@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAF72C08C4;
-	Sun, 15 Feb 2026 23:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CA12E5D17;
+	Sun, 15 Feb 2026 23:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199086; cv=none; b=oGplryiYUjOYotHp1j/z9bSONjhki7dTHRB8zIr9LWGo3otG7+/pA7HlummxJeRR4+U4BknQhs9T1WIcmDOyJvahkZ7zPti7j3GeGKmv+KVxfPcB4NRuCs0iTFHVue0xXhbQOwZi5ZvXXs86WYYX9Fm2RKU5k9V+tgvsy983g3Y=
+	t=1771199091; cv=none; b=hI3wvyY8A9oQj4ckoLqg/XOzHc5nkP8Tr80BdtWe6IBaIVCpOkngT1kV1H0WAjRSWaFPHXA7qJY1uCPPCpYmluAAO3sKHJyktez9BAb/0Opm/yeiv7zFHW4VDSXr7lWfsmbLHqxDIYo9/z/CZiiYM3TdALpDHQsuJ3N03oMZqTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199086; c=relaxed/simple;
-	bh=3rrDHSRDSri7M7s71IQjuy8vdWUBLRb6Dxl+38bP14w=;
+	s=arc-20240116; t=1771199091; c=relaxed/simple;
+	bh=KJozLO0lF2FpzqbaUJL2aSa4aBhSF0NKtk7cOClvuLI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rs/zFo1itKWnh7hNhkzD948c12243aMpXU8mGvGqjhIFl3HXjvOa3fZ7UwwGTLhvTswr64zRDY34Hf3Z+JFBrGg3StstMBxxmLvQ7dRnd0vTGzdvGV4rVy1VzKIXAnP6QJi/KxmR5lZq9YMA+6Z1gzp09SQkjugps6GFD2L9SyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Az8alV7B; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=FSq2yzWxmtRclToyo+jqL+NUrJOHwOUw/0oYi9ks58PY1t92uQl8zLwy+LKs3fl5L/wurfCC8NFtcErWg/3Y9UCixFDMhJ7t51doW6RzjnCz7Vxc3Z92I+LEGAcp6SUnWG2dXQomuoN7qZOkY40DwkcPFm78HJknqT5BzpUtRWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q+2PSU7K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Az8alV7B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 412F1C4CEF7;
-	Sun, 15 Feb 2026 23:44:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+2PSU7K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E54BC4CEF7;
+	Sun, 15 Feb 2026 23:44:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199086;
-	bh=3rrDHSRDSri7M7s71IQjuy8vdWUBLRb6Dxl+38bP14w=;
+	s=k20201202; t=1771199091;
+	bh=KJozLO0lF2FpzqbaUJL2aSa4aBhSF0NKtk7cOClvuLI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Az8alV7BraHRqfL7hqn1+NA0R7pNI58SQGJvj5divghBndBEdJ7+CWNP9YYTwuCvW
-	 xnR+vaaQmP1sIsn8x8tjLpNvnDCbh56EmdBr9xaqP1yY5IQoHoFDgDz3r5JQEyRcqZ
-	 XSeGPCJCBW3BEsaYvNBylzzVvEufatAxXeDpNIBCjdUounvU4KAEGOWq21FtrYyGqm
-	 p/N1/k0Us5fBVlmokfwPcvqXqLxdiA6eqDwKxVlT6SCwd6XmlW+4782dpmicVQ6lp/
-	 lbHcEgBGjOKlEpwOLg4XrnDQzzD+HSCKGcWy6uyuBekezyCnwiy5+VCdAFP7/5IsMZ
-	 OxCBFb8nOKloQ==
+	b=Q+2PSU7KVK894R2Aztskm49ouQ07YfRkNT67DhLkNKw5XawmZyq6qySRtQpyy+saB
+	 mVJCqCqdjTlB1y6P7X24Fu5LTd3da+95pdHalXDcprdYiTnIvLj5J/wxd8ekT5Ai5J
+	 Wkjj9njcLJq4qDAQI+Fqc7ArOvP/CP44APlRwKETRtEI42nRovriFsRO1apokavlUs
+	 Brt6wdP4c9BHfJ2wgp4LZXKhFO9fTadztmUrOIFg8FRrzweKW0Kn7rc4K6MmS84EaS
+	 oKY3LNB4d5MPiSiqKEoWDT0oqp0SqaVrdyzpxexuhFsW7vuKq/n+4QLSpC+rfJZMVl
+	 VFlIDixTWGJvA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:00 +0100
-Subject: [PATCH 13/79] block: rnull: add memory backing
+Date: Mon, 16 Feb 2026 00:35:37 +0100
+Subject: [PATCH 50/79] block: rust: add an abstraction for `struct
+ blk_mq_queue_map`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-13-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-50-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,327 +57,192 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9784; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=3rrDHSRDSri7M7s71IQjuy8vdWUBLRb6Dxl+38bP14w=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgnM2ycmnCqrRa591Gzsguln6y/lmOkye/8U
- u03WEeU+5iJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYJwAKCRDhuBo+eShj
- dzQDD/4+t9unn5Mhb8F+eGinmC5GX+e4Vgm8WLHicT77yJovXDieWRqEZcKzenYhQQpF44ENEuG
- 5RUNKWiHM3Ld1h8Xfhrhn6KEMyfdJXRwRMLVtxqF29PL7pFggp3FrR1o4YC9j1Ohl3XUXCCBUMQ
- KjoN8T4omTMpp7P24ryCxPy9xhOPpZhZIGlQXkhbhCsjefas33oC9eUHu0B8E/XKuW06dOZ4ir+
- nZW1q0FvtPphCJ02Bfham9zg2LyAz3SZCnSMUaKXForaWUtnF/JJBrVNnEPxvk7oylk7/5lXDgr
- wgjrZ9chQDAEujX8ngpxIyNdKJunI6tUkr6PBJIJxbAZsLoqBZ/Sbtxee1g9KGqw4idw/MKU6bs
- cbu/ZoAjf970wlAdt/zgJNu3VRKt0JWQ90UuiHNwZSUyNiVLieslklWD+cr6EPQJHFAqS06xvK8
- S46rxQHj7DXbSZbYaRBaBsTCcGssCHJDwJIFgAOLt5NLs4UzK7RfNCTjTqSGP+ZBowoG0qsLCQo
- L//dMYspPRPLKIrl1S51xt42j1hdnbd/hGbDWnltSU3K2DCbVyoL0oBbD323LGMJDe3mZQpMID0
- ND4pY6RuGedkc/qQkHVe58XTsPKi7+MNoTd2F+u3n83cy9hhPVuJxS6KpYJUHFiHl2Pe/Mdjw2d
- /aEyUyu1Iq58/AA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7024; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=KJozLO0lF2FpzqbaUJL2aSa4aBhSF0NKtk7cOClvuLI=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhIw61luKCnzKfaISJJLxAq6+mHxPJwvpl1v
+ iP3zQiPIySJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYSAAKCRDhuBo+eShj
+ d26FD/4gfr3V2SAN/XvgmWVz1dCEbXu+WeUMPsAAH49GKVtWbtkIiO/6r31TsF16Sb536ocwLdH
+ emuUJDlG0IWhGUn9Lz9qme/Hw7xd1SHBKuWDtnGXTbQA+8jva2+qeMC08WKSP0ygKCLVOPMfnjR
+ Xbv4nOBDi7ElpZ+F6szkqSAPj3wz+fCy+TfpfB4WWZ2hzuoKkcn5Ei1lrvEysMSqg4AwP0VC8/s
+ jTTrcisI392gezwBwij8jQ5Ji3VV+8NDAx4rNLM03hwnqzx7M+6T4rALLxTzW58HWlJjfijKF+G
+ 2+b+6BJn+Lfv3TAi1jWJvgidUL5xAE510CTbU0cSA6mUOvL/Ev2zVViOzI+qvENkta8PH3mAepe
+ 39OpQmA6i1/FKTsEITNCMz51/h8S6I/ua48TThZWl7F6GKVT6lVQj0nn5gZGM/sdfLPris2LhC9
+ 8VxcSXdoG9vr80uOhOLX3m57p78D70sxiEwpL7MrDBDNak7LU0OZxe/DJWvTkkDMmBsEUp2V478
+ ZWfDU/N81fzpEWo0uvKPRGjIU12NYvlS7tIRVQwdSJUq2VWr8Lx6PJ2ZeWHSbyXJMcH4ACcoPLo
+ 8cWW1iXCBlTAEWGHLpiaU+L8M0k0LjLvPvRMKJDQW9xoxXvBIf8mfaAGGn8ZQ/cV77KB6TRL4sk
+ PZfkxR9kYsQ6KXQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add memory backing to the rust null block driver. This implementation will
-always allocate a page on write, even though a page backing the written
-sector is already allocated, in which case the page will be released again.
-A later patch will fix this inefficiency.
+Add the `QueueMap` and `QueueType` types as Rust abstractions for CPU
+to hardware queue mappings. The `QueueMap` type wraps `struct
+blk_mq_queue_map` and provides methods to set up the mapping between
+CPUs and hardware queues.
+
+`QueueType` represents the different queue types: default, read, and
+poll queues.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs |  37 +++++++++++-
- drivers/block/rnull/rnull.rs    | 125 ++++++++++++++++++++++++++++++++++------
- 2 files changed, 144 insertions(+), 18 deletions(-)
+ rust/kernel/block/mq.rs            |  1 +
+ rust/kernel/block/mq/operations.rs | 10 ++--
+ rust/kernel/block/mq/tag_set.rs    | 96 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 102 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 7952f41f42bfd..b5dc30c5d3e20 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -59,7 +59,7 @@ impl AttributeOperations<0> for Config {
+diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+index 057a5f366be3a..cd0bfbcbf317a 100644
+--- a/rust/kernel/block/mq.rs
++++ b/rust/kernel/block/mq.rs
+@@ -136,4 +136,5 @@
+ pub use request::Request;
+ pub use request::RequestTimerHandle;
+ pub use request_queue::RequestQueue;
++pub use tag_set::QueueType;
+ pub use tag_set::TagSet;
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index 017fad010d174..28dd4b28d203f 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -102,8 +102,8 @@ fn report_zones(
+         Err(ENOTSUPP)
+     }
  
-     fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-         let mut writer = kernel::str::Formatter::new(page);
--        writer.write_str("blocksize,size,rotational,irqmode,completion_nsec\n")?;
-+        writer.write_str("blocksize,size,rotational,irqmode,completion_nsec,memory_backed\n")?;
-         Ok(writer.bytes_written())
+-    /// Called by the kernel to map submission queues to CPU cores.
+-    fn map_queues(_tag_set: &TagSet<Self>) {
++    /// Called by the kernel to map hardware queues to CPU cores.
++    fn map_queues(_tag_set: Pin<&mut TagSet<Self>>) {
+         build_error!(crate::error::VTABLE_DEFAULT_ERROR)
      }
  }
-@@ -83,6 +83,7 @@ fn make_group(
-                 size: 3,
-                 irqmode: 4,
-                 completion_nsec: 5,
-+                memory_backed: 6,
-             ],
-         };
- 
-@@ -100,6 +101,7 @@ fn make_group(
-                     irq_mode: IRQMode::None,
-                     completion_time: time::Delta::ZERO,
-                     name: name.try_into()?,
-+                    memory_backed: false,
-                 }),
-             }),
-             core::iter::empty(),
-@@ -154,6 +156,7 @@ struct DeviceConfigInner {
-     irq_mode: IRQMode,
-     completion_time: time::Delta,
-     disk: Option<GenDisk<NullBlkDevice>>,
-+    memory_backed: bool,
- }
- 
- #[vtable]
-@@ -184,6 +187,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                 guard.capacity_mib,
-                 guard.irq_mode,
-                 guard.completion_time,
-+                guard.memory_backed,
-             )?);
-             guard.powered = true;
-         } else if guard.powered && !power_op {
-@@ -209,3 +213,34 @@ fn from_str(s: &str) -> Result<Self> {
-         value.try_into()
+@@ -408,9 +408,9 @@ impl<T: Operations> OperationsVTable<T> {
+     /// must be a pointer to a valid and initialized `TagSet<T>`. The pointee
+     /// must be valid for use as a reference at least the duration of this call.
+     unsafe extern "C" fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
+-        // SAFETY: The safety requirements of this function satiesfies the
+-        // requirements of `TagSet::from_ptr`.
+-        let tag_set = unsafe { TagSet::from_ptr(tag_set) };
++        // SAFETY: By C API contract `tag_set` is the tag set registered with the `GenDisk` created
++        // by `GenDiskBuilder`.
++        let tag_set = unsafe { TagSet::from_ptr_mut(tag_set) };
+         T::map_queues(tag_set);
      }
- }
+ 
+diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
+index 330ff28c91507..e6edc5bc39312 100644
+--- a/rust/kernel/block/mq/tag_set.rs
++++ b/rust/kernel/block/mq/tag_set.rs
+@@ -97,11 +97,46 @@ pub(crate) fn raw_tag_set(&self) -> *mut bindings::blk_mq_tag_set {
+     /// `ptr` must be a pointer to a valid and initialized `TagSet<T>`. There
+     /// may be no other mutable references to the tag set. The pointee must be
+     /// live and valid at least for the duration of the returned lifetime `'a`.
++    #[expect(dead_code)]
+     pub(crate) unsafe fn from_ptr<'a>(ptr: *mut bindings::blk_mq_tag_set) -> &'a Self {
+         // SAFETY: By the safety requirements of this function, `ptr` is valid
+         // for use as a reference for the duration of `'a`.
+         unsafe { &*(ptr.cast::<Self>()) }
+     }
 +
-+#[vtable]
-+impl configfs::AttributeOperations<6> for DeviceConfig {
-+    type Data = DeviceConfig;
++    /// Create a `TagSet<T>` from a raw pointer.
++    ///
++    /// # Safety
++    ///
++    /// `ptr` must be a pointer to a valid and initialized `TagSet<T>`. There
++    /// may be no other mutable references to the tag set. The pointee must be
++    /// live and valid at least for the duration of the returned lifetime `'a`.
++    pub(crate) unsafe fn from_ptr_mut<'a>(ptr: *mut bindings::blk_mq_tag_set) -> Pin<&'a mut Self> {
++        // SAFETY: By function safety requirements, `ptr` is valid for use as a mutable reference.
++        let mref = unsafe { &mut *(ptr.cast::<Self>()) };
 +
-+    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-+        let mut writer = kernel::str::Formatter::new(page);
-+
-+        if this.data.lock().memory_backed {
-+            writer.write_fmt(fmt!("1\n"))?;
-+        } else {
-+            writer.write_fmt(fmt!("0\n"))?;
-+        }
-+
-+        Ok(writer.bytes_written())
++        // SAFETY: We never move out of `mref`.
++        unsafe { Pin::new_unchecked(mref) }
 +    }
 +
-+    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-+        if this.data.lock().powered {
-+            return Err(EBUSY);
++    /// Helper function to invoke a closure each hardware queue type supported.
++    ///
++    /// This function invokes `cb` for each variant of [`QueueType`] that this [`TagSet`] supports.
++    /// This is helpful for setting up CPU to hardware queue maps in the [`Operations::map_queues`]
++    /// callback.
++    pub fn update_maps(self: Pin<&mut Self>, mut cb: impl FnMut(QueueMap)) -> Result {
++        // SAFETY: By type invariant, `self.inner` is valid.
++        let nr_maps = unsafe { (*self.inner.get()).nr_maps };
++        for i in 0..nr_maps {
++            cb(QueueMap {
++                // SAFETY: By type invariant, `self.inner` is valid.
++                map: unsafe { &raw mut (*self.inner.get()).map[i as usize] },
++                kind: i.try_into()?,
++            });
 +        }
 +
-+        this.data.lock().memory_backed = core::str::from_utf8(page)?
-+            .trim()
-+            .parse::<u8>()
-+            .map_err(|_| kernel::error::code::EINVAL)?
-+            != 0;
-+
 +        Ok(())
++    }
+ }
+ 
+ #[pinned_drop]
+@@ -125,3 +160,64 @@ unsafe impl<T: Operations> Sync for TagSet<T> {}
+ 
+ // SAFETY: It is safe to share references to `TagSet` across thread boundaries.
+ unsafe impl<T: Operations> Send for TagSet<T> {}
++
++/// A [`TagSet`] CPU to hardware queue mapping.
++///
++/// # Invariants
++///
++/// - `self.map` points to a valid `blk_mq_queue_map`
++pub struct QueueMap {
++    map: *mut bindings::blk_mq_queue_map,
++    kind: QueueType,
++}
++
++impl QueueMap {
++    /// Set the number of queues for this mapping kind.
++    pub fn set_queue_count(&mut self, nr_queues: u32) {
++        // SAFETY: By type invariant, `self.map` is valid.
++        unsafe { (*self.map).nr_queues = nr_queues }
++    }
++
++    /// First hardware queue to map this queue kind onto. Used by the PCIe NVMe driver to map each
++    /// hardware queue type ([`QueueType`]) onto a distinct set of hardware queues.
++    pub fn set_offset(&mut self, offset: u32) {
++        // SAFETY: By type invariant, `self.map` is valid.
++        unsafe { (*self.map).queue_offset = offset }
++    }
++
++    /// Effectuate the mapping described by [`Self`].
++    pub fn map_queues(&self) {
++        // SAFETY: By type invariant, `self.map` is valid.
++        unsafe { bindings::blk_mq_map_queues(self.map) }
++    }
++
++    /// Return the kind of this queue mapping.
++    pub fn kind(&self) -> QueueType {
++        self.kind
 +    }
 +}
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 33c1144550a0e..a1156a368c467 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -6,8 +6,10 @@
- 
- use configfs::IRQMode;
- use kernel::{
-+    bindings,
-     block::{
-         self,
-+        bio::Segment,
-         mq::{
-             self,
-             gen_disk::{
-@@ -19,15 +21,12 @@
-         },
-     },
-     error::Result,
--    new_mutex,
-+    new_mutex, new_xarray,
-+    page::SafePage,
-     pr_info,
-     prelude::*,
-     str::CString,
--    sync::{
--        aref::ARef,
--        Arc,
--        Mutex, //
--    },
-+    sync::{aref::ARef, Arc, Mutex},
-     time::{
-         hrtimer::{
-             HrTimerCallback,
-@@ -40,7 +39,8 @@
-     types::{
-         OwnableRefCounted,
-         Owned, //
--    }, //
-+    },
-+    xarray::XArray,
- };
- use pin_init::PinInit;
- 
-@@ -76,6 +76,10 @@
-             default: 10_000,
-             description:  "Time in ns to complete a request in hardware. Default: 10,000ns",
-         },
-+        memory_backed: u8 {
-+            default: 0,
-+            description: "Create a memory-backed block device. 0-false, 1-true. Default: 0",
-+        },
-     },
- }
- 
-@@ -105,6 +109,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                     *module_parameters::gb.value() * 1024,
-                     (*module_parameters::irqmode.value()).try_into()?,
-                     Delta::from_nanos(completion_time),
-+                    *module_parameters::memory_backed.value() != 0,
-                 )?;
-                 disks.push(disk, GFP_KERNEL)?;
-             }
-@@ -129,17 +134,23 @@ fn new(
-         capacity_mib: u64,
-         irq_mode: IRQMode,
-         completion_time: Delta,
-+        memory_backed: bool,
-     ) -> Result<GenDisk<Self>> {
--        let tagset = Arc::pin_init(
--            TagSet::new(1, 256, 1, mq::tag_set::Flags::default()),
--            GFP_KERNEL,
--        )?;
-+        let flags = if memory_backed {
-+            mq::tag_set::Flag::Blocking.into()
-+        } else {
-+            mq::tag_set::Flags::default()
-+        };
 +
-+        let tagset = Arc::pin_init(TagSet::new(1, 256, 1, flags), GFP_KERNEL)?;
- 
--        let queue_data = Box::new(
--            QueueData {
-+        let queue_data = Box::pin_init(
-+            pin_init!(QueueData {
-+                tree <- new_xarray!(kernel::xarray::AllocKind::Alloc),
-                 irq_mode,
-                 completion_time,
--            },
-+                memory_backed,
-+            }),
-             GFP_KERNEL,
-         )?;
- 
-@@ -150,11 +161,72 @@ fn new(
-             .rotational(rotational)
-             .build(fmt!("{}", name.to_str()?), tagset, queue_data)
-     }
++/// Type of hardware queue.
++#[derive(Copy, Clone, Debug, PartialEq, Eq)]
++#[repr(u32)]
++pub enum QueueType {
++    /// All I/O not otherwise accounted for.
++    Default = bindings::hctx_type_HCTX_TYPE_DEFAULT,
++    /// Just for READ I/O.
++    Read = bindings::hctx_type_HCTX_TYPE_READ,
++    ///  Polled I/O of any kind.
++    Poll = bindings::hctx_type_HCTX_TYPE_POLL,
++}
 +
-+    #[inline(always)]
-+    fn write(tree: &Tree, mut sector: usize, mut segment: Segment<'_>) -> Result {
-+        while !segment.is_empty() {
-+            let page = SafePage::alloc_page(GFP_NOIO)?;
-+            let mut tree = tree.lock();
++impl TryFrom<u32> for QueueType {
++    type Error = kernel::error::Error;
 +
-+            let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
-+
-+            let page = if let Some(page) = tree.get_mut(page_idx) {
-+                page
-+            } else {
-+                tree.store(page_idx, page, GFP_NOIO)?;
-+                tree.get_mut(page_idx).unwrap()
-+            };
-+
-+            let page_offset = (sector & block::SECTOR_MASK as usize) << block::SECTOR_SHIFT;
-+            sector += segment.copy_to_page(page, page_offset) >> block::SECTOR_SHIFT;
++    fn try_from(value: u32) -> core::result::Result<Self, Self::Error> {
++        match value {
++            bindings::hctx_type_HCTX_TYPE_DEFAULT => Ok(QueueType::Default),
++            bindings::hctx_type_HCTX_TYPE_READ => Ok(QueueType::Read),
++            bindings::hctx_type_HCTX_TYPE_POLL => Ok(QueueType::Poll),
++            _ => Err(kernel::error::code::EINVAL),
 +        }
-+        Ok(())
 +    }
-+
-+    #[inline(always)]
-+    fn read(tree: &Tree, mut sector: usize, mut segment: Segment<'_>) -> Result {
-+        let tree = tree.lock();
-+
-+        while !segment.is_empty() {
-+            let idx = sector >> block::PAGE_SECTORS_SHIFT;
-+
-+            if let Some(page) = tree.get(idx) {
-+                let page_offset = (sector & block::SECTOR_MASK as usize) << block::SECTOR_SHIFT;
-+                sector += segment.copy_from_page(page, page_offset) >> block::SECTOR_SHIFT;
-+            } else {
-+                sector += segment.zero_page() >> block::SECTOR_SHIFT;
-+            }
-+        }
-+
-+        Ok(())
-+    }
-+
-+    #[inline(never)]
-+    fn transfer(
-+        command: bindings::req_op,
-+        tree: &Tree,
-+        sector: usize,
-+        segment: Segment<'_>,
-+    ) -> Result {
-+        match command {
-+            bindings::req_op_REQ_OP_WRITE => Self::write(tree, sector, segment)?,
-+            bindings::req_op_REQ_OP_READ => Self::read(tree, sector, segment)?,
-+            _ => (),
-+        }
-+        Ok(())
-+    }
- }
- 
-+type TreeNode = Owned<SafePage>;
-+type Tree = XArray<TreeNode>;
-+
-+#[pin_data]
- struct QueueData {
-+    #[pin]
-+    tree: Tree,
-     irq_mode: IRQMode,
-     completion_time: Delta,
-+    memory_backed: bool,
- }
- 
- #[pin_data]
-@@ -184,7 +256,7 @@ impl HasHrTimer<Self> for Pdu {
- 
- #[vtable]
- impl Operations for NullBlkDevice {
--    type QueueData = KBox<QueueData>;
-+    type QueueData = Pin<KBox<QueueData>>;
-     type RequestData = Pdu;
- 
-     fn new_request_data() -> impl PinInit<Self::RequestData> {
-@@ -194,7 +266,26 @@ fn new_request_data() -> impl PinInit<Self::RequestData> {
-     }
- 
-     #[inline(always)]
--    fn queue_rq(queue_data: &QueueData, rq: Owned<mq::Request<Self>>, _is_last: bool) -> Result {
-+    fn queue_rq(
-+        queue_data: Pin<&QueueData>,
-+        mut rq: Owned<mq::Request<Self>>,
-+        _is_last: bool,
-+    ) -> Result {
-+        if queue_data.memory_backed {
-+            let tree = &queue_data.tree;
-+            let command = rq.command();
-+            let mut sector = rq.sector();
-+
-+            for bio in rq.bio_iter_mut() {
-+                let segment_iter = bio.segment_iter();
-+                for segment in segment_iter {
-+                    let length = segment.len();
-+                    Self::transfer(command, tree, sector, segment)?;
-+                    sector += length as usize >> block::SECTOR_SHIFT;
-+                }
-+            }
-+        }
-+
-         match queue_data.irq_mode {
-             IRQMode::None => rq.end_ok(),
-             IRQMode::Soft => mq::Request::complete(rq.into()),
-@@ -207,7 +298,7 @@ fn queue_rq(queue_data: &QueueData, rq: Owned<mq::Request<Self>>, _is_last: bool
-         Ok(())
-     }
- 
--    fn commit_rqs(_queue_data: &QueueData) {}
-+    fn commit_rqs(_queue_data: Pin<&QueueData>) {}
- 
-     fn complete(rq: ARef<mq::Request<Self>>) {
-         OwnableRefCounted::try_from_shared(rq)
++}
 
 -- 
 2.51.2
