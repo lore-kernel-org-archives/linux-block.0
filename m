@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CA12E5D17;
-	Sun, 15 Feb 2026 23:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533B530F533;
+	Sun, 15 Feb 2026 23:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199091; cv=none; b=hI3wvyY8A9oQj4ckoLqg/XOzHc5nkP8Tr80BdtWe6IBaIVCpOkngT1kV1H0WAjRSWaFPHXA7qJY1uCPPCpYmluAAO3sKHJyktez9BAb/0Opm/yeiv7zFHW4VDSXr7lWfsmbLHqxDIYo9/z/CZiiYM3TdALpDHQsuJ3N03oMZqTA=
+	t=1771199096; cv=none; b=tNUaFVzN9Ki7kwV7OQNcc5eTW5UItNwZXXEKQ1h21hqi9/jT47tYISCYn2WsS1fOdHwu6i9KV52q8luuwY2jeJir2dSsIWK1x37/Gw1/muBuM+M0VRzpKFYuxfJFy9NRtAZqhVHWtaP1nb1Gqx5cpD3kq7BEyiRGjXBWSpkmMW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199091; c=relaxed/simple;
-	bh=KJozLO0lF2FpzqbaUJL2aSa4aBhSF0NKtk7cOClvuLI=;
+	s=arc-20240116; t=1771199096; c=relaxed/simple;
+	bh=Px3eI2zDMAVJLYyUnOivw8WZDG9ekgsY8W3TNggTDzU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FSq2yzWxmtRclToyo+jqL+NUrJOHwOUw/0oYi9ks58PY1t92uQl8zLwy+LKs3fl5L/wurfCC8NFtcErWg/3Y9UCixFDMhJ7t51doW6RzjnCz7Vxc3Z92I+LEGAcp6SUnWG2dXQomuoN7qZOkY40DwkcPFm78HJknqT5BzpUtRWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q+2PSU7K; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=q9YyHaBdZv1F8hDbPmrro7C0rwT+LGH4r6X4zqCoGp7Gsabx82jLXdb6wuQezlkuNXHKLe+QA1OOUfJXGCY+IAvnGI+uSuhzEL6NKktKWetqCV/Q6vZEz1/No85QOjUr+WEnzBZLFvIwogbCj2ZZtcT0dpP39aWPhgbuXKNrzZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lh34cizW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+2PSU7K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E54BC4CEF7;
-	Sun, 15 Feb 2026 23:44:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lh34cizW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF8BAC4CEF7;
+	Sun, 15 Feb 2026 23:44:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199091;
-	bh=KJozLO0lF2FpzqbaUJL2aSa4aBhSF0NKtk7cOClvuLI=;
+	s=k20201202; t=1771199096;
+	bh=Px3eI2zDMAVJLYyUnOivw8WZDG9ekgsY8W3TNggTDzU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Q+2PSU7KVK894R2Aztskm49ouQ07YfRkNT67DhLkNKw5XawmZyq6qySRtQpyy+saB
-	 mVJCqCqdjTlB1y6P7X24Fu5LTd3da+95pdHalXDcprdYiTnIvLj5J/wxd8ekT5Ai5J
-	 Wkjj9njcLJq4qDAQI+Fqc7ArOvP/CP44APlRwKETRtEI42nRovriFsRO1apokavlUs
-	 Brt6wdP4c9BHfJ2wgp4LZXKhFO9fTadztmUrOIFg8FRrzweKW0Kn7rc4K6MmS84EaS
-	 oKY3LNB4d5MPiSiqKEoWDT0oqp0SqaVrdyzpxexuhFsW7vuKq/n+4QLSpC+rfJZMVl
-	 VFlIDixTWGJvA==
+	b=Lh34cizW7d/gBLwSVeE4ys9vsfLxOpCx97lcyLN9wxX6puurpKIPB60ex0e5s2pek
+	 YjX/ebbARJzLTG04MyEdPzMVV8Tgdw/dwPJGNal7y41AdpZ3PKjDvhcvhYMpTW0jkd
+	 DNsXPxviMaBGEAsG/BzwPx7ZU5gUJR3UAZJxbJ9AW4wL4eL80+fsb0zBRIe6sprGiM
+	 xnOJvxKjn+0I1dbfo5ntcXOhQvoEJVqfjDFDMFMoa+mzPsu78A9Plf5iKkq/s6Wl5C
+	 sPHH3+IahusncPzCzzai6AmDK4+YLxoY0evmg5qON45mmAfw6IklPFobLgFDXdrtou
+	 JOvITASMzTdng==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:37 +0100
-Subject: [PATCH 50/79] block: rust: add an abstraction for `struct
- blk_mq_queue_map`
+Date: Mon, 16 Feb 2026 00:34:59 +0100
+Subject: [PATCH 12/79] block: rust: add `TagSet` flags
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-50-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-12-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -57,190 +56,143 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7024; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=KJozLO0lF2FpzqbaUJL2aSa4aBhSF0NKtk7cOClvuLI=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhIw61luKCnzKfaISJJLxAq6+mHxPJwvpl1v
- iP3zQiPIySJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYSAAKCRDhuBo+eShj
- d26FD/4gfr3V2SAN/XvgmWVz1dCEbXu+WeUMPsAAH49GKVtWbtkIiO/6r31TsF16Sb536ocwLdH
- emuUJDlG0IWhGUn9Lz9qme/Hw7xd1SHBKuWDtnGXTbQA+8jva2+qeMC08WKSP0ygKCLVOPMfnjR
- Xbv4nOBDi7ElpZ+F6szkqSAPj3wz+fCy+TfpfB4WWZ2hzuoKkcn5Ei1lrvEysMSqg4AwP0VC8/s
- jTTrcisI392gezwBwij8jQ5Ji3VV+8NDAx4rNLM03hwnqzx7M+6T4rALLxTzW58HWlJjfijKF+G
- 2+b+6BJn+Lfv3TAi1jWJvgidUL5xAE510CTbU0cSA6mUOvL/Ev2zVViOzI+qvENkta8PH3mAepe
- 39OpQmA6i1/FKTsEITNCMz51/h8S6I/ua48TThZWl7F6GKVT6lVQj0nn5gZGM/sdfLPris2LhC9
- 8VxcSXdoG9vr80uOhOLX3m57p78D70sxiEwpL7MrDBDNak7LU0OZxe/DJWvTkkDMmBsEUp2V478
- ZWfDU/N81fzpEWo0uvKPRGjIU12NYvlS7tIRVQwdSJUq2VWr8Lx6PJ2ZeWHSbyXJMcH4ACcoPLo
- 8cWW1iXCBlTAEWGHLpiaU+L8M0k0LjLvPvRMKJDQW9xoxXvBIf8mfaAGGn8ZQ/cV77KB6TRL4sk
- PZfkxR9kYsQ6KXQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4410; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=Px3eI2zDMAVJLYyUnOivw8WZDG9ekgsY8W3TNggTDzU=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgmG/fV80AH9+jNFOPrjKBYXkqkQyBHVCZEq
+ oBbsCPTrhOJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYJgAKCRDhuBo+eShj
+ dy2UD/4oSy3vFK2Ftcro2uRPRmoKZLNWf32I0hhmtmP678KPwSICk/IrlxiYYhnymniK9BKQa5d
+ 5KcVEYOR1sET2O5Yl1YQ3LBgLxVdRTQck6w98SZBT5b14hXnnSDh7re/DfJMArLV+BYyzFYSdpu
+ bVk3syb0ZLc9gMOdL+rNBTIYRFI/7O/LRceo3pTAanFs33idABcN2sTUhQE80/hS8KPUX822thb
+ 9rws+ncn3h0w6/xkR0jpPS30yjl9Cx3cjezlE3esWeVTVL6edNP4U9ohZSgS6VgTbrLxUdpse3i
+ TOMvfF/K0ggKh1dZWgXkkGFTGUuTfCZUp4TY2HcLzJmZClMwf/zY6A1KwHRlkT/NaqhtZv2A1t0
+ fA6HP6ysJx5YDnRpAtBNk0x0W0FpJzAmO2Jcvz9vWqbbQhVITHwUt/ghW3H4h8izrNl3tK17zYu
+ LrEBWs0SgTmbXo1RLsY3+ylr9iT31SuEx1DcNL5ty/FR5C9Nq5kUkCvKkmnFxasoAJDtv7yd6n5
+ lyL0SHlB0pJ87F6LAfBz15p7x0EJCK6FAs3aVO4/6dcrLKlaFFrySaEcuOP9+GASye/21wQEbFY
+ EKKUhH2/Lxv/5WJI9obMOKll1+CvHy+r2jq+fweRjr+Vd1MEFg3gIEwGhenEY9K1ze9p2pLCVOZ
+ BLLMwQb1LMThPfw==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add the `QueueMap` and `QueueType` types as Rust abstractions for CPU
-to hardware queue mappings. The `QueueMap` type wraps `struct
-blk_mq_queue_map` and provides methods to set up the mapping between
-CPUs and hardware queues.
+Add support for `TagSet` flags by introducing a `Flags` type and adding
+a flags parameter to `TagSet::new`. This allows configuring tagset
+behavior such as blocking vs non-blocking operation.
 
-`QueueType` represents the different queue types: default, read, and
-poll queues.
+The Flags type supports bitwise operations and provides values like
+`Blocking` for common use cases. The module documentation example is
+updated to demonstrate the new API.
+
+For now, only a single flag is added.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq.rs            |  1 +
- rust/kernel/block/mq/operations.rs | 10 ++--
- rust/kernel/block/mq/tag_set.rs    | 96 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 102 insertions(+), 5 deletions(-)
+ drivers/block/rnull/rnull.rs          |  5 ++++-
+ rust/kernel/block/mq.rs               |  6 +++---
+ rust/kernel/block/mq/tag_set.rs       |  7 ++++++-
+ rust/kernel/block/mq/tag_set/flags.rs | 19 +++++++++++++++++++
+ 4 files changed, 32 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 55e56c39f1c2c..33c1144550a0e 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -130,7 +130,10 @@ fn new(
+         irq_mode: IRQMode,
+         completion_time: Delta,
+     ) -> Result<GenDisk<Self>> {
+-        let tagset = Arc::pin_init(TagSet::new(1, 256, 1), GFP_KERNEL)?;
++        let tagset = Arc::pin_init(
++            TagSet::new(1, 256, 1, mq::tag_set::Flags::default()),
++            GFP_KERNEL,
++        )?;
+ 
+         let queue_data = Box::new(
+             QueueData {
 diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 057a5f366be3a..cd0bfbcbf317a 100644
+index 884bf18abbba5..76e790cdb1f8f 100644
 --- a/rust/kernel/block/mq.rs
 +++ b/rust/kernel/block/mq.rs
-@@ -136,4 +136,5 @@
+@@ -57,7 +57,7 @@
+ //!
+ //! ```rust
+ //! use kernel::{
+-//!     block::mq::*,
++//!     block::mq::{self, *},
+ //!     new_mutex,
+ //!     prelude::*,
+ //!     sync::{aref::ARef, Arc, Mutex},
+@@ -92,7 +92,7 @@
+ //! }
+ //!
+ //! let tagset: Arc<TagSet<MyBlkDevice>> =
+-//!     Arc::pin_init(TagSet::new(1, 256, 1), GFP_KERNEL)?;
++//!     Arc::pin_init(TagSet::new(1, 256, 1, mq::tag_set::Flags::default()), GFP_KERNEL)?;
+ //! let mut disk = gen_disk::GenDiskBuilder::new()
+ //!     .capacity_sectors(4096)
+ //!     .build(fmt!("myblk"), tagset, ())?;
+@@ -103,7 +103,7 @@
+ pub mod gen_disk;
+ mod operations;
+ mod request;
+-mod tag_set;
++pub mod tag_set;
+ 
+ pub use operations::Operations;
  pub use request::Request;
- pub use request::RequestTimerHandle;
- pub use request_queue::RequestQueue;
-+pub use tag_set::QueueType;
- pub use tag_set::TagSet;
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 017fad010d174..28dd4b28d203f 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -102,8 +102,8 @@ fn report_zones(
-         Err(ENOTSUPP)
-     }
- 
--    /// Called by the kernel to map submission queues to CPU cores.
--    fn map_queues(_tag_set: &TagSet<Self>) {
-+    /// Called by the kernel to map hardware queues to CPU cores.
-+    fn map_queues(_tag_set: Pin<&mut TagSet<Self>>) {
-         build_error!(crate::error::VTABLE_DEFAULT_ERROR)
-     }
- }
-@@ -408,9 +408,9 @@ impl<T: Operations> OperationsVTable<T> {
-     /// must be a pointer to a valid and initialized `TagSet<T>`. The pointee
-     /// must be valid for use as a reference at least the duration of this call.
-     unsafe extern "C" fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
--        // SAFETY: The safety requirements of this function satiesfies the
--        // requirements of `TagSet::from_ptr`.
--        let tag_set = unsafe { TagSet::from_ptr(tag_set) };
-+        // SAFETY: By C API contract `tag_set` is the tag set registered with the `GenDisk` created
-+        // by `GenDiskBuilder`.
-+        let tag_set = unsafe { TagSet::from_ptr_mut(tag_set) };
-         T::map_queues(tag_set);
-     }
- 
 diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
-index 330ff28c91507..e6edc5bc39312 100644
+index 46481754b1335..af214f7dd0c10 100644
 --- a/rust/kernel/block/mq/tag_set.rs
 +++ b/rust/kernel/block/mq/tag_set.rs
-@@ -97,11 +97,46 @@ pub(crate) fn raw_tag_set(&self) -> *mut bindings::blk_mq_tag_set {
-     /// `ptr` must be a pointer to a valid and initialized `TagSet<T>`. There
-     /// may be no other mutable references to the tag set. The pointee must be
-     /// live and valid at least for the duration of the returned lifetime `'a`.
-+    #[expect(dead_code)]
-     pub(crate) unsafe fn from_ptr<'a>(ptr: *mut bindings::blk_mq_tag_set) -> &'a Self {
-         // SAFETY: By the safety requirements of this function, `ptr` is valid
-         // for use as a reference for the duration of `'a`.
-         unsafe { &*(ptr.cast::<Self>()) }
-     }
-+
-+    /// Create a `TagSet<T>` from a raw pointer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// `ptr` must be a pointer to a valid and initialized `TagSet<T>`. There
-+    /// may be no other mutable references to the tag set. The pointee must be
-+    /// live and valid at least for the duration of the returned lifetime `'a`.
-+    pub(crate) unsafe fn from_ptr_mut<'a>(ptr: *mut bindings::blk_mq_tag_set) -> Pin<&'a mut Self> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as a mutable reference.
-+        let mref = unsafe { &mut *(ptr.cast::<Self>()) };
-+
-+        // SAFETY: We never move out of `mref`.
-+        unsafe { Pin::new_unchecked(mref) }
-+    }
-+
-+    /// Helper function to invoke a closure each hardware queue type supported.
-+    ///
-+    /// This function invokes `cb` for each variant of [`QueueType`] that this [`TagSet`] supports.
-+    /// This is helpful for setting up CPU to hardware queue maps in the [`Operations::map_queues`]
-+    /// callback.
-+    pub fn update_maps(self: Pin<&mut Self>, mut cb: impl FnMut(QueueMap)) -> Result {
-+        // SAFETY: By type invariant, `self.inner` is valid.
-+        let nr_maps = unsafe { (*self.inner.get()).nr_maps };
-+        for i in 0..nr_maps {
-+            cb(QueueMap {
-+                // SAFETY: By type invariant, `self.inner` is valid.
-+                map: unsafe { &raw mut (*self.inner.get()).map[i as usize] },
-+                kind: i.try_into()?,
-+            });
-+        }
-+
-+        Ok(())
-+    }
- }
+@@ -16,6 +16,10 @@
+ use core::{convert::TryInto, marker::PhantomData};
+ use pin_init::{pin_data, pinned_drop, PinInit};
  
- #[pinned_drop]
-@@ -125,3 +160,64 @@ unsafe impl<T: Operations> Sync for TagSet<T> {}
- 
- // SAFETY: It is safe to share references to `TagSet` across thread boundaries.
- unsafe impl<T: Operations> Send for TagSet<T> {}
++mod flags;
++pub use flags::Flag;
++pub use flags::Flags;
 +
-+/// A [`TagSet`] CPU to hardware queue mapping.
-+///
-+/// # Invariants
-+///
-+/// - `self.map` points to a valid `blk_mq_queue_map`
-+pub struct QueueMap {
-+    map: *mut bindings::blk_mq_queue_map,
-+    kind: QueueType,
-+}
+ /// A wrapper for the C `struct blk_mq_tag_set`.
+ ///
+ /// `struct blk_mq_tag_set` contains a `struct list_head` and so must be pinned.
+@@ -37,6 +41,7 @@ pub fn new(
+         nr_hw_queues: u32,
+         num_tags: u32,
+         num_maps: u32,
++        flags: Flags,
+     ) -> impl PinInit<Self, error::Error> {
+         // SAFETY: `blk_mq_tag_set` only contains integers and pointers, which
+         // all are allowed to be 0.
+@@ -51,7 +56,7 @@ pub fn new(
+                     numa_node: bindings::NUMA_NO_NODE,
+                     queue_depth: num_tags,
+                     cmd_size,
+-                    flags: 0,
++                    flags: flags.into_inner(),
+                     driver_data: core::ptr::null_mut::<crate::ffi::c_void>(),
+                     nr_maps: num_maps,
+                     ..tag_set
+diff --git a/rust/kernel/block/mq/tag_set/flags.rs b/rust/kernel/block/mq/tag_set/flags.rs
+new file mode 100644
+index 0000000000000..768db938b9a95
+--- /dev/null
++++ b/rust/kernel/block/mq/tag_set/flags.rs
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+impl QueueMap {
-+    /// Set the number of queues for this mapping kind.
-+    pub fn set_queue_count(&mut self, nr_queues: u32) {
-+        // SAFETY: By type invariant, `self.map` is valid.
-+        unsafe { (*self.map).nr_queues = nr_queues }
-+    }
++use kernel::prelude::*;
 +
-+    /// First hardware queue to map this queue kind onto. Used by the PCIe NVMe driver to map each
-+    /// hardware queue type ([`QueueType`]) onto a distinct set of hardware queues.
-+    pub fn set_offset(&mut self, offset: u32) {
-+        // SAFETY: By type invariant, `self.map` is valid.
-+        unsafe { (*self.map).queue_offset = offset }
-+    }
++impl_flags! {
 +
-+    /// Effectuate the mapping described by [`Self`].
-+    pub fn map_queues(&self) {
-+        // SAFETY: By type invariant, `self.map` is valid.
-+        unsafe { bindings::blk_mq_map_queues(self.map) }
-+    }
++    /// Flags to be used when creating [`super::TagSet`] objects.
++    #[derive(Debug, Clone, Default, Copy, PartialEq, Eq)]
++    pub struct Flags(u32);
 +
-+    /// Return the kind of this queue mapping.
-+    pub fn kind(&self) -> QueueType {
-+        self.kind
-+    }
-+}
-+
-+/// Type of hardware queue.
-+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-+#[repr(u32)]
-+pub enum QueueType {
-+    /// All I/O not otherwise accounted for.
-+    Default = bindings::hctx_type_HCTX_TYPE_DEFAULT,
-+    /// Just for READ I/O.
-+    Read = bindings::hctx_type_HCTX_TYPE_READ,
-+    ///  Polled I/O of any kind.
-+    Poll = bindings::hctx_type_HCTX_TYPE_POLL,
-+}
-+
-+impl TryFrom<u32> for QueueType {
-+    type Error = kernel::error::Error;
-+
-+    fn try_from(value: u32) -> core::result::Result<Self, Self::Error> {
-+        match value {
-+            bindings::hctx_type_HCTX_TYPE_DEFAULT => Ok(QueueType::Default),
-+            bindings::hctx_type_HCTX_TYPE_READ => Ok(QueueType::Read),
-+            bindings::hctx_type_HCTX_TYPE_POLL => Ok(QueueType::Poll),
-+            _ => Err(kernel::error::code::EINVAL),
-+        }
++    /// Allowed values for [`Flags`].
++    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
++    pub enum Flag {
++        /// Indicate that the queues associated with this tag set might sleep when
++        /// processing IO. When this flag is not set, IO is processed in atomic
++        /// context. When this flag is set, IO is processed in process context.
++        Blocking = bindings::BLK_MQ_F_BLOCKING,
 +    }
 +}
 
