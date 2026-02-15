@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF3930CD94;
-	Sun, 15 Feb 2026 23:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EE92E92B7;
+	Sun, 15 Feb 2026 23:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199181; cv=none; b=joUe8DTAyybxEvQ4FHe8I8nt2CaezLrF0LGu8AYul3KNjo5pyX/qwgVi+9S8b1XFkLBhaOcpK1XVAhVK+z93wI9Z9Khd6qDt7UCfz+/MLuPBrojMlHrRCJONTmlm7j/PsQq8ZrCurxOPbSUZ59JazEQmdPRMMH6SUqQm8I87Ptw=
+	t=1771199186; cv=none; b=uOauQ4STyU58i6te8QOqgOAEsh8yZ3Zd3V6PWrLhg4ETbZ3Lc2109iROJSaRfXKHAbPb4gBHgYnNxfw9v9LiXITZFy3rALX80ANtkVDwHfNSOfW+pY643t2UWGbx5CN8LDn4FzGDktqilHMJc/XNSPJRJKK4ye1jE7P04UBVUAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199181; c=relaxed/simple;
-	bh=9wLxYaTCPfOG5uonTZ2h8ocU8FWs+hSDrEKcM2sv5z4=;
+	s=arc-20240116; t=1771199186; c=relaxed/simple;
+	bh=KwNsjS9BksChOKWlphQ7tBX5Ukevdabgk4N9RSuoPnU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DlaRhCz4p0LLG/VnxxWTt1LPqSpYlNQwiorUfc1hoUiL8uuoP/X+rrCau22mgq5kX37nTTStWbiYKFYgGVozvDUOw2INX/Raic6m+22Meq8adxMvG9Qhjt5oATQ+BFSNHLMnvCwKxVkRl5iIhoe4V2xu8LZmzBjlUroaog+3ooY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjCDYQsR; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Cjzn4OtMpHf/vbT7i9S1LCODQtIQcvspfSskhsxdCRB3aW0DYuGS8TUKmu3JxigfIr5rgQoJPHDa8DRZyWWFFSmhBnSHp9zcFEMsSwwRZa/1tHAH/dd7B8RtbZf0DCje2SGvxGpQ41X12GXwvFJIeuFxdYzgPccN+OHp2hMwAZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tt2dauBM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjCDYQsR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FD6C4CEF7;
-	Sun, 15 Feb 2026 23:46:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tt2dauBM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 980BCC4CEF7;
+	Sun, 15 Feb 2026 23:46:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199181;
-	bh=9wLxYaTCPfOG5uonTZ2h8ocU8FWs+hSDrEKcM2sv5z4=;
+	s=k20201202; t=1771199185;
+	bh=KwNsjS9BksChOKWlphQ7tBX5Ukevdabgk4N9RSuoPnU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=kjCDYQsRlhCQN6obSBw1ii95Qd4xqZ2D3oZ1pMKrFWp3LbPJEa068zb6SNYsrLyzl
-	 RNtqfQABlx0D/geY5TXUSQ0unzKd7ZTFl8WrcQ6ptjFu3A7zKaqi2rHelGAxlnSd+D
-	 J3eLNHh7W6AAppxKG9zzibmJ3iLxifuLzA7d+yJ7P4tFY8tPnGTRQKZ30Y2RvuxtbT
-	 5aAU2fp1DgwaHG2wxFp/FdWtUMtAu/NBUq8CY2UY5lei5riX8DMBInCnZ5ry7D2sfd
-	 9iQrZXLs9GlIXjr3wAh1d/iIpmUWJ6nvaC/yLvGJXKLavrqTYsAvNxCt1mLq6iK4Sp
-	 nSEyBV6LaEO/g==
+	b=Tt2dauBM/91ZcwHIxNjZy56t8ADRDk73M1R5xgyoFIhLuLmwJmT3LGC5PHQHKrRZU
+	 UHEMd0NMajM/5cKHDRp50D0h0NngwdfrnD5Gap/LYFz1aW9lktQkW8EPg9j97g9TwP
+	 Gcb8+JNOW7U8Gxsr5pJ6Cq+V9Xbmb2v6c6s7Ub6pAzjGLbpJWQ2f1R62YGKpCAVWME
+	 ICQIpspC0YXkYRMeFUPjz+mi3UBrNgjteaVDgCAYR7/+xDO0EFkYlXrYxMG8M6XdCX
+	 ZLiSWePHfLfXqWmTb9XyN4MPms6F3pxrawtqc67a6UB+m9/r6Vz5lWyEkj8CLW4v1b
+	 SGGBfz54SbOew==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:36 +0100
-Subject: [PATCH 49/79] block: rust: add `map_queues` support
+Date: Mon, 16 Feb 2026 00:35:28 +0100
+Subject: [PATCH 41/79] block: rnull: add blocking queue mode
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-49-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-41-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,121 +56,131 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3879; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=9wLxYaTCPfOG5uonTZ2h8ocU8FWs+hSDrEKcM2sv5z4=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhHteQM6fc3Iu+s7ErTmW5+zxHdbuM7v9MUt
- WW0qbMjDayJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYRwAKCRDhuBo+eShj
- d82UEADCFQq4xg0GLRoFbDArGbCjq1pYimjtXweH1jUHAlgJbGGDkikwcOVePhVAnaq0cdE5BuY
- FST4N7wGwn5uDWVPQjXpCx3F0A00D312QyAmD8cvTc3vOP3J4jJptfyTx18my0TG3l/QpGh2k6+
- VRnt/4++OOUgxoE8WyWXsHSiexrgbP5JGRTRiN48GSZzVsD+hMHSp/+pgp7Xcl0BR+8bGdFiCQm
- LGiYwXAUL5k3Gqj/IYOdhE00o/x0U8DPQMfes514MGFteRl7clkgSvYEFKWth04xf/u7Ko2u7Ku
- 9RZFRbrxsRa66tuTEpsFIA6IX/RwvMKZoXDegWKZ8M0TsY7LUUI2V7aNC7bnV2Xv0mertjEooNo
- Ua16efkXqh+Tx/mi18AdzA0+qemfM30vBYaWJ9xQDcAbSVCfSq+gB9EFg/ft+MzN7AS9w2UdGdt
- EJyQcDaAUyDI4zCU7pPSm/5GHu52+/vVcaHnTHT8vGfMk1tFZQ4t5d9DTiAS11OUgBMHJqhQEPX
- F2LkCpJ5bsvfp0U5L+/nuiphEGkRmHRxMhE4MQ2vGaAWhI4jUEAeiJC76C5ficBetddzfL4fS+U
- ZIk5m9JLWOTZyF3nP1DNE0C1fLiAMjBgV3OOwQg8Bp5j7v0btIbGpJUHAd4dzkHYMBmRMjTb/gX
- QQhP/zLigZgzM0g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4047; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=KwNsjS9BksChOKWlphQ7tBX5Ukevdabgk4N9RSuoPnU=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhAAmONZuTCFAmTy2QHtO/6KeA3aonRqhccD
+ uZyYAiEM3SJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYQAAKCRDhuBo+eShj
+ d/SdD/4xA7LPhW3edXP28x48xx8Oy40JA8mu40mUSF5x2Tm15UWJyOC4BFixM90yuvg4wTo2zbM
+ 5FjABT+A3GA1+BGStHP8qJFkr/LlankpKRWlAp5QS1fwzoNxiFBtmAzXpEppDrjRCdjb5IO+sTn
+ 0A5pcAJmZCRVPib8vlo5SxL3+A2VBpRxM0BLRiKqgmwDOUoeJxUfMq64NTn21Xyg7QpFKiJuIG1
+ U5KaR5sY1hftYG38q+wQr2sVXEClQ1+x26DhrIsrneB9Rfr89n36u1ZtawLYg6R64d9xOgsz5Dy
+ CN407ZNK5zGV4OjZVjkHlDK8n950RY/ZRevXXR6IOe07+ymK9yx311faO5rpu+VWEdxBKR6QT+C
+ TWIxrxkT60DXJreOUhL8cnuLfgOhMx6hTBZO0ymjY+kULDyHYZ30QgZxVZkFfNywjxSUCGOMGXK
+ o3jxI4/LUHD8A0tZF50UjiewRjVny1ZvKe5ToPQsRynbkxfzyJrQR07uq3QraGzA9ePn3bn+nZc
+ eFBxwbD2XGyR2cwVAf4hjpQBQjj1GpldPiBqwUSW7Ar7j7kRG0+gGjaB+Vh6HRMAZwRt5Y+Ly6G
+ SBJo8EI5oMVDXucaXmjm0FLx6TtARqzZXTGvr5SW1QfCF7UgcJGhNRr+q7FqMGqdJWkl+dMoRif
+ og+WAb8NDQS7JeQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add support for the `map_queues` callback to the Rust block layer
-bindings. This callback allows drivers to customize the mapping between
-CPUs and hardware queues.
-
-The callback receives a mutable reference to the `TagSet`, and drivers
-can use the `TagSet::update_maps` method to configure the mappings for
-each queue type.
+Add support for blocking queue mode via the `blocking` configfs
+attribute. When enabled, the tag set is created with the
+`BLK_MQ_F_BLOCKING` flag.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq/operations.rs | 28 ++++++++++++++++++++++++++--
- rust/kernel/block/mq/tag_set.rs    | 13 +++++++++++++
- 2 files changed, 39 insertions(+), 2 deletions(-)
+ drivers/block/rnull/configfs.rs | 7 ++++++-
+ drivers/block/rnull/rnull.rs    | 9 ++++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 3f84ebadec86b..017fad010d174 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -8,7 +8,7 @@
-     bindings,
-     block::{
-         error::BlkResult,
--        mq::{gen_disk::GenDiskRef, request::RequestDataWrapper, IdleRequest, Request},
-+        mq::{gen_disk::GenDiskRef, request::RequestDataWrapper, IdleRequest, Request, TagSet},
-     },
-     error::{from_result, to_result, Result},
-     prelude::*,
-@@ -101,6 +101,11 @@ fn report_zones(
-     ) -> Result<u32> {
-         Err(ENOTSUPP)
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index d369d8b683c61..640e3de230c0a 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -70,7 +70,7 @@ impl AttributeOperations<0> for Config {
+         let mut writer = kernel::str::Formatter::new(page);
+         writer.write_str(
+             "blocksize,size,rotational,irqmode,completion_nsec,memory_backed\
+-             submit_queues,use_per_node_hctx\n",
++             submit_queues,use_per_node_hctx,discard,blocking\n",
+         )?;
+         Ok(writer.bytes_written())
      }
-+
-+    /// Called by the kernel to map submission queues to CPU cores.
-+    fn map_queues(_tag_set: &TagSet<Self>) {
-+        build_error!(crate::error::VTABLE_DEFAULT_ERROR)
-+    }
+@@ -106,6 +106,7 @@ fn make_group(
+                 badblocks_partial_io: 14,
+                 cache_size_mib: 15,
+                 mbps: 16,
++                blocking: 17,
+             ],
+         };
+ 
+@@ -138,6 +139,7 @@ fn make_group(
+                     )?,
+                     cache_size_mib: 0,
+                     mbps: 0,
++                    blocking: false,
+                 }),
+             }),
+             core::iter::empty(),
+@@ -203,6 +205,7 @@ struct DeviceConfigInner {
+     cache_size_mib: u64,
+     disk_storage: Arc<DiskStorage>,
+     mbps: u32,
++    blocking: bool,
  }
  
- /// A vtable for blk-mq to interact with a block device driver.
-@@ -394,6 +399,21 @@ impl<T: Operations> OperationsVTable<T> {
-         })
-     }
+ #[vtable]
+@@ -243,6 +246,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 bad_blocks_partial_io: guard.bad_blocks_partial_io,
+                 storage: guard.disk_storage.clone(),
+                 bandwidth_limit: u64::from(guard.mbps) * 2u64.pow(20),
++                blocking: guard.blocking,
+             })?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -462,3 +466,4 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+ );
  
-+    /// This function is called by the C kernel. A pointer to this function is
-+    /// installed in the `blk_mq_ops` vtable for the driver.
-+    ///
-+    /// # Safety
-+    ///
-+    /// This function may only be called by blk-mq C infrastructure. `tag_set`
-+    /// must be a pointer to a valid and initialized `TagSet<T>`. The pointee
-+    /// must be valid for use as a reference at least the duration of this call.
-+    unsafe extern "C" fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
-+        // SAFETY: The safety requirements of this function satiesfies the
-+        // requirements of `TagSet::from_ptr`.
-+        let tag_set = unsafe { TagSet::from_ptr(tag_set) };
-+        T::map_queues(tag_set);
-+    }
-+
-     const VTABLE: bindings::blk_mq_ops = bindings::blk_mq_ops {
-         queue_rq: Some(Self::queue_rq_callback),
-         queue_rqs: None,
-@@ -415,7 +435,11 @@ impl<T: Operations> OperationsVTable<T> {
-         exit_request: Some(Self::exit_request_callback),
-         cleanup_rq: None,
-         busy: None,
--        map_queues: None,
-+        map_queues: if T::HAS_MAP_QUEUES {
-+            Some(Self::map_queues_callback)
-+        } else {
-+            None
+ configfs_simple_field!(DeviceConfig, 16, mbps, u32);
++configfs_simple_bool_field!(DeviceConfig, 17, blocking);
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 16a4f915e59f4..cfc00c104d9ca 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -141,6 +141,10 @@
+             default: 0,
+             description: "Max bandwidth in MiB/s. 0 means no limit.",
+         },
++        blocking: u8 {
++            default: 0,
++            description: "Register as a blocking blk-mq driver device",
 +        },
-         #[cfg(CONFIG_BLK_DEBUG_FS)]
-         show_rq: None,
-     };
-diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
-index 600c9c6249123..330ff28c91507 100644
---- a/rust/kernel/block/mq/tag_set.rs
-+++ b/rust/kernel/block/mq/tag_set.rs
-@@ -89,6 +89,19 @@ pub fn new(
-     pub(crate) fn raw_tag_set(&self) -> *mut bindings::blk_mq_tag_set {
-         self.inner.get()
-     }
-+
-+    /// Create a `TagSet<T>` from a raw pointer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// `ptr` must be a pointer to a valid and initialized `TagSet<T>`. There
-+    /// may be no other mutable references to the tag set. The pointee must be
-+    /// live and valid at least for the duration of the returned lifetime `'a`.
-+    pub(crate) unsafe fn from_ptr<'a>(ptr: *mut bindings::blk_mq_tag_set) -> &'a Self {
-+        // SAFETY: By the safety requirements of this function, `ptr` is valid
-+        // for use as a reference for the duration of `'a`.
-+        unsafe { &*(ptr.cast::<Self>()) }
-+    }
+     },
  }
  
- #[pinned_drop]
+@@ -187,6 +191,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     bad_blocks_partial_io: false,
+                     storage: Arc::pin_init(DiskStorage::new(0, block_size as usize), GFP_KERNEL)?,
+                     bandwidth_limit: u64::from(*module_parameters::mbps.value()) * 2u64.pow(20),
++                    blocking: *module_parameters::blocking.value() != 0,
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -218,6 +223,7 @@ struct NullBlkOptions<'a> {
+     bad_blocks_partial_io: bool,
+     storage: Arc<DiskStorage>,
+     bandwidth_limit: u64,
++    blocking: bool,
+ }
+ 
+ #[pin_data]
+@@ -260,6 +266,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
+             bad_blocks_partial_io,
+             storage,
+             bandwidth_limit,
++            blocking,
+         } = options;
+ 
+         let mut flags = mq::tag_set::Flags::default();
+@@ -267,7 +274,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
+         // TODO: lim.features |= BLK_FEAT_WRITE_CACHE;
+         // if (dev->fua)
+         // 	lim.features |= BLK_FEAT_FUA;
+-        if memory_backed {
++        if blocking || memory_backed {
+             flags |= mq::tag_set::Flag::Blocking;
+         }
+ 
 
 -- 
 2.51.2
