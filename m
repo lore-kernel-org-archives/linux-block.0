@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2BC2DC77A;
-	Sun, 15 Feb 2026 23:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7A92BEC34;
+	Sun, 15 Feb 2026 23:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199036; cv=none; b=KTCH/EnwJke/npVad6bwCNNoWeYEIxG1s2KX0OTOout3+mu4EVNj9LTQf/oMS+x580Lx76MbacaCyI63BRKGbaaS4uv8PHLPNYdsBWSytMnWw4CBQEjtAGQtIIjbq/1KgLePMzmNvNU8V+fKeIuV2hByemVWYNVUxZ5bavUJsw0=
+	t=1771199041; cv=none; b=c8zm/U3hcWxNrB2DkzhqWTlbOkGZJI2nqQa50NXZgoR40cKGBK5uite8skj1z3kcYxh95V2qwVIHhTDkXydbgItGBtdj2CO+APn7aC0poTTmeykySoDyhBaOuuTS9aaK2N/x9M6SWed6jXB4KhkhwVC13NyCxc05lHc0o6Nl4fM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199036; c=relaxed/simple;
-	bh=bBQ8yAcFgCBTwCDBWmKONawvvu9tlBRUpgl5zlaS9nw=;
+	s=arc-20240116; t=1771199041; c=relaxed/simple;
+	bh=3/is2sfDJmdRy9QPPG2gvTdPrheCZt7kkxfe/Rrhb04=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nhDICN7ijL/ZdqUgsU79ksO96kwoQaXnKari++X0mZDgUJP/UeenXro7f/yRmgLNP/ZqGndDO2+mQfsRkGjFNDQJFMsOORzhzxnFkspmGE5j2nU85/tAcwQN+D5n94u46CBNSdkVihSnNyp4cOJP4ikBgz1b4evHfiDLYdfPz6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6UrUbRs; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=tWF3b6Pl7dM3a2SWavlP884LO1RtzQrS9Bg559mktgGYuyJrz2k99kY13W8yYObrnaQ+iBll5Zu3NuvUqTjcIHRr9yzMrePOYS18cpkTaEj8+56VtYbomOuz73Bs6M0h0CHaAZiFolShi77sdtNOMzJavmn6CIhV6zYh1TMuyjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kVqOk658; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6UrUbRs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5095FC4CEF7;
-	Sun, 15 Feb 2026 23:43:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kVqOk658"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41E13C4CEF7;
+	Sun, 15 Feb 2026 23:43:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199036;
-	bh=bBQ8yAcFgCBTwCDBWmKONawvvu9tlBRUpgl5zlaS9nw=;
+	s=k20201202; t=1771199041;
+	bh=3/is2sfDJmdRy9QPPG2gvTdPrheCZt7kkxfe/Rrhb04=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=n6UrUbRsU/eilmTFtnqrnuOQKsNAklT+OH9G9flbdBGqPlLm0qv+OggfwWEMbrrMB
-	 Yn74kcGGmJRJFyn2vrxb4WcIcs9u6tFPY2bo5plpoOLDqGJLuJeTtB3TGaEnVvM8xN
-	 etiyNQyo1q3gwIqw/f10uNDPobs0FyEbgvEjP96Ju0L4jKqg5Vl/G6pjUwj/qRuQhf
-	 RUhR8lXMzv+MUzYX1Olb2IbPgQkD/S2THEAz620BIdE3w13KFGw2Nc4sTnx7wPOHyC
-	 qdRPkNLHooJYpEjaVvo1m4gCyQtT/enAIILBRIpkbbmDYFeJa7nNsFTIj/q1SW03h0
-	 /8hJ9B2n3BpsQ==
+	b=kVqOk658tO6pg8KYX7bNxxRB+cTHS2c50HdL/p1++R6v4GnH7HLRcxAuw8IA5riP7
+	 3Jt4IDICWjq7yzM4n5QjAQ8/ig/OqXNTTM3n6zQ52XFn73acEKir+D+ouQNgzERc44
+	 hVOEEdRJHUNE3P7LFU3s65wdgXswhaUvfHjfWnDpUAn6Le/wmlemPdd/nnmTq35F1E
+	 ngL8/34WOhSc91d6R/xOShCJl4l6B/bPuHYyjs/qwtS4s8NbMHmI9wNTIYZPQyL0FA
+	 TBQSbXL1sFUr2iAXfXoTHHxuhd044WD/AjNe8u0gs6QfQL1C1KR5W1W0ELiKWSUDaz
+	 CyuLRbD8VyITw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:21 +0100
-Subject: [PATCH 34/79] block: rust: introduce an idle type state for
- `Request`
+Date: Mon, 16 Feb 2026 00:36:06 +0100
+Subject: [PATCH 79/79] block: rnull: add zone offline and readonly configfs
+ files
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-34-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-79-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -57,368 +57,439 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=13824;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=15509;
  i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=bBQ8yAcFgCBTwCDBWmKONawvvu9tlBRUpgl5zlaS9nw=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklg6eftWJsbtc7ccT5eFMt9qD5FJDBCfQB9cw
- qVSpUuNqMaJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYOgAKCRDhuBo+eShj
- dxT7EACC2jKTAH6h3LBY12TZ2SyfT6bjGFjPmw/FiOhMk2oeO+YHkqt2kEUTxtWXY1Fyz+kYQVA
- BwIALV/KI5VtSHgnVABoOv1g9N1To0X/DMhJCQ7v8LjjJ8/Gb+MDgl0RD5m8/4vfZMq49uUmztX
- PqTGCObV+CZrYmzh3OY0dIjcKu8YSZMJweQ7dKm93/40dwFUVCGRiqYsATIX0+1DKkY8T99xH+s
- PpbgKRo4U2pjbUOnGc4VEeanV7F/gbwxiU62W3YktWG9uoa4eEH7w4FcqIxRmhqUv+5Q2Ag7qxX
- ap8tS2XW9hVLV1cwgA+dbatAF1Ta9yZioFY7mJ2Q7vnmDvDZ9vIFbQEI5j4Cg9EwBzvnctdUUem
- sxSClSrn2/p9JsYZ/Qgd+FNa+xrOIQ4pSIOoLj0X2nYZ6QqIqRkQSSFc+UkTfjUeOuUctrPnuAD
- x5Fa9OrI+wqK8m0JCSI3olhEdJ/ZXcJe1WCVklaAGFa4rsxjXpoUMRwE+mJxcok6Uxcyt1bRPbp
- dcC0iTrmW+oWBaXXgawIZmfpBLeUg7RE588FHzeYIn3B10XoMH40boiJrq8OHDrG3/2pt7w+KKb
- p24ynnpY1kOiqse2xzxQDSijN0+GrNHZH+mYDVjZXUEmM/kxDNqArE53275wlEorov82Im7fgwa
- uRkoFc1wpUn0LPA==
+ bh=3/is2sfDJmdRy9QPPG2gvTdPrheCZt7kkxfe/Rrhb04=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhjWcIdNupHJZ+Z1Iqa1OXKENuLiidyv1T3i
+ 5O5U2MYdHyJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYYwAKCRDhuBo+eShj
+ d8/3EACTdpRzmaQm8jpMo+udlUhbjmqYZQ1GbysxKSwhPMyLWPONRaDgmeKa2b3Rmbe0NV7Zo5Y
+ rIwj38weF3m+Its2XgvUVrahJIiqFSk5NMNQ5HeI+0K+NAQKcKozx5TfEpepA5HdoeaGfJj8b+n
+ JkMOaapjc3sNbmsXCjQPo2o2xg0NND5UUAxe0+z0OLn/Ye9inZkivJzED1jXQFs4c9Vkl47lRzo
+ UTuKDsSk6spxKiGGbtP2JdlHXjRP8iShxxogibBxN3IWVkYmbyngRfTzgnok73Ozq59wTjYzE5S
+ HsuPV36y7jZHTrwnsGiipOeQ0gF6r4E//T+uwJG2yMrszInghK6vLBdJK8TxhAdOwYdEnMdzeVN
+ G/LxoYwndTaA4vOOMj8Rt6WWf1AGu3oV57dmJ56qet8F4ssTJnIira4KNF9WHsFYagJHmUzd5Oh
+ RSUE1Rp/TBTf8aoBQF0i7uC52UL6SLWO3rPiVQGsidikcmpAHYYEAJSVa60nXzdkT8g8X5v0FWm
+ ohKXpgLXGKlIdEgSnROrl/30yR+Gb0F8IO3ZIrmNkncT93pCGE4Cu6Lo6UhcQxzrs0ugJevxH02
+ h7Qo6Le7yIoYIZLE0eldLg/PTtbB9il8DVQ5sVVDvI7EsI8f/hjx8XmZpUq/VA10kXbtI8Llr+i
+ ZUv36CKP5YOWpDg==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Block device drivers need to invoke `blk_mq_start_request` on a request to
-indicate that they have started processing the request. This function may
-only be called once after a request has been issued to a driver. For Rust
-block device drivers, the Rust abstractions handle this call. However, in
-some situations a driver may want to control when a request is started.
-Thus, expose the start method to Rust block device drivers.
-
-To ensure the method is not called more than once, introduce a type state
-for `Request`. Requests are issued as `IdleRequest` and transition to
-`Request` when the `start` method is called.
+Add configfs attributes for managing zone states in the rnull zoned
+block device emulation. The `zone_offline` and `zone_readonly`
+attributes allow setting specific zones to offline or read-only states,
+which is useful for testing how applications handle degraded zones.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/rnull.rs       |   3 +-
- rust/kernel/block/mq.rs            |   5 +-
- rust/kernel/block/mq/operations.rs |  13 ++--
- rust/kernel/block/mq/request.rs    | 155 ++++++++++++++++++++++++++++++-------
- 4 files changed, 136 insertions(+), 40 deletions(-)
+ drivers/block/rnull/configfs.rs     | 80 +++++++++++++++++++++++++++++++++++
+ drivers/block/rnull/disk_storage.rs | 59 +++++++++++++-------------
+ drivers/block/rnull/rnull.rs        |  2 +-
+ drivers/block/rnull/zoned.rs        | 83 ++++++++++++++++++++++++++-----------
+ 4 files changed, 168 insertions(+), 56 deletions(-)
 
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index aa59ede72e495..034ddc06eabf9 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -575,9 +575,10 @@ fn new_request_data() -> impl PinInit<Self::RequestData> {
-     fn queue_rq(
-         hw_data: Pin<&SpinLock<HwQueueContext>>,
-         this: Pin<&Self>,
--        mut rq: Owned<mq::Request<Self>>,
-+        rq: Owned<mq::IdleRequest<Self>>,
-         _is_last: bool,
-     ) -> Result {
-+        let mut rq = rq.start();
-         let mut sectors = rq.sectors();
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 395da68d96dc6..1c0d95ded7e9f 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -125,6 +125,8 @@ fn make_group(
+                 max_sectors: 29,
+                 virt_boundary: 30,
+                 shared_tag_bitmap: 31,
++                zone_offline: 32,
++                zone_readonly: 33,
+             ],
+         };
  
-         Self::handle_bad_blocks(this.get_ref(), &mut rq, &mut sectors)?;
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 3eab3ca8f5480..ab493bd91af4c 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -88,10 +88,10 @@
- //!     fn queue_rq(
- //!         _hw_data: (),
- //!         _queue_data: (),
--//!         rq: Owned<Request<Self>>,
-+//!         rq: Owned<IdleRequest<Self>>,
- //!         _is_last: bool
- //!     ) -> Result {
--//!         rq.end_ok();
-+//!         rq.start().end_ok();
- //!         Ok(())
- //!     }
- //!
-@@ -130,6 +130,7 @@
- pub mod tag_set;
- 
- pub use operations::Operations;
-+pub use request::IdleRequest;
- pub use request::Request;
- pub use request::RequestTimerHandle;
- pub use tag_set::TagSet;
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 6641c340d87f4..fb75d65f67071 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -6,13 +6,13 @@
- 
- use crate::{
-     bindings,
--    block::mq::{request::RequestDataWrapper, Request},
-+    block::mq::{request::RequestDataWrapper, IdleRequest, Request},
-     error::{from_result, Result},
-     prelude::*,
-     sync::{aref::ARef, atomic::ordering, Refcount},
-     types::{ForeignOwnable, Owned},
- };
--use core::{marker::PhantomData, ptr::NonNull};
-+use core::marker::PhantomData;
- use pin_init::PinInit;
- 
- type ForeignBorrowed<'a, T> = <T as ForeignOwnable>::Borrowed<'a>;
-@@ -60,7 +60,7 @@ pub trait Operations: Sized {
-     fn queue_rq(
-         hw_data: ForeignBorrowed<'_, Self::HwData>,
-         queue_data: ForeignBorrowed<'_, Self::QueueData>,
--        rq: Owned<Request<Self>>,
-+        rq: Owned<IdleRequest<Self>>,
-         is_last: bool,
-     ) -> Result;
- 
-@@ -132,14 +132,14 @@ impl<T: Operations> OperationsVTable<T> {
-                 == 0
-         );
- 
-+        // INVARIANT: By C API contract, `bd.rq` has not been started yet.
-         // SAFETY:
-         //  - By API contract, we own the request.
-         //  - By the safety requirements of this function, `request` is a valid
-         //    `struct request` and the private data is properly initialized.
-         //  - `rq` will be alive until `blk_mq_end_request` is called and is
-         //    reference counted by until then.
--        let mut rq =
--            unsafe { Owned::from_raw(NonNull::<Request<T>>::new_unchecked((*bd).rq.cast())) };
-+        let rq = unsafe { IdleRequest::from_raw((*bd).rq) };
- 
-         // SAFETY: The safety requirement for this function ensure that `hctx`
-         // is valid and that `driver_data` was produced by a call to
-@@ -155,9 +155,6 @@ impl<T: Operations> OperationsVTable<T> {
-         // dropped, which happens after we are dropped.
-         let queue_data = unsafe { T::QueueData::borrow(queue_data) };
- 
--        // SAFETY: We have exclusive access and we just set the refcount above.
--        unsafe { rq.start_unchecked() };
--
-         let ret = T::queue_rq(
-             hw_data,
-             queue_data,
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index 38289b9f966fa..f6addd20624a9 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -15,13 +15,111 @@
-     time::hrtimer::{
-         HasHrTimer, HrTimer, HrTimerCallback, HrTimerHandle, HrTimerMode, HrTimerPointer,
-     },
--    types::{Opaque, Ownable, OwnableRefCounted, Owned},
-+    types::{ForeignOwnable, Opaque, Ownable, OwnableRefCounted, Owned},
- };
--use core::{ffi::c_void, marker::PhantomData, ptr::NonNull};
-+use core::{ffi::c_void, marker::PhantomData, ops::Deref, ptr::NonNull};
- 
- use crate::block::bio::Bio;
- use crate::block::bio::BioIterator;
- 
-+/// A [`Request`] that a driver has not yet begun to process.
-+///
-+/// A driver can convert an `IdleRequest` to a [`Request`] by calling [`IdleRequest::start`].
-+///
-+/// # Invariants
-+///
-+/// - This request has not been started yet.
-+#[repr(transparent)]
-+pub struct IdleRequest<T>(RequestInner<T>);
+@@ -639,3 +641,81 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+ configfs_simple_field!(DeviceConfig, 29, max_sectors, u32);
+ configfs_simple_bool_field!(DeviceConfig, 30, virt_boundary);
+ configfs_simple_bool_field!(DeviceConfig, 31, shared_tag_bitmap);
 +
-+impl<T: Operations> IdleRequest<T> {
-+    /// Mark the request as processing.
-+    ///
-+    /// This converts the [`IdleRequest`] into a [`Request`].
-+    pub fn start(self: Owned<Self>) -> Owned<Request<T>> {
-+        // SAFETY: By type invariant `self.0.0` is a valid request. Because we have an `Owned<_>`,
-+        // the refcount is zero.
-+        let mut request = unsafe { Request::from_raw(self.0 .0.get()) };
++#[cfg(CONFIG_BLK_DEV_ZONED)]
++fn set_zone_condition(
++    this: &DeviceConfig,
++    sector: u64,
++    cb: impl FnOnce(
++        &crate::zoned::ZoneOptions,
++        &DiskStorage,
++        &mut crate::zoned::ZoneDescriptor,
++    ) -> Result,
++) -> Result {
++    use crate::zoned::ZoneType;
++    let data_guard = this.data.lock();
++    let null_disk = data_guard.disk.as_ref().ok_or(EBUSY)?.queue_data();
++    let storage = &null_disk.storage;
++    let zone_options = &null_disk.zoned;
++    zone_options.enabled.then_some(()).ok_or(EINVAL)?;
++    let mut zone = zone_options.zone(sector)?.lock();
 +
-+        debug_assert!(
-+            request
-+                .wrapper_ref()
-+                .refcount()
-+                .as_atomic()
-+                .load(ordering::Acquire)
-+                == 0
-+        );
-+
-+        // SAFETY: We have exclusive access and the refcount is 0. By type invariant `request` was
-+        // not started yet.
-+        unsafe { request.start_unchecked() };
-+
-+        request
++    if zone.kind == ZoneType::Conventional {
++        return Err(EINVAL);
 +    }
 +
-+    /// Create a [`Self`] from a raw request pointer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// - The request pointed to by `ptr` must satisfythe invariants of both [`Request`] and
-+    ///   [`Self`].
-+    /// - The refcount of the request pointed to by `ptr` must be 0.
-+    pub(crate) unsafe fn from_raw(ptr: *mut bindings::request) -> Owned<Self> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as an `IdleRequest`.
-+        unsafe { Owned::from_raw(NonNull::<Self>::new_unchecked(ptr.cast())) }
-+    }
++    cb(zone_options, storage, &mut zone)
 +}
 +
-+// SAFETY: The `release` implementation leaks the `IdleRequest`, which is a valid state for a
-+// [`Request`] with refcount 0.
-+unsafe impl<T: Operations> Ownable for IdleRequest<T> {
-+    unsafe fn release(_this: NonNull<Self>) {}
-+}
++#[cfg(CONFIG_BLK_DEV_ZONED)]
++configfs_attribute!(
++    DeviceConfig,
++    32,
++    show: |_this, _page| Ok(0),
++    store: |this,page| {
++        let text = core::str::from_utf8(page)?.trim();
++        let sector = text.parse().map_err(|_| EINVAL)?;
 +
-+impl<T: Operations> Deref for IdleRequest<T> {
-+    type Target = RequestInner<T>;
++        set_zone_condition(this, sector, |zone_options, storage, zone| {
++            zone_options.offline_zone(storage, zone)
++        })?;
++        Ok(())
++    },
++);
 +
-+    fn deref(&self) -> &Self::Target {
-+        &self.0
-+    }
-+}
++#[cfg(CONFIG_BLK_DEV_ZONED)]
++configfs_attribute!(
++    DeviceConfig,
++    33,
++    show: |_this, _page| Ok(0),
++    store: |this,page| {
++        let text = core::str::from_utf8(page)?.trim();
++        let sector = text.parse().map_err(|_| EINVAL)?;
 +
-+pub struct RequestInner<T>(Opaque<bindings::request>, PhantomData<T>);
++        set_zone_condition(this, sector, |zone_options, storage, zone| {
++            zone_options.read_only_zone(storage, zone)
++        })?;
 +
-+impl<T: Operations> RequestInner<T> {
-+    /// Get the command identifier for the request
-+    pub fn command(&self) -> u32 {
-+        // SAFETY: By C API contract and type invariant, `cmd_flags` is valid for read
-+        unsafe { (*self.0.get()).cmd_flags & ((1 << bindings::REQ_OP_BITS) - 1) }
-+    }
++        Ok(())
++    },
++);
 +
-+    /// Get the target sector for the request.
-+    #[inline(always)]
-+    pub fn sector(&self) -> u64 {
-+        // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
-+        unsafe { (*self.0.get()).__sector }
-+    }
++#[cfg(not(CONFIG_BLK_DEV_ZONED))]
++configfs_attribute!(
++    DeviceConfig,
++    32,
++    show: |this, page| {Ok(0)},
++    store: |this,page| {
++        Err(ENOTSUPP)
++    },
++);
 +
-+    /// Get the size of the request in number of sectors.
-+    #[inline(always)]
-+    pub fn sectors(&self) -> u32 {
-+        self.bytes() >> crate::block::SECTOR_SHIFT
-+    }
-+
-+    /// Get the size of the request in bytes.
-+    #[inline(always)]
-+    pub fn bytes(&self) -> u32 {
-+        // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
-+        unsafe { (*self.0.get()).__data_len }
-+    }
-+
-+    /// Borrow the queue data from the request queue associated with this request.
-+    pub fn queue_data(&self) -> <T::QueueData as ForeignOwnable>::Borrowed<'_> {
-+        // SAFETY: By type invariants of `Request`, `self.0` is a valid request.
-+        unsafe { T::QueueData::borrow((*(*self.0.get()).q).queuedata) }
-+    }
-+}
-+
- /// A wrapper around a blk-mq [`struct request`]. This represents an IO request.
- ///
- /// # Implementation details
-@@ -58,9 +156,28 @@
- /// [`struct request`]: srctree/include/linux/blk-mq.h
- ///
- #[repr(transparent)]
--pub struct Request<T>(Opaque<bindings::request>, PhantomData<T>);
-+pub struct Request<T>(RequestInner<T>);
-+
-+impl<T: Operations> Deref for Request<T> {
-+    type Target = RequestInner<T>;
-+
-+    fn deref(&self) -> &Self::Target {
-+        &self.0
-+    }
-+}
- 
- impl<T: Operations> Request<T> {
-+    /// Create a `Owned<Request>` from a request pointer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// - `ptr` must satisfy invariants of `Request`.
-+    /// - The refcount of the request pointed to by `ptr` must be 0.
-+    pub(crate) unsafe fn from_raw(ptr: *mut bindings::request) -> Owned<Self> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as `Owned<Request>`.
-+        unsafe { Owned::from_raw(NonNull::<Self>::new_unchecked(ptr.cast())) }
-+    }
-+
-     /// Create an [`ARef<Request>`] from a [`struct request`] pointer.
-     ///
-     /// # Safety
-@@ -78,12 +195,6 @@ pub(crate) unsafe fn aref_from_raw(ptr: *mut bindings::request) -> ARef<Self> {
-         unsafe { ARef::from_raw(NonNull::new_unchecked(ptr.cast())) }
++#[cfg(not(CONFIG_BLK_DEV_ZONED))]
++configfs_attribute!(
++    DeviceConfig,
++    33,
++    show: |this, page| {Ok(0)},
++    store: |this,page| {
++        Err(ENOTSUPP)
++    },
++);
+diff --git a/drivers/block/rnull/disk_storage.rs b/drivers/block/rnull/disk_storage.rs
+index d9f2703957fc0..802e9534ca2a5 100644
+--- a/drivers/block/rnull/disk_storage.rs
++++ b/drivers/block/rnull/disk_storage.rs
+@@ -65,27 +65,45 @@ pub(crate) fn lock(&self) -> SpinLockGuard<'_, Pin<KBox<TreeContainer>>> {
+         self.trees.lock()
      }
  
--    /// Get the command identifier for the request
--    pub fn command(&self) -> u32 {
--        // SAFETY: By C API contract and type invariant, `cmd_flags` is valid for read
--        unsafe { (*self.0.get()).cmd_flags & ((1 << bindings::REQ_OP_BITS) - 1) }
--    }
+-    pub(crate) fn discard(
+-        &self,
+-        hw_data: &Pin<&SpinLock<HwQueueContext>>,
+-        mut sector: u64,
+-        sectors: u32,
+-    ) {
+-        let mut tree_guard = self.lock();
+-        let mut hw_data_guard = hw_data.lock();
 -
-     /// Complete the request by scheduling `Operations::complete` for
-     /// execution.
-     ///
-@@ -106,7 +217,7 @@ pub fn complete(this: ARef<Self>) {
-     pub fn bio(&self) -> Option<&Bio> {
-         // SAFETY: By type invariant of `Self`, `self.0` is valid and the deref
-         // is safe.
--        let ptr = unsafe { (*self.0.get()).bio };
-+        let ptr = unsafe { (*self.0 .0.get()).bio };
-         // SAFETY: By C API contract, if `bio` is not null it will have a
-         // positive refcount at least for the duration of the lifetime of
-         // `&self`.
-@@ -118,7 +229,7 @@ pub fn bio(&self) -> Option<&Bio> {
-     pub fn bio_mut(&mut self) -> Option<&mut Bio> {
-         // SAFETY: By type invariant of `Self`, `self.0` is valid and the deref
-         // is safe.
--        let ptr = unsafe { (*self.0.get()).bio };
-+        let ptr = unsafe { (*self.0 .0.get()).bio };
-         // SAFETY: By C API contract, if `bio` is not null it will have a
-         // positive refcount at least for the duration of the lifetime of
-         // `&self`.
-@@ -132,25 +243,11 @@ pub fn bio_iter_mut<'a>(self: &'a mut Owned<Self>) -> BioIterator<'a> {
-         // `NonNull::new` will return `None` if the pointer is null.
-         BioIterator {
-             // SAFETY: By type invariant `self.0` is a valid `struct request`.
--            bio: NonNull::new(unsafe { (*self.0.get()).bio.cast() }),
-+            bio: NonNull::new(unsafe { (*self.0 .0.get()).bio.cast() }),
-             _p: PhantomData,
+-        let mut access = self.access(&mut tree_guard, &mut hw_data_guard, None);
++    pub(crate) fn discard(&self, mut sector: u64, sectors: u32) {
++        let tree_guard = self.lock();
++        let mut cache_guard = tree_guard.cache_tree.lock();
++        let mut disk_guard = tree_guard.cache_tree.lock();
+ 
+         let mut remaining_bytes = sectors_to_bytes(sectors);
+ 
+         while remaining_bytes > 0 {
+-            access.free_sector(sector);
++            self.free_sector(&mut cache_guard, &mut disk_guard, sector);
+             let processed = remaining_bytes.min(self.block_size);
+             sector += Into::<u64>::into(bytes_to_sectors(processed));
+             remaining_bytes -= processed;
          }
      }
  
--    /// Get the target sector for the request.
--    #[inline(always)]
--    pub fn sector(&self) -> u64 {
--        // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
--        unsafe { (*self.0.get()).__sector }
++    fn free_sector_tree(tree_access: &mut xarray::Guard<'_, TreeNode>, sector: u64) {
++        let index = DiskStorageAccess::to_index(sector);
++        if let Some(page) = tree_access.get_mut(index) {
++            page.set_free(sector);
++
++            if page.is_empty() {
++                tree_access.remove(index);
++            }
++        }
++    }
++
++    pub(crate) fn free_sector<'a>(
++        &self,
++        cache_guard: &mut xarray::Guard<'a, TreeNode>,
++        disk_guard: &mut xarray::Guard<'a, TreeNode>,
++        sector: u64,
++    ) {
++        if self.cache_size > 0 {
++            Self::free_sector_tree(cache_guard, sector);
++        }
++
++        Self::free_sector_tree(disk_guard, sector);
++    }
++
+     pub(crate) fn flush(&self, hw_data: &Pin<&SpinLock<HwQueueContext>>) {
+         let mut tree_guard = self.lock();
+         let mut hw_data_guard = hw_data.lock();
+@@ -262,25 +280,6 @@ pub(crate) fn get_read_page(&self, sector: u64) -> Option<&NullBlockPage> {
+             self.disk_guard.get(index)
+         }
+     }
+-
+-    fn free_sector_tree(tree_access: &mut xarray::Guard<'_, TreeNode>, sector: u64) {
+-        let index = Self::to_index(sector);
+-        if let Some(page) = tree_access.get_mut(index) {
+-            page.set_free(sector);
+-
+-            if page.is_empty() {
+-                tree_access.remove(index);
+-            }
+-        }
 -    }
 -
--    /// Get the size of the request in number of sectors.
--    #[inline(always)]
--    pub fn sectors(&self) -> u32 {
--        // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
--        (unsafe { (*self.0.get()).__data_len }) >> crate::block::SECTOR_SHIFT
--    }
+-    pub(crate) fn free_sector(&mut self, sector: u64) {
+-        if self.disk_storage.cache_size > 0 {
+-            Self::free_sector_tree(&mut self.cache_guard, sector);
+-        }
 -
-     /// Return a pointer to the [`RequestDataWrapper`] stored in the private area
-     /// of the request structure.
-     ///
-@@ -289,10 +386,10 @@ impl<T: Operations> Owned<Request<T>> {
-     /// `self.wrapper_ref().refcount() == 0`.
-     ///
-     /// This can only be called once in the request life cycle.
--    pub(crate) unsafe fn start_unchecked(&mut self) {
-+    pub unsafe fn start_unchecked(&mut self) {
-         // SAFETY: By type invariant, `self.0` is a valid `struct request` and
-         // we have exclusive access.
--        unsafe { bindings::blk_mq_start_request(self.0.get()) };
-+        unsafe { bindings::blk_mq_start_request(self.0 .0.get()) };
+-        Self::free_sector_tree(&mut self.disk_guard, sector);
+-    }
+ }
+ 
+ type Tree = XArray<TreeNode>;
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 5bf965908ef63..91f8636d74cca 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -739,7 +739,7 @@ fn handle_regular_command(
+ 
+         if self.memory_backed {
+             if rq.command() == mq::Command::Discard {
+-                self.storage.discard(hw_data, rq.sector(), sectors);
++                self.storage.discard(rq.sector(), sectors);
+             } else {
+                 self.transfer(hw_data, rq, rq.command(), sectors)?;
+             }
+diff --git a/drivers/block/rnull/zoned.rs b/drivers/block/rnull/zoned.rs
+index 0f15f4cc4e5c3..3b8ebf5449a8d 100644
+--- a/drivers/block/rnull/zoned.rs
++++ b/drivers/block/rnull/zoned.rs
+@@ -178,7 +178,7 @@ pub(crate) fn handle_zoned_command(
+         match rq.command() {
+             ZoneAppend | Write => self.zoned_write(hw_data, rq)?,
+             ZoneReset | ZoneResetAll | ZoneOpen | ZoneClose | ZoneFinish => {
+-                self.zone_management(hw_data, rq)?
++                self.zone_management(rq)?
+             }
+             _ => self.zoned_read(hw_data, rq)?,
+         }
+@@ -186,18 +186,14 @@ pub(crate) fn handle_zoned_command(
+         Ok(())
      }
  
-     /// Notify the block layer that the request has been completed without errors.
-@@ -302,7 +399,7 @@ pub fn end_ok(self) {
+-    fn zone_management(
+-        &self,
+-        hw_data: &Pin<&SpinLock<HwQueueContext>>,
+-        rq: &mut Owned<mq::Request<Self>>,
+-    ) -> Result {
++    fn zone_management(&self, rq: &mut Owned<mq::Request<Self>>) -> Result {
+         if rq.command() == mq::Command::ZoneResetAll {
+             for zone in self.zoned.zones_iter() {
+                 let mut zone = zone.lock();
+                 use ZoneCondition::*;
+                 match zone.condition {
+                     Empty | ReadOnly | Offline => continue,
+-                    _ => self.zoned.reset_zone(&self.storage, hw_data, &mut zone)?,
++                    _ => self.zoned.reset_zone(&self.storage, &mut zone)?,
+                 }
+             }
  
-     /// Notify the block layer that the request has been completed.
-     pub fn end(self, status: u8) {
--        let request_ptr = self.0.get().cast();
-+        let request_ptr = self.0 .0.get().cast();
-         core::mem::forget(self);
-         // SAFETY: By type invariant, `this.0` was a valid `struct request`. The
-         // existence of `self` guarantees that there are no `ARef`s pointing to
+@@ -213,10 +209,10 @@ fn zone_management(
+ 
+         use mq::Command::*;
+         match rq.command() {
+-            ZoneOpen => self.zoned.open_zone(&mut zone, rq.sector()),
++            ZoneOpen => self.zoned.open_zone(&mut zone),
+             ZoneClose => self.zoned.close_zone(&mut zone),
+-            ZoneReset => self.zoned.reset_zone(&self.storage, hw_data, &mut zone),
+-            ZoneFinish => self.zoned.finish_zone(&mut zone, rq.sector()),
++            ZoneReset => self.zoned.reset_zone(&self.storage, &mut zone),
++            ZoneFinish => self.zoned.finish_zone(&mut zone),
+             _ => Err(EIO),
+         }
+     }
+@@ -282,7 +278,7 @@ fn zoned_write(
+             if self.zoned.use_accounting() {
+                 let mut accounting = self.zoned.accounting.lock();
+                 self.zoned
+-                    .check_zone_resources(&mut accounting, &mut zone, rq.sector())?;
++                    .check_zone_resources(&mut accounting, &mut zone)?;
+ 
+                 if zone.condition == ZoneCondition::Closed {
+                     accounting.closed -= 1;
+@@ -365,7 +361,7 @@ fn zone_no(&self, sector: u64) -> usize {
+         (sector >> self.size_sectors.ilog2()) as usize
+     }
+ 
+-    fn zone(&self, sector: u64) -> Result<&Mutex<ZoneDescriptor>> {
++    pub(crate) fn zone(&self, sector: u64) -> Result<&Mutex<ZoneDescriptor>> {
+         self.zones.get(self.zone_no(sector)).ok_or(EINVAL)
+     }
+ 
+@@ -418,7 +414,7 @@ fn try_close_implicit_open_zone(&self, accounting: &mut ZoneAccounting, sector:
+         Err(EINVAL)
+     }
+ 
+-    fn open_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
++    fn open_zone(&self, zone: &mut ZoneDescriptor) -> Result {
+         if zone.kind == ZoneType::Conventional {
+             return Err(EINVAL);
+         }
+@@ -434,13 +430,13 @@ fn open_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
+             let mut accounting = self.accounting.lock();
+             match zone.condition {
+                 Empty => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                 }
+                 ImplicitOpen => {
+                     accounting.implicit_open -= 1;
+                 }
+                 Closed => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                     accounting.closed -= 1;
+                 }
+                 _ => (),
+@@ -457,14 +453,13 @@ fn check_zone_resources(
+         &self,
+         accounting: &mut ZoneAccounting,
+         zone: &mut ZoneDescriptor,
+-        sector: u64,
+     ) -> Result {
+         match zone.condition {
+             ZoneCondition::Empty => {
+                 self.check_active_zones(accounting)?;
+-                self.check_open_zones(accounting, sector)
++                self.check_open_zones(accounting, zone.start_sector)
+             }
+-            ZoneCondition::Closed => self.check_open_zones(accounting, sector),
++            ZoneCondition::Closed => self.check_open_zones(accounting, zone.start_sector),
+             _ => Err(EIO),
+         }
+     }
+@@ -533,7 +528,7 @@ fn close_zone(&self, zone: &mut ZoneDescriptor) -> Result {
+         Ok(())
+     }
+ 
+-    fn finish_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
++    fn finish_zone(&self, zone: &mut ZoneDescriptor) -> Result {
+         if zone.kind == ZoneType::Conventional {
+             return Err(EINVAL);
+         }
+@@ -545,12 +540,12 @@ fn finish_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
+             match zone.condition {
+                 Full => return Ok(()),
+                 Empty => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                 }
+                 ImplicitOpen => accounting.implicit_open -= 1,
+                 ExplicitOpen => accounting.explicit_open -= 1,
+                 Closed => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                     accounting.closed -= 1;
+                 }
+                 _ => return Err(EIO),
+@@ -566,7 +561,6 @@ fn finish_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
+     fn reset_zone(
+         &self,
+         storage: &crate::disk_storage::DiskStorage,
+-        hw_data: &Pin<&SpinLock<HwQueueContext>>,
+         zone: &mut ZoneDescriptor,
+     ) -> Result {
+         if zone.kind == ZoneType::Conventional {
+@@ -589,16 +583,55 @@ fn reset_zone(
+         zone.condition = ZoneCondition::Empty;
+         zone.write_pointer = zone.start_sector;
+ 
+-        storage.discard(hw_data, zone.start_sector, zone.size_sectors);
++        storage.discard(zone.start_sector, zone.size_sectors);
++
++        Ok(())
++    }
++
++    fn set_zone_condition(
++        &self,
++        storage: &crate::disk_storage::DiskStorage,
++        zone: &mut ZoneDescriptor,
++        condition: ZoneCondition,
++    ) -> Result {
++        if zone.condition == condition {
++            zone.condition = ZoneCondition::Empty;
++            zone.write_pointer = zone.start_sector;
++            storage.discard(zone.start_sector, zone.size_sectors);
++        } else {
++            if matches!(
++                zone.condition,
++                ZoneCondition::ReadOnly | ZoneCondition::Offline
++            ) {
++                self.finish_zone(zone)?;
++            }
+ 
++            zone.condition = ZoneCondition::Offline;
++            zone.write_pointer = u64::MAX;
++        }
+         Ok(())
+     }
++    pub(crate) fn offline_zone(
++        &self,
++        storage: &crate::disk_storage::DiskStorage,
++        zone: &mut ZoneDescriptor,
++    ) -> Result {
++        self.set_zone_condition(storage, zone, ZoneCondition::Offline)
++    }
++
++    pub(crate) fn read_only_zone(
++        &self,
++        storage: &crate::disk_storage::DiskStorage,
++        zone: &mut ZoneDescriptor,
++    ) -> Result {
++        self.set_zone_condition(storage, zone, ZoneCondition::ReadOnly)
++    }
+ }
+ 
+ pub(crate) struct ZoneDescriptor {
+     start_sector: u64,
+     size_sectors: u32,
+-    kind: ZoneType,
++    pub(crate) kind: ZoneType,
+     capacity_sectors: u32,
+     write_pointer: u64,
+     condition: ZoneCondition,
+@@ -626,7 +659,7 @@ fn check_bounds_read(&self, sector: u64, sectors: u32) -> Result {
+ 
+ #[derive(Copy, Clone, PartialEq, Eq, Debug)]
+ #[repr(u32)]
+-enum ZoneType {
++pub(crate) enum ZoneType {
+     Conventional = bindings::blk_zone_type_BLK_ZONE_TYPE_CONVENTIONAL,
+     SequentialWriteRequired = bindings::blk_zone_type_BLK_ZONE_TYPE_SEQWRITE_REQ,
+     #[expect(dead_code)]
 
 -- 
 2.51.2
