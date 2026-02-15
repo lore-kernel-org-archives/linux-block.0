@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B0C2D77E3;
-	Sun, 15 Feb 2026 23:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DD02DB7A1;
+	Sun, 15 Feb 2026 23:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771198938; cv=none; b=uOoncBX13dyJNZNvzlN5lSlmT7pu8N71u74Ukw58XCPwjUc1RS6c5iyq8k/qr0488017DlJUs55h1hQ0keP6szoe0awCDB5LX/vCp2ZpoMU10/DSFkFNQVsKtSdD5Wepjumh6zBSSsD5wbxKotBFvfUD53KWtqBktNxr0m/jzZc=
+	t=1771198944; cv=none; b=NZvmUvoNjxsDwezDLO0VFwEcoAjZqb01bFn/E8F61Sge6i9Ulzo07AuAKhvD8sdrmBHU+KLnPvcLxibVekNOzGlrEAJ0wQkQYT7LCrHtIptACf96Ek87PXb+gKQf5jEp1P9I1UwaprOUbF+B+OSQ7Aw2YjF0IcSh5DVkaOIUvWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771198938; c=relaxed/simple;
-	bh=6LAOeUSwUtS+ZAfhWOk/dU6VGMrvdfMVJxYHu0ElVWg=;
+	s=arc-20240116; t=1771198944; c=relaxed/simple;
+	bh=7BsUMdxU+4o8Atmxvi2C2Yk4sut1Zh21/NZvpuROV9U=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dv8jjiaRCkTa1bdupKS7x9jGS6bNf9Fb/U28l5uiaZ+K5i0kDUBf3cr9DMNfLe7VBTU8O9T7nhO8D6ZFb67dYFH5D4jLbHXj75q7Tm6ujq7bHY1npy7HDvkzDSOw8AWQtWJSeMNZdbbL9klYo6U6t8k9A9MqXMj87YofMKpK8cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kcb1swnd; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Ao3I0cGy+NmhMOtJwxU3oh3yq+pgkBIBb8QfaNatWkSF8QQ4ZHT/rrtjbBpq5i6xppOQHd/1Qv/Mmn71JPT8y5XBHR8dq+6J+BMRkuBa6khyU5IzgQ6Xh7FDs7t7khr5MjwbtuHW/nZzHj13ykJTS069br15x5K3lHUcZMAj5CE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EegIw3n9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kcb1swnd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 350C8C4CEF7;
-	Sun, 15 Feb 2026 23:42:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EegIw3n9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B953C19422;
+	Sun, 15 Feb 2026 23:42:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771198938;
-	bh=6LAOeUSwUtS+ZAfhWOk/dU6VGMrvdfMVJxYHu0ElVWg=;
+	s=k20201202; t=1771198943;
+	bh=7BsUMdxU+4o8Atmxvi2C2Yk4sut1Zh21/NZvpuROV9U=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=kcb1swndbwEz60aKfQ99++Rx9ZSn4aB6GXhSvIWTAtBLl+Gei2BTtnc0kzm3a7S0/
-	 ZEFK3Z/FEEJBNBU/1853eTcF1/WaLL5LIzC5aL/DY5xSwYWNBVPmfhSlCsa7L1g0EA
-	 s2M9buM51ruySlwcLy82Ty4vaqCXrRc2Xd165o0hXHjbsqBwLpRYRbo4NUcyAa+zTG
-	 IOrz5tLX6DqRxU90SXXemi3PAyj1TiSpW2Bc1cdQUy13U9B+Iooibo5xtPJGa/hlyx
-	 krgIJqFyXDL+10P2EqvACbuSXgjkgWocQEBfYfbfLy+N+Xny7G/B4I4dNE8+ax/k7t
-	 ZIJOiPjGtEneg==
+	b=EegIw3n9AdLDkfngVG9lXqk9jft65qhpfo7Y99ZYTJpFjM0kcakmlgeOqfTqa39np
+	 CGDtEygqvaUzQVXVkn7uhm35v42HlHKpNJSF6ZWaMThfSXkDbT0d5oZuA29WBFXLSz
+	 yPcZJxj4Drwm1X8Od7cbhYIFkTCOpMGP/Mw8JO3JMPzvPFwe2h7VRME0TaLde5DGvU
+	 tqQcC3t4+ligYcd1ufKAT3OebAopO/oTInmhAMBA48c98UMtB9Q/eUtdUQzJ/kmKMC
+	 JAekf0ru/muJbn6mFt0y4zH+Qzy6ZtH4g3gt9gD2+t9NCIOeNypeXp6jnK2HBP6iEE
+	 jP1Jy+fPjLrkw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:06 +0100
-Subject: [PATCH 19/79] block: rust: mq: add max_hw_discard_sectors support
- to GenDiskBuilder
+Date: Mon, 16 Feb 2026 00:35:19 +0100
+Subject: [PATCH 32/79] block: rust: implement `Sync` for `GenDisk`.
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-19-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-32-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -57,81 +56,46 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2183; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=6LAOeUSwUtS+ZAfhWOk/dU6VGMrvdfMVJxYHu0ElVWg=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgtNy3HVqeMKx/bZtfhBvhyhrqQKDLf+61b+
- q5GOgtGnQCJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYLQAKCRDhuBo+eShj
- d9IBEADCxuBV98p4EeEhXjdQG5XWMxSpvLsVbj3M0E2kKiIwcrxpa9AJxkVUursKhIi9rUDxdXd
- NGWZ8HSlmyqls7Y3hpUwFYndcQuW4nxAIZWt42FirgHrX0NCX16lx5I5/+eo+IiCe4ccRoHMgEq
- 01JXhX/piAGvhuN76Mw1mnLR5cum7zQp7ycaIRJ4K4/UMpTsEF3OfLWykGYO5K0WPyk+KEbqEm9
- sgiwnrbXmxW/bSIdx/1FPpb3hBkpCM2zn63p7d5iA80VcNj7gIlcujiu0fHe1Y1ReypylwCgQzs
- P1D7ypmft0pyj6sUvKE3DpC5IP5Mw4drtUI1vuNg3gA4679X3QodH4030qzOSKOZc365A865dmg
- GfRFkfTBC+7EpHTNS5k5/Yxjv9Gm3kF86NLFSsIKsceTL94/dhP3rKEwbkzqG6HmyS7Bv/kF0RB
- 5QkWfbIieVe+VA5YZz8BywbkcyjaDfWQG7QKSXjZywbVUM/iU6+1Mw/RCtFmSaB8sNcGTKLIQ+H
- 9ECe9/cLh7S9dHdjxSGMNER1PxwGSyywJRieit8ZRWY1dplVI1K+zBzDgYH9mNOTOSODhSau8rs
- gpAckvS/+VSaabzfijTBrBxcN45a6FbRcjIFeDm1mzmlEjyk1hONveYVeINnK3BBzTQXtb3VABW
- l0QslnlC7NVHN2g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1028; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=7BsUMdxU+4o8Atmxvi2C2Yk4sut1Zh21/NZvpuROV9U=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklg4ccLaxdetyIDs2ivzwrKOGT9mU3qMRJbLi
+ d6udKXYB6SJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYOAAKCRDhuBo+eShj
+ d/SMD/4/4YwNGwDDtKVPiCoYpIESWdAQIduCAObFrzlsZL/kCIkB0OMU0EMKO2cMmBBT6bBYFd4
+ qwedoAdYdDByA3piKaKLOQezC5celEc4+F+IphMdiaMg4tBLjAMqFL89thiK2OnvtZbp6OL79rT
+ NBUa7EFfsQiAnB4bZcRRYzklaRthtLFmRqcIdJZGHau7OsWUvw3wj+aPzdlf//RqEN63DtvzKEc
+ mRMVMLqSeZr1ZHQ4CwBFbyEC1yrDP2WFEy6gj0BiiuDexcKL8K/0N/NvzxNK3bCPtUOV/1pHbfU
+ 3uUAbAci131lesi6I+yYt/+QInj/lXfCzn3IKf823uTyiqVLSMPbbOVzKhxVmaTkMeRFucAhRSZ
+ oiHx2upFd/aQAOuBcGrj/OkFuwkvJvIFJxLySCTC8t22KX8GEn6V6j7UuBH5S9W0B1McCBvVeFK
+ XncX2V3/mHuBkbio45kWI+PXeWDVQSAeqXa/60JmUhvrhg9Ch/X1pWqsL712Tu/qQ24BswVQ8aO
+ gI+GMJV7qKO28JtHvCtGjpLDZ1K8M12Y3tsyn1GNqq0EPY0CAlDJY0rrNnaNhFQGgYOlPfz9TCx
+ g06pY4/jCcEw5VJ1WUVg/wtHYiBCYOySd7LvzbXLfFmR8VWI35FnRmPOOxWnuQE2C71SiAefNiI
+ TzllyUbiu4t9g4w==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add support for configuring the maximum hardware discard sectors
-through GenDiskBuilder. This allows block devices to specify their
-discard/trim capabilities.
-
-Setting this value to 0 (the default) indicates that discard is not
-supported by the device. Non-zero values specify the maximum number
-of sectors that can be discarded in a single operation.
+`GenDisk` is a pointer to a `struct gendisk`. It is safe to reference this
+struct from multiple threads.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq/gen_disk.rs | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ rust/kernel/block/mq/gen_disk.rs | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 1ce815c8cdab0..75968d6a57639 100644
+index 75968d6a57639..72bbf3cadfe82 100644
 --- a/rust/kernel/block/mq/gen_disk.rs
 +++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -25,6 +25,7 @@ pub struct GenDiskBuilder {
-     logical_block_size: u32,
-     physical_block_size: u32,
-     capacity_sectors: u64,
-+    max_hw_discard_sectors: u32,
- }
+@@ -218,6 +218,10 @@ pub struct GenDisk<T: Operations> {
+ // `TagSet` It is safe to send this to other threads as long as T is Send.
+ unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
  
- impl Default for GenDiskBuilder {
-@@ -34,6 +35,7 @@ fn default() -> Self {
-             logical_block_size: bindings::PAGE_SIZE as u32,
-             physical_block_size: bindings::PAGE_SIZE as u32,
-             capacity_sectors: 0,
-+            max_hw_discard_sectors: 0,
-         }
-     }
- }
-@@ -94,6 +96,16 @@ pub fn capacity_sectors(mut self, capacity: u64) -> Self {
-         self
-     }
- 
-+    /// Set the maximum amount of sectors the underlying hardware device can
-+    /// discard/trim in a single operation.
-+    ///
-+    /// Setting 0 (default) here will cause the disk to report discard not
-+    /// supported.
-+    pub fn max_hw_discard_sectors(mut self, max_hw_discard_sectors: u32) -> Self {
-+        self.max_hw_discard_sectors = max_hw_discard_sectors;
-+        self
-+    }
++// SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a `TagSet`. It is
++// safe to reference these from multiple threads.
++unsafe impl<T: Operations> Sync for GenDisk<T> {}
 +
-     /// Build a new `GenDisk` and add it to the VFS.
-     pub fn build<T: Operations>(
-         self,
-@@ -112,6 +124,7 @@ pub fn build<T: Operations>(
- 
-         lim.logical_block_size = self.logical_block_size;
-         lim.physical_block_size = self.physical_block_size;
-+        lim.max_hw_discard_sectors = self.max_hw_discard_sectors;
-         if self.rotational {
-             lim.features = bindings::BLK_FEAT_ROTATIONAL;
-         }
+ impl<T: Operations> Drop for GenDisk<T> {
+     fn drop(&mut self) {
+         // SAFETY: By type invariant of `Self`, `self.gendisk` points to a valid
 
 -- 
 2.51.2
