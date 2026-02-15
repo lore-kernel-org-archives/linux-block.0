@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1272D837C;
-	Sun, 15 Feb 2026 23:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19E23128B6;
+	Sun, 15 Feb 2026 23:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199216; cv=none; b=ggrZQiZDobe4o2jppYygHXod7EzaqXdpwfKcxFDD3H172XkWwQQtdL+o42+VwuUkN+mtckxv57aoiGC53sXvD+FpGoLp34HczzWJHLIBVEdm7NOhVTBUFGkjzI9g1j1my6PxbYVwXEALd6eolegZnAFg0B1AsJnfVQh5NtEEOSI=
+	t=1771199221; cv=none; b=hKIoV9rtO2b16ESf9CSA/PGaBeYVcZf7+SL3Dr7LsVzU72WO4WWONrVwvnDzjcjvNVbaZwgcZqEH9Dz7w9nIkuOAen7W5ZERQAK0m36kYKNJOFIfgJbvN7zjVrjdl+PPvqAH3rGKCMOGBknqBN9pQ5EXJ9aOViklaSoDfABCECo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199216; c=relaxed/simple;
-	bh=pHTvVkZRFYcjiaGREx9N7FRfc2mqdwNLh9peaN0Ub0Y=;
+	s=arc-20240116; t=1771199221; c=relaxed/simple;
+	bh=+9VoTKjKEOvBExxZyNph/soC3n95VmzkDwZhpUL6gGk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X0qZ4FwE+ouVN05XTjca3j25MnGd72vZLC7XGrGJ7gt3jl/I5NVCVeEtUGZrYBz/ObraBPcwfMC/aQwwKEPd7jPlmaB68gglx0stCyz9ceBy9Pn0F+6EUWnaWvB1rc8doHy4QseudbmHzbObgsoUrnCl4wQR756VkiATwT4/3XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmQjiPkM; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=pQnos+EeQ3QsYl73HwcNNobYQBxSbKqTsyW0CtzQ2/7RpH5mf0NrZj13s2wGug8JJXY7C117gsGj7GidB4qP1AH7IArMmk44DILEJCu6ksZ7A8KbcQh4A8vWgL/akQOJRZfOH/ipYnPyTuvDM1Aty9vU/fqYgolkUFfNGpVzOVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6yFBLnh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmQjiPkM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9CFFC4CEF7;
-	Sun, 15 Feb 2026 23:46:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6yFBLnh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89508C4CEF7;
+	Sun, 15 Feb 2026 23:46:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199215;
-	bh=pHTvVkZRFYcjiaGREx9N7FRfc2mqdwNLh9peaN0Ub0Y=;
+	s=k20201202; t=1771199220;
+	bh=+9VoTKjKEOvBExxZyNph/soC3n95VmzkDwZhpUL6gGk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=BmQjiPkMGbCMCCRWpIRKmUkMrdGCR9uHTSwgOcA660yGX9ktAN30df2PCPV3s1HZk
-	 6CEfKyzgEVdxnIQWZU2sAQGCS/S5FdfVQVx0cD/mKtl8lag7yrZ8mIUEs/tcjl+jas
-	 tssEjIRSACRWsCVEMNjHKPKw1d/9YnUX5GO5JjL7vJn6UA0FNu/5BO4te+G6TLLUiQ
-	 HzbZ8HZG8ZWn206d5cPypIxHAoQtaq4lhGaTNVkvT1CLAR88iFZsgYvzaUWz3IW4DZ
-	 ukKxIk36VgGppMIBD5qzeXu/6eheDOcZsDLM1PwpEyM2bT1EGdmd7VcKD5s0+Beoq5
-	 Pyi7Orb/Ucqhw==
+	b=p6yFBLnh1+UCZDBzNagelOCQiAZTy6t9bFvCt3DfPY2kQjp89cxxnx/WqzR7uPkja
+	 XtFGPzD709kaFS8rYUarJHVM5GG9Ji4D/BEmVk7PNzGqp6vPNfsy+s1KPD1tzNyA8/
+	 kUp2P3pl+lqLRVQCboXDNycR9wZdV5J7kDe9/J7Pzji3+YlPfufknDWmzv02HHD9Rb
+	 Oy6tumJ0FYF4Fy+rwaPqkV8EERwiTTka5MsM6Z2EXPPqyza5mQ+q53Nl+f4snLPddz
+	 vNh/wt5/YsJA2FppjhCbiJIX11xf2/8kjwATVyvsSIAj+i1PGPC8ofwodRrTys3fVZ
+	 v/AlL1tiw4nZw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:31 +0100
-Subject: [PATCH 44/79] block: rust: add an abstraction for
- `bindings::req_op`
+Date: Mon, 16 Feb 2026 00:35:02 +0100
+Subject: [PATCH 15/79] block: rnull: add `use_per_node_hctx` config option
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-44-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-15-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -57,180 +56,167 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6414; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=pHTvVkZRFYcjiaGREx9N7FRfc2mqdwNLh9peaN0Ub0Y=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhDEeCdW/yi4dywjzU/1Nk+MWm9S2xIIH2Cn
- V0G9M1w7xSJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYQwAKCRDhuBo+eShj
- d/D6D/44ecuU5yS9H5GCaAuZSVh+YOzWJCcgz/rVCkktg1rouPSSpD6CxPVUon461IFCjG00DLA
- G0FKsh7baTRApFzDessKhoxB+9+5mm5uoe3KDBZka+ZtKw6XmL13kwSE6QDe4izJo2fXWh8ZECc
- T88vr0uJG817P2hEkIKdE7sfywllU2Boyaxc256EgmJko0htOudxKOPi0nX2tGTWC2quFmMbBnj
- 5ZR4gxFx4OewOOIf2Iyt1vcRNuDuTTJRa38dGXbjwgF/KTExWRKIikmoN/0HKJgOYgsHtGvyCLS
- NrEInkyirWFL29VlZeTQAEcIuc5yYEBJwCaXeckvuyEk7pivpurH2atUKKpy1Qn/QshXpDuIBFA
- 5cNc6Vu2ZlFJrGZBXaOjXwcN8Ra7nLJ6wgs82RQJ3RQP+CjK7FjLMFXceHE4cgluDKQtECeD3pl
- raa/er7bmW6GL7Q5ZQurcZJ6sptVEQC4uq/pWVwnC/IwZfCLGTQjFmhyYBLaxNqrNUx3u40ll9v
- /8ylEGx1cgYdBcnRaZSV90oIGgrAB8nipQus1bMtJV2hsXIg9jnAEa9dTHZTXuqbK2Aqw/2SmS9
- cXooL5FmaBASTDq6ifdv1QwvzLB+mS6rmIPRbTiD7s0baqG2g9Xpk8t7etiq84wChnJIRI1LA76
- 32fIHtKfsDlyO5g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4913; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=+9VoTKjKEOvBExxZyNph/soC3n95VmzkDwZhpUL6gGk=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgp/QnG7POfeQUiu6svmmlJXvglJFlTee9SK
+ tUtnVeNTJqJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYKQAKCRDhuBo+eShj
+ d/YcEADDBnyhEHkcnKjgjSOfCTFCpflKQjLLvFu6y+3h6U/AAMU78Ooa0UWjtF/iAX3ljz+Jw38
+ +38ZE28EZIEB3oKXNFlW+Bu5c0Gl+sGHnDr9pWorObN7SOuzgXrqT20MVvUCfmBT7ZvhaSOJ1cU
+ kdaZrlwcTmlB+TeD2Zf2MDIrdSgwoRdbRj7MjtFnWmmUEYeXBlAriFw9w6MTmNg5cuIu86YyV8G
+ SMwkCgo8520RMC1HPaIMdnfafpsaSU+wwlOLWWmqRBGinA/yFpC64y0UjskOCk7PlsWYkKKrBXw
+ N/sDKTZ8k9e1d/LTJctLsOKbdd3neRxwbJ+l+UNtu8qzgZhQR/CKepJxeHk5csYXyKosM7lZ8VL
+ iBexxDt3LaW/TgzxQYlKqAR6cgVpDxCqLPGXN6N3lILjfobVN17IIIBMeS/dMaU9iIPUzRpE9c8
+ xFVesd0gonPwZU+0MngZ71gXTW7zoeG9UsufKNxQRc8KqmHik976k+KwoPxL34GdAd3iOsLBtgB
+ cBqPbCD77dmJumgXnYPM4PXREAE748c76L66EeBrq1bJ/cEfek3j0jT+dOVA8Iro47s2HwJm7NN
+ YGi/5HKi90LE3zlnMj+ayAvpkvKnvl3sYgkmwFijBqbX0hz0Wfiwa/tJJ3EzCpbKl94uhHlcPY/
+ HGlnL5hJHMYoRiw==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add the `Command` enum as a Rust abstraction for block request operation
-codes. The enum variants correspond to the C `REQ_OP_*` defines and
-include read, write, flush, discard, and zone management operations.
-
-Also add a `command()` method to `Request` to retrieve the operation
-code.
+Add a configfs attribute to enable per-NUMA-node hardware contexts.
+When enabled, the driver creates one hardware queue per NUMA node
+instead of the default configuration.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/rnull.rs            |  6 +--
- rust/kernel/block/mq.rs                 |  1 +
- rust/kernel/block/mq/request.rs         | 11 +++++-
- rust/kernel/block/mq/request/command.rs | 65 +++++++++++++++++++++++++++++++++
- 4 files changed, 79 insertions(+), 4 deletions(-)
+ drivers/block/rnull/configfs.rs | 26 ++++++++++++++++++++++++--
+ drivers/block/rnull/rnull.rs    | 28 ++++++++++++++++++++++------
+ 2 files changed, 46 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index fd3cbf7aa012e..b05bfc23090c2 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -30,8 +30,11 @@
+     time, //
+ };
+ use macros::{
++    configfs_attribute,
+     configfs_simple_bool_field,
+-    configfs_simple_field, //
++    configfs_simple_field,
++    show_field,
++    store_with_power_check, //
+ };
+ use pin_init::PinInit;
+ 
+@@ -61,7 +64,7 @@ impl AttributeOperations<0> for Config {
+         let mut writer = kernel::str::Formatter::new(page);
+         writer.write_str(
+             "blocksize,size,rotational,irqmode,completion_nsec,memory_backed\
+-             submit_queues\n",
++             submit_queues,use_per_node_hctx\n",
+         )?;
+         Ok(writer.bytes_written())
+     }
+@@ -88,6 +91,7 @@ fn make_group(
+                 completion_nsec: 5,
+                 memory_backed: 6,
+                 submit_queues: 7,
++                use_per_node_hctx: 8,
+             ],
+         };
+ 
+@@ -280,3 +284,21 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+         Ok(())
+     }
+ }
++
++configfs_attribute!(DeviceConfig, 8,
++    show: |this, page| show_field(
++        this.data.lock().submit_queues == kernel::num_online_nodes(), page
++    ),
++    store: |this, page| store_with_power_check(this, page, |this, page| {
++        let value = core::str::from_utf8(page)?
++            .trim()
++            .parse::<u8>()
++            .map_err(|_| kernel::error::code::EINVAL)?
++            != 0;
++
++        if value {
++            this.data.lock().submit_queues *= kernel::num_online_nodes();
++        }
++        Ok(())
++    })
++);
 diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 3fb19836ce6ff..9383b82f9a736 100644
+index 55ee5165b90b3..990dfcf95c9de 100644
 --- a/drivers/block/rnull/rnull.rs
 +++ b/drivers/block/rnull/rnull.rs
-@@ -508,10 +508,10 @@ fn transfer(
-                     .len()
-                     .min((end_sector - sector) as u32 >> SECTOR_SHIFT);
-                 match command {
--                    bindings::req_op_REQ_OP_WRITE => {
-+                    mq::Command::Write => {
-                         self.write(&mut tree_guard, &mut hw_data_guard, sector, segment)?
-                     }
--                    bindings::req_op_REQ_OP_READ => {
-+                    mq::Command::Read => {
-                         self.read(&mut tree_guard, &mut hw_data_guard, sector, segment)?
-                     }
-                     _ => (),
-@@ -703,7 +703,7 @@ fn queue_rq(
-         Self::handle_bad_blocks(this.deref(), &mut rq, &mut sectors)?;
+@@ -21,12 +21,17 @@
+         },
+     },
+     error::Result,
+-    new_mutex, new_xarray,
++    new_mutex,
++    new_xarray,
+     page::SafePage,
+     pr_info,
+     prelude::*,
+     str::CString,
+-    sync::{aref::ARef, Arc, Mutex},
++    sync::{
++        aref::ARef,
++        Arc,
++        Mutex, //
++    },
+     time::{
+         hrtimer::{
+             HrTimerCallback,
+@@ -40,7 +45,7 @@
+         OwnableRefCounted,
+         Owned, //
+     },
+-    xarray::XArray,
++    xarray::XArray, //
+ };
+ use pin_init::PinInit;
  
-         if this.memory_backed {
--            if rq.command() == bindings::req_op_REQ_OP_DISCARD {
-+            if rq.command() == mq::Command::Discard {
-                 this.discard(&hw_data, rq.sector(), sectors)?;
-             } else {
-                 this.transfer(&hw_data, &mut rq, sectors)?;
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 02738f52389ba..057a5f366be3a 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -131,6 +131,7 @@
- pub mod tag_set;
+@@ -73,8 +78,9 @@
+             description:  "IRQ completion handler. 0-none, 1-softirq, 2-timer",
+         },
+         completion_nsec: u64 {
+-            default: 10_000,
+-            description:  "Time in ns to complete a request in hardware. Default: 10,000ns",
++                default: 10_000,
++                description:
++            "Time in ns to complete a request in hardware. Default: 10,000ns",
+         },
+         memory_backed: u8 {
+             default: 0,
+@@ -84,6 +90,11 @@
+             default: 1,
+             description: "Number of submission queues",
+         },
++        use_per_node_hctx: u8 {
++            default: 0,
++            description:
++        "Use per-node allocation for hardware context queues, 0-false, 1-true. Default: 0-false",
++        },
+     },
+ }
  
- pub use operations::Operations;
-+pub use request::Command;
- pub use request::IdleRequest;
- pub use request::Request;
- pub use request::RequestTimerHandle;
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index d6f3ffde1c5c4..4e47419776e0f 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -23,6 +23,9 @@
- use crate::block::bio::Bio;
- use crate::block::bio::BioIterator;
+@@ -106,6 +117,11 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+             for i in 0..(*module_parameters::nr_devices.value()) {
+                 let name = CString::try_from_fmt(fmt!("rnullb{}", i))?;
  
-+mod command;
-+pub use command::Command;
-+
- /// A [`Request`] that a driver has not yet begun to process.
- ///
- /// A driver can convert an `IdleRequest` to a [`Request`] by calling [`IdleRequest::start`].
-@@ -89,11 +92,17 @@ fn deref(&self) -> &Self::Target {
- 
- impl<T: Operations> RequestInner<T> {
-     /// Get the command identifier for the request
--    pub fn command(&self) -> u32 {
-+    fn command_raw(&self) -> u32 {
-         // SAFETY: By C API contract and type invariant, `cmd_flags` is valid for read
-         unsafe { (*self.0.get()).cmd_flags & ((1 << bindings::REQ_OP_BITS) - 1) }
-     }
- 
-+    /// Get the command of this request.
-+    pub fn command(&self) -> Command {
-+        // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
-+        unsafe { Command::from_raw(self.command_raw()) }
-+    }
-+
-     /// Get the target sector for the request.
-     #[inline(always)]
-     pub fn sector(&self) -> u64 {
-diff --git a/rust/kernel/block/mq/request/command.rs b/rust/kernel/block/mq/request/command.rs
-new file mode 100644
-index 0000000000000..70a8d67fa35c0
---- /dev/null
-+++ b/rust/kernel/block/mq/request/command.rs
-@@ -0,0 +1,65 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/// Block I/O operation codes.
-+///
-+/// This is the Rust abstraction for the C [`enum req_op`].
-+///
-+/// Operations common to the bio and request structures. The kernel uses 8 bits
-+/// for encoding the operation, and the remaining 24 bits for flags.
-+///
-+/// The least significant bit of the operation number indicates the data
-+/// transfer direction:
-+///
-+/// - If the least significant bit is set, transfers are TO the device.
-+/// - If the least significant bit is not set, transfers are FROM the device.
-+///
-+/// If an operation does not transfer data, the least significant bit has no
-+/// meaning.
-+///
-+/// [`enum req_op`]: srctree/include/linux/blk_types.h
-+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-+#[repr(u32)]
-+pub enum Command {
-+    /// Read sectors from the device.
-+    Read = bindings::req_op_REQ_OP_READ,
-+    /// Write sectors to the device.
-+    Write = bindings::req_op_REQ_OP_WRITE,
-+    /// Flush the volatile write cache.
-+    Flush = bindings::req_op_REQ_OP_FLUSH,
-+    /// Discard sectors.
-+    Discard = bindings::req_op_REQ_OP_DISCARD,
-+    /// Securely erase sectors.
-+    SecureErase = bindings::req_op_REQ_OP_SECURE_ERASE,
-+    /// Write data at the current zone write pointer.
-+    ZoneAppend = bindings::req_op_REQ_OP_ZONE_APPEND,
-+    /// Write zeroes. This allows to implement zeroing for devices that don't use either discard
-+    /// with a predictable zero pattern or WRITE SAME of zeroes.
-+    WriteZeroes = bindings::req_op_REQ_OP_WRITE_ZEROES,
-+    /// Open a zone.
-+    ZoneOpen = bindings::req_op_REQ_OP_ZONE_OPEN,
-+    /// Close a zone.
-+    ZoneClose = bindings::req_op_REQ_OP_ZONE_CLOSE,
-+    /// Transition a zone to full.
-+    ZoneFinish = bindings::req_op_REQ_OP_ZONE_FINISH,
-+    /// Reset a zone write pointer.
-+    ZoneReset = bindings::req_op_REQ_OP_ZONE_RESET,
-+    /// Reset all the zones present on the device.
-+    ZoneResetAll = bindings::req_op_REQ_OP_ZONE_RESET_ALL,
-+    /// Driver private request for data transfer to the driver.
-+    DriverIn = bindings::req_op_REQ_OP_DRV_IN,
-+    /// Driver private request for data transfer from the driver.
-+    DriverOut = bindings::req_op_REQ_OP_DRV_OUT,
-+}
-+
-+impl Command {
-+    /// Creates a [`Command`] from a raw `u32` value.
-+    ///
-+    /// # Safety
-+    ///
-+    /// The value must be a valid `req_op` operation code.
-+    pub unsafe fn from_raw(value: u32) -> Self {
-+        // SAFETY: The caller guarantees that the value is a valid operation
-+        // code.
-+        unsafe { core::mem::transmute(value) }
-+    }
-+}
++                let submit_queues = if *module_parameters::use_per_node_hctx.value() != 0 {
++                    kernel::num_online_nodes()
++                } else {
++                    *module_parameters::submit_queues.value()
++                };
+                 let disk = NullBlkDevice::new(NullBlkOptions {
+                     name: &name,
+                     block_size: *module_parameters::bs.value(),
+@@ -114,7 +130,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     irq_mode: (*module_parameters::irqmode.value()).try_into()?,
+                     completion_time: Delta::from_nanos(completion_time),
+                     memory_backed: *module_parameters::memory_backed.value() != 0,
+-                    submit_queues: *module_parameters::submit_queues.value(),
++                    submit_queues,
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
 
 -- 
 2.51.2
