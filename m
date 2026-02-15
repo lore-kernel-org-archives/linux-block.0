@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67AD2D94BE;
-	Sun, 15 Feb 2026 23:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FA52DC772;
+	Sun, 15 Feb 2026 23:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771198953; cv=none; b=QUGReWhcnV3Cxr7rFscaWMo3P3VMcIoeaihGrxRY5lyV8xK7dPoLkveOtBnRBfnRv3mlr2Yo6JLpnNKhv9U9TM804z38bbtIW1DqQsiwNAPDs9EldFWLDXozBRCenQXeIkfRnjb6wsnCTdBJjs/6fFFv2tLYi3PQDTCz0T1gW2U=
+	t=1771198958; cv=none; b=Tz/ptuqrPYenRrv7RpPQfZcX8y3EC70FfJfTP2Ga/Kk8ef+HP3kmk5nyTfaIS0ZUXFh5/6qmMzIPdTOTy5hU7p5NgSUl6ql/mHe8EpNNIHTuNX5G1JdAETv68Sbo88h/mfFLYSYHUPpFYbYyZXyZq/h1s7WML8y+ttdgeIybYSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771198953; c=relaxed/simple;
-	bh=ZBT3g2yxwr2ga5MlCDT4cJc5rd6AoVQ9CyP5UJLr7JY=;
+	s=arc-20240116; t=1771198958; c=relaxed/simple;
+	bh=mPaJdnA08bz6YzukufDATJZJlX5Z7yfcsTpWSx7drrU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SSkmRB9niKNZutB+V+ITW322IlefuETSSKVmu+DsXlx/OKtGrSq0k0+xVjGrrB8SRbi1NY2sljZNvajtrBYNPqzeyGGJzPiwrfIRmIjI4Zm2Kl2WvqyiGd9h4uoyTvF3sJQK2qmQ1u9tdPd6gx0Ar/7u0AunKcZh33+HUe3si/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQ0LJSHO; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=fpgTflLnDY+UkInjcqtvlGpevvPoEIeZ1nLhZT2oyjkNZjFFgN+3LWGNZJOnmPsxT0sJ2SC85s39jC9feaowsatmBkZ0fAhNov9hpWO8eWmTItGPr4fMy3BP9JeryQe82xknFZY/4d/uE430vZz+A1AvH3j06NgxbqHV27tYcyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uLg4izf1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQ0LJSHO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DBDCC19422;
-	Sun, 15 Feb 2026 23:42:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uLg4izf1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 528A3C4CEF7;
+	Sun, 15 Feb 2026 23:42:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771198953;
-	bh=ZBT3g2yxwr2ga5MlCDT4cJc5rd6AoVQ9CyP5UJLr7JY=;
+	s=k20201202; t=1771198958;
+	bh=mPaJdnA08bz6YzukufDATJZJlX5Z7yfcsTpWSx7drrU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oQ0LJSHOI5yscAmkUVG++3cAQSWRAceqv3D0uq2h4/A0ND+d+Vay35uo/6D8Nhd6t
-	 Kzr1zb85rkn8P/78LpvGZ59R4GfHdtt3COdBcJEYKIr7lRH4bRoIKWw+fymLavNP3q
-	 SBtVcCVRmM1yfS7oBEqzJe77DVBax4bkBD6j2pITc/rOXCSZ1qH1STZdMsBJNZV+OG
-	 yXnGajUfOZZ7QyYxYwN6FUzK9Vjj63nHRv3vcVqya/h5YfvC3g/PWL7l2ZdE2XLJwd
-	 h9KR3R+ehhy5DQU9iIce96EAr3JH88izhhVM63PLazxU4ndAAPzn3uOjCSAVGobvf2
-	 oevjZEmirz1wA==
+	b=uLg4izf1PM8gqhPDfHqZL929CRE2DTJ/KxnrvYokJWM7vmx++wtifuDiKP7IDH+/q
+	 15hyyd/bcNJWdAMht6NQ8O5WHgwhmDA1mp2jtL4Vmyj4bL6IvYUnYAtcnPdlIWcByl
+	 jkz8KNty6uFOR0qPcf+m7WbDyPeonycK4debT3X+sKdLT3r9yW5jYep4sftXPAkLX2
+	 ISpV0T0YhSXNjeTNxm2mBQVGXh3Y5U9CA7pIqz+Qvp72cZZUJH9CIEbzv0csjVaZin
+	 bDW6RU2bn/zpJ/0f0Bj2cQya7kaJyOWTWoOO0xB7x1e92pbEjzYGH2yDK9aCiAtPDy
+	 nFr65qRtcN8qA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:34:50 +0100
-Subject: [PATCH 03/79] block: rnull: add macros to define configfs
- attributes
+Date: Mon, 16 Feb 2026 00:35:14 +0100
+Subject: [PATCH 27/79] block: rnull: add badblocks_once support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-3-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-27-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -57,332 +56,181 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10210;
- i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=ZBT3g2yxwr2ga5MlCDT4cJc5rd6AoVQ9CyP5UJLr7JY=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgeSt5Gpp+/cjlALcsKqnCvx2CtOLaSgTmuZ
- 5S1M+PAvxKJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYHgAKCRDhuBo+eShj
- dxG0EACwY4lNl7HxgkSgg52iQKuudaW+KKtUEtLbOPnjN4vwDRaW5/rzgKREi8+8L4Hn5i/pRaE
- aLRUmsG035uMlSrRwgqucvAmHDuETFlxewsvaN7bHlDpPIc69KG7I6dqME4ApI99615IFir39Il
- US4j/8i7YXr6fLC7NRBJwm0YG31P22xqc/oHntGgoG8zFsyiUbOp3AnMBP/2ffB1zdwLTVDNDGp
- zcFP3+yr7euceudcVIoeVJkw74154p/lEI8rerssardEivgs7WsVg5nDpvSJO3elWw2ZSyCP/u0
- v/XB3MuW+tuiYWeJl4ZQdSwQecBB4T5lirjtCUR87ijjFr4U7gV+0uzyEf4htnzdnOY3LzVkxxX
- +UDQYhjIA3VI5xFOLVe9lA9vmGmpgVXANMzhsaqH10mf4qx/EeqxFqFPDUskqY2caxftq7KxGQK
- mvVrfajabD6Bsbpoe19hmDSh1GG5dQ0AZwVDTGVLQt5Yhgrx6jhCDqV8tfHRV88+vj6++g1QAOy
- 5AGIXTLcyWlLBc57zWrNCWZKLv2ZFE1hewbPQQhGbMmvmBmzAtSA6EVXeBEtZrgKGzGNu73fCGb
- /GXzLK6AF3F/BfkVnOcRSln/2rPEyETi0aqJoa8EPiCrGY7UEoJuwxs0SkRb93ZhKRRxCoqTEcJ
- fIvQw9h7rLuyy/Q==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5676; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=mPaJdnA08bz6YzukufDATJZJlX5Z7yfcsTpWSx7drrU=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklg0gpsXFXxzc1lHaiAxCsn05VWspInODyhcx
+ +COma0+h1WJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYNAAKCRDhuBo+eShj
+ d6NdD/9VzqziYOZORL+w+EyvJ+DjwGX57mT4SohYFt5k0+dyu6GNOpWEPwoiE96dQtqQncyWvEt
+ TXtKlLSGDSZ3yfpf0ID75MqiBwnUtOmOtLS4R360hVOfPSs64mvN4lR3M9EcXoH+lgZFxcADFuv
+ LSM3jC+mSrMj28AzbquDyrPLLDD+wABbXX67Lf2bVrNUajlK9T+8J0arhxvmY4sqF61cF0vDScq
+ VtvnB61d8V02U0oYkIXlpr18oitcK4jHHzr+6R0Vh8WN74GW2fpuvX5P32RnHWVaIWR+qVXM+m9
+ OnwVifaDcOOR2QwKTFF/G5KoPn7H9Fp4hpDK9ieBVEioELGh+bep84Nw/VbqIIzLhtePNuNYH5+
+ zais2/7lYmLWqa/gtJZBIdq4IiA8sxlmDpurdga6YlezkCf/zSFIpTmuZE7sBCNg2AlQ6NCXtud
+ 2CeNoEMzunwPewSKt7+W3bvaJvri93/eoFj16eH6AfhBLJoIiT048CTEjBNzYDjFE7QlRcxxMvM
+ EtLAZvsvI3Pd+0i1zzB6WuQkVsAupbWzVf5k+gcbWy1pPAWaBeK/mSzAPKMYq+IS+g/C40POev6
+ j/y+QHdq2/G3Pfnqjis+7XJglP1xf4eBE6wUJesr/Jd3tB4VA5fklhxUZVq210VUyUTKSJXPxEN
+ 1Vz7GfFZyKM7Kew==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Defining configfs attributes in rust is a bit verbose at the moment. Add
-some macros to make the attribute definition less verbose.
+Add support for the badblocks_once feature, which automatically clears
+bad blocks after they are encountered during I/O operations. This
+matches the functionality in the C null_blk driver.
 
-The configfs Rust abstractions should eventually provide procedural macros
-for this task. When we get more users of the configfs Rust abstractions, we
-shall consider this task.
+When badblocks_once is enabled:
+- Bad blocks are checked during I/O requests as usual
+- If a bad block is encountered, the I/O is marked as failed
+- The bad block range is immediately cleared from the bad blocks table
+- Subsequent I/O to the same sectors will succeed
+
+This feature is useful for testing scenarios where bad blocks are
+transient or where devices can recover from bad sectors after a single
+access attempt.
+
+The feature is configurable via the configfs badblocks_once attribute
+and disabled by default, maintaining compatibility with existing
+behavior.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs        | 134 +++++++++------------------------
- drivers/block/rnull/configfs/macros.rs | 128 +++++++++++++++++++++++++++++++
- 2 files changed, 164 insertions(+), 98 deletions(-)
+ drivers/block/rnull/configfs.rs | 31 +++++++++++++++++++++++++++++++
+ drivers/block/rnull/rnull.rs    | 21 +++++++++++++++------
+ 2 files changed, 46 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index ea38b27a9011c..eafa71dfc40d3 100644
+index 61a76addf468b..a39691b39e374 100644
 --- a/drivers/block/rnull/configfs.rs
 +++ b/drivers/block/rnull/configfs.rs
-@@ -1,20 +1,41 @@
- // SPDX-License-Identifier: GPL-2.0
+@@ -103,6 +103,7 @@ fn make_group(
+                 discard: 10,
+                 no_sched:11,
+                 badblocks: 12,
++                badblocks_once: 13,
+             ],
+         };
  
--use super::{NullBlkDevice, THIS_MODULE};
-+use super::{
-+    NullBlkDevice,
-+    THIS_MODULE, //
-+};
- use kernel::{
--    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
-+    block::mq::gen_disk::{
-+        GenDisk,
-+        GenDiskBuilder, //
-+    },
-     c_str,
--    configfs::{self, AttributeOperations},
-+    configfs::{
-+        self,
-+        AttributeOperations, //
-+    },
-     configfs_attrs,
--    fmt::{self, Write as _},
-+    fmt::{
-+        self,
-+        Write as _, //
-+    },
-     new_mutex,
-     page::PAGE_SIZE,
-     prelude::*,
--    str::{kstrtobool_bytes, CString},
--    sync::Mutex,
-+    str::{
-+        kstrtobool_bytes,
-+        CString, //
-+    },
-+    sync::Mutex, //
-+};
-+use macros::{
-+    configfs_simple_bool_field,
-+    configfs_simple_field, //
- };
- use pin_init::PinInit;
- 
-+mod macros;
-+
- pub(crate) fn subsystem() -> impl PinInit<kernel::configfs::Subsystem<Config>, Error> {
-     let item_type = configfs_attrs! {
-         container: configfs::Subsystem<Config>,
-@@ -166,99 +187,16 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-     }
+@@ -126,6 +127,7 @@ fn make_group(
+                     discard: false,
+                     no_sched: false,
+                     bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
++                    bad_blocks_once: false,
+                 }),
+             }),
+             core::iter::empty(),
+@@ -186,6 +188,7 @@ struct DeviceConfigInner {
+     discard: bool,
+     no_sched: bool,
+     bad_blocks: Arc<BadBlocks>,
++    bad_blocks_once: bool,
  }
  
--#[vtable]
--impl configfs::AttributeOperations<1> for DeviceConfig {
--    type Data = DeviceConfig;
--
--    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
--        let mut writer = kernel::str::Formatter::new(page);
--        writer.write_fmt(fmt!("{}\n", this.data.lock().block_size))?;
--        Ok(writer.bytes_written())
--    }
--
--    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
--        if this.data.lock().powered {
--            return Err(EBUSY);
--        }
--
--        let text = core::str::from_utf8(page)?.trim();
--        let value = text.parse::<u32>().map_err(|_| EINVAL)?;
--
--        GenDiskBuilder::validate_block_size(value)?;
--        this.data.lock().block_size = value;
--        Ok(())
--    }
--}
--
--#[vtable]
--impl configfs::AttributeOperations<2> for DeviceConfig {
--    type Data = DeviceConfig;
--
--    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
--        let mut writer = kernel::str::Formatter::new(page);
--
--        if this.data.lock().rotational {
--            writer.write_str("1\n")?;
--        } else {
--            writer.write_str("0\n")?;
--        }
--
--        Ok(writer.bytes_written())
--    }
--
--    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
--        if this.data.lock().powered {
--            return Err(EBUSY);
--        }
--
--        this.data.lock().rotational = kstrtobool_bytes(page)?;
--
--        Ok(())
--    }
--}
--
--#[vtable]
--impl configfs::AttributeOperations<3> for DeviceConfig {
--    type Data = DeviceConfig;
--
--    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
--        let mut writer = kernel::str::Formatter::new(page);
--        writer.write_fmt(fmt!("{}\n", this.data.lock().capacity_mib))?;
--        Ok(writer.bytes_written())
--    }
--
--    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
--        if this.data.lock().powered {
--            return Err(EBUSY);
--        }
--
--        let text = core::str::from_utf8(page)?.trim();
--        let value = text.parse::<u64>().map_err(|_| EINVAL)?;
--
--        this.data.lock().capacity_mib = value;
--        Ok(())
--    }
--}
--
--#[vtable]
--impl configfs::AttributeOperations<4> for DeviceConfig {
--    type Data = DeviceConfig;
--
--    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
--        let mut writer = kernel::str::Formatter::new(page);
--        writer.write_fmt(fmt!("{}\n", this.data.lock().irq_mode))?;
--        Ok(writer.bytes_written())
--    }
-+configfs_simple_field!(DeviceConfig, 1, block_size, u32, check GenDiskBuilder::validate_block_size);
-+configfs_simple_bool_field!(DeviceConfig, 2, rotational);
-+configfs_simple_field!(DeviceConfig, 3, capacity_mib, u64);
-+configfs_simple_field!(DeviceConfig, 4, irq_mode, IRQMode);
- 
--    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
--        if this.data.lock().powered {
--            return Err(EBUSY);
--        }
-+impl core::str::FromStr for IRQMode {
-+    type Err = Error;
- 
--        let text = core::str::from_utf8(page)?.trim();
--        let value = text.parse::<u8>().map_err(|_| EINVAL)?;
--
--        this.data.lock().irq_mode = IRQMode::try_from(value)?;
--        Ok(())
-+    fn from_str(s: &str) -> Result<Self> {
-+        let value: u8 = s.parse().map_err(|_| EINVAL)?;
-+        value.try_into()
+ #[vtable]
+@@ -222,6 +225,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 discard: guard.discard,
+                 no_sched: guard.no_sched,
+                 bad_blocks: guard.bad_blocks.clone(),
++                bad_blocks_once: guard.bad_blocks_once,
+             })?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -422,3 +426,30 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+         Ok(())
      }
  }
-diff --git a/drivers/block/rnull/configfs/macros.rs b/drivers/block/rnull/configfs/macros.rs
-new file mode 100644
-index 0000000000000..53ce9d5dbdc8a
---- /dev/null
-+++ b/drivers/block/rnull/configfs/macros.rs
-@@ -0,0 +1,128 @@
-+// SPDX-License-Identifier: GPL-2.0
 +
-+use super::DeviceConfig;
-+use core::{fmt::Write, str::FromStr};
-+use kernel::{page::PAGE_SIZE, prelude::*};
++#[vtable]
++impl configfs::AttributeOperations<13> for DeviceConfig {
++    type Data = DeviceConfig;
 +
-+pub(crate) fn show_field<T: fmt::Display>(value: T, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-+    let mut writer = kernel::str::Formatter::new(page);
-+    writer.write_fmt(fmt!("{}\n", value))?;
-+    Ok(writer.bytes_written())
-+}
++    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
++        let mut writer = kernel::str::Formatter::new(page);
 +
-+pub(crate) fn store_with_power_check<F>(this: &DeviceConfig, page: &[u8], store_fn: F) -> Result
-+where
-+    F: FnOnce(&DeviceConfig, &[u8]) -> Result,
-+{
-+    if this.data.lock().powered {
-+        return Err(EBUSY);
-+    }
-+    store_fn(this, page)
-+}
-+
-+pub(crate) fn store_number_with_power_check<F, T>(
-+    this: &DeviceConfig,
-+    page: &[u8],
-+    store_fn: F,
-+) -> Result
-+where
-+    F: FnOnce(&DeviceConfig, T) -> Result,
-+    T: FromStr,
-+{
-+    if this.data.lock().powered {
-+        return Err(EBUSY);
-+    }
-+
-+    let text = core::str::from_utf8(page)?.trim();
-+    let value = text.parse::<T>().map_err(|_| EINVAL)?;
-+
-+    store_fn(this, value)
-+}
-+
-+macro_rules! configfs_attribute {
-+    (
-+        $type:ty,
-+        $id:literal,
-+        show: |$show_this:ident, $show_page:ident| $show_block:expr,
-+        store: |$store_this:ident, $store_page:ident| $store_block:expr
-+        $(,)?
-+    ) => {
-+        #[vtable]
-+        impl configfs::AttributeOperations<$id> for $type {
-+            type Data = $type;
-+
-+            fn show($show_this: &$type, $show_page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-+                $show_block
-+            }
-+
-+            fn store($store_this: &$type, $store_page: &[u8]) -> Result {
-+                $store_block
-+            }
++        if this.data.lock().bad_blocks_once {
++            writer.write_str("1\n")?;
++        } else {
++            writer.write_str("0\n")?;
 +        }
-+    };
-+}
-+pub(crate) use configfs_attribute;
 +
-+// Specialized macro for simple boolean fields that just store kstrtobool_bytes result.
-+macro_rules! configfs_simple_bool_field {
-+    ($type:ty, $id:literal, $field:ident) => {
-+        crate::configfs::macros::configfs_attribute!($type, $id,
-+            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
-+            store: |this, page|
-+              crate::configfs::macros::store_with_power_check(this, page, |this, page| {
-+                this.data.lock().$field = kstrtobool_bytes(page)?;
-+                Ok(())
-+            })
-+        );
-+    };
-+}
-+pub(crate) use configfs_simple_bool_field;
++        Ok(writer.bytes_written())
++    }
 +
-+// Specialized macro for simple numeric fields that just parse and assign
-+macro_rules! configfs_simple_field {
-+    // Simple direct assignment
-+    ($type:ty, $id:literal, $field:ident, $field_type:ty) => {
-+        crate::configfs::macros::configfs_attribute!($type, $id,
-+            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
-+            store: |this, page| crate::configfs::macros::store_number_with_power_check(
-+                this,
-+                page,
-+                |this, value: $field_type| {
-+                    this.data.lock().$field = value;
-+                    Ok(())
-+                }
-+            )
-+        );
-+    };
-+    // With infallible conversion expression (direct value)
-+    ($type:ty, $id:literal, $field:ident, $field_type:ty, into $convert:expr) => {
-+        crate::configfs::macros::configfs_attribute!($type, $id,
-+            show: |this, page|
-+                crate::configfs::macros::show_field(this.data.lock().$field, page),
-+            store: |this, page| crate::configfs::macros::store_number_with_power_check(
-+                this,
-+                page,
-+                |this, value: $field_type| {
-+                    this.data.lock().$field = $convert(value);
-+                    Ok(())
-+                }
-+            )
-+        );
-+    };
-+    // With check, no conversion
-+    ($type:ty, $id:literal, $field:ident, $field_type:ty, check $check:expr) => {
-+        crate::configfs::macros::configfs_attribute!($type, $id,
-+            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
-+            store: |this, page| crate::configfs::macros::store_number_with_power_check(
-+                this,
-+                page,
-+                |this, value: $field_type| {
-+                    $check(value)?;
-+                    this.data.lock().$field = value;
-+                    Ok(())
-+                }
-+            )
-+        );
-+    };
++    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
++        if this.data.lock().powered {
++            return Err(EBUSY);
++        }
++
++        this.data.lock().bad_blocks_once = kstrtobool_bytes(page)?;
++
++        Ok(())
++    }
 +}
-+pub(crate) use configfs_simple_field;
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 861392c5b5841..0f569c5b65f77 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -161,6 +161,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     discard: *module_parameters::discard.value() != 0,
+                     no_sched: *module_parameters::no_sched.value() != 0,
+                     bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
++                    bad_blocks_once: false,
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -188,6 +189,7 @@ struct NullBlkOptions<'a> {
+     discard: bool,
+     no_sched: bool,
+     bad_blocks: Arc<BadBlocks>,
++    bad_blocks_once: bool,
+ }
+ struct NullBlkDevice;
+ 
+@@ -206,6 +208,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+             discard,
+             no_sched,
+             bad_blocks,
++            bad_blocks_once,
+         } = options;
+ 
+         let mut flags = mq::tag_set::Flags::default();
+@@ -235,6 +238,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+                 memory_backed,
+                 block_size: block_size.into(),
+                 bad_blocks,
++                bad_blocks_once,
+             }),
+             GFP_KERNEL,
+         )?;
+@@ -393,6 +397,7 @@ struct QueueData {
+     memory_backed: bool,
+     block_size: u64,
+     bad_blocks: Arc<BadBlocks>,
++    bad_blocks_once: bool,
+ }
+ 
+ #[pin_data]
+@@ -442,12 +447,16 @@ fn queue_rq(
+         if queue_data.bad_blocks.enabled() {
+             let start = rq.sector();
+             let end = start + u64::from(rq.sectors());
+-            if !matches!(
+-                queue_data.bad_blocks.check(start..end),
+-                badblocks::BlockStatus::None
+-            ) {
+-                rq.data_ref().error.store(1, ordering::Relaxed);
+-            }
++            match queue_data.bad_blocks.check(start..end) {
++                badblocks::BlockStatus::None => {}
++                badblocks::BlockStatus::Acknowledged(range)
++                | badblocks::BlockStatus::Unacknowledged(range) => {
++                    rq.data_ref().error.store(1, ordering::Relaxed);
++                    if queue_data.bad_blocks_once {
++                        queue_data.bad_blocks.set_good(range)?;
++                    }
++                }
++            };
+         }
+ 
+         // TODO: Skip IO if bad block.
 
 -- 
 2.51.2
