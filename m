@@ -1,168 +1,128 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797FD21E098;
-	Sun, 15 Feb 2026 13:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A6013AA2F
+	for <linux-block@vger.kernel.org>; Sun, 15 Feb 2026 14:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771162611; cv=none; b=EdJM3g45eAIRG1z9vjfpVbJGf93M0Rx7dHLt8ix/THtODttg5JAo8qNYLqU3ufyC63ZNopRXJRWwij5yH5lMPoYD1ITdOVh2v/mom7fAovDl+5VmPEBCs6g+R2SVktqUFp2Qiqlc9uXAIBCKHeeMnVaHoqqMahQMRFW2ZTr+FUo=
+	t=1771165044; cv=none; b=AAEzNqFZSrbzv6rrZwjhhEnVoegAz4o/4m5MFNnsSEoKLr4oPAwayEcMuloaOKKKmoByhr9cCSWfTHUHBwxsxvpA1QqWFAIQg66fbCLYNTQHApVAeYz5gEEoGljrM+5opREc7NY1Hm77wl1JBqLVXhKauKaI0Tx/4mXj+wojfXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771162611; c=relaxed/simple;
-	bh=tv696dnWNUfGESUXUqgcJCr5JOIOnS/430nP6KkHIII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hrdv2jnE2q534RSdC68xLJ4dRuUXhpXDfdt3Eq/UDBLiNvod7xbJ39vfHtm1QubHt9fmBOGgoEUMsEOYzR2uHX2LiKEDW3Y59Vuu+K4rTjHZBW/SxZxElAE1YMUE1vjerV9obkXexAsGxHuxndJLQVJGKhTmUlDtWX2/26hfwIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RvG36rvs; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RvG36rvs"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61FCEvgm2467508;
-	Sun, 15 Feb 2026 13:36:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=wv0twF
-	G2AbTUbcmqc9QmUNDyOQT9K8V9I+NilC4yf1w=; b=RvG36rvsIKNaDAabmEyD29
-	BiKRerYsqOgAkzeBD51ElLsNecIsoeOf/dgiqpcQqYEJpc6QXg8bGdntY/SF9hGw
-	xCrw9GzYHIETLvToE+oi5SvbY8VX7HYuDct6PS5ob67JYOHM//4PiO9FFWQcO8ko
-	vPORDlc7kJgaRdwfx7BAi6dwfSkncJhHrvnCDo06Hv+SWFw4bq6/3ED5QIxLK00P
-	wyViDEZQjiCNcm7nRsI9Vh2AUxTsKhtboEkxkeY0CxOgc4BWqFBX+3ONAx0egyu5
-	9NBl9dbVeHidTeBPxQANE7QPh7CiKt0ypzeLWkonM6LgWFSiSEC1Eswo9zVUeaSQ
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4caj4k3tq5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 15 Feb 2026 13:36:29 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61FDIobQ032483;
-	Sun, 15 Feb 2026 13:36:28 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cb4vjss6t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 15 Feb 2026 13:36:28 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61FDaS9J590520
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 15 Feb 2026 13:36:28 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ECF3658059;
-	Sun, 15 Feb 2026 13:36:27 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D511858058;
-	Sun, 15 Feb 2026 13:36:23 +0000 (GMT)
-Received: from [9.111.50.199] (unknown [9.111.50.199])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Sun, 15 Feb 2026 13:36:23 +0000 (GMT)
-Message-ID: <defde5ab-eb0b-4f1d-b930-91732367a311@linux.ibm.com>
-Date: Sun, 15 Feb 2026 19:06:21 +0530
+	s=arc-20240116; t=1771165044; c=relaxed/simple;
+	bh=ZBLB7jFPV8OZ7V3p93BOQLk28F7cz08wYQ94FSvB4ss=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=GCoCqy4s9y5E7miI82GOjLTK9iXM3y6Ei226Gk2AbgBhgqST56JKXRX6vWY2Dvb1sTzkqjJsr+PaEVsunjh6I5/7s5yxlybl/zjPQ0wR3v8mRXcBNU1m7oYt3ZYJ11KXv/6iCpzTRMSTt5oSNwAMR6QCDOguF0ELbfF+ULS6Y/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6751720c676so28267772eaf.3
+        for <linux-block@vger.kernel.org>; Sun, 15 Feb 2026 06:17:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771165042; x=1771769842;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KFQ0suPqLa7s93qRuDqntHlf05CVVhmbHVLlG5/KLUU=;
+        b=TiqdxTgdleB5tAq7e0D3R0f0GBtB362mtY8/Q34yLO2GNnkpewv5NoZdBFXCT7TpJH
+         juzeK49aFuGKm3xQe+4m6KXWXDjfQQSY9D3l2JxziLAkLftSWnYyOeZVnSYJqL3nwZLj
+         /FBL6ojoQJ7avv3vgSsXUcNhoC6w+E9UD0Gq0479f7mq877N+KPQO08RiypxFFlHk4Tl
+         8d2ybJyDMO9ann/OaYsCnZeDYNF0bcM9P6zBGv0yYP71F9I3wKjTJCUTnP8feIi8FNdu
+         HUlHTnQh1H0FcpYge8L4lW031Ikz3B48Io8coDydVkDX1Hum4odheZOedT/eEUguaIum
+         dbXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZuTUotWylRtBKqJ059sQ6v5KAza6gufixsVAEaMEKjuENsLT08qPtbMcqs/GQnfWuci5aiMAmCFj1mQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqgHKG5Rjp+0aPuRrZSZubkU0CD8NlSzdEPZA11HJYdrVdVtzq
+	5QtIrc5kX4E6hgVtHwTzF0vloRtEifzkGyUdv0fkxGB7kxRRBP8LVYCqEFjh6zlarQDVQIqZbOj
+	QN2w0KxWXA51P/JVuikCbmHwZkFoO2NfIpwYEdaKfplV0enyqkWFJ4H5WkAA=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq-debugfs: Fix warning about possible deadlock
-To: Mohamed Khalfella <mkhalfella@purestorage.com>,
-        Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>, Yu Kuai <yukuai@fnnas.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260213224504.3990506-1-mkhalfella@purestorage.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20260213224504.3990506-1-mkhalfella@purestorage.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjE1MDEwOCBTYWx0ZWRfX317GoWlVQ6JG
- M5X0OeyJM88Cbw0jutbBu+OcOxdlBcFTLqAUBt5BfZd3UPAZQ7rq4j5XfrHh4arQaiX0RQuJrLr
- JIPagdXtWhq0jjK9Hcz7dyLontOd1wUQ+1y9izUorVqmkFJW3UcjmdnCYUmSvZYRRgrAOhdMAOm
- uTfInsf8mE3ebtpSgvhHFEGRxWy19AoINu27/U+OjP/9zUiH2J5o69Mo2g6ryShFggiyT0mkAF8
- dSJ3cfzGB2ajcsWGcW5CTc47cRMUHL0PQ1zCGiDDXLE9GUs47+3W5CxqHmK0gAgFvnzX4VrSs7G
- FnNX5Gs9DXkJ6cqaO3NI6hmGEHbB+EDBAdj6eepL3f3ZPS802Gi5uTa93bIVMaufkuWiW37dOw7
- LIyu0aFjOVhMf18clAS6NWRngMaxHZ1H3pvvdrckMPZM+s22D0v1qQktnm49WFZpp4Vl+ZbWEqH
- VTaha4FpIwrR8KXaXqg==
-X-Proofpoint-ORIG-GUID: tWl3MxVNjerv5k9vDHJ5tirmNOqSctBT
-X-Proofpoint-GUID: tWl3MxVNjerv5k9vDHJ5tirmNOqSctBT
-X-Authority-Analysis: v=2.4 cv=M7hA6iws c=1 sm=1 tr=0 ts=6991cbdd cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8
- a=tJLSzyRPAAAA:8 a=WTJdmG3rAAAA:8 a=tIEEJtxj3QNLvETeUEAA:9 a=QEXdDO2ut3YA:10
- a=H0xsmVfZzgdqH4_HIfU3:22 a=q3NGepEMMmKWaCv8Sx90:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-15_04,2026-02-13_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 lowpriorityscore=0 clxscore=1011 phishscore=0
- impostorscore=0 suspectscore=0 priorityscore=1501 adultscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602150108
+X-Received: by 2002:a05:6820:1623:b0:659:9a49:8f9a with SMTP id
+ 006d021491bc7-6785989e4abmr2824842eaf.19.1771165042168; Sun, 15 Feb 2026
+ 06:17:22 -0800 (PST)
+Date: Sun, 15 Feb 2026 06:17:22 -0800
+In-Reply-To: <691367ae.a70a0220.22f260.0141.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6991d572.050a0220.2757fb.0031.GAE@google.com>
+Subject: Re: [syzbot] [block?] [trace?] INFO: task hung in blk_trace_startstop
+From: syzbot <syzbot+774863666ef5b025c9d0@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com, 
+	mhiramat@kernel.org, rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    635c467cc14e Add linux-next specific files for 20260213
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=14d8ec02580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f09eec269f9f4746
+dashboard link: https://syzkaller.appspot.com/bug?extid=774863666ef5b025c9d0
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12cc2ffa580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/24870d51cbd0/disk-635c467c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/49283c738806/vmlinux-635c467c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8c5f9d1da977/bzImage-635c467c.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/b01c09978893/mount_0.gz
+  fsck result: OK (log: https://syzkaller.appspot.com/x/fsck.log?x=163e915a580000)
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+774863666ef5b025c9d0@syzkaller.appspotmail.com
+
+INFO: task syz.3.20:6102 blocked for more than 143 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.3.20        state:D stack:28368 pid:6102  tgid:6087  ppid:5957   task_flags:0x400040 flags:0x00080002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5295 [inline]
+ __schedule+0x1585/0x5340 kernel/sched/core.c:6907
+ __schedule_loop kernel/sched/core.c:6989 [inline]
+ schedule+0x164/0x360 kernel/sched/core.c:7004
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7061
+ __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+ __mutex_lock+0x7fe/0x1300 kernel/locking/mutex.c:776
+ blk_trace_startstop+0x8f/0x610 kernel/trace/blktrace.c:901
+ blk_trace_ioctl+0x315/0x740 kernel/trace/blktrace.c:947
+ blkdev_common_ioctl+0x13a7/0x3250 block/ioctl.c:724
+ blkdev_ioctl+0x528/0x740 block/ioctl.c:798
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f530c39bf79
+RSP: 002b:00007f530d2e4028 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f530c616180 RCX: 00007f530c39bf79
+RDX: 0000000000000000 RSI: 0000000000001275 RDI: 0000000000000007
+RBP: 00007f530c4327e0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f530c616218 R14: 00007f530c616180 R15: 00007ffdd027c568
+ </TASK>
+INFO: task syz.2.19:6109 blocked for more than 150 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.2.19        state:D stack:26720 pid:6109  tgid:6091  ppid:5955   task_flags:0x400140 flags:0x00080002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5295 [inline]
+ __schedule+0x1585/0x5340 kernel/sched/core.c:6907
+ __schedule_loop kernel/sched/core.c:6989 [inline]
+ schedule+0x164/0x360 kernel/sched/core.c:7004
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7061
+ __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+ __mutex_lock+0x7fe/0x1300 kernel/locking/mutex.c:776
+ relay_open+0x3b8/0x920 kernel/relay.c:516
+ blk_trace_setup_prepare+0x425/0x5a0 kernel/trace/blktrace.c:716
+ blk_trace_setup+0x2c0/0x430 kernel/trace/blktrace.c:789
+ blk_trace_ioctl+0x380/0x740 kernel/trace/blktrace.c:935
 
 
-
-On 2/14/26 4:15 AM, Mohamed Khalfella wrote:
-> Commit 65d466b62984 ("blk-mq-debugfs: warn about possible deadlock")
-> added WARN_ONCE_ON() to debugfs_create_files() to prevent potential
-> deadlock if the queue is frozen. We hit this warning with the stacktrace
-> below
-> 
-> WARNING: block/blk-mq-debugfs.c:620 at debugfs_create_files+0x9c/0x1d0
-> Workqueue: nvme-wq nvme_tcp_reconnect_ctrl_work [nvme_tcp]
-> RIP: 0010:debugfs_create_files+0x9c/0x1d0
-> Call Trace:
->  <TASK>
->  blk_mq_debugfs_register_hctx+0x186/0x320
->  blk_mq_debugfs_register_hctxs+0x80/0xa0
->  blk_mq_update_nr_hw_queues+0xc8f/0xd50
->  nvme_tcp_setup_ctrl+0xcfa/0xda0 [nvme_tcp]
->  nvme_tcp_reconnect_ctrl_work+0x51/0x180 [nvme_tcp]
->  process_scheduled_works+0x840/0xd80
->  worker_thread+0x36d/0x4a0
->  kthread+0x366/0x380
->  ret_from_fork+0x7b/0x670
->  ret_from_fork_asm+0x1a/0x30
->  </TASK>
-> 
-> Here __blk_mq_update_nr_hw_queues() did set PF_MEMALLOC_NOIO flag before
-> calling blk_mq_debugfs_register_hctxs() and this should guarantee the
-> described deadlock will not happen. Warn only if the queue is frozen and
-> NOIO flag is not set.
-> 
-> Fixes: 65d466b62984 ("blk-mq-debugfs: warn about possible deadlock")
-> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
-> ---
->  block/blk-mq-debugfs.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index faeaa1fc86a7..ec6670dc0a3d 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -612,12 +612,14 @@ static void debugfs_create_files(struct request_queue *q, struct dentry *parent,
->  				 void *data,
->  				 const struct blk_mq_debugfs_attr *attr)
->  {
-> +	unsigned int pflags = READ_ONCE(current->flags);
-> +
->  	lockdep_assert_held(&q->debugfs_mutex);
->  	/*
->  	 * Creating new debugfs entries with queue freezed has the risk of
->  	 * deadlock.
->  	 */
-> -	WARN_ON_ONCE(q->mq_freeze_depth != 0);
-> +	WARN_ON_ONCE((q->mq_freeze_depth != 0) && !(pflags & PF_MEMALLOC_NOIO));
->  	/*
->  	 * debugfs_mutex should not be nested under other locks that can be
->  	 * grabbed while queue is frozen.
-> 
-> base-commit: cd7a5651db263b5384aef1950898e5e889425134
-
-This issue is already being addressed here:
-https://lore.kernel.org/all/20260214054350.2322436-1-yukuai@fnnas.com/
-
-Thanks,
---Nilay
-
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
