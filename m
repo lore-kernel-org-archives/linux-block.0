@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF65A30DED4;
-	Sun, 15 Feb 2026 23:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA65C2EA732;
+	Sun, 15 Feb 2026 23:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199062; cv=none; b=lEsS06errte+OM1Z9GDokAWV5Ua2d403MQkRSGnJoIM5bOR4o+Byp+RXdX+hKRr1lhRzczE0lH0hW526KKn2laQJrs3uY97+1spAsu/m0w+gZjZqTmdwoOeOMqvTwNrbrLzC50mKQxsE0MUIO76kh+HpcBnFWIcSAfTNLKjVEYw=
+	t=1771199066; cv=none; b=mSB4gyr6jrxD/qppTWz2JjSL9YbqK8/Aev8qUfS9CkG75UVK+ls27uCl6EaN9zMQaDH+FJcrycSEsSxOPgSIDGNjtMnGabw+Jl8KiIJpxsz8cNPsKsz/q/RBZ+bxhhKHxMDP4yFCMqPeql7zNU6wAFphfJ75i8DZ0oyUCCnLDg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199062; c=relaxed/simple;
-	bh=kxfk0NxivP7xMNYmKs13HrD3bNE4wuOWBn6+zseKLgk=;
+	s=arc-20240116; t=1771199066; c=relaxed/simple;
+	bh=enMteMP5s8/CfnF3wWbknhPBzI+BpA10sTDrdile/IM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sM31WfP+dte0w3F9kyJg1hfLc3DSMsWreqx8guJ0P2GHwm+iF0VtrF4nOs8tbll2xVVKkpwlSSBrFIhCThqxdMYZUWDtjv7hhfTAxfdSJRFj1eDwo5IrQLyUooWN5OmnA3Te3H7AWNb4rG1ONxGrZ/Yxk8hDKRObPQbPc8/2w8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FljKbIJu; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Y9WSPpe4ZdC3NFJsJZ2g34PhT/6KEn0xIXHdXcTTRAfNqM+vy+UJ2eQDiK0IDj7jmqhVtaeeYAW4ObYU8iQn8YHzGrU/jL/ks7DsnUAv0EydHqRBLMbI6zt9NQQDCuoxh+Cvf7GMsOo9+yo8DPMfHTO1M/wPgc0qlSBIzgRUP2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fi7zEjiX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FljKbIJu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40614C4CEF7;
-	Sun, 15 Feb 2026 23:44:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fi7zEjiX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31973C4CEF7;
+	Sun, 15 Feb 2026 23:44:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199061;
-	bh=kxfk0NxivP7xMNYmKs13HrD3bNE4wuOWBn6+zseKLgk=;
+	s=k20201202; t=1771199066;
+	bh=enMteMP5s8/CfnF3wWbknhPBzI+BpA10sTDrdile/IM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FljKbIJuZZV66echQHbgF+iOvpuxT26U4pYgG5yJje98VOFVcvJuhy02vW5XcPTVA
-	 bxYXKtNYmHU32oYNfnDOb2EbvpaNaYB5599R+2Jnhfiu16c0NlSkEYER/ncbTcT2B8
-	 fSCYG4AQY4BSXZ0pI9TQzqd7P8SwHOBzkyRw4oXcWDJf3g+g8AX+seX8T9GxtPyZ8I
-	 GQTNEXG/zPo90Q9PhF/jSEQyzD4ZQv47uPvGWog8R22euuESIr3z6iOuSWK/Kn5enU
-	 u0i12EoV6H1O1hWYHXBioxGfVfKA1YZh2JxUMIkkkdiWn2qSTdN2TaogEfxqJKe1oO
-	 KOppbs4tPn9+Q==
+	b=Fi7zEjiXHEcQox5CSzxIu8gEQJNU3drOgLK/ZCUnUl8SRgsygu9o8tlBmDwqzN7tC
+	 WWOO4630doCXhemOiYg7oNF2HkVI51FL87JWKO0/H31u+sIF/7pkYT9R+tPZKZmm5C
+	 Gj188GWSPqXoNqPlP6pRJacUEs/A1Abnb22H7f2WhTwJuJTZBSTV4gg8d10aVwyGgS
+	 5hJGDBtIgGONZoc4kRRhR358KqdtkaJJYrQJ4zqSLOQ/nwHjSZ4BP5sB9aMPuBxI6N
+	 WFeTuesNYUcZcYZO+xnMw702tACBpSU8Y3UdOToaPeyG0lu9yyBnQDd6WT3WrPBxM6
+	 IVjBwkbpuJlDQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:52 +0100
-Subject: [PATCH 65/79] block: rust: add `queue_rqs` vtable hook
+Date: Mon, 16 Feb 2026 00:35:29 +0100
+Subject: [PATCH 42/79] block: rnull: add shared tags
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-65-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-42-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,167 +56,167 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5925; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=kxfk0NxivP7xMNYmKs13HrD3bNE4wuOWBn6+zseKLgk=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhWkfykeGrJtn+Xnt679z12Wv0nstxNgY43F
- EyZrVwsMdaJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYVgAKCRDhuBo+eShj
- dxR9D/0b80WZwQzfSaWye9AkT8IHEguI8Qx2vaI9c49aW3ONnRUoCG99C7oEbKQC1dE0BU87+o2
- 05pBhsiaG0aSEKewssne26p6QXeZkluBdkjIOZqUb0Ul+gaWrY74tiSv+jdv3hO3nWzcvZhISdV
- i3CaMJDevyGKBbjJNJxJOyHQasm5ftuNatcq1B04oFLV6RSbyeMRkUaqQIlcqOCArM0CPRhCpnK
- BDgRy8EekJyo+YmhBMT+9S0wIojLfRXKn7O3+2VHXK46if+TUT1w+oQhXMf9XvC9GiHujgEecBZ
- 85tLpgJ+aJS5e1cbOS6XTpmjXRIoJ5XnKWIpN7SlhaeghSqt9CM3cU1EL2RG3x4ZIQ6XXbtAML+
- Gvj5fj/c57My8iy4WkMlhV07XgrnpYKLHK1QJ+iMW0QgzV8yyUf+rIQb7//5G0yjLDh9AznYqn2
- Vux4Ysb8OK0gYe/7TIDRZt8KxoL0cts/hsCN7nJh+MVwIPnniT6+Uvhdb7i4h+ut2te9w/K+pYA
- SGqW7821xeTiYqtrc+zsI8zOtiHfG9N93Z3i3TtbdFCOcSJFReUy3nAUl0VzlieSejw3RKDCJb/
- PH0ZLgEh4U0jm8RJhhkmycDkZ13VuCv9zvKlz1g/4fvfzTZF1IxeP7IFcOGmsD62fMV7l9hJKfs
- iFCzlr4gnyB3iKg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5495; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=enMteMP5s8/CfnF3wWbknhPBzI+BpA10sTDrdile/IM=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhBL064yZgPJ9mugO4wJgGrxE2244ynwHMHH
+ zlYceC/FKuJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYQQAKCRDhuBo+eShj
+ d5nHD/0ZLzSQ6fLnmrRaqZcDtZxnXn5I8kL8xB9CSs7SomzddSxg5j8EqpW5yTSUgmISr2dFH51
+ K6ol+CRJQU0TUhxt6cONjzsdJUQPm1Uj/U4+2yhSvj5qoA1uhrw68M49v+XQ70f3IAWj8jukCwc
+ crCE8EZqgAd7BBtAxM8g/0yHpTnZdODTIsbEOS0r5oKT4dJ3wuPDWzTw/qk2BlYK/sccOj8wLFJ
+ 7Ah1FukNn1a921F1Ol+GUn7ZoHWV4XNImSRK/vF79N02eP8VsqvoIRbXpDgM6wsSN/iDmsxCxB8
+ oLltq6SzHTb7D2bGrgkKN4Vby9JxE8mEpmDrrRiumUJ9nXPBbAmhZdchS+vgrIWMWscFzeDjy0k
+ MnG6aHC7k9+FXMShBK2L3F+Lt9HzGkiknV79V0yLZp25awM1pZFXk+pFHyyJL8iu+9DNMpjo4gP
+ ksm1M+bZtwiaclKVUIGRMMsCUG0oemikiJIyW6jaNrHMqRHdlzvK0ofkWd1MShzrbTs/pvM1yUf
+ DEAWbp7M+t41QAppAgnT98WO8RI2jz7XVS99IDcCZu1hPxINxl/j1kEFD1Rau6O99fRYb0QXWu2
+ MQ3jxj/5M8PdkSBMdU71L+5fv7p/+FiNhlkwnYnd4Qw5UyiWgwPd86SS6X7nIgXWGJZDNqVWe30
+ x1YFdvqTGyvgVzg==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add support for the `queue_rqs` callback to the Rust block layer
-bindings. This callback allows drivers to receive multiple requests in
-a single call, enabling batch processing optimizations.
+Add support for sharing tags between multiple rnull devices. When
+enabled via the `shared_tags` configfs attribute, all devices in the
+group share a single tag set, reducing memory usage.
 
-The callback receives a `RequestList` containing the requests to be
-processed. Drivers should remove successfully processed requests from
-the list; any remaining requests will be requeued individually.
+This feature requires creating a shared `TagSet` that can be referenced
+by multiple devices.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq/operations.rs | 61 +++++++++++++++++++++++++++++++++++++-
- rust/kernel/block/mq/request.rs    | 26 ++++++++++++++++
- 2 files changed, 86 insertions(+), 1 deletion(-)
+ drivers/block/rnull/configfs.rs |  7 ++++++-
+ drivers/block/rnull/rnull.rs    | 25 +++++++++++++++++++++----
+ rust/kernel/block/mq/tag_set.rs |  6 ++++++
+ 3 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index bccc1903a0d10..e4de6db807e18 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -18,6 +18,8 @@
- use core::{marker::PhantomData, ptr::NonNull};
- use pin_init::PinInit;
- 
-+use super::request_list::RequestList;
-+
- type ForeignBorrowed<'a, T> = <T as ForeignOwnable>::Borrowed<'a>;
- 
- /// Implement this trait to interface blk-mq as block devices.
-@@ -68,6 +70,15 @@ fn queue_rq(
-         is_poll: bool,
-     ) -> BlkResult;
- 
-+    /// Called by the kernel to queue a list of requests with the driver.
-+    fn queue_rqs(
-+        _hw_data: ForeignBorrowed<'_, Self::HwData>,
-+        _queue_data: ForeignBorrowed<'_, Self::QueueData>,
-+        _requests: &mut RequestList<Self>,
-+    ) {
-+        build_error!(crate::error::VTABLE_DEFAULT_ERROR)
-+    }
-+
-     /// Called by the kernel to indicate that queued requests should be submitted.
-     fn commit_rqs(
-         hw_data: ForeignBorrowed<'_, Self::HwData>,
-@@ -208,6 +219,50 @@ impl<T: Operations> OperationsVTable<T> {
-         }
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 640e3de230c0a..d1a70fe030cb2 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -70,7 +70,7 @@ impl AttributeOperations<0> for Config {
+         let mut writer = kernel::str::Formatter::new(page);
+         writer.write_str(
+             "blocksize,size,rotational,irqmode,completion_nsec,memory_backed\
+-             submit_queues,use_per_node_hctx,discard,blocking\n",
++             submit_queues,use_per_node_hctx,discard,blocking,shared_tags\n",
+         )?;
+         Ok(writer.bytes_written())
      }
+@@ -107,6 +107,7 @@ fn make_group(
+                 cache_size_mib: 15,
+                 mbps: 16,
+                 blocking: 17,
++                shared_tags: 18,
+             ],
+         };
  
-+    /// This function is called by the C kernel to queue a list of new requests.
-+    ///
-+    /// Driver is guaranteed that each request belongs to the same queue. If the
-+    /// driver doesn't empty the `rqlist` completely, then the rest will be
-+    /// queued individually by the block layer upon return.
-+    ///
-+    /// # SAFETY
-+    ///
-+    /// - `requests` must satisfy the safety requirements of `RequestList<T>`
-+    /// - All requests in `requests` must belong to the same hardware context.
-+    unsafe extern "C" fn queue_rqs_callback(requests: *mut bindings::rq_list) {
-+        // SAFETY:
-+        // - By the safety requirements of this function, `requests` is valid for use as a
-+        // `RequestList`.
-+        // - We have exclusive access to `requests` for the duration of this function.
-+        let requests = unsafe { RequestList::from_raw(requests) };
-+
-+        let rq_ptr = requests.peek_raw();
-+
-+        if rq_ptr.is_null() {
-+            return;
-+        }
-+
-+        // SAFETY: By function safety requirements, rq_ptr is pointing to a
-+        // valid request.
-+        let hctx = unsafe { (*rq_ptr).mq_hctx };
-+
-+        // SAFETY: The safety requirement for this function ensure that `hctx`
-+        // is valid and that `driver_data` was produced by a call to
-+        // `into_foreign` in `Self::init_hctx_callback`.
-+        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
-+
-+        // SAFETY: `hctx` is valid as required by this function.
-+        let queue_data = unsafe { (*(*hctx).queue).queuedata };
-+
-+        // SAFETY: `queue.queuedata` was created by `GenDiskBuilder::build` with
-+        // a call to `ForeignOwnable::into_foreign` to create `queuedata`.
-+        // `ForeignOwnable::from_foreign` is only called when the tagset is
-+        // dropped, which happens after we are dropped.
-+        let queue_data = unsafe { T::QueueData::borrow(queue_data) };
-+
-+        T::queue_rqs(hw_data, queue_data, requests);
-+    }
-+
-     /// This function is called by the C kernel. A pointer to this function is
-     /// installed in the `blk_mq_ops` vtable for the driver.
-     ///
-@@ -450,7 +505,11 @@ impl<T: Operations> OperationsVTable<T> {
- 
-     const VTABLE: bindings::blk_mq_ops = bindings::blk_mq_ops {
-         queue_rq: Some(Self::queue_rq_callback),
--        queue_rqs: None,
-+        queue_rqs: if T::HAS_QUEUE_RQS {
-+            Some(Self::queue_rqs_callback)
-+        } else {
-+            None
-+        },
-         commit_rqs: Some(Self::commit_rqs_callback),
-         get_budget: None,
-         put_budget: None,
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index bc655d202ca01..e22af7ea77bbc 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -148,6 +148,32 @@ pub fn queue(&self) -> &RequestQueue<T> {
-     pub fn as_raw(&self) -> *mut bindings::request {
-         self.0.get()
-     }
-+
-+    // Return a valid hctx pointer.
-+    fn hctx_raw(&self) -> *mut bindings::blk_mq_hw_ctx {
-+        // SAFETY: The requests is guaranteed to be associated with a hardware
-+        // context while we have access to it.
-+        unsafe { (*self.0.get()).mq_hctx }
-+    }
-+
-+    /// Get a reference to the [`T::HwData`] for the hardware context that this
-+    /// request is associated with.
-+    pub fn hw_data(&self) -> <T::HwData as ForeignOwnable>::Borrowed<'_> {
-+        let hctx = self.hctx_raw();
-+
-+        // SAFETY: `hctx` is valid and `driver_data` was produced by a call to
-+        // `into_foreign` in `Operations::init_hctx_callback`.
-+        unsafe { T::HwData::borrow((*hctx).driver_data) }
-+    }
-+
-+    pub fn is_poll(&self) -> bool {
-+        let hctx = self.hctx_raw();
-+
-+        u32::from(
-+            // SAFETY: `hctx_raw` returns a valid pointer.
-+            unsafe { (*hctx).type_ },
-+        ) == bindings::hctx_type_HCTX_TYPE_POLL
-+    }
+@@ -140,6 +141,7 @@ fn make_group(
+                     cache_size_mib: 0,
+                     mbps: 0,
+                     blocking: false,
++                    shared_tags: false,
+                 }),
+             }),
+             core::iter::empty(),
+@@ -206,6 +208,7 @@ struct DeviceConfigInner {
+     disk_storage: Arc<DiskStorage>,
+     mbps: u32,
+     blocking: bool,
++    shared_tags: bool,
  }
  
- /// A wrapper around a blk-mq [`struct request`]. This represents an IO request.
+ #[vtable]
+@@ -247,6 +250,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 storage: guard.disk_storage.clone(),
+                 bandwidth_limit: u64::from(guard.mbps) * 2u64.pow(20),
+                 blocking: guard.blocking,
++                shared_tags: guard.shared_tags,
+             })?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -467,3 +471,4 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+ 
+ configfs_simple_field!(DeviceConfig, 16, mbps, u32);
+ configfs_simple_bool_field!(DeviceConfig, 17, blocking);
++configfs_simple_bool_field!(DeviceConfig, 18, shared_tags);
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index cfc00c104d9ca..84e75a7042214 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -145,6 +145,10 @@
+             default: 0,
+             description: "Register as a blocking blk-mq driver device",
+         },
++        shared_tags: u8 {
++            default: 0,
++            description: "Share tag set between devices for blk-mq",
++        },
+     },
+ }
+ 
+@@ -192,6 +196,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     storage: Arc::pin_init(DiskStorage::new(0, block_size as usize), GFP_KERNEL)?,
+                     bandwidth_limit: u64::from(*module_parameters::mbps.value()) * 2u64.pow(20),
+                     blocking: *module_parameters::blocking.value() != 0,
++                    shared_tags: *module_parameters::shared_tags.value() != 0,
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -224,8 +229,11 @@ struct NullBlkOptions<'a> {
+     storage: Arc<DiskStorage>,
+     bandwidth_limit: u64,
+     blocking: bool,
++    shared_tags: bool,
+ }
+ 
++static SHARED_TAG_SET: SetOnce<Arc<TagSet<NullBlkDevice>>> = SetOnce::new();
++
+ #[pin_data]
+ struct NullBlkDevice {
+     storage: Arc<DiskStorage>,
+@@ -267,6 +275,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
+             storage,
+             bandwidth_limit,
+             blocking,
++            shared_tags,
+         } = options;
+ 
+         let mut flags = mq::tag_set::Flags::default();
+@@ -286,10 +295,18 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
+             return Err(code::EINVAL);
+         }
+ 
+-        let tagset = Arc::pin_init(
+-            TagSet::new(submit_queues, (), 256, 1, home_node, flags),
+-            GFP_KERNEL,
+-        )?;
++        let tagset_ctor = || -> Result<Arc<_>> {
++            Arc::pin_init(
++                TagSet::new(submit_queues, (), 256, 1, home_node, flags),
++                GFP_KERNEL,
++            )
++        };
++
++        let tagset = if shared_tags {
++            SHARED_TAG_SET.as_ref_or_populate_with(tagset_ctor)?.clone()
++        } else {
++            tagset_ctor()?
++        };
+ 
+         let queue_data = Arc::try_pin_init(
+             try_pin_init!(Self {
+diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
+index f18b51e5217fe..600c9c6249123 100644
+--- a/rust/kernel/block/mq/tag_set.rs
++++ b/rust/kernel/block/mq/tag_set.rs
+@@ -106,3 +106,9 @@ fn drop(self: Pin<&mut Self>) {
+         unsafe { T::TagSetData::from_foreign(tagset_data) };
+     }
+ }
++
++// SAFETY: It is safe to transfer ownership of `TagSet` across thread boundaries.
++unsafe impl<T: Operations> Sync for TagSet<T> {}
++
++// SAFETY: It is safe to share references to `TagSet` across thread boundaries.
++unsafe impl<T: Operations> Send for TagSet<T> {}
 
 -- 
 2.51.2
