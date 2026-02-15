@@ -1,205 +1,191 @@
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012050.outbound.protection.outlook.com [52.101.53.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05062D29AA
-	for <linux-block@vger.kernel.org>; Sat, 14 Feb 2026 22:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771107754; cv=none; b=tFX6yQ+neLCO+ag9xCSxO3rxPDLQwsfVKL+JRubg0ALuvLxQMg1gdbkvdaeWUE9cBP1SpZzcSibXBVdKLLTyVd9pN2AgpCPsLXo/i+a12+RYAqXLdkis2hz35p5UVvBGQpLZpw2RFf4Oz2rzzohSHeE5IUjtpcDv3bzGhEk0xrg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771107754; c=relaxed/simple;
-	bh=cY9EDC0bLiBjmY8V6AKr0uVLs1BH4/jLkBnenjlMrjs=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rSlW4FgcD+nW36B3j2w5/hHuoUWm1elbSa2luOfvY0/FFiZII/AlPa+11ksZ2j8Sx/UMA5ot0759tTIfZIYiFYve6aK5L+iam7Yc734Db5RfU8ekNaVYrKkOMEW9uH6idNWraVYSK5bpnpo1qXqeQghRsSqeJqjLTjno8RW7dek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-46335278e7bso30492261b6e.0
-        for <linux-block@vger.kernel.org>; Sat, 14 Feb 2026 14:22:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771107752; x=1771712552;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HQvXiZ3bvjTqq9MfSaAXTHZyzhEp1Dv5jw/IRy11WWY=;
-        b=aNphxdASJT3qXzfUjF8CixuMW9M+qCCcEgIcq7KhPUm3npGdK5TzrFXDxh3HO47kiE
-         +4QtFfYHPONNj48VH4xuqMaznidrE3DCo7iytJHNJy1Prmg2hQQWrhkIDmW7Boz2Ggc5
-         FEp1y+8jvzg9fLo85zekNyPGqjmJrUqYgfksLL0EG5vnYlEZ/qpxBYK9h8E0qXECfSMb
-         w5sjxAGOCYXvY4qxOjFbzR4tMOLFbv3RZxAAvetUywfjCHjykn7bsNJBUKw6kQ2eMWEV
-         maYpG53iIIZslxViqClvBRZJYgDG1r232WDQhPIzY4172KhO4yISvuVrWEOdLrTLX791
-         E7uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqvbFaRt/QA3JoqUxulO9jzdHDwMVZAs+0crBn+rS/ABLtO/EfUsyBMdpAAPsesJS5drNdkwqCan2yhw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5jQzuB6P7tUNeXe2Nivk1UrCjs1ABNv5cR6Oph/oTmPIA1z+6
-	Qc2lhLGrm0T7L6tHwdVTY9ezU1oaoajjcLdS7Q4jCooIFi/yRt2fV5vDxPLv4TK76XjXNuAnyWl
-	Q/B7vxrdcEi2UzGGnR3bElgPuraTnoS/oUtEMD4qMypA78HYAcUm/Xe38Azg=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8C422A4E9
+	for <linux-block@vger.kernel.org>; Sun, 15 Feb 2026 04:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771129499; cv=fail; b=pndH9nhrOtxjQLJ+KK+2SZZEz0ji0N9rs+aDq81d38+g4HyA9EJTD6elX7VQYrOqH26ozLynViwmygy283m7s6+NIU1awa6KZgRfYzuBM4ninRdqzK+a+yARCwwndZ9jo/rSOwRx7Ozm7culAcWmQcm8c8tznunDzdIWdKT8X3A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771129499; c=relaxed/simple;
+	bh=Ftr1BkLuoDE7paZxe3dUW+38riykZzeP2XV2u0UWtt0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=J5V3hDSTFvCsdaJIzM6aK2Is3ThyTwUuHtk+9NvFcUW9IrOA9tfXwX6w9VqMy/YYFP1BQDinOSybcmi7el8BN9rwllwWWGwvytp9UP9GDOOXlw9iSf0Bog9SneBPzUtImiQQrfzWxSrAke8GI1B9hpXIarHGHwb4HTEa8FB1DFU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gFjoftio; arc=fail smtp.client-ip=52.101.53.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gFjoftio"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sF/bUzKZXAat9XwRMbmoEshf4MZAxVMGo9pOmLpmfPQqfii9BHoyte6uljLgiN377vmHyFxrNGN/oEChhbb9IzPEp02BKsaUi99fmO7FpTASUX22/D4yLHwGl71D58velnlwjglmkxu6jHT0pwC9irw2ammgJVFN3V+enzYeaEgJsArGe7CZsYRY1p3KvdAO2vYE/X1u/lO63RKWl7XJmisarLfyeyhgRqAZe2fqZvmgMkAK6wfOnhca6mOBoBRTI9e4+AAwWmP9ezcrTK+SFcOBRsIopmVeM3BbidyOAvNTIfeSmROsH9bK5t79By/aXXMQOvsRfKNYNCzBGWpUBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ftr1BkLuoDE7paZxe3dUW+38riykZzeP2XV2u0UWtt0=;
+ b=cj153Knh3qKX/4XT6vOlr6qp9dzZ3NmpHSdI+I3B/D2nhTy05n//fe9qNMVDUyPmZqHt8T+GlEMTnIWbQsa62t00kXqCNifxKSRK+QMrvtyrvk5cUPU1UrWd8ttUiQgrTLg7EOEAbGpBESD02yrZtO5MSLUl1NgvCLzBgBiNFNi396lnoEvqM0dhq5BI0lyy3tH+YRUHuj4YZw1CGfXqC9btoCv7aWV7kqfs9FHOwXP1L9C1FK458LaToSAcUucmObv40pXfQJUsMQvCJwpCepm1RA5ikm5rKYCW3Q0C1qt5+nz9VDQljBPdusLQRdZAzscIeyPDFRR49TTPQ7m0YQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ftr1BkLuoDE7paZxe3dUW+38riykZzeP2XV2u0UWtt0=;
+ b=gFjoftio/tr9lPT0/QWkdILZrVlyGyja269pJs84ptKMxS9ZGqsqHxzPn5cM4FIR8D/YlHhdj7bX1Mly+wtwYda7390jgwtJFo0pgVloQF62Unv4YkHXh5I7hLr1RZzbyGQbo78RPoqX3tUvyCvDKs1gUPyoMRhUowYuW4KAJeABBtbayuzmp1keHOC0gOPACAejnghy/UW2MUpewf+ARBJUWRSlyTXjXWtVh4qyEVSmm47pXpRxJloHFUC3cEeNG/y+3XgR06U8mz+kp76v6IZ5r+iQJ6afAZ1TIcegH814Aw1VbtkrKiV+R1cutrTcbbI6H3zn3RMWGfpLmfwcSw==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by DS0PR12MB6461.namprd12.prod.outlook.com (2603:10b6:8:c7::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.15; Sun, 15 Feb
+ 2026 04:24:51 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::2109:679c:3b3e:b008]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::2109:679c:3b3e:b008%6]) with mapi id 15.20.9611.013; Sun, 15 Feb 2026
+ 04:24:51 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC: "leon@kernel.org" <leon@kernel.org>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: fix partial IOVA mapping cleanup in
+ blk_rq_dma_map_iova
+Thread-Topic: [PATCH] block: fix partial IOVA mapping cleanup in
+ blk_rq_dma_map_iova
+Thread-Index: AQHcm5gI8K0VikFwAkWJaYRTPpq5L7V+2lCAgARUjAA=
+Date: Sun, 15 Feb 2026 04:24:51 +0000
+Message-ID: <5546b3c1-4c3c-420b-9aea-d87fa0c6d1dd@nvidia.com>
+References: <20260211204944.23380-1-kch@nvidia.com>
+ <20260212101711.GA8869@lst.de>
+In-Reply-To: <20260212101711.GA8869@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|DS0PR12MB6461:EE_
+x-ms-office365-filtering-correlation-id: b2869bc2-5ee4-4210-8669-08de6c4a298e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|10070799003|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?QmdOQ1V1d0NHYjA1SmdLaERXUUM3RUIxZVk5ZDh2MVdTVFZ1OVJaRCtuTW13?=
+ =?utf-8?B?SVByNkdJNi9Qc3AyY0F4MzZxdnA4L3g3N1BhMk5SaStqMmxVcndyQUFSVW9W?=
+ =?utf-8?B?TzVKbTF4cnhTUzdKbE1rNDI1WHJOWmNtQ042NkM1Yzc3NGNrcTYzOWZMU2J0?=
+ =?utf-8?B?dUU4UjZsMkRDSzg3UHo1aFFJdmhodElYeUtPTCsxYkR0a3YvWktBQTgrSVZk?=
+ =?utf-8?B?Z3ZxS011S1d6UnFBUHEwQS9Ba1dnMEFPUXAxQXM4M0Rsd3BabXoxeG1BdUR0?=
+ =?utf-8?B?Qjh3SDhFbFNCb2JwK2I3QkxxbU0yQVB0b2hkNlhaNzNubUhwOXowZWVVdk1S?=
+ =?utf-8?B?TzlFQ0o2eTRHKzRpN3p2Slc4V01IODJiTVVVZDVIcHlaMzEvR0pKdFdGR1pG?=
+ =?utf-8?B?NG5WTTRCOUpnTWd6aWlvR3FvOEtvdVNOVVgrd04wRGtqeVh4T2ZSRHZVZmla?=
+ =?utf-8?B?M01GMmtlcU1WY0lMcUxVbVgyTmhyUVRBSkVjMDQxMXpXNXZzT2QwVUdoRUFo?=
+ =?utf-8?B?T2RhRWxSemhLS0RVdXRtczVwU2xDbnQxc1JQdUNzVExNWkEwbko4M1RTWWFy?=
+ =?utf-8?B?ZU5SR3pNdkc4RjNUZVhGK0QwL0RCYzlHclFNYlN0cFJaekFTdm1GSm9oT3Q4?=
+ =?utf-8?B?azhDand5NXNFUEx6R3dGZlV2Zi8wVnd1M3piSXRCSStIa0pyZUozMWpHUmw3?=
+ =?utf-8?B?L09nUG5KU0ZrOThlY1Y2Qlk3UjNBS091M1ZPK210NzB4OFkrZXY0L0FZcGFV?=
+ =?utf-8?B?Q2g3YnVLSzVPSEM2anhZUmNMTEdnZ0xVM2Q2Tmp5dmVHUXpLN0ZGcnlUQmx5?=
+ =?utf-8?B?SUtCandaWk15NGNPa05YSlU0WnFnbWY1OEsxWktJVlpzdEVXclUzcG5oRWUr?=
+ =?utf-8?B?R3hQTmpyREVOVnhUTlhleDJnR2tDSFYwRXBYZjdKUStXcXhtdDBkdDU1NFN1?=
+ =?utf-8?B?OHd2OUVma2pTbHoySHpsYzRSd1lpVFVTNHNEa3hveEdnYVZ1VnVDeDdIRTQ3?=
+ =?utf-8?B?V0REbjV0ZHpUUW92V2JoZVJNMG50QVpvUU9rSHZMTnczVC9rMnMvc3pyYnRI?=
+ =?utf-8?B?VmptT25xQzNpMHRGT0JBanh6bG04V2txRktBQnlIWUM1UDJOSVhjNmxpWWl6?=
+ =?utf-8?B?SHBQZUZtaGF4blNWbmxmUjllWmNPeDdaQ1pla244Wjk4Wkc1NUR1Mk9CZmdZ?=
+ =?utf-8?B?MVpyZ25LeFB4OE9xZVlEc1BoZkNzMk1rWFZFOFYzbHlrYU43czZKcytMQmVJ?=
+ =?utf-8?B?dG9FNzhqM3FESE52OS9EWUFUeS9CdVlHbjNwWnhwbktoWVNscnF6dXZpTjFT?=
+ =?utf-8?B?Y3N4RklrRVlnS2RsZkVQcU9FQkF1V1kzVFZvMTg4U1k1Kzh1THRUZS9FS2ln?=
+ =?utf-8?B?UVg0NVBOT1dVMVFxYmZKNGlXdUFhNTV6RFFiOERSR1lGSTUwWDZCTE10ejhO?=
+ =?utf-8?B?WEdqTzk1dWNxejVva0UxL1ZvU09lRDhmWWc0ZFJLdHV2K1VsbUM0UU0zZHVv?=
+ =?utf-8?B?dVdqZ2JkSDVGVXRLaUJBN21ZQ2l0MVJiU0U0bE5hV3ZKTE1MQTVNUURuT0JZ?=
+ =?utf-8?B?TUdiRERwYU80Tk8xOHBva0srV2FRK1A2b1NDTkVScWNsdm15L2prYlZ1V1Jj?=
+ =?utf-8?B?cFVyM1Q0QkR3RDRVTkFUc0pyRmVtaFhNcHVBSkNGWmsyanJVWTJ0Z3RzZk5p?=
+ =?utf-8?B?akhOZnltRjVSRWgvQ0FSQ1RNcjJBSmRFbitKWFlhdzI0ZTB0V0dYWUovQ25v?=
+ =?utf-8?B?UHhTUyt2TXQycVVTWWh6dVFNam5GWGNDUklQR0RDbVpLak53RW5LQzlab2Nl?=
+ =?utf-8?B?bUl3NmFUUjVrS3lrTUpaNVpJUHpmVGF6S2EwT1Vpb1B4eEFhdUYxMFZiMlFl?=
+ =?utf-8?B?UzdUdjgrdWVOc3RUUW1vSWFWMFZodVNqM0llWlVkY2Q0c21PNlV1YzVabEw5?=
+ =?utf-8?B?NFlZdEVjaE1VbWZFZ1F0bHlnOUtWd254YXVla2pkajVIbE1BOWNST3BMQkFm?=
+ =?utf-8?B?UnRINFc3NnErRG1vd1NVamFJbHhRTkNXLzZUbWM3dFBqWlNyTDhwYTFLVnlq?=
+ =?utf-8?B?VmF1Wi9zUElkR1ZQMUdKSTVuQW9GbmovK0gwdkw4SHhZdGJ0ZlJiRjNkYXdL?=
+ =?utf-8?B?RVFCaDlYWXNuUXh3bVdUdEhJaXRyamV1THd5KzQxTnFZSzE4UjRzZ01ZVHZs?=
+ =?utf-8?Q?yD+H287z8k0MVmgtwKPxuaE=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ZlZNdWVtSURqQzVRQWJPZHg2Q2MyTExDVmdZc05PQzVCMWtQVVlVOUdUQnFU?=
+ =?utf-8?B?YUU0dGI0S1pZMHhKWXh6dVJseHdVeGFlZG8xd2VLb3owbnRHQXBnWXdtamN3?=
+ =?utf-8?B?c0c5YUdQQ2xmaUE3UU8rc2p6YVZmL0hIdzc1dnRwWitHa0tQckNPcGtKTmVu?=
+ =?utf-8?B?Zm1rWGVzNlB0SktUUmM1dVd5SmZQSlZlelNTdGYzbEhsc2szajhpUWNYM1dT?=
+ =?utf-8?B?dTcydXZ0L28xcGFIdTFOak5HSzJNU2hTekkrRUtpd2Zicm1aTTk1VzZzUGpl?=
+ =?utf-8?B?WVp1MnBrSXVqQ2ZxVG9WdS85N05TdVJwNVZJQ0Yrb083Vm1TM3EwS2RUcEhH?=
+ =?utf-8?B?dXJ1TlV4bkhrb1pmVkhIaEFjR1R5N1FoY2wzMFFvWkI1ZkJzNFUwbGliRUFr?=
+ =?utf-8?B?UDBPUkU5THQyV0VuWUp2YWZaNmxTSy9OMnB2WXZ6ZVFrNDYyMVpPa2w4dXIv?=
+ =?utf-8?B?Tm9HZ3dzZlZjdVBQallVSklSZHNFREpWTmVINnc5OU1SRm1nSkhhM2dPQlFX?=
+ =?utf-8?B?NFJqUFF6ckxxU3hMUG4xV3ZpU01RZW9jbE5KTE9pOUREK3VCbjRMWlU3S3ZF?=
+ =?utf-8?B?V3BnYVUzTFdZYjE1d0RacGtqUEpEMDFzQzVxVm5VdUtrc0I3Tk0yZzU0czNu?=
+ =?utf-8?B?bytIbU9sZmRwdUs1WGRsMDl2bmZySXNuRnBxODRneDQ5Rjh3MmpOU01LYWNN?=
+ =?utf-8?B?ZE9Pa3JjeUJYNFFXYzliNlZXRW5RQk5aS2s4aVdwWUg1WHFVRzh5TEk1N1NT?=
+ =?utf-8?B?S0JyczhQN3dBUlFqcHhodHMyaG9kcVI1RkU4alM3aGs4OW5uWDZIMjRSZ0Vi?=
+ =?utf-8?B?VEltOEpVaUtkalBMbmJVa2JNZkJXL2tsN21MSW93ZG5OTXF2VnlQNXNYMXN6?=
+ =?utf-8?B?RFRjZGxtdW5zNkZLc01veG5ydFlvKzdLd2xSSlF0V2FldnZUSkhtbnNEMTMv?=
+ =?utf-8?B?b0VlZmhKRWE3RW4vK3ArTWxEUlJTOGh4MkkvYW9mUGZGRm1hRlhyZnI0RUlZ?=
+ =?utf-8?B?N2tiSTJlMHIzdThrVStkdmxScWJob3hmQkZmYTVyazM5c05nN3pYQWh3TGdF?=
+ =?utf-8?B?MllrLzZtS2VQMnlxQmcwNlVsZUsxUGhkOG1xWTBCM2w1YnIxa2EwUHpMRTRu?=
+ =?utf-8?B?emdXTlJ3N2JWR0RrZUdUVEx3anhEdDg0Mkw5Sk5hYmt0a2VlbDFKbkZKbzdt?=
+ =?utf-8?B?NFcvMWlkbGVJVkN3MTJ0V1dOS2NnY3RiOTFuS0R5ZVJZZEJZSzQ4Mko2ejdr?=
+ =?utf-8?B?WHJhcVdTKzVWakFITlVOZnV0bFFtNUFzdDQ0NTJEVlZyVldVQ21vckozcFQx?=
+ =?utf-8?B?RWlzMEFKWFpGNlhRY0drZ0FGZXI1TlptZ1o0a0dkS083aDZHZTVJbWhjaFFr?=
+ =?utf-8?B?dDdmNGMrQUhlbzZuazc0TlZwZWlZb0FMWm5GOE51OXN4Tm10MklJZnRXaVl2?=
+ =?utf-8?B?UHBhYVVhM3J3UFZQTktMTUtCcXZVSFd1UlA4OTFvYlpPdjFjZ3Vic3poMEZ6?=
+ =?utf-8?B?Vjk4SE9pREhnVWJla3lNM0FyeHYyMWJyU0pWemJSc2MvVFFSMS84elFvYmxV?=
+ =?utf-8?B?dHNLTndKb2EzTTByUzcrOHpsTlhvbWNPcU9RanZuZGZNODFPekk1NHJtcnp5?=
+ =?utf-8?B?Rk8yd05nOUlaR3dnZmpvcGRmNHpmSlp4Q2FDTnd4QlVnY0YvSTRHRkNISkdH?=
+ =?utf-8?B?VklISlgzS1lpWStpYTU5RDJpemxGS3FUeGt5Z1RMdnBkckZWM1JOWWdjVHdJ?=
+ =?utf-8?B?SVc1REszS1E3OHRJeGU4cFdwenkxVytUenBVekU2cFNweUJSNWFTaVZiamY0?=
+ =?utf-8?B?ZE8yeEtSUE1BQW9EdUZOS29lMml4ZHJ0dUYranhBMGE0QVU5S0YxRUZySml0?=
+ =?utf-8?B?MXlpODdVL2gwck9JV21ZMFZEdVRJeVcxd0htOUx0SUd6d0NkdlZINU1tYmtm?=
+ =?utf-8?B?Uy9adE1yTmd5K0g4RTJ4QWZTakc5aCtET3ZJcHJsWGJtS3doSE1hVmFZQkZK?=
+ =?utf-8?B?RDQ2c21tZFN4K1JhemFkZEQ4Ykl5bk9TbjQ2ZFFUWmR4Yk5vTjJINnMxMmNK?=
+ =?utf-8?B?YnB5RitqbGs4VWo0UGxKcGJsWDF6S3V4WjkxNnJTU3RQVGhiNDZqZVpRa1FD?=
+ =?utf-8?B?clNUL1NGUHY4TTJjajhuNmdIWVlxb0Z5amoyYUtUeWkvWnJLbGVrUGlmSHpu?=
+ =?utf-8?B?OHg2aHhraWpDbTg2NkZJSEUwSlF0bTE4SitURTdlUUNPYTdNNHhacE5tRkQv?=
+ =?utf-8?B?bDJleitFR0FoOUlIY2N4TTFuM2ZQVXhvd0NZckRtQ3QxaDVCZFkwclJyWFFj?=
+ =?utf-8?B?amROSG82aFlQM0NVaThXSkJKdHNkQmVqUUdlWTJnUFJXVFdDZ1dvb2xzQi9x?=
+ =?utf-8?Q?Zjpm0YMHhw7kwCQoKytNo8EEAh0ucFxNANLhf7Yw9i9Fw?=
+x-ms-exchange-antispam-messagedata-1: 5SScp4p35DQs8w==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <711EEF4213DA474EA2741E57638831BA@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2283:b0:66a:e8cd:4954 with SMTP id
- 006d021491bc7-6781fff0e52mr2384339eaf.7.1771107751898; Sat, 14 Feb 2026
- 14:22:31 -0800 (PST)
-Date: Sat, 14 Feb 2026 14:22:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6990f5a7.050a0220.3a4a67.018e.GAE@google.com>
-Subject: [syzbot] [mm?] [block?] INFO: rcu detected stall in sendfile64
-From: syzbot <syzbot+8b65a69dedebce19fd11@syzkaller.appspotmail.com>
-To: brauner@kernel.org, jack@suse.cz, linux-block@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2869bc2-5ee4-4210-8669-08de6c4a298e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2026 04:24:51.3713
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OtkizYn/MOaI1HBoKGwM88XUeIAFCCyci9sZ7qRJZx0YAWQKV+zgCGRchc/zz9jylqgC4EreaUroyyRHJe8HDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6461
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    e98f34af6116 Merge tag 'i2c-for-6.19-final' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14abe7fa580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e3161cabe5a361ff
-dashboard link: https://syzkaller.appspot.com/bug?extid=8b65a69dedebce19fd11
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/495818579ef6/disk-e98f34af.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a07da13c17ca/vmlinux-e98f34af.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b38fd29e4a16/bzImage-e98f34af.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8b65a69dedebce19fd11@syzkaller.appspotmail.com
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P6857/1:b..l
-rcu: 	(detected by 0, t=10502 jiffies, g=14329, q=377 ncpus=2)
-task:syz.2.237       state:R  running task     stack:26360 pid:6857  tgid:6845  ppid:5832   task_flags:0x400140 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5260 [inline]
- __schedule+0x1522/0x51d0 kernel/sched/core.c:6867
- preempt_schedule_irq+0x4d/0xa0 kernel/sched/core.c:7194
- irqentry_exit+0x597/0x620 kernel/entry/common.c:216
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:lock_is_held_type+0x106/0x150 kernel/locking/lockdep.c:5945
-Code: 18 00 00 b8 ff ff ff ff 65 0f c1 05 74 f3 5b 07 83 f8 01 75 25 9c 58 a9 00 02 00 00 75 39 41 f7 c4 00 02 00 00 74 01 fb 89 d8 <5b> 41 5c 41 5d 41 5e 41 5f 5d e9 a6 1e 79 f5 cc 90 0f 0b 90 48 c7
-RSP: 0018:ffffc900037df408 EFLAGS: 00000206
-RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000046
-RDX: ffff88802afdbd00 RSI: ffffffff8df35112 RDI: ffffffff8c073b00
-RBP: 00000000ffffffff R08: ffffea0001dfa1c7 R09: 1ffffd40003bf438
-R10: dffffc0000000000 R11: fffff940003bf439 R12: 0000000000000246
-R13: ffff88802afdbd00 R14: ffffffff8e55a360 R15: 0000000000000000
- xa_entry include/linux/xarray.h:1226 [inline]
- xas_next include/linux/xarray.h:1912 [inline]
- filemap_get_read_batch+0x642/0x970 mm/filemap.c:2457
- filemap_get_pages+0x351/0x1ec0 mm/filemap.c:2680
- filemap_splice_read+0x5cd/0xd10 mm/filemap.c:3079
- do_splice_read fs/splice.c:982 [inline]
- splice_direct_to_actor+0x478/0xc70 fs/splice.c:1086
- do_splice_direct_actor fs/splice.c:1204 [inline]
- do_splice_direct+0x195/0x290 fs/splice.c:1230
- do_sendfile+0x535/0x7d0 fs/read_write.c:1370
- __do_sys_sendfile64 fs/read_write.c:1425 [inline]
- __se_sys_sendfile64+0xdf/0x1a0 fs/read_write.c:1417
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd7a899aeb9
-RSP: 002b:00007fd7a9835028 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
-RAX: ffffffffffffffda RBX: 00007fd7a8c16180 RCX: 00007fd7a899aeb9
-RDX: 0000200000000080 RSI: 0000000000000007 RDI: 0000000000000007
-RBP: 00007fd7a8a08c1f R08: 0000000000000000 R09: 0000000000000000
-R10: 000000004d9b6eaf R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fd7a8c16218 R14: 00007fd7a8c16180 R15: 00007ffc22589c58
- </TASK>
-rcu: rcu_preempt kthread starved for 10431 jiffies! g14329 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:28000 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5260 [inline]
- __schedule+0x1522/0x51d0 kernel/sched/core.c:6867
- __schedule_loop kernel/sched/core.c:6949 [inline]
- schedule+0x164/0x360 kernel/sched/core.c:6964
- schedule_timeout+0x158/0x2c0 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x312/0x1560 kernel/rcu/tree.c:2083
- rcu_gp_kthread+0x9d/0x3b0 kernel/rcu/tree.c:2285
- kthread+0x726/0x8b0 kernel/kthread.c:463
- ret_from_fork+0x51b/0xa40 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 0 UID: 0 PID: 6846 Comm: syz.0.238 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/24/2026
-RIP: 0010:csd_lock_wait kernel/smp.c:342 [inline]
-RIP: 0010:smp_call_function_many_cond+0xcea/0x1270 kernel/smp.c:877
-Code: 89 ee 83 e6 01 31 ff e8 c4 db 0b 00 41 83 e5 01 49 bd 00 00 00 00 00 fc ff df 75 07 e8 6f d7 0b 00 eb 38 f3 90 42 0f b6 04 2b <84> c0 75 11 41 f7 04 24 01 00 00 00 74 1e e8 53 d7 0b 00 eb e4 44
-RSP: 0018:ffffc900038cf4a0 EFLAGS: 00000293
-RAX: 0000000000000000 RBX: 1ffff110170e8129 RCX: ffff88801aba3d00
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffc900038cf5c8 R08: ffff8880249a3047 R09: 1ffff11004934608
-R10: dffffc0000000000 R11: ffffffff81778480 R12: ffff8880b8740948
-R13: dffffc0000000000 R14: ffff8880b863bb00 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff8881256f3000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b30b06ff8 CR3: 0000000075c65000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- on_each_cpu_cond_mask+0x3f/0x80 kernel/smp.c:1043
- __flush_tlb_multi arch/x86/include/asm/paravirt.h:91 [inline]
- flush_tlb_multi arch/x86/mm/tlb.c:1382 [inline]
- flush_tlb_mm_range+0x5c3/0x10c0 arch/x86/mm/tlb.c:1472
- tlb_flush arch/x86/include/asm/tlb.h:23 [inline]
- tlb_flush_mmu_tlbonly include/asm-generic/tlb.h:506 [inline]
- zap_pte_range mm/memory.c:1885 [inline]
- zap_pmd_range mm/memory.c:1950 [inline]
- zap_pud_range mm/memory.c:1978 [inline]
- zap_p4d_range mm/memory.c:1999 [inline]
- unmap_page_range+0x3780/0x4030 mm/memory.c:2020
- unmap_single_vma mm/memory.c:2062 [inline]
- unmap_vmas+0x3c0/0x5c0 mm/memory.c:2104
- exit_mmap+0x251/0xb30 mm/mmap.c:1277
- __mmput+0x118/0x430 kernel/fork.c:1173
- exit_mm+0x168/0x220 kernel/exit.c:581
- do_exit+0x62e/0x2310 kernel/exit.c:959
- do_group_exit+0x21b/0x2d0 kernel/exit.c:1112
- __do_sys_exit_group kernel/exit.c:1123 [inline]
- __se_sys_exit_group kernel/exit.c:1121 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1121
- x64_sys_call+0x2210/0x2210 arch/x86/include/generated/asm/syscalls_64.h:232
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f986059aeb9
-Code: Unable to access opcode bytes at 0x7f986059ae8f.
-RSP: 002b:00007ffd0f27cf08 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f986059aeb9
-RDX: 0000000000000064 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 00007ffd0f27cf6c R08: 0000000000000000 R09: 00000000000927c0
-R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000023
-R13: 00000000000927c0 R14: 000000000003162f R15: 00007ffd0f27cfc0
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+T24gMi8xMi8yNiAwMjoxNywgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IE9uIFdlZCwgRmVi
+IDExLCAyMDI2IGF0IDEyOjQ5OjQ0UE0gLTA4MDAsIENoYWl0YW55YSBLdWxrYXJuaSB3cm90ZToN
+Cj4+IFdoZW4gZG1hX2lvdmFfbGluaygpIGZhaWxzIHBhcnR3YXkgdGhyb3VnaCBtYXBwaW5nIGEg
+cmVxdWVzdCdzIGJ2ZWMNCj4+IGxpc3QsIHRoZSBmdW5jdGlvbiBicmVha3Mgb3V0IG9mIHRoZSBs
+b29wIHdpdGhvdXQgY2xlYW5pbmcgdXANCj4+IGFscmVhZHkgbWFwcGVkIHNlZ21lbnRzLiBTaW1p
+bGFybHksIGlmIGRtYV9pb3ZhX3N5bmMoKSBmYWlscyBhZnRlcg0KPj4gbGlua2luZyBhbGwgc2Vn
+bWVudHMsIG5vIGNsZWFudXAgaXMgcGVyZm9ybWVkLg0KPj4NCj4+IFRoaXMgbGVhdmVzIHBhcnRp
+YWwgSU9WQSBtYXBwaW5ncyBpbiBwbGFjZS4gVGhlIGNvbXBsZXRpb24gcGF0aA0KPj4gYXR0ZW1w
+dHMgdG8gdW5tYXAgdGhlIGZ1bGwgZXhwZWN0ZWQgc2l6ZSB2aWEgZG1hX2lvdmFfZGVzdHJveSgp
+IG9yDQo+PiBudm1lX3VubWFwX2RhdGEoKSwgYnV0IG9ubHkgYSBwYXJ0aWFsIHNpemUgd2FzIGFj
+dHVhbGx5IG1hcHBlZCwNCj4+IGxlYWRpbmcgdG8gaW5jb3JyZWN0IHVubWFwIG9wZXJhdGlvbnMu
+DQo+IERvIHlvdSBoYXZlIGEgcmVwcm9kdWNlciBmb3IgdGhpcz8NCj4NCj4gT3RoZXJ3aXNlIGxv
+b2tzIGdvb2Q6DQo+DQo+IFJldmlld2VkLWJ5OiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5k
+ZT4NCj4NCkkgZG9uJ3QgaGF2ZSBhIHJlLXByb2R1Y2VyLCBJIGZvdW5kIHRoaXMgYnVnIGFsb25n
+IHdpdGggQVJNIElPTU1VIGJ1Zw0KcHVyZWx5IGJhc2VkIG9uIHJlYWRpbmcgdGhlIGNvZGUgd2hp
+bGUgY2hhc2luZyBhbm90aGVyIGZhaWx1cmUuDQoNCkkgdGhpbmsgaW4gZnV0dXJlIGVycm9yIGlu
+amVjdGlvbiBpbiB0aGlzIHBhdGggd291bGQgYmUgdmVyeSB1c2VmdWwuDQoNCi1jaw0KDQoNCg0K
