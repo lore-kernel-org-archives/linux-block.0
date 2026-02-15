@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30047312826;
-	Sun, 15 Feb 2026 23:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1272D837C;
+	Sun, 15 Feb 2026 23:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199211; cv=none; b=KzEUySZKs78TGzK5i+iDuEw9Wj8IvKFIgnqg6gafOGb9+c3v+iUUn3o/xrW7iLh3kqTY9DizQIezRl3lYZqo/YSR0V9egvj0/jCNYwZPsdRWUKTnvd+/fjrJVbMsz2sLpQCNr/E6PlRELDPTRYgu7YU9IiWyasTSylIhyY4cgh8=
+	t=1771199216; cv=none; b=ggrZQiZDobe4o2jppYygHXod7EzaqXdpwfKcxFDD3H172XkWwQQtdL+o42+VwuUkN+mtckxv57aoiGC53sXvD+FpGoLp34HczzWJHLIBVEdm7NOhVTBUFGkjzI9g1j1my6PxbYVwXEALd6eolegZnAFg0B1AsJnfVQh5NtEEOSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199211; c=relaxed/simple;
-	bh=rgMlD4sSCyRxG8oxO2Pb6vDkLa6w1B6y8QPvsSGTaZc=;
+	s=arc-20240116; t=1771199216; c=relaxed/simple;
+	bh=pHTvVkZRFYcjiaGREx9N7FRfc2mqdwNLh9peaN0Ub0Y=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nS2e1AiehrjzVGtagNHJcg2N+hhIMWwQbapiJ+vpGTTOTePo4oKq3B7MrvUYzv86gjCm63L05cC8cBAyvZ6KGvW70OITCTEV9oq+S3NzU1hh93TbpgxeDI1ZtyIg8A7/cZYOsh9ODC8moFHsxW2wvz1gyv9X/5++ZTg7ALw6tHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WmPoQJMO; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=X0qZ4FwE+ouVN05XTjca3j25MnGd72vZLC7XGrGJ7gt3jl/I5NVCVeEtUGZrYBz/ObraBPcwfMC/aQwwKEPd7jPlmaB68gglx0stCyz9ceBy9Pn0F+6EUWnaWvB1rc8doHy4QseudbmHzbObgsoUrnCl4wQR756VkiATwT4/3XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmQjiPkM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WmPoQJMO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A05CFC4CEF7;
-	Sun, 15 Feb 2026 23:46:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmQjiPkM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9CFFC4CEF7;
+	Sun, 15 Feb 2026 23:46:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199211;
-	bh=rgMlD4sSCyRxG8oxO2Pb6vDkLa6w1B6y8QPvsSGTaZc=;
+	s=k20201202; t=1771199215;
+	bh=pHTvVkZRFYcjiaGREx9N7FRfc2mqdwNLh9peaN0Ub0Y=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=WmPoQJMOP0UiKshCcGC2ekbgXi4gGMlJFjAOZ5MxskaSSSd+rXiJqBFSm59d9+B3m
-	 0s5y1/PJFCE3IQLKtRAlU/wup1FgMbqxO4DKfmsSGzk6bQlt56ouh40xpjiJIu+xQ+
-	 wUp4adpOBJ4FzHFcEec+9kxPGsWy9C69T3jmsLiZoXBV0KfD5lTEx8XwdR7Wv3vcfk
-	 gopZcVsalEwSnEnreQVd+cFZIwC2gG5zdA9SFBdB2aLCV5v7uKeHzK9IeUHgcOLghj
-	 ZfPFSozibHnKLdm772y85ZlrajGlHVSPadvHQKgUENZtO9GBKw4L2VHOOciApLT+5c
-	 KSkkG/y80PoXw==
+	b=BmQjiPkMGbCMCCRWpIRKmUkMrdGCR9uHTSwgOcA660yGX9ktAN30df2PCPV3s1HZk
+	 6CEfKyzgEVdxnIQWZU2sAQGCS/S5FdfVQVx0cD/mKtl8lag7yrZ8mIUEs/tcjl+jas
+	 tssEjIRSACRWsCVEMNjHKPKw1d/9YnUX5GO5JjL7vJn6UA0FNu/5BO4te+G6TLLUiQ
+	 HzbZ8HZG8ZWn206d5cPypIxHAoQtaq4lhGaTNVkvT1CLAR88iFZsgYvzaUWz3IW4DZ
+	 ukKxIk36VgGppMIBD5qzeXu/6eheDOcZsDLM1PwpEyM2bT1EGdmd7VcKD5s0+Beoq5
+	 Pyi7Orb/Ucqhw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:34:49 +0100
-Subject: [PATCH 02/79] block: rnull: add module parameters
+Date: Mon, 16 Feb 2026 00:35:31 +0100
+Subject: [PATCH 44/79] block: rust: add an abstraction for
+ `bindings::req_op`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-2-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-44-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,124 +57,180 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3195; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=rgMlD4sSCyRxG8oxO2Pb6vDkLa6w1B6y8QPvsSGTaZc=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgdRABPWARqS1bNRC+vWhj9vKzZMZZcE3x1J
- YLYupX3Y7yJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYHQAKCRDhuBo+eShj
- d9LAD/9LvTRLSgtyV5rn6DK63XIy00fXEsKbYH8ZTfptYGBha30Wxnq4BRbzlAGzSI7eseVirtu
- U2fUA67OrAjwLTSxPkmJhR53AM7ylkIh+qc60AWS9hwAu0T5MyOK8jphpvwA0rWLKHaKw8JOFjA
- v4I49NQ7hDBxCmBG6svW1KzaxBnEN3sLb5zn7bAE6+wDppgTZc+pBYJXRK2ITRlWSl3BsDAY6fX
- eMajzH3BrBzqbS49rnM0/yjEGCyezkbXE+KCLx54uudBjCle9yLGzBqcTa6iFsxsgbj3xQl3W5d
- UUFXc3j/AjYSOLJaQPRE/AUjaFuXjdoEi72vpE5Be5eiikPFPU1N5KESsjdZ0rziWu7N5n2zBmI
- xUFRcHYOGWJlCoasEcDU1LzAy7NTFzrxsFs2c1oLrFLgVfbC/C4sQW3VDJ8S2OGeUsRhu7vdHtH
- SHF5YH9h5dksV5cM8rhy0uh+BC63HhvCM6ZqByKuFvxhd6Fh4al+YYmVYoYQgmFLMYcHprOo32D
- Oh+mJ02nU0YBCHqy0HGNrwQQBloNC864jBfkOPR62speL9TbdseULqpzx96q5EY1BBzzolCMUss
- lUP0KXF3Sp4JTC+3IqQ5sB3l/ZjUTARO52gSRtkLFn4XTHn5rP77RTo8Si+9U17qsEQvvKHrZt8
- vbnD6kdgtG+8tPw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6414; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=pHTvVkZRFYcjiaGREx9N7FRfc2mqdwNLh9peaN0Ub0Y=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhDEeCdW/yi4dywjzU/1Nk+MWm9S2xIIH2Cn
+ V0G9M1w7xSJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYQwAKCRDhuBo+eShj
+ d/D6D/44ecuU5yS9H5GCaAuZSVh+YOzWJCcgz/rVCkktg1rouPSSpD6CxPVUon461IFCjG00DLA
+ G0FKsh7baTRApFzDessKhoxB+9+5mm5uoe3KDBZka+ZtKw6XmL13kwSE6QDe4izJo2fXWh8ZECc
+ T88vr0uJG817P2hEkIKdE7sfywllU2Boyaxc256EgmJko0htOudxKOPi0nX2tGTWC2quFmMbBnj
+ 5ZR4gxFx4OewOOIf2Iyt1vcRNuDuTTJRa38dGXbjwgF/KTExWRKIikmoN/0HKJgOYgsHtGvyCLS
+ NrEInkyirWFL29VlZeTQAEcIuc5yYEBJwCaXeckvuyEk7pivpurH2atUKKpy1Qn/QshXpDuIBFA
+ 5cNc6Vu2ZlFJrGZBXaOjXwcN8Ra7nLJ6wgs82RQJ3RQP+CjK7FjLMFXceHE4cgluDKQtECeD3pl
+ raa/er7bmW6GL7Q5ZQurcZJ6sptVEQC4uq/pWVwnC/IwZfCLGTQjFmhyYBLaxNqrNUx3u40ll9v
+ /8ylEGx1cgYdBcnRaZSV90oIGgrAB8nipQus1bMtJV2hsXIg9jnAEa9dTHZTXuqbK2Aqw/2SmS9
+ cXooL5FmaBASTDq6ifdv1QwvzLB+mS6rmIPRbTiD7s0baqG2g9Xpk8t7etiq84wChnJIRI1LA76
+ 32fIHtKfsDlyO5g==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Module parameter support for Rust modules was merged a few releases back.
-Add module parameter support to the rnull driver.
+Add the `Command` enum as a Rust abstraction for block request operation
+codes. The enum variants correspond to the C `REQ_OP_*` defines and
+include read, write, flush, discard, and zone management operations.
 
-This allows the user to control the driver either via configfs or module
-parameters, just like the C counterpart.
-
-Please note that the rust module parameters do not support boolean values.
-Flags that should have been booleans are parsed as integers and compared to
-zero.
+Also add a `command()` method to `Request` to retrieve the operation
+code.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/rnull.rs | 51 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 49 insertions(+), 2 deletions(-)
+ drivers/block/rnull/rnull.rs            |  6 +--
+ rust/kernel/block/mq.rs                 |  1 +
+ rust/kernel/block/mq/request.rs         | 11 +++++-
+ rust/kernel/block/mq/request/command.rs | 65 +++++++++++++++++++++++++++++++++
+ 4 files changed, 79 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 2c83b014b05e9..bd883a5061cab 100644
+index 3fb19836ce6ff..9383b82f9a736 100644
 --- a/drivers/block/rnull/rnull.rs
 +++ b/drivers/block/rnull/rnull.rs
-@@ -19,11 +19,13 @@
-         },
-     },
-     error::Result,
--    pr_info,
-+    new_mutex, pr_info,
-     prelude::*,
-+    str::CString,
-     sync::{
-         aref::ARef,
--        Arc, //
-+        Arc,
-+        Mutex, //
-     },
- };
- use pin_init::PinInit;
-@@ -34,20 +36,65 @@
-     authors: ["Andreas Hindborg"],
-     description: "Rust implementation of the C null block driver",
-     license: "GPL v2",
-+    params: {
-+        gb: u64 {
-+            default: 4,
-+            description: "Device capacity in GiB",
-+        },
-+        rotational: u8 {
-+            default: 0,
-+            description:
-+            "Set the rotational feature for the device (0 for false, 1 for true). Default: 0",
-+        },
-+        bs: u32 {
-+            default: 4096,
-+            description: "Block size (in bytes)",
-+        },
-+        nr_devices: u64 {
-+            default: 1,
-+            description: "Number of devices to register",
-+        },
-+        irqmode: u8 {
-+            default: 0,
-+            description:  "IRQ completion handler. 0-none, 1-softirq",
-+        },
-+    },
- }
+@@ -508,10 +508,10 @@ fn transfer(
+                     .len()
+                     .min((end_sector - sector) as u32 >> SECTOR_SHIFT);
+                 match command {
+-                    bindings::req_op_REQ_OP_WRITE => {
++                    mq::Command::Write => {
+                         self.write(&mut tree_guard, &mut hw_data_guard, sector, segment)?
+                     }
+-                    bindings::req_op_REQ_OP_READ => {
++                    mq::Command::Read => {
+                         self.read(&mut tree_guard, &mut hw_data_guard, sector, segment)?
+                     }
+                     _ => (),
+@@ -703,7 +703,7 @@ fn queue_rq(
+         Self::handle_bad_blocks(this.deref(), &mut rq, &mut sectors)?;
  
- #[pin_data]
- struct NullBlkModule {
-     #[pin]
-     configfs_subsystem: kernel::configfs::Subsystem<configfs::Config>,
-+    #[pin]
-+    param_disks: Mutex<KVec<GenDisk<NullBlkDevice>>>,
- }
+         if this.memory_backed {
+-            if rq.command() == bindings::req_op_REQ_OP_DISCARD {
++            if rq.command() == mq::Command::Discard {
+                 this.discard(&hw_data, rq.sector(), sectors)?;
+             } else {
+                 this.transfer(&hw_data, &mut rq, sectors)?;
+diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+index 02738f52389ba..057a5f366be3a 100644
+--- a/rust/kernel/block/mq.rs
++++ b/rust/kernel/block/mq.rs
+@@ -131,6 +131,7 @@
+ pub mod tag_set;
  
- impl kernel::InPlaceModule for NullBlkModule {
-     fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-         pr_info!("Rust null_blk loaded\n");
+ pub use operations::Operations;
++pub use request::Command;
+ pub use request::IdleRequest;
+ pub use request::Request;
+ pub use request::RequestTimerHandle;
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index d6f3ffde1c5c4..4e47419776e0f 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -23,6 +23,9 @@
+ use crate::block::bio::Bio;
+ use crate::block::bio::BioIterator;
  
-+        let mut disks = KVec::new();
++mod command;
++pub use command::Command;
 +
-+        let defer_init = move || -> Result<_, Error> {
-+            for i in 0..(*module_parameters::nr_devices.value()) {
-+                let name = CString::try_from_fmt(fmt!("rnullb{}", i))?;
-+
-+                let disk = NullBlkDevice::new(
-+                    &name,
-+                    *module_parameters::bs.value(),
-+                    *module_parameters::rotational.value() != 0,
-+                    *module_parameters::gb.value() * 1024,
-+                    (*module_parameters::irqmode.value()).try_into()?,
-+                )?;
-+                disks.push(disk, GFP_KERNEL)?;
-+            }
-+
-+            Ok(disks)
-+        };
-+
-         try_pin_init!(Self {
-             configfs_subsystem <- configfs::subsystem(),
-+            param_disks <- new_mutex!(defer_init()?),
-         })
+ /// A [`Request`] that a driver has not yet begun to process.
+ ///
+ /// A driver can convert an `IdleRequest` to a [`Request`] by calling [`IdleRequest::start`].
+@@ -89,11 +92,17 @@ fn deref(&self) -> &Self::Target {
+ 
+ impl<T: Operations> RequestInner<T> {
+     /// Get the command identifier for the request
+-    pub fn command(&self) -> u32 {
++    fn command_raw(&self) -> u32 {
+         // SAFETY: By C API contract and type invariant, `cmd_flags` is valid for read
+         unsafe { (*self.0.get()).cmd_flags & ((1 << bindings::REQ_OP_BITS) - 1) }
      }
- }
+ 
++    /// Get the command of this request.
++    pub fn command(&self) -> Command {
++        // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
++        unsafe { Command::from_raw(self.command_raw()) }
++    }
++
+     /// Get the target sector for the request.
+     #[inline(always)]
+     pub fn sector(&self) -> u64 {
+diff --git a/rust/kernel/block/mq/request/command.rs b/rust/kernel/block/mq/request/command.rs
+new file mode 100644
+index 0000000000000..70a8d67fa35c0
+--- /dev/null
++++ b/rust/kernel/block/mq/request/command.rs
+@@ -0,0 +1,65 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/// Block I/O operation codes.
++///
++/// This is the Rust abstraction for the C [`enum req_op`].
++///
++/// Operations common to the bio and request structures. The kernel uses 8 bits
++/// for encoding the operation, and the remaining 24 bits for flags.
++///
++/// The least significant bit of the operation number indicates the data
++/// transfer direction:
++///
++/// - If the least significant bit is set, transfers are TO the device.
++/// - If the least significant bit is not set, transfers are FROM the device.
++///
++/// If an operation does not transfer data, the least significant bit has no
++/// meaning.
++///
++/// [`enum req_op`]: srctree/include/linux/blk_types.h
++#[derive(Copy, Clone, Debug, PartialEq, Eq)]
++#[repr(u32)]
++pub enum Command {
++    /// Read sectors from the device.
++    Read = bindings::req_op_REQ_OP_READ,
++    /// Write sectors to the device.
++    Write = bindings::req_op_REQ_OP_WRITE,
++    /// Flush the volatile write cache.
++    Flush = bindings::req_op_REQ_OP_FLUSH,
++    /// Discard sectors.
++    Discard = bindings::req_op_REQ_OP_DISCARD,
++    /// Securely erase sectors.
++    SecureErase = bindings::req_op_REQ_OP_SECURE_ERASE,
++    /// Write data at the current zone write pointer.
++    ZoneAppend = bindings::req_op_REQ_OP_ZONE_APPEND,
++    /// Write zeroes. This allows to implement zeroing for devices that don't use either discard
++    /// with a predictable zero pattern or WRITE SAME of zeroes.
++    WriteZeroes = bindings::req_op_REQ_OP_WRITE_ZEROES,
++    /// Open a zone.
++    ZoneOpen = bindings::req_op_REQ_OP_ZONE_OPEN,
++    /// Close a zone.
++    ZoneClose = bindings::req_op_REQ_OP_ZONE_CLOSE,
++    /// Transition a zone to full.
++    ZoneFinish = bindings::req_op_REQ_OP_ZONE_FINISH,
++    /// Reset a zone write pointer.
++    ZoneReset = bindings::req_op_REQ_OP_ZONE_RESET,
++    /// Reset all the zones present on the device.
++    ZoneResetAll = bindings::req_op_REQ_OP_ZONE_RESET_ALL,
++    /// Driver private request for data transfer to the driver.
++    DriverIn = bindings::req_op_REQ_OP_DRV_IN,
++    /// Driver private request for data transfer from the driver.
++    DriverOut = bindings::req_op_REQ_OP_DRV_OUT,
++}
++
++impl Command {
++    /// Creates a [`Command`] from a raw `u32` value.
++    ///
++    /// # Safety
++    ///
++    /// The value must be a valid `req_op` operation code.
++    pub unsafe fn from_raw(value: u32) -> Self {
++        // SAFETY: The caller guarantees that the value is a valid operation
++        // code.
++        unsafe { core::mem::transmute(value) }
++    }
++}
 
 -- 
 2.51.2
