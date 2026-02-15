@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D010DEEC0;
-	Sun, 15 Feb 2026 23:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DE02D8798;
+	Sun, 15 Feb 2026 23:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771198899; cv=none; b=rQPtRp0Xj/ySzZRlaYgx0zSePwHemPnm9d/NHvaBXsLRp7Sp9G7ReS/E/5Ph+Ybr8pTwk5gaTZfd7Qb19fXMkw50qhX0hRrRxBJnz34CY0nSj1FOsw/n760USF5ePoDfIY2RcPAo3PoMs0WJR2NJyTsBLQCbqUz0Ox8jL8jw2FI=
+	t=1771198904; cv=none; b=pRAe6NEcMNKQ8+sbK0377jDMCyuPC6SJQXeFVjane2odvJpe2dt4n5F5TQLliIVB4qHOhF47fCiZ3kc/Y6KoVkt8vdafmyfBM38P8SlpIijYdnv2kmUlSORljiLORfTDqhzwh1oQbvhwlGE80r/0jVckNHYLcdlnnATWLi2MiLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771198899; c=relaxed/simple;
-	bh=D7D66X+gJAFczQNNgh5CL7i3hR5Izk7o4xJkF6qeolE=;
+	s=arc-20240116; t=1771198904; c=relaxed/simple;
+	bh=L3XSJojS07YDYbfXfGO4e+2UgYlsugCATTWsJ+jV4ls=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YizoMg+UtMMr2A2cp/XrAqbbkyLd8xGUNCyjgmQiPKZcAGaejHGrBDUIl0W0tZqEGNKhHCjDmCyWEOdMCXSeVf7QWjxQsWjFlQfVAAfX/R/oePJv9ZmmfhxZrdX8c086N/EpgJ0Dn8rjLdCw40dDOFmAToVkZ/g2X407zZoUyfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UiZ4uB0f; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=CGt17bZgTpRgan+RSCa9VzR5W+WDVKFBCGsegR2Qxge0rnx3I3vECAbS32i3F4PdBuBS+9S/qF2DuzJ32VGta86wvOXtMS/UiqYJ5h93Xypb2XzGUiL15QuU0hAa+mJkKugKbyO8zZD3BqGKYxNJ3E02+589ptxyotND/uRnuUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=igDz9M0v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UiZ4uB0f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FAE9C19422;
-	Sun, 15 Feb 2026 23:41:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="igDz9M0v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22CC8C19422;
+	Sun, 15 Feb 2026 23:41:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771198899;
-	bh=D7D66X+gJAFczQNNgh5CL7i3hR5Izk7o4xJkF6qeolE=;
+	s=k20201202; t=1771198904;
+	bh=L3XSJojS07YDYbfXfGO4e+2UgYlsugCATTWsJ+jV4ls=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=UiZ4uB0ftkvcfsuyCpp2BCvenjYi5DGaspOgGnronBlOVcBlhMu3VmURoNZfYtac6
-	 NiVhgllacLrufMvslVuIeJtia9BaGhvMckaBy1dQio2CVJkduOxjuE3e1T8E4Ta/f4
-	 TRfsHSjnMU/MEQSjnHOJcXq5084eZ3b0clE7i1+35RFxHF5uz9mIa048JqptbMPHw3
-	 4DT6C+6bjXQyEW30Mg5Lk+P+JPc652re0g//ypjmuHRJxOWNmXRHY8G8bHyGYyIWKB
-	 2fdGqxMMxiolOCw+saPhkpaQ6eNcXg6+S0l9fEc4uncVsDSxrdk8gX2gR/ndqswy5v
-	 7ez5UBte+KnjQ==
+	b=igDz9M0vYhXKDIo+yjIsqqbNWXQbpqsH1646n5gEfRTWn8Uv/6oPPwENkcBFA55Js
+	 Yr0nrwjfAB8HxMohbg7LqLtlgQLA8+e6HtRquFS4kPiJlF7RFlHKiRTGt+ztkne6YO
+	 Jh8sDfztk1ShNdTtMjSBxXKPI8rWao8ch0oUtPz3PWZb5DURn7g/Yki0zNaHrFaCas
+	 ghpIGP8JrPGVlo8a533fw6N8Ls3yF3hwsZXYPqKC0xoeC/w0r69OQMffkohJkFViUH
+	 4YUPNO8RfaarEmlgXRTUL+MYhQ9esViCqspjjFM8Vfa/A22YGikB0srm7nMl8G+0us
+	 E46u6vm1xhY2w==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:16 +0100
-Subject: [PATCH 29/79] block: rust: add `TagSet` private data support
+Date: Mon, 16 Feb 2026 00:35:07 +0100
+Subject: [PATCH 20/79] block: rnull: add discard support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-29-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-20-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,163 +56,314 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5916; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=D7D66X+gJAFczQNNgh5CL7i3hR5Izk7o4xJkF6qeolE=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklg2rFmUUi6LLaqQTrSP7Cjji5l3ptpVNJ3Mb
- 1LLO0X1treJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYNgAKCRDhuBo+eShj
- d2x7EACrjvttPgu6cF9IkrYrF2Y2L7/35Z6wNExRAfCWDx4SrpD3/6Yne063iZ3oG/ih3R0obID
- qfp4ntGFuP3Z6/XfIV63okRkoTxcAw35XZg+kZuTy82328/rRgWZZsLUhCzPaTc3x2hU/06mgy3
- 0qG/0aC23ua7hHWpnLQtJxqoAxLce8qX9KRb/3HrJtN74hV5ffluD6bcFTtBAkVMISJoXC+qefe
- 29TQuTOpRbj0vQHXKZsbTXkj0XVdWfHd1cAfzpNRyi3rGkw+VDLDxYV5uDU0oJ/klMZAPCyF4FI
- V2MBB9AWE8449Mkh5qbEfw8/A68+Xd3rZ6a93K74icb2QnYf4g+aJm0GKvhgEwOz+Qe6LsD6ABe
- u5OgzcAomqzjOxMvd/MgqoW1bxnnupdUfdTyzSzujUjBKC1HVuBcRdupuN6PpW2VU6Vpa1ugb5y
- +65lOvPVgjVw2c6hEsZkSR1FULHvkbC714OwvUfo55pQolUV8vSt7Kjzl/TssRlXu8Wjkx7fx9Q
- WcxvPxxaSwcPexeGtoCF7BZ7F5Nh4FXQKCaReDSddZ3ioQTU8DNkmoeDzQ6CCGzJEeAfIRuUU2s
- mUD/Je4nqrrTVdvYB99b35nU+EQ/zBlzGjPcU26fzDxbCf3ozbpC/FKrL/PZsRtK9WQlOV4AZKi
- 17jWogjukxsD0ZA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10018;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=L3XSJojS07YDYbfXfGO4e+2UgYlsugCATTWsJ+jV4ls=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgtUZ2EEiKlJcCmtv5PNpC9ErgLsmTBI2uRU
+ 9XxwKAejBGJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYLQAKCRDhuBo+eShj
+ d8QpD/0aOYUEHA91S9PGUYMcbZUu6Nvel4/gIWiCvQFtcuJD+1ZAJOF+fOyT6RcBgie3kRaNwde
+ WctVwIEmb5oeWENqVXTlE1YZ04r+TzBlvOfynxh4PxsHQUuQ5ra7xSIhW6zVg+qO3JwYxwcUO5+
+ mcVfO7w+gIN2k/feuuEY5OkquTWlDDK0qPGkN34ax2LICaFohGgugLDlnj6U3ugj3P8Pc2W1vfh
+ JfMsqBCMDGwUBHABeOj/ttTyxmwbwbqEn0RE1CUPH+sBU37he60j+TxXOMe5lhTRj+wJ7n/soeq
+ S4I7P4heDFRKG7JJSYvEOLGgzGnPy/Vz340UWzhBjYKcpCQnuN7hNbkq3c/6I5Dj5qMe/pzrod5
+ kkCsHYlLKQpqPU/REIZTagphKAtdAvF/16yoBmfj1RMNprpHqngs8sHwUSHKlsJzckOD/2plski
+ Oeb3Z0XZiYjjs6O1SH+olc4NmLTjUaUSgIFoOzYK0WoRe44+DbOU5DIo+G/oOCxvKOSsn1Zm+pa
+ 0URrr/009mux/KXiFLAAiSDDLLJiwztoqYEFMTHevmVKsYPct57PMBX3NHiRU4dUeNU5o/AMgei
+ kNxccWqgKS6jRkjBti5yxV7YLsIkNn8KJRLiCz5mNu9YXgOjiRZYWUNFfl4uSJPfpKhtD6DeRsP
+ SnyxLPVhFvuKO3A==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-C block device drivers can attach private data to a `struct
-blk_mq_tag_set`. Add support for this feature for Rust block device
-drivers via the `Operations::TagSetData` associated type.
+Add support for discard operations to the rnull block driver:
+- Add discard module parameter and configfs attribute.
+- Set max_hw_discard_sectors when discard is enabled.
+- Add sector occupancy tracking.
+- Add discard handling that frees sectors and removes empty pages.
+- Discard operations require memory backing to function.
 
-The private data is passed to `TagSet::new` and is stored in the
-`driver_data` field of the underlying `struct blk_mq_tag_set`. It is
-released when the `TagSet` is dropped.
+The discard feature uses a bitmap to track which sectors in each page are
+occupied, allowing cleanup of pages when they are empty.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/rnull.rs       |  3 ++-
- rust/kernel/block/mq.rs            |  6 ++++--
- rust/kernel/block/mq/operations.rs |  4 ++++
- rust/kernel/block/mq/tag_set.rs    | 25 ++++++++++++++++++++-----
- 4 files changed, 30 insertions(+), 8 deletions(-)
+ drivers/block/rnull/configfs.rs |  15 ++++++
+ drivers/block/rnull/rnull.rs    | 115 +++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 116 insertions(+), 14 deletions(-)
 
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index fe00617d2b679..4ec9be440105d 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -94,6 +94,7 @@ fn make_group(
+                 submit_queues: 7,
+                 use_per_node_hctx: 8,
+                 home_node: 9,
++                discard: 10,
+             ],
+         };
+ 
+@@ -114,6 +115,7 @@ fn make_group(
+                     memory_backed: false,
+                     submit_queues: 1,
+                     home_node: bindings::NUMA_NO_NODE,
++                    discard: false,
+                 }),
+             }),
+             core::iter::empty(),
+@@ -171,6 +173,7 @@ struct DeviceConfigInner {
+     memory_backed: bool,
+     submit_queues: u32,
+     home_node: i32,
++    discard: bool,
+ }
+ 
+ #[vtable]
+@@ -204,6 +207,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 memory_backed: guard.memory_backed,
+                 submit_queues: guard.submit_queues,
+                 home_node: guard.home_node,
++                discard: guard.discard,
+             })?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -321,3 +325,14 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+         }
+     }
+ );
++
++configfs_attribute!(DeviceConfig, 10,
++    show: |this, page| show_field(this.data.lock().discard, page),
++    store: |this, page| store_with_power_check(this, page, |this, page| {
++        if !this.data.lock().memory_backed {
++            return Err(EINVAL);
++        }
++        this.data.lock().discard = kstrtobool_bytes(page)?;
++        Ok(())
++    })
++);
 diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 6691e5912c5c9..9e8d085924040 100644
+index fb3ce272d5bec..d1fb5fbc0c0be 100644
 --- a/drivers/block/rnull/rnull.rs
 +++ b/drivers/block/rnull/rnull.rs
-@@ -229,7 +229,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-         }
+@@ -19,14 +19,19 @@
+             Operations,
+             TagSet, //
+         },
++        SECTOR_MASK, SECTOR_SHIFT,
+     },
+     error::{
+         code,
+         Result, //
+     },
++    ffi,
+     new_mutex,
+     new_xarray,
+-    page::SafePage,
++    page::{
++        SafePage, //
++        PAGE_SIZE,
++    },
+     pr_info,
+     prelude::*,
+     str::CString,
+@@ -102,6 +107,11 @@
+             default: -1,
+             description: "Home node for the device. Default: -1 (no node)",
+         },
++        discard: u8 {
++            default: 0,
++            description:
++            "Support discard operations (requires memory-backed null_blk device). Default: false",
++        },
+     },
+ }
  
-         let tagset = Arc::pin_init(
--            TagSet::new(submit_queues, 256, 1, home_node, flags),
-+            TagSet::new(submit_queues, (), 256, 1, home_node, flags),
+@@ -139,6 +149,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     memory_backed: *module_parameters::memory_backed.value() != 0,
+                     submit_queues,
+                     home_node: *module_parameters::home_node.value(),
++                    discard: *module_parameters::discard.value() != 0,
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -163,6 +174,7 @@ struct NullBlkOptions<'a> {
+     memory_backed: bool,
+     submit_queues: u32,
+     home_node: i32,
++    discard: bool,
+ }
+ struct NullBlkDevice;
+ 
+@@ -178,6 +190,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+             memory_backed,
+             submit_queues,
+             home_node,
++            discard,
+         } = options;
+ 
+         let flags = if memory_backed {
+@@ -201,22 +214,30 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+                 irq_mode,
+                 completion_time,
+                 memory_backed,
++                block_size: block_size as usize,
+             }),
              GFP_KERNEL,
          )?;
  
-@@ -505,6 +505,7 @@ fn align_down<T>(value: T, to: T) -> T
- impl Operations for NullBlkDevice {
-     type QueueData = Pin<KBox<QueueData>>;
-     type RequestData = Pdu;
-+    type TagSetData = ();
- 
-     fn new_request_data() -> impl PinInit<Self::RequestData> {
-         pin_init!(Pdu {
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index d3957f2fb1a66..415be31e9a777 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -71,6 +71,7 @@
- //! impl Operations for MyBlkDevice {
- //!     type RequestData = ();
- //!     type QueueData = ();
-+//!     type TagSetData = ();
- //!
- //!     fn new_request_data(
- //!     ) -> impl PinInit<()> {
-@@ -94,8 +95,9 @@
- //!
- //! let tagset: Arc<TagSet<MyBlkDevice>> =
- //!     Arc::pin_init(
--//!         TagSet::new(1, 256, 1, bindings::NUMA_NO_NODE, mq::tag_set::Flags::default()),
--//!         GFP_KERNEL)?;
-+//!         TagSet::new(1, (), 256, 1, bindings::NUMA_NO_NODE, mq::tag_set::Flags::default()),
-+//!         GFP_KERNEL
-+//!     )?;
- //! let mut disk = gen_disk::GenDiskBuilder::new()
- //!     .capacity_sectors(4096)
- //!     .build(fmt!("myblk"), tagset, ())?;
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index cd37b939bbf30..9aab6240428cc 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -44,6 +44,10 @@ pub trait Operations: Sized {
-     /// the `GenDisk` associated with this `Operations` implementation.
-     type QueueData: ForeignOwnable;
- 
-+    /// Data associated with a `TagSet`. This is stored as a pointer in `struct
-+    /// blk_mq_tag_set`.
-+    type TagSetData: ForeignOwnable;
+-        gen_disk::GenDiskBuilder::new()
++        let mut builder = gen_disk::GenDiskBuilder::new()
+             .capacity_sectors(capacity_mib << (20 - block::SECTOR_SHIFT))
+             .logical_block_size(block_size)?
+             .physical_block_size(block_size)?
+-            .rotational(rotational)
+-            .build(fmt!("{}", name.to_str()?), tagset, queue_data)
++            .rotational(rotational);
 +
-     /// Called by the kernel to get an initializer for a `Pin<&mut RequestData>`.
-     fn new_request_data() -> impl PinInit<Self::RequestData>;
++        if memory_backed && discard {
++            builder = builder
++                // Max IO size is u32::MAX bytes
++                .max_hw_discard_sectors(ffi::c_uint::MAX >> block::SECTOR_SHIFT);
++        }
++
++        builder.build(fmt!("{}", name.to_str()?), tagset, queue_data)
+     }
  
-diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
-index e9b36d6329b9b..f18b51e5217fe 100644
---- a/rust/kernel/block/mq/tag_set.rs
-+++ b/rust/kernel/block/mq/tag_set.rs
-@@ -10,8 +10,8 @@
-     bindings,
-     block::mq::{operations::OperationsVTable, request::RequestDataWrapper, Operations},
-     error::{self, Result},
--    prelude::try_pin_init,
--    types::Opaque,
-+    try_pin_init,
-+    types::{ForeignOwnable, Opaque},
- };
- use core::{convert::TryInto, marker::PhantomData};
- use pin_init::{pin_data, pinned_drop, PinInit};
-@@ -39,6 +39,7 @@ impl<T: Operations> TagSet<T> {
-     /// Try to create a new tag set
-     pub fn new(
-         nr_hw_queues: u32,
-+        tagset_data: T::TagSetData,
-         num_tags: u32,
-         num_maps: u32,
-         numa_node: i32,
-@@ -58,7 +59,7 @@ pub fn new(
-                     queue_depth: num_tags,
-                     cmd_size,
-                     flags: flags.into_inner(),
--                    driver_data: core::ptr::null_mut::<crate::ffi::c_void>(),
-+                    driver_data: tagset_data.into_foreign(),
-                     nr_maps: num_maps,
-                     ..tag_set
-                 }
-@@ -71,7 +72,14 @@ pub fn new(
-                 // SAFETY: we do not move out of `tag_set`.
-                 let tag_set: &mut Opaque<_> = unsafe { Pin::get_unchecked_mut(tag_set) };
-                 // SAFETY: `tag_set` is a reference to an initialized `blk_mq_tag_set`.
--                error::to_result( unsafe { bindings::blk_mq_alloc_tag_set(tag_set.get())})
-+                let status = error::to_result(
-+                    unsafe { bindings::blk_mq_alloc_tag_set(tag_set.get())}
-+                );
-+                if status.is_err() {
-+                    // SAFETY: We created `driver_data` above with `into_foreign`
-+                    unsafe { T::TagSetData::from_foreign((*tag_set.get()).driver_data) };
+     #[inline(always)]
+     fn write(tree: &Tree, mut sector: usize, mut segment: Segment<'_>) -> Result {
+         while !segment.is_empty() {
+-            let page = SafePage::alloc_page(GFP_NOIO)?;
++            let page = NullBlockPage::new()?;
+             let mut tree = tree.lock();
+ 
+             let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
+@@ -228,8 +249,10 @@ fn write(tree: &Tree, mut sector: usize, mut segment: Segment<'_>) -> Result {
+                 tree.get_mut(page_idx).unwrap()
+             };
+ 
++            page.set_occupied(sector);
+             let page_offset = (sector & block::SECTOR_MASK as usize) << block::SECTOR_SHIFT;
+-            sector += segment.copy_to_page(page, page_offset) >> block::SECTOR_SHIFT;
++            sector +=
++                segment.copy_to_page(page.page.get_pin_mut(), page_offset) >> block::SECTOR_SHIFT;
+         }
+         Ok(())
+     }
+@@ -243,7 +266,7 @@ fn read(tree: &Tree, mut sector: usize, mut segment: Segment<'_>) -> Result {
+ 
+             if let Some(page) = tree.get(idx) {
+                 let page_offset = (sector & block::SECTOR_MASK as usize) << block::SECTOR_SHIFT;
+-                sector += segment.copy_from_page(page, page_offset) >> block::SECTOR_SHIFT;
++                sector += segment.copy_from_page(&page.page, page_offset) >> block::SECTOR_SHIFT;
+             } else {
+                 sector += segment.zero_page() >> block::SECTOR_SHIFT;
+             }
+@@ -252,6 +275,32 @@ fn read(tree: &Tree, mut sector: usize, mut segment: Segment<'_>) -> Result {
+         Ok(())
+     }
+ 
++    fn discard(tree: &Tree, mut sector: usize, sectors: usize, block_size: usize) -> Result {
++        let mut remaining_bytes = sectors << SECTOR_SHIFT;
++        let mut tree = tree.lock();
++
++        while remaining_bytes > 0 {
++            let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
++            let mut remove = false;
++            if let Some(page) = tree.get_mut(page_idx) {
++                page.set_free(sector);
++                if page.is_empty() {
++                    remove = true;
 +                }
-+                status
-             }),
-             _p: PhantomData,
-         })
-@@ -87,7 +95,14 @@ pub(crate) fn raw_tag_set(&self) -> *mut bindings::blk_mq_tag_set {
- impl<T: Operations> PinnedDrop for TagSet<T> {
-     fn drop(self: Pin<&mut Self>) {
-         // SAFETY: By type invariant `inner` is valid and has been properly
--        // initialized during construction.
-+        // initialised during construction.
-+        let tagset_data = unsafe { (*self.inner.get()).driver_data };
++            }
 +
-+        // SAFETY: `inner` is valid and has been properly initialised during construction.
-         unsafe { bindings::blk_mq_free_tag_set(self.inner.get()) };
++            if remove {
++                drop(tree.remove(page_idx))
++            }
 +
-+        // SAFETY: `tagset_data` was created by a call to
-+        // `ForeignOwnable::into_foreign` in `TagSet::try_new()`
-+        unsafe { T::TagSetData::from_foreign(tagset_data) };
++            let processed = remaining_bytes.min(block_size);
++            sector += processed >> SECTOR_SHIFT;
++            remaining_bytes -= processed;
++        }
++
++        Ok(())
++    }
++
+     #[inline(never)]
+     fn transfer(
+         command: bindings::req_op,
+@@ -268,7 +317,40 @@ fn transfer(
      }
  }
+ 
+-type TreeNode = Owned<SafePage>;
++const _CHEKC_STATUS_WIDTH: () = build_assert!((PAGE_SIZE >> SECTOR_SHIFT) <= 64);
++
++struct NullBlockPage {
++    page: Owned<SafePage>,
++    status: u64,
++}
++
++impl NullBlockPage {
++    fn new() -> Result<KBox<Self>> {
++        Ok(KBox::new(
++            Self {
++                page: SafePage::alloc_page(GFP_NOIO | __GFP_ZERO)?,
++                status: 0,
++            },
++            GFP_NOIO,
++        )?)
++    }
++
++    fn set_occupied(&mut self, sector: usize) {
++        let idx = sector & SECTOR_MASK as usize;
++        self.status |= 1 << idx;
++    }
++
++    fn set_free(&mut self, sector: usize) {
++        let idx = sector & SECTOR_MASK as usize;
++        self.status &= !(1 << idx);
++    }
++
++    fn is_empty(&self) -> bool {
++        self.status == 0
++    }
++}
++
++type TreeNode = KBox<NullBlockPage>;
+ type Tree = XArray<TreeNode>;
+ 
+ #[pin_data]
+@@ -278,6 +360,7 @@ struct QueueData {
+     irq_mode: IRQMode,
+     completion_time: Delta,
+     memory_backed: bool,
++    block_size: usize,
+ }
+ 
+ #[pin_data]
+@@ -327,12 +410,16 @@ fn queue_rq(
+             let command = rq.command();
+             let mut sector = rq.sector();
+ 
+-            for bio in rq.bio_iter_mut() {
+-                let segment_iter = bio.segment_iter();
+-                for segment in segment_iter {
+-                    let length = segment.len();
+-                    Self::transfer(command, tree, sector, segment)?;
+-                    sector += length as usize >> block::SECTOR_SHIFT;
++            if command == bindings::req_op_REQ_OP_DISCARD {
++                Self::discard(tree, sector, rq.sectors(), queue_data.block_size)?;
++            } else {
++                for bio in rq.bio_iter_mut() {
++                    let segment_iter = bio.segment_iter();
++                    for segment in segment_iter {
++                        let length = segment.len();
++                        Self::transfer(command, tree, sector, segment)?;
++                        sector += length as usize >> block::SECTOR_SHIFT;
++                    }
+                 }
+             }
+         }
 
 -- 
 2.51.2
