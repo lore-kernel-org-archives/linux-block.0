@@ -1,71 +1,73 @@
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2192C15BA
-	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 17:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42EF2D9ED1
+	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 17:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771262508; cv=none; b=tGAj8ThYjv6m6tCt7NXXIQvCye4ZjPAYfvb0bmKlcxe6u0lYKTZFa/cMY06rhBmoQkLOGNqNnX/iUG7mDus8bPpAPGoa7vhr5dtxRL9LYIMBgod6Rg5YttVd4/5y0PjTw2hZP2fXqnSjcIEU8I/WsefkzAOwwirPyWnBJ82Ab3g=
+	t=1771262510; cv=none; b=DJDagVPOTAFOYG4jfBQWqFJJ6zby8oAv5LcPe+NokTImAwnKIE2KXXhkChdPA8PoiwNPjmXmK3zrQ5jG20sxz1Y43tIj6HpOd7CQmAJvbHfUa/V1+i1V68j+8O+WQ+nAV9vanhmnIGZ7TqZdE2i5fA0qi+hkqpuUpgAAevDYr14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771262508; c=relaxed/simple;
-	bh=rniSLWzq+j6F/OFp4LCIQuaKCm4TU5+I4xgbBmuX5s0=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=D3uQpVuIwJhU8qXAOGo7Ypn0+6o8/ZOvD474Vvg/+xsU7W78wTkBEVT6LrwGVGlx1WTxuCepytVPLFexRAhhB1U47k01ACFVET3BZ4P35HsiuapIJ3O6wIDNDrYS5AEHfBt2k+g2FCT0C+ZDjvSfh6bttlHRtr+W/OaIL9/IrCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UFMficp9; arc=none smtp.client-ip=209.85.160.52
+	s=arc-20240116; t=1771262510; c=relaxed/simple;
+	bh=irI6iv3P/TQovVrDbfpUft0UKQQLvoDcCG/7U032pOg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=NY8VTvzZA8yUFjz0FjJygTuGUGX/OR/DK+onhDiGi8Am8JR19dGrGdoGdRWZErcx+v18JzZGT92fofSxK/ad77zaK8CDXTkWZ/RfVeD/mX2yKg83AN37iju8dDGRscqYi4zULf93coxqAzGSfPP1Sr9we2fvQkm9dfzr7SOzC7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GdPrF8kX; arc=none smtp.client-ip=209.85.160.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UFMficp9"
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-40429b1d8baso1161848fac.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 09:21:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GdPrF8kX"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-4138136f02eso288024fac.2
+        for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 09:21:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771262504; x=1771867304; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771262507; x=1771867307; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s/LvOneH/nT8ypSFSsWXSmbYmlTfsJ2qNHg7b9d1jQE=;
-        b=UFMficp9pODLHP8Khu0RTGqhlVStEZkhdhcukKKezWC08Td1/mHnSm5W8C300ZsIgD
-         6nQQP0EX0vTPO3sdV3yyWoIawMaAkaI6hkJO+JMuLOy+U7RPgcXuG2tzANcMWl3E67eJ
-         GR5DoKBrNo45rAP1JG9gPhK+dB9Vy1xE1GOpl38rQTCincWMYwc68fCzi1AWqj+TEh5Z
-         3t04++xlpTlZKKwZFY3diXvrxM2iCm582C/JHbp5aE2GkWAa9e2hqFxCxbm0auibjo3r
-         KOYVD3rH7s+mQKks3HhMWBFjiOsOs3/thSbFtxY4xuPwgHOw1u6kK3yTNEMIrZ8gmiHu
-         iHvA==
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M3T101hN9NEm3neDoNTWSMgO71Ca9QnzZNhrDcXRwOg=;
+        b=GdPrF8kX7M6vfWSFhx1rvWgERi4tVgY0UQCxiBn9NRp5r0yx46fm0iVVPnx8nyrJuQ
+         +ujxIs4ryMmxXJIqerUcVbzvxlEJuG+8VP+4GYk1x3ArKVByzuwqxWmkE0AiRMYkB6Eq
+         JIQa1ja07ID5xpzHk9LNPYY5kP8fcKNb4u4hj3HRrF8ChhWmQT66oESCZkIb0MWAvpVV
+         Y1xgbgwnNYknAxBca2ogLMuAl1xrOdTDpRgoXsJxPG4V8f42+DAHD22aGx5H6GTapSyX
+         h03+++k2t2qB6bGueku85CHCH8mhwWABvX8+yp9ZihoSx3f2YpiTh+YL0LbWzqRJr0Gu
+         QVjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771262504; x=1771867304;
+        d=1e100.net; s=20230601; t=1771262507; x=1771867307;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=s/LvOneH/nT8ypSFSsWXSmbYmlTfsJ2qNHg7b9d1jQE=;
-        b=p4JD/r0qR0KkaKTgNjSZc2zCe4VuXwOFpihVtkC0isAV1/AvcUQrktMcHhO5QKuaHc
-         qt6FtJzqD3g4j7LFFR7p7M/x55FyqGEABC6IOO9E/XkQ5ycnXn/nyn+UNaxdpdqAWQvu
-         IP6VIKuaKcSZFi2Ej3l7YbTY/kezSk8Had61s2CQNk84G9yOpPO3UAhUDI2OfGicw0gh
-         ClDD+XQf54d0MgoXCSwNekFSJc8vh3Ny+Unw1O64YUPwiYyT0BptllSxfob5izG0Isl5
-         /P6jeO1YBpf0stoJDyyC1zjTdi/gVL8td9W17KueV0OjfyHh9UXX0FH73YmCkGO6+xtw
-         DFsA==
-X-Gm-Message-State: AOJu0YwXmnvpLb/qVeJRrPKOxyXTNt6cO5ouPVCgUe7ZHJVAn7AQI5A4
-	SgwWB3GWs5cOAlHpxfS6H0glkg0ZO4suVDvD8SaU+pGdgvlDnyJk35y68UMgTRfxmvFY9d3AXRe
-	sLPd7
-X-Gm-Gg: AZuq6aJiKU5vhyaMIs1gIggL8WsPUMOHc9A4fhRufAhsFn0okZXiiYeYIZ802yE6vKv
-	M/fIUI6MbCEug0ABAhNO4z3PqvV7Ftc+uzG26Kijxsyiffpf/VDIWx0R500a5vAcKT7QuiHPWNR
-	glNY0Mck4gvRTfi+P4gLUXRKw8DnsXkUEaSca9+tTezqcp6ZULdp8c+6hgUHQOHbvO3e/0JzQss
-	hG93k9oCuz1pbE36MA9xaabvC+pHZslKA2MiMxbpxJ1MyOdSVB0qhv/18EvvkwcqF+s2BNEFL0a
-	OX54yWNsDXWir8MOuXwKrn5PBtCff1bXF+59kMTYgwpcAorhRBBRxJhu8ZtNKBI1/ZW6XJnZhgK
-	yPkvyWQHhRgpQRD3i/RFk5DluRKPaukuLJn/a0UntzL1ftpF0/gPQ/+z6H6gy+5XdiSDpm3NQki
-	m42cZbdtlQD00wggD2vg30MYmpaEfezdj8kfAv3Dwct3qL8WPv37lLHWba6n0LOoKSXPVH6Pk3A
-	11H
-X-Received: by 2002:a05:6870:16cd:b0:404:15b0:4602 with SMTP id 586e51a60fabf-40ef3b7e945mr6084121fac.7.1771262504058;
-        Mon, 16 Feb 2026 09:21:44 -0800 (PST)
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=M3T101hN9NEm3neDoNTWSMgO71Ca9QnzZNhrDcXRwOg=;
+        b=KQZQ71HlQ0qhti8hdUGtwi+MXD6whhUP57z6dvX3TXCY8bLSm5GF0Xrh5FU1eiJvfU
+         988AmvsK5+QVa2SPuiYsDMllj93CS8P4GitJXDu6VJqpw2O6p72rQ0Cqcs0IzIgc0FaE
+         x6gHGfC1xCc5yrbT2VGSBmBe+V1VxUwIu5YCiyH0so4gNIE6qFspj9kxxxthGsuxbxHu
+         +eTmeITX37afE14gd14zEOlmytt0k/yT2tzsPw78d2tonztUF4ZXA/AG/omx3LkPSsY1
+         GUMbuR+yFs76vOL89Cr36cXAuSiQwlOUxRYSloD3JRtyyAGpKFJe6s3d8gGq3CMfJ5/p
+         XkiA==
+X-Gm-Message-State: AOJu0YwG6HvhjrsnAJkzrsYFkY083zvHMQFFcT2/2PGmafpST2PVErTk
+	yDG8Xrw63TQDbz5I0XyIL6QLMko+eUc6paxR706LFmz7R9ohX865+/Pk7luPGoclig47BMhZe2Q
+	8qOdL
+X-Gm-Gg: AZuq6aIXQP36jeRMZVRozPm+Qs6CQFN//QbTaPydv5v2rrTC840sBcpR33Qh4Dz0zGU
+	ZExBdGxf8SVLb/f4n5blFsIr5p1YYXG/Hi+2E4EvkTxHxcKiVmjEiORASjJGidmBkl6TpyGa/fh
+	SBxRWmvLrBEhpErNTGQJMaJZVtQ/nMUSXIz/N4NFYqf+bq30DmtvebLwYufrVsEnFfqhyZKv33j
+	kMUSBWqmDUH84G2SqSJ6qe3CzZyaliKDVUryIWm4DMerv+X81RWNcjqldVGYthRhUvMxY0CAhmd
+	zvCGu76cAq1m6m/qzz/zJlmOOrl9y1KvKEbRV2cohxp2BF7afiOae4Et7Eh0HWmK6AjrXDhWURy
+	v96hb6ZRFAq2dRmpNicwHrmWiAtnRuCMb8OqqF1HpPjFktEfKJe5cSGcmUlKnTAvvTqQ4FI62ag
+	Ksxbj2mJjlqt+SoR21ZkjxcAOuWzUO55HpnaHemkrfhaZcxLoW9G1h/gfrZIJiBTU9AX5P7yzra
+	31i
+X-Received: by 2002:a05:6870:c98b:b0:409:829f:f9f9 with SMTP id 586e51a60fabf-40ef3bae262mr5640228fac.17.1771262505821;
+        Mon, 16 Feb 2026 09:21:45 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40ee90ba325sm11658295fac.8.2026.02.16.09.21.43
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40ee90ba325sm11658295fac.8.2026.02.16.09.21.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Feb 2026 09:21:43 -0800 (PST)
+        Mon, 16 Feb 2026 09:21:44 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: linux-block@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260216052941.2744390-1-rdunlap@infradead.org>
-References: <20260216052941.2744390-1-rdunlap@infradead.org>
-Subject: Re: [PATCH] block: fix enum descriptions kernel-doc
-Message-Id: <177126250318.152457.15668767280339480930.b4-ty@kernel.dk>
-Date: Mon, 16 Feb 2026 10:21:43 -0700
+Cc: Chaitanya Kulkarni <kch@nvidia.com>
+In-Reply-To: <20260216052951.2744415-1-rdunlap@infradead.org>
+References: <20260216052951.2744415-1-rdunlap@infradead.org>
+Subject: Re: [PATCH v2] blk-stat: convert struct blk_stat_callback to
+ kernel-doc
+Message-Id: <177126250422.152457.15412219294500221010.b4-ty@kernel.dk>
+Date: Mon, 16 Feb 2026 10:21:44 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,31 +79,26 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Sun, 15 Feb 2026 21:29:41 -0800, Randy Dunlap wrote:
-> Fix all kernel-doc warnings in blk_types.h:
+On Sun, 15 Feb 2026 21:29:51 -0800, Randy Dunlap wrote:
+> Most of struct blk_stat_callback documentation is already in kernel-doc
+> format. Convert the remaining struct members to kernel-doc to avoid
+> kernel-doc warnings:
 > 
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_READ' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_WRITE' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_FLUSH' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_DISCARD' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_SECURE_ERASE' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_ZONE_APPEND' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_WRITE_ZEROES' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_ZONE_OPEN' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_ZONE_CLOSE' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_ZONE_FINISH' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_ZONE_RESET' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_ZONE_RESET_ALL' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_DRV_IN' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_DRV_OUT' not described in enum 'req_op'
-> Warning: include/linux/blk_types.h:371 Enum value 'REQ_OP_LAST' not described in enum 'req_op'
+> Warning: block/blk-stat.h:62 struct member 'list' not described
+>  in 'blk_stat_callback'
+> Warning: block/blk-stat.h:62 struct member 'timer_fn' not described
+>  in 'blk_stat_callback'
+> Warning: block/blk-stat.h:62 struct member 'rcu' not described
+>  in 'blk_stat_callback'
+> Warning: block/blk-stat.h:133 No description found for return value of
+>  'blk_stat_is_active'
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: fix enum descriptions kernel-doc
-      commit: 4c431a76a288ce958aaa114d8ea6fc0968942832
+[1/1] blk-stat: convert struct blk_stat_callback to kernel-doc
+      commit: 3678a334a55e869b413e2fb4824e92200b149d73
 
 Best regards,
 -- 
