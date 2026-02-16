@@ -1,156 +1,179 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1399729A9FA
-	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 10:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE1A30CD82
+	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 12:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771237614; cv=none; b=SK3VMhAqImZ2VkvdQHj2EWM/N7EPbB3P5iefZyTJ4d5/weAOS6r3E2wI6bWO3LW/WH9OWFWZaugEgsOQzn0GVMY/UIv4fQqt3d+mVWxcUba4iEwssqOSb6bqZWPSo9gxNmq2Hto8BKshdxZ+7o4mZWQlSKYdXC7nkEydzVgZqdE=
+	t=1771244863; cv=none; b=BDXVNnGh95U5ay83VFFjq/YCmVw8fCG1b6Jr9IJzFe1VCwpcKfnVx5BbFBdjYko3hVO1cSvkRKepIkns4PGmLhozCgvjwMj0LeR0bjYaH4k+FAdNhZzXU28Ttq0AjY1q7x9meckMc5IACsYQ98xY2JmysvAAMHq5ei26Blpi8kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771237614; c=relaxed/simple;
-	bh=VpS1jREeXNOktCV2b7BBtqTk78zhODwbK/VNIF5TEP4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PuXS2A9g66P+tYn0/npFFtZTTMg6j/gCfoGZFqAkrrf7ANwFjUn1EmhLDLD8sxBJJFIoTJSHvOFIQRR7AUJDf4Z23tuY07lQkpExJPfahKwPjlsFQ4vxFj0ivv82CFjl2pUu61nK/ZXomvCDok1oYoBxUyZGr6Hdat6Dj8pX8qM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mDwJoE6l; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5zJWdHoe; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mDwJoE6l; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5zJWdHoe; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1771244863; c=relaxed/simple;
+	bh=J0iFkiQN3SnVaRpcxvIoNeKph+tH2m9CpY7H0YukxQk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rNGlLN8giiernfFIDyqiT4GMk0KmSrmmQ/MZLDD0Sy9HV9Vq0db5CFY48k0ke2Ke6ZE+n8S/L46qExIjWrC1GkA0UIylNPrsfyEjQpTJAez+fyBpfeODH/z0pf7FKkgZon6e6u7n+Z+gbSH6aetGooKmE7TODpOKTRqxJTrUj9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QD1s04uF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mDwJoE6l";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5zJWdHoe";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mDwJoE6l";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5zJWdHoe"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 709F33E6EF;
-	Mon, 16 Feb 2026 10:26:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771237611; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jiR2ZjzsH+TbpZ8dWUKhjhEhCBp20SYV/pfGiHv004o=;
-	b=mDwJoE6lYGSqy7KgYWfcFgECanCDZk3awgJswbfWfXzGi59AklgDKjf9QW7RgloTdY1gP0
-	jg/HuBnUpslZvoOSNWDe0fvUtP5PSEPPs1dl9qW4OibFT8DyTuAWsR3vbywH1v7zxcCmiT
-	FU51Fbigzoq1wo/fqnFsTSuN+6PTjyk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771237611;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jiR2ZjzsH+TbpZ8dWUKhjhEhCBp20SYV/pfGiHv004o=;
-	b=5zJWdHoemC5WLO6iPVN83AklrTl41tBz+T3lk+62U+eCBTPwh373uShG+sfkVdNUVJzfil
-	Ku810sqGtu8uucCw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=mDwJoE6l;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=5zJWdHoe
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771237611; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jiR2ZjzsH+TbpZ8dWUKhjhEhCBp20SYV/pfGiHv004o=;
-	b=mDwJoE6lYGSqy7KgYWfcFgECanCDZk3awgJswbfWfXzGi59AklgDKjf9QW7RgloTdY1gP0
-	jg/HuBnUpslZvoOSNWDe0fvUtP5PSEPPs1dl9qW4OibFT8DyTuAWsR3vbywH1v7zxcCmiT
-	FU51Fbigzoq1wo/fqnFsTSuN+6PTjyk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771237611;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jiR2ZjzsH+TbpZ8dWUKhjhEhCBp20SYV/pfGiHv004o=;
-	b=5zJWdHoemC5WLO6iPVN83AklrTl41tBz+T3lk+62U+eCBTPwh373uShG+sfkVdNUVJzfil
-	Ku810sqGtu8uucCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 54E743EA64;
-	Mon, 16 Feb 2026 10:26:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Jqu0FOvwkmkONgAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Mon, 16 Feb 2026 10:26:51 +0000
-Date: Mon, 16 Feb 2026 11:26:42 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: blktests failures with v6.19 kernel
-Message-ID: <1a4f4064-8352-49c3-a7f5-3883c2c13025@flourine.local>
-References: <aY7ZBfMjVIhe_wh3@shinmob>
- <6ad314f7-f3d2-495a-b1ef-a81a06498952@flourine.local>
- <f26001d6-062e-402b-8acd-46a737523e23@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QD1s04uF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26102C116C6;
+	Mon, 16 Feb 2026 12:27:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771244863;
+	bh=J0iFkiQN3SnVaRpcxvIoNeKph+tH2m9CpY7H0YukxQk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QD1s04uFP9DZI/epJBWLbulJtYeZjRU5IWAhFZSJeYjnhyJTrSWd3wet1UrlqGVs7
+	 MYw+FXOlKlAXAs6OM0B1exxwp6bgZOw2/yOsTpbxQsXoH6BwlK3OVJeQw7BtYuh1qE
+	 mrcWNHH7KEQmt8rwDAUiABCrhD7pDbjW2qdmaWCJfEvXurS/sWjYgZ8zTbiBgDA0Sz
+	 9/S9p3iuOdRr1eq/pNMqTqd6ld0npQteBsYP0bjieNFGqTbqwsYlB/RJ320lu2hyRA
+	 nKn5Vbj1uoGkXx7V6qmhUUYdxiYzCnJsLSTwYg4735jHOll1RxaaxNgnPA9+rStqAl
+	 NzKREQQ+gxMXw==
+From: Hannes Reinecke <hare@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Hannes Reinecke <hare@kernel.org>
+Subject: [PATCH] ublk: persistent device links
+Date: Mon, 16 Feb 2026 13:27:30 +0100
+Message-ID: <20260216122730.144092-1-hare@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f26001d6-062e-402b-8acd-46a737523e23@nvidia.com>
-X-Spam-Score: -4.51
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	URIBL_BLOCKED(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 709F33E6EF
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
-Hi Chaitanya,
+Implement a 'uuid' parameter to export a device UUID in a sysfs
+attribute 'uuid'. This allows udev to create persistent device
+links for ublk devices:
 
-On Sat, Feb 14, 2026 at 09:19:47PM +0000, Chaitanya Kulkarni wrote:
-> On 2/13/26 01:56, Daniel Wagner wrote:
-> > nvmet_fc_target_assoc_free runs in the nvmet_wq context and calls
-> >
-> >    nvmet_fc_delete_target_queue
-> >      nvmet_cq_put
-> >        nvmet_cq_destroy
-> >          nvmet_ctrl_put
-> >           nvmet_ctrl_free
-> >             flush_work(&ctrl->async_event_work);
-> >             cancel_work_sync(&ctrl->fatal_err_work);
-> >   
-> > The async_event_work could be running on nvmet_wq. So this deadlock is
-> > real. No idea how to fix it yet.
-> >
-> 
-> Can following patch be the potential fix for above issue as well ?
-> totally untested ...
+KERNEL=="ublkb*", ATTRS{uuid}=="?*", SYMLINK+="disk/by-id/ublk-$attr{uuid}"
 
-Yes this should work. I was not so happy adding a workqueue for this but
-after looking at nvme, this seems acceptable approach. Though, I'd make
-nvmet follow the nvme and instead adding an AEN workqueue, rather have a
-nvmet-reset-wq or nvmet_delete-wq.
+Signed-off-by: Hannes Reinecke <hare@kernel.org>
+---
+ drivers/block/ublk_drv.c      | 57 +++++++++++++++++++++++++++++++++--
+ include/uapi/linux/ublk_cmd.h |  6 ++++
+ 2 files changed, 61 insertions(+), 2 deletions(-)
 
-Thanks,
-Daniel
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index aaf94d2fb789..859414065be0 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -89,7 +89,7 @@
+ 	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
+ 	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
+ 	 UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT | \
+-	 UBLK_PARAM_TYPE_INTEGRITY)
++	 UBLK_PARAM_TYPE_INTEGRITY | UBLK_PARAM_TYPE_UUID)
+ 
+ struct ublk_uring_cmd_pdu {
+ 	/*
+@@ -761,6 +761,16 @@ static int ublk_validate_params(const struct ublk_device *ub)
+ 			return -EINVAL;
+ 	}
+ 
++	if (ub->params.types & UBLK_PARAM_TYPE_UUID) {
++		const struct ublk_param_uuid *p = &ub->params.uuid;
++		uuid_t uuid;
++
++		import_uuid(&uuid, p->uuid);
++		if (uuid_is_null(&uuid)) {
++			printk("uuid is NULL\n");
++			return -EINVAL;
++		}
++	}
+ 	return 0;
+ }
+ 
+@@ -2971,6 +2981,49 @@ static int ublk_add_chdev(struct ublk_device *ub)
+ 	return ret;
+ }
+ 
++static ssize_t uuid_show(struct device *dev,
++		struct device_attribute *attr, char *buf)
++{
++	struct gendisk *disk = dev_to_disk(dev);
++	struct ublk_device *ub = disk->private_data;
++	const struct ublk_param_uuid *p = &ub->params.uuid;
++	uuid_t uuid;
++
++	import_uuid(&uuid, p->uuid);
++	return sprintf(buf, "%pU\n", &uuid);
++}
++
++static DEVICE_ATTR_RO(uuid);
++
++static struct attribute *ublk_attrs[] = {
++	&dev_attr_uuid.attr,
++	NULL,
++};
++
++static umode_t ublk_attrs_are_visible(struct kobject *kobj,
++		struct attribute *a, int n)
++{
++	struct device *dev = kobj_to_dev(kobj);
++	struct gendisk *disk = dev_to_disk(dev);
++	struct ublk_device *ub = disk->private_data;
++
++	if (a == &dev_attr_uuid.attr &&
++	    (ub->params.types & UBLK_PARAM_TYPE_UUID))
++		return S_IRUGO;
++
++	return a->mode;
++}
++
++static const struct attribute_group ublk_attr_group = {
++	.attrs = ublk_attrs,
++	.is_visible = ublk_attrs_are_visible,
++};
++
++static const struct attribute_group *ublk_attr_groups[] = {
++	&ublk_attr_group,
++	NULL,
++};
++
+ /* align max io buffer size with PAGE_SIZE */
+ static void ublk_align_max_io_size(struct ublk_device *ub)
+ {
+@@ -3149,7 +3202,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 			goto out_put_cdev;
+ 	}
+ 
+-	ret = add_disk(disk);
++	ret = device_add_disk(NULL, disk, ublk_attr_groups);
+ 	if (ret)
+ 		goto out_put_cdev;
+ 
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 90f47da4f435..b30a0de44b85 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -630,6 +630,10 @@ struct ublk_param_integrity {
+ 	__u8	pad[5];
+ };
+ 
++struct ublk_param_uuid {
++	__u8	uuid[16];
++};
++
+ struct ublk_params {
+ 	/*
+ 	 * Total length of parameters, userspace has to set 'len' for both
+@@ -645,6 +649,7 @@ struct ublk_params {
+ #define UBLK_PARAM_TYPE_DMA_ALIGN       (1 << 4)
+ #define UBLK_PARAM_TYPE_SEGMENT         (1 << 5)
+ #define UBLK_PARAM_TYPE_INTEGRITY       (1 << 6) /* requires UBLK_F_INTEGRITY */
++#define UBLK_PARAM_TYPE_UUID            (1 << 7)
+ 	__u32	types;			/* types of parameter included */
+ 
+ 	struct ublk_param_basic		basic;
+@@ -654,6 +659,7 @@ struct ublk_params {
+ 	struct ublk_param_dma_align	dma;
+ 	struct ublk_param_segment	seg;
+ 	struct ublk_param_integrity	integrity;
++	struct ublk_param_uuid		uuid;
+ };
+ 
+ #endif
+-- 
+2.43.0
+
