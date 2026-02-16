@@ -1,43 +1,57 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873EF289358
-	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 05:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB8414F70
+	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 05:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771219794; cv=none; b=g35/rJzIRD3zd9LjQePbpKdvaHW9oOQW3wP+wNMgM4Vaq9VFAIv3YSLJShxhNtd1Qn4sxBlX0LDhPDKjXlKcoDs9hjzNTrbqIr4e+eE9Gy+vX0V29zOUpoICAabqhxUaCXKVyf7Jb3/akUEDla7TC33YqfXFNG+5grcFU255ESM=
+	t=1771219817; cv=none; b=QamWAluPQUpplAbBM0x6nXibyKzSzllMZS0FqYbmkM9KMkwZ6iZCmaezpLagdJcGu15W01dIoI0w6YaN2fI9c2p5yD8MJ8ufz4I2Rwnq0LtsnxX6eJ+OSrSDbiw1nqhQJFwNUiAwQQtN1ojJ4kjBOHSXgWeX5tKYK6njG7a7dwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771219794; c=relaxed/simple;
-	bh=1/lyPlxddxFwCTtEUoa7LEZYzd6wn2XLrkGfrRCvWyo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B1cs1KOvB3TYi/kpBdd4oHKNp/WwCmIN3miGSaO5XnPbN/MpZdm5DkO7O0ZxSPMcC3oCnRXRp6ruYtk19n9P7IfrUvjhsIZlJopph+f64aI6PnD7CPAPZChnlO1cbQBCWrUOHqgKMe8dH3I127O0+6hMujFuOSsCO2htb7KW8+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=t5/rGItE; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1771219817; c=relaxed/simple;
+	bh=v3po6HqXnP9XNEwTzzQncPi8k6bGVsTBZ/yyaMQRcnE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=ZtoRe3fRk/gFFQMiBSWvnaKtcMP3YEDSfltEdkVNmwvaeYY1PEeOdZ/IRFnDQSeplH5/81+NW8VxAPx9ULG6JxrpSPWx3SU+4Y79DSB8jP4PkUjuD6b+ABQfVe2lbqysDHJukmCBvt9S5h/NhVABiG1f7ZlniFf3qP/EB2yM49s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=cMd4d41r; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="t5/rGItE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=pKIirhZG6Orhy59/Pl1cSjxD9TWKCAKuobCm9D13wXA=; b=t5/rGItELT7sVvkC2724B5rmxL
-	HvbjZvkUO7i9r453TuqKl/rDQGzMVesbxm+2EU3A/RXvjDvd5yabVWFDLWWejsrVhqxDcdBKzVCIJ
-	0FhbYljTc5sZBAyGG8hGm4wjRL99ZonCs8mpn9YtUAWkBYcZGXPY9FH0l3oxNZ+Y4A6oyiSCGPlbM
-	n3SpwSK1e6tjx/zZFRr23H81hJBbHWOj0oBqDWnV1uAxHQELfVlKRP3dQG33visNtwgWirpB56knu
-	iMdPqaCzT/kbq6ugwQiqF7kbTojdkSgrFAu3eqmx5PiaOquUqdQe+JmmxMA/ujq9j9yQgDqUJFWIm
-	yAOtYOYA==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vrrB9-00000005z70-3VjF;
-	Mon, 16 Feb 2026 05:29:51 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-block@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] blk-stat: convert struct blk_stat_callback to kernel-doc
-Date: Sun, 15 Feb 2026 21:29:51 -0800
-Message-ID: <20260216052951.2744415-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="cMd4d41r"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260216053012epoutp0107abd90fde45248fcc7b4484a275ac7e~UowkEZloV2537025370epoutp01X
+	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 05:30:12 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260216053012epoutp0107abd90fde45248fcc7b4484a275ac7e~UowkEZloV2537025370epoutp01X
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1771219812;
+	bh=+2Q9cs81mGLZ6eNq/6YqlmRX8CoeWDDw0BcNeK1YJgs=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=cMd4d41rnK3/osF2biJElC2MoKEttaRiVJPoSOcqDNMfLnJFA+yDZoKIANEW1jC77
+	 /+y16wYJ3SYAcWxMc9VKVdx7BXlfu7WUJ8PZS61PjMDqmjqWu6iUKPHn7DuG7NwWFu
+	 8jD//VbXC0XNZJetXU44PMNN+X7P4Ta7HdVSlBwo=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
+	20260216053012epcas5p4c5bf1a92444f946b69b05d714c83e0da~Uowjq53Kw2729427294epcas5p4-;
+	Mon, 16 Feb 2026 05:30:12 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.90]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4fDrvR39TWz6B9mJ; Mon, 16 Feb
+	2026 05:30:11 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260216053011epcas5p127f51074dc05c5dc6e6df56f5a564721~Uowinycbe1714217142epcas5p19;
+	Mon, 16 Feb 2026 05:30:11 +0000 (GMT)
+Received: from localhost.localdomain (unknown [107.99.41.245]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260216053009epsmtip1658b1edf49d24a134f8dc157e75640e7~UowhKU4zo1594915949epsmtip1G;
+	Mon, 16 Feb 2026 05:30:09 +0000 (GMT)
+From: Kanchan Joshi <joshi.k@samsung.com>
+To: hch@lst.de, brauner@kernel.org, jack@suse.cz, djwong@kernel.org,
+	axboe@kernel.dk, kbusch@kernel.org
+Cc: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com, Kanchan Joshi
+	<joshi.k@samsung.com>
+Subject: [PATCH 0/4] write-stream for file I/O
+Date: Mon, 16 Feb 2026 10:55:36 +0530
+Message-Id: <20260216052540.217920-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,69 +59,174 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20260216053011epcas5p127f51074dc05c5dc6e6df56f5a564721
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260216053011epcas5p127f51074dc05c5dc6e6df56f5a564721
+References: <CGME20260216053011epcas5p127f51074dc05c5dc6e6df56f5a564721@epcas5p1.samsung.com>
 
-Most of struct blk_stat_callback documentation is already in kernel-doc
-format. Convert the remaining struct members to kernel-doc to avoid
-kernel-doc warnings:
+This patch series introduces a generic interface for 'Write Stream
+Management', enabling applications to guide physical data placement
+on files that support it.
 
-Warning: block/blk-stat.h:62 struct member 'list' not described
- in 'blk_stat_callback'
-Warning: block/blk-stat.h:62 struct member 'timer_fn' not described
- in 'blk_stat_callback'
-Warning: block/blk-stat.h:62 struct member 'rcu' not described
- in 'blk_stat_callback'
-Warning: block/blk-stat.h:133 No description found for return value of
- 'blk_stat_is_active'
+### Changes since RFC [1]
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
----
-v2: add one Reviewed-by: tag
-  - rebase
-  - fix one more warning
+- Move stream-management to file operations (Christoph)
+- Stop adding "write-stream" in vfs inode but use FS-specific inode (Christoph)
+- Iomap based write-stream propagation (Christoph)
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
----
- block/blk-stat.h |    9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+### Motivation
 
---- linux-next-20260213.orig/block/blk-stat.h
-+++ linux-next-20260213/block/blk-stat.h
-@@ -17,7 +17,7 @@
-  * timer fires, @cpu_stat is flushed to @stat and @timer_fn is invoked.
-  */
- struct blk_stat_callback {
--	/*
-+	/**
- 	 * @list: RCU list of callbacks for a &struct request_queue.
- 	 */
- 	struct list_head list;
-@@ -50,7 +50,7 @@ struct blk_stat_callback {
- 	struct blk_rq_stat *stat;
- 
- 	/**
--	 * @fn: Callback function.
-+	 * @timer_fn: Callback function.
- 	 */
- 	void (*timer_fn)(struct blk_stat_callback *);
- 
-@@ -59,6 +59,9 @@ struct blk_stat_callback {
- 	 */
- 	void *data;
- 
-+	/**
-+	 * @rcu: rcu list head
-+	 */
- 	struct rcu_head rcu;
- };
- 
-@@ -126,6 +129,8 @@ void blk_stat_free_callback(struct blk_s
-  * blk_stat_is_active() - Check if a block statistics callback is currently
-  * gathering statistics.
-  * @cb: The callback.
-+ *
-+ * Returns: %true iff the callback is active.
-  */
- static inline bool blk_stat_is_active(struct blk_stat_callback *cb)
- {
+Maybe LSFMM session [2] repetition;
+Standard SSDs abstract physical data placement, limiting the Host to
+logical data placement.
+FDP-capable NVMe SSDs allow the Host to physically separate data into
+distinct "streams" or "buckets." This separation reduces
+device-internal write amplification, yielding tangible benefits to the
+drive users: improved life, predictable QoS, and better energy
+efficiency.
+
+While Linux supports write-stream based placement for block IO path
+(since 6.16), the capability remains inaccessible to standard file-based
+applications. The series fills that gap and enables application-driven
+placement on files.
+
+### Implementation
+
+The series implements generic write-stream management via:
+
+- VFS: New `fcntl` user interface for write-stream discovery and assignment.
+- Iomap: Infrastructure to propagate file-level write-streams to the block layer.
+- XFS: Initial filesystem support implementing the write-stream interface.
+
+The application interface involves three new `fcntl` commands:
+
+F_GET_MAX_WRITE_STREAMS: Query the number of available streams.
+F_SET_WRITE_STREAM: Assign a specific stream to a file.
+F_GET_WRITE_STREAM: Retrieve the stream currently assigned to a file.
+
+### Comparison with Write Hints (RWH_WRITE_LIFE_*)
+
+- Semantics: Write Hints describe 'data temperature' (e.g.,
+short/long/extreme), implying a lifetime. Write Streams describe 'data
+placement' (e.g., Bin 1/Bin 2), implying only separation.
+
+- Scalability: Write Hints are limited to a small, fixed enum (6
+values). Write streams are dynamic, device-dependent values that can
+scale much higher (kernel limit: up to 255 due to u8 field).
+
+- Discovery: The existing write-hint interface is advisory and decoupled
+  from underlying capabilties; application has no way to probe support
+and cannot deterministically know which hints are valid. Write-streams
+provide explicit discovery via `F_GET_MAX_WRITE_STREAMS`.
+
+Note: within the kernel, the separation between two constructs
+(write-hint and write-stream) had started from 6.16 itself.
+
+### Interface example
+
+An example program for the new write-stream interface is attached below [3].
+New interface has also worked fine when integrated with RockDB.
+
+
+[1] https://lore.kernel.org/linux-fsdevel/20250729145135.12463-1-joshi.k@samsung.com/
+[2] https://lwn.net/Articles/1018642/
+[3]
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <linux/fcntl.h>
+
+#define BUF_SIZE        (4096)
+
+int write_fd(int fd, int st) {
+
+        char buf[BUF_SIZE];
+        int ret, set, get;
+
+        if (fd < 0) {
+                printf("[!]invalid fd\n");
+                return fd;
+        }
+
+        ret = fcntl(fd, F_GET_MAX_WRITE_STREAMS);
+        if (ret < 0) {
+                printf("F_GET_MAX_WRITE_STREAMS: failed (%s)\n",
+strerror(errno));
+                return ret;
+        }
+        if (st > ret) {
+                printf("error in setting stream, available upto %d\n", ret);
+                return -1;
+        }
+
+        ret = fcntl(fd, F_SET_WRITE_STREAM, st);
+        if (ret < 0) {
+                printf("F_SET_WRITE_STREAM: failed (%s)\n", strerror(errno));
+                return ret;
+        }
+        set = st;
+
+        ret = fcntl(fd, F_GET_WRITE_STREAM);
+        if (ret < 0) {
+                printf("F_GET_WRITE_STREAM: failed (%s)\n", strerror(errno));
+                return ret;
+        }
+        get = ret;
+
+        if (get != set)
+                printf("unexpected, set %d but get %d\n", set, get);
+
+        ret = write(fd, buf, BUF_SIZE);
+        if (ret < BUF_SIZE) {
+                printf("failed, wrote %d bytes (expected %d)\n", ret, BUF_SIZE);
+                return ret;
+        }
+        return 0;
+}
+
+int main(int argc, char *argv[])
+{
+        int ret, regfd;
+
+        /* two file writes, one buffered another direct */
+        regfd = open("/mnt/f_buffered", O_CREAT | O_RDWR, 0644);
+        ret = write_fd(regfd, 7);
+        close(regfd);
+
+        regfd = open("/mnt/f_direct", O_CREAT | O_RDWR| O_DIRECT, 0644);
+        ret = write_fd(regfd, 6);
+        close(regfd);
+        return ret;
+}
+
+Kanchan Joshi (4):
+  fs: add write-stream management file_operations
+  fcntl: expose write-stream management to userspace
+  iomap: introduce and propagate write_stream
+  xfs: enable userspace write stream support
+
+ fs/fcntl.c                 | 33 +++++++++++++++++++++++
+ fs/iomap/direct-io.c       |  1 +
+ fs/iomap/ioend.c           |  3 +++
+ fs/xfs/xfs_file.c          | 54 ++++++++++++++++++++++++++++++++++++++
+ fs/xfs/xfs_icache.c        |  1 +
+ fs/xfs/xfs_inode.h         |  3 +++
+ fs/xfs/xfs_iomap.c         |  1 +
+ include/linux/fs.h         |  6 +++++
+ include/linux/iomap.h      |  2 ++
+ include/uapi/linux/fcntl.h |  4 +++
+ 10 files changed, 108 insertions(+)
+
+-- 
+2.25.1
+
