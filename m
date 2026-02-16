@@ -1,108 +1,109 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42EF2D9ED1
-	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 17:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0062C11FE
+	for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 18:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771262510; cv=none; b=DJDagVPOTAFOYG4jfBQWqFJJ6zby8oAv5LcPe+NokTImAwnKIE2KXXhkChdPA8PoiwNPjmXmK3zrQ5jG20sxz1Y43tIj6HpOd7CQmAJvbHfUa/V1+i1V68j+8O+WQ+nAV9vanhmnIGZ7TqZdE2i5fA0qi+hkqpuUpgAAevDYr14=
+	t=1771266492; cv=none; b=og8Rqyqnf91e+yBWKlLBbtnT2m4g33oCmuzM1f9mYoW0G0q2/q0Z0yJrf/QLeHQ3m69ffWqFMABSyeiAQKkmpHIQv7PTbJmBUPGMruiYETFRamIW221rbMFRxIq6/74XoGsUnzPnyajNw0eGD2SB+LS0WF33JHH0cVqelWFYkI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771262510; c=relaxed/simple;
-	bh=irI6iv3P/TQovVrDbfpUft0UKQQLvoDcCG/7U032pOg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=NY8VTvzZA8yUFjz0FjJygTuGUGX/OR/DK+onhDiGi8Am8JR19dGrGdoGdRWZErcx+v18JzZGT92fofSxK/ad77zaK8CDXTkWZ/RfVeD/mX2yKg83AN37iju8dDGRscqYi4zULf93coxqAzGSfPP1Sr9we2fvQkm9dfzr7SOzC7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GdPrF8kX; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1771266492; c=relaxed/simple;
+	bh=DXdW2sVJpUEGRsnsDNt3IDY65YC/KG+dJKnnrkCN2No=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ot5MmV4CXvRCJzO+j6ABpUkAw1hkrkxSZhVf+ZPMUV9LXGmtbFiCLwohEtFILEE//Phb9YYn/5aFSYAB4Zvc+VF5eH1xtsLLD+G3P7kL8QpQQdCSsCIyGdlni75mMNoADXxuXchdvs5zgQyV1w8aaKdBDXvt/gc9emtTw6VlLQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Vzot2n/f; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GdPrF8kX"
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-4138136f02eso288024fac.2
-        for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 09:21:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Vzot2n/f"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2aaecf9c325so24418125ad.1
+        for <linux-block@vger.kernel.org>; Mon, 16 Feb 2026 10:28:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771262507; x=1771867307; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M3T101hN9NEm3neDoNTWSMgO71Ca9QnzZNhrDcXRwOg=;
-        b=GdPrF8kX7M6vfWSFhx1rvWgERi4tVgY0UQCxiBn9NRp5r0yx46fm0iVVPnx8nyrJuQ
-         +ujxIs4ryMmxXJIqerUcVbzvxlEJuG+8VP+4GYk1x3ArKVByzuwqxWmkE0AiRMYkB6Eq
-         JIQa1ja07ID5xpzHk9LNPYY5kP8fcKNb4u4hj3HRrF8ChhWmQT66oESCZkIb0MWAvpVV
-         Y1xgbgwnNYknAxBca2ogLMuAl1xrOdTDpRgoXsJxPG4V8f42+DAHD22aGx5H6GTapSyX
-         h03+++k2t2qB6bGueku85CHCH8mhwWABvX8+yp9ZihoSx3f2YpiTh+YL0LbWzqRJr0Gu
-         QVjQ==
+        d=purestorage.com; s=google2022; t=1771266490; x=1771871290; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=N1Yj1yhuptOSylTDyOUs8iyxlJcujGeDn2NjJk0xsTM=;
+        b=Vzot2n/f3TKjMdB3hfeRySQcM9ZlEKJ5PMVQqz4/D6yE+pt4EFNWrV7PN9g1WsGFSz
+         Yha/xxkHF8k1LxjgLJJLiIgOVCrkKqrIygapjAO39Jgso9o3Zt7eCxm6ZRS37dEPHLQm
+         wwpajlsr8iLr4arXLXbT+/mR2oL4d0X2w3FwB7Nht5zPVEO6dunOSGZsFgZU+MJ61vVa
+         7izyhQVb3iOqXV3oiwa/7OOItjuG1z+c0VueZFdBDN6YedTJi5NvCrQrS0Tx+8tHslrZ
+         H7BPCR+0n6Fr+UCdYBrG09+CbaqdpmCLQbbXngZ+/IGT/32/xkfkP/jSo5+8Z23FdvRS
+         GLwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771262507; x=1771867307;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=M3T101hN9NEm3neDoNTWSMgO71Ca9QnzZNhrDcXRwOg=;
-        b=KQZQ71HlQ0qhti8hdUGtwi+MXD6whhUP57z6dvX3TXCY8bLSm5GF0Xrh5FU1eiJvfU
-         988AmvsK5+QVa2SPuiYsDMllj93CS8P4GitJXDu6VJqpw2O6p72rQ0Cqcs0IzIgc0FaE
-         x6gHGfC1xCc5yrbT2VGSBmBe+V1VxUwIu5YCiyH0so4gNIE6qFspj9kxxxthGsuxbxHu
-         +eTmeITX37afE14gd14zEOlmytt0k/yT2tzsPw78d2tonztUF4ZXA/AG/omx3LkPSsY1
-         GUMbuR+yFs76vOL89Cr36cXAuSiQwlOUxRYSloD3JRtyyAGpKFJe6s3d8gGq3CMfJ5/p
-         XkiA==
-X-Gm-Message-State: AOJu0YwG6HvhjrsnAJkzrsYFkY083zvHMQFFcT2/2PGmafpST2PVErTk
-	yDG8Xrw63TQDbz5I0XyIL6QLMko+eUc6paxR706LFmz7R9ohX865+/Pk7luPGoclig47BMhZe2Q
-	8qOdL
-X-Gm-Gg: AZuq6aIXQP36jeRMZVRozPm+Qs6CQFN//QbTaPydv5v2rrTC840sBcpR33Qh4Dz0zGU
-	ZExBdGxf8SVLb/f4n5blFsIr5p1YYXG/Hi+2E4EvkTxHxcKiVmjEiORASjJGidmBkl6TpyGa/fh
-	SBxRWmvLrBEhpErNTGQJMaJZVtQ/nMUSXIz/N4NFYqf+bq30DmtvebLwYufrVsEnFfqhyZKv33j
-	kMUSBWqmDUH84G2SqSJ6qe3CzZyaliKDVUryIWm4DMerv+X81RWNcjqldVGYthRhUvMxY0CAhmd
-	zvCGu76cAq1m6m/qzz/zJlmOOrl9y1KvKEbRV2cohxp2BF7afiOae4Et7Eh0HWmK6AjrXDhWURy
-	v96hb6ZRFAq2dRmpNicwHrmWiAtnRuCMb8OqqF1HpPjFktEfKJe5cSGcmUlKnTAvvTqQ4FI62ag
-	Ksxbj2mJjlqt+SoR21ZkjxcAOuWzUO55HpnaHemkrfhaZcxLoW9G1h/gfrZIJiBTU9AX5P7yzra
-	31i
-X-Received: by 2002:a05:6870:c98b:b0:409:829f:f9f9 with SMTP id 586e51a60fabf-40ef3bae262mr5640228fac.17.1771262505821;
-        Mon, 16 Feb 2026 09:21:45 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40ee90ba325sm11658295fac.8.2026.02.16.09.21.44
+        d=1e100.net; s=20230601; t=1771266490; x=1771871290;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N1Yj1yhuptOSylTDyOUs8iyxlJcujGeDn2NjJk0xsTM=;
+        b=aAigtzkZ4e9mImNCitX+7+gsAVKFS6B8EHtpm8eEk2hSfK/FgDuqCpalrJ0mIqoqY+
+         YriVf+3K26taZ6uDIolmBRYT2LL9cur7aHR+QQAcAHnzl+yFxkipb88CyvOcIbbE8Wu2
+         hEP0ejg6FlVApBv2nJeL+01ILUZs9JO1W5Jy/bAqzWjX2TJ9mPRmmKawNhlYCpGCLEH6
+         wWV8eVofHbt7eU0oxyXRUb0OtJZkfFGf0lhong8u1MWV7YtWE/OnSxUJpHnCaO/yGfhr
+         tVu9BZAq9u7oXku9XjDyXVC6q7eMdsEr6jCP4mn9gRwuPVGv8wKkYzbM3G6NCWMUnmDJ
+         dh1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWB9FkpxQer4SOPNnhcCuyEzJjnmlhjE1V7v7zz2WtW1aj0zNaoZGmBmgtElmwKccRza5psP/IlkzBDmw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Uc0TV3xA4BokPYjwv4lhrdlKPN/ViBGyxg8b34/Fb9STq0YX
+	0FJfDQMvR+LanqJzqxA6WG7LtUbg79SA7zZyWrCwgmX4ktNK9uhWFFxJ3QK3FDlMNu4=
+X-Gm-Gg: AZuq6aIdwQlRsTISTkD3eAjWLwumnJzIiZVWHwDn/uj1in/URj/tPoxvvrqA7KeOkkl
+	CxO6iVtB8XCgmGgzO9qm1H7NnXwEf+eLCjsPlR1gaNrIf6gXBz5ZVdYkTzHvAnk0Oo7QXlkzjKg
+	pvycHzwUVdsh7IXr9hKWRHetY0bfM3l3G7++9GmpqXKG5qaYYVvva3zs42CWqyK2lgoEMAP7xsk
+	7j6QEwKUF2Yk730aQDbe26BRCLvRBwj4iBb0sAaxOxZI3RE3tU//UFYm13ubV6l0EJiywV1UTqN
+	EY5UuI4vGJWHbo0voUHYmUrIAzdA0tB+krb8uMvfjHZRukOADdoKh/C/sBWUm2HlQlY+0DHYV8E
+	j4s7roynsQiBhI0UzwoIi78Pn/05sc5eK/H3mP17KgkDF5BTQxQoqg4pJOyZfCi3CcqNjhx4MZT
+	u5mCY1MWzAlaEPaV4Usga94G4WCaCwLpxSXkMwkg==
+X-Received: by 2002:a17:902:d50a:b0:2a9:ebae:f3f6 with SMTP id d9443c01a7336-2ac97593413mr94716045ad.20.1771266490130;
+        Mon, 16 Feb 2026 10:28:10 -0800 (PST)
+Received: from medusa.lab.kspace.sh ([2601:640:8202:6fb0::68dd])
+        by smtp.googlemail.com with UTF8SMTPSA id d9443c01a7336-2ad1a9d5df0sm74851785ad.58.2026.02.16.10.28.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Feb 2026 09:21:44 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>
-In-Reply-To: <20260216052951.2744415-1-rdunlap@infradead.org>
-References: <20260216052951.2744415-1-rdunlap@infradead.org>
-Subject: Re: [PATCH v2] blk-stat: convert struct blk_stat_callback to
- kernel-doc
-Message-Id: <177126250422.152457.15412219294500221010.b4-ty@kernel.dk>
-Date: Mon, 16 Feb 2026 10:21:44 -0700
+        Mon, 16 Feb 2026 10:28:09 -0800 (PST)
+Date: Mon, 16 Feb 2026 10:28:08 -0800
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Yu Kuai <yukuai@fnnas.com>
+Cc: axboe@kernel.dk, nilay@linux.ibm.com, ming.lei@redhat.com, hch@lst.de,
+	yi.zhang@redhat.com, shinichiro.kawasaki@wdc.com, kbusch@kernel.org,
+	rostedt@goodmis.org, mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] blk-mq: use NOIO context to prevent deadlock during
+ debugfs creation
+Message-ID: <20260216182808.GA1799879-mkhalfella@purestorage.com>
+References: <20260214054350.2322436-1-yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260214054350.2322436-1-yukuai@fnnas.com>
 
-
-On Sun, 15 Feb 2026 21:29:51 -0800, Randy Dunlap wrote:
-> Most of struct blk_stat_callback documentation is already in kernel-doc
-> format. Convert the remaining struct members to kernel-doc to avoid
-> kernel-doc warnings:
+On Sat 2026-02-14 13:43:50 +0800, Yu Kuai wrote:
+> Creating debugfs entries can trigger fs reclaim, which can enter back
+> into the block layer request_queue. This can cause deadlock if the
+> queue is frozen.
 > 
-> Warning: block/blk-stat.h:62 struct member 'list' not described
->  in 'blk_stat_callback'
-> Warning: block/blk-stat.h:62 struct member 'timer_fn' not described
->  in 'blk_stat_callback'
-> Warning: block/blk-stat.h:62 struct member 'rcu' not described
->  in 'blk_stat_callback'
-> Warning: block/blk-stat.h:133 No description found for return value of
->  'blk_stat_is_active'
+> Previously, a WARN_ON_ONCE check was used in debugfs_create_files()
+> to detect this condition, but it was racy since the queue can be frozen
+> from another context at any time.
 > 
-> [...]
+> Introduce blk_debugfs_lock()/blk_debugfs_unlock() helpers that combine
+> the debugfs_mutex with memalloc_noio_save()/restore() to prevent fs
+> reclaim from triggering block I/O. Also add blk_debugfs_lock_nomemsave()
+> and blk_debugfs_unlock_nomemrestore() variants for callers that don't
+> need NOIO protection (e.g., debugfs removal or read-only operations).
+> 
+> Replace all raw debugfs_mutex lock/unlock pairs with these helpers,
+> using the _nomemsave/_nomemrestore variants where appropriate.
+> 
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Closes: https://lore.kernel.org/all/CAHj4cs9gNKEYAPagD9JADfO5UH+OiCr4P7OO2wjpfOYeM-RV=A@mail.gmail.com/
+> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Closes: https://lore.kernel.org/all/aYWQR7CtYdk3K39g@shinmob/
+> Suggested-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 
-Applied, thanks!
+Maybe added Fixes: 65d466b62984 ("blk-mq-debugfs: warn about possible deadlock")?
 
-[1/1] blk-stat: convert struct blk_stat_callback to kernel-doc
-      commit: 3678a334a55e869b413e2fb4824e92200b149d73
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Reviewed-by: Mohamed Khalfella <mkhalfella@purestorage.com>
