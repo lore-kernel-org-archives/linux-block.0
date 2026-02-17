@@ -1,58 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DB537755A;
-	Tue, 17 Feb 2026 20:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500AD211A14;
+	Tue, 17 Feb 2026 21:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771359220; cv=none; b=K1DeUeAeIxZQSgJLYpCitPiSwmUobWNHRtCCWbAnLwSXAbnqJCiHZV9J+Mc9VTCJG4KvyLbPRVvbn2nLtSN6bOY2A0LrnyB/ncw00V534iBOZSpWb09dvKHqUMo82yRIE9wZKQWg02B0/UgY/108Z5yTMzRXsKtsfuW4C7AhcQI=
+	t=1771362875; cv=none; b=MDIe7Eshyoxh0xSGa66Y1usZi2rt30RWFLr/ukc+ZxvfLoEybJqhqrj35CWm7d4sGKtXHEWmB0F/cSCH/9YL78/YvnfHst/HgvxwFsmiJ0Y7zcOctHoJCmQ7X08ik+hmna/59Q35L3PJAgJTDzX0ld2kb50Y0iqAR4aah+VZoOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771359220; c=relaxed/simple;
-	bh=O3KNzwdv/fZolh9vEe47GHGiaeS4Hpe5Gsp1brWunUU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pFmZTxLBBnCN7tpymKAiSEMH+vs2KdBatmu05L9po0HgO5QXCruCYuTpKJ48IwUMeoWp6wVXwMVkonpqIDwp3ouEfjOQMksygHRcGGIWBOxOeNJR9phd2+BvKo8a1dIw1ZGxJ2AE4WcOqYQ1sqH72WENLsrGjKwcVK51eZgQjq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=go5nyuTk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771362875; c=relaxed/simple;
+	bh=rF0onOkRJ1MrR79ZRlAH0saur24ktYQyPGIU00QVPCI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=s4vlYJAUJxVCbG4HZC/NMsScc+53wdsQal9ouS9pw7qn4AY7FEmyHPw+3CbnhMh6Z5YD2oMnc+qdMvuDe94dMDRrgrEk85zMtRgSXga5ySF2tIv/lIfg3Voj6UDOkNyW3cM2rbQie2tClN1/x8onV4Qz28b2h8OOr1YlrGSovrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obNAHU30; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="go5nyuTk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D5CAC4CEF7;
-	Tue, 17 Feb 2026 20:13:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obNAHU30"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0374CC4CEF7;
+	Tue, 17 Feb 2026 21:14:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771359220;
-	bh=O3KNzwdv/fZolh9vEe47GHGiaeS4Hpe5Gsp1brWunUU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=go5nyuTkw3Ac1hUXhYVUndWAXOiKYJtszHh1P9R2ACAHgkhM7pToXmL8alG0lOSsv
-	 O5V/rrSjAZQkpT2diAPlhAmNGX3Trl7M9m1wajgozmuuRyLDqvbkdhjp7YCRFHs+4t
-	 fLnQNrSexcp8U0sX1jVYnSE5x+xE9IeQuGPXZPO2JnhU07Y17XemWPGux8F+mDr4Gd
-	 sYOSmkz/i24+izPybQRX23xyP8w9WMzPSKHaHKB7EoRD1Vh0lARB9Nkv9SOyfK00t8
-	 wR6EElkoxYpbv95s91Ww73C7quHjPvuE4wWDOMTyNE4dc+Xart6U/p6qBcuf5QZ5e0
-	 h8S6TM2IEpQ2Q==
-Date: Tue, 17 Feb 2026 13:13:38 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: John Garry <john.g.garry@oracle.com>, lsf-pc@lists.linux-foundation.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Native SCSI multipath support
-Message-ID: <aZTL8srSowTU81Rz@kbusch-mbp>
-References: <69349b51-72c2-47f9-948f-f89843af62e4@oracle.com>
- <049a177d-85d6-4c9d-9a9a-f07391046101@acm.org>
+	s=k20201202; t=1771362875;
+	bh=rF0onOkRJ1MrR79ZRlAH0saur24ktYQyPGIU00QVPCI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=obNAHU30KeK7e4E+sJrNxIjHjieqmvasFe6OLCrFOzjIJ/x/ojJyR0JO/ZkJX3uKX
+	 tbWWtrc5dHY8LwitoshVEtU/1kxURSuzZIjO8r6uOdGHN18+12Urb+dFuH67HYbwhT
+	 DI/Yw/Kr77gPExDFVz6ed7SpTm8irFrx3L9YGbh4TpucAbeBjCbzUo8hygal10yJRL
+	 xBSwgaiQww96d3ZVpu08zOJmu+zi9YB6vCrQNEcrYCrJQasyYZ2peWj5ctsXwB1q7s
+	 4MajCpqM0F2EM1gDpyQG2Glw6Qc+6LCZgMx4vt+uN6/sO5VpYO1WkvlgkjKbwgyU8D
+	 SJBJRAHiqaIeQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B0D13806667;
+	Tue, 17 Feb 2026 21:14:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <049a177d-85d6-4c9d-9a9a-f07391046101@acm.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [f2fs-dev] [PATCH V3 0/6] block: ignore __blkdev_issue_discard()
+ ret value
+From: patchwork-bot+f2fs@kernel.org
+Message-Id: 
+ <177136286684.643511.2911265753074075940.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Feb 2026 21:14:26 +0000
+References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+In-Reply-To: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Cc: axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
+ song@kernel.org, yukuai@fnnas.com, hch@lst.de, sagi@grimberg.me,
+ kch@nvidia.com, jaegeuk@kernel.org, chao@kernel.org, cem@kernel.org,
+ dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+ bpf@vger.kernel.org, linux-xfs@vger.kernel.org
 
-On Tue, Feb 17, 2026 at 11:33:12AM -0800, Bart Van Assche wrote:
-> More important: what will the performance impact be on SCSI devices that
-> do not need multipath support? UFS devices don't need multipath support
-> and soon (later this year) will support more than one million IOPS per
-> device. Further performance improvements are on the roadmap.
+Hello:
 
-For nvme, we can detect if a device is multipath capable. If not, we
-skip the multipath layer altogether so it has no performance impact. I'd
-imagine the generic library version would similarly require an opt-in
-approach that UFS simply wouldn't subscribe to.
+This series was applied to jaegeuk/f2fs.git (dev)
+by Carlos Maiolino <cem@kernel.org>:
+
+On Mon, 24 Nov 2025 15:48:00 -0800 you wrote:
+> Hi,
+> 
+> __blkdev_issue_discard() only returns value 0, that makes post call
+> error checking code dead. This patch series revmoes this dead code at
+> all the call sites and adjust the callers.
+> 
+> Please note that it doesn't change the return type of the function from
+> int to void in this series, it will be done once this series gets merged
+> smoothly.
+> 
+> [...]
+
+Here is the summary with links:
+  - [f2fs-dev,V3,1/6] block: ignore discard return value
+    (no matching commit)
+  - [f2fs-dev,V3,2/6] md: ignore discard return value
+    https://git.kernel.org/jaegeuk/f2fs/c/699fcfb6cb80
+  - [f2fs-dev,V3,3/6] dm: ignore discard return value
+    (no matching commit)
+  - [f2fs-dev,V3,4/6] nvmet: ignore discard return value
+    https://git.kernel.org/jaegeuk/f2fs/c/38d12f15c477
+  - [f2fs-dev,V3,5/6] f2fs: ignore discard return value
+    (no matching commit)
+  - [f2fs-dev,V3,6/6] xfs: ignore discard return value
+    https://git.kernel.org/jaegeuk/f2fs/c/2145f447b79a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
