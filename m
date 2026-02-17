@@ -1,139 +1,345 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9FF32695D
-	for <linux-block@vger.kernel.org>; Tue, 17 Feb 2026 10:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771324655; cv=pass; b=GpuTxDXQdEYVR7HwYcZg43wlPyBN9QOivKrsBSShCzz9t8AgMLovyk4httFyNrw/DJG6cgw9+UpTklqErJDOZr3wKhHTyuNdFQqRH6ixYy40DmEEOSvBwfFaz/RHoAZiop/Jw8Klz43VG21ndvycVl/6aQIPHUR+xbXNi+iPWUI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771324655; c=relaxed/simple;
-	bh=dPjtly+ZxqrcgnTcKSIFDHsF1hA5MWE73lwPbiR8+3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C0fsjCO/bTjm3LZvTGfvj3RKqYnrmk93+fOmtDoV5chHdOxDkU0OzIlBKc9pwtC+wzDgIEuxSxqXZ/zGT6iKpoorpe+1hm+VLco9LHFNwYSmclbKavNRccoZy1GQo63mW7fyRyb/n/Qq/1QUjbNMIYSeR//Q2nT41Ua1KYfAmGo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=dmYLmGrQ; arc=pass smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A9D3358B1
+	for <linux-block@vger.kernel.org>; Tue, 17 Feb 2026 12:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771330690; cv=none; b=bYGlxs5KeWa0dTjT85/WA8qRSMSMCOF4HuR5mAccVWqrf7iV7FHOD99cfloNkCfVI9BtISxLguhFindizhsE+7C0EyzPhV4fgXt3crcwNPBftl20qotbvco0gMvtPWwFS0kr5AnqYlUjBjNk6VAeKydAgSqCPVgIfoGXNueLhOI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771330690; c=relaxed/simple;
+	bh=8FaViZIsFFjduqimpKIDkioopbikGif5gxHaLIaZkTU=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=Lgy3SpPAKgCLfmnYHKS8nMDugxTA806sng+XOUgQ+HkhLayI9EvAaJcAj/xL8FkUYkQH2/Yv+kX5Ad3+at/4PnBKsTWji4f/gvdoY+Ovf9N708u7u+0rIKKrSsuWzHkmkWjbXXxpiXT1iDAfXFx8R+NAPunNJlIg7v0m1O5pjdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Da2TxgH+; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="dmYLmGrQ"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-387090ae5b1so32458611fa.0
-        for <linux-block@vger.kernel.org>; Tue, 17 Feb 2026 02:37:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771324652; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BHl29tIF3OY48BS3hcSNw+qtFlYmsAnD+/B4WidNhjWpiCQ/YBVaceCIaeqavQM5e3
-         WT0NmS/1FQgsS2oNcATyJA77i/sSyqLFOZHpOsfRx0FnGbijisCwHvuf6nlyQ57VgPD8
-         rZZJc+nmSN1o1iNi4HtUs7+WzZeHFcKVZ9UE1I30XquOYNoq3gV2mHWz17NZ5yuHKnBQ
-         zYfjp/dFEzskc9X9ib5Of5Ru5m90J5YdmQkdfRKLqSUHewyUBuIjIZYN9ykOjg1BsSuj
-         ESbtg3lVvBij+9dtDy3rkO8us/niwN/aKSCe1gW1ueUjkS5osknHBTON7n4NbAmmU8J0
-         r3Gg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NZMo/PtOIzSJeD+bvKh62aH9xtqgsP4XaPk4C2v4d9E=;
-        fh=nHBtpJkKnlDGP1pWBK+UR35aSb6GcMox0+qSEPK70Q4=;
-        b=ZBq/EeOO7eM27BtQcEFYIV/WTNJRZ+d8Vqg3wFH47sNlBS7KNtiN7W6eVEAW52oePx
-         WWJcaeQsHCvgFbw8noILj24Bmd+h0x7phhkkepoGG68717xPpT8LbwLAtAMWl/Wwe3r2
-         0/AE/X/tRUP3Y78e3+L5fbo4ZpG8dNbSckwa0muaWXGVfCilfop17nFqhkHabiAJmZYX
-         f0axBqdeHDgwd2XuDkMFy/d3xO0AkZdU624kvObvg3Gap6uIEDIKrljZdV0rh52AKjJw
-         J5tawabOauwQoqrL1l/G2qTQ/Khsg5bUs7MYHdU+dA5RJ09ZiZbHx6ZnmJe+x2Cbi7ot
-         MY0g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Da2TxgH+"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4836f363ad2so46467785e9.1
+        for <linux-block@vger.kernel.org>; Tue, 17 Feb 2026 04:18:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1771324652; x=1771929452; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NZMo/PtOIzSJeD+bvKh62aH9xtqgsP4XaPk4C2v4d9E=;
-        b=dmYLmGrQL6EpWGinGmazJYZO2mJYS/9YAtjKAkQYVsYcu67/5AA8mkj764LmfULiGy
-         Bq1tyIlasq5pw9UoS4Sr+XCwvWTBbwX8s+hIVYntsZPYoiwNa3nVU4Db6qMzN0KObR5u
-         +szP0cw+XNRlcTzTNf4B5GXh2CK1xmRAFYDmrGhbKeZ1DNZbm24/fY6wlyVWhzNOgLOX
-         /tZInKxJH3v+wzSCU2v2Mk1DEhlRMMh0/0h0X+K4aDFEi0cYkMFereA5+SHXhdwt9Ejn
-         m9++REQio3HlLCp4R4ZiLcPl3WV10drQ7hxCz+iw3pxBnEx/RC6cNykCWYgpsliYzvIg
-         1YKA==
+        d=gmail.com; s=20230601; t=1771330688; x=1771935488; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QTONtFoNtbkbeYo5PUcTqFHZpngRg049E98Be51k7a0=;
+        b=Da2TxgH+1BQpdBJZ5xAHJXGDcdpQNPdHyEXoFBkOVDVZeYA9eYINi+tnm7IkIyw2io
+         GX8uVWesRR5Mi1zYIgD7DlxvUmOZiuOnHPzcse/ftTTuf/zvY3+cPtNU56g+SpHa83ue
+         7a5MD6tqVNgGgC4CyYH7PgEU99+sc+xJkdxQj3OSYB6pImqUE2VogXRd2WJgrwnplhSF
+         984/ie11jHjeh//hJo3vu9Zauu99WttRnP6bcFfxKAWe2WJEiyoHUPNNDvKPlMgd/iqP
+         Cr41TdVYNBnA6cXGL2kJ6tmT6l9Pi9Igq7E+OQmBPScKpSJXdwGsTOMSFKZ2v85BH+5J
+         HwzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771324652; x=1771929452;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NZMo/PtOIzSJeD+bvKh62aH9xtqgsP4XaPk4C2v4d9E=;
-        b=BfPA9FAWQ0sJYgJUZGknlE2SujCetAmv6wlIOncIQRtYC+3eKiCMjAyK1pcFG9umsa
-         BHGt85C9sbxzc8+qRVv5ocXHmntGz5+rd0gQVT7P+neKN9vQaj52XZJat0QtNKcy+toh
-         WWvpfvxdfsWr5MqG/77bD2wZAK04MPBawPAwe+vdCvZ7rmvEP48fxf67ZV3yfpJ1QOaI
-         BJ4kHxhEQWyGUu/3XFuGSJQlxHKx4SkmZYoWzgOqC3w9nTMzyp3HMkxVsmjQHSCnr/47
-         MgAQSTwpjnKNyW1/bow8wUvUuRhfq3QYtsGcr6QNbj5tRJpI+f+tIYe5SThdCdx81KBU
-         LFmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUR4DIX9coMCnGpofbJYovqLeQj+jkgVPO0fdV2w9fbgAsT1C3s7IuU0wW5EbS593Ct5dOzXFMRZqWMsg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrquBWmruOSkscvqc800S3aRqbKqi7FmfiEpO7lMorGSTFxaX8
-	uxXMPSCaGzFDs28M+yfvbHZ6eslqSy6ot0jbdWvf2XVxyd+A59hYG9WepBPaQaibA2gdIUVjVSP
-	WZssYiNpopbLqq3gg5E9p9AOLBgScOoYc2Gzyj324ug==
-X-Gm-Gg: AZuq6aIyF8IWqqCTLQVkKuCneBCuC2mSDJYT1/38Gj3WctVqGTGuEm8bxm5V6lBspxx
-	Q6BSC7Y5BDFa9qLPUtOkyfKo5TBIEH0sEzou701zf/JZAUCHEHgvI+FFj+tTkowKd4nh2mfRMBV
-	jUliq2nOAqJi9ropCcYv9u7Q5FMCuh3LR6Cz8Fz85ClL7tzAueNetMccfnsxRgLV21xqxc1J9wX
-	yEnvIp0Sf9nrd0rOzP3lU3d51WhFmwHIcK2MfiaZs7/Et4vVNmFJu5Z/aYHHURkTqhkvyxezbOs
-	ZnJshnIeLR1T3ROJ2pFcnlCD554AxtQqsePTU8zTxkeQR8XBS2IsEG2pan37sGRiUA5+
-X-Received: by 2002:a05:651c:1ca:b0:386:ec21:c87f with SMTP id
- 38308e7fff4ca-3881b99cc9cmr30135731fa.42.1771324651832; Tue, 17 Feb 2026
- 02:37:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771330688; x=1771935488;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QTONtFoNtbkbeYo5PUcTqFHZpngRg049E98Be51k7a0=;
+        b=IfpZanfRg9y8EyUauwStc4Lx6uuSyCyx8lphluWamlhkWW7NICdTqrkU7GkviOEKyO
+         GEagNS7q9bRI8juXoDX1KUKfJ4sQy2zueF0SS0vIPFjDIYO7ptUsG1IdrwSsdYFDXvVc
+         BWIFW1RnYcoZYpt1TjelUAd40r3fRM22Wl0JreUtK/29dpPSFvdNL+TqHqk+2e8YUrwp
+         xyyLNG8lMPHyQuZ0YpqB+6t0oLcTxZ08ApUqWiRsCeZVj2+w4BZC8m9HZYsyRxra46pk
+         Lb7yYDF77bNfvoOR9KHec2DsWxx0TUMHLMOOHxw1AplDaIfXGhPUVQn5FM98vu0EcOz0
+         BYSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVHEdwbMh3oj3aIRRnqdwDTyxwLRq1I5zlfJJqeXYEddNhuqCmNSmAgnJxIP184Z2U5C7nLC2aX51CaGw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1LSzZ0gpmTKCgQdkfRk9biEGgbtAOJirRvDGJarIprQ94LQTA
+	xY09FFcR3zuT3d5pF5AO1Z+gwheAeiF453MsyBVWnTQLmVIgbO+/ktKz
+X-Gm-Gg: AZuq6aLLj2/YGDPATLh7+0UCu6fBGG5IfJ/PshF7T1qrY9ZNOmhF77HFX+vmXb8tsAZ
+	uHtyLFsgwd3Mvnsn1611I7F4Zm9juuRUQVv9VZ6IBx3beur1OkeL1GCc23tU1oAupovlfDCcG+E
+	mx+bAbRz24d8UAcj9knLhNNmGru0+dsO0/ypLFagy82YtCl9Uh5UX4bvwHvX/kNYjrdJG1dnQEk
+	cznE5hKPjof71KlfdC5vmWQzAk3btG5IQ5vv3DDOm3j65JzXOZ84Rpnc0JGE+g8IA4bPOW5GzAc
+	nE4P/DSGM+C1D4ee/0Wcqfz1wXZqFOmaVU7S04n+2kHUWUVqx6hh+1li3r+sN2dAA6HEtzanP0B
+	d95JM/pk115tBL8fpJnq3bEW+T7knoie+kLWBb3XblmXE3gk6fKMV2reYjPc/OixYKyYiCHe7vP
+	xSpLTeyNtwUIobKsBDw3HK6SK8R6VzDPhqHb+k/zB26PA0Lg==
+X-Received: by 2002:a05:600c:6990:b0:483:8f38:a928 with SMTP id 5b1f17b1804b1-4838f38a961mr40324805e9.34.1771330687636;
+        Tue, 17 Feb 2026 04:18:07 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:7dc3:4609:42c2:f18f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d834ebesm525985725e9.13.2026.02.17.04.18.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Feb 2026 04:18:07 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Hristo Venev <hristo@venev.name>
+Cc: Jakub Kicinski <kuba@kernel.org>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
+ <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  netdev@vger.kernel.org,  Josef Bacik <josef@toxicpanda.com>,  Jens Axboe
+ <axboe@kernel.dk>,  linux-block@vger.kernel.org,  nbd@other.debian.org
+Subject: Re: [PATCH] netlink: specs: add specification for NBD
+In-Reply-To: <20260215180309.2255721-3-hristo@venev.name>
+Date: Tue, 17 Feb 2026 12:17:25 +0000
+Message-ID: <m2o6lnlg2y.fsf@gmail.com>
+References: <20260215180309.2255721-3-hristo@venev.name>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260110-lsfmm-2026-cfp-ae970765d60e@brauner> <20260119-bagger-desaster-e11c27458c49@brauner>
- <20260129-beidseitig-unwohl-9ae543e9f9f5@brauner> <20260216-ruhelosigkeit-umlegen-548e2a107686@brauner>
-In-Reply-To: <20260216-ruhelosigkeit-umlegen-548e2a107686@brauner>
-From: Haris Iqbal <haris.iqbal@ionos.com>
-Date: Tue, 17 Feb 2026 11:37:19 +0100
-X-Gm-Features: AaiRm52ye33PKO28CcExseV6coNOG-rZ2nBeMP78z80h8Dwp-N455yQLK7UlhmY
-Message-ID: <CAJpMwyg-3-Z=ZDC60Vn0s-8Z78VOPKYmvX9s=Nnvcoao4T5zbg@mail.gmail.com>
-Subject: Re: LSF/MM/BPF: 2026: Call for Proposals
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	bpf@vger.kernel.org, lsf-pc@lists.linux-foundation.org, 
-	linux-kernel@vger.kernel.org, lwn@lwn.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, Feb 16, 2026 at 3:28=E2=80=AFPM Christian Brauner <brauner@kernel.o=
-rg> wrote:
+Hristo Venev <hristo@venev.name> writes:
+
+> This patch adds an initial YNL specification for NBD. The specification
+> can be used to produce a UAPI header that is equivalent to the one
+> currently shipped in the kernel.
 >
-> On Thu, Jan 29, 2026 at 05:13:52PM +0100, Christian Brauner wrote:
-> > On Mon, Jan 19, 2026 at 03:26:39PM +0100, Christian Brauner wrote:
-> > > > (1) Fill out the following Google form to request attendance and
-> > > >     suggest any topics for discussion:
-> > > >
-> > > >           https://forms.gle/hUgiEksr8CA1migCA
-> > > >
-> > > >     If advance notice is required for visa applications, please poi=
-nt
-> > > >     that out in your proposal or request to attend, and submit the =
-topic
-> > > >     as soon as possible.
+> The spec appears to be accurate enough so that commands can be issued
+> with pyynl.
 >
-> This is (likely) the final reminder to put in your invitation request!
-> The invitation request form closes this Friday, 20th February.
+> Signed-off-by: Hristo Venev <hristo@venev.name>
+> ---
+>  Documentation/netlink/specs/nbd.yaml | 206 +++++++++++++++++++++++++++
+>  1 file changed, 206 insertions(+)
+>  create mode 100644 Documentation/netlink/specs/nbd.yaml
 
-Hello,
+There are yamllint errors:
 
-What is the announcement date for accepted topics and invitations?
+make -C tools/net/ynl lint
+make: Entering directory '/home/donaldh/net-next/tools/net/ynl'
+yamllint ../../../Documentation/netlink/specs
+../../../Documentation/netlink/specs/nbd.yaml
+  159:81    error    line too long (104 > 80 characters)  (line-length)
+  169:6     error    syntax error: expected <block end>, but found '<block mapping start>' (syntax)
+  170:7     error    wrong indentation: expected 5 but found 6  (indentation)
 
 >
-> Fever has struck me down so all you get is a bad limerick:
->
-> There's a conference called LSFMM,
-> Where maintainers debate and condemn,
-> They argue till dawn
-> What's merged or withdrawn,
-> Then next year do it over again!
->
-> Don't forget to pester^wask^wremind your respective organizations to
-> sponsor LSF/MM/BPF 2026! If it helps, you can tell them that we're
-> considering renaming it LSF/MM/BPF/AI.
->
-> Thanks!
-> Christian
->
+> diff --git a/Documentation/netlink/specs/nbd.yaml b/Documentation/netlink/specs/nbd.yaml
+> new file mode 100644
+> index 0000000000000..a84912a867d91
+> --- /dev/null
+> +++ b/Documentation/netlink/specs/nbd.yaml
+> @@ -0,0 +1,206 @@
+> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+> +---
+> +name: nbd
+> +protocol: genetlink-c
+> +uapi-header: linux/nbd-netlink.h
+> +doc: See :file:`drivers/block/nbd.c`
+
+Prefer to see a meaningful doc string here.
+
+> +
+> +c-family-name: nbd-genl-family-name
+> +c-version-name: nbd-genl-version
+> +max-by-define: true
+> +
+> +attribute-sets:
+> +  -
+> +    name: nbd-attrs
+> +    name-prefix: nbd-attr-
+> +    doc: Configuration policy attributes, used for CONNECT
+> +    attributes:
+> +      -
+> +        name: unspec
+> +        value: 0
+> +        type: unused
+
+No need for unspec in the attribute list, ynl codegen does the right thing.
+
+> +      -
+> +        name: index
+> +        type: u32
+> +      -
+> +        name: size-bytes
+> +        type: u64
+> +      -
+> +        name: block-size-bytes
+> +        type: u64
+> +      -
+> +        name: timeout
+> +        type: u64
+> +      -
+> +        name: server-flags
+> +        type: u64
+> +      -
+> +        name: client-flags
+> +        type: u64
+> +      -
+> +        name: sockets
+> +        type: nest
+> +        nested-attributes: sock-item-attrs
+> +      -
+> +        name: dead-conn-timeout
+> +        type: u64
+> +      -
+> +        name: device-list
+> +        type: nest
+> +        nested-attributes: device-item-attrs
+> +      -
+> +        name: backend-identifier
+> +        type: string
+> +  -
+> +    name: device-item-attrs
+> +    name-prefix: nbd-device-item-
+> +    doc: |
+> +      This is the format for multiple devices with :code:`NBD_ATTR_DEVICE_LIST`
+> +
+> +      .. code-block::
+> +
+> +        [NBD_ATTR_DEVICE_LIST]
+> +          [NBD_DEVICE_ITEM]
+> +            [NBD_DEVICE_INDEX]
+> +            [NBD_DEVICE_CONNECTED]
+> +    attributes:
+> +      -
+> +        name: unspec
+> +        value: 0
+> +        type: unused
+
+Not required.
+
+> +      -
+> +        name: item
+> +        name-prefix: nbd-device-
+> +        type: nest
+> +        nested-attributes: device-attrs
+> +        multi-attr: true
+> +  -
+> +    name: device-attrs
+> +    name-prefix: nbd-device-
+> +    attr-max-name: nbd-device-attr-max
+> +    attributes:
+> +      -
+> +        name: unspec
+> +        value: 0
+> +        type: unused
+
+Not required.
+
+> +      -
+> +        name: index
+> +        type: u32
+> +      -
+> +        name: connected
+> +        type: u8
+> +  -
+> +    name: sock-item-attrs
+> +    name-prefix: nbd-sock-item-
+> +    doc: |
+> +      This is the format for multiple sockets with :code:`NBD_ATTR_SOCKETS`
+> +
+> +      .. code-block::
+> +
+> +        [NBD_ATTR_SOCKETS]
+> +          [NBD_SOCK_ITEM]
+> +            [NBD_SOCK_FD]
+> +          [NBD_SOCK_ITEM]
+> +            [NBD_SOCK_FD]
+> +    attributes:
+> +      -
+> +        name: unspec
+> +        value: 0
+> +        type: unused
+
+Not required.
+
+> +      -
+> +        name: item
+> +        name-prefix: nbd-sock-
+> +        type: nest
+> +        nested-attributes: sock-attrs
+> +        multi-attr: true
+> +  -
+> +    name: sock-attrs
+> +    name-prefix: nbd-sock-
+> +    attributes:
+> +      -
+> +        name: unspec
+> +        value: 0
+> +        type: unused
+
+Not required.
+
+> +      -
+> +        name: fd
+> +        type: u32
+> +
+> +operations:
+> +  enum-model: unified
+> +  name-prefix: nbd-cmd-
+> +  list:
+> +    -
+> +      name: unspec
+> +      value: 0
+> +      doc: NBD_CMD_UNSPEC
+
+Not required.
+
+> +    -
+> +      name: connect
+> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_connect()`
+
+Prefer to see meaningful doc string (same for other ops)
+
+> +      attribute-set: nbd-attrs
+> +      dont-validate: [strict]
+
+nbd.c has strict & dump, should this be [strict, dump] ? (same for other ops)
+
+> +      do:
+> +        request:
+> +          attributes:
+> +            - index
+> +            - size-bytes
+> +            - block-size-bytes
+> +            - timeout
+> +            - server-flags
+> +            - client-flags
+> +            - sockets
+> +            - dead-conn-timeout
+> +            - backend-identifier
+> +        reply:
+> +          attributes:
+> +            - index
+> +    -
+> +      name: disconnect
+> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_disconnect()`
+> +      attribute-set: nbd-attrs
+> +      dont-validate: [strict]
+> +      do:
+> +        request:
+> +          attributes:
+> +            - index
+> +    -
+> +      name: reconfigure
+> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_reconfigure()`
+> +      attribute-set: nbd-attrs
+> +      dont-validate: [strict]
+> +      do:
+> +        request:
+> +          attributes:
+> +            - index
+> +            - size-bytes
+> +            - block-size-bytes
+> +            - timeout
+> +            - client-flags
+> +            - sockets
+> +            - dead-conn-timeout
+> +            - backend-identifier
+> +    -
+> +      name: link-dead
+> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_mark_nsock_dead()` / :code:`nbd_dead_link_work()`
+> +      attribute-set: nbd-attrs
+> +      event:
+> +        attributes:
+> +          - index
+> +      mcgrp: nbd_mc_group
+> +    -
+> +      name: status
+> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_status()`
+> +      attribute-set: nbd-attrs
+> +      dont-validate: [strict]
+> +      do:
+> +        request:
+> +          attributes:
+> +            - index
+> +        reply:
+> +          attributes:
+> +            - device-list
+> +
+> +mcast-groups:
+> +  list:
+> +    -
+> +      name: nbd_mc_group
+> +      c-define-name: nbd-genl-mcast-group-name
