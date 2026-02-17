@@ -1,42 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41997275AF0;
-	Tue, 17 Feb 2026 08:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537722ED87F;
+	Tue, 17 Feb 2026 09:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771317170; cv=none; b=bse4/CESw9Bw8fvwTObJ6atTlf/sWagh/hkSYzOiTkuhg2GnOQ+VRu1Rk7cz0emATtMMTpqEJVEDamw5yBf9BVghRsS5tFvutjCL+y78d8TVrwGKn1uVahRmN0KyYB0MOf2Cvne1JNHrsNqsjymU/suGH+zTmkAlYc6Noq/yDzI=
+	t=1771322083; cv=none; b=pBwkJMl7UubKPjWkVLs4HxRAJHz2OjEzDwILoJcjTtkH0UYlxOtvzOGPlBuIczt/GHrAdKpiPKLEMKe99QEW4bgFV+y+/R0m6YwNCuH5z36UayNxBm4BPola2q0G1r/gcIhiQg1/R2BXvYhAEu+ZsV/qyoQDc0b0S4Ym4DxnS4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771317170; c=relaxed/simple;
-	bh=gxGGcZXN9XagxxSOycI0vC1KukirZ8YXQOvNNscm36o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFBe5ZxcOGTUUONBv+KKeD1a689ByCPY7B2RLEp2Zybexb45hN9D8KkCr+ogcnqQCepG+W3JSVaUYoj8GNp3TEipz9lAZVNiV9V6UuP/21+ZG9wJksEMEMERCTyaj/uIpWHpN/VAmY4HTsm3CmgKjCIRX0o6WqRyVkN2R9C86BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bEEs6nl5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771322083; c=relaxed/simple;
+	bh=OvhRtzauUYE1vtiYM7Ck4byDcsw4wUNWtgU3sMsXlvo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pVWe/ynCmBc/REhHvppJrKN2KHbcroAnOB3OgZHZA5LvyiD1AF/z+f89a8KfYXUxan4pP/5M6iouftAdyxpdg69Lb+b4eKO5b7iHbMIbEts8mjssz+MeQWN6dCkAmiSDqHmTP5aoBy3B6d29PolnxrfLsGPc2R5Akv4snXRDZV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e/yigSBh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bEEs6nl5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64B1EC4CEF7;
-	Tue, 17 Feb 2026 08:32:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/yigSBh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4E98C4CEF7;
+	Tue, 17 Feb 2026 09:54:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771317169;
-	bh=gxGGcZXN9XagxxSOycI0vC1KukirZ8YXQOvNNscm36o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bEEs6nl5qqphGtyp8xiCn+UO9RJRvy+d9vmzydzqhZa5fE5gVrKLDgZlmKVMn5ZAV
-	 SgIty3S5iXNig4uPSKKmu2OwNS//ABPS3XU/TR0m0Isc6Uyvw47opL+3wCJy4r/bcK
-	 +HkdbmlalUW4zNmtVGQZsa1lc/sEpDeYjHTVLunCUGLiI6u320ItiR46GuonkK5/jn
-	 Vip1w7g3YuGkUvyLY4YOZsiw5EnhFB805yBqJMzn9WCFg/+2oV9AB1LELy8S1mFjWM
-	 5VSk9fR+nD5EtIzRde8XxBQ6ftnqRpu7Jw07AERmEauIziqfMKZR+2MokgX0K/9k5Q
-	 KmomRX5GDMe7Q==
-Date: Tue, 17 Feb 2026 09:32:45 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: hch@lst.de, jack@suse.cz, djwong@kernel.org, axboe@kernel.dk, 
-	kbusch@kernel.org, linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	linux-block@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [PATCH 1/4] fs: add write-stream management file_operations
-Message-ID: <20260217-idealerweise-geheuer-ee86894f4792@brauner>
-References: <20260216052540.217920-1-joshi.k@samsung.com>
- <CGME20260216053017epcas5p2d6492dd8c33c6d2453b15d79819d97eb@epcas5p2.samsung.com>
- <20260216052540.217920-2-joshi.k@samsung.com>
+	s=k20201202; t=1771322083;
+	bh=OvhRtzauUYE1vtiYM7Ck4byDcsw4wUNWtgU3sMsXlvo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=e/yigSBhw5HsG6R95eIIT87pjgr6Q12VzafeNce1IeQ3E0SxOAZ6GtUNpjXzmeZNl
+	 mjr+WkX1Zu5qrOg0llSZa8uupppQw8nO0ddWc4CgVhZrhzo3rAtQPOKeqDXqNHw06l
+	 mhW7Ht+9FtfsnFWmtp3+U4tasPucTG/Qql+0Of+QzY7lv88ZWR7Mr563HC/XcuFYgR
+	 TZAILEzOpUcWJHN7t1If1tB18PZTVODae7G+wN5/xmICPuiOOIOQ9c91q4CKeBi2bW
+	 URhQMuesFJfkU19AlWcaiMX1pP7PR77p8xHDsH24C91g2EVWlrg5SEL7hNzUAznvi/
+	 Xynrlrb8dHlPA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Ken Kurematsu <k.kurematsu@nskint.co.jp>, Boqun Feng
+ <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, Miguel Ojeda
+ <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn?= Roy
+ Baron
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Alice Ryhl
+ <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich
+ <dakr@kernel.org>, FUJITA
+ Tomonori <fujita.tomonori@gmail.com>, Frederic Weisbecker
+ <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, Thomas Gleixner
+ <tglx@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, John
+ Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Lorenzo
+ Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett"
+ <Liam.Howlett@oracle.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>, Ken Kurematsu
+ <k.kurematsu@nskint.co.jp>
+Subject: RE: [PATCH 62/79] block: rust: add `TagSet::update_hw_queue_count`
+In-Reply-To: <TYRP286MB59951867FB2026AAB52DA80FDB6CA@TYRP286MB5995.JPNP286.PROD.OUTLOOK.COM>
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
+ <20260216-rnull-v6-19-rc5-send-v1-62-de9a7af4b469@kernel.org>
+ <DlelngRf2sXB2dUQOltrLhHN_bPwumkBYEef-iGa_6HSHxyilar1tt87eOVUD7v667_I--EPwiAeRc2-rA1jZA==@protonmail.internalid>
+ <TYRP286MB59951867FB2026AAB52DA80FDB6CA@TYRP286MB5995.JPNP286.PROD.OUTLOOK.COM>
+Date: Tue, 17 Feb 2026 10:54:30 +0100
+Message-ID: <87seazd7ah.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,33 +60,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260216052540.217920-2-joshi.k@samsung.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 16, 2026 at 10:55:37AM +0530, Kanchan Joshi wrote:
-> Add three new hooks in struct file_operations to allow fileystems to
-> manage write streams at per-file level.
-> 
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> ---
->  include/linux/fs.h | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 2e4d1e8b0e71..ff9aa391eda7 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -1967,6 +1967,12 @@ struct file_operations {
->  	int (*uring_cmd_iopoll)(struct io_uring_cmd *, struct io_comp_batch *,
->  				unsigned int poll_flags);
->  	int (*mmap_prepare)(struct vm_area_desc *);
-> +	/* To fetch number of streams that are available for a file */
-> +	int (*get_max_write_streams)(struct file *);
-> +	/* To set write stream on a file */
-> +	int (*set_write_stream)(struct file *, unsigned long);
-> +	/* To query the write stream on a file */
-> +	int (*get_write_stream)(struct file *);
+"Ken Kurematsu" <k.kurematsu@nskint.co.jp> writes:
 
-Let's not waste three new file operations for this thing. Either make it
-VFS level ioctl() commands or add support for it into file_getattr() and
-file_setattr().
+> Hi Andreas,
+>
+>> -----Original Message-----
+>> From: Andreas Hindborg <a.hindborg@kernel.org>
+>> Sent: Monday, February 16, 2026 8:36 AM
+>> To: Boqun Feng <boqun.feng@gmail.com>; Jens Axboe <axboe@kernel.dk>;
+>> Miguel Ojeda <ojeda@kernel.org>; Gary Guo <gary@garyguo.net>; Bj=C3=B6rn=
+ Roy
+>> Baron <bjorn3_gh@protonmail.com>; Benno Lossin <lossin@kernel.org>;
+>> Alice Ryhl <aliceryhl@google.com>; Trevor Gross <tmgross@umich.edu>;
+>> Danilo Krummrich <dakr@kernel.org>; FUJITA Tomonori
+>> <fujita.tomonori@gmail.com>; Frederic Weisbecker <frederic@kernel.org>;
+>> Lyude Paul <lyude@redhat.com>; Thomas Gleixner <tglx@kernel.org>;
+>> Anna-Maria Behnsen <anna-maria@linutronix.de>; John Stultz
+>> <jstultz@google.com>; Stephen Boyd <sboyd@kernel.org>; Lorenzo Stoakes
+>> <lorenzo.stoakes@oracle.com>; Liam R. Howlett
+>> <Liam.Howlett@oracle.com>
+>> Cc: linux-block@vger.kernel.org; rust-for-linux@vger.kernel.org;
+>> linux-kernel@vger.kernel.org; linux-mm@kvack.org; Andreas Hindborg
+>> <a.hindborg@kernel.org>
+>> Subject: [PATCH 62/79] block: rust: add `TagSet::update_hw_queue_count`
+>>
+>> Add a method to `TagSet` that allows changing the number of hardware
+>> queues
+>> dynamically.
+>>
+>> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+>> ---
+>>  rust/kernel/block/mq/tag_set.rs | 17 ++++++++++++++++-
+>>  1 file changed, 16 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/rust/kernel/block/mq/tag_set.rs
+>> b/rust/kernel/block/mq/tag_set.rs
+>> index 4d00979a83dbd..47a162360e628 100644
+>> --- a/rust/kernel/block/mq/tag_set.rs
+>> +++ b/rust/kernel/block/mq/tag_set.rs
+>> @@ -8,6 +8,7 @@
+>>      bindings,
+>>      block::mq::{operations::OperationsVTable, request::RequestDataWrapp=
+er,
+>> Operations},
+>>      error::{self, Result},
+>> +    prelude::*,
+>>      try_pin_init,
+>>      types::{ForeignOwnable, Opaque},
+>>  };
+>> @@ -34,7 +35,7 @@ pub struct TagSet<T: Operations> {
+>>  }
+>>
+>>  impl<T: Operations> TagSet<T> {
+>> -    /// Try to create a new tag set
+>> +    /// Try to create a new tag se }t
+>
+> Is this a typo?
+> It looks like an unnecessary ' }'.
+
+Yes, that is a mistake. Thanks!
+
+
+Best regards,
+Andreas Hindborg
+
+
+
