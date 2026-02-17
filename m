@@ -1,75 +1,66 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A9D3358B1
-	for <linux-block@vger.kernel.org>; Tue, 17 Feb 2026 12:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33913335077;
+	Tue, 17 Feb 2026 13:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771330690; cv=none; b=bYGlxs5KeWa0dTjT85/WA8qRSMSMCOF4HuR5mAccVWqrf7iV7FHOD99cfloNkCfVI9BtISxLguhFindizhsE+7C0EyzPhV4fgXt3crcwNPBftl20qotbvco0gMvtPWwFS0kr5AnqYlUjBjNk6VAeKydAgSqCPVgIfoGXNueLhOI=
+	t=1771333542; cv=none; b=VGiHejtMuP9WP7k0m3VZ+KuTFLuqc2VJeQbehWppVFJHegcWl6W2FIzG1dbTFkpcPJ8mix87l7G0W+rw5PB6Mao8Tn4uezkjZjOH99nfU4EgUwVOYtpnJnImMstQWZjdccrlvQn5iAzMORhSRUIi0tN5YuTC8QYmghi/KSpfClA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771330690; c=relaxed/simple;
-	bh=8FaViZIsFFjduqimpKIDkioopbikGif5gxHaLIaZkTU=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Lgy3SpPAKgCLfmnYHKS8nMDugxTA806sng+XOUgQ+HkhLayI9EvAaJcAj/xL8FkUYkQH2/Yv+kX5Ad3+at/4PnBKsTWji4f/gvdoY+Ovf9N708u7u+0rIKKrSsuWzHkmkWjbXXxpiXT1iDAfXFx8R+NAPunNJlIg7v0m1O5pjdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Da2TxgH+; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1771333542; c=relaxed/simple;
+	bh=hamGqIsC8rZ/FYqoaXYuXhl5LCie5VeMevUCMal2QF0=;
+	h=From:To:To:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:
+	 Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:Date:Message-ID:MIME-Version:
+	 Content-Type; b=Pr4DxNv4LDBu5JQaetbmdLHROHyhD2QZE9HzKnHGbyUGZ06aVQmEbPNrQCEF+FO5v4/h6XZIs3mY+x0Sv47Sj3L84VhNrQIu8cacEeSwyFeUBWV77rQd3esLxy7BdJArlLMA18MUKnMdPbNxODhX/5eknxVwHjLm86AumzgFKCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YTgdHzFm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Da2TxgH+"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4836f363ad2so46467785e9.1
-        for <linux-block@vger.kernel.org>; Tue, 17 Feb 2026 04:18:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771330688; x=1771935488; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QTONtFoNtbkbeYo5PUcTqFHZpngRg049E98Be51k7a0=;
-        b=Da2TxgH+1BQpdBJZ5xAHJXGDcdpQNPdHyEXoFBkOVDVZeYA9eYINi+tnm7IkIyw2io
-         GX8uVWesRR5Mi1zYIgD7DlxvUmOZiuOnHPzcse/ftTTuf/zvY3+cPtNU56g+SpHa83ue
-         7a5MD6tqVNgGgC4CyYH7PgEU99+sc+xJkdxQj3OSYB6pImqUE2VogXRd2WJgrwnplhSF
-         984/ie11jHjeh//hJo3vu9Zauu99WttRnP6bcFfxKAWe2WJEiyoHUPNNDvKPlMgd/iqP
-         Cr41TdVYNBnA6cXGL2kJ6tmT6l9Pi9Igq7E+OQmBPScKpSJXdwGsTOMSFKZ2v85BH+5J
-         HwzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771330688; x=1771935488;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QTONtFoNtbkbeYo5PUcTqFHZpngRg049E98Be51k7a0=;
-        b=IfpZanfRg9y8EyUauwStc4Lx6uuSyCyx8lphluWamlhkWW7NICdTqrkU7GkviOEKyO
-         GEagNS7q9bRI8juXoDX1KUKfJ4sQy2zueF0SS0vIPFjDIYO7ptUsG1IdrwSsdYFDXvVc
-         BWIFW1RnYcoZYpt1TjelUAd40r3fRM22Wl0JreUtK/29dpPSFvdNL+TqHqk+2e8YUrwp
-         xyyLNG8lMPHyQuZ0YpqB+6t0oLcTxZ08ApUqWiRsCeZVj2+w4BZC8m9HZYsyRxra46pk
-         Lb7yYDF77bNfvoOR9KHec2DsWxx0TUMHLMOOHxw1AplDaIfXGhPUVQn5FM98vu0EcOz0
-         BYSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHEdwbMh3oj3aIRRnqdwDTyxwLRq1I5zlfJJqeXYEddNhuqCmNSmAgnJxIP184Z2U5C7nLC2aX51CaGw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1LSzZ0gpmTKCgQdkfRk9biEGgbtAOJirRvDGJarIprQ94LQTA
-	xY09FFcR3zuT3d5pF5AO1Z+gwheAeiF453MsyBVWnTQLmVIgbO+/ktKz
-X-Gm-Gg: AZuq6aLLj2/YGDPATLh7+0UCu6fBGG5IfJ/PshF7T1qrY9ZNOmhF77HFX+vmXb8tsAZ
-	uHtyLFsgwd3Mvnsn1611I7F4Zm9juuRUQVv9VZ6IBx3beur1OkeL1GCc23tU1oAupovlfDCcG+E
-	mx+bAbRz24d8UAcj9knLhNNmGru0+dsO0/ypLFagy82YtCl9Uh5UX4bvwHvX/kNYjrdJG1dnQEk
-	cznE5hKPjof71KlfdC5vmWQzAk3btG5IQ5vv3DDOm3j65JzXOZ84Rpnc0JGE+g8IA4bPOW5GzAc
-	nE4P/DSGM+C1D4ee/0Wcqfz1wXZqFOmaVU7S04n+2kHUWUVqx6hh+1li3r+sN2dAA6HEtzanP0B
-	d95JM/pk115tBL8fpJnq3bEW+T7knoie+kLWBb3XblmXE3gk6fKMV2reYjPc/OixYKyYiCHe7vP
-	xSpLTeyNtwUIobKsBDw3HK6SK8R6VzDPhqHb+k/zB26PA0Lg==
-X-Received: by 2002:a05:600c:6990:b0:483:8f38:a928 with SMTP id 5b1f17b1804b1-4838f38a961mr40324805e9.34.1771330687636;
-        Tue, 17 Feb 2026 04:18:07 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:7dc3:4609:42c2:f18f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d834ebesm525985725e9.13.2026.02.17.04.18.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Feb 2026 04:18:07 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Hristo Venev <hristo@venev.name>
-Cc: Jakub Kicinski <kuba@kernel.org>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  netdev@vger.kernel.org,  Josef Bacik <josef@toxicpanda.com>,  Jens Axboe
- <axboe@kernel.dk>,  linux-block@vger.kernel.org,  nbd@other.debian.org
-Subject: Re: [PATCH] netlink: specs: add specification for NBD
-In-Reply-To: <20260215180309.2255721-3-hristo@venev.name>
-Date: Tue, 17 Feb 2026 12:17:25 +0000
-Message-ID: <m2o6lnlg2y.fsf@gmail.com>
-References: <20260215180309.2255721-3-hristo@venev.name>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTgdHzFm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3216C4CEF7;
+	Tue, 17 Feb 2026 13:05:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771333541;
+	bh=hamGqIsC8rZ/FYqoaXYuXhl5LCie5VeMevUCMal2QF0=;
+	h=From:To:To:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:
+	 Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Cc:Subject:Date:From;
+	b=YTgdHzFmfDPQy6aH8mVy2avCKJ/Gf+SFs3XX/CLEwbxhbnenXQj4OM8HK2h65MMBU
+	 iC3m+o8r9XiUdJlXneQTPj3fr7RV5RzFLC4rygDZphuPGOkau+3CjWTvE/xAkBsQnE
+	 1kInNaRhYSc2v0lMpQzLbaeGhvB75gsgDkrUzxpYOGbIHQm+jRLlZ7WP5Dr3CXX+TP
+	 9lhnSfsIKlryF8xhV/UXCptJcTdrySUpoRK7hDwQjdr0ZxNtyC6fG42NlUdX1+ac6U
+	 iIMjssSyyzjBZahKTaKDxnSio2jCk7Rg+f+Vc63jKYJCBZteVCQ65WWY/7jpZA6eGs
+	 a8VpA45bsa4OA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: lsf-pc@lists.linux-foundation.org
+To: linux-block@vger.kernel.org
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Daniel Gomez <da.gomez@samsung.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Hans Holmberg <Hans.Holmberg@wdc.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: John Pittman <jpittman@redhat.com>
+Cc: John Stultz <jstultz@google.com>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Niklas Cassel <cassel@kernel.org>
+Cc: Nitesh Shetty <nj.shetty@samsung.com>
+Cc: Oliver Mangold <oliver.mangold@pm.me>
+Cc: Pankaj Raghav <kernel@pankajraghav.com>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Theodore Tso <tytso@mit.edu>
+Cc: Wedson Almeida Filho <wedsonaf@gmail.com>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: gost.dev@samsung.com
+Cc: rust-for-linux@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [LSF/MM/BPF TOPIC] Status of Rust in the block subsystem
+Date: Tue, 17 Feb 2026 14:04:44 +0100
+Message-ID: <87h5rfcyhf.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,268 +69,82 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Hristo Venev <hristo@venev.name> writes:
+I would like to propose a session to discuss the status of Rust in the block
+subsystem. I have two distinct points to discuss: 1) The status of Rust in the
+block layer, and 2) the out-of-tree Rust NVMe driver.
 
-> This patch adds an initial YNL specification for NBD. The specification
-> can be used to produce a UAPI header that is equivalent to the one
-> currently shipped in the kernel.
->
-> The spec appears to be accurate enough so that commands can be issued
-> with pyynl.
->
-> Signed-off-by: Hristo Venev <hristo@venev.name>
-> ---
->  Documentation/netlink/specs/nbd.yaml | 206 +++++++++++++++++++++++++++
->  1 file changed, 206 insertions(+)
->  create mode 100644 Documentation/netlink/specs/nbd.yaml
 
-There are yamllint errors:
+== The status of Rust in the block subsystem ==
 
-make -C tools/net/ynl lint
-make: Entering directory '/home/donaldh/net-next/tools/net/ynl'
-yamllint ../../../Documentation/netlink/specs
-../../../Documentation/netlink/specs/nbd.yaml
-  159:81    error    line too long (104 > 80 characters)  (line-length)
-  169:6     error    syntax error: expected <block end>, but found '<block mapping start>' (syntax)
-  170:7     error    wrong indentation: expected 5 but found 6  (indentation)
+Rust has special status in the block subsystem [1]. We are currently at "Stage
+1" of a two stage "kind of thing", where enabling Rust code in the block
+subsystem is essentially an experiment that can be terminated if it does not
+work out. In order to move on from this stage to "Stage 2", where Rust in the
+block subsystem is a first class citizen, we need two things. 1) We must observe
+that Rust is applicable for writing block device drivers and 2) the kernel in
+general must have fully adopted Rust.
 
->
-> diff --git a/Documentation/netlink/specs/nbd.yaml b/Documentation/netlink/specs/nbd.yaml
-> new file mode 100644
-> index 0000000000000..a84912a867d91
-> --- /dev/null
-> +++ b/Documentation/netlink/specs/nbd.yaml
-> @@ -0,0 +1,206 @@
-> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-> +---
-> +name: nbd
-> +protocol: genetlink-c
-> +uapi-header: linux/nbd-netlink.h
-> +doc: See :file:`drivers/block/nbd.c`
+For 1) I just sent a patch series that brings the Rust null block driver to
+feature parity with the C counterpart [2]. Although the null block driver is not
+real hardware, I think this submission goes a long way to demonstrate that
+Rust is in fact applicable for writing block device drivers.
 
-Prefer to see a meaningful doc string here.
+For 2) I would point to the fact that Rust in general is no longer experimental
+in the kernel as a whole [3]. The "Rust Experiment" has been concluded,
+successfully. We see adoption in the form of the binder driver, and in the
+large, ongoing, effort targeting GPU drivers in the DRM subsystem. A few network
+PHY drivers also made it in. There is a lot of activity on the Rust list though,
+and I expect we will see Rust in more and more subsystems over the next few years.
 
-> +
-> +c-family-name: nbd-genl-family-name
-> +c-version-name: nbd-genl-version
-> +max-by-define: true
-> +
-> +attribute-sets:
-> +  -
-> +    name: nbd-attrs
-> +    name-prefix: nbd-attr-
-> +    doc: Configuration policy attributes, used for CONNECT
-> +    attributes:
-> +      -
-> +        name: unspec
-> +        value: 0
-> +        type: unused
+On that basis, I suggest we discuss whether or not we can move to "Stage 2" -
+and what that entails.
 
-No need for unspec in the attribute list, ynl codegen does the right thing.
 
-> +      -
-> +        name: index
-> +        type: u32
-> +      -
-> +        name: size-bytes
-> +        type: u64
-> +      -
-> +        name: block-size-bytes
-> +        type: u64
-> +      -
-> +        name: timeout
-> +        type: u64
-> +      -
-> +        name: server-flags
-> +        type: u64
-> +      -
-> +        name: client-flags
-> +        type: u64
-> +      -
-> +        name: sockets
-> +        type: nest
-> +        nested-attributes: sock-item-attrs
-> +      -
-> +        name: dead-conn-timeout
-> +        type: u64
-> +      -
-> +        name: device-list
-> +        type: nest
-> +        nested-attributes: device-item-attrs
-> +      -
-> +        name: backend-identifier
-> +        type: string
-> +  -
-> +    name: device-item-attrs
-> +    name-prefix: nbd-device-item-
-> +    doc: |
-> +      This is the format for multiple devices with :code:`NBD_ATTR_DEVICE_LIST`
-> +
-> +      .. code-block::
-> +
-> +        [NBD_ATTR_DEVICE_LIST]
-> +          [NBD_DEVICE_ITEM]
-> +            [NBD_DEVICE_INDEX]
-> +            [NBD_DEVICE_CONNECTED]
-> +    attributes:
-> +      -
-> +        name: unspec
-> +        value: 0
-> +        type: unused
+== The out-of-tree Rust PCI NVMe driver ==
 
-Not required.
+As you may know, I am maintaining a Rust PCI NVMe driver out of tree. For the
+development work of the block layer Rust APIs, it has been essential to
+implement a real driver, in addition to the null block driver. A driver
+targeting actual hardware has to deal with interrupts, registers, IO memory,
+DMA, memory mappings, in a way that an emulated device does not. Keeping this
+driver around has helped shape the Rust block APIs in a way that makes sense for
+real devices, not just emulated ones.
 
-> +      -
-> +        name: item
-> +        name-prefix: nbd-device-
-> +        type: nest
-> +        nested-attributes: device-attrs
-> +        multi-attr: true
-> +  -
-> +    name: device-attrs
-> +    name-prefix: nbd-device-
-> +    attr-max-name: nbd-device-attr-max
-> +    attributes:
-> +      -
-> +        name: unspec
-> +        value: 0
-> +        type: unused
+Rebasing this driver every cycle is a lot of work. Driven by requirements of the
+DRM drivers, core Rust APIs for DMA, register access, IO memory, etc. are being
+reshaped and rethought, which is great. Rebasing on top of these changes as a
+second class citizen all the time - not so great. But I believe that the Rust
+NVMe driver is a great piece of reference code, so I keep doing it.
 
-Not required.
+I would ask that we discuss merging the Rust NVMe driver so as to have a reference
+implementation of a real driver in-tree. I think it would have the following
+benefits:
 
-> +      -
-> +        name: index
-> +        type: u32
-> +      -
-> +        name: connected
-> +        type: u8
-> +  -
-> +    name: sock-item-attrs
-> +    name-prefix: nbd-sock-item-
-> +    doc: |
-> +      This is the format for multiple sockets with :code:`NBD_ATTR_SOCKETS`
-> +
-> +      .. code-block::
-> +
-> +        [NBD_ATTR_SOCKETS]
-> +          [NBD_SOCK_ITEM]
-> +            [NBD_SOCK_FD]
-> +          [NBD_SOCK_ITEM]
-> +            [NBD_SOCK_FD]
-> +    attributes:
-> +      -
-> +        name: unspec
-> +        value: 0
-> +        type: unused
+ - It would help ensure that the Rust block layer API actually works with real
+   devices.
 
-Not required.
+ - It would help make sure that the changes to core APIs that are made to
+   facilitate other subsystems are done in a way that is compatible with block
+   layer requirements.
 
-> +      -
-> +        name: item
-> +        name-prefix: nbd-sock-
-> +        type: nest
-> +        nested-attributes: sock-attrs
-> +        multi-attr: true
-> +  -
-> +    name: sock-attrs
-> +    name-prefix: nbd-sock-
-> +    attributes:
-> +      -
-> +        name: unspec
-> +        value: 0
-> +        type: unused
+ - It would serve as a nice reference implementation and a great piece of
+   documentation.
 
-Not required.
+ - I would not have to rebase it all the time. Patches changing Rust APIs used
+   by Rust NVMe would have to change the Rust NVMe call sites.
 
-> +      -
-> +        name: fd
-> +        type: u32
-> +
-> +operations:
-> +  enum-model: unified
-> +  name-prefix: nbd-cmd-
-> +  list:
-> +    -
-> +      name: unspec
-> +      value: 0
-> +      doc: NBD_CMD_UNSPEC
+Please note the emphasis on *reference* driver. I am not suggesting to replace
+the existing C driver. I will maintain the new code if necessary.
 
-Not required.
+If we could establish consensus on this, I would clean up the driver to a state
+where it can be included in the kernel.
 
-> +    -
-> +      name: connect
-> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_connect()`
 
-Prefer to see meaningful doc string (same for other ops)
+Best regards,
+Andreas Hindborg
 
-> +      attribute-set: nbd-attrs
-> +      dont-validate: [strict]
 
-nbd.c has strict & dump, should this be [strict, dump] ? (same for other ops)
+Link: https://lore.kernel.org/r/593a98c9-baaa-496b-a9a7-c886463722e1@kernel.dk [1]
+Link: https://lore.kernel.org/r/20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org [2]
+Link: https://lore.kernel.org/all/20251213000042.23072-1-ojeda@kernel.org/ [3]
 
-> +      do:
-> +        request:
-> +          attributes:
-> +            - index
-> +            - size-bytes
-> +            - block-size-bytes
-> +            - timeout
-> +            - server-flags
-> +            - client-flags
-> +            - sockets
-> +            - dead-conn-timeout
-> +            - backend-identifier
-> +        reply:
-> +          attributes:
-> +            - index
-> +    -
-> +      name: disconnect
-> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_disconnect()`
-> +      attribute-set: nbd-attrs
-> +      dont-validate: [strict]
-> +      do:
-> +        request:
-> +          attributes:
-> +            - index
-> +    -
-> +      name: reconfigure
-> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_reconfigure()`
-> +      attribute-set: nbd-attrs
-> +      dont-validate: [strict]
-> +      do:
-> +        request:
-> +          attributes:
-> +            - index
-> +            - size-bytes
-> +            - block-size-bytes
-> +            - timeout
-> +            - client-flags
-> +            - sockets
-> +            - dead-conn-timeout
-> +            - backend-identifier
-> +    -
-> +      name: link-dead
-> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_mark_nsock_dead()` / :code:`nbd_dead_link_work()`
-> +      attribute-set: nbd-attrs
-> +      event:
-> +        attributes:
-> +          - index
-> +      mcgrp: nbd_mc_group
-> +    -
-> +      name: status
-> +      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_status()`
-> +      attribute-set: nbd-attrs
-> +      dont-validate: [strict]
-> +      do:
-> +        request:
-> +          attributes:
-> +            - index
-> +        reply:
-> +          attributes:
-> +            - device-list
-> +
-> +mcast-groups:
-> +  list:
-> +    -
-> +      name: nbd_mc_group
-> +      c-define-name: nbd-genl-mcast-group-name
