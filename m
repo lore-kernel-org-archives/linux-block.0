@@ -1,95 +1,94 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B624330330
-	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 16:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AB62FF657
+	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 17:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771431087; cv=pass; b=jKzAogdA2Hk08m4hYKpy1ShNoDZc4LaeNIksM1St8X4vegpl/17vHFFuWCOlH2ugz8xRsrtU3CSAlFEG1Wrv3aTMMcLLO6StLu+0UrKq43e1vmQsUSxBO9PuUhHgB02IUf1722b88z/btzQOCbUnTyaMQAcp71TP4EeuO299XXg=
+	t=1771435523; cv=pass; b=IFsHe/+r5vl0UaRpOs/pBu15pJh8Lxwfa/5Dun+H9jeFMtSTADc8THBJuGcZhidcUQwcy5KEDYSaRAVNkIn3fJQof9CPC6sZs+58Xyc2QqfamcyFTihm2n804QOeBpF264qtBofZUp1ba1zr3j2qPnWmHEm9SCnyl64FYZZUpyY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771431087; c=relaxed/simple;
-	bh=Dnfw3O7yWCnVIQEgDYrdHlr08rz6PxDdK3ndz6QSILY=;
+	s=arc-20240116; t=1771435523; c=relaxed/simple;
+	bh=N+tav2HTy87uvDs4cm+LHcXfnxXGxM0ESG6Aqemj0F4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AoLOaCXS4FTLss/jMUyauOdBI6F9cKQcaOf1Sk36w8X0hj9uWy2m6k91Cd44bwxz15rKkDgh4kjUIVPcroxGgPEpZgLem5TD6hdl9yWfrNBbRap5DFAo64zOht6C85U4VgWY1VlNzSJumadDrV9Lh4WViKSN7t1dohPfmlBmSbU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PfZdcMqY; arc=pass smtp.client-ip=209.85.221.50
+	 To:Cc:Content-Type; b=lszEco4ij/Ot4VT5PXv5BNrNwZFn77EURpOX+D9UvytaTN9OUwQeoSA3IVbpToqDd7mrcUFGox0MLcfdzhtWSuTPvDLmt3wEULvV6oeGkj7Uf7C2FZhGcSvq6TCeHnLI9lY6exiv/X17Zv//h0o5pGBB9onzZ7W7UXphmE1gQZ4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ST60dWro; arc=pass smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PfZdcMqY"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4362c635319so5389807f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 08:11:26 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771431084; cv=none;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ST60dWro"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43591b55727so67243f8f.3
+        for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 09:25:20 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771435519; cv=none;
         d=google.com; s=arc-20240605;
-        b=WBO/GRIjp0vYMazdwl/VXDv+CTeGGgeUkxzq3ikcESYk36wLwqEgWrl5o+wvnVOJ+f
-         s83aX2vEFJ/vNa3sZDqorTaC/caitRKfh4/nDt5tyj4txnKR6nKWi4k/FzSMgDxAAe+C
-         UuYOYXMuvXQcfo/NGu+K7qx5TyyE3nsLQ7gBmbVRMWQcZCbBNLP9pxCviRWNQwCBbudv
-         RxKACywXWwpRZhLWwi7SVQXYqHsrRWUnPcYvY9ZooY9g/0fdl5jcxPyQLNT/WJsSMYaZ
-         38sn5o00FLBmiQjMa1WJSwbB/6GXILjyKU5LX1se8XV8ZokzjlxJ3urdLJT1DsicZF+H
-         pkBA==
+        b=Qi/kdvAlk7CagUg8aJ7tZMfUTM9AUZolE8m7QuI8+977vld70bGOb1bj0ct9jYqr5A
+         P/AebwpdZNjf62vGFj1o2DzxUEQo46yz2RUSrwTJ3FEHxUJmZMk6Wy5y6MdwkD+enI2I
+         xxm31yu94cQHNRXHpdw4w/05DBOuQwuQMc9JqwNo346K/29FAIF14X0V2zgEKA0raZ51
+         sw5VkfTXuIy0ggH7qkgc1LkCwMNmrUdgcMJFOCNeNueh0k8fhU0K52XvJJGrSkDl0sBW
+         dbrhRqmM41MbyldbKbiuOCvTbhGngRlyWrzxvTfQdiyb34euApobMVHIwtTW9XGm4t4T
+         BIrw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=npZADHZ7rRxwkGy8riawRonufvbdSCewmEnndlsCQtE=;
-        fh=6jwvgJxG95TI12gIY3YhPEf7CVBud9uZbdCJBGNmOTA=;
-        b=Pex+OyFoXQGVogh4R8LtFXmipZkxtvguhJUeV12hj4Dsar04Asfi5wHJfqbQ9muDW3
-         EPqmmdOMlKspPe6EMHhmklxAlyGHGsmyyeSFUzXpg8iuh3oFeB95h2sV/PkVxH+H00TF
-         vAnPzPSNdP9JwzjMDjRDFrusSza7IK54wqBq8BRRgrySyTK1pdRjn87lOUATHNVgz1pJ
-         oEkWhRO3CiLyDY5q2po8OO6FTHlCCSKSdTz5w0mgoZRHfeyasYI1LhACMOUu1fI2qBAt
-         gscqqCn8LMP8Ih40FR2PqC3reY6cQ1kiO15+UfL0BGBoUzeBD37sZ+Dwd5VBAG9Ld+gY
-         C0KQ==;
+        bh=D6PV26WrJgM8OsqISNWJ5AfIh8Z/AmyWHm0tc1qPxzY=;
+        fh=nmSkLQU0fm8Y75/5kyOWlu8vF26iE2FXolIA7mOgIQU=;
+        b=XiNIsDlQfMtW4NRSfm5d7NuIiPq8PcseYxztjgXE0zk7O9ZDLvKhJklpR9H8PX2G1w
+         9PialiioIgqxickjg2lh2lmrajzI6vo8CsAEP7aTG//uE+EHNCzEXqzgZNnFh7SfJ0dR
+         TwO5EhIDyUzSp5sILJRVCledp2QQ2c3BkQkDq8dhVSJEqPQ+K/JF2xCPbBLj6rWMFu+X
+         /hkaaEeRQXdch9PfWoW2krQ3plLiFVEtElgr+S4vY1BzoVakAopKD6AZ+XIimCMDaFtx
+         866QGkJDTVwdWWrompP24hFLokygNIrSkOOhl5Fl+pOz6WApsj0JzUElbR4cfsuqioa6
+         dw8g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1771431084; x=1772035884; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1771435519; x=1772040319; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=npZADHZ7rRxwkGy8riawRonufvbdSCewmEnndlsCQtE=;
-        b=PfZdcMqYwNT7onik+41pV0XW615Gz/ybTHKwKGbSkAOd6Mos1WFO7LFtssv3KsJMAR
-         XO1TRVb6Qo9qvBRRnOAWBFni1s0Zr1eQu98HHdBJLIqTgYGHCQqJovzdZJXq5RY7WgBA
-         KbyJMtBcWCKZLenWtLsvG4qStEZNU8jXJeRMurhR7RdIDttjb3aOAftogUIVGiwTD2ZU
-         nRghyuIC+NU7OcJgVdDcGZ5i7lez+7EHPkSZypqLabQ+eMSL1t2/DOfNeqwydh729w4J
-         vA4ZP+FZ3IjJp+guVfb6qPNiGwFesSdjS0Ey9sQ8kUrOWMHj0hurPFY7lF2535atr29C
-         kOOA==
+        bh=D6PV26WrJgM8OsqISNWJ5AfIh8Z/AmyWHm0tc1qPxzY=;
+        b=ST60dWro0wvwS2dgKYtI4A8AaDQy7wm+Qg3slO8Ahg9ZTnnZrLBfNxma2LnoswIn9W
+         NLiOluW/rk20qQProSW3lRAhxJEjvY1hthDuLpjl07A1hgMMgnD3f2TmT9r7xn6wsfyX
+         KJxXceqaQkAp6M//qKERt3dhbSD9KDyj7REFt4/yYj6a4F7XCq5GYCihzF7LTB94MFTq
+         bV5/t8ujS6fzY7YhSxLLOlVsUIqv6YPuKf1iVGRckVMz3KMVcDn8aBy//PsD3KzgmbmJ
+         0fXK30LPk5pLxkC5XdJKN7UFG0ox8b34T1xuhztJsGS8gVDjsWlPMASh6DgUrhbg2IzI
+         ur8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771431084; x=1772035884;
+        d=1e100.net; s=20230601; t=1771435519; x=1772040319;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=npZADHZ7rRxwkGy8riawRonufvbdSCewmEnndlsCQtE=;
-        b=qBHHOsBY/MZJQlrevd3LrXbhPOXRM3koi1NKGH8/nsr3wkvBji5q37NRpObE5EukN3
-         tOD6KG25Oq4TWcztFCcepWvjLqwrhFpVSVoO16U9xqTjgWuIgJ4xcMr25Vm7UoNINVN4
-         YA1/FFrqeo3kp2UjMGkr2s6BuWN3jmfIK2vs8oZfyP0w+GIHOhseZbP5XOq5FRPeX8cp
-         bCmzRYxzAbzATfUYvFx4bv+4cr/6Rf8CHlWFnQ2VyNDdhIWRhPFgdCcZEjXHwCAe9UtK
-         FowJAWP8dI05lCN7H1USfoEi1Mz6KXIhReCF9EKGjc8zfC/7bRtes9J6fcAwGQERazep
-         qhGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBC3YGBrAJnhAI5AEIVhDiqbXMlJhuTw/1+4PMKZRaTSrJuJ1imVEabQXKyIdSo0dMi66hGIBGI6jv0A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7sOTIinsfKUhk3JgdmUP+HvMt4r7GsmxA1PIsokp0leR1kM7+
-	hRCvahWLFSjuPUWGqk9wLCt0YMYI8EdSEyJaN1DcUktoajQDFjZvmukZqFkNXjyKkSYGL1kV0WT
-	wKzK4rr2q7YleX3n/zlf40WSr2qiXHy7J9rVPBetN3g==
-X-Gm-Gg: AZuq6aIV0i5jlmUPJJcih3GZyq+I9tlPcLSUnfS886bEHgZMEjdeG5a7a+4VlUpQuxJ
-	tpOFL2/c+b04ECxZbyjyqruu2gGyaWUPvrKernkVZeI6QAMj1RDmsnbCELaf+QtjAnYYp46bCfi
-	4QGXZ4Xc0d3dyEEdVyHyJQRtxaKeo9laC92KH/Jsux4fUGCDkplkE+pQ9leUww5iX0qHB17VVhF
-	2txfRz1U0c0G8nitbTQosDxqOIZPFIfXYjI6XysNrSCIL5MOPH8hFUVdPLCD0E62dn9dg+vl4qf
-	uvvMG1RVXLNb3zYA4fz8rMdKgESfPRi2GBNeeVFx/LtX5hkDVrDo4V+eZgqLrwzXW+49fsTyeuA
-	miyFB
-X-Received: by 2002:a05:6000:2dca:b0:437:6e63:9172 with SMTP id
- ffacd0b85a97d-43958df3516mr4465105f8f.4.1771431084459; Wed, 18 Feb 2026
- 08:11:24 -0800 (PST)
+        bh=D6PV26WrJgM8OsqISNWJ5AfIh8Z/AmyWHm0tc1qPxzY=;
+        b=XTlKji06iNjQHHo2KMaAQnNTfkwjslE+aoFc/f/NN/Az3dSAWJpyWsqtHWxWbdj5u+
+         pGcXL/fVH/9VuTQfxMU4v3lJ96yC0Hs0zfx528/DELRSQWaQ0FPHkme1rxIv/Yf+LLBV
+         zryySD56Xztnojj4Smc4jD1JD5NccBHF8cFco6s+wS8v9mA+fmbfRHCvqBOZ1XpAewx2
+         LXiE4I3RbFtoOSTnPqlunt5WRSgkDumiiFEykzfcXOCNxjmUEpM/zQh7NKw4PovcM+CP
+         4MQDTbZQq9eKMpaBKnY1HqJEnWqViWUHV0Vbp72la3TWNcBtmUo8IrD1TQerijqFfQn+
+         PCxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWlP7B87aX6OKgUuV1Khf+41Mt7yiXCjfW5ImaN0ZaO8Dnp3iA38RQMqempK+dcAkKn7X38xkt860JU5g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZXlLhLekJ9LDjdeFdnCjcIoeRjVDd7ZnZ5zRyq46nRVfM6+x0
+	OeFvGGwFZNO/z4lEcoeGz+mJcmUo2Gc+UKSbOSbOKikkyQm4EgJM1HgbGZnMuNOHlELvnu8OnCk
+	6IzicIM8eZArnzfMlaf91MFtEgyy8gujYod6XMpRqyg==
+X-Gm-Gg: AZuq6aLymUlCjwzCp0SXIaylr129o0oq00L7IWEPtHrknSHR5E24dZeR2zGp9gy6lVb
+	Bkx6kuTaf3CUmJdJoJxZJ0WSEtw7Bao2TyQ4DekEM4DhiCtumX0NjsiGTdB7WWRgXqxdbPHdqnq
+	N7iJl6dyjm22ycByL5CwfeglN7tTOJ7X0UHQlA4QHfqyvVnFV/Ua5Nb3iLyGUITYgkUCr1lkqaz
+	1iRyqw90OGdz2w8sLaU4FqhBAmM7dfBqYLz6AEl7fm05ZKvj6fM1MI69Kq1vdSMfAQFXu1rVED3
+	ARWsQk8mhWDuSvnS+X9mzYz6ra3BBKqZePpjDY63FMV0SNjMS8Yl/MTF9sR1ak47SraJb51KICn
+	4jgaR
+X-Received: by 2002:a05:6000:402b:b0:437:6e6e:6f95 with SMTP id
+ ffacd0b85a97d-4379db70171mr28853405f8f.27.1771435519063; Wed, 18 Feb 2026
+ 09:25:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-21-neelx@suse.com>
- <20260208151928.3245396-1-clm@meta.com> <CAPjX3FdiskLiELriX5gE2YEDMMwz5QQbNDnkAuFVov1a=WL_jQ@mail.gmail.com>
- <989433cb-4ab6-4a79-8dfc-9f5f542e2647@meta.com>
-In-Reply-To: <989433cb-4ab6-4a79-8dfc-9f5f542e2647@meta.com>
+References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-25-neelx@suse.com>
+ <20260208151728.3212554-1-clm@meta.com>
+In-Reply-To: <20260208151728.3212554-1-clm@meta.com>
 From: Daniel Vacek <neelx@suse.com>
-Date: Wed, 18 Feb 2026 17:11:13 +0100
-X-Gm-Features: AaiRm52H6a8Dx1S_J50i9RFK-wqtAs4pqoNkIHGApsZEVneSHeR9ZFaJMuu2lQI
-Message-ID: <CAPjX3Ff3qBoBxWzZ+Tg5HgSSEPGrbmmGMmf5MtiE4iU8PtHUMw@mail.gmail.com>
-Subject: Re: [PATCH v6 20/43] btrfs: add fscrypt_info and encryption_type to ordered_extent
+Date: Wed, 18 Feb 2026 18:25:07 +0100
+X-Gm-Features: AaiRm507L4YZn8mKVfmFL0jTM398GIfUhQk4fH9ld-lHWQu5maDHhF9XOU_HEIA
+Message-ID: <CAPjX3FdgJKQyM0tdCksgLAtVyjos_nx3TRg6rvjYB1wE2QH1Cw@mail.gmail.com>
+Subject: Re: [PATCH v6 24/43] btrfs: add extent encryption context tree item type
 To: Chris Mason <clm@meta.com>
 Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
 	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -98,172 +97,373 @@ Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 18 Feb 2026 at 16:50, Chris Mason <clm@meta.com> wrote:
-> On 2/18/26 10:29 AM, Daniel Vacek wrote:
-> > On Sun, 8 Feb 2026 at 16:20, Chris Mason <clm@meta.com> wrote:
-> >> Daniel Vacek <neelx@suse.com> wrote:
-> >>> From: Josef Bacik <josef@toxicpanda.com>
-> >>>
-> >>> We're going to need these to update the file extent items once the
-> >>> writes are complete.  Add them and add the pieces necessary to assign
-> >>> them and free everything.
-> >>>
-> >>
-> >> Hi everyone,
-> >>
-> >> I'm running the btrfs for-next branch, along with the encryption patch set
-> >> through my AI review prompts:
-> >>
-> >> https://github.com/masoncl/review-prompts
-> >>
-> >> I'm working on some btrfs specific instructions, but hopefully these reviews
-> >> are already useful.  I've kept the headers to make it easier to double check
-> >> that I'm actually replying to the right email, but please let me know if any
-> >> parts of this are incorrect:
-> >>
-> >> commit 61cd57301840de69a3f6573374d41ad4b4bcf348
-> >> Author: Josef Bacik <josef@toxicpanda.com>
-> >>
-> >> btrfs: add fscrypt_info and encryption_type to ordered_extent
-> >>
-> >> This commit adds encryption-related fields (encryption_type and
-> >> fscrypt_info) to struct btrfs_ordered_extent to support fscrypt
-> >> integration in btrfs.
-> >>
-> >>> diff --git a/fs/btrfs/ordered-data.c b/fs/btrfs/ordered-data.c
-> >>> index 5df02c707aee6..7a5701937184e 100644
-> >>> --- a/fs/btrfs/ordered-data.c
-> >>> +++ b/fs/btrfs/ordered-data.c
-> >>> @@ -192,6 +192,7 @@ static struct btrfs_ordered_extent *alloc_ordered_extent(
-> >>>       }
-> >>>       entry->inode = inode;
-> >>>       entry->compress_type = compress_type;
-> >>> +     entry->encryption_type = BTRFS_ENCRYPTION_NONE;
-> >>>       entry->truncated_len = (u64)-1;
-> >>>       entry->qgroup_rsv = qgroup_rsv;
-> >>
-> >> This isn't a bug, but the fscrypt_info field isn't explicitly initialized
-> >> to NULL here. While kmem_cache_zalloc() at line 175 does zero the memory,
-> >> all the other important fields in this function are explicitly initialized
-> >> (compress_type, encryption_type, truncated_len, qgroup_rsv, refs). Would
-> >> adding an explicit 'entry->fscrypt_info = NULL;' improve consistency?
+On Sun, 8 Feb 2026 at 16:17, Chris Mason <clm@meta.com> wrote:
+> Daniel Vacek <neelx@suse.com> wrote:
+> > From: Josef Bacik <josef@toxicpanda.com>
 > >
-> > `entry->fscrypt_info` is set in the very next patch "[21/43] btrfs:
-> > plumb through setting the fscrypt_info for ordered extents". The
-> > series is meant to be applied as a whole. It's just factored into
-> > implementation steps.
+> > The fscrypt encryption context will be stored as a new tree item type.
+> > This gives us flexibility to include different things in the future.
+> >
+> > Also update the tree-checker to validate the new item type.
 >
-> The prompts try to flag any patch series that don't follow best
-> practices around bisectability.  There isn't a ton of instruction about
-> what those best practices are beyond if commit A makes bug and then
-> commit B fixes the bug, flag it.
+> Hi everyone,
 >
-> This patch set is pretty unusual because you're trying to preserve
-> authorship for a number of people, and so there are a lot of small
-> judgement calls about when to change patches and when to fix them up
-> later.  I sent claude's comments to help highlight places we want to
-> decide things, but I don't think there's really a wrong decision.
-
-I understand that. I was checking every commit to ensure it builds
-correctly. But not really testing for bugs or regressions.
-
+> I'm running the btrfs for-next branch, along with the encryption patch set
+> through my AI review prompts:
+>
+> https://github.com/masoncl/review-prompts
+>
+> I'm working on some btrfs specific instructions, but hopefully these reviews
+> are already useful.  I've kept the headers to make it easier to double check
+> that I'm actually replying to the right email, but please let me know if any
+> parts of this are incorrect:
+>
+> commit 203bfb91a4db9c826fa7f72034c13a1810a1b605
+> Author: Josef Bacik <josef@toxicpanda.com>
+>
+> btrfs: add extent encryption context tree item type
+>
+> The fscrypt encryption context will be stored as a new tree item type.
+> This gives us flexibility to include different things in the future.
+> Also update the tree-checker to validate the new item type.
+>
+> > diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+> > index 3c0db279f592e..639462164d089 100644
+> > --- a/fs/btrfs/file.c
+> > +++ b/fs/btrfs/file.c
+>
+> [ ... ]
+>
+> > @@ -496,6 +503,60 @@ int btrfs_drop_extents(struct btrfs_trans_handle *trans,
+> >               args->extent_inserted = true;
+> >       }
 > >
-> >>>       entry->flags = flags;
-> >>> @@ -630,6 +631,7 @@ void btrfs_put_ordered_extent(struct btrfs_ordered_extent *entry)
-> >>>               btrfs_add_delayed_iput(entry->inode);
-> >>>               list_for_each_entry_safe(sum, tmp, &entry->list, list)
-> >>>                       kvfree(sum);
-> >>> +             fscrypt_put_extent_info(entry->fscrypt_info);
-> >>>               kmem_cache_free(btrfs_ordered_extent_cache, entry);
-> >>>       }
-> >>>  }
-> >>> diff --git a/fs/btrfs/ordered-data.h b/fs/btrfs/ordered-data.h
-> >>> index 1e6b0b182b295..ce19198e7f844 100644
-> >>> --- a/fs/btrfs/ordered-data.h
-> >>> +++ b/fs/btrfs/ordered-data.h
-> >>> @@ -124,6 +124,9 @@ struct btrfs_ordered_extent {
-> >>>       /* compression algorithm */
-> >>>       int compress_type;
-> >>>
-> >>> +     /* encryption mode */
-> >>> +     u8 encryption_type;
-> >>> +
-> >>
-> >> This isn't a bug, but placing the u8 encryption_type field between two int
-> >> fields creates 3 bytes of padding. This is minor, but in a filesystem with
-> >> many ordered extents, it could add up. The current placement does have the
-> >> advantage of grouping encryption-related fields together logically, though.
-> >
-> > This was actually changed from int (as Dave suggested, IIRC). But I
-> > did not move it.
-> > I guess we can do this:
-> >
-> > --- a/fs/btrfs/ordered-data.h
-> > +++ b/fs/btrfs/ordered-data.h
-> > @@ -127,18 +127,18 @@ struct btrfs_ordered_extent {
-> >      /* flags (described above) */
-> >      unsigned long flags;
-> >
-> > -    /* compression algorithm */
-> > -    int compress_type;
-> > -
-> > -    /* encryption mode */
-> > -    u8 encryption_type;
-> > -
-> >      /* Qgroup reserved space */
-> >      int qgroup_rsv;
-> >
-> >      /* reference count */
-> >      refcount_t refs;
-> >
-> > +    /* compression algorithm */
-> > +    int compress_type;
+> > +     if (first_ctx <= last_ctx) {
+> > +             int slot, nritems;
 > > +
-> > +    /* encryption mode */
-> > +    u8 encryption_type;
+> > +             btrfs_release_path(path);
+> > +
+> > +             key.objectid = ino;
+> > +             key.type = BTRFS_FSCRYPT_CTX_KEY;
+> > +             key.offset = first_ctx;
+> > +
+> > +             ret = btrfs_search_slot(trans, root, &key, path, modify_tree, !!modify_tree);
+> > +             if (ret < 0)
+> > +                     goto out_ctx;
+>
+> [ ... ]
+>
+> > +out_ctx:
+> > +             if (args->path && args->extent_inserted) {
+> > +                     btrfs_release_path(path);
+> > +
+> > +                     key.objectid = ino;
+> > +                     key.type = BTRFS_EXTENT_DATA_KEY;
+> > +                     key.offset = args->start;
+> > +                     ret = btrfs_search_slot(trans, root, &key, path, 0, 0);
+> > +             }
+> > +     }
 > > +
 >
-> Seems mostly the same?  I'd suggest paholing things to find a good spot.
-
-Hmm, that's what I did. There was a 4 bytes hole.
-Nah, I see. I just moved it. It's not a big deal then. The structure's
-size remains unchanged in either case. Still plugging a hole. Or am I
-missing something?
-
-> >      /* the inode we belong to */
-> >      struct btrfs_inode *inode;
-> >
-> >
-> >>>       /* Qgroup reserved space */
-> >>>       int qgroup_rsv;
-> >>>
-> >>> @@ -133,6 +136,9 @@ struct btrfs_ordered_extent {
-> >>>       /* the inode we belong to */
-> >>>       struct btrfs_inode *inode;
-> >>>
-> >>> +     /* the fscrypt_info for this extent, if necessary */
-> >>> +     struct fscrypt_extent_info *fscrypt_info;
-> >>> +
-> >>>       /* list of checksums for insertion when the extent io is done */
-> >>>       struct list_head list;
-> >>
-> >> How does btrfs_split_ordered_extent() handle the new fscrypt_info field?
-> >> Looking at that function in ordered-data.c, it calls alloc_ordered_extent()
-> >> which initializes encryption_type to BTRFS_ENCRYPTION_NONE and fscrypt_info
-> >> to NULL. If the original ordered extent has encryption_type set to
-> >
-> > Ditto. This is changed in the next patch [21/43].
-> > alloc_ordered_extent() correctly sets these fields.
+> Can btrfs_search_slot() at line 556 overwrite an error that occurred
+> earlier in the out_ctx path?
 >
-> It seems unlikely that we're really going to maintain bisectability for
-> encryption being on in the middle of this patchset.  So this seems fine
-> to me as long as the bug doesn't impact encryption being off.
+> If btrfs_search_slot() at line 515 fails and execution jumps to out_ctx,
+> but args->path and args->extent_inserted are both true, the second
+> btrfs_search_slot() call will overwrite the original error stored in ret.
+>
+> If this second search succeeds (returns 0 or >0), the function returns
+> success to the caller despite the fscrypt context cleanup having failed.
+> This could lead to inconsistent filesystem state where extent data was
+> inserted but the corresponding fscrypt context items were not properly
+> cleaned up.
 
-Yeah, I think it should not. (Famous last words...)
+Right, the original error should be returned. We do not care that much
+about the latter if the former failed.
+This should do the trick:
+
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -549,12 +549,16 @@ int btrfs_drop_extents(struct btrfs_trans_handle *trans,
+         }
+ out_ctx:
+         if (args->path && args->extent_inserted) {
++            int err;
++
+             btrfs_release_path(path);
+
+             key.objectid = ino;
+             key.type = BTRFS_EXTENT_DATA_KEY;
+             key.offset = args->start;
+-            ret = btrfs_search_slot(trans, root, &key, path, 0, 0);
++            err = btrfs_search_slot(trans, root, &key, path, 0, 0);
++            if (err && ret >= 0)
++                ret = err;
+         }
+     }
+
+
+> > diff --git a/fs/btrfs/tree-checker.c b/fs/btrfs/tree-checker.c
+> > index 9675dbcd78a3b..776901f297fea 100644
+> > --- a/fs/btrfs/tree-checker.c
+> > +++ b/fs/btrfs/tree-checker.c
+>
+> [ ... ]
+>
+> > +static int check_fscrypt_context(struct extent_buffer *leaf,
+> > +                              struct btrfs_key *key, int slot,
+> > +                              struct btrfs_key *prev_key)
+> > +{
+> > +     u32 sectorsize = leaf->fs_info->sectorsize;
+> > +     u32 item_size = btrfs_item_size(leaf, slot);
+> > +
+> > +     if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
+> > +             file_extent_err(leaf, slot,
+> > +"unaligned file_offset for encryption context, have %llu should be aligned to %u",
+> > +                     key->offset, sectorsize);
+> > +             return -EUCLEAN;
+> > +     }
+> > +
+> > +     /*
+> > +      * Previous key must have the same key->objectid (ino).
+> > +      * It can be XATTR_ITEM, INODE_ITEM or just another EXTENT_DATA.
+> > +      * But if objectids mismatch, it means we have a missing
+> > +      * INODE_ITEM.
+> > +      */
+>
+> This isn't a bug, but the comment says "It can be XATTR_ITEM, INODE_ITEM
+> or just another EXTENT_DATA" - can EXTENT_DATA actually be the previous
+> key type?
+>
+> For BTRFS_FSCRYPT_CTX_KEY (type=42), EXTENT_DATA (type=108) cannot be a
+> previous key because keys are sorted by (objectid, type, offset) and
+> 108 > 42.
+>
+> The correct previous key types would be: XATTR_ITEM, INODE_ITEM,
+> FSCRYPT_INODE_CTX_KEY, or another FSCRYPT_CTX_KEY.
+
+Spot on! The comment is wrong. I realized that later but never fixed it here.
+This is because of the redesign. In v5 the crypt context was embedded
+in the extent data item, so they could have been next to each other.
+This should look better:
+
+--- a/fs/btrfs/tree-checker.c
++++ b/fs/btrfs/tree-checker.c
+@@ -220,10 +220,9 @@ static int check_fscrypt_context(struct
+extent_buffer *leaf,
+     }
+
+     /*
+-     * Previous key must have the same key->objectid (ino).
+-     * It can be XATTR_ITEM, INODE_ITEM or just another EXTENT_DATA.
+-     * But if objectids mismatch, it means we have a missing
+-     * INODE_ITEM.
++     * Previous key must have the same key->objectid (ino).  It can be
++     * XATTR_ITEM, INODE_ITEM, FSCRYPT_INODE_CTX_KEY, or another
+FSCRYPT_CTX_KEY.
++     * But if objectids mismatch, it means we have a missing INODE_ITEM.
+      */
+     if (unlikely(!check_prev_ino(leaf, key, slot, prev_key)))
+         return -EUCLEAN;
+
+> > @@ -214,6 +248,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
+> >       u32 item_size = btrfs_item_size(leaf, slot);
+> >       u64 extent_end;
+> >       u8 policy;
+> > +     u8 fe_type;
+> >
+> >       if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
+> >               file_extent_err(leaf, slot,
+>
+> [ ... ]
+>
+> > @@ -298,6 +333,19 @@ static int check_extent_data_item(struct extent_buffer *leaf,
+> >               return 0;
+> >       }
+> >
+> > +     if (policy == BTRFS_ENCRYPTION_FSCRYPT) {
+> > +             /*
+> > +              * Only regular and prealloc extents should have an encryption
+> > +              * context.
+> > +              */
+> > +             if (unlikely(fe_type != BTRFS_FILE_EXTENT_REG &&
+> > +                          fe_type != BTRFS_FILE_EXTENT_PREALLOC)) {
+> > +                     file_extent_err(leaf, slot,
+> > +             "invalid type for encrypted file extent, have %u", fe_type);
+> > +                     return -EUCLEAN;
+> > +             }
+> > +     }
+>
+> Can this validation check detect encrypted inline extents? Looking at
+> the function flow, inline extents (BTRFS_FILE_EXTENT_INLINE) are handled
+> at lines 310-333 and return before reaching this check.
+>
+> If a corrupted filesystem has an encrypted inline extent, it would pass
+> tree-checker validation. Should the encryption check be moved to also
+> cover the inline extent path, or should inline extents explicitly reject
+> BTRFS_ENCRYPTION_FSCRYPT?
+
+Inline extents are not encrypted.
 
 Thanks.
 
 --nX
 
-> -chris
+On Sun, 8 Feb 2026 at 16:17, Chris Mason <clm@meta.com> wrote:
+>
+> Daniel Vacek <neelx@suse.com> wrote:
+> > From: Josef Bacik <josef@toxicpanda.com>
+> >
+> > The fscrypt encryption context will be stored as a new tree item type.
+> > This gives us flexibility to include different things in the future.
+> >
+> > Also update the tree-checker to validate the new item type.
+>
+> Hi everyone,
+>
+> I'm running the btrfs for-next branch, along with the encryption patch set
+> through my AI review prompts:
+>
+> https://github.com/masoncl/review-prompts
+>
+> I'm working on some btrfs specific instructions, but hopefully these reviews
+> are already useful.  I've kept the headers to make it easier to double check
+> that I'm actually replying to the right email, but please let me know if any
+> parts of this are incorrect:
+>
+> commit 203bfb91a4db9c826fa7f72034c13a1810a1b605
+> Author: Josef Bacik <josef@toxicpanda.com>
+>
+> btrfs: add extent encryption context tree item type
+>
+> The fscrypt encryption context will be stored as a new tree item type.
+> This gives us flexibility to include different things in the future.
+> Also update the tree-checker to validate the new item type.
+>
+> > diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+> > index 3c0db279f592e..639462164d089 100644
+> > --- a/fs/btrfs/file.c
+> > +++ b/fs/btrfs/file.c
+>
+> [ ... ]
+>
+> > @@ -496,6 +503,60 @@ int btrfs_drop_extents(struct btrfs_trans_handle *trans,
+> >               args->extent_inserted = true;
+> >       }
+> >
+> > +     if (first_ctx <= last_ctx) {
+> > +             int slot, nritems;
+> > +
+> > +             btrfs_release_path(path);
+> > +
+> > +             key.objectid = ino;
+> > +             key.type = BTRFS_FSCRYPT_CTX_KEY;
+> > +             key.offset = first_ctx;
+> > +
+> > +             ret = btrfs_search_slot(trans, root, &key, path, modify_tree, !!modify_tree);
+> > +             if (ret < 0)
+> > +                     goto out_ctx;
+>
+> [ ... ]
+>
+> > +out_ctx:
+> > +             if (args->path && args->extent_inserted) {
+> > +                     btrfs_release_path(path);
+> > +
+> > +                     key.objectid = ino;
+> > +                     key.type = BTRFS_EXTENT_DATA_KEY;
+> > +                     key.offset = args->start;
+> > +                     ret = btrfs_search_slot(trans, root, &key, path, 0, 0);
+> > +             }
+> > +     }
+> > +
+>
+> Can btrfs_search_slot() at line 556 overwrite an error that occurred
+> earlier in the out_ctx path?
+>
+> If btrfs_search_slot() at line 515 fails and execution jumps to out_ctx,
+> but args->path and args->extent_inserted are both true, the second
+> btrfs_search_slot() call will overwrite the original error stored in ret.
+>
+> If this second search succeeds (returns 0 or >0), the function returns
+> success to the caller despite the fscrypt context cleanup having failed.
+> This could lead to inconsistent filesystem state where extent data was
+> inserted but the corresponding fscrypt context items were not properly
+> cleaned up.
+>
+> > diff --git a/fs/btrfs/tree-checker.c b/fs/btrfs/tree-checker.c
+> > index 9675dbcd78a3b..776901f297fea 100644
+> > --- a/fs/btrfs/tree-checker.c
+> > +++ b/fs/btrfs/tree-checker.c
+>
+> [ ... ]
+>
+> > +static int check_fscrypt_context(struct extent_buffer *leaf,
+> > +                              struct btrfs_key *key, int slot,
+> > +                              struct btrfs_key *prev_key)
+> > +{
+> > +     u32 sectorsize = leaf->fs_info->sectorsize;
+> > +     u32 item_size = btrfs_item_size(leaf, slot);
+> > +
+> > +     if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
+> > +             file_extent_err(leaf, slot,
+> > +"unaligned file_offset for encryption context, have %llu should be aligned to %u",
+> > +                     key->offset, sectorsize);
+> > +             return -EUCLEAN;
+> > +     }
+> > +
+> > +     /*
+> > +      * Previous key must have the same key->objectid (ino).
+> > +      * It can be XATTR_ITEM, INODE_ITEM or just another EXTENT_DATA.
+> > +      * But if objectids mismatch, it means we have a missing
+> > +      * INODE_ITEM.
+> > +      */
+>
+> This isn't a bug, but the comment says "It can be XATTR_ITEM, INODE_ITEM
+> or just another EXTENT_DATA" - can EXTENT_DATA actually be the previous
+> key type?
+>
+> For BTRFS_FSCRYPT_CTX_KEY (type=42), EXTENT_DATA (type=108) cannot be a
+> previous key because keys are sorted by (objectid, type, offset) and
+> 108 > 42.
+>
+> The correct previous key types would be: XATTR_ITEM, INODE_ITEM,
+> FSCRYPT_INODE_CTX_KEY, or another FSCRYPT_CTX_KEY.
+>
+> > @@ -214,6 +248,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
+> >       u32 item_size = btrfs_item_size(leaf, slot);
+> >       u64 extent_end;
+> >       u8 policy;
+> > +     u8 fe_type;
+> >
+> >       if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
+> >               file_extent_err(leaf, slot,
+>
+> [ ... ]
+>
+> > @@ -298,6 +333,19 @@ static int check_extent_data_item(struct extent_buffer *leaf,
+> >               return 0;
+> >       }
+> >
+> > +     if (policy == BTRFS_ENCRYPTION_FSCRYPT) {
+> > +             /*
+> > +              * Only regular and prealloc extents should have an encryption
+> > +              * context.
+> > +              */
+> > +             if (unlikely(fe_type != BTRFS_FILE_EXTENT_REG &&
+> > +                          fe_type != BTRFS_FILE_EXTENT_PREALLOC)) {
+> > +                     file_extent_err(leaf, slot,
+> > +             "invalid type for encrypted file extent, have %u", fe_type);
+> > +                     return -EUCLEAN;
+> > +             }
+> > +     }
+>
+> Can this validation check detect encrypted inline extents? Looking at
+> the function flow, inline extents (BTRFS_FILE_EXTENT_INLINE) are handled
+> at lines 310-333 and return before reaching this check.
+>
+> If a corrupted filesystem has an encrypted inline extent, it would pass
+> tree-checker validation. Should the encryption check be moved to also
+> cover the inline extent path, or should inline extents explicitly reject
+> BTRFS_ENCRYPTION_FSCRYPT?
 >
