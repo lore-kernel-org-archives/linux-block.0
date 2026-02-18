@@ -1,137 +1,391 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F21F1A9F91;
-	Wed, 18 Feb 2026 21:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556A5335BDB
+	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 21:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771450387; cv=none; b=KtDYGEPusCEGeCFzoRqFcIlwq9NbswS/kO8KWfE5iVspkZ6w8PmcNcMv/SbD/Jr0Nh9DiVRbnnXxiVwuawjE1KCMRmI1Zs+S22OclC11KqZX31cPHd2PbVZT0G/SAP6OSyaHcbq+RXQsppjv4ycE2Eu+AUGLIBYvL44dIHrdrkQ=
+	t=1771450616; cv=none; b=olqkcXnPhqo4BHglb2aRK3dVOTG4lNr7rZ50Ju60oeqLwRVwpALe7hYHR8x4kMZHSdwrq2c0P5igfamhsmCr+sAYPLfCnQ9gTDlc8KgL8rwDb3yklncEx2/RaUYpTndlMWGMWmbR6xPnz03H7WHagjqV6hfjk3a00vT5Gl5C6TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771450387; c=relaxed/simple;
-	bh=kfGAhkOiB+AelT/oXAbO72B43PTOwZchxc5JaB0AiZM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T+u7vmfbkk9l8s6Kq4Ey5cBd3HyqcrVfIDuGn001LyC1SYfq+K53P0xH8S4sFUj0PJWt5bh95jsT4gjD6/bfyLxa2bPdWWe3rNr60ImzSLERhsaLoNtiPFwi+r9Of8ow5NOkLJds8kHLe624Accozn+JisKTSSd+EXY6Gy10UEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WxGKWj+/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771450616; c=relaxed/simple;
+	bh=T0LvtdehGbkNJTSiNQgmirD033nsR1VjUZyYykwDeYI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Q9zsV118H/HXgdvkTy1trL49R4by5OYPXVwQMdP/bo0AFgbnFUsgdm4hF5YUa7W93JlyA8BnngHE3y5VKRM2iEzgD+036VFhuXu3LxBtxIggTE8X+UHyoit609101AXDSHaFfMZ1vZxDOWD8LA5LOUJH3/u0tqsL8Zc9t7UJfa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=KeuNmF5o; arc=none smtp.client-ip=148.163.139.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WxGKWj+/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B228C116D0;
-	Wed, 18 Feb 2026 21:33:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771450386;
-	bh=kfGAhkOiB+AelT/oXAbO72B43PTOwZchxc5JaB0AiZM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=WxGKWj+/IcL2X5oUhb46em6jU/uFjuByWHnmdOlXoytpm1VpV7UIJzQCgePBTNvE1
-	 oQiDulu7hvWWdSluRvvHvPjtM8sP3CJoP2OACE4OYAKVKoLYP7NN6iVLAkbp2k+Fo6
-	 /xjfRoZvmr7YhxhceWBeoMgCb0zDTN5SkTc1GjDSeinL3VidSKgCDJh3m5OcvS0RbW
-	 90uyRVOOQyWOGBvUhMh6QQhGs3A1k2Hi7tm3OZv04GMA2af/BNzTsUjJCWvq7AtEoi
-	 jBLXpwXJ8zDzQXpRC0bg+0Vp2p9p3FDOH32EswwvHHEXc9+Iw4RB5dz9rgvhjmPl+8
-	 ZguLY0/4eZ8kg==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bvanassche@acm.org>, Chaitanya Kulkarni
- <chaitanyak@nvidia.com>, Christoph Hellwig <hch@lst.de>, Damien Le Moal
- <dlemoal@kernel.org>, Daniel Gomez <da.gomez@samsung.com>, Hannes Reinecke
- <hare@suse.de>, Hans Holmberg <Hans.Holmberg@wdc.com>, Jan Kara
- <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, Johannes Thumshirn
- <johannes.thumshirn@wdc.com>, John Pittman <jpittman@redhat.com>, John
-  Stultz <jstultz@google.com>, Keith Busch <kbusch@kernel.org>, "Martin K.
-  Petersen" <martin.petersen@oracle.com>, Miguel Ojeda <ojeda@kernel.org>,
- Ming Lei <ming.lei@redhat.com>, Niklas Cassel <cassel@kernel.org>, Nitesh
-  Shetty <nj.shetty@samsung.com>, Oliver Mangold <oliver.mangold@pm.me>,
- Pankaj Raghav <kernel@pankajraghav.com>, Shin'ichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>, Theodore Tso <tytso@mit.edu>, Wedson
-  Almeida Filho <wedsonaf@gmail.com>, Andreas Hindborg
- <a.hindborg@kernel.org>, gost.dev@samsung.com,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [LSF/MM/BPF TOPIC][RESEND] Status of Rust in the block subsystem
-Date: Wed, 18 Feb 2026 22:31:34 +0100
-Message-ID: <878qcpbux5.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="KeuNmF5o"
+Received: from pps.filterd (m0167075.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61ILDSBZ1788899
+	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 16:13:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps01; bh=uuJ79dh9olk4pYGV3v3Dl4Z5kR
+	JT1ZZ5CX7FO3lNziY=; b=KeuNmF5oPATHpJ95S8DRfxBbTUWTy53j/ULgNAxQWU
+	0ybJCdDUX8KamSqaD++34v507hflbquC/BwZaas9fSXXivIpGKw/MSm+qUZUB5By
+	Zg47BJ93bNc1Msqqr18QqBYryLWctBDCM/7OfotBLr82TvVNoq6nw5xOFTPojuE6
+	njW9YWrIVgH9yBajGp7dN5y+dpo8AST5XOhyH8M7rHqFE1Q4LU7Goaj18A3+4DnO
+	cxsp6MVO19RCoKXTk43qGsZYKR4eaYV7RSul6t5XySvt1JTiLN4rLf+pFjT3XU8r
+	lxRdk6Edk9tpF2NfOCzmYVt6vUvNEw8JTi5xsF+H9GdQ==
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4cdk3318gr-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 16:13:27 -0500 (EST)
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-506b3fb32a1so30606521cf.0
+        for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 13:13:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771449205; x=1772054005;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uuJ79dh9olk4pYGV3v3Dl4Z5kRJT1ZZ5CX7FO3lNziY=;
+        b=tL6UcYuq4jRaGudXQjuxktn16kuCloKPms8a2p72pUeUQ1fDntPHRxQ6BgRH112aiJ
+         ubg1fLbb1Q9EsbpTHV9yVklMm7pgNMPEazx1yT04HAnYUUSX2F4XeSivss2iob2VofCQ
+         bs1u5s3Ne1/A/oF2K+VNa8W7/Ujz+fL1xAoPIr6x4YmBZzHjmoUlMNNOxTd7NU/ldosJ
+         nLfUGkuq8iXy5Tv7zkBg+B9T1ylBmUb/+xiJWjOdkRLGyQ7kgZao7UMVA+JL5pEEw+dm
+         BRTcNiwTFl+6yLDys6SiPuNUES3/rkaKG2sXgIDcyZOZZ5sM3SYg5E6vYn9qFBuvAT5B
+         UIzQ==
+X-Gm-Message-State: AOJu0YyZtE4VsOFDukX8p8XvHMtyL/K8HoMztHd3awRqcjHqXy3cyorA
+	J0sktCLyOiQx8bLr8kfjXx9URoOULEwUcRWijkUQdWxDAo8D5fg13/fWCRDeqYO2ydHx2YaqGQn
+	Y+B3lNsA0ZNw3uouPxxdwbgf2tLk20uYs4nCWZmfsFZWgZtn9+e18+oT/aguF
+X-Gm-Gg: AZuq6aKzVcRZLyk2rF8rkY8IfLPzXi8n5A06dYqpYXdh5/qJh33/jhaa4AtTTTzdPTJ
+	BdLJROlUsHEzLXdFVzp1gn7zD8HbY1a+QUMRiNvUVIlkWAwR/GilCe9taR+brUla9uE44qeMAcF
+	vPkqR16GpR24wgT9hzVQsGTFR3wYu+oREQbUM/tSR0uS0sv5dkHw8OXMrSxkNrc/QpEJmLT7GmS
+	qWq7ck6DfI14k5IYyRuZkEIjYTd1GOts/Dl+ZcQ6TEYJ88lhpDlWSGkpr1jAoRtTqUa9Vbj8Fj6
+	e+0Ze21TNAM+jQLYB7IOjp3/cIMFnmC07ohenrSLjjcOP9d85tupw1V33TfLXZKUa5wbceJ9AuK
+	VTtzOmuh1PViQAVBO2O6IgYu5lOCc9TSu
+X-Received: by 2002:ac8:5ac3:0:b0:501:13b1:14cd with SMTP id d75a77b69052e-506b3f7dc4amr210923831cf.3.1771449204953;
+        Wed, 18 Feb 2026 13:13:24 -0800 (PST)
+X-Received: by 2002:ac8:5ac3:0:b0:501:13b1:14cd with SMTP id d75a77b69052e-506b3f7dc4amr210923401cf.3.1771449204472;
+        Wed, 18 Feb 2026 13:13:24 -0800 (PST)
+Received: from [127.0.1.1] ([216.158.158.246])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8972a23c824sm180233646d6.34.2026.02.18.13.13.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 13:13:23 -0800 (PST)
+From: Tal Zussman <tz2294@columbia.edu>
+Date: Wed, 18 Feb 2026 16:13:17 -0500
+Subject: [PATCH RFC] block: enable RWF_DONTCACHE for block devices
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260218-blk-dontcache-v1-1-fad6675ef71f@columbia.edu>
+X-B4-Tracking: v=1; b=H4sIAGwrlmkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDI0ML3aScbN2U/LyS5MTkjFRdY2MLQ2PjlBQDE9NUJaCegqLUtMwKsHn
+ RSkFuzkqxtbUAJdTZe2QAAAA=
+X-Change-ID: 20260218-blk-dontcache-338133dd045e
+To: Jens Axboe <axboe@kernel.dk>,
+        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sungjong Seo <sj1557.seo@samsung.com>,
+        Yuezhang Mo <yuezhang.mo@sony.com>, Dave Kleikamp <shaggy@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Bob Copeland <me@bobcopeland.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net,
+        Tal Zussman <tz2294@columbia.edu>
+X-Mailer: b4 0.14.3-dev-d7477
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1771449202; l=9869;
+ i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
+ bh=T0LvtdehGbkNJTSiNQgmirD033nsR1VjUZyYykwDeYI=;
+ b=ncr9b3Og8wbWU8LbF6spEUvNolCpc/Omr1KB8euffU2v938xtBKSpJRbDWzlQXyoEaqvB7eBM
+ EkxUdWlF2bvBic15lk0/0ypTHQFiFDCMJEjYAAgimrx91gq1j8YjEKy
+X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
+ pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
+X-Authority-Analysis: v=2.4 cv=Jqz8bc4C c=1 sm=1 tr=0 ts=69962b78 cx=c_pps
+ a=JbAStetqSzwMeJznSMzCyw==:117 a=mD05b5UW6KhLIDvowZ5dSQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=x7bEGLp0ZPQA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22
+ a=Omgu3vtQbb9kFtOpCJYA:9 a=QEXdDO2ut3YA:10 a=uxP6HrT_eTzRwkO_Te1X:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjE4MDE4MiBTYWx0ZWRfX7eVvpuzyJpZ1
+ P5hSEgEal9zNm1a5Ta+t8/Y/M+boRGOWs8bXhUwcLKeSUYEZV5E2YzYUNme/G1hTwfFYSRlzErs
+ 2I7mp+J1GgMqYC5nV2NeNIY08VFoGrr6aj0NTdbtKoJHasPjT/8QAX+6Btoou5T615dAJ0f349Z
+ zIVXmAly7CHuFBC6QH5yOtdIT492lnUl7bBn42r9i76EQ8lrdZKDEiaAGTv3qsBSfbp207qEShq
+ NaX8s3UiUNZq8C6LOjPcoixlOxe7lncFluuYFCLNB+omIl8gCOvyuicRtWm88CE0sKHbd24HQrw
+ CUTmFqcVSVk5GD/OBScLlSxaM/9sXw/q+XA9Ec/3DpBD7NDEJJpAda9thmgAloXZoFFm12ajWTW
+ NvHpmHZR11yoYSWVmVgLRjsx32QsdrSgtQivIX1k6zg8eXWfMi1hVlLWOgh+r4QTZxgIQR4ywJQ
+ qvHLYDY0ara3jpW4pvg==
+X-Proofpoint-GUID: tRDgz39QQ_d9zFOha5yiGXbUQ55RskwJ
+X-Proofpoint-ORIG-GUID: tRDgz39QQ_d9zFOha5yiGXbUQ55RskwJ
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11705
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 adultscore=0 priorityscore=1501 bulkscore=10 spamscore=0
+ impostorscore=10 lowpriorityscore=10 phishscore=0 malwarescore=0
+ clxscore=1011 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602180182
 
-This is a resend. I have been informed that the original email was
-malformed and might not have been delivered to the intended recipients.
-I apologize if you receive this email twice. Original content is below
-the cut.
+Block device buffered reads and writes already pass through
+filemap_read() and iomap_file_buffered_write() respectively, both of
+which handle IOCB_DONTCACHE. Enable RWF_DONTCACHE for block device files
+by setting FOP_DONTCACHE in def_blk_fops.
+
+For CONFIG_BUFFER_HEAD paths, thread the kiocb through
+block_write_begin() so that buffer_head-based I/O can use DONTCACHE
+behavior as well. Callers without a kiocb context (e.g. nilfs2 recovery)
+pass NULL, which preserves the existing behavior.
+
+This support is useful for databases that operate on raw block devices,
+among other userspace applications.
+
+Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+---
+This is based on v6.19. Please let me know if there's a different tree I
+should base this on.
+
+I wasn't sure if the block_write_begin() changes were necessary for
+block device support if CONFIG_BUFFER_HEAD is set (hence the RFC tag). I
+can remove those if they're not necessary.
+---
+ block/fops.c                |  4 ++--
+ fs/bfs/file.c               |  2 +-
+ fs/buffer.c                 | 12 ++++++++----
+ fs/exfat/inode.c            |  2 +-
+ fs/ext2/inode.c             |  2 +-
+ fs/jfs/inode.c              |  2 +-
+ fs/minix/inode.c            |  2 +-
+ fs/nilfs2/inode.c           |  2 +-
+ fs/nilfs2/recovery.c        |  2 +-
+ fs/ntfs3/inode.c            |  2 +-
+ fs/omfs/file.c              |  2 +-
+ fs/udf/inode.c              |  2 +-
+ fs/ufs/inode.c              |  2 +-
+ include/linux/buffer_head.h |  5 +++--
+ 14 files changed, 24 insertions(+), 19 deletions(-)
+
+diff --git a/block/fops.c b/block/fops.c
+index 4d32785b31d9..6bc727f8b252 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -505,7 +505,7 @@ static int blkdev_write_begin(const struct kiocb *iocb,
+ 			      unsigned len, struct folio **foliop,
+ 			      void **fsdata)
+ {
+-	return block_write_begin(mapping, pos, len, foliop, blkdev_get_block);
++	return block_write_begin(iocb, mapping, pos, len, foliop, blkdev_get_block);
+ }
+ 
+ static int blkdev_write_end(const struct kiocb *iocb,
+@@ -967,7 +967,7 @@ const struct file_operations def_blk_fops = {
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= blkdev_fallocate,
+ 	.uring_cmd	= blkdev_uring_cmd,
+-	.fop_flags	= FOP_BUFFER_RASYNC,
++	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
+ };
+ 
+ static __init int blkdev_init(void)
+diff --git a/fs/bfs/file.c b/fs/bfs/file.c
+index d33d6bde992b..f2804e38b8a7 100644
+--- a/fs/bfs/file.c
++++ b/fs/bfs/file.c
+@@ -177,7 +177,7 @@ static int bfs_write_begin(const struct kiocb *iocb,
+ {
+ 	int ret;
+ 
+-	ret = block_write_begin(mapping, pos, len, foliop, bfs_get_block);
++	ret = block_write_begin(iocb, mapping, pos, len, foliop, bfs_get_block);
+ 	if (unlikely(ret))
+ 		bfs_write_failed(mapping, pos + len);
+ 
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 838c0c571022..33c3580b85d8 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2241,14 +2241,18 @@ EXPORT_SYMBOL(block_commit_write);
+  *
+  * The filesystem needs to handle block truncation upon failure.
+  */
+-int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
+-		struct folio **foliop, get_block_t *get_block)
++int block_write_begin(const struct kiocb *iocb, struct address_space *mapping,
++		loff_t pos, unsigned len, struct folio **foliop, get_block_t *get_block)
+ {
+ 	pgoff_t index = pos >> PAGE_SHIFT;
++	fgf_t fgp_flags = FGP_WRITEBEGIN;
+ 	struct folio *folio;
+ 	int status;
+ 
+-	folio = __filemap_get_folio(mapping, index, FGP_WRITEBEGIN,
++	if (iocb && iocb->ki_flags & IOCB_DONTCACHE)
++		fgp_flags |= FGP_DONTCACHE;
++
++	folio = __filemap_get_folio(mapping, index, fgp_flags,
+ 			mapping_gfp_mask(mapping));
+ 	if (IS_ERR(folio))
+ 		return PTR_ERR(folio);
+@@ -2591,7 +2595,7 @@ int cont_write_begin(const struct kiocb *iocb, struct address_space *mapping,
+ 		(*bytes)++;
+ 	}
+ 
+-	return block_write_begin(mapping, pos, len, foliop, get_block);
++	return block_write_begin(iocb, mapping, pos, len, foliop, get_block);
+ }
+ EXPORT_SYMBOL(cont_write_begin);
+ 
+diff --git a/fs/exfat/inode.c b/fs/exfat/inode.c
+index f9501c3a3666..39d36e8fdfd6 100644
+--- a/fs/exfat/inode.c
++++ b/fs/exfat/inode.c
+@@ -456,7 +456,7 @@ static int exfat_write_begin(const struct kiocb *iocb,
+ 	if (unlikely(exfat_forced_shutdown(mapping->host->i_sb)))
+ 		return -EIO;
+ 
+-	ret = block_write_begin(mapping, pos, len, foliop, exfat_get_block);
++	ret = block_write_begin(iocb, mapping, pos, len, foliop, exfat_get_block);
+ 
+ 	if (ret < 0)
+ 		exfat_write_failed(mapping, pos+len);
+diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
+index dbfe9098a124..11aab03de752 100644
+--- a/fs/ext2/inode.c
++++ b/fs/ext2/inode.c
+@@ -930,7 +930,7 @@ ext2_write_begin(const struct kiocb *iocb, struct address_space *mapping,
+ {
+ 	int ret;
+ 
+-	ret = block_write_begin(mapping, pos, len, foliop, ext2_get_block);
++	ret = block_write_begin(iocb, mapping, pos, len, foliop, ext2_get_block);
+ 	if (ret < 0)
+ 		ext2_write_failed(mapping, pos + len);
+ 	return ret;
+diff --git a/fs/jfs/inode.c b/fs/jfs/inode.c
+index 4709762713ef..ae52db437771 100644
+--- a/fs/jfs/inode.c
++++ b/fs/jfs/inode.c
+@@ -303,7 +303,7 @@ static int jfs_write_begin(const struct kiocb *iocb,
+ {
+ 	int ret;
+ 
+-	ret = block_write_begin(mapping, pos, len, foliop, jfs_get_block);
++	ret = block_write_begin(iocb, mapping, pos, len, foliop, jfs_get_block);
+ 	if (unlikely(ret))
+ 		jfs_write_failed(mapping, pos + len);
+ 
+diff --git a/fs/minix/inode.c b/fs/minix/inode.c
+index 51ea9bdc813f..9075c0ba2f20 100644
+--- a/fs/minix/inode.c
++++ b/fs/minix/inode.c
+@@ -465,7 +465,7 @@ static int minix_write_begin(const struct kiocb *iocb,
+ {
+ 	int ret;
+ 
+-	ret = block_write_begin(mapping, pos, len, foliop, minix_get_block);
++	ret = block_write_begin(iocb, mapping, pos, len, foliop, minix_get_block);
+ 	if (unlikely(ret))
+ 		minix_write_failed(mapping, pos + len);
+ 
+diff --git a/fs/nilfs2/inode.c b/fs/nilfs2/inode.c
+index 51bde45d5865..d9d57eeecc5d 100644
+--- a/fs/nilfs2/inode.c
++++ b/fs/nilfs2/inode.c
+@@ -230,7 +230,7 @@ static int nilfs_write_begin(const struct kiocb *iocb,
+ 	if (unlikely(err))
+ 		return err;
+ 
+-	err = block_write_begin(mapping, pos, len, foliop, nilfs_get_block);
++	err = block_write_begin(iocb, mapping, pos, len, foliop, nilfs_get_block);
+ 	if (unlikely(err)) {
+ 		nilfs_write_failed(mapping, pos + len);
+ 		nilfs_transaction_abort(inode->i_sb);
+diff --git a/fs/nilfs2/recovery.c b/fs/nilfs2/recovery.c
+index a9c61d0492cb..2f5fe44bf736 100644
+--- a/fs/nilfs2/recovery.c
++++ b/fs/nilfs2/recovery.c
+@@ -541,7 +541,7 @@ static int nilfs_recover_dsync_blocks(struct the_nilfs *nilfs,
+ 		}
+ 
+ 		pos = rb->blkoff << inode->i_blkbits;
+-		err = block_write_begin(inode->i_mapping, pos, blocksize,
++		err = block_write_begin(NULL, inode->i_mapping, pos, blocksize,
+ 					&folio, nilfs_get_block);
+ 		if (unlikely(err)) {
+ 			loff_t isize = inode->i_size;
+diff --git a/fs/ntfs3/inode.c b/fs/ntfs3/inode.c
+index 0a9ac5efeb67..8c788feb319e 100644
+--- a/fs/ntfs3/inode.c
++++ b/fs/ntfs3/inode.c
+@@ -966,7 +966,7 @@ int ntfs_write_begin(const struct kiocb *iocb, struct address_space *mapping,
+ 			goto out;
+ 	}
+ 
+-	err = block_write_begin(mapping, pos, len, foliop,
++	err = block_write_begin(iocb, mapping, pos, len, foliop,
+ 				ntfs_get_block_write_begin);
+ 
+ out:
+diff --git a/fs/omfs/file.c b/fs/omfs/file.c
+index 49a1de5a827f..3bade632e36e 100644
+--- a/fs/omfs/file.c
++++ b/fs/omfs/file.c
+@@ -317,7 +317,7 @@ static int omfs_write_begin(const struct kiocb *iocb,
+ {
+ 	int ret;
+ 
+-	ret = block_write_begin(mapping, pos, len, foliop, omfs_get_block);
++	ret = block_write_begin(iocb, mapping, pos, len, foliop, omfs_get_block);
+ 	if (unlikely(ret))
+ 		omfs_write_failed(mapping, pos + len);
+ 
+diff --git a/fs/udf/inode.c b/fs/udf/inode.c
+index 7fae8002344a..aec9cdc938be 100644
+--- a/fs/udf/inode.c
++++ b/fs/udf/inode.c
+@@ -259,7 +259,7 @@ static int udf_write_begin(const struct kiocb *iocb,
+ 	int ret;
+ 
+ 	if (iinfo->i_alloc_type != ICBTAG_FLAG_AD_IN_ICB) {
+-		ret = block_write_begin(mapping, pos, len, foliop,
++		ret = block_write_begin(iocb, mapping, pos, len, foliop,
+ 					udf_get_block);
+ 		if (unlikely(ret))
+ 			udf_write_failed(mapping, pos + len);
+diff --git a/fs/ufs/inode.c b/fs/ufs/inode.c
+index e2b0a35de2a7..dfba985265a8 100644
+--- a/fs/ufs/inode.c
++++ b/fs/ufs/inode.c
+@@ -481,7 +481,7 @@ static int ufs_write_begin(const struct kiocb *iocb,
+ {
+ 	int ret;
+ 
+-	ret = block_write_begin(mapping, pos, len, foliop, ufs_getfrag_block);
++	ret = block_write_begin(iocb, mapping, pos, len, foliop, ufs_getfrag_block);
+ 	if (unlikely(ret))
+ 		ufs_write_failed(mapping, pos + len);
+ 
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index b16b88bfbc3e..4b07dec5f8eb 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -258,8 +258,9 @@ int __block_write_full_folio(struct inode *inode, struct folio *folio,
+ 		get_block_t *get_block, struct writeback_control *wbc);
+ int block_read_full_folio(struct folio *, get_block_t *);
+ bool block_is_partially_uptodate(struct folio *, size_t from, size_t count);
+-int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
+-		struct folio **foliop, get_block_t *get_block);
++int block_write_begin(const struct kiocb *iocb, struct address_space *mapping,
++		loff_t pos, unsigned len, struct folio **foliop,
++		get_block_t *get_block);
+ int __block_write_begin(struct folio *folio, loff_t pos, unsigned len,
+ 		get_block_t *get_block);
+ int block_write_end(loff_t pos, unsigned len, unsigned copied, struct folio *);
 
 ---
-
-I would like to propose a session to discuss the status of Rust in the block
-subsystem. I have two distinct points to discuss: 1) The status of Rust in the
-block layer, and 2) the out-of-tree Rust NVMe driver.
-
-== The status of Rust in the block subsystem ==
-
-Rust has special status in the block subsystem [1]. We are currently at "Stage
-1" of a two stage "kind of thing", where enabling Rust code in the block
-subsystem is essentially an experiment that can be terminated if it does not
-work out. In order to move on from this stage to "Stage 2", where Rust in the
-block subsystem is a first class citizen, we need two things. 1) We must observe
-that Rust is applicable for writing block device drivers and 2) the kernel in
-general must have fully adopted Rust.
-
-For 1) I just sent a patch series that brings the Rust null block driver to
-feature parity with the C counterpart [2]. Although the null block driver is not
-real hardware, I think this submission goes a long way to demonstrate that
-Rust is in fact applicable for writing block device drivers.
-
-For 2) I would point to the fact that Rust in general is no longer experimental
-in the kernel as a whole [3]. The "Rust Experiment" has been concluded,
-successfully. We see adoption in the form of the binder driver, and in the
-large, ongoing, effort targeting GPU drivers in the DRM subsystem. A few network
-PHY drivers also made it in. There is a lot of activity on the Rust list though,
-and I expect we will see Rust in more and more subsystems over the next few years.
-
-On that basis, I suggest we discuss whether or not we can move to "Stage 2" -
-and what that entails.
-
-== The out-of-tree Rust PCI NVMe driver ==
-
-As you may know, I am maintaining a Rust PCI NVMe driver out of tree. For the
-development work of the block layer Rust APIs, it has been essential to
-implement a real driver, in addition to the null block driver. A driver
-targeting actual hardware has to deal with interrupts, registers, IO memory,
-DMA, memory mappings, in a way that an emulated device does not. Keeping this
-driver around has helped shape the Rust block APIs in a way that makes sense for
-real devices, not just emulated ones.
-
-Rebasing this driver every cycle is a lot of work. Driven by requirements of the
-DRM drivers, core Rust APIs for DMA, register access, IO memory, etc. are being
-reshaped and rethought, which is great. Rebasing on top of these changes as a
-second class citizen all the time - not so great. But I believe that the Rust
-NVMe driver is a great piece of reference code, so I keep doing it.
-
-I would ask that we discuss merging the Rust NVMe driver so as to have a reference
-implementation of a real driver in-tree. I think it would have the following
-benefits:
-
- - It would help ensure that the Rust block layer API actually works with real
-   devices.
-
- - It would help make sure that the changes to core APIs that are made to
-   facilitate other subsystems are done in a way that is compatible with block
-   layer requirements.
-
- - It would serve as a nice reference implementation and a great piece of
-   documentation.
-
- - I would not have to rebase it all the time. Patches changing Rust APIs used
-   by Rust NVMe would have to change the Rust NVMe call sites.
-
-Please note the emphasis on *reference* driver. I am not suggesting to replace
-the existing C driver. I will maintain the new code if necessary.
-
-If we could establish consensus on this, I would clean up the driver to a state
-where it can be included in the kernel.
+base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+change-id: 20260218-blk-dontcache-338133dd045e
 
 Best regards,
-Andreas Hindborg
-
-Link: https://lore.kernel.org/r/593a98c9-baaa-496b-a9a7-c886463722e1@kernel.dk [1]
-Link: https://lore.kernel.org/r/20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org [2]
-Link: https://lore.kernel.org/all/20251213000042.23072-1-ojeda@kernel.org/ [3]
+-- 
+Tal Zussman <tz2294@columbia.edu>
 
