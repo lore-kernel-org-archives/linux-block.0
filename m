@@ -1,76 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A3933DEE5;
-	Wed, 18 Feb 2026 09:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66AE2FE56F
+	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 10:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771408608; cv=none; b=cJVW5fpzKdLb9tJHzi7np/x1HUlIAVF1hP0fiTaqOxBNsrL406k7vR2KcSdaMtkGmqDCQIVSs2BWIZQCtGbhp2cg4YtTrvJ6QFsoDocPc6C/b7MmCUm8cEjKjoRneMIlUCq+7UMe4hCs5O4yTdiTljlh2paVIh1TwJ/+AQLHl6E=
+	t=1771411982; cv=none; b=OOOKP7lGnIAt+vTDbj4d9NMnpECioLOASWoT233ZV4uktCcgPYBTMA6FGdqmaMkTX5LiWy4B+XsqBUw2YkIf689H7Ii6VPNfEbY+65pcni/CHYZ82AXxZ1qWR99uFXAMoY1AgUmEodtvAsJBj25hM6x3HI2hdzbw0OF+5z7PHHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771408608; c=relaxed/simple;
-	bh=2M/oHwf738t/3QfICnitZIlKcPZTFwrhHKLEPVnncmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IdQrYLsDp61jZZOPVbZwOvgGfBtFzDJj0bUOGMCCXHQQKQF+andAJEZ/7QNOjlv8T8KHbyUE0THRZYi7m6iRpcbu49GO+mSdkF9UNPlErTj+6zNtN8cZuIEkgpOLbnN/FEfWOPnhWB/K+ewHN5jT6MnXpkntHQoqgd1XQqAg1uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fgQ128kW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771411982; c=relaxed/simple;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=arVXJsE9NzwxR1TFtWcWPoYni9YzqXWfOCpnwPH6LG5CkhgFJ2meZARdKUon1CJ8/s/8nVjpXAOFDZB3AzybYp/x+5t5SZ1/wiq3Naepq+SkQIYPkTCzu05lhGN3LGrW45T5lxdONXIqi50s413WaljwjRLxZVq0kDlIVBG4RtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=MYGC1Pxj; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fgQ128kW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62380C19421;
-	Wed, 18 Feb 2026 09:56:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771408608;
-	bh=2M/oHwf738t/3QfICnitZIlKcPZTFwrhHKLEPVnncmI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fgQ128kWu65YDpWegMGfZb53YMJOn37hIRSVFfGx+pX+XzlqcyAlnYaoU4+6+1DmR
-	 RORpysuoN+2jc/iElKEHzTyrk0kzgPds9IeF8VxQJ+oNH9GOwItJ1Z3Oxdd7tUBcVN
-	 gc5Nrt9uyY/DSO/rlnEeiwkHWl3ev1N5AM2HgxyK3ZUZYnYyxqmq25m1NcF14MNeOg
-	 cCpyzWOtZJzVvtGzG8/VOLvy1VOmg3CHRMe8f06ebQMRHR55fCCvgN/TodM6lois0T
-	 F2PEVMj7VwCi7XlgOy78HPknik2Fxg643Q0kw2U9PSjATb6snf0OTVTdqf2Er++Lkg
-	 qhpQKFaFxakhg==
-Date: Wed, 18 Feb 2026 10:56:42 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Haris Iqbal <haris.iqbal@ionos.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, bpf@vger.kernel.org, lsf-pc@lists.linux-foundation.org, 
-	linux-kernel@vger.kernel.org, lwn@lwn.net
-Subject: Re: LSF/MM/BPF: 2026: Call for Proposals
-Message-ID: <20260218-haben-protokollieren-d4b5d2a1f8c9@brauner>
-References: <20260110-lsfmm-2026-cfp-ae970765d60e@brauner>
- <20260119-bagger-desaster-e11c27458c49@brauner>
- <20260129-beidseitig-unwohl-9ae543e9f9f5@brauner>
- <20260216-ruhelosigkeit-umlegen-548e2a107686@brauner>
- <CAJpMwyg-3-Z=ZDC60Vn0s-8Z78VOPKYmvX9s=Nnvcoao4T5zbg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="MYGC1Pxj"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260218105252epoutp04fda1789f488d8db7ae086a680e0f8755~VUc3PTWOx0436604366epoutp04K
+	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 10:52:52 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260218105252epoutp04fda1789f488d8db7ae086a680e0f8755~VUc3PTWOx0436604366epoutp04K
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1771411972;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=MYGC1PxjznuhiOWZu70tL4bYSlPmvjJ5fGp7ptC6gLYqdx1l7RKpNU69WhRXkh0TH
+	 6WydTKrvq7cj3KUxBMpVB59u+9t+tR0lSgd+qBYUyXcHNwMV/rHBSlyIjlImotWKPP
+	 9oRd7nDLpBMKXQNg6acGUvjn0o7zDuNfhzpWnyVg=
+Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20260218105252epcas5p2a1cd5fd4a4fa3e5a71cbbe99421ef9b6~VUc2nkLM00982209822epcas5p2x;
+	Wed, 18 Feb 2026 10:52:52 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.91]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4fGCyq3G6Xz6B9m6; Wed, 18 Feb
+	2026 10:52:51 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20260218105250epcas5p3d63a86bf5f61784ccd0f02bbaf2cd280~VUc1PEMui1692816928epcas5p3V;
+	Wed, 18 Feb 2026 10:52:50 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260218105249epsmtip10a20eda6b4f4ae6e5d841b750a3e92d2~VUczwmyvL1133211332epsmtip11;
+	Wed, 18 Feb 2026 10:52:48 +0000 (GMT)
+Message-ID: <e40e6a2f-a03a-4133-b863-a88df0b967cf@samsung.com>
+Date: Wed, 18 Feb 2026 16:22:48 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJpMwyg-3-Z=ZDC60Vn0s-8Z78VOPKYmvX9s=Nnvcoao4T5zbg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/15] block: pass a maxlen argument to
+ bio_iov_iter_bounce
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian
+	Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta
+	<anuj20.g@samsung.com>, linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20260218061238.3317841-8-hch@lst.de>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260218105250epcas5p3d63a86bf5f61784ccd0f02bbaf2cd280
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260218061322epcas5p2ad69ece4b346b48d47f90a52a120801e
+References: <20260218061238.3317841-1-hch@lst.de>
+	<CGME20260218061322epcas5p2ad69ece4b346b48d47f90a52a120801e@epcas5p2.samsung.com>
+	<20260218061238.3317841-8-hch@lst.de>
 
-On Tue, Feb 17, 2026 at 11:37:19AM +0100, Haris Iqbal wrote:
-> On Mon, Feb 16, 2026 at 3:28 PM Christian Brauner <brauner@kernel.org> wrote:
-> >
-> > On Thu, Jan 29, 2026 at 05:13:52PM +0100, Christian Brauner wrote:
-> > > On Mon, Jan 19, 2026 at 03:26:39PM +0100, Christian Brauner wrote:
-> > > > > (1) Fill out the following Google form to request attendance and
-> > > > >     suggest any topics for discussion:
-> > > > >
-> > > > >           https://forms.gle/hUgiEksr8CA1migCA
-> > > > >
-> > > > >     If advance notice is required for visa applications, please point
-> > > > >     that out in your proposal or request to attend, and submit the topic
-> > > > >     as soon as possible.
-> >
-> > This is (likely) the final reminder to put in your invitation request!
-> > The invitation request form closes this Friday, 20th February.
-> 
-> Hello,
-> 
-> What is the announcement date for accepted topics and invitations?
-
-We will very likely aim to get the initial batch of invitations out the
-middle or end of February.
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
