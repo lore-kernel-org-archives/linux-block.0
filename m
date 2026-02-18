@@ -1,469 +1,137 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AB62FF657
-	for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 17:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771435523; cv=pass; b=IFsHe/+r5vl0UaRpOs/pBu15pJh8Lxwfa/5Dun+H9jeFMtSTADc8THBJuGcZhidcUQwcy5KEDYSaRAVNkIn3fJQof9CPC6sZs+58Xyc2QqfamcyFTihm2n804QOeBpF264qtBofZUp1ba1zr3j2qPnWmHEm9SCnyl64FYZZUpyY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771435523; c=relaxed/simple;
-	bh=N+tav2HTy87uvDs4cm+LHcXfnxXGxM0ESG6Aqemj0F4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lszEco4ij/Ot4VT5PXv5BNrNwZFn77EURpOX+D9UvytaTN9OUwQeoSA3IVbpToqDd7mrcUFGox0MLcfdzhtWSuTPvDLmt3wEULvV6oeGkj7Uf7C2FZhGcSvq6TCeHnLI9lY6exiv/X17Zv//h0o5pGBB9onzZ7W7UXphmE1gQZ4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ST60dWro; arc=pass smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F21F1A9F91;
+	Wed, 18 Feb 2026 21:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771450387; cv=none; b=KtDYGEPusCEGeCFzoRqFcIlwq9NbswS/kO8KWfE5iVspkZ6w8PmcNcMv/SbD/Jr0Nh9DiVRbnnXxiVwuawjE1KCMRmI1Zs+S22OclC11KqZX31cPHd2PbVZT0G/SAP6OSyaHcbq+RXQsppjv4ycE2Eu+AUGLIBYvL44dIHrdrkQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771450387; c=relaxed/simple;
+	bh=kfGAhkOiB+AelT/oXAbO72B43PTOwZchxc5JaB0AiZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T+u7vmfbkk9l8s6Kq4Ey5cBd3HyqcrVfIDuGn001LyC1SYfq+K53P0xH8S4sFUj0PJWt5bh95jsT4gjD6/bfyLxa2bPdWWe3rNr60ImzSLERhsaLoNtiPFwi+r9Of8ow5NOkLJds8kHLe624Accozn+JisKTSSd+EXY6Gy10UEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WxGKWj+/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ST60dWro"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43591b55727so67243f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 09:25:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771435519; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Qi/kdvAlk7CagUg8aJ7tZMfUTM9AUZolE8m7QuI8+977vld70bGOb1bj0ct9jYqr5A
-         P/AebwpdZNjf62vGFj1o2DzxUEQo46yz2RUSrwTJ3FEHxUJmZMk6Wy5y6MdwkD+enI2I
-         xxm31yu94cQHNRXHpdw4w/05DBOuQwuQMc9JqwNo346K/29FAIF14X0V2zgEKA0raZ51
-         sw5VkfTXuIy0ggH7qkgc1LkCwMNmrUdgcMJFOCNeNueh0k8fhU0K52XvJJGrSkDl0sBW
-         dbrhRqmM41MbyldbKbiuOCvTbhGngRlyWrzxvTfQdiyb34euApobMVHIwtTW9XGm4t4T
-         BIrw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=D6PV26WrJgM8OsqISNWJ5AfIh8Z/AmyWHm0tc1qPxzY=;
-        fh=nmSkLQU0fm8Y75/5kyOWlu8vF26iE2FXolIA7mOgIQU=;
-        b=XiNIsDlQfMtW4NRSfm5d7NuIiPq8PcseYxztjgXE0zk7O9ZDLvKhJklpR9H8PX2G1w
-         9PialiioIgqxickjg2lh2lmrajzI6vo8CsAEP7aTG//uE+EHNCzEXqzgZNnFh7SfJ0dR
-         TwO5EhIDyUzSp5sILJRVCledp2QQ2c3BkQkDq8dhVSJEqPQ+K/JF2xCPbBLj6rWMFu+X
-         /hkaaEeRQXdch9PfWoW2krQ3plLiFVEtElgr+S4vY1BzoVakAopKD6AZ+XIimCMDaFtx
-         866QGkJDTVwdWWrompP24hFLokygNIrSkOOhl5Fl+pOz6WApsj0JzUElbR4cfsuqioa6
-         dw8g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1771435519; x=1772040319; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=D6PV26WrJgM8OsqISNWJ5AfIh8Z/AmyWHm0tc1qPxzY=;
-        b=ST60dWro0wvwS2dgKYtI4A8AaDQy7wm+Qg3slO8Ahg9ZTnnZrLBfNxma2LnoswIn9W
-         NLiOluW/rk20qQProSW3lRAhxJEjvY1hthDuLpjl07A1hgMMgnD3f2TmT9r7xn6wsfyX
-         KJxXceqaQkAp6M//qKERt3dhbSD9KDyj7REFt4/yYj6a4F7XCq5GYCihzF7LTB94MFTq
-         bV5/t8ujS6fzY7YhSxLLOlVsUIqv6YPuKf1iVGRckVMz3KMVcDn8aBy//PsD3KzgmbmJ
-         0fXK30LPk5pLxkC5XdJKN7UFG0ox8b34T1xuhztJsGS8gVDjsWlPMASh6DgUrhbg2IzI
-         ur8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771435519; x=1772040319;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D6PV26WrJgM8OsqISNWJ5AfIh8Z/AmyWHm0tc1qPxzY=;
-        b=XTlKji06iNjQHHo2KMaAQnNTfkwjslE+aoFc/f/NN/Az3dSAWJpyWsqtHWxWbdj5u+
-         pGcXL/fVH/9VuTQfxMU4v3lJ96yC0Hs0zfx528/DELRSQWaQ0FPHkme1rxIv/Yf+LLBV
-         zryySD56Xztnojj4Smc4jD1JD5NccBHF8cFco6s+wS8v9mA+fmbfRHCvqBOZ1XpAewx2
-         LXiE4I3RbFtoOSTnPqlunt5WRSgkDumiiFEykzfcXOCNxjmUEpM/zQh7NKw4PovcM+CP
-         4MQDTbZQq9eKMpaBKnY1HqJEnWqViWUHV0Vbp72la3TWNcBtmUo8IrD1TQerijqFfQn+
-         PCxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWlP7B87aX6OKgUuV1Khf+41Mt7yiXCjfW5ImaN0ZaO8Dnp3iA38RQMqempK+dcAkKn7X38xkt860JU5g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZXlLhLekJ9LDjdeFdnCjcIoeRjVDd7ZnZ5zRyq46nRVfM6+x0
-	OeFvGGwFZNO/z4lEcoeGz+mJcmUo2Gc+UKSbOSbOKikkyQm4EgJM1HgbGZnMuNOHlELvnu8OnCk
-	6IzicIM8eZArnzfMlaf91MFtEgyy8gujYod6XMpRqyg==
-X-Gm-Gg: AZuq6aLymUlCjwzCp0SXIaylr129o0oq00L7IWEPtHrknSHR5E24dZeR2zGp9gy6lVb
-	Bkx6kuTaf3CUmJdJoJxZJ0WSEtw7Bao2TyQ4DekEM4DhiCtumX0NjsiGTdB7WWRgXqxdbPHdqnq
-	N7iJl6dyjm22ycByL5CwfeglN7tTOJ7X0UHQlA4QHfqyvVnFV/Ua5Nb3iLyGUITYgkUCr1lkqaz
-	1iRyqw90OGdz2w8sLaU4FqhBAmM7dfBqYLz6AEl7fm05ZKvj6fM1MI69Kq1vdSMfAQFXu1rVED3
-	ARWsQk8mhWDuSvnS+X9mzYz6ra3BBKqZePpjDY63FMV0SNjMS8Yl/MTF9sR1ak47SraJb51KICn
-	4jgaR
-X-Received: by 2002:a05:6000:402b:b0:437:6e6e:6f95 with SMTP id
- ffacd0b85a97d-4379db70171mr28853405f8f.27.1771435519063; Wed, 18 Feb 2026
- 09:25:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WxGKWj+/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B228C116D0;
+	Wed, 18 Feb 2026 21:33:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771450386;
+	bh=kfGAhkOiB+AelT/oXAbO72B43PTOwZchxc5JaB0AiZM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WxGKWj+/IcL2X5oUhb46em6jU/uFjuByWHnmdOlXoytpm1VpV7UIJzQCgePBTNvE1
+	 oQiDulu7hvWWdSluRvvHvPjtM8sP3CJoP2OACE4OYAKVKoLYP7NN6iVLAkbp2k+Fo6
+	 /xjfRoZvmr7YhxhceWBeoMgCb0zDTN5SkTc1GjDSeinL3VidSKgCDJh3m5OcvS0RbW
+	 90uyRVOOQyWOGBvUhMh6QQhGs3A1k2Hi7tm3OZv04GMA2af/BNzTsUjJCWvq7AtEoi
+	 jBLXpwXJ8zDzQXpRC0bg+0Vp2p9p3FDOH32EswwvHHEXc9+Iw4RB5dz9rgvhjmPl+8
+	 ZguLY0/4eZ8kg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
+Cc: Bart Van Assche <bvanassche@acm.org>, Chaitanya Kulkarni
+ <chaitanyak@nvidia.com>, Christoph Hellwig <hch@lst.de>, Damien Le Moal
+ <dlemoal@kernel.org>, Daniel Gomez <da.gomez@samsung.com>, Hannes Reinecke
+ <hare@suse.de>, Hans Holmberg <Hans.Holmberg@wdc.com>, Jan Kara
+ <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, Johannes Thumshirn
+ <johannes.thumshirn@wdc.com>, John Pittman <jpittman@redhat.com>, John
+  Stultz <jstultz@google.com>, Keith Busch <kbusch@kernel.org>, "Martin K.
+  Petersen" <martin.petersen@oracle.com>, Miguel Ojeda <ojeda@kernel.org>,
+ Ming Lei <ming.lei@redhat.com>, Niklas Cassel <cassel@kernel.org>, Nitesh
+  Shetty <nj.shetty@samsung.com>, Oliver Mangold <oliver.mangold@pm.me>,
+ Pankaj Raghav <kernel@pankajraghav.com>, Shin'ichiro Kawasaki
+ <shinichiro.kawasaki@wdc.com>, Theodore Tso <tytso@mit.edu>, Wedson
+  Almeida Filho <wedsonaf@gmail.com>, Andreas Hindborg
+ <a.hindborg@kernel.org>, gost.dev@samsung.com,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [LSF/MM/BPF TOPIC][RESEND] Status of Rust in the block subsystem
+Date: Wed, 18 Feb 2026 22:31:34 +0100
+Message-ID: <878qcpbux5.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-25-neelx@suse.com>
- <20260208151728.3212554-1-clm@meta.com>
-In-Reply-To: <20260208151728.3212554-1-clm@meta.com>
-From: Daniel Vacek <neelx@suse.com>
-Date: Wed, 18 Feb 2026 18:25:07 +0100
-X-Gm-Features: AaiRm507L4YZn8mKVfmFL0jTM398GIfUhQk4fH9ld-lHWQu5maDHhF9XOU_HEIA
-Message-ID: <CAPjX3FdgJKQyM0tdCksgLAtVyjos_nx3TRg6rvjYB1wE2QH1Cw@mail.gmail.com>
-Subject: Re: [PATCH v6 24/43] btrfs: add extent encryption context tree item type
-To: Chris Mason <clm@meta.com>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-On Sun, 8 Feb 2026 at 16:17, Chris Mason <clm@meta.com> wrote:
-> Daniel Vacek <neelx@suse.com> wrote:
-> > From: Josef Bacik <josef@toxicpanda.com>
-> >
-> > The fscrypt encryption context will be stored as a new tree item type.
-> > This gives us flexibility to include different things in the future.
-> >
-> > Also update the tree-checker to validate the new item type.
->
-> Hi everyone,
->
-> I'm running the btrfs for-next branch, along with the encryption patch set
-> through my AI review prompts:
->
-> https://github.com/masoncl/review-prompts
->
-> I'm working on some btrfs specific instructions, but hopefully these reviews
-> are already useful.  I've kept the headers to make it easier to double check
-> that I'm actually replying to the right email, but please let me know if any
-> parts of this are incorrect:
->
-> commit 203bfb91a4db9c826fa7f72034c13a1810a1b605
-> Author: Josef Bacik <josef@toxicpanda.com>
->
-> btrfs: add extent encryption context tree item type
->
-> The fscrypt encryption context will be stored as a new tree item type.
-> This gives us flexibility to include different things in the future.
-> Also update the tree-checker to validate the new item type.
->
-> > diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-> > index 3c0db279f592e..639462164d089 100644
-> > --- a/fs/btrfs/file.c
-> > +++ b/fs/btrfs/file.c
->
-> [ ... ]
->
-> > @@ -496,6 +503,60 @@ int btrfs_drop_extents(struct btrfs_trans_handle *trans,
-> >               args->extent_inserted = true;
-> >       }
-> >
-> > +     if (first_ctx <= last_ctx) {
-> > +             int slot, nritems;
-> > +
-> > +             btrfs_release_path(path);
-> > +
-> > +             key.objectid = ino;
-> > +             key.type = BTRFS_FSCRYPT_CTX_KEY;
-> > +             key.offset = first_ctx;
-> > +
-> > +             ret = btrfs_search_slot(trans, root, &key, path, modify_tree, !!modify_tree);
-> > +             if (ret < 0)
-> > +                     goto out_ctx;
->
-> [ ... ]
->
-> > +out_ctx:
-> > +             if (args->path && args->extent_inserted) {
-> > +                     btrfs_release_path(path);
-> > +
-> > +                     key.objectid = ino;
-> > +                     key.type = BTRFS_EXTENT_DATA_KEY;
-> > +                     key.offset = args->start;
-> > +                     ret = btrfs_search_slot(trans, root, &key, path, 0, 0);
-> > +             }
-> > +     }
-> > +
->
-> Can btrfs_search_slot() at line 556 overwrite an error that occurred
-> earlier in the out_ctx path?
->
-> If btrfs_search_slot() at line 515 fails and execution jumps to out_ctx,
-> but args->path and args->extent_inserted are both true, the second
-> btrfs_search_slot() call will overwrite the original error stored in ret.
->
-> If this second search succeeds (returns 0 or >0), the function returns
-> success to the caller despite the fscrypt context cleanup having failed.
-> This could lead to inconsistent filesystem state where extent data was
-> inserted but the corresponding fscrypt context items were not properly
-> cleaned up.
+This is a resend. I have been informed that the original email was
+malformed and might not have been delivered to the intended recipients.
+I apologize if you receive this email twice. Original content is below
+the cut.
 
-Right, the original error should be returned. We do not care that much
-about the latter if the former failed.
-This should do the trick:
+---
 
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -549,12 +549,16 @@ int btrfs_drop_extents(struct btrfs_trans_handle *trans,
-         }
- out_ctx:
-         if (args->path && args->extent_inserted) {
-+            int err;
-+
-             btrfs_release_path(path);
+I would like to propose a session to discuss the status of Rust in the block
+subsystem. I have two distinct points to discuss: 1) The status of Rust in the
+block layer, and 2) the out-of-tree Rust NVMe driver.
 
-             key.objectid = ino;
-             key.type = BTRFS_EXTENT_DATA_KEY;
-             key.offset = args->start;
--            ret = btrfs_search_slot(trans, root, &key, path, 0, 0);
-+            err = btrfs_search_slot(trans, root, &key, path, 0, 0);
-+            if (err && ret >= 0)
-+                ret = err;
-         }
-     }
+== The status of Rust in the block subsystem ==
 
+Rust has special status in the block subsystem [1]. We are currently at "Stage
+1" of a two stage "kind of thing", where enabling Rust code in the block
+subsystem is essentially an experiment that can be terminated if it does not
+work out. In order to move on from this stage to "Stage 2", where Rust in the
+block subsystem is a first class citizen, we need two things. 1) We must observe
+that Rust is applicable for writing block device drivers and 2) the kernel in
+general must have fully adopted Rust.
 
-> > diff --git a/fs/btrfs/tree-checker.c b/fs/btrfs/tree-checker.c
-> > index 9675dbcd78a3b..776901f297fea 100644
-> > --- a/fs/btrfs/tree-checker.c
-> > +++ b/fs/btrfs/tree-checker.c
->
-> [ ... ]
->
-> > +static int check_fscrypt_context(struct extent_buffer *leaf,
-> > +                              struct btrfs_key *key, int slot,
-> > +                              struct btrfs_key *prev_key)
-> > +{
-> > +     u32 sectorsize = leaf->fs_info->sectorsize;
-> > +     u32 item_size = btrfs_item_size(leaf, slot);
-> > +
-> > +     if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
-> > +             file_extent_err(leaf, slot,
-> > +"unaligned file_offset for encryption context, have %llu should be aligned to %u",
-> > +                     key->offset, sectorsize);
-> > +             return -EUCLEAN;
-> > +     }
-> > +
-> > +     /*
-> > +      * Previous key must have the same key->objectid (ino).
-> > +      * It can be XATTR_ITEM, INODE_ITEM or just another EXTENT_DATA.
-> > +      * But if objectids mismatch, it means we have a missing
-> > +      * INODE_ITEM.
-> > +      */
->
-> This isn't a bug, but the comment says "It can be XATTR_ITEM, INODE_ITEM
-> or just another EXTENT_DATA" - can EXTENT_DATA actually be the previous
-> key type?
->
-> For BTRFS_FSCRYPT_CTX_KEY (type=42), EXTENT_DATA (type=108) cannot be a
-> previous key because keys are sorted by (objectid, type, offset) and
-> 108 > 42.
->
-> The correct previous key types would be: XATTR_ITEM, INODE_ITEM,
-> FSCRYPT_INODE_CTX_KEY, or another FSCRYPT_CTX_KEY.
+For 1) I just sent a patch series that brings the Rust null block driver to
+feature parity with the C counterpart [2]. Although the null block driver is not
+real hardware, I think this submission goes a long way to demonstrate that
+Rust is in fact applicable for writing block device drivers.
 
-Spot on! The comment is wrong. I realized that later but never fixed it here.
-This is because of the redesign. In v5 the crypt context was embedded
-in the extent data item, so they could have been next to each other.
-This should look better:
+For 2) I would point to the fact that Rust in general is no longer experimental
+in the kernel as a whole [3]. The "Rust Experiment" has been concluded,
+successfully. We see adoption in the form of the binder driver, and in the
+large, ongoing, effort targeting GPU drivers in the DRM subsystem. A few network
+PHY drivers also made it in. There is a lot of activity on the Rust list though,
+and I expect we will see Rust in more and more subsystems over the next few years.
 
---- a/fs/btrfs/tree-checker.c
-+++ b/fs/btrfs/tree-checker.c
-@@ -220,10 +220,9 @@ static int check_fscrypt_context(struct
-extent_buffer *leaf,
-     }
+On that basis, I suggest we discuss whether or not we can move to "Stage 2" -
+and what that entails.
 
-     /*
--     * Previous key must have the same key->objectid (ino).
--     * It can be XATTR_ITEM, INODE_ITEM or just another EXTENT_DATA.
--     * But if objectids mismatch, it means we have a missing
--     * INODE_ITEM.
-+     * Previous key must have the same key->objectid (ino).  It can be
-+     * XATTR_ITEM, INODE_ITEM, FSCRYPT_INODE_CTX_KEY, or another
-FSCRYPT_CTX_KEY.
-+     * But if objectids mismatch, it means we have a missing INODE_ITEM.
-      */
-     if (unlikely(!check_prev_ino(leaf, key, slot, prev_key)))
-         return -EUCLEAN;
+== The out-of-tree Rust PCI NVMe driver ==
 
-> > @@ -214,6 +248,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
-> >       u32 item_size = btrfs_item_size(leaf, slot);
-> >       u64 extent_end;
-> >       u8 policy;
-> > +     u8 fe_type;
-> >
-> >       if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
-> >               file_extent_err(leaf, slot,
->
-> [ ... ]
->
-> > @@ -298,6 +333,19 @@ static int check_extent_data_item(struct extent_buffer *leaf,
-> >               return 0;
-> >       }
-> >
-> > +     if (policy == BTRFS_ENCRYPTION_FSCRYPT) {
-> > +             /*
-> > +              * Only regular and prealloc extents should have an encryption
-> > +              * context.
-> > +              */
-> > +             if (unlikely(fe_type != BTRFS_FILE_EXTENT_REG &&
-> > +                          fe_type != BTRFS_FILE_EXTENT_PREALLOC)) {
-> > +                     file_extent_err(leaf, slot,
-> > +             "invalid type for encrypted file extent, have %u", fe_type);
-> > +                     return -EUCLEAN;
-> > +             }
-> > +     }
->
-> Can this validation check detect encrypted inline extents? Looking at
-> the function flow, inline extents (BTRFS_FILE_EXTENT_INLINE) are handled
-> at lines 310-333 and return before reaching this check.
->
-> If a corrupted filesystem has an encrypted inline extent, it would pass
-> tree-checker validation. Should the encryption check be moved to also
-> cover the inline extent path, or should inline extents explicitly reject
-> BTRFS_ENCRYPTION_FSCRYPT?
+As you may know, I am maintaining a Rust PCI NVMe driver out of tree. For the
+development work of the block layer Rust APIs, it has been essential to
+implement a real driver, in addition to the null block driver. A driver
+targeting actual hardware has to deal with interrupts, registers, IO memory,
+DMA, memory mappings, in a way that an emulated device does not. Keeping this
+driver around has helped shape the Rust block APIs in a way that makes sense for
+real devices, not just emulated ones.
 
-Inline extents are not encrypted.
+Rebasing this driver every cycle is a lot of work. Driven by requirements of the
+DRM drivers, core Rust APIs for DMA, register access, IO memory, etc. are being
+reshaped and rethought, which is great. Rebasing on top of these changes as a
+second class citizen all the time - not so great. But I believe that the Rust
+NVMe driver is a great piece of reference code, so I keep doing it.
 
-Thanks.
+I would ask that we discuss merging the Rust NVMe driver so as to have a reference
+implementation of a real driver in-tree. I think it would have the following
+benefits:
 
---nX
+ - It would help ensure that the Rust block layer API actually works with real
+   devices.
 
-On Sun, 8 Feb 2026 at 16:17, Chris Mason <clm@meta.com> wrote:
->
-> Daniel Vacek <neelx@suse.com> wrote:
-> > From: Josef Bacik <josef@toxicpanda.com>
-> >
-> > The fscrypt encryption context will be stored as a new tree item type.
-> > This gives us flexibility to include different things in the future.
-> >
-> > Also update the tree-checker to validate the new item type.
->
-> Hi everyone,
->
-> I'm running the btrfs for-next branch, along with the encryption patch set
-> through my AI review prompts:
->
-> https://github.com/masoncl/review-prompts
->
-> I'm working on some btrfs specific instructions, but hopefully these reviews
-> are already useful.  I've kept the headers to make it easier to double check
-> that I'm actually replying to the right email, but please let me know if any
-> parts of this are incorrect:
->
-> commit 203bfb91a4db9c826fa7f72034c13a1810a1b605
-> Author: Josef Bacik <josef@toxicpanda.com>
->
-> btrfs: add extent encryption context tree item type
->
-> The fscrypt encryption context will be stored as a new tree item type.
-> This gives us flexibility to include different things in the future.
-> Also update the tree-checker to validate the new item type.
->
-> > diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-> > index 3c0db279f592e..639462164d089 100644
-> > --- a/fs/btrfs/file.c
-> > +++ b/fs/btrfs/file.c
->
-> [ ... ]
->
-> > @@ -496,6 +503,60 @@ int btrfs_drop_extents(struct btrfs_trans_handle *trans,
-> >               args->extent_inserted = true;
-> >       }
-> >
-> > +     if (first_ctx <= last_ctx) {
-> > +             int slot, nritems;
-> > +
-> > +             btrfs_release_path(path);
-> > +
-> > +             key.objectid = ino;
-> > +             key.type = BTRFS_FSCRYPT_CTX_KEY;
-> > +             key.offset = first_ctx;
-> > +
-> > +             ret = btrfs_search_slot(trans, root, &key, path, modify_tree, !!modify_tree);
-> > +             if (ret < 0)
-> > +                     goto out_ctx;
->
-> [ ... ]
->
-> > +out_ctx:
-> > +             if (args->path && args->extent_inserted) {
-> > +                     btrfs_release_path(path);
-> > +
-> > +                     key.objectid = ino;
-> > +                     key.type = BTRFS_EXTENT_DATA_KEY;
-> > +                     key.offset = args->start;
-> > +                     ret = btrfs_search_slot(trans, root, &key, path, 0, 0);
-> > +             }
-> > +     }
-> > +
->
-> Can btrfs_search_slot() at line 556 overwrite an error that occurred
-> earlier in the out_ctx path?
->
-> If btrfs_search_slot() at line 515 fails and execution jumps to out_ctx,
-> but args->path and args->extent_inserted are both true, the second
-> btrfs_search_slot() call will overwrite the original error stored in ret.
->
-> If this second search succeeds (returns 0 or >0), the function returns
-> success to the caller despite the fscrypt context cleanup having failed.
-> This could lead to inconsistent filesystem state where extent data was
-> inserted but the corresponding fscrypt context items were not properly
-> cleaned up.
->
-> > diff --git a/fs/btrfs/tree-checker.c b/fs/btrfs/tree-checker.c
-> > index 9675dbcd78a3b..776901f297fea 100644
-> > --- a/fs/btrfs/tree-checker.c
-> > +++ b/fs/btrfs/tree-checker.c
->
-> [ ... ]
->
-> > +static int check_fscrypt_context(struct extent_buffer *leaf,
-> > +                              struct btrfs_key *key, int slot,
-> > +                              struct btrfs_key *prev_key)
-> > +{
-> > +     u32 sectorsize = leaf->fs_info->sectorsize;
-> > +     u32 item_size = btrfs_item_size(leaf, slot);
-> > +
-> > +     if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
-> > +             file_extent_err(leaf, slot,
-> > +"unaligned file_offset for encryption context, have %llu should be aligned to %u",
-> > +                     key->offset, sectorsize);
-> > +             return -EUCLEAN;
-> > +     }
-> > +
-> > +     /*
-> > +      * Previous key must have the same key->objectid (ino).
-> > +      * It can be XATTR_ITEM, INODE_ITEM or just another EXTENT_DATA.
-> > +      * But if objectids mismatch, it means we have a missing
-> > +      * INODE_ITEM.
-> > +      */
->
-> This isn't a bug, but the comment says "It can be XATTR_ITEM, INODE_ITEM
-> or just another EXTENT_DATA" - can EXTENT_DATA actually be the previous
-> key type?
->
-> For BTRFS_FSCRYPT_CTX_KEY (type=42), EXTENT_DATA (type=108) cannot be a
-> previous key because keys are sorted by (objectid, type, offset) and
-> 108 > 42.
->
-> The correct previous key types would be: XATTR_ITEM, INODE_ITEM,
-> FSCRYPT_INODE_CTX_KEY, or another FSCRYPT_CTX_KEY.
->
-> > @@ -214,6 +248,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
-> >       u32 item_size = btrfs_item_size(leaf, slot);
-> >       u64 extent_end;
-> >       u8 policy;
-> > +     u8 fe_type;
-> >
-> >       if (unlikely(!IS_ALIGNED(key->offset, sectorsize))) {
-> >               file_extent_err(leaf, slot,
->
-> [ ... ]
->
-> > @@ -298,6 +333,19 @@ static int check_extent_data_item(struct extent_buffer *leaf,
-> >               return 0;
-> >       }
-> >
-> > +     if (policy == BTRFS_ENCRYPTION_FSCRYPT) {
-> > +             /*
-> > +              * Only regular and prealloc extents should have an encryption
-> > +              * context.
-> > +              */
-> > +             if (unlikely(fe_type != BTRFS_FILE_EXTENT_REG &&
-> > +                          fe_type != BTRFS_FILE_EXTENT_PREALLOC)) {
-> > +                     file_extent_err(leaf, slot,
-> > +             "invalid type for encrypted file extent, have %u", fe_type);
-> > +                     return -EUCLEAN;
-> > +             }
-> > +     }
->
-> Can this validation check detect encrypted inline extents? Looking at
-> the function flow, inline extents (BTRFS_FILE_EXTENT_INLINE) are handled
-> at lines 310-333 and return before reaching this check.
->
-> If a corrupted filesystem has an encrypted inline extent, it would pass
-> tree-checker validation. Should the encryption check be moved to also
-> cover the inline extent path, or should inline extents explicitly reject
-> BTRFS_ENCRYPTION_FSCRYPT?
->
+ - It would help make sure that the changes to core APIs that are made to
+   facilitate other subsystems are done in a way that is compatible with block
+   layer requirements.
+
+ - It would serve as a nice reference implementation and a great piece of
+   documentation.
+
+ - I would not have to rebase it all the time. Patches changing Rust APIs used
+   by Rust NVMe would have to change the Rust NVMe call sites.
+
+Please note the emphasis on *reference* driver. I am not suggesting to replace
+the existing C driver. I will maintain the new code if necessary.
+
+If we could establish consensus on this, I would clean up the driver to a state
+where it can be included in the kernel.
+
+Best regards,
+Andreas Hindborg
+
+Link: https://lore.kernel.org/r/593a98c9-baaa-496b-a9a7-c886463722e1@kernel.dk [1]
+Link: https://lore.kernel.org/r/20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org [2]
+Link: https://lore.kernel.org/all/20251213000042.23072-1-ojeda@kernel.org/ [3]
+
