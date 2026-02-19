@@ -1,208 +1,180 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A030C2DCF4C;
-	Thu, 19 Feb 2026 02:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771466681; cv=none; b=AM4N0/DNyBPR5lVFRQfKp/dlbM+RK1o9NCoxQ3i48RzB15/W0AHQpGFRk38+vfAHlsFQ68ME+5Vk8zwOWbcj+hCtEsfUp364lQHgw3wa9wOC0eb9gnFxvye9MF0LjzGpiG3tOoSsuISQ7QuUW53hsIMf2FeUK/fXCVxMtt3JnXU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771466681; c=relaxed/simple;
-	bh=bPo6irn4L27PBL7wCzQUZj+yQ5CRpD1GRlWw8+EcY34=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vy6IOhoqCh1IIjScs9ZYfj8dNe/6PPOS+8qiScvqpIJqOBC6o+g7MnPaJxtb+PvGW+6b3D9ZDqBelodMOvYPs3POSBgaC2X3QjT7Q9bAjDKwtHvWRyev3XWAiw/msg9aNcFPudaP9kEMvq7HuoR7C/JL1H10MhCInTP66hariqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bf++E7Cc; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C9F262D0B
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 05:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771479543; cv=pass; b=GoGdF/nA9PvMzgfVWolILquHJl5oJ8ETPOOWt8BoXVXFO570jeXCbDwNaCLBkk54FLuGzh4HcO+67bD+kr5IYMQ8vvunfTX8V2cJETbzyzbOFoBZ586O9qh1Ns6j25sqNiUcn0PwREOIibELKRo/XFqF+ghCWoNL16QEJehIGHQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771479543; c=relaxed/simple;
+	bh=JfpGmH93zrf0ivQZq5XswlZvKz2XZ0BAPJqLOFBVyDI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=tpv1sMAJIooTPO05/+wgKMM06hciyVfAaZF26OtCmLXfDQMuGwH5ZxzZjJgz9c9RduA5BKfIHvD3+Ik/sHnaRtNEOpLPxRnaQISZGojZBsi1Em3mMO+6M5b86Llkh3OmA74ln8StriFn4DtFHQh1nagGjOPYyFmJrMmRMkT6+FE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AAqBH+pI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rHvcnijn; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bf++E7Cc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2062C19424;
-	Thu, 19 Feb 2026 02:04:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771466681;
-	bh=bPo6irn4L27PBL7wCzQUZj+yQ5CRpD1GRlWw8+EcY34=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Bf++E7Cc+YLFg1mvAdbaucQknsX+PrmwB6HQBQxcHU17GE2TbrDNPul7Se/ynFCUI
-	 5+enGAptO48jYxNBi+C1KdXocByoo0OxYE61B1/ndcldR3kqNdkpancRvyQBW0uBQC
-	 EHEJZIgEtZ+tGfrq8jn6t0hXlh+jfhk/xpvKwiRPCNJfUFG48z0u4qSU1tQATtlhhG
-	 4vNvTxzRMmGYQ5Tv6vNrLbiCSCPLcoj2HtnH8ead7ZQiYW6ci+/BMhhfCIaNv7M22o
-	 7kGM5sK9w4z5dzJTXI/nkSiZRuZk28ihvcNYGP3nvdq7kz0nAv9L+b4eEciWO2QFcf
-	 ZdiDACQyxG+Qw==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Chaitanya Kulkarni <kch@nvidia.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19] block: fix partial IOVA mapping cleanup in blk_rq_dma_map_iova
-Date: Wed, 18 Feb 2026 21:03:50 -0500
-Message-ID: <20260219020422.1539798-14-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260219020422.1539798-1-sashal@kernel.org>
-References: <20260219020422.1539798-1-sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AAqBH+pI";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rHvcnijn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771479541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=kOS5XCAZ7s18H+yJMwEy2Ks3wIVTG5DOD6ofLB7byYo=;
+	b=AAqBH+pI2zugUYF/HxAmXSxnifTE0QI5mMzuKtj3orXDOauwSxgckV89XfynH1Ch77fM6d
+	GSrjaHrW/0wNad0MpWra5c/I6U6JFCu2bu7CqAIhQ7FE3TTOiZ0X4xSyF5xeQFwt2na/0O
+	ZmTk/4hXBsR+gbPudOMUsd+8fQbyi5E=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-202-F2X7FZAGP7qPlx7G050eWw-1; Thu, 19 Feb 2026 00:38:59 -0500
+X-MC-Unique: F2X7FZAGP7qPlx7G050eWw-1
+X-Mimecast-MFC-AGG-ID: F2X7FZAGP7qPlx7G050eWw_1771479538
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-59e5c59df7aso412813e87.1
+        for <linux-block@vger.kernel.org>; Wed, 18 Feb 2026 21:38:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771479538; cv=none;
+        d=google.com; s=arc-20240605;
+        b=c3ckKs1fZyk6mImATQZCG9pjLFl0QJ8fkQjVLIL1ulPxG+mjRYMAcPfbSVoJvaSnlU
+         a0KE5ICB8VchbKzZ6cIEC34xrEOZVz0iGxpDj19wqjosDKflp5rT0Abhhwwf5rO5aSxX
+         +2tWE+olR9NDzqf5f0q8zgi/bs1Cdq2j54z8QOrBZAdI+oZ2F0Qu8JBHgfRxj+Wq5AaE
+         FtoB5PpB06ZtKnIceAczoCxvj7+TdLwAHamGBm7uFi+pTJoDnJ2mVnJkyf7uMOsg3Acc
+         OB7cJ3JGsbw1z0QKOPzxqYPiX4J5vfGyfqaHEaEumjEog21UZ2daWCq5VimD7yUXj4A9
+         0zgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=kOS5XCAZ7s18H+yJMwEy2Ks3wIVTG5DOD6ofLB7byYo=;
+        fh=UYTUZond9cC40q1LNX81k8AyA9OrSzWceiCCaIFaeck=;
+        b=c1kIf9bj6BuQUKXgEfrEk27diMPQqogm8TxuF2b7LKtO0AjCLhGWmhuCQK7uskigPx
+         GtdWchhDhm+MToOAx7b6SMvNRXUDMqYn34TI74qzknE/V9mOfLjUnFdWXV9cHulegFKJ
+         czUk3cgdrHcD/CaLXzjPKmlQaK71pUCB0QhWUcJg/JlG0F/7SjqHgJyL3NeL+9sti/hU
+         EyCs0rDMTdCBpOnmxw9XpBMp4DA0ZE/Uhk4BQWY0xOzorMKSMr4WGTkXEodz8YAGUhWf
+         8Q8Fv2dUATLLeDczcxf4ERmSOat3rNnmjPzb8v7NPPHdDwUx2Jh0pWo/LBkhFgFGehDm
+         gr/A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1771479538; x=1772084338; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kOS5XCAZ7s18H+yJMwEy2Ks3wIVTG5DOD6ofLB7byYo=;
+        b=rHvcnijnxE3cTF49pOuZ0aGDtCMxlBbeNOonYZMfxeBvS7h6cxZgSHsGlQZ6oN+E3A
+         eGPE2PCC+uan4fjRxhVKr3Yg893XR39BvuTKzXjFa3MZ+ZOyp6uF8ab1RsP+r4lCOMzX
+         HP4/v0x8IRN28wa4H2iA1vrWc9LwDaaJ51efiMvM2ESKX2tRSF9+XW7Yq23v/ZTTFhQY
+         4XfqZYmHljYTmsdLaJsDjcinZh2ix0fYix9yMhA27niwvZSzGcZsKEPMgvv5hc8bBQHi
+         NjHJMdfuxSXW4Y9yY6py21Fc3qJfpp3ZCuTjqx1S2xTgaTG7omwLKVHXNpuHGa1TY+0l
+         0xSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771479538; x=1772084338;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kOS5XCAZ7s18H+yJMwEy2Ks3wIVTG5DOD6ofLB7byYo=;
+        b=qwVGHgz+DYL7zZ57H8a2v3OCQl0a5q9iVrsXQrc2TCikkMiozWijTsQih08q02uzRA
+         ZcphEUJmDQHPZGZOeabwltOsZ2oW+lj6hzAF+Ozx3zzxXE0sLStDZLtDAjOVpOFOm6m3
+         zVlBd5epKs8l8ljM0OD7E0d/RM6U8GqxXkFJzZJ+4TR0u8WfHAd8+tGVJdxbh3RLezkE
+         VrMQ/kQM90on/PSECAbA7e6eV8PbUC+yzOoPwxwlk9Qv4nLGLxvxfGgja0cFwrWqgmYD
+         48KYHTnQvrA9LqwNuJwB5d2RcZQlyuEJZeULsUNsVqfaJL60s54C8XL1ysmKc+X5bqte
+         ShWw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3JyAHMS5S9Ey8sjh9xqyfjirAt5h8L8vJGsSYez5ymuUa6ghcGXZVtmsuOvmC7+dwMVTkbyvQttJ2UA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf4dwJkR9j0VnE+viKc38V8deSaErpjLv75VDUcj+L8wMYZYfA
+	jTTZh24nGvgR+K6kvj/nOXJIbLxIeg+fN49sdo2ze9dGjfPSWeRUrSMEO2KHHhTo1KubyaAiSIF
+	ozmW+UUffnPw+I3HiZF/lLAmqPK8FGqguaDmLJG8TWbzcWlmn2xcamQjcTDHbFlXYl5FAcClDM4
+	bw4hqLSSCxgz8aIN/9KZRAOx2JDAaw/B0qAmRWwEA=
+X-Gm-Gg: AZuq6aITzuzvFDHqcDVnCSsYRFysNCbs01WtSGM9e3oIIbuaYC5QCpz/MuzPbBcgzNa
+	/tJScA+ImzsY/sXHLEzMNz7ktpL+PaX7xwOkZsDPD429+vG4RBzRvXFCWNjbHQi0ZrkldtGWusx
+	rkOPc3sFx+FXIEWzKDejLdwGpxWl/AJTZpCFQW5tivjPvm8dxYaSVX1Yx7kMSZzteiABgmOuX9I
+	MLbEBuYy+IlfQM5mDGOCLJGGW9aIVXXAKM84ikq6EQkiZ74e3pom0dgkeSyOq7iJ0PU1WouMBHf
+	cBuGIA==
+X-Received: by 2002:a05:6512:3190:b0:59d:dffb:cd70 with SMTP id 2adb3069b0e04-59f8adfa16amr216887e87.21.1771479538082;
+        Wed, 18 Feb 2026 21:38:58 -0800 (PST)
+X-Received: by 2002:a05:6512:3190:b0:59d:dffb:cd70 with SMTP id
+ 2adb3069b0e04-59f8adfa16amr216874e87.21.1771479537632; Wed, 18 Feb 2026
+ 21:38:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.19.2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Xiao Ni <xni@redhat.com>
+Date: Thu, 19 Feb 2026 13:38:46 +0800
+X-Gm-Features: AaiRm511bzlGB3pDN7u3SHsYX-LO7QQII70qqttOYf0DSiJ8VulB68nwomLRZc4
+Message-ID: <CALTww28QMg=YXqKWpWLZrLO+xiqOe3LGyput8dx68-dnQsxg=g@mail.gmail.com>
+Subject: [LSF/MM/BPF TOPIC] User space RAID5 with ublk and io_uring BPF
+To: lsf-pc@lists.linux-foundation.org, 
+	linux-block <linux-block@vger.kernel.org>, bpf@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Chaitanya Kulkarni <kch@nvidia.com>
+Hi all
 
-[ Upstream commit 81e7223b1a2d63b655ee72577c8579f968d037e3 ]
+I'm doing some work on user-space RAID recently. I'd like to propose a
+topic for LSF/MM 2026 regarding the implementation of RAID5 in user
+space using ublk and io_uring bpf[1], particularly focusing on the
+challenges encountered and potential kernel improvements needed.
 
-When dma_iova_link() fails partway through mapping a request's bvec
-list, the function breaks out of the loop without cleaning up
-already mapped segments. Similarly, if dma_iova_sync() fails after
-linking all segments, no cleanup is performed.
+Ublk raid5 uses the ublk framework (tools/testing/selftests/ublk/),
+with the goal of leveraging io_uring's zero-copy capabilities and
+BPF[1] for performance optimization. The implementation includes:
+* RAID5 stripe handling with configurable chunk sizes
+* Multi-queue support via io_uring
+* Degraded mode for single disk failure tolerance
+* Integration with io_uring BPF struct_ops framework
 
-This leaves partial IOVA mappings in place. The completion path
-attempts to unmap the full expected size via dma_iova_destroy() or
-nvme_unmap_data(), but only a partial size was actually mapped,
-leading to incorrect unmap operations.
+During the implementation, I encountered several technical challenges.
+The primary challenge is performing XOR parity calculations in a true
+zero-copy manner:
 
-Add an out_unlink error path that calls dma_iova_destroy() to clean
-up partial mappings before returning failure. The dma_iova_destroy()
-function handles both partial unlink and IOVA space freeing. It
-correctly handles the mapped_len == 0 case (first dma_iova_link()
-failure) by only freeing the IOVA allocation without attempting to
-unmap.
+1. Bpf program support
+Raid5 needs to calculate parity with data. Now io_uring already
+supports zero copy. For targets such as raid0/raid1, it's enough. But
+for targets such as raid5, it still needs to copy data to userspace
+and calculate the parity. Bpf program is a nice solution[1] to resolve
+this issue. Besides the patch set[1], it still needs another bpf kfunc
+uring_bpf_xor() support.
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+2. Register buffer per io
+Raid5 needs to calculate parity with data. So it still needs to
+pre-alloc buffer and register it for each io. The total memory is
+controlled by queue number and queue depth. With the pre-alloc memory
+and bpf program support, target such as raid5 can support true
+zero-copy manner.
 
-LLM Generated explanations, may be completely bogus:
+Question for discussion:
+* Should the kernel provide XOR operation kfuncs for io_uring BPF?
+* What would be the appropriate API design?
+* Are there security or verification concerns with BPF performing XOR
+on registered buffers?
 
-The function is called from `blk_dma_map_iter_start()` which is the main
-DMA mapping entry point for block requests using IOMMU-based (IOVA)
-mapping. This is used by NVMe drivers and potentially other high-
-performance storage drivers.
+Current Status:
+* Basic RAID5 functionality: implemented
+* BPF struct_ops framework: successfully integrated
+* Performance testing: in progress
+* Main blocker: zero-copy XOR implementation waiting for kernel
+support I've written a patch for testing based on [1]
 
-## 3. Summary of Analysis
+Why this matters
+User-space block devices (ublk) offer several advantages:
+* Faster development and iteration
+* Easier debugging
+*  Ability to leverage user-space libraries
+* No kernel panic risks during development
+* Easy to evaluate/compare performance between kernel raid and ublk
+based userspace raid.
 
-### What the bug is:
-In `blk_rq_dma_map_iova()`, when `dma_iova_link()` fails partway through
-mapping multiple segments, or when `dma_iova_sync()` fails after all
-segments are linked:
+Desired Outcome
+* If proposal in [1] would be acceptable
+* Get feedback on whether `uring_bpf_xor()` kfunc would be acceptable
+* Discuss API design for BPF-based computation on io_uring buffers
+* Understand the roadmap for io_uring + BPF capabilities
+* Learn best practices from the community for similar implementations
 
-1. **dma_iova_link() failure**: The code breaks out of the loop but
-   doesn't clean up already-linked segments. The IOVA allocation and
-   partial mappings are leaked. Additionally, when the `dma_iova_link()`
-   fails, the code falls through to `dma_iova_sync()` which then
-   operates on partially mapped data — this is also incorrect behavior.
+I'll finish the ublk raid5(tools/testing/selftests/ublk/) and submit
+patches later. Also, I'll try to prepare a patch for uring_bpf_xor.
+Next, I'll try to impement it based on rublk[2].
 
-2. **dma_iova_sync() failure**: The code returns `false` with
-   `iter->status` set, but doesn't call `dma_iova_destroy()` to clean up
-   the linked IOVA mappings.
+[1] https://lore.kernel.org/io-uring/20260106101126.4064990-1-ming.lei@redhat.com/
+[2] https://github.com/ublk-org/libublk-rs
 
-In both cases, the completion path will attempt to unmap using the full
-expected size via `dma_iova_destroy()` or `nvme_unmap_data()`, but only
-a partial size was actually mapped, leading to **incorrect unmap
-operations** — which could corrupt IOMMU mappings, cause IOMMU faults,
-or lead to data corruption.
-
-### Why it matters:
-- This is a bug in the **block I/O DMA path** — the very core of how
-  storage I/O works with IOMMU
-- It can trigger on any system using IOMMU with NVMe storage when memory
-  pressure or IOMMU resource exhaustion causes `dma_iova_link()` to fail
-- Consequences of incorrect IOMMU unmap: potential data corruption,
-  IOMMU page faults, kernel crashes
-- NVMe is extremely widely deployed; any system with IOMMU enabled could
-  be affected
-
-### Stable criteria assessment:
-- **Obviously correct**: Yes — adds proper error cleanup with
-  `dma_iova_destroy()` which is designed for exactly this purpose
-- **Fixes a real bug**: Yes — partial IOVA mapping cleanup is missing,
-  leading to incorrect unmap operations
-- **Small and contained**: Yes — the diff is minimal (~15 lines changed
-  in a single function in a single file)
-- **No new features**: Correct — purely error path fix
-- **Reviewed**: Yes — reviewed by Christoph Hellwig (original author of
-  the code), committed by Jens Axboe (block layer maintainer)
-- **Tested in mainline**: Yes — it's in mainline already
-
-### Risk assessment:
-- **Very low risk**: The change only affects error paths, adding proper
-  cleanup where none existed
-- **Well-understood cleanup function**: `dma_iova_destroy()` is
-  specifically designed for this cleanup and handles both partial and
-  zero-length cases
-- **Backport note**: The patch won't apply cleanly to 6.17.y and 6.18.y
-  because the `attrs` variable was added in v6.19. A minor adaptation
-  would be needed (remove `attrs` and pass `0` to `dma_iova_destroy()`).
-  For 6.19.y, it should apply cleanly.
-
-## Verification
-
-- **git log** showed `blk-mq-dma.c` was created by commit
-  `b0a4158554b90` and the buggy function `blk_rq_dma_map_iova` was
-  introduced by `858299dc61603` ("block: add scatterlist-less DMA
-  mapping helpers"), first in v6.17
-- **git tag --contains** confirmed the buggy code entered mainline in
-  v6.17
-- **git show stable/linux-6.18.y:block/blk-mq-dma.c** and **git show
-  stable/linux-6.17.y:block/blk-mq-dma.c** both confirmed the buggy code
-  is present in stable trees (with `break` instead of `goto out_unlink`,
-  and no cleanup on `dma_iova_sync` failure)
-- **git show stable/linux-6.12.y:block/blk-mq-dma.c** confirmed the file
-  does NOT exist in 6.12.y (only affects 6.17+)
-- **Read of drivers/iommu/dma-iommu.c** confirmed `dma_iova_destroy()`
-  properly handles mapped_len == 0 by calling `dma_iova_free()` only,
-  and mapped_len > 0 by unlinking and freeing
-- **git log stable/linux-6.18.y** and **stable/linux-6.19.y** confirmed
-  the fix has not yet been applied to stable trees
-- **git log 37f0c7a8df7ad** confirmed the `attrs` variable was
-  introduced in v6.19, meaning 6.17.y and 6.18.y will need a trivial
-  adaptation for clean backport
-- The reviewer (Christoph Hellwig) is verified as the original author of
-  the buggy code via the Signed-off-by on `858299dc61603`
-
-**YES**
-
- block/blk-mq-dma.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index fb018fffffdcc..feead1934301a 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -126,17 +126,20 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
- 		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
- 				vec->len, dir, attrs);
- 		if (error)
--			break;
-+			goto out_unlink;
- 		mapped += vec->len;
- 	} while (blk_map_iter_next(req, &iter->iter, vec));
- 
- 	error = dma_iova_sync(dma_dev, state, 0, mapped);
--	if (error) {
--		iter->status = errno_to_blk_status(error);
--		return false;
--	}
-+	if (error)
-+		goto out_unlink;
- 
- 	return true;
-+
-+out_unlink:
-+	dma_iova_destroy(dma_dev, state, mapped, dir, attrs);
-+	iter->status = errno_to_blk_status(error);
-+	return false;
- }
- 
- static inline void blk_rq_map_iter_init(struct request *rq,
--- 
-2.51.0
+Best Regards
+Xiao
 
