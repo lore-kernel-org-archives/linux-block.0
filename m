@@ -1,83 +1,156 @@
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261513382D6
-	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 08:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE037303A3B
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 09:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771491566; cv=none; b=pYQWIQ0p+evVLpVPDPdC5TEXZt9nEmkpf1myroMpK6GigmnUqkrfYsUGrT8AmE5S9L4Espc4R0VLEYDzYLqkptjyQfjrCgP2eZzrB5N7tPfS+hMcb99UmOtbeg7w4nYMNq4BfL1FKxvnROhiRAaRNwwcGzoEXJAS2P9rnwWjFDI=
+	t=1771494892; cv=none; b=f/T7H09Z5j9dSiuDliwWDp+PmhDYXniiBhHG+ciNL78JSAWSlMLIO7rSkTlTu79L5qAMsKRhrmbtvujlzOqQNoGZ4Gt3P3MNTFZM71aoWl7GvvLk0m2Da3y/kATuBtjWKXHYPww/aQ75CiZgDYMHU7IZjH/PJiTUASzH0/TeVZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771491566; c=relaxed/simple;
-	bh=D8UGhu9M908NgUJFkNSCYO4U6X5C1x0Y8oHhK7B0sMA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tAX9uMKH0xpwblglV+/xC4HxgL3c1tC2ChidrhlafJ9wCU3TPpBNj2ul/p0S8Kv+6HjhknCKcgBjQvXhQ35VjTKr5rEFPcON17Dp+4e+VV2BSzpDyesVWQXoKSv2kCMn8JWeyBbkJqtxHAzrV57DLK2U68DvB7cnSFcEtM4mUHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-678f3fef828so11182646eaf.1
-        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 00:59:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771491564; x=1772096364;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5nC+b72pVA44Uc6CcxtsvLZb+c2BvwoMTpPD1V9VdNs=;
-        b=BR8mVdcwe45OzLVW/7WBNCR+2G8mFpY2XfPoaqU5d04zowkYNapb1KR1Et1edl5Ma/
-         wxFJCFXr5to7rl74LV4f0+bCA1ITuT1xRwTp/ba2JqSGY64zl1UtVBvorbxbBiIOCmQ1
-         od05vOqdcp5jPLnLnZ4Cl70TDbErMrD0ga8bL/YXyrRMiCBZ8yN0gPN0ZYbHqvaeHF5k
-         vrnhA9gEjyv1/SLaVbx8WHgML2xSgyK91eH7FppnEkf3+jLyTBZ/dXhIEq+Nj0dNZGZH
-         eEW6aZkmUjn/aF1nWBguudtBvaEmYdI2R1jxwz5LnsTmI1Mo9QRxz5ibq/ahu1Rc5fkj
-         MW3g==
-X-Forwarded-Encrypted: i=1; AJvYcCW50+SccX7W56sAH1u6+qgCsLvwYFT28oUIVBkRZYgTRGeypL2d2tpGU+HPJHOV81ytjVJvo/jNQMwntg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsMXbHp0k7/oXruJwGGMOzCmJhB8zfYTjF+GMpOz1BPgifonNm
-	7WrY/V1AbprYuMK+sieKsbVt6q5YDaBDqIpzBTkSnUieNw2svW/Kj7X76/ttKBCpT4uCsx+2W31
-	lv4S+FGFLBpSwqIH6aGwCUts3oYDjT+2CuTLoufGjVYy8BayzT4HQ+kC1+KI=
+	s=arc-20240116; t=1771494892; c=relaxed/simple;
+	bh=DC2Pt8hIrWFIINaq/OAUpk4sf/yHj2GhdQi3YeDeOGQ=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=WfbMkH00NrbWue2RlXo5t7ThWZMsrGdy0exBH4n6xbwC9xFyL5GaHgXtXCs3sy/Zn8PiZKRdCDP6R5p4WnNEfMLRtWnjkeawH8TlTD+Y+Fnld0w6y1hI+E8jJQFiLrcxRHRSANQi8mzM0dEpLDFm+v4lMkIGdZHuyhTcZhSWA2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BNoOW7Ta; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rGfDI4Sz; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BNoOW7Ta; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rGfDI4Sz; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BNoOW7Ta";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rGfDI4Sz";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BNoOW7Ta";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rGfDI4Sz"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 313055BCC7;
+	Thu, 19 Feb 2026 09:54:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771494889; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
+	b=BNoOW7Ta9bzhOeu6BmeXIU3CukJpHmWhf3JW9U55bYDe1aXhPML9SZx/SzLQpHYLhXmhJ4
+	XeVGHpBZQJ5QgPfCDgDwY8fSwMdoEGtFGUPljC2m7xODa/LGoDYo8q+ddBM8B+1FuVelER
+	/Ms74PK1QoBqlMqzd9RmTdfnKCvairE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771494889;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
+	b=rGfDI4SzjwY8KzuPdzLugT9WuovU6r0d+qVBpZP4QOsfeUm8yoYUXuMpMaf13jorWQpw7T
+	DKkwtNsJvzv8ZWDw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=BNoOW7Ta;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=rGfDI4Sz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1771494889; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
+	b=BNoOW7Ta9bzhOeu6BmeXIU3CukJpHmWhf3JW9U55bYDe1aXhPML9SZx/SzLQpHYLhXmhJ4
+	XeVGHpBZQJ5QgPfCDgDwY8fSwMdoEGtFGUPljC2m7xODa/LGoDYo8q+ddBM8B+1FuVelER
+	/Ms74PK1QoBqlMqzd9RmTdfnKCvairE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1771494889;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
+	b=rGfDI4SzjwY8KzuPdzLugT9WuovU6r0d+qVBpZP4QOsfeUm8yoYUXuMpMaf13jorWQpw7T
+	DKkwtNsJvzv8ZWDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7D9B3EA68;
+	Thu, 19 Feb 2026 09:54:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id c/GwNujdlmkBSgAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 19 Feb 2026 09:54:48 +0000
+Message-ID: <f22caf98-1375-493a-a275-0500ffac3e81@suse.de>
+Date: Thu, 19 Feb 2026 10:54:48 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4a0d:b0:66e:58f3:b505 with SMTP id
- 006d021491bc7-679a71b93bdmr1828802eaf.12.1771491564022; Thu, 19 Feb 2026
- 00:59:24 -0800 (PST)
-Date: Thu, 19 Feb 2026 00:59:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6996d0ec.050a0220.21cd75.0107.GAE@google.com>
-Subject: [syzbot] Monthly nbd report (Feb 2026)
-From: syzbot <syzbot+list11bd3f2823c04b2285b6@syzkaller.appspotmail.com>
-To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: lsf-pc <lsf-pc@lists.linux-foundation.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-mm@kvack.org
+From: Hannes Reinecke <hare@suse.de>
+Subject: [LSF/MM/BPF TOPIC] Memory fragmentation with large block sizes
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_TLS_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Queue-Id: 313055BCC7
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 
-Hello nbd maintainers/developers,
+Hi all,
 
-This is a 31-day syzbot report for the nbd subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nbd
+I (together with the Czech Technical University) did some experiments 
+trying to measure memory fragmentation with large block sizes.
+Testbed used was an nvme setup talking to a nvmet storage over
+the network.
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 9 have already been fixed.
+Doing so raised some challenges:
 
-Some of the still happening issues:
+- How do you _generate_ memory fragmentation? The MM subsystem is
+   precisely geared up to avoid it, so you would need to come up
+   with some idea how to defeat it. With the help from Willy I managed
+   to come up with something, but I really would like to discuss
+   what would be the best option here.
+- What is acceptable memory fragmentation? Are we good enough if the
+   measured fragmentation does not grow during the test runs?
+- Do we have better visibility into memory fragmentation other than
+   just reading /proc/buddyinfo?
 
-Ref Crashes Repro Title
-<1> 3344    Yes   possible deadlock in pcpu_alloc_noprof (2)
-                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
-<2> 560     Yes   INFO: task hung in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
-<3> 74      Yes   possible deadlock in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
+And, of course, I would like to present (and discuss) the results
+of the testruns done on 4k, 8k, and 16k blocksizes.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Not sure if this should be a storage or MM topic; I'll let the
+lsf-pc decide.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Cheers,
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
-You may send multiple commands in a single email message.
