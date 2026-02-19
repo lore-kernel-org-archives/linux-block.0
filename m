@@ -1,240 +1,99 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815441DE3A4
-	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 14:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1215B253B58
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 14:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771510824; cv=none; b=bQVs1I3HdRjNFnHWnhrHxEb75buY475GyGktgLn0P9mEt4mzSlzkSjuqzN9Im4dy7ZPPw1eZH5EoT7BpAzVz+92Hg/+5wboiMD4pIHSAWUvEB6uJpLqVNkKAbyS4pxoqouM/UyQ6lBJYGwZUDEfZoLN3rlHKXZ6kgTwPsDPPpI8=
+	t=1771511548; cv=none; b=tZB1tVlyxoInp9hlZoM5YCu3vq65lJCD+2Z38wImUy4AOJWbPDWE+c/qgvHWdim36C5c7UwKQy0/WN8wa7s8XVWYN8Pt/X6Ni0ZrBPNJ08n8urzMXfH6+zWLA7QwwArtH7o44RoCZxiMpyO4t8AI5sJ6uShCiGclHlnzomGjm3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771510824; c=relaxed/simple;
-	bh=sCDkI7ENHQnXmpAh3KuSLSxg0XzvGEd48fbJO0pMl7o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aERB0JYOTSVItHZftYPu5Q8MKmdSGjEebLBkVBEnZCm4qDEktulv+HALYk3h3lAtGzTtFij5NZcBvwP7AcI4WkU+rinB2WPZM6jXXGHmfVqJbVhsHpzBakyJC36c1EN88oyNUPkkTXtcKZmB+Uu+0ThkQcvF7LOgynpNMzML2Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=wyO1xh1b; arc=none smtp.client-ip=209.85.221.45
+	s=arc-20240116; t=1771511548; c=relaxed/simple;
+	bh=66JfyiLinFfCyvPAbgz21SZgjf7hQ2708s1WoW1oV3Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hw19B4vU66m82oze5XTH1CcsNs9q0ClK+DO6DWmp+2w/mkRrjt3BQsAX1VQZpsSS4OcX29+jukcgkEuYqlXWQKw+tR6reGHxbPcQmEXPIuAFbBfBaUnw0zkN3fi+h1RplRwS+iNuLQBxF3Ph3j7GV4NknSyfMFGir2c6mKS7r58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=hBWWhNvb; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="wyO1xh1b"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-436309f1ad7so757853f8f.3
-        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 06:20:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="hBWWhNvb"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4834826e555so9631245e9.2
+        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 06:32:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1771510821; x=1772115621; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5WPV5zc+4pTYNW/WHh9z0i95W/Lb1GJgH88opLKR1Gc=;
-        b=wyO1xh1bbqeqBY+KIqukgTEM6kchR+ZVBd/FALdRv5m7+YXXQnkMDM5o2cHAZTgKCC
-         RDmAgDO4zOSW/QxhgW4GxHF1J7TCG2aFQRm0/+0DRwrtagY52KqtNcteEk8ypTy4clb+
-         X3/b9tNZk754jVwBMRsna3iB7+s4XgZRD2pZW4yilyNDkCC5uAAx1xro1ownVuXoNMJo
-         BtQAeYCQk94NeA0pjzsCuLXuGw5q/TJ+HQhCJQIZbmcKUd0H1iTcrZoF+GgGU6AzuYYx
-         qPBD9cqZ0LSbsnIljmVLJpdTWocjKKz9HWqcqeHfF9TbyEnfCxxUchmp+PvLWP3B4Ot3
-         xepw==
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1771511545; x=1772116345; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=X1aygOr2SiR46cucNthKeoKXJ2dYog6+H1Q6WGVnZgI=;
+        b=hBWWhNvb7L0w90k4CATqgfrqCrm4DMfRQvFMmiMw/zqcCd2IpukF8gKMt+neDDnUVQ
+         kRsyH4c3O4PuAMpLwkhSpzvfR1zAx6ckqnqD5U4dQxbHjrVGsaAF7egZTbKyFkVFd2if
+         jYdyYrEwU4dY3Y4wzvf+D9OFbyTPSGUhuQaMZ7s+NlBgqQwHyWxlF5xzI058dC44t/+Z
+         yKM3ldeTbMLuKPiJvX+CSaYpiHfyBbTSJ9TXXfc/ReXFCGohCiBG6LwQ1zVSjCIvZ6hL
+         qOKGaQXuRbKSkGqxjKOs47j8uZxPYg0hzut3Db28L7Be/PLQXCGXeJeFT13jsKL0XO/b
+         PM4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771510821; x=1772115621;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5WPV5zc+4pTYNW/WHh9z0i95W/Lb1GJgH88opLKR1Gc=;
-        b=QlLNypt3mvWhL2cilTu43Pkw56m8XMw0ILQ/QtFQ1lgec8S92RN1yBpjCUdxp0Yjk8
-         mJdpgtFScEC5ltl6x/eVlPSKfbw0epnwciEZ5P+SvxnX3wDMT8NjwDp5lnI0wq1ZB1sL
-         1pr4trJ9Fb9f4MdFdaHkRA5Nf/RNlsJAhOOh4FEvA+PIG1hvIQLgJHuRCTS3Eog7bvUb
-         Q1dPOWCDTLVMabnQqGNoLot0G7btJ7okziY2Vjo22FBcsduejZQ3ZP/QoDLUzOsDYceb
-         kxMnynftpqNJv254ObeOmkwSrcT83DBWtH10Q+QNpF5lbNEDUw7wuR9maGYAz2FP9PTi
-         qXew==
-X-Forwarded-Encrypted: i=1; AJvYcCVQk9zmR+AMPxALin6Q9Hto/cygHTWFok20/d4Q/VlmcJPhK3m7ny4S50kVofWlnea4D+uoaUVw0Y7kCA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJg8ev6PDT79KnF49hOYfkaohXjL2FhSPLA/1LmtxvxiOV9Tzg
-	crtzuC5mclvpByHyKuC7UxPL2fHyR4RZvpuGQoRyaTyVCRw/lZ1UngVeqzIuobRk1cE=
-X-Gm-Gg: AZuq6aLlDWR8TKRQCpNuSUM+NZyj6emGXseRbnrt8qhPJ9g6xp/4FAESNZxnLW6805m
-	4aazE1fmReFJykERs68cZNvHsomNrRDR0tS8bdY8WhNzoEl8U/I+U6tZLDdCw7Z2D3lywIJB/0n
-	6IshhvPZ/XeWMHlC/hM9ebyXi+oXfFiKZxv+T1jLeOd2tbZ+JGWXBfudIwZqS2t1YMn1+uBVl7x
-	s/KdOyMXD3wKPrns6heKOEUETH4OdK4/zlIkRZDBqzOWiG5foTH8q9frtXodrN6ucD3kJK6g5Ya
-	/AcYrSIejLwSGI+LvONwDzsWw3Zy8TpavvXpEsLFsf4eN/WItD00dN78zwVrfEQrYGo0JI2kBk5
-	vQ4D0orfQ9Je1khtIx8ClR2eUhCo3Vskmyk2NKiOzPybJK+xMuz0g4EBoze6IVB3MrlO/W3g5eY
-	pA7A4GlwoyxSPM59GBvLcI9Outp6jned2Zv6RFwooSyPTxoM1pwWqd0gmTDWJcPSYOFv3wAooVm
-	ebFvjJinB1rYVH39MWkvLzcTzk66TORV7k=
-X-Received: by 2002:a5d:5d83:0:b0:437:6b6e:d114 with SMTP id ffacd0b85a97d-4379db9800dmr29808717f8f.30.1771510820603;
-        Thu, 19 Feb 2026 06:20:20 -0800 (PST)
-Received: from localhost.localdomain.com (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796a5ac7csm47122906f8f.7.2026.02.19.06.20.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 06:20:20 -0800 (PST)
-From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars@linbit.com>,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	stable@vger.kernel.org,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Subject: [PATCH] drbd: fix "LOGIC BUG" in drbd_al_begin_io_nonblock()
-Date: Thu, 19 Feb 2026 15:20:12 +0100
-Message-ID: <20260219142012.97756-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.52.0
+        d=1e100.net; s=20230601; t=1771511545; x=1772116345;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X1aygOr2SiR46cucNthKeoKXJ2dYog6+H1Q6WGVnZgI=;
+        b=vhMN1koZZh/fY54YETpvZj2deX+D4A9UcQEQJmqRNJwndhQV9gvqvOPGbaTL0zK9ao
+         z3vidF+GZ4TL86i9PiJaTc+qlohMHkdtHaH67N2K8nX/NT9qs51Jl4Wo6V2x0pLP3vGB
+         /TEeEhj+b+Lpu1Adg1t77BhdiBVJ4ImM1cZsxQ9ih8YswcDYv5qB+9OPxlPRcdwrMTbV
+         vWKbZX1y5pqTja8PV9t5HSUIu39YnzTcQtLTMdzAveHgLiD27sXLbzJEhpCrw06QcIm7
+         5VmndffxyhaJgWEHqb+u39LQQzDJIvRQmOT+I3PzTqgwfrwZ7sOop0ux9qVwnRDHHH4D
+         jXFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWZQHE0YD3v7l8uVU5jQ97fezyUtsMu9SH8T6tVda5+IkH+jH/ej7SVpK5ejo2UiylrxtZC3u0AxGVApg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/T2HjN6vsGK8id2BBpfEL/O9GzYXlMMeGcCK/tERXUhTCmAwR
+	5UGx/RICA28+0YZq96vYcxkOWoC42NaK0saOBjqi2N0Vrt6TcbLSREuxP5OZ7/H5i3c=
+X-Gm-Gg: AZuq6aJwo1Wcv+t3+PyH7UA/Y7GyC6mOXdlTLilqV5c/EX3vLBJRx+JOY7H7JhBKnpl
+	2Os5Um0TZ20sYW+KXzpXKmFS1wboJbM8wGt+VhaCDS1SB9aGKdMmRbhvEDtLdG3ARJ3kMtaTHk2
+	6MEHtWiWg56Oempt4IoJSmURII4qhIt4vVyfIjRgikYG4/KbOAWXxiHAKa0RY0JRPlEw7m/RpYa
+	HjVa44FxVG47nAnEALE3rsYIn7ub4sRGsI1OChDSJkcKy8HavOjZHq+a1L8LlP+2K68E2fOU9rW
+	ygkaqBvBW/EeYCjJ5FTem9u5xE6gjSQ7Xkqft9mMHAJsu8k+csny16sL4LzBEciHHq1iX3SR/bt
+	XsQG6r2zA1AhSr6WUeuz7CeU45KQi/uIRmT2XJ8Sb4XA6K2tNZC49IHHfr1s7Jpk7RzErH94jNP
+	SnMeL97p/ni/jSJJMM/g/GNalyXLAkszNC4iMfICJbXUKNEIL+7QwBBUg1ucw+OOXsCUEKOCEPw
+	FK0NFabtdxnS0NwZCvG6mO3/pPYeQ==
+X-Received: by 2002:a05:600c:8b61:b0:480:1b65:b744 with SMTP id 5b1f17b1804b1-48379bf7907mr277885095e9.28.1771511545296;
+        Thu, 19 Feb 2026 06:32:25 -0800 (PST)
+Received: from [10.43.5.171] (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a31f9475sm6559915e9.14.2026.02.19.06.32.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Feb 2026 06:32:24 -0800 (PST)
+Message-ID: <432b20cd-9ef0-4335-b8da-425d9a441c34@linbit.com>
+Date: Thu, 19 Feb 2026 15:32:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] drbd: Replace deprecated strcpy with strscpy
+To: Thorsten Blum <thorsten.blum@linux.dev>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260112170412.741013-2-thorsten.blum@linux.dev>
+Content-Language: en-US
+From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+In-Reply-To: <20260112170412.741013-2-thorsten.blum@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
+On 1/12/26 18:04, Thorsten Blum wrote:
+> strcpy() has been deprecated [1] because it performs no bounds checking
+> on the destination buffer, which can lead to buffer overflows. Replace
+> it with the safer strscpy().  No functional changes.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy [1]
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>   drivers/block/drbd/drbd_main.c     | 14 +++++++++-----
+>   drivers/block/drbd/drbd_receiver.c |  4 ++--
+>   2 files changed, 11 insertions(+), 7 deletions(-)
 
-Even though we check that we "should" be able to do lc_get_cumulative()
-while holding the device->al_lock spinlock, it may still fail,
-if some other code path decided to do lc_try_lock() with bad timing.
+Looks good, thanks.
 
-If that happened, we logged "LOGIC BUG for enr=...",
-but still did not return an error.
-
-The rest of the code now assumed that this request has references
-for the relevant activity log extents.
-
-The implcations are that during an active resync, mutual exclusivity of
-resync versus application IO is not guaranteed. And a potential crash
-at this point may not realizs that these extents could have been target
-of in-flight IO and would need to be resynced just in case.
-
-Also, once the request completes, it will give up activity log references it
-does not even hold, which will trigger a BUG_ON(refcnt == 0) in lc_put().
-
-Fix:
-
-Do not crash the kernel for a condition that is harmless during normal
-operation: also catch "e->refcnt == 0", not only "e == NULL"
-when being noisy about "al_complete_io() called on inactive extent %u\n".
-
-And do not try to be smart and "guess" whether something will work, then
-be surprised when it does not.
-Deal with the fact that it may or may not work.  If it does not, remember a
-possible "partially in activity log" state (only possible for requests that
-cross extent boundaries), and return an error code from
-drbd_al_begin_io_nonblock().
-
-A latter call for the same request will then resume from where we left off.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
----
- drivers/block/drbd/drbd_actlog.c   | 53 +++++++++++++-----------------
- drivers/block/drbd/drbd_interval.h |  5 ++-
- 2 files changed, 27 insertions(+), 31 deletions(-)
-
-diff --git a/drivers/block/drbd/drbd_actlog.c b/drivers/block/drbd/drbd_actlog.c
-index 742b2908ff68..b3dbf6c76e98 100644
---- a/drivers/block/drbd/drbd_actlog.c
-+++ b/drivers/block/drbd/drbd_actlog.c
-@@ -483,38 +483,20 @@ void drbd_al_begin_io(struct drbd_device *device, struct drbd_interval *i)
- 
- int drbd_al_begin_io_nonblock(struct drbd_device *device, struct drbd_interval *i)
- {
--	struct lru_cache *al = device->act_log;
- 	/* for bios crossing activity log extent boundaries,
- 	 * we may need to activate two extents in one go */
- 	unsigned first = i->sector >> (AL_EXTENT_SHIFT-9);
- 	unsigned last = i->size == 0 ? first : (i->sector + (i->size >> 9) - 1) >> (AL_EXTENT_SHIFT-9);
--	unsigned nr_al_extents;
--	unsigned available_update_slots;
- 	unsigned enr;
- 
--	D_ASSERT(device, first <= last);
--
--	nr_al_extents = 1 + last - first; /* worst case: all touched extends are cold. */
--	available_update_slots = min(al->nr_elements - al->used,
--				al->max_pending_changes - al->pending_changes);
--
--	/* We want all necessary updates for a given request within the same transaction
--	 * We could first check how many updates are *actually* needed,
--	 * and use that instead of the worst-case nr_al_extents */
--	if (available_update_slots < nr_al_extents) {
--		/* Too many activity log extents are currently "hot".
--		 *
--		 * If we have accumulated pending changes already,
--		 * we made progress.
--		 *
--		 * If we cannot get even a single pending change through,
--		 * stop the fast path until we made some progress,
--		 * or requests to "cold" extents could be starved. */
--		if (!al->pending_changes)
--			__set_bit(__LC_STARVING, &device->act_log->flags);
--		return -ENOBUFS;
-+	if (i->partially_in_al_next_enr) {
-+		D_ASSERT(device, first < i->partially_in_al_next_enr);
-+		D_ASSERT(device, last >= i->partially_in_al_next_enr);
-+		first = i->partially_in_al_next_enr;
- 	}
- 
-+	D_ASSERT(device, first <= last);
-+
- 	/* Is resync active in this area? */
- 	for (enr = first; enr <= last; enr++) {
- 		struct lc_element *tmp;
-@@ -529,14 +511,21 @@ int drbd_al_begin_io_nonblock(struct drbd_device *device, struct drbd_interval *
- 		}
- 	}
- 
--	/* Checkout the refcounts.
--	 * Given that we checked for available elements and update slots above,
--	 * this has to be successful. */
-+	/* Try to checkout the refcounts. */
- 	for (enr = first; enr <= last; enr++) {
- 		struct lc_element *al_ext;
- 		al_ext = lc_get_cumulative(device->act_log, enr);
--		if (!al_ext)
--			drbd_info(device, "LOGIC BUG for enr=%u\n", enr);
-+
-+		if (!al_ext) {
-+			/* Did not work. We may have exhausted the possible
-+			 * changes per transaction. Or raced with someone
-+			 * "locking" it against changes.
-+			 * Remember where to continue from.
-+			 */
-+			if (enr > first)
-+				i->partially_in_al_next_enr = enr;
-+			return -ENOBUFS;
-+		}
- 	}
- 	return 0;
- }
-@@ -556,7 +545,11 @@ void drbd_al_complete_io(struct drbd_device *device, struct drbd_interval *i)
- 
- 	for (enr = first; enr <= last; enr++) {
- 		extent = lc_find(device->act_log, enr);
--		if (!extent) {
-+		/* Yes, this masks a bug elsewhere.  However, during normal
-+		 * operation this is harmless, so no need to crash the kernel
-+		 * by the BUG_ON(refcount == 0) in lc_put().
-+		 */
-+		if (!extent || extent->refcnt == 0) {
- 			drbd_err(device, "al_complete_io() called on inactive extent %u\n", enr);
- 			continue;
- 		}
-diff --git a/drivers/block/drbd/drbd_interval.h b/drivers/block/drbd/drbd_interval.h
-index 366489b72fe9..5d3213b81eed 100644
---- a/drivers/block/drbd/drbd_interval.h
-+++ b/drivers/block/drbd/drbd_interval.h
-@@ -8,12 +8,15 @@
- struct drbd_interval {
- 	struct rb_node rb;
- 	sector_t sector;		/* start sector of the interval */
--	unsigned int size;		/* size in bytes */
- 	sector_t end;			/* highest interval end in subtree */
-+	unsigned int size;		/* size in bytes */
- 	unsigned int local:1		/* local or remote request? */;
- 	unsigned int waiting:1;		/* someone is waiting for completion */
- 	unsigned int completed:1;	/* this has been completed already;
- 					 * ignore for conflict detection */
-+
-+	/* to resume a partially successful drbd_al_begin_io_nonblock(); */
-+	unsigned int partially_in_al_next_enr;
- };
- 
- static inline void drbd_clear_interval(struct drbd_interval *i)
-
-base-commit: 72f4d6fca699a1e35b39c5e5dacac2926d254135
--- 
-2.52.0
-
+Reviewed-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
