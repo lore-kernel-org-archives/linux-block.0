@@ -1,102 +1,113 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3DD341062
-	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 15:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3548341062
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 15:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771514544; cv=none; b=UUAqknFsxWelzFGbEZh7btj60xdeU3HVIBJtPeX1IK/TbKdab3HhEEjsvn8eYqi6wczhbp/F5ohiNsO0BBNJaBcqnGEaFN2D+sp/S/zDxq22nTlE1m5vIMVbE6As6U3kAUrfSi4DQslwOsgG8qTGSDRnGfLp7M9OdwVAfP9DbiM=
+	t=1771514684; cv=none; b=Ia5WzLtjvlGo7x45H6PUzEwFAJjEliFFIHHgjSGB92K2ZKrnxt0VFLU7gYOyKuMMtarCnjc4IDXMk3A6TpNHB7byN6lE5x1sNq8FfQ2XtQixZL9MY0UbFxU+bjtzSlgYGR24wwmaaWqgS9PXTUhRvGob8q50iEw1oX1s+wU0ypQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771514544; c=relaxed/simple;
-	bh=SrwoEvhK/qDevRWILRDkfcVZX/1zzUR6RAuiJ2wMZ60=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=h7JWvxX65jqMggjZIvnR1ZsdsHyYuaMsULclMOJsl6zoFwmz5okImeBE/Oc62amT9YVxzEdlA9r7oBb6sSgAApxrwuMPVcK4H8ugGjljp7yM+FYT+hTxzMcECgGZV1aaHyeliAaPKuEUQEDsno9fNgxhS1pnMKcKGKYPwuqve2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=T8hlW/4c; arc=none smtp.client-ip=209.85.161.50
+	s=arc-20240116; t=1771514684; c=relaxed/simple;
+	bh=lDifLTAx9n9Mk40OXQsRSz1vGqgpmvsXnNPyhYBsb2A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GoaTNuQVcpSJulCovDWaDGEYiRHiQOxSztyMi1EvClp1hjtJ8Pg2z3VwPTPLZycH6/hUphsqrJnVx13rfBHpTFts0L5EjnSyb8yk/k6Zn6z0etqUc13MO8f+7SrsWdy5w5bu7reP8i1nAd5UsaG2ufxqPuufzMWTj4vUyd+IP40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nfweMifn; arc=none smtp.client-ip=209.85.160.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="T8hlW/4c"
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-67997ce9e1cso611646eaf.2
-        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 07:22:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nfweMifn"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-40fb2789476so1894429fac.1
+        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 07:24:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771514542; x=1772119342; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W0a42HPsS2WRNnKKxk79oQNkIqa+mdBipBEupoa2oeM=;
-        b=T8hlW/4c72cypm3aFKlpQ7l31th2BCWI1bmze9iBm2PC0oudU9OJLbz3HwStC72twf
-         c03rJ9Ym58aI3uNRYDlIEBGvYbqX38TqnlN5+MzkVImUTqpZdh8EwvIIwcFqgs4ih4rg
-         vfQ+bd4h+coMvvyDJIMHbsRyBYbGAAvG6c1LdCTLzpo2f0B1jyRP3RIW8HDqnUp/UOE5
-         FQGzatS1rf205Ivu5D3yIVCFKfqh1cc++bEZntjrus5ZFkq6THx6mpqGtyRRZPxaFWpf
-         uFf3PBJ+8gu0F1HbqGvaJKQZemwJ+cXoH9suLRbXKcKcPWVKU/Xo+JrEe70r83qvR0eX
-         7hrw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771514681; x=1772119481; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JgHRaYW1iBhNDu18vHtaVid1O4fLAXLvbx6+OcL28Ko=;
+        b=nfweMifnjHOZmoTcEy3J+1PjlBhCJxMCujx5qg+V9WHrK/hWtzTz7dSFyG/VXUArAh
+         CgY6H0NmgPcqaiA5lxAHqJiaUGIehkLGoSCqSCkH5D821Pc0YtQZMS+hmYOHoVxVfHEw
+         Uax4INI1Ac3q8lfAxG7CinFd8jG9XreSJyE/g3+tKUpGut7LxH4fQ/9hhFRfpxNyeqW5
+         kcdCSJY7vKcg46VTk0kkoTdWsKMXusrGpf0qlSon2YpTgpecdY8B5ewRcx0SfhcIkDpm
+         3gKICwk3W2OXa3BYHJc5Cxce50FFAuuFh1XswNbRUasXWB9dM1Ksdo4EHfLIPOPAAIRe
+         Jszg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771514542; x=1772119342;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=W0a42HPsS2WRNnKKxk79oQNkIqa+mdBipBEupoa2oeM=;
-        b=piSXMhumc4lRIWXuA94vHliktpAk7oGub4tZuPpebTlIvu2SvFN2fLF6YDlhyFi9yA
-         /F7uur2uMhUCS7vSTH8RiT5dHKFcBJnsXsj1ca6aIlW/HFp0yhz7dj83HcNmFxLNa6aF
-         NcksqAgHG/3X/3wgMfwd2RinnLwdvLU5NV+XiMexgk8OrtRKTp81W6pr1N0VM57kwplO
-         SDvriz7cV8doA4pYUvsLWpqbx6mfKD2/jDuf69gc5OYVnH5VoyhFr2VB7PUKwd6+8vkX
-         ms63hhFThOlTr8aDtgJKTACamhMv2eRArJx+uqPbj4XGH294GiDQ8jJ//hA/nD9J5CTN
-         dPRA==
-X-Forwarded-Encrypted: i=1; AJvYcCXYSO8rP4yhft4Cm0jOGLjx7wfHPJXCrjoReQatZCRXz5BWLgVeRL9ShC1J5aMa2Xt4w4EB4mYKCOau4g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFHCILdrqPlhG8+yJZOdokF82A19O0etdf+Qa+DurK5ecQy86e
-	Yk1X12vfoxzP6quXcU6wk6ap22794KFRcP86eyz8srf8SGhVtQbyo35CsR6dOfJ04cY=
-X-Gm-Gg: AZuq6aIMPS9MEZFxnrh05zvk504VclIm10SkpsLJJt918gZpjn3SVEohNdFLAKFRNCP
-	lPBcqfnp6B9ZQ2JXipkJpckYAC/XNXSEpKdts8+vSzEmbPsjKToNz2ahLGQn6s+nGD/MDAo/xlV
-	nnS1KQiBi9EKoeQ/nvAbECRxSipLwqtKkw98m+vIqQ/tNyDisc1rExn+6EHfZ+UyWW9S6h3RMSR
-	kteC80cU0G+2oqP17rLhCdwcPRnHTwm5YJFUjSTe0ajG6Z5oNAnqvZC8N2JMxjZUjWwqto6DaCZ
-	aN/GP2+laxn/8LU6rojIttfqk0nvzqC8a6PdZFhz/TpvexFkom6k8ctal+vajh6RVM6SyKEewpi
-	P7qYvNZ+zgrKUGTpgwIzRJeVzXZCBrlmosMYpK7XsA2M9v+t608/N3kknF/sxA+UumDoxsljcwQ
-	5qvAkzlXaU53gMiGNpAjiBM5cUISNWt7+Ta3L3TmcivEp0CoicDb4mODhyT4keWjkia9ujIUaWu
-	BQ8hA==
-X-Received: by 2002:a05:6820:612:b0:677:7c5f:e1c7 with SMTP id 006d021491bc7-67858fea339mr8563625eaf.15.1771514541947;
-        Thu, 19 Feb 2026 07:22:21 -0800 (PST)
-Received: from [127.0.0.1] ([187.199.77.89])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-679aebf54f1sm1954014eaf.5.2026.02.19.07.22.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 07:22:21 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Philipp Reisner <philipp.reisner@linbit.com>, 
- Lars Ellenberg <lars.ellenberg@linbit.com>, 
- =?utf-8?q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>, 
- Thorsten Blum <thorsten.blum@linux.dev>
-Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260112170412.741013-2-thorsten.blum@linux.dev>
-References: <20260112170412.741013-2-thorsten.blum@linux.dev>
-Subject: Re: [PATCH] drbd: Replace deprecated strcpy with strscpy
-Message-Id: <177151454067.556009.8199495060801939828.b4-ty@kernel.dk>
-Date: Thu, 19 Feb 2026 08:22:20 -0700
+        d=1e100.net; s=20230601; t=1771514681; x=1772119481;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JgHRaYW1iBhNDu18vHtaVid1O4fLAXLvbx6+OcL28Ko=;
+        b=S4cNv1iZ3R9uVwDCcZY6RReyvetQ+ZXeUq3zMn1NHP/uRLVn4A0Yt3z/8kddT/iWqe
+         VYI0IEUCAzChP0JPc9VQB4ez0jz0cm6ZZK9HkdrFqqaEncGjAzhr6LaMiKjwCz5WDmlR
+         GPgxiC0DWtZCOGedm8DU84c/8mUn2ggNX/yjU5xieAqDBXKB++72ywO3R/NPiG/4C4Pe
+         zb79NuXaJorSSNbE9Col8JT6v5zqx28ltivHl1EC/CkdhmFu+SdfrZO8OHsHk8zbgZIY
+         tY3zICd3AbDRZTVwj4q0FEiUxEeFWDiBcsvfceTlwlW3x1Lt5TcKEImY4NAlQfmmQQ7Y
+         2zcw==
+X-Gm-Message-State: AOJu0YyESTqwfofvZehMYQSNZNKRO7SSqwKv+8CR8UjMDKhvwuCTgG8L
+	HMy1hJ3xkWcoDrj+aZZrQBMKAaXaTQKKHrr1+Ccoiuixjehg9BOpaRsiMGsfOWoSTKA=
+X-Gm-Gg: AZuq6aJc3gBZJerg2OhxPoy2Ka8+bOkCvYBsDIOGwTALlo21jXTcTokO7B1D7v5f8tZ
+	v5okwDejdyLg68gNLkQzEfFHmlHHEuYyAzlEmhWikLmllupN2KnbsKXNkSfbXDISj/ccMEV7C1D
+	v82pqvqbLsnj3+x2r5OPyq5Hn9FlW7q/TL51a3XwZqdqdtrcdanDzxkyfYFZ0UG6ve/lsMPSKHV
+	u7HvO6fCagj6z+FOOVgQwJ7OvkSIBx1P6eTJDEfpavH8gllPaip0czXtAF/M7rP/NlxKPRGY6YZ
+	7DVBCvCLyvb6frDfg/FQCUx/03cpB5CiX2ZWpRPHw6i8Aljd/bZZsvvMyxjJ5oPFICttACjc8oB
+	QQ2tNXhp9CUHC775eUiDPq5/Vxt/QF3NzZLGcLQ8mMESBpAWi9qqrNM8AYi824wNunvfFAJW7jG
+	7JXOK6i1097NYX4gAd18/mHMU7EYIlcKO4xz2//IEUu5IeLJ14b//ZV0XHSctCq4kYhb5t6sm+K
+	sbExJkKvA8=
+X-Received: by 2002:a05:6870:a0ad:b0:414:9285:c243 with SMTP id 586e51a60fabf-41545713115mr1093784fac.21.1771514681487;
+        Thu, 19 Feb 2026 07:24:41 -0800 (PST)
+Received: from [172.25.209.35] ([187.199.77.89])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40f062ee328sm17955312fac.4.2026.02.19.07.24.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Feb 2026 07:24:40 -0800 (PST)
+Message-ID: <35866783-2312-4e31-904d-3746510eaf56@kernel.dk>
+Date: Thu, 19 Feb 2026 08:24:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC] block: enable RWF_DONTCACHE for block devices
+To: Tal Zussman <tz2294@columbia.edu>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Namjae Jeon <linkinjeon@kernel.org>, Sungjong Seo <sj1557.seo@samsung.com>,
+ Yuezhang Mo <yuezhang.mo@sony.com>, Dave Kleikamp <shaggy@kernel.org>,
+ Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+ Viacheslav Dubeyko <slava@dubeyko.com>,
+ Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+ Bob Copeland <me@bobcopeland.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+ ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net
+References: <20260218-blk-dontcache-v1-1-fad6675ef71f@columbia.edu>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260218-blk-dontcache-v1-1-fad6675ef71f@columbia.edu>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
-
-On Mon, 12 Jan 2026 18:04:12 +0100, Thorsten Blum wrote:
-> strcpy() has been deprecated [1] because it performs no bounds checking
-> on the destination buffer, which can lead to buffer overflows. Replace
-> it with the safer strscpy().  No functional changes.
+On 2/18/26 2:13 PM, Tal Zussman wrote:
+> Block device buffered reads and writes already pass through
+> filemap_read() and iomap_file_buffered_write() respectively, both of
+> which handle IOCB_DONTCACHE. Enable RWF_DONTCACHE for block device files
+> by setting FOP_DONTCACHE in def_blk_fops.
 > 
+> For CONFIG_BUFFER_HEAD paths, thread the kiocb through
+> block_write_begin() so that buffer_head-based I/O can use DONTCACHE
+> behavior as well. Callers without a kiocb context (e.g. nilfs2 recovery)
+> pass NULL, which preserves the existing behavior.
 > 
+> This support is useful for databases that operate on raw block devices,
+> among other userspace applications.
 
-Applied, thanks!
+OOO right now so I'll take a real look when I'm back, but when I
+originally did this work, it's not the issue side that's the issue. It's
+the pruning done from completion context, and you need to ensure that's
+sane context for that (non-irq).
 
-[1/1] drbd: Replace deprecated strcpy with strscpy
-      commit: 81b1f046ff8a5ad5da2c970cff354b61dfa1d6b1
-
-Best regards,
 -- 
 Jens Axboe
-
-
-
