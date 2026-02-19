@@ -1,49 +1,83 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DBD2D738A;
-	Thu, 19 Feb 2026 07:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261513382D6
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 08:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771485466; cv=none; b=Z/ZxRUwvUwe/3M1KIuzD4WxSQ0zBxaU8bcefgbx7l43ox29AQ6O2FQzqWqXsJlgk4CnwEYcTl4UP5CqadRvxI0rhr2ir5Tbh2FbKHoYKO8WWSuZPA8P4URxVjoZIdRX1rSllOv7D1cbozKahrMo3PtIhKOeKYlEJZANwQjwWOos=
+	t=1771491566; cv=none; b=pYQWIQ0p+evVLpVPDPdC5TEXZt9nEmkpf1myroMpK6GigmnUqkrfYsUGrT8AmE5S9L4Espc4R0VLEYDzYLqkptjyQfjrCgP2eZzrB5N7tPfS+hMcb99UmOtbeg7w4nYMNq4BfL1FKxvnROhiRAaRNwwcGzoEXJAS2P9rnwWjFDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771485466; c=relaxed/simple;
-	bh=ICUE0bteUdxkiGpe4n9eBKgwJb7CEd6x/aJ0sGAuQDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fVmLFP8bapdWYHrAw/cSyyMdn3YehCnVz1Y6ROWNPO1qH4EI2pK9I9ig4VIv8Js6JSSvF9OREVtRIAZxTEpnXqANO0vrgSPcZMNZ7JMlw5GFXgE6CyOBWP6JKCceAeEypbPlMeUPtK6N8ZR7AF6YBnSMfpxdno8Sn++sv7wbJfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 84B7A68C7B; Thu, 19 Feb 2026 08:17:36 +0100 (CET)
-Date: Thu, 19 Feb 2026 08:17:36 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>
-Cc: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 10/15] iomap: only call into ->submit_read when there
- is a read_ctx
-Message-ID: <20260219071736.GB5460@lst.de>
-References: <20260218061238.3317841-1-hch@lst.de> <20260218061238.3317841-11-hch@lst.de>
+	s=arc-20240116; t=1771491566; c=relaxed/simple;
+	bh=D8UGhu9M908NgUJFkNSCYO4U6X5C1x0Y8oHhK7B0sMA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tAX9uMKH0xpwblglV+/xC4HxgL3c1tC2ChidrhlafJ9wCU3TPpBNj2ul/p0S8Kv+6HjhknCKcgBjQvXhQ35VjTKr5rEFPcON17Dp+4e+VV2BSzpDyesVWQXoKSv2kCMn8JWeyBbkJqtxHAzrV57DLK2U68DvB7cnSFcEtM4mUHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-678f3fef828so11182646eaf.1
+        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 00:59:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771491564; x=1772096364;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5nC+b72pVA44Uc6CcxtsvLZb+c2BvwoMTpPD1V9VdNs=;
+        b=BR8mVdcwe45OzLVW/7WBNCR+2G8mFpY2XfPoaqU5d04zowkYNapb1KR1Et1edl5Ma/
+         wxFJCFXr5to7rl74LV4f0+bCA1ITuT1xRwTp/ba2JqSGY64zl1UtVBvorbxbBiIOCmQ1
+         od05vOqdcp5jPLnLnZ4Cl70TDbErMrD0ga8bL/YXyrRMiCBZ8yN0gPN0ZYbHqvaeHF5k
+         vrnhA9gEjyv1/SLaVbx8WHgML2xSgyK91eH7FppnEkf3+jLyTBZ/dXhIEq+Nj0dNZGZH
+         eEW6aZkmUjn/aF1nWBguudtBvaEmYdI2R1jxwz5LnsTmI1Mo9QRxz5ibq/ahu1Rc5fkj
+         MW3g==
+X-Forwarded-Encrypted: i=1; AJvYcCW50+SccX7W56sAH1u6+qgCsLvwYFT28oUIVBkRZYgTRGeypL2d2tpGU+HPJHOV81ytjVJvo/jNQMwntg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsMXbHp0k7/oXruJwGGMOzCmJhB8zfYTjF+GMpOz1BPgifonNm
+	7WrY/V1AbprYuMK+sieKsbVt6q5YDaBDqIpzBTkSnUieNw2svW/Kj7X76/ttKBCpT4uCsx+2W31
+	lv4S+FGFLBpSwqIH6aGwCUts3oYDjT+2CuTLoufGjVYy8BayzT4HQ+kC1+KI=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260218061238.3317841-11-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Received: by 2002:a05:6820:4a0d:b0:66e:58f3:b505 with SMTP id
+ 006d021491bc7-679a71b93bdmr1828802eaf.12.1771491564022; Thu, 19 Feb 2026
+ 00:59:24 -0800 (PST)
+Date: Thu, 19 Feb 2026 00:59:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6996d0ec.050a0220.21cd75.0107.GAE@google.com>
+Subject: [syzbot] Monthly nbd report (Feb 2026)
+From: syzbot <syzbot+list11bd3f2823c04b2285b6@syzkaller.appspotmail.com>
+To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-FYI,
+Hello nbd maintainers/developers,
 
-for some reason neither my local build not the initial build-bot run
-picked up that ntfs3 added an instance of this in 6.19.  And oh my
-god is it stupid things, so the series will grow a patch to fix that
-ontop of the fixups in this one.  If only we had someone to actually
-look over file systems pull requests :(
+This is a 31-day syzbot report for the nbd subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nbd
+
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 9 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 3344    Yes   possible deadlock in pcpu_alloc_noprof (2)
+                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
+<2> 560     Yes   INFO: task hung in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
+<3> 74      Yes   possible deadlock in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
