@@ -1,52 +1,54 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F75D1A724C
-	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 12:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57DE277C9E
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 12:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771503590; cv=none; b=irBZ6Vc3ODxwozH1a2wjlaG3abN+DgDtC/feJdpIyqyA5UUOGtvITpIt5GuRXWqM6FkdWBbIxkt1rh+oadTnB2ot1DrGIi98br+N3WtYQexE969zPtVutjuFVeaHCM3uB2h8QnrWkOZO1h/7niLbqvCLLfzoIny28jgDz6T8NkY=
+	t=1771503761; cv=none; b=s/6nZ5tIeSF4sXSDZmnG1fQUCnKlPFiWJDJ/UgoF/bdr5yePZPDDPKkgcfag4nmU9xZQrSKmA/pjm247c0p8cCAt/1qFGdGvYwR86HBmZKwUdeBznqazTZ6vFaumD79ost/6bdeffyUVS2qbqlrTZshHDwAlkvgayE+l0KXPc0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771503590; c=relaxed/simple;
+	s=arc-20240116; t=1771503761; c=relaxed/simple;
 	bh=t1jxowCMRVnWXhCvu55X0Pr/SHNWETwgfFMnMqXS/9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XJCI+XSmXOCu6iRXUMo5l2BKm7nVwyi2yncwEDWJzzDqeucARkemFStjWbUfjzpcl31F2s0mo4QxujQ+mTsq7dzTg+grJRmqsLprvD2G1OyjxkYJPHMO5p8oN/KJyWtZmXTRvF5pAUOzBqCPLcbdyQMUNyvOyAFT7tzdD6Dpdms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=iAQZGcUq; arc=none smtp.client-ip=68.232.141.245
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h60wBHL7MboX5QUMt7QEpzftnCPH78V29qML5x2WiRmXwM9nHmNNIYHUmDxFAMT1evK050NFE73IKikEj4h0FtV++7uLBhN6MQrGZdwAhd7S7FoyEMYkB0Ew/r534qa8nmu/8Tv053VIqk2WctkeaAcg5Wu3eLlugI8hgAV96PU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=od9AEW/X; arc=none smtp.client-ip=216.71.153.144
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iAQZGcUq"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="od9AEW/X"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1771503589; x=1803039589;
+  t=1771503756; x=1803039756;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
   bh=t1jxowCMRVnWXhCvu55X0Pr/SHNWETwgfFMnMqXS/9o=;
-  b=iAQZGcUqF2WPyYbWXwjXypBy06jCMEMWKD5bMjISEBNdG9zK2zF7nnvp
-   s39Zb9owjd7YSzUq8TB1S31aziGpHbppe3YJNkC47J37s08DNV2TQjuba
-   ndNVIk4ghFGg2MkkAQLcyHv6yOK21Y3vHkZoQbfQVS5MYrTvr1yWbXxML
-   YFgtDge1DSmrxdnitvOdsjZqsyLd8SE8YJ+2RdbyMEula95fNjuZhX4MK
-   C9TbGeh4pH8GaRUodQS6wUcntcLcHvQ0RGKJhwPyd7TI3dRLkBJrTKLtC
-   7tbU9NOnUaj6RTYEKFA0dXk34AFO1flrtv03G/jitkMTRr6fNj+9ln3pI
-   Q==;
-X-CSE-ConnectionGUID: oS56FOl8TE2YjFZdU1oy6w==
-X-CSE-MsgGUID: HF1fvDMgStS36DS+cVoRFg==
+  b=od9AEW/X6RVh5TdwbZElqKQkZuzDJ0PDIbQVpKrWmEt+ivMYjFHRiOf+
+   0XABwb7+sZcn5Jr4NW3eWPTbJyy87sTY1wPZuLND2q2SxaZQRsudaeMKc
+   AjImocCDD05B4qx/TAz8lxHOeWpJVW1tv4mlTeFYmAKF6prr7yZVvPVBY
+   y5cXTx91rl4IH5riTpN+buObpfPVcmfJ14Vrz9JZRER2SvDc2WkrM9aiO
+   P0eneiQJ70qYZyL77dhQA8r5iBoU3Vsh37smAdBEd+pkEh+sPjH7pqYjT
+   v3NSwYgB0ZjqXjsjzpa+vOcldxzs+0I0DYZKuLFfkyTaYsulB/zPYSHvI
+   g==;
+X-CSE-ConnectionGUID: Vk4WyiwFRgucglDNSlAk9Q==
+X-CSE-MsgGUID: t7X7Je4xQ3eycePFeaWTnA==
 X-IronPort-AV: E=Sophos;i="6.21,299,1763395200"; 
-   d="scan'208";a="141017472"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Feb 2026 20:19:42 +0800
-IronPort-SDR: 6996ffde_7Ymu90mMhQFTEE0Hj1fpDrBKWplcjUAvDhafQRO+X6CEak4
- L85QPk8Vi8N/Q9lhZiJbhlYBdOxMS22DOU8lZDA==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Feb 2026 04:19:42 -0800
+   d="scan'208";a="140659069"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep03.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Feb 2026 20:22:30 +0800
+IronPort-SDR: 69970087_hDBDbwzFwDvagwZrPS232QRdCHGwP3L2LojZJv1uEnqhU+y
+ cynS3TdBDv5MtrAqLTpdS/uys4m0MFy/iaJ1/xg==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Feb 2026 04:22:31 -0800
 WDCIronportException: Internal
 Received: from 5cg21741tt.ad.shared (HELO shinmob.wdc.com) ([10.224.109.91])
-  by uls-op-cesaip01.wdc.com with ESMTP; 19 Feb 2026 04:19:41 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 Feb 2026 04:22:30 -0800
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Subject: [PATCH blktests] zbd: do not handle write pointer values as numeric for full zones
-Date: Thu, 19 Feb 2026 21:19:40 +0900
-Message-ID: <20260219121940.174239-1-shinichiro.kawasaki@wdc.com>
+Date: Thu, 19 Feb 2026 21:22:29 +0900
+Message-ID: <20260219122229.174539-1-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
