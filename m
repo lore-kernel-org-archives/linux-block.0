@@ -1,156 +1,132 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE037303A3B
-	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 09:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771494892; cv=none; b=f/T7H09Z5j9dSiuDliwWDp+PmhDYXniiBhHG+ciNL78JSAWSlMLIO7rSkTlTu79L5qAMsKRhrmbtvujlzOqQNoGZ4Gt3P3MNTFZM71aoWl7GvvLk0m2Da3y/kATuBtjWKXHYPww/aQ75CiZgDYMHU7IZjH/PJiTUASzH0/TeVZQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771494892; c=relaxed/simple;
-	bh=DC2Pt8hIrWFIINaq/OAUpk4sf/yHj2GhdQi3YeDeOGQ=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=WfbMkH00NrbWue2RlXo5t7ThWZMsrGdy0exBH4n6xbwC9xFyL5GaHgXtXCs3sy/Zn8PiZKRdCDP6R5p4WnNEfMLRtWnjkeawH8TlTD+Y+Fnld0w6y1hI+E8jJQFiLrcxRHRSANQi8mzM0dEpLDFm+v4lMkIGdZHuyhTcZhSWA2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BNoOW7Ta; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rGfDI4Sz; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BNoOW7Ta; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rGfDI4Sz; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9CD3382E5
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 10:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771497805; cv=pass; b=cp3/IGOptT5ZpUAeUcWlbfnzS97BDN4/48jVqDh2Lj0XrOrdeq3befY/HrWt0+RRYnj6/Ru12TZzrwSifovj4TBkIHuNWP/k+9eYB7dm3K7+4uAHR2aOptbjucIVDD4ZoUppfDYvD7+9+NwCq/HwDdcNvxuLNQ2QSU4z8wKv9cY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771497805; c=relaxed/simple;
+	bh=fhnuYB8beKyJ4Mt13AymxBrbjVthPvqwfJloa7cxwhA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XBd6c8GXYG9HQMMiFav7YMbJbVthTsierruf0b8O3uC9IEnDdRXyKqglmWyuFbNxENrcXiDEDgRjgI3awY8etJfMxjYv5FAP5e1SIc0+5gtLM4lo+HX55riaPL1JAYzreEsKpXCN78sgW6M7F1nTogHw+FpTzmpbo/8n5pzaKPU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=WTNE7KR1; arc=pass smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BNoOW7Ta";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rGfDI4Sz";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BNoOW7Ta";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rGfDI4Sz"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 313055BCC7;
-	Thu, 19 Feb 2026 09:54:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771494889; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
-	b=BNoOW7Ta9bzhOeu6BmeXIU3CukJpHmWhf3JW9U55bYDe1aXhPML9SZx/SzLQpHYLhXmhJ4
-	XeVGHpBZQJ5QgPfCDgDwY8fSwMdoEGtFGUPljC2m7xODa/LGoDYo8q+ddBM8B+1FuVelER
-	/Ms74PK1QoBqlMqzd9RmTdfnKCvairE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771494889;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
-	b=rGfDI4SzjwY8KzuPdzLugT9WuovU6r0d+qVBpZP4QOsfeUm8yoYUXuMpMaf13jorWQpw7T
-	DKkwtNsJvzv8ZWDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=BNoOW7Ta;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=rGfDI4Sz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771494889; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
-	b=BNoOW7Ta9bzhOeu6BmeXIU3CukJpHmWhf3JW9U55bYDe1aXhPML9SZx/SzLQpHYLhXmhJ4
-	XeVGHpBZQJ5QgPfCDgDwY8fSwMdoEGtFGUPljC2m7xODa/LGoDYo8q+ddBM8B+1FuVelER
-	/Ms74PK1QoBqlMqzd9RmTdfnKCvairE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771494889;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3e7k0CMgUbTj2xC5pAxQgef7+E5hHmV9itvXo3DbZGE=;
-	b=rGfDI4SzjwY8KzuPdzLugT9WuovU6r0d+qVBpZP4QOsfeUm8yoYUXuMpMaf13jorWQpw7T
-	DKkwtNsJvzv8ZWDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7D9B3EA68;
-	Thu, 19 Feb 2026 09:54:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id c/GwNujdlmkBSgAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 19 Feb 2026 09:54:48 +0000
-Message-ID: <f22caf98-1375-493a-a275-0500ffac3e81@suse.de>
-Date: Thu, 19 Feb 2026 10:54:48 +0100
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="WTNE7KR1"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-59de2d1fc2cso795650e87.2
+        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 02:43:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771497794; cv=none;
+        d=google.com; s=arc-20240605;
+        b=czH3OW4fvyvlkyvP6rYsCoF5Dowmc5PmO75g7jfyA0PIrREB7LdEdbK7j+DcOoJ/pa
+         9FKPbl7keaVP4FsH/VTXEhDG391EZbuircylFhQZgukNvuEGdHrajgjBKByFsXJMJa3p
+         zAQXLopRsy6bnOjRl3wrSLJoI0lUQ2xeaHyQTvEl2uLLOq1AkS6WqJF6Lx2GmmvaEHEq
+         3zUtOJ1V6AqfuinJOMlyl/TvTDx7u6Nu2bbgqh6KrWGTDobc9eKqZdEkqxD9fgU0LUfx
+         Xh4COmN895wNnn1tJ2I5cpCPU/c0jTsEtg02TUQAy1olHvMk8u85cGWWQbFDRhXz29xR
+         mP3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=fhnuYB8beKyJ4Mt13AymxBrbjVthPvqwfJloa7cxwhA=;
+        fh=FUPt2XbM33hlu7Ok+22UmMs3T9GUMMSzI3Jj9pjZ1ok=;
+        b=THrdAeexC7wcCdP5PZKn1hIXI0GSUdwlbvWLAcbFXqMw8F5/BrYu1W0201hW/ttb3P
+         k5nWbDLJDEGL5hQF4JeLqCTtFtEAxw3HM+KP2kNuj1ngs5168bSB//EIJjuB1VhHY/BM
+         fncV1hyrdMECsliIbmmR07QEjNGWVhU6ocjZ4aKCw9jyTGnSXbr4f8uBerCTWO2cbUS/
+         iUO/S34v1ACQ8FkQ9KDNovFadv0RUgyCgUODgoEAMAhY7LldCdjRmg0UAtvkPHvqVXVE
+         OE8Md0ujoxpC6qDt/F9I0rwoKa8v+ktpPJcqhED+2my5Zq6EsI9zhzNndxv4tf1wCnQ/
+         +Q2w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1771497794; x=1772102594; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fhnuYB8beKyJ4Mt13AymxBrbjVthPvqwfJloa7cxwhA=;
+        b=WTNE7KR1coqYdbKJ7BUEzoZ6fx2KB9yole8aO4nbXOr/oUJIZNEEhOqXAQa5tVlwf/
+         P0x7GIDc8zXnPB+uwvG9+f3YzAv73rXEp+ZxaaiBkOkeclyFn/kzM6sbkZ9wQRwxvXFg
+         SzXUkr67W4JfxTqRECdHwMcbDmmRHbB+zTOeAYqYj4gu7YTpsYinWrsWcA9bRamQRomH
+         ZquLc4+c4KD0v+2jSsmVYYLUEPZQjY4uH5xmexdm9BLRfTbDv+cBSPhZxajl+j6vZkl0
+         bc+oe9v4wGPn/pmWA/t/OcKsexjzVL0O5ZKWwN8BZNN9LR04G9FE/dWUKASCjesE+HH6
+         Uuzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771497794; x=1772102594;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fhnuYB8beKyJ4Mt13AymxBrbjVthPvqwfJloa7cxwhA=;
+        b=mKh9/mvbn57kpqtNUhRhPdJByidDu0FdIFZkIP8f32suiId+Zhzo4hACqqBlrw4LC6
+         s1XyiUnCdGGiNfAcL5IxHcleipYyObDeMtQVUaYCrzhhgdNGKeMrTSECBu5qMs5eDaDS
+         yuFb7CVKGvIsJt4x2SO3/JKzB6zjyXBpLPGjUkyvkuN9FGgqrO186wvU/gYDqz8QGUVl
+         2plTOcIVg4eXByAvm40JZFQL3gvbQ3VRynikf+XuDtQAi5HIHYJOhp1GVPLPShnRLJkG
+         DdhETGuGFtDv2LPQt6URwtrd2+tg3jDoiVyXkNEYaSmSimBDMhvgIyct4I10OFTmMrrR
+         zYgw==
+X-Forwarded-Encrypted: i=1; AJvYcCU03lv0Ag5YMN2F1HbP+l07hzBxmuKwJqxDtvEOlSFV828m0ekxkC9HKtx61oZAOKTVge3gAF3Ji6hqQQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOehfTOXQJawfE1+cwj8QOxSR5nqxLSfKa+qL+hgqKeCnY0Dfx
+	JCGuNTeIeTGWos63wZ/BJFU+i3Eqb7V7U/mTj7xgwqaxxrnM/c4Z+NP/MCluTxjwRgqxnDtmP9Y
+	nyOH9zcSPUaSlvnE/sHM59odTX1isHGOBaZOQD46vLQ==
+X-Gm-Gg: AZuq6aIIEC2crvLqn7oA3+vUZ8aERh3OAsztc6BYUfmclrULcn0aCV59mKJd+yKYyV/
+	MDpq4BICUQC5uUYmSbJQxXECb2+LYeEGTtSKTgzTLBccAulYp0jMO4XJJU5IJe44ijT4hPk82GX
+	MxxrvV2taNoBB3xT2jM8Ws07Ebj8Igj6oHfTB5Io7FMy6v0ijoZbV4sguKpWUQsoMz649iLq4hp
+	giNqERPrGSvmtmd44xD8nSfd9ofCnboRqxUDrDBahsU9zUt8ahQF/2iFVgSWn6OjYJy2Fla9QGn
+	eQI3fg7lI/P1q5khmUa66nH25LvLlSPneV6mUsBIuh704ALN8gUVlbJEf1yYuRAkg22GrtU58IH
+	xrG0=
+X-Received: by 2002:a05:6512:124a:b0:59e:2aeb:3acb with SMTP id
+ 2adb3069b0e04-59f83ba4fa4mr1708881e87.23.1771497794469; Thu, 19 Feb 2026
+ 02:43:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: lsf-pc <lsf-pc@lists.linux-foundation.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org
-From: Hannes Reinecke <hare@suse.de>
-Subject: [LSF/MM/BPF TOPIC] Memory fragmentation with large block sizes
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Queue-Id: 313055BCC7
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+References: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
+ <7aca0686-b255-4ece-b766-ebfc90df7340@acm.org>
+In-Reply-To: <7aca0686-b255-4ece-b766-ebfc90df7340@acm.org>
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Thu, 19 Feb 2026 11:43:03 +0100
+X-Gm-Features: AaiRm515hLP0roKsdGWQZfdyzUXrLj8hv4bgx4OtzfAflEQjzn5D8oCpl6Rn_uM
+Message-ID: <CAJpMwyha9Tuzn1nEDvfPbdaPFa6WbVBO91QoPEKJC+DB7V4PBw@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] A block level, active-active replication solution
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
+	Jia Li <jia.li@ionos.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Fri, Feb 13, 2026 at 6:32=E2=80=AFPM Bart Van Assche <bvanassche@acm.org=
+> wrote:
+>
+> On 2/3/26 7:09 AM, Haris Iqbal wrote:
+> > We would like to present the idea and internal workings of the
+> > solution, and also discuss design and some benchmarking results
+> > (comparison with RAID1 over RNBD/NVMeOF devices, or DRBD) during
+> > LSF/MM/BPF. We also want to get feedback, and potentially get more
+> > people involved in the project.
+>
+> Please prepare for the question why the choice has been made to
+> implement this functionality as a new kernel module instead of
+> integrating this functionality in the DRBD kernel driver.
 
-I (together with the Czech Technical University) did some experiments 
-trying to measure memory fragmentation with large block sizes.
-Testbed used was an nvme setup talking to a nvmet storage over
-the network.
+Hi Bart,
 
-Doing so raised some challenges:
 
-- How do you _generate_ memory fragmentation? The MM subsystem is
-   precisely geared up to avoid it, so you would need to come up
-   with some idea how to defeat it. With the help from Willy I managed
-   to come up with something, but I really would like to discuss
-   what would be the best option here.
-- What is acceptable memory fragmentation? Are we good enough if the
-   measured fragmentation does not grow during the test runs?
-- Do we have better visibility into memory fragmentation other than
-   just reading /proc/buddyinfo?
+In short, it was mostly because of 2 reasons.
+1) We wanted to keep the "single-hop replication and syncing" offering
+in a generic transport module (RMR), so that it can be used re-used by
+other modules in the future.
+2) We think that DRBD=E2=80=99s core abstractions (per=E2=80=91node peer re=
+plication,
+single lower device) are orthogonal to =E2=80=9Cactive-active replication=
+=E2=80=9D
+model.
 
-And, of course, I would like to present (and discuss) the results
-of the testruns done on 4k, 8k, and 16k blocksizes.
+We can discuss this further during the summit.
+I assume when you said to "prepare for the question", you meant the same?
 
-Not sure if this should be a storage or MM topic; I'll let the
-lsf-pc decide.
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
-
+>
+> Thanks,
+>
+> Bart.
