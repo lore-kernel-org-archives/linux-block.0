@@ -1,48 +1,67 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACC733ADAA
-	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 14:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FCC33F8B1
+	for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 14:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771512820; cv=none; b=JCYyOGCIXsgFswqVtm+TuzwYfoQuscSYWj+4mriFh6cqvTZOTOQxXRb5c2a8dPX4G2dIbGvosVysiQ0opFGsBcuwhrlj85c/Qo7HzA9Ufik2iQ8K/N3PbskkUomzJafrZW7Q+vghCGqiSvqYxa67tMQabxVf/Pi6R5oO6sTrM7c=
+	t=1771512838; cv=none; b=WZp1LZGmrD6I8eAsc9tJvvSdcR34mIHLM2K4/jz35UjLVy452BjxyjC/q82us8u94hwzhbJKRnOudMkSPcPwQx8mn2/0EvRDUWGbzbR/uL+2AOoaoPfsf3flon3JO/SBhlp3IrCxjTfMhDQiYCcBpa3xvQ0aA0MP6qhzzJGE1LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771512820; c=relaxed/simple;
-	bh=UrUjai8u6cXHh2+G8/qX0EhH70xOkqAzUdC8B16/41w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=TvaxF7WLaOG/mx4zeirg0WTGtVUhj7bpd1g540sjISg//Vjh/n+WaXLt7UUl9Asoq2o4oxFVvQA0nUBi1Eqle317WXS0ZC9jyKNs/+kkjRAaSz2bZ6L2bHzBXd3qPn3j2IO5JmA7jUV0bTBzlByeQ9ozBaKrGXrz0obdQmMNjUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=33m25o9O; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1771512838; c=relaxed/simple;
+	bh=UtSPcQuy9S0EqE5S/a3ZAC5VC3JZC6AUONOCl5P9GPk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EGlrqpabvKUCGU76q9yvjucd4nG6gGtSHc8UmaBQEUZ7TLsd3fGDPg0QgFnuITD7UcdIY54C8857u3pHKACSUJWelsteqrUs7ycKAf72k6LOq8grAuO4iLNwbY3CBUKdyemjnA4itfAZ1Z7FCHsc69Zxp7Vre0+FOUk1MfY9tRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=L+zM3Z+j; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="33m25o9O"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fGxG53hkfz1XM0nn;
-	Thu, 19 Feb 2026 14:53:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1771512812; x=1774104813; bh=Hunk2Dv1mebPSEeGUspQczD4
-	2feWNf6sRslRoqaD9x4=; b=33m25o9OsFO5l3zjvISU1ttAkoFEsdWWD7CgzOx6
-	fC4HehvWZSOk3tjy5SD4cMAU8Lt99d8I/f5YC8NmHFO8wz+m75fWLW3TX/tXiN9y
-	PPKSBfZmsgmnTuQPOzARa1MGLiCP71c7dT72r5OxKVSYB2UtapBdyfaSqpTvUTaC
-	sjaMkrANYElMsbMEIlliiDx/T6lUR5hk6hSlvLoBLSldrGFiTLaV0Af4mfqt6Fe0
-	D7AN6/3OzTpCgoCufHH3hLRO1rasGIPT5ndOrNaqobxHy7Pp2mifDFeWHXRVCPke
-	gM81OQAepWn2NKRQH5OBSsD/lJyVQFA4vn/TP8BMvtyaNA==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id yijDWlHsKgO7; Thu, 19 Feb 2026 14:53:32 +0000 (UTC)
-Received: from [10.237.57.149] (173-255-98-114.utilitytelephone.net [173.255.98.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fGxG232syz1XM6JF;
-	Thu, 19 Feb 2026 14:53:30 +0000 (UTC)
-Message-ID: <e2733d9f-823d-433b-9bfd-24df20b98b7d@acm.org>
-Date: Thu, 19 Feb 2026 06:53:28 -0800
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="L+zM3Z+j"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4359a316d89so982077f8f.0
+        for <linux-block@vger.kernel.org>; Thu, 19 Feb 2026 06:53:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1771512835; x=1772117635; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/BPu7oUCo+mkYs6t9WVIVRIlfLwpsIPMLJ2jvnF+txg=;
+        b=L+zM3Z+js+MbjFV1LHJxMEWmJNqNbnGHDcBNYS22/len5y+2vEIICqvC3geXuTMDTD
+         IAae65O0bXL6ijB3mzNXJQdASyShxQhoBpf/pFd7hEN0lXdeEVAA17RyV3IXLAQMjjMO
+         Fy8zMkNSfhaIP/f17HcggDSEk3EeVqmYlg3WTzQynNz5Jr4vF7hAxnlq76rEbCwt5tvs
+         FyV82OVy/9a8hDPdhu1Yw+PxmFYmm3Z55/Ir0MiMOzTCxhox5sV7oavyJZcYxloTQgkL
+         XZpeIadQ1TuxE5Od5SKrkKHmd90NPI72XBueKuGsSAEj7pMxNmc9zO2k4+FsQFHWpWmK
+         yXRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771512835; x=1772117635;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/BPu7oUCo+mkYs6t9WVIVRIlfLwpsIPMLJ2jvnF+txg=;
+        b=ab3Y0KwGSPVVFJ4yC5azrGMaEil7chJW7VHTRLkUXh4HnCGH8/zzNG3KGT0rWdwifY
+         OTNVu1eox/+ouhdUiRwbwrElE2PpePSz9FeKr2sY7hfo6YlltoLV7Aw7n116MeA6OmSh
+         dYH8eWNLws+6qR8ndR5kAMR0LeCyHo5sG22za4z5jaqR4d1gfvbVNoVPFTm2zixViQDR
+         Bd8QDU5CeClCoS5p9AVmZ6AT+MhL5Rp7KcIw9hrucDUTDwv1FcV1AmPVktBZDB0px93C
+         l3uyPq65gIsdfcKDvOAXhUuUSmsyORc20Uc1go/rG1d4Viu78CEU7tdiGCBU5c8SipQs
+         qqbA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5mMRi7GSQPI+xUXwmskUG0NGQ8VqC1EAaINMCuHjEHANAv7VZyZSCLp7e3+yB65+fhcwFkAffFKvJTw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1Dwkm7978uPhZWtRO9fjMOxqdLaONdldyERarV/XDzCt1JlNy
+	guUlUrlIfQ4DHKNFiw3iubfBmJq8fJCm4M9KcaXAHpBczcUXfBLLjpFS7wSY5T/s/qQ=
+X-Gm-Gg: AZuq6aJVDcdhOrJ/Am/i53Wb3OPB5mwMC1rII01+ttwx7iA6JOqsDaDXH6UMlorFDN9
+	1brepVXbzlUpp+PS3M8uJ5c4jkU4M+4e8T6KT4kVfu4mRT41lQIJcPajG1ZDYOPVaXURzjMGpFn
+	pC/K4a1qgAlYflSjIs4LyBrGQ35OKHb+j5xH93O2cG/YUR4k7YRpEqKkBNwGqPhdzTCzXVNg3op
+	laG/5VWIWq1EbGF/VW24b4qUtlW6wGii9pbZBjInWbuIxj7MigSssMwlv+yKsi98MdToSZV3Nu/
+	1HmYUzlaYDjDpXSBZZaWqGnJ2w/VOpNoI1yx1R/oTzinjXL6wUV13hPx9OUeik61KtdNwPfCCMY
+	oyO8wou5IWOrc3ZBFfHiuyNbci2tIthOA3vdFG/7sS1mXJjlm2o5P77bIF7hEa522Av3cVGBWpf
+	gY0C5jUW5u3JK91VzV32Kbmii8LEpTKb5exS631t4rsiczVNpZekJKJ8hruNlvpxvebs0wvYO3I
+	Wvw1ymE+FmxFxJzJiw=
+X-Received: by 2002:a5d:50ce:0:b0:437:8fc0:8802 with SMTP id ffacd0b85a97d-43958e527f8mr8129399f8f.48.1771512835126;
+        Thu, 19 Feb 2026 06:53:55 -0800 (PST)
+Received: from [10.43.5.171] (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43796acf5b9sm49037171f8f.34.2026.02.19.06.53.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Feb 2026 06:53:54 -0800 (PST)
+Message-ID: <2b87cbab-49e2-4290-8784-b771e90e016f@linbit.com>
+Date: Thu, 19 Feb 2026 15:53:53 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,46 +69,91 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Memory fragmentation with large block sizes
-To: Hannes Reinecke <hare@suse.de>, lsf-pc
- <lsf-pc@lists.linux-foundation.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org
-References: <f22caf98-1375-493a-a275-0500ffac3e81@suse.de>
+Subject: Re: [PATCH] drbd: fix a null-pointer dereference when the request
+ event in drbd_request_endio() is READ_COMPLETED_WITH_ERROR
+To: Tuo Li <islituo@gmail.com>, philipp.reisner@linbit.com,
+ lars.ellenberg@linbit.com, axboe@kernel.dk
+Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260104165355.151864-1-islituo@gmail.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <f22caf98-1375-493a-a275-0500ffac3e81@suse.de>
+From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+In-Reply-To: <20260104165355.151864-1-islituo@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 2/19/26 1:54 AM, Hannes Reinecke wrote:
-> I (together with the Czech Technical University) did some experiments=20
-> trying to measure memory fragmentation with large block sizes.
-> Testbed used was an nvme setup talking to a nvmet storage over
-> the network.
->=20
-> Doing so raised some challenges:
->=20
-> - How do you _generate_ memory fragmentation? The MM subsystem is
->  =C2=A0 precisely geared up to avoid it, so you would need to come up
->  =C2=A0 with some idea how to defeat it. With the help from Willy I man=
-aged
->  =C2=A0 to come up with something, but I really would like to discuss
->  =C2=A0 what would be the best option here.
-> - What is acceptable memory fragmentation? Are we good enough if the
->  =C2=A0 measured fragmentation does not grow during the test runs?
-> - Do we have better visibility into memory fragmentation other than
->  =C2=A0 just reading /proc/buddyinfo?
+On 1/4/26 17:53, Tuo Li wrote:
+> In drbd_request_endio(), the request event what can be set to
+> READ_COMPLETED_WITH_ERROR. In this case, __req_mod() is invoked with a NULL
+> peer_device:
+> 
+>    __req_mod(req, what, NULL, &m);
+> 
+> When handling READ_COMPLETED_WITH_ERROR, __req_mod() unconditionally calls
+> drbd_set_out_of_sync():
+> 
+>    case READ_COMPLETED_WITH_ERROR:
+>      drbd_set_out_of_sync(peer_device, req->i.sector, req->i.size);
+> 
+> The drbd_set_out_of_sync() macro expands to __drbd_change_sync():
+> 
+>    #define drbd_set_out_of_sync(peer_device, sector, size) \
+> 	__drbd_change_sync(peer_device, sector, size, SET_OUT_OF_SYNC)
+> 
+> However, __drbd_change_sync() assumes a valid peer_device and immediately
+> dereferences it:
+> 
+>    struct drbd_device *device = peer_device->device;
+> 
+> If peer_device is NULL, this results in a NULL-pointer dereference.
+> 
+> Fix this by adding a NULL check in __req_mod() before calling
+> drbd_set_out_of_sync().
 
-The larger the block size, the higher the write amplification (WAF),
-isn't it? Why to increase the block size since there is a solution
-available that doesn't increase WAF, namely zoned storage?
+Thank you for the report and patch.
+The bug analysis is correct, but the fix is not.
 
-Additionally, why is contiguous memory required for block sizes
-larger than the page size? Does this perhaps come from the VFS layer?
-If so, is this something that can be fixed?
+> 
+> Signed-off-by: Tuo Li <islituo@gmail.com>
+> ---
+>   drivers/block/drbd/drbd_req.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+> index d15826f6ee81..aa3da2733f14 100644
+> --- a/drivers/block/drbd/drbd_req.c
+> +++ b/drivers/block/drbd/drbd_req.c
+> @@ -621,7 +621,8 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
+>   		break;
+>   
+>   	case READ_COMPLETED_WITH_ERROR:
+> -		drbd_set_out_of_sync(peer_device, req->i.sector, req->i.size);
+> +		if (peer_device)
+> +			drbd_set_out_of_sync(peer_device, req->i.sector, req->i.size);
+>   		drbd_report_io_error(device, req);
+>   		__drbd_chk_io_error(device, DRBD_READ_ERROR);
+>   		fallthrough;
 
-Thanks,
+In this code path, peer_device is *always* NULL -- the only caller that
+sets READ_COMPLETED_WITH_ERROR is drbd_request_endio(), which always
+passes NULL for peer_device. So this NULL check effectively turns the
+drbd_set_out_of_sync() call into dead code.
 
-Bart.
+Silently skipping the call here means we lose out-of-sync tracking
+for local read errors, which is a data consistency problem.
+
+The proper fix is to obtain the peer_device via 
+first_peer_device(device), like in a similar path in drbd_req_destroy 
+(drbd_req.c:125).
+
+case READ_COMPLETED_WITH_ERROR:
+	drbd_set_out_of_sync(first_peer_device(device),
+			     req->i.sector, req->i.size);
+
+Regards,
+Christoph
+
+--
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
