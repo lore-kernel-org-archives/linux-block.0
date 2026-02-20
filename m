@@ -1,204 +1,121 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E6D2D8375
-	for <linux-block@vger.kernel.org>; Fri, 20 Feb 2026 11:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C6E331202
+	for <linux-block@vger.kernel.org>; Fri, 20 Feb 2026 11:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771587356; cv=none; b=Z0hUUJyO68i+fYP6Xv9u3Leko4Sw9JMZZdJ0/TwDUaqaq7ZRHAH2pIUxtrG5AK3ZwYbf5OaT/7R7jiYrjgIeCuW8n2OylxyykXdiGAOlWfZTyrU4X7opq073zNdDNF3XAhnpiq1UsMhxJ3fp1/g8NrZeLJ2iAyWjDpvGWGYFL24=
+	t=1771587587; cv=none; b=Zal1oMBZd2TwE7V+yq4OBz+ATUZ8VsdwJ096+4tHS/hO9aCFJZQ4bGHQ2bdrAbRXRZAAwjyZ/0SZHaPdgxD65ApbivyMzDAr/sySF+CpJys++FPVXHKBXT94Vhxf1Rs7+p1FdUsWW/E8k3ZjuQcxJ1C7nafFuO+WRQTaBW+JSoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771587356; c=relaxed/simple;
-	bh=2OoGpJ5Mywexi3BTt5E+ogbs4577B+O63xQ7OeKCEwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Se4Q8cwdqxgTvY4Fy9HauwSN3tZ9nopHJqLc/BrIr7VbY2LnyeJ3K5lWJWfKAmAKLnUrMqz819q4pb+rvUjJa1yxjyNdJOF7lhBrHBeYt8OSobUFriznnAO4pvT/w4bv7OvkvUNl4c32HxwsSD6xP7yWoIb5d/pYb1FlhA2y8GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=geMVNDIh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1771587587; c=relaxed/simple;
+	bh=09UEbk9dCc1/v7GTUjrY4SUM9KDAOWfH15C+AzLS2AM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h2MdTBC5sbg75CCPb2+5kqMo1NTWx+uqFmsYFj3+LRyt6YehuHAO+fYnCFJFR9PO2xpQk0jIKTLjLmOLOhzma05sHo+6LjDZYL/kudEi3og7pUcke8om+x1tA3ql1RlEJk7CrEt54by1btA/DqDTph3QSGclhoFF8S40kcDKSiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=Mh8hHb79; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="geMVNDIh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771587353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WBLjTwFOuvMYqr5FtLunJpnAPsrf9ld2OSiOfvJCaJ4=;
-	b=geMVNDIh1I+qYp03+QwbidHmoud4lFvbh8IwPXD/EqaAnuh9/7MADkiI58lrQzsdjO1RmO
-	9iaI2AFVl/KgpyvRRwrMqu65YkpaVa6G7Cftq9QjIaj2RKVlmtppfA5iYhKHvXTy0LhSnR
-	NmjOEq1w5HlsZMYWjIF96QlTgK0CGTU=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-266-11eGQDexNP-d7MBgxcZyFg-1; Fri,
- 20 Feb 2026 06:35:49 -0500
-X-MC-Unique: 11eGQDexNP-d7MBgxcZyFg-1
-X-Mimecast-MFC-AGG-ID: 11eGQDexNP-d7MBgxcZyFg_1771587348
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 168D31956059;
-	Fri, 20 Feb 2026 11:35:48 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.11])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C22F5180058A;
-	Fri, 20 Feb 2026 11:35:44 +0000 (UTC)
-Date: Fri, 20 Feb 2026 19:35:39 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Hannes Reinecke <hare@kernel.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] ublk: persistent device links
-Message-ID: <aZhHC-mVNOeroiBS@fedora>
-References: <20260216122730.144092-1-hare@kernel.org>
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="Mh8hHb79"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-483703e4b08so15514235e9.1
+        for <linux-block@vger.kernel.org>; Fri, 20 Feb 2026 03:39:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1771587584; x=1772192384; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NAZvmYa4+oLnoaGzT3J4OlkyuUdxp/o/vWFvPoP3fG0=;
+        b=Mh8hHb794dTdhWTQo28a964za56bBpuZ9D4oliBPpVgnd1Yrs2rgIgfwZHn/yNRvQg
+         EF7iJyFR3nf0tOVrBT7Gy89mRTAfnZgwUIxjWn1CXc6tVjwMzrU4hQ9W7JpZXZTRAOY4
+         gu+nivpZ87n3oKx/u8rhnpLqXjOfUBgD25tMcp0FrnmYosm+N4rhzLDdrk6d3mzOFkfz
+         UBbUWfb7Grs+oHCZuQy43E8JtOizYc3030pIbWR0dw2TyoTq+Om3XALDBTZW9zQBEZM7
+         YlsheWQLhIdJZKU7Eq22Wb/2XJvXPTf9TNq5TPgWQxLSvNnEQus7YE9ByolRRLZt0ViU
+         c5ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771587584; x=1772192384;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NAZvmYa4+oLnoaGzT3J4OlkyuUdxp/o/vWFvPoP3fG0=;
+        b=EQykX9rbb5vMff4WnCQzZuO9y8ginnGa0q6VvAd6Lxj7yO0x2HAtvnR84vzis08tWv
+         AOkqr98A5DX9/9IWTNpeJPoVNEOHQwqPssV7f6k+XcIDiYhD5lUw6biT9p424c6KBdm2
+         PySy54sYNvB+/m8OMGUHS1H8mS/7zF1zNtuIs5qmXQ9TbSZ1+N/6bP85QYswKM9+5nnE
+         sQbVkWsLJiJRIPPAutbDf+oWM3sdhMQo1cA9Y1X9Br0srOrrqS54b2zmcQS3OPec12CO
+         GiNMFjpO7WHvl6/ro1fWnnjkKcJ7g224HG97c9pmeCTdFCNHjjeyZbkoo9YemwxQIJ+7
+         vx0g==
+X-Forwarded-Encrypted: i=1; AJvYcCW5EnHW8PE7MWSa0AndBD3FFXSt9XpkXt3yIHbPJ30Qt9MBs7WHuHDNG0Xy56Fgypm/k3g+wJEgVnrwMg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7Da720/PbktkMZL8r3x4EjUoZ3kbG3r0m2GmOTRSkP6qWccIa
+	GViwc2DXIpD+8RX0VdG+aYqHuSUgL3iqDxIJMkNX8xitfPlA46CKXcMOa950tIgWxpg=
+X-Gm-Gg: AZuq6aKo9xRI0ivao/TN3TAwT64IpPRjsoiy7efhyGnaGMIZB4ekm7WrKy8jiYmB+GS
+	LTesdgIZ4g2U+1gr5z06QPnPuNKGo4KgHUvJ+5i+FHgGemi/SKefbGAvBPlfvosv/dXvmUohVKX
+	v5YfJTvMdE9a2XZyiQtDvxX61iUTjQWA2UDWcgWmXrW6/IaPxLfhM+48UW8NFv+hIsMcmHVL4aT
+	nfcsSr2SZc9s63NzhBkIUiqBr1wplCJahUXEJwfIbl4WMqC1x2HH544e859f9V7iMYVogdhDrv8
+	yPm971pt4KiOc/P7xS73xubezgpvikkq67BDoGmgxNYxPaUSSUasaBcC/pi8FgeRWlMMKvf0FT0
+	Lw/jGvv1MOxPHyjTJttZzhRppk2XfKBsqsQmG517iYud9+4B8ERoRI4p/+Nxky4sKoPF9aZvJ1m
+	lvgzYyECIf0xsUpiBPc3fi7Cc38y882sY+MVRKl379KxugPkXnuNqAdDE3M0jZvqRF4PJyKHL/2
+	VRGw9f0KNwiWWlIx9wuEw==
+X-Received: by 2002:a05:600c:c114:b0:47e:e97e:11aa with SMTP id 5b1f17b1804b1-4839fe8e843mr76621565e9.4.1771587583811;
+        Fri, 20 Feb 2026 03:39:43 -0800 (PST)
+Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a316eb08sm75529045e9.0.2026.02.20.03.39.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Feb 2026 03:39:43 -0800 (PST)
+From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linbit.com,
+	linux-kernel@vger.kernel.org,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	linux-block@vger.kernel.org,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	stable@vger.kernel.org,
+	Tuo Li <islituo@gmail.com>
+Subject: [PATCH] drbd: fix null-pointer dereference on local read error
+Date: Fri, 20 Feb 2026 12:39:37 +0100
+Message-ID: <20260220113937.2691322-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260216122730.144092-1-hare@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 16, 2026 at 01:27:30PM +0100, Hannes Reinecke wrote:
-> Implement a 'uuid' parameter to export a device UUID in a sysfs
-> attribute 'uuid'. This allows udev to create persistent device
-> links for ublk devices:
-> 
-> KERNEL=="ublkb*", ATTRS{uuid}=="?*", SYMLINK+="disk/by-id/ublk-$attr{uuid}"
-> 
-> Signed-off-by: Hannes Reinecke <hare@kernel.org>
-> ---
->  drivers/block/ublk_drv.c      | 57 +++++++++++++++++++++++++++++++++--
->  include/uapi/linux/ublk_cmd.h |  6 ++++
->  2 files changed, 61 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index aaf94d2fb789..859414065be0 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -89,7 +89,7 @@
->  	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
->  	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
->  	 UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT | \
-> -	 UBLK_PARAM_TYPE_INTEGRITY)
-> +	 UBLK_PARAM_TYPE_INTEGRITY | UBLK_PARAM_TYPE_UUID)
->  
->  struct ublk_uring_cmd_pdu {
->  	/*
-> @@ -761,6 +761,16 @@ static int ublk_validate_params(const struct ublk_device *ub)
->  			return -EINVAL;
->  	}
->  
-> +	if (ub->params.types & UBLK_PARAM_TYPE_UUID) {
-> +		const struct ublk_param_uuid *p = &ub->params.uuid;
-> +		uuid_t uuid;
-> +
-> +		import_uuid(&uuid, p->uuid);
-> +		if (uuid_is_null(&uuid)) {
-> +			printk("uuid is NULL\n");
+In drbd_request_endio(), READ_COMPLETED_WITH_ERROR is passed to
+__req_mod() with a NULL peer_device:
 
-pr_warn() could be better.
+  __req_mod(req, what, NULL, &m);
 
-> +			return -EINVAL;
-> +		}
-> +	}
->  	return 0;
->  }
->  
-> @@ -2971,6 +2981,49 @@ static int ublk_add_chdev(struct ublk_device *ub)
->  	return ret;
->  }
->  
-> +static ssize_t uuid_show(struct device *dev,
-> +		struct device_attribute *attr, char *buf)
-> +{
-> +	struct gendisk *disk = dev_to_disk(dev);
-> +	struct ublk_device *ub = disk->private_data;
-> +	const struct ublk_param_uuid *p = &ub->params.uuid;
-> +	uuid_t uuid;
-> +
-> +	import_uuid(&uuid, p->uuid);
-> +	return sprintf(buf, "%pU\n", &uuid);
-> +}
-> +
-> +static DEVICE_ATTR_RO(uuid);
-> +
-> +static struct attribute *ublk_attrs[] = {
-> +	&dev_attr_uuid.attr,
-> +	NULL,
-> +};
-> +
-> +static umode_t ublk_attrs_are_visible(struct kobject *kobj,
-> +		struct attribute *a, int n)
-> +{
-> +	struct device *dev = kobj_to_dev(kobj);
-> +	struct gendisk *disk = dev_to_disk(dev);
-> +	struct ublk_device *ub = disk->private_data;
-> +
-> +	if (a == &dev_attr_uuid.attr &&
-> +	    (ub->params.types & UBLK_PARAM_TYPE_UUID))
-> +		return S_IRUGO;
-> +
-> +	return a->mode;
-> +}
-> +
-> +static const struct attribute_group ublk_attr_group = {
-> +	.attrs = ublk_attrs,
-> +	.is_visible = ublk_attrs_are_visible,
-> +};
-> +
-> +static const struct attribute_group *ublk_attr_groups[] = {
-> +	&ublk_attr_group,
-> +	NULL,
-> +};
-> +
->  /* align max io buffer size with PAGE_SIZE */
->  static void ublk_align_max_io_size(struct ublk_device *ub)
->  {
-> @@ -3149,7 +3202,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->  			goto out_put_cdev;
->  	}
->  
-> -	ret = add_disk(disk);
-> +	ret = device_add_disk(NULL, disk, ublk_attr_groups);
->  	if (ret)
->  		goto out_put_cdev;
->  
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> index 90f47da4f435..b30a0de44b85 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -630,6 +630,10 @@ struct ublk_param_integrity {
->  	__u8	pad[5];
->  };
->  
-> +struct ublk_param_uuid {
-> +	__u8	uuid[16];
-> +};
-> +
->  struct ublk_params {
->  	/*
->  	 * Total length of parameters, userspace has to set 'len' for both
-> @@ -645,6 +649,7 @@ struct ublk_params {
->  #define UBLK_PARAM_TYPE_DMA_ALIGN       (1 << 4)
->  #define UBLK_PARAM_TYPE_SEGMENT         (1 << 5)
->  #define UBLK_PARAM_TYPE_INTEGRITY       (1 << 6) /* requires UBLK_F_INTEGRITY */
-> +#define UBLK_PARAM_TYPE_UUID            (1 << 7)
->  	__u32	types;			/* types of parameter included */
->  
->  	struct ublk_param_basic		basic;
-> @@ -654,6 +659,7 @@ struct ublk_params {
->  	struct ublk_param_dma_align	dma;
->  	struct ublk_param_segment	seg;
->  	struct ublk_param_integrity	integrity;
-> +	struct ublk_param_uuid		uuid;
+The READ_COMPLETED_WITH_ERROR handler then unconditionally passes this
+NULL peer_device to drbd_set_out_of_sync(), which dereferences it,
+causing a null-pointer dereference.
 
-Please document ublk server should provide persistent uuid for persistent
-id or link.
+Fix this by obtaining the peer_device via first_peer_device(device),
+matching how drbd_req_destroy() handles the same situation.
 
-Otherwise, this patch looks fine.
+Cc: stable@vger.kernel.org
+Reported-by: Tuo Li <islituo@gmail.com>
+Link: https://lore.kernel.org/linux-block/20260104165355.151864-1-islituo@gmail.com
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+---
+ drivers/block/drbd/drbd_req.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index d15826f6ee81..70f75ef07945 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -621,7 +621,8 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
+ 		break;
+ 
+ 	case READ_COMPLETED_WITH_ERROR:
+-		drbd_set_out_of_sync(peer_device, req->i.sector, req->i.size);
++		drbd_set_out_of_sync(first_peer_device(device),
++				req->i.sector, req->i.size);
+ 		drbd_report_io_error(device, req);
+ 		__drbd_chk_io_error(device, DRBD_READ_ERROR);
+ 		fallthrough;
 
-Thanks,
-Ming
+base-commit: 72f4d6fca699a1e35b39c5e5dacac2926d254135
+-- 
+2.53.0
 
