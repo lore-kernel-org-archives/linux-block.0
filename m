@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05ABB31AAA3;
-	Fri, 20 Feb 2026 09:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9190232A3D4;
+	Fri, 20 Feb 2026 09:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771581111; cv=none; b=jCm4PUK3j6SlKaWlLflnAhpnXPDC5xXbT4997R7r+QAu62Z6m60bUitduOeOHSh5a7MAZ93QiXKJTtHXPmH4xxqYuad8kUWDxk4Uvl7ZhsPEoIsLfiD2yn24VpzcfdAF8EFXW5rR8i7ANkVB5VNdPNXetMmZ75XFhAEPpfme+Hk=
+	t=1771581118; cv=none; b=mOFLfBHnP9F6NScxzsnnUIifc5u2dGMHtkLX5h36qVveBepn3yAbH6Zx9z/01hR8QKGlJ0vKWfVBfWV0uhLo2PuFXPBmZNOvY1XQTLOIMONGlr3cWi+Ouzx8YnywCj/0dkzSoxxCjmaR+zeCvSRvYUTjWwLxkw0RCQEbhR+Fcqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771581111; c=relaxed/simple;
-	bh=PBOESvJWRqEQ2bmBI+MqZdyLdwyA7OsD4YPXBLOYQLU=;
+	s=arc-20240116; t=1771581118; c=relaxed/simple;
+	bh=B5FbaZHoWu3lXzLWsvxiL2xffXnxnFX4nBQhSLyFXlg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MzMFTRupQRbm+Bros7FocBFH6/IIvqFpzgFWo6d6Bz1RNCkQCv8zh/QEfvdCqU2qciXwzniSCm8omUIm2G4cTFnqBY6n2HR0fhK0KTJvzuPJPqk7hwpWFj7d22f34zziC4tFs74NjerFWZZU4D38lbTeUYEy8efulkRpj8cgIZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oSMnR2VB; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=IOTUxU6z2+czOHRXbeknDh8POtedWbbLmq+PnJMVdsDuhXb9cLfQuap838qTZrSs3D7K8g9e5Pp7uPM+8c6TT2ETrfkLqakF4Wo31woi97gJ6OTuT2PV0TM6pCcaqGprKKQodaTJP9Wck4bIIz+4UeFYkaqvhYee1YmQRTFPWWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBlUoq08; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oSMnR2VB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50E18C116D0;
-	Fri, 20 Feb 2026 09:51:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBlUoq08"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC2AC116C6;
+	Fri, 20 Feb 2026 09:51:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771581110;
-	bh=PBOESvJWRqEQ2bmBI+MqZdyLdwyA7OsD4YPXBLOYQLU=;
+	s=k20201202; t=1771581118;
+	bh=B5FbaZHoWu3lXzLWsvxiL2xffXnxnFX4nBQhSLyFXlg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oSMnR2VBFiYF7mSjxjkfNVi7njkjNf3PLhFrBmpcM9d4pWK/GXd5fkMSWFUZ6VD2x
-	 5eWFNCJJkIsdUzWD77f02RYiEeD4v6skYIt2XW4ao3NA2rgWmQjg+wQhZGtGTM0+Zj
-	 QiUHPRguHu8S8fyOflkwjbIMsLyOrB/J3XN0Hx2jcXaSuNOpyqtRqMaEsgaUkyYUeX
-	 KxMtJKZRfO/w92vTqQMucveSOe8zWyt3q17hU4n7gBLOq3rKrBHkil4p0WmBHZZPXk
-	 G1/C+VImEEajDd/Cp9FfpLnahW7HziI4vghEkK4AbpaRBMnwIhHj6tE38PTOuLCsH6
-	 mzUUw11uwWtqQ==
+	b=TBlUoq08h8THjyqgOPa5qFuSUJ9EA2rl/GDN9uRVQwt25XUkK2RxR0vWqjtTL+7yR
+	 cxoufxtl3dRE9KagTQfI7RkbgRykxBYpq8jJ357TWuSs3n6WeNy78TnJ/OsGZlbPKT
+	 Thm6Otw7Q8bFXfFocqjTXBUKiV7Vq5W/wpQDQS4W6T/s8x/iBPpgcY0S/jf3hOLE33
+	 0EliLnOFmz9t6PWADdrJir83Vzp8lwr1ATpcd8KGS9kH3OtcrnuhXChO/0fBhJkudy
+	 zok60YIdfXuLJ3TKGwePrpf4o1T+iRXL6mZVb9VWayQRcEU3mgx8PQfbIuGjqMAxUD
+	 GWwJKsOvDrPrg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 20 Feb 2026 10:51:13 +0100
-Subject: [PATCH v15 4/9] rust: aref: update formatting of use statements
+Date: Fri, 20 Feb 2026 10:51:17 +0100
+Subject: [PATCH v15 8/9] rust: implement `ForeignOwnable` for `Owned`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260220-unique-ref-v15-4-893ed86b06cc@kernel.org>
+Message-Id: <20260220-unique-ref-v15-8-893ed86b06cc@kernel.org>
 References: <20260220-unique-ref-v15-0-893ed86b06cc@kernel.org>
 In-Reply-To: <20260220-unique-ref-v15-0-893ed86b06cc@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
@@ -65,47 +65,103 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=753; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=PBOESvJWRqEQ2bmBI+MqZdyLdwyA7OsD4YPXBLOYQLU=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpmC6hzPFPu7KGUd6cRx7n7GKtIx6VHoVNewyV0
- EXg0W57W8CJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZguoQAKCRDhuBo+eShj
- dxM1EACnIHiAlYn9gPgqZulCKlNlf50uQDXyF9B5lqzxCB4xzKIk29CViLlfREtNEQpmiNQ6TtS
- hzd1FYLf8u5dAvd4QayeNLUYTUptXcQrByNp2EdNsAhuMhgCPbvxv+5XzO7Yb4c2iwvxXZ/GV3F
- Ez583A3k+mRd7YqWWpEj4RFpnKFo5uIsu+8LJckCpHdVp+QBP16CQHoJpF/FjhcEYaulQ62G4kF
- NkTJmahq5F85IlPLQZ9bZfLgDII15NQvFGJDbj6tOPcVDVLOZrSpdw9wHnDj5K7h4UE2FTUpyZ8
- sl8Hk5h+JXj/1GqZbQyHuxIM2mJq3l3W8UusstI+ftPaYNK+cRNg5aEEWt/uP7WYBqUR2R+rFez
- NF32cG5Xgq9fKisyoiE0H808A3G9U4UA8GIZlqilG16eM24JIQWAw/cbRleD8D7YDiPtRb6id5R
- yRJBMLPT83Cz61htPmBosbIHLJX7srwu8C40hy8wXT8NeJvJKVYf2HY8q1ViVS9uaHBWecAHYjJ
- qa0FaiULDIt0mIIUOHhDKnldiiopsOPUz3D+Fz0tJhlLaaw602DiBfp+t8ghomDp+O6GNvrZA5m
- yzaE5kR1WUPNuPs0iFLB5ez3KpIEebt3HS7YpUVYt1xLlkOuC4mg364/IymHXlngTS1mnkrgVVf
- wmnQL4v1G3QBseQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2835; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=B5FbaZHoWu3lXzLWsvxiL2xffXnxnFX4nBQhSLyFXlg=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpmC6lQ8ViWhXfTBxkBwYXwCvpZEQQpsFdLjSWt
+ Z/0DPcp01iJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZgupQAKCRDhuBo+eShj
+ dynCD/wPCHcbzgHFtI1xHdF07F3Sl7RvyuqebxX7QafkNthmS2wK+6fYvfrTUdnL1z/OBT1a29v
+ Ekv+847w5ksZlRBgGMKWxazpNxfKF5eWQvBoKPWlYxkyWDMvo5kyar5hxw0w3x3COrfeu9QKl56
+ KhsRSpsbaevfgdJSut7YliqvTpAiGKoUhon8VZJN9MfpgxHFA8h4daaTbVL7VknN+9j2z7j7sy1
+ Sgk87Kl23zumku0CP8xCTL/v2iQdTZkeAo0DqBaYMIqW99TDPpzpfzfY0vMKWUdz3CKfi0NVOL1
+ ha+JjyDc1y9rbdiDLBax6CvmSMa3YTUcETVRBpfR1iK9Nv5jfwJ/ahTThdwfuq27a98NOsjeZM7
+ xSMg0DOPOZm2bogbOUFEwQxYUeZawSZw5998KQzSnn9YHKJwKEyRhqKqLDSfv8O35BgPsTCYfZx
+ ulAarVM09f3S8iZXGFdpWCwIIZXvoyMEV5vsnhvNxrcgESzwem5PCkmknWlGyJB4BTjaB7CVwu4
+ EhB+2yo3w2A6G3YxFFEK2Y+4pBEXalKlRTVLSKaOAPoKkXmw4MtJptUOgpKFlnAlWsJJPvDVAPX
+ Zj4fG0pZkGwmYQf3x8c6EhW/QFvUIWp3kCah+QYzszA1iz7lJcu0LsCpfHpmCOqa9mFhCq4JFVx
+ H3Cwg/+isbapMRQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Update formatting if use statements in preparation for next commit.
+Implement `ForeignOwnable` for `Owned<T>`. This allows use of `Owned<T>` in
+places such as the `XArray`.
+
+Note that `T` does not need to implement `ForeignOwnable` for `Owned<T>` to
+implement `ForeignOwnable`.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/sync/aref.rs | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ rust/kernel/owned.rs | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
-index efe16a7fdfa5d..3c63c9a5fb9be 100644
---- a/rust/kernel/sync/aref.rs
-+++ b/rust/kernel/sync/aref.rs
-@@ -17,7 +17,12 @@
- //! [`Arc`]: crate::sync::Arc
- //! [`Arc<T>`]: crate::sync::Arc
+diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
+index a9bc871e07ce1..b115b4f3db6d0 100644
+--- a/rust/kernel/owned.rs
++++ b/rust/kernel/owned.rs
+@@ -16,7 +16,10 @@
+ };
+ use kernel::{
+     sync::aref::ARef,
+-    types::RefCounted, //
++    types::{
++        ForeignOwnable, //
++        RefCounted,
++    }, //
+ };
  
--use core::{marker::PhantomData, mem::ManuallyDrop, ops::Deref, ptr::NonNull};
-+use core::{
-+    marker::PhantomData,
-+    mem::ManuallyDrop,
-+    ops::Deref,
-+    ptr::NonNull, //
-+};
+ /// Types that specify their own way of performing allocation and destruction. Typically, this trait
+@@ -120,6 +123,7 @@ pub unsafe trait Ownable {
+ ///
+ /// - The [`Owned<T>`] has exclusive access to the instance of `T`.
+ /// - The instance of `T` will stay alive at least as long as the [`Owned<T>`] is alive.
++#[repr(transparent)]
+ pub struct Owned<T: Ownable> {
+     ptr: NonNull<T>,
+ }
+@@ -201,6 +205,45 @@ fn drop(&mut self) {
+     }
+ }
  
- /// Types that are internally reference counted.
++// SAFETY: We derive the pointer to `T` from a valid `T`, so the returned
++// pointer satisfy alignment requirements of `T`.
++unsafe impl<T: Ownable + 'static> ForeignOwnable for Owned<T> {
++    const FOREIGN_ALIGN: usize = core::mem::align_of::<Owned<T>>();
++
++    type Borrowed<'a> = &'a T;
++    type BorrowedMut<'a> = Pin<&'a mut T>;
++
++    fn into_foreign(self) -> *mut kernel::ffi::c_void {
++        let ptr = self.ptr.as_ptr().cast();
++        core::mem::forget(self);
++        ptr
++    }
++
++    unsafe fn from_foreign(ptr: *mut kernel::ffi::c_void) -> Self {
++        Self {
++            // SAFETY: By function safety contract, `ptr` came from
++            // `into_foreign` and cannot be null.
++            ptr: unsafe { NonNull::new_unchecked(ptr.cast()) },
++        }
++    }
++
++    unsafe fn borrow<'a>(ptr: *mut kernel::ffi::c_void) -> Self::Borrowed<'a> {
++        // SAFETY: By function safety requirements, `ptr` is valid for use as a
++        // reference for `'a`.
++        unsafe { &*ptr.cast() }
++    }
++
++    unsafe fn borrow_mut<'a>(ptr: *mut kernel::ffi::c_void) -> Self::BorrowedMut<'a> {
++        // SAFETY: By function safety requirements, `ptr` is valid for use as a
++        // unique reference for `'a`.
++        let inner = unsafe { &mut *ptr.cast() };
++
++        // SAFETY: We never move out of inner, and we do not hand out mutable
++        // references when `T: !Unpin`.
++        unsafe { Pin::new_unchecked(inner) }
++    }
++}
++
+ /// A trait for objects that can be wrapped in either one of the reference types [`Owned`] and
+ /// [`ARef`].
  ///
 
 -- 
