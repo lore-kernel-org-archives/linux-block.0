@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9190232A3D4;
-	Fri, 20 Feb 2026 09:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D05AA31AAA3;
+	Fri, 20 Feb 2026 09:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771581118; cv=none; b=mOFLfBHnP9F6NScxzsnnUIifc5u2dGMHtkLX5h36qVveBepn3yAbH6Zx9z/01hR8QKGlJ0vKWfVBfWV0uhLo2PuFXPBmZNOvY1XQTLOIMONGlr3cWi+Ouzx8YnywCj/0dkzSoxxCjmaR+zeCvSRvYUTjWwLxkw0RCQEbhR+Fcqw=
+	t=1771581126; cv=none; b=OBEg6R2aaAWA/35URZbVzzFCT3xdo1HLJtuJ3qReCMMOCC3tYaDXDRHf4O2qB48PdU7GBgegkLb0hL3L1iB86VgrF6O9caZgaVfcBu2vaJfZQEgK4/1v73qqg5SGcNgp6/MrDOvmwWD+2AQIg14Xo3yyC0VrKZqL1JgjAaunUiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771581118; c=relaxed/simple;
-	bh=B5FbaZHoWu3lXzLWsvxiL2xffXnxnFX4nBQhSLyFXlg=;
+	s=arc-20240116; t=1771581126; c=relaxed/simple;
+	bh=+PodXl/wwBV+PA5BRedOUZgBWeTtGynnDCp6iX2CeiQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IOTUxU6z2+czOHRXbeknDh8POtedWbbLmq+PnJMVdsDuhXb9cLfQuap838qTZrSs3D7K8g9e5Pp7uPM+8c6TT2ETrfkLqakF4Wo31woi97gJ6OTuT2PV0TM6pCcaqGprKKQodaTJP9Wck4bIIz+4UeFYkaqvhYee1YmQRTFPWWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBlUoq08; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=VM8wuCrMeUT6GMIN3Lf5Bcz32GsS5lC3z/wCX38kSYgT48W+bxPd0nII10LbhLF9kHxXvOBPROo704Nrgc4wVR4b9F91hH0zgIR4FulV7+1EKzXMKH+wYfDjulzVvjWwFDpyRvqYK0frkARwV+qHSxMSlTusb3Jg4IQSLtCpw60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ppi1/XPY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBlUoq08"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC2AC116C6;
-	Fri, 20 Feb 2026 09:51:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppi1/XPY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB4AC116C6;
+	Fri, 20 Feb 2026 09:51:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771581118;
-	bh=B5FbaZHoWu3lXzLWsvxiL2xffXnxnFX4nBQhSLyFXlg=;
+	s=k20201202; t=1771581126;
+	bh=+PodXl/wwBV+PA5BRedOUZgBWeTtGynnDCp6iX2CeiQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=TBlUoq08h8THjyqgOPa5qFuSUJ9EA2rl/GDN9uRVQwt25XUkK2RxR0vWqjtTL+7yR
-	 cxoufxtl3dRE9KagTQfI7RkbgRykxBYpq8jJ357TWuSs3n6WeNy78TnJ/OsGZlbPKT
-	 Thm6Otw7Q8bFXfFocqjTXBUKiV7Vq5W/wpQDQS4W6T/s8x/iBPpgcY0S/jf3hOLE33
-	 0EliLnOFmz9t6PWADdrJir83Vzp8lwr1ATpcd8KGS9kH3OtcrnuhXChO/0fBhJkudy
-	 zok60YIdfXuLJ3TKGwePrpf4o1T+iRXL6mZVb9VWayQRcEU3mgx8PQfbIuGjqMAxUD
-	 GWwJKsOvDrPrg==
+	b=ppi1/XPYegHcMDBduaR2AnqAkljs+pg+qcNju89css9+XCAA0jXc1xa5GCd6lccdF
+	 sygwslGFM1sjSX+cc1WCOxc9MrsU8O9OAQSF7HWz6gzaDOzuDVDrgz/8jS0Yytcykm
+	 S/5/P/ZBaJZao2Ot0T5DiNLPV06ob5YYtkVhg+dZAAkYIGTGaiUz9puarlTz1QpKBT
+	 SihqUp4jb2y9DuxrgGlLS++EpC+3RSBEmYi2jPMC2kCINRotKFCfLxNHHS0P2WQ1Zz
+	 +alFa0pKOZvRtmwZd7zpfG7S+Z764JzwodHRmUqWBd4wHZ8Ihj35r6ODrJtkFOKUvc
+	 kXMjlj21r3OtQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 20 Feb 2026 10:51:17 +0100
-Subject: [PATCH v15 8/9] rust: implement `ForeignOwnable` for `Owned`
+Date: Fri, 20 Feb 2026 10:51:10 +0100
+Subject: [PATCH v15 1/9] rust: types: Add Ownable/Owned types
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260220-unique-ref-v15-8-893ed86b06cc@kernel.org>
+Message-Id: <20260220-unique-ref-v15-1-893ed86b06cc@kernel.org>
 References: <20260220-unique-ref-v15-0-893ed86b06cc@kernel.org>
 In-Reply-To: <20260220-unique-ref-v15-0-893ed86b06cc@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
@@ -63,105 +63,314 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
  dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
  linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
- Andreas Hindborg <a.hindborg@kernel.org>
+ Andreas Hindborg <a.hindborg@kernel.org>, 
+ Asahi Lina <lina+kernel@asahilina.net>, 
+ Oliver Mangold <oliver.mangold@pm.me>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2835; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=B5FbaZHoWu3lXzLWsvxiL2xffXnxnFX4nBQhSLyFXlg=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpmC6lQ8ViWhXfTBxkBwYXwCvpZEQQpsFdLjSWt
- Z/0DPcp01iJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZgupQAKCRDhuBo+eShj
- dynCD/wPCHcbzgHFtI1xHdF07F3Sl7RvyuqebxX7QafkNthmS2wK+6fYvfrTUdnL1z/OBT1a29v
- Ekv+847w5ksZlRBgGMKWxazpNxfKF5eWQvBoKPWlYxkyWDMvo5kyar5hxw0w3x3COrfeu9QKl56
- KhsRSpsbaevfgdJSut7YliqvTpAiGKoUhon8VZJN9MfpgxHFA8h4daaTbVL7VknN+9j2z7j7sy1
- Sgk87Kl23zumku0CP8xCTL/v2iQdTZkeAo0DqBaYMIqW99TDPpzpfzfY0vMKWUdz3CKfi0NVOL1
- ha+JjyDc1y9rbdiDLBax6CvmSMa3YTUcETVRBpfR1iK9Nv5jfwJ/ahTThdwfuq27a98NOsjeZM7
- xSMg0DOPOZm2bogbOUFEwQxYUeZawSZw5998KQzSnn9YHKJwKEyRhqKqLDSfv8O35BgPsTCYfZx
- ulAarVM09f3S8iZXGFdpWCwIIZXvoyMEV5vsnhvNxrcgESzwem5PCkmknWlGyJB4BTjaB7CVwu4
- EhB+2yo3w2A6G3YxFFEK2Y+4pBEXalKlRTVLSKaOAPoKkXmw4MtJptUOgpKFlnAlWsJJPvDVAPX
- Zj4fG0pZkGwmYQf3x8c6EhW/QFvUIWp3kCah+QYzszA1iz7lJcu0LsCpfHpmCOqa9mFhCq4JFVx
- H3Cwg/+isbapMRQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11400;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=ceazmDY9zMprkGKe4DZha/pUGe1Tz44cJElMoCN5Ww8=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpmC6eV2ZYvrOTK3GwhcNVSnYwa0jqhZycgxRw5
+ QAdJb+eFTaJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZgungAKCRDhuBo+eShj
+ d/e/EAC578jug50o8pjquFcaOzJNQRtvp4mbQZhiWMJ5iKm9oustdqkgktfqn0ktoOPq6qzDSAf
+ nCit66IsOx8Y5QwgAwpn5vgRuyydcCmTf25MIVyMGUzAoVqwSFgGaKYgqUSXo0pyf5CNfPEp6LM
+ KEWAtxej9ZRYs8lmvR9ioAPmKDqvmdTW/o3cbjkbhVg8ggJ4KardbP9cXSBrn4ZGotp4sFki8LP
+ 4IHRo85AS/Occfn1IJ3K+iIQqvj1JnyuzSj+ZOZiS9ubqNbq3240QVNCdQ6lBGxFJZb/gWJirx6
+ 0spbB8Rt+9F1zlcymRrZDeOHuoputD/1g6NkCwsHer8mOSW2kzZhnCYKaDBE2wVqguZ/g+HExDm
+ D2VXlCtYClx/+6NFFdg2OOjJ4aOrw+JUFMgJSv8IHtiXgdgZ/tiEVggwcRCFCX0L4fXLR6IATd5
+ nghyX8WSexXNIv9kp25GkSSTtJvBuMJQIU1gkGP+e4BZyb4hi50P2jTxyuFZ5zxfbcOXFRxz8GS
+ 68OhvCuxZCdAyb5E45zsp1a/wiwzEyVSa1JDadKJOaJ0xhqkvBUjWiuJ7R7SpSSFYsShWY1vo2m
+ U7PewVmuduHLx6zTOAWTZfVI8lbOtLpSEmh+HK4Rd4CQ1/u51PHr7nnQRIzdUZRRA5dBUlH5ZOq
+ z5YBURXQAJRbopg==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Implement `ForeignOwnable` for `Owned<T>`. This allows use of `Owned<T>` in
-places such as the `XArray`.
+From: Asahi Lina <lina+kernel@asahilina.net>
 
-Note that `T` does not need to implement `ForeignOwnable` for `Owned<T>` to
-implement `ForeignOwnable`.
+By analogy to `AlwaysRefCounted` and `ARef`, an `Ownable` type is a
+(typically C FFI) type that *may* be owned by Rust, but need not be. Unlike
+`AlwaysRefCounted`, this mechanism expects the reference to be unique
+within Rust, and does not allow cloning.
 
+Conceptually, this is similar to a `KBox<T>`, except that it delegates
+resource management to the `T` instead of using a generic allocator.
+
+[ om:
+  - Split code into separate file and `pub use` it from types.rs.
+  - Make from_raw() and into_raw() public.
+  - Remove OwnableMut, and make DerefMut dependent on Unpin instead.
+  - Usage example/doctest for Ownable/Owned.
+  - Fixes to documentation and commit message.
+]
+
+Link: https://lore.kernel.org/all/20250202-rust-page-v1-1-e3170d7fe55e@asahilina.net/
+Signed-off-by: Asahi Lina <lina+kernel@asahilina.net>
+Co-developed-by: Oliver Mangold <oliver.mangold@pm.me>
+Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
+Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
+Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
+[ Andreas: Updated documentation, examples, and formatting ]
+Reviewed-by: Gary Guo <gary@garyguo.net>
+Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/owned.rs | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ rust/kernel/lib.rs       |   1 +
+ rust/kernel/owned.rs     | 196 +++++++++++++++++++++++++++++++++++++++++++++++
+ rust/kernel/sync/aref.rs |   5 ++
+ rust/kernel/types.rs     |  11 ++-
+ 4 files changed, 212 insertions(+), 1 deletion(-)
 
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 696f62f85eb5f..a2bec807f03f1 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -121,6 +121,7 @@
+ pub mod of;
+ #[cfg(CONFIG_PM_OPP)]
+ pub mod opp;
++pub mod owned;
+ pub mod page;
+ #[cfg(CONFIG_PCI)]
+ pub mod pci;
 diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
-index a9bc871e07ce1..b115b4f3db6d0 100644
---- a/rust/kernel/owned.rs
+new file mode 100644
+index 0000000000000..d566ad0aa1c99
+--- /dev/null
 +++ b/rust/kernel/owned.rs
-@@ -16,7 +16,10 @@
- };
- use kernel::{
-     sync::aref::ARef,
--    types::RefCounted, //
-+    types::{
-+        ForeignOwnable, //
-+        RefCounted,
-+    }, //
- };
- 
- /// Types that specify their own way of performing allocation and destruction. Typically, this trait
-@@ -120,6 +123,7 @@ pub unsafe trait Ownable {
- ///
- /// - The [`Owned<T>`] has exclusive access to the instance of `T`.
- /// - The instance of `T` will stay alive at least as long as the [`Owned<T>`] is alive.
-+#[repr(transparent)]
- pub struct Owned<T: Ownable> {
-     ptr: NonNull<T>,
- }
-@@ -201,6 +205,45 @@ fn drop(&mut self) {
-     }
- }
- 
-+// SAFETY: We derive the pointer to `T` from a valid `T`, so the returned
-+// pointer satisfy alignment requirements of `T`.
-+unsafe impl<T: Ownable + 'static> ForeignOwnable for Owned<T> {
-+    const FOREIGN_ALIGN: usize = core::mem::align_of::<Owned<T>>();
+@@ -0,0 +1,196 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+    type Borrowed<'a> = &'a T;
-+    type BorrowedMut<'a> = Pin<&'a mut T>;
++//! Unique owned pointer types for objects with custom drop logic.
++//!
++//! These pointer types are useful for C-allocated objects which by API-contract
++//! are owned by Rust, but need to be freed through the C API.
 +
-+    fn into_foreign(self) -> *mut kernel::ffi::c_void {
-+        let ptr = self.ptr.as_ptr().cast();
-+        core::mem::forget(self);
-+        ptr
++use core::{
++    mem::ManuallyDrop,
++    ops::{
++        Deref,
++        DerefMut, //
++    },
++    pin::Pin,
++    ptr::NonNull, //
++};
++
++/// Types that specify their own way of performing allocation and destruction. Typically, this trait
++/// is implemented on types from the C side.
++///
++/// Implementing this trait allows types to be referenced via the [`Owned<Self>`] pointer type. This
++/// is useful when it is desirable to tie the lifetime of the reference to an owned object, rather
++/// than pass around a bare reference. [`Ownable`] types can define custom drop logic that is
++/// executed when the owned reference [`Owned<Self>`] pointing to the object is dropped.
++///
++/// Note: The underlying object is not required to provide internal reference counting, because it
++/// represents a unique, owned reference. If reference counting (on the Rust side) is required,
++/// [`AlwaysRefCounted`](crate::types::AlwaysRefCounted) should be implemented.
++///
++/// # Safety
++///
++/// Implementers must ensure that the [`release()`](Self::release) function frees the underlying
++/// object in the correct way for a valid, owned object of this type.
++///
++/// # Examples
++///
++/// A minimal example implementation of [`Ownable`] and its usage with [`Owned`] looks like
++/// this:
++///
++/// ```
++/// # #![expect(clippy::disallowed_names)]
++/// # use core::cell::Cell;
++/// # use core::ptr::NonNull;
++/// # use kernel::sync::global_lock;
++/// # use kernel::alloc::{flags, kbox::KBox, AllocError};
++/// # use kernel::types::{Owned, Ownable};
++///
++/// // Let's count the allocations to see if freeing works.
++/// kernel::sync::global_lock! {
++///     // SAFETY: we call `init()` right below, before doing anything else.
++///     unsafe(uninit) static FOO_ALLOC_COUNT: Mutex<usize> = 0;
++/// }
++/// // SAFETY: We call `init()` only once, here.
++/// unsafe { FOO_ALLOC_COUNT.init() };
++///
++/// struct Foo;
++///
++/// impl Foo {
++///     fn new() -> Result<Owned<Self>> {
++///         // We are just using a `KBox` here to handle the actual allocation, as our `Foo` is
++///         // not actually a C-allocated object.
++///         let result = KBox::new(
++///             Foo {},
++///             flags::GFP_KERNEL,
++///         )?;
++///         let result = NonNull::new(KBox::into_raw(result))
++///             .expect("Raw pointer to newly allocation KBox is null, this should never happen.");
++///         // Count new allocation
++///         *FOO_ALLOC_COUNT.lock() += 1;
++///         // SAFETY: We just allocated the `Self`, thus it is valid and there cannot be any other
++///         // Rust references. Calling `into_raw()` makes us responsible for ownership and we won't
++///         // use the raw pointer anymore. Thus we can transfer ownership to the `Owned`.
++///         Ok(unsafe { Owned::from_raw(result) })
++///     }
++/// }
++///
++/// // SAFETY: The implementation of `release` in this trait implementation correctly frees the
++/// // owned `Foo`.
++/// unsafe impl Ownable for Foo {
++///     unsafe fn release(this: NonNull<Self>) {
++///         // SAFETY: The [`KBox<Self>`] is still alive. We can pass ownership to the [`KBox`], as
++///         // by requirement on calling this function, the `Self` will no longer be used by the
++///         // caller.
++///         drop(unsafe { KBox::from_raw(this.as_ptr()) });
++///         // Count released allocation
++///         *FOO_ALLOC_COUNT.lock() -= 1;
++///     }
++/// }
++///
++/// {
++///    let foo = Foo::new().expect("Failed to allocate a Foo. This shouldn't happen");
++///    assert!(*FOO_ALLOC_COUNT.lock() == 1);
++/// }
++/// // `foo` is out of scope now, so we expect no live allocations.
++/// assert!(*FOO_ALLOC_COUNT.lock() == 0);
++/// ```
++pub unsafe trait Ownable {
++    /// Releases the object.
++    ///
++    /// # Safety
++    ///
++    /// Callers must ensure that:
++    /// - `this` points to a valid `Self`.
++    /// - `*this` is no longer used after this call.
++    unsafe fn release(this: NonNull<Self>);
++}
++
++/// A mutable reference to an owned `T`.
++///
++/// The [`Ownable`] is automatically freed or released when an instance of [`Owned`] is
++/// dropped.
++///
++/// # Invariants
++///
++/// - The [`Owned<T>`] has exclusive access to the instance of `T`.
++/// - The instance of `T` will stay alive at least as long as the [`Owned<T>`] is alive.
++pub struct Owned<T: Ownable> {
++    ptr: NonNull<T>,
++}
++
++impl<T: Ownable> Owned<T> {
++    /// Creates a new instance of [`Owned`].
++    ///
++    /// This function takes over ownership of the underlying object.
++    ///
++    /// # Safety
++    ///
++    /// Callers must ensure that:
++    /// - `ptr` points to a valid instance of `T`.
++    /// - Ownership of the underlying `T` can be transferred to the `Self<T>` (i.e. operations
++    ///   which require ownership will be safe).
++    /// - An `Owned<T>` is a mutable reference to the underlying object. As such,
++    ///   the object must not be accessed (read or mutated) through any pointer
++    ///   other than the created `Owned<T>`. Opt-out is still possible similar to
++    ///   a mutable reference (e.g. by using [`Opaque`]).
++    ///
++    /// [`Opaque`]: kernel::types::Opaque
++    pub unsafe fn from_raw(ptr: NonNull<T>) -> Self {
++        // INVARIANT: By function safety requirement:
++        // - The resulting object has exclusive access to the `T` pointed to by `ptr`.
++        // - The `T` object pointed to by `ptr` is alive at least as long as the returned `Self`.
++        Self { ptr }
 +    }
 +
-+    unsafe fn from_foreign(ptr: *mut kernel::ffi::c_void) -> Self {
-+        Self {
-+            // SAFETY: By function safety contract, `ptr` came from
-+            // `into_foreign` and cannot be null.
-+            ptr: unsafe { NonNull::new_unchecked(ptr.cast()) },
-+        }
++    /// Consumes the [`Owned`], returning a raw pointer.
++    ///
++    /// This function does not drop the underlying `T`. When this function returns, ownership of the
++    /// underlying `T` is with the caller.
++    pub fn into_raw(me: Self) -> NonNull<T> {
++        ManuallyDrop::new(me).ptr
 +    }
 +
-+    unsafe fn borrow<'a>(ptr: *mut kernel::ffi::c_void) -> Self::Borrowed<'a> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as a
-+        // reference for `'a`.
-+        unsafe { &*ptr.cast() }
-+    }
++    /// Get a pinned mutable reference to the data owned by this `Owned<T>`.
++    pub fn as_pin_mut(&mut self) -> Pin<&mut T> {
++        // SAFETY: The type invariants guarantee that the object is valid, and that we can safely
++        // return a mutable reference to it.
++        let unpinned = unsafe { self.ptr.as_mut() };
 +
-+    unsafe fn borrow_mut<'a>(ptr: *mut kernel::ffi::c_void) -> Self::BorrowedMut<'a> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as a
-+        // unique reference for `'a`.
-+        let inner = unsafe { &mut *ptr.cast() };
-+
-+        // SAFETY: We never move out of inner, and we do not hand out mutable
-+        // references when `T: !Unpin`.
-+        unsafe { Pin::new_unchecked(inner) }
++        // SAFETY: We never hand out unpinned mutable references to the data in
++        // `Self`, unless the contained type is `Unpin`.
++        unsafe { Pin::new_unchecked(unpinned) }
 +    }
 +}
 +
- /// A trait for objects that can be wrapped in either one of the reference types [`Owned`] and
- /// [`ARef`].
++// SAFETY: It is safe to send an [`Owned<T>`] to another thread when the underlying `T` is [`Send`],
++// because of the ownership invariant. Sending an [`Owned<T>`] is equivalent to sending the `T`.
++unsafe impl<T: Ownable + Send> Send for Owned<T> {}
++
++// SAFETY: It is safe to send [`&Owned<T>`] to another thread when the underlying `T` is [`Sync`],
++// because of the ownership invariant. Sending an [`&Owned<T>`] is equivalent to sending the `&T`.
++unsafe impl<T: Ownable + Sync> Sync for Owned<T> {}
++
++impl<T: Ownable> Deref for Owned<T> {
++    type Target = T;
++
++    fn deref(&self) -> &Self::Target {
++        // SAFETY: The type invariants guarantee that the object is valid.
++        unsafe { self.ptr.as_ref() }
++    }
++}
++
++impl<T: Ownable + Unpin> DerefMut for Owned<T> {
++    fn deref_mut(&mut self) -> &mut Self::Target {
++        // SAFETY: The type invariants guarantee that the object is valid, and that we can safely
++        // return a mutable reference to it.
++        unsafe { self.ptr.as_mut() }
++    }
++}
++
++impl<T: Ownable> Drop for Owned<T> {
++    fn drop(&mut self) {
++        // SAFETY: The type invariants guarantee that the `Owned` owns the object we're about to
++        // release.
++        unsafe { T::release(self.ptr) };
++    }
++}
+diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
+index 0d24a0432015d..e175aefe86151 100644
+--- a/rust/kernel/sync/aref.rs
++++ b/rust/kernel/sync/aref.rs
+@@ -29,6 +29,11 @@
+ /// Rust code, the recommendation is to use [`Arc`](crate::sync::Arc) to create reference-counted
+ /// instances of a type.
+ ///
++/// Note: Implementing this trait allows types to be wrapped in an [`ARef<Self>`]. It requires an
++/// internal reference count and provides only shared references. If unique references are required
++/// [`Ownable`](crate::types::Ownable) should be implemented which allows types to be wrapped in an
++/// [`Owned<Self>`](crate::types::Owned).
++///
+ /// # Safety
+ ///
+ /// Implementers must ensure that increments to the reference count keep the object alive in memory
+diff --git a/rust/kernel/types.rs b/rust/kernel/types.rs
+index 9c5e7dbf16323..4aec7b699269a 100644
+--- a/rust/kernel/types.rs
++++ b/rust/kernel/types.rs
+@@ -11,7 +11,16 @@
+ };
+ use pin_init::{PinInit, Wrapper, Zeroable};
+ 
+-pub use crate::sync::aref::{ARef, AlwaysRefCounted};
++pub use crate::{
++    owned::{
++        Ownable,
++        Owned, //
++    },
++    sync::aref::{
++        ARef,
++        AlwaysRefCounted, //
++    }, //
++};
+ 
+ /// Used to transfer ownership to and from foreign (non-Rust) languages.
  ///
 
 -- 
