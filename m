@@ -1,55 +1,58 @@
 Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA9B2045AD
-	for <linux-block@vger.kernel.org>; Fri, 20 Feb 2026 13:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2148E344030
+	for <linux-block@vger.kernel.org>; Fri, 20 Feb 2026 13:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771593842; cv=none; b=YkuS7UvrNnIU/cWbF7kdNVBFmvlyTz46AUMfqntJb3zVQ3Eowa6abCQbNP+q1i5R4tPePWaaKhf61QlXyQacuwkbyEhI/aKlyYIPb2k/bmrABligsDx/DUxB8H3hIOSxsmtUTpNFXWo0qqXhFv1P6FWwpvyp+3xH7YMy++d819Y=
+	t=1771593843; cv=none; b=EfR0qIXnVW9SmWW9nOmxkgxfkGdYd1JE7J97vF+KPIupYx28nzbY61/yIwVp3MQItuR+gq9x99z/BorsL2nAegunfPoNPXGjYDUL28IF1syLSwtrRvRH7FHiYJ2lLdd2bdx5wlLAGxXw+CxbRsa7Zkc4GJQiEwZIN4v3herOy/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771593842; c=relaxed/simple;
-	bh=bDao1ZUxUrKM+x112UuRVky3nEuininO+DUhrMA161Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nl9qR5npZE9KAKy16/k6CzU/7dPb1/A41pEEfqhUw2f0dKag/m/owbwOifXQHfWOIFZ5WBmnWg9+HNAQ2W6F6KtKcui2g0vEa+aLN/RY+JqHkH927KNimDp7nJFxOgljSSmc5qj7B68JH72jJ78InAAo9H423sRUeYP1rmchPew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=EsE/u9rQ; arc=none smtp.client-ip=68.232.141.245
+	s=arc-20240116; t=1771593843; c=relaxed/simple;
+	bh=WsEle54cltu5igbDB3CnT5jG9ZelS35BRa0dHJM7f5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OiSeH/HtkU5Og8k9S78jhVD9MqXpa5Aq4ni/8I/QLd8x9/fM707r2uijrCXa8BUwvyTeSivDeHfjgtP6IHA7VhvQGgQMuTdrNgrcwWjrlEztvjdwIQHeUlibbmGUEVU1L+ThmtqwN5HlZuBiZU3r0ppFuBOX6fGlLtUQBnTiUC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Qry9dtyF; arc=none smtp.client-ip=68.232.141.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EsE/u9rQ"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Qry9dtyF"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1771593840; x=1803129840;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=bDao1ZUxUrKM+x112UuRVky3nEuininO+DUhrMA161Y=;
-  b=EsE/u9rQTadERUWXt1kyXNgPHAuIqnlK5OrI5+Ip2xsTWHnosOT6+t1r
-   jSEIcH68FSNbwEeQlHKz5xHYpIa2xVDCLkfPzlyJV1M+9Q5WO20MpPZMb
-   1s/wyuMLqDFIKbRMFS0ovAdHFt/fGWyVlnZHiI313bEfE901K+5irnHvr
-   5cpb4iaoQfz510OZdAbu7FKDOuFiT4WVvJ8G7+HZp70jzVj3QF5LRhjuA
-   MClq23K1h+Q+kkYXY4kYaDQ/eEuEWCwQVB2cZgD4YCe+o8aF5w0rTeX8e
-   A2DoRuXQzPkWMODqfU5GPT/FQOyJqanzT/nyYK3UaMRM5CRFtzD/30w/V
-   w==;
-X-CSE-ConnectionGUID: QT+Ov+0KQBKNpUJg87agDQ==
-X-CSE-MsgGUID: LFa1lIzLTh6rKMzQ+TNReA==
+  t=1771593841; x=1803129841;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=WsEle54cltu5igbDB3CnT5jG9ZelS35BRa0dHJM7f5o=;
+  b=Qry9dtyFQmlY9e1Lu/2t29Rr+xw98uxJtFsRBfUonaz5HMs2//K2pGXV
+   6s16Vaf7yXn4Rt9ao86CT3OZ8TWo8FhU4XliZRpY7z5a5gvK7DmmeRMwZ
+   5rQ7hZFWLyQWH7wfkN5Sa+itZujdH3wpjgUGBLJBdbjwjNKm7XpZDwXZ8
+   GLM04E/X47iKFIXvaFOdST5t2oreBkcxHfifnRm4qfLaWkJzp4Ki6ep0k
+   OQxV0edNuL8RqQS9QTLu7jGC8+ZDcZ1yNi7++CgAU1afK0sbBv69KlhNu
+   27vOB19vnc3kVmDXH7d44yX0+NNrWuFjEr65DpP7lmTjnTXf7K80txSBU
+   Q==;
+X-CSE-ConnectionGUID: YFR9ZAPwSDaoRkK2xmW9/Q==
+X-CSE-MsgGUID: rCZDnAQWQV6hVJqIsvSQwQ==
 X-IronPort-AV: E=Sophos;i="6.21,302,1763395200"; 
-   d="scan'208";a="141089912"
+   d="scan'208";a="141089913"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep03.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Feb 2026 21:23:53 +0800
-IronPort-SDR: 6998606a_WtrGv1U83uO+gv49Ce0Xp3KuJUQ+7ZF6VsJ7PEYpHdWeNft
- Csxt8jCcl4bY4LHkohvmMdqlISAOOxG6PtJ453w==
+  by ob1.hgst.iphmx.com with ESMTP; 20 Feb 2026 21:23:55 +0800
+IronPort-SDR: 6998606b_EsdVqQcoVpVMnAZ952zYRkPeUfdL3lMy+qqHXKBJwUo7aU9
+ eJaoT+6+t/gyFn0ByeQqyhAoi9iLqIxUlJJH1yA==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Feb 2026 05:23:54 -0800
+  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Feb 2026 05:23:55 -0800
 WDCIronportException: Internal
 Received: from wdap-y8axpm7exs.ad.shared (HELO shinmob.wdc.com) ([10.224.99.2])
-  by uls-op-cesaip02.wdc.com with ESMTP; 20 Feb 2026 05:23:52 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 20 Feb 2026 05:23:54 -0800
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: Damien Le Moal <dlemoal@kernel.org>,
 	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v2 0/2] zbd: adjust to recent blkzone change
-Date: Fri, 20 Feb 2026 22:23:49 +0900
-Message-ID: <20260220132351.273758-1-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 1/2] zbd/rc: do not use invalid write pointer values by blkzone report
+Date: Fri, 20 Feb 2026 22:23:50 +0900
+Message-ID: <20260220132351.273758-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260220132351.273758-1-shinichiro.kawasaki@wdc.com>
+References: <20260220132351.273758-1-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,32 +61,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After the recent change in util-linux [1], 'blkzone report' command no
-longer reports numeric values for write pointers when the write pointers
-are invalid. This change caused two failure symptoms in the zbd test
-group. The first failure symptom is arithmetic failures by evaluating
-the string 'N/A' as a numeric value. The second failure symptom is
-write pointer validity check failure for conventional zones. The two
-patches in this series address the two failure symptoms respectively.
+After the recent change in util-linux [1], the 'blkzone report' command
+no longer reports numeric values for write pointers when the write
+pointers are invalid. Instead, it reports the sting 'N/A'. Currently,
+_get_blkzone_report() assumes that the write pointer values are numeric
+even when the values are invalid. Then it evaluates 'N/A' as numeric and
+triggers arithmetic operation failures.
+
+To avoid the failures, check zone type and zone condition. If the zone
+type and condition indicate that the write pointer is invalid, do not
+use the blkzone report string. Instead, use -1 as the write pointer
+value to indicate the value is invalid.
 
 Link: [1] https://github.com/util-linux/util-linux/commit/b032247f48d8b6a13bf8541eb663c779e448f568
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/zbd/rc | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-Changes from v1:
-- 1st patch: Added the check for read-only and offline conditions
-- 1st patch: Added the check for conventional zones
-- 1st patch: Use the value -1 when write pointers are invalid
-- Added the 2nd patch for zbd/002 failure case
-- Link to v1: https://lore.kernel.org/linux-block/20260219121940.174239-1-shinichiro.kawasaki@wdc.com/
-
-
-Shin'ichiro Kawasaki (2):
-  zbd/rc: do not use invalid write pointer values by blkzone report
-  zbd/002: do not check write pointers of conventional zones
-
- tests/zbd/002 |  3 ++-
- tests/zbd/rc  | 19 +++++++++++++++----
- 2 files changed, 17 insertions(+), 5 deletions(-)
-
+diff --git a/tests/zbd/rc b/tests/zbd/rc
+index 570928b..32a80a7 100644
+--- a/tests/zbd/rc
++++ b/tests/zbd/rc
+@@ -141,16 +141,27 @@ _get_blkzone_report() {
+ 	fi
+ 
+ 	local _IFS=$IFS
+-	local -i loop=0
++	local -i loop=0 cond type
+ 	IFS=$' ,:'
+ 	while read -r -a _tokens
+ 	do
+ 		ZONE_STARTS+=($((_tokens[1])))
+ 		ZONE_LENGTHS+=($((_tokens[3])))
+ 		ZONE_CAPS+=($((_tokens[cap_idx])))
+-		ZONE_WPTRS+=($((_tokens[wptr_idx])))
+-		ZONE_CONDS+=($((${_tokens[conds_idx]%\(*})))
+-		ZONE_TYPES+=($((${_tokens[type_idx]%\(*})))
++		# The latest blkzone reports 'N/A' as write pointers for full
++		# zones. In that case, do not handle it as numeric.
++		cond=$((${_tokens[conds_idx]%\(*}))
++		type=$((${_tokens[type_idx]%\(*}))
++		if ((type == ZONE_TYPE_CONVENTIONAL ||
++			(cond == ZONE_COND_READ_ONLY ||
++			 cond == ZONE_COND_FULL ||
++			 cond == ZONE_COND_OFFLINE))); then
++			ZONE_WPTRS+=(-1)
++		else
++			ZONE_WPTRS+=($((_tokens[wptr_idx])))
++		fi
++		ZONE_CONDS+=("${cond}")
++		ZONE_TYPES+=("${type}")
+ 		if [[ ${ZONE_TYPES[-1]} -eq ${ZONE_TYPE_CONVENTIONAL} ]]; then
+ 			(( NR_CONV_ZONES++ ))
+ 		fi
 -- 
 2.53.0
 
