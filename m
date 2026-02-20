@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EF131D36B;
-	Fri, 20 Feb 2026 09:52:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF3332AAA5;
+	Fri, 20 Feb 2026 09:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771581158; cv=none; b=PVv1MFrmhoLCPAySm8Hccbs6fV/qS2mhK9TD2NM5bhoa7oGWu0P8KdnHDrWjED1ihjXJqumMcV6tR6mr9wjReCMN0yYkrsGqOHYCrDzBfOQ84meGsBk4bi+b9goUQWmoMdpvr9sO0wCHEIvOUcB/zXqg9NHgKJ6u8sVgesJYQLw=
+	t=1771581166; cv=none; b=KsBpnbKtPhXTTTjufJKpYNm1N/CW17AjQjCXn+mNjuAg23pgyZSOcxSZK+poZ8hGvU6QEDFROcZ8Mu7IrLQo3cv/nRDvqANJJ69M8cK7OBordzw7SJbt2LyBQM9rZ6E7aldTSPt4utVhi83g1xXc/58dksHcKXKGGr9oFvQ4V30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771581158; c=relaxed/simple;
-	bh=TzCUGpEDUTKD6tcoKokHDlQAGVLw4XXksTwjbV99rHQ=;
+	s=arc-20240116; t=1771581166; c=relaxed/simple;
+	bh=4kJUgBgTj0V7kRaDlo9MltCBPjRgIT4dj8eMOKXfB5o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MegYNEdIWg8ck5duvli9r8oC9OWVnzg7AXPvqs2YU5XAP0LL5RCt/Ar/9uPWHlD87r9LnIrZWcyFJPIZ5qCVbhHcaVay+rvjWKDx5H32kziTSSr75Np4KSg+kCKDmhIQDJC/lgK1fPbt5z9wryPlRYMOkfrEuOVZH4Az+y42K5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cPkoJgHz; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=E3Ow4vpIRY9JuFMWKuo00YNMZ40cA9krFD99qobD5MYulbGLlXpAzHPJ8jOZsduav+OseBBFE2oFSwoYrT2wTLCzlUSjqs9ZwfeiXn9MADqy5EpbeLkKoQsq5bjhruhWq6IvmZaZkiXRdZRiCzS9Qs0V2Cnl7Mk7M3y5aJAcbr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pa9f/rFM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cPkoJgHz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA1BCC116C6;
-	Fri, 20 Feb 2026 09:52:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pa9f/rFM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952BDC116C6;
+	Fri, 20 Feb 2026 09:52:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771581158;
-	bh=TzCUGpEDUTKD6tcoKokHDlQAGVLw4XXksTwjbV99rHQ=;
+	s=k20201202; t=1771581166;
+	bh=4kJUgBgTj0V7kRaDlo9MltCBPjRgIT4dj8eMOKXfB5o=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=cPkoJgHzjTOK4adLqKvtWOk0lV5xxjHFhFd25u0lCbutgaak9HaBvj5iIti9G5zzW
-	 t5vdRzwJCLIKRG+RRSwnAgaRKFt8OQCM5Bsl53NinxBG8sVCTF4QNaeLdH9UxPUy38
-	 SnApW6PeCr6R83MsQ4DvuDxOcpHt19YUEVb8MoxXaiN0eIPQECQ/Mvy2ooVEw6Susy
-	 EaQEmFLvxd1MwRXs2wqSCWeHSLIcYvdOQxH7HmLfJLbN8RM7dhkJKZWm6wOC3jReXI
-	 d2uxnfQYxQPohdutcdThilJmAB86H/L0DvpS2d8rLyBBWYMWfuezR7qHlVEqzMZcsA
-	 g8ACwDxkQlGnQ==
+	b=Pa9f/rFMzl4E/wPD8ciUx13iCfAgUF6vmSFXaR6Ks+u5bb5DAJXeMviiLdxh2MJv8
+	 8+qc5hza/6VMGw4cPNgIQtSvcyxAvv/XWpRWhKCTzzjefbOVYgl2Bn+9VGuU00cEAc
+	 jTvBr1iVHBszyNOkPQO3sX9uTj+4qv9eIpWpokFIoB5BYxSyamUEEtpnqHSLtYolX3
+	 imBdySgeUu1FiifVSkCzKnQQ5D89I3lmT78VRrlGo0C4YvUidrWgNYFLXT3STRDR1B
+	 TCUlRIjeq31xVyq9aJ1FHRa6M6evLAQpUau+Rs7uGaiXXLTqvstat9/ewV25hDKnY2
+	 FyieTCY2HPk1g==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Fri, 20 Feb 2026 10:51:15 +0100
-Subject: [PATCH v15 6/9] rust: page: update formatting of `use` statements
+Date: Fri, 20 Feb 2026 10:51:18 +0100
+Subject: [PATCH v15 9/9] rust: page: add `from_raw()`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260220-unique-ref-v15-6-893ed86b06cc@kernel.org>
+Message-Id: <20260220-unique-ref-v15-9-893ed86b06cc@kernel.org>
 References: <20260220-unique-ref-v15-0-893ed86b06cc@kernel.org>
 In-Reply-To: <20260220-unique-ref-v15-0-893ed86b06cc@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
@@ -63,63 +63,56 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
  dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
  linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
+ Andreas Hindborg <a.hindborg@kernel.org>, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=910; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=TzCUGpEDUTKD6tcoKokHDlQAGVLw4XXksTwjbV99rHQ=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpmC6j7xMqrOaWhqb9sz3GGfZ0fqISUkN5QKA93
- RZup+H7tAiJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZguowAKCRDhuBo+eShj
- d0DZD/0dTBrrqUbBOcxFA2tD+zDIiI+fVqhQyXpWOHZTJ14cd+6Va4NBWr4jjedyZ060dAaM1sA
- Femvxpu86flN8RTIjT1fu/C1Xs2xhYXBJFk5pYbKzIzYG18wMgunFXxKnF8fzwQj5Q55A0x6dSX
- d4sn/PolHwlhr/GJeDpRZbrCiypzkXj4a4yuOdjQNdooFyEfvj+8NbUSFgbidam5i/qUWNQCy2d
- 5iGDU7RejE+DaQPyVc7RRenEMGW0GkVZqQIEcFj4QpDcCqUBduVmeMKJTAq4Hey9md/SCJ1RiPu
- CYiacAclAAKm9n0ybuxbdSJxi0PTvf+fzWIA6n95kw67kRWiUY8YtQvAd+IN3vL64EW5L1uib+H
- RyPos2pTret4c2ZrRxYKFRRWWTZpDs2Ar6HDMojnmuJ+5+74601NEJqBPN9Xk0AYTrR2TglyTjd
- Z/2T9Aex4ZOhAl3GsayG4AEAIJ14DcEej1m+GxHfGKpvmAU4FjhP2JkEKPlWbTdmeZO702b17nw
- ZBIdWaLXJx3pPL4ZrTHqGfdpWlSYag7OkRTNCKhDn0JGyNU85S3MWU7JwuBf0oStMiFrR352hs3
- eH+ufisPMWgHK5PriCQ5BN9Wrjq/QaF7Y/kQaK5SfsooyRg3R42rIYY7jf5WnRUHCZCREvdgm5P
- RQI1LGOLLZoKTjw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1098; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=4kJUgBgTj0V7kRaDlo9MltCBPjRgIT4dj8eMOKXfB5o=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpmC6mLFWJC4FUrb2akl8BDN0BW5kYHddNAH8R6
+ ePI4Cw2p8aJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZgupgAKCRDhuBo+eShj
+ d4hjD/9a6KYUv/3QDTCUbU4jBZySYMrlWTE3KyUKD7sMA5hI7Q0Tt6utA8LOxT6+fWgt78T6dsP
+ YLaKTrcMsbBbF9ZlaZrHl8lklZikAR4xxXgnPSPGr59l/ggK4Mo7kCUQdgwUuC8ahkpgb3RVcUP
+ l5OhLwF21W8lWV0hEx409t8Kzk3WeW2aOLHrkVtgPaBMUoTkJvPAEdi/M7QMEd7KvTGtBEN10Sd
+ uhQioHELdqQTvuoGD/2Nklb8dMjHCDjnPf6DJyD7DydQTfEn2hjA6jQdq7K8J00MQuP/InZd1qU
+ EMO1sfL3nqfaUHKHOpGHjKARDrvThnL2r030YD0tcCw2YZMWv5umGNAlyGF1CNCEDVa59lBEGmW
+ owSPtNvf3UrEKKpr7iymtNmm91VsmBBLGJ8Zwg5nZHvn44w2XR5sr6sXo0Qe5IlG+RZQPG7y+cX
+ rB+YoFcD82kVzVU3ZT/1RJWC2PZPOs34ie+0a+iU/I3k5swQfcovtHfPX+UM5RXMZmUiFZJmvKU
+ FWReMNdU9IC65rTvBqhTBOmM6OZJu8DGdagZs9ZIcaXPj84ZEtd+dYi7mQlLkTxwBnCjC0nwacH
+ JuKEKkSC25+lzZDp9QXvecJqUf1eC1gnMOjlYogawynT0QOSpqelvJDq1GJeBuRYH3wCvocTQ8u
+ WWDeedFFS03kT+w==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Update formatting in preparation for next patch
+Add a method to `Page` that allows construction of an instance from `struct
+page` pointer.
 
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 ---
- rust/kernel/page.rs | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ rust/kernel/page.rs | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/rust/kernel/page.rs b/rust/kernel/page.rs
-index 432fc0297d4a8..bf3bed7e2d3fe 100644
+index 4591b7b01c3d2..803f3e3d76b22 100644
 --- a/rust/kernel/page.rs
 +++ b/rust/kernel/page.rs
-@@ -3,17 +3,23 @@
- //! Kernel page allocation and management.
+@@ -191,6 +191,17 @@ pub fn nid(&self) -> i32 {
+         unsafe { bindings::page_to_nid(self.as_ptr()) }
+     }
  
- use crate::{
--    alloc::{AllocError, Flags},
-+    alloc::{
-+        AllocError,
-+        Flags, //
-+    },
-     bindings,
-     error::code::*,
-     error::Result,
--    uaccess::UserSliceReader,
-+    uaccess::UserSliceReader, //
- };
- use core::{
-     marker::PhantomData,
-     mem::ManuallyDrop,
-     ops::Deref,
--    ptr::{self, NonNull},
-+    ptr::{
-+        self,
-+        NonNull, //
-+    }, //
- };
- 
- /// A bitwise shift for the page size.
++    /// Create a `&Page` from a raw `struct page` pointer
++    ///
++    /// # Safety
++    ///
++    /// `ptr` must be valid for use as a reference for the duration of `'a`.
++    pub unsafe fn from_raw<'a>(ptr: *const bindings::page) -> &'a Self {
++        // SAFETY: By function safety requirements, ptr is not null and is
++        // valid for use as a reference.
++        unsafe { &*Opaque::cast_from(ptr).cast::<Self>() }
++    }
++
+     /// Runs a piece of code with this page mapped to an address.
+     ///
+     /// The page is unmapped when this call returns.
 
 -- 
 2.51.2
