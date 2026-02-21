@@ -1,202 +1,169 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBA12DF12F
-	for <linux-block@vger.kernel.org>; Sat, 21 Feb 2026 09:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771665125; cv=pass; b=IrkFmrA0Ytfc01YmMFQJkZ7n34lRssq2TMLywNoa/ocyAyqSz1iBvK04V7wOO2lM9UWW0iiyJ7quFSLanqZ8L7RZmkpqxlb4KPbgfuwDPwnr85mvKs2I4X5onWL786wekqjsCXHO5yAihHeadcsRHGRJK9iP72qKmswM+q5U3gE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771665125; c=relaxed/simple;
-	bh=YLMy/eJC33SeA+X6nkHRGtxREcz9ZXeGvlp94b9j/OM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mM3RIS779lz8nYciNgD1gwSsDmkhlzASN1eDeDbu+etfnM/DSrjUTGtl5w1Jg0RwURaiCWTnHM8iNobIPJcMGy3qNh5OozuBML5K/u63j7EJXh4eoQaTTFSxDingTb167b5DOuKJ1mpuzQsPXDqpDGAplA7CALRUriBBBeJjxos=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WvOk4n7a; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=eUwZIYWz; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115A3131E49
+	for <linux-block@vger.kernel.org>; Sat, 21 Feb 2026 13:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771679200; cv=none; b=CO1aHZpzE/NXyxx+GBc5Bp7Tua/xVvdn6j4Cao/tBPS+lpY4T+jouhaUPsIuEj0siGQy/Hgp6b5vBUdUcVtUHEn9NaXVY7Yr6vi8mzJtFjqcmAmtYvUmxF+aGsLBc8lbJMpDa/7aC5IasjwJMzQD/TPRWYyaO8hHC0Nw7j8C9Fc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771679200; c=relaxed/simple;
+	bh=Hc8U17Xt6LcVin8TphIgzsxXMQmZ54svpKwBTfwEiR4=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=nX3fSKIyW8Z4+rJmpMfZmyJKpVb7LTR20Mpn8u+L+laXOzF4DjUu0oXrSoyAU9fJI0iYFF5uvH+Zw60Ei+vcaObEmrPx/kR1ofb6LJthFcJhNTmmkbM8QkO2sqBkud2eT04HGCK3zftcfeM5/y/Yb4P5/aX3pDdO4oQcrfVpovE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=kaPxk7q0; arc=none smtp.client-ip=185.125.111.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WvOk4n7a";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="eUwZIYWz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771665122;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8Med7MAxXcpqee2OOIkX9OPTkN8DI7LIqce9DvMMQG8=;
-	b=WvOk4n7ay2Rx4BZRdJiL2sbIeSYEVkzfUTg4tuTZo3InWJ656gC8KnxqRSKVBrfR5JPA5Z
-	1UKAwSfmqUdF/xdl6qUjAtDnG9pCA8QV20htWXdT+S4PX2ycz6izRWVJv1LPDQC/isCOJI
-	4P/07kLX2UYGA9E8ISnLE5BRvGh4pv4=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-378-R7q7-XIeM8-JntcPglvpHA-1; Sat, 21 Feb 2026 04:12:00 -0500
-X-MC-Unique: R7q7-XIeM8-JntcPglvpHA-1
-X-Mimecast-MFC-AGG-ID: R7q7-XIeM8-JntcPglvpHA_1771665119
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-59e0abad4fbso1369742e87.2
-        for <linux-block@vger.kernel.org>; Sat, 21 Feb 2026 01:12:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771665118; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Jy3OjTKljNxqyNi4W74B5i4cWdwb9SiTm8sC+/UhMKthLmvJCzdOk5OwVoJXmireu9
-         jDyC/UwH5q5Y/xBM/poMlS1hoid11K/6IAeet9bhDte8bEz++ap0sjTG09Jpujv4DX9K
-         dRIx+A2TOx9Se0g/sh9J/a/pINCLts0obN7ogiEO3oi2m0LJEctywMLtAxjy9ZK2GCjE
-         xB4Vym6WF6LMhsW4+QZ/xNq+efOogzwPE1c89lXUPjyhLt9b+JiF4qy3l196uqaO+gzL
-         6bxfeJmGyR4PS2OqhHIhhsPMuwJEpc67hmHlI42OQf2MPKgCnr5sTrIDpfCIIOd/4cQs
-         YlcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8Med7MAxXcpqee2OOIkX9OPTkN8DI7LIqce9DvMMQG8=;
-        fh=XBWDWzjFnltviZKYu4SXVdzRT4IZF9u6kBbr2jLb5J4=;
-        b=h9IiYPD+8VxRtMbRQuC3q5tgMPOdKpjdSzLJIJEVUEveGTag+XbUEHZC+vuG6Qb4N8
-         xK2NHqDOYw4OO+FAF82qzGzcWqeWqv5qG2SPsOzrKuPkl6zvEhKQY+nOuBz6ZoLlWfhs
-         qo1AESZnC6S5lPV0WqV+N8FAWikXK6NwwcwnMx+1IFEw3hWPBzIhbiUQ8WpFPBq2JWiX
-         78W0BwG7fs+kqPPJRb/dbWjalbB0IYPJmsUW6I5QiVQR4BHdGagGL01z9hP54G5CJr9N
-         bl/H0i7ZnsIJzgCyJtrLJLyViV144WUAi9HHK/fXTayIu6YAwRfnBYT/CeQCBpTBzrCX
-         XDNQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771665118; x=1772269918; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Med7MAxXcpqee2OOIkX9OPTkN8DI7LIqce9DvMMQG8=;
-        b=eUwZIYWz8kVvqHRqIyucU44mxnCfw6vQz/2tzMC5pVdYGeMSAg9WYzGXGiwtNm7Sww
-         66dF6KGmcfa1M6GjQwO6B6HGwO0QQS5qt6xvSaYNfX9mc2X2cnWJ6kRe3DZwwI2R7iEc
-         QSJjjPC7k/96qpyK5JuigawI8Cj6SBT3HiFDfpPJjxBDLrKrPPh859ZilwptQXUCILQD
-         SIlNXlmVuYjrA/bqTfReaKx+x0Wn/j8CWUZBkkNH9CXi3Q/jWd64zux264En+RpxNCIx
-         sBShO/aj8G7zqjAyK7nkE8SGK0NTfEsVkoZMF3i7y+lYPwispS+dTqLQsmHnIAgkjlpb
-         5Mmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771665118; x=1772269918;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8Med7MAxXcpqee2OOIkX9OPTkN8DI7LIqce9DvMMQG8=;
-        b=OAMNMlDRaSmuQvc8ngU8r5sbwZ9aX3w+9xeuScO7oDLHWOseh/JNGuvV3MQfcArWbv
-         IeVOr6vB2xlxt0UTh3V1GUqo90JjtEAY/9q0YAM8DWm6HZnKQIlWChV4Xk5S6qPqN339
-         RR8SHxqyMxbCbtrVru9BeSrhh+VE7uEwlhGicLyJ1SyzGhPwocqfXfuAwLCicupg47rM
-         2eJKIJT/+ErMv/nTmT/PirtLCOPNMc0P4EsebhlzGfAdF8V8wc3yzW/zfvVzbq9srA0Y
-         Bn77koZHgbMSSdNR7VnAFjERvi6SAETc7p3RlIrZLSWRoxOpNHbeQr3Qyx6w/vZFLjji
-         dtkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX5WSii2kmEdf5P/JjUkF1w1c3x/ikv2t0K6fT9mKjM+mERCFMoS8MRXrm2uMcqZrrd1c5PFfkLKMggRA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7YW+LFSZUxVUhRBDsjOIdjT7Lbul4Ql4COoyzSL8ABFnihm7i
-	nBY39ya1QobL+aKYigHT0BrVh6Ls0SK3uc9FY8E/FSmqAJ2K9sMg0gmyiljSHPiXsRN1tWYcDJL
-	nVhK7x7ZwNtz3XJ+7r/u4ih9s/UzDcGHGLF+23pdhpdtrTxyQO/I+Eexp08OgjohefVljeeNwiH
-	1+CWyGG1OCLlzeXi3GxJwaYu0/ImTPHAH4kWI3K6lXIqm5HQ0=
-X-Gm-Gg: AZuq6aIOkZ8+H5IwcmCDWb7Vwsv5Dt2/24/b7tV4mSloqNfkM1FCQXYPMhLXJ8rro8b
-	cnmnRyCyOcApvXtaJMtPiLjAOxb8EuuLlPzz1UDYEH95XbtS4JD4AVtJNpqWwz2FLA1gmBax4mc
-	pmXMc9V+w5vbXaP5CJYUzKMFYNST2rIpoezLXHMJ++i5G45f0VGgqDY6AVRW4zuqVPgAaqpaytU
-	7xpEdkZiuJ0DU7rB54XztspExVHMGiV7AkQzoIiz9wotBIKu8/KXv8BmapMs7L16+k2Aj7YZQqW
-	q4pLrQ==
-X-Received: by 2002:a05:6512:ac5:b0:59e:64d2:71a0 with SMTP id 2adb3069b0e04-5a0ed8973d0mr739517e87.18.1771665117758;
-        Sat, 21 Feb 2026 01:11:57 -0800 (PST)
-X-Received: by 2002:a05:6512:ac5:b0:59e:64d2:71a0 with SMTP id
- 2adb3069b0e04-5a0ed8973d0mr739509e87.18.1771665117295; Sat, 21 Feb 2026
- 01:11:57 -0800 (PST)
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="kaPxk7q0"
+X-Virus-Scanned: Yes
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
+	t=1771678828; bh=Hc8U17Xt6LcVin8TphIgzsxXMQmZ54svpKwBTfwEiR4=;
+	h=Subject:From:In-Reply-To:Cc:References:To;
+	b=kaPxk7q09eu/ix48yYtRtCmB3MPEf7Lts8xlsurX23RCzS3rlTmTcdcmb7vuSrkTT
+	 Jk+Wsjz6dwMjziLyuT3SlnEfSN7Clvz5o7tdD0kPL9AQFvgfrH/Uqtamrlf8KSrcOP
+	 F1xtVDRpsDhXEm2W0jluQT8sv54L2bARR2MypJ6Pg3zwIjo9tvEM3pBvWna3oDbP0b
+	 DsWhW/Jtny4EqDJ3z90onTj1++VIULhRa+GIdtqcmedVIfwxpKDOXwypiLMX9ANemM
+	 JRYlsYJVbIqnlEgQ+cF9jqP/R6X3ZRKktTsFnYyz5YZR3OMh4pm0tOsrtbfsZVtPz3
+	 OIIxOE9QTU9ipmGWjUg6R0aF8T+JXMusGeaccqLT/79cwS2feR2Y+dIla3EoZsYmug
+	 gS9U+oL2koubKJG+WJt+o53bVKWi9Fkzo+CE6AE1syndCH7eP/QH46EbM8JQLI2yQj
+	 Hg7/SspTgRcPsZXQ3wSnDu7ouw5BcfmIcH62IT/q5dEueJeR7KQ5a2e8IBI6KVaoIw
+	 OeApAyMpbH7ETtz7HlFDOdNbMhfvc2sirD5OCNXWRIS5noDV1F+7CEILHDzDTwVwOk
+	 ZH/Qesm4aa7wnhLtm5KBhqsDG9XhKeGd0Q3jDICqQBwZnxNCLr75qEXvdDVH7lEAem
+	 Uws3mDywT0vOA5xCdAhnEyrg=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALTww28QMg=YXqKWpWLZrLO+xiqOe3LGyput8dx68-dnQsxg=g@mail.gmail.com>
- <aZhsIVa2TJ9-bMhj@fedora>
-In-Reply-To: <aZhsIVa2TJ9-bMhj@fedora>
-From: Xiao Ni <xni@redhat.com>
-Date: Sat, 21 Feb 2026 17:11:45 +0800
-X-Gm-Features: AaiRm53ma7jtT6vamly0SrGhEI1ssRVkr2jsQhQTJq5DZzr5sP6W0rlDwudIYu0
-Message-ID: <CALTww2_8B=rZbGgJCDjG7bqa64RfE3tK9MdCKkJBzW8qXomkdQ@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] User space RAID5 with ublk and io_uring BPF
-To: Ming Lei <ming.lei@redhat.com>
-Cc: lsf-pc@lists.linux-foundation.org, 
-	linux-block <linux-block@vger.kernel.org>, bpf@vger.kernel.org, 
-	Caleb Sander Mateos <csander@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] ublk: cleanup flag handling and fix
+ UBLK_F_NO_AUTO_PART_SCAN
+From: Alexander Atanasov <alex@zazolabs.com>
+In-Reply-To: <aZfb7aQTMRbRaRgb@fedora>
+Date: Sat, 21 Feb 2026 15:00:15 +0200
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ Hannes Reinecke <hare@suse.de>,
+ Yoav Cohen <yoav@nvidia.com>
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <CFA6B655-C9E6-4D44-975D-45D1F75628D6@zazolabs.com>
+References: <20260212152553.1737373-1-alex@zazolabs.com>
+ <aY6fAlXmzQZCKwmM@fedora> <efe851c6-cb40-4e6f-a382-047b33753ee1@zazolabs.com>
+ <aZfb7aQTMRbRaRgb@fedora>
+To: Ming Lei <ming.lei@redhat.com>
 
-On Fri, Feb 20, 2026 at 10:14=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wro=
-te:
->
-> Hi Xiao,
->
-> On Thu, Feb 19, 2026 at 01:38:46PM +0800, Xiao Ni wrote:
-> > Hi all
-> >
-> > I'm doing some work on user-space RAID recently. I'd like to propose a
-> > topic for LSF/MM 2026 regarding the implementation of RAID5 in user
-> > space using ublk and io_uring bpf[1], particularly focusing on the
-> > challenges encountered and potential kernel improvements needed.
-> >
-> > Ublk raid5 uses the ublk framework (tools/testing/selftests/ublk/),
-> > with the goal of leveraging io_uring's zero-copy capabilities and
-> > BPF[1] for performance optimization. The implementation includes:
-> > * RAID5 stripe handling with configurable chunk sizes
-> > * Multi-queue support via io_uring
-> > * Degraded mode for single disk failure tolerance
-> > * Integration with io_uring BPF struct_ops framework
-> >
-> > During the implementation, I encountered several technical challenges.
-> > The primary challenge is performing XOR parity calculations in a true
-> > zero-copy manner:
-> >
-> > 1. Bpf program support
-> > Raid5 needs to calculate parity with data. Now io_uring already
-> > supports zero copy. For targets such as raid0/raid1, it's enough. But
-> > for targets such as raid5, it still needs to copy data to userspace
-> > and calculate the parity. Bpf program is a nice solution[1] to resolve
-> > this issue. Besides the patch set[1], it still needs another bpf kfunc
-> > uring_bpf_xor() support.
-> >
-> > 2. Register buffer per io
-> > Raid5 needs to calculate parity with data. So it still needs to
-> > pre-alloc buffer and register it for each io. The total memory is
-> > controlled by queue number and queue depth. With the pre-alloc memory
-> > and bpf program support, target such as raid5 can support true
-> > zero-copy manner.
-> >
-> > Question for discussion:
-> > * Should the kernel provide XOR operation kfuncs for io_uring BPF?
-> > * What would be the appropriate API design?
-> > * Are there security or verification concerns with BPF performing XOR
-> > on registered buffers?
-> >
-> > Current Status:
-> > * Basic RAID5 functionality: implemented
-> > * BPF struct_ops framework: successfully integrated
-> > * Performance testing: in progress
-> > * Main blocker: zero-copy XOR implementation waiting for kernel
-> > support I've written a patch for testing based on [1]
-> >
-> > Why this matters
-> > User-space block devices (ublk) offer several advantages:
-> > * Faster development and iteration
-> > * Easier debugging
-> > *  Ability to leverage user-space libraries
-> > * No kernel panic risks during development
-> > * Easy to evaluate/compare performance between kernel raid and ublk
-> > based userspace raid.
-> >
-> > Desired Outcome
-> > * If proposal in [1] would be acceptable
-> > * Get feedback on whether `uring_bpf_xor()` kfunc would be acceptable
-> > * Discuss API design for BPF-based computation on io_uring buffers
-> > * Understand the roadmap for io_uring + BPF capabilities
-> > * Learn best practices from the community for similar implementations
->
-> I am interested in this topic, and looks Caleb Sander Mateos has similar
-> requirement too.
+Hello,
 
-Hi Ming
+> On 20 Feb 2026, at 5:58, Ming Lei <ming.lei@redhat.com> wrote:
+>=20
+> Hi Alexander,
+>=20
+> On Fri, Feb 13, 2026 at 01:05:40PM +0200, Alexander Atanasov wrote:
+>> On 13.02.26 5:48, Ming Lei wrote:
+>>> On Thu, Feb 12, 2026 at 03:25:52PM +0000, Alexander Atanasov wrote:
+>>>> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
+[snip]
+>>=20
+>>>=20
+>>> Alexander, please let us know if you'd like work this way?
+>>=20
+>> =
+https://lore.kernel.org/linux-block/c95b3de4-f4f8-4b35-a3e4-a83da98ced0b@z=
+azolabs.com/T/#mbb410ceb3f4c6f23e6c566911dfc833365ce9cdc
+>>=20
+>> in short - having partitions and auto scan are two different =
+features, why
+>> merge them?
+>=20
+> Yoav's original requirement has been addressed by scheduling scan work =
+in
+> wq already.
+>=20
+> So I think it makes more sense to switch to UBLK_F_NO_PART_SCAN.
 
-Thanks and any suggestion is welcome :)
 
-Best Regards
-Xiao
->
->
-> Thanks,
-> Ming
->
+Okay.
+
+>=20
+>>=20
+>> If we want to cover all cases i thing we should go like this:
+>>=20
+>> /* Enable partitions support on device */
+>> #define UBLK_F_PARTITIONS (1ULL << 18)
+>>=20
+>> /* Do not perform automatic partition scanning when device is added =
+*/
+>> #define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 19)
+>>=20
+>> Added value is to have partitions enabled/disabled explicitly for =
+trusted
+>> devices. Where by default they will be disabled.
+>>=20
+>> Also may be change from UBLK_F_NO_AUTO_PART_SCAN to =
+UBLK_F_AUTO_PART_SCAN -
+>> to make it explicit instead and be like
+>> the rest of the flags - all are enable flags
+>>=20
+>> Then these variants become possible:
+>> - unprivileged without partitions (can we add security checks to =
+allow
+>> partitions for them too?)
+>> - trusted with or without partitions (UBLK_F_PARTITIONS bound to
+>> GD_SUPPRESS_PART_SCAN)
+>> - If it is a device with partitions then UBLK_F_NO_AUTO_PART_SCAN =
+controls
+>> if initial auto scan is performed or not.
+>>=20
+>> Having them separate can allow emulation of removable media where =
+data is
+>> not available at device creation time but is known when available by
+>> external event so you can load partitions. Two step device bring up, =
+i.e.
+>> partition scan at device creation time will block you, but you know =
+when
+>> data is available from an external event, and then you can load =
+partitions.
+>>=20
+>> What do you think?
+>>=20
+>> I'be added CC Yoav since i think he requested that feature in first =
+place. I
+>> beleive Hannes may have a different use case, so let's get some more =
+input
+>> on this.
+>=20
+> Yoav's original requirement is to not scan partition during ADD_DEV
+> command for avoiding hang, which is addressed already by scheduling =
+scan work in wq
+> context.
+
+Okay.
+
+>=20
+> So I think it is fine to change UBLK_F_NO_AUTO_PART_SCAN into
+> UBLK_F_NO_PART_SCAN, which can be implemented by GENHD_FL_NO_PART, as =
+you
+> mentioned.
+
+
+Okay then I will switch to use GENHD_FL_NO_PART.
+UBLK_F_NO_PARTITIONS/UBLK_F_PARTITIONS will be a better flag name than=20=
+
+UBLK_F_NO_PART_SCAN - since it will not be about scanning any more.
+Partitions will be disabled completely -  by default for untrusted and=20=
+
+if requested for privileged.
+
+And if privileged have partitions - we need UBLK_F_AUTO_PART_SCAN
+or UBLK_F_NO_AUTO_PART_SCAN option to explicitly request or suppress
+the initial auto scan.
+
+
+Regards,
+Alexander Atanasov
+
+
 
