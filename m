@@ -1,140 +1,156 @@
-Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BBB30BBA9
-	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 16:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A1C30FC1D;
+	Mon, 23 Feb 2026 16:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771863819; cv=none; b=qIlcWCGY0qNiFaQRbIMHgvG+dFtFOZAzuYf83HAXfhUpTcPY+zml+7VZlsvtJ3yYc2De9YBdl2dei+O3ghGwmv5tbQoOXM3PDKs6+bNJD7AlFT6cPiEbTDixIwqdGFZ4k9DMBPqqE4PmKKHbiyDOkQta6uacIG5A3v6jjdOSyiE=
+	t=1771864060; cv=none; b=LZFIouZD2SWuOWWzdIgJMvDtIJfQi3DxwtYkZFUk6Wc+YvtBlXtZz6TgOAGy2M7//UkV4SM1FFPWKD38uOamqL0vgGS2/a41hEHm2iozPoibJjUOFaHfSBkJCntd9zP1RuBUv8JfVaUVsqkQSlixYWVbzou5Ufqbz84oLhCSzgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771863819; c=relaxed/simple;
-	bh=1Xg70YMd+FaVEOb4w7tS4Z1DiPj7LoxSZz0ooGNfLJA=;
-	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=LzrusI5lWglNOVIlNXQrv5jz6xlhRGSRbdhBqhJ5hu297zkMCvZnzMY7HrX8OZDR2jz2OS8F55HXnqL1DUgwhLktMGwd6AndpAtyPn2kHYL5Qdp1fGxVIuZ7JMoiyBd8VR/vrYq/C/+zzphGmOSPrzbNFcxjQe5iZ/kV0rJKGMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=RMQ+HSdw; arc=none smtp.client-ip=185.125.111.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
+	s=arc-20240116; t=1771864060; c=relaxed/simple;
+	bh=fzmMAPqHr6UY1W4QOVefe5i2Klnyid7y4W4h12ZJ2Lo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TwMW/WX1Lx42fVqraMDhJpwsbkntahoPoXrc8zxcbgzgNc9+pp0I4pKy18NE9bkILaMcUoK8UXbbqD2M1WENro+MVd16b2xYVfWJm0TU6CaWnrvNr1goJHYFd/7/UpBzvoUxI0v9BtHge5Tu0W+ID4DnYmQeKHfyFt1cfmHm43c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZpZHqKCQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="RMQ+HSdw"
-X-Virus-Scanned: Yes
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1771863813; bh=1Xg70YMd+FaVEOb4w7tS4Z1DiPj7LoxSZz0ooGNfLJA=;
-	h=Subject:From:In-Reply-To:Cc:References:To;
-	b=RMQ+HSdwctZiDtv2Jm2NSE7NKTLRMqLGYwGn9ESKrLc1fGF6wSCW5Bkk7wQXWXTuV
-	 beiddA+C/LUcaW7A80qJhr+hNZPjAiePuVkQdQ57xvPVRaqSYai0eA38ZEey0VqKRg
-	 I7qdp4vDEWzYpiN70812gBNXvCdU88bYsCOar4gGzvot1/DTtONhJF5YEu49Pt7id8
-	 enMXRBx0GP8P8JNHoenHyqqwWq7CVEx3QHC7Cn7Y1E4h6laLLrMMR0GACmZCq7CiDq
-	 gAO81tw/4LvMnFgTdD76AHcobgE8vU707pBzO2uZMbn24S9RVJ8Y2DQKUYxsb1zxcB
-	 jm4Nt6at9KUpRJcs4nC31XKecaa7A8VhC05gvY/a3Ftb74RZwE/MtM3KwsdwiZI5XL
-	 lIZ43L19AaWc2+ORgW/kjMkpzVKhbhsA6l5cg3TtKHScrLHdTZ53A3Y3UIRbegSzh7
-	 9V7LKg0KdEp/fmE6hvIKin1ZSwm+xK8nvPm4llFCJwG4oonHlUOqmvvTsjzlHe76/b
-	 giUtvgoAh1UvfpT0lN9Yo2Xor4Y63HNwIpB5HlOcDpn62pRLRU9gW3i2zG/IXq4okH
-	 xnMGYYgYCw7BolGAkFfzKudNNvEUaWmlM/rzYg8GYEw2y5WD9gtJ1N1e5nqL9yxGDi
-	 X9bFDVGoNwvmA4K9dBrESjSY=
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZpZHqKCQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4C0C116C6;
+	Mon, 23 Feb 2026 16:27:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771864060;
+	bh=fzmMAPqHr6UY1W4QOVefe5i2Klnyid7y4W4h12ZJ2Lo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZpZHqKCQVoqovvBwyXxOJHCiEMZrA6Q/JpYJGnJIIc2oQPs06MEKkI2nY/zfzmSWW
+	 RUMoIBImCulZAFA1eRig7dOUjjvPSv7vrLnjoa5hpGddB6C8VZjV9DU4c5omi5GA3V
+	 kbB0tp1pQ4yEZCNRLtkWc/NrBeyohlbB9FoijXBqBflMlKjQa+/gXYebPitszzgJUv
+	 76a515aLdWGxWI/p9dF+d2BNiOHcnnrwsg1RCAZbpUyI9HB5oyHCU9SRwIoBytvTdg
+	 eBnyigzBpUc4z5n0YMet2oqc1k0UhJU4y9u22UoLfJJqBTVOPfxsZ50XKnQE1Okwbx
+	 2Kc+0pi50pInA==
+Date: Mon, 23 Feb 2026 08:27:39 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	ntfs3@lists.linux.dev, linux-block@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 12/16] ntfs3: remove copy and pasted iomap code
+Message-ID: <20260223162739.GC2390353@frogsfrogsfrogs>
+References: <20260223132021.292832-1-hch@lst.de>
+ <20260223132021.292832-13-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/4] ublk: cleanup flag handling and fix
- UBLK_F_NO_AUTO_PART_SCAN
-From: Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <CADUfDZp-jX98mfERO0OUoMePfws5yRtvfmLfzD2tzfi+HDPyLQ@mail.gmail.com>
-Date: Mon, 23 Feb 2026 18:23:21 +0200
-Cc: Ming Lei <ming.lei@redhat.com>,
- Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A21C344C-709D-4E28-B0C4-62946391D560@zazolabs.com>
-References: <20260223121515.3296983-1-alex@zazolabs.com>
- <20260223121515.3296983-2-alex@zazolabs.com>
- <CADUfDZp-jX98mfERO0OUoMePfws5yRtvfmLfzD2tzfi+HDPyLQ@mail.gmail.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260223132021.292832-13-hch@lst.de>
 
+On Mon, Feb 23, 2026 at 05:20:12AM -0800, Christoph Hellwig wrote:
+> ntfs3 copied the iomap code without attribution or talking to the
+> maintainers, to hook into the bio completion for (unexplained) zeroing.
 
+Well they /did/ attribute it...
 
-> On 23 Feb 2026, at 17:59, Caleb Sander Mateos =
-<csander@purestorage.com> wrote:
->=20
-> On Mon, Feb 23, 2026 at 4:17=E2=80=AFAM Alexander Atanasov =
-<alex@zazolabs.com> wrote:
->>=20
->> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
->> as it tries to use it as a switch for the auto partition scan.
->> To fully disable creation of partitions GENHD_FL_NO_PART must
->> be used, switch code to use it instead GD_SUPPRESS_PART_SCAN.
->>=20
->> Using the new flags rules for partitions become:
->> - Unprivileged daemons - never scan partitions, they have
->> GENHD_FL_NO_PART always set - they are devices without partitions.
->>=20
->> - Trusted daemons - by default have partitions disabled.
->> Partitions can be enabled via UBLK_F_PARTITIONS flag and
->> automatic initial scan can be requested via UBLK_F_AUTO_PART_SCAN =
-flag.
->>=20
+> Fix this by just overriding the bio completion handler in the submit
+> handler.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/ntfs3/inode.c | 51 +++---------------------------------------------
+>  1 file changed, 3 insertions(+), 48 deletions(-)
+> 
+> diff --git a/fs/ntfs3/inode.c b/fs/ntfs3/inode.c
+> index 7ab4e18f8013..60af9f8e0366 100644
+> --- a/fs/ntfs3/inode.c
+> +++ b/fs/ntfs3/inode.c
+> @@ -605,63 +605,18 @@ static void ntfs_iomap_read_end_io(struct bio *bio)
+>  	bio_put(bio);
+>  }
+>  
+> -/*
+> - * Copied from iomap/bio.c.
 
-[snip]
+...extremely poorly, by not recording their reasons for copy-pasting the
+code.
 
->> Rework the code to work as described above:
->> - remove checks in ublk_partition_scan_work and rely on
->> the caller to schedule the work only if it has to be done.
->> diff --git a/include/uapi/linux/ublk_cmd.h =
-b/include/uapi/linux/ublk_cmd.h
->> index a88876756805..467ecaa20ac1 100644
->> --- a/include/uapi/linux/ublk_cmd.h
->> +++ b/include/uapi/linux/ublk_cmd.h
->> @@ -367,8 +367,11 @@
->>  */
->> #define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
->>=20
->> -/* Disable automatic partition scanning when device is started */
->> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
->> +/* Enable partitions on the device */
->> +#define UBLK_F_PARTITIONS (1ULL << 18)
->=20
-> This is not backwards compatible. Existing ublk servers expect their
-> devices to support partitioning. If you want to introduce a feature
-> flag to control this, it needs to be opt-out rather than opt-in.
-> UBLK_F_AUTO_PART_SCAN probably also needs to remain as
-> UBLK_F_NO_AUTO_PART_SCAN.
+> - */
+> -static int ntfs_iomap_bio_read_folio_range(const struct iomap_iter *iter,
+> -					   struct iomap_read_folio_ctx *ctx,
+> -					   size_t plen)
+> -{
+> -	struct folio *folio = ctx->cur_folio;
+> -	const struct iomap *iomap = &iter->iomap;
+> -	loff_t pos = iter->pos;
+> -	size_t poff = offset_in_folio(folio, pos);
+> -	loff_t length = iomap_length(iter);
+> -	sector_t sector;
+> -	struct bio *bio = ctx->read_ctx;
+> -
+> -	sector = iomap_sector(iomap, pos);
+> -	if (!bio || bio_end_sector(bio) != sector ||
+> -	    !bio_add_folio(bio, folio, plen, poff)) {
+> -		gfp_t gfp = mapping_gfp_constraint(folio->mapping, GFP_KERNEL);
+> -		gfp_t orig_gfp = gfp;
+> -		unsigned int nr_vecs = DIV_ROUND_UP(length, PAGE_SIZE);
+> -
+> -		if (bio)
+> -			submit_bio(bio);
+> -
+> -		if (ctx->rac) /* same as readahead_gfp_mask */
+> -			gfp |= __GFP_NORETRY | __GFP_NOWARN;
+> -		bio = bio_alloc(iomap->bdev, bio_max_segs(nr_vecs), REQ_OP_READ,
+> -				gfp);
+> -		/*
+> -		 * If the bio_alloc fails, try it again for a single page to
+> -		 * avoid having to deal with partial page reads.  This emulates
+> -		 * what do_mpage_read_folio does.
+> -		 */
+> -		if (!bio)
+> -			bio = bio_alloc(iomap->bdev, 1, REQ_OP_READ, orig_gfp);
+> -		if (ctx->rac)
+> -			bio->bi_opf |= REQ_RAHEAD;
+> -		bio->bi_iter.bi_sector = sector;
+> -		bio->bi_end_io = ntfs_iomap_read_end_io;
+> -		bio_add_folio_nofail(bio, folio, plen, poff);
+> -		ctx->read_ctx = bio;
+> -	}
+> -	return 0;
+> -}
 
-It is easy to turn both to opt-out - it will just get double negatives =
-here and there,
-which I tried to avoid. I got the impression that the API can be changed =
-in current stage
-and people in general do not want to have partitions at all, so not =
-having them by default
-is better. But looks like I am wrong here.=20
+Yeah, identical to iomap_bio_read_folio_range except for setting
+bi_end_io.
 
-UBLK_F_NO_AUTO_PART_SCAN(old) -> UBLK_F_NO_PARTITIONS on by default
-UBLK_F_NO_AUTO_PART_SCAN(new) -> disable auto scan on by default
+Don't copy-paste stuff.
+Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 
-Also for backward compatibility moving to GENHD_FL_NO_PART can also =
-break
-users who did a user space partition scan.  But I have no idea what to =
-do here (yet),
-especially with regard to unprivileged devices.
+--D
 
->=20
-> Best,
-> Caleb
->=20
->> +
->> +/* Perform automatic partition scanning when device is started */
->> +#define UBLK_F_AUTO_PART_SCAN (1ULL << 19)
->>=20
->> /* device state */
->> #define UBLK_S_DEV_DEAD        0
->> --
->> 2.43.0
-
-
-Regards,
-Alexander Atanasov
-
-
-
+> -
+>  static void ntfs_iomap_bio_submit_read(const struct iomap_iter *iter,
+>  		struct iomap_read_folio_ctx *ctx)
+>  {
+>  	struct bio *bio = ctx->read_ctx;
+>  
+> +	bio->bi_end_io = ntfs_iomap_read_end_io;
+>  	submit_bio(bio);
+>  }
+>  
+>  static const struct iomap_read_ops ntfs_iomap_bio_read_ops = {
+> -	.read_folio_range = ntfs_iomap_bio_read_folio_range,
+> -	.submit_read = ntfs_iomap_bio_submit_read,
+> +	.read_folio_range	= iomap_bio_read_folio_range,
+> +	.submit_read		= ntfs_iomap_bio_submit_read,
+>  };
+>  
+>  static int ntfs_read_folio(struct file *file, struct folio *folio)
+> -- 
+> 2.47.3
+> 
+> 
