@@ -1,129 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2119D28C869;
-	Mon, 23 Feb 2026 16:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BBB30BBA9
+	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 16:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771862945; cv=none; b=tu8UD6wMo/hVdP+EMVeCNepHq2i0Qt4owF/WVtRELei9CpM4Trjqoy5BRRnX4TqeVXqYasWfoMI+TS9I4SqVPr3xhnk7KDackJi7KxEGfHioBDGvmq97nm0Z3ksFxZVvSx+Q/lNGDjiAJU4Zj0H4g0mIA57smazg3CJPuHWJQc8=
+	t=1771863819; cv=none; b=qIlcWCGY0qNiFaQRbIMHgvG+dFtFOZAzuYf83HAXfhUpTcPY+zml+7VZlsvtJ3yYc2De9YBdl2dei+O3ghGwmv5tbQoOXM3PDKs6+bNJD7AlFT6cPiEbTDixIwqdGFZ4k9DMBPqqE4PmKKHbiyDOkQta6uacIG5A3v6jjdOSyiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771862945; c=relaxed/simple;
-	bh=U1f4VUWvlVoHVRzjSsvSj6+GTfFekKDeqZn6GrwXI0o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h/BOkjva8uPoNlA87lW1vnTJV0L42mPpMMwkGRvuYmqENEHrzwDUeeEEUve3dhXf4L0WulaToDpFbsNE1ihtn/MzJkZAQFdKXAJfE6nc+8JiTT94YWQFfs/0clxtyH0yZ+a81h5JoUfJDhq3pcZAnpJqZwNRaEku1tz8+NjRDxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9pVaPN/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771863819; c=relaxed/simple;
+	bh=1Xg70YMd+FaVEOb4w7tS4Z1DiPj7LoxSZz0ooGNfLJA=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=LzrusI5lWglNOVIlNXQrv5jz6xlhRGSRbdhBqhJ5hu297zkMCvZnzMY7HrX8OZDR2jz2OS8F55HXnqL1DUgwhLktMGwd6AndpAtyPn2kHYL5Qdp1fGxVIuZ7JMoiyBd8VR/vrYq/C/+zzphGmOSPrzbNFcxjQe5iZ/kV0rJKGMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=RMQ+HSdw; arc=none smtp.client-ip=185.125.111.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9pVaPN/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91C5AC116C6;
-	Mon, 23 Feb 2026 16:09:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771862944;
-	bh=U1f4VUWvlVoHVRzjSsvSj6+GTfFekKDeqZn6GrwXI0o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l9pVaPN/cxEh/suCVhuWE9zKuRvobiCEGJ0txgkBo9PpXkl47x3YeBE24NtYlHPBp
-	 Z9MvnO0WtjK2zPWfQ/IfIVLCZffKJlqemIihS/QeSLhwIJq8IdOPIU+1f9688A4XMp
-	 gwlAn+/8UAVE4a0QW6Jp5dz96715FKWMWVIWgA0sngCXHv+7g87EwavNZvdprMhmg7
-	 MahbRAl/A4ygOiEtD77hedrDSCJEvgQIk8RNwhzzo9fFOFuUA/+QEBobC2lco7cD/+
-	 etfl/NJ7Xp0yiJtecEPjRZB5hFueUHK0rlemZus13jXbfPV+sMsHDxL+4n4NsgZMVR
-	 B+47pl7GCN5cg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vuYUX-0000000D3Lu-3QOf;
-	Mon, 23 Feb 2026 16:09:01 +0000
-Date: Mon, 23 Feb 2026 16:09:01 +0000
-Message-ID: <86jyw3a1cy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: David Lechner <dlechner@baylibre.com>
-Cc: Frederic Weisbecker <frederic@kernel.org>,	LKML
- <linux-kernel@vger.kernel.org>,	Michal =?UTF-8?B?S291dG7DvQ==?=
- <mkoutny@suse.com>,	Andrew Morton <akpm@linux-foundation.org>,	Bjorn
- Helgaas <bhelgaas@google.com>,	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,	Eric Dumazet
- <edumazet@google.com>,	Gabriele Monaco <gmonaco@redhat.com>,	Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>,	Ingo Molnar <mingo@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,	Jens Axboe <axboe@kernel.dk>,	Johannes
- Weiner <hannes@cmpxchg.org>,	Lai Jiangshan <jiangshanlai@gmail.com>,	Marco
- Crivellari <marco.crivellari@suse.com>,	Michal Hocko <mhocko@suse.com>,
-	Muchun Song <muchun.song@linux.dev>,	Paolo Abeni <pabeni@redhat.com>,	Peter
- Zijlstra <peterz@infradead.org>,	Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,	Roman Gushchin
- <roman.gushchin@linux.dev>,	Shakeel Butt <shakeel.butt@linux.dev>,	Simon
- Horman <horms@kernel.org>,	Tejun Heo <tj@kernel.org>,	Thomas Gleixner
- <tglx@linutronix.de>,	Vlastimil Babka <vbabka@suse.cz>,	Waiman Long
- <longman@redhat.com>,	Will Deacon <will@kernel.org>,
-	cgroups@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org,	linux-mm@kvack.org,	linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 04/33] mm: vmstat: Prepare to protect against concurrent isolated cpuset change
-In-Reply-To: <47be2ff3-c25a-4aab-89fc-53921af8b0a9@baylibre.com>
-References: <20260101221359.22298-1-frederic@kernel.org>
-	<20260101221359.22298-5-frederic@kernel.org>
-	<47be2ff3-c25a-4aab-89fc-53921af8b0a9@baylibre.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="RMQ+HSdw"
+X-Virus-Scanned: Yes
+Content-Type: text/plain;
+	charset=utf-8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
+	t=1771863813; bh=1Xg70YMd+FaVEOb4w7tS4Z1DiPj7LoxSZz0ooGNfLJA=;
+	h=Subject:From:In-Reply-To:Cc:References:To;
+	b=RMQ+HSdwctZiDtv2Jm2NSE7NKTLRMqLGYwGn9ESKrLc1fGF6wSCW5Bkk7wQXWXTuV
+	 beiddA+C/LUcaW7A80qJhr+hNZPjAiePuVkQdQ57xvPVRaqSYai0eA38ZEey0VqKRg
+	 I7qdp4vDEWzYpiN70812gBNXvCdU88bYsCOar4gGzvot1/DTtONhJF5YEu49Pt7id8
+	 enMXRBx0GP8P8JNHoenHyqqwWq7CVEx3QHC7Cn7Y1E4h6laLLrMMR0GACmZCq7CiDq
+	 gAO81tw/4LvMnFgTdD76AHcobgE8vU707pBzO2uZMbn24S9RVJ8Y2DQKUYxsb1zxcB
+	 jm4Nt6at9KUpRJcs4nC31XKecaa7A8VhC05gvY/a3Ftb74RZwE/MtM3KwsdwiZI5XL
+	 lIZ43L19AaWc2+ORgW/kjMkpzVKhbhsA6l5cg3TtKHScrLHdTZ53A3Y3UIRbegSzh7
+	 9V7LKg0KdEp/fmE6hvIKin1ZSwm+xK8nvPm4llFCJwG4oonHlUOqmvvTsjzlHe76/b
+	 giUtvgoAh1UvfpT0lN9Yo2Xor4Y63HNwIpB5HlOcDpn62pRLRU9gW3i2zG/IXq4okH
+	 xnMGYYgYCw7BolGAkFfzKudNNvEUaWmlM/rzYg8GYEw2y5WD9gtJ1N1e5nqL9yxGDi
+	 X9bFDVGoNwvmA4K9dBrESjSY=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dlechner@baylibre.com, frederic@kernel.org, linux-kernel@vger.kernel.org, mkoutny@suse.com, akpm@linux-foundation.org, bhelgaas@google.com, catalin.marinas@arm.com, chenridong@huawei.com, dakr@kernel.org, davem@davemloft.net, edumazet@google.com, gmonaco@redhat.com, gregkh@linuxfoundation.org, mingo@redhat.com, kuba@kernel.org, axboe@kernel.dk, hannes@cmpxchg.org, jiangshanlai@gmail.com, marco.crivellari@suse.com, mhocko@suse.com, muchun.song@linux.dev, pabeni@redhat.com, peterz@infradead.org, pauld@redhat.com, rafael@kernel.org, roman.gushchin@linux.dev, shakeel.butt@linux.dev, horms@kernel.org, tj@kernel.org, tglx@linutronix.de, vbabka@suse.cz, longman@redhat.com, will@kernel.org, cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/4] ublk: cleanup flag handling and fix
+ UBLK_F_NO_AUTO_PART_SCAN
+From: Alexander Atanasov <alex@zazolabs.com>
+In-Reply-To: <CADUfDZp-jX98mfERO0OUoMePfws5yRtvfmLfzD2tzfi+HDPyLQ@mail.gmail.com>
+Date: Mon, 23 Feb 2026 18:23:21 +0200
+Cc: Ming Lei <ming.lei@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A21C344C-709D-4E28-B0C4-62946391D560@zazolabs.com>
+References: <20260223121515.3296983-1-alex@zazolabs.com>
+ <20260223121515.3296983-2-alex@zazolabs.com>
+ <CADUfDZp-jX98mfERO0OUoMePfws5yRtvfmLfzD2tzfi+HDPyLQ@mail.gmail.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
 
-On Mon, 23 Feb 2026 16:01:03 +0000,
-David Lechner <dlechner@baylibre.com> wrote:
-> 
-> On 1/1/26 4:13 PM, Frederic Weisbecker wrote:
-> > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
-> > runtime. In order to synchronize against vmstat workqueue to make sure
-> > that no asynchronous vmstat work is pending or executing on a newly made
-> > isolated CPU, target and queue a vmstat work under the same RCU read
-> > side critical section.
-> > 
-> > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a vmstat
-> > workqueue flush will also be issued in a further change to make sure
-> > that no work remains pending after a CPU has been made isolated.
-> > 
-> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > ---
-> >  mm/vmstat.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/mm/vmstat.c b/mm/vmstat.c
-> > index 65de88cdf40e..ed19c0d42de6 100644
-> > --- a/mm/vmstat.c
-> > +++ b/mm/vmstat.c
-> > @@ -2144,11 +2144,13 @@ static void vmstat_shepherd(struct work_struct *w)
-> >  		 * infrastructure ever noticing. Skip regular flushing from vmstat_shepherd
-> >  		 * for all isolated CPUs to avoid interference with the isolated workload.
-> >  		 */
-> > -		if (cpu_is_isolated(cpu))
-> > -			continue;
-> > +		scoped_guard(rcu) {
-> > +			if (cpu_is_isolated(cpu))
-> > +				continue;
-> 
-> I think this might have introduced a bug - or at least an
-> unintentional change in the program flow.
-> 
-> scoped_guard() is implemented using a for loop. Now this continue
-> statement will only exit the scoped_guard() scope rather than
-> continuing the outer for loop. This means that cond_resched() will
-> be called when it previously was not.
 
-Yup, I've been bitten by that once before. It lead to very subtle
-breakage that took me a while to figure out. I've now mentally
-banished the use of scoped_guard() inside any form of loop, but that's
-a pretty brittle strategy...
 
-	M.
+> On 23 Feb 2026, at 17:59, Caleb Sander Mateos =
+<csander@purestorage.com> wrote:
+>=20
+> On Mon, Feb 23, 2026 at 4:17=E2=80=AFAM Alexander Atanasov =
+<alex@zazolabs.com> wrote:
+>>=20
+>> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
+>> as it tries to use it as a switch for the auto partition scan.
+>> To fully disable creation of partitions GENHD_FL_NO_PART must
+>> be used, switch code to use it instead GD_SUPPRESS_PART_SCAN.
+>>=20
+>> Using the new flags rules for partitions become:
+>> - Unprivileged daemons - never scan partitions, they have
+>> GENHD_FL_NO_PART always set - they are devices without partitions.
+>>=20
+>> - Trusted daemons - by default have partitions disabled.
+>> Partitions can be enabled via UBLK_F_PARTITIONS flag and
+>> automatic initial scan can be requested via UBLK_F_AUTO_PART_SCAN =
+flag.
+>>=20
 
--- 
-Without deviation from the norm, progress is not possible.
+[snip]
+
+>> Rework the code to work as described above:
+>> - remove checks in ublk_partition_scan_work and rely on
+>> the caller to schedule the work only if it has to be done.
+>> diff --git a/include/uapi/linux/ublk_cmd.h =
+b/include/uapi/linux/ublk_cmd.h
+>> index a88876756805..467ecaa20ac1 100644
+>> --- a/include/uapi/linux/ublk_cmd.h
+>> +++ b/include/uapi/linux/ublk_cmd.h
+>> @@ -367,8 +367,11 @@
+>>  */
+>> #define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
+>>=20
+>> -/* Disable automatic partition scanning when device is started */
+>> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
+>> +/* Enable partitions on the device */
+>> +#define UBLK_F_PARTITIONS (1ULL << 18)
+>=20
+> This is not backwards compatible. Existing ublk servers expect their
+> devices to support partitioning. If you want to introduce a feature
+> flag to control this, it needs to be opt-out rather than opt-in.
+> UBLK_F_AUTO_PART_SCAN probably also needs to remain as
+> UBLK_F_NO_AUTO_PART_SCAN.
+
+It is easy to turn both to opt-out - it will just get double negatives =
+here and there,
+which I tried to avoid. I got the impression that the API can be changed =
+in current stage
+and people in general do not want to have partitions at all, so not =
+having them by default
+is better. But looks like I am wrong here.=20
+
+UBLK_F_NO_AUTO_PART_SCAN(old) -> UBLK_F_NO_PARTITIONS on by default
+UBLK_F_NO_AUTO_PART_SCAN(new) -> disable auto scan on by default
+
+Also for backward compatibility moving to GENHD_FL_NO_PART can also =
+break
+users who did a user space partition scan.  But I have no idea what to =
+do here (yet),
+especially with regard to unprivileged devices.
+
+>=20
+> Best,
+> Caleb
+>=20
+>> +
+>> +/* Perform automatic partition scanning when device is started */
+>> +#define UBLK_F_AUTO_PART_SCAN (1ULL << 19)
+>>=20
+>> /* device state */
+>> #define UBLK_S_DEV_DEAD        0
+>> --
+>> 2.43.0
+
+
+Regards,
+Alexander Atanasov
+
+
+
