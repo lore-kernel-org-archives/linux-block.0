@@ -1,211 +1,316 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0FB17C203;
-	Sun, 22 Feb 2026 21:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ED626ADC;
+	Mon, 23 Feb 2026 00:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771796812; cv=none; b=PwKwX408tC/wnlLC8LaYSr7Ay/2hIq+0Zj6cm4wtA8z5zQYNZi64Eb437or2z7uuBr8XZfyPxT6yQeK6U1vxJEaA65AIngw/P6nIo3W5bW2u5rVfyEllhqRV0WYy8cWGIgOuq6daq2C/Z33HGa8jgQK8hjbIi0X286SvKawvfIE=
+	t=1771806823; cv=none; b=MouFHGiR8wU4OwkYjBcYdextIjodswNe5/oc7kS7Lo6DHFIaoGSZgF5lqWCetde1dERstTxFIpSVLOG8YhqsebRFoqzbvURpa2NdI8yDAiBtM3gKCDd6W9tIrqSDmRURomPWpyePg8URvEQhey+8y8Ehwg70z6UUx0IqG6CWYoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771796812; c=relaxed/simple;
-	bh=PShAnn5NkbThhv3yFxSNY6IBmrCp7uHLu1e2LOKxblc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qRi9CyaNCGHEd4bkW4BL11totIXzinE8zbgN2NQjZftD07L82sfDc0j0p/GMEs97wp550ueO3wgIO1tmNqKu16XinmAZ81/S37TXpo+J+yiuaGQEje0C7A8qoESlbWeF1YuJ9VK2fSYVVqAA2mQiXUQO2KE5xGcuycEa1X14nNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+Dg4TQU; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+Dg4TQU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE0AC116D0;
-	Sun, 22 Feb 2026 21:46:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771796811;
-	bh=PShAnn5NkbThhv3yFxSNY6IBmrCp7uHLu1e2LOKxblc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=q+Dg4TQUKfByCnYHWVLn9v5mJM7/dAoa7hDC+q7BGu2o+DBc8e4C+Eo0gevRvMHpV
-	 TgWcdDkOVwynCi853Q6J7XMxTvZ2THLCvLwt2UpA51wI5I9fxdNI+mfdoQ658ZtfXO
-	 KL7P83I05UD9VirIsd8S2wpykgQdZKeheWl69rBRMWZ9U77Z7rXTsIA9asRvTEKcG3
-	 54B6LDeyZz96Jjk4W3Fpiec9fPuxhJV5opLyN03N3XAzFnVR/NypDZ94CrJKrveaBA
-	 seBd7iLl06TZEJ2qBGF5B5gE/32vBPcr8prsjuQg34xBdR6YAlipPCV683+9kND56Q
-	 agX8wle1UKW7A==
-From: Thomas Gleixner <tglx@kernel.org>
-To: syzbot <syzbot+0b6ec149bb8b98bd9485@syzkaller.appspotmail.com>,
- bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
- linux-kernel@vger.kernel.org, mingo@redhat.com,
- syzkaller-bugs@googlegroups.com, x86@kernel.org
-Cc: linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
- nbd@other.debian.org
-Subject: Re: [syzbot] [kernel?^W NDB] possible deadlock in worker_thread (3)
-In-Reply-To: <69988ebc.a70a0220.2c38d7.0142.GAE@google.com>
-References: <69988ebc.a70a0220.2c38d7.0142.GAE@google.com>
-Date: Sun, 22 Feb 2026 22:46:48 +0100
-Message-ID: <87bjhgwiwn.ffs@tglx>
+	s=arc-20240116; t=1771806823; c=relaxed/simple;
+	bh=Empke4UdsPxxKAiOLj2ALTMJhcJk2XqsTNT04XmtesE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VOIIM7tZIEohDCqt6ehbSZ6OzD3nE2rp4C5B8iPHcMMUzA8xqc6H6WaTAPIruSSdPEUbzHyAP3OLZjFzd8pXCuY6FzBHOMua2V6AhXIC/e8Y1BDSkzc3Yu4E840qlHWzy603GnGWL7Bng4QP6VAAMCkCWGbdARJl7uxi8HddCUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-4c-699ba05f2957
+Date: Mon, 23 Feb 2026 09:33:30 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Petr Pavlu <petr.pavlu@suse.com>
+Cc: kernel_team@skhynix.com, torvalds@linux-foundation.org,
+	damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+	adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+	mingo@redhat.com, peterz@infradead.org, will@kernel.org,
+	tglx@linutronix.de, rostedt@goodmis.org, joel@joelfernandes.org,
+	sashal@kernel.org, daniel.vetter@ffwll.ch, duyuyang@gmail.com,
+	johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+	willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+	gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org,
+	akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
+	hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
+	jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
+	yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
+	catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
+	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
+	gustavo@padovan.org, christian.koenig@amd.com,
+	andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
+	mcgrof@kernel.org, da.gomez@kernel.org, samitolvanen@google.com,
+	paulmck@kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+	joelagnelf@nvidia.com, josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
+	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
+	bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
+	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
+	tmgross@umich.edu, rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v18 34/42] dept: add module support for struct
+ dept_event_site and dept_event_site_dep
+Message-ID: <20260223003330.GB44876@system.software.com>
+References: <20251205071855.72743-1-byungchul@sk.com>
+ <20251205071855.72743-35-byungchul@sk.com>
+ <7afb6666-43b6-4d17-b875-e585c7a5ac99@suse.com>
+ <20260213055006.GA55430@system.software.com>
+ <7765df86-b08a-4f70-900d-4b4d85c07d49@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7765df86-b08a-4f70-900d-4b4d85c07d49@suse.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxbVRjHPffce3tpqLnWLR4h0a1ojOjQ6WKebI26D8b7ZZHMxWwzy9bJ
+	zWhWXiwMh/GFkTE7XBBLKK4MZei6SkvGypi8j9EA1tEUSp1lg7UspbVhgHZjhLSAvRjjvjz5
+	5X9++T/Ph8NhZQObxmnzi0V9vkanYuW0fC61acuhxnrtq1c6N8FkIMTAuUt2FgKLBgRL8XoM
+	FZ1rNDxYvi0D05gRg3/0Gob7rasszDpjCOqiJ2hYsJxBEB18F+YC3QysTUUosIRWKVgxHYUf
+	mtqSqukvFuJuD4a62lEEsWgQQa+1nIWZ6nYM46HHwVX7NQvzrSw0lvcy0FBvRNAZ7JLB2GyC
+	gkmTkQKbYxcELGEablQ3UVDb0k3BsqVZBvXucQYS01vBdecmA7NhY/L44VMM/FIWlIFjYhDB
+	A980BYauRRp6b70E50/9RENPr4uGoY67FIx3nWPhTGs7A3fsawx4baM0XIr4KXCZf6bhtvsb
+	GXi6Whi48McYBdNBPwNt7hEMLfNNLNTMhxHMPrTgt3OEpYoqWqjwrrCC/Xs7Eiqqk8N5bwEL
+	F27cY4Vv3VuETvOUTDjZd0smNDqOCW3WTOHHniglOJpPs4IjZpQJ5+N/YqFyzkdlZ+6Xq3NE
+	nbZE1L/y5iF5brjqMi6ceON4x2R2GfruxUqUwhF+G/mqz05VIm6dR5ycFNP888TWV4UkZvkX
+	iN+/jCVlA/8c8d7dWYnkHOZNzxBXm4GRnCd5HXHW/L1eo+CB2GMbpVjJLyLinnhPYgX/BHGd
+	DdESYz6T+Fej6zrm08nFVU7CFF5N5gaflYyNfAbpvzpMSZsIH04hM2dj6N+DnybXrX66GvHm
+	R1rNj7Sa/29tRLgZKbX5JXkarW5bVm5pvvZ41kcFeQ6U/LSWzxMfdqDY6PsDiOeQKlXRv2DW
+	KhlNSVFp3gAiHFZtUMTjyUiRoyn9VNQXHNQf04lFAyido1VPKV57+EmOkj+iKRaPimKhqP/v
+	leJS0spQzcXI6Z0a9UrDO+URT6jQMLX5A+Tbv08ZGPY4bTvSfAePBKeyjCM96ScHUq/byIli
+	9b7X72//LD6z6ctd1w7Evyioae5+2fqYujbbuofvX0lEfmUMDsvu3Ycz9k7u3X7TGPmNqTJ4
+	NzMRQ6Juj29HyONVfuxsX4rHhtIPDGW89buKLsrVbM3E+iLNP7WxGd+wAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUwbdRjHfe53vR6NZ86ubOeImnU2TsxejM48iXNxxrhzZnPinHFZ3Kq7
+	SEMpWzvZGDECtVrREKhpGe3QilIXqG5rGY4tVUIdAweRDiegvGym1hFgnUBZoJTaMzHunyff
+	53k+n+T542GJel6xkjWYDktmk96oZVS0asdT1rX7vB7Dhrn4/Wi3vYfDY1EF/lreTmNi1k7j
+	iVN+BlOe75RoD9QpsGuggsa+b5sBxxJ2wNtJD0FbW5rGlKNTibPzvyvRWQ6YDnUCuiIOgoN9
+	PxD0t5RTOHN6icGJ8DSg83qUwdrxchrjvk8A3TGPEscvbsWpsQsKTI/8ReHA3CSgL7pEYbT9
+	Q8CUqwA/bwhmdNctBpO9PxOsdfYBfnF9hOD0+DXAls5RwNDJCgb/rD5LsD96D/6SiDPY7fyY
+	wanICQpvnmbQWxFSYKRnArDe4wCM/Rai0PrlKQZd9QEa266dV2JkYpHCYZeDwubAdhzzxWi8
+	XN1AZc7NUGdWoKfWSmXKDQqd31ygcN7XpHymEcTbtipabAq2UqLtSooR/Z/5QUwuOECcbbQS
+	0VadacOTcSK+HzwiNl6eZMSFxFVGDM15afGnBkH86qMFSqzpXSu2uUeUO7fsUW06IBkNxZJ5
+	/eb9qvxY1RlycOjJo+eGd5bB8UcqgWUF/gmhJ8xWQhZL8zqh+fsqkDPDPywMDs4TGdHwDwlX
+	/thSCSqW8K4HhO6gXSEzy3ijEP70b0pmOB4F/3S2PFbzCRB6h16SM8ffK3TXRWk5Ez5XGFwa
+	/xcnfI7w9RIrxyx+kzB18UGZyOZXC+2tl6hq4Nx3yO47ZPf/shdIE2gMpuJCvcG4cZ2lIL/E
+	ZDi67q2iwgBkHtL37mLNOZjt39oBPAvau7lb93kMaoW+2FJS2AECS7QaLpl0G9TcAX3JMclc
+	tM/8jlGydEAOS2tXcNtek/ar+bf1h6UCSToomf/bUmzWyjJ481i6LLZo1nj7D63GILf8lR6z
+	LlTwslN/12R6d9zZ0jXQym6eXnboyO6hIrixUTHzqu+F0tIPXr/KWbcnt+19uk633vNjIO/x
+	Ndl5nGn5s6N7F3TdeaZHzz9X6grtmtmVU3Pp+eNrVrV0rdqjC2t6TcWjG07mvng2MpBqrLe9
+	kU7f1NKWfP1jucRs0f8DOc5IfIwDAAA=
+X-CFilter-Loop: Reflected
 
-On Fri, Feb 20 2026 at 08:41, syzbot wrote:
+On Wed, Feb 18, 2026 at 04:08:19PM +0100, Petr Pavlu wrote:
+> On 2/13/26 6:50 AM, Byungchul Park wrote:
+> > On Wed, Jan 07, 2026 at 01:19:00PM +0100, Petr Pavlu wrote:
+> >> On 12/5/25 8:18 AM, Byungchul Park wrote:
+> >>> struct dept_event_site and struct dept_event_site_dep have been
+> >>> introduced to track dependencies between multi event sites for a single
+> >>> wait, that will be loaded to data segment.  Plus, a custom section,
+> >>> '.dept.event_sites', also has been introduced to keep pointers to the
+> >>> objects to make sure all the event sites defined exist in code.
+> >>>
+> >>> dept should work with the section and segment of module.  Add the
+> >>> support to handle the section and segment properly whenever modules are
+> >>> loaded and unloaded.
+> >>>
+> >>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> >>
+> >> Below are a few comments from the module loader perspective.
+> >
+> > Sorry about the late reply.  I've been going through some major life
+> > changes lately. :(
+> >
+> > Thank you sooooo~ much for your helpful feedback.  I will leave my
+> > opinion below.
+> >
+> [...]
+> >>> diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+> >>> index b14400c4f83b..07d883579269 100644
+> >>> --- a/kernel/dependency/dept.c
+> >>> +++ b/kernel/dependency/dept.c
+> >>> @@ -984,6 +984,9 @@ static void bfs(void *root, struct bfs_ops *ops, void *in, void **out)
+> >>>   * event sites.
+> >>>   */
+> >>>
+> >>> +static LIST_HEAD(dept_event_sites);
+> >>> +static LIST_HEAD(dept_event_site_deps);
+> >>> +
+> >>>  /*
+> >>>   * Print all events in the circle.
+> >>>   */
+> >>> @@ -2043,6 +2046,33 @@ static void del_dep_rcu(struct rcu_head *rh)
+> >>>       preempt_enable();
+> >>>  }
+> >>>
+> >>> +/*
+> >>> + * NOTE: Must be called with dept_lock held.
+> >>> + */
+> >>> +static void disconnect_event_site_dep(struct dept_event_site_dep *esd)
+> >>> +{
+> >>> +     list_del_rcu(&esd->dep_node);
+> >>> +     list_del_rcu(&esd->dep_rev_node);
+> >>> +}
+> >>> +
+> >>> +/*
+> >>> + * NOTE: Must be called with dept_lock held.
+> >>> + */
+> >>> +static void disconnect_event_site(struct dept_event_site *es)
+> >>> +{
+> >>> +     struct dept_event_site_dep *esd, *next_esd;
+> >>> +
+> >>> +     list_for_each_entry_safe(esd, next_esd, &es->dep_head, dep_node) {
+> >>> +             list_del_rcu(&esd->dep_node);
+> >>> +             list_del_rcu(&esd->dep_rev_node);
+> >>> +     }
+> >>> +
+> >>> +     list_for_each_entry_safe(esd, next_esd, &es->dep_rev_head, dep_rev_node) {
+> >>> +             list_del_rcu(&esd->dep_node);
+> >>> +             list_del_rcu(&esd->dep_rev_node);
+> >>> +     }
+> >>> +}
+> >>> +
+> >>>  /*
+> >>>   * NOTE: Must be called with dept_lock held.
+> >>>   */
+> >>> @@ -2384,6 +2414,8 @@ void dept_free_range(void *start, unsigned int sz)
+> >>>  {
+> >>>       struct dept_task *dt = dept_task();
+> >>>       struct dept_class *c, *n;
+> >>> +     struct dept_event_site_dep *esd, *next_esd;
+> >>> +     struct dept_event_site *es, *next_es;
+> >>>       unsigned long flags;
+> >>>
+> >>>       if (unlikely(!dept_working()))
+> >>> @@ -2405,6 +2437,24 @@ void dept_free_range(void *start, unsigned int sz)
+> >>>       while (unlikely(!dept_lock()))
+> >>>               cpu_relax();
+> >>>
+> >>> +     list_for_each_entry_safe(esd, next_esd, &dept_event_site_deps, all_node) {
+> >>> +             if (!within((void *)esd, start, sz))
+> >>> +                     continue;
+> >>> +
+> >>> +             disconnect_event_site_dep(esd);
+> >>> +             list_del(&esd->all_node);
+> >>> +     }
+> >>> +
+> >>> +     list_for_each_entry_safe(es, next_es, &dept_event_sites, all_node) {
+> >>> +             if (!within((void *)es, start, sz) &&
+> >>> +                 !within(es->name, start, sz) &&
+> >>> +                 !within(es->func_name, start, sz))
+> >>> +                     continue;
+> >>> +
+> >>> +             disconnect_event_site(es);
+> >>> +             list_del(&es->all_node);
+> >>> +     }
+> >>> +
+> >>>       list_for_each_entry_safe(c, n, &dept_classes, all_node) {
+> >>>               if (!within((void *)c->key, start, sz) &&
+> >>>                   !within(c->name, start, sz))
+> >>> @@ -3337,6 +3387,7 @@ void __dept_recover_event(struct dept_event_site_dep *esd,
+> >>>
+> >>>       list_add(&esd->dep_node, &es->dep_head);
+> >>>       list_add(&esd->dep_rev_node, &rs->dep_rev_head);
+> >>> +     list_add(&esd->all_node, &dept_event_site_deps);
+> >>>       check_recover_dl_bfs(esd);
+> >>>  unlock:
+> >>>       dept_unlock();
+> >>> @@ -3347,6 +3398,23 @@ EXPORT_SYMBOL_GPL(__dept_recover_event);
+> >>>
+> >>>  #define B2KB(B) ((B) / 1024)
+> >>>
+> >>> +void dept_mark_event_site_used(void *start, void *end)
+> >>
+> >> Nit: I suggest that dept_mark_event_site_used() take pointers to
+> >> dept_event_site_init, which would catch the type mismatch with
+> >
+> > IMO, this is the easiest way to get all the pointers from start to the
+> > end, or I can't get the number of the pointers.  It's similar to the
+> > initcalls section for device drivers.
+> 
+> This was a minor suggestion.. The idea is to simply change the function
+> signature to:
+> 
+> void dept_mark_event_site_used(struct dept_event_site_init **start,
+>                                struct dept_event_site_init **end))
 
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    635c467cc14e Add linux-next specific files for 20260213
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=15339b3a580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=61690c38d1398936
-> dashboard link: https://syzkaller.appspot.com/bug?extid=0b6ec149bb8b98bd9485
-> compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/78b3d15ca8e6/disk-635c467c.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/a95f3d108ef4/vmlinux-635c467c.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/e58086838b24/bzImage-635c467c.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+0b6ec149bb8b98bd9485@syzkaller.appspotmail.com
->
-> block nbd1: Receive control failed (result -32)
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> syzkaller #0 Not tainted
-> ------------------------------------------------------
-> kworker/u9:3/5827 is trying to acquire lock:
-> ffff8880275b9a78 (&nbd->config_lock){+.+.}-{4:4}, at: refcount_dec_and_mutex_lock+0x30/0xa0 lib/refcount.c:118
->
-> but task is already holding lock:
-> ffffc90003bd7c40 ((work_completion)(&args->work)#3){+.+.}-{0:0}, at: process_one_work+0x87c/0x1650 kernel/workqueue.c:3255
->
-> which lock already depends on the new lock.
+I got what you meant.  I will.  Thanks.
 
-This is clearly a NDB issue and the lockdep splat is pretty clear.
+	Byungchul
 
-Cc'ed the maintainer and left the report intact.
-
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #2 ((work_completion)(&args->work)#3){+.+.}-{0:0}:
->        process_one_work+0x895/0x1650 kernel/workqueue.c:3255
->        process_scheduled_works kernel/workqueue.c:3362 [inline]
->        worker_thread+0xb46/0x1140 kernel/workqueue.c:3443
->        kthread+0x388/0x470 kernel/kthread.c:467
->        ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->
-> -> #1 ((wq_completion)nbd3-recv){+.+.}-{0:0}:
->        touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:3994
->        __flush_workqueue+0x14b/0x14f0 kernel/workqueue.c:4036
->        nbd_disconnect_and_put+0x9e/0x2c0 drivers/block/nbd.c:2264
->        nbd_genl_disconnect+0x4a9/0x590 drivers/block/nbd.c:2303
->        genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1115
->        genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->        genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1210
->        netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
->        genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->        netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
->        netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
->        netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
->        sock_sendmsg_nosec+0x18f/0x1d0 net/socket.c:737
->        __sock_sendmsg net/socket.c:752 [inline]
->        ____sys_sendmsg+0x589/0x8c0 net/socket.c:2610
->        ___sys_sendmsg+0x2a5/0x360 net/socket.c:2664
->        __sys_sendmsg net/socket.c:2696 [inline]
->        __do_sys_sendmsg net/socket.c:2701 [inline]
->        __se_sys_sendmsg net/socket.c:2699 [inline]
->        __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2699
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> -> #0 (&nbd->config_lock){+.+.}-{4:4}:
->        check_prev_add kernel/locking/lockdep.c:3165 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3284 [inline]
->        validate_chain kernel/locking/lockdep.c:3908 [inline]
->        __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
->        lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
->        __mutex_lock_common kernel/locking/mutex.c:614 [inline]
->        __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
->        refcount_dec_and_mutex_lock+0x30/0xa0 lib/refcount.c:118
->        nbd_config_put+0x2c/0x580 drivers/block/nbd.c:1434
->        recv_work+0x1cc1/0x1d90 drivers/block/nbd.c:1026
->        process_one_work+0x949/0x1650 kernel/workqueue.c:3279
->        process_scheduled_works kernel/workqueue.c:3362 [inline]
->        worker_thread+0xb46/0x1140 kernel/workqueue.c:3443
->        kthread+0x388/0x470 kernel/kthread.c:467
->        ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->
-> other info that might help us debug this:
->
-> Chain exists of:
->   &nbd->config_lock --> (wq_completion)nbd3-recv --> (work_completion)(&args->work)#3
->
->  Possible unsafe locking scenario:
->
->        CPU0                    CPU1
->        ----                    ----
->   lock((work_completion)(&args->work)#3);
->                                lock((wq_completion)nbd3-recv);
->                                lock((work_completion)(&args->work)#3);
->   lock(&nbd->config_lock);
->
->  *** DEADLOCK ***
->
-> 2 locks held by kworker/u9:3/5827:
->  #0: ffff8880275c9148 ((wq_completion)nbd1-recv){+.+.}-{0:0}, at: process_one_work+0x855/0x1650 kernel/workqueue.c:3254
->  #1: ffffc90003bd7c40 ((work_completion)(&args->work)#3){+.+.}-{0:0}, at: process_one_work+0x87c/0x1650 kernel/workqueue.c:3255
->
-> stack backtrace:
-> CPU: 0 UID: 0 PID: 5827 Comm: kworker/u9:3 Not tainted syzkaller #0 PREEMPT(full) 
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
-> Workqueue: nbd1-recv recv_work
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
->  print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2043
->  check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2175
->  check_prev_add kernel/locking/lockdep.c:3165 [inline]
->  check_prevs_add kernel/locking/lockdep.c:3284 [inline]
->  validate_chain kernel/locking/lockdep.c:3908 [inline]
->  __lock_acquire+0x15a5/0x2cf0 kernel/locking/lockdep.c:5237
->  lock_acquire+0xf0/0x2e0 kernel/locking/lockdep.c:5868
->  __mutex_lock_common kernel/locking/mutex.c:614 [inline]
->  __mutex_lock+0x19f/0x1300 kernel/locking/mutex.c:776
->  refcount_dec_and_mutex_lock+0x30/0xa0 lib/refcount.c:118
->  nbd_config_put+0x2c/0x580 drivers/block/nbd.c:1434
->  recv_work+0x1cc1/0x1d90 drivers/block/nbd.c:1026
->  process_one_work+0x949/0x1650 kernel/workqueue.c:3279
->  process_scheduled_works kernel/workqueue.c:3362 [inline]
->  worker_thread+0xb46/0x1140 kernel/workqueue.c:3443
->  kthread+0x388/0x470 kernel/kthread.c:467
->  ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->  </TASK>
-> block nbd1: shutting down sockets
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
+> This way, the compiler can provide proper type checking to ensure that
+> correct pointers are passed to dept_mark_event_site_used(). It would
+> catch the type mismatch with module::dept_event_sites.
+> 
+> >
+> >> module::dept_event_sites.
+> >>
+> >>> +{
+> >>> +     struct dept_event_site_init **evtinitpp;
+> >>> +
+> >>> +     for (evtinitpp = (struct dept_event_site_init **)start;
+> >>> +          evtinitpp < (struct dept_event_site_init **)end;
+> >>> +          evtinitpp++) {
+> >>> +             (*evtinitpp)->evt_site->used = true;
+> >>> +             (*evtinitpp)->evt_site->func_name = (*evtinitpp)->func_name;
+> >>> +             list_add(&(*evtinitpp)->evt_site->all_node, &dept_event_sites);
+> >>> +
+> >>> +             pr_info("dept_event_site %s@%s is initialized.\n",
+> >>> +                             (*evtinitpp)->evt_site->name,
+> >>> +                             (*evtinitpp)->evt_site->func_name);
+> >>> +     }
+> >>> +}
+> >>> +
+> >>>  extern char __dept_event_sites_start[], __dept_event_sites_end[];
+> >>
+> >> Related to the above, __dept_event_sites_start and
+> >> __dept_event_sites_end can already be properly typed here.
+> >
+> > How can I get the number of the pointers?
+> 
+> Similarly here, changing the code to:
+> 
+> extern struct dept_event_site_init *__dept_event_sites_start[], *__dept_event_sites_end[];
+> 
+> It is the same for the initcalls you mentioned. The declarations of
+> their start/end symbols are also already properly typed as
+> initcall_entry_t[] in include/linux/init.h.
+> 
+> --
+> Thanks,
+> Petr
