@@ -1,105 +1,110 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E0E29A1
-	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 14:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D8C2376FD;
+	Mon, 23 Feb 2026 15:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771857929; cv=none; b=G44BvliGauTdgFpJ0p4Y4SZl8D3tyU74Gh+kfAnG4KL97JgvVBKHCs4uBJ4pc2m+/AkRKDfbCK0DVMWMICt7iO3D8skVwdI+yZst/fjy4wkRE9HJfErVlR0ONB10FQ3NqC5C5BiO2IN5k0hHmmD1h2p/B0Ac8EVESNhmDrvVhl4=
+	t=1771858856; cv=none; b=B028ajxOkXYQqrYMajrVe3MMo8b+eYTTR8SCkIHOFxz7/iiI86gkokNhtloowQd0Wn8JYgc153r/NYVFaTsvXxmFJDMFMYoaG0TtVppYiYZSuDppnU1toK5xSZ3VIAEY/o5RsstUpN5D/kTfKR+RyJx81ypjNUR1GAYAjeHTq9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771857929; c=relaxed/simple;
-	bh=HDYcZUSPWzr4EyxlcAcF2TO+c/EsDVGTlJ/4XVu9bKs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HpZxjOTnxAZcMyjAfEiCrwDCyDBpl5tq2so4Fi0PrtH0g+Z8Zgvka9tqhXrBi/lq5Xw6ni+oUeozvcpJRCrY5zOlrhC/DfCuhSyGe6uQKDDXAuQMAdPTIcSfAaUBMjDQwXI2Diqaq3Z4Q7VdVIgz5MqKtHd7I6WWfppc5pLHCTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gvPA+MB/; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1771858856; c=relaxed/simple;
+	bh=LZJWPyqc7zRDNeLJ/kaMnDCbQKW6iC+a3VJo41M3xIE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ofvs7gsyLXnkSr8BiOhqnIBjPuDBAMsRC93LmBHWm6FMkBMWvlGEYl0F55fzlKmn5X6X0ka02qpanxclmFkJeRHTb+gdIB7o59bfS4vcyGTCW3sAMNge4z6qyCEJAOQ8zuc+LaW4y/+0pcIRuC1CvvOiuO8llYnbEUHheVmh4bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubEKdO1F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gvPA+MB/"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771857916;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jrdY52taT3U/NZQPuGXBlMxO3l3XijeN4kwKfbf/UaA=;
-	b=gvPA+MB/3rPZe3/+/xAdy7rLGGsuixZx+6Lg/SFcdvj7Pne2gcTVBzuqWYk6/eSywKtBCg
-	/+sZ+33MMW3OoWIFucMMZgXUSMYkPwnWDirsMg0jvpEzROz4AOTFePeJ+p4rAiMfDKgcVO
-	5d9tzkSlI2GvoE75tBd7urtM5+ANWj4=
-From: Usama Arif <usama.arif@linux.dev>
-To: Zi Yan <ziy@nvidia.com>
-Cc: Usama Arif <usama.arif@linux.dev>,
-	linux-mm@kvack.org,
-	David Hildenbrand <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-erofs@lists.ozlabs.org,
-	linux-block@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Yushan Zhou <katrinzhou@tencent.com>,
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-Subject: Re: [PATCH v1 01/11] relay: zero page->private when freeing pages
-Date: Mon, 23 Feb 2026 06:45:06 -0800
-Message-ID: <20260223144507.3065618-1-usama.arif@linux.dev>
-In-Reply-To: <20260223032641.1859381-2-ziy@nvidia.com>
-References: 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubEKdO1F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B72C116C6;
+	Mon, 23 Feb 2026 15:00:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771858856;
+	bh=LZJWPyqc7zRDNeLJ/kaMnDCbQKW6iC+a3VJo41M3xIE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ubEKdO1FeQU4KehKkk4Ha+sWn8rhfohWnTzrm5CQTdxfLOh0UTSboTY5F7p1nHvdb
+	 c9CXLVWjqNOPyM3IFuKtP5z1azU7USMNNrUpB7SeVFwk3RoAJYzLxs1vztVb8aZ0Dg
+	 +JUgamzo3UrhAJN82wQ+cEgtBc6YV+GtEuO3fPoqKYljQW/zE+0q9rjOMZyhojRUaX
+	 oaVPUfn3nyPnD1VlIIcPzhKN1gu3nthfg40z8QQBwjBa2qQIklIls4ZYFZ4SJgFW3H
+	 mMimssaZEdP8xcE7negFA4+KTvkjEOlgRnMa7kVg1pSO+AhJHvtIApe4ftxUg+oYUJ
+	 HNgCcU376zbaw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>,
+ =?utf-8?Q?Bj=C3=B6rn?= Roy
+ Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor
+ Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman
+ <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, Leon
+ Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Serge
+ Hallyn <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, David
+ Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Alexander
+ Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>, Igor Korotin <igor.korotin.linux@gmail.com>,
+ Daniel Almeida <daniel.almeida@collabora.com>, Lorenzo Stoakes
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, Stephen
+ Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Krzysztof
+ =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Boqun Feng
+ <boqun@kernel.org>,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org,
+ Oliver Mangold <oliver.mangold@pm.me>
+Subject: Re: [PATCH v15 3/9] rust: Add missing SAFETY documentation for
+ `ARef` example
+In-Reply-To: <CAH5fLggNjCZ3AvHnhO8O0cmd33B3zMbfq+hhNvonznTsLLtgYw@mail.gmail.com>
+References: <20260220-unique-ref-v15-0-893ed86b06cc@kernel.org>
+ <20260220-unique-ref-v15-3-893ed86b06cc@kernel.org>
+ <CAH5fLggNjCZ3AvHnhO8O0cmd33B3zMbfq+hhNvonznTsLLtgYw@mail.gmail.com>
+Date: Mon, 23 Feb 2026 15:59:52 +0100
+Message-ID: <87v7fn33pz.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 22 Feb 2026 22:26:31 -0500 Zi Yan <ziy@nvidia.com> wrote:
+Alice Ryhl <aliceryhl@google.com> writes:
 
-> This prepares for upcoming page->private checks in page freeing path.
-> 
-> Signed-off-by: Zi Yan <ziy@nvidia.com>
-> Cc: Jason Xing <kernelxing@tencent.com>
-> Cc: Yushan Zhou <katrinzhou@tencent.com>
-> Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-> ---
->  kernel/relay.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/relay.c b/kernel/relay.c
-> index 5c665b729132..d16f9966817f 100644
-> --- a/kernel/relay.c
-> +++ b/kernel/relay.c
-> @@ -131,8 +131,10 @@ static void *relay_alloc_buf(struct rchan_buf *buf, size_t *size)
->  	return mem;
->  
->  depopulate:
-> -	for (j = 0; j < i; j++)
-> +	for (j = 0; j < i; j++) {
-> +		set_page_private(buf->page_array[i], 0);
+> On Fri, Feb 20, 2026 at 10:52=E2=80=AFAM Andreas Hindborg <a.hindborg@ker=
+nel.org> wrote:
+>>
+>> From: Oliver Mangold <oliver.mangold@pm.me>
+>>
+>> SAFETY comment in rustdoc example was just 'TODO'. Fixed.
+>>
+>> Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
+>> Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
+>> Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
+>> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+>> ---
+>>  rust/kernel/sync/aref.rs | 10 ++++++----
+>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
+>> index 61caddfd89619..efe16a7fdfa5d 100644
+>> --- a/rust/kernel/sync/aref.rs
+>> +++ b/rust/kernel/sync/aref.rs
+>> @@ -129,12 +129,14 @@ pub unsafe fn from_raw(ptr: NonNull<T>) -> Self {
+>>      /// # Examples
+>>      ///
+>>      /// ```
+>> -    /// use core::ptr::NonNull;
+>> -    /// use kernel::sync::aref::{ARef, RefCounted};
+>> +    /// # use core::ptr::NonNull;
+>> +    /// # use kernel::sync::aref::{ARef, RefCounted};
+>>      ///
+>
+> Either keep the imports visible or delete this empty line. And either
+> way, it doesn't really fit in this commit.
 
-Hi Zi,
+I'll drop this for this commit.
 
-Should the index into page_array be j and not i over here?
 
->  		__free_page(buf->page_array[j]);
-> +	}
->  	relay_free_page_array(buf->page_array);
->  	return NULL;
->  }
-> @@ -196,8 +198,10 @@ static void relay_destroy_buf(struct rchan_buf *buf)
->  
->  	if (likely(buf->start)) {
->  		vunmap(buf->start);
-> -		for (i = 0; i < buf->page_count; i++)
-> +		for (i = 0; i < buf->page_count; i++) {
-> +			set_page_private(buf->page_array[i], 0);
->  			__free_page(buf->page_array[i]);
-> +		}
->  		relay_free_page_array(buf->page_array);
->  	}
->  	*per_cpu_ptr(chan->buf, buf->cpu) = NULL;
-> -- 
-> 2.51.0
-> 
-> 
+Best regards,
+Andreas Hindborg
+
+
