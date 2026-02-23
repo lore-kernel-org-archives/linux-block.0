@@ -1,32 +1,32 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90CC2777F3
-	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 22:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2674D379964
+	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 22:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771884083; cv=none; b=h/no/Osp8HjYVDTO/5/RQxrq9l1E+P1uevmXylB27XS2QmMT5ODqiTNvQFAPoF+6rDFSSlV+EMANO2/fxLUNc/4UODtsC6XV6/D/bU0tROpDZalpGabCkkOABKBRvv5VcAY6cpJo8L2ZJ5Z9n0CViJaCBp0Y0W+mnZzEzh0Oljk=
+	t=1771884086; cv=none; b=aWGxd+zkEnL1nWRG6hBXihyyUHqC1qQ+t1+uMOaosFNa+tpgRezBTrP1vfzwBertO4lvlF3uFDEHCZ0tSATDWhk0c6MvVAdLKbj+LRihPCZgkUJ5tKUR/q5bywPqW55txf4SrWJH35dOZ55oJHWju5Tf7fTEepZE+aLTGVmK56I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771884083; c=relaxed/simple;
-	bh=oLTQjEWqJNE3iA16VAIOsduSmQs67Tk7mW7l7/oauGE=;
+	s=arc-20240116; t=1771884086; c=relaxed/simple;
+	bh=WGkLiS9MZjtBAnFErKv0K5iFWAdpUe4u2FP3kC8rqEU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BmYP4kSA7adPJq3O4x6Ad1zNegdvY1lgMbSGvZTGYdgdWiYzv+v/saZ0v0kDDukc3rXFfmVlkJFHKSkPvp3r38HYi7QxpN02bHsdTxq45f6OYvd6LAYvAJ7QoL2OTckrPzjXZJCmvIzPIbGuMC9SvdQ/slyoYsB6jNi6Z83g/rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kJxxBx1L; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version; b=nmeI4paVBLoks24fM4R2b2P1Tbk1j4NFLgMrx4MeGPh75YXKu5QQFdhSvBcVRl5vMSWKaGdq2Czju0EZiU2abtV2G9ttOFhemyyiRC1mer9JItnfubw9EnhQnlhXgN42x4cP3bR3PLlV1+xV0fSQSfbxpPKwaCxP5/oJ3kLZ7Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KuzZJ/tV; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kJxxBx1L"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KuzZJ/tV"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771884079;
+	t=1771884083;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wOwBm8Z+X6qHsN1shZWr10vlktsSRb9Qk4tTjTBnCxs=;
-	b=kJxxBx1LbPdCCWBnr0j/6q9bQ5JlkuDHQyMPUvlY1RBnfOJeQDLJLtRlfwnYSdKYlE/d45
-	yhoVEoKvw959vGYlLBX6J2MyjkT3ZWv2xO784z7wzjfvc8R4m8sbQo6/QiWIfLXKdRrjOU
-	8veQ27Z1R/YAOqswOPB90y5yH0LY5xE=
+	bh=aw0Lla25rrpcrf3Xx5jXGVyFmiYi2w+ViLecCy5WA1A=;
+	b=KuzZJ/tV8iOE3ONdDapivzGZr/6CnqXPWF+qd9J0bTyaz7Y1jpGXjLZLv3m3E3lpRuJ+uL
+	jNKYz+R10YqKf1tRNa0EwtjBS/rP0kuZ4LaFe5ZjSYqBnN8lXVRa0A5hskD51Kyw2pF2JN
+	R4pYCf4bf1Mjm1ccqyxMjf+i175pbkg=
 From: Bart Van Assche <bart.vanassche@linux.dev>
 To: Peter Zijlstra <peterz@infradead.org>
 Cc: Ingo Molnar <mingo@redhat.com>,
@@ -42,13 +42,11 @@ Cc: Ingo Molnar <mingo@redhat.com>,
 	Kees Cook <kees@kernel.org>,
 	Jann Horn <jannh@google.com>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Jan Kara <jack@suse.cz>,
+	Andreas Gruenbacher <agruen@linbit.com>,
 	linux-block@vger.kernel.org
-Subject: [PATCH 02/62] blk-ioc: Prepare for enabling thread-safety analysis
-Date: Mon, 23 Feb 2026 14:00:02 -0800
-Message-ID: <20260223220102.2158611-3-bart.vanassche@linux.dev>
+Subject: [PATCH 03/62] drbd: Balance RCU calls in drbd_adm_dump_devices()
+Date: Mon, 23 Feb 2026 14:00:03 -0800
+Message-ID: <20260223220102.2158611-4-bart.vanassche@linux.dev>
 In-Reply-To: <20260223220102.2158611-1-bart.vanassche@linux.dev>
 References: <20260223220102.2158611-1-bart.vanassche@linux.dev>
 Precedence: bulk
@@ -62,29 +60,43 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Bart Van Assche <bvanassche@acm.org>
 
-The Clang thread-safety analyzer does not support testing return values
-with "< 0". Hence change the "< 0" test into "!= 0". This is fine since
-the radix_tree_maybe_preload() return value is <= 0.
+Make drbd_adm_dump_devices() call rcu_read_lock() before
+rcu_read_unlock() is called. This has been detected by the Clang
+thread-safety analyzer. Compile-tested only.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Yu Kuai <yukuai3@huawei.com>
-Cc: Jan Kara <jack@suse.cz>
+Cc: Andreas Gruenbacher <agruen@linbit.com>
 Cc: linux-block@vger.kernel.org
+Fixes: a55bbd375d18 ("drbd: Backport the "status" command")
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-ioc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/drbd/drbd_nl.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index d15918d7fabb..0bf78aebc887 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -364,7 +364,7 @@ static struct io_cq *ioc_create_icq(struct request_queue *q)
- 	if (!icq)
- 		return NULL;
- 
--	if (radix_tree_maybe_preload(GFP_ATOMIC) < 0) {
-+	if (radix_tree_maybe_preload(GFP_ATOMIC) != 0) {
- 		kmem_cache_free(et->icq_cache, icq);
- 		return NULL;
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index e201f0087a0f..728ecc431b38 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -3378,8 +3378,10 @@ int drbd_adm_dump_devices(struct sk_buff *skb, struct netlink_callback *cb)
+ 		if (resource_filter) {
+ 			retcode = ERR_RES_NOT_KNOWN;
+ 			resource = drbd_find_resource(nla_data(resource_filter));
+-			if (!resource)
++			if (!resource) {
++				rcu_read_lock();
+ 				goto put_result;
++			}
+ 			cb->args[0] = (long)resource;
+ 		}
+ 	}
+@@ -3628,8 +3630,10 @@ int drbd_adm_dump_peer_devices(struct sk_buff *skb, struct netlink_callback *cb)
+ 		if (resource_filter) {
+ 			retcode = ERR_RES_NOT_KNOWN;
+ 			resource = drbd_find_resource(nla_data(resource_filter));
+-			if (!resource)
++			if (!resource) {
++				rcu_read_lock();
+ 				goto put_result;
++			}
+ 		}
+ 		cb->args[0] = (long)resource;
  	}
