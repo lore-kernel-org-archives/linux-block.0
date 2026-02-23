@@ -1,178 +1,356 @@
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDD01A3160;
-	Mon, 23 Feb 2026 00:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771807659; cv=none; b=r2gTlsQTaAszrTBXAXrm/5IjaoX5DkFJTRjcNVA4cNKDhhikEzliR2bAQLEton4KI8YH1HUDwmV3ZN/eDcn+PPX2REiD1ep9GqGegrUycUGgz4X9ynuG0qFfxtmbN16XvfBQZ+ogYtCl5GJCOPVAsrtghboCd5Wv9NASXNkZd6w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771807659; c=relaxed/simple;
-	bh=9Rg2ovzdHFVJcpJOm3vuScJXDsF1IsJTiaRKGC5EjjE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CGrLhzwItaxXLe7TpMpDCUARs6cyxd3M9bleebK3gVvS8AKiq8tAO96PzeCV96zI0nJay3gnQSFf+IRS+Fo1eo2J++rTzEM/wPnQ9w+H5txmXd2hSrAo1vDpNFNFeVY4eHEMkra8Se9FxNT6JwdfXe3zIbXhOiC4a/tLo3Zy7ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-c0-699ba00d57c1
-Date: Mon, 23 Feb 2026 09:32:07 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Dirk Behme <dirk.behme@gmx.de>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
-	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
-	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
-	gustavo@padovan.org, christian.koenig@amd.com,
-	andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
-	mcgrof@kernel.org, petr.pavlu@suse.com, da.gomez@kernel.org,
-	samitolvanen@google.com, paulmck@kernel.org, frederic@kernel.org,
-	neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
-	josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
-	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
-	yuzhao@google.com, baolin.wang@linux.alibaba.com,
-	usamaarif642@gmail.com, joel.granados@kernel.org,
-	richard.weiyang@gmail.com, geert+renesas@glider.be,
-	tim.c.chen@linux.intel.com, linux@treblig.org,
-	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
-	chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
-	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
-	bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
-	dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
-	tmgross@umich.edu, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v18 31/42] dept: assign unique dept_key to each distinct
- wait_for_completion() caller
-Message-ID: <20260223003207.GA44876@system.software.com>
-References: <20251205071855.72743-1-byungchul@sk.com>
- <20251205071855.72743-32-byungchul@sk.com>
- <ab0b9f9c-3a05-42f3-b4a7-ddb6ab0d37a4@gmx.de>
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010011.outbound.protection.outlook.com [52.101.46.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4D41F4C8C;
+	Mon, 23 Feb 2026 03:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771817329; cv=fail; b=sh5EyTfpV4jNO3SgUCIW0GVVACL4eEiSGuWppEy9zN8zoaLMs2LDG1124rZ0U48aTN7C4hqFULS19pssYFvKq2k0v7+/8/KwvfZIaL7zg1S/vF67x3ZFR+re8d1Rz22zfDicZUgdivJr7BDhqY0I8B1jqeG8QqmU1oVUbE+S9Yw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771817329; c=relaxed/simple;
+	bh=ks9r5SLOEu8sm1bqvYrcnE4bba1kLBW3hTIUt4zrhV4=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HBsRwAoOUxglQs8+iBqwqi8QvsHvn6wtJ671zeNjtRLen9rC5+Fex2TYr3ob7quWODCzUQwzz2WsATla8HmVBeaCG88klnOtaf9eDb2O4uiAIEPtX9Bbmq+2G/HKjDcfCThTPinKj1ULlgYkgb+/auQB+7BcRe5GtG06vKwuitM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=koKDrV2a; arc=fail smtp.client-ip=52.101.46.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="koKDrV2a"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FujbKHUv4XrRiL0N24Vgd19CfOkR88tx+tDzR+UfhRkt21RR9DL8mF238aGvzeOPBAWra7eCVcWqQEV4DynWgpkyRekv6+8R1Xrn9Fj3Fy0QRs4PolmqcYznzRV9/x594GkkhOEcxMUMZQ7sBo2YmvUlcS2tQxJCWe3MosII9y28v8J2GCJwirB0op7NvXQ7ZognEVdMME+xXJKQVNHInyfNFMVMnQwT4AU4jLeEgyEttxdwrW4dXk9ltWoA2IW+HXq8KMS3K9p+TLKGQZwuy5VA62xfyUZuo4NgA7ME1TqPVnPOpTUTK7iVfcvImIYa4a7HgBRwD3PFY1YQ7EB8Vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c4I8Fw09M6BpL8BEzycALjDTQVg+sAZljRgrR/y82Dw=;
+ b=YyectcXIUI90N8F1ysY3aehByeHV+HleiK/YY4AuKAg1yagteO2f8xqWNMjT16wZgDas2QgDg5iLbNpiqF3vgteYgSdi4Dl0b/A/3kid81yCWZ2j/zZLcIl3c+Sh/5kxpnaeKLSCWhG65514BNY5p8jwlwNOXLoRx5i7QW771a5nMXZfl+VzoNg9RJ9wKUkcNF0pd6mu92q5W8XLougPrMiEBOBUWUDJMTVzcgnUemIlRYEtSxqSQ0ORRqHxds4QuOIqTmmE2wvGhC8zA1cDPj1RJlqevpmZ1rETyIgna5jJxdf7aUxTGttR+2PJcfgU87RosL+31XHgPnkZ3uu8gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c4I8Fw09M6BpL8BEzycALjDTQVg+sAZljRgrR/y82Dw=;
+ b=koKDrV2a5zdHiq8QoknqljTQXURU4/5Cpe3363uotpZGiNhAejntB942HA9z+VspNwe1N8DgW7aoNnyTyXt9Mu57sUk+tzTBcNn7216Igia5lLAmLC9o1y2MXzdwsoVphes3tdItH6MfdSo3iZSldLHsGVGzI2OKUUObyRBVX66Ev7AHInhcwdjOiT2lblsDmawG5SibRIrHYBCXzbWbZepckvB7bA8UxP/+ct8cnuJ46HO7o/NfVXgowbQdS4wwKLIhIllhx2Nr7tQnhjCwMbHqOcMhusH52or2SSlvy4BrYXNWHsynb8yzcicU+r+HMsGI7T0W1CJ/q2pcmkb3Ig==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
+ IA0PR12MB8908.namprd12.prod.outlook.com (2603:10b6:208:48a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.17; Mon, 23 Feb
+ 2026 03:28:43 +0000
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::f01d:73d2:2dda:c7b2]) by DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::f01d:73d2:2dda:c7b2%4]) with mapi id 15.20.9632.017; Mon, 23 Feb 2026
+ 03:28:43 +0000
+From: Zi Yan <ziy@nvidia.com>
+To: linux-mm@kvack.org
+Cc: David Hildenbrand <david@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-erofs@lists.ozlabs.org,
+	linux-block@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-kernel@vger.kernel.org,
+	Zi Yan <ziy@nvidia.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>,
+	Barry Song <baohua@kernel.org>,
+	Lance Yang <lance.yang@linux.dev>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Jason Xing <kernelxing@tencent.com>,
+	Yushan Zhou <katrinzhou@tencent.com>,
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Christoph Lameter <cl@gentwo.org>,
+	David Rientjes <rientjes@google.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Harry Yoo <harry.yoo@oracle.com>,
+	Christian Koenig <christian.koenig@amd.com>,
+	Huang Rui <ray.huang@amd.com>,
+	Matthew Auld <matthew.auld@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Eric Sandeen <sandeen@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+	Todd Kjos <tkjos@android.com>,
+	Carlos Llamas <cmllamas@google.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Dennis Zhou <dennis@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Gao Xiang <xiang@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Sandeep Dhavale <dhavale@google.com>,
+	Hongbo Li <lihongbo22@huawei.com>,
+	Chunhai Guo <guochunhai@vivo.com>
+Subject: [PATCH v1 00/11] Zero page->private when freeing pages
+Date: Sun, 22 Feb 2026 22:26:30 -0500
+Message-ID: <20260223032641.1859381-1-ziy@nvidia.com>
+X-Mailer: git-send-email 2.51.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BLAPR03CA0148.namprd03.prod.outlook.com
+ (2603:10b6:208:32e::33) To DS7PR12MB9473.namprd12.prod.outlook.com
+ (2603:10b6:8:252::5)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab0b9f9c-3a05-42f3-b4a7-ddb6ab0d37a4@gmx.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0yTZxTH87x3GupeOpFHmS6pQROm9RKTHZdlMSbL3i9zW/xgoonayCs0
-	QMUWuXiJXGokRATqSmc7sUCoRGpEFKmZdR2deIG6drjRlRasqWjDEMZaHOG2dsTMLyf//P45
-	v5wPhyNl3zGrOJW6UNSolXlyRkJJxpObNkotZtXmke7NEBgJ0/B7uZOCWLSKgnlzNwsjsSoE
-	0ZkhFgzlCBYdvQh8nh9JsN0qJ+DvjgUGxlxTCAyhMAOR+19A2HkWwVjDJAOz7l9IMBo8CJpC
-	QRKmIs8Q3OodRuBoq2DgRV0XCaahwzAQXgZPYxMMvO5gwFLhoOGSWY9g1O8goLLlOgMNlzop
-	8I7NERBo0BPQ3vkl9NU1E2CMxLsbaWA2VhLx8YoAw7UfCJixXmWhvyVAgbUsA563mViYC22B
-	YK2BgrFRPQPRpyECbOdGSXD4P4KLjQEG7joeUVA1H0XQa39OwLmOLhqGbYs0eJx9NPza7qGg
-	r/chBUPuWhZaB70EhJ754m19Db0jS3hz5jwl2BptSIi2VpKC688JUtDdLBYc0xZKeNyMhXr3
-	RuGOKcgKk3/tF3T3/Kxg6Twm6H4ep4WbbZlCy90IITRNxeivN+yVfJol5qmKRM2mzw5Kcu58
-	62IKLiSXDOpyy1CFpBolcZjfhofdV5i32VVhZasRx1F8Bh7xZicww6/HPt8MmcDLeTnuCuxI
-	YJJvX4MHxksS+X0+F9+/Pf+fRcoDbg5H6Gok4WS8HmGv6wKxVKTgRxfD1NJyJvYtRIiEk+TT
-	8ZUFLoGT+E+wq/sMncip/FrsvP2ASHgw70/Cw9bL5NKZK/FPbT6qDvGmd7Smd7Sm/7UWRF5F
-	MpW6KF+pytumyClVq0oUh47kd6L4v1pPze2zoynP7h7Ec0ieLHVOmFQyWlmkLc3vQZgj5cul
-	s7NxJM1Slh4XNUcOaI7lidoelM5R8jTp1uniLBmfrSwUc0WxQNS8bQkuaVUZWjYPGfu3qxST
-	A2tOptt1J/4QK92DT/pTTm21N77Sr17dX7ryn49TB2vKdiZ7wydSUrdfvjYaXEx7WH84c12s
-	etG4W63Y89X3ZEvsvWlF64ZvWPPn8NsHsQ/vvTz7+ugh5LfXnD94XL5zz5NdaM649vSKuuzp
-	dcag9k3BrrQDxfLC2hVySpuj3JJJarTKfwENi1eBqwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH8zzP7e1tQ821YLjo4ofqYmIibmaa4yRK9mHe7P0TOr+MRq5y
-	VyimVQZOYyk065hZsK4ltMoQtVugvpXXznQjNOAcM7ZWRzPBalaRhiJMWhmtpWtjlvnl5H/+
-	//M7OR8OQ5RJyWpG1B4WdFp1lYqWU/KPdjRuyutwiG8MTJeA2XQCJsIRCfzRMERBIm6m4MwV
-	Fw1px4AUzO42Cfw6bqTAf7kbQThhRrCYchAweTIUpC2jUogv3ZeCtQFBxjuKwBawEAj5fyHg
-	6m3AsHB1mYYZ3zME1kcRGlqjDRTMOU8isE85pBAd2Q2z4esSyEw+wTD+PIbAGVnGEBn6CkHa
-	poHvO3uyuG2ehtSt2wRarX4E5x5NEngWfYigd/QBAu+PRhoet/QRsN8/AMHICribmKPhpvUb
-	GmYDZzA8vUpDh9ErgcDvMwjOOiwIpv70Ymg8f4UG21k3BZ6HP0khMPMCw4TNgqHb/SGEnVMU
-	jLV04uzJ2alrheBobcTZMo3Beuk6LnUiftH0LcV39fRj3nQnTfOudhfiU0kL4uMXGwlvasm2
-	vtgc4Zt6vuAvjsVoPpm4R/Pe5x0U/1snx1/4Oon5U7c28R77pPSTd/bJSyqEKrFW0G3eWS6v
-	9Hznow+dzqsbb9IYkFHejGQMx77F+YxOaTNiGIp9nQsHDuZsmt3AhUJLJGcXsCqub6I0ZxO2
-	ey0XnK3L6XxWw430p+mcVrDAdUaikmYkZ5SsBXEB32n8MljJ3WyLUC/hjVxoOYpzOwm7hvth
-	mcnZMvZtzjdgkuT0KnYdN9R/A7cghf0V2v4Kbf+f7kCkCxWI2tpqtVi1tVivqazXinXF+2uq
-	3Sj7kc7jL04Nonhw9zBiGaTKU8wXOUSlRF2rr68eRhxDVAWKVMouKhUV6vqjgq7mM92RKkE/
-	jNYwlKpQ8d4eoVzJHlQfFjSCcEjQ/ZdiRrbagPJJHDyfip/vCZTtcpfn9cnW73C1/82Qnr1d
-	wS+Xap7mG8rOtZaGmv7SJsvmNYsFI0Xr321P/bz1yMKqf1zFK/C1bbEwGZx+PCiDxPumtfqg
-	v7332F3PvnuGGydjbQuWiqLeO2Mf6Oq2vLaue0vKf+Dj6Inthl0lhRHz9kyGFWMqSl+pfnMj
-	0enV/wJlLv3cjQMAAA==
-X-CFilter-Loop: Reflected
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|IA0PR12MB8908:EE_
+X-MS-Office365-Filtering-Correlation-Id: b2f676f7-f50a-418a-0381-08de728ba537
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ckovbk9zL3Iwdi8zUE1nODhYbjM3b0xQQzRxSDBvSHZvQ3hZRFBQZDZ5NWYx?=
+ =?utf-8?B?b1d6cXVWU3VxY2psdVI2VFlqWDUreURLY1dIQ1M2cFlrLzhtL1Z1ek9HUnY3?=
+ =?utf-8?B?WXoybksrMU1OYm9EbUwzdjZEdEpGbHdKNURtWUQxUWp1S1VhNE9NSitGZHRS?=
+ =?utf-8?B?bFNxaXJiNlJGNDl2WDg2UjFHRlZ2ak1TU2hLdjNydXphVVQvZ0dyUExqcVEr?=
+ =?utf-8?B?MURqb2ZNQThQck1yREZOSW1URjJUVzBMbWp3dEQ0VEhCblNxaktqR3dxTzVv?=
+ =?utf-8?B?cHUvZ3RUZFpDZ1ZmOW9zSlhCMGtQRjUvNVFSOGF4SldEWUNQNlhEMGxaRlhT?=
+ =?utf-8?B?bzhvaE5uSFF6Z1FraUVic3NnTlBVZ0lZNGR1bUlPempNZXNOSmh5K2s2MUNK?=
+ =?utf-8?B?dWZIT3NPeFM5dkFrVDlQMDJLeWpwWFRWZHhYcDlIRE44RnFsTHIxUUFIc3h5?=
+ =?utf-8?B?OUo1QStvby9MYVhCRjRqeXlKTGttaVhJRVlhR2lKWWVRdkFVZkVkeHRnTm9s?=
+ =?utf-8?B?bXJFaWYwbnIvRk5oTktrMHVMQUdFRlZqTDVlWHp4NkE5WWRpMTNtRUJ0M281?=
+ =?utf-8?B?Q0ROUDRadFJ6aDZWMVQ5UjN6Q3lEZlVpbytZMTMzb1dtcldmalRwVURkQkUw?=
+ =?utf-8?B?eWkzMWVoaVN6ekhQQ2JVY3ZkVDZXcVA5a01NbDhVcDNOM1BjSjVTZ2R2dlBC?=
+ =?utf-8?B?Z3NFYm1KT2lnUGthS1dPSmNpaERWOHNiRHZVWjlzc0czZTlueEsrazVmRHBT?=
+ =?utf-8?B?RG9BNTRtMys4UHdjeFhtK3lsYlJpb1gxRTFwL29kTzVabFFwSmJDS3Rob2xJ?=
+ =?utf-8?B?cWhSWm1ldFRaVFVGNmFkeEFQQkxRUGZobzlwdTFhaHFoZTEyemVsN2xYRHhP?=
+ =?utf-8?B?cGtmKzhvajhhNHJXYS9YZXhuU05PcW1MbkhKT0hlUnpJLzA3aW9IM0JPd3Vz?=
+ =?utf-8?B?NkhjaG5DUHBkd2hGM09Na2lxOGgwSmZJYWlhS0NFam93N3FCdTRBY0ErUEZP?=
+ =?utf-8?B?YXF0eVUzaFRUdHZHL3FOVEp5R0lPaHMwTWdwdWlQVXdWbGFKSHJMamVSbTRY?=
+ =?utf-8?B?aXpLV3I2QjN3SHNYZG4vZFByelRxZnJ5T21zc2daU0YyL2t0a0hlck83ZXMw?=
+ =?utf-8?B?OGRVSFVBRjROVGtEeW1va3hySXZyYVlDMVVXZWtDa1IxNUh3eXdDeFlaVGg2?=
+ =?utf-8?B?RUdzVS9xL2t1TVI0YkpjSVcwSzM3amVMRlk1TzBDcFNBMFA5NVBzWlBoNnBi?=
+ =?utf-8?B?OCtxaC9JUWdUdEdQaXE3c1k4aWVCUkxKU0VKblhveWlUMkQ4Wk5ITmUvNkow?=
+ =?utf-8?B?bWN3Z3dVVW5ZQ0JjVWwzeFc1WFVqR3BJSGk0NzZvWjJ2RjFmc0ZiZHV1aHZ3?=
+ =?utf-8?B?aGpJYzI2TmxHdTRUUXdvTWFDSzlCaEpBQVZGN09PYzdxOTlOaFRTN0MzSlVa?=
+ =?utf-8?B?T1h6MmIzSExaalZYbXZINk90bDU2bWRBczFiOUNMa0dQMmhYVG5lR2ZHK1U5?=
+ =?utf-8?B?NUpYbjJYRGRBN2xkQklNSzBwWlQ2NGg3SHhEY0NMTEhqdmE3alprUTBGSHlI?=
+ =?utf-8?B?M1hPVEI2dzNIMEwxSFF4ZFlMZlFuWENXMmFvSHhjdENpWXpWNEJXTHFaNk5U?=
+ =?utf-8?B?RnFsY0RHb2VQbzdaYTZtZ3lkckZOU2VpeXhNcDBXMVlQMzlvdlFSbXlwRnVH?=
+ =?utf-8?B?dVNvY3ZBa0tXWUNudTdxNnE4QURvcld0ZkwybjRZNmZvT2lkMTlnMFl6bG9R?=
+ =?utf-8?B?WmdxWWlubUN5TlNmVERLY01QN21WUU1ncXZXOVMzRmdmaVNKQjBCRjM5RlU2?=
+ =?utf-8?B?emUrWEgzdVBnTzl3U3FCQWs4aGJJZTlTTkNLOVpnWEN3eVJJRjdubzBBQ0lz?=
+ =?utf-8?B?UW5SQlpacU5GSnRnd1ZDQVRhN2FwaWtuOW5wNTUvY2RQNHI1ZS9rbFNkWUdq?=
+ =?utf-8?B?aTZXbjk1SDFKak5UUVJiaXpNeHFubTZla216VXB0YnhNcUUxSzVGOEJBZjFB?=
+ =?utf-8?B?RjRuNFFCSDdMWVVpMmJpcG00TGMzZmNjZ0ltVEZwUkZzMDU0UERVejYrZEhw?=
+ =?utf-8?B?cVNBdmhRMUdMQjMzMmgzdGRVNkE4cDVHK3YrNGtRNkJ4ZFVybGwwbkt5ZWNo?=
+ =?utf-8?Q?xVxw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NFhBcWJkL0xTSkVxVS83b1MyTVk5TzZZK3Y0K1MzSldFNkVTZlRFcDJKWEpq?=
+ =?utf-8?B?cTRCek9VeFFUUzFUQ1VrWjEvZzNTWWFXbVpwTHhnZS9qcjdQcU9BMDRiS0tB?=
+ =?utf-8?B?eEo2Qy85NWRwZ3lvbXNydkM4NlV1emY3SjhDbGVIdGNCRVh6K0paVDBWMzhs?=
+ =?utf-8?B?WGs5Y2dZSGpRaXhxS3FMd0VHMS9MQ00xV2MvSHpOS1JzY3VPalBVWmFDUHlH?=
+ =?utf-8?B?RDd3TUhta3o2ck9kN3ZhOEI5N1JuczB0bXNJejc2SStodHdUbm5pWUtvWlFN?=
+ =?utf-8?B?VDU0eXcvUGVnYlBvcEtBb2M2Q21pSWJ6RTgwTlFieWxqL2RMNFMxamd0eXBr?=
+ =?utf-8?B?VkJFR3FKMnNETS9tR2xYT0xsMndRNFp0YVRJbG9mOVhML3lNVVNKV3o0bFIw?=
+ =?utf-8?B?TEl4TCtLSGxrN0RLVmNFYUtHWHg5WkxET2Noa0FHT21sREc4U243WUZUSHB4?=
+ =?utf-8?B?Wk9KR3Era2txc0dXUFVOTmc4QUNvVkdkcUdBWEtkbzhObU5jcW4vV1UyWmI0?=
+ =?utf-8?B?VUlQamQrWUY5S1J1eHFRWHMvODBZNTBVazVuUFBhWjByYU43a3VteWFMREdW?=
+ =?utf-8?B?REs2Ymlrd3B4b1ZWaStnQnIzbnQxOXY4bTRmSTFDaTNXNnFwYTIvaUxyRU5V?=
+ =?utf-8?B?K29WYkZWa1VPN3VlS2NjeEJKeTFaMkYrdDF0bUFSUklMMmRvQmNndWhIakls?=
+ =?utf-8?B?ZEgvQUZndU1Hb2NoTUZ5UGxJc3AzandzS1pwbHkvL3NiZjRySG1JT1kzWklD?=
+ =?utf-8?B?citFeDJwU1NNZnJ3YWF2aDUrUHdtSGhxa2RRUE1BRVl5bG1oeHA4ekpSR2I5?=
+ =?utf-8?B?WWpsbTVyWnFWd1pnVlNIdFBaMHRKZys2ZlhBRzF2dVhvcW9NUkNqQWVaTUow?=
+ =?utf-8?B?YVNnRXBXTXJDQVhoZ3A0M3lFb2JNbmc2enJCRUthWHhUMTdaTEdBNTZhbTlv?=
+ =?utf-8?B?akZhOE0yMUVRSWliamxRc1VkL21wSjJqNk9oTWxtZitCakUwSTYxdGVuZ2J5?=
+ =?utf-8?B?V2taN051a25VcCszZ2d6V2VYTlcxOEowSlVKbmF6SmdsWWYycXU1dFkrWmlu?=
+ =?utf-8?B?bDN3ZG0wbHNDL3V5dHJrdWpmWmFoM29PcEQzSWwydVhVa0RlRW5ZaGllVGhU?=
+ =?utf-8?B?L2o4UDZ3TUpDcmNra2FjdUxWV0pNZElFSmVnN2ErU0h2dHlJK0ZwTGVObmhl?=
+ =?utf-8?B?UVNpQlM4YUNHeXhlb05JVHNkV1FDZ2liN1g0UXlrMUdla2dScWhNazlRVkRM?=
+ =?utf-8?B?QmtOYnNrMitwUDVnNmw3a2dTZitaMElqclIwY21YU2JWdUxKNUFKZEpNRVk4?=
+ =?utf-8?B?YWZKK2FmV0twSU8wMGZEVCtHTGdqQlJSd0FIcUZ1LzhtYlk2VS9aRzRPelk3?=
+ =?utf-8?B?ZHl5bkNJVmJRaHRHNm1TbFBJQ0ZwNjNwRG5lOVJQVFVTd2tBNytKTkgwQ2Q5?=
+ =?utf-8?B?dzRVdHovNmc0S1V1djdlcHhhM3lWTDBHTTRnNHF5Y0MzMjlHZW4rVDBua3dW?=
+ =?utf-8?B?empMbUlObDFIVGFTdWVYSTR0T1dHb21DMUo3MDdmUkpQQzZzT1ltV3pzWGhw?=
+ =?utf-8?B?c3MrSHhBMXI2YStIMFdhTnVWUjc0S1dzQ2RnR290cHV4MW1idUk4dlFLdEo5?=
+ =?utf-8?B?S29JRVA3NHFNaVZHdHpBQ1lNMklWeW4zUThjbVFwMWJUZ3hVZDQ5ZWg1Q2ZX?=
+ =?utf-8?B?SjM3MzVTUlorM3dVQzRrWDIwbCtJWm5udVE0S25oVWNqd3AyQ3NWUUg4d2hO?=
+ =?utf-8?B?ZUlkU1RKTHhoTS9TLzlaYVN0dVYvQjNxVkpHK3FuWXk0TXNaZU84U2hia2RP?=
+ =?utf-8?B?VnZreHEzT0Y1UHU3dGxidkNTOU5uOWVKREpubEF2bWVEUVdPNVEzZFJPcjFH?=
+ =?utf-8?B?VlJBTDh5elVBMEhzd0tYYzYyV1Y2QjBGQ0JkclE5K1BCU01sck5UME1tazN4?=
+ =?utf-8?B?Q2grVjhPY0tuMzhPVDBQaW0xaXcxZW5nVHU1NlQ1dTVzdnN5d0ExYjRqNXha?=
+ =?utf-8?B?RDZWcEI0RGEwVER3SG5BMFM1akpXNlNMVjRCMEh0N3lwTlZoSVRYeXB1emRU?=
+ =?utf-8?B?MFhUTWFRSUpldFVUbUkyNzFLWlFvNFNSZDJYeU1JRzJ4WXFpMnE2SUZyb3B2?=
+ =?utf-8?B?YUFTcm12cUZvMG5rQlJGYzJzRWlNdnNqcENBMjRPZkhnSVI2M2JkOEFHMk9v?=
+ =?utf-8?B?enBZWTNWWTZMMytzbk9pdkYvekVsR3FISUIwNGM1aDFTWm00OGdCMFpRQitn?=
+ =?utf-8?B?Skh4dEFLVXhzR3hKdlhCQTdRSFJKcGRvTVppZGR4a1BpNXN2RElDOExzOU5z?=
+ =?utf-8?B?azBvcFNHc3B6VXlyc0JOOEY5Vm80cGNwWEh5VG50dHJKUkt5KytGMDY3Sms1?=
+ =?utf-8?Q?Jzf1egMLp4BiWteVA/IiPGHEeQUWxTmbSH6rq?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2f676f7-f50a-418a-0381-08de728ba537
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2026 03:28:43.2287
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OmXyG1YaIfgQSq0AxSGb81yHvo26Z4Qr0AVL39KT8bSi9UI4W2387iErqh/et62X
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8908
 
-On Sun, Feb 15, 2026 at 07:42:05AM +0100, Dirk Behme wrote:
-> On 05.12.25 08:18, Byungchul Park wrote:
-> > wait_for_completion() can be used at various points in the code and it's
-> > very hard to distinguish wait_for_completion()s between different usages.
-> > Using a single dept_key for all the wait_for_completion()s could trigger
-> > false positive reports.
-> >
-> > Assign unique dept_key to each distinct wait_for_completion() caller to
-> > avoid false positive reports.
-> >
-> > While at it, add a rust helper for wait_for_completion() to avoid build
-> > errors.
-> >
-> > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > ---
-> >  include/linux/completion.h | 100 +++++++++++++++++++++++++++++++------
-> >  kernel/sched/completion.c  |  60 +++++++++++-----------
-> >  rust/helpers/completion.c  |   5 ++
-> >  3 files changed, 120 insertions(+), 45 deletions(-)
-> >
-> ...
-> > diff --git a/rust/helpers/completion.c b/rust/helpers/completion.c
-> > index b2443262a2ae..5bae5e749def 100644
-> > --- a/rust/helpers/completion.c
-> > +++ b/rust/helpers/completion.c
-> > @@ -6,3 +6,8 @@ void rust_helper_init_completion(struct completion *x)
-> >  {
-> >       init_completion(x);
-> >  }
-> > +
-> > +void rust_helper_wait_for_completion(struct completion *x)
-> 
-> Please add `__rust_helper`:
+Hi all,
 
-I will.  Thanks.
+Based on a recent discussion with David Hildenbrand on page->private
+is not zero when a page is freed[1], this patchset is trying to fix all
+users do not zero ->private when freeing a page and add checks to make
+sure all freed pages have ->private set to zero. For compound pages,
+both head page and tail pages need to have ->private set to zero.
 
-	Byungchul
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/rust/helpers/completion.c?h=next-20260213&id=1c7a6f48f7eeb3014584d2fc55fc67f0cbaeef69
-> 
-> Best regards
-> 
-> Dirk
+People are only cc'd on the cover letter and related patches.
+Mailing lists get all patches.
+
+Patch 1 to 9: fix all users do not zero ->private upon freeing pages.
+I only tested part of them, so would like to get reviews to make sure I
+did the right thing.
+
+Patch 10    : restores page->private check in folio split code, since
+the code was removed in a prior commit without a proper reason.
+
+Patch 11    : adds checks in page freeing path, __free_pages_prepare(),
+to make sure freed pages have zeroed ->prviate.
+
+Any comment or suggestion is welcome.
+
+Thanks.
+
+
+Link: https://lore.kernel.org/all/91F2E741-5473-4D34-ADA1-C9E6EDCBF5E0@nvidia.com/ [1]
+
+
+# MM - THP
+Cc: David Hildenbrand <david@kernel.org>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+Cc: Nico Pache <npache@redhat.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Dev Jain <dev.jain@arm.com>
+Cc: Barry Song <baohua@kernel.org>
+Cc: Lance Yang <lance.yang@linux.dev>
+
+# MM - page allocator
+Cc: Suren Baghdasaryan <surenb@google.com>
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Brendan Jackman <jackmanb@google.com>
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+
+# relay
+Cc: Jason Xing <kernelxing@tencent.com>
+Cc: Yushan Zhou <katrinzhou@tencent.com>
+Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
+
+# MM - slub
+Cc: Vlastimil Babka <vbabka@kernel.org>
+Cc: Christoph Lameter <cl@gentwo.org>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Roman Gushchin <roman.gushchin@linux.dev>
+Cc: Harry Yoo <harry.yoo@oracle.com>
+
+# DRM TTM
+Cc: Christian Koenig <christian.koenig@amd.com>
+Cc: Huang Rui <ray.huang@amd.com>
+Cc: Matthew Auld <matthew.auld@intel.com>
+Cc: Matthew Brost <matthew.brost@intel.com>
+Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Cc: Maxime Ripard <mripard@kernel.org>
+Cc: Thomas Zimmermann <tzimmermann@suse.de>
+Cc: David Airlie <airlied@gmail.com>
+Cc: Simona Vetter <simona@ffwll.ch>
+
+# Block
+Cc: Jens Axboe <axboe@kernel.dk>
+
+# watch queue
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: Davidlohr Bueso <dave@stgolabs.net>
+Cc: Eric Sandeen <sandeen@redhat.com>
+
+# binder
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Arve Hjønnevåg" <arve@android.com>
+Cc: Todd Kjos <tkjos@android.com>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Carlos Llamas <cmllamas@google.com>
+Cc: Alice Ryhl <aliceryhl@google.com>
+
+# null_blk
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+
+# percpu
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Lameter <cl@gentwo.org>
+
+# erofs
+Cc: Gao Xiang <xiang@kernel.org>
+Cc: Yue Hu <zbestahu@gmail.com>
+Cc: Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc: Sandeep Dhavale <dhavale@google.com>
+Cc: Hongbo Li <lihongbo22@huawei.com>
+Cc: Chunhai Guo <guochunhai@vivo.com>
+
+# lists
+Cc: linux-erofs@lists.ozlabs.org
+Cc: linux-block@vger.kernel.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: linux-mm@kvack.org
+Cc: linux-kernel@vger.kernel.org
+
+Zi Yan (11):
+  relay: zero page->private when freeing pages
+  mm/slub: zero page->private when freeing pages
+  drm/ttm: zero page->private when freeing pages
+  blk-mq: zero page->private when freeing pages
+  watch_queue: zero page->private when freeing pages
+  binder: zero page->private when freeing pages
+  null_blk: zero page->private when freeing pages
+  percpu: zero page->private when freeing pages
+  erofs: zero page->private when freeing pages
+  mm/huge_memory: add page->private check back in
+    __split_folio_to_order()
+  mm/page_alloc: check page->private upon page free
+
+ block/blk-mq-tag.c             |  6 +++++-
+ drivers/android/binder_alloc.c |  1 +
+ drivers/block/null_blk/main.c  |  1 +
+ drivers/gpu/drm/ttm/ttm_pool.c |  1 +
+ fs/erofs/zutil.c               |  1 +
+ kernel/relay.c                 |  8 ++++++--
+ kernel/watch_queue.c           |  8 ++++++--
+ mm/huge_memory.c               | 10 ++++++++++
+ mm/page_alloc.c                |  3 ++-
+ mm/percpu-vm.c                 |  4 +++-
+ mm/slub.c                      |  1 +
+ 11 files changed, 37 insertions(+), 7 deletions(-)
+
+-- 
+2.51.0
+
