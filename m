@@ -1,110 +1,232 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA51027FB18
-	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 15:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771862095; cv=none; b=qn8LhmPgfIBLeDQ1/IHbRRkycd9HX55efwCu5jSUTJdx9Ahc6d0GaM+UE/4db8/3iS58ZxXVospIXXhJxLc1P7MB39th8zcg8cr02Vffyd/JJGo6SPWsK6PgQNIfQFg3BmcWTd3efqfjhdu4D6cDUFWGGzlFV4rSNvEPwdJbdAY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771862095; c=relaxed/simple;
-	bh=R1AUHGXxe3dGgZHbFkQxH0f/b1HLtXH7ZZMS1myvRDw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H5FbxRkRX4EpFl9WCTWQ+Lt0D69xidHud5bpzvPpcNiBv2vYBPUEs/Qh0S7qzxEjQtyf/5HNtXV8FCWbCHeKeTibHq4QEUEIj/GOrgg+F/mDSf/LPdaHw7uDSMkHVEpVWxPH/SImAqyxPHo2uGPUSIIelwr8/dgJGHQI3xaj0+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AV/trNVK; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DBC2BE7BB
+	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 16:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771862409; cv=pass; b=E00JY3ANJzodhRMd3H7LFLvCtIqQGCp4ArQYBvDtMMwS3Vo3QERxLD+XozxtRUpjTidi2f3AqHYj60zsUPA4cHCfPTLeSaFpQ0euzh80SpoJfsB6WUNKE+d2H+0Ffri2vrzNojkEVEUI36VsptrTv9Chhf2qUQvqVwZxO17z3n0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771862409; c=relaxed/simple;
+	bh=HykTNcuKiAcsKETODVGw7I4p4N7pYvwiMmxacuq81Ns=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CLxbFeDebOSPJxgWeFM93LEKDTDSjADGof2OkRg8casQ6TaFZn7bkUEhdesBoWQb6FPcfDVgMcvo871XMK+LOpKUdH33uP7eMOhlUeG2wP74GDuYdq7lq8Va/wwC/TdrEyPMgzpnfWDGMs4Hks5Iw+B+cfnvifw8EOjQ6icJQ4s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=d2Vg84Ee; arc=pass smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AV/trNVK"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b8f92f3db6fso724192466b.0
-        for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 07:54:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="d2Vg84Ee"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b90ba3bae60so6154666b.2
+        for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 08:00:07 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771862406; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gTdxb7TX0IuAVZZfkkvgD+mYozvSV1FBlv1wGi67aaPkB3FqLYSNMNgWper/0Wateq
+         VT4aM5M72BVeH85fjuj5epC1RdD9WWvyjLnyu46kdr3IVpuTXFyHNAl5XJUsxy+3wOp/
+         N0Q4CnneUwRhC6qKVEyo/bMYLf6YGDYqQZUPsn+p1E8F5xECeAPL1R6wT27A9idOTK9i
+         GectTb/DLzEW6Ovt2QyF3qInvyewJBRJW/VqXJ9KYXuvuPvWKHq9eqVAh2qs50BBmVo4
+         3C9VbZaKdBKg7aoV0hSexcdHe0cHMpkYFpiNxfOjs8VCLUPAvL/11anjvujO7nNPIluG
+         c7qQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GECeIAnRG+1DYzQpeso4UuY5rhuqMyULaoSHS1c9rjk=;
+        fh=NEvYU9yC3qFadjezBzpvOGN/aEkZI9SvsGvsRkg7qLE=;
+        b=OVFpN04yBths+Bxc8OlrLjh1qXV/oNuZiJeLDj1WoLAtLNhXvj+pgQPJ/8+rAsp0Bu
+         ogWbvn9tglEjuJyYBCG8PPDDR1tE9MgBLdCLy5d7ytfSr902adtVDm+jtt3B3tgPhXLi
+         0lGNtbZCv51u4GkvK22yiJ2ffFDXWIDzMe1mksLSenuLdSqwbYNkSj5ysa0UYmfPt9rC
+         g/Z26I4ZQPFSFnDfIOgWk/tUSAdU2hXxTJ45OFXa8iA36vT8zR1gtIooOabWqOXyJgOt
+         7mrQzSI0jyGojtKI8Fxc3wANoGFv8kxsv9CSGRIs6HZ6PfmcGnPl9Z3d1ErqCwP1Ybat
+         Lr3A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771862091; x=1772466891; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cyQb0+priOw9IUD9vV+F9EltCgHvh5WCMeDq2M8hato=;
-        b=AV/trNVK+3bVsOKnp5bahBdRAH07bioQbb+KQdhDdReRC6BRzawScBjHSwKs+AhGUB
-         iZ9AQZGG3s1e+nAmEEy0xHhD3d4xIMx8y6Z/yQ+wTJ4cVxHc/yg6MwgGVLPyxT8IAAou
-         uhFX6ih3LF71xZRew+arQeEsEDozLUMo0ojuRIG+gJWYkQ5RxV+70Hk9wxWOgbNJv9qb
-         MhGWm8RpXByui/rR61Hket8H6wtRBMr7N9b1zwc3gputqFhlSuzGn+NSwyrtYpPRpk/h
-         VJ3oaez6xGsaRenOEca1c0+yQ/C/yHzImvR9FrZ7toR2aDszDqjbeA8idHsvmj2D/i1e
-         QYXQ==
+        d=purestorage.com; s=google2022; t=1771862406; x=1772467206; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GECeIAnRG+1DYzQpeso4UuY5rhuqMyULaoSHS1c9rjk=;
+        b=d2Vg84EeF7Njp91MFPPMufhZ0V/kmhWOUZmdBgK/iLzq5csY1YhNyn8/3UBN+gxUH2
+         OOWqlYnDq29j+sK2dv3utoC8ECa19VvuTpKbm1U2SgPP6LINDB/0XVPRfdm1Br2JsA9H
+         g/DvZXB881L8b5LobOqIqWKLTwIQ2Rr1peYcHl4TsvjD+3aJ9nFVvYLjmSp1/WLbQpJw
+         hW7fW3gkIxDPe0KN2bV17xRehci33U90fl56CGVPkjHJ9EEeNZgEyHjiBfVncisYYs1z
+         uEm07vrCeh9TjtFN6Hb2YacMF1lozByhgwzao2vjzHr1hzIwtWrZTk9dOFRwe8UdZsQ7
+         kKfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771862091; x=1772466891;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cyQb0+priOw9IUD9vV+F9EltCgHvh5WCMeDq2M8hato=;
-        b=t7AS4txJouoAkZqKZijk9Qei6YPnHQrOsjTNVcJZfNl0znZgj400+zWBBdmAGaqNYR
-         LGXHVG0lDV6WuiDvlrdO017lOjCNyLu/1p0WSyN1563NADg8yJsoSvzhxlBpGU8eMvGS
-         LScX5u9P8k3DwGiNbQlrX5lFKHkQpA2x5OypiVcX9+AAbRnV5Eylr+QOBQ4TXxyQTWQG
-         fn+0lP7mYPSD+ZylGvOXAoyydmMvjMuKa4qneR/RASpalfkAySBix9Am1lEm903ilseI
-         isZHZ8knUUKX0Sqa7Utn1dyvNp63FtS/UjXzUrndE3dEugq4MnrapZN+tc2EUIbjdAnU
-         Yz/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWO/ePPHvIkYQtxAQX8REEeRPs9J6xVWGrXzIf57XED2EzZ6S62juIt9VLerC0kB6/AZtZcaCN/lTyvkg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0c/dwZOoM+HQuk1RkcJTjWGPE6r3N0BwVn5rs/uJ9KCbD7yZO
-	B4kzUQziIx5taJoG1K9sbdQVpR9BoQYFHz9XGI9B+rj9V60BKBFYNeiq
-X-Gm-Gg: AZuq6aJCF8e4aynnZyuieTTlWi2BE7mmb5CgZKqMeE1PIluTY5qvkkXhf8bQtgsH1gh
-	r3lPmAeqbreT9YNfQU6qjmmmH1ovexiQy526lEcwnPviaQEEp2jLB0vd8kBlL1xyj+GHq6kwucn
-	n8P0Qb2wzQmQK0gwN/lHmeRORRdmFCNQdYWJ4L6A7seI0x48qw/p6Qn7ngzFhoWyuzyTMgLh7Eo
-	q0lUyi+9DxXNMPY6cJ/QUyU1Z/AyxQvdkBGjNR8PxOslwZt10I3Ye/fYZbtA37s8XQEoO8beDh+
-	KifkOIx0eAXFiligCPRLoui+H1uPAirmbh004Z81rFTnSRcB6rQ/Ekkp8qx9e07SkCjpKr1nKpD
-	nesGsnX/852FCGJkzxnIvA4oH3PSdWgybsIXwGGHQd+MhqGmIcNCl9xEq/tmK3gkWMGZP9ovc1f
-	ZjBVIZH+PGoXi2LjiIv6Or6u4YUxWaasE/ok+tx+HziI7IgpK1EyOhLfc8XD7FPTycnCmJR04zY
-	lsrQzI6UYEdPIR0fjiKiYiKldZqJvrVSwprBioqSSnm3WUr7Wa/7IPWJlcd+UYpEmSnySqnSWeA
-	mg==
-X-Received: by 2002:a17:906:19cb:b0:b8f:8e99:7860 with SMTP id a640c23a62f3a-b9081ba9436mr397974566b.46.1771862090575;
-        Mon, 23 Feb 2026 07:54:50 -0800 (PST)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9084a4d6e1sm341510066b.0.2026.02.23.07.54.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Feb 2026 07:54:50 -0800 (PST)
-Message-ID: <7e772d91-a546-40ed-90c0-29e2a9721c53@gmail.com>
-Date: Mon, 23 Feb 2026 15:54:46 +0000
+        d=1e100.net; s=20230601; t=1771862406; x=1772467206;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GECeIAnRG+1DYzQpeso4UuY5rhuqMyULaoSHS1c9rjk=;
+        b=rLB9fl7Xse3xB4kkD4tnGEvUGmHyHjaxfetSp602YQ2qMBsX4T3+Lxf8uxyl9c1Hpd
+         79QcamQxREKqH1GlxwWSgninU1GNXWdoM3VBSNwsdlGVbbnyZHn65LT7dW86O++012S/
+         OulhKpMUcqSvmS9MWB7QBArZggqjUzaJ0EsC/H99kP03+qMFbdlB05uIg3Zs1l/0EtOu
+         Wur7ZfA4Z34pC5hLG+7gVU4wY6cMPT6Ob4dK2vZHfeheUlbNQ4kJXFPu8y0j5g/TDkJS
+         bq74GlioHquxajj1G7vwkfv9nSwyQ0wkOk3YoX/Z5UU+P1ykHO6J3MbL83ZMDeD1U5p4
+         zpIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXXMNklwfsf2mUYbhc7NE4Mu+wmZBtPGoKEk9P9sZswGQ13H6GZYNzsGRuHhOxvKORgxjX5dveBukSMIQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVHwLjICE+FChxYQitrMEHYhwmrR7rTePIBJdkYPVfq1ljZhJ1
+	dqcE/ULFtd3A3nr6eYoSHKduuFBTTlOXI3GhJORAoeU698ydte/yWwv6xy8RZIKAlB60ymNs2cJ
+	QM1ioxvTqWYUla/d1qQY4UfxOdFLdCbBxspVvUQY5eg==
+X-Gm-Gg: AZuq6aKzK79Kpq1wbCtwLze3E0fxDryFO4hI8FTXO3SAWUn51iUFBjWoYI/yVJPRvwm
+	7tj7oEeALbawvayzyLOC+THr5c7pPrfNl1lsWQKItAacyhjyUORByKIi+YFhxMx8w9FB78PuWa/
+	QT/33g91lAMx80fftVifiNJCVcjOJYb3VzTZfJYu3dgM4gXAESZiYaCYhgmen9UPs1GdvDFMyMC
+	SADxSlkFU0BnNMElfKuAluX+8AFZczbXb29JSAwvfI8cvtSPdXQ/PdottybEM5/EuwQ/qU4M2HF
+	J5zUos09
+X-Received: by 2002:a17:906:9fc7:b0:b8e:7dcb:7f23 with SMTP id
+ a640c23a62f3a-b90819894c5mr292261566b.2.1771862405564; Mon, 23 Feb 2026
+ 08:00:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] User space RAID5 with ublk and io_uring BPF
-To: Xiao Ni <xni@redhat.com>, lsf-pc@lists.linux-foundation.org,
- linux-block <linux-block@vger.kernel.org>, bpf@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-References: <CALTww28QMg=YXqKWpWLZrLO+xiqOe3LGyput8dx68-dnQsxg=g@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CALTww28QMg=YXqKWpWLZrLO+xiqOe3LGyput8dx68-dnQsxg=g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260223121515.3296983-1-alex@zazolabs.com> <20260223121515.3296983-2-alex@zazolabs.com>
+In-Reply-To: <20260223121515.3296983-2-alex@zazolabs.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 23 Feb 2026 07:59:54 -0800
+X-Gm-Features: AaiRm52mv0s4yYyx4erpIoUu5xL17crYd1kLm0qUcxlxIIBPp6ebT8GP2t6MsLY
+Message-ID: <CADUfDZp-jX98mfERO0OUoMePfws5yRtvfmLfzD2tzfi+HDPyLQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] ublk: cleanup flag handling and fix UBLK_F_NO_AUTO_PART_SCAN
+To: Alexander Atanasov <alex@zazolabs.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/19/26 05:38, Xiao Ni wrote:
-> Hi all
-> 
-> I'm doing some work on user-space RAID recently. I'd like to propose a
-> topic for LSF/MM 2026 regarding the implementation of RAID5 in user
-> space using ublk and io_uring bpf[1], particularly focusing on the
-> challenges encountered and potential kernel improvements needed.
-> 
-> Ublk raid5 uses the ublk framework (tools/testing/selftests/ublk/),
-> with the goal of leveraging io_uring's zero-copy capabilities and
-> BPF[1] for performance optimization. The implementation includes:
-> * RAID5 stripe handling with configurable chunk sizes
-> * Multi-queue support via io_uring
-> * Degraded mode for single disk failure tolerance
-> * Integration with io_uring BPF struct_ops framework
-> 
-> During the implementation, I encountered several technical challenges.
-> The primary challenge is performing XOR parity calculations in a true
-> zero-copy manner:
+On Mon, Feb 23, 2026 at 4:17=E2=80=AFAM Alexander Atanasov <alex@zazolabs.c=
+om> wrote:
+>
+> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
+> as it tries to use it as a switch for the auto partition scan.
+> To fully disable creation of partitions GENHD_FL_NO_PART must
+> be used, switch code to use it instead GD_SUPPRESS_PART_SCAN.
+>
+> Using the new flags rules for partitions become:
+>  - Unprivileged daemons - never scan partitions, they have
+> GENHD_FL_NO_PART always set - they are devices without partitions.
+>
+>  - Trusted daemons - by default have partitions disabled.
+> Partitions can be enabled via UBLK_F_PARTITIONS flag and
+> automatic initial scan can be requested via UBLK_F_AUTO_PART_SCAN flag.
+>
+> Rework the code to work as described above:
+> - remove checks in ublk_partition_scan_work and rely on
+> the caller to schedule the work only if it has to be done.
+> - set GENHD_FL_NO_PART on unprivileged devices
+> - set GENHD_FL_NO_PART depending on UBLK_F_PARTITIONS on trusted
+> devices.
+>
+> Fixes: 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
+> Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
+> ---
+>  drivers/block/ublk_drv.c      | 34 +++++++++++++++++++---------------
+>  include/uapi/linux/ublk_cmd.h |  7 +++++--
+>  2 files changed, 24 insertions(+), 17 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 3c918db4905c..d0c646eb9435 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -81,7 +81,8 @@
+>                 | (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ? UBLK_F_INTEGRIT=
+Y : 0) \
+>                 | UBLK_F_SAFE_STOP_DEV \
+>                 | UBLK_F_BATCH_IO \
+> -               | UBLK_F_NO_AUTO_PART_SCAN)
+> +               | UBLK_F_PARTITIONS \
+> +               | UBLK_F_AUTO_PART_SCAN)
+>
+>  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+>                 | UBLK_F_USER_RECOVERY_REISSUE \
+> @@ -2361,14 +2362,9 @@ static void ublk_partition_scan_work(struct work_s=
+truct *work)
+>         if (!disk)
+>                 return;
+>
+> -       if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
+> -                                            &disk->state)))
+> -               goto out;
+> -
+>         mutex_lock(&disk->open_mutex);
+>         bdev_disk_changed(disk, false);
+>         mutex_unlock(&disk->open_mutex);
+> -out:
+>         ublk_put_disk(disk);
+>  }
+>
+> @@ -4409,9 +4405,13 @@ static int ublk_ctrl_start_dev(struct ublk_device =
+*ub,
+>          * wait while holding ub->mutex, which can deadlock with other
+>          * operations that need the mutex. Defer partition scan to async
+>          * work.
+> -        * For unprivileged daemons, keep GD_SUPPRESS_PART_SCAN set
+> -        * permanently.
+> +        * For unprivileged daemons, set GENHD_FL_NO_PART to
+> +        * disable partitions.
+>          */
+> +       if (ub->unprivileged_daemons)
+> +               disk->flags |=3D GENHD_FL_NO_PART;
+> +
+> +       /* Disable partition scans */
+>         set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+>
+>         ublk_get_device(ub);
+> @@ -4429,13 +4429,17 @@ static int ublk_ctrl_start_dev(struct ublk_device=
+ *ub,
+>
+>         set_bit(UB_STATE_USED, &ub->state);
+>
+> -       /* Skip partition scan if disabled by user */
+> -       if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+> -               clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> -       } else {
+> -               /* Schedule async partition scan for trusted daemons */
+> -               if (!ub->unprivileged_daemons)
+> -                       schedule_work(&ub->partition_scan_work);
+> +       if (!ub->unprivileged_daemons) {
+> +               if (!(ub->dev_info.flags & UBLK_F_PARTITIONS)) {
+> +                       /* disable partitions on trusted device */
+> +                       disk->flags |=3D GENHD_FL_NO_PART;
+> +               } else {
+> +                       /* Enable partition scan on device */
+> +                       clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> +                       /* Schedule auto partition scan if requested */
+> +                       if (ub->dev_info.flags & UBLK_F_AUTO_PART_SCAN)
+> +                               schedule_work(&ub->partition_scan_work);
+> +               }
+>         }
+>
+>  out_put_cdev:
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
+h
+> index a88876756805..467ecaa20ac1 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -367,8 +367,11 @@
+>   */
+>  #define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
+>
+> -/* Disable automatic partition scanning when device is started */
+> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
+> +/* Enable partitions on the device */
+> +#define UBLK_F_PARTITIONS (1ULL << 18)
 
-I aim at similar use cases, i.e. interacting with registered buffers
-from BPF, but based on a different BPF-io_uring implementation. I'd be
-interesting to discuss how the kfunc API should look like.
+This is not backwards compatible. Existing ublk servers expect their
+devices to support partitioning. If you want to introduce a feature
+flag to control this, it needs to be opt-out rather than opt-in.
+UBLK_F_AUTO_PART_SCAN probably also needs to remain as
+UBLK_F_NO_AUTO_PART_SCAN.
 
--- 
-Pavel Begunkov
+Best,
+Caleb
 
+> +
+> +/* Perform automatic partition scanning when device is started */
+> +#define UBLK_F_AUTO_PART_SCAN (1ULL << 19)
+>
+>  /* device state */
+>  #define UBLK_S_DEV_DEAD        0
+> --
+> 2.43.0
+>
+>
