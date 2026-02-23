@@ -1,51 +1,42 @@
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011007.outbound.protection.outlook.com [52.101.62.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6249B2874FE;
-	Mon, 23 Feb 2026 15:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771860163; cv=fail; b=GM2KPLQ0paqonc1uQcS7NmRWHUpaKzUyyGnakNCA2tLoTPIEmHChGWxpyTNDAjSXluKnn9knc0KdI/SSjVfC36zfXRIennXFrBM1ZSBAO+nuElfNirnzO8zz8h+sL/xnoP3T2ICwmLpwLqRr8mQI2rPA1kHqvLAGvQB3ZRw0S3U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771860163; c=relaxed/simple;
-	bh=jKWwpiA4tn4S0F/L0gHj8WRjp0yCIkCm2d2dhJ8IEr8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Kh4+D2o6NclacW1Wy/tljPTzjB5DHTiKu/2rFLuTtlcTyxTF3vgfMh5YJI6sqWtNP1WIem10dgDLVQQfAWexObjoeCOFd0Ixnok9WCiRokcQKDA1mEDJqtygqWmJhWO0LMBc+0n5rnzqwXCMqmQLP+PUb5urpSkRpNC6rCcDAuk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1R8fHFBg; arc=fail smtp.client-ip=52.101.62.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18C1296BB6;
+	Mon, 23 Feb 2026 15:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771860452; cv=none; b=NteLIt4L1NzGdblHzWIELwCjyAjxtoAK4Fki6y8QzggIg67LGYcI6NN1NxK8uo9tSN9pVDaOfQS3DEmgc/qOMJe5B8sePEXkdb1JFpHR32BPIszZhae/bf5lAz7o7o8UrioRchU/pxuAIC9Rl71Rryc4n5gBmvTGf0y8ZEeGrEs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771860452; c=relaxed/simple;
+	bh=sNIFAxdhsfczXp0u6khA1iIW4G427nJP4aj8xANK8vo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jxHB/oxVYmjcc7OXzJut2SqEVYiHB0N7E9aX7sLe5vjs7buJ/R/SqdmJ1ray+Gz6P0KahFIXAZ567hAztu1aCPAYC4dBJPOQN5KY1bWTmIjshtP6XNlb19JmtiS7BLbFBLT15u3DHE52armJZHObsZPb0tXH8FZjM6YmqZixPmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RhxvaE8n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1R8fHFBg"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gGsWoYQEn5BteuaHUdwewRBKmYId9br1Xf6oKr6/Zl7DWDjPheceNAH/A9GQtJN6sZ9ev0wVoAvBrSxJ1Yzz6kJIo4c/fDMqbm+OT3SxGkXhcCBZKJHgh1dPXXH8t30Otp5Poq5wVD+xj70R0PAFusrJi/vCRhZrMCE+f5BXYkNjpJ/iGqbSb1Z63MeTVeJem80sID8XT2VdGLhHpUxkXNbCh4I9ngrgTV5NWy0sJqXAFdu8cLZlsdxdYQMa15iOQb48gYJVG2/qXDUwqAM3Rlmcoh/kLgMBf01EJNZiOdARyYm5fGutnubM68UhwktWGUAWQcHVq19AXPcHnopfNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1a8DOf85OXZZ9cRZWI2U5OsHQxBvst5ogD53MlLBsMc=;
- b=JSoLMdD4Az83v3RXlDrRqYALtLtGtQWY0Qi6ZNNn0jClzZh+tpcJb9Ymqw6eAF0+1DcRmMi3G9eJjkZMLr3iOdDa0VhW0HwYUwMm/Ld0y0EV8PhJdjGVVq5MRoycTj4ziqCyqL+EOTIEzhl9yK1FFpMgLSMIZesZh1fyw3othDVtgo/qI6EBmBdHViSU0mAoMKLbZ4F9rrq4dcPAKYNL262AwNUn8oAilgAK0zblPMp8pTWw3xqGQqv/ETQMvPiUDJ0AZqDiWly/qIWuHKBbr3A+7kT5+pdmQbhfMMEZasMc4PNtZqJ1+TQjKe3+RHlmWLWTxce+RlkWTLsL/4jXKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1a8DOf85OXZZ9cRZWI2U5OsHQxBvst5ogD53MlLBsMc=;
- b=1R8fHFBgUVgxvXX/8n38SAQySgwHRMVByiGxuhLHkUcWANG+m5bqzIFlDRcX1vlm1yqVaC2efQZi/O9F//d12ZvHwscIAwdb9oCEvLEZ+BnIHvreo9BfmwtCa2cQEW3oe5zVdkXnXQmFm42uiKzxe2IbwIr57p/t6qLfjOHzST8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by PH0PR12MB7096.namprd12.prod.outlook.com (2603:10b6:510:21d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.21; Mon, 23 Feb
- 2026 15:22:31 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.20.9632.017; Mon, 23 Feb 2026
- 15:22:31 +0000
-Message-ID: <da2f5f7c-0252-4085-a490-a505d0169bc4@amd.com>
-Date: Mon, 23 Feb 2026 16:22:17 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RhxvaE8n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5437C116C6;
+	Mon, 23 Feb 2026 15:27:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771860451;
+	bh=sNIFAxdhsfczXp0u6khA1iIW4G427nJP4aj8xANK8vo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RhxvaE8nn/UMV0eGCQCN6bn3AFU1O7cE1NrNBD8N6is7e063xjThYwogLjKdFJpZD
+	 ebgIqwodFIJ+4KeMFIny2fwDvixKBYpFJsgYAQDliELDxoz9p+fhiwfUDbNhkB8waw
+	 p8eG9KFgN95UWQsqVzDMKndJgRm5J1xgUKy1IlwS6q1YzHNZb9KJTOSc0uYgJPYNsI
+	 8aW0w51Zw0KGVuipNQgBzopbnZuKVbxGgLCSsqb5fNQkktOVlsRD77I4/XyzyzEss/
+	 qQr0MqF/zzAN2DuA2QWeqREmuBOhDFiqADJhUZua6bZDN5d1kKCZ6XX5SVA4N1gOTO
+	 qYsSQ7b5JSZFg==
+Message-ID: <61e2acbc-d3c7-424a-80da-3c34a593c9ad@kernel.org>
+Date: Mon, 23 Feb 2026 16:27:09 +0100
+Precedence: bulk
+X-Mailing-List: linux-block@vger.kernel.org
+List-Id: <linux-block.vger.kernel.org>
+List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v1 00/11] Zero page->private when freeing pages
-To: "David Hildenbrand (Arm)" <david@kernel.org>,
+To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
  Christoph Hellwig <hch@infradead.org>, Zi Yan <ziy@nvidia.com>
 Cc: linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
  linux-erofs@lists.ozlabs.org, linux-block@vger.kernel.org,
@@ -84,144 +75,87 @@ References: <20260223032641.1859381-1-ziy@nvidia.com>
  <aZxaIEFZr2NvO2eQ@infradead.org>
  <cb8d6ee2-fd1d-436a-b934-aff87adf5dcb@amd.com>
  <5105764a-8313-45bd-8b91-8c0ea8cdf077@kernel.org>
+ <da2f5f7c-0252-4085-a490-a505d0169bc4@amd.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
 Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <5105764a-8313-45bd-8b91-8c0ea8cdf077@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <da2f5f7c-0252-4085-a490-a505d0169bc4@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR2P281CA0010.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::20) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
-Precedence: bulk
-X-Mailing-List: linux-block@vger.kernel.org
-List-Id: <linux-block.vger.kernel.org>
-List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|PH0PR12MB7096:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3364a66c-0ac8-4d55-5507-08de72ef5c87
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UG9uNWhBRUZOUXJvUHNQNjhhTjFDenRMeGpUdlNnR1BUY1U3SnJrbFRoWmxM?=
- =?utf-8?B?RTNMZ3dRb0RjVXJIYVA5RWtxQ0lGZlhjWW1pMDZIOWRxaSsyVDBrcUZIOWZa?=
- =?utf-8?B?MlFjZ2MvRDI1M3pTc0ZrYVlDdnhvRDhrbUZrOTBVU1hWcXZwOFMzV1EzWXpj?=
- =?utf-8?B?TzZqeFhaR3F5T0p2eXNUT0Exa0h6N2xCQ1Vub29zcCtkakVxRmkzcWJUK2lu?=
- =?utf-8?B?VnJjM0FSL3lLS1dROGtwZU9EaitWUmZzQmduL09ZNWJYY3JIdVhOdUFrU2dG?=
- =?utf-8?B?N2VtMXZ4MWJtWGxRWnN3VWhEWWc5eU1ObVpiNEF2ZnVKendib25WdmNKZkNX?=
- =?utf-8?B?eXpCN3diUVc5LzBYYVUrYlM3THJUcS8wZUJUZG00QktJdldHdGR3eFJhZE9h?=
- =?utf-8?B?c0JlWWFwWG5qRWpramppZXV0TTJtZ1o5VHRBdlVGYkZJNWlRQ0pMaVdhQmVY?=
- =?utf-8?B?dk9ZUXAwYlZHa2FWREpuM3FFUUxFODBCSFBvZ2lsbTdLbGtJY0c2dFFBNEFr?=
- =?utf-8?B?WTE2RXNkWWVZWlBZN01leEtTUVl4aFVxQTZuS0FsWUVQbHZFVDVqakI0cHdm?=
- =?utf-8?B?eGtQU1hVZjRYS0dlSVdaNDFSV2ROSUpCa1pzSmdXeGxYUGdjK1RYczd1UDFi?=
- =?utf-8?B?NU0vL0w3MEcvaTR1d2FmK0tsUWVWUmJzdkhheWVDVHpLVXlWdCtDVFBPT2sz?=
- =?utf-8?B?Z3ZuMnV1VjVKcFdpdkVrMy9rSWVBYUpTTk8yeDFQNVB2MXRqL2Z5Zm5EWDJ5?=
- =?utf-8?B?cStOZmdOTXRYWmZpSS9FOEJYTW1CN3NZL1Zwc0FGOXU2OWd4eXJOQXQ2QWJX?=
- =?utf-8?B?MW14UjNydlVPWVhubkZzanYyTk5TUk9ZWW9yM0MycGVwbVd0STd4M2xxUVJk?=
- =?utf-8?B?eC9VVkQ0UlBKVmFqSnpLZFdlNlRhZm8vM3phL3JXa2Z6NzgvZnk3VVNrY3pv?=
- =?utf-8?B?RzRqQ25BUmVEbjVsSG5TWm9sVU9rc2syTXo0TnBIN211TUpjWngwT09vNzRy?=
- =?utf-8?B?cWxMVEQ5YTdoL2dQVy9iZUpZQ2dJK0gxSWxIMFJPbDJuUGVkbTBOWFJXSU1y?=
- =?utf-8?B?UzhZTDMvWUpVK004TGJLNU16bzVWaXpoZTh5R1JqRG9tbEtGTCsyMmZreG43?=
- =?utf-8?B?NzBUNXJqOEU5TTFTWEFNOTVrZks2S3MvUG0rU0Q2amo0anhhdWFqTTBPbitw?=
- =?utf-8?B?dHFkMzJPbkJxRllHd3RhZGJub1dtbEpYdGM4Y2FWYWtDdm1hUDY2QUtOdGNa?=
- =?utf-8?B?ZDl5M0g5aFkwRUJ4dStVTWNkdnk4UTlrb3ZzdE9WQVoxSldzdGtvS3JkSHFj?=
- =?utf-8?B?ZmpRZHhLQm9TQ0FTdnFPZWN6YkpvdTB2Rk1lTjJYQmZta2hUMDVIM3Fma0dt?=
- =?utf-8?B?WGlUNGxUWGVXUUJpaUJpK0ZEK1hCVld1NG9ta3F5RFI1OW0zOXZQQnlDZlIv?=
- =?utf-8?B?V1NLRkZDZHM5clY4bjNPRkdBWWwvTTVuRG1WcklTVFdGZ2RrQlY5c2JjWDJC?=
- =?utf-8?B?QWo1clRzWi8wUW9yVTBrOEhCZHljaEdqKytkUzNhRnZTM2hWZitlQ3Y2eHly?=
- =?utf-8?B?QWdVRWZCSUt6d2tSYjQyVDFicGFDaXpuQXBpajVPNVQ0NDFaTFp1NzlhM3NM?=
- =?utf-8?B?ZkZBM0VrWi9vcEdVME1ZMkhjdy9zOFYybkJJNFIzVmVBUEx5MWh2TUFIZmZ1?=
- =?utf-8?B?ZytoZ2RjUnBJdjYydXo0YnFPRUNUZjRXT244aDlpTThRSUhsQkoyaS95WG43?=
- =?utf-8?B?dkpnako2L3NhRjRTRzNPemtkb1lwSFlGTGpMWHJnNTJUOTFFZTR4alNUQnJR?=
- =?utf-8?B?bnN3d0dINU5EUzNVRlpnKzl3VmtCZHREdGYzbHljQzZRWlI2UTdHMVdHeUQy?=
- =?utf-8?B?MFNPQmwyQVR1aGdSdXFVNjdJRlFTczBsUFJYc0t3dFhpTWJEMnVRSjJXWHVi?=
- =?utf-8?B?aWVCaEVDdkFrN0x0VnRmUWxPcXV6eG1XRGhVeEQ4VzZpb2R5SFhmaHR5Z1F0?=
- =?utf-8?B?YkMwV1VRbFBQSkxvTGZscWlXMzhvYUhvcjhaaW5tSFpUS3JnUDg3L2tiWmdH?=
- =?utf-8?B?cFlKRFpsOTY5amNWUE81U1QyVDM0RXZwNTA4bWRtd2VjSGJuQVo3SGI0ekk2?=
- =?utf-8?Q?ghgQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OEtrTmdLSHRMditnMmtZVWsvQmY4ZlZ5VU1BeVdQa2RvS0tGY0R5aVY1Rysx?=
- =?utf-8?B?TmlXS1g0SzRXMktqMVdZQzRoTTNaY21lOHhFL3lrZ0thUkJ3Rm5wemNZUmpG?=
- =?utf-8?B?WVprT3pZajBxTkNMcy95Ynh5ck1rQ0FwZWpuRksrelpQYjVxWFZkUWtQSWV2?=
- =?utf-8?B?bTVJSXRIU0U5WkZ5Szd5NnEzNDIvbnBnMHhnTzZGVlE3TkZFRWtXb3JBeVA2?=
- =?utf-8?B?TG1FK016Y2dxaVN3cURWOTNURExHbERyTDBTbHBNL0l2Ny9DUkNiR3ZPeVRP?=
- =?utf-8?B?RjRySTR0QjRjb28yYWpJeHJzd2M0NE44OHlaTE1MVHQrdnpSZkxSdFBKUDZW?=
- =?utf-8?B?RXhUU0lwZEl2S2lCVDdhYUI0TVl2ZFV4Zm96d3VTK09kSnl3MDEwZ2dYSVJn?=
- =?utf-8?B?VnRwWkpsdjNwd1BzTmxmUmtPZDFzTFNZYk9UNG92TU9QT2ZuamdNRTl1eWtN?=
- =?utf-8?B?RjNBL1lnc2cxVHNCbkNXUnJKcEU4QWtpQkNXeDNVenV4Ly9paTNoMXl2emFK?=
- =?utf-8?B?N0N3ZHB1RzRjblFZajJKN2pTTTBDQzJXZ3JENm1teGs0QmlvOUdabXZrOXpQ?=
- =?utf-8?B?ZGowcmhDVUJxVDV3a2VNRXZnL3hvOVUvMWh5MWVtcHp0WVF2WmhmNmtYK0ps?=
- =?utf-8?B?dU1GZExEajVBQ2hVbHNsWnUvc3pTNnNVeG5RNExVK1VoUmhTUjdGM0ZWWHN2?=
- =?utf-8?B?b0hQL2lhc1ZkMmtyOTYrU05qRkd1S3pQUzdWTDhvWGxWMzdIb3VOVC9tWnZ3?=
- =?utf-8?B?SEpvb2ZRTmJRbTNlMmZiOTlmdTMzZDZ1MGg4U3JVTTQyVUZ1VGZMakRKMmp2?=
- =?utf-8?B?eTlkSjUzZzVVOVBHOWp1WmgyRDVxTkRBK2RPMEdYdkNGdkZwU0pGdUNHMUlO?=
- =?utf-8?B?MnNVRVhTRThPMERLcnY5VVdEM2V0NFVnRkducmFRWG1qZ0FHTVZFRXdhbmpB?=
- =?utf-8?B?cXpnSDI5QWdaUFlzWmQxOWc3NlR3VHAwTFpZc1JmQ2h2NjRCZWEwL3N2cnBK?=
- =?utf-8?B?WDF6SFJQcWtzYlBaZm5sdHlmNnN0SlJSSHF0cTRzdk9hSEk2ZjRIZnU2UHZ4?=
- =?utf-8?B?Wm9ycDF2UU1qcnJsMGVFaU1nclh4QW5pSm51ek92L3QvbWc2S3lhcGUyZ1Fs?=
- =?utf-8?B?dnM2cGZaVUp6ZHd0eUNuWGlmRTRQdFZRdlBKZlE0TlJobGFGYWJHRER3ZHBG?=
- =?utf-8?B?SXdFTVY4M21IQ3ZOQ1YxdTg4Q3lReWJVanVZdmx1U0RxbXdWbkt4Qjh4NkNX?=
- =?utf-8?B?QnhhK0dsQjRpb3p5amJ6R1MzclRiY200VFAyZ1FDYnNwSHlVZnQxbVE4MHdZ?=
- =?utf-8?B?Q2pnRGh1azc2RUF2TElLNmdzNnpHNU9LWEpqSkFLMG1XRGlQMU0zbldIK3V3?=
- =?utf-8?B?MGlKWXVUOW9LTHMyMlhYeXJleDBQSVAzSElFT0dON2g4VUpFVHlMeENodDY2?=
- =?utf-8?B?K3JZL3RJOHRDSlBrVENxY1hNck1JRVRWWkFJQ0ViTGkwTFJrM3dpTFhXTVlB?=
- =?utf-8?B?R0RPK0Z3SUpCd2ZlVitIZGxzSy9xUHd1bDR3RXNmMUhwSG9EeWl3OXZmeEpP?=
- =?utf-8?B?Yk5hOHd6S2RqeElNajNIUDY2bUl3VExzUFBYU1hPWGNYcUtuQUVyZlZuSjJK?=
- =?utf-8?B?bzNsRHhuc0dTR0ZORWltcEF3VE1EQnJubVU1VFFiRGkxWDM0MmQwZFZXQTQy?=
- =?utf-8?B?Z0FjemVSRUJhRkhMRFVWYitFY1pyc0UrbSt2ZXREN0xvV3d6RVBwbzg0dDcx?=
- =?utf-8?B?Y0xQYmx6VGh1aWxqTTQ1RXpPYTcvU3ZYRXRENzJMVkZYZUtrVmttcVNqNjZk?=
- =?utf-8?B?YmZidFk0amp5enRqYUFRM2JlbVVSckF5ZmZWeFpPVk5Pc1ZmdjFTUUtaMEVP?=
- =?utf-8?B?UHg0NlFzL2lncHJMN1BVSnpBNXBDSXBGb0tGdDluOFZHWXpnTEZOVFhOclVx?=
- =?utf-8?B?d2F4Uk9xNzZpbE9ING00VW5vRnJqa3Z6d21MTWlOUzdJZVM2Q2V5eDUwSk1T?=
- =?utf-8?B?cHBENitMNEhrTE1xUjk5QStsSHc2L1BZSDl4ZzFrVHFTVENZQnJBS0pFY1k1?=
- =?utf-8?B?OEVqbFpDMzFZbGNQVk1CQnd1OEtGcFZYeERjUWNEbHFWTm9aRUYrUEF4MzBq?=
- =?utf-8?B?bnUzdTBwT2QzWlNpSnpjMmFTSWhoZ2toRzYrZ3haMW1KUTJ6QXJMeDI0b1pv?=
- =?utf-8?B?SU52clpaVXNsYnZkeDFIaTNma3ZPdTF3ajhIWGQ3TjVWNGd3dUFHYSsxbDV6?=
- =?utf-8?B?WDZMeVQwNzdqM2x0VXZqeG5SNEdPRWxNRGxIM04xMUNCd1JzZlIxbFV3eUp6?=
- =?utf-8?Q?oNt/DRR6nbShYklv1Q?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3364a66c-0ac8-4d55-5507-08de72ef5c87
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2026 15:22:31.2876
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ObwsaqhfVgEujivvym37aVRlFcjn2SUWXLOtHZw8Y5i7PdnDsTHnhcYGobYklASG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7096
 
-On 2/23/26 15:14, David Hildenbrand (Arm) wrote:
-> On 2/23/26 15:06, Christian König wrote:
->> On 2/23/26 14:46, Christoph Hellwig wrote:
->>> On Sun, Feb 22, 2026 at 10:26:30PM -0500, Zi Yan wrote:
->>>> Hi all,
->>>>
->>>> Based on a recent discussion with David Hildenbrand on page->private
->>>> is not zero when a page is freed[1], this patchset is trying to fix all
->>>> users do not zero ->private when freeing a page and add checks to make
->>>> sure all freed pages have ->private set to zero. For compound pages,
->>>> both head page and tail pages need to have ->private set to zero.
+On 2/23/26 16:22, Christian König wrote:
+> On 2/23/26 15:14, David Hildenbrand (Arm) wrote:
+>> On 2/23/26 15:06, Christian König wrote:
 >>>
->>> Requiring the user to clear a field before freeing is just a way to
->>> awkward interface.  Don't do that.
+>>> Completely agree. This is just asking for trouble.
+>>>
+>>> The cache line(s) backing this struct page are most likely accessed anyway on free/alloc. So I don't see much extra overhead.
 >>
->> Completely agree. This is just asking for trouble.
->>
->> The cache line(s) backing this struct page are most likely accessed anyway on free/alloc. So I don't see much extra overhead.
+>> I think the question is more around handling non-head pages when freeing larger orders. But maybe the overhead of zeroing page->private it there as well in __free_pages_prepare() is tolerable.
 > 
-> I think the question is more around handling non-head pages when freeing larger orders. But maybe the overhead of zeroing page->private it there as well in __free_pages_prepare() is tolerable.
+> Good point, sounds like that is a bit more than I thought it would be.
 
-Good point, sounds like that is a bit more than I thought it would be.
+Right. We already iterate over all "tail" pages in 
+__free_pages_prepare() to clear page flags
 
-> I'll note, though, that we already require page->mapping and page->memcg_data of pages to be zeroed by the caller, so it's not completely crazy. (see page_expected_state)
+	(page + i)->flags.f &= ~PAGE_FLAGS_CHECK_AT_PREP;
 
-Well that's not defensive at all, basically everybody which forgets to do that can cause hard to debug trouble. Maybe that practice should be reconsidered.
+Maybe zeroing page->private there is not too bad.
 
-Regards,
-Christian.
+> 
+>> I'll note, though, that we already require page->mapping and page->memcg_data of pages to be zeroed by the caller, so it's not completely crazy. (see page_expected_state)
+> 
+> Well that's not defensive at all, basically everybody which forgets to do that can cause hard to debug trouble. Maybe that practice should be reconsidered.
+
+Right, we do have check_pages= to activate the page_expected_state() 
+checks, where we will detect such problems.
+
+(including the mapcount being -1 etc.)
+
+-- 
+Cheers,
+
+David
