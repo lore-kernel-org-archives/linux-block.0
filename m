@@ -1,44 +1,44 @@
 Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA2F34D391
-	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 12:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEF71DE3DC
+	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 12:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771848943; cv=none; b=kBhzpQ9jT3n/PdwcIuf4YKUh+xoeW4oLqeoan9Pn6Y+ixZgb/Z/j6dmeRlOG4Sz0HcrWsy29SpHGaQgt1SlNCUV6y4dgZDcw88uFNwxwfRyfqN379qDOeBX361M2eN+ve+q1r9hjq1wx8lO5kzJEaZBsH2a8hm9bishNGDkYhWg=
+	t=1771848944; cv=none; b=hdv4J/J6d1Yprkwiox7hIEY4/2wbYul2/SJexQwqYgj9akezDBF146BC/1rHM5ZAXxtGtEdOnpAvgrsQuVGwM5pxPSifjQJN9s+bw3rEJIMKS4AtwT5I0I9QPshWiXSSzGbkvTUNqVVG/zIT/w8cHoJa25TrA6NcXwLLe8JF8Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771848943; c=relaxed/simple;
-	bh=nPx7EK/DOElmMN9m3wfIuWOoTU//YRsIVEOOMC3+ppk=;
+	s=arc-20240116; t=1771848944; c=relaxed/simple;
+	bh=0qggTXxazRQjbqYblxKwRLmVZo+Ctiwcwe7smprYR48=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kj/eSzSD/Y0CjTL1j8ubKXri6u/OBy2/87GfDbzdEq1w1Mdd8KNviSL7+z6gxKn3hXpz8bEe3rsvgm2hN6FGmtsnG/bll6TQBypGmew7HqoSlMrCiaCadYOCahP6zUjG27Ih32DSsasd2gTPajT0Ubjj6otvhH21xtRmLTg9a1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=LmhxAnmJ; arc=none smtp.client-ip=185.125.111.158
+	 MIME-Version; b=GFvOZQXifZNZd572OqwLAAkL6i2W2qCe2r7wOto4nSqffNb/mxUo6giqQ7CyC5HZqUkPO4DHac49WT+eAXbh8ZvTUD6Z/g1hWRy4TmU7JrruaEtRkR02aIHV6Pqa+nq9N4dQdt8efUPy06uj82Gs1jLjSGeUuajPTLtfosxV4AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=f4SraJdi; arc=none smtp.client-ip=185.125.111.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="LmhxAnmJ"
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="f4SraJdi"
 X-Virus-Scanned: Yes
 From: Alexander Atanasov <alex@zazolabs.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1771848939; bh=nPx7EK/DOElmMN9m3wfIuWOoTU//YRsIVEOOMC3+ppk=;
+	t=1771848933; bh=0qggTXxazRQjbqYblxKwRLmVZo+Ctiwcwe7smprYR48=;
 	h=From:To:Cc:Subject:In-Reply-To:References;
-	b=LmhxAnmJm4BvWfwb3T1fUVqTX0TZIaQSu6J56Gu+wT+zU6ZtGJxyMhG5uTqO2gk13
-	 4qo++kAzfdHLOA70yKcjrv4cHf7YcFS49j/69AChAPHwwtRbRNd9+HQqI0IZrKUAEX
-	 qXmgkA2kNoAHsg0WkBuwLXJXFrQ0w07paAaedRlRn9R3/8rdTNoVmalpdSxW/uNfUy
-	 +4uuo6kP2mwV0Grb/hiXam1VDXgMzgcGgsw26IplvCAb49cGpx2bBA/tHFZELqwz7c
-	 GhVlUJW1vhWm2H3vP9M1ZDzQBXZaVlMSnZo+c58uIBjiuXo5th/3g1cFS9/6jDvwEw
-	 vtBT6G/g/lbQ1oUEWdYfaaTJ11KjY2H2kPOkP1RCn6brLAemlz+FDUbwEJfxwW4O9Y
-	 RNUbInODGr6W+EvLvLkt+2MHn0HZUDBenOwQFyuHg76PEgo8QHZmheNnmu/vDqlgtJ
-	 tehhe2W6/rlcxENsb3sDuRtl7Xlm60z05bdgqDBCs/FPTbHPFI83JtVSDhYAZ24so4
-	 tc9IUXcfujyNk4BBNNphy096EC/RnOw5kbXspT3Y4TA0lsTExIzeE77oUTC+uQYB4g
-	 ofJ7gzwD129NpJOIJE6vtyu9IeWdzzjDgko//kjBWvzbD/Om4u4+WivDFu1ntVGceu
-	 UIHu4b97sUTALotrS6ow1Nr4=
+	b=f4SraJdisszIxEaag0t8dAY4nxjmOynFnLlumLKPHTQn17/C1jzHFp9vtEtasFXMR
+	 P6NGKM0JLncl6IcSU48PZXbBYaeSqUrxpKO/B3E/3zYrwI2RoGJuE+EjSmMUbQHQFb
+	 6nifZji33qtEjtMe693Ib+DIaZb9b4UD3QxNIvh8ZB6LuZxjMk5e1yOadep5DTQbfr
+	 P7Cq6Im+uZCB6wXHetKKysYT3m4kTte6Alr8uBV7lOcxMTw1DWN7HxuFP1x6ReDt0r
+	 KcUjou8ovslVHRQnGXJmuAEz3WzVtHSQ0cAYHehwfUx+Sgn3i8zu4Rc0063UIbgdjo
+	 6h2OEJGwzv+hGbPJHvcpqOOh+Lqd/SkiAkT4PfGj8uoIfJ/fArcsPHoAo5VrtBqcb1
+	 8GghLj89ANzUdUWkDY6iyyNw2549kMheHBq1Ko8tVkKKDlAsweTPVe0fFUElgZzjbw
+	 EjspO9feLiKUXRJ1wg+20qIosMOY3pl7zplCb4GCDspnFqbzlcVv1R88IwlN7QmBiC
+	 07iQWOkD5ibuL0QNqFoo45ZBnBB7kzzbMXoOz0Wh2DWLpuok5pTRuM3v4J6ayJGQ9/
+	 BJBbD8hUt3pNpwDx7OGN37ARdja9MNEqQvKmOmZIXOKyMB/uERA/Y3zhgWqqjvkOaB
+	 SYeGG+7xbvDhykOOFNBxvE1Q=
 To: Ming Lei <ming.lei@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Alexander Atanasov <alex@zazolabs.com>
-Subject: [PATCH 3/4] ublk: document partition flags, kublk and update external links
-Date: Mon, 23 Feb 2026 12:15:13 +0000
-Message-ID: <20260223121515.3296983-4-alex@zazolabs.com>
+Subject: [PATCH 1/4] ublk: cleanup flag handling and fix UBLK_F_NO_AUTO_PART_SCAN
+Date: Mon, 23 Feb 2026 12:15:11 +0000
+Message-ID: <20260223121515.3296983-2-alex@zazolabs.com>
 In-Reply-To: <20260223121515.3296983-1-alex@zazolabs.com>
 References: <20260223121515.3296983-1-alex@zazolabs.com>
 Precedence: bulk
@@ -49,67 +49,121 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add section about partition handling on ublk devices.
-Document UBLK_F_PARTITIONS and UBLK_F_AUTO_PART_SCAN.
+Currently the code misuse GD_SUPPRESS_PART_SCAN flag
+as it tries to use it as a switch for the auto partition scan.
+To fully disable creation of partitions GENHD_FL_NO_PART must
+be used, switch code to use it instead GD_SUPPRESS_PART_SCAN.
 
-Add section for kublk to be used as reference.
+Using the new flags rules for partitions become:
+ - Unprivileged daemons - never scan partitions, they have
+GENHD_FL_NO_PART always set - they are devices without partitions.
 
-Update extenal github links - repos have moved to ublk-org
-and README is renamed to README.rst
+ - Trusted daemons - by default have partitions disabled.
+Partitions can be enabled via UBLK_F_PARTITIONS flag and
+automatic initial scan can be requested via UBLK_F_AUTO_PART_SCAN flag.
 
+Rework the code to work as described above:
+- remove checks in ublk_partition_scan_work and rely on
+the caller to schedule the work only if it has to be done.
+- set GENHD_FL_NO_PART on unprivileged devices
+- set GENHD_FL_NO_PART depending on UBLK_F_PARTITIONS on trusted
+devices.
+
+Fixes: 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
 Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
 ---
- Documentation/block/ublk.rst | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ drivers/block/ublk_drv.c      | 34 +++++++++++++++++++---------------
+ include/uapi/linux/ublk_cmd.h |  7 +++++--
+ 2 files changed, 24 insertions(+), 17 deletions(-)
 
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index 6ad28039663d..168b61098d4a 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -88,6 +88,14 @@ Below is example of using ``ublksrv`` to provide ublk-based loop device.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 3c918db4905c..d0c646eb9435 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -81,7 +81,8 @@
+ 		| (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ? UBLK_F_INTEGRITY : 0) \
+ 		| UBLK_F_SAFE_STOP_DEV \
+ 		| UBLK_F_BATCH_IO \
+-		| UBLK_F_NO_AUTO_PART_SCAN)
++		| UBLK_F_PARTITIONS \
++		| UBLK_F_AUTO_PART_SCAN)
  
- See usage details in README of ``ublksrv`` [#userspace_readme]_.
+ #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+ 		| UBLK_F_USER_RECOVERY_REISSUE \
+@@ -2361,14 +2362,9 @@ static void ublk_partition_scan_work(struct work_struct *work)
+ 	if (!disk)
+ 		return;
  
-+Using kublk from ublk test suite
-+================================
+-	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
+-					     &disk->state)))
+-		goto out;
+-
+ 	mutex_lock(&disk->open_mutex);
+ 	bdev_disk_changed(disk, false);
+ 	mutex_unlock(&disk->open_mutex);
+-out:
+ 	ublk_put_disk(disk);
+ }
+ 
+@@ -4409,9 +4405,13 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 	 * wait while holding ub->mutex, which can deadlock with other
+ 	 * operations that need the mutex. Defer partition scan to async
+ 	 * work.
+-	 * For unprivileged daemons, keep GD_SUPPRESS_PART_SCAN set
+-	 * permanently.
++	 * For unprivileged daemons, set GENHD_FL_NO_PART to
++	 * disable partitions.
+ 	 */
++	if (ub->unprivileged_daemons)
++		disk->flags |= GENHD_FL_NO_PART;
 +
-+ublk selftests contain utility(``kublk``) which can be used for reference
-+and as a simple server. It is a stripped down  version of ublk.
++	/* Disable partition scans */
+ 	set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+ 
+ 	ublk_get_device(ub);
+@@ -4429,13 +4429,17 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 
+ 	set_bit(UB_STATE_USED, &ub->state);
+ 
+-	/* Skip partition scan if disabled by user */
+-	if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+-		clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+-	} else {
+-		/* Schedule async partition scan for trusted daemons */
+-		if (!ub->unprivileged_daemons)
+-			schedule_work(&ub->partition_scan_work);
++	if (!ub->unprivileged_daemons) {
++		if (!(ub->dev_info.flags & UBLK_F_PARTITIONS)) {
++			/* disable partitions on trusted device */
++			disk->flags |= GENHD_FL_NO_PART;
++		} else {
++			/* Enable partition scan on device */
++			clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
++			/* Schedule auto partition scan if requested */
++			if (ub->dev_info.flags & UBLK_F_AUTO_PART_SCAN)
++				schedule_work(&ub->partition_scan_work);
++		}
+ 	}
+ 
+ out_put_cdev:
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index a88876756805..467ecaa20ac1 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -367,8 +367,11 @@
+  */
+ #define UBLK_F_SAFE_STOP_DEV	(1ULL << 17)
+ 
+-/* Disable automatic partition scanning when device is started */
+-#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
++/* Enable partitions on the device */
++#define UBLK_F_PARTITIONS (1ULL << 18)
 +
-+See ``tools/testing/selftests/ublk/kublk.c``
-+
- Design
- ======
++/* Perform automatic partition scanning when device is started */
++#define UBLK_F_AUTO_PART_SCAN (1ULL << 19)
  
-@@ -238,6 +246,14 @@ be provided in these commands' payload from ublk server. With this way,
- ublk device becomes container-ware, and device created in one container
- can be controlled/accessed just inside this container.
- 
-+Partitions
-+----------
-+
-+By default partitions are disabled on ublk devices.
-+
-+They can be enabled *only on trusted* devices with ``UBLK_F_PARTITIONS`` flag.
-+Automatic partition scan can be requested with ``UBLK_F_AUTO_PART_SCAN`` flag.
-+
- Data plane
- ----------
- 
-@@ -488,10 +504,10 @@ Limitations
- References
- ==========
- 
--.. [#userspace] https://github.com/ming1/ubdsrv
-+.. [#userspace] https://github.com/ublk-org/ublksrv
- 
--.. [#userspace_lib] https://github.com/ming1/ubdsrv/tree/master/lib
-+.. [#userspace_lib] https://github.com/ublk-org/ublksrv/tree/master/lib
- 
- .. [#userspace_nbdublk] https://gitlab.com/rwmjones/libnbd/-/tree/nbdublk
- 
--.. [#userspace_readme] https://github.com/ming1/ubdsrv/blob/master/README
-+.. [#userspace_readme] https://github.com/ublk-org/ublksrv/blob/master/README.rst
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
 -- 
 2.43.0
 
