@@ -1,137 +1,84 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832D9361DCE
-	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 12:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E511DE3DC
+	for <linux-block@vger.kernel.org>; Mon, 23 Feb 2026 12:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771848482; cv=none; b=rlSPGDkEpZ2KVk/8rHd9AMgMozYHRvytQLv+KUwAJ6XoxBhMcXLOEINv0imvz7VZVbow6jytrkkJuQordmNF6Y0sJvMQdXFhUmz6SN9c+nIqtyURqsgouQIv64/D1UM6hoPa6BAQFjLLHE73Kk7e+IeRVpVHmnXChaLOQlFLC+M=
+	t=1771848941; cv=none; b=l2m2xTU7cmqaqDO4n9Ej6tYhuWIwCr0yOyBOOQ2fO7M/3gvsrik61FDNxemlcqheKmqAYdad/8O4nHfI+8GxZ7VbRg3cANddNtQ7NeKdg9Yi+8Fca7XEaXTdhRW/8BJ24DRk527XlpE2ixv0ID+PgwxkU4E5bA5178l8f+0Z780=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771848482; c=relaxed/simple;
-	bh=hUTKqS4suNvpGQGK7NnVPR54skEJcXyQGQ493zhHnkI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fTIhTPN3MmMNYycOMatwHWkjLvs69lZ4Qsesg0y96b7qq/bGOvi4GKd4drblWSKcnNyS7JcVh3uhAeL44rHBrcjpdA9WMXaSXV0oD7jiRNE8YNuEQw1o8S46Tl0GwFXgg3UZ2l8RDwxdDvI4vCB+MuUBZ4cyG2s7mYKiIX3A+ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IUce53La; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RODavTs7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=IUce53La; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RODavTs7; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1771848941; c=relaxed/simple;
+	bh=4OcuD5ZcDKdRD+Bi9bCa8Ujvaj5gFzwiyjB4ChXmEtw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mma8N6+xAy3gySH0lPeT8AszjmLUGUOah3ongXD8IaF7MIrRu+Z51d0fWpxpoZp0tf1MlJktZN7xLJ5w3w460i91sNRkxh3Kj178KFT2LKSgWL8Pslyv0GpqbF6ZwofjjRPcCNCobQeNdeoaKhR/SixweanotohtT36vu4xldpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=IG8LDSfj; arc=none smtp.client-ip=185.125.111.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IUce53La";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RODavTs7";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="IUce53La";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RODavTs7"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D5D973EC6D;
-	Mon, 23 Feb 2026 12:07:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771848479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NLj5WOCUUHt5H83rXTGvISzWiL/bYxgS1tn8mmw33pI=;
-	b=IUce53LavKh9AfKkTrf70FeiY+R3y8ERjgTwOQZDvFyPVwWWGziffLppUas5nMtheVh1Ke
-	+dkjg+ZrvR+NMuRdxsFSVY3HiAbzEGLILMp1xQiRXnYW31P0LCX+CMuTo4PrgTFEIAhgoY
-	IVLRUw+eVdpB/6djQzw8D9RjlxeGpt4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771848479;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NLj5WOCUUHt5H83rXTGvISzWiL/bYxgS1tn8mmw33pI=;
-	b=RODavTs7vWrOXvgo4By9fv0n2GRHW4YM9z4mnf5mVitMiK4MII6WU61uWQMxpwXZHW4qiF
-	En/jGisLcE+utsAw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1771848479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NLj5WOCUUHt5H83rXTGvISzWiL/bYxgS1tn8mmw33pI=;
-	b=IUce53LavKh9AfKkTrf70FeiY+R3y8ERjgTwOQZDvFyPVwWWGziffLppUas5nMtheVh1Ke
-	+dkjg+ZrvR+NMuRdxsFSVY3HiAbzEGLILMp1xQiRXnYW31P0LCX+CMuTo4PrgTFEIAhgoY
-	IVLRUw+eVdpB/6djQzw8D9RjlxeGpt4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1771848479;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NLj5WOCUUHt5H83rXTGvISzWiL/bYxgS1tn8mmw33pI=;
-	b=RODavTs7vWrOXvgo4By9fv0n2GRHW4YM9z4mnf5mVitMiK4MII6WU61uWQMxpwXZHW4qiF
-	En/jGisLcE+utsAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BE6F03EA68;
-	Mon, 23 Feb 2026 12:07:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +8gPLh9DnGnEUQAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 23 Feb 2026 12:07:59 +0000
-Message-ID: <0e6561ea-d575-400b-a62e-712b43d104b6@suse.de>
-Date: Mon, 23 Feb 2026 13:07:59 +0100
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="IG8LDSfj"
+X-Virus-Scanned: Yes
+From: Alexander Atanasov <alex@zazolabs.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
+	t=1771848929; bh=4OcuD5ZcDKdRD+Bi9bCa8Ujvaj5gFzwiyjB4ChXmEtw=;
+	h=From:To:Cc:Subject;
+	b=IG8LDSfjitrqEbr9AbJnLqcMFfwhgW5P0nMpoQOtSFBJyHtb82mcSdYQDylAR5eL5
+	 b932Ul1VjEF0fNFqJd+PsYjZq1kx70EDcs1ZXls/uV+hs2Yxpk+gdlVz9PbO1p5Dk/
+	 eE+Zl0PcKnyKeSMrE6NgOHbyxb51yAvzgdkUMR4xP5TQ0TMJKsfXD8QW6Ju2pZwGNH
+	 J17PoUoSFxZTVtgS04vtAisWHLTgOFaLmtmRfz8WfI9vV/ntbM+rQ5TvhCJfHLmftO
+	 hikc6bxpLyDDKE92+1xh3rYmJWVQ7u1zqUdzDSpWbYZsgmArF111A5nCXVfIRU/LXJ
+	 hYlqnNIdO86IKk+2WKN+0xVM8bZ0MzQ0uSAZkn4Elxa6lgtnePdhhVSwPfx7geLp9Y
+	 bgAzlzmtcSVX5Yvyukiu1os85t45LYe0bkzkkaUsym+iVPrzhQIY5DrnSSMjXX2izT
+	 nAXaTrSIwtt8T5x6dMt/gSC8YubpTgpqx+1YvGm4MZ/16AC1l74rTQo6kv4TkQA4cA
+	 SQVHwHD3zZrvY2I8ru2Xz3e3UXVrJi90FlNypjZl8FGj4699xP1Rp56VdSMt43Fxyf
+	 uxv/SWZsZ+xY6R6vfAcMT3ZnuiDPTlyrAwWFJPDZHkaGFoQM4cU9YRqPLTMzGOB/+6
+	 vKsbYz+JYvJP4W2GM58wXsek=
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Alexander Atanasov <alex@zazolabs.com>
+Subject: [PATCH 0/4] ublk: rework partition handling
+Date: Mon, 23 Feb 2026 12:15:10 +0000
+Message-ID: <20260223121515.3296983-1-alex@zazolabs.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 8/8] Documentation: ABI: stable: document the
- zoned_qd1_writes attribute
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-References: <20260221004411.548482-1-dlemoal@kernel.org>
- <20260221004411.548482-9-dlemoal@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260221004411.548482-9-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
 
-On 2/21/26 01:44, Damien Le Moal wrote:
-> Update the documentation file Documentation/ABI/stable/sysfs-block to
-> describe the zoned_qd1_writes sysfs queue attribute file.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   Documentation/ABI/stable/sysfs-block | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Rework how partitions are handled for ublk devices.
 
-Cheers,
+Disable partitions on unprivileged devices completely -
+GD_SUPPRESS_PART_SCAN is used but partitions still can
+be created by userspace scan.
+Use GENHD_FL_NO_PART to truly disable partitions on device.
 
-Hannes
+For privileged device partitions are optional - disabled
+by default.
+They can be enabled with UBLK_F_PARTITIONS flag.
+Auto partition scan is performed only when explicitly requested
+by user.
+
+Update related tests and documentation.
+
+Alexander Atanasov (4):
+  ublk: cleanup flag handling and fix UBLK_F_NO_AUTO_PART_SCAN
+  selftests: ublk: rework partitions tests for new flags
+  ublk: document partition flags, kublk and update external links
+  selftests: ublk: cleanup kublk.h
+
+ Documentation/block/ublk.rst                  | 22 ++++++++++--
+ drivers/block/ublk_drv.c                      | 34 +++++++++++--------
+ include/uapi/linux/ublk_cmd.h                 |  7 ++--
+ tools/testing/selftests/ublk/kublk.c          | 18 ++++++----
+ tools/testing/selftests/ublk/kublk.h          |  1 -
+ .../selftests/ublk/test_integrity_01.sh       |  9 ++---
+ tools/testing/selftests/ublk/test_part_01.sh  | 14 ++++----
+ tools/testing/selftests/ublk/test_part_02.sh  |  6 ++--
+ 8 files changed, 71 insertions(+), 40 deletions(-)
+
+
+base-commit: 72f4d6fca699a1e35b39c5e5dacac2926d254135
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.43.0
+
