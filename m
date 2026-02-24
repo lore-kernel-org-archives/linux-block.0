@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5BA1EB9F2
-	for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 02:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FCE1C5D44
+	for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 02:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771898568; cv=none; b=daT3wu3qjTMc/TKGDl7lZ6rl7CHEBk8dOfQu0yiWfqMqqnD1b2kTw+0bhSRjixF0bPXp0gigWf6Y2balIl8cTewOJBTnfKtmuKDxePO2JX0n/ris8onxtBoi/Vieiil0Ir32WXoNuSF76TI2msQrDs5OYvCKjuVQ0YPFiSY+A2M=
+	t=1771898761; cv=none; b=uUo9eSCttxb+GhgxAzFP3gNRmIR9r1KW0ylfA6NSS3qVl3HRBMPPAP/Bf6ERCRaljqhDs4RvS5oeSYqEYw9XjG3drxfYy7KdvuUYRtmx1MwVx7iXx0Gf9UOctRZ9LbauLItvV9NfHjrPsNM+8Nx200Bpbyx8WSL5zxVi1S4VdqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771898568; c=relaxed/simple;
-	bh=EZ+y7mXBpd9O4iXYm1C5x0cCB4Aiy9JSOa0cJyCwvGA=;
+	s=arc-20240116; t=1771898761; c=relaxed/simple;
+	bh=OV3fk9iyLzBM4vnIfFXQQW0bhrwA1chN9mngShFWJ5A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=UyzNfQJqfUW5AYcRZyzcNcg9vvwl62M62qh74+lKC1k1WGX73zRi7M3HTYJQg0jPP4Lan5Lrnm2khl8JjqTOdMwb9tJ44faM6tVq0YP6CQ2k4VbhZ2mOMUf7LFczAxQeu2+sUY8bQSpDwUJ+fvQ7P4Q4oWXJepLWRUGzD+g10f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sY//onz+; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=EQ4aG8Gbd2FBby2wpFP9b2DRiQgk1KWkH9VadSZGFiLuQUekPGR50XSpOsytfIlcLq9Nq0uYWZ3nX2VCKJZEm1DGOwskMMskowdX0hBryH3wSo2REtAwX5Z1OJqSIAx6SFlqY0ZXg1d09kV2BWAvr8XmASVLL7j5nOLbk/08lQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YZqwxNzq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sY//onz+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5460CC116C6;
-	Tue, 24 Feb 2026 02:02:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZqwxNzq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB9ECC116C6;
+	Tue, 24 Feb 2026 02:06:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771898567;
-	bh=EZ+y7mXBpd9O4iXYm1C5x0cCB4Aiy9JSOa0cJyCwvGA=;
+	s=k20201202; t=1771898761;
+	bh=OV3fk9iyLzBM4vnIfFXQQW0bhrwA1chN9mngShFWJ5A=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=sY//onz+pqwWuXlc0IBYWKhKT3fbxNoXf7jh5Xf/4BwkNVhfp66eA5iASeE1AzVyc
-	 XKS2HUIDFmeyWTKgckaCZRiWtq5lv141NCX36k3haJgxdrYD+XgeBAMN7fUxecjm4Q
-	 mnxkE/pPSzsRo9zS0yeyRZwXs0IeVtcBxRnvVCwSXRP7jGQHNx6x+bqATv/gc4WXQF
-	 rJNZuv+gvhvE9eMQYjc6uwnIIiXR1GvwuxQ6G/nEfedqvvr0UmVMd/RTVYOaMn9xGE
-	 0oRejveSDjlr9qsd6uoLaAuHHf5+kWsNaBn4Ae4CyVK3DbMNkBM/fnU1ttRCfE4jfn
-	 keQOznxBwtGQQ==
-Message-ID: <3a8fdb1f-db52-4264-b9c4-e8339c719dc4@kernel.org>
-Date: Tue, 24 Feb 2026 10:57:31 +0900
+	b=YZqwxNzq7C4BpHROE98LkMMVM5EFHtvp3gDT9qYBT5oDYkIQBJb/SjV5IIZx0o0Nh
+	 JR7BCR3Hw8DkAaWejuskjk2ZDl48RXjVoGq5YIa/DhNiPOkqIcAkTpHAgGj1zNi9/7
+	 4RO3q1E3ZeqVKIGh10AsHSknZWzmq9PsZoDFYUa0Iepn8tej/7yKaJfx57153k/Bax
+	 7GEc9kCD0PUdjjdq9pcSY787b1fIx9YHWtDAI+DLaDSECH7t1MPqODqHqo5VXH+kRK
+	 aALOUftgM/y/9qmYHUZ6uIkq/vFwvoIlrS+x/SdsAextgyoL3b4RBcxSg04wD8p1YC
+	 OfMZVlRoAPXCw==
+Message-ID: <5ced7cb1-49a2-4ed3-aa93-3784f853cc38@kernel.org>
+Date: Tue, 24 Feb 2026 11:00:44 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,88 +35,257 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/8] block: fix zone write plug removal
-To: Bart Van Assche <bvanassche@acm.org>, Hannes Reinecke <hare@suse.de>,
- Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 6/8] block: allow submitting all zone writes from a single
+ context
+To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
 References: <20260221004411.548482-1-dlemoal@kernel.org>
- <20260221004411.548482-2-dlemoal@kernel.org>
- <ab25a49b-0732-4d0e-94b7-1785934a1a5e@suse.de>
- <ed42e14c-6378-48f2-891c-87463a6ee9eb@acm.org>
- <03e14c32-8592-421f-992a-84301d1ec692@acm.org>
-Content-Language: en-US
+ <20260221004411.548482-7-dlemoal@kernel.org>
+ <f61591f3-1b0a-44c2-b53c-9b10fbf4a432@suse.de>
 From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <03e14c32-8592-421f-992a-84301d1ec692@acm.org>
+In-Reply-To: <f61591f3-1b0a-44c2-b53c-9b10fbf4a432@suse.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 2/24/26 5:21 AM, Bart Van Assche wrote:
-> On 2/23/26 11:30 AM, Bart Van Assche wrote:
->> On 2/23/26 3:56 AM, Hannes Reinecke wrote:
->>> On 2/21/26 01:44, Damien Le Moal wrote:
->>>> +static inline void disk_check_and_put_zone_wplug(struct blk_zone_wplug
->>>> *zwplug)
->>>> +{
->>>> +    lockdep_assert_not_held(&zwplug->lock);
->>>> +
->>>> +    /*
->>>> +     * Check for the need to remove the zone write plug from the hash list
->>>> +     * when we see that only the caller is referencing the zone write plug.
->>>> +     * Since this is racy without holding the zone write plug lock, this
->>>> +     * check is done again in  disk_should_remove_zone_wplug().
->>>> +     */
->>>> +    if (refcount_read(&zwplug->ref) <= 2) {
->>>> +        struct gendisk *disk = zwplug->disk;
->>>> +        unsigned long flags;
->>>> +
->>>> +        spin_lock_irqsave(&zwplug->lock, flags);
->>>> +        if (disk_should_remove_zone_wplug(disk, zwplug))
->>>> +            disk_remove_zone_wplug(disk, zwplug);
->>>> +        spin_unlock_irqrestore(&zwplug->lock, flags);
->>>> +    }
->>>> +
->>>> +    disk_put_zone_wplug(zwplug);
->>>> +}
->>>> +
->>>>   static void blk_zone_wplug_bio_work(struct work_struct *work);
->>>>   /*
->>>
->>> This looks slightly odd; a simple 'refcount_read()' always trigger alarm
->>> bells with me as it inevitably races with 'refcount_dec()' /
->>> 'refcount_inc()'.
->>> And similar the check 'refcount <= 2' also looks odd; typically one
->>> would check against '< 1' and let the refcount destructor handle
->>> things.
->> Hmm ... I think that the above code is racy. Here is an example:
+On 2/23/26 9:07 PM, Hannes Reinecke wrote:
+> On 2/21/26 01:44, Damien Le Moal wrote:
+>> In order to maintain sequential write patterns per zone with zoned block
+>> devices, zone write plugging issues only a single write BIO per zone at
+>> any time. This works well but has the side effect that when large
+>> sequential write streams are issued by the user and these streams cross
+>> zone boundaries, the device ends up receiving a discontiguous set of
+>> write commands for different zones. The same also happens when a user
+>> writes simultaneously at high queue depth multiple zones: the device
+>> does not see all sequential writes per zone and receives discontiguous
+>> writes to different zones. While this does not affect the performance of
+>> solid state zoned block devices, when using an SMR HDD, this pattern
+>> change from sequential writes to discontiguous writes to different zones
+>> significantly increases head seek which results in degraded write
+>> throughput.
 >>
->> thread 1                                thread 2
->> -------------------------------         -------------------------------
->> refcount_read() returns 3               refcount_read() returns 3
+>> In order to reduce this seek overhead for rotational media devices,
+>> introduce a per disk zone write plugs kernel thread to issue all write
+>> BIOs to zones. This single zone write issuing context is enabled for
+>> any zoned block device that has a request queue flagged with the new
+>> QUEUE_ZONED_QD1_WRITES flag.
 >>
->> disk_should_remove_zone_wplug() is      disk_should_remove_zone_wplug()
->> is not called                           is not called
+>> The flag QUEUE_ZONED_QD1_WRITES is visible as the sysfs queue attribute
+>> zoned_qd1_writes. For a regular block device, this attribute cannot be
+>> changed and is always 0. For zoned block devices, a user can override
+>> the default value set to force the global write maximum queue depth of
+>> 1 for a zoned block device, or clear this attribute to fallback to the
+>> default behavior of zone write plugging which limits writes to QD=1 per
+>> sequential zone.
 >>
->> disk_put_zone_wplug() decreases         disk_put_zone_wplug() decreases
->> zwplug->ref from 3 to 2                 zwplug->ref from 2 to 1
+>> Writing to a zoned block device flagged with QUEUE_ZONED_QD1_WRITES is
+>> implemented using a list of zone write plugs that have a non-empty BIO
+>> list. Listed zone write plugs are processed by the disk zone write plugs
+>> worker kthread in FIFO order, and all BIOs of a zone write plug are all
+>> processed before switching to the next listed zone write plug. A newly
+>> submitted BIO for a non-FULL zone write plug that is not yet listed
+>> causes the addition of the zone write plug at the end of the disk list
+>> of zone write plugs.
 >>
+>> Since the write BIOs queued in a zone write plug BIO list are
+>> necessarilly sequential, for rotational media, using the single zone
+>> write plugs kthread to issue all BIOs maintains a sequential write
+>> pattern and thus reduces seek overhead and improves write throughput.
+>> This processing essentially result in always writing to HDDs at QD=1,
+>> which is not an issue for HDDs operating with write caching enabled.
+>> Performance with write cache disabled is also not degraded thanks to
+>> the efficient write handling of modern SMR HDDs.
 >>
->> Result: zwplug->ref became less than 2 without
->> disk_should_remove_zone_wplug() having been called.
+>> A disk list of zone write plugs is defined using the new struct gendisk
+>> zone_wplugs_list, and accesses to this list is protected using the
+>> zone_wplugs_list_lock spinlock.  The per disk kthread
+>> (zone_wplugs_worker) code is implemented by the function
+>> disk_zone_wplugs_worker(). A reference on listed zone write plugs is
+>> always held until all BIOs of the zone write plug are processed by the
+>> worker kthread. BIO issuing at QD=1 is driven using a completion
+>> structure (zone_wplugs_worker_bio_done) and calls to blk_io_wait().
+>>
+>> With this change, performance when sequentially writing the zones of a
+>> 30 TB SMR SATA HDD connected to an AHCI adapter changes as follows
+>> (1MiB direct I/Os, results in MB/s unit):
+>>
+>>                      +--------------------+
+>>             |   Write BW (MB/s)  |
+>>   +------------------+----------+---------+
+>>   | Sequential write | Baseline | Patched |
+>>   |  Queue Depth     | 6.19-rc8 |         |
+>>   +------------------+----------+---------+
+>>   | 1                | 244      | 245     |
+>>   | 2                | 244      | 245     |
+>>   | 4                | 245      | 245     |
+>>   | 8                | 242      | 245     |
+>>   | 16               | 222      | 246     |
+>>   | 32               | 211      | 245     |
+>>   | 64               | 193      | 244     |
+>>   | 128              | 112      | 246     |
+>>   +------------------+----------+---------+
+>>
+>> With the current code (baseline), as the sequential write stream crosses
+>> a zone boundary, higher queue depth creates a gap between the
+>> last IO to the previous zone and the first IOs to the following zones,
+>> causing head seeks and degrading performance. Using the disk zone
+>> write plugs worker thread, this pattern disappears and the maximum
+>> throughput of the drive is maintained, leading to over 100%
+>> improvements in throughput for high queue depth write.
+>>
+>> Using 16 fio jobs all writing to randomly chosen zones at QD=32 with 1
+>> MiB direct IOs, write throughput also increases significantly.
+>>
+>>                      +--------------------+
+>>             |   Write BW (MB/s)  |
+>>   +------------------+----------+---------+
+>>   |   Random write   | Baseline | Patched |
+>>   |  Number of zones | 6.19-rc7 |         |
+>>   +------------------+----------+---------+
+>>   | 1                | 191      | 192     |
+>>   | 2                | 101      | 128     |
+>>   | 4                | 115      | 123     |
+>>   | 8                | 90       | 120     |
+>>   | 16               | 64       | 115     |
+>>   | 32               | 58       | 105     |
+>>   | 64               | 56       | 101     |
+>>   | 128              | 55       | 99      |
+>>   +------------------+----------+---------+
+>>
+>> Tests using XFS shows that buffered write speed with 8 jobs writing
+>> files increases by 12% to 35% depending on the workload.
+>>
+>>                      +--------------------+
+>>             |   Write BW (MB/s)  |
+>>   +------------------+----------+---------+
+>>   |     Workload     | Baseline | Patched |
+>>   |                  | 6.19-rc7 |         |
+>>   +------------------+----------+---------+
+>>   | 256MiB file size | 212      | 238     |
+>>   +------------------+----------+---------+
+>>   | 4MiB .. 128 MiB  | 213      | 243     |
+>>   | random file size |          |         |
+>>   +------------------+----------+---------+
+>>   | 2MiB .. 8 MiB    | 179      | 242     |
+>>   | random file size |          |         |
+>>   +------------------+----------+---------+
+>>
+>> Performance gains are even more significant when using an HBA that
+>> limits the maximum size of commands to a small value, e.g. HBAs
+>> controlled with the mpi3mr driver limit commands to a maximum of 1 MiB.
+>> In such case, the write throughput gains are over 40%.
+>>
+>>                      +--------------------+
+>>             |   Write BW (MB/s)  |
+>>   +------------------+----------+---------+
+>>   |     Workload     | Baseline | Patched |
+>>   |                  | 6.19-rc7 |         |
+>>   +------------------+----------+---------+
+>>   | 256MiB file size | 175      | 245     |
+>>   +------------------+----------+---------+
+>>   | 4MiB .. 128 MiB  | 174      | 244     |
+>>   | random file size |          |         |
+>>   +------------------+----------+---------+
+>>   | 2MiB .. 8 MiB    | 171      | 243     |
+>>   | random file size |          |         |
+>>   +------------------+----------+---------+
+>>
+>> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+>> ---
+>>   block/blk-mq-debugfs.c |   1 +
+>>   block/blk-sysfs.c      |  35 ++++++++
+>>   block/blk-zoned.c      | 197 +++++++++++++++++++++++++++++++++++------
+>>   include/linux/blkdev.h |   8 ++
+>>   4 files changed, 215 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>> index 28167c9baa55..047ec887456b 100644
+>> --- a/block/blk-mq-debugfs.c
+>> +++ b/block/blk-mq-debugfs.c
+>> @@ -97,6 +97,7 @@ static const char *const blk_queue_flag_name[] = {
+>>       QUEUE_FLAG_NAME(NO_ELV_SWITCH),
+>>       QUEUE_FLAG_NAME(QOS_ENABLED),
+>>       QUEUE_FLAG_NAME(BIO_ISSUE_TIME),
+>> +    QUEUE_FLAG_NAME(ZONED_QD1_WRITES),
+>>   };
+>>   #undef QUEUE_FLAG_NAME
+>>   diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+>> index f3b1968c80ce..789802286d95 100644
+>> --- a/block/blk-sysfs.c
+>> +++ b/block/blk-sysfs.c
+>> @@ -384,6 +384,39 @@ static ssize_t queue_nr_zones_show(struct gendisk *disk,
+>> char *page)
+>>       return queue_var_show(disk_nr_zones(disk), page);
+>>   }
+>>   +static ssize_t queue_zoned_qd1_writes_show(struct gendisk *disk, char *page)
+>> +{
+>> +    return queue_var_show(!!blk_queue_zoned_qd1_writes(disk->queue),
+>> +                  page);
+>> +}
+>> +
+>> +static ssize_t queue_zoned_qd1_writes_store(struct gendisk *disk,
+>> +                        const char *page, size_t count)
+>> +{
+>> +    struct request_queue *q = disk->queue;
+>> +    unsigned long qd1_writes;
+>> +    unsigned int memflags;
+>> +    ssize_t ret;
+>> +
+>> +    if (!blk_queue_is_zoned(q))
+>> +        return -EOPNOTSUPP;
+>> +
+>> +    ret = queue_var_store(&qd1_writes, page, count);
+>> +    if (ret < 0)
+>> +        return ret;
+>> +
+>> +    memflags = blk_mq_freeze_queue(q);
+>> +    blk_mq_quiesce_queue(q);
+>> +    if (qd1_writes)
+>> +        blk_queue_flag_set(QUEUE_FLAG_ZONED_QD1_WRITES, q);
+>> +    else
+>> +        blk_queue_flag_clear(QUEUE_FLAG_ZONED_QD1_WRITES, q);
+>> +    blk_mq_unquiesce_queue(q);
+>> +    blk_mq_unfreeze_queue(q, memflags);
+>> +
+>> +    return count;
+>> +}
+>> +
+>>   static ssize_t queue_iostats_passthrough_show(struct gendisk *disk, char
+>> *page)
+>>   {
+>>       return queue_var_show(!!blk_queue_passthrough_stat(disk->queue), page);
+>> @@ -611,6 +644,7 @@ QUEUE_LIM_RO_ENTRY(queue_max_zone_append_sectors,
+>> "zone_append_max_bytes");
+>>   QUEUE_LIM_RO_ENTRY(queue_zone_write_granularity, "zone_write_granularity");
+>>     QUEUE_LIM_RO_ENTRY(queue_zoned, "zoned");
+>> +QUEUE_RW_ENTRY(queue_zoned_qd1_writes, "zoned_qd1_writes");
+>>   QUEUE_RO_ENTRY(queue_nr_zones, "nr_zones");
+>>   QUEUE_LIM_RO_ENTRY(queue_max_open_zones, "max_open_zones");
+>>   QUEUE_LIM_RO_ENTRY(queue_max_active_zones, "max_active_zones");
+>> @@ -748,6 +782,7 @@ static struct attribute *queue_attrs[] = {
+>>       &queue_nomerges_entry.attr,
+>>       &queue_poll_entry.attr,
+>>       &queue_poll_delay_entry.attr,
+>> +    &queue_zoned_qd1_writes_entry.attr,
+>>         NULL,
+>>   };
 > 
-> A correction to the above: three threads are required before it becomes
-> possible for the zwplug reference count to drop from 3 to zero without
-> disk_should_remove_zone_wplug() having been called.
+> Can't you plug it into the 'queue_attr_visible()' function, too,
+> such that it doesn't even show up for non-zoned drives?
+> (After all, it's not that you can change between zoned and
+> non-zoned drives.)
+> (One hopes :-)
 
-I do not see how your example is possible... If refcount read are form the BIO
-work context, we only have one per zone, so there is not such concurrency.
-The additional contexts can be from zone reset or zone finish, but these
-unconditionally call disk_should_remove_zone_wplug(), so there is no such race.
+Good point. Will look into that.
 
-> 
-> Thanks,
-> 
-> Bart.
+> And I really had hoped that we wouldn't need to introduce new
+> kthreads, rather that workqueue are the new kthreads.
+> Any reasoning why you couldn't use workqueues here?
 
+I can use a single work item instead of a kthread. I had that initially, but
+the code ended up cleaner with the kthread. I can try again with the work item
+if you insist...
 
 -- 
 Damien Le Moal
