@@ -1,110 +1,146 @@
-Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A75839C625;
-	Tue, 24 Feb 2026 13:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C502436BCDC
+	for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 13:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771940256; cv=none; b=UxDxzIdItQaPokqyDCIq+yXcmbAq+yuhgfywz5Xx4CYib3w9VfZCuBbE5Muk9JFN+2xLU/kiNECcKQd7qBlP3YVdZs1h33vHuE1q05y9VgbsVfEU9ww5C1wCv8JCkcRQ7+EGalqKj75ECzGZ272NhIspXJBbMUWO6BMjmyMussU=
+	t=1771940925; cv=none; b=CccJm0a9viPKDuh6Uca1ahDRO6/0U0MYTJCA2OlLmethN9PwNNNiA5r5EyOyMX7vqKaYCgQHUFiROFc8Kl973CnwELFDAb7UIoxsx+wkjL6UR9SyQWvfg4bJ3d4cNblNCOHg614u7wkgGgThAUjflnDW9hOfdLU8d+2K6f1xTKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771940256; c=relaxed/simple;
-	bh=N+y9fema4fxMIXCGy9yuAezozfWEywSX0IbLhPWbQXk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RaW2SjJiLYJlmEbnrskF1Ml0wacLf0prF/WOOsXhIx7uhSbCdDn0tVq6ekCGiFMWNFBMMp7Qnh2DvtmybTTXtj5UH5bwzWektkxPD7MI6Hg0+5/u9ECxCYlSpKewWUBA6ZBrB2LMInMbUVFifibhZTtxHiLYkgksjDTOvL9ctEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=NGlk9KXQ; arc=none smtp.client-ip=198.37.111.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1771940925; c=relaxed/simple;
+	bh=EFzZrlZ2A8XJECXkGSOPGAYLDNQ9+SHBQIYlc/V/zf8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gGX2QjVBjKmDcrbFeP9KSTUOXyzO2GhvYfOPTC+NFar3/9g3iWwG2zurcA/Oe/Ym4RBSakT+JMB1bQ8PDOz3/uVjaVjxy+MIAmTt0KEcuU9+mwX2eoIPSOowg2fm1YvtIcbKIRwVnwOIFhKbUVYJTz3NjHCqHl7o1bmH1+jeOy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzhlVvoJ; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="NGlk9KXQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1771940252;
-	bh=N+y9fema4fxMIXCGy9yuAezozfWEywSX0IbLhPWbQXk=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=NGlk9KXQNPaoBvbjaF6D5At679PxdxNFUxH7x9mNGOShwMMH8lmGNd1cOx20OC7Ob
-	 08ABzVn8Fb4pPl+yaBi6SgsLuCcJgcK0O6QQz9O7BTly4IE47dMUasgXnBXxa1jIUJ
-	 IjUSIe2pGLbSTOuEkRPpsvBUMgk2icZB57FiKIrk=
-Received: from [IPv6:2601:5c4:4300:d341::a774] (unknown [IPv6:2601:5c4:4300:d341::a774])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 8BB401C033A;
-	Tue, 24 Feb 2026 08:37:32 -0500 (EST)
-Message-ID: <72f731b8153106fd32ee991da10f847a3a8d768a.camel@HansenPartnership.com>
-Subject: Re: LSF/MM/BPF: 2026: Call for Proposals
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, 
- linux-mm@kvack.org, linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-  linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
- bpf@vger.kernel.org,  lwn@lwn.net
-Cc: lsf-pc@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Date: Tue, 24 Feb 2026 08:37:31 -0500
-In-Reply-To: <20260224-sangen-aufatmen-06ba16719f33@brauner>
-References: <20260110-lsfmm-2026-cfp-ae970765d60e@brauner>
-	 <20260119-bagger-desaster-e11c27458c49@brauner>
-	 <20260129-beidseitig-unwohl-9ae543e9f9f5@brauner>
-	 <20260216-ruhelosigkeit-umlegen-548e2a107686@brauner>
-	 <20260224-sangen-aufatmen-06ba16719f33@brauner>
-Autocrypt: addr=James.Bottomley@HansenPartnership.com;
- prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzhlVvoJ"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4362507f396so5264885f8f.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 05:48:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1771940922; x=1772545722; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7doier/S6v57RTdBt1iVFnJdNLGw+lPl8KUgoSr5lVI=;
+        b=EzhlVvoJr68dAV5eekTaSL5I86uAnH6oyagDe5AP2ZpWWis8KUIfu96ACoUQBUndoY
+         2t6LuK6r0q2I80l0BY5oB9y3kuMH/c0B5L2yQbvVZEF7QWlp8sh6sQzLudZMg7k6CIiv
+         bPPDABKEF4psEliEtsMnQb5vs9KH4B329JhIQrd05opQyH1Wpdp2wLRDDfeas+2H2W+H
+         ZZxi7K6ayigCHchi2bZtZDc3LFiLgnQV9pfvWApPq3MKE4dRVBn2z0qS6+IRDq05Yw5a
+         aj3gBTQ5CEZDHU8aK07nf4kfSiih7RHd77/yVDBuAUKJH90z6aD6grqmrf5KDuauRpF/
+         FefQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771940922; x=1772545722;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7doier/S6v57RTdBt1iVFnJdNLGw+lPl8KUgoSr5lVI=;
+        b=UJaS4iHDBwyEpx1hDYCOBPS3LYfvgQ6869EEveXHoI86V0x70BluK3tjdiR9DAP9+2
+         rhpRJT2nFRymDTVa6tv2QjLM0YQ7+whLUbE4wnk2MOnzISVWBxQFnBLe0FROjQpD4zEt
+         mH6iHFGt9ThutlL8KtyJYcmPkGgwVW1tpKqHousLcgarM/l4NEQgRI5DoLoPfydbpbdO
+         EmC/TXxeGkoBxDIczNakIbhg1RwddF30ROPsQhvhne+7RFz4zF/LosRhAr/+HUUOiZ93
+         NFmue27lO8Z0r7fB/yoHuvRLAQHEumbGsq1CBk+dFBArkQukDZED87nEbKAxunp7JXdX
+         Mo2Q==
+X-Gm-Message-State: AOJu0Yw1BAo8S4IAX/TeOepanvm+tdNtxayPHaRpeqIBAxGOrODi66fl
+	OCYmZHEfZorXjfVaFy2GOIq1Q43xmIf3E24ur43pX3d9efZFztp6dUYs
+X-Gm-Gg: ATEYQzzGZCzvzyssgyBa2/1r1x2s7rLIfWDnRus9WWJ215UoCUyGm2MeExYcl1+itOp
+	WujOYhplFR0OI3KOa7NkF8YEK9xFgwZuK0tWwnqVoklnfszuMtcFgduxSDJvZFaL7mV6uuPSV1l
+	QMfx/85u4huNiyuvzeF/yDi/fruPwaeaG+oqqON0icH5mWYAFIJS/+8iDWmTQW9xyIg5hSZ8nBH
+	j4n0N6u+ijuWqptV9b+OTRE19xnfFSabnJb8djvThsns38BNct3q9ARFSUOrwzp/KxpRmTjkyUR
+	0yQ4l/KPj6i4FCa6LEiEADr2ngwaM/Irzl/TitDrZVcbmTfR+krUx/aLSwg1UMx3ngSAPXIV72Z
+	+8t06+buUXASOVC+EIo6orkuiP/YW/Y9R5F8Id4NrOBL/ZZI7cdlATbjCm4gwmZl2e0JLUrg32v
+	+SdzdkTLPRNx2skx1UZ9AJ0yOnQXHbnPp1fWSIFemBqYMYyLzt6keOHjg7GCrZFWgIBegMzvk8z
+	9/l60fLcHcPtma960JPYi6R6n9kC+Xv2a2Tw3zEM9AiaOoqOQ1QRLmhQhdJkl9tEUWoY+rjDrqL
+	Bw==
+X-Received: by 2002:a5d:5d84:0:b0:437:69c0:9612 with SMTP id ffacd0b85a97d-4396f15af1dmr21713147f8f.13.1771940921895;
+        Tue, 24 Feb 2026 05:48:41 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43970d3fc12sm24786376f8f.24.2026.02.24.05.48.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Feb 2026 05:48:41 -0800 (PST)
+Message-ID: <b091a8ae-4767-4ca4-a1b2-09cb525c4ff9@gmail.com>
+Date: Tue, 24 Feb 2026 13:48:39 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] dmabuf backed read/write
+To: "T.J. Mercier" <tjmercier@google.com>
+Cc: linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "Gohad, Tushar" <tushar.gohad@intel.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
+References: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
+ <CABdmKX2+OiqobQKf5G0ABiTeW5oqXS0p1dH7wRe2H7Gwdroi0g@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CABdmKX2+OiqobQKf5G0ABiTeW5oqXS0p1dH7wRe2H7Gwdroi0g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2026-02-24 at 10:53 +0100, Christian Brauner wrote:
-> > Don't forget to pester^wask^wremind your respective organizations
-> > to sponsor LSF/MM/BPF 2026! If it helps, you can tell them that
-> > we're considering renaming it LSF/MM/BPF/AI.
->=20
-> I have just looked at the sponsorship site for LSF/MM/BPF/AI again
-> and we all really need to go out and go steal some of that AI funding
-> money and funnel it into one of the conferences that really drives
-> development of the operating system that drives the compute for all
-> of this.
->=20
-> Please go and remind your organizations to sponsor. They should know
-> how to get in touch with the Linux Foundation. Just going by the
-> sponsorship page we're missing a bunch of large organizations that we
-> would appreciate if they decided to pitch in. :)
+On 2/24/26 00:13, T.J. Mercier wrote:
+> On Tue, Feb 3, 2026 at 6:29 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> Good day everyone,
+>>
+>> dma-buf is a powerful abstraction for managing buffers and DMA mappings,
+>> and there is growing interest in extending it to the read/write path to
+>> enable device-to-device transfers without bouncing data through system
+>> memory. I was encouraged to submit it to LSF/MM/BPF as that might be
+>> useful to mull over details and what capabilities and features people
+>> may need.
+>>
+>> The proposal consists of two parts. The first is a small in-kernel
+>> framework that allows a dma-buf to be registered against a given file
+>> and returns an object representing a DMA mapping. The actual mapping
+>> creation is delegated to the target subsystem (e.g. NVMe). This
+>> abstraction centralises request accounting, mapping management, dynamic
+>> recreation, etc. The resulting mapping object is passed through the I/O
+>> stack via a new iov_iter type.
+>>
+>> As for the user API, a dma-buf is installed as an io_uring registered
+>> buffer for a specific file. Once registered, the buffer can be used by
+>> read / write io_uring requests as normal. io_uring will enforce that the
+>> buffer is only used with "compatible files", which is for now restricted
+>> to the target registration file, but will be expanded in the future.
+>> Notably, io_uring is a consumer of the framework rather than a
+>> dependency, and the infrastructure can be reused.
+>>
+>> It took a couple of iterations on the list to get it to the current
+>> design, v2 of the series can be looked up at [1], which implements the
+>> infrastructure and initial wiring for NVMe. It slightly diverges from
+>> the description above, as some of the framework bits are block specific,
+>> and I'll be working on refining that and simplifying some of the
+>> interfaces for v3. A good chunk of block handling is based on prior work
+>> from Keith that was pre DMA mapping buffers [2].
+>>
+>> Tushar was helping and mention he got good numbers for P2P transfers
+>> compared to bouncing it via RAM. Anuj, Kanchan and Nitesh also
+>> previously reported encouraging results for system memory backed
+>> dma-buf for optimising IOMMU overhead, quoting Anuj:
+>>
+>> - STRICT: before = 570 KIOPS, after = 5.01 MIOPS
+>> - LAZY: before = 1.93 MIOPS, after = 5.01 MIOPS
+>> - PASSTHROUGH: before = 5.01 MIOPS, after = 5.01 MIOPS
+>>
+>> [1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gmail.com/
+>> [2] https://lore.kernel.org/io-uring/20220805162444.3985535-1-kbusch@fb.com/
+>> --
+>> Pavel Begunkov
+>>
+> 
+> Hi, I'm interested in this topic. I'm guessing this will be in the FS track?
 
-Just on this point, at least for Linux Plumbers Conference, we've found
-that increasingly OSPOs (which usually hold the LF contacts) are
-aligned with Marketing organizations and don't see as much value in
-sponsoring pure engineering events (like LSF and LPC).  We've thus
-started getting our money from the Engineering organizations themselves
-(where you are all better placed to wield influence).  To convince your
-engineering management chain (who may never have done this before) you
-need to articulate the value (it's the place where Linux features
-you're working on get presented, discussed and decided so a good
-showing by your engineers can drastically shorten the time to
-acceptance of something, or actually set direction better than a
-mailing list discussion, which provides more roadmap certainty for VPs)
-and provide the details, so the sponsor prospectus is here:
+Forgot to mention, I submitted it to the storage track, thanks
 
-http://events.linuxfoundation.org/sponsor-lsfmm-bp-f26
-
-You have to go high enough in your organization to find someone with an
-actual budget, which can be a bit daunting, so if you need outside
-help, the PC (lsf-pc@lists.linuxfoundation.org) will be able to help
-articulate the value once you've found the person to convince.
-
-If you manage to convince them to sponsor, the address to request a
-contract and a PO is
-
-sponsorships@linuxfoundation.org
-
-Regards,
-
-James
+-- 
+Pavel Begunkov
 
