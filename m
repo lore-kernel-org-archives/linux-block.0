@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BEA37BE83;
-	Tue, 24 Feb 2026 11:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C5F37B3F1;
+	Tue, 24 Feb 2026 11:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771931990; cv=none; b=P5RoDRMoTv3DjTA/e5CaDwwHSol7MuvHZ8IuTafApLWu/wAPqLr9YhGC0ZgT9czsvHbhJngj4GiChMFCqu7uZyH4N9IgR7q6zHUCeuYsIKhbnL8W18nkXsKiFqd/fbuMGZrXZfuVUjQNiGWEUXF2/i31pzrqH1DX/GQrAgILNuQ=
+	t=1771932000; cv=none; b=LiS3yTA435sRCp8M4ggbR4sE1VH/X0WtrtYNDAph/Xoo1HXwTs4WHQ5O8204P/e0jmT8CysindzEp4492WIqs+yWIt9OWZvCAt6/NT7KFL2Ux68t+wh7IUfJLKm+PbHwdUwJxUMU0yfKn1EP4lIbA1C6Yfsr8hhrscH/GM7gE7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771931990; c=relaxed/simple;
-	bh=ZXVxYHlu0zHczyQ9RV4gzKJTzAnDzspoUnWv3esNFwE=;
+	s=arc-20240116; t=1771932000; c=relaxed/simple;
+	bh=Cv+ro0rgKKTNndu1LXkpKQFAsbhVDrLwsjlr+g88uog=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X4uwGX8PrsSagcSxu+BHaiCmyAlb8MKNMHpDn2PDFblxeTGogxhGpC0FvL9x3Bva9G9mvABwZa8aiZ97ZiRqID0bsyYxDywHrnBAp+nY9BRg/riJYp70KU9/V3l6wOsJJdFfyk4XL5q8MADu/Mb4BTiEdkZFSY3CkATlMmFrtqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dDpqaaZj; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=IuS8V5LqCf3GOYBfBY8xfJHt9i3AP5wMH/xSK8FVMEHzoxIUuLUvSOkMst72+P+tZu7yv2tEHZOpK0fMeEXFPDBL0eumg/5VJLcVqx049uZX3R31n9cTWLtW7rdbU38tRkQ8mfszAGEGKI7Zlr/zr4LHhCy5IXxgb3Spf3WRa8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HdqzLYlm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dDpqaaZj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71FE0C116D0;
-	Tue, 24 Feb 2026 11:19:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HdqzLYlm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58D8BC116D0;
+	Tue, 24 Feb 2026 11:19:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771931989;
-	bh=ZXVxYHlu0zHczyQ9RV4gzKJTzAnDzspoUnWv3esNFwE=;
+	s=k20201202; t=1771931999;
+	bh=Cv+ro0rgKKTNndu1LXkpKQFAsbhVDrLwsjlr+g88uog=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=dDpqaaZjsrKAAuBigQMTjSHyxPwyewaJ+Kh431pzCvN3W/5M0RWV/9LsDjrc8NJAn
-	 ji8U2nnjIczOlsmv9Cc8A8/xV2GqUP5ESuXy4HSP6AgQdIH6Q8oYe45W47lN8bPXWy
-	 dYy9O/c+OBIQAmB31y7RS0nduullT7ZOft6gWwXrfyBcNTM1LXOndDBQcMGZdltFCt
-	 kblbrFJuhKDqAQxsaH0YxOn7BGEr/kRvVDvQlDVo5VToqaNaIw5A9B4B2yN5sWcz62
-	 jzbZSa9w5/3bCsNch90KohlPX2hcU2oWOPDfWIc7OQeB8SrVG8zCEdClApUuvgU7+4
-	 MhoQkxKQ68UDg==
+	b=HdqzLYlmRb3TVe2hLfyaAeT0QbXfs78M3TRb3E0NDn89wwEK4fRY5WmX/jrbvQDL1
+	 5efYY+T10vBU1kIR5uTfVO3tiDrUgzG3MA9Lrwtrwz4HKPEbbPB8bDxQMstX90wLNe
+	 7/caSsxNgBpZvhZeSictKOSRKfaRaTFAzeDwXGE31oo+tEmVF9c+kKOlzDasQD/O/g
+	 Df5fKMfSAXTsGZ4+ZBGt1VgcrMx5lTp1WYHN1ovyzgjrqrFdWR6h/nW9T9Pwkz4Uzs
+	 +Ypjx0M41BhOmxFpplST2zMxs7sA+EpkwwuD0XjHB8jvF8sgOKiS/IjVU2yAdOvgPp
+	 l2F1QjiQtEcHA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 24 Feb 2026 12:18:04 +0100
-Subject: [PATCH v16 09/10] rust: implement `ForeignOwnable` for `Owned`
+Date: Tue, 24 Feb 2026 12:18:00 +0100
+Subject: [PATCH v16 05/10] rust: aref: update formatting of use statements
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260224-unique-ref-v16-9-c21afcb118d3@kernel.org>
+Message-Id: <20260224-unique-ref-v16-5-c21afcb118d3@kernel.org>
 References: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
 In-Reply-To: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
@@ -66,103 +66,47 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2791; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=ZXVxYHlu0zHczyQ9RV4gzKJTzAnDzspoUnWv3esNFwE=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpnYj7ybE9TfHosMN/v3D3om/fVXrbbm9j9l/ed
- /oqHH++SfWJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZ2I+wAKCRDhuBo+eShj
- dyh4D/4seiQJBYM348GadM5XGPLQ2AkZegX5kl5/dCXU3YauTHjS275rRpJntm2vV2eW/wX4Fz6
- I1vb5+83Hx2A47fK+9mEi/LG+DaNNVI0qsjDismLwy7V7Yf6z5qVr3Ds6gcMrdJ0hFGGOnMZXks
- j7xsnNXbvg1HgxnWNbz9QmWQyFXDdI/FPHe09R9WUkuszYtFJ6qlaZQdDQ+pvsCqN4xFC7UsKWu
- sQl1MmCT3Q+1hIHi3ZRrSJGt2CGuXKmrozMQmciIRuPtoMfLbKAz7lkc1alwqFtIaRuVnS68GS4
- dggi4hKlQl8QBTRR4CJQbohp5P/tZtnyBtAmFfLuCUJUBcZmoXKlflQTZiLJlrcdqOlWvIdx8y1
- gkz87chPU0yBGd4aT6TQJZDZzBWa0fGffmvzrdVSUyHT9YreCKsvCEke4GTJArXO7EuthJtMBbC
- Vs6Aysbti08nBgBd4lvF2FhwN5A8dMJprHs3joAecEV7pDVW2w4lEwJ+1prv8vz9B1E+2z8BGwC
- V+7yKZGJYnbUBKB47yqVr1MB1+6MqPRX/7WGPTuKF8MYcKTweCSf8OEgYbXPnA3yzm4VM9iQzGO
- PQXZTqVa3Oj1y5UELjmLwoh6RupeHLk7qDU84qKlFWCv66hFoQvwVTVJ1U8574/2NN/ArwwjTyv
- BK4RQHMK0lR4VdA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=753; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=Cv+ro0rgKKTNndu1LXkpKQFAsbhVDrLwsjlr+g88uog=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpnYj3SgJinL4mzNCGJB/VLOiKjYIotpZTAeQ5d
+ eiujQ/x9mmJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZ2I9wAKCRDhuBo+eShj
+ d3ysD/0XSb30S75V7XwmTKiRWjUL3YRT0n+cqNFGirejC2hDTAlc45ifHqn5BqDHPpxlN4259sn
+ JL858hlbzJzoatv7LAvF11urCZjNWN6J+hdE6QOW4BHuyJ2yLNgGV676GOzDcToOmfPOKBOgNav
+ tClWhpadwI3oyrs+v8v+kuwlOCEl+P2GCkpjQ6T8UsDk36ZDMF37vBtR1JG1J/hUUx0ZWQzewXq
+ rUs0v6+QsxeaIe0GKCi4tT5p7avyJU1e7T0WAorLYzLb4jidXod3lnSQxQqZosDciGhCkn2iUpf
+ Kp2xH+AWuSEyVLUdMOUp6pAc4hS3QfB05dKeQCbTXd7XTaF98QhLuW9F1R1JDwk5lzrl/n6ifHW
+ a4iHIRVLfU6EleuG6f5MBh8/SKyj+faoS9mKgJbkfoD4kW8Hr8YRBrKrsFqsDE/2lKCzUudOupA
+ oFpnOowIQqCm7iXRyVGnIxaKDMd+HqJ6KhuH1QJDojEgMZsLHZrpLcQYKAETyk0MOR2xhCmSmpN
+ OMxoqfGwnO8Xwzk7fNHWAXezkISwJ6wFPmkG4Wb2vz6E0QPkHEtAjA6pNZwjtmarcSBnlX3axhb
+ h1srotfFPhfGHOeu86lBShAiJD4EDSb9IoWPjgEh4imYv7anzzgS1wA5qJtX6rSLm9DxpJHzFfy
+ Pqz7QVN5g1wyAIA==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Implement `ForeignOwnable` for `Owned<T>`. This allows use of `Owned<T>` in
-places such as the `XArray`.
-
-Note that `T` does not need to implement `ForeignOwnable` for `Owned<T>` to
-implement `ForeignOwnable`.
+Update formatting if use statements in preparation for next commit.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/owned.rs | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ rust/kernel/sync/aref.rs | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
-index c81c2ea88124b..505ac2200d2d6 100644
---- a/rust/kernel/owned.rs
-+++ b/rust/kernel/owned.rs
-@@ -16,7 +16,10 @@
- };
- use kernel::{
-     sync::aref::ARef,
--    types::RefCounted, //
-+    types::{
-+        ForeignOwnable, //
-+        RefCounted,
-+    }, //
- };
+diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
+index 76deab0cb225e..8c23662a7e6a1 100644
+--- a/rust/kernel/sync/aref.rs
++++ b/rust/kernel/sync/aref.rs
+@@ -17,7 +17,12 @@
+ //! [`Arc`]: crate::sync::Arc
+ //! [`Arc<T>`]: crate::sync::Arc
  
- /// Types that specify their own way of performing allocation and destruction. Typically, this trait
-@@ -114,6 +117,7 @@ pub trait Ownable {
- ///
- /// - Until `T::release` is called, this `Owned<T>` exclusively owns the underlying `T`.
- /// - The `T` value is pinned.
-+#[repr(transparent)]
- pub struct Owned<T: Ownable> {
-     ptr: NonNull<T>,
- }
-@@ -186,6 +190,45 @@ fn drop(&mut self) {
-     }
- }
+-use core::{marker::PhantomData, mem::ManuallyDrop, ops::Deref, ptr::NonNull};
++use core::{
++    marker::PhantomData,
++    mem::ManuallyDrop,
++    ops::Deref,
++    ptr::NonNull, //
++};
  
-+// SAFETY: We derive the pointer to `T` from a valid `T`, so the returned
-+// pointer satisfy alignment requirements of `T`.
-+unsafe impl<T: Ownable + 'static> ForeignOwnable for Owned<T> {
-+    const FOREIGN_ALIGN: usize = core::mem::align_of::<Owned<T>>();
-+
-+    type Borrowed<'a> = &'a T;
-+    type BorrowedMut<'a> = Pin<&'a mut T>;
-+
-+    fn into_foreign(self) -> *mut kernel::ffi::c_void {
-+        let ptr = self.ptr.as_ptr().cast();
-+        core::mem::forget(self);
-+        ptr
-+    }
-+
-+    unsafe fn from_foreign(ptr: *mut kernel::ffi::c_void) -> Self {
-+        Self {
-+            // SAFETY: By function safety contract, `ptr` came from
-+            // `into_foreign` and cannot be null.
-+            ptr: unsafe { NonNull::new_unchecked(ptr.cast()) },
-+        }
-+    }
-+
-+    unsafe fn borrow<'a>(ptr: *mut kernel::ffi::c_void) -> Self::Borrowed<'a> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as a
-+        // reference for `'a`.
-+        unsafe { &*ptr.cast() }
-+    }
-+
-+    unsafe fn borrow_mut<'a>(ptr: *mut kernel::ffi::c_void) -> Self::BorrowedMut<'a> {
-+        // SAFETY: By function safety requirements, `ptr` is valid for use as a
-+        // unique reference for `'a`.
-+        let inner = unsafe { &mut *ptr.cast() };
-+
-+        // SAFETY: We never move out of inner, and we do not hand out mutable
-+        // references when `T: !Unpin`.
-+        unsafe { Pin::new_unchecked(inner) }
-+    }
-+}
-+
- /// A trait for objects that can be wrapped in either one of the reference types [`Owned`] and
- /// [`ARef`].
+ /// Types that are internally reference counted.
  ///
 
 -- 
