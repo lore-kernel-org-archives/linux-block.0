@@ -1,215 +1,129 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE18D77F39
-	for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 11:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCC737BE83;
+	Tue, 24 Feb 2026 11:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771931113; cv=none; b=l3FqCllB7TliQvh8auQXv49hJZqXp70XZWflRZNBdsoU4h8Tu8Qox3IxibZ0GSJ18PDz6oMuoLs46WVVTIMlDKBsoMHwvvloAXKv/2iFKJKJTqZgx/GRchGsVRPnV7ndaYHcsgTCM7jfzsBDNhtx+qQ7HgJiAAGtAeVqTAvaNlE=
+	t=1771931941; cv=none; b=t5o8OaIDKMXLEBCMp1wNSkRy6kzU11k4Xg8hL8gpeYAlowMjfmfk1DZYiA6RsFiHrBkgTj8Ly4AANeKNG77YKQ0kes2CjNdrz2vIqNEEHZjQHiOsVAWDSQ1lGihpO0uZ8IpxThapQ3BaP34iN07CZMtbU2AMBMDA4Gxu6Op3H3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771931113; c=relaxed/simple;
-	bh=CMYLu/FjXNePvswjTTR/FOd8oi5kP5ug7ib3Z9f5GdA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OoA7gX9oAvsapXheIicrDE1JLSkB85du/O95M4LvcNAkJXvND8YfPCm3bfDIEwTYeHFkdsX4DV6wX4QWEHjUlQnp7GSZI/70LEDwLugqEpqTnO0vndJ8C/C0noIBUfhZvokDsOPnYoiXnrlAY6gU/dxrvbBOFaNMsgxl/UNtO2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gV8P0D9o; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1771931941; c=relaxed/simple;
+	bh=TzCUGpEDUTKD6tcoKokHDlQAGVLw4XXksTwjbV99rHQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=SC4xSsnQLuZhNraIQxkolHaQLFuNCzjK462fNet7Fck8P6tBY6Q9uOzOh26IlOss5jBtGbI7O3n0/LXCdDiPVS9m/FXSQKMveSuggMofcN1kOdq/qtC8os+11cmG0O1Y9cbMIi9vlewaJdWJBpetGnDvPu4UxkCF30y8ndgfPsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOu8qMmm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gV8P0D9o"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771931111;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y/eoOPnI20jSHQXZytKyjy7pUBnJnTQhijpG/jpqSmo=;
-	b=gV8P0D9ox2JRVvC8gGgrJYFy5ZAJ7wDfsIQI6xVBh/msSYiXpxMURr6p3fa1MP3qbutNqK
-	6yxwwA4sx02wGrxjdmb0yDLNAj38Tri+hR/bLOkk6fZRlGqap2yQebANjCWJgX6qRxMJw0
-	j7IFuZIlrOUsQVOUWakAoGr2LhPVDaM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-13-Arll-6kWMgOf0691QT5ziw-1; Tue,
- 24 Feb 2026 06:05:09 -0500
-X-MC-Unique: Arll-6kWMgOf0691QT5ziw-1
-X-Mimecast-MFC-AGG-ID: Arll-6kWMgOf0691QT5ziw_1771931108
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E535B195605C;
-	Tue, 24 Feb 2026 11:05:07 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.18])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C000D19560A2;
-	Tue, 24 Feb 2026 11:05:04 +0000 (UTC)
-Date: Tue, 24 Feb 2026 19:04:59 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Alexander Atanasov <alex@zazolabs.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/4] ublk: cleanup flag handling and fix
- UBLK_F_NO_AUTO_PART_SCAN
-Message-ID: <aZ2F24VQcnFOySji@fedora>
-References: <20260223121515.3296983-1-alex@zazolabs.com>
- <20260223121515.3296983-2-alex@zazolabs.com>
- <aZ1wrIbONgxopbIa@fedora>
- <182C75BB-3CBC-4627-9F15-AE8FE675260C@zazolabs.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOu8qMmm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB733C116D0;
+	Tue, 24 Feb 2026 11:18:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771931941;
+	bh=TzCUGpEDUTKD6tcoKokHDlQAGVLw4XXksTwjbV99rHQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=MOu8qMmmrykyBB4CVhwqsAo8Gs8bS7U6AafB15auu2pLImpGtcvmUXOPslyfKs2el
+	 cA6Tgr0KiCNDlclglU7X5nBYMurMj/c4b5jgIPllHvoz8I5zv55L8nL/QYuioiqNz0
+	 bFHwNBCzqEwNzza99Dotcw3hy2WSMt1k4v0Nu1ObFnuzzPCJTaZJR09VKnQPVNu0Ie
+	 YiaCR0DXwqb5L1MTAH33VJOtane4KNMsI/15XTFxxb0XWg50vHeumHbafF+RW87C0o
+	 zS7G0Yc9SFTSe1i5chVbdD//SENR7XS47MSpwMtFs06smyoMu66VTyAuEoDPiztBuc
+	 FG8EIBIcIDBog==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Date: Tue, 24 Feb 2026 12:18:02 +0100
+Subject: [PATCH v16 07/10] rust: page: update formatting of `use`
+ statements
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <182C75BB-3CBC-4627-9F15-AE8FE675260C@zazolabs.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260224-unique-ref-v16-7-c21afcb118d3@kernel.org>
+References: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
+In-Reply-To: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
+To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
+ Serge Hallyn <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Igor Korotin <igor.korotin.linux@gmail.com>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+ Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, 
+ Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Boqun Feng <boqun@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
+ Uladzislau Rezki <urezki@gmail.com>, Boqun Feng <boqun@kernel.org>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
+ linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
+ Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=910; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=TzCUGpEDUTKD6tcoKokHDlQAGVLw4XXksTwjbV99rHQ=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpnYj5ytywbjKxCmfhmUDrIuCRIXch3CamTuuGv
+ j824oj6dJyJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZ2I+QAKCRDhuBo+eShj
+ d33LD/4tIWyZ+fNIywG0iGTvb2DorpPWbOHBNN9ywRijqdgN4kCYPMclfyWq5jb0IYw6fO5XvGS
+ n3w8ZMsfLfCWPUxLJdLXezRidEemIyeulj0g1sXIMUJtJCTE5KGLt1cF2TlmAqfIGDb1Hxva9+n
+ a17hvt6TxHT6vtxd6YhnJcIRECoOoIi6t163hqhNU+3Hy46/GrL+c+nTkA/ZlnfxLgaXP1+VGB7
+ I5d4mn9T5xF6HdI3RAI44jmR25J4E5AypWhSJtFg83rD1WbnwAcDa+Ow11Emd7UpvLdl7IYKorJ
+ VNJ5BCcmWvA7Uv5SbU6NqZ46lpaYD0303kqPl4SzHPc9ZgGpj1itJTcAZZg+7N11zMJ6N5UNtgL
+ 55lUMrNsD4c2ho5ywzGrZm+g8TjNVjqpCx+CcfiRj100RVyVJxpUoJsKKhElKn7CNCCvKJQk37C
+ ckI1Utyd486+FYBxr0xjySMGhSl+kuUkGVSs7o4WGXtaGlBup26dnSeAkV0hwb7PIJTnVEqhNG9
+ kkzffHhBC7rgSMVm/7JPpUvyMDnshDU2+oBO08eew7B5Exm7GXhrbIxkwxtnS8isIL6D8vMXvdR
+ 1M7UgSTMkNpZejv8PvjASBdsv1PFNoFB4h/GbJw5gpvV2ud0ebXXQu7h+wVO6KP4Jt9TmyvfoVj
+ JnTkk1uh31vgExw==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-On Tue, Feb 24, 2026 at 12:54:49PM +0200, Alexander Atanasov wrote:
-> 
-> 
-> > On 24 Feb 2026, at 11:34, Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > On Mon, Feb 23, 2026 at 12:15:11PM +0000, Alexander Atanasov wrote:
-> >> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
-> >> as it tries to use it as a switch for the auto partition scan.
-> >> To fully disable creation of partitions GENHD_FL_NO_PART must
-> >> be used, switch code to use it instead GD_SUPPRESS_PART_SCAN.
-> >> 
-> >> Using the new flags rules for partitions become:
-> >> - Unprivileged daemons - never scan partitions, they have
-> >> GENHD_FL_NO_PART always set - they are devices without partitions.
-> >> 
-> >> - Trusted daemons - by default have partitions disabled.
-> >> Partitions can be enabled via UBLK_F_PARTITIONS flag and
-> >> automatic initial scan can be requested via UBLK_F_AUTO_PART_SCAN flag.
-> >> 
-> >> Rework the code to work as described above:
-> >> - remove checks in ublk_partition_scan_work and rely on
-> >> the caller to schedule the work only if it has to be done.
-> >> - set GENHD_FL_NO_PART on unprivileged devices
-> >> - set GENHD_FL_NO_PART depending on UBLK_F_PARTITIONS on trusted
-> >> devices.
-> >> 
-> >> Fixes: 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
-> >> Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
-> >> ---
-> >> drivers/block/ublk_drv.c      | 34 +++++++++++++++++++---------------
-> >> include/uapi/linux/ublk_cmd.h |  7 +++++--
-> >> 2 files changed, 24 insertions(+), 17 deletions(-)
-> >> 
-> >> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> >> index 3c918db4905c..d0c646eb9435 100644
-> >> --- a/drivers/block/ublk_drv.c
-> >> +++ b/drivers/block/ublk_drv.c
-> >> @@ -81,7 +81,8 @@
-> >> 		| (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ? UBLK_F_INTEGRITY : 0) \
-> >> 		| UBLK_F_SAFE_STOP_DEV \
-> >> 		| UBLK_F_BATCH_IO \
-> >> -		| UBLK_F_NO_AUTO_PART_SCAN)
-> >> +		| UBLK_F_PARTITIONS \
-> >> +		| UBLK_F_AUTO_PART_SCAN)
-> >> 
-> >> #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
-> >> 		| UBLK_F_USER_RECOVERY_REISSUE \
-> >> @@ -2361,14 +2362,9 @@ static void ublk_partition_scan_work(struct work_struct *work)
-> >> 	if (!disk)
-> >> 		return;
-> >> 
-> >> -	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
-> >> -					     &disk->state)))
-> >> -		goto out;
-> >> -
-> >> 	mutex_lock(&disk->open_mutex);
-> >> 	bdev_disk_changed(disk, false);
-> >> 	mutex_unlock(&disk->open_mutex);
-> >> -out:
-> >> 	ublk_put_disk(disk);
-> >> }
-> >> 
-> >> @@ -4409,9 +4405,13 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
-> >> 	 * wait while holding ub->mutex, which can deadlock with other
-> >> 	 * operations that need the mutex. Defer partition scan to async
-> >> 	 * work.
-> >> -	 * For unprivileged daemons, keep GD_SUPPRESS_PART_SCAN set
-> >> -	 * permanently.
-> >> +	 * For unprivileged daemons, set GENHD_FL_NO_PART to
-> >> +	 * disable partitions.
-> >> 	 */
-> >> +	if (ub->unprivileged_daemons)
-> >> +		disk->flags |= GENHD_FL_NO_PART;
-> > 
-> > The above code block can cover UBLK_F_PARTITIONS too.
-> 
-> Yes, as Hannes noted. I will merge flag update fragments in one place where possible.
-> Only clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state); needs to be after add_disk(disk);
-> which will trigger partition scan that we want to do manually when ready.
-> 
-> 
-> >> +
-> >> +	/* Disable partition scans */
-> >> 	set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
-> >> 
-> >> 	ublk_get_device(ub);
-> >> @@ -4429,13 +4429,17 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
-> >> 
-> >> 	set_bit(UB_STATE_USED, &ub->state);
-> >> 
-> >> -	/* Skip partition scan if disabled by user */
-> >> -	if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
-> >> -		clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
-> >> -	} else {
-> >> -		/* Schedule async partition scan for trusted daemons */
-> >> -		if (!ub->unprivileged_daemons)
-> >> -			schedule_work(&ub->partition_scan_work);
-> >> +	if (!ub->unprivileged_daemons) {
-> >> +		if (!(ub->dev_info.flags & UBLK_F_PARTITIONS)) {
-> >> +			/* disable partitions on trusted device */
-> >> +			disk->flags |= GENHD_FL_NO_PART;
-> >> +		} else {
-> >> +			/* Enable partition scan on device */
-> >> +			clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
-> >> +			/* Schedule auto partition scan if requested */
-> >> +			if (ub->dev_info.flags & UBLK_F_AUTO_PART_SCAN)
-> >> +				schedule_work(&ub->partition_scan_work);
-> >> +		}
-> >> 	}
-> >> 
-> >> out_put_cdev:
-> >> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> >> index a88876756805..467ecaa20ac1 100644
-> >> --- a/include/uapi/linux/ublk_cmd.h
-> >> +++ b/include/uapi/linux/ublk_cmd.h
-> >> @@ -367,8 +367,11 @@
-> >>  */
-> >> #define UBLK_F_SAFE_STOP_DEV	(1ULL << 17)
-> >> 
-> >> -/* Disable automatic partition scanning when device is started */
-> >> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
-> >> +/* Enable partitions on the device */
-> >> +#define UBLK_F_PARTITIONS (1ULL << 18)
-> >> +
-> >> +/* Perform automatic partition scanning when device is started */
-> >> +#define UBLK_F_AUTO_PART_SCAN (1ULL << 19)
-> > 
-> > I think it isn't necessary to add UBLK_F_AUTO_PART_SCAN, and the default
-> > behavior is to scan partitions automatically just like other block device.
-> 
-> 
-> If we want by default to scan there should be  UBLK_F_NO_AUTO_PART_SCAN to disable
-> scanning when desired - are you ok with it?
+Update formatting in preparation for next patch
 
-I am fine with either way:
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+---
+ rust/kernel/page.rs | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-- keep UBLK_F_NO_AUTO_PART_SCAN as it is, which just disallow partition
-  scan during add disk; meantime add UBLK_F_NO_PART_SCAN, which disables part
-  scan permanently
+diff --git a/rust/kernel/page.rs b/rust/kernel/page.rs
+index 432fc0297d4a8..bf3bed7e2d3fe 100644
+--- a/rust/kernel/page.rs
++++ b/rust/kernel/page.rs
+@@ -3,17 +3,23 @@
+ //! Kernel page allocation and management.
+ 
+ use crate::{
+-    alloc::{AllocError, Flags},
++    alloc::{
++        AllocError,
++        Flags, //
++    },
+     bindings,
+     error::code::*,
+     error::Result,
+-    uaccess::UserSliceReader,
++    uaccess::UserSliceReader, //
+ };
+ use core::{
+     marker::PhantomData,
+     mem::ManuallyDrop,
+     ops::Deref,
+-    ptr::{self, NonNull},
++    ptr::{
++        self,
++        NonNull, //
++    }, //
+ };
+ 
+ /// A bitwise shift for the page size.
 
-- remove UBLK_F_NO_AUTO_PART_SCAN, as no one requires it, meantime add
-  UBLK_F_NO_PART_SCAN, which disables part scan permanently
+-- 
+2.51.2
 
-But looks Hannes prefers to the latter, which is cleaner from UAPI
-viewpoint.
-
-
-Thanks,
-Ming
 
