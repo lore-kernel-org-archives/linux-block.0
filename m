@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25104379974;
-	Tue, 24 Feb 2026 11:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA95E2D6E6F;
+	Tue, 24 Feb 2026 11:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771932034; cv=none; b=eIjYjEpJX8Guo5AmbS5O9/jnIkVJ5sdLq79wo/jNKFB9ccoyUKoTBtQle2SBXscenBr5qRghDLuBcnxIe4OAkZV1K8mOu/Uwt8+KnoOxQ8+0Ppa27dyiT1C/lGQ00n9n8+WmVnHNGS9qmzRb+/BRdHVyXSjC8J4F6ZjbhvCTrQ4=
+	t=1771932043; cv=none; b=Ct1P7UQa6ZPqeRNb0r6QYxcS4MWU2f9RodNsE/+Ku9+YIWM0vNuRcZb21BrLVwmgsiR+8DjUUAtnQ9xK3Le6q0C6y5AqdShfZscxFURMGXU4t2rS6Kj+AqTNT3A0nH75AH2PdIJ7zXGml0mxNfJyWNjRwTK+Xwwxtk7KUE1Ocd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771932034; c=relaxed/simple;
-	bh=8blkgRGad5yywyXctIGzlJVTqzYWum47B0ORZDHUOHs=;
+	s=arc-20240116; t=1771932043; c=relaxed/simple;
+	bh=jLcwJmCU6NuD58W2dvDRqr7xKpNKXDGKLW9pDqZ3mBg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VfceK/lxzDGwrbLaEmVZeolPzJjydbq8XUz9qJjO+DpoPZL3dN7R6CtvlvdYtVsFfTMLI1LDbMJuLA1/o/GZoAbWWD4yZqAxhdw3UxIlOnKGXT3Z+W1HnWe8JuymGwcdC825Xtl4rErCDlBQCDxZCU07h4PzNM76Vnks3NBTlNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diiRtWQG; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=COfBpdq5jhItWAO4F7BjY6RXEVp4L7Vs+AZnCEs4gA3PlKMgl+cllL2ZFwWicMGnj7oURi2DvI3aTunEE5D4hW5HTbd5WJPAUYGFDqBIGQYTrhg67HCtpYNJZo0/WtlRiKGFMBEG2TynKbj+v0es2tcKGhvQjLVwLCRoe2marg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FnD6iV9K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diiRtWQG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECCD5C116D0;
-	Tue, 24 Feb 2026 11:20:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FnD6iV9K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8595C2BC86;
+	Tue, 24 Feb 2026 11:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771932034;
-	bh=8blkgRGad5yywyXctIGzlJVTqzYWum47B0ORZDHUOHs=;
+	s=k20201202; t=1771932043;
+	bh=jLcwJmCU6NuD58W2dvDRqr7xKpNKXDGKLW9pDqZ3mBg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=diiRtWQGbNsdc0h1Enpi/pVNcSAaCWR19qvAIJoesAE0mu5EUaR8gi6E2meijCd3l
-	 97m65gcugi/MEpeLuoE/El+ebtQwyFcqdyp15jnsHJkkBIDPu1Kgk4LkUufqBenC1c
-	 UR3PJJ+hys5NdZ2nbMk43WX7u9weWHc2W4hh20fReiF4KkuRcqpf232RVYMMUpfBOT
-	 sufS5qXIN0A3yfDCqynIeneINu4gSc2NH6Xbl3ER2z7OAPwIkka8a27jugFup+0bRf
-	 MOW4Xg3d4YH05H0TJJ4S2hVRhnqjSVnOV3XT3525keF7NACqpz7ed4h4T18APxCRpI
-	 sB5T08oMsNdpQ==
+	b=FnD6iV9K9NZ7mJJSAL00XOjIPTg6UsieDGlm3jaXgSc4Rc9rMU8mCbbe0Ub0QU04s
+	 j+XA7mBrzuVEuqRfQI92KsNlua/cpKJgCXIE8vr6AZo0jhnoNhVLUoWlWaAfplH4CX
+	 T5sAiTOh3WoLzwRvaEg5Hlr+AzFOgVnxNtBg8DyOwJeF38TDShZKCUIt4HUXRybDpW
+	 R/l7zwbU3DLkv6fDnzGUcBYSBRH3Eu5wt2beNLcG/kisJ4dWaJfnvuLRpJeRdFTgfv
+	 ylStit7gCo0yNJCiejtjQZi34htmpdrmCKcOiapJ3ywb88WPPGD50uHtZIJnTb+Acb
+	 HTH87pF60sZqQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 24 Feb 2026 12:18:03 +0100
-Subject: [PATCH v16 08/10] rust: page: convert to `Ownable`
+Date: Tue, 24 Feb 2026 12:17:56 +0100
+Subject: [PATCH v16 01/10] rust: alloc: add `KBox::into_nonnull`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260224-unique-ref-v16-8-c21afcb118d3@kernel.org>
+Message-Id: <20260224-unique-ref-v16-1-c21afcb118d3@kernel.org>
 References: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
 In-Reply-To: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
@@ -64,139 +64,53 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
  dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
  linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
- Andreas Hindborg <a.hindborg@kernel.org>, 
- Asahi Lina <lina+kernel@asahilina.net>, 
- Asahi Lina <lina+kernel@asahilina.net>
+ Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4409; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=7QArePJ/pjN7cnWoG0Oe4tA+Fg7KV4ZTWL57uMIfL+M=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpnYj6lI/S2fx31p6OdqYp54cwV/ZbM95Hj1Ip+
- BqHsBArEFuJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZ2I+gAKCRDhuBo+eShj
- d+jAEADCyxHHAeQ9w9chDL5by1fVQ/N2FPpmL6SwLswTZkGUfXNDnAk/H82ilVO62oy5hZ8KaRu
- OsXJgrKn/02LDtIGs2dErMz/Xm62Qw5RikfQFgd9ILpgPHQVjUd0Ca+NiFC0tMiwf1M3TzX10oy
- 2yJ9a35fdQZVecuk8gGwNztfDXC23g11XjYUzukzr8/UWRzywluZ14HPZn9o6W5mhLO1LYimTiH
- VlMKHqHyUtOyQ6p4LP/hQInN6A7D47XFx6TIgiMk7ZVKHIQJQQY/ViRDDdrAeAKPp1gZo+xW/Xl
- 4bOBdBlhIm48CYKt1te/GksCvwE2aAcqV8I5r9hMUrrkDYNxK7UEYiKWGPsQ53aALJMQJSA5XDi
- GxVnZA+oOSsx9RzjngNovD1jQjVKTOGiL86/RdGb4XjSoqtZBX949dgVrJgW8bWMUvo9a3r5uy+
- ldnSR7x9fOoPEo2o1Cge0zxUDTim5d/ze7bCnukyq16eD+03/qtca55aDF45XNeEjR6hpoqERA7
- 9JRoT/7cP19VcrIwkeZZwE6R8oqhoQUcNdxjMVkbxpWASF76Ml63W3g58rOQphacvZGhixvI2tO
- gwE7QuRGxSCGpSYFerpnwT0LxJnhUo+JtZUCQR7AlZC7pGrkFNCOJChGHYLZQfCP/45/0U7y8AC
- OtZo8io7bnV4TnQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1062; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=jLcwJmCU6NuD58W2dvDRqr7xKpNKXDGKLW9pDqZ3mBg=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpnYj0TV4DAv2lVFJSr3recsWpK7mpdMvf0fOO4
+ GsqOYqcl7SJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZ2I9AAKCRDhuBo+eShj
+ dxXvD/4uTFSqjCY3iWHRTIEAh2NylxI+XqsaQVjNHfa55ZJJLgTNfYUvcse4RyQozv7pvyVWd9X
+ RTV+xLwmBnbBtZhV/uwmF8F2kvjU113KJpO3sMatO2yNc358Ve7JZhap3nzmvf689b+moR9KW8U
+ 8ifp9shwqd9GxSnUqYmJQww4ytW7n6vmrS9fdCG0VpncaoHbclEqKrb8kHlDpPWubp6c+Qu+ywV
+ ZSm0AOEF5voLr6yFpDRkglqwU7L54LiXgfITkIb6UbNJrDRXOO57QGjUnybgV9oIPGKKkwQwRZQ
+ uZX42y2zKXJNwE7e0PtSQh/G9iJSeO6OlIl3XlsH9/nwxhmAe99bikE2XWCyvXsybp6xdn8BHKc
+ r54RW+VeOtJ8HA3/xoWs07B2k0WCCDEs5APzVEAOAAzVtB0PabBsu+U6ama860OueMRxHOILlcZ
+ +Xf+pOsN30kSX9dsaxnpoC6hcm2hPWPJL/HaytSlHURknmIo6ZknstZlgrOJ6sPfuOgZPJ9KatI
+ nzNP0Z3U5LkY0BatvObNNaHXd8Ke66SruMP3igQJaaJm0DeDpUNWuOdkv9+3giycXGQXpdPIHCt
+ lQVZzP3lDsyullj2okwbZRVi01SEBePzKduMTuRLyTs6JjpW7tCsxzzCAC0M5H7le096T5lOwCQ
+ cYxZVgcHcuck6nQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-From: Asahi Lina <lina+kernel@asahilina.net>
+Add a method to consume a `Box<T, A>` and return a `NonNull<T>`. This
+is a convenience wrapper around `Self::into_raw` for callers that need
+a `NonNull` pointer rather than a raw pointer.
 
-This allows Page references to be returned as borrowed references,
-without necessarily owning the struct page.
-
-Signed-off-by: Asahi Lina <lina@asahilina.net>
-[ Andreas: Fix formatting and add a safety comment. ]
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/page.rs | 38 +++++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
+ rust/kernel/alloc/kbox.rs | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/rust/kernel/page.rs b/rust/kernel/page.rs
-index bf3bed7e2d3fe..e21f02ae47b72 100644
---- a/rust/kernel/page.rs
-+++ b/rust/kernel/page.rs
-@@ -10,6 +10,11 @@
-     bindings,
-     error::code::*,
-     error::Result,
-+    types::{
-+        Opaque,
-+        Ownable,
-+        Owned, //
-+    },
-     uaccess::UserSliceReader, //
- };
- use core::{
-@@ -83,7 +88,7 @@ pub const fn page_align(addr: usize) -> usize {
- ///
- /// [`VBox`]: kernel::alloc::VBox
- /// [`Vmalloc`]: kernel::alloc::allocator::Vmalloc
--pub struct BorrowedPage<'a>(ManuallyDrop<Page>, PhantomData<&'a Page>);
-+pub struct BorrowedPage<'a>(ManuallyDrop<NonNull<Page>>, PhantomData<&'a Page>);
- 
- impl<'a> BorrowedPage<'a> {
-     /// Constructs a [`BorrowedPage`] from a raw pointer to a `struct page`.
-@@ -93,7 +98,9 @@ impl<'a> BorrowedPage<'a> {
-     /// - `ptr` must point to a valid `bindings::page`.
-     /// - `ptr` must remain valid for the entire lifetime `'a`.
-     pub unsafe fn from_raw(ptr: NonNull<bindings::page>) -> Self {
--        let page = Page { page: ptr };
-+        let page: NonNull<Page> =
-+            // SAFETY: By function safety requirements `ptr` is non null.
-+            unsafe { NonNull::new_unchecked(ptr.as_ptr().cast()) };
- 
-         // INVARIANT: The safety requirements guarantee that `ptr` is valid for the entire lifetime
-         // `'a`.
-@@ -105,7 +112,8 @@ impl<'a> Deref for BorrowedPage<'a> {
-     type Target = Page;
- 
-     fn deref(&self) -> &Self::Target {
--        &self.0
-+        // SAFETY: By type invariant `self.0` is convertible to a reference for `'a`.
-+        unsafe { self.0.as_ref() }
+diff --git a/rust/kernel/alloc/kbox.rs b/rust/kernel/alloc/kbox.rs
+index 622b3529edfcb..e6efdd572aeea 100644
+--- a/rust/kernel/alloc/kbox.rs
++++ b/rust/kernel/alloc/kbox.rs
+@@ -213,6 +213,14 @@ pub fn leak<'a>(b: Self) -> &'a mut T {
+         // which points to an initialized instance of `T`.
+         unsafe { &mut *Box::into_raw(b) }
      }
++
++    /// Consumes the `Box<T,A>` and returns a `NonNull<T>`.
++    ///
++    /// Like [`Self::into_raw`], but returns a `NonNull`.
++    pub fn into_nonnull(b: Self) -> NonNull<T> {
++        // SAFETY: `KBox::into_raw` returns a valid pointer.
++        unsafe { NonNull::new_unchecked(Self::into_raw(b)) }
++    }
  }
  
-@@ -126,8 +134,9 @@ pub trait AsPageIter {
- /// # Invariants
- ///
- /// The pointer is valid, and has ownership over the page.
-+#[repr(transparent)]
- pub struct Page {
--    page: NonNull<bindings::page>,
-+    page: Opaque<bindings::page>,
- }
- 
- // SAFETY: Pages have no logic that relies on them staying on a given thread, so moving them across
-@@ -161,19 +170,20 @@ impl Page {
-     /// # Ok::<(), kernel::alloc::AllocError>(())
-     /// ```
-     #[inline]
--    pub fn alloc_page(flags: Flags) -> Result<Self, AllocError> {
-+    pub fn alloc_page(flags: Flags) -> Result<Owned<Self>, AllocError> {
-         // SAFETY: Depending on the value of `gfp_flags`, this call may sleep. Other than that, it
-         // is always safe to call this method.
-         let page = unsafe { bindings::alloc_pages(flags.as_raw(), 0) };
-         let page = NonNull::new(page).ok_or(AllocError)?;
--        // INVARIANT: We just successfully allocated a page, so we now have ownership of the newly
--        // allocated page. We transfer that ownership to the new `Page` object.
--        Ok(Self { page })
-+        // SAFETY: We just successfully allocated a page, so we now have ownership of the newly
-+        // allocated page. We transfer that ownership to the new `Owned<Page>` object.
-+        // Since `Page` is transparent, we can cast the pointer directly.
-+        Ok(unsafe { Owned::from_raw(page.cast()) })
-     }
- 
-     /// Returns a raw pointer to the page.
-     pub fn as_ptr(&self) -> *mut bindings::page {
--        self.page.as_ptr()
-+        Opaque::cast_into(&self.page)
-     }
- 
-     /// Get the node id containing this page.
-@@ -348,10 +358,12 @@ pub unsafe fn copy_from_user_slice_raw(
-     }
- }
- 
--impl Drop for Page {
-+impl Ownable for Page {
-     #[inline]
--    fn drop(&mut self) {
--        // SAFETY: By the type invariants, we have ownership of the page and can free it.
--        unsafe { bindings::__free_pages(self.page.as_ptr(), 0) };
-+    unsafe fn release(&mut self) {
-+        let ptr: *mut Self = self;
-+        // SAFETY: By the function safety requirements, we have ownership of the page and can free
-+        // it. Since Page is transparent, we can cast the raw pointer directly.
-+        unsafe { bindings::__free_pages(ptr.cast(), 0) };
-     }
- }
+ impl<T, A> Box<MaybeUninit<T>, A>
 
 -- 
 2.51.2
