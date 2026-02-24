@@ -1,103 +1,106 @@
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E77A39E18C
-	for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 14:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D8139B4AF
+	for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 14:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771943322; cv=none; b=ZatL9fnRzQpiZvE0IH26e5mY4KAOHMvSDdXDBFVDrVS70UYVNpoZfry3CvlPC0UBggrHW6D3S49bzAqLPfLlMz+5z7KN4LGGO4XDetvGxcUxYybIVfINi6AikNP9BZADnCRX3kIDbzLCVvnOYHp9EdJnSxrH1S1UOZH7T16oWKA=
+	t=1771943352; cv=none; b=kWtjHPC1G8dvV8CxI7nSdLFf48/RJsAHjD40k5aSnmf4psrtAeNRlhPvHtyF/WGxr/e+jbpSjCo3Wb7B1Xck5oo9oMlHVTFKH09Sv8RUU1r0ST3rkRmr1VdTDQ1zaSH0e4blKpiN/E00P6fi7vOxT6CLM9X6A0ibHHV81ueINdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771943322; c=relaxed/simple;
-	bh=HbeAMq582A9z+G97NykvUDrQegiuawefgGe7H7Duy/U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bk/o0blmCK4gM2qLGuGEnnpRZ083qyl03Gjz84ov9+CYd43jKhKRc5sy8PKZ7QBQ484Q2U6O+F+DlUj67xqB7grbnkZtWFhqEHEd8PXsQDgE8XoeDxiDZJP5s9AiAeg/cayD+Hiy5B6hYK45wQEzQDLp+ZsrQdLnY8dS9yD44x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Vl9lb38G; arc=none smtp.client-ip=209.85.167.175
+	s=arc-20240116; t=1771943352; c=relaxed/simple;
+	bh=r2xK9ymerIfBib/fwRAh6IfFO7DwgaTRkn5wo2POBHQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mFaqYXWXanqr7cwMskHwU+mnC1oV5Uq46d4/MKGw5wko/k1Zlrn+jaw/g2v2AX0UnSjI7CK2CCXGcHI3MXgxqJksQb+N0jNVZ9XGvfBDY1U9elsa66zBNASSmlmosdB2aKIvqn5Z+a1w3AYqYF9gfQya7acHB+sLQ023ovM52Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mi4wyyu2; arc=none smtp.client-ip=209.85.210.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Vl9lb38G"
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-46392972257so3760085b6e.2
-        for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 06:28:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mi4wyyu2"
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7d1959ba05cso2645352a34.2
+        for <linux-block@vger.kernel.org>; Tue, 24 Feb 2026 06:29:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771943318; x=1772548118; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2HGGQfAteJxa/z4n6+vUqrmhg74qyKNk6vF173syhMc=;
-        b=Vl9lb38G5GMmhAqu1wEaTe0PX1UUh3ZwU8GBUNZDH3YinoFi0zB8wn2TjYqUsDYxHN
-         oNcVugM2QanBq6xsSPhi9nd2MJfZdDW9bIKUPqQsurFZh9j1xDaTCAcxUzRLZDs7pM9G
-         cV8SBe9V7v0bGfNJ6rn6OV6C5kevFWPDaVZvDKTwc1Vmmp7+LdBUFoDuRtjOLO/WwV/8
-         iXIU/APSzgf0OE5GZsyj02GmyJAPI0tfTBslMWZKicD7RQ82WT41lCiycsogsahalDzY
-         cIAJ8CP6HuRN8XX8ORkJehY1rMylassvG7eQcFqsbdfFjoXJ86VMdv8KN20KFfNsCFT3
-         SpFQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1771943349; x=1772548149; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+h4cUB5z3gwLli6Uxnqc/gAlaab/h3hRG/G3BGWGVEQ=;
+        b=mi4wyyu2MQSSvp4eqmx6MHmTV5bkhYy8AdqnhvDuQn66VfbNKayY7HWsdSml9Dr7Bx
+         McVNCKV5Luupisfyo50c/DRKLu47IU9MO7yvciayJvqw39nB9oFcbLLA5kkYOmV9R5BI
+         mbE7mBhlFI+uWJ28ujl1fDoKFnGH6NEzoc8/XRCNoa3f5QzYXNS7GrTU8Xwz1pDZIq9V
+         ca7H0a2r4IA8DMRU9vkn4CUx9QPshQLBECksNa+B55eAYi3ZM1O9WawVqN0gBMkpFb8a
+         sFsmu5e+auFc1WNxu2+JFAhYPJl4ordUCxjiStQK8vyYg79pzyTGaijw48qROCsVcU2V
+         Tk/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771943318; x=1772548118;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2HGGQfAteJxa/z4n6+vUqrmhg74qyKNk6vF173syhMc=;
-        b=eL5NpBSQwcUwNAEMBT2HkAAqhS75r4rfmI2Go/laEmUOfOtjNXVJ2k9tt8zXVA+j5U
-         PvboX8+FUWcdnjitV7RD5uXogcqWn51e+bacqWCLbmrbpyaqJZ6+hIbvlhUtsMYKPLFi
-         UgofLa+IWXgA6TFFNY+sVctnfikxvVR75twuJG/r39sijXtxhwURB9r+PUl8vhNNoX4T
-         Jjz11wm7WXpHwwXZaj87dd5uuhKHt0BGs+En9rnpMPC4ZXFP6KHOFHZtd80KWbhxtHIq
-         lgo9QTNWXjCxygxr9fJYb/9ierw9n5yfN/w3PomY5JM9wIEskup+/HLs8xqA6417d2CB
-         urTg==
-X-Forwarded-Encrypted: i=1; AJvYcCWnXw6gg3BXygBvh5DrExIMB0JgkmchXhKUlYYSn/fy4qfgKmbEnNEtlreVWcjRxDWZ/VZAEyxY0ILPJQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0qro9SEKZA0F674oUPRsUETFzFmdQPOgBz78i36dh3AgtYUFB
-	NRjWzEjS5fW/TJuHAipyOQk7cNKIuZW5pk7f2Z+xL+STJJ6d6oQBbpcMlIzXtLtsbKhX49ZuuLo
-	Sgdbc
-X-Gm-Gg: ATEYQzxBB/33g9EV+XXvBfmnjgEgDMjbZ6b936F4B2PGATupTB/oseSipNjsFW70Mx7
-	rTqEbusp4TPvqzet81Nw2c1H4AevrMyVaourNzDWd7xWP+/d6i15zyegizsv3J+6KdLNgkXP4iM
-	J7IQ37c1dtMK8WS4xWyxr8lZyB5zNZVZ6I+05lpeQ5B0Y3/fJPoh3oYqqYRDkx5jkaRWGVYtZaN
-	F0OBzhQ4sPL2fklgvMgz0DFQQMD+jEUkkg4e2bFm4PC6JVbMttImwPL2PGy/xFwEJi9XWHXRtWc
-	6ZdMcjwYj8T0zVoiq2X7qyhNkNJNVNqL/twMi273nS9vTdraLofmEny6eDQ04oo8n9ayTRntlVA
-	Eti2TU7Q4RTR/BVePVQQr66g+C8VjxVicD4bT1oXQIvKC/AU8R1hl4CUw9PAppFce62//T7/am1
-	sXjKxtHMOJ4PheYzdwRv1AeU+WVovXmqQ4hEFpvUvN4CwfCc3Gyx5Pm4QnOyyEIgC18Di7j2AGq
-	CyR8mg6AQ==
-X-Received: by 2002:a05:6870:8594:b0:40e:e9ab:f6f0 with SMTP id 586e51a60fabf-4157af8a521mr7483495fac.25.1771943317693;
-        Tue, 24 Feb 2026 06:28:37 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4157d3a24bdsm10037152fac.18.2026.02.24.06.28.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Feb 2026 06:28:36 -0800 (PST)
-Message-ID: <8a6e89f2-d93a-4497-b22d-09142f5a828e@kernel.dk>
-Date: Tue, 24 Feb 2026 07:28:28 -0700
+        d=1e100.net; s=20230601; t=1771943349; x=1772548149;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+h4cUB5z3gwLli6Uxnqc/gAlaab/h3hRG/G3BGWGVEQ=;
+        b=KyEdxhSLTNsRQDdVFQv4eZAHLL/oZn3om/7+B2x1lZ5D48TYJOQw3xwHIqZU//dGDK
+         OsX4p2Yq3Fdvs+EbwKh1sMZnmeEp+Bw9bY5Hj5RLTu+FLtZeQRZtSmIO+fDcZSjtyWqS
+         gQHARLs4KKVpjxLCbIwD87QiPKHVTavBnVtb+zhHzb+9HuXqv7n5WM44XHQqCfY712Xj
+         Nrv+VSLk9Q4k+Ug7u6vvVFK5MCCUC5lY4GOGW4iJ4per6/mJgSHKG1xM8FQsM7Z6aqj+
+         CqNGs94fXrjZEaOqehCTeViSQkKdfyA7QM9LNh2woeJzpsnEbp+H1uc7Fc2PSkuOt4Y3
+         A0HA==
+X-Gm-Message-State: AOJu0YxJwGEHMGFOCH1xt9nTS0a9A/Fa3yQXkbEz38GodxSbxpaWwiTm
+	dps2FPZCm8sS/ZTTYfUK5fptATGfOlyUggTgix8DJM5QTUau0IzaWEJtzYijd55ZCKPd4iDTxEH
+	SUxvEgTM=
+X-Gm-Gg: AZuq6aIVEEeRBlGShEuFKcFWiJsE7U2lzP9eNmPuJ57ov0FGdkklLG/ZUqD0CYAi8uN
+	bJXcx1oXbIteiFwdAWYxZHdfdTIdeioysg+0zuN1XQxprWIyf2TVc4ceq2Z+vV1wI72fdeKkMeT
+	ODsb+o19lHcqx+/BViYyPYO4iFy6nQ7sg6ppNAlUBdcz8L1EvEJ1McGHpF0k2oEbk8eoTGOneaU
+	7xr0I9J2vKCaPjofTMVLwcFgPX+fbpeB0aN76OLoPSnnIhkEEUN70V1QL4nJSGLnxl92awvgSeD
+	q5D01KrE7tFD874mWK3jPtby0aCdR/sdurixkcGjDvZd5x9HqOPVQQROzlgs/btY/EpIKj4csTz
+	ohG+NsheT05Hejh3YTW76kMPeb6aozdEyGbvhU/Jeg3Zb4+rAqvKIs/8UYtXLhvx/76vFON/AOa
+	K7RmBJdpMcsSqXI/JLlsiXoBIdj+iuSjzvr5Mvd3qgogdVJPzkMCMSbKPUynDzhqVQutbmwDd9n
+	6mu
+X-Received: by 2002:a05:6830:2a92:b0:7cf:dc2d:8508 with SMTP id 46e09a7af769-7d52c1d65d1mr6777350a34.1.1771943349263;
+        Tue, 24 Feb 2026 06:29:09 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d52cf78e52sm10058593a34.2.2026.02.24.06.29.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Feb 2026 06:29:08 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Keith Busch <kbusch@meta.com>
+Cc: csander@purestorage.com, Keith Busch <kbusch@kernel.org>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20260223162939.523508-1-kbusch@meta.com>
+References: <20260223162939.523508-1-kbusch@meta.com>
+Subject: Re: [RESEND PATCHv7] blk-integrity: support arbitrary buffer
+ alignment
+Message-Id: <177194334824.714329.13631824511589600708.b4-ty@kernel.dk>
+Date: Tue, 24 Feb 2026 07:29:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv7] blk-integrity: support arbitrary buffer alignment
-To: Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- csander@purestorage.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
- Christoph Hellwig <hch@lst.de>
-References: <20251125185718.2190305-1-kbusch@meta.com>
- <aZYy3L-UVjgNQS11@kbusch-mbp>
- <b1c7cb9b-f790-4e3d-b1bd-4f4f516f9b3a@kernel.dk>
- <aZyAxTqM0ABwDswl@kbusch-mbp>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aZyAxTqM0ABwDswl@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On 2/23/26 9:31 AM, Keith Busch wrote:
-> On Sun, Feb 22, 2026 at 09:29:50AM -0700, Jens Axboe wrote:
->> Looks like that got missed. If you rebase it, let's take a look and see
->> if we can do it for this kernel release. It is on the bigger side though
->> for this deep into the merge window... But since it's still early days
->> for the release as a whole, we may be able to sneak it in.
+
+On Mon, 23 Feb 2026 08:29:39 -0800, Keith Busch wrote:
+> A bio segment may have partial interval block data with the rest
+> continuing into the next segments because direct-io data payloads only
+> need to align in memory to the device's DMA limits.
 > 
-> Just resent it. That would be cool if you want to squeeze this into 7.0,
-> but it's also fine if you decide to wait for 7.1. As long as it's staged
-> somewhere for upstream inclusion, I'm happy to backport this as needed.
+> At the same time, the protection information may also be split in
+> multiple segments. The most likely way that may happen is if two
+> requests merge, or if we're directly using the io_uring user metadata.
+> The generate/verify, however, only ever accessed the first bip_vec.
+> 
+> [...]
 
-Let's just go for 7.1 if it isn't a huge deal. I'll queue it up.
+Applied, thanks!
 
+[1/1] blk-integrity: support arbitrary buffer alignment
+      commit: 1fa00430269e08636c14b52919a63d0b5cb77eed
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
