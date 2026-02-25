@@ -1,293 +1,270 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC3E2D6401;
-	Wed, 25 Feb 2026 05:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771997145; cv=fail; b=coZV4g0IfVLnfk790cBMBK6nkv6Ud8+5y8EZPVHU6BDNni0ru+M6OnQo/TcE3qlmeX7cYIZwpgzRrUnu0C7GY5dP1Y00JleDV4+aLnGJKUnJX1FpkwmOJLa+CW7NoE9c4lFLzdJHTLSuyFeSWGkUwdoA8WcubF3yOlHnJLokA0o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771997145; c=relaxed/simple;
-	bh=2iMc4qgCoYSCUd6SwHOQEJFnwar5rcCF3ILz1fqDmAg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Dnsxv9Q7bPktjpAZE4arTqq5QciNp7GsoRyBf7Fe5kJvJIrc2IvK/xFintCdbODhJ/Qg/axIQ6b9BUpB/eCVOpNPfN+/NRQ69H8REc6y1PpRUq/P6VFUTqjL4lFeLGBsyhrx6iK1l+qmB7ibw8FfssgDmStuiLQnCciOeCl7LGI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Rk37bSA2; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Qw/tvbGD; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01111ADC97
+	for <linux-block@vger.kernel.org>; Wed, 25 Feb 2026 05:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771997576; cv=none; b=mHbDI2QN3OX18Qs2tiAZ5jqa66+Kbw6roF3h8EagE8DjGR20mWZ1d+PhnyN/CDoGkjPLgbg20EJPxBXrkxeAkvuOXb6V1eqMAyJuSO0sflDG1MitNXdQ/cu6wErcy6y7Zp1firVETDazl4JhMItMK8xO17l43ABOlV96o3/AS4I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771997576; c=relaxed/simple;
+	bh=MAIqVOCWvfiIg61fuRKUxaKcUoWseeGC9H3DkgjCQ0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E3tFKwbWwNNGVF3fIvCsNnnfI6vO5zSW/8+idH5lzjJ8TO2oU6jCX7/7b5IXh+v63KvQb7B733P+P3cvFSFle99TDoSDngO2Md/iWC+4siWAiwbTxAgPyko2ZbsyGKrapGHn7SJ6h/8OFiv7USia09EnYU0TqBe4XuKuoQyyOfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CImoPmkW; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Rk37bSA2";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Qw/tvbGD"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61OItv423927989;
-	Wed, 25 Feb 2026 05:25:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=BRlxSGvQnupZPTEDtM
-	Md1jlmK/+8lk/YNYOBKjaJiXk=; b=Rk37bSA2QImCVFj7dqiFjynVDpYFt9Ei7v
-	dpHvMBagK5t5QM68fZdW/aVACOGepE7BjlHUOdCrYWrQBPeAQsqq2091dx/VtoTE
-	wbiDjyd/uasZF8Aa1dUZcSAYeLdrXBaqwSEh6T5KEXF5554kMijgA3ylWdqn1ELK
-	ERQCrskIGVFKcC806fA7JRANTMU33YraPETYqIcDjeWhlMZkNZD7RXXtkIB6/ZsG
-	qL4DdabzYG8JSi2EF9g24LiMOPVdjGKLEKnpza0fG5LMtqO2FTmzbn3lb7dANmGO
-	3sa4LUa9lAYC7QsrzhFSItLvWz/6wuFbZx0/QNEoQmXM1TokvNMw==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cf58qdffu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Feb 2026 05:25:04 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 61P5Iibb027868;
-	Wed, 25 Feb 2026 05:25:03 GMT
-Received: from ph8pr06cu001.outbound.protection.outlook.com (mail-westus3azon11012013.outbound.protection.outlook.com [40.107.209.13])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4cf35fnktm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Feb 2026 05:25:03 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RD4q5fkcuq7xW9Xrem2Bjkdq3mQGYag2XW5n3OqdyRhrdgAdfO/X0p/c8GEz3zCJUYUxs4EHjNCYDhF20KUA0VL8VgpekTjSua6zsXjnnItrakBBHakpYJiVIIgSgGshsCmKi5dCZZ2hHwrHZJ/qrGFcTHkJnf2+7INNSD5JuXNIqns46Ucdadmc+iBEwxP6EnWTnu7c/k0GDBZNF8udLUGUHj9MP5KUnNo/g2sMxNLOQmAbHYzpKYJwhXJ7FVs65hIevIdAauD2aD0jwN50OfUGBAVREce9c1I7ZZcBXWRu0yZNCiThhaIA2lVEM21o0R9x8F0ZyiD+p5zFVY1e8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BRlxSGvQnupZPTEDtMMd1jlmK/+8lk/YNYOBKjaJiXk=;
- b=kMB8caWTxGeqY2GQu4C6is3gF7CK+ngEDpROyT3zPzKy6gjOEXBrKzHdYTcoS0b7EiCxk7WSV7U7Qt6XlElAh3Wkb0EuBsYlA+gclyNfV5Af1pIbkCXLhEORqjZ/0dtOXB8AVueAngq/gaydPQuIUynMKCqTvWOODQDsJ+c5At21CT+2ZSVicD0hPTnlGRW3GvQkJ2ciqW/SQ6++ybVVPuZTPKJo/D8Qqt5TtZ6789ey06qAEq33E14Dv10ObHScM9D68X0mFWUY6Fk5AlKvDh2J73MBPhc/5IaCUd2NCTufaz9nGkC/r2DJYfQfQ1aZFf5f8k5gG3Lgyv8WNWorUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BRlxSGvQnupZPTEDtMMd1jlmK/+8lk/YNYOBKjaJiXk=;
- b=Qw/tvbGDA3FHgLLxBKp6ZbJeQbgmwvhu1Prh2MMxw+nXUZaCOcOMjskWRDfI2bmyNHR1Cf7OMzBu/mGn475h5in6w/1nwJ9T0bFQ9nNMgiW9astdC246HNiFX45EGN1zeaSMvr7DCqSfY9HX2LhRpzdmyCiclhH0QVRcMr7Feao=
-Received: from CH3PR10MB7329.namprd10.prod.outlook.com (2603:10b6:610:12c::16)
- by IA6PR10MB997560.namprd10.prod.outlook.com (2603:10b6:208:5e0::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Wed, 25 Feb
- 2026 05:24:59 +0000
-Received: from CH3PR10MB7329.namprd10.prod.outlook.com
- ([fe80::c2a4:fdda:f0c2:6f71]) by CH3PR10MB7329.namprd10.prod.outlook.com
- ([fe80::c2a4:fdda:f0c2:6f71%7]) with mapi id 15.20.9632.017; Wed, 25 Feb 2026
- 05:24:58 +0000
-Date: Wed, 25 Feb 2026 14:24:51 +0900
-From: Harry Yoo <harry.yoo@oracle.com>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Ming Lei <ming.lei@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Hao Li <hao.li@linux.dev>,
-        Christoph Hellwig <hch@infradead.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CImoPmkW"
+Date: Wed, 25 Feb 2026 13:32:36 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1771997572;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3jxsmk4aiLysalS58AwyTlC9Tr29Psn/XYPzl9fICvE=;
+	b=CImoPmkWMFcn7OlwDBqgB1cnRI7RL/b+Mat+I9M1hfzD5B1PkeNq4CeDzLSqXk6xwyaR1H
+	bmrCWwDjEjtUBZ8Uqx6GRXUxgzf7NprdKP27Jh2jt+/bzVyT3oGdf+m+HeqsJ7s5p1B/wB
+	nQtrOmb8dWj+xkkojcknGNTqHHTRLY8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Hao Li <hao.li@linux.dev>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Harry Yoo <harry.yoo@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, surenb@google.com
 Subject: Re: [Regression] mm:slab/sheaves: severe performance regression in
  cross-CPU slab allocation
-Message-ID: <aZ6Ho9YXzLzVOZUz@hyeyoo>
+Message-ID: <qiqptuqsiaufeasf2xukfzoumiyoau3zfpokosn2amgc6zskc6@vl6ie2h2zj4m>
 References: <aZ0SbIqaIkwoW2mB@fedora>
- <5cf75a95-4bb9-48e5-af94-ef8ec02dcd4d@suse.cz>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cf75a95-4bb9-48e5-af94-ef8ec02dcd4d@suse.cz>
-X-ClientProxiedBy: SEWP216CA0121.KORP216.PROD.OUTLOOK.COM
- (2603:1096:101:2b9::17) To CH3PR10MB7329.namprd10.prod.outlook.com
- (2603:10b6:610:12c::16)
+ <aZ0wX_QuxNTxXHMj@hyeyoo>
+ <aZ1qRhIGDAR7d56r@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|IA6PR10MB997560:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4a2fccc1-ae12-4dbd-e237-08de742e37d9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?nCO4dba6gdAqWx8vf3QZHBMH7QU77rGOXOM4IWEMi9OvcuElES8gfm45ETqq?=
- =?us-ascii?Q?87DBftp2AxLba3kv8NcO3mof9XwLTN0DvcVgzXD1VV7ZumP2BqwHokMxXael?=
- =?us-ascii?Q?nQuEL5w9izImo6SOnVIBSo0YXhajkoJiU2AvxueQ74weM7HWWHGIzAD3RslC?=
- =?us-ascii?Q?b14+J02EJ+WhjecMSAGCnq93RturFfZYs1hqMnBH+OXc0vHrxujB6AL8iDFW?=
- =?us-ascii?Q?i2Qk51C3lYa/k/Tt4Akjss6EfXvbj14goOCr8xv7/YMUcHR/cQsILkOQuzVk?=
- =?us-ascii?Q?P+6bzGwamDWR03X3HK8L3QEJzOIcRfGpMSX6NSPNk+0RRqxhSOGM9YqHx0jY?=
- =?us-ascii?Q?LqhE8vyYWMwLsONLrfb0xXarO0vYFpaE0eSmqRIDmFqVXvP4oP9ODgEjZCo3?=
- =?us-ascii?Q?IMr2W4rS0c5v+FpH0p2PvAdGXNpv6BoRl9xshSue8PwvIW92AXejqopWLUJv?=
- =?us-ascii?Q?bysVQOaJo0aSJG06k7LiY1YOmiywXMfrbAW4mmvCO5weRmPvjdOed1MWblyt?=
- =?us-ascii?Q?0O8Am7ir3s4iMeO7QB3qcKeyF6MtJeoKYMb+8iFcDfxWAMbxhlCeWe6uc37A?=
- =?us-ascii?Q?h6/8YNT53bmr0RE38FkHWGpS54SY6QZ0ovZU+hwq0smcHGvAFvux5KX7ISYP?=
- =?us-ascii?Q?FslkZQdNIiyiwUZyfe1GoXh+D2QuXSW0MilU8KHDqNGHWcOccl9Lja3rbLMZ?=
- =?us-ascii?Q?oZM3/98uX3RJ0NIL+fgxbsxL7G3dXSNZoAF8rX1TObTo76mGcGck1WGZjIgW?=
- =?us-ascii?Q?OyNkGWyrjvtTUIA+nvDURoffw4r3Pznw754hXyBUKzUK+ZF2WmcUQliMFvU9?=
- =?us-ascii?Q?Z81fnUxx88wxj1j0w4cwu00jHG0PctgvXvO9gYOb5EUXrie/e11IUp4Fm7/1?=
- =?us-ascii?Q?oX5t/9nRcrHbLzEILNG7O7GXfrmP4u1+61pyXiy5aFlML7W/MyX8L2XdpB28?=
- =?us-ascii?Q?dinfWxQabjU80I8991JXgsJv6GwhEgUzsmEGKszpcDstci5ZLiMPEdkVhsnI?=
- =?us-ascii?Q?e4mGFvHUGpIYtaIM73cJoN16McbgtA7QDYivPvzgaf0aRZ1O7TdO8cCtuYpO?=
- =?us-ascii?Q?cT2OXpdnnJIFZZNY02OX4O6u7LdvSr04Gfg3dnW1uwYnNCff58hQWt3p3xyV?=
- =?us-ascii?Q?8oEotIQbRdJKrZxr71L+v5l5/p3I28ZUJEH9GDvQWkqb6DkvX0RjMsH/xN53?=
- =?us-ascii?Q?jV4kAXOiIex59gAbOMBeR5aTI49v0DnDZMgZwGJjRj3l0a5sD+Dz5IWWr2ED?=
- =?us-ascii?Q?ngzQuPo6NxYTzopNYgP7BBVRTGwIS3XvN0cC6uIAc5cgCjeWZ+QjJb5WBQOa?=
- =?us-ascii?Q?9CACFnpJT1kaINWge4F5P7f5H2Cy16Ig8HIiEGjoLozmdKWTyOe9DJzNMgWs?=
- =?us-ascii?Q?uLYCXgzo2SINvrvKHc1Hw/8oDw0bS3lsVpabHaihxDTvpkHehgu4PvZ4WU0h?=
- =?us-ascii?Q?YfpIblp4OHB6twUH/QKdyv/qoNcqQmPNK0Urrp+ZSw4knCd4Wdg0Xuoi1qTD?=
- =?us-ascii?Q?VAeLg06pjmkv8ediXUBq7wZdEowFL7j5un+sC3ExnQuk9rMHLkoFE1mUkK+q?=
- =?us-ascii?Q?A+cLUe3v7xqZ2Tt1gYw=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?K+X8I7Oj4mTfk4DSD1+lf0VcNoeiWqwiJH1MgRHNAWSkYUT6UqVXowUsz7V1?=
- =?us-ascii?Q?DhJCepBpp5FqdIMxS+hwfZspLY94LVgZPMZXHXmmc6xJF0fqMxzPpBRU8trm?=
- =?us-ascii?Q?GsLUJQXccwiyPZhK/afbWpQq5oTdCUJxgrbilbsboU2/U1B5/7X5VBq644cg?=
- =?us-ascii?Q?dGex5ibKgCUR85BCj7xFVBcOwWXk1700KXd4IDmQO+7EOLdFCMblmaE9vUCx?=
- =?us-ascii?Q?Stx/E6mafXfP4Vzaznif3PUaHg5l+Q4kTKPFeFf9ryL7GZwZ1NN423jyEAJD?=
- =?us-ascii?Q?fmjxVXCTjfP5Mu2D68DZdHjw9vNIVs5ae7aadBPBWL1ww3liZTUElBcRYOoK?=
- =?us-ascii?Q?Wk20ukfvi6FEHVHpiDEo8IzI/Q+QnN4HfBMyA0154jhiuwRglSdZZlHaHgf1?=
- =?us-ascii?Q?ZuZuRX9Z63G3vNaWQWnC22Vr2mvu4EsqJ3F3E4oyLzZ8vlZKkUjXEL/5xXdy?=
- =?us-ascii?Q?ciP6/7LjH/na3mTQTGzgGsDHFt+XDHgpQPagND0I18XoRZhiUfDHk+1KpHFB?=
- =?us-ascii?Q?UxKZUnIXKSRsFbPbCRJxLd/pEH6A8ClfGlDEpQJJfBatqYSgZG9RUjK/LlAp?=
- =?us-ascii?Q?8W6jnHkVaXBeT5205g4FSBX4fzcBzbL7xrqqBjg1H5oy4WZvRV29uJGsCeJb?=
- =?us-ascii?Q?cN8I0ncYA0Qny/z84lwnSx+DHD+v4kB4d49XufluxFNZb5uhzKAKmlwNgdYO?=
- =?us-ascii?Q?zNq0v+rSmHA1NZCKMVa631j1LYC0xsLudL28UjxV71Ddi7xQHZzc8Q2aSYiM?=
- =?us-ascii?Q?ITeFJIMCqX9JiGtrvcME82l7oIyf2gQjE44mSRcQJ8b15VAT8Y1LFQT6Frzr?=
- =?us-ascii?Q?iQbhJIvSGwCqRVYR0R0fYwHJv/jyzbFheoewc980hpJSPsHJ9Ktn3bWw2VDE?=
- =?us-ascii?Q?uSwoUET05rHZ3iBQkKuat82lSK2zRZ4hrVaY1jrjgHXsFKfv5nDhGgCI4sCW?=
- =?us-ascii?Q?C/EkZr84bJZ3FD40ZSIcfjXLATgbbQe3bz7EKXMF1+cyJnL+L15D9Srxj6Ix?=
- =?us-ascii?Q?MhG7sSlu4BF/ATVeEJcLmlIAecSEHfNTppy1day6hE7qMmQZ1n9rDqyTG2gv?=
- =?us-ascii?Q?2cPl0XMospf6LsdlxGJbmRvd1Mf4y7gylACwVHxsE1YxPhHQB5GCfKjRIB5r?=
- =?us-ascii?Q?Ks44U9eqIFaXNmEFIVrNy0R3d5EL5VH/eb+8DwlM+Gu6K6l+5TDDEsq3JlN6?=
- =?us-ascii?Q?mk0tzW6iPqw0S+S5r0Fs5QwyclgtO5vCd/2u3ioDlDY+IgeQiCZMa6XzX9lv?=
- =?us-ascii?Q?+OcUK2JTgfnGGd+vEITm2nNT4yhLEdk2TAGQtk0o1I2nCx1knbQD+jCvRUBE?=
- =?us-ascii?Q?rtb/CrDmcB631v48r4YFByiWoy1bO0y3NAjz9jtBlzc8u75mH0mufROMa4Nn?=
- =?us-ascii?Q?nt3rOMjNzci66sVsbq22o2WKccjbg1dzFdiUjl2TpKy2HuVAWe/JiLbTT5Bx?=
- =?us-ascii?Q?9FDVk0t9Uovo+AIMFWOG51JmL5ObJe6jUmf6OUsltMzZcSVSKesjs1Bc5sY6?=
- =?us-ascii?Q?HhPBzM/89PYU5M+uT/kRzJ75jSObJ/XuAvuR1C8XnK82E62HywS8cGZMdpmP?=
- =?us-ascii?Q?0paP7QDbZY3CigxNnL4W/qh4GiIS9APUCnR/QU7Rlg2DRC36ZGQKHh+vn8hB?=
- =?us-ascii?Q?wwVzRuPZK0XQUyj2ji2Lk/j4OtRJ8pvrG9ZJv8kAnebEQODoq7sKwNptmtJb?=
- =?us-ascii?Q?nhFTPZINDz2i1/09IVSNd0kvGnyqnsydVl4udr9fxxAZTF8a9gX/YSi2Yf9f?=
- =?us-ascii?Q?TKG5gGF8SQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	76TEQ9Q9UOdBtzeGHLQYx/5cjzB0GmkxEmynNBqlFrLp6AEMlPN1kjx9c1O1wpdEJh6ix9eYpyVC7Kj9dhpSPAzBcPUtc03O7jpgwAcPDQuGpUa1Bwe6Wo6EVfnhki6Ve//X4Cqfi1EHQSDpTpaCnrjqNm66LLxBqfxDQqkTIrkfq+6kCNJaJFG/FF/b/EoxHFFlSzGkv2jPbBCzmkL3J+cNjXLA1UA+NV+H24u0Nvu9F5r6uJ4JAbZajN0OqGNBTx4rv+SgPgFsHyZX+576sYafnD2YRUeS/7RyYtlVa4BbW5m9xo1QQR+k5jes0UOLfTSSZeeqeTmJNHGYalPfRJDxu+X7u0ejCVsxEwaKKC89UjXWQc9Avk8XZDMPCvBVhB/BJH+xykQpQpuD+0A79JhLxYwZlc+HVsyIBM6BtY9aQwSzhYTIisoMcCj2Z2zdCYKtwGlNa8YRhpZ5Gd2IF5UhbwMzzSX6CavO+FNm2eoKqc52JdX4kUXEyQbCtWQ4c2YaQlpa82UJBkDPFhDvVxUsixOVkNyKKsKoXzMnWtQkkAUiYg3mubXNa9tuvd3iFm6U/7E7O2wXPqo281c9a3TJnRUY5Vhbcv18qi6VMFo=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a2fccc1-ae12-4dbd-e237-08de742e37d9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB7329.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 05:24:58.8894
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GrVJOUzLJfIBPUQpTmmxs6uF6j7BvRrTPl3F5yIrHn9ZgYXKoajQWmO4kewjiE/5GRGUY/oqy5bqpozvpzoKqQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA6PR10MB997560
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-24_03,2026-02-23_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 mlxscore=0
- phishscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
- definitions=main-2602250050
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI1MDA1MCBTYWx0ZWRfXz0eW25c9xMzG
- Kvf+Zdcuhpk7enZX8x5R66QIOIjYqXjLk5QYVC30Q1ET0CY6wwty0s2qYy0ME2SS8sMdhkR9eCP
- fsUwTxhpiRHuGy2g2LRwUat2P0cEoSoz/iGaB6RY4YAUTNqWRBb3V9S/CihLowGt9AYzHCY9OHp
- YwJcWGx2hO7Ez/elglSZ8B8Ystl1y9FiOUVHxnZJBCnLGcG1KyTNPxdq5r40OrGUu/bw8Fq4eLP
- NoM/oXsMvoW6BHNehs6JrPKX8tZgUX9tvsF2OUYWZyP7y3zek5lFndbgyqyZWo7PZbCIw352O+j
- Q7subp02yI3qKz2fwXL88h/dAhciWS4nJ+/X+i/+q3K+KC8oyCMybTuVO2aShyhVoGMJDIe1CSZ
- Kj8yOG30NuP06H4YObfY+5NjxDB4HrUHqiO345XCNAhuuv37jKmVqD8tpakwpN+H3KK5cYEMLRC
- Ui+TncaGCyRt6XGrrW1Jn0vs8yOuBYAsJP4P8juQ=
-X-Authority-Analysis: v=2.4 cv=XNc9iAhE c=1 sm=1 tr=0 ts=699e87b0 b=1 cx=c_pps
- a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=HzLeVaNsDn8A:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=HLplz3OVK-q_4qNNnhoA:9
- a=CjuIK1q_8ugA:10 cc=ntf awl=host:12262
-X-Proofpoint-ORIG-GUID: vZ9YqplqeRH2-_rioZnaH2sLuAXJG5lq
-X-Proofpoint-GUID: vZ9YqplqeRH2-_rioZnaH2sLuAXJG5lq
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aZ1qRhIGDAR7d56r@fedora>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Feb 24, 2026 at 09:27:40PM +0100, Vlastimil Babka wrote:
-> On 2/24/26 3:52 AM, Ming Lei wrote:
-> > Hello Vlastimil and MM guys,
-> > 
-> > The SLUB "sheaves" series merged via 815c8e35511d ("Merge branch
-> > 'slab/for-7.0/sheaves' into slab/for-next") introduces a severe
-> > performance regression for workloads with persistent cross-CPU
-> > alloc/free patterns. ublk null target benchmark IOPS drops
-> > significantly compared to v6.19: from ~36M IOPS to ~13M IOPS (~64%
-> > drop).
-> > 
-> > Bisecting within the sheaves series is blocked by a kernel panic at
-> > 17c38c88294d ("slab: remove cpu (partial) slabs usage from allocation
-> > paths"), so the exact first bad commit could not be identified.
-> > 
-> > Reproducer
-> > ==========
-> > 
-> > Hardware: NUMA machine with >= 32 CPUs
-> > Kernel:   v7.0-rc (with slab/for-7.0/sheaves merged)
-> > 
-> >     # build kublk selftest
-> >     make -C tools/testing/selftests/ublk/
-> > 
-> >     # create ublk null target device with 16 queues
-> >     tools/testing/selftests/ublk/kublk add -t null -q 16
-> > 
-> >     # run fio/t/io_uring benchmark: 16 jobs, 20 seconds, non-polled
-> >     taskset -c 0-31 fio/t/io_uring -p0 -n 16 -r 20 /dev/ublkb0
-> > 
-> >     # cleanup
-> >     tools/testing/selftests/ublk/kublk del -n 0
-> > 
-> > Good: v6.19 (and 41f1a08645ab, the mainline parent of the slab merge)
-> > Bad:  815c8e35511d (Merge branch 'slab/for-7.0/sheaves' into slab/for-next)
-> > 
-> > perf profile (bad kernel)
-> > =========================
-> > 
-> > ~47% of CPU time is spent in bio allocation hitting the SLUB slow path,
-> > with massive spinlock contention on the node partial list lock:
-> > 
-> > +   47.65%     1.21%  io_uring  [k] bio_alloc_bioset
-> > -   44.87%     0.45%  io_uring  [k] kmem_cache_alloc_noprof
-> >    - 44.41% kmem_cache_alloc_noprof
-> >       - 43.89% ___slab_alloc
-> >          + 41.16% get_from_any_partial
+On Tue, Feb 24, 2026 at 05:07:18PM +0800, Ming Lei wrote:
+> Hi Harry,
 > 
-> So this function is not used in the sheaf refill path, but in the
-> fallback slowpath when alloc_from_pcs() fastpath fails.
-
-Good point.
-
-> >            0.91% get_from_partial_node
-> >          + 0.87% alloc_from_new_slab
-> >          + 0.65% allocate_slab
-> > -   44.70%     0.21%  io_uring  [k] mempool_alloc_noprof
-> >    - 44.49% mempool_alloc_noprof
-> >       - 44.43% kmem_cache_alloc_noprof
+> On Tue, Feb 24, 2026 at 02:00:15PM +0900, Harry Yoo wrote:
+> > On Tue, Feb 24, 2026 at 10:52:28AM +0800, Ming Lei wrote:
+> > > Hello Vlastimil and MM guys,
+> > 
+> > Hi Ming, thanks for the report!
+> > 
+> > > The SLUB "sheaves" series merged via 815c8e35511d ("Merge branch
+> > > 'slab/for-7.0/sheaves' into slab/for-next") introduces a severe
+> > > performance regression for workloads with persistent cross-CPU
+> > > alloc/free patterns. ublk null target benchmark IOPS drops
+> > > significantly compared to v6.19: from ~36M IOPS to ~13M IOPS (~64%
+> > > drop).
+> > > 
+> > > Bisecting within the sheaves series is blocked by a kernel panic at
+> > > 17c38c88294d ("slab: remove cpu (partial) slabs usage from allocation
+> > > paths"), so the exact first bad commit could not be identified.
+> > 
+> > Ouch. Why did it crash?
 > 
-> And I'd guess alloc_from_pcs() fails because in
-> __pcs_replace_empty_main() we have gfpflags_allow_blocking() false,
-> because mempool_alloc_noprof() tries the first attempt without
-> __GFP_DIRECT_RECLAIM. So that will succeed, but we end up relying on the
-> slowpath all the time and performance will drop.
+> [   16.162422] Oops: general protection fault, probably for non-canonical address 0xdead000000000110: 0000 [#1] SMP NOPTI
+> [   16.162426] CPU: 44 UID: 0 PID: 908 Comm: (udev-worker) Not tainted 6.19.0-rc5_master+ #116 PREEMPT(lazy) 
+> [   16.162429] Hardware name: Giga Computing MZ73-LM2-000/MZ73-LM2-000, BIOS R19_F40 05/12/2025
+> [   16.162430] RIP: 0010:__put_partials+0x2f/0x140
+> [   16.162437] Code: 41 57 41 56 49 89 f6 41 55 49 89 fd 31 ff 41 54 45 31 e4 55 53 48 83 ec 18 48 c7 44 24 10 00 00 00 00 eb 03 48 89 df 4c9
+> [   16.162438] RSP: 0018:ff5117c0ca2dfa60 EFLAGS: 00010086
+> [   16.162441] RAX: 0000000000000001 RBX: ff1b266981200d80 RCX: 0000000000000246
+> [   16.162442] RDX: ff1b266981200d90 RSI: ff1b266981200d90 RDI: ff1b266981200d80
+> [   16.162442] RBP: dead000000000100 R08: 0000000000000000 R09: ffffffffa761bf5e
+> [   16.162443] R10: ffb6d4b7841d5400 R11: ff1b2669800575c0 R12: 0000000000000000
+> [   16.162444] R13: ff1b2669800575c0 R14: dead000000000100 R15: ffb6d4b7846be410
+> [   16.162445] FS:  00007f5fdccc23c0(0000) GS:ff1b267902427000(0000) knlGS:0000000000000000
+> [   16.162446] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   16.162446] CR2: 0000559824c6c058 CR3: 000000011fb49001 CR4: 0000000000f71ef0
+> [   16.162447] PKRU: 55555554
+> [   16.162448] Call Trace:
+> [   16.162450]  <TASK>
+> [   16.162452]  kmem_cache_free+0x410/0x490
+> [   16.162454]  do_readlinkat+0x14e/0x180
+> [   16.162459]  __x64_sys_readlinkat+0x1c/0x30
+> [   16.162461]  do_syscall_64+0x7e/0x6b0
+> [   16.162465]  ? post_alloc_hook+0xb9/0x140
+> [   16.162468]  ? get_page_from_freelist+0x478/0x720
+> [   16.162470]  ? path_openat+0xb3/0x2a0
+> [   16.162472]  ? __alloc_frozen_pages_noprof+0x192/0x350
+> [   16.162474]  ? count_memcg_events+0xd6/0x210
+> [   16.162476]  ? memcg1_commit_charge+0x7a/0xa0
+> [   16.162479]  ? mod_memcg_lruvec_state+0xe7/0x2d0
+> [   16.162481]  ? charge_memcg+0x48/0x80
+> [   16.162482]  ? lruvec_stat_mod_folio+0x85/0xd0
+> [   16.162484]  ? __folio_mod_stat+0x2d/0x90
+> [   16.162487]  ? set_ptes.isra.0+0x36/0x80
+> [   16.162490]  ? do_anonymous_page+0x100/0x4a0
+> [   16.162492]  ? __handle_mm_fault+0x45d/0x6f0
+> [   16.162493]  ? count_memcg_events+0xd6/0x210
+> [   16.162494]  ? handle_mm_fault+0x212/0x340
+> [   16.162495]  ? do_user_addr_fault+0x2b4/0x7b0
+> [   16.162500]  ? irqentry_exit+0x6d/0x540
+> [   16.162502]  ? exc_page_fault+0x7e/0x1a0
+> [   16.162503]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-That's very good point. I was missing that aspect.
+For this problem, I have a hypothesis which is inspired by a comment in the
+patch "slab: remove cpu (partial) slabs usage from allocation paths":
 
-> It made sense to me not to refill sheaves when we can't reclaim, but I
-> didn't anticipate this interaction with mempools.
+/*
+ * get a single object from the slab. This might race against __slab_free(),
+ * which however has to take the list_lock if it's about to make the slab fully
+ * free.
+ */
 
-Me neither :)
+My understanding is that this comment is pointing out a possible race between
+__slab_free() and get_from_partial_node(). Since __slab_free() takes
+n->list_lock when it is about to make the slab fully free, and
+get_from_partial_node() also takes the same lock, the two paths should be
+mutually excluded by the lock and thus safe.
 
-> We could change them but there might be others using a similar pattern.
+However, I'm wondering if there could be another race window. Suppose CPU0's
+get_from_partial_node() has already finished __slab_update_freelist(), but has
+not yet reached remove_partial(). In that gap, another CPU1 could free an object
+to the same slab via __slab_free(). CPU1 would observe was_full == 1 (due to the
+previous get_from_partial_node()->__slab_update_freelist() on CPU0), and then
+__slab_free() will call put_cpu_partial(s, slab, 1) without holding
+n->list_lock, trying to add this slab to the CPU partial list. In that case,
+both paths would operate on the same union field in struct slab, which might
+lead to list corruption.
 
-Probably, yes.
-
-> Maybe it would be for the best to just drop that heuristic from
-> __pcs_replace_empty_main()
-
-Sounds fair.
-
-> (but carefully as some deadlock avoidance depends on it, we might need
-> to e.g. replace it with gfpflags_allow_spinning()). I'll send a patch
-> tomorrow to test this theory, unless someone beats me to it (feel free to).
-
-I think your point is valid. Let's give it a try.
-
-> Until then IMHO we can dismiss the AI explanation and also the
-> insufficient sheaf capacity theories.
-
-Yeah :) let's first see how it performs after addressing your point.
-
--- 
-Cheers,
-Harry / Hyeonggon
+> 
+> > 
+> > > Reproducer
+> > > ==========
+> > > 
+> > > Hardware: NUMA machine with >= 32 CPUs
+> > > Kernel:   v7.0-rc (with slab/for-7.0/sheaves merged)
+> > > 
+> > >     # build kublk selftest
+> > >     make -C tools/testing/selftests/ublk/
+> > > 
+> > >     # create ublk null target device with 16 queues
+> > >     tools/testing/selftests/ublk/kublk add -t null -q 16
+> > > 
+> > >     # run fio/t/io_uring benchmark: 16 jobs, 20 seconds, non-polled
+> > >     taskset -c 0-31 fio/t/io_uring -p0 -n 16 -r 20 /dev/ublkb0
+> > > 
+> > >     # cleanup
+> > >     tools/testing/selftests/ublk/kublk del -n 0
+> > > 
+> > > Good: v6.19 (and 41f1a08645ab, the mainline parent of the slab merge)
+> > > Bad:  815c8e35511d (Merge branch 'slab/for-7.0/sheaves' into slab/for-next)
+> > 
+> > Thanks for such a detailed steps to reproduce :)
+> > 
+> > > perf profile (bad kernel)
+> > > =========================
+> > > 
+> > > ~47% of CPU time is spent in bio allocation hitting the SLUB slow path,
+> > > with massive spinlock contention on the node partial list lock:
+> > > 
+> > > +   47.65%     1.21%  io_uring  [k] bio_alloc_bioset
+> > > -   44.87%     0.45%  io_uring  [k] kmem_cache_alloc_noprof
+> > >    - 44.41% kmem_cache_alloc_noprof
+> > >       - 43.89% ___slab_alloc
+> > >          + 41.16% get_from_any_partial
+> > >            0.91% get_from_partial_node
+> > >          + 0.87% alloc_from_new_slab
+> > >          + 0.65% allocate_slab
+> > > -   44.70%     0.21%  io_uring  [k] mempool_alloc_noprof
+> > >    - 44.49% mempool_alloc_noprof
+> > >       - 44.43% kmem_cache_alloc_noprof
+> > >          - 43.90% ___slab_alloc
+> > >             + 41.18% get_from_any_partial
+> > >               0.90% get_from_partial_node
+> > >             + 0.87% alloc_from_new_slab
+> > >             + 0.65% allocate_slab
+> > > +   41.23%     0.10%  io_uring  [k] get_from_any_partial
+> > > +   40.82%     0.48%  io_uring  [k] __raw_spin_lock_irqsave
+> > > -   40.75%     0.20%  io_uring  [k] get_from_partial_node
+> > >    - 40.56% get_from_partial_node
+> > >       - 38.83% __raw_spin_lock_irqsave
+> > >            38.65% native_queued_spin_lock_slowpath
+> > 
+> > That's pretty severe contention. Interestingly, the profile shows
+> > a severe contention on the alloc path, but I don't see free path here.
+> > wondering why only the alloc path is suffering, hmm...
+> 
+> free path looks fine.
+> 
+> +    2.84%     0.16%  kublk            [kernel.kallsyms]       [k] mempool_free
+> +    2.66%     0.17%  kublk            [kernel.kallsyms]       [k] security_uring_cmd
+> +    2.57%     0.36%  kublk            [kernel.kallsyms]       [k] __slab_free
+> 
+> > 
+> > Anyway, I think there may be two pieces contributing to this contention:
+> > 
+> > Part 1) We probably made the portion of slowpath bigger,
+> >         by caching a smaller number of objects per CPU
+> > 	after transitioning to sheaves.
+> > 
+> > Part 2) We probably made the slowpath much slower.
+> > 
+> > We need to investigate those parts separately.
+> > 
+> > Regarding Part 1:
+> > 
+> > # Point 1. The CPU slab was not considered in the sheaf capacity calculation
+> > 
+> > calculate_sheaf_capacity() does not take into account that the CPU slab
+> > was also cached per CPU. Shouldn't we add oo_objects(s->oo) to the existing
+> > calculation to cache a number of objects similar to the CPU slab + percpu
+> > partial slab list layers that SLUB previously had?
+> > 
+> > # Point 2. SLUB no longer relies on "Slabs are half-full" assumption,
+> > # and that probably means we're caching less objects per CPU.
+> > 
+> > Because SLUB previously assumed "slabs are half-full" when calculating
+> > the number of slabs to cache per CPU, that could actually cache as twice
+> > as many objects than intended when slabs are mostly empty.
+> > 
+> > Because sheaves track the number of objects precisely, that inaccuracy
+> > is gone. If the workload was previously benefiting from the inaccuracy,
+> > sheaves can make CPUs cache a smaller number of objects per CPU compared
+> > to the percpu slab caching layer.
+> > 
+> > Anyway, I guess we need to check how many objects are actually
+> > cached per CPU w/ and w/o sheaves, during the benchmark.
+> 
+> In the workload `fio/t/io_uring -p0 -n 16 -r 20 /dev/ublkb0`, queue depth
+> is 128, so there should be 128 inflight bios on these 16 tasks/cpus.
+> 
+> > 
+> > After making sure the number of objects cached per CPU is the same as
+> > before, we could further investigate how much Part 2 plays into it.
+> > 
+> > Slightly off-topic, by the way, slab currently doesn't let system admins
+> > set custom sheaf_capacity. Instead, calculate_sheaf_capacity() sets
+> > the default capacity. I think we need to allow sys admins to set a custom
+> > sheaf_capacity in the very near future.
+> > 
+> > > Analysis
+> > > ========
+> > > 
+> > > The ublk null target workload exposes a cross-CPU slab allocation
+> > > pattern: bios are allocated on the io_uring submitter CPU during block
+> > > layer submission, but freed on a different CPU — the ublk daemon thread
+> > > that runs the completion via io_uring_cmd_complete_in_task() task work.
+> > > And the completion CPU stays in same LLC or numa node with submission CPU.
+> > 
+> > Ok, so a submitter CPU keeps allocating objects, while a completion CPU
+> > keeps freeing objects.
+> 
+> Yes.
+> 
+> 
+> Thanks, 
+> Ming
+> 
