@@ -1,189 +1,98 @@
-Received: from sg-1-13.ptr.blmpb.com (sg-1-13.ptr.blmpb.com [118.26.132.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217F43D7D89
-	for <linux-block@vger.kernel.org>; Wed, 25 Feb 2026 15:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0F93D7D85;
+	Wed, 25 Feb 2026 16:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772034660; cv=none; b=QgIzOfF/ere/rT2PpQ15Mx2OKNTdJQiibCJPO7vlqC84urzCyBYFjZ9LtGtZjDqra8vtj66HG+Q4jxrqMsktJQ/zstHn0Ubwx1bS8PMhLBfY87acZLMacMWVPJHg9BY0Qt3tSMMQS85N3JdaqHkGm0vEE1hKDujgeQxm126j0bY=
+	t=1772037015; cv=none; b=SRS0xK/24x6VV7b5PqjaBYOTnuFsMnrVWRBryYs4DzSNHPle8JY8CQRQf1Hi1XkqDZ1/fJ5/oCx4KFLddJ0EnKu9Z01YNgHp6ejlqiahRLiKlMUYedvKV6wa5FxAjH1qs5wNO6uWewilt+6R9O6Fd7fV3XwdcxgnOiqwYEVRkGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772034660; c=relaxed/simple;
-	bh=pkVOD0eCRZIymdTyz41IN+4HPrww708w73WlG6rWSYA=;
-	h=In-Reply-To:Cc:References:Content-Type:To:From:Subject:Date:
-	 Mime-Version:Message-Id; b=cS1zDYi6+tflpHo4TDi5mMTwiOaZ4oWwbl6Mg2s2TtADB4z5XoN4sujWrKAzrcn3eo/L8h7powVSVU/rVWh0KTbaz4ogQzkGtQwMtbW04o5sMXCXYGke4egGHloHgnMDRgq3nBz5YJO9Sr3AgQuuNeA6AMRe8Oo4QIRGOU3vv1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=q1S01wZt; arc=none smtp.client-ip=118.26.132.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1772037015; c=relaxed/simple;
+	bh=vJ804UQQ83e2Rnv1VzpHVArw1fg05t5j1rsobVSyUnM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NCbap3Gr5XCfB5xEL+y/uW4IJmeqV0XLzJzAtt/HZ7py5BzTsc0ia04w6av2h0x9rDqOJohM4iUvUCMegUP89zR1Qxz7nZwXSvmIPyyDOxfuKAcuToHzO/DAiU7NJ13ClBj52Tabrj33AAxpaH5RxKqw1r2Ornz9JemlEY8rMQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=oKDqJRh0; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="q1S01wZt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1772034644;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=LXDma3vsb4q0KCMIrkMBaUr+IRBe58Upuc3EAUQaOUg=;
- b=q1S01wZtJsOqKBeNco+WjJNGAlAIZ1uweQQ71Y+z7VaEDjmWsIZPIy+hHiNHwPMyavdscG
- kL0qi8Cqv7qmLZxydTReziqb930uW3Ptt17EwQVWOp6pXtpc3kGzKwF1ZbShyFoqHb6MQC
- 90y2G14f9g3LIPAqfTsikpo7W0WMLh5dnfakCVruowt/10AgoxGbGPNWZxwz41u/EvxZK9
- n08r4/Gth2s85lnUs4hGy0bWpUwWb8qmwFV9vUGE2DhxRHYQ2UQI+JG3bgRr750GRvof1l
- e6Be0+MPw4E3ujSB+ufu17IhaYzVqjHuV+V5yCjmLOWLJ5n373NDEHXtSXaeOw==
-In-Reply-To: <20260225124556.1152510-1-nilay@linux.ibm.com>
-Cc: <axboe@kernel.dk>, <hch@lst.de>, <ming.lei@redhat.com>, 
-	<yi.zhang@redhat.com>, <shinichiro.kawasaki@wdc.com>, <gjoyce@ibm.com>, 
-	<yukuai@fnnas.com>
-Content-Transfer-Encoding: quoted-printable
-Received: from [192.168.1.104] ([39.182.0.132]) by smtp.feishu.cn with ESMTPS; Wed, 25 Feb 2026 23:50:41 +0800
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-References: <20260225124556.1152510-1-nilay@linux.ibm.com>
-Reply-To: yukuai@fnnas.com
-X-Lms-Return-Path: <lba+2699f1a52+2a791f+vger.kernel.org+yukuai@fnnas.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-To: "Nilay Shroff" <nilay@linux.ibm.com>, <linux-block@vger.kernel.org>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH] block: break pcpu_alloc_mutex dependency on freeze_lock
-Date: Wed, 25 Feb 2026 23:50:40 +0800
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="oKDqJRh0"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fLg6r5kwPzlh1W5;
+	Wed, 25 Feb 2026 16:30:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1772037008; x=1774629009; bh=vJ804UQQ83e2Rnv1VzpHVArw
+	1fg05t5j1rsobVSyUnM=; b=oKDqJRh0D6vrq2hrDuQAWCr7+ZHvJBmruObJB2yC
+	0iJ5hP0MKKYub9DnzowIBVtpaYR/t1o/q2lsH/q+ZGip59k5WZlnRwcRJ3hibvzk
+	XX1zZWi9SYyGvIhXtbI6y2DMxwCBZd7nE2u12PNF2f480MWUS/V3sUnc8j/kIImp
+	ApjjQ5WxkD+DnWPSO6JWfzOa6/FVB48s1+C5FiIxzJlBcnnjWF7zR9ZYrEnlBk+M
+	cAwRLs79KryJ2bd69dnH9kQoBbzxFZrTTxSVnwppuYjtyNVMQsiF+bcuY0xQw1be
+	Tba3TOYq0lPendvfe3Rydfg39DaTa8uZl1TFSzqSCOMxhA==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id WG1e1sKu4RAY; Wed, 25 Feb 2026 16:30:08 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fLg6Y0fk6zlgr48;
+	Wed, 25 Feb 2026 16:29:56 +0000 (UTC)
+Message-ID: <4bc30e61-e83d-4368-98bd-78f7d22c3f2e@acm.org>
+Date: Wed, 25 Feb 2026 08:29:56 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-Id: <1a2c39d4-5d39-42c6-89f9-3ec473b44b06@fnnas.com>
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
+ expansion plan for the storage stack test framework
+To: Haris Iqbal <haris.iqbal@ionos.com>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Daniel Wagner <dwagner@suse.de>, Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ Hannes Reinecke <hare@suse.de>, hch <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>, "sagi@grimberg.me" <sagi@grimberg.me>,
+ "tytso@mit.edu" <tytso@mit.edu>,
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ Christian Brauner <brauner@kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+ "willy@infradead.org" <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+ "amir73il@gmail.com" <amir73il@gmail.com>, "vbabka@suse.cz"
+ <vbabka@suse.cz>, Damien Le Moal <dlemoal@kernel.org>
+References: <31a2a4c2-8c33-429a-a2b1-e1f3a0e90d72@nvidia.com>
+ <459953fa-5330-4eb1-a1b4-7683b04e3d45@flourine.local>
+ <aY77ogf5nATlJUg_@shinmob>
+ <CAJpMwyis1iZB2dQMC4VC8stVhRhOg0mfauCWQd_Nv8Ojb+X-Yw@mail.gmail.com>
+ <40edeeec-dbc3-4aef-ac86-691e1ed2ed06@acm.org>
+ <CAJpMwygzTcBnKVp=bJWZpW9X5JdcP9Lj4H1BRBu2bNV_kGyDQQ@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAJpMwygzTcBnKVp=bJWZpW9X5JdcP9Lj4H1BRBu2bNV_kGyDQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 2/25/26 2:07 AM, Haris Iqbal wrote:
+> Regarding data modification, if the tests do not involve any crash or
+> reboot, then the VMs can be started in "snapshot" mode.
+I'm not sure that proposal makes sense. If e.g. an NVMe device is
+specified in the blktests config file, it probably is the intention of
+the person who runs the test to test the NVMe driver and/or the NVMe
+device. Using any method to create a "snapshot" of the device and to
+run blktests against that snapshot changes the kernel driver and also
+the physical device that are tested. Not modifying the kernel driver
+or physical device that are tested implies using PCIe passthrough. And
+the PCIe passthrough mechanism can only be used by one VM at a time as
+far as I know.
 
-=E5=9C=A8 2026/2/25 20:44, Nilay Shroff =E5=86=99=E9=81=93:
-> While nr_hw_update allocates tagset tags it acquires ->pcpu_alloc_mutex
-> after ->freeze_lock is acquired or queue is frozen. This potentially
-> creates a circular dependency involving ->fs_reclaim if reclaim is
-> triggered simultaneously in a code path which first acquires ->pcpu_
-> alloc_mutex. As the queue is already frozen while nr_hw_queue update
-> allocates tagsets, the reclaim can't forward progress and thus it could
-> cause a potential deadlock as reported in lockdep splat[1].
->
-> Fix this by  pre-allocating tagset tags before we freeze queue during
-> nr_hw_queue update. Later the allocated tagset tags could be safely
-> installed and used after queue is frozen.
->
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Closes: https://lore.kernel.org/all/CAHj4cs8F=3DOV9s3La2kEQ34YndgfZP-B5PH=
-S4Z8_b9euKG6J4mw@mail.gmail.com/ [1]
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
->   block/blk-mq.c | 53 +++++++++++++++++++++++++++++++++++---------------
->   1 file changed, 37 insertions(+), 16 deletions(-)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d5602ff62c7c..687fd47786a6 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4793,10 +4793,10 @@ static void blk_mq_update_queue_map(struct blk_mq=
-_tag_set *set)
->   	}
->   }
->  =20
-> -static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
-> -				       int new_nr_hw_queues)
-> +static int blk_mq_prealloc_tag_set_tags(struct blk_mq_tag_set *set,
-> +		       int new_nr_hw_queues, struct blk_mq_tags ***tags)
-
-Personally I don't like the last parameter, since the return value is not
-used at all, I feel it's better to return the new_tags instead.
-
->   {
-> -	struct blk_mq_tags **new_tags;
-> +	struct blk_mq_tags **new_tags =3D NULL;
->   	int i;
->  =20
->   	if (set->nr_hw_queues >=3D new_nr_hw_queues)
-> @@ -4807,24 +4807,42 @@ static int blk_mq_realloc_tag_set_tags(struct blk=
-_mq_tag_set *set,
->   	if (!new_tags)
->   		return -ENOMEM;
->  =20
-> -	if (set->tags)
-> -		memcpy(new_tags, set->tags, set->nr_hw_queues *
-> -		       sizeof(*set->tags));
-> -	kfree(set->tags);
-> -	set->tags =3D new_tags;
-> -
->   	for (i =3D set->nr_hw_queues; i < new_nr_hw_queues; i++) {
-> -		if (!__blk_mq_alloc_map_and_rqs(set, i)) {
-> -			while (--i >=3D set->nr_hw_queues)
-> -				__blk_mq_free_map_and_rqs(set, i);
-> -			return -ENOMEM;
-> +		if (blk_mq_is_shared_tags(set->flags))
-> +			new_tags[i] =3D set->shared_tags;
-> +		else {
-> +			new_tags[i] =3D blk_mq_alloc_map_and_rqs(set, i,
-> +					set->queue_depth);
-> +			if (!new_tags[i])
-> +				goto out_unwind;
->   		}
->   		cond_resched();
->   	}
->  =20
->   done:
-> -	set->nr_hw_queues =3D new_nr_hw_queues;
-> +	*tags =3D new_tags;
->   	return 0;
-> +out_unwind:
-> +	while (--i >=3D set->nr_hw_queues) {
-> +		if (!blk_mq_is_shared_tags(set->flags))
-> +			blk_mq_free_map_and_rqs(set, new_tags[i], i);
-> +	}
-> +	return -ENOMEM;
-> +}
-> +
-> +static void blk_mq_init_tag_set_tags(struct blk_mq_tag_set *set,
-> +		int new_nr_hw_queues, struct blk_mq_tags **new_tags)
-> +{
-> +	if (set->nr_hw_queues >=3D new_nr_hw_queues)
-> +		goto done;
-> +
-> +	if (set->tags)
-> +		memcpy(new_tags, set->tags, set->nr_hw_queues *
-> +		       sizeof(*set->tags));
-> +	kfree(set->tags);
-> +	set->tags =3D new_tags;
-> +done:
-> +	set->nr_hw_queues =3D new_nr_hw_queues;
->   }
->  =20
->   /*
-> @@ -5113,6 +5131,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk=
-_mq_tag_set *set,
->   	unsigned int memflags;
->   	int i;
->   	struct xarray elv_tbl;
-> +	struct blk_mq_tags **new_tags;
->   	bool queues_frozen =3D false;
->  =20
->   	lockdep_assert_held(&set->tag_list_lock);
-> @@ -5147,11 +5166,13 @@ static void __blk_mq_update_nr_hw_queues(struct b=
-lk_mq_tag_set *set,
->   		if (blk_mq_elv_switch_none(q, &elv_tbl))
->   			goto switch_back;
->  =20
-> +	if (blk_mq_prealloc_tag_set_tags(set, nr_hw_queues, &new_tags) < 0)
-> +		goto switch_back;
-> +
->   	list_for_each_entry(q, &set->tag_list, tag_set_list)
->   		blk_mq_freeze_queue_nomemsave(q);
->   	queues_frozen =3D true;
-> -	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
-> -		goto switch_back;
-> +	blk_mq_init_tag_set_tags(set, nr_hw_queues, new_tags);
-
-It looks ok just leave set->nr_hw_queues =3D nr_hw_queues, and the patch sh=
-ould
-be much simpler.
-
->  =20
->   fallback:
->   	blk_mq_update_queue_map(set);
-
---=20
-Thansk,
-Kuai
+Bart.
