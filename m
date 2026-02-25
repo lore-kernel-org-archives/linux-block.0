@@ -1,138 +1,98 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F28126F46F;
-	Wed, 25 Feb 2026 02:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5A329D264
+	for <linux-block@vger.kernel.org>; Wed, 25 Feb 2026 02:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771986766; cv=none; b=l+E45UVhBKtn7DAnmXakzmH5IfW2jfW/Tn9woMeqiMC4Uzvjcx84ZMLZCskH/5ky7YaQR0HEd32a7qHyMoPjU3jKuDma5Cy4dyZHBv+t367R/H67SlZ0ugeY0rCvP5PFgVN/FQSxEyuc/dy/gRI9XgWcESfDN7pCsG1fG+k763c=
+	t=1771987761; cv=none; b=eR9s8z+qLB6GDmv7LKinQtn5ecneBmccEvLgVxMp4ylVPMI/vQ0wkuuiYKplDfIFDLxc359mCqlqImAm5AfsqY447MxiE4neWGWiHrCeOO2qJ/HRxCvDzHnC4YIlJBeeuSBBkGumGdNbMCjdmHvm14h1YFSq1MHtwDDT2F6oP3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771986766; c=relaxed/simple;
-	bh=aG/j1CTumnrhavQPqTjfysHv89qbQiOwddXSaUmOgMc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B/HVsQTtAARInCqwNAm1tUKkeL8ZP47vm+oa+Gtd9aUxxYFbxe65+rMu4gta2T5GMeLZ7HmYbx6XxszqrMh+wuW29hno0dpLkfiZwuZvlgSqvL+UO/Mj2YciB0DEMuy5GX8h71oKzshk+tJqVSVP0S+4N93uRAQa4PYVf7SeO6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fLJX14fZ2zYQtwf;
-	Wed, 25 Feb 2026 10:32:17 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 9C73E4056E;
-	Wed, 25 Feb 2026 10:32:40 +0800 (CST)
-Received: from [10.174.178.253] (unknown [10.174.178.253])
-	by APP4 (Coremail) with SMTP id gCh0CgBnE_REX55p6vqmIg--.46236S3;
-	Wed, 25 Feb 2026 10:32:38 +0800 (CST)
-Message-ID: <7d2a3f65-4272-46c1-991a-356f0d2323cb@huaweicloud.com>
-Date: Wed, 25 Feb 2026 10:32:36 +0800
+	s=arc-20240116; t=1771987761; c=relaxed/simple;
+	bh=4HFrWpFXHStHyAJDRKafDSwsXeaiBR4GTYw95WU4oD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lLcwIRJhY5KpeAzVJ9Lavljkt7HAyKgk16TPMN0UADvW5WS/Sn8gpXfEdHAqz6z9IWGtv0/ihTh9R36VWyms/A3EnSJU7XKEWlbzUyoNdNi2BgFbQCFiR6KwOMSoj0nSMSUJ6wPK0zqnMBiLQqEtUNeENbt8I8IbaRIRiyZSCmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AC95wuQu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AC95wuQu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771987759;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pjB7FH+yEMTAbO/yiMu0jHt9Q1j6LBXFMbedN1pzql8=;
+	b=AC95wuQuHxeCjkUId4/MVDD1R/mbUYNDeiSkqjVPXK7bJ7+c3QtrVE9D0cHNxSVux0LbAn
+	ALpYbzcWsuTr16VkrcbgEoIadrLIT2YfCT/hzomonkX00aqt6ecE6b+nJ7eDUG6PdnQDiL
+	gMOnD6cFiY9l2zUl2nvZjydigHQU+BA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-375-DJGhvPOKNaqfIszjs92zww-1; Tue,
+ 24 Feb 2026 21:49:14 -0500
+X-MC-Unique: DJGhvPOKNaqfIszjs92zww-1
+X-Mimecast-MFC-AGG-ID: DJGhvPOKNaqfIszjs92zww_1771987753
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F54119560A7;
+	Wed, 25 Feb 2026 02:49:12 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.18])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9B57F1955D71;
+	Wed, 25 Feb 2026 02:49:06 +0000 (UTC)
+Date: Wed, 25 Feb 2026 10:48:56 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 7.1] ublk: report BLK_SPLIT_INTERVAL_CAPABLE
+Message-ID: <aZ5jGLX9cBQPLn_d@fedora>
+References: <20260224155724.3142007-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/9] nvme: set max_hw_wzeroes_unmap_sectors if device
- supports DEAC bit
-To: Robert Pang <robertpang@google.com>, Zhang Yi <yi.zhang@huawei.com>
-Cc: bmarzins@redhat.com, brauner@kernel.org, chaitanyak@nvidia.com,
- chengzhihao1@huawei.com, djwong@kernel.org, dm-devel@lists.linux.dev,
- hch@lst.de, john.g.garry@oracle.com, linux-block@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
- martin.petersen@oracle.com, shinichiro.kawasaki@wdc.com, tytso@mit.edu,
- yangerkun@huawei.com, yukuai3@huawei.com
-References: <20250619111806.3546162-3-yi.zhang@huaweicloud.com>
- <20260225000531.3658802-1-robertpang@google.com>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <20260225000531.3658802-1-robertpang@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgBnE_REX55p6vqmIg--.46236S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxur4rJFyDCw15JF4UuF4fGrg_yoW5ZFyrpF
-	4DWry0vrn8WF1UA3yDZw1I9FyUXws5Zry3Wa4kG3W5ZrZ0qryfZr1kuFZ0qa1DGrnrWw4F
-	ya1xZryqvasrXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	s2-5UUUUU==
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260224155724.3142007-1-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Robert!
-
-On 2/25/2026 8:05 AM, Robert Pang wrote:
-> Dear Zhang Yi,
+On Tue, Feb 24, 2026 at 08:57:22AM -0700, Caleb Sander Mateos wrote:
+> The ublk driver doesn't access request integrity buffers directly, it
+> only copies them to/from the ublk server in ublk_copy_user_integrity().
+> ublk_copy_user_integrity() uses bio_for_each_integrity_vec() to walk all
+> the integrity segments. ublk devices are therefore capable of handling
+> requests with integrity intervals split across segments. Set
+> BLK_SPLIT_INTERVAL_CAPABLE in the struct blk_integrity flags for ublk
+> devices to opt out of the integrity-interval dma_alignment limit.
 > 
-> In reviewing your patch series implementing support for the
-> FALLOC_FL_WRITE_ZEROES flag, I noted the logic propagating
-> max_write_zeroes_sectors to max_hw_wzeroes_unmap_sectors in commit 545fb46e5bc6
-> "nvme: set max_hw_wzeroes_unmap_sectors if device supports DEAC bit" [1]. This
-> appears to be intended for devices that support the Write Zeroes command
-> alongside the DEAC bit to indicate unmap capability.
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+>  drivers/block/ublk_drv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Furthermore, within core.c, the NVME_QUIRK_DEALLOCATE_ZEROES quirk already
-> identifies devices that deterministically return zeroes after a deallocate
-> command [2]. This quirk currently enables Write Zeroes support via discard in
-> existing implementations [3, 4].
-> 
-> Given this, would it be appropriate to respect NVME_QUIRK_DEALLOCATE_ZEROES also
-> to enable unmap Write Zeroes for these devices, following the prior commit
-> 6e02318eaea5 "nvme: add support for the Write Zeroes command" [5]? I have
-> included a proposed change to nvme_update_ns_info_block() below for your
-> consideration.
-> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 004f367243b6..34ed4f6a02ef 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -806,11 +806,11 @@ static void ublk_dev_param_basic_apply(struct ublk_device *ub)
+>  	set_capacity(ub->ub_disk, p->dev_sectors);
+>  }
+>  
+>  static int ublk_integrity_flags(u32 flags)
+>  {
+> -	int ret_flags = 0;
+> +	int ret_flags = BLK_SPLIT_INTERVAL_CAPABLE;
+>  
+>  	if (flags & LBMD_PI_CAP_INTEGRITY) {
+>  		flags &= ~LBMD_PI_CAP_INTEGRITY;
+>  		ret_flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
 
-Thank you for your point. Overall, this makes sense to me, but I have one
-question below.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-> Best regards
-> Robert Pang
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index f5ebcaa2f859..9c7e2cabfab3 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -2422,7 +2422,9 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
->          * require that, it must be a no-op if reads from deallocated data
->          * do not return zeroes.
->          */
-> -       if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3))) {
-> +       if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3)) ||
-> +           (ns->ctrl->quirks & NVME_QUIRK_DEALLOCATE_ZEROES) &&
-> +           (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM)) {
-                                ^^^^^^^^^^^^^^^^^^
-Why do you want to add a check for NVME_CTRL_ONCS_DSM? In nvme_config_discard(),
-it appears that we prioritize ctrl->dmrsl, allowing discard to still be
-supported even on some non-standard devices where NVME_CTRL_ONCS_DSM is not set.
-In nvme_update_disk_info(), if the device only has NVME_QUIRK_DEALLOCATE_ZEROES,
-we still populate lim->max_write_zeroes_sectors (which might be non-zero on
-devices that support NVME_CTRL_ONCS_WRITE_ZEROES). Right? So I'm not sure if we
-only need to check for NVME_QUIRK_DEALLOCATE_ZEROES here.
-
->                 ns->head->features |= NVME_NS_DEAC;
-
-I think we should not set NVME_NS_DEAC for the quirks case.
-
-Cheers,
-Yi.
-
->                 lim.max_hw_wzeroes_unmap_sectors = lim.max_write_zeroes_sectors;
->         }
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=545fb46e5bc6
-> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/nvme/host/nvme.h#n72
-> [3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/nvme/host/core.c#n938
-> [4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/nvme/host/core.c#n2122
-> [5] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6e02318eaea5
+Thanks, 
+Ming
 
