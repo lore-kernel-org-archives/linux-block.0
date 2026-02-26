@@ -1,64 +1,45 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397393A1E82;
-	Thu, 26 Feb 2026 21:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508C138F22D
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 21:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772140345; cv=none; b=Z3d5vS9JQOeS1xtl7n8viGXhI6FlwrjDBRCpCNH2sfeIH3LdzrT5dqVclsibosdYvYGZrJB3X/ci4vXM6hue8XaxTE/IP53kvo/9Wq9PhyE/p4w6HeBB/2xalftpC2cYj/8IJHYLQ0dXV6iQAOj2gIkNtScGGBlKbXTd9HCvm+g=
+	t=1772141872; cv=none; b=H9G+aElbF+DjjT35os+WJGDZzDFJhCakNAKTLKEQH7k+/QrlvGwDdf5koUp3PWFvUWXhzQ4ogwkwf4ffZ8qA/L1E2rNdX8ALnQ4OhGUqgveyCAUmSksbQ11iKNRd0dlav4so4yCe9NwCipLxGvuRwfdf/czh0aIc5+NtXtfhE+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772140345; c=relaxed/simple;
-	bh=h/eCq6uk34O9sRVEPL6UJ9Eruk+vrXSzn2fekqThhV4=;
+	s=arc-20240116; t=1772141872; c=relaxed/simple;
+	bh=YnR9ffm9iDsrmTnrSK+BYOMVVbIYhuRYPyQ+kiew8v8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dZHnnEtPDQbk9Q4PaKb/IjzJDhEVKNM8A4v6IE04aBVWmBD/u/6wvA3H2Czdr64Gxz3VGMlZTZyRFIA4tg3OoB+RvMUMK2TZnKDLlQ57gc8fEspn7k/SzTIlj5IV/wTj2fUe0K2J5Ks0F9E9kaZtgrfPa1iMvzAJfynvwCsmyp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lgkspXoZ; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=G/dzxGNAbPP8EadKwP+GZInR2MtlIzd4MsWshP9vLW8opYRt0YvJsNSCSWdJZTLKWnJqtTHa2skbl4L4hxDSCUJH3JHUJQFmui8llPI7isq+yepU0f44FSk1s0Uaq7MCIQ9w9663Ngi7H3CHx0mZfYZ5LBPUZ4l2wu70pRWT6to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gkT6Ulij; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lgkspXoZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=cxjFK2I1rFqs+rF+S3xFy7UtO9xYKfa9VhNCsIXi0UM=; b=lgkspXoZtskd+nEFTO7IHEtKtY
-	QTWQeCvLBoCUJsiEPlwCe6SWhlX4OpH4sfIcf973/D/KHKtxmL7cdhI6EVPhq+88YezeXjnYeF9/k
-	lTBC4JUAHiw0PjPxqQDKyXesl0LB4Vk4iaFTKfzl2Tl3I2RHXTu5RqbQRomZRKajicLkxk1Zc3Cgl
-	EA9AE9Aq8Dj+/BUR9USybQncuYrIbgeNeLca3LgZvkDQDBJlBeBiGdrYoUnF5XrvaNGooNpTfJR43
-	oaTeNczWoFDSM88QQWW6khDtS0804E+RmfZTXk4WzycI+T/ry+ky6kMNEO4z3lOlB81Jk2mHVpBQg
-	Mtjq8aOQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vviec-00000003Sxg-0gjd;
-	Thu, 26 Feb 2026 21:12:14 +0000
-Date: Thu, 26 Feb 2026 21:12:13 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tal Zussman <tz2294@columbia.edu>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net,
-	linux-mm@kvack.org,
-	"Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Subject: Re: [PATCH RFC v2 1/2] filemap: defer dropbehind invalidation from
- IRQ context
-Message-ID: <aaC3LUFa1Jz2ahk3@casper.infradead.org>
-References: <20260225-blk-dontcache-v2-0-70e7ac4f7108@columbia.edu>
- <20260225-blk-dontcache-v2-1-70e7ac4f7108@columbia.edu>
- <c8078a80-f801-4f8a-b3cd-e2ccbfca1def@kernel.dk>
- <aZ-2G_6lDZePLSyx@casper.infradead.org>
- <44e3e9ea-350b-4357-ba50-726e506feab5@kernel.dk>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gkT6Ulij"
+Date: Thu, 26 Feb 2026 13:37:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772141869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DcdznLUrOcDmYG/a2OAhCexa8EAGJv2HXxaM916vS+4=;
+	b=gkT6UlijS0Kh4njOGpNrZHm+ANe8rI2Cfxg81HEL5UhvGGvUPTXaIXh3IrTkVbBbG9NWJj
+	68Jj9R6Hw6VPjJ9g3PxxpSnXd0NymJ8vQQwW+MZKFEEzZ52nGcpYQI/r9l/TJ31Tt7PL27
+	x7gwr5+lsU0JMaAUQ8VduP7e9/YsZL4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Joshua Hahn <joshua.hahnjy@gmail.com>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Jens Axboe <axboe@kernel.dk>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
+	Nhat Pham <hoangnhat.pham@linux.dev>, Nhat Pham <nphamcs@gmail.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH 3/8] mm/zsmalloc: Introduce objcgs pointer in struct
+ zpdesc
+Message-ID: <aaC80TsqmKpwFzQf@linux.dev>
+References: <20260226192936.3190275-1-joshua.hahnjy@gmail.com>
+ <20260226192936.3190275-4-joshua.hahnjy@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,48 +48,34 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <44e3e9ea-350b-4357-ba50-726e506feab5@kernel.dk>
+In-Reply-To: <20260226192936.3190275-4-joshua.hahnjy@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Feb 25, 2026 at 08:15:28PM -0700, Jens Axboe wrote:
-> On 2/25/26 7:55 PM, Matthew Wilcox wrote:
-> > I recently saw something (possibly XFS?) promoting this idea again.
-> > And now there's this.  Perhaps the time has come to process all
-> > write-completions in task context, rather than everyone coming up with
-> > their own workqueues to solve their little piece of the problem?
-> 
-> Perhaps, even though the punting tends to suck... One idea I toyed with
-> but had to abandon due to fs freezeing was letting callers that process
-> completions in task context anyway just do the necessary work at that
-> time. There's literally nothing worse than having part of a completion
-> happen in IRQ, then punt parts of that to a worker, and need to wait for
-> the worker to finish whatever it needs to do - only to then wake the
-> target task. We can trivially do this in io_uring, as the actual
-> completion is posted from the task itself anyway. We just need to have
-> the task do the bottom half of the completion as well, rather than some
-> unrelated kthread worker.
-> 
-> I'd be worried a generic solution would be the worst of all worlds, as
-> it prevents optimizations that happen in eg iomap and other spots, where
-> only completions that absolutely need to happen in task context get
-> punted. There's a big difference between handling a completion inline vs
-> needing a round-trip to some worker to do it.
+On Thu, Feb 26, 2026 at 11:29:26AM -0800, Joshua Hahn wrote:
+> --- a/mm/zpdesc.h
+> +++ b/mm/zpdesc.h
+> @@ -20,10 +20,12 @@
+>   * @zspage:		Points to the zspage this zpdesc is a part of.
+>   * @first_obj_offset:	First object offset in zsmalloc pool.
+>   * @_refcount:		The number of references to this zpdesc.
+> + * @objcgs:		Array of objcgs pointers that the stored objs
+> + *			belong to. Overlayed on top of page->memcg_data, and
+> + *			will always have first bit set if it is a valid pointer.
+>   *
+>   * This struct overlays struct page for now. Do not modify without a good
+> - * understanding of the issues. In particular, do not expand into the overlap
+> - * with memcg_data.
+> + * understanding of the issues.
+>   *
+>   * Page flags used:
+>   * * PG_private identifies the first component page.
+> @@ -47,6 +49,9 @@ struct zpdesc {
+>  	 */
+>  	unsigned int first_obj_offset;
+>  	atomic_t _refcount;
+> +#ifdef CONFIG_MEMCG
+> +	unsigned long objcgs;
 
-I spoke a little hastily when I said "all write completions".  What I
-really meant was something like:
+Why not just strore struct obj_cgroup ** instead of unsigned long? You will not
+need to do conversions when storing or accessing. 
 
-+++ b/block/bio.c
-@@ -1788,7 +1788,9 @@ void bio_endio(struct bio *bio)
-        }
- #endif
-
--       if (bio->bi_end_io)
-+       if (!in_task() && bio_flagged(bio, BIO_COMPLETE_IN_TASK_CONTEXT))
-+               bio_queue_completion(bio);
-+       else if (bio->bi_end_io)
-                bio->bi_end_io(bio);
- }
- EXPORT_SYMBOL(bio_endio);
-
-and then the submitter (ie writeback) would choose to set
-BIO_COMPLETE_IN_TASK_CONTEXT.  And maybe others (eg fscrypt) would
-want to do the same.
