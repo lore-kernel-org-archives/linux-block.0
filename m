@@ -1,86 +1,73 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5BF3921E6;
-	Thu, 26 Feb 2026 22:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860CF279DB6
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 22:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772143640; cv=none; b=KzXQrDG/6ZDkUSBOcQ3FTI5/0QhGbROvKb8o/EBmqEkmsXYm2YPGrnslDqyShFuxMzGZn3jWUFvzZBMXa5sfUlsm0giDCGozcoPXq1Z+ZUMYtP1YTkvjVmv28T/2K+p6/cji4h53KzdRiw7wQZ25M2i08pZ4Y61o20kIE/dKUE0=
+	t=1772144251; cv=none; b=uhx5MJSytv7MDRIgjurB7Tj1jodECNNmbaQ2bnYUyiHG0dBzJniEhH+IeJrRgx9wGgqB4GN6fBLIUH4M/vyjHWoL2ekHflvsokdXV8wcwcUowmlhOawUD+O0DuJIQ5LQU67jpenFwq24TbMrg1xGiamlvWveqzNwCdkSESCn3Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772143640; c=relaxed/simple;
-	bh=Bgb0YK8o2pkzPSpfkgVBWrdj2AMPxC0nf48KXkcpp6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V5pWth4zvtLmYDFVuks0SKQyufYm63x6wEe7t4ByrS11buot/6+C8D4TBaj4IqwpbMyIgpjVfq3tlA+0Vj7VqWMjmJio+AwZPXxQnaypT6i8xHu1AMvdZ4YyD/0BCOnPRLHmstoQj9c9VhXaq9KfWITCG2jk/RYhRGcsQytVcqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=K7DL8n1Q; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1772144251; c=relaxed/simple;
+	bh=trPYJJyb9C9JlMCbDa0XYIZu6v4NQ+s4Jquz6mkIFOE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=BvzIDUbURBFufBpzwJQtLVUTXofMpSDXJxT5H83wN9NVU/pRXWryQQXCfwxDVmNver2aN6HYPcQczkIT/sob3bMPkdfDt0IFWyhtehDY7GyJ9iu+isnrfZ22jgstgjapF6umz4aXR5rC+9Hb/XrKLJ7JMCLHRbUdjlL+BN2D9gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=caLVxYTI; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K7DL8n1Q"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Kg9gzOuUKPXfQ8TifAkHBiU5GSG5v54A0/HGpdATajE=; b=K7DL8n1QS3fDGk8/1/ItX9kSyq
-	wGDsP3RH3tejeQ90Haptd0/T0PuP9s1ekbp6LW1y31cbyrt9nWxqXpDH5yWK910W0H7qDmAOp4mir
-	vPyykjX5r2Y9hYE4nuPKuxchdUtNCMGnFo7DpEMxzLsXdtuACqOyH7o+aoj6LwBSld9JPHEVZZaeS
-	qBKvr5fqBFTTGOOveTkKaGnpZpaKhIND3S5tdw74N7oTSKyYDDBmUZ77/NuHPY3rtWDa/wNtmot3+
-	r6z1pWxyxWHCTDAUm65LDMvRpEaU6e357eJg8d2uGILLtuClnyLAlOgGs7cbZuIkAkYRoS4MeaaqN
-	lclBFExg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vvjVq-00000007HdC-1p3G;
-	Thu, 26 Feb 2026 22:07:14 +0000
-Date: Thu, 26 Feb 2026 14:07:14 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net,
-	linux-mm@kvack.org
-Subject: Re: [PATCH RFC v2 2/2] block: enable RWF_DONTCACHE for block devices
-Message-ID: <aaDEEjVKBKrLxsht@infradead.org>
-References: <20260225-blk-dontcache-v2-0-70e7ac4f7108@columbia.edu>
- <20260225-blk-dontcache-v2-2-70e7ac4f7108@columbia.edu>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="caLVxYTI"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fMQmw5vyCzlfdfS;
+	Thu, 26 Feb 2026 22:17:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1772144239; x=1774736240; bh=trPYJJyb9C9JlMCbDa0XYIZu
+	6v4NQ+s4Jquz6mkIFOE=; b=caLVxYTI71pA2PlEhwzKF6hLDB/Zy/uZRXgj6jm/
+	J2fWJ0kWdOERkbk4N9czH3dQ0xRUy/nGrHCx03uWmv5BM2DblRIMVV6EG5dHxFyH
+	u2u9ioCvFLwQGRVpyiSnN9PZyr6/I/eJ/ZEjSW/2qPVzJBYylWPU1uUrsCifHOZy
+	zEELNpXvGpmjYMBeDulIYf19dlSfvgr9ohWczIniZJxLWd0S+p6/aaptae4C1GS4
+	X37g0HfzHis1Ul/kyawcU6X683hnXD3gr+nb0DTx+osCzrOEG7FPYYiaSINHv2NJ
+	ybk+/dSBjl808vsv66aRD2AycY4/J5/7pMwhTDDoWMgABQ==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id BJu3FG4hr_uA; Thu, 26 Feb 2026 22:17:19 +0000 (UTC)
+Received: from [172.20.2.156] (unknown [4.28.11.157])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fMQmt2gZnzlgqsJ;
+	Thu, 26 Feb 2026 22:17:18 +0000 (UTC)
+Message-ID: <e852d89d-e910-4f62-9d78-e4e6579625f3@acm.org>
+Date: Thu, 26 Feb 2026 14:17:16 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225-blk-dontcache-v2-2-70e7ac4f7108@columbia.edu>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/7] Improve zoned (SMR) HDD write throughput
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+References: <20260226041024.2154806-1-dlemoal@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260226041024.2154806-1-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> --- a/fs/bfs/file.c
-> +++ b/fs/bfs/file.c
-> @@ -177,7 +177,7 @@ static int bfs_write_begin(const struct kiocb *iocb,
->  {
->  	int ret;
->  
-> -	ret = block_write_begin(mapping, pos, len, foliop, bfs_get_block);
-> +	ret = block_write_begin(iocb, mapping, pos, len, foliop, bfs_get_block);
+On 2/25/26 8:10 PM, Damien Le Moal wrote:
+> This patch series cleans up the zone write plugging code and introduces
+> the ability to issue all write BIOs from a single context (a kthread)
+> instead of allowing multiple zones to be written at the same time using
+> a per zone work. As shown in patch 6, raw block device tests and XFS
+> tests with an SMR HDD show that this can significantly increase write
+> throughput (up to 40% over the current zone write plugging).
+For the entire series:
 
-Please don't change the prototoype for block_write_begin and thus
-cause churn for all these legacy file systems.  Add a new
-block_write_begin_iocb, and use that in the block code and to implement
-block_write_begin.
-
-And avoid the overly long line there to keep the code readable.
-
-Note that you also need to cover the !CONFIG_BUFFER_HEAD case.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
