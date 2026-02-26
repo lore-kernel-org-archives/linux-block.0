@@ -1,107 +1,71 @@
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAC73B95F1
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 15:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E16C368976
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 16:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772120492; cv=none; b=qcBr8f94RzMro4xQHF5Kz/bdSuPEX78fgRxigjvSj8Kg5N+2Sxr2OzJSoM0fPetJtmbC6arTdu35MFODczh6hDTHfJF2SSK/2fxYNAIqyl6o2YzINO8wRbenftPaQvek2Nyt4PHaSZzVQi8nh7LgSqHqcKwhdBDQKYc6qO1JnFg=
+	t=1772122256; cv=none; b=SF3VZrW7/ciAYnlHeHMmVe51DdcoAAawjZt+BbuZBy4h1A85Gj0zk5Fv9Rl4IhqlE3fa4cWwYT7cgwqV4o/rw8ex9ds0AEm7EPJ2MRy4LteY0AwoCZMsbuEJ500zrfm8SakI6sENvlXgOntdr4V0vLah/wNBOvcgXtadOoeECsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772120492; c=relaxed/simple;
-	bh=Jry6WCkZJt8VKBX6UrnGtmlrGoPK52ERr93AfOBVj5g=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=CnoIOMQm8sZ27tZNFdUR9+zPoX2cJgmG/QFWhPfJ7yRbIOCc4PzEf9hryX+WaOxzeaItkVEDkqivUi570UblRp82j8q2tRBZ/LUTZyYDugA+yrkxQdQbLwIsnbWIkc2q2puaODV1xr4l8q+I0LSP702nDpMI/p3rgZPnuJ64kSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=oLjNF8Fs; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1772122256; c=relaxed/simple;
+	bh=SizxvNHyIIIub/kci3lpbHrNciXMkt4wDgh0Qedujbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BEMKepU+TGxCt9UCCjO+TPzpqTFpac3WhlXJzRSWmukBgU+Oth52ibnc4VI8Zd2+u7sKpXeOjjTGFSGbLxvHCYXE7mc8TMG/9yju+njJbDXw5vMV+p7N+SH1zCfGs95CmIZqSbYmN64H0j5+z1ShMmAuOSadPiBoEFH78j7Eyek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KdyLX7kf; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="oLjNF8Fs"
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d1890f5cafso376518a34.1
-        for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 07:41:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772120489; x=1772725289; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i7HOayF1h8DktJ0cz4nMEDuzZ+6gF+C9n5bCyyta3ME=;
-        b=oLjNF8FshxLOL4/SdIIDbVkjldddSFGyV7n3ATsAS1iSvFioEKMyGoDElb11bgdgrQ
-         FtMHkuBewoDOUud26kKYDMlD7Kb6hiUSxAyCcFAz/Un2twNf3UGXFllka0It6r/r+ODv
-         WlTFdFCzxvXPziCbCnwFg3ga9Rd+MjEGtYfM/LEe4xQ3jPDcpQd+d4tjhbd0e6buGEdO
-         HjpTqoXnj225wTx2Woi5Z4TusngsmI2qoj+lrjxXY3ldppr8gcn+aRntYIVes703DKry
-         1F8CCeU4U6E/qOCV48TM/T1VRRiyMhyHYdRIEoUgcawQfhO8Ib+CqqLeXYjP+ecGosJC
-         Cb4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772120489; x=1772725289;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=i7HOayF1h8DktJ0cz4nMEDuzZ+6gF+C9n5bCyyta3ME=;
-        b=lxa/eIhyBmQ25u9SXDhq5S+Vpwo85hEohQ4C5HjoRhCLnwQNLyQhatr5XTmiKZKoSm
-         tPN0FZbRDsbM1Q7xwYXd4Uv2GrbSGEPx95WebNx/S+lCkCHeMG458LwV1/lyZXst/vJy
-         64P8qYfIdEa3ypi4r7f4dAyfW38rWkGLyCiPAX8yFyD7KTONv+J84HEnQDYHsEUcM2oA
-         ZhKsq8CH5s/AzssCBCq6euPjAHp+79Tctf34nNQpBr0pdJHGmOXFauEOxWRF4zXCmGBI
-         uAs/Ep2uFygoHBUUIcC3ng0PwzFNICJFEQCJTZiVa7o0amoWOB3GfFns5pN6ng/Lo/hG
-         dgvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXu9maGvY2ZlRV02HBPctfUCox2fl4j5CcKGJPvR2WJtpybxkT1+2tZhxszuTjcvybYf6BWrBpn1l85OQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ+HDACHilJNexnjdPMQB+I41GbRQiNA2+eDnc6bGswMiuerwT
-	kSFEe3PHMqwX4Kl1+FTD2IocUyaxTCEc1qDayObks2vOU6d/F16RK/IhZlxy4hUSwHeivinmdNZ
-	fvSnI7rM=
-X-Gm-Gg: ATEYQzzHd/7lqGOwjAFeeYXtW2MLecaIXULDAR3F1cqky4dxtHTtutP/c0uPlAEfTLN
-	/FJ+VA4WBsiZ7et2sqh3QT74xWkCzEFKm+yPiTTHlmUgVAhuiJdZ8i2Ugz2A6+EsUUT3b8A8NZx
-	W7uxV+G79CTzQ9oLBh2HHXX2W9LZCpbYhm93HDHFCdKs3ewGRSn0ArgGlNsJRlbLe0k2l7+7baF
-	L3HyaAyW7yXP/jLH0bpRWgRnMxKPqY+FLtOxA0uWHAvAfcnx/OFiNZ1ZFVstYB0pMj/URhfHjeu
-	ZpaN2ODo0qOjOeadr543Q4RdiR9CX5z6VCt4x9mOVxtvLsaoBD5fiD5b431YIoGwPj7kn1g6N46
-	9B06nmm3AfOSrlTCYjA5VE3oKvFBFuvoSdSs0QRojlhnBRtQYojr2HlIwSoKc8pcECvmAv+/Has
-	jZJjeh/NuqDEb/sBFC9CmQkcLaxiflivguGsXndahTAzgQDuisdj6L8H4ZqUHbYPAuICAOEHopJ
-	6Eb
-X-Received: by 2002:a05:6830:2b2a:b0:7d1:a028:4464 with SMTP id 46e09a7af769-7d582a92612mr2231783a34.36.1772120489482;
-        Thu, 26 Feb 2026 07:41:29 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d586626869sm1978963a34.16.2026.02.26.07.41.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 07:41:28 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-kernel@vger.kernel.org, Bill Wendling <morbo@google.com>
-Cc: Daniel Wagner <dwagner@suse.de>, Kees Cook <kees@kernel.org>, 
- Gogul Balakrishnan <bgogul@google.com>, 
- Arman Hasanzadeh <armanihm@google.com>, linux-block@vger.kernel.org
-In-Reply-To: <20260225205107.2837665-1-morbo@google.com>
-References: <20260219004940.2594201-1-morbo@google.com>
- <20260225205107.2837665-1-morbo@google.com>
-Subject: Re: [PATCH v2] blkdev: Annotate struct request_queue with
- __counted_by_ptr
-Message-Id: <177212048818.990177.5581263448487693184.b4-ty@kernel.dk>
-Date: Thu, 26 Feb 2026 08:41:28 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KdyLX7kf"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=XJD1uUbIl1Mm/G4UUvmqbKE+RB1RV1NvHVzJyMkIL10=; b=KdyLX7kf4ghUXSxmbl1B6sknVz
+	D6KNET7D0trbRj+ximXIHrd43YoA7fHhrM6D7+IuATPmIRbEyzYaQUGr2cgk6JzfVyAFANso9g3SW
+	B7QPaHmSOhf1LQOjOI15NBQYoZVrPuHYzAG7A2ezj9ATiyxfr1Nfbo7SRGKmSkzjML/BIiJwqnYPM
+	8l4LoszXY2UbTRAus0vP5z9xWAH2a78h1UXNxPtf7Hd3EtB0ouz9a7aoyJs3C/vKmFxT44wA9htws
+	jzGAOLsgvSYimy7lPhmxyRdDfT6ieX6I+ArU91dHmhVKg73C9S0tCavzLaeGBwAOu+CYhCZfhf4Sn
+	XcJJiHyQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vvdwu-00000006hU9-1ifM;
+	Thu, 26 Feb 2026 16:10:48 +0000
+Date: Thu, 26 Feb 2026 08:10:48 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 1/7] block: fix zone write plug removal
+Message-ID: <aaBwiGGrS5StFlWX@infradead.org>
+References: <20260226041024.2154806-1-dlemoal@kernel.org>
+ <20260226041024.2154806-2-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226041024.2154806-2-dlemoal@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+On Thu, Feb 26, 2026 at 01:10:18PM +0900, Damien Le Moal wrote:
+>  		/*
+> -		 * Check that a BIO completion or a zone reset or finish
+> -		 * operation has not already removed the zone write plug from
+> -		 * the hash table and dropped its reference count. In such case,
+> -		 * we need to get a new plug so start over from the beginning.
+> +		 * We already have a zone write plug. If it is flagged as dead,
+> +		 * its initial reference count was already dropped. In
+> +		 * this case, increment the reference count and clear the dead
+> +		 * flag to restore the plug to a state similar to a newly
+> +		 * allocated zone write plug.
 
-On Wed, 25 Feb 2026 20:51:05 +0000, Bill Wendling wrote:
-> The queue_hw_ctx field in struct request_queue is an array of pointers to
-> struct blk_mq_hw_ctx. The number of elements in this array is tracked by
-> the nr_hw_queues field.
-> 
-> The array is allocated in __blk_mq_realloc_hw_ctxs() using kcalloc_node()
-> with set->nr_hw_queues elements. q->nr_hw_queues is subsequently updated
-> to set->nr_hw_queues.
-> 
-> [...]
+This comment, both in the old and new version describes what happens
+here, but it really fails to explain why.  The plug is scheduled
+for removal if we either filled up the zone or reset it, so any new
+bio coming in would result in an I/O error anyway.  So why do we try
+to resurrect the plug instead of just failing the I/O?
 
-Applied, thanks!
+Or am I missing something?
 
-[1/1] blkdev: Annotate struct request_queue with __counted_by_ptr
-      (no commit info)
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Otherwise this looks good.
