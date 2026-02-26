@@ -1,149 +1,114 @@
-Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C9032E720;
-	Thu, 26 Feb 2026 20:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.77.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397393A1E82;
+	Thu, 26 Feb 2026 21:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772137154; cv=none; b=U+WIDkbPZ3REsvFQbSb5NQ5FPMp84ZwO/+7TXfG2Yh+2aGip1xGNVKM2CGd/dKONunMmpFEZnclRujXMwSo4sKJdBpW8QOXRTwJitT7fLYQnJUeTf03gYw9FDTTEOt0Ga8PKq50zTSddfqMhbMZFzkSmVABOE3R16PSV6YAOiQY=
+	t=1772140345; cv=none; b=Z3d5vS9JQOeS1xtl7n8viGXhI6FlwrjDBRCpCNH2sfeIH3LdzrT5dqVclsibosdYvYGZrJB3X/ci4vXM6hue8XaxTE/IP53kvo/9Wq9PhyE/p4w6HeBB/2xalftpC2cYj/8IJHYLQ0dXV6iQAOj2gIkNtScGGBlKbXTd9HCvm+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772137154; c=relaxed/simple;
-	bh=XMDAjoQkTjgcB7K1B5xaNYpPic527m/p7uMetODqzp8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jzBgmZE4v3DQ6GyIcqvq5m/ByoDrYmBGWkPnlcLT0slRbUrMhb+gOA9oTjGAWb/wuMJUdpredOZchl5JZWKFPLWOFPD+XYj5J0Tp0YDwZxCUGog4fe9WJGKgFk5Y+hDbSZppPH3dcOsPUfPfbkTNrh06XGQmOD6ZZxtKnIOrVvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=XTPLWk9H; arc=none smtp.client-ip=44.246.77.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1772140345; c=relaxed/simple;
+	bh=h/eCq6uk34O9sRVEPL6UJ9Eruk+vrXSzn2fekqThhV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dZHnnEtPDQbk9Q4PaKb/IjzJDhEVKNM8A4v6IE04aBVWmBD/u/6wvA3H2Czdr64Gxz3VGMlZTZyRFIA4tg3OoB+RvMUMK2TZnKDLlQ57gc8fEspn7k/SzTIlj5IV/wTj2fUe0K2J5Ks0F9E9kaZtgrfPa1iMvzAJfynvwCsmyp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lgkspXoZ; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="XTPLWk9H"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1772137153; x=1803673153;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=l5CyLmWSy70xXQrTFUBICNcYiP+xBbTRP1l/4MnIwJo=;
-  b=XTPLWk9HSHdi2yxmL8gJokx/u1ZpNgEhf0TSFkqb6iiRpRyadlqr/jB/
-   0PSCzli+F2fSUU8tlRwIgeA3Ap/ippgy5yp4E+e8a3NvUdRTnTgwiPgr/
-   Rxh4DvIB69ZWaVNjifMyGfQnidjhLdMzsKrdiHmj5Vt+RIDcuhF7qv+Xz
-   rPD7vlVZZMw8zgqxNE7sApPKDcblmbPOYbNG1uPgoxCDSLP86UW4AYgdj
-   lH1mzkKgqKByyUAkpXcKB5TazayxrZhCVYyNhAQl5luCNMLqj7pbuu7Wh
-   74+GTaRpzpOO2Po824HvAKWrwypQ3tpm//iQMuBCWkdHmlFM7wy1gVas6
-   A==;
-X-CSE-ConnectionGUID: xcG1cJc8QiKHzmVxUnhJMA==
-X-CSE-MsgGUID: 2GZQKUuhRJqLX4PVlkovFQ==
-X-IronPort-AV: E=Sophos;i="6.21,312,1763424000"; 
-   d="scan'208";a="13881999"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 20:19:10 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:15821]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.152:2525] with esmtp (Farcaster)
- id 73aa004f-0205-4f88-98b1-e027e45a5a1d; Thu, 26 Feb 2026 20:19:10 +0000 (UTC)
-X-Farcaster-Flow-ID: 73aa004f-0205-4f88-98b1-e027e45a5a1d
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 26 Feb 2026 20:19:08 +0000
-Received: from c889f3b07a0a.amazon.com (10.106.83.20) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 26 Feb 2026 20:19:06 +0000
-From: Yuto Ohnuki <ytohnuki@amazon.com>
-To: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, Yuto Ohnuki <ytohnuki@amazon.com>, "kernel
- test robot" <lkp@intel.com>
-Subject: [PATCH v2] fs: remove stale and duplicate forward declarations
-Date: Thu, 26 Feb 2026 20:18:58 +0000
-Message-ID: <20260226201857.27310-2-ytohnuki@amazon.com>
-X-Mailer: git-send-email 2.50.0
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lgkspXoZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cxjFK2I1rFqs+rF+S3xFy7UtO9xYKfa9VhNCsIXi0UM=; b=lgkspXoZtskd+nEFTO7IHEtKtY
+	QTWQeCvLBoCUJsiEPlwCe6SWhlX4OpH4sfIcf973/D/KHKtxmL7cdhI6EVPhq+88YezeXjnYeF9/k
+	lTBC4JUAHiw0PjPxqQDKyXesl0LB4Vk4iaFTKfzl2Tl3I2RHXTu5RqbQRomZRKajicLkxk1Zc3Cgl
+	EA9AE9Aq8Dj+/BUR9USybQncuYrIbgeNeLca3LgZvkDQDBJlBeBiGdrYoUnF5XrvaNGooNpTfJR43
+	oaTeNczWoFDSM88QQWW6khDtS0804E+RmfZTXk4WzycI+T/ry+ky6kMNEO4z3lOlB81Jk2mHVpBQg
+	Mtjq8aOQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vviec-00000003Sxg-0gjd;
+	Thu, 26 Feb 2026 21:12:14 +0000
+Date: Thu, 26 Feb 2026 21:12:13 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tal Zussman <tz2294@columbia.edu>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sungjong Seo <sj1557.seo@samsung.com>,
+	Yuezhang Mo <yuezhang.mo@sony.com>,
+	Dave Kleikamp <shaggy@kernel.org>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Bob Copeland <me@bobcopeland.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net,
+	linux-mm@kvack.org,
+	"Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Subject: Re: [PATCH RFC v2 1/2] filemap: defer dropbehind invalidation from
+ IRQ context
+Message-ID: <aaC3LUFa1Jz2ahk3@casper.infradead.org>
+References: <20260225-blk-dontcache-v2-0-70e7ac4f7108@columbia.edu>
+ <20260225-blk-dontcache-v2-1-70e7ac4f7108@columbia.edu>
+ <c8078a80-f801-4f8a-b3cd-e2ccbfca1def@kernel.dk>
+ <aZ-2G_6lDZePLSyx@casper.infradead.org>
+ <44e3e9ea-350b-4357-ba50-726e506feab5@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <44e3e9ea-350b-4357-ba50-726e506feab5@kernel.dk>
 
-Remove the following unnecessary forward declarations from fs.h, which
-improves maintainability.
+On Wed, Feb 25, 2026 at 08:15:28PM -0700, Jens Axboe wrote:
+> On 2/25/26 7:55 PM, Matthew Wilcox wrote:
+> > I recently saw something (possibly XFS?) promoting this idea again.
+> > And now there's this.  Perhaps the time has come to process all
+> > write-completions in task context, rather than everyone coming up with
+> > their own workqueues to solve their little piece of the problem?
+> 
+> Perhaps, even though the punting tends to suck... One idea I toyed with
+> but had to abandon due to fs freezeing was letting callers that process
+> completions in task context anyway just do the necessary work at that
+> time. There's literally nothing worse than having part of a completion
+> happen in IRQ, then punt parts of that to a worker, and need to wait for
+> the worker to finish whatever it needs to do - only to then wake the
+> target task. We can trivially do this in io_uring, as the actual
+> completion is posted from the task itself anyway. We just need to have
+> the task do the bottom half of the completion as well, rather than some
+> unrelated kthread worker.
+> 
+> I'd be worried a generic solution would be the worst of all worlds, as
+> it prevents optimizations that happen in eg iomap and other spots, where
+> only completions that absolutely need to happen in task context get
+> punted. There's a big difference between handling a completion inline vs
+> needing a round-trip to some worker to do it.
 
-- struct hd_geometry: became unused in fs.h when
-  block_device_operations was moved to blkdev.h in commit 08f858512151
-  ("[PATCH] move block_device_operations to blkdev.h"). The forward
-  declaration is now added to blkdev.h where it is actually used.
+I spoke a little hastily when I said "all write completions".  What I
+really meant was something like:
 
-- struct iovec: became unused when aio_read/aio_write were removed in
-  commit 8436318205b9 ("->aio_read and ->aio_write removed")
++++ b/block/bio.c
+@@ -1788,7 +1788,9 @@ void bio_endio(struct bio *bio)
+        }
+ #endif
 
-- struct iov_iter: duplicate forward declaration. This removes the
-  redundant second declaration, added in commit 293bc9822fa9
-  ("new methods: ->read_iter() and ->write_iter()")
+-       if (bio->bi_end_io)
++       if (!in_task() && bio_flagged(bio, BIO_COMPLETE_IN_TASK_CONTEXT))
++               bio_queue_completion(bio);
++       else if (bio->bi_end_io)
+                bio->bi_end_io(bio);
+ }
+ EXPORT_SYMBOL(bio_endio);
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202512301303.s7YWTZHA-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202512302139.Wl0soAlz-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202512302105.pmzYfmcV-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202512302125.FNgHwu5z-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202512302108.nIV8r5ES-lkp@intel.com/
-Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
----
-Changes in v2:
-- Add forward declaration of struct hd_geometry to blkdev.h to fix
-  build errors reported by kernel test robot.
-- Verified with allmodconfig build and all configs reported by 
-  kernel test robot.
-
-v1: https://lore.kernel.org/lkml/20251229071401.98146-1-ytohnuki@amazon.com/
----
- include/linux/blkdev.h | 1 +
- include/linux/fs.h     | 3 ---
- 2 files changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d463b9b5a0a5..0b5942e08754 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -38,6 +38,7 @@ struct blk_flush_queue;
- struct kiocb;
- struct pr_ops;
- struct rq_qos;
-+struct hd_geometry;
- struct blk_report_zones_args;
- struct blk_queue_stats;
- struct blk_stat_callback;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 8b3dd145b25e..75c97faf8799 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -55,8 +55,6 @@ struct bdi_writeback;
- struct bio;
- struct io_comp_batch;
- struct fiemap_extent_info;
--struct hd_geometry;
--struct iovec;
- struct kiocb;
- struct kobject;
- struct pipe_inode_info;
-@@ -1917,7 +1915,6 @@ struct dir_context {
-  */
- #define COPY_FILE_SPLICE		(1 << 0)
- 
--struct iov_iter;
- struct io_uring_cmd;
- struct offset_ctx;
- 
--- 
-2.50.1
-
-
-
-
-Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
-
-Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
-
-
-
+and then the submitter (ie writeback) would choose to set
+BIO_COMPLETE_IN_TASK_CONTEXT.  And maybe others (eg fscrypt) would
+want to do the same.
