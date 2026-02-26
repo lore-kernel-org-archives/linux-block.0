@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305FC26ED2A;
-	Thu, 26 Feb 2026 13:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0ACE363C47;
+	Thu, 26 Feb 2026 13:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772113258; cv=none; b=ZfmWvDUgxT8wFU3gnIR1OkeNA5v+9g/DFLOASlGxQIYPv7Or/hIY9ziVFfac5i9mW9n71Qbgypnlav6slkIShroQAlPzZskfwEC/69ntP48qP8oba+o0y8TtWQOVKgmdvNxKjdnRA0tLXr+dHvuN8Vl5UktvyFByQwJKqLuwSmE=
+	t=1772113261; cv=none; b=nF162XZGyP8u5xksUGeULx2j6D8EvpMADWdsVzCvpSHtG3Su4A2GS9WJy4+qS9Ie/MpkOBGUlemwpbyZzpjhMFUXFmg4Auw+mztfmX+ARPyu+k4yIFwShyC7HKF/K2xD1WFmLyew1qsgcoEs1VtEWkJUAbcdLGjWIBqE1HtZJuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772113258; c=relaxed/simple;
-	bh=0azBERXcRTN33V3AXQD758lpRoN9AlvXH7kqpfeZ/q8=;
+	s=arc-20240116; t=1772113261; c=relaxed/simple;
+	bh=uEwx2TPo5bfwJfl0eBFkq0lqqN7InLdCO/Qn2mw7YgI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pYvGs06qd2F2kWQds09SOktFpLnaI/7ftQTm+3Fa6Y3ZwJslzMSaWQcfkC6GG6ZHDjrXIna7oskCvfGNCWzWVqz8eIa0V4SICMdZiDaJem5yrq+XBNiL+gVU/YbcueBPmn1lihYxsqTy11X5zMdlhMrNL40Iqmjkz84BknMTVAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBk6/A9/; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=iZvQ9X0TIElkodaKEhDiYgqnkZcYtf36uO21tGq0vIucTH91tDDb8Z+9A3GGcHFvSfl1AFDNeSYpMr9zCjbeFdtA/id9enJR0+wV5vPs+NqviQbj2gnemeqEIPXnqo2tNgBJoBhbBKrVS1o+IVW4eM42GIJJ03SsjLjA664oUks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQ8BujHV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBk6/A9/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE7AC116C6;
-	Thu, 26 Feb 2026 13:40:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQ8BujHV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BFB8C19422;
+	Thu, 26 Feb 2026 13:41:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772113257;
-	bh=0azBERXcRTN33V3AXQD758lpRoN9AlvXH7kqpfeZ/q8=;
+	s=k20201202; t=1772113260;
+	bh=uEwx2TPo5bfwJfl0eBFkq0lqqN7InLdCO/Qn2mw7YgI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oBk6/A9/NcPJ7ezf065AonndDI7t79vPhZKPshoYUMPaojwkjTSE+mJ4WcWhgVWTw
-	 dK7/7k654nvJNsBtpvFRt9uRbl65D5bAD+4KfdBCWIb+z/y6okemcmxRxUG9QpyNe5
-	 RvHnYqLzVc8Fec6+ZGH29JvAKOV3H+RlyIjWS6BS+QJyYhKeW7ttHWyKBRBMXSbiWH
-	 WxHboMdWAeVe36vNg+87wrWVXOJqbI1B2ZAynBNlHMirw1Le0nurwLZC8p7jVzDWLN
-	 GUx/jGVnAZ9eLkL2USDt46PdqHDjhcClOSSj7ssqJty8Cemi5wlUg+siYDsQs9vplU
-	 mW3NsJcdsLsJA==
+	b=AQ8BujHVTKAinfaFgOcgtKPuftXbumYS0fdhV1gpVwRr+jjblOn7IAu2xNO09I03r
+	 YhjU45iMhqyEpQkeDLU+zKgSrw9hd8FTPt9qzZnUgV3akMPwMRl4+jwGWyVFaxgN3Y
+	 rpBFELtzgXBK6UHYaJTtSGBiAkJ3Y5zoDnyOr00hmMx+MpVRpYLd8vzYqbkSJCsBFY
+	 eObkNluFAkD0k9SiMInSynrHmn8UYAa9qG06qEIyY2OomkgZ9RIrD3+PeuMAEEkInE
+	 a2zSQdR/X4diIf1kjseHcOh283KzewT5qw2LLMOgeLvfHI4LDPMI81gveF5aLMYnnc
+	 MSbWfgdW9Fxbw==
 From: Daniel Wagner <wagi@kernel.org>
-Date: Thu, 26 Feb 2026 14:40:35 +0100
-Subject: [PATCH 1/3] nvme: failover requests for inactive hctx
+Date: Thu, 26 Feb 2026 14:40:36 +0100
+Subject: [PATCH 2/3] blk-mq: add handshake for offlinig hw queues
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260226-revert-cpu-read-lock-v1-1-eb005072566e@kernel.org>
+Message-Id: <20260226-revert-cpu-read-lock-v1-2-eb005072566e@kernel.org>
 References: <20260226-revert-cpu-read-lock-v1-0-eb005072566e@kernel.org>
 In-Reply-To: <20260226-revert-cpu-read-lock-v1-0-eb005072566e@kernel.org>
 To: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, 
@@ -49,169 +49,193 @@ Cc: Guangwu Zhang <guazhang@redhat.com>,
  Daniel Wagner <wagi@kernel.org>
 X-Mailer: b4 0.14.3
 
-When the ctrl is not in LIVE state, a hardware queue can be in the
-INACTIVE state due to CPU hotplug offlining operations. In this case,
-the driver will freeze and quiesce the request queue and doesn't expect
-new request entering via queue_rq. Though a request will fail eventually,
-though shortcut it and fail it earlier.
+The CPU hotplug offline handler in the block layer checks for any
+in-flight requests on a CPU going offline. It prevents the CPU hotplug
+state engine from progressing as long as there are pending requests.
 
-Check if a request is targeted for an inactive hardware queue and use
-nvme_failover_req and hand it back to the block layer.
+This is done by checking for any allocated requests on the hardware
+context that is going offline. The driver is responsible for completing
+all in-flight requests.
+
+However, the driver might be performing error recovery simultaneously.
+Therefore, the request queue might be in a frozen or quiesced state. In
+this case, requests may not make progress (see
+blk_mq_sched_dispatch_requests for an example).
+
+Introduce an explicit handshake protocol between the driver and the
+block layer. This allows the driver to signal when it is safe to ignore
+any remaining pending requests.
 
 Signed-off-by: Daniel Wagner <wagi@kernel.org>
 ---
- drivers/nvme/host/core.c      | 55 ++++++++++++++++++++++++++++++++++++++++++-
- drivers/nvme/host/multipath.c | 43 ---------------------------------
- drivers/nvme/host/nvme.h      |  1 -
- 3 files changed, 54 insertions(+), 45 deletions(-)
+ block/blk-mq-debugfs.c   |  1 +
+ block/blk-mq.c           | 36 ++++++++++++++++++++++++++++++++++++
+ drivers/nvme/host/core.c | 28 ++++++++++++++++++++++++++++
+ drivers/nvme/host/nvme.h |  2 ++
+ drivers/nvme/host/pci.c  |  3 +++
+ include/linux/blk-mq.h   |  3 +++
+ 6 files changed, 73 insertions(+)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f5ebcaa2f859..e84df1a2d321 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -454,6 +454,51 @@ void nvme_end_req(struct request *req)
- 	blk_mq_end_request(req, status);
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 28167c9baa55..a312cb6b6127 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -162,6 +162,7 @@ static const char *const hctx_state_name[] = {
+ 	HCTX_STATE_NAME(TAG_ACTIVE),
+ 	HCTX_STATE_NAME(SCHED_RESTART),
+ 	HCTX_STATE_NAME(INACTIVE),
++	HCTX_STATE_NAME(IDLE),
+ };
+ #undef HCTX_STATE_NAME
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9af8c3dec3f6..359f19b8238a 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -112,6 +112,31 @@ void blk_mq_in_driver_rw(struct block_device *part, unsigned int inflight[2])
+ 	inflight[WRITE] = mi.inflight[WRITE];
  }
  
-+static void nvme_failover_req(struct request *req)
++static void __blk_update_hw_queue_idle(struct request_queue *q, bool idle)
 +{
-+	struct nvme_ns *ns = req->q->queuedata;
-+	u16 status = nvme_req(req)->status & NVME_SCT_SC_MASK;
-+	unsigned long flags;
-+	struct bio *bio;
++	struct blk_mq_hw_ctx *hctx;
++	unsigned long i;
 +
-+	if (nvme_ns_head_multipath(ns->head))
-+		nvme_mpath_clear_current_path(ns);
-+
-+	/*
-+	 * If we got back an ANA error, we know the controller is alive but not
-+	 * ready to serve this namespace.  Kick of a re-read of the ANA
-+	 * information page, and just try any other available path for now.
-+	 */
-+	if (nvme_is_ana_error(status) && ns->ctrl->ana_log_buf) {
-+		set_bit(NVME_NS_ANA_PENDING, &ns->flags);
-+		queue_work(nvme_wq, &ns->ctrl->ana_work);
++	queue_for_each_hw_ctx(q, hctx, i) {
++		if (idle)
++			set_bit(BLK_MQ_S_IDLE, &hctx->state);
++		else
++			clear_bit(BLK_MQ_S_IDLE, &hctx->state);
 +	}
-+
-+	spin_lock_irqsave(&ns->head->requeue_lock, flags);
-+	for (bio = req->bio; bio; bio = bio->bi_next) {
-+		if (nvme_ns_head_multipath(ns->head))
-+			bio_set_dev(bio, ns->head->disk->part0);
-+		if (bio->bi_opf & REQ_POLLED) {
-+			bio->bi_opf &= ~REQ_POLLED;
-+			bio->bi_cookie = BLK_QC_T_NONE;
-+		}
-+		/*
-+		 * The alternate request queue that we may end up submitting
-+		 * the bio to may be frozen temporarily, in this case REQ_NOWAIT
-+		 * will fail the I/O immediately with EAGAIN to the issuer.
-+		 * We are not in the issuer context which cannot block. Clear
-+		 * the flag to avoid spurious EAGAIN I/O failures.
-+		 */
-+		bio->bi_opf &= ~REQ_NOWAIT;
-+	}
-+	blk_steal_bios(&ns->head->requeue_list, req);
-+	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
-+
-+	nvme_req(req)->status = 0;
-+	nvme_end_req(req);
-+	kblockd_schedule_work(&ns->head->requeue_work);
 +}
 +
- void nvme_complete_rq(struct request *req)
- {
- 	struct nvme_ctrl *ctrl = nvme_req(req)->ctrl;
-@@ -762,8 +807,13 @@ blk_status_t nvme_fail_nonready_command(struct nvme_ctrl *ctrl,
- 	    state != NVME_CTRL_DELETING &&
- 	    state != NVME_CTRL_DEAD &&
- 	    !test_bit(NVME_CTRL_FAILFAST_EXPIRED, &ctrl->flags) &&
--	    !blk_noretry_request(rq) && !(rq->cmd_flags & REQ_NVME_MPATH))
-+	    !blk_noretry_request(rq) && !(rq->cmd_flags & REQ_NVME_MPATH)) {
-+		if (test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state)) {
-+			nvme_failover_req(rq);
-+			return BLK_STS_OK;
-+		}
- 		return BLK_STS_RESOURCE;
-+	}
++void blk_mq_set_hw_queues_idle(struct request_queue *q)
++{
++	__blk_update_hw_queue_idle(q, true);
++}
++EXPORT_SYMBOL_GPL(blk_mq_set_hw_queues_idle);
++
++void blk_mq_clear_hw_queues_idle(struct request_queue *q)
++{
++	__blk_update_hw_queue_idle(q, false);
++}
++EXPORT_SYMBOL_GPL(blk_mq_clear_hw_queues_idle);
++
+ #ifdef CONFIG_LOCKDEP
+ static bool blk_freeze_set_owner(struct request_queue *q,
+ 				 struct task_struct *owner)
+@@ -3679,6 +3704,17 @@ static bool blk_mq_has_request(struct request *rq, void *data)
  
- 	if (!(rq->rq_flags & RQF_DONTPREP))
- 		nvme_clear_nvme_request(rq);
-@@ -809,6 +859,9 @@ bool __nvme_check_ready(struct nvme_ctrl *ctrl, struct request *rq,
- 		}
- 	}
- 
-+	if (test_bit(BLK_MQ_S_INACTIVE, &rq->mq_hctx->state))
+ 	if (rq->mq_hctx != iter_data->hctx)
+ 		return true;
++
++	/*
++	 * The driver ensures that all hardware queue resources are freed, even
++	 * if a request has a tag allocated to a CPU that is going offline. This
++	 * applies to requests not yet handed to the hardware. Essentially those
++	 * 'in-flight' between the block layer and the hardware (e.g., a request
++	 * blocked because the queue is quiesced).
++	 */
++	if (test_bit(BLK_MQ_S_IDLE, &iter_data->hctx->state))
 +		return false;
 +
- 	return queue_live;
+ 	iter_data->has_rq = true;
+ 	return false;
  }
- EXPORT_SYMBOL_GPL(__nvme_check_ready);
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 174027d1cc19..cce3a23f6de5 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -134,49 +134,6 @@ void nvme_mpath_start_freeze(struct nvme_subsystem *subsys)
- 			blk_freeze_queue_start(h->disk->queue);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index e84df1a2d321..1b736a58e467 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -5354,6 +5354,34 @@ void nvme_unquiesce_admin_queue(struct nvme_ctrl *ctrl)
  }
+ EXPORT_SYMBOL_GPL(nvme_unquiesce_admin_queue);
  
--void nvme_failover_req(struct request *req)
--{
--	struct nvme_ns *ns = req->q->queuedata;
--	u16 status = nvme_req(req)->status & NVME_SCT_SC_MASK;
--	unsigned long flags;
--	struct bio *bio;
--
--	nvme_mpath_clear_current_path(ns);
--
--	/*
--	 * If we got back an ANA error, we know the controller is alive but not
--	 * ready to serve this namespace.  Kick of a re-read of the ANA
--	 * information page, and just try any other available path for now.
--	 */
--	if (nvme_is_ana_error(status) && ns->ctrl->ana_log_buf) {
--		set_bit(NVME_NS_ANA_PENDING, &ns->flags);
--		queue_work(nvme_wq, &ns->ctrl->ana_work);
--	}
--
--	spin_lock_irqsave(&ns->head->requeue_lock, flags);
--	for (bio = req->bio; bio; bio = bio->bi_next) {
--		bio_set_dev(bio, ns->head->disk->part0);
--		if (bio->bi_opf & REQ_POLLED) {
--			bio->bi_opf &= ~REQ_POLLED;
--			bio->bi_cookie = BLK_QC_T_NONE;
--		}
--		/*
--		 * The alternate request queue that we may end up submitting
--		 * the bio to may be frozen temporarily, in this case REQ_NOWAIT
--		 * will fail the I/O immediately with EAGAIN to the issuer.
--		 * We are not in the issuer context which cannot block. Clear
--		 * the flag to avoid spurious EAGAIN I/O failures.
--		 */
--		bio->bi_opf &= ~REQ_NOWAIT;
--	}
--	blk_steal_bios(&ns->head->requeue_list, req);
--	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
--
--	nvme_req(req)->status = 0;
--	nvme_end_req(req);
--	kblockd_schedule_work(&ns->head->requeue_work);
--}
--
- void nvme_mpath_start_request(struct request *rq)
++static void __nvme_set_hw_queues_idle(struct nvme_ctrl *ctrl, bool idle)
++{
++	struct nvme_ns *ns;
++	int srcu_idx;
++
++	srcu_idx = srcu_read_lock(&ctrl->srcu);
++	list_for_each_entry_srcu(ns, &ctrl->namespaces, list,
++				 srcu_read_lock_held(&ctrl->srcu)) {
++		if (idle)
++			blk_mq_set_hw_queues_idle(ns->queue);
++		else
++			blk_mq_clear_hw_queues_idle(ns->queue);
++	}
++	srcu_read_unlock(&ctrl->srcu, srcu_idx);
++}
++
++void nvme_set_hw_queues_idle(struct nvme_ctrl *ctrl)
++{
++	__nvme_set_hw_queues_idle(ctrl, true);
++}
++EXPORT_SYMBOL_GPL(nvme_set_hw_queues_idle);
++
++void nvme_clear_hw_queues_idle(struct nvme_ctrl *ctrl)
++{
++	__nvme_set_hw_queues_idle(ctrl, false);
++}
++EXPORT_SYMBOL_GPL(nvme_clear_hw_queues_idle);
++
+ void nvme_sync_io_queues(struct nvme_ctrl *ctrl)
  {
- 	struct nvme_ns *ns = rq->q->queuedata;
+ 	struct nvme_ns *ns;
 diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 9a5f28c5103c..dbd063413da9 100644
+index dbd063413da9..d199009982f1 100644
 --- a/drivers/nvme/host/nvme.h
 +++ b/drivers/nvme/host/nvme.h
-@@ -967,7 +967,6 @@ void nvme_mpath_unfreeze(struct nvme_subsystem *subsys);
- void nvme_mpath_wait_freeze(struct nvme_subsystem *subsys);
- void nvme_mpath_start_freeze(struct nvme_subsystem *subsys);
- void nvme_mpath_default_iopolicy(struct nvme_subsystem *subsys);
--void nvme_failover_req(struct request *req);
- void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
- int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
- void nvme_mpath_add_sysfs_link(struct nvme_ns_head *ns);
+@@ -834,6 +834,8 @@ void nvme_quiesce_io_queues(struct nvme_ctrl *ctrl);
+ void nvme_unquiesce_io_queues(struct nvme_ctrl *ctrl);
+ void nvme_quiesce_admin_queue(struct nvme_ctrl *ctrl);
+ void nvme_unquiesce_admin_queue(struct nvme_ctrl *ctrl);
++void nvme_set_hw_queues_idle(struct nvme_ctrl *ctrl);
++void nvme_clear_hw_queues_idle(struct nvme_ctrl *ctrl);
+ void nvme_mark_namespaces_dead(struct nvme_ctrl *ctrl);
+ void nvme_sync_queues(struct nvme_ctrl *ctrl);
+ void nvme_sync_io_queues(struct nvme_ctrl *ctrl);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 2f0c05719316..0097a4f71f97 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -3211,6 +3211,8 @@ static void nvme_reset_work(struct work_struct *work)
+ 	nvme_unquiesce_admin_queue(&dev->ctrl);
+ 	mutex_unlock(&dev->shutdown_lock);
+ 
++	nvme_set_hw_queues_idle(&dev->ctrl);
++
+ 	/*
+ 	 * Introduce CONNECTING state from nvme-fc/rdma transports to mark the
+ 	 * initializing procedure here.
+@@ -3243,6 +3245,7 @@ static void nvme_reset_work(struct work_struct *work)
+ 	if (result)
+ 		goto out;
+ 
++	nvme_clear_hw_queues_idle(&dev->ctrl);
+ 	/*
+ 	 * Freeze and update the number of I/O queues as those might have
+ 	 * changed.  If there are no I/O queues left after this reset, keep the
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 18a2388ba581..8885e84a7889 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -721,6 +721,7 @@ enum {
+ 	BLK_MQ_S_SCHED_RESTART,
+ 	/* hw queue is inactive after all its CPUs become offline */
+ 	BLK_MQ_S_INACTIVE,
++	BLK_MQ_S_IDLE,
+ 	BLK_MQ_S_MAX
+ };
+ 
+@@ -934,6 +935,8 @@ void blk_mq_stop_hw_queues(struct request_queue *q);
+ void blk_mq_start_hw_queues(struct request_queue *q);
+ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
+ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
++void blk_mq_set_hw_queues_idle(struct request_queue *q);
++void blk_mq_clear_hw_queues_idle(struct request_queue *q);
+ void blk_mq_quiesce_queue(struct request_queue *q);
+ void blk_mq_wait_quiesce_done(struct blk_mq_tag_set *set);
+ void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set);
 
 -- 
 2.53.0
