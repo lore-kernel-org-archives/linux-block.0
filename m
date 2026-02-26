@@ -1,72 +1,75 @@
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012059.outbound.protection.outlook.com [40.93.195.59])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010009.outbound.protection.outlook.com [52.101.201.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DC5285419
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 03:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C163815ED
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 03:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.9
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772075587; cv=fail; b=DUwl1SM1kNM1YqQCUmeXratKlLWwwmipImq5clGbjbkOo5L/RInTl2pu9NAyr8FNW02RC/J0x+gQTVt3Y+w/f4aB1P3X1SBDqwDVp5JNmc+ZVotggeuyj12Hwz+QpSbalMBXRCAZ4hedyq9q+bbXM6TNuPTp9Z9wNw8TD+qZ0pg=
+	t=1772075602; cv=fail; b=noxZgPpoDxjQ18996GuqsjC1CsPREQ8Arnkl+04/W2zxwxs4RWQu5VugsbRyhyOo493GJnENQJRFIxXgoL0PueUmq1ieV5yOiF+C7Xu3NeexBHzh6Wx4/bxo3R7QOG6qQz777CqLLiQOOGcRyCjJ9VFmxv0IqGbtoDWPcHv5hAk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772075587; c=relaxed/simple;
-	bh=AoEMQ7kQd2Ii9rjbIAMggRMsf8jF4hB6BLcXrHhuPeI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qB2hJhBL5cP+H+O35KRvfBr6tgUyTOpQiddR0onpbYVztyNpCbsLKUI/kq3aGf9sQON0fgh5866L3MLYHcBjrtplMvgV9cgsp/KhMG6CaR2idtom6K4ggE0js7SxxrHM9v7K7newUDzKIaLL9P+tbPpgjI5wPGtC5iQaw9Ehplg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Td8bdrib; arc=fail smtp.client-ip=40.93.195.59
+	s=arc-20240116; t=1772075602; c=relaxed/simple;
+	bh=hW3vVLLk5VIq6wY4ivwAxI9dKOKjdoqzUQyTSARMRdk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mdS1+tw5mlyuglrLqc3KWNGJ4ARcdrzJ8q6Vg2HxA053Xi3saac0XT+RwsR9wRsPXe8/mbI/VwyknfOM7Bps62hbcTZecgCZcCLheKg36VElfqjUllNVJjTY0OaU/+uVoaqirKzo2wM8Xi9WUUsltWyQh8UB3jMdc9TkuHhOjmI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kAkXO/jT; arc=fail smtp.client-ip=52.101.201.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Td8bdrib"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kAkXO/jT"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CKziYbv/djlnzRVjEv3yHPvASyAhJOh5Gd+z1jTlW7I+j3VUbIYleNfIDmc3V0e2En0urc1oS2DuTR/wfoDcoSvAEvMUPioWTTqHMMYwWdoeuItlUbyvWIBcFJz8+fDhq+Qv+GOQSBoHacyqNRxiKd/wbhjY8ZkJZndeVGa/5yi7JfEv6ERxE9ILOx9nGUrode7/xptBHW1+sG0sPRpqYl1qu+86nRoFTXPgXW0QukkFWgVhzBVdzIJc4Wmo4N9Q57eP/GouhobxfQp2OC9U2s0UtjwthMZqMiFG/bcycUS1MZd98QAGXaU6Twi/v5Ea0wnv5B21uFKmBlCvUO0oqQ==
+ b=NFZEwhb9UTOe6GKUrj9CALExGWTWlByQortUxvUDFH/KgKbztT5vBVtfnHEwi77YRWlmIexXnPi9pfkvVAFdn11I5Fgrl56AaSL4OnJrMzq+xsBU8XIoIgpDKOYoBrT3x3iP6417img6UnhMtPISK3NwFRNCirpCHVBBz8FU41gGirO0ySqeItD7ikhbe0Z7oZ0zDZI53tgc6BznFCjV7/+qPXYqb+FHiYdZk6PLacM1Mha3eLCjPrun7PUIc2xQBcOTLfmPgI9XUTyZw0HcTqz43ouKP0XkZ8DgGFZmxuok7stHKqdsLBXLk8maNTn8nDh61utNFra4eNvgwhn64w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jUWW/DzSbCEg9HKwNxgCposxrAKo5hZxqGV0cdDbel4=;
- b=glCvCyZbGBN2LeC+whugQgSUxGha9bpmgFXU9UFB+ZSjTJHSviQ/HR09H0vkIMInPmECAwtUklT70rrFBz66IY0CmpHCYlEpziKgzwBXWN9yauHEyeY1VTRBWjdTVt4X1W9FTM8Ge99paZga0Yk/LThGjFeEJLidnjNyXwtw5aytsgdP3hND40k9txvqSXyhMUd8ksfFbG8t6ty/l4th5RGeAiUUZm84l32YXDAqZN4JBJ17YCFbA/XeLNL+ztmJhFDZH/2/RZul2sRdeKPjsXElYLOeav+Fin0M199eWt2R1X7WoqmV0M+C+izfZwYyXxWZo3ig1JR0iFDPjQLsow==
+ bh=+e8TUli8dzyNJnmcU4YHeRMeAb+Njk+TMsoHFCA0p+4=;
+ b=L4Jpmzc9BaTzdGZ3cG9rTC+nVFL555Hojz7jaCk0jjr7Hw31Jae+iigpmUcxb2zz3D9HbxSDrXIG7aVpJhANGaaXe3Neh8gjafkwJxugrRBMK06ovKI+Tzs/hsDXl92BOo6Cp5QIKIpkXcHrkEZy0mlERvwReuAKfsUS7Xs63zI00X3FME/ld5X8AXIyU/UVEIlsQPkYkG5SyYmvthWADnj1YrCKx7mTU7t+SyW2v/IQO9gNcYqimqDxluHeld6OYcMDoI9YF4chhvdnHy/B8XckfrLmILk3ULFFeImoepVclfVJSlsNNbsv0fRgDQJwM2zRTNJ9ROHNYwbsbTBkgg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jUWW/DzSbCEg9HKwNxgCposxrAKo5hZxqGV0cdDbel4=;
- b=Td8bdrib4i/YlJfnd0BStcr5PX6Kc8fu4YmmeyIY7THm733mOszsQsPbXa406dWcCfsTBPTKM1RptBSS+oe+ERUijm2rDOxNg4NlLkrQ1hj27/cKRHvBGqusZIOff1XCRlMjlqsUV1zbXCxrzhoW3r5TCnYgBhEaAdb0j0xvnH+o9Z1tnRDjyADVOZqdxYvV3PDcWwCcnCSD2iUBhFuAIORcFaUQrn38ibG4v7xRIHanvMvZhhJzR2PpnDdOE91WRMAPyRLFbhUMwh2TSJZK/1F1nkpFjuMHJy+Q1FqSraC5y15pIVlUNqSwbRJIor7LnAZGce8+zaXsioz9X5pfpw==
-Received: from LV3P220CA0029.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:234::8)
- by CY8PR12MB8364.namprd12.prod.outlook.com (2603:10b6:930:7f::7) with
+ bh=+e8TUli8dzyNJnmcU4YHeRMeAb+Njk+TMsoHFCA0p+4=;
+ b=kAkXO/jTh82IcY+b4NYouFkPDlWo88U0P4/hweUXEeiZ/n+OLKu0UsKKusQUlzvtmzmbQhmBq9yZZkq6rJ84pAFPGMJeJLE+oYZ+79LpTK7iAUVk3ElFAc8/PQNGeDoPBtqpjVJJ+hwPa6+O0/cdv4HLJZoPa5jiApspjMmVEFF81XuApOMkOYoMVQAMQlSbUmjr5CiHJcEAkvCTDeIQK0rRYkVHG/xHsp7eLboWTwS80ocTNDWQenyT7y6HaRg1+IVr03HgvIsyxqOqbArZ5dlM9+U66cXu7egDB4RQ5vu4m4Qc8CGZdqZeqaCBQrzSzyo8QjLqyppmnk75Y8quyg==
+Received: from DS7PR05CA0043.namprd05.prod.outlook.com (2603:10b6:8:2f::22) by
+ IA0PPF6E99B1BC1.namprd12.prod.outlook.com (2603:10b6:20f:fc04::bd1) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Thu, 26 Feb
- 2026 03:13:02 +0000
-Received: from BN2PEPF000044A1.namprd02.prod.outlook.com
- (2603:10b6:408:234:cafe::51) by LV3P220CA0029.outlook.office365.com
- (2603:10b6:408:234::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.25 via Frontend Transport; Thu,
- 26 Feb 2026 03:13:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.21; Thu, 26 Feb
+ 2026 03:13:15 +0000
+Received: from DS1PEPF00017095.namprd03.prod.outlook.com
+ (2603:10b6:8:2f:cafe::f0) by DS7PR05CA0043.outlook.office365.com
+ (2603:10b6:8:2f::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Thu,
+ 26 Feb 2026 03:13:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN2PEPF000044A1.mail.protection.outlook.com (10.167.243.152) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS1PEPF00017095.mail.protection.outlook.com (10.167.17.138) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Thu, 26 Feb 2026 03:13:02 +0000
+ 15.20.9632.12 via Frontend Transport; Thu, 26 Feb 2026 03:13:14 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Feb
- 2026 19:12:50 -0800
-Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ 2026 19:13:07 -0800
+Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Feb
- 2026 19:12:50 -0800
+ 2026 19:13:06 -0800
 From: Chaitanya Kulkarni <kch@nvidia.com>
 To: <kbusch@kernel.org>, <hch@lst.de>, <sagi@grimberg.me>, <wagi@monom.org>
 CC: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
 	"Chaitanya Kulkarni" <kch@nvidia.com>
-Subject: [PATCH v2 0/2] blk/nvme: fix NULL deref in rq_qos_done_bio() on multipath failover
-Date: Wed, 25 Feb 2026 19:12:41 -0800
-Message-ID: <20260226031243.87200-1-kch@nvidia.com>
+Subject: [PATCH V2 1/2] block: move bio queue-transition flag fixups into blk_steal_bios()
+Date: Wed, 25 Feb 2026 19:12:42 -0800
+Message-ID: <20260226031243.87200-2-kch@nvidia.com>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260226031243.87200-1-kch@nvidia.com>
+References: <20260226031243.87200-1-kch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,59 +82,101 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A1:EE_|CY8PR12MB8364:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8625217c-c37c-4021-738a-08de74e4f3b2
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017095:EE_|IA0PPF6E99B1BC1:EE_
+X-MS-Office365-Filtering-Correlation-Id: 10679230-6329-4c1e-4a7d-08de74e4fb23
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
 X-Microsoft-Antispam-Message-Info:
-	RQLDr9EO2iR/KYnh2kHcQINbMO63TovCCDaP6xRxgoFSoEX/lc2rPqHc3uxBBsHDdMREVViWJpD7AR9s31c3YmtjVhcbeDZDalbp62CD29XgeHYgVO/Uu3FMlzA0uPiOUfmRLYDOIrh3DZZlhQKhHSKPvudIn+PELyFkViX0bQX6bSa99ODmYaj9mzRrRBpVpmWXiScRobNEiaPz0955RZr5dFYk4WCxxd5MToDhamO6H139oMLQcuhFJu8tUr12LBtuHbQwwyDWp6/48N6keN9jxwvFVZgB0mwOg72AvNTI3fUAFJ8IUv7hLtwiGsoHnLDzdFlDLCjh7cMqRVrj+CnJEdTQPHxe2+MTgp9Qiyyulq8rBEMw8x9iqrM12rBR4hub4N2kOjyWu7qYjVadMypaPoJJ+gR17XqNA7yV5JkRiuZeMOAfLDfbbq/fXJQp3I3GN088oD7C2u2zeHGZltKRKoRYhbpunMR0F1Fq7mcRmAEjvbdKoPCr1RlkOZARTcI4kYZFHAcrHWYFsDXX0eYghWa0ivnab3eTJrASycojI7dOgcsNrDIUQCAj3soj604bG4f9Ip1WdoL8n6IU5W/Q9/qJ6q7gP6oZIBThmwEufZ7EYfjkqp+r5ErDou+y3yTiho1UyTzorjk+dgLrOIrRrzn7g1OWoPTmpbkI1vHT26OYhlmw6pEgio+wE+JmFFlBSvNuIl5dOHLzt/GykecGb+/iuHmBFfiOfowut9JNs5yO8PWSjbHVR9Ca0Js4ry/wAU2PQTk1O/biiepwD1GwN7aSvRymHA8GSOm3VljDbn+3pNtsuoqdYeagmdYMu6LFBAU1B3jHCKvjs9C3qA==
+	cYgcpIJQiCX/PipUxrbFDkAuWU+ZyxRi+xkQU0QcoHY6wCBsbs75bVbmrkAPNS4P9M3S7NNHcLw2ON4iB6BFYbp2jWqeJdULW/X+TcJnyck/g0egrLTRkhwzh3pXwAtRSYprlSmBAI9ZuaprR4KLA/NQZwq+pRXscfTF+ohFp7K+9jBH8ddvIvWQltCSCZakuy6+bLCaQV/IAjkibOeqIOKzsZEVPPJOh8dAS3zp1PNLtD7xmQaLVwatVEmxjdMgTuDWn6KhNh0eNlQW/WAxYGMfwcm9+6tc8hBUOzT/AtjpgjCM1H5xy73eN8Skwam3vH+RcvnxwrXCa22/HNQGKDvbshtV1ABdgMmCKTxYaHgY909FE/Jp6+Sf5gVerSv25fZEwnonP/hvZlEMzXCViHaYhuMy6d4jZq5za9rlpNix5gIqeZRu5+zvW6QO3EsjLl8nyRX1jsOH5leXjFBR2LtKoormLF2PFYpXz4BimgSBfvX1gIOBGwIuJauV9Q/Vzz9+qsAwdYTNPYE9OT8CtYmYuM6C6uSqp9iNcmeEKv+C+sGqwK9CJ8kJ1OPrZitb7J6wz3wxKm1tQWwMLec3EUIjdZaTyt3ES4/vUAZkrrk3qFs2KaJrUQtMAFJaOEXE7yLHtHqQ72SY7epUrzM9KPDeCFW3nsWB+a4Jgq92J27e1lCVvB2fWZVNwRXJZ3REFHxDXWRsk2LLfgkJ77UQ2MP1/3CfejWiCZVsIpXZFPsrR5G4+3gvUdQ9afSZIKBagix3EMezMzGO06rqo8NiaRxEtwrgZ4d5vHKLC6+3ZmiBKCo+LrImVjpUUnDbxv7aFuvKxltHn38LyUAq9R6Slw==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	HuMUMg1i5jxHOpO096plxM2vErEQV4qkEh9/YqY0COpEzGY0s3/r7hVkggiH/chPlb0qQBcoPFTy1WiB81PVBkIAAi2UrUHeZqxHFefKA8ClBpqs10ym3c1xgobbZG6PPd55tiRyqiI4BB8zsK4P09P674zQyWHS/UUOjJuPRMXdT/TQpK5VBBquHXYQ5cvM+HRoiQKrOGTwq962NV+PN1RUuFNmuc8sY4R9HISRTLPiJP1GDRJ/V/sgfZZdH0MdWkrssr5w2+oArU/aBRX/wMSsAarnDKIlnelMscFGZeCq8c/aTt8hfXTqTXj56bjeGlLb22zGruxqFo/tJiXJJ5vELCf9HPKalLNlKQ9ZAM1PHFce06D36/WqrgJED2qeYDUWhCkmKtlmxAZ3MlN0M2CLsjV4wWYLbHFFsBuUKz0LsaGCuK67EUOD1JlXIcWa
+	i8cf8x4dGuc+UgDsHrnqd0oj7jaANTN9843EODGDU5nrooxNyEjZW64ymPddj7JsBRIrcJuyHfJH8Ujp9kLsP1X0EUJVXKqRDn5fxC9ES0mjGq+dI+0DRz/jiwIb/EwlBU05X4zrk0WtKUhR+DVAcCYBGLCyX0K+zZW4/xiiW1XKGxwFvmg84bz7L6BRAiCjBvjIeUGcExX0YaGi4mYe24uocMfH/m9usqbiNJtKHmBIwM63+HNvg5FJ8cRjVLnkNklSOvOg3O4eRJQ/C4L8t0t0iQAAYhxpJiYChA5DPZTrLM4l0q0t321V/VvRvSiHcs0bHG0Pzifr6IrabEdTZQsRjLJG5/BvJrwEhsXhMP+eubRYeXDddRnTPJeEpn9xOJM9wcgaqY2civyo7NgFt36O2ahiXpQEtVm6/39UShkpdXtBrrKYjWiDmGDQFXqr
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 03:13:02.0988
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 03:13:14.6448
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8625217c-c37c-4021-738a-08de74e4f3b2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10679230-6329-4c1e-4a7d-08de74e4fb23
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A1.namprd02.prod.outlook.com
+	DS1PEPF00017095.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8364
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPF6E99B1BC1
 
-Hi,
+blk_steal_bios() transfers bios from a request to a bio_list when the
+request is requeued to a different queue. The NVMe multipath failover
+path (nvme_failover_req) currently open-codes clearing of REQ_POLLED,
+bi_cookie, and REQ_NOWAIT on each bio before calling blk_steal_bios().
 
-When a bio is processed on a path's request queue with rq_qos enabled,
-it gets BIO_QOS_THROTTLED or BIO_QOS_MERGED flags set.  During NVMe
-multipath failover, nvme_failover_req() redirects the bio's bi_bdev to
-the multipath head's disk via bio_set_dev(), but the BIO_QOS flags are
-left intact.
+Move these fixups into blk_steal_bios() itself so that any caller
+automatically gets correct flag state when bios cross queue boundaries.
+Simplify nvme_failover_req() accordingly.
 
-This series moves bio queue transition code into blk_steal_bios()
-and adds a patch to clears BIO_QOS_THROTTLED and BIO_QOS_MERGED flags
-in blk_steal_bios().
-
--ck
-
-v1->v2 https://lore.kernel.org/all/20251124070142.GA17632@lst.de/:
-
-*  Add a new patch to move the bio flag fixup loop from nvme_failover_req()
-   into blk_steal_bios() rather than adding it only in the NVMe multipath
-   path. (Christoph)
-
-Chaitanya Kulkarni (2):
-  block: move bio queue-transition flag fixups into blk_steal_bios()
-  block: clear BIO_QOS flags in blk_steal_bios()
-
- block/blk-mq.c                | 19 +++++++++++++++++++
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+---
+ block/blk-mq.c                | 17 +++++++++++++++++
  drivers/nvme/host/multipath.c | 15 +--------------
- 2 files changed, 20 insertions(+), 14 deletions(-)
+ 2 files changed, 18 insertions(+), 14 deletions(-)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a29d8ac9d3e3..419b5c768af2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3412,6 +3412,23 @@ EXPORT_SYMBOL_GPL(blk_rq_prep_clone);
+  */
+ void blk_steal_bios(struct bio_list *list, struct request *rq)
+ {
++	struct bio *bio;
++
++	for (bio = rq->bio; bio; bio = bio->bi_next) {
++		if (bio->bi_opf & REQ_POLLED) {
++			bio->bi_opf &= ~REQ_POLLED;
++			bio->bi_cookie = BLK_QC_T_NONE;
++		}
++		/*
++		 * The alternate request queue that we may end up submitting
++		 * the bio to may be frozen temporarily, in this case REQ_NOWAIT
++		 * will fail the I/O immediately with EAGAIN to the issuer.
++		 * We are not in the issuer context which cannot block. Clear
++		 * the flag to avoid spurious EAGAIN I/O failures.
++		 */
++		bio->bi_opf &= ~REQ_NOWAIT;
++	}
++
+ 	if (rq->bio) {
+ 		if (list->tail)
+ 			list->tail->bi_next = rq->bio;
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index bfcc5904e6a2..cda8a1e21f59 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -154,21 +154,8 @@ void nvme_failover_req(struct request *req)
+ 	}
+ 
+ 	spin_lock_irqsave(&ns->head->requeue_lock, flags);
+-	for (bio = req->bio; bio; bio = bio->bi_next) {
++	for (bio = req->bio; bio; bio = bio->bi_next)
+ 		bio_set_dev(bio, ns->head->disk->part0);
+-		if (bio->bi_opf & REQ_POLLED) {
+-			bio->bi_opf &= ~REQ_POLLED;
+-			bio->bi_cookie = BLK_QC_T_NONE;
+-		}
+-		/*
+-		 * The alternate request queue that we may end up submitting
+-		 * the bio to may be frozen temporarily, in this case REQ_NOWAIT
+-		 * will fail the I/O immediately with EAGAIN to the issuer.
+-		 * We are not in the issuer context which cannot block. Clear
+-		 * the flag to avoid spurious EAGAIN I/O failures.
+-		 */
+-		bio->bi_opf &= ~REQ_NOWAIT;
+-	}
+ 	blk_steal_bios(&ns->head->requeue_list, req);
+ 	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
+ 
 -- 
 2.39.5
 
