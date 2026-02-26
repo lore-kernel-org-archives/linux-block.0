@@ -1,95 +1,67 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B693451CF;
-	Thu, 26 Feb 2026 02:55:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BBF12D21B;
+	Thu, 26 Feb 2026 03:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772074539; cv=none; b=OptAEXjK0biR9zPz31TD3uNb3ngZ6MxprxAaa2NrFZGA6UxI3lIC2gH/mfbL4cyFXFZX1KSvZJV1rSJMSzrWJuOWEEIXQUFlGgKhfsdmvxGGXjeyjBUskgdVrhqcayN99h9gqNbLp3sfgjP3hehVmGhcfxefZSjRedDG6q2L2h8=
+	t=1772075010; cv=none; b=NJJcmTM5XPbKBJWW9wswl4/2kTyoRrADY8RJDK11aQsUy9sbgL/xHfzvQcDRDS8GQqzxKgEjthFBI1xt3rdbnWQmdAA0pF+fzUhsunfhIUYo3bdNto7npxNXUm5uM3OjnlOk26dUhZCH2JsbST93nxhBrx9D+ppGM3H45GgcVk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772074539; c=relaxed/simple;
-	bh=C4NznxqjcoVcyOiI3PHdefTOI5IbbnZt/ta8EjHjsBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QsZBrju4oM1OjwPbH3OwVJiPaycywOiydaFCgcVDQXoHfxjmz2TeQQ4HGxxsqLL7T/W0Fy2/8oQ18mgSp3cQ5JmfpfyFwNIFAz0nmjP/soHbQH79cm9S8pg+9niqA6pS3EucMzBuP+3g3jKvsRvnB5VxMntO9unAVsQ23JslR6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lT4z/kxJ; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1772075010; c=relaxed/simple;
+	bh=w4nmxgg6B2apbZjFl/wiFqr3+gpq+vuQ3u1MkV8t4+8=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=ocYvZ3lMj1thnXjtmsRG0tUNNVugElXPwItfCIKNMR6wEc2hnk+JJh9c1u2MRx8Cfo6LsiFwb9vdvY7eA/eLFUxvkR93SoIbsDs6CAFoE4eViUasKUPFpwfQWV/00H1JzRsn/VC90jVi+ma/lrec8iFgWVb8GEg39JilpKDE2OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=kf7vD2PM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lT4z/kxJ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=YhcyepidlpHsmGgGlbRMBKJer3APQ37SWyjKz6GiydU=; b=lT4z/kxJOpRr2y8PL3itayYgJ3
-	i7ZwoiMb1z2uyIxU40ivVgqHH9trh+os4979z2Zqho9027f2XMpjQwXu4WrFWsVhiC7TPeJPMFiWA
-	gY5Nx0DUj/IlPs4LB5T3TQX9JwzlCZKXG/qNd44L3nFJxmZwkUt/c5d4yVFzQMVrqTMgiAckXiQQv
-	VXSOgWR4lM/M5fbsc7o8/LNO/njgdgbDcnsTUTjWfa2X7I1OeE/KtKZWKBd50xC/8qWXOdJrRtHxa
-	bjHSfDSEJawaj9ug3LKsibAnOPgnzmVmc7GOT2cW8fy/u0uTmIAJ5HciOQcjzplM+oJiP/C0Gl3mu
-	rjc+CEBg==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vvRX9-000000024RA-1i48;
-	Thu, 26 Feb 2026 02:55:23 +0000
-Date: Thu, 26 Feb 2026 02:55:23 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Tal Zussman <tz2294@columbia.edu>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-	ntfs3@lists.linux.dev, linux-karma-devel@lists.sourceforge.net,
-	linux-mm@kvack.org,
-	"Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Subject: Re: [PATCH RFC v2 1/2] filemap: defer dropbehind invalidation from
- IRQ context
-Message-ID: <aZ-2G_6lDZePLSyx@casper.infradead.org>
-References: <20260225-blk-dontcache-v2-0-70e7ac4f7108@columbia.edu>
- <20260225-blk-dontcache-v2-1-70e7ac4f7108@columbia.edu>
- <c8078a80-f801-4f8a-b3cd-e2ccbfca1def@kernel.dk>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="kf7vD2PM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D073DC116D0;
+	Thu, 26 Feb 2026 03:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1772075010;
+	bh=w4nmxgg6B2apbZjFl/wiFqr3+gpq+vuQ3u1MkV8t4+8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kf7vD2PMlRugco/gixwl6qO61uIeodj7f+pX287GNC4q7nt63hRP6khor5FKThsPS
+	 GsHH9OI7giafksCC0Cye9sdUcyIjZ+Uz3SvTD8dEBcfteBtTPohLvfu2+NdwUxLnty
+	 2nUPZkCm4J92i4NLFTradHtn4rXOoFr0Vg/qg/RI=
+Date: Wed, 25 Feb 2026 19:03:29 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, Minchan Kim
+ <minchan@kernel.org>, Brian Geffon <bgeffon@google.com>, Richard Chang
+ <richardycc@google.com>, Suren Baghdasaryan <surenb@google.com>
+Subject: Re: [PATCH] zram: rename writeback_compressed device attr
+Message-Id: <20260225190329.8f76b847d391c71d58988234@linux-foundation.org>
+In-Reply-To: <20260226025429.1042083-1-senozhatsky@chromium.org>
+References: <20260226025429.1042083-1-senozhatsky@chromium.org>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c8078a80-f801-4f8a-b3cd-e2ccbfca1def@kernel.dk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 25, 2026 at 03:52:41PM -0700, Jens Axboe wrote:
-> How well does this scale? I did a patch basically the same as this, but
-> not using a folio batch though. But the main sticking point was
-> dropbehind_lock contention, to the point where I left it alone and
-> thought "ok maybe we just do this when we're done with the awful
-> buffer_head stuff". What happens if you have N threads doing IO at the
-> same time to N block devices? I suspect it'll look absolutely terrible,
-> as each thread will be banging on that dropbehind_lock.
+On Thu, 26 Feb 2026 11:54:21 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
+
+> Rename writeback_compressed attr to compressed_writeback
+> to avoid possible confusion and have more natural naming.
+> writeabck_compressed may look like an alternative version
+> of writeback while in fact writeback_compressed only sets
+> a writeback property.  Make this distinction more clear
+> with a new compressed_writeback name.
 > 
-> One solution could potentially be to use per-cpu lists for this. If you
-> have N threads working on separate block devices, they will tend to be
-> sticky to their CPU anyway.
+> ...
+> 
+> Andrew, the code in question is in 7.0-rc1, it has not been
+> released yet, so we think it's safe to rename the attribute
+> without breaking userspace.  Can you please pick this patch
+> for 7.0-rc2?
 
-Back in 2021, I had Vishal look at switching the page cache from using
-hardirq-disabling locks to softirq-disabling locks [1].  Some of the
-feedback (which doesn't seem to be entirely findable on the lists ...)
-was that we'd be better off punting writeback completion from interrupt
-context to task context and going from spin_lock_irq() to spin_lock()
-rather than going to spin_lock_bh().
+Fair enough.  I'll add
 
-I recently saw something (possibly XFS?) promoting this idea again.
-And now there's this.  Perhaps the time has come to process all
-write-completions in task context, rather than everyone coming up with
-their own workqueues to solve their little piece of the problem?
+Fixes: 4c1d61389e8e ("zram: introduce writeback_compressed device attribute")
 
-[1] https://lore.kernel.org/linux-block/20210730213630.44891-1-vishal.moola@gmail.com/
+and shall queue it as a hotfix.
