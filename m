@@ -1,322 +1,149 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A290544CF4E
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 19:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C9032E720;
+	Thu, 26 Feb 2026 20:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.77.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772134189; cv=none; b=iF1BOw8cwIuxNlRhbLGW09tOAKJbwNDDxnspdu7WZKXmyvnaJqu2atOqDssrSVeObKoGit1kqMqwyWaAsGnekzMUlVNVY6s3issMUS0zkYrMeDP8Y8YVAaWZHBnukSN0jnhHaBypw5w9jmY/QvzJE33FzYJdhlzbs6FzgJqsWmE=
+	t=1772137154; cv=none; b=U+WIDkbPZ3REsvFQbSb5NQ5FPMp84ZwO/+7TXfG2Yh+2aGip1xGNVKM2CGd/dKONunMmpFEZnclRujXMwSo4sKJdBpW8QOXRTwJitT7fLYQnJUeTf03gYw9FDTTEOt0Ga8PKq50zTSddfqMhbMZFzkSmVABOE3R16PSV6YAOiQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772134189; c=relaxed/simple;
-	bh=wfhNq3yitHAZ8XpYXoCk88fkKDKZU9yo7nZb3MeoDNk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PcU4tXUvYtSTcka3eXad/c6wwV0LOkwM4KG2iBoq0EmfLwUUKw84SW53NzOYFCxfmR9o52lKyQYUGhYRxQ8B8FmqR1g+24omSYzWDJGTC0jm1K++fuEiWwTtbZmLBgTkrlW8QOez2+W227QlF2gw+vCJei6FvpXhtsbSc6LlWk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lyU8G3QK; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772137154; c=relaxed/simple;
+	bh=XMDAjoQkTjgcB7K1B5xaNYpPic527m/p7uMetODqzp8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jzBgmZE4v3DQ6GyIcqvq5m/ByoDrYmBGWkPnlcLT0slRbUrMhb+gOA9oTjGAWb/wuMJUdpredOZchl5JZWKFPLWOFPD+XYj5J0Tp0YDwZxCUGog4fe9WJGKgFk5Y+hDbSZppPH3dcOsPUfPfbkTNrh06XGQmOD6ZZxtKnIOrVvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=XTPLWk9H; arc=none smtp.client-ip=44.246.77.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lyU8G3QK"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7d1890f7ee4so921526a34.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 11:29:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="XTPLWk9H"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772134186; x=1772738986; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MTFgJFJwcADBwm8xdyLgLzJR5Ju+0hDvZcOEI0tPhVw=;
-        b=lyU8G3QKqXOrqG+pgD5g2k1/qy/eledBVYavkCp4YD3z5HAkZoQ0KtqH6PTCesqi0/
-         rJrjggHz2AGrIm8qig45DSzgskxQqZw5yGr5GF7mVNpxz8xJRcy7cXqfoHjXvNr7/irN
-         PxpsnQYwoWsqheOTDzJ2B38B0oWKzeUT0kM/jqmZkFyai6w8PSslNjxTibWyOWf57ML4
-         YlimCqA0zprTFOLRt6RBMExF9EfzxOYQT5rCAOJWpE85eKkS3EeFluc4f9zcaYq6usc4
-         OLWD30HGWwKJ6Qn4YB3I49PlNQAmdSuGSkmpo7C68upaHCMNYkhcTzELRlKp1GsQq3bc
-         HJew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772134186; x=1772738986;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MTFgJFJwcADBwm8xdyLgLzJR5Ju+0hDvZcOEI0tPhVw=;
-        b=RfbPBjrhG9FJDk+mCIeFJoh8Zw+TMQJFJN3rygJeR6CyLR34udaaYSRtERKT7v+V8Y
-         YYZHVIiZ2gK7ZXCwWsl+K2kskyKgSHg2Q2yOcMk8CwSvt/ZdmDNSlaq+bWmpsMtjtKC7
-         MM+NGNf9G+jRvN3K9g/EQsH+ujJ9rSvmfHMKatIBISYpHMGR9oaP2rYVZ7oza8pfJYys
-         17aJveCoRyowMlHbyweasWBtONw86cPHJY9C6WN6PJG+yWRy5LIrKYe4w/459TgWwXDm
-         bS8bp7nslV1aeL16akfBnoa+lfsEHs1V74KHSIQ+KZQq90xENpY1TQA8hszdRcLlY8jO
-         Wbdw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxboQ0j0iTXl8jCq2XFp4WYkgzCvunfAfndDJQIrGKKAmfTjswi180T+BQ2u7rcrUcz2vdkAGapHokkg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy75HWUakUNU0U2FBHEcBegEprqhDnVRmczPqjXiOQXm87cbbNr
-	xHNlztRY9biPQv+EeMxcI0GVO2mTWj4nRGgW4Sx4Hw7NSZ5H0iHGCUXbKslqrou/
-X-Gm-Gg: ATEYQzz2Dg9kESeQB86Pvt8SIINV3Whl4j9afoLHA6IMZWazqHjkJz/gXQqJJPiLKrn
-	FvrnBR3LQtSEryj/vDcbM3zn1mr5bybNHfEV8YwohFsoYdCuhvAeq15kP306FK6fHzBLFwsCfJc
-	e9rp/DYh5pC9NqCniYOBp+lwEhkHOOZGmOAHukd/63x9RpFMHIwzSZ65oQxUlHTPnXSEdQwzcIp
-	iWj6G6ITv14V7NGopA254fAtG7Vks8aLmQ9xzcUKsNiMEDhIUyKP7mtU298IUsJ92EdpyoYjXf7
-	NY9ajW276/Jbq44BdN6jnhCgaraP5hFrHe+g97lH+szUrSOhi7/Db67NfNh/mksJew38FsefjLX
-	1T49pgdH7+nUxvtFEJ+HcY82ilwkZeOnbmFnUzLv5Dck5QhZuJcrfovPrglcq6JdJWeasK0YBhM
-	rZE94aSmT2Xs/Xjore5mU2DA==
-X-Received: by 2002:a05:6871:7402:b0:40e:9550:3242 with SMTP id 586e51a60fabf-41626de807cmr252273fac.16.1772134186118;
-        Thu, 26 Feb 2026 11:29:46 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:5f::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4160d21196csm2606670fac.12.2026.02.26.11.29.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 11:29:45 -0800 (PST)
-From: Joshua Hahn <joshua.hahnjy@gmail.com>
-To: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Nhat Pham <hoangnhat.pham@linux.dev>,
-	Nhat Pham <nphamcs@gmail.com>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH 4/8] mm/zsmalloc: Store obj_cgroup pointer in zpdesc
-Date: Thu, 26 Feb 2026 11:29:27 -0800
-Message-ID: <20260226192936.3190275-5-joshua.hahnjy@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260226192936.3190275-1-joshua.hahnjy@gmail.com>
-References: <20260226192936.3190275-1-joshua.hahnjy@gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772137153; x=1803673153;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=l5CyLmWSy70xXQrTFUBICNcYiP+xBbTRP1l/4MnIwJo=;
+  b=XTPLWk9HSHdi2yxmL8gJokx/u1ZpNgEhf0TSFkqb6iiRpRyadlqr/jB/
+   0PSCzli+F2fSUU8tlRwIgeA3Ap/ippgy5yp4E+e8a3NvUdRTnTgwiPgr/
+   Rxh4DvIB69ZWaVNjifMyGfQnidjhLdMzsKrdiHmj5Vt+RIDcuhF7qv+Xz
+   rPD7vlVZZMw8zgqxNE7sApPKDcblmbPOYbNG1uPgoxCDSLP86UW4AYgdj
+   lH1mzkKgqKByyUAkpXcKB5TazayxrZhCVYyNhAQl5luCNMLqj7pbuu7Wh
+   74+GTaRpzpOO2Po824HvAKWrwypQ3tpm//iQMuBCWkdHmlFM7wy1gVas6
+   A==;
+X-CSE-ConnectionGUID: xcG1cJc8QiKHzmVxUnhJMA==
+X-CSE-MsgGUID: 2GZQKUuhRJqLX4PVlkovFQ==
+X-IronPort-AV: E=Sophos;i="6.21,312,1763424000"; 
+   d="scan'208";a="13881999"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 20:19:10 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:15821]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.152:2525] with esmtp (Farcaster)
+ id 73aa004f-0205-4f88-98b1-e027e45a5a1d; Thu, 26 Feb 2026 20:19:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 73aa004f-0205-4f88-98b1-e027e45a5a1d
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Thu, 26 Feb 2026 20:19:08 +0000
+Received: from c889f3b07a0a.amazon.com (10.106.83.20) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Thu, 26 Feb 2026 20:19:06 +0000
+From: Yuto Ohnuki <ytohnuki@amazon.com>
+To: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+CC: <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, Yuto Ohnuki <ytohnuki@amazon.com>, "kernel
+ test robot" <lkp@intel.com>
+Subject: [PATCH v2] fs: remove stale and duplicate forward declarations
+Date: Thu, 26 Feb 2026 20:18:58 +0000
+Message-ID: <20260226201857.27310-2-ytohnuki@amazon.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-With each zswap-backing zpdesc now having an array of obj_cgroup pointers,
-plumb the obj_cgroup pointer from the zswap / zram layer down to
-zsmalloc.
+Remove the following unnecessary forward declarations from fs.h, which
+improves maintainability.
 
-Introduce two helper functions zpdesc_obj_cgroup and zpdesc_set_obj_cgroup,
-which abstract the conversion of an object's zspage idx to its zpdesc
-idx and the retrieval of the obj_cgroup pointer from the zpdesc.
+- struct hd_geometry: became unused in fs.h when
+  block_device_operations was moved to blkdev.h in commit 08f858512151
+  ("[PATCH] move block_device_operations to blkdev.h"). The forward
+  declaration is now added to blkdev.h where it is actually used.
 
-From the zswap path, store the obj_cgroup pointer after compression when
-writing the object and free when the object gets freed. Also handle the
-migration of an object across zpdescs.
+- struct iovec: became unused when aio_read/aio_write were removed in
+  commit 8436318205b9 ("->aio_read and ->aio_write removed")
 
-The lifetime and charging of the obj_cgroup is still handled in the
-zswap layer.
+- struct iov_iter: duplicate forward declaration. This removes the
+  redundant second declaration, added in commit 293bc9822fa9
+  ("new methods: ->read_iter() and ->write_iter()")
 
-Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
-Signed-off-by: Joshua Hahn <joshua.hahnjy@gmail.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202512301303.s7YWTZHA-lkp@intel.com/
+Closes: https://lore.kernel.org/oe-kbuild-all/202512302139.Wl0soAlz-lkp@intel.com/
+Closes: https://lore.kernel.org/oe-kbuild-all/202512302105.pmzYfmcV-lkp@intel.com/
+Closes: https://lore.kernel.org/oe-kbuild-all/202512302125.FNgHwu5z-lkp@intel.com/
+Closes: https://lore.kernel.org/oe-kbuild-all/202512302108.nIV8r5ES-lkp@intel.com/
+Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
 ---
- drivers/block/zram/zram_drv.c |  7 ++--
- include/linux/zsmalloc.h      |  3 +-
- mm/zsmalloc.c                 | 71 ++++++++++++++++++++++++++++++++++-
- mm/zswap.c                    |  6 +--
- 4 files changed, 79 insertions(+), 8 deletions(-)
+Changes in v2:
+- Add forward declaration of struct hd_geometry to blkdev.h to fix
+  build errors reported by kernel test robot.
+- Verified with allmodconfig build and all configs reported by 
+  kernel test robot.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 60ee85679730..209668b14428 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2231,7 +2231,7 @@ static int write_incompressible_page(struct zram *zram, struct page *page,
- 	}
+v1: https://lore.kernel.org/lkml/20251229071401.98146-1-ytohnuki@amazon.com/
+---
+ include/linux/blkdev.h | 1 +
+ include/linux/fs.h     | 3 ---
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d463b9b5a0a5..0b5942e08754 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -38,6 +38,7 @@ struct blk_flush_queue;
+ struct kiocb;
+ struct pr_ops;
+ struct rq_qos;
++struct hd_geometry;
+ struct blk_report_zones_args;
+ struct blk_queue_stats;
+ struct blk_stat_callback;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 8b3dd145b25e..75c97faf8799 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -55,8 +55,6 @@ struct bdi_writeback;
+ struct bio;
+ struct io_comp_batch;
+ struct fiemap_extent_info;
+-struct hd_geometry;
+-struct iovec;
+ struct kiocb;
+ struct kobject;
+ struct pipe_inode_info;
+@@ -1917,7 +1915,6 @@ struct dir_context {
+  */
+ #define COPY_FILE_SPLICE		(1 << 0)
  
- 	src = kmap_local_page(page);
--	zs_obj_write(zram->mem_pool, handle, src, PAGE_SIZE);
-+	zs_obj_write(zram->mem_pool, handle, src, PAGE_SIZE, NULL);
- 	kunmap_local(src);
+-struct iov_iter;
+ struct io_uring_cmd;
+ struct offset_ctx;
  
- 	slot_lock(zram, index);
-@@ -2296,7 +2296,7 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
- 		return -ENOMEM;
- 	}
- 
--	zs_obj_write(zram->mem_pool, handle, zstrm->buffer, comp_len);
-+	zs_obj_write(zram->mem_pool, handle, zstrm->buffer, comp_len, NULL);
- 	zcomp_stream_put(zstrm);
- 
- 	slot_lock(zram, index);
-@@ -2520,7 +2520,8 @@ static int recompress_slot(struct zram *zram, u32 index, struct page *page,
- 		return PTR_ERR((void *)handle_new);
- 	}
- 
--	zs_obj_write(zram->mem_pool, handle_new, zstrm->buffer, comp_len_new);
-+	zs_obj_write(zram->mem_pool, handle_new, zstrm->buffer,
-+		     comp_len_new, NULL);
- 	zcomp_stream_put(zstrm);
- 
- 	slot_free(zram, index);
-diff --git a/include/linux/zsmalloc.h b/include/linux/zsmalloc.h
-index 8ef28b964bb0..22f3baa13f24 100644
---- a/include/linux/zsmalloc.h
-+++ b/include/linux/zsmalloc.h
-@@ -15,6 +15,7 @@
- #define _ZS_MALLOC_H_
- 
- #include <linux/types.h>
-+#include <linux/memcontrol.h>
- 
- struct zs_pool_stats {
- 	/* How many pages were migrated (freed) */
-@@ -48,7 +49,7 @@ void zs_obj_read_sg_begin(struct zs_pool *pool, unsigned long handle,
- 			  struct scatterlist *sg, size_t mem_len);
- void zs_obj_read_sg_end(struct zs_pool *pool, unsigned long handle);
- void zs_obj_write(struct zs_pool *pool, unsigned long handle,
--		  void *handle_mem, size_t mem_len);
-+		  void *handle_mem, size_t mem_len, struct obj_cgroup *objcg);
- 
- extern const struct movable_operations zsmalloc_mops;
- 
-diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
-index 7d56bb700e11..e5ae9a0fc78a 100644
---- a/mm/zsmalloc.c
-+++ b/mm/zsmalloc.c
-@@ -899,6 +899,41 @@ static void init_zspage(struct size_class *class, struct zspage *zspage)
- }
- 
- #ifdef CONFIG_MEMCG
-+/* idx is indexed per-zspage, not per-zpdesc. */
-+static inline struct obj_cgroup *zpdesc_obj_cgroup(struct zpdesc *zpdesc,
-+						   unsigned int idx,
-+						   int size)
-+{
-+	struct obj_cgroup **objcgs = zpdesc_objcgs(zpdesc);
-+	unsigned int off = offset_in_page(size * idx);
-+	unsigned int zpdesc_idx = DIV_ROUND_UP(off, size);
-+
-+	if (!objcgs)
-+		return NULL;
-+
-+	return objcgs[zpdesc_idx];
-+}
-+
-+/* idx is indexed per-zspage, not per-zpdesc. */
-+static inline void zpdesc_set_obj_cgroup(struct zpdesc *zpdesc,
-+					 unsigned int idx, int size,
-+					 struct obj_cgroup *objcg)
-+{
-+	struct obj_cgroup **objcgs = zpdesc_objcgs(zpdesc);
-+	unsigned int off = offset_in_page(size * idx);
-+	unsigned int zpdesc_idx = DIV_ROUND_UP(off, size);
-+
-+	if (!objcgs)
-+		return;
-+
-+	objcgs[zpdesc_idx] = objcg;
-+	if (off + size > PAGE_SIZE) {
-+		/* object spans two pages */
-+		objcgs = zpdesc_objcgs(get_next_zpdesc(zpdesc));
-+		objcgs[0] = objcg;
-+	}
-+}
-+
- static bool alloc_zspage_objcgs(struct size_class *class, gfp_t gfp,
- 				struct zpdesc *zpdescs[])
- {
-@@ -927,12 +962,40 @@ static bool alloc_zspage_objcgs(struct size_class *class, gfp_t gfp,
- 
- 	return true;
- }
-+
-+static void migrate_obj_objcg(unsigned long used_obj, unsigned long free_obj,
-+			      int size)
-+{
-+	unsigned int s_obj_idx, d_obj_idx;
-+	struct zpdesc *s_zpdesc, *d_zpdesc;
-+	struct obj_cgroup *objcg;
-+
-+	obj_to_location(used_obj, &s_zpdesc, &s_obj_idx);
-+	obj_to_location(free_obj, &d_zpdesc, &d_obj_idx);
-+	objcg = zpdesc_obj_cgroup(s_zpdesc, s_obj_idx, size);
-+
-+	zpdesc_set_obj_cgroup(d_zpdesc, d_obj_idx, size, objcg);
-+	zpdesc_set_obj_cgroup(s_zpdesc, s_obj_idx, size, NULL);
-+}
- #else
-+static inline struct obj_cgroup *zpdesc_obj_cgroup(struct zpdesc *zpdesc,
-+						   unsigned int offset,
-+						   int size)
-+{
-+	return NULL;
-+}
-+
-+static inline void zpdesc_set_obj_cgroup(struct zpdesc *zpdesc,
-+					 unsigned int offset, int size,
-+					 struct obj_cgroup *objcg) {}
- static bool alloc_zspage_objcgs(struct size_class *class, gfp_t gfp,
- 				struct zpdesc *zpdescs[])
- {
- 	return true;
- }
-+
-+static void migrate_obj_objcg(unsigned long used_obj, unsigned long free_obj,
-+			      int size) {}
- #endif
- 
- static void create_page_chain(struct size_class *class, struct zspage *zspage,
-@@ -1221,7 +1284,7 @@ void zs_obj_read_sg_end(struct zs_pool *pool, unsigned long handle)
- EXPORT_SYMBOL_GPL(zs_obj_read_sg_end);
- 
- void zs_obj_write(struct zs_pool *pool, unsigned long handle,
--		  void *handle_mem, size_t mem_len)
-+		  void *handle_mem, size_t mem_len, struct obj_cgroup *objcg)
- {
- 	struct zspage *zspage;
- 	struct zpdesc *zpdesc;
-@@ -1242,6 +1305,9 @@ void zs_obj_write(struct zs_pool *pool, unsigned long handle,
- 	class = zspage_class(pool, zspage);
- 	off = offset_in_page(class->size * obj_idx);
- 
-+	if (objcg)
-+		zpdesc_set_obj_cgroup(zpdesc, obj_idx, class->size, objcg);
-+
- 	if (!ZsHugePage(zspage))
- 		off += ZS_HANDLE_SIZE;
- 
-@@ -1415,6 +1481,8 @@ static void obj_free(int class_size, unsigned long obj)
- 	f_offset = offset_in_page(class_size * f_objidx);
- 	zspage = get_zspage(f_zpdesc);
- 
-+	zpdesc_set_obj_cgroup(f_zpdesc, f_objidx, class_size, NULL);
-+
- 	vaddr = kmap_local_zpdesc(f_zpdesc);
- 	link = (struct link_free *)(vaddr + f_offset);
- 
-@@ -1587,6 +1655,7 @@ static void migrate_zspage(struct zs_pool *pool, struct zspage *src_zspage,
- 		used_obj = handle_to_obj(handle);
- 		free_obj = obj_malloc(pool, dst_zspage, handle);
- 		zs_obj_copy(class, free_obj, used_obj);
-+		migrate_obj_objcg(used_obj, free_obj, class->size);
- 		obj_idx++;
- 		obj_free(class->size, used_obj);
- 
-diff --git a/mm/zswap.c b/mm/zswap.c
-index dd083110bfa0..1e2d60f47919 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -851,7 +851,7 @@ static void acomp_ctx_put_unlock(struct crypto_acomp_ctx *acomp_ctx)
- }
- 
- static bool zswap_compress(struct page *page, struct zswap_entry *entry,
--			   struct zswap_pool *pool)
-+			   struct zswap_pool *pool, struct obj_cgroup *objcg)
- {
- 	struct crypto_acomp_ctx *acomp_ctx;
- 	struct scatterlist input, output;
-@@ -911,7 +911,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
- 		goto unlock;
- 	}
- 
--	zs_obj_write(pool->zs_pool, handle, dst, dlen);
-+	zs_obj_write(pool->zs_pool, handle, dst, dlen, objcg);
- 	entry->handle = handle;
- 	entry->length = dlen;
- 
-@@ -1413,7 +1413,7 @@ static bool zswap_store_page(struct page *page,
- 		return false;
- 	}
- 
--	if (!zswap_compress(page, entry, pool))
-+	if (!zswap_compress(page, entry, pool, objcg))
- 		goto compress_failed;
- 
- 	old = xa_store(swap_zswap_tree(page_swpentry),
 -- 
-2.47.3
+2.50.1
+
+
+
+
+Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
+
+Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
+
+
 
