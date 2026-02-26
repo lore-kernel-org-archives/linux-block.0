@@ -1,240 +1,120 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101DD3EDACF
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 15:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795B13D6470
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 15:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772120303; cv=none; b=OKA9ii1l+4zWW6/VRmvWb3+KT1pZh2Pd1xBcxmIWjCw+TdxyRSjGqWYY0Vyzddz4qquPYcK4stIG2m5S2EatzYc1vCsB8gBRT5ZZA+xRJAXcHzuHUFrXdbjKj2zoOcZdYaXKMJa2dIEbHdmiAJGpd6FJrmPwD1N6UlPk3zlVNUI=
+	t=1772120491; cv=none; b=aN6PSIssPW5OQ2xcWhIaMz0jcKQjyxENW7TgAZEnTfGcHmobrZoJnagtCjapejTH2dWBZKDgEEYdeApxbg1qcegjn0CbeEWK8Kz1JSMcche3bxgHs7IkEyhmDluJ4RDIUBr7BxMZYgbJ9W7LPMwZFbN9hDNO4P4RktzS4YXoEXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772120303; c=relaxed/simple;
-	bh=ssXkoZLNw5U/Sj/ACER4l+EgfA3oMnML0uj4dVaRpcw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XmW+9Qw+NdzCMLKaDsL0sYOhivq2KWoFEQj47FPMikc8MMSH6XUvlaMqWzhfJNiJt73udHqutdNUDbUo9LqxJsLG0ZlnGXDiE9HdaO+/2sOJVoC2vtmP6tZkuHM1mFrj6M+5MJWZrMhAA7jUTKUzy3bMPcq7rG+59+e506m/t8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iZb0JAR8; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1772120491; c=relaxed/simple;
+	bh=73LC2pC5CX8V1OVYDzrlgGpHDCLk6stJa9pX2mrIQi8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=ibNIuwImqMFkZNEwXkqHVD+lvMilb7GqMKMuTxiK6cKsWubenMJu+ty1uwNXB8tooo2hpNfroof8tdrV53Ayg4gZgwy8T3XK9vjxputI4kSjEunldpTHyQf9/xU2mcu5VcjoJ4GoWpLlo3QWxxgCeItqSPZRkXP2ZoLH1M1Ti68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1qikbDOq; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iZb0JAR8"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61QDgEKm1936303;
-	Thu, 26 Feb 2026 15:38:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=vRSnJx
-	IeuGHXVMc4CQeQe521vBwwPZnYU3eR6M4E0ZE=; b=iZb0JAR8QRvv8GEN+CEDI2
-	9Z87aqoyDuLD8GFYkNWwJR3iH3LNIyx1SHLarHpLbcNQtMLdeY4kq1RHRrc+VXvG
-	Bybcs6sxbeSAoj2ea+zVMGWyR7FD3l2bLBsh0QJnC1HNIXD+YwHu/9yGtg2ypsCJ
-	fTOt1TzHoIY7gIMpT4ZZdqGkjlkjTTwcpHkp0nx52nzmlswVfSvN3MmH83Epj39P
-	yfk01keMvxeXeTi0s8jwW1k2P5JisRO2KPNpHTyyKRdTaU0OiAZk0Re4VgH8CN3Z
-	vZzBlTINw5i8ygkKdnbbCLui9lnCDgAsjk1QWu707lJdiFM2dbfbMyrvS9SzNhlQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf4bs6epj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Feb 2026 15:38:07 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61QDG7gv001674;
-	Thu, 26 Feb 2026 15:38:07 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cfr1ncbd9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Feb 2026 15:38:07 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61QFc6lm10552032
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Feb 2026 15:38:06 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6558D58053;
-	Thu, 26 Feb 2026 15:38:06 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7CD9758043;
-	Thu, 26 Feb 2026 15:38:01 +0000 (GMT)
-Received: from [9.43.72.132] (unknown [9.43.72.132])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 26 Feb 2026 15:38:00 +0000 (GMT)
-Message-ID: <80246de3-f22e-46ba-8a78-17282190224c@linux.ibm.com>
-Date: Thu, 26 Feb 2026 21:07:58 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1qikbDOq"
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7d18a9d2b1aso1040671a34.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 07:41:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772120488; x=1772725288; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6lcgSH6BIx1z+qenksgSCQPSRkHipodAz9c6UCb+DJg=;
+        b=1qikbDOqVHOg3bPJq8TWoWiH9kZOwWx6uKQ9ReaXyy4tSI5QPlY8lp/tbvCkxChTYc
+         LMmpVHdS4uRyNdf8r0koaCeG/OkJREP3YJKwgWlaMdfLZRglDUoV89jjKPqVtgfL9L+U
+         dQo5CM7t9l0NTnxfrIEkdIZV7TYZKOEfNbwey3NyAV/RXv+6VN2hJXGzB1nPJBhWcs5Z
+         TIgyL85vD0p3aCN/QdzpiXpmppdjC2IEjJkA+B0SeIrQA6sUBmt7HDNWr0tBBpHnQ55O
+         2jQdpghU2M0gsTkhvyDm9EdE6dexjp7MLhHArzhtEyCRG6AAPQzgCWad5D+TyP/EnHvB
+         c2eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772120488; x=1772725288;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6lcgSH6BIx1z+qenksgSCQPSRkHipodAz9c6UCb+DJg=;
+        b=FjrIsEjKHuWVN/1diGvFYiNBlF/sADI9FWXkZLn48X41rQ3AqoRABXzpR8VSzuDjZ/
+         15AkSg6eYUr6BdvdGur5UGTqD7FaOF1LxCGyBGpMx6MCP6DRut1D/0QN3oENE5pM2eKE
+         cJ/ouk8RXetDtHk2DJQPF7FQgmJXYtnBz6KcTN590FL4oeLy7DZOQBLKLqdt0dWrBctl
+         UHPv8jbVgIxmL3QxUyWPrMGFrKRYdO6SE8XEryaWbmBzi4Cg3q5S7EqURnsUNwdrXrYS
+         5wZpd1nVjY9Yr+OvqAZAcRyD2MeDyMqfNvwOzFfTpr85/H9YwHjPt4tSihXgaeJwRpTL
+         2gSg==
+X-Gm-Message-State: AOJu0Yw02O8Wq4uw/ROICweU2fLVdwvTtrwWAYRqSqYql7h/U2WT+8Y5
+	YhwuxQiW5yF6ZAnaVJEWSp7EIwnDN4iCe2I/q8RFQw8/9wS0HijjmAsC0xhOAwgfvp8g18ECf45
+	rN9dyndw=
+X-Gm-Gg: ATEYQzwxMJgGNCUdKN+yP4SHWY1N7aM3lul0E7YdkkoOLqweMnX0Q5C5s5x4U5j4f+7
+	Mg5JRM1Koie/uF4YnwhtI13JdxDZK2ao4p1ZpBNxf2NwaGAHuPuID7x4xZq+HNcfXHy8Uk6tHFg
+	OvFCLxHC78LUdvNurLl3XROqUVFXW5J59J01CwH7Vy+l9GZ0ZpHzKBNPUBDl2jSolcQKy19LZrk
+	S/VNsRrS9drJiP0foe87kNKgL4m6e1ifZsYptCx8U+F4piQgVXU8qO3paWQBEXXMwHn0j2QC1Oy
+	QUGDPxgnh3m47dK4CGtlLKwlv6L4ONLG9pskKpV7zqWH6h5PrQiWfxtHID96dqsjnQZMNTnjNuE
+	Vrvrm6grpE3kCr7m1W77M8NxhS+16JEU+/o23cVPECmb9+Li9a/igFTykkJ2vsncN3yhCvcBoxc
+	gaScvaa+kfAYrpQSK2scRwEHpdIA05n1CgIxAav1303rpJWSmsMhz4kNfJH5fWsZe2xWCUAcw9W
+	ynngwZjw2t5JYM=
+X-Received: by 2002:a05:6830:82e1:b0:7d5:1101:9196 with SMTP id 46e09a7af769-7d52bdf7653mr13276500a34.6.1772120488091;
+        Thu, 26 Feb 2026 07:41:28 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d586626869sm1978963a34.16.2026.02.26.07.41.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 07:41:27 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ondrej Kozina <okozina@redhat.com>
+Cc: gmazyland@gmail.com, jonathan.derrick@linux.dev, gjoyce@ibm.com, 
+ hare@suse.de
+In-Reply-To: <20260206141804.278721-1-okozina@redhat.com>
+References: <20260205150935.238137-1-okozina@redhat.com>
+ <20260206141804.278721-1-okozina@redhat.com>
+Subject: Re: [PATCH v3 0/9] Extend Single User Mode (SUM) support in
+ sed-opal.
+Message-Id: <177212048698.990177.1302244716721420868.b4-ty@kernel.dk>
+Date: Thu, 26 Feb 2026 08:41:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: break pcpu_alloc_mutex dependency on freeze_lock
-To: yukuai@fnnas.com, linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com, yi.zhang@redhat.com,
-        shinichiro.kawasaki@wdc.com, gjoyce@ibm.com
-References: <20260225124556.1152510-1-nilay@linux.ibm.com>
- <1a2c39d4-5d39-42c6-89f9-3ec473b44b06@fnnas.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <1a2c39d4-5d39-42c6-89f9-3ec473b44b06@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: CZj2i_XJOH1olpZkACwR0U-uIjA2NiV2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDEzNiBTYWx0ZWRfXyBlmpBPjOHPF
- LJg3CQyB47uc70Gc2+CEe2Im2YnMB/4LlU/lnPPqEaGrALBdXxQ4e7REkIAheGNllPbvvUpHeXs
- jbYJ5aoA6RNqqJJ6hnk149wFLEYCCDllQMYiAmnnRA4H9CyfO9rPFoz7DbZGgBRW465fDaZifsP
- cvUN9kCJ5qt1bOItVWt6IHzaejeYKdUf81jcvVm9KZWzLmC+04eSOLSPZUHiq+PEW9RI42Cu7A+
- 7SPkEx0GfDawjvvbdYfV6u688WZ/jNY4DW+vQ6+Vf597JzA5EV0g4+DZdfql+qpytnzTD9RI+cs
- 4nYWeltGkJYW0kXxnLVs+aHWcE0wvqzGKHuvH+sNd5mfT9letKjKJL/uNVSNFR2YjL2xwYFuBe/
- fF/fRDz+lY6tirmcikFise+Gs8u7ujrBAukLTtDJLOrvZyf/fWR4F8s6sEe+ZkRrbw6b4+6LtXY
- sO4GZXFqEZZwtSvbSYA==
-X-Authority-Analysis: v=2.4 cv=eNceTXp1 c=1 sm=1 tr=0 ts=69a068e0 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8
- a=pGLkceISAAAA:8 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=3GNCSvPvoGDAPeXhQ7gA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: CZj2i_XJOH1olpZkACwR0U-uIjA2NiV2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-26_01,2026-02-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602260136
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
 
-
-On 2/25/26 9:20 PM, Yu Kuai wrote:
-> Hi,
+On Fri, 06 Feb 2026 15:17:54 +0100, Ondrej Kozina wrote:
+> This patch series extends support for TCG Storage Opal SSC Single User
+> Mode (SUM) in the sed-opal kernel interface. SUM addresses few
+> shortcomins described in the chapter 2 of the OPAL2 sepecification
+> extension (see below). It better isolates Admin authority from User
+> stored data by taking the Lock/Unlock/Enable/Disable privileges from
+> Admin when managing Locking Ranges configured for SUM.
 > 
-> 在 2026/2/25 20:44, Nilay Shroff 写道:
->> While nr_hw_update allocates tagset tags it acquires ->pcpu_alloc_mutex
->> after ->freeze_lock is acquired or queue is frozen. This potentially
->> creates a circular dependency involving ->fs_reclaim if reclaim is
->> triggered simultaneously in a code path which first acquires ->pcpu_
->> alloc_mutex. As the queue is already frozen while nr_hw_queue update
->> allocates tagsets, the reclaim can't forward progress and thus it could
->> cause a potential deadlock as reported in lockdep splat[1].
->>
->> Fix this by  pre-allocating tagset tags before we freeze queue during
->> nr_hw_queue update. Later the allocated tagset tags could be safely
->> installed and used after queue is frozen.
->>
->> Reported-by: Yi Zhang <yi.zhang@redhat.com>
->> Closes: https://lore.kernel.org/all/CAHj4cs8F=OV9s3La2kEQ34YndgfZP-B5PHS4Z8_b9euKG6J4mw@mail.gmail.com/ [1]
->> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->> ---
->>   block/blk-mq.c | 53 +++++++++++++++++++++++++++++++++++---------------
->>   1 file changed, 37 insertions(+), 16 deletions(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index d5602ff62c7c..687fd47786a6 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -4793,10 +4793,10 @@ static void blk_mq_update_queue_map(struct blk_mq_tag_set *set)
->>   	}
->>   }
->>   
->> -static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
->> -				       int new_nr_hw_queues)
->> +static int blk_mq_prealloc_tag_set_tags(struct blk_mq_tag_set *set,
->> +		       int new_nr_hw_queues, struct blk_mq_tags ***tags)
-> 
-> Personally I don't like the last parameter, since the return value is not
-> used at all, I feel it's better to return the new_tags instead.
-> 
+> [...]
 
-Hmm ok I could return new_tags and then use ERR_PTR when it fails to 
-alloc tags. Then at call site we could use IS_ERR to distinguish 
-between success vs fail case.
+Applied, thanks!
 
->>   {
->> -	struct blk_mq_tags **new_tags;
->> +	struct blk_mq_tags **new_tags = NULL;
->>   	int i;
->>   
->>   	if (set->nr_hw_queues >= new_nr_hw_queues)
->> @@ -4807,24 +4807,42 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
->>   	if (!new_tags)
->>   		return -ENOMEM;
->>   
->> -	if (set->tags)
->> -		memcpy(new_tags, set->tags, set->nr_hw_queues *
->> -		       sizeof(*set->tags));
->> -	kfree(set->tags);
->> -	set->tags = new_tags;
->> -
->>   	for (i = set->nr_hw_queues; i < new_nr_hw_queues; i++) {
->> -		if (!__blk_mq_alloc_map_and_rqs(set, i)) {
->> -			while (--i >= set->nr_hw_queues)
->> -				__blk_mq_free_map_and_rqs(set, i);
->> -			return -ENOMEM;
->> +		if (blk_mq_is_shared_tags(set->flags))
->> +			new_tags[i] = set->shared_tags;
->> +		else {
->> +			new_tags[i] = blk_mq_alloc_map_and_rqs(set, i,
->> +					set->queue_depth);
->> +			if (!new_tags[i])
->> +				goto out_unwind;
->>   		}
->>   		cond_resched();
->>   	}
->>   
->>   done:
->> -	set->nr_hw_queues = new_nr_hw_queues;
->> +	*tags = new_tags;
->>   	return 0;
->> +out_unwind:
->> +	while (--i >= set->nr_hw_queues) {
->> +		if (!blk_mq_is_shared_tags(set->flags))
->> +			blk_mq_free_map_and_rqs(set, new_tags[i], i);
->> +	}
->> +	return -ENOMEM;
->> +}
->> +
->> +static void blk_mq_init_tag_set_tags(struct blk_mq_tag_set *set,
->> +		int new_nr_hw_queues, struct blk_mq_tags **new_tags)
->> +{
->> +	if (set->nr_hw_queues >= new_nr_hw_queues)
->> +		goto done;
->> +
->> +	if (set->tags)
->> +		memcpy(new_tags, set->tags, set->nr_hw_queues *
->> +		       sizeof(*set->tags));
->> +	kfree(set->tags);
->> +	set->tags = new_tags;
->> +done:
->> +	set->nr_hw_queues = new_nr_hw_queues;
->>   }
->>   
->>   /*
->> @@ -5113,6 +5131,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->>   	unsigned int memflags;
->>   	int i;
->>   	struct xarray elv_tbl;
->> +	struct blk_mq_tags **new_tags;
->>   	bool queues_frozen = false;
->>   
->>   	lockdep_assert_held(&set->tag_list_lock);
->> @@ -5147,11 +5166,13 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->>   		if (blk_mq_elv_switch_none(q, &elv_tbl))
->>   			goto switch_back;
->>   
->> +	if (blk_mq_prealloc_tag_set_tags(set, nr_hw_queues, &new_tags) < 0)
->> +		goto switch_back;
->> +
->>   	list_for_each_entry(q, &set->tag_list, tag_set_list)
->>   		blk_mq_freeze_queue_nomemsave(q);
->>   	queues_frozen = true;
->> -	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
->> -		goto switch_back;
->> +	blk_mq_init_tag_set_tags(set, nr_hw_queues, new_tags);
-> 
-> It looks ok just leave set->nr_hw_queues = nr_hw_queues, and the patch should
-> be much simpler.
-> 
+[1/9] sed-opal: add UID of Locking Table.
+      commit: 985977af2390d5055ae30f9f56846b74dbe16311
+[2/9] sed-opal: add RangeStartRangeLengthPolicy parameter.
+      commit: d7c65aba73efb1519685bda79d0b924f3fc1d856
+[3/9] sed-opal: add Admin1PIN parameter.
+      commit: 1ccd8e90d2d705ccee423acb7eb69cdc2e17b3f3
+[4/9] sed-opal: add IOC_OPAL_REACTIVATE_LSP.
+      commit: e00c5bf602e9e99397c9385fc6687403b6536676
+[5/9] sed-opal: refactor (split) IOC_OPAL_LR_SETUP internals.
+      commit: 700cc7055c96dcecb1fe3ce86ad9769b6ecf87ba
+[6/9] sed-opal: add IOC_OPAL_LR_SET_START_LEN ioctl.
+      commit: 401262181b2f041679f526c9557e13ef4d243cd9
+[7/9] sed-opal: add IOC_OPAL_ENABLE_DISABLE_LR.
+      commit: e777eba95dae6427d640dd493c489511342f8b7f
+[8/9] sed-opal: increase column attribute type size to 64 bits.
+      commit: 93c58e070b38cd5be7a9870b324a14a4b0142475
+[9/9] sed-opal: add IOC_OPAL_GET_SUM_STATUS ioctl.
+      commit: 42dcb3826c86288a5c517dc2b465da687e7b38d6
 
-I think you’re suggesting that blk_mq_init_tag_set_tags() can be removed and
-the tag installation along with set->nr_hw_queues = nr_hw_queues can be done
-inline at the call site. Makes sense. I will implement it in v2.
+Best regards,
+-- 
+Jens Axboe
 
-Thanks,
---Nilay
+
 
