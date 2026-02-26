@@ -1,98 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC4E1A3164
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 03:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF319328B75
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 04:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772077034; cv=none; b=Ue3ti9BjwOamWqqqPl3DZ2IoMFTjz8edL5TX20R1/lDIkiuOSGc8Moo5ROeWCxxe5lsIQyGRdpUwUsq9UWneS3OS768Gi9WfHv0gPcja10Y1AtCGAwtXN4OkINPavYiltO/Ai9c4kyz4ZYsxvbgCXmspr+tX7g13aQgh8IXhWps=
+	t=1772079341; cv=none; b=XuSN1xC0LKNJWCNLmTvtB0bDR43pL2NkbPk2P4Vwm0i59spu4+K/zeE5gGQZJI0AGtfGGho5jNVFDfP1MRXdW3O8NMAdETdzEs4dlieef3oPsIKiIIkCXULJVzCcgxL5hN9CKmfWRU4oJzdzkeDWmaZF2FmkfWxXiyK67gZw7x4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772077034; c=relaxed/simple;
-	bh=2NoCN6+mTCZfckAbUadVoYxFffzxni/k9obOl9HI1y4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OrLePh4DLG6vzQphAli0l9qhGMRMpcCkNxWLdwdvLASne6EnHkAqiGcG6m+M3ASbJXv6WuFxMmk+SOCeWflY0okMt+SvwEyYII6+qtmOZM4aYa8DtNzIzEgUTAH4NaHzqcPBGd0wMz/XpwRK6Ew61X17mVDKg4uZDogxCFbEDlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fo+4MtIt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1772079341; c=relaxed/simple;
+	bh=9M8xoinSiMVO3BCht5NVWvit/M+i61f/Mujbsy4XTts=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UO6kogUlxTeQWlKgyUSz8YK3RyAp+VHLxIxVFzJ6bcK3xRSvB1lshwWARfkhYqIiFC9AqGkIwpdalDlkQYB/S+NboC1Gvtg/aijkZWqqcquVAY/vYp8wJbkT6ev1ADLqgBZ7KRglSvYBAd04RqeNWlbSSNjLkDxriKWQYMFOF4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5Cqeurm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fo+4MtIt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772077032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bkLc+GDTQrnsggrpWJFZMbOK/80PHJQs/QIq3lF3I4w=;
-	b=fo+4MtItLc2K/i2RowYc+e9H9c2GWdj86JAr3e/eUtGKI3w8mkwnchzkHR4WBw6kwrrUwm
-	yV3uBcsbwcvannJdW+4yEP0xHxjGRJVpk6txPXkJf0oFSkzlxMtNCCPjdsfY4xAsa7/bmI
-	0EMTJ6raQIja3huEQkkNFKPkgEGDmE8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-st2cy_XBNqSdjq7AuUSX_w-1; Wed,
- 25 Feb 2026 22:37:09 -0500
-X-MC-Unique: st2cy_XBNqSdjq7AuUSX_w-1
-X-Mimecast-MFC-AGG-ID: st2cy_XBNqSdjq7AuUSX_w_1772077027
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 304EC19560A3;
-	Thu, 26 Feb 2026 03:37:06 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE9641800465;
-	Thu, 26 Feb 2026 03:37:04 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 61Q3b3hQ1680267
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 25 Feb 2026 22:37:03 -0500
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 61Q3b33W1680266;
-	Wed, 25 Feb 2026 22:37:03 -0500
-Date: Wed, 25 Feb 2026 22:37:03 -0500
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: John Garry <john.g.garry@oracle.com>
-Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
-        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
-        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
-        snitzer@kernel.org, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/13] libmultipath: Add path selection support
-Message-ID: <aZ-_3_hXEkFEClhs@redhat.com>
-References: <20260225153225.1031169-1-john.g.garry@oracle.com>
- <20260225153225.1031169-4-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5Cqeurm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD6AC116C6;
+	Thu, 26 Feb 2026 04:15:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772079341;
+	bh=9M8xoinSiMVO3BCht5NVWvit/M+i61f/Mujbsy4XTts=;
+	h=From:To:Subject:Date:From;
+	b=G5Cqeurm6zek8oXa+IkhPIBAU0KTHHReKd0BgDtl/fvBn06rLzG4D6xInKeFN5Efb
+	 vLOLjeYcs48YVuNRqWRoT5SADUELPL9R/on0vlj5VHfWRhNTYxUgnj8fbSVTxIw3SS
+	 Rm/IYBcae19dIxJkz/GIP3Zt6QOvVi1kRQw5n6uwis3OoIkC6aOrLe0L4IPubLyku4
+	 IrOnntdbbrlbWGIyqyEDetfdM416B7+MN23VRRdkloam9PUmIAtndHOU5RrEXvjSA1
+	 bMTEAGNO0ezcAYM3f0ORlmIOEcVRGzNfe5UXXpXaTyLxn2qDuQjiTfmXMlpFM/Pl90
+	 ktLISN9gI8GiA==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH v2 0/7] Improve zoned (SMR) HDD write throughput
+Date: Thu, 26 Feb 2026 13:10:17 +0900
+Message-ID: <20260226041024.2154806-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225153225.1031169-4-john.g.garry@oracle.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 25, 2026 at 03:32:15PM +0000, John Garry wrote:
-> +__maybe_unused
-> +static struct mpath_device *mpath_find_path(struct mpath_head *mpath_head)
-> +{
-> +	enum mpath_iopolicy_e iopolicy =
-> +			mpath_head->mpdt->get_iopolicy(mpath_head);
-> +
-> +	switch (iopolicy) {
-> +	case MPATH_IOPOLICY_QD:
-> +		return mpath_queue_depth_path(mpath_head);
-> +	case MPATH_IOPOLICY_RR:
-> +		return mpath_round_robin_path(mpath_head, iopolicy);
-> +	default:
-> +		return mpath_numa_path(mpath_head, iopolicy);
+Jens,
 
-When we're in mpath_round_robin_path() and mpath_numa_path(), we know the
-iopolicy, so we don't really need to pass it in.
+This patch series cleans up the zone write plugging code and introduces
+the ability to issue all write BIOs from a single context (a kthread)
+instead of allowing multiple zones to be written at the same time using
+a per zone work. As shown in patch 6, raw block device tests and XFS
+tests with an SMR HDD show that this can significantly increase write
+throughput (up to 40% over the current zone write plugging).
 
--Ben
+Changes from v1:
+ - Reworked patch 1 to remove the fragile use of refcount_read. Zone
+   write plug removal is now more solid by being controlled with
+   refcount_dec_and_test().
+ - Changed patch 2 to keep the refcount increase before scheduling the
+   BIO work but drop that reference if scheduling the work did nothing.
+ - Dropped the patch "block: remove BLK_ZONE_WPLUG_UNHASHED" as the
+   patch 1 changes make it unnecessary.
+ - Modified patch 5 to have the zoned_qd1_writes attribute visible only
+   for zoned block devices.
+ - Added review tags
 
-> +	}
-> +}
-> +
+Damien Le Moal (7):
+  block: fix zone write plug removal
+  block: fix zone write plugs refcount handling in
+    disk_zone_wplug_schedule_bio_work()
+  block: remove disk_zone_is_full()
+  block: rename struct gendisk zone_wplugs_lock field
+  block: allow submitting all zone writes from a single context
+  block: default to QD=1 writes for blk-mq rotational zoned devices
+  Documentation: ABI: stable: document the zoned_qd1_writes attribute
+
+ Documentation/ABI/stable/sysfs-block |  15 ++
+ block/blk-mq-debugfs.c               |   1 +
+ block/blk-sysfs.c                    |  46 +++-
+ block/blk-zoned.c                    | 368 +++++++++++++++++----------
+ include/linux/blkdev.h               |  10 +-
+ 5 files changed, 308 insertions(+), 132 deletions(-)
+
+-- 
+2.53.0
 
