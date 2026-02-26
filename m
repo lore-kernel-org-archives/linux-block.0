@@ -1,231 +1,86 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE213A4F3A;
-	Thu, 26 Feb 2026 10:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD203A4F3D
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 10:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772100328; cv=none; b=TC4HV17Pn63cCtsRKBsZ1xMPaGALHdxODfu6HwgbKzCmHYxcPdrToYsPObHmKsZ9PyZrSO3oOE6cOM4VDEG+7vVWU1o2J0TFF7L68wr2obIVcbJDy7+Rlx6ewD944jOiPNLX5x4CHEAG7fs1qBGxMtIFdl4QnbziwzmEyWfiRLU=
+	t=1772101646; cv=none; b=Qfhf+lYVuC8LUUge/jwWppr+vHH0JaYXlryn8+9j9V50zNVzAkR/iZk2/syR5YXp6CCMxjV330ERZgRpNYmye/RIKDVN4LH2MRpUZT8h2mpGft9kbpgF/iGDxNyuKD6Y5jYlotVg4uKOs/inf+v5oMpr8WLvkd1NT13DIsI6dz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772100328; c=relaxed/simple;
-	bh=Jr71TEpuefliB8XSf5nWXwoG0tj6pv/9i9Mu40e8vMc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=Eq0DOPAB10eaRXThNxhi9TWp082YYnEJGPGSMy9t8g572UXTwV0xVt1U5j7vn/KnIJKD0craxlkq0CUqS8VRno5YtXrYefFGy2hYtW5+Eb0ZtzwZQA446XVWim7Jppq07y+/LeG75ZA1Y7VGWeRsKIzGYnk73V2B70PuRY+BU/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.108.10.175] (unknown [194.94.98.184])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 95D5A4C4430406;
-	Thu, 26 Feb 2026 11:04:24 +0100 (CET)
-Message-ID: <5b8c1811-c9d9-469a-b8d0-992814a11b9a@molgen.mpg.de>
-Date: Thu, 26 Feb 2026 11:04:23 +0100
+	s=arc-20240116; t=1772101646; c=relaxed/simple;
+	bh=Uaiul+pRa8BIOsaQ1gQAyL0YUie6OJf6H/L4D6o86EI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7Iqmt54noxgvRe5Opsr/p/qoY7nI4w1wgJUviczkE01QHcUdBxU/Zg9Jtd5VDE0D1RaHw8cLKI3suIOlX6sVCyDML/REhBS3K0/IclFWxmpnukj0xRVtqgPGLSX71P8xTTSaC+32tOkajVy0Ak8XAy2yQaLgOQAhl4Gf2U4ffI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YpiQibrs; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YpiQibrs"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-827390e8a3cso457422b3a.0
+        for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 02:27:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1772101644; x=1772706444; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uYd9LQOgtGfr6ToFGPcm9vHMjH23U3Gx01wMC48gKw4=;
+        b=YpiQibrsjTNMmFiKa7/ZOIUlAwD5H/GFE0Po+GcDbwAdvCMjcqvWtC1W7U4cPxz4D8
+         T3WhAR8Q5OmjwY0xa+exZZcBEQ8GssohxKoB8GAY3sptx2ipQHT06Zs8wso/zzK+Limr
+         A7VIrPaAis0A1G3tR2aQP7tnArLJAI3gUjO7Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772101644; x=1772706444;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uYd9LQOgtGfr6ToFGPcm9vHMjH23U3Gx01wMC48gKw4=;
+        b=ka2Ym5Y5ojqWTol56Vtl+zJIKvieDxQYC6MvJYFGRr0Kl0dlBBntWO54cA9/Iwsqjq
+         CMNkowcv+UbET7bEcGq75PfKdceB9KF9ijX4ZFBZfoCJpG8oKc/uQfqGR9bnmxdPfD5p
+         tXk2uE8vjnhH4X2Y7ZQ1K2hdX8Hfe4UQREfFCa55tuZhfVVdSMI8ENWVH17ZD7zS1V8J
+         JkaKQ5I1yc3Z1gLRrBU4tsqml0zXCjl63lH76j85sTepaYuUgtdwA0ZuP/cMqVkpb2Vo
+         IMM5vkF4I2EFeJpJOIuMraJVBYONkqJeCY1ZjJk6xUCTvW+EGhwaVioyjoBTXjko1HZK
+         Eqlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVi0d1J3nS8rRsaCGMTtoEub76BkQMwxr8w9WDZm3TxZqFVudMS2mhQvrWfxM9dvQxXf0PMmHlTbnbsOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXutwLj27wptCZOMZL1M8wPLtfwPGqKB8ZfjRTrQeAe0YXrYzQ
+	J2tBFtPXzQUgAtu3v8L3b4fAR2uV2tpSs3jInEWeH/n9+py0LI7QvIVNjKdm+DHntNRFe50pyBO
+	uMk8=
+X-Gm-Gg: ATEYQzyRU5ZWGhOG9gHh8xQ8mPX6QnBcFPAy/0d+e4891Hm64pG0EkQQjzwwLLtTco3
+	KCCM63FHMOs+GMSpafMOlP/kuATsVdHaFCsQhuhlhCxalBCZQiNi/zoXhTHduQD5u45F42eHN0R
+	MxbqVqNtLZdV5Qn27gB3lgddc1A8Lc1eiq+Vup226+xgANRqdhAxJBK+etB/HWe6VcBtgZ0Dn+B
+	laXhmP2TvDW4ETO7C7XoF17PZhn98/w1+9l5SStUkyegktgovZdagc61wrnR5p2DgV4J/xXNUUb
+	4zgJSlGSJ9VmZdlH2ouKC2x0qHyAbCHRey24ZRBY2t9MyxFvOcI/cjAzvGbWU7rINC712Jf61D9
+	4l8IJ3tPs3uEaRGuJ4Rd+iQoVUxGZYgydqIWNmASqe/5BV6Uey8ymxIL/rPpcCZQa+1IRv2ZW1y
+	1s8Y3aCpUsROJStnfj6nGKsz18BrxKYf+zjJovVL2vYyA2vadHYM07Hjb1V+dcNk8=
+X-Received: by 2002:a05:6a00:4217:b0:824:ad25:6477 with SMTP id d2e1a72fcca58-8273984fd38mr1756156b3a.30.1772101644430;
+        Thu, 26 Feb 2026 02:27:24 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:280f:e47e:6718:7698])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a064167sm2076304b3a.56.2026.02.26.02.27.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 02:27:23 -0800 (PST)
+Date: Thu, 26 Feb 2026 19:27:19 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: gao xu <gaoxu2@honor.com>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>, 
+	zhouxiaolong <zhouxiaolong9@honor.com>
+Subject: Re: [PATCH] zram: compression algorithms name use static fields
+Message-ID: <p3k2ohyq7jbbhjrvi5er5rencd4ffmcauk5ts72co2exjwgfyc@r4fgfsdp5hep>
+References: <32d733a0719c479f85d06f6fec3cc533@honor.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: remove bdev_nonrot()
-To: Damien Le Moal <dlemoal@kernel.org>
-References: <20260226075448.2229655-1-dlemoal@kernel.org>
-Content-Language: en-US
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
- linux-raid@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org,
- target-devel@vger.kernel.org, David Sterba <dsterba@suse.com>,
- linux-btrfs@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
- linux-ext4@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>,
- Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
- Kairui Song <kasong@tencent.com>, linux-mm@kvack.org
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260226075448.2229655-1-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32d733a0719c479f85d06f6fec3cc533@honor.com>
 
-Dear Damien,
+On (26/02/26 07:50), gao xu wrote:
+> Subject: [PATCH] zram: compression algorithms name use static fields
 
-
-Thank you for your patch.
-
-
-Am 26.02.26 um 08:54 schrieb Damien Le Moal:
-> bdev_nonrot() is simply the negative return value of bdev_rot().
-> So replace all call sites of bdev_nonrot() with calls to bdev_rot()
-> and remove bdev_nonrot().
-
-Is the generated code different now?
-
-Is it worth the change, as it looks quite subjective if you prefer the 
-one or the other way?
-
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   drivers/md/raid1.c                  | 2 +-
->   drivers/md/raid10.c                 | 2 +-
->   drivers/md/raid5.c                  | 2 +-
->   drivers/target/target_core_file.c   | 2 +-
->   drivers/target/target_core_iblock.c | 2 +-
->   fs/btrfs/volumes.c                  | 4 ++--
->   fs/ext4/mballoc-test.c              | 2 +-
->   fs/ext4/mballoc.c                   | 2 +-
->   include/linux/blkdev.h              | 5 -----
->   mm/swapfile.c                       | 2 +-
->   10 files changed, 10 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-> index 181400e147c0..cda6af0712b9 100644
-> --- a/drivers/md/raid1.c
-> +++ b/drivers/md/raid1.c
-> @@ -1878,7 +1878,7 @@ static bool raid1_add_conf(struct r1conf *conf, struct md_rdev *rdev, int disk,
->   	if (info->rdev)
->   		return false;
->   
-> -	if (bdev_nonrot(rdev->bdev)) {
-> +	if (!bdev_rot(rdev->bdev)) {
->   		set_bit(Nonrot, &rdev->flags);
->   		WRITE_ONCE(conf->nonrot_disks, conf->nonrot_disks + 1);
->   	}
-> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-> index 0653b5d8545a..cfbd345805ca 100644
-> --- a/drivers/md/raid10.c
-> +++ b/drivers/md/raid10.c
-> @@ -806,7 +806,7 @@ static struct md_rdev *read_balance(struct r10conf *conf,
->   		if (!do_balance)
->   			break;
->   
-> -		nonrot = bdev_nonrot(rdev->bdev);
-> +		nonrot = !bdev_rot(rdev->bdev);
->   		has_nonrot_disk |= nonrot;
->   		pending = atomic_read(&rdev->nr_pending);
->   		if (min_pending > pending && nonrot) {
-> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> index a8e8d431071b..ba9d6d05b089 100644
-> --- a/drivers/md/raid5.c
-> +++ b/drivers/md/raid5.c
-> @@ -7541,7 +7541,7 @@ static struct r5conf *setup_conf(struct mddev *mddev)
->   	rdev_for_each(rdev, mddev) {
->   		if (test_bit(Journal, &rdev->flags))
->   			continue;
-> -		if (bdev_nonrot(rdev->bdev)) {
-> +		if (!bdev_rot(rdev->bdev)) {
->   			conf->batch_bio_dispatch = false;
->   			break;
->   		}
-> diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
-> index 3ae1f7137d9d..d6e3e5214652 100644
-> --- a/drivers/target/target_core_file.c
-> +++ b/drivers/target/target_core_file.c
-> @@ -173,7 +173,7 @@ static int fd_configure_device(struct se_device *dev)
->   		 */
->   		dev->dev_attrib.max_write_same_len = 0xFFFF;
->   
-> -		if (bdev_nonrot(bdev))
-> +		if (!bdev_rot(bdev))
->   			dev->dev_attrib.is_nonrot = 1;
->   	} else {
->   		if (!(fd_dev->fbd_flags & FBDF_HAS_SIZE)) {
-> diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-> index 3c92f94497b4..1087d1d17c36 100644
-> --- a/drivers/target/target_core_iblock.c
-> +++ b/drivers/target/target_core_iblock.c
-> @@ -148,7 +148,7 @@ static int iblock_configure_device(struct se_device *dev)
->   	else
->   		dev->dev_attrib.max_write_same_len = 0xFFFF;
->   
-> -	if (bdev_nonrot(bd))
-> +	if (!bdev_rot(bd))
->   		dev->dev_attrib.is_nonrot = 1;
->   
->   	target_configure_write_atomic_from_bdev(&dev->dev_attrib, bd);
-> diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-> index 6fb0c4cd50ff..c6e49eb74f3a 100644
-> --- a/fs/btrfs/volumes.c
-> +++ b/fs/btrfs/volumes.c
-> @@ -694,7 +694,7 @@ static int btrfs_open_one_device(struct btrfs_fs_devices *fs_devices,
->   			set_bit(BTRFS_DEV_STATE_WRITEABLE, &device->dev_state);
->   	}
->   
-> -	if (!bdev_nonrot(file_bdev(bdev_file)))
-> +	if (bdev_rot(file_bdev(bdev_file)))
->   		fs_devices->rotating = true;
->   
->   	if (bdev_max_discard_sectors(file_bdev(bdev_file)))
-> @@ -2919,7 +2919,7 @@ int btrfs_init_new_device(struct btrfs_fs_info *fs_info, const char *device_path
->   
->   	atomic64_add(device->total_bytes, &fs_info->free_chunk_space);
->   
-> -	if (!bdev_nonrot(device->bdev))
-> +	if (bdev_rot(device->bdev))
->   		fs_devices->rotating = true;
->   
->   	orig_super_total_bytes = btrfs_super_total_bytes(fs_info->super_copy);
-> diff --git a/fs/ext4/mballoc-test.c b/fs/ext4/mballoc-test.c
-> index 9fbdf6a09489..b9f22e3a8d5c 100644
-> --- a/fs/ext4/mballoc-test.c
-> +++ b/fs/ext4/mballoc-test.c
-> @@ -72,7 +72,7 @@ static int mbt_mb_init(struct super_block *sb)
->   	ext4_fsblk_t block;
->   	int ret;
->   
-> -	/* needed by ext4_mb_init->bdev_nonrot(sb->s_bdev) */
-> +	/* needed by ext4_mb_init->bdev_rot(sb->s_bdev) */
->   	sb->s_bdev = kzalloc_obj(*sb->s_bdev);
->   	if (sb->s_bdev == NULL)
->   		return -ENOMEM;
-> diff --git a/fs/ext4/mballoc.c b/fs/ext4/mballoc.c
-> index 20e9fdaf4301..8a4dfe19878c 100644
-> --- a/fs/ext4/mballoc.c
-> +++ b/fs/ext4/mballoc.c
-> @@ -3836,7 +3836,7 @@ int ext4_mb_init(struct super_block *sb)
->   		spin_lock_init(&lg->lg_prealloc_lock);
->   	}
->   
-> -	if (bdev_nonrot(sb->s_bdev))
-> +	if (!bdev_rot(sb->s_bdev))
->   		sbi->s_mb_max_linear_groups = 0;
->   	else
->   		sbi->s_mb_max_linear_groups = MB_DEFAULT_LINEAR_LIMIT;
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index d463b9b5a0a5..e439d6fa8484 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1467,11 +1467,6 @@ static inline bool bdev_rot(struct block_device *bdev)
->   	return blk_queue_rot(bdev_get_queue(bdev));
->   }
->   
-> -static inline bool bdev_nonrot(struct block_device *bdev)
-> -{
-> -	return !bdev_rot(bdev);
-> -}
-> -
->   static inline bool bdev_synchronous(struct block_device *bdev)
->   {
->   	return bdev->bd_disk->queue->limits.features & BLK_FEAT_SYNCHRONOUS;
-> diff --git a/mm/swapfile.c b/mm/swapfile.c
-> index 94af29d1de88..60e21414624b 100644
-> --- a/mm/swapfile.c
-> +++ b/mm/swapfile.c
-> @@ -3460,7 +3460,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
->   	if (si->bdev && bdev_synchronous(si->bdev))
->   		si->flags |= SWP_SYNCHRONOUS_IO;
->   
-> -	if (si->bdev && bdev_nonrot(si->bdev)) {
-> +	if (si->bdev && !bdev_rot(si->bdev)) {
->   		si->flags |= SWP_SOLIDSTATE;
->   	} else {
->   		atomic_inc(&nr_rotate_swap);
-
-My point above aside, the diff looks good.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+Can you also change the order of the words in the subject line in v2?
+Perhaps, to something like
+	zram: use statically allocated compression algorithms names
+or something along those lines.  The current subject line is a bit
+hard to parse.
