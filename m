@@ -1,72 +1,66 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01B93803FF
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 03:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC4E1A3164
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 03:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772076903; cv=none; b=YwOr1jI6NyFZjTfIYFvEGxPB+r3DhBuTRkz9649WidEzvMxEGip/AIaQFkqq3/ZxW/gmxK1i6IRo903BafhYLa/n0Ft4fjfCKc8gKcgJ2jj+pB8cnMIOhgPIuMwKhkMCx+ZSEJEojv4Fhz4FyMHWd+SL1PWuzrAFsNR/L1Tl7WM=
+	t=1772077034; cv=none; b=Ue3ti9BjwOamWqqqPl3DZ2IoMFTjz8edL5TX20R1/lDIkiuOSGc8Moo5ROeWCxxe5lsIQyGRdpUwUsq9UWneS3OS768Gi9WfHv0gPcja10Y1AtCGAwtXN4OkINPavYiltO/Ai9c4kyz4ZYsxvbgCXmspr+tX7g13aQgh8IXhWps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772076903; c=relaxed/simple;
-	bh=i/NTjeuLnse6p6g7kBeWZuyZfgSD4fLROke7iVDX8dA=;
+	s=arc-20240116; t=1772077034; c=relaxed/simple;
+	bh=2NoCN6+mTCZfckAbUadVoYxFffzxni/k9obOl9HI1y4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U+p8MgPynnpQ6ymYCrdgjmSrEQBJu6o5ve5JNRsV0IlwmI4ZU2uEAcJAeaKiW7+KfF9V1m3V1+viGIhzpaYq9iPPaME80sH9NR3gy7JagmrEf3QuswG9YHzCSrHIzQ5Hcc+pPd9f/t84agSV8pCZ/26Pn0QNF/gnLju4KkTjCW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PVwsXcMQ; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=OrLePh4DLG6vzQphAli0l9qhGMRMpcCkNxWLdwdvLASne6EnHkAqiGcG6m+M3ASbJXv6WuFxMmk+SOCeWflY0okMt+SvwEyYII6+qtmOZM4aYa8DtNzIzEgUTAH4NaHzqcPBGd0wMz/XpwRK6Ew61X17mVDKg4uZDogxCFbEDlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fo+4MtIt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PVwsXcMQ"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8230f2140beso953384b3a.1
-        for <linux-block@vger.kernel.org>; Wed, 25 Feb 2026 19:35:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1772076902; x=1772681702; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IyaVGnjfNzlE1ptyk6n5dAoHe2pTLjJWHR99F+D6o8Y=;
-        b=PVwsXcMQfll9dApnBn2YqWwWB0AdiAK17ce0qHg/li8HP/8RuHUvH7RXXJvsDZn6O5
-         b1QUArCnB8gPk+rkoRGe6nzBlzOR8Z1TmkkxYUptlNSxK8vytbQ+5veXKLnoH695QBcp
-         xyKZ4YUYIr/bTVo0srI20J1M1PiJ6OubFc9Lw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772076902; x=1772681702;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IyaVGnjfNzlE1ptyk6n5dAoHe2pTLjJWHR99F+D6o8Y=;
-        b=sM+y+1Y1F/s5IWxsX7ZjhGEXKGazuib3zVB5qmfh6VBtNV7LQEKAeAQysVxzpiyIWm
-         mOsMggPrpdhfZPIK6B/C+fY9ORAL2QlIdTxexr3hy+KuUJ8Kl6NE6MrbmT0FDcUL1JzC
-         ftnbXDTK+ovbh7l/tbRG7vJA2ArkzfV1v6p3TnpiIbiaID0xEI6oGrMvEemDwlbsFBik
-         MXEck8JkCRK0rKl0fBdkHT4aBWKLiWGX3xtR2l36XgmjSBItv1gjnrf13wuthuHFAbxm
-         zUvtwxxdgTc/07Z4PmgifWBLvQxgUvfMdatLEUDKpQ9xwtFWaUpw2N//0YJWtNIBCgbZ
-         m8Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCryH03kt+5yYQYbCxdWDIHdSL2OxzvNZBOg98/XhZ58ChqV8ek5EpbAYblq8eqiCth2qZi8JCLtxbUQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeRmQuaa0vxuhq35JJbsFQauPu9AkSq9rE3Vjpd1dF2UltasuQ
-	6tX4SvR3ogkaoFtWRU9DrHN1eokOjiPfcZbtk7NDZq/pYR5xIAscnOs5V1hP/YgejA==
-X-Gm-Gg: ATEYQzzJ4f2ik6ECcYOO36RORNaV61/8EcluqTcIYtISscnlUi6ybwFoJ7siPj9mWEq
-	YEicoNQLhoqX5pTLbg+pMtTzwWZ+I69YTZjiuGs4X8VyvPztbTmpVZxby3CoTzrnzMaaAtWeSL5
-	RtKSnkhrhqec6OhHA7/DQGXKLYLfz69bAFd9Z4oVv+/acU59MZ3IVuCn3Fk8JdvzsRj0wJgDugx
-	y6Lg1ysqstmlNKmbCo1/iDt6LPa9aLCwzu4goCiYz51xc8lAUbXr9rlrCesAcGhGJekQVNgZW/J
-	yIr9WGygreB3lpN8yjaB5p8M7GEvAS5qcKXA8lG+8oetVS/eZhJ6DiQMkuWOWkWcbs86LZEpB1Y
-	2TNeHtas4d6UutYite4f3TD6vHEHS7bBXN59rVXAtAG19dPBcB36s3joDbTAApVZT5zP5Y2l7c7
-	+6WW/GzSlhe66SUg+txVID7WfMNXFQKiAvGqCaKF1zaWsPuCArOzQaZojiiG8bg81uui4IFcYH1
-	Q==
-X-Received: by 2002:a05:6a20:3ca0:b0:375:4503:ef0e with SMTP id adf61e73a8af0-395b1d2376bmr1303951637.14.1772076901993;
-        Wed, 25 Feb 2026 19:35:01 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:f7cc:c9c1:b4d7:b50d])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c70fa801849sm431165a12.20.2026.02.25.19.35.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 19:35:01 -0800 (PST)
-Date: Thu, 26 Feb 2026 12:34:58 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-mm@kvack.org, Minchan Kim <minchan@kernel.org>, 
-	Brian Geffon <bgeffon@google.com>, Richard Chang <richardycc@google.com>, 
-	Suren Baghdasaryan <surenb@google.com>
-Subject: Re: [PATCH] zram: rename writeback_compressed device attr
-Message-ID: <5mpns2z54isunnwyoembp5xuip6jzcivzlxdomrohtlooedqfu@ymznfhwglrsd>
-References: <20260226025429.1042083-1-senozhatsky@chromium.org>
- <20260225190329.8f76b847d391c71d58988234@linux-foundation.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fo+4MtIt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772077032;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bkLc+GDTQrnsggrpWJFZMbOK/80PHJQs/QIq3lF3I4w=;
+	b=fo+4MtItLc2K/i2RowYc+e9H9c2GWdj86JAr3e/eUtGKI3w8mkwnchzkHR4WBw6kwrrUwm
+	yV3uBcsbwcvannJdW+4yEP0xHxjGRJVpk6txPXkJf0oFSkzlxMtNCCPjdsfY4xAsa7/bmI
+	0EMTJ6raQIja3huEQkkNFKPkgEGDmE8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-st2cy_XBNqSdjq7AuUSX_w-1; Wed,
+ 25 Feb 2026 22:37:09 -0500
+X-MC-Unique: st2cy_XBNqSdjq7AuUSX_w-1
+X-Mimecast-MFC-AGG-ID: st2cy_XBNqSdjq7AuUSX_w_1772077027
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 304EC19560A3;
+	Thu, 26 Feb 2026 03:37:06 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE9641800465;
+	Thu, 26 Feb 2026 03:37:04 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 61Q3b3hQ1680267
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 22:37:03 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 61Q3b33W1680266;
+	Wed, 25 Feb 2026 22:37:03 -0500
+Date: Wed, 25 Feb 2026 22:37:03 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
+        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
+        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
+        snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/13] libmultipath: Add path selection support
+Message-ID: <aZ-_3_hXEkFEClhs@redhat.com>
+References: <20260225153225.1031169-1-john.g.garry@oracle.com>
+ <20260225153225.1031169-4-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,13 +69,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260225190329.8f76b847d391c71d58988234@linux-foundation.org>
+In-Reply-To: <20260225153225.1031169-4-john.g.garry@oracle.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On (26/02/25 19:03), Andrew Morton wrote:
-> Fair enough.  I'll add
-> 
-> Fixes: 4c1d61389e8e ("zram: introduce writeback_compressed device attribute")
-> 
-> and shall queue it as a hotfix.
+On Wed, Feb 25, 2026 at 03:32:15PM +0000, John Garry wrote:
+> +__maybe_unused
+> +static struct mpath_device *mpath_find_path(struct mpath_head *mpath_head)
+> +{
+> +	enum mpath_iopolicy_e iopolicy =
+> +			mpath_head->mpdt->get_iopolicy(mpath_head);
+> +
+> +	switch (iopolicy) {
+> +	case MPATH_IOPOLICY_QD:
+> +		return mpath_queue_depth_path(mpath_head);
+> +	case MPATH_IOPOLICY_RR:
+> +		return mpath_round_robin_path(mpath_head, iopolicy);
+> +	default:
+> +		return mpath_numa_path(mpath_head, iopolicy);
 
-Sounds good, thanks.
+When we're in mpath_round_robin_path() and mpath_numa_path(), we know the
+iopolicy, so we don't really need to pass it in.
+
+-Ben
+
+> +	}
+> +}
+> +
+
