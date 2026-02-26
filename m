@@ -1,145 +1,87 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7BC2853F3
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 03:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01B93803FF
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 03:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772075734; cv=none; b=gplkrXHobhofMyWWGS9Wc3eWubqrDXMJ4RQ5tjJyjKE+kFENSGkycWzQKY5VdFhzCthTEvffmbTdj7aGtqgbZ7TK6mxIw5ZFPwN2AU+bW8CtmG3utkiSF9sCl89tbnhFiGN8c7z46rg8V4FyXFP9V6NiLEDvBFHIouRxp+1L8sg=
+	t=1772076903; cv=none; b=YwOr1jI6NyFZjTfIYFvEGxPB+r3DhBuTRkz9649WidEzvMxEGip/AIaQFkqq3/ZxW/gmxK1i6IRo903BafhYLa/n0Ft4fjfCKc8gKcgJ2jj+pB8cnMIOhgPIuMwKhkMCx+ZSEJEojv4Fhz4FyMHWd+SL1PWuzrAFsNR/L1Tl7WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772075734; c=relaxed/simple;
-	bh=3Uj98JRcjkXg45L932sgBQ4jyAOkKnrA4eVXq0Mc2RQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tMPCGXbl2jhPEvUmcC5OcnOTP9TvLzHwXlht4Vs8ua4YT5ysFygBgxJok+19NfNFNJS3GfXQcS0tf41Zi++dVYCBBcbLmZfDfLCkfZUTqB0SznA0gT5MBhCYO4K2yNQoyUMVJccs7KdaBXOI/kMk+Q+i1AoseJlUMjpP0nqJdCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Pt3QESqe; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1772076903; c=relaxed/simple;
+	bh=i/NTjeuLnse6p6g7kBeWZuyZfgSD4fLROke7iVDX8dA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U+p8MgPynnpQ6ymYCrdgjmSrEQBJu6o5ve5JNRsV0IlwmI4ZU2uEAcJAeaKiW7+KfF9V1m3V1+viGIhzpaYq9iPPaME80sH9NR3gy7JagmrEf3QuswG9YHzCSrHIzQ5Hcc+pPd9f/t84agSV8pCZ/26Pn0QNF/gnLju4KkTjCW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PVwsXcMQ; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Pt3QESqe"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-46398742245so161565b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 25 Feb 2026 19:15:32 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PVwsXcMQ"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8230f2140beso953384b3a.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Feb 2026 19:35:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772075731; x=1772680531; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=myOpzKKufRrzTXzkKkTioHHnRh1Fxba9oHbsZ8bSehI=;
-        b=Pt3QESqeGYGEyfcbtu599/TaELTldNHt9ng7MdkbQscEZnkRuSh25I41b9c9dvwbs0
-         pbRiegVYVhXxN6kv/Eg0EFcqolSkF8sW2dHcoxou+89/W6wTpoKs3MeS5dRmlnq0QHLz
-         beD0NKXnUFkxdzpurznywZsv0jcAXSFUEZlDVEaGEZX/fH8nT2ZLRuRzU4wRZYWgAJYK
-         HjXy/ScGA0aB6TeNRft1Dvn6Qb35HEKMPwb1Y7g7J2FWEhFtSj7eArl0e01dC8zPx26E
-         xYJnhHsEiybj+rxDtRCtjALwF7rqZEnbad8aUzCkCd2gR90/cfeFhG91HuY5K4g9N7cT
-         grQw==
+        d=chromium.org; s=google; t=1772076902; x=1772681702; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IyaVGnjfNzlE1ptyk6n5dAoHe2pTLjJWHR99F+D6o8Y=;
+        b=PVwsXcMQfll9dApnBn2YqWwWB0AdiAK17ce0qHg/li8HP/8RuHUvH7RXXJvsDZn6O5
+         b1QUArCnB8gPk+rkoRGe6nzBlzOR8Z1TmkkxYUptlNSxK8vytbQ+5veXKLnoH695QBcp
+         xyKZ4YUYIr/bTVo0srI20J1M1PiJ6OubFc9Lw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772075731; x=1772680531;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=myOpzKKufRrzTXzkKkTioHHnRh1Fxba9oHbsZ8bSehI=;
-        b=Q8DxJO6I+xf7u2pqCLtfSDNexwE0ZD/W6MVlnZ8VDmtv803r73+/oEOttysgDIkgNb
-         qRCUR/on50rSozy6A61McW0brTVDcMuS9YTebvIL57jjM11rxx7GcAOxFRNwLVSSCWy4
-         ULuMZHN9mLIYvhF7iILx3PYyO8j9l0mS9ouZ2Z8BVBPIZTXfvG2weVHmxmS2xbBAfeYY
-         6RPDXryrTdY9UlAXolSg2/dwIKJ+tVsCzsS9jV3bwDv8/TtmT2JrZDI6qDWaEclyo6on
-         84orNyN0zI5HGd9cjUE108xYTbkbNnZNL/O+RmWxpMN8ZZGvK2mMrfBx5jx9e+nEPxz4
-         5WWw==
-X-Forwarded-Encrypted: i=1; AJvYcCVY5bZZsgDrejfzGrP7qFlwTE1nDe3yh4q+v+p0M11h6NWhyzcIs0HCDkFfcv+zqmLlahyh5nTCq3+goQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxil6+0rYIYPbNYPEe7iUHAv57P3jJewXFG+XLhK6u/SO2Fs2lQ
-	FDp0jzeC7YwZJgtp7p2l/Y5AGRe0x24ebRs6Mp6mwwv2lJyzf3wMcEoyxDFKKyof3Bg=
-X-Gm-Gg: ATEYQzxV0TBsYfWrY34QuE/QZVq0zZxjHHej7y5e+BLh6ry4dQHB5u99eFy+ru6Re34
-	UaX58jsSA/OvQOoPJQQIOj5p13zRtVfvdJmpQSLoEpFEGgubSSnIddaq+AhLuSE9yK85uroXN9v
-	kTOZ1jXAFiJFBVheqWWW6e+syw/sI9K8jiU+Lu4LQjx+qSenoJ3cxEQTTWH9Y6je273j444xNT8
-	JaQ0JKtUxOK5gRVmupWAAYsnEDmCyyqkrO2u1YsGEYcV4x5mV6pU8NJ6roYhxFPcFe0++zwCt8r
-	8At1OGoV4YO7JoTMu4cEJT05D2azU/8qP/g9tsQVaiUXPHmTXT2Oo2s7SWhYajTmgV4NSrhdaR6
-	5gYeDUkI0NXAXiK4u88SlvP1qNLKXh3f305H1TWHCbfE5oTDny9lBCMJ1zd30Zr0gytJZ1UDFDa
-	dwI9rmOXFkLvFFqh/lMPFdVySR68AKRbeVkdW69DhscCQuMZExnwLpv1XMI2zpOvkZCu7rK4jfr
-	+ArBgFCZQ==
-X-Received: by 2002:a05:6808:320b:b0:462:d9a2:84e1 with SMTP id 5614622812f47-464463ef61fmr8794809b6e.60.1772075731397;
-        Wed, 25 Feb 2026 19:15:31 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4160cf9b240sm786090fac.8.2026.02.25.19.15.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Feb 2026 19:15:30 -0800 (PST)
-Message-ID: <44e3e9ea-350b-4357-ba50-726e506feab5@kernel.dk>
-Date: Wed, 25 Feb 2026 20:15:28 -0700
+        d=1e100.net; s=20230601; t=1772076902; x=1772681702;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IyaVGnjfNzlE1ptyk6n5dAoHe2pTLjJWHR99F+D6o8Y=;
+        b=sM+y+1Y1F/s5IWxsX7ZjhGEXKGazuib3zVB5qmfh6VBtNV7LQEKAeAQysVxzpiyIWm
+         mOsMggPrpdhfZPIK6B/C+fY9ORAL2QlIdTxexr3hy+KuUJ8Kl6NE6MrbmT0FDcUL1JzC
+         ftnbXDTK+ovbh7l/tbRG7vJA2ArkzfV1v6p3TnpiIbiaID0xEI6oGrMvEemDwlbsFBik
+         MXEck8JkCRK0rKl0fBdkHT4aBWKLiWGX3xtR2l36XgmjSBItv1gjnrf13wuthuHFAbxm
+         zUvtwxxdgTc/07Z4PmgifWBLvQxgUvfMdatLEUDKpQ9xwtFWaUpw2N//0YJWtNIBCgbZ
+         m8Cw==
+X-Forwarded-Encrypted: i=1; AJvYcCWCryH03kt+5yYQYbCxdWDIHdSL2OxzvNZBOg98/XhZ58ChqV8ek5EpbAYblq8eqiCth2qZi8JCLtxbUQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeRmQuaa0vxuhq35JJbsFQauPu9AkSq9rE3Vjpd1dF2UltasuQ
+	6tX4SvR3ogkaoFtWRU9DrHN1eokOjiPfcZbtk7NDZq/pYR5xIAscnOs5V1hP/YgejA==
+X-Gm-Gg: ATEYQzzJ4f2ik6ECcYOO36RORNaV61/8EcluqTcIYtISscnlUi6ybwFoJ7siPj9mWEq
+	YEicoNQLhoqX5pTLbg+pMtTzwWZ+I69YTZjiuGs4X8VyvPztbTmpVZxby3CoTzrnzMaaAtWeSL5
+	RtKSnkhrhqec6OhHA7/DQGXKLYLfz69bAFd9Z4oVv+/acU59MZ3IVuCn3Fk8JdvzsRj0wJgDugx
+	y6Lg1ysqstmlNKmbCo1/iDt6LPa9aLCwzu4goCiYz51xc8lAUbXr9rlrCesAcGhGJekQVNgZW/J
+	yIr9WGygreB3lpN8yjaB5p8M7GEvAS5qcKXA8lG+8oetVS/eZhJ6DiQMkuWOWkWcbs86LZEpB1Y
+	2TNeHtas4d6UutYite4f3TD6vHEHS7bBXN59rVXAtAG19dPBcB36s3joDbTAApVZT5zP5Y2l7c7
+	+6WW/GzSlhe66SUg+txVID7WfMNXFQKiAvGqCaKF1zaWsPuCArOzQaZojiiG8bg81uui4IFcYH1
+	Q==
+X-Received: by 2002:a05:6a20:3ca0:b0:375:4503:ef0e with SMTP id adf61e73a8af0-395b1d2376bmr1303951637.14.1772076901993;
+        Wed, 25 Feb 2026 19:35:01 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:f7cc:c9c1:b4d7:b50d])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c70fa801849sm431165a12.20.2026.02.25.19.35.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Feb 2026 19:35:01 -0800 (PST)
+Date: Thu, 26 Feb 2026 12:34:58 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-mm@kvack.org, Minchan Kim <minchan@kernel.org>, 
+	Brian Geffon <bgeffon@google.com>, Richard Chang <richardycc@google.com>, 
+	Suren Baghdasaryan <surenb@google.com>
+Subject: Re: [PATCH] zram: rename writeback_compressed device attr
+Message-ID: <5mpns2z54isunnwyoembp5xuip6jzcivzlxdomrohtlooedqfu@ymznfhwglrsd>
+References: <20260226025429.1042083-1-senozhatsky@chromium.org>
+ <20260225190329.8f76b847d391c71d58988234@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 1/2] filemap: defer dropbehind invalidation from
- IRQ context
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Tal Zussman <tz2294@columbia.edu>,
- "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Namjae Jeon <linkinjeon@kernel.org>, Sungjong Seo <sj1557.seo@samsung.com>,
- Yuezhang Mo <yuezhang.mo@sony.com>, Dave Kleikamp <shaggy@kernel.org>,
- Ryusuke Konishi <konishi.ryusuke@gmail.com>,
- Viacheslav Dubeyko <slava@dubeyko.com>,
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
- Bob Copeland <me@bobcopeland.com>, Andrew Morton
- <akpm@linux-foundation.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-ext4@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
- linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
- linux-karma-devel@lists.sourceforge.net, linux-mm@kvack.org,
- "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-References: <20260225-blk-dontcache-v2-0-70e7ac4f7108@columbia.edu>
- <20260225-blk-dontcache-v2-1-70e7ac4f7108@columbia.edu>
- <c8078a80-f801-4f8a-b3cd-e2ccbfca1def@kernel.dk>
- <aZ-2G_6lDZePLSyx@casper.infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aZ-2G_6lDZePLSyx@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260225190329.8f76b847d391c71d58988234@linux-foundation.org>
 
-On 2/25/26 7:55 PM, Matthew Wilcox wrote:
-> On Wed, Feb 25, 2026 at 03:52:41PM -0700, Jens Axboe wrote:
->> How well does this scale? I did a patch basically the same as this, but
->> not using a folio batch though. But the main sticking point was
->> dropbehind_lock contention, to the point where I left it alone and
->> thought "ok maybe we just do this when we're done with the awful
->> buffer_head stuff". What happens if you have N threads doing IO at the
->> same time to N block devices? I suspect it'll look absolutely terrible,
->> as each thread will be banging on that dropbehind_lock.
->>
->> One solution could potentially be to use per-cpu lists for this. If you
->> have N threads working on separate block devices, they will tend to be
->> sticky to their CPU anyway.
+On (26/02/25 19:03), Andrew Morton wrote:
+> Fair enough.  I'll add
 > 
-> Back in 2021, I had Vishal look at switching the page cache from using
-> hardirq-disabling locks to softirq-disabling locks [1].  Some of the
-> feedback (which doesn't seem to be entirely findable on the lists ...)
-> was that we'd be better off punting writeback completion from interrupt
-> context to task context and going from spin_lock_irq() to spin_lock()
-> rather than going to spin_lock_bh().
+> Fixes: 4c1d61389e8e ("zram: introduce writeback_compressed device attribute")
 > 
-> I recently saw something (possibly XFS?) promoting this idea again.
-> And now there's this.  Perhaps the time has come to process all
-> write-completions in task context, rather than everyone coming up with
-> their own workqueues to solve their little piece of the problem?
+> and shall queue it as a hotfix.
 
-Perhaps, even though the punting tends to suck... One idea I toyed with
-but had to abandon due to fs freezeing was letting callers that process
-completions in task context anyway just do the necessary work at that
-time. There's literally nothing worse than having part of a completion
-happen in IRQ, then punt parts of that to a worker, and need to wait for
-the worker to finish whatever it needs to do - only to then wake the
-target task. We can trivially do this in io_uring, as the actual
-completion is posted from the task itself anyway. We just need to have
-the task do the bottom half of the completion as well, rather than some
-unrelated kthread worker.
-
-I'd be worried a generic solution would be the worst of all worlds, as
-it prevents optimizations that happen in eg iomap and other spots, where
-only completions that absolutely need to happen in task context get
-punted. There's a big difference between handling a completion inline vs
-needing a round-trip to some worker to do it.
-
--- 
-Jens Axboe
+Sounds good, thanks.
