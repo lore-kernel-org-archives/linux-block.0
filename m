@@ -1,130 +1,222 @@
-Received: from mta20.hihonor.com (mta20.honor.com [81.70.206.69])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB36318131;
-	Thu, 26 Feb 2026 12:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.206.69
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772109449; cv=none; b=MQ7hxlgkjQY78fkG8kxCOdoAcCKMRthjC+wNDG8fVtPlQXEL2bo9JrnVqrSW6pgvm4Pbkc/SHvp+c6WssfNo2d7Y7Xui/vuL5NKVN3iH1ZY36aPegYyLIoOfPw5uonPPHGbnLZoVGr+/49+T+KFxw0JpQYObJE7SkR6l3C3IDtA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772109449; c=relaxed/simple;
-	bh=Na+ewq1zInvYiZUUwbf4n+d+17IoK0dPSUysZrxXWWw=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=THFQmVcjpyApG1rodxJayxfXs92h4N8hUCc80hDjmfssYZKfi/1htkFEG1UEPa/0FdmDN010IKSns26/9ccZDMDh7i+GjvodLwuv0uUphWGuRywvnYFmYv1wzngY4+3Ev0Wk5W+J3xAkPHlFznh+zw7Po2hgWGOMtO0etahZAfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.206.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
-Received: from w012.hihonor.com (unknown [10.68.27.189])
-	by mta20.hihonor.com (SkyGuard) with ESMTPS id 4fM9r34kgxzYkxs9;
-	Thu, 26 Feb 2026 20:34:11 +0800 (CST)
-Received: from a001.hihonor.com (10.68.28.182) by w012.hihonor.com
- (10.68.27.189) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Thu, 26 Feb
- 2026 20:37:22 +0800
-Received: from a008.hihonor.com (10.68.30.56) by a001.hihonor.com
- (10.68.28.182) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Thu, 26 Feb
- 2026 20:37:22 +0800
-Received: from a008.hihonor.com ([fe80::b6bf:fc6a:207:6851]) by
- a008.hihonor.com ([fe80::b6bf:fc6a:207:6851%6]) with mapi id 15.02.2562.027;
- Thu, 26 Feb 2026 20:37:22 +0800
-From: gao xu <gaoxu2@honor.com>
-To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
-	<senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>,
-	zhouxiaolong <zhouxiaolong9@honor.com>
-Subject: [PATCH v2] zram: use statically allocated compression algorithm names
-Thread-Topic: [PATCH v2] zram: use statically allocated compression algorithm
- names
-Thread-Index: AdynGK1vcq4GzljDSRK93Q6Z8tt7XA==
-Date: Thu, 26 Feb 2026 12:37:22 +0000
-Message-ID: <5bb2e9318d124dbcb2b743dcdce6a950@honor.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B4E3859E4
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 12:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772109890; cv=pass; b=eHcqN7pplqGOW+j52uheq1LSibXUij4wzlHm+H6bkm0IDmS15gnGJlgZN5Id7qTAbMZ+XnMkt3HqilHeN37/PUcw95pbf9WFMBeF1yd95TXZQqTb9Vtw77Paf0mGivCuuzMFAdcPtmq+obgKdF7HqGdi7fiJZPE7R59XGz6fomw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772109890; c=relaxed/simple;
+	bh=Bd7TSH3sQ1ydVDukcJUgRGcoc75et8kxJkirb6I8QwU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZRDbuvcL8j0RMVYhJD9pSXflXZbUCeSZcqm0LWCAH7jHVrdel5vrpHJfUzTnY2/SV2Won8lD4OzTJD2sDvDmSD8QisJIxXtI2Z2W8bpOK2GDLNYdfOlJXJpea0EslXGsqA0DFXGxap6db3aM4VrSYJo6SEmwDmIX+1NWk7bo01M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MaLeT8ry; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZAC2Fsu9; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MaLeT8ry";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZAC2Fsu9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772109886;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bshf/mcnbaq0IwjhUA3zsi8qImySXUNgNqm9NtsMnU8=;
+	b=MaLeT8ryuCaSjf1DkX0A98fRgc1wFIDXBqgnh1QJwPmCyBdFu2w4dJLa4086XioU+oeGzS
+	XH12h4djhrhP2YWTfdoVHbb4sBYzOObE13yw5mB8hauSZKMOGHMetFVrntVpoF1goUHsuf
+	0IU2iw8NVeYNmrYnS5SiCj4gNnbkKU8=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-iZxrqC4wMheAdSIOqZjrcA-1; Thu, 26 Feb 2026 07:44:45 -0500
+X-MC-Unique: iZxrqC4wMheAdSIOqZjrcA-1
+X-Mimecast-MFC-AGG-ID: iZxrqC4wMheAdSIOqZjrcA_1772109885
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-5fef501e24cso996399137.2
+        for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 04:44:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772109885; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IenswSs5IFeDwc6frHhsS/d11Iye+KGER43Z/BpHMOftnJYA5gaOfY7n14u7kcJRGY
+         Dh8/PKik7fTB0ZH64Xw8C53OGgCN9m6yckj/I8Jjnj67NxRpbORWmD5vZeOcKIy1Rjg1
+         gpqeUWhkLiV9yEaa0ZsPaGW2yfda8rNtGahnhdrT/2lwpKdZMyNxow5g9hTGZsVcCaPC
+         6MxVBrDRY2OLjgc5ugmFNUuI77Vn/6WJSwSCvJkwZGShqZ3kwl8P55wdNoi+TYiSYRAT
+         148U/R/ndFqe0rnvBNBzuHKXj0MqGJZBxSGIG5iUTdarq1x8METrRK2Wn+NeoVUJx3G9
+         WDzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=bshf/mcnbaq0IwjhUA3zsi8qImySXUNgNqm9NtsMnU8=;
+        fh=MtoI2tufSuVONEM44zYiFzTZ+wa95BRySs8S7rSrS0g=;
+        b=REumcb7c8BJr2+WbrAL+jN/GvsOJ0EqTa9N5UtS2mhv+/pLmdLZvnDsx4RWInIrx7c
+         SW9Aptz/g0GTdEjFJH4VOXbuBdpnYFPm25D+T8plTgV54iQZe7jgFV1u5ZjnOPDxtBvf
+         QheaApCh6i+KHX/VO0qJ6PJjIGNs0TsY/3atBu65sB/q7Jhs2dddK2lLvwmMGqSulMF0
+         cSi4qi5nj9383cUXEZgPkp1nATpvHhKVpJBNgPyJaB+usNoq8QgvWbJVfIqgtLdiAKFF
+         MB9GOy14JRE4cpej8+3q6SbhHybscMqaNw5Z3KdgtX+z8T12q5dVUCOcX5njFsz1gNoI
+         4rBQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772109885; x=1772714685; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bshf/mcnbaq0IwjhUA3zsi8qImySXUNgNqm9NtsMnU8=;
+        b=ZAC2Fsu9WWNbCekhd90Y3TsWoHG85j1W7e7KlK2sKkw7FCuwpO77QSbVkiI2mYMR0u
+         3HheCn7JiWXLdfpH0x72wd9z+cPLVeurdSPanviD9P3z6oyVUvzEkbYSojnHbsmvaP4W
+         ir8Dt+97YPwk+KdTneX2ck+BrLUyTICK8LoOy1PqEtKnUj1DGrYHV+y1nk8E7RepnCxS
+         ArLIb9O9YgcqntRDZDNl/fRgT6pa2ELLpnxKUzK2YmpzDuVtVDkmvoSlrSa89sgquW8D
+         BDz9vBlXaj0ClzR17BRst2jkobBlcI4VWKX1dUo/G42sQqFjKtIt0XHCmwIJ6SFsTdjh
+         F3Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772109885; x=1772714685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=bshf/mcnbaq0IwjhUA3zsi8qImySXUNgNqm9NtsMnU8=;
+        b=JMSMqdjzKykGEClh0vuoSZxhuatmfFmJWzhMyu5X36E2YrO4CPQdYP+zfp8/GENwzW
+         3qW+IvhTcodK32Z8RGbs2x5eAcf6zD/f5RG3ohj9XCgkZDfgjfhRSYkxwo884S/msgN1
+         KgAzOPYsrOiRwOskVr08ucqEIYdRabwAGhknoluZejr6h4bj65Chhxz8DaPVqo5LJAat
+         d87qmT6Cmiz1bUmV2EkBLqgvDixF4nr0AeTcowp2PHBTRKs5wwj+Rg84GuE7rYVVKbTY
+         P4QS0gZo0NFo60Tq+WAKn6Y0AQnqDcZDXINiSz7aO43eHQe1+WeG4HI0N9DwpDHDJvbq
+         8RKg==
+X-Gm-Message-State: AOJu0Yxsl502fFfo+69Wld+bMKmFBz1jrnwEZq0IWBm7Em6brWNEWdfi
+	eAmSaMQpMK1Qvg5cSf2ESi8KIwXRS+V/QORGz0CV9L7T3U0g8fucR3ShDAoXT064YIzSh2Y16oy
+	3xAybY6Vqn75HOumPehaY97q/nDldMTmSs8LIXXQxHrJIhzMMP3BYSnfoAeUM1D/IYk5W5E676y
+	H0T20vaevpTwgSfHYGK5osudWHZ/n6HbyNrnrnj8g=
+X-Gm-Gg: ATEYQzwyxQJAturEFEyK7sZIcmCa+/3RudiPcqQcJejkpISdmVevcVkEjKEwEfpXdmQ
+	SDqc3TYgFzhEujpakTPSZRr6WBCxlBCJxpBVwnPvj2afQaK6qSXxqO48peUawOVQ9UJ20BzxqP0
+	DeAQGzObEcKcssvPs/SSuV8zeFJRsnuSuGzWhCIogGCgBzLBqU+IGRpWJhzw6scbUokiSsjjxWP
+	WAIhyo=
+X-Received: by 2002:a05:6102:26c4:b0:5fd:fa29:ae15 with SMTP id ada2fe7eead31-5ff20a24165mr745709137.9.1772109884907;
+        Thu, 26 Feb 2026 04:44:44 -0800 (PST)
+X-Received: by 2002:a05:6102:26c4:b0:5fd:fa29:ae15 with SMTP id
+ ada2fe7eead31-5ff20a24165mr745697137.9.1772109884400; Thu, 26 Feb 2026
+ 04:44:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <CAGVVp+U0EYVX+VbbEHzcYP70zdmOXwAmUvpMYV9y3jBSRFmS6g@mail.gmail.com>
+ <CAFj5m9L8ahNYFf-tUAZFKAUzkeyqV-Sx94MxC268XJ-hqHPCig@mail.gmail.com>
+In-Reply-To: <CAFj5m9L8ahNYFf-tUAZFKAUzkeyqV-Sx94MxC268XJ-hqHPCig@mail.gmail.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Thu, 26 Feb 2026 20:44:32 +0800
+X-Gm-Features: AaiRm53VyTpzKmhhQXSLZ_ZoPRe94CeaxghmO6T7uoyLJFYCNdev5YhkPNpazsI
+Message-ID: <CAFj5m9+OCswLULgVx8eSydTG0OeN4f-8dK1-JyoAA70CNF88Qg@mail.gmail.com>
+Subject: Re: [bug report] Bug: Write fault blocked by KUAP!
+To: Changhui Zhong <czhong@redhat.com>, Caleb Sander Mateos <csander@purestorage.com>
+Cc: Linux Block Devices <linux-block@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>, 
+	linuxppc-dev@lists.ozlabs.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Q3VycmVudGx5LCB6cmFtIGR5bmFtaWNhbGx5IGFsbG9jYXRlcyBtZW1vcnkgZm9yIGNvbXByZXNz
-b3IgYWxnb3JpdGhtIG5hbWVzDQp3aGVuIHRoZXkgYXJlIHNldCBieSB0aGUgdXNlci4gVGhpcyBy
-ZXF1aXJlcyBjYXJlZnVsIG1lbW9yeSBtYW5hZ2VtZW50LA0KaW5jbHVkaW5nIGV4cGxpY2l0IGBr
-ZnJlZWAgY2FsbHMgYW5kIHNwZWNpYWwgaGFuZGxpbmcgdG8gYXZvaWQgZnJlZWluZw0Kc3RhdGlj
-YWxseSBkZWZpbmVkIGRlZmF1bHQgY29tcHJlc3NvciBuYW1lcy4NCg0KVGhpcyBwYXRjaCByZWZh
-Y3RvcnMgdGhlIHdheSB6cmFtIGhhbmRsZXMgY29tcHJlc3Npb24gYWxnb3JpdGhtIG5hbWVzLg0K
-SW5zdGVhZCBvZiBzdG9yaW5nIGR5bmFtaWNhbGx5IGFsbG9jYXRlZCBjb3BpZXMsIGB6cmFtLT5j
-b21wX2FsZ3NgIHdpbGwgbm93DQpzdG9yZSBwb2ludGVycyBkaXJlY3RseSB0byB0aGUgc3RhdGlj
-IG5hbWUgc3RyaW5ncyBkZWZpbmVkIHdpdGhpbiB0aGUNCmB6Y29tcF9vcHNgIGJhY2tlbmQgc3Ry
-dWN0dXJlcywgdGhlcmVieSByZW1vdmluZyB0aGUgbmVlZCBmb3IgY29uZGl0aW9uYWwNCmBrZnJl
-ZWAgY2FsbHMuDQoNClNpZ25lZC1vZmYtYnk6IGdhbyB4dSA8Z2FveHUyQGhvbm9yLmNvbT4NCi0t
-LQ0KdjEgLT4gdjI6IA0KMS4gUmVtb3ZlIGNvbXByZXNzb3IgYW5kIHBhc3MgYnVmIGRpcmVjdGx5
-IHRvIHpjb21wX2xvb2t1cF9iYWNrZW5kX25hbWUoKS4NCjIuIFVwZGF0ZSB0aGUgY29tbWl0IHN1
-YmplY3QuDQpCYXNlZCBvbiBTZXJnZXkgU2Vub3poYXRza3kncyBzdWdnZXN0aW9ucy4NCg0KaHR0
-cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtYmxvY2svNDIzNTA1YWE1MzMxNDAwNGIwZjJlZTA0
-ZWQ1YTEyNjZAaG9ub3IuY29tL1QvI3QNCi0tLQ0KIGRyaXZlcnMvYmxvY2svenJhbS96Y29tcC5j
-ICAgIHwgIDkgKysrKysrKy0tDQogZHJpdmVycy9ibG9jay96cmFtL3pjb21wLmggICAgfCAgMiAr
-LQ0KIGRyaXZlcnMvYmxvY2svenJhbS96cmFtX2Rydi5jIHwgMjggKysrKystLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLQ0KIDMgZmlsZXMgY2hhbmdlZCwgMTMgaW5zZXJ0aW9ucygrKSwgMjYgZGVsZXRp
-b25zKC0pDQoNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL3pyYW0vemNvbXAuYyBiL2RyaXZl
-cnMvYmxvY2svenJhbS96Y29tcC5jDQppbmRleCBhNzcxYThlY2MuLjk3NGM0NjkxOCAxMDA2NDQN
-Ci0tLSBhL2RyaXZlcnMvYmxvY2svenJhbS96Y29tcC5jDQorKysgYi9kcml2ZXJzL2Jsb2NrL3py
-YW0vemNvbXAuYw0KQEAgLTg0LDkgKzg0LDE0IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgemNvbXBf
-b3BzICpsb29rdXBfYmFja2VuZF9vcHMoY29uc3QgY2hhciAqY29tcCkNCiAJcmV0dXJuIGJhY2tl
-bmRzW2ldOw0KIH0NCiANCi1ib29sIHpjb21wX2F2YWlsYWJsZV9hbGdvcml0aG0oY29uc3QgY2hh
-ciAqY29tcCkNCitjb25zdCBjaGFyICp6Y29tcF9sb29rdXBfYmFja2VuZF9uYW1lKGNvbnN0IGNo
-YXIgKmNvbXApDQogew0KLQlyZXR1cm4gbG9va3VwX2JhY2tlbmRfb3BzKGNvbXApICE9IE5VTEw7
-DQorCWNvbnN0IHN0cnVjdCB6Y29tcF9vcHMgKmJhY2tlbmQgPSBsb29rdXBfYmFja2VuZF9vcHMo
-Y29tcCk7DQorDQorCWlmIChiYWNrZW5kKQ0KKwkJcmV0dXJuIGJhY2tlbmQtPm5hbWU7DQorDQor
-CXJldHVybiBOVUxMOw0KIH0NCiANCiAvKiBzaG93IGF2YWlsYWJsZSBjb21wcmVzc29ycyAqLw0K
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2svenJhbS96Y29tcC5oIGIvZHJpdmVycy9ibG9jay96
-cmFtL3pjb21wLmgNCmluZGV4IGVhY2ZkM2Y3ZC4uODFhMGYzZjZmIDEwMDY0NA0KLS0tIGEvZHJp
-dmVycy9ibG9jay96cmFtL3pjb21wLmgNCisrKyBiL2RyaXZlcnMvYmxvY2svenJhbS96Y29tcC5o
-DQpAQCAtODAsNyArODAsNyBAQCBzdHJ1Y3QgemNvbXAgew0KIGludCB6Y29tcF9jcHVfdXBfcHJl
-cGFyZSh1bnNpZ25lZCBpbnQgY3B1LCBzdHJ1Y3QgaGxpc3Rfbm9kZSAqbm9kZSk7DQogaW50IHpj
-b21wX2NwdV9kZWFkKHVuc2lnbmVkIGludCBjcHUsIHN0cnVjdCBobGlzdF9ub2RlICpub2RlKTsN
-CiBzc2l6ZV90IHpjb21wX2F2YWlsYWJsZV9zaG93KGNvbnN0IGNoYXIgKmNvbXAsIGNoYXIgKmJ1
-Ziwgc3NpemVfdCBhdCk7DQotYm9vbCB6Y29tcF9hdmFpbGFibGVfYWxnb3JpdGhtKGNvbnN0IGNo
-YXIgKmNvbXApOw0KK2NvbnN0IGNoYXIgKnpjb21wX2xvb2t1cF9iYWNrZW5kX25hbWUoY29uc3Qg
-Y2hhciAqY29tcCk7DQogDQogc3RydWN0IHpjb21wICp6Y29tcF9jcmVhdGUoY29uc3QgY2hhciAq
-YWxnLCBzdHJ1Y3QgemNvbXBfcGFyYW1zICpwYXJhbXMpOw0KIHZvaWQgemNvbXBfZGVzdHJveShz
-dHJ1Y3QgemNvbXAgKmNvbXApOw0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2svenJhbS96cmFt
-X2Rydi5jIGIvZHJpdmVycy9ibG9jay96cmFtL3pyYW1fZHJ2LmMNCmluZGV4IGJjYTMzNDAzZi4u
-NmYxY2UwMzE3IDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibG9jay96cmFtL3pyYW1fZHJ2LmMNCisr
-KyBiL2RyaXZlcnMvYmxvY2svenJhbS96cmFtX2Rydi5jDQpAQCAtMTYzNyw0MyArMTYzNywyOSBA
-QCBzdGF0aWMgdm9pZCB6cmFtX2RlYnVnZnNfdW5yZWdpc3RlcihzdHJ1Y3QgenJhbSAqenJhbSkg
-e307DQogDQogc3RhdGljIHZvaWQgY29tcF9hbGdvcml0aG1fc2V0KHN0cnVjdCB6cmFtICp6cmFt
-LCB1MzIgcHJpbywgY29uc3QgY2hhciAqYWxnKQ0KIHsNCi0JLyogRG8gbm90IGZyZWUgc3RhdGlj
-YWxseSBkZWZpbmVkIGNvbXByZXNzaW9uIGFsZ29yaXRobXMgKi8NCi0JaWYgKHpyYW0tPmNvbXBf
-YWxnc1twcmlvXSAhPSBkZWZhdWx0X2NvbXByZXNzb3IpDQotCQlrZnJlZSh6cmFtLT5jb21wX2Fs
-Z3NbcHJpb10pOw0KLQ0KIAl6cmFtLT5jb21wX2FsZ3NbcHJpb10gPSBhbGc7DQogfQ0KIA0KIHN0
-YXRpYyBpbnQgX19jb21wX2FsZ29yaXRobV9zdG9yZShzdHJ1Y3QgenJhbSAqenJhbSwgdTMyIHBy
-aW8sIGNvbnN0IGNoYXIgKmJ1ZikNCiB7DQotCWNoYXIgKmNvbXByZXNzb3I7DQorCWNvbnN0IGNo
-YXIgKmFsZzsNCiAJc2l6ZV90IHN6Ow0KIA0KIAlzeiA9IHN0cmxlbihidWYpOw0KIAlpZiAoc3og
-Pj0gWlJBTV9NQVhfQUxHT19OQU1FX1NaKQ0KIAkJcmV0dXJuIC1FMkJJRzsNCiANCi0JY29tcHJl
-c3NvciA9IGtzdHJkdXAoYnVmLCBHRlBfS0VSTkVMKTsNCi0JaWYgKCFjb21wcmVzc29yKQ0KLQkJ
-cmV0dXJuIC1FTk9NRU07DQotDQotCS8qIGlnbm9yZSB0cmFpbGluZyBuZXdsaW5lICovDQotCWlm
-IChzeiA+IDAgJiYgY29tcHJlc3NvcltzeiAtIDFdID09ICdcbicpDQotCQljb21wcmVzc29yW3N6
-IC0gMV0gPSAweDAwOw0KLQ0KLQlpZiAoIXpjb21wX2F2YWlsYWJsZV9hbGdvcml0aG0oY29tcHJl
-c3NvcikpIHsNCi0JCWtmcmVlKGNvbXByZXNzb3IpOw0KKwlhbGcgPSB6Y29tcF9sb29rdXBfYmFj
-a2VuZF9uYW1lKGJ1Zik7DQorCWlmICghYWxnKQ0KIAkJcmV0dXJuIC1FSU5WQUw7DQotCX0NCiAN
-CiAJZ3VhcmQocndzZW1fd3JpdGUpKCZ6cmFtLT5kZXZfbG9jayk7DQogCWlmIChpbml0X2RvbmUo
-enJhbSkpIHsNCi0JCWtmcmVlKGNvbXByZXNzb3IpOw0KIAkJcHJfaW5mbygiQ2FuJ3QgY2hhbmdl
-IGFsZ29yaXRobSBmb3IgaW5pdGlhbGl6ZWQgZGV2aWNlXG4iKTsNCiAJCXJldHVybiAtRUJVU1k7
-DQogCX0NCiANCi0JY29tcF9hbGdvcml0aG1fc2V0KHpyYW0sIHByaW8sIGNvbXByZXNzb3IpOw0K
-Kwljb21wX2FsZ29yaXRobV9zZXQoenJhbSwgcHJpbywgYWxnKTsNCiAJcmV0dXJuIDA7DQogfQ0K
-IA0KQEAgLTI4NTEsMTIgKzI4MzcsOCBAQCBzdGF0aWMgdm9pZCB6cmFtX2Rlc3Ryb3lfY29tcHMo
-c3RydWN0IHpyYW0gKnpyYW0pDQogCQl6cmFtLT5udW1fYWN0aXZlX2NvbXBzLS07DQogCX0NCiAN
-Ci0JZm9yIChwcmlvID0gWlJBTV9QUklNQVJZX0NPTVA7IHByaW8gPCBaUkFNX01BWF9DT01QUzsg
-cHJpbysrKSB7DQotCQkvKiBEbyBub3QgZnJlZSBzdGF0aWNhbGx5IGRlZmluZWQgY29tcHJlc3Np
-b24gYWxnb3JpdGhtcyAqLw0KLQkJaWYgKHpyYW0tPmNvbXBfYWxnc1twcmlvXSAhPSBkZWZhdWx0
-X2NvbXByZXNzb3IpDQotCQkJa2ZyZWUoenJhbS0+Y29tcF9hbGdzW3ByaW9dKTsNCisJZm9yIChw
-cmlvID0gWlJBTV9QUklNQVJZX0NPTVA7IHByaW8gPCBaUkFNX01BWF9DT01QUzsgcHJpbysrKQ0K
-IAkJenJhbS0+Y29tcF9hbGdzW3ByaW9dID0gTlVMTDsNCi0JfQ0KIA0KIAl6cmFtX2NvbXBfcGFy
-YW1zX3Jlc2V0KHpyYW0pOw0KIH0NCi0tDQo=
+On Thu, Feb 26, 2026 at 6:48=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Hi Changhui,
+>
+> Thanks for the report!
+>
+> Loop Caleb Sander Mateos  in.
+>
+> Thanks,
+>
+> On Thu, Feb 26, 2026 at 6:37=E2=80=AFPM Changhui Zhong <czhong@redhat.com=
+> wrote:
+> >
+> > Hello,
+> >
+> > on the ppc64le arch, I hit the issue below with ublksrv on the latest
+> > linux-block/for-next, please help check it, and let me know if you
+> > need any info/test for it. Thanks.
+> >
+> > INFO: HEAD of cloned kernel
+> > commit 37a43fd770f3dcac8f72f3ea909b3e893e2385c9
+> > Merge: 13cd9b41227a c1dfbd7e71b0
+> > Author: Jens Axboe <axboe@kernel.dk>
+> > Date:   Wed Feb 25 08:37:06 2026 -0700
+> >
+> >     Merge branch 'for-7.1/block' into for-next
+> >
+> >     * for-7.1/block:
+> >       ublk: report BLK_SPLIT_INTERVAL_CAPABLE
+> >
+> > reproducer:
+> > compile and install https://github.com/ublk-org/ublksrv.git
+> > #echo 0 > /proc/sys/kernel/io_uring_disabled
+> > #modprobe ublk_drv
+> > #cd ublksrv
+> > #make test T=3Dnull
+> > #make test T=3Dloop
+> >
+> > dmesg log=EF=BC=9A
+> > Feb 26 00:24:30 ibm-p9z-27-lp26 journal: running null/002
+> > Feb 26 00:24:30 ibm-p9z-27-lp26 ublksrvd-0[57921]: start ublksrv io
+> > daemon ublksrvd-0
+> > Feb 26 00:24:30 ibm-p9z-27-lp26 ublksrvd-0[57921]: tid 57923: ublk dev
+> > 0 queue 0 started
+> > Feb 26 00:24:30 ibm-p9z-27-lp26 ublksrvd-0[57921]: tid 57924: ublk dev
+> > 0 queue 1 started
+> > Feb 26 00:24:36 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083476.4882] platform-linux: do-add-ip6-address[2:
+> > fe80::8448:a3ff:fe51:f102]: failure 13 (Permission denied - ipv6: IPv6
+> > is disabled on this device)
+> > Feb 26 00:24:36 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083476.4885] platform-linux: do-add-ip6-address[2:
+> > 2620:52:9:160c:8448:a3ff:fe51:f102]: failure 13 (Permission denied -
+> > ipv6: IPv6 is disabled on this device)
+> > Feb 26 00:24:36 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083476.4938] l3cfg[0f1985ec14299e62,ifindex=3D2]: unable to
+> > configure IPv6 route: type unicast fe80::/64 dev 2 metric 1024 mss 0
+> > rt-src ipv6ll
+> > Feb 26 00:24:38 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083478.4938] ipv6ll[95ab7f3fdbfe643d,ifindex=3D2]: changed: no IPv=
+6
+> > link local address to retry after Duplicate Address Detection failures
+> > (back off)
+> > Feb 26 00:24:38 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083478.4943] platform-linux: do-add-ip6-address[2:
+> > 2620:52:9:160c:8448:a3ff:fe51:f102]: failure 13 (Permission denied -
+> > ipv6: IPv6 is disabled on this device)
+> > Feb 26 00:24:48 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083488.5034] platform-linux: do-add-ip6-address[2:
+> > fe80::8448:a3ff:fe51:f102]: failure 13 (Permission denied - ipv6: IPv6
+> > is disabled on this device)
+> > Feb 26 00:24:48 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083488.5037] platform-linux: do-add-ip6-address[2:
+> > 2620:52:9:160c:8448:a3ff:fe51:f102]: failure 13 (Permission denied -
+> > ipv6: IPv6 is disabled on this device)
+> > Feb 26 00:24:48 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083488.5041] l3cfg[0f1985ec14299e62,ifindex=3D2]: unable to
+> > configure IPv6 route: type unicast fe80::/64 dev 2 metric 1024 mss 0
+> > rt-src ipv6ll
+> > Feb 26 00:24:50 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083490.5034] ipv6ll[95ab7f3fdbfe643d,ifindex=3D2]: changed: no IPv=
+6
+> > link local address to retry after Duplicate Address Detection failures
+> > (back off)
+> > Feb 26 00:24:50 ibm-p9z-27-lp26 NetworkManager[818]: <warn>
+> > [1772083490.5039] platform-linux: do-add-ip6-address[2:
+> > 2620:52:9:160c:8448:a3ff:fe51:f102]: failure 13 (Permission denied -
+> > ipv6: IPv6 is disabled on this device)
+> > Feb 26 00:24:58 ibm-p9z-27-lp26 kernel: Kernel attempted to read user
+> > page (7fff81210000) - exploit attempt? (uid: 0)
+> > Feb 26 00:24:58 ibm-p9z-27-lp26 kernel: ------------[ cut here ]-------=
+-----
+> > Feb 26 00:24:58 ibm-p9z-27-lp26 kernel: Bug: Read fault blocked by KUAP=
+!
+> > Feb 26 00:24:58 ibm-p9z-27-lp26 kernel: WARNING:
+> > arch/powerpc/mm/fault.c:231 at bad_kernel_fault.isra.0+0xc8/0x2c0,
+> > CPU#5: lt-ublk.null/57924
+
+oops, it shouldn't be related with `ublk: report BLK_SPLIT_INTERVAL_CAPABLE=
+`,
+Perhaps one issue lies in the ppcle64 architecture code.
+
+I will find one ppc box and try to reproduce this.
+
+Thanks,
+
