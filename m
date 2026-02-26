@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F5C38947E
-	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 04:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D63389E18
+	for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 04:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772079342; cv=none; b=nlESezZ2vxw8vGuZnuc6uj/NP1hzo2LbsW6niH7ad08fstUL9pX6Ldni2AS06Sq9+4KHu0pk9lj1MVrESSN6ivBpvLjh5Ogqk1Nf6l7zT7XDB8vZTO/LW2NNDMNoPJg2LOiAQUv9l8vvFmFlYFl5TvS2uY92OxSxkfG6T5QJLeI=
+	t=1772079343; cv=none; b=U3+w2AaBuIn8hrNt8yJkl+NXyQmG6aknPU559AR71YT53QTudUKxwv3kgVY0b31d9a4VD7VWnXiEA+Rux9FsfxMyn8tDsNBCb5r2BpMIfF+2xTUD0mT8jNQFToDFdeQKJRLq9VyNvQmX35A6pKb+54tHuhGxeiPdTkH0R/BSnZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772079342; c=relaxed/simple;
-	bh=Ooh7QOwXTPTTENVQnnOJmUunLH1BMrkpouVhonLjYjA=;
+	s=arc-20240116; t=1772079343; c=relaxed/simple;
+	bh=NIuoj63Rje6SM/8sXjXV4z1kc8c1OwPr/WEfPN16Co8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lt20JPW7KT3I2wPHC9FzgDX9qfecFG0+uCmLUJjUf1ksm6YKS5cYJCuNXmuTefdQcX+NdrWAwZsW4lAIXh+w6K576r6x+KGH69Alx4W/mPamchgaWyYQcd0dS15l8033sT+Kdh4SZALb2Mc429cAKUEUBKhsgABrgz/OYmIrrWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wfp66RYl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ob7jHS/w6+lrfweqRWntRBLXbAhoWgAGCLi7BWRubrAxUYp5/4ijFul0ivcKNR4you+aQVYo2zi1vdgPxFd34LHrCF6NL0fThG2rRUz6dcosikT9zc/V6Vz9ApWJAdLI7AxbWff21fyhtJgW1Q3aRSX2AJXpZs4O7d6HOcGA6m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbQHvQ4P; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wfp66RYl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38524C2BC87;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbQHvQ4P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE24EC19424;
 	Thu, 26 Feb 2026 04:15:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772079342;
-	bh=Ooh7QOwXTPTTENVQnnOJmUunLH1BMrkpouVhonLjYjA=;
+	s=k20201202; t=1772079343;
+	bh=NIuoj63Rje6SM/8sXjXV4z1kc8c1OwPr/WEfPN16Co8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Wfp66RYlNn31RyGX+QSm3wDzGjtoFF7sq5ryTrVkw0TDveRVt9exxh/o00ZgjGNtE
-	 IG3X1UVmQ2p66y0ECt0IQkSCh5qJlNZ1XVhvBT899dXTyfzD+4IHdOduaLt6G/FVgG
-	 0Bc9sKUczJQVLZEjmKVWlpWfHAb0ARJ/C3B/BZPNuMSYEgrM4uygP8X2TSw4TBNFBt
-	 +woPQ+F5u+b08QwL1ZTyxnQuhIkIAA6Twv3RMkybj/V0g9WMcV7nEuM90zt3sPlEEY
-	 YkxGrVB6sgv8fv2VDc6nhk5HYHGoDq9zL5aKIDKmw2GUQTi2Nlm/VEFkvrerxA3r38
-	 gDjBVLsXkGp+A==
+	b=dbQHvQ4PdELUO9BWA9CCI81jP1TnJZ/ApcFgUXAXhsJEfsKn38HjaPzjz0zvB0nNs
+	 +Ha6crnsl3jVd1PmRuUKahUALYaKqXr4DJw6I5lYp/6qqzo4O1EGoeILSTnKYCcYyc
+	 iFYZbRxQk8MUUzeifrCDUderK300WNdgrxLbzu9Z2jgAsnEN/APzuOvwyARhjlQD7F
+	 Okawr6Oz6quFqAYI0nNTWcdfkRjlziaofD1su0p6/5pJ1fjre5U88EnWsdVPXIUMdl
+	 B0dmLQfdm7LHRS+vLN4m+EorQh9TDJe7tY9MAuEEouGcGltgs/wknG96P61dJFqAnG
+	 sXxgputkXsILA==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
-Subject: [PATCH v2 2/7] block: fix zone write plugs refcount handling in disk_zone_wplug_schedule_bio_work()
-Date: Thu, 26 Feb 2026 13:10:19 +0900
-Message-ID: <20260226041024.2154806-3-dlemoal@kernel.org>
+Subject: [PATCH v2 3/7] block: remove disk_zone_is_full()
+Date: Thu, 26 Feb 2026 13:10:20 +0900
+Message-ID: <20260226041024.2154806-4-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260226041024.2154806-1-dlemoal@kernel.org>
 References: <20260226041024.2154806-1-dlemoal@kernel.org>
@@ -43,51 +43,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The function disk_zone_wplug_schedule_bio_work() always takes a
-reference on the zone write plug of the BIO work being scheduled. This
-ensures that the zone write plug cannot be freed while the BIO work is
-being scheduled but has not run yet. However, this unconditional
-reference taking is fragile since the reference taken is released by the
-BIO work blk_zone_wplug_bio_work() function, which implies that there
-always must be a 1:1 relation between the work being scheduled and the
-work running.
+The helper function disk_zone_is_full() is only used in
+disk_zone_wplug_is_full(). So remove it and open code it directly in
+this single caller.
 
-Make sure to drop the reference taken when scheduling the BIO work if
-the work is already scheduled, that is, when queue_work() returns false.
-
-Fixes: 9e78c38ab30b ("block: Hold a reference on zone write plugs to schedule submission")
-Cc: stable@vger.kernel.org
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/blk-zoned.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ block/blk-zoned.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index fd404bdd5fa2..3f66e7ae699c 100644
+index 3f66e7ae699c..12829e14fcda 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -1165,13 +1165,17 @@ static void disk_zone_wplug_schedule_bio_work(struct gendisk *disk,
- 	lockdep_assert_held(&zwplug->lock);
- 
- 	/*
--	 * Take a reference on the zone write plug and schedule the submission
--	 * of the next plugged BIO. blk_zone_wplug_bio_work() will release the
--	 * reference we take here.
-+	 * Schedule the submission of the next plugged BIO. Taking a reference
-+	 * to the zone write plug is required as the bio_work belongs to the
-+	 * plug, and thus we must ensure that the write plug does not go away
-+	 * while the work is being scheduled but has not run yet.
-+	 * blk_zone_wplug_bio_work() will release the reference we take here,
-+	 * and we also drop this reference if the work is already scheduled.
- 	 */
- 	WARN_ON_ONCE(!(zwplug->flags & BLK_ZONE_WPLUG_PLUGGED));
- 	refcount_inc(&zwplug->ref);
--	queue_work(disk->zone_wplugs_wq, &zwplug->bio_work);
-+	if (!queue_work(disk->zone_wplugs_wq, &zwplug->bio_work))
-+		disk_put_zone_wplug(zwplug);
+@@ -492,18 +492,12 @@ static bool disk_zone_is_last(struct gendisk *disk, struct blk_zone *zone)
+ 	return zone->start + zone->len >= get_capacity(disk);
  }
  
- static inline void disk_zone_wplug_add_bio(struct gendisk *disk,
+-static bool disk_zone_is_full(struct gendisk *disk,
+-			      unsigned int zno, unsigned int offset_in_zone)
+-{
+-	if (zno < disk->nr_zones - 1)
+-		return offset_in_zone >= disk->zone_capacity;
+-	return offset_in_zone >= disk->last_zone_capacity;
+-}
+-
+ static bool disk_zone_wplug_is_full(struct gendisk *disk,
+ 				    struct blk_zone_wplug *zwplug)
+ {
+-	return disk_zone_is_full(disk, zwplug->zone_no, zwplug->wp_offset);
++	if (zwplug->zone_no < disk->nr_zones - 1)
++		return zwplug->wp_offset >= disk->zone_capacity;
++	return zwplug->wp_offset >= disk->last_zone_capacity;
+ }
+ 
+ static bool disk_insert_zone_wplug(struct gendisk *disk,
 -- 
 2.53.0
 
