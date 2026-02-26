@@ -1,66 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mta20.hihonor.com (mta20.hihonor.com [81.70.206.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1C438BF68;
-	Thu, 26 Feb 2026 08:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D4738E5E4;
+	Thu, 26 Feb 2026 08:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.206.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772092889; cv=none; b=uL9Sqesy4U87crmgsgThb0kCl2b4RP9Ugzra64Nsn2awuyMhIBb4ZzvsATvxfBDITGhs3F4/+w2hi75hwwqTcOxHxNUUIc0QkXjPciJhDq6UnanDVtC3NevnJRFZNJnhCkskvZX9x+AgoIbOxj20MyGDmUZxS12m05NQJs9btao=
+	t=1772093211; cv=none; b=F2aOFEFtB3Ii/uXlBN3k0mvzT3DK+QrZwdl0TggFbbYrI5iPYifVnywbIsK+ROVQLWDHNPQ/6Ztq46UxsubgE3fZYOL7SLzLQMUzepqIlA+2YfhrZMBeKB5beBaeiyTP4IQkyC+KW7tDW/UvFK8t5elKgELRk6j7/eSCsZu1n/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772092889; c=relaxed/simple;
-	bh=3sfrdCB29oEXL3KJoL+J5uaz+wquoAS1wW/bgZeqLzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UWoHtPI+1ajOeYx/DwbaW4N7EbTr8d7xlMQ+XBlrG34/voxJ3yrsQi2VHyO5Z/fNjwILWeJ8v92usB1Cv92h9uEEGJ77gUG58b/9/swBsqWgl+xmOePkYky8uj1ZcjeCl5dMKCbvm11E94kn6pFKBiIZrHNuwPeObHMpuzYwHvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s6rw1H6y; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s6rw1H6y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C7A6C19422;
-	Thu, 26 Feb 2026 08:01:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772092888;
-	bh=3sfrdCB29oEXL3KJoL+J5uaz+wquoAS1wW/bgZeqLzs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s6rw1H6y+vqnuONK6Ysu4jhs1mtWgILyhWX8bkvjNuDWTNWJeY1kZ2SS4YKjpc8LI
-	 FHcKTU3VS5txnq2yS9u0CzzWjkdfg/G0GzxpgnA0MIIG0LClu6Tc57h4ezhaxkbICf
-	 iS+OH+/nfIYWOzK/be/qhYjSi5jydhVOUM8YBXRMZwCYOXMKS69JInmD3oJC7O9eTT
-	 FK4aFl4YMMllcrVPJIiat+0ZFX7NoYAGEn3V1vkvVKtRSN4Mmi2na/iWXdKEzeHOPM
-	 D3x8gyB4NAnASl9JDNjaUOA7YjXaZqh4FKt2grwkSrMxbXz/Gs5GJoJMd6qV+LO7AO
-	 bXvBpLcRvEtyA==
-Date: Thu, 26 Feb 2026 00:01:27 -0800
-From: Minchan Kim <minchan@kernel.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, Brian Geffon <bgeffon@google.com>,
-	Richard Chang <richardycc@google.com>,
-	Suren Baghdasaryan <surenb@google.com>
-Subject: Re: [PATCH] zram: rename writeback_compressed device attr
-Message-ID: <aZ_91zBGSKfpsUii@google.com>
-References: <20260226025429.1042083-1-senozhatsky@chromium.org>
+	s=arc-20240116; t=1772093211; c=relaxed/simple;
+	bh=qElxrGmCY3qzQ2pQXyYa/oLzWEfK61HbA3slC9WOweI=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=bOku32rtbyJlB/ZyW9r4rgbIg9k/Y5126NGhIaGfA5sxYlR47/z+W7fa5xjIqaYkzRnCZu3dPJT4AC8BkPiwYWS+4goeSxs1snOqN4fPR7Doq5xsS/rczRVwL17t8t75VgISrR47la/EJva6nYEuRv0TXgt2PKmyN3VMQcLkN0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.206.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
+Received: from w001.hihonor.com (unknown [10.68.25.235])
+	by mta20.hihonor.com (SkyGuard) with ESMTPS id 4fM3TD2LtzzYkxQc;
+	Thu, 26 Feb 2026 15:47:28 +0800 (CST)
+Received: from a008.hihonor.com (10.68.30.56) by w001.hihonor.com
+ (10.68.25.235) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Thu, 26 Feb
+ 2026 15:50:39 +0800
+Received: from a008.hihonor.com (10.68.30.56) by a008.hihonor.com
+ (10.68.30.56) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Thu, 26 Feb
+ 2026 15:50:39 +0800
+Received: from a008.hihonor.com ([fe80::b6bf:fc6a:207:6851]) by
+ a008.hihonor.com ([fe80::b6bf:fc6a:207:6851%6]) with mapi id 15.02.2562.027;
+ Thu, 26 Feb 2026 15:50:39 +0800
+From: gao xu <gaoxu2@honor.com>
+To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
+	<senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>,
+	zhouxiaolong <zhouxiaolong9@honor.com>
+Subject: [PATCH] zram: compression algorithms name use static fields
+Thread-Topic: [PATCH] zram: compression algorithms name use static fields
+Thread-Index: Adym8lMkejBmbNzMQs2D5/5nPYBYaA==
+Date: Thu, 26 Feb 2026 07:50:39 +0000
+Message-ID: <32d733a0719c479f85d06f6fec3cc533@honor.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226025429.1042083-1-senozhatsky@chromium.org>
 
-On Thu, Feb 26, 2026 at 11:54:21AM +0900, Sergey Senozhatsky wrote:
-> Rename writeback_compressed attr to compressed_writeback
-> to avoid possible confusion and have more natural naming.
-> writeabck_compressed may look like an alternative version
-> of writeback while in fact writeback_compressed only sets
-> a writeback property.  Make this distinction more clear
-> with a new compressed_writeback name.
-> 
-> Suggested-by: Minchan Kim <minchan@kernel.org>
-> Cc: Brian Geffon <bgeffon@google.com>
-> Cc: Richard Chang <richardycc@google.com>
-> Cc: Suren Baghdasaryan <surenb@google.com>
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Acked-by: Minchan Kim <minchan@kernel.org>
-
-Thanks for the quick fix, Sergey and Andrew.
-
+Q3VycmVudGx5LCB6cmFtIGR5bmFtaWNhbGx5IGFsbG9jYXRlcyBtZW1vcnkgZm9yIGNvbXByZXNz
+b3IgYWxnb3JpdGhtIG5hbWVzDQp3aGVuIHRoZXkgYXJlIHNldCBieSB0aGUgdXNlci4gVGhpcyBy
+ZXF1aXJlcyBjYXJlZnVsIG1lbW9yeSBtYW5hZ2VtZW50LA0KaW5jbHVkaW5nIGV4cGxpY2l0IGBr
+ZnJlZWAgY2FsbHMgYW5kIHNwZWNpYWwgaGFuZGxpbmcgdG8gYXZvaWQgZnJlZWluZw0Kc3RhdGlj
+YWxseSBkZWZpbmVkIGRlZmF1bHQgY29tcHJlc3NvciBuYW1lcy4NCg0KVGhpcyBwYXRjaCByZWZh
+Y3RvcnMgdGhlIHdheSB6cmFtIGhhbmRsZXMgY29tcHJlc3Npb24gYWxnb3JpdGhtIG5hbWVzLg0K
+SW5zdGVhZCBvZiBzdG9yaW5nIGR5bmFtaWNhbGx5IGFsbG9jYXRlZCBjb3BpZXMsIGB6cmFtLT5j
+b21wX2FsZ3NgIHdpbGwgbm93DQpzdG9yZSBwb2ludGVycyBkaXJlY3RseSB0byB0aGUgc3RhdGlj
+IG5hbWUgc3RyaW5ncyBkZWZpbmVkIHdpdGhpbiB0aGUNCmB6Y29tcF9vcHNgIGJhY2tlbmQgc3Ry
+dWN0dXJlcywgdGhlcmVieSByZW1vdmluZyB0aGUgbmVlZCBmb3IgY29uZGl0aW9uYWwNCmBrZnJl
+ZWAgY2FsbHMuDQoNClNpZ25lZC1vZmYtYnk6IGdhbyB4dSA8Z2FveHUyQGhvbm9yLmNvbT4NCi0t
+LQ0KIGRyaXZlcnMvYmxvY2svenJhbS96Y29tcC5jICAgIHwgIDkgKysrKysrKy0tDQogZHJpdmVy
+cy9ibG9jay96cmFtL3pjb21wLmggICAgfCAgMiArLQ0KIGRyaXZlcnMvYmxvY2svenJhbS96cmFt
+X2Rydi5jIHwgMTkgKysrKysrLS0tLS0tLS0tLS0tLQ0KIDMgZmlsZXMgY2hhbmdlZCwgMTQgaW5z
+ZXJ0aW9ucygrKSwgMTYgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2Nr
+L3pyYW0vemNvbXAuYyBiL2RyaXZlcnMvYmxvY2svenJhbS96Y29tcC5jDQppbmRleCBhNzcxYThl
+Y2MuLjk3NGM0NjkxOCAxMDA2NDQNCi0tLSBhL2RyaXZlcnMvYmxvY2svenJhbS96Y29tcC5jDQor
+KysgYi9kcml2ZXJzL2Jsb2NrL3pyYW0vemNvbXAuYw0KQEAgLTg0LDkgKzg0LDE0IEBAIHN0YXRp
+YyBjb25zdCBzdHJ1Y3QgemNvbXBfb3BzICpsb29rdXBfYmFja2VuZF9vcHMoY29uc3QgY2hhciAq
+Y29tcCkNCiAJcmV0dXJuIGJhY2tlbmRzW2ldOw0KIH0NCiANCi1ib29sIHpjb21wX2F2YWlsYWJs
+ZV9hbGdvcml0aG0oY29uc3QgY2hhciAqY29tcCkNCitjb25zdCBjaGFyICp6Y29tcF9sb29rdXBf
+YmFja2VuZF9uYW1lKGNvbnN0IGNoYXIgKmNvbXApDQogew0KLQlyZXR1cm4gbG9va3VwX2JhY2tl
+bmRfb3BzKGNvbXApICE9IE5VTEw7DQorCWNvbnN0IHN0cnVjdCB6Y29tcF9vcHMgKmJhY2tlbmQg
+PSBsb29rdXBfYmFja2VuZF9vcHMoY29tcCk7DQorDQorCWlmIChiYWNrZW5kKQ0KKwkJcmV0dXJu
+IGJhY2tlbmQtPm5hbWU7DQorDQorCXJldHVybiBOVUxMOw0KIH0NCiANCiAvKiBzaG93IGF2YWls
+YWJsZSBjb21wcmVzc29ycyAqLw0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2svenJhbS96Y29t
+cC5oIGIvZHJpdmVycy9ibG9jay96cmFtL3pjb21wLmgNCmluZGV4IGVhY2ZkM2Y3ZC4uODFhMGYz
+ZjZmIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibG9jay96cmFtL3pjb21wLmgNCisrKyBiL2RyaXZl
+cnMvYmxvY2svenJhbS96Y29tcC5oDQpAQCAtODAsNyArODAsNyBAQCBzdHJ1Y3QgemNvbXAgew0K
+IGludCB6Y29tcF9jcHVfdXBfcHJlcGFyZSh1bnNpZ25lZCBpbnQgY3B1LCBzdHJ1Y3QgaGxpc3Rf
+bm9kZSAqbm9kZSk7DQogaW50IHpjb21wX2NwdV9kZWFkKHVuc2lnbmVkIGludCBjcHUsIHN0cnVj
+dCBobGlzdF9ub2RlICpub2RlKTsNCiBzc2l6ZV90IHpjb21wX2F2YWlsYWJsZV9zaG93KGNvbnN0
+IGNoYXIgKmNvbXAsIGNoYXIgKmJ1Ziwgc3NpemVfdCBhdCk7DQotYm9vbCB6Y29tcF9hdmFpbGFi
+bGVfYWxnb3JpdGhtKGNvbnN0IGNoYXIgKmNvbXApOw0KK2NvbnN0IGNoYXIgKnpjb21wX2xvb2t1
+cF9iYWNrZW5kX25hbWUoY29uc3QgY2hhciAqY29tcCk7DQogDQogc3RydWN0IHpjb21wICp6Y29t
+cF9jcmVhdGUoY29uc3QgY2hhciAqYWxnLCBzdHJ1Y3QgemNvbXBfcGFyYW1zICpwYXJhbXMpOw0K
+IHZvaWQgemNvbXBfZGVzdHJveShzdHJ1Y3QgemNvbXAgKmNvbXApOw0KZGlmZiAtLWdpdCBhL2Ry
+aXZlcnMvYmxvY2svenJhbS96cmFtX2Rydi5jIGIvZHJpdmVycy9ibG9jay96cmFtL3pyYW1fZHJ2
+LmMNCmluZGV4IGJjYTMzNDAzZi4uMjQ3MmQzZTVjIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibG9j
+ay96cmFtL3pyYW1fZHJ2LmMNCisrKyBiL2RyaXZlcnMvYmxvY2svenJhbS96cmFtX2Rydi5jDQpA
+QCAtMTYzNywxMCArMTYzNyw2IEBAIHN0YXRpYyB2b2lkIHpyYW1fZGVidWdmc191bnJlZ2lzdGVy
+KHN0cnVjdCB6cmFtICp6cmFtKSB7fTsNCiANCiBzdGF0aWMgdm9pZCBjb21wX2FsZ29yaXRobV9z
+ZXQoc3RydWN0IHpyYW0gKnpyYW0sIHUzMiBwcmlvLCBjb25zdCBjaGFyICphbGcpDQogew0KLQkv
+KiBEbyBub3QgZnJlZSBzdGF0aWNhbGx5IGRlZmluZWQgY29tcHJlc3Npb24gYWxnb3JpdGhtcyAq
+Lw0KLQlpZiAoenJhbS0+Y29tcF9hbGdzW3ByaW9dICE9IGRlZmF1bHRfY29tcHJlc3NvcikNCi0J
+CWtmcmVlKHpyYW0tPmNvbXBfYWxnc1twcmlvXSk7DQotDQogCXpyYW0tPmNvbXBfYWxnc1twcmlv
+XSA9IGFsZzsNCiB9DQogDQpAQCAtMTY0OCw2ICsxNjQ0LDcgQEAgc3RhdGljIGludCBfX2NvbXBf
+YWxnb3JpdGhtX3N0b3JlKHN0cnVjdCB6cmFtICp6cmFtLCB1MzIgcHJpbywgY29uc3QgY2hhciAq
+YnVmKQ0KIHsNCiAJY2hhciAqY29tcHJlc3NvcjsNCiAJc2l6ZV90IHN6Ow0KKwljb25zdCBjaGFy
+ICphbGc7DQogDQogCXN6ID0gc3RybGVuKGJ1Zik7DQogCWlmIChzeiA+PSBaUkFNX01BWF9BTEdP
+X05BTUVfU1opDQpAQCAtMTY2MSwxMCArMTY1OCwxMCBAQCBzdGF0aWMgaW50IF9fY29tcF9hbGdv
+cml0aG1fc3RvcmUoc3RydWN0IHpyYW0gKnpyYW0sIHUzMiBwcmlvLCBjb25zdCBjaGFyICpidWYp
+DQogCWlmIChzeiA+IDAgJiYgY29tcHJlc3NvcltzeiAtIDFdID09ICdcbicpDQogCQljb21wcmVz
+c29yW3N6IC0gMV0gPSAweDAwOw0KIA0KLQlpZiAoIXpjb21wX2F2YWlsYWJsZV9hbGdvcml0aG0o
+Y29tcHJlc3NvcikpIHsNCi0JCWtmcmVlKGNvbXByZXNzb3IpOw0KKwlhbGcgPSB6Y29tcF9sb29r
+dXBfYmFja2VuZF9uYW1lKGNvbXByZXNzb3IpOw0KKwlrZnJlZShjb21wcmVzc29yKTsNCisJaWYg
+KCFhbGcpDQogCQlyZXR1cm4gLUVJTlZBTDsNCi0JfQ0KIA0KIAlndWFyZChyd3NlbV93cml0ZSko
+JnpyYW0tPmRldl9sb2NrKTsNCiAJaWYgKGluaXRfZG9uZSh6cmFtKSkgew0KQEAgLTE2NzMsNyAr
+MTY3MCw3IEBAIHN0YXRpYyBpbnQgX19jb21wX2FsZ29yaXRobV9zdG9yZShzdHJ1Y3QgenJhbSAq
+enJhbSwgdTMyIHByaW8sIGNvbnN0IGNoYXIgKmJ1ZikNCiAJCXJldHVybiAtRUJVU1k7DQogCX0N
+CiANCi0JY29tcF9hbGdvcml0aG1fc2V0KHpyYW0sIHByaW8sIGNvbXByZXNzb3IpOw0KKwljb21w
+X2FsZ29yaXRobV9zZXQoenJhbSwgcHJpbywgYWxnKTsNCiAJcmV0dXJuIDA7DQogfQ0KIA0KQEAg
+LTI4NTEsMTIgKzI4NDgsOCBAQCBzdGF0aWMgdm9pZCB6cmFtX2Rlc3Ryb3lfY29tcHMoc3RydWN0
+IHpyYW0gKnpyYW0pDQogCQl6cmFtLT5udW1fYWN0aXZlX2NvbXBzLS07DQogCX0NCiANCi0JZm9y
+IChwcmlvID0gWlJBTV9QUklNQVJZX0NPTVA7IHByaW8gPCBaUkFNX01BWF9DT01QUzsgcHJpbysr
+KSB7DQotCQkvKiBEbyBub3QgZnJlZSBzdGF0aWNhbGx5IGRlZmluZWQgY29tcHJlc3Npb24gYWxn
+b3JpdGhtcyAqLw0KLQkJaWYgKHpyYW0tPmNvbXBfYWxnc1twcmlvXSAhPSBkZWZhdWx0X2NvbXBy
+ZXNzb3IpDQotCQkJa2ZyZWUoenJhbS0+Y29tcF9hbGdzW3ByaW9dKTsNCisJZm9yIChwcmlvID0g
+WlJBTV9QUklNQVJZX0NPTVA7IHByaW8gPCBaUkFNX01BWF9DT01QUzsgcHJpbysrKQ0KIAkJenJh
+bS0+Y29tcF9hbGdzW3ByaW9dID0gTlVMTDsNCi0JfQ0KIA0KIAl6cmFtX2NvbXBfcGFyYW1zX3Jl
+c2V0KHpyYW0pOw0KIH0NCi0tDQo=
