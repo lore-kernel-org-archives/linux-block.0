@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CB026F2AD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A371D8E01
 	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 01:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772157310; cv=none; b=TGWW/bkZGK3EHufOp/z/rOT3rB0GJeC53GmFQv/lP6yfPyU3TC/s1QwvVMXqrTntbTw0YquCNAUMjP2hIJ9lmuxGfYjVQMIKIuv2zhZ8vi+egZruQm4+R18qWdPjmCwPJq09CguJmQsNzVh/utCI/eDbUYywFk5N/qXra8tAmdc=
+	t=1772157310; cv=none; b=r/3kGkRwC/MuBR4lshY8XD4W2zg9I4A1UJlswSuewi7MzNi5LqooXqf9EKYVyijAYMwMvWvAnDABVd2kIyzSei5nouymRTUDRqXB5uXp7pgNtnZCMKw4HD/up8uzjyysC3h2k4LoqvnKqXqenj9Y9hoDSgyzM2n7CsLJmhHVt5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772157310; c=relaxed/simple;
-	bh=As2ibBLl5r+2aKTaTEMRVnYM3vHgUNPIooXxj66F9/8=;
+	bh=rAtQV/RwNJ/gUum9EHZD7wt/BKywfLSycmcOWsvv8Ek=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rvoXAcCUf/Vnd8fUw77W/0rY10QjVZLsDx9MbwW1ptlWVdElpD2vHQnNp+wohCWylhP+pqgATqTNGCdMf1wK14t0Y51L+8gijA8Jb8In0LDCdPh/qZpDkSyOzkqDip34RKs7cG4wHR5Q34Bx2z4dVK1RakVJjtWIXC0t24sEifU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UpdmsPLH; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=OjGmFSes+LIvr31LNOV9Zhr2uYa6SHpBvciBSEBGgaGYcq5VLC8CD2IPXxyvWHSRkkvMeZWEXLMOz5PfvsmSCQuVj5UklHUok7k2+KIXCzk1ok7HxIsSwd3GF+aYwPb2JHfDyOThRwGSo4aG0ATg584+9J5kA2XjSvBE2SL1ekQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uN8YoU1I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UpdmsPLH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8FF8C19425;
-	Fri, 27 Feb 2026 01:55:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uN8YoU1I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4553FC19423;
+	Fri, 27 Feb 2026 01:55:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772157310;
-	bh=As2ibBLl5r+2aKTaTEMRVnYM3vHgUNPIooXxj66F9/8=;
+	bh=rAtQV/RwNJ/gUum9EHZD7wt/BKywfLSycmcOWsvv8Ek=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=UpdmsPLHiC89XD0TemzOF9HXAkIXVhASoDybdRGUUgAbG7XqKIQlzztfbgPlvMw0s
-	 SJ9irdafGOQcZiUt1feZ9vmUTLGnQr25jdKmdtnOzC7I8JRmR6Z38XXCjPfp0PAhtt
-	 CM0vcOkrLb0few3ik7c2ydugH4CEGS3meLcjlCOVK0hg4+CZIQBThkoW65D+Fj/zGJ
-	 Z5j70Uj50lm7u8ZkkgfA9Mpbim9ECvaqGLiO+SkgreLOt88YozLxbOQKJhV7Vwr9vK
-	 kiWBUBvHLzoC81vB16hXlCrUIZBW1PosO1Cub0rsxOvQqd865PELJl19T+98/aVCWl
-	 jSLd9CUf7BUDw==
+	b=uN8YoU1IMs1Wb0DzyDedD65cnIrd/2FfQhulSXjjIjvcugvpF0TmHwUIGhJEQxV9I
+	 HEnksTpPnn51P7TvkxN2HK6AlqODs+Vc9NKRC5KeYra5zgTPBkKcLonXwS15a0Zh8w
+	 gmGrE+g7JaZhdafna4ctJND55eRQjPjXKinyRob9E3sXw19gEIVWQKxtd/JpjVtskP
+	 OyIzid8GY5qQDuAdqQdSLw6na0EHsjPYyYoMeQYOnVU9cLKu1zHVyPY843vgCDUYKE
+	 JqsSAlA2vz/UOqRv01nU+7USxH4dbo4DVnHQi9uw31kxbJO16yrrXaMk4U2QfejG7P
+	 yYbqhjj1GyKyg==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
-Subject: [PATCH v3 4/8] block: remove disk_zone_is_full()
-Date: Fri, 27 Feb 2026 10:49:47 +0900
-Message-ID: <20260227014951.2327711-5-dlemoal@kernel.org>
+Subject: [PATCH v3 5/8] block: rename struct gendisk zone_wplugs_lock field
+Date: Fri, 27 Feb 2026 10:49:48 +0900
+Message-ID: <20260227014951.2327711-6-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260227014951.2327711-1-dlemoal@kernel.org>
 References: <20260227014951.2327711-1-dlemoal@kernel.org>
@@ -43,9 +43,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The helper function disk_zone_is_full() is only used in
-disk_zone_wplug_is_full(). So remove it and open code it directly in
-this single caller.
+Rename struct gendisk zone_wplugs_lock field to zone_wplugs_hash_lock to
+clearly indicates that this is the spinlock used for manipulating the
+hash table of zone write plugs.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
@@ -53,35 +53,99 @@ Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-zoned.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ block/blk-zoned.c      | 23 ++++++++++++-----------
+ include/linux/blkdev.h |  2 +-
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 185651a0d617..26c2aa79faf6 100644
+index 26c2aa79faf6..78810e726222 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -492,18 +492,12 @@ static bool disk_zone_is_last(struct gendisk *disk, struct blk_zone *zone)
- 	return zone->start + zone->len >= get_capacity(disk);
- }
+@@ -514,10 +514,11 @@ static bool disk_insert_zone_wplug(struct gendisk *disk,
+ 	 * are racing with other submission context, so we may already have a
+ 	 * zone write plug for the same zone.
+ 	 */
+-	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
++	spin_lock_irqsave(&disk->zone_wplugs_hash_lock, flags);
+ 	hlist_for_each_entry_rcu(zwplg, &disk->zone_wplugs_hash[idx], node) {
+ 		if (zwplg->zone_no == zwplug->zone_no) {
+-			spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
++			spin_unlock_irqrestore(&disk->zone_wplugs_hash_lock,
++					       flags);
+ 			return false;
+ 		}
+ 	}
+@@ -529,7 +530,7 @@ static bool disk_insert_zone_wplug(struct gendisk *disk,
+ 	 * necessarilly in the active condition.
+ 	 */
+ 	zones_cond = rcu_dereference_check(disk->zones_cond,
+-				lockdep_is_held(&disk->zone_wplugs_lock));
++				lockdep_is_held(&disk->zone_wplugs_hash_lock));
+ 	if (zones_cond)
+ 		zwplug->cond = zones_cond[zwplug->zone_no];
+ 	else
+@@ -537,7 +538,7 @@ static bool disk_insert_zone_wplug(struct gendisk *disk,
  
--static bool disk_zone_is_full(struct gendisk *disk,
--			      unsigned int zno, unsigned int offset_in_zone)
--{
--	if (zno < disk->nr_zones - 1)
--		return offset_in_zone >= disk->zone_capacity;
--	return offset_in_zone >= disk->last_zone_capacity;
--}
--
- static bool disk_zone_wplug_is_full(struct gendisk *disk,
- 				    struct blk_zone_wplug *zwplug)
+ 	hlist_add_head_rcu(&zwplug->node, &disk->zone_wplugs_hash[idx]);
+ 	atomic_inc(&disk->nr_zone_wplugs);
+-	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
++	spin_unlock_irqrestore(&disk->zone_wplugs_hash_lock, flags);
+ 
+ 	return true;
+ }
+@@ -590,13 +591,13 @@ static void disk_free_zone_wplug(struct blk_zone_wplug *zwplug)
+ 	WARN_ON_ONCE(zwplug->flags & BLK_ZONE_WPLUG_PLUGGED);
+ 	WARN_ON_ONCE(!bio_list_empty(&zwplug->bio_list));
+ 
+-	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
++	spin_lock_irqsave(&disk->zone_wplugs_hash_lock, flags);
+ 	blk_zone_set_cond(rcu_dereference_check(disk->zones_cond,
+-				lockdep_is_held(&disk->zone_wplugs_lock)),
++				lockdep_is_held(&disk->zone_wplugs_hash_lock)),
+ 			  zwplug->zone_no, zwplug->cond);
+ 	hlist_del_init_rcu(&zwplug->node);
+ 	atomic_dec(&disk->nr_zone_wplugs);
+-	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
++	spin_unlock_irqrestore(&disk->zone_wplugs_hash_lock, flags);
+ 
+ 	call_rcu(&zwplug->rcu_head, disk_free_zone_wplug_rcu);
+ }
+@@ -1739,7 +1740,7 @@ static void blk_zone_wplug_bio_work(struct work_struct *work)
+ 
+ void disk_init_zone_resources(struct gendisk *disk)
  {
--	return disk_zone_is_full(disk, zwplug->zone_no, zwplug->wp_offset);
-+	if (zwplug->zone_no < disk->nr_zones - 1)
-+		return zwplug->wp_offset >= disk->zone_capacity;
-+	return zwplug->wp_offset >= disk->last_zone_capacity;
+-	spin_lock_init(&disk->zone_wplugs_lock);
++	spin_lock_init(&disk->zone_wplugs_hash_lock);
  }
  
- static bool disk_insert_zone_wplug(struct gendisk *disk,
+ /*
+@@ -1829,10 +1830,10 @@ static void disk_set_zones_cond_array(struct gendisk *disk, u8 *zones_cond)
+ {
+ 	unsigned long flags;
+ 
+-	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
++	spin_lock_irqsave(&disk->zone_wplugs_hash_lock, flags);
+ 	zones_cond = rcu_replace_pointer(disk->zones_cond, zones_cond,
+-				lockdep_is_held(&disk->zone_wplugs_lock));
+-	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
++				lockdep_is_held(&disk->zone_wplugs_hash_lock));
++	spin_unlock_irqrestore(&disk->zone_wplugs_hash_lock, flags);
+ 
+ 	kfree_rcu_mightsleep(zones_cond);
+ }
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d463b9b5a0a5..689090023770 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -200,7 +200,7 @@ struct gendisk {
+ 	u8 __rcu		*zones_cond;
+ 	unsigned int		zone_wplugs_hash_bits;
+ 	atomic_t		nr_zone_wplugs;
+-	spinlock_t		zone_wplugs_lock;
++	spinlock_t		zone_wplugs_hash_lock;
+ 	struct mempool		*zone_wplugs_pool;
+ 	struct hlist_head	*zone_wplugs_hash;
+ 	struct workqueue_struct *zone_wplugs_wq;
 -- 
 2.53.0
 
