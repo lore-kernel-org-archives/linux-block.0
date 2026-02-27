@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA50129E11D
-	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 01:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E5A2836B0
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 01:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772157311; cv=none; b=fjAnfwHbjaxQwT9UREyHlnLIVMvu1MPWfIOJ2Sidhm8pXBSTShpRcJyEmyzI+PGbyIQwr6SFimvJw40Smu6g5DOVfuqkK36Ww9DB6yzrvllsLLvhPHtuArih+QKn5ZYMp1ms4BlVyD8qEXLUgILLMZyVV8O+qJbmnAhckQ6hWVk=
+	t=1772157313; cv=none; b=YlwOM82XjwXoB/8Umn045kiSR479WV2v9cbBNlhB0zlyrnTOWv7LBm+s1oJ9tmE2n8oNenc0aoyoOoJLIzSxoGOKT/bmXe7CCXe5CevAIIKJ43wKPDyAV+c2cp1tuTMyRjEJqwKC+OC0LfkMjPpEYsIK1CFRT7sbJloG2YuIlPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772157311; c=relaxed/simple;
-	bh=GMFWNShs/ijwErAgjqovTzo2GfoBYce6yMLBV90Ruh0=;
+	s=arc-20240116; t=1772157313; c=relaxed/simple;
+	bh=FokXQSpn/ALpnesxUYr5dJVjQzELagCScsbNsPrRoz8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rGHv/Y672MP09Wqx9NrRskVeabcuhGnkPjtZBNVrYzpvSvibEBYsyZHzlcN379xUGifYEOcPqhNV8KvMpus1CjnYOGpAu1mpU/OOEzOlTBSn35UtUCbwtP6Zl+8Oa9FbOMXllcAxhQwEVJpJ7ofpG1SV0SA/aNYn4RqWqBRl8XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xdihkn0v; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=A46SM53N3eJb4umQ3xujEPwmvcBxDOmg9pSFnYDsdpiWUvno7ijCwFxizq5BneB5la99hJ/Fx6UzFuctdkisKXj4GC7s+wXflGFeVTEVhEJO+jbjatpxM/+dwHJ+5cHB2ptecsdNSgl32yOv1tc/8O2JPQ06vEuzMNxqHyqa2pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AsRlOoB2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xdihkn0v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C5C1C2BC86;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AsRlOoB2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2BF1C116C6;
 	Fri, 27 Feb 2026 01:55:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772157311;
-	bh=GMFWNShs/ijwErAgjqovTzo2GfoBYce6yMLBV90Ruh0=;
+	s=k20201202; t=1772157312;
+	bh=FokXQSpn/ALpnesxUYr5dJVjQzELagCScsbNsPrRoz8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Xdihkn0vwyLikORoTh0W/o4xPAb+wk5j9SY9VGwQ+EjQQizziTIWbcGyxPWzmjc/C
-	 PwGUHsDnRkHgfEui3OpC+7pzA4ZI87HAsE/OlIZsF7rzdnnS/cvda8j9RCnKGHZ2Tb
-	 y+1TYGPj7YzMEz4ifaJXwwG+dCzUDz4bTq16zgAG0YbYeboWRGqQMXRWMkTiznFE8o
-	 ofc54IsyngfSfMClcAh9qIts4VXehVxpsnNc77eYDpz8t2N/ymeVLvqkE2lElFR1j1
-	 LU52+daRwUF031zdvoHqm46T1QPnpDXxzWELRlFG/M2v4PN6hEKNkmkDdNj1I7Yl0/
-	 px2IXtcKkXKNQ==
+	b=AsRlOoB2wDkUG0KPemoDE7hnaaihoFeaQIBE5HofSf2GSyZQ2TRf9VA8613gauJuG
+	 w7O7I8gSBZLLwvDYpE0gFJ3fX/jRsnF5HDfg/78/Iu6Cru/Zf9lkcd3hOGw4Q+Kgff
+	 6FuMP2E1xaG3zbHC/lQUbODS7tG7m4ZZc2oYOqY94LLrZ7onNEqJAuJZ1HXdoRaJM+
+	 BJf9wa1dVfa9BuKAtQdKUMdb5tSnZsikic0cIVnAFxkjLmGrnBS9540dKSz4ikduMv
+	 34T9R7PETVZXdZZMlmeK/RKHNTLk1S4V3deYbLP00Jhu6UDNF5DV1CyVo+DSdf+Wv5
+	 vlY2nZF1WdNhg==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
-Subject: [PATCH v3 7/8] block: default to QD=1 writes for blk-mq rotational zoned devices
-Date: Fri, 27 Feb 2026 10:49:50 +0900
-Message-ID: <20260227014951.2327711-8-dlemoal@kernel.org>
+Subject: [PATCH v3 8/8] Documentation: ABI: stable: document the zoned_qd1_writes attribute
+Date: Fri, 27 Feb 2026 10:49:51 +0900
+Message-ID: <20260227014951.2327711-9-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260227014951.2327711-1-dlemoal@kernel.org>
 References: <20260227014951.2327711-1-dlemoal@kernel.org>
@@ -43,48 +43,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For blk-mq rotational zoned block devices (e.g. SMR HDDs), default to
-having zone write plugging limit write operations to a maximum queue
-depth of 1 for all zones. This significantly reduce write seek overhead
-and improves SMR HDD write throughput.
-
-For remotely connected disks with a very high network latency this
-features might not be useful. However, remotely connected zoned devices
-are rare at the moment, and we cannot know the round trip latency to
-pick a good default for network attached devices. System administrators
-can however disable this feature in that case.
-
-For BIO based (non blk-mq) rotational zoned block devices, the device
-driver (e.g. a DM target driver) can directly set an appropriate
-default.
+Update the documentation file Documentation/ABI/stable/sysfs-block to
+describe the zoned_qd1_writes sysfs queue attribute file.
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-sysfs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Documentation/ABI/stable/sysfs-block | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index bfa2ab82cc55..a92513bfbdfc 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -964,6 +964,14 @@ int blk_register_queue(struct gendisk *disk)
- 		blk_mq_debugfs_register(q);
- 	blk_debugfs_unlock(q, memflags);
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index 09a9d4aca0fd..bc3056af5eb2 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -886,6 +886,21 @@ Description:
+ 		zone commands, they will be treated as regular block devices and
+ 		zoned will report "none".
  
-+	/*
-+	 * For blk-mq rotational zoned devices, default to using QD=1
-+	 * writes. For non-mq rotational zoned devices, the device driver can
-+	 * set an appropriate default.
-+	 */
-+	if (queue_is_mq(q) && blk_queue_rot(q) && blk_queue_is_zoned(q))
-+		blk_queue_flag_set(QUEUE_FLAG_ZONED_QD1_WRITES, q);
++What:		/sys/block/<disk>/queue/zoned_qd1_writes
++Date:		January 2026
++Contact:	Damien Le Moal <dlemoal@kernel.org>
++Description:
++		[RW] zoned_qd1_writes indicates if write operations to a zoned
++		block device are being handled using a single issuer context (a
++		kernel thread) operating at a maximum queue depth of 1. A value
++		of 0 is always reported for regular block devices and for zoned
++		block devices that are not rotational devices (e.g. ZNS SSDs or
++		zoned UFS devices). For rotational zoned block devices (e.g. SMR
++		HDDs) the default value is 1. Since this default may not be
++		appropriate for some devices, e.g. remotely connected devices
++		over high latency networks, the user can disable this feature by
++		setting this attribute to 0.
 +
- 	ret = disk_register_independent_access_ranges(disk);
- 	if (ret)
- 		goto out_debugfs_remove;
+ 
+ What:		/sys/block/<disk>/hidden
+ Date:		March 2023
 -- 
 2.53.0
 
