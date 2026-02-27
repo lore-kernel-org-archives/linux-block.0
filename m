@@ -1,116 +1,154 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E7418BC3D
-	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 16:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B281A3154
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 16:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772210763; cv=none; b=JCv9ei3ZQkIuBn6iO5alXf1cEqDZs+nF1vY95Z5PH49NaMSVWzLWzM8mB+BEWgRF6k+pOs/aFJWNhwho6C+UV9zUbSzmYGe3gXzEwxk5vzNfNAUprK609BmRQ6FeYxHSFWzPYrRPGMByToM48EfZgYNiXMAtAEfdLDjAj3ft0x0=
+	t=1772210893; cv=none; b=erhjjM29aYamK9RvqPJRuRqkhMDfmyd4VfTXuqEn3juH/l64xbJhPmUjLMJxbyvsciQU1QGzoFR+rLxkhEuC0sIpowteEfur8cyd/03TsXTzdgS3QN3eFkdx5OlIK8FLLekxOK+77qomdrmZN4zAotw38Ttpd6Cp0tDf+eCodaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772210763; c=relaxed/simple;
-	bh=YraavJsaLN9URd3LPj6XhlPbEyOprjT9eDPAN83WTvs=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=CrhTOMp5OJ4v2D7V0zcyl4wrstWIABO5dPLLp1NL65fCkLAdWVcTqpieMzj05ccB++u9c2B4+fMHGksHcL1unkwdjqTiGnbth2qAVZRmV6EaVyKT0SQW9eFnh4pBn+PuA+Vq+V2BEnd8qq9jYZf3sP9irjGSAk0WDWvysI1pYPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xmIebQH3; arc=none smtp.client-ip=209.85.219.43
+	s=arc-20240116; t=1772210893; c=relaxed/simple;
+	bh=WdcgKOisl/3Pz2aZMgv4ysAytBvMWUyRVewFSKc7cFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M3kXa4w5XqKG/S8ff9UWOZBtPRBD1N+LrcPJOGSNl6i7UqPJsNAVNw4jnHAeSNJ5ECt8U/icPHcOXzK6IzB37h4i9b7t6yY1kcy94dJUI8AdyGmTCBsV0ntxiNxDHuyVRYtRmYuxHNdVujL7VD1UbVKsstgbnbw8slyBkRIrFAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZENWQWEU; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xmIebQH3"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-899b676b5d2so29014026d6.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 08:46:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZENWQWEU"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8cb38e6d164so285402185a.3
+        for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 08:48:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772210760; x=1772815560; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+Qf40BBS3ytKOtSwy2EBWxHko406dzIUXFnhbArPU0s=;
-        b=xmIebQH3qVZ3n1QZCVN6Q4WyPPXFcierZujxObPfyeBtLGb+Z37yNgaIP3i+6qLM3J
-         Odm0hD2q22hCMFWUU0gGULGULoNU5Tewlj/YNT02GFLludAGrOtl9bMHWs25Sy48FcQO
-         d5EaeRdGByaHPWHCJzBzWKUFhDub+cszLGjEZebV5XNyY6ThQVdwKRfVu5iUZp/pY2ug
-         lA1jLRZiwVBArcupQJlXl4oIXd/nyZ0neGlA7LxZmoxCpXjGWXCh7silcQD6ftiw2KhC
-         kfvO4dKu5U1lWe7TaxIlhhvtKNHjI6npi8KKSA4+His/uUBrPh5JKyohiz+0Mx1mYQjg
-         De3g==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772210891; x=1772815691; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3hiE9IS4sVfvJ0jVFsXC7dT1wVCZ240JEvmTzP3RBOg=;
+        b=ZENWQWEUYqJRTdOSg0eJM/h1/bWd7wIZIJbiNx3/zfuw0wyVWoFLCZYXDeiMn4fyp+
+         jICJAub34LhDutgtnjjjYYtncLWGuyS79zyVC2oHEBKYAOH2Zzid4JQmVChPydvGZLow
+         b+zkMYlRv7oAt9sTti3wLQWiW1LODBG6bJIMrb5/s8Noi/B7lBSvLkucwBwlxWS9kbSy
+         3b5PMsfDehul+Xk592iQ1baDsan83o/w1uHrQjW+tfInbyoEkx9hoIIZZRDUNlng33uP
+         f/zcO9FQ50SOUwHpzIMYjtuHEu2mMrcYfYDpAA0EX0KQGktpqDWHHxbxhsvmrhc2zMLZ
+         ldfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772210760; x=1772815560;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+Qf40BBS3ytKOtSwy2EBWxHko406dzIUXFnhbArPU0s=;
-        b=ScKr0az/etQPi3K9EE1LqSETyC2kpoOrR3QFJ0fYCHpbHYoy+rq/mNRxxaEyOZOfIU
-         2XJ7xciJTOzeVkDFkk29aHwnbfwqDjrTtBb/lcy6fcjqlv9JZAgtwbhTZtdhgIFamvD9
-         U/7Zx0qC6RK5wS6qZ4FeqkcVXmvqWl9Wu9EDAfb3r0TIoiWd3NhWMnQ7i5CJDVkz99bl
-         aNgWxrZxjn8pdr3HdObQScAdeOR+YRLOv58vDK2lktIMFCkuqWfKCgYwipPOl0ptkcRB
-         CA8C+5a4/uG+qgKXnAtQgoCd8m6Hyw12UklKk/W4sD9cprnUj719Rchc/j+lx7hEShYP
-         UKdQ==
-X-Gm-Message-State: AOJu0Yz/bG2SJJBML2sVO/L+W0/luWezN0LuDDllCbQpkXTLZyofsoH6
-	trP5DHHOnjvfXfYm4dDdd3zzNGRso9w/DaxOFqfu91ujm5o0cM5pbANcV51GOAobXSNcaU2E17W
-	6JfnA
-X-Gm-Gg: ATEYQzxk/RzbZrS+Uu2e3Rcon+4AL8hqDDgoShooj3sAVuyc+b2GO/O9emRzGFvBcQK
-	bOToxO6hLMoTuvpyLqjduh9iMX9qNp1ZWY3800pjVnVq1j6ikGyFy4aeStytWjg9pxbnj3R34BP
-	R4fmEXg3ras1jilhYvykM0zs5Gn/h7k7OtX0Exm72VmxT1chOIntajvaFqoG8A8KItkZHSHjfvj
-	PM4dDpbzL4rQeBC99aHkDxvmyuxMp5dnOFWwliCYDKkV49C3bXEmLpRyJkIAQlJMUcFdsMmdfmK
-	o96brOVFzSaB2Ty6J83rd9RptWpTYrLn4jANehQxbR9rs9WB2PN90iVN0eJLbQF9LEkrZaFfDGI
-	IUBKl2W6D8G/MZBfu/Fy6XRt8DaM6cMG0UK1ZA8PiI/4+tOq5+e5pqseHU1doc3EHQ/ufcPL3AH
-	cLoUVU8n83FY4GLbpJn5Zy1nBkskyHm//urTv4w4q62ed+Pevr+/e5YLteOxx58lahmFCRrSE10
-	l4=
-X-Received: by 2002:ac8:5f4a:0:b0:507:3d1:e4fe with SMTP id d75a77b69052e-507527142b7mr44420791cf.9.1772210760357;
-        Fri, 27 Feb 2026 08:46:00 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-507449a66f1sm53611171cf.12.2026.02.27.08.45.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 08:45:59 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-In-Reply-To: <20260227131951.2464150-1-dlemoal@kernel.org>
-References: <20260227131951.2464150-1-dlemoal@kernel.org>
-Subject: Re: [PATCH v4 0/8] Improve zoned (SMR) HDD write throughput
-Message-Id: <177221075911.1149491.4524149342491662979.b4-ty@kernel.dk>
-Date: Fri, 27 Feb 2026 09:45:59 -0700
+        d=1e100.net; s=20230601; t=1772210891; x=1772815691;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3hiE9IS4sVfvJ0jVFsXC7dT1wVCZ240JEvmTzP3RBOg=;
+        b=GTkWP2FcIiRvYZqpGh0wv/zdiKlm8sODzSsRT+cn04BdL/I+ASpi7cDePjisJlEZ0X
+         uYygU104qt88/Z0u6WElh6EPFAu9UMZjBeBim5dPBkbngIDEKQe7Dhg9jqFFbgoFoFw+
+         M2FRupydl7lsqhipYhymlZDLmrFH/Ork/LM3+IhzOOOPOjkjZJ41vxrFW7AgrbwQEHOL
+         xDl75zXCRYN7Bd//obQ//gAlAsMkNrRMoEqnphUXw4Q2MrjIECrtE7Pdx2bABW7rSi2c
+         OZxSu84S3UeTaztZewMFSc7tgxWTJGWQAGhEmjRlCr6t44/Wb0rhFW32U0jQo0M4zWu+
+         otxA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrM4OTYbhiiaX+NYhluyWoIbkyk2tf4LY0pWBPDMYRPWwhuLfxKIwRAmSs02UCr5xlGAA+PbeSJeEGQA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgOGI5Zkrme/Sugo4DqH3dWiWzLpUGVtFNjeVGnx5AZmqUwj1/
+	kQdKHDWO/bEVCaJhEyMjKVWvhEqiYrQyCjR8DMOV3R3XipCIBBi0n/rS/ecC0+BMOwE=
+X-Gm-Gg: ATEYQzwhLKp5hbbMTgRyWeNgDgZeaVv4m5PTwCbYcimvm79N0AE/mBJu4EecssC9TeP
+	7YSDuotaY2hY4l1CFdDFWjDvDkwC4GX+5iGJyBxorxoHvmgDFU5kfe/45TSmjlP9uYCZzhUkPC0
+	AyQpxR8/ZmrH0pljwCwnBxh6VFM82lAqSAms9HAju13IhhVJiVmOYsL+C8r+D9qo2f2BjANq3/p
+	qyfL3r56TbdzT8EekFks8zZgRM32pYP/f/oSexw9z2+EIiojkP8qGrgd3qOAovk9SQadq2n3I6q
+	MMO9hTbQFMwXmyF1iZsKwXi1jnASgOGtNOjkw5r5GEmu4s2Lk+KRnp3VvRRM/8IpNDz4fC9qafC
+	qNr72RZ4ja3Q8BJaPT45jW6vJO3zEsii+6q74sCiBjrQomfQUJ5Ml+9hou5QPmyz67l7bnZuPFp
+	guObAo9Fbv7gm63NIDdwmRC9mc8c0XKBeHBKCKpAtFI+r/eI9xNLeNk2H0xBGUIILZcmR03SqUF
+	NfhdTi2
+X-Received: by 2002:a05:620a:bd5:b0:8ca:2e36:18b3 with SMTP id af79cd13be357-8cbc8e4e8b3mr441837985a.50.1772210891027;
+        Fri, 27 Feb 2026 08:48:11 -0800 (PST)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf717301sm504582385a.36.2026.02.27.08.48.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Feb 2026 08:48:10 -0800 (PST)
+Message-ID: <488e0beb-d18c-4fce-9787-2fb9ea01f677@kernel.dk>
+Date: Fri, 27 Feb 2026 09:48:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blktrace: fix __this_cpu_read/write in preemptible
+ context
+To: Chaitanya Kulkarni <kch@nvidia.com>, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com
+Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20260227050303.10945-1-kch@nvidia.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260227050303.10945-1-kch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
-
-On Fri, 27 Feb 2026 22:19:43 +0900, Damien Le Moal wrote:
-> Jens,
+On 2/26/26 10:03 PM, Chaitanya Kulkarni wrote:
+> tracing_record_cmdline() internally uses __this_cpu_read() and
+> __this_cpu_write() on the per-CPU variable trace_taskinfo_save, and
+> trace_save_cmdline() explicitly asserts preemption is disabled via
+> lockdep_assert_preemption_disabled().  These operations are safe only
+> when preemption is off, as they were designed to be called from the
+> scheduler's context probe_wakeup_sched_switch() / probe_wakeup().
 > 
-> This patch series cleans up the zone write plugging code and introduces
-> the ability to issue all write BIOs from a single context (a kthread)
-> instead of allowing multiple zones to be written at the same time using
-> a per zone work. As shown in patch 6, raw block device tests and XFS
-> tests with an SMR HDD show that this can significantly increase write
-> throughput (up to 40% over the current zone write plugging).
+> __blk_add_trace() calls tracing_record_cmdline(current) from process
+> context where preemption is fully enabled, triggering the following
+> splat on using blktests/blktrace/002:
 > 
-> [...]
+> blktrace/002 (blktrace ftrace corruption with sysfs trace)   [failed]
+>     runtime  0.367s  ...  0.437s
+>     something found in dmesg:
+>     [   81.211018] run blktests blktrace/002 at 2026-02-25 22:24:33
+>     [   81.239580] null_blk: disk nullb1 created
+>     [   81.357294] BUG: using __this_cpu_read() in preemptible [00000000] code: dd/2516
+>     [   81.362842] caller is tracing_record_cmdline+0x10/0x40
+>     [   81.362872] CPU: 16 UID: 0 PID: 2516 Comm: dd Tainted: G                 N  7.0.0-rc1lblk+ #84 PREEMPT(full)
+>     [   81.362877] Tainted: [N]=TEST
+>     [   81.362878] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
+>     [   81.362881] Call Trace:
+>     [   81.362884]  <TASK>
+>     [   81.362886]  dump_stack_lvl+0x8d/0xb0
+>     ...
+>     (See '/mnt/sda/blktests/results/nodev/blktrace/002.dmesg' for the entire message)
+> 
+> [   81.211018] run blktests blktrace/002 at 2026-02-25 22:24:33
+> [   81.239580] null_blk: disk nullb1 created
+> [   81.357294] BUG: using __this_cpu_read() in preemptible [00000000] code: dd/2516
+> [   81.362842] caller is tracing_record_cmdline+0x10/0x40
+> [   81.362872] CPU: 16 UID: 0 PID: 2516 Comm: dd Tainted: G                 N  7.0.0-rc1lblk+ #84 PREEMPT(full)
+> [   81.362877] Tainted: [N]=TEST
+> [   81.362878] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
+> [   81.362881] Call Trace:
+> [   81.362884]  <TASK>
+> [   81.362886]  dump_stack_lvl+0x8d/0xb0
+> [   81.362895]  check_preemption_disabled+0xce/0xe0
+> [   81.362902]  tracing_record_cmdline+0x10/0x40
+> [   81.362923]  __blk_add_trace+0x307/0x5d0
+> [   81.362934]  ? lock_acquire+0xe0/0x300
+> [   81.362940]  ? iov_iter_extract_pages+0x101/0xa30
+> [   81.362959]  blk_add_trace_bio+0x106/0x1e0
+> [   81.362968]  submit_bio_noacct_nocheck+0x24b/0x3a0
+> [   81.362979]  ? lockdep_init_map_type+0x58/0x260
+> [   81.362988]  submit_bio_wait+0x56/0x90
+> [   81.363009]  __blkdev_direct_IO_simple+0x16c/0x250
+> [   81.363026]  ? __pfx_submit_bio_wait_endio+0x10/0x10
+> [   81.363038]  ? rcu_read_lock_any_held+0x73/0xa0
+> [   81.363051]  blkdev_read_iter+0xc1/0x140
+> [   81.363059]  vfs_read+0x20b/0x330
+> [   81.363083]  ksys_read+0x67/0xe0
+> [   81.363090]  do_syscall_64+0xbf/0xf00
+> [   81.363102]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [   81.363106] RIP: 0033:0x7f281906029d
+> [   81.363111] Code: 31 c0 e9 c6 fe ff ff 50 48 8d 3d 66 63 0a 00 e8 59 ff 01 00 66 0f 1f 84 00 00 00 00 00 80 3d 41 33 0e 00 00 74 17 31 c0 0f 05 <48> 3d 00 f0 ff ff 77 5b c3 66 2e 0f 1f 84 00 00 00 00 00 48 83 ec
+> [   81.363113] RSP: 002b:00007ffca127dd48 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+> [   81.363120] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f281906029d
+> [   81.363122] RDX: 0000000000001000 RSI: 0000559f8bfae000 RDI: 0000000000000000
+> [   81.363123] RBP: 0000000000001000 R08: 0000002863a10a81 R09: 00007f281915f000
+> [   81.363124] R10: 00007f2818f77b60 R11: 0000000000000246 R12: 0000559f8bfae000
+> [   81.363126] R13: 0000000000000000 R14: 0000000000000000 R15: 000000000000000a
+> [   81.363142]  </TASK>
 
-Applied, thanks!
+Is this a new issue? Needs a Fixes tag.
 
-[1/8] block: fix zone write plug removal
-      commit: 6ff36afa5eaf22db6c7a8b43d7bc7fb55efb8822
-[2/8] block: fix zone write plugs refcount handling in disk_zone_wplug_schedule_bio_work()
-      commit: fe2696d207b4d8da382fa6239a4689b68fcc0cc7
-[3/8] block: rename and simplify disk_get_and_lock_zone_wplug()
-      commit: 9fe9d5db6e28211eb1e93be584ee538cef8ad242
-[4/8] block: remove disk_zone_is_full()
-      commit: 56d54df82aaef511d7f6d716f761202f67e3dd05
-[5/8] block: rename struct gendisk zone_wplugs_lock field
-      commit: e05624be8150a73a25cf8612013b2847c0a38459
-[6/8] block: allow submitting all zone writes from a single context
-      commit: 2f0d2401a412ce84929c369240c1f900262bc96d
-[7/8] block: default to QD=1 writes for blk-mq rotational zoned devices
-      commit: 904100e435d1eb71dfb3d9ee5ac6ed8c0b7791af
-[8/8] Documentation: ABI: stable: document the zoned_qd1_writes attribute
-      commit: b154532ca0f25ba89bb3494dc0ae1a8f17bd83cc
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
