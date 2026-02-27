@@ -1,61 +1,61 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B2136F414
-	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 08:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9971A37A48D
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 08:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772180510; cv=none; b=YJ3X1XRquEGOihGPWfo9k02CkGQdj8uxOkAC4A4zr4G7HgxP5mI51xi+5g6tHdKdNJdPMUULpVf4mxGeWRPSpiKCixGQjPZSERi5htZf8G4eO/Rzt6J7uINsImT93Pdbx7whkbdWUHxsJOgUf5Q/nz6LTwurFybey6uOdsHGfUQ=
+	t=1772180511; cv=none; b=jamKZIQesZdJToQVN/6xA9JptBaWgYReUbWFj2nOK1afA6SK3VZCuBwXBNUkHGX/2kIJQ6wodciMIFsdNDKYAZLKid2DIO2AVpMf4RHR1HqYp0VjBX9o3q7jPiUEW5FXakoFbEqTBPZbnH9xlItIeu0vQWzKK3Y5+z8VQHKmCeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772180510; c=relaxed/simple;
-	bh=S+KOjpvrklh68zt1GathuTVw/1qRliOtsdPhXBFrCAY=;
+	s=arc-20240116; t=1772180511; c=relaxed/simple;
+	bh=PJqkS04aD9CY/XEV2okgNctMe1u6Z05FGUQvcfQngKk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k45A8dHqJ6dvYPQNClKId3xiD/pUhAsjrWSfytVjSSegAAL3rhchyeN+wW4hZ9H7OBskovaCUn4uvOrGLzJHzCeuAxMYfpls95RmpqUyKG/GFa0sM9OBO9wEwVkAt034/Zp/oDkj2tULNxbpHTyMF4mocUq+lsf7+v/+w0R779E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Or5iyYZB; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=TMR7LQzSErElmwB473B9/Q2WPFJaDSotVIvESIjADZC306l92RaMSZCBk3qY1c5uWU/YCBV7Sl6AFqhipe1w3+J/V8WlEpXgVcJCKsRl07CvuVNK3EnO7olCMavyD1UMRTgUSNBhAlfXBEDodiDHiQtnDZTt+nwQEoYd8juJUkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=eDmSgGKp; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Or5iyYZB"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ad9f2ee29aso10972635ad.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 00:21:48 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="eDmSgGKp"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2ad21f437eeso13347785ad.0
+        for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 00:21:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1772180508; x=1772785308; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1772180510; x=1772785310; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f3yf5ARvnDjqHtotIsjeKl4n8R0v3XhJ9293+3JNQB0=;
-        b=Or5iyYZB5twUeGR1/x4ysy3fNf8wRF5stNFhkosAJ3SdEuHUb45atnOcZMbgCW/h1Y
-         eN8xfjCor+n6/hoei5QWt6ryk+lbRewEjh2jCQNFtXW/G2nM7BJ0du1lVmSKuH6+vAOD
-         qvioENEc//bUByfRlxm/s8kMpQ3R9/fLiYjWQ=
+        bh=kstHbIwiV9VI/ZIuMCRHTYCFnv0sGQ9axw2LL0ura2M=;
+        b=eDmSgGKpHDJVcajf8fRVHpqA47HBaJux3FnVKIIDX7xN/wnhhJXmrkl+16B/zX3Ray
+         NCHG6jp4g41xOxPE+uvPeLFTg+8IimDN68Duzub53vcwNSIcy+WOsAS8m9++mJ52cBkb
+         LtW5KkUwybogUrTmWrpH3jP/nW/CIxKQxOUHg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772180508; x=1772785308;
+        d=1e100.net; s=20230601; t=1772180510; x=1772785310;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=f3yf5ARvnDjqHtotIsjeKl4n8R0v3XhJ9293+3JNQB0=;
-        b=s1HKHvqyVJ0QoQiwbNjly3vF6ZvPFg9omDMafMe4GXE61A7ExL22iMJWPyW9WfWroS
-         HhzLeGTv/kDXxdvmdF2AxmAOl2RXmDBJcIo4u05gn4UzO1MFZDlh7reaf6SJd1Fko66Y
-         zmy34z+pRh1Hc9xyFZ9ADhnTV2Hxkn3q/yhuE9TAS/5DuH/1zA0RL/X5qXoIW6r8ZO5f
-         o+15zP5Zp742eNne5D865J9uSNtH9KcQXZ2mIQfCqcSFIdRp2W+zpcQIQoGpPqYs/qzH
-         QNXMf9SCAQV00JtPXebbYXlZ4GiqUQ5+unyZoyidccrwZJOG8II/PkED/lHqnhZktiT2
-         bElA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/tS19QdfJ2AXhLv9ElwrwZFXdhfK+T36VDkQnVAhIXYBb/R3hJ1TQbI+/B1yAl5RTY6YtND/GNzAZ0w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ0aevk0gFi9V6U77e6wEhyDgnxZkjZW2zKCFK4SbJ26y/CLJg
-	suYxtCTdMDVCAV8FQ+0TndnbkMgrsj2Zg1wsu4cV+dLx3abCDllgIkX5y+GH2j+IPQ==
-X-Gm-Gg: ATEYQzyDnIDR08ov/Kr1KYi1N/S+ps2FS97TPVxLHdf9jvagQ9r63n3ZoIJqXiOGyDa
-	QXhUG5zvt9hecu50/f39inmzkSXZL9FE4CCzbbKKYoVJVzCVWgDuOtNh9NVQcZ2qdULzAvV9Cq4
-	+WED1Mdv1x0VpMkpQCab8Oq64QS93/jkQr2qc08Mj0w+79Kb98/gqle7W3M/pbepqJ6aNE0CqWa
-	oAuLZeP7Pqzj30jaUsqGtgO/MhmVKP8w/Kp7FvB6DM/cRhYDmjWcyQnw5FRzwLodv3BVva4Gxaz
-	Q5N6XWf8vRWIduGLW8M/wVR/kh7KDXTMC4OA62isZNVox1+nnVx/ZHLCA91vqVB7TlmW0R918uj
-	8s3q6uibJ87mqAwaMcFlw31NMgiRT7lqXzWLs7U8kYwAyu3UPglsl8QiU+4dXU6kp7GDBV/eXI1
-	Cnc6NsGwpnZiOJZ7DqYHMOWVKiAlr2rcaoe2R11eKl8GUdqyoWJHx+Xo5G2XLM8E3RcntR3LBKU
-	P4twIMzz/cvxw==
-X-Received: by 2002:a17:902:ce11:b0:2ad:c337:5a32 with SMTP id d9443c01a7336-2ae2e4b0d31mr18520555ad.28.1772180508256;
-        Fri, 27 Feb 2026 00:21:48 -0800 (PST)
+        bh=kstHbIwiV9VI/ZIuMCRHTYCFnv0sGQ9axw2LL0ura2M=;
+        b=E8gK8FK388joVXQJz2sUwRlu82ep6CT5O6tL5UIAK1XPttBR0hVy58MJLtAgKRcznY
+         nRa7EiyyFrgwJb9hac3Bh7MQIjEWUBj8jylbnwfSNIMhqIbOOR/qGvNBpA7cH1KYwFuI
+         +D5A3tKFK4yEnNYUNm9xZcoQVjRp1dYwO0VJGZxRalrpfW8X/U5GkH5I0D+pCxCu3Nxn
+         hEcsymMMYT3ymZVlat2T+GBuMxakby5lxSRxc2lmO86NJ2El4QG9Y7OeF80MR0rEmJZp
+         eaWLqy1PakAcFHAcedoWX7i/xExDb3RMT0QqE0pcnCCFINMh/3AGHDv8AvEWGDfCy0xu
+         HDXg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLU82ASLXp7A9Btr0vMqwSHa16WZUerfpmAN82BeNpf54SyzcRHXe5/5feZA4K44nSc4vG7VSFBywH1w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYFFHTJ3ZiNVumw7PGW0LlnhIsQyEshBKVpuIEM3xS4XYq7SU+
+	Y5dXiTNaMewo0IdGU8fnDSchLr1rBq687IEzcqUQGw35Qa07mm4IuwMZDtBX61lPrg==
+X-Gm-Gg: ATEYQzz++rFViWLphngzserimxWr8Y2WghdVtIDze32m2tSaQl4xszQGMCBFZB6daFe
+	URvSIB86t/PBpTv0zPhQLQYcawHPpVSFIlQUe6stAA1yym2liPMK4IVd+2ox8YwK8cprL6W9BTq
+	LVw5GXl511mMW0GQdRorshcPDiZqoDpQWNdCMmcK+zKqvtK16GSLyfJlFXb+figW3NAmjVhdDxs
+	nxBKG+/eEfIkkTuZhNpzBNLUKcE+i8eSYyB7EvANErsbfVPliDGhB3IPSBYCngRlY+4k2IdohlQ
+	54pUUJkU+MhzdtzJ+BQDWx35Onhk/1B25UjZeKi4h9Xc6UQoV/ZQ/nZ7zsCiqBhs68vPiSHAnbL
+	oevCXogFzhbuphec2tSNEpS1tOUXtyTrl16T7zDCWkNr84WNxaVZNAsVp94Exgq0jqcrpCYyfzh
+	hhZYf/5jntOHoWnWMIqhx0iWutoccohDKJwe3jDw0rx5f8hHLvXdpp765qa6naloViwYL0wfa/h
+	dqJUzlMBKC+Iw==
+X-Received: by 2002:a17:903:40c9:b0:2aa:d320:e965 with SMTP id d9443c01a7336-2ae2bad7ab0mr20498815ad.21.1772180510059;
+        Fri, 27 Feb 2026 00:21:50 -0800 (PST)
 Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:280f:e47e:6718:7698])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69fa4fsm48796025ad.45.2026.02.27.00.21.46
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb69fa4fsm48796025ad.45.2026.02.27.00.21.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 00:21:47 -0800 (PST)
+        Fri, 27 Feb 2026 00:21:49 -0800 (PST)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Minchan Kim <minchan@kernel.org>
@@ -64,9 +64,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-mm@kvack.org,
 	Brian Geffon <bgeffon@google.com>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH 2/5] zram: drop ->num_active_comps
-Date: Fri, 27 Feb 2026 17:21:08 +0900
-Message-ID: <eb7cd3ca578320be9aff13e71298fc36e110af41.1772180459.git.senozhatsky@chromium.org>
+Subject: [PATCH 3/5] zram: recompression priority param should override algo
+Date: Fri, 27 Feb 2026 17:21:09 +0900
+Message-ID: <831636c74ca6d72317de02d96585cc6833d082e6.1772180459.git.senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
 In-Reply-To: <8a5d53d19a8dbd51d7d81d153676895163e0735e.1772180459.git.senozhatsky@chromium.org>
 References: <8a5d53d19a8dbd51d7d81d153676895163e0735e.1772180459.git.senozhatsky@chromium.org>
@@ -78,106 +78,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It's not entirely correct to use ->num_active_comps for
-max-prio limit, as ->num_active_comps just tells the
-number of configured algorithms, not the max configured
-priority.  For instance, in the following theoretical
-example:
+Recompression algorithm lookup by name is ambiguous and
+can lead to unexpected results.  The problem is that
+the system can configure the same algorithm but with
+different parameters (compression level, C/D-dicts, etc.)
+multiple times:
 
-    [lz4] [nil] [nil] [deflate]
+    [zstd clevel=3] [zstd clevel=8 dict=/etc/dict]
 
-->num_active_comps is 2, while the actual max-prio is 3.
-
-Drop ->num_active_comps and use ZRAM_MAX_COMPS instead.
+making it impossible to distinguish compressors by name.
+It is advised to always use "priority".  Additionally,
+override "algo" with "priority", when both params are
+provided.
 
 Suggested-by: Minchan Kim <minchan@kernel.org>
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/zram_drv.c | 29 ++++++++++++++++-------------
- drivers/block/zram/zram_drv.h |  1 -
- 2 files changed, 16 insertions(+), 14 deletions(-)
+ drivers/block/zram/zram_drv.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 53e0bbf9d6ec..6ca5a76c3865 100644
+index 6ca5a76c3865..118b0b277e37 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -2371,6 +2371,18 @@ static int scan_slots_for_recompress(struct zram *zram, u32 mode, u32 prio_max,
- 	return 0;
- }
+@@ -2594,6 +2594,16 @@ static ssize_t recompress_store(struct device *dev,
+ 			if (ret)
+ 				return ret;
  
-+static bool highest_priority_algorithm(struct zram *zram, u32 prio)
-+{
-+	u32 p;
-+
-+	for (p = prio + 1; p < ZRAM_MAX_COMPS; p++) {
-+		if (zram->comp_algs[p])
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- /*
-  * This function will decompress (unless it's ZRAM_HUGE) the page and then
-  * attempt to compress it using provided compression algorithm priority
-@@ -2478,12 +2490,11 @@ static int recompress_slot(struct zram *zram, u32 index, struct page *page,
- 		 * Secondary algorithms failed to re-compress the page
- 		 * in a way that would save memory.
- 		 *
--		 * Mark the object incompressible if the max-priority
--		 * algorithm couldn't re-compress it.
-+		 * Mark the object incompressible if the max-priority (the
-+		 * last configured one) algorithm couldn't re-compress it.
- 		 */
--		if (prio < zram->num_active_comps)
--			return 0;
--		set_slot_flag(zram, index, ZRAM_INCOMPRESSIBLE);
-+		if (highest_priority_algorithm(zram, prio))
-+			set_slot_flag(zram, index, ZRAM_INCOMPRESSIBLE);
- 		return 0;
- 	}
- 
-@@ -2615,12 +2626,6 @@ static ssize_t recompress_store(struct device *dev,
- 		}
- 	}
- 
--	prio_max = min(prio_max, (u32)zram->num_active_comps);
--	if (prio >= prio_max) {
--		ret = -EINVAL;
--		goto out;
--	}
--
- 	if (prio < ZRAM_SECONDARY_COMP || prio >= ZRAM_MAX_COMPS) {
- 		ret = -EINVAL;
- 		goto out;
-@@ -2833,7 +2838,6 @@ static void zram_destroy_comps(struct zram *zram)
- 		if (!comp)
++			/*
++			 * "priority" overrides "algo".
++			 *
++			 * We can have several algorithms configured with
++			 * different params (compression/acceleration level,
++			 * C/D-dict, etc.) but under the same name.
++			 *
++			 * "algorithm" name lookup is ambiguous.
++			 */
++			algo = NULL;
+ 			prio_max = min(prio + 1, ZRAM_MAX_COMPS);
  			continue;
- 		zcomp_destroy(comp);
--		zram->num_active_comps--;
- 	}
- 
- 	for (prio = ZRAM_PRIMARY_COMP; prio < ZRAM_MAX_COMPS; prio++)
-@@ -2898,7 +2902,6 @@ static ssize_t disksize_store(struct device *dev, struct device_attribute *attr,
  		}
- 
- 		zram->comps[prio] = comp;
--		zram->num_active_comps++;
- 	}
- 	zram->disksize = disksize;
- 	set_capacity_and_notify(zram->disk, zram->disksize >> SECTOR_SHIFT);
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index f0de8f8218f5..08d1774c15db 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -125,7 +125,6 @@ struct zram {
- 	 */
- 	u64 disksize;	/* bytes */
- 	const char *comp_algs[ZRAM_MAX_COMPS];
--	s8 num_active_comps;
- 	/*
- 	 * zram is claimed so open request will be failed
- 	 */
 -- 
 2.53.0.473.g4a7958ca14-goog
 
