@@ -1,222 +1,162 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD58333725;
-	Fri, 27 Feb 2026 05:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772170980; cv=none; b=jdwliek1ewMccgM9CgYbsIDww6mbn1gSKQXXUu1CQWqRsHhZgItnoV65hmJWXMMarSOX4ZI1Mtc+ppRzkWvbXSSPtpMKCwWiZc9bPdI9GOIiiuE+ObRNRf8rHpVmp2YjCftQGMXc9BSsn1T2XvGCoE5Djj0aId9oxcoyNy9+3j8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772170980; c=relaxed/simple;
-	bh=UEFYHfqMWFpDiSnQ2ZxTCTNSUX+TOxmPK4EN9foOkkY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r1qszyLYV29PjzWZlfoks2QDiETcUVKKnhj5Rv2h8pi2ryWwwBDoQTSo1I+N+En/86Myvy6zBKeW8Cesnrqfm2o+9e7+F+mo93v/eGbyaB6YQgKV+w46tNZgNJpKk9dGoY3ax8Z6EEW7ssoXdgeA2s77HSmW5Oikn/a59YY72Eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=QZiHFZH/; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5897E332606
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 06:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772174892; cv=fail; b=Tpde0OLpYVGB3AE8aXXekABYD5zsFrh1bNOkBQQZPCWJ5nhVhy49RhXTlKnwXVdV0U88qfq23nkHDh6h2e1Vd0x0K02+HHrh/xVdrLDsq6A57MwjljRCJIE2i0UOJvD04Jla6/N8UOXRd0uveDTx1e3o/dvTvAoZ7HGGgsAbjR0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772174892; c=relaxed/simple;
+	bh=zELI9SlV83IdEwwEv6PZqYFF2TnqcKTJtbdTGXgu2hM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=F937/N7PQtqJjidO+ZiIUOdJBW31qhJbitvYeVwqcQkh2puEGIwNn336sesmkdWnojysGyraFnlnWTZRaSiXCzJquDpFH9GmecLE9/xFqFDw7MnH/XzD/gkVe2Tsoxt1zEQmszVMHmMHBd5C74i+R+3lrJn59qHD9DSHw0WWCLQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=j6UMF6gh; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=TjZdDmlZ; arc=fail smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="QZiHFZH/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=3P
-	V+nFQl72KJIa+ap8G2QRJx7vnWLumEZixOEyBdyH4=; b=QZiHFZH/nJwoGVezg2
-	Jc40EX6AD7MmmYuL3z0mT8Ralhtk7rARLwtLodMTgpAZcYQB13WE0oy1KWkThqly
-	BQzU+Lhdm7Ssydu8++48Dr5bSuDkTHG3EkHiqW0J9qSUc1PoNjgH6TRKFoete5Cs
-	LWtzCn20QA7XlS3hSsPPv1mgs=
-Received: from pek-lpg-core5.wrs.com (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgD3H+q_LqFpzaxOTQ--.788S2;
-	Fri, 27 Feb 2026 13:42:24 +0800 (CST)
-From: Robert Garcia <rob_garcia@163.com>
-To: stable@vger.kernel.org,
-	Han Guangjiang <hanguangjiang@lixiang.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Robert Garcia <rob_garcia@163.com>,
-	Liang Jie <liangjie@lixiang.com>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6.12.y] blk-throttle: fix access race during throttle policy activation
-Date: Fri, 27 Feb 2026 13:42:23 +0800
-Message-Id: <20260227054223.1552598-1-rob_garcia@163.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="j6UMF6gh";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="TjZdDmlZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1772174891; x=1803710891;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=zELI9SlV83IdEwwEv6PZqYFF2TnqcKTJtbdTGXgu2hM=;
+  b=j6UMF6ghWuCy/wwTX4bUByGMlco7LkbWRBMy8NrmKA+YgNeG/fuHC4Mx
+   5IMQZCU+CukSIzouYaCQvioYpwii7pcdwVSdabClqai61PEYtOuVIXQL7
+   au8DYCqWDWFQbO9LB6i3hq7uWnl4yUFrQRzBbnwgxDF+4PrDZTYNKwDDh
+   22YwrhwnwzoJxd/YWAoSQSvAkJvFDZDs8aDVXCTGLNk0nqG+fBi8gvSed
+   roMJGiw7G01X/IboorKIRsfHQXgJkgp1iGDHWxbPyXRHKwvelU76g+Hai
+   6r5ZfeMBvf2ikbxnIHK6qecujH0OZzeZ43V5Tzi1XVfHJH7t7BQPlBzPO
+   g==;
+X-CSE-ConnectionGUID: 00FMu6BLQoyG4i3ZTWq08Q==
+X-CSE-MsgGUID: sy6xIAP+Q0CcrlM6GoUJlA==
+X-IronPort-AV: E=Sophos;i="6.21,313,1763395200"; 
+   d="scan'208";a="142124215"
+Received: from mail-southcentralusazon11012006.outbound.protection.outlook.com (HELO SN4PR2101CU001.outbound.protection.outlook.com) ([40.93.195.6])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Feb 2026 14:48:05 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=b+RLERTWN7AL+ARSNyN+X1fISXdtg6iBIAvX86VkIL4TLWaMw3mNCNU0ovMv488WcPbkjN9XYsBogeMV3D4Pbz6U4A6AGZjg8H0lgMUMZt+yetqSP0eLjUBBbnJR2MnYF/9qydOk5yZ6ogVI1r9i5VjLksb/v8C4mAAF02s0UfryO4WiSu0HFepHXPxxRv4Xj81deKmaDeLM2YqoRlZc/Cc0uDsRori7jP+ocuruttDw8UtyffaleBmRUdmy+Ndxp7o7hnnwbsMiG3fX+qm8gNROMKWMni1Eqhv/5c6jmegaVzzZI79JIQvLwtX7fEB+/rLAwCV7j52vpW4LGw7IXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zELI9SlV83IdEwwEv6PZqYFF2TnqcKTJtbdTGXgu2hM=;
+ b=g6pLpsSDBDJ9i0qkmwGbxv1NzZtA+B0m4cItVf4IAtgW1g+/4m4SmwqhfxS39Ha1BltoXBMQeizPl0m28OgEzVPkhwCpGTMk1EVBw2V1OCR79x3ywC0aNLmvn0CMYQbIyaSJF6E9WkRssj21zKLZ0GG/9JXC+DiujWno3vBPSHOJCa4JR3P8T8sdgo8X6tWsOMer9f62C39QzdqZz926N+cS3PGN5+HJzTEPuvD+R+/7PcAV2WNNps6TZOSTbT1UfTRZGheyugNVM6Pc6qyPd9RQgP0CxKwIwGYlyOpR5pTYxyrke9WQxcdirY93TYtygZu205zBuRQ8JALdhRmJlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zELI9SlV83IdEwwEv6PZqYFF2TnqcKTJtbdTGXgu2hM=;
+ b=TjZdDmlZl9Czt3uuWWGg62X1A3wNXUMAe5U2gpVKBtlQge3G8i9DpNiaZaSFUeYdXUviTgqWmFaqFGyttRsBj2V5LmzCBSWaUbYybD4ZI7kTX7C81p3zz4LtWe4I+o+kqaZN1jdnw3kliRZrhgPfZa0TtDq5hEw8pKkAUYiUCg4=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by IA3PR04MB9109.namprd04.prod.outlook.com (2603:10b6:208:51e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.16; Fri, 27 Feb
+ 2026 06:48:03 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4%5]) with mapi id 15.20.9632.015; Fri, 27 Feb 2026
+ 06:48:01 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: Damien Le Moal <dlemoal@kernel.org>, Wilfred Mallawa
+	<wilfred.mallawa@wdc.com>
+Subject: Re: [PATCH blktests v2 0/2] zbd: adjust to recent blkzone change
+Thread-Topic: [PATCH blktests v2 0/2] zbd: adjust to recent blkzone change
+Thread-Index: AQHcomwrgnibqxl6T0SDcBfnaRzmsbWWJS2A
+Date: Fri, 27 Feb 2026 06:48:00 +0000
+Message-ID: <aaE9xHGzie-Pim6y@shinmob>
+References: <20260220132351.273758-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20260220132351.273758-1-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|IA3PR04MB9109:EE_
+x-ms-office365-filtering-correlation-id: 64392bd4-5d0f-4edd-2675-08de75cc26a2
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|1800799024|19092799006|38070700021;
+x-microsoft-antispam-message-info:
+ ScPFiP+phMYkJs9zx9MzT1inDDoECBhI0ta5WKOAYjHhAjMY86qsAnoyp7bVDoga5ashgA95txwOaLdYOOkvPc5rXiEG318pFg2qQoJ+Yf3VvO/G8JGZubfeDtIGJEySNg1WFxw1dC1yOyCWuULIE9XkxsDOE5t1Uf13sOYKoC0oGQXVKlgoBwLr2rNfSXhIsMzCkBYkJR1Zdg2qSGVMEFKc5YvKDcYV+JKxQZcQ13U/Up7eJtJjg2wCakHhpOFn8iaxXbbKBRx9JyvDDuKat7UnGKeifePtcY4srNAE/u3q+sJHrSgJKqGhnKPdyHUngpXO4AgPZ61Yi0RmTaqDploU5QJfhfAlhcdW24YVmRRRl1j/EEUk5jIbCaMrP/55vRyXOw7JnOTsUwNCsq1SRgTkgRD4UpPL69skh0HyGicFKsRUb/XNLnklWmO3pPQGXXAS4zfS0gWeYUk8Whifrye2LT9FdJYKcjwiTMOWXD4H1RPQzMxpBtf7XVB+HkIDkHAf8Qh3q7vwMV7D4NXGqZHzxQdamtgADvaoEJA+ZWGlxG5ZPU8oWHHVN0q6o9tzTtsthIGnOLT/vTA/0tm8/EPsd34UM4kBnrQmi2xWldN3xAQ9S/elO/UvUkhVMxj/vErrWhU13JzzPiJhmtI3t8Aioe52dGrudEqpN1T2wOYUfDbxotqSFjR2v567+Og9zOplR5oRKO+A0Me/eOpzgGBmfKhzboJElLwIF37NC9RH8o1qJhVLlKL6WYjzYCLJ
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(19092799006)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?j07TsB9S7AMsB4lerwLSTINrCMArN9Ju78Is1zHi6nF+ZcfZz2dBHvES5FBP?=
+ =?us-ascii?Q?1A8SnxnKY6Bx44JpUQfZ/l7bBTyMHorpxvkHJG20puES5dK2x/9Cpq8CpyqS?=
+ =?us-ascii?Q?Waq3jduS4AKTEIQ2GqiUMOk9c1G8LiSWST4KFIDwht+ANokZTGmhOZ1W5Aze?=
+ =?us-ascii?Q?WkeLv1cKc7xZVBX7qhOGFMdaXAt4J2UcSHsq707Y+5e0sFkP9/71O2qpZiLu?=
+ =?us-ascii?Q?ldM8H8Sc6roYBV53OV379D9/rpiPUYPMO7vAu9Mi1f9JcgChp13hUbskSBmk?=
+ =?us-ascii?Q?pYNl9+djmkCpGugDDh3xV0SKS2PGk3YesiGeJjemPrDHvgO9WE/j7kGpRuDb?=
+ =?us-ascii?Q?Zn8pdxrorRIysuf5cwce8eYYbLzsCTfRbAo+8gRO1WT4d/VIDQzy7npBOY0c?=
+ =?us-ascii?Q?/LGoqf7rtkaubydqXSSgEMORclU6nXKQqscpd6wcyK9x+eF2OGmVGaGUPniT?=
+ =?us-ascii?Q?AX4dwzhClyNb43xob2uNaAw7dOP6cUIrjBYI1G5CMFHYOJ7RHELBqOSFP3jU?=
+ =?us-ascii?Q?gYdq3YNEDN579vCLzaWGtKoUuS4SJUX/tc2ae9S+gD9pz+eRR9vo+Qjgk67Z?=
+ =?us-ascii?Q?K29KL6HeRVRLGvn1yzELsftNDP7sxE1UJXMOtRmkLRY5jo6tyLdNxBd2F6F6?=
+ =?us-ascii?Q?4bpqDUKjwi3nhPwIbShIYTb15kDsTqLfYhf25Fm7iKdu6lG0Aw1WApUqogsa?=
+ =?us-ascii?Q?ZLhArndR4D/wzjg0x7YIAYyoitXKBxKVRgRokg4R/QWGuuiEXU0mfaydXL0R?=
+ =?us-ascii?Q?yLIC+YmZPGGKSJKhcVRiqdsQ+Kq5WQRYU3Y18NMzyvykJRfEiQybj4gFaawo?=
+ =?us-ascii?Q?FfN5Lov2pE6n+sV2ez+FeMOjNqT8TPdXlEfafb7DJCc3zlAc1dOIOkxDZU3b?=
+ =?us-ascii?Q?Yj09jhPfE1RtkHNVMpdl2/Kui43j6pH+01DbZ5+jGJ8BduloPvVne2jBMBN+?=
+ =?us-ascii?Q?rCb3i+prnnMwPSEduLDo4lU32DNwF5WsYEEn1/9Z8dxsgNc6obRYiQziljlj?=
+ =?us-ascii?Q?/LBLAqQkq2eYRL3UZ/APCbzQ3dsjqBliBJuCjyoLvblsGLeU/XDbsm/Fu7Xe?=
+ =?us-ascii?Q?JrLvlN/huJ705ZF5VqeUAhpukr4B1Xu4FDppIEMBte0bfyn+0LG1oNs22Zbg?=
+ =?us-ascii?Q?aOv3825XHRBabm1QBQSCLdYae2LjCDnFtb+MtfVNgn4SoJiflte+Qy33KN+7?=
+ =?us-ascii?Q?HNVP8upvZIocopt9IvaNPsZFtZEeOkxLBvrjhvq5QjFbYa7JEe0wTj+d82Sa?=
+ =?us-ascii?Q?CdqzjUhV0v1z9dkaxivSo/hxCSPOFbuQ1YY5vaCAEKnvfodrMC2mU8ktZWOb?=
+ =?us-ascii?Q?r2ZBhSkJrCkFKl/viIyfaOLkOIHzPxX5pT+1lIILJgUhurTkP+9ojZX+zmyE?=
+ =?us-ascii?Q?aXyAZxGcXbPLYRM4zJunVyhR/l64WAA8/I0WeU8bKWGrqyej8cuGYl1TjbdM?=
+ =?us-ascii?Q?uK5FI1y0bws8d2ikeAo7s3063rLuelAIUty3ySgr3x5zSocZYRzWHpq0D2Vp?=
+ =?us-ascii?Q?cHzYSi4P+bxfort9XHW4D8VbFJ4ukEzNFZWoN81k2yH+8PhkXZHu53nc1vCB?=
+ =?us-ascii?Q?5FEO1qJRq7Jdb8R1Rt0g4etCDO4F+I8u6zpjDHAkPWP4QPVFssL/+suRRhye?=
+ =?us-ascii?Q?3T1telN1I7DiBOEEaGFMkufwQvOFktgNvi/3vJ0OUFjQ7YB6lEnkaNAjMwmx?=
+ =?us-ascii?Q?Gf9eIU2B8Zhwvb95FhrBCemkA+/mXc+hmsb3lu1yXyWpZrfM7mdbYn7yipV2?=
+ =?us-ascii?Q?dyiMbLH1oAag4Zjpz6UE3eJdU6OG/fU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <8309918AAB433A49BC1D5ECDABAF70DA@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgD3H+q_LqFpzaxOTQ--.788S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxtF4rCr1DWF4DJrWxuF1UGFg_yoWxJr45pr
-	W3WF15Kr4vqFsrWF45Jw43XFWrKw4kAay5G393J3yayF4j9w18t3WrAry8ArW8AFs3GF43
-	Ar4Dtr40kF1UCaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UxnYwUUUUU=
-X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDAQB+6WmhLsC-HAAA3T
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	U2SbIeR8WWiS++gsnl8wWpqsEh9yrOFn0Lim3B0zyUJZVH/IFvP7Txtft3eMXblvlaWFBcEvIgqW5cVyfKf+EiSBEZI75MuatfK/U4XtWuVFu2aP2EX5ZbtFl5v3SCpcFrIyR8uw67NHu44ZIXmNAccpxakS8oNe+huGCW7GWjk/FbuEozxz5515BMkXq0cMsjJg1925M/DORoQY4z8+t0m/fxxO0mWDkB0fDIDwV17SeBoIcfAFbJwTa7celx4/aOEjmRDSgi/ryiytvlpEGY2AXeRpSmkgcuZgh3H5mUTXSh1GVPMp2QhdMTkVOThHRDp2TceLfy2h6yPw6Sv70hrC0sHxoTgk39DrFBTVvwdOds44wPW+lkflYW/vFymRYB9szY7mzhzUh023+NfpX9DhGc/Fsqd/54TXyK7JcPlXW9TvSBS5ESPZUfMUXFDz/US7aDCSczXMhQv36/w2+DS3qG0U5THCr1K12qbMiQS+0Zv0m8qDoEG+szV3tGPBfFiWH1LPXJwHO2aykw6Tvlr7JaOKXUbM8Xw3NnNQcjWxW6J3o+5IvzO5ky4u1Ff83EVRJNNJpSjFM+EankkvnSIEML6gGSayqTKneE+yuM70+hjPzCI3/d514ooD52Xp
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64392bd4-5d0f-4edd-2675-08de75cc26a2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2026 06:48:01.4576
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eIIXu8hw03KQ+CsTj5PCERYrZ/PlVE809DdHh2DyKXzpUvTmhEv/+nvw/cziRxNFhiWqD3d6m7sJ7EVSv5EJuPF8pTIolK5N5WhrNUTRc0s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR04MB9109
 
-From: Han Guangjiang <hanguangjiang@lixiang.com>
+On Feb 20, 2026 / 22:23, Shin'ichiro Kawasaki wrote:
+> After the recent change in util-linux [1], 'blkzone report' command no
+> longer reports numeric values for write pointers when the write pointers
+> are invalid. This change caused two failure symptoms in the zbd test
+> group. The first failure symptom is arithmetic failures by evaluating
+> the string 'N/A' as a numeric value. The second failure symptom is
+> write pointer validity check failure for conventional zones. The two
+> patches in this series address the two failure symptoms respectively.
+>=20
+> Link: [1] https://github.com/util-linux/util-linux/commit/b032247f48d8b6a=
+13bf8541eb663c779e448f568
 
-[ Upstream commit bd9fd5be6bc0836820500f68fff144609fbd85a9 ]
-
-On repeated cold boots we occasionally hit a NULL pointer crash in
-blk_should_throtl() when throttling is consulted before the throttle
-policy is fully enabled for the queue. Checking only q->td != NULL is
-insufficient during early initialization, so blkg_to_pd() for the
-throttle policy can still return NULL and blkg_to_tg() becomes NULL,
-which later gets dereferenced.
-
- Unable to handle kernel NULL pointer dereference
- at virtual address 0000000000000156
- ...
- pc : submit_bio_noacct+0x14c/0x4c8
- lr : submit_bio_noacct+0x48/0x4c8
- sp : ffff800087f0b690
- x29: ffff800087f0b690 x28: 0000000000005f90 x27: ffff00068af393c0
- x26: 0000000000080000 x25: 000000000002fbc0 x24: ffff000684ddcc70
- x23: 0000000000000000 x22: 0000000000000000 x21: 0000000000000000
- x20: 0000000000080000 x19: ffff000684ddcd08 x18: ffffffffffffffff
- x17: 0000000000000000 x16: ffff80008132a550 x15: 0000ffff98020fff
- x14: 0000000000000000 x13: 1fffe000d11d7021 x12: ffff000688eb810c
- x11: ffff00077ec4bb80 x10: ffff000688dcb720 x9 : ffff80008068ef60
- x8 : 00000a6fb8a86e85 x7 : 000000000000111e x6 : 0000000000000002
- x5 : 0000000000000246 x4 : 0000000000015cff x3 : 0000000000394500
- x2 : ffff000682e35e40 x1 : 0000000000364940 x0 : 000000000000001a
- Call trace:
-  submit_bio_noacct+0x14c/0x4c8
-  verity_map+0x178/0x2c8
-  __map_bio+0x228/0x250
-  dm_submit_bio+0x1c4/0x678
-  __submit_bio+0x170/0x230
-  submit_bio_noacct_nocheck+0x16c/0x388
-  submit_bio_noacct+0x16c/0x4c8
-  submit_bio+0xb4/0x210
-  f2fs_submit_read_bio+0x4c/0xf0
-  f2fs_mpage_readpages+0x3b0/0x5f0
-  f2fs_readahead+0x90/0xe8
-
-Tighten blk_throtl_activated() to also require that the throttle policy
-bit is set on the queue:
-
-  return q->td != NULL &&
-         test_bit(blkcg_policy_throtl.plid, q->blkcg_pols);
-
-This prevents blk_should_throtl() from accessing throttle group state
-until policy data has been attached to blkgs.
-
-Fixes: a3166c51702b ("blk-throttle: delay initialization until configuration")
-Co-developed-by: Liang Jie <liangjie@lixiang.com>
-Signed-off-by: Liang Jie <liangjie@lixiang.com>
-Signed-off-by: Han Guangjiang <hanguangjiang@lixiang.com>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Robert Garcia <rob_garcia@163.com>
----
- block/blk-cgroup.c   |  6 ------
- block/blk-cgroup.h   |  6 ++++++
- block/blk-throttle.c |  6 +-----
- block/blk-throttle.h | 18 +++++++++++-------
- 4 files changed, 18 insertions(+), 18 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 5a5525d10a5e..3f7cb9d891aa 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -110,12 +110,6 @@ static struct cgroup_subsys_state *blkcg_css(void)
- 	return task_css(current, io_cgrp_id);
- }
- 
--static bool blkcg_policy_enabled(struct request_queue *q,
--				 const struct blkcg_policy *pol)
--{
--	return pol && test_bit(pol->plid, q->blkcg_pols);
--}
--
- static void blkg_free_workfn(struct work_struct *work)
- {
- 	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index b9e3265c1eb3..112bf11d0fad 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -455,6 +455,12 @@ static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio)
- 		bio_issue_as_root_blkg(rq->bio) == bio_issue_as_root_blkg(bio);
- }
- 
-+static inline bool blkcg_policy_enabled(struct request_queue *q,
-+				const struct blkcg_policy *pol)
-+{
-+	return pol && test_bit(pol->plid, q->blkcg_pols);
-+}
-+
- void blk_cgroup_bio_start(struct bio *bio);
- void blkcg_add_delay(struct blkcg_gq *blkg, u64 now, u64 delta);
- #else	/* CONFIG_BLK_CGROUP */
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 4aa66c07d2e8..bdf363868ac0 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1209,17 +1209,13 @@ static int blk_throtl_init(struct gendisk *disk)
- 	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
- 	throtl_service_queue_init(&td->service_queue);
- 
--	/*
--	 * Freeze queue before activating policy, to synchronize with IO path,
--	 * which is protected by 'q_usage_counter'.
--	 */
- 	blk_mq_freeze_queue(disk->queue);
- 	blk_mq_quiesce_queue(disk->queue);
- 
- 	q->td = td;
- 	td->queue = q;
- 
--	/* activate policy */
-+	/* activate policy, blk_throtl_activated() will return true */
- 	ret = blkcg_activate_policy(disk, &blkcg_policy_throtl);
- 	if (ret) {
- 		q->td = NULL;
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 1a36d1278eea..e1b5343cd43f 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -154,7 +154,13 @@ void blk_throtl_cancel_bios(struct gendisk *disk);
- 
- static inline bool blk_throtl_activated(struct request_queue *q)
- {
--	return q->td != NULL;
-+	/*
-+	 * q->td guarantees that the blk-throttle module is already loaded,
-+	 * and the plid of blk-throttle is assigned.
-+	 * blkcg_policy_enabled() guarantees that the policy is activated
-+	 * in the request_queue.
-+	 */
-+	return q->td != NULL && blkcg_policy_enabled(q, &blkcg_policy_throtl);
- }
- 
- static inline bool blk_should_throtl(struct bio *bio)
-@@ -162,11 +168,6 @@ static inline bool blk_should_throtl(struct bio *bio)
- 	struct throtl_grp *tg;
- 	int rw = bio_data_dir(bio);
- 
--	/*
--	 * This is called under bio_queue_enter(), and it's synchronized with
--	 * the activation of blk-throtl, which is protected by
--	 * blk_mq_freeze_queue().
--	 */
- 	if (!blk_throtl_activated(bio->bi_bdev->bd_queue))
- 		return false;
- 
-@@ -192,7 +193,10 @@ static inline bool blk_should_throtl(struct bio *bio)
- 
- static inline bool blk_throtl_bio(struct bio *bio)
- {
--
-+	/*
-+	 * block throttling takes effect if the policy is activated
-+	 * in the bio's request_queue.
-+	 */
- 	if (!blk_should_throtl(bio))
- 		return false;
- 
--- 
-2.34.1
-
+FYI, I applied the patches. Of note is that I made a slight change to the
+block comment in the first patch when I applied it.=
