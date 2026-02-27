@@ -1,105 +1,111 @@
-Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DEA3D1CB1;
-	Fri, 27 Feb 2026 19:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F2A36921B
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 19:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772219979; cv=none; b=qnQoHEZz6JAgMB7216LHwUN9V/aVE6FHF6VfJTEhrJTxg+cSLfmYf+91DXy+xiDl/UTU6KtIlKtnLCCo/lnJ3XgbtN8VEG/kpnMDdICfu7wIBz0W/fRSTBh8fB7TNb9hHq7yDUj9IKStbydNDFi2lhkZuSb2YxJKDV4ZPOzRqA8=
+	t=1772221945; cv=none; b=XhS8DLg/Og29bV8gdZc+IUO69cCwcbXyHd+SPw+fIsjMpMFM6HGEJjls9irs/+hTKpgRhrHfKhEH2GKEFZ1SIVHLka3FI2CnH0N/p05v1bQeN0/GnXH+i8rblOpOd7cvibkRbOYFsDZR2lFTQGdfb1cghKiKbXvFsDrw8PH+Vn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772219979; c=relaxed/simple;
-	bh=omdyWATOk+1bsTz6vm1xBAr2qEDPOku6BXtUH5LcIBM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fur93Uu7is5WEgn1jC/kybQZ0xf6MoCabcbyjxQWaLBKMPfmH5XZkGVGmete0wpXbHJk0D6s5wLMo2Ym1IHATWw8hlKldZMAvy9hU4pzk8srjPZPTJw82HCBLIqWV2jo5Fh3mE0kNNbMcxHVOzEBaf4AIshis1jn40CCIpeU/Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf08.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay02.hostedemail.com (Postfix) with ESMTP id A4819139F33;
-	Fri, 27 Feb 2026 19:19:28 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf08.hostedemail.com (Postfix) with ESMTPA id A6C6A20027;
-	Fri, 27 Feb 2026 19:19:26 +0000 (UTC)
-Date: Fri, 27 Feb 2026 14:19:51 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Chaitanya Kulkarni <kch@nvidia.com>
-Cc: <axboe@kernel.dk>, <mhiramat@kernel.org>,
- <mathieu.desnoyers@efficios.com>, <shinichiro.kawasaki@wdc.com>,
- <linux-block@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>
-Subject: Re: [PATCH] blktrace: fix __this_cpu_read/write in preemptible
- context
-Message-ID: <20260227141951.102e19ce@gandalf.local.home>
-In-Reply-To: <20260227050303.10945-1-kch@nvidia.com>
-References: <20260227050303.10945-1-kch@nvidia.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772221945; c=relaxed/simple;
+	bh=AVjNWv52I/SShc+g8l5QzIxcmqI4KZIzz5YjHaqQqns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUt2wQd3RU0ZLyTB5YCZ0x7nPhYlFJbCcdHjzRlmyu6Z9C8w55jPVMzVI3cYp0Hzg6IR7dCq9TeuJYt5dLIiw9ZbbyL56UmF9VH6VfhxQQlBp1L7hJiGH4kcYqXNQih0Ne49/N0aZqcLXwR7I8yB3b2IwHwhIlG8m7M7yYBh3A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BwUZhkfa; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BwUZhkfa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772221943;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i9XwpDxs/qoFLn1Jvyqbmikgtgk6yGhzXhIV9M3DNKQ=;
+	b=BwUZhkfabJvonB5y89XeVwUYTKlh9D+o+XsF6gwzqse1gmbFXA5HTogIjjyHytZWlljwXG
+	wLhhdqoBOUysN7yLv7szbxnUWYcmv2I/sRzYjmlDyiAintiDQfnl2MyH0qz03Sdqmg7dkQ
+	z6Ak9/qHWrLfS2pCiIR4G1vlPYQoK4M=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-690-AAfjTlalMvC76zMyXgTzMA-1; Fri,
+ 27 Feb 2026 14:52:21 -0500
+X-MC-Unique: AAfjTlalMvC76zMyXgTzMA-1
+X-Mimecast-MFC-AGG-ID: AAfjTlalMvC76zMyXgTzMA_1772221939
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C8E61956063;
+	Fri, 27 Feb 2026 19:52:19 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 47D8B1800286;
+	Fri, 27 Feb 2026 19:52:18 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 61RJqH8H1743483
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 27 Feb 2026 14:52:17 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 61RJqG1o1743482;
+	Fri, 27 Feb 2026 14:52:16 -0500
+Date: Fri, 27 Feb 2026 14:52:16 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
+        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
+        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
+        snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 11/13] libmultipath: Add support for block device IOCTL
+Message-ID: <aaH18HKCMdjuUhUh@redhat.com>
+References: <20260225153225.1031169-1-john.g.garry@oracle.com>
+ <20260225153225.1031169-12-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: A6C6A20027
-X-Rspamd-Server: rspamout06
-X-Stat-Signature: r4qqxqiszkhab4sehibryxzocaq78913
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX18D3dX5k0KHc6/1OC6JwPvbmjmshfA+M8k=
-X-HE-Tag: 1772219966-529596
-X-HE-Meta: U2FsdGVkX18w1tJZ+tTxvJpfXrhGJtIUwrwE7Z7rqFFEA0BBj9kVtzfdaAf95c4jJGuMJWa2nzTVyMT/BgYFArgwWziLkJ+d4Me1UUdXRXJgqiZN+kwLwa8c5Dsv7zg86ePzpKNtoOlaeqOWG2SWT5xDoSCugfHJh51DFV1Ad86aRBpFNYh2CD7xweqqjBdA3crJiqOVPHxqBG5G/udDzQ860dcvZ+Wsv/NzBakcVCFhjcrWkv8tc+dVXoIyxjrqjgI/kkclBFzHYiO0DKwP31aK7tKPbCKlea54KyVrv9HjDHEudKrtI4GIbP0rA4KmdNZLLJE25KOXAgjWD4l9j+CDZvp75b/R
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260225153225.1031169-12-john.g.garry@oracle.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Thu, 26 Feb 2026 21:03:03 -0800
-Chaitanya Kulkarni <kch@nvidia.com> wrote:
+On Wed, Feb 25, 2026 at 03:32:23PM +0000, John Garry wrote:
+> Add mpath_bdev_ioctl() as a multipath block device IOCTL handler. This
+> handler calls into driver mpath_head_template.ioctl handler.
+> 
+> It is expected that the .ioctl handler will unlock the SRCU read lock,
+> as this is what NVMe requires - see nvme_ns_head_ctrl_ioctl(). As such,
+> export a handler to unlock, mpath_head_read_unlock().
+> 
+> The .compat_ioctl handler is given the standard handler.
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  include/linux/multipath.h |  4 ++++
+>  lib/multipath.c           | 42 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 46 insertions(+)
+> 
+> diff --git a/include/linux/multipath.h b/include/linux/multipath.h
+> index 3846ea8cfd319..40dda6a914c5f 100644
+> --- a/include/linux/multipath.h
+> +++ b/include/linux/multipath.h
+> @@ -72,6 +72,9 @@ struct mpath_head_template {
+>  	bool (*is_disabled)(struct mpath_device *);
+>  	bool (*is_optimized)(struct mpath_device *);
+>  	enum mpath_access_state (*get_access_state)(struct mpath_device *);
+> +	int (*bdev_ioctl)(struct block_device *bdev, struct mpath_device *,
+> +			blk_mode_t mode, unsigned int cmd, unsigned long arg,
+> +			int srcu_idx);
 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 3b7c102a6eb3..488552036583 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -383,7 +383,9 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
->  	cpu = raw_smp_processor_id();
->  
->  	if (blk_tracer) {
-> +		preempt_disable_notrace();
->  		tracing_record_cmdline(current);
-> +		preempt_enable_notrace();
->  
->  		buffer = blk_tr->array_buffer.buffer;
->  		trace_ctx = tracing_gen_ctx_flags(0);
+I don't know that this API is going to work out. SCSI persistent
+reservations need access to all the mpath_devices, not just one, and
+they are commonly handled via SG_IO ioctls. Unless you want to disallow
+SCSI persistent reservations via SG_IO, you need to be able to detect
+them, and handle them using the persistent reservation code with the
+mpath_head.
 
-Do you know when this started? rcu_read_lock() doesn't disable preemption
-in PREEMPT environments, and hasn't for a very long time. I'm surprised it
-took this long to detect this? Perhaps this was a bug from day one?
+-Ben 
 
-Anyway, the tracing_record_cmdline() is to update the COMM cache so that
-the trace has way to show the task->comm based on the saved PID in the
-trace. It sets a flag to record the COMM from the sched_switch event if a
-trace event happened. It's not needed if no trace event occurred. That
-means, instead of adding preempt_disable() here, just move it after the
-ring buffer event is reserved, as that means preemption is disabled until
-the event is committed.
-
-i.e.
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index e6988929ead2..3735cbc1f99f 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -383,8 +383,6 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
- 	cpu = raw_smp_processor_id();
- 
- 	if (blk_tracer) {
--		tracing_record_cmdline(current);
--
- 		buffer = blk_tr->array_buffer.buffer;
- 		trace_ctx = tracing_gen_ctx_flags(0);
- 		switch (bt->version) {
-@@ -419,6 +417,8 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
- 		if (!event)
- 			return;
- 
-+		tracing_record_cmdline(current);
-+
- 		switch (bt->version) {
- 		case 1:
- 			record_blktrace_event(ring_buffer_event_data(event),
-
--- Steve
