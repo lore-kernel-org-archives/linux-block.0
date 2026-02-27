@@ -1,86 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6AD24A06B
-	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 13:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F62923E34C
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 13:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772198713; cv=none; b=sTho+BUw5dU9X/hDtmpf1CP3Yf+CdhjDyPLM5E5WWFsOjhXQsCW9bdgZucjP2tvVmMFmXbV1jrGHtscXx9ipfwEbuyq7iLf2Fyl8bS2m+ql6lELyjbxDOsvBT0u4Yj/h35UvfAcTAncxg7DO8Y3qD4j0mb6BhrKLMO45ehvzzfw=
+	t=1772198897; cv=none; b=cU+DnFqBs0g3I8KBMV9FR8dq5HHcPYx3rS9GQVrq2bRkiidZ8PJu9csp8RPHMj8OUp0lOghRtAcBBcqoS0RMmhNEIlLUfVrbEHYq7r/+01Tj1t+wi4xv6jfxWq68v5Oo1T9AmQ79AgvzAc0S6RXdy6bSp2rPzDwluSArCmFZcJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772198713; c=relaxed/simple;
-	bh=KXcTWENAAi6rryDqPczD27csZ+RGzcGrtgq0IxR0iM4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=liEPcDjVnK3B2rwtkkCvn/6GzDeqhmHPL08sH45C1BhtZ6GvO/3GmhXYOQLfIy7QMlTb7UyQZIq2VdoGtPv5Q6WoI4KY1eKcQAE5jVQRgfKzErRaKUmk9W5eVLMsiBuLPk2opsokrZgGhHfb8yBSEkMtSD1Pg6OJ7CBQY3eXgrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mjqR4Lno; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772198897; c=relaxed/simple;
+	bh=CssOadRfP1nI/lX56pRax/5xGOn5KgJs2w+Wn1EdsY4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jp1/DOkOTfC/Q84QjXT0hLx/Ij/IbHW8rgGMlBJhY2b7lAY3TrIB4OjHSDmEyZYclwHpI6pZOFO896+GD+3ECqPXLKWe1hnWTGz3QbfEJbTMjsEzMcTQ4dXQP4A7hgpWdbHt7cBhhSoYFE/FbjZVudvezDhrHYUDC0rweiyS+Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIJ/FXTc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mjqR4Lno"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAF1BC19425;
-	Fri, 27 Feb 2026 13:25:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIJ/FXTc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15367C116C6;
+	Fri, 27 Feb 2026 13:28:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772198713;
-	bh=KXcTWENAAi6rryDqPczD27csZ+RGzcGrtgq0IxR0iM4=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=mjqR4Lnoj5VcRGrq4eat6d0xHsoFKQIsogC7wqdaKVc4ctKsYX5godCu118kh4g3W
-	 YKMVoYx1HwWxUNqG4HzvZ72qyJ/Fa7oyX5PkbNfxNZuphFTPPV3gSNJiPKN44oakkQ
-	 HwdPqZYflwjfT1+UzWfofbuQeBrxhXJVAXjeUsZ+uneCIx3m/fd2QpzwJ3+j7GoAjK
-	 f4DSkg4ivm+urW5CttWwlV9SWxteyhScgM/ZAftP6SMI0V33Q5YQe6yyI22QekuRV4
-	 fGraZKXzWuP6MqpUOPLwtCjORNWRSP2EnVoVKa6OJwIXA/0t4AnVkLzR0h6pmD4xoI
-	 nrLc8nf745P7w==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: [PATCH v4 8/8] Documentation: ABI: stable: document the zoned_qd1_writes attribute
-Date: Fri, 27 Feb 2026 22:19:51 +0900
-Message-ID: <20260227131951.2464150-9-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260227131951.2464150-1-dlemoal@kernel.org>
-References: <20260227131951.2464150-1-dlemoal@kernel.org>
+	s=k20201202; t=1772198896;
+	bh=CssOadRfP1nI/lX56pRax/5xGOn5KgJs2w+Wn1EdsY4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aIJ/FXTcNawCbTxg2+H1vxJAgbFxP7ERu6iZkx66zjBI817mYrTeGSd98peMLMbRn
+	 J1icVSNRzVjRQgx/A5iiexGaEh/tUceds/KK+k2miwPHQRvx7mhNm4mFJ56M8R6abO
+	 YNDrM+rQzJdeMBtmGpyQ8zyhg2bUEBGrTZPcMrxmpTqchki71khYIVGAQOVVnyvPHk
+	 TnxZ5ytLAL/Xo7zBZku3+xBBnakQ5tygTKCOoohYHWs9XMSLb+m60Y2MEOOaXWUp01
+	 iGwlZS28LuqwgL6d2d/agGl9/5OOobqCuZCOmjs7vEzp1V97uOSbTMd51Nzb01rrB3
+	 gwtUhXxHVNnVA==
+Message-ID: <38c949c4-9903-49d8-8992-899d90580a0c@kernel.org>
+Date: Fri, 27 Feb 2026 22:28:14 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: Correct comments on bio_alloc_clone() and
+ bio_init_clone()
+To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, hch@lst.de
+Cc: linux-block@vger.kernel.org
+References: <20260227104438.1646405-1-john.g.garry@oracle.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260227104438.1646405-1-john.g.garry@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Update the documentation file Documentation/ABI/stable/sysfs-block to
-describe the zoned_qd1_writes sysfs queue attribute file.
+On 2/27/26 19:44, John Garry wrote:
+> Correct the comments that the cloned bio must be freed before the memory
+> pointed to by @bio_Src->bi_io_vecs (is freed).
+> 
+> Christoph Hellwig contributed most the of the update wording.
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- Documentation/ABI/stable/sysfs-block | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Looks good to me.
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 09a9d4aca0fd..900b3fc4c72d 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -886,6 +886,21 @@ Description:
- 		zone commands, they will be treated as regular block devices and
- 		zoned will report "none".
- 
-+What:		/sys/block/<disk>/queue/zoned_qd1_writes
-+Date:		January 2026
-+Contact:	Damien Le Moal <dlemoal@kernel.org>
-+Description:
-+		[RW] zoned_qd1_writes indicates if write operations to a zoned
-+		block device are being handled using a single issuer context (a
-+		kernel thread) operating at a maximum queue depth of 1. This
-+		attribute is visible only for zoned block devices. The default
-+		value for zoned block devices that are not rotational devices
-+		(e.g. ZNS SSDs or zoned UFS devices) is 0. For rotational zoned
-+		block devices (e.g. SMR HDDs) the default value is 1. Since
-+		this default may not be appropriate for some devices, e.g.
-+		remotely connected devices over high latency networks, the user
-+		can disable this feature by setting this attribute to 0.
-+
- 
- What:		/sys/block/<disk>/hidden
- Date:		March 2023
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+Note: Not sure if it matters, but your patch is missing the "---" separator
+between your SoB and the beginning of the diff.
+
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 8203bb7455a9f..156bb75f55298 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -897,10 +897,11 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+>   * @gfp: allocation priority
+>   * @bs: bio_set to allocate from
+>   *
+> - * Allocate a new bio that is a clone of @bio_src. The caller owns the returned
+> - * bio, but not the actual data it points to.
+> - *
+> - * The caller must ensure that the return bio is not freed before @bio_src.
+> + * Allocate a new bio that is a clone of @bio_src. This reuses the bio_vecs
+> + * pointed to by @bio_src->bi_io_vec, and clones the iterator pointing to
+> + * the current position in it.  The caller owns the returned bio, but not
+> + * the bio_vecs, and must ensure the bio is freed before the memory
+> + * pointed to by @bio_Src->bi_io_vecs.
+>   */
+>  struct bio *bio_alloc_clone(struct block_device *bdev, struct bio *bio_src,
+>  		gfp_t gfp, struct bio_set *bs)
+> @@ -929,9 +930,7 @@ EXPORT_SYMBOL(bio_alloc_clone);
+>   * @gfp: allocation priority
+>   *
+>   * Initialize a new bio in caller provided memory that is a clone of @bio_src.
+> - * The caller owns the returned bio, but not the actual data it points to.
+> - *
+> - * The caller must ensure that @bio_src is not freed before @bio.
+> + * The same bio_vecs reuse and bio lifetime rules as bio_alloc_clone() apply.
+>   */
+>  int bio_init_clone(struct block_device *bdev, struct bio *bio,
+>  		struct bio *bio_src, gfp_t gfp)
+
+
 -- 
-2.53.0
-
+Damien Le Moal
+Western Digital Research
