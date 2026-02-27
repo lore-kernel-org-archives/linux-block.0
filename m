@@ -1,123 +1,228 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE96213254
-	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 16:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0606C346E5E
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 16:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772209936; cv=none; b=RjPh5GRoTEm2lk+iodXRCKQunvma50DiC3bYz0ziC4otrzGmWV6Z/yjHykwM9IPHqFPwR+X8uo7xCsE6UaTTmsFZgEnbgQ4Zo9azIeDQ6llhgDikGwYNy6nusKdTBWkO6J9c30YqE1X6REkf/u+oPwZRvbmCzWfn7H3J2Tga0a0=
+	t=1772210490; cv=none; b=sLJfiPvIZGLsIJi9T7gA4I+BEuwCkJK2ft7IvfrV2JsUC6T2glVK8vhr8AzMgYwyinK8qaESK8y4HSln/jYZlpVCPfU1LHEPUUZn0dZtEX3mn2Qo1AkhpgzVNASd+u2pxk+igj+c/LDW88UhEeeIO8oKMLAwY/7r+A5BlS9WgjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772209936; c=relaxed/simple;
-	bh=/BapDNawBYTPNQtLFvcbjOBiOrdot+WMlSySdPCqGWI=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Bi8aYyowhBLv1C0mkn0+oZzckj6tCTOA61S1bE9qISPlwwh8+B2wKrmUmjscHz+aRqGrRr3Flx1z6aFhVG3WoODTRsYOgXe5YBYMP6VLzMxfsN4YEFystirBr0Zvnb65QqvCHQchLFmPfk9eXe68Jw1C6nRQ65yvbG2n4fD8tD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=M5IwV/MY; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1772210490; c=relaxed/simple;
+	bh=BEeIa88RvYQBpBW8wSWS7+9ZmJtRT8takeYNLITWrCY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GvcUqb4YlTDVhZTrJCJfGHPZQxT1JY4MKEzSA6JsJELjL3Ccg1GyXoEgTAtJVbHlMnTBP3Jpql8Wk3m/fcMq1NOA8qZLExfuHRMBFGB1vJKuyd8FU7fuLqyylHoi/e6bpEWih/qvmXXj5fwxHfLoXVYW95akEV1d3uMhu+T0NRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=WJ4WE7fY; arc=none smtp.client-ip=148.163.139.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="M5IwV/MY"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8cb40277a8bso234283485a.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 08:32:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772209934; x=1772814734; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iyz+XFmEXxmNg1sViGIlwOnlw1Vth725+nqlUf7cGgI=;
-        b=M5IwV/MYCNs2gxI0n4nWpGWrV+171EvFsovOEkxINUPx+UW7oCAI8OTdA91WmO+vN6
-         PRAoEC0C/I1QAWYapf8xcjUW6aen/2w6CA7qpnsLK9l6SKLVmaZyrVOq8wtmu7Y7lc3Y
-         bRjcnmnEIIrg1zemvZ32J63ZzL4oq97EZWyQz4YUeMMvTjeBMtr3mRAg48zhid4tAo+g
-         Nn56DaTERg38ql3NAcvzVpsRJ16afubqbs5wZkkaosei7Y2uLhbcRmd+Pe7LeGDNTCMt
-         KqASf3ZGdBR26xI+S8Fge/eEaN4m67MFluStj2WWXg4vdjBnRmIzZ0u3kLEo2V/kAyiU
-         qVXg==
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="WJ4WE7fY"
+Received: from pps.filterd (m0499198.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61RGNJQw1565668
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 11:41:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps01; bh=kIopnbRq4jN3V/2gTsORTjLWBT
+	vRkSveHkD2aWFgnTg=; b=WJ4WE7fYoUyiLGjnYIFC46Hw/0vUjE3nebGm34U/zr
+	VZ/f462QjOtqeQqZLHDTtDdmUbsOAHcPrqc/Lvwfx91+uB0xBk8rkq5l4I5FzvrW
+	aRsGK8IBpv2Im9i6x0aKDjoeIfX4KrI5kRkOqkW8bYQ5cbetHnqRZ1vnjc/jjE7Q
+	2G5FNrqaZJh1N4OAXDAioA8u07YK/p2dQj6SVlccARRyT7vd/9vSGC0EeUPjQjhy
+	Iay7JWvyDMuBOyZ2x5+pA6A2MPMgoo8Mj+2c13tnG7vnxK+D2zslW1qwNxiiVvEF
+	SY+rN3sSzrh8QadkH7FOQtja5UpCp/iDBWPU4r3bYXWw==
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4ckdsa0rc9-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 11:41:25 -0500 (EST)
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-899c5d3d00fso280166066d6.3
+        for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 08:41:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772209934; x=1772814734;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Iyz+XFmEXxmNg1sViGIlwOnlw1Vth725+nqlUf7cGgI=;
-        b=mhP1chwsy745TjuelaOuiCwGoBL8JMsNAFhNes0k4cg1VttHiPkpF//ZUang8rGyvn
-         9M7wxiiwBQU8qhKNz9Njm9RItBu9AwVhS7lUaBq7DGTpkyzxVgckj0L0Znzm7p1LPog1
-         XZEvzQ7sA9KB5wkkFsS+Zh9pJlds2ThqXTraFaI70/bvQnuLYzAdTT/xq0BO+4yROvYu
-         5LVI2xrjyzShf/xkLHAVLGILKAmn68ka8xbAJ+tcH6e4PT60XLbhdVvlXF/XX0lEny+F
-         UJwjVO8xYx28XNzbuGLrhygGICD5wQfQT7iMvdrWABAsjpsUW6/GsqGSlXFU2gOwXqXg
-         KAgw==
-X-Gm-Message-State: AOJu0YxChDnX1P+sL7itXWSkfXlIaQou0N3hrvB5ZVCVjDqtdbAeCXbA
-	r8vZRNdeWhUEx08D8OEsL+OcmaEJUz5YVTyEICOkMIktdoNC1ix+aMiXttNTRK9R+Ko=
-X-Gm-Gg: ATEYQzzCagxk+TwO7zpoD9yV4US9Wb7Vj/MpKn5rhIsELF23+T4B2uK2R1qiNsSjPN7
-	QF3QGsNrT9M3KSxGOwYd0XppMbq4llATO0oQxuqrIFXHbIwMpL//ojwJcRy0MEwIDudtnvSbib3
-	ZHmqZQPPfLMua/eC0U2eaXJW38f7O692NYvmnuaC59a+GJw+kGt1JbVcL8n8PQE4iMuD3euB9yR
-	4299SmhbDM2mDsYBnQggVycnXGI64lAO/KTaf+50HrISxl0KvZdzLT6S4ql7Pxu9q92VjMK1aus
-	o7j4cM2gxoFWiA14JbRs/9p3AclogehBRb04Jkws75MiQKHpDr0N/+ZRLGKDf7BVzL8Y9xSTrNK
-	rl2xR7TU9P+Bnx0tyHIkgvbV4YIM+agq1MPJ4Q04VWPOF0H0rq9SoU11DDho/qrvusiE5DSMaC3
-	YUxAz80WZx1gwwr8Rjg+LZRgfJePG1+KJz4lmM4q5d/VghxXMUsGVVUqJdtu97hXLn5VxKr+Ler
-	E2dy6WniQAvx0uh7s4=
-X-Received: by 2002:a05:620a:f05:b0:8cb:fa4:7b45 with SMTP id af79cd13be357-8cbc8e7728cmr391357885a.60.1772209933684;
-        Fri, 27 Feb 2026 08:32:13 -0800 (PST)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf66f325sm503765485a.16.2026.02.27.08.32.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Feb 2026 08:32:12 -0800 (PST)
-Message-ID: <4cdfcc4f-2cf2-44c9-9365-a3babf9a05d1@kernel.dk>
-Date: Fri, 27 Feb 2026 09:32:11 -0700
+        d=1e100.net; s=20230601; t=1772210485; x=1772815285;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kIopnbRq4jN3V/2gTsORTjLWBTvRkSveHkD2aWFgnTg=;
+        b=FIQRCRy841TWkmxH0yiqHQ6yFbcIJALcjuS3KWmAPUf6szlvdq6Zu+4c0YLC8NgILK
+         J2irFrcXepDfDj74m1UDsOYbIblX3V/bHbRvOVmRDpcj1lZaTCnc272TP390naLDfmiE
+         JyHGcYrojj4Ipa2HIKj2LNJbyckBzflBCWGlV+pkuQ17sbB2pLgLg+kK7i1bWSnOW4m1
+         LPuqUK5G+F4g9npVTS/uWbBNQlT6XLhaqFU+GnxjncvHiQ6PUf+MISNdps4BLkBY+qQ+
+         xbr4BUKFk5I2ZnDIGcIqUejp/xdOCTJx+wJ3+O/+DfVoMibtF2BT4A2TgwUcV2k6hOLa
+         50ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfX6qkVQPfWcDYdNx1/GZYL6dMuDPW3Vv8SVEeKP70fw4NQrOGftaH/5OITLdXXBpNQxaAJytH0DHlOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi2kkDvj6jiLAauRVDhvHZkJVceUI8Txmrf3Q4zXlzBxdrIOx7
+	D9ck+zYYzOm/sq34h7ksY+JIWed+uci/wYz7FYXQBVRNyLTcQR2Qw2IWu/U4lV+UPdAYLXuL4wn
+	oYYHwhWzE69IV5ZXK+k3oZULVRA7mZkmlMr30OOwCd0HAFigNULBi8UUtRQZX
+X-Gm-Gg: ATEYQzwijNg61PXsooUbCMCTij/iQK10SHSWD30EwqpJAzCirYkDV8JrkRzKjYWpqBC
+	/q1TXZOWplySRtXn13rD9IcVNut+9jqkQTVVhbHQaknl+J4fvB967ZQHDQD6Pm+tiFFhJt7qqPC
+	untYhk3ju18f1Ir/JC/t06hROj514QYsXSBzjI8sTlEeJbtV9mQansSElOfhJO1gTmGtowZRZyn
+	dlZxYn8cWIYBxbPHGZiiSUqGT5Wz261LH/MEkEdtltFvEALH/dVUQKYQEt3naGq8cFSXky9U41b
+	oGwvbLXYKfXDbQcMeZQR+umzn86GmkwesiuNQ/4IEwb+SRNe3AH6KaJIlQw6ckvwALN0eCfLok8
+	/T6y7oP/GNHjL/W4bn5OYEOsEediyWDcBo8v2rrCl1F95tiYQq3YbqDekC1rtkyweSac=
+X-Received: by 2002:a05:6214:4109:b0:88f:a4a0:2ddf with SMTP id 6a1803df08f44-899d1e5070dmr56245596d6.46.1772210485141;
+        Fri, 27 Feb 2026 08:41:25 -0800 (PST)
+X-Received: by 2002:a05:6214:4109:b0:88f:a4a0:2ddf with SMTP id 6a1803df08f44-899d1e5070dmr56245036d6.46.1772210484479;
+        Fri, 27 Feb 2026 08:41:24 -0800 (PST)
+Received: from [127.0.1.1] (dyn-160-39-33-242.dyn.columbia.edu. [160.39.33.242])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c716caebsm46535886d6.15.2026.02.27.08.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Feb 2026 08:41:23 -0800 (PST)
+From: Tal Zussman <tz2294@columbia.edu>
+Subject: [PATCH RFC v3 0/2] block: enable RWF_DONTCACHE for block devices
+Date: Fri, 27 Feb 2026 11:41:06 -0500
+Message-Id: <20260227-blk-dontcache-v3-0-cd309ccd5868@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 7.0-rc2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACLJoWkC/3XNywrCMBAF0F8pWTuSR1+4EgQ/wK24SJOJDdZGk
+ jYopf9uyEoKLu8d7pmFBPQWAzkUC/EYbbBuTEHsCqJ6Od4RrE6ZcMprylkL3fAA7cZJSdUjCNE
+ yIbSmZYUkbV4ejX1n70ou5xO5pbK3YXL+k39Elk9/uMiAgZG6rpsKTcPMUblhfnZW7lHPGYv8B
+ +DVFuBAoaHYSFWmPW03wLquXysbLKrzAAAA
+X-Change-ID: 20260218-blk-dontcache-338133dd045e
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Hildenbrand <david@kernel.org>,
+        Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+        Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+        Brendan Jackman <jackmanb@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>,
+        Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Tal Zussman <tz2294@columbia.edu>
+X-Mailer: b4 0.14.3-dev-d7477
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772210483; l=3619;
+ i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
+ bh=BEeIa88RvYQBpBW8wSWS7+9ZmJtRT8takeYNLITWrCY=;
+ b=P2OAzuWnRvGmfMu3FKgpEoLuWT0SusPENu+T5BBqjDCAzaIIHtNgLjq1p6L6MeydJbtozid2B
+ FzfMGcUqZEjAp//Ioln1ll+QavLMRrtpcuVgSj1+WlZ/W6AWGzIkaUw
+X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
+ pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
+X-Proofpoint-GUID: t47WZhv8P5dsQX9sNHjb4J1WqgmoOsFY
+X-Proofpoint-ORIG-GUID: t47WZhv8P5dsQX9sNHjb4J1WqgmoOsFY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI3MDE0OCBTYWx0ZWRfX+nQuPi8MTCTI
+ grn0OtmA53JgstRqgG581syXuBkVAooiLlHagbqOLGZNkyMS78SmGFZPgfm3vbWDUWg7h9yLpjr
+ +xz07F4OUgYYrrxg4XCbZy+Liehp1j8a1as/ATW5+405YYxeNETBZJMJpZ3wbpUXF2LnyPiYyWL
+ DAvB6ocPEDILU9MVt64CR+koJiHwKzqijQyaj1hNnxCL81ClL5VHZ9II9woPEFJXyzAUbbWxGkl
+ bZxqyG98il9Dn2Y2R2K6AorB/kzdhbXQVQoh2AKRvaFMQxSHxpSfEFImlaiUgjIk52wJsJMuU1p
+ tGRr5lIyJDUuO6xyzcvosFHVDayEdd5Kwtwc0JGZBPic2nAFfrPh8uj7IFs/tC/owk9PzKyIe1a
+ zQFoj9kJTqJaBS5T860K0sSTWXA1sw+P1sWuRyEtFjpUNUGKnxuJlyo4PJYwLLoFdV1wyauNVnI
+ k2tGu7lzhJW3L67P+mw==
+X-Authority-Analysis: v=2.4 cv=fu7RpV4f c=1 sm=1 tr=0 ts=69a1c935 cx=c_pps
+ a=7E5Bxpl4vBhpaufnMqZlrw==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=x7bEGLp0ZPQA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=BpGzv1V74M3SfeTrGa8v:22
+ a=VwQbUJbxAAAA:8 a=sdoS8YJ70VgF2Jk85QkA:9 a=QEXdDO2ut3YA:10
+ a=pJ04lnu7RYOZP9TFuWaZ:22
+X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11714
+ signatures=596818
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=10 malwarescore=0 adultscore=0 suspectscore=0
+ priorityscore=1501 bulkscore=10 clxscore=1015 lowpriorityscore=10
+ phishscore=0 spamscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2602270148
 
-Hi Linus,
+Add support for using RWF_DONTCACHE with block devices and other
+buffer_head-based I/O.
 
-A few fixes for block that should go into this release. This pull
-request contains two sets of fixes, one for drbd, and one for the zoned
-loop driver.
+Dropbehind pruning needs to be done in non-IRQ context, but block
+devices complete writeback in IRQ context. To fix this, we first defer
+dropbehind completion initiated from IRQ context by scheduling a work
+item to process a per-CPU batch of folios.
 
-Please pull!
+Then, add a block_write_begin_iocb() variant that threads the kiocb
+through for RWF_DONTCACHE I/Os.
 
+This support is useful for databases that operate on raw block devices,
+among other userspace applications.
 
-  Merge tag 'turbostat-2026.02.14' of git://git.kernel.org/pub/scm/linux/kernel/git/lenb/linux (2026-02-17 15:51:14 -0800)
+I tested this (with CONFIG_BUFFER_HEAD=y) for reads and writes on a
+single block device on a VM, so results may be noisy.
 
-are available in the Git repository at:
+Reads were tested on the root partition with a 45GB range (~2x RAM).
+Writes were tested on a disabled swap parition (~1GB) in a memcg of size
+244MB to force reclaim pressure.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.0-20260227
+Results: 
 
-for you to fetch changes up to 3c4617117a2b7682cf037be5e5533e379707f050:
+===== READS (/dev/nvme0n1p2) =====
+ sec   normal MB/s  dontcache MB/s
+----  ------------  --------------
+   1         993.9          1799.6
+   2         992.8          1693.8
+   3         923.4          2565.9
+   4        1013.5          3917.3
+   5        1557.9          2438.2
+   6        2363.4          1844.3
+   7        1447.9          2048.6
+   8         899.4          1951.7
+   9        1246.8          1756.1
+  10        1139.0          1665.6
+  11        1089.7          1707.7
+  12        1270.4          1736.5
+  13        1244.0          1756.3
+  14        1389.7          1566.2
+----  ------------  --------------
+ avg        1258.0          2005.4  (+59%)
 
-  zloop: check for spurious options passed to remove (2026-02-24 14:50:18 -0700)
+==== WRITES (/dev/nvme0n1p3) =====
+ sec   normal MB/s  dontcache MB/s
+----  ------------  --------------
+   1        2396.1          9670.6
+   2        8444.8          9391.5
+   3         770.8          9400.8
+   4          61.5          9565.9
+   5        7701.0          8832.6
+   6        8634.3          9912.9
+   7         469.2          9835.4
+   8        8588.5          9587.2
+   9        8602.2          9334.8
+  10         591.1          8678.8
+  11        8528.7          3847.0
+----  ------------  --------------
+ avg        4981.7          8914.3  (+79%)
 
-----------------------------------------------------------------
-block-7.0-20260227
+---
+Changes in v3:
+- 1/2: Convert dropbehind deferral to per-CPU folio_batches protected by
+  local_lock using per-CPU work items, to reduce contention, per Jens.
+- 1/2: Call folio_end_dropbehind_irq() directly from
+  folio_end_writeback(), per Jens.
+- 1/2: Add CPU hotplug dead callback to drain the departing CPU's folio
+  batch.
+- 2/2: Introduce block_write_begin_iocb(), per Christoph.
+- 2/2: Dropped R-b due to changes.
+- Link to v2: https://lore.kernel.org/r/20260225-blk-dontcache-v2-0-70e7ac4f7108@columbia.edu
 
-----------------------------------------------------------------
-Christoph Böhmwalder (1):
-      drbd: fix null-pointer dereference on local read error
+Changes in v2:
+- Add R-b from Jan Kara for 2/2.
+- Add patch to defer dropbehind completion from IRQ context via a work
+  item (1/2).
+- Add initial performance numbers to cover letter.
+- Link to v1: https://lore.kernel.org/r/20260218-blk-dontcache-v1-1-fad6675ef71f@columbia.edu
 
-Christoph Hellwig (2):
-      zloop: advertise a volatile write cache
-      zloop: check for spurious options passed to remove
+---
+Tal Zussman (2):
+      filemap: defer dropbehind invalidation from IRQ context
+      block: enable RWF_DONTCACHE for block devices
 
-Lars Ellenberg (1):
-      drbd: fix "LOGIC BUG" in drbd_al_begin_io_nonblock()
+ block/fops.c                |   5 +-
+ fs/buffer.c                 |  19 ++++++-
+ include/linux/buffer_head.h |   3 +
+ include/linux/pagemap.h     |   1 +
+ mm/filemap.c                | 130 +++++++++++++++++++++++++++++++++++++++++---
+ mm/page_alloc.c             |   1 +
+ 6 files changed, 145 insertions(+), 14 deletions(-)
+---
+base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+change-id: 20260218-blk-dontcache-338133dd045e
 
-Thorsten Blum (1):
-      drbd: Replace deprecated strcpy with strscpy
-
- drivers/block/drbd/drbd_actlog.c   | 53 +++++++++++++++++---------------------
- drivers/block/drbd/drbd_interval.h |  5 +++-
- drivers/block/drbd/drbd_main.c     | 14 ++++++----
- drivers/block/drbd/drbd_receiver.c |  4 +--
- drivers/block/drbd/drbd_req.c      |  3 ++-
- drivers/block/zloop.c              | 31 +++++++++++++++++-----
- 6 files changed, 64 insertions(+), 46 deletions(-)
-
+Best regards,
 -- 
-Jens Axboe
+Tal Zussman <tz2294@columbia.edu>
 
