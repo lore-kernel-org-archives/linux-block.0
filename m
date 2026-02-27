@@ -1,265 +1,91 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E02271476
-	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 01:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772156093; cv=pass; b=TKTZZnns68vYABffrF4lut5D3Pgh57XHmiDw33HebHvlN7P2xVs6u9RVpi1eb1NBhgstXA2LAD2xGuaXWZSwih3QKHiUJZEP9B/5Y1DPEtmHDPkIz/5kumBEPMhwOmvtaC02gP/NXv7Vv8XvrH/ct9Dzb8F/k1RXOCDoezTMe4U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772156093; c=relaxed/simple;
-	bh=z+/M+lo5ksz1TRd449byu/D3ls0drNyd6IdGp40lVms=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jQShjAUv8n0YvAnjMdEzyYHkThPpF73MiRdi4Gq8I5Id2XhHp1vrhtA4sc1w7N1k8fLq0298pNffX2PYU1J343wcCXKNrYXhHNsYLUW3v1Vicfy6zyy9tD1tQZ6e79C2POT+tB8Lk2a6m7iT7npUkKee49kgIxvbFM9al6d1GSI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rddm3gQ1; arc=pass smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B731A9FAF
+	for <linux-block@vger.kernel.org>; Fri, 27 Feb 2026 01:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772157308; cv=none; b=LMvE2n0vLbHZ0NqLnvuZLzJWvnNUSejIv2/NW7PixCr2e9MIqkXS3yVGJP3jPNDgN88JFNZ057BtoUhIfkHVo1UyCTv0ZQTt5bUpHAzE12dp7QAXxygNU1lb/lUQGHDSQ3S/MXxuoirbjvLUepi0Qm66NI58jDLC0wscMhb9sEA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772157308; c=relaxed/simple;
+	bh=1Uu2Zo7vwohFI1wiL78HZ3DJYKQxpIrfYIi1ocLdUzc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=F5LtgOENNyylJRzkQZL4Su8EVlGuMbgxV5SOZ89T4jeRpExA2QZfrTVzZBFh/fAogg2eX6vwIvUEchEneHe13L923idOHk2RwkUVFxGLPtJvt9cCj9XNdU9tAESqXp71nW6tuNKiVpEpQl4AxCfRcfCzXIHJeuYbi7dxwT6BXOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=APpalWEa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rddm3gQ1"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-65a38c42037so5830a12.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Feb 2026 17:34:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772156091; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MJLQCgXfLOIxrmwDvarJZUtO7siTUCI0HFCnqqAWHuHNZlxHpOGhcJOlKIj013B8n0
-         yYKZtA6yXXwLh96EqckGCDdJxdriO+wlo+A1xkrtIxSALKlSMOC2jenbawO3/dsN9Io8
-         krJVFfs/AAu5Xnemn1POUg755kjuZmdLWCsWhEg+feB/Q1U9BQfhFx+wuanmD5zv3Elv
-         QZBVVms/rXAKFhC+aSeBpEr8bGlUCT418ePmIucYWBqETeB7vc4TuI0jdq4b3maYor4T
-         gAAUCdy22QBuh8+5SF6S660eXEuR0pyF3Mbrxb4vX0xjQ+/QLFomWuzVROcy3d212MLl
-         mEjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1Xe9R0FTdq/8KgfEwhSHbjVGMoqD5nAmJr57+aBN6PM=;
-        fh=2eK/HbsUh+TNQmkrtO6mDG6EEdxRMmIOLh/rfqP6JrI=;
-        b=e7Dq5/quo+7YBgHHqKoTQocGZB17585wtvwD7T5EFpT8nC4CgSWVH1AEZ6fGvryJ5c
-         A5k5Hozx50jSnH9v7kryrL6AVXYNy8xOAZ0aTCCtscNjdOXEJAdrETKiZjauts0orb7M
-         KH8gtpmVWlOMSjzsS7nTxRcQ5VBbI7MYOjEy/Ed4h6zzZIsnK6Dctxcg86nCotm4k57g
-         C5EnKF8VfKvzP4CDJ0pCppAOJbtToiRu3eklqTBH3gOYaT/OD8tMPYE6bMMAant5PAKZ
-         Kk62+sc/OcL0rVCgXID+pBJZTJTxLwOZxs4NUStDltuZvjiYZ7CbLoXrRpIryp2nzsyd
-         ZLZQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772156091; x=1772760891; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Xe9R0FTdq/8KgfEwhSHbjVGMoqD5nAmJr57+aBN6PM=;
-        b=rddm3gQ1poAClVezwlhFzOklnlG2jCOcA8fPH+hPp39nqDYzbC13+YaQ5knel9Nc4X
-         9txnBTkpriryN3sCntMm14YJHjPutq9y4fdcbgrBcx8QOfsslKMJRmijVl4Qr0dLfNmX
-         sZ/QORdUvMtqPpg8a/G/Ao4vAZ6lxE5RahFokvAfNkUQCX6j5jlPFrA43P0Cfod1RJkD
-         M0Ud3vrqyldiAZKDKgQ2bToAoJrckOSlpN1PLMP131kbZ/zi1uiaPq18LBiIt36QsWIt
-         30JJ8ovJkBBLtU1MCuG7CwqmlwVn4f7QXR9ix1yfdhJb+4sHBp246ezHLS7EBQ8rPioS
-         qnjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772156091; x=1772760891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=1Xe9R0FTdq/8KgfEwhSHbjVGMoqD5nAmJr57+aBN6PM=;
-        b=OqK0ijorVzLJXh911yeEZorbsP72cqVq+nHRK+x2uvrf9/t/hdey7Hl6F19E9KfBs5
-         hmZiI2gzZTMasi1zvofMOx2j8TmmrIxBSOfAeY5XuqA0XL4FlPyer/1vxLdLpLtsd+R/
-         eB6OjtryJlwIpwNTGGplwrextlP0njRepK/Y1x2ZMQliubwAnt5VavjnFTcELaC5t++I
-         O6bCJhQNUghp5uxnns6ra/lwNn2Q3RH/xZtzeWdijZ3QG/kZmzayhQ4VMKoCxOU5z9Vj
-         FFyGNkbCNGLgbiv4BtyO2MFDc5vZ2WREZOEctZpZWaWDyaLB5MS3POtxHjCnNB6zS3/C
-         02Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXY4N+K05LrpZWBPn9Xg6/tB4Ujn8+FIBZkS31Z0aRY/FJdP2fhtLhtF8tK3fvDdxogbdtLlYBC9OVmw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLSvzL65Es4IRlOltY25RmYiLYNGdRtef39byJxQwfm45cSnBl
-	rtBjQ8nbOEEVpqWYmHGn7vlxy3UjmbWfdpJGZ5OSGKz9GhyQM3W6tEDjMXyLa0zlvz2EHZzb3yS
-	qjaZJfJjAj5m4dyIGZEeXYgL4AskqYEf8K7SG89K2
-X-Gm-Gg: ATEYQzx9Qw66oi+fWhzqegi1uerXN7sm/urH/YW5tmYGh4WGthwCcYshdPubI1+GcSK
-	7ADRHd+t6R7roykeDLUkxXkzVk+K6olVQhgdikqX6FqHBmvLtjWA6XLFdrp/HmVNiCJhkZL2lXV
-	e+XzbJD551lwVIbh29LCHDtBZ7cmRnrocgkhrQZq5tsrgzTVctOT2WHgEW0NUA2BlDmMbcSE+lm
-	wt+PlS6v2CftW/PZbZJobetRQfcDNA9277ktZISfdSl6FQuxEzPvQCoo76Et9tC0tXjnnpYSotb
-	bOsMX4zvouwmiHwuqlQwNLNBgw50KQHhqRnn2A==
-X-Received: by 2002:a05:6402:4619:10b0:65f:76c8:b92f with SMTP id
- 4fb4d7f45d1cf-65fab2c4155mr103050a12.0.1772156090158; Thu, 26 Feb 2026
- 17:34:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="APpalWEa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E3B3C116C6;
+	Fri, 27 Feb 2026 01:55:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772157307;
+	bh=1Uu2Zo7vwohFI1wiL78HZ3DJYKQxpIrfYIi1ocLdUzc=;
+	h=From:To:Subject:Date:From;
+	b=APpalWEakg2ge4scxwmXZ45llN7ywPmPfZFjFZ/nwJKUvmziJm3Rc7zeDrltnvwrY
+	 LiMGjbdkNyXUIbMzV2wINPoWbKy+TIoXjKlIVYPxpYuoDR8UV79i2gyonAD03R+vV7
+	 egMbj8rG0lkCnMhwW80FnoGm5Y6sZOSvCeJV9/L6aa16Fa/TRWbhVcpBOMpNvpAg3F
+	 1P3mMeL/x7ah9xw42eUgRuTQZLlTZmCYZAnGYDKOZ8ydNe5oUAnVr1aux6/ltF6jLE
+	 fYkzkeKdSVym/YmohTX+XS5JiQqbHNwp4gyjLNmh5W1aiz69Go48aDnPhgGyhuOxaq
+	 3Go2eceiPz10Q==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH v3 0/8] Improve zoned (SMR) HDD write throughput
+Date: Fri, 27 Feb 2026 10:49:43 +0900
+Message-ID: <20260227014951.2327711-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250619111806.3546162-3-yi.zhang@huaweicloud.com>
- <20260225000531.3658802-1-robertpang@google.com> <7d2a3f65-4272-46c1-991a-356f0d2323cb@huaweicloud.com>
- <CAJhEC05L7QEc9iY7gFZVK3SPYvFhtFyURss6xQgZ-qWwZZkFjA@mail.gmail.com> <8a45c55f-8abe-4cdf-be70-208550edf320@huaweicloud.com>
-In-Reply-To: <8a45c55f-8abe-4cdf-be70-208550edf320@huaweicloud.com>
-From: Robert Pang <robertpang@google.com>
-Date: Thu, 26 Feb 2026 17:34:38 -0800
-X-Gm-Features: AaiRm52oy9vcXDycCt3HX0a8oowZo0wXmgzHk3BLllBwVjMbefXMCEMxh3i5upc
-Message-ID: <CAJhEC04Vpo96SKN7iRjV0fUKXEj3oQ698RdoVAdWjRjVLpgvGw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/9] nvme: set max_hw_wzeroes_unmap_sectors if device
- supports DEAC bit
-To: Zhang Yi <yi.zhang@huaweicloud.com>
-Cc: Zhang Yi <yi.zhang@huawei.com>, bmarzins@redhat.com, brauner@kernel.org, 
-	chaitanyak@nvidia.com, chengzhihao1@huawei.com, djwong@kernel.org, 
-	dm-devel@lists.linux.dev, hch@lst.de, john.g.garry@oracle.com, 
-	linux-block@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, martin.petersen@oracle.com, 
-	shinichiro.kawasaki@wdc.com, tytso@mit.edu, yangerkun@huawei.com, 
-	yukuai3@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Dear Zhang Yi
+Jens,
 
-On Thu, Feb 26, 2026 at 3:09=E2=80=AFAM Zhang Yi <yi.zhang@huaweicloud.com>=
- wrote:
->
-> On 2/26/2026 5:43 AM, Robert Pang wrote:
-> > Dear Zhang Yi
-> >
-> > Thank you for your quick response. Please see my comments below:
-> >
-> > On Tue, Feb 24, 2026 at 6:32=E2=80=AFPM Zhang Yi <yi.zhang@huaweicloud.=
-com> wrote:
-> >>
-> >> Hi Robert!
-> >>
-> >> On 2/25/2026 8:05 AM, Robert Pang wrote:
-> >>> Dear Zhang Yi,
-> >>>
-> >>> In reviewing your patch series implementing support for the
-> >>> FALLOC_FL_WRITE_ZEROES flag, I noted the logic propagating
-> >>> max_write_zeroes_sectors to max_hw_wzeroes_unmap_sectors in commit 54=
-5fb46e5bc6
-> >>> "nvme: set max_hw_wzeroes_unmap_sectors if device supports DEAC bit" =
-[1]. This
-> >>> appears to be intended for devices that support the Write Zeroes comm=
-and
-> >>> alongside the DEAC bit to indicate unmap capability.
-> >>>
-> >>> Furthermore, within core.c, the NVME_QUIRK_DEALLOCATE_ZEROES quirk al=
-ready
-> >>> identifies devices that deterministically return zeroes after a deall=
-ocate
-> >>> command [2]. This quirk currently enables Write Zeroes support via di=
-scard in
-> >>> existing implementations [3, 4].
-> >>>
-> >>> Given this, would it be appropriate to respect NVME_QUIRK_DEALLOCATE_=
-ZEROES also
-> >>> to enable unmap Write Zeroes for these devices, following the prior c=
-ommit
-> >>> 6e02318eaea5 "nvme: add support for the Write Zeroes command" [5]? I =
-have
-> >>> included a proposed change to nvme_update_ns_info_block() below for y=
-our
-> >>> consideration.
-> >>>
-> >>
-> >> Thank you for your point. Overall, this makes sense to me, but I have =
-one
-> >> question below.
-> >>
-> >>> Best regards
-> >>> Robert Pang
-> >>>
-> >>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> >>> index f5ebcaa2f859..9c7e2cabfab3 100644
-> >>> --- a/drivers/nvme/host/core.c
-> >>> +++ b/drivers/nvme/host/core.c
-> >>> @@ -2422,7 +2422,9 @@ static int nvme_update_ns_info_block(struct nvm=
-e_ns *ns,
-> >>>          * require that, it must be a no-op if reads from deallocated=
- data
-> >>>          * do not return zeroes.
-> >>>          */
-> >>> -       if ((id->dlfeat & 0x7) =3D=3D 0x1 && (id->dlfeat & (1 << 3)))=
- {
-> >>> +       if ((id->dlfeat & 0x7) =3D=3D 0x1 && (id->dlfeat & (1 << 3)) =
-||
-> >>> +           (ns->ctrl->quirks & NVME_QUIRK_DEALLOCATE_ZEROES) &&
-> >>> +           (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM)) {
-> >>                                 ^^^^^^^^^^^^^^^^^^
-> >> Why do you want to add a check for NVME_CTRL_ONCS_DSM? In nvme_config_=
-discard(),
-> >> it appears that we prioritize ctrl->dmrsl, allowing discard to still b=
-e
-> >> supported even on some non-standard devices where NVME_CTRL_ONCS_DSM i=
-s not set.
-> >> In nvme_update_disk_info(), if the device only has NVME_QUIRK_DEALLOCA=
-TE_ZEROES,
-> >> we still populate lim->max_write_zeroes_sectors (which might be non-ze=
-ro on
-> >> devices that support NVME_CTRL_ONCS_WRITE_ZEROES). Right? So I'm not s=
-ure if we
-> >> only need to check for NVME_QUIRK_DEALLOCATE_ZEROES here.
-> >>
-> > The check for NVME_CTRL_ONCS_DSM is to follow the same check in [3]. Th=
-ere, the
-> > check was added by 58a0c875ce02 "nvme: don't apply NVME_QUIRK_DEALLOCAT=
-E_ZEROES
-> > when DSM is not supported" [6]. The idea is to limit
-> > NVME_QUIRK_DEALLOCATE_ZEROES
-> > to those devices that support DSM.
-> >
->
-> OK.
->
-> >>>                 ns->head->features |=3D NVME_NS_DEAC;
-> >>
-> >> I think we should not set NVME_NS_DEAC for the quirks case.
-> >>
-> > Make sense. In that case, will it be more appropriate to set
-> > max_hw_wzeroes_unmap_sectors in nvme_update_disk_info() where
-> > NVME_QUIRK_DEALLOCATE_ZEROES is checked? I.e.
-> >
-> > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> > index f5ebcaa2f859..3f5dd3f867e9 100644
-> > --- a/drivers/nvme/host/core.c
-> > +++ b/drivers/nvme/host/core.c
-> > @@ -2120,9 +2120,10 @@ static bool nvme_update_disk_info(struct
-> > nvme_ns *ns, struct nvme_id_ns *id,
-> >         lim->io_min =3D phys_bs;
-> >         lim->io_opt =3D io_opt;
-> >         if ((ns->ctrl->quirks & NVME_QUIRK_DEALLOCATE_ZEROES) &&
-> > -           (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM))
-> > +           (ns->ctrl->oncs & NVME_CTRL_ONCS_DSM)) {
-> >                 lim->max_write_zeroes_sectors =3D UINT_MAX;
-> > -       else
-> > +               lim->max_hw_wzeroes_unmap_sectors =3D UINT_MAX;
-> > +       } else
-> >                 lim->max_write_zeroes_sectors =3D ns->ctrl->max_zeroes_=
-sectors;
-> >         return valid;
-> >  }
-> >
->
-> Yeah, it looks good to me.
+This patch series cleans up the zone write plugging code and introduces
+the ability to issue all write BIOs from a single context (a kthread)
+instead of allowing multiple zones to be written at the same time using
+a per zone work. As shown in patch 6, raw block device tests and XFS
+tests with an SMR HDD show that this can significantly increase write
+throughput (up to 40% over the current zone write plugging).
 
-Thank you for your confirmation. I will follow up and submit the patch
-to other maintainers for their review.
+Changes from v2:
+ - Modified patch 1 slightly to not restore dead zones and instead check
+   for such state in the BIO submission path and fail BIOs that are
+   submitted to dead zones as that represents an erroneous use of zones.
+ - Added patch 3
+ - Added review tags.
 
-Best regards,
-Robert
+Changes from v1:
+ - Reworked patch 1 to remove the fragile use of refcount_read. Zone
+   write plug removal is now more solid by being controlled with
+   refcount_dec_and_test().
+ - Changed patch 2 to keep the refcount increase before scheduling the
+   BIO work but drop that reference if scheduling the work did nothing.
+ - Dropped the patch "block: remove BLK_ZONE_WPLUG_UNHASHED" as the
+   patch 1 changes make it unnecessary.
+ - Modified patch 5 to have the zoned_qd1_writes attribute visible only
+   for zoned block devices.
+ - Added review tags
 
-> Best regards,
-> Yi.
->
-> > Best regards
-> > Robert
-> >
-> >> Cheers,
-> >> Yi.
-> >>
-> >>>                 lim.max_hw_wzeroes_unmap_sectors =3D lim.max_write_ze=
-roes_sectors;
-> >>>         }
-> >>>
-> >>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t/commit/?id=3D545fb46e5bc6
-> >>> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t/tree/drivers/nvme/host/nvme.h#n72
-> >>> [3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t/tree/drivers/nvme/host/core.c#n938
-> >>> [4] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t/tree/drivers/nvme/host/core.c#n2122
-> >>> [5] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t/commit/?id=3D6e02318eaea5
-> > [6] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
-commit/?id=3D58a0c875ce02
->
+Damien Le Moal (8):
+  block: fix zone write plug removal
+  block: fix zone write plugs refcount handling in
+    disk_zone_wplug_schedule_bio_work()
+  block: rename and simplify disk_get_and_lock_zone_wplug()
+  block: remove disk_zone_is_full()
+  block: rename struct gendisk zone_wplugs_lock field
+  block: allow submitting all zone writes from a single context
+  block: default to QD=1 writes for blk-mq rotational zoned devices
+  Documentation: ABI: stable: document the zoned_qd1_writes attribute
+
+ Documentation/ABI/stable/sysfs-block |  15 +
+ block/blk-mq-debugfs.c               |   1 +
+ block/blk-sysfs.c                    |  46 ++-
+ block/blk-zoned.c                    | 402 +++++++++++++++++----------
+ include/linux/blkdev.h               |  10 +-
+ 5 files changed, 323 insertions(+), 151 deletions(-)
+
+-- 
+2.53.0
+
