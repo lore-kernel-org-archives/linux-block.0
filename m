@@ -1,212 +1,194 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020087.outbound.protection.outlook.com [52.101.196.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0978405F7
-	for <linux-block@vger.kernel.org>; Sun,  1 Mar 2026 13:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772370020; cv=none; b=syp40pg6Pu1XR3ctcIgeaBRSb3rlT4vWwdWvnBGSFNQsBPKEEWGDmvizZR4IEBUtu3D3jqwA7H5cS4zYcIRGmY3cwn5txIN4tDO9MqnOOQtWfZWNcRdtUmO0S2IxV/JD1qjdNGsedo8mINbwRYd9+Q7uTi0U7y9SybSdqNxAr8I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772370020; c=relaxed/simple;
-	bh=bs2SoH4NL5vP1/Fhp8iLu2szzE/T0jrgT4pBBwflQIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pegFmH3iyt7bpMsYgiHbZgW5ALkRmIRExAW1Oj0CQgvn50ZguaF3ZniHl6dExcBzJ4kerPFuIkLh0VLZXeR0mrEb4bLyTa654vJ1XdsvU0hy3qfhmMRFREQyreEjQJOdn3cVgFcKGM1pFNxv+dAR9BcM9h/Ozs+f2KW54flZbIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=D1vRpGRM; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7431327C08;
+	Sun,  1 Mar 2026 13:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772371582; cv=fail; b=UMwFC0mH7u480dXCk/+DWz0DqvnUXhnZ1rPUXs7Hc3vtFFvDooa9gRI2dKsTrV2iC6cK+8Odr8az+D8dEkkmScV7Kg7JtN/28hhcgoxwQCFTKeysHefKZZ8u55AAwuBMVm11bPsTSIXpvCRqV6hCB/9vg6BGkHl2LIiKxXWM1X4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772371582; c=relaxed/simple;
+	bh=SabPlY97MDTqwed4UL9138Wiz9nWMG0T+S9M9FXSUfU=;
+	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
+	 In-Reply-To:MIME-Version; b=CNWWVbg7sQl777fehl5u3KFA6hkfbx4Fo6vWO622ydYOcWFJ62hLjQIz7NKxBJrVm/7pxqgT8KbJ6motmERBZo/NYbZLuxZdqFOyqmMIJiMYtnNp/UK9UUwo5gubhUnBOquq4SgXkwO7/emvVie7vtuxwHoI7p+NvigqqWloVnk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=Se1ukJx+; arc=fail smtp.client-ip=52.101.196.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="D1vRpGRM"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 621CvUwe969840;
-	Sun, 1 Mar 2026 12:59:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=zmYlCa/Vb+t+5MB8ckfY7ZXc0LOBTtTf6xO+nKfTj
-	NA=; b=D1vRpGRMeksZbKRtrsajCAc2jr+HDiSh+Lq2e7LdAkK0WXWkHwR60eZgx
-	yxRjdyTalrxhF5gmeTL3McRT9dPZhwBHlAOslVm3wzqlC5gPHwysHzJE0VBoSyiN
-	Wo/5R+4RTuqe3VnocDz2vDw2ZRiihnEgBTlPYKGtTyiYmhBjziCYohI0+cTUwxRR
-	DjiHguelM8y1WPDl7ovWHTCABdqUEvdRuVZUHyVDsn/uQvT72HYkE5sug9nq3Kio
-	ubf3Pz/LwhLKqNWF5YAd8qxk4L7Q67fsJqAIpzEFQXXrOGjx8o+rhBBEtftQCUci
-	8V0qSIxabpjH6+1YopW9xyXKWk7kA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ckskbk5mm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 01 Mar 2026 12:59:58 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 621CHNc5003210;
-	Sun, 1 Mar 2026 12:59:57 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmb2xsury-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 01 Mar 2026 12:59:57 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 621Cxtcq49676608
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 1 Mar 2026 12:59:55 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9AE7B20049;
-	Sun,  1 Mar 2026 12:59:55 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3CFC920040;
-	Sun,  1 Mar 2026 12:59:53 +0000 (GMT)
-Received: from li-a84c74cc-2b13-11b2-a85c-acdd023f0674.ibm.com.com (unknown [9.39.31.206])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Sun,  1 Mar 2026 12:59:53 +0000 (GMT)
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com, yi.zhang@redhat.com,
-        yukuai@fnnas.com, shinichiro.kawasaki@wdc.com, gjoyce@ibm.com
-Subject: [PATCHv2] block: break pcpu_alloc_mutex dependency on freeze_lock
-Date: Sun,  1 Mar 2026 18:29:43 +0530
-Message-ID: <20260301125951.582690-1-nilay@linux.ibm.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="Se1ukJx+"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Az72xLEE1mi1Yj3AyQQTEtLaJLa080h2nKM9DWz6/MsqtuOQpdAGOfzZOpYPvPGSTfsaNHYbHRCCKrgmnFUxjaOx/8HGfRgVUNBORgS1LT50oRmXwoYWomngBlU2FNx8rnFS5oO3M6r6IkE7CGk+PrvecGTmZPe325LF9+TZWx49m2+MJbHAsqW9a1e35+f1zt79gs+SfYeDToR317UiSxEi5gwjGk0/oR51qw0uCxzyYf/QSO3IAmyAajxsvz8X+fdYtQS2YBip9wahY12klW2boWXrEVt5TME7oALkqut1hsUtsDHXLJnipHgn+Iry9jDOmj168URXfHyX1ABHEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+g/lR3Xw+DDAZVO+yaZkupin8NEPozqTdB7sa1zk22o=;
+ b=RXX28GDABlICIVLb/gQRRaLk9bzTZAzGyeLsE+s5Nzf38fBs4lvCMvbVwzWNvydoL5347MfTmLWr4EUKKypFc/wS05HcPW/sj5wYQQwuapvTuOgUANQH8ezP7c3Cp772GnpBfZB7ju1aXtv2MQTcbDkiLtZ1B5c5W+PdIXLKlHMAFGvD0/tyieEbBjpYnyUCnoNf5Okpko0IVSwn1YaXBLb5pD1RXL6ZmIFPACNpPIXYwSv7oT0FrcXbO3ftAVZu5d/PiKtoKk5/izek8bYWqzN3QxICpU7BB47ZAYon7E37UwKI2nRml+pVPbZqWSgLBQuNxgTDIdnp5EnmFaRWqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+g/lR3Xw+DDAZVO+yaZkupin8NEPozqTdB7sa1zk22o=;
+ b=Se1ukJx+SnZ6383OleWh1YOxUyT20flP5coJ7KnwOMfJA2FWYg8gqKhtsZ0UOxhRAbfYeQNI7u8cX00qTC5VNWpIX28RRol92tV0ikjdnSQODmJhJipv7uZbRdLEFqaXL15NZgppoP0ySbVlZYZCiuDv0dAPolBO2THA7DtNoOw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by LO4P265MB3647.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:1bf::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.20; Sun, 1 Mar
+ 2026 13:26:19 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%5]) with mapi id 15.20.9654.015; Sun, 1 Mar 2026
+ 13:26:19 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sun, 01 Mar 2026 13:26:18 +0000
+Message-Id: <DGRHAEM7OFBD.27RUUCHCRHI6K@garyguo.net>
+Cc: <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <linux-block@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, <linux-fsdevel@vger.kernel.org>,
+ <linux-mm@kvack.org>, <linux-pm@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>
+Subject: Re: [PATCH v16 01/10] rust: alloc: add `KBox::into_nonnull`
+From: "Gary Guo" <gary@garyguo.net>
+To: "Andreas Hindborg" <a.hindborg@kernel.org>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <lossin@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross"
+ <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Dave Ertman"
+ <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Paul Moore" <paul@paul-moore.com>, "Serge
+ Hallyn" <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
+ <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>, "Igor Korotin"
+ <igor.korotin.linux@gmail.com>, "Daniel Almeida"
+ <daniel.almeida@collabora.com>, "Lorenzo Stoakes"
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ "Viresh Kumar" <vireshk@kernel.org>, "Nishanth Menon" <nm@ti.com>, "Stephen
+ Boyd" <sboyd@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Boqun
+ Feng" <boqun@kernel.org>, "Vlastimil Babka" <vbabka@suse.cz>, "Uladzislau
+ Rezki" <urezki@gmail.com>
+X-Mailer: aerc 0.21.0
+References: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
+ <20260224-unique-ref-v16-1-c21afcb118d3@kernel.org>
+In-Reply-To: <20260224-unique-ref-v16-1-c21afcb118d3@kernel.org>
+X-ClientProxiedBy: LO4P123CA0480.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a8::17) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: fa7qgYpAwYlmC3yBTTex3DG_0o4FZdb0
-X-Authority-Analysis: v=2.4 cv=b66/I9Gx c=1 sm=1 tr=0 ts=69a4384e cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=V8glGbnc2Ofi9Qvn3v5h:22 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=20KFwNOVAAAA:8
- a=VnNF1IyMAAAA:8 a=0ddmZlBLnuk0VgvrfPYA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAxMDExNCBTYWx0ZWRfX69Qf6A7vLB5s
- 3L67gRTEMqOw/Hmm/xVLp3s4tOCu719ARjXeMjXgAbZpBIO283wkf7IIlxXhnBU4l/sMTU/VaUi
- QQUaKS6MBddXQmerTC+mumxfvPC4mqmEdoMtVykUnliYPwxLKaX3lG2HKG72Ec7t2IypxcT8QF1
- 6UfT+LqnIjdhQhAuByBBtRbLEwv0PNSTPAK7Zm553RHBWwN5oRuYQJf/9gk3BbdUgrNszfGpDp0
- /mmTvBaiTYxktbsw3M2z160h3Gr+0e1TC8R8NjHa9PlGkVlh2oN/MKyYNuWWr62yxVSRJYMud7S
- 5ag7w4WfzpvE8XTTCvVdtNkkMgMCFEy5VxTj81CVcZgpsCKMU4TWN1gL50jd5LL4sBgDWs0lu6g
- K43lTvF7RKm6YlqTyjlhQ6C1HIbYkk1XLHUAOjip6q7bGa7ndabQGZMslci8xbAH4daziBlT3Kn
- 6hvd1MV/pnomhkNFJXw==
-X-Proofpoint-GUID: fa7qgYpAwYlmC3yBTTex3DG_0o4FZdb0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-01_01,2026-02-27_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015 adultscore=0
- bulkscore=0 impostorscore=0 malwarescore=0 spamscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603010114
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO4P265MB3647:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d8fb033-a2c8-41cb-d0fa-08de77961f76
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|10070799003|921020|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	GFWpL0xljursFFSK8xcXUJ2sfAMA7oOgG1HLu+Y9yQ75CSpN3sglPzNhOWKJFQhZIAfyGiiQNnfbKngNKutvH7lV+iJBKftqjpl995oa/yUYkWnhcT45IOEKgFooy+10+885xQwXr4HPDigRDjsRtzP31CsTtDJt7E9TCr/TyVpIsqZj7G6OJ6LMxIpbLT8+gyon7g8i7aw8s+Wd91QRvH2QIvtEYUevmAMfauYAYIAAJ/Br82alsghHrsp3fMmsyHfyr7mvfKIEAU+qnCq+TxgfUrMipRf5/Yp3f0S4NDK9lOXFSluxTpSu3wFIjVK6sH2T41wkJ7l0WVm2SHz30PZmHH4IC7RFP7vKqkKna0YPs22pgipCoyRdwConIsPjHtR/PCcCuf1t04WqLFFwYEbu+b7GdPsPuLE99YHpXbfXK15HGzUafp/nDja53rZhmf+QNY+FI9G4stFPVgFfzYlQEFf9IFlRCkWicCgXg4SHmzHT4bvcL53htScU2Jp4Nl9SrCW957rYVek2+ilN1QTJ46iIjRxV6XVrN4/sgOBeO9USn644c8SmmRJBmFF/5dvoxtf2x+HLOBdg/RQdhA5zrK35hoSqCew+wr9T9It9yKUve+vFgyfRVbr+3GwDobZDdo2Jhbea9MrxAeyKMWAXBJmhdUDdwP2lisS2HMFj5dUEb2+ECSX/oKE8I6yfFhwOdiFn3BUBVLpWBS/uhmpstCv8y8ERb+g19Ib2ucnnjWgTxYmosJQYk5J9hHVQKluvh05HtaeF7djTal8C/g==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(10070799003)(921020)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MWpndU5VZ3hEZXN3eVp0S0RsaU1EcldlLzJxS0JoMnBSWFdZd1A3b1M3ODUz?=
+ =?utf-8?B?NnliNjd1NElrOEZBak5ra1hYVUtVelhKRGwzaS9YejJROVkwS25UUzhEcVRF?=
+ =?utf-8?B?TThoMXV6Z2FhVURycG92QVU2QTJsR0ZXNDZkTnZGUVNwbHdneGIwMXdMQzhQ?=
+ =?utf-8?B?dDgvWm4wLzduRUQ3Smo0aVpLZ2d6c0xJNTQvdW1BL1NtUHNreVBONG9SbmFM?=
+ =?utf-8?B?OUZFd0dSR2hkWm5zMDhmNFZwc1BBVUg0QUZ5TmFpUlprM2xBSFFydUNrV3Nt?=
+ =?utf-8?B?TmpSYjk0Y21PK1FFQUgxVHcvbWtWdzVOb2MvUFJERkFFK1dtZHF1RGgxSVRl?=
+ =?utf-8?B?OUx2MU9ZN1VoVHgzbGYwRll4OERRMEhxZUlYVzBkV3NMTFRKUk05TVlLdEZ6?=
+ =?utf-8?B?ZUE3ajAydzVkVEFZcGp4bXQ3TzhpSDhGS0U2UGZSZklVeFExVlRta2NjOFlD?=
+ =?utf-8?B?ZnROVGRZUlpHSHUzcTQ0NkFOSG9WVi9Fc2tScDlEUFlINWR2cDBoejJNQnBB?=
+ =?utf-8?B?TnVnYURMQm5jM2hraDNNUXQ1dkFaakJGTS9hZ0Roanp6U3dMczFzeDd2OFQ3?=
+ =?utf-8?B?dllUcFdBWXVvNXFSYzJJQXZPOUd5U21icU5CZTkyN2lnTHFDeGRwVEFnZHhJ?=
+ =?utf-8?B?Qk1KTWlhenJCbmJjWFUvd1c3UFVvYTRvSXVOR3E5VW5MYkE1THlVZ0UvVlNu?=
+ =?utf-8?B?Z1VUaDJRQngzU1BUeS8yUDZ4ZUJrZkN6UUY0SnQ0eVJjUXpwcU0zTG9NN2tU?=
+ =?utf-8?B?TURZRVJ0M24zSFdDNW5PWWF5Ry8yUk1LZXZVbHVuTkNjQmlEQWRNdFl4Z3Qz?=
+ =?utf-8?B?QmI0TXdPMFpoaXJoWEFxNkIxZzZrbWtLQnkxZXRldi96cm4rU0xQaHNXNnZa?=
+ =?utf-8?B?aDdkeWVGR3RFdGpMUytvd21pbStiUmN1TDU4T2FBR0dveHN1aSswQUo4NEtK?=
+ =?utf-8?B?cXhabllXNmNubnpmV1Y1VWkrc1JJOVU1OEFlbVQxclU5YTQ4YkV1dG0ybjlG?=
+ =?utf-8?B?YmQveGhCZDRjMjVqckdIbUQyMmVOV1dpT1RId3BoM1NwbmJpLzRrR0k5RmdK?=
+ =?utf-8?B?MituNklHMVE4d251S3ZuSmo1NFJSRDI1RWVnZHRTeHlud1NzZCtoWTYzd1hR?=
+ =?utf-8?B?blg0Qzg2NGJQakgyK2w3ZmtUaFBzVUNCMENMZzVkSENzYm9KV3ZyWmxDMlla?=
+ =?utf-8?B?SzlvZUJOaENPNHpENkdtREFlZjNiaGtmWXdCVHd0MDhRZUd1SGZOQU12ajZJ?=
+ =?utf-8?B?OW5STjY2aW16ZWNKM2pqTHpoeXB2U3RFRU04aVBMTFhnUCs1NlRpTlVNMXJs?=
+ =?utf-8?B?dU1rWEZLR0J0UU9wcldPMkpCTTVINk5Zbm1HdTFxTUZvN3pxcTlxOWlKRHVV?=
+ =?utf-8?B?ZHozSnpnWWY2eEtDSXNVUHlEWEYrU0tHS3RNdSsvcSs5eFRsZFZaVjJkTWJ0?=
+ =?utf-8?B?U3pNY2habTJoNFFzUjdDZkYzMHo2aVk4ejd4Z2kwNGltUTdaK2RFeXBzSktw?=
+ =?utf-8?B?RE9Icko3eUlZaWY2WEptazVjeEFqWUdWdlBudW15YzlZckFTV2hpK2dVRUxh?=
+ =?utf-8?B?a0ZHOTc5dUFxSm9mMVZBK1A3N1FoaFM5RFdWajRFN05uZ29KaEIvdGNKMWZL?=
+ =?utf-8?B?OHFhNy9JdTlHRVZmSTFXVGM0WVl6eGlIRnlrcWx6QU1paFdHcU8rZkxsbVlY?=
+ =?utf-8?B?UmZ0Y3Z0Q0JRaHhuNzlxemJrWUt2cFhsZ3BzRS9QelFaV05rZGtFWXlZbk41?=
+ =?utf-8?B?NVFOLzd6ek95cjU4aVVMTmJmUjNhOWVxYW1hQ0M2MjhEOHo2VjdXUSt2ZzRB?=
+ =?utf-8?B?dmFxcXBaV3VDY0V0bWNYVjhQTzRudklNSjlPaFp6cFpIVWZuQklHMCtwOENJ?=
+ =?utf-8?B?RXN5bHhORlNMZ0Fxcy9BSVpVNUJQSUhucHpuT0ZsY3lHb2RMU1llNlpRaUZz?=
+ =?utf-8?B?T2c3ODladWVDd003cTBmVFVZTlhTL094d0xocmZlSFFZaTl4SXFxekFoRUth?=
+ =?utf-8?B?cGk4a0d3TFdDUGpWZ2YyWEJZcWVScW1lOXNWUHllSjNFWXdzeVJHaEpDeGtn?=
+ =?utf-8?B?TTd4ZjlBTVBQeUYzOWlEV05DeUJpK05hM2JFRFRzcEVvcmQrTWdqd291empo?=
+ =?utf-8?B?d1dGWTlBVGk1d0wvM1Zvb3RzNHBHODVZTWYyRGpGVWp1M3hwNy9kTXlVb1lY?=
+ =?utf-8?B?V2RnM1RHNDUzOXNMVVVoMzZNR016d3NTUDZwenJBSy9NM2E1blh1ZUo1cUpp?=
+ =?utf-8?B?RWNvU090OXpzRkZzZ2E3Qi8xQ2dOTnlRS3NWaE8ydVZxSnRBdExWVm1zRWdw?=
+ =?utf-8?B?anh3R296SFVJdXdnQ2tzY2tnSDlJUTNRZUI1ZDAyRk9obkVjc1Y2UT09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d8fb033-a2c8-41cb-d0fa-08de77961f76
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2026 13:26:19.0582
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TsjA09eLwLNYItAwdRFrk5Hgzs8cZIN2JCPna+hBPlvajL7oa5/fFN1+v1TKkAp53esO/yksqbVs6ymGcS6SfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P265MB3647
 
-While nr_hw_update allocates tagset tags it acquires ->pcpu_alloc_mutex
-after ->freeze_lock is acquired or queue is frozen. This potentially
-creates a circular dependency involving ->fs_reclaim if reclaim is
-triggered simultaneously in a code path which first acquires ->pcpu_
-alloc_mutex. As the queue is already frozen while nr_hw_queue update
-allocates tagsets, the reclaim can't forward progress and thus it could
-cause a potential deadlock as reported in lockdep splat[1].
+On Tue Feb 24, 2026 at 11:17 AM GMT, Andreas Hindborg wrote:
+> Add a method to consume a `Box<T, A>` and return a `NonNull<T>`. This
+> is a convenience wrapper around `Self::into_raw` for callers that need
+> a `NonNull` pointer rather than a raw pointer.
+>
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> ---
+>  rust/kernel/alloc/kbox.rs | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/rust/kernel/alloc/kbox.rs b/rust/kernel/alloc/kbox.rs
+> index 622b3529edfcb..e6efdd572aeea 100644
+> --- a/rust/kernel/alloc/kbox.rs
+> +++ b/rust/kernel/alloc/kbox.rs
+> @@ -213,6 +213,14 @@ pub fn leak<'a>(b: Self) -> &'a mut T {
+>          // which points to an initialized instance of `T`.
+>          unsafe { &mut *Box::into_raw(b) }
+>      }
+> +
+> +    /// Consumes the `Box<T,A>` and returns a `NonNull<T>`.
+> +    ///
+> +    /// Like [`Self::into_raw`], but returns a `NonNull`.
+> +    pub fn into_nonnull(b: Self) -> NonNull<T> {
+> +        // SAFETY: `KBox::into_raw` returns a valid pointer.
+> +        unsafe { NonNull::new_unchecked(Self::into_raw(b)) }
+> +    }
 
-Fix this by pre-allocating tagset tags before we freeze queue during
-nr_hw_queue update. Later the allocated tagset tags could be safely
-installed and used after queue is frozen.
+Hi Andreas,
 
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Closes: https://lore.kernel.org/all/CAHj4cs8F=OV9s3La2kEQ34YndgfZP-B5PHS4Z8_b9euKG6J4mw@mail.gmail.com/ [1]
-Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
----
-Changes from v1:
-  - Make blk_mq_prealloc_tag_set_tags() return the tags pointer directly,
-    encoding error conditions using ERR_PTR(). Update caller to use IS_ERR()
-    to distinguish between success and failure. (Yu Kuai)
----
- block/blk-mq.c | 45 ++++++++++++++++++++++++++++++---------------
- 1 file changed, 30 insertions(+), 15 deletions(-)
+It looks like this patch and many others in the series are missing `#[inlin=
+e]`
+for quite a few very simple functions. Could you go through the series and =
+mark
+small functions as such?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9af8c3dec3f6..a27bade45de3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4793,38 +4793,45 @@ static void blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- 	}
- }
- 
--static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
--				       int new_nr_hw_queues)
-+static struct blk_mq_tags **blk_mq_prealloc_tag_set_tags(
-+				struct blk_mq_tag_set *set,
-+				int new_nr_hw_queues)
- {
- 	struct blk_mq_tags **new_tags;
- 	int i;
- 
- 	if (set->nr_hw_queues >= new_nr_hw_queues)
--		goto done;
-+		return NULL;
- 
- 	new_tags = kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_tags *),
- 				GFP_KERNEL, set->numa_node);
- 	if (!new_tags)
--		return -ENOMEM;
-+		return ERR_PTR(-ENOMEM);
- 
- 	if (set->tags)
- 		memcpy(new_tags, set->tags, set->nr_hw_queues *
- 		       sizeof(*set->tags));
--	kfree(set->tags);
--	set->tags = new_tags;
- 
- 	for (i = set->nr_hw_queues; i < new_nr_hw_queues; i++) {
--		if (!__blk_mq_alloc_map_and_rqs(set, i)) {
--			while (--i >= set->nr_hw_queues)
--				__blk_mq_free_map_and_rqs(set, i);
--			return -ENOMEM;
-+		if (blk_mq_is_shared_tags(set->flags))
-+			new_tags[i] = set->shared_tags;
-+		else {
-+			new_tags[i] = blk_mq_alloc_map_and_rqs(set, i,
-+					set->queue_depth);
-+			if (!new_tags[i])
-+				goto out_unwind;
- 		}
- 		cond_resched();
- 	}
- 
--done:
--	set->nr_hw_queues = new_nr_hw_queues;
--	return 0;
-+	return new_tags;
-+out_unwind:
-+	while (--i >= set->nr_hw_queues) {
-+		if (!blk_mq_is_shared_tags(set->flags))
-+			blk_mq_free_map_and_rqs(set, new_tags[i], i);
-+	}
-+	kfree(new_tags);
-+	return ERR_PTR(-ENOMEM);
- }
- 
- /*
-@@ -5113,6 +5120,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	unsigned int memflags;
- 	int i;
- 	struct xarray elv_tbl;
-+	struct blk_mq_tags **new_tags;
- 	bool queues_frozen = false;
- 
- 	lockdep_assert_held(&set->tag_list_lock);
-@@ -5147,11 +5155,18 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		if (blk_mq_elv_switch_none(q, &elv_tbl))
- 			goto switch_back;
- 
-+	new_tags = blk_mq_prealloc_tag_set_tags(set, nr_hw_queues);
-+	if (IS_ERR(new_tags))
-+		goto switch_back;
-+
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_freeze_queue_nomemsave(q);
- 	queues_frozen = true;
--	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
--		goto switch_back;
-+	if (new_tags) {
-+		kfree(set->tags);
-+		set->tags = new_tags;
-+	}
-+	set->nr_hw_queues = nr_hw_queues;
- 
- fallback:
- 	blk_mq_update_queue_map(set);
--- 
-2.53.0
+Thanks,
+Gary
+
+>  }
+> =20
+>  impl<T, A> Box<MaybeUninit<T>, A>
 
