@@ -1,177 +1,331 @@
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012055.outbound.protection.outlook.com [52.101.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE13212FAD;
-	Mon,  2 Mar 2026 08:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772440925; cv=fail; b=T+NmoWsYyMzYByPNZaxTA89nlTsw6n2PBxij0mk8+uwwK+Y9+cg7lwpqXNYlyTH9Yhl2J7kWY7268Lf8WrBlSYy+f/7Ih19NDQRUYjjubyZ3kFcVikVq6Qj9jRZpsF1aV/CCY1W4jMcPS/zI2TRGQXswEoG9RgCcOYue2GD9Crk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772440925; c=relaxed/simple;
-	bh=tTOYI9Vard7aA/LWIYgqL1ETu+a5nlV6xexTzZSSDXI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XJxouq/z9OCHNKSC7eVN28mc+pEsljQCZqMss9012gnr/cqGe9sWC41SuHyUbXwh7ye4mnDDz4KKHh7/yMRPavzJrOo+gJnd3Ab9koK9ZoxouqrZIUrH0NKY2Ql5Etz/+lZPXAgNDHc0xmx2NR2eywgQgDoii13ZM07LzxytsDU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nBqcXm3A; arc=fail smtp.client-ip=52.101.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58D938D006
+	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 09:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772442691; cv=none; b=gL5N/uKcKZYx+AzR38mjM2HLMsAZslGk1hQgoPmxoJxyy2keUdGKJ/hX6Y7XJjWv4VQ7631gXPCAomvXbzcy/nts0son1cca1CKikReHR8reFAqJBzAFjvxo2cQMtqMm90S5PvDHZ8n/hKhcsZpyTcZ6fgziRQ22ucE0BcNXna4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772442691; c=relaxed/simple;
+	bh=mvQLTwmrSD8dspK32eKTIahwi/9lhspVJ31hBeGRhCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A+tz4jHTKd2bWaGywV1hz/4Njl95Se8wCtIwzrOcXDAMPTSwpploObmaAWoEuO1C8w0H9ofUFomHutSWP38DEtTPuyxz9JNVPFxtMwwUS015UgD9hQyHwW95HFneYx06oVy/XGyMarw1JhOTZddnNbuy8TFK+9X12d3k3FfEu3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Gy3YI4c/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=vKrhrjxe; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=bOOHWhwH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Jl1vtw9k; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nBqcXm3A"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=M/yh+FDwSJOLbB/BuyGaX0kstUAv783ZsiQZ9hc8crzz2gk+wMGv8nmTVwMIuSa832NSPVoYSBt2blegEXITxOCF7nuGY5ciV4bcWn2uxJFWdPDD0KjwYHlC1DMYB2cDFo1soCoQeQ7jwaTrPk0PpuQiVK7VVmtYUyCcZHQ6GF/Uad+kOF9zVuNiDGdIg/i63LN8gexHCJPWo/oI7DIbLheuXr091hJaXN0jDlBsXGA8+44DQRL9Py66VdjISMK+LYhB9pb+m6kekhrINANY1XbF9l0b8oxzib+iuNLXoq5X/2CxwJssLpVkXOLySAuKoIL3gXs7NPT3CU7jhANZsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tTOYI9Vard7aA/LWIYgqL1ETu+a5nlV6xexTzZSSDXI=;
- b=L6yMMzx4lLClJNMTa/n/zwYoiHpUYUF2sGiL4tU9MatJWGZqT14gPqjnGJPdw0o/NvqO0SgtXp/QEs/uDfdpkjrTjNmMcpk4Hheu1cmwMW7OOt3mCpk0j7Jp5HqpEBe4SToBknscYJ+awLOt8GwXbGrPQKrBLjugp0Vlx17KlJxEiVJNQ3D9JFbu/hmeDe6AbIFIt8ioWZ8Wrb3xqUiOlE/h9fdCUpU3laZFfiyioSxekHnwEonldBsU4nS8Upw09W1JIg4qvlh98QZ6Pa9muj7ceJH+sHddHjeAJyPjMowYLhRIm6Y1vXnhrgm8XeoSWBttj8KiFHmX5pyQ6/XmgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tTOYI9Vard7aA/LWIYgqL1ETu+a5nlV6xexTzZSSDXI=;
- b=nBqcXm3Ap9aUlDHbhZsooA6KcnXhhTfV7DCQNjyB30LsA/ZOhh6bcgzzDZ+c2V1itrcOGONyp4CXcJjqXOx9vxfErPwt8f8TciGTlvo4mAI0aPCRTwyWgUlCJNWsOelVDmMVe7ZvmNyvnzpQTQEQQgZVToPEaRl4C00eD3EMFRkgztwniqBtJCfB4aWbLwrylBDemDZnIJQv9PUPjIblm+uFw0Wz546C/aw29l+Vtm8WJ4Hyyf6FMKVk46KwsiLC+7xQZJft705sa1XeAqqqClLs0vbm63bncPa5k78pCUYL7WrXaIDJHCKrpLlAo3M9EZDHcLpYFJWB1sA5d8y8xQ==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by DS5PPF5C5D42165.namprd12.prod.outlook.com (2603:10b6:f:fc00::64f) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.17; Mon, 2 Mar
- 2026 08:41:59 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::2109:679c:3b3e:b008]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::2109:679c:3b3e:b008%6]) with mapi id 15.20.9654.020; Mon, 2 Mar 2026
- 08:41:59 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Jens Axboe <axboe@kernel.dk>, "rostedt@goodmis.org" <rostedt@goodmis.org>
-CC: "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
-	"mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>,
-	"mhiramat@kernel.org" <mhiramat@kernel.org>, Chaitanya Kulkarni
-	<chaitanyak@nvidia.com>
-Subject: Re: [PATCH V2] blktrace: fix __this_cpu_read/write in preemptible
- context
-Thread-Topic: [PATCH V2] blktrace: fix __this_cpu_read/write in preemptible
- context
-Thread-Index: AQHcqdqrzEa0aI0kSkuxxWUm9NQAWbWawI8AgAAsmAA=
-Date: Mon, 2 Mar 2026 08:41:58 +0000
-Message-ID: <84f1e52c-7e70-4b98-8302-ca1f1e3db9fc@nvidia.com>
-References: <20260302002207.12165-1-kch@nvidia.com>
- <CAKb3OG_1yUUhLK8uHUxrYtnpph8jNr_j1kjivEWQ9VtkP-fRpQ@mail.gmail.com>
-In-Reply-To:
- <CAKb3OG_1yUUhLK8uHUxrYtnpph8jNr_j1kjivEWQ9VtkP-fRpQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|DS5PPF5C5D42165:EE_
-x-ms-office365-filtering-correlation-id: 61b8cac6-247e-454a-d6da-08de78379148
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|1800799024|10070799003|38070700021;
-x-microsoft-antispam-message-info:
- /IrVdN/EWdB0ci2GBiKNBY+Xc+mPkXU4+OHEozEzBRHje3o12vGi1bb3GWpdy0eju0k6sXHz69/cSOGvlcxPj34gNpfznwclTwWPmtV6KDKCVtjLtHauMBF++EHCqoh/ETOhKLIWJuLlknyzYasjA0/SJVFDUY4Ayk8aXp5y2OKOblxPLQB2/5DAzAkPYj1rVTaeCZ6RfRntHSTJGhomfGBbzl0LU3i967sSziDJDHEKsZCeQxZEVnuz1jQwfAAkTDidnUW78cbGVj5/nqUCMV5XeEFxDGyy+lcz1Sz4V8SY90Ndr45UrLRgRqo9KZNz8RiPvQ/qTxTCgTYI+bQ9JC0h3TT2CMMblbg4tfZMxfYYGi/947r59eTvThGHZmDC0E06ipi+iwNJmyoffh5XI7b/nODbcRc0pzI8EYTcsElMMa6Tf474fxBR+es6F2A9bsdsuFFw4yTKh9pVmOG6vz6u+5TqCVd19MyRiDQEzpQ8PXtxezPIoHd5dVnJPSoHDLBtPwh0VnjtPVfAwDUpvSZnSvAd6P1iFjt86/mFjE0m8GjrAy95TSTKWSBsq6M0h9Yi/Bf15g7c592kdG9jXwLXwZdz6jk/eV39I2gppZ33au68WtpqoRclkHoqCPWQLtz87JJMbA0PrDeyx3WMylBVYNRadaKDWZ4suTRPbD6NRzqyPQSrnWYWnahQ9RABNUT6Ew1+oz2n7ckrcloB8TjwcOYlkJ499hL3AI8frbHHI+yTKEKuPRVqRv3ZA5fId460R/+o7Lfyd3sTm7pBzFuaFJpk1Wkb6/BIraETM2E=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(10070799003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?NXRIeG1rU3hxM1RtS3RqN0NGQTFLZVVpMzRTUjFMSXVWVkZaektRK2hLejh2?=
- =?utf-8?B?YU1tbjRjR29GaEl4d3kwNTl5emFaYkQ5bkthaTk3L1l5NFp4Y1hnZm9mMVRF?=
- =?utf-8?B?UlpFU25EanRjWTlMR2RDb0NtSHFMZHRHL3dIMENVNFNiNVl1RWhRaks0eDBR?=
- =?utf-8?B?RStKNGhDRlZZM0w5amxJOFNrbDdQWENXeEw4Tk5MeDlpSmlHcmlHejZqUTBh?=
- =?utf-8?B?Y25xdEhJa1M5MnEwM1dFUjBpZkR0R0E4UnZIQzI1MndpZlVPU2EweXBjVTRk?=
- =?utf-8?B?UkZ6ZmtTTlZ5YjFvUmxsNzExc2thWExnaTNFd3FKUlAxZk85UE9IdVN5UnN5?=
- =?utf-8?B?djI0TFI4ZFB2MDQ3Qi8zckdpZURpTVlJZExvS0YzR1VkeFBKbWgvRFVKNXFX?=
- =?utf-8?B?Y2g0VVRlbmVHV0JGVzNva3BnMUpnSEZQd0tWQ29DUGwrd3d1emZMTXJUWUI0?=
- =?utf-8?B?RWg3a0UrME8wUklBNWJDWjgyR1ZXM2hZOCtuZ3pEYW8vOEF4YUNwM0ptenEx?=
- =?utf-8?B?UXpSTFJzZjkxYVduT1FRaFlCOUJmMWJQbk1CSHp4MGxqUXBQalV4UC9SVXdw?=
- =?utf-8?B?ZmFLaG01anFocEd3bUVRMU8ydUtKNWFrTWxSc1RYeFRWNHJNLzBtNlhPTUg4?=
- =?utf-8?B?a2I3RzVBNnNxSmFlRXhuRjJqZXJGdmRLeXRvMlRWZk1VaTR3cEduTlZVNlMy?=
- =?utf-8?B?bmF4M2ZDeFZ3VG5yMzVubTlTTWpVNnF4dUd0NEc4UFlReWlwSThwYUtFMERz?=
- =?utf-8?B?Y28ySFZqMjJkWWg5R2xyZ0VsSkpENytFbFRoaUdWV3ZjQ3FMRXZrbHM2amxO?=
- =?utf-8?B?MHErM1YrYWRUdW5hTDR6dExBVW5XQmRBYWRUaGNXQ3lFMmtCRmNONUJFYTBv?=
- =?utf-8?B?QjN2Z3E4c09Yc1Y1UzJnd0R5VFZNL3hJQnFrRzlXUVNiMEZibDd5R1Z0K1RW?=
- =?utf-8?B?Vk9mSUgrcW1WK0toRGxINjhkbnF0NFZ4Y1ZCcnhxVUU4ME14dDE5K0FTU0Nt?=
- =?utf-8?B?OWkyTGFiMVp3MzU4OC9DdFFwbUJsNmZFNEtNKzRrTDFHdUNObXNvTnVYMlZt?=
- =?utf-8?B?TGZjS1N2aHQ3NDB5Q0ZwUTI2K3U5SkdxeS9zek1tblJSbXlKc0I3ZmRvNVVO?=
- =?utf-8?B?eXN4bUo0d3Bvdnd0TDZFWEV6M2FHY2hUcXUwdTJMV1psRjJ1UDlpRmxucXJG?=
- =?utf-8?B?dHRYZlR5YUxvSWtXa041Z2hKZDVZMGFQLytWcE5VM1MwSVZHeWFzYXBjNzU2?=
- =?utf-8?B?dWxDekxWeW1GVVViSStEd1ZxTnh5cXE5cUtnRlRkVVkyTXk1NDlXdUgySTd0?=
- =?utf-8?B?Mi9PdFRtM1RWeDFzQitJY09zNlo1bXBFT1VPWTdKZlNEdUtVU2JrWDVRMjNK?=
- =?utf-8?B?TnUvQ1JWSnVsbzJvS3g0eTd1bWRuRXRmb0k5SktnYXV3dzBtaGxzNVBQdHQ1?=
- =?utf-8?B?M0VDTmovaS9laEZKclJQZVdOenVmVmtpM2pXTjR2dFluWVBpZTNGWUdvdDRi?=
- =?utf-8?B?bkY0V3hJQjgvSHgzdFBkamNDZWQ1dTBWL1FvRlhFai82M0tKWjlieThHMndk?=
- =?utf-8?B?L3BubHB2YVc5RUtHTTBSbGlJVERHaTJxQTVCaXhMR1JHUVhpSi9VSGJ0YUxu?=
- =?utf-8?B?Tys1bDZ5UzZSU2tFTjBENUVKRWpOM1BkQlFlZTBCWXhVVUtRa2Y2VGJTMnBN?=
- =?utf-8?B?OW1udmJjSzd0b25CL2ZyZ0JIU3lsQXl2eGxDV0VHbW5WN0VhQVZZZGJwYmpk?=
- =?utf-8?B?V0JKRGF4Ym5KZjBKc0hzL0F3RmxteEs0eFBndkpmZEQ3djhCNnJSYzRSam5w?=
- =?utf-8?B?cE9EbXUxZXlhVXo5dTNKREtvWkptc2JUbmdoN2JyM3ltU0NhUDFjbzdyZDcy?=
- =?utf-8?B?NldncnQ3M0RtT3hIWHBLczljVzNZbllTbTZvZnJJZXhLU1BHV1NDeGdaSWEy?=
- =?utf-8?B?WWNDcU5NL3htQk1IRVZ6Y0VaZmo4Wk5YQzJaTVp3L3hGOXRzbURpSUZVV05y?=
- =?utf-8?B?eTExVUJsQ09uSzlYZXZOcWhQbXFUK0ZyYnFRYXRuQ3VicmZaMlhKaDYwSGds?=
- =?utf-8?B?RHg3blhJZ2FEamhNZVJyQWRTZXl4WTZDU0tEbzVIMDlHL2RoazlUTkhJR1Zt?=
- =?utf-8?B?UW5UVytlRHFMVXhhY01PMmtTYlFRS2VXb1ZwT283TUNXM2tsa0VrUWxVcUdQ?=
- =?utf-8?B?QkZRMlF1NHQ4KzhDakl3aDdBQjFKYW5CWnlPQXFjYlZRS3JzYXJXSzFLQVZU?=
- =?utf-8?B?QUgyeURLR0tIRjM1cFdXbERPaGhhUmFacHl3YWtYTVBVd1FzMXEwd3lwMkwr?=
- =?utf-8?B?RTFPdi9oeHBxWXdsWlV2alczakRpTHVhRmp2cmV4a3Q3Nmoxd1FFN1NYdit0?=
- =?utf-8?Q?aopUmDTgA3e+44JEwy4dnkl4Sh0ClIxFGxrbFiszcYsvh?=
-x-ms-exchange-antispam-messagedata-1: FyZ2EGsWun1G7A==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E7D0B1F3ADE08D42862C3B6E007A78BA@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Gy3YI4c/";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="vKrhrjxe";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="bOOHWhwH";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Jl1vtw9k"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D28C83E847;
+	Mon,  2 Mar 2026 09:11:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1772442688; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vAnmRLMm8a2fR89ZeXIizBJSqoFgJNl3qhftcyIkWPs=;
+	b=Gy3YI4c/TA5IPlDYK/sR9YAq7mKf4gdDPZXpcrAycscCVHGhZ+MIbmoRz60ax+tZLE6VNI
+	VuiiOlNONvwt+fCCPsPOSpleSdUf6opje+n8qn7i+dUCXfDcdXCAwXLnRgdy+enHoNE6nD
+	O6ylxNNedFo1d/HFn8wt+Z8uspK4e3o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1772442688;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vAnmRLMm8a2fR89ZeXIizBJSqoFgJNl3qhftcyIkWPs=;
+	b=vKrhrjxeQ7Nv+IrOBKPcHIu8uF3ffMnbXQm2oJwIme8zxNGosBGXgsaQ69xARhqGjcGr9c
+	tb9x1hg/rmPBI9Dw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1772442687; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vAnmRLMm8a2fR89ZeXIizBJSqoFgJNl3qhftcyIkWPs=;
+	b=bOOHWhwHHl7EkUzBk5e9XNf9DdNQygJO1DSqd4VFEq4JKe2xShPDpedsnCxTtWye42Ukhd
+	qQ68F546vbiZObAyu3DiS0PBeIcSUMzNAsQyDKUP5EHxNEPsh4pu3raM4i3P6B1QeW7cm9
+	c6FZAsnUXJ1tsgyMhRFZr08ew6PPUKw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1772442687;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vAnmRLMm8a2fR89ZeXIizBJSqoFgJNl3qhftcyIkWPs=;
+	b=Jl1vtw9kkBwXJbPBFO2LkD5OfmmoruLfHAjXA1LmOzHqVpqBGmp86yyDD/OcXa1dS3HlXl
+	GJnbiyyY4xwSBHCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A56403EA69;
+	Mon,  2 Mar 2026 09:11:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Rp1eKD9UpWm/XgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 02 Mar 2026 09:11:27 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 56F97A0AAA; Mon,  2 Mar 2026 10:11:19 +0100 (CET)
+Date: Mon, 2 Mar 2026 10:11:19 +0100
+From: Jan Kara <jack@suse.cz>
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH RFC v3 1/2] filemap: defer dropbehind invalidation from
+ IRQ context
+Message-ID: <wen63cjbk3k54mjzgw7zftsuze6bzxmdk5u5wdjabzdiqg645k@67666k5lrevh>
+References: <20260227-blk-dontcache-v3-0-cd309ccd5868@columbia.edu>
+ <20260227-blk-dontcache-v3-1-cd309ccd5868@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61b8cac6-247e-454a-d6da-08de78379148
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2026 08:41:58.8572
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FtQQtUUk5pSPEq28CCTKTHBYwUU6U+jM0TiJPTDg9Op22AstX7R7DyLIkjB8AM04dwegaVXg2+NrdmTGPF9Lzg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPF5C5D42165
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227-blk-dontcache-v3-1-cd309ccd5868@columbia.edu>
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
+X-Spam-Level: 
 
-T24gMy8xLzI2IDIyOjAyLCBKZW5zIEF4Ym9lIHdyb3RlOg0KPiBPbiAzLzEvMjYgNToyMiBQTSwg
-Q2hhaXRhbnlhIEt1bGthcm5pIHdyb3RlOg0KPj4gRml4ZXM6IDdmZmJkNDhkNWNhYiAoInRyYWNp
-bmc6IENhY2hlIGNvbW1zIG9ubHkgYWZ0ZXIgYW4gZXZlbnQgb2NjdXJyZWQiKQ0KPiBJIGRvbid0
-IHVuZGVyc3RhbmQsIHRoaXMgZGF0ZXMgYmFjayB0byAyMDEyPw0KPg0KPiAtLQ0KPiBKZW5zIEF4
-Ym9lDQoNClRoZSBjb21taXQgYzcxYTg5NjE1NDExOSAoImJsa3RyYWNlOiBhZGQgZnRyYWNlIHBs
-dWdpbiIpIGFkZGVkDQp0cmFjaW5nX3JlY29yZF9jbWRsaW5lKCkgZGVmaW5pdGlvbiBmaXJzdC4N
-Cg0KVGhlbiBjb21taXQgN2ZmYmQ0OGQ1Y2FiICgidHJhY2luZzogQ2FjaGUgY29tbXMgb25seSBh
-ZnRlciBhbiBldmVudCBvY2N1cnJlZCIpDQp1cGRhdGVkIHRyYWNpbmdfcmVjb3JkX2NtZGxpbmUo
-KSBmdW5jdGlvbiB3aXRoICBfX3RyYWNlX2NwdV9yZWFkKCkgYW5kDQpfX3RyYWNlX2NwdV93cml0
-ZSgpLg0KDQpBYm92ZSBhZGRlZCBfX3RyYWNlX2NwdV9yZWFkKCkgd2hlbiB1c2VkIGluIHByb2Nl
-c3MgY29udGV4dCBpbiB0aGUgY2FsbA0KY2hhaW4gZnJvbSBzdGFydGluZyBibGtfYWRkX3RyYWNl
-KCkgaXMgcmVzdWx0aW5nIGluIHRoZSBzcGxhdCA6LQ0KDQpydW4gYmxrdGVzdHMgYmxrdHJhY2Uv
-MDAyIGF0IDIwMjYtMDItMjUgMjI6MjQ6MzMNCm51bGxfYmxrOiBkaXNrIG51bGxiMSBjcmVhdGVk
-DQoNCl9CVUc6IHVzaW5nIF9fdGhpc19jcHVfcmVhZCgpIGluIHByZWVtcHRpYmxlIFswMDAwMDAw
-MF0gY29kZTogZGQvMjUxNl8NCg0KY2FsbGVyIGlzIHRyYWNpbmdfcmVjb3JkX2NtZGxpbmUrMHgx
-MC8weDQwDQpDUFU6IDE2IFVJRDogMCBQSUQ6IDI1MTYgQ29tbTogZGQgVGFpbnRlZDogRyAgICAg
-ICAgICAgICAgICAgTiAgNy4wLjAtcmMxbGJsaysgIzg0IFBSRUVNUFQoZnVsbCkNClRhaW50ZWQ6
-IFtOXT1URVNUDQpIYXJkd2FyZSBuYW1lOiBRRU1VIFN0YW5kYXJkIFBDIChpNDQwRlggKyBQSUlY
-LCAxOTk2KSwgQklPUyByZWwtMS4xNy4wLTAtZ2I1MmNhODZlMDk0ZC1wcmVidWlsdC5xZW11Lm9y
-ZyAwNC8wMS8yMDE0DQpDYWxsIFRyYWNlOg0KPFRBU0s+DQpkdW1wX3N0YWNrX2x2bCsweDhkLzB4
-YjANCmNoZWNrX3ByZWVtcHRpb25fZGlzYWJsZWQrMHhjZS8weGUwDQp0cmFjaW5nX3JlY29yZF9j
-bWRsaW5lKzB4MTAvMHg0MA0KICBfX2Jsa19hZGRfdHJhY2UrMHgzMDcvMHg1ZDANCj8gbG9ja19h
-Y3F1aXJlKzB4ZTAvMHgzMDANCj8gaW92X2l0ZXJfZXh0cmFjdF9wYWdlcysweDEwMS8weGEzMA0K
-YmxrX2FkZF90cmFjZV9iaW8rMHgxMDYvMHgNCg0KWy4uLl0NCg0KSGVuY2Ugd2hlbiBfX3RyYWNl
-X2NwdV9yZWFkKCkgaXMgYWRkZWQgaW4gdGhlIHBhdGggZnJvbSBibGtfYWRkX3RyYWNlKCkNCnRo
-aXMgYnVnIHdhcyBpbnRyb2R1Y2VkIDdmZmJkNDhkNWNhYiA/DQoNCkkgdG90YWxseSBmYWlsZWQg
-dG8gdW5kZXJzdGFuZCB3aHkgdGhpcyBidWcgaXMgYXBwZWFyaW5nIHJpZ2h0IG5vdw0KdGhhbiBi
-ZWZvcmUuDQoNCi1jaw0KDQpPdGhlciByZWZlcmVuY2UgY29tbWl0cyA6LQ0KDQpUaGUgY29tbWl0
-IDJjYzYyMWZkMmU5YjgNCigidHJhY2luZzogTW92ZSBzYXZlZF9jbWRsaW5lIGNvZGUgaW50byB0
-cmFjZV9zY2hlZF9zd2l0Y2guYyIpDQptb3ZlZCB0aGUgbG9ja2RlcCB0byBuZXcgZmlsZS4NCg0K
-VGhlIGNvbW1pdCBjMGE1ODFkNzEyNmMwDQooInRyYWNpbmc6IERpc2FibGUgaW50ZXJydXB0IG9y
-IHByZWVtcHRpb24gYmVmb3JlIGFjcXVpcmluZyBhcmNoX3NwaW5sb2NrX3QiKQ0KQWRkZWQgbG9j
-a2RlcF9hc3NlcnRfcHJlZW1wdGlvbl9kaXNhYmxlZCgpIGluIHRyYWNlX3NhdmVfY21kbGluZSgp
-Lg0KDQoNCg==
+On Fri 27-02-26 11:41:07, Tal Zussman wrote:
+> folio_end_dropbehind() is called from folio_end_writeback(), which can
+> run in IRQ context through buffer_head completion.
+> 
+> Previously, when folio_end_dropbehind() detected !in_task(), it skipped
+> the invalidation entirely. This meant that folios marked for dropbehind
+> via RWF_DONTCACHE would remain in the page cache after writeback when
+> completed from IRQ context, defeating the purpose of using it.
+> 
+> Fix this by adding folio_end_dropbehind_irq() which defers the
+> invalidation to a workqueue. The folio is added to a per-cpu folio_batch
+> protected by a local_lock, and a work item pinned to that CPU drains the
+> batch. folio_end_writeback() dispatches between the task and IRQ paths
+> based on in_task().
+> 
+> A CPU hotplug dead callback drains any remaining folios from the
+> departing CPU's batch to avoid leaking folio references.
+> 
+> This unblocks enabling RWF_DONTCACHE for block devices and other
+> buffer_head-based I/O.
+> 
+> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+
+Thanks for the patch. Couple of comments below:
+
+> @@ -1613,26 +1617,131 @@ static void filemap_end_dropbehind(struct folio *folio)
+>   * If folio was marked as dropbehind, then pages should be dropped when writeback
+>   * completes. Do that now. If we fail, it's likely because of a big folio -
+>   * just reset dropbehind for that case and latter completions should invalidate.
+> + *
+> + * When called from IRQ context (e.g. buffer_head completion), we cannot lock
+> + * the folio and invalidate. Defer to a workqueue so that callers like
+> + * end_buffer_async_write() that complete in IRQ context still get their folios
+> + * pruned.
+> + */
+> +struct dropbehind_batch {
+> +	local_lock_t lock_irq;
+> +	struct folio_batch fbatch;
+> +	struct work_struct work;
+> +};
+> +
+> +static DEFINE_PER_CPU(struct dropbehind_batch, dropbehind_batch) = {
+> +	.lock_irq = INIT_LOCAL_LOCK(lock_irq),
+> +};
+> +
+> +static void dropbehind_work_fn(struct work_struct *w)
+> +{
+> +	struct dropbehind_batch *db_batch;
+> +	struct folio_batch fbatch;
+> +
+> +again:
+> +	local_lock_irq(&dropbehind_batch.lock_irq);
+> +	db_batch = this_cpu_ptr(&dropbehind_batch);
+> +	fbatch = db_batch->fbatch;
+> +	folio_batch_reinit(&db_batch->fbatch);
+> +	local_unlock_irq(&dropbehind_batch.lock_irq);
+> +
+> +	for (int i = 0; i < folio_batch_count(&fbatch); i++) {
+> +		struct folio *folio = fbatch.folios[i];
+> +
+> +		if (folio_trylock(folio)) {
+> +			filemap_end_dropbehind(folio);
+> +			folio_unlock(folio);
+> +		}
+> +		folio_put(folio);
+> +	}
+
+This logic of take folio batch and call filemap_end_dropbehind() for each
+folio repeats twice in this patch - perhaps we can factor it out into a
+helper function fbatch_end_dropbehind()?
+
+> +
+> +	/* Drain folios that were added while we were processing. */
+> +	local_lock_irq(&dropbehind_batch.lock_irq);
+> +	if (folio_batch_count(&db_batch->fbatch)) {
+> +		local_unlock_irq(&dropbehind_batch.lock_irq);
+> +		goto again;
+
+I'm somewhat nervous from this potentially unbounded loop if someone is
+able to feed folios into db_batch fast enough. That could hog the CPU for
+quite a long time causing all sorts of interesting effects. If nothing else
+we should abort this loop if need_resched() is true.
+
+> +	}
+> +	local_unlock_irq(&dropbehind_batch.lock_irq);
+> +}
+> +
+> +/*
+> + * Drain a dead CPU's dropbehind batch. The CPU is already dead so no
+> + * locking is needed.
+> + */
+> +void dropbehind_drain_cpu(int cpu)
+> +{
+> +	struct dropbehind_batch *db_batch = per_cpu_ptr(&dropbehind_batch, cpu);
+> +	struct folio_batch *fbatch = &db_batch->fbatch;
+> +
+> +	for (int i = 0; i < folio_batch_count(fbatch); i++) {
+> +		struct folio *folio = fbatch->folios[i];
+> +
+> +		if (folio_trylock(folio)) {
+> +			filemap_end_dropbehind(folio);
+> +			folio_unlock(folio);
+> +		}
+> +		folio_put(folio);
+> +	}
+> +	folio_batch_reinit(fbatch);
+> +}
+> +
+> +static void __init dropbehind_init(void)
+> +{
+> +	int cpu;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		struct dropbehind_batch *db_batch = per_cpu_ptr(&dropbehind_batch, cpu);
+> +
+> +		folio_batch_init(&db_batch->fbatch);
+> +		INIT_WORK(&db_batch->work, dropbehind_work_fn);
+> +	}
+> +}
+> +
+> +/*
+> + * Must be called from task context. Use folio_end_dropbehind_irq() for
+> + * IRQ context (e.g. buffer_head completion).
+>   */
+>  void folio_end_dropbehind(struct folio *folio)
+>  {
+>  	if (!folio_test_dropbehind(folio))
+>  		return;
+>  
+> -	/*
+> -	 * Hitting !in_task() should not happen off RWF_DONTCACHE writeback,
+> -	 * but can happen if normal writeback just happens to find dirty folios
+> -	 * that were created as part of uncached writeback, and that writeback
+> -	 * would otherwise not need non-IRQ handling. Just skip the
+> -	 * invalidation in that case.
+> -	 */
+> -	if (in_task() && folio_trylock(folio)) {
+> +	if (folio_trylock(folio)) {
+>  		filemap_end_dropbehind(folio);
+>  		folio_unlock(folio);
+>  	}
+>  }
+>  EXPORT_SYMBOL_GPL(folio_end_dropbehind);
+>  
+> +/*
+> + * In IRQ context we cannot lock the folio or call into the invalidation
+> + * path. Defer to a workqueue. This happens for buffer_head-based writeback
+> + * which runs from bio IRQ context.
+> + */
+> +static void folio_end_dropbehind_irq(struct folio *folio)
+> +{
+> +	struct dropbehind_batch *db_batch;
+> +	unsigned long flags;
+> +
+> +	if (!folio_test_dropbehind(folio))
+> +		return;
+> +
+> +	local_lock_irqsave(&dropbehind_batch.lock_irq, flags);
+> +	db_batch = this_cpu_ptr(&dropbehind_batch);
+> +
+> +	/* If there is no space in the folio_batch, skip the invalidation. */
+> +	if (!folio_batch_space(&db_batch->fbatch)) {
+> +		local_unlock_irqrestore(&dropbehind_batch.lock_irq, flags);
+> +		return;
+
+Folio batches are relatively small (31 folios). With 4k folios it is very
+easy to overflow the batch with a single IO completion. Large folios will
+obviously make this less likely but I'm not sure reasonable working of
+dropbehind should be dependent on large folios... Not sure how to best
+address this though. We could use larger batches but that would mean using
+our own array of folios instead of folio_batch.
+
+> +	}
+> +
+> +	folio_get(folio);
+> +	folio_batch_add(&db_batch->fbatch, folio);
+> +	local_unlock_irqrestore(&dropbehind_batch.lock_irq, flags);
+> +
+> +	schedule_work_on(smp_processor_id(), &db_batch->work);
+> +}
+> +
+>  /**
+>   * folio_end_writeback_no_dropbehind - End writeback against a folio.
+>   * @folio: The folio.
+> @@ -1685,7 +1794,10 @@ void folio_end_writeback(struct folio *folio)
+>  	 */
+>  	folio_get(folio);
+>  	folio_end_writeback_no_dropbehind(folio);
+> -	folio_end_dropbehind(folio);
+> +	if (in_task())
+> +		folio_end_dropbehind(folio);
+> +	else
+> +		folio_end_dropbehind_irq(folio);
+
+I think it would be more elegant to have folio_end_dropbehind() which based
+on context decides whether to offload to workqueue or not. Because
+folio_end_dropbehind() is never safe in irq context so I don't think it
+makes sense to ever give users possibility to call it in wrong context.
+
+>  	folio_put(folio);
+>  }
+>  EXPORT_SYMBOL(folio_end_writeback);
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
