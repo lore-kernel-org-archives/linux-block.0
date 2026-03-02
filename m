@@ -1,103 +1,108 @@
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF84B37C0F8
-	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 06:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772431362; cv=pass; b=F81F/eT5Sa0JUbS4SC/qaiTV9K7T7o2FnIhxUtrnkZfCya9h4ruVRnPNCtTftLpbtqo7G8Ja4sw34t6dnKwGaYWY6CZuXVNGj7PiZ2iKH4xCh/3NW7iifnKA4sTx/z1brO5hrbPFilLU1wsqcgtI/KbGbCbN7JQZGCZ3EF9wmiQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772431362; c=relaxed/simple;
-	bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HYldnEBIIWKEs0PnaIpNwHfpQoHazfKZXLK1J4ioxQfRsRTc+KEvzUC4kI6XfzIyLEekgifGLiFeoCLe8SsFWu/cOtNOaRmyRnYPqFAgWraTaS2IvxPRSSt74JQI3HBXSb6IA6zB7IMOU5oTC8oQtZgo74BkvJkzT3wAELkWNU4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JNqmYRkE; arc=pass smtp.client-ip=74.125.82.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E501D0DEE;
+	Mon,  2 Mar 2026 07:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772435943; cv=none; b=FSpihM9W3L0zhZNpk4UicboUqYGQJzQm2hMR8ENjmw16t1hdo/wq28OmSzCcm6CbEjgNzYrLm+UGS8BvyjnKYsnsgptVefU1ZrHMaLCn/KVU4mmj5Ag9qWJRKQ9xowjR6Xx5yX6xe9ziLN0JJ3XFsppdj2+d1eQ/HAgJi44uTl4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772435943; c=relaxed/simple;
+	bh=IWFUYHylqRFZaRm5r8RrLRDa3YLgSmjWVVLiN7LHGy4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=k5b/g0CzCTvCFTaHqUrg3lyz6k0fGNA3sK3tLcVfj7t3oXVdAg1MWxOlk91xsC4Cl6sX7fr/GHhnA0beONPhLYzs5PTieyRkvJueYTHR3hjYqZYpJ5Ui5OwtijYoaqGfoo0bFxHgeYG80WLRjes2Bnhnz4cxInFFy+lv4TSxxGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9ZaeF4a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JNqmYRkE"
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2bdc47747e2so3006818eec.0
-        for <linux-block@vger.kernel.org>; Sun, 01 Mar 2026 22:02:35 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772431354; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UCRh8nXf/6BKVjXH4hGuC8OKrZ5fu7IoAqxYfhVIsW9kj7FOa7oMAIx3XZBe6+UOOp
-         d6BdZDnPmXu8gD91a0iMu2dCrirjxyz2ynhrXNPuCt8hzeaOMOLoZY+4SWIcbuFpIEnA
-         VLJnkYrBxHnW4Bxzl1msUP36gq0GVzV8MUwGyQx9WygiO+IHEXxWuEZ08PLjX+wuUMd/
-         3J9xPJ5MRw60XIjuo/9dzDoCVGLHXKvy6e1SzSco9Lojf0uZuLvyUg4/CEzX5ff8eHEa
-         3abB5LsZgvWWbdsSTVjpLmbAlsPYqmxSk7qHQbnRpSTjFDdWjmMxXduBXhgwD4HA+lgH
-         Tpeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
-        fh=it9Tl9E0kVxdwGCeedR0XC+JPx4sv3+7ezMpHs4eM9E=;
-        b=cCaCm985txjlvCX8CshL+IfrVW6WqkH5c+Q2lXd1c7y5yHRZZbHrdJJ2vCridZ05j5
-         U3RYquBBJv8BhiuAtGPQaIu8X6JbfKUc1IIgWi4P5O/P5gSuL9WdUDW2hvR4Zjcm5onj
-         z/2r/8j/8fwNxl+SslemOuLfRau/UIlRAWoZebijY57YXQiat1Uvwif9F4VzwjwkN4ni
-         3Fa4vEQrW+BY/d/wu1ZbZPAg6CIGPhW28C2tt/A00WPCh+J3mIOpggP8y1sZUa6aq772
-         E3r9DGawHBvBOduGLaP9VNvdBjvPTtg3qtoxN9Egj4CobxbOLW7+t3Q73wYkJPpakusa
-         oWfw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772431354; x=1773036154; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
-        b=JNqmYRkEqX0bev5ZtyCq2ZhWTXrynvV9z1AhVO6s1tjrVZ1IVD+y8BKm1FoZlO9nb/
-         CkMJDUgHS+mUvMbZNR+bu3KqPQDc1ufJ5xWrDmVOG5S5JHwwMWgPFp4qPPY35jpSihdV
-         GsXPyQbQ/Mf2hlmjXCCF3VzZweTHLlX4h3Usqb0zZfSs1cHWPVWxVq9BY69NBJ6VYBp2
-         4SAKoaRkKtNZErTvgN/Dc8kojmpU8v9EGc7c8raqcopRQPSn3jagSHnxBFQ87MxeLxNt
-         Ol34550Yb8hhz8AIVH+rf9sWwd4Lm/FRnvEl+8bdeEJRaMQ/OtI/rP2+vKPwragU0zs/
-         PCQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772431354; x=1773036154;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
-        b=o/XeDI0C3lIV6/tY8bhAA1QV/az5L/Dto7u/EVAO2GVMoAlcnTwRU844S2CxFkPa/d
-         ivhZJO1JlGeC2QUgJnN54OJq3vaHmBDKvd+NYgwdf0VwXCyW8o/cdQDal3PF9dJyv3oJ
-         595JX/rGU4hF+QWv2RO5bv4WoUpYpu7oNmWEd3EAxdvk464JwIsv0RdDmD00RVllhnSB
-         53ziW18rRio4Qemr8lKohHTQypNXba836NNq/S/x3cuedBv7XJbZaqbKGrscN87ddppj
-         EvPjRsf4nrnerrJ7rokoxPvb4GGAsv00b4SvAJQ8tNNzsQCl8rjB/qg3E3A0km050h/U
-         SKPg==
-X-Forwarded-Encrypted: i=1; AJvYcCXXA3Sh7UAIFHeUJUrq9MWMqI5WzJI7AYMcKrKWA1QYUM5SY4HjQw8iJM1xh2gLq2nLNGqtGwNyrUu/9A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YybQToF8r11hg/nnTDOuezR4Dmx5z4eTf2gfjwESA6pmGSLEg8S
-	zfAVcub0SzX2Uj3t+wGW8JejvUe9SuaMxl5noPs+Z3BYoeIbl/tqpVY5QwHtYaSPxKvv/Y8TyeQ
-	8FMCIcS+tWByBFCptQKsN5GWRu6ksf10RWXrXXimX2NeImLoPIcaWNjA=
-X-Gm-Gg: ATEYQzy4EQ/X4fIc8Rk74ctbXvxB8SsUb2Oho/hg2E7pKL8OovZ6620qk6Te4PfCXn/
-	u+4USeDG1ekl0MbJLG3QRr/yCdk/J+I9LEYwfTIXxZ4fwTRg8asQZHB+NzOm/oaEMKgI2rKlaKj
-	18vhhWgC17MefAU5tRLDQzElkB2qVhAVZcBP4DuZBv/5Bb+P4OMQHUb3p5AFR+SA2ug1jFNBWYF
-	Cl+rU6hRz66RXxRKeik0mWw53MMwSZXuNvGeAsJ0PHd/F/dFMuZV2GtkoVV+TqdhAl+qfpK/pHv
-	nTAscd5JR0cci+27FG2L8TEk/tHkslo5hQrYDo+9NjMoFYaL9JhigVKjnEL0wogvfnhH7WZeSs3
-	ZWw==
-X-Received: by 2002:a05:7300:214f:b0:2ba:7069:686c with SMTP id
- 5a478bee46e88-2bde1be2e31mr3755376eec.17.1772431354342; Sun, 01 Mar 2026
- 22:02:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9ZaeF4a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D3EC19423;
+	Mon,  2 Mar 2026 07:18:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772435943;
+	bh=IWFUYHylqRFZaRm5r8RrLRDa3YLgSmjWVVLiN7LHGy4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=l9ZaeF4aPU2R5rFFz1KzYT2AzZwYDAcXSFOWGleyGX4IJCSYh3ey9X9MFaec25Jvt
+	 R41n5ogriJLHLbTnbAhRUlTENuE8zHqJZ4hmXfIoI14lQa1CZ833Zh2NufwlrmebRa
+	 uRquDMiQ7euErjNofmy94n80bTQAgtr9fYExYWtiCa7u6OSqVRwgJZtiI9fbt0Id5d
+	 X42If6KFdaneLbuS8GYtRtOBZ+FwIRmVTq7yyXCkl7+v+oM/ByWo3UXqtNZIjzLubr
+	 CxI1q1dwT1MHjvxnZsz6xERpo7UqyUz5qw5zjzCMpgHhrhI/5JG2NlqgMLZulaFmBF
+	 wrN8cEwrndjoQ==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Gary Guo <gary@garyguo.net>, Benno Lossin <lossin@kernel.org>, Gary Guo
+ <gary@garyguo.net>, Miguel Ojeda <ojeda@kernel.org>, =?utf-8?Q?Bj=C3=B6rn?=
+ Roy Baron
+ <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Trevor
+ Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman
+ <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, Leon
+ Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, Serge
+ Hallyn <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, David
+ Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Alexander
+ Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>, Igor Korotin <igor.korotin.linux@gmail.com>,
+ Daniel Almeida <daniel.almeida@collabora.com>, Lorenzo Stoakes
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, Stephen
+ Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Krzysztof
+ =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Boqun
+ Feng <boqun@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, Uladzislau
+ Rezki <urezki@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-security-module@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v16 01/10] rust: alloc: add `KBox::into_nonnull`
+In-Reply-To: <DGRQNTVD3N23.33347CYLKMKEH@garyguo.net>
+References: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
+ <20260224-unique-ref-v16-1-c21afcb118d3@kernel.org>
+ <eeDADnWQGSX9PG7jNOEyh9Z-iXlTEy6eK8CZ-KE7UWlWo-TJy15t_R1SkLj-Zway00qMRKkb0xBdxADLH766dA==@protonmail.internalid>
+ <DGRHAEM7OFBD.27RUUCHCRHI6K@garyguo.net>
+ <87ldgbbjal.fsf@t14s.mail-host-address-is-not-set>
+ <DGROXQD756OU.T2CRAPKA2HCB@garyguo.net>
+ <DGRPNLWTEQJG.27A17T7HREAF4@kernel.org>
+ <p7rsBPaYxHKSMFCYVUFY5hdI1H6jxHK0s7lxLQkqH4rylM6yS03Yt52SCjiTO5qBVUmc41ZHZ7XZ0_3w_U-O0g==@protonmail.internalid>
+ <DGRQNTVD3N23.33347CYLKMKEH@garyguo.net>
+Date: Mon, 02 Mar 2026 08:18:47 +0100
+Message-ID: <87ikbebsx4.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260302002207.12165-1-kch@nvidia.com>
-In-Reply-To: <20260302002207.12165-1-kch@nvidia.com>
-From: Jens Axboe <axboe@kernel.dk>
-Date: Sun, 1 Mar 2026 23:02:22 -0700
-X-Gm-Features: AaiRm52BMKBF_6fnIy2o9_Eq51EwXNhN6II0seQLIeXaZHlpvQk2HcLdy7tiHTQ
-Message-ID: <CAKb3OG_1yUUhLK8uHUxrYtnpph8jNr_j1kjivEWQ9VtkP-fRpQ@mail.gmail.com>
-Subject: Re: [PATCH V2] blktrace: fix __this_cpu_read/write in preemptible context
-To: Chaitanya Kulkarni <kch@nvidia.com>, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com
-Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-On 3/1/26 5:22 PM, Chaitanya Kulkarni wrote:
-> Fixes: 7ffbd48d5cab ("tracing: Cache comms only after an event occurred")
+"Gary Guo" <gary@garyguo.net> writes:
 
-I don't understand, this dates back to 2012?
+> On Sun Mar 1, 2026 at 7:59 PM GMT, Benno Lossin wrote:
+>> On Sun Mar 1, 2026 at 8:25 PM CET, Gary Guo wrote:
+>>> `#[inline]` is a hint to make it more likely for compilers to inline. Without
+>>> them, you're relying on compiler heurstics only. There're cases (especially with
+>>> abstractions) where the function may look complex as it contains lots of
+>>> function calls (so compiler heurstics avoid inlining them), but they're all
+>>> zero-cost abstractions so eventually things get optimized away.
+>>>
+>>> For non-generic functions, there is additional issue where only very small
+>>> functions get automatically inlined, otherwise a single copy is generated at the
+>>> defining crate and compiler run on a dependant crate has no chance to even peek
+>>> what's in the function.
+>>>
+>>> If you know a function should be inlined, it's better to just mark them as such,
+>>> so there're no surprises.
+>>
+>> Should we set clippy::missing_inline_in_public_items [1] to "warn"?
+>>
+>> [1]: https://rust-lang.github.io/rust-clippy/master/index.html?search=missing_inline_in_public_items
+>
+> That requires *all* public items to be `#[inline]` regardless the size, which is
+> excessive.
 
---
-Jens Axboe
+I was thinking something similar, in clippy or checkpatch.pl. If we
+should always have this attribute for small functions, we need to have a
+check.
+
+
+Best regards,
+Andreas Hindborg
+
+
+
