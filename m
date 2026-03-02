@@ -1,190 +1,103 @@
-Received: from sg-1-17.ptr.blmpb.com (sg-1-17.ptr.blmpb.com [118.26.132.17])
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5DB2D59E8
-	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 05:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.17
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772428291; cv=none; b=SbTNWWGMESOxg/3TFPsWMcJKWKu6QmhpoXrG+bVYtU1SDT9Tnd8gX63Jx4eFXbjcRfm+s7S7eP5yD2x89UHFpzwcxFUNUt9AQEgnU4h3IkWi0R00j1x5pgpluuT5ircJ0J3QfdDVt4Qsjudf29se1aryiNlFeoJZn+qMTI+tn3U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772428291; c=relaxed/simple;
-	bh=prQVDTPeOL7+0d46ysWRFR+lJl1MQfYpjil3cMDPYDY=;
-	h=From:Date:Content-Type:In-Reply-To:Message-Id:Mime-Version:Cc:
-	 References:To:Subject; b=DJRXMMbp5RzohbrL8G3jfDk6l/2sXKrCzzwfu8wccG2Im6QJdu538Pz70bZhWbPXXr8OyFmn2KmQJ1vDnoRD7nspygq55RAAU3WyOZXiYrYrKR2fZejwsqAQQwgOTSC13SUmALjos7Mb5stWugAVhFoYgOPUksCwDhhLMnE5CnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=WvZ4i9Nk; arc=none smtp.client-ip=118.26.132.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF84B37C0F8
+	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 06:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772431362; cv=pass; b=F81F/eT5Sa0JUbS4SC/qaiTV9K7T7o2FnIhxUtrnkZfCya9h4ruVRnPNCtTftLpbtqo7G8Ja4sw34t6dnKwGaYWY6CZuXVNGj7PiZ2iKH4xCh/3NW7iifnKA4sTx/z1brO5hrbPFilLU1wsqcgtI/KbGbCbN7JQZGCZ3EF9wmiQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772431362; c=relaxed/simple;
+	bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HYldnEBIIWKEs0PnaIpNwHfpQoHazfKZXLK1J4ioxQfRsRTc+KEvzUC4kI6XfzIyLEekgifGLiFeoCLe8SsFWu/cOtNOaRmyRnYPqFAgWraTaS2IvxPRSSt74JQI3HBXSb6IA6zB7IMOU5oTC8oQtZgo74BkvJkzT3wAELkWNU4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JNqmYRkE; arc=pass smtp.client-ip=74.125.82.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="WvZ4i9Nk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1772428281;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=vE+32WZBcGMy6O9LCnYiFZD++G5I1NHPdTs2FwUjXNE=;
- b=WvZ4i9NkwOPtr50Y2RdaKrZnGc7nlwfPjt8bY0Ua/NvCk8RrUAO8l0eM6M1V7kEKfEXIuu
- q8HvGJhvhOfCBj31uZTUiRnG33o/FiAYlUbmSmJNP5AlI/giee3ZrIFVF8FTZABw/KL3gV
- NHiC7x/W2U+nqB/n0NoKOa8yRl3BsnZQhIlH5ffWlk/JEa/xgYG/8PNIDiYaeAUSZ8+zAJ
- 3fLGOUXm9edn4NMXiXFokI7ojVmoXXpinC0aUno0M3lPCawO+BYLRViL1nANpL1V992NZs
- Ru8AUdpqTTZM87TT6bLf8QVdehDWcNRovFoEpLnPBKHA2xDaWMANKy1UhCjmyw==
-Reply-To: yukuai@fnnas.com
-From: "Yu Kuai" <yukuai@fnnas.com>
-Date: Mon, 2 Mar 2026 13:11:16 +0800
-Content-Type: text/plain; charset=UTF-8
-In-Reply-To: <20260301125951.582690-1-nilay@linux.ibm.com>
-Message-Id: <8eaab53b-6525-4a9f-9a4b-94ce7e7fc09f@fnnas.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JNqmYRkE"
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2bdc47747e2so3006818eec.0
+        for <linux-block@vger.kernel.org>; Sun, 01 Mar 2026 22:02:35 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772431354; cv=none;
+        d=google.com; s=arc-20240605;
+        b=UCRh8nXf/6BKVjXH4hGuC8OKrZ5fu7IoAqxYfhVIsW9kj7FOa7oMAIx3XZBe6+UOOp
+         d6BdZDnPmXu8gD91a0iMu2dCrirjxyz2ynhrXNPuCt8hzeaOMOLoZY+4SWIcbuFpIEnA
+         VLJnkYrBxHnW4Bxzl1msUP36gq0GVzV8MUwGyQx9WygiO+IHEXxWuEZ08PLjX+wuUMd/
+         3J9xPJ5MRw60XIjuo/9dzDoCVGLHXKvy6e1SzSco9Lojf0uZuLvyUg4/CEzX5ff8eHEa
+         3abB5LsZgvWWbdsSTVjpLmbAlsPYqmxSk7qHQbnRpSTjFDdWjmMxXduBXhgwD4HA+lgH
+         Tpeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
+        fh=it9Tl9E0kVxdwGCeedR0XC+JPx4sv3+7ezMpHs4eM9E=;
+        b=cCaCm985txjlvCX8CshL+IfrVW6WqkH5c+Q2lXd1c7y5yHRZZbHrdJJ2vCridZ05j5
+         U3RYquBBJv8BhiuAtGPQaIu8X6JbfKUc1IIgWi4P5O/P5gSuL9WdUDW2hvR4Zjcm5onj
+         z/2r/8j/8fwNxl+SslemOuLfRau/UIlRAWoZebijY57YXQiat1Uvwif9F4VzwjwkN4ni
+         3Fa4vEQrW+BY/d/wu1ZbZPAg6CIGPhW28C2tt/A00WPCh+J3mIOpggP8y1sZUa6aq772
+         E3r9DGawHBvBOduGLaP9VNvdBjvPTtg3qtoxN9Egj4CobxbOLW7+t3Q73wYkJPpakusa
+         oWfw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772431354; x=1773036154; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
+        b=JNqmYRkEqX0bev5ZtyCq2ZhWTXrynvV9z1AhVO6s1tjrVZ1IVD+y8BKm1FoZlO9nb/
+         CkMJDUgHS+mUvMbZNR+bu3KqPQDc1ufJ5xWrDmVOG5S5JHwwMWgPFp4qPPY35jpSihdV
+         GsXPyQbQ/Mf2hlmjXCCF3VzZweTHLlX4h3Usqb0zZfSs1cHWPVWxVq9BY69NBJ6VYBp2
+         4SAKoaRkKtNZErTvgN/Dc8kojmpU8v9EGc7c8raqcopRQPSn3jagSHnxBFQ87MxeLxNt
+         Ol34550Yb8hhz8AIVH+rf9sWwd4Lm/FRnvEl+8bdeEJRaMQ/OtI/rP2+vKPwragU0zs/
+         PCQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772431354; x=1773036154;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DnsZppuatu3gSfhyQneomEL62GRSWB4+vnT/LVj/eWU=;
+        b=o/XeDI0C3lIV6/tY8bhAA1QV/az5L/Dto7u/EVAO2GVMoAlcnTwRU844S2CxFkPa/d
+         ivhZJO1JlGeC2QUgJnN54OJq3vaHmBDKvd+NYgwdf0VwXCyW8o/cdQDal3PF9dJyv3oJ
+         595JX/rGU4hF+QWv2RO5bv4WoUpYpu7oNmWEd3EAxdvk464JwIsv0RdDmD00RVllhnSB
+         53ziW18rRio4Qemr8lKohHTQypNXba836NNq/S/x3cuedBv7XJbZaqbKGrscN87ddppj
+         EvPjRsf4nrnerrJ7rokoxPvb4GGAsv00b4SvAJQ8tNNzsQCl8rjB/qg3E3A0km050h/U
+         SKPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXXA3Sh7UAIFHeUJUrq9MWMqI5WzJI7AYMcKrKWA1QYUM5SY4HjQw8iJM1xh2gLq2nLNGqtGwNyrUu/9A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YybQToF8r11hg/nnTDOuezR4Dmx5z4eTf2gfjwESA6pmGSLEg8S
+	zfAVcub0SzX2Uj3t+wGW8JejvUe9SuaMxl5noPs+Z3BYoeIbl/tqpVY5QwHtYaSPxKvv/Y8TyeQ
+	8FMCIcS+tWByBFCptQKsN5GWRu6ksf10RWXrXXimX2NeImLoPIcaWNjA=
+X-Gm-Gg: ATEYQzy4EQ/X4fIc8Rk74ctbXvxB8SsUb2Oho/hg2E7pKL8OovZ6620qk6Te4PfCXn/
+	u+4USeDG1ekl0MbJLG3QRr/yCdk/J+I9LEYwfTIXxZ4fwTRg8asQZHB+NzOm/oaEMKgI2rKlaKj
+	18vhhWgC17MefAU5tRLDQzElkB2qVhAVZcBP4DuZBv/5Bb+P4OMQHUb3p5AFR+SA2ug1jFNBWYF
+	Cl+rU6hRz66RXxRKeik0mWw53MMwSZXuNvGeAsJ0PHd/F/dFMuZV2GtkoVV+TqdhAl+qfpK/pHv
+	nTAscd5JR0cci+27FG2L8TEk/tHkslo5hQrYDo+9NjMoFYaL9JhigVKjnEL0wogvfnhH7WZeSs3
+	ZWw==
+X-Received: by 2002:a05:7300:214f:b0:2ba:7069:686c with SMTP id
+ 5a478bee46e88-2bde1be2e31mr3755376eec.17.1772431354342; Sun, 01 Mar 2026
+ 22:02:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-User-Agent: Mozilla Thunderbird
-Cc: <axboe@kernel.dk>, <hch@lst.de>, <ming.lei@redhat.com>, 
-	<yi.zhang@redhat.com>, <shinichiro.kawasaki@wdc.com>, <gjoyce@ibm.com>, 
-	<yukuai@fnnas.com>
-Content-Transfer-Encoding: quoted-printable
-X-Lms-Return-Path: <lba+269a51bf7+2b3752+vger.kernel.org+yukuai@fnnas.com>
-References: <20260301125951.582690-1-nilay@linux.ibm.com>
-To: "Nilay Shroff" <nilay@linux.ibm.com>, <linux-block@vger.kernel.org>
-Subject: Re: [PATCHv2] block: break pcpu_alloc_mutex dependency on freeze_lock
-Received: from [192.168.1.104] ([39.182.0.182]) by smtp.feishu.cn with ESMTPS; Mon, 02 Mar 2026 13:11:18 +0800
-Content-Language: en-US
+MIME-Version: 1.0
+References: <20260302002207.12165-1-kch@nvidia.com>
+In-Reply-To: <20260302002207.12165-1-kch@nvidia.com>
+From: Jens Axboe <axboe@kernel.dk>
+Date: Sun, 1 Mar 2026 23:02:22 -0700
+X-Gm-Features: AaiRm52BMKBF_6fnIy2o9_Eq51EwXNhN6II0seQLIeXaZHlpvQk2HcLdy7tiHTQ
+Message-ID: <CAKb3OG_1yUUhLK8uHUxrYtnpph8jNr_j1kjivEWQ9VtkP-fRpQ@mail.gmail.com>
+Subject: Re: [PATCH V2] blktrace: fix __this_cpu_read/write in preemptible context
+To: Chaitanya Kulkarni <kch@nvidia.com>, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com
+Cc: shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+On 3/1/26 5:22 PM, Chaitanya Kulkarni wrote:
+> Fixes: 7ffbd48d5cab ("tracing: Cache comms only after an event occurred")
 
-=E5=9C=A8 2026/3/1 20:59, Nilay Shroff =E5=86=99=E9=81=93:
-> While nr_hw_update allocates tagset tags it acquires ->pcpu_alloc_mutex
-> after ->freeze_lock is acquired or queue is frozen. This potentially
-> creates a circular dependency involving ->fs_reclaim if reclaim is
-> triggered simultaneously in a code path which first acquires ->pcpu_
-> alloc_mutex. As the queue is already frozen while nr_hw_queue update
-> allocates tagsets, the reclaim can't forward progress and thus it could
-> cause a potential deadlock as reported in lockdep splat[1].
->
-> Fix this by pre-allocating tagset tags before we freeze queue during
-> nr_hw_queue update. Later the allocated tagset tags could be safely
-> installed and used after queue is frozen.
->
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Closes: https://lore.kernel.org/all/CAHj4cs8F=3DOV9s3La2kEQ34YndgfZP-B5PH=
-S4Z8_b9euKG6J4mw@mail.gmail.com/ [1]
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
-> Changes from v1:
->    - Make blk_mq_prealloc_tag_set_tags() return the tags pointer directly=
-,
->      encoding error conditions using ERR_PTR(). Update caller to use IS_E=
-RR()
->      to distinguish between success and failure. (Yu Kuai)
-> ---
->   block/blk-mq.c | 45 ++++++++++++++++++++++++++++++---------------
->   1 file changed, 30 insertions(+), 15 deletions(-)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 9af8c3dec3f6..a27bade45de3 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4793,38 +4793,45 @@ static void blk_mq_update_queue_map(struct blk_mq=
-_tag_set *set)
->   	}
->   }
->  =20
-> -static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
-> -				       int new_nr_hw_queues)
-> +static struct blk_mq_tags **blk_mq_prealloc_tag_set_tags(
-> +				struct blk_mq_tag_set *set,
-> +				int new_nr_hw_queues)
->   {
->   	struct blk_mq_tags **new_tags;
->   	int i;
->  =20
->   	if (set->nr_hw_queues >=3D new_nr_hw_queues)
-> -		goto done;
-> +		return NULL;
->  =20
->   	new_tags =3D kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_tags =
-*),
->   				GFP_KERNEL, set->numa_node);
->   	if (!new_tags)
-> -		return -ENOMEM;
-> +		return ERR_PTR(-ENOMEM);
->  =20
->   	if (set->tags)
->   		memcpy(new_tags, set->tags, set->nr_hw_queues *
->   		       sizeof(*set->tags));
-> -	kfree(set->tags);
-> -	set->tags =3D new_tags;
->  =20
->   	for (i =3D set->nr_hw_queues; i < new_nr_hw_queues; i++) {
-> -		if (!__blk_mq_alloc_map_and_rqs(set, i)) {
-> -			while (--i >=3D set->nr_hw_queues)
-> -				__blk_mq_free_map_and_rqs(set, i);
-> -			return -ENOMEM;
-> +		if (blk_mq_is_shared_tags(set->flags))
-> +			new_tags[i] =3D set->shared_tags;
+I don't understand, this dates back to 2012?
 
-I think usually we'll keep the braces for if branch.
-
-Otherwise feel free to add:
-
-Reviewed-by: Yu Kuai <yukuai@fnnas.com>
-
-> +		else {
-> +			new_tags[i] =3D blk_mq_alloc_map_and_rqs(set, i,
-> +					set->queue_depth);
-> +			if (!new_tags[i])
-> +				goto out_unwind;
->   		}
->   		cond_resched();
->   	}
->  =20
-> -done:
-> -	set->nr_hw_queues =3D new_nr_hw_queues;
-> -	return 0;
-> +	return new_tags;
-> +out_unwind:
-> +	while (--i >=3D set->nr_hw_queues) {
-> +		if (!blk_mq_is_shared_tags(set->flags))
-> +			blk_mq_free_map_and_rqs(set, new_tags[i], i);
-> +	}
-> +	kfree(new_tags);
-> +	return ERR_PTR(-ENOMEM);
->   }
->  =20
->   /*
-> @@ -5113,6 +5120,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk=
-_mq_tag_set *set,
->   	unsigned int memflags;
->   	int i;
->   	struct xarray elv_tbl;
-> +	struct blk_mq_tags **new_tags;
->   	bool queues_frozen =3D false;
->  =20
->   	lockdep_assert_held(&set->tag_list_lock);
-> @@ -5147,11 +5155,18 @@ static void __blk_mq_update_nr_hw_queues(struct b=
-lk_mq_tag_set *set,
->   		if (blk_mq_elv_switch_none(q, &elv_tbl))
->   			goto switch_back;
->  =20
-> +	new_tags =3D blk_mq_prealloc_tag_set_tags(set, nr_hw_queues);
-> +	if (IS_ERR(new_tags))
-> +		goto switch_back;
-> +
->   	list_for_each_entry(q, &set->tag_list, tag_set_list)
->   		blk_mq_freeze_queue_nomemsave(q);
->   	queues_frozen =3D true;
-> -	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
-> -		goto switch_back;
-> +	if (new_tags) {
-> +		kfree(set->tags);
-> +		set->tags =3D new_tags;
-> +	}
-> +	set->nr_hw_queues =3D nr_hw_queues;
->  =20
->   fallback:
->   	blk_mq_update_queue_map(set);
-
---=20
-Thansk,
-Kuai
+--
+Jens Axboe
