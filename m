@@ -1,81 +1,103 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECDD9317143;
-	Mon,  2 Mar 2026 17:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEBE1A680A
+	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 21:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772473053; cv=none; b=Qs2H2Fv4NH/Y9/v5SDkd37StWwobsSAbcQ3KOIjA+TmJPLjVGY690uXOBDwXBgTGL3h7Y8BO1gzleTRG8qwF/npYs3Sf96Nd9lAXlkJlaW4VFkK5XBmhCr/gCdKbHaF9MDyaI5QvjmN19s1y18KMD1n3oGDJxyN196rXBQhWKL4=
+	t=1772485447; cv=none; b=DvUwbTfkH3WUrlV8r4WZw9oE6CI9DAuQi8GfNt7Jy8x+gySAFonwYmOwhfRAVxsUG2Y9pk58YubjyrvgBrgHlkzt+UMqgDxDC7DnFrLloT+ALmSf4RpsHuMgwZCiVR2my4ryMBx02/10uuscwWKuwGbhGITRAduhbCq9PKWpVz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772473053; c=relaxed/simple;
-	bh=HBZU7lDrqfiSFQCOqZP8QIuscOzDLO1xfpjrl0wUxfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r1OvITxG9UIA7TOQWN7cM1FYMgR1Ks3KiotPvAyPBjoyNq5itecnz5ukuy0uJ5UBwOgbH9BN70sfapc2NkBmAxBhSCoCG8JxUhZRlADWsUEOnXOi6DXGcdyhoWoJawPeptKvFo/z00rSpIiD3gbeb8zXjDWAZAQJrv1hYGlxHNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ehTo4NjD; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1772485447; c=relaxed/simple;
+	bh=UwKN828bpYjsATwe/PFNfBBgDEwwJJjZ3GciXwnOP1g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L4CI/dRwgsGF7x056EeFixNJwbk9oty0C5VE5I1OnlM3vIT0y9FSy96Vbbx12Hci7ggHkUpQf9MdTjgR+smyeQrXcDDY6rV4/20Atvwym0BGYh4p0I5Nm0AW8q/RKADtkVL4dXT4ON8wG0nYeibyZtjPZ3XLkVCRVhdNTPtGCo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Z4Bzo0Wf; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ehTo4NjD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=HBZU7lDrqfiSFQCOqZP8QIuscOzDLO1xfpjrl0wUxfI=; b=ehTo4NjDnDbSNIxrlRcltHgLiK
-	ZFXRHXew8As8wOR37BRxXGVN6MNhYqSj036P4OQs0tY6JLOKITQJ88+z8sdEsQcWgwNIbN0fZVtwv
-	7Ms57LIVncTKXYIGWSVZpxXDRqx//BZsbVounzAl9KGiWVD8c+3+GNEhHQR4jpQ2OJewH48yL2PDS
-	581FS0SqPSNntr8+8yPPW8Jnk5q0RX852O3bKuvptQu2PuqyInVMRO8pGBOUx//Rjas5xux+u67UY
-	pLqcqTYZlbLIbxuG2Fe5wcgnm/zioxUglEBT+zfUPnQ93XE5/4Vql0lOjI2Rq12DOwfx7kcG60GEe
-	v+klc6kg==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vx7Cu-00000009qOO-0PEU;
-	Mon, 02 Mar 2026 17:37:24 +0000
-Date: Mon, 2 Mar 2026 17:37:23 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Tal Zussman <tz2294@columbia.edu>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Brendan Jackman <jackmanb@google.com>,
-	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC v3 1/2] filemap: defer dropbehind invalidation from
- IRQ context
-Message-ID: <aaXK0_HqEnU5SK61@casper.infradead.org>
-References: <20260227-blk-dontcache-v3-0-cd309ccd5868@columbia.edu>
- <20260227-blk-dontcache-v3-1-cd309ccd5868@columbia.edu>
- <wen63cjbk3k54mjzgw7zftsuze6bzxmdk5u5wdjabzdiqg645k@67666k5lrevh>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Z4Bzo0Wf"
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-46392972257so4014365b6e.2
+        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2026 13:04:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772485445; x=1773090245; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UvIDDVWC3amChzTdZaAU+7HRWfu0rMD4zIP/5WJSg4Y=;
+        b=Z4Bzo0Wf3G+d2z5kyswDxW3jW+NPZDiVyYZwCcqN83Y49dvLqgm1fj0D+2nh2e/7HK
+         y8XgjjOFWG50GRCh2srXXbYtnH1gxt5oudR0awiokKqFJBqFV+75vqF0fXZcb9O37PzB
+         ssP/XV05YlZsYh2QLF+rBPyBu9kralV3P1u67TnrC4Gq176kdbtB+q+Yzk7rNrtA2DyL
+         JNxO+m04ssNNgDdJS5SdTjn5rlUQGzbyEPyhUWsMrh4R0eemKB2xMgXYGgCtad/ThjyD
+         pZvO5pkjXBF07tjJWmuzdzaOoLCD/n7CQeuwzhnCm1zeTQbegrjQte7JAmiotc4r7I1y
+         akRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772485445; x=1773090245;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UvIDDVWC3amChzTdZaAU+7HRWfu0rMD4zIP/5WJSg4Y=;
+        b=HGkfKSoqrXn8mn9Gl9JkUEFFNObZQrR2DoPKlYlJYApe6Em89gUNFYnQZhUVyBb9ki
+         S9UF14Kk07GGf1PjbBf9/bt/LPApAFM2PdH/bcPjBEE/1p+a5wyDcNKV8zRXbFNfi/90
+         sa/UxmWITPMy1XDed1N3bCu9CfAwoo1hy53k67g7R8kJJDZz34NDGRrROOL+Z4gjJUt3
+         gCJRez5vImWpf6ULJWchIyuHkhnLtPSU8+N/UexxkrJhZt8rsznFV9vxEsN5OwNHnOIc
+         KMv4JvwN/ntdCFxZERXRT+DpYHfobRgjUZdxLhTy6qyQSUW1z1Twfg4lbFfk8vgPJXFL
+         CYjQ==
+X-Gm-Message-State: AOJu0Yxr9cQcLijn8h7rhO72/GN7WJl8a2uOyaIDAan6hefXJdPNqyVd
+	dIlFQaaLaMimmOizeOvMWZvu9tjQ7fhylQSvyeZjuERblVj+FF9bQVJ5wAaVnyjYkRE=
+X-Gm-Gg: ATEYQzzv3Qp4odsB9zWKEnP0GBbA0Nv7MHuiE9OG/1y2/A/wxtKbBnZ+/xSChsPUUwE
+	mB5BIsMQXLc6bPaYsp6polDdFJDeQNTFb6wKtzpmnT4Lz7j5gqQPqeRj8Op/wFnjkwKrc5La4UY
+	iBgVQZZhOn3DB4PHEwmmeqA871rX/Z6tEL+oSkooomvThlrE04WtC8kPamXuesVz5nktWaEirXC
+	wSZ/413C0oXUNu0Fcf68ABrGsg9Juxcdh76Hhs3fVsfz4px2UVqQA4lqRsnjDIf2/qt3cn9rdcM
+	p77P2YK/Eb2psB9u0bkn/C9pzb62OUThdyaZhCd0uBHz2MnAaADZ4qUL7gM9slVgajbGwVNGpjt
+	joKzE377/Cwwi8BN2IAfok1ZkcNNiHXz0iSNt0WYMGFfZ038htgBQvRRuy4rn1oaU6I0s22o9L9
+	3R5jm1MYD6hUTd1pL/VpEzZtLBjco1+2A90iO4bfngDzdl8Ecd4MjDYS0zYZhmK72Ik45B7GDCo
+	0bzU3xqXC1DXyBwv1Ft
+X-Received: by 2002:a05:6808:8281:b0:463:b4bd:5287 with SMTP id 5614622812f47-464be921973mr6434178b6e.11.1772485444663;
+        Mon, 02 Mar 2026 13:04:04 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-464bb3ab302sm8292175b6e.7.2026.03.02.13.04.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2026 13:04:03 -0800 (PST)
+Message-ID: <40e13629-aa4c-45ba-a2da-b7614961def0@kernel.dk>
+Date: Mon, 2 Mar 2026 14:04:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <wen63cjbk3k54mjzgw7zftsuze6bzxmdk5u5wdjabzdiqg645k@67666k5lrevh>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: remove bdev_nonrot()
+To: Damien Le Moal <dlemoal@kernel.org>, Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: linux-block@vger.kernel.org, Song Liu <song@kernel.org>,
+ Yu Kuai <yukuai@fnnas.com>, linux-raid@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+ David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+ Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+ Andreas Dilger <adilger.kernel@dilger.ca>,
+ Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
+ Kairui Song <kasong@tencent.com>, linux-mm@kvack.org
+References: <20260226075448.2229655-1-dlemoal@kernel.org>
+ <5b8c1811-c9d9-469a-b8d0-992814a11b9a@molgen.mpg.de>
+ <a2993605-2cdb-42b2-85fc-b071f07af4c3@kernel.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <a2993605-2cdb-42b2-85fc-b071f07af4c3@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 02, 2026 at 10:11:19AM +0100, Jan Kara wrote:
-> Folio batches are relatively small (31 folios). With 4k folios it is very
-> easy to overflow the batch with a single IO completion. Large folios will
-> obviously make this less likely but I'm not sure reasonable working of
-> dropbehind should be dependent on large folios... Not sure how to best
-> address this though. We could use larger batches but that would mean using
-> our own array of folios instead of folio_batch.
+On 2/26/26 5:27 AM, Damien Le Moal wrote:
+>   > Is it worth the change, as it looks quite subjective if you prefer the
+>> one or the other way?
+> 
+> I think it is a nice cleanup, but I will let Jens and other
+> maintainers decide on the worth of this patch.
 
-That's why I think we should allow the bio to be tagged as
-"finish the bio in workqueue context",
-https://lore.kernel.org/linux-fsdevel/aaC3LUFa1Jz2ahk3@casper.infradead.org/
+It's a bit of pointless churn, but I kind of suspected this was coming
+when we added the bdev_rot() helper and now had both of them. So I guess
+we may as well finish it, as we're half-way there anyway.
 
-Why remove the folios from one data structure, to put them into a
-different data structure that they don't necessarily fit in, rather than
-just postpone processing to workqueue context?
+-- 
+Jens Axboe
