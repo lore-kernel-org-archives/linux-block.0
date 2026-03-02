@@ -1,153 +1,65 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BC93630B1;
-	Mon,  2 Mar 2026 12:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1B62DC77F;
+	Mon,  2 Mar 2026 13:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772456261; cv=none; b=B8BKQwoIMewfYeSfT72Thz+xsBZyNf+8ivIifTeUFGeTDCYHB/6BS/FnEx6lkYoVDLtosVOx3mlnzoo3JbHMg0YEf+QrN0JwTzf0HRrUHVnxOi3L3szXc0/Pax2vYErPyRZ7rD7PrWCLtgLycDMxCmjgcznCI6H8u41BTBt48A0=
+	t=1772459343; cv=none; b=R5s3h32fKKA9K7uV0+9IVYmSoRdS38Isa6Uu+KzKC7sp16VIHk6+4T6Q8QHOALeJj5E0cv0e5Wjy4QQOKygzJ5lCMSBBKUpO8F0177cUbNKR1EZUeq24gDpCd+I6mEAft1MUQYtohB0RjaRdHcDEA/GqZvOFKP62TVHj9EKOpZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772456261; c=relaxed/simple;
-	bh=hvLSZiQsLnWzNs6WZ5wabnubTCSvxN70/ljhaRbQ3sU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pBbRw73fDkZmY5Jr9SXjneNrRIt4fmV+wY55jEuGMh1mZl1F8VOkN/3AGIc7Ihxpx6QZpnSVV5xcpZYCkMjJK3lBbkygUSv3pKbq7iqj1akyIf/Q39kliSO6Q+suKd5k+4gYFljE4uKPV+b53G0vuXzy+kvC27QJjkW51r9dAVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=j1HJk5Mi; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1772459343; c=relaxed/simple;
+	bh=3oDPHQ27zjmwg0X53/sNtBZXfVW1DU7wX+SBWTA6mfU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dc08D5h+XaqRwLNglMBnuZ/dVFcnt0TV7CRNZnFbtojU6Hm56/JYn8SbY11oyKwQkWSVAXaOqfKrC8/WrF0ZzkRJUDSRkqJLZ8ejm/wW5EJI+VY07PTBHDfY3OvlQb9Jbv4JvCmPwKX+pPYO8ypMqK9ncSy9ToBWIik67EZfFo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=K36bIsbh; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j1HJk5Mi"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 621KiDCG1941479;
-	Mon, 2 Mar 2026 12:57:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=HGxsnL
-	Yfy9kHPdT/nhG4VlprNXrSE18ZkeT+apwbbHo=; b=j1HJk5Micy3UEBWVybBLb4
-	y/CoykrpD+y5spqD4mq7pRQ4RqYy/VdMN+op1dnRE5kCwDPk4FP4/r4WOa+ywACw
-	9924BaKbvbomfZ2M48lB+8TIPsi2Tt25IFvNw48O/v9czGCuqoS6xh+oMElnkFJg
-	lFnaeN0UxC7wxbgCZ6jTBasRb+7EH5j905TQxls3Gnp6ehgiVb/qyR6q2k+7ziYh
-	lrk+xgUDlpBeBLRPBnpKjE6b1WBeC1QucUSC/W8PVVRFD9MgtnmKQsYBEfNVZI/D
-	K7xAFibvHzzq4RNxtqSCOUEl6TwFuDb1/TdBktnuJr5sDg8PCChEh/M0T0eMKGLg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ckssmef16-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Mar 2026 12:57:19 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 622AOjTE027704;
-	Mon, 2 Mar 2026 12:57:19 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cmcwj5w68-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Mar 2026 12:57:19 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 622CvI4162718236
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 2 Mar 2026 12:57:18 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0CA325805E;
-	Mon,  2 Mar 2026 12:57:18 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AFC635805C;
-	Mon,  2 Mar 2026 12:57:12 +0000 (GMT)
-Received: from [9.79.192.112] (unknown [9.79.192.112])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  2 Mar 2026 12:57:12 +0000 (GMT)
-Message-ID: <bfc2bfa4-a28d-47dc-9362-b9ff6680cfab@linux.ibm.com>
-Date: Mon, 2 Mar 2026 18:27:11 +0530
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="K36bIsbh"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=3oDPHQ27zjmwg0X53/sNtBZXfVW1DU7wX+SBWTA6mfU=; b=K36bIsbh0aow/qmFRvIG1jBmC5
+	Teb6mIsR90WV9dU0FSqLKJrIHkdxGtFhNYrSJ9gSmGo5ZKKc2Zu+Kx3rjO+K/AMSJbnFqSEmbs36a
+	twjPAnuB7W0PXbuN0eJVdLVHT2b+ksaYNJDkG3U6ZIF+NC/SrKQqAnObK/qFs1rE0zpNCb9KBLg0Q
+	43dwz3e9zVH6g1WxHAmzvUWbh9A5M0JmIukRM19oh+rko19YHxKMFO1g/ob0qyUQNhb+GSYnAWxhc
+	H5/bCugSkFqinVzMdIdlUxuvWWzKxLT4pArKU0E92X4b/Q5ynSIbocun3L2OuLBSo44v6Gk2tJ0iA
+	Oug8gfMg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vx3dj-0000000D9hr-0xfV;
+	Mon, 02 Mar 2026 13:48:51 +0000
+Date: Mon, 2 Mar 2026 05:48:51 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	ntfs3@lists.linux.dev, linux-block@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: support file system generated / verified integrity information v4
+Message-ID: <aaWVQ3g6vsDB4GvQ@infradead.org>
+References: <20260223132021.292832-1-hch@lst.de>
+ <20260302-legehennen-musizieren-08d0e3caa674@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 19/19] nvme-multipath: switch to use libmultipath
-To: John Garry <john.g.garry@oracle.com>, hch@lst.de, kbusch@kernel.org,
-        sagi@grimberg.me, axboe@fb.com, martin.petersen@oracle.com,
-        james.bottomley@hansenpartnership.com, hare@suse.com
-Cc: jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
-        snitzer@kernel.org, bmarzins@redhat.com, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260225154007.1033735-1-john.g.garry@oracle.com>
- <20260225154007.1033735-20-john.g.garry@oracle.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20260225154007.1033735-20-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAyMDEwNiBTYWx0ZWRfX08ZG4mfYdE6+
- Pgtc0Q/jGKa+jDQNE0D+GrQjHKgMnFzoHCqSu1ifqjMpkeREbPJtmEaIO9GDdlyqoix0A4iKnHM
- cWPTqmGukRD+IAgnETbDg4A6HsMmzcl3mFPG7whALYPLnrPwsfSmk1d1HmZsuB3/sJnjvrcC+ws
- jrR24Dv2Nb41sT1mxJEx7tjCxkwzHlmsRf/oGegnyhGZfHMj7tY/ZXlIJfTJgNj+4eYSdTHnN23
- VToJkQiBTVF7qOd756gghV+boAmuRDWm+lRlynZeh1XKhyAQJZ4pBkmcVgZ7y/gwxByv15H44fi
- ih3mFr+3mKU1Jx+t5maDc4pBFEK1wLhsR/5WxfDXr+lGl9dlfVYLVIU354rQFSrtrdOF+X+vi1s
- /jrdGPpTmejHF9fPkuh+jbj3TYi0P2fTwTjgcFf7fs9l9egIJER25DB/fhJCYN66PvOFOO/v2yQ
- I6RLWIDDP3LRYFqC9Xw==
-X-Proofpoint-ORIG-GUID: 9hUb9hBF3IRM0ca70u5en9RE3Z-TTG7C
-X-Proofpoint-GUID: 9hUb9hBF3IRM0ca70u5en9RE3Z-TTG7C
-X-Authority-Analysis: v=2.4 cv=AobjHe9P c=1 sm=1 tr=0 ts=69a58930 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=CpEX-UuAubdY51wu2XgA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-02_03,2026-02-27_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- spamscore=0 clxscore=1015 suspectscore=0 adultscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603020106
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260302-legehennen-musizieren-08d0e3caa674@brauner>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 2/25/26 9:10 PM, John Garry wrote:
->   void nvme_mpath_clear_ctrl_paths(struct nvme_ctrl *ctrl)
-> @@ -277,30 +279,35 @@ void nvme_mpath_clear_ctrl_paths(struct nvme_ctrl *ctrl)
->   	srcu_idx = srcu_read_lock(&ctrl->srcu);
->   	list_for_each_entry_srcu(ns, &ctrl->namespaces, list,
->   				 srcu_read_lock_held(&ctrl->srcu)) {
-> +		struct nvme_ns_head *head = ns->head;
-> +		struct mpath_disk *mpath_disk = head->mpath_disk;
-> +
-> +		if (!mpath_disk)
-> +			continue;
-> +
->   		nvme_mpath_clear_current_path(ns);
-> -		kblockd_schedule_work(&ns->head->requeue_work);
-> +		kblockd_schedule_work(&mpath_disk->mpath_head->requeue_work);
->   	}
->   	srcu_read_unlock(&ctrl->srcu, srcu_idx);
->   }
->   
-> +static void nvme_mpath_revalidate_paths_cb(struct mpath_device *mpath_device,
-> +					sector_t capacity)
-> +{
-> +	struct nvme_ns *ns = nvme_mpath_to_ns(mpath_device);
-> +
-> +	if (capacity != get_capacity(ns->disk))
-> +		clear_bit(NVME_NS_READY, &ns->flags);
-> +}
-> +
+On Mon, Mar 02, 2026 at 11:11:22AM +0100, Christian Brauner wrote:
+> Applied to the vfs-7.1.verity branch of the vfs/vfs.git tree.
+> Patches in the vfs-7.1.verity branch should appear in linux-next soon.
 
-I don't quite understand the intent of the above function.
-Here I see that we compare mpath_disk capacity with per-path
-disk. Do we really have sectors allocated for mpath_disk?
-
-Overall, IMO abstracting out common multipath function into
-a separate library is a good move. But then I just want to
-understand layering here with libmultipath. Does it sit above
-the driver or below? I see in some places we have back and forth
-callbacks from driver to libmultipath and then back to the
-driver, for instance:
-nvme_mpath_add_disk          => driver
-  -> mpath_device_set_live    => libmultipath
-   -> mpath_head_add_cdev     => libmultipath
-     -> nvme_mpath_add_cdev   => driver
-
-Does this intentional? Or am I missing overall picture...
-
-Thanks,
---Nilay
+Note that the branch name matters much, but this is a different (and
+older) use of integrity compare to fsverity/dm-verity.
 
