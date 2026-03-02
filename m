@@ -1,234 +1,176 @@
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011067.outbound.protection.outlook.com [40.93.194.67])
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8CE430B85;
-	Mon,  2 Mar 2026 00:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AA4430B95
+	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 00:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772410955; cv=fail; b=UD/l/yNWbEisl1qrz09PEAxCVNM9/EjbSxtn13JL3mnt2jg/MR2WgXuiXiZvn5/P+rKkr7X5WXdh/xTVdtRdEsW/+8b9gzhWpwp9+3bIFYddjf1xPnv4E9aTABQo47rDvrBwYXh2vM59nQvRQ23TwRacmy/Bf82gHnS8DbROY7o=
+	t=1772411447; cv=fail; b=KKD3HUBCfXjBw2bzSaqZSb4iIijfTi5QjxPThljyoDjLxGSmEpB00CevijAuJeP2Wg6QQRKyOSsmAeCKLhg8/xhxHoD5EJRKXyk3mJj3+XLJ16dZzCwrZR2V8xFhPEUrUTaAFSvzaAyggT0HVRrgU1qGWoN2RrU4/TxOZmbj7WI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772410955; c=relaxed/simple;
-	bh=3tkq0dvtYacqOktXDK+sJ37izSWKyHWjchKxn9PefCQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DusFlprXvZzhnDOkxDMFXUuk/rTMRKbkmH2inAWc3HKpuUezFVwwinoqsST1jGoV8KXsuVBFmExaxQGUJ+tIeb3OEKGqgtmTOX/NI+czfd92M55cugwPNz6gM7WiqgOHGYIn7tbLMvo9uBUA2M76hdp8y4r3QHHMy6AvlHsqTiQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oERD3D6Q; arc=fail smtp.client-ip=40.93.194.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1772411447; c=relaxed/simple;
+	bh=nYzsACfaFP+dDgPrEdLe2hnPM510krV95u/3xDofwwU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ohYdciwlortyUyUsK9xM6ntBKVVBljsMJOZVih1JdOdTj0ycHeLy9hgBU4SwRFPKcQbpELxtYOdiLAC2EFeDQcgXgsvMx9LOWafopMZeNEYfbO0kKxwJptxh2iPbhAXmRBY/y08ZlEdL87Wlpp4UQRNoNnFnUrJaDT26mjoZ/j0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=RhPTcMr3; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=iCaSLeEL; arc=fail smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oERD3D6Q"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RhPTcMr3";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="iCaSLeEL"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1772411446; x=1803947446;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=nYzsACfaFP+dDgPrEdLe2hnPM510krV95u/3xDofwwU=;
+  b=RhPTcMr3sPNXIucxG/31ef4HX7ANnzn9FcdIRHATmMhJOL2ZQrv92WlV
+   efUrnqfRyYnv270TZu8BdW3meCPvgzjdrKxDpE3OJOA+ODkd4Cgi+WBy4
+   6A6UJosouWsvgHcnl9GpUeQkJj+BW0FgLXbAxVjlkNWgciBNrETY0xR0e
+   0/Ay8k/WHUee5ECRsRiAQaphgdaBWowT9Sp0+MhMiGBI9ZErNw22y5LOj
+   5E6wyOr6JaNE/EhaT7pI2hXLEgc+9DawNGDrO8o6VO1E2caSm0BMow8u6
+   EQA9zTWiJnhjx0Ox/mV/kxBDwwtWmeXe/32QAC1LWTHxbBrp327LUdpYX
+   Q==;
+X-CSE-ConnectionGUID: 0BlMiHTjR1eI/Ot3R7DJ4Q==
+X-CSE-MsgGUID: K8PEqD6sQsC52TeJJT4ASw==
+X-IronPort-AV: E=Sophos;i="6.21,319,1763395200"; 
+   d="scan'208";a="141301308"
+Received: from mail-westus2azon11012036.outbound.protection.outlook.com (HELO MW6PR02CU001.outbound.protection.outlook.com) ([52.101.48.36])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Mar 2026 08:30:44 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u80WAO+TseLuveyAETHvb6Me/gKXSeEi0dQ7+RTzPkr1CwGVPCrG9RH8xug8xfnfsHxqPhk9CPEtx0LeZmBvZHToCssUYiUrZ5lerP2fN6j5wLh74Ogwozznhi4LpMjZD9PELXdYJkPBG4/LQKKBTPhIdaChsFzZERGdVgaPm0b+deFILH6maXuk+P3eCljt0tkmndGi0bZ/c38nZahKiZo/B8HwaZVCS3UnGtJyKcEaDG34fcDmqKJIQOjsHG5p7ZxiOvFUMCeWrR1qYtq0dujktnpy84VzIl65EhtHTnovh8I5WW/ChN/LclITC3+BEHqPdaTZtSeeuq4fEy39kg==
+ b=uZUkBu8HEMzdl9pBS5XynKItQg3tPGbvzYQ447ssH5T2U2y50kqAdx3IBts+9pHQZ+9cef+txGv3bDFW3quAXWnr7aknnw2vdyAoZgqbosSpbCXroVtmsh5pFVwbzWT7qTvFJ7GmgBDMhJk99oqHEesOj8sWp8yd9l+JzHzh/CUg0mXbe0+i4c5SkprFDQFwYXJQUzjPrEwod+8L4op1DE+CC+0bmnSS3ItBnqbfsty8FJnoGcKnKaKRgSqodAt0IEwtukkKFc4vSZJuiybg5t5wXjKPPYyVuAHQ9N/HjBleG5Qf5j1PQvsNnqCGzpxhKGYq0ih6SyfbtIDOYdWHXg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uY991wE8LibZu/ZtTLsnt+XmIPxjmbnxYbEYw1It0KY=;
- b=GCkBHXKaV3Z8KK2RY9xSt8tZOxfW+sRyXgMtdeKhgoZ1dK+3Qq1ViAl6mboSQkGDSQEox86exe8tg6GZt+yctWiW4vPX0FMwX3OnAMHD9levV7Rq+rUlte82d3ec7aZtxeNOFUlCmma5bzveVNsps7hgNrMHdq34nuQIDbtN2wl0BW9uvarvYezXGtqbC0fOocm1nB4QI6ECIh3S4IAyzDmufvy9+DgZmo2s5K9PjgOZG0OTzmRTwiv5Q13i3pq8IImu3C8tlCFINlppec4Bj4zV8vZderRWY/YwBrYgERsqWKrEPwAuXrVRvoVN6ojn+dLUcHK22qsBRYiDZqHYng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.dk smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=s89S79eEcfnsNviT8aqDNBCjsSxWjJ6YGo2cEkZDIo4=;
+ b=Qc71G2f6wauJolawPenHuZoR4vH4KAypsZrpKXfNP94H61s7HHG02zTOX7xo0Dr+59oKiRhITg1hKKIMPyG7nnEbAuJHPHBRb93i4ybRjbyGDyq7smwbHlLfuiy6Y19PX9oYvTRqk+NqSOTAMn0eE+t/NZIqAT5HjMdgnj+4S6n8TDIpsLgbMGnv0s2KpBM6DbmXBH+8ZJ8Zc2CNHAcJNa5c79Nbjn0qoX9aYcKjCAhCAxrHDPlHEtdmQu+wTBkcxjz75h+R/iGQnIEX2Pk6poZ7VihMS5IHmkXQC4fXwW9vAgfQyBHNfyzpvsW6s7i+jv0rXdCPE4ljYZYfE1ztTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uY991wE8LibZu/ZtTLsnt+XmIPxjmbnxYbEYw1It0KY=;
- b=oERD3D6QQccipG5QeQXsecUGL+bOo2iKYYvHVfdAQ9J4PdS6Jf95yGVoyBz4eTabOI/594yJehYTccvEMjbtLO75bd7k7MQucvKY1udyPG6h8zR8gQQSm9R1lzGjdHcej4qasfUfFojXdRZ84Ynp3zlmKWLKGsrwu2bAxP8bFHVr4vm17k0eEU5fCi2NQtnD1EG0fsan7WAwPCkkMlIFXuifiXFFi4uuvZ2FKj4xRMhIGyK2HCxhMhx6zgT9enKFWDLmM/tnNnQwgEjEWiH+1yEIHUBpj+JtHGXBFv36OQUIWaPUBVrOJ8/gN6rWwiyBhd0S8qxqyivGtx/jzChOvQ==
-Received: from BN9PR03CA0800.namprd03.prod.outlook.com (2603:10b6:408:13f::25)
- by CH8PR12MB9790.namprd12.prod.outlook.com (2603:10b6:610:274::16) with
+ bh=s89S79eEcfnsNviT8aqDNBCjsSxWjJ6YGo2cEkZDIo4=;
+ b=iCaSLeELhIW9SIdCceuHctSyO3bRJPMud3pTRF8BJpb++iIE+zGTlV/l/BoTnrBJnzIZKRM8qkCy+1Vqa2Ut6RNRxZB2IG3GgNVStHZDD0CLDT6P9nlmXtLAd6awyoqLBe5ID9m5YSymqHqsrqOUT2/Ayl4UAy1/ijoXcLdmQdM=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by IA3PR04MB9377.namprd04.prod.outlook.com (2603:10b6:208:514::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Mon, 2 Mar
- 2026 00:22:29 +0000
-Received: from BN1PEPF00004688.namprd05.prod.outlook.com
- (2603:10b6:408:13f:cafe::17) by BN9PR03CA0800.outlook.office365.com
- (2603:10b6:408:13f::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.19 via Frontend Transport; Mon,
- 2 Mar 2026 00:22:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN1PEPF00004688.mail.protection.outlook.com (10.167.243.133) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9654.16 via Frontend Transport; Mon, 2 Mar 2026 00:22:29 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 1 Mar
- 2026 16:22:14 -0800
-Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 1 Mar
- 2026 16:22:14 -0800
-From: Chaitanya Kulkarni <kch@nvidia.com>
-To: <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
-	<mathieu.desnoyers@efficios.com>
-CC: <shinichiro.kawasaki@wdc.com>, <linux-block@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH V2] blktrace: fix __this_cpu_read/write in preemptible context
-Date: Sun, 1 Mar 2026 16:22:07 -0800
-Message-ID: <20260302002207.12165-1-kch@nvidia.com>
-X-Mailer: git-send-email 2.39.5
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.16; Mon, 2 Mar
+ 2026 00:30:42 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9678.011; Mon, 2 Mar 2026
+ 00:30:42 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Daniel Wagner <dwagner@suse.de>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH blktests 0/3] fix module unload failures
+Thread-Topic: [PATCH blktests 0/3] fix module unload failures
+Thread-Index: AQHcpHeO/lFtfD4lp0ao0goKJwhOvrWSD6eAgAhfAQA=
+Date: Mon, 2 Mar 2026 00:30:41 +0000
+Message-ID: <aaTaDa3m7dAIE2ix@shinmob>
+References: <20260223035023.21902-1-shinichiro.kawasaki@wdc.com>
+ <ad4c1108-8604-4a09-b3fb-e8f77a4abbcf@flourine.local>
+In-Reply-To: <ad4c1108-8604-4a09-b3fb-e8f77a4abbcf@flourine.local>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|IA3PR04MB9377:EE_
+x-ms-office365-filtering-correlation-id: ecad5c93-7c81-443f-2e9d-08de77f2effc
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|19092799006|366016|1800799024|376014|38070700021;
+x-microsoft-antispam-message-info:
+ Lu119fZFlhw1SV7DZzNBWpNASQc1/cMOAO86BUZcPANIQxeeXnE5snznC3iSXKwSoYDxtmfigbgjy2YU/WRElW0Lpf0sxZMxDzKJMRQoVniomqOmUa3UBWrAnPFtx3IjlIXevE6oWZ00aFFIM7zD72dAXueVHKkSgC2Dgzg1+EXNWpWm3BGMC2MjDoiAfCXSfhHYbBbuKX00/aqtikhvODD0ouDCjplrX21RD0gtP+yEJWFrPYha3/BfyWu6z7BB5teCrM/VWZAPlRHq5BuqZS0i0/VdNEXyeL7GuKO0ER1W77CJwwMe8MbBMoXHjYdn/mhLe7R8Bloztjm07Lka8aCXdzCCY9AmYn+UND2cQ0is6SuV5AXjPRQt7SFzU/X5ikLDWRN9Lj9py8H1fCL/rmsntGY/huCJE8+jwH21a55v5yNjsxpF0YQA70461DoetI3dDpG8doePTX8jsDiBTvLggY+apl+KSGzaMl04fRRofHLzyI4moiigoAmWmB2kW1Eh/q3maicUVtwCNQew3VgiMuwWcL+EUwFRLi8LmH5Gec/lE+Z1cFDRlNBLkgdKIdbgWheX+slNDqPu7uzdgM9exBn/kougkhjhCHX8Hltb7MDapIh/JS+pasxSW8STkevtgRn8EfvPrLJ5YfAEzKbaG5U8BiBNjyAD5JD96TwUSiVY/SWBe0DBkNmsfLhVsE53gPBTZ3WXvjii5FRvc2EVQ+1mTYe4QKgTHTSbJqyC09/ORwogDrCFSpeR6UAzk7OydqTOr742qbxxSRSS0LWpCEiDHMxRqxYc0zMLz+E=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(1800799024)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?XSDohnmKfhhIiUq2GMPLAq9ScIG3TTTGKLj+L4N7vYFWwIE8bJc52/7+jZK8?=
+ =?us-ascii?Q?ezPeD2iGj6JgcoCWobBhGH4cxBkumMM4YqgNCOuSwV2H1JgA+K7eEy/2duF0?=
+ =?us-ascii?Q?L3tbt89bpEKs3iuZy4LFAs7eUeZnERCkPHl6tYYmM6uK88TJwhikBPeqp5Ym?=
+ =?us-ascii?Q?zNXiruKCHsl5nKsvJJC6NaJAtERDF2tMT3KUmFNhau1SnQxFg0xULBvaamEu?=
+ =?us-ascii?Q?aG0ya6S6Eb3EDwaGxCr+laucUWsfp91ND0iZG5qDma+sU5psqaWKNoZJ/WpB?=
+ =?us-ascii?Q?F/u8ss34b+Do/jqaIBRJevCx8qg/W81Avo4miMTfRk4gxrf/kiHD3UPX/RDZ?=
+ =?us-ascii?Q?1zumIQ3ro1zWRGQoE7KxWhKDtKEm7ZHeu5dyYBX57odUHKensuksPH6Ooa3l?=
+ =?us-ascii?Q?KNQMtuSBIfQK41Ko6m1lUc2Q438yy+DbAF66NBkIfs9bkLCnFYqRlzmoe/qF?=
+ =?us-ascii?Q?A/GOe84HMIukfqCMGVRr86mjOa8a0srEwpon1SU4Xd6X2K/Kihwi5ptotQ6M?=
+ =?us-ascii?Q?BT5C8LKOnvInB2M2PaKG6us1+gc35I8Bt0sUUw1pMZ9GSbinGfhlbAoG0T7v?=
+ =?us-ascii?Q?czBJAQ0quUUUNT7NwL3MuNU/9tgy+76f7T0PH3YQZcJKiu4JioHzBRy2izPm?=
+ =?us-ascii?Q?OI6/1dlYUYm1YGcHeQGdElsuxzg0qMPIPE/MXZwwlV4mwgxvIapNia4MMWnu?=
+ =?us-ascii?Q?H03NFV2jBXE3NilPWhJexdduKqGIY9dRBec7akElMORhx5vGgxNgh1K0TJcZ?=
+ =?us-ascii?Q?4v6n7Ye7F2pVtepMl5rApPLHzjVZ+n44CPrf/g2DFo6rneTSyUw27q01GmDH?=
+ =?us-ascii?Q?dK1BazpnBBD4ZA/UUwjR5E2CsLmHUt/k2eb2o3xzwjTgJmoZiABvASn1BFiK?=
+ =?us-ascii?Q?C2AXi8om/+Hm+bUNaQmVzw0oCZnmNIjsj1dNy1JH6bBFrEzVfXSeiafxX4fs?=
+ =?us-ascii?Q?2+bce1zx2J40sh/FpySlu2ggPrTf1Tcswobp4fETSyMfMJjBe2YgAPcQQUPb?=
+ =?us-ascii?Q?Z1pVsMcMKWjZps5yl4FNydhSN5f15/IOLRz3rX8G+2HF/B1Gj5xnawNNggZM?=
+ =?us-ascii?Q?kLlLpldAzu8HuGEczovxQX4do2wUj98wYKpMfYJErRvUE5KO91XGqWxn9u2q?=
+ =?us-ascii?Q?mBc0N4a7d+aCV7E9B1FUUjWGECWftJ793oTozjH3Wa/CShqfDexCcngAlfJR?=
+ =?us-ascii?Q?9s/qBTKvfhmBgQ1Ysneva+SejuELqYIQrwyI/TiDR77vZq2ZCAPXCTUrli94?=
+ =?us-ascii?Q?BQGtM5nBI74ruWxC0GTyIPT9ie9bFyU/7I+qQ0aHwT/xUsh54dJ6RAHPLOO1?=
+ =?us-ascii?Q?zSQ46uo8Q576HRQTugyKEKOjUHX4cIEQvy6+vyGhmhK+J9Zcxv4QaFCuTbLc?=
+ =?us-ascii?Q?+WIjN4heN+URZ7ig+yUOOzDF/PaUbMIOVtHhEq43DwVRUF7GUZKWdoZ9rsMr?=
+ =?us-ascii?Q?MiGldFXbEajSwnuRVSv6KT3hLzw8XgYKOYE8tBvz8Kaq5TuyblOZJE1oH5y7?=
+ =?us-ascii?Q?84s8MgEKDPIkTnYsLe8plVIl0Ha5yXo+AspbvcecCcKWwGIVUBShHrrF6QKg?=
+ =?us-ascii?Q?NwRIx66sgjd4vPz0a/7FpwlrfCjFeHk6lcNkGf/0fmxRPYjc2K6f/vBTDKa5?=
+ =?us-ascii?Q?lABIP3g5zLXvxZyMwk6lH9poKBov1nr1T3/DrCVEZDt4R6eBmgdtTSguiWHx?=
+ =?us-ascii?Q?kdIQzAYm4Ad3IzuteB3EzNMuA9aBNGbD34P1syPSTrcsue/GQlRmFXKGDuYJ?=
+ =?us-ascii?Q?8YiaRQPG7UQEWdK7qgfH4P8ht974X4Q=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <45A748115CA69645BF5CC9C25AE6FFA9@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004688:EE_|CH8PR12MB9790:EE_
-X-MS-Office365-Filtering-Correlation-Id: f57d554d-7808-4161-65af-08de77f1ca0c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	Zhjv7/r9C0jshz3Fl2p2A0iwOAxHI6pe9xoYSj6Ey6PohvnNm+I0pdD79pPFH9WvMvPxAgj0IAyyqSwCsw2UTvK/5PTEQpEWoQI5JjepaYFKceLN54qkIDbcC2XPrxlqs9V7ykAlgXetYj+vLqsgtGhSFi4EszRZXY4qdc2VzJskt6JAdEUrMm2d9fF1jHyMq60X7XOiRVRCNdbbJnaSIW+yIL8HKMgYdNhE4APmnBlNUfnXvbwnTz/U/A3NC/sNTFDO7FUxhRqgCbO0lGs10pLL1fP86U56sSmKEJqgXDskn7D4eOtGVXJmtlMeZ2b5JiaARp62EA3bgR6PEuoh0SjTcaESVxa4JSy+Ypk5lhcAoyhgJYkbvB7cmFwgtjFUDJc0CI9CNAFxcYJUgjoGCrrE07o81CXe1G6hZjBeecLjrsP/WdQ2CfF3bQ/lwT+ORWOADu6cYlRGFRGeF/cLk6qj+Cu/bz+7hTa0WRsMLbWNPrv738JC+hM4q05Fxru2yoMaf6hVW0g0hQI2RZhlngH5bXoDj/NoVA9WG4v6XERO6PQZaAvEOotTJ2OvO48yd1O/DqgdWiZiSeYyVO4/zTGpuJM3NZ7nHMJoBTJY+P3uGzDNKCy8tAkMdJewVckOIjcfL05pN91sozCKdb0wG3V007oYN1/nFvWi5PZTAhfWQFuM09H0N/yyD8S6dnbW7IoXzusI4Jcgn5LE7nCMYfCxXb0N+s3FvzO4lWOENVyf/WHqoBDsHARbDy5En9bZVaUhs5SboI6GeuM4dZtBA+gd8o28widwgPtGa4i+P7D2RkqZlzR8lZZeZfn40OTUjARFddxcJs/S3JijdyDzdA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	xr/6vz3oj8qkDtDffOz3Oslt17cxpHZS1NVJvKjAipOJHgE3dyS2gJoc8Cj6ZskiIMcE9k/XIaF9P6bz9XfNTLROg8a7JEMlCzNMvfbnmFyRATCvjKTi5PaKweXYxfOnOzSdrO7Pyzz9mfldxrBNaGoozVJX1NoNeBjZvtbywBWdz2etkTSexPA8zaVNjRnWQX8Zt/KiEtAgEOwVUTQdCbC9Rs/4ciHuSYuAhdnD26sqINbzg9aycdQNM7fOSBo85EzrcMbhC1IDfiUHXoRsJf55kboyHMmKOeVSP1ss6lMENECIu4MwWMVk+d65RE5BKEjWr6uVHlf7CllSWbEOHfTwDnOqXlwkA5LN5+khBBOTBSwuwrkVgCsXwbp1lRdRAQGxDYfbstHlEhBH0bD0kZsAwBtMZr9BWJgN+87ijRr3jUZdgM83BIJYEn/x2GbC
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 00:22:29.1854
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	nyXswJ+VA2YpfA3f+5XM/3xbclUXKKMRyZoiZbbwTQgmeWWUTG34P83b7CLRzXQ9dqpMuMZn8FxOsfvO4bgITIra+eNq/7wXRmKTxob6hIkrwp4NI8so8ZkZkgY/n6FYYqLulp8uV1VxjYLv2j2dBDghKmcpPiB93Li6ulJILxOovJp8C74Y4rQe0zcDG1SLIl8SOHoJlRlnKl2YzGh8cg4V9eWRPrjyWjASgzVs39Gs/Cn2MiMja48KRTeHK/WgM9Mx2ByWjXcPbnqvq9DNiTuXwtaobDg02mtJIzs7fjixDkChqErEr3GncPjtxeyeTEKU+rBfB7fAsddSrnHGU2x0XfxltQ1cFPW17R/KPyBuI603kUNk2FGhi7fdHNs689YagCenu1D0bZI9Ik9iC0QXobQoQ9ElAVaMoIzCwnQ7roEC6QYIod749SURcLVE+KkI8eiOL363o7Ee8QM60FCZDtFZ4kxntjcHtJf+FGCpLUWcvIiV53K9P3qNVOkfb38IwVikKaEGl/a6G3D63zr5UelZ35WJeINTiKKL57AUqcyvphlbB8JM+87XPj65py75I1mPJcFjy17mVzDw2UYiNqD3A0hdpUVKCkw78pTk1dlCFxhpOUeetKFCyf+g
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecad5c93-7c81-443f-2e9d-08de77f2effc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2026 00:30:42.5110
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f57d554d-7808-4161-65af-08de77f1ca0c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004688.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH8PR12MB9790
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DpOJuDGs5R1dVTM7Azil6fOYzP3BmLCRWzlW4svPOL3dK5JSKBcuO3OY2oHWh7mfo5iUESaDmvkICLIICldxW0RjF/p4LisRCDRiGJtD/Yk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR04MB9377
 
-tracing_record_cmdline() internally uses __this_cpu_read() and
-__this_cpu_write() on the per-CPU variable trace_cmdline_save, and
-trace_save_cmdline() explicitly asserts preemption is disabled via
-lockdep_assert_preemption_disabled(). These operations are only safe
-when preemption is off, as they were designed to be called from the
-scheduler context (probe_wakeup_sched_switch() / probe_wakeup()).
-
-__blk_add_trace() was calling tracing_record_cmdline(current) early in
-the blk_tracer path, before ring buffer reservation, from process
-context where preemption is fully enabled. This triggers the following
-using blktests/blktrace/002:
-
-blktrace/002 (blktrace ftrace corruption with sysfs trace)   [failed]
-    runtime  0.367s  ...  0.437s
-    something found in dmesg:
-    [   81.211018] run blktests blktrace/002 at 2026-02-25 22:24:33
-    [   81.239580] null_blk: disk nullb1 created
-    [   81.357294] BUG: using __this_cpu_read() in preemptible [00000000] code: dd/2516
-    [   81.362842] caller is tracing_record_cmdline+0x10/0x40
-    [   81.362872] CPU: 16 UID: 0 PID: 2516 Comm: dd Tainted: G                 N  7.0.0-rc1lblk+ #84 PREEMPT(full)
-    [   81.362877] Tainted: [N]=TEST
-    [   81.362878] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
-    [   81.362881] Call Trace:
-    [   81.362884]  <TASK>
-    [   81.362886]  dump_stack_lvl+0x8d/0xb0
-    ...
-    (See '/mnt/sda/blktests/results/nodev/blktrace/002.dmesg' for the entire message)
-
-[   81.211018] run blktests blktrace/002 at 2026-02-25 22:24:33
-[   81.239580] null_blk: disk nullb1 created
-[   81.357294] BUG: using __this_cpu_read() in preemptible [00000000] code: dd/2516
-[   81.362842] caller is tracing_record_cmdline+0x10/0x40
-[   81.362872] CPU: 16 UID: 0 PID: 2516 Comm: dd Tainted: G                 N  7.0.0-rc1lblk+ #84 PREEMPT(full)
-[   81.362877] Tainted: [N]=TEST
-[   81.362878] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
-[   81.362881] Call Trace:
-[   81.362884]  <TASK>
-[   81.362886]  dump_stack_lvl+0x8d/0xb0
-[   81.362895]  check_preemption_disabled+0xce/0xe0
-[   81.362902]  tracing_record_cmdline+0x10/0x40
-[   81.362923]  __blk_add_trace+0x307/0x5d0
-[   81.362934]  ? lock_acquire+0xe0/0x300
-[   81.362940]  ? iov_iter_extract_pages+0x101/0xa30
-[   81.362959]  blk_add_trace_bio+0x106/0x1e0
-[   81.362968]  submit_bio_noacct_nocheck+0x24b/0x3a0
-[   81.362979]  ? lockdep_init_map_type+0x58/0x260
-[   81.362988]  submit_bio_wait+0x56/0x90
-[   81.363009]  __blkdev_direct_IO_simple+0x16c/0x250
-[   81.363026]  ? __pfx_submit_bio_wait_endio+0x10/0x10
-[   81.363038]  ? rcu_read_lock_any_held+0x73/0xa0
-[   81.363051]  blkdev_read_iter+0xc1/0x140
-[   81.363059]  vfs_read+0x20b/0x330
-[   81.363083]  ksys_read+0x67/0xe0
-[   81.363090]  do_syscall_64+0xbf/0xf00
-[   81.363102]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   81.363106] RIP: 0033:0x7f281906029d
-[   81.363111] Code: 31 c0 e9 c6 fe ff ff 50 48 8d 3d 66 63 0a 00 e8 59 ff 01 00 66 0f 1f 84 00 00 00 00 00 80 3d 41 33 0e 00 00 74 17 31 c0 0f 05 <48> 3d 00 f0 ff ff 77 5b c3 66 2e 0f 1f 84 00 00 00 00 00 48 83 ec
-[   81.363113] RSP: 002b:00007ffca127dd48 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-[   81.363120] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f281906029d
-[   81.363122] RDX: 0000000000001000 RSI: 0000559f8bfae000 RDI: 0000000000000000
-[   81.363123] RBP: 0000000000001000 R08: 0000002863a10a81 R09: 00007f281915f000
-[   81.363124] R10: 00007f2818f77b60 R11: 0000000000000246 R12: 0000559f8bfae000
-[   81.363126] R13: 0000000000000000 R14: 0000000000000000 R15: 000000000000000a
-[   81.363142]  </TASK>
-
-The same BUG fires from blk_add_trace_plug(), blk_add_trace_unplug(),
-and blk_add_trace_rq() paths as well.
-
-The purpose of tracing_record_cmdline() is to cache the task->comm for
-a given PID so that the trace can later resolve it. It is only
-meaningful when a trace event is actually being recorded. Ring buffer
-reservation via ring_buffer_lock_reserve() disables preemption, and
-preemption remains disabled until the event is committed :-
-
-__blk_add_trace()
-       	__trace_buffer_lock_reserve()
-       		__trace_buffer_lock_reserve()
-       			ring_buffer_lock_reserve()
-       				preempt_disable_notrace();  <---
-
-With this fix blktests for blktrace pass:
-
-  blktests (master) # ./check blktrace
-  blktrace/001 (blktrace zone management command tracing)      [passed]
-      runtime  3.650s  ...  3.647s
-  blktrace/002 (blktrace ftrace corruption with sysfs trace)   [passed]
-      runtime  0.411s  ...  0.384s
-
-Fixes: 7ffbd48d5cab ("tracing: Cache comms only after an event occurred")
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Suggested-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
-v2:-
-
-1. Remove preempt_disable_notrace() and preempt_enable_notrace() calls from V1.
-   Fix the issue by moving a call to tracing_record_cmdline() after ring
-   buffer reservation which also disables the preemption.
-
----
- kernel/trace/blktrace.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 3b7c102a6eb3..ead03e0e0fbe 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -383,8 +383,6 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
- 	cpu = raw_smp_processor_id();
- 
- 	if (blk_tracer) {
--		tracing_record_cmdline(current);
+On Feb 24, 2026 / 17:40, Daniel Wagner wrote:
+> On Mon, Feb 23, 2026 at 12:50:20PM +0900, Shin'ichiro Kawasaki wrote:
+[...]
+> > From these observations, I identified two problems below.
+> >=20
+> > 1) The requirement check for the loop transport left the nvmet and nvme=
 -
- 		buffer = blk_tr->array_buffer.buffer;
- 		trace_ctx = tracing_gen_ctx_flags(0);
- 		switch (bt->version) {
-@@ -419,6 +417,7 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
- 		if (!event)
- 			return;
- 
-+		tracing_record_cmdline(current);
- 		switch (bt->version) {
- 		case 1:
- 			record_blktrace_event(ring_buffer_event_data(event),
--- 
-2.39.5
+> >    loop modules loaded and it affected the following test. In the
+> >    current implementation, the helper function _unload_modules() is
+> >    called once, only after nvme/060 has been executed for all specified
+> >    transport types. Instead, _unload_modules() should be called after
+> >    each run of test test case for every transport. This ensures that th=
+e
+> >    modules loaded for the requirement check are unloaded.
+> >=20
+> > 2) When _setup_nvmet() does not load the nvmet module, there is no need
+> >    for _cleanup_nvmet() to attempts to unload it. _cleanup_nvmet()
+> >    should unload a module only if it was loaded by _setup_nvmet().
+> >=20
+> > This series addresses these two problems. The first patch fixes the
+> > first problem. The other two patches fix the second problem.
+>=20
+> Looks good to me.
+>=20
+> Reviewed-by: Daniel Wagner <dwagner@suse.de>
 
+Thanks for the review. FYI, I applied the patches.=
