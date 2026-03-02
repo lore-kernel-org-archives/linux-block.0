@@ -1,126 +1,212 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90551A9F90;
-	Mon,  2 Mar 2026 02:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C1B29DB86
+	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 02:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772419873; cv=none; b=Il4iXyZMcM7EMBGayK+Hq3PwGM/reGtJdcJH4RGsMg4iivWt4E9lK2l3uhFBt+jQJMuoJTvgwgJzyufGCl6CRTKGwwqYgndy5TiFe/5dCD7hiqGD2X6AYOKLrYyHu/cIDZAsi8V3XUM60oaX3Awdks2LAC0w408OTYAXzCnZtUQ=
+	t=1772420074; cv=none; b=OYnmMDDD76uM/wz/XsYnO24i8+JUGstoyNn1cC/VdMPB+nEVKa3EtGNfNOm/iixfZ8rTkbIoMhku4vAdh6mbeOWuuKrgU0tlJuIdfFlKymyPfAaJbTXxA9PDTr1LBPHrm4OaF2KGhpXrCpY3HYG+uZqBVclLF2dblMjX2dUdwvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772419873; c=relaxed/simple;
-	bh=XYjomkr0dTgWjwPjF8o60Bhsgl0frYza1cTvZQthwv8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZR1LE7uFzR3LLA226gXH3RPHyzCxuWlsgtaLaF2iY9Ro9na8CFvXtVrBinFyFbkYcuuhdbniUO/IPdtNWBqzoxvwRY2r5sAGVBXrbkhcdS40Q50qek7LqPuusoEcwFhYmUaLG7K8WAg4RFiHRIAiIlivrCM+ZXSRWwEtlQUNC6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OOShjZZv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772420074; c=relaxed/simple;
+	bh=QIBOPpDdx+fCrd3vSXwVMSGaBeOjFAF/rLFx2MA7lEU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pOKFOw0ymJSfvsEvoS8DzYm5x+0ivSZtgrZCPC7wcDkLdaVtdDfjt2Y3nn8NoACfNnXCqJ7SPJD1PBNMGkeLufJnHoZEckTjxl8aWemgmgRU4zf6vY29jQ8hj3ulYstgsraKBkA4dMPNHqe/Rfnmki1fL4Xu34eQNFwEOGX7jlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HqzmwF8J; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OOShjZZv"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 78429C116C6;
-	Mon,  2 Mar 2026 02:51:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772419872;
-	bh=XYjomkr0dTgWjwPjF8o60Bhsgl0frYza1cTvZQthwv8=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=OOShjZZvAFifyg0sFjaestiRUxm0YP4LTQ0++TB0MZjeQW25/XjiEQPJAECHA50/w
-	 rMbi2OuitMfVCxsgqOoJHeKRPM0HfYCqcbD2nPg9uYQ/TS9mH12DKYQh68XAD9h559
-	 JzBSGWw66LBFJs0eW3nedi3TIR/sHtefgSdRPzvlTDbsObHiI4mVTg6jUeqzLPbNPg
-	 F9WgBInQ9hNRw3pGrML451x4i1qarqHDB9CE9QhYuoqCXICXQS+yBFvVLcuzoIPg/u
-	 iTD5/f5Zz057eAUG+y3J4QN5k+bvvWZxv9l03SbHoQUlDFDqFavGE6PztOiQrrSoiU
-	 PlLfbyTXmkaUA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EAB7D58E4A;
-	Mon,  2 Mar 2026 02:51:12 +0000 (UTC)
-From: Jiucheng Xu via B4 Relay <devnull+jiucheng.xu.amlogic.com@kernel.org>
-Date: Mon, 02 Mar 2026 10:51:03 +0800
-Subject: [PATCH] block: avoild hang when bio_list is non-NULL in
- submit_bio_wait()
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HqzmwF8J"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772420072;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cRmafe0jH0R0Nafxr/7KHV9xhqMWn925hHllToiFxFs=;
+	b=HqzmwF8JTo9Y2lpWKdc4gZdc+aRwgV5aMmdp95t7X7tBlXqtUs4CuhF02utiW4A8pcIh1A
+	5o7Wo2NxSOkSNdqJZkMDkNY4Nj9VWGC1nkFpaWlxwvgx1M+idIJ9xVJynQvL7/Gv4I60ey
+	/clGdc7DQGjzzGH7HC2GKtCELDaDu6E=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-390-NnOysptOPRWinXNChCc4XQ-1; Sun,
+ 01 Mar 2026 21:54:29 -0500
+X-MC-Unique: NnOysptOPRWinXNChCc4XQ-1
+X-Mimecast-MFC-AGG-ID: NnOysptOPRWinXNChCc4XQ_1772420067
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C74B21800451;
+	Mon,  2 Mar 2026 02:54:26 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 77D691800576;
+	Mon,  2 Mar 2026 02:54:26 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6222sPId1830117
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sun, 1 Mar 2026 21:54:25 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6222sPsI1830116;
+	Sun, 1 Mar 2026 21:54:25 -0500
+Date: Sun, 1 Mar 2026 21:54:25 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
+        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
+        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
+        snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 04/24] scsi-multipath: introduce scsi_mpath_device_class
+Message-ID: <aaT74XadDrQb22Cf@redhat.com>
+References: <20260225153627.1032500-1-john.g.garry@oracle.com>
+ <20260225153627.1032500-5-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260302-for-next-v1-1-eb9339e8dc99@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIABb7pGkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDIyMT3bT8It281IoS3ZQ0szQDo2RjM0uTFCWg8oKi1LTMCrBR0bG1tQA
- I0PQ8WgAAAA==
-X-Change-ID: 20260224-for-next-df6f02c3694d
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- jianxin.pan@amlogic.com, tuan.zhang@amlogic.com, 
- Jiucheng Xu <jiucheng.xu@amlogic.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772419870; l=1659;
- i=jiucheng.xu@amlogic.com; s=20250821; h=from:subject:message-id;
- bh=umq++sfYBrcQgzncaR6KD4RDdLQo6hXzgnvNht92JHc=;
- b=X4RjgRRm6Nf1/IzXU5/a0BXUn8bhim1Iv+n8TXxQpemJztwPBKYqS1YR+PYAsHBQI8wb+Ky9E
- e7RVwpTFwg8CPn//V6Q8dE0FjNN2kt+krfZ6ZZLFPp9hSxEcEzWQ9zw
-X-Developer-Key: i=jiucheng.xu@amlogic.com; a=ed25519;
- pk=Q18IjkdWCCuncSplyu+dYqIrm+n42glvoLFJTQqpb2o=
-X-Endpoint-Received: by B4 Relay for jiucheng.xu@amlogic.com/20250821 with
- auth_id=498
-X-Original-From: Jiucheng Xu <jiucheng.xu@amlogic.com>
-Reply-To: jiucheng.xu@amlogic.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260225153627.1032500-5-john.g.garry@oracle.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-From: Jiucheng Xu <jiucheng.xu@amlogic.com>
+On Wed, Feb 25, 2026 at 03:36:07PM +0000, John Garry wrote:
+> Introduce a new class for multipathed devices, scsi_mpath_device_class.
+> 
+> The purpose of this class is for managing the scsi_mpath_head.dev member.
+> 
+> The naming for the scsi_device structure is in form H:C:I:L,
+> where H is host, C is channel, I is ID, and L is lun.
+> 
+> However, for a multipathed scsi_device, all the naming members may be
+> different between member scsi_device's. As such, just use a simple
+> single-number naming index for each scsi_mpath_head.
+> 
+> The sysfs device folder will have links to the scsi_device's so, it will
+> be possible to lookup the member scsi_device's.
+> 
+> An example sysfs entry is as follows:
+> # ls -l /sys/class/scsi_mpath_device/0/
+> total 0
+> drwxr-xr-x    2 root     root             0 Feb 24 11:56 power
+> lrwxrwxrwx    1 root     root             0 Feb 24 11:56 subsystem -> ../../../../class/scsi_mpath_device
+> -rw-r--r--    1 root     root          4096 Feb 24 11:55 uevent
+> -r--r--r--    1 root     root          4096 Feb 24 11:56 wwid
+> # cat /sys/class/scsi_mpath_device/0/wwid
+> naa.600140505200a986f0043c9afa1fd077
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  drivers/scsi/scsi_multipath.c | 67 ++++++++++++++++++++++++++++++++++-
+>  1 file changed, 66 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/scsi/scsi_multipath.c b/drivers/scsi/scsi_multipath.c
+> index 49316269fad8e..05af178921cb4 100644
+> --- a/drivers/scsi/scsi_multipath.c
+> +++ b/drivers/scsi/scsi_multipath.c
+> @@ -85,6 +85,69 @@ static int scsi_mpath_unique_lun_id(struct scsi_device *sdev)
+>  	return 0;
+>  }
+>  
+> +static void scsi_mpath_delete_head(struct scsi_mpath_head *scsi_mpath_head)
+> +{
+> +	mutex_lock(&scsi_mpath_heads_lock);
+> +	list_del_init(&scsi_mpath_head->entry);
+> +	mutex_unlock(&scsi_mpath_heads_lock);
+> +}
+> +
+> +static void scsi_mpath_head_release(struct device *dev)
+> +{
+> +	struct scsi_mpath_head *scsi_mpath_head =
+> +		container_of(dev, struct scsi_mpath_head, dev);
+> +	struct mpath_head *mpath_head = scsi_mpath_head->mpath_head;
+> +
+> +	scsi_mpath_delete_head(scsi_mpath_head);
+> +	ida_free(&scsi_multipath_dev_ida, scsi_mpath_head->index);
+> +	mpath_put_head(mpath_head);
+> +	kfree(scsi_mpath_head);
+> +}
+> +
+> +static ssize_t scsi_mpath_device_wwid_show(struct device *dev,
+> +			struct device_attribute *attr,
+> +			char *buf)
+> +{
+> +	struct scsi_mpath_head *scsi_mpath_head =
+> +		container_of(dev, struct scsi_mpath_head, dev);
+> +
+> +	return sysfs_emit(buf, "%s\n", scsi_mpath_head->wwid);
+> +}
+> +
+> +static DEVICE_ATTR(wwid, S_IRUGO, scsi_mpath_device_wwid_show, NULL);
+> +
+> +static struct attribute *scsi_mpath_device_attrs[] = {
+> +	&dev_attr_wwid.attr,
+> +	NULL
+> +};
+> +
+> +static const struct attribute_group scsi_mpath_device_attrs_group = {
+> +	.attrs = scsi_mpath_device_attrs,
+> +};
+> +
+> +static bool scsi_multipath_sysfs_group_visible(struct kobject *kobj)
+> +{
+> +	return true;
+> +}
+> +
+> +static bool scsi_multipath_sysfs_attr_visible(struct kobject *kobj,
+> +		struct attribute *attr, int n)
 
-When current->bio_list is non-NULL in submit_bio_wait(),
-submit_bio_noacct_nocheck appends bio to bio_list but skips IO
-submission, causing submit_bio_wait() to hang indefinitely.
+The return for this is actually a umode_t.
 
-Fix this by temporarily backup bio_list, setting bio_list to
-NULL before calling submit_bio(), then restoring bio_list
-after submit_bio() returns.
+> +{
+> +	return false;
+> +}
+> +DEFINE_SYSFS_GROUP_VISIBLE(scsi_multipath_sysfs)
 
-I've trimmed down the call stack, as follows:
+Nitpick again: This could just use DEFINE_SIMPLE_SYSFS_GROUP_VISIBLE()
+Also, this code would make more sense in the next patch.
 
-f2fs_submit_read_io
-  submit_bio
-    mmc_blk_mq_recovery
-      z_erofs_endio
-        vm_map_ram
-          __pte_alloc_kernel
-            __alloc_pages_direct_reclaim
-              shrink_folio_list
-                __swap_writepage
-                  submit_bio_wait  hang!!!
+-Ben
 
-Signed-off-by: Jiucheng Xu <jiucheng.xu@amlogic.com>
----
- block/bio.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index d80d5d26804e32944bcfe4506ca190033308844f..22c8769722cc89620c239310a0f3d4924de68cf9 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1505,8 +1505,17 @@ int submit_bio_wait(struct bio *bio)
- 	bio->bi_private = &done;
- 	bio->bi_end_io = submit_bio_wait_endio;
- 	bio->bi_opf |= REQ_SYNC;
--	submit_bio(bio);
--	blk_wait_io(&done);
-+	if (!current->bio_list) {
-+		submit_bio(bio);
-+		blk_wait_io(&done);
-+	} else {
-+		struct bio_list *tmp = current->bio_list;
-+
-+		current->bio_list = NULL;
-+		submit_bio(bio);
-+		blk_wait_io(&done);
-+		current->bio_list = tmp;
-+	}
- 
- 	return blk_status_to_errno(bio->bi_status);
- }
-
----
-base-commit: 8c5f40a3ba43ae9a26991f0e4a01a3a06e8958fc
-change-id: 20260224-for-next-df6f02c3694d
-
-Best regards,
--- 
-Jiucheng Xu <jiucheng.xu@amlogic.com>
-
+> +
+> +const struct attribute_group *scsi_mpath_device_groups[] = {
+> +	&scsi_mpath_device_attrs_group,
+> +	NULL
+> +};
+> +
+> +static const struct class scsi_mpath_device_class = {
+> +	.name = "scsi_mpath_device",
+> +	.dev_groups = scsi_mpath_device_groups,
+> +	.dev_release = scsi_mpath_head_release,
+> +};
+> +
+>  static int scsi_multipath_sdev_init(struct scsi_device *sdev)
+>  {
+>  	struct Scsi_Host *shost = sdev->host;
+> @@ -129,6 +192,7 @@ static struct scsi_mpath_head *scsi_mpath_alloc_head(void)
+>  		goto out_put_head;
+>  
+>  	device_initialize(&scsi_mpath_head->dev);
+> +	scsi_mpath_head->dev.class = &scsi_mpath_device_class;
+>  	ret = dev_set_name(&scsi_mpath_head->dev, "%d", scsi_mpath_head->index);
+>  	if (ret) {
+>  		put_device(&scsi_mpath_head->dev);
+> @@ -294,11 +358,12 @@ EXPORT_SYMBOL_GPL(scsi_mpath_put_head);
+>  
+>  int __init scsi_multipath_init(void)
+>  {
+> -	return 0;
+> +	return class_register(&scsi_mpath_device_class);
+>  }
+>  
+>  void __exit scsi_multipath_exit(void)
+>  {
+> +	class_unregister(&scsi_mpath_device_class);
+>  }
+>  
+>  MODULE_LICENSE("GPL");
+> -- 
+> 2.43.5
 
