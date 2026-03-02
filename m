@@ -1,192 +1,234 @@
-Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022085.outbound.protection.outlook.com [52.101.96.85])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011067.outbound.protection.outlook.com [40.93.194.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D1532D0CF;
-	Sun,  1 Mar 2026 20:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8CE430B85;
+	Mon,  2 Mar 2026 00:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772398026; cv=fail; b=GHpZneRMs2G3oiXyZ4aAzIVbjQkCFgUL/seYDD9A+OxoQ539etsGWbIK/3kFvW4JRYfnCK2++6dfN2d9hZizybGUeYoaHgfyePPvmkSoRgqqroyeDw6SXCJXuwq6nmgeFi/JJPR8jfeTXn8MVW6yQrvW89/hoNlNx+SD3gNtT7c=
+	t=1772410955; cv=fail; b=UD/l/yNWbEisl1qrz09PEAxCVNM9/EjbSxtn13JL3mnt2jg/MR2WgXuiXiZvn5/P+rKkr7X5WXdh/xTVdtRdEsW/+8b9gzhWpwp9+3bIFYddjf1xPnv4E9aTABQo47rDvrBwYXh2vM59nQvRQ23TwRacmy/Bf82gHnS8DbROY7o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772398026; c=relaxed/simple;
-	bh=vgOGFLU+LyXQQtaMKEnXBbBhab+r2DXObTGrWpTmk+Q=;
-	h=Content-Type:Date:Message-Id:To:Cc:Subject:From:References:
-	 In-Reply-To:MIME-Version; b=n+ywEEkXgArCT5EIsZqCoTEcNptYJHSRCNSWKzF3koA7eqHhWqH35twI6t8uPcR4s1+rmX5PneXsw37cQdtBzOFbEmayhOu+QXEzabKK1XP5X90ZDEcGuGoIA2z/VHipWsV06Behsdj/7qa6pg0O4Pt2btNOSilP+pGasPQ9qhc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=Egod5Ay5; arc=fail smtp.client-ip=52.101.96.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	s=arc-20240116; t=1772410955; c=relaxed/simple;
+	bh=3tkq0dvtYacqOktXDK+sJ37izSWKyHWjchKxn9PefCQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DusFlprXvZzhnDOkxDMFXUuk/rTMRKbkmH2inAWc3HKpuUezFVwwinoqsST1jGoV8KXsuVBFmExaxQGUJ+tIeb3OEKGqgtmTOX/NI+czfd92M55cugwPNz6gM7WiqgOHGYIn7tbLMvo9uBUA2M76hdp8y4r3QHHMy6AvlHsqTiQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oERD3D6Q; arc=fail smtp.client-ip=40.93.194.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="Egod5Ay5"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oERD3D6Q"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xb0QKoxFoj4qhaEzm8s6x7vfTall2fmFpBexc/UrMxYvSioVSXPD9QheCZg0HmqoyK1mDAxvDYl7TGRiyYBkxnoF2v0mE8+xGKB/KGc1zpnd3iznLXsGn3UqFMIki07BXb/cEd/w+cOLI/6OpXuP47mZg02eRd53TBNxxoZi7GsmAb8g4YVfHyggVGfpNGngiKWHPaX9/Weki/MneAQQ+taV85Tdc1MaobEdG4cAQIsD4Uvy4SGurBr0uDwnNLSYyg2hYk72K3Ab2Lfum7Anc+vfq52KfHD9cHh2ehvByakaJpxlVb6j0Ky2niKVezcApFlUKZFYa60pIKVJFJ1ynw==
+ b=u80WAO+TseLuveyAETHvb6Me/gKXSeEi0dQ7+RTzPkr1CwGVPCrG9RH8xug8xfnfsHxqPhk9CPEtx0LeZmBvZHToCssUYiUrZ5lerP2fN6j5wLh74Ogwozznhi4LpMjZD9PELXdYJkPBG4/LQKKBTPhIdaChsFzZERGdVgaPm0b+deFILH6maXuk+P3eCljt0tkmndGi0bZ/c38nZahKiZo/B8HwaZVCS3UnGtJyKcEaDG34fcDmqKJIQOjsHG5p7ZxiOvFUMCeWrR1qYtq0dujktnpy84VzIl65EhtHTnovh8I5WW/ChN/LclITC3+BEHqPdaTZtSeeuq4fEy39kg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vgOGFLU+LyXQQtaMKEnXBbBhab+r2DXObTGrWpTmk+Q=;
- b=bULryEAy3KGgN1ZuQp2I1iFfSwQ1jSYuFwTAxEUs2YFBTBQT+cTkJzzwyzbqbzUzJl9LEhuRxo94t1+AmnPk1lfrrzUuv5zRAoj0lgPSe+uo6cZ77PVl0zSTs7SDFlHlD70c25AJi2YE+uj+iEUU9K7P6NtjIT+Q/NOiQDM5HffCK4gYyozQbeTpbRK580uyIUkyol2kJcJs1OzE2LaXl/MBXk/YFsx1JkqWVXATSOLB3oMWP4YuYVelc1amO2z5v7JZF1gjsTtyP3mIn6hbU2rmfVw+q5cZD5x2ZDm6I+JJHkMEFZGaa/bJocRkMSRJ5a44uoxv/wvhILPvqeNQkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
+ bh=uY991wE8LibZu/ZtTLsnt+XmIPxjmbnxYbEYw1It0KY=;
+ b=GCkBHXKaV3Z8KK2RY9xSt8tZOxfW+sRyXgMtdeKhgoZ1dK+3Qq1ViAl6mboSQkGDSQEox86exe8tg6GZt+yctWiW4vPX0FMwX3OnAMHD9levV7Rq+rUlte82d3ec7aZtxeNOFUlCmma5bzveVNsps7hgNrMHdq34nuQIDbtN2wl0BW9uvarvYezXGtqbC0fOocm1nB4QI6ECIh3S4IAyzDmufvy9+DgZmo2s5K9PjgOZG0OTzmRTwiv5Q13i3pq8IImu3C8tlCFINlppec4Bj4zV8vZderRWY/YwBrYgERsqWKrEPwAuXrVRvoVN6ojn+dLUcHK22qsBRYiDZqHYng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.dk smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vgOGFLU+LyXQQtaMKEnXBbBhab+r2DXObTGrWpTmk+Q=;
- b=Egod5Ay5vQaLkXLSpUiu3oOdp/Wxtou/59nOxk0XCWtJgQzByG6zUBwf0kcP0U/c8J3rLW4/lK+d7KJO2EVXZZ+ipcJW56UmX1B1w5as20wgcc2f4yhZ03DqG6hGwIzr3aMykeEMX0yfbxMWOWWBm5I+4F8KUopyGavCsoC0HBk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LOVP265MB8673.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:4a7::7) with
+ bh=uY991wE8LibZu/ZtTLsnt+XmIPxjmbnxYbEYw1It0KY=;
+ b=oERD3D6QQccipG5QeQXsecUGL+bOo2iKYYvHVfdAQ9J4PdS6Jf95yGVoyBz4eTabOI/594yJehYTccvEMjbtLO75bd7k7MQucvKY1udyPG6h8zR8gQQSm9R1lzGjdHcej4qasfUfFojXdRZ84Ynp3zlmKWLKGsrwu2bAxP8bFHVr4vm17k0eEU5fCi2NQtnD1EG0fsan7WAwPCkkMlIFXuifiXFFi4uuvZ2FKj4xRMhIGyK2HCxhMhx6zgT9enKFWDLmM/tnNnQwgEjEWiH+1yEIHUBpj+JtHGXBFv36OQUIWaPUBVrOJ8/gN6rWwiyBhd0S8qxqyivGtx/jzChOvQ==
+Received: from BN9PR03CA0800.namprd03.prod.outlook.com (2603:10b6:408:13f::25)
+ by CH8PR12MB9790.namprd12.prod.outlook.com (2603:10b6:610:274::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.20; Sun, 1 Mar
- 2026 20:47:01 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%5]) with mapi id 15.20.9654.020; Sun, 1 Mar 2026
- 20:47:01 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 01 Mar 2026 20:47:00 +0000
-Message-Id: <DGRQNTVD3N23.33347CYLKMKEH@garyguo.net>
-To: "Benno Lossin" <lossin@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- "Andreas Hindborg" <a.hindborg@kernel.org>, "Miguel Ojeda"
- <ojeda@kernel.org>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Alice Ryhl" <aliceryhl@google.com>, "Trevor
- Gross" <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, "Dave Ertman"
- <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
- Romanovsky" <leon@kernel.org>, "Paul Moore" <paul@paul-moore.com>, "Serge
- Hallyn" <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
- <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>, "Igor Korotin"
- <igor.korotin.linux@gmail.com>, "Daniel Almeida"
- <daniel.almeida@collabora.com>, "Lorenzo Stoakes"
- <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- "Viresh Kumar" <vireshk@kernel.org>, "Nishanth Menon" <nm@ti.com>, "Stephen
- Boyd" <sboyd@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Boqun
- Feng" <boqun@kernel.org>, "Vlastimil Babka" <vbabka@suse.cz>, "Uladzislau
- Rezki" <urezki@gmail.com>
-Cc: <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
- <linux-block@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
- <dri-devel@lists.freedesktop.org>, <linux-fsdevel@vger.kernel.org>,
- <linux-mm@kvack.org>, <linux-pm@vger.kernel.org>,
- <linux-pci@vger.kernel.org>
-Subject: Re: [PATCH v16 01/10] rust: alloc: add `KBox::into_nonnull`
-From: "Gary Guo" <gary@garyguo.net>
-X-Mailer: aerc 0.21.0
-References: <20260224-unique-ref-v16-0-c21afcb118d3@kernel.org>
- <20260224-unique-ref-v16-1-c21afcb118d3@kernel.org>
- <eeDADnWQGSX9PG7jNOEyh9Z-iXlTEy6eK8CZ-KE7UWlWo-TJy15t_R1SkLj-Zway00qMRKkb0xBdxADLH766dA==@protonmail.internalid> <DGRHAEM7OFBD.27RUUCHCRHI6K@garyguo.net> <87ldgbbjal.fsf@t14s.mail-host-address-is-not-set> <DGROXQD756OU.T2CRAPKA2HCB@garyguo.net> <DGRPNLWTEQJG.27A17T7HREAF4@kernel.org>
-In-Reply-To: <DGRPNLWTEQJG.27A17T7HREAF4@kernel.org>
-X-ClientProxiedBy: LO4P265CA0064.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2af::20) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Mon, 2 Mar
+ 2026 00:22:29 +0000
+Received: from BN1PEPF00004688.namprd05.prod.outlook.com
+ (2603:10b6:408:13f:cafe::17) by BN9PR03CA0800.outlook.office365.com
+ (2603:10b6:408:13f::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.19 via Frontend Transport; Mon,
+ 2 Mar 2026 00:22:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN1PEPF00004688.mail.protection.outlook.com (10.167.243.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9654.16 via Frontend Transport; Mon, 2 Mar 2026 00:22:29 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 1 Mar
+ 2026 16:22:14 -0800
+Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 1 Mar
+ 2026 16:22:14 -0800
+From: Chaitanya Kulkarni <kch@nvidia.com>
+To: <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
+	<mathieu.desnoyers@efficios.com>
+CC: <shinichiro.kawasaki@wdc.com>, <linux-block@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH V2] blktrace: fix __this_cpu_read/write in preemptible context
+Date: Sun, 1 Mar 2026 16:22:07 -0800
+Message-ID: <20260302002207.12165-1-kch@nvidia.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LOVP265MB8673:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3005ec67-92c1-46a3-de4a-08de77d3b01b
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004688:EE_|CH8PR12MB9790:EE_
+X-MS-Office365-Filtering-Correlation-Id: f57d554d-7808-4161-65af-08de77f1ca0c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|7416014|10070799003|1800799024|921020;
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
 X-Microsoft-Antispam-Message-Info:
-	dhUpQNVugHCBnbuyqOvvB21QE4DlvulNCmqXgeEOPwMP220IOCXGupqw0MnQxlpZeyFghTTDoKycwl5AtpOzV2G7Ua2x0MOkKdrETOsO+iAsyk9eEfRIvbu1Oyx5EXlHbRAJzqOMVrS2ZYmYawbL4nj5RobTxrhFttZTq6OaAusjEKPbb+EG4PqGtkGHTaYWuwsDGJ6VGu3iMFrBENxUnwO/zmv4qqhBInoCvvTC9e0+jPvbl3g3uTewS9mq932wYKxW2Ff7vMpDLjVHAdsD2DuPdBqjWy8ix2n2nlOLOJI9yoq1GQ0UZanu9U8Sv5ktiASllaqNqPJSIEgwXEFgJpj+o8R8FGK8/LizDzqbn3+h6BK6GihO6UUeDCsncZxw81N7aQTxAy4w54ky7BSD3WScp44HrpvOXCfJjupi3w+fPk6+6nMNgwRTq9JKO3LkNSyp9cxNJWsMGUMKA5RbT5KPgfULeOoq5VOuvtLb7v47QO4PExE6tq2YoYcMMzkhCsg7iR8slONjOQxvtx1oMNTs7J1jgjFb6qLCEO+gxzFR+CABvINm4xx/C9hkm/4zkQ495G2qA/I/lCbPzXf6FiXeAcUyOPnCMwoW+8I4ls3FUEiFOfOhrDCpwjXOc5g0kI30lv5/WykfuWBUX+EZtD/FuqtuP6PBnDth+W1lGjaPCLZDn0HDJR7OVRkY1kEg5JdflDevVk7wxblNs2Oza5A+xF9a1zEEgQISJMm+FiE=
+	Zhjv7/r9C0jshz3Fl2p2A0iwOAxHI6pe9xoYSj6Ey6PohvnNm+I0pdD79pPFH9WvMvPxAgj0IAyyqSwCsw2UTvK/5PTEQpEWoQI5JjepaYFKceLN54qkIDbcC2XPrxlqs9V7ykAlgXetYj+vLqsgtGhSFi4EszRZXY4qdc2VzJskt6JAdEUrMm2d9fF1jHyMq60X7XOiRVRCNdbbJnaSIW+yIL8HKMgYdNhE4APmnBlNUfnXvbwnTz/U/A3NC/sNTFDO7FUxhRqgCbO0lGs10pLL1fP86U56sSmKEJqgXDskn7D4eOtGVXJmtlMeZ2b5JiaARp62EA3bgR6PEuoh0SjTcaESVxa4JSy+Ypk5lhcAoyhgJYkbvB7cmFwgtjFUDJc0CI9CNAFxcYJUgjoGCrrE07o81CXe1G6hZjBeecLjrsP/WdQ2CfF3bQ/lwT+ORWOADu6cYlRGFRGeF/cLk6qj+Cu/bz+7hTa0WRsMLbWNPrv738JC+hM4q05Fxru2yoMaf6hVW0g0hQI2RZhlngH5bXoDj/NoVA9WG4v6XERO6PQZaAvEOotTJ2OvO48yd1O/DqgdWiZiSeYyVO4/zTGpuJM3NZ7nHMJoBTJY+P3uGzDNKCy8tAkMdJewVckOIjcfL05pN91sozCKdb0wG3V007oYN1/nFvWi5PZTAhfWQFuM09H0N/yyD8S6dnbW7IoXzusI4Jcgn5LE7nCMYfCxXb0N+s3FvzO4lWOENVyf/WHqoBDsHARbDy5En9bZVaUhs5SboI6GeuM4dZtBA+gd8o28widwgPtGa4i+P7D2RkqZlzR8lZZeZfn40OTUjARFddxcJs/S3JijdyDzdA==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(10070799003)(1800799024)(921020);DIR:OUT;SFP:1102;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MWpDL200TGpzMzhkQTlMekNxeTBTRC9FN0g5aGlaL1pjNllObzBmY1NpZ0s4?=
- =?utf-8?B?aVhvZVV2MVNmcE1PZ2I0K25kWjZMazR5a1JqSk5QekRsN05DUktyUmlnV3pq?=
- =?utf-8?B?Q0ZNenlpazN6M0pHU3VXYWlqUnFQVFRlTXc0c3JpaVZCam5EMTlwK2dpdmRp?=
- =?utf-8?B?RW9hMXcvWWlYZElpbFdBSGVhUGVKZFZkcUJ5REtYVVNzd2RMM2t5ZWdvMkMw?=
- =?utf-8?B?c0tTT3Z3TGIzeTJSdFNoM3hJdHVDUVgwd3JQcmErT21WWU1ETUZwS0tBazM5?=
- =?utf-8?B?NUZMejFaUGM4MVJHcHlkRnhzWC8wMXBTVDVpS3hYU3RYY09hWTZ0bGo1Y2tl?=
- =?utf-8?B?Q1N2OS9EeG5xNXRobmFGSkFJL3FObmtrUjR1QkRZcnJlUHM5SFlkS0pDVmpT?=
- =?utf-8?B?VldqV0J4MzF0ZDhmcnJLdDNhZ0ZwZnpsUHZTUmRuRjRxaVFndjA0ejJhZjBT?=
- =?utf-8?B?MVMwTHJ3a1lXTWwxemdLV216ZmJOUVZreTJLQ3QrZTRkbVk5NFRkUTBMV1Jz?=
- =?utf-8?B?SllNS2M1V1ZYaytRWkUza2pVQTBOUTZ4VGNHUzNGRFpXZEE3eG5YeXEvU2xJ?=
- =?utf-8?B?TU9odFJsaG80VmN3dW1Ucms1YjBYVHBjaXl3UGczaEY4MHNsUzFmVlRZZUh2?=
- =?utf-8?B?NTFnb3hIMXFDUHI1NFlvcHcxZDhoQTl1OVNTekNXVDZrS0F1RnpKSkIzRTlH?=
- =?utf-8?B?Wk13K2lXZzVxYStQY3NHVEpnY2hLc1VhVWEzMFQ1bmNEK2VuOHN6RFdjUlNy?=
- =?utf-8?B?WDk3UGd2eTdxMzU5TWl0V09BTVNQMEorK2pKcnA5R2sraCtpZ0FVTUZGcnJs?=
- =?utf-8?B?aGxrRnFmNFpndmtOMjRFd2NTL0ROUm0rQlJuYW1uZ1NKRE5idXowYXRpYytG?=
- =?utf-8?B?Q3htNmxQNHRUUkhrcWpMTUlzckJGclhJdGcxTXQrdGpmaDUrSnExUFhsQWR1?=
- =?utf-8?B?MUJnMVJGZzZURmluSiswRmpidW9RS0ZPY0cyQ1RIejJMWllmL1EwcVdGbGRT?=
- =?utf-8?B?bVJ2UU56WjJmL2Y5dEYvem1OeTRLS0pSVTk4bW9hTzBDRk5nck1KQlhuKzZt?=
- =?utf-8?B?RWZmTjh0RTlCbms1WGh6S0Z1WE43YWZBZUJ5UXc1YWlsQUpuaUVVR1VFUjVh?=
- =?utf-8?B?eWE5a0daUmsyRjlqQUlSSjRXNEMydXFURmFnb2lWWjV2MThLWFc3TG9DZVAz?=
- =?utf-8?B?aUlCLzR1OERtOFIvbVZkUlRZRFBpY2ZPdEJ4OG5sUkRWeGZuSUhOWWF3R2Jj?=
- =?utf-8?B?OFc4S2NPUDRobmpaVFlCYTh4YTNVNkVuQVduQVUyMXJiNythWllOeXlUbTdx?=
- =?utf-8?B?MVgyb21FaGVwYjRLT0tsbGt6by9zcFYxMzF6d1Qzcjg5NS9VeEp4bFpLRUxH?=
- =?utf-8?B?NzBWb3lOcTJsQUtZRFEwZlFjd0RkbU1ZMklHanJpZnB0TGJoc21EVXp3L3NS?=
- =?utf-8?B?OS9oYTRRcmVvUkcyZG9aYzBLRHZqWDBTUVFOSDNPclJHRnlQV0R4QnhOTjQ2?=
- =?utf-8?B?NVNHbktkTzRTaUN4c0tuTklIM1JjU0pEWXkzNnh2YWh1eHFDeXJzY1hzUTlE?=
- =?utf-8?B?WmNXSWFlZGdKWjVNbm8wOUFzcW1ydXY5QkVWbC83dWZhYlB3MW5nejZFZ2dB?=
- =?utf-8?B?WkcvaFBuZGhqaFg0N2NLRHdzN1ZJL3k4RzdYWW05WEhUWm5XbVlwZHBjOUNW?=
- =?utf-8?B?WXZtODFyWEpGTFErRWcwYlhFSVQ5ZkRBamJwdVdIK1R4djZ2NEd0MGFpMTRk?=
- =?utf-8?B?ZHVEMmhPLzdSd1dpdWh3MUFINVFMZVpHMGhPQXZyTVFacTNqb051VUgzM1Iv?=
- =?utf-8?B?UWZRT0xTVnpDZUU5V2NlR0xnbSsvcFI0SW1Zc01oSlVwUGtUdnRodFNvUkp0?=
- =?utf-8?B?UjhHeXVDeitRNzJtSFhSUWhZUnYzUUJ3Sm9TdkJFQ1lKdjJ1ZkVwUU82VHJV?=
- =?utf-8?B?cWd4NmVKdmtWYXZIaWpGQjJrQkwvWFZDc25TWjBVbFhCWTN6d1ZOQk5TOGxw?=
- =?utf-8?B?S2w5VW1ESmg2YTVKRnoxNUpWOC9iZklKbmlNM2M4SUt6TitVcTI2VmI1SWRE?=
- =?utf-8?B?YnJJd2owUzJVQzRpUnBBNkN5RXdOeisvaWNpWDA5OUU5a0trK3ZPNUgvOFpC?=
- =?utf-8?B?Ukw5S2ZNOEdMSEMvYTJpSXpkWjFGU2Q4YWhwYkVkOFF4VEJjVHFJRkVBRkdV?=
- =?utf-8?B?cjJLOVloek81ajFyWkcvMWgxZzZ3enYwcEErd1Z3dTlZa25BWFpIRVZxSVJJ?=
- =?utf-8?B?Mld4K2RlZXVCSjZEWDJxaDVjZ2x6T2ZtYVpacUdHcUp3K1lWaDExZU45SnpJ?=
- =?utf-8?B?RjB1SmpBVU10RTVrcEdHbGJjTE5icEpVaUU4MmpRNHcxVGJJbURRUT09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3005ec67-92c1-46a3-de4a-08de77d3b01b
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2026 20:47:01.0480
+	xr/6vz3oj8qkDtDffOz3Oslt17cxpHZS1NVJvKjAipOJHgE3dyS2gJoc8Cj6ZskiIMcE9k/XIaF9P6bz9XfNTLROg8a7JEMlCzNMvfbnmFyRATCvjKTi5PaKweXYxfOnOzSdrO7Pyzz9mfldxrBNaGoozVJX1NoNeBjZvtbywBWdz2etkTSexPA8zaVNjRnWQX8Zt/KiEtAgEOwVUTQdCbC9Rs/4ciHuSYuAhdnD26sqINbzg9aycdQNM7fOSBo85EzrcMbhC1IDfiUHXoRsJf55kboyHMmKOeVSP1ss6lMENECIu4MwWMVk+d65RE5BKEjWr6uVHlf7CllSWbEOHfTwDnOqXlwkA5LN5+khBBOTBSwuwrkVgCsXwbp1lRdRAQGxDYfbstHlEhBH0bD0kZsAwBtMZr9BWJgN+87ijRr3jUZdgM83BIJYEn/x2GbC
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 00:22:29.1854
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GyJqiYRwvLPy4YUSUxPiuyGLALAaauEVb5TgKJ1XH85z2JxItTbo8WbpU8PW3N6RapiJ6y7M4vuKGOp8UijwDg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LOVP265MB8673
+X-MS-Exchange-CrossTenant-Network-Message-Id: f57d554d-7808-4161-65af-08de77f1ca0c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004688.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH8PR12MB9790
 
-On Sun Mar 1, 2026 at 7:59 PM GMT, Benno Lossin wrote:
-> On Sun Mar 1, 2026 at 8:25 PM CET, Gary Guo wrote:
->> `#[inline]` is a hint to make it more likely for compilers to inline. Wi=
-thout
->> them, you're relying on compiler heurstics only. There're cases (especia=
-lly with
->> abstractions) where the function may look complex as it contains lots of
->> function calls (so compiler heurstics avoid inlining them), but they're =
-all
->> zero-cost abstractions so eventually things get optimized away.
->>
->> For non-generic functions, there is additional issue where only very sma=
-ll
->> functions get automatically inlined, otherwise a single copy is generate=
-d at the
->> defining crate and compiler run on a dependant crate has no chance to ev=
-en peek
->> what's in the function.
->>
->> If you know a function should be inlined, it's better to just mark them =
-as such,
->> so there're no surprises.
->
-> Should we set clippy::missing_inline_in_public_items [1] to "warn"?
->
-> [1]: https://rust-lang.github.io/rust-clippy/master/index.html?search=3Dm=
-issing_inline_in_public_items
+tracing_record_cmdline() internally uses __this_cpu_read() and
+__this_cpu_write() on the per-CPU variable trace_cmdline_save, and
+trace_save_cmdline() explicitly asserts preemption is disabled via
+lockdep_assert_preemption_disabled(). These operations are only safe
+when preemption is off, as they were designed to be called from the
+scheduler context (probe_wakeup_sched_switch() / probe_wakeup()).
 
-That requires *all* public items to be `#[inline]` regardless the size, whi=
-ch is
-excessive.
+__blk_add_trace() was calling tracing_record_cmdline(current) early in
+the blk_tracer path, before ring buffer reservation, from process
+context where preemption is fully enabled. This triggers the following
+using blktests/blktrace/002:
 
-Best,
-Gary
+blktrace/002 (blktrace ftrace corruption with sysfs trace)   [failed]
+    runtime  0.367s  ...  0.437s
+    something found in dmesg:
+    [   81.211018] run blktests blktrace/002 at 2026-02-25 22:24:33
+    [   81.239580] null_blk: disk nullb1 created
+    [   81.357294] BUG: using __this_cpu_read() in preemptible [00000000] code: dd/2516
+    [   81.362842] caller is tracing_record_cmdline+0x10/0x40
+    [   81.362872] CPU: 16 UID: 0 PID: 2516 Comm: dd Tainted: G                 N  7.0.0-rc1lblk+ #84 PREEMPT(full)
+    [   81.362877] Tainted: [N]=TEST
+    [   81.362878] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
+    [   81.362881] Call Trace:
+    [   81.362884]  <TASK>
+    [   81.362886]  dump_stack_lvl+0x8d/0xb0
+    ...
+    (See '/mnt/sda/blktests/results/nodev/blktrace/002.dmesg' for the entire message)
 
->
-> Cheers,
-> Benno
+[   81.211018] run blktests blktrace/002 at 2026-02-25 22:24:33
+[   81.239580] null_blk: disk nullb1 created
+[   81.357294] BUG: using __this_cpu_read() in preemptible [00000000] code: dd/2516
+[   81.362842] caller is tracing_record_cmdline+0x10/0x40
+[   81.362872] CPU: 16 UID: 0 PID: 2516 Comm: dd Tainted: G                 N  7.0.0-rc1lblk+ #84 PREEMPT(full)
+[   81.362877] Tainted: [N]=TEST
+[   81.362878] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
+[   81.362881] Call Trace:
+[   81.362884]  <TASK>
+[   81.362886]  dump_stack_lvl+0x8d/0xb0
+[   81.362895]  check_preemption_disabled+0xce/0xe0
+[   81.362902]  tracing_record_cmdline+0x10/0x40
+[   81.362923]  __blk_add_trace+0x307/0x5d0
+[   81.362934]  ? lock_acquire+0xe0/0x300
+[   81.362940]  ? iov_iter_extract_pages+0x101/0xa30
+[   81.362959]  blk_add_trace_bio+0x106/0x1e0
+[   81.362968]  submit_bio_noacct_nocheck+0x24b/0x3a0
+[   81.362979]  ? lockdep_init_map_type+0x58/0x260
+[   81.362988]  submit_bio_wait+0x56/0x90
+[   81.363009]  __blkdev_direct_IO_simple+0x16c/0x250
+[   81.363026]  ? __pfx_submit_bio_wait_endio+0x10/0x10
+[   81.363038]  ? rcu_read_lock_any_held+0x73/0xa0
+[   81.363051]  blkdev_read_iter+0xc1/0x140
+[   81.363059]  vfs_read+0x20b/0x330
+[   81.363083]  ksys_read+0x67/0xe0
+[   81.363090]  do_syscall_64+0xbf/0xf00
+[   81.363102]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   81.363106] RIP: 0033:0x7f281906029d
+[   81.363111] Code: 31 c0 e9 c6 fe ff ff 50 48 8d 3d 66 63 0a 00 e8 59 ff 01 00 66 0f 1f 84 00 00 00 00 00 80 3d 41 33 0e 00 00 74 17 31 c0 0f 05 <48> 3d 00 f0 ff ff 77 5b c3 66 2e 0f 1f 84 00 00 00 00 00 48 83 ec
+[   81.363113] RSP: 002b:00007ffca127dd48 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+[   81.363120] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f281906029d
+[   81.363122] RDX: 0000000000001000 RSI: 0000559f8bfae000 RDI: 0000000000000000
+[   81.363123] RBP: 0000000000001000 R08: 0000002863a10a81 R09: 00007f281915f000
+[   81.363124] R10: 00007f2818f77b60 R11: 0000000000000246 R12: 0000559f8bfae000
+[   81.363126] R13: 0000000000000000 R14: 0000000000000000 R15: 000000000000000a
+[   81.363142]  </TASK>
+
+The same BUG fires from blk_add_trace_plug(), blk_add_trace_unplug(),
+and blk_add_trace_rq() paths as well.
+
+The purpose of tracing_record_cmdline() is to cache the task->comm for
+a given PID so that the trace can later resolve it. It is only
+meaningful when a trace event is actually being recorded. Ring buffer
+reservation via ring_buffer_lock_reserve() disables preemption, and
+preemption remains disabled until the event is committed :-
+
+__blk_add_trace()
+       	__trace_buffer_lock_reserve()
+       		__trace_buffer_lock_reserve()
+       			ring_buffer_lock_reserve()
+       				preempt_disable_notrace();  <---
+
+With this fix blktests for blktrace pass:
+
+  blktests (master) # ./check blktrace
+  blktrace/001 (blktrace zone management command tracing)      [passed]
+      runtime  3.650s  ...  3.647s
+  blktrace/002 (blktrace ftrace corruption with sysfs trace)   [passed]
+      runtime  0.411s  ...  0.384s
+
+Fixes: 7ffbd48d5cab ("tracing: Cache comms only after an event occurred")
+Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Suggested-by: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+---
+v2:-
+
+1. Remove preempt_disable_notrace() and preempt_enable_notrace() calls from V1.
+   Fix the issue by moving a call to tracing_record_cmdline() after ring
+   buffer reservation which also disables the preemption.
+
+---
+ kernel/trace/blktrace.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 3b7c102a6eb3..ead03e0e0fbe 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -383,8 +383,6 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
+ 	cpu = raw_smp_processor_id();
+ 
+ 	if (blk_tracer) {
+-		tracing_record_cmdline(current);
+-
+ 		buffer = blk_tr->array_buffer.buffer;
+ 		trace_ctx = tracing_gen_ctx_flags(0);
+ 		switch (bt->version) {
+@@ -419,6 +417,7 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
+ 		if (!event)
+ 			return;
+ 
++		tracing_record_cmdline(current);
+ 		switch (bt->version) {
+ 		case 1:
+ 			record_blktrace_event(ring_buffer_event_data(event),
+-- 
+2.39.5
 
