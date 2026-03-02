@@ -1,279 +1,255 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1832D5436
-	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 07:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772436240; cv=none; b=qMc/Zf3KHx25CtNapQdpmdsotoTK+mfnPNd8CdZIjxqrjsxtEJ8XhNY0+N22EqT/SSXOQ9TN+tD0CfBYB9hNcbTr9T64wgTOCanQqHjd4mHKkIIeqvF0xmmVCaxz2dXv07CSSLiMnoMUCbBOhHT7ybqBTNbiosML3tCQ40lc2Ao=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772436240; c=relaxed/simple;
-	bh=T/rwE2qTzy3pnf7Qs8Tz2mS0LtS8WhWbFYfG4Lg3dvk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=mVF90TGffBBvp9XE+xrkyqXWbs1fJrxKMS23NsUmfgrxqs2459ZP1dd8aI8Ak/6D5dIE+bEJglMa7cRzP7AA+LvkN3sPLGU7eqqk3IBC3x/U6hjyVvLQEbiCH6WwXQt5zNrzQFAtVByP6joLfmkfyRiZXYhDMa050rxrEZwbwC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EULW/eYE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nijisR+T; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xA3FYdRg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gs+ZwFGC; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13AD383C9D
+	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 07:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772437397; cv=pass; b=cEyAVE8Zno+VM0QP6Hol0kiTm3yeupfYCrJjrRPY8iKYFC00L9AO0UTcXcxeQ08bpI2FDuN8K8Cvzc6qhl2OgN7MGszDTswDdWdn+NIYJFkVulrzmTT6jafWqQmahWwA7rwToXsJ9yIG0niZzl9yf2vlkdA3WpeQyrh5g2CWYx0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772437397; c=relaxed/simple;
+	bh=iPKbVxKym7OQgnizmhUo9y9f2ovSerP9EfVW2i8EjkA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m5IRthcT4ZDeiXNWB2mKD8iFixw/wIav0zMF90CNSgkY2naImt08sootrtwpihYGH7/1JZshIAxSerXH8Z15xz5u4hsGF06iDUnTmQetgCyGg9EAcd+usy511wu8iemihTXdoAjQmDoJLIoD1YGRX5Iq40FaCz1O5S/Ua0d3+XQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cVkoMsLG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hEOebG+d; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EULW/eYE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nijisR+T";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xA3FYdRg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gs+ZwFGC"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5F6495BD15;
-	Mon,  2 Mar 2026 07:23:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772436237; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVkoMsLG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hEOebG+d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772437394;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6mgwBnWFQswLnsKD43R8TtLe6U95/IzWhXEt4lEW4Lo=;
-	b=EULW/eYEoBQWGKSDPU564omC35VxVINyjoUx9G/c+OJaq5d7j/tO5qrNdGGd/DWr09WkHk
-	8a4eliloThjaujdmxeNiG56kNWxDO0zw4TbDaIETTdODff7g5aII5WdujRnpNOvkua+zKp
-	JYd1WnHBUTF+HIAHzGDnow+PFd08ZYI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772436237;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6mgwBnWFQswLnsKD43R8TtLe6U95/IzWhXEt4lEW4Lo=;
-	b=nijisR+TgKyPGlFJxdGl2QZLbxPgOl/R3F27897qZIixW1UIL3M/lIB+pWkqRCDqJ2kbBV
-	x63HcrIolnuVNtAQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772436236; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6mgwBnWFQswLnsKD43R8TtLe6U95/IzWhXEt4lEW4Lo=;
-	b=xA3FYdRggPs9+HJJ8bbxxnsGU2qU+aN/2RDDKhtVPYbdy1Mkzrl49Od9FOMBwXdVFWZLHq
-	lPvUUyMoPF5SGXTvDBr5e72XSTJFJ2ucXdM8x+03XjfPaqXYcg4A0QCNqGOtTQbUgZ/qQk
-	/OJZwJFwCLyyv9m01ALlEGVv7kxMa1Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772436236;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6mgwBnWFQswLnsKD43R8TtLe6U95/IzWhXEt4lEW4Lo=;
-	b=gs+ZwFGC0Uo6I4i5kgbOBRaMeDxYHBqOdSJQyVs8dGK4D0oK+JTmcge0Q9n5sNzJ27G76A
-	zqeILIX5y/Ryc+Aw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2DCAB3EA69;
-	Mon,  2 Mar 2026 07:23:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9mzDCAw7pWmHbgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 02 Mar 2026 07:23:56 +0000
-Message-ID: <aa6ae051-1ead-4d31-bec9-c990f278e5df@suse.de>
-Date: Mon, 2 Mar 2026 08:23:55 +0100
+	bh=vfrdMnxpEB8TADAgRj2qIx2G9ezghKOnJZAwo8+c12g=;
+	b=cVkoMsLGcrQoZlCW+GxJ0xb6QKH3xdmzXDDtcn/NMUKiHADYQgH0mPYxWFh8E5kPhAlPTy
+	FOdfKK1hip3hA2K1Frk8DEN0yi2hnSRengjlB1xS6lYOxJNYYQWLiPa36yz80CwgUK5erM
+	ZI3CicASWU7qZaus4FzZLctd+egrPiM=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-656-OmPCRiN8MRSKURAGgopEZQ-1; Mon, 02 Mar 2026 02:43:13 -0500
+X-MC-Unique: OmPCRiN8MRSKURAGgopEZQ-1
+X-Mimecast-MFC-AGG-ID: OmPCRiN8MRSKURAGgopEZQ_1772437392
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-3884fe7ace1so41200061fa.1
+        for <linux-block@vger.kernel.org>; Sun, 01 Mar 2026 23:43:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772437392; cv=none;
+        d=google.com; s=arc-20240605;
+        b=H/mRr5TF0Y1fHxde8ErqF0dP2cy6s9iHbM6Y3Tmu7yo3Yb5anOhPsrqrVizeRIFhAS
+         8UFF9hZ9cwoJU6pp7UA0Qt4NXqDfXGCFQzDT1gO8oihxFVbJbKK9dDS7wCebVIoB8OXz
+         c/JQPd1+QwQMsQ+dnbKKBmWP//gJYbW4SECR0FX6qPx4KWUubSktRarPgL6OD3czQENC
+         5XsjEzVci5GnVHkO3xm5+sW9dwLdaTwZRL99nKaVRdQaTaHRsdM5DjkDnih1rIpsBFR6
+         4QaT7dn2Atd22b0BoK0PinO36wjaNG69OmlI7itjXt3eTnfw4Zlh4Vd95j7bLNETxT6P
+         8O4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vfrdMnxpEB8TADAgRj2qIx2G9ezghKOnJZAwo8+c12g=;
+        fh=uRfzHG52hD+wVDdCorI3z6kwJ6X2q5UycVo3bzCgH9o=;
+        b=Jv/O+M5n3lJ1LXvk51GXz/g9Zf3QEkfAiIcM+pZ6m3t0EW2XWMvIQdsscndbXLKdPM
+         EK6/uYIBC7rK5miq90UZVXsXbdHutgpnQ08Frfx+sBb/r5pTwG1ke7DyByH/4cvH+ydM
+         IExpvGuUuiVflQIb5fJYzKde6GcOSHNkghQSYuGIcKRq7CPpsHp+5vI/9hCidTizZArA
+         oQH4zUUYADnkGmH+0XYoPH9togfWHEL7WUtdgR8IOu6oUm6pWqyCLnUQ65rDf/88buJV
+         06hW64EFuMB65AoOO6j+AlmNIojzrCELh2VzsO6tCNSGQxFjsidQLaxSIGYMZEPMNyz3
+         aSsw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772437392; x=1773042192; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vfrdMnxpEB8TADAgRj2qIx2G9ezghKOnJZAwo8+c12g=;
+        b=hEOebG+d8as/DecEIKfRs6htkgrtJWgem35ln4kSg7wpThl5Kb9RiL5fQ5ZtxZrYGm
+         2kzKizxHNeYuywdghFTBHqExJGbQOVzMwbs7HDVrPs0U3KxwlxCKmy0PpnzSgoRCCzdz
+         6HRrFSsBQtvQhdZEnZ40VOxL9TBpa7dnZ8VXtJEgkyvJwVzRdrEMxOShoG+8TrHn17JX
+         ArOx+B9M0OpynChB+o5YSu85QWM3n6HkfD/nmHQFq2HZJFv/cPe1/OfUa9nEeSHFqcBf
+         GY/sQRAmbExLioQbrnjqO1ZuyUjc8VHNJAfjTtfzWUIkm3P0GR/4cBWAeWd4GDFNBvDD
+         N8Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772437392; x=1773042192;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vfrdMnxpEB8TADAgRj2qIx2G9ezghKOnJZAwo8+c12g=;
+        b=I4ZS7BH6B7wFgbuRQIR10q5kSmc9epxxVr6X8OyVQrfu8aWNXZThvl2eWwjeEV1pX7
+         Pk42tG+I3tjf9FOKLHWZSh/91TXRIxbNvfBdNLuLkDXI4XjEHQi9U1KfRjj4urXZ19Tk
+         lakqkWfuTds6c3vI4DsqTYbYWKp18q3tCpQDuIuX1r/GvayhLRJuZeqYI08Kggm0tyDk
+         cIBCtldxvfVLxEqiKl42zHHkCsMMSDzc0mAEJuC+mRpyBQpdte6XqSYhHqJVHT0WTqHr
+         rHklU8xnp7eV4y4463/4gkebjy7LEXlOT5JMdkrT9/ig/bGzdapAlpJR2jjUe7OkfrAM
+         VCow==
+X-Gm-Message-State: AOJu0YzLDC7JAtVc7hfhe9F4UNBUoE1uJgrDNHZSlYpyaQg7DPj3sjB8
+	YcjcvkMQcPE6d3fX3Or/7TQqvRKVWvcW6VcRwYDmOXL6CPNxOlrB8NzbT08qPQajg+b8RAvdSft
+	cjEw3u09MIGY+8Ole04cYp/16ng/SToK5HYvkU87nQijr/tYGIiXLmUv0BBk/A2KrE0dW7PFXkR
+	T+v09DjzVJ7FcBxTTWvyNcNX8hoUZ48VV8qpnsboY=
+X-Gm-Gg: ATEYQzw2+xAIINKQSvQImJgybszcezyEKIzOyF795SfUkYuKVfPUZYyYJ3K2jv0tbJk
+	yGdALxjQgoFS/q99iPLTq6y26Z97hMcvaVTAiisWP1AHjphbR6TJ+Ifh47t12t4VFJYq7UvQYv8
+	PJtsVtlyuKdp2Bf1SBBuid31lgG0RRp9aKsiDE46+fQTBIa83AilbeT0DgThQXjqeORlTtL6vCS
+	mBI6xEZUqD1quKm0Uv4j7dPy5Lc2Zf9WrYN6Mf35X5ydNdifls=
+X-Received: by 2002:a05:651c:1511:b0:385:e793:fb11 with SMTP id 38308e7fff4ca-389ff350b5emr71792371fa.20.1772437392151;
+        Sun, 01 Mar 2026 23:43:12 -0800 (PST)
+X-Received: by 2002:a05:651c:1511:b0:385:e793:fb11 with SMTP id
+ 38308e7fff4ca-389ff350b5emr71792131fa.20.1772437391662; Sun, 01 Mar 2026
+ 23:43:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 6/8] block: allow submitting all zone writes from a
- single context
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-References: <20260227014951.2327711-1-dlemoal@kernel.org>
- <20260227014951.2327711-7-dlemoal@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260227014951.2327711-7-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email,acm.org:email,lst.de:email]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+References: <20260301125951.582690-1-nilay@linux.ibm.com>
+In-Reply-To: <20260301125951.582690-1-nilay@linux.ibm.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Mon, 2 Mar 2026 15:42:58 +0800
+X-Gm-Features: AaiRm50oGc6IAkdQrz8U3lmjw6vs9h5zvpZ5eHCUS-5rkuRhSd2WL9YdeuoKBmM
+Message-ID: <CAHj4cs9HoZZQ5RTAQ1obqaKpznGKsaOy-6F6uCm5CTwbnv09Cw@mail.gmail.com>
+Subject: Re: [PATCHv2] block: break pcpu_alloc_mutex dependency on freeze_lock
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de, 
+	ming.lei@redhat.com, yukuai@fnnas.com, shinichiro.kawasaki@wdc.com, 
+	gjoyce@ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/27/26 02:49, Damien Le Moal wrote:
-> In order to maintain sequential write patterns per zone with zoned block
-> devices, zone write plugging issues only a single write BIO per zone at
-> any time. This works well but has the side effect that when large
-> sequential write streams are issued by the user and these streams cross
-> zone boundaries, the device ends up receiving a discontiguous set of
-> write commands for different zones. The same also happens when a user
-> writes simultaneously at high queue depth multiple zones: the device
-> does not see all sequential writes per zone and receives discontiguous
-> writes to different zones. While this does not affect the performance of
-> solid state zoned block devices, when using an SMR HDD, this pattern
-> change from sequential writes to discontiguous writes to different zones
-> significantly increases head seek which results in degraded write
-> throughput.
-> 
-> In order to reduce this seek overhead for rotational media devices,
-> introduce a per disk zone write plugs kernel thread to issue all write
-> BIOs to zones. This single zone write issuing context is enabled for
-> any zoned block device that has a request queue flagged with the new
-> QUEUE_ZONED_QD1_WRITES flag.
-> 
-> The flag QUEUE_ZONED_QD1_WRITES is visible as the sysfs queue attribute
-> zoned_qd1_writes. For a regular block device, this attribute cannot be
-> changed and is always 0. For zoned block devices, a user can override
-> the default value set to force the global write maximum queue depth of
-> 1 for a zoned block device, or clear this attribute to fallback to the
-> default behavior of zone write plugging which limits writes to QD=1 per
-> sequential zone.
-> 
-> Writing to a zoned block device flagged with QUEUE_ZONED_QD1_WRITES is
-> implemented using a list of zone write plugs that have a non-empty BIO
-> list. Listed zone write plugs are processed by the disk zone write plugs
-> worker kthread in FIFO order, and all BIOs of a zone write plug are all
-> processed before switching to the next listed zone write plug. A newly
-> submitted BIO for a non-FULL zone write plug that is not yet listed
-> causes the addition of the zone write plug at the end of the disk list
-> of zone write plugs.
-> 
-> Since the write BIOs queued in a zone write plug BIO list are
-> necessarilly sequential, for rotational media, using the single zone
-> write plugs kthread to issue all BIOs maintains a sequential write
-> pattern and thus reduces seek overhead and improves write throughput.
-> This processing essentially result in always writing to HDDs at QD=1,
-> which is not an issue for HDDs operating with write caching enabled.
-> Performance with write cache disabled is also not degraded thanks to
-> the efficient write handling of modern SMR HDDs.
-> 
-> A disk list of zone write plugs is defined using the new struct gendisk
-> zone_wplugs_list, and accesses to this list is protected using the
-> zone_wplugs_list_lock spinlock.  The per disk kthread
-> (zone_wplugs_worker) code is implemented by the function
-> disk_zone_wplugs_worker(). A reference on listed zone write plugs is
-> always held until all BIOs of the zone write plug are processed by the
-> worker kthread. BIO issuing at QD=1 is driven using a completion
-> structure (zone_wplugs_worker_bio_done) and calls to blk_io_wait().
-> 
-> With this change, performance when sequentially writing the zones of a
-> 30 TB SMR SATA HDD connected to an AHCI adapter changes as follows
-> (1MiB direct I/Os, results in MB/s unit):
-> 
->                      +--------------------+
-> 		    |   Write BW (MB/s)  |
->   +------------------+----------+---------+
->   | Sequential write | Baseline | Patched |
->   |  Queue Depth     | 6.19-rc8 |         |
->   +------------------+----------+---------+
->   | 1                | 244      | 245     |
->   | 2                | 244      | 245     |
->   | 4                | 245      | 245     |
->   | 8                | 242      | 245     |
->   | 16               | 222      | 246     |
->   | 32               | 211      | 245     |
->   | 64               | 193      | 244     |
->   | 128              | 112      | 246     |
->   +------------------+----------+---------+
-> 
-> With the current code (baseline), as the sequential write stream crosses
-> a zone boundary, higher queue depth creates a gap between the
-> last IO to the previous zone and the first IOs to the following zones,
-> causing head seeks and degrading performance. Using the disk zone
-> write plugs worker thread, this pattern disappears and the maximum
-> throughput of the drive is maintained, leading to over 100%
-> improvements in throughput for high queue depth write.
-> 
-> Using 16 fio jobs all writing to randomly chosen zones at QD=32 with 1
-> MiB direct IOs, write throughput also increases significantly.
-> 
->                      +--------------------+
-> 		    |   Write BW (MB/s)  |
->   +------------------+----------+---------+
->   |   Random write   | Baseline | Patched |
->   |  Number of zones | 6.19-rc7 |         |
->   +------------------+----------+---------+
->   | 1                | 191      | 192     |
->   | 2                | 101      | 128     |
->   | 4                | 115      | 123     |
->   | 8                | 90       | 120     |
->   | 16               | 64       | 115     |
->   | 32               | 58       | 105     |
->   | 64               | 56       | 101     |
->   | 128              | 55       | 99      |
->   +------------------+----------+---------+
-> 
-> Tests using XFS shows that buffered write speed with 8 jobs writing
-> files increases by 12% to 35% depending on the workload.
-> 
->                      +--------------------+
-> 		    |   Write BW (MB/s)  |
->   +------------------+----------+---------+
->   |     Workload     | Baseline | Patched |
->   |                  | 6.19-rc7 |         |
->   +------------------+----------+---------+
->   | 256MiB file size | 212      | 238     |
->   +------------------+----------+---------+
->   | 4MiB .. 128 MiB  | 213      | 243     |
->   | random file size |          |         |
->   +------------------+----------+---------+
->   | 2MiB .. 8 MiB    | 179      | 242     |
->   | random file size |          |         |
->   +------------------+----------+---------+
-> 
-> Performance gains are even more significant when using an HBA that
-> limits the maximum size of commands to a small value, e.g. HBAs
-> controlled with the mpi3mr driver limit commands to a maximum of 1 MiB.
-> In such case, the write throughput gains are over 40%.
-> 
->                      +--------------------+
-> 		    |   Write BW (MB/s)  |
->   +------------------+----------+---------+
->   |     Workload     | Baseline | Patched |
->   |                  | 6.19-rc7 |         |
->   +------------------+----------+---------+
->   | 256MiB file size | 175      | 245     |
->   +------------------+----------+---------+
->   | 4MiB .. 128 MiB  | 174      | 244     |
->   | random file size |          |         |
->   +------------------+----------+---------+
->   | 2MiB .. 8 MiB    | 171      | 243     |
->   | random file size |          |         |
->   +------------------+----------+---------+
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+On Sun, Mar 1, 2026 at 9:00=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> w=
+rote:
+>
+> While nr_hw_update allocates tagset tags it acquires ->pcpu_alloc_mutex
+> after ->freeze_lock is acquired or queue is frozen. This potentially
+> creates a circular dependency involving ->fs_reclaim if reclaim is
+> triggered simultaneously in a code path which first acquires ->pcpu_
+> alloc_mutex. As the queue is already frozen while nr_hw_queue update
+> allocates tagsets, the reclaim can't forward progress and thus it could
+> cause a potential deadlock as reported in lockdep splat[1].
+>
+> Fix this by pre-allocating tagset tags before we freeze queue during
+> nr_hw_queue update. Later the allocated tagset tags could be safely
+> installed and used after queue is frozen.
+>
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Closes: https://lore.kernel.org/all/CAHj4cs8F=3DOV9s3La2kEQ34YndgfZP-B5PH=
+S4Z8_b9euKG6J4mw@mail.gmail.com/ [1]
+> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 > ---
->   block/blk-mq-debugfs.c |   1 +
->   block/blk-sysfs.c      |  38 ++++++++-
->   block/blk-zoned.c      | 190 ++++++++++++++++++++++++++++++++++++-----
->   include/linux/blkdev.h |   8 ++
->   4 files changed, 215 insertions(+), 22 deletions(-)
-> 
-Signed-off-by: Hannes Reinecke <hare@suse.de>
+> Changes from v1:
+>   - Make blk_mq_prealloc_tag_set_tags() return the tags pointer directly,
+>     encoding error conditions using ERR_PTR(). Update caller to use IS_ER=
+R()
+>     to distinguish between success and failure. (Yu Kuai)
+> ---
+>  block/blk-mq.c | 45 ++++++++++++++++++++++++++++++---------------
+>  1 file changed, 30 insertions(+), 15 deletions(-)
 
-Cheers,
+Confirmed the issue was fixed with this patch:
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+
+
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 9af8c3dec3f6..a27bade45de3 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -4793,38 +4793,45 @@ static void blk_mq_update_queue_map(struct blk_mq=
+_tag_set *set)
+>         }
+>  }
+>
+> -static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
+> -                                      int new_nr_hw_queues)
+> +static struct blk_mq_tags **blk_mq_prealloc_tag_set_tags(
+> +                               struct blk_mq_tag_set *set,
+> +                               int new_nr_hw_queues)
+>  {
+>         struct blk_mq_tags **new_tags;
+>         int i;
+>
+>         if (set->nr_hw_queues >=3D new_nr_hw_queues)
+> -               goto done;
+> +               return NULL;
+>
+>         new_tags =3D kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_=
+tags *),
+>                                 GFP_KERNEL, set->numa_node);
+>         if (!new_tags)
+> -               return -ENOMEM;
+> +               return ERR_PTR(-ENOMEM);
+>
+>         if (set->tags)
+>                 memcpy(new_tags, set->tags, set->nr_hw_queues *
+>                        sizeof(*set->tags));
+> -       kfree(set->tags);
+> -       set->tags =3D new_tags;
+>
+>         for (i =3D set->nr_hw_queues; i < new_nr_hw_queues; i++) {
+> -               if (!__blk_mq_alloc_map_and_rqs(set, i)) {
+> -                       while (--i >=3D set->nr_hw_queues)
+> -                               __blk_mq_free_map_and_rqs(set, i);
+> -                       return -ENOMEM;
+> +               if (blk_mq_is_shared_tags(set->flags))
+> +                       new_tags[i] =3D set->shared_tags;
+> +               else {
+> +                       new_tags[i] =3D blk_mq_alloc_map_and_rqs(set, i,
+> +                                       set->queue_depth);
+> +                       if (!new_tags[i])
+> +                               goto out_unwind;
+>                 }
+>                 cond_resched();
+>         }
+>
+> -done:
+> -       set->nr_hw_queues =3D new_nr_hw_queues;
+> -       return 0;
+> +       return new_tags;
+> +out_unwind:
+> +       while (--i >=3D set->nr_hw_queues) {
+> +               if (!blk_mq_is_shared_tags(set->flags))
+> +                       blk_mq_free_map_and_rqs(set, new_tags[i], i);
+> +       }
+> +       kfree(new_tags);
+> +       return ERR_PTR(-ENOMEM);
+>  }
+>
+>  /*
+> @@ -5113,6 +5120,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk=
+_mq_tag_set *set,
+>         unsigned int memflags;
+>         int i;
+>         struct xarray elv_tbl;
+> +       struct blk_mq_tags **new_tags;
+>         bool queues_frozen =3D false;
+>
+>         lockdep_assert_held(&set->tag_list_lock);
+> @@ -5147,11 +5155,18 @@ static void __blk_mq_update_nr_hw_queues(struct b=
+lk_mq_tag_set *set,
+>                 if (blk_mq_elv_switch_none(q, &elv_tbl))
+>                         goto switch_back;
+>
+> +       new_tags =3D blk_mq_prealloc_tag_set_tags(set, nr_hw_queues);
+> +       if (IS_ERR(new_tags))
+> +               goto switch_back;
+> +
+>         list_for_each_entry(q, &set->tag_list, tag_set_list)
+>                 blk_mq_freeze_queue_nomemsave(q);
+>         queues_frozen =3D true;
+> -       if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
+> -               goto switch_back;
+> +       if (new_tags) {
+> +               kfree(set->tags);
+> +               set->tags =3D new_tags;
+> +       }
+> +       set->nr_hw_queues =3D nr_hw_queues;
+>
+>  fallback:
+>         blk_mq_update_queue_map(set);
+> --
+> 2.53.0
+>
+
+
+--=20
+Best Regards,
+  Yi Zhang
+
