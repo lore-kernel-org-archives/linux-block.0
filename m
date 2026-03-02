@@ -1,245 +1,131 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EDB38D018
-	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 09:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5A233A70A;
+	Mon,  2 Mar 2026 10:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772442815; cv=none; b=DY6U1REdQKpX/CmELf2Tt974Led8LCSmOWFbM/Rp+JOKxPWCgUyITXG3OyUWbwLV0Z7fUzu7rOUmTwEV/Usfv0ciztaLAQCZp9iaAOtIewkb4B19sWkPMk3b7ig31SHg8Lgu4Sc4DeKFVuDEGAUahDSZBZyBpCJ8ZODWNOAjWWw=
+	t=1772446300; cv=none; b=nPu549YXIsK6jgxVochzSARXVEmZcgaDFFKB61XjZou01OB56Vt8t5S4OOFINzPcz7euPTAO0Q4u0i5INZqUZk2gbKThmXRowCa/Q+XO/xaZythWz3n/QsQoSrBxXeE4pAwmK9AwkWtTZtGla0XC5dLIcljEDnJlqS+h4aUtt5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772442815; c=relaxed/simple;
-	bh=EAXjxsOEBeehC98taEW35gyDtS/n8loApDj0Bam/mco=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=REGlhChi96+oSPDZJ+BAvXdfrAVESw5MY8/+wXEQxa64/dxO0y8R6TbUUdBlYh6eWzSDdNqurY61ftx64CjmFPiJ46p2Xlsjr5MpyL3/EFpHmFFQp1JWQBO/TOnNX3CUOiA8qfHvNrmz9TXmmjJcMvY707uVXOrwEROLux53mIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=IvEjFCwM; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=AqAAIUzO; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=F9W9Vysl; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=7AZC4XVw; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1772446300; c=relaxed/simple;
+	bh=kUc0farZiGjD/n/ZNvbtXOu1ZJEABLXUI1WRJsXmbXM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g/rAMOFtQmWwICYCJWX1z8ZmVZi9TQxFlXVYawg1t+UGd2JbYnP9zqIrUxdecPT/LcWTmqizTdl+PdtCVTQeUbCTaKtNZGEkYZz418sP8eNGsRKIkBtZsD8ugTZ8Hsz4oX7WKrx1t/GzO5Xcp60guOyxF9KZ/h7dSDEyLd3TKkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ld0iTfc0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="IvEjFCwM";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="AqAAIUzO";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="F9W9Vysl";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="7AZC4XVw"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 310733E7C9;
-	Mon,  2 Mar 2026 09:13:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772442811; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yiUa0ECJNPtkTnLKrDvGHBfFKQ79sQHYL43l9NzCiHc=;
-	b=IvEjFCwMg8Ig9GtG1dDAi58hup1nQvtBAtjeECQAyWwZdCIo/N2Wtz9V4ScqMC3i1Kc/9P
-	BJl8rCMRij6Dzd7CULioRD1AxUHgYCUfs/G8b7USMupWSeSxwvTSSVBBvhg1adhiQUbsDL
-	N8sjoY6XUREb5Rjda6utCrHWcrwv+6o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772442811;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yiUa0ECJNPtkTnLKrDvGHBfFKQ79sQHYL43l9NzCiHc=;
-	b=AqAAIUzOF2Yy8M0YGYw+xIT5ecVWBxEF7GGlyH2RlDAtVRjY8xURwtY0Fge1fc1Eu6m1b4
-	1IWqT4IXLYEjjuCA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1772442810; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yiUa0ECJNPtkTnLKrDvGHBfFKQ79sQHYL43l9NzCiHc=;
-	b=F9W9VyslnpsJVBa1jGUWLmw0W8jMV2z6VYvjzKm7M03b5bnq9P5qwL7/U0i1ZSQU6C2pbI
-	YsbQUDFVtuTCrLlmWhf7TnblMwGoP1Lob8tLesykv8mR+l4wD8IjEbdEXww5Ti9BrUDE7t
-	y0ogEiknF9fugD7F1izz71MC8hRbBh0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1772442810;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yiUa0ECJNPtkTnLKrDvGHBfFKQ79sQHYL43l9NzCiHc=;
-	b=7AZC4XVwYmP//tW6373ZF3FORac015k3gIhkGjb//YXMNtGKxtqEb4iA817SUEpzMJ1ChM
-	YqxVvGdP8on/5MDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 174783EA69;
-	Mon,  2 Mar 2026 09:13:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sbavBbpUpWnXYAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 02 Mar 2026 09:13:30 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id CAF0DA0A27; Mon,  2 Mar 2026 10:13:29 +0100 (CET)
-Date: Mon, 2 Mar 2026 10:13:29 +0100
-From: Jan Kara <jack@suse.cz>
-To: Tal Zussman <tz2294@columbia.edu>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
-	Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC v3 2/2] block: enable RWF_DONTCACHE for block devices
-Message-ID: <blipvn6pfxno5a2cih3e7y2l7g3cbj4yjb6hhwxrer26ma5x55@ez6hhpdfsi63>
-References: <20260227-blk-dontcache-v3-0-cd309ccd5868@columbia.edu>
- <20260227-blk-dontcache-v3-2-cd309ccd5868@columbia.edu>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ld0iTfc0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C359C19423;
+	Mon,  2 Mar 2026 10:11:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772446299;
+	bh=kUc0farZiGjD/n/ZNvbtXOu1ZJEABLXUI1WRJsXmbXM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ld0iTfc0cwdtiAlPMEakYAevL8IA888m/oSGOWsZW9Vt/zRCmvQ4Uc2DLU421l8Ep
+	 FeEfp7BAVN3Md4S7xoDs560NSkIPqpAgGZjI8duIgTUDUN4ffC/n9jlqR9mSdh7DOK
+	 i+fwYRegrrDbqO2zS5LTbG0RJJekRLaCqvE4GMYHd2g6AqdC5IbN1o6ybzmA2KYMQj
+	 H8/+Z0X4Lskdq25zp26NlH+MAudrmt8Ze01H0WanxEKFuUQOsSeWHdU+ioNIsSNDJn
+	 l1yOC6qj/LVeXnfey1eygn3X+LetUHp/cr/wpE8fSTUC2ZAQM12IfB/Z06v2wfSFCz
+	 rcqnAPVmF3txA==
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	ntfs3@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: support file system generated / verified integrity information v4
+Date: Mon,  2 Mar 2026 11:11:22 +0100
+Message-ID: <20260302-legehennen-musizieren-08d0e3caa674@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260223132021.292832-1-hch@lst.de>
+References: <20260223132021.292832-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260227-blk-dontcache-v3-2-cd309ccd5868@columbia.edu>
-X-Spam-Score: -3.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_THREE(0.00)[3];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,columbia.edu:email,imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Flag: NO
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3749; i=brauner@kernel.org; h=from:subject:message-id; bh=kUc0farZiGjD/n/ZNvbtXOu1ZJEABLXUI1WRJsXmbXM=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQuTQr5LTEvM/FaGJOD/CtL7fimM5MvX52/7GFUWNlF5 gnPizyZOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACZyO4zhf+nviJw1/T92tyfF 9+oxcPcx3b+kpPDy0xazm+GSsTvXxDMyTOuLZW/sZO/YaLDhx4U9+x7ZqCtYeCwNmqqhk85+08S cAwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Fri 27-02-26 11:41:08, Tal Zussman wrote:
-> Block device buffered reads and writes already pass through
-> filemap_read() and iomap_file_buffered_write() respectively, both of
-> which handle IOCB_DONTCACHE. Enable RWF_DONTCACHE for block device files
-> by setting FOP_DONTCACHE in def_blk_fops.
+On Mon, 23 Feb 2026 05:20:00 -0800, Christoph Hellwig wrote:
+> this series adds support to generate and verify integrity information
+> (aka T10 PI) in the file system, instead of the automatic below the
+> covers support that is currently used.
 > 
-> For CONFIG_BUFFER_HEAD paths, add block_write_begin_iocb() which threads
-> the kiocb through so that buffer_head-based I/O can use DONTCACHE
-> behavior. The existing block_write_begin() is preserved as a wrapper
-> that passes a NULL iocb.
+> There two reasons for this:
 > 
-> This support is useful for databases that operate on raw block devices,
-> among other userspace applications.
+>   a) to increase the protection enveloped.  Right now this is just a
+>      minor step from the bottom of the block layer to the file system,
+>      but it is required to support io_uring integrity data passthrough in
+>      the file system similar to the currently existing support for block
+>      devices, which will follow next.  It also allows the file system to
+>      directly see the integrity error and act upon in, e.g. when using
+>      RAID either integrated (as in btrfs) or by supporting reading
+>      redundant copies through the block layer.
+>   b) to make the PI processing more efficient.  This is primarily a
+>      concern for reads, where the block layer auto PI has to schedule a
+>      work item for each bio, and the file system them has to do it again
+>      for bounce buffering.  Additionally the current iomap post-I/O
+>      workqueue handling is a lot more efficient by supporting merging and
+>      avoiding workqueue scheduling storms.
 > 
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+> [...]
 
-Looks good. Feel free to add:
+Applied to the vfs-7.1.verity branch of the vfs/vfs.git tree.
+Patches in the vfs-7.1.verity branch should appear in linux-next soon.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-								Honza
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-> ---
->  block/fops.c                |  5 +++--
->  fs/buffer.c                 | 19 ++++++++++++++++---
->  include/linux/buffer_head.h |  3 +++
->  3 files changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/fops.c b/block/fops.c
-> index 4d32785b31d9..d8165f6ba71c 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -505,7 +505,8 @@ static int blkdev_write_begin(const struct kiocb *iocb,
->  			      unsigned len, struct folio **foliop,
->  			      void **fsdata)
->  {
-> -	return block_write_begin(mapping, pos, len, foliop, blkdev_get_block);
-> +	return block_write_begin_iocb(iocb, mapping, pos, len, foliop,
-> +				     blkdev_get_block);
->  }
->  
->  static int blkdev_write_end(const struct kiocb *iocb,
-> @@ -967,7 +968,7 @@ const struct file_operations def_blk_fops = {
->  	.splice_write	= iter_file_splice_write,
->  	.fallocate	= blkdev_fallocate,
->  	.uring_cmd	= blkdev_uring_cmd,
-> -	.fop_flags	= FOP_BUFFER_RASYNC,
-> +	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
->  };
->  
->  static __init int blkdev_init(void)
-> diff --git a/fs/buffer.c b/fs/buffer.c
-> index 838c0c571022..18f1d128bb19 100644
-> --- a/fs/buffer.c
-> +++ b/fs/buffer.c
-> @@ -2241,14 +2241,19 @@ EXPORT_SYMBOL(block_commit_write);
->   *
->   * The filesystem needs to handle block truncation upon failure.
->   */
-> -int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
-> +int block_write_begin_iocb(const struct kiocb *iocb,
-> +		struct address_space *mapping, loff_t pos, unsigned len,
->  		struct folio **foliop, get_block_t *get_block)
->  {
->  	pgoff_t index = pos >> PAGE_SHIFT;
-> +	fgf_t fgp_flags = FGP_WRITEBEGIN;
->  	struct folio *folio;
->  	int status;
->  
-> -	folio = __filemap_get_folio(mapping, index, FGP_WRITEBEGIN,
-> +	if (iocb && iocb->ki_flags & IOCB_DONTCACHE)
-> +		fgp_flags |= FGP_DONTCACHE;
-> +
-> +	folio = __filemap_get_folio(mapping, index, fgp_flags,
->  			mapping_gfp_mask(mapping));
->  	if (IS_ERR(folio))
->  		return PTR_ERR(folio);
-> @@ -2263,6 +2268,13 @@ int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
->  	*foliop = folio;
->  	return status;
->  }
-> +
-> +int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
-> +		struct folio **foliop, get_block_t *get_block)
-> +{
-> +	return block_write_begin_iocb(NULL, mapping, pos, len, foliop,
-> +				      get_block);
-> +}
->  EXPORT_SYMBOL(block_write_begin);
->  
->  int block_write_end(loff_t pos, unsigned len, unsigned copied,
-> @@ -2591,7 +2603,8 @@ int cont_write_begin(const struct kiocb *iocb, struct address_space *mapping,
->  		(*bytes)++;
->  	}
->  
-> -	return block_write_begin(mapping, pos, len, foliop, get_block);
-> +	return block_write_begin_iocb(iocb, mapping, pos, len, foliop,
-> +				     get_block);
->  }
->  EXPORT_SYMBOL(cont_write_begin);
->  
-> diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-> index b16b88bfbc3e..ddf88ce290f2 100644
-> --- a/include/linux/buffer_head.h
-> +++ b/include/linux/buffer_head.h
-> @@ -260,6 +260,9 @@ int block_read_full_folio(struct folio *, get_block_t *);
->  bool block_is_partially_uptodate(struct folio *, size_t from, size_t count);
->  int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
->  		struct folio **foliop, get_block_t *get_block);
-> +int block_write_begin_iocb(const struct kiocb *iocb,
-> +		struct address_space *mapping, loff_t pos, unsigned len,
-> +		struct folio **foliop, get_block_t *get_block);
->  int __block_write_begin(struct folio *folio, loff_t pos, unsigned len,
->  		get_block_t *get_block);
->  int block_write_end(loff_t pos, unsigned len, unsigned copied, struct folio *);
-> 
-> -- 
-> 2.39.5
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.1.verity
+
+[01/16] block: factor out a bio_integrity_action helper
+        https://git.kernel.org/vfs/vfs/c/08163237c7be
+[02/16] block: factor out a bio_integrity_setup_default helper
+        https://git.kernel.org/vfs/vfs/c/32d5010c428f
+[03/16] block: add a bdev_has_integrity_csum helper
+        https://git.kernel.org/vfs/vfs/c/840b166bef09
+[04/16] block: prepare generation / verification helpers for fs usage
+        https://git.kernel.org/vfs/vfs/c/179c2a24466b
+[05/16] block: make max_integrity_io_size public
+        https://git.kernel.org/vfs/vfs/c/1b9353e52c31
+[06/16] block: add fs_bio_integrity helpers
+        https://git.kernel.org/vfs/vfs/c/e539fc923425
+[07/16] block: pass a maxlen argument to bio_iov_iter_bounce
+        https://git.kernel.org/vfs/vfs/c/fc9fc9482061
+[08/16] iomap: refactor iomap_bio_read_folio_range
+        https://git.kernel.org/vfs/vfs/c/9701407ec63e
+[09/16] iomap: pass the iomap_iter to ->submit_read
+        https://git.kernel.org/vfs/vfs/c/f11d7d3307f4
+[10/16] iomap: only call into ->submit_read when there is a read_ctx
+        https://git.kernel.org/vfs/vfs/c/46441138b832
+[11/16] iomap: allow file systems to hook into buffered read bio submission
+        https://git.kernel.org/vfs/vfs/c/04c2cc5bb77b
+[12/16] ntfs3: remove copy and pasted iomap code
+        https://git.kernel.org/vfs/vfs/c/4c3906772536
+[13/16] iomap: add a bioset pointer to iomap_read_folio_ops
+        https://git.kernel.org/vfs/vfs/c/c1dec831dd53
+[14/16] iomap: support ioends for buffered reads
+        https://git.kernel.org/vfs/vfs/c/9c617c91f801
+[15/16] iomap: support T10 protection information
+        https://git.kernel.org/vfs/vfs/c/fa1758bda166
+[16/16] xfs: support T10 protection information
+        https://git.kernel.org/vfs/vfs/c/330cc116c7a0
