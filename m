@@ -1,201 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A812C236B
-	for <linux-block@vger.kernel.org>; Mon,  2 Mar 2026 02:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90551A9F90;
+	Mon,  2 Mar 2026 02:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772419838; cv=none; b=JWBS/FTNd2kx2TaqitgMonB9P9vJNgcooDxDvKYHKTuYvIjpyc4ALl3TO349uy+vYhgVAXMWxNHQcJb0Z1MYgbuzf40bNrm0VovvscmePwYRBEa/dDiFEqg/PwB99HSBxfXNC7UZpHZOFlWbUTjCYnyloKNEv+1XesJbdq6PZ2A=
+	t=1772419873; cv=none; b=Il4iXyZMcM7EMBGayK+Hq3PwGM/reGtJdcJH4RGsMg4iivWt4E9lK2l3uhFBt+jQJMuoJTvgwgJzyufGCl6CRTKGwwqYgndy5TiFe/5dCD7hiqGD2X6AYOKLrYyHu/cIDZAsi8V3XUM60oaX3Awdks2LAC0w408OTYAXzCnZtUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772419838; c=relaxed/simple;
-	bh=ClZ8ASzrh5fGVCrACvsixIVZuArnhDJC4BLke5feM0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UmFRHwr84NAYtiEsA6yXiQJRHDkxVOjI5u8NYG/e6cLVZUxmxslTBAKOVfqmnsEc69KQRmk6GPK7Pj+bbYD4JRdfYIq+d0P3U8QLxffU4kAT73BHI1EhtWStRZ0FbZ1KI4YuPhLanowg2s3y4SWPUCS74KB7t1FRUP+rq+8vroE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ebIrm9TQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1772419873; c=relaxed/simple;
+	bh=XYjomkr0dTgWjwPjF8o60Bhsgl0frYza1cTvZQthwv8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZR1LE7uFzR3LLA226gXH3RPHyzCxuWlsgtaLaF2iY9Ro9na8CFvXtVrBinFyFbkYcuuhdbniUO/IPdtNWBqzoxvwRY2r5sAGVBXrbkhcdS40Q50qek7LqPuusoEcwFhYmUaLG7K8WAg4RFiHRIAiIlivrCM+ZXSRWwEtlQUNC6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OOShjZZv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebIrm9TQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772419832;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IXF3HVABPTZBa89KUkOFW6l2cVIoXXvBTemknfS00g8=;
-	b=ebIrm9TQonO0bQagLW6fYk4gI7kCGfzTossWFziQW7N8CaPfRupJlAaE6niRSTP0WyPxN7
-	ioZGFZTzT+tEnYSJqnHbkB5sSk+f3VK/oMv2WAqRU2kDEG6s2LVFD/hIKbkVB+WP/6JxSG
-	ElJ1FuWWBl/jIInj8NKW+l6MvHkPEiI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-645-G5OB1YsaNp-Y-TuLuNQluQ-1; Sun,
- 01 Mar 2026 21:50:27 -0500
-X-MC-Unique: G5OB1YsaNp-Y-TuLuNQluQ-1
-X-Mimecast-MFC-AGG-ID: G5OB1YsaNp-Y-TuLuNQluQ_1772419825
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B0C118002C4;
-	Mon,  2 Mar 2026 02:50:25 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8929F1956053;
-	Mon,  2 Mar 2026 02:50:24 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6222oNRc1830001
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 1 Mar 2026 21:50:23 -0500
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6222oNtt1830000;
-	Sun, 1 Mar 2026 21:50:23 -0500
-Date: Sun, 1 Mar 2026 21:50:23 -0500
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: John Garry <john.g.garry@oracle.com>
-Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
-        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
-        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
-        snitzer@kernel.org, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/24] scsi-multipath: introduce scsi_device head
- structure
-Message-ID: <aaT676hImMTt5tYh@redhat.com>
-References: <20260225153627.1032500-1-john.g.garry@oracle.com>
- <20260225153627.1032500-4-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OOShjZZv"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 78429C116C6;
+	Mon,  2 Mar 2026 02:51:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772419872;
+	bh=XYjomkr0dTgWjwPjF8o60Bhsgl0frYza1cTvZQthwv8=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=OOShjZZvAFifyg0sFjaestiRUxm0YP4LTQ0++TB0MZjeQW25/XjiEQPJAECHA50/w
+	 rMbi2OuitMfVCxsgqOoJHeKRPM0HfYCqcbD2nPg9uYQ/TS9mH12DKYQh68XAD9h559
+	 JzBSGWw66LBFJs0eW3nedi3TIR/sHtefgSdRPzvlTDbsObHiI4mVTg6jUeqzLPbNPg
+	 F9WgBInQ9hNRw3pGrML451x4i1qarqHDB9CE9QhYuoqCXICXQS+yBFvVLcuzoIPg/u
+	 iTD5/f5Zz057eAUG+y3J4QN5k+bvvWZxv9l03SbHoQUlDFDqFavGE6PztOiQrrSoiU
+	 PlLfbyTXmkaUA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EAB7D58E4A;
+	Mon,  2 Mar 2026 02:51:12 +0000 (UTC)
+From: Jiucheng Xu via B4 Relay <devnull+jiucheng.xu.amlogic.com@kernel.org>
+Date: Mon, 02 Mar 2026 10:51:03 +0800
+Subject: [PATCH] block: avoild hang when bio_list is non-NULL in
+ submit_bio_wait()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225153627.1032500-4-john.g.garry@oracle.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260302-for-next-v1-1-eb9339e8dc99@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIABb7pGkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDIyMT3bT8It281IoS3ZQ0szQDo2RjM0uTFCWg8oKi1LTMCrBR0bG1tQA
+ I0PQ8WgAAAA==
+X-Change-ID: 20260224-for-next-df6f02c3694d
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ jianxin.pan@amlogic.com, tuan.zhang@amlogic.com, 
+ Jiucheng Xu <jiucheng.xu@amlogic.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772419870; l=1659;
+ i=jiucheng.xu@amlogic.com; s=20250821; h=from:subject:message-id;
+ bh=umq++sfYBrcQgzncaR6KD4RDdLQo6hXzgnvNht92JHc=;
+ b=X4RjgRRm6Nf1/IzXU5/a0BXUn8bhim1Iv+n8TXxQpemJztwPBKYqS1YR+PYAsHBQI8wb+Ky9E
+ e7RVwpTFwg8CPn//V6Q8dE0FjNN2kt+krfZ6ZZLFPp9hSxEcEzWQ9zw
+X-Developer-Key: i=jiucheng.xu@amlogic.com; a=ed25519;
+ pk=Q18IjkdWCCuncSplyu+dYqIrm+n42glvoLFJTQqpb2o=
+X-Endpoint-Received: by B4 Relay for jiucheng.xu@amlogic.com/20250821 with
+ auth_id=498
+X-Original-From: Jiucheng Xu <jiucheng.xu@amlogic.com>
+Reply-To: jiucheng.xu@amlogic.com
 
-On Wed, Feb 25, 2026 at 03:36:06PM +0000, John Garry wrote:
-> Introduce a scsi_device head structure - scsi_mpath_head - to manage
-> multipathing for a scsi_device. This is similar to nvme_ns_head structure.
-> 
-> There is no reference in scsi_mpath_head to any disk, as this would be
-> mananged by the scsi_disk driver.
-> 
-> A list of scsi_mpath_head structures is managed to lookup for matching
-> multipathed scsi_device's. Matching is done through the scsi_device
-> unique id.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  drivers/scsi/scsi_multipath.c | 147 ++++++++++++++++++++++++++++++++++
->  drivers/scsi/scsi_sysfs.c     |   3 +
->  include/scsi/scsi_multipath.h |  29 +++++++
->  3 files changed, 179 insertions(+)
-> 
-> diff --git a/drivers/scsi/scsi_multipath.c b/drivers/scsi/scsi_multipath.c
-> index 04e0bad3d9204..49316269fad8e 100644
-> --- a/drivers/scsi/scsi_multipath.c
-> +++ b/drivers/scsi/scsi_multipath.c
->
-> @@ -107,6 +178,7 @@ static void scsi_multipath_sdev_uninit(struct scsi_device *sdev)
->  
->  int scsi_mpath_dev_alloc(struct scsi_device *sdev)
->  {
-> +	struct scsi_mpath_head *scsi_mpath_head;
->  	int ret;
->  
->  	if (!scsi_multipath)
-> @@ -127,13 +199,75 @@ int scsi_mpath_dev_alloc(struct scsi_device *sdev)
->  		goto out_uninit;
->  	}
->  
-> +	scsi_mpath_head = scsi_mpath_find_head(sdev->scsi_mpath_dev);
-> +	if (scsi_mpath_head)
-> +		goto found;
-> +	/* scsi_mpath_disks_list lock held */
+From: Jiucheng Xu <jiucheng.xu@amlogic.com>
 
-Typo. It should be "scsi_mpath_heads_list lock still held". Also, why
-split the locking between this function and scsi_mpath_find_head()? It
-seems like it would be clearer if you did in all here.
+When current->bio_list is non-NULL in submit_bio_wait(),
+submit_bio_noacct_nocheck appends bio to bio_list but skips IO
+submission, causing submit_bio_wait() to hang indefinitely.
 
-> +	scsi_mpath_head = scsi_mpath_alloc_head();
-> +	if (!scsi_mpath_head)
-> +		goto out_uninit;
+Fix this by temporarily backup bio_list, setting bio_list to
+NULL before calling submit_bio(), then restoring bio_list
+after submit_bio() returns.
 
-It seems resonable to failback to treating the device as non-multipathed
-if you can't setup the multipathing resources. But you should probably
-warn if that happens.
+I've trimmed down the call stack, as follows:
 
-> +
-> +	strcpy(scsi_mpath_head->wwid, sdev->scsi_mpath_dev->device_id_str);
-> +
-> +	ret = device_add(&scsi_mpath_head->dev);
-> +	if (ret)
-> +		goto out_put_head;
-> +
-> +	list_add_tail(&scsi_mpath_head->entry, &scsi_mpath_heads_list);
-> +
-> +	mutex_unlock(&scsi_mpath_heads_lock);
-> +	sdev->scsi_mpath_dev->scsi_mpath_head = scsi_mpath_head;
+f2fs_submit_read_io
+  submit_bio
+    mmc_blk_mq_recovery
+      z_erofs_endio
+        vm_map_ram
+          __pte_alloc_kernel
+            __alloc_pages_direct_reclaim
+              shrink_folio_list
+                __swap_writepage
+                  submit_bio_wait  hang!!!
 
-You already set sdev->scsi_mpath_dev->scsi_mpath_head right before you
-return.
+Signed-off-by: Jiucheng Xu <jiucheng.xu@amlogic.com>
+---
+ block/bio.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-> +
-> +found:
-> +	sdev->scsi_mpath_dev->index = ida_alloc(&scsi_mpath_head->ida, GFP_KERNEL);
-> +	if (sdev->scsi_mpath_dev->index < 0) {
-> +		ret = sdev->scsi_mpath_dev->index;
-> +		goto out_put_head;
+diff --git a/block/bio.c b/block/bio.c
+index d80d5d26804e32944bcfe4506ca190033308844f..22c8769722cc89620c239310a0f3d4924de68cf9 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1505,8 +1505,17 @@ int submit_bio_wait(struct bio *bio)
+ 	bio->bi_private = &done;
+ 	bio->bi_end_io = submit_bio_wait_endio;
+ 	bio->bi_opf |= REQ_SYNC;
+-	submit_bio(bio);
+-	blk_wait_io(&done);
++	if (!current->bio_list) {
++		submit_bio(bio);
++		blk_wait_io(&done);
++	} else {
++		struct bio_list *tmp = current->bio_list;
++
++		current->bio_list = NULL;
++		submit_bio(bio);
++		blk_wait_io(&done);
++		current->bio_list = tmp;
++	}
+ 
+ 	return blk_status_to_errno(bio->bi_status);
+ }
 
-&scsi_mpath_heads_lock is already unlocked here, but it will get
-unlocked again in out_uninit
+---
+base-commit: 8c5f40a3ba43ae9a26991f0e4a01a3a06e8958fc
+change-id: 20260224-for-next-df6f02c3694d
 
-> +	}
-> +
-> +	mutex_lock(&scsi_mpath_head->lock);
-> +	scsi_mpath_head->dev_count++;
-> +	mutex_unlock(&scsi_mpath_head->lock);
-> +
-> +	sdev->scsi_mpath_dev->scsi_mpath_head = scsi_mpath_head;
->  	return 0;
->  
-> +out_put_head:
-> +	scsi_mpath_put_head(scsi_mpath_head);
->  out_uninit:
-> +	mutex_unlock(&scsi_mpath_heads_lock);
->  	scsi_multipath_sdev_uninit(sdev);
->  	return ret;
->  }
->  
-> +static void scsi_mpath_remove_head(struct scsi_mpath_device *scsi_mpath_dev)
-> +{
-> +	struct scsi_mpath_head *scsi_mpath_head =
-> +			scsi_mpath_dev->scsi_mpath_head;
-> +	bool last_path = false;
-> +
-> +	mutex_lock(&scsi_mpath_head->lock);
-> +	scsi_mpath_head->dev_count--;
-> +	if (scsi_mpath_head->dev_count == 0)
-> +		last_path = true;
-> +	mutex_unlock(&scsi_mpath_head->lock);
+Best regards,
+-- 
+Jiucheng Xu <jiucheng.xu@amlogic.com>
 
-The locking of scsi_mpath_head->lock makes it appear that
-scsi_mpath_remove_head() and scsi_mpath_dev_alloc() can both happen at
-the same time. I didn't check enough to verify if that's actually the
-case, but if it's not, then the lock is unnecessary. If they can run at
-the same time, then I don't see anything keeping scsi_mpath_dev_alloc()
-from calling scsi_mpath_find_head() and finding a scsi_mpath_head that
-is just about to have its device deleted by
-device_del(&scsi_mpath_head->dev). If this happens, the device won't
-get re-added.
-
--Ben
-
-> +
-> +	if (last_path)
-> +		device_del(&scsi_mpath_head->dev);
-> +
-> +	scsi_mpath_dev->scsi_mpath_head = NULL;
-> +	scsi_mpath_put_head(scsi_mpath_head);
-> +}
 
