@@ -1,189 +1,83 @@
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022080.outbound.protection.outlook.com [52.101.126.80])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E731390991;
-	Tue,  3 Mar 2026 02:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772503445; cv=fail; b=BP1M09dGQe2cAOdtvpfYoJ7sny3OXoUX02cur1f5DOh89XLOI+mhlf+M9EjOrVTRwa8lY+sREmzzgV2o0GKM3kwNXPsWNWymTzODvF7dxBDTLczTc6+6HEkN6EmLr+FT4H+OXvtpi3UADOYdC3B+UEWMpBz82i9YmPMMunE8Jf0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772503445; c=relaxed/simple;
-	bh=ysDHc9+bhfoBRSNu5ZnIOqBM5L9/Q7omq6AEkgQS7vg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rkhsir7Ek2tDbwtMVKgbflFY+UvpMux2LYK/k2WQYitxazfR0Pl1q6oCAj8RtPWNJScx3tArIbJIKcKqKiwyF/l+8cYveQFq9ClZp3+PimEZDAf7iyXBnLa4yQJzWniTTcvde8HeITEzLq7grzJNOq5Kz1BViiL218bi++e5xpE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=yYD4Ww52; arc=fail smtp.client-ip=52.101.126.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC9934E765;
+	Tue,  3 Mar 2026 02:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772503907; cv=none; b=l6Kll1WPEhPzxXSaKnBn8AROpkoxShxYEmTIIWi9bOtBSg8ZCDrjsxqO74NpLE6DhwmfuXMjwFuoZCSNRn6CpJ2QxSkfNyvanPdjZ8NGnH8E7YHVx5H+ePVRT8OKoIiRv/B4oq76pDjIDmJew6mxQohpmHFOgXr29ta2fXMe9fI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772503907; c=relaxed/simple;
+	bh=a+TC0gm3uLYWashzAwaanGyqxXsF7bXFJUVrp559WuA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CvO2l3u9dBUpc1o89FJxvxX+2anxbV9pAEB4tUoCWACdsIqLrWHqAm0gL/Wpn69JPUlCEpCUi5ebjfKTnNlbbN0b/yB/zUUeKVKajvMq1zdAWx6Cy6kUKx6RFDXfYkbiBXDdNj504/bei7FV1t4t3EhPC6SqmXSpIDxbR4Y9wzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RJQbBhOo; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="yYD4Ww52"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fHYravd+B1remPjrIo18Yue0Bd8UA5mZOPlA63VSxXX6wQ9/Q1/h1+0DPpMw/ErC7L3bcqDiDtYq3azM3foOncJayXbyoG+s3NwUU3BzuDlyDZAvUfdFvn1oe4WTydWu+C9h1IJ0kYfw7qdgJ2zE7uvHiPxdTH8CvD1LMbc9dPfa5m6jjqRKCHV095qKABf02nzS+SVTyJjtUPKQnWmdBVpJkLiLHEtL5UfIydAuS1g9wzASV79kXJ+wpshccWFAacoBHsYmfyeGBzYG60e7v9IzsWnQbHqsITYkxUtAU3igh35T8ZXgx7pJeiYJMd0w3l7XxEqJNh/tNDFg+YZ+Xw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B7AajLuk3jeJMXCjIa4ixRFnwqT3oUT5OFsp1vXNZVk=;
- b=YnFz30AeYfeFZCGqJkoFcQwBUR4I/iPfRTYI+h1USoGzBTlWQvuKiRHSUkp2K4yIqXvZ2X5jm0RCmom6Tp3iOf6XzXAglr7884h5owxQ8j9kyYso/hLE1J+1K3uZopPV8DuE0x32otKYqIlW/Qss3Akj9Gx7oZ3WnzhXnDEPe0i/W7aRs+MzGeVzgLB3zcrR+YSfGpdvAS9m63Oqm6LVdvPqg3w618e3JRtmlH86EUMkhJuD+XzjQOHK6WLjOWFJzit87G83IEKbppWCHOOZQkoP1elC6q21WoGqBHg4I/JbZDgCFBGa0vKsjlJZ3v4r3Bcvrx3agJwN+XDTx6xMCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
- dkim=pass header.d=amlogic.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B7AajLuk3jeJMXCjIa4ixRFnwqT3oUT5OFsp1vXNZVk=;
- b=yYD4Ww52+SaIFQuNRU0MxRyfoT/HEuerAHJ+jhoQXHgukviU/y07ZK3cms7Ny9ARlqaN85u7m6uGphQOGjre/6jCHDIFR6da1/L1Tb5M0lIJbah8eIe/8uR9Og9rdX4b65W8Hz+1iCbSWrgt9+4WhX14r2hubC/Hs77EFhCg6vrka+B6hqhqniXfJUB23Y0FTJm0CUiOWx87WVfjNkG1chLqf4ZqY+9Uvu2FpyfgEJ3RPZFv2S1OCk9agMdzCGNmiGI62cTEqq2wqnxA7tY7nVHS1Wnt0tDN9RbDcJ/ZzU514bhkENMoxZDcpZppWJwh1ewi6O3IFIqEBbyGc3wpWQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amlogic.com;
-Received: from TYUPR03MB7232.apcprd03.prod.outlook.com (2603:1096:400:354::5)
- by SEYPR03MB9402.apcprd03.prod.outlook.com (2603:1096:101:2d6::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Tue, 3 Mar
- 2026 02:03:59 +0000
-Received: from TYUPR03MB7232.apcprd03.prod.outlook.com
- ([fe80::525d:fa76:296a:a64f]) by TYUPR03MB7232.apcprd03.prod.outlook.com
- ([fe80::525d:fa76:296a:a64f%6]) with mapi id 15.20.9654.022; Tue, 3 Mar 2026
- 02:03:59 +0000
-Message-ID: <b2ad3f3f-105e-4171-b735-84051906cfb5@amlogic.com>
-Date: Tue, 3 Mar 2026 10:03:04 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: avoild hang when bio_list is non-NULL in
- submit_bio_wait()
-To: Gao Xiang <hsiangkao@linux.alibaba.com>,
- Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, jianxin.pan@amlogic.com,
- tuan.zhang@amlogic.com, Gao Xiang <xiang@kernel.org>,
- linux-erofs@lists.ozlabs.org
-References: <20260302-for-next-v1-1-eb9339e8dc99@amlogic.com>
- <aaWVwH_Xna22DTAq@infradead.org>
- <dddf1754-d575-4f4b-a11c-09847d0d0475@linux.alibaba.com>
-Content-Language: en-US
-From: Jiucheng Xu <jiucheng.xu@amlogic.com>
-In-Reply-To: <dddf1754-d575-4f4b-a11c-09847d0d0475@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TY4PR01CA0031.jpnprd01.prod.outlook.com
- (2603:1096:405:2bd::9) To TYUPR03MB7232.apcprd03.prod.outlook.com
- (2603:1096:400:354::5)
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RJQbBhOo"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1772503901; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=nFbFx2/BFofkXvHdvXlriaDv4ASYA0leI76fEaVkqac=;
+	b=RJQbBhOo8zP+T+B2GP67r4sFAAJLGsvYitCPCY3uWAqX3dOOPLBDPuwe6RRRAsNN/InDQMOXrqWG6/1XT+wDZYPvhE4VuSr5LfNwgMGggVNqY/I3sG4N6ShzNym8/ql38S+VRYH+ww1H2r6k/0UTTPpwPZ/uxFVh/s76Xb7qi+4=
+Received: from 30.221.132.55(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0X-86zLx_1772503900 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 03 Mar 2026 10:11:40 +0800
+Message-ID: <6e5aa87c-f3bb-4ae9-8700-27f7f1a9d7b2@linux.alibaba.com>
+Date: Tue, 3 Mar 2026 10:11:38 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TYUPR03MB7232:EE_|SEYPR03MB9402:EE_
-X-MS-Office365-Filtering-Correlation-Id: 611cd03f-6332-4414-d263-08de78c9222b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	Vubf7vwljv5Fo82YIT5bWZNEOkaXq8MDgNq6qo0ctaotliCsZ5O9stIhzDG8eEwvPiVwbxgZ68YN+N6NrNd/Nvdq9xsaDGa/7Yw8Z09qCPMnFs2wZNXtFt3xhqFbo0kJnuv90GGPa0hzDsj8Sua/kUql0oSaKogcN1PX2wTDzSnG4Q0EKsWE2S4HTwiZnz7Sof+E5my9e9EK1vkifQ1oonU+vRdHWSCBJSuDsHilaaOZFwkREQ/lOcgWeEafPM00DrW5PAvrRiUAJHXTfHJahiG2TJySR+Z78ZYkMVjgvfF74LqKsgrx5H4de6Ptsct2/2B1Um4dZEVFiQ+dGv9emLn2TsJ9GejTtomb8kSg5Le2YVcaBkS1S+cmTZiv5mA8e06YrzdDgnQBcjVoxc4Tdh/rH4DnkF9pMNXVfoecIAqb0gZcpaPkqP0RBhzvqCxdQ5OKZlZuDiEFIGyo57suZTlgo3dD8NZ4ICy1ie6s4ygIA68w2i9QfZSlFurY1ptx0mB/onpBFZQL1BlYqzRt93FLEwdXQqRfEGVdW4mIme2tGLFb5YqUoBhjjJth1+7fFZumDe/25WoiSFcln04rOsFRleuabG+Cs+Xx8owRvwVcIo0Wj/58iPrOSucT2s0VV4nNUs26MfsXZMtjHNTu67ElFJXguPZQz73mpp170tmuvxoAUPi1diQD+kKn/f/vp+P8XLavixs+nQQwMVHuVtoqJVGJ4J4BpzqPzJNhi0Q=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYUPR03MB7232.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UmJnVFZUOFFMS2h5U0xSamw0QXNHdllOcldjUHNLY2FWM2xyWW82Nk9laDdw?=
- =?utf-8?B?dm9qbmZOUTczZjJNVHp2RUp6RTNmMjhjRkpWQ0JCL0ZMMDZkaU1ia3dDL2Ev?=
- =?utf-8?B?TXRjcE5ob1B1Tm1CM2ZpMmlFTm1uY3BGTVc0M3htNENPK0ZxQWJST2JRSkFn?=
- =?utf-8?B?emx3R0I4TnJUd3FzbUppeVpnTUdYamtvemg0TzhvRld6dGdjNTB2dWhUT0JS?=
- =?utf-8?B?czJIUURrbllUVEZsNUFFcUg3NFplaGNNa0JnWTQ0MmxxTXhIeVl4RktsdVNP?=
- =?utf-8?B?citQZGFwZUVLVEtPdndzZVBTNnZFdmlpL2pvZlpscHlYQzVGTU9PbFl4bU1K?=
- =?utf-8?B?VVFVNDNkYTZSQnhNRTdBa1J3YTBsYTZUOGo4ZUV6ZHo4aS9HS0tOVFRITmNv?=
- =?utf-8?B?aldHcnJ2SWlrOHhjMDU5R1NFMUcvWjUxVnFEdDNqMWFlQkI4Y3ZaQUxwWDhk?=
- =?utf-8?B?cDZuL2VWRXhyclVKMFh5Z2xTWDFYMlNBRG1SZzZhL3Q1SVM2Y3JTWlRIUDZK?=
- =?utf-8?B?aVljVmRJTXNFdXVWZ3dORXkwM0NJV1pmbkxUK0l1TnE4M1A4OFR4VHlZSGtl?=
- =?utf-8?B?Q3NnMXdvUVVVcFJjUUxPeHJwU01kUGpWeTBsSTZ5Z2ZzSTUzMUZXNHhHNERn?=
- =?utf-8?B?bXFSL1JSV3NHeDVJbjZDbC9zU05IL0psR01TT3h6TkEyWXY0Zld0cDNEdUNG?=
- =?utf-8?B?VGcralprd3Fzdk5nMmNkbjlPcjFPU1lLWXh3UWovYlRGbkZTR055MDUxdUFF?=
- =?utf-8?B?YmM1cHBSMlljZitUaVRHQlRLVFdwSUI3NS9DMUNjTDVESmZ2cCtiNWZpWnFU?=
- =?utf-8?B?QnJqSm1ySHc2RVJuN09ickNwV01LQWpDYkNnS29nclBzbENTMGpxTUM0cmVT?=
- =?utf-8?B?WUdWMTgrbGVQTnZjNGdhZlFoMjNYYi9vS0o1V3dBUjlWMGYzeXhWazdkS094?=
- =?utf-8?B?Q0JjWFlVWHgvck5hZlh2eVpKSFpLMUEwanMxMEFNa09vYm0wRVYrMWtrQ1BI?=
- =?utf-8?B?Q1pOd0MxWGVkL0owY2ttcFQranh6UFBLNXhXckdManJOT3prWkFnOVcyK0ZJ?=
- =?utf-8?B?YWNWRDhIcmFuaGMxS0VBQ0NoekV4T0dJd0tMYmNQWTNoWUJmOGcyWnp1aDlE?=
- =?utf-8?B?TW1MSmhuamhJZHVNRVcwcktuOEVCamMvNGNScDFtMU1EVTRJTGIrdWQyT1Nk?=
- =?utf-8?B?SFpGQktoak9aTmZOd3VhVWk0VG9kNy9KWjhzbkV1NXJPNlNZUXlKSnBoVGhj?=
- =?utf-8?B?RlpYWUsyZEdHWFJWaFdmNDJBVzFFZVFpdmJweVFLUlVKVUxtNTBBalEvMGRZ?=
- =?utf-8?B?d2c2UFJxbW1qb0tNR0xicGw2enpZTUQ1Z1FJRFFTTUxoSjRUczZTWktla3pj?=
- =?utf-8?B?Tis1dFhOT1JNcEhtNGdJVFJKR1haZTFBbGE1RGhkdVRPT0pGbzNUSFh6a0Js?=
- =?utf-8?B?bEdFQWdqemVYQ3ZtN3lNd3ZLaStEazVnU0lNRkozQk5SRC9ZdGZDR3pFbkJG?=
- =?utf-8?B?SVo5MjBVTnFDM0hLQkZyU3Q3THRlWGs3TWxSKzVqM1EzUnJnYThOTjVsS0pF?=
- =?utf-8?B?bG50cWdZYjl5UW9tVVk1ZHlUS0VzN1kvTFo2Yk1ubjFpUFB2Y3JnKzNLZGZP?=
- =?utf-8?B?bDZwcFhuN0NGay9yeTQrYlR3anArQklsaFozblBrL1MyM0hLOE9ycEtpVFEx?=
- =?utf-8?B?NEgvMzgzdWljOVNyOC91YXFLa2ZSeGlPS2FzSGxWNTFuUmQ2aFk2SHF5RTlM?=
- =?utf-8?B?ajkwUTFmazNMTVNZcFZsbDl2NzBOMVdZSHl5Y2J6SXlaaFhRZytkWWhOOGZB?=
- =?utf-8?B?akI3cGdnNDlpVEhSL3A5aURpa2g2SnJTNzBZQ1Z4TzZ0UWxHeFhaa2NGc3JQ?=
- =?utf-8?B?WXEyd2Z1WFZ0NVExak5tak1UNXVzWFFnaWU4eGxxVWYvRi9QNXd1aWNXWVZS?=
- =?utf-8?B?ZFFCR3d6a1UzTTczWkxuUDdyN09OWWZGYmU3b05YenVLb3VYTlBid1hiYm8x?=
- =?utf-8?B?RXB4QzBPZWZGYWg0Sis3T2Era1A5TkZhMlNhY3J0NHdWc0dGTGpBeHdGTEYz?=
- =?utf-8?B?eWYwbGR0eCtKQmFwVXZUQlU3VWpWSlNOK2o0L3MvTjlnQXp5REltNURzZnQr?=
- =?utf-8?B?YUlJVHBXa1VsanEvNFc3WjA4TVZGNklzbCtrUnYrQjkxWnBCZHhIMlNWRHdF?=
- =?utf-8?B?bVBhSEFIMkxQOGFxeFNiWlhWdVFISEpheFVJNEhwWEd0ZEV0RndidVNsQlAr?=
- =?utf-8?B?cEJzTjFFV1JsU0taMzFSa0F5WFlyamFhTThsSWJQOTR4YVVtU29RdlJseW00?=
- =?utf-8?B?MGoxdThBbENkcTUzZ3Z4enh0bXV0N0lpcnkvSEhXb3FWZGVaa003Zz09?=
-X-OriginatorOrg: amlogic.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 611cd03f-6332-4414-d263-08de78c9222b
-X-MS-Exchange-CrossTenant-AuthSource: TYUPR03MB7232.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 02:03:59.1446
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uKmEp3p6p9Oc9xl1yZAbriHtxSl7N0ok1726c7ntBP+pkhr5AL6lqKtms7zw6VJFjpzH2F5a+6XBCWF7a88bFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR03MB9402
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: avoild hang when bio_list is non-NULL in
+ submit_bio_wait()
+To: Jiucheng Xu <jiucheng.xu@amlogic.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jianxin.pan@amlogic.com,
+ tuan.zhang@amlogic.com, Gao Xiang <xiang@kernel.org>,
+ linux-erofs@lists.ozlabs.org, Christoph Hellwig <hch@infradead.org>
+References: <20260302-for-next-v1-1-eb9339e8dc99@amlogic.com>
+ <aaWVwH_Xna22DTAq@infradead.org>
+ <dddf1754-d575-4f4b-a11c-09847d0d0475@linux.alibaba.com>
+ <b2ad3f3f-105e-4171-b735-84051906cfb5@amlogic.com>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <b2ad3f3f-105e-4171-b735-84051906cfb5@amlogic.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
-On 3/2/2026 10:23 PM, Gao Xiang wrote:
-> [Some people who received this message don't often get email from 
-> hsiangkao@linux.alibaba.com. Learn why this is important at https:// 
-> aka.ms/LearnAboutSenderIdentification ]
+On 2026/3/3 10:03, Jiucheng Xu wrote:
 > 
-> [ EXTERNAL EMAIL ]
 > 
-> Hi Christoph,
-> 
-> On 2026/3/2 21:50, Christoph Hellwig wrote:
->> On Mon, Mar 02, 2026 at 10:51:03AM +0800, Jiucheng Xu via B4 Relay wrote:
->>> From: Jiucheng Xu <jiucheng.xu@amlogic.com>
->>>
->>> When current->bio_list is non-NULL in submit_bio_wait(),
->>> submit_bio_noacct_nocheck appends bio to bio_list but skips IO
->>> submission, causing submit_bio_wait() to hang indefinitely.
->>>
->>> Fix this by temporarily backup bio_list, setting bio_list to
->>> NULL before calling submit_bio(), then restoring bio_list
->>> after submit_bio() returns.
+
+...
+
 >>
->> No.  Fix this by not doing something that is a bad idea.
+>>> that need to use GFP_NOIO.
 >>
->>> I've trimmed down the call stack, as follows:
->>>
->>> f2fs_submit_read_io
->>>    submit_bio
->>>      mmc_blk_mq_recovery
->>>        z_erofs_endio
->>>          vm_map_ram
+>> Yes, it should make vm_map_ram() in the end_io path use
+>> GFP_NOIO instead.
 >>
->> ->bi_end_io code really should not be having random in_atomic()
->> checks that make it completely different, but even if they have
+>> Jiucheng, could you add memalloc_noio_{save,restore}() to
+>> wrap up this path?
 > 
-> Thanks for the head-up.
-> 
-> For this part, I'm pretty sure we need this particular one
-> otherwise the scheduling performance (latency sensitive)
-> is unacceptable for all Android phone users.
-> 
->> that need to use GFP_NOIO.
-> 
-> Yes, it should make vm_map_ram() in the end_io path use
-> GFP_NOIO instead.
-> 
-> Jiucheng, could you add memalloc_noio_{save,restore}() to
-> wrap up this path?
+> Thanks for Christoph's and Xiang's comments, I will try it. Thanks!
 
-Thanks for Christoph's and Xiang's comments, I will try it. Thanks!
+Just one more note: just wrap up z_erofs_decompressqueue_work() in
+z_erofs_decompress_kickoff() with memalloc_noio_{save,restore}() is
+enough.
 
-Best Regards,
-Jiucheng
+  ...
+  memalloc_noio_save()
+  z_erofs_decompressqueue_work()
+  memalloc_noio_restore()
+
+> 
+> Best Regards,
+> Jiucheng
+
