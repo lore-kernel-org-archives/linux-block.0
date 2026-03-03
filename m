@@ -1,135 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C51C4301D6
-	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 14:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796F83A8751
+	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 14:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772547661; cv=none; b=n95fis/MoVk/W/9TWXsJup5zfuQiNr0jtHtwuL4XgW0Xcumddy1+QxKb/KcYyHNexWm+wRKOid3JEYMIrIx8Cd39co3ive7oN80kZe+NVRHUCGI771ESbEON/hxoSjr3NGFgh1o48pdwzVNXjPwI82pdnfCfPGVoe/37wj7KkrM=
+	t=1772549955; cv=none; b=pvGrRgYZuKAhwmmlAHbEe77nvOx0VJ7MBF7PtxtvvOqy9h5CCGpoEf0JaMxluYu1MYHwPYChZJpQNIqFG27pzGbDHzKJIcLQVEK4MbiqbymPlJocU33M7F0ArVQCC76108g+DfRls0RkuOxes43hDTzbNSXuCAqbo3AdkNGHSGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772547661; c=relaxed/simple;
-	bh=IkQ7/gyK0kZ4FalknuXom3D+eyJvw5c+6TIGp5/qhI8=;
+	s=arc-20240116; t=1772549955; c=relaxed/simple;
+	bh=bXbsTlnyOl69D8NqlmKPurDJiOFu5wpqzkEn0HNdUP4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lURwnJipSLdXLzuxU7ZlQolPuCZljYyIROSC1tWPWZZK/YCDMk2a223Q4dFB1bxP8UlbfruDDfwz5tFavv0kh1jjYFAm52x/6pF/qylzkFrbkHWRPKqkh+Znbtk1hNvea7JtRvwo+Nn0mndNFd7rIXujJ7Qy5rjzi40X7ZOXrAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GfPiXkTW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=NjsG+u4hihRNXw9BMJ9sHI4CBlf2J8RHkOb/r69/oJtm7vzMysychochmryH4FgoHRhkA73ff/u9/q7+c50nZTWd6ERtFQ7EVNvoysdgDx7ou5Xskj6Rpb2JKpsxatoBurPzRwWXyRYwMQRfE0f0BeEfTFw52ckY+4uNMSLRnTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mFuZEJ40; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfPiXkTW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772547659;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mFuZEJ40"
+Date: Tue, 3 Mar 2026 06:59:04 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772549951;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hpscGlqtT0S5hsz/lvyVjD4lT80PmJ0j11LCHkWNSX8=;
-	b=GfPiXkTWY7XPmRxefE577HLSa3Yxhy2FJABqZzcrwl4E3i8MkxBUDQ8pUnLwpO4yv0GxC5
-	rXPEqJayhoZ39gqvTXMEfMuoLxa4CUX4yCdQVNJr1waZJCXt7ft0ppfltQwJmxi9zGNfbr
-	rB1WN3Q4PhuvPCIzImpbEjMJ/0rvvWM=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-127-3ehT5qksMqaYvuvFq6SAhg-1; Tue,
- 03 Mar 2026 09:20:52 -0500
-X-MC-Unique: 3ehT5qksMqaYvuvFq6SAhg-1
-X-Mimecast-MFC-AGG-ID: 3ehT5qksMqaYvuvFq6SAhg_1772547649
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B940B1956095;
-	Tue,  3 Mar 2026 14:20:48 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 632EE1800590;
-	Tue,  3 Mar 2026 14:20:47 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 623EKkZo1889507
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 3 Mar 2026 09:20:46 -0500
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 623EKibS1889506;
-	Tue, 3 Mar 2026 09:20:44 -0500
-Date: Tue, 3 Mar 2026 09:20:44 -0500
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: John Garry <john.g.garry@oracle.com>, hch@lst.de, kbusch@kernel.org,
-        sagi@grimberg.me, axboe@fb.com, martin.petersen@oracle.com,
-        james.bottomley@hansenpartnership.com, hare@suse.com,
-        jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
-        snitzer@kernel.org, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/24] scsi-multipath: introduce basic SCSI device support
-Message-ID: <aabuPClNgSC6uO93@redhat.com>
-References: <20260225153627.1032500-1-john.g.garry@oracle.com>
- <20260225153627.1032500-3-john.g.garry@oracle.com>
- <aaT0Taxs6WgX6m-j@redhat.com>
- <784abca8-9dc1-4fca-b72f-62d55b4cc3f1@oracle.com>
- <aaZ0Kf9n79QF4gbR@redhat.com>
- <003612c1-ff07-466c-93e8-d7766a9ec2db@suse.de>
+	bh=LzzRBFY4XpGoGT9xNiopMMRuAAFFoqywP6b/pmzvCT0=;
+	b=mFuZEJ40pKY9dBp8jvbCyRxSoBDKPYlDZPoxXtHml753XhNsEB1+BHk4z/zASW7oSWSXBh
+	o0ZGKNEl53FiGxD372/ksHrfRAcq3fZleJC3Jntw6vxaLZPrRHKZGvDRjmLWZNoeA4Frda
+	x/lt3ZWUs6RcXWVLrqeFOM7M0CqrKGc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Matt Fleming <matt@readmodwrite.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>, 
+	Barry Song <baohua@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	kernel-team@cloudflare.com, Matt Fleming <mfleming@cloudflare.com>, roman.gushchin@linux.dev
+Subject: Re: [RFC PATCH 0/1] mm: Reduce direct reclaim stalls with RAM-backed
+ swap
+Message-ID: <aab0AFAgAzBi4jO6@linux.dev>
+References: <20260303115358.1323188-1-matt@readmodwrite.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <003612c1-ff07-466c-93e8-d7766a9ec2db@suse.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20260303115358.1323188-1-matt@readmodwrite.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Mar 03, 2026 at 09:01:04AM +0100, Hannes Reinecke wrote:
-> On 3/3/26 06:39, Benjamin Marzinski wrote:
-> > On Mon, Mar 02, 2026 at 11:39:28AM +0000, John Garry wrote:
-> > > On 02/03/2026 02:22, Benjamin Marzinski wrote:
-> > > > > diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> > > > > index 19d0884479a24..cfab7ad1e3c2c 100644
-> > > > > --- a/drivers/scsi/Kconfig
-> > > > > +++ b/drivers/scsi/Kconfig
-> > > > > @@ -76,6 +76,16 @@ config SCSI_LIB_KUNIT_TEST
-> > > > >    	  If unsure say N.
-> > > > > +config SCSI_MULTIPATH
-> > > > > +	bool "SCSI multipath support"
-> > > > At least until this supports ALUA, it should probably be marked
-> > > > EXPERIMENTAL, just so people trying it out aren't surprised if it
-> > > > doesn't multipath their device in the way they expect.
-> > > 
-> > > I think that ALUA support will be mainline acceptance criteria, and I am
-> > > looking to add it now.
-> > > 
-> > > BTW, Hannes suggested to not use the DH ALUA support, so that means to
-> > > separate out the core ALUA support from the DH stuff. So you have any
-> > > opinion on that approach?
-> > 
-> > I would (perhaps naively) have thought that the device handlers would be
-> > a useful abstraction for dealing with ALUA devices. But, Hannes knows
-> > this code much better than me. like I said before, I'm no scsi expert.
-> > 
-> The main point of the device handlers was to inject a 'start' command
-> whenever paths needed to be switched (Like you need to do for some
-> active/passive arrays).
-> But that really caused quite some issues with complexity, as you easily
-> can get into array path ping-pong on path failure with no I/O being
-> transmitted.
+Hi Matt,
+
+Thanks for the report and one request I have is to avoid cover letter for a
+single patch to avoid partitioning the discussion.
+
+On Tue, Mar 03, 2026 at 11:53:57AM +0000, Matt Fleming wrote:
+> From: Matt Fleming <mfleming@cloudflare.com>
 > 
-> So for this implementation I would stick with implicit ALUA
-> (most modern implementations have done so already anyway), and
-> then there's no need using the device handlers.
-
-That makes sense. Limiting support to implicit ALUA significantly lowers
-the bar for getting ALUA working. AFAICS, It should just require getting
-the path selecting code right.
-
--Ben
-
+> Hi,
 > 
-> Cheers,
+> Systems with zram-only swap can spin in direct reclaim for 20-30
+> minutes without ever invoking the OOM killer. We've hit this repeatedly
+> in production on machines with 377 GiB RAM and a 377 GiB zram device.
 > 
-> Hannes
-> -- 
-> Dr. Hannes Reinecke                  Kernel Storage Architect
-> hare@suse.de                                +49 911 74053 688
-> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-> HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
+Have you tried zswap and if you see similar issues with zswap?
+
+> The problem
+> -----------
+> 
+> should_reclaim_retry() calls zone_reclaimable_pages() to estimate how
+> much memory is still reclaimable. That estimate includes anonymous
+> pages, on the assumption that swapping them out frees physical pages.
+> 
+> With disk-backed swap, that's true -- writing a page to disk frees a
+> page of RAM, and SwapFree accurately reflects how many more pages can
+> be written. With zram, the free slot count is inaccurate. A 377 GiB
+> zram device with 10% used reports ~340 GiB of free swap slots, but
+> filling those slots requires physical RAM that the system doesn't have
+> -- that's why it's in direct reclaim in the first place.
+> 
+> The reclaimable estimate is off by orders of magnitude.
+> 
+
+Over the time we (kernel MM community) have implicitly decided to keep the
+kernel oom-killer very conservative as adding more heuristics in the reclaim/oom
+path makes the kernel more unreliable and punt the aggressiveness of oom-killing
+to the userspace as a policy. All major Linux deployments have started using
+userspace oom-killers like systemd-oomd, Android's LMKD, fb-oomd or some
+internal alternatives. That provides more flexibility to define the
+aggressiveness of oom-killing based on your business needs.
+
+Though userspace oom-killers are prone to reliability issues (oom-killer getting
+stuck in reclaim or not getting enough CPU), so we (Roman) are working on adding
+support for BPF based oom-killer where wen think we can do oom policies more
+reliably.
+
+Anyways, I am wondering if you have tried systemd-oomd or some userspace
+alternative. If you are interested in BPF oom-killer, we can help with that as
+well.
+
+thanks,
+Shakeel
