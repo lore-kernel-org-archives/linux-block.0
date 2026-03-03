@@ -1,182 +1,174 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7FA361658
-	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 08:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B88358397
+	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 08:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772524869; cv=none; b=j/QToCSGgSTRiN3KyGfbypCSeM/MglJXTaorRY7FJ7IuUww97wNq0HAWoHFLv5VB9eesPQS2cfAEyUK+w9FjwnGAmB8nlwTR3YZc+v2AN0QkfJmM1VKtWJQSXK1v5aQ8Kp7TX2vNzlN2sN70DNqGIZgh37SkgvTI04pj8VZdOKE=
+	t=1772525085; cv=none; b=oad/bi2s8cEe0QhTnS2FxzLl40UNOhao759O5QnEdkViE5qs0s8jJN4L94nLE864uk1qJAX556UIoV+mZ68D1gnVvTrosTSLBU0BZ7qhpDwRZmxZATAoubPUUf/OAdC14NdnMLnzJLp6yOYVPSoc4rEQ8BV/RN20kJtUsviAgJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772524869; c=relaxed/simple;
-	bh=ebuDYg4EqjvMvXQm0sQRpXUJzqn9z9q2/54uXlkiA+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pNWT7H0809uhJyDjMPnzSjowAoMmjW5JyfVH35DjnE1VUtui9tgBsuxT8glzrI2Gf78F6e0wBQiLx86Z40/VUyYddMb4CUS/Z7RF4XdvfGU57Wmrgzpdnu2hewef5bPSttVofxMgrKpk9waavTF/gf375NKUibbzExRmPkNkAF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g+dkNDxI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dE6xoQ9U; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g+dkNDxI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dE6xoQ9U; arc=none smtp.client-ip=195.135.223.131
+	s=arc-20240116; t=1772525085; c=relaxed/simple;
+	bh=fXY1VaLBF865FRc67gKSJd4OVrlGYZYBUEHBgFgjudE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y7b9h1ap/mOCVBB1MidjXvq+gMxTAUo0s0P07LKZOLhj8PBbR4fWD9TUM9FWNrtCCpsYuDFFKikK5VWUyAQzalRk85kZPhzopXbqtvkzUo+4mWaR5vo8Qdt1v/WfDhe6JDx0wnrhxCYN7wG8ieNbVnvGTf0cQkTLP9YZqK6z9JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=U7b2B/B/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O0UJX6XW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=U7b2B/B/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O0UJX6XW; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g+dkNDxI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dE6xoQ9U";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g+dkNDxI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dE6xoQ9U"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="U7b2B/B/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O0UJX6XW";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="U7b2B/B/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O0UJX6XW"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 03AFE5BDE8;
-	Tue,  3 Mar 2026 08:01:05 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6CE3E3F900;
+	Tue,  3 Mar 2026 08:04:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772524865; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1772525082; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fdvlZQLMecCp4iVDrx4FwePf2t0qECbN1F0Byz5D0ic=;
-	b=g+dkNDxI46LZ0Su7x7L9MY1MVi4RHKcw6Sg7AYNNlsWyPzRwQfsnAgjiw9ivDb1kbyvDcO
-	ywK3rLa5Ll0vzJNrV38sbcB2SY8YWuCkr1JFFnpp4481LuUQvpMNEsy7rN6FI7qseHOyxZ
-	rqqHJLa1pjvhsb4xh81TfRiMe5jlF3w=
+	bh=7z8rz4sJXbLEBbjPa23l499jQIycn/gGGJXbkQ5pJRc=;
+	b=U7b2B/B/asBIedHzO7ogSmM7ZrARFTezdRCOFlkXQRTOSZGgYcBdlMdHM/Orgh9/yQGR5+
+	JVbC57CYc5HX5+5FeG0LYAH7k8S+NBL4jzKTaouc2MNoqic9w6d/0Dd35PN+YwQkCKR19g
+	0MwcDlmpc6ZW6VxanaLtu/o1EKfGCiA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772524865;
+	s=susede2_ed25519; t=1772525082;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fdvlZQLMecCp4iVDrx4FwePf2t0qECbN1F0Byz5D0ic=;
-	b=dE6xoQ9UGiXxqaECVOW/IHyRM7T6DUqUyBOLKSpDZ14uUqWGYmcjrzaa2EOtgDdDtciObV
-	NbfSNviAl09g7lDg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=g+dkNDxI;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=dE6xoQ9U
+	bh=7z8rz4sJXbLEBbjPa23l499jQIycn/gGGJXbkQ5pJRc=;
+	b=O0UJX6XWwY+LQSVOgpIlosmqgaBDqE1uAQg7ZYKNL6WWRP0Amf9WsXZmBfos+eQkhI4gUC
+	UsJM/La/gQ/1rLBg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="U7b2B/B/";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=O0UJX6XW
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772524865; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1772525082; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fdvlZQLMecCp4iVDrx4FwePf2t0qECbN1F0Byz5D0ic=;
-	b=g+dkNDxI46LZ0Su7x7L9MY1MVi4RHKcw6Sg7AYNNlsWyPzRwQfsnAgjiw9ivDb1kbyvDcO
-	ywK3rLa5Ll0vzJNrV38sbcB2SY8YWuCkr1JFFnpp4481LuUQvpMNEsy7rN6FI7qseHOyxZ
-	rqqHJLa1pjvhsb4xh81TfRiMe5jlF3w=
+	bh=7z8rz4sJXbLEBbjPa23l499jQIycn/gGGJXbkQ5pJRc=;
+	b=U7b2B/B/asBIedHzO7ogSmM7ZrARFTezdRCOFlkXQRTOSZGgYcBdlMdHM/Orgh9/yQGR5+
+	JVbC57CYc5HX5+5FeG0LYAH7k8S+NBL4jzKTaouc2MNoqic9w6d/0Dd35PN+YwQkCKR19g
+	0MwcDlmpc6ZW6VxanaLtu/o1EKfGCiA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772524865;
+	s=susede2_ed25519; t=1772525082;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fdvlZQLMecCp4iVDrx4FwePf2t0qECbN1F0Byz5D0ic=;
-	b=dE6xoQ9UGiXxqaECVOW/IHyRM7T6DUqUyBOLKSpDZ14uUqWGYmcjrzaa2EOtgDdDtciObV
-	NbfSNviAl09g7lDg==
+	bh=7z8rz4sJXbLEBbjPa23l499jQIycn/gGGJXbkQ5pJRc=;
+	b=O0UJX6XWwY+LQSVOgpIlosmqgaBDqE1uAQg7ZYKNL6WWRP0Amf9WsXZmBfos+eQkhI4gUC
+	UsJM/La/gQ/1rLBg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 75C6B3EA69;
-	Tue,  3 Mar 2026 08:01:04 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 582A53EA69;
+	Tue,  3 Mar 2026 08:04:42 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XD0iG0CVpmkqawAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 03 Mar 2026 08:01:04 +0000
-Message-ID: <003612c1-ff07-466c-93e8-d7766a9ec2db@suse.de>
-Date: Tue, 3 Mar 2026 09:01:04 +0100
+	id 0rjeExqWpml6bgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Tue, 03 Mar 2026 08:04:42 +0000
+Date: Tue, 3 Mar 2026 09:04:41 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>, 
+	Stephen Zhang <starzhangzsd@gmail.com>, Kent Overstreet <kent.overstreet@linux.dev>, 
+	Coly Li <colyli@fnnas.com>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Subject: Re: [PATCH blktests v4 0/3] bcache: add initial test cases
+Message-ID: <f7cff08f-a3e8-4b2e-ac7a-a56d8ed3f2d5@flourine.local>
+References: <20260212-bcache-v4-0-215f3fde1c84@suse.de>
+ <37e2c5a5-d797-4176-98c7-0e43abaa1af8@flourine.local>
+ <aaYwWwGHdoc1uMCu@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/24] scsi-multipath: introduce basic SCSI device support
-To: Benjamin Marzinski <bmarzins@redhat.com>,
- John Garry <john.g.garry@oracle.com>
-Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
- martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
- hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
- linux-scsi@vger.kernel.org, michael.christie@oracle.com, snitzer@kernel.org,
- dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260225153627.1032500-1-john.g.garry@oracle.com>
- <20260225153627.1032500-3-john.g.garry@oracle.com>
- <aaT0Taxs6WgX6m-j@redhat.com>
- <784abca8-9dc1-4fca-b72f-62d55b4cc3f1@oracle.com>
- <aaZ0Kf9n79QF4gbR@redhat.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <aaZ0Kf9n79QF4gbR@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aaYwWwGHdoc1uMCu@shinmob>
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-5.51 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
+	DWL_DNSWL_LOW(-1.00)[suse.de:dkim];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
 	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
 	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
+	FREEMAIL_CC(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Queue-Id: 6CE3E3F900
 X-Spam-Flag: NO
-X-Spam-Score: -4.51
+X-Spam-Score: -5.51
 X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 03AFE5BDE8
 
-On 3/3/26 06:39, Benjamin Marzinski wrote:
-> On Mon, Mar 02, 2026 at 11:39:28AM +0000, John Garry wrote:
->> On 02/03/2026 02:22, Benjamin Marzinski wrote:
->>>> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
->>>> index 19d0884479a24..cfab7ad1e3c2c 100644
->>>> --- a/drivers/scsi/Kconfig
->>>> +++ b/drivers/scsi/Kconfig
->>>> @@ -76,6 +76,16 @@ config SCSI_LIB_KUNIT_TEST
->>>>    	  If unsure say N.
->>>> +config SCSI_MULTIPATH
->>>> +	bool "SCSI multipath support"
->>> At least until this supports ALUA, it should probably be marked
->>> EXPERIMENTAL, just so people trying it out aren't surprised if it
->>> doesn't multipath their device in the way they expect.
->>
->> I think that ALUA support will be mainline acceptance criteria, and I am
->> looking to add it now.
->>
->> BTW, Hannes suggested to not use the DH ALUA support, so that means to
->> separate out the core ALUA support from the DH stuff. So you have any
->> opinion on that approach?
+Hi Shinichiro,
+
+On Tue, Mar 03, 2026 at 12:57:18AM +0000, Shinichiro Kawasaki wrote:
+> On Mar 02, 2026 / 14:54, Daniel Wagner wrote:
+> > On Thu, Feb 12, 2026 at 04:23:30PM +0100, Daniel Wagner wrote:
+> > > I've updated the v3 version with the feedback from Shinichiro for v2.
+> > > Shinichiro, please note I did rewrite some of the logic in v3, thus some of your
+> > > comments didn't apply. But hopefully I don't made a big mess :)
+> > 
+> > ping
 > 
-> I would (perhaps naively) have thought that the device handlers would be
-> a useful abstraction for dealing with ALUA devices. But, Hannes knows
-> this code much better than me. like I said before, I'm no scsi expert.
+> Daniel, I wonder if my replies [1][2] reached your mail box.
+
+Sorry, no, they didn't. Yet another hickup with our mail server...
+
+> [1] https://lore.kernel.org/linux-block/aZQZkjEUw9VnVauX@shinmob/
+> [2] https://lore.kernel.org/linux-block/aZQcH-d-ZcgtMoJb@shinmob/
+
+I'll work on this then.
+
+> Today, I tried this patch series again on v7.0-rc2 kernel with the
+> TEST_CASE_DEV_ARRAY below:
 > 
-The main point of the device handlers was to inject a 'start' command
-whenever paths needed to be switched (Like you need to do for some
-active/passive arrays).
-But that really caused quite some issues with complexity, as you easily
-can get into array path ping-pong on path failure with no I/O being 
-transmitted.
+>   TEST_CASE_DEV_ARRAY[bcache/*]="/dev/nvme0n1 /dev/nvme1n1 /dev/nvme2n1 /dev/nvme4n1"
+> 
+> And found that new files named "nvme?n1" are created in the current directory.
+> Do you see the files created in your environment?
 
-So for this implementation I would stick with implicit ALUA
-(most modern implementations have done so already anyway), and
-then there's no need using the device handlers.
+Will check.
 
-Cheers,
+> Also I saw the failure with the message "ERROR: Accounting leak detected!" as I
+> noted in [2].
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+I am not really sure if this test case should go in the current form.
+I've just used Stephen's test case as input for figuring out what kind
+of API is useful. I also see the leak error with v7.0-rc1 which has
+3ef825dfd4e4 ("bcache: use bio cloning for detached device requests").
+I might have done something wrong here.
+
+BTW, iostat could be replaced by reading directly from sysfs,
+e.g. /sys/block/nvme0n1/stat
+
+Thanks,
+Daniel
