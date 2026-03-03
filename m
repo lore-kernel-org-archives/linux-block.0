@@ -1,41 +1,53 @@
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from TYDPR03CU002.outbound.protection.outlook.com (mail-japaneastazon11023095.outbound.protection.outlook.com [52.101.127.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC9934E765;
-	Tue,  3 Mar 2026 02:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772503907; cv=none; b=l6Kll1WPEhPzxXSaKnBn8AROpkoxShxYEmTIIWi9bOtBSg8ZCDrjsxqO74NpLE6DhwmfuXMjwFuoZCSNRn6CpJ2QxSkfNyvanPdjZ8NGnH8E7YHVx5H+ePVRT8OKoIiRv/B4oq76pDjIDmJew6mxQohpmHFOgXr29ta2fXMe9fI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772503907; c=relaxed/simple;
-	bh=a+TC0gm3uLYWashzAwaanGyqxXsF7bXFJUVrp559WuA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CvO2l3u9dBUpc1o89FJxvxX+2anxbV9pAEB4tUoCWACdsIqLrWHqAm0gL/Wpn69JPUlCEpCUi5ebjfKTnNlbbN0b/yB/zUUeKVKajvMq1zdAWx6Cy6kUKx6RFDXfYkbiBXDdNj504/bei7FV1t4t3EhPC6SqmXSpIDxbR4Y9wzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RJQbBhOo; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1E129BD82;
+	Tue,  3 Mar 2026 02:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.127.95
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772504306; cv=fail; b=f8g/l8Qq38oGMdoQaqJba/TbAWmtS747VKns8d30W2GX2FrzIzkza1IyiL4zPGDzs5zgNkXYzyARgMf8p1CHsfthHXxJ0NGP06bzKccOG2K1jbXNo97AWOLw+lhfjbgAMgtApe6l2hp1D5GmD/rzOAhmyiv4CfuoXLjNcvLG+S8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772504306; c=relaxed/simple;
+	bh=dbQxl1pJE9jBlibFQtLk7kYK0In/gT1UQadY/1J1rxE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=AdqDAhe9+r1wuyB3zFSjUx+EVZ/bARBZztuth1yjP1qelJ+2tfyAIJaYF+mgzWj6MxiXpUeP9dwy7M342quGxBkrWNd/wgp5u6yI9A8PJVt64pgQoJvUDYg+hQpEh9spQSZqkMR2WGxihf1lhiQ8DMuhXJLgfjapBZh/0uS0yTY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=uykjIYuy; arc=fail smtp.client-ip=52.101.127.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RJQbBhOo"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772503901; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=nFbFx2/BFofkXvHdvXlriaDv4ASYA0leI76fEaVkqac=;
-	b=RJQbBhOo8zP+T+B2GP67r4sFAAJLGsvYitCPCY3uWAqX3dOOPLBDPuwe6RRRAsNN/InDQMOXrqWG6/1XT+wDZYPvhE4VuSr5LfNwgMGggVNqY/I3sG4N6ShzNym8/ql38S+VRYH+ww1H2r6k/0UTTPpwPZ/uxFVh/s76Xb7qi+4=
-Received: from 30.221.132.55(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0X-86zLx_1772503900 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 03 Mar 2026 10:11:40 +0800
-Message-ID: <6e5aa87c-f3bb-4ae9-8700-27f7f1a9d7b2@linux.alibaba.com>
-Date: Tue, 3 Mar 2026 10:11:38 +0800
-Precedence: bulk
-X-Mailing-List: linux-block@vger.kernel.org
-List-Id: <linux-block.vger.kernel.org>
-List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="uykjIYuy"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sdT0vv8sfnTz6Q7CluceJeuAxY3+WkVy4/TBYZiaL/QQO0VsWk+bd7XtrkcfUUbZtJkQJRM+nyvsjUzRCwlRMUtBtp12RiANYmkkyaX/3KJe1vAsftjRPKhV3Zv63KfTJ+lRfKdq8I24qifD/9fc9CiSSktoq44Sr9nzNbhTNRQQSD32IEJNdxKNrVFBXyrzA72xYAylEqbKtfT3sCoErx6jRNxk5U07A4+i9RhsQ9j4HgzDePsSW3Vgep7f6SDL0TB+zMto8lZRskoABIOHvlDL7lEXVbztwtj5k9sDhScCCmY9D7YIeyCTJNWhtcmwVSjAoUy+M2yN7z5btyIGhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fltaoTfzJeTLgcSQtCyiHmEaAzzTGWTdXC7k2X5h6KA=;
+ b=YxacpZdOlexluAPdmL9cel2vjH8sH8jRMs/AvPVAdswhptKPfH2khcOSow4lty7i2MKUAv25kvEuh0D3b+ZFvyiJGNjYOXueXoVe/LZm6dxggt768l3ENbd2UPPJ6HfMvIWxKHuwjJAEMghQHTItu8Bn7EjsSjx0hR2NxqAoLaGsqvQ6doTRsQ+n6US9LouZGAPp26944EwVjum/yygZxHKhl4GRGHDdqM37gJtwGjkasvwbXGzROeGX66qQ30f2Kv7pE34xiZa3PpAySSc+yitdwNGMWn2D3n/uy+cPD1o+W1r83452+CsfKMqk+uO/7RDJ6qaGdZL+zxYm5LwtJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
+ dkim=pass header.d=amlogic.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fltaoTfzJeTLgcSQtCyiHmEaAzzTGWTdXC7k2X5h6KA=;
+ b=uykjIYuymMmsatUoA8h9rwqB8XJN88DwcWupn9q4GnsVGEGN+ZnxNIPyWZUUH/A+vYkRzkFWAvNA1BZpIbrctnmaMcdf5Aw/DelDcaC49vOPJc0fSPLK3F6ruaVHfmHYBwDtmPQ9I7SUK5CW4zErVFOm6Y+KdtSM7rVtT+6tfgZj+qc2QvWYvZftbk6Z3xCDpRdoiQ1KafeOKqi37xn/qAt0qNFd5WTBzxhoDWNZzEpL7rbn6FxfpkA2kQx1s228lZd5O7Y546E/Gb3H4C9zOD1bCMRpyzVozT3nHWVu7Hn2ouKSA2EoQWE9WkIkrPsKj3qmDoBMu/dEBcWkm3llzw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amlogic.com;
+Received: from TYUPR03MB7232.apcprd03.prod.outlook.com (2603:1096:400:354::5)
+ by PUZPR03MB7157.apcprd03.prod.outlook.com (2603:1096:301:115::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Tue, 3 Mar
+ 2026 02:18:21 +0000
+Received: from TYUPR03MB7232.apcprd03.prod.outlook.com
+ ([fe80::525d:fa76:296a:a64f]) by TYUPR03MB7232.apcprd03.prod.outlook.com
+ ([fe80::525d:fa76:296a:a64f%6]) with mapi id 15.20.9654.022; Tue, 3 Mar 2026
+ 02:18:21 +0000
+Message-ID: <8dfb1ce8-037a-4e8c-a27b-9c493e461301@amlogic.com>
+Date: Tue, 3 Mar 2026 10:17:25 +0800
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] block: avoild hang when bio_list is non-NULL in
  submit_bio_wait()
-To: Jiucheng Xu <jiucheng.xu@amlogic.com>
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, jianxin.pan@amlogic.com,
  tuan.zhang@amlogic.com, Gao Xiang <xiang@kernel.org>,
@@ -44,40 +56,118 @@ References: <20260302-for-next-v1-1-eb9339e8dc99@amlogic.com>
  <aaWVwH_Xna22DTAq@infradead.org>
  <dddf1754-d575-4f4b-a11c-09847d0d0475@linux.alibaba.com>
  <b2ad3f3f-105e-4171-b735-84051906cfb5@amlogic.com>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <b2ad3f3f-105e-4171-b735-84051906cfb5@amlogic.com>
+ <6e5aa87c-f3bb-4ae9-8700-27f7f1a9d7b2@linux.alibaba.com>
+Content-Language: en-US
+From: Jiucheng Xu <jiucheng.xu@amlogic.com>
+In-Reply-To: <6e5aa87c-f3bb-4ae9-8700-27f7f1a9d7b2@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2P153CA0002.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::16) To TYUPR03MB7232.apcprd03.prod.outlook.com
+ (2603:1096:400:354::5)
+Precedence: bulk
+X-Mailing-List: linux-block@vger.kernel.org
+List-Id: <linux-block.vger.kernel.org>
+List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYUPR03MB7232:EE_|PUZPR03MB7157:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7ab79f66-2eb6-4f6f-6853-08de78cb2404
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	+wW+UMZDiRoTHuFN9nkcDrlc2oXlaXBu6kGtkr8PSUQsa6zYp2FdT631jI1532e7zGn8f8rumCNj1Gd82Qs6xtAu9mryxyHI3E8xzN11B+nQAocca2PuABwr6vrEPJCHWTDfGPLlW9mVE7iFxsdqnuHBlpv0ROLLaVz8Scb8kKgy7+Egr6/hcNcmqQxdiQsXgN476EZ5TH6axCTJ00iQAqGTI9gqTSBLN2fHkOLl4nhW1/1OOuYKv64xDraVVxIixeaHz/MeBzfTUbwk9v7C/4fLiUsEiWg9IHpsre0lj+fAa6qG5gWKRjBgtGgFS0gDxwREPKMNwrqepYDLXHzXLju7Wu+cJPQfbn3V1NOnS20HYFLxxk2Pb+xQfsC8/SxS+Uoeng2Os6LRjLY3qHVV3Ys7Wu+q3twmSXh09cNe7+q5fsQZm0rKPI+q6lQB3PFG4x6uNqFVwxbiAwDPK9TEeNsZDn79dHvD1YEL31dLDZCtRUJYQhy0EPhavpXlN+NnDORyuegSEw+wqZ7RrAhJA/5vXp2Mw+bQODNp8HeqPq+gLmpeGHB5H/yeDRSTAa86YWAGHlIuB9q+AIlgZzKx/EsGsGinxgYmnDWIUMK96Em080/iTvAG3jVP/1hmDHAZh2p4s5DqgijDmF0G1UVST3kcW5EDvPiILp9eWPzG4AxCKeJN+kBPwg0iEilRch/5jVe0iYBII2SQIFAnlSM7a5VzCltykLTZG0jpJciViPY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYUPR03MB7232.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q1V1VitvZjByeWFaNjBiY1NuS1BYbW8vYUV1Q2I0ZlZoZWVRQnBXU2hUZnQ2?=
+ =?utf-8?B?VHRXQUR4VDZnY3YxS21aYWVvSVd4UVFOczJLNXdFTlBNZzRhWGFaays5ekRS?=
+ =?utf-8?B?aDZNdkVlMVNkRFV0WmZDODJIODRMN21IWExvWDRhNlc4ejZVVWZ6S0ZvaDRS?=
+ =?utf-8?B?bTlVRitkWUlPcXNESk00QlFrVUIrbjB0azlpa1ppRlNBNXlDWi9kd3V5aG5B?=
+ =?utf-8?B?a2MydmREbnM5REM3c0ZSbWg1Sit6ZmlXWmJXVnRMb0VhS0VvVDBCMWFoS0ha?=
+ =?utf-8?B?TFRjbG55VlpVMENPbVN2c2dYVzd2U0s0TVJyUnR2WUVJK1plYkVGclVuMjJQ?=
+ =?utf-8?B?b3hkSWhMUytLQUZmYzZvSnFpVFpjVkR5Y2JhNDNLbXBmTTlnSUx0ZnhDQmxK?=
+ =?utf-8?B?NEY2aUxSYkxKejNmcm8zcUxwWGk3UmRienBjam9McUxYMkxTb0xQV3ZZVTJ5?=
+ =?utf-8?B?M0g5ZFRvVlF2T3pwTVZXM2p0bXNKb2trYjhkS3UvSmI3c3VPY0JXamN0aFBk?=
+ =?utf-8?B?KzUzWm9jUTE2Q0xRSzl1YTNKL29neHNxbU5zZndDeVBSaGZ6Ris5aGxXbUoy?=
+ =?utf-8?B?ejVlbktQSXIyM3JNTmhlZFJ2SlZWL1I4U0UzY3lHVTF6dkE1YS81cDRIRTg5?=
+ =?utf-8?B?ZHRZalpNRWExckJMYzUyQmNmWllkc1FNalRiTm1qa0JkK3ZxY1kzMGU3MkVD?=
+ =?utf-8?B?dndXTFBRTnBodks0ZnJuLzBSY2RRNXVHbjJoWThzbk54bkpzdWFCWlc4Z3NH?=
+ =?utf-8?B?MWc3QTc4c2MwaU1zaTdhYlN5aTlwMnRSMUxrYkI2QlVKdHdsUUlIU0JHeklp?=
+ =?utf-8?B?NGJZb0djRE1teWp6UE93NHNlQ2xuVWRVaUMvUzNDVHlMNFlGdEFMdHkzeEtW?=
+ =?utf-8?B?OERIdjlMbGdzblBwc05tVEtNMnM2aU5nV0t6V3BFQ3lLUm1pdFg4YS9NR2oy?=
+ =?utf-8?B?bEdzNnFsdCt0cmN1UHFjYzlBc2ttTUEwNGE1SkZ0MHRLQUVnMU81K3B1Rkxp?=
+ =?utf-8?B?bm0rUktZNm0rNEFCakZURktUTlliSFFJdnVJdHJNc2E4eVVrdnBtV2czeXBt?=
+ =?utf-8?B?U0NBZ2l3RFVOZzBhRlNZSFVvS3RvTytiMkdvSFZFZGJ2RTVadEVwTHFKSmFz?=
+ =?utf-8?B?WStscGZLbHJqL0p2YUxvNDhWbDJrRzVLM0tIVmhIS1BibjlFV0hmMEsrY3Zo?=
+ =?utf-8?B?bFZvSFgrOEVIR3lkWkx0bHZyOEpjRjlaUyttelBWdlM2OHQ5eFBWSHFOQzNx?=
+ =?utf-8?B?ci84UUxZcEJmbUpNY2xrZHdsdll6bUJIQUJ6K2M4N2JnbmtXbUZrVDhIMGpu?=
+ =?utf-8?B?QzdON3V6VkVaTnVscmtVbkNzYXI1bUZYbmxCcnI3ZnFLU1ZxL2lWajdNbXBj?=
+ =?utf-8?B?UFpYeVFmdlQ1UmV3cWpXQUpYbm5yZWhsdVNUbTNqU1FYT0tUWHlkMzdtalFT?=
+ =?utf-8?B?aUtra3NFS3UrZEF4R3ZvMXN0UnRUellnM2dqNnEwazUrekFldE82V3VEdVp5?=
+ =?utf-8?B?cWxvK2pDMXJ6ZVp5UDFCbEdaMVREQTNFUlFoc21TblFCdWk5d3BmRSt4eC9x?=
+ =?utf-8?B?enloWVBhVDhNbC9melArUjFDZTFpV3ppU2lra2NkdmE0U2YyTHZqZnJCMWky?=
+ =?utf-8?B?eUhvdHVTQVk5dUhrckRmM1Z3aUsyaU5hVFpoTEpWK3FYVVRpRzcyYUdrRk01?=
+ =?utf-8?B?VVordkhEa3h5RGFzVzZ4b1VKMldHWk5qbFNjcjRBYWMyaG9XOHpsNXNBOXMz?=
+ =?utf-8?B?dzFxMlN4UFBDZzlON3REV1VGc1kvRXZ6amI0bXVnV3UwMEgyRGU3NzQzWWJI?=
+ =?utf-8?B?U2NtNzgra0ZHSkk5MGJXTTRjcVhNRTdUb3h3QnZ0Ky84YmZmRU83Z2FsbzNN?=
+ =?utf-8?B?TmFCZTFMek9ya3lUQnAvVTFpRVRrUkdMSEl4WXE4ZWszNFpWRnZydGlUQVV2?=
+ =?utf-8?B?VDF4SnREZHljRVJDOVNDaC9BNElSRU92c3R1YTJWcXN6dFU3QTR4Z3h1UFp3?=
+ =?utf-8?B?V3prdCtWekJKUThTOEhyNHFScHhjUkxoT3hYYkNYenNDYVpTS2o4VldGTUdN?=
+ =?utf-8?B?U3lPWUNPU3JnZmZ0SEZFSE9WNGFXR1ZteC81NUlaeFBLUXhuRUNxUTk0Tjc0?=
+ =?utf-8?B?MFgvRmlMaDNOSHZDb2owVHNQaGRZNlNycnAxdDl5dEVVZVZnQWRSZjMwQjhX?=
+ =?utf-8?B?VFNHUUp3QnZxY1FZZGNmMzU5Z21YZFo3RldsTWczU0VQcmZWeXE5blNSL1hE?=
+ =?utf-8?B?L2lTVHdxSUpFSTJ5UWtEVkJMdXN2alZnMTJISTR5Zm1wKzRJbkJUQlI3SzBK?=
+ =?utf-8?B?Zlh4eXhPNlZURTh1cFI2RVErblJ5Smd2YkovUXd3SlJUSDZnZHQvQT09?=
+X-OriginatorOrg: amlogic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ab79f66-2eb6-4f6f-6853-08de78cb2404
+X-MS-Exchange-CrossTenant-AuthSource: TYUPR03MB7232.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 02:18:21.3387
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GmtDpqaT3w2JeV4qP6s8tIdcgJAoCTOj/Wn4Jhkh3EApY2oCK8C6cdLIGhNby+MfToby3pLE4xwPyxn8t+2kUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR03MB7157
 
 
 
-On 2026/3/3 10:03, Jiucheng Xu wrote:
+On 3/3/2026 10:11 AM, Gao Xiang wrote:
+> [Some people who received this message don't often get email from 
+> hsiangkao@linux.alibaba.com. Learn why this is important at https:// 
+> aka.ms/LearnAboutSenderIdentification ]
 > 
+> [ EXTERNAL EMAIL ]
 > 
-
-...
-
+> On 2026/3/3 10:03, Jiucheng Xu wrote:
 >>
->>> that need to use GFP_NOIO.
 >>
->> Yes, it should make vm_map_ram() in the end_io path use
->> GFP_NOIO instead.
+> 
+> ...
+> 
+>>>
+>>>> that need to use GFP_NOIO.
+>>>
+>>> Yes, it should make vm_map_ram() in the end_io path use
+>>> GFP_NOIO instead.
+>>>
+>>> Jiucheng, could you add memalloc_noio_{save,restore}() to
+>>> wrap up this path?
 >>
->> Jiucheng, could you add memalloc_noio_{save,restore}() to
->> wrap up this path?
+>> Thanks for Christoph's and Xiang's comments, I will try it. Thanks!
 > 
-> Thanks for Christoph's and Xiang's comments, I will try it. Thanks!
-
-Just one more note: just wrap up z_erofs_decompressqueue_work() in
-z_erofs_decompress_kickoff() with memalloc_noio_{save,restore}() is
-enough.
-
-  ...
-  memalloc_noio_save()
-  z_erofs_decompressqueue_work()
-  memalloc_noio_restore()
-
+> Just one more note: just wrap up z_erofs_decompressqueue_work() in
+> z_erofs_decompress_kickoff() with memalloc_noio_{save,restore}() is
+> enough.
 > 
-> Best Regards,
-> Jiucheng
+>   ...
+>   memalloc_noio_save()
+>   z_erofs_decompressqueue_work()
+>   memalloc_noio_restore()
+Got it, thanks for the details!
+
 
