@@ -1,182 +1,129 @@
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010026.outbound.protection.outlook.com [40.93.198.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F69370D7C;
-	Tue,  3 Mar 2026 16:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.26
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772556274; cv=fail; b=bnnB3eJgfI4uQs8hJcUQy9sO0f2gTVKKnnd5/QaSO3l0/unxA1CxBj86J00jHMxy+ADh5nT42G3bN+GUWGjfqDeCB5JQGhh1wTi59dQWE541o/l9Pp23EFW7tFZDENqOWdU0E7u/zcVyBleEpG3af1BARYwMUdTcrN70ZiGbVSY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772556274; c=relaxed/simple;
-	bh=bSh8F0eUsxsfWf84T945laSFxnWdUmqynB+YmxN/JBs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oNlLwQzCT6esHg7pQHYqKRsqtWuWh9TZuDUwYUMQP1HpZnBCTfEOkrXQ9YwsgTR8fV+vRBPqUy7c4w9fG+HlgHMN4KU1xjtR8a6MXwryjhv3kNefohdjwgvaO+jPO0Ua2K7GYJYAVWOSspSSnYLMKo5VFuUvAuQNbqIKI74wLLg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tqrGBlHK; arc=fail smtp.client-ip=40.93.198.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A837934F46E
+	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 16:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772557154; cv=none; b=Hg7VbBoWo3lRLxswWhZzc7WPQFN6bKCyepR2snKMoUOq667XR7yOadVXlBV/kHfxvAhbMi7535BCuWkCHc846oGcU7HQmXeqqEgfikRxt9auSXsWvtOtKmV8b7E8JENi8GT8MWO6r8t0mRqki8HtpjQ9jPEPoWuMh74BCCnLbu0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772557154; c=relaxed/simple;
+	bh=Vv8oBh6u29fah7cqUz/BRbt9XhR+uNSS5yLEIDzcwhU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ohf+e7CV7M4ZRMDsqyXm4eAWZmUF5xL/mDx2UaGjDA2wi266MtE+fvrw/dckjXaCJ/cx0nMjIjWy/okP227qBf86uGgIaWul0B8lE0h+zKBDg8rW3qf7gYm3rQPbpE2LXXathYm54xSRS0v7Ezk9upMZk03V8x6nxV4iKEm7CLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b=Y0rgovww; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmpxchg.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tqrGBlHK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OhAH7zlYxc8r6vasL7p1ZRPMHZ5M2d58cORoFOeq/nqhQ4mOP/pJqTnZnY9EIeG+VXVdzN0IFRHvlW9jXT4wcXFAdNxHeSZ5IBT7FOysNiIbGiPaUSCFyFYPIPsY8uBjvjmbBfldS+WIneDdKWukruMLPapLGxoaOVusHFYsDlFittGqmdall/VCUjTSUf51d0gv83bsD2il0wSQt5YSnzoP2/FekHWVAngJgZD/sfL8iZcH3/7U62Jjfk1navHayneeLDAQaeydsuDj+lyZ6F+DJOeqGYmg0BC9SRC1y3GovF+jZk0O1i7BpKgx6ZUixzjbG+Z6KmPQEnoqSgxJ2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1gZC4fbeP4Lg6hUeemeQZ2jGIex2AvBcS/KvUKJKfRg=;
- b=ozs/Gm9TTWQ3Fe6TNiXhCmYShH9PInfeAoBKwnfOaAn2ehfDWWiVAK2HT+AQzLsuaqkc1T7EkyVeIw8XcwF5xdCtJwOTIqwSTKxFkgF7sKqoI6PfOmocxsgRDAXhP5g9hB3vpkAB8ahwyYwZ1s7bF/ZG7dy0YK1P4Rf+jKSf9DKc7ZKl52g3P4sa5vwLnL86LDqzCc2nix2iCR9/A1ehVoPY7BHsObZaMdV2owm8x9B20kRyhmL8iXNOVCFQR1maGI3pRv+MA6rMp9M8vCqDRFRyOqnmPMhG8y8nGT9FTfd70sBbhxqpEj8R1P3htE9qns8ENXORnLHuUjCObAxgyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1gZC4fbeP4Lg6hUeemeQZ2jGIex2AvBcS/KvUKJKfRg=;
- b=tqrGBlHKbsD3uweg0k5Erj/6+vdv2WcEPIGi7AiYjh1me4EoqBkCcANOy5wZ9/X9BOl4tnw2QqYR9sWRyowTNDQ5rRRpOG9dPJlTyax4cx0Rfv8RGKSmbS1dD5dL8R/rFEjeQcDJJ6wcXplbPAYThdqfRyQxULvDZDx8LZyOKrLrKRar0MTJITWOVsYBa6TLxmyYYq78MxIZWGCi1BDcC9zakTdv5uZtVFo9BoS3RRRT7NwRwFBgZ5mbXD+ZLpQsAIKohivz6mMUpovP4lgln6fPx0ixHdJ3XtiTvMGOCggTjRdrB8Lf59r3wxbv1PfTLZqKFjf4ppUVwAOS0dEMdQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- BY5PR12MB4115.namprd12.prod.outlook.com (2603:10b6:a03:20f::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Tue, 3 Mar
- 2026 16:44:29 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::f01d:73d2:2dda:c7b2]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::f01d:73d2:2dda:c7b2%4]) with mapi id 15.20.9654.020; Tue, 3 Mar 2026
- 16:44:28 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Pankaj Raghav <p.raghav@samsung.com>
-Cc: Matthew Wilcox <willy@infradead.org>,
- Suren Baghdasaryan <surenb@google.com>, Mike Rapoport <rppt@kernel.org>,
- David Hildenbrand <david@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
- Michal Hocko <mhocko@suse.com>, Lance Yang <lance.yang@linux.dev>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Dev Jain <dev.jain@arm.com>,
- Barry Song <baohua@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Nico Pache <npache@redhat.com>, Vlastimil Babka <vbabka@suse.cz>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- mcgrof@kernel.org, gost.dev@samsung.com, kernel@pankajraghav.com,
- tytso@mit.edu
-Subject: Re: [RFC v2 0/3] Decoupling large folios dependency on THP
-Date: Tue, 03 Mar 2026 11:44:21 -0500
-X-Mailer: MailMate (2.0r6290)
-Message-ID: <18EA5A93-5D49-483C-A90D-D023F9116F37@nvidia.com>
-In-Reply-To: <6e86c417-c410-4deb-9b47-08e3d5d9be71@samsung.com>
-References: <20251206030858.1418814-1-p.raghav@samsung.com>
- <CGME20260227053155eucas1p2b4b92cca44cefd084ae528fea27419d3@eucas1p2.samsung.com>
- <aaEsOu0hgCUznzl3@casper.infradead.org>
- <6e86c417-c410-4deb-9b47-08e3d5d9be71@samsung.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: SJ0PR13CA0047.namprd13.prod.outlook.com
- (2603:10b6:a03:2c2::22) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+	dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b="Y0rgovww"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8cb49f63238so321291085a.0
+        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2026 08:59:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg.org; s=google; t=1772557151; x=1773161951; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6FEv90vReHYT0L9srNroqmwLlfOuALvxi8SW9QHvPXM=;
+        b=Y0rgovwwKIbT6GfHwNbuTWGqZYkSHyDjsJIit1KFsls01XWCgbxyor7/MKd/FVUKK0
+         EnrGrkYkCLvD8Crcb92LhQq3s7A8N/wc6Pm/LvrkoX+2ZRmSHuAtNsLEAzeatqHp3+44
+         3lOJRak1eRZ4AS/NOgYBNawTxpNI4dRAmsJDPKATbA2d1dgRScXBjexkocX0wtS6GK1/
+         PKukcuX/N3Il29DODhhbZ4N+1dq+SKTdsopK97Ke9aCgln73eWwjz6qROw7p9luZqENM
+         dq+da8FYuc0Sk3ph7a98IHtt+h02OK1simO7TRVi/vwi0glxNepDM1lfD7J+UeVagM6k
+         5rNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772557151; x=1773161951;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6FEv90vReHYT0L9srNroqmwLlfOuALvxi8SW9QHvPXM=;
+        b=YLnPGYyWJe0OzrHgs5GoWwFngUh0gLNFKUZ8ODCTpMVP4PK1nxGN39XbAsZlRC2c8R
+         R8ClOdl15eP5tyocxdgV9YaMDP9iYS1ljxWNu2dsARGEFbaR0O1eRrDTxxUyjeL5IZGc
+         vH66pi8T89oLMnSM4mSdCMeiRO5nbFk1cOiiPa0g+wElNHttwsco/cmSyeTXkk0uTNLb
+         /sVYuymU3Whiab0ys0uNM62eiim2UyGAWA1bl78CzTFlijhm7P1sdtrUdTPqSXKb0ihe
+         7l1syUr9mvnfq7nuDdfQhm2uVft1if9FvZYDpir3ESMzqQzhCr057fWOqKTkcoouJDuu
+         3/bA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSUPeFv/px0fpDYKFTWOYzal2PlKxmGKOLD7nVtQHdKbM92StZiTeuRp+qOOglgFmVJR4Vn83lbwKtlg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YypGb6UQgmYRANrx/QonsHTm2mPiUsWklON/3LMRzYW9oZwRKHJ
+	/eOJACrxSNGp1Jxe2zbCAKbWBhL5YyyD/1IdVshDX8Nxwbj0u0iGlvNjYGcxmmG2aiM=
+X-Gm-Gg: ATEYQzzXSwyoEfcKGAsqp4MZ+cxUWPseWeaZojQpAeDgZANW5qXw9J/t6ocSeE5Q19F
+	a2wHlRSRlGJZ5EYDi7p5fZ3RwVzRHqkmEClg+zcn1TK0a3eh8hb/CgHBNedt5g44kMBupRlDdKQ
+	XRlnNa9IsBtds4Tqs72OLbeuSMxvJTmPs2yVe2vO6tZ1Ue8XVd+vXQMkYE2zLy/5wcfITVsJxhT
+	SXuYVD1itWuyUDHgz36D1tp9Pz+iqbXoYfDwYW0gPK2Js1b/oGuaNxaJkrMq2IFSNPlQf/Xr7ta
+	M19V5dateRNTXk5J0yxsifGjPmhqchuYXHKX3PTv+AFoK5FCPM9peqY6yrpTN77C+XEJWZR+D7Z
+	e/hb3jW7g8yHoWHCoGSn4szTaSoTj7Bi+GRwSmijA26pPQiG9B10sfeODqFPhD1CCbnbhomUp/+
+	dAVh4/88B18e22b96MpF1kmEVdZ03uLnnx
+X-Received: by 2002:a05:620a:3707:b0:8b2:6606:edaf with SMTP id af79cd13be357-8cbc8f16224mr2082525085a.37.1772557151379;
+        Tue, 03 Mar 2026 08:59:11 -0800 (PST)
+Received: from localhost ([2603:7000:c00:3a00:365a:60ff:fe62:ff29])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cbbf7161fcsm1414410985a.33.2026.03.03.08.59.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 08:59:10 -0800 (PST)
+Date: Tue, 3 Mar 2026 11:59:07 -0500
+From: Johannes Weiner <hannes@cmpxchg.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Matt Fleming <matt@readmodwrite.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>,
+	Kemeng Shi <shikemeng@huaweicloud.com>,
+	Nhat Pham <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>,
+	Barry Song <baohua@kernel.org>, Vlastimil Babka <vbabka@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Brendan Jackman <jackmanb@google.com>, Zi Yan <ziy@nvidia.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel-team@cloudflare.com,
+	Matt Fleming <mfleming@cloudflare.com>
+Subject: Re: [RFC PATCH 1/1] mm: Reduce direct reclaim stalls with RAM-backed
+ swap
+Message-ID: <aacTW_FEp6c1coDf@cmpxchg.org>
+References: <20260303115358.1323188-1-matt@readmodwrite.com>
+ <20260303115358.1323188-2-matt@readmodwrite.com>
+ <aabrv_xrsKPx9jZf@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|BY5PR12MB4115:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8e3187d1-0dd7-47da-531f-08de79442321
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	SLdvqmUw6TfAkS5K8VLIEcJ28h/oJrty0TloxELmaIGoDvw8HJ5QTmHHLP4yKdxTddSYy0nIMFXAIU1bTkxfeN+qk+HBzR0+QwYEadsF7yh9JCiWEvQ9VO1AjcMPfGts0LHu/rRsVb+W4RAaQ/2nBOPsnC8tbGzUfPbU0lFW+fJEh0V8251UNJ4B/WB6b/Mze/G9DHeS/budY9EVl0QmiBf6thbHZxQ2YLwn2x8WDDtkN7CSQt7jhrwD9wB7Ng1ObvKcaCN1dcUXC71LrjuVFu82iTpTfF3vzVGo2GEpjlIzjvNeQNJ5oppB2XeERD2Vp05K5VMhfwPY05aNyrSIvMP4BnejLs+l1+AN+BusKAxtKM0JU8/OJfdxu2LWxGwhhs3MPsQJFExPqziCBxNOfudxOIo9QMmoJeVMKfG0K9hnPIT6VawClzkKErUxg87cqQxUPD4xN/nEK4j/asVQEV7PL2HeJhqBkjfW8A36AQ5VAgETxsWKI5fY1Y/9tLgkVUggePvsKubo4aD1LJiIKigI2i/B6JTJVGKEZT1gK5mi4mBkxMJiaalSO65RhqQZMWPyYaXgESmHkhIS5/WGy74pD84jX+1a0O+v0LvvwJnMqW6gFmEKSD8TfLqW8gUwEzcjreokRYzOcaQSclQpeRJYjF2Pg0S97m1nNCdEahmNhwUps7a/dBbMaMdTecJYeM9pIUPXdY/9kU3G/cNSiTwO3sEhac+md3GIz4bFz+0=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ygypR9wu7qRVGA2k9LDxqCmdiXd+KYW9M/hvW/j+jQL6DkzSbvpEWOB7bfBn?=
- =?us-ascii?Q?dn5fpXI+gSpO+q1kTt4GG7fybSRjwR+NUqcSGWu7e1jqMvdFeJA/eWqV6zBK?=
- =?us-ascii?Q?8bPHQfLVv/u1A6WjjAUMwL4dOuSwxdOQj+l+CzLeRP19nfh2ihRLgytnD9UQ?=
- =?us-ascii?Q?jW+BS2+WKImQsrhLe1zx/EyOTBGOvwcjvP7g8GPNvcBKqLPZ7Y6JtF7citko?=
- =?us-ascii?Q?XF1+m784hQZws9HKp8iHmFtwugci+03QVMO6qLvSVMjFoTVOnPKjHQ7+k+v4?=
- =?us-ascii?Q?wscbksOB//Hzt0T+Sj5iewAegH9Z8EV/c2DjYgtPWCEWE1rZJfug801Xh+F7?=
- =?us-ascii?Q?l7H8eWTEeLAFiiEMk/y+9Jb2gBizsRO5KcrpMOAnf67t0fgR62QSyL8282wT?=
- =?us-ascii?Q?EpzUkwmBnSIRMp0z5p7X9VqNouUSj1JANSJFO02p+8laE/9gcg4TH5si7aHR?=
- =?us-ascii?Q?MweRQd5shHNjiLIYvzGxC3+iGo5THn2EiruQQHXjGK8SmtvfcDoHjCDPQOb9?=
- =?us-ascii?Q?xZyNqUF8zuKauOv4lH+/LxawkeyUsOI36UDrD9XY+TPyyd8nG60+pU6bQC1R?=
- =?us-ascii?Q?t2fkOJjv5LbjWCVdK8TjdM06tNAv3h/1UbFVODc3/Kp3doqF6FJcize/WWaK?=
- =?us-ascii?Q?gS3XWxenPWxxmuuRo2fqFommDn+BEnOdJ6CWWaeSCfCBKnRusBbGpEDo2Vln?=
- =?us-ascii?Q?DaRfs2Xye8pW1q+yb9mDvbr2h4hWsXZO0DIsdyGWXrIzUixxIa0i6ZtyzMN0?=
- =?us-ascii?Q?476Gtsdnx+20WUk1FoW08eToTlRQn6swfVQ+1YhXPEmkEG2lufh1cH7X7UGb?=
- =?us-ascii?Q?hR9Tl+7ut4+OeCScnHm+8c8MIU7if0pm5Wd1Fhl696MyO47/qYxvJVYgGWio?=
- =?us-ascii?Q?vh2862VVDWmrQAL9IF979/7wssNterf2m1eLgL3taV0hhvOpTa7GLoR3Sfrv?=
- =?us-ascii?Q?oMy4XUnbtMec7AEZOCRcgCNN4Ub4Y05idWU8KJbvdXBBLmEudcWbZ7AaNMQQ?=
- =?us-ascii?Q?rpG+BzJ4KSxL48yv3j9aPDqu81n4bsKeUJaGlz+qoGQJxzvqr8gHToaCdioZ?=
- =?us-ascii?Q?TpbYzr08Vkl9aGdZiPGRRNss114xEvN+bV/bZl0e2325NISxBmx3iBe+tPyC?=
- =?us-ascii?Q?cXDfOFanHAIHiCDI1Zz+8ign/b35+w9JbQycLfGiKHaQXLspRb4vQ6loh/1Y?=
- =?us-ascii?Q?H/sh1bVFlRrdTRwU/re6/Q+EYUVU/NDyWhpe4TZbzqsALXMfNhAfpjFpP5S0?=
- =?us-ascii?Q?bEWtehFIjso8rr9xttWe5MtL2lgdRZoSClWA1eGhUuflxHm6z7hMCgXxc+Rb?=
- =?us-ascii?Q?8kT54bp8iT+7bsGmUjB8rWZJfyufQgAUs7I9wcwpzRP6edJjqXTqKD2idhok?=
- =?us-ascii?Q?p6703L6DO9LVqM14B9T5oP7myo+Z9Klr6+D24VI9dqIzO8v3Jh7fD87/WnA3?=
- =?us-ascii?Q?qVDq61Re84anku+pONjCFDFswQoeD3uwyfHLovzXZg/bkLZq+PbLkaq9lZnu?=
- =?us-ascii?Q?ZxIdI1nXjKDJwWufgN3QQoosncO+vUWQb7tRQylmroWyYRzRRu4cw2hk1Q0a?=
- =?us-ascii?Q?YAIUpnA8QDYIZgTXkx/Z2FwYUJOndWle6X3PwCizq8rrxh1vzAUFzzrGEqKr?=
- =?us-ascii?Q?0hsjjAk+YPjxq6IYarxH4zx9Po5iDOWOi/TiHOSz5Tb96kjXmO6ZMdFMez+O?=
- =?us-ascii?Q?vBX6eANuCuPloOVXHo0n4uHc2dBWb7Vm8PLyxY+YlnvPTVQO9dHbdsSix1Ch?=
- =?us-ascii?Q?Y/CZnirXZw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e3187d1-0dd7-47da-531f-08de79442321
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 16:44:28.8426
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rpTCfZzAgnR+bDynLUXiSsCwtUs0DdhLRHb+mwOWrv6xmq8JwnDDnr3l6HG8ZI7E
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4115
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aabrv_xrsKPx9jZf@infradead.org>
 
-On 3 Mar 2026, at 9:17, Pankaj Raghav wrote:
+On Tue, Mar 03, 2026 at 06:10:07AM -0800, Christoph Hellwig wrote:
+> No way.  Stop adding hacks to the block layer just because you're
+> abusing a block driver for compressed swap.  Please everyone direct
+> their enegery to pluggable zwap backends and backing store less zswap
+> now instead of making the zram mess even worse.
 
-> On 2/27/2026 6:31 AM, Matthew Wilcox wrote:
->> On Sat, Dec 06, 2025 at 04:08:55AM +0100, Pankaj Raghav wrote:
->>> There are multiple solutions to solve this problem and this is one of=
++1
 
->>> them with minimal changes. I plan on discussing possible other soluti=
-ons
->>> at the talk.
->>
->> Here's an argument.  The one remaining caller of add_to_page_cache_lru=
-()
->> is ramfs_nommu_expand_for_mapping().  Attached is a patch which
->> eliminates it ... but it doesn't compile because folio_split() is
->> undefined on nommu.
->>
->> So either we need to reimplement all the good stuff that folio_split()=
+The virtual block device idea seems simple and attractive at first
+because, hey it looks just like any other swap device, and the block
+surface is so much smaller than the MM surface.
 
->> does for us, or we need to make folio_split() available on nommu.
->>
->
-> I had a question, one conclusion I came to was: folio splitting depends=
- on THP, so we either need to implement the split logic without THP depen=
-dency or just make sure we don't split a large folio at all when we use l=
-arge folio (what I did in this RFC but not a great long term solution).
+But compression is a *memory* consumer. A big one. And with swap it
+sits in the reclaim path. So now you have to solve intricate MM
+problems with the block layer in between.
 
-Why? What folio split does:
-1. unmap pagecache folios or freeze anon folios with migration entries
-2. split the folio to small ones and handle other related meta data like
-	page owner, pgalloc tags, swap, pagecache index info, or others
-3. remove migration entries for anon folios, do nothing for pagecache fol=
-io.
+The effectiveness of compression as a reclaim strategy is also highly
+variable and dependent on page contents, so the static properties of
+the block device abstraction are a poor fit for the problem space.
 
-Unless the large folio is PMD mapped, splitting other large folios should=
+I'd propose the following:
 
-work without THP.
+What keeps users in the zram camp is disk-less setups.
 
->
-> So even if we implement folio_split without any dependency on THP, do w=
-e need to re-implement or make folio_split available for nommu? I am also=
- wondering how nommu code is related to removing large folios dependency =
-on THP.
->
-> --
-> Pankaj
+What keeps users in the zswap camp is reclaim-writeback, cgroup
+accounting & control, and the prospect of fully dynamic sizing.
 
+There are ongoing efforts to solve zswap's disk requirement and with
+it its dependency on static address spacing.
 
-Best Regards,
-Yan, Zi
+The gap on the zram side looks wider, and more awkward to solve given
+the block layer intermediary. And it's already 2.6x the SLOC of zswap.
+
+So I fully agree. We should try to make zswap the single compressed
+swap implementation. It would simplify things dramatically for kernel
+developers working on MM and the swap subsystem. It would make things
+better for users too.
