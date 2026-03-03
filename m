@@ -1,125 +1,120 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBF1397691
-	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 19:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522E43976A2;
+	Tue,  3 Mar 2026 19:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772566679; cv=none; b=qW1unz1of5UzXbfoerJ8hTJkbYf9Pq81aRlsWDcLzNY1TthVdLa4NzKbVCIIyGhyFFug4guh658g2/TzNGa+wHwwJWBfm7ogCx+HHzpQ7B53lBZ8VOObW9OsDHy9MPcPnRTzICFQB8bEmsb5pmE5h8pNdmCEqMG4bGCT6uZhHfQ=
+	t=1772566925; cv=none; b=kbm5BJdHprjP2989uWWAZVxlRPg61fyw59I6BX5hFawPlKr6NhkjLg095ucVzoaoOvrt0Nn1zt/sqe8rbk2vdX4wL8ET2er/KNIC2uZqLV3qaD4cwxSInKcJd0FYBJb6gplP17USEX/I7PBtVA2lC0NFVyJBFe/YK2ADSwm0/CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772566679; c=relaxed/simple;
-	bh=r07I1320FVffZUlAdSYrMpSdkuwDFwPlbxMaqOaCKJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pl0xk6qAYeHOtr8fpAevWPqvSHPnXaQK/LpV3Oh666R7+lGnvQo+oJpzp3Ie+oYFlmh8ZA7phd8Inzh44UBzVOXZXzacvSg4xYnj0VwPLxyFOlG2l//GpEd/QpxmIdJLRFxvrxuQfs7w/lCgGqVtHw/AdS6YyDdwApCKjO/omnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com; spf=none smtp.mailfrom=readmodwrite.com; dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b=c119dpAp; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=readmodwrite.com
+	s=arc-20240116; t=1772566925; c=relaxed/simple;
+	bh=H4mG72owGRTWTwZQX2O/h0Z11mxsQLJFkHUjfOmfgHs=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=UePj5lfWRKVRF0CB5GeMs4cE51jPwLf4e22C+68m0e+Ccx53k7TVEeuq2cfo+ThPes0JAfoGaABE7C5E6ZlJqvjn0tI7Fnbdsw+YOM2DzxAsnz60duR5kUydAMawaBudPZ+Tnd0T9hq6kX3KiQowqIEY1WeR6zY3P8UzhYbWQpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YULONrfw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b="c119dpAp"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-43991064db8so6214916f8f.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2026 11:37:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=readmodwrite-com.20230601.gappssmtp.com; s=20230601; t=1772566676; x=1773171476; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yLA6/lNbnNrbFzoCMsv7/3TnmIMI00PpH+C/qr7USIU=;
-        b=c119dpApB2/u/tQyzKD2eCGFhkWJq0gyVmvpurs8RRSy7g9iZxnRHUXcbaxNuv8yDn
-         Ma4kgVWh/g72DsBC81uvWNP812DsMhZxJD2FlTZie1YfceFVP4/QsqkePxbNkZ+lK4Qi
-         uygSdQ6lptN51nID2tSZIaoBGEpWIlUZizmAs5cC/UVAge4MnwPClZj4HMK8k/w8c/qh
-         na9KhKkIgA1947LsxooTwj2qI6u0/aHaBkkVSv4xHkAYow1CmpmcjZ8giG1IBMkSm3G8
-         1KRHikQW7fpKb85rh96A3xsg0QCsDen+7dbDnfAWyrPQKt/1sQhskA4AxeKFqMdpUKak
-         k+Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772566676; x=1773171476;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yLA6/lNbnNrbFzoCMsv7/3TnmIMI00PpH+C/qr7USIU=;
-        b=O6ZksGqk08g3MYRtYsdj/xbVVjjs7wKkYA0VLnTTQSpHRjjAwsTKWbCvUq8s5ITqYc
-         iHVpny37byGONbOBgKMfbqfWCa2/y5MEipSdLRtiisV3ZDNjHZwTdAgoxiuUd7CTb5Xh
-         yu3fXceEfuuFnAOzY+lx/HiNfbGttHrLjCyBu223MMCnSUPKl8T/Jly7lqzzD0MGOxH2
-         jbYe7hEqK6QWWTiywETWNQa2ShhSo4x3Tzv51FBepubniUIQDFmOSwph5AfDcTZqJrGT
-         nDWawoaTEBbjI1124XL+1mN2mxbUoIWRSFgWn0EBPNtpXpbOeOjFKuwlmBZ4krazAvZ0
-         WYsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxeOckMqnfId/z+k0vfuDkVbn+N/f4nwG8tF8K7akTg09WNT3bvVm1BThppFem9CWvbHZYOQafgEZ+ig==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxB9gZ2Wyn5l3J94WlFdC4ZnAiWcyCOd/5Abgk9NNIznZiEaTBN
-	ftcNZVxniPB1kgoGoqeL+Xb2JNNgEfk6hydkLBeCpeSlfGpGEFt7rtJhfz8m4+ACOVc=
-X-Gm-Gg: ATEYQzxVW9zAX1PQ+UNMjHQGcXk6nMncnFA9rxY/lFLnVPDk8NfY6xuWB6nuv1Mblu8
-	BPAGWFNLVvso7C/jL1f8RqLVsDTXCjv+AEBO+X/ELj9pDBrMofrDdgGWi5emThQACZVRbGfaqHE
-	im4sBV8mUo1xyINAWhNbxtqQYLQM6ZGc3JEtz/shphvMUiMDX5fE6WvXHEoqGNY/S+nOuZt1Zu0
-	f5LLNPJ0xOtPW+65IxB311X9oGgbumoOd6L5/futqjlCU/GvElyMu2XYWGksH0BQSa6kkJ/4R1n
-	CUOg1oZFtdsj/jxFivlhneaR6P/E30RM5Y2ygLnwysiUgCotNtSxTuIK09wR+NSm+pftYLkepY8
-	3Ut50MFhozJdqP2/eX5Tj0GZxeJcfh+bNhqnWu2oS8SEMWUfy92GAq6I9nWZke6Q107sxP/LQvq
-	0x6oJ5yho=
-X-Received: by 2002:a5d:4b48:0:b0:439:c1b7:890d with SMTP id ffacd0b85a97d-439c1b7933dmr3930809f8f.26.1772566675967;
-        Tue, 03 Mar 2026 11:37:55 -0800 (PST)
-Received: from localhost ([2a09:bac1:2880:f0::3df:3d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439ba2a5970sm13526574f8f.33.2026.03.03.11.37.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 11:37:55 -0800 (PST)
-Date: Tue, 3 Mar 2026 19:37:54 +0000
-From: Matt Fleming <matt@readmodwrite.com>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <bhe@redhat.com>, 
-	Barry Song <baohua@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Brendan Jackman <jackmanb@google.com>, Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	kernel-team@cloudflare.com, Matt Fleming <mfleming@cloudflare.com>, roman.gushchin@linux.dev
-Subject: Re: [RFC PATCH 0/1] mm: Reduce direct reclaim stalls with RAM-backed
- swap
-Message-ID: <mmlwwn5dgwzcg6svb7t6torq4py663fgqceea2t4y4ktiep2ch@qm2zw2k5njoh>
-References: <20260303115358.1323188-1-matt@readmodwrite.com>
- <aab0AFAgAzBi4jO6@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YULONrfw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A119C2BC87;
+	Tue,  3 Mar 2026 19:42:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772566925;
+	bh=H4mG72owGRTWTwZQX2O/h0Z11mxsQLJFkHUjfOmfgHs=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=YULONrfwiUJJHfNzs1A2iAyqurt2++EC2cUpbU7F/CeBOq1PhUv0UHCI5NNHGqPdg
+	 WAFXLwu2AjK8jSfA8ckWoXvVbttyaPOJ43jsGSUK0jS5G/tfrNSEJfzgEZqM3JaoFH
+	 3Ao89imjDrd745ChexTw7drDNE+RUIfSVO9Y66yxJmXsCzEkQopiUV6HkDxeFlrYUm
+	 AmL98eF9HKC1+jl6Dr18nd3x8c1R9IGdwdqTNOD4lqGpUJ+8lLgkrPsxS9xMMpACLR
+	 w0NQ0+8ax3EQUamhwScLJGUBC2D4x+ZgPPr3Wf4XrxaaObVDwvXfZ07R/oDLr6ZXWJ
+	 pP1Z+oFnym6fA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 3F2EAF40068;
+	Tue,  3 Mar 2026 14:42:03 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Tue, 03 Mar 2026 14:42:03 -0500
+X-ME-Sender: <xms:izmnafQBroN4CG91qhP0QwS14BKG5PiKCYZKboEqDbyyhpvruE7k9Q>
+    <xme:izmnabngVqdFv5UTPHWrrsz7LIEXTIaF085FUit_wPOsNtBOysS6LS6Vl1clKSQWC
+    aBZuUqIQu6G1FIBMbTdivrz_GVQ8hTYo40RLtHdVADNa6lezpVlgA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddviedugeeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepfihilhhlhiesihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehguhhsth
+    grvhhorghrsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvvghssehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomh
+    dprhgtphhtthhopehlihhnuhigqdgslhhotghksehvghgvrhdrkhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehlihhnuhigqdhhrghruggvnhhinhhgsehvghgvrhdrkhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtohepvhhirhhoseiivghnihhvrdhlihhnuhigrdhorhhgrdhukh
+X-ME-Proxy: <xmx:izmnaW3BPh6K1tLSpLmw47oHWLGYXUMY_CzEtWuBQ37lyZU4XevX4g>
+    <xmx:izmnaRRabts1SNWaW47_wijnFEsni4ikC5Qd874L1c5WPSByGvgAyA>
+    <xmx:izmnaacU1X6HfA9cfGkm8tWQtzYq8SmYe1ntkqN5LA2Ldlx3sVGMDQ>
+    <xmx:izmnaSdbtK9_I_Hz2RYAoiw03ZnxBCHTfOH4N_PfwHL38fjLN8OlXQ>
+    <xmx:izmnaU0d8qpB8qTyWA_0VyV4ciHlMo5_ZXv2U6-BzCNmYP1rP8uOgrJE>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 1A4F5780076; Tue,  3 Mar 2026 14:42:03 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aab0AFAgAzBi4jO6@linux.dev>
+X-ThreadId: AyMVdAmERJ9c
+Date: Tue, 03 Mar 2026 14:41:33 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc: "Alexander Viro" <viro@zeniv.linux.org.uk>, kees@kernel.org,
+ gustavoars@kernel.org, linux-hardening@vger.kernel.org,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ "Chuck Lever" <chuck.lever@oracle.com>
+Message-Id: <8c2c2a3f-c718-4275-a2ba-b796438e9a13@app.fastmail.com>
+In-Reply-To: <aachxPdUi2puxQKq@casper.infradead.org>
+References: <20260303162932.22910-1-cel@kernel.org>
+ <aachxPdUi2puxQKq@casper.infradead.org>
+Subject: Re: [RFC PATCH] iov: Bypass usercopy hardening for kernel iterators
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 03, 2026 at 06:59:04AM -0800, Shakeel Butt wrote:
-> Hi Matt,
-> 
-> Thanks for the report and one request I have is to avoid cover letter for a
-> single patch to avoid partitioning the discussion.
- 
-Noted.
 
-> Have you tried zswap and if you see similar issues with zswap?
- 
-Yes, we've started experimenting with zswap but that's still in
-progress.
+On Tue, Mar 3, 2026, at 1:00 PM, Matthew Wilcox wrote:
+> On Tue, Mar 03, 2026 at 11:29:32AM -0500, Chuck Lever wrote:
+>> Profiling NFSD under an iozone workload showed that hardened
+>> usercopy checks consume roughly 1.3% of CPU in the TCP receive
+>> path. The runtime check in check_object_size() validates that
+>> copy buffers reside in expected slab regions, which is
+>> meaningful when data crosses the user/kernel boundary but adds
+>> no value when both source and destination are kernel addresses.
+>
+> I'm not sure I'd go as far as "no value".  I could see an attack which
+> managed to trick the kernel into copying past the end of a slab object
+> and sending the contents of that buffer across the network to an attacker.
+>
+> Or I guess in this case you're talking about copying _to_ a slab object.
+> Then we could see a network attacker somewhow confusing the kernel into
+> copying past the end of the object they allocated, overwriting slab
+> metadata and/or the contents of the next object in the slab.
+>
+> Limited value, sure.  And the performance change you're showing here
+> certainly isn't nothing!
 
-> Over the time we (kernel MM community) have implicitly decided to keep the
-> kernel oom-killer very conservative as adding more heuristics in the reclaim/oom
-> path makes the kernel more unreliable and punt the aggressiveness of oom-killing
-> to the userspace as a policy. All major Linux deployments have started using
-> userspace oom-killers like systemd-oomd, Android's LMKD, fb-oomd or some
-> internal alternatives. That provides more flexibility to define the
-> aggressiveness of oom-killing based on your business needs.
-> 
-> Though userspace oom-killers are prone to reliability issues (oom-killer getting
-> stuck in reclaim or not getting enough CPU), so we (Roman) are working on adding
-> support for BPF based oom-killer where wen think we can do oom policies more
-> reliably.
-> 
-> Anyways, I am wondering if you have tried systemd-oomd or some userspace
-> alternative. If you are interested in BPF oom-killer, we can help with that as
-> well.
+To be clear, I'm absolutely interested in not degrading our security
+posture. But NFSD (and other storage ULPs, for example) do a lot of
+internal data copying that could be more efficient.
 
-oomd is also being discussed but so far we haven't experimented with it
-yet.
+I would place the "trick the kernel into copying past the end of
+a slab object" attack in the category of "you should sanitize your
+input better"... Perhaps the existing copy_to_iter protection is
+a general salve that could be replaced by something more narrow
+and less costly. </hand wave>
 
-What's the status of BPF oom-killer: is this the latest?
-
-  https://lore.kernel.org/all/20260127024421.494929-1-roman.gushchin@linux.dev/
-
-Thanks,
-Matt
+-- 
+Chuck Lever
