@@ -1,366 +1,162 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D943382CB
-	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 11:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4383533FE26;
+	Tue,  3 Mar 2026 12:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772538845; cv=none; b=AIzml+sWWIBBX4oEJ1xxLA3RqmNHAc4fR6Z8gsy0nhSN7ebd1WwGwsq65KYdbssmUQZPLI8e6NsOWC8flkceOLi3vYFVAyxyoc9eid6XR96weDuCPON9UzN30cg2Be1D8C+zYfHABKQ/PXDB1aQgCfOZWX/myz2h/pe7CueXTI0=
+	t=1772540037; cv=none; b=gpfoNZlmRLzVafvYL2UDa/k4X581mu96t67S4cAPMkqzWhNKm7GGMPOk2/ZTd9t95e64HK33FtoTm6fVuZfzjcUFytjnztIcK0xPgiibdpxv7DW1wCZQkjdW8D4UByTpm/2yynkgaw3U9w9yGUnJsFDZ0AgvT1wIYBq2ZpiYHzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772538845; c=relaxed/simple;
-	bh=XcvrOBvCezPNbCUvCF/7mnxP4IJ0851/IJN2rQRzWwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PdryPJtkqPSzY+w/c6uHbxYatguIz8bZ96nkMPERg2+xVKeUS8a+Uyt7Fc7/hkHMqVVkr138OCGyAcir3CPEl/J62nqnS2itxapqbs3BgNXUqm5jJzr7AFImw+43Gq5ktmm8j6hLZooYhg1En4wCst+Dp5TT0eDVWoGasClHuRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com; spf=none smtp.mailfrom=readmodwrite.com; dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b=fZSdCnVw; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=readmodwrite.com
+	s=arc-20240116; t=1772540037; c=relaxed/simple;
+	bh=TWj0Uz55Wuh0z68fyA36RmjG//2hytmhazu3ZxHQV4A=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=CGysNgjg4mbpV9ae3FiOXQsdRNyDX+y26o5QGg2JMB0ET08axhnMuxiRzSKegefQMmn9TpFSYJ5O1/d+2DnDwGN9ht4QQLz9obPlefObcH8CZkrhJ2OB59Oyz6IHarySicGrlSfWLS+QNA1xwBUVXmSAkSALWjKEeAs24YZYkgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VL4xd4hz; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b="fZSdCnVw"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4833115090dso57583285e9.3
-        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2026 03:54:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=readmodwrite-com.20230601.gappssmtp.com; s=20230601; t=1772538842; x=1773143642; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FUWT63/jg9iqgoqLOExCtkSXzsQ+kIFy2uXbPBqqyUY=;
-        b=fZSdCnVwB6d6BELWV2m6FCEmF+SkpIHX4XbJ3xiZ2sz7jO8ToAzVLQCrsvexM4W062
-         lkwxcJNl1loZ5Ap1S++A1+IFGp//PLleS7YAP4ULr56YUNMVDXb0mMtD/zb1G3D92W+Q
-         uHIb/tCX6J5kOqzABp09rhCiJpACMCaseEULYSTsLXq+qyCtQzRu2Q4uul4xRXlrS2Vy
-         3bwBWGImmdHzpMMKQAkDV/oOLFpDNwg0W3jg3jzEzLeyPqBT1gVOsq+Pdggta7bwTYuQ
-         6tKcQvUqUPX0yJlwWQFtbUT9aK4PQK5Rk0boQus0UKzoUTS54iCP6v0UfQATlvfi6asm
-         KAVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772538842; x=1773143642;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FUWT63/jg9iqgoqLOExCtkSXzsQ+kIFy2uXbPBqqyUY=;
-        b=NlJdI8GIeDD9OmwrvXqZGPAhhcxU2e0nmLLcqzg7aTpjsYaL9/VRbGoKB4n4uyQD8d
-         9z5BQ0kE9vW48MBBeHEv/y675gSfBJjUzz5qzXzPn68jupD+tXnjBF+gznrxDXd2tsHd
-         /jHi3I6E885tizlSBbvtpZjyb0W8zXrKAMzlpjhPiJtp7u87WIjg+3CrDzn0gbOtvNgx
-         EwMyJWIdAvguuq8BWdbxjCNfzPXPCfr/NSd+gdHqj0ihcdDVTxDe/DqXSwYce4Sjk13j
-         v3bbb6gEmkJMil0FpuUMl6TOzCwAtbPhkbhHrbtEMo11wv4DplbgXffYivr+tl5qaEXI
-         RgEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWm7GudC/EbO9TWH3yrhaLTfFhq4ZTvZYM52GoBNLF3X+iTf9imAyBa2MngoR7LlPVVE5h50xJSnKo2Ig==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1gw2PqPDYbAQ9S/9WQjI7YME81phGWaGOBVqKZKImFkddHrhs
-	PQOoqbrkJrPuF1MKr7OMgEJbOfBiS9rhAXlB3b4/To+fp0xIUiKn7UqUzL87eH5qGvI=
-X-Gm-Gg: ATEYQzzIZkiBhwI90s3urmWt6ZGKQOkn/EwPvr1fR0FxDVEmAJqFywGQ7C22dk0LreM
-	9Di8lgMmCMlkIs9iYdo2fWpl5TDwIv33+BL+qYSeqJ2oTCJ8+YCiRacBMnc0SsdIvheqAsvUB/j
-	f7xZ0giAPKgzJs1LM+ftIi8cve2ooJ/7YJvRq80Jtex71H4YRR05gRvcaqrmy9Nr8Wc9Vr3IXur
-	dvYvOfKRdY/eKnNFIIxddGnXhXFkau+eRMFAL0gSAjy+sqxjSh7s+itr/1TGEasGDMfwa0sLzwy
-	AVihNcw38r3DCHztEdGJ3ltBWCwpY01tcbx39APNLT8ksAxc9zoOuREnyo7USjhO5x+M0VKAjQC
-	4nuhw67MjGiatySy7sx0eAnYdmG63diaslGIt16tQGYKbwFrK0YSXDCuKXICi4o15DqN1IxBf9p
-	0TwgtsgFXjWP9Z5NrM3ai+b3A=
-X-Received: by 2002:a05:600c:45d5:b0:480:6c75:ddce with SMTP id 5b1f17b1804b1-483c9c11ef1mr271279875e9.33.1772538842224;
-        Tue, 03 Mar 2026 03:54:02 -0800 (PST)
-Received: from matt-Precision-5490.. ([2a09:bac1:2880:f0::15:430])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439b3cc2e65sm18598717f8f.2.2026.03.03.03.54.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 03:54:01 -0800 (PST)
-From: Matt Fleming <matt@readmodwrite.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Chris Li <chrisl@kernel.org>,
-	Kairui Song <kasong@tencent.com>,
-	Kemeng Shi <shikemeng@huaweicloud.com>,
-	Nhat Pham <nphamcs@gmail.com>,
-	Baoquan He <bhe@redhat.com>,
-	Barry Song <baohua@kernel.org>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Brendan Jackman <jackmanb@google.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Zi Yan <ziy@nvidia.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	kernel-team@cloudflare.com,
-	Matt Fleming <mfleming@cloudflare.com>
-Subject: [RFC PATCH 1/1] mm: Reduce direct reclaim stalls with RAM-backed swap
-Date: Tue,  3 Mar 2026 11:53:58 +0000
-Message-ID: <20260303115358.1323188-2-matt@readmodwrite.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260303115358.1323188-1-matt@readmodwrite.com>
-References: <20260303115358.1323188-1-matt@readmodwrite.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="VL4xd4hz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1772540005; x=1773144805; i=markus.elfring@web.de;
+	bh=gIp54MN4jChuEYUh7TNa6eqBLe7+iFuIFJTp65fofko=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=VL4xd4hzTmxeRHnNfny/2YerGM5ZFuLtzbSrtOQmtHR0nvZlKNaRRud1MdQawEto
+	 49B7QDrjPUxSdxjsLExlQ2JXWsLOhJy/6T5w4nhCfHy1qxZrM2pWVGAgqgKzxnOd1
+	 O0rxyW4vq3aDchyISnb1hfkWCGlCPALjzBZD2Cbn2MIWKbLOZkdf825FjIDFMEaZy
+	 cWguu+UYHb9BiTc/6wMToFTIHlCqJgpXcZ6KFq9LBJGPdWOh2bhbF7jbHphJIgUjj
+	 TPDbJpw8FQDoNSdUBKxG1ngOAlKOjnS8YV3SfNIhjCvIuEVbDZF9SZ+5EZyJiruMa
+	 GmkiSDgpX8wBtc5a1w==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MFJnX-1vvUwm0ZNR-00BCZp; Tue, 03
+ Mar 2026 13:13:25 +0100
+Message-ID: <317a7883-9470-453d-a3cf-8d819383aca2@web.de>
+Date: Tue, 3 Mar 2026 13:13:21 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org,
+ linux-scsi@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@suse.com>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ Jens Axboe <axboe@fb.com>, Keith Busch <kbusch@kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Sagi Grimberg <sagi@grimberg.me>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Benjamin Marzinski <bmarzins@redhat.com>,
+ John Meneghini <jmeneghi@redhat.com>,
+ Mike Christie <michael.christie@oracle.com>,
+ Mike Snitzer <snitzer@kernel.org>
+References: <20260225153225.1031169-3-john.g.garry@oracle.com>
+Subject: Re: [PATCH 02/13] libmultipath: Add basic gendisk support
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20260225153225.1031169-3-john.g.garry@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Y9Tc070tjaLWTl1kQxMYkGBPvc0yZW6gcj0I/lU6blB2sw2I6X5
+ FNV025sdMT51il+Fyo390oz8ADSxrqQEQTVB35shpjZiBYP7pochPJ7Q1oPGW1/Ml0c52qn
+ eZi9PcdDyYSAH5lNDPryZJcYkGPLzFZfDCbX9c4qG8YJHI76+yqjO8bRvfAk7UkjFPDObbv
+ lfopfHBl9sSQr8KGN4aWg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:GvzOakMwmiM=;WR8ltfsCe2n2cQ9lB5rEju6RTFT
+ uxDL/XtT4nTmcI5EQuv1kVHjXP/idWl7OIGVgRTQOdOynFo+vCbpx4APdDxOPxtAUEw9AHBL6
+ ItY9LuoqfkY8ul5c55BO44o0pXb6Ztw5l0PsBL1/6oZzboMOD+vO+x35eVIye45BCcHuOFtBW
+ jTAIu80ZMUya34x5XgOTbM6doH3mv2ENGYIX4z8og4ofENKEqJWvyLVVR8osJIuFwCwZtK5ww
+ T+9G9D3Px0+2wfez9AN3V59hSKdUaOCmr0j9F+t47m8wO+bdRsJ8lUDqgCcUqjJigE5PP4QyV
+ YfhGtsv2fzNXZ/6FDerkz35SGZ5/cckODG169hEJ8bFfNcn7AWElCEAVV18I6QFS0c4vsR6T1
+ nTsWCchALcTaGikyaFHbo6tzBP2zN5prZqakHvG9y/myv1Up+Y8cdvn1DNZ/pC5W0rDZT96vN
+ MBYdd76LJ4PnXb6v1P3nnJq/GF8ekXzqcPcjzQoaL65UeYVZKTrLy5slbTCjw3NWX/G8wXrCV
+ 2yrPZD38Z436cxypa7wQ0QwDEZYRFB4IqgCgPGzUu/XrUvY0Rm/AfqOAlYG11tBjxbyor0z6a
+ VeuPOyztSYuAMlH3ymdiFa+Wui980w3BnUpbEVq52KUZn3qI9dav/4mQT3kV4ycwdai5dkcKo
+ i0igUyYZnfoW9ledKN5AJMjborXuKrEinUZK+nmmmO0aRyN+Mk0PDOgywZzm6nqJwoVg8fczR
+ khddNpL8v0AWJq6tChpFtsNlWLvSz9Lwv1BWrlTc4t0jvIrqPcWJLnVdTrBfMyaDzelIUwqIw
+ 4ocLELiO9bYIEhxFRCr9INOPcC1aigpIgTmUawNsG90UoXmyud4yZTrPYeko+7aWRfjgdhQ8o
+ BP3GlFllGgECc3n6hznrobHUV8a3Wr2Gr8LGAjyGIa3YRU31vsFzyMt2kKVLTqGS8JYtqkxiG
+ 4rc+yxk0RBpWzr+RohWFB/1O+tMktiuhY05Pj18qHs8YW+7pYOdAeassR+fI3OwZ47JRJ77dj
+ G6oEWsgEgzo8qv2axxzS67XzGKzdRc2P27esOcU9SKWJrdUs5KIuVgTLOK5HFWDfTa92v5t+j
+ 0oDAV3T/mtkFpzfmcGyVwefWdK0/U6d64ZL1xqfS5uREmjQk6U6zSDJrWMoAjdogOQwjn2OGq
+ zpMPdIXfcxBkLZ4v7u9jJ7yCPyqdu3GcnNmHeB7L7DAUy943E/kdEH7PjnnNI8X9FkPfJKRy6
+ IT6kifKmWcDWcKK8aCNNLpNl9LSX2LcTTAjf64gp16k/qWXVBcseg4pe9cwJ1KQeCfgPufaNH
+ MjZ16i4919VDxkPcjLg58RQk5m8+toiMgWuWteq46LNWelNkiPjQhMbNkD59qkMFCK32UZqi7
+ XSAY24jHzfdyI4QHbps6EcQecAajN40vEbn071sWhPYq/xUkxajgHHyn2ZHJjZ09j9Dn08t8T
+ BJm7q4aSrgWkIdsuBr2DwrfahaSW2QOV4uvA22bxF2DndTNEptBKC1hV1xxqEEy2FdhAvVo6v
+ Jxn/9FPfGT5SVLlEl9rTPI4x7LyOBWzJr0EjYqsdNnfUYeCC9EL3/2P3VREH/R77Vnh1u2BqV
+ KhELUmpimw+MRUo79SdYD6HFtlSom2cSO6Y7K9gRzEW9WSx2oAn09yoOFQYdssjlNk+fMWush
+ LWQETSap04NO6CwF4wDJL73jwEY27MFCDFuCl/Tr4xisnkCkhhBe7e8sjex6pKlGP+/ck16Wp
+ Yj4yqBtXSa9QPy05UU5LOBy6ljtfMpHmQHtTv7QxZKRhP8U1lixMIJ2YQFs+S8sCpgBAFA4yV
+ ZuDXPvqFKGiNarUn/tsy81SG8sFFnHrgaUwwugWfEj//lca4iOHgihtwoi0qvJa4Ec9d+cZUd
+ UiGTezZqOEVOae+2WK6piENxTCK25JL+K3AxL8+aT3y00xTkqT37Iaa9fj7oB9HrgP4rWrq7T
+ WmFqXe24LV97i8bQQr0iY+BvoyXfVfE6rZpA4iKMDI6UJ9PsqHcl5UFNipH63OGhwZSfXNUGj
+ ztKtaxif9rJmjg+JaUByD1NY9dAV0HdHiYYT7Qxg7zXCXMtiJlpZoFRJNWbU79g54rzrQMC2T
+ NyaLfWbegnDc7Coz+pkQv/jjPKfaRZX2miQWtno8d9SiOi/yinqkZgU/kqS1QYQWwjptNJ0Iy
+ 4k6ARpgs2gcLSCk5wFub/6jWe2epSP4uE/NOjOjuHfolyaFdX0tqAtxZdyOp80Ltc0MMXuDXF
+ OmrxN2kgpMtzOJsXUrRT/lF1a3ieCwSRg00LRJywBhMacbkD37NKgq822Fk+ZvpBWSkhsIeSL
+ 6ObJfcH9swW274HDExfGxwzIs4fZ2Gz9QglhFQblUSd1nPuBsuW+LxSSwpaCgPxzmogmQEro8
+ gOeOF8eDnzXqj4ICl7NOcTltVhreiKF/roCZMvgCu+CmNgFvIeejXThaHJ6r5cp+hkapDhaqX
+ mYFp+/ZG9xHEBfWr+j3y4yzIZpIsiVYMcWQ/FaaLLgInTkfQUKmHI06yrF0Ac2Pzj5AUdyYbY
+ YcaIRjjl4BMkFgWEmfRPFgF7XlWTUGXXVSDoXE+2zHbs74FYweR57A537fHRBM7yb/mIsp1BF
+ w5itjAMlhCqu32Xy/RxrXx5dx8OcranYk88KTXLQmpn/foPm0bP1pq5yAOQaSz9J1O4zb0nEo
+ pEcaBJzAFMqDcFm33EpVarM/Eh5vHvrhNcG2uGMIKhmhNuqO+oFYexwamWPnu4Mmg0RQQNduo
+ byKszToBeAXUzdJEh1Kh9XyZkRWKzCkmAnaP7KOHjU3AGpJSMHu8WL9atVrxoz4z4CzRfzMWq
+ jouL/l/uEmGY3czHabHcPC5X+1oY/rHqtvkWVjVNlrvEkjswjkZaWlYScAfg42/X6jp9TXkXv
+ zNWmC6ibSVbb1OE9QYhhCR9l6vPfcXPvWgxBXVUYbt+JeI2LsJQPP4ZnT5iy2yfqVo1TYOFHu
+ UUGlMBm1FLnLjjilUuWetGL7VjFoX/7QBktS8C0I665bMM1wf27pnHwZyPwnxUbADVY0nypRY
+ ebiVCnRL5aBThoE6sEac7/M4EFfj+sjkauuEGUYGRN+O8qvlQe41bLjJk8NbZueK18c60cltm
+ GxmNB8FD5VjLsOhgr1aSj/b5BaETkYofEjQG5kM+b1Nq9uIdWZQE0rIwIZtjOvJCROZ5CNeZC
+ tFFnE/E4SPcCe7MNptXgRjK0BcGtwWnmfbyZHPAKe5sbJ0rSaqMbi5NYjEnYiKVtUkXdu8Nhd
+ Bsn3v4i34MUYkT785vkqEoErOIptzd6czjS6dfh9xGBEX7gzm+h3CQjlhQuq98bQWe4uZ6Mbg
+ /F0a+oP/Q/FWV24TbgumW/lyTkGcP8f1EenHPjJfWPeYQw5JNJv/q8LB+/19WOSUshhM1Mi22
+ Ht7iubO06/vXvBO998dZrfWZBVV6bEmu8T32jc7USv3PRRg2lpRHUFkEfsuje0k273kyYlVIF
+ EI1S6OZFrALplqn/LxSW8d/t2vCAYxbwa89AJMEcv4mtr7P2wiU9Xhzp9pkV+YqpSlwB+PeeQ
+ cWzdGazVj/XIeqXCy+FhT72SSyQ035Sn5EWHUMRL+aUAIa0E0aKPhbgyXkQky/XA/KlwN+P8P
+ j25v42f203tL6sXJB723QtYDgZj99Q3I4OIIBhFMl4c7RETM/i4HTTG/kAhdX8rw4q71cam0a
+ XzvkeP+NzdjAGP3+C6KaOE+cGiqIDfkHcV5VF/qwDdktHE0tG+SD9JdI3fU+blC/miUdLAI76
+ oa+KOtA65XqroOS379Sv+IbynOTXZ8uU2eQKzBv8umKIZAOWedfkgjutl653MoIi5ozLU8fHa
+ BfFRAQOyfFYtO4qGgQ8Va5iTCsaLDuqIxSX010LprRrHIxTgTMKPRZwKo8YAbWdqSWUlEs7Nu
+ G5JkxccufB2NWEyer72u/8SI11P/7Gk0zbJbUOUm/xEUmeEFycMG6TkqobZ7eKQ19EUsGjdpE
+ rmeQXkN5Hnqj72QgXev+LBkZ/y3v20lAX4fbe1RQr4IgS2Vub3PZT9cuJee7Tz71D8HvKA1IJ
+ yYcuxS71//41w6YCzlyej9ht0NDDfgje0RqYQTdaHkMgm3wC2DETThc68tVs/UAykynuUT2Q6
+ 7peS5IBbqKGvL5LESDMP7rgawyIjWtTjEdTsMBLtehlxt+/XfQFn8C8SE+8HTd3q8g2wklMwn
+ feXaNtHeXVto5Oey2JPNy29SJQUp3AwMyLQe5e7deYj+MSBnPafuPyNncUmdFrUss2f1C+nGq
+ x1K3YnPe2sBKE//U/7cwq5WPHGF58A7l2UVn827f1NnExH6GxThZ6lM4mJrQK7l5MUp4+nZWu
+ qWiTMmAo9OfHrYfe++ua54+JES4xFukgFK2dsy1HNH0K/FH/FvHsIjaPgFYESRYk29EUSkoqb
+ 1AVHqWBFnbtZAPlHxoiMA/btyfrGsTepnh5H7l81ttSNPTo6BcJf13kw0ZpIdv+BelmDwzl9e
+ niMmfTm14LzKvO0FSUJ57WdRC7cuVIIqd3ueCtHyLSxyKeB/G7BSA2Sf5Kl5r+pGdcjHuuL+B
+ l2jYzpEWmzeUrQyN/12RS50s/x3pFSCBEtqMJuv+QcYpSdYxJdpTz2e162NQwQTPyX2t/UVRH
+ Ed2J1e2yqawMJgNI1GvJrYASsETZkeBTP0+l3K8JoHls0TUFHKUbKIpYXS8NyYOtUgFH0MDEU
+ zwEgQkNhSN1tpcK8vf/Nl5IvmwOgC7uSnWT7TCFA7MMMMpuUSzm3hYvojBA4PjHKLAKyUy6f2
+ YIB3iGkoQaXFdo1tUJmSl7hxRgRNdI6pD3lt5iOo37B/Y251unJW9PNUW9dWsKcUFMOhtr97r
+ GS5DyxQDA9SUrseJctP63YI0ywXK8hzdb7euiy9Bah1C8YV56pgU7P4RjoEOlecAfrQPBObOc
+ ydX5hXu9xEtszff3SQvinoBohTXzMYcEy+0jaqQSiwjdj3BkIB25AtfXDiyflknXV370UdiKi
+ s6AlfKY0CF8tpsUpu95D8aIUY5K5iu0ko+SyJ+P8g6tamn/aDSsGsfKfq4Nkj1/5LI7MFnJFO
+ DjSCU5NLPAqAWyWtxTF2/7U7zVQqaMeU+91elzd/2rhbIQ4w4raHwYFKK7BnkOXxRM27bf2yk
+ H22r9Bkt7an9fvyw846kvHxEEkixsByQDyHxpz9r0VDn8x7VVlE93MfTq4TP7CIiFCvkCGSKo
+ dv4rfAGauumZ3Sr1I4lBt3IXtXCUT
 
-From: Matt Fleming <mfleming@cloudflare.com>
+=E2=80=A6
+> +++ b/lib/multipath.c
+=E2=80=A6
+> +static void multipath_partition_scan_work(struct work_struct *work)
+> +{
+=E2=80=A6
+> +	mutex_lock(&mpath_disk->disk->open_mutex);
+> +	bdev_disk_changed(mpath_disk->disk, false);
+> +	mutex_unlock(&mpath_disk->disk->open_mutex);
+> +}
+=E2=80=A6
 
-The current should_reclaim_retry() code does not account for the fact
-the number of logical swap pages available for RAM-backed swap (zram,
-brd) is dependent on having enough free physical pages, and simply
-always assumes that enough pages are reclaimable to satisfy the
-allocation.
+Under which circumstances would you become interested to apply a statement
+like =E2=80=9Cguard(mutex)(&mpath_disk->disk->open_mutex);=E2=80=9D?
+https://elixir.bootlin.com/linux/v6.19.3/source/include/linux/mutex.h#L253
 
-For instance, given a system with a 200GiB zram device (10% used) and
-100MB of free physical pages, should_reclaim_retry() incorrectly
-concludes that it can swap 180GiB worth of anon pages to swap.
-
-Because it appears to be always possible to write to swap, the OOM
-killer is delayed and the system retries in direct reclaim for
-prolonged periods (20-30 minutes observed in production).
-
-Fix this by excluding anon pages from the reclaimable estimate when all
-active swap devices are RAM-backed. Once file-backed pages are exhausted
-the watermark check fails and the kernel falls through to OOM as
-expected.
-
-To identify RAM-backed swap devices at swapon time, introduce
-BLK_FEAT_RAM_BACKED (set by zram and brd) and SWP_RAM_BACKED
-(swapfile.c). A cached bool swap_all_ram_backed is maintained under
-swap_lock by swap_update_all_ram_backed() during swapon/swapoff, which
-is locklessly accessed in should_reclaim_retry().
-
-Signed-off-by: Matt Fleming <mfleming@cloudflare.com>
----
- drivers/block/brd.c           |  3 ++-
- drivers/block/zram/zram_drv.c |  3 ++-
- include/linux/blkdev.h        |  8 ++++++
- include/linux/swap.h          |  9 +++++++
- mm/page_alloc.c               | 23 ++++++++++++++++-
- mm/swapfile.c                 | 47 ++++++++++++++++++++++++++++++++++-
- 6 files changed, 89 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 00cc8122068f..c021dd51ff0a 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -310,7 +310,8 @@ static int brd_alloc(int i)
- 		.max_discard_segments	= 1,
- 		.discard_granularity	= PAGE_SIZE,
- 		.features		= BLK_FEAT_SYNCHRONOUS |
--					  BLK_FEAT_NOWAIT,
-+					  BLK_FEAT_NOWAIT |
-+					  BLK_FEAT_RAM_BACKED,
- 	};
- 
- 	brd = brd_find_or_alloc_device(i);
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index bca33403fc8b..8075bab39e62 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -3074,7 +3074,8 @@ static int zram_add(void)
- 		.max_write_zeroes_sectors	= UINT_MAX,
- #endif
- 		.features			= BLK_FEAT_STABLE_WRITES |
--						  BLK_FEAT_SYNCHRONOUS,
-+						  BLK_FEAT_SYNCHRONOUS |
-+						  BLK_FEAT_RAM_BACKED,
- 	};
- 	struct zram *zram;
- 	int ret, device_id;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d463b9b5a0a5..3666837e8774 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -334,6 +334,9 @@ typedef unsigned int __bitwise blk_features_t;
- /* is a zoned device */
- #define BLK_FEAT_ZONED			((__force blk_features_t)(1u << 10))
- 
-+/* storage is backed by system RAM (e.g. zram, brd) */
-+#define BLK_FEAT_RAM_BACKED		((__force blk_features_t)(1u << 11))
-+
- /* supports PCI(e) p2p requests */
- #define BLK_FEAT_PCI_P2PDMA		((__force blk_features_t)(1u << 12))
- 
-@@ -1477,6 +1480,11 @@ static inline bool bdev_synchronous(struct block_device *bdev)
- 	return bdev->bd_disk->queue->limits.features & BLK_FEAT_SYNCHRONOUS;
- }
- 
-+static inline bool bdev_ram_backed(struct block_device *bdev)
-+{
-+	return bdev->bd_disk->queue->limits.features & BLK_FEAT_RAM_BACKED;
-+}
-+
- static inline bool bdev_stable_writes(struct block_device *bdev)
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
-diff --git a/include/linux/swap.h b/include/linux/swap.h
-index 62fc7499b408..844727fe929c 100644
---- a/include/linux/swap.h
-+++ b/include/linux/swap.h
-@@ -216,6 +216,7 @@ enum {
- 	SWP_PAGE_DISCARD = (1 << 10),	/* freed swap page-cluster discards */
- 	SWP_STABLE_WRITES = (1 << 11),	/* no overwrite PG_writeback pages */
- 	SWP_SYNCHRONOUS_IO = (1 << 12),	/* synchronous IO is efficient */
-+	SWP_RAM_BACKED	= (1 << 13),	/* swap device uses main memory (e.g. zram) */
- 					/* add others here before... */
- };
- 
-@@ -451,6 +452,11 @@ static inline long get_nr_swap_pages(void)
- }
- 
- extern void si_swapinfo(struct sysinfo *);
-+extern bool swap_all_ram_backed;
-+static inline bool swap_is_all_ram_backed(void)
-+{
-+	return READ_ONCE(swap_all_ram_backed);
-+}
- extern int add_swap_count_continuation(swp_entry_t, gfp_t);
- int swap_type_of(dev_t device, sector_t offset);
- int find_first_swap(dev_t *device);
-@@ -508,6 +514,9 @@ static inline void put_swap_device(struct swap_info_struct *si)
- 
- #define si_swapinfo(val) \
- 	do { (val)->freeswap = (val)->totalswap = 0; } while (0)
-+
-+static inline bool swap_is_all_ram_backed(void) { return false; }
-+
- #define free_folio_and_swap_cache(folio) \
- 	folio_put(folio)
- #define free_pages_and_swap_cache(pages, nr) \
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 2d4b6f1a554e..c1a8f4620baa 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -37,6 +37,7 @@
- #include <linux/vmstat.h>
- #include <linux/fault-inject.h>
- #include <linux/compaction.h>
-+#include <linux/swap.h>
- #include <trace/events/kmem.h>
- #include <trace/events/oom.h>
- #include <linux/prefetch.h>
-@@ -4604,6 +4605,7 @@ should_reclaim_retry(gfp_t gfp_mask, unsigned order,
- 	struct zone *zone;
- 	struct zoneref *z;
- 	bool ret = false;
-+	bool ram_backed_swap = swap_is_all_ram_backed();
- 
- 	/*
- 	 * Costly allocations might have made a progress but this doesn't mean
-@@ -4637,7 +4639,26 @@ should_reclaim_retry(gfp_t gfp_mask, unsigned order,
- 			!__cpuset_zone_allowed(zone, gfp_mask))
- 				continue;
- 
--		available = reclaimable = zone_reclaimable_pages(zone);
-+		if (ram_backed_swap) {
-+			/*
-+			 * Exclude anon pages when all swap is RAM-backed.
-+			 * The reclaimable estimate assumes anon can be
-+			 * reclaimed using free swap slots, but those slots
-+			 * are only logical accounting for zram: storing the
-+			 * swapped data still consumes physical pages. Free
-+			 * RAM is the real limit, so counting anon inflates
-+			 * 'available', keeps the watermark check passing,
-+			 * and delays falling through to OOM.
-+			 */
-+			reclaimable =
-+				zone_page_state_snapshot(zone,
-+							 NR_ZONE_INACTIVE_FILE) +
-+				zone_page_state_snapshot(zone,
-+							 NR_ZONE_ACTIVE_FILE);
-+		} else {
-+			reclaimable = zone_reclaimable_pages(zone);
-+		}
-+		available = reclaimable;
- 		available += zone_page_state_snapshot(zone, NR_FREE_PAGES);
- 
- 		/*
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 94af29d1de88..18713618f35c 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -64,6 +64,7 @@ static bool folio_swapcache_freeable(struct folio *folio);
- static void move_cluster(struct swap_info_struct *si,
- 			 struct swap_cluster_info *ci, struct list_head *list,
- 			 enum swap_cluster_flags new_flags);
-+static void swap_update_all_ram_backed(void);
- 
- static DEFINE_SPINLOCK(swap_lock);
- static unsigned int nr_swapfiles;
-@@ -74,8 +75,15 @@ atomic_long_t nr_swap_pages;
-  * check to see if any swap space is available.
-  */
- EXPORT_SYMBOL_GPL(nr_swap_pages);
--/* protected with swap_lock. reading in vm_swap_full() doesn't need lock */
-+
-+/*
-+ * Updates to these globals are serialized by swap_lock.
-+ * Read locklessly in vm_swap_full() (total_swap_pages) and
-+ * should_reclaim_retry() (swap_all_ram_backed).
-+ */
- long total_swap_pages;
-+bool swap_all_ram_backed;
-+
- #define DEF_SWAP_PRIO  -1
- unsigned long swapfile_maximum_size;
- #ifdef CONFIG_MIGRATION
-@@ -2670,6 +2678,8 @@ static void _enable_swap_info(struct swap_info_struct *si)
- 
- 	plist_add(&si->list, &swap_active_head);
- 
-+	swap_update_all_ram_backed();
-+
- 	/* Add back to available list */
- 	add_to_avail_list(si, true);
- }
-@@ -2813,6 +2823,7 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
- 	spin_lock(&p->lock);
- 	del_from_avail_list(p, true);
- 	plist_del(&p->list, &swap_active_head);
-+	swap_update_all_ram_backed();
- 	atomic_long_sub(p->pages, &nr_swap_pages);
- 	total_swap_pages -= p->pages;
- 	spin_unlock(&p->lock);
-@@ -3460,6 +3471,9 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
- 	if (si->bdev && bdev_synchronous(si->bdev))
- 		si->flags |= SWP_SYNCHRONOUS_IO;
- 
-+	if (si->bdev && bdev_ram_backed(si->bdev))
-+		si->flags |= SWP_RAM_BACKED;
-+
- 	if (si->bdev && bdev_nonrot(si->bdev)) {
- 		si->flags |= SWP_SOLIDSTATE;
- 	} else {
-@@ -3587,6 +3601,37 @@ void si_swapinfo(struct sysinfo *val)
- 	spin_unlock(&swap_lock);
- }
- 
-+/*
-+ * Recompute swap_all_ram_backed. Must be called with swap_lock held
-+ * whenever a swap device is added to or removed from swap_active_head.
-+ *
-+ * swap_all_ram_backed is true when every active swap device is backed
-+ * by main memory (e.g. zram, brd). False if there are no swap devices
-+ * configured or at least one of them is backed by disk.
-+ *
-+ * With RAM-backed swap, swapping out an anonymous page does not yield
-+ * net free pages because the driver must allocate physical RAM to
-+ * store the compressed data.
-+ *
-+ * See should_reclaim_retry().
-+ */
-+static void swap_update_all_ram_backed(void)
-+{
-+	struct swap_info_struct *si;
-+	bool all_ram = !plist_head_empty(&swap_active_head);
-+
-+	assert_spin_locked(&swap_lock);
-+
-+	plist_for_each_entry(si, &swap_active_head, list) {
-+		if (!(si->flags & SWP_RAM_BACKED)) {
-+			all_ram = false;
-+			break;
-+		}
-+	}
-+
-+	WRITE_ONCE(swap_all_ram_backed, all_ram);
-+}
-+
- /*
-  * Verify that nr swap entries are valid and increment their swap map counts.
-  *
--- 
-2.43.0
-
+Regards,
+Markus
