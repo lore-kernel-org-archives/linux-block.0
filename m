@@ -1,116 +1,135 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764A33DEADE
-	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 14:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C51C4301D6
+	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 14:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772547462; cv=none; b=lzZ9CtWbwO4h+b9O72qLt05zvIsmZIOGJtnGj4pqiRzFmzEckE/qIZKWm+P+N+hq4L7ju3sFN9vTSoSBN+iwygv9xqOZpM85qXgRdZSEjIHTZwa+YwngqKmYloQrvcEoggJZxU8es+tSAO5cKNnQrdXrfrBY7aqQe9Yj6JU4ScM=
+	t=1772547661; cv=none; b=n95fis/MoVk/W/9TWXsJup5zfuQiNr0jtHtwuL4XgW0Xcumddy1+QxKb/KcYyHNexWm+wRKOid3JEYMIrIx8Cd39co3ive7oN80kZe+NVRHUCGI771ESbEON/hxoSjr3NGFgh1o48pdwzVNXjPwI82pdnfCfPGVoe/37wj7KkrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772547462; c=relaxed/simple;
-	bh=KXtPR45XlwA5t9dJ3rfNgFxtzZ9y5nb7ehtXyJUvGRM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:From:In-Reply-To:
-	 Content-Type:References; b=STRxgzvBAx2C1qiCz3/xk4DU2nuYAmWIrq5HvB0m2dfEnm0ZjjywtyDXmurktvNB1zaygwXE9KfJiC73EdiBXQwa4XFEuxnWwdWF6XgAZnYOo2uTDXaLf4B4Sw/mPb07QkmQuGEwBtV0FyLwMksiqghISatikUSXvMvTPcw/oQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=nAHolJpm; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1772547661; c=relaxed/simple;
+	bh=IkQ7/gyK0kZ4FalknuXom3D+eyJvw5c+6TIGp5/qhI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lURwnJipSLdXLzuxU7ZlQolPuCZljYyIROSC1tWPWZZK/YCDMk2a223Q4dFB1bxP8UlbfruDDfwz5tFavv0kh1jjYFAm52x/6pF/qylzkFrbkHWRPKqkh+Znbtk1hNvea7JtRvwo+Nn0mndNFd7rIXujJ7Qy5rjzi40X7ZOXrAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GfPiXkTW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="nAHolJpm"
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260303141732euoutp01bb7b9ff9b69a7a87ecd370dff96d15f9~ZWoQ7fs9J2737827378euoutp01I
-	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 14:17:32 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260303141732euoutp01bb7b9ff9b69a7a87ecd370dff96d15f9~ZWoQ7fs9J2737827378euoutp01I
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1772547452;
-	bh=yI63eG0TpyudB4EbuxKXYS2S0olMXbkfWRAVH8sYml4=;
-	h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-	b=nAHolJpmRCQ4gHFFWFKGXTt1mm4rLcsJZwxxRVqII9a8+aRkttC5F2e0ONfQcPxHw
-	 3JVo+Gtcdd248Xf0fW4Swmdfb+xq06oSLF0CjoSYEG/BzpexuQVYcWOeNUqJmrX3w1
-	 sIlwE2iFK4XGOA1aW7Y+5ZaIEhTK0qNMGjWb6dwo=
-Received: from eucas1p1.samsung.com (unknown [203.254.199.20]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20260303141731eucas1p2e2776e83eaddf31d46a04572d08ecb6d~ZWoQeWN_70751407514eucas1p24;
-	Tue,  3 Mar 2026 14:17:31 +0000 (GMT)
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260303141731eucas1p294a43af96c9468f35fc3b88ddda944b8~ZWoQMnWCl0751807518eucas1p20;
-	Tue,  3 Mar 2026 14:17:31 +0000 (GMT)
-Received: from CAMSPWEXC02.scsc.local (unknown [106.1.227.4]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260303141731eusmtip1a2108785e03078cd80aeba1cd79b3739~ZWoQEqtIM1956719567eusmtip1N;
-	Tue,  3 Mar 2026 14:17:31 +0000 (GMT)
-Received: from [106.210.248.154] (106.210.248.154) by CAMSPWEXC02.scsc.local
-	(106.1.227.4) with Microsoft SMTP Server (version=TLS1_2,
-	cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.39; Tue, 3 Mar
-	2026 14:17:29 +0000
-Message-ID: <6e86c417-c410-4deb-9b47-08e3d5d9be71@samsung.com>
-Date: Tue, 3 Mar 2026 15:17:29 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfPiXkTW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772547659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hpscGlqtT0S5hsz/lvyVjD4lT80PmJ0j11LCHkWNSX8=;
+	b=GfPiXkTWY7XPmRxefE577HLSa3Yxhy2FJABqZzcrwl4E3i8MkxBUDQ8pUnLwpO4yv0GxC5
+	rXPEqJayhoZ39gqvTXMEfMuoLxa4CUX4yCdQVNJr1waZJCXt7ft0ppfltQwJmxi9zGNfbr
+	rB1WN3Q4PhuvPCIzImpbEjMJ/0rvvWM=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-127-3ehT5qksMqaYvuvFq6SAhg-1; Tue,
+ 03 Mar 2026 09:20:52 -0500
+X-MC-Unique: 3ehT5qksMqaYvuvFq6SAhg-1
+X-Mimecast-MFC-AGG-ID: 3ehT5qksMqaYvuvFq6SAhg_1772547649
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B940B1956095;
+	Tue,  3 Mar 2026 14:20:48 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 632EE1800590;
+	Tue,  3 Mar 2026 14:20:47 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 623EKkZo1889507
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 3 Mar 2026 09:20:46 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 623EKibS1889506;
+	Tue, 3 Mar 2026 09:20:44 -0500
+Date: Tue, 3 Mar 2026 09:20:44 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: John Garry <john.g.garry@oracle.com>, hch@lst.de, kbusch@kernel.org,
+        sagi@grimberg.me, axboe@fb.com, martin.petersen@oracle.com,
+        james.bottomley@hansenpartnership.com, hare@suse.com,
+        jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
+        snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/24] scsi-multipath: introduce basic SCSI device support
+Message-ID: <aabuPClNgSC6uO93@redhat.com>
+References: <20260225153627.1032500-1-john.g.garry@oracle.com>
+ <20260225153627.1032500-3-john.g.garry@oracle.com>
+ <aaT0Taxs6WgX6m-j@redhat.com>
+ <784abca8-9dc1-4fca-b72f-62d55b4cc3f1@oracle.com>
+ <aaZ0Kf9n79QF4gbR@redhat.com>
+ <003612c1-ff07-466c-93e8-d7766a9ec2db@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v2 0/3] Decoupling large folios dependency on THP
-To: Matthew Wilcox <willy@infradead.org>
-CC: Suren Baghdasaryan <surenb@google.com>, Mike Rapoport <rppt@kernel.org>,
-	David Hildenbrand <david@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	Michal Hocko <mhocko@suse.com>, Lance Yang <lance.yang@linux.dev>, "Lorenzo
- Stoakes" <lorenzo.stoakes@oracle.com>, Baolin Wang
-	<baolin.wang@linux.alibaba.com>, Dev Jain <dev.jain@arm.com>, Barry Song
-	<baohua@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nico Pache
-	<npache@redhat.com>, Zi Yan <ziy@nvidia.com>, Vlastimil Babka
-	<vbabka@suse.cz>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe
-	<axboe@kernel.dk>, <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<mcgrof@kernel.org>, <gost.dev@samsung.com>, <kernel@pankajraghav.com>,
-	<tytso@mit.edu>
-Content-Language: en-US
-From: Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <aaEsOu0hgCUznzl3@casper.infradead.org>
-Content-Type: text/plain; charset="UTF-8"; format="flowed"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CAMSPWEXC01.scsc.local (106.1.227.3) To
-	CAMSPWEXC02.scsc.local (106.1.227.4)
-X-CMS-MailID: 20260303141731eucas1p294a43af96c9468f35fc3b88ddda944b8
-X-Msg-Generator: CA
-X-RootMTR: 20260227053155eucas1p2b4b92cca44cefd084ae528fea27419d3
-X-EPHeader: CA
-cpgsPolicy: EUCPGSC10-065,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260227053155eucas1p2b4b92cca44cefd084ae528fea27419d3
-References: <20251206030858.1418814-1-p.raghav@samsung.com>
-	<CGME20260227053155eucas1p2b4b92cca44cefd084ae528fea27419d3@eucas1p2.samsung.com>
-	<aaEsOu0hgCUznzl3@casper.infradead.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <003612c1-ff07-466c-93e8-d7766a9ec2db@suse.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-
-
-On 2/27/2026 6:31 AM, Matthew Wilcox wrote:
-> On Sat, Dec 06, 2025 at 04:08:55AM +0100, Pankaj Raghav wrote:
->> There are multiple solutions to solve this problem and this is one of
->> them with minimal changes. I plan on discussing possible other solutions
->> at the talk.
+On Tue, Mar 03, 2026 at 09:01:04AM +0100, Hannes Reinecke wrote:
+> On 3/3/26 06:39, Benjamin Marzinski wrote:
+> > On Mon, Mar 02, 2026 at 11:39:28AM +0000, John Garry wrote:
+> > > On 02/03/2026 02:22, Benjamin Marzinski wrote:
+> > > > > diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
+> > > > > index 19d0884479a24..cfab7ad1e3c2c 100644
+> > > > > --- a/drivers/scsi/Kconfig
+> > > > > +++ b/drivers/scsi/Kconfig
+> > > > > @@ -76,6 +76,16 @@ config SCSI_LIB_KUNIT_TEST
+> > > > >    	  If unsure say N.
+> > > > > +config SCSI_MULTIPATH
+> > > > > +	bool "SCSI multipath support"
+> > > > At least until this supports ALUA, it should probably be marked
+> > > > EXPERIMENTAL, just so people trying it out aren't surprised if it
+> > > > doesn't multipath their device in the way they expect.
+> > > 
+> > > I think that ALUA support will be mainline acceptance criteria, and I am
+> > > looking to add it now.
+> > > 
+> > > BTW, Hannes suggested to not use the DH ALUA support, so that means to
+> > > separate out the core ALUA support from the DH stuff. So you have any
+> > > opinion on that approach?
+> > 
+> > I would (perhaps naively) have thought that the device handlers would be
+> > a useful abstraction for dealing with ALUA devices. But, Hannes knows
+> > this code much better than me. like I said before, I'm no scsi expert.
+> > 
+> The main point of the device handlers was to inject a 'start' command
+> whenever paths needed to be switched (Like you need to do for some
+> active/passive arrays).
+> But that really caused quite some issues with complexity, as you easily
+> can get into array path ping-pong on path failure with no I/O being
+> transmitted.
 > 
-> Here's an argument.  The one remaining caller of add_to_page_cache_lru()
-> is ramfs_nommu_expand_for_mapping().  Attached is a patch which
-> eliminates it ... but it doesn't compile because folio_split() is
-> undefined on nommu.
+> So for this implementation I would stick with implicit ALUA
+> (most modern implementations have done so already anyway), and
+> then there's no need using the device handlers.
+
+That makes sense. Limiting support to implicit ALUA significantly lowers
+the bar for getting ALUA working. AFAICS, It should just require getting
+the path selecting code right.
+
+-Ben
+
 > 
-> So either we need to reimplement all the good stuff that folio_split()
-> does for us, or we need to make folio_split() available on nommu.
+> Cheers,
 > 
-
-I had a question, one conclusion I came to was: folio splitting depends on THP, 
-so we either need to implement the split logic without THP dependency or just 
-make sure we don't split a large folio at all when we use large folio (what I 
-did in this RFC but not a great long term solution).
-
-So even if we implement folio_split without any dependency on THP, do we need to 
-re-implement or make folio_split available for nommu? I am also wondering how 
-nommu code is related to removing large folios dependency on THP.
-
---
-Pankaj
-
+> Hannes
+> -- 
+> Dr. Hannes Reinecke                  Kernel Storage Architect
+> hare@suse.de                                +49 911 74053 688
+> SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+> HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
