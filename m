@@ -1,188 +1,116 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3244B362121;
-	Tue,  3 Mar 2026 14:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764A33DEADE
+	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 14:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772547097; cv=none; b=Ka3io60gXCV0cloMsWmaNPyMgTG4iBehSPSF0OPjXQIxdqrKuffTN3cx5HEC9ya0jmqASkQfwF9GRHHGYXDJ9Fqkha1mYJwCUnF7aojmLxpzIdNDRXaquxCO2B8vW9zOWUejHn5lYZcj26BdvzhTaELFC3fkshmJvpdBrO/g6yA=
+	t=1772547462; cv=none; b=lzZ9CtWbwO4h+b9O72qLt05zvIsmZIOGJtnGj4pqiRzFmzEckE/qIZKWm+P+N+hq4L7ju3sFN9vTSoSBN+iwygv9xqOZpM85qXgRdZSEjIHTZwa+YwngqKmYloQrvcEoggJZxU8es+tSAO5cKNnQrdXrfrBY7aqQe9Yj6JU4ScM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772547097; c=relaxed/simple;
-	bh=gRb5Q9YI+ym8+95kKkS+hRTOyMkhQ5+z/S0MPFREgQ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=sN8+5pj3CvPFaOCkz8zCyV+ppT5rTReht2rcczZPW/Jf0dQWn+TUZUuh7itO2ReUVfrcS0MphHRqEJZJba4fgN7qeKDUrIne9cUeKlLj0eka/2B0gYLjWG0h3phbHwJicTo2qRKnJrhq+Hm/w7eSHkM9S+61XLuM9JBZj+px0No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=GSbjRNaI; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+	s=arc-20240116; t=1772547462; c=relaxed/simple;
+	bh=KXtPR45XlwA5t9dJ3rfNgFxtzZ9y5nb7ehtXyJUvGRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:From:In-Reply-To:
+	 Content-Type:References; b=STRxgzvBAx2C1qiCz3/xk4DU2nuYAmWIrq5HvB0m2dfEnm0ZjjywtyDXmurktvNB1zaygwXE9KfJiC73EdiBXQwa4XFEuxnWwdWF6XgAZnYOo2uTDXaLf4B4Sw/mPb07QkmQuGEwBtV0FyLwMksiqghISatikUSXvMvTPcw/oQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=nAHolJpm; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="GSbjRNaI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=/sc0gv5n3HTa2+ensifFm2Ixdrdjn5M3YKYyX65Jgk4=; b=GSbjRNaI9Tw45hJXi2j6h5lyh0
-	FKIRfkSEg7sgd3Oa9/LSEsSZNY2LoBDn86eWXkisWs0DJrjVq84IsOEA5QUMbsmTsYtl3ecEbNqpW
-	sc2I4Oqqz7bECQrsgpUTKqb+O1Ej9tblQiaHLvDGkG0wsOnH6XqEije+yRmEfzUJEvc1bOUkhgCoJ
-	HrzDsJzWkGGfV2zS9JlRIkZU9AE+aiMz395i4Ct/fRxQegnQ5iHxQ6fd2Ey9eGCgY4GAls2xXxtvW
-	ydszWVgq68Mg55w036Mt7EuOkcoum1LNeYHWFqArf7uhwGrzyR5aEJChG6mH+wLfDg3lPdMyO8XXG
-	7BrBMcLw==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vxQTD-00FEjl-P7; Tue, 03 Mar 2026 14:11:32 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 03 Mar 2026 06:11:15 -0800
-Subject: [PATCH v2] blk-cgroup: always display debug stats in io.stat
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="nAHolJpm"
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260303141732euoutp01bb7b9ff9b69a7a87ecd370dff96d15f9~ZWoQ7fs9J2737827378euoutp01I
+	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 14:17:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260303141732euoutp01bb7b9ff9b69a7a87ecd370dff96d15f9~ZWoQ7fs9J2737827378euoutp01I
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1772547452;
+	bh=yI63eG0TpyudB4EbuxKXYS2S0olMXbkfWRAVH8sYml4=;
+	h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+	b=nAHolJpmRCQ4gHFFWFKGXTt1mm4rLcsJZwxxRVqII9a8+aRkttC5F2e0ONfQcPxHw
+	 3JVo+Gtcdd248Xf0fW4Swmdfb+xq06oSLF0CjoSYEG/BzpexuQVYcWOeNUqJmrX3w1
+	 sIlwE2iFK4XGOA1aW7Y+5ZaIEhTK0qNMGjWb6dwo=
+Received: from eucas1p1.samsung.com (unknown [203.254.199.20]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20260303141731eucas1p2e2776e83eaddf31d46a04572d08ecb6d~ZWoQeWN_70751407514eucas1p24;
+	Tue,  3 Mar 2026 14:17:31 +0000 (GMT)
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260303141731eucas1p294a43af96c9468f35fc3b88ddda944b8~ZWoQMnWCl0751807518eucas1p20;
+	Tue,  3 Mar 2026 14:17:31 +0000 (GMT)
+Received: from CAMSPWEXC02.scsc.local (unknown [106.1.227.4]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260303141731eusmtip1a2108785e03078cd80aeba1cd79b3739~ZWoQEqtIM1956719567eusmtip1N;
+	Tue,  3 Mar 2026 14:17:31 +0000 (GMT)
+Received: from [106.210.248.154] (106.210.248.154) by CAMSPWEXC02.scsc.local
+	(106.1.227.4) with Microsoft SMTP Server (version=TLS1_2,
+	cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.39; Tue, 3 Mar
+	2026 14:17:29 +0000
+Message-ID: <6e86c417-c410-4deb-9b47-08e3d5d9be71@samsung.com>
+Date: Tue, 3 Mar 2026 15:17:29 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260303-blk_cgroup_debug_stats-v2-1-196c713cb762@debian.org>
-X-B4-Tracking: v=1; b=H4sIAAPspmkC/4WNSwqDMBQArxLe2pQkTetn1XsUEROfMW0xkhelR
- bx70R6gy4FhZgXC6JGgYitEXDz5MELFVMbADu3okPsOKgZKqKtQQnPzejbWxTBPTYdmdg2lNhH
- HQpqiyPvSngVkDKaIvX8f4Xv9Y5rNA23aa7sxeEohfo7zInfv72SRXHJRWpFftNFKq1uHxrfjK
- UQH9bZtX3GbGBbPAAAA
-X-Change-ID: 20260204-blk_cgroup_debug_stats-e81b887f9c30
-To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
- Josef Bacik <josef@toxicpanda.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- cgroups@vger.kernel.org, thevlad@meta.com, kernel-team@meta.com, 
- =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-f4305
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4080; i=leitao@debian.org;
- h=from:subject:message-id; bh=gRb5Q9YI+ym8+95kKkS+hRTOyMkhQ5+z/S0MPFREgQ4=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBppuwP/L99GgvgPkddfNY6PW3omGvIjY27ZpX0R
- mJO+rBeTJGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaabsDwAKCRA1o5Of/Hh3
- bZg+D/9bKc2EUQrurpSAhVc5Ua+wIhLsNFwKI7qtxGP+1uU+kaD0J2BDZiUynt2ot/DErQiBa18
- uE6Aa2E1FCKUObtbWI9Q/SfWQ0BjIjeM/cVPdyEPAq6V8KMxK+2OXagoVIEkLZVL7NRhIUorIy4
- D6WAnu8YQ5D6X+LPsGWUgXFEZEisGZZM422xVeFq8FklOYKIqpYbLQ6IfVczoT6QWzxfbPGnxtC
- +U49m38vV1AIWoxbJyuHOjKNMUyVmHLTy0oc96A/t1MSjICk6qdHRi4f9ttPnUBGMpoigtQBuXP
- NvhfOe6uq34//BpOA51ime/wSbgv8fMudkIUd4/IxhwxMvNfz3RHaVksqqa8w4Dec3ZTnRrMCYA
- /1yjYFyK0jBpKO4ibbItndhpLUP437EWB/DCQMfBIv81dWFkDpDo89l33tyr+MeCVJH7uIUkLjc
- LoQCiaz6Whm8DyAkMGZYGxf9EFNUeGsgGxU1ROUwrS600fe5BIS7VcqyIp7bMq9goAFLY9B4BkV
- 9s+060DLYQmW94lE5u2RzrhzwvwmlLmXa5pdoHZb40Mvq/1+/SA0jeMU9lpsdb1JIvLhySb+bxv
- YzAqybv4AZBY4IcY7YZHi23lxVqGeLijFtsvQvg+G0IFYEL+fbl4XBl8aNZ9Gv/IDIM7nsQ7vNq
- t1SK3Se4G9RyKew==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 0/3] Decoupling large folios dependency on THP
+To: Matthew Wilcox <willy@infradead.org>
+CC: Suren Baghdasaryan <surenb@google.com>, Mike Rapoport <rppt@kernel.org>,
+	David Hildenbrand <david@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Michal Hocko <mhocko@suse.com>, Lance Yang <lance.yang@linux.dev>, "Lorenzo
+ Stoakes" <lorenzo.stoakes@oracle.com>, Baolin Wang
+	<baolin.wang@linux.alibaba.com>, Dev Jain <dev.jain@arm.com>, Barry Song
+	<baohua@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Nico Pache
+	<npache@redhat.com>, Zi Yan <ziy@nvidia.com>, Vlastimil Babka
+	<vbabka@suse.cz>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe
+	<axboe@kernel.dk>, <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<mcgrof@kernel.org>, <gost.dev@samsung.com>, <kernel@pankajraghav.com>,
+	<tytso@mit.edu>
+Content-Language: en-US
+From: Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <aaEsOu0hgCUznzl3@casper.infradead.org>
+Content-Type: text/plain; charset="UTF-8"; format="flowed"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CAMSPWEXC01.scsc.local (106.1.227.3) To
+	CAMSPWEXC02.scsc.local (106.1.227.4)
+X-CMS-MailID: 20260303141731eucas1p294a43af96c9468f35fc3b88ddda944b8
+X-Msg-Generator: CA
+X-RootMTR: 20260227053155eucas1p2b4b92cca44cefd084ae528fea27419d3
+X-EPHeader: CA
+cpgsPolicy: EUCPGSC10-065,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260227053155eucas1p2b4b92cca44cefd084ae528fea27419d3
+References: <20251206030858.1418814-1-p.raghav@samsung.com>
+	<CGME20260227053155eucas1p2b4b92cca44cefd084ae528fea27419d3@eucas1p2.samsung.com>
+	<aaEsOu0hgCUznzl3@casper.infradead.org>
 
-Remove the blkcg_debug_stats toggle and always display detailed
-statistics in the cgroup io.stat file. This includes use_delay and
-delay_nsec information, cost.wait/cost.indebt/cost.indelay for iocost,
-and latency statistics for iolatency.
 
-The stats are already being collected regardless of the toggle, so
-gating their display provides no real benefit. Additionally, blk-cgroup
-has not been modularized since commit 32e380aedc3de ("blkcg: make
-CONFIG_BLK_CGROUP bool"), making the module parameter a historical
-artifact. Readers of the nested-keys format should be able to handle
-additional fields.
 
-Before (without blkcg_debug_stats enabled):
-  253:0 rbytes=6273024 wbytes=0 rios=20 wios=0 dbytes=0 dios=0 cost.usage=0
+On 2/27/2026 6:31 AM, Matthew Wilcox wrote:
+> On Sat, Dec 06, 2025 at 04:08:55AM +0100, Pankaj Raghav wrote:
+>> There are multiple solutions to solve this problem and this is one of
+>> them with minimal changes. I plan on discussing possible other solutions
+>> at the talk.
+> 
+> Here's an argument.  The one remaining caller of add_to_page_cache_lru()
+> is ramfs_nommu_expand_for_mapping().  Attached is a patch which
+> eliminates it ... but it doesn't compile because folio_split() is
+> undefined on nommu.
+> 
+> So either we need to reimplement all the good stuff that folio_split()
+> does for us, or we need to make folio_split() available on nommu.
+> 
 
-After:
-  253:0 rbytes=6273024 wbytes=0 rios=20 wios=0 dbytes=0 dios=0 cost.usage=0 cost.wait=0 cost.indebt=0 cost.indelay=0
+I had a question, one conclusion I came to was: folio splitting depends on THP, 
+so we either need to implement the split logic without THP dependency or just 
+make sure we don't split a large folio at all when we use large folio (what I 
+did in this RFC but not a great long term solution).
 
-Suggested-by: Michal Koutný <mkoutny@suse.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Changes in v2:
-- Remove blkcg_debug_stats instead of creating a CONFIG_ to set it. (Michal)
-- Link to v1: https://patch.msgid.link/20260204-blk_cgroup_debug_stats-v1-1-09c0754b4242@debian.org
----
- block/blk-cgroup.c    | 6 +-----
- block/blk-cgroup.h    | 1 -
- block/blk-iocost.c    | 9 ++++-----
- block/blk-iolatency.c | 3 ---
- 4 files changed, 5 insertions(+), 14 deletions(-)
+So even if we implement folio_split without any dependency on THP, do we need to 
+re-implement or make folio_split available for nommu? I am also wondering how 
+nommu code is related to removing large folios dependency on THP.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index b70096497d389..8b89a1ce6927a 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -56,8 +56,6 @@ static struct blkcg_policy *blkcg_policy[BLKCG_MAX_POLS];
- 
- static LIST_HEAD(all_blkcgs);		/* protected by blkcg_pol_mutex */
- 
--bool blkcg_debug_stats = false;
--
- static DEFINE_RAW_SPINLOCK(blkg_stat_lock);
- 
- #define BLKG_DESTROY_BATCH_SIZE  64
-@@ -1209,7 +1207,7 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
- 			dbytes, dios);
- 	}
- 
--	if (blkcg_debug_stats && atomic_read(&blkg->use_delay)) {
-+	if (atomic_read(&blkg->use_delay)) {
- 		seq_printf(s, " use_delay=%d delay_nsec=%llu",
- 			atomic_read(&blkg->use_delay),
- 			atomic64_read(&blkg->delay_nsec));
-@@ -2246,5 +2244,3 @@ bool blk_cgroup_congested(void)
- 	return ret;
- }
- 
--module_param(blkcg_debug_stats, bool, 0644);
--MODULE_PARM_DESC(blkcg_debug_stats, "True if you want debug stats, false if not");
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index 1cce3294634d1..ac38bc3e2486b 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -189,7 +189,6 @@ struct blkcg_policy {
- };
- 
- extern struct blkcg blkcg_root;
--extern bool blkcg_debug_stats;
- 
- void blkg_init_queue(struct request_queue *q);
- int blkcg_init_disk(struct gendisk *disk);
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index d145db61e5c31..a913e67d0f695 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -3060,11 +3060,10 @@ static void ioc_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
- 
- 	seq_printf(s, " cost.usage=%llu", iocg->last_stat.usage_us);
- 
--	if (blkcg_debug_stats)
--		seq_printf(s, " cost.wait=%llu cost.indebt=%llu cost.indelay=%llu",
--			iocg->last_stat.wait_us,
--			iocg->last_stat.indebt_us,
--			iocg->last_stat.indelay_us);
-+	seq_printf(s, " cost.wait=%llu cost.indebt=%llu cost.indelay=%llu",
-+		iocg->last_stat.wait_us,
-+		iocg->last_stat.indebt_us,
-+		iocg->last_stat.indelay_us);
- }
- 
- static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 53e8dd2dfa8ad..e99abc97050a0 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -946,9 +946,6 @@ static void iolatency_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
- 	unsigned long long avg_lat;
- 	unsigned long long cur_win;
- 
--	if (!blkcg_debug_stats)
--		return;
--
- 	if (iolat->ssd)
- 		return iolatency_ssd_stat(iolat, s);
- 
+--
+Pankaj
 
----
-base-commit: d517cb8cea012f43b069617fc8179b45404f8018
-change-id: 20260204-blk_cgroup_debug_stats-e81b887f9c30
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
 
