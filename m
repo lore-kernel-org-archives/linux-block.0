@@ -1,66 +1,80 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A733859D4
-	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 06:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001E93016E9
+	for <linux-block@vger.kernel.org>; Tue,  3 Mar 2026 07:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772521037; cv=none; b=T921HX2JolOMNlo4noW77eU93zFXHcGX8Z/nn4a4BXs7fiYt29k8hCp0z5sutCEmD5Oyvsd+lOXkBkPkUC3i0SBjK4cMTKrJEXd0z3PkTOe3SFEbV+mfmXjjxYEsbKkuoEssCR8EtLB3LKJKpdZLi35sWCtG7j0Ut5cprzkk6j8=
+	t=1772521511; cv=none; b=lsQw/rqSO8A4UZRz/j7zOfGr31dUpRAFyaBsRA1IXd2h/kc/E98GSj2iLBMAS2qUXdf7rnkLBc4WmUdfaxrL+L6V0EVown2ETEg24Z+TGTpClfsqfqsTBAzsb9KrMcdqxzAOJMhNuLxVMUk2qC3r1u/GPXzjPcjvh2J7vKfdsPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772521037; c=relaxed/simple;
-	bh=brmgYvldAEzJ2O8fsEmwzrbBh4ultBTeueXu8bmByKQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ctiXU75Dc2PA1ZalSxiAL+QCCFfwEjllpMlHu8sQQBlZOwkojg1gx4tg5li1nJraXeoYmXTiq97pbX1F7Q7b7SjxtQU7iAGbBiD7eWN3i9XcZo4UzSpmVqAFFVsYiZWnLRlWI85nbFKN9MEWIOUNfD+urFYPxWY416KgixHO1Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=cFpmwWab; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1772521511; c=relaxed/simple;
+	bh=OK85ODcXSI14pHW0qavR2jzAcmcSAt2oan2mNZv/Brs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=BHJkM/Mm5oaGX2avQS1dzAO3tvK10NbMtTcYI++Tu3kw+qKjKS7NBpukjlSvWpp3xEJILh5OXvK+OIba12mkAl3pwDHf+Yy7PU2faDdR2zIHbMszhiZRSyFzsT/efaB9w9w2htTt2mGo81sTM3+M68rsYOaIjEb6vYPzbp7D/sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b7bGWMoL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hCBv1slS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=cdiT0o1t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=G6vp1Oyj; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="cFpmwWab"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-439b8a3f2bcso1295763f8f.3
-        for <linux-block@vger.kernel.org>; Mon, 02 Mar 2026 22:57:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1772521034; x=1773125834; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+UWoE6mn2375qZ/+kFXj+S+YU2oT2pZiLz3gYYgeg/c=;
-        b=cFpmwWabk3Yww6ESHhDeYJi2bD22oPTWIhv36cwI0qbC3LM0/boXyXsa1yojvCJMMX
-         BT0sEj+CAPryDqJlE9sZ8IpBg5cgK3Z7ahS989YrIhpkST/4T/vPIdkruCG+CpIwwuT2
-         LxUEOsJsN+j8OYxlrh/zIKcMpWP0Ju9rMszdPwobV393pfm/4Rtaqeq9CvZ8c12yfvfp
-         FXI64GaowLdgEWAUzFXrhKHFEe89BY779V2U93522leikCVtf1OIiyg+2KTBhw+tGHG+
-         KLndZ9C8sFFHvKGeMNVQziXl/lDqU+Qox7g1etwpEKJqfhuok1FY1h3tzUJG/9cVxsHB
-         Mk1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772521034; x=1773125834;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+UWoE6mn2375qZ/+kFXj+S+YU2oT2pZiLz3gYYgeg/c=;
-        b=k4/RuRWH8VOFpOalR3h9CfcUgsrWbNmYbHI1lmtEnKWEylixERUfM//VcVCfYqX0BV
-         5bz4TCpHAH26FZeqd8POElqOokXOy1ynLUfy/1ygCJitfuZsjhW4cDtjXPGeFM75IZSY
-         KNyO+3Ph/rGZ0boYOBN1hswKCHIkKv6rT+C3CkrpIHb7UwB9ezTihuO93O7gcZJqQ6q7
-         thOdCLSxWlEIEli+w1RG2EVohdQmciwneEMJtYfAdQVmhxsu8lb2VINgxy7twPSeiQCj
-         5Ap8GUCcuBjs+dO0cOcIbmfjfaaqLRybKW7wDtj6rh9TS1wuUKdp7l2EqsFTYzDEJ+JF
-         xxUA==
-X-Forwarded-Encrypted: i=1; AJvYcCVqLlCM/qYWO6v1pdyvEqVChSlGrrZoGN23d/wRvcIYJaT1xDxAWtL48aRnc0/biBhwcwmeVzpLA5AbTQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXCTjw2t+wHE9y6JHTZcjIL9pQRwI3yl7B/MTldWfsxFQbgQd0
-	slITXC0KhSdLEfTEn7ySbhxF8eQT9iyPXmB9T7iK5xmzx3q8qU9rJDbaumibNIbvuvs=
-X-Gm-Gg: ATEYQzwVUz7BHjTzKo/AX+9KXONbDXYA1ljNhMlHTVU/h+aTx0okpQeIKDXHvUSutjZ
-	m+esvsIQJ2flCcWKzvHU/URpSHHiLxwYj6NJtVG9qgjvLXKBz7sSXZc1g9ugBzxgLWICwF2kPzR
-	QFWmsTjDbj99wfwVGJDhw7sEgPbVtupKyRk1n/rdY7njHaHQUC7hRMHIUXXOnh9MykvLR6yoziS
-	WI6m7nHFtsavyMW1nm79jsfaufFC1rRxum5hr32GpizkjF6rDziOwjk8GUBDdQEGA8nDl3HcLhv
-	gg/CCq72swgJ5sSEvldwvDi8rfwzA7XNIV0oD4iRwa6bSlAAH5Q+d0sijVYfpim+T+jRlTZ6/xt
-	AVPwjYxh0XQMspTylYhjSfhzIIVTxeYPeN78KUDwZJ4hLkmHJKv8bycSbC+Ttdq/EjzrGzqYmjT
-	aalPK0DxdmGeAKxDIBSHmDJ4MTt5hlUfQIIf9ij/HJohGCtREKPoF+75XwiXGIcw9GCw==
-X-Received: by 2002:a05:600c:8108:b0:483:7907:ea02 with SMTP id 5b1f17b1804b1-483c9bfa9eamr271767355e9.16.1772521034082;
-        Mon, 02 Mar 2026 22:57:14 -0800 (PST)
-Received: from [192.168.178.47] (aftr-82-135-83-117.dynamic.mnet-online.de. [82.135.83.117])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485132f202bsm16289535e9.0.2026.03.02.22.57.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2026 22:57:13 -0800 (PST)
-Message-ID: <e22f5444-f8ff-4c91-b9ab-fa95714f2df7@suse.com>
-Date: Tue, 3 Mar 2026 07:57:12 +0100
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b7bGWMoL";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hCBv1slS";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="cdiT0o1t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="G6vp1Oyj"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D9CBC3F82F;
+	Tue,  3 Mar 2026 07:05:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772521508; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SbqtGQb2uRnaIeW2MpYChMLVJcwORfI33Kj45iR5gD8=;
+	b=b7bGWMoLOoDCZ26WjcpqihlrGzrArS2YeOhAXLEKm5snTwFGoZVqkZ8XCkQJIk3VleLja6
+	dSO/ktVRHj1VHBGHNtaNsBi2SSmGDZ0FfpDJOPspMRsmvBDDTFcjgPko5UmfEEkO1kH/YO
+	q3FO9HHRDUYRrnRqpo/x3UhrspaowLY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772521508;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SbqtGQb2uRnaIeW2MpYChMLVJcwORfI33Kj45iR5gD8=;
+	b=hCBv1slS+nbBHnG32l+Y5Nc/BsLk9YqcZV5QF+5TH+iyedtJVK7fAYvYHU3F5XuLmVW6Hg
+	5ggeAEQdM+3JuAAA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772521507; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SbqtGQb2uRnaIeW2MpYChMLVJcwORfI33Kj45iR5gD8=;
+	b=cdiT0o1tQF4nCZN2lEtBxgukeo3434zDN8hmYw3dTOybk1kMrAwbpBUOzRGkpkCa29Y5IZ
+	7SqnSzwY6tYvFD3Xrcro3bFLKXNykay6t5c22n2TNsPIy+2/w/unLaur3sxrquFoltJArI
+	gSBLP6Sersr4fFGye5MSSvzSLNi9d9E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772521507;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SbqtGQb2uRnaIeW2MpYChMLVJcwORfI33Kj45iR5gD8=;
+	b=G6vp1Oyj0nd2IqH6dGlJSzy0/UfhTeBd3Uk6Lgm58EZK1e+QazOV8G3wPnzDf1PSSDt+Ro
+	N4M+SeFm945QbBDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2BF7D3EA69;
+	Tue,  3 Mar 2026 07:05:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id toBfCCOIpmmDLwAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 03 Mar 2026 07:05:07 +0000
+Message-ID: <a8851c28-bd31-47e3-9af9-e299ed0780cb@suse.de>
+Date: Tue, 3 Mar 2026 08:05:06 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,49 +82,72 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/24] scsi-multipath: introduce basic SCSI device support
-To: John Garry <john.g.garry@oracle.com>, hch@lst.de, kbusch@kernel.org,
- sagi@grimberg.me, axboe@fb.com, martin.petersen@oracle.com,
- james.bottomley@hansenpartnership.com
-Cc: jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
- linux-scsi@vger.kernel.org, michael.christie@oracle.com, snitzer@kernel.org,
- bmarzins@redhat.com, dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260225153627.1032500-1-john.g.garry@oracle.com>
- <20260225153627.1032500-3-john.g.garry@oracle.com>
+Subject: Re: [PATCH] block: remove bdev_nonrot()
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Song Liu <song@kernel.org>,
+ Yu Kuai <yukuai@fnnas.com>, linux-raid@vger.kernel.org,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+ David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+ Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+ Andreas Dilger <adilger.kernel@dilger.ca>,
+ Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
+ Kairui Song <kasong@tencent.com>, linux-mm@kvack.org
+References: <20260226075448.2229655-1-dlemoal@kernel.org>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.com>
-In-Reply-To: <20260225153627.1032500-3-john.g.garry@oracle.com>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260226075448.2229655-1-dlemoal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 
-On 2/25/26 16:36, John Garry wrote:
-> For a scsi_device to support multipath, introduce structure
-> scsi_mpath_device to hold multipath-specific details.
+On 2/26/26 08:54, Damien Le Moal wrote:
+> bdev_nonrot() is simply the negative return value of bdev_rot().
+> So replace all call sites of bdev_nonrot() with calls to bdev_rot()
+> and remove bdev_nonrot().
 > 
-> Like NS structure for NVME, scsi_mpath_device holds the mpath_device
-> structure to device management and path selection.
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>   drivers/md/raid1.c                  | 2 +-
+>   drivers/md/raid10.c                 | 2 +-
+>   drivers/md/raid5.c                  | 2 +-
+>   drivers/target/target_core_file.c   | 2 +-
+>   drivers/target/target_core_iblock.c | 2 +-
+>   fs/btrfs/volumes.c                  | 4 ++--
+>   fs/ext4/mballoc-test.c              | 2 +-
+>   fs/ext4/mballoc.c                   | 2 +-
+>   include/linux/blkdev.h              | 5 -----
+>   mm/swapfile.c                       | 2 +-
+>   10 files changed, 10 insertions(+), 15 deletions(-)
 > 
-> Two module params are introduced to enable multipath:
-> - scsi_multipath
-> - scsi_multipath_always
-> 
-> SCSI multipath will only be available until the following conditions:
-> - scsi_multipath enabled and ALUA supported and unique ID available in
->    VPD page 83.
-> - scsi_multipath_always enabled and unique ID available in VPD page 83
-> 
-Why don't you merge these two options, and have
-scsi_multipath=on
-and
-scsi_multipath=always
-?
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
 Cheers,
 
 Hannes
 -- 
 Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.com                               +49 911 74053 688
+hare@suse.de                                +49 911 74053 688
 SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
 HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
