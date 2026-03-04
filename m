@@ -1,56 +1,64 @@
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E4A3CCA07
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554E838657C
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772653743; cv=none; b=Q9U/AXmvTrNtK5ivw+rxrfPEvm3Y8O3COrUxZCRQtwsUBQ17JD8Jq0Uv5C69ULTs7vyuQYtpIOH+/HW1icbOFxI+jctLfMZAxFp3QQ1e4gtHVvWPtsyA0Bag3AMaU7pzPe2t+o8z20aas5zru0y8/LHu6jvQq36Gcrcf8B9AhcA=
+	t=1772653747; cv=none; b=AQC5IhjHtiHstmyS1JWRQXdXkQyelH33XLK74l+XDj80NK7myRGvCu/wP7KUkoMmJ4gniiTnzmsEvuDgOfgqyPEG3YEHy/G8ZhP0LgANaKaGvyQ2Bxwpd4hNJUjb5I67NjQ34TlikikWUko78PMlc0wBiAknr+t6NFIEy3RMURc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772653743; c=relaxed/simple;
-	bh=Uf0dbPMpeXsXGa69WrDxZiv2IN18mXiCQRtTZ6Sb1gA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=siuEn4mup13mQYt5hc4QQO5vZtj3VxxEXC6OttCb/SOQASwIE8X6F0mDtE1Fa3EZgdZwoOGys2f8XhC5rqkxUfRfLKtjf3QJmDUHBU4ZAgRutHuDbY5YRic+D9TivSblfmgVTA6v92sSKrGlddYACS6U8c8lrK2qO3RfmAMzieI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=W2syi55h; arc=none smtp.client-ip=199.89.1.14
+	s=arc-20240116; t=1772653747; c=relaxed/simple;
+	bh=OUcLerF14RC+NdTM+rfTeKQUatoGXTRtKadZdfn5cxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D0FyUNnh+K98NQcZ1+AZ03VicsAZLyR0pgPjG4vheFbVa0BK9v+XXot5bN6Z5FSgpLJeju1BOuPYodX5YmM5R6YF8XF8dbytWYlvdllEq5umpMS4lj9FSXr45KTvHEeq1ddkOinx5VYmqhcidpd+d1BOtsDp1QY8Z25igAEUtGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=qO8C9O28; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="W2syi55h"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="qO8C9O28"
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR3C164ybz1XM0pH;
-	Wed,  4 Mar 2026 19:49:01 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR3C56KRlz1XM0pH;
+	Wed,  4 Mar 2026 19:49:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:mime-version
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1772653736; x=1775245737; bh=wrTqR
-	ailX3WzInCczkv+MgmHJXIQDkqn25mHBO3AMM4=; b=W2syi55h+0hH2JA015CwM
-	tB8tPzLQeuGpu6a/o111Der+bO5ENuUjx54TmEUugBN+V8XgKrtgWevu5Z5upS+s
-	0rBudwwRGmaLDcx690VclXtxqlHSbX0gxtvWGSUotXWYTNvO4tymRukn+0BGMdpD
-	nJ+2KZh2Bp7Phw+xZSMbIKEEXFUr8Qlje7ND+7ZKBNNIStI2FNFV5Pny7l8W6E6A
-	74EqRDzlWkRqfPWxSBSP1KerBJoTCPeiaQ545OAup0m8UVWBuOME8HY49nlpKT8I
-	owD4+B0Yw/RCxOW+Or7k1q/udQuJMOCz++hplsUhIdHEC+DA5eiXXhqNWjoh2ctV
-	Q==
+	:references:in-reply-to:x-mailer:message-id:date:date:subject
+	:subject:from:from:received:received; s=mr01; t=1772653740; x=
+	1775245741; bh=nQSYXZga5E6QxePLEpqTnGRazvQOE7vvfCXFQNXDZSs=; b=q
+	O8C9O28cevPlCaj4Ji7DcnOU6RUQvq1Tx84WZJO7z/T+OUQ7xm+AME4BYmQ4STRq
+	fPcFSAZG2ObAfobMHD+n/0fkcHfiz9pzxMp/2vr1QX3+4s87r+Gl/mG56P31r8Ia
+	tkzvirBcv3QsTzFYCyaZXPzAYgUwDK9LHFGv9zykFstcLWLgF7atyr6vs1dSsl/0
+	hOpNSM/zMNVywko5xFjaSN6N+kOcw/DiosBxCahrOTvi4i9yUKpplSGa4UKSVcDw
+	P1XIu2w+Bse7lGDNOItTdgZr6FyOjMkJFtQE6eEA4vY/L+r+XvoMSBaLQqLZL1ua
+	buSd+Sm9GZzLnctPJ5WMQ==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id gVArRNv4kj8H; Wed,  4 Mar 2026 19:48:56 +0000 (UTC)
+ id SljoZ6_RsgYZ; Wed,  4 Mar 2026 19:49:00 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR3Bv31qlz1XM5kt;
-	Wed,  4 Mar 2026 19:48:54 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR3Bx2WLbz1XM6JV;
+	Wed,  4 Mar 2026 19:48:57 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Christoph Hellwig <hch@lst.de>,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Marco Elver <elver@google.com>,
 	linux-block@vger.kernel.org,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 00/14] Enable lock context analysis
-Date: Wed,  4 Mar 2026 11:48:19 -0800
-Message-ID: <20260304194843.760669-1-bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Andreas Gruenbacher <agruen@linbit.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 01/14] drbd: Balance RCU calls in drbd_adm_dump_devices()
+Date: Wed,  4 Mar 2026 11:48:20 -0800
+Message-ID: <20260304194843.760669-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+In-Reply-To: <20260304194843.760669-1-bvanassche@acm.org>
+References: <20260304194843.760669-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,91 +68,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jens,
+Make drbd_adm_dump_devices() call rcu_read_lock() before
+rcu_read_unlock() is called. This has been detected by the Clang
+thread-safety analyzer. Compile-tested only.
 
-During the most recent merge window the following patch series has been m=
-erged:
-[PATCH v5 00/36] Compiler-Based Context- and Locking-Analysis
-(https://lore.kernel.org/lkml/20251219154418.3592607-1-elver@google.com/)=
-. That
-patch series drops support for verifying lock context annotations with sp=
-arse
-and introduced support for verifying lock context annotations with Clang.=
- The
-support in Clang for lock context annotation and verification is better t=
-han
-that in sparse. Hence this patch series that enables lock context analysi=
-s for
-the block layer core and all block drivers.
+Tested-by: Christoph B=C3=B6hmwalder <christoph.boehmwalder@linbit.com>
+Cc: Andreas Gruenbacher <agruen@linbit.com>
+Fixes: a55bbd375d18 ("drbd: Backport the "status" command")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/block/drbd/drbd_nl.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-The first patch in this series fixes a bug discovered in DRBD while enabl=
-ing
-lock context analysis.
-
-Please consider this patch series for the upstream kernel.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (14):
-  drbd: Balance RCU calls in drbd_adm_dump_devices()
-  blk-ioc: Prepare for enabling thread-safety analysis
-  block: Make the lock context annotations compatible with Clang
-  aoe: Add a lock context annotation
-  drbd: Make the lock context annotations compatible with Clang
-  loop: Add lock context annotations
-  nbd: Add lock context annotations
-  null_blk: Add more lock context annotations
-  rbd: Add lock context annotations
-  rnbd: Add more lock context annotations
-  ublk: Fix the lock context annotations
-  zloop: Add a lock context annotations
-  zram: Add lock context annotations
-  block: Enable lock context analysis for all block drivers
-
- block/Makefile                     |  2 ++
- block/bdev.c                       |  7 +++--
- block/blk-cgroup.c                 |  7 +++--
- block/blk-crypto-profile.c         |  2 ++
- block/blk-ioc.c                    |  2 +-
- block/blk-iocost.c                 |  2 ++
- block/blk-mq-debugfs.c             | 12 ++++----
- block/blk-zoned.c                  |  1 +
- block/blk.h                        |  4 +++
- block/ioctl.c                      |  1 +
- block/kyber-iosched.c              |  4 +--
- block/mq-deadline.c                |  8 +++---
- drivers/block/Makefile             |  2 ++
- drivers/block/aoe/Makefile         |  2 ++
- drivers/block/aoe/aoecmd.c         |  1 +
- drivers/block/drbd/Makefile        |  3 ++
- drivers/block/drbd/drbd_bitmap.c   | 20 +++++++------
- drivers/block/drbd/drbd_int.h      | 46 ++++++++++++++----------------
- drivers/block/drbd/drbd_main.c     | 45 ++++++++++++++++++++++-------
- drivers/block/drbd/drbd_nl.c       | 13 ++++++---
- drivers/block/drbd/drbd_receiver.c | 20 +++++++------
- drivers/block/drbd/drbd_req.c      |  2 ++
- drivers/block/drbd/drbd_state.c    |  3 ++
- drivers/block/drbd/drbd_worker.c   |  6 ++--
- drivers/block/loop.c               |  4 +++
- drivers/block/mtip32xx/Makefile    |  2 ++
- drivers/block/nbd.c                |  3 ++
- drivers/block/null_blk/Makefile    |  2 ++
- drivers/block/null_blk/main.c      |  7 +++--
- drivers/block/null_blk/zoned.c     |  2 ++
- drivers/block/rbd.c                |  7 +++++
- drivers/block/rnbd/Makefile        |  2 ++
- drivers/block/rnbd/rnbd-clt.c      |  2 ++
- drivers/block/ublk_drv.c           |  6 +++-
- drivers/block/xen-blkback/Makefile |  3 ++
- drivers/block/zloop.c              |  1 +
- drivers/block/zram/Makefile        |  2 ++
- drivers/block/zram/zcomp.c         |  3 +-
- drivers/block/zram/zcomp.h         |  6 ++--
- drivers/block/zram/zram_drv.c      |  1 +
- include/linux/backing-dev.h        |  2 ++
- include/linux/blkdev.h             | 11 +++++--
- include/linux/bpf.h                |  1 +
- 43 files changed, 197 insertions(+), 85 deletions(-)
-
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index e201f0087a0f..728ecc431b38 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -3378,8 +3378,10 @@ int drbd_adm_dump_devices(struct sk_buff *skb, str=
+uct netlink_callback *cb)
+ 		if (resource_filter) {
+ 			retcode =3D ERR_RES_NOT_KNOWN;
+ 			resource =3D drbd_find_resource(nla_data(resource_filter));
+-			if (!resource)
++			if (!resource) {
++				rcu_read_lock();
+ 				goto put_result;
++			}
+ 			cb->args[0] =3D (long)resource;
+ 		}
+ 	}
+@@ -3628,8 +3630,10 @@ int drbd_adm_dump_peer_devices(struct sk_buff *skb=
+, struct netlink_callback *cb)
+ 		if (resource_filter) {
+ 			retcode =3D ERR_RES_NOT_KNOWN;
+ 			resource =3D drbd_find_resource(nla_data(resource_filter));
+-			if (!resource)
++			if (!resource) {
++				rcu_read_lock();
+ 				goto put_result;
++			}
+ 		}
+ 		cb->args[0] =3D (long)resource;
+ 	}
