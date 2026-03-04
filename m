@@ -1,33 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299052D8DA8
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 20:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260A0361DAB
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 20:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772655907; cv=none; b=pM+Fp3Z4Ts4EDGMCT13ak+0OSri+NtX//2MJ/hUm5R+yfda9VyQOAylyqxiLlqva96b11vUiemMsAVTIX4hGM2nyeGksRNNuAI3HrfWJ6ooaq/XaB9b1r3X3jARHSvPMIHdXVl1tN8B+2woWXd6ZTyAORubuDNMZ5IF1Pw0EB0M=
+	t=1772656163; cv=none; b=ifb1oOXFceYi7Suu60mzNIBCuP/PL3BSrBfHllCaOTDnwsWWmu8l8Af9IGegthmVtyppZSyS8wk0Le0IYtjdsKqathw7x8TnVkxsEa22uz5tsiXFaaSR1QSwTHGHH5s+VvQcBR3TH53ae+Lwp6HhsmhVmcuVhltmlFEyWULUtnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772655907; c=relaxed/simple;
-	bh=pOUxmRBpGQP60VOcs1zQ0MqbWgMvFmHVtSB5zL6dgJM=;
+	s=arc-20240116; t=1772656163; c=relaxed/simple;
+	bh=K6yxeuOPTkK9WYTQomSuJKp/AEo8GhOr0vcTI0vQFSw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jq+epvLL0SUU2oZuPpUz99ZiVN6iG6oh993pceYzd4BGgDLX4Q1usDFlwFirMvew3L5ErJn89ff+zAnD5b4lDV++Wuptp6kxAyZlo7k6XZwQoL1pOY8PzmR2hfsXjl18Mi3ED/p7vXUr6G5izM8UoI7NLHbetIDqjWmoHnBeaEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=td/i951A; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=DbckpXC4CMWoV9bo/qzD1aC2FJiw7rMYF/XOsgYj0bmNcsMlTFrXaXxAaKN4nTbhjKbjM3eakoNC++OBCGmAbvnw0vyF9kDK+TYkRzJgR6DCf9vb0W2kiMyrUUQ4vmfuDxwUWXt/dpjacusrXP564wV0ues0/Y8uGNTWnPCOFvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2w0r0ZVQ; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="td/i951A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E393C19425;
-	Wed,  4 Mar 2026 20:25:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772655906;
-	bh=pOUxmRBpGQP60VOcs1zQ0MqbWgMvFmHVtSB5zL6dgJM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=td/i951AI50+Q7QKfBEjikWRAiSXLQl2xq67L0tQpTDEMXOtacOEds+w4/pOZ32Hz
-	 QOMsb98RQuRS33/7YvOI4bpv8FmrRlF7ZxnJ8o79rJoK/sXK8UFwL9vvwgtdhgCf4r
-	 xogapVBYeRJkR2mDULPGjWfGeB7nUjjFbjJVX9y6aayPSbfUtExvQ6Xv46IJJF5S43
-	 CFoWCPY/A464gd3TVW69DxM2VNHSoexxpIiCqkMamd1jc7+7OtX+Fi3vp8q+iAU0S2
-	 WweyZ1PRJ7thIY759IjMoPP2I2AN9ehQrrd25INxXrGBiICbLCRoeibS2//NaLjYLN
-	 5SRPRvrOmGKfQ==
-Message-ID: <8650044e-595d-4058-9b67-25cc545bc302@kernel.org>
-Date: Thu, 5 Mar 2026 05:25:03 +0900
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2w0r0ZVQ"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR45Y4q6Cz1XM0p0;
+	Wed,  4 Mar 2026 20:29:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1772656153; x=1775248154; bh=UZR7uovX52MtB0hQ5X1P9Yuo
+	kOp6fDjExEQh4vmGpcs=; b=2w0r0ZVQcxxAzHkyeHR8WUxrVimMN4ESkH8Ao5P/
+	o72IqUaX77Wi38vxgR+v4CuQs6NFKZhSV5MeKS/d9evwT3baLtdZfOcDIE0GKoWJ
+	J0fHepoNCgPxX4hZLjO8BGLeDghfdIkOyWV5MyDvqh5BkpMAkruTMbLaCocZqAZ4
+	vxnrkoVG4UWO+MRqzLiMK262vk9RuuR+3Xz4oTZ459gN7l9dhkaqqYhnTgqHF3KK
+	QFiG52ae3P9LIgix6/zEiM/XdayHJDC1wzofkdq0OqcNSpAl9iWyvdx4UlQTLtAF
+	KBaggycwFvqhXcEeF6wBfHczTV5t1ctASKv+5Mf6YuPR3g==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ndoRFqO25wca; Wed,  4 Mar 2026 20:29:13 +0000 (UTC)
+Received: from [192.168.132.187] (unknown [12.150.89.26])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR45J6wfNz1XM5kt;
+	Wed,  4 Mar 2026 20:29:08 +0000 (UTC)
+Message-ID: <dfa02afc-b517-43cf-a136-4c5d464fc457@acm.org>
+Date: Wed, 4 Mar 2026 14:29:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,37 +50,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/14] drbd: Balance RCU calls in drbd_adm_dump_devices()
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Marco Elver <elver@google.com>,
- linux-block@vger.kernel.org,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Andreas Gruenbacher <agruen@linbit.com>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH 03/14] block: Make the lock context annotations compatible
+ with Clang
+To: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>,
+ linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Miklos Szeredi <mszeredi@redhat.com>, Christian Brauner
+ <brauner@kernel.org>, Andreas Gruenbacher <agruenba@redhat.com>,
+ Joanne Koong <joannelkoong@gmail.com>, Mateusz Guzik <mjguzik@gmail.com>
 References: <20260304194843.760669-1-bvanassche@acm.org>
- <20260304194843.760669-2-bvanassche@acm.org>
+ <20260304194843.760669-4-bvanassche@acm.org>
+ <aaiP-EE4M0iywHzc@slm.duckdns.org>
 Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20260304194843.760669-2-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <aaiP-EE4M0iywHzc@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 3/5/26 04:48, Bart Van Assche wrote:
-> Make drbd_adm_dump_devices() call rcu_read_lock() before
-> rcu_read_unlock() is called. This has been detected by the Clang
-> thread-safety analyzer. Compile-tested only.
+On 3/4/26 2:03 PM, Tejun Heo wrote:
+> On Wed, Mar 04, 2026 at 11:48:22AM -0800, Bart Van Assche wrote:
+>> Clang is more strict than sparse with regard to lock context annotation
+>> checking. Hence this patch that makes the lock context annotations
+>> compatible with Clang. __release() annotations have been added below
+>> invocations of indirect calls that unlock a mutex because Clang does not
+>> support annotating function pointers with __releases().
+>>
+>> Enable context analysis in the block layer Makefile.
 > 
-> Tested-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-> Cc: Andreas Gruenbacher <agruen@linbit.com>
-> Fixes: a55bbd375d18 ("drbd: Backport the "status" command")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> Maybe I'm in the minority here but are these annotations actually useful?
+> What do these capture that lockdep can't? Can we just remove these?
 
-This probably should be sent independently of this series and immediately as
-this look like a serious bug.
+Every Linux kernel release cycle new locking bugs are introduced, often
+in error paths. Clang can detect many of these bugs at compile time.
+This is why I would like to enable lock context analysis for the entire
+kernel tree. This patch series only covers the block layer and block
+drivers. The entire patch series (needs to be split further) is
+available here: https://github.com/bvanassche/linux/tree/thread-safety
 
--- 
-Damien Le Moal
-Western Digital Research
+Thanks,
+
+Bart.
