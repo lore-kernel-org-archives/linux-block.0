@@ -1,46 +1,46 @@
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9A0288514
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F44C38645C
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772653767; cv=none; b=FbWPSK6ZSPY8vtQ6mjNdNulDjdb6ZiGAx0ELtNDtbza5lDlPq7gEbybVM6pY8+cVZa0UADD3K9ohZQ4+krutg1o4JccV2dqIG8d0s7BFCaBKgBXUCYsS3z59pkZuFC3HZxo/tR2tc8Y/9ri7Li6BBkpfKxZ3DKBFVXLoOhXJdpo=
+	t=1772653775; cv=none; b=IviveyxzWv3XBJDqgAlDUz/S18jGSgz1YtP/vwgwAFAeKhYVhmZIELz8Txzb4qw2shEKFb74wLk2HoCmQt0ByCaichy3BjfFYMr3SwYY3vjJRwtILKZlOcfpBJb8EeFm0+09Rde7kJE149HTtAmZEPKJeHKAJFzGPOTCswYzBK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772653767; c=relaxed/simple;
-	bh=n1HoTtshdcxdl63UZqYb9oyvpofv6dZudcJhcfOMR14=;
+	s=arc-20240116; t=1772653775; c=relaxed/simple;
+	bh=M4rPLehfPVDqrAFFUua2ECNWHpUfRPjKTXQml4yV7f0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mrjvu0znWzc/XDQZ/7psrvHGahHuiHVNeij5KvLSzCLS7dVFg424AHh/lbQuFqycl++0gVt29JZwoTOamnxCEw/y6WhK8jpF1EXRqKF6B5ab7vj/+qIG3XKAu2ErEETHY3lVVy4fN4F4DVP2TKaJHv9SQTGvRcZoyxLep2uSfTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=SI4Cg5hO; arc=none smtp.client-ip=199.89.1.14
+	 MIME-Version; b=YgwySpmIgqD9R5Zr41/GeyYt44xe2hSofENxA6CQKv03IwlLIcJcAuGfhMhbeniOI92GI+cFIddpzmAfksvxNb8Ak1+4tjAMFGUnokwL+HcC01svVMlcF+ezd5p9j+dGC3SnyfeQBcKnxRuJi1CgHXoYhh6ED+ptQdQh21L36Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=eLbUar0s; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="SI4Cg5hO"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="eLbUar0s"
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR3CT60tMz1XM6Ht;
-	Wed,  4 Mar 2026 19:49:25 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR3Cf33hBz1XMFhv;
+	Wed,  4 Mar 2026 19:49:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1772653761; x=1775245762; bh=z1lI+
-	ITS8LiaD+ZKCmdKdrirSoknPNt97L12BMcmyhw=; b=SI4Cg5hO/IKlktbgGByP/
-	Ay8jwgONtAoh1YTndNBqCfSAxEI/YAxDHcq9v6D+NlHL5kDqogLcguav1S+JVgnf
-	q8bGqpPOeHn3S0scQ1QBN3poGueXy5s6Fk8OgLkUk0A4GIm14IqG/Cd6QGihpRD+
-	73/bFGEXoHIfRmArIxzGWH5dAMFL61Po3wxChLSfKOb7LD1oTrHD9TKF/wbkONwi
-	L8l5gfTFNINBoNrKJBclKupeioYahOfYZFijuRjEL7tSAKdA2rloKB2ZkXgWqZvU
-	/aatyn0HxHNDZktQM9mNT1BvMxV0bVLlzpUhmp811/2InDUjwjqU6/riz4CksSB6
+	:received:received; s=mr01; t=1772653769; x=1775245770; bh=SS6ci
+	BNaM3Vh/VIS/Bjrj/JRHAh/+xuUjO6GdXmDymI=; b=eLbUar0snkannxG3fKlMh
+	YjGfkFsXxTUNpceSIypiPdvouYrdlfK4wyg7gIouBoQaVhIPPXaD9XLz7lsZu+F2
+	/jZlGl2LG34n9m3T82G8gqRV5bshvPRb4Ag74up89t8XNP974IQlhigG874FedUZ
+	8uSccrnHTptJs7wuabCbtldq4haDHANHv9zR8u2+i4Mzjy8zJYi90/EQhe8e2Iex
+	Fz8ArZJnzYJ9fiZ1/p3FA+9jxKMSQhxeri+tr56jF5gDGoY/dJpQIGCaJm5rYHHP
+	6VMmNW87zi+ilFBzTqDYkslr21k5xwqklyHph5DcSMBtaHFNTh/FSyvjVcS6KGjN
 	w==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id IKNeAd6UWcNW; Wed,  4 Mar 2026 19:49:21 +0000 (UTC)
+ id r3Blr1RMlSJh; Wed,  4 Mar 2026 19:49:29 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR3CL34lJz1XM0pg;
-	Wed,  4 Mar 2026 19:49:18 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR3CW3l6hz1XMFjF;
+	Wed,  4 Mar 2026 19:49:27 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Christoph Hellwig <hch@lst.de>,
@@ -48,11 +48,11 @@ Cc: Christoph Hellwig <hch@lst.de>,
 	Marco Elver <elver@google.com>,
 	linux-block@vger.kernel.org,
 	Bart Van Assche <bvanassche@acm.org>,
-	Josef Bacik <josef@toxicpanda.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
 	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH 07/14] nbd: Add lock context annotations
-Date: Wed,  4 Mar 2026 11:48:26 -0800
-Message-ID: <20260304194843.760669-8-bvanassche@acm.org>
+Subject: [PATCH 09/14] rbd: Add lock context annotations
+Date: Wed,  4 Mar 2026 11:48:28 -0800
+Message-ID: <20260304194843.760669-10-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
 In-Reply-To: <20260304194843.760669-1-bvanassche@acm.org>
 References: <20260304194843.760669-1-bvanassche@acm.org>
@@ -64,41 +64,70 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Prepare for enabling lock context analysis by adding those lock context
+Prepare for enabling lock context analysis by adding the lock context
 annotations that are required by Clang.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/nbd.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/block/rbd.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fe63f3c55d0d..28bb89bc7de3 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1469,6 +1469,7 @@ static void nbd_config_put(struct nbd_device *nbd)
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index e7da06200c1e..595e4ba720ec 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -4185,6 +4185,7 @@ static void rbd_acquire_lock(struct work_struct *wo=
+rk)
  }
 =20
- static int nbd_start_device(struct nbd_device *nbd)
-+	__must_hold(&nbd->config_lock)
+ static bool rbd_quiesce_lock(struct rbd_device *rbd_dev)
++	__must_hold(&rbd_dev->lock_rwsem)
  {
- 	struct nbd_config *config =3D nbd->config;
- 	int num_connections =3D config->num_connections;
-@@ -1541,6 +1542,7 @@ static int nbd_start_device(struct nbd_device *nbd)
- }
-=20
- static int nbd_start_device_ioctl(struct nbd_device *nbd)
-+	__must_hold(nbd->config_lock)
+ 	dout("%s rbd_dev %p\n", __func__, rbd_dev);
+ 	lockdep_assert_held_write(&rbd_dev->lock_rwsem);
+@@ -4229,6 +4230,7 @@ static void __rbd_release_lock(struct rbd_device *r=
+bd_dev)
+  * lock_rwsem must be held for write
+  */
+ static void rbd_release_lock(struct rbd_device *rbd_dev)
++	__must_hold(&rbd_dev->lock_rwsem)
  {
- 	struct nbd_config *config =3D nbd->config;
+ 	if (!rbd_quiesce_lock(rbd_dev))
+ 		return;
+@@ -4597,6 +4599,7 @@ static void rbd_unregister_watch(struct rbd_device =
+*rbd_dev)
+  * lock_rwsem must be held for write
+  */
+ static void rbd_reacquire_lock(struct rbd_device *rbd_dev)
++	__must_hold(&rbd_dev->lock_rwsem)
+ {
+ 	struct ceph_osd_client *osdc =3D &rbd_dev->rbd_client->client->osdc;
+ 	char cookie[32];
+@@ -6789,6 +6792,7 @@ static void rbd_dev_device_release(struct rbd_devic=
+e *rbd_dev)
+  * upon return.
+  */
+ static int rbd_dev_device_setup(struct rbd_device *rbd_dev)
++	__releases(&rbd_dev->header_rwsem)
+ {
  	int ret;
-@@ -1592,6 +1594,7 @@ static void nbd_set_cmd_timeout(struct nbd_device *=
-nbd, u64 timeout)
- /* Must be called with config_lock held */
- static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd=
-,
- 		       unsigned int cmd, unsigned long arg)
-+	__must_hold(nbd->config_lock)
+=20
+@@ -6890,6 +6894,7 @@ static void rbd_dev_image_release(struct rbd_device=
+ *rbd_dev)
+  * with @depth =3D=3D 0.
+  */
+ static int rbd_dev_image_probe(struct rbd_device *rbd_dev, int depth)
++	__no_context_analysis /* conditional locking */
  {
- 	struct nbd_config *config =3D nbd->config;
- 	loff_t bytesize;
+ 	bool need_watch =3D !rbd_is_ro(rbd_dev);
+ 	int ret;
+@@ -7143,6 +7148,8 @@ static ssize_t do_rbd_add(const char *buf, size_t c=
+ount)
+ 	if (rc < 0)
+ 		goto err_out_rbd_dev;
+=20
++	__acquire(&rbd_dev->header_rwsem);
++
+ 	if (rbd_dev->opts->alloc_size > rbd_dev->layout.object_size) {
+ 		rbd_warn(rbd_dev, "alloc_size adjusted to %u",
+ 			 rbd_dev->layout.object_size);
