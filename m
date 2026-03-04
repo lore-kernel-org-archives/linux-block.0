@@ -1,203 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01B23DA5D9
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E4A3CCA07
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772651087; cv=none; b=dPqYTin44Kes9VF3eGqFgDD2/SV0pIToNY26e8cNRw05rG3hQpNCSri9pDRXYkpCJLEzrDmIxEkcPmcma6IGT7VEwnCir9zE7RiONFwM6MorgoaqpXdFzPWPNVDCjb0t0VohMg/8xEoYh49+9Ilx1XVKYjuEStE43xJL2g3Dkao=
+	t=1772653743; cv=none; b=Q9U/AXmvTrNtK5ivw+rxrfPEvm3Y8O3COrUxZCRQtwsUBQ17JD8Jq0Uv5C69ULTs7vyuQYtpIOH+/HW1icbOFxI+jctLfMZAxFp3QQ1e4gtHVvWPtsyA0Bag3AMaU7pzPe2t+o8z20aas5zru0y8/LHu6jvQq36Gcrcf8B9AhcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772651087; c=relaxed/simple;
-	bh=BGwt7vwDCNf5WQi6ZmYsfu/4zMuWe7hZj2XX4UEX1oA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AbN0OEwMpNt2WkEBcg2CGQL7DsCFcW77Ax/KO3s7KZjNGhtqsuTVEeJoE9dp8+O3fiMCiqEa68aMNTnwW89hWXsXtaDckTIGaqoZ/YAwQobqh0yJvu6DRVIbrhJgHfsfOYm6u3HP0GDzrRZWOWxyHSHfX7v9v7opAJEL5qRfG1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CMfJNW4i; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1772653743; c=relaxed/simple;
+	bh=Uf0dbPMpeXsXGa69WrDxZiv2IN18mXiCQRtTZ6Sb1gA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=siuEn4mup13mQYt5hc4QQO5vZtj3VxxEXC6OttCb/SOQASwIE8X6F0mDtE1Fa3EZgdZwoOGys2f8XhC5rqkxUfRfLKtjf3QJmDUHBU4ZAgRutHuDbY5YRic+D9TivSblfmgVTA6v92sSKrGlddYACS6U8c8lrK2qO3RfmAMzieI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=W2syi55h; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CMfJNW4i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772651085;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cjLvbwBfqfXiZnaMfS45T56EHtgzdALqjSiM9T5ouBw=;
-	b=CMfJNW4iOjNKBQZ/5lvXEjiYAFrVCcCSM/T7oBqwzCzBCXl6R0h4vLmTdB4Kfb0LDU4fnT
-	sGdlKhYhOz69rU2yaBDtfyPJQGJ/MMSwockJ2TVXdmI1K5cYUcqWSBBIRU3Mbi6waMkGqq
-	ydvVWsPVbGcImduamtx6IZMzIeUZT+c=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-321--lemc0VmNrClkT2m_r8aQg-1; Wed,
- 04 Mar 2026 14:04:42 -0500
-X-MC-Unique: -lemc0VmNrClkT2m_r8aQg-1
-X-Mimecast-MFC-AGG-ID: -lemc0VmNrClkT2m_r8aQg_1772651081
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="W2syi55h"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR3C164ybz1XM0pH;
+	Wed,  4 Mar 2026 19:49:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:mime-version
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1772653736; x=1775245737; bh=wrTqR
+	ailX3WzInCczkv+MgmHJXIQDkqn25mHBO3AMM4=; b=W2syi55h+0hH2JA015CwM
+	tB8tPzLQeuGpu6a/o111Der+bO5ENuUjx54TmEUugBN+V8XgKrtgWevu5Z5upS+s
+	0rBudwwRGmaLDcx690VclXtxqlHSbX0gxtvWGSUotXWYTNvO4tymRukn+0BGMdpD
+	nJ+2KZh2Bp7Phw+xZSMbIKEEXFUr8Qlje7ND+7ZKBNNIStI2FNFV5Pny7l8W6E6A
+	74EqRDzlWkRqfPWxSBSP1KerBJoTCPeiaQ545OAup0m8UVWBuOME8HY49nlpKT8I
+	owD4+B0Yw/RCxOW+Or7k1q/udQuJMOCz++hplsUhIdHEC+DA5eiXXhqNWjoh2ctV
+	Q==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id gVArRNv4kj8H; Wed,  4 Mar 2026 19:48:56 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A3448195605C;
-	Wed,  4 Mar 2026 19:04:40 +0000 (UTC)
-Received: from pasta.fast.eng.rdu2.dc.redhat.com (unknown [10.44.32.29])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D8CD81800576;
-	Wed,  4 Mar 2026 19:04:37 +0000 (UTC)
-From: Andreas Gruenbacher <agruenba@redhat.com>
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR3Bv31qlz1XM5kt;
+	Wed,  4 Mar 2026 19:48:54 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Andreas Gruenbacher <agruenba@redhat.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Marco Elver <elver@google.com>,
 	linux-block@vger.kernel.org,
-	drbd-dev@lists.linbit.com,
-	linux-bcache@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 4/4] bio: use bio_io_error more often
-Date: Wed,  4 Mar 2026 20:04:09 +0100
-Message-ID: <20260304190424.291743-5-agruenba@redhat.com>
-In-Reply-To: <20260304190424.291743-1-agruenba@redhat.com>
-References: <20260304190424.291743-1-agruenba@redhat.com>
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 00/14] Enable lock context analysis
+Date: Wed,  4 Mar 2026 11:48:19 -0800
+Message-ID: <20260304194843.760669-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Instead of setting bio->bi_status to BLK_STS_IOERR and calling
-bio_endio(bio), use the shorthand bio_io_error(bio).
+Hi Jens,
 
-Created with Coccinelle using the following semantic patch:
+During the most recent merge window the following patch series has been m=
+erged:
+[PATCH v5 00/36] Compiler-Based Context- and Locking-Analysis
+(https://lore.kernel.org/lkml/20251219154418.3592607-1-elver@google.com/)=
+. That
+patch series drops support for verifying lock context annotations with sp=
+arse
+and introduced support for verifying lock context annotations with Clang.=
+ The
+support in Clang for lock context annotation and verification is better t=
+han
+that in sparse. Hence this patch series that enables lock context analysi=
+s for
+the block layer core and all block drivers.
 
-@@
-struct bio *bio;
-@@
-- bio->bi_status = BLK_STS_IOERR;
-- bio_endio(bio);
-+ bio_io_error(bio);
+The first patch in this series fixes a bug discovered in DRBD while enabl=
+ing
+lock context analysis.
 
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/fops.c                  | 3 +--
- drivers/block/drbd/drbd_int.h | 3 +--
- drivers/md/bcache/bcache.h    | 3 +--
- drivers/md/bcache/request.c   | 6 ++----
- drivers/md/dm-mpath.c         | 3 +--
- drivers/md/dm-writecache.c    | 3 +--
- fs/f2fs/segment.c             | 3 +--
- 7 files changed, 8 insertions(+), 16 deletions(-)
+Please consider this patch series for the upstream kernel.
 
-diff --git a/block/fops.c b/block/fops.c
-index bb6642b45937..9547f656904d 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -218,8 +218,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 
- 		ret = blkdev_iov_iter_get_pages(bio, iter, bdev);
- 		if (unlikely(ret)) {
--			bio->bi_status = BLK_STS_IOERR;
--			bio_endio(bio);
-+			bio_io_error(bio);
- 			break;
- 		}
- 		if (iocb->ki_flags & IOCB_NOWAIT) {
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index f6d6276974ee..32639e8ea72a 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -1491,8 +1491,7 @@ static inline void drbd_submit_bio_noacct(struct drbd_device *device,
- 	__release(local);
- 	if (!bio->bi_bdev) {
- 		drbd_err(device, "drbd_submit_bio_noacct: bio->bi_bdev == NULL\n");
--		bio->bi_status = BLK_STS_IOERR;
--		bio_endio(bio);
-+		bio_io_error(bio);
- 		return;
- 	}
- 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index ec9ff9715081..e0c9d9eef0a0 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -947,8 +947,7 @@ static inline void closure_bio_submit(struct cache_set *c,
- {
- 	closure_get(cl);
- 	if (unlikely(test_bit(CACHE_SET_IO_DISABLE, &c->flags))) {
--		bio->bi_status = BLK_STS_IOERR;
--		bio_endio(bio);
-+		bio_io_error(bio);
- 		return;
- 	}
- 	submit_bio_noacct(bio);
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 3fa3b13a410f..0f6fa0a2920b 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -1178,8 +1178,7 @@ void cached_dev_submit_bio(struct bio *bio)
- 
- 	if (unlikely((d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags)) ||
- 		     dc->io_disable)) {
--		bio->bi_status = BLK_STS_IOERR;
--		bio_endio(bio);
-+		bio_io_error(bio);
- 		return;
- 	}
- 
-@@ -1283,8 +1282,7 @@ void flash_dev_submit_bio(struct bio *bio)
- 	struct bcache_device *d = bio->bi_bdev->bd_disk->private_data;
- 
- 	if (unlikely(d->c && test_bit(CACHE_SET_IO_DISABLE, &d->c->flags))) {
--		bio->bi_status = BLK_STS_IOERR;
--		bio_endio(bio);
-+		bio_io_error(bio);
- 		return;
- 	}
- 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 7cb7bb6233b6..bf4927f58d7f 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -712,8 +712,7 @@ static void process_queued_bios(struct work_struct *work)
- 		r = __multipath_map_bio(m, bio, mpio);
- 		switch (r) {
- 		case DM_MAPIO_KILL:
--			bio->bi_status = BLK_STS_IOERR;
--			bio_endio(bio);
-+			bio_io_error(bio);
- 			break;
- 		case DM_MAPIO_REQUEUE:
- 			bio->bi_status = BLK_STS_DM_REQUEUE;
-diff --git a/drivers/md/dm-writecache.c b/drivers/md/dm-writecache.c
-index 98bd945f6da7..78a730a9b1ef 100644
---- a/drivers/md/dm-writecache.c
-+++ b/drivers/md/dm-writecache.c
-@@ -1876,8 +1876,7 @@ static void __writecache_writeback_pmem(struct dm_writecache *wc, struct writeba
- 		if (WC_MODE_FUA(wc))
- 			bio->bi_opf |= REQ_FUA;
- 		if (writecache_has_error(wc)) {
--			bio->bi_status = BLK_STS_IOERR;
--			bio_endio(bio);
-+			bio_io_error(bio);
- 		} else if (unlikely(!bio_sectors(bio))) {
- 			bio->bi_status = BLK_STS_OK;
- 			bio_endio(bio);
-diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
-index 6a97fe76712b..2dac0cbb5540 100644
---- a/fs/f2fs/segment.c
-+++ b/fs/f2fs/segment.c
-@@ -4101,8 +4101,7 @@ int f2fs_inplace_write_data(struct f2fs_io_info *fio)
- 	if (fio->bio && *(fio->bio)) {
- 		struct bio *bio = *(fio->bio);
- 
--		bio->bi_status = BLK_STS_IOERR;
--		bio_endio(bio);
-+		bio_io_error(bio);
- 		*(fio->bio) = NULL;
- 	}
- 	return err;
--- 
-2.52.0
+Thanks,
+
+Bart.
+
+Bart Van Assche (14):
+  drbd: Balance RCU calls in drbd_adm_dump_devices()
+  blk-ioc: Prepare for enabling thread-safety analysis
+  block: Make the lock context annotations compatible with Clang
+  aoe: Add a lock context annotation
+  drbd: Make the lock context annotations compatible with Clang
+  loop: Add lock context annotations
+  nbd: Add lock context annotations
+  null_blk: Add more lock context annotations
+  rbd: Add lock context annotations
+  rnbd: Add more lock context annotations
+  ublk: Fix the lock context annotations
+  zloop: Add a lock context annotations
+  zram: Add lock context annotations
+  block: Enable lock context analysis for all block drivers
+
+ block/Makefile                     |  2 ++
+ block/bdev.c                       |  7 +++--
+ block/blk-cgroup.c                 |  7 +++--
+ block/blk-crypto-profile.c         |  2 ++
+ block/blk-ioc.c                    |  2 +-
+ block/blk-iocost.c                 |  2 ++
+ block/blk-mq-debugfs.c             | 12 ++++----
+ block/blk-zoned.c                  |  1 +
+ block/blk.h                        |  4 +++
+ block/ioctl.c                      |  1 +
+ block/kyber-iosched.c              |  4 +--
+ block/mq-deadline.c                |  8 +++---
+ drivers/block/Makefile             |  2 ++
+ drivers/block/aoe/Makefile         |  2 ++
+ drivers/block/aoe/aoecmd.c         |  1 +
+ drivers/block/drbd/Makefile        |  3 ++
+ drivers/block/drbd/drbd_bitmap.c   | 20 +++++++------
+ drivers/block/drbd/drbd_int.h      | 46 ++++++++++++++----------------
+ drivers/block/drbd/drbd_main.c     | 45 ++++++++++++++++++++++-------
+ drivers/block/drbd/drbd_nl.c       | 13 ++++++---
+ drivers/block/drbd/drbd_receiver.c | 20 +++++++------
+ drivers/block/drbd/drbd_req.c      |  2 ++
+ drivers/block/drbd/drbd_state.c    |  3 ++
+ drivers/block/drbd/drbd_worker.c   |  6 ++--
+ drivers/block/loop.c               |  4 +++
+ drivers/block/mtip32xx/Makefile    |  2 ++
+ drivers/block/nbd.c                |  3 ++
+ drivers/block/null_blk/Makefile    |  2 ++
+ drivers/block/null_blk/main.c      |  7 +++--
+ drivers/block/null_blk/zoned.c     |  2 ++
+ drivers/block/rbd.c                |  7 +++++
+ drivers/block/rnbd/Makefile        |  2 ++
+ drivers/block/rnbd/rnbd-clt.c      |  2 ++
+ drivers/block/ublk_drv.c           |  6 +++-
+ drivers/block/xen-blkback/Makefile |  3 ++
+ drivers/block/zloop.c              |  1 +
+ drivers/block/zram/Makefile        |  2 ++
+ drivers/block/zram/zcomp.c         |  3 +-
+ drivers/block/zram/zcomp.h         |  6 ++--
+ drivers/block/zram/zram_drv.c      |  1 +
+ include/linux/backing-dev.h        |  2 ++
+ include/linux/blkdev.h             | 11 +++++--
+ include/linux/bpf.h                |  1 +
+ 43 files changed, 197 insertions(+), 85 deletions(-)
 
