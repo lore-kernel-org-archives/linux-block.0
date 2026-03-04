@@ -1,71 +1,158 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEC639FCBC;
-	Wed,  4 Mar 2026 13:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729FB269D18;
+	Wed,  4 Mar 2026 13:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772632143; cv=none; b=RdRwwCEcHOQkfqsoNes5u3AwHhEI1/VaCfsUkkb6F5WrItoGbtfznTPhMfvD5W8/LuJBh8p0qhfu5zWFJqwqyj6PQoTJ8wlkSWvlKyDx41Qz54yS6PIywnF5AWnJobpjz/5SEbq1zb+jTXQVTsylEH0cscAVciEvAiY+4pOwapw=
+	t=1772632235; cv=none; b=JsKhxPhlxuX94nyV6a26OBWdeFNTlecUvouykFuIhT50WyzVM4lTQTIwvHYWTOnXCW7hZWP0t2YQB4eu4KvVnErgiT8KPB9Yrc8iJidOloYBkyuey/ncRoLPA4Ch+6u9GXIcGvCzt2rDt51bU1jhnHbHEEsDQJHelu+wQQn1HRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772632143; c=relaxed/simple;
-	bh=qOc2VmidsMlzi9mWf/yfs4Ql8Hq0zsQO1aGzkGYtWCA=;
+	s=arc-20240116; t=1772632235; c=relaxed/simple;
+	bh=CvBFSLoX33HHaYixzYhjVgKTwhFEBX5XLgiyHC53qns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4Uq/bv3d2rS8B4RXeAa88L0FSEZNmke1MVITf97UogstelOl3mOy9XVI+yDkd1sM+/Ba/2pNDVasdK83LZuUD4qPw7J2HUsrnFHqdN+xyOHkQrNsvWAJwL7pBIxHOdWN3EcRaP3m+6TB8L8K+ncEIcqE63qhMl6VfxnajNzm38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=QHEnG8/K; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=RX3ygvrffLeoYmg80dKISUfkciVlS1ucX7LFeVtvvsHgL7zcaPYenSjuZms4nfVCqophao35QkE6zWaln+bL+Onzr+JorDqAmAHO56IWdw6WVCgaNH4Eiy6zQBEK6kbrFHm+MufQ+SUCJXm3BBE1QkL3Ptoz7YnfIqfHxUsleaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S7+on1be; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="QHEnG8/K"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Reply-To:Content-ID:Content-Description;
-	bh=qOc2VmidsMlzi9mWf/yfs4Ql8Hq0zsQO1aGzkGYtWCA=; b=QHEnG8/K4CkkGOo2R0wxB0IQvd
-	7hDWzybVnBQBVOlXKZi7R2k5bIvfxmK2ISb3LeGtv78AueHd+vlyjWiyUGI62AEuBeTiH4Nw3Qu93
-	C4FMc2GwDNEL3gCdF4dWzsyz/qp7Qk3cmoNIopmzvIb0QzSNo9TQGJ6IEYV0CJPi/6NJoG95LDkvJ
-	cx5QU/U4VyiLfiIE9KJQDTVLKyM9hVa0vgAqULC0MDDqYyjuwUQnPnERnH6XjYp9jxnK6Z1lpY9SG
-	tCCtjUa8fh4fHfHhtVAfGdTqFNtPLC4Wy405vAVBdaH2aqJPVg7CFNnfVvIjkFx4OoIupJ0Ds3bQ9
-	m785yV+g==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vxmav-00Fzzj-Ar; Wed, 04 Mar 2026 13:48:57 +0000
-Date: Wed, 4 Mar 2026 05:48:52 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	cgroups@vger.kernel.org, thevlad@meta.com, kernel-team@meta.com
-Subject: Re: [PATCH v2] blk-cgroup: always display debug stats in io.stat
-Message-ID: <aag30EagagRlie0A@gmail.com>
-References: <20260303-blk_cgroup_debug_stats-v2-1-196c713cb762@debian.org>
- <aacehv3rpO9irhEG@slm.duckdns.org>
- <poawwl44nvy4ru4mmjqi3kxfq7xqcpdeq6ghixphcrwhpv3bnz@xsltjt52rbqm>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S7+on1be"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772632233; x=1804168233;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CvBFSLoX33HHaYixzYhjVgKTwhFEBX5XLgiyHC53qns=;
+  b=S7+on1beXofLBbeVIEHWQBSQSvTQIZjVH7zPoHMfFCXo10CK8cEBzdSc
+   hG3MJKLlcP6MBqaMeRHroZNMZdAJhbcd+/7OcubForceGJx8PvnKp5PNr
+   RgIr/5VxScDa2XQmVyBDO6pna8buKeH4+zC14ftoUDxAuJk+tTR16y0Yz
+   s5ITuoBEGlMMTurngORRPQnb10DOp2Pm4xY+kzX1ZXUU77aJpMzIYDvr3
+   rsu073raljIMFHmd7YxH6n32aLkNkVAHI5hu3Bg9hIyzPWzkI/hnTrEhK
+   mbNkTWWPNAA38toO4BFfIJpGDqTWXQxdyEx3SK03tGGSkOK/5WWhCXE12
+   A==;
+X-CSE-ConnectionGUID: kmZ580dGRWimb1hdRaU8Jg==
+X-CSE-MsgGUID: 8yJ+VgB8TvqooW/XlzD/pg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="72716438"
+X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
+   d="scan'208";a="72716438"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 05:50:33 -0800
+X-CSE-ConnectionGUID: qyz74MoRSr6dtWijARqkUA==
+X-CSE-MsgGUID: yyvgiF75S7qCuY+bN4KKCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
+   d="scan'208";a="217502197"
+Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
+  by orviesa006.jf.intel.com with ESMTP; 04 Mar 2026 05:50:31 -0800
+Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vxmcN-000000001iR-2yOe;
+	Wed, 04 Mar 2026 13:50:27 +0000
+Date: Wed, 4 Mar 2026 14:50:07 +0100
+From: kernel test robot <lkp@intel.com>
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>, fujita.tomonori@lab.ntt.co.jp,
+	axboe@kernel.dk, James.Bottomley@hansenpartnership.com,
+	martin.petersen@oracle.com
+Cc: oe-kbuild-all@lists.linux.dev, bvanassche@acm.org,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: Re: [PATCH v5 3/3] scsi: bsg: add io_uring passthrough handler
+Message-ID: <202603041450.tuj48h9Q-lkp@intel.com>
+References: <20260304080313.675768-4-yangxiuwei@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <poawwl44nvy4ru4mmjqi3kxfq7xqcpdeq6ghixphcrwhpv3bnz@xsltjt52rbqm>
-X-Debian-User: leitao
+In-Reply-To: <20260304080313.675768-4-yangxiuwei@kylinos.cn>
 
-Hello Michal,
+Hi Yang,
 
-On Wed, Mar 04, 2026 at 02:28:03PM +0100, Michal Koutný wrote:
->
-> On Wed, Mar 04, 2026 at 01:56:43AM -0800, Breno Leitao <leitao@debian.org> wrote:
-> > My goal is to ship a kernel that exposes these detailed io stats by
-> > default, without requiring any runtime configuration. The stats should
-> > simply be available out of the box.
->
-> Does it mean the information is useful to you since early boot and
-> adjusting the param with a userspace tool in boot sequence is too late?
+kernel test robot noticed the following build errors:
 
-Not exactly. The goal is to have a kernel binary that, regardless of
-where it is deployed and how it is configured, I know know it provides
-full io.stat details without requiring any tunable to be changed.
+[auto build test ERROR on axboe/for-next]
+[also build test ERROR on jejb-scsi/for-next mkp-scsi/for-next linus/master v7.0-rc2 next-20260303]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yang-Xiuwei/bsg-add-bsg_uring_cmd-uapi-structure/20260304-160717
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
+patch link:    https://lore.kernel.org/r/20260304080313.675768-4-yangxiuwei%40kylinos.cn
+patch subject: [PATCH v5 3/3] scsi: bsg: add io_uring passthrough handler
+config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260304/202603041450.tuj48h9Q-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260304/202603041450.tuj48h9Q-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603041450.tuj48h9Q-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/scsi/scsi_bsg.c: In function 'scsi_bsg_map_user_buffer':
+>> drivers/scsi/scsi_bsg.c:111:71: error: macro "io_uring_sqe_cmd" requires 2 arguments, but only 1 given
+     111 |         const struct bsg_uring_cmd *cmd = io_uring_sqe_cmd(ioucmd->sqe);
+         |                                                                       ^
+   In file included from drivers/scsi/scsi_bsg.c:3:
+   include/linux/io_uring/cmd.h:29:9: note: macro "io_uring_sqe_cmd" defined here
+      29 | #define io_uring_sqe_cmd(sqe, type)     ({                                      \
+         |         ^~~~~~~~~~~~~~~~
+>> drivers/scsi/scsi_bsg.c:111:43: error: 'io_uring_sqe_cmd' undeclared (first use in this function); did you mean 'io_uring_sqe'?
+     111 |         const struct bsg_uring_cmd *cmd = io_uring_sqe_cmd(ioucmd->sqe);
+         |                                           ^~~~~~~~~~~~~~~~
+         |                                           io_uring_sqe
+   drivers/scsi/scsi_bsg.c:111:43: note: each undeclared identifier is reported only once for each function it appears in
+   drivers/scsi/scsi_bsg.c: In function 'scsi_bsg_uring_cmd':
+   drivers/scsi/scsi_bsg.c:137:71: error: macro "io_uring_sqe_cmd" requires 2 arguments, but only 1 given
+     137 |         const struct bsg_uring_cmd *cmd = io_uring_sqe_cmd(ioucmd->sqe);
+         |                                                                       ^
+   include/linux/io_uring/cmd.h:29:9: note: macro "io_uring_sqe_cmd" defined here
+      29 | #define io_uring_sqe_cmd(sqe, type)     ({                                      \
+         |         ^~~~~~~~~~~~~~~~
+   drivers/scsi/scsi_bsg.c:137:43: error: 'io_uring_sqe_cmd' undeclared (first use in this function); did you mean 'io_uring_sqe'?
+     137 |         const struct bsg_uring_cmd *cmd = io_uring_sqe_cmd(ioucmd->sqe);
+         |                                           ^~~~~~~~~~~~~~~~
+         |                                           io_uring_sqe
+   drivers/scsi/scsi_bsg.c:203:21: error: assignment to 'enum rq_end_io_ret (*)(struct request *, blk_status_t,  const struct io_comp_batch *)' {aka 'enum rq_end_io_ret (*)(struct request *, unsigned char,  const struct io_comp_batch *)'} from incompatible pointer type 'enum rq_end_io_ret (*)(struct request *, blk_status_t)' {aka 'enum rq_end_io_ret (*)(struct request *, unsigned char)'} [-Wincompatible-pointer-types]
+     203 |         req->end_io = scsi_bsg_uring_cmd_done;
+         |                     ^
+
+
+vim +/io_uring_sqe_cmd +111 drivers/scsi/scsi_bsg.c
+
+   106	
+   107	static int scsi_bsg_map_user_buffer(struct request *req,
+   108					    struct io_uring_cmd *ioucmd,
+   109					    unsigned int issue_flags, gfp_t gfp_mask)
+   110	{
+ > 111		const struct bsg_uring_cmd *cmd = io_uring_sqe_cmd(ioucmd->sqe);
+   112		struct iov_iter iter;
+   113		bool is_write = cmd->dout_xfer_len > 0;
+   114		u64 buf_addr = is_write ? cmd->dout_xferp : cmd->din_xferp;
+   115		unsigned long buf_len = is_write ? cmd->dout_xfer_len : cmd->din_xfer_len;
+   116		int ret;
+   117	
+   118		if (ioucmd->flags & IORING_URING_CMD_FIXED) {
+   119			ret = io_uring_cmd_import_fixed(buf_addr, buf_len,
+   120							is_write ? WRITE : READ,
+   121							&iter, ioucmd, issue_flags);
+   122			if (ret < 0)
+   123				return ret;
+   124			ret = blk_rq_map_user_iov(req->q, req, NULL, &iter, gfp_mask);
+   125		} else {
+   126			ret = blk_rq_map_user(req->q, req, NULL, uptr64(buf_addr),
+   127					      buf_len, gfp_mask);
+   128		}
+   129	
+   130		return ret;
+   131	}
+   132	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
