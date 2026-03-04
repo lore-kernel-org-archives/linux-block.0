@@ -1,46 +1,46 @@
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9C23A4503
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF961386448
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772653781; cv=none; b=FeaH6ga0wkjUI8Q5YDm8lbZX28fnWxriZ23PZRRw7LmECLJmzT03AvKDQ6zDWue4JXuAT6TON4n0Q0sbq3UM5jjocjrWoGeBMED/Ll5SGb8l/beijSi9kyw0VP4/yVGmO9JSMS6Z7BO8n7H6Hphz7JbrRxrBdLqGZDDPTJzaxi4=
+	t=1772653781; cv=none; b=OeU5PeBYgHwvqlfxJw44DYa0WnS2GxNl0quLGc2jzrc5lRMxGq+3TsXrZv+SVpC5eGJ+e2CwoDb5n2g3tAgmck1CXY11YjO3s3SX2d5II1jwIbq96rQk7wjStB4X/NQ2iI9fQ5PLt2Nqoua/gP4V2afh2sdF6iLXHswlPTNzdnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772653781; c=relaxed/simple;
-	bh=9hg1pS7J/xb6xuMbC7sA3DcPxwOmW+8AVjK3lu+triA=;
+	bh=3KE/6HY8yqHcG7/W489hxgiV4L8JPmmdsdc5Wtlvm1c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZUO5MT0vjbBWLqhna2MhvhL0b+ozuVqZRTQ5aT5ehqxfVKX1fVbJ/7Bn4s33BkzXHxRUIcOY/B2yzONnjXgB1HSJ4yYUCgDRiORClHIEbrh7Ztu+sJMRXZTYjbxngyv3MZWZMzZxUkPe3CPpS82uXjqyE/+Pk6IS/yS0llFCJwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=zNSpEKcn; arc=none smtp.client-ip=199.89.1.14
+	 MIME-Version; b=G31GfaCXyLto8bkxKHVi8+vvVIxXP3yCP6rKYMP91CjISlDT1J1fv2V8mSUPQQVmu7DL7fIvO9qU6vClPThBMnulgepWDjNrHu0jtZ0VR8eB2dT0YWLN0jdp0yqRMNqEbi7+5O1X4jS7oH1DB6fa+Z/6kFyLUHN+JKTQiUPW5AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=N46Wxv75; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="zNSpEKcn"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="N46Wxv75"
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR3Cl56YDz1XM6JV;
-	Wed,  4 Mar 2026 19:49:39 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fR3Cm3fzZz1XM0p0;
+	Wed,  4 Mar 2026 19:49:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1772653774; x=1775245775; bh=V6hyG
-	sWpW0SzvYUESJNz3pGgzGtFAhgHeWjZkos+WGk=; b=zNSpEKcn2Nu1XzwVi711l
-	UeKMdI9dZSG+Tg/EuKRvQfh+LtOGF5QSbKZdcfsJNy9fcCVzRVGPaJuL73qa9O0B
-	htVNv3Lx8I87e6GSLIPqAQMZu0krpHexs+mtjvmZFmd+wMriZEWDK1M14ICHdk7r
-	SL2/Awy/FeHAslWtFP7WF9UctwaTdIfIEP04hM2hAw1isB6e7Coxj1nUQjQnxUxT
-	6/7z+RZp2KMVyfJFE3oLOAVyE9N6fKGxMNKpoztY0mI3ISpdiNv9uBnXFm+G6eyc
-	bJulfaoj8/ikspuYnOomdEMntlyd6wHne4LxzFaE4BWXWMjrvZ3VKM+rUNRsmXZD
-	w==
+	:received:received; s=mr01; t=1772653776; x=1775245777; bh=UYN3p
+	WHjAoGH0ZpDGsfRv6ghQjDX8sbKfRXhzGHruu0=; b=N46Wxv75e/VA1btEWVRub
+	k+ttlMRz/mWcqW4q8EOat3w6equad80ih/MUvpI0mmJABkOrtWzgCcyV7zABDNBX
+	4mFEU1vOZe3KRAz30ylhSjfMgRKYhgh8lkCcOoFiY0st337k/MCdcwIKz/puRHZC
+	Bve5yTySZpmevedchHdLFfPDeOjs9lYSpgcuHO8RvK1A6yHcqs7j+wzVbiVm6eWm
+	sc0tAk7xQdk1yzqzWyY5vDStcZmpcHrVk99xQTH2tBorJgMPVgaqEkDox45XnbxZ
+	oU8AW+AtFMzE36GNtFm62ZbopPIHeBx/t0ByVECXhiYLUorEjg3yJffDIaanzGZl
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 5jq35YIzniuO; Wed,  4 Mar 2026 19:49:34 +0000 (UTC)
+ id LmAuBDahPn15; Wed,  4 Mar 2026 19:49:36 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR3Cc4x03z1XLyhT;
-	Wed,  4 Mar 2026 19:49:32 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fR3Cg14skz1XMFkQ;
+	Wed,  4 Mar 2026 19:49:34 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Christoph Hellwig <hch@lst.de>,
@@ -48,11 +48,10 @@ Cc: Christoph Hellwig <hch@lst.de>,
 	Marco Elver <elver@google.com>,
 	linux-block@vger.kernel.org,
 	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
 	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH 11/14] ublk: Fix the lock context annotations
-Date: Wed,  4 Mar 2026 11:48:30 -0800
-Message-ID: <20260304194843.760669-12-bvanassche@acm.org>
+Subject: [PATCH 12/14] zloop: Add a lock context annotations
+Date: Wed,  4 Mar 2026 11:48:31 -0800
+Message-ID: <20260304194843.760669-13-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
 In-Reply-To: <20260304194843.760669-1-bvanassche@acm.org>
 References: <20260304194843.760669-1-bvanassche@acm.org>
@@ -64,63 +63,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add the lock context annotations that are required by Clang. Remove the
-__must_hold(&ub->mutex) annotation from ublk_mark_io_ready() because not
-all callers hold ub->mutex.
+Prepare for enabling lock context analysis by adding a lock context
+annotation that is required for Clang.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/ublk_drv.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/block/zloop.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 34ed4f6a02ef..70f2ebde3be9 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -353,11 +353,13 @@ static inline bool ublk_support_batch_io(const stru=
-ct ublk_queue *ubq)
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 51c043342127..b3654fd814c7 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -379,6 +379,7 @@ static void zloop_rw_complete(struct kiocb *iocb, lon=
+g ret)
  }
 =20
- static inline void ublk_io_lock(struct ublk_io *io)
-+	__acquires(&io->lock)
+ static void zloop_rw(struct zloop_cmd *cmd)
++	__no_context_analysis /* conditional locking */
  {
- 	spin_lock(&io->lock);
- }
-=20
- static inline void ublk_io_unlock(struct ublk_io *io)
-+	__releases(&io->lock)
- {
- 	spin_unlock(&io->lock);
- }
-@@ -2926,7 +2928,6 @@ static void ublk_queue_reset_io_flags(struct ublk_q=
-ueue *ubq)
-=20
- /* device can only be started after all IOs are ready */
- static void ublk_mark_io_ready(struct ublk_device *ub, u16 q_id)
--	__must_hold(&ub->mutex)
- {
- 	struct ublk_queue *ubq =3D ublk_get_queue(ub, q_id);
-=20
-@@ -3160,6 +3161,7 @@ static int ublk_check_fetch_buf(const struct ublk_d=
-evice *ub, __u64 buf_addr)
-=20
- static int __ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub=
-,
- 			struct ublk_io *io, u16 q_id)
-+	__must_hold(&ub->mutex)
- {
- 	/* UBLK_IO_FETCH_REQ is only allowed before dev is setup */
- 	if (ublk_dev_ready(ub))
-@@ -3598,9 +3600,11 @@ static int ublk_batch_prep_io(struct ublk_queue *u=
-bq,
- 	}
-=20
- 	ublk_io_lock(io);
-+	__acquire(&data->ub->mutex);
- 	ret =3D __ublk_fetch(data->cmd, data->ub, io, ubq->q_id);
- 	if (!ret)
- 		io->buf =3D buf;
-+	__release(&data->ub->mutex);
- 	ublk_io_unlock(io);
-=20
- 	if (!ret)
+ 	struct request *rq =3D blk_mq_rq_from_pdu(cmd);
+ 	struct zloop_device *zlo =3D rq->q->queuedata;
