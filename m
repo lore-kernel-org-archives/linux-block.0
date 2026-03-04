@@ -1,83 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCE537FF66;
-	Wed,  4 Mar 2026 13:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEC639FCBC;
+	Wed,  4 Mar 2026 13:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772631600; cv=none; b=G5kYA5jo/DhmNTxr8SB5Oki1zMyWrT+JMLLjHl3It58GG4yrTE6xOMVsVQuAjnp/HSRFs9aYk2Fqibls57xYqnyd8O+3JTamjinlYlCBFyjCH6Vbbhw1pRxqNpgJAmAYWrN50L7BWDcTTxKhAlo7iWnq2FpiIq1DWOJQNNX8DMI=
+	t=1772632143; cv=none; b=RdRwwCEcHOQkfqsoNes5u3AwHhEI1/VaCfsUkkb6F5WrItoGbtfznTPhMfvD5W8/LuJBh8p0qhfu5zWFJqwqyj6PQoTJ8wlkSWvlKyDx41Qz54yS6PIywnF5AWnJobpjz/5SEbq1zb+jTXQVTsylEH0cscAVciEvAiY+4pOwapw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772631600; c=relaxed/simple;
-	bh=IgVErusGbBVUvuBX5aaGbT+VBaSMQ9ieeAk3Mhvg7ag=;
+	s=arc-20240116; t=1772632143; c=relaxed/simple;
+	bh=qOc2VmidsMlzi9mWf/yfs4Ql8Hq0zsQO1aGzkGYtWCA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=THQqt5PNfa92P0+52/UGjR/d7x53E1FkSfud30TFA4z7nUzuZOinkkXfgTZLcmtK5L1nV0AsZCAwVea9whXxZJZSUBRUysR1d2429xYjpQFl91/69k2jAwhQSBz+h5UOip3KoyhHxnSYsaeR5f+WfV/qGZqYYUHQtpWKcyVt/I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TxHpF5jF; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z4Uq/bv3d2rS8B4RXeAa88L0FSEZNmke1MVITf97UogstelOl3mOy9XVI+yDkd1sM+/Ba/2pNDVasdK83LZuUD4qPw7J2HUsrnFHqdN+xyOHkQrNsvWAJwL7pBIxHOdWN3EcRaP3m+6TB8L8K+ncEIcqE63qhMl6VfxnajNzm38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=QHEnG8/K; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TxHpF5jF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79464C19423;
-	Wed,  4 Mar 2026 13:39:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772631600;
-	bh=IgVErusGbBVUvuBX5aaGbT+VBaSMQ9ieeAk3Mhvg7ag=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TxHpF5jF632zcGOUPVYUAwPxtaLg9GeT4g9b8AGgvI/Zf/6MLbRx0eOYaqs/Tz2rX
-	 WoDEX6icwQJ1AHKZfguDJaIB5cRqgN1uNpOv4nw+AYXXvVUCpbmoMjrLnMIhhOnQAJ
-	 ixhvNXxrQ81HxbnMc+0ijk9fkkvUodWYyN2hDg4t0D2BLcdjZjB1xUPcC220usP4K5
-	 kDlhOs/7zTcneZ5s7xZHMkkhmUYqSA5oFrsG/nXHoGJs4jaz9M9poyaP5RQ/6MPFlF
-	 MFFV70+MuyvqSNLnJjWu3+ok2FdzzAItsx9wpeoCzA8GpbDpOahu3g0wyN6Baqx8Kv
-	 2jiP7V/X8SUig==
-Date: Wed, 4 Mar 2026 14:39:54 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>, 
-	linux-ext4@vger.kernel.org, Ted Tso <tytso@mit.edu>, 
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>, David Sterba <dsterba@suse.com>, 
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, linux-mm@kvack.org, 
-	linux-aio@kvack.org, Benjamin LaHaise <bcrl@kvack.org>, Jens Axboe <axboe@kernel.dk>, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 21/32] bdev: Drop pointless invalidate_mapping_buffers()
- call
-Message-ID: <20260304-dachboden-minibar-620c6f7d69fc@brauner>
-References: <20260303101717.27224-1-jack@suse.cz>
- <20260303103406.4355-53-jack@suse.cz>
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="QHEnG8/K"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=qOc2VmidsMlzi9mWf/yfs4Ql8Hq0zsQO1aGzkGYtWCA=; b=QHEnG8/K4CkkGOo2R0wxB0IQvd
+	7hDWzybVnBQBVOlXKZi7R2k5bIvfxmK2ISb3LeGtv78AueHd+vlyjWiyUGI62AEuBeTiH4Nw3Qu93
+	C4FMc2GwDNEL3gCdF4dWzsyz/qp7Qk3cmoNIopmzvIb0QzSNo9TQGJ6IEYV0CJPi/6NJoG95LDkvJ
+	cx5QU/U4VyiLfiIE9KJQDTVLKyM9hVa0vgAqULC0MDDqYyjuwUQnPnERnH6XjYp9jxnK6Z1lpY9SG
+	tCCtjUa8fh4fHfHhtVAfGdTqFNtPLC4Wy405vAVBdaH2aqJPVg7CFNnfVvIjkFx4OoIupJ0Ds3bQ9
+	m785yV+g==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vxmav-00Fzzj-Ar; Wed, 04 Mar 2026 13:48:57 +0000
+Date: Wed, 4 Mar 2026 05:48:52 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	cgroups@vger.kernel.org, thevlad@meta.com, kernel-team@meta.com
+Subject: Re: [PATCH v2] blk-cgroup: always display debug stats in io.stat
+Message-ID: <aag30EagagRlie0A@gmail.com>
+References: <20260303-blk_cgroup_debug_stats-v2-1-196c713cb762@debian.org>
+ <aacehv3rpO9irhEG@slm.duckdns.org>
+ <poawwl44nvy4ru4mmjqi3kxfq7xqcpdeq6ghixphcrwhpv3bnz@xsltjt52rbqm>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260303103406.4355-53-jack@suse.cz>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <poawwl44nvy4ru4mmjqi3kxfq7xqcpdeq6ghixphcrwhpv3bnz@xsltjt52rbqm>
+X-Debian-User: leitao
 
-On Tue, Mar 03, 2026 at 11:34:10AM +0100, Jan Kara wrote:
-> Nobody is calling mark_buffer_dirty_inode() with internal bdev inode and
-> it doesn't make sense for internal bdev inode to have any metadata
-> buffer heads. Just drop the pointless invalidate_mapping_buffers() call.
+Hello Michal,
 
-s/invalidate_mapping_buffers/invalidate_inode_buffers/g?
+On Wed, Mar 04, 2026 at 02:28:03PM +0100, Michal Koutný wrote:
+>
+> On Wed, Mar 04, 2026 at 01:56:43AM -0800, Breno Leitao <leitao@debian.org> wrote:
+> > My goal is to ship a kernel that exposes these detailed io stats by
+> > default, without requiring any runtime configuration. The stats should
+> > simply be available out of the box.
+>
+> Does it mean the information is useful to you since early boot and
+> adjusting the param with a userspace tool in boot sequence is too late?
 
-> 
-> CC: Jens Axboe <axboe@kernel.dk>
-> CC: linux-block@vger.kernel.org
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->  block/bdev.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index ed022f8c48c7..ad1660b6b324 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -420,7 +420,6 @@ static void init_once(void *data)
->  static void bdev_evict_inode(struct inode *inode)
->  {
->  	truncate_inode_pages_final(&inode->i_data);
-> -	invalidate_inode_buffers(inode); /* is it needed here? */
->  	clear_inode(inode);
->  }
->  
-> -- 
-> 2.51.0
-> 
+Not exactly. The goal is to have a kernel binary that, regardless of
+where it is deployed and how it is configured, I know know it provides
+full io.stat details without requiring any tunable to be changed.
