@@ -1,126 +1,115 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5E53CE49B
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 18:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772647400; cv=none; b=hO9sfELoYtuk4gTQ9OpIouJLwDjATJq66VEh1aed0DUTv5D0UKmxTHhPACwQltEI5r3UFF+ojQexh7KlX2YI0XQ3STZOKjg6KbMdIPkfUkoBMw0cxdEUkL91vuKa1UtAP2yQ/Cn192nbCixJ2pnFtCJTJC32yOp6DLB5pzm0Vg8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772647400; c=relaxed/simple;
-	bh=b3z2Q6w2vfKhXsc40dBWP44/TifLR8eOYPiKu5rSkjM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IFU4hHdTNWveeHy8Eqc7ZKsf5TS0oyGaVaRqZZTnE74Dyr7RtN9yUzdaG6TkqjVSeaAMxrZrswFwlVd9fzW0yTINngy13nW5lnERzkYimsSxx7aFU1MrOxKfUUwK1mN+3+TB6F4i2Lk2MFl8o63ORYJFu3CTVzGbiGPhg5KQCpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XVAzsvot; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112B63D6686
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 18:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772647797; cv=pass; b=tHdKGjPHooSGKNjfbJQFoH+hqQhGuIrV+PiZEgOuJwGUpXqCHnKULvRR07Ol0zK37P1Wa1dZe4nZJFmfFbCDK+F55vjVxqUyzqexgH5MPSfszaqOiamvHc4d6PUD8rEpmg7AfDzBrtYHwkzzyLNH8Sj/afS2hbcIU7JtT9gKRpI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772647797; c=relaxed/simple;
+	bh=RalLVkkry4FncaXhIQ16HmZaENLn1C4uOsOfiZ6OFOU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l9Y6dCHB/ZGjbsLIdiiohC2B29Zwn1h2WSGcwlcKNEjpdRyhDQpciuo8Vzux/Lbwp9jiawRwMIGLdAxy/C09Vn6wFn90dUnXbMGwxTcyfx7A+CJAcfI+XPNNNKFBaU6QQrmhGptyyj48MC25X0yTlCoY2CQMDj13dOPii1OoUgA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=je2IXbX7; arc=pass smtp.client-ip=74.125.224.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVAzsvot"
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7d596a96475so4201235a34.3
-        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2026 10:03:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="je2IXbX7"
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64c9fcc24b3so5372400d50.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2026 10:09:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772647795; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FxB22jkjY7B3tVCucwXPsD50fRrkZ9EwD+ojbcaKSU5b6C9oVp9jYIdUf3huvEp19h
+         QNDnk5/SUFDCpN1EdYeJxOwhGrkGp1eke/mpLPnVh5IWtrSMBDwjSqGfgpHzbpZW+M3u
+         t0atbyTAxyOidG3D3BgXQY8FY4C3RdE/ZDeKAugyR7XBoFnH8QtsQxUGu3JmHTkhBaX7
+         zbb7Z3ZWKoW2Jj3ADyLb7vfI/8nsvVAhrYXjDYm/6C66BTnc6DHgeNMyj7exeu1V+c9E
+         j81LwnYQGC0KGCkHBPJ2A8p2fjAXorMqvfcqiMD5Hnd1yn0Zh0756FbvAa03kp25cwod
+         GLXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=/AAP6xDZoNmpLXND/XB3hSZCf89V94pBMhQ2bbUGJDk=;
+        fh=Rnnfzo8jZlobVIJKOIcrd2rvK6HOTvJyctEdtEnTYcQ=;
+        b=a7tW6eEx1VzBCoKLaq2Thx8AUkYauZVekZ+gBAvDODj/cUbT5VoN+6p+1MGVANO//K
+         /ZeJxXWX4gBVkfLLRa5mhV8Pd2N4zyj/MtgibmRrXsKc7hrSMCdLQSpslKbatax5jQs7
+         b8cpkpL6Ptd1P+y4D4Hjlp6zoDyK+SWpDgForSxWhJgJLsa44HaO8KAkfVvUpa/gO/w0
+         M08r5Gn6XB5sBcBEAm6LOKyAIby0845lABxMkp6hE4FpAdjeuDze9T35lGgfAdnnu5oZ
+         +d50kkdxeodeZ3dm0GzWfkZlOgdTlkdgEg/lMAqMAJHWQI055kulU49AiuHkJMBPK0dF
+         8u7Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772647398; x=1773252198; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1772647795; x=1773252595; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s081Yqcw4FMldRcUhZ32fBADnqVG0rTSkc+UZ7N5S5M=;
-        b=XVAzsvotUfvQOZn3lxZRpH1uFmYnkjKjKZBwn66eMnCZ26Ie9zEYnkMUgIv7IJQ1bD
-         cE5T/wI5RtK5teDTi8AkYWjoD5wdMrZOMrgiFmoHrR1u3/gDYy9us7JKH8/V6dMNut5t
-         s0bFX016WUn0UU2kXSUt4sn9Oeor+VHkan6Rt7mNTNAyFPKYPxq/NNacAuhwuWNFDeLR
-         OVHcXUoTDWmF7+UHgelIT1dDXJzFsdxGU176qMaJxfUQCNpE0Pbn4TYGevG3UX78cTiU
-         TZtqMug8psnp3Ka9zON9tCnqkeQo5K5cv1xM/GuG60zrxRzZVpvZvGfpe+0NAGfK+5RN
-         tewg==
+        bh=/AAP6xDZoNmpLXND/XB3hSZCf89V94pBMhQ2bbUGJDk=;
+        b=je2IXbX7sUK68iTCEqzNDtQk1dXBGuPkLGyezCkAuulDxDToUhQtJ35U0z2pDE+6Ce
+         6QB3SoK/IKFi7R2OcgTjWYEaPGC8GFurueh5S3wNMlzCkVsTtV+z3HBXpUx1nkVPkasE
+         IeVDz1t5Uedpj8pVcfCUEvch14sHW+63q3X6jBpUQrEr42yi0QUDfuA4+/1ViKxSe+Cd
+         NSa7HfpGrPo9uyMQx3eRVEhnubzWUsrLb4It+deBw/N7xNbW/DhAqKCiy7ppnd/u3xbR
+         sZ9LLBYdJ1IyV7BY0RTZUuqhIAzyqwefzUF6FDeaWl/vSqF3Xc13khNJG+BNBVtp1dnY
+         QBxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772647398; x=1773252198;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1772647795; x=1773252595;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=s081Yqcw4FMldRcUhZ32fBADnqVG0rTSkc+UZ7N5S5M=;
-        b=u1ezlIfciRHFOZGEaN/bdXzVUhvPXZ2/pjpDYbsIWTwwcUvFArk7RSnyB+K2a4b2iy
-         MAgk6teICllmvMj9xF7F+ExyQWBkgEwj+AvlJlP9pXUTp4yKEEx95bjdzrmcxQ2xX7tp
-         Izw2/0Cx0Lavm7hgMoCk4rEQ+O4xmPff32MkcD7nP7P55yRiCE8BuZB4qfbZ8tjCPjKD
-         zWyKbmheeI9f+LhdVJ6+8+siyZqoYR6b3bO1no1Y750xHEmmhWeVXz+/bRfPqv7HM7+H
-         AHZ3JDcw1QQhaotaD0LEKIrEqlENayM14y9S31wR/l7DqZZ6pC+p0uVvGDkGM1hbzGZZ
-         4BlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9K068/BPmDc7A4jEgRMJ/33DpBjLR/92WmB5/m9Lendof1jgMuCXwIZAksdMGjBX2z4xjfClndEFiVw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUbeaSgdk9we2QMMLQHLXmgApFKcqS9lGa1jJPEgD9MCrscN7W
-	uLT9nBUltKijcyJnt/OfUzDCaaQJ5daEivcGERNDrJ/qVNWg3D5yFQL/
-X-Gm-Gg: ATEYQzxxawXl/HELehC4anx18SvPwd1g1CAZZJBZkrcW8FakAWywICWLpCQpyuNWNo6
-	52VXpkFtLfYUjaMoOtLRcXZiUCElBgXG6RPA943A/BrciFCEN+VDgA1xccDtd5jmilZBoCEG4t1
-	Ve9Rjjk5+L61egsKj9ZokPIdo/D3P/MpHoGfQjWx3HuxK0xWrOT+6TW6OafwZNnPAAyCcm2ILpV
-	83UaT8ETlff5+WA77A2ZTDX5/McOvGsk2FxNPySj6My4/Lt3kNU4//0u0gwqF5om8n62iqNALN2
-	RRPnFvmuoBL4Fkl31C+P/FQZvw9sGZJyDYPaCAr5Qm6T8bWw0nm4Mgh561dCcZozYA+tFrb/k+E
-	EFD9GTnsVhWq3lsoJNIE4MXJh/QOpnNQf2iFotsuFDb4Qt9/6rk+cnxEmkEH6BG7sfsugckmnzO
-	cOZP8JZqhBiYeyQaIOuSAS
-X-Received: by 2002:a05:6830:264e:b0:7cf:dca3:5c6f with SMTP id 46e09a7af769-7d6c7f5e661mr1785549a34.16.1772647398349;
-        Wed, 04 Mar 2026 10:03:18 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:c::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d58644edfbsm15582806a34.6.2026.03.04.10.03.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 10:03:17 -0800 (PST)
-From: Joshua Hahn <joshua.hahnjy@gmail.com>
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Nhat Pham <hoangnhat.pham@linux.dev>,
-	Nhat Pham <nphamcs@gmail.com>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH 3/8] mm/zsmalloc: Introduce objcgs pointer in struct zpdesc
-Date: Wed,  4 Mar 2026 10:03:16 -0800
-Message-ID: <20260304180316.1429892-1-joshua.hahnjy@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <CAO9r8zP56KdyaQjMp4PK_yS27x35s0p=aHYzT8Ey0f7bkbvNuA@mail.gmail.com>
-References: 
+        bh=/AAP6xDZoNmpLXND/XB3hSZCf89V94pBMhQ2bbUGJDk=;
+        b=icOcC3ykaOzLoS2lIp5YdRvjTpCwnY1XtJg2WE6XW7YJDk7tZzQOutC7DQZGafag4o
+         OiZXZxiXZ663mlyCwMembpbHNo0ENecqsq+wJtFgrqiSPUyFzaJ+ZmteWZ39hCtoJtSy
+         vMuoa9FGZjmBB6SIaCb2QOgncM61D8ZhK+UX4iqOMNcUPCwiION2IRJvsUkB8sJL9VC6
+         pRIXtRMV75Afh75/2f4IWWTnbo0Dagdc49lztMi4LPEC+bGf/ghhTxMPPMsuQisBR1XI
+         S2C4OdYLEW8V//0kpZkTY1j5oT0bNMMLDswB3YkFlEmZOoFNpNKC1eIU9+zNFmlApPdh
+         A67A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBaYT3WZRjYEyEQvWF2re9XhXPSu7X3kBX30Z/R+V92iFBrDu2cex9xIE3Jk0AlPmSpYmOsUKufysIXA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkvaO+JCDMXIER2VPnL5PDStX9kZ3cVTBByJgyZQvvC7jno38u
+	OMcA6iTrftzHhix5qBjpW7xLP1tRcVjGyqpR0T2J5OjXYh3AOs1tZ5FvSYAmhARfphi2kIT1Itr
+	gRQXWUxIlaapaZvcRpV3k6V8elGmoh6M=
+X-Gm-Gg: ATEYQzwl1HzYsSWbmDy8MPEqqu40MG6yRI6A22uNJohwVF9C9T2sQIZey/T+l8qayUr
+	QYkzIZ54ewL0YgAp2xcr1EbsEzO812ZBMUHji4FSeeOckiWiR8eSj55m+eLaNe/fdx0WWqRrrKt
+	Ex1jk8v6ENcNJX37YyAv7J/ThoBBNuXoUYYayP2AwZuGZ20nAALn2DYL/N75Stxlacch78trhjL
+	JXzVfhUfI+PoJ9bXdS/Y7+qkmztu732ciJy6rIbQnPRp7kZRceOroI6j/+kXYhUtdWpDfUEtEh9
+	7wD//9j35Pc8uyqewdOOi5Jd5rrIALy+YZ9xlDneZeUjC2EScNQ8aj74prl7jtn4+5p8YsbcOs0
+	U04Q4iBfnmg==
+X-Received: by 2002:a05:690e:dcf:b0:640:dd02:a777 with SMTP id
+ 956f58d0204a3-64cf9bbde6dmr2328620d50.69.1772647795104; Wed, 04 Mar 2026
+ 10:09:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com> <aaguW3p3_LOeM_Dz@infradead.org>
+In-Reply-To: <aaguW3p3_LOeM_Dz@infradead.org>
+From: Adrian Vovk <adrianvovk@gmail.com>
+Date: Wed, 4 Mar 2026 13:09:44 -0500
+X-Gm-Features: AaiRm53qIrqqlwryq6-vL-KMtUUaiHvUVdrssaMtyjIxU1gScjYF_6wvmEHxIl8
+Message-ID: <CAAdYy_nRbYMsiysC66nrMqFEtEdjjBTdpLcVZBak-M9QL7BK3g@mail.gmail.com>
+Subject: Re: [PATCH v1 0/3] dm-inlinecrypt: add target for inline block device encryption
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Linlin Zhang <linlin.zhang@oss.qualcomm.com>, linux-block@vger.kernel.org, 
+	ebiggers@kernel.org, linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, 
+	quic_mdalam@quicinc.com, gmazyland@gmail.com, israelr@nvidia.com, 
+	mpatocka@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 4 Mar 2026 08:58:44 -0800 Yosry Ahmed <yosry@kernel.org> wrote:
+Hello Christoph,
 
-> >  static struct zspage *find_get_zspage(struct size_class *class)
-> > @@ -1289,13 +1336,14 @@ static unsigned long obj_malloc(struct zs_pool *pool,
-> >   * @size: size of block to allocate
-> >   * @gfp: gfp flags when allocating object
-> >   * @nid: The preferred node id to allocate new zspage (if needed)
-> > + * @objcg: Whether the zspage should track per-object memory charging.
-> >   *
-> >   * On success, handle to the allocated object is returned,
-> >   * otherwise an ERR_PTR().
-> >   * Allocation requests with size > ZS_MAX_ALLOC_SIZE will fail.
-> >   */
-> >  unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t gfp,
-> > -                       const int nid)
-> > +                       const int nid, bool objcg)
-> 
-> Instead of passing in a boolean here, what if we make it a pool
-> parameter at creation time? I don't foresee I use case where some
-> objects are charged and some aren't. This avoids needing to always
-> pass objcg=true (for zswap) or objcg=false (for zram), and reduces
-> churn. Also, it allows us to add assertions to zs_obj_write() (and
-> elsewhere if needed) that an objcg is passed in when the pool should
-> be charged.
+On Wed, Mar 4, 2026 at 8:06=E2=80=AFAM Christoph Hellwig <hch@infradead.org=
+> wrote:
+>
+> What is the use case for this?  I'd much rather add fscrypt support
+> to file systems that are missing it than forcing another stacking
+> layer.
 
-Hi Yosry,
+Maybe I am misunderstanding something, but this seems orthogonal to
+fscrypt? Userspace would use this to do LUKS full-disk encryption, but
+with the hardware acceleration provided by the inline encryption
+hardware.
 
-Thank you for another great idea! Makes sense to me, then I can leave most
-of the existing ABI signatures alone and just make the zpool changes.
-
-Thanks a lot again : -)
-Joshua
-
-> We can even add a zs_obj_write_objcg() variant that takes in an objcg,
-> and keep the current one as-is. Both would internally call a helper
-> that takes in an objcg, but that would further minimize churn to zram.
-> Not sure if that's worth it though. Sergey, WDYT?
+Best,
+Adrian
