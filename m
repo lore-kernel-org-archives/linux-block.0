@@ -1,174 +1,162 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A69D377EB1
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 12:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1826C23F26A
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 12:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772626345; cv=none; b=gdz9WWPtZPRUZeXsac59UKVdKAjHQkeZ7ZgBXHlpR2m3lPCIrNaBt3EV4Zw9lnDLKvIfpcsUKIQvY7QYArgpFUFz8ZgHsNTBUxVWCBC5DpTAb1Uqh0OOrbGEehNG5wEKhTr8ty4c7hUAbTnOF/DP8sdHx0kq8G9RKCXWvLK9jtY=
+	t=1772626659; cv=none; b=DAR+rozZtSAuexkTSFtesSsvOFezMrTTrq0lgqiuHvD5oXJ0bEWj7x5idIwXlyOGGuY5yTeD5YCG6WTjnEKg8XdgO5NV1/zLOI8a6kb9CD0KeVILK8DWpsh/Cy+2ZvCenbW0tSCatenQaaiRSJqWU+zpRo3g0XaN2AJZETt00iU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772626345; c=relaxed/simple;
-	bh=5PBIpDZUoWmzMLSSr4AMFrJThU2kmJNnnlCij9fJqvY=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=pKjbOY9mIVma9gR15fqPKO8fuO0HuTYrB0nEhfCln5wmpLKVvK+bP8wK/I/yVfiyik7qDwQ3YXpKbmlBDSAMJUs2Q1mXQa7/RgCy+AtluqiEvzXIDdijTZcxxor8PUmZQW52d6XSaepi3I6+MOh2cvr42mM1lbvN9Xdv0FvqrTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g1QdB4do; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1772626659; c=relaxed/simple;
+	bh=Gi8vIjmxw30nPsVfY5h1SYrFPO/Lza1eh9E6GrQ4rtk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=MnO8HU9liOEa58w7fZ89PXuLbNU8CApuqnkl4ofBcxdNX8Xaz3bIZ7Q/QE/UH59v3/owrs6aKJYQi09HooMyX6rLW1ZYVRGaSSOLXPEUChsuzuqdV4tKZfey9L18rtZDMOMeP1/yAcTV61GFpqG2t7PcKW3cNMgMbuvS46fbL/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=UBnoObBy; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=j+sM9UOi; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g1QdB4do"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-483a233819aso66635455e9.3
-        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2026 04:12:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="UBnoObBy";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="j+sM9UOi"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6245SOEJ152521
+	for <linux-block@vger.kernel.org>; Wed, 4 Mar 2026 12:17:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=LUNISlqFvuqnxUOZI9HzNX
+	Af4XHNKIKzsl1pT9nO+Us=; b=UBnoObByL4ZxXEE5LhlbH4Rr6fXjJZCjp4Clvv
+	rDAiMZhWEgGneIRJA52g2soGrhK+GhmQCdrrybfGCUopAxoBn1YFgstmheFskHCb
+	B7B6yJA5k3VkAu1fmEJGlWbFBB/Cy5gsGSX4Idh+0o1OqxH/vqcB7CcGgBTPAvpa
+	me6N6CzZbVa+0O/Q/+jxM2EAz0D14ddGQvfr3N/jyHMS30t8C0Zl6SRe4x4i/DcV
+	svizXjD+zU1ahBhOTalnknxDE9ThiYrOxdGYs8aSSOrChehadtJhdlZ1OeK83l2n
+	DKNE/MW5fm1ZYoaS6UopoKpewLMNP3WWY3F7zLCQ6smV+YOw==
+Received: from mail-dl1-f69.google.com (mail-dl1-f69.google.com [74.125.82.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cp3tvkj8e-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 04 Mar 2026 12:17:37 +0000 (GMT)
+Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-1277896014fso118512049c88.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2026 04:17:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772626343; x=1773231143; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5PBIpDZUoWmzMLSSr4AMFrJThU2kmJNnnlCij9fJqvY=;
-        b=g1QdB4do0A00IJyh4YOenmWRPZje1sfomIaSWdoO5KTRgO5tXJt+8mlCMh4NOULI3l
-         rajd1URAhDYtIrrmC7Dl/9yuzzy8LzEsml4ruLw7DdnS09rB16NeTdd7e17rNUvZwSC9
-         y+RCBni71L2aJUjNqpgSclEzrHB+j8xSMBMGs5fNrBqZPMsOo146NKaZo6xVXlNICYlb
-         g2AeNcNca+Mrv5i8L09J//xIzssGVbgx2Z2jiMX+JshtHVijnA1IyOo5laJ4LKvYUL5U
-         +z9CSoTGiJuT7cMFN7y0ehzUnNCJf7X2eg30hxprGKPIPBPU+2akv0N/0WUYrIgQfXls
-         jMCw==
+        d=oss.qualcomm.com; s=google; t=1772626656; x=1773231456; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LUNISlqFvuqnxUOZI9HzNXAf4XHNKIKzsl1pT9nO+Us=;
+        b=j+sM9UOiY8oY61pkgY5XIZ0ymsj6jaXUQHbPgku1yrJAaKi0blq3C6uP2GUDTFUtsT
+         N5w7WbBxwNLjtO7pzIVBRwfZlw8Rh7Cu3uWqj4h0P8OqQfHqgfiELEDS/BRiJN0wgcyF
+         vHQTH1UJj9SCFOz9ZhUjvDn8rRTm5kTb6h1kL5Vd2VDduaVJFT8b+y5z+UIUo6U9H+6N
+         qMsgYG6o299Wz9KSXSKxQspQF2y9Sv7IgQ9s8KvuZMTgwmBopr69BMY+2eH71AEq05QZ
+         wvkon3waQratIRJrl5MBq/X6sveieN2ieopT0meuepmfVr4le0Y0Sg7Dt8DbBRdJyhAE
+         +pJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772626343; x=1773231143;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5PBIpDZUoWmzMLSSr4AMFrJThU2kmJNnnlCij9fJqvY=;
-        b=woc7cKY7SE3d+8j2NNR3J/PrXWoZli/+OOBJotPfpUYgxYi/F616TqEi1Mverv0byE
-         lGFaDUAGsjfr8Jxzdkp1UogZrdPNI6+RJbaPH2h3BG/vHXT4dorteoIxSdmvFTOrld2e
-         g7t1bc4xmbIc9mQAj/uW3Bnmj9HXm1mMFDCAD5UcGPBEqyD2qfp/xzQxjoWOwyt00voi
-         U/dmDJD2RGXC+29qRKayVLmSXFyPPQ/KwkcXPd+2NjZ9pSTDwy2zdujO3aim/omxaIlC
-         S6kFZOAy8nrb8U5ILnwd0qVK5qKehEwXQXNC7OJtJ2a/Y0EXMbuQTshy0E2dSDkdlgJN
-         Y3AQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKkGE4Tvoks6ihIYraVBUjACW7FioqY/AxZ0ww9vufcpsS4YZN7Seyi3qMROD9dWv/+HpIt4K8yJEYlg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEutVnHEeCEKgnAydBsBkSZoABcWWkX09j+X3M735bmOlLJgAc
-	c3NLlEZ08PUOMRb2eP189n5x1qLBcQ+6BU85elMmYRlxwIB8jeYGsyjx
-X-Gm-Gg: ATEYQzxX9ypE1o6l33cXDRK0LOYBLPFrS7MW3q3IxC0NRAlRbjBNfKkg6y/tM1G12gC
-	W8/InzZrrcbtdSK2wjEuRr15ng/A7Hlicrh8WbieUYCGWd7uoSsm2TlCNgRkHksWXzXrSIB6cs/
-	3WF2zYPejFA+uZOKWGfNteiV2yj7yNGH4g6UP+iCPSj36S7gWYApy7cNbVUQBY6BkWYV0etyqWr
-	4ZVXFMzGlsN7Jx14v9TCXtFRiIjhXYSH2PicP8oHHmxyVwu+tIRg97k2daJeX6tZ2kwOzD+XVku
-	VxjW3l911Zlp//4vCRWekvJbB763NERBCMALQQIwIhQcJQyr+2ydLfpu3B7gnErpwosshkG9Bj7
-	Knin9acCLOfXKPGNdB2Wl7r0qSWuvdkPUvcADEoO9tcZKbNNflDoWURbkFJqV121+756rfBgfaL
-	bZk34aJ8QBwnJr6ogcr4TrdcRoqA==
-X-Received: by 2002:a05:600c:1f85:b0:47e:e712:aa88 with SMTP id 5b1f17b1804b1-4851989f765mr30694295e9.31.1772626342560;
-        Wed, 04 Mar 2026 04:12:22 -0800 (PST)
-Received: from imac ([88.97.103.74])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485188923c2sm48580075e9.14.2026.03.04.04.12.21
+        d=1e100.net; s=20230601; t=1772626656; x=1773231456;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LUNISlqFvuqnxUOZI9HzNXAf4XHNKIKzsl1pT9nO+Us=;
+        b=F3tyxqc8eLM2QWDjus/YYYzFrowv4l9y6wcBcAh5OmKcSXh9u+KcnEh9b5DedQtwYH
+         zd7UKyhGeFHnZc2CB2hg7uHAVQJrNRJx76fnxN6jEGzSvjoMtGqM82PEZLtIwMmMSjmJ
+         ClwZSMjq3eQivxt6ngQinux0ER9CR7Axa+HYe9O4qllj9OXp7v99V+gUCH2uCFWsIMeE
+         Qfj6AKUlp2sUBbMVALHr4PEUvxR78/QqtCJqqOdk9hqBcehIYP0lj0I6BrXS3hBW3atj
+         K+wMCuBkoEMczn6ZRbIVq76Wl9InAsm2MjGj65aKPjC7zE8Zv0mqYEP4e8ZBd309Cot6
+         p5NA==
+X-Gm-Message-State: AOJu0YwvVAmaJ/sMSdOn2yNaem82Eh+cFW5k/d0Ig3751KXdAfl1WcG+
+	q+XSXlEfmX5zugJy6Gqo1lSwUy63tGFOC/tSQW6ukMh4WUnyph7VMrHvjizPkWdQZlUbrmuPV/6
+	f/+iKxLKnuqCGCZeU38BPxQr4FCB0jBd5inqXSLU4jDRvvZGL9lIoyrToWGZFORCGDM02m93xEn
+	cv
+X-Gm-Gg: ATEYQzxVK+xAG+16mD1WDhL/IXNTKbqCbO+nc51vwqGQGnfM+heEua1bP/GkuPrvJFo
+	TIF42E40gl8Z9nvO6Ts4Ab0py8ghOv0y+lvsGhDi9b/LaySgbFq+3dTGvqEynjn5fF+FK63JAQd
+	Q8AOxGfF8Tag3bl4GYeNMbl1iQ9B5syA+lRyJ0PR0OUpGwLPjqag5B+ZMx3vmkprmTRmQc6J07R
+	MR8cE+M3QY77rUCqBSWyN4Y/5QbPTe//0ykwfW9iA2lvCK4DDF35QdZqX5oKM02PZ4WkmwIf4oF
+	nPnV6B/Ic7x26IAvj2rLAwK55N17nyniZfEHRc9NgoYeyKwfosYXePxPinssp5FbBZRXCRmH2dj
+	jxP30i3/zIJXE6ylUYbnjmfgCmGAOKqenRGfLZe4IKq8yxX0GSliiu5ZV5HQXl2gFdcQ2lZRrSJ
+	PpNPxg
+X-Received: by 2002:a05:7022:6ba1:b0:124:9acd:3b15 with SMTP id a92af1059eb24-128b70eb80emr744122c88.39.1772626656371;
+        Wed, 04 Mar 2026 04:17:36 -0800 (PST)
+X-Received: by 2002:a05:7022:6ba1:b0:124:9acd:3b15 with SMTP id a92af1059eb24-128b70eb80emr744109c88.39.1772626655800;
+        Wed, 04 Mar 2026 04:17:35 -0800 (PST)
+Received: from u20-san1p10573.qualcomm.com (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-127899dfc47sm22171276c88.6.2026.03.04.04.17.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2026 04:12:21 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Hristo Venev <hristo@venev.name>
-Cc: Jakub Kicinski <kuba@kernel.org>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  netdev@vger.kernel.org,  Josef Bacik <josef@toxicpanda.com>,  Jens Axboe
- <axboe@kernel.dk>,  linux-block@vger.kernel.org,  nbd@other.debian.org
-Subject: Re: [PATCH] netlink: specs: add specification for NBD
-In-Reply-To: <6a1339999b091edaaa15e34aceb7961dfc61581b.camel@venev.name>
-Date: Wed, 18 Feb 2026 11:28:44 +0000
-Message-ID: <m2fr6yl28j.fsf@gmail.com>
-References: <20260215180309.2255721-3-hristo@venev.name>
-	<m2o6lnlg2y.fsf@gmail.com>
-	<6a1339999b091edaaa15e34aceb7961dfc61581b.camel@venev.name>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Wed, 04 Mar 2026 04:17:35 -0800 (PST)
+From: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+To: linux-block@vger.kernel.org, ebiggers@kernel.org
+Cc: linux-kernel@vger.kernel.org, adrianvovk@gmail.com,
+        dm-devel@lists.linux.dev, quic_mdalam@quicinc.com, gmazyland@gmail.com,
+        israelr@nvidia.com, mpatocka@redhat.com
+Subject: [PATCH v1 0/3] dm-inlinecrypt: add target for inline block device encryption
+Date: Wed,  4 Mar 2026 04:17:25 -0800
+Message-Id: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDA5NyBTYWx0ZWRfX4xD4dRSMJhv5
+ Cuv1B7qkyYFdzTNhI5s7saJwagmYpsjde84EwwDrld/tAkYvryEwKJMb8eCYB/OeZxfXV9jGDtt
+ qbccZepPX5QFX8612bAfORUGhvA9twi1IOQNJnGWt6eZa0LgosfxMSjrIohbt0ySMsMScFhglHs
+ j1S+YajuH+tuJ73U3RlBLTzKriunLzZ5O/I0RWy68ZArauZV1HF+GFCMQiHYcK/alunfzWcX8Oo
+ Um5R1LYfjb/ZbQsdK2wZl9kFnJu2vlPPM32QHKEaD+66053itpUvitYwzKIq+UUZY7s9pukrZUG
+ zqL/XI8KCJyVaFSOtVkas88XQb6knwOrzMrelyvO+eIQTPlDxIlGKnTo/XFfzbojJHN7A7glLKU
+ E8RujcDjL5iXiIq8b6BghY6T879YAs0A5I6W37PvQr3XLc2BGefUyF6PgcBzk1AHRwV5MMcq2Xs
+ l4RThqcJ38Xmvq9MVnQ==
+X-Authority-Analysis: v=2.4 cv=VYv6/Vp9 c=1 sm=1 tr=0 ts=69a822e1 cx=c_pps
+ a=kVLUcbK0zfr7ocalXnG1qA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
+ a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=RSN1029XlG8FoBkqcK4A:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=vr4QvYf-bLy2KjpDp97w:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: hOXsbcmlJ8kh6T3U_gLTtbxb7EQBdjoc
+X-Proofpoint-ORIG-GUID: hOXsbcmlJ8kh6T3U_gLTtbxb7EQBdjoc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-04_05,2026-03-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 lowpriorityscore=0 suspectscore=0 bulkscore=0 adultscore=0
+ spamscore=0 phishscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603040097
 
-Hristo Venev <hristo@venev.name> writes:
+This patch series is based on Eric’s work posted at:
+https://lore.kernel.org/all/ecbb7ea8-11f6-30c1-ad77-bd984c52ca33@quicinc.com/
 
-> On Tue, 2026-02-17 at 12:17 +0000, Donald Hunter wrote:
->> There are yamllint errors:
->>=20
->> make -C tools/net/ynl lint
->> make: Entering directory '/home/donaldh/net-next/tools/net/ynl'
->> yamllint ../../../Documentation/netlink/specs
->> ../../../Documentation/netlink/specs/nbd.yaml
->> =C2=A0 159:81=C2=A0=C2=A0=C2=A0 error=C2=A0=C2=A0=C2=A0 line too long (1=
-04 > 80 characters)=C2=A0 (line-
->> length)
->> =C2=A0 169:6=C2=A0=C2=A0=C2=A0=C2=A0 error=C2=A0=C2=A0=C2=A0 syntax erro=
-r: expected <block end>, but found
->> '<block mapping start>' (syntax)
->> =C2=A0 170:7=C2=A0=C2=A0=C2=A0=C2=A0 error=C2=A0=C2=A0=C2=A0 wrong inden=
-tation: expected 5 but found 6=C2=A0
->> (indentation)
->
-> Thanks, I will fix the lint errors in v2.
->
->> > +doc: See :file:`drivers/block/nbd.c`
->>=20
->> Prefer to see a meaningful doc string here.
->
-> I will add more proper documentation in v2. I couldn't find any
-> existing documentation of this netlink interface, so I guess I will
-> write it myself.
->
->> > +attribute-sets:
->> > +=C2=A0 -
->> > +=C2=A0=C2=A0=C2=A0 name: nbd-attrs
->> > +=C2=A0=C2=A0=C2=A0 name-prefix: nbd-attr-
->> > +=C2=A0=C2=A0=C2=A0 doc: Configuration policy attributes, used for CON=
-NECT
->> > +=C2=A0=C2=A0=C2=A0 attributes:
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: unused
->>=20
->> No need for unspec in the attribute list, ynl codegen does the right
->> thing.
->
-> For me `pyynl.ynl_gen_c --mode uapi --header` no longer generates
-> `NBD_ATTR_UNSPEC` if I remove this. Is there a YNL property to specify
-> the name of the zero value of the attribute set? If not, should I
-> remove it anyway, changing the generated header?
+Eric’s patches introduce a new dm target, dm-inlinecrypt, to support inline
+block‑device encryption. The implementation builds on the work previously done
+in Android’s dm-default-key, but intentionally drops passthrough support,
+as that functionality does not appear likely to be accepted upstream in the
+near future. With this limitation, dm-inlinecrypt is positioned as a
+practical replacement for dm-crypt, rather than a general passthrough
+mechanism.
 
-Oh sorry, if your goal is 100% equivalence then I guess you need it. We
-have the same in "fou" for example.
+On top of Eric’s series, this patch addresses a limitation in dm‑core: the
+inlinecrypt DM device does not currently have a block crypto profile
+initialized, because only DM devices with passthrough support can be associated
+with a block crypto profile today. However, dm-inlinecrypt consumes inline
+crypto capabilities itself and does not pass them through to upper layers.
+To support this model, this series introduces a new consuming‑crypto flag.
+This flag indicates that the underlying block device exposes inline crypto
+capabilities which are consumed directly by the DM device, rather than being
+propagated upward. This allows dm‑core to correctly initialize and manage a
+block crypto profile for dm‑inlinecrypt devices.
 
->> > +operations:
->> > +=C2=A0 enum-model: unified
->> > +=C2=A0 name-prefix: nbd-cmd-
->> > +=C2=A0 list:
->> > +=C2=A0=C2=A0=C2=A0 -
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: unspec
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 value: 0
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 doc: NBD_CMD_UNSPEC
->
-> A similar question applies here. If I remove this, `pyynl.ynl_gen_c
-> --mode uapi --header` no longer generates `NBD_CMD_UNSPEC`. Is there a
-> YNL property to generate it? If not, should I remove it anyway?
 
-You'll need to keep it for equivalence.
+Eric Biggers (2):
+  block: export blk-crypto symbols required by dm-inlinecrypt
+  dm-inlinecrypt: add target for inline block device encryption
 
->> > +=C2=A0=C2=A0=C2=A0 -
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: connect
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 doc: See :file:`drivers/block/nbd.c`,
->> > :code:`nbd_genl_connect()`
->>=20
->> Prefer to see meaningful doc string (same for other ops)
->
-> I guess I will have to document the four operations in v2 as well.
->
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attribute-set: nbd-attrs
->> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dont-validate: [strict]
->>
->> nbd.c has strict & dump, should this be [strict, dump] ? (same for
->> other ops)
->
-> The NBD operations don't have `dump`, only `do`, so adding `dump` to
-> `dont-validate` does not change the output of `pyynl.ynl_gen_c --mode
-> kernel --source`. Should I add it anyway?
+Linlin Zhang (1):
+  dm-inlinecrypt: Expose inline crypto caps to the device
 
-Ah, so it's redundant in nbd.c.
+ block/blk-crypto.c            |   3 +
+ drivers/md/Kconfig            |  10 +
+ drivers/md/Makefile           |   1 +
+ drivers/md/dm-inlinecrypt.c   | 416 ++++++++++++++++++++++++++++++++++
+ drivers/md/dm-table.c         |   3 +-
+ include/linux/device-mapper.h |   7 +
+ 6 files changed, 439 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/md/dm-inlinecrypt.c
 
-Thanks,
-Donald.
+-- 
+2.34.1
+
