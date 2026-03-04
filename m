@@ -1,54 +1,54 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC882225417
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 05:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4DF366544
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 06:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772603211; cv=none; b=mkL63xr6QoEE2pBN9P1wsr5xr2eBWbfGY06hyoJjYmhto+8rk8/z9Tk9refhRwPxNLFPuQDmlkuFMcps5dDkJWxuiA/0FqI1DMipHm5nZ4YMH9Y70MDkck6guO8BNsCl0+U8IWfcI/d/HMTjYzq3NI4NB2LLelLzVB95cYmFM1I=
+	t=1772604840; cv=none; b=hmC9ExhZ8CZ5xSI51Gwoa0V/SGCJP5a1Q900GCXgS2OQ72LcSrIQdNyPIRhVaxi6lIErS7Cd9f1a9YqN78KOVRS76UGY/v+KFjuo6LK1nF9yJCR6nfCgY6vIAlINOY3y/HDRId5DXYEHySR1ah0hyE7FUFOeY4Nyen27QfJFYQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772603211; c=relaxed/simple;
-	bh=hUIfmPCBilfP0Xqq8pH0ZUucRs2CUWQ8XFLyALPYOuA=;
+	s=arc-20240116; t=1772604840; c=relaxed/simple;
+	bh=gqXRrFTZaqcVbrfVc+/wuwQR8f0xb49c1Wd6BXvdxFE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FPBpgd4o6Iy1Zjx36S4FU/bLydkODIQf96WSEgjzh0dBgD3Nz+X6TQ2xi/MpyqCi+p/FuEVAWkcJQM1QuzvJdvH/fSgqeju2JzGavggwoJWe4vCa84tJWdQ0BanIhwQ1eVR5M1WlRWbNZClWo4iBb63MSLM62Eg5dxVWKWrbWTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Shhq8aM3; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=oj01nsxVDA1nLOT1Ys4iLZST32X3x/fAL9v/ChonspR9Ekrx6tIL+mKB8AtpSonxQgqAE71x6iTSu/EUNRy0Xs0CqgeyOPU8jWt7ZX3cJzD0iTM79CagJALVmWcozPmU+OLsv8JoyUR3qOD/YKNDzCRlgkkcCyPMjQnaU6L9aFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HkFYOMZE; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Shhq8aM3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HkFYOMZE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772603209;
+	s=mimecast20190719; t=1772604837;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YwA0ezg/TFuorG4SmLYdxWUhuc54KWNW48ti3csISxk=;
-	b=Shhq8aM3vIABbr8yOh+e6Y0PsGt8TDW/48KEMWi834KEImKKDSrNgfrmn2uHdK2ulFu8D7
-	WcdpLFX7187vWcf39u7WAoiJ0W6Q2G+suTGHU3cutUx8eTAGIV0/vlNM4b0SaiF/5kc/x1
-	0OX1yT/FkxPmeOkwDERWr+wUm0OBCNw=
+	bh=hifhB8EKHJQ7PQPYx3jR5aKs6hdV4ehfn0Z4JLP6Nxg=;
+	b=HkFYOMZEgI5NR5c9K7j7g9MQnmwmpwNPt1Ns4Q9BdtFNMDIq8j6cLScdq1jYRM9gRt/m4b
+	u8RwjjaSBJR8z6AskcgaVdZ5LgwL7Gk7nSOD9ivWA//wrvvA3rB4vJ0RQl/Q6zNEXMTRli
+	P2ZhY0ul5bGl7gipTpFmMng5dCoUn5k=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-1g9MKLyDNZC5E5YDYvfhVA-1; Wed,
- 04 Mar 2026 00:46:43 -0500
-X-MC-Unique: 1g9MKLyDNZC5E5YDYvfhVA-1
-X-Mimecast-MFC-AGG-ID: 1g9MKLyDNZC5E5YDYvfhVA_1772603201
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-QBsmGE1QP9ycB549mn9zFQ-1; Wed,
+ 04 Mar 2026 01:13:54 -0500
+X-MC-Unique: QBsmGE1QP9ycB549mn9zFQ-1
+X-Mimecast-MFC-AGG-ID: QBsmGE1QP9ycB549mn9zFQ_1772604832
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9934C1956096;
-	Wed,  4 Mar 2026 05:46:40 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D94C7195609F;
+	Wed,  4 Mar 2026 06:13:50 +0000 (UTC)
 Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8845619560AB;
-	Wed,  4 Mar 2026 05:46:38 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0873D18002A6;
+	Wed,  4 Mar 2026 06:13:49 +0000 (UTC)
 Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6245kbZD1917094
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6246Dm4e1917917
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 4 Mar 2026 00:46:37 -0500
+	Wed, 4 Mar 2026 01:13:48 -0500
 Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6245kaS41917093;
-	Wed, 4 Mar 2026 00:46:36 -0500
-Date: Wed, 4 Mar 2026 00:46:36 -0500
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6246Dmhf1917916;
+	Wed, 4 Mar 2026 01:13:48 -0500
+Date: Wed, 4 Mar 2026 01:13:48 -0500
 From: Benjamin Marzinski <bmarzins@redhat.com>
 To: John Garry <john.g.garry@oracle.com>
 Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
@@ -57,10 +57,11 @@ Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
         linux-scsi@vger.kernel.org, michael.christie@oracle.com,
         snitzer@kernel.org, dm-devel@lists.linux.dev,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/24] scsi-multipath: failover handling
-Message-ID: <aafHPC3yncBxuBVx@redhat.com>
+Subject: Re: [PATCH 10/24] scsi-multipath: add
+ scsi_mpath_{start,end}_request()
+Message-ID: <aafNnO6o2yoeLjPs@redhat.com>
 References: <20260225153627.1032500-1-john.g.garry@oracle.com>
- <20260225153627.1032500-10-john.g.garry@oracle.com>
+ <20260225153627.1032500-11-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,122 +70,45 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260225153627.1032500-10-john.g.garry@oracle.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20260225153627.1032500-11-john.g.garry@oracle.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Feb 25, 2026 at 03:36:12PM +0000, John Garry wrote:
-> For a scmd which suffers failover, requeue the master bio of each bio
-> attached to its request.
+On Wed, Feb 25, 2026 at 03:36:13PM +0000, John Garry wrote:
+> Add scsi_mpath_{start,end}_request() to handle updating private multipath
+> request data, like nvme_mpath_{start,end}_request().
 > 
-> A handler is added in the scsi_driver structure to lookup a
-> mpath_disk from a request. This is needed because the scsi_disk structure
-> will manage the mpath_disk, and the code core has no method to look this
-> up from the scsi_scmnd.
-> 
-> Failover occurs when the scsi_cmnd has failed and it is discovered that the
-> original scsi_device has transport down.
+> Since we may need to update mpath_disk data, add a callbacks in
+> scsi_driver to actually do this work for the scsi driver.
 > 
 > Signed-off-by: John Garry <john.g.garry@oracle.com>
 > ---
->  drivers/scsi/scsi_error.c     | 12 ++++++
->  drivers/scsi/scsi_lib.c       |  9 +++-
->  drivers/scsi/scsi_multipath.c | 80 +++++++++++++++++++++++++++++++++++
->  include/scsi/scsi.h           |  1 +
->  include/scsi/scsi_driver.h    |  3 ++
->  include/scsi/scsi_multipath.h | 14 ++++++
->  6 files changed, 118 insertions(+), 1 deletion(-)
+>  drivers/scsi/scsi_lib.c       |  4 ++++
+>  include/scsi/scsi_driver.h    |  2 ++
+>  include/scsi/scsi_multipath.h | 24 ++++++++++++++++++++++++
+>  3 files changed, 30 insertions(+)
 > 
-> diff --git a/drivers/scsi/scsi_multipath.c b/drivers/scsi/scsi_multipath.c
-> index c3e0f792e921f..16b1f84fc552c 100644
-> --- a/drivers/scsi/scsi_multipath.c
-> +++ b/drivers/scsi/scsi_multipath.c
-> @@ -518,6 +518,86 @@ void scsi_mpath_put_head(struct scsi_mpath_head *scsi_mpath_head)
->  }
->  EXPORT_SYMBOL_GPL(scsi_mpath_put_head);
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 7ed0defc8161e..61179caa7b2c8 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -654,6 +654,8 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+>  	 */
+>  	destroy_rcu_head(&cmd->rcu);
 >  
-> +bool scsi_is_mpath_request(struct request *req)
-> +{
-> +	return is_mpath_request(req);
-> +}
-> +EXPORT_SYMBOL_GPL(scsi_is_mpath_request);
+> +	scsi_mpath_end_request(req);
 > +
-> +static inline void bio_list_add_clone_master(struct bio_list *bl,
-> +				struct bio *clone)
-> +{
-> +	struct scsi_mpath_clone_bio *scsi_mpath_clone_bio;
-> +	struct bio *master_bio;
-> +
-> +	if (clone->bi_next)
-> +		bio_list_add_clone_master(bl, clone->bi_next);
-> +
-> +	scsi_mpath_clone_bio = scsi_mpath_to_master_bio(clone);
-> +	master_bio = scsi_mpath_clone_bio->master_bio;
-> +
-> +	if (bl->tail)
-> +		bl->tail->bi_next = master_bio;
-> +	else
-> +		bl->head = master_bio;
-> +
-> +	bl->tail = master_bio;
-> +
-> +	bio_put(clone);
-> +}
-> +
-> +void scsi_mpath_failover_req(struct request *req)
-> +{
-> +	struct scsi_cmnd *scmd = blk_mq_rq_to_pdu(req);
-> +	struct scsi_device *sdev = scmd->device;
-> +	struct scsi_driver *drv = to_scsi_driver(sdev->sdev_gendev.driver);
-> +	struct mpath_disk *mpath_disk = drv->to_mpath_disk(req);
-> +	struct scsi_mpath_device *scsi_mpath_dev = sdev->scsi_mpath_dev;
-> +	struct mpath_head *mpath_head = mpath_disk->mpath_head;
-> +	unsigned long flags;
-> +
-> +	scsi_mpath_dev_clear_path(scsi_mpath_dev);
-> +
-> +	spin_lock_irqsave(&mpath_head->requeue_lock, flags);
-> +	bio_list_add_clone_master(&mpath_head->requeue_list, req->bio);
-> +	spin_unlock_irqrestore(&mpath_head->requeue_lock, flags);
-> +	req->bio = NULL;
-> +	req->biotail = NULL;
-> +	req->__data_len = 0;
-> +
-> +	/* End old request with clone detached */
-> +	scmd->result = 0;
-> +	blk_mq_end_request(req, 0);
-> +
-> +	kblockd_schedule_work(&mpath_head->requeue_work);
-> +}
-> +
-> +static inline bool scsi_is_mpath_error(struct scsi_cmnd *scmd)
-> +{
-> +	struct scsi_device *sdev = scmd->device;
-> +
-> +	if (sdev->sdev_state == SDEV_TRANSPORT_OFFLINE)
-> +		return true;
-> +	return false;
-> +}
-> +
-> +int scsi_mpath_failover_disposition(struct scsi_cmnd *scmd)
-> +{
-> +	struct request *req = scsi_cmd_to_rq(scmd);
-> +
-> +	if (is_mpath_request(req)) {
-> +		if (scsi_is_mpath_error(scmd) ||
-> +		    blk_queue_dying(req->q))
-> +			return FAILOVER;
-> +		return NEEDS_RETRY;
-> +	} else {
+>  	/*
+>  	 * In the MQ case the command gets freed by __blk_mq_end_request,
+>  	 * so we have to do all cleanup that depends on it earlier.
 
-nitpick: this else block is unnecessary.
+This looks wrong. We start accounting in scsi_queue_rq(), and we need to
+end it whenever we complete or requeue the request, otherwise the
+accounting will get off. But not all requests go through
+scsi_end_request(). scsi_mpath_failover_req(), for instance, calls
+blk_mq_end_request() directly, and other functions, like
+scsi_queue_insert() call blk_mq_requeue_request(). I'm pretty sure that
+this should go in scsi_complete(), as well in the error path of
+scsi_queue_rq().
 
 -Ben
-
-> +		if (blk_queue_dying(req->q))
-> +			return SUCCESS;
-> +	}
-> +
-> +	return SUCCESS;
-> +}
-> +
 
