@@ -1,114 +1,174 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4DF366544
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 06:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772604840; cv=none; b=hmC9ExhZ8CZ5xSI51Gwoa0V/SGCJP5a1Q900GCXgS2OQ72LcSrIQdNyPIRhVaxi6lIErS7Cd9f1a9YqN78KOVRS76UGY/v+KFjuo6LK1nF9yJCR6nfCgY6vIAlINOY3y/HDRId5DXYEHySR1ah0hyE7FUFOeY4Nyen27QfJFYQs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772604840; c=relaxed/simple;
-	bh=gqXRrFTZaqcVbrfVc+/wuwQR8f0xb49c1Wd6BXvdxFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oj01nsxVDA1nLOT1Ys4iLZST32X3x/fAL9v/ChonspR9Ekrx6tIL+mKB8AtpSonxQgqAE71x6iTSu/EUNRy0Xs0CqgeyOPU8jWt7ZX3cJzD0iTM79CagJALVmWcozPmU+OLsv8JoyUR3qOD/YKNDzCRlgkkcCyPMjQnaU6L9aFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HkFYOMZE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1E237F8CC
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 06:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772606509; cv=pass; b=CZ3OWbY3zOCwPxsssDp4FSN1En0OXOcbSUGw89x+m8K6F87orOq65WU+EBt3KjIh9Kymm4+nDf36u5os8gQWUQlJnw8OvEOfm7Dhf5LiOvD9FnIrQRgKDqp3BKRw3y0Er3M1/jlQoGOz7AsZxnkc85xCJNE8EK7yW7p9yonN1wY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772606509; c=relaxed/simple;
+	bh=x/1AQIzKqy3eeGcRuT6KpUmiqylazmvdAnXXk9TfUJs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uurGLeVQ7ihPnw7mmvJtJWfqR9FCf0DkrfTB1UJh0fPgH8fYdrNFx6S98+P2189Ilp7CMHl4YTXx0XPLdSkMWq9pEvO++C6lQO4cheRyEmTDYL+rTiVqohXSH3WnDam0WZlrR3wciQfXB3SoBgKd2hO5ukl3Y+296y3vlxNOQp8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Izzjk3h1; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HkFYOMZE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772604837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hifhB8EKHJQ7PQPYx3jR5aKs6hdV4ehfn0Z4JLP6Nxg=;
-	b=HkFYOMZEgI5NR5c9K7j7g9MQnmwmpwNPt1Ns4Q9BdtFNMDIq8j6cLScdq1jYRM9gRt/m4b
-	u8RwjjaSBJR8z6AskcgaVdZ5LgwL7Gk7nSOD9ivWA//wrvvA3rB4vJ0RQl/Q6zNEXMTRli
-	P2ZhY0ul5bGl7gipTpFmMng5dCoUn5k=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-QBsmGE1QP9ycB549mn9zFQ-1; Wed,
- 04 Mar 2026 01:13:54 -0500
-X-MC-Unique: QBsmGE1QP9ycB549mn9zFQ-1
-X-Mimecast-MFC-AGG-ID: QBsmGE1QP9ycB549mn9zFQ_1772604832
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D94C7195609F;
-	Wed,  4 Mar 2026 06:13:50 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0873D18002A6;
-	Wed,  4 Mar 2026 06:13:49 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6246Dm4e1917917
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 4 Mar 2026 01:13:48 -0500
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6246Dmhf1917916;
-	Wed, 4 Mar 2026 01:13:48 -0500
-Date: Wed, 4 Mar 2026 01:13:48 -0500
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: John Garry <john.g.garry@oracle.com>
-Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
-        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
-        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
-        snitzer@kernel.org, dm-devel@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 10/24] scsi-multipath: add
- scsi_mpath_{start,end}_request()
-Message-ID: <aafNnO6o2yoeLjPs@redhat.com>
-References: <20260225153627.1032500-1-john.g.garry@oracle.com>
- <20260225153627.1032500-11-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Izzjk3h1"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-506a321cc53so74676131cf.3
+        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2026 22:41:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772606507; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Suhsr4ufe+D84gh6azEdFRXqequaf3ubJ/k4YNIlZ8E368nYoD1lL0LPtvEs/DGjbL
+         Y4qnVyogJRmylaxifZeC8IIBWyo+gCRg+0XbT76+uuoK7jQwSVL/9rKVvzumoYp8qiHH
+         MwQtFp/aoSQYnZZGCoAwQTNvjp5f1ekNOz6+Rhy6GJA+4m47cQUW2YQjZFFqdjOqdDK+
+         z5ppz4jO1YxEXE3f74CuO+9CO2Vrn8BBdFWxVyHA12vPFYEbrwVh6j2e0/rxBYTzSPA3
+         sNVIsLkUY1eKCKKgCUgsFgeze93L4KaW9V8sUnjl07dvFr6vJRkEwRdgAj1m54UdMwHq
+         +0iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=fY5RR3f2cBt4YkmJTXjStwDUAMcp57BFkt8Mktxrb0w=;
+        fh=0jJr4C4FbHoRFkMm+upMCCUJ+4PKI604T45NDvzk7Gs=;
+        b=DrU+rjtXZUPcggL/cTfPGTHdl4fUj4f/FD9aP5G5qIv+ofU1JOODaxGldQkb2Fm0gl
+         4fpGShymYuCfK4Mg6ZUxjzntssyA2viHSHoI59RqaT5q4UsxpdZdylwDx6ry6E9mXyHU
+         iUC2AiWcaLXl6k4hFAsRyCtyXW9fhrGQGeFxFceyp+sIYDs53Jh3+qW/QCDRNWMBa6C4
+         C/rcYoytAkDhRd69559QgaUwrC/MulOrgnXRyUKu4HjSUSGL+KkCpPGnMu2/bCugSQBc
+         VlPNUZiPXuuVQSzGx5BRWS4FD/yoyxtpTkNxcAgPnCimm2FL0hB40som97oes9IDI/LJ
+         /mGg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772606507; x=1773211307; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fY5RR3f2cBt4YkmJTXjStwDUAMcp57BFkt8Mktxrb0w=;
+        b=Izzjk3h1cixtDsbVl43RD+4DcYQiY+2FCz5O9UEYUqeX8F5N47MWh6BF56uiM6O3Iy
+         37IJcGQ/4SVg5bYEM6JHezJPRXHliwGocZEwGfV9aEfaT3yJ/O4amznXE/GYtDknSJu8
+         toua3y9QplyRV33C9HAPIP2jFJnvErJ5uIgsnV3fH9wbD1aPXX7qeujJNbPhixbEoZRF
+         cm3LFfNGY/HnlS1L8L1760TLpFmQUrdskytgjRO/lo3h+DBGuclYBFCDVcsU3Li7Zsb6
+         QACm/+b8i1wvM1Gm+btaY+DMj2VVU1G4M0nRgW0jd+jGnzPKMtHlrJkdPFcnNnwXILg4
+         p09Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772606507; x=1773211307;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fY5RR3f2cBt4YkmJTXjStwDUAMcp57BFkt8Mktxrb0w=;
+        b=RyE+fOvhNt5TjUiajHjmdcVogXy1MEBSg8LSRzzyWKDNG6SYVCf3bvmEg1AmpPgeI7
+         YxXN/xwrm9gO9M4n3kh8Eg97vxHuAB40mXqDkiLOzRfdR7JSeibwBO2Ag/X0FbQYiJF5
+         cBBFDJkqY63oltnsVeCcl42S0+MX+FJAznS5uGJeAwKgeaaZi5NnlsK7Hz5QgU/A6oJF
+         vGfnInnDEVOOkwOCVfB/XyeGD6HAo7I5Zc4xUc5ZBxYSfGytmYqoqQYf9rmIUMZ3PKjG
+         ePo06G+xqLALahfucKAvlWq6PZw7mItUL+NuVS2DoqVCTEgQ9QghfCzx5Z/55QIgP71+
+         dyag==
+X-Forwarded-Encrypted: i=1; AJvYcCWK4DjHP2zmKMFAwEbmi1OBM8n3MSilnOpkMuUu/iiolO+z+5cUCt2UJ1FQnA6p+OaJmq9/eQqgKrCrMA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4k2rqOL0R2JQVJmBR+6dLonSwIyhFTLjst2rtdDBKUGW+l38l
+	4Un52EVbAiOz3r+QHETovFJRzBw9YoZSqtLzCXBwsirGYPPd72o1uwiULFPs+x/vBKdjNQE2KDZ
+	t1XFk4FzgavQmUsurtZRdCgkPXBcJY5Q=
+X-Gm-Gg: ATEYQzzdrn0o5+xbk3VdTNW5FF5grxA7YXSTniIyQcoqMZ/U5erkwT/EsTvRnOLqZkB
+	RCIAp0DGYKH+bTGbB9/SZ0Rnhw9pDqom/fCOTpK+KJ8NcLMo99RJ+0prqIMHG83NGk/s7zppeJf
+	NhYKs10yBr2nrkXKaA2DNJ7IwhqVhzDMNKbZS1kMTuwgiBgw0J2ZCGU8ybZiZZp3vbm68YNI0uc
+	o3PTPCVMoo3qoJ+HaVXR1MnszmXTJDC6UzgS44iQKLy4dPBgQ5Xlx1pj2BE+Yxs7dQqQEqvFAH2
+	amSILw==
+X-Received: by 2002:a05:622a:11d0:b0:4f4:c104:8e9f with SMTP id
+ d75a77b69052e-508db41c1fdmr12539911cf.75.1772606506980; Tue, 03 Mar 2026
+ 22:41:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225153627.1032500-11-john.g.garry@oracle.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+References: <20260212-bcache-v4-0-215f3fde1c84@suse.de> <37e2c5a5-d797-4176-98c7-0e43abaa1af8@flourine.local>
+ <aaYwWwGHdoc1uMCu@shinmob> <f7cff08f-a3e8-4b2e-ac7a-a56d8ed3f2d5@flourine.local>
+In-Reply-To: <f7cff08f-a3e8-4b2e-ac7a-a56d8ed3f2d5@flourine.local>
+From: Stephen Zhang <starzhangzsd@gmail.com>
+Date: Wed, 4 Mar 2026 14:41:11 +0800
+X-Gm-Features: AaiRm53iNAp6g1g2jz5IP61Qal0wvsHlURp_wIEZA5Nd2eRgAa8MqeGIj0LN7AA
+Message-ID: <CANubcdU92Uv7wNdZH357LLTnfwPouekXNTPSjHnzYzK99-eZ9w@mail.gmail.com>
+Subject: Re: [PATCH blktests v4 0/3] bcache: add initial test cases
+To: Daniel Wagner <dwagner@suse.de>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "hch@infradead.org" <hch@infradead.org>, 
+	Kent Overstreet <kent.overstreet@linux.dev>, Coly Li <colyli@fnnas.com>, 
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 25, 2026 at 03:36:13PM +0000, John Garry wrote:
-> Add scsi_mpath_{start,end}_request() to handle updating private multipath
-> request data, like nvme_mpath_{start,end}_request().
-> 
-> Since we may need to update mpath_disk data, add a callbacks in
-> scsi_driver to actually do this work for the scsi driver.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  drivers/scsi/scsi_lib.c       |  4 ++++
->  include/scsi/scsi_driver.h    |  2 ++
->  include/scsi/scsi_multipath.h | 24 ++++++++++++++++++++++++
->  3 files changed, 30 insertions(+)
-> 
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index 7ed0defc8161e..61179caa7b2c8 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -654,6 +654,8 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
->  	 */
->  	destroy_rcu_head(&cmd->rcu);
->  
-> +	scsi_mpath_end_request(req);
-> +
->  	/*
->  	 * In the MQ case the command gets freed by __blk_mq_end_request,
->  	 * so we have to do all cleanup that depends on it earlier.
+Daniel Wagner <dwagner@suse.de> =E4=BA=8E2026=E5=B9=B43=E6=9C=883=E6=97=A5=
+=E5=91=A8=E4=BA=8C 16:04=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Hi Shinichiro,
+>
+> On Tue, Mar 03, 2026 at 12:57:18AM +0000, Shinichiro Kawasaki wrote:
+> > On Mar 02, 2026 / 14:54, Daniel Wagner wrote:
+> > > On Thu, Feb 12, 2026 at 04:23:30PM +0100, Daniel Wagner wrote:
+> > > > I've updated the v3 version with the feedback from Shinichiro for v=
+2.
+> > > > Shinichiro, please note I did rewrite some of the logic in v3, thus=
+ some of your
+> > > > comments didn't apply. But hopefully I don't made a big mess :)
+> > >
+> > > ping
+> >
+> > Daniel, I wonder if my replies [1][2] reached your mail box.
+>
+> Sorry, no, they didn't. Yet another hickup with our mail server...
+>
+> > [1] https://lore.kernel.org/linux-block/aZQZkjEUw9VnVauX@shinmob/
+> > [2] https://lore.kernel.org/linux-block/aZQcH-d-ZcgtMoJb@shinmob/
+>
+> I'll work on this then.
+>
+> > Today, I tried this patch series again on v7.0-rc2 kernel with the
+> > TEST_CASE_DEV_ARRAY below:
+> >
+> >   TEST_CASE_DEV_ARRAY[bcache/*]=3D"/dev/nvme0n1 /dev/nvme1n1 /dev/nvme2=
+n1 /dev/nvme4n1"
+> >
+> > And found that new files named "nvme?n1" are created in the current dir=
+ectory.
+> > Do you see the files created in your environment?
+>
+> Will check.
+>
+> > Also I saw the failure with the message "ERROR: Accounting leak detecte=
+d!" as I
+> > noted in [2].
+>
+> I am not really sure if this test case should go in the current form.
+> I've just used Stephen's test case as input for figuring out what kind
+> of API is useful. I also see the leak error with v7.0-rc1 which has
+> 3ef825dfd4e4 ("bcache: use bio cloning for detached device requests").
+> I might have done something wrong here.
+>
 
-This looks wrong. We start accounting in scsi_queue_rq(), and we need to
-end it whenever we complete or requeue the request, otherwise the
-accounting will get off. But not all requests go through
-scsi_end_request(). scsi_mpath_failover_req(), for instance, calls
-blk_mq_end_request() directly, and other functions, like
-scsi_queue_insert() call blk_mq_requeue_request(). I'm pretty sure that
-this should go in scsi_complete(), as well in the error path of
-scsi_queue_rq().
+Hi,
+I noticed an issue with the test. The 100% utilization shown by iostat
+during active I/O is NORMAL! The test is flawed - it's checking
+utilization while fio is still running.
+The test does:
+1. Start fio in background with --runtime=3D30
+2. Sleep only 5 seconds
+3. Check iostat immediately (while fio is still active!)
+A real leak would show persistent utilization AFTER all I/O completes.
+During active I/O, 100% utilization is expected behavior.
+To properly detect a leak, the test should:
+1. Wait for fio to complete (wait $fio_pid)
+2. Wait a few seconds for I/O to drain
+3. Then check iostat
+If utilization is still > 0% after I/O completes, then there's a real
+accounting leak.
 
--Ben
+Thanks,
+Shida
 
+
+> BTW, iostat could be replaced by reading directly from sysfs,
+> e.g. /sys/block/nvme0n1/stat
+>
+> Thanks,
+> Daniel
