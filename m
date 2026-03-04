@@ -1,65 +1,66 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96637DEAF
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 05:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC882225417
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 05:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772601308; cv=none; b=MtlTXlZ+6bmXQkLSg5lUYmx6O+w9VsoMv+FFUSij7ZVsFMc/iL0OakLdSxtxRa5tdULEMAWlsS3hEYTM8ZI/Z6bSf91/xH8QB8XJf9FC73TAc9jWr7m89Im9luCDUhaLy4cuxjlbmP121EKhu8Cv+q+EMyvORw+ickRCPWgJpTU=
+	t=1772603211; cv=none; b=mkL63xr6QoEE2pBN9P1wsr5xr2eBWbfGY06hyoJjYmhto+8rk8/z9Tk9refhRwPxNLFPuQDmlkuFMcps5dDkJWxuiA/0FqI1DMipHm5nZ4YMH9Y70MDkck6guO8BNsCl0+U8IWfcI/d/HMTjYzq3NI4NB2LLelLzVB95cYmFM1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772601308; c=relaxed/simple;
-	bh=+HK1VcL4ACd098XuVXpDjTaXJba7czI9J0aOsg7Y3Qc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=t8EDumAcfKk2MABmYmvdC3b/RomyVcu2nC+0sQOn6xcTFyt8TJwzar/ExRg69qsqzZmxwsaaKppMF2NjXMn3s7HGDUv57az4louWEf7YyDH+DvgmN2GJ6ruCum2z8/BDWcrGuYKgFtjSiM/800yp9CARix9U0a6mK/tp7KlYLng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JYQyR7GA; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1772603211; c=relaxed/simple;
+	bh=hUIfmPCBilfP0Xqq8pH0ZUucRs2CUWQ8XFLyALPYOuA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FPBpgd4o6Iy1Zjx36S4FU/bLydkODIQf96WSEgjzh0dBgD3Nz+X6TQ2xi/MpyqCi+p/FuEVAWkcJQM1QuzvJdvH/fSgqeju2JzGavggwoJWe4vCa84tJWdQ0BanIhwQ1eVR5M1WlRWbNZClWo4iBb63MSLM62Eg5dxVWKWrbWTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Shhq8aM3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JYQyR7GA"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8273e0fb87aso3576326b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2026 21:15:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1772601307; x=1773206107; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0KaxuFPOuVbrS//18Q3BNFuHwa485ma3N7D6ogKqzaE=;
-        b=JYQyR7GAwpqFqT8ilCuK0jLmIOetYZtbVurT6TB2aNX6s8juVhFSu6obRLdQChD3x9
-         M5ZozI+pJJPF2Rf+kqvOzgMMIRcQnaFbTyvGVHPLUXX6R9KJwxJ1ozJAwyrbtWFVzeRP
-         OtGbP3eOMQ6Q19dHnn0YLNx83MEpvSQjEBNHA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772601307; x=1773206107;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0KaxuFPOuVbrS//18Q3BNFuHwa485ma3N7D6ogKqzaE=;
-        b=BgQsdjd337gXWR1n6Cg4BPcqtsZbSzsgjmYbKCst79k+D3fLA6mqqdlfDn0sycxsgj
-         x4PLda1gNHOjaqEFEcnax6INIlKuXZoGDyhGkSx4X64lgL/nMKRvI1Msxj7uRS1rOhI/
-         IxUWxUniJDc6GE3DF9fPZT4zoZi45kWXjzc6em8yDIFMyJp6xETOVF58jsPgsor7RxsY
-         33VDVhFTMzlloNjkl8xtTKzI4n3aUOAwAIacnSVuo8H5A30G8v0BEU9FEd3iaGezCT2s
-         O+3jUs5J9E5WlGS5l1u6SCRxj2kBInGzOfuJUlL60JVahq35dAcMRAYwI3J0Nd1bjiYl
-         fb4A==
-X-Gm-Message-State: AOJu0YwmTjAA7APRbF6RuxzwEpKHWmcas5nWOsQ1y8NN/gDKbcNDAskf
-	XuvlHX2C5jOU1QEezuP6L05ujdkgTDQo/IfYE9J/APLyyQvdk/IGvjDGB/0oAzHQKw==
-X-Gm-Gg: ATEYQzyvgjLrna8QjcRB5Awf6YAfP31Eqf9wXTDiSD5T/+AjIps2b10FC8sztkBq0Dd
-	24Xb/uxfgoHmOOwefXlB8HUfcB71aLncRaMMhgVRqOBmZ4QiCYd4lAheg3IjgTDMWU7XjbULSK/
-	KLJcvflYSThEIKLElj4m4yNjuy6nx1CQLXDMM6AsXZegS0N8BugrekE8pUr6B2fuER/W8UAxrQK
-	28IQ9ZNcVylzDdEboYJrwbvz0o0tda4jhT4AhoKpkE4JlAwe2dNSLydGpg7qtWpjf78RujKDi67
-	jrvVRVWw+hRfqmAdS9FNZcxVx0URvyApLH+Ieq0ePXQ+G2MROWsErfWj+kt4z0XOEx71Pk8uHMo
-	98ZKno2Ap+diN5cy/bXAqr+AWK7goWPPSjZ+LLU+fFd8GdAC8v7FmS9isYKcGvwE8bjBKs+6Ix6
-	gwkiT9UR0YUWEcesfthWBviGWMCTYM1noH+gKWNh98cLVedJQbvI7xaZ3A8D+aK+o=
-X-Received: by 2002:a05:6a00:460a:b0:81f:5acb:55e5 with SMTP id d2e1a72fcca58-8297292ea6emr744575b3a.2.1772601306775;
-        Tue, 03 Mar 2026 21:15:06 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:7218:9151:d36e:8e85])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a05e831sm17697953b3a.58.2026.03.03.21.15.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 21:15:06 -0800 (PST)
-Date: Wed, 4 Mar 2026 14:15:03 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [RFC] zram: sleepable async read bio completion
-Message-ID: <brqb2utojkegjv3vz542y6fz5pnkxngknaofz6ll4tviy5ljpx@fjvdjtr3tzfv>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Shhq8aM3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772603209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YwA0ezg/TFuorG4SmLYdxWUhuc54KWNW48ti3csISxk=;
+	b=Shhq8aM3vIABbr8yOh+e6Y0PsGt8TDW/48KEMWi834KEImKKDSrNgfrmn2uHdK2ulFu8D7
+	WcdpLFX7187vWcf39u7WAoiJ0W6Q2G+suTGHU3cutUx8eTAGIV0/vlNM4b0SaiF/5kc/x1
+	0OX1yT/FkxPmeOkwDERWr+wUm0OBCNw=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-1g9MKLyDNZC5E5YDYvfhVA-1; Wed,
+ 04 Mar 2026 00:46:43 -0500
+X-MC-Unique: 1g9MKLyDNZC5E5YDYvfhVA-1
+X-Mimecast-MFC-AGG-ID: 1g9MKLyDNZC5E5YDYvfhVA_1772603201
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9934C1956096;
+	Wed,  4 Mar 2026 05:46:40 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8845619560AB;
+	Wed,  4 Mar 2026 05:46:38 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6245kbZD1917094
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 4 Mar 2026 00:46:37 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6245kaS41917093;
+	Wed, 4 Mar 2026 00:46:36 -0500
+Date: Wed, 4 Mar 2026 00:46:36 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
+        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
+        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
+        snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 09/24] scsi-multipath: failover handling
+Message-ID: <aafHPC3yncBxuBVx@redhat.com>
+References: <20260225153627.1032500-1-john.g.garry@oracle.com>
+ <20260225153627.1032500-10-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,30 +69,122 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20260225153627.1032500-10-john.g.garry@oracle.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hello Jens, Christoph,
+On Wed, Feb 25, 2026 at 03:36:12PM +0000, John Garry wrote:
+> For a scmd which suffers failover, requeue the master bio of each bio
+> attached to its request.
+> 
+> A handler is added in the scsi_driver structure to lookup a
+> mpath_disk from a request. This is needed because the scsi_disk structure
+> will manage the mpath_disk, and the code core has no method to look this
+> up from the scsi_scmnd.
+> 
+> Failover occurs when the scsi_cmnd has failed and it is discovered that the
+> original scsi_device has transport down.
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  drivers/scsi/scsi_error.c     | 12 ++++++
+>  drivers/scsi/scsi_lib.c       |  9 +++-
+>  drivers/scsi/scsi_multipath.c | 80 +++++++++++++++++++++++++++++++++++
+>  include/scsi/scsi.h           |  1 +
+>  include/scsi/scsi_driver.h    |  3 ++
+>  include/scsi/scsi_multipath.h | 14 ++++++
+>  6 files changed, 118 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/scsi/scsi_multipath.c b/drivers/scsi/scsi_multipath.c
+> index c3e0f792e921f..16b1f84fc552c 100644
+> --- a/drivers/scsi/scsi_multipath.c
+> +++ b/drivers/scsi/scsi_multipath.c
+> @@ -518,6 +518,86 @@ void scsi_mpath_put_head(struct scsi_mpath_head *scsi_mpath_head)
+>  }
+>  EXPORT_SYMBOL_GPL(scsi_mpath_put_head);
+>  
+> +bool scsi_is_mpath_request(struct request *req)
+> +{
+> +	return is_mpath_request(req);
+> +}
+> +EXPORT_SYMBOL_GPL(scsi_is_mpath_request);
+> +
+> +static inline void bio_list_add_clone_master(struct bio_list *bl,
+> +				struct bio *clone)
+> +{
+> +	struct scsi_mpath_clone_bio *scsi_mpath_clone_bio;
+> +	struct bio *master_bio;
+> +
+> +	if (clone->bi_next)
+> +		bio_list_add_clone_master(bl, clone->bi_next);
+> +
+> +	scsi_mpath_clone_bio = scsi_mpath_to_master_bio(clone);
+> +	master_bio = scsi_mpath_clone_bio->master_bio;
+> +
+> +	if (bl->tail)
+> +		bl->tail->bi_next = master_bio;
+> +	else
+> +		bl->head = master_bio;
+> +
+> +	bl->tail = master_bio;
+> +
+> +	bio_put(clone);
+> +}
+> +
+> +void scsi_mpath_failover_req(struct request *req)
+> +{
+> +	struct scsi_cmnd *scmd = blk_mq_rq_to_pdu(req);
+> +	struct scsi_device *sdev = scmd->device;
+> +	struct scsi_driver *drv = to_scsi_driver(sdev->sdev_gendev.driver);
+> +	struct mpath_disk *mpath_disk = drv->to_mpath_disk(req);
+> +	struct scsi_mpath_device *scsi_mpath_dev = sdev->scsi_mpath_dev;
+> +	struct mpath_head *mpath_head = mpath_disk->mpath_head;
+> +	unsigned long flags;
+> +
+> +	scsi_mpath_dev_clear_path(scsi_mpath_dev);
+> +
+> +	spin_lock_irqsave(&mpath_head->requeue_lock, flags);
+> +	bio_list_add_clone_master(&mpath_head->requeue_list, req->bio);
+> +	spin_unlock_irqrestore(&mpath_head->requeue_lock, flags);
+> +	req->bio = NULL;
+> +	req->biotail = NULL;
+> +	req->__data_len = 0;
+> +
+> +	/* End old request with clone detached */
+> +	scmd->result = 0;
+> +	blk_mq_end_request(req, 0);
+> +
+> +	kblockd_schedule_work(&mpath_head->requeue_work);
+> +}
+> +
+> +static inline bool scsi_is_mpath_error(struct scsi_cmnd *scmd)
+> +{
+> +	struct scsi_device *sdev = scmd->device;
+> +
+> +	if (sdev->sdev_state == SDEV_TRANSPORT_OFFLINE)
+> +		return true;
+> +	return false;
+> +}
+> +
+> +int scsi_mpath_failover_disposition(struct scsi_cmnd *scmd)
+> +{
+> +	struct request *req = scsi_cmd_to_rq(scmd);
+> +
+> +	if (is_mpath_request(req)) {
+> +		if (scsi_is_mpath_error(scmd) ||
+> +		    blk_queue_dying(req->q))
+> +			return FAILOVER;
+> +		return NEEDS_RETRY;
+> +	} else {
 
-zram supports writeback, when "idle" pages are written back to the
-actual physical device, so that they can be free from the zsmalloc
-pool.  Previously, zram would write back such pages un-compressed
-(raw), which made async read back rather trivial: just sibmit bio
-and return.  However, decompression of every writtenback page is
-expensive (battery wise), not every written back page is read back.
-Therefore zram now also supports compressed writeback, which means
-that async read back is not trivial anymore - zram needs to decompress
-the page upon bio completion.  The problem is that bio completion is
-called from atomic context, while zram decompression is sleepable.
-So at this point we have to deffer the decompression to a workqueue,
-which adds (painful) latency to the read path.  We clearly would like
-to avoid that workquque offloading.  What can we do about it?
+nitpick: this else block is unnecessary.
 
-A wild idea, (I know it's not perfect), it would be nice if we could
-decompress in the same context/task that submitted bio in the first
-place.  Perhaps via addition callback:
+-Ben
 
-->submit_bio()
-  reads data async
-->post_submit_bio()      // random name
-  decompresses bio page
+> +		if (blk_queue_dying(req->q))
+> +			return SUCCESS;
+> +	}
+> +
+> +	return SUCCESS;
+> +}
+> +
 
-Is that too ugly to live?  Is there a better way to do it?
