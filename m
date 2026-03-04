@@ -1,85 +1,97 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDAF3090F5
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 04:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96637DEAF
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 05:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772599980; cv=none; b=VShc6rinPTvF03egKsSXS9UbjUVZpDjXlR/+Bxi24bbQc/EwLg2xrYeD7XIPwAXvANSQ+5xUrmvszQ+SSAV/KD3FHUskJGknP1cWXX5zeSOq7VS8MwzdaGFkboqB1CxOi2CvPrFIyN5RGhvS+fCd77h1xB1gLQKODWwAuiJnl+8=
+	t=1772601308; cv=none; b=MtlTXlZ+6bmXQkLSg5lUYmx6O+w9VsoMv+FFUSij7ZVsFMc/iL0OakLdSxtxRa5tdULEMAWlsS3hEYTM8ZI/Z6bSf91/xH8QB8XJf9FC73TAc9jWr7m89Im9luCDUhaLy4cuxjlbmP121EKhu8Cv+q+EMyvORw+ickRCPWgJpTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772599980; c=relaxed/simple;
-	bh=FRibMBPQ+XmvMSVTopgRhzCP1sone2mAh+16SksAKIM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V+kBGXBRPTFfGObRxVpt/xY11qBi6IIoF5DuW5seu07azHKjFLCmqy+BZfK+tfaKEnTV2lTi2Z1mOVo/fkRFFUrp77BalTarB3A2DyEvon7nEBID69KNXRdzwBhNWyxXew0/c8rHgYk7LeAq2218GK4wTSHBn9pjyWUsEUReGeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=fhuezt+V; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1772601308; c=relaxed/simple;
+	bh=+HK1VcL4ACd098XuVXpDjTaXJba7czI9J0aOsg7Y3Qc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=t8EDumAcfKk2MABmYmvdC3b/RomyVcu2nC+0sQOn6xcTFyt8TJwzar/ExRg69qsqzZmxwsaaKppMF2NjXMn3s7HGDUv57az4louWEf7YyDH+DvgmN2GJ6ruCum2z8/BDWcrGuYKgFtjSiM/800yp9CARix9U0a6mK/tp7KlYLng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JYQyR7GA; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fhuezt+V"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=yR
-	8YrUPRBUqrUt83xh7TPpD7jiK1YTxbI1PSs49d3iw=; b=fhuezt+VqgJkfPxFow
-	7kNKyQW2XQ7rBLDpJl0ESfhkRf7ZDWkGfb/lM7f2vUEtTRBdMu8YfZs2s7sWcBoy
-	Z+c3VQRkSaSjXFKFiqSeS/gwfnTBh3Zguz+rP4LI4FmfrFeamnze6Z7wBB4bYN8t
-	0y2BXmDlyDNshtQwOZmgqg1vw=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wDXhltyuqdpwkS_Og--.58555S2;
-	Wed, 04 Mar 2026 12:52:03 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: axboe@kernel.dk
-Cc: hch@infradead.org,
-	kch@nvidia.com,
-	linux-block@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH v2] block: use __bio_add_page in bio_copy_kern
-Date: Wed,  4 Mar 2026 12:51:19 +0800
-Message-Id: <20260304045119.396832-1-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260304025335.225965-1-yangxiuwei@kylinos.cn>
-References: <20260304025335.225965-1-yangxiuwei@kylinos.cn>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JYQyR7GA"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8273e0fb87aso3576326b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Mar 2026 21:15:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1772601307; x=1773206107; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0KaxuFPOuVbrS//18Q3BNFuHwa485ma3N7D6ogKqzaE=;
+        b=JYQyR7GAwpqFqT8ilCuK0jLmIOetYZtbVurT6TB2aNX6s8juVhFSu6obRLdQChD3x9
+         M5ZozI+pJJPF2Rf+kqvOzgMMIRcQnaFbTyvGVHPLUXX6R9KJwxJ1ozJAwyrbtWFVzeRP
+         OtGbP3eOMQ6Q19dHnn0YLNx83MEpvSQjEBNHA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772601307; x=1773206107;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0KaxuFPOuVbrS//18Q3BNFuHwa485ma3N7D6ogKqzaE=;
+        b=BgQsdjd337gXWR1n6Cg4BPcqtsZbSzsgjmYbKCst79k+D3fLA6mqqdlfDn0sycxsgj
+         x4PLda1gNHOjaqEFEcnax6INIlKuXZoGDyhGkSx4X64lgL/nMKRvI1Msxj7uRS1rOhI/
+         IxUWxUniJDc6GE3DF9fPZT4zoZi45kWXjzc6em8yDIFMyJp6xETOVF58jsPgsor7RxsY
+         33VDVhFTMzlloNjkl8xtTKzI4n3aUOAwAIacnSVuo8H5A30G8v0BEU9FEd3iaGezCT2s
+         O+3jUs5J9E5WlGS5l1u6SCRxj2kBInGzOfuJUlL60JVahq35dAcMRAYwI3J0Nd1bjiYl
+         fb4A==
+X-Gm-Message-State: AOJu0YwmTjAA7APRbF6RuxzwEpKHWmcas5nWOsQ1y8NN/gDKbcNDAskf
+	XuvlHX2C5jOU1QEezuP6L05ujdkgTDQo/IfYE9J/APLyyQvdk/IGvjDGB/0oAzHQKw==
+X-Gm-Gg: ATEYQzyvgjLrna8QjcRB5Awf6YAfP31Eqf9wXTDiSD5T/+AjIps2b10FC8sztkBq0Dd
+	24Xb/uxfgoHmOOwefXlB8HUfcB71aLncRaMMhgVRqOBmZ4QiCYd4lAheg3IjgTDMWU7XjbULSK/
+	KLJcvflYSThEIKLElj4m4yNjuy6nx1CQLXDMM6AsXZegS0N8BugrekE8pUr6B2fuER/W8UAxrQK
+	28IQ9ZNcVylzDdEboYJrwbvz0o0tda4jhT4AhoKpkE4JlAwe2dNSLydGpg7qtWpjf78RujKDi67
+	jrvVRVWw+hRfqmAdS9FNZcxVx0URvyApLH+Ieq0ePXQ+G2MROWsErfWj+kt4z0XOEx71Pk8uHMo
+	98ZKno2Ap+diN5cy/bXAqr+AWK7goWPPSjZ+LLU+fFd8GdAC8v7FmS9isYKcGvwE8bjBKs+6Ix6
+	gwkiT9UR0YUWEcesfthWBviGWMCTYM1noH+gKWNh98cLVedJQbvI7xaZ3A8D+aK+o=
+X-Received: by 2002:a05:6a00:460a:b0:81f:5acb:55e5 with SMTP id d2e1a72fcca58-8297292ea6emr744575b3a.2.1772601306775;
+        Tue, 03 Mar 2026 21:15:06 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:7218:9151:d36e:8e85])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8273a05e831sm17697953b3a.58.2026.03.03.21.15.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 21:15:06 -0800 (PST)
+Date: Wed, 4 Mar 2026 14:15:03 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [RFC] zram: sleepable async read bio completion
+Message-ID: <brqb2utojkegjv3vz542y6fz5pnkxngknaofz6ll4tviy5ljpx@fjvdjtr3tzfv>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXhltyuqdpwkS_Og--.58555S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7XryfAF4ruFW8Wr4fWF1UGFg_yoWDAwb_WF
-	y8tw1kWF1kGF1Y9F45Ca13JFy0q3WDuFy093WjqrZ3JFykJF4DuFWFyr1qvFZ7CFZ7ua47
-	trsrJFnrCryIvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbJ73JUUUUU==
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6hMPn2mnunMAkAAA3+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Since the bio is allocated with the exact number of pages needed via
-blk_rq_map_bio_alloc(), and the loop iterates exactly that many times,
-bio_add_page() cannot fail due to insufficient space.  Switch to
-__bio_add_page() and remove the dead error handling code.
+Hello Jens, Christoph,
 
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
----
-v2: Fixed patch format by adding "---" separator and diffstat
+zram supports writeback, when "idle" pages are written back to the
+actual physical device, so that they can be free from the zsmalloc
+pool.  Previously, zram would write back such pages un-compressed
+(raw), which made async read back rather trivial: just sibmit bio
+and return.  However, decompression of every writtenback page is
+expensive (battery wise), not every written back page is read back.
+Therefore zram now also supports compressed writeback, which means
+that async read back is not trivial anymore - zram needs to decompress
+the page upon bio completion.  The problem is that bio completion is
+called from atomic context, while zram decompression is sleepable.
+So at this point we have to deffer the decompression to a workqueue,
+which adds (painful) latency to the read path.  We clearly would like
+to avoid that workquque offloading.  What can we do about it?
 
- block/blk-map.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+A wild idea, (I know it's not perfect), it would be nice if we could
+decompress in the same context/task that submitted bio in the first
+place.  Perhaps via addition callback:
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 53bdd100aa4b..768549f19f97 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -398,8 +398,7 @@ static struct bio *bio_copy_kern(struct request *rq, void *data, unsigned int le
- 		if (op_is_write(op))
- 			memcpy(page_address(page), p, bytes);
- 
--		if (bio_add_page(bio, page, bytes, 0) < bytes)
--			break;
-+		__bio_add_page(bio, page, bytes, 0);
- 
- 		len -= bytes;
- 		p += bytes;
--- 
-2.25.1
+->submit_bio()
+  reads data async
+->post_submit_bio()      // random name
+  decompresses bio page
 
+Is that too ugly to live?  Is there a better way to do it?
