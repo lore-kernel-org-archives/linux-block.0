@@ -1,155 +1,161 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43230332638
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 10:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BABD3A257A;
+	Wed,  4 Mar 2026 10:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772619399; cv=none; b=MOWq2WazDrQMiJQ+8PPxiU1oQwZ1zH73zLMUtSps2Hcsw18qmgQU9dn6mb29mIitaMiWKjAdZ/1UzTGXwlxvozZStRgHq/XmmLhos/GPYJha1bjVAo5uicajLvAMnsi4qVlhNXMd9mOxCWbohF+hgNrSY2i27LZlT5iPS15J9TQ=
+	t=1772620059; cv=none; b=Yoa2cZGiJrhTDGWjfcR0geX4mR8nAP/jDEwput83cGYi9X0AKZndxYFVA/ISFrEP1v0M11AQv01qXowA3F7VlzOOYdlW56JY0DNxSs9DHr/4ZmMASfi6Ks9nDGz8PRGb2x1laKcC9XfhUcST4vs3MQ9GXQL3MuwFhDL6hhIpG/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772619399; c=relaxed/simple;
-	bh=4jCF1LngWbZ6Wa1eVU/+mphf348lpwr0ipuWQb6Vv3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LY5kJec8ngLItJtQmJn7bmAuRaV16DLz6TpiOQJcCljtDqbGG/3w3hMM3l5lbIVIrKMpiqix+OJOyGNXvORpRTzi+hNKbDrKt9SpVgyzWqVV2ywxQ6beuTJbRSXhv+I4/1aIcu6p7kaZQL1ALaJVazhUGNOvArebm/gPUIOn+mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MGxOou4r; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1772620059; c=relaxed/simple;
+	bh=Z/3chUdybAWfKXNCyHixzcOaStdCTyntIPmDWRI4nos=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=afTKMQ8+voO0C72sy6dtMK58n8AJlJwpGx18mTGcmszHvlMHxYNYx1shuqkcOUazWaQ6MlqaGKA/FGN9cIJJVmjZ8dDoF3KYQZP78I4Yw5eM6YKGaLaSGaTRny5jnsVJRpXE2EDIx5DA8MpDuEph5AYVZRnn1GwqE5vyuIHjNqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cNHPyJHZ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MGxOou4r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772619397;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CmgHGHfWo6IDzrSlGCBMMqrj82oeE0gNAQ7XURHyn04=;
-	b=MGxOou4repeKWNdqDnqMSmxrOqqeKcEjcP50LJE6QYQgy731tl/pGNuXETaVWE+pOjT63j
-	BxUAcVQgA7K24yLhojATwN9jL7oYM9aj+xdpfzPeo2CY41omP0Ir2rUCPceAq+1RDrPHqR
-	fFRNc6abhK3oz6IeKMu/l2Qy5siPJSs=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-577-7TIiIZg8NzKKuz6wx_xGGw-1; Wed,
- 04 Mar 2026 05:16:36 -0500
-X-MC-Unique: 7TIiIZg8NzKKuz6wx_xGGw-1
-X-Mimecast-MFC-AGG-ID: 7TIiIZg8NzKKuz6wx_xGGw_1772619395
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B7BDC19560B2;
-	Wed,  4 Mar 2026 10:16:34 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.5])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 306421958DC2;
-	Wed,  4 Mar 2026 10:16:30 +0000 (UTC)
-Date: Wed, 4 Mar 2026 18:16:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yi Zhang <yi.zhang@redhat.com>
-Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [bug report] blktests block/022 failed with possible circular
- locking dependency detected at: __kernfs_remove+0x275/0x710 and
- del_gendisk+0xfd/0x190
-Message-ID: <aagGeXqeHnCugRyr@fedora>
-References: <CAHj4cs-em-4acsHabMdT=jJhXkCzjnprD-aQH1OgrZo4nTnmMw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cNHPyJHZ"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 623L7LD92186284;
+	Wed, 4 Mar 2026 10:27:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=BPigoS
+	Ymg8LVmc0ulN1tLtRw3HA0BukgwUSoeuIc5m4=; b=cNHPyJHZ0x3WmT5XhZ/RW1
+	uOyB6UduOIgBmEHhV79hEqUxDE6tsqosw4tk6ZQUmMi9DmzEUDthSaiaZQUHQcE5
+	k83ScpYUtJ0EuwMCIFNI6YHA8Srt/ZSkj5OTNc1XdWirZ6zQ94ErJc37AdO7OvpU
+	VpLp4rRnB35cLWHuSH4kCsMJMop3RmDeiXmC0+etQ7ocP4aA0yHvU+Blb0++/3HB
+	5W8IgDGRtY6rK2Z+vq9fjhKKUuYPuyZOQTW3/EwkL26jdQLvNfyuIu0m8TgYatjE
+	frjxCtsTwhF7ADzMYgfB8qWhEhNcDc9lokoR25Z70wah4N6+sFQ24iJdcIX8nUWA
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cksk3xgq8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Mar 2026 10:27:03 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6249Mqp1003200;
+	Wed, 4 Mar 2026 10:27:03 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmb2y6bnu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Mar 2026 10:27:03 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 624AR2Wv31654490
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 4 Mar 2026 10:27:02 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8C11E58056;
+	Wed,  4 Mar 2026 10:27:02 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D73395805A;
+	Wed,  4 Mar 2026 10:26:56 +0000 (GMT)
+Received: from [9.124.211.174] (unknown [9.124.211.174])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  4 Mar 2026 10:26:56 +0000 (GMT)
+Message-ID: <02288590-486e-4243-8352-c756c6879629@linux.ibm.com>
+Date: Wed, 4 Mar 2026 15:56:55 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHj4cs-em-4acsHabMdT=jJhXkCzjnprD-aQH1OgrZo4nTnmMw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/13] libmultipath: Add path selection support
+To: John Garry <john.g.garry@oracle.com>, hch@lst.de, kbusch@kernel.org,
+        sagi@grimberg.me, axboe@fb.com, martin.petersen@oracle.com,
+        james.bottomley@hansenpartnership.com, hare@suse.com
+Cc: jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
+        snitzer@kernel.org, bmarzins@redhat.com, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260225153225.1031169-1-john.g.garry@oracle.com>
+ <20260225153225.1031169-4-john.g.garry@oracle.com>
+ <775dd360-ea41-4e27-9690-e0633e0522d7@linux.ibm.com>
+ <f9fb6d73-9b90-4c11-ae1f-3f2e76773d7f@oracle.com>
+ <bb4df6e1-cd83-4a73-af67-f83c543d6e6c@linux.ibm.com>
+ <bfd8c2c2-65f7-44f0-a4ec-01158e249505@oracle.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <bfd8c2c2-65f7-44f0-a4ec-01158e249505@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: wNdMAJ64d3mlu4w06oN3uBVodrM75bmh
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA0MDA3OCBTYWx0ZWRfX7aCZjoK/0h89
+ nfkoJhaNkFP30m55Iua+DttUn+MkRh89/flMWcylmjPQRdCQHBxM4CPWt+zXWlarviKrVZ1jAVP
+ K0W931geLEdpHezq4/kIUjNVbocFBLdYMiFn+c6ovGXUpjn8KmFZf4g6lY+gPdEC9fV+bTKiW6l
+ REy/4qBcu9OyEDG+NX/BTBCTp/4hxr6TiRnUPNHfyU4gyE83nd5nrXYyz5Th4noFkCrJvaDBu28
+ XgKj7Amx9keoMkyH9E9oEtQeXAsGlXo1DeuSlIZTt9FdywMOcbKiaoYpuCvvruLmeEc+6A/8hok
+ TjpcV48HPp0OnESFdrk9mxVDfOQl2QzfO0+qX8650mubePBJF/GdthXwrIeVU8EuF9GyYeSFBqu
+ 6poJX0WnmP6CV1reMe8B5Uou7q5s4sRXXaa4CZD0klEFTrXUfhXpP+Os+IS40AwPXaVnAtkb1lP
+ VF/CZ5zlieVTVbKmiPQ==
+X-Authority-Analysis: v=2.4 cv=csCWUl4i c=1 sm=1 tr=0 ts=69a808f7 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=xTIvoFW6gsbRu0B_4BsA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: wNdMAJ64d3mlu4w06oN3uBVodrM75bmh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-04_05,2026-03-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 adultscore=0
+ clxscore=1015 bulkscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603040078
 
-On Wed, Mar 04, 2026 at 03:10:06PM +0800, Yi Zhang wrote:
-> Hi
+On 3/3/26 6:11 PM, John Garry wrote:
+>>>
+>> The nvme_mpath_start_request() increments ns->ctrl->nr_active, and 
+>> nvme_mpath_end_request() decrements it. This means that nr_active is 
+>> maintained per controller. If multiple NVMe namespaces are created and 
+>> attached to the same controller, their I/O activity is accumulated in 
+>> the single ctrl->nr_active counter.
+>>
+>> In contrast, libmultipath defines nr_active in struct mpath_device, 
+>> which is referenced from struct nvme_ns. Even if we add code to update 
+>> mpath_device->nr_active, that accounting would effectively be per 
+>> namespace, not per controller.
 > 
-> I found blktests block/022 failed on the latest
-> linux-block/for-next[1], please help check it and let me know if you
-> need any info/testing for it, thanks.
+> Right, I need to change that back to per-controller.
 > 
-> [1]
-> commit b82c5e4f1bcb3fa78ba3c95a0d198f55553c0fc1
-> Merge: 187d9a5a18b4 d47f7c173262
-> Author: Jens Axboe <axboe@kernel.dk>
-> Date:   Mon Mar 2 14:04:16 2026 -0700
+>>
+>> The nr_active value is used by the queue-depth policy. Currently, 
+>> mpath_queue_depth_path() accesses mpath_device->nr_active to make 
+>> forwarding decisions. However, if mpath_device->nr_active is 
+>> maintained per namespace, it does not correctly reflect controller- 
+>> wide load when multiple namespaces share the same controller.
 > 
->     Merge branch 'for-7.1/block' into for-next
+> Yes
 > 
-> dmesg:
-> [ 1329.227229] run blktests block/022 at 2026-03-03 13:51:07
-> [ 1329.838331] null_blk: module loaded
-> --snip--
-
-...
-
-> [ 1349.822314]  Possible unsafe locking scenario:
+>>
+>> Therefore, instead of maintaining a separate nr_active in struct 
+>> mpath_device, it may be more appropriate for mpath_queue_depth_path() 
+>> to reference ns->ctrl->nr_active directly. In that case, nr_active 
+>> could be removed from struct mpath_device entirely.
+>>
 > 
-> [ 1349.828232]        CPU0                    CPU1
-> [ 1349.832766]        ----                    ----
-> [ 1349.837296]   rlock(&set->update_nr_hwq_lock);
-> [ 1349.841752]                                lock(kn->active#104);
-> [ 1349.847767]                                lock(&set->update_nr_hwq_lock);
-> [ 1349.854647]   lock(kn->active#104);
-> [ 1349.858148]
->                 *** DEADLOCK ***
+> I think so, but we will need scsi to maintain such a count internally to 
+> support this policy. And for NVMe we will need some abstraction to 
+> lookup the per-controller QD for a mpath_device.
+> 
+This raises another question regarding the current framework. From what 
+I can see, all NVMe multipath I/O policies are currently supported for 
+SCSI as well. Going forward, if we introduce a new I/O policy for NVMe 
+that does not make sense for SCSI, how can we ensure that the new policy 
+is supported only for NVMe and not for SCSI? Conversely, we may also 
+want to introduce a policy that is relevant only for SCSI but not for NVMe.
 
-Looks one real deadlock risk, can you try the following patch?
+With the current framework, it seems difficult to restrict a policy to a 
+specific transport. It appears that all policies are implicitly shared 
+between NVMe and SCSI.
 
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f3b1968c80ce..55a1bbfef7d4 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -78,8 +78,14 @@ queue_requests_store(struct gendisk *disk, const char *page, size_t count)
- 	/*
- 	 * Serialize updating nr_requests with concurrent queue_requests_store()
- 	 * and switching elevator.
-+	 *
-+	 * Use trylock to avoid circular lock dependency with kernfs active
-+	 * reference during concurrent disk deletion:
-+	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
-+	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
- 	 */
--	down_write(&set->update_nr_hwq_lock);
-+	if (!down_write_trylock(&set->update_nr_hwq_lock))
-+		return -EBUSY;
- 
- 	if (nr == q->nr_requests)
- 		goto unlock;
-diff --git a/block/elevator.c b/block/elevator.c
-index ebe2a1fcf011..3bcd37c2aa34 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -807,7 +807,16 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
- 	elv_iosched_load_module(ctx.name);
- 	ctx.type = elevator_find_get(ctx.name);
- 
--	down_read(&set->update_nr_hwq_lock);
-+	/*
-+	 * Use trylock to avoid circular lock dependency with kernfs active
-+	 * reference during concurrent disk deletion:
-+	 *   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
-+	 *   kn->active -> update_nr_hwq_lock (via this sysfs write path)
-+	 */
-+	if (!down_read_trylock(&set->update_nr_hwq_lock)) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
- 	if (!blk_queue_no_elv_switch(q)) {
- 		ret = elevator_change(q, &ctx);
- 		if (!ret)
-@@ -817,6 +826,7 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
- 	}
- 	up_read(&set->update_nr_hwq_lock);
- 
-+out:
- 	if (ctx.type)
- 		elevator_put(ctx.type);
- 	return ret;
-
+Would it make sense to introduce some abstraction for I/O policies in 
+the framework so that a given policy can be implemented and exposed only 
+for the relevant transport (e.g., NVMe-only or SCSI-only), rather than 
+requiring it to be supported by both?
 
 Thanks,
-Ming
-
+--Nilay
