@@ -1,115 +1,92 @@
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112B63D6686
-	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 18:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772647797; cv=pass; b=tHdKGjPHooSGKNjfbJQFoH+hqQhGuIrV+PiZEgOuJwGUpXqCHnKULvRR07Ol0zK37P1Wa1dZe4nZJFmfFbCDK+F55vjVxqUyzqexgH5MPSfszaqOiamvHc4d6PUD8rEpmg7AfDzBrtYHwkzzyLNH8Sj/afS2hbcIU7JtT9gKRpI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772647797; c=relaxed/simple;
-	bh=RalLVkkry4FncaXhIQ16HmZaENLn1C4uOsOfiZ6OFOU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l9Y6dCHB/ZGjbsLIdiiohC2B29Zwn1h2WSGcwlcKNEjpdRyhDQpciuo8Vzux/Lbwp9jiawRwMIGLdAxy/C09Vn6wFn90dUnXbMGwxTcyfx7A+CJAcfI+XPNNNKFBaU6QQrmhGptyyj48MC25X0yTlCoY2CQMDj13dOPii1OoUgA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=je2IXbX7; arc=pass smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850C03DA5A3
+	for <linux-block@vger.kernel.org>; Wed,  4 Mar 2026 19:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772651075; cv=none; b=aDIO8AQC0xs4l9c2hOrG8SUBG2Rae1RcsS4cJXLRS8cEuxpxjK6An9mnvEe81fDfKcLidUpeO7c8/rYnhhVyzKrwWmZhzcwlL46M1NLgtgoYGVMcGm2DIYxkzKYl7Pd/StTakiVOx9n3yZSR2cyyNs0k5KhCBkLV/a8NrJjjTso=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772651075; c=relaxed/simple;
+	bh=7fjVhH/FBtHymATnj2FKNK9LgmXiZXkSN20I63NEuY0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jyFp9CCVvz8qK5zexqDh7FvYhmdKZGMnkRbKxLfKKFndkl3lalhN8BV4pehf/r3u0wofdFB7Db/FNuIPvAxiU0zF7loThG4Dl6+E1DUQmO+2FwlhxPPDsbeiCwWfEUJR3ojCA384eBqJjLFlqXRLfUCKdhLJoXmlvPXGU9XsD0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JvTAIFCh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="je2IXbX7"
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-64c9fcc24b3so5372400d50.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2026 10:09:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772647795; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FxB22jkjY7B3tVCucwXPsD50fRrkZ9EwD+ojbcaKSU5b6C9oVp9jYIdUf3huvEp19h
-         QNDnk5/SUFDCpN1EdYeJxOwhGrkGp1eke/mpLPnVh5IWtrSMBDwjSqGfgpHzbpZW+M3u
-         t0atbyTAxyOidG3D3BgXQY8FY4C3RdE/ZDeKAugyR7XBoFnH8QtsQxUGu3JmHTkhBaX7
-         zbb7Z3ZWKoW2Jj3ADyLb7vfI/8nsvVAhrYXjDYm/6C66BTnc6DHgeNMyj7exeu1V+c9E
-         j81LwnYQGC0KGCkHBPJ2A8p2fjAXorMqvfcqiMD5Hnd1yn0Zh0756FbvAa03kp25cwod
-         GLXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=/AAP6xDZoNmpLXND/XB3hSZCf89V94pBMhQ2bbUGJDk=;
-        fh=Rnnfzo8jZlobVIJKOIcrd2rvK6HOTvJyctEdtEnTYcQ=;
-        b=a7tW6eEx1VzBCoKLaq2Thx8AUkYauZVekZ+gBAvDODj/cUbT5VoN+6p+1MGVANO//K
-         /ZeJxXWX4gBVkfLLRa5mhV8Pd2N4zyj/MtgibmRrXsKc7hrSMCdLQSpslKbatax5jQs7
-         b8cpkpL6Ptd1P+y4D4Hjlp6zoDyK+SWpDgForSxWhJgJLsa44HaO8KAkfVvUpa/gO/w0
-         M08r5Gn6XB5sBcBEAm6LOKyAIby0845lABxMkp6hE4FpAdjeuDze9T35lGgfAdnnu5oZ
-         +d50kkdxeodeZ3dm0GzWfkZlOgdTlkdgEg/lMAqMAJHWQI055kulU49AiuHkJMBPK0dF
-         8u7Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772647795; x=1773252595; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/AAP6xDZoNmpLXND/XB3hSZCf89V94pBMhQ2bbUGJDk=;
-        b=je2IXbX7sUK68iTCEqzNDtQk1dXBGuPkLGyezCkAuulDxDToUhQtJ35U0z2pDE+6Ce
-         6QB3SoK/IKFi7R2OcgTjWYEaPGC8GFurueh5S3wNMlzCkVsTtV+z3HBXpUx1nkVPkasE
-         IeVDz1t5Uedpj8pVcfCUEvch14sHW+63q3X6jBpUQrEr42yi0QUDfuA4+/1ViKxSe+Cd
-         NSa7HfpGrPo9uyMQx3eRVEhnubzWUsrLb4It+deBw/N7xNbW/DhAqKCiy7ppnd/u3xbR
-         sZ9LLBYdJ1IyV7BY0RTZUuqhIAzyqwefzUF6FDeaWl/vSqF3Xc13khNJG+BNBVtp1dnY
-         QBxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772647795; x=1773252595;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/AAP6xDZoNmpLXND/XB3hSZCf89V94pBMhQ2bbUGJDk=;
-        b=icOcC3ykaOzLoS2lIp5YdRvjTpCwnY1XtJg2WE6XW7YJDk7tZzQOutC7DQZGafag4o
-         OiZXZxiXZ663mlyCwMembpbHNo0ENecqsq+wJtFgrqiSPUyFzaJ+ZmteWZ39hCtoJtSy
-         vMuoa9FGZjmBB6SIaCb2QOgncM61D8ZhK+UX4iqOMNcUPCwiION2IRJvsUkB8sJL9VC6
-         pRIXtRMV75Afh75/2f4IWWTnbo0Dagdc49lztMi4LPEC+bGf/ghhTxMPPMsuQisBR1XI
-         S2C4OdYLEW8V//0kpZkTY1j5oT0bNMMLDswB3YkFlEmZOoFNpNKC1eIU9+zNFmlApPdh
-         A67A==
-X-Forwarded-Encrypted: i=1; AJvYcCUBaYT3WZRjYEyEQvWF2re9XhXPSu7X3kBX30Z/R+V92iFBrDu2cex9xIE3Jk0AlPmSpYmOsUKufysIXA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkvaO+JCDMXIER2VPnL5PDStX9kZ3cVTBByJgyZQvvC7jno38u
-	OMcA6iTrftzHhix5qBjpW7xLP1tRcVjGyqpR0T2J5OjXYh3AOs1tZ5FvSYAmhARfphi2kIT1Itr
-	gRQXWUxIlaapaZvcRpV3k6V8elGmoh6M=
-X-Gm-Gg: ATEYQzwl1HzYsSWbmDy8MPEqqu40MG6yRI6A22uNJohwVF9C9T2sQIZey/T+l8qayUr
-	QYkzIZ54ewL0YgAp2xcr1EbsEzO812ZBMUHji4FSeeOckiWiR8eSj55m+eLaNe/fdx0WWqRrrKt
-	Ex1jk8v6ENcNJX37YyAv7J/ThoBBNuXoUYYayP2AwZuGZ20nAALn2DYL/N75Stxlacch78trhjL
-	JXzVfhUfI+PoJ9bXdS/Y7+qkmztu732ciJy6rIbQnPRp7kZRceOroI6j/+kXYhUtdWpDfUEtEh9
-	7wD//9j35Pc8uyqewdOOi5Jd5rrIALy+YZ9xlDneZeUjC2EScNQ8aj74prl7jtn4+5p8YsbcOs0
-	U04Q4iBfnmg==
-X-Received: by 2002:a05:690e:dcf:b0:640:dd02:a777 with SMTP id
- 956f58d0204a3-64cf9bbde6dmr2328620d50.69.1772647795104; Wed, 04 Mar 2026
- 10:09:55 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvTAIFCh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772651073;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=u7S3JSUw0L6B/lSDSpa518AgIIh6Ud2RJzojY8j4acU=;
+	b=JvTAIFCh9b8mofiYBuuCUyMKiVSySykyN4kNR3ho29zRL32NePh7g3+GSnAjsQ+tgLICLN
+	RKEgSKROkirMd37ygEKIb6qTxZoIU4ONGrmjKAQA11ChFZ5zrfXNNFyF2pLIQr88Oi5Q6S
+	TxGKHyOoKiLPTd16RyLNjN6ay8nk27Y=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-454-nJzCNDAMOC263_7eoJTryw-1; Wed,
+ 04 Mar 2026 14:04:30 -0500
+X-MC-Unique: nJzCNDAMOC263_7eoJTryw-1
+X-Mimecast-MFC-AGG-ID: nJzCNDAMOC263_7eoJTryw_1772651069
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ABAB61956096;
+	Wed,  4 Mar 2026 19:04:28 +0000 (UTC)
+Received: from pasta.fast.eng.rdu2.dc.redhat.com (unknown [10.44.32.29])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 298AB18002A6;
+	Wed,  4 Mar 2026 19:04:25 +0000 (UTC)
+From: Andreas Gruenbacher <agruenba@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>,
+	linux-block@vger.kernel.org,
+	drbd-dev@lists.linbit.com,
+	linux-bcache@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] simple bio cleanups
+Date: Wed,  4 Mar 2026 20:04:05 +0100
+Message-ID: <20260304190424.291743-1-agruenba@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com> <aaguW3p3_LOeM_Dz@infradead.org>
-In-Reply-To: <aaguW3p3_LOeM_Dz@infradead.org>
-From: Adrian Vovk <adrianvovk@gmail.com>
-Date: Wed, 4 Mar 2026 13:09:44 -0500
-X-Gm-Features: AaiRm53qIrqqlwryq6-vL-KMtUUaiHvUVdrssaMtyjIxU1gScjYF_6wvmEHxIl8
-Message-ID: <CAAdYy_nRbYMsiysC66nrMqFEtEdjjBTdpLcVZBak-M9QL7BK3g@mail.gmail.com>
-Subject: Re: [PATCH v1 0/3] dm-inlinecrypt: add target for inline block device encryption
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Linlin Zhang <linlin.zhang@oss.qualcomm.com>, linux-block@vger.kernel.org, 
-	ebiggers@kernel.org, linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, 
-	quic_mdalam@quicinc.com, gmazyland@gmail.com, israelr@nvidia.com, 
-	mpatocka@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hello Christoph,
+Jens,
 
-On Wed, Mar 4, 2026 at 8:06=E2=80=AFAM Christoph Hellwig <hch@infradead.org=
-> wrote:
->
-> What is the use case for this?  I'd much rather add fscrypt support
-> to file systems that are missing it than forcing another stacking
-> layer.
+here are some simple bio related cleanups.  Any thoughts?  Can those go
+in via your tree?
 
-Maybe I am misunderstanding something, but this seems orthogonal to
-fscrypt? Userspace would use this to do LUKS full-disk encryption, but
-with the hardware acceleration provided by the inline encryption
-hardware.
+Thanks,
+Andreas
 
-Best,
-Adrian
+Andreas Gruenbacher (4):
+  block: consecutive blk_status_t error codes
+  block: get rid of blk_status_to_{errno,str} inconsistency
+  bio: rename bio_chain arguments
+  bio: use bio_io_error more often
+
+ block/bio.c                   | 22 +++++++++++-----------
+ block/blk-core.c              |  5 +----
+ block/fops.c                  |  3 +--
+ drivers/block/drbd/drbd_int.h |  3 +--
+ drivers/md/bcache/bcache.h    |  3 +--
+ drivers/md/bcache/request.c   |  6 ++----
+ drivers/md/dm-mpath.c         |  3 +--
+ drivers/md/dm-writecache.c    |  3 +--
+ fs/f2fs/segment.c             |  3 +--
+ include/linux/blk_types.h     |  2 +-
+ 10 files changed, 21 insertions(+), 32 deletions(-)
+
+-- 
+2.52.0
+
