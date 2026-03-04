@@ -1,87 +1,84 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from relayaws-01.paragon-software.com (relayaws-01.paragon-software.com [35.157.23.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE56439EF32;
-	Wed,  4 Mar 2026 09:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0853B39EF3B;
+	Wed,  4 Mar 2026 09:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.157.23.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772618217; cv=none; b=O3zemgbeMyjhNqS1fKlG+0dXmvzhKQeZOjkKJCpbbc13V49BUZqFZSybi/pWSmGcCJ2lecjSiGdB2IhGXHyAcEqtabpG6gc3XJVXt/BNCDNfFuTTtDOYQ2neBZb60aloBBupe2DRcWVGS864sFYDaatzoJe4rcQkagkiLMlNDbU=
+	t=1772618287; cv=none; b=r5wHRtbUbpvyk40DbV60NJ2S//6JqmV70J1x3F9VNb9cjg1JKTKySkBvxb5vzReEvA6aHzKiUJW9u32OJqgI92rqMB7Y2RL9QkBMB8QUoRi2XjIvqQQJgXQU7jDuGfrSf5FUKKo6HJVNQi1/NVhL4+uRLllxGbP9VZaB4m8tLtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772618217; c=relaxed/simple;
-	bh=PeW5Y5/TplyanUbfLPcUrfoUI9pBebkTvkpqYew2Dl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wdmd9j3RD6t2whCAgbZmjjN6MMCkMh42PFz6QYMbTOk5gjN0GaQzxYL2t60lul4L2yYHEjwjrEMEg0Ekkr1uDTeeTc4guntlS5i3zudNmdXfFv5iZElyXJuAVRizujBrcNXq86j1B+HAGor3ZRw0PbU5rz+j1dpq8Bjz6S9AT9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=gcK92lHh; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+	s=arc-20240116; t=1772618287; c=relaxed/simple;
+	bh=fI+vexsTPJVCqZpKkMJGR83uuJfFm+zjxRoLgV/4HRo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=dAveup5w0P3C2luG7gwGwot8nbua4wSfQDiBFEIzAGWmJ9GaGmcPy4/p/beFaGOs0wNIrffSOzRL2zO2Y0qcGyA3NxTGdMNunpB9prBlKinz6ydVT33Vlt44NV6cqWRaWCjSJpNcUgZiqAHSryfzPs6NSCNzHFoMxc1LJ2VBL3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=paragon-software.com; spf=pass smtp.mailfrom=paragon-software.com; dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b=L/5hpOlo; arc=none smtp.client-ip=35.157.23.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=paragon-software.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paragon-software.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="gcK92lHh"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=1VNnNCWRfI0pPH/pClHiGfRJm2fLXPerTPHVskmyYhc=; b=gcK92lHhnrq+b+nR/PJi3NGi1V
-	O8nYXDvd0VtpbKoizP5dcL5AaDqM3gemEUCVb0L76wajprFWNL3tXEeFzInmrkmNMXI5ifXNEcbp+
-	g3Zzc8HrdOuIATQHmqhsFAdaN3efVuV696IJgbRw6ch53EQfrkmP/eHGH7az9Hd7mtK7zaVJKvfIw
-	lRBXz3l3V81xe3k5IASCIKBYihSnl51zKDKDits3cgZUXH3c7MFqfbVdUdsaOwIoHhuFMjDrnMqMg
-	LSzRT+Z/pjum+VbUZf3IJw+vfLIvgoWiVpSOnM+29hImDIJ998+gh8ku3Gk5A+N+91vrxlp0Lk+/V
-	olFGPAig==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vxiyG-00FsAC-DE; Wed, 04 Mar 2026 09:56:48 +0000
-Date: Wed, 4 Mar 2026 01:56:43 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	thevlad@meta.com, kernel-team@meta.com, 
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-Subject: Re: [PATCH v2] blk-cgroup: always display debug stats in io.stat
-Message-ID: <aaf98kejfRuMvIu3@gmail.com>
-References: <20260303-blk_cgroup_debug_stats-v2-1-196c713cb762@debian.org>
- <aacehv3rpO9irhEG@slm.duckdns.org>
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="L/5hpOlo"
+Received: from relayfre-01.paragon-software.com (unknown [176.12.100.13])
+	by relayaws-01.paragon-software.com (Postfix) with ESMTPS id 1E8BA1D40;
+	Wed,  4 Mar 2026 09:56:24 +0000 (UTC)
+Authentication-Results: relayaws-01.paragon-software.com;
+	dkim=pass (1024-bit key; unprotected) header.d=paragon-software.com header.i=@paragon-software.com header.b=L/5hpOlo;
+	dkim-atps=neutral
+Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
+	by relayfre-01.paragon-software.com (Postfix) with ESMTPS id 11067455;
+	Wed,  4 Mar 2026 09:58:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=paragon-software.com; s=mail; t=1772618283;
+	bh=rLSjnmY/cT6MyNJrkorgVkW/EiWZZxD40n/yPLgNYgA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=L/5hpOlo2ThTyN5JgtP+XTVcc/qsumK9z6Pi3+yyFWzq2fvgmTcJnyfSjI8HS/ecR
+	 8oIsYSLE+dU3kwYhKA90eNkcp8/rhILO0FzNH8jT2z27+F/WcZe6LRWs+iPgy/q6sW
+	 086dqkk8pB162t3OmbwM353L7I0Tpm3D3bPyadUo=
+Received: from [192.168.95.128] (172.30.20.150) by
+ vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 4 Mar 2026 12:58:01 +0300
+Message-ID: <c70472ec-02b8-4c56-9806-1a9ef7e65d3d@paragon-software.com>
+Date: Wed, 4 Mar 2026 10:57:59 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aacehv3rpO9irhEG@slm.duckdns.org>
-X-Debian-User: leitao
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/16] ntfs3: remove copy and pasted iomap code
+To: Christoph Hellwig <hch@lst.de>
+CC: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta
+	<anuj20.g@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+	<ntfs3@lists.linux.dev>, <linux-block@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>, <linux-fsdevel@vger.kernel.org>,
+	<linux-xfs@vger.kernel.org>
+References: <20260223132021.292832-1-hch@lst.de>
+ <20260223132021.292832-13-hch@lst.de>
+ <449fd474-0b61-42ff-afbe-56b728d69262@paragon-software.com>
+ <20260303152141.GB5281@lst.de>
+Content-Language: en-US
+From: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+In-Reply-To: <20260303152141.GB5281@lst.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
+ vdlg-exch-02.paragon-software.com (172.30.1.105)
 
-Hello Tejun,
+On 3/3/26 16:21, Christoph Hellwig wrote:
 
-On Tue, Mar 03, 2026 at 07:46:46AM -1000, Tejun Heo wrote:
-> On Tue, Mar 03, 2026 at 06:11:15AM -0800, Breno Leitao wrote:
-
-> > Before (without blkcg_debug_stats enabled):
-> >   253:0 rbytes=6273024 wbytes=0 rios=20 wios=0 dbytes=0 dios=0 cost.usage=0
-> >
-> > After:
-> >   253:0 rbytes=6273024 wbytes=0 rios=20 wios=0 dbytes=0 dios=0 cost.usage=0 cost.wait=0 cost.indebt=0 cost.indelay=0
+> On Fri, Feb 27, 2026 at 02:46:08PM +0100, Konstantin Komarov wrote:
+>> Thanks for the note. The iomap helper was copied because
+>> `iomap_bio_read_folio_range` is defined `static` in iomap/bio.c and thus
+>> not available for reuse; that prevented using the exported helpers in this
+>> tree.
+> Please talk to maintainers and authors before copy and pasting their
+> code.  There's usually a better way.
 >
-> Given that they haven't changed for a long time, maybe it's okay to expose
-> them by default, but why? This is something which can be toggled on easily
-> at any time.
+Understood. In future I will contact the authors and maintainers before
+copying code.
 
-My goal is to ship a kernel that exposes these detailed io stats by
-default, without requiring any runtime configuration. The stats should
-simply be available out of the box.
+Regards,
+Konstantin
 
-> What's the benefit of exposing these extra numbers which
-> probably don't mean much for most people?
-
-My original plan was to introduce a Kconfig option for this. In v1 (about a
-month ago), Michal suggested removing the toggle entirely and always exposing
-the stats, which seemed reasonable to me and received no objections, so I
-went ahead with that approach.
-
-To be clear: is your position that we should not support building a kernel
-that always exposes the detailed stats in io.stat?
-
-Thanks for your review,
---breno
