@@ -1,67 +1,48 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA3C383C88
-	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 11:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0503195EA
+	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 12:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772708934; cv=none; b=dQNCOZWK//8jvtZpMPchXnye95aekt/3Yi2WTx1dKH1hWnkmjkG+tw1xSF7EuAFr2P5/+WcYIOF+zYKuDudyBMHJcUHbwJ99yg3q/Yt0kVbWMo8rq6cdJdWx/bOKPlASr15HD4XDGC9YUsIkiP+XmHmZikFpCF50ldYhNF2NkJk=
+	t=1772714779; cv=none; b=TOhnDRhwoz7T8/L122SiHbaGCso1y0gR1IHHcUzPE4AenBapU5bauFxMrhb365T8a0sh+Rch9MHduWEsHBugpm4s/1BUxt8H+1RU+6XWVqI5FLLy+PgDp1SMW+MRvNbwUiUGjL9JDP+p82+RYVKsPU0vaqxBBShAhp06L/Bc3aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772708934; c=relaxed/simple;
-	bh=FDV1UFpNDyC4iS3F2XShJWOkvPHnFKhP4zOwlM1364Y=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XSr04rxDkXnnXJ2mw539/2wcC8+oQUjIyUigy1ig92JM+02+PXXzNiJ/sqQWk5Ywg6c8/pA20641CYwgJmay0NpTMttHK+uMFzesDU6UfKxJVbtjCkjbTTyTmMWJzRZtGvHXC/ojyPLZac8eYbvLk0DQNq88AK6F7xkY7YG2QBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=m8rIvJDz; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1772714779; c=relaxed/simple;
+	bh=Tig2ayktz5O1Utrhd2DYfDjJEisbxytE3Aj2FvrYeyc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P9UHMYc2t+paQIRx/yxeIAKLBW83AZnkUpOwrm8cu3BC1VZtHg1WMosB3vAjUg3M27O9Q8eduRw3dC7YWSSip9O/hLTw3TyZHqKVg8uhcbTeHkWLOQSVcVmWTm6Bo1SuhAEYxr2hJWd8y2kZ3Xx4FE/j0o8mn8R/BsfoUPX4KfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=14IWbm1a; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="m8rIvJDz"
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56a9402b52fso6598922e0c.0
-        for <linux-block@vger.kernel.org>; Thu, 05 Mar 2026 03:08:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1772708932; x=1773313732; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uYKtZyrHMRmfsrGjqt9iGtCfDVYbxBNH/xhoLATJFco=;
-        b=m8rIvJDzFgrLITaOoSF32cHduDFH/u8+aunwwyJpU0oY/KffMdAKyritSKdCOS+S6P
-         9N7QYlHeMLr0qTXhqPt/XHdIjTKnnBbk0XTddStWuzoJLgZusIV9sLq2g56NDBHqtQez
-         Xs/vmv4WbkFl0UXep7DZXND7tBBYAzDVNV/+aCMP1UugsAeWHDpoMTGAv6h/hx0hqhJN
-         Tm9GQx+K3pzj7wr4biW2YGnRI/ozR6gNQapXGPZg9/edExgkzcKoQS5VIU0trZuvQO6t
-         W9inIULPnpggbOMgLI1YZo1BOWwF8caDBy+dp2qVbEmv8tUKBVeJRx4mA9+Rsjp6UviN
-         MmlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772708932; x=1773313732;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uYKtZyrHMRmfsrGjqt9iGtCfDVYbxBNH/xhoLATJFco=;
-        b=ZwKNOekfGOdms1k3tO3vQT5W55PxhCvhgC0t572efgy1TgbUacW5t/VGiwmFqlipvs
-         l8X4FHEz/BIHdX8AsGapfwRbPrLmeOt3t+sKXoeL3rd8RKyQFH+c/JS9Bx5K0AbOwsn3
-         AfXb4kLxBAXVjZo6aSlfGJmecZN10VMnCzoZmz+NQ65ndS7kHKQVeCatk4ArE3J+WAzv
-         P6U4FTtWNyWpVzdH40EIlDDtzCqsH4ahBdupaq70lRI/5jw+Qcfz0f+nsu5COSEaUFmg
-         r43RmOvhLEzIj65gYjWT6UDEVIzoJwpQyzQe9uqiN3KDh8P1WjARBtwB0J4oouIOsrgG
-         0B7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWqzAkL3mfHw87+TuWD9NIg/eI94EwxdyKWZrOb38Gkob54GUynXNJvpAPAnQZbtnqo6j4DiujcDFzc7w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIzYhlEc+s/D6RGeEy9E4kvPMmtXVkbr79YnnYVN2WnoqBdcWd
-	q+dcsQwK3FIO8n0gTDEX7qAcs7ItNrBilRCZvqmYbsl6RWbuyjyG5msiH+jtE9yh6nx3u1jG9ro
-	xlvsLJNU=
-X-Gm-Gg: ATEYQzyWSjAH7crrQ83ARKvq7R882v8mA8T1ilmMrjvTKVoECLwGUopg/BQXqTAEqMc
-	Q/tEhDCuwkwzbyKn0s4RgXYcR8zfGilYiwdSdZPkPGpP1ENV4sPJbzAhOTFFi7/O1VImy6Qd2AT
-	Si8+0BhE71o1x81hqdfBEhQURykVEHY4uch6oobp1pyTaYbSjcH1fZ607jg6Ft+UIpKEgY9P+32
-	wLvdoradHr43lTTv6Ps9AJTJEJ6rq4gfNzB6RKSuqBRyPT5Ce/Z98bsVFhYv9AhrdWB6lpupEm4
-	2kBFb2uT3YFylSk/EPHxeKFPcfvkLO8yjUT5T99Ukfqd23h08S6ajsnAzldu6hG1IeEK1bYlGk0
-	aEuNBrzx/Wu53vDeAiLOHHzRA5N1ZKvOlN0uRn9DsNOmEHnvBozDEfc/+zWIgR0aMRuobCeKqmv
-	xmCjmbSAO+oCvC75XNc5cMKoI4foEatRxnew2DTUuyiPmZe/yWNu8QqrkDogFfKG9yGsxhTCryD
-	5D3ulXvhc1spfjMAsBIRa2VO2ewck8oH+MdqUhv7cfn/k3Rl75DeTujjwhu
-X-Received: by 2002:a05:6122:1308:b0:557:c6d3:5c0f with SMTP id 71dfb90a1353d-56ae7793a3emr2597260e0c.13.1772708932416;
-        Thu, 05 Mar 2026 03:08:52 -0800 (PST)
-Received: from [172.16.0.133] (syn-071-043-216-131.biz.spectrum.com. [71.43.216.131])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56ae35d455fsm6387070e0c.4.2026.03.05.03.08.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Mar 2026 03:08:51 -0800 (PST)
-Message-ID: <6d40385d-e447-4cb4-b327-bb10aa6a8563@kernel.dk>
-Date: Thu, 5 Mar 2026 04:08:50 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="14IWbm1a"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fRTmk3m7mz1XM0pP;
+	Thu,  5 Mar 2026 12:46:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1772714770; x=1775306771; bh=ftTtIeax0vlDpF/HfvUluF8s
+	hnj3D50HCetBhf2uNQE=; b=14IWbm1aGqU7J+U51p1CnuTkvSec8E9V2XybruX8
+	VC+JZAiqsO3gsWY9UwWfNGtCmTAxxFx2ioJkg2ewJjMYGE0nsCJhqU1ztHXZ4fNL
+	IqeZgKfuF88v2kFn0Uj27yLi4V0o7WsWYtLfAkxgfQucOcWpXC8L1I4WG5Bwg9Xk
+	hnpN7CYL1QAs60St/JzGJ19mSDvkuMYd6qA321NoDHg7s3udMLZgIunb1UjMMAG1
+	7XY+Qy/aROwBlZP3ag3QfQ7pTeyM8fE0I9cGljEvLVcFfp51GlzNQwOXXG9g59Om
+	BZ8/BgmWEVgCAw1DCiuEfn/RYGHDe6DfdNWCWzp6TUh7cQ==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id GVee-PXqiyd1; Thu,  5 Mar 2026 12:46:10 +0000 (UTC)
+Received: from [192.168.132.187] (unknown [12.150.89.26])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fRTmb554Wz1XM6Jc;
+	Thu,  5 Mar 2026 12:46:07 +0000 (UTC)
+Message-ID: <a7834c93-1eaf-4230-9add-d1c4b77549c8@acm.org>
+Date: Thu, 5 Mar 2026 06:46:05 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,38 +50,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] block: use trylock to avoid lockdep circular dependency
- in sysfs
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: Yi Zhang <yi.zhang@redhat.com>
-References: <20260305031550.1161328-1-ming.lei@redhat.com>
+Subject: Re: [PATCH 02/14] blk-ioc: Prepare for enabling thread-safety
+ analysis
+To: Marco Elver <elver@google.com>, Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ Yu Kuai <yukuai3@huawei.com>, Nathan Chancellor <nathan@kernel.org>
+References: <20260304194843.760669-1-bvanassche@acm.org>
+ <20260304194843.760669-3-bvanassche@acm.org>
+ <an6x6or3aceomqwhy4rc4zz5a4kyrnbitoz3v2m2ekkfaaslnu@uuwya3gdk3qp>
 Content-Language: en-US
-In-Reply-To: <20260305031550.1161328-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <an6x6or3aceomqwhy4rc4zz5a4kyrnbitoz3v2m2ekkfaaslnu@uuwya3gdk3qp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/4/26 8:15 PM, Ming Lei wrote:
-> Use trylock instead of blocking lock acquisition for update_nr_hwq_lock
-> in queue_requests_store() and elv_iosched_store() to avoid circular lock
-> dependency with kernfs active reference during concurrent disk deletion:
+On 3/5/26 4:10 AM, Jan Kara wrote:
+> On Wed 04-03-26 11:48:21, Bart Van Assche wrote:
+>> The Clang thread-safety analyzer does not support testing return values
+>> with "< 0". Hence change the "< 0" test into "!= 0". This is fine since
+>> the radix_tree_maybe_preload() return value is <= 0.
+>>
+>> Cc: Yu Kuai <yukuai3@huawei.com>
+>> Cc: Jan Kara <jack@suse.cz>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > 
->   update_nr_hwq_lock -> kn->active (via del_gendisk -> kobject_del)
->   kn->active -> update_nr_hwq_lock (via sysfs write path)
-> 
-> Return -EBUSY when the lock is not immediately available.
+> Frankly, I dislike changing the idiomatic ways we use in the kernel for
+> checking for error returns just because some static checker tool is too
+> dumb... It may make life easier for the tool but it makes it harder for
+> humans which I don't think is a good tradeoff.
 
-This does mean that scripts can get spurious -EBUSY they now need to
-handle. Which probably isn't a big real world problem. While it isn't a
-hard thing to fix up in a script, it can potentially break existing
-setups.
+Marco, do you agree it would help to add a variant of
+try_acquire_capability in Clang that accepts a range of successful
+return values instead of a single boolean? That would not only address
+Jan Kara's concern but would also make it possible to annotate the
+many functions that return an ERR_PTR() value. With the current
+thread-safety support in Clang the only option is to annotate these
+functions with __no_context_analysis.
 
-Not sure I see a good way around that however, without queueing these
-to a clean context and having the store helpers wait on eg work item
-being processed and completed.
+Thanks,
 
-Hopefully this will never be a thing and we'll never need to discuss
-this issue, I'll get this one applied for now.
-
--- 
-Jens Axboe
+Bart.
