@@ -1,112 +1,66 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A7726AF4
-	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 14:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC29334685;
+	Thu,  5 Mar 2026 14:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721371; cv=none; b=gGKcAlt/XmOUjqGikP+HTR1VKOuRpEXAYFqL0a8CRClFiSj0mrLz5WmJC/CBPiKB8IHX27Us47ssdymeWwuW/ZDs7AFJKUMBgkXvmSq6lzpOnOJHMPrJkAxUwfKAH6gEKZyjP/qI1YU/7qwI1q3H22mpfxLNJgA9xxgRGHo+glU=
+	t=1772721501; cv=none; b=uwVjhbdho23c0Kf9Fr/+izsl9Qx3sp0vHX5eBgSto0rcF1pEYMbElHjsrJPpAA5dh5tfqDebxdalNMqbzv76Gxte9yHES0YHoVfey3LcVhH2yxkFqBbMbpNqAM+k47e4aq+FtjCCw91xwC/VEolWflgLdgaW8hTjZevl2I+XMk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721371; c=relaxed/simple;
-	bh=gPDQSiRMlnXGq1lpzK7vHGuOq7ZpePhHZ1fiiuyIP34=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CTszWgEH3k3NcUpSE3u5fC6QZLhJHOTgpaRkbHX7yyVTtxbvrVT6JVmkWh0YeWsl8CItkoLmqOVR1f1+x1QARPFM+TNKOW1V+HDTuUOjXOkYEBt+hHv74/vvarKPMXaqDhTLDC0jpjrMdL7Lv+r3LCV3fL8SVV9ncl0tqepSAaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=yztMxbQl; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1772721501; c=relaxed/simple;
+	bh=Aa3G6/S8t6pJ7Gm8T1kOYk1pBCzqfa7v6DOedTkDZ6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nbattO+mWcFk9l76P+PskvgBbRmDHawJsQwPOsUFfk37SwJIGPP2Nr0+Is6L13m+7+J6iuYXdREvt1spSUzf/accgp3HuHa6zYBFW+MikbgaSj/KgHF1zKBfmu75VRHE5YDK6v1QlBKe+VFUkEauRJT/AupNMPPUNpWwlpruc6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1hVZBk1U; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="yztMxbQl"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fRXCY5fhbzlh1Rb;
-	Thu,  5 Mar 2026 14:36:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1772721364; x=1775313365; bh=vqcEVW66IQt4Woec1RZhhnYE
-	N61x+uvz4GOE+opTKy8=; b=yztMxbQl7ULCB3BOfDOIkDyUrrlxZi+YJVVgRnqT
-	voSwI45l06v0IKijGdYFTE+BXqgQNPfT2jIlcdz1roJvzvxm/8WUGOHie8ZgZecK
-	1Sa/VI+QRoPA/o41Pxp8zfTDWOw0J1ilFXVISpYj2P5dTmIQ4ecedIAOB8ATFzk0
-	FatLmLAeVgeBTLVsKTasWEgRzTwAxwhhABPJwScV0y38fbbuAouvTyV8t3FnnW6S
-	ET37XhQe+BJ6tHNy/6tcwfVCmPCTD9MUipDJ0HozMiGfSQ0Ki4hv0TcoasBjVO6u
-	/hGIqCBBKRGbsjMJVrl+v92DxkadCwpoivcZxwg7NY87Fg==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 8kcgr82mTT8d; Thu,  5 Mar 2026 14:36:04 +0000 (UTC)
-Received: from [192.168.132.187] (unknown [12.150.89.26])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fRXCP4lHtzlh1Rd;
-	Thu,  5 Mar 2026 14:36:01 +0000 (UTC)
-Message-ID: <adf8116b-d88b-42dd-9790-cd4c5582271a@acm.org>
-Date: Thu, 5 Mar 2026 08:35:59 -0600
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1hVZBk1U"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=xOUTuNuSRBZbL1ueUm5qfqOmmk38QH6XBB6u0ubYvjU=; b=1hVZBk1UAL6ybRINUCtiCnO7Kh
+	iclPcd8Oq7FlNqG0/9ONyza4ESWMqo36S+ZU2E0fl5j1YeIzfR3AtyI2C6pajZLZIjj6Aof4gaDL0
+	CSYHB03DH6oJleVPsFFeCHA77sTEuNFMJ4hCwFLhqblvVXf+CBJAJpUx5AAAC82LJf6dgh1aHBNJ6
+	2qtbsgY1QGo/vkWVNiagfWCftSGSQphZ7d+PQO9pkhqWnDR5r1X5c5UkqLp3L/Ulu+a3TTjWo58YT
+	Y4KIfa/CABTOI2GKSBv1Un4np23/EMB7iSmn0z+U4dxjHVKRwS81dWyqZjM42OWigTFrbo7u6Pl0v
+	2rhsTwzg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vy9qG-000000020M3-0Mns;
+	Thu, 05 Mar 2026 14:38:20 +0000
+Date: Thu, 5 Mar 2026 06:38:20 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Adrian Vovk <adrianvovk@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Linlin Zhang <linlin.zhang@oss.qualcomm.com>,
+	linux-block@vger.kernel.org, ebiggers@kernel.org,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	quic_mdalam@quicinc.com, gmazyland@gmail.com, israelr@nvidia.com,
+	mpatocka@redhat.com
+Subject: Re: [PATCH v1 0/3] dm-inlinecrypt: add target for inline block
+ device encryption
+Message-ID: <aamVXAqlWGcPXCDe@infradead.org>
+References: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com>
+ <aaguW3p3_LOeM_Dz@infradead.org>
+ <CAAdYy_mSB4U39Onwa=V2e2XB0sJXV6tCGkzwV2-z7ZtMcm+8zg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/14] blk-ioc: Prepare for enabling thread-safety
- analysis
-To: Marco Elver <elver@google.com>
-Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
- linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
- Nathan Chancellor <nathan@kernel.org>, Peter Zijlstra <peterz@infradead.org>
-References: <20260304194843.760669-1-bvanassche@acm.org>
- <20260304194843.760669-3-bvanassche@acm.org>
- <an6x6or3aceomqwhy4rc4zz5a4kyrnbitoz3v2m2ekkfaaslnu@uuwya3gdk3qp>
- <a7834c93-1eaf-4230-9add-d1c4b77549c8@acm.org>
- <CANpmjNP0gqV7A34Gsyu2AjE4Cfg=k2FX3NyLd3XhD_gTJ=jyuw@mail.gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CANpmjNP0gqV7A34Gsyu2AjE4Cfg=k2FX3NyLd3XhD_gTJ=jyuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAdYy_mSB4U39Onwa=V2e2XB0sJXV6tCGkzwV2-z7ZtMcm+8zg@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 3/5/26 7:18 AM, Marco Elver wrote:
-> It's a tough one, and no clear solution exists yet. Exploring the
-> design space here is the first step - I don't think "accepts a range
-> of successful return values" is trivial, because we have to either
-> list those values, or encode the possible ranges as an expression
-> which we can then match against. Only the latter is usable IMHO, but
-> implementing that in the compiler is a big deal - we need some kind of
-> solver to match expressions - or severely limiting allowed
-> expressions.
+On Wed, Mar 04, 2026 at 01:02:41PM -0500, Adrian Vovk wrote:
+> Hello Christoph,
 > 
-> Either way, getting that implemented and upstreamed is a ~2-3 months
-> effort. Which is why I have ignored this for now given the poor ROI -
-> the current infrastructure is opt-in, and my thoughts were to enable
-> in as many places as possible where we don't run into this issue. We'd
-> need an estimate %% what coverage we're missing and if it's worth it.
-> I understand you're working on global enablement, but this particular
-> problem needs careful design analysis before committing to anything.
+> Maybe I am misunderstanding something, but this seems orthogonal to
+> fscrypt? Userspace would use this to do LUKS full-disk encryption, but with
+> the hardware acceleration provided by the inline encryption hardware.
 
-I'm interested in enabling compile-time thread-safety analysis for the
-kernel in its entirety. If thread-safety analysis can't be enabled for
-the kernel in its entirety I probably will stop working on this topic.
+Ok, if people really still want to do that that should be ok.
 
-Regarding your questions, so far I have identified 17 functions that
-perform conditional locking and that may return an error pointer:
-
-$ git grep -nH '__no_context_analysis.*ERR_PTR' | wc -l
-17
-
-The most widely used among these functions is probably fc_mount(). The
-direct and indirect callers of that function include
-fc_mount_longterm(), vfs_kern_mount() and path_mount().
-
-Another concern is the concern Jan brought up: with the current support
-for conditional locking a large number of callers of conditional locking
-functions would have to be modified. If I counted correctly the patch
-"treewide: Modify mutex_lock_interruptible() return value checks" on my
-thread-safety branch includes 173 changes. There probably will be more
-kernel maintainer than Jan who will protest against these changes.
-
-Thanks,
-
-Bart.
