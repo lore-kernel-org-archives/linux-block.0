@@ -1,144 +1,137 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9063E364E99
-	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 18:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772735861; cv=pass; b=FssvKXqq+SnoyntRc15iYO8CRfSDKC5iQrQ6a/8/tcXNyfXl4rMYU6UA6XEPE50mqE+3r/z+ooRHJShIvUXbjlv4VKOV21t8lT2HzCWWTGz+NHwXxNM9xSs/aDxkWgnrjlTixrYSCUcyBI9sU17km1BvI7netq+gnfz41Z+Evlw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772735861; c=relaxed/simple;
-	bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kj6ggUZsXhFqdFiaHCc/q+P5XTdA2cLhhmOtyEbHQNGLFimWiuP2PwqRYEbgPwuMLybSCLLvOzvzSy1pyzINbyAZaMWoEmVFdhMYsaXn88Mk0iUFTL60LwT47r20tcVMnO3Fjde0smvOnyPVMGrjmnBCeCpwCqgv9JNBeOHelJI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GMSvzMaw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=C6+t+gmv; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B0B481B1
+	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 19:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772739154; cv=none; b=O9M2Za62CNvYUxebpewCOK9OgYVSftNIuF3ISBPh+9xYaI2lEwoFanPWLotvCgRAyVs1ipSsjLLD0QlM5SypohO4F3z9LiL5dzhyS9qAFrrfVa5kYeL+SWiUW8J0W+wYxh2BQzS1TAHJt8FtWK0AuFzw3uZMVpFJDnttqlSK9N4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772739154; c=relaxed/simple;
+	bh=F8yKZIQV+gdODPzHgzDqYospjCHYKr90Bu5fAIrXze8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fxujTK0BswPcH9qUKsSVVCV8y5dBxDsWx6kxOGeh32j9vibUKXrgYLIe8+xSvbP6/e2NvY6NW6bpvMthnpxvEgHJfEvXTHQGuZi+xFGLhbwWjp+nTP/YVEsfyC/X9aZl+2pFJPVwa1bQ8ffZjZpCP5vXF6PG8lC21vKawG0yOLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lDRQapOY; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMSvzMaw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="C6+t+gmv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772735859;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
-	b=GMSvzMawyK+f5DnL6FSGjgCNefvwZroZ0qrfMOOLKMI2sg0Ig/xOie+TP4mLL41GABAdCR
-	VUNjfZBvncRkNVM+OQ0xk+g26CqSDtQnm/jgIUItcrp/g+4dZHxxy7o8U7KuzljAnWeoNy
-	k25ysmExwfRBSAtcnRTksL9kAzVMUTs=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-711-NaZt3LI1MxqzyN2_xUAsYw-1; Thu, 05 Mar 2026 13:37:38 -0500
-X-MC-Unique: NaZt3LI1MxqzyN2_xUAsYw-1
-X-Mimecast-MFC-AGG-ID: NaZt3LI1MxqzyN2_xUAsYw_1772735858
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-798541939fdso147918647b3.2
-        for <linux-block@vger.kernel.org>; Thu, 05 Mar 2026 10:37:38 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772735858; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fjvlSpgLCW+lh1HA1NJ7Q6HIpBV0CItKnGpZ4RlVv00bXzaZ+B0++MJRCyV9spfRcT
-         MZOkg+tWd2bktVhovqmJKaRZzkJTyuHNvQ3bB96ptJGYNnFeqTF8hO7bcG8ayuxkifH3
-         CR11sv3ziccI+NgyZR64JiY99iPB+m3U8UKcwOxb6MkY0g/eE0vG7/Fg73hZn/rCAnrZ
-         WcvpFxYs1hX5mYsi0qZqZIRwDOv1LF2qSh7EdlpnqlgfVkrIev90XRUMvhZ0M9lUcIVn
-         PUFS9srB+GoY5Sxk9gd8B1bI0cJmeSjjNMscgef/nY68eIU1a2gM7IhvKgnRR/2JPOCQ
-         5uUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
-        fh=1q2DxcHYeNHrVUMyGOFIJB0d0Tc0zFo5cabnsCWI/hw=;
-        b=ch15ihUaLuEncHK9H9KlsTMgSPjg3nzEa5MW8I27IBkXtdk/px3YiBsBxgqE6i4WMu
-         rz1JVPEsR7fIRotlFWNoYnR9fnMt/iiFPKeZOig9iv1f2/qv7C+9U0669QWEOdQ/dnhz
-         YwqAQPEqMKl1JEbJqsvUBC0sgFNVXA29QAnWkIoRVgWjIP0rdVSqgEqQqcDSbE/iDtyr
-         fHbyZ9YeAXMoL9ha/eO9nQlMN2deNMRtx+ax0mDG+eCaC4kMNlds5KFuglz9+fWrwvKH
-         4A7nTn1gDyk2wxOadh1lNDK4uZ1Dz2e4ZpThZyQypnIDzp0EJHOG9/wsSbZ/On+5o99X
-         qQ7g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lDRQapOY"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7982c3b7dfcso85664597b3.0
+        for <linux-block@vger.kernel.org>; Thu, 05 Mar 2026 11:32:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772735858; x=1773340658; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
-        b=C6+t+gmvFevtjGdH+DEZ5DMp3y2iKxSjmoSFw10y1/Ru2CoyKo+/bCFruvyq9inHqF
-         QcicYjEF6+wQWjpTobI9il3OCo8r/5rIP4lRNSlYfR3A4w5aXpDlppanYC0aUokaPjsD
-         RSXWZHdNaHCHDBCIiFe3Qn0XAyeTnLPGzwLIyKPedZIERoGjjis83Xt7qxJNc371vBEs
-         UNz9aSn0MvpI5R99iXu8293BzrQIj+9wUJ4XdMY4ThNRzsIhfC6Namz8m4Bo0GofBf5C
-         tqU3hEp5pKH+c4avG5DYeHi+w1hdThIjD3UkuTy6+RjSq9frCzpXHdf/i6ySmjXnYSMU
-         m2bA==
+        d=gmail.com; s=20230601; t=1772739151; x=1773343951; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BWGzOFn/dLr+0JASN1nlbhCeckpCAXU9j/BcQj2Bi/E=;
+        b=lDRQapOYXEvj3gPjQ9I9A+S9dBNNdk/+ddKSWxW5fivQ1N3+0SMDM/jUGWSDJMgdPO
+         U9M8OSa9qXT5Z84a99+vimxSvvutWjagYsWk5gVUhBTXud9/U99VDhtuSAilmdi7Utfp
+         ls6BDTJonHzZOiNszgM2PSkVaA6z7v+zu2qmZr8uCDMpSa/xOp4RtZaYUtSc4+cp6GLn
+         iGPjPhK18JkCI2ebVDD3fnWSNxv298tCDwX7hHO+EjwxeP42dTEF6kB+OI8rDCIDu145
+         ohYQuqzQSF6+GyYufxwpyt8YbzY0X3Q+Yb/RwprfsqQEOiZ8Qr7JmnJOftJzg3/pOD+T
+         fuaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772735858; x=1773340658;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
-        b=e+XM0vFT2Z3FYsjFd7rpnE0nUL89I/n6c/No/UveqGlzLoR9gDx92Ob1PyLlxJOSSH
-         TBPwxV9O7TFVJpFfdoItDfnDeibKAjo1DkaPb/ShPhqYtQKl844+UjnVCtTWVZcjd+FU
-         OJUJn9ncxkF24vJY7E2aIIW6/G+wlNy1AepW4JnQoj0zerXBlJIfUgVT74fXoGrcQZti
-         ag8pNCL38GAo/YzIT6WCX/yrnVIGonT337JhZ8Wu76f571NsmVOHdpPI0B97LoJEToek
-         BGXKNznlkeoX6pNfgzNuQpbkNtrT0t/J1r+l9yTSOiGT/LkQIraCaSnlTNMZDc8tG5lM
-         TL5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVd/KsJiJJSXmJ57/3kWjUPki7n0CkGudKnP4m0TGMOD98JAzKZYXctsWdU9lSjEHw42PK+p9hB25OP0w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWIxU3Bg0DXWeGJz8ppVpIZk7OWrWsvJAiLXXHT0tNmC6MMIqI
-	pADHgOi7+3uYmqtYUhqgqDPzbD/12BelXFWMWGOgVa0D+siBzS4BiQgahpv+FGBcUPRfnudo6BT
-	tTMF0Ro/7VPA23JYsCz6Ldv6q7fDdpjfmcf7DqtcGaeUY/IvnIle0rdour1T36z1ym3U3pN5SEo
-	ZvHr2PyiZnfudofdFUj8qujq6IvdAAGA05d3Zmk4s=
-X-Gm-Gg: ATEYQzwDQ1mhCWxGjfuEv2BbSxdde9PfgU656x0bMdtepERgj19pnghzKO+LwqPgCrh
-	o1YOKVWLvEbuuPYF7Vk431MO1Gt/iY5AKEpZZyJrabH9nbwRzJ8ClhM86GmIFKCMQZUgTUps+yO
-	e6COtYLxS9Yt5l+cViCT/M5JC1XF1T8MKBpGaleW6ay24H7W7lLrQ6SOwABdXFhk/qOVSjRgIVr
-	V64MZArHQjmiXjmHLlt1HkSprStoN7CItjxw1LbOxCdVdwh53gInGXk1/TVRXmUBQ==
-X-Received: by 2002:a05:690c:c513:b0:798:647f:239 with SMTP id 00721157ae682-798c6c01a87mr55056807b3.21.1772735858034;
-        Thu, 05 Mar 2026 10:37:38 -0800 (PST)
-X-Received: by 2002:a05:690c:c513:b0:798:647f:239 with SMTP id
- 00721157ae682-798c6c01a87mr55056657b3.21.1772735857680; Thu, 05 Mar 2026
- 10:37:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772739151; x=1773343951;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BWGzOFn/dLr+0JASN1nlbhCeckpCAXU9j/BcQj2Bi/E=;
+        b=uVbWnmbIVswnPLBSUJvXPHoZM9KtN0OsC3Fh7Ver+pMRxqSHIBC6F9xajYAQcqP9TN
+         jwW5zsZSCT8bxossOKZsAxlBR3JwnB75zjt+DFEtrGT0E4gqgQKGFp+e4lJmeWTT6RlG
+         ZdEQIqsMcIQ0o+RmYcbi6UjF3FhT1cXPHYfSjyYl1Qvsec231Is5XQnIXL+l87FOPTez
+         68V3ec6GDYL+bs4R+8jevavaZywU4p0O0CHfqXK5GUa9ikMMjpktlYgzi7a6LS6R9Gb/
+         4rWgnQfPakH2DqCzW6EQqJv7zL+G//thjWusX13fbaqj60dSe0biIrenqd5Kh0AWlU12
+         c4ew==
+X-Gm-Message-State: AOJu0YxdTIWsBnGP0ibxme3rAITxICCfDTTi9898mfVvr+ePEDtG9bih
+	oTVb62iS2VjS32JQcUaF4N++JplUtidnRduxZGKDMCzg6v9dlrib/qa8
+X-Gm-Gg: ATEYQzzunJ2k8VbegKHEKX1EdOvtZSUHh0Nd5LyeUBbgvVog13uTpeH98NoHjte9Ptl
+	CD3B/LfaiNMipmkH9CQ282+NGAitu2hGn5IxGvPCxYotIZOVx6YF1aG0gValvjh8ISg4D/IyDXB
+	eFK0Fgk2rrMVaCYt9gmSLLsMYKtq1nLj8Rx4RJ3549M+/dxvxZFcbJrHcBQRg88RqfZvOo9+yGb
+	vjMaYzYG20IBNrUYJ1Sg1f3ao2mqsHYUODP9z8KXSSlIkJPsSmLUXAhaj5RwYN3GrJSV1j/dDbm
+	qpAj+H4oJm9ESlRoOU/2SonroayeuijNYpsTK8bJCUCDjkFRfZAgjev+qMpdAxJOGAzBIyBi7Jz
+	DHMnYhDRg7faL8J89p05v2Zt6fNl4p1KXuQ2Ey6/C/eqTt6j4Z9ZbGsyQ/gurH/BE1rws76K9u+
+	BfEFmKhKcIvAS0k5Qmib5WMWgypIVrLh+UBvDcp+d1tMhfAIBftpxCpkqE
+X-Received: by 2002:a05:690c:4446:b0:798:6a34:74bf with SMTP id 00721157ae682-798c6bd9218mr64283397b3.5.1772739150760;
+        Thu, 05 Mar 2026 11:32:30 -0800 (PST)
+Received: from desktop-linux.python-stargazer.ts.net ([50.168.180.218])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79876a9004dsm92357617b3.6.2026.03.05.11.32.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2026 11:32:30 -0800 (PST)
+From: Mehul Rao <mehulrao@gmail.com>
+To: ming.lei@redhat.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Mehul Rao <mehulrao@gmail.com>
+Subject: [PATCH] ublk: fix NULL pointer dereference in ublk_ctrl_set_size()
+Date: Thu,  5 Mar 2026 14:31:46 -0500
+Message-ID: <20260305193146.304526-1-mehulrao@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304190424.291743-1-agruenba@redhat.com> <20260304190424.291743-5-agruenba@redhat.com>
- <aamP2qNKEmiyXQQH@infradead.org>
-In-Reply-To: <aamP2qNKEmiyXQQH@infradead.org>
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Date: Thu, 5 Mar 2026 19:37:26 +0100
-X-Gm-Features: AaiRm500QkwsYOPyC8DDeTtG7W1JPyGlNX5bDWdmiHocLDeSRR23AHcZAF5cQWI
-Message-ID: <CAHc6FU5sEivMqj38xrAXuTxZ0d19LJjxbvoWtsPqm6NYigAEhA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] bio: use bio_io_error more often
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, drbd-dev@lists.linbit.com, 
-	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
-	Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 5, 2026 at 3:14=E2=80=AFPM Christoph Hellwig <hch@infradead.org=
-> wrote:
-> On Wed, Mar 04, 2026 at 08:04:09PM +0100, Andreas Gruenbacher wrote:
-> > Instead of setting bio->bi_status to BLK_STS_IOERR and calling
-> > bio_endio(bio), use the shorthand bio_io_error(bio).
->
-> I'm a little torn how good these helpers actually are, as
-> hard coding one specific type of error seems to create weird
-> code and lead to bugs like the xfs one you fixed yesterday.
->
-> Maybe we just need a bio_endio_status() that allows passing the
-> status?
+ublk_ctrl_set_size() unconditionally dereferences ub->ub_disk via
+set_capacity_and_notify() without checking if it is NULL.
 
-I'm not particularly attached to bio_io_error(bio); it's been around
-forever but it can be confusing. Any thoughts on replacing it with a
-new bio_endio_status(bio, BLK_STS_IOERR) helper instead of keeping two
-mechanisms for doing the same thing?
+ub->ub_disk is NULL before UBLK_CMD_START_DEV completes (it is only
+assigned in ublk_ctrl_start_dev()) and after UBLK_CMD_STOP_DEV runs
+(ublk_detach_disk() sets it to NULL). Since the UBLK_CMD_UPDATE_SIZE
+handler performs no state validation, a user can trigger a NULL pointer
+dereference by sending UPDATE_SIZE to a device that has been added but
+not yet started, or one that has been stopped.
 
-> Also you really need to send one patch per subsystem.
+Fix this by checking ub->ub_disk under ub->mutex before dereferencing
+it, and returning -ENODEV if the disk is not available.
 
-I'm really trying to avoid that for simple, obviously correct,
-mechanical changes that can be recreated from scratch any time.
+Fixes: 98b995660bff ("ublk: Add UBLK_U_CMD_UPDATE_SIZE")
+Cc: stable@vger.kernel.org
+Signed-off-by: Mehul Rao <mehulrao@gmail.com>
+---
+ drivers/block/ublk_drv.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-Thanks,
-Andreas
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 004f36724..41ed30a18 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -5006,15 +5006,22 @@ static int ublk_ctrl_get_features(const struct ublksrv_ctrl_cmd *header)
+ 	return 0;
+ }
+ 
+-static void ublk_ctrl_set_size(struct ublk_device *ub, const struct ublksrv_ctrl_cmd *header)
++static int ublk_ctrl_set_size(struct ublk_device *ub, const struct ublksrv_ctrl_cmd *header)
+ {
+ 	struct ublk_param_basic *p = &ub->params.basic;
+ 	u64 new_size = header->data[0];
++	int ret = 0;
+ 
+ 	mutex_lock(&ub->mutex);
++	if (!ub->ub_disk) {
++		ret = -ENODEV;
++		goto out;
++	}
+ 	p->dev_sectors = new_size;
+ 	set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
++out:
+ 	mutex_unlock(&ub->mutex);
++	return ret;
+ }
+ 
+ struct count_busy {
+@@ -5335,8 +5342,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 		ret = ublk_ctrl_end_recovery(ub, &header);
+ 		break;
+ 	case UBLK_CMD_UPDATE_SIZE:
+-		ublk_ctrl_set_size(ub, &header);
+-		ret = 0;
++		ret = ublk_ctrl_set_size(ub, &header);
+ 		break;
+ 	case UBLK_CMD_QUIESCE_DEV:
+ 		ret = ublk_ctrl_quiesce_dev(ub, &header);
+-- 
+2.53.0
 
