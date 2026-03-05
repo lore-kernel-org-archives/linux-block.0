@@ -1,134 +1,88 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3486920ED;
-	Thu,  5 Mar 2026 01:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB081B808
+	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 01:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772674211; cv=none; b=KxN5upXh8envW0MHAaKVZdDUkST1zkL0a9byZ7CN/DG/mcqw9zPnfzEV+tHtyh054q98erUtcItV8j84LE/N5kATD4+DnGPlSdI8t1qkdOxcwHYkYmPTn2ihU0LwhTjBSkpx0c/aaqRVxkutJdStnTPW2ZXxvS/+QbybhtDcHWg=
+	t=1772674392; cv=none; b=k6c6h9WTqHnxeWXyU7Tx7cnbaHw11ZjT8pV+iRsVs/XSZxTeZ52i8rv4JHAEpeSKA5hdT6cCnw5c/nW1shvyybeQDy/iyOTx2kecFxX4TkdFZygebb8r0FWBCy2Szq0rygOXDtbT3uweG3vcpZLMtfr3/073zws10qtbSTXSf0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772674211; c=relaxed/simple;
-	bh=dV/FPRteY1wulI6CA5N2gnWp2+JTFOt8V+6zE8RHQ+0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KIM9q33XU8c+e5zO8/Sa17sBa/xbzLIhebssqhY2zqh3Qldrhi6Sn44fAt14l3S8ZpcNi806qCPn3skgN+du/FtIPyRmKqFN5aKx3edTS3KESvAcvpYc7iIlXj8t2nljT3ni2pQnCKDOgb72dhfqRGY/xZCRRH9c7kdaThfg9oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jcgYLnkA; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1772674392; c=relaxed/simple;
+	bh=yKkpRJfAHH+aEWRantADj4ssSR9MylVZFqNjzMwABbs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AL0xIuXpmn4xT2jylAf1/dzJCzlFLuPo3K8eM+Jz94iyW6cbOfs0HmdMxSopach5U/1qbAq6+lfnB6+nT6whYeX5DI3ClkzKDq4bsma7OELPdmoFR8HUH1r2UCe3Wq83k8ubKn9pkyptPJtqPSjlUcBCSAToNtTZAAfn0wG0dxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=A/LUy6Op; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jcgYLnkA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=T6
-	3Vv00CV8w3oQ42GU98ZAmfpnNbI05s+0v60yzo/hI=; b=jcgYLnkAHsm5AXxDfA
-	97cMJd8WdoGQisRv2oPMcZGCM6A6dvw54CzqzmfRdUSovaFWMFrqQYhf/grbkFXU
-	azNgmfmxSqWn6DbvSvF96HbumjVq4CDEnRo4DsAb2NI1ch/en/Dx3lcgr7Q3ToFb
-	B2Wfqqj9Bl0sKpENdehOABGQk=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wBXMO9b3Khp6W63OA--.24976S2;
-	Thu, 05 Mar 2026 09:29:01 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: fujita.tomonori@lab.ntt.co.jp,
-	axboe@kernel.dk,
-	James.Bottomley@HansenPartnership.com,
-	martin.petersen@oracle.com
-Cc: bvanassche@acm.org,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH v6 0/3] bsg: add io_uring command support for SCSI passthrough
-Date: Thu,  5 Mar 2026 09:28:54 +0800
-Message-Id: <20260305012857.2136525-1-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260304080313.675768-1-yangxiuwei@kylinos.cn>
-References: <20260304080313.675768-1-yangxiuwei@kylinos.cn>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="A/LUy6Op"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82748095963so3834710b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 04 Mar 2026 17:33:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1772674391; x=1773279191; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3hlY/DLVAvTGbsibR1lYmvcW/rlbZp5AzPQGUEqxkzA=;
+        b=A/LUy6Op/arHVvBEd7LdsbmrTI3G296I/JDXCkeDThJuwXpUladhq2wdnQ5+jLjKVY
+         1ziH0EXGYbmLupU5xOa8MZDFcZPtWMtG+zlKkGazPiU81hQskDMTiAMCgQcHG+8d9G1K
+         uhnbzsdUD7jXu24CJOIKW4bC2Xpj+uzyfN/UA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772674391; x=1773279191;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3hlY/DLVAvTGbsibR1lYmvcW/rlbZp5AzPQGUEqxkzA=;
+        b=XPMjHoKEYp56A0JED8reE28v8Ic9AWim7KN2u9czi49ztopZij5HZLjnCdR888yXPE
+         Sz+abkspekXI6Oe5S4fzmwv9fLVMlss+WSnQPN4/DO8xs50IuxWfpED0udBRIwWVIB4z
+         41YjExZ3BBhD89H9EIj9EApU4N/J/INydQlI9jEbJ7eWmvW2Fb1i0Y8t9BIK/psiG0iK
+         YCaScKIhWmGLDkqre/xE3BOcTO2eZAAvAbTmiWvRAkep4KGoy0Y1fPEADrqUWMVrFw7T
+         QdJ4yDydPi2R5s2oRGYXt+m+NuvFlhUjU0CgQqHhO0y5YBQrsx53Pg+d851o62ANsexd
+         9SSg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1hhKUNpNm4VXJLZAXNyCQyc+ZnXhSSoCUcwxygQYSdq1q38ozO5gCj7nr4i1Dq1hWHl6ieSc9qET3eQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBwpw+C7ivxuPmKSVti5OrAZfhtMe2IkZX6ncxnYRNh0BL56ph
+	xtRCBDQYiSnGdru+jQoPjS0dlWCmS0ZL3CQOq0fZ7rUUg4cWuigtPOz+ouC/XnRcJQ==
+X-Gm-Gg: ATEYQzxtclB8YP5m456Zpotd4F7o5pgd0irSBWvmto9vzS2VoKri7paTxHKFd+Ew7oP
+	jY7h8oRLnyydAn1l27ZFY6P+2k8gGFD7GTV6QXF+S0F/gqupRW8A2BerfxaHn7Gmh2v153COyKE
+	b8jK9GrzP8+D7RqdCQN+1ZLn6Xn564bNkNaZ+W/VLSXHzYN775e25cb4tppy6tbPsJn469JV6wU
+	Wx+1Dphl1QHcIeWDPU17XUA751fHadsztYLLPR8OsLt5yC+IZMOCCxPiOxSWTP6Q2VlnwfbxFPe
+	GJq+1u5OMgHc/L3fwmBBa5aAJoZFxeV6b3keBQ4ObxpssNVQ/U8uH9HxlZbY6vExgq8huI8LoC/
+	ym919vl6/7Agb4oTGq1S4yB+kJfYhFXwIdOUBRjAH/q5vn4WjnIe2i1CFKmbos7v71Yl0nTr679
+	a/rDdERb3KhrdxKy46Wx5OtjE7t6CInOhGCMUOluYWBzNGSMxiDrJtOw883yZYWnI=
+X-Received: by 2002:a05:6a00:3d14:b0:81e:372c:b02e with SMTP id d2e1a72fcca58-82972d22fd6mr4322052b3a.47.1772674390909;
+        Wed, 04 Mar 2026 17:33:10 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:713c:a5b2:ae9d:686d])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82980d76251sm725814b3a.15.2026.03.04.17.33.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Mar 2026 17:33:10 -0800 (PST)
+Date: Thu, 5 Mar 2026 10:33:06 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
+	Damien Le Moal <dlemoal@kernel.org>, Marco Elver <elver@google.com>, linux-block@vger.kernel.org, 
+	Justin Sanders <justin@coraid.com>, Philipp Reisner <philipp.reisner@linbit.com>, 
+	Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
+	Jack Wang <jinpu.wang@ionos.com>, Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>, 
+	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH 14/14] block: Enable lock context analysis for all block
+ drivers
+Message-ID: <nrdlva4b42gghgjp3gfnmb5b335632g7xy3wumfhhbd52pj5tm@u53ysp7c667k>
+References: <20260304194843.760669-1-bvanassche@acm.org>
+ <20260304194843.760669-15-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBXMO9b3Khp6W63OA--.24976S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWF13Ar13Xw4DKry3WryDWrg_yoW5WFy8pF
-	WYgFnxJrWUC3WftFyfAF4DWFyYq3s3Ca1xG347Z34kArn8AF9Fgr1DKF45XFZrCw129a4U
-	Xr12vrZ8u3WDAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j1HqcUUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6R-SY2mo3F+X1wAA3F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260304194843.760669-15-bvanassche@acm.org>
 
-This series adds io_uring command support to the BSG SCSI passthrough
-path.
+On (26/03/04 11:48), Bart Van Assche wrote:
+> Now that all locking functions in block drivers have been annotated,
+> enable lock context analysis for all block drivers.
+> 
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-The goal is to allow userspace to submit SCSI passthrough commands via
-IORING_OP_URING_CMD, in addition to the existing sg_io interface.
-The io_uring path mirrors the existing BSG behaviour: it currently only
-supports BSG_PROTOCOL_SCSI + BSG_SUB_PROTOCOL_SCSI_CMD and does not
-support BIDI transfers.
-
-Patch 1 defines struct bsg_uring_cmd in the UAPI so that userspace can
-describe SCSI passthrough requests for io_uring.
-
-Patch 2 extends the generic BSG layer with an .uring_cmd file operation
-and a bsg_uring_cmd_fn callback, allowing transport-specific handlers to
-be registered.
-
-Patch 3 implements the SCSI BSG io_uring handler. It builds a SCSI
-request from struct bsg_uring_cmd, maps user buffers (including fixed
-buffers), and completes asynchronously via a request end_io callback and
-task_work. Completion returns SCSI device/host/driver status, residual
-length and sense data length packed into the CQE result.
-
-Changes since v5:
-- Fixed compilation errors:
-  * Use io_uring_sqe128_cmd() instead of io_uring_sqe_cmd()
-  * Update scsi_bsg_uring_cmd_done() signature to match rq_end_io_fn typedef
-
-Compared to the earlier RFC v4 series [1], this version only includes
-minor code cleanups (mainly comments and wording), without changing the
-behaviour or logic of the implementation.
-
-[1] https://lore.kernel.org/linux-block/20260122015653.703188-1-yangxiuwei@kylinos.cn/
-
-Testing
--------
-Testing was done inside a VM on a disk with:
-  /sys/block/sdd/mq/0/nr_tags     = 1024
-  /sys/block/sdd/queue/nr_requests = 256
-
-The following SCSI INQUIRY micro-benchmark was run with N=100000:
-
-  sg+SG_IO (v3), /dev/sg4:
-    avg = 139.0 us, p50 = 128.9 us, p90 = 149.7 us, p99 = 301.0 us
-
-  bsg+SG_IO (v4), /dev/bsg/2:0:0:0:
-    avg = 97.2 us,  p50 = 92.7 us,  p90 = 111.5 us, p99 = 150.9 us
-
-  bsg+io_uring, /dev/bsg/2:0:0:0:
-    avg = 105.9 us, p50 = 95.4 us,  p90 = 116.2 us, p99 = 175.0 us
-
-  bsg+io_uring (batch=64), /dev/bsg/2:0:0:0:
-    avg = 61.9 us,  p50 = 60.9 us,  p90 = 63.9 us,  p99 = 94.6 us
-
-These results show that the new io_uring path is comparable to the
-existing BSG SG_IO interface for single-command workloads, and that
-batched io_uring submission can significantly improve latency for
-high-concurrency workloads when the device supports sufficient queue
-depth.
-
-Yang Xiuwei (3):
-  bsg: add bsg_uring_cmd uapi structure
-  bsg: add io_uring command support to generic layer
-  scsi: bsg: add io_uring passthrough handler
-
- block/bsg-lib.c          |   2 +-
- block/bsg.c              |  32 +++++-
- drivers/scsi/scsi_bsg.c  | 207 ++++++++++++++++++++++++++++++++++++++-
- include/linux/bsg.h      |   6 +-
- include/uapi/linux/bsg.h |  21 ++++
- 5 files changed, 264 insertions(+), 4 deletions(-)
-
-base-commit: af4e9ef3d78420feb8fe58cd9a1ab80c501b3c08
--- 
-2.25.1
-
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org> # zram
