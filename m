@@ -1,160 +1,144 @@
-Received: from sg-1-38.ptr.blmpb.com (sg-1-38.ptr.blmpb.com [118.26.132.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AEC3A0E98
-	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 17:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.38
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772731001; cv=none; b=ciuD0b01vprflUn4OsCK7IHkCxk8EIFmC2Fmc8P6LzrPlQBVLlVlTnXHB9ykGFThYa6YtMSxu5KYjuifCh5XPIDMt2LoWVaIyIDiLf/TWFpyJWOaFkdcYEF3kUspiObDYo2A6WsTzyf703WLZp/9K/wQje62//bd2AkL8ca7zO4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772731001; c=relaxed/simple;
-	bh=NBgiYgLBu5nM+0SlN7Vrkrmq9hi8EhTzyCsZ1rCym2s=;
-	h=To:Date:Message-Id:In-Reply-To:From:Mime-Version:Cc:Subject:
-	 Content-Type:References; b=oeoRsEef/6VMZBTgd4d8XH1sICf2A1y7fxOiJwaYtnAvpSu2CweOJiNgWrTlYFj6vDtoxZocPYgW6urhVztksCqFkHtOTOPXItUpHgESKaHXnpm/89Y9XVnorbSWS290GqWQjBozpi7SeU7NKL3MTrBNoBzRunqtOBhmwJ6d/5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=0KG82UYG; arc=none smtp.client-ip=118.26.132.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9063E364E99
+	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 18:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772735861; cv=pass; b=FssvKXqq+SnoyntRc15iYO8CRfSDKC5iQrQ6a/8/tcXNyfXl4rMYU6UA6XEPE50mqE+3r/z+ooRHJShIvUXbjlv4VKOV21t8lT2HzCWWTGz+NHwXxNM9xSs/aDxkWgnrjlTixrYSCUcyBI9sU17km1BvI7netq+gnfz41Z+Evlw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772735861; c=relaxed/simple;
+	bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kj6ggUZsXhFqdFiaHCc/q+P5XTdA2cLhhmOtyEbHQNGLFimWiuP2PwqRYEbgPwuMLybSCLLvOzvzSy1pyzINbyAZaMWoEmVFdhMYsaXn88Mk0iUFTL60LwT47r20tcVMnO3Fjde0smvOnyPVMGrjmnBCeCpwCqgv9JNBeOHelJI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GMSvzMaw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=C6+t+gmv; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="0KG82UYG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1772730992;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=D2pGLx3lueL6dK4c/ymuVOTZI8taow9V0Cys4kW88s4=;
- b=0KG82UYGoX54hg4oIoHI1gcPeVov/6gr4nLy66XGVCtxeb8DlT2Kk7Q6O39qAjWZem0GR9
- Nyd4UHedOAZCJqdEaPrjzDmXbtxlKIk12Kx6alT4/uWInU5DufAyf6C+aWPquxGyZORmot
- z4MeJoNU+J7ufkpwcp64kDIdXiZU+7lZlubca4xkvvsN08Fg1ECMJ5Vd0Zhd3qTe0e3HLY
- X1GxsGLkv2rUj4y9OEq5U3s4nPzb7gZS6HbtsMw2uBD9I601cXxHy2MNH00Nu073WXYo3A
- xi4/wggbf3jHXIaMXb4ouDX6LGI56TLa7X0++i2P7xqdb13Cdq6Y4vSyjRoxHQ==
-Reply-To: yukuai@fnnas.com
-To: "Jialin Wang" <wjl.linux@gmail.com>, <axboe@kernel.dk>
-Date: Fri, 6 Mar 2026 01:16:28 +0800
-Message-Id: <71d29799-2b5b-4ebe-ba7f-70f87aa16ad3@fnnas.com>
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Received: from [192.168.1.104] ([39.182.0.182]) by smtp.feishu.cn with ESMTPS; Fri, 06 Mar 2026 01:16:29 +0800
-In-Reply-To: <20260228100144.254436-1-wjl.linux@gmail.com>
-X-Lms-Return-Path: <lba+269a9ba6e+443ef3+vger.kernel.org+yukuai@fnnas.com>
-From: "Yu Kuai" <yukuai@fnnas.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMSvzMaw";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="C6+t+gmv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772735859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
+	b=GMSvzMawyK+f5DnL6FSGjgCNefvwZroZ0qrfMOOLKMI2sg0Ig/xOie+TP4mLL41GABAdCR
+	VUNjfZBvncRkNVM+OQ0xk+g26CqSDtQnm/jgIUItcrp/g+4dZHxxy7o8U7KuzljAnWeoNy
+	k25ysmExwfRBSAtcnRTksL9kAzVMUTs=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-711-NaZt3LI1MxqzyN2_xUAsYw-1; Thu, 05 Mar 2026 13:37:38 -0500
+X-MC-Unique: NaZt3LI1MxqzyN2_xUAsYw-1
+X-Mimecast-MFC-AGG-ID: NaZt3LI1MxqzyN2_xUAsYw_1772735858
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-798541939fdso147918647b3.2
+        for <linux-block@vger.kernel.org>; Thu, 05 Mar 2026 10:37:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772735858; cv=none;
+        d=google.com; s=arc-20240605;
+        b=fjvlSpgLCW+lh1HA1NJ7Q6HIpBV0CItKnGpZ4RlVv00bXzaZ+B0++MJRCyV9spfRcT
+         MZOkg+tWd2bktVhovqmJKaRZzkJTyuHNvQ3bB96ptJGYNnFeqTF8hO7bcG8ayuxkifH3
+         CR11sv3ziccI+NgyZR64JiY99iPB+m3U8UKcwOxb6MkY0g/eE0vG7/Fg73hZn/rCAnrZ
+         WcvpFxYs1hX5mYsi0qZqZIRwDOv1LF2qSh7EdlpnqlgfVkrIev90XRUMvhZ0M9lUcIVn
+         PUFS9srB+GoY5Sxk9gd8B1bI0cJmeSjjNMscgef/nY68eIU1a2gM7IhvKgnRR/2JPOCQ
+         5uUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
+        fh=1q2DxcHYeNHrVUMyGOFIJB0d0Tc0zFo5cabnsCWI/hw=;
+        b=ch15ihUaLuEncHK9H9KlsTMgSPjg3nzEa5MW8I27IBkXtdk/px3YiBsBxgqE6i4WMu
+         rz1JVPEsR7fIRotlFWNoYnR9fnMt/iiFPKeZOig9iv1f2/qv7C+9U0669QWEOdQ/dnhz
+         YwqAQPEqMKl1JEbJqsvUBC0sgFNVXA29QAnWkIoRVgWjIP0rdVSqgEqQqcDSbE/iDtyr
+         fHbyZ9YeAXMoL9ha/eO9nQlMN2deNMRtx+ax0mDG+eCaC4kMNlds5KFuglz9+fWrwvKH
+         4A7nTn1gDyk2wxOadh1lNDK4uZ1Dz2e4ZpThZyQypnIDzp0EJHOG9/wsSbZ/On+5o99X
+         qQ7g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772735858; x=1773340658; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
+        b=C6+t+gmvFevtjGdH+DEZ5DMp3y2iKxSjmoSFw10y1/Ru2CoyKo+/bCFruvyq9inHqF
+         QcicYjEF6+wQWjpTobI9il3OCo8r/5rIP4lRNSlYfR3A4w5aXpDlppanYC0aUokaPjsD
+         RSXWZHdNaHCHDBCIiFe3Qn0XAyeTnLPGzwLIyKPedZIERoGjjis83Xt7qxJNc371vBEs
+         UNz9aSn0MvpI5R99iXu8293BzrQIj+9wUJ4XdMY4ThNRzsIhfC6Namz8m4Bo0GofBf5C
+         tqU3hEp5pKH+c4avG5DYeHi+w1hdThIjD3UkuTy6+RjSq9frCzpXHdf/i6ySmjXnYSMU
+         m2bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772735858; x=1773340658;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=R6dH8XgJiObtxOpcsUX3tskHijiwulWb20uGf7t+NqY=;
+        b=e+XM0vFT2Z3FYsjFd7rpnE0nUL89I/n6c/No/UveqGlzLoR9gDx92Ob1PyLlxJOSSH
+         TBPwxV9O7TFVJpFfdoItDfnDeibKAjo1DkaPb/ShPhqYtQKl844+UjnVCtTWVZcjd+FU
+         OJUJn9ncxkF24vJY7E2aIIW6/G+wlNy1AepW4JnQoj0zerXBlJIfUgVT74fXoGrcQZti
+         ag8pNCL38GAo/YzIT6WCX/yrnVIGonT337JhZ8Wu76f571NsmVOHdpPI0B97LoJEToek
+         BGXKNznlkeoX6pNfgzNuQpbkNtrT0t/J1r+l9yTSOiGT/LkQIraCaSnlTNMZDc8tG5lM
+         TL5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVd/KsJiJJSXmJ57/3kWjUPki7n0CkGudKnP4m0TGMOD98JAzKZYXctsWdU9lSjEHw42PK+p9hB25OP0w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWIxU3Bg0DXWeGJz8ppVpIZk7OWrWsvJAiLXXHT0tNmC6MMIqI
+	pADHgOi7+3uYmqtYUhqgqDPzbD/12BelXFWMWGOgVa0D+siBzS4BiQgahpv+FGBcUPRfnudo6BT
+	tTMF0Ro/7VPA23JYsCz6Ldv6q7fDdpjfmcf7DqtcGaeUY/IvnIle0rdour1T36z1ym3U3pN5SEo
+	ZvHr2PyiZnfudofdFUj8qujq6IvdAAGA05d3Zmk4s=
+X-Gm-Gg: ATEYQzwDQ1mhCWxGjfuEv2BbSxdde9PfgU656x0bMdtepERgj19pnghzKO+LwqPgCrh
+	o1YOKVWLvEbuuPYF7Vk431MO1Gt/iY5AKEpZZyJrabH9nbwRzJ8ClhM86GmIFKCMQZUgTUps+yO
+	e6COtYLxS9Yt5l+cViCT/M5JC1XF1T8MKBpGaleW6ay24H7W7lLrQ6SOwABdXFhk/qOVSjRgIVr
+	V64MZArHQjmiXjmHLlt1HkSprStoN7CItjxw1LbOxCdVdwh53gInGXk1/TVRXmUBQ==
+X-Received: by 2002:a05:690c:c513:b0:798:647f:239 with SMTP id 00721157ae682-798c6c01a87mr55056807b3.21.1772735858034;
+        Thu, 05 Mar 2026 10:37:38 -0800 (PST)
+X-Received: by 2002:a05:690c:c513:b0:798:647f:239 with SMTP id
+ 00721157ae682-798c6c01a87mr55056657b3.21.1772735857680; Thu, 05 Mar 2026
+ 10:37:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+MIME-Version: 1.0
+References: <20260304190424.291743-1-agruenba@redhat.com> <20260304190424.291743-5-agruenba@redhat.com>
+ <aamP2qNKEmiyXQQH@infradead.org>
+In-Reply-To: <aamP2qNKEmiyXQQH@infradead.org>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Thu, 5 Mar 2026 19:37:26 +0100
+X-Gm-Features: AaiRm500QkwsYOPyC8DDeTtG7W1JPyGlNX5bDWdmiHocLDeSRR23AHcZAF5cQWI
+Message-ID: <CAHc6FU5sEivMqj38xrAXuTxZ0d19LJjxbvoWtsPqm6NYigAEhA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] bio: use bio_io_error more often
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, drbd-dev@lists.linbit.com, 
+	linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Cc: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<lianux.mm@gmail.com>, <lenohou@gmail.com>, <yukuai@fnnas.com>
-Subject: Re: [PATCH] block: fix race in update_io_ticks causing inflated disk statistics
-Content-Type: text/plain; charset=UTF-8
-References: <20260228100144.254436-1-wjl.linux@gmail.com>
 
-Hi,
+On Thu, Mar 5, 2026 at 3:14=E2=80=AFPM Christoph Hellwig <hch@infradead.org=
+> wrote:
+> On Wed, Mar 04, 2026 at 08:04:09PM +0100, Andreas Gruenbacher wrote:
+> > Instead of setting bio->bi_status to BLK_STS_IOERR and calling
+> > bio_endio(bio), use the shorthand bio_io_error(bio).
+>
+> I'm a little torn how good these helpers actually are, as
+> hard coding one specific type of error seems to create weird
+> code and lead to bugs like the xfs one you fixed yesterday.
+>
+> Maybe we just need a bio_endio_status() that allows passing the
+> status?
 
-=E5=9C=A8 2026/2/28 18:01, Jialin Wang =E5=86=99=E9=81=93:
-> When multiple threads issue I/O requests concurrently after a period of
-> disk idle time, iostat can report abnormal %util spikes (100%+) even
-> when the actual I/O load is extremely light.
->
-> This issue can be reproduced using fio. By binding 8 fio threads to
-> different CPUs, and having them issue 4KB I/Os every 1 second:
->
->    fio --name=3Dtest --ioengine=3Dsync --rw=3Drandwrite --direct=3D1 --bs=
-=3D4k \
->      --numjobs=3D8 --cpus_allowed=3D0-7 --cpus_allowed_policy=3Dsplit \
->      --thinktime=3D1s --time_based --runtime=3D60 --group_reporting \
->      --filename=3D/mnt/sdb/test
->
-> The iostat -d sda 1 output will show a false 100%+ %util randomly:
->
-> Device  ...    w/s   wkB/s   wrqm/s  %wrqm w_await wareq-sz  ...  aqu-sz =
- %util
-> sdb     ...  16.00  104.00     0.00   0.00    1.25     6.50  ...    0.02 =
-  0.90
->
-> Device  ...    w/s   wkB/s   wrqm/s  %wrqm w_await wareq-sz  ...  aqu-sz =
- %util
-> sdb     ...   8.00   32.00     0.00   0.00    1.38     4.00  ...    0.01 =
-100.30
->
-> Device  ...    w/s   wkB/s   wrqm/s  %wrqm w_await wareq-sz  ...  aqu-sz =
- %util
-> sdb     ...   8.00   32.00     0.00   0.00    1.38     4.00  ...    0.01 =
-  0.20
->
-> Device  ...    w/s   wkB/s   wrqm/s  %wrqm w_await wareq-sz  ...  aqu-sz =
- %util
-> sdb     ...  11.00   44.00     0.00   0.00    1.27     4.00  ...    0.01 =
- 82.80
->
-> The root cause is a race condition in update_io_ticks(). When the disk
-> has been idle for a while (e.g., 1 second), part->bd_stamp holds an
-> old timestamp. If CPU A and CPU B start I/O at the exact same time:
->
-> 1. Both CPUs read the same old 'stamp' and pass the time_after() check.
-> 2. CPU A executes try_cmpxchg() successfully.
-> 3. CPU B fails try_cmpxchg(), exits update_io_ticks(), and immediately
->     increments its local in_flight counter via part_stat_local_inc().
-> 4. CPU A continues to evaluate the 'busy' condition:
->     end || bdev_count_inflight(part).
-> 5. Since it is an I/O start, 'end' is false, so CPU A calls
->     bdev_count_inflight() to check.
-> 6. However, bdev_count_inflight() iterates over all CPUs and sees CPU B's
->     newly incremented in_flight count. It returns true.
-> 7. CPU A incorrectly assumes the disk was busy during the entire
->     'now - stamp' window (the 1-second idle period) and adds this large
->     delta to io_ticks.
->
-> To fix this, we capture the 'busy' state before performing the
-> try_cmpxchg(). By taking a snapshot of whether the device is active
-> prior to updating bd_stamp, we prevent CPU A from being misled by
-> concurrent I/O submissions from other CPUs that occur after the
-> timestamp comparison but before the inflight check.
->
-> Fixes: 99dc422335d8 ("block: support to account io_ticks precisely")
-> Signed-off-by: Jialin Wang <wjl.linux@gmail.com>
-> ---
->   block/blk-core.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 474700ffaa1c..1481daf1e664 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1026,10 +1026,11 @@ void update_io_ticks(struct block_device *part, u=
-nsigned long now, bool end)
->   	unsigned long stamp;
->   again:
->   	stamp =3D READ_ONCE(part->bd_stamp);
-> -	if (unlikely(time_after(now, stamp)) &&
-> -	    likely(try_cmpxchg(&part->bd_stamp, &stamp, now)) &&
-> -	    (end || bdev_count_inflight(part)))
-> -		__part_stat_add(part, io_ticks, now - stamp);
-> +	if (unlikely(time_after(now, stamp))) {
-> +		bool busy =3D end || bdev_count_inflight(part);
+I'm not particularly attached to bio_io_error(bio); it's been around
+forever but it can be confusing. Any thoughts on replacing it with a
+new bio_endio_status(bio, BLK_STS_IOERR) helper instead of keeping two
+mechanisms for doing the same thing?
 
-First of all, you're moving bdev_count_inflight() before try_cmpxchg(), mea=
-ns
-there is no guarantee it can only be called once in one jiffy, and I think
-this will have performance overhead that might be unacceptable.
+> Also you really need to send one patch per subsystem.
 
-BTW, this is a known issue for us, and we're fixing this in iostat, by
-checking util together with aqusz, specifically:
+I'm really trying to avoid that for simple, obviously correct,
+mechanical changes that can be recreated from scratch any time.
 
-util =3D min(min(util, aqusz * 100), 100)
+Thanks,
+Andreas
 
-With the respect, if user issue IO one by one, util is the same as aqusz; a=
-nd if
-user issue IO concurrently, aqusz must be greater than util.
-
-> +		if (likely(try_cmpxchg(&part->bd_stamp, &stamp, now)) && busy)
-> +			__part_stat_add(part, io_ticks, now - stamp);
-> +	}
->  =20
->   	if (bdev_is_partition(part)) {
->   		part =3D bdev_whole(part);
-
---=20
-Thansk,
-Kuai
