@@ -1,66 +1,156 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC29334685;
-	Thu,  5 Mar 2026 14:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC34309DDB
+	for <linux-block@vger.kernel.org>; Thu,  5 Mar 2026 15:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721501; cv=none; b=uwVjhbdho23c0Kf9Fr/+izsl9Qx3sp0vHX5eBgSto0rcF1pEYMbElHjsrJPpAA5dh5tfqDebxdalNMqbzv76Gxte9yHES0YHoVfey3LcVhH2yxkFqBbMbpNqAM+k47e4aq+FtjCCw91xwC/VEolWflgLdgaW8hTjZevl2I+XMk0=
+	t=1772722924; cv=none; b=KFdNLTqZZZStQ/wXObUdzNpWGrQ6VqIcB5NTBJl2gzWjs15XfT9Rk1LarvHCU08RsezB6kxTrxAdBCNUDdIaiXOgzNw+oZuPK9hJvPdomxpOoadVc60TsLp+lka8un7/NXSheCDIjJPPSfSkybS3NnRs3HbTsN3ZNxmv07Hz3zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721501; c=relaxed/simple;
-	bh=Aa3G6/S8t6pJ7Gm8T1kOYk1pBCzqfa7v6DOedTkDZ6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nbattO+mWcFk9l76P+PskvgBbRmDHawJsQwPOsUFfk37SwJIGPP2Nr0+Is6L13m+7+J6iuYXdREvt1spSUzf/accgp3HuHa6zYBFW+MikbgaSj/KgHF1zKBfmu75VRHE5YDK6v1QlBKe+VFUkEauRJT/AupNMPPUNpWwlpruc6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1hVZBk1U; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1772722924; c=relaxed/simple;
+	bh=Ae2N++dbOdjQGpsx2NiT5jHVY4JMX2Php0P3EY0Ai84=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To; b=iNPSxrpFcNr2vnreytb0+13XdixMbZgmfAC7RRvIwt3A1iTEi/CR4faYOTezaZ4vO5zCYxSoqapy0nxdiJKl11K6r8Kbl0wJX6sWbSbTZM56eMdGG+fcprgyy2bYg+OzrR/HIuJChH+q/ST9ddozhU1CAkV1+3RReIuMWJ1pcQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0g0Z/UrX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rfQfJtI3; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0g0Z/UrX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rfQfJtI3; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1hVZBk1U"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xOUTuNuSRBZbL1ueUm5qfqOmmk38QH6XBB6u0ubYvjU=; b=1hVZBk1UAL6ybRINUCtiCnO7Kh
-	iclPcd8Oq7FlNqG0/9ONyza4ESWMqo36S+ZU2E0fl5j1YeIzfR3AtyI2C6pajZLZIjj6Aof4gaDL0
-	CSYHB03DH6oJleVPsFFeCHA77sTEuNFMJ4hCwFLhqblvVXf+CBJAJpUx5AAAC82LJf6dgh1aHBNJ6
-	2qtbsgY1QGo/vkWVNiagfWCftSGSQphZ7d+PQO9pkhqWnDR5r1X5c5UkqLp3L/Ulu+a3TTjWo58YT
-	Y4KIfa/CABTOI2GKSBv1Un4np23/EMB7iSmn0z+U4dxjHVKRwS81dWyqZjM42OWigTFrbo7u6Pl0v
-	2rhsTwzg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vy9qG-000000020M3-0Mns;
-	Thu, 05 Mar 2026 14:38:20 +0000
-Date: Thu, 5 Mar 2026 06:38:20 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Adrian Vovk <adrianvovk@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Linlin Zhang <linlin.zhang@oss.qualcomm.com>,
-	linux-block@vger.kernel.org, ebiggers@kernel.org,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	quic_mdalam@quicinc.com, gmazyland@gmail.com, israelr@nvidia.com,
-	mpatocka@redhat.com
-Subject: Re: [PATCH v1 0/3] dm-inlinecrypt: add target for inline block
- device encryption
-Message-ID: <aamVXAqlWGcPXCDe@infradead.org>
-References: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com>
- <aaguW3p3_LOeM_Dz@infradead.org>
- <CAAdYy_mSB4U39Onwa=V2e2XB0sJXV6tCGkzwV2-z7ZtMcm+8zg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0g0Z/UrX";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rfQfJtI3";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0g0Z/UrX";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rfQfJtI3"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id AE32E5BD1F;
+	Thu,  5 Mar 2026 15:02:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772722921; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a0y8C2+BwX136Xn8XL84qBWd0BiUIMubhkk6hqkM0Jc=;
+	b=0g0Z/UrXuyKFPW2U2hBfBmPUN+xK8ISxSeixQphVlEWmn5MbhV/8j1e+T37A5jMgCC4nUD
+	S6qFtAOES2vt508NObUzJ6nsRv9CUSJe0AxD87ckqJR/Df+PfsssSG1CiU0JUk/KghfOg7
+	DlsrpTQI5rtwlE6fjJKRau++sobhihI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772722921;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a0y8C2+BwX136Xn8XL84qBWd0BiUIMubhkk6hqkM0Jc=;
+	b=rfQfJtI3aoeD0sQs4U0bGmxWyAurEeJsi7XgpbEvW/7RU4U0mOfYDrWIFmI5rMa76Dfoxf
+	7h/L5aZRkmbxz3AA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1772722921; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a0y8C2+BwX136Xn8XL84qBWd0BiUIMubhkk6hqkM0Jc=;
+	b=0g0Z/UrXuyKFPW2U2hBfBmPUN+xK8ISxSeixQphVlEWmn5MbhV/8j1e+T37A5jMgCC4nUD
+	S6qFtAOES2vt508NObUzJ6nsRv9CUSJe0AxD87ckqJR/Df+PfsssSG1CiU0JUk/KghfOg7
+	DlsrpTQI5rtwlE6fjJKRau++sobhihI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1772722921;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a0y8C2+BwX136Xn8XL84qBWd0BiUIMubhkk6hqkM0Jc=;
+	b=rfQfJtI3aoeD0sQs4U0bGmxWyAurEeJsi7XgpbEvW/7RU4U0mOfYDrWIFmI5rMa76Dfoxf
+	7h/L5aZRkmbxz3AA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 958583EA77;
+	Thu,  5 Mar 2026 15:02:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ERTpIumaqWmvGQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 05 Mar 2026 15:02:01 +0000
+From: Daniel Wagner <dwagner@suse.de>
+Date: Thu, 05 Mar 2026 16:01:46 +0100
+Subject: [PATCH blktests v5 3/3] doc: document how to configure bcache
+ tests
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAdYy_mSB4U39Onwa=V2e2XB0sJXV6tCGkzwV2-z7ZtMcm+8zg@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260305-bcache-v5-3-04cd4c9080d7@suse.de>
+References: <20260305-bcache-v5-0-04cd4c9080d7@suse.de>
+In-Reply-To: <20260305-bcache-v5-0-04cd4c9080d7@suse.de>
+To: Christoph Hellwig <hch@infradead.org>, 
+ Stephen Zhang <starzhangzsd@gmail.com>, 
+ Kent Overstreet <kent.overstreet@linux.dev>, Coly Li <colyli@fnnas.com>, 
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
+ linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+ Daniel Wagner <dwagner@suse.de>
+X-Mailer: b4 0.14.3
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org,suse.de];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
 
-On Wed, Mar 04, 2026 at 01:02:41PM -0500, Adrian Vovk wrote:
-> Hello Christoph,
-> 
-> Maybe I am misunderstanding something, but this seems orthogonal to
-> fscrypt? Userspace would use this to do LUKS full-disk encryption, but with
-> the hardware acceleration provided by the inline encryption hardware.
+Add a bcache entry in running-tests which explains how to configure
+blktests for the bcache tests.
 
-Ok, if people really still want to do that that should be ok.
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+ Documentation/running-tests.md | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index f9da042bb3a0..7d935aad3331 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -189,6 +189,16 @@ THROTL_BLKDEV_TYPES="sdebug" ./check throtl/
+ THROTL_BLKDEV_TYPES="nullb sdebug" ./check throtl/
+ ```
+ 
++### Bcache test configuration
++
++The bcache tests require multiple devices to run simultaneously. By default,
++blktests run each test case for each device in TEST_DEVS. This behavior
++prevents testing with multiple devices. The TEST_CASE_DEV_ARRAY resolves this by
++enabling multiple device configurations per test. Bcache tests need at
++least three devices, which can be specified in your configuration as follows:
++
++TEST_CASE_DEV_ARRAY[bcache/*]="/dev/nvme0n1 /dev/vdb /dev/vdc"
++
+ ### Normal user
+ 
+ To run test cases which require normal user privilege, prepare a user and
+
+-- 
+2.53.0
 
