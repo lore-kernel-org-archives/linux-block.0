@@ -1,182 +1,194 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0433B7B8B
-	for <linux-block@vger.kernel.org>; Fri,  6 Mar 2026 15:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772812091; cv=none; b=XuWGC56j4+iyfWOI7hK+NOqADprVletIf54IyYKR3eszgjMD6pX3F63PzbAGRn/mOouIm/INUaJtfch/ptQJKt708WdgOKoSx7X/5zPucQkxHdltf2cMtS8zAODYXhC7N0VORt9scuoguSybDv+7KDwwSor/02JQRcCzwV7WpD4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772812091; c=relaxed/simple;
-	bh=QiQtrjw9eIMb2cuYIUCH/KxXjh1LseTI/2iLzYitHWU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bPrJeeWz7pQwG8VRg8MhWB+eqMyQvcaDZo4jx5QSTqLC3AlIzwtFHQDLBaoTfLMnbZCJ1ICAKaIKKCDSPYqqX0mBIp1TBC4CO/+nEfFCLSKtCv93osOAbxLTPQRGaB16sgmFN9UCXFKqvluG6SOaM3P1WRXfJz5C2Ev0bA5RNJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X2+/fxbK; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD159460;
+	Fri,  6 Mar 2026 15:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772812312; cv=fail; b=tneEczpgjiB+vJb6KXeftZo6VrlDnagkDu6ktskHKGlWRG/r/UWYsDvshfjEI3imDhxtMOgZaZTontz2XnYcEWd94q2ylMvVohHzcS35ry8NQVFdTaLBwzmM2QjgmYAJNgJCB5jrxrE0sC7soeiUWOqVStmSffqGk1K8czEQeOY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772812312; c=relaxed/simple;
+	bh=FcWZ8un9cXxzgXxa05bqwHMNo1Tjm8xxn4JDMw8hjHs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LEzEp2d3V6yMUAg/lhZjo7f+Nvy8y5o9hFqe/s7QGyOu/SuoyLMxt27zSY84RORHPj9MHYrgpT63LTMqx9THzugrnZ7UmEdZOJGqAAApkxY9boBW2BNF9W2sJBF1sjl59WfveQNlT9E/JLTuYJBs1ThQAf/M9eIzHLUBLcnEsKo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=XH9Gtncl; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=RNx2iwqR; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2+/fxbK"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-45f194e9a98so3441222b6e.3
-        for <linux-block@vger.kernel.org>; Fri, 06 Mar 2026 07:48:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XH9Gtncl";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="RNx2iwqR"
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 626FYJgx3388845;
+	Fri, 6 Mar 2026 15:51:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=Vj+Cl8+X0dRaDZp9DQzN1/LLixpKg52S/fU79P3Ss8Y=; b=
+	XH9GtncltqH6bEMQZ9VPTN9X7OcSDBxjFDI5c0QhCUE+WZiTFNQ0Dt2BsKQCr82V
+	+XRQgDTbAV2IK8bmVxxLmW7nL8RlvHzFZeaygbIWQ47YtpbOB+BRA6Hcsbh05szt
+	c6BgSOZc8AI69eh1rq65JKBf7nZE4HH42Y9UfwEI7f9rLSRenuHS/XywsJFTK3PB
+	p+BtyuhQt3rqTNn7SCeYJBoeYbkpXgPX+73Od11sSgT6J2ZlvKHYyLdsV58RIuHP
+	KFHSTalQRYuClkE54bePNpD1FRSC4THe9p4raeP0s+XaubLk28QVw0r2CDgOdiBm
+	LWfwRN9emAwbnVq8G/Mqsg==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cr1p5r12n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 06 Mar 2026 15:51:38 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 626EOgHG001439;
+	Fri, 6 Mar 2026 15:51:37 GMT
+Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11012034.outbound.protection.outlook.com [52.101.48.34])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptk50q3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 06 Mar 2026 15:51:37 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YJP9d1sgQWcADlVbJd87pibJ/nShHBVZjMgx18tvTCyaOP5UuDPKWaUX9D854xwVbew2Ui9Md8c8kj4cM7IetGVRbbGQFTF/klE4N373Rrp0J/UJVHmfaRiVJYCEi7zr1DjXM5Ww3XOSCme4ItDdlj2Lk317sEMQbghXwzMOMx+qKPvnGeD1uHpboybVYr31c1hWc3gHRIsM/uVotelcwKRsfsvXwnfERdGgCQjjxIPGz2vV74M82+oxd4Rdbl7nGETOVwWKjy1BzwzeKmIpy3jM5XC/A+cLrYRFbyY5jwLtqAa7NBLFPsoNBuDi/5cWW7Hst0m0467qQXC4Iqsnrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Vj+Cl8+X0dRaDZp9DQzN1/LLixpKg52S/fU79P3Ss8Y=;
+ b=YDaXIppxt4YCry5l6EsN95wTg6iYdeXwXIO3UaVWxM4pFPcgePkFnyGZIRnT4pcbdifLS48mjr859mQKGFhg6kMTYxVBgW1WwbxFh7EA0EC2Cn4sXyiv/6C8Sj3KXqrm9psfuAtLO6XcIYqyPcmg6yYc+SjrCYmjbnr/hfsDOGuWjGgT7gRVZsVCco09253A5m+062/mKgHfO2ij00nk3DWyS9MppXWjOO1N/ABl3Atdc0YRz8MABsrR3t1tM7+xNpqOiUfq7CzsTce8M2erXNhg/611Rwdep25X8nK0jftTpj2YALvO7JC8gs48LSFgSK/WH1qakXbZ34WatXO37A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772812089; x=1773416889; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ltlmh5+xfasabBt3G7wfvJiHvUvttPKwWWOjoNqhRlQ=;
-        b=X2+/fxbKHtxUbrCFdv/jPdLDloIXufoeipQcQY2hOv3LiDXMJVg6TeBqKuKiI5HJ6m
-         aId4KbWpM5rnJ6gDv1tAdfAKK1zG/0gfRrEZWmXcX8VGY5LI/v+sGwgaTp33TbG+EEzY
-         231dzWFMe80B8SriVeKweH6KdpcSOixSLUlkfIymEq92IN9mOp/hPmZAx2ICU1P+QVqj
-         4bKfMQyUEw6ajJUrD5fNnaqtm2SZ40mYFuMtlq3kpgOe1JzPyOVqs27iZT8Dk/PyR//o
-         8AGePpM2h7ThXXo9q/PebPd++w5EkcnbOvdAzPfjuj7LSFU2hVdLh/MK26ObyY5Yig4A
-         jkJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772812089; x=1773416889;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Ltlmh5+xfasabBt3G7wfvJiHvUvttPKwWWOjoNqhRlQ=;
-        b=VxBNY5y3YtnbFiOnFnewU1cffzAL0DaKAOrBYn5XfFdVxz/f6ExwI9HnBSl5keLeH+
-         mgsQS3fMVo3MMxJE/w8TXIUJEafdWtorAWegZ9HMgXETICDeUSmLnXn+HumIy+MkAqbz
-         BiBFtwPjTMTMrELJHn0A8EUtd2n+gsNk+CQThYiftHi8i6LHpkSviY4QgKTb7/7MvCRq
-         epDIyQD0UIfkyyR/7vwTXdh4AarXJzy1tJ2Y+T/xtocR0QGX2MZt0pyk6rA7VBiJUgAT
-         roX+KWsz7XC2XG0qkllYo9SBEQDDtkDXEgw+v9w7vhkw1dzilhCoEv+RccK8FCz5yhd+
-         m/gA==
-X-Forwarded-Encrypted: i=1; AJvYcCXoww36f1khtLbonMnNePMSnj7aC0/Q75HPXnKHoa28f1z5xBvhhLt+vLHOJa5MQCbS25zK6U9E/uSsbg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO9CPCCm9uzJQzQmkEhlN5/k6nj2uBwJ6A47Rou4uBmnSpt+0Y
-	vV277yuiz7awh/IEeuORohrBEnYh3qtQRdxMQmXW+UFOguM28T538mOl
-X-Gm-Gg: ATEYQzzVtpSpH53hVZDX2X9cnx3qolNcJDShe5OE35DsnmLPuP76UaglhppvmJVNusR
-	gJ/OG7/TAAMo9W6XxDK5JcLTxiDq2RLGPjUPF5CNlqmBF3xhKqtMEwZ5KYlPOkkztgXrZb5IGI6
-	ihV7/sNdXIJ89NaD7gq67VBOAUH2riCNSA2UoBtt+kjaSb5QUgyqWSXlYD4BGZUivyGNeDnmldI
-	nmpHQ86ujCPM0n2srMmSbRXzJt4Z2uVUrABJ5H40NjLFY16MLbKqBFsb4Nxa/2VfpBlxSKvDkpI
-	WO5HTlnKccL+res/549oEg6h+nX1qH0kTihrwAKrQA34ZiKQaCxjhQVgioR8azagZh2mc+N4JAq
-	kicSooqDy2GBH9pLPJ920UgstuVrYz9j/1wZE6orVJuFvpXRXuiqtxBsHnLAGBetYgeh0MMzNXI
-	rXQfhAn1Hd55ib0SJqfWdMqg==
-X-Received: by 2002:a05:6808:4f08:b0:43f:5c61:448c with SMTP id 5614622812f47-466dcb0c3bemr1240922b6e.39.1772812088834;
-        Fri, 06 Mar 2026 07:48:08 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:52::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-416e68369bcsm1683173fac.15.2026.03.06.07.48.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2026 07:48:08 -0800 (PST)
-From: Joshua Hahn <joshua.hahnjy@gmail.com>
-To: Harry Yoo <harry.yoo@oracle.com>
-Cc: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Nhat Pham <hoangnhat.pham@linux.dev>,
-	Nhat Pham <nphamcs@gmail.com>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH 3/8] mm/zsmalloc: Introduce objcgs pointer in struct zpdesc
-Date: Fri,  6 Mar 2026 07:48:06 -0800
-Message-ID: <20260306154806.187506-1-joshua.hahnjy@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <aapO2Pd9d5B6MEtu@hyeyoo>
-References: 
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vj+Cl8+X0dRaDZp9DQzN1/LLixpKg52S/fU79P3Ss8Y=;
+ b=RNx2iwqR84KhFsQX66plS2HxYPd0+cLR0m9mC9wwsPENkb8GTart/3tChv5UCZq+kIuRD0uRFzWwM7SXZWKxaP67J9tknjgjkJHVQVx3v2A7ygDed9aAPnoWzVcozGkLzirhs9yco6UiIhPXWxJcamkHA4WwN/q3y86ZCPSZIxw=
+Received: from DS4PPFEAFA21C69.namprd10.prod.outlook.com
+ (2603:10b6:f:fc00::d54) by MN6PR10MB7421.namprd10.prod.outlook.com
+ (2603:10b6:208:46e::5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.18; Fri, 6 Mar
+ 2026 15:51:34 +0000
+Received: from DS4PPFEAFA21C69.namprd10.prod.outlook.com
+ ([fe80::5266:1601:5598:3f0a]) by DS4PPFEAFA21C69.namprd10.prod.outlook.com
+ ([fe80::5266:1601:5598:3f0a%4]) with mapi id 15.20.9632.017; Fri, 6 Mar 2026
+ 15:51:34 +0000
+Message-ID: <a60a80a7-e612-4eb1-a151-eaaef57ac14c@oracle.com>
+Date: Fri, 6 Mar 2026 15:51:29 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4] block: get rid of blk_status_to_{errno,str}
+ inconsistency
+To: Andreas Gruenbacher <agruenba@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org, dm-devel@lists.linux.dev,
+        linux-f2fs-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org
+References: <20260304190424.291743-1-agruenba@redhat.com>
+ <20260304190424.291743-3-agruenba@redhat.com>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20260304190424.291743-3-agruenba@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU7P194CA0006.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:10:553::15) To DS4PPFEAFA21C69.namprd10.prod.outlook.com
+ (2603:10b6:f:fc00::d54)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS4PPFEAFA21C69:EE_|MN6PR10MB7421:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13cf97d7-52d8-4247-792d-08de7b983dfc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	IP7zh7es9N3BfbKyfk/E2s2igtd92ZXHd343ChA4yDk7yVlV556SX9n+D0iy8FquYeYND3Sd5C3jpuzbcw/c0GU7a70hgY3CGyleltf/Rx4HOT72UE5lWZCfSp3HKhIJMoNDFj/w0SqFXlhZsKt56x0QraMyTBhgmylk4vbo291tZgbDH7GJvdNquXg9pRwCDG4woAWyg90erhBF6sUEh1JXI+DCAhg1iarFnG+HzcohAwU2l2C5+SoJ083lyA3bOsaZwX/ZArffabwYLlaQmojLUN9+ZOMO0oT0lw5mhA53b/A6PQYDDqQbZQgcDqx5O7V0RUtRiMRsH9vehx7oeDXZvK8l7KQdSEkHqDQiFEYIf7zZC33xPpH+DofIMkAu9ZofFbLtslzG0bdgAwprjy6Hd6o8Fz9tKFHRD9j6JHLQJEwfi7L7TOW6zAoPPfIGtxhQwwzovoJVzfviDhveYBhzcx8fl2oavp39EpgTMTEGKWDjzQKraB56toJgps0fGHrZTMtcfRQIxF6xAvl7arMX80zoxirVUPC/FAX4pzEn5uYEIMrejKdmfHx/294BOhI8KJnecP93dWjyk9ytti/Ct1tuRgMaXTAXMiSG3lfhKLJnOl/Pv9vzJ6aHpqPqrWhtl3HG0LHzDWIp+s0BYXPYissb+rjM24+Iw8u5/zdOaqiwya/5jlYcV2oM6T/Qz/8HJ3wAWwyvvAioAv/x/rj/5vPUvz4BOJbtx+XhuRg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PPFEAFA21C69.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WCtrZCtrcmdCdmFkZXlEZjF6SFlPSDQ4T3lnNlhBM3BOUXpCY0tMaWFDQjda?=
+ =?utf-8?B?c1M2Mk9Wc1RDdytORGpaYlc4THRZUHVqYVJLNjZXUTZJYXU5Wk9vQUw4REQ1?=
+ =?utf-8?B?OFpYbzA3YytRc2NzOFdVK3ZUdzMyM0hDZGI0VGRiUTFZTVRqZjFKbFhVZVFt?=
+ =?utf-8?B?MkpQUTN6VkNGMDdrT1hieitqSXlFNXdWMkFjU1F3azBmSU1sKzRqVEtCWHVj?=
+ =?utf-8?B?SHJiNXlWVmw3djRHa3VJZU0yLzNVMWpzZ1JhOFJHSEhVaHBnT0V5SzgyOGFX?=
+ =?utf-8?B?eEtmNGpRQXNsSTR4dERPZUd0UklCREFwLzZUbmxYaSs2SjJtbkdiMXZHT1VW?=
+ =?utf-8?B?UGtVTHoraTNmaS9MV3pxam9rM1BpQ0sxNUgyYXVwVForSUxZcEYvU1NCb2p2?=
+ =?utf-8?B?bFVndnVrY2owVG5RWjZsWFNHcHN5TkxjSW4va3VsenVpNnk3QUt4Zy9zS2g1?=
+ =?utf-8?B?eVNJRzhnSk51OTU1cmQxZkx5b3JkRjVaZTFCZGNUczhpRU9aLzZKQk0vNWtG?=
+ =?utf-8?B?QXB5dG9rSUZYb3JPdTNGTHg4bEdGL05QVEpGTGd3djlhZVVKWjgwVm0wVUt0?=
+ =?utf-8?B?Z2k2SlBJQ0pvUWFSb2ZnK2RCbW9lRXBIQ2JBYWY1ZmtCSTlCamROUVRUZlZB?=
+ =?utf-8?B?TmVDcGp6b2ZPUERpWEZVU1dlVjVpalUwM29jbzZ0MTZ4NVhyL0FyT1A4enBk?=
+ =?utf-8?B?VDRvbHoyNEhtVEpmYXRuejFZUXQ0azlFU043S1R2aXJJd3VlWG5uVnlvR0Nr?=
+ =?utf-8?B?WTBXTnV1dXY0Sk05MTJ3ZlUwL2twM1ZFaXJxbkp4dXNzQUNJdEhCVmNmQjdO?=
+ =?utf-8?B?N3J5eVh3b0lkdmJCaHYwbHQ1Y0IrVmxMT0xIQ0FqNFJWTVNHRVRXeTNwMm1n?=
+ =?utf-8?B?cEViZUw3K2hsbnB6MDVQcytEcUhaTGpDSFlUYXQza25rTUpLVUlENHhNU3Ax?=
+ =?utf-8?B?alRUQ081L3ZFVTFDQzJLWlJWaVI5VzFOSFAvZDlHUDJiemVUcEdYZ2tkOVpJ?=
+ =?utf-8?B?UVdPN1lLREY0bzdobDdkL3IvUFc3RnJtK2FaUEc0c2NLb3J0c0VEUW5kVk1k?=
+ =?utf-8?B?ZHNlT3drcWt1Z2JWZmRFWWNBbWhHT3hLait0YlVENnlBaXpKTW5idXdOdVcx?=
+ =?utf-8?B?QXFndzRJZ0dWUC8wMCtseFdDcnhES1AwU3VDTHRJUFlTVjhaZmxQMWg2TDdE?=
+ =?utf-8?B?L0dIVnZReXE3SlEwWlBEQmlXQTgzb1J4VFVJVHZGRmRsdzA3NXp4M1Jzelhy?=
+ =?utf-8?B?dnZXbzhOczRZcXBnQlJTaS8rRDJwYkx3Nk0xSnZzYVkzQUw3ZWFnNUpONEQv?=
+ =?utf-8?B?VENQcDYreWw0Qlg5YUk3K3duZ2E1eE1hcUZ6MHVwMTRkSXRWZ2d4OTFIQVFO?=
+ =?utf-8?B?ZUVRNkVFNkFBQXpIaEtoVWVzLzZWamRsNWJ5RW1sQmt6RTJiaG1rMXRwL2VC?=
+ =?utf-8?B?Z3BTN1ROc3czT1ZFRUxPL3pEWmUvRDlUMHhBc0xHVnNWSHlodVkwYWUzV3ND?=
+ =?utf-8?B?WXlMb2tjOE02VGZJeGxjWHhBQnErY081SXF0Tlk2K2xCc3RlZmxLMDh2OUNk?=
+ =?utf-8?B?WGlqWXo5OGt5YUd2ZjlTL3pyWEFPMFRnSDdpNmFuWmxHVDBVQUpVMXR6enhj?=
+ =?utf-8?B?M3h5M2NXVzJ2ZHFXcktyTXdVWm9NQStBL3N2NHBmSGFJSkhnelgySDFvdzFj?=
+ =?utf-8?B?U2V4NXVHRnFTaFI5RnlER2JuZzU3NXpJRzNFcDlITFFreWRGMlpZZktIQkdl?=
+ =?utf-8?B?elowd3g2T2dSa01EV2xIR1Frd2hjcU1GQVR1RW15YjdJcTB6cGJuWXFHSDFq?=
+ =?utf-8?B?Z2dPRXg1bzhTNzFpRklDY21lcVRvQVFHcWdId0RxSjhvdnFoakNMRTl2MmQ0?=
+ =?utf-8?B?dFpaRjZqcm9WVEE2WEFrNnQyS2h6MzBUSk43NEJyeEU3VCtKMXp0TFlVYUVJ?=
+ =?utf-8?B?SFVsN3dtV0gzRERIVzB3VWt4N0ZjbkFYWmozZTRxQjBjS2I4eFJYcnZ6Rjgz?=
+ =?utf-8?B?OWxFZzFrcmRmaXZhY3V0T3pnSVpJR2NQN0J4ZW51UU90SlVCdVloRmo4UXI1?=
+ =?utf-8?B?T0RvNi9VN1U2UzRLVGtCNUp3WFVXem1SK2NPT0hXVGRzL05CbkRhVG9ZMkJ3?=
+ =?utf-8?B?eDNRalRXM1JwR1g5ejZ4U1MwYVlHQ1VsZXoxT0ZQV1RhNGl0WW0rVFJUenlD?=
+ =?utf-8?B?U2EwWjQ2ZERwMTNvaTRyWlZudTNkZXptS1pkL0o2bDJCWEhOU0RwTisvM0hj?=
+ =?utf-8?B?ck5aZDNjbWxKenIvdDR2YUFvUG95Uk5FMHNheEFmWitJY2VuZDdDY0w3R2V1?=
+ =?utf-8?B?Z3dVVFJ3cXdwSTdxYW9wdkJjZlZhRngzRGg4Uk1ZbTJScTZvbkVaUT09?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	QXka6RZHy2AbjneGqmbZLvUjHn4cRO2Nv+1maRYTUm0oGpoQJcqJxy3umO2Wmoz0bLM9Whse9nhws5bESSZ+th2OsYW2+cNhF+JW7XOsfJpubcZJ8XQ29pGCxjskfoD2ARLWlAGSy25P6OgpzHH3QqpyG+GXGulfiK8yBis4remZEgS5/UtnTtRniODZqCzkT+e9iWIDZ5HOlLvkHABOY6PCHdWX4LSveBxSKEGzDMUsHDukrsnCKinusm1SBB1vN/2uPMYm8AJXCHB/eYsEC/rsW3tYGHIiyvYshqPesdMDKzXfFfTMfatocWqj08LzgZE9gzF0E8WshcNviu/Xwbb2y12FuUshmAvCp5TdAFbH+KUzXGBGIG1w9ebMvnPmR2LujDAOjjaUr9EmTiGlArslCZQ9Ym2fVewHGbHxZn9dRF7IDSN8slLpHdF3cGe7WaJBw2QyVuTTagb9w1dzGR0ircJx6ubNIrA6bNGOsdZ2zQDiUPixKVSRalbyNyEVJ9UPQ/1VkOs2NIrvXq/tKU1R0j0q2BvGB1vsK9eKvapbPD1Q68P8jzO/2IgmUPXLRi/1rWJZ6XG3OFdbMo3LZzgSNe48CrI6MoGfoMnr8j4=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13cf97d7-52d8-4247-792d-08de7b983dfc
+X-MS-Exchange-CrossTenant-AuthSource: DS4PPFEAFA21C69.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2026 15:51:34.1415
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cLuQjF1+8IQYCeKDC9sPUBcCWtxdT2voK6XngvmnrbAp6SRJ0dCxALrOhpWvP54Bp03mZk10Nyoynk0pDXtHlQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR10MB7421
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-06_05,2026-03-06_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 phishscore=0
+ spamscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
+ definitions=main-2603060149
+X-Proofpoint-GUID: JFs8JS8Ia3dSEdxKKY2qKcBhK-QRtZOo
+X-Authority-Analysis: v=2.4 cv=JOg2csKb c=1 sm=1 tr=0 ts=69aaf80a b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Yq5XynenixoA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jiCTI4zE5U7BLdzWsZGv:22 a=o5oIOnhZENCTenyL_yNV:22 a=20KFwNOVAAAA:8
+ a=yPCof4ZbAAAA:8 a=FCHOSpNyMqDNgBJJgV8A:9 a=QEXdDO2ut3YA:10 cc=ntf
+ awl=host:13812
+X-Proofpoint-ORIG-GUID: JFs8JS8Ia3dSEdxKKY2qKcBhK-QRtZOo
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA2MDE1MCBTYWx0ZWRfX/K4kcxrCfMJN
+ Nw/6CMRx11r5tUnWlLbEcDhTKjExjnZQCj+4HUli1WrcDZUibomzq7zkraIj/ifTeuksnguPpjI
+ NYJXxO9tZjQbkxqLwGbeypMO7JdVWoHj2LUuCud4Rui/TMP7CItnVZMRNJbs/TF4BW1CrWUqfKz
+ aguPl0Pp/a7tYQ2mjqE1McWl04wcs2oN2whohOFBq/gp52XgqB/nJKp/07QOGKEuhm/cO16R6bH
+ XssCSzbrhvljpcBFtnKuVrc2p8XTYuxxsUZA9lo3xAbGOd2dsGKZodlakYRc15NhRUKiTyZ8yzU
+ Eikg9/aXj5oRvlL3JcnFoSvpjfnTAJmLeUgBu8aZLg5SWlDlj83306JUmVC07McyWyYsExcsDqZ
+ 4Xqvz20yg9L9Ro1f7XSob0mvFMjO0W/gB8wMu4QkVs1rCtGhq3K4ldLozM8xsapwvx6oGEgbu1F
+ rh1zxI1PoRn1UVgO3AQ63EE+ezsvdgHPnJlSJlZg=
 
-On Fri, 6 Mar 2026 12:49:44 +0900 Harry Yoo <harry.yoo@oracle.com> wrote:
-
-> On Thu, Feb 26, 2026 at 11:29:26AM -0800, Joshua Hahn wrote:
-> > Introduce an array of struct obj_cgroup pointers to zpdesc to keep track
-> > of compressed objects' memcg ownership.
-> > 
-> > The 8 bytes required to add the array in struct zpdesc brings its size
-> > up from 56 bytes to 64 bytes. However, in the current implementation,
-> > struct zpdesc lays on top of struct page[1]. This allows the increased
-> > size to remain invisible to the outside, since 64 bytes are used for
-> > struct zpdesc anyways.
-> > 
-> > The newly added obj_cgroup array pointer overlays page->memcg_data,
-> > which causes problems for functions that try to perform page charging by
-> > checking the zeroness of page->memcg_data. To make sure that the
-> > backing zpdesc's obj_cgroup ** is not interpreted as a mem_cgroup *,
-> > follow SLUB's lead and use the MEMCG_DATA_OBJEXTS bit to tag the pointer.
-> > 
-> > Consumers of zsmalloc that do not perform memcg accounting (i.e. zram)
-> > are completely unaffected by this patch, as the array to track the
-> > obj_cgroup pointers are only allocated in the zswap path.
-> > 
-> > This patch temporarily increases the memory used by zswap by 8 bytes
-> > per zswap_entry, since the obj_cgroup pointer is duplicated in the
-> > zpdesc and in zswap_entry. In the following patches, we will redirect
-> > memory charging operations to use the zpdesc's obj_cgroup instead, and
-> > remove the pointer from zswap_entry. This will leave no net memory usage
-> > increase for both zram and zswap.
-> > 
-> > In this patch, allocate / free the objcg pointer array for the zswap
-> > path, and handle partial object migration and full zpdesc migration.
-> > 
-> > [1] In the (near) future, struct zpdesc may no longer overlay struct
-> > page as we shift towards using memdescs. When this happens, the size
-> > increase of struct zpdesc will no longer free. With that said, the
-> > difference can be kept minimal.
-> > 
-> > All the changes that are being implemented are currently guarded under
-> > CONFIG_MEMCG. We can optionally minimize the impact on zram users by
-> > guarding these changes in CONFIG_MEMCG && CONFIG_ZSWAP as well.
-> > 
-> > Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
-> > Signed-off-by: Joshua Hahn <joshua.hahnjy@gmail.com>
-> > ---
-> >  drivers/block/zram/zram_drv.c | 10 ++---
-> >  include/linux/zsmalloc.h      |  2 +-
-> >  mm/zpdesc.h                   | 25 +++++++++++-
-> >  mm/zsmalloc.c                 | 74 +++++++++++++++++++++++++++++------
-> >  mm/zswap.c                    |  2 +-
-> >  5 files changed, 93 insertions(+), 20 deletions(-)
-> > 
-> > @@ -893,6 +898,43 @@ static void init_zspage(struct size_class *class, struct zspage *zspage)
-> >  	set_freeobj(zspage, 0);
-> >  }
-> >  
-> > +#ifdef CONFIG_MEMCG
-> > +static bool alloc_zspage_objcgs(struct size_class *class, gfp_t gfp,
-> > +				struct zpdesc *zpdescs[])
-> > +{
-> > +	/*
-> > +	 * Add 2 to objcgs_per_zpdesc to account for partial objs that may be
-> > +	 * stored at the beginning or end of the zpdesc.
-> > +	 */
-> > +	int objcgs_per_zpdesc = (PAGE_SIZE / class->size) + 2;
-> > +	int i;
-> > +	struct obj_cgroup **objcgs;
+On 04/03/2026 19:04, Andreas Gruenbacher wrote:
+> Change blk_status_to_str() to be consistent with blk_status_to_errno()
+> and return "I/O" for undefined status codes.
 > 
-> Just wondering, perhaps it makes more sense to have an array of
-> objcg pointers for each zspage (of size objs_per_zspage)?
+> With that, the fallback case in the blk_errors array can be removed with
+> no change in behavior.
+> 
+> Signed-off-by: Andreas Gruenbacher<agruenba@redhat.com>
 
-Hi Harry! I hope you are doing well, thanks for taking a look : -)
-
-Hmm, I think you might be right. For context, one of the first
-ideas I had for this patch was to have a per-zspage array, but store
-it in the first zpdesc. As you can imagine this was not a good idea...
-(head zpdesc page and tail zpdesc page? ;) )
-But! storing it in the zspage struct makes a lot more sense to me.
-And I think we can actually simplify the migration pathways as well.
-
-My immediate response to this was that "subzpdesc swap ins/outs would
-be difficult" since right now we can just move the pointer, but
-if we have a per-zspage array, we actually don't have to do any
-objcgs pointer migration at all.
-
-And I think the cross-boundary cases are handled a lot beter by having
-a per-zpdesc array too. We also don't have to convert the per-zspage
-obj_idx into a per-zpdesc obj_idx as well, I think if we do this...
-
-Let me mull on this for a bit : -) I'll give a shot at implementing
-it this way, I think it makes sense!
-
-Thanks again for taking a look, Harry. Have a great day!
-Joshua
+Reviewed-by: John Garry <john.g.garry@oracle.com>
