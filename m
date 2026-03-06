@@ -1,161 +1,113 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6072C21DF
-	for <linux-block@vger.kernel.org>; Fri,  6 Mar 2026 13:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37DD30E858
+	for <linux-block@vger.kernel.org>; Fri,  6 Mar 2026 14:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772802885; cv=none; b=tGUe4nBhTTwaycEqzQL+2pfBc6Lw1Oh/KXVKcBwGZ/I6OvdqbYFrg1m3aVM3uyehaib5vG7KDXeEqbixyzlQjeoZisd1jWgt7WKDJzzJpnp95GSLpTpl2IZymUXqIljr0yX0vs01MZxURJCytB4nqu+FrkrxZWkzW/2mtbLWA70=
+	t=1772806272; cv=none; b=F5FS1dPAoTio3INi62iXYZNfab6Q/lXsr6TtroLPvL9lH/RbcM0Bu9G9vasRK10W0tmLfxWylZ6+OGNVBlMYK5vv4NltTBc2syKiCrvtioiCsCpaGhvRilrBzLeCpOvc7PtRqgqZnEH8SFlJreERTapmwrlSFIqqLF1beFvJ5lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772802885; c=relaxed/simple;
-	bh=0UPSJIeo/JJvd/qYCZajeRPsdMgtU5mDlOQrWloj5pw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dtr3tgMrOqrpNTMZ4sOFlqCVKMj6F/z3xRz4od8e2XmnHHMHRnzoHdbiXWFlNbC3GuHFV0cy5BA6X7sG8m3mXKx3KPzBfkWC4KaLluNQivDvysyYwVnhjXqTcHYoGoQE9absUaKjuzRt7p7l7AMysH36XhWVNJwDFo/w7+YsN80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z9gyY4DG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u5MWZKh9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z9gyY4DG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u5MWZKh9; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1772806272; c=relaxed/simple;
+	bh=TZDTyUP/OWJM0C4I/rZxQy/PouTuxpTXK+v2jl0Q5VA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jjlDJYUI9DaGFEJENFS7lmNpLDeddPibH0zislQJRV9GMjQr3ZdhOj+3D2QQ+qqDNpTk7YF1qN8u8Olnt2RgtUKvua1id0TRBpxZStNk/5mhrnPj6RJp3oSdVBzsWJhoRwdjMrpNOBzXfB0wumpqBJjDiBtGCpTBbZtqqY+EYv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=y9vUTXkk; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z9gyY4DG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u5MWZKh9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z9gyY4DG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u5MWZKh9"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="y9vUTXkk"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fS7cH0hd4z1XLyjF;
+	Fri,  6 Mar 2026 14:11:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1772806266; x=1775398267; bh=6m2ihEtaInK8g8aivIX/90kM
+	lyC7t8007nV7nqLP3J8=; b=y9vUTXkkJAC0/POKUpDMAVn0VTClS9ZYbQ+YT0DJ
+	+Y/W6jNDyDW9z9HfG82RhT9ORYViF5dKSojm8E3KdT0QYEX4yGTvWFmW7Y5ofTSs
+	P4iRBcurA83h0joZYFGXPW6clYbbT5RfN1aI5duUS59rzy5Z30e4FsiObTlX7jmI
+	iHynRCWIPMvZ/LyzCOgQoncw64YULgOTEK+79+fMFqyZvKrIiBfei9oHs3RiUGbc
+	Tk9wDXZ5YoTJY4HwpMP8I6a5HxQJN5aFdU/iyRGWlbyb0WFZUPoP2wgsa3hbT87g
+	DGfecmx7+jI2uooisOIDyhIUM+voFQPjHY1ilUeFdIDcTQ==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id UJMQmVM-kA3e; Fri,  6 Mar 2026 14:11:06 +0000 (UTC)
+Received: from [192.168.132.187] (unknown [12.150.89.26])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 133F75BE2A;
-	Fri,  6 Mar 2026 13:14:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772802883; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tuo/M54ZYoIpZVfc9Tj3P0rGNr9hcET3MKrZ/9AEN/g=;
-	b=Z9gyY4DGuk3OK1kcnHqsW88eZQ7po2TUUAA0C19QMq+E3LBu2kLq843qdHcSZKKWzRr6wT
-	UVM078iBEOrUBWqPWFnUv02aGUsfoMMpEthXe5f6EtEmqp8JoCiIciW9glBXEFeIPBPcSP
-	wQKrrr5GqjdZOOVkO46/CkOlQeP4VKo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772802883;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tuo/M54ZYoIpZVfc9Tj3P0rGNr9hcET3MKrZ/9AEN/g=;
-	b=u5MWZKh9U1ehMrPjJKGfKvU5/lYEYEsgbl8WJCQBB/A/Wdy66DsEVeeVJIPf+68Kmnu9xu
-	WC54tlTo9pPmfoDw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Z9gyY4DG;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=u5MWZKh9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1772802883; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tuo/M54ZYoIpZVfc9Tj3P0rGNr9hcET3MKrZ/9AEN/g=;
-	b=Z9gyY4DGuk3OK1kcnHqsW88eZQ7po2TUUAA0C19QMq+E3LBu2kLq843qdHcSZKKWzRr6wT
-	UVM078iBEOrUBWqPWFnUv02aGUsfoMMpEthXe5f6EtEmqp8JoCiIciW9glBXEFeIPBPcSP
-	wQKrrr5GqjdZOOVkO46/CkOlQeP4VKo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1772802883;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tuo/M54ZYoIpZVfc9Tj3P0rGNr9hcET3MKrZ/9AEN/g=;
-	b=u5MWZKh9U1ehMrPjJKGfKvU5/lYEYEsgbl8WJCQBB/A/Wdy66DsEVeeVJIPf+68Kmnu9xu
-	WC54tlTo9pPmfoDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 032053EA75;
-	Fri,  6 Mar 2026 13:14:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id rswlAEPTqmmtaQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Fri, 06 Mar 2026 13:14:43 +0000
-Date: Fri, 6 Mar 2026 14:14:42 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "hch@infradead.org" <hch@infradead.org>, 
-	Stephen Zhang <starzhangzsd@gmail.com>, Kent Overstreet <kent.overstreet@linux.dev>, 
-	Coly Li <colyli@fnnas.com>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
-Subject: Re: [PATCH blktests v5 2/3] bcache: add bcache/002
-Message-ID: <baa3a723-2f9c-4e10-9d42-b4152de92df2@flourine.local>
-References: <20260305-bcache-v5-0-04cd4c9080d7@suse.de>
- <20260305-bcache-v5-2-04cd4c9080d7@suse.de>
- <aarFVqxrXF9Bah31@shinmob>
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fS7c81ZW2z1XM6JT;
+	Fri,  6 Mar 2026 14:11:03 +0000 (UTC)
+Message-ID: <255978c9-1cb3-4fa5-bb91-c07c6ee7a498@acm.org>
+Date: Fri, 6 Mar 2026 08:11:02 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aarFVqxrXF9Bah31@shinmob>
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[flourine.local:mid,suse.de:dkim];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Queue-Id: 133F75BE2A
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 10/14] rnbd: Add more lock context annotations
+To: Marco Elver <elver@google.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+ "Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jack Wang <jinpu.wang@ionos.com>,
+ Nathan Chancellor <nathan@kernel.org>
+References: <20260304194843.760669-1-bvanassche@acm.org>
+ <20260304194843.760669-11-bvanassche@acm.org>
+ <CANpmjNNF4wjZout_zz9rW2eoH4nAHQy9YURmn1hNtiuSsk+9fQ@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CANpmjNNF4wjZout_zz9rW2eoH4nAHQy9YURmn1hNtiuSsk+9fQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 06, 2026 at 12:27:51PM +0000, Shinichiro Kawasaki wrote:
-> On Mar 05, 2026 / 16:01, Daniel Wagner wrote:
-> > Add test case from Stephen Zhang [1][2], which is
-> > 
-> > 1. Wait for fio to complete (wait $fio_pid)
-> > 2. Wait a few seconds for I/O to drain
-> > 3. Then check the utilization
-> > 
-> > If utilization is still > 0% after I/O completes, then there's a real
-> > accounting leak.
-> > 
-> > [1] https://lore.kernel.org/linux-bcache/CANubcdX7eNbH_bo4-f94DUbdiEbt04Vxy1MPyhm+CZyXB01FuQ@mail.gmail.com/
-> > [2] https://lore.kernel.org/all/CANubcdU92Uv7wNdZH357LLTnfwPouekXNTPSjHnzYzK99-eZ9w@mail.gmail.com
+
+On 3/6/26 7:09 AM, Marco Elver wrote:
+> On Wed, 4 Mar 2026 at 20:49, Bart Van Assche <bvanassche@acm.org> wrote:
+>>
+>> Prepare for enabling lock context analysis by adding the lock context
+>> annotations required by Clang.
+>>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>> ---
+>>   drivers/block/rnbd/rnbd-clt.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+>> index 4d6725a0035e..7f0f29b8e75a 100644
+>> --- a/drivers/block/rnbd/rnbd-clt.c
+>> +++ b/drivers/block/rnbd/rnbd-clt.c
+>> @@ -833,6 +833,7 @@ static int wait_for_rtrs_connection(struct rnbd_clt_session *sess)
+>>   static void wait_for_rtrs_disconnection(struct rnbd_clt_session *sess)
+>>          __releases(&sess_lock)
+>>          __acquires(&sess_lock)
+>> +       __must_hold(sess_lock)
+>>   {
+>>          DEFINE_WAIT(wait);
+>>
+>> @@ -855,6 +856,7 @@ static void wait_for_rtrs_disconnection(struct rnbd_clt_session *sess)
+>>   static struct rnbd_clt_session *__find_and_get_sess(const char *sessname)
+>>          __releases(&sess_lock)
+>>          __acquires(&sess_lock)
+>> +       __must_hold(sess_lock)
+>>   {
+>>          struct rnbd_clt_session *sess, *sn;
+>>          int err;
 > 
-> Thanks for the updates. It's good that we do not need iostat :)
-> 
-> I ran this test case with v7.0-rc2 kernel, and it passes. Good.
-> 
-> I also ran this test case with older kernel without the kernel fix [1]. I
-> expected failure, but it passed. I ran the Stephen's original test script and it
-> did not fail either. So I guess my test environment does not fulfill the
-> conditions to recreate the failure. Daniel, did you observe this test case
-> failed with any older kernel?
+> This has all 3: __releases, __acquires, __must_hold. Only either
+> __releases + __acquires OR __must_hold is sufficient. __must_hold
+> implies that the lock must be both held on entry and exit - if that
+> lock is released and re-acquired within the function is irrelevant.
+> For documentation purposes it might be that one or the other is
+> clearer (e.g. I've used both __release+__acquires in some cases where
+> I felt it's clearer).
 
-Same here, it doesn't fail on older kernels either. Maybe we should just
-not merge this test then? Maybe Stephen can have a look and figure out
-what needs to be done to trigger the condition more reliable.
+Let's not make more changes than strictly necessary. I will drop this patch.
 
-> Let me leave nit comments in line. If this patch does not respin, I can fold in
-> the changes for the nit comments.
+Thanks,
 
-Sure, just fix it up if you decide to apply it.
-
-Thanks!
-Daniel
+Bart.
