@@ -1,188 +1,173 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D288460;
-	Sat,  7 Mar 2026 10:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772879238; cv=fail; b=ML8TBQQ2XILtIK2FkPlJhFVtlPXN4Tg9pUcwQyqUqYT5AWFQs5aAMblY+hcGnKqwfou/L9n2Aq6yu68dDrr4wkr2UUDyQl6ops8ML0pcosotu4sHrC/FdX4fLKiO8vf31DkihY7n9nCr3qQV9CRWXPk4oZoh+YGYY6ToahFPBGk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772879238; c=relaxed/simple;
-	bh=uTPvXE72tgJsMK/o0377JYrAfLLs7DpQB+yshDBVHg0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OlkK9QAr3bbni+qQFGZeKZdXbw+U2+Ap2N5tZti7f8K0gBFCUCS9JPoHp1dT6RBirh27v4KOFs74II/xC2kCdqGFEfDjMtIwxteqeDHJBi+ODQr89ldmK8ZdvB0K6zytAfhCRM+TIE7XL8dDpYLw7a5hHJlkzDwIM4oazRFAUWo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=OcW2Z0LA; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=aTRoDG54; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OcW2Z0LA";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="aTRoDG54"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1772879237; x=1804415237;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=uTPvXE72tgJsMK/o0377JYrAfLLs7DpQB+yshDBVHg0=;
-  b=OcW2Z0LAkmpHZSMrRU5nJ9oARoeS/TV+xKIn+q0vkuWhj88aWoQzH+ea
-   3u1aREXVLYFIVixHkbz6Kn0GMf7fA6YzZQ2RaVuAINBzcnEmC+4pVBb5G
-   pegWWyqYaBARTxU1mm/FUK+ofN+rjD/Dwq+ArR4C6+y+ikPzXjm2DehoJ
-   xeqiF/JnRXrtFPQ2ftkczNLLLkwcPHzfiGK7E7laY2HrzdRB9mEp4uLVv
-   HQYCPR6AlVEOau9v96l2QdB8VVU5lKflwH6waDwXOU4PVP/ljxkTZVbzk
-   o8KZKwApA2iiyzPQXoug/o38Ju4MkhIkpt3Pf8xYQydLV26pjPcUPZttv
-   Q==;
-X-CSE-ConnectionGUID: 559GZ9iBSxWhl4cmNKjqAQ==
-X-CSE-MsgGUID: IBOU4XiNQmC0qrh8SyqeWg==
-X-IronPort-AV: E=Sophos;i="6.23,106,1770566400"; 
-   d="scan'208";a="142081669"
-Received: from mail-westus2azon11010054.outbound.protection.outlook.com (HELO CO1PR03CU002.outbound.protection.outlook.com) ([52.101.46.54])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Mar 2026 18:27:09 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wYhwSvjHMUIO4oSlVNdcdE+TCkcvYbUh8YIYt3S/urV+xjrKtXoO1Y+nPerD1pWgJ4T50VftR1QUv6S27Oafn0ePlTV/602zrYZbFwkxFBMLhYUgUyRRl36Sp1In4Dl9uQDVKvw961AtKwAJ7F1FWXIGatkz0PrjlT/b51lfIHBSjbFWBg3OwB0GgXjcwH/G1SAjKXS/b+4PcWvIpY/v2pdBYkKqAPx+yzDnppyhxKUHFwDzyntxRRegtowBv1o6B5atp3oQh7QjNqsXAM/Kz3jDqgprPak2Eb3/yZlDytkiF5G3R5lJtIss+5AJt3j7/Y5uwiUMIKPacr7NTFYdBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NGtIF9rZXul195s8Fu+SC/djoMbVh1634ETl2M87hSk=;
- b=sMiw4VhW6oDDd6kyohQU9RqgcZjFOSrDBNupGhcf5XblkWlQ4w6qu4/X9DoASzEWjm95OZ1QuqaW/cSt3QUg9JP3HXqTnjplx0mwH86UN11AAHvtS9dZHlGEeDwtsS9IlTx5ISBdeLD7kA/eN8Wm5OCbPD7M7WaOuMKRqBi+PtThPcUF6Eswgc87VnNPhAnhh7EVGdGNtRXhcYQPoj2LsKhn5hAj2esGH4PvUDDifV2oNqJkMMgfVXmSHTse1aknM2DzXPb2JylM7cdik7tiNjU4PD0iISAeKOERjP4su4GnVxVnaj537GWJO60LOv+n4nBexOZM5muNkVk1Dd0KmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NGtIF9rZXul195s8Fu+SC/djoMbVh1634ETl2M87hSk=;
- b=aTRoDG545jHxYyEt9W5B1ICo1/ntt6wfJUyZlt/zoWw8ONHoWTrKw9E0C6Zl8Rtcrf7fFWE/LmE/mUT/QL4N/Jp8fy9i+1NI3ZTvg5mCqbD8sYzN+qh37UVVFdQvaejWbfar8Ao9tFbrrD3vTwqUz1erJGjThVeG7Ex2bulGT7E=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by SJ0PR04MB7600.namprd04.prod.outlook.com (2603:10b6:a03:32a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.20; Sat, 7 Mar
- 2026 10:27:08 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9678.016; Sat, 7 Mar 2026
- 10:27:08 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Daniel Wagner <dwagner@suse.de>
-CC: "hch@infradead.org" <hch@infradead.org>, Stephen Zhang
-	<starzhangzsd@gmail.com>, Kent Overstreet <kent.overstreet@linux.dev>, Coly
- Li <colyli@fnnas.com>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
-Subject: Re: [PATCH blktests v5 0/3] bcache: add initial test cases
-Thread-Topic: [PATCH blktests v5 0/3] bcache: add initial test cases
-Thread-Index: AQHcrLEM/A8AMNyjxUSi7B7tit7ezLWi4IOA
-Date: Sat, 7 Mar 2026 10:27:08 +0000
-Message-ID: <aav89rnofa3mpOM-@shinmob>
-References: <20260305-bcache-v5-0-04cd4c9080d7@suse.de>
-In-Reply-To: <20260305-bcache-v5-0-04cd4c9080d7@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|SJ0PR04MB7600:EE_
-x-ms-office365-filtering-correlation-id: 98485972-dc1d-4288-b625-08de7c3415f1
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|19092799006|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- NO8IZOup/w+QkmOfG7RAWKhf+o1wiLZiWLoQ9yR4lPsT1V+HhX7p/0hCVbroh4pcx283w/xT3dFzaF78nXYPbNmsNXx3Ihj9Nj/jX4qKLzCR5fmPCxdsbsy/U+JLX54S37YADGhquON2uJAnvhaukmE2d/i9bMMohMqvcOkWOjXWsHXKoUvNlBzAEeph7AlGbOVD6AfTO+gUUWU2oBkxTFC2bwmkTGTHafYTFRIJIEVap4A6KoZD8eiCkVTDtbr7iAm6WcLniCEYbfQQGBAYQcAN0fcVmU15IpZL++eib7bmakugEM16gOwjcoDaYu4G24ljv/xbUmKSKKhBS8PAXigChqsJl2ZCXL3VbP0wNF4tnB6J5hZqq0JkY6xZfMZO+0PTQFqn2pOxc1xpT555o0i0qNqxjdk3aupeOOxrNHQWjnEeCRbKboeVmY0zcHqoshQpoxcFnHOEeF/hAiOYNVFs51L5Lhz771d+klnCItQ1ivCbXYG+AbyASIp8k95ujCjGinc+y8D+Ledtft3Nt2if/NvDVJl3SFnTy/dhxhEjLgUe1KX+2egPOoiDblf5eprt44BpLV2x9OjU0Zv2BoDKlwKiOVEoWTKSCLimMFFLcYCEcPtAi5AkLS4tg5D3KGEH7KvPk0CEqu5H29LN8QSphrUmhWzSEehAz9bzRKqGm+reus7XfFjhbs6Z3Vn+rXs4+wibNXeVwm+EU8Qf/urbtV5ta8jev12G3e2joYLHJ+TMyoyPZKGqsTitERI2p/7EzNurg7aprVjXSzfg+2zOj7+I2cF+gTHaJh3NZKk=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(19092799006)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?aF8AWrwWqebHMDIzkOWFVdzAFHmIY522+PjxjtaY89/xhC9+GebID7XusIzz?=
- =?us-ascii?Q?cVlZaiQjryDL/0Ic/GeAguHoPNEga26cmVjL0CDrD84PZW7IEaem2ZG9CbQ/?=
- =?us-ascii?Q?93MEYx1XJWfQ/S0lwCJ+eqXH/fmlH1Cb3Bw1rBcfaInQEX0Ntx4yqAh2e7dd?=
- =?us-ascii?Q?fPo5DZY+gOIDRub5q0bRXuZO6ERcuGXFqssahX5ZHn+ucBODQiV9GXGcCbmB?=
- =?us-ascii?Q?IdqI4R2BcBDiuwAOYimueU9qkLx+ZcqSiIMU+JGWWO2j4mLB0zG0NpP5EH+1?=
- =?us-ascii?Q?5wogaaMvNbluS9UNaQn2TgSjgqdWACtmq3i0WSKjAPTZvcWbodQpkk82yXpj?=
- =?us-ascii?Q?40iANGBTCCEAgGGfECQ5namTb5tNnAKXqhKckPmvpbHt3nFMFxi5625MR9re?=
- =?us-ascii?Q?Q7eKsKbdXfjSPGyY3jGd/qRC1cusiySSaDWsyPflJcWmbIiymzd1kmmSei19?=
- =?us-ascii?Q?FJ6X3iQaFQYfoumyniAfllignUSz51qQcMmXDWx4DNJY7DOeDFElmvppwcC+?=
- =?us-ascii?Q?lt3kT0uxjaiX+8uNYHtVrBS8tP4iw5XSBPCjimtILWTAgf1yIlxbRzJ8cZ9L?=
- =?us-ascii?Q?j7WlGANW6QM7K7IlCNx8eUnTwjzRLexwCLoPi9zoXOQkYhNMyhdW7ibmUpsG?=
- =?us-ascii?Q?ExZpuYDkkZvDKLj6BUuw4sP11XVC3Pmudz7DPPSGqIr0ouaJ5uVG1PdLdW2D?=
- =?us-ascii?Q?nCAjkfhxqyQO3CNDpPOm9qzf9wXEEdH/0n4niRKLP0+305ShtCx1I12tKJa2?=
- =?us-ascii?Q?LOpLfIDK2JdjB5jeB2LXBcMwpE6DIh1drkiNF0taRjo3Ki0UfjoiLQ9bietd?=
- =?us-ascii?Q?HF+zDxZIgr54D3wH3/8y7ydL9IrdHI2dD6S0wqb19Dc2RCq5LuLCL2GbCd7/?=
- =?us-ascii?Q?Cy3KRlVG0SCSTaTMXpvDEOX8QGYjOoS4GIVlhYOXxiuK4fD4EpSUJKOfpGO+?=
- =?us-ascii?Q?S8QiO2jEqS0MNiSE0zK6nhv6UqRr6o1vqJZ4hZdlkNEuCU0vCQfP23NnfTs8?=
- =?us-ascii?Q?0X5D+LJVuIzAm5WN0is3i9CbvmuPFYcB6zispzZZ1Sjr0ZfYMdBjHKDhNnlj?=
- =?us-ascii?Q?SPGnZ49Qwng8e0UMHjND+ZRkZd8qKVqXJ9HeOMeNRjtwmsCblyJGVXQT99xV?=
- =?us-ascii?Q?ksGcQRxvDaGFnfItvM/ADSaa51TF/8tnSB4dc9bbItgtFG4ja9t8S/cDFBDS?=
- =?us-ascii?Q?FYMIV/NOtxRQ49ZfwW0+r5LsiQqLM2xuZBfYRNqjuriZAm6Y41wVlFDadiq7?=
- =?us-ascii?Q?qWgUpa/UdCU3De+nfsJ/2Pe5iCvh5GJ4p8SEHGvOq0ZO6GPSb4IKjVHVl3L1?=
- =?us-ascii?Q?dX8/AahEejlM0volrHBO6SoQ/lRdVA+HQ62riBHvKrL8iUKRODj0QXNlOBva?=
- =?us-ascii?Q?5BSxxLPUXWkzb8L8VfYbmbrQ7xAtVbFIDa97YwwT2AwaXrDZAoDv/8I9k0tm?=
- =?us-ascii?Q?OYNAG4dpqhPF6f7gHhH76J9yuArHdDB4JPXI0n4z2ltO9xAe1eM+F2e8E1t5?=
- =?us-ascii?Q?qMHmIErQ2yrjHBXvRM0cQz7jpq9MQu/ozx80hTNZpmqlNjJge+yFo9iCMNXx?=
- =?us-ascii?Q?9/THRSK550K3alKlgcGBuhuvjEyvrhrfdC7frVdh9y4GrIO217Y4AjWzv26x?=
- =?us-ascii?Q?lAzZdK2B+yBRBBTR6pxQPoUZQVShG1sy4BuJdFsE9A4Y6SXh0M76yfMbe1NZ?=
- =?us-ascii?Q?oRk0xrmu/Ro+qyCsgvHDHd1HLk51V3s1fmlqLiofEIJIezSBacNS5ux9jNso?=
- =?us-ascii?Q?EXGRqxWKXv3mXYUUJTS66yeU5fNvvxo=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <A5F4003D81954144B9152CEAB3B0F2E7@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7565A1A83F9
+	for <linux-block@vger.kernel.org>; Sun,  8 Mar 2026 00:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772928908; cv=none; b=VwgSnQ2lhCV7y/xxK0c/dVUB7NHH6Z2uOinqhGAXAlaKa5+qz/qGHTsxf6Bsv12rUw0FC1DggYkI/uUZ/2oxoo7T298MJVH9O3eDQfZyG9eolbzfDDq2YTgSDXCitYUkFmf25LMziNVOsnFYUP03eoMGDpLQElfURUMbh2eLh/A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772928908; c=relaxed/simple;
+	bh=FNz4mqUtJvniaS740HIZmjIeq6NhnHImvn1ePA1cD3U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZxnJTsLtWLyT3Ik/5s6EGM/A6I4ZHxA/wVSltZHOQlaYkUoPYWrQisqqK6Q7m2D1zCgknonHaSr4jPD1de1WEr8J+74YyQFBY6Cu9Xz5l9YYKSBjM0F3k0xkyYJR07INzP6iCXIlyhM0VwH58YbZvdBfnhehtQ3VokQaBGBhvbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-793fdbb8d3aso127496977b3.3
+        for <linux-block@vger.kernel.org>; Sat, 07 Mar 2026 16:15:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772928905; x=1773533705;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SDVoImbCMyrTI+fckI2KesjRHDf+Y2Y+sy8o597R4xM=;
+        b=u5UM6YLwww2oRzB/P6mWKvCpBDaz05K1WcfpBMGQoWS7BU6DdKJm8mW+OPJqIDvDgL
+         SBZUiXzWwk5PUG9vfg4SMRtVkgMCHSfERn2H8tptqGyawUjELJ024+kjn/G+algOKc3l
+         FV2UnnLHjd+V234dnV6d++rRPoxBkDXUVwVjldshaswN4F6ki2po9fVh3iGzE5mXgn8l
+         jXSuye82Yhwd9vM6mIttHvfUCPxJ4WflH2ar2psbQg9kNYw4sdbqWWej7LX4Ca3/QItb
+         hWgqbgpuTj5OQ3Dqo/yEGsaxit65QGGs+ZuY1B6gNmjCgMhw8vh8FlHAUZBK0heVz+Kp
+         JyyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXo8FaXjxuF0x2Y7ntnSeD7hbjkmYs4ZPjMGnVk5PLGMQ0FO62Iria3qUuXykhNTiL7zalcIpAT9Yr+JA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8/FxBnb0YFaJh3/OIkqVsMe4WM2nvXOl2vhLySv/jD2BJPnTi
+	yWYpCwx0HulBEWm7pA/4Zgfb9szC0ilO7wCpH/xKc52JX/YWJyxRJ9U1
+X-Gm-Gg: ATEYQzwzJUS7OQpS5CIWxCxF5hdu/xoDgOFQ49VabiZ+1ikjOJ2spxDCyy7kOJFakOi
+	SzMwBU3j0exk6J42lLsk9ApguthXtfS8p9ZjzJa55zcRDMJ+Xkd60MQ2ve1jsCcNIyGUvZ5oBzT
+	Mypa4iRKhM/qgC3OHrnC2v5xHv+MEe5rTaVZQ5yT2SJN9H7JhqPHXu74yc3VFi8xGBGHZe0Ke3Q
+	sKa+LW3R0t7YZ4mvplU6uj82xJYrd/2wFoviVvmP/ZCrx1Q8UMC+idWpKQjcEwnZePKzXDRKVZX
+	fXZ0VwrxXqG2R5RuF9oNQhvuBsTM5Pld0yBZieVsuAbxEZHv1B+8KpxYXrqCithm3J/NmOepq8x
+	T6dxLvOSYqdxqTNUNjWe4lHkpA4a0Ak4ra6577D6OB91kaJsCAmrXACcDXwYRidz7adKm5hFScJ
+	LwqhIun2OpiA==
+X-Received: by 2002:a05:690c:a:b0:798:6d23:17d3 with SMTP id 00721157ae682-798dd7d130dmr62437067b3.61.1772928905338;
+        Sat, 07 Mar 2026 16:15:05 -0800 (PST)
+Received: from tofu.. ([128.210.0.165])
+        by smtp.googlemail.com with ESMTPSA id 00721157ae682-798decdd38dsm25665067b3.21.2026.03.07.16.15.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Mar 2026 16:15:04 -0800 (PST)
+From: Sungwoo Kim <iam@sung-woo.kim>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>
+Cc: Sungwoo Kim <iam@sung-woo.kim>,
+	Chao Shi <cshi008@fiu.edu>,
+	Weidong Zhu <weizhu@fiu.edu>,
+	Dave Tian <daveti@purdue.edu>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Fix null-ptr-deref in bio_integrity_map_user()
+Date: Sat,  7 Mar 2026 19:13:58 -0500
+Message-ID: <20260308001358.1675543-2-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	hO2WQ/7V7pE/acF6q+VHhcKq+QyV5VQ+hvGkFF6nZ8fNuwXxHywUNQzxPxlqjeKhA+in1ut8JrWI4i40t+zUW/zxmSBWwLdVxK3NFJiHaUFH4x9w+9EzmSOAUVhwEN/O7OlrbRogXzbD93hXa/EQ9TerKGM/o8TOCBoyZj+DR9ge7dQFq1Pvnny/2uABVObFr6aPqhrHFBJdnXjKjuJIJgkZeGCztdtEIkvren7dlEXvrzpgoJ1lGqzVPsnWLO5KyZlroa+2i/q4kagwochNXL0GhIJtikdo4HtgtBKxdoWLajwAUOFOpU8r7IHMyHXl+gR6EVYCbeS2Hc2lRR8BrA==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MYcqVcGOgPKrlNZPmovzpoGXTWUApfjpoFLz1rJ1J/JzUvwrNMSswys7bN/sFZ79WMX4HX4qycbnLTERK1UuQ8kNMidL09T6nmPKp/ZmzbxgUnKhmNDPsbD6MGYOBJWrtAQU9LvUH+keRWKXgMQmjQqmhfxpPZWNN4kb+sRlTEirRcUKB8fFecnFoqq/VTSCvjQ5Utj8SFdk5qbLkQ4Uyf16f1XfmGFUshDfoxbZ+yYmQD9VRKiQjmwtiXyFK5+pJHVssENLpEeivr3KnrLhG1+9C5/Oqpyi3qs3si3E2CO8xJn9+YgXS97pqiNREwIWnu1oM9kN1nOyr95EB0qeppqCK1WdPRrZLZWuzQzozD/HFS2ZYWcuOVqeKRoMxUauZWt5PEPMxgpALh+2j2wt+WBZTzxlhR90IZJK6VM5nRi889293TtlxOhOaQSGyYgp0LFdknP1sVLwO+5U1Ev8RRp1FHy9XKtNyXZHKIrqHrIeWD4z/FxoYNaufANbnPwmhXKh/P1JO9c6QZSkl9oi2DGoBazt2iDuIQ8Ak/ejLadu1gJQoYGb9//Y36WVo+JVhoXA8W4aFL3OPKP6Z3wQEpe6eLFbrtwjBMvMNUiaJ3coxrSjiCuqeb1LsRaWJiy6
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98485972-dc1d-4288-b625-08de7c3415f1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2026 10:27:08.0886
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZXnEklxEnH5GPgwqY8845qLl3cSaMEYj9XlU/kvOd6tEQPEDSBZ3nJfhXKax+jyfEe7tYLnvPgiINcJme39FeXCjivIHjnHrVpt5JSojiuM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7600
+Content-Transfer-Encoding: 8bit
 
-On Mar 05, 2026 / 16:01, Daniel Wagner wrote:
-> I've addressed all comments from Shinichiro.=20
->=20
-> bcache/002 is not using iostat anymore, instead it reads directly from sy=
-sfs.
-> Also updated this tests according Stephen's feedback. I didn't test yet w=
-ith an
-> older version.
->=20
-> Unfortunatly, I was not able to reproduce the "nvme?n1" file in my setup =
-with:
->=20
->   TEST_CASE_DEV_ARRAY[bcache/*]=3D"/dev/nvme0n1 /dev/vdb /dev/vdc"
->   TEST_CASE_DEV_ARRAY[bcache/*]=3D"/dev/nvme0n1 /dev/vdb /dev/vdc /dev/nv=
-me1n1"
->=20
-> Not sure where this is coming from.
->=20
-> Cheers,
-> Daniel
-> =20
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: Stephen Zhang <starzhangzsd@gmail.com>
-> Cc: Kent Overstreet <kent.overstreet@linux.dev>
-> Cc: Coly Li <colyli@fnnas.com>
-> Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-> Cc: linux-block@vger.kernel.org
-> Cc: linux-bcache@vger.kernel.org
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
+A malicious user program can request large user-memory pinning via
+ioctl with a large metadata_len. However, this does not guarantee
+that all requested memory will be pinned. Pinning may partially succeed
+and return the number of bytes that were actually pinned, which may not
+match the requested size. In this case, only the addresses of the
+pinned pages are valid.
 
-Daniel, thank you for this effot. FYI, I applied the 1st (with my fix) and =
-the
-3rd patch. Let's do some more effort to confirm the value of the 2nd patch.=
+The current implementation does not handle partial pinning and
+incorrectly assumes that all pages in the range [0, nr_vecs) are valid.
+This can lead to a null-pointer dereference because pages[n] may refer
+to an unpinned memory range.
+
+To fix this, add a check to verify that all requested pages are
+successfully pinned. Pinning all pages is required to copy user data.
+
+KASAN splat:
+
+Syzkaller hit 'general protection fault in bio_integrity_map_user' bug.
+
+nvme nvme0: Command: 80f60320000000000300000000c9ffffb38ab5410000000070693aa0ffffffffb00e619dffffffff80f6032000000000b38ab5410000000070fc38a0ffffffff
+nvme nvme0: Command: 80f60320000000000300000000c9ffffb38ab5410000000070693aa0ffffffffb00e619dffffffff80f6032000000000b38ab5410000000070fc38a0ffffffff
+nvme nvme0: 2/0/0 default/read/poll queues
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+CPU: 0 UID: 0 PID: 280 Comm: syz-executor294 Not tainted 6.11.0-dirty #6
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+RIP: 0010:_compound_head home/wukong/fuzznvme/linux/./include/linux/page-flags.h:240 [inline]
+RIP: 0010:bvec_from_pages home/wukong/fuzznvme/linux/block/bio-integrity.c:290 [inline]
+RIP: 0010:bio_integrity_map_user+0x5a3/0x11e0 home/wukong/fuzznvme/linux/block/bio-integrity.c:345
+Code: 4c 89 e0 48 c1 e8 03 80 3c 30 00 0f 85 4b 0a 00 00 48 be 00 00 00 00 00 fc ff df 49 8b 1c 24 48 8d 7b 08 48 89 f8 48 c1 e8 03 <80> 3c 30 00 0f 85 35 0a 00 00 48 8b 43 08 31 ff 49 89 c5 48 89 44
+RSP: 0018:ffffc900010cf4f0 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: 0000000000000000 RCX: 000000000000f761
+RDX: ffff888006cae600 RSI: dffffc0000000000 RDI: 0000000000000008
+RBP: ffffc900010cf7d0 R08: ffff888006cae600 R09: ffffed1000e0db95
+R10: ffff88800706dcaf R11: ffff888006a31a00 R12: ffff888006a31a08
+R13: 0000000000000740 R14: ffff888006a31a00 R15: 0000000000000001
+FS:  0000555587e483c0(0000) GS:ffff88806ce00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000002002f8c0 CR3: 000000000719a000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ nvme_map_user_request+0x4b6/0x5e0 home/wukong/fuzznvme/linux/drivers/nvme/host/ioctl.c:149
+ nvme_submit_user_cmd+0x2e8/0x3c0 home/wukong/fuzznvme/linux/drivers/nvme/host/ioctl.c:185
+ nvme_user_cmd.constprop.0+0x35b/0x540 home/wukong/fuzznvme/linux/drivers/nvme/host/ioctl.c:325
+ nvme_ns_ioctl+0x11e/0x1c0 home/wukong/fuzznvme/linux/drivers/nvme/host/ioctl.c:570
+ nvme_ioctl+0x147/0x1d0 home/wukong/fuzznvme/linux/drivers/nvme/host/ioctl.c:605
+ blkdev_ioctl+0x28c/0x6c0 home/wukong/fuzznvme/linux/block/ioctl.c:676
+ vfs_ioctl home/wukong/fuzznvme/linux/fs/ioctl.c:51 [inline]
+ __do_sys_ioctl home/wukong/fuzznvme/linux/fs/ioctl.c:907 [inline]
+ __se_sys_ioctl home/wukong/fuzznvme/linux/fs/ioctl.c:893 [inline]
+ __x64_sys_ioctl+0x1bc/0x230 home/wukong/fuzznvme/linux/fs/ioctl.c:893
+ x64_sys_call+0x1209/0x20d0 home/wukong/fuzznvme/linux/./arch/x86/include/generated/asm/syscalls_64.h:17
+ do_syscall_x64 home/wukong/fuzznvme/linux/arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6f/0x110 home/wukong/fuzznvme/linux/arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7f5b3d8e98bd
+Code: c3 e8 a7 1f 00 00 0f 1f 80 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffd1c0e988 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00000000000f4240 RCX: 00007f5b3d8e98bd
+RDX: 000000002003f680 RSI: 00000000c0484e43 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007f5b3d93eb4d R09: 00007f5b3d93eb4d
+R10: 00007f5b3d93eb4d R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fffd1c0ebe8 R14: 00007fffd1c0e9b0 R15: 00007fffd1c0e9a0
+ </TASK>
+Modules linked in:
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#2] PREEMPT SMP KASAN PTI
+
+Fixes: 492c5d455969 (block: bio-integrity: directly map user buffers)
+Acked-by: Chao Shi <cshi008@fiu.edu>
+Acked-by: Weidong Zhu <weizhu@fiu.edu>
+Acked-by: Dave Tian <daveti@purdue.edu>
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+ block/bio-integrity.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 96a265390..7d633f39e 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -341,6 +341,23 @@ int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t bytes,
+ 	ret = iov_iter_extract_pages(&iter, &pages, bytes, nr_vecs, 0, &offset);
+ 	if (unlikely(ret < 0))
+ 		goto free_bvec;
++	if (unlikely(ret != bytes)) {
++		/*
++		 * Not all pages could be pinned. This can happen when
++		 * pin_user_pages_fast() returns fewer pages than requested.
++		 * All pages must be pinned to copy user data, so unpin
++		 * whatever we got and fail.
++		 */
++		int npinned = DIV_ROUND_UP(offset + ret, PAGE_SIZE);
++		int i;
++
++		for (i = 0; i < npinned; i++)
++			unpin_user_page(pages[i]);
++		if (pages != stack_pages)
++			kvfree(pages);
++		ret = -EFAULT;
++		goto free_bvec;
++	}
+ 
+ 	nr_bvecs = bvec_from_pages(bvec, pages, nr_vecs, bytes, offset);
+ 	if (pages != stack_pages)
+-- 
+2.47.3
+
