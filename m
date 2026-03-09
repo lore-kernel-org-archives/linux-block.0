@@ -1,134 +1,115 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DEC3803C1
-	for <linux-block@vger.kernel.org>; Mon,  9 Mar 2026 10:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C74C3803ED
+	for <linux-block@vger.kernel.org>; Mon,  9 Mar 2026 10:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773050933; cv=none; b=Jz+8zf5vcO9vltfxG9V0k7ooMv8P1mZnpKNnYHrFiZBacS7fuCsOBzU/9O5R83GuMOyDyjaNTdfCG4Mla67rNHaI8I78y8sM/MO2KdgaQEzERMHRo5YLQI0UneZI2MydHE1zAFe5UrZqg2cQ3paYMcSmgCuxHJF7Dl7LfHn5VVk=
+	t=1773050964; cv=none; b=uSQERS8YbRzymEe5nEGN5N6nmWEuhnMg3hHcooyT/+ccS24Mh1M0aNWtwFR870MkjlXE6ngIij6IigkPIyPDdJhIofdiME6VEscflm9shc7Pu6KwVudceu41ZdMuQewTM/riqvLhcMZGfmQnj6MSKjMYR/3Bp9yPpgMUWOFJIns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773050933; c=relaxed/simple;
-	bh=xlxOdHU01zXUgPqkDL2Rz95md1PvVDxj1Ea7cW2QxKk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rgvmmU9BNF0K9YtzVYcDzqYmeZsLivJBp94vFDz+ueT4EgdG0dX4tGaF40rg/qOOJZC1vzxNcs/9uedeOzSdPUg2UZmFLpttaLj+tWInU9tV6cC5qlNC1CWsSXXHKkSK56Jvoc7T86l8lZ+LwdNek9KVITm5maJNuHiBj79G4Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=JOJV8ab7; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1773050964; c=relaxed/simple;
+	bh=MA9sQnLiuZy6KGmGqechv31+qSKWZ7oeqFzcXKsqNSs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoWzQ7HVueYP9HKwJf1EBs1MOqyO4Vd6E8BX1rga48i4QrR0UxamTJRLf7IiyVH1RaTr1ucbkbPQ5Ejp43dSumnV0OfR3p0Z0yvvWXAqs7Vx6FhIzeP28DF7fScx+XcjVJUrGiUq6UEX4Kk3AS6ltxUDhEY5x0vJoifUD5ehKRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dh15NXTH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="JOJV8ab7"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso92523745e9.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 03:08:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773050930; x=1773655730; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TbXW5x5tYbyTYwpxI98m0FduOlkZmsP9jD1G75SV6Q0=;
-        b=JOJV8ab7Fowuv5uYkRU/gUcrQSD8AqYLaUJzC0Yl33dBmhrw7mNba4RTnNN+A4BoiV
-         uyaWGw4ehYylI844kIBx6mnloPNmo9z0eKAW/5enA6tBXp1qrqQp6Kd/XVaFA4sButt0
-         nkUwpVhnQCkG9fQBPTOXv7zeEhBHB/YTyQFcG+9whpHDlUNADx3QWrQ8AKVm/8bwDrYl
-         mH/LcurMYqujruh4HWEWPNfNdu/+UtiR8x3VyYUX4FNy7SGgtRlP1KZqbN6GX/62vZyk
-         3nebkkq5zfupd8ebLxzdJ7xOnQ3NUdFkppTWbOHP9bz0wZR0aIFIYRAmQT6sJgPJS2bI
-         dNbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773050930; x=1773655730;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TbXW5x5tYbyTYwpxI98m0FduOlkZmsP9jD1G75SV6Q0=;
-        b=TqMXhYu62cV1qWEV2oJh5mUR0wFUNJMB5/ZbUiFP3Gu4DJ4KRTYZe2pIC5jyXVL/bS
-         nI3LO98Kag5/qrNl5mvh43xxw/vaRFBp5zMfgDi5t8ehFPkXFFlGaEQYt6Sx5l+vRz2d
-         nC8Xis+16QOO/dKzRPBLJb70LESWBxHLRu1yLGDwHa8Dauq2Hw7GJskFy0p9hacwzvSb
-         lRliOb99lWZWMM39HSF9Jfx7Wa2ZG3LmTmON+1ieJFSVTEUfBTQNamiHVCKibk/z1wc0
-         hA0x4i+RdRvO3sa32W5af4FFqONvLKkfTfZuOBsvoII+P4TMFGZopi3oU19P16ATovP2
-         de/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ3cySYrVRmYmKg6oNN8N/pQS5Yyf6OpuUf2RxaqMcCECcuj4Qzm+o1geLhODosEkYj9s8ASHCigCuYw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbaIA/KRukGl7+qWbfAEkk74a+eveK7pluZ8P7AO/suUBX50RZ
-	HphRKwwgTL6zAnv0C8irnAQqGjL5k07sQbVckKeTPdrKTe5BbMYce3RBoaV5I1LOOM4=
-X-Gm-Gg: ATEYQzxSPZWdWfMz4XJaY8SE5Biy78Z4MnFocdUNWkLIk8I+DpFe69bn1SC+JkJpkNf
-	tiDDKOQEnqKUKJgcxTEdvpUu0wX31uXwHASIT8yeg3cPmllZQ+mbqAyodX2ZUBY2AYCBCi9XkYK
-	1TincZ6cXAKCFtL4Luk9RtoLxTuDxM4EvccT8YvYI3q69Y+KOUWinvvYGI6//1YtojVgve6d5KX
-	pxlfEwMJ2YB2iEgAnleJz6lYkBFLFrZ7NdbYmszDdXhSNStpZyozDn4U8BAMO4xwPlvHrw5YCdS
-	NOzG4sfX394XSX00LgfSzl/GLkhMazhUymTS6CVMqHy6DVGzJIIh6yvHf6xClWYOYQ+gcAT+cdw
-	G6HHk0mlMPgFhArHUbDGsIfE8moKxAbdt6OdxI/XsUMN2pB3u8W32YRsWAk1tLxeUnJznU9XF6E
-	Vv8zNxo9Q7f9vrrpGCcsWQ7hdhRytzRKFxYNs1oO3NZc9MRn+65+HqZR9GHByEVpwLFk9Zq7eAE
-	a+wCI/hVdZ84kq3BdrWuPwPqQ==
-X-Received: by 2002:a05:600c:8b5b:b0:46e:4e6d:79f4 with SMTP id 5b1f17b1804b1-48526927a4dmr172833535e9.15.1773050930048;
-        Mon, 09 Mar 2026 03:08:50 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48529a2fa39sm66483065e9.8.2026.03.09.03.08.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Mar 2026 03:08:48 -0700 (PDT)
-Message-ID: <cbcfb229-9a5d-4552-9ced-788de1e69842@linbit.com>
-Date: Mon, 9 Mar 2026 11:08:41 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dh15NXTH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773050960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=US86VN5kkobsatL1Dlg/ylYmZj1+gOU0IJcJn5oPtlU=;
+	b=dh15NXTHHUJTkv6BjevtipdsTw7WZjyY1x0h0aq4JkjoINVxIu43t74DKTrPShZmGMpSfo
+	81lMjgcwuC4Rvo/TJtb+rWZjQdE8bhXsSEyfqqM/9D8Rcq3LBzanamRilyMfi0frpPCWLF
+	E8m97pxs2EYYw3mz3+rIk8rAXpbuyBI=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-7yOgQ4J2Mey5ITtsVg_1nw-1; Mon,
+ 09 Mar 2026 06:09:17 -0400
+X-MC-Unique: 7yOgQ4J2Mey5ITtsVg_1nw-1
+X-Mimecast-MFC-AGG-ID: 7yOgQ4J2Mey5ITtsVg_1nw_1773050957
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9EB7C1956054;
+	Mon,  9 Mar 2026 10:09:16 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.147])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 69BF518001FE;
+	Mon,  9 Mar 2026 10:09:14 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Tejun Heo <tj@kernel.org>
+Subject: [PATCH] blk-cgroup: wait for blkcg cleanup before initializing new disk
+Date: Mon,  9 Mar 2026 18:09:06 +0800
+Message-ID: <20260309100906.1740351-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/14] drbd: Make the lock context annotations compatible
- with Clang
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
- Marco Elver <elver@google.com>, linux-block@vger.kernel.org,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- Nathan Chancellor <nathan@kernel.org>
-References: <20260304194843.760669-1-bvanassche@acm.org>
- <20260304194843.760669-6-bvanassche@acm.org>
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Content-Language: en-US
-In-Reply-To: <20260304194843.760669-6-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Am 04.03.26 um 20:48 schrieb Bart Van Assche:
-> Clang performs more strict checking of lock context annotations than
-> sparse. This patch makes the DRBD lock context annotations compatible
-> with Clang and prepares for enabling lock context analysis.
-> 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  drivers/block/drbd/drbd_bitmap.c   | 20 +++++++------
->  drivers/block/drbd/drbd_int.h      | 46 ++++++++++++++----------------
->  drivers/block/drbd/drbd_main.c     | 45 ++++++++++++++++++++++-------
->  drivers/block/drbd/drbd_nl.c       |  5 ++--
->  drivers/block/drbd/drbd_receiver.c | 20 +++++++------
->  drivers/block/drbd/drbd_req.c      |  2 ++
->  drivers/block/drbd/drbd_state.c    |  3 ++
->  drivers/block/drbd/drbd_worker.c   |  6 ++--
->  8 files changed, 91 insertions(+), 56 deletions(-)
-[...]
->  
->  void drbd_send_sr_reply(struct drbd_peer_device *peer_device, enum drbd_state_rv retcode)
-> +	__cond_acquires(true, peer_device->connection->data.mutex)
->  {
->  	struct drbd_socket *sock;
->  	struct p_req_state_reply *p;
-> @@ -1048,6 +1063,7 @@ void drbd_send_sr_reply(struct drbd_peer_device *peer_device, enum drbd_state_rv
->  }
->  
->  void conn_send_sr_reply(struct drbd_connection *connection, enum drbd_state_rv retcode)
-> +	__cond_acquires(true, connection->data.mutex)
->  {
->  	struct drbd_socket *sock;
->  	struct p_req_state_reply *p;
+When a queue is shared across disk rebind (e.g., SCSI unbind/bind), the
+previous disk's blkcg state is cleaned up asynchronously via
+disk_release() -> blkcg_exit_disk(). If the new disk's blkcg_init_disk()
+runs before that cleanup finishes, we may overwrite q->root_blkg while
+the old one is still alive, and radix_tree_insert() in blkg_create()
+fails with -EEXIST because the old blkg entries still occupy the same
+queue id slot in blkcg->blkg_tree. This causes the sd probe to fail
+with -ENOMEM.
 
-These are marked as acquiring connection->data.mutex, but actually use
-connection->meta later. So the annotation should reference meta.mutex.
+Fix it by waiting in blkcg_init_disk() for root_blkg to become NULL,
+which indicates the previous disk's blkcg cleanup has completed.
 
-Also, I think the annotations on drbd_send_* are wrong. These functions
-have no path where they return without releasing the mutex, but these
-annotations would tell clang that they hold the mutex on non-zero return.
+Fixes: 1059699f87eb ("block: move blkcg initialization/destroy into disk allocation/release handler")
+Cc: Yi Zhang <yi.zhang@redhat.com>
+Cc: Tejun Heo <tj@kernel.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-cgroup.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-Regards,
-Christoph
-
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index b70096497d38..7aa2ed7f7c82 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1498,6 +1498,27 @@ int blkcg_init_disk(struct gendisk *disk)
+ 	struct blkcg_gq *new_blkg, *blkg;
+ 	bool preloaded;
+ 
++	/*
++	 * If the queue is shared across disk rebind (e.g., SCSI), the
++	 * previous disk's blkcg state is cleaned up asynchronously via
++	 * disk_release() -> blkcg_exit_disk(). Wait for that cleanup to
++	 * finish (indicated by root_blkg becoming NULL) before setting up
++	 * new blkcg state. Otherwise, we may overwrite q->root_blkg while
++	 * the old one is still alive, and radix_tree_insert() in
++	 * blkg_create() will fail with -EEXIST because the old entries
++	 * still occupy the same queue id slot in blkcg->blkg_tree.
++	 */
++	if (READ_ONCE(q->root_blkg)) {
++		/* 20s is a random timeout, disk_release() should be done well before */
++		unsigned long end = jiffies + msecs_to_jiffies(20000);
++
++		while (READ_ONCE(q->root_blkg) &&
++				time_before(jiffies, end))
++			msleep(1);
++		if (READ_ONCE(q->root_blkg))
++			return -EEXIST;
++	}
++
+ 	new_blkg = blkg_alloc(&blkcg_root, disk, GFP_KERNEL);
+ 	if (!new_blkg)
+ 		return -ENOMEM;
 -- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+2.47.1
 
