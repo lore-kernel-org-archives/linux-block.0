@@ -1,140 +1,142 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C892337BE8F;
-	Mon,  9 Mar 2026 15:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773071151; cv=none; b=IhFSJMqHueawwFKvfigwgXJPIyqaEUik++bFsOBFuHrsBhSNin4eK+FulhuNlTJ6gTtinp7cuAyH4H5/XT8TEi1lUnnY4R1941/38Yt7ZTnIM1iKomg7JVoZcvXGHGuOFKjdLg6zDNL7slh73oWmaNLUL4UtqgTAi/21lGAuUi4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773071151; c=relaxed/simple;
-	bh=rCt8TwEoX6RUjX3Ol5H8E1fQFJJiWpMnctAnEqxheAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5YPrhcome2dtIueX6WUO6CMXxNytHBkhhfToHFOceKMg910g7idWopcA1FNnB5Ko0WyP/BfDo53+fPbA4qkfgcDmWjrhhFuldPWoSGqnd8PW1bjzjvjdRl7QJBeIZ6clhfnU7m8A+v4sZy70m0lyt6e/2RZroRcndAgaUAtA1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=khPM7IdR; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263943921ED
+	for <linux-block@vger.kernel.org>; Mon,  9 Mar 2026 16:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773072233; cv=pass; b=OlgixrWu1c8kqRELNfNz6LkRsLDTHKrxKOM9wCu4wolme1VJKDzR5VLsfiu6sYxUE2SwbqGQZ0LbSmA1W1K6mUwcQrB5koJSlNjUcu86SS8A1fnpqtW2fa6tJeotmFcd+xA9IbMG4yRQkDlb3uebplXfeRFXLJ+BR26XQl4aThQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773072233; c=relaxed/simple;
+	bh=NQvqvKOGW96HAPIU8J0MIWlgq0AT5gUFyoIguzMm9yQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k4tzLpRc9IqBmrWdmzj17HPbmnZ3gotEwOUtSN1rnFyCNP6lLYkPeEK5EvOur8XgUsPNmQn+SwG11HDSrbGtBI9zy+8CfazXSQQkpO//KNM68HVCXGrdf4pPWae4mEABLATarSn7x9VM2mxMgB1pqhZtVWJWIlhPrb46uC2LnGw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=BLhmrD81; arc=pass smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="khPM7IdR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773071150; x=1804607150;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rCt8TwEoX6RUjX3Ol5H8E1fQFJJiWpMnctAnEqxheAo=;
-  b=khPM7IdR9MFli8rDH937Lsm8dp9Dmg8V5j4dCYencoORJTX4yHnnIVzM
-   zQpGeMlD4mpxF/xzhbYlxP52JY46s/3DoYbGlyGXBox6yBudBW4SBmWlD
-   o9+L8CulA1Vr4CzUf74rLMyxmOX1C+PDhmNGZgjrCIXU3hKCDKTRUlQeM
-   WYvnOjbR6hXadCQcJQijPs3n0WYAI0F8Yje72n0xeWjwzTyVzDnj/9eHg
-   0K1pJzceiUOjRQ7UldzLpysiLyDjSypPtvW3R4usgME96HagjZwalSQn6
-   bFSXMy6Npqvx1Q23BWl4Ti3SoiaVfQ31iofug+kw1IwqH1/7jYf7UH3bZ
-   w==;
-X-CSE-ConnectionGUID: UY2s4gvvTpOuHZyp32JlSQ==
-X-CSE-MsgGUID: 5YqXvyIXR0O9WECBlRtvpQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11723"; a="84425198"
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="84425198"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 08:45:45 -0700
-X-CSE-ConnectionGUID: OMDR4XcbRTSxWzhtRo1HIw==
-X-CSE-MsgGUID: rFUv7x1wQnqy+hBWujFnNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="218939094"
-Received: from lkp-server01.sh.intel.com (HELO 434e41ea3c86) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 09 Mar 2026 08:45:38 -0700
-Received: from kbuild by 434e41ea3c86 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vzcnV-000000000Rw-12zd;
-	Mon, 09 Mar 2026 15:45:33 +0000
-Date: Mon, 9 Mar 2026 23:44:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sungwoo Kim <iam@sung-woo.kim>, Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Richard Weinberger <richard@nod.at>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	James Smart <james.smart@broadcom.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Sungwoo Kim <iam@sung-woo.kim>, Chao Shi <cshi008@fiu.edu>,
-	Weidong Zhu <weizhu@fiu.edu>, Dave Tian <daveti@purdue.edu>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	nbd@other.debian.org, linux-mmc@vger.kernel.org,
-	linux-mtd@lists.infradead.org, asahi@lists.linux.dev
-Subject: Re: [PATCH] blk-mq: nvme: Fix general protection fault in
- nvme_setup_descriptor_pools()
-Message-ID: <202603092305.jcWVkoXK-lkp@intel.com>
-References: <20260309062840.2937858-2-iam@sung-woo.kim>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="BLhmrD81"
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-4170dc73280so245663fac.0
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 09:03:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773072231; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YWK6x8JPXpZDzFzlEce90z7Uu6cQlgHUb+QW3dwBY4zEaXHzTaumb8BMCxiUWbyzga
+         rvRgMCmxl/oIJNpxFI1bpSOZUdZAa/TTWpbamQuPPwRoiM5TX6b7h3tRlUH5g7o0hwkc
+         sL3ugS5UiCa+zAykC5ogoq81Fbf97fQfHs+2XiEIz4sXBR9vxQdcWL/+TcvlDQTfpqP2
+         wIYWfMR9f9FsVNDViCq6qUXwneRg2lcOOXkdUOIZgTSJ9cLHycZAjEH0w6BDV4V/25tF
+         dhLCuTzs60ULCojhhNzyJD5hPKM2EUfkifEmRUd5Pg1zGOGKhsdOi++cn9zvZJdzAY6G
+         Hvww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=0gey3qaRhe9Prl8t/c226rpSUV7VipRuVJoYNhEoSf4=;
+        fh=CBiB/CiGMDvAKeL82fzEaukCPeewrY8JUurFn9VwGts=;
+        b=BPAlGrrwwC4jSRCaIKlZ2fQc/vQjytHf3eFwSKWhbJoXxadhKhEBa/QCFyGYpYjaHn
+         c0AFkCJzZ2tHtToRv3UQJ2dRW8tAflsVD4/XmRJEJkCejWiEEzP1+iaaR0nF9MX+73Qg
+         B7/qDnwGl5dHPuksxV9hmJ9HCwv2PALypfVZcXF7bXVOUQ2z9R3ppc8U5OkwTnVAKrEi
+         zf61e/2O8d+aZrAeZeMNU1ND0fixLPI80COZ5bokZAkis+azHuVm73fT1U4NVht9S1Le
+         gdVQqBSIGgIuVpe1KT+z84AoCYZzCOBsdg8yb0u3U8Ib7TtshWwKXFmn6gIxBBxvWYha
+         0+yQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1773072231; x=1773677031; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0gey3qaRhe9Prl8t/c226rpSUV7VipRuVJoYNhEoSf4=;
+        b=BLhmrD81zaPOsPa96CnAWUYxxHh+gtGuGU5qSZI33fbXN5X03deI0R7rCDgucmG3pl
+         6X6XhbHtu9F06DWmekKajYmY9AytEVMAO6jODCR1aIJGdpINpytxs+zwsV+4Q//SbKy4
+         o/u5qBOPNyRmPpk/fyTklZ7a8kQEBgPwasjb6EtkdFOtBQloECllGuRHahhkfnPSaWGn
+         Bsyv/0Fr8NlT2grqG7sEdoOlE8TvVt4y4kAL4XZwgjDQscfKspP0QSKD/V5d99d+Tn9M
+         K7vL31+fCpLcWVwzj8cOzXuhDP2rIWd+hXd0VV5zFqH/zXALcLcCIQHofV4t6jaFB2Ud
+         yTOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773072231; x=1773677031;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0gey3qaRhe9Prl8t/c226rpSUV7VipRuVJoYNhEoSf4=;
+        b=vCTDelYjw62voP//DiVtueXUC6mYIO3Me/PqkmTp2qESa774KcOEHz94VnMppuaQuj
+         wANs8Hv5wOPzJ5xb5uGimJrB45bGMG+PEmUDIlgE0hvZIPA+yo3jsubKyLO6jCEKySI9
+         cb+RbTO/Runb+G7AEBWcpndg7CkW4QzQisYAiDcvVrFa9IWSvoekAigcrLI3n0IdGQb0
+         Nzz07zqlCN6/4JG01rdTZsu6PUI0lij3sap/nKJ/srUUYKbzbkhfVUqJSeULWHu7uBHG
+         FRexLwpPmT9trDZGjqK4VN9sON5ywzZIMpM5Rda9HFvm7eXb/2kt+RRMcU6KhMV+ouo+
+         JosQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWpfTrMn02kUsmVRCRoDY3uZaDm4YlpQcmp3SFMb/6+7w4rUaqgdUKZRff6BzQjKXk9OOvj3X2s1PVvww==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXjN3o98LdeUpxNUolFUmPuSCHZ74/7CkfVnZo6bsm/sbSKx7W
+	v1eaQIejpB+mr2kZvbspVzjEIg3jQ/oh5nwdyIi/9YokUAJsTVrmRVZ1qeUpgXUMXMbGoO8w0Kd
+	3NQAkDa+F/h1cN/Qi+Yotr8CgGdvc7lpTFVb3fg4Qug==
+X-Gm-Gg: ATEYQzwGOcHn4P0/2q+PQoYlFTzNMSybbSF9qOa2fynmQrP68ERUlkXv0zlG055ccwY
+	3Rx/+0wv5XVmc80phrrPJFZEMScFqTYjayBKWVNBXfTdVOSqxYPOjePY2Ng5dQHlt+M65mZCt4V
+	XOtc/S4mnpzoHH7TX4jU2pHln7iIy9u/QkXgUFqY+UJH+zqCx417II5c2iEWv4lzq4IrcWkjjK4
+	U/sI0EWhzULmZ4lNHFkQ/nJpgn/pr8+KCj6Z4CcJBGH66JG89456E5ETCJ840kd1ITF6tRNzvAi
+	ZW3OTtCAlYwqRGGWUA==
+X-Received: by 2002:a05:6871:6084:b0:3fd:9958:1cb4 with SMTP id
+ 586e51a60fabf-416e39a4eafmr5699999fac.0.1773072230701; Mon, 09 Mar 2026
+ 09:03:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260309062840.2937858-2-iam@sung-woo.kim>
+References: <20260308143902.1643155-1-ming.lei@redhat.com>
+In-Reply-To: <20260308143902.1643155-1-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 9 Mar 2026 09:03:39 -0700
+X-Gm-Features: AaiRm522QC33-pn6ypfj1HraosDgIOCcxzFxbavX0PwQYmw1LIpMVrouwly1L8M
+Message-ID: <CADUfDZriujeKOexHfJr6ZGFq1z-OQAfBCH+QYrHFn5G=fLyeWQ@mail.gmail.com>
+Subject: Re: [PATCH] ublk: don't clear GD_SUPPRESS_PART_SCAN for unprivileged daemons
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Alexander Atanasov <alex@zazolabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sungwoo,
+On Sun, Mar 8, 2026 at 7:39=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> When UBLK_F_NO_AUTO_PART_SCAN is set, GD_SUPPRESS_PART_SCAN is cleared
+> unconditionally, including for unprivileged daemons. Keep it consistent
+> with the code block for setting GD_SUPPRESS_PART_SCAN by not clearing
+> it for unprivileged daemons.
+>
+> In reality this isn't a problem because ioctl(BLKRRPART) requires
+> CAP_SYS_ADMIN, but it is more reliable to not clear the bit.
+>
+> Cc: Alexander Atanasov <alex@zazolabs.com>
+> Fixes: 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 004f367243b6..9573a46d0ef4 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -4443,7 +4443,9 @@ static int ublk_ctrl_start_dev(struct ublk_device *=
+ub,
+>
+>         /* Skip partition scan if disabled by user */
+>         if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+> -               clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> +               /* Not clear for unprivileged daemons, see comment above =
+*/
+> +               if (!ub->unprivileged_daemons)
+> +                       clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+>         } else {
+>                 /* Schedule async partition scan for trusted daemons */
+>                 if (!ub->unprivileged_daemons)
 
-kernel test robot noticed the following build errors:
+Looks like the two if (!ub->unprivileged_daemons) checks could be
+moved outside the if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN)
+to reduce repetition. But the logic looks fine to me.
 
-[auto build test ERROR on axboe/for-next]
-[also build test ERROR on device-mapper-dm/for-next linus/master v7.0-rc3 next-20260306]
-[cannot apply to linux-nvme/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Best,
+Caleb
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sungwoo-Kim/blk-mq-nvme-Fix-general-protection-fault-in-nvme_setup_descriptor_pools/20260309-143107
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
-patch link:    https://lore.kernel.org/r/20260309062840.2937858-2-iam%40sung-woo.kim
-patch subject: [PATCH] blk-mq: nvme: Fix general protection fault in nvme_setup_descriptor_pools()
-config: x86_64-randconfig-074-20260309 (https://download.01.org/0day-ci/archive/20260309/202603092305.jcWVkoXK-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260309/202603092305.jcWVkoXK-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603092305.jcWVkoXK-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> error[E0308]: mismatched types
-   --> rust/kernel/block/mq/operations.rs:274:28
-   |
-   274 |         init_request: Some(Self::init_request_callback),
-   |                       ---- ^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected fn pointer, found fn item
-   |                       |
-   |                       arguments to this enum variant are incorrect
-   |
-   = note: expected fn pointer `unsafe extern "C" fn(_, _, _, i32) -> _`
-   found fn item `unsafe extern "C" fn(_, _, _, u32) -> _ {OperationsVTable::<T>::init_request_callback}`
-   help: the type constructed contains `unsafe extern "C" fn(*mut blk_mq_tag_set, *mut bindings::request, u32, u32) -> i32 {OperationsVTable::<T>::init_request_callback}` due to the type of the argument passed
-   --> rust/kernel/block/mq/operations.rs:274:23
-   |
-   274 |         init_request: Some(Self::init_request_callback),
-   |                       ^^^^^---------------------------^
-   |                            |
-   |                            this argument influences the type of `Some`
-   note: tuple variant defined here
-   --> /opt/cross/rustc-1.88.0-bindgen-0.72.1/rustup/toolchains/1.88.0-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:597:5
-   |
-   597 |     Some(#[stable(feature = "rust1", since = "1.0.0")] T),
-   |     ^^^^
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> --
+> 2.47.1
+>
