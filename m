@@ -1,80 +1,86 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AFC2C027E;
-	Mon,  9 Mar 2026 08:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193BA37B024
+	for <linux-block@vger.kernel.org>; Mon,  9 Mar 2026 09:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773045699; cv=none; b=lM4H81G5eXm+9MFyFuKilkeEoVEc9PlKKe4BbTLcJSzK0VygvERr94vX8zn701jJ7bGt3QTuZM7NnmxT4+dCw98HN80wpjH/zjeeqH/TSS/bUuUIuF1OptSOjhaOp9xsuYr9SSspHlezA1NupXSG1gM7rikiR9eP3XW1jTZWDdc=
+	t=1773049248; cv=none; b=ajDxl7hM2o9GFbDTAorxQ3kZ9p0qAWjsjm2XbDURkks86Q+hXaJ5sqWO/XW5JTsxPnoh2lKpn6xmFimbmtJXOMEV+3m2LrwoQS11xKUzlFYzqzwiL2kM8SbHbXE4OXg4fHmbJ+2Yy9ApPg7CNZTvM9uQl9+o8XwYy6PK2q0PNYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773045699; c=relaxed/simple;
-	bh=JBpXZptTSUunAq5dyKc9na25R/vc1bFHXrI3d81DJiI=;
+	s=arc-20240116; t=1773049248; c=relaxed/simple;
+	bh=k5buxHRIZWjpTnXw0EcJlrekSX4x6Cy9tnCX+2Pi8TA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q+s5NxUptYvamgPzrgOR+iRwF82Osv8WGGdHdQyDwXzxx7Nb0iwbWc4QUH/PBPV7wG/HX+tuIbwtfFGwyivbfnMLt48s+gSHg6mbPVH6Kmk4kxomyZq/co2tfQfTWCX1O7GheAHik7YS50KGUtw/LfB9VBe+0YsewelbEogiX0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DEzokvNv; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=bauma4IbS4sE/PAV6GMfzGMIuYKnXxuzSTb0zJnnvw9dWNu9aIYmRG/CY+MnJbv+tpBGQdPjp7jeYjLn/fMwcKM7IULmDQ6APaqXikj8dEPmtVXgmEyyNL6q/W62t/7YlY9W771pUZJgU2iuVXwSMQ/fY1sCt4NuKf3Kq8reKd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=q6GfOWS8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XJ01uJRd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=q6GfOWS8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=XJ01uJRd; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DEzokvNv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773045697; x=1804581697;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JBpXZptTSUunAq5dyKc9na25R/vc1bFHXrI3d81DJiI=;
-  b=DEzokvNvsTs1SbPjydXPbhUzcBv+RNfFujeGoTkb67ifT+Zca+Gu9RUF
-   9OFNwNNYvFsfTuczujDf8217kONKP/2xZrvRbUrYjb1rP3IwpdPyRDXIk
-   loTTx0PXn9I7Al8qJdsT1d8Rc5mh3vgpFm/nJdMPzM9LlL5BP4+cYKh2F
-   eALmUm1Ee4gfSmvto8JW3scyEV8A94weSL27U3cfAbzVu2yeF0/3myxMY
-   4g6WcDx/CMBE2nwqmK6d2FzNvMC5OTCG8RTHRMYQsn8R+qE1wILpZrxrp
-   pzDpaPzZNVSXwibsxtWOm3vu9v8SUxpkQRv62bxwu0BIeQ6Ou5g1c/btx
-   Q==;
-X-CSE-ConnectionGUID: 9oYZ4/ueTpO25QzVLWHT7A==
-X-CSE-MsgGUID: yhZZydyKQoe18MU7gOSwlQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11723"; a="74141549"
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="74141549"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 01:41:35 -0700
-X-CSE-ConnectionGUID: QnlBDgkcTaOqYfPdIBMwrg==
-X-CSE-MsgGUID: As52cKYSQV+Zc4xb5wE3Qw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="219661399"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by orviesa008.jf.intel.com with ESMTP; 09 Mar 2026 01:41:27 -0700
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vzWB3-000000002pl-2K7j;
-	Mon, 09 Mar 2026 08:41:25 +0000
-Date: Mon, 9 Mar 2026 09:40:41 +0100
-From: kernel test robot <lkp@intel.com>
-To: Sungwoo Kim <iam@sung-woo.kim>, Jens Axboe <axboe@kernel.dk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Richard Weinberger <richard@nod.at>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	James Smart <james.smart@broadcom.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: oe-kbuild-all@lists.linux.dev, Sungwoo Kim <iam@sung-woo.kim>,
-	Chao Shi <cshi008@fiu.edu>, Weidong Zhu <weizhu@fiu.edu>,
-	Dave Tian <daveti@purdue.edu>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, nbd@other.debian.org,
-	linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-	asahi@lists.linux.dev
-Subject: Re: [PATCH] blk-mq: nvme: Fix general protection fault in
- nvme_setup_descriptor_pools()
-Message-ID: <202603090911.0DdOwjTR-lkp@intel.com>
-References: <20260309062840.2937858-2-iam@sung-woo.kim>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="q6GfOWS8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XJ01uJRd";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="q6GfOWS8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="XJ01uJRd"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1DB434D20A;
+	Mon,  9 Mar 2026 09:40:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773049245; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zVxFaAHbg3bDXiJQqBzLYbhKHtrZj5HCyqeBP33Jr2U=;
+	b=q6GfOWS8mvTJh9V3SB/EANnHssgZCC8jaIgJig9hYYOe1fOHwABI7j5IpHpvsfWUk3HFGE
+	XIb3PwBgVna0ebwCuaec2Dt26nwAJfRYsGTOxMBSbrRB8KW4iRkeEapdwbQ5TcSKUncKiq
+	/pg8JSsN2+NqD9WuvZpNNVol3S4ZkRc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773049245;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zVxFaAHbg3bDXiJQqBzLYbhKHtrZj5HCyqeBP33Jr2U=;
+	b=XJ01uJRdjGTzs6RLVgkSp2VE9US9hFKIFXkjuChCYU2O9gnuUoA1buxZ58YLudrqv5IbXB
+	B515zOacEjlsj4AQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=q6GfOWS8;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=XJ01uJRd
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1773049245; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zVxFaAHbg3bDXiJQqBzLYbhKHtrZj5HCyqeBP33Jr2U=;
+	b=q6GfOWS8mvTJh9V3SB/EANnHssgZCC8jaIgJig9hYYOe1fOHwABI7j5IpHpvsfWUk3HFGE
+	XIb3PwBgVna0ebwCuaec2Dt26nwAJfRYsGTOxMBSbrRB8KW4iRkeEapdwbQ5TcSKUncKiq
+	/pg8JSsN2+NqD9WuvZpNNVol3S4ZkRc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1773049245;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zVxFaAHbg3bDXiJQqBzLYbhKHtrZj5HCyqeBP33Jr2U=;
+	b=XJ01uJRdjGTzs6RLVgkSp2VE9US9hFKIFXkjuChCYU2O9gnuUoA1buxZ58YLudrqv5IbXB
+	B515zOacEjlsj4AQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 089073EE25;
+	Mon,  9 Mar 2026 09:40:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id I3prAJ2Vrml/dwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Mon, 09 Mar 2026 09:40:45 +0000
+Date: Mon, 9 Mar 2026 10:40:44 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>, 
+	Stephen Zhang <starzhangzsd@gmail.com>, Kent Overstreet <kent.overstreet@linux.dev>, 
+	Coly Li <colyli@fnnas.com>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Subject: Re: [PATCH blktests v5 0/3] bcache: add initial test cases
+Message-ID: <d9aae3e1-4a91-42bc-b65f-81491b5ac964@flourine.local>
+References: <20260305-bcache-v5-0-04cd4c9080d7@suse.de>
+ <aav89rnofa3mpOM-@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,58 +89,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260309062840.2937858-2-iam@sung-woo.kim>
+In-Reply-To: <aav89rnofa3mpOM-@shinmob>
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DKIM_TRACE(0.00)[suse.de:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Queue-Id: 1DB434D20A
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 
-Hi Sungwoo,
+On Sat, Mar 07, 2026 at 10:27:08AM +0000, Shinichiro Kawasaki wrote:
+> Daniel, thank you for this effot. FYI, I applied the 1st (with my fix) and the
+> 3rd patch. Let's do some more effort to confirm the value of the 2nd
+> patch.
 
-kernel test robot noticed the following build errors:
+Thanks! FWIW, it should be hopefully fairly simple to add some more
+tests based on:
 
-[auto build test ERROR on axboe/for-next]
-[also build test ERROR on device-mapper-dm/for-next linus/master v6.16-rc1 next-20260306]
-[cannot apply to linux-nvme/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+  https://evilpiepirate.org/git/ktest.git/tree/tests/bcache
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sungwoo-Kim/blk-mq-nvme-Fix-general-protection-fault-in-nvme_setup_descriptor_pools/20260309-143107
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
-patch link:    https://lore.kernel.org/r/20260309062840.2937858-2-iam%40sung-woo.kim
-patch subject: [PATCH] blk-mq: nvme: Fix general protection fault in nvme_setup_descriptor_pools()
-config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20260309/202603090911.0DdOwjTR-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260309/202603090911.0DdOwjTR-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603090911.0DdOwjTR-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> error[E0308]: mismatched types
-   --> rust/kernel/block/mq/operations.rs:274:28
-   |
-   274 |         init_request: Some(Self::init_request_callback),
-   |                       ---- ^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected fn pointer, found fn item
-   |                       |
-   |                       arguments to this enum variant are incorrect
-   |
-   = note: expected fn pointer `unsafe extern "C" fn(_, _, _, i32) -> _`
-   found fn item `unsafe extern "C" fn(_, _, _, u32) -> _ {block::mq::operations::OperationsVTable::<T>::init_request_callback}`
-   help: the type constructed contains `unsafe extern "C" fn(*mut bindings::blk_mq_tag_set, *mut bindings::request, u32, u32) -> i32 {block::mq::operations::OperationsVTable::<T>::init_request_callback}` due to the type of the argument passed
-   --> rust/kernel/block/mq/operations.rs:274:23
-   |
-   274 |         init_request: Some(Self::init_request_callback),
-   |                       ^^^^^---------------------------^
-   |                            |
-   |                            this argument influences the type of `Some`
-   note: tuple variant defined here
-   --> /opt/cross/rustc-1.88.0-bindgen-0.72.1/rustup/toolchains/1.88.0-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/option.rs:597:5
-   |
-   597 |     Some(#[stable(feature = "rust1", since = "1.0.0")] T),
-   |     ^^^^
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+This should cover some more ground.
