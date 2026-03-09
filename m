@@ -1,100 +1,481 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562B63D412B
-	for <linux-block@vger.kernel.org>; Mon,  9 Mar 2026 15:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773068778; cv=none; b=mZSz1coiFkc3ad58VIfY6OqJmiZHIkf3q2rKUzxtls6XYtkUcUX6/krUQ11p6P+c2sVpabCDwC3KMYOP21Oj9oqvkD0eXHZ6Y5PdDcRrR2eoVjlDRP158sSox2ykiQhpk6tlgD7Ehn7e6mXJumX6e+qyYArle8Y2AnhhmGR++5M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773068778; c=relaxed/simple;
-	bh=wRzvLbBGaAh9TMd/K6fo819fSxGJuZ6OqTWdUwzMPLc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lRLVGm+K5KuoCfzESVDtfwbZUG0Rgk/qUk7ygTCgyMzkhssL2XK365PI1JxVrRVqlhVbUHyL79gyoqE96+7GXty1zKKT5MnmyEAQJpdRotlctp4RUKoq1PkFiADfIMuXaQ45utqbvaz7IDb7Kkxr2qyONdanEjHJt5k3q9ehWwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=QgQvDif1; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9743D75D2
+	for <linux-block@vger.kernel.org>; Mon,  9 Mar 2026 15:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773070303; cv=pass; b=sjuVbRXqfEU0mGzHVttPaYtvg9zhwZmtjeTmY3vGvIbrWqssEkfurHFKZeVmp5WrybcbkX3jYqY55n9rmJr278T62E27MSrtgD0Rt6/IKC7vgGZu8fzFYUZdSQ6jEF/P5ViyycJd4PJvHdbsic40ahkCNW9oe/RhVMkYca46NBI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773070303; c=relaxed/simple;
+	bh=IAhun4C5RUHet00HwD7ul+JrFNPWw1T6eUv63nRkCNU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D8ADmlrU2oktVK/R6lkjBEmPnYfX9Dsv/jn4UKKlR4GllYwTly2AeOHPM/MBaVNfggaIR0M0f1ArMkL5098l7IQxa4wTUxXDkXTBsXNt3sOaFJBeouSmoTv0tEi+eJTaEfOuVjtNYcMdnQgaEpfg5fmbvWRNXuXCnaJ9CQ0aXcQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PqFA5YcF; arc=pass smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QgQvDif1"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50917e02472so13388281cf.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 08:06:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PqFA5YcF"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7d746975576so45995a34.3
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 08:31:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773070300; cv=none;
+        d=google.com; s=arc-20240605;
+        b=T/LUhaKcKq2MPLPKtOjTixNEAr2tF6fI9l3mDj19ylyAaQ/lPwGKrcGlysk8zmaxBq
+         IiLGnjaVsmkRMgEQNT+Tc0bOJ0KY3Ml8AyNzFNnNKEEwZGK41fC5nKlwYLloII6vE8+D
+         qjPVbsmlHv0B3qXyFhb0AWaoEcYfzo1hx+J1Xl7b7E1Hyg/Zvej1K01saAtpuGooJNIN
+         8uB9siV1+dT+6nGqyGFPXWR7+bsj/laalcsunzZZOWu28C6cUfVrQ4haS7JNAl/G5dfK
+         u6UJjaOvUFsHJF1R86HxQqwqvMZmyzxK5PMtUSBQO4Mq5+mCMwPOAJxHcajoEra3TCGo
+         VUYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6+r9RgPpLrGiXVfQx056rbYEWCZcszUA9kQtErD1KEc=;
+        fh=VJZS0u3DCgSupzGnkkiSEynGYq79N4BZQurZJLkyceo=;
+        b=WqGklp9s/TvE/Ts0kDgOPEB+Zkao81i1w+zSyyIAU9weAbED5zcGhRqGdz0if9WTqK
+         M3RcoZSjIHBp7btS1gWW7CGAA8SoMl1i9pua4Hl+4JdNjP8MNpf/FK51UTovgiogL6Qz
+         rmzn+uDLmz7UH0AfPAZ7Uz8kp4YqBGRo9xHMUfB2vRVRcTWrcJ1c/tejAlObrP51Vkzi
+         A6XmPjVBMWCgB0ehY9i16ObW4yxyyqF8838eJGmaUcd5bxN+GavKuvfibJsK6OWpBD2l
+         5SXIb+gv+yJGT1sNoLoYTOxHf73YQSNBDzMJ40gZo/L5NRsvEWW6mOyzMY/dZ/UufpLY
+         Xwkw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1773068774; x=1773673574; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X/pSwYu0Cu6TqiNKu2kObY4zE6l9DNx84f7s+dA/j44=;
-        b=QgQvDif1NIjqRxM11baBFkHEqk/HxULzhzftporqFxmVEHecLGAje59XnFE8gEPg0D
-         LeK66wT733AJybGdkJ1kKkpbmyOIbGI9DG/l2cWKRJqrsCGll/KbazQ4ch5nrmwKpePm
-         RDwb5WJkumj8UjEBAMz9zQl0p3sqs5V46rgvcEWc/mTYf/7AATdsHnJzvl87dGnDyFQk
-         hsj9JSRIXSpP7HGhYzFA0O0pWcd2HEUt/DA5mWWHnKxPnBt0WYytP6SPaLuFWGcG01qn
-         fvwpa7INTrUY3zANODcXIFPiT1iZhw6sRNVXpcrIpqdgUAz28jCIqqJl8sJRo5zGKA5s
-         l2TA==
+        d=purestorage.com; s=google2022; t=1773070300; x=1773675100; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6+r9RgPpLrGiXVfQx056rbYEWCZcszUA9kQtErD1KEc=;
+        b=PqFA5YcFnKVkNGYXYu/zjEoz5CoL7xNnxWEUUjsrVreoUECANOFMpdhSPDT3a/sgL6
+         qy4/58lvq1tYnBuNh9ITTY2gZvwtG2GdAxBMWhLm6iPQajc/axdnYPY1PcJm+Jt3FwO4
+         UPq4HCUtTEzvK7AqgW6OwPbRxh3tv+3cuMz/C7Kanzv6RuohWEsGsDNOWxlpepfQvlE5
+         QXJR8AEnBG0uMYoEJ2pW1gslnIr/yEdowxKkuLPPg2dyaxvZf4z3mfMIj/jvhDGovvcE
+         +Y7CGBU5jKvdrIdHlNIPReTkr6E04odkkJ3lbz+zZ1tJCE9IUQ2S3kYtIyoztQ10N3I7
+         9iLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773068774; x=1773673574;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X/pSwYu0Cu6TqiNKu2kObY4zE6l9DNx84f7s+dA/j44=;
-        b=HapZt7NgQ+/Q5pVsEf39Jv2ta4mG/QCZ7KmNGeqrxWMPU45mvRd7a4CtJSqGIVceXX
-         sIAC/kF2lyZohl8w+VEds3Ks0jC30MtpaC78bEnkYzBBPDrdr+BG9r1/Q4YsxfucpUwT
-         kPNpe/TGIP2RpQ42sv9AgjWjRxtGrB/FHevCDyF5WeGZZTzFWy3qDAXF1Z/9xRf1aUm9
-         9wwOdYM32rOC+5l1QahlLtY02CLOQmZUfFKAfegB1K3ZboJllU/q4KIjeD/hrO3COt+7
-         fW+gUASulaWgoaRt07fGJAx6GYMGofiInX3Q9WOmoX0HZ0UBtbFpzjIt9rwLAOAIB7eC
-         0MnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXnckgW1pfdlxUW46IpZx/GHii556FpIhxVHoEIdWgVUijhsrhCqhYDeXEFhjtU6f7UjvoeuMj0uly/Bw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjwURKW0Y//nbWHPBT9N53jz+6RSLbN/Rb4nUw6movDB/Y1eL7
-	GmdXra7Au91kjyr9X77aQMNCaQPp7gBbLfE8AOwcGHLTERb3wa7/EE8DEGkWkNpMurU=
-X-Gm-Gg: ATEYQzz2pKYrB3tJxQQ6kqfz9WHil5AQPxT+2VL82Si1fdFG23P/N1KMXs5Go4l4PcL
-	STifOgS+mv0tSma1VL6sYXsX4+gMzf3W3ZvK47E73LzsFQJeGUI59zI2HToKVgaBmgh17rmCnTX
-	OrEhivZZoKGcJ8nO2i4wKtp77+JIZ/1e0waiOyzYkdtnkvbKe4SwQA/EDwtzj/8TSjHxyh1afmp
-	8wN7902ZX/kbNkK9RhLDe7PJrO/+2IVRSqfhKvAfDoFGEX4H1nD46SwdlDNz21JWANFF9BgZPPB
-	Umu4q3BH2tjIx3pOeubhWItifxM5zKrrjeddphQegpDauMFGUGS7P7Pbwx0jR4j80sncjSCGZf9
-	xJU9GagFraPo/KdtQWLj6IL9hu5wuyHhVG+UrPu+wGkiuTPmdSKQkyiJl+jGH9gG7qnDiWKbRr8
-	46gUX5sqwnY1q4Tbbt+I0lrUAyMFDxI08DVv9Apm28gAklUXSNuQ==
-X-Received: by 2002:ac8:7f86:0:b0:509:17b5:654c with SMTP id d75a77b69052e-50917b56abdmr50427091cf.37.1773068774226;
-        Mon, 09 Mar 2026 08:06:14 -0700 (PDT)
-Received: from [172.19.0.48] ([99.196.133.212])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50923ed69bbsm5209671cf.28.2026.03.09.08.06.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Mar 2026 08:06:13 -0700 (PDT)
-Message-ID: <4d46676d-e738-497c-b848-4278ec15d868@kernel.dk>
-Date: Mon, 9 Mar 2026 09:05:56 -0600
+        d=1e100.net; s=20230601; t=1773070300; x=1773675100;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6+r9RgPpLrGiXVfQx056rbYEWCZcszUA9kQtErD1KEc=;
+        b=s2nOmliR07tEMCe7ctVh3Ff4yuf6KAlVvcdODaZm/YXqTwWnuw8Yrvje6zIAOKwoW8
+         L26VZEuaN2bxNVT2rnUsn2q2wey25T42DuIN/AW444r0lkGFneaOD2YrKuFdIFgV74Dp
+         TWYPYcap/dP+v9Rute1XSFxb9zJNWUvSLiiNVRMTy7PJOg7OIZNA7Zse4U1Kq5l31+/3
+         Oi/BZXZnGn/iHKow7qiDxv2AD8CFPcyhKueE4Igp8adS4FfCURM652Gs6t6/KH2LuPqk
+         pqzolwWNj+vBImu2i6zFScwyvp/hO3gIXcZ3zL+8Fx3uEY9yCNSI8UylJEhc80kjJ7Tn
+         szRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVcouT38L1H7JZ7LMRpQIk2cuI8CKplvNNomE66zNY93X+RBfbN0fJvI6qdqAxSFAWQrFTQm1SXononlw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5NoS+beLPDsctXAs+5k6wbUg/GeALzAhHU+fdZ4Cl73Y1lsL4
+	yd6Z0jG9qJCFMmf7EYsNE0U1LJzzLrELRaubxlHWVAq6csGDjz5IxLugeLUpJ74bfgim8/Vw7a7
+	wgHERAV2ZznwU/UXfNF88a9c3AaDSDgHu6MJEkQu8Zg==
+X-Gm-Gg: ATEYQzyq0aNdBunwLI47HCF/R6xsiHcGH2BcX2dSCQ0eyT8Rfp2E8pRBoDow49jmqPa
+	ndG7Atg6JPTVMlcMBO+m8CdgYYz7xDwtPDBx0yao7U6cLe/GNGe9fktA6UaCAe0rw1yva8TTLND
+	Bl/oyP7m3REtiASEktlZdOMKVvpKvTrZq6u3olYQWeL1yZH9O4VyXjAjVfrMBLUGf+OELRwlaam
+	kEJP98MIMljWL8rcKtbOa+qONXwZGOMv5zWeehf7IrCvu+RDQq3IE5bdtEjYF17qcW5269RxJIq
+	2LcqVsg=
+X-Received: by 2002:a05:6830:3495:b0:7d7:40e7:9536 with SMTP id
+ 46e09a7af769-7d740e79670mr3723400a34.0.1773070299522; Mon, 09 Mar 2026
+ 08:31:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/3] block: export blk-crypto symbols required by
- dm-inlinecrypt
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>,
- linux-block@vger.kernel.org, ebiggers@kernel.org
-Cc: linux-kernel@vger.kernel.org, adrianvovk@gmail.com,
- dm-devel@lists.linux.dev, quic_mdalam@quicinc.com, gmazyland@gmail.com,
- israelr@nvidia.com, mpatocka@redhat.com
-References: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com>
- <20260304121729.1532469-2-linlin.zhang@oss.qualcomm.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260304121729.1532469-2-linlin.zhang@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260309062840.2937858-2-iam@sung-woo.kim>
+In-Reply-To: <20260309062840.2937858-2-iam@sung-woo.kim>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 9 Mar 2026 08:31:27 -0700
+X-Gm-Features: AaiRm50lVynE24y1iGtUrsPblHqAJTvTl9abhpAYnSu85cy3kb3SYItst0KXwYA
+Message-ID: <CADUfDZorSQCVtQyfjBuaziwG2Jo28yZiiqLKbp9PkFFw-9VgfQ@mail.gmail.com>
+Subject: Re: [PATCH] blk-mq: nvme: Fix general protection fault in nvme_setup_descriptor_pools()
+To: Sungwoo Kim <iam@sung-woo.kim>
+Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>, 
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Richard Weinberger <richard@nod.at>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>, 
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Sagi Grimberg <sagi@grimberg.me>, James Smart <james.smart@broadcom.com>, 
+	Chaitanya Kulkarni <kch@nvidia.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Chao Shi <cshi008@fiu.edu>, 
+	Weidong Zhu <weizhu@fiu.edu>, Dave Tian <daveti@purdue.edu>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, linux-mmc@vger.kernel.org, 
+	linux-mtd@lists.infradead.org, asahi@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-nvme@lists.infradead.org, 
+	linux-scsi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/4/26 5:17 AM, Linlin Zhang wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> bio_crypt_set_ctx(), blk_crypto_init_key(), and
-> blk_crypto_start_using_key() are needed to use inline encryption; see
-> Documentation/block/inline-encryption.rst.  Export them so that
-> dm-inlinecrypt can use them.  The only reason these weren't exported
-> before was that inline encryption was previously used only by fs/crypto/
-> which is built-in code.
+On Sun, Mar 8, 2026 at 11:30=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wrot=
+e:
+>
+> The numa_node can be < 0 since NUMA_NO_NODE =3D -1. However,
+> struct blk_mq_hw_ctx{} defines numa_node as unsigned int. As a result,
+> numa_node is set to UINT_MAX for NUMA_NO_NODE in blk_mq_alloc_hctx().
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+The node argument to blk_mq_alloc_hctx() comes from
+blk_mq_alloc_and_init_hctx(), which is called by
+blk_mq_alloc_and_init_hctx() with int node =3D blk_mq_get_hctx_node(set,
+i). node =3D NUMA_NO_NODE would suggest that blk_mq_hw_queue_to_node()
+doesn't find any CPU affinitized to the queue. Is that even possible?
 
--- 
-Jens Axboe
+>
+> Later, nvme_setup_descriptor_pools() accesses
+> descriptor_pools[numa_node]. Due to the above, it tries to access
+> descriptor_pools[UINT_MAX]. The address is garbage but accessible
+> because it is canonical and still within the slab memory range.
+> Therefore, no page fault occurs, and KASAN cannot detect this since it
+> is beyond the redzones.
+>
+> Subsequently, normal I/O calls dma_pool_alloc() with the garbage pool
+> address. pool->next_block contains a wild pointer, causing a general
+> protection fault (GPF).
+>
+> To fix this, this patch changes the type of numa_node to int and adds
+> a check for NUMA_NO_NODE.
+>
+> Log:
+>
+> Oops: general protection fault, probably for non-canonical address 0xe980=
+3b040854d02c: 0000 [#1] SMP KASAN PTI
+> KASAN: maybe wild-memory-access in range [0x4c01f82042a68160-0x4c01f82042=
+a68167][FEMU] Err: I/O cmd failed: opcode=3D0x2 status=3D0x4002
+> CPU: 0 UID: 0 PID: 112363 Comm: systemd-udevd Not tainted 6.19.0-dirty #1=
+0 PREEMPT(voluntary)
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-=
+ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> RIP: 0010:pool_block_pop mm/dmapool.c:187 [inline]
+> RIP: 0010:dma_pool_alloc+0x110/0x990 mm/dmapool.c:417
+> Code: 00 0f 85 a4 07 00 00 4c 8b 63 58 4d 85 e4 0f 84 12 01 00 00 e8 41 1=
+d 93 ff 4c 89 e2 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f=
+ 85 a7 07 00 00 49 8b 04 24 48 8d 7b 68 48 89 fa 48
+> RSP: 0018:ffffc90002b9efd0 EFLAGS: 00010003
+> RAX: dffffc0000000000 RBX: ffff888005466800 RCX: ffffffff94faab7f
+> RDX: 09803f040854d02c RSI: 6c9b26c9b26c9b27 RDI: ffff88800c725ea0
+> RBP: ffffc90002b9f060 R08: 0000000000000001 R09: 0000000000000001
+> R10: 0000000000000003 R11: 0000000000000000 R12: 4c01f82042a68164
+> R13: ffff888005466800 R14: 0000000000000820 R15: ffff888007b29000
+> FS:  00007f2abc4ff8c0(0000) GS:ffff8880d1ff7000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000056360eb89000 CR3: 000000000a480000 CR4: 00000000000006f0
+> Call Trace:
+>  <TASK>
+>  nvme_pci_setup_data_prp drivers/nvme/host/pci.c:906 [inline]
+>  nvme_map_data drivers/nvme/host/pci.c:1114 [inline]
+>  nvme_prep_rq.part.0+0x17d3/0x3c90 drivers/nvme/host/pci.c:1243
+>  nvme_prep_rq drivers/nvme/host/pci.c:1239 [inline]
+>  nvme_prep_rq_batch drivers/nvme/host/pci.c:1321 [inline]
+>  nvme_queue_rqs+0x37b/0x8a0 drivers/nvme/host/pci.c:1336
+>  __blk_mq_flush_list block/blk-mq.c:2848 [inline]
+>  __blk_mq_flush_list+0xaa/0xe0 block/blk-mq.c:2844
+>  blk_mq_dispatch_queue_requests+0x4f5/0x990 block/blk-mq.c:2893
+>  blk_mq_flush_plug_list+0x232/0x650 block/blk-mq.c:2981
+>  __blk_flush_plug+0x2c3/0x510 block/blk-core.c:1225
+>  blk_finish_plug block/blk-core.c:1252 [inline]
+>  blk_finish_plug+0x64/0xc0 block/blk-core.c:1249
+>  read_pages+0x6bd/0x9d0 mm/readahead.c:176
+>  page_cache_ra_unbounded+0x659/0x950 mm/readahead.c:269
+>  do_page_cache_ra mm/readahead.c:332 [inline]
+>  force_page_cache_ra+0x282/0x3a0 mm/readahead.c:361
+>  page_cache_sync_ra+0x201/0xbf0 mm/readahead.c:579
+>  filemap_get_pages+0x3be/0x1990 mm/filemap.c:2690
+>  filemap_read+0x3ea/0xdf0 mm/filemap.c:2800
+>  blkdev_read_iter+0x1b8/0x520 block/fops.c:856
+>  new_sync_read fs/read_write.c:491 [inline]
+>  vfs_read+0x90f/0xd80 fs/read_write.c:572
+>  ksys_read+0x14e/0x280 fs/read_write.c:715
+>  __do_sys_read fs/read_write.c:724 [inline]
+>  __se_sys_read fs/read_write.c:722 [inline]
+>  __x64_sys_read+0x7b/0xc0 fs/read_write.c:722
+>  x64_sys_call+0x17ec/0x21b0 arch/x86/include/generated/asm/syscalls_64.h:=
+1
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0x8b/0x1200 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7f2abc7b204e
+> Code: 0f 1f 40 00 48 8b 15 79 af 00 00 f7 d8 64 89 02 48 c7 c0 ff ff ff f=
+f eb ba 0f 1f 00 64 8b 04 25 18 00 00 00 85 c0 75 14 0f 05 <48> 3d 00 f0 ff=
+ ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 28
+> RSP: 002b:00007fff07113cb8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+> RAX: ffffffffffffffda RBX: 000056360eb6a528 RCX: 00007f2abc7b204e
+> RDX: 0000000000040000 RSI: 000056360eb6a538 RDI: 000000000000000f
+> RBP: 000056360e8d23d0 R08: 000056360eb6a510 R09: 00007f2abc79abe0
+> R10: 0000000000040050 R11: 0000000000000246 R12: 000000003ff80000
+> R13: 0000000000040000 R14: 000056360eb6a510 R15: 000056360e8d2420
+>  </TASK>
+> Modules linked in:
+>
+> Fixes: 320ae51feed5 ("blk-mq: new multi-queue block IO queueing mechanism=
+")
+> Fixes: d977506f8863 ("nvme-pci: make PRP list DMA pools per-NUMA-node")
+> Acked-by: Chao Shi <cshi008@fiu.edu>
+> Acked-by: Weidong Zhu <weizhu@fiu.edu>
+> Acked-by: Dave Tian <daveti@purdue.edu>
+> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+> ---
+>  block/bsg-lib.c                   |  2 +-
+>  drivers/block/mtip32xx/mtip32xx.c |  2 +-
+>  drivers/block/nbd.c               |  2 +-
+>  drivers/md/dm-rq.c                |  2 +-
+>  drivers/mmc/core/queue.c          |  2 +-
+>  drivers/mtd/ubi/block.c           |  2 +-
+>  drivers/nvme/host/apple.c         |  2 +-
+>  drivers/nvme/host/fc.c            |  2 +-
+>  drivers/nvme/host/pci.c           | 11 ++++++++---
+>  drivers/nvme/host/rdma.c          |  2 +-
+>  drivers/nvme/host/tcp.c           |  2 +-
+>  drivers/nvme/target/loop.c        |  2 +-
+>  drivers/scsi/scsi_lib.c           |  2 +-
+>  include/linux/blk-mq.h            |  4 ++--
+>  14 files changed, 22 insertions(+), 17 deletions(-)
+>
+> diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+> index 9ceb5d0832f5..e93b1018a346 100644
+> --- a/block/bsg-lib.c
+> +++ b/block/bsg-lib.c
+> @@ -299,7 +299,7 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx=
+ *hctx,
+>
+>  /* called right after the request is allocated for the request_queue */
+>  static int bsg_init_rq(struct blk_mq_tag_set *set, struct request *req,
+> -                      unsigned int hctx_idx, unsigned int numa_node)
+> +                      unsigned int hctx_idx, int numa_node)
+>  {
+>         struct bsg_job *job =3D blk_mq_rq_to_pdu(req);
+>
+> diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/m=
+tip32xx.c
+> index 567192e371a8..8aedba9b5690 100644
+> --- a/drivers/block/mtip32xx/mtip32xx.c
+> +++ b/drivers/block/mtip32xx/mtip32xx.c
+> @@ -3340,7 +3340,7 @@ static void mtip_free_cmd(struct blk_mq_tag_set *se=
+t, struct request *rq,
+>  }
+>
+>  static int mtip_init_cmd(struct blk_mq_tag_set *set, struct request *rq,
+> -                        unsigned int hctx_idx, unsigned int numa_node)
+> +                        unsigned int hctx_idx, int numa_node)
+>  {
+>         struct driver_data *dd =3D set->driver_data;
+>         struct mtip_cmd *cmd =3D blk_mq_rq_to_pdu(rq);
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index f6c33b21f69e..e1fac1c0c4cd 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1888,7 +1888,7 @@ static void nbd_dbg_close(void)
+>  #endif
+>
+>  static int nbd_init_request(struct blk_mq_tag_set *set, struct request *=
+rq,
+> -                           unsigned int hctx_idx, unsigned int numa_node=
+)
+> +                           unsigned int hctx_idx, int numa_node)
+>  {
+>         struct nbd_cmd *cmd =3D blk_mq_rq_to_pdu(rq);
+>         cmd->nbd =3D set->driver_data;
+> diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+> index a6ca92049c10..b687a209256b 100644
+> --- a/drivers/md/dm-rq.c
+> +++ b/drivers/md/dm-rq.c
+> @@ -455,7 +455,7 @@ static void dm_start_request(struct mapped_device *md=
+, struct request *orig)
+>  }
+>
+>  static int dm_mq_init_request(struct blk_mq_tag_set *set, struct request=
+ *rq,
+> -                             unsigned int hctx_idx, unsigned int numa_no=
+de)
+> +                             unsigned int hctx_idx, int numa_node)
+>  {
+>         struct mapped_device *md =3D set->driver_data;
+>         struct dm_rq_target_io *tio =3D blk_mq_rq_to_pdu(rq);
+> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> index 284856c8f655..06cb29190a88 100644
+> --- a/drivers/mmc/core/queue.c
+> +++ b/drivers/mmc/core/queue.c
+> @@ -203,7 +203,7 @@ static unsigned short mmc_get_max_segments(struct mmc=
+_host *host)
+>  }
+>
+>  static int mmc_mq_init_request(struct blk_mq_tag_set *set, struct reques=
+t *req,
+> -                              unsigned int hctx_idx, unsigned int numa_n=
+ode)
+> +                              unsigned int hctx_idx, int numa_node)
+>  {
+>         struct mmc_queue_req *mq_rq =3D req_to_mmc_queue_req(req);
+>         struct mmc_queue *mq =3D set->driver_data;
+> diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
+> index b53fd147fa65..1c0bd2b36637 100644
+> --- a/drivers/mtd/ubi/block.c
+> +++ b/drivers/mtd/ubi/block.c
+> @@ -312,7 +312,7 @@ static blk_status_t ubiblock_queue_rq(struct blk_mq_h=
+w_ctx *hctx,
+>
+>  static int ubiblock_init_request(struct blk_mq_tag_set *set,
+>                 struct request *req, unsigned int hctx_idx,
+> -               unsigned int numa_node)
+> +               int numa_node)
+>  {
+>         struct ubiblock_pdu *pdu =3D blk_mq_rq_to_pdu(req);
+>
+> diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
+> index ed61b97fde59..50ff5e9a168d 100644
+> --- a/drivers/nvme/host/apple.c
+> +++ b/drivers/nvme/host/apple.c
+> @@ -819,7 +819,7 @@ static int apple_nvme_init_hctx(struct blk_mq_hw_ctx =
+*hctx, void *data,
+>
+>  static int apple_nvme_init_request(struct blk_mq_tag_set *set,
+>                                    struct request *req, unsigned int hctx=
+_idx,
+> -                                  unsigned int numa_node)
+> +                                  int numa_node)
+>  {
+>         struct apple_nvme_queue *q =3D set->driver_data;
+>         struct apple_nvme *anv =3D queue_to_apple_nvme(q);
+> diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+> index 6948de3f438a..64d0c5d7613a 100644
+> --- a/drivers/nvme/host/fc.c
+> +++ b/drivers/nvme/host/fc.c
+> @@ -2109,7 +2109,7 @@ __nvme_fc_init_request(struct nvme_fc_ctrl *ctrl,
+>
+>  static int
+>  nvme_fc_init_request(struct blk_mq_tag_set *set, struct request *rq,
+> -               unsigned int hctx_idx, unsigned int numa_node)
+> +               unsigned int hctx_idx, int numa_node)
+>  {
+>         struct nvme_fc_ctrl *ctrl =3D to_fc_ctrl(set->driver_data);
+>         struct nvme_fcp_op_w_sgl *op =3D blk_mq_rq_to_pdu(rq);
+> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> index 3c83076a57e5..a5f12fc7655d 100644
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -443,11 +443,16 @@ static bool nvme_dbbuf_update_and_check_event(u16 v=
+alue, __le32 *dbbuf_db,
+>  }
+>
+>  static struct nvme_descriptor_pools *
+> -nvme_setup_descriptor_pools(struct nvme_dev *dev, unsigned numa_node)
+> +nvme_setup_descriptor_pools(struct nvme_dev *dev, int numa_node)
+>  {
+> -       struct nvme_descriptor_pools *pools =3D &dev->descriptor_pools[nu=
+ma_node];
+> +       struct nvme_descriptor_pools *pools;
+>         size_t small_align =3D NVME_SMALL_POOL_SIZE;
+>
+> +       if (numa_node =3D=3D NUMA_NO_NODE)
+> +               pools =3D &dev->descriptor_pools[numa_node_id()];
+> +       else
+> +               pools =3D &dev->descriptor_pools[numa_node];
 
+Simpler: if (numa_node =3D=3D NUMA_NO_NODE) numa_node =3D numa_node_id();
+
+> +
+>         if (pools->small)
+>                 return pools; /* already initialized */
+>
+> @@ -516,7 +521,7 @@ static int nvme_init_hctx(struct blk_mq_hw_ctx *hctx,=
+ void *data,
+>
+>  static int nvme_pci_init_request(struct blk_mq_tag_set *set,
+>                 struct request *req, unsigned int hctx_idx,
+> -               unsigned int numa_node)
+> +               int numa_node)
+>  {
+>         struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
+>
+> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+> index 35c0822edb2d..c2514ef94028 100644
+> --- a/drivers/nvme/host/rdma.c
+> +++ b/drivers/nvme/host/rdma.c
+> @@ -292,7 +292,7 @@ static void nvme_rdma_exit_request(struct blk_mq_tag_=
+set *set,
+>
+>  static int nvme_rdma_init_request(struct blk_mq_tag_set *set,
+>                 struct request *rq, unsigned int hctx_idx,
+> -               unsigned int numa_node)
+> +               int numa_node)
+>  {
+>         struct nvme_rdma_ctrl *ctrl =3D to_rdma_ctrl(set->driver_data);
+>         struct nvme_rdma_request *req =3D blk_mq_rq_to_pdu(rq);
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index 69cb04406b47..385eef98081b 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -547,7 +547,7 @@ static void nvme_tcp_exit_request(struct blk_mq_tag_s=
+et *set,
+>
+>  static int nvme_tcp_init_request(struct blk_mq_tag_set *set,
+>                 struct request *rq, unsigned int hctx_idx,
+> -               unsigned int numa_node)
+> +               int numa_node)
+>  {
+>         struct nvme_tcp_ctrl *ctrl =3D to_tcp_ctrl(set->driver_data);
+>         struct nvme_tcp_request *req =3D blk_mq_rq_to_pdu(rq);
+> diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
+> index fc8e7c9ad858..72a8ea70eae7 100644
+> --- a/drivers/nvme/target/loop.c
+> +++ b/drivers/nvme/target/loop.c
+> @@ -202,7 +202,7 @@ static int nvme_loop_init_iod(struct nvme_loop_ctrl *=
+ctrl,
+>
+>  static int nvme_loop_init_request(struct blk_mq_tag_set *set,
+>                 struct request *req, unsigned int hctx_idx,
+> -               unsigned int numa_node)
+> +               int numa_node)
+>  {
+>         struct nvme_loop_ctrl *ctrl =3D to_loop_ctrl(set->driver_data);
+>         struct nvme_loop_iod *iod =3D blk_mq_rq_to_pdu(req);
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 4a902c9dfd8b..8958ad31ed2a 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1948,7 +1948,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_=
+ctx *hctx,
+>  }
+>
+>  static int scsi_mq_init_request(struct blk_mq_tag_set *set, struct reque=
+st *rq,
+> -                               unsigned int hctx_idx, unsigned int numa_=
+node)
+> +                               unsigned int hctx_idx, int numa_node)
+>  {
+>         struct Scsi_Host *shost =3D set->driver_data;
+>         struct scsi_cmnd *cmd =3D blk_mq_rq_to_pdu(rq);
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index cae9e857aea4..1a5a3786522c 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -426,7 +426,7 @@ struct blk_mq_hw_ctx {
+>         struct blk_mq_tags      *sched_tags;
+>
+>         /** @numa_node: NUMA node the storage adapter has been connected =
+to. */
+> -       unsigned int            numa_node;
+> +       int             numa_node;
+>         /** @queue_num: Index of this hardware queue. */
+>         unsigned int            queue_num;
+>
+> @@ -651,7 +651,7 @@ struct blk_mq_ops {
+>          * flush request.
+>          */
+>         int (*init_request)(struct blk_mq_tag_set *set, struct request *,
+> -                           unsigned int, unsigned int);
+> +                           unsigned int, int);
+
+Pre-existing, but naming these integer arguments would be helpful for
+documentation.
+
+Best,
+Caleb
+
+>         /**
+>          * @exit_request: Ditto for exit/teardown.
+>          */
+> --
+> 2.47.3
+>
+>
