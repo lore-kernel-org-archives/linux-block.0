@@ -1,115 +1,149 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C74C3803ED
-	for <linux-block@vger.kernel.org>; Mon,  9 Mar 2026 10:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722943A4F36;
+	Mon,  9 Mar 2026 12:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773050964; cv=none; b=uSQERS8YbRzymEe5nEGN5N6nmWEuhnMg3hHcooyT/+ccS24Mh1M0aNWtwFR870MkjlXE6ngIij6IigkPIyPDdJhIofdiME6VEscflm9shc7Pu6KwVudceu41ZdMuQewTM/riqvLhcMZGfmQnj6MSKjMYR/3Bp9yPpgMUWOFJIns=
+	t=1773058987; cv=none; b=Jf3i8qrVOqfVqZuuEsZl3+S75vjkVrOaVkYuMR7lH4gBxMwbR9sFpzwrdd/gAdeOgEwvHmLN8RJ2RhM9a39D3HDboH7Sqk7QS5H8pk4vVxWQpWxlJ7FibDYaVvyhV81EWZvMeBeUBjk1zVEMMq8QotTHSOQ4gkxcgNGESFoFEio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773050964; c=relaxed/simple;
-	bh=MA9sQnLiuZy6KGmGqechv31+qSKWZ7oeqFzcXKsqNSs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aoWzQ7HVueYP9HKwJf1EBs1MOqyO4Vd6E8BX1rga48i4QrR0UxamTJRLf7IiyVH1RaTr1ucbkbPQ5Ejp43dSumnV0OfR3p0Z0yvvWXAqs7Vx6FhIzeP28DF7fScx+XcjVJUrGiUq6UEX4Kk3AS6ltxUDhEY5x0vJoifUD5ehKRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dh15NXTH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1773058987; c=relaxed/simple;
+	bh=LKnZfOM/Cwn+vL43qm0h8f/cfu1cc6MvbJveFJQGlZI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=PDIVFraUncX8l5FEeU0gJUneoXALDn2prH+MQN/G1FD8lfjGvU75ILYgrecXX3FYlJJuQUfn7yKukPZyxGjxsu+7rP2BpGcGnrr6OXGTESLgxk98VaVSZYc99si6EmevKPZc8nYI+pcdocrsq0rGTz9lzUpO01cWnSVT/CFOHCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGtVqG88; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dh15NXTH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773050960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=US86VN5kkobsatL1Dlg/ylYmZj1+gOU0IJcJn5oPtlU=;
-	b=dh15NXTHHUJTkv6BjevtipdsTw7WZjyY1x0h0aq4JkjoINVxIu43t74DKTrPShZmGMpSfo
-	81lMjgcwuC4Rvo/TJtb+rWZjQdE8bhXsSEyfqqM/9D8Rcq3LBzanamRilyMfi0frpPCWLF
-	E8m97pxs2EYYw3mz3+rIk8rAXpbuyBI=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-7yOgQ4J2Mey5ITtsVg_1nw-1; Mon,
- 09 Mar 2026 06:09:17 -0400
-X-MC-Unique: 7yOgQ4J2Mey5ITtsVg_1nw-1
-X-Mimecast-MFC-AGG-ID: 7yOgQ4J2Mey5ITtsVg_1nw_1773050957
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9EB7C1956054;
-	Mon,  9 Mar 2026 10:09:16 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.147])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 69BF518001FE;
-	Mon,  9 Mar 2026 10:09:14 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Tejun Heo <tj@kernel.org>
-Subject: [PATCH] blk-cgroup: wait for blkcg cleanup before initializing new disk
-Date: Mon,  9 Mar 2026 18:09:06 +0800
-Message-ID: <20260309100906.1740351-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGtVqG88"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 48AEAC4CEF7;
+	Mon,  9 Mar 2026 12:23:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773058987;
+	bh=LKnZfOM/Cwn+vL43qm0h8f/cfu1cc6MvbJveFJQGlZI=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=iGtVqG88/Q+wH/LkV8vt4S69eq3SfB/3sNGBsVAP8mcm5n0DjJMKQ1pGyg4QFSCxi
+	 ZLSg8qsNiIklFrLUuMLXz3l5YE9WqRDfLTcdA6EZ/co/Z68/nndAh/IaAw6+XQNxYq
+	 XmODSZA3M7WSSNW8Y70YYNV5SL97rUp22SWeScUqBYQbsm441w5x8uWDXzfpgtmvLY
+	 eKOC7uhI0OFZpAn41fzvw9z2KjcCVRr0dfmtmwdvq5r4k0LaBJgFG3h96w0LJfSrnA
+	 tb7EM8LkEClCehnNE/hb0cJCmvxHJLRdQ4gLotQcWqtDPTIUKJUaH20xImlQ3Kwnwf
+	 ohouTGxbQ73lw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39430F3C246;
+	Mon,  9 Mar 2026 12:23:07 +0000 (UTC)
+From: Jihan LIN via B4 Relay <devnull+linjh22s.gmail.com@kernel.org>
+Subject: [PATCH RFC v2 0/5] zram: Allow zcomps to manage their own streams
+Date: Mon, 09 Mar 2026 12:23:03 +0000
+Message-Id: <20260309-b4_zcomp_stream-v2-0-7148622326eb@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKe7rmkC/2WNywrCMBBFf6XM2kiS1ja6EgQ/wK2UUtNpO2Cbk
+ pSglvy7Ibhzc+HM49wNHFpCB6dsA4ueHJk5gtxloMd2HpBRFxkklyWPwR5F89FmWhq3WmwnVuG
+ xr5QqUEgF8Wux2NMrGe9wu16gjsOR3GrsO7V4kVY/YfEn9IJxlh80LzWKLs/leZhaeu7jDdQhh
+ C/w0jXsswAAAA==
+X-Change-ID: 20260202-b4_zcomp_stream-7e9f7884e128
+To: Minchan Kim <minchan@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+ Jihan LIN <linjh22s@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773058983; l=3907;
+ i=linjh22s@gmail.com; s=linjh22s_machine; h=from:subject:message-id;
+ bh=LKnZfOM/Cwn+vL43qm0h8f/cfu1cc6MvbJveFJQGlZI=;
+ b=fiUOv5NcKwfeNr2yKcdNu3XUx8YchsAE4VCCw/XTSSE8szkvGWAe3wf/+rfslvd8BWcG5EI3R
+ 1btxriNmYuSA+z3fLXPP9/+5B9r47B63PzIswx9mMbjBOsFdApOGri3
+X-Developer-Key: i=linjh22s@gmail.com; a=ed25519;
+ pk=MnRQAVFy1t4tiGb8ce7ohJwrN2YFXd+dA7XmzR6GmUc=
+X-Endpoint-Received: by B4 Relay for linjh22s@gmail.com/linjh22s_machine
+ with auth_id=592
+X-Original-From: Jihan LIN <linjh22s@gmail.com>
+Reply-To: linjh22s@gmail.com
 
-When a queue is shared across disk rebind (e.g., SCSI unbind/bind), the
-previous disk's blkcg state is cleaned up asynchronously via
-disk_release() -> blkcg_exit_disk(). If the new disk's blkcg_init_disk()
-runs before that cleanup finishes, we may overwrite q->root_blkg while
-the old one is still alive, and radix_tree_insert() in blkg_create()
-fails with -EEXIST because the old blkg entries still occupy the same
-queue id slot in blkcg->blkg_tree. This causes the sd probe to fail
-with -ENOMEM.
+Hi all,
 
-Fix it by waiting in blkcg_init_disk() for root_blkg to become NULL,
-which indicates the previous disk's blkcg cleanup has completed.
+This RFC series introduces a new interface to allow zram compression
+backends to manage their own streams, in addition to the existing
+per-CPU stream model.
 
-Fixes: 1059699f87eb ("block: move blkcg initialization/destroy into disk allocation/release handler")
-Cc: Yi Zhang <yi.zhang@redhat.com>
-Cc: Tejun Heo <tj@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Currently, zram manages compression contexts via preemptive per-CPU
+streams, which strictly limits concurrency to the number of online CPUs.
+In contrast, hardware accelerators specialized for page compression
+generally process PAGE_SIZE payloads (e.g. 4K) using standard
+algorithms. These devices expose the limitations of the current model
+due to the following features:
+ - These devices utilize a hardware queue to batch requests. A typical
+   queue depth (e.g., 256) far exceeds the number of available CPUs.
+ - These devices are asymmetric. Submission is generally fast and
+   asynchronous, but completion implies latency.
+ - Some devices only support compression requests, leaving decompression
+   to be handled by software.
+
+The current "one-size-fits-all" design lacks the flexibility to support
+these devices, preventing effective offloading of compression work.
+
+This series proposes a hybrid approach. While maintaining full backward
+compatibility with existing backends, this series introduces a new set
+of operations, op->{get, put}_stream(), for backends that wish to manage
+their own streams. This allows the backend to handle contention
+internally and dynamically select an execution path for the acquired
+streams. A new flag is also introduced to indicate this capability at
+runtime. zram_write_page() now prefers streams managed by the backend if
+a bio is considered asynchronous.
+
+Some design decisions are as follows.
+1. The proposed get_stream() does not take gfp_t flags to keep the
+   interface minimal. By design, backends are fully responsible for
+   allocation safety.
+2. The default per-cpu streams now also imply a synchronous path for the
+   backends.
+3. The recompression path currently relies on the default per-cpu
+   streams. This is a trade-off, since recompression is primarily for
+   memory saving, and hardware accelerators typically prioritize
+   throughput over compression ratio.
+4. Backends must implement internal locking if required. 
+
+This RFC series focuses on the stream management interface required for
+accelerator backends, laying the groundwork for batched asynchronous
+operations in zram. Since I cannot verify this on specific accelerators
+at this moment, a PoC patch that simulates this behavior in software is
+included to verify new stream operations without requiring specific
+accelerators. The next step would be to add a non-blocking interface to
+fully utilize their concurrency, and allow backends to be built as
+separate modules. Any feedback would be greatly appreciated.
+
+Signed-off-by: Jihan LIN <linjh22s@gmail.com>
 ---
- block/blk-cgroup.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Changes in v2:
+- Decouple locking from per-CPU streams by introducing struct
+  percpu_zstrm (PATCH 2/5)   
+- Refactor zcomp-managed streams to use struct managed_zstrm (PATCH 3/5)
+- Add PoC zcomp-managed streams for lz4 backend (PATCH 5/5, only for
+  demonstration)
+- Rebase to v7.0-rc2
+- Link to v1: https://lore.kernel.org/r/20260204-b4_zcomp_stream-v1-0-35c06ce1d332@gmail.com
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index b70096497d38..7aa2ed7f7c82 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1498,6 +1498,27 @@ int blkcg_init_disk(struct gendisk *disk)
- 	struct blkcg_gq *new_blkg, *blkg;
- 	bool preloaded;
- 
-+	/*
-+	 * If the queue is shared across disk rebind (e.g., SCSI), the
-+	 * previous disk's blkcg state is cleaned up asynchronously via
-+	 * disk_release() -> blkcg_exit_disk(). Wait for that cleanup to
-+	 * finish (indicated by root_blkg becoming NULL) before setting up
-+	 * new blkcg state. Otherwise, we may overwrite q->root_blkg while
-+	 * the old one is still alive, and radix_tree_insert() in
-+	 * blkg_create() will fail with -EEXIST because the old entries
-+	 * still occupy the same queue id slot in blkcg->blkg_tree.
-+	 */
-+	if (READ_ONCE(q->root_blkg)) {
-+		/* 20s is a random timeout, disk_release() should be done well before */
-+		unsigned long end = jiffies + msecs_to_jiffies(20000);
-+
-+		while (READ_ONCE(q->root_blkg) &&
-+				time_before(jiffies, end))
-+			msleep(1);
-+		if (READ_ONCE(q->root_blkg))
-+			return -EEXIST;
-+	}
-+
- 	new_blkg = blkg_alloc(&blkcg_root, disk, GFP_KERNEL);
- 	if (!new_blkg)
- 		return -ENOMEM;
+---
+Jihan LIN (5):
+      zram: Rename zcomp_strm_{init, free}()
+      zram: Separate the lock from zcomp_strm
+      zram: Introduce zcomp-managed streams
+      zram: Use zcomp-managed streams for async write requests
+      zram: Add lz4 PoC for zcomp-managed streams
+
+ drivers/block/zram/backend_lz4.c | 464 +++++++++++++++++++++++++++++++++++++--
+ drivers/block/zram/zcomp.c       |  85 +++++--
+ drivers/block/zram/zcomp.h       |  35 ++-
+ drivers/block/zram/zram_drv.c    |  29 ++-
+ 4 files changed, 562 insertions(+), 51 deletions(-)
+---
+base-commit: 11439c4635edd669ae435eec308f4ab8a0804808
+change-id: 20260202-b4_zcomp_stream-7e9f7884e128
+
+Best regards,
 -- 
-2.47.1
+Jihan LIN <linjh22s@gmail.com>
+
 
