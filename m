@@ -1,128 +1,290 @@
-Received: from mta20.hihonor.com (mta20.honor.com [81.70.206.69])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E597A361DDF;
-	Tue, 10 Mar 2026 08:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.206.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4871743CEF0;
+	Tue, 10 Mar 2026 09:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773132682; cv=none; b=RnfJu30D1x+JaMeYbtJeBC5lai12VaCHy+aHmdRz2vfPwVf+BdO/xC87jqBBz4IBaVZlXwOmieGc8oom8FCIRr7YDzMDrA6XNQH7vaSOgACb8Glbsdn5QFIkf4/Hi7245GXZk+gbJEDNTmp7pMOh8H+ITyua1KrvXDcwS8x4ziY=
+	t=1773133320; cv=none; b=DAOi+K3nFygHrCpIqDigJQ9d8vJRwCgz/wemp2Wy1q4wlD7MnMmPikRFo8gIIJbB2arQvzAA2FN/ulrUrbTupbiWgR7FwxEeoBeHIlzoHF6THD+WyeywmhtgEYJ1U7SlnPp/MQoqnUucL4W+M3InFPQfzP8XLaB+NICEX666xlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773132682; c=relaxed/simple;
-	bh=W+1iM8bel6opFwNeNTtOBmhiNVYCkuLIq+k9UfxQNzA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=h83tBZmZiCZQ70RrUG/j5q8lDISQLl+bBikoqa+KPET1i9C8+RCk+8+UTx4SlMoq4xxkFZqFQ6yGAKKal2W2UKySJcVu3y0oB3WRYC/Ikibae6ULnqtxnaS2p7+nkgIvOoCYkvOAGQ8/fQc3AtkQOa0AuqK3VLpxLV5D/ewBLK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.206.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
-Received: from w013.hihonor.com (unknown [10.68.26.19])
-	by mta20.hihonor.com (SkyGuard) with ESMTPS id 4fVRqv2B3czYlJfZ;
-	Tue, 10 Mar 2026 16:29:15 +0800 (CST)
-Received: from a002.hihonor.com (10.68.31.193) by w013.hihonor.com
- (10.68.26.19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Tue, 10 Mar
- 2026 16:32:32 +0800
-Received: from a008.hihonor.com (10.68.30.56) by a002.hihonor.com
- (10.68.31.193) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Tue, 10 Mar
- 2026 16:32:32 +0800
-Received: from a008.hihonor.com ([fe80::b6bf:fc6a:207:6851]) by
- a008.hihonor.com ([fe80::b6bf:fc6a:207:6851%6]) with mapi id 15.02.2562.027;
- Tue, 10 Mar 2026 16:32:32 +0800
-From: gao xu <gaoxu2@honor.com>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-CC: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>,
-	zhouxiaolong <zhouxiaolong9@honor.com>
-Subject: RE: zram: Optimize LZ4 dictionary compression performance
-Thread-Topic: zram: Optimize LZ4 dictionary compression performance
-Thread-Index: AdywM2pDLIO0gp5TQXuJ4OQmnHDBWf//vSSA//9WTwA=
-Date: Tue, 10 Mar 2026 08:32:32 +0000
-Message-ID: <234ad9d53124461185f60b9cd2f1603e@honor.com>
-References: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
- <aa-1iKEWKNB0zDwj@google.com>
-In-Reply-To: <aa-1iKEWKNB0zDwj@google.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1773133320; c=relaxed/simple;
+	bh=ZYzDc+vI/hMkWC6CX1qm1YhK+pw7uB7KPtXG2eIbW0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kqlQ4VJv5J8VTO5dZkXgV1B5A2C86PWguVdHJST+wc9o8KLmtiJkdieXh/NWUvAh3EtQFpwFjUJBH4ZWPxyNvOE5N3831/NuFbFSlj0J8ZdCxZVDn2ysEOU4yDlkYzPstJJFLYDkB/PEMwiR/2EiQ4cfKBcw4x9BkyqDeSWb0lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DHReEEsd; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DHReEEsd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5133C2BC87;
+	Tue, 10 Mar 2026 09:01:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773133319;
+	bh=ZYzDc+vI/hMkWC6CX1qm1YhK+pw7uB7KPtXG2eIbW0g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DHReEEsdXqrkbsZ5oUAG+tr+Y9qoSEL67c1z9+EbFovv+wFXqt77asim+Ev1BxiFR
+	 ePyiX3YV+wOsQ0RBGysQv1J+O6pzhCeJsuOTLwN7xXNv6St+/mmCosLz1oKeBcTteW
+	 UU/5PmaE3y7KEiMEipvGygcAeQVH1Yt8xKB1qQD0hktEptKAJcTjxb+JQOWNrh3cV0
+	 0n6MnQRc+8wwKJK9NC7u6QIr1P8up6yQwroag777aWZS3NgSZ/yDB/6n/RuOgh2/RT
+	 pR5VgK5Js1Y33aY17utipHrc4HZSO6LE5Wybf8PnbmtLLCeM888JI+bv0HGOsRqIop
+	 ZeVJyH2IlAYnQ==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Yu Kuai <yukuai@fnnas.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-6.18] block: break pcpu_alloc_mutex dependency on freeze_lock
+Date: Tue, 10 Mar 2026 05:01:09 -0400
+Message-ID: <20260310090145.2709021-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260310090145.2709021-1-sashal@kernel.org>
+References: <20260310090145.2709021-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-PiANCj4gT24gKDI2LzAzLzEwIDAyOjU0KSwgZ2FvIHh1IHdyb3RlOg0KPiA+ICtzdHJ1Y3QgbHo0
-X2RydiB7DQo+ID4gKwkvKiB0ZW1wbGF0ZSBjb21wcmVzc2lvbiBzdHJlYW0gd2l0aCBkaWN0aW9u
-YXJ5ICovDQo+ID4gKwlMWjRfc3RyZWFtX3QgYmFzZV9jc3RyZWFtOw0KPiA+ICsJLyogZGljdGlv
-bmFyeSBpbmRleCBvZiB0aGUgY3VycmVudCB0ZW1wbGF0ZSAqLw0KPiA+ICsJdTMyIGRpY3RfZ2Vu
-Ow0KPiA+ICsJYm9vbCBiYXNlX2NfdmFsaWQ7DQo+ID4gK307DQo+ID4gKw0KPiA+ICBzdGF0aWMg
-dm9pZCBsejRfcmVsZWFzZV9wYXJhbXMoc3RydWN0IHpjb21wX3BhcmFtcyAqcGFyYW1zKQ0KPiA+
-ICB7DQo+ID4gKwlrZnJlZShwYXJhbXMtPmRydl9kYXRhKTsNCj4gPiArCXBhcmFtcy0+ZHJ2X2Rh
-dGEgPSBOVUxMOw0KPiA+ICB9DQo+ID4NCj4gPiAgc3RhdGljIGludCBsejRfc2V0dXBfcGFyYW1z
-KHN0cnVjdCB6Y29tcF9wYXJhbXMgKnBhcmFtcykNCj4gPiAgew0KPiA+ICsJc3RydWN0IGx6NF9k
-cnYgKmRydjsNCj4gPiArDQo+ID4gIAlpZiAocGFyYW1zLT5sZXZlbCA9PSBaQ09NUF9QQVJBTV9O
-T1RfU0VUKQ0KPiA+ICAJCXBhcmFtcy0+bGV2ZWwgPSBMWjRfQUNDRUxFUkFUSU9OX0RFRkFVTFQ7
-DQo+ID4NCj4gPiArCWRydiA9IGt6YWxsb2Nfb2JqKGRydiwgR0ZQX0tFUk5FTCk7DQo+ID4gKwlp
-ZiAoIWRydikNCj4gPiArCQlyZXR1cm4gLUVOT01FTTsNCj4gPiArDQo+ID4gKwlkcnYtPmRpY3Rf
-Z2VuID0gMDsNCj4gPiArCWRydi0+YmFzZV9jX3ZhbGlkID0gZmFsc2U7DQo+ID4gKw0KPiA+ICsJ
-cGFyYW1zLT5kcnZfZGF0YSA9IGRydjsNCj4gPiArDQo+ID4gIAlyZXR1cm4gMDsNCj4gPiAgfQ0K
-PiA+DQo+ID4gQEAgLTY3LDEwICs4OCwzMiBAQCBzdGF0aWMgaW50IGx6NF9jcmVhdGUoc3RydWN0
-IHpjb21wX3BhcmFtcyAqcGFyYW1zLA0KPiBzdHJ1Y3QgemNvbXBfY3R4ICpjdHgpDQo+ID4gIAly
-ZXR1cm4gLUVOT01FTTsNCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyBpbnQgbHo0X2J1aWxkX2Jh
-c2VfY3N0cmVhbShzdHJ1Y3QgemNvbXBfcGFyYW1zICpwYXJhbXMpDQo+ID4gK3sNCj4gPiArCXN0
-cnVjdCBsejRfZHJ2ICpkcnYgPSBwYXJhbXMtPmRydl9kYXRhOw0KPiA+ICsJaW50IHJldDsNCj4g
-PiArDQo+ID4gKwlpZiAoIXBhcmFtcy0+ZGljdCB8fCAhcGFyYW1zLT5kaWN0X3N6KQ0KPiA+ICsJ
-CXJldHVybiAtRUlOVkFMOw0KPiA+ICsNCj4gPiArCW1lbXNldCgmZHJ2LT5iYXNlX2NzdHJlYW0s
-IDAsIHNpemVvZihkcnYtPmJhc2VfY3N0cmVhbSkpOw0KPiA+ICsNCj4gPiArCXJldCA9IExaNF9s
-b2FkRGljdCgmZHJ2LT5iYXNlX2NzdHJlYW0sDQo+ID4gKwkJCSAgIHBhcmFtcy0+ZGljdCwgcGFy
-YW1zLT5kaWN0X3N6KTsNCj4gPiArCWlmIChyZXQgIT0gcGFyYW1zLT5kaWN0X3N6KQ0KPiA+ICsJ
-CXJldHVybiAtRUlOVkFMOw0KPiA+ICsNCj4gPiArCWRydi0+ZGljdF9nZW4gPSBwYXJhbXMtPmRp
-Y3RfZ2VuOw0KPiA+ICsJZHJ2LT5iYXNlX2NfdmFsaWQgPSB0cnVlOw0KPiA+ICsNCj4gPiArCXJl
-dHVybiAwOw0KPiA+ICt9DQo+IA0KPiBJIHRoaW5rIHRoaXMgc2ltcGx5IGNhbiBtb3ZlIHRvIC0+
-bHo0X3NldHVwX3BhcmFtcygpLCBiZWNhc2UgdGhhdA0KPiBmdW5jdGlvbiBpcyBzdXBwb3NlZCB0
-byBsb2FkRGljdC4gIEkgZ3Vlc3Mgd2UgY2FuIHVzZSBiYWNrZW5kX3pzdGQuYw0KPiBhcyBhIHJl
-ZmVyZW5jZS4gIEFsc28gcHJvYmFibHkgY2FuIGluaGVyaXQgbmFtaW5nIHNjaGVtZSBmcm9tIHpz
-dGQNCj4gYmFja2VuZCBhcyB3ZWxsLg0KU2hvdWxkIEkgbW9kaWZ5IGl0IGxpa2UgdGhpcz8NCitz
-dGF0aWMgaW50IGx6NF9jcmVhdGVfY3N0cmVhbShzdHJ1Y3QgemNvbXBfcGFyYW1zICpwYXJhbXMp
-DQorew0KKwlpbnQgcmV0Ow0KKw0KKwlpZiAoIXBhcmFtcy0+ZGljdCB8fCAhcGFyYW1zLT5kaWN0
-X3N6KQ0KKwkJcmV0dXJuIDA7DQorDQorCXBhcmFtcy0+ZHJ2X2RhdGEgPSBremFsbG9jKHNpemVv
-ZihMWjRfc3RyZWFtX3QpLCBHRlBfS0VSTkVMKTsNCisJaWYgKCFwYXJhbXMtPmRydl9kYXRhKQ0K
-KwkJcmV0dXJuIC1FTk9NRU07DQorDQorCXJldCA9IExaNF9sb2FkRGljdCgoTFo0X3N0cmVhbV90
-ICopcGFyYW1zLT5kcnZfZGF0YSwNCisJCQkgICBwYXJhbXMtPmRpY3QsIHBhcmFtcy0+ZGljdF9z
-eik7DQorCWlmIChyZXQgIT0gcGFyYW1zLT5kaWN0X3N6KSB7DQorCQlrZnJlZShwYXJhbXMtPmRy
-dl9kYXRhKTsNCisJCXJldHVybiAtRUlOVkFMOw0KKwl9DQorDQorCXJldHVybiAwOw0KK30NCg0K
-c3RhdGljIGludCBsejRfc2V0dXBfcGFyYW1zKHN0cnVjdCB6Y29tcF9wYXJhbXMgKnBhcmFtcykN
-CnsNCglpZiAocGFyYW1zLT5sZXZlbCA9PSBaQ09NUF9QQVJBTV9OT19MRVZFTCkNCgkJcGFyYW1z
-LT5sZXZlbCA9IExaNF9BQ0NFTEVSQVRJT05fREVGQVVMVDsNCg0KLSAgIHJldHVybiAwOw0KKwly
-ZXR1cm4gbHo0X2NyZWF0ZV9jc3RyZWFtKHBhcmFtcyk7DQp9DQo+IA0KPiA+ICBzdGF0aWMgaW50
-IGx6NF9jb21wcmVzcyhzdHJ1Y3QgemNvbXBfcGFyYW1zICpwYXJhbXMsIHN0cnVjdCB6Y29tcF9j
-dHgNCj4gKmN0eCwNCj4gPiAgCQkJc3RydWN0IHpjb21wX3JlcSAqcmVxKQ0KPiA+ICB7DQo+ID4g
-IAlzdHJ1Y3QgbHo0X2N0eCAqemN0eCA9IGN0eC0+Y29udGV4dDsNCj4gPiArCXN0cnVjdCBsejRf
-ZHJ2ICpkcnYgID0gcGFyYW1zLT5kcnZfZGF0YTsNCj4gPiAgCWludCByZXQ7DQo+ID4NCj4gPiAg
-CWlmICghemN0eC0+Y3N0cm0pIHsNCj4gPiBAQCAtNzgsMTAgKzEyMSwxNiBAQCBzdGF0aWMgaW50
-IGx6NF9jb21wcmVzcyhzdHJ1Y3QgemNvbXBfcGFyYW1zDQo+ICpwYXJhbXMsIHN0cnVjdCB6Y29t
-cF9jdHggKmN0eCwNCj4gPiAgCQkJCQlyZXEtPmRzdF9sZW4sIHBhcmFtcy0+bGV2ZWwsDQo+ID4g
-IAkJCQkJemN0eC0+bWVtKTsNCj4gPiAgCX0gZWxzZSB7DQo+ID4gKwkJLyogcmVidWlsZCBiYXNl
-X2NzdHJlYW0gd2hlbiB0aGUgZGljdGlvbmFyeSBjaGFuZ2VzICovDQo+ID4gKwkJaWYgKCFkcnYt
-PmJhc2VfY192YWxpZCB8fCBkcnYtPmRpY3RfZ2VuICE9IHBhcmFtcy0+ZGljdF9nZW4pIHsNCj4g
-PiArCQkJcmV0ID0gbHo0X2J1aWxkX2Jhc2VfY3N0cmVhbShwYXJhbXMpOw0KPiA+ICsJCQlpZiAo
-cmV0KQ0KPiA+ICsJCQkJcmV0dXJuIHJldDsNCj4gPiArCQl9DQo+IA0KPiBXZSBzaG91bGQgbm90
-IG5lZWQgdGhpcywgdW5sZXNzIEknbSBtaXNzaW5nIHNvbWV0aGluZy4gIFBhcmFtcyBzaG91bGQN
-Cj4gY2hhbmdlIG9uY2UgYWxnb3JpdGhtcyBhcmUgc2V0dXBzIGFuZCB0aGUgZGV2aWNlIGlzIGlu
-aXQuDQo+IA0KPiBbLi5dDQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2svenJhbS96cmFt
-X2Rydi5jIGIvZHJpdmVycy9ibG9jay96cmFtL3pyYW1fZHJ2LmMNCj4gPiBpbmRleCBiY2EzMzQw
-M2YuLmYzNGYzZmE0MyAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2Jsb2NrL3pyYW0venJhbV9k
-cnYuYw0KPiA+ICsrKyBiL2RyaXZlcnMvYmxvY2svenJhbS96cmFtX2Rydi5jDQo+ID4gQEAgLTE3
-MDksNiArMTcwOSw3IEBAIHN0YXRpYyBpbnQgY29tcF9wYXJhbXNfc3RvcmUoc3RydWN0IHpyYW0g
-KnpyYW0sDQo+IHUzMiBwcmlvLCBzMzIgbGV2ZWwsDQo+ID4gIAl6cmFtLT5wYXJhbXNbcHJpb10u
-ZGljdF9zeiA9IHN6Ow0KPiA+ICAJenJhbS0+cGFyYW1zW3ByaW9dLmxldmVsID0gbGV2ZWw7DQo+
-ID4gIAl6cmFtLT5wYXJhbXNbcHJpb10uZGVmbGF0ZS53aW5iaXRzID0gZGVmbGF0ZV9wYXJhbXMt
-PndpbmJpdHM7DQo+ID4gKwl6cmFtLT5wYXJhbXNbcHJpb10uZGljdF9nZW4rKzsNCj4gDQo+IFdl
-IHNob3VsZCBub3QgbmVlZCB0aGlzLCBhcyBmYXIgYXMgSSBjYW4gc2VlLiAgSXQgd2FzIGEgYnVn
-IHRoYXQgd2UNCj4gcGVybWl0dGVkIHBhcmFtcyBjaGFuZ2UgYWZ0ZXIgaW5pdC4gIEkgc2VudCBh
-IGZpeHVwIHBhdGNoLg0KWW91IGFyZSByaWdodC4NCg==
+From: Nilay Shroff <nilay@linux.ibm.com>
+
+[ Upstream commit 539d1b47e935e8384977dd7e5cec370c08b7a644 ]
+
+While nr_hw_update allocates tagset tags it acquires ->pcpu_alloc_mutex
+after ->freeze_lock is acquired or queue is frozen. This potentially
+creates a circular dependency involving ->fs_reclaim if reclaim is
+triggered simultaneously in a code path which first acquires ->pcpu_
+alloc_mutex. As the queue is already frozen while nr_hw_queue update
+allocates tagsets, the reclaim can't forward progress and thus it could
+cause a potential deadlock as reported in lockdep splat[1].
+
+Fix this by pre-allocating tagset tags before we freeze queue during
+nr_hw_queue update. Later the allocated tagset tags could be safely
+installed and used after queue is frozen.
+
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Closes: https://lore.kernel.org/all/CAHj4cs8F=OV9s3La2kEQ34YndgfZP-B5PHS4Z8_b9euKG6J4mw@mail.gmail.com/ [1]
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+Reviewed-by: Yu Kuai <yukuai@fnnas.com>
+[axboe: fix brace style issue]
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+Now I have a complete picture. Let me write the analysis.
+
+## Analysis
+
+### What the commit fixes
+
+This commit fixes a **potential deadlock** in the block layer's
+`__blk_mq_update_nr_hw_queues()` path. The deadlock involves a circular
+lock dependency between:
+
+1. **`freeze_lock`** (held when the queue is frozen)
+2. **`pcpu_alloc_mutex`** (acquired internally by `alloc_percpu_gfp()`
+   during tag allocation via `sbitmap_init_node()`)
+3. **`fs_reclaim`** - if memory reclaim is triggered while
+   `pcpu_alloc_mutex` is held, and the queue is frozen, forward progress
+   is blocked
+
+The fix pre-allocates tagset tags **before** freezing the queue, then
+installs them after freeze. This breaks the circular dependency.
+
+### Bug severity and evidence
+
+- **Lockdep splat**: Reported with a concrete lockdep trace by Yi Zhang
+  (Red Hat)
+- **Tested-by**: The reporter confirmed the fix works
+- **Multiple reviews**: Ming Lei, Yu Kuai, and Jens Axboe (block layer
+  maintainer) all reviewed/signed off
+- **Block layer core path**: `blk_mq_update_nr_hw_queues()` is called by
+  many storage drivers (NVMe, SCSI, etc.) during hardware queue
+  reconfiguration
+- **Deadlock type**: Not a mere theoretical concern - lockdep actually
+  fired, indicating the lock ordering violation is real
+
+### Dependency analysis - CRITICAL ISSUE
+
+The commit's diff is entangled with a **long chain of prerequisite
+commits** that heavily restructured `__blk_mq_update_nr_hw_queues()`:
+
+| Commit | Description | First in |
+|--------|-------------|----------|
+| `596dce110b7d` | simplify elevator reattachment | v6.16-rc1 |
+| `2d8951aee844` | unfreeze queue if realloc fails | v6.16-rc1 |
+| `5989bfe6ac6b` | restore two stage elevator switch | v6.17-rc1 |
+| `04225d13aef1` | fix deadlock (sched_tags outside freeze) | v6.17-rc1
+|
+| `2d82f3bd8910` | fix lockdep warning | v6.17-rc3 |
+
+The function in **v6.12** (latest stable tree) looks completely
+different:
+- v6.12: freezes queues first, then calls
+  `blk_mq_realloc_tag_set_tags()` inside the frozen state
+- v7.0 (this commit): has batch sched allocation, restructured elevator
+  switching, new flow
+
+The **underlying bug** (allocating tags with `GFP_KERNEL` while queues
+are frozen → `pcpu_alloc_mutex` inside freeze) **exists in all stable
+kernels**. In v6.12, `blk_mq_realloc_tag_set_tags()` is called at line
+4818, well inside the freeze started at line 4803.
+
+However, this exact patch **will not apply** to any current stable tree
+without significant rework due to the restructured function flow (the
+`blk_mq_alloc_sched_ctx_batch`, `blk_mq_alloc_sched_res_batch`, and the
+new elevator switching pattern all don't exist in stable).
+
+### Scope and risk
+
+- **Files changed**: 1 (block/blk-mq.c)
+- **Lines changed**: +30/-15 (net diff), but significant structural
+  refactoring of two functions
+- **Risk**: Moderate - the core logic is sound and well-reviewed, but a
+  backport would require crafting a simpler version for the older code
+
+### Verification
+
+- `git show 539d1b47e935` confirmed the upstream commit exists and
+  matches
+- `git describe --contains 539d1b47e935` → v7.0-rc3 (very recent)
+- `git show v6.12:block/blk-mq.c` verified the v6.12 function structure
+  differs significantly (freeze before realloc at line 4803-4818)
+- `git describe --contains` for prerequisites confirmed they are all
+  v6.16+ or v6.17+ (not in any stable tree)
+- `git show v6.12:block/blk-mq.c | sed -n '4474,4510p'` confirmed the
+  old `blk_mq_realloc_tag_set_tags` function matches the "before"
+  version in the diff
+- The lore.kernel.org link in the commit references a real lockdep splat
+  report
+- Traced the allocation chain: `blk_mq_alloc_map_and_rqs` →
+  `sbitmap_queue_init_node` → `alloc_percpu_gfp` → `pcpu_alloc_mutex`
+  (verified via agent analysis of sbitmap.c)
+- Could NOT verify whether a simplified backport has been prepared
+  separately (unverified)
+
+### Decision rationale
+
+This is a real deadlock fix in core block layer infrastructure, reported
+with concrete lockdep evidence, well-reviewed, and tested. The bug
+affects all stable kernels. Despite the dependency chain making the
+exact diff incompatible with current stable trees, the fix warrants
+backporting - either via this commit with its prerequisite chain, or via
+a simplified targeted backport. The deadlock involves the per-cpu
+allocator mutex and queue freeze lock, which can cause system hangs
+during NVMe/SCSI hardware reconfiguration events that are common in
+production.
+
+**YES**
+
+ block/blk-mq.c | 45 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 30 insertions(+), 15 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 968699277c3d5..3b58dd5876114 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4778,38 +4778,45 @@ static void blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ 	}
+ }
+ 
+-static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
+-				       int new_nr_hw_queues)
++static struct blk_mq_tags **blk_mq_prealloc_tag_set_tags(
++				struct blk_mq_tag_set *set,
++				int new_nr_hw_queues)
+ {
+ 	struct blk_mq_tags **new_tags;
+ 	int i;
+ 
+ 	if (set->nr_hw_queues >= new_nr_hw_queues)
+-		goto done;
++		return NULL;
+ 
+ 	new_tags = kcalloc_node(new_nr_hw_queues, sizeof(struct blk_mq_tags *),
+ 				GFP_KERNEL, set->numa_node);
+ 	if (!new_tags)
+-		return -ENOMEM;
++		return ERR_PTR(-ENOMEM);
+ 
+ 	if (set->tags)
+ 		memcpy(new_tags, set->tags, set->nr_hw_queues *
+ 		       sizeof(*set->tags));
+-	kfree(set->tags);
+-	set->tags = new_tags;
+ 
+ 	for (i = set->nr_hw_queues; i < new_nr_hw_queues; i++) {
+-		if (!__blk_mq_alloc_map_and_rqs(set, i)) {
+-			while (--i >= set->nr_hw_queues)
+-				__blk_mq_free_map_and_rqs(set, i);
+-			return -ENOMEM;
++		if (blk_mq_is_shared_tags(set->flags)) {
++			new_tags[i] = set->shared_tags;
++		} else {
++			new_tags[i] = blk_mq_alloc_map_and_rqs(set, i,
++					set->queue_depth);
++			if (!new_tags[i])
++				goto out_unwind;
+ 		}
+ 		cond_resched();
+ 	}
+ 
+-done:
+-	set->nr_hw_queues = new_nr_hw_queues;
+-	return 0;
++	return new_tags;
++out_unwind:
++	while (--i >= set->nr_hw_queues) {
++		if (!blk_mq_is_shared_tags(set->flags))
++			blk_mq_free_map_and_rqs(set, new_tags[i], i);
++	}
++	kfree(new_tags);
++	return ERR_PTR(-ENOMEM);
+ }
+ 
+ /*
+@@ -5093,6 +5100,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	unsigned int memflags;
+ 	int i;
+ 	struct xarray elv_tbl;
++	struct blk_mq_tags **new_tags;
+ 	bool queues_frozen = false;
+ 
+ 	lockdep_assert_held(&set->tag_list_lock);
+@@ -5127,11 +5135,18 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		if (blk_mq_elv_switch_none(q, &elv_tbl))
+ 			goto switch_back;
+ 
++	new_tags = blk_mq_prealloc_tag_set_tags(set, nr_hw_queues);
++	if (IS_ERR(new_tags))
++		goto switch_back;
++
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+ 		blk_mq_freeze_queue_nomemsave(q);
+ 	queues_frozen = true;
+-	if (blk_mq_realloc_tag_set_tags(set, nr_hw_queues) < 0)
+-		goto switch_back;
++	if (new_tags) {
++		kfree(set->tags);
++		set->tags = new_tags;
++	}
++	set->nr_hw_queues = nr_hw_queues;
+ 
+ fallback:
+ 	blk_mq_update_queue_map(set);
+-- 
+2.51.0
+
