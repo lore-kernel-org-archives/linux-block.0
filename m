@@ -1,135 +1,87 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214983C1F
-	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 00:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C01175A78
+	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 01:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773100955; cv=none; b=UB3KgcQBCZJwsxb3eA5SXoHdsyih3eSIQyACuhd69A2/fSVEId2TFxS2Sn2QpVIx/AJixlow+11vOryfKZYnqdzUGTpPBZYFuesxLRXBzPNgutVI9jnn4A7YCuJRh8FGsTRYCvA3SUdutji7fkn2qV6+zGMQnyieHwnWtTpHzRE=
+	t=1773104724; cv=none; b=m1iQajV85GnawXhhnql5Cpo+UiqWydknCia7cYbD+pGsYgTXfj8Rp1IrpbGN/wWE2eKD6ggtniMG6iJt/C3MrnXAO5FxMkPGjUhascSTxE/0zDSndkumCyHMjICuqOJwJrykA92yipDDABFSwJ5nn809s4spZHKX43D6+OXE3gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773100955; c=relaxed/simple;
-	bh=6Vofe/6ZWdzfe1bQhwcok7tc5hua1lVSK0g1U2J3b8Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=erdNGP/dLV7vptnTHabZ1pqHL9BvOsAvc5bs2Zvkr9kXHfyaA/wr0q+yugdC0WwDA+PD75xCpRiQSXKsS+z5q1Yx2xec5bjOmoxs69S+uZWJ4cmKjo9QZb3KYo9XrE00GkTK02EtqkvfXlhgWf7A/l6p94RgmTMUytQvbVaCnbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b9358dd7f79so969198066b.1
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 17:02:33 -0700 (PDT)
+	s=arc-20240116; t=1773104724; c=relaxed/simple;
+	bh=Hugvm+jxoXh6V7xQSyCucuJEOioP7jRP7KQYsVJdP1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=spCiPl2uNXo80l5SmmzQxa2SRCqvMYSrB96QyN82tTiaBzK+zpTEskVQsvU14H9fAshgSOohoJ045mIkm6NP7OqLBvGpEQu8XP7P0c5xdZtM0n1HsVazKjmv6IAqXXFPaaWkA/Alb10/NB21BgRw5psPBL5n9n+KQO3IPZ7uNuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=I3M+IGnX; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="I3M+IGnX"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c6dd5b01e14so4200583a12.0
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 18:05:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1773104719; x=1773709519; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JgIuGkK661WhUgAcGq5SdhS/TWkxB+zDVtaAdBFj00A=;
+        b=I3M+IGnXxHdUJdwYq8QV/HnI8rOCEYmiyoP66s+APys8PrscKFQsKhG+7+/qrtyuHh
+         m1Gd+6M4I6PowcoW0eYQpDJHGX+0Elv5CDN5oqC70zyZw1EuSsfm+zh5RX8cfuujMvrJ
+         S+Olt5oFoG1vVoM02q2HCgA57S4on9WfLQJUs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773100952; x=1773705752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wUJ62UzriDRExITrg9iBzNvEWYzDINBTrPfASD/nLws=;
-        b=u056Px5jtq44HQqVF1JxAmqJpormOientetsUBiU6KcEAwr+9DzuflNLurOvg134ww
-         fQQo9YWC43psfphKubiypwBljvuR/X8gcUfkDYbGsr1Ma34/itHgK4kVAR3H7XoR4tPq
-         rGWPQ/B89lK8gFVnrKj3Pn/yBbTv5r9d+2sS3JGH4IN/Xx0ZOqZdoe4XZeZMTpVWbTJW
-         foEVbl+L78WDkSdyY2SML89Fbl3h3B/GTsJsPaaJy1hip9yYl38RWHbq53jIlz0IC6ig
-         TTxyf3nIOWlQkziT7Vmv+EHgrCvLCuk6y/Apq0OtSEHc1Kg3bP/RQ1wbaNBSqv7Wtdn7
-         kT+w==
-X-Forwarded-Encrypted: i=1; AJvYcCXrfV4jfLIEZ4+hAkYQvdZenRUn/tfdVSkFd38uCiA7ZCiBWApHe31gG1VYpbWbWWGeQJ4OvRNGtI+U6Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBplruSwM+wFzbkhOn9UiYtYY/v+gPPdApWi6oCais28JGqIQ+
-	qrvieDs7GAZJbU5j2ouNOHr0ZUzO4pNbjtsvJ+5IJjn75CJKT3hBPdUsTMMV0CSBf2+v5For
-X-Gm-Gg: ATEYQzyAOLxOMX8uJRaG5h67v4h+DJN/TZFNbPxWqAMxJh80WRPR/vHQaAaSIelkG1O
-	fLIlCSkyFYxzqLZue51o5IgsXyiSb5Pe9pnMKf5D/8p9gBTjqht/kkI9p41JjY2aPkhrt2Hx+6y
-	UPbNwRvbXZcEzELo+VVwTtY0WhKvXPv4MEjMgiFanWO7ntAv4vJxuTzDT3pM0LRtZDil4LlVlFp
-	y2ASGx+AuXPrspAgxjuCWK/jfk4kbLBexHsWduhSUDaR/mzbRnj8SFMvN+yoCdIb5XbMxPdFGUh
-	gDoCzcxeDorLiw6UJCz3OY0qvI2ymb7ImMs0dRRCGyAc3006XS18GiHQjT8Ju7axN6tMeIdPwdd
-	B7pne5ZR5eUAmZCwLZ+/8hrH1m/dVr/4dXMVqNix8UTL7ro9kT7RGc1tyyTZgBy/sLguxqgDJMy
-	HemooQtoZ2nK5cRC2eTk+PMoE574KVPigEYXf0GRC26X5aUnoKVXZz/AQ=
-X-Received: by 2002:a17:907:3d89:b0:b8e:5e2:79fc with SMTP id a640c23a62f3a-b942dba6626mr744267166b.14.1773100952182;
-        Mon, 09 Mar 2026 17:02:32 -0700 (PDT)
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b942f189de1sm424918466b.63.2026.03.09.17.02.31
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Mar 2026 17:02:31 -0700 (PDT)
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-661b16ac011so5723585a12.2
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 17:02:31 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXY0EEiJsdMAr2Pjjblk2H/uslloXmZalo2FWyzUoNRmudcdeDK8bqGT27qIgGSfWI6Tgd9DIurxz8fMg==@vger.kernel.org
-X-Received: by 2002:a05:6000:144b:b0:439:ac33:5082 with SMTP id
- ffacd0b85a97d-439da66b72cmr23928350f8f.26.1773100503051; Mon, 09 Mar 2026
- 16:55:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1773104719; x=1773709519;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JgIuGkK661WhUgAcGq5SdhS/TWkxB+zDVtaAdBFj00A=;
+        b=enfqXggI+54+JHRBschJWHfTxbIl6+BXRKex9EnuGPJ7GzGAA7unQjUxJsM0wqEj7r
+         2r74LLqq6NzUWaWNe9Yt/+kLiZZAhOMqMnRdpiKorqrRtE8x4iaEAQDomLpsyH677Ugv
+         7EDnvvhj+pdqluVmlMU6kCIIDR38fIE3XGEwqrpS0dLJQnkevk5v49zQBb/t80jJTRRn
+         IXalHK65IiZ6rOq3gmu7rvwDbcKX+I4PYdhw2ovKkkxBlhcIpZEpxvXvQ8ExvYw2fBXl
+         ByjHHXh0+0s57K0lCqQXV+if1hDEFQS4OM7ST4JKNdnaaCMrWHTuCeJuWJh1HpkIDJ1P
+         xJbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVF+j4F3+iN52/IHIMIPVzm3xh0pLigCjo6OXab6uT8pA/UYZAg74CEEtOst58L5+Rml/8AwDJvI4LvtA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeyQwKWPKvx4vl/F43sk6ebvU/+rGsfAzVLpPGQUtU7El9ezxn
+	cUCLjW9xycQdlG6tetboh4dF7TBoApM4ThboIzhGuOvcU7afDO4yNaB9yihp8nCV5g==
+X-Gm-Gg: ATEYQzzkACXfRfya+2fx5k+NEzGCIYStMDsV8AEkm3/YlsJ57M1LqJ6dz6Vo55R2agr
+	R1RQVpaGOyNvlGSt1TGNzWTU1CnhjyDgaY3n64xv/o2SxntFOQjdFSCxMoHKsREX2Efab1uPt0b
+	zIDp6P2I0IbM/LDcRH73hMwqAbaMLfN7QugNy3i1XdDsIUBlMrxW/yUeOV/C8E8QawarZP5Dv63
+	DEEDLsGKw0mHF2wmLRrh7C6QRWe799dYJ3w1LNy0XuMbJye/wfcyJODiYzDkBMNQwZsuSinj6lA
+	1H/5n20R7euYbGa6yBkqwjVwzR1HUKjqmJFXfaYlsmB/xkIhmCYBANPQzhZr7LLQKhIurzFmm8n
+	lNP1Ynxhbc0ij8428dpBiKn5JJ+QWRRsC1BbASM0YF7A0O3Vb205sdchGMMcs82+77GP6IS69lZ
+	Y6KHRS9OgGwrcc00xCn9Xn1TFIdVFKiuhLUcrnFokbZi67WEnFAFlEbzzvdq+UWrc=
+X-Received: by 2002:a17:903:32ca:b0:2ae:63bf:29ac with SMTP id d9443c01a7336-2ae8252fedfmr121738655ad.44.1773104718749;
+        Mon, 09 Mar 2026 18:05:18 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:5620:959c:240f:eb2a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f77350sm145552475ad.51.2026.03.09.18.05.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 18:05:18 -0700 (PDT)
+Date: Tue, 10 Mar 2026 10:05:15 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: linjh22s@gmail.com
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH RFC v2 3/5] zram: Introduce zcomp-managed streams
+Message-ID: <aa9tz-EIh7kOF3RM@google.com>
+References: <20260309-b4_zcomp_stream-v2-0-7148622326eb@gmail.com>
+ <20260309-b4_zcomp_stream-v2-3-7148622326eb@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309062840.2937858-2-iam@sung-woo.kim> <CADUfDZorSQCVtQyfjBuaziwG2Jo28yZiiqLKbp9PkFFw-9VgfQ@mail.gmail.com>
-In-Reply-To: <CADUfDZorSQCVtQyfjBuaziwG2Jo28yZiiqLKbp9PkFFw-9VgfQ@mail.gmail.com>
-From: Sungwoo Kim <iam@sung-woo.kim>
-Date: Mon, 9 Mar 2026 19:54:47 -0400
-X-Gmail-Original-Message-ID: <CAJNyHp+i3M_ko7rhgTz=nxP=MZYM3oQf3L-y=7YnhnRyeUxayA@mail.gmail.com>
-X-Gm-Features: AaiRm53vE5uEinTHUYE1aa6bIvdkwyOpz0dn9fOlsjLR4PN8Z_3w05vllGJ47mw
-Message-ID: <CAJNyHp+i3M_ko7rhgTz=nxP=MZYM3oQf3L-y=7YnhnRyeUxayA@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: nvme: Fix general protection fault in nvme_setup_descriptor_pools()
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>, 
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Richard Weinberger <richard@nod.at>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
-	Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>, 
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	Sagi Grimberg <sagi@grimberg.me>, James Smart <james.smart@broadcom.com>, 
-	Chaitanya Kulkarni <kch@nvidia.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Chao Shi <cshi008@fiu.edu>, 
-	Weidong Zhu <weizhu@fiu.edu>, Dave Tian <daveti@purdue.edu>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, linux-mmc@vger.kernel.org, 
-	linux-mtd@lists.infradead.org, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-nvme@lists.infradead.org, 
-	linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260309-b4_zcomp_stream-v2-3-7148622326eb@gmail.com>
 
-On Mon, Mar 9, 2026 at 11:31=E2=80=AFAM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
->
-> On Sun, Mar 8, 2026 at 11:30=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wr=
-ote:
-> >
-> > The numa_node can be < 0 since NUMA_NO_NODE =3D -1. However,
-> > struct blk_mq_hw_ctx{} defines numa_node as unsigned int. As a result,
-> > numa_node is set to UINT_MAX for NUMA_NO_NODE in blk_mq_alloc_hctx().
->
-> The node argument to blk_mq_alloc_hctx() comes from
-> blk_mq_alloc_and_init_hctx(), which is called by
-> blk_mq_alloc_and_init_hctx() with int node =3D blk_mq_get_hctx_node(set,
-> i). node =3D NUMA_NO_NODE would suggest that blk_mq_hw_queue_to_node()
-> doesn't find any CPU affinitized to the queue. Is that even possible?
+Hi Jihan,
 
-Thanks for your review, Celeb.
+On (26/03/09 12:23), Jihan LIN via B4 Relay wrote:
+> From: Jihan LIN <linjh22s@gmail.com>
+> 
+> Currently, zcomp uses a per-CPU stream model. This design is restrictive
+> for hardware-accelerated or batched zcomp backends.
 
-blk_mq_hw_queue_to_node() can return NUMA_NO_NODE if the device queues
-exceed the
-number of CPUs. Afterward, it is adjusted on the caller side to
-numa_node =3D set->numa_node.
-
-set->numa_node can still be NUMA_NO_NODE if CONFIG_NUMA=3Dn (trivial) or
-pcibus_to_node() returns NUMA_NO_NODE if ACPI doesn't provide
-proximity information.
-But I'm not sure if this is usual in the real machines. We found the
-crash in QEMU.
-
-> >  static struct nvme_descriptor_pools *
-> > -nvme_setup_descriptor_pools(struct nvme_dev *dev, unsigned numa_node)
-> > +nvme_setup_descriptor_pools(struct nvme_dev *dev, int numa_node)
-> >  {
-> > -       struct nvme_descriptor_pools *pools =3D &dev->descriptor_pools[=
-numa_node];
-> > +       struct nvme_descriptor_pools *pools;
-> >         size_t small_align =3D NVME_SMALL_POOL_SIZE;
-> >
-> > +       if (numa_node =3D=3D NUMA_NO_NODE)
-> > +               pools =3D &dev->descriptor_pools[numa_node_id()];
-> > +       else
-> > +               pools =3D &dev->descriptor_pools[numa_node];
->
-> Simpler: if (numa_node =3D=3D NUMA_NO_NODE) numa_node =3D numa_node_id();
->
-
-Thanks, I will modify it in V2.
-
-Sungwoo.
+zcomp doesn't support hardware-accelerated compression, and that's
+why we plan to delete zcomp API sometime this year and switch to a
+acomp crypto API instead.  Does crypto API address your use case?
