@@ -1,133 +1,92 @@
-Received: from mta22.hihonor.com (mta22.honor.com [81.70.192.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E013A452A;
-	Tue, 10 Mar 2026 03:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.192.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2626284881
+	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 05:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773112279; cv=none; b=pHyIjM3vocjs0ZlycTttPiw+mJuDZUF3+pjKLbpjKIhc1jxZ+cPe756Anfwh/ER9LdhsuTfIE/uXlQVG46G1jH65G4LDYs+lnTGA5Ll4dD2kJE3uZD6Htjhslhi8RDWqznCDn2JLb1p2DxbF3ij/24VdHD+D8YsPcPWEGB/G03A=
+	t=1773121185; cv=none; b=tzBwRfCwojQFcWGF4xztfQiwvT7piQtnq1e4V3lWehhNWBj1oEjTYWpFEa+KRTXrJm6Fj66QS739bx9YhxAs0EpICDKK9ybK5eeth2eFIiSdrn5yVoIIdFOfbm6/4Za4GB/vR4JKVXIaRL0pqWba1x0MnxpWttkAcS9iglk3HNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773112279; c=relaxed/simple;
-	bh=FrTNU9QqEgBesd8LSr5+k82rHCLewAx1intBK2YmK6g=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HBLphpP8DclvwlTm6Bp7ZYlT4FDV3z/EsRlIe5paAGYxCXumnTMJ7EwragsB3wVcui9O6aV8KrjxHEqV2ugWt5ZhzGdAs/sWTnsU2XeqSOhqTFYelCpXPn2dee9blZSN7YHejasmjnfIPa8R6OJMy3xtp21Voj5PVeOMVtz6v5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; dkim=pass (1024-bit key) header.d=honor.com header.i=@honor.com header.b=O6hIAe4b; arc=none smtp.client-ip=81.70.192.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
+	s=arc-20240116; t=1773121185; c=relaxed/simple;
+	bh=nB9xIMLjhF/iaWa4zTIp5oFpdXpCe7lSh9rcsGcI/uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s80od2xgeSuzStjG7ThN1mPWx1fU1MoSKfhK4Sy6u+kmoVWEGLyaiqYL5ZaXfreECjD1T/i9PDedsz5NMmFTd3dbb6Bdl8j7pPfTquvlerGpWoQalGZ91vm4QgdBZGPa6UeJ+cL/xlIEO1MEArFUI8e2Vf1j41GtP7SCWhFFdek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Op3OaI6/; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=honor.com header.i=@honor.com header.b="O6hIAe4b"
-dkim-signature: v=1; a=rsa-sha256; d=honor.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=To:From;
-	bh=FrTNU9QqEgBesd8LSr5+k82rHCLewAx1intBK2YmK6g=;
-	b=O6hIAe4bM3UFlR0SP9ukVwhhb4+Cobwzxc3oWuB0dcL2U17AC8vuEtixh/aHNpXoJaEhJTUnX
-	BLFbkqtpreB2+0as7q1thbpRHf2P91auLJ0kLFxVeoAjP9EyoA3rAuSBdYXDrtgVXI5XFDhe7fr
-	wtNIzE8LKTjCvEDu1Bf7ewM=
-Received: from w012.hihonor.com (unknown [10.68.27.189])
-	by mta22.hihonor.com (SkyGuard) with ESMTPS id 4fVJKR5nmnzYlkpW;
-	Tue, 10 Mar 2026 10:50:51 +0800 (CST)
-Received: from a001.hihonor.com (10.68.28.182) by w012.hihonor.com
- (10.68.27.189) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Tue, 10 Mar
- 2026 10:54:21 +0800
-Received: from a008.hihonor.com (10.68.30.56) by a001.hihonor.com
- (10.68.28.182) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Tue, 10 Mar
- 2026 10:54:21 +0800
-Received: from a008.hihonor.com ([fe80::b6bf:fc6a:207:6851]) by
- a008.hihonor.com ([fe80::b6bf:fc6a:207:6851%6]) with mapi id 15.02.2562.027;
- Tue, 10 Mar 2026 10:54:21 +0800
-From: gao xu <gaoxu2@honor.com>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-CC: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>,
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Op3OaI6/"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c73aabd620bso1686684a12.1
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 22:39:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1773121183; x=1773725983; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HvRlyDyTSjBWwIiXQKIbLdkGLZLef1DOzpb4yqLasSE=;
+        b=Op3OaI6/2R8eSi9EDq7nQmQUEkTL+oFWvS9zsm5TEdlMRfyo9S3p2K4TMygMRL2Oq7
+         igDCgfdsOsVThny6nDHScjnxV7+RxwDVwPAup+Xc3uEoZ9UEAP331Cgg5kvXAn1ITx47
+         Uu2UzP9lU24LpBj30EwEg0wNXdRPjwTDKF/u8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773121183; x=1773725983;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HvRlyDyTSjBWwIiXQKIbLdkGLZLef1DOzpb4yqLasSE=;
+        b=xDTapCUE6JjryFv2RYd1hiRhlEBU576iqJiv+z9vyZ5ymjQKzZyk8HzItAC/3PWdVy
+         bK0hPHKBu9+mpaien2IatgxpMem/S37x4W7m3aUAyX4jPD7xpVwHlovwRtmjRZ+SvZq3
+         0UpyPsx36mZNOZCiX3Tqg/fQJFXX5v212rDa0LY145yQaZq/klQWhwy+fnJ2G4PgET3j
+         /KWfqhLbLaEavSHBT09ZYGVsMBmBIy87THQRrJ6TuQMA/AkNbJrFjBs0bEQTsKytKvsL
+         QtsXfimRpCcUk48nho9GQ3snVX26wXejprMJFLwlFHTQBhqALGU2fA6ERfZDPaKF+pMt
+         3kTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhkJCN36ILQacrUwnVbdZVmJgUWXRvfVb6Lxh5EA6bh7kcV4feQM6MzCGiIPLhAAu8gkL28L6sjE/g4w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfV+5LM5+xgephmFb6H5YhoLbORxpvcQMVHpVTplR3aHNjdHgX
+	I9cZtRO8xBOGYN8ODKrf9+9qnqAJc4KAkn7a4Blag5ovqcRABQgaL1nEMD+wOtOscg==
+X-Gm-Gg: ATEYQzwe774E7oXGdgHjS7fEhivvLHaDvEmicfirI6w1WNQMjxG0o3uKr6QXqAloj+j
+	JN+e71lpgDu4Cr3NDuznHZYafn6KMe25BcUuS6YA/1Hyf68yOMrjyx9YBVqfey8oJvesy3ev5iU
+	ylMhnm5KnPyEYOPqNcMIImqhX9Rlilf5Xaduw8WUoXI6ivOgD/pkXkQCluH1aKFTnTm0QUjfpW/
+	K0sDAHpIsc1rh66vbpIfnXWw1ARXIWgJ4LFrpMZXyQhTEKCxU9gw3HZpYQ67yIHS5ps0cL5YP0a
+	e6oO0CLID2fxraQg1PDri7zyhQGkyZ3XXs8eJikM7idhX80A26OmUl5Ex9AZH5DTl0rfL1+ztZM
+	m6noEqFQgLPcmtr8DwOTMTWmgPFKz3pHiVO8jy/+3b9K0D+wFvyRDBp9TxUKz7GFy7Q9JsPsRm8
+	DBLn4TDbTcyJlt/S4tZOvZtzpUvux3Q66Wp0nJUxm5lZuXukB1/b1yt4ahBdM7gJA=
+X-Received: by 2002:a05:6a21:6f16:b0:393:dc6b:a0eb with SMTP id adf61e73a8af0-398590d6298mr13032783637.64.1773121183093;
+        Mon, 09 Mar 2026 22:39:43 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:5620:959c:240f:eb2a])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c739e170c87sm11446175a12.18.2026.03.09.22.39.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 22:39:42 -0700 (PDT)
+Date: Tue, 10 Mar 2026 14:39:39 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: gao xu <gaoxu2@honor.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>, 
 	zhouxiaolong <zhouxiaolong9@honor.com>
-Subject: zram: Optimize LZ4 dictionary compression performance
-Thread-Topic: zram: Optimize LZ4 dictionary compression performance
-Thread-Index: AdywM2pDLIO0gp5TQXuJ4OQmnHDBWQ==
-Date: Tue, 10 Mar 2026 02:54:20 +0000
-Message-ID: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Subject: Re: zram: Optimize LZ4 dictionary compression performance
+Message-ID: <aa-ucbuYGj-sZylm@google.com>
+References: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
 
-Q2FsbGluZyBgTFo0X2xvYWREaWN0KClgIHJlcGVhdGVkbHkgaW4gWnJhbSBjYXVzZXMgc2lnbmlm
-aWNhbnQgb3ZlcmhlYWQNCmR1ZSB0byBpdHMgaW50ZXJuYWwgZGljdGlvbmFyeSBwcmUtcHJvY2Vz
-c2luZy4gVGhpcyBjb21taXQgaW50cm9kdWNlcyBhDQp0ZW1wbGF0ZSBzdHJlYW0gbWVjaGFuaXNt
-IHRvIHByZS1wcm9jZXNzIHRoZSBkaWN0aW9uYXJ5IG9ubHkgb25jZSB3aGVuDQp0aGUgZGljdGlv
-bmFyeSBpcyBpbml0aWFsbHkgc2V0IG9yIG1vZGlmaWVkLiBJdCB0aGVuIGVmZmljaWVudGx5IGNv
-cGllcw0KdGhpcyBzdGF0ZSBmb3Igc3Vic2VxdWVudCBjb21wcmVzc2lvbnMuDQoNClRoaXMgb3B0
-aW1pemF0aW9uIGltcHJvdmVzIExaNCBkaWN0aW9uYXJ5IGNvbXByZXNzaW9uIHBlcmZvcm1hbmNl
-IGJ5DQpvdmVyIDUwJSBpbiBacmFtIEkvTyB0ZXN0cy4NCi0tLQ0KIGRyaXZlcnMvYmxvY2svenJh
-bS9iYWNrZW5kX2x6NC5jIHwgNTUgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCiBk
-cml2ZXJzL2Jsb2NrL3pyYW0vemNvbXAuaCAgICAgICB8ICAxICsNCiBkcml2ZXJzL2Jsb2NrL3py
-YW0venJhbV9kcnYuYyAgICB8ICAxICsNCiAzIGZpbGVzIGNoYW5nZWQsIDU0IGluc2VydGlvbnMo
-KyksIDMgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL3pyYW0vYmFj
-a2VuZF9sejQuYyBiL2RyaXZlcnMvYmxvY2svenJhbS9iYWNrZW5kX2x6NC5jDQppbmRleCAwNGUx
-ODY2MTQuLmIzNTNmNzRhOCAxMDA2NDQNCi0tLSBhL2RyaXZlcnMvYmxvY2svenJhbS9iYWNrZW5k
-X2x6NC5jDQorKysgYi9kcml2ZXJzL2Jsb2NrL3pyYW0vYmFja2VuZF9sejQuYw0KQEAgLTEyLDE1
-ICsxMiwzNiBAQCBzdHJ1Y3QgbHo0X2N0eCB7DQogCUxaNF9zdHJlYW1fdCAqY3N0cm07DQogfTsN
-CiANCitzdHJ1Y3QgbHo0X2RydiB7DQorCS8qIHRlbXBsYXRlIGNvbXByZXNzaW9uIHN0cmVhbSB3
-aXRoIGRpY3Rpb25hcnkgKi8NCisJTFo0X3N0cmVhbV90IGJhc2VfY3N0cmVhbTsNCisJLyogZGlj
-dGlvbmFyeSBpbmRleCBvZiB0aGUgY3VycmVudCB0ZW1wbGF0ZSAqLw0KKwl1MzIgZGljdF9nZW47
-DQorCWJvb2wgYmFzZV9jX3ZhbGlkOw0KK307DQorDQogc3RhdGljIHZvaWQgbHo0X3JlbGVhc2Vf
-cGFyYW1zKHN0cnVjdCB6Y29tcF9wYXJhbXMgKnBhcmFtcykNCiB7DQorCWtmcmVlKHBhcmFtcy0+
-ZHJ2X2RhdGEpOw0KKwlwYXJhbXMtPmRydl9kYXRhID0gTlVMTDsNCiB9DQogDQogc3RhdGljIGlu
-dCBsejRfc2V0dXBfcGFyYW1zKHN0cnVjdCB6Y29tcF9wYXJhbXMgKnBhcmFtcykNCiB7DQorCXN0
-cnVjdCBsejRfZHJ2ICpkcnY7DQorDQogCWlmIChwYXJhbXMtPmxldmVsID09IFpDT01QX1BBUkFN
-X05PVF9TRVQpDQogCQlwYXJhbXMtPmxldmVsID0gTFo0X0FDQ0VMRVJBVElPTl9ERUZBVUxUOw0K
-IA0KKwlkcnYgPSBremFsbG9jX29iaihkcnYsIEdGUF9LRVJORUwpOw0KKwlpZiAoIWRydikNCisJ
-CXJldHVybiAtRU5PTUVNOw0KKw0KKwlkcnYtPmRpY3RfZ2VuID0gMDsNCisJZHJ2LT5iYXNlX2Nf
-dmFsaWQgPSBmYWxzZTsNCisNCisJcGFyYW1zLT5kcnZfZGF0YSA9IGRydjsNCisNCiAJcmV0dXJu
-IDA7DQogfQ0KIA0KQEAgLTY3LDEwICs4OCwzMiBAQCBzdGF0aWMgaW50IGx6NF9jcmVhdGUoc3Ry
-dWN0IHpjb21wX3BhcmFtcyAqcGFyYW1zLCBzdHJ1Y3QgemNvbXBfY3R4ICpjdHgpDQogCXJldHVy
-biAtRU5PTUVNOw0KIH0NCiANCitzdGF0aWMgaW50IGx6NF9idWlsZF9iYXNlX2NzdHJlYW0oc3Ry
-dWN0IHpjb21wX3BhcmFtcyAqcGFyYW1zKQ0KK3sNCisJc3RydWN0IGx6NF9kcnYgKmRydiA9IHBh
-cmFtcy0+ZHJ2X2RhdGE7DQorCWludCByZXQ7DQorDQorCWlmICghcGFyYW1zLT5kaWN0IHx8ICFw
-YXJhbXMtPmRpY3Rfc3opDQorCQlyZXR1cm4gLUVJTlZBTDsNCisNCisJbWVtc2V0KCZkcnYtPmJh
-c2VfY3N0cmVhbSwgMCwgc2l6ZW9mKGRydi0+YmFzZV9jc3RyZWFtKSk7DQorDQorCXJldCA9IExa
-NF9sb2FkRGljdCgmZHJ2LT5iYXNlX2NzdHJlYW0sDQorCQkJICAgcGFyYW1zLT5kaWN0LCBwYXJh
-bXMtPmRpY3Rfc3opOw0KKwlpZiAocmV0ICE9IHBhcmFtcy0+ZGljdF9zeikNCisJCXJldHVybiAt
-RUlOVkFMOw0KKw0KKwlkcnYtPmRpY3RfZ2VuID0gcGFyYW1zLT5kaWN0X2dlbjsNCisJZHJ2LT5i
-YXNlX2NfdmFsaWQgPSB0cnVlOw0KKw0KKwlyZXR1cm4gMDsNCit9DQorDQogc3RhdGljIGludCBs
-ejRfY29tcHJlc3Moc3RydWN0IHpjb21wX3BhcmFtcyAqcGFyYW1zLCBzdHJ1Y3QgemNvbXBfY3R4
-ICpjdHgsDQogCQkJc3RydWN0IHpjb21wX3JlcSAqcmVxKQ0KIHsNCiAJc3RydWN0IGx6NF9jdHgg
-KnpjdHggPSBjdHgtPmNvbnRleHQ7DQorCXN0cnVjdCBsejRfZHJ2ICpkcnYgID0gcGFyYW1zLT5k
-cnZfZGF0YTsNCiAJaW50IHJldDsNCiANCiAJaWYgKCF6Y3R4LT5jc3RybSkgew0KQEAgLTc4LDEw
-ICsxMjEsMTYgQEAgc3RhdGljIGludCBsejRfY29tcHJlc3Moc3RydWN0IHpjb21wX3BhcmFtcyAq
-cGFyYW1zLCBzdHJ1Y3QgemNvbXBfY3R4ICpjdHgsDQogCQkJCQlyZXEtPmRzdF9sZW4sIHBhcmFt
-cy0+bGV2ZWwsDQogCQkJCQl6Y3R4LT5tZW0pOw0KIAl9IGVsc2Ugew0KKwkJLyogcmVidWlsZCBi
-YXNlX2NzdHJlYW0gd2hlbiB0aGUgZGljdGlvbmFyeSBjaGFuZ2VzICovDQorCQlpZiAoIWRydi0+
-YmFzZV9jX3ZhbGlkIHx8IGRydi0+ZGljdF9nZW4gIT0gcGFyYW1zLT5kaWN0X2dlbikgew0KKwkJ
-CXJldCA9IGx6NF9idWlsZF9iYXNlX2NzdHJlYW0ocGFyYW1zKTsNCisJCQlpZiAocmV0KQ0KKwkJ
-CQlyZXR1cm4gcmV0Ow0KKwkJfQ0KKw0KIAkJLyogQ3N0cm0gbmVlZHMgdG8gYmUgcmVzZXQgKi8N
-Ci0JCXJldCA9IExaNF9sb2FkRGljdCh6Y3R4LT5jc3RybSwgcGFyYW1zLT5kaWN0LCBwYXJhbXMt
-PmRpY3Rfc3opOw0KLQkJaWYgKHJldCAhPSBwYXJhbXMtPmRpY3Rfc3opDQotCQkJcmV0dXJuIC1F
-SU5WQUw7DQorCQltZW1jcHkoemN0eC0+Y3N0cm0sICZkcnYtPmJhc2VfY3N0cmVhbSwNCisJCSAg
-IHNpemVvZigqemN0eC0+Y3N0cm0pKTsNCiAJCXJldCA9IExaNF9jb21wcmVzc19mYXN0X2NvbnRp
-bnVlKHpjdHgtPmNzdHJtLCByZXEtPnNyYywNCiAJCQkJCQkgcmVxLT5kc3QsIHJlcS0+c3JjX2xl
-biwNCiAJCQkJCQkgcmVxLT5kc3RfbGVuLCBwYXJhbXMtPmxldmVsKTsNCmRpZmYgLS1naXQgYS9k
-cml2ZXJzL2Jsb2NrL3pyYW0vemNvbXAuaCBiL2RyaXZlcnMvYmxvY2svenJhbS96Y29tcC5oDQpp
-bmRleCBlYWNmZDNmN2QuLjViN2ZmOWZkZCAxMDA2NDQNCi0tLSBhL2RyaXZlcnMvYmxvY2svenJh
-bS96Y29tcC5oDQorKysgYi9kcml2ZXJzL2Jsb2NrL3pyYW0vemNvbXAuaA0KQEAgLTIxLDYgKzIx
-LDcgQEAgc3RydWN0IHpjb21wX3BhcmFtcyB7DQogCXZvaWQgKmRpY3Q7DQogCXNpemVfdCBkaWN0
-X3N6Ow0KIAlzMzIgbGV2ZWw7DQorCXUzMiBkaWN0X2dlbjsNCiAJdW5pb24gew0KIAkJc3RydWN0
-IGRlZmxhdGVfcGFyYW1zIGRlZmxhdGU7DQogCX07DQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9j
-ay96cmFtL3pyYW1fZHJ2LmMgYi9kcml2ZXJzL2Jsb2NrL3pyYW0venJhbV9kcnYuYw0KaW5kZXgg
-YmNhMzM0MDNmLi5mMzRmM2ZhNDMgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL2Jsb2NrL3pyYW0venJh
-bV9kcnYuYw0KKysrIGIvZHJpdmVycy9ibG9jay96cmFtL3pyYW1fZHJ2LmMNCkBAIC0xNzA5LDYg
-KzE3MDksNyBAQCBzdGF0aWMgaW50IGNvbXBfcGFyYW1zX3N0b3JlKHN0cnVjdCB6cmFtICp6cmFt
-LCB1MzIgcHJpbywgczMyIGxldmVsLA0KIAl6cmFtLT5wYXJhbXNbcHJpb10uZGljdF9zeiA9IHN6
-Ow0KIAl6cmFtLT5wYXJhbXNbcHJpb10ubGV2ZWwgPSBsZXZlbDsNCiAJenJhbS0+cGFyYW1zW3By
-aW9dLmRlZmxhdGUud2luYml0cyA9IGRlZmxhdGVfcGFyYW1zLT53aW5iaXRzOw0KKwl6cmFtLT5w
-YXJhbXNbcHJpb10uZGljdF9nZW4rKzsNCiAJcmV0dXJuIDA7DQogfQ0KIA0KLS0NCg==
+On (26/03/10 02:54), gao xu wrote:
+[..]
+> @@ -78,10 +121,16 @@ static int lz4_compress(struct zcomp_params *params, struct zcomp_ctx *ctx,
+>  					req->dst_len, params->level,
+>  					zctx->mem);
+>  	} else {
+> +		/* rebuild base_cstream when the dictionary changes */
+
+How often does it change and under what circumstances?
+
+> +		if (!drv->base_c_valid || drv->dict_gen != params->dict_gen) {
+> +			ret = lz4_build_base_cstream(params);
+> +			if (ret)
+> +				return ret;
+> +		}
