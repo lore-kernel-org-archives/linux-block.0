@@ -1,69 +1,66 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C01175A78
-	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 01:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4323A63EE
+	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 02:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773104724; cv=none; b=m1iQajV85GnawXhhnql5Cpo+UiqWydknCia7cYbD+pGsYgTXfj8Rp1IrpbGN/wWE2eKD6ggtniMG6iJt/C3MrnXAO5FxMkPGjUhascSTxE/0zDSndkumCyHMjICuqOJwJrykA92yipDDABFSwJ5nn809s4spZHKX43D6+OXE3gE=
+	t=1773110466; cv=none; b=KVV50btiD+m/aPctJr7X+SgzIZw/FO9BhyqbqdLw4pwETGR2hEaMf57xwEfT7WuElX6Gpccx6AP31Z50z0EBhw1wf0MoF6lQCK1bfQMNb7Yv05Sp00fJVZb+6aTDJOisCxFbhfwgmrXunPFVHMY9jomC2YMQekzEIPYVXOqIrTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773104724; c=relaxed/simple;
-	bh=Hugvm+jxoXh6V7xQSyCucuJEOioP7jRP7KQYsVJdP1Q=;
+	s=arc-20240116; t=1773110466; c=relaxed/simple;
+	bh=LRcLLBHRU5GLCzyUqdv3jNI81HpymoQj00jKeO2lTzY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=spCiPl2uNXo80l5SmmzQxa2SRCqvMYSrB96QyN82tTiaBzK+zpTEskVQsvU14H9fAshgSOohoJ045mIkm6NP7OqLBvGpEQu8XP7P0c5xdZtM0n1HsVazKjmv6IAqXXFPaaWkA/Alb10/NB21BgRw5psPBL5n9n+KQO3IPZ7uNuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=I3M+IGnX; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=sckr0r8A+g7Alhg7WWJXc0wfXDhAPAKx/+VZjFTboOAu/NZlnkwnMMWaOL5qO/pDwpcomVAv8ZKIot4dzWloI7zuRHdjnELhhqpzEyflzmmBa7uQWW3jTnk6ch1dxfyi6a4ZK+sKXZ+FXaQxZmDgQFi57d01keBO7G1ySs/LWbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cKtIWhno; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="I3M+IGnX"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c6dd5b01e14so4200583a12.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 18:05:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1773104719; x=1773709519; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JgIuGkK661WhUgAcGq5SdhS/TWkxB+zDVtaAdBFj00A=;
-        b=I3M+IGnXxHdUJdwYq8QV/HnI8rOCEYmiyoP66s+APys8PrscKFQsKhG+7+/qrtyuHh
-         m1Gd+6M4I6PowcoW0eYQpDJHGX+0Elv5CDN5oqC70zyZw1EuSsfm+zh5RX8cfuujMvrJ
-         S+Olt5oFoG1vVoM02q2HCgA57S4on9WfLQJUs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773104719; x=1773709519;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JgIuGkK661WhUgAcGq5SdhS/TWkxB+zDVtaAdBFj00A=;
-        b=enfqXggI+54+JHRBschJWHfTxbIl6+BXRKex9EnuGPJ7GzGAA7unQjUxJsM0wqEj7r
-         2r74LLqq6NzUWaWNe9Yt/+kLiZZAhOMqMnRdpiKorqrRtE8x4iaEAQDomLpsyH677Ugv
-         7EDnvvhj+pdqluVmlMU6kCIIDR38fIE3XGEwqrpS0dLJQnkevk5v49zQBb/t80jJTRRn
-         IXalHK65IiZ6rOq3gmu7rvwDbcKX+I4PYdhw2ovKkkxBlhcIpZEpxvXvQ8ExvYw2fBXl
-         ByjHHXh0+0s57K0lCqQXV+if1hDEFQS4OM7ST4JKNdnaaCMrWHTuCeJuWJh1HpkIDJ1P
-         xJbw==
-X-Forwarded-Encrypted: i=1; AJvYcCVF+j4F3+iN52/IHIMIPVzm3xh0pLigCjo6OXab6uT8pA/UYZAg74CEEtOst58L5+Rml/8AwDJvI4LvtA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeyQwKWPKvx4vl/F43sk6ebvU/+rGsfAzVLpPGQUtU7El9ezxn
-	cUCLjW9xycQdlG6tetboh4dF7TBoApM4ThboIzhGuOvcU7afDO4yNaB9yihp8nCV5g==
-X-Gm-Gg: ATEYQzzkACXfRfya+2fx5k+NEzGCIYStMDsV8AEkm3/YlsJ57M1LqJ6dz6Vo55R2agr
-	R1RQVpaGOyNvlGSt1TGNzWTU1CnhjyDgaY3n64xv/o2SxntFOQjdFSCxMoHKsREX2Efab1uPt0b
-	zIDp6P2I0IbM/LDcRH73hMwqAbaMLfN7QugNy3i1XdDsIUBlMrxW/yUeOV/C8E8QawarZP5Dv63
-	DEEDLsGKw0mHF2wmLRrh7C6QRWe799dYJ3w1LNy0XuMbJye/wfcyJODiYzDkBMNQwZsuSinj6lA
-	1H/5n20R7euYbGa6yBkqwjVwzR1HUKjqmJFXfaYlsmB/xkIhmCYBANPQzhZr7LLQKhIurzFmm8n
-	lNP1Ynxhbc0ij8428dpBiKn5JJ+QWRRsC1BbASM0YF7A0O3Vb205sdchGMMcs82+77GP6IS69lZ
-	Y6KHRS9OgGwrcc00xCn9Xn1TFIdVFKiuhLUcrnFokbZi67WEnFAFlEbzzvdq+UWrc=
-X-Received: by 2002:a17:903:32ca:b0:2ae:63bf:29ac with SMTP id d9443c01a7336-2ae8252fedfmr121738655ad.44.1773104718749;
-        Mon, 09 Mar 2026 18:05:18 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:5620:959c:240f:eb2a])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83f77350sm145552475ad.51.2026.03.09.18.05.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 18:05:18 -0700 (PDT)
-Date: Tue, 10 Mar 2026 10:05:15 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: linjh22s@gmail.com
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC v2 3/5] zram: Introduce zcomp-managed streams
-Message-ID: <aa9tz-EIh7kOF3RM@google.com>
-References: <20260309-b4_zcomp_stream-v2-0-7148622326eb@gmail.com>
- <20260309-b4_zcomp_stream-v2-3-7148622326eb@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cKtIWhno"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773110463;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tAGewiFPK0elo/WiSxOjUP/dvI4PkKIm5cf5C8uZl1U=;
+	b=cKtIWhnoVW949nbtfAYkCsECxsz2foOo0BgCfTpwKGaAxAPJrALLggjo+hSmEwAZggiI1t
+	VdeDdZ0zACpGfHDk8LbwGG01mS/wtGu+WstwX825UiulbeX2AcmitgeZdA6WYQOqMHcUJ3
+	We70PpammDGERWeaqtunAXUS6BL7lI8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-175-b1Rn-TQjPs--YYd2Ud5OpQ-1; Mon,
+ 09 Mar 2026 22:41:00 -0400
+X-MC-Unique: b1Rn-TQjPs--YYd2Ud5OpQ-1
+X-Mimecast-MFC-AGG-ID: b1Rn-TQjPs--YYd2Ud5OpQ_1773110458
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D3EC180034E;
+	Tue, 10 Mar 2026 02:40:57 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D52B195410D;
+	Tue, 10 Mar 2026 02:40:55 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 62A2esvQ007596
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 9 Mar 2026 22:40:54 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 62A2erW1007595;
+	Mon, 9 Mar 2026 22:40:53 -0400
+Date: Mon, 9 Mar 2026 22:40:53 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me, axboe@fb.com,
+        martin.petersen@oracle.com, james.bottomley@hansenpartnership.com,
+        hare@suse.com, jmeneghi@redhat.com, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, michael.christie@oracle.com,
+        snitzer@kernel.org, dm-devel@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 21/24] scsi: sd: support multipath disk
+Message-ID: <aa-EtdqIOX603PVu@redhat.com>
+References: <20260225153627.1032500-1-john.g.garry@oracle.com>
+ <20260225153627.1032500-22-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,16 +69,308 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260309-b4_zcomp_stream-v2-3-7148622326eb@gmail.com>
+In-Reply-To: <20260225153627.1032500-22-john.g.garry@oracle.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Jihan,
-
-On (26/03/09 12:23), Jihan LIN via B4 Relay wrote:
-> From: Jihan LIN <linjh22s@gmail.com>
+On Wed, Feb 25, 2026 at 03:36:24PM +0000, John Garry wrote:
+> Add support to attach a multipath disk.
 > 
-> Currently, zcomp uses a per-CPU stream model. This design is restrictive
-> for hardware-accelerated or batched zcomp backends.
+> We still allocate the gendisk per path, and this is required for the
+> per-path submission. However, those gendisks are marked as hidden. Those
+> disks are named sdX:Y, where X is the multipath disk index and Y is the
+> per-path index.
+> 
+> A global list of sd_mpath_disks is kept for matching scsi_device's.
+> 
+> The multipath gendisk has the name and disk->major/minor set to minic a
+> scsi_disk.
+> 
+> The following is an example of relevant scsi_disk and block sysfs
+> directories:
+> 
+> $ ls -l /sys/block/ | grep sdc
+> lrwxrwxrwx    1 root     root             0 Feb 24 16:01 sdc -> ../devices/virtual/scsi_mpath_disk/0/sdc
+> lrwxrwxrwx    1 root     root             0 Feb 24 16:01 sdc:0 -> ../devices/platform/host8/session1/target8:0:0/8:0:0:0/block/sdc:0
+> lrwxrwxrwx    1 root     root             0 Feb 24 16:02 sdc:1 -> ../devices/platform/host9/session2/target9:0:0/9:0:0:0/block/sdc:1
+> 
+> $ ls -l /sys/class/scsi_mpath_disk/0/
+> total 0
+> drwxr-xr-x    2 root     root             0 Feb 24 16:03 power
+> drwxr-xr-x   11 root     root             0 Feb 24 16:01 sdc
+> lrwxrwxrwx    1 root     root             0 Feb 24 16:01 subsystem -> ../../../../class/scsi_mpath_disk
+> -rw-r--r--    1 root     root          4096 Feb 24 16:01 uevent
+> 
+> $ ls -l /sys/class/scsi_mpath_disk/0/sdc/multipath/
+> total 0
+> lrwxrwxrwx    1 root     root             0 Feb 24 16:20 sdc:0 -> ../../../../../platform/host8/session1/target8:0:0/8:0:0:0/block/sdc:0
+> lrwxrwxrwx    1 root     root             0 Feb 24 16:20 sdc:1 -> ../../../../../platform/host9/session2/target9:0:0/9:0:0:0/block/sdc:1
+> 
+> 
+> $ ls -l /dev/sdc*
+> brw-rw----    1 root     disk        8,  32 Feb 24 16:01 /dev/sdc
+> brw-rw----    1 root     disk        8,  33 Feb 24 16:01 /dev/sdc1
+> brw-rw----    1 root     disk        8,  34 Feb 24 16:01 /dev/sdc2
+> 
+> 
+> $ lsblk /dev/sdc
+> NAME            MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+> sdc               8:32   0  600M  0 disk
+> |-sdc1            8:33   0    9M  0 part
+> `-sdc2            8:34   0  568M  0 part
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  drivers/scsi/sd.c | 376 +++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 358 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> index 9617878b53ec6..409c0937764d9 100644
+> --- a/drivers/scsi/sd.c
+> +++ b/drivers/scsi/sd.c
+> @@ -117,12 +117,33 @@ static DEFINE_IDA(sd_index_ida);
+>  static mempool_t *sd_page_pool;
+>  static struct lock_class_key sd_bio_compl_lkclass;
+>  #ifdef CONFIG_SCSI_MULTIPATH
+> +static LIST_HEAD(sd_mpath_disks_list);
+> +static DEFINE_MUTEX(sd_mpath_disks_lock);
+> +
+>  struct sd_mpath_disk {
+> +	struct device			dev;
+> +	int				disk_index;
+> +	int				disk_count;
+> +	struct list_head		entry;
+> +	struct mutex			lock;
+>  	struct mpath_disk		*mpath_disk;
+> +	struct scsi_mpath_head		*scsi_mpath_head;
+>  };
+>  
+>  static void sd_mpath_disk_release(struct device *dev)
+>  {
+> +	struct sd_mpath_disk *sd_mpath_disk =
+> +		container_of(dev, struct sd_mpath_disk, dev);
+> +	struct scsi_mpath_head *scsi_mpath_head =
+> +		sd_mpath_disk->scsi_mpath_head;
+> +	struct mpath_disk *mpath_disk = sd_mpath_disk->mpath_disk;
+> +
+> +	mpath_put_disk(mpath_disk);
+> +
+> +	ida_free(&sd_index_ida, sd_mpath_disk->disk_index);
+> +	scsi_mpath_put_head(scsi_mpath_head);
+> +
+> +	kfree(sd_mpath_disk);
+>  }
+>  
+>  static const struct class sd_mpath_disk_class = {
+> @@ -4144,7 +4165,302 @@ static const struct scsi_mpath_pr_ops sd_mpath_pr_ops = {
+>  	.pr_read_keys	= sd_mpath_pr_read_keys,
+>  	.pr_read_reservation = sd_mpath_pr_read_reservation,
+>  };
+> +
+> +static int sd_mpath_revalidate_head(struct scsi_disk *sdkp)
+> +{
+> +	struct sd_mpath_disk *sd_mpath_disk = sdkp->sd_mpath_disk;
+> +	struct mpath_disk *mpath_disk = sd_mpath_disk->mpath_disk;;
+> +	struct gendisk *disk = mpath_disk->disk;
+> +	struct queue_limits *sdkp_lim = &sdkp->disk->queue->limits;
+> +	struct queue_limits lim;
+> +	unsigned int memflags;
+> +	int ret;
+> +
+> +	lim = queue_limits_start_update(disk->queue);
+> +	memflags = blk_mq_freeze_queue(disk->queue);
+> +
+> +	lim.logical_block_size = sdkp_lim->logical_block_size;
+> +	lim.physical_block_size = sdkp_lim->physical_block_size;
+> +	lim.io_min = sdkp_lim->io_min;
+> +	lim.io_opt = sdkp_lim->io_opt;
+> +
+> +	queue_limits_stack_bdev(&lim, sdkp->disk->part0, 0,
+> +					disk->disk_name);
+> +
+> +	/* TODO: setup integrity limits */
+> +	lim.max_write_streams = sdkp_lim->max_write_streams;
+> +	lim.write_stream_granularity = sdkp_lim->write_stream_granularity;
+> +	ret = queue_limits_commit_update(disk->queue, &lim);
+> +
+> +	set_capacity_and_notify(disk, get_capacity(sdkp->disk));
+> +
+> +	blk_mq_unfreeze_queue(disk->queue, memflags);
+> +
+> +	return ret;
+> +}
+> +static int sd_mpath_get_disk(struct sd_mpath_disk *sd_mpath_disk)
+> +{
+> +	if (!get_device(&sd_mpath_disk->dev))
+> +		return -ENXIO;
+> +	return 0;
+> +}
+> +
+> +static void sd_mpath_put_disk(struct sd_mpath_disk *sd_mpath_disk)
+> +{
+> +	put_device(&sd_mpath_disk->dev);
+> +}
+> +
+> +static struct sd_mpath_disk *sd_mpath_find_disk(struct scsi_device *sdp)
+> +{
+> +	struct scsi_mpath_device *scsi_mpath_dev = sdp->scsi_mpath_dev;
+> +	struct sd_mpath_disk *sd_mpath_disk;
+> +	int ret;
+> +
+> +	mutex_lock(&sd_mpath_disks_lock);
+> +	list_for_each_entry(sd_mpath_disk, &sd_mpath_disks_list, entry) {
+> +		struct scsi_mpath_head *scsi_mpath_head;
+> +		struct mpath_disk *mpath_disk;
+> +		struct mpath_head *mpath_head;
+> +
+> +		ret = sd_mpath_get_disk(sd_mpath_disk);
+> +		if (ret)
+> +			continue;
+> +		mpath_disk = sd_mpath_disk->mpath_disk;
+> +		mpath_head = mpath_disk->mpath_head;
+> +		scsi_mpath_head = mpath_head->drvdata;
+> +
+> +		if (strncmp(scsi_mpath_head->wwid,
+> +			scsi_mpath_dev->device_id_str,
+> +			SCSI_MPATH_DEVICE_ID_LEN) == 0) {
+> +
+> +			mutex_unlock(&sd_mpath_disks_lock);
+> +			return sd_mpath_disk;
+> +		}
+> +		sd_mpath_put_disk(sd_mpath_disk);
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static void sd_mpath_add_disk(struct scsi_disk *sdkp)
+> +{
+> +	struct scsi_device *sdp = sdkp->device;
+> +	struct scsi_mpath_device *scsi_mpath_dev = sdp->scsi_mpath_dev;
+> +	struct mpath_device *mpath_device = &scsi_mpath_dev->mpath_device;
+> +	struct sd_mpath_disk *sd_mpath_disk = sdkp->sd_mpath_disk;
+> +	struct mpath_disk *mpath_disk = sd_mpath_disk->mpath_disk;
+> +	struct mpath_head *mpath_head = mpath_disk->mpath_head;
+> +
+> +	mpath_device->disk = sdkp->disk;
+> +	mpath_add_device(mpath_head, mpath_device);
+> +	mpath_device_set_live(mpath_disk, mpath_device);
+> +}
+> +
+> +static int sd_mpath_probe(struct scsi_disk *sdkp)
+> +{
+> +	struct scsi_device *sdp = sdkp->device;
+> +	struct scsi_mpath_device *scsi_mpath_dev = sdp->scsi_mpath_dev;
+> +	struct device *dma_dev = sdp->host->dma_dev;
+> +	struct scsi_mpath_head *scsi_mpath_head =
+> +				scsi_mpath_dev->scsi_mpath_head;
+> +	struct sd_mpath_disk *sd_mpath_disk;
+> +	struct mpath_head *mpath_head = scsi_mpath_head->mpath_head;
+> +	struct queue_limits lim;
+> +	struct gendisk *disk;
+> +	int error;
+> +
+> +	/*
+> +	 * sd_mpath_disks_list is kept locked if no disk found.
+> +	 * Otherwise an extra reference is taken.
+> +	 */
 
-zcomp doesn't support hardware-accelerated compression, and that's
-why we plan to delete zcomp API sometime this year and switch to a
-acomp crypto API instead.  Does crypto API address your use case?
+Again, I personally think the logic is easier to follow when all the
+locking isn't split over multiple functions.
+
+> +	sd_mpath_disk = sd_mpath_find_disk(sdp);
+> +	if (sd_mpath_disk) {
+> +		mutex_lock(&sd_mpath_disk->lock);
+> +		sd_mpath_disk->disk_count++;
+> +		mutex_unlock(&sd_mpath_disk->lock);
+> +		goto found;
+> +	}
+> +
+> +	sd_mpath_disk = kzalloc(sizeof(*sd_mpath_disk), GFP_KERNEL);
+> +	if (!sd_mpath_disk) {
+> +		error = -ENOMEM;
+> +		goto out_unlock;
+> +	}
+> +
+> +	sd_mpath_disk->scsi_mpath_head = scsi_mpath_head;
+> +	device_initialize(&sd_mpath_disk->dev);
+> +	mutex_init(&sd_mpath_disk->lock);
+> +	sd_mpath_disk->dev.class = &sd_mpath_disk_class;
+> +
+> +	blk_set_stacking_limits(&lim);
+> +	lim.dma_alignment = 3;
+> +	lim.features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT |
+> +		BLK_FEAT_POLL | BLK_FEAT_ATOMIC_WRITES;
+> +
+> +	sd_mpath_disk->mpath_disk = mpath_alloc_head_disk(&lim,
+> +						dev_to_node(dma_dev));
+> +	if (!sd_mpath_disk->mpath_disk) {
+> +		error = -ENOMEM;
+> +		goto out_free_disk;
+> +	}
+> +	disk = sd_mpath_disk->mpath_disk->disk;
+> +	mpath_get_head(mpath_head); /* undone in mpath_free_disk() */
+> +
+> +	sd_mpath_disk->mpath_disk->mpath_head = mpath_head;
+> +	sd_mpath_disk->mpath_disk->parent = &sd_mpath_disk->dev;
+> +
+> +	error = ida_alloc(&sd_index_ida, GFP_KERNEL);
+> +	if (error < 0) {
+> +		sdev_printk(KERN_WARNING, sdp, "sd_probe: memory exhausted.\n");
+> +		goto out_put_disk;
+> +	}
+> +	sd_mpath_disk->disk_index = error;
+> +	error = sd_format_disk_name("sd", sd_mpath_disk->disk_index,
+> +				disk->disk_name, DISK_NAME_LEN);
+> +	if (error)
+> +		goto out_free_index;
+> +
+> +	error = dev_set_name(&sd_mpath_disk->dev, "%s",
+> +				dev_name(&scsi_mpath_head->dev));
+> +	if (error)
+> +		goto out_free_index;
+> +
+> +	/* undone in sd_mpath_disk_release() */
+> +	scsi_mpath_get_head(scsi_mpath_head);
+> +
+> +	error = device_add(&sd_mpath_disk->dev);
+> +	if (error) {
+> +		put_device(&sd_mpath_disk->dev);
+> +		goto out_unlock;
+
+We should clean up when we fail here, instead of just unlocking without
+fully setting things up.
+
+-Ben
+
+> +	}
+> +
+> +	list_add_tail(&sd_mpath_disk->entry, &sd_mpath_disks_list);
+> +	disk->major = sd_major((sd_mpath_disk->disk_index & 0xf0) >> 4);
+> +	disk->first_minor = ((sd_mpath_disk->disk_index & 0xf) << 4) |
+> +				(sd_mpath_disk->disk_index & 0xfff00);
+> +	disk->minors = SD_MINORS;
+> +
+> +	sd_mpath_disk->disk_count = 1;
+> +	mutex_unlock(&sd_mpath_disks_lock);
+> +
+> +found:
+> +	sdkp->sd_mpath_disk = sd_mpath_disk;
+> +	sdkp->disk->flags |= GENHD_FL_HIDDEN;
+> +	snprintf(sdkp->disk->disk_name, DISK_NAME_LEN, "%s:%d",
+> +		sd_mpath_disk->mpath_disk->disk->disk_name,
+> +		scsi_mpath_dev->index);
+> +
+> +	sdkp->index = -1;
+> +	return 0;
+> +
+> +out_free_index:
+> +	ida_free(&sd_index_ida, sd_mpath_disk->disk_index);
+> +out_put_disk:
+> +	mpath_put_disk(sd_mpath_disk->mpath_disk);
+> +out_free_disk:
+> +	kfree(sd_mpath_disk);
+> +out_unlock:
+> +	mutex_unlock(&sd_mpath_disks_lock);
+> +	return error;
+> +}
+
