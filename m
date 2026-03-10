@@ -1,152 +1,146 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3662D2D9EDC
-	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 14:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773151385; cv=pass; b=RzKgfO2tIHxBkK8rhC5t0BvHDlb2/H5OthDEGQm9MbOxLGYsLuTUom7QsbKKEP1aWB4QdJuaIFLuluhJ8INM+ns4S/P0HPJcoyifVyb/8rg5PykvQleZio43ydBABJepIrv9B55B+LBAwM7WK2/qv2YbhRAt5F3DHmcuJVi2CWc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773151385; c=relaxed/simple;
-	bh=t8Uqc0fYYKsuzOBE55YHlxelJFfvA3Jskj7e0Dhpho8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a2gN212ILpacKuW/RHmBTls+rKfcQiAPI3AsSdbo/w7F3zMGkz9Y1HIv0KOKwPAs5k9lTyFUl3YchXmNQ8uMXuXiCB6ZSkUmgyGD4ERRyj6ttqTZCpNa8tSEQdzOVnL/j4ffeZBsC9L9vAQJmnuWHciy5HsfRYR0kG3kLSYa19o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iVMnzGf3; arc=pass smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iVMnzGf3"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-509069a7a7fso564501cf.0
-        for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 07:03:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773151383; cv=none;
-        d=google.com; s=arc-20240605;
-        b=M2vOcBYKbGGUJPpm4Uit8P2Bw73nRzLgldTuevBoHIH/UAEL5wR4Mf3yyT0rmCdC1c
-         s5bhCuuwQig93Ldqv1An5fcXl0pGCfaazaoffAVYUM4+dg4gxor8v3WcfuVBFxtRYu6J
-         t7f36/umJ3tNg+aE7YdMLuAhvmjA7rMRUojp/843VdLGlwqKt+kVdj8aLt59XEQ9Fkia
-         GjH02RPrnGeAZ1Z3BDnlulH0HEEpb+GboxSXAtqkSv0jVHopnzhyh1Zi3v2gquzi2L1k
-         xChxfmIMlmvMN3cBW3D6Ku3KReJdh5dBN74vUMjed98Gq0XiR/ohkZaxfh4mc0MBn5/u
-         P9Gg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tIavvIBtTtHaasvUFabIuv5jcPdC5cBsH9MQOa5Z8Ag=;
-        fh=Viz7MHGtG4Jbs/ZGz7yjZzMS1HeDNXP2eZVJv0kh/gc=;
-        b=BtsaaEBsWNhqJbfHdRcHfJSF7k2Jp43UdNc/cHmAdqhnDBpIc+HjNGet/+T3D1xqPH
-         mCmKBTTsq7kWqR6YZaU5k+9tIm71JEgDDt9wmZR9Pd+m8RnvFEiZc50dyMXDR9L7bP6R
-         m1mV24inJ/NcyVoiU1Bs3EFp2bovDGLHQMVqqBiPz1K4gzm7EJfC7Bm1MOM5BNmqNyEt
-         9Ju/y6v9S8JgVjfG17qU6NWdKMXksO/TBnFc2d0KpDnJJamCmZKYlx1dSbdalDroBH3A
-         7tb4FJa/WskWdtYHC+drJgGGXtjibzKgUsUuL5vTTW12HH2mWyb/iuf8SD714AshfQc5
-         bmFg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773151383; x=1773756183; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tIavvIBtTtHaasvUFabIuv5jcPdC5cBsH9MQOa5Z8Ag=;
-        b=iVMnzGf3wWF7BB8Egl6m0pR8gqZrxRdp4tXwUbA7Hy8JbrUBlYnA3O1ymAnWOO0CYw
-         uXGuHPOcbHGQu16ViZJBfmZSK/0/SoZlr0RTz/E+9JAMaqpQStCCL7O1Yi+7+OIa4Ad7
-         XtZdMPpTE0wFZWEnlDp+3BCoyFcVUALMwzAJ5ZXBFFnstkb0lod11M5A8kAtAr29UTWu
-         TRly+gBv3Fo5dgsvf4NCI0lLlyNV5UmeAloJ1Us2ObKYP0Dd9Kkw88stj+Nt47U5EBJ8
-         OpkBaW15Vc+KJ+5FDoWvh17RTU+3ayDcX8xUnHYLO2j9ERgci4e7stBpb3xSj98NBuGY
-         iA3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773151383; x=1773756183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tIavvIBtTtHaasvUFabIuv5jcPdC5cBsH9MQOa5Z8Ag=;
-        b=fU9fjajQMrVTsWBB1EhrX59Iq741Fo/CHliw6aa6ifbG0tmgGStkMrtTjLVE48FTXU
-         +V5C/ymhWWNSSnDOeOos20qbGgWeFqI3RRaMWd9hoMjvvDs589awYjFg7vjOTgg7TogP
-         rBS1pc/MceqFbqX+x2KUhF4ZlEhacGt4JgHJUdBJF6PeQnRyJYGQmlKIwjC6SyRzeJWK
-         rCKSEovPgLb88emH97+S54PMh1Jcc5mkFT+VabdjUmU1Frcj3RTuVtIzsY2BbLCGeSQT
-         PAGram3+ozVC+aWMbOWbLHsA1bvRhCW6sEVGa7uPdwmq9nI4qI5ybwNrobX0dajl9FKI
-         RneA==
-X-Forwarded-Encrypted: i=1; AJvYcCVXWiVXJg2blnKswzFuujPW/+m72KJTgXfd/AqcKisr2k76gY5ErJ+CRIM8A2aPFF8mauGhvdjuKKc+rg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8YKQFsB7Q9JWtGpk+cD41P5e8sAf3jmi0vmYEFCOPmejRurMe
-	enQtAIdjMxSRmGNmh1IWUhNOJs6fkYdLNMCmy/9H8Rkb6u3zkymZmInzBONXHqRzkTVBTiMp0kr
-	hDWG9Hy/FwmNAjsw0IZdHtU3kRANodXahSQX0OwYu
-X-Gm-Gg: ATEYQzzok7b4KnFdEF3SCOdDpaJ+b8mHU48saQE7rIM4eWfEhLurVcAsTJphph7n75P
-	JdlXBTTyMrppoXR87dCgWOaTIBp7Na7TP6jpflWQRwxxdSq8qAEj35htZP5li0MpxeDUwO1gVgM
-	tu1Umttv4SKB49BthLUb4tRwkXpE8ezgN2xLTrxau/4pZXnA2N+PvX/NwK4TfXwmPAz99Dt5mWL
-	cx3r9SWRGoc1Wg2vfyHOM0mUfGF0NKUa7s9gPTWSHdqRY9M9cg22zxIR3S46v5Cfrs4nGjnuCpn
-	HGFPriUD1gfWDRevUBA1Yyz/+rPu/S6Cr2jeo/H9DL3Qdc/WFFQrbIsgZD8J907okGIAUz4yTyg
-	n7MKfaQzQvTt0aomUUXD59BwDiCzK7L5D1Hg=
-X-Received: by 2002:ac8:5e4f:0:b0:509:105c:74a9 with SMTP id
- d75a77b69052e-50926f1e3aamr13927151cf.18.1773151382478; Tue, 10 Mar 2026
- 07:03:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF472391E63;
+	Tue, 10 Mar 2026 14:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773152055; cv=none; b=k7HLW1eu0CVhEw1JOHUvmzxhZg9w+0HcdgG4jPigu3gUdoQF3fQJYlT7RLFSF2aTeAq7RWaKORcQEcAlEPYIUwBT8BNfE6tyspF6JO7txXJwQsUFpyTZO3IUicm2hJG08M5u3aYpgoF4jc9eKBWX1hGeXqwZPGGdqheS4/QSpnk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773152055; c=relaxed/simple;
+	bh=SMamLYuK7QpP5Qy11gfel2SYdZy/ey1WEVc9Se5MWz0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nAGcBReV5CYWz9pLAKq9eCNFHF6PdQxOeJjbrZQZUfHBULwX5aVkcgIuRI1rxu+PBtefANSOk4AFOKw+/KscrNk3GeCxWASrklK4jmTd1wfTzkQ4QHxfwlmxugKQpOqG7gVNggk0k501/HqZwzAwZU4BRrsVZy3mu0TLEX8TAuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf14.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay01.hostedemail.com (Postfix) with ESMTP id 0CEFF1C171;
+	Tue, 10 Mar 2026 14:08:05 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf14.hostedemail.com (Postfix) with ESMTPA id 847E92D;
+	Tue, 10 Mar 2026 14:07:40 +0000 (UTC)
+Date: Tue, 10 Mar 2026 10:07:50 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mm@kvack.org,
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>
+Subject: Re: [PATCH 15/61] trace: Prefer IS_ERR_OR_NULL over manual NULL
+ check
+Message-ID: <20260310100750.303af303@gandalf.local.home>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+	<20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310060407.1133800-1-senozhatsky@chromium.org> <CADyq12zF3cwzSFcKYiGAdJ_G-NVnydBRQn+x0fgNq1kVgof4Vg@mail.gmail.com>
-In-Reply-To: <CADyq12zF3cwzSFcKYiGAdJ_G-NVnydBRQn+x0fgNq1kVgof4Vg@mail.gmail.com>
-From: Brian Geffon <bgeffon@google.com>
-Date: Tue, 10 Mar 2026 10:02:25 -0400
-X-Gm-Features: AaiRm505DSdRTNRL1G8h-GZEtlrvi5UA2vbcMF3uI1SjdIgSiG4KGr1my05BvOM
-Message-ID: <CADyq12wpJVSvWDzWb8Y7ZQAN940qPKRdHbmu-UCN1L2GkyH5Ww@mail.gmail.com>
-Subject: Re: [PATCH] zram: do not permit params change after init
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org, gao xu <gaoxu2@honor.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamout05
+X-Rspamd-Queue-Id: 847E92D
+X-Stat-Signature: 7qtdkkf3por5hcs9du9pir5nqq8uht35
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19Z3Tx1sMlUDFHS8YYPfSOpiqPw8cg/LfU=
+X-HE-Tag: 1773151660-993833
+X-HE-Meta: U2FsdGVkX1+JWrMXdInzvBx9l2WUqahyoYUezPLaF3HICGuHpiLcos2NJHmqwFPLfM8ZBXZ6/fmTg/vlHLcqcaFGukyEZOsOE3kBaCKhhIkGksjLucUHfFRW8KX39dTkHeOQhZTWX/A0f9Y+1fWRMEQzHGhaJF2wpPshgb4yUxNCAKdeI6QYyukTSlQGbTY7Uxizi79ndrJuznFkrJ0f1Gh3JC2I5gazyCY5QhqLMJ9a9ShPFpKdZ7NDaPeyx31oXfa0p+bWWHR1R5JbGDYWhbllAgJDuEbxQsOff6UlFUV0L3hTo0f3pFVAKw4ZSe/3wUeKTGah6IcaIcnei7ziR9eK5k/ow6hfmOBOZGq2CLBxHUplOJMJzaQEF/IeU48U6bUZ8WiPpl/JDxwK03ucqBa/7oG+YB+etWyAxh+TKdi7NbCLCb6PbeExJ2cO76n2AdjJCB03SaDGNN90kGsLmA==
 
-On Tue, Mar 10, 2026 at 10:01=E2=80=AFAM Brian Geffon <bgeffon@google.com> =
-wrote:
->
-> On Tue, Mar 10, 2026 at 2:04=E2=80=AFAM Sergey Senozhatsky
-> <senozhatsky@chromium.org> wrote:
-> >
-> > First, algorithm_params_store(), like any sysfs handler,
-> > should grab device init lock.
-> >
-> > Second, like any write() sysfs handler, it should grab
-> > device init lock in exclusive mode.
->
-> comp_algorithm_store() and recomp_algorithm_store()?
+On Tue, 10 Mar 2026 12:48:41 +0100
+Philipp Hahn <phahn-oss@avm.de> wrote:
 
-disregard, that happens in __comp_algorithm_store().
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
 
->
-> >
-> > Third, it should not permit change of algos' parameters
-> > after device init, as this doesn't make sense - we cannot
-> > compress with one C/D dict and then just change C/D dict
-> > to a different one, for example.
-> >
-> > Fixes: 4eac932103a5d ("zram: introduce algorithm_params device attribut=
-e")
-> > Cc: gao xu <gaoxu2@honor.com>
-> > Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
->
-> Acked-by: Brian Geffon <bgeffon@google.com>
->
-> > ---
-> >  drivers/block/zram/zram_drv.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_dr=
-v.c
-> > index c41e1257243f..7551c5e664a9 100644
-> > --- a/drivers/block/zram/zram_drv.c
-> > +++ b/drivers/block/zram/zram_drv.c
-> > @@ -1769,6 +1769,10 @@ static ssize_t algorithm_params_store(struct dev=
-ice *dev,
-> >         if (prio < ZRAM_PRIMARY_COMP || prio >=3D ZRAM_MAX_COMPS)
-> >                 return -EINVAL;
-> >
-> > +       guard(rwsem_write)(&zram->dev_lock);
-> > +       if (init_done(zram))
-> > +               return -EBUSY;
-> > +
-> >         ret =3D comp_params_store(zram, prio, level, dict_path, &deflat=
-e_params);
-> >         return ret ? ret : len;
-> >  }
-> > --
-> > 2.53.0.473.g4a7958ca14-goog
-> >
+Why?
+
+> 
+> Change generated with coccinelle.
+> 
+> To: Steven Rostedt <rostedt@goodmis.org>
+> To: Masami Hiramatsu <mhiramat@kernel.org>
+> To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-trace-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  kernel/trace/fprobe.c                | 2 +-
+>  kernel/trace/kprobe_event_gen_test.c | 2 +-
+>  kernel/trace/trace_events_hist.c     | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/kernel/trace/fprobe.c b/kernel/trace/fprobe.c
+> index dcadf1d23b8a31f571392d0c49cbd22df1716b4f..a94ce810d83b90f55d1178a9bd29c78fd068df4c 100644
+> --- a/kernel/trace/fprobe.c
+> +++ b/kernel/trace/fprobe.c
+> @@ -607,7 +607,7 @@ static int fprobe_module_callback(struct notifier_block *nb,
+>  	do {
+>  		rhashtable_walk_start(&iter);
+>  
+> -		while ((node = rhashtable_walk_next(&iter)) && !IS_ERR(node))
+> +		while (!IS_ERR_OR_NULL((node = rhashtable_walk_next(&iter))))
+
+Ug, No!
+
+That looks so much worse than the original.
+
+-- Steve
+
+>  			fprobe_remove_node_in_module(mod, node, &alist);
+>  
+>  		rhashtable_walk_stop(&iter);
+> diff --git a/kernel/trace/kprobe_event_gen_test.c b/kernel/trace/kprobe_event_gen_test.c
+> index 5a4b722b50451bfdee42769a6d3be39c055690d1..a1735ca273f0b756aa1fcfcdab30ddad9bc51c5f 100644
+> --- a/kernel/trace/kprobe_event_gen_test.c
+> +++ b/kernel/trace/kprobe_event_gen_test.c
+> @@ -75,7 +75,7 @@ static struct trace_event_file *gen_kretprobe_test;
+>  
+>  static bool trace_event_file_is_valid(struct trace_event_file *input)
+>  {
+> -	return input && !IS_ERR(input);
+> +	return !IS_ERR_OR_NULL(input);
+>  }
+>  
+>  /*
+> diff --git a/kernel/trace/trace_events_hist.c b/kernel/trace/trace_events_hist.c
+> index 73ea180cad555898693e92ee397a1c9493c7c167..59df215e1dfd9349eca1c0823ed709ec7285f766 100644
+> --- a/kernel/trace/trace_events_hist.c
+> +++ b/kernel/trace/trace_events_hist.c
+> @@ -3973,7 +3973,7 @@ trace_action_create_field_var(struct hist_trigger_data *hist_data,
+>  	 */
+>  	field_var = create_target_field_var(hist_data, system, event, var);
+>  
+> -	if (field_var && !IS_ERR(field_var)) {
+> +	if (!IS_ERR_OR_NULL(field_var)) {
+>  		save_field_var(hist_data, field_var);
+>  		hist_field = field_var->var;
+>  	} else {
+> 
+
