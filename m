@@ -1,122 +1,89 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038F0352C58
-	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 13:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773149524; cv=pass; b=LUuQvR1pCL/NLMkiUU6ApAb1008cF0d7NhlgQpU8sDJF3mq2HVLp2ShHNMuJrMOpZ5lBAxTjgGLpHpCIHrH6kH/oEtcqgBVgfXgFZDzOxVfgblprcZ3gHd0B9yhw5WArdIkyYsZnG4I4M18jD2jgJEoPWZgoo5fSxoLIoceQsUU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773149524; c=relaxed/simple;
-	bh=oR7yZ7p110w4YDqSp6iwoHTcaw6N6KC0iH+SbjywiYc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kV/OqSm7Z8poQseRbkyrijXFrbOgsRMRkfRQZsRsyEYic3D4gv3z5skCRn69Cg6a4mm92Zf9m17hYWDe0dLda9oUUEZRhYVz2Aduat5TgKTH6tWDLSQzDTcIG9S44kosRiD5eMAuXRhBvFdQIZkOStXmFz+xMc/rrG3ENVKbFc8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dibsIwD8; arc=pass smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D893928504D;
+	Tue, 10 Mar 2026 13:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773149642; cv=none; b=Gk9ySCD5/rAR5Gy3RzZ4VZBJ5YdQkLjvYY3CnURVP6azsDNuNLXl67L7AwfaW+kFIVmAg69qVzOEqgj1SgEicJMOH+W8Zq7YP/hG3GghJRlD42iVd8OxXSxWs9zv9sYp0gHdLV4jeOoeLIJgn3eLZThMvzq+Cl9pzD19ix1SKk0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773149642; c=relaxed/simple;
+	bh=1YnmztTcNk3Ff+PgeiUurE/Sk941AjWRBcXze9NtmZ0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=CTaqG6Qbuu27oteze+zxysGBNFSZ/btmMioft52nvKI7u8kDplNmtazy1wXjbYOnW6IAfyvScHf9HGoQcVC8rXKgOTP1RaAYz/MfYZtaBiOdpXgFIo/Pnx9zFBqS3PnIPl2BT7kNJblGVTah+KTbnSiLxbJ+eXQdz8NNZ0MSxtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbboZny9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dibsIwD8"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7d744540081so1375297a34.0
-        for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 06:32:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773149522; cv=none;
-        d=google.com; s=arc-20240605;
-        b=erVUf5KU8AXOutss4ed4rzx3CXLCE/mEctGS8c+fXwbXAP1O1rGcu2CnZaHX9ocAFt
-         hH/R07D58Ta9vCBY4EYZqRLmdwlp+EJm045RA2eVKzIafbUuBaRiYQkDdC67hV9AtWDy
-         m7LeU/csBCutoQixPw7/RgONfN4T3wBw+Wx49fFO8ereaP3lwdfhJ+1/1DEmbQVlChmx
-         keL9xgOBFbEj6lGZtTNbq85bVdGEuBRUlZ4DctUaSQ+5SzZkDk88Upc2nvKFPk46f/Zy
-         lqWH4YR9dgm0tI0uPEgmgvXnUXwiFd8EtjJxyEwDtSsId6cwej3Nfn69nyxtDtqdKCCy
-         ChwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=oR7yZ7p110w4YDqSp6iwoHTcaw6N6KC0iH+SbjywiYc=;
-        fh=kVTcKfiIvbFDQRu11A8SWBJmMjdbgpEXxtA3GQTvqNs=;
-        b=bSYZFW0eFXzIm0wSgQV9EIIOo5T26sZoSEZQIiy5hecbUKI1fFrfLX2i59vddKd+wz
-         EMTNngTyIpSH5as9fLWv/6sJreTpC5OpMOBzCkKTyE2Jjn9Ay6JmQkshXfsYlAX6uc4V
-         hyUi0OZSB28iiWd/XmrMixhOwYYbfoGzoQgZtlcfVdbPXQ5T4vdaxbOaVle6u/9smMCr
-         u2Z6O48rxufxRhGts+tb1tbctFSpMdjSudLPr992bfFPoTZAqQDFd0OpQVmbKpGIvC75
-         PsY48hmcN4QKF9SDwtRnp/drayFhYsiw9oIprCgkYE1FI7smhBgWOvd42nAZOGvuuBrj
-         swEw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773149522; x=1773754322; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oR7yZ7p110w4YDqSp6iwoHTcaw6N6KC0iH+SbjywiYc=;
-        b=dibsIwD8ooZobgDH9iiaeP6aoBdN2jwYk0zkmxgLcxnt/0mkIi5a1Ip5OmD4u8jwNc
-         6i/Ns5Ovn38T4Ip0JwbzBtwS0eYXZwlb76sOBUkBb2Oc+Jl2/YBLZKqesi0Jn4DXytp/
-         LhjCRF8az2XyGWpc+Y2z2ca+1WwEvkdwwc0ZG74+gq7Eg0DlAtYdnmXbQYnU03ldJ3UO
-         K0Zu0sVlWIPg16BAQSqWGjnEvXySfvpYSqkajSdrfQ3/RhAs09zdRHt96dWbK+CLR5op
-         Hx0IV0Mv0jUylCL1ujbvUMMu/K3O38KssqU/5OE2LwbTdgivFgJF77eUKmHb6Do5kPNt
-         awgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773149522; x=1773754322;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oR7yZ7p110w4YDqSp6iwoHTcaw6N6KC0iH+SbjywiYc=;
-        b=mxeSdKxgyoi1G+r9VFsyo4QjgNlDZJMLGLGCDHtU8FU5nmisW203lJmtXIYLXmQ6mZ
-         rokTdyvWLiOCBhBuBWCFWfCYuGk5kXLVEryMvHs1cooLn1bXwLUKqZE5ZHrCxtpF0Jmr
-         B+3iyf4y9MuYLMezQpJfv2nxz7qx1SgmQVaR619VTjaxv51th0AILQ2FI+18BGJfC7Eg
-         TGRiUJP71M1kznSCI0y581OJunPYGtNNpn/3FiX7JpGW8wmm9cgNqnadxkM0Mv9RycQH
-         vVKarwLNq+gGjz5VaTHechKiQkttQB4n7ZCuMDe1qJgRLKz/rWDGfg8LDfWstvIwcgvK
-         QPLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXNf8zop4Z5KDBdy3hwSxBdpsnU9yT6Dm189Dq0SV9x2ZiL4+Zqw8cHn9MQgzeyYYeI8RaaTnQF/RQ10w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjaC2ZESoF3z6MTSiZJtgVe15aSVqPzpg2BfNvARNM7EhHdY3Z
-	MJfb2OLiJe3RmcW+X4H2hDkkB7Pk4Dhv2hcDZWdueV9+o9QvebqgToV6NaT/CAadxChsz28WJ5B
-	GZh/oXtEEYeOZ0IV+0lo0Pb+g1ufJtPZoO9CpZ3CppqFn
-X-Gm-Gg: ATEYQzy1ixhCdTs+nV+MlED4eFZn+pxO5vvVebn3LeBQnjSiErs//owPJ4G3OVNteZK
-	/u07U1yo4PfK/YX6xEWaJ36fac++mq2v741Pdr+AWzq83hzbf7hsredlmgVZXDd6oRhpAnZCpMF
-	8o7bvgdsQCjmOre8CiFB0BtiG0yCGkJSDB4o2yfltX2cRo2cx7ATv1S3G0MEU80UlH6A/gl9GPQ
-	Zs+SeFhodxHqvZsdLWNux7CXH/PXK9SXWfgVg/sbw0PT4k2BjTbgFyGFP24FurrbH2+TAMu9j/E
-	hGe1Yio7uA==
-X-Received: by 2002:a05:6820:1688:b0:67b:ba7d:442a with SMTP id
- 006d021491bc7-67bbc961213mr2190834eaf.39.1773149521735; Tue, 10 Mar 2026
- 06:32:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbboZny9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1338AC19423;
+	Tue, 10 Mar 2026 13:33:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773149641;
+	bh=1YnmztTcNk3Ff+PgeiUurE/Sk941AjWRBcXze9NtmZ0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=gbboZny9vDD72Pka+n0iXs0baByjKbSZoFC4cppvyGvi6DURLPzP7/PURy6H4x0SE
+	 hZcTDQvWtiIR96dUWEkTSxfg7YW1/icauTRQtPPhn3DjatNJnXXgx9ePr2EFS/J1xE
+	 m2MZHJen8/8vAxVjX4Rh0mvAwOneBCTEICPjlkx0jZOCBN/iedVV5+9QBqwIzFk1vO
+	 tVOWY5YqoR5nPBwka2P8esnXtwU65aqvGrom7R8xo/zbp7HcZsAU1Ct1Z6jDsVgPm9
+	 q6q+cosYNG9tKwHqU9XoTXUFgoVy3XzQYbAwRSYwrOvATdzUAyZiFt5O4W3gYPYlF6
+	 gVdqFVkFvSybA==
+From: Lee Jones <lee@kernel.org>
+To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
+ linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org, 
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, 
+ Philipp Hahn <phahn-oss@avm.de>
+Cc: Lee Jones <lee@kernel.org>, Pavel Machek <pavel@kernel.org>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-51-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-51-bd63b656022d@avm.de>
+Subject: Re: (subset) [PATCH 51/61] leds: Prefer IS_ERR_OR_NULL over manual
+ NULL check
+Message-Id: <177314963081.2226692.3105447886678957300.b4-ty@kernel.org>
+Date: Tue, 10 Mar 2026 13:33:50 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309-b4_zcomp_stream-v2-0-7148622326eb@gmail.com>
- <20260309-b4_zcomp_stream-v2-3-7148622326eb@gmail.com> <aa9tz-EIh7kOF3RM@google.com>
-In-Reply-To: <aa9tz-EIh7kOF3RM@google.com>
-From: Jihan LIN <linjh22s@gmail.com>
-Date: Tue, 10 Mar 2026 21:31:49 +0800
-X-Gm-Features: AaiRm53sXnY0nHNz7eZ6IbvcBHm_vxYaDTsrkKCZX6ADUPUcCdM0iEHTOA0igVg
-Message-ID: <CALmCz4rfM3graGfnrMjXwg+5W5gUrq2g0ycPwRbkcRKsL8woyw@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 3/5] zram: Introduce zcomp-managed streams
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, Kairui Song <kasong@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.15-dev-52d38
 
-Hi Sergey,
+On Tue, 10 Mar 2026 12:49:17 +0100, Philipp Hahn wrote:
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+> 
+> Change generated with coccinelle.
+> 
+> 
 
-On Tue, Mar 10, 2026 at 9:05=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
-> zcomp doesn't support hardware-accelerated compression, and that's
-> why we plan to delete zcomp API sometime this year and switch to a
-> acomp crypto API instead.
+Applied, thanks!
 
-Thanks for the note.
+[51/61] leds: Prefer IS_ERR_OR_NULL over manual NULL check
+        commit: e68f95a51d1a8c1594b536c4d495cbea38d47561
 
-Yes, the acomp crypto API can cover my user case. However, per-cpu
-streams can still limit concurrency to num_online_cpus() even with acomp
-as in mm/zswap.c. And simply replacing them with a global idle stream
-list leads to a significant lock contention regression, as tested by
-Kairui[1].
+--
+Lee Jones [李琼斯]
 
-Would it make sense to try using per-CPU stream first and fallback to a
-global idle stream pool only when the per-cpu stream is busy? Happy to
-help with the migration effort.
-
-Best Regards,
-Jihan
-
-[1]: https://lore.kernel.org/all/CAMgjq7BFUrUY5Xq5Eks4ibqbWgJcca1vqB4kq=3Do=
-tQVyG=3D23FRw@mail.gmail.com/
