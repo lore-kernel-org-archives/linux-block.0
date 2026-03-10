@@ -1,112 +1,176 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3C3F4FA
-	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 06:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F68313E3D
+	for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 06:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773122659; cv=none; b=Lnm7abuf4aLlomCGIuiDm9Vcdxh8IB0aL1N67qSDb2dS0VHE4Tak0Gitjxsx0+Pidq1p8lh0r14eFSbBInhmqnAk/ot6KExwGpWbcsQpR1G1Ozjk6uGfZoIKzII+HH6Jvamp4t1u/zyLwKbCDBGaDv0omwxkuwg9GnAvGg63joo=
+	t=1773123227; cv=none; b=UavY3cG9aSk+8cKTaamMBwLG1iGfJKSQUlOEsgZ+s8PpwRqfB/G0XXZfiFDtklo0yDVBe7K9Bk0uLOv+ZmM+iE1c5+aWT2n8XdiSbTcJj9NdwVJ5tpL9WQoioas5UTYBbWC8XennlbnP5KpL+3VvJNJ3LVe0gwzVxJY5LKHekm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773122659; c=relaxed/simple;
-	bh=gdqS+DcKOh995ZwG6L2dod/0Ur7V6FgVG8CLsaUdo+I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=abiuRTnv3hnfDjfByBmHh33H/QPKfX14U07vO42ophlsErhi+Q4xI/PpJA1wBUwWwX3IiGWwKTjGVmu+1mPHlYmBBbrXK3D2IZtGtJKPDFQpzcIoOwlRQeME/UVxGbXRn4yTRl6CuOjqIsVsqT/6Elh+EoPUEIsIXhP5d+qLo/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=NG/rKLD+; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1773123227; c=relaxed/simple;
+	bh=zLJsL7pi4v3XLz/EgEHSGOIArkQrlrmDLpLfCY3mx1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hGBXktO4mrsnFfIxC5Z+mTkYy3XLvJgHuSobZ+0zhVdHWK4b7kMpX1gYyHgVhVxCGeDqsUUjgchQMbkKELjZXLLjUionMYZ3B/x8lsR8QGoSGkgY83dPmMlLtjTy7l3Yb0mPDhSXCGVsR/Gqu+i6srjjgJYPiVDv6RgXTp+AKfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=cmKO2eVF; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NG/rKLD+"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-82995242934so1698160b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 23:04:18 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cmKO2eVF"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ad9a9be502so81724065ad.0
+        for <linux-block@vger.kernel.org>; Mon, 09 Mar 2026 23:13:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1773122657; x=1773727457; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TcMkfkqcCmjFUwCLyfQBIcEGfJ4AtjBgCr7uCX9+Zgs=;
-        b=NG/rKLD+ejuoNHN17XeJwwsIDfUh/KcvheuMSaUD6MjfGhTQeHC7SJmvMIdkNSCQ1K
-         1MXiYVmcSYB0zsWzrqSL3YgySdoxqhzvRhqyUZr2OCNkNIfkNXyQqMsfmrpfyKCHTh6F
-         DDHGhF+/wcuMp9mkWoPyKBZheQOoEOjWpVV7M=
+        d=chromium.org; s=google; t=1773123225; x=1773728025; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c4ji8TdbgweIE6/GO1LR8k/VYUpCh62PQy0KsUDQ9gM=;
+        b=cmKO2eVFhNgOng03jkc5y82ZIZbs81GXKijTcmCGeqeUNiSM639GupLKX95htQF7mb
+         x8+wACMgXzJjjX8Outdp1QdIxeKSZjtpyCl+qzy+uo+/c2dSqijTzwRZG2EUm+TzGiZF
+         glZqx0s1KzhCDu1B5RBitRPyW+ul6XtlKgrck=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773122657; x=1773727457;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TcMkfkqcCmjFUwCLyfQBIcEGfJ4AtjBgCr7uCX9+Zgs=;
-        b=Qe2MnAQFMp7sUzK+7ZRHEUe4Ne4VNu5r0XrZ2EiFq8evBSsiK9i3ARaRn9wnLj79IK
-         gL8ymxtlEZVYzxFgjNPWjuAdM4cYkoOekIq06Ma4HLDyDiIkkGp5+blzfILpWonUq5Tl
-         BNagQeG4oZKOb20mErjyFOLEZ31i0icOpBttXPpw2Mwsp1wiwxGQgxFOdVNRHTwxJAqd
-         GRJx3LLkzL3DvYTh05jO9uY3kdRG+3htFgFJZrQj5+kN7PcGba16Xjo1TWFsFI0DIS2Q
-         tMBqycS52qadLshqkYzswZmQDeX+Iv67cqPaxo/OMleUoryHszPQSBdtPhT6A9P/9hNp
-         uDKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXJMLDUuBn9K/BMKcyAQAhDMN9XcOmFb9x7wzSM8+r9BDpaVy8FcQ20gc12EbrX5xxWGr1LUFfN45c3CQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywqpy+dzaKj+K/+11bDCseAPMzNRpsKSFKvaKllVmof1LMOxi7k
-	YVMtW/Gql1vf6j2B0//vBPuGPGwpPr2//Qea0cGKzwssfkMbDjWokcb+Jkj2Sv6wYg==
-X-Gm-Gg: ATEYQzzSq+/vT8E6Zg2ClwlgXdt+cx06fFdt/Hm+VyF2Xe2PvT++l7WDjQT2mOhIjQ4
-	op1FZEZLGjWbD/FZwl6cenirmoWDlYqvxJcdLC6rFasge6zPDT11rFxcgFTLFiyMu79mAkoA6mG
-	ORfLlpSq1vBm0tZHRZrh1GxwmHYRweGPhWe2F5sO996+Q/E/41nrEiZF1EmJXbg367ILWYykXSG
-	xzTg9unxn5Hkh8f+DBCu5F3RggazX7afw9TildmzhMtG0xTBGb+vNF1s2fhKtYHk7H83RsfdxZ0
-	vUJ5s/Orp8+Ryt1vTCfv4jRmIU5UuQjqa1ZvvgKTaCnLpBz/koCtKDIP7qlaxfk3PzclcxdPt5C
-	l3Y16xSy/BfB8w84L1BYJKc1Ywh58XPgvJ/Buthwiu4iTa/hsOyLP+GVFSMn1rIBYgJ4WPQAOvG
-	Xu4k2tODk6+gzgcusBddBG6OB2FS1ChxhpeteqFL3YjFKWjZM5fUsPC4r2pHYhDuYlNnWp4Azml
-	nnYvEiXlHY2Ig==
-X-Received: by 2002:a05:6a20:9150:b0:394:4d99:ff56 with SMTP id adf61e73a8af0-398ab2dde40mr2134777637.11.1773122657543;
-        Mon, 09 Mar 2026 23:04:17 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:5620:959c:240f:eb2a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a465b702sm12184581b3a.20.2026.03.09.23.04.16
+        d=1e100.net; s=20230601; t=1773123225; x=1773728025;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c4ji8TdbgweIE6/GO1LR8k/VYUpCh62PQy0KsUDQ9gM=;
+        b=FnpOzC0FmwrFdxprvMn4FSIZzE+OtImeVeWjmdXhEiCppNfwzHYxwhXz+88l12PVd/
+         jbklWbEAn+Q3Pgrjr/8UGyjCqIdAU0HKWFQwkG4xG1Z8NbAl2sUpF95GdHc+iC5dE8Rr
+         TqO9SVC0pKDyIbefCquUf8OFT87r2Udevf1iB1kkBIJRTKAwgUuU+DAmB6bWLcFSwqFU
+         A09lOTme3kSNrDJXdiBLT9n6EG90vrPUBdEV3yDK77s0QBkKLb4mAuouA3ZjX48RjMul
+         /4nQy2csgnbVmIBN+lLi5DG+70DpC6LbelntAXKvj0uygsoAyUMvKPoc/1IDwznMe+d0
+         BlWg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+qnqEivqjFtESVAsiR9bcXGj3Bu2H4AAgcy8rALeb3vbPymN2VsBMTUjl2/crEE3bVJbMCuiCi6mODA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5AeLZYkRPswVi2c+gzqM7h/kaHUTB4HLV78X00pRcygHj2Vkb
+	gL4u0Vl/x7nb270V58XSBXqaXufhhzuTWjVsOcG5i8486hzTy+DyQCzBwjUq5AWtNw==
+X-Gm-Gg: ATEYQzzID6O8Rot+1FUOOzz8TkzuzB+emRhywcUKpxMDvzZoUD7ouLSaWytG+BW9il+
+	3hF/QxklvgeLV9CDd5ZLHoWnm7q53+VFs/8hx1OjrK0FP5RQ0Zkqc77LsaWfo067lmvt1+171yx
+	0HBjpkmx2YCbChvZ3sOSf0VLYwo6ZNLVeo2ynkwboY/qJX85wBHxAKBNHJorC0zSRNcYVbkEzPF
+	ycBxsQiP7WGnfBNqwh/whMev+/NGZawSY5jgUB1QDswesLNa+1fkwIKB+mHJf1HP+yzmcYD/6GL
+	rfMvUXfhMB0qdk/G2uBH9oLCmCJZjRnf/3hjUuJSbvUwdd1gzKtaBu1byUEoXl5CeQPtxbvcQl9
+	AY9OpM4X6PZ74+0WM5/6tIvj4y3zkOol6Gwx/LbQMpAsOFcu6R+9IWUbl6c+6UANJMK9q/+E1rv
+	hkK4H0mZW7LowfnWj0iboeXarC/IKrvZ69dXlHB2KcjilrsaDnp5vq7fg5lQeG7w8=
+X-Received: by 2002:a17:903:1a26:b0:2ae:66c9:494f with SMTP id d9443c01a7336-2ae82368445mr141368195ad.2.1773123225415;
+        Mon, 09 Mar 2026 23:13:45 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:5620:959c:240f:eb2a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae840be379sm136280495ad.87.2026.03.09.23.13.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 23:04:17 -0700 (PDT)
+        Mon, 09 Mar 2026 23:13:44 -0700 (PDT)
+Date: Tue, 10 Mar 2026 15:13:41 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Minchan Kim <minchan@kernel.org>,
-	Brian Geffon <bgeffon@google.com>,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	gao xu <gaoxu2@honor.com>
-Subject: [PATCH] zram: do not permit params change after init
-Date: Tue, 10 Mar 2026 15:01:41 +0900
-Message-ID: <20260310060407.1133800-1-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+To: gao xu <gaoxu2@honor.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>, 
+	zhouxiaolong <zhouxiaolong9@honor.com>
+Subject: Re: zram: Optimize LZ4 dictionary compression performance
+Message-ID: <aa-1iKEWKNB0zDwj@google.com>
+References: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
 
-First, algorithm_params_store(), like any sysfs handler,
-should grab device init lock.
+On (26/03/10 02:54), gao xu wrote:
+> +struct lz4_drv {
+> +	/* template compression stream with dictionary */
+> +	LZ4_stream_t base_cstream;
+> +	/* dictionary index of the current template */
+> +	u32 dict_gen;
+> +	bool base_c_valid;
+> +};
+> +
+>  static void lz4_release_params(struct zcomp_params *params)
+>  {
+> +	kfree(params->drv_data);
+> +	params->drv_data = NULL;
+>  }
+>  
+>  static int lz4_setup_params(struct zcomp_params *params)
+>  {
+> +	struct lz4_drv *drv;
+> +
+>  	if (params->level == ZCOMP_PARAM_NOT_SET)
+>  		params->level = LZ4_ACCELERATION_DEFAULT;
+>  
+> +	drv = kzalloc_obj(drv, GFP_KERNEL);
+> +	if (!drv)
+> +		return -ENOMEM;
+> +
+> +	drv->dict_gen = 0;
+> +	drv->base_c_valid = false;
+> +
+> +	params->drv_data = drv;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -67,10 +88,32 @@ static int lz4_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
+>  	return -ENOMEM;
+>  }
+>  
+> +static int lz4_build_base_cstream(struct zcomp_params *params)
+> +{
+> +	struct lz4_drv *drv = params->drv_data;
+> +	int ret;
+> +
+> +	if (!params->dict || !params->dict_sz)
+> +		return -EINVAL;
+> +
+> +	memset(&drv->base_cstream, 0, sizeof(drv->base_cstream));
+> +
+> +	ret = LZ4_loadDict(&drv->base_cstream,
+> +			   params->dict, params->dict_sz);
+> +	if (ret != params->dict_sz)
+> +		return -EINVAL;
+> +
+> +	drv->dict_gen = params->dict_gen;
+> +	drv->base_c_valid = true;
+> +
+> +	return 0;
+> +}
 
-Second, like any write() sysfs handler, it should grab
-device init lock in exclusive mode.
+I think this simply can move to ->lz4_setup_params(), becase that
+function is supposed to loadDict.  I guess we can use backend_zstd.c
+as a reference.  Also probably can inherit naming scheme from zstd
+backend as well.
 
-Third, it should not permit change of algos' parameters
-after device init, as this doesn't make sense - we cannot
-compress with one C/D dict and then just change C/D dict
-to a different one, for example.
+>  static int lz4_compress(struct zcomp_params *params, struct zcomp_ctx *ctx,
+>  			struct zcomp_req *req)
+>  {
+>  	struct lz4_ctx *zctx = ctx->context;
+> +	struct lz4_drv *drv  = params->drv_data;
+>  	int ret;
+>  
+>  	if (!zctx->cstrm) {
+> @@ -78,10 +121,16 @@ static int lz4_compress(struct zcomp_params *params, struct zcomp_ctx *ctx,
+>  					req->dst_len, params->level,
+>  					zctx->mem);
+>  	} else {
+> +		/* rebuild base_cstream when the dictionary changes */
+> +		if (!drv->base_c_valid || drv->dict_gen != params->dict_gen) {
+> +			ret = lz4_build_base_cstream(params);
+> +			if (ret)
+> +				return ret;
+> +		}
 
-Fixes: 4eac932103a5d ("zram: introduce algorithm_params device attribute")
-Cc: gao xu <gaoxu2@honor.com>
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- drivers/block/zram/zram_drv.c | 4 ++++
- 1 file changed, 4 insertions(+)
+We should not need this, unless I'm missing something.  Params should
+change once algorithms are setups and the device is init.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index c41e1257243f..7551c5e664a9 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1769,6 +1769,10 @@ static ssize_t algorithm_params_store(struct device *dev,
- 	if (prio < ZRAM_PRIMARY_COMP || prio >= ZRAM_MAX_COMPS)
- 		return -EINVAL;
- 
-+	guard(rwsem_write)(&zram->dev_lock);
-+	if (init_done(zram))
-+		return -EBUSY;
-+
- 	ret = comp_params_store(zram, prio, level, dict_path, &deflate_params);
- 	return ret ? ret : len;
- }
--- 
-2.53.0.473.g4a7958ca14-goog
+[..]
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index bca33403f..f34f3fa43 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -1709,6 +1709,7 @@ static int comp_params_store(struct zram *zram, u32 prio, s32 level,
+>  	zram->params[prio].dict_sz = sz;
+>  	zram->params[prio].level = level;
+>  	zram->params[prio].deflate.winbits = deflate_params->winbits;
+> +	zram->params[prio].dict_gen++;
 
+We should not need this, as far as I can see.  It was a bug that we
+permitted params change after init.  I sent a fixup patch.
