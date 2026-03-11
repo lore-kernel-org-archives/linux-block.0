@@ -1,169 +1,202 @@
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AB03E868E
-	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 18:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=148.163.139.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773253971; cv=pass; b=nF/HXmJodxjsHjIdo8LVCgUP/drtU/u9pKvX5e5NHusTOBdKmXMp1sv8G7lELfjEvx83vuFlG2YnmM0s25DhaKye3Y8pkzeSeO4MrfYDUrqcC8JLSjfQ3nN90B2Sjcvs8PCJjiTEunCQRFoITsddoNfxe2axq6690yekHf8gGF8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773253971; c=relaxed/simple;
-	bh=Cq8+tWfGf0TNmdPtc7SAv9a2DVpNwq16jsP0bVMh1cM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r7jcZJavACrvK4VBtcNSUdvDPAiqFxlSBayDZJPy+YMVSwI67qqSaS0uViB7JJz4u6E07A4ysZlHbBo9e27WFWI8UNvKNsM5x/2tfZPnt4g5qqhpqsg3dNJKbMQgvQQ9jbtNqiE9+Azl8StLvSNeSnMXbkHKqI+i7XtHASwy/9g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=UUM+ow1l; arc=pass smtp.client-ip=148.163.139.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85191355F36
+	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 19:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773258722; cv=none; b=BDivolfOvxfmtuD+NYaAcQeurDV4yi0szXQmGqI3xH8h1X31lJ4vh6p9JdmBaPgq/9VnrjhlEWIXacbJB0tcrTgsi/x1Mx+wz+3C5djj4PA2yFNAVpZjK23SU+fQXcWeVcnOF0vdGYKy01VwRMN/lcYKEXVvQBykt5zeQ4V4Zgk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773258722; c=relaxed/simple;
+	bh=DZCEel+gASKs1YULBRoMAZRVMrRj9weWbG1mBFEBaxA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hfFkLAb7dePkYHujMlTW+Zsw+FPinoBUQCOZ2gMosHtaofTeaeRjAXZ41t49NtucVG/oiHWgSt65G48k1M1+XA1jB4Bg7CtWWkg0qXnWrZ4PWovZdJ11wm9jPtFSk1fQQY3y6lJ214NTzY0yCDInNF6zQ2kEVOpvCivAG9X5YaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YnnNA+Dy; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="UUM+ow1l"
-Received: from pps.filterd (m0167073.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62BIDJuS1911339
-	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 14:21:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=Cq8+
-	tWfGf0TNmdPtc7SAv9a2DVpNwq16jsP0bVMh1cM=; b=UUM+ow1l9Ax4aODk3kCA
-	f7C6HX+J1u99B/02owTapIzmg/S3suK/So7h+9shCsOsMY31YQ+ehmWLJShBDZtJ
-	XSPB3SYVeDnU5cbRSko0FZu01N7ob0aWMQCkAQxNNKfYhkrHloUojrVFq2qb+lrm
-	6SwDtWiAxy8bBpNfFnmfwdfuhUVGAAvvZtsQsPKsxGPE9DClIL++hxAb18jfEGmt
-	XOjrspU7yPFaEr4YHZgDT7jQr7AF4Oi1HRsZTHLlWuzw7s9+LBlcYmbUdLVRCZms
-	ao5ZTen4Lmub3RDeEx9C7ttLVWXnex1T9F2275PLGcL4nuBCa3SsS9N40ALWOpX0
-	YQ==
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com [209.85.128.197])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4cuawa1ker-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 14:21:01 -0400 (EDT)
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-798531a0f58so6861657b3.0
-        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 11:21:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773253261; cv=none;
-        d=google.com; s=arc-20240605;
-        b=joV375UxBM+FbiTtScEYkRemKrLSaLoAI5r72SWso4zl0tCEISDxhr5LutSnFWG2zK
-         9ydHScKZ81ff17X3nYwCr6gHkYGbdlt2nuqmwrRBs2exn0xuViQ1MMjN7JqPBulo0wLR
-         CTfUBhrVA0dEtD1jj+ftaxV5voFGFPermX0dK8Q5HyHxfNdigVtPPf5pjtZbbGG90Pew
-         1EUmVULFikSSW3wSftY2yEFOOijAErlJ+W3jCWtfwK1ZAcbf3Bx4ns76L51q6rTy/VKL
-         V5Wc0M/+gfNbFpTsNBXj6UvECYeEpm9fAPlochgMCXQP1MQfZ1XzHrYpJY81WRmzR+ag
-         e4yg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version;
-        bh=Cq8+tWfGf0TNmdPtc7SAv9a2DVpNwq16jsP0bVMh1cM=;
-        fh=NCec1UViVTiEQsA2xJzm5HnG7roC9FpxTKliag9Egus=;
-        b=M8Yx6e8NTRlUZ8mC86jS/9ryi41i7lPrqzw+NOgEE8UFCzE5oMpWTF+pIlwVYHupPG
-         CQoNIECn/0W4i5KzJS/Jl5d+w8jXk4Xpur/69rWgIwmvjdZbvp0j5WNMJYVfYLWLun2a
-         mGzfKt2KEbj88URuYYOlFyQQnPlcpwgtEOhl3o/OK+GU5VExZWV38mv8B0EC+NY1BVRm
-         TpkAT+eK3x1X1+3wWgpgVgyeORDJF3Xfnr0VJeM5MuU+p/yRdEZs7cozwNaLGs7VrzTb
-         1wq8aXU9No1qLeeUi4cqEoWohKpUlbuV6pMUx/7WPoFok5fA/LPz6qeAp7nstsxl/TUS
-         JgIg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YnnNA+Dy"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-40f387a688dso239314fac.0
+        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 12:51:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773258718; x=1773863518; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xHiXRPU0oj2HIsyVL3yHXql4isoiizU2/nOjnBQn0Ag=;
+        b=YnnNA+DyqHV+7WGhKKZQpaWCFo2/y8o9ZrLvOKKtAKeYx5Y70QC6p7Dho6K+SP3uGr
+         jdLaja0Dkk7rA/4nKXBO4ay5zzAMM3mphLO8xAFVY9W5hfXJ0Y81CZ4f3fiGxh+0KcJp
+         2lAhp/neawJfeOInaoyIQjl2cbPzGsCdRgUFDDuwwthVGI8keIC/jVHWQG6A5ikE+EWM
+         bin1EuSzvpBEKnIa697x1nVWzRy5YJnnf6nVpdGhAYpdhrbgNc20mm6zvuqNx45zgxpD
+         KFsXlFiKD+cEmVdQGV2GU9k/ml9Iw6qoCPXcxoI/p7/EK6T1l84qUUmdpk3dK5witaPI
+         Qp2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773253261; x=1773858061;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1773258718; x=1773863518;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Cq8+tWfGf0TNmdPtc7SAv9a2DVpNwq16jsP0bVMh1cM=;
-        b=sxYgAU8NvBdhZobdxatbE8BkFPzeviMFUarOE76EZnQ1txs/avAukteQ3y1WUojp5O
-         OB26ZG+noc+sipSDBlqXZwZYxAK0kNFbGQDQId/JedlO7OUYFHqfjEovVlomjF3tZlh2
-         /6HFaiix0FYDxK93w1VfFdaq9KTlOzXhkoxMujMVqsbolZCK+ean0YaVbBU/Fshxp0Mm
-         JnJV8vYTeHHug+Bb7dxtsxDUYUK3L5DfMcS/fT7c5Of3p8B+/1RUAqGb0VjdvC/WgOKK
-         g+nHiZr1DlOglxfdevpctMMi6EF4Tvl4YYD2Vtar8bGsaxMj6yPSREb8qg7uMe6nJvU+
-         QBZw==
-X-Forwarded-Encrypted: i=1; AJvYcCW9rFMWSBcLWHCzepad2vGmYKIG26YGod53bHWzVm5RSnBt3y2esCna61FMBC38ypS9dPjf2f6BeFS8kw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyppECF0imDyNdVSBSIhLXoZBe0G+xj/iMagORobJmcofUToo60
-	yibVOlrAH0wWi/7yHUD0oWxYk1IPJ+zWciX6zLsnLBHiJoCHbkT+e7xn2Ne58tuFGiEZ14SXSYw
-	aRI6NMM/HMtt7FdIhU3/Hj+ZxZRF5SsDmG42gd/OcnZjgRlOAScq/zrtE34vN1sa1MsA4gCNmmC
-	nCIoZGzMvKWRdayht6UBsSyAwB4PAlulRk9eM=
-X-Gm-Gg: ATEYQzy0ZdP3p7K0FALO2ErayR99y6kqe2IsmgZXIkBff2b+3o8EPmXE+WhAd5sK2bs
-	ucvQTdJyPqpMAkOVCJKx7H7UqXiNpYd1ag7pdrweXSqPSmg7o3f+Z9fzLBIs2cWP2IZr0lvgJJc
-	ZHmNL5WZxDs+VTpN+x0LQlm7ApQW7QeF9DIIIrrgaEHrVNJ4VGandPl0Ch1XCXReu2w/TiI9KKc
-	7T+xUa9
-X-Received: by 2002:a05:690c:2704:b0:798:e281:a51d with SMTP id 00721157ae682-79917f7333dmr31676327b3.32.1773253261150;
-        Wed, 11 Mar 2026 11:21:01 -0700 (PDT)
-X-Received: by 2002:a05:690c:2704:b0:798:e281:a51d with SMTP id
- 00721157ae682-79917f7333dmr31676087b3.32.1773253260648; Wed, 11 Mar 2026
- 11:21:00 -0700 (PDT)
+        bh=xHiXRPU0oj2HIsyVL3yHXql4isoiizU2/nOjnBQn0Ag=;
+        b=a69rKB1zjH7SGrJipXo9ZQKBsR2n1UV+IDrAPmSbcbPD+GpafHqLL9Ml7m2GlnqPLJ
+         vvaxq5EaMtuFlk4Ew3fijJ9tzEKWHJOlk+9EkTT4HPsQHjraJRNDH1oaXEOa8OGRMYGl
+         Nr8YYmAKlUXv5rYNlI30l4jQ7TmhkhNGVC8F/51EzuK/s4vK0klOAe7NMcveGLpO0wQ5
+         GjxEeh+OkzDypOhVJ6sIp7YP4V/N+yTl/FQBLZXC3XVmSEEh4BsQ7VaB6Z+9j9nGOV9q
+         QctXVNLV1q3PapidfGZq145RgDcRTRTkSQY619+4W2JYSP4puGPzjcgdIZZtW0763oaD
+         Ahew==
+X-Forwarded-Encrypted: i=1; AJvYcCXko9Ry2JeWFO0y1yQ3nrVTAAtiN+M37XGrtBSUXjpA84dDJbnHlByZB76l6qvhL7i0N7MmayQ/70BqkA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAl9GTmDo7YaTlSl2F9QjQm8nzgO7tJ9tQrE3uDasNAQRCDY1x
+	8hVZHxOSx5pcvDwTnVQf+GvIOdOg5n619JpRTS74Ru3yF7XphcFhrjE2
+X-Gm-Gg: ATEYQzzdz7QeoPUpb8W56kOPbL9M5mIKdSZ/vBOMUnk/kIvR4Dev/K8S5hAJid8tj8A
+	fxR82us7RCFe3NG6NZfJKkeXFXGyJfae9UZ4uQe6sd7j3dYfQPOoCQJSpebymSuva02NfGLCKIH
+	ZPOG+e49p77Xd7dNryEMSxeZAts02JELFRaArhtvbY7BQYm10Gg6If8c6ly6Oh8/zDh34Mphi34
+	yRgamo/2pnk3rcU+HOKFYtfYifsukh/tbxWyOqrc0dLD2yfDhRoOe+ZqBfan+CCzjT0OrRean8Q
+	4KJTrouCljQsCBPhhJzsQlN6t6uUpph3HtdjRMfJOvtCkt6w+35RZia9/2FPWz766B0NMpPIBpV
+	wqGoPxlO91phxClymfNMcC3zQdh0B3Hfg6h6giAMSqQcqNu34M2ztlMmQcEAwKmGxw2ZYGj3Y8F
+	xVsiWz/HQklJpbfFS6jBeWeNYT35ateFKa
+X-Received: by 2002:a05:6870:3314:b0:3d9:2fe2:f5c8 with SMTP id 586e51a60fabf-4177c8bcaf6mr2475836fac.32.1773258718211;
+        Wed, 11 Mar 2026 12:51:58 -0700 (PDT)
+Received: from localhost ([2a03:2880:10ff:55::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e64a931sm3100578fac.14.2026.03.11.12.51.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2026 12:51:57 -0700 (PDT)
+From: Joshua Hahn <joshua.hahnjy@gmail.com>
+To: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Nhat Pham <hoangnhat.pham@linux.dev>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@meta.com
+Subject: [PATCH 03/11] mm/zsmalloc: Introduce conditional memcg awareness to zs_pool
+Date: Wed, 11 Mar 2026 12:51:40 -0700
+Message-ID: <20260311195153.4013476-4-joshua.hahnjy@gmail.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260311195153.4013476-1-joshua.hahnjy@gmail.com>
+References: <20260311195153.4013476-1-joshua.hahnjy@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260227-blk-dontcache-v3-0-cd309ccd5868@columbia.edu>
- <20260227-blk-dontcache-v3-1-cd309ccd5868@columbia.edu> <wen63cjbk3k54mjzgw7zftsuze6bzxmdk5u5wdjabzdiqg645k@67666k5lrevh>
- <aaXK0_HqEnU5SK61@casper.infradead.org> <aaybsigvp33i54w244jy4jarwf53zph5mzwjy2hcfm4v7m5o5o@e5hljmjqa3kq>
-In-Reply-To: <aaybsigvp33i54w244jy4jarwf53zph5mzwjy2hcfm4v7m5o5o@e5hljmjqa3kq>
-From: Tal Zussman <tz2294@columbia.edu>
-Date: Wed, 11 Mar 2026 14:20:49 -0400
-X-Gm-Features: AaiRm52QGrwhBIHZ_poQdAn3zaJ3OJ_GcxWQiC5XIABJrq0SVTc4spz01Omwcfs
-Message-ID: <CAKha_sp3nF=UbVd3tjie2qat44P3_puZLABWJRXs24SLVpG+gQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 1/2] filemap: defer dropbehind invalidation from
- IRQ context
-To: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@kernel.org>,
-        Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-        Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-        Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
-        Brendan Jackman <jackmanb@google.com>,
-        Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-GUID: YXzzPZmBH4-agXqH_tsDg2opdQMPnW5L
-X-Authority-Analysis: v=2.4 cv=ev3SD4pX c=1 sm=1 tr=0 ts=69b1b28d cx=c_pps
- a=0mLRTIufkjop4KoA/9S1MA==:117 a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10
- a=x7bEGLp0ZPQA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22
- a=jHxIr1HyPKZ_Q5_91PL3:22 a=-5RlsJUDQDLQn6G50gQA:9 a=QEXdDO2ut3YA:10
- a=WgItmB6HBUc_1uVUp3mg:22
-X-Proofpoint-ORIG-GUID: YXzzPZmBH4-agXqH_tsDg2opdQMPnW5L
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzExMDE1NSBTYWx0ZWRfX0+ByKxw7G8vd
- RBV5bpsvCddeypsz46woXRY06WsqR3ezfRxRwLcdFwO30aLVcyHzzvQEZ9hLIqhwo8YRsel2Dc1
- bBTMXCoYKp3KQw3dAhQTPaN0b91qVCLpbMOr+pCvs3y8cT1A7vPVGoHmm0JU6H2h/YswAY6Ozqd
- FNw+YQ7ljv3EsNliwsUERkvUbuIpKw9M48g2QcKPxai6zQw+BOrdneqO1Iyfi3iufLatMCliuWr
- n/Rvn5TSkCu9QfDs38RljQk/v7ouZRMtcJM/C7MtiNYwouaXeTE0UpBW2t/9Fa40HNe9fotuZ4C
- 8OctDL/gJOfRdWP+w4zVS5GqvmOhCtGlGQv/8mE7yhHHkS4lyGIPAbDoxwE3qumZXoDInjYbrW6
- pUidPovwbIfFqopcrpeVWte37KXeGfOLr1hxLsBxsqjnV+dSE5rt/+lYCw6Co7oYNJM7yp+HfpQ
- jr+P5zVV4kynMk/HlWg==
-X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11726
- signatures=596818
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=10 impostorscore=10 clxscore=1015 spamscore=0 adultscore=0
- bulkscore=10 priorityscore=1501 suspectscore=0 phishscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603110155
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 3, 2026 at 5:39=E2=80=AFAM Jan Kara <jack@suse.cz> wrote:
-> On Mon 02-03-26 17:37:23, Matthew Wilcox wrote:
-> > On Mon, Mar 02, 2026 at 10:11:19AM +0100, Jan Kara wrote:
-> > > Folio batches are relatively small (31 folios). With 4k folios it is =
-very
-> > > easy to overflow the batch with a single IO completion. Large folios =
-will
-> > > obviously make this less likely but I'm not sure reasonable working o=
-f
-> > > dropbehind should be dependent on large folios... Not sure how to bes=
-t
-> > > address this though. We could use larger batches but that would mean =
-using
-> > > our own array of folios instead of folio_batch.
-> >
-> > That's why I think we should allow the bio to be tagged as
-> > "finish the bio in workqueue context",
->
-> Yeah, what you suggested there makes sense to me. The workqueue would
-> probably have to be a per-cpu one for performance reasons but otherwise I
-> think it's worth a try.
+Introduce 3 new fields to struct zs_pool to allow individual zpools to
+be "memcg-aware": memcg_aware, compressed_stat, and uncompressed_stat.
 
-If the consensus is that completing tagged bios in workqueues is the right
-approach, I can give that a shot based on Matthew's suggestion.
+memcg_aware is used in later patches to determine whether memory
+should be allocated to keep track of per-compresed object objgs.
+compressed_stat and uncompressed_stat are enum indices that point into
+memcg (node) stats that zsmalloc will account towards.
 
-Jens, does that approach sound reasonable to you?
+In reality, these fields help distinguish between the two users of
+zsmalloc, zswap and zram. The enum indices compressed_stat and
+uncompressed_stat are parametrized to minimize zswap-specific hardcoding
+in zsmalloc.
 
-Thanks,
-Tal
+Suggested-by: Yosry Ahmed <yosry@kernel.org>
+Signed-off-by: Joshua Hahn <joshua.hahnjy@gmail.com>
+---
+ drivers/block/zram/zram_drv.c |  3 ++-
+ include/linux/zsmalloc.h      |  5 ++++-
+ mm/zsmalloc.c                 | 13 ++++++++++++-
+ mm/zswap.c                    |  3 ++-
+ 4 files changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index bca33403fc8b..d1eae5c20df7 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1980,7 +1980,8 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ 	if (!zram->table)
+ 		return false;
+ 
+-	zram->mem_pool = zs_create_pool(zram->disk->disk_name);
++	/* zram does not support memcg accounting */
++	zram->mem_pool = zs_create_pool(zram->disk->disk_name, false, 0, 0);
+ 	if (!zram->mem_pool) {
+ 		vfree(zram->table);
+ 		zram->table = NULL;
+diff --git a/include/linux/zsmalloc.h b/include/linux/zsmalloc.h
+index 478410c880b1..24fb2e0fdf67 100644
+--- a/include/linux/zsmalloc.h
++++ b/include/linux/zsmalloc.h
+@@ -23,8 +23,11 @@ struct zs_pool_stats {
+ 
+ struct zs_pool;
+ struct scatterlist;
++enum memcg_stat_item;
+ 
+-struct zs_pool *zs_create_pool(const char *name);
++struct zs_pool *zs_create_pool(const char *name, bool memcg_aware,
++			       enum memcg_stat_item compressed_stat,
++			       enum memcg_stat_item uncompressed_stat);
+ void zs_destroy_pool(struct zs_pool *pool);
+ 
+ unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t flags,
+diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
+index 7758486e1d06..3f0f42b78314 100644
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -214,6 +214,9 @@ struct zs_pool {
+ #ifdef CONFIG_COMPACTION
+ 	struct work_struct free_work;
+ #endif
++	bool memcg_aware;
++	enum memcg_stat_item compressed_stat;
++	enum memcg_stat_item uncompressed_stat;
+ 	/* protect zspage migration/compaction */
+ 	rwlock_t lock;
+ 	atomic_t compaction_in_progress;
+@@ -2050,6 +2053,9 @@ static int calculate_zspage_chain_size(int class_size)
+ /**
+  * zs_create_pool - Creates an allocation pool to work from.
+  * @name: pool name to be created
++ * @memcg_aware: whether the consumer of this pool will account memcg stats
++ * @compressed_stat: compressed memcontrol stat item to account
++ * @uncompressed_stat: uncompressed memcontrol stat item to account
+  *
+  * This function must be called before anything when using
+  * the zsmalloc allocator.
+@@ -2057,7 +2063,9 @@ static int calculate_zspage_chain_size(int class_size)
+  * On success, a pointer to the newly created pool is returned,
+  * otherwise NULL.
+  */
+-struct zs_pool *zs_create_pool(const char *name)
++struct zs_pool *zs_create_pool(const char *name, bool memcg_aware,
++			       enum memcg_stat_item compressed_stat,
++			       enum memcg_stat_item uncompressed_stat)
+ {
+ 	int i;
+ 	struct zs_pool *pool;
+@@ -2071,6 +2079,9 @@ struct zs_pool *zs_create_pool(const char *name)
+ 	rwlock_init(&pool->lock);
+ 	atomic_set(&pool->compaction_in_progress, 0);
+ 
++	pool->memcg_aware = memcg_aware;
++	pool->compressed_stat = compressed_stat;
++	pool->uncompressed_stat = uncompressed_stat;
+ 	pool->name = kstrdup(name, GFP_KERNEL);
+ 	if (!pool->name)
+ 		goto err;
+diff --git a/mm/zswap.c b/mm/zswap.c
+index e6ec3295bdb0..ff9abaa8aa38 100644
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -257,7 +257,8 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
+ 
+ 	/* unique name for each pool specifically required by zsmalloc */
+ 	snprintf(name, 38, "zswap%x", atomic_inc_return(&zswap_pools_count));
+-	pool->zs_pool = zs_create_pool(name);
++	pool->zs_pool = zs_create_pool(name, true, MEMCG_ZSWAP_B,
++				       MEMCG_ZSWAPPED);
+ 	if (!pool->zs_pool)
+ 		goto error;
+ 
+-- 
+2.52.0
+
