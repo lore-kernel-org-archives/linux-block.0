@@ -1,71 +1,121 @@
-Received: from mta20.hihonor.com (mta20.hihonor.com [81.70.206.69])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CEB30EF8B;
-	Wed, 11 Mar 2026 04:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.206.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A6A23ABA8;
+	Wed, 11 Mar 2026 04:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773201655; cv=none; b=gsmw4QcFqd5YQwlk06VJDF0LGlk3QQodjcedI16bkKD+2sCHHHYH+1+XVg00hb3HW00ICZStmTTB2uebHncPUc1suKA0i+9cSKU2xj/uNSOS3KgBWe2CMzysdKLZSdJs5lKv5za8efr39EFuHdtiZXgvwSILV3p33c8J5F5eN+c=
+	t=1773205159; cv=none; b=AfUOn7Xr22tdivnqiMJmXtugg75clXxy/ixinW+84d9P9bQcU6XygWynS5vcLY1bvg0ClT+/FZLNRV3acp/hmfB7bGKfikZIxgb4DM7rG+GfxYVjjZgSZlcXDJ+WHdNfJlM6MXdJ14xAjKoxZwyPwj2kpc1le2hoxL9iMo6ym0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773201655; c=relaxed/simple;
-	bh=za318KmxwpZ1gDhTjFlKNWedrLcKDVlRK0MPiajZW+8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cbIxc/t93NzZpbOtsaGaJO3L5/pJ6HskCltf0znRkoYoy21FTdYYddlNa69cEemVU+LT/781sgJhtcN4J/niR+ThRTPfjEFVPVIlAAzBDnsI4T96D32CLuUK8BTOY0xO+RdqiTmdGiDFXtSsI4ozWGWvjh7LMLzO/xeH7gerv3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.206.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
-Received: from w001.hihonor.com (unknown [10.68.25.235])
-	by mta20.hihonor.com (SkyGuard) with ESMTPS id 4fVxlv1Xy6zYmMpt;
-	Wed, 11 Mar 2026 11:57:31 +0800 (CST)
-Received: from a003.hihonor.com (10.68.18.8) by w001.hihonor.com
- (10.68.25.235) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Wed, 11 Mar
- 2026 12:00:48 +0800
-Received: from a008.hihonor.com (10.68.30.56) by a003.hihonor.com (10.68.18.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Wed, 11 Mar
- 2026 12:00:48 +0800
-Received: from a008.hihonor.com ([fe80::b6bf:fc6a:207:6851]) by
- a008.hihonor.com ([fe80::b6bf:fc6a:207:6851%6]) with mapi id 15.02.2562.027;
- Wed, 11 Mar 2026 12:00:48 +0800
-From: gao xu <gaoxu2@honor.com>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-CC: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>,
-	zhouxiaolong <zhouxiaolong9@honor.com>
-Subject: RE: zram: Optimize LZ4 dictionary compression performance
-Thread-Topic: zram: Optimize LZ4 dictionary compression performance
-Thread-Index: AdywM2pDLIO0gp5TQXuJ4OQmnHDBWf//vZmA//4fC/A=
-Date: Wed, 11 Mar 2026 04:00:48 +0000
-Message-ID: <cfb89ffc52d649f39ec98b844efa8bd9@honor.com>
-References: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
- <aa-2nItXDdeDj4Xi@google.com>
-In-Reply-To: <aa-2nItXDdeDj4Xi@google.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1773205159; c=relaxed/simple;
+	bh=hs7h01zebVZ3Cw5TSlyQoCCjwzUa+l8Cgq+3i/i+v4I=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=d+XpBF8R6hSjSTcMBfmH4ILegC+T+VFU6cnWCeL1UynvVuQvwhGK9HU46EbLxpSuUjgEosLLNlyp/vWQRByhJqvaUVytBWX5j1mOlK0gjr5ZpJ0vTdvEsR3BRMdUbUK3k1H4T5bY1NHCoXs6ClvsiRYESo1PnmzsuR0fJZq8vHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R7QWHNq5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R7QWHNq5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7C9CC4CEF7;
+	Wed, 11 Mar 2026 04:59:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773205158;
+	bh=hs7h01zebVZ3Cw5TSlyQoCCjwzUa+l8Cgq+3i/i+v4I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R7QWHNq5KYIpTwVo6Up5GHHSOdSE2gpk5GaKkIBbqjAR4gbzmNPFWIlQW10KkTPof
+	 EwepFELDieEhDwLa7MFg7ekO96kgeq0l/+LlK0SmYNrKgD9B5JFn2p8cKdN19q4bAB
+	 ZH5nM61a+EeP1bfo59H2leGLnAv8MA9DVbVTjKyoY75UQZCsrcqb+6U4ml2aryZAOd
+	 53HkEOSnemZkK807SePgE6JYJ0qIK9ypnQbQrEKCx7cEo9CjlroOKs6BchxOV0buhD
+	 E4Ehzc8FteV6XUFhu9KE6nGI0Pkr7s204WVgcSsEwXmzro7D3LuhuKd0AU39V1R3Ja
+	 2cWkRLISF31UQ==
+Date: Wed, 11 Mar 2026 13:59:11 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
+ bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+ intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-mm@kvack.org,
+ linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+ sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, Philipp Zabel
+ <p.zabel@pengutronix.de>
+Subject: Re: [PATCH 57/61] reset: Prefer IS_ERR_OR_NULL over manual NULL
+ check
+Message-Id: <20260311135911.ced50d67e940cdf933a98d1a@kernel.org>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-57-bd63b656022d@avm.de>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+	<20260310-b4-is_err_or_null-v1-57-bd63b656022d@avm.de>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-PiANCj4gT24gKDI2LzAzLzEwIDAyOjU0KSwgZ2FvIHh1IHdyb3RlOg0KPiA+ICsJCW1lbWNweSh6
-Y3R4LT5jc3RybSwgJmRydi0+YmFzZV9jc3RyZWFtLA0KPiA+ICsJCSAgIHNpemVvZigqemN0eC0+
-Y3N0cm0pKTsNCj4gDQo+IERvIHdlIG5lZWQgdG8gZG8gdGhpcyBtZW1jcHkoKSBldmVyeSB0aW1l
-Pw0KbWVtY3B5IGlzIGEgcmVwbGFjZW1lbnQgZm9yIExaNF9sb2FkRGljdC4gTFo0X2xvYWREaWN0
-IHVwZGF0ZXMgdGhlIExaNCBoYXNoIHRhYmxlIHVzaW5nIHRoZSBkaWN0aW9uYXJ5LiBGdXJ0aGVy
-bW9yZSwgTFo0IGFsc28gdXBkYXRlcyBpdHMgaGFzaCB0YWJsZSB3aXRoIHRoZSByZXN1bHRzIG9m
-IHRoZSBwcmV2aW91cyBjb21wcmVzc2lvbi4gVGhlcmVmb3JlLCB0byBlbnN1cmUgdGhlIGNvbXBy
-ZXNzaW9uIGRpY3Rpb25hcnkgcmVtYWlucyBlZmZlY3RpdmUsIHdlIHdvdWxkIG5lZWQgdG8gcmVz
-ZXQgdGhlIGhhc2ggdGFibGUgZXZlcnkgdGltZSwgd2hpY2ggd291bGQgaW52b2x2ZSBleGVjdXRp
-bmcgbWVtY3B5KCkgb3IgTFo0X2xvYWREaWN0KCkuIChQbGVhc2UgY29ycmVjdCBtZSBpZiB0aGVy
-ZSdzIGFueSBtaXN1bmRlcnN0YW5kaW5nIGhlcmUuKQ0KPiBBIG5pdDogaWYgaXQgY2Fubm90IGZp
-dCBvbiBvbmUgbGluZSwgdGhlbiBsZXQncyBhbGlnbiBzaXplb2YoKnpjdHgtPmNzdHJtKSB3aXRo
-ICIoIi4NClJlY2VpdmVkLCB0aGFuayB5b3UuDQoNCg==
+On Tue, 10 Mar 2026 12:49:23 +0100
+Philipp Hahn <phahn-oss@avm.de> wrote:
+
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+> 
+> Semantich change: Previously the code only printed the warning on error,
+> but not when the pointer was NULL. Now the warning is printed in both
+> cases!
+> 
+> Change found with coccinelle.
+> 
+> To: Philipp Zabel <p.zabel@pengutronix.de>
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+> ---
+>  drivers/reset/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/reset/core.c b/drivers/reset/core.c
+> index fceec45c8afc1e74fe46311bdc023ff257e8d770..649bb4ebabb20a09349ccbfc62f8280621df450e 100644
+> --- a/drivers/reset/core.c
+> +++ b/drivers/reset/core.c
+> @@ -715,7 +715,7 @@ EXPORT_SYMBOL_GPL(reset_control_bulk_acquire);
+>   */
+>  void reset_control_release(struct reset_control *rstc)
+>  {
+> -	if (!rstc || WARN_ON(IS_ERR(rstc)))
+> +	if (WARN_ON(IS_ERR_OR_NULL(rstc)))
+
+This changes the behavior when rstc == NULL.
+WARN_ON does not hit when rstc == NULL in the original code.
+
+Thanks,
+
+>  		return;
+>  
+>  	if (reset_control_is_array(rstc))
+> 
+> -- 
+> 2.43.0
+> 
+> 
+
+
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
