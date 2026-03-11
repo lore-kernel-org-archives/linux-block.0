@@ -1,154 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895653148D5;
-	Wed, 11 Mar 2026 13:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E022D8391
+	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 13:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773235274; cv=none; b=ICB8mf0cVnu7WOb/qjGSYGZqe0yDVV7C2B3jnIzHDWNEyyI0WEZ2l+IBdR3kDTr2KCOdgvfp4MINlD97xEJGC7ZAE0WfK6bEWRubtGtv4gmIBK4BFhXG1Sw+dmQz9jN5zplej0qCZkqSCXLeK+D7a7pWqftg3Aa5iOXpbslY//I=
+	t=1773235288; cv=none; b=J6n3WvrtqNA4BllKZgsCtQ+B4EhvzYgFx3w/cfDM/gSofYtfpi0e1kUwD2oXgJfpzPU4QWi9iINfkNNBS0/wi3WnwSCEHlt7108CEIBxUkHTBI2I0RG80yeFWYSuZb/y92EEBEvso0puFTcEZgTZ6deYhS1JoYh+RZa2b8bdGLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773235274; c=relaxed/simple;
-	bh=RXdVi4o90dChxbva+1+5nQfEtOIAGmmKN8r49o1nvfo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jNeMg3BideDri5Uc7zw8pdKFn5e11uPwiJh7aQeajWznKE2H5dkxqYTEvp3JgZUHC+kAnBqHbWiHhqceSvkysX+Ib0s0o7i/BbLpLw0EqnWgvJnswgBa2wb68ukIi30OC1GijNqVCJNfNfJR232dYBveiXolgKq5bkI8GZpVgZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYslXCcg; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYslXCcg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2B50C4CEF7;
-	Wed, 11 Mar 2026 13:21:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773235274;
-	bh=RXdVi4o90dChxbva+1+5nQfEtOIAGmmKN8r49o1nvfo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=SYslXCcg8ZocLdT9Nn5mr1QaU/7bNoDc232jum50wN6xbNZ+uWju1afqBneVGuocz
-	 1HKDIt816EDwj5iiTFX9r+Xx0k5/Bv68ggEGGRF42q7ddeuXmYn246eMpyZbeIthSb
-	 dIkZdQtgPyPKlIey0NGOHM4yAFo042f7KigtmT2i+P3iJcYA/mT/hwzyIaKf8L8SC5
-	 9h83BXWCfD6U7KdEYFv4VjKFpSCBLpiLKoc11feaKvkpUyTWxniWYSKZ5NC4byurtY
-	 dgnZG3oI4Zzg1+D4eP4qTrFzLJjA7SSkqBSG8TuL6AkN+zGOQf7fkx76g9IGtoP5aN
-	 xqQ3vT7odEcMg==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Damien Le Moal <dlemoal@kernel.org>, Daniel Gomez <da.gomez@samsung.com>,
-	Hannes Reinecke <hare@suse.de>, Hans Holmberg <Hans.Holmberg@wdc.com>,
-	Jan Kara <jack@suse.cz>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	John Pittman <jpittman@redhat.com>, John
-  Stultz <jstultz@google.com>,  "Martin K.
-  Petersen" <martin.petersen@oracle.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>, Niklas Cassel <cassel@kernel.org>,
-  Nitesh Shetty <nj.shetty@samsung.com>, Oliver Mangold <oliver.mangold@pm.me>,
-	Pankaj Raghav <kernel@pankajraghav.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Theodore Tso <tytso@mit.edu>, Wedson
-  Almeida Filho <wedsonaf@gmail.com>, gost.dev@samsung.com,
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC][RESEND] Status of Rust in the block subsystem
-In-Reply-To: <878qcpbux5.fsf@kernel.org>
-References: <878qcpbux5.fsf@kernel.org>
-Date: Wed, 11 Mar 2026 14:21:00 +0100
-Message-ID: <87ikb2mrib.fsf@t14s.mail-host-address-is-not-set>
+	s=arc-20240116; t=1773235288; c=relaxed/simple;
+	bh=bQRlE5OR+3/41N9B/xBGXfMeOTv3hgeQ2WrY6jcTpBY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tEiTtQH/lSyeSSsLJ6jfr3cc1Z4BoQX1CTa/4lHWK20b7np8DlwTIAQmslcXjDhdpdsOus4ua3TMuxLmgrc+rTbG8tVxGpdmC6yOJFCxWPXqEDxu1wYBaYOFkUbMagLtcjeMst7vtVQUiTGGXM8EEWLI7ZZvwljIaPeGtqn6eFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5675d609621so11790674e0c.2
+        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 06:21:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773235286; x=1773840086;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=34DR94e/1PAvLLEaib58vFA4GW0m5SGe6jvxchEhMek=;
+        b=reOTzc2i0+Qb3OVSqrLwT2fc4YPW3jb7RHcYw+bPDP+sromK5Klf6P5S6e10abTkeZ
+         ICE17TT35/fu4kSb3TCzmt6XDlI7o3/gCGZUqt+NFi01j66n9+o73N1TgE8FOxYrrNmY
+         eCNVTq9KVFfMTSmFynXePh4TjUEpDpPc/Jit0FmJ1vWdOVJgSMFDIOyVIWXQy3loetHx
+         vU1VuR3c5lnF50KAfjvrH+9y+o6RxUXNuHnh+75ijJEnBA6H1EonYNQqwwLeOvzlgH0y
+         YzIIJLYID+7w2DC8jcjMdwdo//Dy3d7nPwGJDJonjXFBNO1deDsXSmp284yCOxbXiYf/
+         E9ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXeeYisuLn3sY9MmByv+WvDoOMhuaO2/TypDUJA6Y/QAEOVKcWwtFTcgOTjwO9PUwhxQHn1y9cNL/9IVA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YysgA4lFUg9TSQH6V5SdgwYvRwCmnZNSsBt66UQ0fnF1+ly4RAb
+	ra1lPcXdz+FSkYp3EeSbfxKcet/gzWauakjKeDwyLq0Qt7ISJFRhy0FLcKUmb58qTQ4=
+X-Gm-Gg: ATEYQzyr9rby6jDLkqXtoGcXq2w2/vDqZ1ancE8EMutJpSCilEunLwS+rX7VknBd2Hd
+	jbnTbjdg60Fb7bGZZ+AmMJHCAZvN0ZXacBMJywK5HySwttR32h9mnn8r3NYhsxjsZeFJ0S5E7So
+	+4MpTKa3gkgLnm4bnCQrkzlD9X5oT4Zd9cJYqD59co4hYFA2JiTcsI8xrclLqv0Vs6HQiFNvjtu
+	lo5XaDkQOtBbr/3zLFW3myvN4w8qIIMisBebGBn2mChRBL1XiOUEM6ccAA6+fdCuFGS4Va+0gl/
+	3s+OYLWhoXxkPTg/T2YZCa3iC3Qukx90RwZFM8o5oBlwJCEjE187W6HN7B8OrfgW82xERYSFDMV
+	aH0+/7K07itG7vlVMGrv3svg4j0lipcBzNH0Lu0LK/hOEQexm1vDneXvxuuCub8rBSoURcah/1s
+	88+s+TYE7eJPrJzna2aT9lrB1qheXwmUaZLBTMjwHWkc/lB1wQr+Ovb5Qbt2NM
+X-Received: by 2002:a05:6122:6090:b0:566:354d:9f4a with SMTP id 71dfb90a1353d-56b47448dfdmr920514e0c.1.1773235286258;
+        Wed, 11 Mar 2026 06:21:26 -0700 (PDT)
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com. [209.85.217.46])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-94ecff71a40sm529187241.13.2026.03.11.06.21.26
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2026 06:21:26 -0700 (PDT)
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-5ffa277c115so4957519137.3
+        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 06:21:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVyRqnpUhocJY6+4zQWEO7klDSwfLqKW3te4I025qwl54twUonsrKR40YDEG6Nim2WsuHwMPNmPdrOe5A==@vger.kernel.org
+X-Received: by 2002:a05:6122:1d05:b0:55b:7494:177b with SMTP id
+ 71dfb90a1353d-56b4752d806mr922396e0c.10.1773234967338; Wed, 11 Mar 2026
+ 06:16:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de> <20260310-b4-is_err_or_null-v1-36-bd63b656022d@avm.de>
+In-Reply-To: <20260310-b4-is_err_or_null-v1-36-bd63b656022d@avm.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 11 Mar 2026 14:15:56 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXQ8Q4jvkgFRJYhghz2BZRDC-9Mk6DbXxuaOc6C9DFHZQ@mail.gmail.com>
+X-Gm-Features: AaiRm52J84H77ROK64ZWWtJfaiCpnFeKyoSRmPbi-NC8CN6Ju1TJEFxJU9gZQQ8
+Message-ID: <CAMuHMdXQ8Q4jvkgFRJYhghz2BZRDC-9Mk6DbXxuaOc6C9DFHZQ@mail.gmail.com>
+Subject: Re: [PATCH 36/61] arch/sh: Prefer IS_ERR_OR_NULL over manual NULL check
+To: Philipp Hahn <phahn-oss@avm.de>
+Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
+	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
+	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
+	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	v9fs@lists.linux.dev, Yoshinori Sato <ysato@users.sourceforge.jp>, 
+	Rich Felker <dalias@libc.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Content-Type: text/plain; charset="UTF-8"
 
-Andreas Hindborg <a.hindborg@kernel.org> writes:
+On Tue, 10 Mar 2026 at 12:56, Philipp Hahn <phahn-oss@avm.de> wrote:
+> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
+> check.
+>
+> Change generated with coccinelle.
+>
+> To: Yoshinori Sato <ysato@users.sourceforge.jp>
+> To: Rich Felker <dalias@libc.org>
+> To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+> Cc: linux-sh@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
 
-> I would like to propose a session to discuss the status of Rust in the block
-> subsystem. I have two distinct points to discuss: 1) The status of Rust in the
-> block layer, and 2) the out-of-tree Rust NVMe driver.
->
-> == The status of Rust in the block subsystem ==
->
-> Rust has special status in the block subsystem [1]. We are currently at "Stage
-> 1" of a two stage "kind of thing", where enabling Rust code in the block
-> subsystem is essentially an experiment that can be terminated if it does not
-> work out. In order to move on from this stage to "Stage 2", where Rust in the
-> block subsystem is a first class citizen, we need two things. 1) We must observe
-> that Rust is applicable for writing block device drivers and 2) the kernel in
-> general must have fully adopted Rust.
->
-> For 1) I just sent a patch series that brings the Rust null block driver to
-> feature parity with the C counterpart [2]. Although the null block driver is not
-> real hardware, I think this submission goes a long way to demonstrate that
-> Rust is in fact applicable for writing block device drivers.
->
-> For 2) I would point to the fact that Rust in general is no longer experimental
-> in the kernel as a whole [3]. The "Rust Experiment" has been concluded,
-> successfully. We see adoption in the form of the binder driver, and in the
-> large, ongoing, effort targeting GPU drivers in the DRM subsystem. A few network
-> PHY drivers also made it in. There is a lot of activity on the Rust list though,
-> and I expect we will see Rust in more and more subsystems over the next few years.
->
-> On that basis, I suggest we discuss whether or not we can move to "Stage 2" -
-> and what that entails.
->
-> == The out-of-tree Rust PCI NVMe driver ==
->
-> As you may know, I am maintaining a Rust PCI NVMe driver out of tree. For the
-> development work of the block layer Rust APIs, it has been essential to
-> implement a real driver, in addition to the null block driver. A driver
-> targeting actual hardware has to deal with interrupts, registers, IO memory,
-> DMA, memory mappings, in a way that an emulated device does not. Keeping this
-> driver around has helped shape the Rust block APIs in a way that makes sense for
-> real devices, not just emulated ones.
->
-> Rebasing this driver every cycle is a lot of work. Driven by requirements of the
-> DRM drivers, core Rust APIs for DMA, register access, IO memory, etc. are being
-> reshaped and rethought, which is great. Rebasing on top of these changes as a
-> second class citizen all the time - not so great. But I believe that the Rust
-> NVMe driver is a great piece of reference code, so I keep doing it.
->
-> I would ask that we discuss merging the Rust NVMe driver so as to have a reference
-> implementation of a real driver in-tree. I think it would have the following
-> benefits:
->
->  - It would help ensure that the Rust block layer API actually works with real
->    devices.
->
->  - It would help make sure that the changes to core APIs that are made to
->    facilitate other subsystems are done in a way that is compatible with block
->    layer requirements.
->
->  - It would serve as a nice reference implementation and a great piece of
->    documentation.
->
->  - I would not have to rebase it all the time. Patches changing Rust APIs used
->    by Rust NVMe would have to change the Rust NVMe call sites.
->
-> Please note the emphasis on *reference* driver. I am not suggesting to replace
-> the existing C driver. I will maintain the new code if necessary.
->
-> If we could establish consensus on this, I would clean up the driver to a state
-> where it can be included in the kernel.
->
-> Best regards,
-> Andreas Hindborg
->
-> Link: https://lore.kernel.org/r/593a98c9-baaa-496b-a9a7-c886463722e1@kernel.dk [1]
-> Link: https://lore.kernel.org/r/20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org [2]
-> Link: https://lore.kernel.org/all/20251213000042.23072-1-ojeda@kernel.org/ [3]
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-As this topic was not selected for discussion at LSF, and I did not
-receive an invitation for LSF this year, I propose that we discuss these
-two topics on list.
+Gr{oetje,eeting}s,
 
-I do believe that these topics need to be discussed, and I would very
-much appreciate your input.
+                        Geert
 
-Cc: Jens Axboe <axboe@kernel.dk>,
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-Best regards,
-Andreas Hindborg
-
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
