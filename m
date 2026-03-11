@@ -1,67 +1,68 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85191355F36
-	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 19:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F5A37D103
+	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 19:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773258722; cv=none; b=BDivolfOvxfmtuD+NYaAcQeurDV4yi0szXQmGqI3xH8h1X31lJ4vh6p9JdmBaPgq/9VnrjhlEWIXacbJB0tcrTgsi/x1Mx+wz+3C5djj4PA2yFNAVpZjK23SU+fQXcWeVcnOF0vdGYKy01VwRMN/lcYKEXVvQBykt5zeQ4V4Zgk=
+	t=1773258723; cv=none; b=OXSUxCyFoxpAFh1jjt1w/TX26zX7/Oj3LGXeYaykM3nXCm4DLlizPUvbVTB0r2Yd+d3HSuATcZT/5ZdvHNUoK9WcesERyN98QW5qk6y4g44ClEUOfQYGXI5f/wud22JQsl+f0yTZ3kSXyDEQCUF91StnOojZebayzBD2jLiYths=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773258722; c=relaxed/simple;
-	bh=DZCEel+gASKs1YULBRoMAZRVMrRj9weWbG1mBFEBaxA=;
+	s=arc-20240116; t=1773258723; c=relaxed/simple;
+	bh=FlX1JxtGQ4L9YMM6+aD5mJkMLFZBnO5Nl+spgsSmm9o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hfFkLAb7dePkYHujMlTW+Zsw+FPinoBUQCOZ2gMosHtaofTeaeRjAXZ41t49NtucVG/oiHWgSt65G48k1M1+XA1jB4Bg7CtWWkg0qXnWrZ4PWovZdJ11wm9jPtFSk1fQQY3y6lJ214NTzY0yCDInNF6zQ2kEVOpvCivAG9X5YaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YnnNA+Dy; arc=none smtp.client-ip=209.85.160.47
+	 MIME-Version; b=As8/BkronPINzHVZY+BBsQB8++dMO29QyaLfCiTHCrgletecPmfU6zIPM+yJiLf3GVdNjFj7gzug+GJudNR+61GiuS3SkQz+iK3JlSvhh6NdxkVtCH+t0aCtHgKm+76GNLa+kgoIioWpH5VEtnsUObm/z9mNZkZyhxBDxWc5CDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YbPANPoy; arc=none smtp.client-ip=209.85.167.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YnnNA+Dy"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-40f387a688dso239314fac.0
-        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 12:51:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbPANPoy"
+Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-466f935a82fso193571b6e.0
+        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 12:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773258718; x=1773863518; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773258719; x=1773863519; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xHiXRPU0oj2HIsyVL3yHXql4isoiizU2/nOjnBQn0Ag=;
-        b=YnnNA+DyqHV+7WGhKKZQpaWCFo2/y8o9ZrLvOKKtAKeYx5Y70QC6p7Dho6K+SP3uGr
-         jdLaja0Dkk7rA/4nKXBO4ay5zzAMM3mphLO8xAFVY9W5hfXJ0Y81CZ4f3fiGxh+0KcJp
-         2lAhp/neawJfeOInaoyIQjl2cbPzGsCdRgUFDDuwwthVGI8keIC/jVHWQG6A5ikE+EWM
-         bin1EuSzvpBEKnIa697x1nVWzRy5YJnnf6nVpdGhAYpdhrbgNc20mm6zvuqNx45zgxpD
-         KFsXlFiKD+cEmVdQGV2GU9k/ml9Iw6qoCPXcxoI/p7/EK6T1l84qUUmdpk3dK5witaPI
-         Qp2A==
+        bh=mnVFn/QWUod1peerD4NOctgVgrZtb1oHuY7D76awS8Y=;
+        b=YbPANPoyXW0LwO6glEfUA2Fpx9mVsjufWa/85vXlALMXac8oAWxKTspdMrtCR9gc5J
+         CktD1x7RR/vjNVCGXyFDo1tjYh21yvl8rpXqKNhQf4LSdhJzlNaRVyPZDK2QHzM8lljj
+         9yw++01j1o3GYGLxic4jo9kNZE7WLN4AGht3IH+Rj2UfbTaCfZKFzvSPD+GCstaKoUji
+         +cHjUCNBpNmuBShzEEF2OPvnGf7tgRJggFO006DwtCJnUUX9KBRpYzQQ4iX0bjCssiVf
+         59stEfMDFLUS6HtZsbL/i+wItGXOVUVsiKrQMX6r3c/Csdfv+2WrBLRl0n7TZAvdR26R
+         WKwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773258718; x=1773863518;
+        d=1e100.net; s=20230601; t=1773258719; x=1773863519;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=xHiXRPU0oj2HIsyVL3yHXql4isoiizU2/nOjnBQn0Ag=;
-        b=a69rKB1zjH7SGrJipXo9ZQKBsR2n1UV+IDrAPmSbcbPD+GpafHqLL9Ml7m2GlnqPLJ
-         vvaxq5EaMtuFlk4Ew3fijJ9tzEKWHJOlk+9EkTT4HPsQHjraJRNDH1oaXEOa8OGRMYGl
-         Nr8YYmAKlUXv5rYNlI30l4jQ7TmhkhNGVC8F/51EzuK/s4vK0klOAe7NMcveGLpO0wQ5
-         GjxEeh+OkzDypOhVJ6sIp7YP4V/N+yTl/FQBLZXC3XVmSEEh4BsQ7VaB6Z+9j9nGOV9q
-         QctXVNLV1q3PapidfGZq145RgDcRTRTkSQY619+4W2JYSP4puGPzjcgdIZZtW0763oaD
-         Ahew==
-X-Forwarded-Encrypted: i=1; AJvYcCXko9Ry2JeWFO0y1yQ3nrVTAAtiN+M37XGrtBSUXjpA84dDJbnHlByZB76l6qvhL7i0N7MmayQ/70BqkA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAl9GTmDo7YaTlSl2F9QjQm8nzgO7tJ9tQrE3uDasNAQRCDY1x
-	8hVZHxOSx5pcvDwTnVQf+GvIOdOg5n619JpRTS74Ru3yF7XphcFhrjE2
-X-Gm-Gg: ATEYQzzdz7QeoPUpb8W56kOPbL9M5mIKdSZ/vBOMUnk/kIvR4Dev/K8S5hAJid8tj8A
-	fxR82us7RCFe3NG6NZfJKkeXFXGyJfae9UZ4uQe6sd7j3dYfQPOoCQJSpebymSuva02NfGLCKIH
-	ZPOG+e49p77Xd7dNryEMSxeZAts02JELFRaArhtvbY7BQYm10Gg6If8c6ly6Oh8/zDh34Mphi34
-	yRgamo/2pnk3rcU+HOKFYtfYifsukh/tbxWyOqrc0dLD2yfDhRoOe+ZqBfan+CCzjT0OrRean8Q
-	4KJTrouCljQsCBPhhJzsQlN6t6uUpph3HtdjRMfJOvtCkt6w+35RZia9/2FPWz766B0NMpPIBpV
-	wqGoPxlO91phxClymfNMcC3zQdh0B3Hfg6h6giAMSqQcqNu34M2ztlMmQcEAwKmGxw2ZYGj3Y8F
-	xVsiWz/HQklJpbfFS6jBeWeNYT35ateFKa
-X-Received: by 2002:a05:6870:3314:b0:3d9:2fe2:f5c8 with SMTP id 586e51a60fabf-4177c8bcaf6mr2475836fac.32.1773258718211;
-        Wed, 11 Mar 2026 12:51:58 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:55::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e64a931sm3100578fac.14.2026.03.11.12.51.57
+        bh=mnVFn/QWUod1peerD4NOctgVgrZtb1oHuY7D76awS8Y=;
+        b=iGEQKTLGCDyrOyXbAZvDipm8nRHQYPSKUxMGF3gN3isX0+doropF0tzvt5e5+qdIpJ
+         ivNXytAczjvRS0fPb0VOi2poJ87R2CE1MmKipG+kxhe1HNDH2hqLO3QTDRNMCdD9vRH0
+         pmvAhzpU9OHkVQjvgKYPRXDseT/iee6v9Ko55T9RUoxzBo1wvmySq5C9jtHQYayFVTN8
+         +enAFR5eewuKxC7k37Tlbzw14yAcb0F70byBnbpeXQ2ZC64T1mUUbaff7G5hNNPKtu3c
+         SIkHrzK6Iu1zbgmbK9baCICivyM19+aqSoNSfwEzTJXBrtGk+OR+YTQOPkn3kDGEcISr
+         So9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ7AH63sywkRBu7S02tBS1xvkqZbQTQOatHXrgdG9/De7HUMPuaXUP4+W1DIl8gQGAH21v2wrvREhWNg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1LhTdtWCzWNDJNzrQAmdRy3pmNtQcrKRqkAWA/2qlETjYscyD
+	0NGiYFlIfgNdEhBquD20cDSw3WvoXWwvq4Nl9b8aFotvUhcQnlYKS4id
+X-Gm-Gg: ATEYQzzDHHdbdGn7EVJKQJLqsr/fvuESujIr7pXCf0UFpONOuXoDuY8GTsaceXWZGnn
+	l0C4PJ+SGMoIOs9uyDglxqfcsgJWySbD6QzqU8FLqn0DvWkUnfGjTKdDQhjjMTyDdbCDnp+PlMb
+	Dt317/r7JkFaYitQewyKM8Hng27Yq9cviHEg4s6eO+4hYVlDOHlZtYO8lOrnEn02oepPYvphLTB
+	hNy4gMVDXHwHP/GwF4FU/LVDTksHf4aLmfNStPlM8GwT0i5289QUmv+c5dlOp07Jux4MZfzaQUv
+	ChJOuhY210FOWQrtye3rBNCY/zjBW85CCQT3fZRzZfcLEKGa2LpM1BivotqbRIYOLWzqvFZWno5
+	dZFpZleu0y2lkuPskEYkC5VtueZV+pJH4QrdxpSFC4Rtyc40xcsZCzNa71958yLK6938OuxGdAA
+	UUs2mFYHx1RudDL7CyXVwv4g==
+X-Received: by 2002:a05:6808:6a83:b0:462:d09a:cdca with SMTP id 5614622812f47-46733545ca6mr2042383b6e.32.1773258719499;
+        Wed, 11 Mar 2026 12:51:59 -0700 (PDT)
+Received: from localhost ([2a03:2880:10ff:4d::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e5e94b4sm2862488fac.11.2026.03.11.12.51.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 12:51:57 -0700 (PDT)
+        Wed, 11 Mar 2026 12:51:59 -0700 (PDT)
 From: Joshua Hahn <joshua.hahnjy@gmail.com>
 To: Minchan Kim <minchan@kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Johannes Weiner <hannes@cmpxchg.org>,
+	Harry Yoo <harry.yoo@oracle.com>,
 	Yosry Ahmed <yosry.ahmed@linux.dev>,
 	Nhat Pham <hoangnhat.pham@linux.dev>,
 	Nhat Pham <nphamcs@gmail.com>,
@@ -71,9 +72,9 @@ Cc: Johannes Weiner <hannes@cmpxchg.org>,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	kernel-team@meta.com
-Subject: [PATCH 03/11] mm/zsmalloc: Introduce conditional memcg awareness to zs_pool
-Date: Wed, 11 Mar 2026 12:51:40 -0700
-Message-ID: <20260311195153.4013476-4-joshua.hahnjy@gmail.com>
+Subject: [PATCH 04/11] mm/zsmalloc: Introduce objcgs pointer in struct zspage
+Date: Wed, 11 Mar 2026 12:51:41 -0700
+Message-ID: <20260311195153.4013476-5-joshua.hahnjy@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260311195153.4013476-1-joshua.hahnjy@gmail.com>
 References: <20260311195153.4013476-1-joshua.hahnjy@gmail.com>
@@ -85,118 +86,100 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce 3 new fields to struct zs_pool to allow individual zpools to
-be "memcg-aware": memcg_aware, compressed_stat, and uncompressed_stat.
+Introduce an array of struct obj_cgroup pointers to zspage to keep track
+of compressed objects' memcg ownership, if the zs_pool has been made to
+be memcg-aware at creation time.
 
-memcg_aware is used in later patches to determine whether memory
-should be allocated to keep track of per-compresed object objgs.
-compressed_stat and uncompressed_stat are enum indices that point into
-memcg (node) stats that zsmalloc will account towards.
+Move the error path for alloc_zspage to a jump label to simplify the
+growing error handling path for a failed zpdesc allocation.
 
-In reality, these fields help distinguish between the two users of
-zsmalloc, zswap and zram. The enum indices compressed_stat and
-uncompressed_stat are parametrized to minimize zswap-specific hardcoding
-in zsmalloc.
-
-Suggested-by: Yosry Ahmed <yosry@kernel.org>
+Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
+Suggested-by: Harry Yoo <harry.yoo@oracle.com>
 Signed-off-by: Joshua Hahn <joshua.hahnjy@gmail.com>
 ---
- drivers/block/zram/zram_drv.c |  3 ++-
- include/linux/zsmalloc.h      |  5 ++++-
- mm/zsmalloc.c                 | 13 ++++++++++++-
- mm/zswap.c                    |  3 ++-
- 4 files changed, 20 insertions(+), 4 deletions(-)
+ mm/zsmalloc.c | 34 ++++++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index bca33403fc8b..d1eae5c20df7 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1980,7 +1980,8 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
- 	if (!zram->table)
- 		return false;
- 
--	zram->mem_pool = zs_create_pool(zram->disk->disk_name);
-+	/* zram does not support memcg accounting */
-+	zram->mem_pool = zs_create_pool(zram->disk->disk_name, false, 0, 0);
- 	if (!zram->mem_pool) {
- 		vfree(zram->table);
- 		zram->table = NULL;
-diff --git a/include/linux/zsmalloc.h b/include/linux/zsmalloc.h
-index 478410c880b1..24fb2e0fdf67 100644
---- a/include/linux/zsmalloc.h
-+++ b/include/linux/zsmalloc.h
-@@ -23,8 +23,11 @@ struct zs_pool_stats {
- 
- struct zs_pool;
- struct scatterlist;
-+enum memcg_stat_item;
- 
--struct zs_pool *zs_create_pool(const char *name);
-+struct zs_pool *zs_create_pool(const char *name, bool memcg_aware,
-+			       enum memcg_stat_item compressed_stat,
-+			       enum memcg_stat_item uncompressed_stat);
- void zs_destroy_pool(struct zs_pool *pool);
- 
- unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t flags,
 diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
-index 7758486e1d06..3f0f42b78314 100644
+index 3f0f42b78314..dcf99516227c 100644
 --- a/mm/zsmalloc.c
 +++ b/mm/zsmalloc.c
-@@ -214,6 +214,9 @@ struct zs_pool {
- #ifdef CONFIG_COMPACTION
- 	struct work_struct free_work;
- #endif
-+	bool memcg_aware;
-+	enum memcg_stat_item compressed_stat;
-+	enum memcg_stat_item uncompressed_stat;
- 	/* protect zspage migration/compaction */
- 	rwlock_t lock;
- 	atomic_t compaction_in_progress;
-@@ -2050,6 +2053,9 @@ static int calculate_zspage_chain_size(int class_size)
- /**
-  * zs_create_pool - Creates an allocation pool to work from.
-  * @name: pool name to be created
-+ * @memcg_aware: whether the consumer of this pool will account memcg stats
-+ * @compressed_stat: compressed memcontrol stat item to account
-+ * @uncompressed_stat: uncompressed memcontrol stat item to account
-  *
-  * This function must be called before anything when using
-  * the zsmalloc allocator.
-@@ -2057,7 +2063,9 @@ static int calculate_zspage_chain_size(int class_size)
-  * On success, a pointer to the newly created pool is returned,
-  * otherwise NULL.
-  */
--struct zs_pool *zs_create_pool(const char *name)
-+struct zs_pool *zs_create_pool(const char *name, bool memcg_aware,
-+			       enum memcg_stat_item compressed_stat,
-+			       enum memcg_stat_item uncompressed_stat)
- {
- 	int i;
+@@ -39,6 +39,7 @@
+ #include <linux/zsmalloc.h>
+ #include <linux/fs.h>
+ #include <linux/workqueue.h>
++#include <linux/memcontrol.h>
+ #include "zpdesc.h"
+ 
+ #define ZSPAGE_MAGIC	0x58
+@@ -273,6 +274,7 @@ struct zspage {
+ 	struct zpdesc *first_zpdesc;
+ 	struct list_head list; /* fullness list */
  	struct zs_pool *pool;
-@@ -2071,6 +2079,9 @@ struct zs_pool *zs_create_pool(const char *name)
- 	rwlock_init(&pool->lock);
- 	atomic_set(&pool->compaction_in_progress, 0);
++	struct obj_cgroup **objcgs;
+ 	struct zspage_lock zsl;
+ };
  
-+	pool->memcg_aware = memcg_aware;
-+	pool->compressed_stat = compressed_stat;
-+	pool->uncompressed_stat = uncompressed_stat;
- 	pool->name = kstrdup(name, GFP_KERNEL);
- 	if (!pool->name)
- 		goto err;
-diff --git a/mm/zswap.c b/mm/zswap.c
-index e6ec3295bdb0..ff9abaa8aa38 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -257,7 +257,8 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
+@@ -825,6 +827,8 @@ static void __free_zspage(struct zs_pool *pool, struct size_class *class,
+ 		zpdesc = next;
+ 	} while (zpdesc != NULL);
  
- 	/* unique name for each pool specifically required by zsmalloc */
- 	snprintf(name, 38, "zswap%x", atomic_inc_return(&zswap_pools_count));
--	pool->zs_pool = zs_create_pool(name);
-+	pool->zs_pool = zs_create_pool(name, true, MEMCG_ZSWAP_B,
-+				       MEMCG_ZSWAPPED);
- 	if (!pool->zs_pool)
- 		goto error;
++	if (pool->memcg_aware)
++		kfree(zspage->objcgs);
+ 	cache_free_zspage(zspage);
  
+ 	class_stat_sub(class, ZS_OBJS_ALLOCATED, class->objs_per_zspage);
+@@ -946,6 +950,16 @@ static struct zspage *alloc_zspage(struct zs_pool *pool,
+ 	if (!IS_ENABLED(CONFIG_COMPACTION))
+ 		gfp &= ~__GFP_MOVABLE;
+ 
++	if (pool->memcg_aware) {
++		zspage->objcgs = kcalloc(class->objs_per_zspage,
++					 sizeof(struct obj_cgroup *),
++					 gfp & ~__GFP_HIGHMEM);
++		if (!zspage->objcgs) {
++			cache_free_zspage(zspage);
++			return NULL;
++		}
++	}
++
+ 	zspage->magic = ZSPAGE_MAGIC;
+ 	zspage->pool = pool;
+ 	zspage->class = class->index;
+@@ -955,14 +969,8 @@ static struct zspage *alloc_zspage(struct zs_pool *pool,
+ 		struct zpdesc *zpdesc;
+ 
+ 		zpdesc = alloc_zpdesc(gfp, nid);
+-		if (!zpdesc) {
+-			while (--i >= 0) {
+-				zpdesc_dec_zone_page_state(zpdescs[i]);
+-				free_zpdesc(zpdescs[i]);
+-			}
+-			cache_free_zspage(zspage);
+-			return NULL;
+-		}
++		if (!zpdesc)
++			goto err;
+ 		__zpdesc_set_zsmalloc(zpdesc);
+ 
+ 		zpdesc_inc_zone_page_state(zpdesc);
+@@ -973,6 +981,16 @@ static struct zspage *alloc_zspage(struct zs_pool *pool,
+ 	init_zspage(class, zspage);
+ 
+ 	return zspage;
++
++err:
++	while (--i >= 0) {
++		zpdesc_dec_zone_page_state(zpdescs[i]);
++		free_zpdesc(zpdescs[i]);
++	}
++	if (pool->memcg_aware)
++		kfree(zspage->objcgs);
++	cache_free_zspage(zspage);
++	return NULL;
+ }
+ 
+ static struct zspage *find_get_zspage(struct size_class *class)
 -- 
 2.52.0
 
