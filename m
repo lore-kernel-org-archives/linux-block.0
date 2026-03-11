@@ -1,128 +1,104 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9970A3382E1
-	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 14:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170D640DFAF
+	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 14:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773238392; cv=none; b=tEbH9SGWqJ8fTZC32zvNTusp27N4XxnfewcnvddFeYlpr6SjvM55AczhJsR7+ojUP6HFF/xA9QKHlmCoqL0ltm2QHYaku05w7Tpbimomqs+sNso9IaaTQz88wu4fOFX/EzJ3gNvYIYZ63ZOznF+HcBUBNw6TS7AtHUJMytT11yU=
+	t=1773239455; cv=none; b=uqw7ftbX7/sFQPS/RuHOC2nG3Kualh3Ozo4fkF+zDh9PbRZ+9s1GYQg17/IhkUERv3sh76XIJZ34LJR4597jvmDj07usbCcMVEJAVWOGzCiiR3HbQPuerRAgjO+KDNlJ6eeXHJ4WlDCV2hhMFvjfhqT/40qXUq7eSgF82gbsX78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773238392; c=relaxed/simple;
-	bh=POUJjzeRhBIXfPGojdZfC417KH92loTKx1KmDpRcfoc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MMbu6d5k3Al0WZc+2xMpzk1Sq6+lFQvoEUPxB4i30VpEisRXAHMXwaKV+g+uGpb/RsFwWoy7zGin2UUQkl0npR8F110Md1O0fVDG+RU+cpGHpf8CENwhTRImNpd/mj0Rd9F4zGx0IaM88a8nVVtByGLLmQmOcQitEETOTtcB7tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b93698bb57aso170392166b.0
-        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 07:13:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773238390; x=1773843190;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1773239455; c=relaxed/simple;
+	bh=oGFJVrw5MPryM38Hc+hepiTZFx+TepespPPKdJPjAp4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=QCAl+RDs9XTir8ojN4gE6/LcT0MP/b+px12kc7u8StnzpH4eFiXQX2G7XGDU5knzAksKpDaYu5x5NwN6FVURy1ZgWET66VCv+fhzSf5bbGKO+iEREUyWyNrJ1Pq2nGbGkngXv8JRvk5bvH3VZ4JAATL9CwiQFfqRkVoTnglzxoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=B6jbbNja; arc=none smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="B6jbbNja"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-662f30d3f1fso626915eaf.1
+        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 07:30:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1773239452; x=1773844252; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wIz9Fr5w5J45ZN4rxwvT/0kjXMGfLP1VpB2aKPOax7k=;
-        b=J7SC3HNU0ZwHlRM+/ZdCIdsc1LmekqCHOMjAk8JPVNFTwFwe4/4Fe9owDA/wlSX7li
-         thN43HL+yXbD7wXMrz7NM+P7T05xARlf2PbuUlEv+Jjo7ihDKqnMMMKklkUp+q62jDGW
-         7WJ1qvVjh5jvWRjDdO2vddNv3Tyd2XhVBb3AAHoZtosALgqCYDHcbE89FmkqrI3tkvyF
-         kf2c/xWZGG/B0k7TvUIqaID34n/DiaiA/Dk+7eRZuLS/Ljcbt9IPjyc3JYNCOOQ06yY3
-         9EQv0+eIVmtdxPjL+nssil3fGNIBdvNpUWMvGTGEJtQWwkG4H6OYH8w04cg+GAza1ncO
-         c7Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCVmkEBwrk3aGD2LAUNmOn2uOWOGCFnsWGcDAHY57OjdZyhZ21Xol51RT4NvX0RO0yxOncbyAEsJKxp6Zw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyblakGKLzHrrI+LZ5RvcLlfZc93Z7XTuxGUGXEltB3cMAniweC
-	vb8HKvO2nQNSB15IGCIWSWkbPKwjPQp07NZPHREaSwDmmk/FZNVMOq6kw8/YiVgXX5LBRw==
-X-Gm-Gg: ATEYQzw5ZwNEpZ4RuPOIVebcA6K/4/HUvI23F9R2hKh4PWAB138iR+iFOJ5NXk5IFgf
-	dI67iu96tqm9r/VrNEhNc3Ff1dfaeGwjhPbAzgIXsmJKnds4ktTjAX7p8IYQhJkfsvshe7y5yUF
-	XUiBXlGlSyw9mMvstmvsHSLCa8tXE/SkOMh9WERSIhedK0jkS9S+Jc6ju7iEkyRUDrG4HbrhZ8W
-	+Juh9KGO+72rsdzgRwMGEXP7/Bf+SfkA+DVQt1p/Kvca3AjDFV0aH0PfjFEkSkZUSbQ3ylN8+ZP
-	A/BeOaD7Iuyx8hI+jXnxoZtFNrj4776ldTyBQrIGyNRD/I2YdaEjwa2z/OGF3priY1dzka8yefs
-	i5T7Fq4qGduBP2mH7xwByX9c02KucLyCdlB04AMwFxhnWcLM0atVHzW8cEJKTmP3sFzSgPaOo3z
-	xhOVBc78SnuoBzki3toNPGoj5WJyOH8KwnWjALsZNrsnBlYVLrGhw+VldW2phi
-X-Received: by 2002:a17:907:3d56:b0:b88:5b72:ec39 with SMTP id a640c23a62f3a-b9711851e14mr416154466b.5.1773238389726;
-        Wed, 11 Mar 2026 07:13:09 -0700 (PDT)
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com. [209.85.218.48])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b972e14c45bsm57453066b.34.2026.03.11.07.13.08
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Mar 2026 07:13:09 -0700 (PDT)
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b93698bb57aso170388366b.0
-        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 07:13:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUlVHeHcLCfI9j0i34WZJJ7AIXA1d3QCWPeIPK/4KIKrYyCypOldVIoDESt6STxFLc9aSCFbgeWQUJ8mg==@vger.kernel.org
-X-Received: by 2002:a17:907:6d16:b0:b88:4f25:81da with SMTP id
- a640c23a62f3a-b97113ff0b9mr462021166b.0.1773237981235; Wed, 11 Mar 2026
- 07:06:21 -0700 (PDT)
+        bh=oM6lCoflebWUbf3iwIkh9GT6oyd1KsXTjtUHxgqxqWU=;
+        b=B6jbbNjaVa60r4cSdbcQqheOOZ+WnhPceLqH6hdSlEEIPFXblOJPorRllNxALr3n2f
+         VRPyxISO8fObmTNYt9eW4qP9qHWMcyT16m6bXwjlMI9OnETFClq5nATcwg2IFjDkQOOA
+         8J8sAS2t13LZZUd3CiY2HQTbSMR1ZLiSY+ZDDnXMTSME1wfrQ7eFLVw1VELa9xBaaih5
+         TSdptSEoAp5XZ+MHH8UXSRE12+wHaNNsbVjimtDsLpWpnqJebEMzJjnPR8J59I3J/tMf
+         5fIkwX9Ve4Cq/HNxbZoKKr2kxFz7qVyNO8JuXPSuN7TEr+1Ci+c6QBr2FI7F4bTpAUCn
+         s3rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773239452; x=1773844252;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oM6lCoflebWUbf3iwIkh9GT6oyd1KsXTjtUHxgqxqWU=;
+        b=A2+EnTql04BmoarhgcycRklhk6lRm59iuwn9r/cY35YCrYQD/dwU5ft/rhHEs9CyTp
+         Jwi37B0txge8ECzDErZgk15djAVGlM5S77xgoSuwSx/Z40FUsPOxB0ST1IdboPZZCxrR
+         ifJ4BLF2fZG3vhAYk3drPcg9cgm8klYT1kRPEq6aB5A7xZH1ZHcNzv1rDBVK1uimy990
+         dTglWUT4FVXWk7r7cVr1OUlaGx7bxq5mYCS9XHMox4PJN10FtGnGy4Ubq9M7QoGWNc4A
+         EBIaHcQQEo4MsT7AwT59wJ9lBjKeiF/4Oo7qoolOzMEVRDEXNo1xE0e46ZJLIlXhLM5M
+         PaPw==
+X-Gm-Message-State: AOJu0YxNdjK3wZS98QTxMmZ2fmgOudBPt45bLEOuQXUn3G0x/3hBu9NK
+	pdiicm42wlo3Ryeo8ZqWFFfmpCe0VGk9FhBP9ghvVshtCSMQpNpWHO5Yt3/S8mMLf6Lj5jWIMTZ
+	kMxEWFXg=
+X-Gm-Gg: ATEYQzyEB5UGafkOV9TZSN7pylj6NnGh64OUV7b5gGx6Eg59dkQSAUhi5b4yEEcGJ0I
+	4ARgb1Lob72/LB66hnna35PDpQOHxN1UClnjat7o8Zuu8AhAdjZ6IKkrWeb3gRiIN+8eZp6VdD8
+	wy6liaERTDW15wZGUQkRK1gpXaXvFnjqi0OkVppQTQ+PWZy4OvuvUSPVe1mGVKGB0VqXHg8idHg
+	iKC4alwAxdnSlYsnqIJ/jXAb1ZVByrz0mox7h8NkW93CKUN7x7N6JYuazd0v/KYut4fzXk7eT9L
+	BhuTGQ6mT9up6hEcRkYLYG8PjbEvk2+tDCQSIqnZ/znILpMoI3AuabZHRO3FwlpZvj5LcsiKfY6
+	+CftIN3tVMHBVzo1DmywRQjuLv0YAEnTEclmdW4RTRAERFqS8EwDWpq+qHRpRvUYnHVINCOZmhp
+	Ms+OzBBvJq0raisw3E2cXmrL8WOtdMnRy3PcqY3ihhoMGPPp7+puM21oppWuEWi+rsN/nfD36ZF
+	y1w
+X-Received: by 2002:a05:6820:1786:b0:675:99c9:cf7f with SMTP id 006d021491bc7-67bc9151c93mr1425052eaf.38.1773239452329;
+        Wed, 11 Mar 2026 07:30:52 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e5e9f53sm2524812fac.13.2026.03.11.07.30.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2026 07:30:51 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Yi Zhang <yi.zhang@redhat.com>
+In-Reply-To: <20260311032837.2368714-1-ming.lei@redhat.com>
+References: <20260311032837.2368714-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2] blk-cgroup: wait for blkcg cleanup before
+ initializing new disk
+Message-Id: <177323945100.213870.2430768479850715913.b4-ty@kernel.dk>
+Date: Wed, 11 Mar 2026 08:30:51 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-15-bd63b656022d@avm.de> <20260310100750.303af303@gandalf.local.home>
- <20260311141332.b611237d36b61b2409e66cb3@kernel.org> <20260311100332.6a2ce4b1@gandalf.local.home>
-In-Reply-To: <20260311100332.6a2ce4b1@gandalf.local.home>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 11 Mar 2026 15:06:07 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdX4kRGLaKMzPuhS1Pmxh609eiqQW-cAS_jWBBbt-vE6SA@mail.gmail.com>
-X-Gm-Features: AaiRm53WEGMMLW4z34e7P-lM1qFvsCJGZ_o4JNL5NPWbhJPKmcqz6k9bJcyL--8
-Message-ID: <CAMuHMdX4kRGLaKMzPuhS1Pmxh609eiqQW-cAS_jWBBbt-vE6SA@mail.gmail.com>
-Subject: Re: [PATCH 15/61] trace: Prefer IS_ERR_OR_NULL over manual NULL check
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org, 
-	apparmor@lists.ubuntu.com, bpf@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	cocci@inria.fr, dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, 
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org, 
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org, 
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
-	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, 
-	target-devel@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
-	v9fs@lists.linux.dev, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-Hi Steven,
 
-On Wed, 11 Mar 2026 at 15:03, Steven Rostedt <rostedt@goodmis.org> wrote:
-> On Wed, 11 Mar 2026 14:13:32 +0900
-> Masami Hiramatsu (Google) <mhiramat@kernel.org> wrote:
->
-> > Hmm, now IS_ERR_OR_NULL() is an inline function, so it is safe.
-> > But if you want to use IS_ERR_OR_NULL() here, it will be better something like
-> >
-> > node = rhashtable_walk_next(&iter);
-> > while (!IS_ERR_OR_NULL(node)) {
-> >       fprobe_remove_node_in_module(mod, node, &alist);
-> >       node = rhashtable_walk_next(&iter);
-> > }
->
-> But now you need to have a duplicate code in order to acquire "node"
->
-> I think the patch just makes the code worse.
+On Wed, 11 Mar 2026 11:28:37 +0800, Ming Lei wrote:
+> When a queue is shared across disk rebind (e.g., SCSI unbind/bind), the
+> previous disk's blkcg state is cleaned up asynchronously via
+> disk_release() -> blkcg_exit_disk(). If the new disk's blkcg_init_disk()
+> runs before that cleanup finishes, we may overwrite q->root_blkg while
+> the old one is still alive, and radix_tree_insert() in blkg_create()
+> fails with -EEXIST because the old blkg entries still occupy the same
+> queue id slot in blkcg->blkg_tree. This causes the sd probe to fail
+> with -ENOMEM.
+> 
+> [...]
 
-Obviously we need a new for_each_*() helper hiding all the gory internals?
+Applied, thanks!
 
-Gr{oetje,eeting}s,
+[1/1] blk-cgroup: wait for blkcg cleanup before initializing new disk
+      commit: 3dbaacf6ab68f81e3375fe769a2ecdbd3ce386fd
 
-                        Geert
-
+Best regards,
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Jens Axboe
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+
+
