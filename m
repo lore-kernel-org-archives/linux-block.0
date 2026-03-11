@@ -1,130 +1,122 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308D936C580
-	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 20:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A91D38AC92
+	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 20:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773260683; cv=none; b=VjLQKYWaETKIYaz/PuN1PCvEV/NpkenOyplFkvh90wPRhdIZp7p7rnmqn/gTxL8hOcXK4E9bmu70De0jKfKhDeAAcjhKfnzGOy1HV8uOw+pu7AuKksVnadPjYSYy/lXdQH5S0gCSu0ONXQLAxnijLOceKvC0An5BMlhtFIT4mTM=
+	t=1773261745; cv=none; b=pvjYxiMp4zYJdkHBO9aJS+acQP+u8UffwvB26MfhM9jOre3rJYoLS7xwmZZu1hUNIFhi8hD9h0UlYR3mdl4sZXV+YbKmZPqI8GHXBm9R9LlarUMH799XOubM8JEgPBuX+NkcKIw72Oi0eyPVKMk5Oqo9jXHJSxyASposkj9VhL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773260683; c=relaxed/simple;
-	bh=1ebZfbM4X603XE/sdZ/ON5ikeZRpPVo7q4h0RtA/jMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pi9lFP5HVi2j0OUiVKd+UENlJtZouQt0dW++S6Nha89Z3kyxUFiRBcaZxnTv+DtMBs2MTsfHs1lgxUgyjOV89oR8RTNZUcRCZZI9dr0R/t2Pzi566+49mH/MeX1ZeVfLPt/j41VAnlVFefKlvKOcodfW4Cbi1Ew+H/ZtRAKDqjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=McOcEVag; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773261745; c=relaxed/simple;
+	bh=OqYSohQ9wmjFzgFFtXqFhnT+y32D7vCWHF/R8qdhoss=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rnhbz/kU8vyPIyXlw1Y1OHIlI8A37K81+A/j0ENqWC8S3LGBzC9kimAoYTtk9lohtIR2hbweXaOk+9Joal+omFh2TXIBt2fjmvbE0ORyBTuD0NNQUaF+B4o/EtUbik1nqzXYfpjoa12AxYQ/Fn1ojtjctAcW+SU3SdKh1Dx6wp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=ie9jDDiP; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="McOcEVag"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-4671cbce626so170397b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 13:24:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="ie9jDDiP"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-439aa2f8ebaso176579f8f.2
+        for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 13:42:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773260681; x=1773865481; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0VjrInrO/cbuWkSTY+7vTnSbrX2Q7GpHHflnugtvKto=;
-        b=McOcEVagGHS7MoGWx5kH7DTu++OAvU6GUZiVYF2guwYMEuQbpYI5TmhWHEwpu5eahT
-         JoucF9v8UEcly9vNLRiSpLyBsvdY+iDmW/5q78/P0/wcEoC7TFGAUav3WqbPz2vaeQQS
-         B90PzXyrsXPrYXlnkk/fRmS/bkatmFI97jaaOHgGBTmotTBpNwjRrtf8eHZknlcgpRx+
-         81B/xD5Ozuee7K3UBqgsFipKZSmhxQxLKAcgYIwOb7fLqrtfHC0/NDwhMMmUotZ2Iv36
-         dxx2OraPGQw/MlWBt4PsFbnNmCx93AK1c2qopuiQktjyE8d3x8vA5bDRPvs938jehSaj
-         f0Ew==
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773261738; x=1773866538; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pu0NIFLN/ECFVaOtKO0yfpos5sjB3G2gTzkdHYJNxIY=;
+        b=ie9jDDiPJQeIFwCFtbfGcDKNyb4+Jj7u8G03eFPdPnBupImDTNZLxkYyw/coJBBzJt
+         t8zytfVfDg9rmtM1DumDYcHx8CQtV/MIIc3KOkRFPNgK0jkOMsUsdsQ75EqKhVSEPnZx
+         U7N1yj4EOSrR+UYDAX2ztpQ1p+dKbAuaM6mdE575WUlcGw1ucpdj/Fh0XQArbpN5Exdl
+         QbjzBjWyfiF8KkODC7bMCmjr5XzPe2BSwmgR4WdyfzjhBFLjYnvzWCiLvEVnBwFrtlMR
+         FrsCt1nIvQRRVBvVFxe7INTRDo9cTJSeS8xFuf6wQLbjLZwqD/H//J5sKthNFxE5ZB4X
+         KzZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773260681; x=1773865481;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0VjrInrO/cbuWkSTY+7vTnSbrX2Q7GpHHflnugtvKto=;
-        b=XtMDgrotI6E8/uH4iaBZDGCOIjCSCT0KzGFzlI+pPmOh0/LI+u+c7ihYMSY9d0+Eay
-         bGz/9dMxNA/ihhYJqEIvU6FhVPxPPXddswaZSos2RDM138Fynf0Oumzp7RXktU3f+Aas
-         vswCDJEf+Tn2sOHmxJFAuoUb8FM2oMsOhe6jZx3ybXoIWXrcDrWMD35RviiRijEU+o42
-         QR3tC4kEJcD9GDQ+R4vDiIbgcX4Ze4httPCFmeqy50rY6MOtrM9PpkwxXG7xX3vzzRiA
-         /wr5vk+oCmBraRrtnXbLCLaadr32wCNRPuBRGHpmo5l6zGy6eG1TJJnnWsvm0WckHrI4
-         ddWg==
-X-Forwarded-Encrypted: i=1; AJvYcCX6TY7rhE8sKoq31v05Y6GiTrfOUmIF2zZaGzlakAiLlq1+2qLkZEFOWX7omeh8U4gQDKd44a+J+rCt3g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTvzL01PbHnfu4i8395hwgxcpGBo39ucCqYCyiyPvx5+oSotY3
-	gUfCGDBEWWXVZZlgWj4TFDvUjgQZODN3rCsjj1zS6hoEar8z7cPrSpPN
-X-Gm-Gg: ATEYQzz3BrTFHGbWRd3/GCxdrEZn+nk7kHW+jelp4wDsfRBOJKkjXY/ivicm0jSqVmX
-	ELUKk8AKUK30ZBWtw095G536MLH0FCqe6xLrvpEYCRB5N5RYvJyUEl/vrngTM2jvGpC0I7C7fEm
-	2GhFwnfrE0BjGK2aHYZH7wE4Zkg6ClO2uzyYb80UaRIhYO/jpIlFDnID/MHXgwv48GsVskSMsiz
-	TjFnmpFRJZWaepIYQXP/VCCHn1OTjucLunzJcFyWTJTu1zaz8yp6HuiyzdD2/xwRYLadLDN621R
-	1uUG+hTSwj3ejodYN9DcDu5QBZ8xnTdLhYE3HkS2eU6NcC7kcmyTt142rCvwsFrZIQahW2guqAD
-	UI2VCQ93KAhPuepotud4LHHzVKH+74jxZdsteUNtE3sEztSKnA9vJsii2rJa3xVXdbiJ7cJym1I
-	0qhrZZzBUnQgQdpn6bxbE5Yw==
-X-Received: by 2002:a05:6808:1927:b0:467:880:7441 with SMTP id 5614622812f47-4673346153cmr2131673b6e.18.1773260681119;
-        Wed, 11 Mar 2026 13:24:41 -0700 (PDT)
-Received: from localhost ([2a03:2880:10ff:48::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e5e9f53sm3382611fac.13.2026.03.11.13.24.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2026 13:24:40 -0700 (PDT)
-From: Joshua Hahn <joshua.hahnjy@gmail.com>
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Nhat Pham <hoangnhat.pham@linux.dev>,
-	Nhat Pham <nphamcs@gmail.com>,
-	Chengming Zhou <chengming.zhou@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH 05/11] mm/zsmalloc: Store obj_cgroup pointer in zspage
-Date: Wed, 11 Mar 2026 13:24:38 -0700
-Message-ID: <20260311202439.324081-1-joshua.hahnjy@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <CAO9r8zMRwFTbv4jWWNf2sEc+SkUawxPtnvOc7LKsJr5R3vkZjQ@mail.gmail.com>
-References: 
+        d=1e100.net; s=20230601; t=1773261738; x=1773866538;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Pu0NIFLN/ECFVaOtKO0yfpos5sjB3G2gTzkdHYJNxIY=;
+        b=LeODgrFmkcOPic0FEQWs8GGC91N6ou9IXxBKrlOI/8yik24L321IMScZlBVqbZtBYM
+         pWC3/hnfqUY3CPLnyR0D+p8x1B7TCv/z99+4apt/ZtK5gYpg5PeCn3P3Di16yF1LG77Q
+         U4tt99h0t1AH6yppgVLCUxIk6dw67IAF8nJpH37q508C7Qu8nDZmwj7+OHoTY4gZWVI7
+         Xg11Gj6rOZWOB7lHhZfXFbH5yKOUJNL4i5g/8LPjcMlfEpKTHAfvI/qGmkLks8dWcPTX
+         ZdW7qPmE1fikvKNww6svo0LIhxFJTWtpsjiSj5t7oGJi7sq7aGuMFXtrXuUYAOyxnsas
+         c48w==
+X-Forwarded-Encrypted: i=1; AJvYcCV2+MpeK/3WQrHz4qEpvbZ0IqXG9FKbWbAXAUM6vhOeBzznyHzNM/z+evLQVPWy+Zduo5gMi4iu1tn2+g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yydl40CK+qy+eE/BMedfwmr195vuA5VNKqCdM6MY2pRmgRRGM6z
+	aZGkugbUAfolEYA4bCXlCewXcJ+Ha2Praq/R0wUFjSBBcrlSZpSKByzodt1uBscIc+U=
+X-Gm-Gg: ATEYQzy3E9UolbwQ7HtGqcCqX5WXSAK1L0kHO6qTuvrrC412Kz9qH65EjnRAESKHtXc
+	I7A5Buoa7KHn6i/3G6SIzASUnuXz6Ek+WV0lFOyALk7hvGNtHzBS0o2nUJI+0GK1bGJLGtDvGHT
+	sc3IXZwJTTCRQUY0ozq5uzdeuXqdFbvrkBTADGlA+VuZwSZyPtkJFmpwUa5j4HBRgPkDC+dDmv8
+	ANwt19fzhOtnIdvAGcrah2kJm+/rN0AaY+i+rVT7X66uJ5gwNZ6inA3oyop87SGW3zpYvB7Yz8S
+	UmWKTNTCeBncqXFUlj7iaNs+Lq1P94fvD8+PrKmROrXqvTTKPxo3vZZQMu8GbQFqxnjfnlN20zc
+	U/ZNhIwmBU9U+EDGTvnbyFnKEQJKt244n9hdBk0oeqVRGJuLLfB6fauU7C+YfQvhW/Mp128FzpJ
+	TYILoZ9PdEZBPHB6JYFXwskmL9uCUW+yf1qWFiShTOatcDfeqR7OkVW+bHGVFhq/GCXzm6peteZ
+	8CHVLI8UQrYyCk=
+X-Received: by 2002:a5d:5f53:0:b0:439:8a13:2c65 with SMTP id ffacd0b85a97d-439f821bb8bmr7863321f8f.37.1773261737629;
+        Wed, 11 Mar 2026 13:42:17 -0700 (PDT)
+Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe1a737csm1717190f8f.10.2026.03.11.13.42.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Mar 2026 13:42:16 -0700 (PDT)
+Message-ID: <e8431e46-95ff-4daa-959d-024be1ed2fee@linbit.com>
+Date: Wed, 11 Mar 2026 21:42:14 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/14] drbd: Make the lock context annotations compatible
+ with Clang
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+ Marco Elver <elver@google.com>, linux-block@vger.kernel.org,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ Nathan Chancellor <nathan@kernel.org>
+References: <20260304194843.760669-1-bvanassche@acm.org>
+ <20260304194843.760669-6-bvanassche@acm.org>
+ <cbcfb229-9a5d-4552-9ced-788de1e69842@linbit.com>
+ <19592fdb-3bd1-4406-939e-3e7afc6f6919@acm.org>
+From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Content-Language: en-US
+In-Reply-To: <19592fdb-3bd1-4406-939e-3e7afc6f6919@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On Wed, 11 Mar 2026 13:17:26 -0700 Yosry Ahmed <yosry@kernel.org> wrote:
 
-> [..]
-> > @@ -1216,6 +1216,11 @@ void zs_obj_write(struct zs_pool *pool, unsigned long handle,
-> >         class = zspage_class(pool, zspage);
-> >         off = offset_in_page(class->size * obj_idx);
-> >
-> > +       if (objcg) {
-> > +               WARN_ON_ONCE(!pool->memcg_aware);
-> > +               zspage->objcgs[obj_idx] = objcg;
-> > +       }
 
-Hello Yosry,
-
-I hope you are doing well. Thank you for reviewing this series! : -)
-
-> If pool->memcg_aware is not set the warning will fire, but the
-> following line will write to uninitialized memory and probably crash.
-> We should avoid the write if the warning fires.
+Am 10.03.26 um 00:15 schrieb Bart Van Assche:
+> On 3/9/26 3:08 AM, Christoph Böhmwalder wrote:
+>> These are marked as acquiring connection->data.mutex, but actually use
+>> connection->meta later. So the annotation should reference meta.mutex.
+>>
+>> Also, I think the annotations on drbd_send_* are wrong. These functions
+>> have no path where they return without releasing the mutex, but these
+>> annotations would tell clang that they hold the mutex on non-zero return.
 > 
-> Maybe:
+> Thanks for the feedback. Does the patch below look better? Compared to
+> the previous version, all lock context annotations (except for static
+> functions) have been moved from .c into .h files. Lock context aliases
+> have been introduced if the synchronization object is not visible in the
+> .h file. Two function declarations have been moved from before to after
+> the struct drbd_device definition.
 > 
-> if (objcg && !WARN_ON_ONCE(!pool->memcg_aware))
->        zspage->objcgs[obj_idx] = objcg;
-
-Ack. 
-
-> Not pretty, but the same pattern is followed in many places in the kernel.
+> Thanks,
 > 
-> > +
-> >         if (!ZsHugePage(zspage))
-> >                 off += ZS_HANDLE_SIZE;
-> >
+> Bart.
+> 
 
-Definitely better than writing garbage and crashing : -)
-I'll make this change in the next version, I think I should also sprinkle
-these WARN_ON_ONCEs in a few other places as well. I'll be more
-mindful of this for those cases as well.
+Yes, looks better now, and I can confirm that no warnings remain (after
+the other DRBD patch in this series).
 
-Thank you again Yosry, I hope you have a great day!
-Joshua
+Reviewed-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+
+-- 
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
+
