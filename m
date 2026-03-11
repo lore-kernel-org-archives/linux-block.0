@@ -1,74 +1,71 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBE61D5ADE
-	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 05:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E3A29B764
+	for <linux-block@vger.kernel.org>; Wed, 11 Mar 2026 05:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773206528; cv=none; b=YGuCJ8svAxD15XmPY2uS4nN33bgma+TDgkb1xhlOvQ++Msefy8ZQ6DVuxhjSlmkt0wYterRcIzGdL1SWDtyggyRduG+A9YS+wAIF3RRhUO03sNQGrLlu1kJ2g6lm1LaBX6CXMkgA+UjG71rPWscW7bNp8KaduuQZc0MJayKlTnc=
+	t=1773207002; cv=none; b=G6uRMAhOjDnOmLhp+rsB/YFWeOvR+WkDYCdZqQmy1Av5dszFsSkhG4XY8E1wnVMzW5334OW3MBe+6DlWnkH3dV4IKr4qHJTM3PswvC1Tbf8/ekeAFlpYZtGdx0/b0jU1adla2pmyg33vTVYdyckIxJA56bHDhh9ME6wAMWlftUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773206528; c=relaxed/simple;
-	bh=zan1LPmq6HbmulMzgA9gW+UUtyY5DbZLNRaN3yrnRdY=;
+	s=arc-20240116; t=1773207002; c=relaxed/simple;
+	bh=Cl7naJDsdxKofAKL13XTAAg0NFqCf5G30oR7fQpbKvk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ia/Sm2jH0NJSW3oUAi3lPHRQJTxM2F4NfkG/USCt9cqpmy3eUDfJSCa/jpWCnhdIRyUWEyXiAjWmsZsuuDrQC2kiyB4XKlCz6lcoRm+bSOc8e5ZNPJCVil9vg0ZKXL5qmIp6av/euBrwHcI8zzvKQFzwcJxgqQcjnZFr3xUEYnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=n3X508/B; arc=none smtp.client-ip=209.85.210.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=TVUSlCBG2rziBUfsoyD4Xt6IU8Nu90hvG74WidSlD1MRRGTxv/lxXpsrjaHB/FmxekiXGMrW4RHghqINNJ+3tC2L9tY5QGt1t8/P1YyO3DwcEGt8APazd0R23lHuJ4NtPt4y32IFauA0pYWum8rxVl9wbbymiYI5pkcbcEVZU2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ZYYxjQZb; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="n3X508/B"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-829ac8d56c5so4264459b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 22:22:06 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZYYxjQZb"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a7a9b8ed69so150264715ad.2
+        for <linux-block@vger.kernel.org>; Tue, 10 Mar 2026 22:30:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1773206526; x=1773811326; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1773207001; x=1773811801; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NorOqui97Uy+vQC59x0dyKRHlJOJ9bIHMLqnBZs2Jos=;
-        b=n3X508/BMyN/vIirFR8yZFoGj3FhFqg9MViZu+NnjCN8k+wvwY97NaHgHKUXza74KB
-         Qd/jpaflMauHqHqMVHX2maMIecDAP+jhkuVBgemAAc8zNbLegdp/r43JMr0AfxbiKydj
-         cPEM61axCxeKkvg6VUd2a4FWPUHr1Zq6mKa38=
+        bh=tpIlh++gNSqrjxti8e+fCN/v6IbpRXIC+wi7lGmEm8w=;
+        b=ZYYxjQZb672J8H8bueVgQZkkVe2nlsxN9HI6km+HLy99eC9o+Yd9mCrbE7rV4hvSkx
+         idHDuSqNyyWkae9+yZsth9HFzudxzo0kFYdhcDdR9I5/Uh9Xrgjn+qfekbBhLKRa10T2
+         TcSWMTefrYZfjaoV89DJCNfXAtiDXA87xF/zg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773206526; x=1773811326;
+        d=1e100.net; s=20230601; t=1773207001; x=1773811801;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NorOqui97Uy+vQC59x0dyKRHlJOJ9bIHMLqnBZs2Jos=;
-        b=mkiH38Sr3oOKeGJuYFRiIaGvWJtiD/mxbv6iH/oNKgwORnfZmiYOforaJcm/+GpUWQ
-         B8VK5hNv1/5iwU4Ic+JGWAApxjU95dydDzWJZPFAi20HV3pB02VVg7/IKTq//gdMaIjb
-         waNTUPyJHxRtuRLCeM/CvIbhVZFLmq4/ulYY88YbLF+fH4Sg4bk8uYzSaXz8ptmQJoIW
-         nDXmOjSIrb+t9xBxzjrP8U18vGQn81sR7SO95ykLPs8aSotr7AcV3AQQSWwWKk6K6eX4
-         EMKzuPIZn0U4UHquwJL3OoId8s51Ekkr5kO/Ih3tZQNE70rfbT7uKP7iT5Pgp6MKqM4d
-         JGsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWbyKM3K+ihDsn0KaZ7bhGr0rkbyc+eU4eTZTQBHHQyg5eSHa3pYQYfri7rHbba+j8yxVowFtQYoWNLJA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/BTMz2tQRjuPx00206iGt79XjLGlSUgzat9ZjYUOgOpBbnRGH
-	fuXmsSBLs9CnV85A76dU2C/WqeJqCVpHE6ChYNeekullMmOcfeKIcZLYtnSw8ei/n/619YrYldC
-	LzjE=
-X-Gm-Gg: ATEYQzzk+wLgi4stJjTlOGfZDYYnK2diLkCEbHRXLKT7kpIFAVTZEv+GGldn9ePb1DH
-	4utqA3d9NAIvdHfDIxzu67njxaGsrYhOa8EO3bEdNyZuCr0DSyggFQBiFjEaZj9I++pBeDclcqH
-	34Vav+j2gr01a8jzJkbIX3soptCUQd8yY1rz19Vdkzj6nio1PJOvm89uLBq4cy+xtotoiJIbHP1
-	hYxkVnQmvR6ZqG9AzrqntBBAtRY6YfnZasUmKSE6BxOTkJEpo50CBIgXyb9PIHPqpN97qOPzq4R
-	InkGYnrPd61T1v6r88F2LHaYiBrWCAPrKETNj8MZN6tFdcJk2S6CaOW2SGdCAsb4mAGw0JHLONB
-	dfjd6IsFRcjTNGgyhWEzAgvUwmtITEsZMxqcCLzwLOvtAelodHVbePlAeDT3z3Qew5PbgUO47NP
-	5hgDuOPdtJqXzTpButP4M76whTA2e/GFcrzkUeDUkmw9dYzm74FimDHOIH6mysdLBdCADXxqKl2
-	A==
-X-Received: by 2002:a05:6a00:430a:b0:829:6f82:5953 with SMTP id d2e1a72fcca58-829f6eee0damr1238945b3a.5.1773206526485;
-        Tue, 10 Mar 2026 22:22:06 -0700 (PDT)
+        bh=tpIlh++gNSqrjxti8e+fCN/v6IbpRXIC+wi7lGmEm8w=;
+        b=bi8xog6photLTjoBJr1qG00fUUV//feEiqKa4ZU9yhYCc9F02lkNM5UeOqf4Ri9kDh
+         xBVYQeJng3TLnE+9x5BMZb7EE//a6Q8v6MRZ9YR3D6sJ6FjpwaJvQMp9cLrtm5Dj/Gh7
+         t9uPmilP8axAMN1sAeT2RkjsIjFSmUFT0f7bHiSMygbkmw7MWJdpBWE9F5W++wIMEm6A
+         0Eari3oXpw0RJAOTtIAMJzOYsP1/3Dq4YNU4/zWHZH40o03oaFtmQzeAGfwKuy91YFC1
+         8VuDHviVMymg3s4gKi0LsMK/qkoj5YZDLt2dmUQtVYryE5PSZuzM3ZmhAkLc4N59uAfD
+         0SVg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/RXb5RCVtmVHvgsRe5jPPRpBFKUQ+PBIZgRb6u85kIFMg3mOf9Y8GoBhj+fgTVmGaO6rqLnplmYwhpg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzgf6BlWlKKeTGT9NPq52Zxm1NqmFCmkxybpws2NkBj7nt6tFBs
+	AZ4tjsflsLbBTaErQXSX3v8NWkFDURI4608CRqFN0MwBYdvdKAh3VuT1FPHqMeC0AAJEkwKTmwF
+	aL54=
+X-Gm-Gg: ATEYQzwdbi95+NWkjphXYhb59cUuhqjRY01HrDUsiuZFRdM1l4KqTeujZpmtxqMg1NK
+	r3GyE8/s1gXTMBMwumxqtZwWa1yQ93OEAfVpaso9lTVsTC/T2gjVnTUNaQySb78Jkf3dzdflfmI
+	Wuy/md+QPw/VErZDVKi3jpQFYNfbh4J5WQvd2nSwNQ9cVbTe0OYMsZOm/ImM51QUDeDbmrxs1HY
+	LihiYvWQbdHbrzmMEA3NL9OGT/OfX/M8P7VSQ+fqT78BOHi6MuwNdXgfz5BK77q/wS0qN3oHOfj
+	zAvkgdQDZ0BUzxaqr4/UGvksKcLH3WqLmTrFW6baSf32WxvV8bDaeKVtC8lOvcukhhnFiwbp+R2
+	kvzWPhQyW4QHqO8Uh/ufy24QeAyBhUh+0/xw3E8qIN2Mog8BsXLbYXLrCY85gOCPQ9F0OFJnBiG
+	GOR/a4GKMOcHMg9Z3q9+ETFvSi9RRMk69kRolEoNquZxsHb3goj2WSuk2Oi8hplbE=
+X-Received: by 2002:a17:902:c951:b0:2ae:46df:5643 with SMTP id d9443c01a7336-2aeae763812mr14917185ad.11.1773207000953;
+        Tue, 10 Mar 2026 22:30:00 -0700 (PDT)
 Received: from google.com ([2a00:79e0:2031:6:93a4:8281:fe98:426a])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829f6dc0c9bsm978368b3a.5.2026.03.10.22.22.04
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2aeae222a2dsm9964165ad.17.2026.03.10.22.29.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Mar 2026 22:22:05 -0700 (PDT)
-Date: Wed, 11 Mar 2026 14:22:02 +0900
+        Tue, 10 Mar 2026 22:30:00 -0700 (PDT)
+Date: Wed, 11 Mar 2026 14:29:57 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: gao xu <gaoxu2@honor.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>, 
-	zhouxiaolong <zhouxiaolong9@honor.com>
-Subject: Re: zram: Optimize LZ4 dictionary compression performance
-Message-ID: <abD7boWrSrE-2-5F@google.com>
-References: <ae51966c3cb445e9983230243bb6a5b2@honor.com>
- <aa-2nItXDdeDj4Xi@google.com>
- <cfb89ffc52d649f39ec98b844efa8bd9@honor.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, Brian Geffon <bgeffon@google.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH 3/5] zram: recompression priority param should override
+ algo
+Message-ID: <abD9faU5BcoCNcfY@google.com>
+References: <8a5d53d19a8dbd51d7d81d153676895163e0735e.1772180459.git.senozhatsky@chromium.org>
+ <831636c74ca6d72317de02d96585cc6833d082e6.1772180459.git.senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,19 +74,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cfb89ffc52d649f39ec98b844efa8bd9@honor.com>
+In-Reply-To: <831636c74ca6d72317de02d96585cc6833d082e6.1772180459.git.senozhatsky@chromium.org>
 
-On (26/03/11 04:00), gao xu wrote:
-> > On (26/03/10 02:54), gao xu wrote:
-> > > +		memcpy(zctx->cstrm, &drv->base_cstream,
-> > > +		   sizeof(*zctx->cstrm));
-> > 
-> > Do we need to do this memcpy() every time?
-> memcpy is a replacement for LZ4_loadDict. LZ4_loadDict updates
-> the LZ4 hash table using the dictionary. Furthermore, LZ4 also
-> updates its hash table with the results of the previous compression.
-> Therefore, to ensure the compression dictionary remains effective, we
-> would need to reset the hash table every time, which would involve
-> executing memcpy() or LZ4_loadDict()
+On (26/02/27 17:21), Sergey Senozhatsky wrote:
+> Recompression algorithm lookup by name is ambiguous and
+> can lead to unexpected results.  The problem is that
+> the system can configure the same algorithm but with
+> different parameters (compression level, C/D-dicts, etc.)
+> multiple times:
+> 
+>     [zstd clevel=3] [zstd clevel=8 dict=/etc/dict]
+> 
+> making it impossible to distinguish compressors by name.
+> It is advised to always use "priority".  Additionally,
+> override "algo" with "priority", when both params are
+> provided.
 
-OK, I see.  (I assume you tested and verified that.)
+I don't like this patch.  Andrew, can you drop that whole
+series?  I'll send a v2.
