@@ -1,43 +1,103 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3DC334C0D
-	for <linux-block@vger.kernel.org>; Thu, 12 Mar 2026 12:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27123C3C0A
+	for <linux-block@vger.kernel.org>; Thu, 12 Mar 2026 12:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773317624; cv=none; b=eHkOpo+Tve6B8sCEeVa5cjgruzASL5XnNJjMZcKG4EW4ZqGb5ig12zLCHgair5xtmsjiBp1ROxugqJ9iMXES8vxrw9QcHH9pjMJIGywzTdZHCbYO/qhm6doRP4zGR44PuLXHjcvUx9oqtDjUBZww6ozLrAMWL8/uug0+CIPr2bw=
+	t=1773320257; cv=none; b=mc232GmpSmUCviW3ww2f6+CIjtvnBe14tY+yF5A6nc3xHAcID130BTAfJN712fUHPWYMAtqxMR74Yo/bozFOSm+iB4xCY+2VzQnvMEN1sciU+t/j+ysUFjwEBvhOhstT/3ni1U7sbNhEX7aS5V2aA3ORx2COnnTxp1kOcpOrnBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773317624; c=relaxed/simple;
-	bh=sGswExIWudK6n4STg2EMFT9pTHCXetJSPMojdu+Gt18=;
+	s=arc-20240116; t=1773320257; c=relaxed/simple;
+	bh=Rr1jkAP22lZkLvo3o90a9fRSWh9+kilNKtAarSScWFY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nzuaGShy1S35uFxNJpNGSev9cy/7jNuJy6LIyYp20Dy50wrNVGm+daDUsdx1XCw8X95MwYOvrO4CyOkwvtPM184GDcg/umZdp33o5EnhCb7HUWffoT/pGJinorws4fMaoow98KDrmxK8Y/e1n2YbsgQOXjYh/9SEky/ay/5m7Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rIKdLdcF; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=oJI5n+aVpjQyl0zTECMn/uIU6ubbfYsRMb82XyHZsooEhpwafpnPgxIkxdDVA5Y8wssuQTaS9lpwWvtgNNREuhlLr2mTtySVQdr6OHf4VFR5yeCIb683M56l7DxJ4QyFKaJ4cKA1Oa3gMX1QB9uHkZEp6YHulz7rUS+0ja6lkTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fHqxjqGD; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rIKdLdcF"
-Date: Thu, 12 Mar 2026 20:13:18 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773317619;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jEo+AU5jak9Tki+9cRYeuDI/fkIxZPTyffIn30O4KQo=;
-	b=rIKdLdcFCw7xuYn7MgGpUGaSmWH0HYCuC6qQbE9EHLb3k3Afdm8jYOLHP5q8+bbi9hs0cj
-	/DzlykMtdvkZ9RBCEjqkkPUjWf0kbd3vHLWH2STpSVbjtpn+q2FwxxmaKPftg1VXb2k/1V
-	A/TnktqOu5hpsFLnk1WY7/XkKXGwSvg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Hao Li <hao.li@linux.dev>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Harry Yoo <harry.yoo@oracle.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Subject: Re: [Regression] mm:slab/sheaves: severe performance regression in
- cross-CPU slab allocation
-Message-ID: <iypdqo2s5oobenjrmoqqplgshsz65bwegih7kxhgd547fcofm7@yb6xqors6snx>
-References: <aZ0SbIqaIkwoW2mB@fedora>
- <fbssy5y6kpyjlefacmabuojiustr3nocj7timpgejpchkj3lw7@qfss5ffmwdxa>
- <abKp7-HzFT6llbYT@fedora>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fHqxjqGD"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-506251815a3so8617391cf.0
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2026 05:57:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1773320252; x=1773925052; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=fHqxjqGD7mReR8MT2yBowt9MuNKPAKQc++mWcb4ZOttX6YldICO+OnnxWIQjO0C8L5
+         wjOw0Gg7MqV4U+G9pES+s6h1NtZIjaKrBXMW81hrLyc8SxWYHtvQK3FlTjqiyroZskXE
+         jYj0kUENL7Yhu5zg+0UQ91XYlYYlozX9U8uAqBEFaih0fSnDo8kprjTDRYJ58gzKRExo
+         MSUW+Q+e0P2WpZGotx0DuVRaUqq4vGsUUSX1YbPnOxmRUKlXFY/aNRmXMXDbAEfx0Lnn
+         e41FpuPSZjTSuTkWfTMW8e1MvewVXC2p6zLd4GrSZjvSKS4Q06nDQYaSimUW3qR5RhoY
+         JV6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773320252; x=1773925052;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J1SF1XBHkHR0j7NZVucv0LxpGoGXl67PUefLsfwpAbo=;
+        b=VB2K7RU5XuMystb1lsaAlgBjhk+VKQwo9SXZEeTmxrKo9dJ8x8+W28IKBKbjAabg7r
+         5UenqLYP9o14ZA6n9DFV9GwiI9jTAoWBfFCwJbiTYZmwhgk15NjrHG6n+hDqpHxxiKjn
+         yjAbVYxZiCdhEP9E0B86LM9yKrS2uh01UQ0JD0ju1fBXmEtGrUPzEwWQfJR23z/j1Ts2
+         RUPTPxDkUZbjs/yI1vco7Bq78XyDiKCgRGqUEr/bFiyBjAD2iFqISSYFCoOpULhhqqiy
+         vAwP9FkzFM544pvZTho4ASY3y2UIyWKC1ArlcvBZKLzlFYkhdvQZwDPraTwAKra6bijO
+         dhBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvo7YaXA1nYhw55kvGqsTsmqKgbEu/ZtMVVqHiJGh3MN4ZgGM9FZD7IKm70Y/356CUr1Wuclf8zYEg0g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxK1aXpLNYNZF4UvSjWCZPjKZgy6oq5D4z/Fha70kSZ/IKyHtT
+	iyEkJVevGMpCSuQUs24cDcYNUtlc/qlhu0MDednDzWAFyBnBCofQ5oxqny4fmO2wkzg=
+X-Gm-Gg: ATEYQzyiSwqsvWcVw1qnUJ4x36HxgTMpcBEpcYZl3Fenfa/TjWLTvn1WNyGQRjGb31X
+	pI/3Xe1lBKav/Dyc+hEgFTLm0UxiA6Dig+nh9mjoAhjRaJTiSA+KWPs45ErAYt7UH7UA5Dy3K9E
+	Qr+yXLdmoODIhjJv/kiKBTeGnZeRMez8Re2EHmohli50F5prB+T6KZkgn07D3+Qzuv3+jogG5c8
+	UTGXgbFJSDSKugTPLinBRr7J0DL+9OiT2mF4w6UlomjwB18sfW5/r7l5XvXavOZrJ+el/FuCGOh
+	/BQOoZ4IpHqkLJvS2i1uEbHxhXPF0UkLrCXxgvsDUP3o6vpexvfLpdvaPVZVoMUjIBCzogONdbe
+	I9E7cD2ztjziTDCKQypPli8TalXdG4WHXq68buSQMLYw1U/hoot4tz0uDOoDiTh9QnnFcSTrJQG
+	xsSp0TfWFlAMKdeLKUX/5u6gPs8yniHWxKzmM411Tyz6oBMGBTTT7D18LZJJiD8GZ0QWBwLFMkI
+	X79Vm/9
+X-Received: by 2002:ac8:5d4d:0:b0:509:cbc:127b with SMTP id d75a77b69052e-5093a1bd58fmr77950521cf.60.1773320251710;
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89a65bd318fsm33341196d6.8.2026.03.12.05.57.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Mar 2026 05:57:31 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1w0fbW-00000006fKD-1POa;
+	Thu, 12 Mar 2026 09:57:30 -0300
+Date: Thu, 12 Mar 2026 09:57:30 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: Philipp Hahn <phahn-oss@avm.de>, amd-gfx@lists.freedesktop.org,
+	apparmor@lists.ubuntu.com, bpf@vger.kernel.org,
+	ceph-devel@vger.kernel.org, cocci@inria.fr,
+	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
+	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
+	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
+Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
+ check - refactor
+Message-ID: <20260312125730.GI1469476@ziepe.ca>
+References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
+ <abBlpGKO842B3yl9@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,127 +106,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <abKp7-HzFT6llbYT@fedora>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <abBlpGKO842B3yl9@google.com>
 
-On Thu, Mar 12, 2026 at 07:56:31PM +0800, Ming Lei wrote:
-> On Thu, Mar 12, 2026 at 07:26:28PM +0800, Hao Li wrote:
-> > On Tue, Feb 24, 2026 at 10:52:28AM +0800, Ming Lei wrote:
-> > > Hello Vlastimil and MM guys,
-> > > 
-> > > The SLUB "sheaves" series merged via 815c8e35511d ("Merge branch
-> > > 'slab/for-7.0/sheaves' into slab/for-next") introduces a severe
-> > > performance regression for workloads with persistent cross-CPU
-> > > alloc/free patterns. ublk null target benchmark IOPS drops
-> > > significantly compared to v6.19: from ~36M IOPS to ~13M IOPS (~64%
-> > > drop).
-> > > 
-> > > Bisecting within the sheaves series is blocked by a kernel panic at
-> > > 17c38c88294d ("slab: remove cpu (partial) slabs usage from allocation
-> > > paths"), so the exact first bad commit could not be identified.
-> > > 
-> > > Reproducer
-> > > ==========
-> > > 
-> > > Hardware: NUMA machine with >= 32 CPUs
-> > > Kernel:   v7.0-rc (with slab/for-7.0/sheaves merged)
-> > > 
-> > >     # build kublk selftest
-> > >     make -C tools/testing/selftests/ublk/
-> > > 
-> > >     # create ublk null target device with 16 queues
-> > >     tools/testing/selftests/ublk/kublk add -t null -q 16
-> > > 
-> > >     # run fio/t/io_uring benchmark: 16 jobs, 20 seconds, non-polled
-> > >     taskset -c 0-31 fio/t/io_uring -p0 -n 16 -r 20 /dev/ublkb0
-> > > 
-> > >     # cleanup
-> > >     tools/testing/selftests/ublk/kublk del -n 0
-> > > 
-> > > Good: v6.19 (and 41f1a08645ab, the mainline parent of the slab merge)
-> > > Bad:  815c8e35511d (Merge branch 'slab/for-7.0/sheaves' into slab/for-next)
-> > > 
-> > 
-> > Hi Ming,
-> > 
-> > I also have a similar machine, but my test results show that the IOPS is below
-> > 1M, only around 900K. That seems quite strange to me.
-> > 
-> > My test commands are:
-> > 
-> > ```bash
-> > tools/testing/selftests/ublk/kublk add -t null -q 16
-> > taskset -c 24-47 /home/haolee/fio/t/io_uring -p0 -n 16 -r 20 /dev/ublkb0
-> > ```
-> 
-> The command line looks similar with mine, just in my tests:
-> 
-> taskset -c 0-31 fio/t/io_uring -p0 -n 16 -r 20 /dev/ublkb0
-> 
-> so the test is run cpu 0~31, which covers all 8 numa node.
+On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
 
-Oh, yes, this is a difference.
+> IMHO, the necessity of IS_ERR_OR_NULL() often highlights a confusing or
+> flawed API design. It usually implies that the caller is unsure whether
+> a failure results in an error pointer or a NULL pointer. 
 
-> 
-> Also what is the single job perf result on your setting?
-> 
-> /home/haolee/fio/t/io_uring -p0 -n 1 -r 20 /dev/ublkb0
++1
 
-If I use this command without taskset, the IOPS is still 900K...
+IS_ERR_OR_NULL() should always be looked on with suspicion. Very
+little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
+pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
+implies ERR and NULL are semanticly the same, so fix the things to
+always use ERR.
 
-> 
-> > 
-> > Below are my machine numa info. Could there be something configured incorrectly
-> > on my side?
-> > 
-> > available: 8 nodes (0-7)
-> > node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
-> > node 0 size: 193175 MB
-> > node 0 free: 164227 MB
-> > node 1 cpus: 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
-> > node 1 size: 0 MB
-> > node 1 free: 0 MB
-> > node 2 cpus: 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71
-> > node 2 size: 0 MB
-> > node 2 free: 0 MB
-> > node 3 cpus: 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95
-> > node 3 size: 0 MB
-> > node 3 free: 0 MB
-> > node 4 cpus: 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119
-> > node 4 size: 193434 MB
-> > node 4 free: 189559 MB
-> > node 5 cpus: 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143
-> > node 5 size: 0 MB
-> > node 5 free: 0 MB
-> > node 6 cpus: 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167
-> > node 6 size: 0 MB
-> > node 6 free: 0 MB
-> > node 7 cpus: 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191
-> > node 7 size: 0 MB
-> > node 7 free: 0 MB
-> > node distances:
-> > node   0   1   2   3   4   5   6   7
-> >   0:  10  12  12  12  32  32  32  32
-> >   1:  12  10  12  12  32  32  32  32
-> >   2:  12  12  10  12  32  32  32  32
-> >   3:  12  12  12  10  32  32  32  32
-> >   4:  32  32  32  32  10  12  12  12
-> >   5:  32  32  32  32  12  10  12  12
-> >   6:  32  32  32  32  12  12  10  12
-> >   7:  32  32  32  32  12  12  12  10
-> 
-> The nuam topo is different with mine, please see:
-> 
-> https://lore.kernel.org/all/aZ7p9uF8H8u6RxrK@fedora/
+If you want to improve things work to get rid of the NULL checks this
+script identifies. Remove ERR or NULL because only one can ever
+happen, or fix the source to consistently return ERR.
 
-Yes, our NUMA topology does have some differences, but I feel there may be some
-other factors affecting my test results as well.
-
-Even when I run with "-p0 -n 16 -r 20 /dev/ublkb0" without using taskset to pin
-the CPU affinity, the best performance I can get is only around 10M.
-
-My cpu is also AMD Zen 4
-
--- 
-Thanks,
-Hao
+Jason
