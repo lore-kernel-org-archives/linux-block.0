@@ -1,147 +1,117 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29C23FB7FC
-	for <linux-block@vger.kernel.org>; Thu, 12 Mar 2026 16:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F1F282F0D;
+	Thu, 12 Mar 2026 19:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773334493; cv=none; b=ffv4G4XlyNYDI/OptrB8jb+U/gV1IkQKBjXSf81+SJ4P/UYdzdjTLpQ5fBoEenRMj0dIVjxrVbAnNNeiJUERwL7DtvSlkuA2hVcNHSVKOohsp+EFsKJwv+WcoROosYn4ojoErXA3+Getfj1Vc24aJMd01hT9VrkFZuc1xlV+I9U=
+	t=1773343796; cv=none; b=E9+ypTd78iQW1URpgPOVFbNssge7GYyMBVETxMW6QrQw4Gcw3Pml6IqsW/iRd4pKEjJ0D5v1Awh2MVx1NPczyeF5dRpkHLaFcuAVJpBBZNnfXWT3fNCx8UNhlqxra8pZKxuOHdRvZx3jpA7w/SuHGgyVeiY8+Fk4ANBuo+RKzQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773334493; c=relaxed/simple;
-	bh=ENv0+4bH9YdpFLGeURNwJ3+rEUsnNn74RNCtOl26SEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QP6iTvng5toZXtHmkIxRhCg0rZjRcQPyWOTUwk0jJJs8Se8cPWNGYlZa+kxXRhhAK+wteDlRxDv/QMsNqmvhYW4WIvXBz2TxgE/rjqYPl+3ebCDW8RZJzbtUhuXiNBILzT6iRgufO44ZoloHCa+xSJ8iQ0lAxWExPVYgP8eBP4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=TCUycPJz; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1773343796; c=relaxed/simple;
+	bh=Atdv+nKaVv5bnq8b8E94YBFgB56c1lpVIf2/AVjA3MI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JxvY+WcRXkHqwE6KLVS8Yvuy3X2o0xJ0LoY1gP12TkPYKCNgl+869MaIPveD8aK6thWlkmdF4UDguDfuOtCbvk4miCQy/CouxI/SBeJVSDGcGuEp81ZbIOc3aBze0p/ZN/AKBVav6eVJAsPrRSXdStH2wIYdB3a7dqrTms4pg+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=KrgowKUF; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="TCUycPJz"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-509149ab7d7so10174561cf.2
-        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2026 09:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1773334491; x=1773939291; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VQXCfPVu6b6dIVECzm0C8AUD7IL7VvpSkD5+M4S95sw=;
-        b=TCUycPJzE2fI+UEqk7FktReSuNB+qmtoLxCPQIhObf2GoM3FGGUoUzmOL4EcJ8nqrV
-         31wLWw0iuRrm5q/A3vl9oGJab4nkcB5GgE9L87TaBE5zWVhGKUEWMOYZrC4hQkz7+K+y
-         MdSN9PZxg9+VlLOffdwRmQphGTW7UoGABbBRu3CtgROAhKqAusDMmmrNFgCXGsGgS+um
-         4b3n9KF8H9mgZuxtPx/c84lVtPd3kX8R2XT1vLZ+RjANCZT5FGS44RpBGA5cN1JRJXTn
-         oCOtB2FnqO56y3+c6Fos0prISIneHSMHrQ7vAs2p/teTVBOn2DfneDCxuRpkTU9D9cja
-         6IGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773334491; x=1773939291;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VQXCfPVu6b6dIVECzm0C8AUD7IL7VvpSkD5+M4S95sw=;
-        b=sL9r8ZqJpcR+viFJdhPm6MNZplJjk8jEDSYH5wqO5zp83XKCoXlhRKXxd5VfegwR5r
-         QkYx5ghSFphtUFkDdGYsoPZXyhtS0c9zqO0jxbCv2i7xHRup/WfX7EhV51ySQ5gOmgau
-         nc9aDlHqMfJzCD7z4JcoLfjHnjSz0q9X4K7kq49HOemvtIXKnFGDKyvbD6tOxgfNLjrk
-         nUo2hwvrSKQtQAlXcJoJOxbSatN2zR0f2tEhz1EACN2BuVxDHZ+BCDQIsC75D1yCRGT6
-         sjT2PeTaTkBK5AIzza4OBG82xvHR9JxJ6dxZI6B6jApNXMs+40d7WCskrM531+hC5Lji
-         aTLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCIVL64Yl06prV/WveI7CdQeds1paJC9wkY5TPYsnVap4Ew2DyZJy6+jLX2CFrLllwPnSQVwlFfpVP0Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyQSRR3HrBHPtjDrn55IVrzf/fFIxZRJeWkiQd1otjpN/bL1PH
-	fJ8Vy9fXjjBio9Qc95XqZM9lhW7bzpjam6PXqlOI8KRpfUF6GUjHxIIMxqNIhFl+Qt4=
-X-Gm-Gg: ATEYQzylwK89dJWFFahYq86VqcXmnykIIvLgN9lbfeMtPKYLmpM1dXOhPpX1BwNfrz+
-	L8larKpo0MpBsWwjbjApztJM2L/tHSEwoP644atJUSi2jTndz4aG4Lrgy993RXqaSrlmPx5lRaR
-	9Cjc5TH1vA1riz0DZNOYZyVEvlnlK3P6XRyiKN53PqlFSnyjuY4M5lzImu1lC9orttyXu40GWff
-	NCPmnOpey1ci5kRwZkdYhWJTqN8tlNKRF0JaQd6kfuxBoDgV0MPb4HRyD2TRDxczu/OvHLQg5Xr
-	6YXBOq7/zJEWPKNpJp5mSMej710Kr4zUWjLBlKdF0fQRB6/3GfVnhTM92wnXoj0uiiCJBNiv8LU
-	99DnILoHY/aWkvkg7KOSA9dZmgE4x7DsqofbMayg7rHg1I6tqL3uPymydQMcLz2kwT4jp41Extt
-	RSYuWYr9RVF63K8CdjcXI8nrzqPOPY4i60cxgQBUVw+Cqps24VzTWTYQvSTly1YojcmFToCfPZi
-	Vl/uJXkwAHuKPP8okU=
-X-Received: by 2002:a05:622a:289:b0:509:44c3:5ffa with SMTP id d75a77b69052e-50957e10673mr1403911cf.52.1773334490530;
-        Thu, 12 Mar 2026 09:54:50 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5093a119602sm36658181cf.28.2026.03.12.09.54.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2026 09:54:49 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1w0jJA-00000006i8N-40X9;
-	Thu, 12 Mar 2026 13:54:48 -0300
-Date: Thu, 12 Mar 2026 13:54:48 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Kuan-Wei Chiu <visitorckw@gmail.com>, Philipp Hahn <phahn-oss@avm.de>,
-	amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
-	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-	sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev
-Subject: Re: [PATCH 00/61] treewide: Use IS_ERR_OR_NULL over manual NULL
- check - refactor
-Message-ID: <20260312165448.GN1469476@ziepe.ca>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <abBlpGKO842B3yl9@google.com>
- <20260312125730.GI1469476@ziepe.ca>
- <f5688b895eaebabae6545a0d9baf8f1404e8454e.camel@HansenPartnership.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="KrgowKUF"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fWyPG67b4z1XM0nn;
+	Thu, 12 Mar 2026 19:29:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1773343790; x=1775935791; bh=oLVQN6f85szCUFzcTrIEVs8Y
+	h2E/2cez0U0xXuby44k=; b=KrgowKUF8xZInrtZOpQfOjK8Z+xBfUb5ytpsh5Zs
+	8p4rgarzc1Ucsj+Wefwd53nlO5jXeddEFWKoCGT6JuxK9LPEXbzCCjuhDxuvqh9L
+	CpQQhkU1H3+wRpUvVlu2cfKHwj1C5StP37siRVkJ+UTS9AtU/pES2RWtywN/qMNx
+	D4m3cFXtpkce6LhSO+YSvXBqPaZfu92I52Ymf9R3ECZGVHNBT/GtI3ZXOlNHWKx8
+	XvgTE+fn+FNJIdZ0dBRHqrHr5n02KM3uEgWhd65AYUGh8vwIMFM4GM6cXrkPd+6T
+	3lQL+g1qewf40btyn6c06De2bTlbj5ZoJw0Y+3DoPeKLjg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id c9m32iRkHB03; Thu, 12 Mar 2026 19:29:50 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fWyP904dfz1XM31H;
+	Thu, 12 Mar 2026 19:29:48 +0000 (UTC)
+Message-ID: <574620fd-903b-4fd3-8cbb-22a3cefda645@acm.org>
+Date: Thu, 12 Mar 2026 12:29:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f5688b895eaebabae6545a0d9baf8f1404e8454e.camel@HansenPartnership.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 1/3] bsg: add bsg_uring_cmd uapi structure
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>, axboe@kernel.dk,
+ fujita.tomonori@lab.ntt.co.jp, James.Bottomley@HansenPartnership.com,
+ martin.petersen@oracle.com
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20260312092237.2464560-1-yangxiuwei@kylinos.cn>
+ <20260312092237.2464560-2-yangxiuwei@kylinos.cn>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260312092237.2464560-2-yangxiuwei@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 12, 2026 at 11:32:37AM -0400, James Bottomley wrote:
-> On Thu, 2026-03-12 at 09:57 -0300, Jason Gunthorpe wrote:
-> > On Wed, Mar 11, 2026 at 02:40:36AM +0800, Kuan-Wei Chiu wrote:
-> > 
-> > > IMHO, the necessity of IS_ERR_OR_NULL() often highlights a
-> > > confusing or flawed API design. It usually implies that the caller
-> > > is unsure whether a failure results in an error pointer or a NULL
-> > > pointer. 
-> > 
-> > +1
-> > 
-> > IS_ERR_OR_NULL() should always be looked on with suspicion. Very
-> > little should be returning some tri-state 'ERR' 'NULL' 'SUCCESS'
-> > pointer. What does the middle condition even mean? IS_ERR_OR_NULL()
-> > implies ERR and NULL are semanticly the same, so fix the things to
-> > always use ERR.
-> 
-> Not in any way supporting the original patch.  However, the pattern
-> ERR, NULL, PTR is used extensively in the dentry code of filesystems. 
-> See the try_lookup..() set of functions in fs/namei.c
-> 
-> The meaning is
-> 
-> PTR - I found it
-> NULL - It definitely doesn't exist
-> ERR - something went wrong during the lookup.
-> 
-> So I don't think you can blanket say this pattern is wrong.
+On 3/12/26 2:22 AM, Yang Xiuwei wrote:
+> +struct bsg_uring_cmd {
+> +	__u64 request;		/* [i], [*i] command descriptor address */
+> +	__u32 request_len;	/* [i] command descriptor length in bytes */
+> +	__u32 protocol;		/* [i] protocol type (BSG_PROTOCOL_*) */
+> +	__u32 subprotocol;	/* [i] subprotocol type (BSG_SUB_PROTOCOL_*) */
+> +	__u32 max_response_len;	/* [i] response buffer size in bytes */
+> +
+> +	__u64 response;		/* [i], [*o] response data address */
+> +	__u64 dout_xferp;	/* [i], [*i] */
+> +	__u32 dout_xfer_len;	/* [i] bytes to be transferred to device */
+> +	__u32 dout_iovec_count;	/* [i] 0 -> "flat" dout transfer else
+> +				 * dout_xferp points to array of iovec
+> +				 */
+> +	__u64 din_xferp;	/* [i], [*o] */
+> +	__u32 din_xfer_len;	/* [i] bytes to be transferred from device */
+> +	__u32 din_iovec_count;	/* [i] 0 -> "flat" din transfer */
+> +
+> +	__u32 timeout_ms;	/* [i] timeout in milliseconds */
+> +	__u8  reserved[12];	/* reserved for future extension */
+> +};
 
-Lots of places also would return ENOENT, I'd argue that is easier to
-use..
+Please consider adding a static_assert() statement that verifies the
+size of this data structure at compile time. Such a statement is useful
+to document the size of the data structure, helps with verifying that
+the size is the same on all architectures and helps with verifying that
+the size doesn't change if a reserved byte is taken in use.
 
-But yes, I did use the word "suspicion" not blanket wrong :)
+> +#define BSG_SCSI_RES2_DEVICE_STATUS(res2)   ((__u8)((__u64)(res2) & 0xff))
+> +#define BSG_SCSI_RES2_DRIVER_STATUS(res2)   ((__u8)((__u64)(res2) >> 8))
+> +#define BSG_SCSI_RES2_HOST_STATUS(res2)     ((__u8)((__u64)(res2) >> 16))
+> +#define BSG_SCSI_RES2_SENSE_LEN(res2)       ((__u8)((__u64)(res2) >> 24))
+> +#define BSG_SCSI_RES2_RESID_LEN(res2)       ((__u32)((__u64)(res2) >> 32))
+> +
+> +#define BSG_SCSI_RES2_BUILD(device_status, driver_status, host_status,   \
+> +			    sense_len_wr, resid_len)			\
+> +	(((__u64)(__u32)(resid_len) << 32) |				\
+> +	 ((__u64)(__u8)(sense_len_wr) << 24) |				\
+> +	 ((__u64)(__u8)(host_status) << 16) |				\
+> +	 ((__u64)(__u8)(driver_status) << 8) |				\
+> +	 ((__u64)(__u8)(device_status)))
 
-Jason
+Please convert all the above macros into inline functions because that
+will result in removal of most of the typecasts. I think that inline
+functions are allowed in uapi headers:
+
+$ git grep 'static.*inline' include/uapi | wc -l
+354
+
+Thanks,
+
+Bart.
