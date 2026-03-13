@@ -1,151 +1,128 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272E8363098
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 11:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8585F6F2F2
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 12:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773402588; cv=none; b=bSrto1rSe6/r6ljGgjuYOUE9bpa0WF3k09Ca/+ccmvoNsLlpxcLUuctT87+ZmBuN50JDv2iWOgv1wZ8OsrsDlcT8/flrsGrR+bN+O+1kXwZTwID3cs5sw0XHsxeBNxjv9NcT2W5jbB3bOQ1pJankaqMADP5hK/9Bm0WmHL/oyrk=
+	t=1773404345; cv=none; b=ObovCsa7QSSmA4ByMdrQarYQ3LUwsYxcYBMTI86t5vXtjVm/pVx9X6mEYkpXXstoJhOy3ShcYb3WinfdFjEg1mNWQ05lXxp6wNvLiFT4hCn0OM82Hq0zzgQBbO/2u0uQvRIPtciQtnonGBfy+fl2bi8SMIAgQD2QxNcRziKUVcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773402588; c=relaxed/simple;
-	bh=LtbU/iv2e4Kg2GdtsiY2bJOKx5molPD2fFbPFnO1g8A=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=h5YPuBBS5x5W+Gb7KFM2UoAV016WPU9ylOUnVEQo26wiWrapligfRCiRHM6pThkjlFROTcPD8Z2gjwS0fcX4ag3IruBe9t1Jiqg2AhOKC2mGAexURr6yvnYKZCyg65nXNixMbbx8OlUko7N94uhUIh4AYcC/X9llxh0oQWnS4QU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UrAidbyo; arc=none smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1773404345; c=relaxed/simple;
+	bh=LHmkgd6DeGU7yrcNy27Ek4yDAwpy3PZexxlDYeH8Q3Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AUQTiy1Wrg7sKxa45zYOIZVI2BuIFmHonRDf0dK1Wv+JUBneMO5S13YTXcjzTvA20PqgC0jaQ85RIxQqCozMAXP7YJi3F+qKUegl8MUB/uRo6HbgEMX5IV5ELo6eDMnCO8z7FePuEAYjP43tdjjW7BDtk+1vwgvUEue4OMnJ6TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=esBykbEi; arc=none smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UrAidbyo"
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-41708f6aa5fso1324567fac.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 04:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1773402586; x=1774007386; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S8VAXUd+j6ULovYxRRLxzB+bZXe3RnjMuJH9W1X1J4Q=;
-        b=UrAidbyoMls/OW/RD7wEaPklbtfqlEUZoJIB/8LoJkXik6hRh0De5MILUHKh0S6Dqk
-         UkEMyv9/MOc+F/7Se5kA4Jo0BEv+nFJnMVIXwOj+G4B5YnM/dqm6UallWuWx3RXr7U6K
-         6CV0+ZcxoLtqofmpn+u/LhomV/L78X6w46iXXxsahT93ISpFlKdyOJV8GXrAoWMU25SQ
-         ePBfLZqA8bPv9xZdkRId2MTg3gSMwCfiviyxCjr7vY/SyIfNR2Q40gjUzjnBCdvjzez7
-         KApCxvSh+PmMf5wd04ke7K0tyLHDDX9Z0TumrZum4zwtf1FWDlnerHtyV9mNSYwN8tP2
-         FiAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773402586; x=1774007386;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S8VAXUd+j6ULovYxRRLxzB+bZXe3RnjMuJH9W1X1J4Q=;
-        b=GGnlbbQG9CCZiphc/ZL3KS9E7mRMjquHO1/KR8A+x8NnRROUSjsPHB2pvpR5+wF+D/
-         xHEmWOaEEvJAiyMi8tkQWc2/ZR7xuYN87nbUHNQ8IoPrD2ndXSeIGTw8y1+W12IJQ47G
-         ksWbjIFh1MINAIWjgmLykSzxiIVBCMapZb0Xxr8NnnDryyFU2zbyyzNOUnhSOnByFJr7
-         2QfWTMGUHPLfSf2bc5oQJlf2w+MwREpKFhOthAb+5SL8fugunRqqkxn9aGqDBe1oaBfg
-         5qdmatR/oL08jTvG7VK5imu0lU016wSj3gOeRK2pud7kSIQp9Uc/Bka9kRr691OKznKm
-         jDew==
-X-Gm-Message-State: AOJu0YwBNmIFLxeXjz9aq6QZGhxJ6D2MRJjEfRkQjzPIEygBdqB+TsWK
-	9N8QVvJSUvRGJVJBdgKfZqTZvMteYYiN1mtR3QI41tOy/2RiY31cDWQbuRvW6K6d7Qg=
-X-Gm-Gg: ATEYQzzDtaY/qN3VXiPkheXQvXnqPb4a1FjNkdEIqnYQ/UZ4M9rHi3CulEG3hjjibHE
-	e8OHGmdliOV1fJCjq8OjPTR4ynU1QnsfyD5YuL2dVTKnCQ3qqFwAw13+s0/v4KWPbUhdxaSdFJE
-	rumtd+LS+8zp76uM8jmQoPzUBCFPl4se1PUUE9Y3Gyrc89XpGQR1KPSnQzHrnoSlYEgZZd13k5o
-	Rs5EAGqJ9aUqw2kQp9gQSJnd7kJF4Hm0Bife85t6jpbOllkFGOMWikBdZMV0ZdIHizKRe7T1hx1
-	qrqQZKDlsxCAzPu6WXO7hfzUQ6MNzWHp0gJ8s/nqLl+7RNWXyeXR0ea22W2QsyPu9lIosJhH/Zk
-	L3CxgVEo71EJA41qsQc0xitgY+2i2m8FMUFHkX4QZYRU3no9EFm7M9JIGdNvUEuV0Gsh/Pcl3EV
-	CC27wrf+tj+gXS62AcSafbRcoFDFRFEo69SMNZZOCf4AeIvDdb32ROt9gCWMtAUnJx6nzv9tqlH
-	lVbJaGRnw==
-X-Received: by 2002:a05:6870:d183:b0:417:548d:67c2 with SMTP id 586e51a60fabf-417b945f4d7mr1573474fac.44.1773402585951;
-        Fri, 13 Mar 2026 04:49:45 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e1fb6efsm8619752fac.3.2026.03.13.04.49.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Mar 2026 04:49:45 -0700 (PDT)
-Message-ID: <e5ffce8a-1a3b-4c89-8ca0-8178b9046cf1@kernel.dk>
-Date: Fri, 13 Mar 2026 05:49:43 -0600
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="esBykbEi"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1773404343; x=1804940343;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LHmkgd6DeGU7yrcNy27Ek4yDAwpy3PZexxlDYeH8Q3Y=;
+  b=esBykbEibA4flGsbUEMKQJrytJl+vd+sb8IuSa7p20Vq1AD2Dbk9a+LD
+   rgg4irdn6Uo7iwISDECsnV+Fb3Xj4ZS0rFUO+64moqSD84wIYzAKQbsOp
+   ddbOAXFN3jrHSPMqAGp+qtw18U7QKp03waogtALra95PQrK+UHm50+e8x
+   HkDC5J5Qf8/PrZAv5IxdjjwrgXJqGbFlTidRYwQySXx+xUohOJTx80MoF
+   ZlDbIgZt5OCsmJ5BC9R3c+vfpZ6tanEetgYAc4rdpPA6R/EBmUtuuMHdq
+   cLkr+h1VK7Ht9ZS3D9fqnNGIUCfRds/P8cm8qYNTBlPry3Zc+p85vOkxi
+   g==;
+X-CSE-ConnectionGUID: ipzJblkgRvGoZ6wH1uSPag==
+X-CSE-MsgGUID: 4uTNmqNeRzulC0pkE3369A==
+X-IronPort-AV: E=Sophos;i="6.23,118,1770566400"; 
+   d="scan'208";a="138823842"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep03.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Mar 2026 20:18:57 +0800
+IronPort-SDR: 69b400b0_w9CFY4C0BjWFY/9C6BOUms3gRNH7droIht23t18SsvziP5s
+ yrXw4U5D+E/DtEtTDJ40fPzRStsOdYXQI3Z9mBQ==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Mar 2026 05:18:57 -0700
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.67.30])
+  by uls-op-cesaip01.wdc.com with ESMTP; 13 Mar 2026 05:18:56 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] check: check kmemleak before test run start
+Date: Fri, 13 Mar 2026 21:18:55 +0900
+Message-ID: <20260313121855.3666215-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 7.0-rc4
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Linus,
+When the kernel enables kmemleak, the check script scans for memory
+leaks at the end of every test case run. However, if memory has already
+leaked before the blktests test run starts, the leak is detected at the
+end of the first test case. This makes it look as if the leak happend
+during the firest test case, which is confusing.
 
-Set of block fixes that should go into the 7.0 kernel release. This pull
-request contains:
+To avoid this, check for memory leaks once before staring blktests. If
+any leaks are found, report them separately.
 
-- NVMe pull request via Keith
-	- Fix nvme-pci IRQ race and slab-out-of-bounds access
-	- Fix recursive workqueue locking for target async events
-	- Various cleanups
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ check | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-- Fix a potential NULL pointer dereference in ublk on size setting.
-
-- ublk automatic partition scanning fix
-
-- Two s390 dasd fixes
-
-Please pull!
-
-
-The following changes since commit ce8ee8583ed83122405eabaa8fb351be4d9dc65c:
-
-  block: use trylock to avoid lockdep circular dependency in sysfs (2026-03-05 04:01:42 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.0-20260312
-
-for you to fetch changes up to 7d0abefec48dfefeec28dc7c3105a88c43747d02:
-
-  Merge tag 'nvme-7.0-2026-03-12' of git://git.infradead.org/nvme into block-7.0 (2026-03-12 15:15:53 -0600)
-
-----------------------------------------------------------------
-block-7.0-20260312
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (1):
-      nvmet: move async event work off nvmet-wq
-
-Jens Axboe (1):
-      Merge tag 'nvme-7.0-2026-03-12' of git://git.infradead.org/nvme into block-7.0
-
-Maurizio Lombardi (1):
-      nvme-core: do not pass empty queue_limits to blk_mq_alloc_queue()
-
-Mehul Rao (1):
-      ublk: fix NULL pointer dereference in ublk_ctrl_set_size()
-
-Ming Lei (1):
-      ublk: don't clear GD_SUPPRESS_PART_SCAN for unprivileged daemons
-
-Stefan Haberland (2):
-      s390/dasd: Move quiesce state with pprc swap
-      s390/dasd: Copy detected format information to secondary device
-
-Sungwoo Kim (2):
-      nvme-pci: Fix slab-out-of-bounds in nvme_dbbuf_set
-      nvme-pci: Fix race bug in nvme_poll_irqdisable()
-
-Thorsten Blum (1):
-      nvme: Annotate struct nvme_dhchap_key with __counted_by
-
- drivers/block/ublk_drv.c        | 16 ++++++++++++----
- drivers/nvme/host/core.c        |  3 +--
- drivers/nvme/host/pci.c         |  8 +++++---
- drivers/nvme/target/admin-cmd.c |  2 +-
- drivers/nvme/target/core.c      | 14 ++++++++++++--
- drivers/nvme/target/nvmet.h     |  1 +
- drivers/nvme/target/rdma.c      |  1 +
- drivers/s390/block/dasd_eckd.c  | 16 ++++++++++++++++
- include/linux/nvme-auth.h       |  2 +-
- 9 files changed, 50 insertions(+), 13 deletions(-)
-
+diff --git a/check b/check
+index 3b5738f..f170458 100755
+--- a/check
++++ b/check
+@@ -229,6 +229,7 @@ _setup_kmemleak() {
+ 
+ _check_kmemleak() {
+ 	local kmemleak
++	local out=$1
+ 
+ 	((KMEMLEAK)) || return 0
+ 
+@@ -240,7 +241,7 @@ _check_kmemleak() {
+ 		return 0
+ 	fi
+ 
+-	printf '%s\n' "$kmemleak" > "${seqres}.kmemleak"
++	printf '%s\n' "$kmemleak" > "$out"
+ 	return 1
+ }
+ 
+@@ -477,7 +478,7 @@ __call_test() {
+ 		elif ! _check_dmesg "$dmesg_marker"; then
+ 			TEST_RUN["status"]=fail
+ 			TEST_RUN["reason"]=dmesg
+-		elif ! _check_kmemleak; then
++		elif ! _check_kmemleak "${seqres}.kmemleak"; then
+ 			TEST_RUN["status"]=fail
+ 			TEST_RUN["reason"]=kmemleak
+ 		else
+@@ -1022,6 +1023,7 @@ _check() {
+ 
+ 	local test_dev test_name
+ 	local -a all_test_devs_in_array
++	local km_log="${OUTPUT}/start.kmemleak"
+ 
+ 	for test_name in "${!TEST_CASE_DEV_ARRAY[@]}"; do
+ 		IFS=" " read -r -a all_test_devs_in_array <<< \
+@@ -1050,6 +1052,14 @@ _check() {
+ 		done
+ 	done
+ 
++	if ((KMEMLEAK)); then
++		# check if memory is already leaked before blktests run
++		_setup_kmemleak
++		if ! _check_kmemleak "$km_log"; then
++			echo "Memory leak detected before test run start. See '${km_log}'."
++		fi
++	fi
++
+ 	local test_name group prev_group
+ 	local tests=()
+ 	local ret=0
 -- 
-Jens Axboe
+2.49.0
 
