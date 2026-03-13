@@ -1,185 +1,128 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1150B2571B8
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 14:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFB33A872A
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 14:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773412570; cv=pass; b=aIlkEKYtNibKAIZsNwcPjIQWekk2Yma4GfvFdK8k4CrKL6kfuFDrnqT09ZsErVoDCiJtwJ3fvJLd5DIsnTPUfQwxqz1MHcSm7rm/vDQg5sHIeACFQVehaRRvVKu4/q9BEGb8HjYO1rZe6oYha1CovQ+J0AAgPcZ2RlZ+azQZJas=
+	t=1773412950; cv=pass; b=TyljNv5OndKCVkKc3NuTsJZsacIzsfnJzChpQKF7LmHKQ6k38fi5qZUWFP65CP+/FsCP5vlSU/Ejrt9uI0V/YT+bAVJctlhLY/KOdpyllyu4SMJCVBVbHABKAD1yOJUbwFBHbVKOHyfb3nz2s20iNx6UzDYqwkhLoxL/HmJoShg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773412570; c=relaxed/simple;
-	bh=ufun1Wcths+rb07VUe3k8d704B6RETyuxyIo09gQ9pQ=;
+	s=arc-20240116; t=1773412950; c=relaxed/simple;
+	bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tWoM9U0kXWViSGzoNJgoAnBHDr4pgOt9/TJZpIZQlw8n/ZSF1xnoGwAAUcQexVfs891jnbz1xSO93VkhwFtfN1z6zal5nu0FI938A2/nwf8c41lF3CMjzypMQumDPQqYnDayU7XSf1h2FtTDAUzF3Bmw1SO9+rECOtwCqTrWPGE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y6ZXGJTi; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OHtN0vcj; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=hh+yWvqkNo5jSuAsndEL+JgEiETwgRTRID53dk3VjSl5EY51Oj58oLrtEutZTDFNBLZkZtptnIHpMTs2oRGV3q9uhasBRthSnlXZ/aLPDWpd7y/QLUWDUum4dVh4v9qWGVjz+yXV0ILgDNxMlKRnf4u9MQaujhVSDrCDtaYGNpI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i94YX5lp; arc=pass smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6ZXGJTi";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OHtN0vcj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773412567;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bJMneynKGatLodHqYQuBMM3+if+Rl1AvLNuNJYWpNo0=;
-	b=Y6ZXGJTi753gPM/nt0f6JeBWBlrzyg1lHgAMsAqF0v7Sta55Lk8e6juo0cVe05CGr8Uvgl
-	QnoWefYh8y8bcnXi7STTlt1Lt54N+7s8z2F0ZeIyl1GwY0XhsJryiivKcb7IjuSvUodyOR
-	ZKXse1NAlIHbJ+/RzUGD3844KYxCvNk=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562--9BTC6idNmSu1JfjzUP4nQ-1; Fri, 13 Mar 2026 10:36:05 -0400
-X-MC-Unique: -9BTC6idNmSu1JfjzUP4nQ-1
-X-Mimecast-MFC-AGG-ID: -9BTC6idNmSu1JfjzUP4nQ_1773412565
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-79832285fa1so24540617b3.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 07:36:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773412565; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i94YX5lp"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d75ed779bfso2357384a34.2
+        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 07:42:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773412948; cv=none;
         d=google.com; s=arc-20240605;
-        b=TTVmRIx4GkbFcdlIGuAdrLDG9t+yaLpZH+egr14ID0Q9ME1WY8CvE2VsxHSP96h2yL
-         0AJ45tPA/2Yg6FmNSNq8xIGe+5pbUkUh+daXhf4gQU0XsQoDbeO4F5SzAyuLb63gMDhX
-         CRZp4SJp1RP300dUnBFuHIkLcDtQEDjE1Z9TXEghhk91JA+b9zje+aViix0OMtqqHRGW
-         y168JCW0gY8bnyh1XOoyXZTdLwbWTukw3pw0CaJsSnaToDjQah5lGF/adCf07ys7Eh0Y
-         BRuIk1GskRBqy2xjuS+bNDnXB1qtCSepBf/lTfhE/LBfwiyWzjcKxsN+CRyx3T+l2Qmp
-         bhOQ==
+        b=i8PL80NhxF9Wz/tiW+0pd6pAvP9SJP8EU1MogBDAcpzQPgoYOXdRyCXTQmaoMA7L0N
+         fUw745QfuoEssqTrp98kaRClkPmbKPk+KAm+BiwX+fPFFAHI0XOVyF4hn9H5PreKvuHB
+         G6seuac8WshC4GedsDVMJJxpLoZlY2iWQ+tSZWRIVfN/Nm4wH+9Pmk7b6IqK2ex/1aPj
+         CrPq9b0Q/fwDi3OkpX3sferFR8j0Sv5I5po+gk02czELrzZTXuAWT0K75HSwKjgg+KGD
+         7ovdVXm7xUa4u/kfY41wdo//b+/8qU8kCfjJO1q6dP/OKGXnGOOja6MnEBMtfjz5bFlP
+         6Lbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=bJMneynKGatLodHqYQuBMM3+if+Rl1AvLNuNJYWpNo0=;
-        fh=fx85En6Y/9pWnsuXRwxZTPJrePGzwmgjLpHJ4A2ZAmw=;
-        b=PkdMglAgKn9MK1yzdYxgEursGJcyPprXmbhC5ZyZIqLfW/KCGs9Q5RwPnmpQ2kam6/
-         e2MDaIYrUEj7uP20+VCrJYYEJKH+8hn41wttuKN0bLqvrmXdstzjgXuTtxuwiNX8ugHv
-         20tadU7yR+YBGtCjHKOUCYcdPd7/ZuxoN9iJU5jFPzYhlVb3Q0Xlm2Y2Uto8H2tNY0lv
-         fpEiutguKySuhJuA3d4V2yttR8oxsz8+gmqDZ2LhDtHc+qmNyuGz+tNRqjS0qBJfhC+1
-         1A6QDigLp7Rv9ktNf2dAy8B7fOWnd7oYGK8YNiIt4ZUGCfXk9qnSKJIdZ9VNJaePnY7u
-         No/g==;
+        bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
+        fh=2Sfl9zWjb/2Wmc2sE0kExOjZPnMIIBCTCGl1XMtWo28=;
+        b=ECCBx6lL5ZMBGSco2kltS3d9Ksv1GAMrlq6RN2SGNox9pO7R/wIEm6bzsbbrkrJ7GR
+         xuVL6S//vZnGvPkutD4Yv+nQwHbImW9P1kYzQLBv39SnJkN+k7zP4uiR9QJthVmhbTTp
+         XBnoHFDBqlaLUhw/o7xxPeYId9S7eT11h6gJAiwQRuqyyInnuTo7DljEGEGyRSD6K2cN
+         9zr6pJYoNr2i6q/PVPZ0dZvURpfZ0GhrFc0VTkIWEhTW7Tfy1NA2ZsJ3lR8+DmJIGLbI
+         Sh7RYCvv2yXbFcERkkkTHlzFdJTz4tSiLEjT6NJC1JNBMMTHPghw7iLYTlRXGFonDYmE
+         V4yw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1773412565; x=1774017365; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773412948; x=1774017748; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bJMneynKGatLodHqYQuBMM3+if+Rl1AvLNuNJYWpNo0=;
-        b=OHtN0vcjn8vPBoEPCjRNNwpd/v8rJlIfe1bWU3iq3Ii3pNBGXTD5NNgSkfQJPsBkbn
-         XXx5vHbj2YB4kT1Xu7AmgtvUEaSGQbjvGfykL/VUGzfCJCoLjF3RC+LH5O37/TcW0fes
-         nuY5qWLf+Dtkl8w11W9YrCfZMjmTttNtL+6v+ub3djxT8TIMhr0HumayysblADnsDOj7
-         aGj5xRdz+j86PGM1Ea6hCLo6cuH4CONejZ2rPIxrlDRG0kUGzFXpulFHawBPJGLhYSaH
-         tj3zy/SzlY/xUXYEPVsIdz/k8kJyrTBcWc9F7pq0Iwh5Se7Kz3VLhp/qUBLm0asvz7ea
-         kgyA==
+        bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
+        b=i94YX5lpCpydiVrIUjiLL5jm/xaG3++pUbcN3E7ZAFoskGS89B86RFCOB1zy0luxhV
+         JytSAfE2Z13LJ0KR5sRPsoMohtFTMPE8Rdfbs79q5+ypTRt9n9izE53XEiqr20Qk4fr3
+         5iBByAXoMd6wLsSPHWS+Vs73RwMBXN7pi0h51tge/UZjTzjyWqNLijSOG+iCCKCkuQ5j
+         w3ELmo0YyC/FvYCFE8RevVF1s7jL+UfgUranY4BY60eYyOgZikKdNIZSF713yMh6CcyX
+         4wTf15voxDyo0vEdI9E4cur7D+pqq0/h3KNOQea4R1WMaj/OeGf6U/AdnUPlXSrKCQOx
+         mqyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773412565; x=1774017365;
+        d=1e100.net; s=20251104; t=1773412948; x=1774017748;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=bJMneynKGatLodHqYQuBMM3+if+Rl1AvLNuNJYWpNo0=;
-        b=iiNvCCioV1ijOIlZ2TOUeZlWFf+9yo8xNqLMMM6UXlBIbFdavy/86JBNDxtZgmIBZa
-         RxgFoJ5Lvu4EXFs8EORhz0nQ+gTYZCeBVA4GHqSf7jLRunhxLvivOYUwHBeAtqTPr1jF
-         CZv06OqdDDuRqcgdx/YMOCIbWSlAjOGGxhNNXMJDBfMCitFAcO/gSfS7rNZ4WlvqMIze
-         BNsF2x1dLzC3deSs5kzDDP46oy9Jyv1pDYjF+YoaCPXdQIMPpRpVYeS1Zj+b14ATKDNJ
-         p63A36kVDE4HsW0vC3cEuNYbdu7HRkeTwbVQ4neYLxYixkCeYaoD5KrJCNM3JpWL8/Eh
-         xQ4w==
-X-Forwarded-Encrypted: i=1; AJvYcCXIUzUh2NIfXfoHLvCgtSnlCZ7PvMhtfH46dCqfNkCn1JDFpk21cAL9V1PWo1s3iVEwiUNiwSv+WXnmng==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDg7u+H5gYDCoEHPqFWCAxo0e2YpAyWQAdcg6Z4x49OEOXUgCq
-	4xhHsKudJpM67sMqstUrQFAoJR9YF7Fdl5J39q4fgCT2U7dS6hBOLnG6Uypjd97npjvkrtfk6KZ
-	luW2jnCZVTcvJGa7aHMpzZ0VkHZXycOCZA9imVABH8CMTTyNAh0MbyECn9LQjlJ6+EmTscWCn4J
-	3OH4W+AE20O2qCdBLngW/CL7fZB1QxypHSZRDOfCr/4Emi1twUHw==
-X-Gm-Gg: ATEYQzz+x8yOZbSbo+HGTdIj0x9/iv6akKk41E1kfJiVVjFv2DNhb0febm1lyB+99TP
-	o/GgFFYv7+hDEA6hbgJ8v93vTpOYJ7a0CGwUUBbKyEPmBL3rr3guJxYzkRs4YnSrQr4/v0T928b
-	d48UMxdIDU6KHM2tET6aEJBqQ2R7G6w+XHL0aS2Znd5i9rfGOOPqcnL8FVyV18axS8h0h0vL3ca
-	B67GMr/pT+NxAYnNNIUopQac78spG5MbxPHLU2ZPumppS4xTF2Eal1KzrMMpf3wpg==
-X-Received: by 2002:a05:690c:c1d5:b0:798:711f:a0a5 with SMTP id 00721157ae682-79a1c10febemr31150427b3.29.1773412565245;
-        Fri, 13 Mar 2026 07:36:05 -0700 (PDT)
-X-Received: by 2002:a05:690c:c1d5:b0:798:711f:a0a5 with SMTP id
- 00721157ae682-79a1c10febemr31150237b3.29.1773412564819; Fri, 13 Mar 2026
- 07:36:04 -0700 (PDT)
+        bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
+        b=D422la2VN3Clwlde9oFAkt9UbqbxU8f93XsDPUPFQs4vwhUFjm5NoSRDi49UqOLoKK
+         BYR4uuyQwCvclQ2FGNOoJM2On3azDC67GC7KapTqr7EyQgrLcRRPYMDjc3Hit3kt/5CJ
+         PG3ORDqtmAQYRgg/dCscl8y5phumE120HN7Wxa00xHIwveZC/8+H19730Q3+iqnRy9yx
+         nnRHrfnjDHW5LpK9OSAXQHNZid02LL9YkDC0STrNcpvnObfsEWphol7OEC/Ofv2F6VrA
+         iy8nHqVCssHHlM9yC5IgRbr9m+TmhPNKKZIoessN5LDraHM3aBf7I3xeWEHhDRITE9bb
+         JWGA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEn+8SvqgCwD7DDhg23p0OrveGzNrlu+euRdM53y89RoNuMy6+gcug7uwwnAD1p0ww6p7kUKCA7SSOKg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqrtoHVVhYPkic0Vb+D1uRkvubnjHxSzOV5n9VyM/StJivC968
+	IFOQpEj03UmM1Lkqw+4R6Lc4K/4RUTKW50hVugmVqjz1hgPbLC5nXFjFk6V2yXfKb8VjwYnrPis
+	0oE+0ivROzvpJa8AsoktueV04NXt1oeo=
+X-Gm-Gg: ATEYQzx9rMvGottgNoc3WlG+sDR605wNNhYx0Kx4YejUIRAHY8S8+wiWQpyFRCf1jcb
+	STtjPLzsMHmyxCR1GaM8M2+bfuUIokFKvG57RYAbvLhAW1f1kQ+feD+qi3aNzgxPkKSIjGfhxtq
+	o1o9g30TtfeVpwROkxEnJYDI90e/a4QzEzQ0kOFXLMK/Pl1+urlZ/8P7u/rCPmofii9qFvQCSHo
+	G9bNVe92NGfc18awUtjcPbYigdau8tmaGT1dr7OSmcy++BXvP8/nig+AVa7Kmyr5qjS9QhuKaDF
+	rcv+0Cw=
+X-Received: by 2002:a05:6820:22a0:b0:67b:c4cf:9cc3 with SMTP id
+ 006d021491bc7-67bda98ddb4mr2281287eaf.11.1773412947998; Fri, 13 Mar 2026
+ 07:42:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260304190424.291743-1-agruenba@redhat.com> <abQHNzJ0FR1EF0NX@shinmob>
-In-Reply-To: <abQHNzJ0FR1EF0NX@shinmob>
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Date: Fri, 13 Mar 2026 15:35:53 +0100
-X-Gm-Features: AaiRm50KyYlBUXDBLdnEEHXDx37wzlGjPP-UmRDDKX74QQoo2rYJKifETYROgh4
-Message-ID: <CAHc6FU7bab0+snOVBog-FZkn_sy3AHoEP2SNFxdZ-n13tAE5Ng@mail.gmail.com>
-Subject: Re: [PATCH 0/4] simple bio cleanups
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>, 
-	"linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>, 
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>, 
-	"linux-f2fs-devel@lists.sourceforge.net" <linux-f2fs-devel@lists.sourceforge.net>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260309-b4_zcomp_stream-v2-0-7148622326eb@gmail.com> <abEsgvG547veeuVU@google.com>
+In-Reply-To: <abEsgvG547veeuVU@google.com>
+From: Jihan LIN <linjh22s@gmail.com>
+Date: Fri, 13 Mar 2026 22:42:16 +0800
+X-Gm-Features: AaiRm52u47eggjN5ILSVJD2qajNpAe1MOhxFuX-Fmy8LWt8Dm7EhiDYU7aU65Vo
+Message-ID: <CALmCz4q1WVGrTqibaxAnXK1qkOoLuC9TqLFdV43h-VNiDdCPzA@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 0/5] zram: Allow zcomps to manage their own streams
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 13, 2026 at 1:54=E2=80=AFPM Shinichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
-> On Mar 04, 2026 / 20:04, Andreas Gruenbacher wrote:
-> > Jens,
-> >
-> > here are some simple bio related cleanups.  Any thoughts?  Can those go
-> > in via your tree?
-> >
-> > Thanks,
-> > Andreas
-> >
-> > Andreas Gruenbacher (4):
-> >   block: consecutive blk_status_t error codes
-> >   block: get rid of blk_status_to_{errno,str} inconsistency
-> >   bio: rename bio_chain arguments
-> >   bio: use bio_io_error more often
->
-> Hello Andreas, during blktests CI trial runs, I noticed that this patch s=
-eries
-> triggered failures of three blktests test cases: scsi/004, scsi/007 and
-> throtl/004. Do you see which patch triggered these failures?
+Hi Sergey,
 
-Hello Shinichiro,
+On Wed, Mar 11, 2026 at 4:52=E2=80=AFPM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+> So does such a hardware exist?
 
-thanks a lot for the report. I now see that patch "block: get rid of
-blk_status_to_{errno,str} inconsistency" is broken in its current
-form.
+Yes, there are a few examples, as far as I know.
 
-Andreas
+LZ4 is relevant here because it is widely used, and decompression is
+already very fast on the CPU. So a compression-only accelerator makes
+sense.
 
->
->
-> scsi/004 (ensure repeated TASK SET FULL results in EIO on timing out comm=
-and) [failed]
->     runtime    ...  3.855s
->     --- tests/scsi/004.out      2026-03-12 15:23:54.664435639 +0000
->     +++ /home/fedora/blktests/results/nodev/scsi/004.out.bad    2026-03-1=
-2 18:13:40.059747989 +0000
->     @@ -1,3 +1,2 @@
->      Running scsi/004
->     -Input/output error
->      Test complete
->
-> scsi/007 (Trigger the SCSI error handler)                    [failed]
->     runtime    ...  115.385s
->     --- tests/scsi/007.out      2026-03-12 15:23:54.668435644 +0000
->     +++ /home/fedora/blktests/results/nodev/scsi/007.out.bad    2026-03-1=
-2 18:15:55.054944537 +0000
->     @@ -1,3 +1,3 @@
->      Running scsi/007
->     -Reading from scsi_debug failed
->     +Reading from scsi_debug succeeded
->      Test complete
->
-> throtl/004 (nullb) (delete disk while IO is throttled)       [failed]
->     runtime    ...  1.643s
->     --- tests/throtl/004.out    2026-03-12 15:23:54.710435695 +0000
->     +++ /home/fedora/blktests/results/nodev_nullb/throtl/004.out.bad    2=
-026-03-12 18:20:46.314368581 +0000
->     @@ -1,3 +1,2 @@
->      Running throtl/004
->     -Input/output error
->      Test complete
->
+HiSilicon has hisi_zip in its server SoCs. For LZ4, hisi_zip offloads
+compression only, with decompression handled in software[1].
 
+I also found some out-of-tree examples, such as qpace_drv for SM8845 in
+OnePlus's tree[2] and mtk_hwz for some MediaTek SoCs from Samsung[3].
+
+These examples suggest a similar setup: queue-based hardware, while
+software (or synchronous paths) is still used for some decompression
+paths. These are the kinds of devices I had in mind, and deeper hardware
+queues do not fit well into the current model. Well, I don't have any of
+these on hand yet, but this is a kind of use case behind this series.
+
+
+[1]: https://lore.kernel.org/all/20260117023435.1616703-1-huangchenghai2@hu=
+awei.com/
+[2]: https://github.com/OnePlusOSS/android_kernel_oneplus_sm8845/tree/ecfc6=
+7b9e933937140df7a1cf39060de8dbd11be/drivers/block/zram
+[3]: https://github.com/samsung-mediatek/android_kernel_device_modules-6.12=
+/tree/4749bfe7783c045f53c50160e05b67a9a2acc3f4/drivers/misc/mediatek/mtk_zr=
+am
