@@ -1,165 +1,161 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F053AC0FB
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 14:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570A521770B;
+	Fri, 13 Mar 2026 15:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413247; cv=none; b=iav9plcLMVXmkYx6Sb2poc9VdSJTaTyHyNMrYw8pzyUx+oRFJBC85fvwlOgwDFqwDVrOy1ctcF4FL+Hbl2q5J/yYDcpzNw2qHwmi9oiFJFrNVWDkNzbIvblgsAe6pbSf1Eq18wRNfOrexpPxTC3lxDox6mgFaYPRp3MtLGQ24a0=
+	t=1773414058; cv=none; b=clST9d4Mqmcr59k0YZs71CKi2Q2fx1j7oKivcvZmYaew3SC3yI3RmUNJ7WdcUxBiJkzutSDLvy6uvoEHKPXZiJC3JmeVBEI3Au03Vnu3Gzo9mm+HGBPdq9crHg2pbphNTVH0LX2eg3DecMON5PoMVOU3yLN9g6gsa4ujzEy6Znk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413247; c=relaxed/simple;
-	bh=m/YwuHPY9oLKTAP5H8+At4LsaxQLvpb18Tn+uB5hwvg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EbUtK0slNja8p+AtO+zXvEkpsVK3vbT0V8yQoMrtULWBxSVsS9fbzYEUBNjkcJnPUOi7OJMwsY+sjx7zKubrfFZIP7Jcc8Isd4oKOm2TBRlPHLW3LxDEQThnyitQXgqFKZT6n/X9wNvnqwb6E85V/NNNShrVoCOOMYhmXZIDQRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=H3uNv0Nh; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1773414058; c=relaxed/simple;
+	bh=c6LBU7XJk1IiaPu8DZnHkyMvzaSk2SyumHxHJ9AXqDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=QDjOUZpAMEZowk3EJad1nJc5U43cX5Fe6u5Yzu6HedlQfv9uwpVSnCE9woiHYJAcgfxH+rKXbzy3NvKds/YbtLWB8OevOSZeoMzezeVOz5MbY1mnoMMS1hU/W59m0SCk14Pg9USH4pgprA9PD3PNIoTOnOyxlpAd4GPt9h4Q3VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQP4QY7j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="H3uNv0Nh"
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62D8op383817689
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 07:47:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=wM0UDpJRp6QOFTtsFT
-	dfYMBg36gAI2McbfOUdi4ik5E=; b=H3uNv0NhQXQNLFGoq3lKx6/GLfeovKEZCz
-	N4oqpM/yBtwOAmBYWwzANXWP5pK9GTGZfA/0Lp/f2pG/FfC//agNV1TeYWI9ySBB
-	qvuINd7fWLwtT7Av8F1m7KrO7VUb9V44sbHDlWlm0AwU46dLq1GdmuMqUsSawXd9
-	NB5r506OLZZmzJM0ICoXT0rUW4gH77ZFRgyCRKcj57+fsf0Q8BSTpAkwsYuojsWG
-	iiRfvvWnmtafMH/N9BcX1LU8xabqi8vcAVvn3IL7oNviPQsY/SEb9A+7AB84jOEI
-	uEyaaZHITCkZ3Cd+wz21ETS9bMPcf6hb6Pie6pznEuvVsksL3Qsw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4cv9h4f7ec-7
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 07:47:24 -0700 (PDT)
-Received: from twshared10897.36.frc1.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Fri, 13 Mar 2026 14:47:20 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 044EEB3BB9E3; Fri, 13 Mar 2026 07:47:01 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-nvme@lists-infradead.org>, <linux-block@vger.kernel.org>,
-        <axboe@kernel.dk>
-CC: <hch@lst.de>, <martin.petersen@oracle.com>, <csander@purestorage.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv8 0/2] block for-7.1/integrity rebase for mem alignment
-Date: Fri, 13 Mar 2026 07:46:59 -0700
-Message-ID: <20260313144701.1221652-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQP4QY7j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09655C19421;
+	Fri, 13 Mar 2026 15:00:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773414057;
+	bh=c6LBU7XJk1IiaPu8DZnHkyMvzaSk2SyumHxHJ9AXqDc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=gQP4QY7jrRaQZI/TPm8j+LG6X6CjmJDC1LSul8Kfv1G4NRf7b4Noz7XmHRE4KYR68
+	 8Y+QMGfCXeoQnAGygWkYgEVuku9VnnMaGiV7cqbfospN1uxpXkdbXak4JhcShry7iD
+	 aR2x/I4iKXuyYPKsrQkNrvYMloEjfydHM6JFHpcKBl/wJtM4LsEdHkkdaNhSzp4Rtj
+	 kkjyIsTfCv2BrUs6IWuLlM4OQQiqpFWqMUWFOu2xeTDofZCdtXR4/s9kAkgl3+lR2S
+	 STl8QylAB3CoLh++D8n2FdmoZr5K7sXeIb41MAf2oBWuYm8qhrN0hM3GMx/venLW5T
+	 HyAlsOJS3m5rA==
+Date: Fri, 13 Mar 2026 16:00:38 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Josh Law <hlcj1234567@gmail.com>, 
+	"Lorenzo Stoakes (Oracle)" <ljs@kernel.org>, Vlastimil Babka <vbabka@suse.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, Josh Law <objecting@objecting.org>, mm-commits@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: add Josh Law as reviewer for library code
+Message-ID: <20260313-anvisiert-gemeckert-352414e3d58d@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Y5AKr8Cjt6ZYp_Elag6ktrx7lQ42L1DV
-X-Authority-Analysis: v=2.4 cv=Afi83nXG c=1 sm=1 tr=0 ts=69b4237c cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=JnKecZnUtZousrUlYMGU:22 a=VwQbUJbxAAAA:8 a=VN40FoYtMKXBmFH6IBkA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDExNyBTYWx0ZWRfX5SIAGOXbfqkI
- TIZAcJ28bEmGF83qpIT+K8NiscbGsbXScRLjOyTCJpieaUkrVYR9cOaQLqW6h1mno3i+tBN1958
- f9oYkxnYrFBkgIhWDfejEjVsls1x/DgRrtIzRSmgFuQvrdelrTkIB4aq62b4amBPK4VES27rZ9G
- SwebZ1j3ZLBb0B3NqI1cqpuyQdaJ0AfH+v1Uc9ituoTgo2wn/m5uC9DYe4EvjyfDR4JX+jnUMK4
- 1r0FhP+jhIJIrzsxfodQEn4bo4tJfqS6DRJowV9Fj5rAPwPSCH1iNs/AnEzPPLutfD0d2Cvhati
- iIu5xQsx5GGDXEoqlhfR9JLvH9gV2FsWl2/c0zwQD6d4yO1qcy5wrIy8GFSkqbsmDMquzLJgYCX
- 8iq9+30BvuV1Gt+RrYHUIeLZ/j89h1OBXN0vCNoK1MCWQOfwNz6kGhD+kSzPQub33JsEqd19jab
- DjG1WpyiJRCuykJQ9vg==
-X-Proofpoint-GUID: Y5AKr8Cjt6ZYp_Elag6ktrx7lQ42L1DV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-13_02,2026-03-13_01,2025-10-01_01
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260307221931.2848601-1-objecting@objecting.org>
+ <3cd25de5-3737-49f4-aa8b-eaaee471af50@lucifer.local>
+ <ee644e1b-5759-477f-8aec-35c91a5a938e@suse.com>
+ <20260307222154.2848660-1-objecting@objecting.org>
+ <667b75ad-bce9-4997-8ebf-8077952c2797@gmail.com>
 
-From: Keith Busch <kbusch@kernel.org>
+On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
+> Add myself as a designated reviewer for the library code to help review
+> incoming patches and improvements.
+> 
+> Signed-off-by: Josh Law <objecting@objecting.org>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 96e97d25e1c2..8fd03ab9c657 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -14613,6 +14613,7 @@ F:	tools/testing/nvdimm/
+>  
+>  LIBRARY CODE
+>  M:	Andrew Morton <akpm@linux-foundation.org>
+> +R:	Josh Law <objecting@objecting.org>
+>  L:	linux-kernel@vger.kernel.org
+>  S:	Supported
+>  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
+> -- 
+> 2.43.0
+> 
 
-This is the rebased version of the flexible t10 alignment feature on top
-of block's for-7.1/block-integrity branch to apply atop Christoph's
-fs-integrity:
+On Fri, Mar 13, 2026 at 10:17:53AM +0000, Lorenzo Stoakes (Oracle) wrote:
+> On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
+> > Add myself as a designated reviewer for the library code to help review
+> > incoming patches and improvements.
+> >
+> > Signed-off-by: Josh Law <objecting@objecting.org>
+> 
+> Sorry but NAK, I appreciate your enthusiasm but this is literally _all_
+> library code, and you don't have a long track history in the kernel.
+> 
+> Also in [0], [1], etc. you aren't demonstrating a great deal of maturity,
+> so I don't think it's appropriate for you to be added at this time.
+> 
+> I really don't think a 'catch all' category should be getting arbitrary
+> extra reviewers in any case.
+> 
+> Please take some time to contribute to the kernel, establish yourself, and
+> then look to reviewership for a specific category.
+> 
+> Thanks, Lorenzo
+> 
+> > ---
+> >  MAINTAINERS | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 96e97d25e1c2..8fd03ab9c657 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -14613,6 +14613,7 @@ F:	tools/testing/nvdimm/
+> >
+> >  LIBRARY CODE
+> >  M:	Andrew Morton <akpm@linux-foundation.org>
+> > +R:	Josh Law <objecting@objecting.org>
+> >  L:	linux-kernel@vger.kernel.org
+> >  S:	Supported
+> >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
+> > --
+> > 2.43.0
+> >
+> >
+> 
+> [0]:https://lore.kernel.org/all/c41dbb9d-b8a5-4b5f-9f71-3fe1bed210b6@gmail.com/
+> [1]:https://lore.kernel.org/linux-mm/40767ecf-7e25-48f5-a604-c43b835b6b66@gmail.com/
 
-  https://lore.kernel.org/linux-block/20260223132021.292832-1-hch@lst.de/
+On Fri, Mar 13, 2026 at 11:49:03AM +0100, Vlastimil Babka wrote:
+> On 3/13/26 11:17, Lorenzo Stoakes (Oracle) wrote:
+> > On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
+> >> Add myself as a designated reviewer for the library code to help review
+> >> incoming patches and improvements.
+> >>
+> >> Signed-off-by: Josh Law <objecting@objecting.org>
+> > 
+> > Sorry but NAK, I appreciate your enthusiasm but this is literally _all_
+> > library code, and you don't have a long track history in the kernel.
+> 
+> Agreed, just a week after first appearance on lists is really quite too soon.
+> 
+> Yes, getting Cc'd thanks to R: entry is one thing, but that can be achieved
+> with lei as well. The other aspect of R: is giving weigh in replies to
+> (potentially new) contributors and that's why it's not given out rather that
+> quickly.
+> 
+> > Also in [0], [1], etc. you aren't demonstrating a great deal of maturity,
+> > so I don't think it's appropriate for you to be added at this time.
+> > 
+> > I really don't think a 'catch all' category should be getting arbitrary
+> > extra reviewers in any case.
+> 
+> Agreed. Many of the files under lib/ are listed in other sections with their
+> own maintainers. They were not cc'd on this MAINTAINERS update and yet it
+> would affect all patches to their files too, so they could at least have a
+> say. It's unfortunate that it's how this catch-all works. Maybe X: entries
+> could be used by the specific maintainers in the catch-all section, although
+> it's somewhat tedious.
 
-The only change from the previous version is to incorporate the function
-name changes and verify's status code return type that were introduced
-in the file system integrity support patch set.
+Agreed. I'm sorry but there is no meaningful track record that would
+justify this addition. lib/ encompasses locking.c, iov_iter.c,
+rhashtable.c and a ton of other stuff that is consumed by literally the
+whole kernel from core to drivers. If this was something innocous I
+wouldn't care but there's a lot of really gnarly but important stuff in
+there.
 
-I've also included the ublk support for this feature since it was
-previously accepted and has a dependency on patch 1.
-
-For reference, here is the resulting diff from the previous version's
-implementation before fs-integrity to this new one after fs support:
-
----
---- block/t10-pi.c.orig	2026-03-12 16:04:57.191719482 -0700
-+++ block/t10-pi.c	2026-03-12 16:09:04.304084389 -0700
-@@ -304,7 +304,8 @@
- 	return ret;
- }
-=20
--static void blk_integrity_iterate(struct bio *bio, struct bvec_iter *dat=
-a_iter,
-+static blk_status_t blk_integrity_iterate(struct bio *bio,
-+					  struct bvec_iter *data_iter,
- 				  bool verify)
- {
- 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
-@@ -342,11 +343,10 @@
- 		kunmap_local(kaddr);
- 	}
-=20
--	if (ret)
--		bio->bi_status =3D ret;
-+	return ret;
- }
-=20
--void blk_integrity_generate(struct bio *bio)
-+void bio_integrity_generate(struct bio *bio)
- {
- 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
-=20
-@@ -361,7 +361,7 @@
- 	}
- }
-=20
--void blk_integrity_verify_iter(struct bio *bio, struct bvec_iter *saved_=
-iter)
-+blk_status_t bio_integrity_verify(struct bio *bio, struct bvec_iter *sav=
-ed_iter)
- {
- 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
-=20
-@@ -369,11 +369,12 @@
- 	case BLK_INTEGRITY_CSUM_CRC64:
- 	case BLK_INTEGRITY_CSUM_CRC:
- 	case BLK_INTEGRITY_CSUM_IP:
--		blk_integrity_iterate(bio, saved_iter, true);
--		break;
-+		return blk_integrity_iterate(bio, saved_iter, true);
- 	default:
- 		break;
- 	}
-+
-+	return BLK_STS_OK;
- }
-=20
- /*
---
-
-Caleb Sander Mateos (1):
-  ublk: report BLK_SPLIT_INTERVAL_CAPABLE
-
-Keith Busch (1):
-  blk-integrity: support arbitrary buffer alignment
-
- block/blk-settings.c          |  12 +-
- block/t10-pi.c                | 816 +++++++++++++++++++---------------
- drivers/block/ublk_drv.c      |   2 +-
- drivers/nvme/host/core.c      |   1 +
- include/linux/blk-integrity.h |   1 +
- 5 files changed, 466 insertions(+), 366 deletions(-)
-
---=20
-2.52.0
-
+And yes, all of the externally maintained files should be dropped from
+the generic lib/ catch-all ideally.
