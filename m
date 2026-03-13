@@ -1,128 +1,116 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFB33A872A
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 14:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773412950; cv=pass; b=TyljNv5OndKCVkKc3NuTsJZsacIzsfnJzChpQKF7LmHKQ6k38fi5qZUWFP65CP+/FsCP5vlSU/Ejrt9uI0V/YT+bAVJctlhLY/KOdpyllyu4SMJCVBVbHABKAD1yOJUbwFBHbVKOHyfb3nz2s20iNx6UzDYqwkhLoxL/HmJoShg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773412950; c=relaxed/simple;
-	bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hh+yWvqkNo5jSuAsndEL+JgEiETwgRTRID53dk3VjSl5EY51Oj58oLrtEutZTDFNBLZkZtptnIHpMTs2oRGV3q9uhasBRthSnlXZ/aLPDWpd7y/QLUWDUum4dVh4v9qWGVjz+yXV0ILgDNxMlKRnf4u9MQaujhVSDrCDtaYGNpI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i94YX5lp; arc=pass smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA743446B0
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 14:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773413240; cv=none; b=dN9nVm8qiEWbZ4LhKwFTjstD1LxnPPFVatgZF44IRq3zhJlGYawIUhEkWFey4hoYbMynTHszaEPk4DfBgFcCBVJllLZhyKmJn6vJ+CdUxFpcM1mJN/8a9kFygQuTd/xZU8gDNuGlnnz48YhVbjV84R+QEm5Czij31BIfucmBIE0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773413240; c=relaxed/simple;
+	bh=EZl1Zpu311+UaLdcH1TjXcbNSDI4FgArW73LcYkGEas=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VGCCvZUQwtkV6jh4NjJTUM+bIAx7fWttqbvy78PTpzvt2Tt07rdTxbq8/euCd4Dus0TAk+jQY8j51IBdkAywFRnKxkNlhYnLBNoMAgedkc9abJrcjTIMKRORM3IeC0fhps0Y2Zt20QI7Ckezl1guKKCFI6ZbZCdRepWocn19nNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=byXcXnep; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i94YX5lp"
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d75ed779bfso2357384a34.2
-        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 07:42:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773412948; cv=none;
-        d=google.com; s=arc-20240605;
-        b=i8PL80NhxF9Wz/tiW+0pd6pAvP9SJP8EU1MogBDAcpzQPgoYOXdRyCXTQmaoMA7L0N
-         fUw745QfuoEssqTrp98kaRClkPmbKPk+KAm+BiwX+fPFFAHI0XOVyF4hn9H5PreKvuHB
-         G6seuac8WshC4GedsDVMJJxpLoZlY2iWQ+tSZWRIVfN/Nm4wH+9Pmk7b6IqK2ex/1aPj
-         CrPq9b0Q/fwDi3OkpX3sferFR8j0Sv5I5po+gk02czELrzZTXuAWT0K75HSwKjgg+KGD
-         7ovdVXm7xUa4u/kfY41wdo//b+/8qU8kCfjJO1q6dP/OKGXnGOOja6MnEBMtfjz5bFlP
-         6Lbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
-        fh=2Sfl9zWjb/2Wmc2sE0kExOjZPnMIIBCTCGl1XMtWo28=;
-        b=ECCBx6lL5ZMBGSco2kltS3d9Ksv1GAMrlq6RN2SGNox9pO7R/wIEm6bzsbbrkrJ7GR
-         xuVL6S//vZnGvPkutD4Yv+nQwHbImW9P1kYzQLBv39SnJkN+k7zP4uiR9QJthVmhbTTp
-         XBnoHFDBqlaLUhw/o7xxPeYId9S7eT11h6gJAiwQRuqyyInnuTo7DljEGEGyRSD6K2cN
-         9zr6pJYoNr2i6q/PVPZ0dZvURpfZ0GhrFc0VTkIWEhTW7Tfy1NA2ZsJ3lR8+DmJIGLbI
-         Sh7RYCvv2yXbFcERkkkTHlzFdJTz4tSiLEjT6NJC1JNBMMTHPghw7iLYTlRXGFonDYmE
-         V4yw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773412948; x=1774017748; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
-        b=i94YX5lpCpydiVrIUjiLL5jm/xaG3++pUbcN3E7ZAFoskGS89B86RFCOB1zy0luxhV
-         JytSAfE2Z13LJ0KR5sRPsoMohtFTMPE8Rdfbs79q5+ypTRt9n9izE53XEiqr20Qk4fr3
-         5iBByAXoMd6wLsSPHWS+Vs73RwMBXN7pi0h51tge/UZjTzjyWqNLijSOG+iCCKCkuQ5j
-         w3ELmo0YyC/FvYCFE8RevVF1s7jL+UfgUranY4BY60eYyOgZikKdNIZSF713yMh6CcyX
-         4wTf15voxDyo0vEdI9E4cur7D+pqq0/h3KNOQea4R1WMaj/OeGf6U/AdnUPlXSrKCQOx
-         mqyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773412948; x=1774017748;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=l3q1P09EzWZcb9nezxuUfanl437Rdh8lbY1S+Z5oQXM=;
-        b=D422la2VN3Clwlde9oFAkt9UbqbxU8f93XsDPUPFQs4vwhUFjm5NoSRDi49UqOLoKK
-         BYR4uuyQwCvclQ2FGNOoJM2On3azDC67GC7KapTqr7EyQgrLcRRPYMDjc3Hit3kt/5CJ
-         PG3ORDqtmAQYRgg/dCscl8y5phumE120HN7Wxa00xHIwveZC/8+H19730Q3+iqnRy9yx
-         nnRHrfnjDHW5LpK9OSAXQHNZid02LL9YkDC0STrNcpvnObfsEWphol7OEC/Ofv2F6VrA
-         iy8nHqVCssHHlM9yC5IgRbr9m+TmhPNKKZIoessN5LDraHM3aBf7I3xeWEHhDRITE9bb
-         JWGA==
-X-Forwarded-Encrypted: i=1; AJvYcCXEn+8SvqgCwD7DDhg23p0OrveGzNrlu+euRdM53y89RoNuMy6+gcug7uwwnAD1p0ww6p7kUKCA7SSOKg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqrtoHVVhYPkic0Vb+D1uRkvubnjHxSzOV5n9VyM/StJivC968
-	IFOQpEj03UmM1Lkqw+4R6Lc4K/4RUTKW50hVugmVqjz1hgPbLC5nXFjFk6V2yXfKb8VjwYnrPis
-	0oE+0ivROzvpJa8AsoktueV04NXt1oeo=
-X-Gm-Gg: ATEYQzx9rMvGottgNoc3WlG+sDR605wNNhYx0Kx4YejUIRAHY8S8+wiWQpyFRCf1jcb
-	STtjPLzsMHmyxCR1GaM8M2+bfuUIokFKvG57RYAbvLhAW1f1kQ+feD+qi3aNzgxPkKSIjGfhxtq
-	o1o9g30TtfeVpwROkxEnJYDI90e/a4QzEzQ0kOFXLMK/Pl1+urlZ/8P7u/rCPmofii9qFvQCSHo
-	G9bNVe92NGfc18awUtjcPbYigdau8tmaGT1dr7OSmcy++BXvP8/nig+AVa7Kmyr5qjS9QhuKaDF
-	rcv+0Cw=
-X-Received: by 2002:a05:6820:22a0:b0:67b:c4cf:9cc3 with SMTP id
- 006d021491bc7-67bda98ddb4mr2281287eaf.11.1773412947998; Fri, 13 Mar 2026
- 07:42:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="byXcXnep"
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62DDtWp32954810
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 07:47:18 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=UP2hK2eX/saeHSZLDr3Hpsk2KdjI33GdK7J7L8FP7UI=; b=byXcXnepk6g6
+	dG/cLKPu6Wzt12T3Sa3juB9BKBD45BnfFzBBo/4/WlhuZDwcjSmPzaMt1YG0kjxG
+	UtJYs2cs2VWK9p/XkGPFuYXLI2ydA+Nx8x2vzEPJbDtf126JxGNOn9VVeKeitto1
+	6kfcV7BIoLKh6XWrd8ggAeI1sGl7IzyrJOQxbdMFm4Rh5rSS64rtqC4gXHX2b0xo
+	0vq+qArjT3rpit7wLCdP+fd9/LSpUkeWR67yZME67SB6fN6oB7GBzeT4MSj0A1M+
+	lLa4bw6EGhgbZrJoBE6tEkzg5wmDBJ2jclgaYSFyy6wXcjVGF+0jtyaKOwYzg2Fe
+	L1Bu6MTHjQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4cvkw48n0b-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 07:47:18 -0700 (PDT)
+Received: from twshared17475.04.snb3.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Fri, 13 Mar 2026 14:47:16 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 0BB0DB3BB9E5; Fri, 13 Mar 2026 07:47:02 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-nvme@lists-infradead.org>, <linux-block@vger.kernel.org>,
+        <axboe@kernel.dk>
+CC: <hch@lst.de>, <martin.petersen@oracle.com>, <csander@purestorage.com>,
+        Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv8 2/2] ublk: report BLK_SPLIT_INTERVAL_CAPABLE
+Date: Fri, 13 Mar 2026 07:47:01 -0700
+Message-ID: <20260313144701.1221652-3-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260313144701.1221652-1-kbusch@meta.com>
+References: <20260313144701.1221652-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260309-b4_zcomp_stream-v2-0-7148622326eb@gmail.com> <abEsgvG547veeuVU@google.com>
-In-Reply-To: <abEsgvG547veeuVU@google.com>
-From: Jihan LIN <linjh22s@gmail.com>
-Date: Fri, 13 Mar 2026 22:42:16 +0800
-X-Gm-Features: AaiRm52u47eggjN5ILSVJD2qajNpAe1MOhxFuX-Fmy8LWt8Dm7EhiDYU7aU65Vo
-Message-ID: <CALmCz4q1WVGrTqibaxAnXK1qkOoLuC9TqLFdV43h-VNiDdCPzA@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 0/5] zram: Allow zcomps to manage their own streams
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: Y0KbE0dlhAlacLvVBwIaqt-d1bkGckb2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzEzMDExNyBTYWx0ZWRfX1dAk2PQM7x8A
+ DE8Auiq1zRfD6RaZRCkHggHMFxZ/luD+p5EGGKlCa51eTtgt1Ki8XXPslZ/V7tte+xF3n+7kwOD
+ Cvts/FD3tHoiQ3nItK331nitLfXWr9onTOI0RjW6EY6K9Nc92UltjE+9K9mf7Hu+esREqeDx8GJ
+ V2uZgYyAgOLZ0jFmnI2TZqh9cadfL3b6ZA069il0/JF88BHuKurL1h1pWfDSXTcTI4aIS0RF65B
+ nNDE4v7u9RG2JEzNXqtZwV21MSfwCcUWvjbN6WXVKZuc7B3igsGpeZsULTPUJBDo4j8xTxvKUJa
+ DdT971ZbYxdEFRDwbCbIaFp4cTiIJU/FmYQVSUptdYQ0T9KNh3GaWofkh9HPiehKA2Eo1cU9OY0
+ 20sIlgIDfRa6EBJDOuVHek0Qc7G06legCz/CEDijOiv11BsROr5nIe8RRotYDviaueLW8uhSm8u
+ 2CCmdCKecIBR2NjP99A==
+X-Proofpoint-GUID: Y0KbE0dlhAlacLvVBwIaqt-d1bkGckb2
+X-Authority-Analysis: v=2.4 cv=XvL3+FF9 c=1 sm=1 tr=0 ts=69b42376 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=8elwO82fXORLTBIkMd32:22 a=WTJdmG3rAAAA:8 a=20KFwNOVAAAA:8 a=VwQbUJbxAAAA:8
+ a=yPCof4ZbAAAA:8 a=O2R9A2DNrl80SOu8WGEA:9 a=q3NGepEMMmKWaCv8Sx90:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-13_02,2026-03-13_01,2025-10-01_01
 
-Hi Sergey,
+From: Caleb Sander Mateos <csander@purestorage.com>
 
-On Wed, Mar 11, 2026 at 4:52=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
-> So does such a hardware exist?
+The ublk driver doesn't access request integrity buffers directly, it
+only copies them to/from the ublk server in ublk_copy_user_integrity().
+ublk_copy_user_integrity() uses bio_for_each_integrity_vec() to walk all
+the integrity segments. ublk devices are therefore capable of handling
+requests with integrity intervals split across segments. Set
+BLK_SPLIT_INTERVAL_CAPABLE in the struct blk_integrity flags for ublk
+devices to opt out of the integrity-interval dma_alignment limit.
 
-Yes, there are a few examples, as far as I know.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/block/ublk_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-LZ4 is relevant here because it is widely used, and decompression is
-already very fast on the CPU. So a compression-only accelerator makes
-sense.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 004f367243b69..34ed4f6a02ef2 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -808,7 +808,7 @@ static void ublk_dev_param_basic_apply(struct ublk_de=
+vice *ub)
+=20
+ static int ublk_integrity_flags(u32 flags)
+ {
+-	int ret_flags =3D 0;
++	int ret_flags =3D BLK_SPLIT_INTERVAL_CAPABLE;
+=20
+ 	if (flags & LBMD_PI_CAP_INTEGRITY) {
+ 		flags &=3D ~LBMD_PI_CAP_INTEGRITY;
+--=20
+2.52.0
 
-HiSilicon has hisi_zip in its server SoCs. For LZ4, hisi_zip offloads
-compression only, with decompression handled in software[1].
-
-I also found some out-of-tree examples, such as qpace_drv for SM8845 in
-OnePlus's tree[2] and mtk_hwz for some MediaTek SoCs from Samsung[3].
-
-These examples suggest a similar setup: queue-based hardware, while
-software (or synchronous paths) is still used for some decompression
-paths. These are the kinds of devices I had in mind, and deeper hardware
-queues do not fit well into the current model. Well, I don't have any of
-these on hand yet, but this is a kind of use case behind this series.
-
-
-[1]: https://lore.kernel.org/all/20260117023435.1616703-1-huangchenghai2@hu=
-awei.com/
-[2]: https://github.com/OnePlusOSS/android_kernel_oneplus_sm8845/tree/ecfc6=
-7b9e933937140df7a1cf39060de8dbd11be/drivers/block/zram
-[3]: https://github.com/samsung-mediatek/android_kernel_device_modules-6.12=
-/tree/4749bfe7783c045f53c50160e05b67a9a2acc3f4/drivers/misc/mediatek/mtk_zr=
-am
