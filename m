@@ -1,182 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B8F3A6F14;
-	Fri, 13 Mar 2026 15:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D83199E89;
+	Fri, 13 Mar 2026 15:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773416036; cv=none; b=qpIGJmDLxmaUifytHtHYhfxlWXbj6oWRbDyoFs3aYfDOuI4AYDqnxOuKtrCQZcUXVT6kdgTloNtOLoRtEzTevZswAxaDC6Aq8kmnz+OHuktYjQHgEziRotr6xeAIr7RjZXxawJZT8C6cPOYYrFG37gbJShdZcS6uRf92umHW4Cw=
+	t=1773416070; cv=none; b=jqOY9L9TJ7tOjz1LKvdX+27t0YE2ruhIJQXIO5flqOD3uCLgqkeC8N/lsOrOkBwokmakU+h9NLS8oDDQb5qqcVs+nAs+65liVOwl1c2vXxLK8zlf10/IPKSzc1rvyQxuNRN11stvLt/365Zqn0afFq1U2xV5StBG7a1omCn5I0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773416036; c=relaxed/simple;
-	bh=+2WVFPv5Wopw2CylUPNTgQsPlMjqFAHPGesXRLCaYK8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X1c5rGz8zkfhIiMytAEaaojfJkMZfueg90BM7QblrZIDHFF3T+gjuiyGPWID4gxInGfbBJi5EhQPbmSliuhLSWePbVvnetVf+nd9x0bC/7XiRCJljV3oyE5+9qxm5iIBS66dBnSlb5p3gqtxIIDN375BR85UX6u/R1qFh9fDbok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/zjjQWO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773416070; c=relaxed/simple;
+	bh=2wKd1sNaYC7m/ZxufJJ7RxLHcjeH6oj3MOhyWumYy5o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QYn+YlotOqk+frA2w+FYHui1zIdnu/SpeKdesXMnlYCFYC1zS36AwbjC9a5aQ8FBbovfJqhE+8hVKn8+RRrd1ZL+5FQsatrfjCArArjB3FKhx7PClim1qMrfwyRImNRMNBKRx7SxysZQWcaPZy9M60Y6wf9svxfctW3vYSj+DNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=W7DVqOUc; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/zjjQWO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CF78C19421;
-	Fri, 13 Mar 2026 15:33:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773416035;
-	bh=+2WVFPv5Wopw2CylUPNTgQsPlMjqFAHPGesXRLCaYK8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X/zjjQWOxacwq0iUzxFSBmjItd3PUFnlqSAHBkGRKf2bFY8q0Cka9nAlI+Z3LRvGA
-	 +UXb2iI6rD3WeImGCjiMi+qOBkW0n3jxhHW+rbJacz/u2TBGKX4cyLdKxVVNbMyh/H
-	 XrvwrwaKmhXrpD6hy3VR9+1st/yqTE8/nKvDhzl4p9voz1UnSuOxgt36B+XtL6Rnio
-	 kF0bdnWkCMAYRWI6pwqbngxJ1cJ5QVLAHEtOeiTnj2q/WvnayGgVCOsz1YuOXX5mWZ
-	 5fO92Cbaoa2ctk3/8DPaRKdc6vfRPyL2QjYf2nKSM3EItbR4YFqjxddXjLTWtj22YM
-	 rUNxF5DXY+nyg==
-Date: Fri, 13 Mar 2026 16:33:49 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Josh Law <hlcj1234567@gmail.com>, 
-	"Lorenzo Stoakes (Oracle)" <ljs@kernel.org>, Vlastimil Babka <vbabka@suse.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, Josh Law <objecting@objecting.org>, mm-commits@vger.kernel.org, 
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH] MAINTAINERS: add Josh Law as reviewer for library code
-Message-ID: <20260313-halskette-annahme-94e782eb4ae4@brauner>
-References: <20260307221931.2848601-1-objecting@objecting.org>
- <3cd25de5-3737-49f4-aa8b-eaaee471af50@lucifer.local>
- <ee644e1b-5759-477f-8aec-35c91a5a938e@suse.com>
- <20260307222154.2848660-1-objecting@objecting.org>
- <667b75ad-bce9-4997-8ebf-8077952c2797@gmail.com>
- <20260313-anvisiert-gemeckert-352414e3d58d@brauner>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="W7DVqOUc"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fXT782fGbz1XM6JH;
+	Fri, 13 Mar 2026 15:34:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1773416064; x=1776008065; bh=WQnbIMKyp5TiZs3eFTjZI2dY
+	rCOP0Gx2eTdJ2zaGR3Y=; b=W7DVqOUcg137+H6v+KhZunKkim2ou+jySp8hUrl5
+	1Jju9wW3F/AgviO5qnRgs8b7zye89bWQ3D34vwyyeyr3j+XlB5zeSgW9qw/BjfK+
+	dhyj7QY4YCPaksUP8qye6XZyfE3VeKlDIrLHzjfpzFggsorEfG5iU5fnemgSUqMH
+	9DLTxMm7bNQPtl38fDZl+RnHTv0sZiDrqYLFfH2T4C9B12xwNsKrKoct2SUDYqAF
+	CH8DGmKs4NSrkaJGQRIvzoXaIvCC+DmLjG4eZa8htCLuzPOXFFv7dncsy7HC1/X1
+	YSypBaK9EJ1kSrcP4CrLb63J9sNT1FSUeyjZ85je2rHGuA==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 984WlDcOHD1F; Fri, 13 Mar 2026 15:34:24 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fXT732qGqz1XM6JB;
+	Fri, 13 Mar 2026 15:34:23 +0000 (UTC)
+Message-ID: <79039bac-3785-41cf-8277-c120e3e475fa@acm.org>
+Date: Fri, 13 Mar 2026 08:34:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260313-anvisiert-gemeckert-352414e3d58d@brauner>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 1/3] bsg: add bsg_uring_cmd uapi structure
+To: Yang Xiuwei <yangxiuwei@kylinos.cn>
+Cc: axboe@kernel.dk, fujita.tomonori@lab.ntt.co.jp,
+ James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
+ linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20260312092237.2464560-1-yangxiuwei@kylinos.cn>
+ <20260312092237.2464560-2-yangxiuwei@kylinos.cn>
+ <574620fd-903b-4fd3-8cbb-22a3cefda645@acm.org>
+ <20260313073415.102437-1-yangxiuwei@kylinos.cn>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260313073415.102437-1-yangxiuwei@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 13, 2026 at 04:00:38PM +0100, Christian Brauner wrote:
-> On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
-> > Add myself as a designated reviewer for the library code to help review
-> > incoming patches and improvements.
-> > 
-> > Signed-off-by: Josh Law <objecting@objecting.org>
-> > ---
-> >  MAINTAINERS | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 96e97d25e1c2..8fd03ab9c657 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -14613,6 +14613,7 @@ F:	tools/testing/nvdimm/
-> >  
-> >  LIBRARY CODE
-> >  M:	Andrew Morton <akpm@linux-foundation.org>
-> > +R:	Josh Law <objecting@objecting.org>
-> >  L:	linux-kernel@vger.kernel.org
-> >  S:	Supported
-> >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
-> > -- 
-> > 2.43.0
-> > 
+On 3/13/26 12:34 AM, Yang Xiuwei wrote:
+> 	/* include/uapi/linux/bsg.h */
+> 	#define BSG_URING_CMD_SIZE	80
 > 
-> On Fri, Mar 13, 2026 at 10:17:53AM +0000, Lorenzo Stoakes (Oracle) wrote:
-> > On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
-> > > Add myself as a designated reviewer for the library code to help review
-> > > incoming patches and improvements.
-> > >
-> > > Signed-off-by: Josh Law <objecting@objecting.org>
-> > 
-> > Sorry but NAK, I appreciate your enthusiasm but this is literally _all_
-> > library code, and you don't have a long track history in the kernel.
-> > 
-> > Also in [0], [1], etc. you aren't demonstrating a great deal of maturity,
-> > so I don't think it's appropriate for you to be added at this time.
-> > 
-> > I really don't think a 'catch all' category should be getting arbitrary
-> > extra reviewers in any case.
-> > 
-> > Please take some time to contribute to the kernel, establish yourself, and
-> > then look to reviewership for a specific category.
-> > 
-> > Thanks, Lorenzo
-> > 
-> > > ---
-> > >  MAINTAINERS | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index 96e97d25e1c2..8fd03ab9c657 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -14613,6 +14613,7 @@ F:	tools/testing/nvdimm/
-> > >
-> > >  LIBRARY CODE
-> > >  M:	Andrew Morton <akpm@linux-foundation.org>
-> > > +R:	Josh Law <objecting@objecting.org>
-> > >  L:	linux-kernel@vger.kernel.org
-> > >  S:	Supported
-> > >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
-> > > --
-> > > 2.43.0
-> > >
-> > >
-> > 
-> > [0]:https://lore.kernel.org/all/c41dbb9d-b8a5-4b5f-9f71-3fe1bed210b6@gmail.com/
-> > [1]:https://lore.kernel.org/linux-mm/40767ecf-7e25-48f5-a604-c43b835b6b66@gmail.com/
+> 	/* drivers/scsi/scsi_bsg.c */
+> 	static_assert(sizeof(struct bsg_uring_cmd) == BSG_URING_CMD_SIZE);
 > 
-> On Fri, Mar 13, 2026 at 11:49:03AM +0100, Vlastimil Babka wrote:
-> > On 3/13/26 11:17, Lorenzo Stoakes (Oracle) wrote:
-> > > On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
-> > >> Add myself as a designated reviewer for the library code to help review
-> > >> incoming patches and improvements.
-> > >>
-> > >> Signed-off-by: Josh Law <objecting@objecting.org>
-> > > 
-> > > Sorry but NAK, I appreciate your enthusiasm but this is literally _all_
-> > > library code, and you don't have a long track history in the kernel.
-> > 
-> > Agreed, just a week after first appearance on lists is really quite too soon.
-> > 
-> > Yes, getting Cc'd thanks to R: entry is one thing, but that can be achieved
-> > with lei as well. The other aspect of R: is giving weigh in replies to
-> > (potentially new) contributors and that's why it's not given out rather that
-> > quickly.
-> > 
-> > > Also in [0], [1], etc. you aren't demonstrating a great deal of maturity,
-> > > so I don't think it's appropriate for you to be added at this time.
-> > > 
-> > > I really don't think a 'catch all' category should be getting arbitrary
-> > > extra reviewers in any case.
-> > 
-> > Agreed. Many of the files under lib/ are listed in other sections with their
-> > own maintainers. They were not cc'd on this MAINTAINERS update and yet it
-> > would affect all patches to their files too, so they could at least have a
-> > say. It's unfortunate that it's how this catch-all works. Maybe X: entries
-> > could be used by the specific maintainers in the catch-all section, although
-> > it's somewhat tedious.
-> 
-> Agreed. I'm sorry but there is no meaningful track record that would
-> justify this addition. lib/ encompasses locking.c, iov_iter.c,
-> rhashtable.c and a ton of other stuff that is consumed by literally the
-> whole kernel from core to drivers. If this was something innocous I
-> wouldn't care but there's a lot of really gnarly but important stuff in
-> there.
-> 
-> And yes, all of the externally maintained files should be dropped from
-> the generic lib/ catch-all ideally.
+> Does this arrangement look reasonable to you?
 
-Ok, so let's look at this for a minute:
+Wouldn't it be simpler to add the following statement just below the
+struct bsg_uring_cmd definition, or in other words, not to introduce a
+new #define?
 
-- first patch Feb 28 under pseudonym "techyguyperplexable", switched to "Josh Law" only when Andrew required a real name
-  in https://lore.kernel.org/all/20260228114939.de7d44de38d907a9b6632480@linux-foundation.org
-- 142+ emails in ~2 weeks — 37 patches in a single day (Mar 1)
-- All trivial/cosmetic — SPDX headers, comment grammar, spacing, const qualifiers. Zero bug fixes, zero new functionality
-- Carpet-bombed multiple subsystems — lib/, arm64/, staging/, input/, etc.
-- within 1 week of first-ever patch, submitted MAINTAINERS: add Josh Law as reviewer for library code covering all of lib/ (locking.c, iov_iter.c, rhashtable.c, etc.)
-- Email identity mismatch — From: hlcj1234567@gmail.com, Signed-off-by: objecting@objecting.org
-- Formatting problems — top-posting, line length violations, patches not applying cleanly
+	static_assert(sizeof(struct bsg_uring_cmd) == 80);
 
-So I mean, one week to Reviewer. Even if we're being very generous here,
-we need to do a lot more due diligence going forward. We can't just hand
-out core components like this and risking our reputation and security
-posture.
+There are already static_assert() statements in uapi header files:
+
+$ git grep -nH 'static_assert.*sizeof' include/uapi
+include/uapi/cxl/features.h:22:static_assert(sizeof(__uapi_uuid_t) == 
+sizeof(uuid_t));
+include/uapi/linux/media/amlogic/c3-isp-config.h:516:static_assert((sizeof(struct 
+c3_isp_params_cfg) - C3_ISP_PARAMS_MAX_SIZE) ==
+include/uapi/linux/rkisp1-config.h:1617:static_assert((sizeof(struct 
+rkisp1_ext_params_cfg) -
+
+Thanks,
+
+Bart.
