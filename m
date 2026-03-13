@@ -1,124 +1,121 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25F3340A51;
-	Fri, 13 Mar 2026 07:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0F61F1518
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 08:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773387324; cv=none; b=iD67mXxEVuLCB6wQhqLGGY4a2sbfpNp7gsNdAmifHLtCwYx9oC6os2MRVRWdF6f1SYmBUlazO/Z82A8PJhILga5mg0dqjOzaTt0/LRoPaYt5GKHTyYqDgrcTT19qiaC77g9oBJXp6VgT0WjN3Zgxt1X7i4/IPO1qaY7ZC1wFVvk=
+	t=1773391069; cv=none; b=qu+e3v7NWsC3CWdm/+nZcsAOfiUsOZUiRvzaRxRM3cohNEvNhWTcw6vPYlf67bNersIcPeWeT8PPyp6u3D8Fan2iHltisLOh5LFSPST1qeMHNkgSeIBGeya2XbrJbXiCh0s2belkGrdpkZeylb07LsHSzwMUTSmgkQTHmNjBY7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773387324; c=relaxed/simple;
-	bh=4Ue++4Hb/qJaxI72Mrzhg0z9YGqNtKMwSslQ1SN+qTc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jAnuFMXy6J8ezHk/HyUu6kbFvJOtHbjg1dxKIVDeeaZehbCxrJd66IDu5wSVB2YB0A/R9Z9pX7RvG9uO+Rmhk8Lg4jtmOWKRbTN2NkoW5uzBf65ZaxNNWseQ29XrTXxZH6CXVoKCZeLojgdBRvKBaR3l4v53IsQxgvmKOpOC2YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=oYlKDHXj; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="oYlKDHXj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=yCpoBGZSziwxHEFh5uCWzsxZiLinKocXMAN0ScbxSq0=;
-	b=oYlKDHXjXYU63wqIxf2/JXeJcuoabY8S2aw/mWbAiIL7nS6V6q7uR+R4hDK9dO
-	QeG7Neo1ReDiG4yRwEcBQOSlUSpG6ScEjcrj5WmG+0arDK8ubHHZniTe/gc3Uukf
-	WlN9ugaL+uTMNZIbfaBQ9d33THlWaSqYGlpHi8NEAjqjk=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD3H5P4vbNpeSPcAg--.42535S4;
-	Fri, 13 Mar 2026 15:34:18 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: bvanassche@acm.org
-Cc: axboe@kernel.dk,
-	fujita.tomonori@lab.ntt.co.jp,
-	James.Bottomley@HansenPartnership.com,
-	martin.petersen@oracle.com,
-	linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v7 3/3] scsi: bsg: add io_uring passthrough handler
-Date: Fri, 13 Mar 2026 15:34:15 +0800
-Message-Id: <20260313073415.102437-3-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <e6167003-82e4-4814-9e11-d1609681b5a9@acm.org>
-References: <20260312092237.2464560-1-yangxiuwei@kylinos.cn> <20260312092237.2464560-4-yangxiuwei@kylinos.cn> <e6167003-82e4-4814-9e11-d1609681b5a9@acm.org>
+	s=arc-20240116; t=1773391069; c=relaxed/simple;
+	bh=5C2N+yqVonPkUsA7emt/0lQdoL+YvGyCHE9EN7cyLf8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u+Zr5WSAthwRaF8GGZl4ljAMrGAUVNRXoe5ZUHkqh5qbX0rN0W7g6ZtdFqLBoNyw/huamNxEBwTwlw0lFDd4dlbup6QnATc239ihaityhgjIcFW67I9ETbrlwLfgCzjlwxD/gl24cXEXHCbnFGQ0+SeE+XpmSlW9NDqaFbJ5MdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fXHsK0qvFzYQv7h
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 16:36:53 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id A67414056B
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 16:37:43 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.129])
+	by APP1 (Coremail) with SMTP id cCh0CgD3+NjXzLNpNUXyAg--.25488S4;
+	Fri, 13 Mar 2026 16:37:43 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	yukuai@fnnas.com,
+	ming.lei@redhat.com,
+	linux-block@vger.kernel.org
+Cc: yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	houtao1@huawei.com,
+	zhengqixing@huawei.com,
+	wozizhi@huaweicloud.com
+Subject: [PATCH] blk-wbt: Cleanup in __wbt_enable_default
+Date: Fri, 13 Mar 2026 16:27:27 +0800
+Message-Id: <20260313082727.3585288-1-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3H5P4vbNpeSPcAg--.42535S4
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGFW8Wry7ZFW7Kr4rtFW3Awb_yoW5Jw1kpF
-	W5Ka1UJF4DWr1F9Fnrtw4DuFyfZws5C3W3KFW5Cw4UCr1DAr929F4UKF18ZF1avrnrCFyI
-	qr4vvFWqkr1qva7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UBCJQUUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwRr0hWmzvfqLFgAA3q
+X-CM-TRANSID:cCh0CgD3+NjXzLNpNUXyAg--.25488S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxJrW5Xw1DKF1kJw45uryUZFb_yoW8Wr4Dpw
+	4rK3yxK3409r4xWr47Jr18XrW3Cw40gr4kJ3s3K3WfX3W8Zrsa9a1vkFy5WF48Zr97XF47
+	ta12qFs8Za1UJ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AK
+	xVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VU1eWlP
+	UUUUU==
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-Hi Bart,
+From: Zizhi Wo <wozizhi@huawei.com>
 
-On 3/12/26 7:41 PM, Bart Van Assche wrote:
-> On 3/12/26 2:22 AM, Yang Xiuwei wrote:
->> +/*
->> + * Per-command BSG SCSI PDU stored in io_uring_cmd.pdu[32].
->> + * Holds temporary state between submission, completion and task_work.
->> + */
->> +struct scsi_bsg_uring_cmd_pdu {
->> +	struct bio *bio;		/* mapped user buffer, unmap in task work */
->> +	struct request *req;		/* block request, freed in task work */
->> +	u64 response_addr;		/* user space response buffer address */
->> +};
->
-> A static_assert() that verifies that sizeof(struct
-> scsi_bsg_uring_cmd_pdu) is less than or equal to the size of
-> ((struct io_uring_cmd *)NULL)->pdu seems appropriate here.
->
+In __wbt_enable_default(), if "enable" is false, function can directly
+return false without executing subsequent processes. Based on this,
+remove the "enable" variable and simplify the related processes.
 
-Will add a static_assert() in scsi_bsg.c to ensure the PDU fits in
-io_uring_cmd->pdu, e.g.:
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+---
+ block/blk-wbt.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-        static_assert(sizeof(struct scsi_bsg_uring_cmd_pdu) <=
-                      sizeof_field(struct io_uring_cmd, pdu));
-
->> +struct scsi_bsg_uring_cmd_pdu *pdu;
->> +struct io_uring_cmd *ioucmd = io_uring_cmd_from_tw(tw_req);
->> +struct scsi_cmnd *scmd;
->> +struct request *rq;
->> +u64 res2;
->> +int ret = 0;
->> +u8 driver_status = 0;
->> +u8 sense_len_wr = 0;
->> +
->> +pdu = scsi_bsg_uring_cmd_pdu(ioucmd);
->> +rq = pdu->req;
->> +scmd = blk_mq_rq_to_pdu(rq);
->
-> Please combine the above three assignments with the above declarations
-> since that is the style followed by most kernel code.
->
-
-Sorry for the noise here — in v6 I did not change this part, but in v7
-I took the liberty to tweak the ordering myself. Done. I will combine
-the declarations with initializers in scsi_bsg_uring_task_cb() in v8
-while keeping the data dependency and reverse Christmas tree style, e.g.:
-
-	struct io_uring_cmd *ioucmd = io_uring_cmd_from_tw(tw_req);
-	struct scsi_bsg_uring_cmd_pdu *pdu = scsi_bsg_uring_cmd_pdu(ioucmd);
-	struct request *rq = pdu->req;
-	struct scsi_cmnd *scmd = blk_mq_rq_to_pdu(rq);
-
-Additionally, for the `scsi_bsg_map_user_buffer()` helper in v7 I tried
-to follow the same principle (dependency first, then length) when
-ordering the initializations around `cmd`, `is_write`, `buf_addr` and
-`buf_len`. If you think the current ordering there should be adjusted as
-well, I'm happy to rework that in v8. In particular, when there is a
-tension between keeping the reverse Christmas tree order and making
-data/control dependencies explicit in the declaration order, I would
-very much appreciate your advice on how to handle such cases, so that I
-can do better here and in future patches.
-
-Thanks for the review.
-
-Best regards,
-Yang Xiuwei
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 33006edfccd4..b614c76dd4f2 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -740,29 +740,29 @@ static bool __wbt_enable_default(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	struct rq_qos *rqos;
+-	bool enable = IS_ENABLED(CONFIG_BLK_WBT_MQ);
++
++	if (!IS_ENABLED(CONFIG_BLK_WBT_MQ))
++		return false;
+ 
+ 	mutex_lock(&disk->rqos_state_mutex);
+ 
+ 	if (blk_queue_disable_wbt(q))
+-		enable = false;
++		goto out_false;
+ 
+ 	/* Throttling already enabled? */
+ 	rqos = wbt_rq_qos(q);
+ 	if (rqos) {
+-		if (enable && RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
++		if (RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
+ 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
+-		mutex_unlock(&disk->rqos_state_mutex);
+-		return false;
++		goto out_false;
+ 	}
+ 	mutex_unlock(&disk->rqos_state_mutex);
+ 
+ 	/* Queue not registered? Maybe shutting down... */
+-	if (!blk_queue_registered(q))
+-		return false;
++	return blk_queue_registered(q) && queue_is_mq(q);
+ 
+-	if (queue_is_mq(q) && enable)
+-		return true;
++out_false:
++	mutex_unlock(&disk->rqos_state_mutex);
+ 	return false;
+ }
+ 
+-- 
+2.39.2
 
