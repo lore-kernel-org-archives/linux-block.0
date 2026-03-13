@@ -1,81 +1,102 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AD2313267;
-	Fri, 13 Mar 2026 15:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A6335838F;
+	Fri, 13 Mar 2026 15:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773416240; cv=none; b=gIcz/v+rIlmhcH1CaVoUY0/6lNkklzm+MetyQqQrR2UoD9Z7ivFfJOr81jzyXSyfplQcGPcpDsSDMQYq2lhRlj61I+DM3ToXihsEm11k6URQJ5OJwBhFQmHS74h/ovLkjJTGWY6i4GNYUFxp18EmrxVH3PnUNbCWILsaS6IbdZI=
+	t=1773416912; cv=none; b=QuDVLIBtIFwlw69fBZyfk1URQnQIDhgaM+0yzSGg88Qf0klCtfCDe9w24k6wQwlPgyyWC9vdeXx7khKUP6+rR+NW7PBGoE2L+oNBIwPopoMGsEoA8WO86i+6Y0UmDQNBNPaA3l2OJV51T0QVbv+zptCIOsJJdCL270ZvEJhGA4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773416240; c=relaxed/simple;
-	bh=Lq4Cs/UjN1YYM3lxwRR6FuodfhjXJFuFV3Kw6ipIAkc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fj9sFJBRbbaPEg4d/jfeFR85ycnJV62yqJjoFVqMXLOCn6Xd4zSkHK9i3KUhXgd98rf0jTC3nXCLb3fFVGMwVpKl6yaVyMaoXMR1VmXR/vUeHG+/jbQ0RcsJs+oH+Gxl4WNQgGPTJtEqdH6jbAZYZKnz9lxPTsBp//sTnLUbw9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=VRBu+av4; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1773416912; c=relaxed/simple;
+	bh=xCtooFBlYayR6p/jvyKQJ9Wmo2RiUb+PyTS+owxN9Ms=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZB6JO4GUqrvZCmx4QgOtRJToPZEWDp5lx126GOZpWu61VQX03YuCyibhxKfv8T7UbxsY3V4A0Gsba5sxsJQ5kGJh72TZ2ZSfIyr3VxuuhJXKMI/l3DAak94vAI45fX5HHgxgU/DP9wjvbPeYNASQS7zxUMg3UCqz89MRR/00SoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlSFysvo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="VRBu+av4"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fXTBQ4k3Zzlfc9G;
-	Fri, 13 Mar 2026 15:37:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1773416235; x=1776008236; bh=fwTlrE7W9YlBzE45EbCXgLTg
-	NZlbjMPq9I9sC+Dm/60=; b=VRBu+av4bYn5bysWUCRxbRTOP8knMpQH8sjMdbvN
-	cURXi3mYoDlPtFv7mXLDTXh6/2doiNcYNsuxAG1rtC6di+Wb6QFvGpjftSR+J34E
-	h9R3i844wX9+U0ytLX9DkDPO2N/NwFjXYRsesDrC8EcDeVBhBSqjkT02oO/Cmtqx
-	ambtUXq1gyyD+Z9NnuScwobnoy9hkacMQwpU6IfTnPSmx/WCOKO+C4+DZuMKMsT3
-	Cg14NPCj3KzvV5nUN7/vjUuAdVsYCL2dLdNN2Thi7Jfv/Zc1IC1DbdoX0gyYEPTX
-	LVsbNAgcBQM+lq2fHPH4I75PXdrMSFfywSWVGIjgiwXxoA==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id mhVwUa2RWWsM; Fri, 13 Mar 2026 15:37:15 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fXTBK5Xtczlfc9C;
-	Fri, 13 Mar 2026 15:37:13 +0000 (UTC)
-Message-ID: <aa1e0517-3b90-4c14-aaac-d0f9526e088d@acm.org>
-Date: Fri, 13 Mar 2026 08:37:13 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlSFysvo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 608E1C19421;
+	Fri, 13 Mar 2026 15:48:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773416912;
+	bh=xCtooFBlYayR6p/jvyKQJ9Wmo2RiUb+PyTS+owxN9Ms=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KlSFysvowjbt+r+Rl0xVh/PRT2zSo04GQjTGfwHSTq6um3RSn1Iv/kZDub/qoJXCd
+	 Xp9v0Iwh3rer1GPgv42grDcV43YMJ/zZPRc+G5Hx7qmfJJczvf+rsB9ILLv8oNG4Oc
+	 L7ezsxzUMiONbaRQyiZLAhX5lX4pgkoYvRRvJnME86QoUg7WLtOrF5uW8jIRUXQmBX
+	 sIFagOmfDVT4X0Z5j0XRVe89ui7AMg7FEpM1F97y8tBKpM/TLVeSdq16nlJNvTgCe9
+	 m040lMyU3tfQibFMk5f5Fd5CMeZ0Rgjl1WqPr4hvBSy5ha0KEQo0S85yiXrMqws889
+	 u5I0iR8QJiKig==
+Date: Fri, 13 Mar 2026 15:48:27 +0000
+From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Josh Law <hlcj1234567@gmail.com>, Vlastimil Babka <vbabka@suse.com>, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Josh Law <objecting@objecting.org>, 
+	mm-commits@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	"David Hildenbrand (Arm)" <david@kernel.org>
+Subject: Re: [PATCH] MAINTAINERS: add Josh Law as reviewer for library code
+Message-ID: <01a6bbcc-1442-48c7-be5b-14f07fe655c9@lucifer.local>
+References: <20260307221931.2848601-1-objecting@objecting.org>
+ <3cd25de5-3737-49f4-aa8b-eaaee471af50@lucifer.local>
+ <ee644e1b-5759-477f-8aec-35c91a5a938e@suse.com>
+ <20260307222154.2848660-1-objecting@objecting.org>
+ <667b75ad-bce9-4997-8ebf-8077952c2797@gmail.com>
+ <20260313-anvisiert-gemeckert-352414e3d58d@brauner>
+ <20260313-halskette-annahme-94e782eb4ae4@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 3/3] scsi: bsg: add io_uring passthrough handler
-To: Yang Xiuwei <yangxiuwei@kylinos.cn>
-Cc: axboe@kernel.dk, fujita.tomonori@lab.ntt.co.jp,
- James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
- linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20260312092237.2464560-1-yangxiuwei@kylinos.cn>
- <20260312092237.2464560-4-yangxiuwei@kylinos.cn>
- <e6167003-82e4-4814-9e11-d1609681b5a9@acm.org>
- <20260313073415.102437-3-yangxiuwei@kylinos.cn>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260313073415.102437-3-yangxiuwei@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260313-halskette-annahme-94e782eb4ae4@brauner>
 
-On 3/13/26 12:34 AM, Yang Xiuwei wrote:
-> In particular, when there is a
-> tension between keeping the reverse Christmas tree order and making
-> data/control dependencies explicit in the declaration order, I would
-> very much appreciate your advice on how to handle such cases, so that I
-> can do better here and in future patches.
++cc David for mention
 
-I think that combining declarations and initializations is considered 
-more important than strictly ordering declarations from longest to
-shortest.
+On Fri, Mar 13, 2026 at 04:33:49PM +0100, Christian Brauner wrote:
+> - first patch Feb 28 under pseudonym "techyguyperplexable", switched to "Josh Law" only when Andrew required a real name
+>   in https://lore.kernel.org/all/20260228114939.de7d44de38d907a9b6632480@linux-foundation.org
+> - 142+ emails in ~2 weeks — 37 patches in a single day (Mar 1)
+> - All trivial/cosmetic — SPDX headers, comment grammar, spacing, const qualifiers. Zero bug fixes, zero new functionality
+> - Carpet-bombed multiple subsystems — lib/, arm64/, staging/, input/, etc.
+> - within 1 week of first-ever patch, submitted MAINTAINERS: add Josh Law as reviewer for library code covering all of lib/ (locking.c, iov_iter.c, rhashtable.c, etc.)
+> - Email identity mismatch — From: hlcj1234567@gmail.com, Signed-off-by: objecting@objecting.org
+> - Formatting problems — top-posting, line length violations, patches not applying cleanly
+>
+> So I mean, one week to Reviewer. Even if we're being very generous here,
+> we need to do a lot more due diligence going forward. We can't just hand
+> out core components like this and risking our reputation and security
+> posture.
 
-Thanks,
+Thanks! Agree absolutely that we need to be careful about this. Jia Tan should
+be instructive.
 
-Bart.
+Josh - there's nothing personal here to be clear, this is a question of
+procedure and caution.
+
+More broadly I think we should avoid assigning new people to catch-all
+categories anyway unless they are well established enough to be involved with
+_everything_ the catch-all covers.
+
+For instance adding people to the mm/* other than perhaps... David ;) would be
+crazy.
+
+Also - Andrew - I think for cases where you are the only maintainer but it
+impacts others, you should seek acks proportional to the scope the MAINTAINERS
+entry spans - in this case that'd be a _lot_ of people - but that only
+underlines that we shouldn't be updating such entries anyway.
+
+In fact - can we just do away with catch-all's and just make sure MAINTAINERS
+entries are established for everything?
+
+I have ground to stand on for this as I personally did it for mm, although we do
+still have a catch-all (not sure if necessary any more?)
+
+In the case of lib/ a quick fix could be to figure out which files are not
+covered by other MAINTAINERS entries and adding them all to what is currently
+the catch-all?
+
+Cheers, Lorenzo
