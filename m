@@ -1,48 +1,64 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BDA38D690;
-	Thu, 12 Mar 2026 19:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54302F5A36
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 02:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773344512; cv=none; b=cd7hWFwI4Tf8V2qhxiDvpY8InnyH6t90BOEtO6TCUVKYUB7DmFprHr1Vl4G1qd1nAuuTFNgBafQp4HxlnymgX4eXX1MbAF8Xa34sgw8Peb5GuUXyiDHWVo+CnrhaRG+TmMuwKKGaDBRLYwoXd2TGMbyOtvPSyBlj7tc+x+LqTxE=
+	t=1773368163; cv=none; b=E1RmMT0TTVSkgsk2shNwZgS3NXTUe8SG4wN3Iu9yygIzkfVCeDIhFrVhAJwshzWOfVy6PSsxJt0fr93pr4ZhWVYxawl77iZ9Cod2nMLSPFDRGB5dy8/Z8VwuhRuTEmDq/h7mIjJ2nd3CfjaEHmj9uf6KdEhT6HAv/hbG6I0CdZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773344512; c=relaxed/simple;
-	bh=OGAEmeGHIL9eZf2akW4AqFCYKzgonLb++ag85Acwi5k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZ36F2BWFcohycffNTX/rYladff2SOwbvLBYy7NPkz3PlsJ7+hk/f171pqAw3r2XWR/0HnwgUOZ8oYMwcMX0H/ViJUNLYHBhZVSvFodYpRiQM3j0H7j3KbzByPtQ1JUau4gcl2tChS91YY/SNCpjWVF1jGSKtZwifBukkA2620k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=IPlFneW/; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1773368163; c=relaxed/simple;
+	bh=32hunHUFd6x+kdFoIJVoxgXSKZ06iEJVOLqaYDJWR9A=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=sf/uvV1F31KW8ouQiiCyBPE7F8C9/h+xcdyKnQ4WjNtXMDqVsnwIM+ksmoKQ8iXWWljY53Uo6nGTeylyP6ApLujEVS5mufroC1yRWI4Nx7b7TpN3Rah+xlIQZqkUIzVgDBzVrpeIBoD5J98tMFBWjx21GThIHZ4D9o7zdF0Wwv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QeSX2qFV; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="IPlFneW/"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fWyg03xT9z1XLyhK;
-	Thu, 12 Mar 2026 19:41:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1773344504; x=1775936505; bh=TRPRSoj7XGjlCwJVmQKqfy4p
-	weWzylLFBG/ocmFU5Mc=; b=IPlFneW/e8zUyACNkzvamvTFj7DU1hDUxvtN1iHp
-	rgYP4cO5fjtE5VyqiTG5dias/er7l32w38jig6AjcCSsbO1/t1k1+lzkYu6KZRyI
-	LWMnd82foC2WpgJfw5IpwGt63z2ItDyEc66i0wOjxlSr7qXTroBd2j+imFLCmJsU
-	JR2Scd5qNUQlQOueK+0iGMh1yxyJSCGPIt1iLuJVO1MKi1cV2c+Jb8oMruMwVQYA
-	RvY+iwVCwt0R/R3Dm53ndA8R2BUGPv0vTAbWuAPRCwQIYIDraczfado8EOyzrNbZ
-	o99uy6I5AFosXS9o90nlSnomRTsXqy8Cf3+7c956WuEA8w==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id FKubJJEF-M-X; Thu, 12 Mar 2026 19:41:44 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fWyfv1fCsz1XM0ns;
-	Thu, 12 Mar 2026 19:41:42 +0000 (UTC)
-Message-ID: <e6167003-82e4-4814-9e11-d1609681b5a9@acm.org>
-Date: Thu, 12 Mar 2026 12:41:42 -0700
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QeSX2qFV"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-48534b59cf3so14870665e9.2
+        for <linux-block@vger.kernel.org>; Thu, 12 Mar 2026 19:16:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1773368160; x=1773972960; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WVcNCq4krl0cJzX6/a6sN31q6s37ery0DuP+eb4laYc=;
+        b=QeSX2qFVe2ZCvuusaZG7iUv+Y87IyXeHaW82ZFRx9rqj/MfmegxKSc89iJvpW14miY
+         B3xEqf/tm85TPu5L5kvgGfM5Pgmua8TdGQp+YPEyYXfqPtBNBzKQc5c2HFdYvLPnTcIW
+         kazaymRiirM03jX/yMvZc/IjlcP58AOGUs0JtAYlnQwfUXOBkafcn1ILQYuMMtmfxAoK
+         PeK/DVjXDYXCMWOE29+Eq/PJ8BN/RTcjgE3si0b22ol7oQKiunTVAPiv0G9ozVBIxKS2
+         4WwYEZwsHNSUJj6GOIXxvkrYNB/SWXiQGy7PdFERdo1utO8PnDJK2TAE7qdj+JvAxzjM
+         q9qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773368160; x=1773972960;
+        h=content-transfer-encoding:autocrypt:subject:from:to
+         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WVcNCq4krl0cJzX6/a6sN31q6s37ery0DuP+eb4laYc=;
+        b=bI4NrYEGImvYuGSJ21U5WC2nj38K/oIM85GKb+GGQcy3Ou3FzgU/6MzGsc+i/pZqU1
+         6BWje1xff0w/xTHJw5G5qBuYYM4316G3wopvZg2dchjd1S/9S1/0KfhWq54LP5WXpkaQ
+         VN/mvlM7tmrrAx6vDkfkl5dvn3E1+F3bNVzjs1KB8Hv+H23SrNBrMsXhTAISiT9LBOTq
+         O2uR7wO4fwVaj0TIOG0Zrzu33BgoJgKyazAbvVcXGQe8UuX+Q0LEmELdpNxGnDayGZWQ
+         EZcLLYTU2pNCFIZcVRYNV3/APDfshsNkM2TCf93SVM3WO/2lxDaPsTBSH/InpGytCtrk
+         R3Ug==
+X-Gm-Message-State: AOJu0YxsQuS4M/miQUttr2rnB4siEH+dp7nO+bHhqtTuNxaZm2Ilhcin
+	nfgsAFg6v1MhRaX5Y6b1VmTnTdyTNoBF/bwEVx7JT2cYGH8DOFZ/EAP1DnRG3GLVt/j0OkbUqLZ
+	VYV0YX0k=
+X-Gm-Gg: ATEYQzzphKBPThF2/u6Poadqh8IBvLhr6oT/OdZpm0UEo3jAlaSmFjHIW59qKlZLtLB
+	1uelFlxGD9nvO+uLkJZK3uaeo7zw9PCD9IQLEFJ8pXkI2W9z6ou7eHDbUwnyLaLuCULII/YoojI
+	MafKnN0kCGJplPXAph5zDlLlgWwKNoFn4CMXrg27brfB9DVb89WA05By0GxwOgOGdQo4HNqWMID
+	4ql2M4skmA9WR47o9eDctb2T02GUL24W6BZIAIggo8ngAE21rc9slmnqdDlYw3cTm/5xYu3WUyC
+	zinPLsGB0iYLCtarP0bJkFS1+UBqreOoORONd8WDhtpujaGmVzdvD029YX81X4G43YCxkCVd1xM
+	NQDuNWElpdkC8N8aqrbcdGAvyY7G7U0Smx2GLsMguo9x8cCSSlmL/Yo2JZXRG89Oy7HIhP1pUu0
+	yqf0xOHI+s2Z0xV1iRvYx5Jw89lObJSs3vQIlNel9hy8+ZH7Pv0eU=
+X-Received: by 2002:a05:600c:45d5:b0:485:4535:73d with SMTP id 5b1f17b1804b1-485566cfb8amr23453695e9.2.1773368160125;
+        Thu, 12 Mar 2026 19:16:00 -0700 (PDT)
+Received: from ?IPV6:2403:580d:fda1::299? (2403-580d-fda1--299.ip6.aussiebb.net. [2403:580d:fda1::299])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a07343719sm4359523b3a.38.2026.03.12.19.15.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Mar 2026 19:15:59 -0700 (PDT)
+Message-ID: <4810d3dc-22bf-4a8d-9964-017c2fdf3c3b@suse.com>
+Date: Fri, 13 Mar 2026 12:45:54 +1030
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,55 +66,60 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 3/3] scsi: bsg: add io_uring passthrough handler
-To: Yang Xiuwei <yangxiuwei@kylinos.cn>, axboe@kernel.dk,
- fujita.tomonori@lab.ntt.co.jp, James.Bottomley@HansenPartnership.com,
- martin.petersen@oracle.com
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20260312092237.2464560-1-yangxiuwei@kylinos.cn>
- <20260312092237.2464560-4-yangxiuwei@kylinos.cn>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260312092237.2464560-4-yangxiuwei@kylinos.cn>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+From: Qu Wenruo <wqu@suse.com>
+Subject: Should bio_add_folio() add the folio even it returned false for @len
+ == 0 case?
+Autocrypt: addr=wqu@suse.com; keydata=
+ xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
+ 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
+ 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
+ 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
+ gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
+ AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
+ FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
+ Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
+ fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
+ 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
+ V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
+ rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
+ rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
+ Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
+ E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
+ vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
+ g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
+ AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
+ cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
+ qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
+ /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
+ o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
+ JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/12/26 2:22 AM, Yang Xiuwei wrote:
-> +/*
-> + * Per-command BSG SCSI PDU stored in io_uring_cmd.pdu[32].
-> + * Holds temporary state between submission, completion and task_work.
-> + */
-> +struct scsi_bsg_uring_cmd_pdu {
-> +	struct bio *bio;		/* mapped user buffer, unmap in task work */
-> +	struct request *req;		/* block request, freed in task work */
-> +	u64 response_addr;		/* user space response buffer address */
-> +};
+Hi,
 
-A static_assert() that verifies that sizeof(struct
-scsi_bsg_uring_cmd_pdu) is less than or equal to the size of
-((struct io_uring_cmd *)NULL)->pdu seems appropriate here.
+Normally no one should call bio_add_folio() with a zero length, but when 
+that happened, bio_add_folio() will always return false.
 
-> +/* Task work: build res2 (layout in uapi/linux/bsg.h) and copy sense to user. */
-> +static void scsi_bsg_uring_task_cb(struct io_tw_req tw_req, io_tw_token_t tw)
-> +{
-> +	struct scsi_bsg_uring_cmd_pdu *pdu;
-> +	struct io_uring_cmd *ioucmd = io_uring_cmd_from_tw(tw_req);
-> +	struct scsi_cmnd *scmd;
-> +	struct request *rq;
-> +	u64 res2;
-> +	int ret = 0;
-> +	u8 driver_status = 0;
-> +	u8 sense_len_wr = 0;
-> +
-> +	pdu = scsi_bsg_uring_cmd_pdu(ioucmd);
-> +	rq = pdu->req;
-> +	scmd = blk_mq_rq_to_pdu(rq);
+However if the bio has enough free bvec slots, that folio will still be 
+added to that folio, breaking that "returning false meaning addition 
+failed" assumption.
 
-Please combine the above three assignments with the above declarations
-since that is the style followed by most kernel code.
+This can result folio double freeing (well, if you ignore the bigger bug 
+of queuing zero length in the first place), as return false normally 
+means the add failed, caller normally needs to release that folio manually.
 
-Otherwise this patch series looks good to me.
+But caller also needs to cleanup that folio, which involves releasing 
+each queued folio, resulting double freeing of the last added folio.
+
+Thus I'm wondering if we should add a @len == 0 check (maybe with a 
+WARN_ON_ONCE() too) in bio_add_page().
+
+And please don't ask me why/how I hit this, I'm already embarrassed 
+enough to hit it in the first place.
 
 Thanks,
-
-Bart.
+Qu
