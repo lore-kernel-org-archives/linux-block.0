@@ -1,151 +1,136 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta20.hihonor.com (mta20.hihonor.com [81.70.206.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18351A267
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 02:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE871E633C;
+	Fri, 13 Mar 2026 02:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.206.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773368779; cv=none; b=rRvqgqpW4j1hjbdsnDJCxp2KfSl4LbyxEVQmHh3OHJ9Hn+ARdjNPZekzXQBjb+XqF61mV9DPpCl7EV+OMdreffFDoHYK9ZYuiZJdjo3JlR99Sl4gObOkL50sm91IlUpBapt78ja2KVCtq3SH/5KqSZm32poqcARZwqZpqzmo6Gk=
+	t=1773369695; cv=none; b=dB92Zo+GKicL9N+/ZrHGE981vnSpO/lYATg42BKTlUd4NxRCI0J68ZfMxj99nXvkItEYaSXInb3sXnRev+tqzzT5Mo4rxlZU67bIY2BtoACKCnh2ZqXUJPeGzrXBo0ejOh0Ok3AJih4/OetD3t6d1mxavfjl7+kjnFgUcNxDLmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773368779; c=relaxed/simple;
-	bh=Hm5jpoPT9BrYcpXJ0gxIk4hBg6IkiZnU/bFMPU1r8b8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=k9T1Bx+VnsCPe7AjF8UhU6IDoHYfwtjkJ5CLufla2emgE0d2t2I/I+/zs9ojouHIEDXWvUB7CGq++zPoe5NwZBJNASkwV5+nSCMHRYIU1XKqJCyF6kd8ifr0/wqTcb37UXs1dLkTgL0rj+SZa9apSMHOFWQHAAxdqZeFXFb6+1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=vNl1cdMR; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=jDTvSneP; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="vNl1cdMR";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="jDTvSneP"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 179424E074;
-	Fri, 13 Mar 2026 02:26:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1773368775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=PWlCkTT4olomkKZRyvwvUxLdDzvznCdm856iBmHiu/c=;
-	b=vNl1cdMR3azhio4GFei/d6pY350Zl4t4YgK2CjMoh6NifDNL3XGCdBbbxPnRJmpfL2WydK
-	DiwvGEQb8ASfk3Suy+RoOAYFj7WpKjMuQ6eD1Op81y+WoW8kql9YAW3zDe7Bdhxob9RAO+
-	NPXhbGWm5girM8/UBKcps648d9RETso=
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=jDTvSneP
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1773368774; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=PWlCkTT4olomkKZRyvwvUxLdDzvznCdm856iBmHiu/c=;
-	b=jDTvSnePuSdEd7bvwHdlUcqBhAyA+ek1yIQ4Bv6ZUkpjSj0Edfc2bm9xizc+x295RdYqh0
-	a9dqZx+J4RMB65e1OfWYso0Jy9OAVXRSjmn0QYqXjqB/wtqnim4gTIuVrNdw4/tvC7C8Yg
-	zj/FtvvQ0oZWfASgvFRu03KNuELyncU=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 172C1402B4;
-	Fri, 13 Mar 2026 02:26:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id x6WzMsR1s2lXVQAAD6G6ig
-	(envelope-from <wqu@suse.com>); Fri, 13 Mar 2026 02:26:12 +0000
-From: Qu Wenruo <wqu@suse.com>
-To: linux-btrfs@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block: reject zero length in bio_add_page()
-Date: Fri, 13 Mar 2026 12:55:55 +1030
-Message-ID: <f3db373bad065ae6251892acd15993f5dd56dfe1.1773368732.git.wqu@suse.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1773369695; c=relaxed/simple;
+	bh=jDIUV0XJYHkMsfe2XaUbabxW0P2+eqZwWvAIWiaj6tg=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=UvNFXyKRj4VUlq/dInCsrX08nd6cnNz3ebCSloNmepXQTuLNQDEI+EF0beTrWPQdMZnR+Spe6l7wRGPGh6BJ4EX6oLnP5hhyaG5TQ6/dWHStSWw5+8wh6UkaNCMEz/rVQ975PpfoNPZN56/qGEVUttiEhcuEAVkpD2EHRdbKyRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.206.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
+Received: from w001.hihonor.com (unknown [10.68.25.235])
+	by mta20.hihonor.com (SkyGuard) with ESMTPS id 4fX7vG3ZPBzYmW2D;
+	Fri, 13 Mar 2026 10:38:02 +0800 (CST)
+Received: from a008.hihonor.com (10.68.30.56) by w001.hihonor.com
+ (10.68.25.235) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Fri, 13 Mar
+ 2026 10:41:21 +0800
+Received: from a008.hihonor.com (10.68.30.56) by a008.hihonor.com
+ (10.68.30.56) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.27; Fri, 13 Mar
+ 2026 10:41:21 +0800
+Received: from a008.hihonor.com ([fe80::b6bf:fc6a:207:6851]) by
+ a008.hihonor.com ([fe80::b6bf:fc6a:207:6851%6]) with mapi id 15.02.2562.027;
+ Fri, 13 Mar 2026 10:41:14 +0800
+From: gao xu <gaoxu2@honor.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+CC: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, "surenb@google.com" <surenb@google.com>,
+	zhouxiaolong <zhouxiaolong9@honor.com>
+Subject: [PATCH v2] zram: Optimize LZ4 dictionary compression performance
+Thread-Topic: [PATCH v2] zram: Optimize LZ4 dictionary compression performance
+Thread-Index: AdyykR12UwAs41bVT+uuRgnhIVy8Cw==
+Date: Fri, 13 Mar 2026 02:41:14 +0000
+Message-ID: <698181478c9c4b10aa21b4a847bdc706@honor.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_NONE(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:dkim,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 179424E074
 
-[BUG]
-I caused a regression in btrfs where an incorrect check leads to
-a bio_add_folio() call with a zero length.
-
-Then btrfs goes through the error handling, including:
-- Freeing the folio
-- Freeing every folio inside that bio
-
-But that can lead VM_BUG_ON() on the last folio.
-
-[CAUSE]
-When calling bio_add_folio()/bio_add_page() with zero length, the folio
-can still be added to the bio as long as there is a free bvec slot or
-can be merged with previous folio/page.
-
-Then bio_add_page() return @len, which is 0.
-
-Normally this means an addition failure, but this time the folio is
-already queued into the folio.
-
-This can easily confuse the caller, as for normal failure cases both the
-folio and bio should be cleaned up.
-But since the bio has the last folio queued in already, this leads to
-double folio freeing.
-
-[FIX]
-I do not think anyone should call bio_add_folio()/bio_add_page() with zero
-length, but idiots like me can still show up.
-
-So add an extra WARN_ON_ONCE() check for zero length and rejects it
-early to avoid double freeing.
-
-Signed-off-by: Qu Wenruo <wqu@suse.com>
----
- block/bio.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/bio.c b/block/bio.c
-index d80d5d26804e..6048d9382fec 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1064,6 +1064,8 @@ int bio_add_page(struct bio *bio, struct page *page,
- {
- 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
- 		return 0;
-+	if (WARN_ON_ONCE(len == 0))
-+		return 0;
- 	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)
- 		return 0;
- 
--- 
-2.53.0
-
+Q2FsbGluZyBgTFo0X2xvYWREaWN0KClgIHJlcGVhdGVkbHkgaW4gWnJhbSBjYXVzZXMgc2lnbmlm
+aWNhbnQgb3ZlcmhlYWQNCmR1ZSB0byBpdHMgaW50ZXJuYWwgZGljdGlvbmFyeSBwcmUtcHJvY2Vz
+c2luZy4gVGhpcyBjb21taXQgaW50cm9kdWNlcyBhDQp0ZW1wbGF0ZSBzdHJlYW0gbWVjaGFuaXNt
+IHRvIHByZS1wcm9jZXNzIHRoZSBkaWN0aW9uYXJ5IG9ubHkgb25jZSB3aGVuDQp0aGUgZGljdGlv
+bmFyeSBpcyBpbml0aWFsbHkgc2V0IG9yIG1vZGlmaWVkLiBJdCB0aGVuIGVmZmljaWVudGx5IGNv
+cGllcw0KdGhpcyBzdGF0ZSBmb3Igc3Vic2VxdWVudCBjb21wcmVzc2lvbnMuDQoNClZlcmlmaWNh
+dGlvbiBUZXN0IEl0ZW1zOg0KVGVzdCBQbGF0Zm9ybTogYW5kcm9pZDE2LTYuMTINCjEuIENvbGxl
+Y3QgQW5vbnltb3VzIFBhZ2UgRGF0YXNldA0KMSkgQXBwbHkgdGhlIGZvbGxvd2luZyBwYXRjaDoN
+CnN0YXRpYyBib29sIHpyYW1fbWV0YV9hbGxvYyhzdHJ1Y3QgenJhbSAqenJhbSwgdTY0IGRpc2tz
+aXplKQ0KCWlmICghaHVnZV9jbGFzc19zaXplKQ0KLQkJaHVnZV9jbGFzc19zaXplID0genNfaHVn
+ZV9jbGFzc19zaXplKHpyYW0tPm1lbV9wb29sKTsNCisJCWh1Z2VfY2xhc3Nfc2l6ZSA9IDA7DQoy
+77yJSW5zdGFsbCBtdWx0aXBsZSBhcHBzIGFuZCBtb25rZXkgdGVzdGluZyB1bnRpbCBTd2FwRnJl
+ZSBpcyBjbG9zZSB0byAwLg0KM++8iUV4ZWN1dGUgdGhlIGZvbGxvd2luZyBjb21tYW5kIHRvIGV4
+cG9ydCBkYXRhOg0KZGQgaWY9L2Rldi9ibG9jay96cmFtMCBvZj0vZGF0YS9zYW1wbGVzL3pyYW1f
+ZHVtcC5pbWcgYnM9NEsNCg0KMi4gVHJhaW4gRGljdGlvbmFyeQ0KU2luY2UgTFo0IGRvZXMgbm90
+IGhhdmUgYSBkZWRpY2F0ZWQgZGljdGlvbmFyeSB0cmFpbmluZyB0b29sLCB0aGUgenN0ZA0KdG9v
+bCBjYW4gYmUgdXNlZCBmb3IgdHJhaW5pbmdbMV0uIFRoZSBjb21tYW5kIGlzIGFzIGZvbGxvd3M6
+DQp6c3RkIC0tdHJhaW4gL2RhdGEvc2FtcGxlcy8qIC0tc3BsaXQ9NDA5NiAtLW1heGRpY3Q9NjRL
+QiAtbyAvdmVuZG9yL2V0Yy9kaWN0X2RhdGENCg0KMy4gVGVzdCBDb2RlDQphZGIgc2hlbGwgImRk
+IGlmPS9kYXRhL3NhbXBsZXMvenJhbV9kdW1wLmltZyBvZj0vZGV2L3Rlc3RfcGF0dGVybiBicz00
+MDk2IGNvdW50PTEzMTA3MiBjb252PWZzeW5jIg0KYWRiIHNoZWxsICJzd2Fwb2ZmIC9kZXYvYmxv
+Y2svenJhbTAiDQphZGIgc2hlbGwgImVjaG8gMSA+IC9zeXMvYmxvY2svenJhbTAvcmVzZXQiDQph
+ZGIgc2hlbGwgImVjaG8gbHo0ID4gL3N5cy9ibG9jay96cmFtMC9jb21wX2FsZ29yaXRobSINCmFk
+YiBzaGVsbCAiZWNobyBkaWN0PS92ZW5kb3IvZXRjL2RpY3RfZGF0YSAgID4gIC9zeXMvYmxvY2sv
+enJhbTAvYWxnb3JpdGhtX3BhcmFtcyINCmFkYiBzaGVsbCAiZWNobyA2RyA+IC9zeXMvYmxvY2sv
+enJhbTAvZGlza3NpemUiDQplY2hvICJTdGFydCBDb21wcmVzc2lvbiINCmFkYiBzaGVsbCAidGFz
+a3NldCA4MCBkZCBpZj0vZGV2L3Rlc3RfcGF0dGVybiBvZj0vZGV2L2Jsb2NrL3pyYW0wIGJzPTQw
+OTYgY291bnQ9MTMxMDcyIGNvbnY9ZnN5bmMiDQplY2hvLg0KZWNobyAiU3RhcnQgRGVjb21wcmVz
+c2lvbiINCmFkYiBzaGVsbCAidGFza3NldCA4MCBkZCBpZj0vZGV2L2Jsb2NrL3pyYW0wIG9mPS9k
+ZXYvb3V0cHV0X3Jlc3VsdCBicz00MDk2IGNvdW50PTEzMTA3MiBjb252PWZzeW5jIg0KZWNobyAi
+bW1fc3RhdDoiDQphZGIgc2hlbGwgImNhdCAvc3lzL2Jsb2NrL3pyYW0wL21tX3N0YXQiDQplY2hv
+Lg0KTm90ZTogVG8gZW5zdXJlIHN0YWJsZSB0ZXN0IHJlc3VsdHMsIGl0IGlzIGJlc3QgdG8gbG9j
+ayB0aGUgQ1BVIGZyZXF1ZW5jeQ0KYmVmb3JlIGV4ZWN1dGluZyB0aGUgdGVzdC4NCg0KTFo0IHN1
+cHBvcnRzIGRpY3Rpb25hcmllcyB1cCB0byA2NEtCLiBCZWxvdyBhcmUgdGhlIHRlc3QgcmVzdWx0
+cyBmb3INCmNvbXByZXNzaW9uIHJhdGVzIGF0IHZhcmlvdXMgZGljdGlvbmFyeSBzaXplczoNCmRp
+Y3Rfc2l6ZSAgICAgICAgICBiYXNlICAgICAgICBwYXRjaA0KICA0IEtCICAgICAgICAgIDE1Nk0v
+cyAgICAgIDIxOU0vcw0KICA4IEtCICAgICAgICAgIDEzNk0vcyAgICAgIDIxN00vcw0KIDE2S0Ig
+ICAgICAgICAgIDk4TS9zICAgICAgIDIxNE0vcw0KIDMyS0IgICAgICAgICAgIDY2TS9zICAgICAg
+IDIyNU0vcw0KIDY0S0IgICAgICAgICAgIDM4TS9zICAgICAgIDIyNE0vcw0KDQpXaGVuIGFuIExa
+NCBjb21wcmVzc2lvbiBkaWN0aW9uYXJ5IGlzIGVuYWJsZWQsIGNvbXByZXNzaW9uIHNwZWVkIGlz
+DQpuZWdhdGl2ZWx5IGltcGFjdGVkIGJ5IHRoZSBkaWN0aW9uYXJ5J3Mgc2l6ZTsgbGFyZ2VyIGRp
+Y3Rpb25hcmllcyByZXN1bHQNCmluIHNsb3dlciBjb21wcmVzc2lvbi4gVGhpcyBwYXRjaCBlbGlt
+aW5hdGVzIHRoZSBpbmZsdWVuY2Ugb2YgZGljdGlvbmFyeQ0Kc2l6ZSBvbiBjb21wcmVzc2lvbiBz
+cGVlZCwgZW5zdXJpbmcgY29uc2lzdGVudCBwZXJmb3JtYW5jZSByZWdhcmRsZXNzIG9mDQpkaWN0
+aW9uYXJ5IHNjYWxlLg0KDQpbMV0gaHR0cHM6Ly9naXRodWIuY29tL2x6NC9sejQ/dGFiPXJlYWRt
+ZS1vdi1maWxlDQoNClNpZ25lZC1vZmYtYnk6IGdhbyB4dSA8Z2FveHUyQGhvbm9yLmNvbT4NCi0t
+LQ0KdjEgLT4gdjI6DQpodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1ibG9jay8yMDI2MDMx
+MTA4NDMxMi4xNzY2MDM2LTItc2Vub3poYXRza3lAY2hyb21pdW0ub3JnLw0KVGhpcyBwYXRjaCBl
+bnN1cmVzIHRoYXQgdGhlIGNvbXByZXNzaW9uIGRpY3Rpb25hcnkgaXMgc2V0IG9ubHkgZHVyaW5n
+IGluaXRpYWxpemF0aW9uLA0KcmVtb3ZpbmcgY29kZSByZWxhdGVkIHRvIHRoZSBjb21wcmVzc2lv
+biBkaWN0aW9uYXJ5IGNoYW5naW5nIGR1cmluZyBkZXZpY2Ugb3BlcmF0aW9uLg0KQmFzZWQgb24g
+U2VyZ2V5IFNlbm96aGF0c2t5J3Mgc3VnZ2VzdGlvbnMuDQoNCmh0dHBzOi8vbG9yZS5rZXJuZWwu
+b3JnL2xpbnV4LWJsb2NrL2FlNTE5NjZjM2NiNDQ1ZTk5ODMyMzAyNDNiYjZhNWIyQGhvbm9yLmNv
+bS8NCi0tLQ0KIGRyaXZlcnMvYmxvY2svenJhbS9iYWNrZW5kX2x6NC5jIHwgMjkgKysrKysrKysr
+KysrKysrKysrKysrKysrKystLS0NCiAxIGZpbGUgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygrKSwg
+MyBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2svenJhbS9iYWNrZW5k
+X2x6NC5jIGIvZHJpdmVycy9ibG9jay96cmFtL2JhY2tlbmRfbHo0LmMNCmluZGV4IDA0ZTE4NjYx
+NC4uYzQ0OWQ1MTFiIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9ibG9jay96cmFtL2JhY2tlbmRfbHo0
+LmMNCisrKyBiL2RyaXZlcnMvYmxvY2svenJhbS9iYWNrZW5kX2x6NC5jDQpAQCAtMTQsMTMgKzE0
+LDM4IEBAIHN0cnVjdCBsejRfY3R4IHsNCiANCiBzdGF0aWMgdm9pZCBsejRfcmVsZWFzZV9wYXJh
+bXMoc3RydWN0IHpjb21wX3BhcmFtcyAqcGFyYW1zKQ0KIHsNCisJTFo0X3N0cmVhbV90ICpkaWN0
+X3N0cmVhbSA9IHBhcmFtcy0+ZHJ2X2RhdGE7DQorDQorCXBhcmFtcy0+ZHJ2X2RhdGEgPSBOVUxM
+Ow0KKwlpZiAoIWRpY3Rfc3RyZWFtKQ0KKwkJcmV0dXJuOw0KKw0KKwlrZnJlZShkaWN0X3N0cmVh
+bSk7DQogfQ0KIA0KIHN0YXRpYyBpbnQgbHo0X3NldHVwX3BhcmFtcyhzdHJ1Y3QgemNvbXBfcGFy
+YW1zICpwYXJhbXMpDQogew0KKwlMWjRfc3RyZWFtX3QgKmRpY3Rfc3RyZWFtOw0KKwlpbnQgcmV0
+Ow0KKw0KIAlpZiAocGFyYW1zLT5sZXZlbCA9PSBaQ09NUF9QQVJBTV9OT1RfU0VUKQ0KIAkJcGFy
+YW1zLT5sZXZlbCA9IExaNF9BQ0NFTEVSQVRJT05fREVGQVVMVDsNCiANCisJaWYgKCFwYXJhbXMt
+PmRpY3QgfHwgIXBhcmFtcy0+ZGljdF9zeikNCisJCXJldHVybiAwOw0KKw0KKwlkaWN0X3N0cmVh
+bSA9IGt6YWxsb2Nfb2JqKCpkaWN0X3N0cmVhbSwgR0ZQX0tFUk5FTCk7DQorCWlmICghZGljdF9z
+dHJlYW0pDQorCQlyZXR1cm4gLUVOT01FTTsNCisNCisJcmV0ID0gTFo0X2xvYWREaWN0KGRpY3Rf
+c3RyZWFtLA0KKwkJCSAgIHBhcmFtcy0+ZGljdCwgcGFyYW1zLT5kaWN0X3N6KTsNCisJaWYgKHJl
+dCAhPSBwYXJhbXMtPmRpY3Rfc3opIHsNCisJCWtmcmVlKGRpY3Rfc3RyZWFtKTsNCisJCXJldHVy
+biAtRUlOVkFMOw0KKwl9DQorCXBhcmFtcy0+ZHJ2X2RhdGEgPSBkaWN0X3N0cmVhbTsNCisNCiAJ
+cmV0dXJuIDA7DQogfQ0KIA0KQEAgLTc5LDkgKzEwNCw3IEBAIHN0YXRpYyBpbnQgbHo0X2NvbXBy
+ZXNzKHN0cnVjdCB6Y29tcF9wYXJhbXMgKnBhcmFtcywgc3RydWN0IHpjb21wX2N0eCAqY3R4LA0K
+IAkJCQkJemN0eC0+bWVtKTsNCiAJfSBlbHNlIHsNCiAJCS8qIENzdHJtIG5lZWRzIHRvIGJlIHJl
+c2V0ICovDQotCQlyZXQgPSBMWjRfbG9hZERpY3QoemN0eC0+Y3N0cm0sIHBhcmFtcy0+ZGljdCwg
+cGFyYW1zLT5kaWN0X3N6KTsNCi0JCWlmIChyZXQgIT0gcGFyYW1zLT5kaWN0X3N6KQ0KLQkJCXJl
+dHVybiAtRUlOVkFMOw0KKwkJbWVtY3B5KHpjdHgtPmNzdHJtLCBwYXJhbXMtPmRydl9kYXRhLCBz
+aXplb2YoKnpjdHgtPmNzdHJtKSk7DQogCQlyZXQgPSBMWjRfY29tcHJlc3NfZmFzdF9jb250aW51
+ZSh6Y3R4LT5jc3RybSwgcmVxLT5zcmMsDQogCQkJCQkJIHJlcS0+ZHN0LCByZXEtPnNyY19sZW4s
+DQogCQkJCQkJIHJlcS0+ZHN0X2xlbiwgcGFyYW1zLT5sZXZlbCk7DQotLQ0K
