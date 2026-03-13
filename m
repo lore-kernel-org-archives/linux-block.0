@@ -1,41 +1,41 @@
 Received: from sender-of-o55.zoho.eu (sender-of-o55.zoho.eu [136.143.169.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133873DDDD9
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 18:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED6B3DE447
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 18:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.55
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773425466; cv=pass; b=TTZB/OpKBZtlfObcRj8LqvQoz31CcvTw3KcCyaGtJ39T9895dU47hV4CH9fgYFIsqO6qAyRM5xtiHFIEB6fOFZMPMOp1Lpa91qUl90RQVT8tkn8ORRj1Lo0KkPVOZM/mU2qjUIIUSayZsxtFqNOWvxwi3iLc0YiXHfi3q+orE7Y=
+	t=1773425467; cv=pass; b=GPKvo2N+TSvGkhzszOM/NpTwkRiwbsSG3Z73yxgybL6TxOrCwKPU//ha6dSxcLzHvEwrp+Ta9aEtZ61TEOqZtyALLmQgubhtGuQqmb6pY3GF5oUfWrJiNZdLw4YbXJ9sS3b24t1zp6K7FpcMvnmpNaHugl44NYqbwLcSMutPqys=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773425466; c=relaxed/simple;
-	bh=Kc/3AKIpwTzSkyARNIxZFhYv6buQLTsMNPDjGT35jOo=;
+	s=arc-20240116; t=1773425467; c=relaxed/simple;
+	bh=IFLiBLH2CQlJfYJQUH1DiMqZU4G90xmzuB1KhGFsVR4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kwtOzj2zMhOC850HefezQTJmm+p9AdrietOh72qXVJ3BVMoeEifEYKn0ic8atSHw20f3n5aQGxtcX0uRzLDzatoM4o0J8mBRcQLJcJ1haIi+RxNcUuaIZWQSmbWLNARkSMQyhDJr3m/YXhYK9901OEqj8YJmyTKA7Ah29CO80sI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=objecting.org; spf=pass smtp.mailfrom=objecting.org; dkim=pass (1024-bit key) header.d=objecting.org header.i=objecting@objecting.org header.b=cIhwmImR; arc=pass smtp.client-ip=136.143.169.55
+	 MIME-Version:Content-Type; b=lZxN8iU1dkBynZbHvmWTL1QwwOEftC+xgeT2ccaEX3ULxYvbCGjsHDumNGHp3MUsvlSPpc61i+6dzOW4I72hxR6ezPlPN2WSFftH1C8R2XVyh84a19gzUUg66mQXajjMScTuK31pQTI+MLLaLzQO9i20JNceBJIS76XgzkG8rQA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=objecting.org; spf=pass smtp.mailfrom=objecting.org; dkim=pass (1024-bit key) header.d=objecting.org header.i=objecting@objecting.org header.b=WRcFEG4d; arc=pass smtp.client-ip=136.143.169.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=objecting.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=objecting.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=objecting.org header.i=objecting@objecting.org header.b="cIhwmImR"
-ARC-Seal: i=1; a=rsa-sha256; t=1773425443; cv=none; 
+	dkim=pass (1024-bit key) header.d=objecting.org header.i=objecting@objecting.org header.b="WRcFEG4d"
+ARC-Seal: i=1; a=rsa-sha256; t=1773425445; cv=none; 
 	d=zohomail.eu; s=zohoarc; 
-	b=Hq1Fo1wrzq5Swt9L6WunKco2N00mB/Kvk4MoEXX98C3Rz1PraaclfDfOIEo1iSFyDvBVXQEC7pjTyGlKC23DpuBO0yy+/0XGc1dxzwcW1GJ72CbrB9kilwDiZEZIVL0uQ9Nqx+DZrIZBICyeEgzK/9fxe4ZVr5o51TJLXDY72Ek=
+	b=LIkC9eU3Vy41CSlU4P9hKNIa/+2tAiFJnc/Hh/W9wuqowgWlGKBMQPyxyjtwp0b1Xmv0u3nVjVVmReqtUN7VvMwrDQyX4yCd9MtLKDidATkZSL5uovjSbnXNuIbr/Js3MIoGqv6QP4OxbwWOOcLjM3SIl7+6B/XC7jqlugLLDWc=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1773425443; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=qjNsFUrMiANXtVwfgqUllgON46nJBxUf5dbGwwSm1RY=; 
-	b=g8uXpGNsOUrn8Xkv1iruNjEcuOlyrBRT119kaVCsJFTBAguN4f2n7iOlJqOh2oLCFnCAm3e92W5EMdrZXsoxP1/TJcUGeib6LY2ZFw6OTLN9dC8S/HAEj4kAVcK8vmUnGFpS/nu0Ps3cjYDVmrtUaNPbx7fViLTMnklqj3fW1Oc=
+	t=1773425445; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Q2wEFWHClElXL8mEWY3utSjA7/avsVmLg4tZS6cFKYo=; 
+	b=RFMzj+6LlNVWBdukgoBSriHR66jw62/3/oC3XQIZE5cwmXiSTJlo0m3ERS0wnTfAdGo4MNEgisgkv7Mo//4agl0LsRJgghPUiZ6NPO9f4jqHgez13D+4fnQoVkDLP6+4UN4hCH/xwBq29S45M6f7ohGYhflWA3+MyLI7+4gBV4g=
 ARC-Authentication-Results: i=1; mx.zohomail.eu;
 	dkim=pass  header.i=objecting.org;
 	spf=pass  smtp.mailfrom=objecting@objecting.org;
 	dmarc=pass header.from=<objecting@objecting.org>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1773425443;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1773425445;
 	s=zmail; d=objecting.org; i=objecting@objecting.org;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-Id:Message-Id:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Reply-To;
-	bh=qjNsFUrMiANXtVwfgqUllgON46nJBxUf5dbGwwSm1RY=;
-	b=cIhwmImRf0tlhHMw708SognLTq9rSV0U6PDnJ+qvYHpp7XjCP/wGbMNjobdCaxRY
-	dpPrB9VIKdBzGs+lZS7vsLMvB7MaWYhsP2DCZDSbvAazZuvjJp/sfmgrODrOP3GyGnn
-	1RTtRZHzuBh2aBi40u+lsqxARce5WrT7AGIEhuHo=
-Received: by mx.zoho.eu with SMTPS id 1773425441062377.8134339982736;
-	Fri, 13 Mar 2026 19:10:41 +0100 (CET)
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-Id:Message-Id:In-Reply-To:References:MIME-Version:Content-Type:Content-Transfer-Encoding:Reply-To;
+	bh=Q2wEFWHClElXL8mEWY3utSjA7/avsVmLg4tZS6cFKYo=;
+	b=WRcFEG4dmjAbFZ1LMoCIMgSiJiGJPvDnPPynUPAfURSGiQLxfdAl6axTHd48g30W
+	ySBh/z4RChKDuZjq74W/zDVpDeZlCzqILvHNWNgHZ+T4DLwLC2FqozTXMU/bwYcbPUQ
+	V/19QRgJASTp6KuzA6UKjxL//CLvlUKktuHrAH1U=
+Received: by mx.zoho.eu with SMTPS id 1773425442308668.2028255196005;
+	Fri, 13 Mar 2026 19:10:42 +0100 (CET)
 From: Josh Law <objecting@objecting.org>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Alexander Viro <viro@zeniv.linux.org.uk>
@@ -43,9 +43,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	Josh Law <objecting@objecting.org>
-Subject: [PATCH 1/7] lib/iov_iter: fix missing allocation failure check in iov_iter_extract_bvec_pages()
-Date: Fri, 13 Mar 2026 18:10:32 +0000
-Message-Id: <20260313181038.30018-2-objecting@objecting.org>
+Subject: [PATCH 3/7] lib/iov_iter: fix misplaced parenthesis in iov_iter_restore() kvec check
+Date: Fri, 13 Mar 2026 18:10:34 +0000
+Message-Id: <20260313181038.30018-4-objecting@objecting.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260313181038.30018-1-objecting@objecting.org>
 References: <20260313181038.30018-1-objecting@objecting.org>
@@ -55,45 +55,50 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-ZohoMailClient: External
 
-When iterating bvec pages for direct I/O submission on a block device
-under heavy memory pressure, want_pages_array() can return 0 if the
-internal kvmalloc_objs() call fails.  Every other call site in the file
-(iter_folioq_get_pages, iter_xarray_get_pages, iov_iter_extract_kvec_pages,
-iov_iter_extract_user_pages, __iov_iter_get_pages_alloc) checks for this
-and returns -ENOMEM, but iov_iter_extract_bvec_pages() does not.
+When restoring a kvec-backed iterator after a short write in a kernel
+socket sendmsg path (e.g. an NFS client resending an RPC call), the
+WARN_ON_ONCE guard fires a spurious warning on every first call.
 
-When the allocation fails, *pages is left NULL and maxpages is set to 0,
-but the while loop still enters because bi.bi_size is nonzero.  The
-subsequent (*pages)[k++] = bv.bv_page dereferences the NULL pointer,
-causing a kernel oops.
+The closing parenthesis of WARN_ON_ONCE is after !iter_is_ubuf(i),
+leaving !iov_iter_is_kvec(i) as a separate && operand outside the
+macro:
 
-This was found through code review comparing the error handling patterns
-across all want_pages_array() call sites in the file and noticing the
-one that was inconsistent.
+  WARN_ON_ONCE(!bvec && !iovec && !ubuf) && !kvec
 
-Add the same !maxpages check present at every other call site.
+For kvec iterators this evaluates as WARN_ON_ONCE(true) && false — the
+warning fires but the return is skipped, so execution proceeds correctly.
+The warning is the only visible symptom, but it is confusing and may
+mask real issues.
+
+Found through code review of the operator precedence in the condition
+expression and confirmed by tracing the macro expansion.
+
+Move the closing parenthesis to include the kvec check inside
+WARN_ON_ONCE so the warning only fires for genuinely unsupported
+iterator types.
 
 Signed-off-by: Josh Law <objecting@objecting.org>
 ---
- lib/iov_iter.c | 2 ++
- 1 file changed, 2 insertions(+)
+ lib/iov_iter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 0a63c7fba313..852f9ed40e5c 100644
+index 325669b103ed..6a7959bfc849 100644
 --- a/lib/iov_iter.c
 +++ b/lib/iov_iter.c
-@@ -1628,6 +1628,8 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 	bi.bi_bvec_done = skip;
- 
- 	maxpages = want_pages_array(pages, maxsize, skip, maxpages);
-+	if (!maxpages)
-+		return -ENOMEM;
- 
- 	while (bi.bi_size && bi.bi_idx < i->nr_segs) {
- 		struct bio_vec bv = bvec_iter_bvec(i->bvec, bi);
+@@ -1471,7 +1471,7 @@ EXPORT_SYMBOL_GPL(import_ubuf);
+ void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state)
+ {
+ 	if (WARN_ON_ONCE(!iov_iter_is_bvec(i) && !iter_is_iovec(i) &&
+-			 !iter_is_ubuf(i)) && !iov_iter_is_kvec(i))
++			 !iter_is_ubuf(i) && !iov_iter_is_kvec(i)))
+ 		return;
+ 	i->iov_offset = state->iov_offset;
+ 	i->count = state->count;
 -- 
 2.34.1
 
