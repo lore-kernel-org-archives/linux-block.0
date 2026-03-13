@@ -1,121 +1,151 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0F61F1518
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 08:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272E8363098
+	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 11:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773391069; cv=none; b=qu+e3v7NWsC3CWdm/+nZcsAOfiUsOZUiRvzaRxRM3cohNEvNhWTcw6vPYlf67bNersIcPeWeT8PPyp6u3D8Fan2iHltisLOh5LFSPST1qeMHNkgSeIBGeya2XbrJbXiCh0s2belkGrdpkZeylb07LsHSzwMUTSmgkQTHmNjBY7Y=
+	t=1773402588; cv=none; b=bSrto1rSe6/r6ljGgjuYOUE9bpa0WF3k09Ca/+ccmvoNsLlpxcLUuctT87+ZmBuN50JDv2iWOgv1wZ8OsrsDlcT8/flrsGrR+bN+O+1kXwZTwID3cs5sw0XHsxeBNxjv9NcT2W5jbB3bOQ1pJankaqMADP5hK/9Bm0WmHL/oyrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773391069; c=relaxed/simple;
-	bh=5C2N+yqVonPkUsA7emt/0lQdoL+YvGyCHE9EN7cyLf8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u+Zr5WSAthwRaF8GGZl4ljAMrGAUVNRXoe5ZUHkqh5qbX0rN0W7g6ZtdFqLBoNyw/huamNxEBwTwlw0lFDd4dlbup6QnATc239ihaityhgjIcFW67I9ETbrlwLfgCzjlwxD/gl24cXEXHCbnFGQ0+SeE+XpmSlW9NDqaFbJ5MdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fXHsK0qvFzYQv7h
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 16:36:53 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id A67414056B
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 16:37:43 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.87.129])
-	by APP1 (Coremail) with SMTP id cCh0CgD3+NjXzLNpNUXyAg--.25488S4;
-	Fri, 13 Mar 2026 16:37:43 +0800 (CST)
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-To: axboe@kernel.dk,
-	yukuai@fnnas.com,
-	ming.lei@redhat.com,
-	linux-block@vger.kernel.org
-Cc: yangerkun@huawei.com,
-	chengzhihao1@huawei.com,
-	houtao1@huawei.com,
-	zhengqixing@huawei.com,
-	wozizhi@huaweicloud.com
-Subject: [PATCH] blk-wbt: Cleanup in __wbt_enable_default
-Date: Fri, 13 Mar 2026 16:27:27 +0800
-Message-Id: <20260313082727.3585288-1-wozizhi@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1773402588; c=relaxed/simple;
+	bh=LtbU/iv2e4Kg2GdtsiY2bJOKx5molPD2fFbPFnO1g8A=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=h5YPuBBS5x5W+Gb7KFM2UoAV016WPU9ylOUnVEQo26wiWrapligfRCiRHM6pThkjlFROTcPD8Z2gjwS0fcX4ag3IruBe9t1Jiqg2AhOKC2mGAexURr6yvnYKZCyg65nXNixMbbx8OlUko7N94uhUIh4AYcC/X9llxh0oQWnS4QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UrAidbyo; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UrAidbyo"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-41708f6aa5fso1324567fac.2
+        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 04:49:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1773402586; x=1774007386; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S8VAXUd+j6ULovYxRRLxzB+bZXe3RnjMuJH9W1X1J4Q=;
+        b=UrAidbyoMls/OW/RD7wEaPklbtfqlEUZoJIB/8LoJkXik6hRh0De5MILUHKh0S6Dqk
+         UkEMyv9/MOc+F/7Se5kA4Jo0BEv+nFJnMVIXwOj+G4B5YnM/dqm6UallWuWx3RXr7U6K
+         6CV0+ZcxoLtqofmpn+u/LhomV/L78X6w46iXXxsahT93ISpFlKdyOJV8GXrAoWMU25SQ
+         ePBfLZqA8bPv9xZdkRId2MTg3gSMwCfiviyxCjr7vY/SyIfNR2Q40gjUzjnBCdvjzez7
+         KApCxvSh+PmMf5wd04ke7K0tyLHDDX9Z0TumrZum4zwtf1FWDlnerHtyV9mNSYwN8tP2
+         FiAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773402586; x=1774007386;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S8VAXUd+j6ULovYxRRLxzB+bZXe3RnjMuJH9W1X1J4Q=;
+        b=GGnlbbQG9CCZiphc/ZL3KS9E7mRMjquHO1/KR8A+x8NnRROUSjsPHB2pvpR5+wF+D/
+         xHEmWOaEEvJAiyMi8tkQWc2/ZR7xuYN87nbUHNQ8IoPrD2ndXSeIGTw8y1+W12IJQ47G
+         ksWbjIFh1MINAIWjgmLykSzxiIVBCMapZb0Xxr8NnnDryyFU2zbyyzNOUnhSOnByFJr7
+         2QfWTMGUHPLfSf2bc5oQJlf2w+MwREpKFhOthAb+5SL8fugunRqqkxn9aGqDBe1oaBfg
+         5qdmatR/oL08jTvG7VK5imu0lU016wSj3gOeRK2pud7kSIQp9Uc/Bka9kRr691OKznKm
+         jDew==
+X-Gm-Message-State: AOJu0YwBNmIFLxeXjz9aq6QZGhxJ6D2MRJjEfRkQjzPIEygBdqB+TsWK
+	9N8QVvJSUvRGJVJBdgKfZqTZvMteYYiN1mtR3QI41tOy/2RiY31cDWQbuRvW6K6d7Qg=
+X-Gm-Gg: ATEYQzzDtaY/qN3VXiPkheXQvXnqPb4a1FjNkdEIqnYQ/UZ4M9rHi3CulEG3hjjibHE
+	e8OHGmdliOV1fJCjq8OjPTR4ynU1QnsfyD5YuL2dVTKnCQ3qqFwAw13+s0/v4KWPbUhdxaSdFJE
+	rumtd+LS+8zp76uM8jmQoPzUBCFPl4se1PUUE9Y3Gyrc89XpGQR1KPSnQzHrnoSlYEgZZd13k5o
+	Rs5EAGqJ9aUqw2kQp9gQSJnd7kJF4Hm0Bife85t6jpbOllkFGOMWikBdZMV0ZdIHizKRe7T1hx1
+	qrqQZKDlsxCAzPu6WXO7hfzUQ6MNzWHp0gJ8s/nqLl+7RNWXyeXR0ea22W2QsyPu9lIosJhH/Zk
+	L3CxgVEo71EJA41qsQc0xitgY+2i2m8FMUFHkX4QZYRU3no9EFm7M9JIGdNvUEuV0Gsh/Pcl3EV
+	CC27wrf+tj+gXS62AcSafbRcoFDFRFEo69SMNZZOCf4AeIvDdb32ROt9gCWMtAUnJx6nzv9tqlH
+	lVbJaGRnw==
+X-Received: by 2002:a05:6870:d183:b0:417:548d:67c2 with SMTP id 586e51a60fabf-417b945f4d7mr1573474fac.44.1773402585951;
+        Fri, 13 Mar 2026 04:49:45 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4177e1fb6efsm8619752fac.3.2026.03.13.04.49.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Mar 2026 04:49:45 -0700 (PDT)
+Message-ID: <e5ffce8a-1a3b-4c89-8ca0-8178b9046cf1@kernel.dk>
+Date: Fri, 13 Mar 2026 05:49:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3+NjXzLNpNUXyAg--.25488S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxJrW5Xw1DKF1kJw45uryUZFb_yoW8Wr4Dpw
-	4rK3yxK3409r4xWr47Jr18XrW3Cw40gr4kJ3s3K3WfX3W8Zrsa9a1vkFy5WF48Zr97XF47
-	ta12qFs8Za1UJ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AK
-	xVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VU1eWlP
-	UUUUU==
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 7.0-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Zizhi Wo <wozizhi@huawei.com>
+Hi Linus,
 
-In __wbt_enable_default(), if "enable" is false, function can directly
-return false without executing subsequent processes. Based on this,
-remove the "enable" variable and simplify the related processes.
+Set of block fixes that should go into the 7.0 kernel release. This pull
+request contains:
 
-Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
----
- block/blk-wbt.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+- NVMe pull request via Keith
+	- Fix nvme-pci IRQ race and slab-out-of-bounds access
+	- Fix recursive workqueue locking for target async events
+	- Various cleanups
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 33006edfccd4..b614c76dd4f2 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -740,29 +740,29 @@ static bool __wbt_enable_default(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
- 	struct rq_qos *rqos;
--	bool enable = IS_ENABLED(CONFIG_BLK_WBT_MQ);
-+
-+	if (!IS_ENABLED(CONFIG_BLK_WBT_MQ))
-+		return false;
- 
- 	mutex_lock(&disk->rqos_state_mutex);
- 
- 	if (blk_queue_disable_wbt(q))
--		enable = false;
-+		goto out_false;
- 
- 	/* Throttling already enabled? */
- 	rqos = wbt_rq_qos(q);
- 	if (rqos) {
--		if (enable && RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
-+		if (RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
- 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
--		mutex_unlock(&disk->rqos_state_mutex);
--		return false;
-+		goto out_false;
- 	}
- 	mutex_unlock(&disk->rqos_state_mutex);
- 
- 	/* Queue not registered? Maybe shutting down... */
--	if (!blk_queue_registered(q))
--		return false;
-+	return blk_queue_registered(q) && queue_is_mq(q);
- 
--	if (queue_is_mq(q) && enable)
--		return true;
-+out_false:
-+	mutex_unlock(&disk->rqos_state_mutex);
- 	return false;
- }
- 
+- Fix a potential NULL pointer dereference in ublk on size setting.
+
+- ublk automatic partition scanning fix
+
+- Two s390 dasd fixes
+
+Please pull!
+
+
+The following changes since commit ce8ee8583ed83122405eabaa8fb351be4d9dc65c:
+
+  block: use trylock to avoid lockdep circular dependency in sysfs (2026-03-05 04:01:42 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.0-20260312
+
+for you to fetch changes up to 7d0abefec48dfefeec28dc7c3105a88c43747d02:
+
+  Merge tag 'nvme-7.0-2026-03-12' of git://git.infradead.org/nvme into block-7.0 (2026-03-12 15:15:53 -0600)
+
+----------------------------------------------------------------
+block-7.0-20260312
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (1):
+      nvmet: move async event work off nvmet-wq
+
+Jens Axboe (1):
+      Merge tag 'nvme-7.0-2026-03-12' of git://git.infradead.org/nvme into block-7.0
+
+Maurizio Lombardi (1):
+      nvme-core: do not pass empty queue_limits to blk_mq_alloc_queue()
+
+Mehul Rao (1):
+      ublk: fix NULL pointer dereference in ublk_ctrl_set_size()
+
+Ming Lei (1):
+      ublk: don't clear GD_SUPPRESS_PART_SCAN for unprivileged daemons
+
+Stefan Haberland (2):
+      s390/dasd: Move quiesce state with pprc swap
+      s390/dasd: Copy detected format information to secondary device
+
+Sungwoo Kim (2):
+      nvme-pci: Fix slab-out-of-bounds in nvme_dbbuf_set
+      nvme-pci: Fix race bug in nvme_poll_irqdisable()
+
+Thorsten Blum (1):
+      nvme: Annotate struct nvme_dhchap_key with __counted_by
+
+ drivers/block/ublk_drv.c        | 16 ++++++++++++----
+ drivers/nvme/host/core.c        |  3 +--
+ drivers/nvme/host/pci.c         |  8 +++++---
+ drivers/nvme/target/admin-cmd.c |  2 +-
+ drivers/nvme/target/core.c      | 14 ++++++++++++--
+ drivers/nvme/target/nvmet.h     |  1 +
+ drivers/nvme/target/rdma.c      |  1 +
+ drivers/s390/block/dasd_eckd.c  | 16 ++++++++++++++++
+ include/linux/nvme-auth.h       |  2 +-
+ 9 files changed, 50 insertions(+), 13 deletions(-)
+
 -- 
-2.39.2
+Jens Axboe
 
