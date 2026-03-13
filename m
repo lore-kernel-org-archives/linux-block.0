@@ -1,162 +1,182 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B8C38F649
-	for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 15:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B8F3A6F14;
+	Fri, 13 Mar 2026 15:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773415672; cv=none; b=PivF8KgMgU67im9K1VbOXngyq9VBa+m44A4gheuWpTI4CyTDiwoHOjgHwuhc44mIw9fEPPRM+JWl6eXqni1PTYLUzrag+P/YYd10PxEGAy8lh9sRXMluQ/yg/2QeeejP3eIaId2u7bYJH+Ld7subO1STNP5dkJ5F5n4dAHIHCio=
+	t=1773416036; cv=none; b=qpIGJmDLxmaUifytHtHYhfxlWXbj6oWRbDyoFs3aYfDOuI4AYDqnxOuKtrCQZcUXVT6kdgTloNtOLoRtEzTevZswAxaDC6Aq8kmnz+OHuktYjQHgEziRotr6xeAIr7RjZXxawJZT8C6cPOYYrFG37gbJShdZcS6uRf92umHW4Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773415672; c=relaxed/simple;
-	bh=r732MH4eUyZFj0cG1H0vXTxFnuY4XK0oCax8NJCzLZk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=brosjIrSvA+6edb9ApeUML/OJEyqsAFNrq8ChVWVBhg29sCA+QQflZuzgnj6f/iWaZQUP8NUVxrD8Yx3VCcyB80z+yGAkUEsIhX2iidSm64Wud+8lrUJqJKHelVN2hbbWeXxZlBRgGDbnP6+04ZtslXsU9hDG22F8TB/xiAG+W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JIK4oR8f; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773416036; c=relaxed/simple;
+	bh=+2WVFPv5Wopw2CylUPNTgQsPlMjqFAHPGesXRLCaYK8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1c5rGz8zkfhIiMytAEaaojfJkMZfueg90BM7QblrZIDHFF3T+gjuiyGPWID4gxInGfbBJi5EhQPbmSliuhLSWePbVvnetVf+nd9x0bC/7XiRCJljV3oyE5+9qxm5iIBS66dBnSlb5p3gqtxIIDN375BR85UX6u/R1qFh9fDbok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/zjjQWO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JIK4oR8f"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48529c325f0so16994385e9.0
-        for <linux-block@vger.kernel.org>; Fri, 13 Mar 2026 08:27:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773415669; x=1774020469; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MMNm0gL3Me4TtMRtXwPRJioaCzWcm1bgO59kj5/wfh4=;
-        b=JIK4oR8faDg1s//Z10u09I3vKcunVZj7Enu18xNpQLdQonpUPSyrxITWzNxHw0qZGn
-         +gYTi4FTbM/A3LvPp/Ysts3AU1kvcoQHXkwMHKKqmUVAGkx8RmThPmaSpOPGlp3vp3vw
-         YdpNWVOFvV/qVvkzpoANSAarTKK4/QvqmoOkfuM+COkOAcIpwU75RmpE7eGP1XqCxspr
-         JExro/0MEo9rd4oVvu1Q8z1CvwqpePU1u7nbHpUYaH5h33aO0p43RCdN/F9a6T4KHEVA
-         yIHmxC4gbAE9LW4qiwrv3lxbNZhORitNjE+3YYSNWU34VT7lmhOpfeo7nshaxe1U6dxk
-         UjJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773415669; x=1774020469;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MMNm0gL3Me4TtMRtXwPRJioaCzWcm1bgO59kj5/wfh4=;
-        b=VwBDbgVFgFM/OmIBXs4FJK1J7kStdFN1Vvfws7W/s5J7UU2FV8ABKZIGZ97LaQrCKO
-         uX5dzCRURtkgCuXPNLVrOckzIyHKB4KYKAcQyaU8FW6kPalXCYlnMxfL1p3CVOCPtaEd
-         t16weym1Hc4N+Bu9q/jAxJQgyxpGLGD7JpRdS74lIkbouGdIn8RTRdF5NfTknvqswVEI
-         Nu5gXzWWnvDnFdAa6K00MiDZjVd1FrV6lKpdn6j0XdEJKxUk/2OcL/3jH9CUOQsA1QLY
-         XIIa+EquARZwdJqGXA/aoDABqzBLONNcasN+5iB9U8UyhhkN1I4pGkhO9HoIjI7Skm5O
-         Hq3A==
-X-Forwarded-Encrypted: i=1; AJvYcCU7WcKqMtKICXwNLOeOUovHs9z8a5nSBycJlOpGoQehWBYmEiQ53Zv/5wzEz8zZkezQYJjazMxyTbV5sw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvYm7Hklb/HXQ6R9m7wkGO4/sPli1yr2NBzDBpnTOix/TDSBOH
-	b0XmwSCse3ZnS3VdQuIDMDZ0skZwy7c4dppGb2UDQaiVES3Lkume7hmGr66QETtz
-X-Gm-Gg: ATEYQzzNpDzekOfsMA2iik24Secqfnl5sVbY6JxiCftcrH9MmBwXuQ1Hr2ahpBTM7Nx
-	ANSKvxIUhPjctrGpiEyWx4fO46Fd6FLdKjs0G66coSNjpBNIMTXdERyG8GMAM/x5bNhE9NsAw0J
-	u4+JOIGzAA0weq3lshsuNx/MtPNtFbrISpkJ0jU/LUc2sU1hSw8gYwOPq5cuK2ZQZA9aPjN4lmy
-	la+AfsJutWOytRMpXPlP3N1VIjFgThTUXsxqBoiYkslfqZrNtoT1fj7dXIy4mjehWCVrjfXObiv
-	NacOeB37I0lKuGaZ/2BmQYyH/CIb3iDMsiW3KHoudqIPVZagkuCDjCRuMCW5+Wwy12Wer2pq8GP
-	Ypadag3NKRvKJ1aVVVgVfgdupEN/f0WrnjIIBddKWihz6XY3wcqtCA+doLRz7ruP7XQ/zVLDCLg
-	4v94HARXDW5prEZveDrjC8dUoRPMzx3MU2VViukVTvYmCjLBNkjc8SjsgYWOgZ6mk=
-X-Received: by 2002:a05:600c:c049:b0:483:7903:c3b1 with SMTP id 5b1f17b1804b1-485566f7a35mr46270265e9.20.1773415669234;
-        Fri, 13 Mar 2026 08:27:49 -0700 (PDT)
-Received: from [192.168.8.102] (89-24-59-99.nat.epc.tmcz.cz. [89.24.59.99])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fdf09abesm18409700f8f.0.2026.03.13.08.27.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Mar 2026 08:27:48 -0700 (PDT)
-Message-ID: <7f613001-fc2b-44e3-ac14-7e661cf52fdd@gmail.com>
-Date: Fri, 13 Mar 2026 16:27:46 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/zjjQWO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CF78C19421;
+	Fri, 13 Mar 2026 15:33:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773416035;
+	bh=+2WVFPv5Wopw2CylUPNTgQsPlMjqFAHPGesXRLCaYK8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X/zjjQWOxacwq0iUzxFSBmjItd3PUFnlqSAHBkGRKf2bFY8q0Cka9nAlI+Z3LRvGA
+	 +UXb2iI6rD3WeImGCjiMi+qOBkW0n3jxhHW+rbJacz/u2TBGKX4cyLdKxVVNbMyh/H
+	 XrvwrwaKmhXrpD6hy3VR9+1st/yqTE8/nKvDhzl4p9voz1UnSuOxgt36B+XtL6Rnio
+	 kF0bdnWkCMAYRWI6pwqbngxJ1cJ5QVLAHEtOeiTnj2q/WvnayGgVCOsz1YuOXX5mWZ
+	 5fO92Cbaoa2ctk3/8DPaRKdc6vfRPyL2QjYf2nKSM3EItbR4YFqjxddXjLTWtj22YM
+	 rUNxF5DXY+nyg==
+Date: Fri, 13 Mar 2026 16:33:49 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Josh Law <hlcj1234567@gmail.com>, 
+	"Lorenzo Stoakes (Oracle)" <ljs@kernel.org>, Vlastimil Babka <vbabka@suse.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, Josh Law <objecting@objecting.org>, mm-commits@vger.kernel.org, 
+	Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH] MAINTAINERS: add Josh Law as reviewer for library code
+Message-ID: <20260313-halskette-annahme-94e782eb4ae4@brauner>
+References: <20260307221931.2848601-1-objecting@objecting.org>
+ <3cd25de5-3737-49f4-aa8b-eaaee471af50@lucifer.local>
+ <ee644e1b-5759-477f-8aec-35c91a5a938e@suse.com>
+ <20260307222154.2848660-1-objecting@objecting.org>
+ <667b75ad-bce9-4997-8ebf-8077952c2797@gmail.com>
+ <20260313-anvisiert-gemeckert-352414e3d58d@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/3] dm-inlinecrypt: add target for inline block device
- encryption
-To: Mikulas Patocka <mpatocka@redhat.com>, Eric Biggers <ebiggers@kernel.org>
-Cc: Linlin Zhang <linlin.zhang@oss.qualcomm.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- adrianvovk@gmail.com, dm-devel@lists.linux.dev, quic_mdalam@quicinc.com,
- israelr@nvidia.com
-References: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com>
- <20260304121729.1532469-3-linlin.zhang@oss.qualcomm.com>
- <20260312070110.GD2359@sol> <5a310122-bd7e-d10e-653e-bc7e09681478@redhat.com>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <5a310122-bd7e-d10e-653e-bc7e09681478@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260313-anvisiert-gemeckert-352414e3d58d@brauner>
 
-On 3/13/26 2:25 PM, Mikulas Patocka wrote:
-> On Thu, 12 Mar 2026, Eric Biggers wrote:
+On Fri, Mar 13, 2026 at 04:00:38PM +0100, Christian Brauner wrote:
+> On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
+> > Add myself as a designated reviewer for the library code to help review
+> > incoming patches and improvements.
+> > 
+> > Signed-off-by: Josh Law <objecting@objecting.org>
+> > ---
+> >  MAINTAINERS | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 96e97d25e1c2..8fd03ab9c657 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -14613,6 +14613,7 @@ F:	tools/testing/nvdimm/
+> >  
+> >  LIBRARY CODE
+> >  M:	Andrew Morton <akpm@linux-foundation.org>
+> > +R:	Josh Law <objecting@objecting.org>
+> >  L:	linux-kernel@vger.kernel.org
+> >  S:	Supported
+> >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
+> > -- 
+> > 2.43.0
+> > 
 > 
->> On Wed, Mar 04, 2026 at 04:17:27AM -0800, Linlin Zhang wrote:
->>> From: Eric Biggers <ebiggers@google.com>
->>>
->>> Add a new device-mapper target "dm-inlinecrypt" that is similar to
->>> dm-crypt but uses the blk-crypto API instead of the regular crypto API.
->>> This allows it to take advantage of inline encryption hardware such as
->>> that commonly built into UFS host controllers.
+> On Fri, Mar 13, 2026 at 10:17:53AM +0000, Lorenzo Stoakes (Oracle) wrote:
+> > On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
+> > > Add myself as a designated reviewer for the library code to help review
+> > > incoming patches and improvements.
+> > >
+> > > Signed-off-by: Josh Law <objecting@objecting.org>
+> > 
+> > Sorry but NAK, I appreciate your enthusiasm but this is literally _all_
+> > library code, and you don't have a long track history in the kernel.
+> > 
+> > Also in [0], [1], etc. you aren't demonstrating a great deal of maturity,
+> > so I don't think it's appropriate for you to be added at this time.
+> > 
+> > I really don't think a 'catch all' category should be getting arbitrary
+> > extra reviewers in any case.
+> > 
+> > Please take some time to contribute to the kernel, establish yourself, and
+> > then look to reviewership for a specific category.
+> > 
+> > Thanks, Lorenzo
+> > 
+> > > ---
+> > >  MAINTAINERS | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 96e97d25e1c2..8fd03ab9c657 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -14613,6 +14613,7 @@ F:	tools/testing/nvdimm/
+> > >
+> > >  LIBRARY CODE
+> > >  M:	Andrew Morton <akpm@linux-foundation.org>
+> > > +R:	Josh Law <objecting@objecting.org>
+> > >  L:	linux-kernel@vger.kernel.org
+> > >  S:	Supported
+> > >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
+> > > --
+> > > 2.43.0
+> > >
+> > >
+> > 
+> > [0]:https://lore.kernel.org/all/c41dbb9d-b8a5-4b5f-9f71-3fe1bed210b6@gmail.com/
+> > [1]:https://lore.kernel.org/linux-mm/40767ecf-7e25-48f5-a604-c43b835b6b66@gmail.com/
+> 
+> On Fri, Mar 13, 2026 at 11:49:03AM +0100, Vlastimil Babka wrote:
+> > On 3/13/26 11:17, Lorenzo Stoakes (Oracle) wrote:
+> > > On Sat, Mar 07, 2026 at 10:19:31PM +0000, Josh Law wrote:
+> > >> Add myself as a designated reviewer for the library code to help review
+> > >> incoming patches and improvements.
+> > >>
+> > >> Signed-off-by: Josh Law <objecting@objecting.org>
+> > > 
+> > > Sorry but NAK, I appreciate your enthusiasm but this is literally _all_
+> > > library code, and you don't have a long track history in the kernel.
+> > 
+> > Agreed, just a week after first appearance on lists is really quite too soon.
+> > 
+> > Yes, getting Cc'd thanks to R: entry is one thing, but that can be achieved
+> > with lei as well. The other aspect of R: is giving weigh in replies to
+> > (potentially new) contributors and that's why it's not given out rather that
+> > quickly.
+> > 
+> > > Also in [0], [1], etc. you aren't demonstrating a great deal of maturity,
+> > > so I don't think it's appropriate for you to be added at this time.
+> > > 
+> > > I really don't think a 'catch all' category should be getting arbitrary
+> > > extra reviewers in any case.
+> > 
+> > Agreed. Many of the files under lib/ are listed in other sections with their
+> > own maintainers. They were not cc'd on this MAINTAINERS update and yet it
+> > would affect all patches to their files too, so they could at least have a
+> > say. It's unfortunate that it's how this catch-all works. Maybe X: entries
+> > could be used by the specific maintainers in the catch-all section, although
+> > it's somewhat tedious.
+> 
+> Agreed. I'm sorry but there is no meaningful track record that would
+> justify this addition. lib/ encompasses locking.c, iov_iter.c,
+> rhashtable.c and a ton of other stuff that is consumed by literally the
+> whole kernel from core to drivers. If this was something innocous I
+> wouldn't care but there's a lot of really gnarly but important stuff in
+> there.
+> 
+> And yes, all of the externally maintained files should be dropped from
+> the generic lib/ catch-all ideally.
 
-...
+Ok, so let's look at this for a minute:
 
->> I don't think it's plausible that this new patch was actually tested.
->> The version I sent in 2024 was tested at the time
->> (https://lore.kernel.org/r/20241016232748.134211-3-ebiggers@kernel.org/),
->> but I see at least two things that would make this new patch not work.
+- first patch Feb 28 under pseudonym "techyguyperplexable", switched to "Josh Law" only when Andrew required a real name
+  in https://lore.kernel.org/all/20260228114939.de7d44de38d907a9b6632480@linux-foundation.org
+- 142+ emails in ~2 weeks — 37 patches in a single day (Mar 1)
+- All trivial/cosmetic — SPDX headers, comment grammar, spacing, const qualifiers. Zero bug fixes, zero new functionality
+- Carpet-bombed multiple subsystems — lib/, arm64/, staging/, input/, etc.
+- within 1 week of first-ever patch, submitted MAINTAINERS: add Josh Law as reviewer for library code covering all of lib/ (locking.c, iov_iter.c, rhashtable.c, etc.)
+- Email identity mismatch — From: hlcj1234567@gmail.com, Signed-off-by: objecting@objecting.org
+- Formatting problems — top-posting, line length violations, patches not applying cleanly
 
-What a waste of time... thanks.
-> OK. I dropped it.
-
-Well, the inline crypt has some advantages to proprietary internal
-hw implementations (like self-encrypting drives)  - it can be actually validated
-comparing to sw version.
-
-Anyway, Mikulas, if this dm-inlinecrypt returns one day, please be
-sure that we do not have security-related "regressions" like not supporting
-keyring. There is no need for dm-inlinecrypt to keep key inside the mapping table.
-The keyring code is in dm-crypt, it should be easy to adapt it here.
-
-Thanks,
-Milan
-
+So I mean, one week to Reviewer. Even if we're being very generous here,
+we need to do a lot more due diligence going forward. We can't just hand
+out core components like this and risking our reputation and security
+posture.
