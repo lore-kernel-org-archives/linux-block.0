@@ -1,139 +1,118 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A987137B027
-	for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 20:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773605842; cv=none; b=YUM7kH5pldUwd6r6ZSZm6emH36rsmMbo3LIIqXG3X06IAjoo1FHoV67PP3TNR08bIEJoioibsGO5XQHEHKNfXiGX+a+bf7iuads9U+2OFrUnkkww8RdX3kVPSUeAQ28MrescgGkAfn4aMwCLNDQ/Z+FpgI1JqbJlf/kkLyfkNT8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773605842; c=relaxed/simple;
-	bh=yxw1o5RsGgzifEgVy+t37G08vYALXyzCnGPt1gRrNDI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lX3xiqXOc3TmwdHF+IgfgUAWBIFFY3MK/tsdpYLd8+sXPTusmQMRAKHw5FXzHTKdy10ttNQKJZvh7wntLD+9QmNmXJPjCSpOFdzqvE4OAZPrkRZIIeTJ9mEMoFE4Md0dSSuTpYKH8E0Cfzl88DdnGXzAPWQHT3KwqBjpN764vnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lxs6UqEx; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71FB192D97
+	for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 22:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773612983; cv=pass; b=d0xwhc8n4wzQeFaJyvDhrLoiq4xR8S5tay4PewWC/FwlGP9bK9fadW+VqE7t8u/L6vHH/PIxZ+tY6ZwIJ+qQEn91b/W9KZO3rQB+JI6F26AnXreQ5pyOPrLha+XuIwU+DAWlLzLHxiAtJxeREr4eMN07rHSFAcz+prFNQn2OP9Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773612983; c=relaxed/simple;
+	bh=+5+hPi2JuPwjHkL8L7DN1vqJD1ja2IKC8acdT9KDE1k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kASu3yVVzmZWBhgiX4tqAl8oYmYpwMT/MW7McwAQAnwQgtS3xGBTr8aaXWXmQdkFPCOTHEwWhFiiVpMfAAvaBEqmQoliXCDBaGxzMqttSUhHWyUDhQ+lxXg3VZc/FkIxanv/TGQEs894q1BEG3khXjppyU//8wQ9nBbA8CY78xw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ABskiqY4; arc=pass smtp.client-ip=74.125.82.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lxs6UqEx"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4852f73d0a3so28259615e9.3
-        for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 13:17:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ABskiqY4"
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2c0bf0a0236so23894eec.1
+        for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 15:16:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773612981; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EQXaXL+x/aOfHsr6N21YUbphliRmDWq1hziR+480r4VYVWWVECwUBQYjzPJGnp6iOf
+         +Gz8Ns7aunghZ7ZVtciz7sF2ub5EUfiz3V07/e7iNOu/OaR2Ob5yqDcSJbm47SEUYG1l
+         TlhA/eyl3tCAZ3RduCtUeoT5jhYZpQs26uSJ37gng2dYnKcfbCIKdbDHNfF72r1T7S6q
+         cVD4U937aZihnfYpHDP+gnZzeP5zpDP7yVOd2MHTb/aqvTO04IFofvr4ekZTgoJQR5+a
+         hrykYJV+t7H2n78KhXWsifXzSNVDqol5XOV6s6fG32FZgkIzm4WTqRRqeAtNj3dUDlE0
+         1d0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=+5+hPi2JuPwjHkL8L7DN1vqJD1ja2IKC8acdT9KDE1k=;
+        fh=ea0RIxF7tnXi+yyuyefqFLykq9ogM84qmV0lyM8d0gg=;
+        b=F5qxLBJvtiQBA9moIuJ0VQtl4cTHlRzt8qYogiM/CAKr0syY3npnZoND34hH2dn462
+         rcySoZNOi435hk0sI8XWGbZWebh8Ly+7ftLJclsrKLJJUZDxBoP7w+OMYLLqQVvZlPYr
+         2Y6YQSeMhwHo84hQfFWkdWfu5UEk19ZZuuuAzGhDU/qZY4FbNh+T64Jfy79vMFhgcb1h
+         tl1QmoivLiYpPj+15uJ6AM+7eYwwfcm/Qbs7fzFsiGxEeX7N8amodIiJ3TLzCX2/PpGe
+         0ta7cvZYQgTldBHbv+0JnR2bKhc4vbqQ0+kcjWxmuEqXCD7NYfUYDaGSItmRdLOU4H7x
+         9DYw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773605839; x=1774210639; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QAjJdat2f+Wu64a9+rtkdfODHEuD9aCaqihPGpN9D90=;
-        b=Lxs6UqExeZpHk8H0SsMkU0x5kdw4+OHRU7rgzfEHHCD2nlwWruaE3D3W4MdNFik3lp
-         y0WzTeybNHBacX5984G7/rQLs/X7HshvdkIBzcQ76qLQjCb87Mv0xEe5crO4y2USb3+7
-         41oPreT/DupThJdCUqTLw/ViE560C+YIMQrS5E5q2NkfAt+RrIpH4e8YAk899EbDEdZV
-         wZvJPyo9QoJyuyOoN8KY/2y0F63H3cLTEomcH1YlF3MdvxckHGLSgCJTZWEU+1f5i24x
-         Hbh9euub4o0HU2E1dOg46iTy7Bx1DHM8nAAOxsoQWXo/QXuZLmgtV2S7dQjcT4iBTIUG
-         7zjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773605839; x=1774210639;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1773612981; x=1774217781; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QAjJdat2f+Wu64a9+rtkdfODHEuD9aCaqihPGpN9D90=;
-        b=ediFGBL9DJslQsV8vKvUziTdTsqVpH1eySaE2X9AfX/7c71zYKyLLMCww351IUnhXZ
-         F+qNSukjdYn3zyDflLPKYaZQJOAmtrzNgJYDZcYVlqw8flOuFINMXpAyUcXW0GJE9a6r
-         62Zg011wme+SBaufowce9bHB+Sq6B+fsG7SFglO3s24n6NLvwSZlyoC5jS9OvOBMEy/O
-         Li+jqv4JVHqSC25YfXPChHWlniShbvbMkb7TbXzpdgFCSScFkj+pGXJHuoMXeAvEa+AI
-         Cl5ovlAY/0NC4DxRTnCzPXTnFmJekxSra1CETxchf6HC3YhYBQoldxCp1KRCbBJmi+nC
-         Sr9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUtqu6Oh5TKU36iwkMoOm2XdB1xSALuHlgZp81fFVFz2bxPzvVQK3o0RFAsN0AXhiuVckZFXys1N8SEkw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1tXLX1xJ4rqOyoMaMRQLdZxoBREemZuRQIbu+UIlkHa5zHvw/
-	eJH+ARSszMy/FU2SVUTOFq+ancSq+/KVMf7IIDIUMllG51lSA8vKdZN9
-X-Gm-Gg: ATEYQzyELy+E6LPrZSn1Xv2h2OubgYLaxT8qIQ44yeVQks1z0ujytat/eZhJwwZmVn6
-	02zz9fOFEn7hHmUXO0jF36aeNFXFS0onPOAZOC3eOSZ45v4Hd8r4zNlcmUeX+crCJlfSkK4ycRN
-	qFoaXWYx+rE4vfSVLGSiDaHYzK+LDYh6hcbH+K/DU9UUHTgCXsOccTd6CMyoDrDvU32S2sfKZ8O
-	SQDF+VojN2cViw/0bzz6xb4L3myeRTa8CoX1zZmFOCjow/9d0ITkgNYmYOjiIthhKvW0xWLrQzB
-	8uyiNWAvKR19mhIP4gIIFgqu3dpL3K0PVc+1q4CHZWnkqUTnTSJHN1MrndWthb4hCZuYzE3gNZS
-	K5fyHlwh4pVFl0CEwFlbFhvt+GSmNWw5paj3P4zBRBusKBHdW1L8IcsAPoOIpS9mTwQZORvV08K
-	p8O8GNXA0+o6iAdLbm0Ad3YNGuS1WYCZ0fzw==
-X-Received: by 2002:a05:600c:8488:b0:485:3f1c:d897 with SMTP id 5b1f17b1804b1-485566d2fdcmr165056395e9.9.1773605838675;
-        Sun, 15 Mar 2026 13:17:18 -0700 (PDT)
-Received: from debian.lan ([171.22.84.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541aa73easm466194515e9.3.2026.03.15.13.17.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Mar 2026 13:17:18 -0700 (PDT)
-From: =?UTF-8?q?Adri=C3=A1n=20Garc=C3=ADa=20Casado?= <adriangarciacasado42@gmail.com>
-To: Andreas Hindborg <a.hindborg@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Boqun Feng <boqun@kernel.org>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	rust-for-linux@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Adri=C3=A1n=20Garc=C3=ADa=20Casado?= <adriangarciacasado42@gmail.com>
-Subject: [PATCH v3 2/3] rust: block: rnull: update to Pin<KBox<QueueData>> for PinInit
-Date: Sun, 15 Mar 2026 21:17:10 +0100
-Message-ID: <20260315201713.15438-1-adriangarciacasado42@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        bh=+5+hPi2JuPwjHkL8L7DN1vqJD1ja2IKC8acdT9KDE1k=;
+        b=ABskiqY4wz0RTBvNLFPMeVsTqeTIc9JiBgJCTgNZpdanWizwxn5x3F/EODJzeacpln
+         TSF8CHR6M/HCyR2yCRw1B1bTz/XV9AzjIAXj12p9MTzyebsB+eFSkmQm9lPJfrpYG2qL
+         I3ywI7W9/Ww3lbMwikxQYGQP46uvVlj6YXViQjE7RydlhHLuHcSAy8q4m7NYH55NRLlG
+         IMGSpYOetATGg37vFsD0d1ClSnA649C82cTj7r1K5y9StNTDpMo2MusMSyBfSIC2U3wZ
+         CSYrzKZ3AKNzG7yLGTP8myRdup1rTUmFopNDr4OE6OJExFwAEmPkqIRCAbcbD/bNBbE6
+         DbPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773612981; x=1774217781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+5+hPi2JuPwjHkL8L7DN1vqJD1ja2IKC8acdT9KDE1k=;
+        b=qU3E5hc3A7istriFD+KGVyzg2HlyfbI978VNNQPWjr58H7jkPeTRUEWm1VZo1oK0Z7
+         945SmDTDAM3PbTTdmzXQlsF58RgOOtsQvwQLRz7O/G4pKr2RY2Tuv5BZD7Iy8LmHQKqb
+         6ooYCABqAQg5Ci15CIosSaYqGBX912F3IWtto2g+MjscNBaY6D6sUyI/EdkwhFGs6mx1
+         VcONOLWPUY4WHN9vcHiwYqGP4VarhFjfwEOmnQwqkyNarMV5yaFgn+DeItyW5rxOtM9o
+         XHQi1WcliIxIx4bin6LYNPPsyM2gWUsZ3HFMGFo25MClBNy4lZG4kIm5F1xO5M1/zELW
+         yUyw==
+X-Forwarded-Encrypted: i=1; AJvYcCU91s5pCd8cMMF3PIbK5k5HCL5JsMYtNw290y09JFqkTtGKR1IMqLZ2vkbqH/ir7vZsNUGTkIpyF85+kg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKf4XnVYH3F/NkusIODh+Yn8E2hyIWwq/Z6Dx/oVGIHp9foqL1
+	VXzgAn6ZyF1gsSb7/U/908b1Fbl6eneDQvk9yfbymFkQq3hmnOSLE/AFyoq7iY5yvw+lKNAiH08
+	2l+ZzF2oeyAe6YHx+KZJ8UOkR7Sjq91E=
+X-Gm-Gg: ATEYQzyOLnnmySshTCwn8AVpLMkG2bvq+xV+LR+5yl3/ondgKn3nTNT9y4dHHSF3KZ0
+	MabwIpcgJoACC1mff2dsEL2u06ZtFUeCotHYF5UJbdgNLYz+4XZvh0MZd1mtxWLJyEkAqA87GGk
+	ldxpewxes7w739CSfDlBHxB9ZqtRsI48q7Obi3YmHzDa8+aqGass4H0nG1R7GjTLUNcDheUkLEw
+	TESTfBnIsWC+QRfARkKvHJPhYtPUkXiSsJVN2FCVzFZMd/xInqKPWtCSeOO7QnJ7iFV7SJrpo/s
+	onyPqA3HzYaKMboUIS7rQnFXqKCNgftZfFXrC9zOQJDQTHm6RXxtgqZIWSYsfRqHRDhaz5LCMtD
+	e/XvK+FmimVnQOVqMjSXnSaQ0vOyNFhuVRg==
+X-Received: by 2002:a05:7300:4313:b0:2c0:bcca:e9ae with SMTP id
+ 5a478bee46e88-2c0bccaed2cmr604178eec.7.1773612980958; Sun, 15 Mar 2026
+ 15:16:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20260315201713.15438-1-adriangarciacasado42@gmail.com>
+In-Reply-To: <20260315201713.15438-1-adriangarciacasado42@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sun, 15 Mar 2026 23:16:08 +0100
+X-Gm-Features: AaiRm53YUbK-sLcHmfXbaOT0BMTdsHLl8HWC_-mgD-EzGothIZUIEAY4ZVovwhU
+Message-ID: <CANiq72=5TWd6BRrAQftDWMu_25H3rmv6=TNpgN0o+NxmT_+M6w@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] rust: block: rnull: update to Pin<KBox<QueueData>>
+ for PinInit
+To: =?UTF-8?Q?Adri=C3=A1n_Garc=C3=ADa_Casado?= <adriangarciacasado42@gmail.com>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Boqun Feng <boqun@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Update the Rust rnull driver to use Pin<KBox<QueueData>> for queue data
-allocation. This aligns the driver with the latest PinInit zero-copy
-initialization abstractions in kernel 7.0 and fixes a type mismatch
-with GenDiskBuilder::build().
+On Sun, Mar 15, 2026 at 9:17=E2=80=AFPM Adri=C3=A1n Garc=C3=ADa Casado
+<adriangarciacasado42@gmail.com> wrote:
+>
+> Update the Rust rnull driver to use Pin<KBox<QueueData>> for queue data
+> allocation. This aligns the driver with the latest PinInit zero-copy
+> initialization abstractions in kernel 7.0 and fixes a type mismatch
+> with GenDiskBuilder::build().
 
-Signed-off-by: Adrián García Casado <adriangarciacasado42@gmail.com>
----
- drivers/block/rnull/rnull.rs | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+What latest abstractions? What type mismatch? Why is pinning needed?
 
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 0ca8715fe..23df23936 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -54,7 +54,7 @@ fn new(
-     ) -> Result<GenDisk<Self>> {
-         let tagset = Arc::pin_init(TagSet::new(1, 256, 1), GFP_KERNEL)?;
- 
--        let queue_data = Box::new(QueueData { irq_mode }, GFP_KERNEL)?;
-+        let queue_data = Box::pin_init(QueueData { irq_mode }, GFP_KERNEL)?;
- 
-         gen_disk::GenDiskBuilder::new()
-             .capacity_sectors(capacity_mib << (20 - block::SECTOR_SHIFT))
-@@ -65,16 +65,21 @@ fn new(
-     }
- }
- 
-+#[pin_data]
- struct QueueData {
-     irq_mode: IRQMode,
- }
- 
- #[vtable]
- impl Operations for NullBlkDevice {
--    type QueueData = KBox<QueueData>;
-+    type QueueData = Pin<KBox<QueueData>>;
- 
-     #[inline(always)]
--    fn queue_rq(queue_data: &QueueData, rq: ARef<mq::Request<Self>>, _is_last: bool) -> Result {
-+    fn queue_rq(
-+        queue_data: Pin<&QueueData>,
-+        rq: ARef<mq::Request<Self>>,
-+        _is_last: bool,
-+    ) -> Result {
-         match queue_data.irq_mode {
-             IRQMode::None => mq::Request::end_ok(rq)
-                 .map_err(|_e| kernel::error::code::EIO)
-@@ -87,7 +92,7 @@ fn queue_rq(queue_data: &QueueData, rq: ARef<mq::Request<Self>>, _is_last: bool)
-         Ok(())
-     }
- 
--    fn commit_rqs(_queue_data: &QueueData) {}
-+    fn commit_rqs(_queue_data: Pin<&QueueData>) {}
- 
-     fn complete(rq: ARef<mq::Request<Self>>) {
-         mq::Request::end_ok(rq)
--- 
-2.47.3
+Anyway, by independent patches, I meant that you should not have added
+the "2/3" in the title, since it looks like this message is part of a
+series that does not exist.
 
+But please wait for the maintainers to get back to you, instead of
+sending a new version.
+
+Cheers,
+Miguel
