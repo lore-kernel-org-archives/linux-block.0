@@ -1,63 +1,63 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2603750D1
-	for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 17:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8BA375F76
+	for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 17:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773595022; cv=none; b=k/gpoJhS26vxsDAyv07b/+7QMPeIJcdoT1L98Wi4d0eP0czkNaXwtkN9OpRMO7Si+4ZeeYiuEs8Bw2zi8ajpyeduhgIZPUEIoQxl6ZoszKdez2H+XyKnGcBtvgTOsqfZ4ZroWZtsMh2vwpW72ooVGp4ZRkIVEXh/n3lxkp6R6LM=
+	t=1773595024; cv=none; b=twviEHwYTDIAJQhDc32WqdEen40lfIcNNygjGl12O7S2iHvTrwatWb+wFUTki68Cs7mraktahH2OJe/4rzKZcW2ld0P6uKzn+G1vyidan2oREqIg38Cxe5PvlvPA7M6cV3dczWv7U4/z+S9s262FZeG58ws7wWN2EERgM15N/30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773595022; c=relaxed/simple;
-	bh=X32PXM6CIYzypQR5TwfD7Jn/cbq77OlrCWR99DHxUpQ=;
+	s=arc-20240116; t=1773595024; c=relaxed/simple;
+	bh=iKpFG0Av0hoqoOlPYCyOzyzjoAeTHTDVQHbGXDPimao=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VcbDVsngojzJm/2byi+Gz7u/6K7ZKsTLrWFMDi0+r+NdC6s4jJd3imB+Srs6LVDwY6s4Qdlp5nyJCVpuBQu6V2huXqAp5YRD5Eyw9TqFgb2OptsSV8BgHvhDVff4chbW7umjzsIYsZaO+AiIoGG7tJwoCnYabNjh+LLNu/9O2Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkP3s57m; arc=none smtp.client-ip=209.85.221.53
+	 MIME-Version; b=Mk2ffY6TQycVg7BC3KjQxzckFPhaZpGR8KnqsjHwRlcK11E1U4qeKgW74LAY6aScjkK69+pJ5/Ll0YYgxfg0oUzwKE+nETivXhx2FNGPgvkLaNURJn1gbIun3Byx7zhifaNc1olFK8jcLHhg6wTrVgHeiChRr+ZiHfWUnZ5qJ0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ArBu8oJU; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkP3s57m"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-439af7d77f0so2970618f8f.0
-        for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 10:17:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArBu8oJU"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-439b6d9c981so2673000f8f.1
+        for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 10:17:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773595019; x=1774199819; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773595021; x=1774199821; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ubQ1v6PBsq99cAcF2yrnS1WsB85d1f/acmJVUU/lg1s=;
-        b=bkP3s57mdv06Q8pGVWI4sO1FcTTW0j4zh+8kzK4R0Kpp+g8bHG1yntDaZr+QWoE5BZ
-         +CtFml9JkkNytDIZEJqKa4MeJ3m4zFKaZt0klCzfeZaEo1KCiakxbgaV2NoKjnXU7otn
-         rr+SYvK4ssEnc1oxI0xCByyWzzsTFU41my6/fvn0ZdD5hhoQe1sSv1jsT58Bf0ByHtj+
-         WvL2wSTQ27qYrzk1BjsVr9PCQvp0NF/1ESdZsOUxwR0KjvVwLsvfIGDUdPgSiOVVkEzn
-         MupnbYA45bC946+Fh0djNXW66NMPP/1gYgk+JFKeCz4keggXKP0N9sdY99ByzigsffOF
-         Rx+g==
+        bh=QBcY1jNO230ersIPOAT9WM1qbuR7iZiog4/B3vVvee0=;
+        b=ArBu8oJUDEqbx6ubRa5lF3ZLeuJit//fOBLBhSwho5ZlzK2T+NoiV56GqNLs/wDk1X
+         wFwOMS+HMJ9wTUcao8Fjdk3ArwEt0qNXw3vgDUT5u4AbV32v9mVJeCqKJrgfpJl85B+F
+         myvJeqvd3DLVoWCTfoHq+eWvzmiZKdBx7YZ+6TIyaTcETv9t01yqqJ4RWq1SRvWa+pin
+         b47SLEr0dtVMZCM/kE8jAZie43cFU2cI110Sv2Xj2c1wk3zB8PbwYGDe/1XF/SVjkcEu
+         2/CvSRjSM87n4952zIBSFwIeVusVrUKFp+zpM4W8d2kBBwHw8PVnbn5F07glXX1pUV8T
+         Eh0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773595019; x=1774199819;
+        d=1e100.net; s=20251104; t=1773595021; x=1774199821;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ubQ1v6PBsq99cAcF2yrnS1WsB85d1f/acmJVUU/lg1s=;
-        b=G5cCC1imXV5B7C4pV1E4CwRb9I4ZrVrxE0xYaNXZRl6CW3YBpEC+ysIZ2rHI0Z/ShX
-         o++aVTB685SyIngEMsOKtVHUFV5h4+APB503cFHB/y+8Q4rH/rsFENZoKh3jOT6PmiPr
-         o1gJcucfnBJz+W+YoyCoxWxmaSvIW1T7ZHG3rFsUcFDxVNZTTE0smDrE/sPoUjWCnyB0
-         3LosRssy8K+JQyvMJEv8zly+9+GQtQbOBa23aX1oiinOFNOsTIfmNlb/9SxIRwN1SMd/
-         Z4UG8vUQP2LGZw695QzAIv2jD+uZyRTI/iOAyHe+bhJLtXY4Cth7e92dvqLhhtih6FAj
-         cHQw==
-X-Forwarded-Encrypted: i=1; AJvYcCUCA6ldRj1iDdcDddJJy2ycitd9QHMRyvECqxjw0glTUX1Zh/MI92Y/0KNvDgm594iePV9nUdlkAsILZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyaMZ0/lqOXO7khvLeEHlC4qHu4hwZsWN2RiUNQXvnNCgCsOmm
-	Rn5yvQsMxrfuEa5gTFiNEi8ED0fdd7HBY9JIXSDulbqN3dUFnnakIvvf
-X-Gm-Gg: ATEYQzxq6FoxSF73ZalwufGXxjpPCEBBS3icoJz0Z2Y9nHAsHdw0k1KBQ/UUE2OYsAf
-	iC9SVbTKM73hI5/m8am0SIbg8Ey3cnvB8wBLoTJb/XoLHTfaURCwX8/UYuAQMfLRXQcfLuRK/iC
-	LBJcnLpor8T4+vJAO2jB8xYx5CgefuK8oOsfr2bzMMpAP4UIyjczcuZY/LfNC6hSZ9g5k++wfg7
-	VuyTy+TYu26ThtiD/1vD4iIGze9ZEDQmgW3hiCviW1j3mcHlc8Eyc5acAhHaJdsu7zCf7WujCUJ
-	sVZxTtX+VQd8BK79ohgTaInrOIfXT6OSNWCdDCekTtzP9V7NnugKfDPUGx8x1xBATzMm8SjAMOe
-	tIgakPgZYzwzachn9b5ZMgLG5nL25hulyxwynaLLKV3MUv8Q9QR2t5kSy+ITlCbsyFkvqgfjGJu
-	YzrXyd543iU0LUeIfIoHaA3xo+hrkoA0oKbg==
-X-Received: by 2002:a05:6000:200f:b0:439:b59e:5e65 with SMTP id ffacd0b85a97d-43a04d79252mr18547646f8f.6.1773595018822;
-        Sun, 15 Mar 2026 10:16:58 -0700 (PDT)
+        bh=QBcY1jNO230ersIPOAT9WM1qbuR7iZiog4/B3vVvee0=;
+        b=CigDczVoLzqGI7M/RTZY7d0EUKCv9xL4s1rHITGGnhKTaVDGDrcnOQuZx3JkHawDrN
+         jWM8yxgze/b3x7OTk6v/1NiE6FiFhcmmCasvv6pE+CKCxanwJBSa2aL/mLTdMJE1WCKb
+         avIafmprtFK29I93YHjSCRqZpThdCqk9G5CdaorOd3Fu72qGrQhnHgUQXWg5JSODirfo
+         v2fssGgLXhJ3ML2dqz9RsJBmx6ueR8k0no7dVSClVAR6QvvrhzmW+WEZdSTyvcRAQ27/
+         ZWq/9cDOn99Jj3Mu6Zsw/ZmxIT7XWa+QXEEODy2SqVO3uph2D3F2CSnGQAB0fpRWiZtn
+         z1zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnVXdsvUFW1f9+tXHU2YVBs3sOG7BoZ6885WHIwK/wXvpTqU6HXmbFP3FTcNXciTlfTki80xmqkwuzFA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7/HQVw6Xz2bqQPegMqSzj7rrprKfZ+GvbBjsQu67queFrsiQl
+	b9zWLxjgXAsqkMwHgnpTUcvJUf4tAiQ3/hkP5iPGPfjzkpMWOjGGCdeZ
+X-Gm-Gg: ATEYQzxWMb7RZhISsd9MNW2mQrqMfCCgKFuW/BdoW436v1jX2cn2frugrefi20l5zZU
+	EqWkPaVUx87vNNx8SslvAMQAaFdBSmw6Rt6C7ceeL4YnnNUt5tUZQegMpCRIzctSbfOLywl1JEI
+	rqF56zJiWBtYWK8k18vDN6E5lwbU7boJTrIoxpQWAW37iGtpxPub/zOGOjdLSps/kkh6M1is1Vo
+	kburiKfqSIjit0L/cQX0+j741k89nAQnlRJXLRc9EkWkwqY3fydcokX34ESXSeaJ0QvpzSXzr9G
+	rZ9tN4ynKN350InYPt/ETqfCZpVF9WqksT62bK4oKq3GkCNrUFzzDc7MOFUNTWG23A3xDqMLFeF
+	M4N+2gpUwzHeqD0edIYyLTIrFnA+QCUpUnqN0GM83pl+3vwXevKWQ+5xg9jUGc2zQz2ZbmHbX+j
+	+ufgF6iF941P3OSU0MhQqLB7GYKWdCG6c/Wg==
+X-Received: by 2002:a05:6000:40ce:b0:439:d74d:a686 with SMTP id ffacd0b85a97d-439fe1ae6b7mr26631100f8f.28.1773595020567;
+        Sun, 15 Mar 2026 10:17:00 -0700 (PDT)
 Received: from debian.lan ([171.22.84.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe21b631sm40536429f8f.27.2026.03.15.10.16.57
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-439fe21b631sm40536429f8f.27.2026.03.15.10.16.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Mar 2026 10:16:58 -0700 (PDT)
+        Sun, 15 Mar 2026 10:17:00 -0700 (PDT)
 From: Adrian Garcia Cicuelo <adriangarciacasado42@gmail.com>
 X-Google-Original-From: Adrian Garcia Cicuelo <adriangarciacicuelo@gmail.com>
 To: Ulf Hansson <ulf.hansson@linaro.org>,
@@ -78,9 +78,9 @@ Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
 	linux-wireless@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Adrian Garcia Cicuelo <adriangarciacicuelo@gmail.com>
-Subject: [PATCH v2 1/3] mmc: sdhci-esdhc-imx: consolidate imx25/35 data and add Kingston CID
-Date: Sun, 15 Mar 2026 18:16:50 +0100
-Message-ID: <20260315171652.269020-2-adriangarciacicuelo@gmail.com>
+Subject: [PATCH v2 2/3] rust: block: rnull: update to Pin<KBox<QueueData>> for PinInit
+Date: Sun, 15 Mar 2026 18:16:51 +0100
+Message-ID: <20260315171652.269020-3-adriangarciacicuelo@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260315171652.269020-1-adriangarciacicuelo@gmail.com>
 References: <20260315171652.269020-1-adriangarciacicuelo@gmail.com>
@@ -92,69 +92,62 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Consolidate esdhc_imx25 and esdhc_imx35 soc data into a single shared
-struct since they share the same flags. This reduces redundancy. Also
-add the CID_MANFID_KINGSTON definition to quirks.h for centralized
-management.
+Update the Rust rnull driver to use Pin<KBox<QueueData>> for queue data
+allocation. This aligns the driver with the latest PinInit zero-copy
+initialization abstractions in kernel 7.0 and fixes a type mismatch
+with GenDiskBuilder::build().
 
 Signed-off-by: Adrian Garcia Cicuelo <adriangarciacicuelo@gmail.com>
 ---
- drivers/mmc/core/quirks.h          |  4 ++++
- drivers/mmc/host/sdhci-esdhc-imx.c | 12 ++++--------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ drivers/block/rnull/rnull.rs | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/mmc/core/quirks.h b/drivers/mmc/core/quirks.h
-index c417ed34c..d736bb4be 100644
---- a/drivers/mmc/core/quirks.h
-+++ b/drivers/mmc/core/quirks.h
-@@ -15,6 +15,10 @@
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 0ca8715fe..23df23936 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -54,7 +54,7 @@ fn new(
+     ) -> Result<GenDisk<Self>> {
+         let tagset = Arc::pin_init(TagSet::new(1, 256, 1), GFP_KERNEL)?;
  
- #include "card.h"
+-        let queue_data = Box::new(QueueData { irq_mode }, GFP_KERNEL)?;
++        let queue_data = Box::pin_init(QueueData { irq_mode }, GFP_KERNEL)?;
  
-+#ifndef CID_MANFID_KINGSTON
-+#define CID_MANFID_KINGSTON	0x70
-+#endif
-+
- static const struct mmc_fixup __maybe_unused mmc_sd_fixups[] = {
- 	/*
- 	 * Kingston Canvas Go! Plus microSD cards never finish SD cache flush.
-diff --git a/drivers/mmc/host/sdhci-esdhc-imx.c b/drivers/mmc/host/sdhci-esdhc-imx.c
-index a7a5df673..9cfa26722 100644
---- a/drivers/mmc/host/sdhci-esdhc-imx.c
-+++ b/drivers/mmc/host/sdhci-esdhc-imx.c
-@@ -256,11 +256,7 @@ struct esdhc_soc_data {
- 	u32 quirks;
- };
- 
--static const struct esdhc_soc_data esdhc_imx25_data = {
--	.flags = ESDHC_FLAG_ERR004536,
--};
--
--static const struct esdhc_soc_data esdhc_imx35_data = {
-+static const struct esdhc_soc_data esdhc_imx25_35_data = {
- 	.flags = ESDHC_FLAG_ERR004536,
- };
- 
-@@ -391,8 +387,8 @@ struct pltfm_imx_data {
- };
- 
- static const struct of_device_id imx_esdhc_dt_ids[] = {
--	{ .compatible = "fsl,imx25-esdhc", .data = &esdhc_imx25_data, },
--	{ .compatible = "fsl,imx35-esdhc", .data = &esdhc_imx35_data, },
-+	{ .compatible = "fsl,imx25-esdhc", .data = &esdhc_imx25_35_data, },
-+	{ .compatible = "fsl,imx35-esdhc", .data = &esdhc_imx25_35_data, },
- 	{ .compatible = "fsl,imx51-esdhc", .data = &esdhc_imx51_data, },
- 	{ .compatible = "fsl,imx53-esdhc", .data = &esdhc_imx53_data, },
- 	{ .compatible = "fsl,imx6sx-usdhc", .data = &usdhc_imx6sx_data, },
-@@ -414,7 +410,7 @@ MODULE_DEVICE_TABLE(of, imx_esdhc_dt_ids);
- 
- static inline int is_imx25_esdhc(struct pltfm_imx_data *data)
- {
--	return data->socdata == &esdhc_imx25_data;
-+	return data->socdata == &esdhc_imx25_35_data;
+         gen_disk::GenDiskBuilder::new()
+             .capacity_sectors(capacity_mib << (20 - block::SECTOR_SHIFT))
+@@ -65,16 +65,21 @@ fn new(
+     }
  }
  
- static inline int is_imx53_esdhc(struct pltfm_imx_data *data)
++#[pin_data]
+ struct QueueData {
+     irq_mode: IRQMode,
+ }
+ 
+ #[vtable]
+ impl Operations for NullBlkDevice {
+-    type QueueData = KBox<QueueData>;
++    type QueueData = Pin<KBox<QueueData>>;
+ 
+     #[inline(always)]
+-    fn queue_rq(queue_data: &QueueData, rq: ARef<mq::Request<Self>>, _is_last: bool) -> Result {
++    fn queue_rq(
++        queue_data: Pin<&QueueData>,
++        rq: ARef<mq::Request<Self>>,
++        _is_last: bool,
++    ) -> Result {
+         match queue_data.irq_mode {
+             IRQMode::None => mq::Request::end_ok(rq)
+                 .map_err(|_e| kernel::error::code::EIO)
+@@ -87,7 +92,7 @@ fn queue_rq(queue_data: &QueueData, rq: ARef<mq::Request<Self>>, _is_last: bool)
+         Ok(())
+     }
+ 
+-    fn commit_rqs(_queue_data: &QueueData) {}
++    fn commit_rqs(_queue_data: Pin<&QueueData>) {}
+ 
+     fn complete(rq: ARef<mq::Request<Self>>) {
+         mq::Request::end_ok(rq)
 -- 
 2.47.3
 
