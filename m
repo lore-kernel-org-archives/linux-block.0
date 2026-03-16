@@ -1,64 +1,64 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF5E30CD82
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 10:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437EC38E5C4
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 10:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773657038; cv=none; b=DYlD5xNyDtfTX+vJkosptfD4OLocdmZk7h5H6a4sJQKmOw+L2JrYTksTsPStwvs3QMrgrRxVPJrpGTsxePjYAAiCs+jMbfD+ayT8onMMIMR0ovJHr09fphWtkzzbHuKfNqnYNh0fn/v2sk9Fznioe3JZNZZI/cMMrMQjL56EgRQ=
+	t=1773657251; cv=none; b=U0w+FzJg5lYv8lgOmbzcNR7v2YoJ6YrXjCtqjCtDjeHUeCkiiiu19yZbIFiou8UnQAIFQ/L3qSccnN7O4acdW17A7H+AvxJXfP9t3pZNZnJKrLXJN2YfmhcEYtiKOfmEdNbfUVDXtdaqW1xfNkIgO36h7r4h+hx/RCfEUeuILvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773657038; c=relaxed/simple;
-	bh=Fn1Z0lBgz6sX38jQOL32jtRPnwQO+I+S3aYN4A2tb6g=;
+	s=arc-20240116; t=1773657251; c=relaxed/simple;
+	bh=nXYX8ohuOP1WmALF4quMK90p2fquSx08wx4cHnDn4Ek=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NIIjyKftx1Ea3nPCIzG71HEdW57zc39z5Eo5H2u36ULCWO5fp4Pq+J2g9GYehS4IeJKcRTkAGMBvSqQZBkqifJ1C5HUWAJX+MhBserH9ojBzBTNshoINPXwaGuiAQ4munMwMJI/EpXRCAkGufnYWLaU62ArJ90JIm5BrCOpsj0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cm52u6QZ; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=CqxAFcB+q1AIO9qsVJu5HifpcS5G9pXzg89zUThJyEe0rqKvJKs/82Nj1jigBh1SOAqIRiETzRJRB5+EGx0F7CeQSAFPg6JHmGojKfV2fjA7vA7kTAfdEeXz8rGb4YwUdqAsvOIzvB2dJv/a3tuKV9tMaIwnBq61fe10LQVqAm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mYnJiQSc; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cm52u6QZ"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4853553944fso46070245e9.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 03:30:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mYnJiQSc"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48553fdd03dso25733745e9.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 03:34:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773657035; x=1774261835; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773657249; x=1774262049; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GnI3L0XQnlP9mY2nbxG4p27V2eYyKmct78Co1ZDhRco=;
-        b=cm52u6QZYkPGC9mCF/FvBO1bjAtPfNKyCHuo/GyzXZeFWQBKC7RzPzAa1YaVkxjGjf
-         zJu5z/uGtXdq1LCjC2VHX1/dOekNqoU053bEOic+WLdmn2LpAKw2zC0Ccn7G0fDVvNxE
-         c/gexKCCPqHWa6id1vun5Sw58tbN4vWY6ZcU4h+dCJDDiNpTh09ok7AmPeGnzkvjt1LB
-         ZQ2ytFg5OOdcAbkiQwcjSGlUP9VYfFcEUDv1SrhHClgWrIng8eRRX/DV83AcWZWfkrVt
-         zDr30sk6mI1DYH2fmKzwzd1G2iPoANbmvYHC+2rYNVy3TL9CxLHmJz7FVA0LoFl4RE+y
-         7rKg==
+        bh=k1Pp6B+kbyJ7AS+BSznHhsZJFqEGhJ13TKhxuOIaMsk=;
+        b=mYnJiQScoqIII8IdrA7JUZEpPeb7bvbvtcZhHUOsdxk851zsnwq3LNP598+VWnkndC
+         IQEQTXy2yKC1iiiyUYr5xbXq8ccBk0Px48BqZL1CZeBHRwayTsthRpFDXQmsc2XcHE9O
+         qswpRZ1BhqcTc9w3QxcaeGuL5a5TeeJoBXdCFxJw4gWjR31dXHIW/kJjdrbVLRRhq/L+
+         g3Bj4/XUm6guLFlZSIT4wf/+kUztGezIQMrcnX1FTkZgKettp81mLaAy+H+d1uh1Lqt/
+         cIL5LP8c1yxgiQjzfIvYpmML/sJZpMBqZt2aUB2Ifykh7wi4FYlog0MvjPX7IDGZz7SB
+         9tKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773657035; x=1774261835;
+        d=1e100.net; s=20251104; t=1773657249; x=1774262049;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GnI3L0XQnlP9mY2nbxG4p27V2eYyKmct78Co1ZDhRco=;
-        b=KJoRTcoZ12nhQ9IyYPjg/Wj+GCwRUoqSGkc304sgGuVSjttZJzfQaU6mSUwMQu4wOR
-         6pgxYONjTA8+gR5jjXcw/EzU2IqHwPDf7l2rAUO697lVvpvV1mm/3iSfxPu4Dqiv7gKx
-         PoklMRuuN9YmsUghWSQMV9afIrGr9rVG2+lQTt0f3W9SdVVD6OAjTj1BcoUA2Mb9UQYg
-         7sYPD74HidlyEjIFBSyh/84+HWAymxDkn36iZ2bkOEATPVLG4TdzLFZpQtnpR64qgKcs
-         hT+VQTmmtU4B5hNYd3LeKUGQ0UkEDVya6gEH1rYgbUo0gi3b3maWT9w4nfejKSF26Lra
-         /ehg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+K+PNX2QF3HbILP5+kAAGdfdKNU9aY2NrnpfgX8Y2LhBlURZ1/84ubWLaOXpXQ903mnM8WBmKjMgm4A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyADqIEZ3kxt4gaRDRnfKhdLVFKbvfvVruQFLJqBwSzKYurRmvH
-	k+K/3Gbzs5sBtliXxQ98qsSLdrwdLjeVBXAI+Pe564gsmLsNB1H1tpLwMb61+I/5/UIkzotfqNA
-	9eM78DX61agenmWJQeA==
-X-Received: from wmbjt1.prod.google.com ([2002:a05:600c:5681:b0:485:2d79:6c7f])
+        bh=k1Pp6B+kbyJ7AS+BSznHhsZJFqEGhJ13TKhxuOIaMsk=;
+        b=TZFuYF2w77nzrjQCn0K7hnmQ14n6TAht4RYdU9Fq0MdZQjkWu4r1PuVwVI/yDSPXKE
+         lIgZSfK0nLd/UdZebGinSfXEcMQ0Y22W1NUmk0VH2tnwBpR8SSlfSYV6zBZg81vbsbUB
+         DvAM+eHYQ7FKPqBDLtEqGkz/EvQPulIP3CDvpVnMlXzdW17G3GzBY4sJDFSvggAjNios
+         7krtPJsPpSnu1WpdxYqaDlWW7f145dctQKkS3Z3As7dm4cY59e1Gw6gJiD/9tsWBVmtL
+         qLgK+3sloZT/caHMeHqrSAHUgQnDpHI8f6MM8D8BLl3Z+HtVKQepSU3w7cSEf/mUe0Z/
+         ANIw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2jXLDwxnjItAEItRvMDi/XIVZeDTpoo+InPsqdCSGDpXEbomArY+IZ2hpf4RxoOCOJBTc0yGpIXrMdQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWjtewBaluFZszTktB+3s9aOEX3P6uHlvIL6RW84E4jb5Dv/VO
+	6GO+IliP4cT26euApHeISH8xv7BGNNdKb2GbX5W6WFbjjG4YEvhXiDD+nlhS+dzJzFhbtj3lAg2
+	s63M8lbxLPo+LzJib6w==
+X-Received: from wmoo9.prod.google.com ([2002:a05:600d:109:b0:485:4f4a:bd87])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3e05:b0:485:3428:774c with SMTP id 5b1f17b1804b1-48555ab09e1mr180890215e9.4.1773657035188;
- Mon, 16 Mar 2026 03:30:35 -0700 (PDT)
-Date: Mon, 16 Mar 2026 10:30:34 +0000
-In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-11-de9a7af4b469@kernel.org>
+ 2002:a05:600c:3553:b0:485:3a27:a961 with SMTP id 5b1f17b1804b1-4855649fdafmr220588635e9.0.1773657248391;
+ Mon, 16 Mar 2026 03:34:08 -0700 (PDT)
+Date: Mon, 16 Mar 2026 10:34:07 +0000
+In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-12-de9a7af4b469@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-11-de9a7af4b469@kernel.org>
-Message-ID: <abfbyuTWIXDz8iax@google.com>
-Subject: Re: [PATCH 11/79] block: rust: mq: use GFP_KERNEL from prelude
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-12-de9a7af4b469@kernel.org>
+Message-ID: <abfcn5dVzjoQmomd@google.com>
+Subject: Re: [PATCH 12/79] block: rust: add `TagSet` flags
 From: Alice Ryhl <aliceryhl@google.com>
 To: Andreas Hindborg <a.hindborg@kernel.org>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -74,13 +74,61 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>,
 	linux-mm@kvack.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, Feb 16, 2026 at 12:34:58AM +0100, Andreas Hindborg wrote:
-> Remove the explicit import of kernel::alloc::flags and use GFP_KERNEL
-> directly from the prelude in the module documentation example.
+On Mon, Feb 16, 2026 at 12:34:59AM +0100, Andreas Hindborg wrote:
+> Add support for `TagSet` flags by introducing a `Flags` type and adding
+> a flags parameter to `TagSet::new`. This allows configuring tagset
+> behavior such as blocking vs non-blocking operation.
 > 
-> This simplifies the import list and follows the pattern of using
-> commonly used constants from the prelude.
+> The Flags type supports bitwise operations and provides values like
+> `Blocking` for common use cases. The module documentation example is
+> updated to demonstrate the new API.
+> 
+> For now, only a single flag is added.
 > 
 > Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
+with nits fixed:
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+
+>  /// A wrapper for the C `struct blk_mq_tag_set`.
+>  ///
+>  /// `struct blk_mq_tag_set` contains a `struct list_head` and so must be pinned.
+> @@ -37,6 +41,7 @@ pub fn new(
+>          nr_hw_queues: u32,
+>          num_tags: u32,
+>          num_maps: u32,
+> +        flags: Flags,
+>      ) -> impl PinInit<Self, error::Error> {
+>          // SAFETY: `blk_mq_tag_set` only contains integers and pointers, which
+>          // all are allowed to be 0.
+> @@ -51,7 +56,7 @@ pub fn new(
+>                      numa_node: bindings::NUMA_NO_NODE,
+>                      queue_depth: num_tags,
+>                      cmd_size,
+> -                    flags: 0,
+> +                    flags: flags.into_inner(),
+>                      driver_data: core::ptr::null_mut::<crate::ffi::c_void>(),
+
+c_void in prelude.
+
+>                      nr_maps: num_maps,
+>                      ..tag_set
+> diff --git a/rust/kernel/block/mq/tag_set/flags.rs b/rust/kernel/block/mq/tag_set/flags.rs
+> new file mode 100644
+> index 0000000000000..768db938b9a95
+> --- /dev/null
+> +++ b/rust/kernel/block/mq/tag_set/flags.rs
+> @@ -0,0 +1,19 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +use kernel::prelude::*;
+> +
+> +impl_flags! {
+> +
+> +    /// Flags to be used when creating [`super::TagSet`] objects.
+> +    #[derive(Debug, Clone, Default, Copy, PartialEq, Eq)]
+> +    pub struct Flags(u32);
+
+Nit: Spurious newline in beginning of macro.
+
+Alice
