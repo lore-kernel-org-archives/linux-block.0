@@ -1,355 +1,244 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AAE37BE9F
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 09:24:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BB43859D1
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 09:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773653044; cv=none; b=PlwFRea7LhMMNz3p9WlNBkdeunzlw+22/GXj7GZ7F8JG/e7W9sE8Rxk/oyiqWeV6lMyjIhqnjJB3AkIKn90EsJuNbJWu9ZY4xBS+bWePn3CmtGdZiBQlXafxGsodF3SMZQcUUIKX9M64KF8QlzUSkVtSDmpvYf28ihPval27L4o=
+	t=1773653090; cv=none; b=CR//bH1YJsuxSlighQ/Kybq0u1MvU21iltTIMPGjV+BzuyixvuwitDxNBaGJk+veTo2UF4wAZm4fxIx9iG8uCy+3ya8rRP6uoK0atIjl3v2LPatggCdjFyjWVmbh5Xm0kXavObpyTCsVM2/BUyiI+yaeqL1ZOoy7GAGMgOLbUtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773653044; c=relaxed/simple;
-	bh=GqtwUZuYaFKAfOkEOlIPoJDqx1ip62yiWDGH5TApDww=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NGj74355oT7dNDs6ZtM0jY1zHZlI4QsFf5TKi1UGVcZqsHPpXbG2wVVtE3mXdbMt+fu8x9QzWqj3I0G0T4Aapj5oNQGrKqPEKQYuh6qILbMo6yB9Zw8EqxgS/jRmKu3PiCOaHtu/mSjlKKQfW9BS+P+7B+LHgY/kWoMtP+Jr6WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I8V54pFd; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+	s=arc-20240116; t=1773653090; c=relaxed/simple;
+	bh=8uFl4BiEAWzwUnaW0z5ea2WrHrmRxA8OYTGN5rE/GBk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eVGvkpwwrKxKzAz4SRuUCE8zzTz3t2ncVoG/VwLmGz8PvDxg1M7AejehjOd/ET0VvJw3yleOblQPyEH4wyBNsapaQPzpSmuP5K1gGxMbQSxwt5+HT7UMro/vydx3Yxl3TRm1tOjmGlV9Go4H5OJ9svhdxSCzlQJnUBJx6Kw5vjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cvO+jJqZ; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I8V54pFd"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-485345e2fdfso23633185e9.2
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 02:24:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cvO+jJqZ"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2adff872068so19217455ad.1
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 02:24:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773653040; x=1774257840; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hJekOo29lf5mJautU95qylonu6gRgxCG19qcBQDNZqA=;
-        b=I8V54pFdJJca/ScD9MOsD46SQYZtwcnBiMUPCGsrebaYH8DzLoyEG52agvEVI2Cu2N
-         mTMpZnZ+VBb/U81UjyhvsuVlkfFqkopaPDDPfpeU0/xFdaz16qOcD/xSmUvcsTbSeNHc
-         mS9Z9Q39HZz6e17/u73EJ8y4H9+s0VbcIgaKA9mEwoAm+7NXZMKcqAF2iFh1yH7o0ZGp
-         SWhImTegaEwQVBc8KD16bhxXdr3QncOmiYoJ1AxrKvYVClbSbGrZ5wF7Mf8lhHGtFVtU
-         MNckdMBwtFJa4awEKX0TcQCkWbN/4DST2jqn3kdSkHMepNIZxU8c23aGFRDNDzB7YVGF
-         8yPQ==
+        d=gmail.com; s=20230601; t=1773653088; x=1774257888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tcw4oEHn1shvNWbj1hEeDKt4rou0ix5KeX5IhU3uCQI=;
+        b=cvO+jJqZc/XXme1+pKOm+LfIS7yr4A0hiDbY/lWkVTNWeLwTgHsHtM0Hx0YGXAA4IZ
+         cDFUnWA7FPAuNBIJ538319no1lftn0Uv7/YYhFvzf1Ei+Ru9FBRAienY3XK46uA4TAHx
+         tqOQ3rDydiRnSt6R87HK9KEIkdLyE5szPGnsFpkoXiwH5784jZW14oYsOpgKkwu6eRhq
+         LSwFlD0+jlIEvjcJkOAR9OM2gjk72qmYbZKtVL7sgvKZhm4+ZgDABRYf3jvEIDwYvH+V
+         +OzZkO7jAVkEqmuQm+ggbIaTOL8/YI0gnUjW3X8MitJz7ddf2ifJqyOw1Wl8sc+VZlQa
+         +Mcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773653040; x=1774257840;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hJekOo29lf5mJautU95qylonu6gRgxCG19qcBQDNZqA=;
-        b=lhCdfnmdpT0wTSToLolIjBEaxm4EYavu7g2pCzQpzWS5/Nl2SYdNyIx5LHqt8+mcG8
-         jeV0ozLlT4ECzqY7RM0K247amlXYAVgcIh/l6Btop40Pi5LgAyqEz7CHPB2e7jY7kT0g
-         2jLbM7MCjgK5lULCg5/MTWabMqo32IswNNqzbOKE54gmM6dDhY6dEoJXKzZGWyjLXpHn
-         NoFePyX1vHfBrCB63Pj2EDDWaxiRKCmYBj2T0XuT8Q2o2HHP7FD93FhzWNCl/uaJE6U5
-         Y91eUXnJ+rLcXek0hCzz+SWpEoKuFyN4EQ9pdaFrwP3lE4A8SxOKS+I2j5aunAz+3xBc
-         Zf8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUyhUhUyBDliJ7QM6rQMcAiQiWO4nd9rvBLby51JyZ9HXqioPAb8faQjkLO6ULZM4ly9qorcT1UuT2Wtw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+gPE19S6jIlEMarnUrVWm9DJfHLDQYiHdqo7ka14EI/qXRLcV
-	AxPdb04ibTMo3IwNehv/PmJzVZnUJhyNKy384kvTLyuOtW8Tw1ZFBOHhbtTAYWnX15Iy16dpDUl
-	uwL0pOQCbS0PFiyuPjg==
-X-Received: from wmqu15.prod.google.com ([2002:a05:600c:19cf:b0:485:34c3:177])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:a011:b0:47e:e952:86c9 with SMTP id 5b1f17b1804b1-485564981e5mr208897415e9.0.1773653039981;
- Mon, 16 Mar 2026 02:23:59 -0700 (PDT)
-Date: Mon, 16 Mar 2026 09:23:58 +0000
-In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-3-de9a7af4b469@kernel.org>
+        d=1e100.net; s=20251104; t=1773653088; x=1774257888;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tcw4oEHn1shvNWbj1hEeDKt4rou0ix5KeX5IhU3uCQI=;
+        b=BbpjT35elD3epCWHfPHErQ6g+9I2qA8Nl+K/mYD7OwlEJg0xHFl1gB10mM7HNL9C+p
+         3+a9nMcUKhzHjHDofdlGuBH0nNcFRnQokOFUdGACk1jK4AY2YE85yqQO7zv2NzLJAWM1
+         TAzkviFnB4cP+VNE364dIOS0y8MwZ8yJFqdPd6NI9JVYC7aFlHvsNCf6mEYXV0DJwGjH
+         QzwBa2mGP8Bez89YWzBPzfN21bN5QOLixg9R7PqaDq+7etJUKmaTHw41Wn6leSUKr3n1
+         RbH1Bh1CYqx2VjcGeNmYQHVRwX0TayhDVqk4zQXV3ei0ibK7V0msvnP+7lbAGSrWipgD
+         o4pA==
+X-Gm-Message-State: AOJu0YyM8MLPMefJD5Ey1xSVYVvUiefV7ECNfGelDLuxPM9eCeDfuKI+
+	4sxXG+sOCjfYTXgIzerf1scNSOm+lYIaKMxENu1inrymie3jawKAr3F2
+X-Gm-Gg: ATEYQzyCYuboEeBhrI7BaXurinyv8MRA34RwKagLTuUoJm/t+A4mFHjOY4SDt6YyXC9
+	yo7pSkFcNC1jx4kkJ/+yobMvQsxY249ANP0uhFVVoUOTPeKrBXWwb1msov4e0Tr/Fdp4bYai+is
+	tZI11G5yjggqImgHXupiiuoTwFFi5GlLuAy30h2a9vAFfTYzSyRPY51JXWBxnTIhmDH4/S6Ssn5
+	PoEMtqpG78feERUgung8BA2i4AaQg1Y+zbw3enKzYABE9pyoQU9jhXjhfiR7Lv4cfI0E+p7GCMY
+	wtVMr7xpOpmGU27OYEyoXvHSqRvLsN06Ks2jRwZtpV7M+0rg6TT2TgF+ck0oWNr8d7nkr0ZBDRc
+	Z/z0+C7+p9ZLwDnS4lwmZ9qLY3AWLtCB8jdHKbGm1BSdOFrow40N7/9AXMepWPmru6XB5Gfx9I5
+	14g/PWiNyizU0rXUX9wZT79jbxjsb5
+X-Received: by 2002:a17:903:1b63:b0:2b0:5682:6973 with SMTP id d9443c01a7336-2b056826d36mr30697845ad.19.1773653088199;
+        Mon, 16 Mar 2026 02:24:48 -0700 (PDT)
+Received: from lavm-prs74opxn5.. ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b04e5cb3dbsm58910915ad.25.2026.03.16.02.24.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Mar 2026 02:24:47 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: efremov@linux.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	r33s3n6@gmail.com,
+	gality369@gmail.com,
+	zhenghaoran154@gmail.com,
+	hanguidong02@gmail.com,
+	ziyuzhang201@gmail.com,
+	Cen Zhang <zzzccc427@gmail.com>
+Subject: [PATCH] floppy: annotate data-races around command_status and floppy_work_fn
+Date: Mon, 16 Mar 2026 17:08:26 +0800
+Message-Id: <20260316090826.2878527-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-3-de9a7af4b469@kernel.org>
-Message-ID: <abfMLujw4GbncLVR@google.com>
-Subject: Re: [PATCH 03/79] block: rnull: add macros to define configfs attributes
-From: Alice Ryhl <aliceryhl@google.com>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
-	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz <jstultz@google.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 16, 2026 at 12:34:50AM +0100, Andreas Hindborg wrote:
-> Defining configfs attributes in rust is a bit verbose at the moment. Add
-> some macros to make the attribute definition less verbose.
-> 
-> The configfs Rust abstractions should eventually provide procedural macros
-> for this task. When we get more users of the configfs Rust abstractions, we
-> shall consider this task.
-> 
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> ---
->  drivers/block/rnull/configfs.rs        | 134 +++++++++------------------------
->  drivers/block/rnull/configfs/macros.rs | 128 +++++++++++++++++++++++++++++++
->  2 files changed, 164 insertions(+), 98 deletions(-)
-> 
-> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-> index ea38b27a9011c..eafa71dfc40d3 100644
-> --- a/drivers/block/rnull/configfs.rs
-> +++ b/drivers/block/rnull/configfs.rs
-> @@ -1,20 +1,41 @@
->  // SPDX-License-Identifier: GPL-2.0
->  
-> -use super::{NullBlkDevice, THIS_MODULE};
-> +use super::{
-> +    NullBlkDevice,
-> +    THIS_MODULE, //
-> +};
->  use kernel::{
-> -    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
-> +    block::mq::gen_disk::{
-> +        GenDisk,
-> +        GenDiskBuilder, //
-> +    },
->      c_str,
-> -    configfs::{self, AttributeOperations},
-> +    configfs::{
-> +        self,
-> +        AttributeOperations, //
-> +    },
->      configfs_attrs,
-> -    fmt::{self, Write as _},
-> +    fmt::{
-> +        self,
-> +        Write as _, //
-> +    },
->      new_mutex,
->      page::PAGE_SIZE,
->      prelude::*,
-> -    str::{kstrtobool_bytes, CString},
-> -    sync::Mutex,
-> +    str::{
-> +        kstrtobool_bytes,
-> +        CString, //
-> +    },
-> +    sync::Mutex, //
-> +};
-> +use macros::{
-> +    configfs_simple_bool_field,
-> +    configfs_simple_field, //
->  };
->  use pin_init::PinInit;
->  
-> +mod macros;
-> +
->  pub(crate) fn subsystem() -> impl PinInit<kernel::configfs::Subsystem<Config>, Error> {
->      let item_type = configfs_attrs! {
->          container: configfs::Subsystem<Config>,
-> @@ -166,99 +187,16 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
->      }
->  }
->  
-> -#[vtable]
-> -impl configfs::AttributeOperations<1> for DeviceConfig {
-> -    type Data = DeviceConfig;
-> -
-> -    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-> -        let mut writer = kernel::str::Formatter::new(page);
-> -        writer.write_fmt(fmt!("{}\n", this.data.lock().block_size))?;
-> -        Ok(writer.bytes_written())
-> -    }
-> -
-> -    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> -        if this.data.lock().powered {
-> -            return Err(EBUSY);
-> -        }
-> -
-> -        let text = core::str::from_utf8(page)?.trim();
-> -        let value = text.parse::<u32>().map_err(|_| EINVAL)?;
-> -
-> -        GenDiskBuilder::validate_block_size(value)?;
-> -        this.data.lock().block_size = value;
-> -        Ok(())
-> -    }
-> -}
-> -
-> -#[vtable]
-> -impl configfs::AttributeOperations<2> for DeviceConfig {
-> -    type Data = DeviceConfig;
-> -
-> -    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-> -        let mut writer = kernel::str::Formatter::new(page);
-> -
-> -        if this.data.lock().rotational {
-> -            writer.write_str("1\n")?;
-> -        } else {
-> -            writer.write_str("0\n")?;
-> -        }
-> -
-> -        Ok(writer.bytes_written())
-> -    }
-> -
-> -    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> -        if this.data.lock().powered {
-> -            return Err(EBUSY);
-> -        }
-> -
-> -        this.data.lock().rotational = kstrtobool_bytes(page)?;
-> -
-> -        Ok(())
-> -    }
-> -}
-> -
-> -#[vtable]
-> -impl configfs::AttributeOperations<3> for DeviceConfig {
-> -    type Data = DeviceConfig;
-> -
-> -    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-> -        let mut writer = kernel::str::Formatter::new(page);
-> -        writer.write_fmt(fmt!("{}\n", this.data.lock().capacity_mib))?;
-> -        Ok(writer.bytes_written())
-> -    }
-> -
-> -    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> -        if this.data.lock().powered {
-> -            return Err(EBUSY);
-> -        }
-> -
-> -        let text = core::str::from_utf8(page)?.trim();
-> -        let value = text.parse::<u64>().map_err(|_| EINVAL)?;
-> -
-> -        this.data.lock().capacity_mib = value;
-> -        Ok(())
-> -    }
-> -}
-> -
-> -#[vtable]
-> -impl configfs::AttributeOperations<4> for DeviceConfig {
-> -    type Data = DeviceConfig;
-> -
-> -    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-> -        let mut writer = kernel::str::Formatter::new(page);
-> -        writer.write_fmt(fmt!("{}\n", this.data.lock().irq_mode))?;
-> -        Ok(writer.bytes_written())
-> -    }
-> +configfs_simple_field!(DeviceConfig, 1, block_size, u32, check GenDiskBuilder::validate_block_size);
-> +configfs_simple_bool_field!(DeviceConfig, 2, rotational);
-> +configfs_simple_field!(DeviceConfig, 3, capacity_mib, u64);
-> +configfs_simple_field!(DeviceConfig, 4, irq_mode, IRQMode);
->  
-> -    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> -        if this.data.lock().powered {
-> -            return Err(EBUSY);
-> -        }
-> +impl core::str::FromStr for IRQMode {
-> +    type Err = Error;
->  
-> -        let text = core::str::from_utf8(page)?.trim();
-> -        let value = text.parse::<u8>().map_err(|_| EINVAL)?;
-> -
-> -        this.data.lock().irq_mode = IRQMode::try_from(value)?;
-> -        Ok(())
-> +    fn from_str(s: &str) -> Result<Self> {
-> +        let value: u8 = s.parse().map_err(|_| EINVAL)?;
-> +        value.try_into()
->      }
->  }
-> diff --git a/drivers/block/rnull/configfs/macros.rs b/drivers/block/rnull/configfs/macros.rs
-> new file mode 100644
-> index 0000000000000..53ce9d5dbdc8a
-> --- /dev/null
-> +++ b/drivers/block/rnull/configfs/macros.rs
-> @@ -0,0 +1,128 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +use super::DeviceConfig;
-> +use core::{fmt::Write, str::FromStr};
-> +use kernel::{page::PAGE_SIZE, prelude::*};
-> +
-> +pub(crate) fn show_field<T: fmt::Display>(value: T, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-> +    let mut writer = kernel::str::Formatter::new(page);
-> +    writer.write_fmt(fmt!("{}\n", value))?;
-> +    Ok(writer.bytes_written())
-> +}
-> +
-> +pub(crate) fn store_with_power_check<F>(this: &DeviceConfig, page: &[u8], store_fn: F) -> Result
-> +where
-> +    F: FnOnce(&DeviceConfig, &[u8]) -> Result,
-> +{
-> +    if this.data.lock().powered {
-> +        return Err(EBUSY);
-> +    }
-> +    store_fn(this, page)
-> +}
-> +
-> +pub(crate) fn store_number_with_power_check<F, T>(
-> +    this: &DeviceConfig,
-> +    page: &[u8],
-> +    store_fn: F,
-> +) -> Result
-> +where
-> +    F: FnOnce(&DeviceConfig, T) -> Result,
-> +    T: FromStr,
-> +{
-> +    if this.data.lock().powered {
-> +        return Err(EBUSY);
-> +    }
-> +
-> +    let text = core::str::from_utf8(page)?.trim();
-> +    let value = text.parse::<T>().map_err(|_| EINVAL)?;
-> +
-> +    store_fn(this, value)
-> +}
-> +
-> +macro_rules! configfs_attribute {
-> +    (
-> +        $type:ty,
-> +        $id:literal,
-> +        show: |$show_this:ident, $show_page:ident| $show_block:expr,
-> +        store: |$store_this:ident, $store_page:ident| $store_block:expr
-> +        $(,)?
-> +    ) => {
-> +        #[vtable]
-> +        impl configfs::AttributeOperations<$id> for $type {
-> +            type Data = $type;
-> +
-> +            fn show($show_this: &$type, $show_page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-> +                $show_block
-> +            }
-> +
-> +            fn store($store_this: &$type, $store_page: &[u8]) -> Result {
-> +                $store_block
-> +            }
-> +        }
-> +    };
-> +}
-> +pub(crate) use configfs_attribute;
-> +
-> +// Specialized macro for simple boolean fields that just store kstrtobool_bytes result.
-> +macro_rules! configfs_simple_bool_field {
-> +    ($type:ty, $id:literal, $field:ident) => {
-> +        crate::configfs::macros::configfs_attribute!($type, $id,
-> +            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
-> +            store: |this, page|
-> +              crate::configfs::macros::store_with_power_check(this, page, |this, page| {
-> +                this.data.lock().$field = kstrtobool_bytes(page)?;
-> +                Ok(())
-> +            })
-> +        );
-> +    };
-> +}
-> +pub(crate) use configfs_simple_bool_field;
-> +
-> +// Specialized macro for simple numeric fields that just parse and assign
-> +macro_rules! configfs_simple_field {
-> +    // Simple direct assignment
-> +    ($type:ty, $id:literal, $field:ident, $field_type:ty) => {
-> +        crate::configfs::macros::configfs_attribute!($type, $id,
-> +            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
-> +            store: |this, page| crate::configfs::macros::store_number_with_power_check(
-> +                this,
-> +                page,
-> +                |this, value: $field_type| {
-> +                    this.data.lock().$field = value;
+command_status is accessed by multiple contexts:
+ - generic_done() and do_wakeup() write it from the floppy
+   workqueue context.
+ - wait_til_done() reads it in wait_event conditions without
+   holding fdc_busy.
+ - is_alive() reads it locklessly to check driver liveness.
+ - floppy_queue_rq(), lock_fdc(), and unlock_fdc() write it
+   during FDC ownership transitions.
 
-I think there's a TOCTOU issue here. You take the lock to perform a
-power check in store_number_with_power_check(), then you release the
-lock and check again in `store`. But `powered` could have changed in the
-meantime.
+There is currently no LKMM annotation for these concurrent accesses
+since command_status relies on the deprecated volatile qualifier.
+Remove volatile and use READ_ONCE()/WRITE_ONCE() on every access
+to command_status to provide proper LKMM data-race annotations.
 
-Alice
+Also annotate floppy_work_fn with WRITE_ONCE() in schedule_bh()
+and READ_ONCE() in floppy_work_workfn(), and current_type[drive]
+with READ_ONCE() in drive_no_geom() where it can be read without
+holding the FDC lock.
+
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+---
+ drivers/block/floppy.c | 38 +++++++++++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 92e446a64371..1da7947fe042 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -502,7 +502,7 @@ static int probing;
+ #define FD_COMMAND_ERROR	2
+ #define FD_COMMAND_OKAY		3
+ 
+-static volatile int command_status = FD_COMMAND_NONE;
++static int command_status = FD_COMMAND_NONE;
+ static unsigned long fdc_busy;
+ static DECLARE_WAIT_QUEUE_HEAD(fdc_wait);
+ static DECLARE_WAIT_QUEUE_HEAD(command_done);
+@@ -601,7 +601,8 @@ static inline void fdc_outb(unsigned char value, int fdc, int reg)
+ 
+ static inline bool drive_no_geom(int drive)
+ {
+-	return !current_type[drive] && !ITYPE(drive_state[drive].fd_device);
++	return !READ_ONCE(current_type[drive]) &&
++	       !ITYPE(drive_state[drive].fd_device);
+ }
+ 
+ #ifndef fd_eject
+@@ -640,7 +641,7 @@ static const char *timeout_message;
+ static void is_alive(const char *func, const char *message)
+ {
+ 	/* this routine checks whether the floppy driver is "alive" */
+-	if (test_bit(0, &fdc_busy) && command_status < 2 &&
++	if (test_bit(0, &fdc_busy) && READ_ONCE(command_status) < 2 &&
+ 	    !delayed_work_pending(&fd_timeout)) {
+ 		DPRINT("%s: timeout handler died.  %s\n", func, message);
+ 	}
+@@ -892,7 +893,7 @@ static int lock_fdc(int drive)
+ 	if (wait_event_interruptible(fdc_wait, !test_and_set_bit(0, &fdc_busy)))
+ 		return -EINTR;
+ 
+-	command_status = FD_COMMAND_NONE;
++	WRITE_ONCE(command_status, FD_COMMAND_NONE);
+ 
+ 	reschedule_timeout(drive, "lock fdc");
+ 	set_fdc(drive);
+@@ -906,7 +907,7 @@ static void unlock_fdc(void)
+ 		DPRINT("FDC access conflict!\n");
+ 
+ 	raw_cmd = NULL;
+-	command_status = FD_COMMAND_NONE;
++	WRITE_ONCE(command_status, FD_COMMAND_NONE);
+ 	cancel_delayed_work(&fd_timeout);
+ 	do_floppy = NULL;
+ 	cont = NULL;
+@@ -990,7 +991,9 @@ static void (*floppy_work_fn)(void);
+ 
+ static void floppy_work_workfn(struct work_struct *work)
+ {
+-	floppy_work_fn();
++	void (*fn)(void) = READ_ONCE(floppy_work_fn);
++
++	fn();
+ }
+ 
+ static DECLARE_WORK(floppy_work, floppy_work_workfn);
+@@ -999,7 +1002,7 @@ static void schedule_bh(void (*handler)(void))
+ {
+ 	WARN_ON(work_pending(&floppy_work));
+ 
+-	floppy_work_fn = handler;
++	WRITE_ONCE(floppy_work_fn, handler);
+ 	queue_work(floppy_wq, &floppy_work);
+ }
+ 
+@@ -1864,7 +1867,7 @@ static void show_floppy(int fdc)
+ 
+ 	pr_info("cont=%p\n", cont);
+ 	pr_info("current_req=%p\n", current_req);
+-	pr_info("command_status=%d\n", command_status);
++	pr_info("command_status=%d\n", READ_ONCE(command_status));
+ 	pr_info("\n");
+ }
+ 
+@@ -1991,7 +1994,7 @@ static void do_wakeup(void)
+ {
+ 	reschedule_timeout(MAXTIMEOUT, "do wakeup");
+ 	cont = NULL;
+-	command_status += 2;
++	WRITE_ONCE(command_status, command_status + 2);
+ 	wake_up(&command_done);
+ }
+ 
+@@ -2019,11 +2022,12 @@ static int wait_til_done(void (*handler)(void), bool interruptible)
+ 	schedule_bh(handler);
+ 
+ 	if (interruptible)
+-		wait_event_interruptible(command_done, command_status >= 2);
++		wait_event_interruptible(command_done,
++					 READ_ONCE(command_status) >= 2);
+ 	else
+-		wait_event(command_done, command_status >= 2);
++		wait_event(command_done, READ_ONCE(command_status) >= 2);
+ 
+-	if (command_status < 2) {
++	if (READ_ONCE(command_status) < 2) {
+ 		cancel_activity();
+ 		cont = &intr_cont;
+ 		reset_fdc();
+@@ -2031,18 +2035,18 @@ static int wait_til_done(void (*handler)(void), bool interruptible)
+ 	}
+ 
+ 	if (fdc_state[current_fdc].reset)
+-		command_status = FD_COMMAND_ERROR;
+-	if (command_status == FD_COMMAND_OKAY)
++		WRITE_ONCE(command_status, FD_COMMAND_ERROR);
++	if (READ_ONCE(command_status) == FD_COMMAND_OKAY)
+ 		ret = 0;
+ 	else
+ 		ret = -EIO;
+-	command_status = FD_COMMAND_NONE;
++	WRITE_ONCE(command_status, FD_COMMAND_NONE);
+ 	return ret;
+ }
+ 
+ static void generic_done(int result)
+ {
+-	command_status = result;
++	WRITE_ONCE(command_status, result);
+ 	cont = &wakeup_cont;
+ }
+ 
+@@ -2873,7 +2877,7 @@ static blk_status_t floppy_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	list_add_tail(&bd->rq->queuelist, &floppy_reqs);
+ 	spin_unlock_irq(&floppy_lock);
+ 
+-	command_status = FD_COMMAND_NONE;
++	WRITE_ONCE(command_status, FD_COMMAND_NONE);
+ 	__reschedule_timeout(MAXTIMEOUT, "fd_request");
+ 	set_fdc(0);
+ 	process_fd_request();
+-- 
+2.34.1
+
