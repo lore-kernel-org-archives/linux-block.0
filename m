@@ -1,64 +1,64 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8ED3939AB
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 12:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69761396595
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 12:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773662541; cv=none; b=k+A4TO+hkwKj6BR8Ijnwxab3869ykaut0t3kPvIsggfdPeCk5C9NoQ/MW3uwBDTCPepJdXjgg8/4U/kZ7f0yTUyr9lq0szehMMDyAxTjFbUYARGuS8tdsJeIQlgmeazqM0FFDikIXCafvp9sn/WhXQybA2gryvR4nzOW7eLFBEg=
+	t=1773663256; cv=none; b=GZujPUcec9OttPZ55ZO6+GRBhYZL94IkTWHUc1SOeIuyvcNfuBuU7xPj50l0/KEqXLgLfwWjFSvhyhO5wgcxxXFywC0qbOOpDEQcVUWEBO8fbADOH4iVzWVSApcT2Xbltd73Q6nWXYyKRrJiDj1kSFb9JqMg6z0xaGu0plY5K/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773662541; c=relaxed/simple;
-	bh=763wC3RRPxIsptrmNPCWXS4C9poStXcpGsCSDU2gvlQ=;
+	s=arc-20240116; t=1773663256; c=relaxed/simple;
+	bh=g8GaV3hlfBHoTjjCvqr/4Va/2jyatxk9/l1Nn+6OTaE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=U1n81eFSbpWjfGkacoKhxAa15sdLllPPmRp7LSHD4T8ZpIGE1E8MrbFs+XRT75NBx1nHXpFn2CkCcJQdHh2lSBbJ6DyfKIl19Oc7gun27huy0lZQwFBOU7ZzncfErCTpj1nj8vbNAqVSVNZ0p95hnzB4B+EZXCiVXOSeHbcWu+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wF+QsSY/; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=HzdOO/vTwa4QKKeSZ0Jg3X0sk6cWLrdKPwRqwuvKXLpMXYrOmmFRYML/xZN0nIWVH2Lxq33KWjoni7OtHgmFs1T+Qd1pu96Wl3AK6ZLsXkY6R+muuxIFFwIGzy9+XJfEy76oncd1wmPPvrV9Ti6SGYdXOtwDgD/kUo+JRVGqDoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MKzalTe5; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wF+QsSY/"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4853ac455b2so42994525e9.1
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 05:02:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MKzalTe5"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-485389bf0daso30780975e9.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 05:14:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773662539; x=1774267339; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773663254; x=1774268054; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UX+URBpTt60dMhGkY9Id85Iw5Xtu00SbMnwBlBMIQ14=;
-        b=wF+QsSY/GQEgB0KYucoeprZCajrScL9vnmSkDBafohk5snzh9c5n/hawYgI/k+MB1B
-         /Pgt2z//Y2bsHpclpB4ewebNbslyjK24KrACWrZcr/8172tv9mwnr492CTEBO3xByOlI
-         QeZwFk/JYx1FA4VQqYDjlxnPzFm4tgzj/UBDQwlwBbems5621c8da7oyNgm9oEscDxLK
-         nuFR3dE3YrGRnStqmu7pSdJkHu2GAQuoIqrn+EkmBnv6NK64Dab6i61iQwR0EbITIFY4
-         UXTU6y0A9FUlxABmJ9q0K5uS6MxEPGkN3wEoUc3oF0sPCOgM4kaLRaL8rb6hVaghQM0e
-         Vw4g==
+        bh=M7q2+A+kkZoyV3rsZQKFhC6jq2dbqO9RaZzFL/EKyo0=;
+        b=MKzalTe5cMEJnDN5HAlmLI1ENwn4C99NhEkEXJP/9etqTjx8Psrj+LrUnOxl+ASIYy
+         xaYpeb7SmEkxNgarhW2Obw4seQt+zikM4udWdv1WnrOVE0rAt7kdDvaIqmNotuMIaQsr
+         uV+TUddQZLuZawdkzrMbcAU0A43yFs2kFVgYL9379qCobRQvs6WvdEor1sNijZluPl6H
+         2RM/Ck5YZURb5ZZzd+KI1Lmz9YxEB8z+dflOGZG0mL4bEXTrt7VQTCO1MRp2SoauD0NK
+         MV6XJyuYb4yX5OeT2RI8VE1eoQl7pnwGloKz7rlbN+OG2fiXRNAFtcy15KnkdU4DyBGu
+         q8PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773662539; x=1774267339;
+        d=1e100.net; s=20251104; t=1773663254; x=1774268054;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UX+URBpTt60dMhGkY9Id85Iw5Xtu00SbMnwBlBMIQ14=;
-        b=X1oSnpQ3piHFuOGu0nyF7NyHNGThPLtldM1xDsb9EvpUeibbxJlGNfDkt79dQIdySe
-         SOhAGxPvRBNsXb4oB1/LRTIabq/tHMf1StCIE13+X5F4Qp33Y55w3CkL+dF4zKO8E/KM
-         u+E/TAbj0FZ6TNxNXy/FfBHPfoQYX6sDPurj++zcwHWiH4rDnyNvcY70CAAT5I4MXMqQ
-         xnb8CzPqv+4ePDrjwInqRISfSr1exNtB6mPavS1/l/rlXmoM2c2+IBBx5pLJXVgGmWNm
-         c20FBxJAfxkY0qbE4np+m24nLDnvIzP7rTQqjflXZGwsfyHRSpaM5s0apwoQBH8syG6g
-         N+7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXvMh7d4BTsRPskc/A+YzZ3ZZnZd0qYj5adwHetrPLNjtqJtNE2v2kfx3AgFxAafdpn9iPb5nnrsLSYHg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKcUjjzdM6Z2r/Kmp3XUwe9ArmwCwDisFZQ8YnlcYh+FrhvmB/
-	Q/7mKMMd97ePSXXuKzFJzys084HblSy8rdbaMKZlhTbW1s6crXJ4VSB7JGKJY3HhvK+gUaQmF7D
-	jR/JSLtp46vXHf9KMzQ==
-X-Received: from wmi8.prod.google.com ([2002:a05:600c:208:b0:485:513d:66da])
+        bh=M7q2+A+kkZoyV3rsZQKFhC6jq2dbqO9RaZzFL/EKyo0=;
+        b=oA9M9sNmeUKSOFylMrZBTzp9cT5WnCwm9YdHzPeEYvwXeoF3LL4YO7F6pnsd6n7DS+
+         9F67Scxr+85FaxvU2RQPqcfBetlLvI3iwFvcaFkeKx3xiMg0mHy/S8G+kbeBO8bcZoAv
+         BLbJePb31/w3mP/AinOmtWABb83Vb4oddz9GXfEkGCdPw6I2rtttQK+72FsN+b89RfuT
+         iZprBK8ddLdqTV/u1oPIODQdhpoKK+rx09Rw9U6vnR9N/0ZUlY9sKTQ144JoV6g2Wc0Q
+         2nwjO4E9muMU7AX14wXxrGA1EBY9ENXW8ITZtQHod1Xxj4KpVSf0v15EBLelFICBPHxv
+         n+AA==
+X-Forwarded-Encrypted: i=1; AJvYcCV5qIrigIB2qyuYgcEWOzdK0s6MDfHIRHbD1fMEpdy5dmFj0uEBHFEqedSo+Dy5VcqKH3MfNp1VRXpJ0g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJIEo7V08rBJTCYW6esGmJ8ovy9dvikaGXuPZJweXJnRr12rI/
+	tS+srk/SHKxoR+iaZXM5lNCMJK0bOOTq/k6MmztgI+hdcmZGdI6a/DI471EjHlTGiQl2QZPu47+
+	GC0JNC+QAmYCnq5zksA==
+X-Received: from wrs7.prod.google.com ([2002:a05:6000:647:b0:439:f5a6:f90f])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b16:b0:480:69b6:dfed with SMTP id 5b1f17b1804b1-4855671e83bmr211989475e9.24.1773662538650;
- Mon, 16 Mar 2026 05:02:18 -0700 (PDT)
-Date: Mon, 16 Mar 2026 12:02:17 +0000
-In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-26-de9a7af4b469@kernel.org>
+ 2002:a05:600c:45d5:b0:485:3ff1:d5c3 with SMTP id 5b1f17b1804b1-485566cfa3cmr204531455e9.5.1773663253523;
+ Mon, 16 Mar 2026 05:14:13 -0700 (PDT)
+Date: Mon, 16 Mar 2026 12:14:12 +0000
+In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-28-de9a7af4b469@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-26-de9a7af4b469@kernel.org>
-Message-ID: <abfxSTL2qTMtpnY7@google.com>
-Subject: Re: [PATCH 26/79] block: rnull: add badblocks support
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-28-de9a7af4b469@kernel.org>
+Message-ID: <abf0FHWkQzbnOtqD@google.com>
+Subject: Re: [PATCH 28/79] block: rnull: add partial I/O support for bad blocks
 From: Alice Ryhl <aliceryhl@google.com>
 To: Andreas Hindborg <a.hindborg@kernel.org>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -74,61 +74,75 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>,
 	linux-mm@kvack.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, Feb 16, 2026 at 12:35:13AM +0100, Andreas Hindborg wrote:
-> Add badblocks support to the rnull driver with a configfs interface for
-> managing bad sectors.
+On Mon, Feb 16, 2026 at 12:35:15AM +0100, Andreas Hindborg wrote:
+> Add bad_blocks_partial_io configuration option that allows partial I/O
+> completion when encountering bad blocks, rather than failing the entire
+> request.
 > 
-> - Configfs attribute for adding/removing bad blocks via "+start-end" and
->   "-start-end" syntax.
-> - Request handling that checks for bad blocks and returns IO errors.
-> - Updated request completion to handle error status properly.
-> 
-> The badblocks functionality is disabled by default and is enabled when
-> first bad block is added.
+> When enabled, requests are truncated to stop before the first bad block
+> range, allowing the valid portion to be processed successfully. This
+> improves compatibility with applications that can handle partial
+> reads/writes.
 > 
 > Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
-> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> +        // This attribute can be set while device is powered.
-> +
-> +        for line in core::str::from_utf8(page)?.lines() {
-> +            let mut chars = line.chars();
-> +            match chars.next() {
-> +                Some(sign @ '+' | sign @ '-') => {
-> +                    if let Some((start, end)) = chars.as_str().split_once('-') {
-> +                        let start: u64 = start.parse().map_err(|_| EINVAL)?;
-> +                        let end: u64 = end.parse().map_err(|_| EINVAL)?;
-> +
-> +                        if start > end {
-> +                            return Err(EINVAL);
-> +                        }
-> +
-> +                        this.data.lock().bad_blocks.enable();
-> +
-> +                        if sign == '+' {
-> +                            this.data.lock().bad_blocks.set_bad(start..=end, true)?;
-> +                        } else {
-> +                            this.data.lock().bad_blocks.set_good(start..=end)?;
+> -#[vtable]
+> -impl configfs::AttributeOperations<13> for DeviceConfig {
+> -    type Data = DeviceConfig;
+> -
+> -    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+> -        let mut writer = kernel::str::Formatter::new(page);
+> -
+> -        if this.data.lock().bad_blocks_once {
+> -            writer.write_str("1\n")?;
+> -        } else {
+> -            writer.write_str("0\n")?;
+> -        }
+> -
+> -        Ok(writer.bytes_written())
+> -    }
+> -
+> -    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+> -        if this.data.lock().powered {
+> -            return Err(EBUSY);
+> -        }
+> -
+> -        this.data.lock().bad_blocks_once = kstrtobool_bytes(page)?;
+> -
+> -        Ok(())
+> -    }
+> -}
+> +configfs_simple_bool_field!(DeviceConfig, 13, bad_blocks_once);
 
-Taking lock twice: TOCTOU.
+Squash this into previous patch.
 
-> @@ -118,6 +125,7 @@ fn make_group(
->                      home_node: bindings::NUMA_NO_NODE,
->                      discard: false,
->                      no_sched: false,
-> +                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
->                  }),
->              }),
->              core::iter::empty(),
+> +fn is_power_of_two<T>(value: T) -> bool
+> +where
+> +    T: core::ops::Sub<T, Output = T>,
+> +    T: core::ops::BitAnd<Output = T>,
+> +    T: core::cmp::PartialOrd<T>,
+> +    T: Copy,
+> +    T: From<u8>,
+> +{
+> +    (value > 0u8.into()) && (value & (value - 1u8.into())) == 0u8.into()
+> +}
 
-[..]
+This is in the standard library.
 
-> @@ -155,6 +160,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
->                      home_node: *module_parameters::home_node.value(),
->                      discard: *module_parameters::discard.value() != 0,
->                      no_sched: *module_parameters::no_sched.value() != 0,
-> +                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
+> +fn align_down<T>(value: T, to: T) -> T
+> +where
+> +    T: core::ops::Sub<T, Output = T>,
+> +    T: core::ops::Not<Output = T>,
+> +    T: core::ops::BitAnd<Output = T>,
+> +    T: core::cmp::PartialOrd<T>,
+> +    T: Copy,
+> +    T: From<u8>,
+> +{
+> +    debug_assert!(is_power_of_two(to));
+> +    value & !(to - 1u8.into())
+> +}
 
-It seems weird to construct this Arc in two places. Is it shared or not?
+Overlap with:
+https://lore.kernel.org/rust-for-linux/20260221020952.412352-22-jhubbard@nvidia.com/
 
 Alice
