@@ -1,31 +1,31 @@
 Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9959A334685;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9962735CB8C;
 	Mon, 16 Mar 2026 22:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773701043; cv=none; b=CiaMTEClsFu0gmsiZAPDyxXeNqT1JeX14ZF4Bm40kxL38gojCXPX5qbYa3iGwf/p162lpZN5k0lmSQAQ/lhu8mNL1/lrOW/pt+btSXrf/FiReioDUVy4ymB4IhtZZBVaEMyu96ihpz47UGJvyrneUb0V8yspLjgS6tirzQjHKdo=
+	t=1773701043; cv=none; b=Z0BUnYT8D84N6zCc0765U4mnqTiYqVeT8m3gKyI55WG8AfFab5vD/31Q0GScEdDZtRHNf/jx6jPDUBLrrqhG+XiGtAnP45bRlsHy4mxX8SHQ6rRCXQqEZhoG2LtZnPneC7n729njj4Bf++c1mWk9KTScW6FynxRAoYC6dMpJyL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773701043; c=relaxed/simple;
-	bh=rK99xjO97vLlnrpiCCJhU6xQmBcRpnOCdghKR35r3nE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Md78TLOGDKFxNnVQL6oI+Suh8KcOorjCBJoMAUBnpcLxI/BY8+qX3974cv15ntYzE1AoOIKtAHeAWYorHkCu46V/j+nNFWCIBPSdiPhqIcC/cFocjWdfxJfz2vMWnj8YzwVkP/2qIo+dEsNq0qJnVbVHpbeQrvTO8fecr8fTj2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=jeCWjYeP; arc=none smtp.client-ip=159.69.126.157
+	bh=sH5PzzfdUt96NHCn8efy973Ql+Lksj3d967tXyztZXU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GHrgK46qlY0dt2ljMv7NJ7V4IPaEzrP419mKbrrNQytMNTYPOg2rtii7+8gQlb9LWn2GHoblbhz/hZNwy0BSFwA4afV6YEDWPk2Kxe3BBTCYo+ACj9tkVV3+dfz51lbAUaReGThyh+I7J4UAIT+I0/j0Ghw9HybBlrP15w4m2+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=lXbwmqYS; arc=none smtp.client-ip=159.69.126.157
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="jeCWjYeP"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="lXbwmqYS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
 	s=mail; t=1773701039;
-	bh=rK99xjO97vLlnrpiCCJhU6xQmBcRpnOCdghKR35r3nE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=jeCWjYePIETn8H4N0kboCT+HaNDfp0+pbwyJN3lQhOr2wWtB0G3c/V0XAxFWBw/Yj
-	 IwzG+VKLQ4mpBk0RHCFDWfwcuAS9UkC9GBzaAZeSS0wy+N1dxdlkzDCqkACnB6gkg6
-	 cZDsNv4pZ9sFMyfYoZViWwnuAA30cZe+nDQkTIco=
+	bh=sH5PzzfdUt96NHCn8efy973Ql+Lksj3d967tXyztZXU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=lXbwmqYSixhKKmzUgrKLALdgpnvlsodD3XH442laQ0akPyePSbZE5wXMp2cc+IWSd
+	 VQY7sp/OtG8UP8+zXAHfUAaTRol+I8PmweyDKF8Jcfbtv08F37+sSUywmyeRrFPylO
+	 RHKhByz593GRGKg3q/Qh/ZbssLDmfWutD489D4Jk=
 From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Mon, 16 Mar 2026 23:43:51 +0100
-Subject: [PATCH 1/4] block: make queue_sysfs_entry instances const
+Subject: [PATCH 0/4] block: make some sysfs attribute instances const
+Date: Mon, 16 Mar 2026 23:43:50 +0100
+Message-Id: <20260316-b4-sysfs-const-attr-block-v1-0-a35d73b986b0@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,142 +34,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260316-b4-sysfs-const-attr-block-v1-1-a35d73b986b0@weissschuh.net>
-References: <20260316-b4-sysfs-const-attr-block-v1-0-a35d73b986b0@weissschuh.net>
-In-Reply-To: <20260316-b4-sysfs-const-attr-block-v1-0-a35d73b986b0@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22NQQ6CMBBFr0Jm7SS0VG25imFR2qk2GsBOJRrC3
+ W1g4cbl+8l/bwGmFImhrRZINEeO41BAHCpwNztcCaMvDLKWx/okNfYK+cOB0Y0DZ7Q5J+wfo7u
+ jcdY1ZyNkoz2U/5QoxPfmvnQ7J3q+SiLv46/QVptfiD/ycpuQjBLKaOmdCu0soVvXLzpw2ya7A
+ AAA
+X-Change-ID: 20250628-b4-sysfs-const-attr-block-9cac3791238d
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773701039; l=4661;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1773701039; l=1398;
  i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=rK99xjO97vLlnrpiCCJhU6xQmBcRpnOCdghKR35r3nE=;
- b=xqBiSVWU++aCYkyesbQyB4lWAycwnX/oKIU6sueT5af+NBFBl7bGXDn6b2yH9kLM2x6AkIiFQ
- nqF0E/EvJumD0ERSxNg/ZSgioAtu0NZ9AHTFD7kWfXCPzqmmC44iAZY
+ bh=sH5PzzfdUt96NHCn8efy973Ql+Lksj3d967tXyztZXU=;
+ b=G6V995yCb9BpvDE/wjrInskM0so1eGQwxEtOLFS4um9ifEKq+CQ9Pn+wQ5wxaWLVjUOGqEwzF
+ BUnBJfrYaIDA1/7paonQzJo4my+9Wk3xLetT9Y5eDu751UOyPnL3s1c
 X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
  pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-The queue_sysfs_entry structures are never modified, mark them as const.
+These attribute structures are never modified, mark them as const.
 
 Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 ---
- block/blk-sysfs.c | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+Thomas Weißschuh (4):
+      block: make queue_sysfs_entry instances const
+      block: ia-ranges: make blk_ia_range_sysfs_entry instances const
+      blk-crypto: make blk_crypto_attr instances const
+      blk-mq: make blk_mq_hw_ctx_sysfs_entry instances const
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 878b8a4b55bb..f22c1f253eb3 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -581,27 +581,27 @@ static int queue_wc_store(struct gendisk *disk, const char *page,
- 	return 0;
- }
- 
--#define QUEUE_RO_ENTRY(_prefix, _name)			\
--static struct queue_sysfs_entry _prefix##_entry = {	\
--	.attr	= { .name = _name, .mode = 0444 },	\
--	.show	= _prefix##_show,			\
-+#define QUEUE_RO_ENTRY(_prefix, _name)				\
-+static const struct queue_sysfs_entry _prefix##_entry = {	\
-+	.attr	= { .name = _name, .mode = 0444 },		\
-+	.show	= _prefix##_show,				\
- };
- 
--#define QUEUE_RW_ENTRY(_prefix, _name)			\
--static struct queue_sysfs_entry _prefix##_entry = {	\
--	.attr	= { .name = _name, .mode = 0644 },	\
--	.show	= _prefix##_show,			\
--	.store	= _prefix##_store,			\
-+#define QUEUE_RW_ENTRY(_prefix, _name)				\
-+static const struct queue_sysfs_entry _prefix##_entry = {	\
-+	.attr	= { .name = _name, .mode = 0644 },		\
-+	.show	= _prefix##_show,				\
-+	.store	= _prefix##_store,				\
- };
- 
- #define QUEUE_LIM_RO_ENTRY(_prefix, _name)			\
--static struct queue_sysfs_entry _prefix##_entry = {	\
-+static const struct queue_sysfs_entry _prefix##_entry = {	\
- 	.attr		= { .name = _name, .mode = 0444 },	\
- 	.show_limit	= _prefix##_show,			\
- }
- 
- #define QUEUE_LIM_RW_ENTRY(_prefix, _name)			\
--static struct queue_sysfs_entry _prefix##_entry = {	\
-+static const struct queue_sysfs_entry _prefix##_entry = {	\
- 	.attr		= { .name = _name, .mode = 0644 },	\
- 	.show_limit	= _prefix##_show,			\
- 	.store_limit	= _prefix##_store,			\
-@@ -665,7 +665,7 @@ QUEUE_LIM_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
- QUEUE_LIM_RO_ENTRY(queue_dma_alignment, "dma_alignment");
- 
- /* legacy alias for logical_block_size: */
--static struct queue_sysfs_entry queue_hw_sector_size_entry = {
-+static const struct queue_sysfs_entry queue_hw_sector_size_entry = {
- 	.attr		= {.name = "hw_sector_size", .mode = 0444 },
- 	.show_limit	= queue_logical_block_size_show,
- };
-@@ -731,7 +731,7 @@ QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
- #endif
- 
- /* Common attributes for bio-based and request-based queues. */
--static struct attribute *queue_attrs[] = {
-+static const struct attribute *const queue_attrs[] = {
- 	/*
- 	 * Attributes which are protected with q->limits_lock.
- 	 */
-@@ -791,7 +791,7 @@ static struct attribute *queue_attrs[] = {
- };
- 
- /* Request-based queue attributes that are not relevant for bio-based queues. */
--static struct attribute *blk_mq_queue_attrs[] = {
-+static const struct attribute *const blk_mq_queue_attrs[] = {
- 	/*
- 	 * Attributes which require some form of locking other than
- 	 * q->sysfs_lock.
-@@ -811,7 +811,7 @@ static struct attribute *blk_mq_queue_attrs[] = {
- 	NULL,
- };
- 
--static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
-+static umode_t queue_attr_visible(struct kobject *kobj, const struct attribute *attr,
- 				int n)
- {
- 	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
-@@ -827,7 +827,7 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
- }
- 
- static umode_t blk_mq_queue_attr_visible(struct kobject *kobj,
--					 struct attribute *attr, int n)
-+					 const struct attribute *attr, int n)
- {
- 	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
- 	struct request_queue *q = disk->queue;
-@@ -841,17 +841,17 @@ static umode_t blk_mq_queue_attr_visible(struct kobject *kobj,
- 	return attr->mode;
- }
- 
--static struct attribute_group queue_attr_group = {
--	.attrs = queue_attrs,
--	.is_visible = queue_attr_visible,
-+static const struct attribute_group queue_attr_group = {
-+	.attrs_const = queue_attrs,
-+	.is_visible_const = queue_attr_visible,
- };
- 
--static struct attribute_group blk_mq_queue_attr_group = {
--	.attrs = blk_mq_queue_attrs,
--	.is_visible = blk_mq_queue_attr_visible,
-+static const struct attribute_group blk_mq_queue_attr_group = {
-+	.attrs_const = blk_mq_queue_attrs,
-+	.is_visible_const = blk_mq_queue_attr_visible,
- };
- 
--#define to_queue(atr) container_of((atr), struct queue_sysfs_entry, attr)
-+#define to_queue(atr) container_of_const((atr), struct queue_sysfs_entry, attr)
- 
- static ssize_t
- queue_attr_show(struct kobject *kobj, struct attribute *attr, char *page)
+ block/blk-crypto-sysfs.c | 40 ++++++++++++++++++++--------------------
+ block/blk-ia-ranges.c    |  6 +++---
+ block/blk-mq-sysfs.c     | 10 +++++-----
+ block/blk-sysfs.c        | 46 +++++++++++++++++++++++-----------------------
+ 4 files changed, 51 insertions(+), 51 deletions(-)
+---
+base-commit: 95c541ddfb0815a0ea8477af778bb13bb075079a
+change-id: 20250628-b4-sysfs-const-attr-block-9cac3791238d
+prerequisite-change-id: 20250114-sysfs-const-attr-prep-e9414982dc4f:v2
+prerequisite-patch-id: e6bb942ab01bd8ea292bd728798170c9331fa3e7
+prerequisite-patch-id: 233540a50b602b30a5a10bcaeb71127c416433b3
+prerequisite-patch-id: 1a16da4318d82f598bc0b35932c9184f714e1c16
+prerequisite-patch-id: 1b7ad00feff741bcb64df61a21af65f165927f8d
+prerequisite-patch-id: 7a197a4d1524884a2c75a49f019f3b4535b2243c
+prerequisite-patch-id: 9112b35d2ac7d0ae6f9f1cf5d2634884590507ab
+prerequisite-patch-id: ab160b8b4f60f53923208365403102303f6390ff
 
+Best regards,
 -- 
-2.53.0
+Thomas Weißschuh <linux@weissschuh.net>
 
