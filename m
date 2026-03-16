@@ -1,172 +1,100 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.42.203.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A7130BBBC
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 02:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773627816; cv=pass; b=AIzkeiK47zmXFxOs8I0tR/uCddXTWNDNL/vNLQtPGcD2Om4JBI8d1jjO2ynnwri0qexiPCkSb9MoT4wLI5s+gjHtHbixHw6B7fU5y1BhLpac95veCPzo3ClukzJoF+9hgMtyqSQLHPUA3XiIN2PILA2Z09axdQ+x9n36VYLJNk8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773627816; c=relaxed/simple;
-	bh=brJlS+ev6IVoIeUgg0ezbYtFVtT61zmnhRsDBv+Ue8I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lTJiU1px/LeBNXtQDWB0D9VQYAoOaZHj25mPgNRZYBCDGUqSIadLXczK5Z8WSn6w/aDr63wFb96ZuE+LRow1WwmHSn1QJ9V5Rs4XteKhXHcnt82nZZCFMgz322B7b6/8AvTsDaTOCk4j2uLLxgx0UWoFVfhcXlyoy/fl1ZpF1h0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EnlajM6D; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793D3346E54;
+	Mon, 16 Mar 2026 06:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.42.203.116
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773644031; cv=none; b=sUVLDCXzCM/H0k0wVFvH3Fh0lKs/CyoXEunHbiqDOHS2aL0uP87dBBX2tNFgabzmnOR8MyWA/bddJQefyuKBxwrEkJfapWz9dn+AObQ40Vo6e6ld00+AJlGDYD1ixYdsOD+SAVrhTke70uo509rS85aV4SfvCmfyf2BDCXAK1V8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773644031; c=relaxed/simple;
+	bh=rJf6Wag6top7ddfXWkudtd2/wCEtMJWUIyS83d15JYo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o0oOdejyuoO/9LZX7FIvHnkaG/6Urv/Bg8GTmGJ0OmxQSAx8e52/SrISrNBnDi2Ho187ZYtBg4HVxc+TlF80B1ArVhEwoAvK7lOo7fMexoU07rb7DIDwIkZ8RzkawGS68sDE2rYJSulbrPymfoliJbY7OFXz0u9IZMhD+O70YU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=dXwFveEV; arc=none smtp.client-ip=52.42.203.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EnlajM6D"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-509062d829dso706631cf.1
-        for <linux-block@vger.kernel.org>; Sun, 15 Mar 2026 19:23:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773627814; cv=none;
-        d=google.com; s=arc-20240605;
-        b=kwc0SMuo/vfDtS6xr8huGRRNsn+oxTn1U98p8Cvkj5jVv9Vb4rT8eTKHdWEjy0reS2
-         +Q9z/MtQcq5Y7iGtJxo9QQm4ppHeZWhzRSRd3k/mD810+7lk7NGaFZ4FK+VY2i/CN9We
-         ye6fVEblPsnb3O/7zWpo+/skRvuKb6tqvCslgQZGyyGqTBliT86xCSlFqGUAJPTwRWQZ
-         EZ8b5WaaltqReno6lu6qcIhoLwuAAQYefM14vhWSZEE46Mj2hs5cYEwlACIQAKRmSM3l
-         dKtXs0cJ3pHdVgS4n9xSvPHa07zKtF7M4/RqrGBA+zxUgFKtCTsSvGl5v3hKg7/BMDxK
-         WLlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=sL9D+UNbJ7e4W6K6buLxChN3rfm9QdJVzjRxuDMxvi8=;
-        fh=/kMfBSQMXmHgP6u6AVe2c9oKvvnIEpXxLrzverG2fQs=;
-        b=GHe4m4W/PxqUm+aOrypa1dNGb31fJckGqDb2uQRcLJQi9oXo6NiLX7HXmAC3s8iAkX
-         NEF/oXNdvLE72Ns91scilb8qSTMos5wirK71ZmwaFgWAX5QXfjsNakP3tZn6D/4iCAkM
-         OrDOaE/wkToLKpw1GTtrOAYMKN1J6GAtNmIYgap2KRCNK+uvK8gvLdKggBxTZaxlEX2I
-         TL7yz+K5saM2o6DztvTzytCcrT8RsUO18MJwDf0DYWuFSYenvgQQF9yLpjAQuGoyVhrf
-         MlnpQ7KV9OgEAT+4XW5byPBJjsOwiuCm8JdZxiNIf3ALpIvqSHLLwIFFCkvrDJd++C4C
-         AkuQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="dXwFveEV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773627814; x=1774232614; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sL9D+UNbJ7e4W6K6buLxChN3rfm9QdJVzjRxuDMxvi8=;
-        b=EnlajM6Dft8s83JnEdAG0SLAX2gXWIKLbxhi3bqKL5fcEwOhh3xbKO8JY6Ocmuj9bY
-         /fSjg7vyS6bYZmL8pG1qVnfaNyeMhZksiFAf2WflTihSfVfzSt84EDzT1xXhkduw+dnz
-         fH9qE1Z+11viHxDTOkOBLtkUX5/rar81i43PTD8O+wkblaGi4Px1u1yxPSoq6XksB2ee
-         1UH16zMeEZLNW8gtwhEFLJm7RtFf81IPNOW0ofAsDjNaWVWjgjT4qAlym51ARDrH4rZX
-         ZRlkLBE8peJfkq7F0GNjI6LfZG0cO0Oj3Z+OmCyRVKQHfep8pHejdQOt4LqiJfUXA8U1
-         tReg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773627814; x=1774232614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sL9D+UNbJ7e4W6K6buLxChN3rfm9QdJVzjRxuDMxvi8=;
-        b=b7B3gnCCGqVJ2KNCBEFnscvMPHJQbxDrsOitNCCJIBOj+WKcpgAwNC6sEf2kSqLn4J
-         U0lD/MKa27QS6MW8W7woIVpfSFQLt/3oNFbOd1LVpywqP2t5pM6RT0agi9FYDSn/UjaB
-         0ieqbTWkIuNGxa716YTiP5EBiEkWtX0v8ka9rxXmm5hu+KuFXLt6OM6QPpAstW7fDRic
-         nMYA2Y7ru1nRgsOeKz2eWZKTC6v+NBpY2NFcgaOKQkmoyXS6gHGABxy3J6cMC3M6XOnH
-         X//gDaIlkrvCV2jDAGHKt0+seLWKa2Vp76mX9zDrnBTmK2mMQs9nM0biBG7WRwlQvcyQ
-         CgPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVPmpeY64g4eHJq028ThggI76aZEHF+StQkIPn9quh8AHCq1/kKGuinX4Vu/G3X7cuVsz6ewrtPIqiGVg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdF/LsGRCiKhE36UKHq/A9iJOlogVk169tg0RoRyqGtlZLWgdA
-	xDt4dtPfPbhUAzjmyX9Pby27uHyEffz031DXWcrT3p2AoGApFcGulCfAJokYzUCmdOXUnfVsbD/
-	6sBL0CYDix6vuUKJMdPtxy+sVzeHx/HsbZwGqiRGP
-X-Gm-Gg: ATEYQzz5qRNkPdxJRqcThobGD4se3XpJqlJFlEw9f3K0snVh7RqKiMA7pdbIfjxESn5
-	0BD85lV7PAFdRUJX5ketcf0aD7RkZG9WmL4oVSp2F16cCTtV5KEtgnKVmhqqDLYL/ZtGwFLUJBV
-	Tq+n91Zx2PA0K9b5/uHKIW739UqeMKY5m0DDZTE340DoMkWI43FQcZj4hgzYHxAThaqNkPgHAGO
-	NPzfSlHk/enq9JJR/CWWow+5b5TBohlZF7bqseV7gkbriHrxHWmx/WHMW/WVkFeFOsbyskuOTL4
-	FL2UEGX3LlWSQsceRZHMnwlHZd5uwhl3fZmwB5bNufZXI+03ZGXrpus1zB5WktmQjrKOP+Jgj3b
-	69K0IM3nosJb2sIow3Nyg765vBHsdUdbHxopMWqiv5+PXuUo/+R6CSF4=
-X-Received: by 2002:ac8:5a10:0:b0:509:cd7:aa18 with SMTP id
- d75a77b69052e-5096946ba5cmr24153891cf.10.1773627813807; Sun, 15 Mar 2026
- 19:23:33 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1773644030; x=1805180030;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=NDgrda0PArO9FXJA6xekuXZsyo6sYula1ULpMPfEyGM=;
+  b=dXwFveEV+0TlznNqzTBOlHBKFuseOdkr9ot/YO2jAni03kB03t394O2X
+   PbwQ2yD2jfWuhoYUm319iUAcLchRTAbhC9yZEFtUGDrSDk4ra/y6bu9t0
+   +BeP8z+0/GIimwgP1TAT/OneLrpsbMe3MfNyc1DJNBgP8qjRpeYW11KSt
+   zyJUU2ucteP1+kIeE2bUu/y2ffBmgbmzwm87ZzKca2qCrb/ynb8ExRisI
+   BOueW5Hk1fd2dDadLlf5soY4u4heDSFfvDQ4a96XGopEulXidDDxNxHL+
+   tsM8qHm+Oqk4t9EqZbTmZ+Hfgo89k3dzQcdcfOo4fb5xdkaNfmCRmGo0g
+   A==;
+X-CSE-ConnectionGUID: BCwT7ftySkiZTzpI5u/hZQ==
+X-CSE-MsgGUID: w8N8Vc+pTbK6B56skVzqDA==
+X-IronPort-AV: E=Sophos;i="6.23,123,1770595200"; 
+   d="scan'208";a="15102142"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 06:53:47 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:24880]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.23:2525] with esmtp (Farcaster)
+ id 5efce3db-7e6a-4c6b-a215-daed90ab2c3f; Mon, 16 Mar 2026 06:53:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 5efce3db-7e6a-4c6b-a215-daed90ab2c3f
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Mon, 16 Mar 2026 06:53:47 +0000
+Received: from c889f3b07a0a.amazon.com (10.106.82.26) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Mon, 16 Mar 2026 06:53:45 +0000
+From: Yuto Ohnuki <ytohnuki@amazon.com>
+To: <yukuai@fnnas.com>
+CC: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <ming.lei@redhat.com>, <nilay@linux.ibm.com>,
+	<syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com>,
+	<ytohnuki@amazon.com>
+Subject: Re: [PATCH] blk-wbt: remove WARN_ON_ONCE from wbt_init_enable_default()
+Date: Mon, 16 Mar 2026 06:53:38 +0000
+Message-ID: <20260316065337.60071-2-ytohnuki@amazon.com>
+X-Mailer: git-send-email 2.50.0
+In-Reply-To: <cd42b95b-58de-4d47-9895-f1b5ac7d499e@fnnas.com>
+References: <cd42b95b-58de-4d47-9895-f1b5ac7d499e@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260316015354.114465-1-senozhatsky@chromium.org>
-In-Reply-To: <20260316015354.114465-1-senozhatsky@chromium.org>
-From: Brian Geffon <bgeffon@google.com>
-Date: Mon, 16 Mar 2026 11:22:57 +0900
-X-Gm-Features: AaiRm515kesiSneWsCz573dJ5nQbUd_phGn-T1G1RXtcvgFvDRcUXQGGWqhv_8E
-Message-ID: <CADyq12xB7zpZq9xTe1sJa2O+dv1e3pbdJjWrTcpagRbGC1MfWQ@mail.gmail.com>
-Subject: Re: [PATCH] zram: propagate read_from_bdev_async() errors
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
-	Richard Chang <richardycc@google.com>, linux-block@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: EX19D033UWC002.ant.amazon.com (10.13.139.196) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 16, 2026 at 10:54=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> When read_from_bdev_async() fails to chain bio, for instance
-> fails to allocate request or bio, we need to propagate the
-> error condition so that upper layer is aware of it.  zram
-> already does that by setting BLK_STS_IOERR ->bi_status,
-> but only for sync reads.  Change async read path to return
-> its error status so that async errors are also handled.
->
-> Suggested-by: Brian Geffon <bgeffon@google.com>
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Acked-by: Brian Geffon <bgeffon@google.com>
+On Mon, Mar 16, 2026 at 01:03:17AM +0800, Yu Kuai wrote:
+> Can you also add a warning message that disk failed to enable wbt?
+> 
+> Otherwise this patch looks good to me.
 
-> ---
->  drivers/block/zram/zram_drv.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
-c
-> index 63f71371a7e9..b47cb1d99144 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1445,21 +1445,21 @@ static void zram_async_read_endio(struct bio *bio=
-)
->         queue_work(system_highpri_wq, &req->work);
->  }
->
-> -static void read_from_bdev_async(struct zram *zram, struct page *page,
-> -                                u32 index, unsigned long blk_idx,
-> -                                struct bio *parent)
-> +static int read_from_bdev_async(struct zram *zram, struct page *page,
-> +                               u32 index, unsigned long blk_idx,
-> +                               struct bio *parent)
->  {
->         struct zram_rb_req *req;
->         struct bio *bio;
->
->         req =3D kmalloc_obj(*req, GFP_NOIO);
->         if (!req)
-> -               return;
-> +               return -ENOMEM;
->
->         bio =3D bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
->         if (!bio) {
->                 kfree(req);
-> -               return;
-> +               return -ENOMEM;
->         }
->
->         req->zram =3D zram;
-> @@ -1475,6 +1475,8 @@ static void read_from_bdev_async(struct zram *zram,=
- struct page *page,
->         __bio_add_page(bio, page, PAGE_SIZE, 0);
->         bio_inc_remaining(parent);
->         submit_bio(bio);
-> +
-> +       return 0;
->  }
->
->  static void zram_sync_read(struct work_struct *w)
-> @@ -1523,8 +1525,7 @@ static int read_from_bdev(struct zram *zram, struct=
- page *page, u32 index,
->                         return -EIO;
->                 return read_from_bdev_sync(zram, page, index, blk_idx);
->         }
-> -       read_from_bdev_async(zram, page, index, blk_idx, parent);
-> -       return 0;
-> +       return read_from_bdev_async(zram, page, index, blk_idx, parent);
->  }
->  #else
->  static inline void reset_bdev(struct zram *zram) {};
-> --
-> 2.53.0.851.ga537e3e6e9-goog
->
+Hi Kuai,
+
+Thanks for the review. That makes sense, and I'll add a pr_warn()
+for the wbt_init() failure path.
+
+For wbt_alloc(), I kept it silent since its failure can be caused
+by e.g. memory pressure, which doesn't require diagnostic
+information.
+
+If I'm missing your point, please let me know.
+
+I'll send a v2. Thanks again.
+
+Yuto
+
+
+
+Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
+
+Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
+
+
+
