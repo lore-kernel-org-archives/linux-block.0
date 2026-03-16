@@ -1,123 +1,115 @@
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C7E280A5B
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 14:02:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773669747; cv=pass; b=RSRx85PimW5eu4RyxztyyFfI9sjt8db87j2nsOge6XWg3MwnHJlXzhXMkeiDM6jPSECvigIpF8ZRLl7ElIRod6nBSwOzpflteE6mhxIEIWwSBkXJS3kFoclEEmri3XKG/ex9J96zcmuhjPEzNhgJGsRITXSHRaIirtgVcYskeQ8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773669747; c=relaxed/simple;
-	bh=cyyiNDptl98k8pZAyExFSCW/9thFIw3OK7mbtDKcMP4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KKEJHPJy0LYlNr6OlYh9AOECz/3phxRY2+8wzsy8Aa7Jvx74FaybaErZZMxSC5pCcLmumj2SpGVL4l1LLgdMwgkB10IGXhiITS8+nnDP+yPSDWRaT/NtKmWK2bkG8XzUN0aVlFsFD6OQgssRqmT+CrPuTGXIsN3StWIMJLe7PPY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l0bfrDHf; arc=pass smtp.client-ip=74.125.82.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F1539F188
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 14:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773669946; cv=none; b=IKdJR22xDEh9JzAtcYCDUGet8rGqj5drirZYHWMUcRqCp+uBwr7+yI1v7PsjpgM4iD9rRp/WcjqDYEQ2J9pbRxOckS6TM7VlT0iwC9rCebPNA+563ZfLtMTPp7RafQ2HdZAvPhQ9muFXpJ36TDUDWqEGKFEAxa6LE/4TFSMmEQg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773669946; c=relaxed/simple;
+	bh=S+D8dSLW8oWKsKSTJ1PKigEnOCf3XPfVYvzqfqISQaU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MyeMB0jOgnH1D1dixwXP1fxmu0rctQw3TYQru53iyvbIkiLpDk8ZP5wfAFV5rf8/kPBxq61werqhv2h5bkjr/OZCX1YogUt6zR8mYq3EHCnE8jp21kn+E8GIsgooBlb6ObvJq7F84jYv9b9705j/BHJLWuFL2i+yT6ou4S+sNtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZvqBxHQu; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l0bfrDHf"
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-2be9ffbcf9aso171167eec.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 07:02:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773669745; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hCpkloagSmnSrdgDcVEkYB2CkLt2mLyPV3SxBbmI86VS/NiiCUbk08nmecO02RgJV9
-         UJCq01QHrsRkKSmo0OxCtgK5gnRqtYgi3iCrOf+RhL6vrN83Ns2QGxQjwkAXx/xz3c0X
-         svzwouRyOdu+FeGhKpPGXQA+jsHBKRzX205yTIZtXgo2inXI6tzHUWHDFDaEWHtLK9SS
-         y8USqIM5LqkJDQbStFlyeyp9OMQ/d3BFJ17kZGbGstkbb6b0X5iKdm/P3j1fFhVmcFeD
-         7lZNWjOFtsTF3r8aUV0W8ENRMMdUjQl3/SpxjO1t5Pxb6SzUeZHYJp2hCc5XSwEdi/I1
-         dvWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cyyiNDptl98k8pZAyExFSCW/9thFIw3OK7mbtDKcMP4=;
-        fh=QaU59PzlknHQRBQ7NTbmKfIzkm6ki0xbtLYkrseH+HM=;
-        b=MM2Afa7Miz9FwCl5xxpZ1CrKoUc0hcX+1boSYo3gM34AovKFYwPzYJjh6JCYz98st6
-         jDAg0eLWuW6FAfjQ8udJh6CMAWZ0dbLI2Ha81utdiNiFeGvbqGvBx51MDgJj5TZLMh3D
-         SZJc0OB5fVWzmFpflYI6T35MAV3uCYjg/5bZ3dK7WyAALV//JcPAjP/btKySac1/JUJz
-         hPRUue9Xxc7rjMF0lOuUZ6k5asH/vAwxypVibJHxKCyo4lGEIkaLJWj26/h60UdGnpMm
-         M/17hWDcH7lH7qMD45BNKRPRCi4nvpyGHHLH1F3pRxBUV2SnXpKyR7f2JlTaZhQVVIc2
-         JftA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZvqBxHQu"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-48535f4d5e1so45380745e9.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 07:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773669745; x=1774274545; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cyyiNDptl98k8pZAyExFSCW/9thFIw3OK7mbtDKcMP4=;
-        b=l0bfrDHfHAXXtUL+rDOmHg+DhwsPpTwlBjNaKxI/dIaYK5PeeMpg5LzpvUFq6Y02HJ
-         dumIKzyptFniUBwwMdjyPuXf3iIfu4rCGRCe89a2mpVgIgAJyp3tFq3jxilucc8s78S0
-         7eBi5ECTHe5/7AD+LWirdzzE1oLGNN0YGwbMnhL0ZXcerPe9PZBLPw1DScdVD/R0Atqr
-         OGdMGTqfb0tyFdeUpiwcabZgeVYNjG3Jq+YQ5Bz/79InUWzgUBvGDLZclFb4UVECthjr
-         Yf8FViLvNAV8wTJuezCZ9gsveQ/2FITPDTV31uJJ6wFz5/cVjj6Xxg/n3e1oTcFZr+YY
-         4r0A==
+        d=google.com; s=20251104; t=1773669943; x=1774274743; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KPjHmgruixhmkQjw04sh9Mjy1u+NZy/GWXT+thsthOE=;
+        b=ZvqBxHQukFU93I/gPsZYLd5MR0bzK6ax2krIrR+3t6HKAfIRmI/LwMbnG/7K8ZuXOD
+         ZM86TCM46gxdbhKAvXAZbbjD0ZWHdsYJ1fYUF9dwxDS722GffSZC+ztJz/RY1TnL77b6
+         hXAPCTJvl/zInACwYmqiF5+dIf+uyiOEw+ZOFTSZCM8o4JvULCTxb6TpCTgacvF+pNT/
+         AnbFdzSNn8QeDSG39YkvGBK5E5bFmSFxvagEEGrkDP3zIzVFjmmQ08fmtBnZPFpx1F2G
+         MkUoMbGTNxy3fs5n5I9lD2NtiPfGMhNmFBY6CCQVKXSWuaCb1WClGmxojHeYlEVd/KUl
+         OSqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773669745; x=1774274545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cyyiNDptl98k8pZAyExFSCW/9thFIw3OK7mbtDKcMP4=;
-        b=oCgNcr5QP1jYyxfvRhW3g0LDqTZrMlhN0oReDn6UJPYOZpzs2gN75KtGOwa2KhuCx2
-         gvRZlbNSibQu3iCgSl63p2I/FzRqcmhwHMEBcoJ2alzo8h5aA355oJnmMtPsDinEtPP5
-         1DS1oqpLslvRUdyDF5Adv7Ktb+aJqjnbmEa4wQ1PtHkGNdy+VcrNgoIuIy+H9F8/tjd0
-         WbCcvW5eDLGL2hOMTeJSikzZxMvTCuEdEpGEXWxXPaT4VNgVht/3zxCQbUB9yf02XqNy
-         LYeW2rE7mXyWMAzxJXS0mV7EB7tFxOuKh2Ag37DrsB3GS7xuTubbCA2U2C1SdbD7so5E
-         MD4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWbKW6dLVzBPlZLBM8rKQxURdUtl7rY5YnQoGwPAMVgTpzgIrrDDK15lUug6kHTJZN/2b0ebIeNyJFYiA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd5MzCVwkQdWBJ/AZAOQ8IMhoncz3m7luc59hMfXzGPC8QhmWp
-	MtaStKCEV0X5WjPAlFnGtieLIxBMjJifPlLLZsAXbG7ALBskxS4lkTsXPY0rrAe4EL6VqPkxfCp
-	ERZWyZkuIj69b0Tby1NlcWZy34bUtLk4=
-X-Gm-Gg: ATEYQzwVMmrRKtTHpVs37YnJTMxaAcNV9YFJiNcEXccjqnbwYVmodx1zFB8JJD6NuwJ
-	e0MGGYwsZinNHHvTwiSugKa7DkQuEo6IydVt7Y3YyinZlClfXHpwxBWC1U3YQDOtpTV81Rx5ysV
-	PhBl7vg6TkBHP/JAtH0st8YyDm9T3VXitS2RDNIKwkbk64sIuJ1xD88MmqSHtvGcYbeiPwpgwM3
-	Te9gweeB/EgubMMQj2yw/Xi+T+W1aWr6JJCm2SJnYonjju/DmQRWxa/4U255cMjCLo3ClKSX8ut
-	N9x8xtvxA96g6/cJlMBkJdFHhxexpFC0F0siX8N/6NTZI0yypgmPRhFWw/hosLKTzpnqy5VqlU4
-	HKoZi+S4ZlH/R20FGpLbOe6iYb4z/J32IHg==
-X-Received: by 2002:a05:7301:19ad:b0:2be:687:5dbc with SMTP id
- 5a478bee46e88-2bea559164cmr2813360eec.6.1773669745095; Mon, 16 Mar 2026
- 07:02:25 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1773669943; x=1774274743;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KPjHmgruixhmkQjw04sh9Mjy1u+NZy/GWXT+thsthOE=;
+        b=GZ/rgFEuArdUjEjBh3kfumj55lpGWocbwl6+meXpqGFFEswqcu2Bvh3eT8W9MElbeW
+         84+tjcd5F+RzlMnDbA1F1HvdsqTIcZNnVTl0JuRFubamSddyKjwEBThBfCQNsn25tVPB
+         LqY+9jftrDAZu85A62NguF4XWUxtkOM+jSn0u0p0QfBtieavhirbc1shSyrUeCXw1fXn
+         FUBqJDKGmsO8PxwV1svsXgAeSatON4gWvBJ1BeC/LEwt2uVYF/NwsiM2VyAnOgu2+6Xm
+         E5hLt4m7AKKvOJfETCT59B9zEzwb3+VrIcRHwKh6bu4iyGZR5SrAVrHRa04DlGtqjgw+
+         pUgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQHm7iY42UNoC2zTKm7cA8OXNM4A//CYe7wAmbn4ztLg378QVN2AwpXLMXXK4sDI/SnENrH+aZ4U4mJA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqzKfXu9c1Mnq8weVHdyPKc8pU2WShw0+QV4GZ7WYzW+lgls8o
+	Yb13eb81jd0nRQi/wjl6xbzDxO58pl5Q+gUndCHshrls6mPVGf9Fwc/5M6903u+NBr26N4l9je+
+	eZJOqLU8Gd6JAZYNiSw==
+X-Received: from wmqy12.prod.google.com ([2002:a05:600c:364c:b0:485:408f:802f])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:64ce:b0:485:3b34:2f62 with SMTP id 5b1f17b1804b1-485566d0c13mr212567075e9.14.1773669940884;
+ Mon, 16 Mar 2026 07:05:40 -0700 (PDT)
+Date: Mon, 16 Mar 2026 14:05:39 +0000
+In-Reply-To: <87cy13swpw.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
  <20260216-rnull-v6-19-rc5-send-v1-15-de9a7af4b469@kernel.org>
  <Y7WTRL6v0WsR-DWju2vumM1EBu4KZgQzE0VJul7mK3pUwD6ba0UuQO8sclDzOaeLGGh9u3WG5iSKq9T3kQqH-Q==@protonmail.internalid>
  <abfe2LbhLzXiGCkA@google.com> <87cy13swpw.fsf@t14s.mail-host-address-is-not-set>
-In-Reply-To: <87cy13swpw.fsf@t14s.mail-host-address-is-not-set>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 16 Mar 2026 15:02:12 +0100
-X-Gm-Features: AaiRm52qARL449c2NWg6ctU1DYpJKWGFTyzYGuap71EBsFi63NYUf31noEiyOu8
-Message-ID: <CANiq72n5+JadJUW-GO0cwQrq9eJW7cB3ZK7zx4J484RzjxmYEA@mail.gmail.com>
+Message-ID: <abgOM3k4hmDCSkon@google.com>
 Subject: Re: [PATCH 15/79] block: rnull: add `use_per_node_hctx` config option
+From: Alice Ryhl <aliceryhl@google.com>
 To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Alice Ryhl <aliceryhl@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz <jstultz@google.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org
+Content-Type: text/plain; charset="utf-8"
 
-On Mon, Mar 16, 2026 at 2:58=E2=80=AFPM Andreas Hindborg <a.hindborg@kernel=
-.org> wrote:
->
+On Mon, Mar 16, 2026 at 02:57:47PM +0100, Andreas Hindborg wrote:
+> "Alice Ryhl" <aliceryhl@google.com> writes:
+> 
+> > On Mon, Feb 16, 2026 at 12:35:02AM +0100, Andreas Hindborg wrote:
+> >> Add a configfs attribute to enable per-NUMA-node hardware contexts.
+> >> When enabled, the driver creates one hardware queue per NUMA node
+> >> instead of the default configuration.
+> >>
+> >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> >
+> > This and other patches make me think that module parameters should have
+> > value() return a copy of the value (and require Copy). For non-copy
+> > types, there can be a separate value_ref() method. You would avoid *so*
+> > many asterisks by doing that.
+> 
+> Makes sense, I'll send a patch.
+
+Nice!
+
+> >> +        use_per_node_hctx: u8 {
+> >> +            default: 0,
+> >> +            description:
+> >> +        "Use per-node allocation for hardware context queues, 0-false, 1-true. Default: 0-false",
+> >> +        },
+> >
+> > formatting (rustfmt ignores macros)
+> 
 > This is intentional. The line gets too long if I pull it up, and I don't
+> think I can break the string in any way. I think it would require
+> changes to the module parameter macro.
 
-Do you mean you don't want to go over the limit or, otherwise, that
-something else complains?
+Just keep the wrong line. Checkpatch will complain, but it's standard to
+ignore that checkpatch warning in C code for long strings to keep them
+greppable, so I think it's fine here too.
 
-i.e. the limit is not a hard requirement -- exceptions can be made
-where reasonable (as long as `rustfmt` is clean), and moving the line
-to an odd position doesn't sound worth it.
-
-Cheers,
-Miguel
+Alice
