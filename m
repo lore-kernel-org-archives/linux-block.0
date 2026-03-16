@@ -1,61 +1,56 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE933ED127
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 20:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401F52512C8
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 20:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773691775; cv=none; b=CIKqK747t+A/+Gf7u2b+jSvzRlZkhAyRzcZGzM/vUX8rZfsGj/vWr66F1lj3DyQZ0TxRNZG33QFKF7GyaocZ2hTztoxKzvuRzzjWWkw+24AIySa47HJOJsLFtzrDMKTpcRAK4BYuYWcJ/IZT8WAP2GZYRC8hyxsFQlivSKNRpGg=
+	t=1773691784; cv=none; b=gnLP+Xrrd828VQQdp571CGTmhDRedOyAiqFjghHzWeotSqiKbKIhfhXiwVriztsAXXRHtktovuia6VTMZXL9DF9XzPmK8VuZiSuVnd0h0oPvVsVi0gg33R8MjxcuZU5O+5TsGok/Day34Es1obGCiwy86zmKitzJWca8tNZNsDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773691775; c=relaxed/simple;
-	bh=6mvBoj3B9nx4GqtAC4XdEkz4MZgOFwA9+bgYeplTNUo=;
+	s=arc-20240116; t=1773691784; c=relaxed/simple;
+	bh=k62Ck2/wQTdLbkAlHH629JDDW0nG2lSyj73GluBjn/g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c8pOl3noDJgXX72GSoy0QHmnBeIJ4qg6o2lloKN/EJgRil9HbWJ7eoTTZ8FzR8hGJsY5xdNI/qvFHSzuJ7gP/LUJLCY3GStaDkwNaPAbGgBJ488fp//3bYxJBJKGxpWG9MvHUmkyyioGSSw3g2AnlRVFRVi5Vpc4+jg2x8YtN5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=HQVBEUGF; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=KxylWwIe5ITQH3B+2ZfUHuSyrN1NdNh7+5daAnGEJNGLFJNbz6C3E1qSnvsxgNRxbPaPS6uHxXIArrn7PXK67bmO4N4cMxMcG3nuLiHtdJTQl6vgAgf+8+4dZetOTMl071U6CKcnSjyLIS2/VieKfFkNo2SAQ5bjt4uxr0HoZHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZGPBqIKO; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="HQVBEUGF"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZGPBqIKO"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fZR593xKkzlffvM;
-	Mon, 16 Mar 2026 20:09:33 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fZR5L6PNszlffvM;
+	Mon, 16 Mar 2026 20:09:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1773691767; x=1776283768; bh=f7uco
-	LGhvULKEeflgeJvGOLrdGggYqtY1tW+f5+pHSk=; b=HQVBEUGF4GSMDU9ygUFyz
-	nPWn3ZuRAtaGTdALA59GXmhdrjLQ0DN7QUYD9t6YEFA3ixOKoPxsPsKJBmCrMvEG
-	AElyggtDGa+lWU77hsJRJgnFWkHifNBTcCB/Ku1VDVrk3MWpU4b3SP6JR7Z4Ikc6
-	ij7DRjOkYZMj5xbIMp2k9RG/TQdO0c4EK4zlxT5cpAGT+Zo1BoPbXxgDnazk73Cg
-	nYJ6vdjgcYNY1M7HVpaQ6G9N+kXk2pO4lAueXq2/3PTJ+sTry2fzVml/yg9vySLc
-	TsfKEC0CWu/bydjYkZ57LDkYmDz+qKblUovCs5r4Hr3/h/4Ce5M/PtU59G/5ayom
-	w==
+	:received:received; s=mr01; t=1773691780; x=1776283781; bh=gO39K
+	3Ybq4VZStEdBwItbzluaXKon4hLekPV65PR9Yw=; b=ZGPBqIKOsoP9ZIIhDC3le
+	NpdBVuGDQhiCPaGgugROEx9rxc/nE9xnD2NiJ86oMkxiG8gipmHzokhITrrRqAGp
+	c+We38TltX2doVBPDmwXKkHP4SEFLZGqqRiZQ9jbq0NDVFlxyHw0XHWGhK0BaBcH
+	IhDqSTNR/9IqXzHWwSH9jZZPslemEKQsbnNzI3W2T5zJPbk7pFoolS72oUgq/57b
+	uO1LR8POvlOJZcMxdq9pTvAfWCdWGGbkGdejERH0MvNAVH3tpeJrxBCwPuw/NNyS
+	wVfCSyJHP3Y3Y9c1Wau28m4rgLT20AISYc20r8CigkW5TZh8JgmlZJ5G5RkArJMG
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 9jp2Xdd9ZCK8; Mon, 16 Mar 2026 20:09:27 +0000 (UTC)
+ id MKsMUn2YxL_r; Mon, 16 Mar 2026 20:09:40 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fZR4y16VlzlfgPq;
-	Mon, 16 Mar 2026 20:09:21 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fZR5F3QlVzlfgPq;
+	Mon, 16 Mar 2026 20:09:37 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@kernel.org>,
-	Kees Cook <kees@kernel.org>
-Subject: [PATCH v2] powerpc/powermac: Remove pmac_low_i2c_{lock,unlock}()
-Date: Mon, 16 Mar 2026 13:08:38 -0700
-Message-ID: <20260316200901.4111651-3-bvanassche@acm.org>
+	Justin Sanders <justin@coraid.com>
+Subject: [PATCH v2 03/12] aoe: Add a lock context annotation
+Date: Mon, 16 Mar 2026 13:08:40 -0700
+Message-ID: <20260316200901.4111651-5-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.851.ga537e3e6e9-goog
 In-Reply-To: <20260316200901.4111651-1-bvanassche@acm.org>
 References: <20260316200901.4111651-1-bvanassche@acm.org>
@@ -67,83 +62,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Commit a28d3af2a26c ("[PATCH] 2/5 powerpc: Rework PowerMac i2c part 2")
-removed the last calls to the pmac_low_i2c_{lock,unlock}() functions.
-Hence, remove these two functions.
+Prepare for enabling lock context analysis by adding __must_hold() where
+appropriate.
 
-Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
+ drivers/block/aoe/aoecmd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes compared to v1: corrected the description of the history of the r=
-emoved
-  functions and added Christophe's Reviewed-by tag.
-
- arch/powerpc/include/asm/pmac_low_i2c.h   |  4 ---
- arch/powerpc/platforms/powermac/low_i2c.c | 34 -----------------------
- 2 files changed, 38 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/pmac_low_i2c.h b/arch/powerpc/inclu=
-de/asm/pmac_low_i2c.h
-index 21bd7297c87f..fead8fae08ab 100644
---- a/arch/powerpc/include/asm/pmac_low_i2c.h
-+++ b/arch/powerpc/include/asm/pmac_low_i2c.h
-@@ -79,10 +79,6 @@ extern int pmac_i2c_match_adapter(struct device_node *=
-dev,
- 				  struct i2c_adapter *adapter);
-=20
-=20
--/* (legacy) Locking functions exposed to i2c-keywest */
--extern int pmac_low_i2c_lock(struct device_node *np);
--extern int pmac_low_i2c_unlock(struct device_node *np);
--
- /* Access functions for platform code */
- extern int pmac_i2c_open(struct pmac_i2c_bus *bus, int polled);
- extern void pmac_i2c_close(struct pmac_i2c_bus *bus);
-diff --git a/arch/powerpc/platforms/powermac/low_i2c.c b/arch/powerpc/pla=
-tforms/powermac/low_i2c.c
-index 73b7f4e8c047..da72a30ab865 100644
---- a/arch/powerpc/platforms/powermac/low_i2c.c
-+++ b/arch/powerpc/platforms/powermac/low_i2c.c
-@@ -1058,40 +1058,6 @@ int pmac_i2c_match_adapter(struct device_node *dev=
-, struct i2c_adapter *adapter)
- }
- EXPORT_SYMBOL_GPL(pmac_i2c_match_adapter);
-=20
--int pmac_low_i2c_lock(struct device_node *np)
--{
--	struct pmac_i2c_bus *bus, *found =3D NULL;
--
--	list_for_each_entry(bus, &pmac_i2c_busses, link) {
--		if (np =3D=3D bus->controller) {
--			found =3D bus;
--			break;
--		}
--	}
--	if (!found)
--		return -ENODEV;
--	return pmac_i2c_open(bus, 0);
--}
--EXPORT_SYMBOL_GPL(pmac_low_i2c_lock);
--
--int pmac_low_i2c_unlock(struct device_node *np)
--{
--	struct pmac_i2c_bus *bus, *found =3D NULL;
--
--	list_for_each_entry(bus, &pmac_i2c_busses, link) {
--		if (np =3D=3D bus->controller) {
--			found =3D bus;
--			break;
--		}
--	}
--	if (!found)
--		return -ENODEV;
--	pmac_i2c_close(bus);
--	return 0;
--}
--EXPORT_SYMBOL_GPL(pmac_low_i2c_unlock);
--
--
- int pmac_i2c_open(struct pmac_i2c_bus *bus, int polled)
+diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+index a4744a30a8af..54c57b9f8894 100644
+--- a/drivers/block/aoe/aoecmd.c
++++ b/drivers/block/aoe/aoecmd.c
+@@ -1193,6 +1193,7 @@ noskb:		if (buf)
+  */
+ static int
+ ktio(int id)
++	__must_hold(&iocq[id].lock)
  {
- 	int rc;
+ 	struct frame *f;
+ 	struct list_head *pos;
