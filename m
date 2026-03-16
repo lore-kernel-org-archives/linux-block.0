@@ -1,141 +1,265 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B525B265CC2
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 11:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D60390C87
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 11:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773661123; cv=none; b=l7d/N/rwy+W5Odt0tZtDMXz4tkJ0re/SJ6vUerKl630UEGiyNNIKVpLo3BShiMxPsIPVZ5IndBeFmcm3epo3zBMjxpITDwdU1dMnW68Y4K4vJfIpiUXQtNO11dFof1I4I68ELNlEDgdS7iDdAV+Rp1WpJ1zE9c3XsmFBBCfsaU4=
+	t=1773662131; cv=none; b=dURSEgb7nFbRlPOLtUNPDV5t4u+21tjX6xLMWxcpPtxLwiCmSd6QUj572E6mf8jONOni2ho/jsQyjzTXzjDLpDm4VcdGbTeAgYpJDnTHqm5U71msuxvGZzN/27cvOLfHgfioaw1hjyBenZADkowNvPw7F72MEeOlI9lf8qbd43w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773661123; c=relaxed/simple;
-	bh=gOMrOsyfFrwV0gR+CT3Byaic8SjUfj8ZTzmoI7LCgv0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RJklb2Kqg8EMfRVWqtUTmzDaHqownEb8mV/OVU7xuoTDp8ys65p5aPJt+XqDi+pygNTKxnr9e+FD0axgWamUp4qISVl7oLb8T4xubYj1w/JXEqnuYfR5i6a5ngLvypl0P0TcyrCwcDHjpLjnz7vAGF15OMgX1VRQnu1F4QjnjzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.170])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fZCkZ0yzfzYQvQQ
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 19:37:42 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id F11564056D
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 19:38:37 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with SMTP id cCh0CgD3+Ni767dpl1tvBA--.34742S3;
-	Mon, 16 Mar 2026 19:38:37 +0800 (CST)
-Message-ID: <fede463e-729e-47e8-8c1d-4680b2998fd3@huaweicloud.com>
-Date: Mon, 16 Mar 2026 19:38:35 +0800
+	s=arc-20240116; t=1773662131; c=relaxed/simple;
+	bh=yJP54nruYNhofJzmaTkgLS9aZcjVp3qA0UJSc13Kp24=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oeH9F8+QE98/LTLKe66qP1D0KYXrYRMHQNzdwr7tK/rLVpHzvAzFKKpXTujKfWeGe1+oeGWHgbOMSQ6wUsqqCsA8uZJJh+ttOURMjfLB9xUd/ppqRlZNOba3Gj7pRSucjAc0qn0HLnJb3eeuEg1eey/zWS6mmunOFHO7iy//gWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=emvdX+2u; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="emvdX+2u"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4852cf0318dso61668625e9.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 04:55:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773662128; x=1774266928; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ob9tzx0aj2zeHdgbk4mDLaOraCCBLId3s0T7A6CDOE4=;
+        b=emvdX+2uOEc2kmkIU3/yOp+rMddbQBN4NUPqAuaRCk9nlex1NleCVWZGJRH9Ylyklc
+         NBKbVorgi6zLDMiUompJ9boEdUqatngT0YFZhlPZudr5zNnDK4RbPCPZDBlV3URs4w/+
+         Ym9TeutAvnulKb8IfuuQdad5UMKa84ch2jMbWnmPtKE51WnMMM/2BZhW3e9zB+7oRBxW
+         35ty3XgMbQ2v2JE7o18Y5A90A4nZic4D0QgsfZ/nORoObhWv9JV1JlXf+nyhMtsD36Cs
+         qBXUFXLZH7BaH0f3pKF3UfBeV87a6UxyU4C3lLnPE9QjfJhtImkdfzwYz1SOQdw5Tl+Q
+         x5jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773662128; x=1774266928;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ob9tzx0aj2zeHdgbk4mDLaOraCCBLId3s0T7A6CDOE4=;
+        b=frvRyd7/mH/heOcA3LvBqhnqWYv9rlvmrcF9Z3aLrIfXpCZVTFMLOpSId09GwKxmIO
+         PBy/HTYmzmdcB5bDA5yDswSwK2ZBGxX3eCnMsuc6WSC2mvOkbI+cVuezZ1zzK+wce8BH
+         9Hy7jpZXa5NhbHigrSX0++Z6ChYp1spFmf8++1qCNvFBYQQBJh5SJEl5jH+ZSmXuu/RW
+         77PXuatPp9Zp6ldCPAf5liXfpXeI3PSFWEniFHsy63N55uMwiMPrU1qAdRrnT7y3xN1q
+         E0n5jtSf0/b87r7nun6DuZhOhK9DAB0lvv/ydNgP5ItxyNUxat4vMRX4sddAdiSVzUo9
+         45EA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsUNjG9WJIdn/ArQVbYqpsSc726qVWiWgrBjohA/fL+wKRngqUa6AxjpUYcdFd46KVgw4cLnsMGcvu/w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUfX0HfL9ukIdTFwmUyN5opqHC4GxbqwgXsHdLVJhPpsE6QGAZ
+	1f5qHsCaatWnlXNqObQnlxUOyO8zdkd2+ZqceClro13gopcKHvVU625XcCIidbyvWTK26IKwZ1O
+	E29EazaAQnhfVHaU77A==
+X-Received: from wmbfc7.prod.google.com ([2002:a05:600c:5247:b0:485:3ddc:f27c])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3515:b0:47e:e57d:404 with SMTP id 5b1f17b1804b1-485567066a8mr212492925e9.16.1773662127851;
+ Mon, 16 Mar 2026 04:55:27 -0700 (PDT)
+Date: Mon, 16 Mar 2026 11:55:26 +0000
+In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-24-de9a7af4b469@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] blk-throttle: remove leftover carryover checks in
- tg_within_[bps/iops]_limit
-To: Zizhi Wo <wozizhi@huaweicloud.com>, axboe@kernel.dk, yukuai@fnnas.com,
- ming.lei@redhat.com, linux-block@vger.kernel.org
-Cc: yangerkun@huawei.com, chengzhihao1@huawei.com
-References: <20260316084455.3323966-1-wozizhi@huaweicloud.com>
- <20260316084455.3323966-2-wozizhi@huaweicloud.com>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <20260316084455.3323966-2-wozizhi@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3+Ni767dpl1tvBA--.34742S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxArW5GF4rJFWrKF1fuw43Awb_yoW5uF1fpr
-	4xGr1I9F4xXFn7KFnxAan8ZFWrJr47Ary5GrW3X348CFn8CFyqqr90grW5tay7Arn7uFWf
-	Z3ZYq3Z7Ar4qvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
-	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYCJmUUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Mime-Version: 1.0
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-24-de9a7af4b469@kernel.org>
+Message-ID: <abfvrh0ObKhtsR8I@google.com>
+Subject: Re: [PATCH 24/79] block: rust: add `BadBlocks` for bad block tracking
+From: Alice Ryhl <aliceryhl@google.com>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz <jstultz@google.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org
+Content-Type: text/plain; charset="utf-8"
 
-Hi,
-
-I need to correct myself — this change is actually problematic. Please 
-ignore this patch...
-
-[bytes/io]_disp is intentionally signed and can be negative to represent
-carryover. By changing io_allowed to unsigned int, the comparison
-tg->io_disp[rw] + 1 <= io_allowed becomes a signed/unsigned comparison. 
-When io_disp is negative, it will be implicitly converted to a large 
-unsigned value.
-
-
-在 2026/3/16 16:44, Zizhi Wo 写道:
-> From: Zizhi Wo <wozizhi@huawei.com>
+On Mon, Feb 16, 2026 at 12:35:11AM +0100, Andreas Hindborg wrote:
+> Add a safe Rust wrapper around the Linux kernel's badblocks infrastructure
+> to track and manage defective sectors on block devices. The BadBlocks type
+> provides methods to:
 > 
-> Commit bb8d5587bdc3 ("blk-throttle: fix wrong comparation while
-> 'carryover_ios/bytes' is negative") changed the type of "io_allowed" and
-> "bytes_allowed", and added "io_allowed > 0" and "bytes_allowed > 0" checks
-> to handle the case where carryover_ios/bytes could be negative.
+> - Mark sectors as bad or good (set_bad/set_good)
+> - Check if sector ranges contain bad blocks (check)
+> - Automatically handle memory management with PinnedDrop
 > 
-> Since commit 6cc477c36875 ("blk-throttle: carry over directly") removed
-> the "carryover" fields, the allowed values are now computed solely by
-> calculate_io_allowed() and calculate_bytes_allowed(), which always return
-> non-negative results. The extra checks are therefore no longer necessary.
+> The implementation includes comprehensive documentation with examples for
+> block device drivers that need to avoid known bad sectors to maintain
+> data integrity. Bad blocks information is used by device drivers,
+> filesystem layers, and device management tools.
 > 
-> Remove the now-unnecessary "> 0" checks and restore the types of
-> "io_allowed" and "bytes_allowed" to unsigned to match the return types of
-> the corresponding calculate functions.
-> 
-> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-> ---
->   block/blk-throttle.c | 11 ++++-------
->   1 file changed, 4 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 97188a795848..b82da0dfa8e8 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -760,7 +760,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
->   				 u32 iops_limit)
->   {
->   	bool rw = bio_data_dir(bio);
-> -	int io_allowed;
-> +	unsigned int io_allowed;
->   	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
->   
->   	jiffy_elapsed = jiffies - tg->slice_start[rw];
-> @@ -768,7 +768,7 @@ static unsigned long tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio
->   	/* Round up to the next throttle slice, wait time must be nonzero */
->   	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, DFL_THROTL_SLICE);
->   	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
-> -	if (io_allowed > 0 && tg->io_disp[rw] + 1 <= io_allowed)
-> +	if (tg->io_disp[rw] + 1 <= io_allowed)
->   		return 0;
->   
->   	/* Calc approx time to dispatch */
-> @@ -783,8 +783,7 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
->   				u64 bps_limit)
->   {
->   	bool rw = bio_data_dir(bio);
-> -	long long bytes_allowed;
-> -	u64 extra_bytes;
-> +	u64 bytes_allowed, extra_bytes;
->   	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
->   	unsigned int bio_size = throtl_bio_data_size(bio);
->   
-> @@ -796,9 +795,7 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
->   
->   	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, DFL_THROTL_SLICE);
->   	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
-> -	/* Need to consider the case of bytes_allowed overflow. */
-> -	if ((bytes_allowed > 0 && tg->bytes_disp[rw] + bio_size <= bytes_allowed)
-> -	    || bytes_allowed < 0)
-> +	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed)
->   		return 0;
->   
->   	/* Calc approx time to dispatch */
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
+> diff --git a/rust/kernel/block/badblocks.rs b/rust/kernel/block/badblocks.rs
+> new file mode 100644
+> index 0000000000000..a5fe0fde2e755
+> --- /dev/null
+> +++ b/rust/kernel/block/badblocks.rs
+> @@ -0,0 +1,721 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +//! Bad blocks tracking for block devices.
+> +//!
+> +//! This module provides a safe Rust wrapper around the badblocks
+> +//! infrastructure, which is used to track and manage bad sectors on block
+> +//! devices. Bad blocks are sectors that cannot reliably store data and should
+> +//! be avoided during I/O operations.
+
+Could use a srctree link to badblocks.h here.
+
+> +/// # Examples
+> +///
+> +/// Basic usage:
+> +///
+> +/// ```rust
+> +/// # use kernel::block::badblocks::{BadBlocks, BlockStatus};
+> +/// # use kernel::prelude::*;
+> +///
+
+Unhide the imports or remove this empty line.
+
+> +/// // Create a new bad blocks tracker
+> +/// let bad_blocks = KBox::pin_init(BadBlocks::new(true), GFP_KERNEL)?;
+> +///
+> +/// // Mark sectors 100-109 as bad (unacknowledged)
+> +/// bad_blocks.set_bad(100..110, false)?;
+> +///
+> +/// // Check if sector range 95-104 contains bad blocks
+> +/// match bad_blocks.check(95..105) {
+> +///     BlockStatus::None => pr_info!("No bad blocks found"),
+> +///     BlockStatus::Acknowledged(range) => pr_warn!("Acknowledged bad blocks: {:?}", range),
+> +///     BlockStatus::Unacknowledged(range) => pr_err!("Unacknowledged bad blocks: {:?}", range),
+> +/// }
+> +/// # Ok::<(), kernel::error::Error>(())
+> +/// ```
+> +/// # Invariants
+> +///
+> +/// - `self.blocks` is a valid `bindings::badblocks` struct.
+> +#[pin_data(PinnedDrop)]
+> +pub struct BadBlocks {
+> +    #[pin]
+> +    blocks: Opaque<bindings::badblocks>,
+> +}
+> +
+> +impl BadBlocks {
+> +    /// Creates a new bad blocks tracker.
+> +    ///
+> +    /// Initializes an empty bad blocks tracker that can manage defective sectors
+> +    /// on a block device. The tracker starts with no bad blocks recorded and
+> +    /// allocates a single page for storing bad block entries.
+> +    ///
+> +    /// # Returns
+> +    ///
+> +    /// Returns a [`PinInit`] that can be used to initialize a [`BadBlocks`] instance.
+> +    /// Initialization may fail with `ENOMEM` if memory allocation fails.
+> +    ///
+> +    /// # Examples
+> +    ///
+> +    /// ```rust
+> +    /// # use kernel::block::badblocks::{BadBlocks, BlockStatus};
+> +    /// # use kernel::prelude::*;
+> +    ///
+
+Ditto. (Many times throughout file.)
+
+> +    /// // Create and initialize a bad blocks tracker
+> +    /// let bad_blocks = KBox::pin_init(BadBlocks::new(true), GFP_KERNEL)?;
+> +    ///
+> +    /// // The tracker is ready to use with no bad blocks initially
+> +    /// match bad_blocks.check(0..100) {
+> +    ///     BlockStatus::None => pr_info!("No bad blocks found initially"),
+> +    ///     _ => unreachable!(),
+> +    /// }
+> +    /// # Ok::<(), kernel::error::Error>(())
+> +    /// ```
+> +    pub fn new(enable: bool) -> impl PinInit<Self, Error> {
+> +        // INVARIANT: We initialize `self.blocks` below. If initialization fails, an error is
+> +        // returned.
+> +        try_pin_init!(Self {
+> +            blocks <- Opaque::try_ffi_init(|slot| {
+> +                // SAFETY: `slot` is a valid pointer to uninitialized memory
+> +                // allocated by the Opaque type. `badblocks_init` is safe to
+> +                // call with uninitialized memory.
+> +                to_result(unsafe {bindings::badblocks_init(slot, if enable {1} else {0})})
+
+I think you can just cast the boolean to an integer.
+
+Also, formatting here is off (but ignored by rustfmt due to macro.)
+
+> +    /// Enables the bad blocks tracker if it was previously disabled.
+> +    ///
+> +    /// Attempts to enable bad block tracking by transitioning the tracker from
+> +    /// a disabled state to an enabled state.
+> +    ///
+> +    /// # Behavior
+> +    ///
+> +    /// - If the tracker is disabled, it will be enabled.
+> +    /// - If the tracker is already enabled, this operation has no effect.
+> +    /// - The operation is atomic and thread-safe.
+> +    ///
+> +    /// # Usage
+> +    ///
+> +    /// Bad blocks trackers can be created in a disabled state and enabled later
+> +    /// when needed. This is useful for conditional bad block tracking or for
+> +    /// deferring activation until the device is fully initialized.
+> +    ///
+> +    /// # Examples
+> +    ///
+> +    /// ```rust
+> +    /// # use kernel::block::badblocks::BadBlocks;
+> +    /// # use kernel::prelude::*;
+> +    ///
+> +    /// // Create a disabled bad blocks tracker
+> +    /// let bad_blocks = KBox::pin_init(BadBlocks::new(false), GFP_KERNEL)?;
+> +    /// assert!(!bad_blocks.enabled());
+> +    ///
+> +    /// // Enable it when needed
+> +    /// bad_blocks.enable();
+> +    /// assert!(bad_blocks.enabled());
+> +    ///
+> +    /// // Subsequent enable calls have no effect
+> +    /// bad_blocks.enable();
+> +    /// assert!(bad_blocks.enabled());
+> +    /// # Ok::<(), kernel::error::Error>(())
+> +    /// ```
+> +    pub fn enable(&self) {
+> +        let _ = self.shift_ref().cmpxchg(-1, 0, ordering::Relaxed);
+
+Is there not a C function you can call here? It would be simpler that
+way. Surely drivers don't do this directly.
+
+> +    }
+> +
+> +    /// Checks whether the bad blocks tracker is currently enabled.
+> +    ///
+> +    /// Returns `true` if bad block tracking is active, `false` if it is disabled.
+> +    /// When disabled, the tracker will not perform bad block checks or operations.
+> +    ///
+> +    /// # Returns
+> +    ///
+> +    /// - `true` - Bad block tracking is enabled and operational
+> +    /// - `false` - Bad block tracking is disabled
+
+You explain the meaning of return values twice here. Just drop the
+'Returns' section.
+
+> +    /// # Thread Safety
+> +    ///
+> +    /// This method is thread-safe and uses atomic operations to check the
+> +    /// tracker's state without requiring external synchronization.
+
+This is implicit from the signature of the function.
+
+> +    pub fn set_good(&self, range: impl RangeBounds<u64>) -> Result {
+> +        let range = Self::range(range);
+> +        // SAFETY: By type invariant `self.blocks` is valid. The C function
+> +        // `badblocks_clear` handles synchronization internally.
+> +        unsafe {
+> +            bindings::badblocks_clear(self.blocks.get(), range.start, range.end - range.start)
+> +        }
+> +        .then_some(())
+> +        .ok_or(EINVAL)
+
+then_some() is quite obscure. I would recommend if/else here.
+
+Alice
