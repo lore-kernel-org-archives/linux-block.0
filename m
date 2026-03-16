@@ -1,115 +1,197 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F1539F188
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 14:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773669946; cv=none; b=IKdJR22xDEh9JzAtcYCDUGet8rGqj5drirZYHWMUcRqCp+uBwr7+yI1v7PsjpgM4iD9rRp/WcjqDYEQ2J9pbRxOckS6TM7VlT0iwC9rCebPNA+563ZfLtMTPp7RafQ2HdZAvPhQ9muFXpJ36TDUDWqEGKFEAxa6LE/4TFSMmEQg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773669946; c=relaxed/simple;
-	bh=S+D8dSLW8oWKsKSTJ1PKigEnOCf3XPfVYvzqfqISQaU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MyeMB0jOgnH1D1dixwXP1fxmu0rctQw3TYQru53iyvbIkiLpDk8ZP5wfAFV5rf8/kPBxq61werqhv2h5bkjr/OZCX1YogUt6zR8mYq3EHCnE8jp21kn+E8GIsgooBlb6ObvJq7F84jYv9b9705j/BHJLWuFL2i+yT6ou4S+sNtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZvqBxHQu; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A276C39C639
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 15:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773673342; cv=pass; b=lFf/vbwKAbSZHNdFg4aXoCBBjsJ4FHLhn8nv/MwlNN42sxKfdFHOih4NePAbJykyVDlkEKsKqrbmNYLPX2k+4LCUS8n2izrLblgd8+gQ6LXlxJEkvMT7QTYxhbU+nXZE5wfqFIWVkLo/GM1MOPiGgPHbylr3sO1SMlQ8DDFQZwo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773673342; c=relaxed/simple;
+	bh=aB1BhmwfaYDhk9Ng1L6dfOkJ4tW5IumC6VwMJNkiH0g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m2+2AB/n/yjNBTIric+gom0X7ri3VBx4g9QXsWF34TS3y62BL6W0ptCfsHlGWOudrKXLLxt+tXPZlgimtI9anSJ1VmxU+9T8m2NYL4yVXVSmOOyOq0IvV9rD/AxnQZiDId36cNXoa4pFyyv2JX0FnAGpBALtkVgedbAQYOOSoPQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rrpER0b3; arc=pass smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZvqBxHQu"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-48535f4d5e1so45380745e9.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 07:05:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rrpER0b3"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-38a3990e87fso31420411fa.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 08:02:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773673335; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a6ZEnSn/bOujpQxVrXoYctQ5AHoNPxZsouqkOZbvwN8fPWBTAQhBCBw+FyL39phHHy
+         Swqn/Gv121FMVczJt+ps2rki2z51gI5qvd5ZKezJRM3e3M+wM4K25XPaEQXxXtIXIzbG
+         FOXtIUxQF57dtWXe6aK/Ji2sF1JnAxisirNnMQdanuH71ABJLV5Ei9gvrTNKL3m9ZF8Q
+         ac0yH/BWulWXqwGvluqH94LaMW3dsbHLujL8sGK3J6gYowOPeJfYE6NkI4ShHbB0UKYl
+         ZsC8mdCGShu0FLSQJcIFZll13RKg/U04niEGMinS/R8IkzVd+QvgXIZA0SmR2aHcy6RN
+         HkgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=fPpnDc3nJAqYDYdTF/V0tJtbqHodlka6bXcAXAw45mk=;
+        fh=IxbL6Ugw3/0rNO2IIcTZ4hBNP4NRxi+ZgMlElmxwVp4=;
+        b=GSGPj7A8xUNO9ahZGXnDM7hjBa166KZ65l40Bczoshjt0Fcj47VsK+igG7eVqUj08J
+         Gdwmr3qdzrB3JD/p9hc8HX0c78B2cTIKPyu8+SWipXIExq3AFC7KsQN3ueiM+yZRi8IY
+         vZncEQEVpLfzqJLrVoUqKBlFT3skX8ngVQZjaeE8VLea0nxbSf3SIGUA/V1+66pXYkAP
+         OiP9IliFGhR7YM25FuafoMtdKkuL+pasj46l9ENprh16c/c9e3LoE4Bdd2UNbNYLboop
+         058hEX1TR7OKWrfKsxh6bb1RG/Stfi5EsylX1we3aW4ib8og/2ygEToj55n+rJOg5AVR
+         r+UA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773669943; x=1774274743; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KPjHmgruixhmkQjw04sh9Mjy1u+NZy/GWXT+thsthOE=;
-        b=ZvqBxHQukFU93I/gPsZYLd5MR0bzK6ax2krIrR+3t6HKAfIRmI/LwMbnG/7K8ZuXOD
-         ZM86TCM46gxdbhKAvXAZbbjD0ZWHdsYJ1fYUF9dwxDS722GffSZC+ztJz/RY1TnL77b6
-         hXAPCTJvl/zInACwYmqiF5+dIf+uyiOEw+ZOFTSZCM8o4JvULCTxb6TpCTgacvF+pNT/
-         AnbFdzSNn8QeDSG39YkvGBK5E5bFmSFxvagEEGrkDP3zIzVFjmmQ08fmtBnZPFpx1F2G
-         MkUoMbGTNxy3fs5n5I9lD2NtiPfGMhNmFBY6CCQVKXSWuaCb1WClGmxojHeYlEVd/KUl
-         OSqw==
+        d=linaro.org; s=google; t=1773673335; x=1774278135; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fPpnDc3nJAqYDYdTF/V0tJtbqHodlka6bXcAXAw45mk=;
+        b=rrpER0b3oQsl6qd2wTfTEp8KCyKWgEh9CHFbHkgrXLBuvYmNT5Y2mxceUIujR/vcsD
+         +Bhng7syUXf0SiOomcKMZE763J18jXLbfTU64FUJIQxmEEUs+WtiA6tXvfIMF9scfvH3
+         ZKPxuxaHtsVgFGQprRYhFAYlC8Ttzo2unQA4yhQwv7yfK6xbl4F7KXul4Ergno712TLQ
+         dDWFHs784BFXDfdUDOip2Qb1tkXYz/nL+Ijrvd1W8q0+bthVUzVQoA9YWaRGjNMFIN4H
+         YZf4diIt+XMOMusyeDcqa0PmJdPk4LjOB+SFNMTqBX3kD+dLhP/fu5pSaybhlGKPFZ8N
+         SOFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773669943; x=1774274743;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KPjHmgruixhmkQjw04sh9Mjy1u+NZy/GWXT+thsthOE=;
-        b=GZ/rgFEuArdUjEjBh3kfumj55lpGWocbwl6+meXpqGFFEswqcu2Bvh3eT8W9MElbeW
-         84+tjcd5F+RzlMnDbA1F1HvdsqTIcZNnVTl0JuRFubamSddyKjwEBThBfCQNsn25tVPB
-         LqY+9jftrDAZu85A62NguF4XWUxtkOM+jSn0u0p0QfBtieavhirbc1shSyrUeCXw1fXn
-         FUBqJDKGmsO8PxwV1svsXgAeSatON4gWvBJ1BeC/LEwt2uVYF/NwsiM2VyAnOgu2+6Xm
-         E5hLt4m7AKKvOJfETCT59B9zEzwb3+VrIcRHwKh6bu4iyGZR5SrAVrHRa04DlGtqjgw+
-         pUgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWQHm7iY42UNoC2zTKm7cA8OXNM4A//CYe7wAmbn4ztLg378QVN2AwpXLMXXK4sDI/SnENrH+aZ4U4mJA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqzKfXu9c1Mnq8weVHdyPKc8pU2WShw0+QV4GZ7WYzW+lgls8o
-	Yb13eb81jd0nRQi/wjl6xbzDxO58pl5Q+gUndCHshrls6mPVGf9Fwc/5M6903u+NBr26N4l9je+
-	eZJOqLU8Gd6JAZYNiSw==
-X-Received: from wmqy12.prod.google.com ([2002:a05:600c:364c:b0:485:408f:802f])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:64ce:b0:485:3b34:2f62 with SMTP id 5b1f17b1804b1-485566d0c13mr212567075e9.14.1773669940884;
- Mon, 16 Mar 2026 07:05:40 -0700 (PDT)
-Date: Mon, 16 Mar 2026 14:05:39 +0000
-In-Reply-To: <87cy13swpw.fsf@t14s.mail-host-address-is-not-set>
+        d=1e100.net; s=20251104; t=1773673335; x=1774278135;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fPpnDc3nJAqYDYdTF/V0tJtbqHodlka6bXcAXAw45mk=;
+        b=clQjbssvrIIEQ1K9JMJj9dr1GPrEhYdrtjshrHqte5aCAJBrewmXRyMD8zl88wZW7r
+         Xf60sdnwszfbumIGBJLf8Wn035vNxL35b2vEIt54+9ww5FSzS1q9P/+gq6Oh8cV2/5bV
+         fHGP5CoeGCYdGyNRCUvpjxDjqKHKisJeZkew9zGmz6secBiNvY7ZjwGAhp4huVoCVuDg
+         JsG4M7iNb5o+/Y5WMIJsDnQftFXqynPVg6BO/veJwUbJ3TFMtWif4P825BQN9+f1qvZE
+         w22J/2gtTvo65MXK+t3wMZ560NVV5L8hZJH13ppsfq+xqnqzIatlzlkgUb2WNqhs7puY
+         3JAQ==
+X-Gm-Message-State: AOJu0YyYfx8TTPFCcL3NmoXtC7p05GDYM2rS4G9uzFNp1CSBGf/58wXN
+	OU0rFryzBMR61Vg/JiiGv7j7Ww9h9CZi4yyO2PvqZXl9DBc6r3cDHSpdCgfb9qLV4WT1Om6pIQW
+	VNrTnEER2i8awmzQnkPoinpWpaKHRokoqeFFnBR8t6A==
+X-Gm-Gg: ATEYQzwYbnfW5g2tMUp9TZQj8HJ8xXQMfEOzuvySAWXnzLF++8DPlVfaUltm4ATWhCl
+	RQvhdBFn0A0R7pno6z6Bw6Zh+k4xou9ZRvwS2Q8I0/vQeuAIfP8nmJY1WyfWH3xP6ntzc4X+Y+s
+	6MgoHq+rS3fQg8s0zRy/xv8rb/3Esqt3UjzfUGTBWU3ZZ89lLBURk9LK42VCvewYROBot8oyFa6
+	7DXFF7n43WmnijphPQ8qt6y6GID63FpANrrQK3lr70miFgdNA4XgjHZq56VGpETTp2n8/OIvtgj
+	oSw8XywY
+X-Received: by 2002:a05:651c:198d:b0:38a:6acb:eb1d with SMTP id
+ 38308e7fff4ca-38a896a74e6mr48932831fa.12.1773673335310; Mon, 16 Mar 2026
+ 08:02:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
- <20260216-rnull-v6-19-rc5-send-v1-15-de9a7af4b469@kernel.org>
- <Y7WTRL6v0WsR-DWju2vumM1EBu4KZgQzE0VJul7mK3pUwD6ba0UuQO8sclDzOaeLGGh9u3WG5iSKq9T3kQqH-Q==@protonmail.internalid>
- <abfe2LbhLzXiGCkA@google.com> <87cy13swpw.fsf@t14s.mail-host-address-is-not-set>
-Message-ID: <abgOM3k4hmDCSkon@google.com>
-Subject: Re: [PATCH 15/79] block: rnull: add `use_per_node_hctx` config option
-From: Alice Ryhl <aliceryhl@google.com>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
-	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz <jstultz@google.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20260310160408.3976760-1-b-liu@ti.com>
+In-Reply-To: <20260310160408.3976760-1-b-liu@ti.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Mon, 16 Mar 2026 16:01:38 +0100
+X-Gm-Features: AaiRm53DmLZQRz5smLYrt90KUkm2n5La6ui90ypON_Qi-KmDRDlQMD2Uiw4Wo1g
+Message-ID: <CAPDyKFrM92eAxCxU9E1eDNfXMdOC4JvAOXYgY=HcmFG2YfrQEg@mail.gmail.com>
+Subject: Re: [PATCH] mmc: block: use single block write in retry
+To: Bin Liu <b-liu@ti.com>
+Cc: linux-block@vger.kernel.org, linux-mmc@vger.kernel.org, axboe@kernel.dk
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 16, 2026 at 02:57:47PM +0100, Andreas Hindborg wrote:
-> "Alice Ryhl" <aliceryhl@google.com> writes:
-> 
-> > On Mon, Feb 16, 2026 at 12:35:02AM +0100, Andreas Hindborg wrote:
-> >> Add a configfs attribute to enable per-NUMA-node hardware contexts.
-> >> When enabled, the driver creates one hardware queue per NUMA node
-> >> instead of the default configuration.
-> >>
-> >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
-> >
-> > This and other patches make me think that module parameters should have
-> > value() return a copy of the value (and require Copy). For non-copy
-> > types, there can be a separate value_ref() method. You would avoid *so*
-> > many asterisks by doing that.
-> 
-> Makes sense, I'll send a patch.
+On Tue, 10 Mar 2026 at 17:04, Bin Liu <b-liu@ti.com> wrote:
+>
+> Due to errata i2493[0], multi-block write would still fail in retries.
+>
+> This patch reuses recovery_mode flag, and switches to single-block
+> write in retry when multi-block write fails. It covers both CQE and
+> non-CQE cases.
+>
+> [0] https://www.ti.com/lit/pdf/sprz582
 
-Nice!
+It's great that a link like the above can be provided, still it would
+be nice to explain a bit more about the problem in the commit message
+too. Can you please do that?
 
-> >> +        use_per_node_hctx: u8 {
-> >> +            default: 0,
-> >> +            description:
-> >> +        "Use per-node allocation for hardware context queues, 0-false, 1-true. Default: 0-false",
-> >> +        },
-> >
-> > formatting (rustfmt ignores macros)
-> 
-> This is intentional. The line gets too long if I pull it up, and I don't
-> think I can break the string in any way. I think it would require
-> changes to the module parameter macro.
+> Signed-off-by: Bin Liu <b-liu@ti.com>
+> ---
+>  block/blk-mq-debugfs.c   |  1 +
+>  drivers/mmc/core/block.c | 12 ++++++++++--
+>  include/linux/blk-mq.h   |  3 +++
+>  3 files changed, 14 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 28167c9baa55..5f97d07fa3c8 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -243,6 +243,7 @@ static const char *const rqf_name[] = {
+>         RQF_NAME(ZONE_WRITE_PLUGGING),
+>         RQF_NAME(TIMED_OUT),
+>         RQF_NAME(RESV),
+> +       RQF_NAME(XFER_SINGLE_BLK),
+>  };
+>  #undef RQF_NAME
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index 05ee76cb0a08..00016584d70d 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -1401,6 +1401,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+>                     rq_data_dir(req) == WRITE &&
+>                     (md->flags & MMC_BLK_REL_WR);
+>
+> +       if (req->rq_flags & RQF_XFER_SINGLE_BLK)
+> +               recovery_mode = 1;
+> +
 
-Just keep the wrong line. Checkpatch will complain, but it's standard to
-ignore that checkpatch warning in C code for long strings to keep them
-greppable, so I think it's fine here too.
+I don't get this, sorry.
 
-Alice
+Under what circumstances do we need to fall back to using "single
+block"? Or is this just for debugging?
+
+>         memset(brq, 0, sizeof(struct mmc_blk_request));
+>
+>         mmc_crypto_prepare_req(mqrq);
+> @@ -1540,10 +1543,13 @@ static void mmc_blk_cqe_complete_rq(struct mmc_queue *mq, struct request *req)
+>                 err = 0;
+>
+>         if (err) {
+> -               if (mqrq->retries++ < MMC_CQE_RETRIES)
+> +               if (mqrq->retries++ < MMC_CQE_RETRIES) {
+> +                       if (rq_data_dir(req) == WRITE)
+> +                               req->rq_flags |= RQF_XFER_SINGLE_BLK;
+>                         blk_mq_requeue_request(req, true);
+> -               else
+> +               } else {
+>                         blk_mq_end_request(req, BLK_STS_IOERR);
+> +               }
+>         } else if (mrq->data) {
+>                 if (blk_update_request(req, BLK_STS_OK, mrq->data->bytes_xfered))
+>                         blk_mq_requeue_request(req, true);
+> @@ -2085,6 +2091,8 @@ static void mmc_blk_mq_complete_rq(struct mmc_queue *mq, struct request *req)
+>         } else if (!blk_rq_bytes(req)) {
+>                 __blk_mq_end_request(req, BLK_STS_IOERR);
+>         } else if (mqrq->retries++ < MMC_MAX_RETRIES) {
+> +               if (rq_data_dir(req) == WRITE)
+> +                       req->rq_flags |= RQF_XFER_SINGLE_BLK;
+>                 blk_mq_requeue_request(req, true);
+>         } else {
+>                 if (mmc_card_removed(mq->card))
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 18a2388ba581..06b6e1c4fca3 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -64,6 +64,7 @@ enum rqf_flags {
+>         /* ->timeout has been called, don't expire again */
+>         __RQF_TIMED_OUT,
+>         __RQF_RESV,
+> +       __RQF_XFER_SINGLE_BLK,
+>         __RQF_BITS
+>  };
+>
+> @@ -85,6 +86,8 @@ enum rqf_flags {
+>                         ((__force req_flags_t)(1 << __RQF_ZONE_WRITE_PLUGGING))
+>  #define RQF_TIMED_OUT          ((__force req_flags_t)(1 << __RQF_TIMED_OUT))
+>  #define RQF_RESV               ((__force req_flags_t)(1 << __RQF_RESV))
+> +#define RQF_XFER_SINGLE_BLK    \
+> +                       ((__force req_flags_t)(1 << __RQF_XFER_SINGLE_BLK))
+>
+>  /* flags that prevent us from merging requests: */
+>  #define RQF_NOMERGE_FLAGS \
+> --
+> 2.34.1
+>
+
+Kind regards
+Uffe
