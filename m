@@ -1,64 +1,64 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A4D3542F8
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 09:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7905A374735
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 09:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773652467; cv=none; b=axlB0h/qWMlwenNAz+J0MnwT3f90xcUYrLkfnpEQZUWiMh7IuJBvgQ9Qg2yTPFq8KU3DtWVhaXVFyOXp4WlC6NtMyepVZMwOe4XXAsEev1LCA5TtOYbyQNMofCDy3yN/9K2OWka2vb5V2gXjQgJ5Vs/ktSiH4UF1RC442+sDgQA=
+	t=1773652709; cv=none; b=LFWcuw+1+Dba8aP3euijWsbPUJATVBdpoM5pxw6WMpnnDbCtU46IUZuaAjiXs0YtfKFJzkqjLplnOGq3dBYUTJsUVtN5VXbFeH9oTIhWRkhAJBFWrfJcIKEYd5LzLx/F4shkY8PP/U+F+wvXAH/Bd0l/tOdohZEZCbP0F7F+WzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773652467; c=relaxed/simple;
-	bh=ikmGGYWkAH56065Y2c/wbwl2+qwV/Q7HqVV+o1Es5HU=;
+	s=arc-20240116; t=1773652709; c=relaxed/simple;
+	bh=Y/i+Kp6k0H4GN3F29K5jC+Y2S/PowNU8GApKouEwjFs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OaPn+gXmuTpJ/H6IdGOGckqTDvZmO63x3P1rf7Od+0vU/4a7XybN8T4iD6Bv/5HJysAeu4iuaGwTVinu5wWZRmZycKrPIcJ5dFS676Rp8yEc52f/3Ti1/6fiFpG6zGojmdC46qfWOtjlaKqv7vg0/FCXguFZr2W3iIterjsUmI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ax4h8Nkh; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=LP9nzAlD8j8N4GtAXpb638pZYGfgOlofBz8blUkopyOqGOd8s07qdf4Wz4JHkISZikcSXOeWYD2OhQ3s6wwHEfk7VQfcdzxX5SMhMTPQcr5NbZTmR9flrX1IIcx1LEENn5q/1Dyw2gNo8eMHi9z+IcokeFwcEYhAzl+B8vU7y4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uNKmhvnU; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ax4h8Nkh"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4853b5b0fafso54301635e9.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 02:14:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uNKmhvnU"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48542d5aa9eso35697755e9.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 02:18:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773652464; x=1774257264; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773652707; x=1774257507; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k2x2io23Ni1twKL4u8xriZ4A7jtPDDRWW6RQ292OVzw=;
-        b=ax4h8Nkhn9l+oEazue0W/TDN2+26bzw7zrSDTyzmhIX/U8NabGrkxpBAFLqzhU013+
-         D4QfwdWYSsUMn/TflZKNNn7CowlXoIFAqHl8lP7j9HKPn+Bo0uDV/HIRd+RSPFmOBMHi
-         At7fixh0mvSsvzBzJY29iur3T8XT2fIMahh4hOBgVUfHdZqa5SpaA5DA7W0I1BNTdqwY
-         8iWwgH6d7vyFh8s77ARaurMOdeGpPGdySQOF2u+rrQq8IQ46LI6Od/9h9sC2Gfes/zx2
-         3q7EdCk607CFwRMnWf00t1u7dOlDxcHFoHV1rWeuR0d2LJMqTJRZwO8YNak2eMbGLgYB
-         FCew==
+        bh=uQL4a5h5hztheILgUGktpxEkb7l9DORW+uY33oC+48Y=;
+        b=uNKmhvnURPyD1GOvmtDDOFbIxFTmBE9jsDPe3o6YzoukCPei5x0VTuCBFEY4Ty1Wyv
+         pOtNaicB1I0yb1cZe9FDXtIyaQ0YcLBma4tcicPqh7O+/zmHgnPJHA160muxPxcs5k93
+         ky8GWFlZ4JDai1y0/8o7V26WdqSQjDU+3kAs0HZW1IK0xr8R6AKNZSfZ/lACWLjTF0TA
+         k7q/nfBqbgCOsYpSM7SzTi3nx2uq0EkP2p33tmXYDsBEhIjMNWxJnM+Lbhh+13GGqZB3
+         Cf+M+Qw0Q4NKmp5T8sTWRnSeaERwFb/nQxOInF5gLf/NoMVrlspTkcljJlM3EKjSqPIc
+         H3HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773652464; x=1774257264;
+        d=1e100.net; s=20251104; t=1773652707; x=1774257507;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k2x2io23Ni1twKL4u8xriZ4A7jtPDDRWW6RQ292OVzw=;
-        b=D34qDJ8xCAQTrykhGid8jAJB6T4+OajFstiXAVCApO+/i3tqWnCUi8hWnlxk+E0zcX
-         BFWpQog4jXrRFDULR9qqglr8N6gKWDMPzNn5rMJ9Zblx26eWn+6RxxEoRmoSWxIO4mC0
-         3URvh3mMmTPOqbNYtGAUbcdrsswQm1e5Hq37vjIZAyJAmcR0Ue0QDDGqeoa2AuzTF/X0
-         Q0VEpHFkURRKUBm1UMt/y4U3ZggUYadnl2I4uCIdx9HlB1v1zOwHlqMoGufqsYkE5z/f
-         u2fyB4s4IqZvI8SmZzf6F5KgmCZ70TG1PDsUQruyD/YIAY/VmxvHSdKrL8hRgcyC6ftT
-         W/Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCVOC5YB5NRu6Lh1k1XDiaGa1mStk4ljpW3QPNN+coikecTk9m4tYVCqRu82NSvJ80cjH628zesrlxHqrQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJtb+/rAAz/boEbv+EESN1fam5bTqZvCJ5FDzGwRwUZz7ckLjy
-	zd9zESJRCELywqZ5AhGqbvUuhu2r0WnS8t5wj9dTb5n+FyVUDzUQwGEQ67RIhQ7M9JbeajCIvFZ
-	4pXVzGgINC60Ke6lL7g==
-X-Received: from wmbip40.prod.google.com ([2002:a05:600c:a6a8:b0:483:7f25:eadd])
+        bh=uQL4a5h5hztheILgUGktpxEkb7l9DORW+uY33oC+48Y=;
+        b=ZkxTe+lS9HENaoNzBcCSK/3H/M8cVbij5kaVIkwDWkDnCI775gB/LZbo93aM7fmuSm
+         CYYuNwKYIe8/vnWGPQQgQSC99U9u8vXPy8sLcJs5wqYn8nAiqznMDtEMs1Y+b4h6acD9
+         7GoI6K8TZHpxrZQuWv6TnqttZREgao6cq/73P63KaI8ODmRTNsNC3h7HkWzbKcJRShK4
+         rKu83tg1IseAwDH1cls9GVX33Gdmh+h6TZg/X4GHUEZjypagUqfQZhjIw2Q9cZJuMMt3
+         F5XQlneDr8pKmpfa2dxf89hffoi0w26xeunGCfAfgiQTQmcmOLzMydwG09dcIw2DSrSM
+         6S/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUWI4uckXh7CsIBPWa91gqqpW/i1TOatRWa5CTlKn+ojxpwp2KpIQlzWrj4BRpSXCb5sQsg9j6B4J/eVA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCkhz5bW90HIzmu1mDCVAYdSRxdwSJiUVptebP0nMn16dh/scP
+	Zr+2JkkiR2A25+06m+CzIGF7jaxo7cfDHKzZIJE01msseqdz88z3BOfk111FD4DwRpxxhdOQNdK
+	90oz/u0VcLUvRbXNegQ==
+X-Received: from wmgi20.prod.google.com ([2002:a05:600c:2d94:b0:479:2d82:5535])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600d:644d:10b0:485:30d4:6b98 with SMTP id 5b1f17b1804b1-485566dd75amr146115915e9.15.1773652464242;
- Mon, 16 Mar 2026 02:14:24 -0700 (PDT)
-Date: Mon, 16 Mar 2026 09:14:20 +0000
-In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-1-de9a7af4b469@kernel.org>
+ 2002:a05:600c:3588:b0:485:5d25:81a9 with SMTP id 5b1f17b1804b1-4855d258656mr167384855e9.14.1773652706667;
+ Mon, 16 Mar 2026 02:18:26 -0700 (PDT)
+Date: Mon, 16 Mar 2026 09:18:25 +0000
+In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-2-de9a7af4b469@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-1-de9a7af4b469@kernel.org>
-Message-ID: <abfJ7MRwufOS2sxE@google.com>
-Subject: Re: [PATCH 01/79] block: rnull: adopt new formatting guidelines
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-2-de9a7af4b469@kernel.org>
+Message-ID: <abfK4eji5jKSeO_W@google.com>
+Subject: Re: [PATCH 02/79] block: rnull: add module parameters
 From: Alice Ryhl <aliceryhl@google.com>
 To: Andreas Hindborg <a.hindborg@kernel.org>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -74,11 +74,20 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>,
 	linux-mm@kvack.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, Feb 16, 2026 at 12:34:48AM +0100, Andreas Hindborg wrote:
-> Reformat `use` statements to have one item per line as required by the
-> updated Rust formatting guidelines. Apply a formatting workaround to
-> ensure `rustfmt` produces the expected output.
+On Mon, Feb 16, 2026 at 12:34:49AM +0100, Andreas Hindborg wrote:
+> Module parameter support for Rust modules was merged a few releases back.
+> Add module parameter support to the rnull driver.
 > 
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> This allows the user to control the driver either via configfs or module
+> parameters, just like the C counterpart.
+> 
+> Please note that the rust module parameters do not support boolean values.
+> Flags that should have been booleans are parsed as integers and compared to
+> zero.
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Since this is uapi, you probably should support booleans here. Otherwise
+it'd be breaking to change this to be a boolean later.
+
+Otherwise lgtm.
+
+Alice
