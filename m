@@ -1,129 +1,102 @@
-Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC22725A655;
-	Mon, 16 Mar 2026 07:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA70B23EA83
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 08:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773644653; cv=none; b=SAOFua3zZUkw1S9tlJoPNieTW9CGIWlocBfATXb6fOREocovPfjVhPfm4LX+b3wjpYXoHiCZQwqWWkwBH3+dn789pEd8AIzKb8EMCBi6xbIGvPLW5xpg/xLxu4PPU29jImiixqXoYQhOcegA42wsJcyIn1DLy1Hfuw0pHm2T+gk=
+	t=1773651327; cv=none; b=nbAcv1ZKSw0Ee0INHUcKS41wDmTJQG8LBH9PFS/S8L5rOEI1Ny8sz8hJFdWBy3ttIIm8jGE4g3mIGJ9efeZy/F5GPaNIMZ24lSUVnPtfnaNjCgocrJFXTEp0c+GDmB3fXSwq5E6vGbN9ETrfk/SEhN8sPPohK0Ujx2ttlcEBVN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773644653; c=relaxed/simple;
-	bh=Nk+SdV3EmwkPKY+kSJeGHIkhg1w689CrkeY+31Dn7JI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nJTpZVUTeOQ1U5N5ca7vTQ05rjatvOKvzCgDDasLO1WVckv26jKQ+thuTYzLqklCr9nYS5yTchmtRkN0S2SJ7RSygEltT+VZ6BN2i8idEz7vv1rHbfZ/GnqDuMv23PXazJ3KhcWtXSXCCPrtDu1Liq2P1JDMZHKL4Y5OcMRlC9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=FTx/HVqC; arc=none smtp.client-ip=52.26.1.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="FTx/HVqC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1773644652; x=1805180652;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wcaWTWB9jH4dvndQPVa+EJIrVfjs3M40llDrFeP1Fqw=;
-  b=FTx/HVqCcPDawZr+E/KyljyexIepaPKfb1pt3q7nZqlLwpCzGb9RxTBc
-   /aOxPT1AbGwTvGUbZy8cx1u/59fzDpoGpE6uSeOzKKEID0IYMaLPw2Rnj
-   D6WO5G+yKGC7dmFs624AeAvEVT133Zgn7oU5RvvUUeZ2G3w+9UX9OrbVH
-   CgsHzhcFzent/3/j3UYPTp4AEmtx1gFYytxQlB/s+ioZv9PtQJTqYGFV1
-   fpyfhjzQxMYHJp4nrOAsiUjCUpTWy1jKzlZtoac8ctwPTQNPKatXxW39H
-   SiTZ0jzMnABwwd54m6UqO2wx5gxulFbqYSNW4lIiCELq2MzposYpAkzJP
-   w==;
-X-CSE-ConnectionGUID: dajelrIlQxOBEqrcPkfHPQ==
-X-CSE-MsgGUID: UHzGCNTVQhqNDwv8djZADA==
-X-IronPort-AV: E=Sophos;i="6.23,123,1770595200"; 
-   d="scan'208";a="15105575"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2026 07:04:09 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:17362]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.226:2525] with esmtp (Farcaster)
- id 306cfb32-9b41-47db-ab42-3f47477815ac; Mon, 16 Mar 2026 07:04:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 306cfb32-9b41-47db-ab42-3f47477815ac
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 16 Mar 2026 07:04:09 +0000
-Received: from c889f3b07a0a.amazon.com (10.106.82.26) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 16 Mar 2026 07:04:07 +0000
-From: Yuto Ohnuki <ytohnuki@amazon.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: Yu Kuai <yukuai@fnnas.com>, Nilay Shroff <nilay@linux.ibm.com>, Ming Lei
-	<ming.lei@redhat.com>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Yuto Ohnuki <ytohnuki@amazon.com>,
-	<syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com>
-Subject: [PATCH v2] blk-wbt: remove WARN_ON_ONCE from wbt_init_enable_default()
-Date: Mon, 16 Mar 2026 07:03:59 +0000
-Message-ID: <20260316070358.65225-2-ytohnuki@amazon.com>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1773651327; c=relaxed/simple;
+	bh=KLoHVHOo4Q1dYGlCScIGe06D7/zZj9Ifi4eYJkxW1Ns=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BOZOrIkbouSLXSmIOCzAlgwbULK+nIcnI+06V83XZApPPC/ymz+1T/OT1B7A/CSfw4R8D53dpc3wvkPktxSvcjyAayKrmFLSeDAI5KKrPFKe5BAeYPy3uIF2BxLSm+l2vs0zEtBb42wIwz3Us+OA2sTadC37NM6R39Chc1vMHNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4fZ86p3WGqzKHMjj
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 16:54:58 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id DA52B40574
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 16:55:22 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.129])
+	by APP1 (Coremail) with SMTP id cCh0CgA3Otp6xbdpKYBhBA--.38497S6;
+	Mon, 16 Mar 2026 16:55:22 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	yukuai@fnnas.com,
+	ming.lei@redhat.com,
+	linux-block@vger.kernel.org
+Cc: yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	wozizhi@huaweicloud.com
+Subject: [PATCH 2/2] blk-throttle: fix timer scheduled on wrong service_queue in tg_flush_bios
+Date: Mon, 16 Mar 2026 16:44:55 +0800
+Message-Id: <20260316084455.3323966-3-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20260316084455.3323966-1-wozizhi@huaweicloud.com>
+References: <20260316084455.3323966-1-wozizhi@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D040UWA003.ant.amazon.com (10.13.139.6) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgA3Otp6xbdpKYBhBA--.38497S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7Xw4rCF13Zw18Ar1xuFyfZwb_yoW8Jr1fpF
+	W3J3W7CF4ktryYkF4Ygwn3WFWYva17XrWjvws8Ga13AFy7XFn7KryDCr1rZFW8Zan3ArWa
+	vFs5t3y5ZF1DG37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUma14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr1j6F4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1l
+	F7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r126r
+	1DMxAIw28IcxkI7VAKI48JMxAqzxv26xkF7I0En4kS14v26r126r1DMxC20s026xCaFVCj
+	c4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
+	CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1x
+	MIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
+	4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsG
+	vfC2KfnxnUUI43ZEXa7VUjOtxDUUUUU==
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-wbt_init_enable_default() uses WARN_ON_ONCE to check for failures from
-wbt_alloc() and wbt_init(). However, both are expected failure paths:
+From: Zizhi Wo <wozizhi@huawei.com>
 
-- wbt_alloc() can return NULL under memory pressure (-ENOMEM)
-- wbt_init() can fail with -EBUSY if wbt is already registered
+tg_flush_bios() calls tg_update_disptime() which inserts the tg into
+the parent_sq's pending_tree, but then schedules the pending timer on
+the tg's own sq. For leaf tg's with no children, the timer fires on an
+empty pending_tree and does nothing, leaving the bio stranded until the
+parent_sq's timer happens to fire naturally.
 
-syzbot triggers this by injecting memory allocation failures during MTD
-partition creation via ioctl(BLKPG), causing a spurious warning.
+This is masked in blk_throtl_cancel_bios() which walks all levels in
+post-order, but affects throtl_pd_offline() where a single leaf cgroup
+goes offline.
 
-wbt_init_enable_default() is a best-effort initialization called from
-blk_register_queue() with a void return type. Failure simply means the
-disk operates without writeback throttling, which is harmless.
+Fix by scheduling the timer on the parent_sq where the tg was actually
+enqueued.
 
-Replace WARN_ON_ONCE with plain if-checks, consistent with how
-wbt_set_lat() in the same file already handles these failures. Add a
-pr_warn() for the wbt_init() failure to retain diagnostic information
-without triggering a full stack trace.
-
-Reported-by: syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=71fcf20f7c1e5043d78c
-Fixes: 41afaeeda509 ("blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under q_usage_counter")
-Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
 ---
-Changes in v2:
-- Add pr_warn() for wbt_init() failure as suggested by Yu Kuai
-- Link to v1: https://lore.kernel.org/all/20260315143137.13547-2-ytohnuki@amazon.com/
----
- block/blk-wbt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/blk-throttle.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 33006edfccd4..dcc2438ca16d 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -782,10 +782,11 @@ void wbt_init_enable_default(struct gendisk *disk)
- 		return;
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index b82da0dfa8e8..93e9e0e352f0 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1646,7 +1646,7 @@ static void tg_flush_bios(struct throtl_grp *tg)
+ 	 */
+ 	tg_update_disptime(tg);
  
- 	rwb = wbt_alloc();
--	if (WARN_ON_ONCE(!rwb))
-+	if (!rwb)
- 		return;
+-	throtl_schedule_pending_timer(sq, jiffies + 1);
++	throtl_schedule_pending_timer(sq->parent_sq, jiffies + 1);
+ }
  
--	if (WARN_ON_ONCE(wbt_init(disk, rwb))) {
-+	if (wbt_init(disk, rwb)) {
-+		pr_warn("%s: failed to enable wbt\n", disk->disk_name);
- 		wbt_free(rwb);
- 		return;
- 	}
+ static void throtl_pd_offline(struct blkg_policy_data *pd)
 -- 
-2.50.1
-
-
-
-
-Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
-
-Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
-
-
+2.39.2
 
