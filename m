@@ -1,65 +1,64 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF3338F953
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 10:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07DB39021F
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 10:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773658477; cv=none; b=iSlVBYnS8UoJFrvPME6weRw7eEs5r3BUeqXWGzAu9ahMi+6afR1nE6o2N5zuJpLGRPCfQIKUg2R92rvc8IgihK71s7GepSAmV3+lKfkRL1/FqDgIS515b17l72WJfQC4YpOw3YBYXj/50ViR1uA5GNvlwZDuwGgC6yPL4zNCHU8=
+	t=1773658585; cv=none; b=lurFRwwLBkCzihU0sRBtY4TIYzOIIETU0Nt9nfCwmS8svwZY3abiJ6NcxHBaCZJpY8W8z/EwiWZx3azVoQWMVEzixZOA7rq/yKvO/ojilKkxOcloPjE0QeGFbHrSAhbwyFdPIJ+2/AHf0C4E+QcQmdwmYcTkDg8N7Z2oDM2OHcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773658477; c=relaxed/simple;
-	bh=ZSI57h88KBCxyATmpw8R75Wzmeb6Dt8kMCMihmwiOJ0=;
+	s=arc-20240116; t=1773658585; c=relaxed/simple;
+	bh=UsrG64AdOhup+wZBugoJxKc7YGItuood9RNG/AVe/pE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UJafqq86MbKleX+JP/jCsHgGgglXgJ3vUPgQ8hS53+xuRqGQRP9zDR05zq3qyaf+H7XyjXbZVD1g8i2l5nlXZbnBZUHFg3z+ab4Xnlhn9XVTQVNkdcR+gpkCMg7uenHsvFbXFxa1heSAaDSHCJl0NFRgLEgpu/0Isbl86pSdQnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UUm7EkC0; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=r4cVKP3s4hQ3G6XMPITPSWa0dFNT5S6nZYbelXiK8E54nUk8nj/dd86z8szOf/wc7nZ2/r6EsmjbV+wuvOtqtgtJhiTRJCwnNnceUtmjDD+10+MF5U2U5Z2TjJBlzouJSolCsfNKW7d7YSSbrgl/yHgufA31qhS0FW82mjGK1sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Et7Fx+F/; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UUm7EkC0"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-439c112b1a4so2853338f8f.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 03:54:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Et7Fx+F/"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4852cf0318dso61014295e9.3
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 03:56:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773658474; x=1774263274; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773658581; x=1774263381; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q/+9kuHNGmF6mJHiC+r6rqWEh7NXnQhAjyYAhKBwFD4=;
-        b=UUm7EkC0smY8AI6r0gFfAX3dmR+zfBU0h/70NgfUHYanSmk3KUYOiCNI60MYsgT5N1
-         OYKV9x9EqzxevWisNyZpzi6fMj6/0GaPtDE/roOK9xtAT0L28rMQSE+Co5GgoVdMIPLS
-         kLK4bMaeGTMtifXjF/4n/Z+PPNQhr2Utey5IlPuBrFSQvnggXDsablp3N2O/vnhyHr8H
-         ls8k/8fJn7S/qSr2ktBr7022G+X4oWlS4thYXxpftnjWrZOQYpast3yt/cKpH9nW4N2X
-         xJHXnNqLwvRLUNqJUJu5BgAhjyDU3NiHN7VeK1B0gEM173eb7ULNWbEX/Dt/SNR8S5r6
-         Bp9A==
+        bh=/z1SiqPCUjiS0l1gYfp55UVRcWnc3c5gpJsp5+gG+GQ=;
+        b=Et7Fx+F/K0livNgzpWkxm0lDeD3B0CP9OCpBTPmi4vlih/NCJD06O2mZe3+jKqJpT+
+         QMiz9z7+7JYrfjXxAofK1n7KgXDlORGSrKR7WlebrahTOsmVx21jMmmiaWr25YCsfAcp
+         uFxwv828mgm1zoE+AuJo5YkO18czJzpy7WIRptUnDFFXbGVuXem81QzN7mgBRwN9hlk0
+         4Q6AZ3suC20pw9X8DkFhDWk5G4XtUecwwZ2FqfwNd6TrgqhX9NISj7+7r9JQQCvxDIiK
+         RsYAV2dKFEkSoRBUDwI2pxD7aYO70yfLlOAZk6KU6bRRn2+czsTX0eGzb+oRTMICFWqe
+         t/WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773658474; x=1774263274;
+        d=1e100.net; s=20251104; t=1773658581; x=1774263381;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q/+9kuHNGmF6mJHiC+r6rqWEh7NXnQhAjyYAhKBwFD4=;
-        b=L0hfvw7ZduMSFOAHZuvgBrU0du+9oMCcDcd+oUz1sfixQHv9SXC2IoD9Ct1tRulTNg
-         8j7iylvLVK5CDJ2dClJgEmb/2WOXo9o2lkpH7MPWu1/bD1oldW/4NMvW8zznXtreWYOd
-         gumZy1zVHWpZ5K7n2d7iBVAkBM/f+a7KTSeDkHPcJZZ4NE5pjDpWx3PfDSzSfwNVG20T
-         9MOrsspG8TKzR7MVVBNnATq5KdixabW0+ylt8Aqgs+FEWr+lNy9nAHbjZqwOTyM4q9Dg
-         bbzfalbRCwXMcJXQU0KkmdSr6TZ7FIkJyCKsjQGwtYf38MJYsA+82GLGOdmTccoDFojp
-         j5DA==
-X-Forwarded-Encrypted: i=1; AJvYcCWqdFJia5e3NTTYt8zgl4Lp3QV1D8Oj+dKnRf38ZjHzEaaI2bKNoeS1CBgFplfO5wZCXh8tGldgq/Eabg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLI23y6l138DFrCjcuHpP36AUKx7tUmzNkMOn2WI/qSf9a+1be
-	hjV66jEfLq9NBCzCkZpHPwRPafbJ9uhuKmIbLQaNvfNNcPrKVc/K7Diodfa7Ij3FOoi5aoRm+DC
-	3ezihdzCQH3xtdTY4cA==
-X-Received: from wrbee14.prod.google.com ([2002:a05:6000:210e:b0:43a:397:db8a])
+        bh=/z1SiqPCUjiS0l1gYfp55UVRcWnc3c5gpJsp5+gG+GQ=;
+        b=s75f1ZZmjgx2cy7IFxfzKScVcd2ozyeGVYhFK9GVW/5oBPME51/ttJ6rD/sKNTRna3
+         PcwS7xmFcD/CbZrECMvzdnrVY4zUHbWyZAax31GWKpW9tvgW2OczDw2ZDWW+BZRWq30P
+         XEjPjMon82H6HyAw7hVl0ewkyBr2O4lsq5ya3ViS3dArVXSzNXY5hXIWstdhkWWPaQyb
+         3EntFiliKrIzHyxelwgG9yzRAAf0JynVeTbK4sMYKN7Q/z9Ci+RgFiAZI+u5OVaokuYM
+         Prf6SpmEIr7PHhudGcAcmge30IRhXb4pS3U4KWTxLixj9O0Z5bWMz7xadVFHW66n9KUF
+         51PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVwjFF/q7ju8vEbiuZvW8sZMA15s3yxhC1MrgQ2FeFkBRV9YTAqG+YBedRVrioon9uuZOpz3APvZZ31vg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy96ibHJG8eiaQ0kw4D0O8Qm4kLYbceMPfYqFOF1Fp9QzL+NrO4
+	PzAw/JxoawgzLRJMeiY8iD88dbLHVdnZFrJWPw+JxlIQeM+YiWho12dzAdHjXLoCMIKP62eIXiK
+	42I3d5deaecIiuWt/9g==
+X-Received: from wmbgx10.prod.google.com ([2002:a05:600c:858a:b0:483:a1ee:5eca])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:adf:fd4f:0:b0:43b:3bed:154b with SMTP id ffacd0b85a97d-43b3bed1827mr7373388f8f.40.1773658473980;
- Mon, 16 Mar 2026 03:54:33 -0700 (PDT)
-Date: Mon, 16 Mar 2026 10:54:32 +0000
-In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-22-de9a7af4b469@kernel.org>
+ 2002:a05:600c:3515:b0:47e:e57d:404 with SMTP id 5b1f17b1804b1-485567066a8mr208531255e9.16.1773658581102;
+ Mon, 16 Mar 2026 03:56:21 -0700 (PDT)
+Date: Mon, 16 Mar 2026 10:56:20 +0000
+In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-23-de9a7af4b469@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-22-de9a7af4b469@kernel.org>
-Message-ID: <abfhaH_aOBHijWGe@google.com>
-Subject: Re: [PATCH 22/79] block: rnull: add no_sched module parameter and
- configfs attribute
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-23-de9a7af4b469@kernel.org>
+Message-ID: <abfh1J8_4tOFkFaH@google.com>
+Subject: Re: [PATCH 23/79] block: rust: change sector type from usize to u64
 From: Alice Ryhl <aliceryhl@google.com>
 To: Andreas Hindborg <a.hindborg@kernel.org>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -75,46 +74,17 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>,
 	linux-mm@kvack.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, Feb 16, 2026 at 12:35:09AM +0100, Andreas Hindborg wrote:
-> Add support for disabling the default IO scheduler by adding:
-> - no_sched module parameter to control scheduler selection at device
->   creation.
-> - no_sched configfs attribute (ID 11) for runtime configuration.
-> - Use of NO_DEFAULT_SCHEDULER flag when no_sched is enabled.
+On Mon, Feb 16, 2026 at 12:35:10AM +0100, Andreas Hindborg wrote:
+> Change the `sector()` and `sectors()` methods in `Request` to return
+> `u64` and `u32` respectively instead of `usize`. This matches the
+> underlying kernel types.
 > 
-> This allows bypassing the default 'mq-deadline' scheduler and using 'none'
-> instead, which can improve performance for certain workloads. The flag
-> selection logic is updated to use compound assignment operators for better
-> readability.
+> Update rnull driver to handle the new sector types with appropriate
+> casting throughout the read, write, and discard operations.
 > 
 > Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
-> +#[vtable]
-> +impl configfs::AttributeOperations<11> for DeviceConfig {
-> +    type Data = DeviceConfig;
-> +
-> +    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-> +        let mut writer = kernel::str::Formatter::new(page);
-> +
-> +        if this.data.lock().no_sched {
-> +            writer.write_str("1\n")?;
-> +        } else {
-> +            writer.write_str("0\n")?;
-> +        }
-> +
-> +        Ok(writer.bytes_written())
-> +    }
-> +
-> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-> +        if this.data.lock().powered {
-> +            return Err(EBUSY);
-> +        }
-> +
-> +        this.data.lock().no_sched = kstrtobool_bytes(page)?;
-> +
-> +        Ok(())
-> +    }
-
-Not using your fancy macro. Also, TOCTOU.
+This has lots of unchecked casts from u64 to usize, which could overflow
+on 32-bit systems. Could use some CAST: comments or similar.
 
 Alice
