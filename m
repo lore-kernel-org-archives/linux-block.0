@@ -1,64 +1,64 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B0F38E130
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 10:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF66277035
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 10:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773658358; cv=none; b=O0kEzdLq0AoW6Ou+t6Lvpu1xmysYVrLwwlBPxuZqUtlHnzBc35pgwHiSVu2ocJheVfMvdTQj0Z03iouVw4q8OiZ3a/8hpVe2pdaudrnAYGQ5pXvSqEwhuH+Ov149/hJAq+22Xi5eL9S0aVx7E+ESnDf3Xm0sWyBpVGv1cujAr50=
+	t=1773658401; cv=none; b=OezHTSulyeUNfUOM6mIa+VPNGDT8CxRFbID5rlgoUN08o4HtieZKf2eeVd8qtcf2UK+S3lvZlbTdMUyKh6CBUeHWHW7IzaBjMiva/AOyeW5APqJsLyzT/1x25h3ABnoc+1N1RTwakheMZk93U3/ov5ryzcZ47wVIRAYCQ0e4Jqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773658358; c=relaxed/simple;
-	bh=L26jm5jX24iJ3KU18ihZvHPzNtD1XydWhsRzUBY1WTE=;
+	s=arc-20240116; t=1773658401; c=relaxed/simple;
+	bh=XXldl4Gmz0I6nXnDLC6BfRsmDRyiK+QCcDXuThk0Y0U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hqeOkGhDjv73+nU1+1GXzmzlSSW+K4+P+EhZD82z0z0P166ziSo9UdbudTWycdPsz9yDFAxwcSGDE6AVqiy2WIVZNqMomg+Tp9pEUVMpSp7D5OZ+XLFwbwP79jLUxpgdhtwc/YnXtGIm4v08KOn1P/8RoChWfYcRr8OWJlzyNDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n0mYfS2R; arc=none smtp.client-ip=209.85.218.74
+	 To:Cc:Content-Type; b=oMo77U8ydGhBBTLaD1uPlbUOLaNm2KjWAk9yN+L9ufFiL5mb1i7n1eaDq3gQ5kqKdPnyEoJhCr992VooxwEjDmyKMeuW2vOrr4/5NYweSToKyM9JCEzJjxF93+/p6L0ikdbwnKPNuHSir26Oz+iVsf0Q3HJuImfC1gN5J9yMeCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MV4wIkqR; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n0mYfS2R"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b9766fcff6fso329871766b.0
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 03:52:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MV4wIkqR"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4853553944fso46312135e9.0
+        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 03:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773658356; x=1774263156; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1773658398; x=1774263198; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2E+qOfGop+QubRQ5BjqIf2g5ptnhpPI53+IOJpnWpE=;
-        b=n0mYfS2RCtrEsy9SwWQwLvPwLry19aIbQS++V/6FquchFRX0DMV94ZzYDwM/+GeSAL
-         5tIvCHA9AL2Phab61tuF9GlYDbPlmBL53J4PrpUTSywBmY9sS6md7T8jx+RH0RfVjXtg
-         nUjgjzpuefqlEd5NYh8dOlQFFk61ShcoIp2Aq+c1zNjnVpHAoc5KwDJtD7D/p7L8xzH/
-         sRnq5tgAkZ2t1zXirJ1x17Di23CjcBr/rv2M6rhtvlURllmRReQJRp4etYIz6NgQddPY
-         1D2xtSRjYJt2GrCHn60iADvXonRCDAPFkSEqJVHbSHTYYuLGh4X6M9KKY7I8xKQw9sh8
-         lyyA==
+        bh=g33pdxtpEHFf1UDlvSO++aA1e6glAPf5ZJ+Ik3YLW6k=;
+        b=MV4wIkqRyu9jqbGSPDe2C4+WOK7Z662lly7t9XbIerpAKjRH8U09t3T4osDCicSd6Q
+         gjIpFYzzqgM09BfHVTDKJgJj+aoCIPj60JxWttkDvcaq4EplSh7ee3t+qhHR+KsWVgoC
+         pZrI++e4D2YNlO+iMSSEF1b+QSZeNaovp+UqmyHAcDRcKCofXmaTXo4kAvRLNvpOXoF7
+         BZeemGfwuuwly595h+KLW8fl+aQWTYpm3cP3zO9vH5U1FYPvtzJqidTzvhAbyvPSGTxv
+         5L+0RP4r01YpXVZgyRymWtPWF34YDmFTPWVL2bado5U1fqcDrYaykaeks9oEtEB3Dmrz
+         kEcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773658356; x=1774263156;
+        d=1e100.net; s=20251104; t=1773658398; x=1774263198;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2E+qOfGop+QubRQ5BjqIf2g5ptnhpPI53+IOJpnWpE=;
-        b=lxb5RIp1296Pg9+qxomZM+QNX25P6+r1+aiw8yXnt+nNDrAMXnbZQvBiTywstKMGzN
-         eV9rtZhOWQ0EHCzjuSyElSQW0MC2YtPwTirz6yNzaOjiU6/gEmtIZvdjykx/iF2ZxBG7
-         XSCOc0CBQz5GusoG5o1hWCNYDpKWX9okQMJRyRXt0pfOsDmHEVlDl1xvjXk5PkiCovj7
-         j/3z1/ovB1B5hm9eBT6c6aNBiiUdhhRn9o/brTGcpdEiY9SmNM6nsdQrg8YXDlx9UEgg
-         6b/O12NhLxbZybnJFpMCnlAQ15bhIW88F/ANGe7JJP2qS5usWtpJ/FqvBp9mACatYkYV
-         DquQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9vSm+aU/XwSMmQBEL1VHVhU7goJqXb272/ur/cINGmEm+pDXixZMIYadkhAF3h7k07Myk7ily57q73A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHhFQ7E80UJDi+1Q9TH7dCD5r34S9q0mGltdwnWebL1QCWHUL4
-	izqhyFPgz7ziychxLWXjkIL6xP1JDwFRbgA+SH4GRmv7M/4lNrj+Ir9BGnGgqVZB+3pirf7KWCL
-	5KFugovrPtwKhiqer7A==
-X-Received: from ejcuc33.prod.google.com ([2002:a17:907:c8a1:b0:b93:4f5f:7d88])
+        bh=g33pdxtpEHFf1UDlvSO++aA1e6glAPf5ZJ+Ik3YLW6k=;
+        b=hjLiRSEBKvE77mB0MYYCcm9G5+BFp3ts91CekcU5//+GqhjX1wiQl5wvt1Ktz5+ADc
+         Lvfk2A7uIWdI4KZmxFocsTMlIC5PpWYZB/+riciSUygpphHHOtok2qhF7Vuk+0rJVO3x
+         nxBfx4lUH3LbJm3/4iISajlPb5+SKzX3GkTTMsYD5sIYLC3xh6vXbQt2KMRBjMNCqqjb
+         CoVGvMaGTMpts/30GMKJO1I+1Z6nRcv/pL21IgyBTiN/AB6lgvxrETbos2+xHoA9X6VI
+         jpP43C7lloDzvlpXJ4h4EOt/NUkBKFxPDuSkK/WFujfiBxtG8tPmIE6WRorbfoABPAHI
+         nVRA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJixNn/ZxLQN5exeCWROEqdvy+URkwI9hXUi18b+cK/dYzGQMPrsF0uHMvAznZFYFunT5ncPF914j1ZA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl0wuEC+hU72yeI1KRczu02tPXYeIeZR6D6236R15iabZwAt0G
+	qDs40+nuIsnjSCZKGpVkVcbVLQAVKlq+ASrVSU6BaFMBonahEcyKMGfaBovN+rOv4eZrGNAzn2u
+	MQV/rkaxaLWajDc5Tuw==
+X-Received: from wmfu16.prod.google.com ([2002:a05:600c:1390:b0:485:2e9a:31b4])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:1c0a:b0:b97:a39d:ae3d with SMTP id a640c23a62f3a-b97a39dc4c4mr350209766b.44.1773658355573;
- Mon, 16 Mar 2026 03:52:35 -0700 (PDT)
-Date: Mon, 16 Mar 2026 10:52:34 +0000
-In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-20-de9a7af4b469@kernel.org>
+ 2002:a05:600c:4752:b0:485:38f1:5cec with SMTP id 5b1f17b1804b1-48555ac714fmr203380975e9.7.1773658398201;
+ Mon, 16 Mar 2026 03:53:18 -0700 (PDT)
+Date: Mon, 16 Mar 2026 10:53:17 +0000
+In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-21-de9a7af4b469@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-20-de9a7af4b469@kernel.org>
-Message-ID: <abfg8lN2L-kVVrOy@google.com>
-Subject: Re: [PATCH 20/79] block: rnull: add discard support
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org> <20260216-rnull-v6-19-rc5-send-v1-21-de9a7af4b469@kernel.org>
+Message-ID: <abfhHQmMmEErFYb6@google.com>
+Subject: Re: [PATCH 21/79] block: rust: add `NoDefaultScheduler` flag for `TagSet`
 From: Alice Ryhl <aliceryhl@google.com>
 To: Andreas Hindborg <a.hindborg@kernel.org>
 Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -74,29 +74,11 @@ Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>,
 	linux-mm@kvack.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, Feb 16, 2026 at 12:35:07AM +0100, Andreas Hindborg wrote:
-> +configfs_attribute!(DeviceConfig, 10,
-> +    show: |this, page| show_field(this.data.lock().discard, page),
-> +    store: |this, page| store_with_power_check(this, page, |this, page| {
-> +        if !this.data.lock().memory_backed {
-> +            return Err(EINVAL);
-> +        }
-> +        this.data.lock().discard = kstrtobool_bytes(page)?;
+On Mon, Feb 16, 2026 at 12:35:08AM +0100, Andreas Hindborg wrote:
+> Add a flag that maps to the BLK_MQ_F_NO_SCHED_BY_DEFAULT. This flag selects
+> the 'none' scheduler during queue registration in case of a single hwq or
+> shared hwqs instead of 'mq-deadline'.
+> 
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
-Similar to the race I mentioned earlier with store_with_power_check(),
-this is also a TOCTOU race.
-
-> +        discard: u8 {
-> +            default: 0,
-> +            description:
-> +            "Support discard operations (requires memory-backed null_blk device). Default: false",
-> +        },
-
-kstrtobool again here...
-
-> -type TreeNode = Owned<SafePage>;
-> +const _CHEKC_STATUS_WIDTH: () = build_assert!((PAGE_SIZE >> SECTOR_SHIFT) <= 64);
-
-Use static_assert! or assert! here.
-
-Alice
+Can be squashed into next patch.
