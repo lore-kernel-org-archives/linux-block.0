@@ -1,197 +1,298 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A276C39C639
-	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 15:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773673342; cv=pass; b=lFf/vbwKAbSZHNdFg4aXoCBBjsJ4FHLhn8nv/MwlNN42sxKfdFHOih4NePAbJykyVDlkEKsKqrbmNYLPX2k+4LCUS8n2izrLblgd8+gQ6LXlxJEkvMT7QTYxhbU+nXZE5wfqFIWVkLo/GM1MOPiGgPHbylr3sO1SMlQ8DDFQZwo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773673342; c=relaxed/simple;
-	bh=aB1BhmwfaYDhk9Ng1L6dfOkJ4tW5IumC6VwMJNkiH0g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m2+2AB/n/yjNBTIric+gom0X7ri3VBx4g9QXsWF34TS3y62BL6W0ptCfsHlGWOudrKXLLxt+tXPZlgimtI9anSJ1VmxU+9T8m2NYL4yVXVSmOOyOq0IvV9rD/AxnQZiDId36cNXoa4pFyyv2JX0FnAGpBALtkVgedbAQYOOSoPQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rrpER0b3; arc=pass smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE6C29D264
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 15:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773673367; cv=none; b=Hco+99so/9+epRIsDe3oWbTR+xQZEEMDd9axA4+YuuNYn1pxLNnbnEgoqB0meIuXYdksymHwFHl8FO0V1uK7frNtN0iIzrVAwFSgQR4Cyjh8znf+1kisjBO8fMlJFeOAJYhzVKGeJhDqUBNDxU6oboeE8ud2vO1QR6wJL/pU36s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773673367; c=relaxed/simple;
+	bh=/4EsLkzXzw32z2n0e9+8Cku8ZdPnNFS8ovsqAsmNRkc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qK5/iN2P8rR0G9nwGcJ6d8Si6NjsoLn+i38KF2TQLgq0ZO5nLm1RTLvOr11GX+D6bGTXByZc1ZcqmYrgtud9hclVxFok0Sox5t/NBITgZjq5zYMtUH0kTE6fHFPdnXO2If5EouwcmgP1KrhHLefUOkS4zMItBrLEa4GXXg9ZhYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=JYJcoa4t; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rrpER0b3"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-38a3990e87fso31420411fa.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 08:02:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773673335; cv=none;
-        d=google.com; s=arc-20240605;
-        b=a6ZEnSn/bOujpQxVrXoYctQ5AHoNPxZsouqkOZbvwN8fPWBTAQhBCBw+FyL39phHHy
-         Swqn/Gv121FMVczJt+ps2rki2z51gI5qvd5ZKezJRM3e3M+wM4K25XPaEQXxXtIXIzbG
-         FOXtIUxQF57dtWXe6aK/Ji2sF1JnAxisirNnMQdanuH71ABJLV5Ei9gvrTNKL3m9ZF8Q
-         ac0yH/BWulWXqwGvluqH94LaMW3dsbHLujL8sGK3J6gYowOPeJfYE6NkI4ShHbB0UKYl
-         ZsC8mdCGShu0FLSQJcIFZll13RKg/U04niEGMinS/R8IkzVd+QvgXIZA0SmR2aHcy6RN
-         HkgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=fPpnDc3nJAqYDYdTF/V0tJtbqHodlka6bXcAXAw45mk=;
-        fh=IxbL6Ugw3/0rNO2IIcTZ4hBNP4NRxi+ZgMlElmxwVp4=;
-        b=GSGPj7A8xUNO9ahZGXnDM7hjBa166KZ65l40Bczoshjt0Fcj47VsK+igG7eVqUj08J
-         Gdwmr3qdzrB3JD/p9hc8HX0c78B2cTIKPyu8+SWipXIExq3AFC7KsQN3ueiM+yZRi8IY
-         vZncEQEVpLfzqJLrVoUqKBlFT3skX8ngVQZjaeE8VLea0nxbSf3SIGUA/V1+66pXYkAP
-         OiP9IliFGhR7YM25FuafoMtdKkuL+pasj46l9ENprh16c/c9e3LoE4Bdd2UNbNYLboop
-         058hEX1TR7OKWrfKsxh6bb1RG/Stfi5EsylX1we3aW4ib8og/2ygEToj55n+rJOg5AVR
-         r+UA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1773673335; x=1774278135; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fPpnDc3nJAqYDYdTF/V0tJtbqHodlka6bXcAXAw45mk=;
-        b=rrpER0b3oQsl6qd2wTfTEp8KCyKWgEh9CHFbHkgrXLBuvYmNT5Y2mxceUIujR/vcsD
-         +Bhng7syUXf0SiOomcKMZE763J18jXLbfTU64FUJIQxmEEUs+WtiA6tXvfIMF9scfvH3
-         ZKPxuxaHtsVgFGQprRYhFAYlC8Ttzo2unQA4yhQwv7yfK6xbl4F7KXul4Ergno712TLQ
-         dDWFHs784BFXDfdUDOip2Qb1tkXYz/nL+Ijrvd1W8q0+bthVUzVQoA9YWaRGjNMFIN4H
-         YZf4diIt+XMOMusyeDcqa0PmJdPk4LjOB+SFNMTqBX3kD+dLhP/fu5pSaybhlGKPFZ8N
-         SOFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773673335; x=1774278135;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fPpnDc3nJAqYDYdTF/V0tJtbqHodlka6bXcAXAw45mk=;
-        b=clQjbssvrIIEQ1K9JMJj9dr1GPrEhYdrtjshrHqte5aCAJBrewmXRyMD8zl88wZW7r
-         Xf60sdnwszfbumIGBJLf8Wn035vNxL35b2vEIt54+9ww5FSzS1q9P/+gq6Oh8cV2/5bV
-         fHGP5CoeGCYdGyNRCUvpjxDjqKHKisJeZkew9zGmz6secBiNvY7ZjwGAhp4huVoCVuDg
-         JsG4M7iNb5o+/Y5WMIJsDnQftFXqynPVg6BO/veJwUbJ3TFMtWif4P825BQN9+f1qvZE
-         w22J/2gtTvo65MXK+t3wMZ560NVV5L8hZJH13ppsfq+xqnqzIatlzlkgUb2WNqhs7puY
-         3JAQ==
-X-Gm-Message-State: AOJu0YyYfx8TTPFCcL3NmoXtC7p05GDYM2rS4G9uzFNp1CSBGf/58wXN
-	OU0rFryzBMR61Vg/JiiGv7j7Ww9h9CZi4yyO2PvqZXl9DBc6r3cDHSpdCgfb9qLV4WT1Om6pIQW
-	VNrTnEER2i8awmzQnkPoinpWpaKHRokoqeFFnBR8t6A==
-X-Gm-Gg: ATEYQzwYbnfW5g2tMUp9TZQj8HJ8xXQMfEOzuvySAWXnzLF++8DPlVfaUltm4ATWhCl
-	RQvhdBFn0A0R7pno6z6Bw6Zh+k4xou9ZRvwS2Q8I0/vQeuAIfP8nmJY1WyfWH3xP6ntzc4X+Y+s
-	6MgoHq+rS3fQg8s0zRy/xv8rb/3Esqt3UjzfUGTBWU3ZZ89lLBURk9LK42VCvewYROBot8oyFa6
-	7DXFF7n43WmnijphPQ8qt6y6GID63FpANrrQK3lr70miFgdNA4XgjHZq56VGpETTp2n8/OIvtgj
-	oSw8XywY
-X-Received: by 2002:a05:651c:198d:b0:38a:6acb:eb1d with SMTP id
- 38308e7fff4ca-38a896a74e6mr48932831fa.12.1773673335310; Mon, 16 Mar 2026
- 08:02:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="JYJcoa4t"
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62G8aqal010308
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 08:02:43 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=u7xOyKKSZf5YKpznst
+	wYHYtqKASayigx8bYJzVCvj24=; b=JYJcoa4tjVUBHxhL68lCD2XAzxnDBwrPOv
+	VtM6t+y31MIiJYs+7Ed1mzSyG9sEg23uvY22TLEHdq8M+H/8XzoAHwJZ86hEaACi
+	SmxU19+PT+IC7i6Xo8L3T70lNsVrsP+b9Dr32SEBCqCPSj79DcleI8l4MNRn0BPx
+	2rxshQ2x6lMebJ6CfRi4CnLPH/J0SNIjOoKRQN1Ft0szZMypDicsXc6HwJ2Todvi
+	C+Lux+vghVkY6AIoU7/BGc//GMJrEhmUDozeg9LdS6MI2ro6VyGO6Lz00vPjeV/r
+	jgwVlT04w436R2aC5ePwp5JHVLlWro322ntZ2iXEwjq0QvcVU4xQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4cxegembun-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 16 Mar 2026 08:02:43 -0700 (PDT)
+Received: from twshared111727.16.frc2.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Mon, 16 Mar 2026 15:02:41 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 86D6ABA09B2A; Mon, 16 Mar 2026 08:02:30 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <dm-devel@lists.linux.dev>
+CC: <linux-block@vger.kernel.org>, <snitzer@kernel.org>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [RESEND PATCHv3 1/2] dm-crypt: allow unaligned bio_vecs for direct io
+Date: Mon, 16 Mar 2026 08:02:29 -0700
+Message-ID: <20260316150229.1771884-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260310160408.3976760-1-b-liu@ti.com>
-In-Reply-To: <20260310160408.3976760-1-b-liu@ti.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Mon, 16 Mar 2026 16:01:38 +0100
-X-Gm-Features: AaiRm53DmLZQRz5smLYrt90KUkm2n5La6ui90ypON_Qi-KmDRDlQMD2Uiw4Wo1g
-Message-ID: <CAPDyKFrM92eAxCxU9E1eDNfXMdOC4JvAOXYgY=HcmFG2YfrQEg@mail.gmail.com>
-Subject: Re: [PATCH] mmc: block: use single block write in retry
-To: Bin Liu <b-liu@ti.com>
-Cc: linux-block@vger.kernel.org, linux-mmc@vger.kernel.org, axboe@kernel.dk
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 7RF7XTqjsw4hn0O30Xk31Q_SZtErQ529
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzE2MDExMSBTYWx0ZWRfX2Q+r02eR6dQF
+ YPb9t/ISHt3be4fK8V9xFqwvJ9iB9aB52hfJPIO6S1q/FCRkAOEZaqtzgcN/BO0byklcSQiLiUb
+ ylmj2eWXVMfhA2zJVayHQt/0ekVpOPCEXhW4ppA/lgJfLzWeo6vodTWX0NAXDrzhV5XktNbZQDj
+ SIE+D8F/ae6DcBEjeVUl5x+eDdj6hwbtITRLMHcP0hb12HvPyTY6KSzHQrz2PHn+DYMSGtr/DTt
+ TBVS423H25lXH1KxV6/32YL6/7TDmYCUUw4hbDvyKtj1Ajzm7AP6UMtxhNA5WtkmbMBRLoAJaoe
+ Y6pUGq3o3EIG2vXfMgHf2Z+yOAeyEVVm+jeh7QZSyDCoNcRTA5Sk0RwBTnRWGTA0OsCbuwtsFQ9
+ +qfF/zJFgvaPyTiTb7kZhWeI27wvHVF2hB52oEPr4VzZZJZadRKhnampEwT5lWkGBk0lzXLy2Ui
+ IM/N4qak/PofdA8afig==
+X-Authority-Analysis: v=2.4 cv=Rdqdyltv c=1 sm=1 tr=0 ts=69b81b93 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=wpfVPzegXHpEFt3DAXn9:22 a=VwQbUJbxAAAA:8 a=IXXs4cDxjPlTTCw5R5gA:9
+X-Proofpoint-GUID: 7RF7XTqjsw4hn0O30Xk31Q_SZtErQ529
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-16_04,2026-03-16_03,2025-10-01_01
 
-On Tue, 10 Mar 2026 at 17:04, Bin Liu <b-liu@ti.com> wrote:
->
-> Due to errata i2493[0], multi-block write would still fail in retries.
->
-> This patch reuses recovery_mode flag, and switches to single-block
-> write in retry when multi-block write fails. It covers both CQE and
-> non-CQE cases.
->
-> [0] https://www.ti.com/lit/pdf/sprz582
+From: Keith Busch <kbusch@kernel.org>
 
-It's great that a link like the above can be provided, still it would
-be nice to explain a bit more about the problem in the commit message
-too. Can you please do that?
+Many storage devices can handle DMA for data that is not aligned to the
+sector block size. The block and filesystem layers have introduced
+updates to allow that kind of memory alignment flexibility when
+possible.
 
-> Signed-off-by: Bin Liu <b-liu@ti.com>
-> ---
->  block/blk-mq-debugfs.c   |  1 +
->  drivers/mmc/core/block.c | 12 ++++++++++--
->  include/linux/blk-mq.h   |  3 +++
->  3 files changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 28167c9baa55..5f97d07fa3c8 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -243,6 +243,7 @@ static const char *const rqf_name[] = {
->         RQF_NAME(ZONE_WRITE_PLUGGING),
->         RQF_NAME(TIMED_OUT),
->         RQF_NAME(RESV),
-> +       RQF_NAME(XFER_SINGLE_BLK),
->  };
->  #undef RQF_NAME
->
-> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-> index 05ee76cb0a08..00016584d70d 100644
-> --- a/drivers/mmc/core/block.c
-> +++ b/drivers/mmc/core/block.c
-> @@ -1401,6 +1401,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
->                     rq_data_dir(req) == WRITE &&
->                     (md->flags & MMC_BLK_REL_WR);
->
-> +       if (req->rq_flags & RQF_XFER_SINGLE_BLK)
-> +               recovery_mode = 1;
-> +
+dm-crypt, however, currently constrains itself to aligned memory because
+it sends a single scatterlist element for the in/out list to the encrypt
+and decrypt algorithms. This forces applications that have unaligned
+data to copy through a bounce buffer, increasing CPU and memory
+utilization.
 
-I don't get this, sorry.
+Use multiple scatterlist elements to relax the memory alignment
+requirement. To keep this simple, this more flexible constraint is
+enabled only for certain encryption and initialization vector types,
+specifically the ones that don't have additional use for the request
+base scatterlist elements beyond holding decrypted data.
 
-Under what circumstances do we need to fall back to using "single
-block"? Or is this just for debugging?
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/md/dm-crypt.c | 79 +++++++++++++++++++++++++++++++++----------
+ drivers/md/dm-table.c |  1 +
+ 2 files changed, 62 insertions(+), 18 deletions(-)
 
->         memset(brq, 0, sizeof(struct mmc_blk_request));
->
->         mmc_crypto_prepare_req(mqrq);
-> @@ -1540,10 +1543,13 @@ static void mmc_blk_cqe_complete_rq(struct mmc_queue *mq, struct request *req)
->                 err = 0;
->
->         if (err) {
-> -               if (mqrq->retries++ < MMC_CQE_RETRIES)
-> +               if (mqrq->retries++ < MMC_CQE_RETRIES) {
-> +                       if (rq_data_dir(req) == WRITE)
-> +                               req->rq_flags |= RQF_XFER_SINGLE_BLK;
->                         blk_mq_requeue_request(req, true);
-> -               else
-> +               } else {
->                         blk_mq_end_request(req, BLK_STS_IOERR);
-> +               }
->         } else if (mrq->data) {
->                 if (blk_update_request(req, BLK_STS_OK, mrq->data->bytes_xfered))
->                         blk_mq_requeue_request(req, true);
-> @@ -2085,6 +2091,8 @@ static void mmc_blk_mq_complete_rq(struct mmc_queue *mq, struct request *req)
->         } else if (!blk_rq_bytes(req)) {
->                 __blk_mq_end_request(req, BLK_STS_IOERR);
->         } else if (mqrq->retries++ < MMC_MAX_RETRIES) {
-> +               if (rq_data_dir(req) == WRITE)
-> +                       req->rq_flags |= RQF_XFER_SINGLE_BLK;
->                 blk_mq_requeue_request(req, true);
->         } else {
->                 if (mmc_card_removed(mq->card))
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 18a2388ba581..06b6e1c4fca3 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -64,6 +64,7 @@ enum rqf_flags {
->         /* ->timeout has been called, don't expire again */
->         __RQF_TIMED_OUT,
->         __RQF_RESV,
-> +       __RQF_XFER_SINGLE_BLK,
->         __RQF_BITS
->  };
->
-> @@ -85,6 +86,8 @@ enum rqf_flags {
->                         ((__force req_flags_t)(1 << __RQF_ZONE_WRITE_PLUGGING))
->  #define RQF_TIMED_OUT          ((__force req_flags_t)(1 << __RQF_TIMED_OUT))
->  #define RQF_RESV               ((__force req_flags_t)(1 << __RQF_RESV))
-> +#define RQF_XFER_SINGLE_BLK    \
-> +                       ((__force req_flags_t)(1 << __RQF_XFER_SINGLE_BLK))
->
->  /* flags that prevent us from merging requests: */
->  #define RQF_NOMERGE_FLAGS \
-> --
-> 2.34.1
->
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 54823341c9fda..bbb4346d0127f 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -150,6 +150,7 @@ enum cipher_flags {
+ 	CRYPT_IV_LARGE_SECTORS,		/* Calculate IV from sector_size, not 512B sec=
+tors */
+ 	CRYPT_ENCRYPT_PREPROCESS,	/* Must preprocess data for encryption (eleph=
+ant) */
+ 	CRYPT_KEY_MAC_SIZE_SET,		/* The integrity_key_size option was used */
++	CRYPT_DISCONTIGUOUS_SEGS,	/* Can use partial sector segments */
+ };
+=20
+ /*
+@@ -215,6 +216,7 @@ struct crypt_config {
+ 	unsigned int key_extra_size; /* additional keys length */
+ 	unsigned int key_mac_size;   /* MAC key size for authenc(...) */
+=20
++	unsigned int io_alignment;
+ 	unsigned int integrity_tag_size;
+ 	unsigned int integrity_iv_size;
+ 	unsigned int used_tag_size;
+@@ -1384,22 +1386,48 @@ static int crypt_convert_block_aead(struct crypt_=
+config *cc,
+ 	return r;
+ }
+=20
++static int crypt_build_sgl(struct crypt_config *cc, struct scatterlist *=
+sg,
++			   struct bvec_iter *iter, struct bio *bio,
++			   int max_segs)
++{
++	unsigned int bytes =3D cc->sector_size;
++	struct bvec_iter tmp =3D *iter;
++	int segs, i =3D 0;
++
++	bio_advance_iter(bio, &tmp, bytes);
++	segs =3D tmp.bi_idx - iter->bi_idx + !!tmp.bi_bvec_done;
++	if (segs > max_segs)
++		return -EIO;
++
++	sg_init_table(sg, segs);
++	do {
++		struct bio_vec bv =3D mp_bvec_iter_bvec(bio->bi_io_vec, *iter);
++		int len =3D min(bytes, bv.bv_len);
++
++		/* Reject unexpected unaligned bio. */
++		if (unlikely((len | bv.bv_offset) & cc->io_alignment))
++			return -EIO;
++
++		sg_set_page(&sg[i++], bv.bv_page, len, bv.bv_offset);
++		bio_advance_iter_single(bio, iter, len);
++		bytes -=3D len;
++	} while (bytes);
++
++	if (WARN_ON_ONCE(i !=3D segs))
++		return -EIO;
++	return 0;
++}
++
+ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+ 					struct convert_context *ctx,
+ 					struct skcipher_request *req,
+ 					unsigned int tag_offset)
+ {
+-	struct bio_vec bv_in =3D bio_iter_iovec(ctx->bio_in, ctx->iter_in);
+-	struct bio_vec bv_out =3D bio_iter_iovec(ctx->bio_out, ctx->iter_out);
+ 	struct scatterlist *sg_in, *sg_out;
+ 	struct dm_crypt_request *dmreq;
+ 	u8 *iv, *org_iv, *tag_iv;
+ 	__le64 *sector;
+-	int r =3D 0;
+-
+-	/* Reject unexpected unaligned bio. */
+-	if (unlikely(bv_in.bv_len & (cc->sector_size - 1)))
+-		return -EIO;
++	int r;
+=20
+ 	dmreq =3D dmreq_of_req(cc, req);
+ 	dmreq->iv_sector =3D ctx->cc_sector;
+@@ -1416,15 +1444,18 @@ static int crypt_convert_block_skcipher(struct cr=
+ypt_config *cc,
+ 	sector =3D org_sector_of_dmreq(cc, dmreq);
+ 	*sector =3D cpu_to_le64(ctx->cc_sector - cc->iv_offset);
+=20
+-	/* For skcipher we use only the first sg item */
+ 	sg_in  =3D &dmreq->sg_in[0];
+ 	sg_out =3D &dmreq->sg_out[0];
+=20
+-	sg_init_table(sg_in, 1);
+-	sg_set_page(sg_in, bv_in.bv_page, cc->sector_size, bv_in.bv_offset);
++	r =3D crypt_build_sgl(cc, sg_in, &ctx->iter_in, ctx->bio_in,
++			    ARRAY_SIZE(dmreq->sg_in));
++	if (r < 0)
++		return r;
+=20
+-	sg_init_table(sg_out, 1);
+-	sg_set_page(sg_out, bv_out.bv_page, cc->sector_size, bv_out.bv_offset);
++	r =3D crypt_build_sgl(cc, sg_out, &ctx->iter_out, ctx->bio_out,
++			    ARRAY_SIZE(dmreq->sg_out));
++	if (r < 0)
++		return r;
+=20
+ 	if (cc->iv_gen_ops) {
+ 		/* For READs use IV stored in integrity metadata */
+@@ -1455,9 +1486,6 @@ static int crypt_convert_block_skcipher(struct cryp=
+t_config *cc,
+ 	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
+ 		r =3D cc->iv_gen_ops->post(cc, org_iv, dmreq);
+=20
+-	bio_advance_iter(ctx->bio_in, &ctx->iter_in, cc->sector_size);
+-	bio_advance_iter(ctx->bio_out, &ctx->iter_out, cc->sector_size);
+-
+ 	return r;
+ }
+=20
+@@ -2788,10 +2816,12 @@ static void crypt_dtr(struct dm_target *ti)
+ static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
+ {
+ 	struct crypt_config *cc =3D ti->private;
++	bool unaligned_allowed =3D true;
+=20
+-	if (crypt_integrity_aead(cc))
++	if (crypt_integrity_aead(cc)) {
+ 		cc->iv_size =3D crypto_aead_ivsize(any_tfm_aead(cc));
+-	else
++		unaligned_allowed =3D false;
++	} else
+ 		cc->iv_size =3D crypto_skcipher_ivsize(any_tfm(cc));
+=20
+ 	if (cc->iv_size)
+@@ -2827,6 +2857,7 @@ static int crypt_ctr_ivmode(struct dm_target *ti, c=
+onst char *ivmode)
+ 		if (cc->key_extra_size > ELEPHANT_MAX_KEY_SIZE)
+ 			return -EINVAL;
+ 		set_bit(CRYPT_ENCRYPT_PREPROCESS, &cc->cipher_flags);
++		unaligned_allowed =3D false;
+ 	} else if (strcmp(ivmode, "lmk") =3D=3D 0) {
+ 		cc->iv_gen_ops =3D &crypt_iv_lmk_ops;
+ 		/*
+@@ -2839,10 +2870,12 @@ static int crypt_ctr_ivmode(struct dm_target *ti,=
+ const char *ivmode)
+ 			cc->key_parts++;
+ 			cc->key_extra_size =3D cc->key_size / cc->key_parts;
+ 		}
++		unaligned_allowed =3D false;
+ 	} else if (strcmp(ivmode, "tcw") =3D=3D 0) {
+ 		cc->iv_gen_ops =3D &crypt_iv_tcw_ops;
+ 		cc->key_parts +=3D 2; /* IV + whitening */
+ 		cc->key_extra_size =3D cc->iv_size + TCW_WHITENING_SIZE;
++		unaligned_allowed =3D false;
+ 	} else if (strcmp(ivmode, "random") =3D=3D 0) {
+ 		cc->iv_gen_ops =3D &crypt_iv_random_ops;
+ 		/* Need storage space in integrity fields. */
+@@ -2852,6 +2885,12 @@ static int crypt_ctr_ivmode(struct dm_target *ti, =
+const char *ivmode)
+ 		return -EINVAL;
+ 	}
+=20
++	if (!unaligned_allowed) {
++		cc->io_alignment =3D cc->sector_size - 1;
++	} else {
++		set_bit(CRYPT_DISCONTIGUOUS_SEGS, &cc->cipher_flags);
++		cc->io_alignment =3D 3;
++	}
+ 	return 0;
+ }
+=20
+@@ -3722,7 +3761,11 @@ static void crypt_io_hints(struct dm_target *ti, s=
+truct queue_limits *limits)
+ 	limits->physical_block_size =3D
+ 		max_t(unsigned int, limits->physical_block_size, cc->sector_size);
+ 	limits->io_min =3D max_t(unsigned int, limits->io_min, cc->sector_size)=
+;
+-	limits->dma_alignment =3D limits->logical_block_size - 1;
++
++	if (test_bit(CRYPT_DISCONTIGUOUS_SEGS, &cc->cipher_flags))
++		limits->dma_alignment =3D cc->io_alignment;
++	else
++		limits->dma_alignment =3D limits->logical_block_size - 1;
+=20
+ 	/*
+ 	 * For zoned dm-crypt targets, there will be no internal splitting of
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index dc2eff6b739df..aecb19a6913db 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1767,6 +1767,7 @@ int dm_calculate_queue_limits(struct dm_table *t,
+ 	bool zoned =3D false;
+=20
+ 	dm_set_stacking_limits(limits);
++	limits->dma_alignment =3D 0;
+=20
+ 	t->integrity_supported =3D true;
+ 	for (unsigned int i =3D 0; i < t->num_targets; i++) {
+--=20
+2.52.0
 
-Kind regards
-Uffe
