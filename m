@@ -1,160 +1,147 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B873A946C;
-	Tue, 17 Mar 2026 07:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773732343; cv=none; b=pRQ5XYbRkUVTywUZDHyGDjM7brmEMNa5hgY5/L/lSKRJN4zmbf64xjKUO9b7mG3OHplmiNKRdNkrml+uBdonx3qUTmiQAFMRwr5ue9/mkcVpJb664e/QtcALTs131XrtNLxLINn3o8cpA05vFictAvWIhaix8U7BwvaJ4GtDi7k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773732343; c=relaxed/simple;
-	bh=RYu/Hlzy4M1NMLc3Xhe8UGrQf4l5omMwfSrz1Eps63w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=upjxlRVVaXmWkB3STpf19lsFSOsNoDLIJodBoHyA0xJ55MbZzjsloMIBuRhxaP7BqITfG+J5JaOCnmfICmJx/Y06pWaCO2EZXyKTP/ERE7WeLn7kgNJqAaISxv/zqHf+/PG+6bCG0+EzQcI9nf+sWYaQkhCEUYXecQ3DQH8K02o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=B2/B/tRX; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CC339184F
+	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 07:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773733034; cv=pass; b=EZzHYSRRspb3TsaaVP3NTLNTj3WK6fPgFslO1qVmnFWERKkI4bDwsyqpgJndTLNH0/5gTuykkbeXcfZKZPKb4mCTHygamCVK2PBWKL25v4sru84z6P4SFuRzBhGDqsDouOwYQ8Uj0nzBlX++5Pe2kcT1yaY5DVRHLQSQYj4vLu0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773733034; c=relaxed/simple;
+	bh=E0B6xp0wJyvQ6PdHIwJ2lqaw6PipcVBjD7iOAyWuQQI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NMTKe4T2Z18YhSPewvvyTSHry+1y5BDPrRWn2JRo4eAaGpSF+onTAO8tAcGfGTxXiKDDBKhi/QCx89/YJl+R+OjNqefzEid9IUYb0SiDbI3yk4hO9NcUX04LRNCOvYVBfmTJlV9vydYcOWvK54J/lBjjz88rtTax3Tkh6K9vGf4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrJwNFv+; arc=pass smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="B2/B/tRX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=VV
-	Awc+xdn6yxKxTFGsxyf3leIZLjYYGFor99fkx3VcY=; b=B2/B/tRXLqRU3I6JI1
-	nHtyO0tNTNiJHdb/Q/jSIbQFETEb1gblYnPNEhAb7NgqSA/g1wijUDUwe4Ee8vmt
-	3I1jLZhztTaNOmUmMaa9jZ/xTepvKI4dsDiD10xOt/3iqlCPjHbkaimvlzZwQ1UQ
-	l05QyjVVHFaqbF36Um1GCaeCk=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgCnhdw1AblpkrBDWA--.58229S3;
-	Tue, 17 Mar 2026 15:22:33 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
-To: axboe@kernel.dk,
-	fujita.tomonori@lab.ntt.co.jp,
-	James.Bottomley@HansenPartnership.com,
-	martin.petersen@oracle.com
-Cc: linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	bvanassche@acm.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH v8 1/3] bsg: add bsg_uring_cmd uapi structure
-Date: Tue, 17 Mar 2026 15:22:24 +0800
-Message-Id: <20260317072226.2598233-2-yangxiuwei@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260317072226.2598233-1-yangxiuwei@kylinos.cn>
-References: <20260317072226.2598233-1-yangxiuwei@kylinos.cn>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrJwNFv+"
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-128d600ad25so309356c88.2
+        for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 00:37:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773733030; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ctn3S0XP4p9xENVZ3qBCewUkWgcanQI1C+oVCZRc2KZnHk92hZ68lGjtGZxRcwDNO+
+         EVo2/ueiI4Xv79b+kaWE3WQVT7U+Ey3uipgZbNR7m1e///FKaStxmBE7YCE4GEJXj5KW
+         9dd4UehqroPczTQ/ik84j6PUXV2adFtQBu16peLtzOtNZ4j/RiN8bPzUO0ZkCuRNNmmV
+         HGsYeh9aWNr+RjCquUEfj4iXHCLUxrFwsZ5FnS2OTLdJhjbMWHjqR8lVvp/34u3nPvtP
+         6v0yj8cTJQj1iX/38bjdn7n+HAeOiW7QWrP8upXULtcbySlUseAI8hVJccqP93chHgYn
+         MC7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=E0B6xp0wJyvQ6PdHIwJ2lqaw6PipcVBjD7iOAyWuQQI=;
+        fh=SeyKegkbynttrYzC40mYacukPbd8O/xGJY5HRvhj4Z8=;
+        b=iFXeID+KYkzo5zPzyGlYR2M6q2k5pWAvbqe1LNge1MNxeyp+22p8UL9MGyU8/sh99g
+         s7GkUnDTnIF/+M7kMHUv/nJ9AMTezI+/N2zL/WlMKHZGgVkenMs4hVrRxX6BRHVYlIHM
+         9Zd3cLW036Zrfh5A6AwA0DrkF02u9byqCkX6awN2hYVWIuLwrmJLfaqhdagI7jYvQcXX
+         GWIjAws2NOzKBLl74VuU2gRoZtMPyczEXM86vBYAtUSU8sCPKm9r3G43Ig5e40gWjoz7
+         72oEA1Pj+Ik/VZuxdrkl+4Y9XLG8bMEgqemZUHg6kSn2iSSFLu3Ln4m0ACSzZmUqe11a
+         PzZw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773733030; x=1774337830; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E0B6xp0wJyvQ6PdHIwJ2lqaw6PipcVBjD7iOAyWuQQI=;
+        b=DrJwNFv+qJ+OkVj3u3T75e1Zwk5mDgFeoYXTSIHD1XHeqSpNxHpXkJ32aqxUf1MDC6
+         XW3M130T+VkPLzZQbvFarB8MPLJxhORqRTTRayjFUHoyJK6I9lO+EQxVo1ctNJG/TkZX
+         14L0SVjZM6uQP1gmimmOISU/QCMGoXTrTqfkJoZl/F8S2VUtVWc0YEFACfRN5bmkm2Eo
+         TdrtnXb6f1A4rGWAhaTPUx3dBPt/VTZQ87SZM9YpmQ6IN6iVkYUGTqsLLD5mSd9tz1us
+         WOqGLFUJ0oub2vkQPCYwW6BL7TSBKz5rjQgOQFLcAu+t4419Zl8SKhNMsWLv7V8Lukr3
+         fPOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773733030; x=1774337830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=E0B6xp0wJyvQ6PdHIwJ2lqaw6PipcVBjD7iOAyWuQQI=;
+        b=FKmF596PPQnbCEvzeTuo+J3Lz7rEjytigytXHyNk7SDSI0KQxLvwyMiWAaJob+inNK
+         MVDMY4oX9TA+G9Xj8BHNCH9EOuOA5+hzUtvTTFfm4EGhZEO3aAn6UTf7Zklysegz6I89
+         bdywsvW5n3rlIBpgXkKWI7E5UUfK8mh96/pqWl8mf7KIrvOtmVaoU7khXu7LOP5VV8ig
+         4bfh9x5joqIpdOkgBobUPmAKMjYiim0oQ74HnfUZbIsTDj45cDtyGuZZ73zv4NQLH6Gs
+         OJK494EPrVyjZKr79ygQ4Rzx/arhMgKdSAPQdxk0x5F7Oy3FkuaefKlhxlKqwbSOFA4d
+         NCfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9Ft/aupv4QhlgYoADOt3KF7awQOisAHrp/rbbG03qmDV2x5uXc3riEE3mGH1oOpm0eaBKZJtDvo8LnA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvL9kpqJPqozkxsYivmoU7K+hl425FNj3LsZsBgozlnTUlWFcz
+	YSTAmuOVNS43D8hjT5y8LHoGIz3HtMMrd5e85OCFwmHPUwUgL622jdf0AIUrj+Ovc48SC3hei+J
+	oMb9xtRVB7PQGn2Q5+bggi2vMBntTg2s=
+X-Gm-Gg: ATEYQzzDwKb4JDzmyiMBY08l0jSUT7Q90+XK+gPhEwfsTMPI1LEjzFPbo1HWH6edzGs
+	mFUDQFvVsw8yREXEh9uWYgG606IayohrdaGB3x2NP9aUD6JnL1Pk7Jd1PXr2nbaZmpB7T5RvN/W
+	GMfTnpR2EjmXGJPgFiGCqmtQMPlwPdi5EeQf8Mu0XWeoINMsw+fS8+e/X+VZEgZBAwPPfL1VBTw
+	uWqH5KxJnMCyLazZXGAaaDKIJLG8yicnv/VZQs5aUd9/hyeC8mg+B8PepINFwsp3dhC/AsOLq4W
+	9fmqMhyjiLWzh8P8s/3i+LPFo4prs9IJq5V8Ke6yo154bCpem0aJZXTFNNkInaULj4rNFGDz4Of
+	AjXXdecrIcpsQ4VUr+l/0VbM=
+X-Received: by 2002:a05:7301:fa8b:b0:2be:1946:858b with SMTP id
+ 5a478bee46e88-2bea5537069mr3995398eec.3.1773733030216; Tue, 17 Mar 2026
+ 00:37:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgCnhdw1AblpkrBDWA--.58229S3
-X-Coremail-Antispam: 1Uf129KBjvJXoWxCr4xGry7Zw43Kw17tF1fWFg_yoW5ZFWxpF
-	Z8Kw43JFWUWw1fZrW3Ja4UCFW5Zr18Ja47Kay7Wwnak3W5tryrA3WjkryjqF48X39Yy34a
-	v3W7trW5C3yktw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jexRDUUUUU=
-Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwhkXp2m5ATmARwAA3E
+References: <878qcpbux5.fsf@kernel.org> <87ikb2mrib.fsf@t14s.mail-host-address-is-not-set>
+ <abiXkTSpZ8CWbJVx@kbusch-mbp> <7a4dfa82-41af-401f-aa92-5bd19fe6f654@suse.de>
+In-Reply-To: <7a4dfa82-41af-401f-aa92-5bd19fe6f654@suse.de>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 17 Mar 2026 08:36:57 +0100
+X-Gm-Features: AaiRm53AuTsuPzxhbX3fcIx0pIKfHjonAsAVpgz9qlBMfy9W6L4Yw7Mbrtmdy1c
+Message-ID: <CANiq72mMtRqXxeCsa1ys8YbxnH5-fm6SsdbD7TPFOsttdytadQ@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC][RESEND] Status of Rust in the block subsystem
+To: Hannes Reinecke <hare@suse.de>
+Cc: Keith Busch <kbusch@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
+	Bart Van Assche <bvanassche@acm.org>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+	Damien Le Moal <dlemoal@kernel.org>, Daniel Gomez <da.gomez@samsung.com>, 
+	Hans Holmberg <Hans.Holmberg@wdc.com>, Jan Kara <jack@suse.cz>, 
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>, John Pittman <jpittman@redhat.com>, 
+	John Stultz <jstultz@google.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Ming Lei <ming.lei@redhat.com>, 
+	Niklas Cassel <cassel@kernel.org>, Nitesh Shetty <nj.shetty@samsung.com>, 
+	Oliver Mangold <oliver.mangold@pm.me>, Pankaj Raghav <kernel@pankajraghav.com>, 
+	"Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>, Theodore Tso <tytso@mit.edu>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, gost.dev@samsung.com, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add the bsg_uring_cmd structure to the BSG UAPI header to support
-io_uring-based SCSI passthrough operations via IORING_OP_URING_CMD.
+On Tue, Mar 17, 2026 at 8:18=E2=80=AFAM Hannes Reinecke <hare@suse.de> wrot=
+e:
+>
+> While I do see the original appeal to have a rust-nvme driver, having
+> one will just lead to confusion on all sides, especially for distros.
+> (Why is it there? should it be preferred to the original one? Do we
+> have to support both of them? Are there features missing in either
+> of these drivers?)
+> In general we are trying hard to avoid duplication in the linux kernel,
+> especially on the driver side. We constantly have to fight^Wargue
+> with driver vendors why duplicating existing drivers to support new
+> hardware is a bad idea, so we really should not start now just because
+> the driver is written in another language.
+> (That really might be giving vendors bad ideas :-)
 
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
----
- include/uapi/linux/bsg.h | 75 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+I think when Andreas refers to "reference driver" he may be referring
+to the https://rust-for-linux.com/rust-reference-drivers framework. If
+so, those are meant to be exceptional, temporary and well-justified.
 
-diff --git a/include/uapi/linux/bsg.h b/include/uapi/linux/bsg.h
-index cd6302def5ed..6cff77f5b857 100644
---- a/include/uapi/linux/bsg.h
-+++ b/include/uapi/linux/bsg.h
-@@ -2,6 +2,9 @@
- #ifndef _UAPIBSG_H
- #define _UAPIBSG_H
- 
-+#ifdef __KERNEL__
-+#include <linux/build_bug.h>
-+#endif /* __KERNEL__ */
- #include <linux/types.h>
- 
- #define BSG_PROTOCOL_SCSI		0
-@@ -63,5 +66,77 @@ struct sg_io_v4 {
- 	__u32 padding;
- };
- 
-+struct bsg_uring_cmd {
-+	__u64 request;		/* [i], [*i] command descriptor address */
-+	__u32 request_len;	/* [i] command descriptor length in bytes */
-+	__u32 protocol;		/* [i] protocol type (BSG_PROTOCOL_*) */
-+	__u32 subprotocol;	/* [i] subprotocol type (BSG_SUB_PROTOCOL_*) */
-+	__u32 max_response_len;	/* [i] response buffer size in bytes */
-+
-+	__u64 response;		/* [i], [*o] response data address */
-+	__u64 dout_xferp;	/* [i], [*i] */
-+	__u32 dout_xfer_len;	/* [i] bytes to be transferred to device */
-+	__u32 dout_iovec_count;	/* [i] 0 -> "flat" dout transfer else
-+				 * dout_xferp points to array of iovec
-+				 */
-+	__u64 din_xferp;	/* [i], [*o] */
-+	__u32 din_xfer_len;	/* [i] bytes to be transferred from device */
-+	__u32 din_iovec_count;	/* [i] 0 -> "flat" din transfer */
-+
-+	__u32 timeout_ms;	/* [i] timeout in milliseconds */
-+	__u8  reserved[12];	/* reserved for future extension */
-+};
-+
-+#ifdef __KERNEL__
-+/* Must match IORING_OP_URING_CMD payload size (e.g. SQE128). */
-+static_assert(sizeof(struct bsg_uring_cmd) == 80);
-+#endif /* __KERNEL__ */
-+
-+
-+/*
-+ * SCSI BSG io_uring completion (res2, 64-bit)
-+ *
-+ * When using BSG_PROTOCOL_SCSI + BSG_SUB_PROTOCOL_SCSI_CMD with
-+ * IORING_OP_URING_CMD, the completion queue entry (CQE) contains:
-+ *   - result: errno (0 on success)
-+ *   - res2: packed SCSI status
-+ *
-+ * res2 bit layout:
-+ *   [0..7]   device_status  (SCSI status byte, e.g. CHECK_CONDITION)
-+ *   [8..15]  driver_status  (e.g. DRIVER_SENSE when sense data is valid)
-+ *   [16..23] host_status    (e.g. DID_OK, DID_TIME_OUT)
-+ *   [24..31] sense_len_wr   (bytes of sense data written to response buffer)
-+ *   [32..63] resid_len      (residual transfer length)
-+ */
-+static inline __u8 bsg_scsi_res2_device_status(__u64 res2)
-+{
-+	return res2 & 0xff;
-+}
-+static inline __u8 bsg_scsi_res2_driver_status(__u64 res2)
-+{
-+	return res2 >> 8;
-+}
-+static inline __u8 bsg_scsi_res2_host_status(__u64 res2)
-+{
-+	return res2 >> 16;
-+}
-+static inline __u8 bsg_scsi_res2_sense_len(__u64 res2)
-+{
-+	return res2 >> 24;
-+}
-+static inline __u32 bsg_scsi_res2_resid_len(__u64 res2)
-+{
-+	return res2 >> 32;
-+}
-+static inline __u64 bsg_scsi_res2_build(__u8 device_status, __u8 driver_status,
-+					__u8 host_status, __u8 sense_len_wr,
-+					__u32 resid_len)
-+{
-+	return ((__u64)(__u32)(resid_len) << 32) |
-+		((__u64)sense_len_wr << 24) |
-+		((__u64)host_status << 16) |
-+		((__u64)driver_status << 8) |
-+		(__u64)device_status;
-+}
- 
- #endif /* _UAPIBSG_H */
--- 
-2.25.1
+So vendors cannot use it as an excuse to try to duplicate stuff (they
+may try, but it should be clear it is not the same case).
 
+And, for users, we should make it so that it is pretty clear they are
+not intended to be used. Perhaps they could be gated behind EXPERT or
+BROKEN or staging or similar. Perhaps even a new Kconfig option to
+mark the ones we have (proposed in the list and in-tree) and that
+allows to easily grep and to tweak the conditions under they can be
+enabled etc.
+
+Now, with that said, like Keith mentions, it should nevertheless be
+clear what the final user of the abstractions are, i.e. the goal is to
+bootstrap other code which will not be dead.
+
+I hope that helps...
+
+Cheers,
+Miguel
