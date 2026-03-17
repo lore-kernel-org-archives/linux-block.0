@@ -1,62 +1,62 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4531134FF4D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0DA3A641E
 	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 23:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773789803; cv=none; b=Vx0DWww3G5WYQLQ4nwExlhWH1FaC8GYjOwPP4810c1w/n7PhD5S6d0SJNyt5mgMevcvfcrXUq3WnKnWJ9UOfbMCKiTT5bQ1PuBYkELx7T/NIIqpqcO3ZEa1qIfqGuQNV/vh/MVerESJ4NVpCaIo41ePQPSFGNg1P41dufUo6dUs=
+	t=1773789804; cv=none; b=KMA1VnLQprQP/50GOhaSaVU9G6h9W9suv6vLu9OEPkpIDciUnWrFYU9UNolS2gbZiYnSWpkXmmqz0U2OuNxVlrk+KWyqG25b17edl7YFkA5oxdcF8ksecx1kZ2tOGvw1PL7AJdCfsohFeqa1CKPY2Dul8ZNAzgCqQmR9kPJ3EZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773789803; c=relaxed/simple;
-	bh=+nWtQs07r0pE+Ze4LkjAmQmhutwoys7wbSABJeTYcqY=;
+	s=arc-20240116; t=1773789804; c=relaxed/simple;
+	bh=k3hQv9gFEIVWQ8BuojhozFDq2pcGJwnuFRlaWbZuJLI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OdzupMjjjkaBWXLGaBZSvyLSYKgVPsuSrb2UQUtMJgDgQJm+TJCx7xLzhjUrlp5HorJeFtI0Vh7Iw/4MEZt6iRslrn2Qh5lowSFKoIP1+KIeuvJpYRYuEkFDyF8YR6TG8KAEu0mM6QJ5s6lxm03qnWgu7m4eibHzBx8GvgG6eiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pb8qhOux; arc=none smtp.client-ip=209.85.128.169
+	 MIME-Version; b=nu5OmqFi+LRDODDlFMAV9KhUPQEPAwdrUrZf4LjlSqmxokGEeHy5r3fM8e6fl2C8sjqJh3cFqfNEk5FKUdwPlywkrATU8KkUWlJTE8GClePDOGawdfmbn07j1ViMmiV42Kh2gZbXuzDnAb2i2/siBq6ZGOAhg0WG4bw6a6MeuTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxtoQgbx; arc=none smtp.client-ip=74.125.224.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pb8qhOux"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-793fdbb8d3aso64220207b3.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxtoQgbx"
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64ad019bbd4so6577225d50.0
         for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 16:23:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773789801; x=1774394601; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1773789802; x=1774394602; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1bBa9pDPqbGfhOBwqPMjjiTOMbtTfvieka9d6hhFj70=;
-        b=Pb8qhOuxXHE5LBfgsEwoSIB8p8wiHxRSdWJFQ9+ZjO5KpbTEaK+n/09xTFXwa9kYx/
-         gSMEQfnYtD9Z5NzXmgyPZETu6TrpUWhZQfQC8VjavUSj3jMF7RIVUDky6BFL6Uwtv60d
-         ZuegBAvYD4FCtdzmYRV4uHolZfAtUT43306IPNrJ4iKfxpFVN8+4VZhHeXSldMbv/E8f
-         HJkYWr+qc6IxKex1ytNQBSYmpapP1j3c9Tb4ih4RnXBPNyn8yWLijH+ciZgR9k7ISlBw
-         yDN5RCVqSfh/FjwkRCTPGat2Xzln2rJ5XaVlKk4NknOWI7ONhirRUBFHXpPRbUwqgTT8
-         J5eQ==
+        bh=GVqejN9RcyteX0OK/Wyi8jfYU0wStXL+Y9sOPfh9k1k=;
+        b=hxtoQgbx2Uk8OlZmjjNMnhNYkUKT+wpKSKyd4eWcn1FgcaRMzq2hHQt9FOq7HZpZHk
+         ua4L2A4lfckexLMfu4VjEtSLXEj5Rq6vi1O8W8Qn2ln/PBWS5V6MqkPlh5ZIn8mWvWI1
+         wkgBOSK9FtovWO6pUn9hKsgBSM7mOMM/bvSlZrzQ5oVk1J5JxU3vrNWGuhplpG8rULxR
+         dN2m12U4PWAxdyhhVgUqv+NgyF5xMuuxXGOTwfUW2k/ibW7uvo2t/NawYeSv6r4gRPhg
+         F3ul+dJLiV9eD5sAN/5sWgT2e8Z61hte1k1A3aEZ/PxkEqgZJtrssqALAspkPJzRYozb
+         rEIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773789801; x=1774394601;
+        d=1e100.net; s=20251104; t=1773789802; x=1774394602;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=1bBa9pDPqbGfhOBwqPMjjiTOMbtTfvieka9d6hhFj70=;
-        b=I3Bmvi1GWK/5Hvy2ios0SFt6MrjMuGpuvk5BEF8hE34uhNB1LjXQyN6gG0iIgShVNO
-         5hTnjY8EppL57FDO3rYjabKq8ouB7q046ePdsiXohfTOsx59TbjY6zNwJxhQCpnWL/G+
-         cOryVYk00ouTK3BRewJdkWQwwnb1h0iv84CSzZDTErLCseaFHwbOlk7TroW5vY5I8Tg5
-         s+8zGft2TgH5jx+HjOfThqVtGHq4DzVvZ9eikktQAsBfzMaDwXSY2t1sW0qAfrQWKF63
-         ZQPPIw4K6IrAucdb3VQ3jNuva42Ojviyk+t7p0R/uAhYcK0RkGbog0sk6317YYi+s5yV
-         P14Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXXpnZ4TeA2UO8kraFCjl5BOLTW3/Bct3txAJsOsXmSEiz3+pJ+fOC3bcHp03hcql8ydtiEPx6jSrQ/kA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhUQlvchbOMBxWGzZtO9faoQfs/X3S/tafa6aaKxavWM7i7rih
-	sOwNlJakzzCCRSTommlUrsJSdtB+PwAPK8Gk75Swxgorbf1mxf+gDBRy
-X-Gm-Gg: ATEYQzxp3xlPXgj4EuoU2D9T/VXYgRmQifqdomdmF8sp2dM4loxhlPN+Mbd/A1jolaw
-	1WughgdUrGcEw+0VCkddlO3lRq+sB9iT8ic1ScuM3cqsC40FOZD9J8UF4EMm0lgtTws3JaIWxIj
-	KdhNyrzuKFQ1SOGCM0D/3TLQLaRTDGN0giUtHXMs0aHBgYBt+ELAs1I3EQk84Tdmg4n0xTrKinH
-	NGfg143a6mS1Nqwgh2JDB7mmZ8juLlImxyyuT8Y4LUGmDj54oyO1tu4+dV4gFzPBZp3gv+yYOs5
-	8aH/SKb8eXUqHFIqSOBJxcPYeRoCnsD4nrScJ/h3BZEoZXEbnlagm9zVuy7+pIzmuH4Sjmv+b26
-	16HEHjSWDT31P6QPy/P4FHQeZ3Clu+rkYwrg/ATpZaS8n10v31899UONo6KWuQ/q8Qve1WiefAs
-	17/EHERE8JmnMPA9HIZ2XGjKmXCLr7MgThRqel1gG/J/lat8Sym1Pfqmdzi/83Y9nEST1KLcWhq
-	WwlZRiHdpV0NFXHc4IF9yn/
-X-Received: by 2002:a05:690c:c1dc:b0:79a:3e2a:7b5e with SMTP id 00721157ae682-79a71637f2fmr12821057b3.0.1773789801257;
+        bh=GVqejN9RcyteX0OK/Wyi8jfYU0wStXL+Y9sOPfh9k1k=;
+        b=c72l9egVjLAGMCW8FVcxr/01Hhg1QfaTVe6JIidtV4pcFlm3DOq+eeqmUrG0bfTQXz
+         P41OmKRfQKmh8ACfly1kg8L3xNsgNpBfmW0SoteKrXEflWhXeGkIjXrjeR1uSLPpP2F3
+         Is9PcgCowxY2BDdXT1aDVbF9z3Ywvr4IcJjlwh67psdJQPghQAutKs7Tc0G9qxy3XAfu
+         FPe6sJBjTdX3eMv64HYCG3CefnntzYYkBiHafvd48n5uGmE96ZFlPwvO5k2vO9pBU0XX
+         Ur0mDN+osvyGfpaQ1mz8WKQQHrQhVlkMlqO8s0kFHGH4muaVgapSWg86fu9A+Vzhm8Fv
+         WXxA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDagGfLxK1oEI7jpuXrzAEgYHvpyyh6+Mnc4p+Qo+b+0wrwpi8WPsbVPaUAKyWSfGuExC1d9BwDgFmgA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTeyK7sNJJJ03+/58I6kskFOUfvVxz9AsIT1FYqoteZyBS/7oH
+	lPMhlW3Z3hfHo/Tb/M+tYt6KHWEFtSmH0VUqa48cG3RQHHd07Wf8gn/Y
+X-Gm-Gg: ATEYQzy6zz3+5OsMWzVt/a7DlNqQMNFjHautt2oHHznzbVySYeIJTQn133+8qgVFbH6
+	TTiBnK8mFdWtvG3tA9TRnt+nvsXZBrJslkU8jdwp4XUggQ5xrhi6Wfsje1StbaBSCiGMO3WGX+V
+	BbV3OH9OQ2BqkUsRQ8lLusw2tVmcYjBQE5FJdvt+jqFNHiws3n6YrGzk0uvQa0mXs2xpnNQNoTu
+	AwfWy6x9C6wSsMK7+CAT2VUGZRULnGK4ejgAwV8ESOp62bF4ZhBMHtMFHHjQugdBtKGZZ3K0cdH
+	ndxpkQEe0vTUOtZCUIsPwnU+Op63507Q3sAY9w767HcJNL4Z4CXOy53VvHmnDtqyrYD+6tiEXg8
+	PyT6Uw9jKu9ExkLzD75YNy4Q+ooaRSTJpdhci++LDCoTkvHAnUE33TZOkbNnqQo7bWA/cyKjDQt
+	InHTk/bQx5r6wciVREY9GFdwhWlgWU2VI/k2jEKvgw1PwIdXikxA/HtAliovQ06MKIvnd/J0JCV
+	5YjCmuW/U2/qlL6mDUWPSEK
+X-Received: by 2002:a05:690c:110:b0:79a:38a2:d8ca with SMTP id 00721157ae682-79a718c62demr13000817b3.23.1773789801990;
         Tue, 17 Mar 2026 16:23:21 -0700 (PDT)
 Received: from tux ([2601:7c0:c37e:2360::f769])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a715d221dsm6858217b3.37.2026.03.17.16.23.20
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a715d221dsm6858217b3.37.2026.03.17.16.23.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Mar 2026 16:23:21 -0700 (PDT)
 From: Ethan Tidmore <ethantidmore06@gmail.com>
@@ -68,9 +68,9 @@ Cc: drbd-dev@lists.linbit.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Ethan Tidmore <ethantidmore06@gmail.com>
-Subject: [PATCH 1/4] drbd: Fix out-of-bounds access
-Date: Tue, 17 Mar 2026 18:23:15 -0500
-Message-ID: <20260317232318.18923-2-ethantidmore06@gmail.com>
+Subject: [PATCH 2/4] drbd: Fix variable dereference before check
+Date: Tue, 17 Mar 2026 18:23:16 -0500
+Message-ID: <20260317232318.18923-3-ethantidmore06@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260317232318.18923-1-ethantidmore06@gmail.com>
 References: <20260317232318.18923-1-ethantidmore06@gmail.com>
@@ -82,38 +82,41 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The array sync_rule_names[] has 22 elements and rule is used to access
-this array. The variable rule has the possibility of being index 22
-because the condition (rule > ARRAY_SIZE(sync_rule_names)) could
-evaluate to 22 > 22 which would be false and then rule would be used to
-index sync_rule_names[] which would cause and out-of-bounds bug.
+The struct is 'req' is checked for NULL after resource was assigned from
+a member from it.
 
-Change condition from (rule > ARRAY_SIZE(sync_rule_names)) to
-(rule >= ARRAY_SIZE(sync_rule_names)).
+Check 'req' for NULL before assigning resource.
 
 Detected by Smatch:
-drivers/block/drbd/drbd_receiver.c:280 drbd_sync_rule_str() error:
-buffer overflow 'sync_rule_names' 22 <= 22
+drivers/block/drbd/drbd_req.c:1996 drbd_unplug() warn:
+variable dereferenced before check 'req' (see line 1993)
 
-Fixes: 851f106c134a3 ("drbd: rework receiver for DRBD 9 transport and protocol")
+Fixes: 71d075200b462 ("drbd: rework request processing for DRBD 9 multi-peer IO")
 Signed-off-by: Ethan Tidmore <ethantidmore06@gmail.com>
 ---
- drivers/block/drbd/drbd_receiver.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/drbd/drbd_req.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 06d83b5ffafb..280be2ee7d7e 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -273,7 +273,7 @@ static void drbd_cancel_conflicting_resync_requests(struct drbd_peer_device *pee
- 
- static const char *drbd_sync_rule_str(enum sync_rule rule)
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index e88b5da15c1e..4cbd9ec15157 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -1990,12 +1990,14 @@ static void drbd_unplug(struct blk_plug_cb *cb, bool from_schedule)
  {
--	if (rule < 0 || rule > ARRAY_SIZE(sync_rule_names)) {
-+	if (rule < 0 || rule >= ARRAY_SIZE(sync_rule_names)) {
- 		WARN_ON(true);
- 		return "?";
- 	}
+ 	struct drbd_plug_cb *plug = container_of(cb, struct drbd_plug_cb, cb);
+ 	struct drbd_request *req = plug->most_recent_req;
+-	struct drbd_resource *resource = req->device->resource;
++	struct drbd_resource *resource;
+ 
+ 	kfree(cb);
+ 	if (!req)
+ 		return;
+ 
++	resource = req->device->resource;
++
+ 	read_lock_irq(&resource->state_rwlock);
+ 	/* In case the sender did not process it yet, raise the flag to
+ 	 * have it followed with P_UNPLUG_REMOTE just after. */
 -- 
 2.53.0
 
