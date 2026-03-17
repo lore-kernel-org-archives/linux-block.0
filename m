@@ -1,134 +1,148 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C6B3BD62C
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 12:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB2E3C278D
+	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 12:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773749657; cv=none; b=P1WkZ0BKcCdkgDGQxPvmsjWXD1z7vwBy1GaOImeNW7R3QQUlsnJCahTikJ1k6QgXG1W16zQEoN+am34+uZd+4nYIICcn/Sbr8Qzst2V59O9XPOs4dvTdvtfE+T0YwMjCK9nIz2R2wOQQkqSxdwEKeMdL2FKazdl7oDrtpzdhwzY=
+	t=1773751614; cv=none; b=p6qMuXnhPNXuXuPoy0TRXKbMMil53+78l+zkiq4Q2v4FGOBxSrsYS7WhTVnHZ/twvqJHnVZclJT7xhNawmuRA7Y02KMvZnXva9gZpmPPm+MSLdEpZdv/pYLfgQfaxPfnASOmMwmqAgLt4KAftKPm0c5F8QHRodl+OQE3ipzHUvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773749657; c=relaxed/simple;
-	bh=McV1kPhilBdgtJZQD0Sj2c6QUB9bHsSHosTvVUM88VU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qeySOkhXtRhIWEYZ4UzxLx7LDHiQGMkkxHACXUeIUZe+iP3o6A5vqD0lZUukcQ9DkBdUA4jFQ4t9h6Wr04nZyV2OKVe7EN4NHCzXHr5Wk4zCDWnMiswmXsV0/K9XyAwUMd/avGnCznPrLsfoANBSwOM08ZQpsdwMJ6zrTUT3nXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fZr751SzPzYQthV
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 19:57:37 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id BF5D44058C
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 19:58:34 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with SMTP id cCh0CgCHitrpQblpkm_qBA--.65349S3;
-	Tue, 17 Mar 2026 19:58:34 +0800 (CST)
-Message-ID: <12cbc935-f2b3-4d8a-bf73-0baae3ff6857@huaweicloud.com>
-Date: Tue, 17 Mar 2026 19:58:32 +0800
+	s=arc-20240116; t=1773751614; c=relaxed/simple;
+	bh=bpOHCBvAKfamuf87j4130QYup0vHYalafqGEHsPgK3M=;
+	h=Cc:Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=jo3sWEoGpg7EXlk4JUIoY+OWbNTzhR1ALhuqxlV9OGtHgzjEuuavpH+HQqXiS+1fqu036+LjxCqfPNQgfPctxboVMEcCEtjmBWydxFanC2/vUVOOdUvKiGKkfK/u9P1QlxaHt7ynsxgzt/ipI8l4ZSGgFilPe2uswA6c1D9d8FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IX6s99Qy; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IX6s99Qy"
+Cc: shawn.lin@linux.dev, ulf.hansson@linaro.org, axboe@kernel.dk,
+ linux-block@vger.kernel.org, linux-mmc@vger.kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773751610;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KIvkfeWW7o3q5upahJb9knMzgwQdHybTen/YHq4j4hs=;
+	b=IX6s99Qy2R4Z1Vx9StxiYNG0HfOkyH/TJmruWeYEJpKHDdlM67U6p6QYM8HHphyuCc6Ym3
+	KS3OyejW5v5BgeU57yUKzhhhbaKuVifstOl9o0Y0A9JAqX7zhkToVkwwl/iguzafPujZnR
+	muQ393BOIgdi6TtZHYWg0ZIOroSH8bA=
+Subject: Re: [PATCH] mmc: block: use single block write in retry
+To: Bin Liu <b-liu@ti.com>
+References: <20260310160408.3976760-1-b-liu@ti.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shawn Lin <shawn.lin@linux.dev>
+Message-ID: <301ff663-7f18-ae12-f0f8-88c4e4375114@linux.dev>
+Date: Tue, 17 Mar 2026 20:46:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] blk-throttle: minor fixes and cleanup
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>, "yukuai@fnnas.com"
- <yukuai@fnnas.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "yangerkun@huawei.com" <yangerkun@huawei.com>,
- "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>
-References: <20260316084455.3323966-1-wozizhi@huaweicloud.com>
- <abkEKqXG_FkZe-l_@shinmob>
- <bc5dda8a-7b43-45e2-8888-cf8c37f53483@huaweicloud.com>
- <abk8PK0cOI_CxieN@shinmob>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <abk8PK0cOI_CxieN@shinmob>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20260310160408.3976760-1-b-liu@ti.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgCHitrpQblpkm_qBA--.65349S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxZF48XFWUWFW8Zw4kWFy3Arb_yoW5GF4DpF
-	W7Wa98tr4kJrn0kr1ftanxXayav3yfJryDXrn5JF4fWFn0v3WUKF1a9ry09FWv9F9ru3yS
-	vw45XryxX3WUAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUylb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwxhLUUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+X-Migadu-Flow: FLOW_OUT
 
-
-
-åœ¨ 2026/3/17 19:41, Shinichiro Kawasaki å†™é“:
-> On Mar 17, 2026 / 16:13, Zizhi Wo wrote:
->>
->>
->> åœ¨ 2026/3/17 15:37, Shinichiro Kawasaki å†™é“:
->>> On Mar 16, 2026 / 16:44, Zizhi Wo wrote:
->>>> From: Zizhi Wo <wozizhi@huawei.com>
->>>>
->>>> This series contains two minor patches for blk-throttle.
->>>>
->>>> Patch1: simple cleanup
->>>> Patch2: fix timer scheduled on tg_flush_bios()
->>>>
->>>> Zizhi Wo (2):
->>>>     blk-throttle: remove leftover carryover checks in
->>>>       tg_within_[bps/iops]_limit
->>>>     blk-throttle: fix timer scheduled on wrong service_queue in
->>>>       tg_flush_bios
->>>
->>> Hello ZiZhi, just FYI. Blktests CI trial run found that this series triggered
->>> the failure of the test case throtl/004 with sdebug:
->>>
->>> throtl/004 (nullb) (delete disk while IO is throttled)
->>> throtl/004 (nullb) (delete disk while IO is throttled)       [passed]
->>>       runtime    ...  1.667s
->>> throtl/004 (sdebug) (delete disk while IO is throttled)
->>> throtl/004 (sdebug) (delete disk while IO is throttled)      [failed]
->>>       runtime    ...  3.273s
->>>       --- tests/throtl/004.out	2026-03-16 10:29:46.761897543 +0000
->>>       +++ /home/fedora/blktests/results/nodev_sdebug/throtl/004.out.bad	2026-03-16 13:31:54.355173644 +0000
->>>       @@ -1,3 +1,2 @@
->>>        Running throtl/004
->>>       -Input/output error
->>>        Test complete
->>
->> Hi, I'm very sorry for my oversight. I have already identified the issue
->> with the first patch in the patch set and replied to it myself. I will
->> review more carefully next time. Please ignore the first patch (although
->> the throtl test case did pass locally...)
+ÔÚ 2026/03/11 ÐÇÆÚÈý 0:04, Bin Liu Ð´µÀ:
+> Due to errata i2493[0], multi-block write would still fail in retries.
 > 
-> Thanks for the explanation, no problem for me.
+> This patch reuses recovery_mode flag, and switches to single-block
+> write in retry when multi-block write fails. It covers both CQE and
+> non-CQE cases.
+
+MMC core natively retries single for multi block read. So I assume
+what you are trying to do is make it the same for write path. We didn't
+resort to upper block layer for help for read case in the past, so  I
+think you could still achieve that within the scope of MMC core.
+
+More importantly, what is the failure rate of this issue? If it occurs
+frequently, we should consider this a significant hardware defect. In
+that case, the host driver could register a multi_io_quirk to apply
+certain restrictions on the write path. This approach has been used
+previously on TI OMAP platforms.
+
 > 
->>
->> I'd like to ask whether applying only the second patch can pass the
->> corresponding tests in your environment?
+> [0] https://www.ti.com/lit/pdf/sprz582
+> Signed-off-by: Bin Liu <b-liu@ti.com>
+> ---
+>   block/blk-mq-debugfs.c   |  1 +
+>   drivers/mmc/core/block.c | 12 ++++++++++--
+>   include/linux/blk-mq.h   |  3 +++
+>   3 files changed, 14 insertions(+), 2 deletions(-)
 > 
-> Sure, I ran throtl/004 on the kernel v7.0-rc4 + the second patch "blk-throttle:
-> fix timer scheduled on wrong service_queue in tg_flush_bios" only.
-> Unfortunately, I still see the test case fails for scsi_debug.
-
-Oh, that is strange. I wasn't able to reproduce it locally. Based on
-theoretical analysis, the tg should be placed into
-sq->parent_sq->pending_tree for scheduling (tg_service_queue_add), and I
-haven't been able to identify the root cause :(
-
-__del_gendisk() will set GD_DEAD first, then call
-blk_throtl_cancel_bios->tg_flush_bios; bio_io_error() will set EIO. So
-I'm not sure why the current test case doesn't show an "Input/output
-error" â€” it seems like the bio was submitted early or got lost? There
-may be some cases I haven't considered. In any case, thanks for
-providing the test.
-
-Thanks,
-Zizhi Wo
-
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 28167c9baa55..5f97d07fa3c8 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -243,6 +243,7 @@ static const char *const rqf_name[] = {
+>   	RQF_NAME(ZONE_WRITE_PLUGGING),
+>   	RQF_NAME(TIMED_OUT),
+>   	RQF_NAME(RESV),
+> +	RQF_NAME(XFER_SINGLE_BLK),
+>   };
+>   #undef RQF_NAME
+>   
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index 05ee76cb0a08..00016584d70d 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -1401,6 +1401,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+>   		    rq_data_dir(req) == WRITE &&
+>   		    (md->flags & MMC_BLK_REL_WR);
+>   
+> +	if (req->rq_flags & RQF_XFER_SINGLE_BLK)
+> +		recovery_mode = 1;
+> +
+>   	memset(brq, 0, sizeof(struct mmc_blk_request));
+>   
+>   	mmc_crypto_prepare_req(mqrq);
+> @@ -1540,10 +1543,13 @@ static void mmc_blk_cqe_complete_rq(struct mmc_queue *mq, struct request *req)
+>   		err = 0;
+>   
+>   	if (err) {
+> -		if (mqrq->retries++ < MMC_CQE_RETRIES)
+> +		if (mqrq->retries++ < MMC_CQE_RETRIES) {
+> +			if (rq_data_dir(req) == WRITE)
+> +				req->rq_flags |= RQF_XFER_SINGLE_BLK;
+>   			blk_mq_requeue_request(req, true);
+> -		else
+> +		} else {
+>   			blk_mq_end_request(req, BLK_STS_IOERR);
+> +		}
+>   	} else if (mrq->data) {
+>   		if (blk_update_request(req, BLK_STS_OK, mrq->data->bytes_xfered))
+>   			blk_mq_requeue_request(req, true);
+> @@ -2085,6 +2091,8 @@ static void mmc_blk_mq_complete_rq(struct mmc_queue *mq, struct request *req)
+>   	} else if (!blk_rq_bytes(req)) {
+>   		__blk_mq_end_request(req, BLK_STS_IOERR);
+>   	} else if (mqrq->retries++ < MMC_MAX_RETRIES) {
+> +		if (rq_data_dir(req) == WRITE)
+> +			req->rq_flags |= RQF_XFER_SINGLE_BLK;
+>   		blk_mq_requeue_request(req, true);
+>   	} else {
+>   		if (mmc_card_removed(mq->card))
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 18a2388ba581..06b6e1c4fca3 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -64,6 +64,7 @@ enum rqf_flags {
+>   	/* ->timeout has been called, don't expire again */
+>   	__RQF_TIMED_OUT,
+>   	__RQF_RESV,
+> +	__RQF_XFER_SINGLE_BLK,
+>   	__RQF_BITS
+>   };
+>   
+> @@ -85,6 +86,8 @@ enum rqf_flags {
+>   			((__force req_flags_t)(1 << __RQF_ZONE_WRITE_PLUGGING))
+>   #define RQF_TIMED_OUT		((__force req_flags_t)(1 << __RQF_TIMED_OUT))
+>   #define RQF_RESV		((__force req_flags_t)(1 << __RQF_RESV))
+> +#define RQF_XFER_SINGLE_BLK	\
+> +			((__force req_flags_t)(1 << __RQF_XFER_SINGLE_BLK))
+>   
+>   /* flags that prevent us from merging requests: */
+>   #define RQF_NOMERGE_FLAGS \
+> 
