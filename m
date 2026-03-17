@@ -1,115 +1,187 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375C03F7E80
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 23:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FE536404D;
+	Tue, 17 Mar 2026 23:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773789805; cv=none; b=TS9Lp+BWVRkZYQSXVj5pKBkA5NFQQuewDTrp+cmh1HsXTDxa4S642fh0U+T8KmcRvm/bH2W5Yy5Os6itlJLyU+ZcjgQ0iAdZybc2vAWT2YkgF2ScyP3C/NuaR56CGpHVwNR4eO066Nb63d4OwhL6Hg6plDTsV/k7zvxkXR7j+/I=
+	t=1773790709; cv=none; b=fqpS2jxci0+b/dbCiaSTKTAUvojwERWNSkjbZRZhCKK6v38eDenazSqDmPES9KQSa6Al+2EB/t0oveWY8KIDbJZ/rJzF7k+XMpBtU96gQwAqZSWkyyfmgdccv/QLQYEPz5Kjh4QaHarmJPSRbq/MFfae3BIzy1RHOiUEZKbD3gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773789805; c=relaxed/simple;
-	bh=MamMwEHvD7VENb++o+ubuwCysRUMRUnSxlW8m9IcJtA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=maVK/JdKlsjBqbhxsJ5Fw3tMFwFXLR5dQ1aJ0JMmpvRGhCuLtkiMLDjv1rwf63nJsKDqjJXUd9DFJFANS5WWD9Kmv/LhXOKnduY76ST6h0yTDuldHWfHcV3msZ+XBhSR3bfiYMzqm+C9PoKP1P9Q1BFLWDixsNeEUuReGChDNtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PewwBtqY; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1773790709; c=relaxed/simple;
+	bh=WwVLPe0QCCCeyvdW/GwssSdLhCdmfc4bf4h4H8OYCjQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YZixjn8D3NxC+nO2IhaSRo9+fQ1G7+gDLfJLRiGP7LPNIIIENqLRageMuchHfXXlkGWb3Rm6iCTjPUs/psqxx1Z0T+zLuBsjjMyycWfVMuaFukWrn+hHrnbVMgSeaW3cVWUmLnnhtHotdo59mkg0LMFq8LBZanRJtWBU1p9Zth4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EpUb6IGm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PewwBtqY"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-79853c0f5b9so49819717b3.0
-        for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 16:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773789803; x=1774394603; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4qAb7BAjRHOKOhLG2ZwGENg8pg0OEX1p0HLdyPGydEM=;
-        b=PewwBtqYLja3Gc9qhxGWsbRDgmuOKbe2bSAvUKKlmX1P2P5c2sA8hO8rUS4v+PsAaV
-         Qbn0WTICYMzmYcqVj7zsKhWeOcGMa0LZkeGruVMD8ujslHfh6q1NuLJOZs4uYVTPq4rB
-         Wxp63OgnrinaymSAybZbsr/Uw1v+aV3fjDRGWCJXKlkykLhWImjRSD3jA4LU9uZ4d8dS
-         hnmsQlV7cpUi+VkYrlXOmnRlzuP1Mpip+cTe14ColX5u9VmjjFLBkjIotUcVtfcKsoq3
-         tM3BsmuUsjFriyJjZYFEMaw3P1kBwo5sDYalE6zdFz107ey7Ixg/SdEarN/TqWxawKdH
-         FIPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773789803; x=1774394603;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4qAb7BAjRHOKOhLG2ZwGENg8pg0OEX1p0HLdyPGydEM=;
-        b=tOte9FP70leAEvfaSPMLGhG2qkXSDLBt2PEs/Y7Y6q6zq1VYWmwRTU6nAjjAMRyTO+
-         V1nJPuqjq2PkZqrvSgLzefysRY+EJRGkVsFUys7uFNJRHM4LDN1venC7xxgtR88NnIrs
-         NOHn0Wmi/41l+N/ErwtnH8MDASqRw/8iTK1gqCizre5HDSPsxvsfTqPZ4UjibX5AJciy
-         cS8CPHeOgnreOBOpN0hHfoOKyhMxBWB8x7zF6+eREuhWUCci/7APeeCSGQCDN6kTBKr2
-         ePlF6kC1LIVdVz1UnhRi5CejU9jWMvqCWHvrWQbyAA0W7BujIC7HNP19khxN3U3lTz6b
-         WbIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+c2g8H5C7K5mCsjjHHaUGuAB73Ar49TlnSRH4l4BMpDqOsSa6IV6d7ZDrzrV/oP7ZD9A3Aln1pmWeRg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw94pRNofaDXGq1b2wDufvSlF09DAKbvX1qJghU7t++W6cAxe0V
-	SNpEHeLvF2UkOyO9hLMQHrDacAgp5Y7dftMUi2kbmYfVPErxSHEQIJau
-X-Gm-Gg: ATEYQzw5YqNZQVx/KW4Aq5K5yOQZJmaT2GpFNzoDbgtMgUZVBcqZs2SUFK0UvgkTfrD
-	pW4cZjITpXz4hEVKbfxgME4OUZRL9bAvr1ZOqptPzMU27sy7SH0FOULQ0zNIa4U0pstif4n1mZ0
-	quTDOXywUMUjIm3+dpYAd+UpubF7R0BnBORgblF2MRaQswhBxj/n484m3OcBwN63y7pNR9Jn+Hd
-	2AAsDjSQuN0ZOtRhle8UMtm8mvfbt/i5gEHWqCewUWo4xeqAkjVghINfegjtI+0+c3MqdtP2BQx
-	O2PPhnoBIJZRMbE+EiqTMFgrDVwRahDqF/hoOteXZtwvu+sX2tlQahC3CFGNsb6Nio7AU05Bydp
-	gtxxpoo1m99Fk5vRzyglHx18UfRYRze9QX2GaqBsj2efFF7C0I820Fi8zyHDdEiX2H0bdIagdNO
-	Dw1XpjeFrQRdBBtAS4czmsOTy0ZiG9fHwuU4KGHUXHrtvKeQWtAudfbbKSZRaK3v+EBCsup1G7V
-	y2syuG6p3qQfQigusMU5//1
-X-Received: by 2002:a05:690c:60c4:b0:799:1c93:7adb with SMTP id 00721157ae682-79a718a5e91mr13675337b3.23.1773789803317;
-        Tue, 17 Mar 2026 16:23:23 -0700 (PDT)
-Received: from tux ([2601:7c0:c37e:2360::f769])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79a715d221dsm6858217b3.37.2026.03.17.16.23.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 16:23:23 -0700 (PDT)
-From: Ethan Tidmore <ethantidmore06@gmail.com>
-To: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ethan Tidmore <ethantidmore06@gmail.com>
-Subject: [PATCH 4/4] drbd: Add check for error pointer
-Date: Tue, 17 Mar 2026 18:23:18 -0500
-Message-ID: <20260317232318.18923-5-ethantidmore06@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260317232318.18923-1-ethantidmore06@gmail.com>
-References: <20260317232318.18923-1-ethantidmore06@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EpUb6IGm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3757BC4CEF7;
+	Tue, 17 Mar 2026 23:38:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773790708;
+	bh=WwVLPe0QCCCeyvdW/GwssSdLhCdmfc4bf4h4H8OYCjQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EpUb6IGmzdS9nIi3iyY7CFvEwaHdupo7T24orgXuhkw+jsb98rstE/3pQUe7soAUZ
+	 G5bCcVQm5gklDMzd+ZoHRUuYLWQcj9YquYPxBiq5RUcNycUG7bvPz1qXcwG1fnqQmU
+	 /iC6WNaed+tRNdUWE080qSAukDM9GHJwWo7sz9ojyFhtgvuGnGf0r2ZgXbXtbFzujx
+	 BOulwgYW/MBP33I5j6cbYbUGYFHSMXrqMWTcBzeL1G8BQLps7UNgqYNMjf8t0N/Eig
+	 VkQq25mQRrSW0c7B5WB91JYFkqsKxwZwsfA0YGfpG5OyMjWF2DdsFuqhRkm8HKU4Ml
+	 vILfhWG4l/6sg==
+Message-ID: <e7db667e-2662-4ad9-89cd-309c457ce17e@kernel.org>
+Date: Wed, 18 Mar 2026 08:38:20 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-mq: add tracepoint block_rq_tag_wait
+To: Aaron Tomlin <atomlin@atomlin.com>, axboe@kernel.dk, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com
+Cc: johannes.thumshirn@wdc.com, kch@nvidia.com, bvanassche@acm.org,
+ ritesh.list@gmail.com, neelx@suse.com, sean@ashe.io, mproche@gmail.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20260317182835.258183-1-atomlin@atomlin.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260317182835.258183-1-atomlin@atomlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The function find_cfg_context_attr() can return an error pointer or NULL
-in its error path.
+On 2026/03/18 3:28, Aaron Tomlin wrote:
+> In high-performance storage environments, particularly when utilising
+> RAID controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED), severe
+> latency spikes can occur when fast devices (SSDs) are starved of hardware
+> tags when sharing the same blk_mq_tag_set.
+> 
+> Currently, diagnosing this specific hardware queue contention is
+> difficult. When a CPU thread exhausts the tag pool, blk_mq_get_tag()
+> forces the current thread to block uninterruptible via io_schedule().
+> While this can be inferred via sched:sched_switch or dynamically
+> traced by attaching a kprobe to blk_mq_mark_tag_wait(), there is no
+> dedicated, out-of-the-box observability for this event.
+> 
+> This patch introduces the block_rq_tag_wait static tracepoint in
+> the tag allocation slow-path. It triggers immediately before the
+> thread yields the CPU, exposing the exact hardware context (hctx)
+> that is starved, the total pool size, and the current active request
+> count.
+> 
+> This provides storage engineers and performance monitoring agents
+> with a zero-configuration, low-overhead mechanism to definitively
+> identify shared-tag bottlenecks and tune I/O schedulers or cgroup
+> throttling accordingly.
+> 
+> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
 
-Change NULL check to IS_ERR_OR_NULL().
+Looks OK to me, but I have some suggestions below.
 
-Detected by Smatch:
-drivers/block/drbd/drbd_nl.c:6571 drbd_adm_dump_paths() error:
-'resource_filter' dereferencing possible ERR_PTR()
+> ---
+>  block/blk-mq-tag.c           |  3 +++
+>  include/trace/events/block.h | 36 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 33946cdb5716..f50993e86ca5 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/kmemleak.h>
+>  
+>  #include <linux/delay.h>
+> +#include <trace/events/block.h>
+>  #include "blk.h"
+>  #include "blk-mq.h"
+>  #include "blk-mq-sched.h"
+> @@ -187,6 +188,8 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>  		if (tag != BLK_MQ_NO_TAG)
+>  			break;
+>  
+> +		trace_block_rq_tag_wait(data->q, data->hctx);
+> +
+>  		bt_prev = bt;
+>  		io_schedule();
+>  
+> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> index 6aa79e2d799c..48e2ba433c87 100644
+> --- a/include/trace/events/block.h
+> +++ b/include/trace/events/block.h
+> @@ -226,6 +226,42 @@ DECLARE_EVENT_CLASS(block_rq,
+>  		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
+>  );
+>  
+> +/**
+> + * block_rq_tag_wait - triggered when an I/O request is starved of a tag
 
-Fixes: 626c95b0e2a23 ("drbd: rework netlink interface for DRBD 9 multi-peer config")
-Signed-off-by: Ethan Tidmore <ethantidmore06@gmail.com>
----
- drivers/block/drbd/drbd_nl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+when an I/O request -> when a request
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index c5e253820ccf..1f458eb972e9 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -6566,7 +6566,7 @@ static int drbd_adm_dump_paths(struct sk_buff *skb, struct netlink_callback *cb)
- 	resource = (struct drbd_resource *)cb->args[0];
- 	if (!cb->args[0]) {
- 		resource_filter = find_cfg_context_attr(cb->nlh, T_ctx_resource_name);
--		if (resource_filter) {
-+		if (!IS_ERR_OR_NULL(resource_filter)) {
- 			retcode = ERR_RES_NOT_KNOWN;
- 			resource = drbd_find_resource(nla_data(resource_filter));
- 			if (!resource)
+> + * @q: queue containing the request
+
+request queue of the target device
+
+("containing" is odd here)
+
+> + * @hctx: hardware context (queue) experiencing starvation
+
+hardware context of the request
+
+> + *
+> + * Called immediately before the submitting thread is forced to block due
+
+the submitting thread -> the submitting context
+
+> + * to the exhaustion of available hardware tags. This tracepoint indicates
+
+s/tracepoint/trace point
+
+> + * that the thread will be placed into an uninterruptible state via
+
+s/thread/context
+
+> + * io_schedule() until an active block I/O operation completes and
+> + * relinquishes its assigned tag.
+
+until an active request completes
+
+(BIOs do not have tags).
+
+> + */
+> +TRACE_EVENT(block_rq_tag_wait,
+> +
+> +	TP_PROTO(struct request_queue *q, struct blk_mq_hw_ctx *hctx),
+> +
+> +	TP_ARGS(q, hctx),
+> +
+> +	TP_STRUCT__entry(
+> +		__field( dev_t,		dev			)
+> +		__field( u32,		hctx_id			)
+> +		__field( u32,		nr_tags			)
+> +		__field( u32,		active_requests		)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->dev		  = q->disk ? disk_devt(q->disk) : 0;
+
+I do not think that q->disk can ever be NULL when there is a request being
+submitted.
+
+> +		__entry->hctx_id	  = hctx ? hctx->queue_num : 0;
+> +		__entry->nr_tags	  = hctx && hctx->tags ? hctx->tags->nr_tags : 0;
+> +		__entry->active_requests  = hctx ? atomic_read(&hctx->nr_active) : 0;
+> +	),
+> +
+> +	TP_printk("%d,%d hctx=%u starved (active=%u/%u)",
+> +		  MAJOR(__entry->dev), MINOR(__entry->dev),
+> +		  __entry->hctx_id, __entry->active_requests, __entry->nr_tags)
+> +);
+> +
+>  /**
+>   * block_rq_insert - insert block operation request into queue
+>   * @rq: block IO operation request
+
+
 -- 
-2.53.0
-
+Damien Le Moal
+Western Digital Research
