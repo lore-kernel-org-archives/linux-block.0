@@ -1,109 +1,137 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B892C3947AC
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 08:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B758394477;
+	Tue, 17 Mar 2026 08:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773735241; cv=none; b=hdE6aumvRM/hnjhqVtsZRVZWwConZumc1Bn8WyI14GLgOLXRasS/KVBasBHQJfg4/pMZgjqQYSNPEr//TrrkImHi0YGbRRupSs0p4cKSbsHUzMaE72UsYoEabBRp3sXKuf0oAHESUaqLzkx+oDYy+XArL8cKw5l30ARYQBWJsg8=
+	t=1773735532; cv=none; b=qHGsmZhiVMMvqXJdktbwOJBEgT7sMQ9ZyDYUxH0VxUkKEbzYtY+mD7+8nAZJlC+lRpz7S6+8ZYj50DhovrV7CMe8X2aVE+Dqt293CtvAHyAwnxQ4s2HmylU4KvLjboyZ/BX1EaMgSz9b3fmEe837EA7AxSw/iBZf6jiP95BM7p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773735241; c=relaxed/simple;
-	bh=S5TsBvBSErp0VfCbfX7JBR9fifqaCus9lWHmv1i3Mrc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aG12O7/XtVzNeBalzsv/IaRlid4gtanNSHE74n+LkqW2H7NSvb4LIiX1l2TJ/RgfJ/Qzg40wj+zpUY8V45x+85D5LfiEAnv6E0ZUONDIGZc3HJmRXE+ygk/AebbkXhbmELhhd/06aksAGsBXJ4BfZfj/WF79DPhdOkizXuvpaus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fZl7v02lTzYQv46
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 16:12:59 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 4F6144057D
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 16:13:56 +0800 (CST)
-Received: from [10.174.176.179] (unknown [10.174.176.179])
-	by APP1 (Coremail) with SMTP id cCh0CgC3utpCDblp21_XBA--.60399S3;
-	Tue, 17 Mar 2026 16:13:56 +0800 (CST)
-Message-ID: <bc5dda8a-7b43-45e2-8888-cf8c37f53483@huaweicloud.com>
-Date: Tue, 17 Mar 2026 16:13:54 +0800
+	s=arc-20240116; t=1773735532; c=relaxed/simple;
+	bh=u5MxGVCRyOl2UZa/5kz/wI6wHnYBB/hBe5n9rZLQYY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OCrZdci2DnPWcVU6C6Z78W834mb4OwiPZIGK2utVmO8lzM3XGEc5ynbdSz6jnbeSaHKC+fPIgRVrrzkyWwXsZxwHgdJ0L90k1PwLY7L0nMRUGgZEZEN6vrHEubeXUSjcD+3fjVPiDldSG3zag9wO8ORQl8JXZZIjJbsBCEybvfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=QopJS4jH; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="QopJS4jH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F5BC4CEF7;
+	Tue, 17 Mar 2026 08:18:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1773735532;
+	bh=u5MxGVCRyOl2UZa/5kz/wI6wHnYBB/hBe5n9rZLQYY8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QopJS4jHPDM+a/5iBTk0hhvck3aRrw+hgrHVq/RG5kOR3zvgw2PcWgFIAmL6aLyBY
+	 xoO7A0vQV/GifLaFgGNuwYKtuB1xeAU7umxqpxeBpGA7Cg97HZP0mFGVM/0P4GsO79
+	 inCr48XnTo67vyDW4FkUY+v6+4KJtw4ngvbJlidc=
+Date: Tue, 17 Mar 2026 09:18:48 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, lsf-pc@lists.linux-foundation.org,
+	linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Hans Holmberg <Hans.Holmberg@wdc.com>, Jan Kara <jack@suse.cz>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	John Pittman <jpittman@redhat.com>,
+	John Stultz <jstultz@google.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Ming Lei <ming.lei@redhat.com>,
+	Niklas Cassel <cassel@kernel.org>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Oliver Mangold <oliver.mangold@pm.me>,
+	Pankaj Raghav <kernel@pankajraghav.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Theodore Tso <tytso@mit.edu>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>, gost.dev@samsung.com,
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC][RESEND] Status of Rust in the block subsystem
+Message-ID: <2026031706-simile-cornball-7744@gregkh>
+References: <878qcpbux5.fsf@kernel.org>
+ <87ikb2mrib.fsf@t14s.mail-host-address-is-not-set>
+ <abiXkTSpZ8CWbJVx@kbusch-mbp>
+ <SHJfcozLGkQIhP4Uu-FI07pSniNPU4Fm-OSq0PjGt2cWg4gimUJttaJz_iEyz-brOqgvcqUd_camzQwgRS9-Ag==@protonmail.internalid>
+ <7a4dfa82-41af-401f-aa92-5bd19fe6f654@suse.de>
+ <87a4w6swup.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] blk-throttle: minor fixes and cleanup
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>, "yukuai@fnnas.com"
- <yukuai@fnnas.com>, "ming.lei@redhat.com" <ming.lei@redhat.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "yangerkun@huawei.com" <yangerkun@huawei.com>,
- "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>
-References: <20260316084455.3323966-1-wozizhi@huaweicloud.com>
- <abkEKqXG_FkZe-l_@shinmob>
-From: Zizhi Wo <wozizhi@huaweicloud.com>
-In-Reply-To: <abkEKqXG_FkZe-l_@shinmob>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgC3utpCDblp21_XBA--.60399S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF13Ar1ktF1xAF13tFWrZrb_yoW8Xw18pF
-	W7W390kF48Ar9Ikrn3ta1aqay3X3yrJrZIkrn5AF4fWFn0vry5Kr1I93409FZYkasruaya
-	93yYqryfJ3WUAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUylb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUwxhLUUUUU
-X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a4w6swup.fsf@t14s.mail-host-address-is-not-set>
 
-
-
-在 2026/3/17 15:37, Shinichiro Kawasaki 写道:
-> On Mar 16, 2026 / 16:44, Zizhi Wo wrote:
->> From: Zizhi Wo <wozizhi@huawei.com>
->>
->> This series contains two minor patches for blk-throttle.
->>
->> Patch1: simple cleanup
->> Patch2: fix timer scheduled on tg_flush_bios()
->>
->> Zizhi Wo (2):
->>    blk-throttle: remove leftover carryover checks in
->>      tg_within_[bps/iops]_limit
->>    blk-throttle: fix timer scheduled on wrong service_queue in
->>      tg_flush_bios
+On Tue, Mar 17, 2026 at 09:07:10AM +0100, Andreas Hindborg wrote:
+> "Hannes Reinecke" <hare@suse.de> writes:
 > 
-> Hello ZiZhi, just FYI. Blktests CI trial run found that this series triggered
-> the failure of the test case throtl/004 with sdebug:
+> > On 3/17/26 00:51, Keith Busch wrote:
+> >> On Wed, Mar 11, 2026 at 02:21:00PM +0100, Andreas Hindborg wrote:
+> >>> As this topic was not selected for discussion at LSF, and I did not
+> >>> receive an invitation for LSF this year, I propose that we discuss these
+> >>> two topics on list.
+> >>>
+> >>> I do believe that these topics need to be discussed, and I would very
+> >>> much appreciate your input.
+> >>
+> >> I can sympathise the difficulty of maintaining external modules.
+> >>
+> >> In terms of this being a reference driver, that implies some future
+> >> hardware driver may leverage this for its development. Is there anything
+> >> in mind at this point for production? If so, maybe that use case should
+> >> take the lead. But either way, I think rust-nvme upstream inclusion
+> >> would invite confusion. Once it's upstream, it's no longer a reference
+> >> when distros and users turn it on.
+> >>
+> > I wholeheartedly agree.
+> >
+> > While I do see the original appeal to have a rust-nvme driver, having
+> > one will just lead to confusion on all sides, especially for distros.
+> > (Why is it there? should it be preferred to the original one? Do we
+> > have to support both of them? Are there features missing in either
+> > of these drivers?)
+> > In general we are trying hard to avoid duplication in the linux kernel,
+> > especially on the driver side. We constantly have to fight^Wargue
+> > with driver vendors why duplicating existing drivers to support new
+> > hardware is a bad idea, so we really should not start now just because
+> > the driver is written in another language.
+> > (That really might be giving vendors bad ideas :-)
 > 
-> throtl/004 (nullb) (delete disk while IO is throttled)
-> throtl/004 (nullb) (delete disk while IO is throttled)       [passed]
->      runtime    ...  1.667s
-> throtl/004 (sdebug) (delete disk while IO is throttled)
-> throtl/004 (sdebug) (delete disk while IO is throttled)      [failed]
->      runtime    ...  3.273s
->      --- tests/throtl/004.out	2026-03-16 10:29:46.761897543 +0000
->      +++ /home/fedora/blktests/results/nodev_sdebug/throtl/004.out.bad	2026-03-16 13:31:54.355173644 +0000
->      @@ -1,3 +1,2 @@
->       Running throtl/004
->      -Input/output error
->       Test complete
+> I actually agree to some extent. But I do think we can get around most
+> confusion with loud and clear documentation. We could make the driver
+> not probe by default, requiring a configfs setting to probe. Or leave
+> the PCI identifier table empty, so patching the driver is required to
+> make it probe.
+> 
+> For me, the big benefit would be having the rust nvme driver as part of
+> an allmodconfig or allyesconfig. That would prevent a ton of trouble.
+> 
+> We do plan to utilize the block infrastructure, but I think we are still
+> quite a long way from sending anything. Keeping the rust nvme driver in
+> tree till that point would prevent pci, dma, irq, etc. from developing
+> in ways that would not support a block device use case. As an example,
+> upstream Rust irq APIs are not actually able to support NVMe at the
+> moment. They work fine for GPU drivers though. And I cannot go an fix
+> them without a user. Same for DMA pool.
+> 
+> I could go and find some other piece of unsupported PCI hardware and
+> write a driver for that, use that to keep the APIs in shape upstream.
+> It's just a lot more work and the NVMe driver is already here and 90%
+> ready.
 
-Hi, I'm very sorry for my oversight. I have already identified the issue
-with the first patch in the patch set and replied to it myself. I will
-review more carefully next time. Please ignore the first patch (although
-the throtl test case did pass locally...)
+This implies that there really is no "need" for these rust bindings at
+all, if you don't know of, or are planning for, any real driver for
+them.  So why have them at all?
 
-I'd like to ask whether applying only the second patch can pass the
-corresponding tests in your environment?
+For the PCI and driver core bindings, and the majority of the other ones
+merged, we have real users (binder, nova-core, etc.) and so we are
+willing to take them and keep them up to date.  For these block
+bindings, why is it even worth it to have them around if there's never
+going to be a real user?
 
-Thanks,
-Zizhi Wo
+thanks,
 
+greg k-h
