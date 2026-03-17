@@ -1,177 +1,220 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1A838C413
-	for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 07:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E4438C428;
+	Tue, 17 Mar 2026 07:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773731935; cv=none; b=rm2xneZyy87JT2EaYObsAelsnnEEU0Zi6TNxMrpjJ6H1sWCYcOknD2oMp/oAG6Q51TJChZhFI5+u/USG+PKZSncPW9xbscEvaC3pFM4m90EcOOMhJwavy4lUQe4cp1lyresVSsXAJvFgxruF7corE9AOQRZCd95P45mkAazW88k=
+	t=1773732223; cv=none; b=gYI5Ndour0dH5tyq3MwlfHWBd71ORKhQiFH771LQL9egP/L0H6oYwM+R0sXQDyuNXplKMOHDqc+6mdZ1Jmm7FwHT1UIcb037SGDf5WcFqUEDv6v/6JfwsCAoZOiporEEMLspXPgYRnnXDa2jsycxyjAWph6DJnquL0jTq32JuDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773731935; c=relaxed/simple;
-	bh=4Zw6h1iwe04NvL497iJ6GgsTyO9zRIQQQwoY6nVK/TE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UWqgqlDSMIi0hPg3MLTclIERI+laXiQKG3cXjkfm1NOQG5nmLm/R4tEsjiaf07MtMaWHHIFc1b+KhvWEU5bMoUgkETAlZj5wMfbJBPKKJeCC+8CBxL8mQLqCFAXBW8/FoIZ0lAZRrY2H36lm3oZpSuP5ks4THjTLmKuumbSuQWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VmRFt23U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=eJWv/yMd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=F6IYd8Y6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DqTVbojB; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1773732223; c=relaxed/simple;
+	bh=94kV+YyGbPZOnbSyDlcl8B4SY4FtvRNWeUcVSiwZ+nU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=r0uRgGVShIRs/ibqhD6Mz6o8racDbMcg6aYWV1Vp7YMcyAFfRXGV1o8NhfWtP6a8gIrMayX66rr8xGwaHq5oFVXtTQD7/XjU8gBgTGWrnkbCGriCDV+8hEmDWZPNsHaMzb18UVFEz1nWAEk9FACYz4rqRRHQhDVefKXl8zKxnx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HiCV+QKN; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VmRFt23U";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="eJWv/yMd";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="F6IYd8Y6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DqTVbojB"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1BB505BD70;
-	Tue, 17 Mar 2026 07:18:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773731932; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1uNOQFwqg7/UNEqHxIWFJVIAKTLewkZHGv7J5mOuCUk=;
-	b=VmRFt23UAb2m3mJV3U0DXCRfBYMzI09slyn/wdV619CilbIAkeTljpMeF3oG2qzfSoEVZM
-	RXWxD08j5TLZyca493LccaaRTs/uQRvZFCbUexaUnpCdOCwNdUyD76MQxW1X3aCwmdGCmX
-	UEoREUmJQjZFE0RN609kI1hBQ7+XkVU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773731932;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1uNOQFwqg7/UNEqHxIWFJVIAKTLewkZHGv7J5mOuCUk=;
-	b=eJWv/yMdeum5FycDO/Pf+ed5pMkE2hg3DF4DAuwoxHmJ/YLWk5eNGL+CIiLbezL0HHSJFC
-	KjXP9iojenBYgtAw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1773731931; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1uNOQFwqg7/UNEqHxIWFJVIAKTLewkZHGv7J5mOuCUk=;
-	b=F6IYd8Y6oGwqyaBfOEm+DINlpchNGIcptnsZa71XDRVAby+x2x7QUDQlPDdFHZSK2Syd+U
-	dUGp0VqEc68RKGCGMpEB1g9cbdHTC88KGwMXXallUkdRtOHcGOVXtjQ4oWFntCU1OQ3Ckw
-	pfF/mBvpzpAoviVYkaxYzBM9zvo95qQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1773731931;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1uNOQFwqg7/UNEqHxIWFJVIAKTLewkZHGv7J5mOuCUk=;
-	b=DqTVbojBA6SuVoASzIyljyuSuDtduRxSYmrOd8y6I9usUgkUcMyiUbSAMMZn5F8NBHJ9Wg
-	8P/hbDLzjytnpzBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 605494273B;
-	Tue, 17 Mar 2026 07:18:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id prlIFloAuWlXGwAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 17 Mar 2026 07:18:50 +0000
-Message-ID: <7a4dfa82-41af-401f-aa92-5bd19fe6f654@suse.de>
-Date: Tue, 17 Mar 2026 08:18:49 +0100
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HiCV+QKN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=9R
+	qBGzMKagNYReOeRIu2ZbercOTEKpe3p1vmTXLqjDo=; b=HiCV+QKNvPnneDcO5f
+	5Uf3LxXgnvXdmayX63zkHszmpHL0R/1KuptdKDpL8aUERRGO1Su3ANBnHkuFzkTG
+	rv4k5edw7NFvDfwizMukmCe1gUb7wfd7OPQOZuqB/yY4WdD3mdt8YbqW/grz2wLN
+	G1rQdZP2apBtS18TMgrg5Zik0=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgCnhdw1AblpkrBDWA--.58229S4;
+	Tue, 17 Mar 2026 15:22:34 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+To: axboe@kernel.dk,
+	fujita.tomonori@lab.ntt.co.jp,
+	James.Bottomley@HansenPartnership.com,
+	martin.petersen@oracle.com
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	bvanassche@acm.org,
+	Yang Xiuwei <yangxiuwei@kylinos.cn>
+Subject: [PATCH v8 2/3] bsg: add io_uring command support to generic layer
+Date: Tue, 17 Mar 2026 15:22:25 +0800
+Message-Id: <20260317072226.2598233-3-yangxiuwei@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260317072226.2598233-1-yangxiuwei@kylinos.cn>
+References: <20260317072226.2598233-1-yangxiuwei@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC][RESEND] Status of Rust in the block subsystem
-To: Keith Busch <kbusch@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, lsf-pc@lists.linux-foundation.org,
- linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- Damien Le Moal <dlemoal@kernel.org>, Daniel Gomez <da.gomez@samsung.com>,
- Hans Holmberg <Hans.Holmberg@wdc.com>, Jan Kara <jack@suse.cz>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- John Pittman <jpittman@redhat.com>, John Stultz <jstultz@google.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Miguel Ojeda <ojeda@kernel.org>, Ming Lei <ming.lei@redhat.com>,
- Niklas Cassel <cassel@kernel.org>, Nitesh Shetty <nj.shetty@samsung.com>,
- Oliver Mangold <oliver.mangold@pm.me>,
- Pankaj Raghav <kernel@pankajraghav.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Theodore Tso <tytso@mit.edu>, Wedson Almeida Filho <wedsonaf@gmail.com>,
- gost.dev@samsung.com, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <878qcpbux5.fsf@kernel.org>
- <87ikb2mrib.fsf@t14s.mail-host-address-is-not-set>
- <abiXkTSpZ8CWbJVx@kbusch-mbp>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <abiXkTSpZ8CWbJVx@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -4.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.dk,lst.de,grimberg.me,lists.linux-foundation.org,vger.kernel.org,acm.org,nvidia.com,kernel.org,samsung.com,wdc.com,suse.cz,redhat.com,google.com,oracle.com,pm.me,pankajraghav.com,mit.edu,gmail.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLhytspa9b8ghbrab87o1fjg5u)];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
+X-CM-TRANSID:PSgvCgCnhdw1AblpkrBDWA--.58229S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxKFW7ZrykGry8KFyxWFWDCFg_yoW7Cry3pF
+	WrXa15JrWFgr4xuFZ8JFs8Ar9Iqw48K3yxJFyI9345KrnFyr9aqr1kWFy8tFWrJrWkCayY
+	qanYqrWDCr1UAw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j-sqAUUUUU=
+Sender: yangxiuwei2025@163.com
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6hoXp2m5ATrc0AAA3n
 
-On 3/17/26 00:51, Keith Busch wrote:
-> On Wed, Mar 11, 2026 at 02:21:00PM +0100, Andreas Hindborg wrote:
->> As this topic was not selected for discussion at LSF, and I did not
->> receive an invitation for LSF this year, I propose that we discuss these
->> two topics on list.
->>
->> I do believe that these topics need to be discussed, and I would very
->> much appreciate your input.
-> 
-> I can sympathise the difficulty of maintaining external modules.
-> 
-> In terms of this being a reference driver, that implies some future
-> hardware driver may leverage this for its development. Is there anything
-> in mind at this point for production? If so, maybe that use case should
-> take the lead. But either way, I think rust-nvme upstream inclusion
-> would invite confusion. Once it's upstream, it's no longer a reference
-> when distros and users turn it on.
-> 
-I wholeheartedly agree.
+Add an io_uring command handler to the generic BSG layer. The new
+.uring_cmd file operation validates io_uring features and delegates
+handling to a per-queue bsg_uring_cmd_fn callback.
 
-While I do see the original appeal to have a rust-nvme driver, having
-one will just lead to confusion on all sides, especially for distros.
-(Why is it there? should it be preferred to the original one? Do we
-have to support both of them? Are there features missing in either
-of these drivers?)
-In general we are trying hard to avoid duplication in the linux kernel,
-especially on the driver side. We constantly have to fight^Wargue
-with driver vendors why duplicating existing drivers to support new
-hardware is a bad idea, so we really should not start now just because
-the driver is written in another language.
-(That really might be giving vendors bad ideas :-)
+Extend bsg_register_queue() so transport drivers can register both
+sg_io and io_uring command handlers.
 
-Cheers,
+Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+---
+ block/bsg-lib.c         |  2 +-
+ block/bsg.c             | 33 ++++++++++++++++++++++++++++++++-
+ drivers/scsi/scsi_bsg.c | 10 +++++++++-
+ include/linux/bsg.h     |  6 +++++-
+ 4 files changed, 47 insertions(+), 4 deletions(-)
 
-Hannes
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 20cd0ef3c394..fdb4b290ca68 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -393,7 +393,7 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
+ 
+-	bset->bd = bsg_register_queue(q, dev, name, bsg_transport_sg_io_fn);
++	bset->bd = bsg_register_queue(q, dev, name, bsg_transport_sg_io_fn, NULL);
+ 	if (IS_ERR(bset->bd)) {
+ 		ret = PTR_ERR(bset->bd);
+ 		goto out_cleanup_queue;
+diff --git a/block/bsg.c b/block/bsg.c
+index e0af6206ed28..82aaf3cee582 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -12,6 +12,7 @@
+ #include <linux/idr.h>
+ #include <linux/bsg.h>
+ #include <linux/slab.h>
++#include <linux/io_uring/cmd.h>
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+@@ -28,6 +29,7 @@ struct bsg_device {
+ 	unsigned int timeout;
+ 	unsigned int reserved_size;
+ 	bsg_sg_io_fn *sg_io_fn;
++	bsg_uring_cmd_fn *uring_cmd_fn;
+ };
+ 
+ static inline struct bsg_device *to_bsg_device(struct inode *inode)
+@@ -158,11 +160,38 @@ static long bsg_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ 	}
+ }
+ 
++static int bsg_check_uring_features(unsigned int issue_flags)
++{
++	/* BSG passthrough requires big SQE/CQE support */
++	if ((issue_flags & (IO_URING_F_SQE128|IO_URING_F_CQE32)) !=
++	    (IO_URING_F_SQE128|IO_URING_F_CQE32))
++		return -EOPNOTSUPP;
++	return 0;
++}
++
++static int bsg_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
++{
++	struct bsg_device *bd = to_bsg_device(file_inode(ioucmd->file));
++	bool open_for_write = ioucmd->file->f_mode & FMODE_WRITE;
++	struct request_queue *q = bd->queue;
++	int ret;
++
++	ret = bsg_check_uring_features(issue_flags);
++	if (ret)
++		return ret;
++
++	if (!bd->uring_cmd_fn)
++		return -EOPNOTSUPP;
++
++	return bd->uring_cmd_fn(q, ioucmd, issue_flags, open_for_write);
++}
++
+ static const struct file_operations bsg_fops = {
+ 	.open		=	bsg_open,
+ 	.release	=	bsg_release,
+ 	.unlocked_ioctl	=	bsg_ioctl,
+ 	.compat_ioctl	=	compat_ptr_ioctl,
++	.uring_cmd	=	bsg_uring_cmd,
+ 	.owner		=	THIS_MODULE,
+ 	.llseek		=	default_llseek,
+ };
+@@ -187,7 +216,8 @@ void bsg_unregister_queue(struct bsg_device *bd)
+ EXPORT_SYMBOL_GPL(bsg_unregister_queue);
+ 
+ struct bsg_device *bsg_register_queue(struct request_queue *q,
+-		struct device *parent, const char *name, bsg_sg_io_fn *sg_io_fn)
++		struct device *parent, const char *name, bsg_sg_io_fn *sg_io_fn,
++		bsg_uring_cmd_fn *uring_cmd_fn)
+ {
+ 	struct bsg_device *bd;
+ 	int ret;
+@@ -199,6 +229,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
+ 	bd->reserved_size = INT_MAX;
+ 	bd->queue = q;
+ 	bd->sg_io_fn = sg_io_fn;
++	bd->uring_cmd_fn = uring_cmd_fn;
+ 
+ 	ret = ida_alloc_max(&bsg_minor_ida, BSG_MAX_DEVS - 1, GFP_KERNEL);
+ 	if (ret < 0) {
+diff --git a/drivers/scsi/scsi_bsg.c b/drivers/scsi/scsi_bsg.c
+index a9a9ec086a7e..4d57e524e141 100644
+--- a/drivers/scsi/scsi_bsg.c
++++ b/drivers/scsi/scsi_bsg.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include <linux/bsg.h>
++#include <linux/io_uring/cmd.h>
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+ #include <scsi/scsi_cmnd.h>
+@@ -9,6 +10,12 @@
+ 
+ #define uptr64(val) ((void __user *)(uintptr_t)(val))
+ 
++static int scsi_bsg_uring_cmd(struct request_queue *q, struct io_uring_cmd *ioucmd,
++			       unsigned int issue_flags, bool open_for_write)
++{
++	return -EOPNOTSUPP;
++}
++
+ static int scsi_bsg_sg_io_fn(struct request_queue *q, struct sg_io_v4 *hdr,
+ 		bool open_for_write, unsigned int timeout)
+ {
+@@ -99,5 +106,6 @@ static int scsi_bsg_sg_io_fn(struct request_queue *q, struct sg_io_v4 *hdr,
+ struct bsg_device *scsi_bsg_register_queue(struct scsi_device *sdev)
+ {
+ 	return bsg_register_queue(sdev->request_queue, &sdev->sdev_gendev,
+-			dev_name(&sdev->sdev_gendev), scsi_bsg_sg_io_fn);
++			dev_name(&sdev->sdev_gendev), scsi_bsg_sg_io_fn,
++			scsi_bsg_uring_cmd);
+ }
+diff --git a/include/linux/bsg.h b/include/linux/bsg.h
+index ee2df73edf83..162730bfc2d8 100644
+--- a/include/linux/bsg.h
++++ b/include/linux/bsg.h
+@@ -7,13 +7,17 @@
+ struct bsg_device;
+ struct device;
+ struct request_queue;
++struct io_uring_cmd;
+ 
+ typedef int (bsg_sg_io_fn)(struct request_queue *, struct sg_io_v4 *hdr,
+ 		bool open_for_write, unsigned int timeout);
+ 
++typedef int (bsg_uring_cmd_fn)(struct request_queue *q, struct io_uring_cmd *ioucmd,
++			       unsigned int issue_flags, bool open_for_write);
++
+ struct bsg_device *bsg_register_queue(struct request_queue *q,
+ 		struct device *parent, const char *name,
+-		bsg_sg_io_fn *sg_io_fn);
++		bsg_sg_io_fn *sg_io_fn, bsg_uring_cmd_fn *uring_cmd_fn);
+ void bsg_unregister_queue(struct bsg_device *bcd);
+ 
+ #endif /* _LINUX_BSG_H */
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.25.1
+
