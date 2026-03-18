@@ -1,67 +1,67 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9D7373C03
-	for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 21:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3C02264D6
+	for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 21:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773868440; cv=none; b=Acq1UgMD7DoOIJ4PwcJbgbX0vgC/55cSsSeV8pf58elmJIxkfUJ6ySEnNzJCqi2ZuCw5GSPR+Cjr9N2SUGUfFZUSwVA91eZQ0PEnpRIKHr+cSkxAQb4T65WzfxgmL43Ly1fUfgs4RVmbk84QPO3Y7rXEXHTxkeC+vLuGU++kBdo=
+	t=1773868600; cv=none; b=PRIg/eG5VqTkp87k+Vrx/KoiM10J4L/aBRir9+VXEXeZvbz9WU3h3yS/JICyQ/RViPH+2OY7d5psCJggK6ebmR/3zkav9Vpnq5uUYsIa0IPQE1DI2anzO1wfP1YJbZt9tG4bu9z99WqP7qYN5t4EOr4gmyb/VFgWglhwMwoD2rQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773868440; c=relaxed/simple;
-	bh=s2NRFJyBQz5oiptd7hu2gPq3H2m/wAy1m114TV5rCh8=;
+	s=arc-20240116; t=1773868600; c=relaxed/simple;
+	bh=P//KxE6W/5Y+HAxi/f5cOXKna4n5LLIU7027UToyg34=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=th9UkY3kvfFzS0gZ9i9XHJchSTsxiaBgsG2A+Y7kVAur9dRmzyoNczzH3RQyBt+MeWHf+IvttEC5TQiZh6/e3IkwCepJkhAYehFVlqNi/MkLz09RIB4V8FTGa+k6YtTv5f/xs8eOae4IbB8DdrNyqB7RrvfoKwwMeInbtCP4CYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=wyNFBTPm; arc=none smtp.client-ip=209.85.128.41
+	 In-Reply-To:Content-Type; b=miT2sBuhQWZ45/9ZL4zwYhq+NTEnvVcMncFjs34pguGuxQjSxUF4PigXqoDWB3+q2jYmtLsMOKGTW6LuRzs0Y4bGCrT4fY0ccjrHcNq/hbmRRxm2cIKYfE1WV7CYLIf9WhfECI2rJZYpk+OLNh2yOQquiPBUrpXwxh428Ee/wxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=Uh+4QSff; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="wyNFBTPm"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-482f454be5bso13620725e9.0
-        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 14:13:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="Uh+4QSff"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48540d21f7dso2835245e9.0
+        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 14:16:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773868436; x=1774473236; darn=vger.kernel.org;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773868597; x=1774473397; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=K2kU43AlMQDJ+y4iCNAzBB3zEZFAq2dkQy3AbLDN39A=;
-        b=wyNFBTPmN3ZkKk2+gIkRTOxtdDqvQFhcTm436M891jABmrJunV9tITfBJ/SgrhcrPB
-         /ux70Xg1uKxZuoc+HXlai26r6HnxH1GnkX5QPPCU5JFiCaWbJhZHF31sQkIPtLeFtqX7
-         RtVLerLONG4TR95eAvRG6zng8IdKfRQRgpNaDI7pGA5nr3+JOtFGlbcXjcyem9puo2ji
-         asE6xd3MhXpsni8xEeee6akhwoJGTBSaIHhWkKnDLKkOYIF2LsxRsZ7wsjVp2LWOKSEt
-         uFOZTbRxWDQizrQ5jFDhVYmNk1+RsWBtGVJ9uRvf/yxk9nzrf9u4B/pIFXotzfi4KUz3
-         Osbw==
+        bh=6JSbsrYhFg+Au4jgvX758AnPNxCSSto/QgL2aLSvMGI=;
+        b=Uh+4QSffM1uGTLyOEOiMET9Q9ElpLzCKb4XanROgT477VE+9Z7Imhlvsbho+yNIPn/
+         edWoCR/vrz4sOfms3aCJk2GXaXp2BB7vQ0c3By8j7A+p+dBzfw3wxMpSL9kuBqByFlOa
+         jfVZeQQS+NyWj6eAT5LYWSwgsc2nPYQ3Q9oO5wjeUmCW/56DH2QmP/av+CgqUY9sFedv
+         GG74szR+s1k8eICg6667X6jFJTG42+2ACKcGpARFX7Bdo+aad+qUFXxfNubA+21WP39I
+         KVIzj7YOZ8gJ07/eygvoApUPGkQ9vOuodL9AWwguT+7Rsuhja8VWzSOIFkm0jbIpckep
+         7KRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773868436; x=1774473236;
+        d=1e100.net; s=20251104; t=1773868597; x=1774473397;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=K2kU43AlMQDJ+y4iCNAzBB3zEZFAq2dkQy3AbLDN39A=;
-        b=EUC3/nZJfV8NcsFtu7e3G2ZsjvBwN52nZfy2aeIO+/qkLpDUVhCrx4gDRM/FvIxczS
-         awBHPxnglBljLU2QlgCXV22V7NaDP8QLINGTxo39Ald6FM+QoLTlgwHBC7G3AIf/nlBi
-         XmEAtFuGH8p9YmlmgiOp4319w2R021StEM1/ew3VUPHdpEW6Xb6y23xMeNQSeYXw9alK
-         2cd2Dy7i6JpYzi0MlUSVPMWXGgs1+o0Epnv48WUJPK43scsrIhJveNuW91VMVnYmph8v
-         fUgs+evbs7Uas1yUgLJJN/nukIpvPHkEpk8EBnGswZmbSos26A7sn7E/xr+r35MHPGKx
-         iuyw==
-X-Forwarded-Encrypted: i=1; AJvYcCXfv9WDB0/aGgqhUKwN3zI+WMezbyZ8qHWuavlEV24I36f4CKEHO48bk0GfLPpZoSQ2Ox6A3onlJE1j6A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsuS4hXAbNckb4lpa7alR05KiodUAlZuU96VKzkrGqzf4ANsOV
-	jm9uTYuDvEhEt00rMFGk4r0B/gUtEloOs2uINxxCjqUWVbFFtZfzm7L0az5gBXQILkU=
-X-Gm-Gg: ATEYQzy2uy93SSssWXI4+wS83zZwq18I+BjB8gnERuG2Ve8jLGOJiE2SqSsz+76P34x
-	cEUcKWWgDY8u1qmwK+zg3qS15WyEJOEtddpU/ucGBPnOr+VA82e9SE/YNJNCL2JBcT+1Hy1Trgg
-	64rZ9yd1oMviPQQvBajNHUsaCH1piDfgU9wd+64jUcx+mUTOr/nhfwM3jUa3fLAGf3R8MJpwhE8
-	3YCp+fRIdvgx+58W6bV/9BIQv/fFg3s+/XVKc8wXIpEwvySWJ6sL7Td6kzRfCvMsLaqcnwjGRM6
-	1qEHGtdrZB/M+zqc0hg65bq3GzLV3fjFOy7Gd69bRwoUUw2AW6xAdCyoyLMD/VvkxeCZTUOK+94
-	4SBX1g3yNF8FMe2Lqac5u0lCzGOubteVYvdZbR9hr09H64NuRzpPjGsDBYQuEDRoiEaZGY+b2td
-	IPCW/xzTjYDzlYGwsT9bu9k7g2BgaZjaJ+6GVOPYceCXUkMl2ipgyqtdglb6lDeIrBIFN+Azhhi
-	uVidN+U9JDf6p8=
-X-Received: by 2002:a05:600c:c493:b0:47e:e59c:67c5 with SMTP id 5b1f17b1804b1-486f8b32877mr19492525e9.8.1773868436229;
-        Wed, 18 Mar 2026 14:13:56 -0700 (PDT)
+        bh=6JSbsrYhFg+Au4jgvX758AnPNxCSSto/QgL2aLSvMGI=;
+        b=TSlYGVTZgpxU+Y2xos3vKlkDIYJAAwPgD5CWvM1RnGDxyFWuQAnI+NJspvUjPkHIhm
+         avEbDAfcTs2IbFtgRAslTinfYBEPfNo1hVK7ezwt0YT0Zyo+yZ2B8pqvDAVuZpyWg3zj
+         XOGXlTK2Kik1OGGrHgm1orPE8VKfHnZus5eFHPCjDiPgpyeT0sBN26T2Cot3ee/l5rer
+         3Q+pBwrukgqUVKAv1QbvtIb5SNrwfr0FFdsYjKff1mCtzfpor4Q6T+KGMFDMXqDPw/gN
+         Laj6DO+g9Ii6agbOA7C9aVnbnkHus0nv9/v0Dkhopo3O7C6G9ALYOm08pxLzd8p7mTKJ
+         y3bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZUY/f+v1ibGg6tTjvGQkbCrbZDz+2Lb/KezhBt/awgf1nZNaPikFet1kSO/S1TrQZpNmt3zov+7PdaQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcG8YR1SnmIQH1NSdDWO5uzxQX34nhGQfIMtJGO3P1GyDthW/o
+	E7yeTKDLTmcMQKPmj7atwvzaAn9+L20fna6gkx6OOKFpAFqi4IMJF+8pIHvZCzdepTs=
+X-Gm-Gg: ATEYQzwDGI7B6tJ63ArEjtAwk0m+CCjHCR3f/CqrPw+suVoc2nzqdVJJWbKkYVu0PHl
+	gMpx0a+D88LtJz9juG9DlnCP7ffTgAbwnrrSmayjz3sWWGl+wUkHBiTGxHP+a+sfGKUIk1pGRPU
+	81d/mHTxU6fv0GvHSQaXlM5Ou/2x4lOZABRj8guZoYFs1uxFaQGqYzl3i5BWgL66d9b02uXHsq4
+	WnNvHfCiiDXhqLRC3Fm5pk4hhpPrjKikd2uOHnTsCOPAC9fUvNWuziUsotb2gKcx9HGBZBuT8N/
+	pvzJqvHaVoG0B/Yw+QswF/sJmUVX3Yt9WGf4B2YcevXxf/cPWi1ZQVYwIQJgWyDCnd443br9xDj
+	lhRC7QKp/KTd8kPRV8Y3hcLit/KjeCL2PlV7Av0oQHoUjeSoirk1F+beQFZv5HrUYOhFMY/dSIt
+	wrPNRhvWTmd7NoB1ekodd5vMNqpWSPxog+1NF6iRp1T1+j1wXBYi1RQvOzbDjlqdzzXFoEXBhcD
+	FSPAaVd6OQqwv4=
+X-Received: by 2002:a05:6000:608:b0:439:c69f:503a with SMTP id ffacd0b85a97d-43b527c4df0mr8143039f8f.27.1773868596733;
+        Wed, 18 Mar 2026 14:16:36 -0700 (PDT)
 Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f4bc0187sm30798895e9.29.2026.03.18.14.13.53
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b51892244sm11628020f8f.22.2026.03.18.14.16.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Mar 2026 14:13:54 -0700 (PDT)
-Message-ID: <f67a657b-bec5-404f-9435-a69f11b7e396@linbit.com>
-Date: Wed, 18 Mar 2026 22:13:52 +0100
+        Wed, 18 Mar 2026 14:16:36 -0700 (PDT)
+Message-ID: <6b696861-ac39-4a87-a2fa-ad47a75031c6@linbit.com>
+Date: Wed, 18 Mar 2026 22:16:34 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,39 +69,82 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][next] drbd: Fix typos: "receive_peer_dagatg" ->
- "receive_peer_dagtag"
-To: Jens Axboe <axboe@kernel.dk>, Colin Ian King <colin.i.king@gmail.com>,
+Subject: Re: [PATCH 2/2] drbd: select CONFIG_NET_HANDSHAKE
+To: Arnd Bergmann <arnd@kernel.org>,
  Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>, drbd-dev@lists.linbit.com,
- linux-block@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260316202549.33978-1-colin.i.king@gmail.com>
- <ea558bc4-3efe-4eca-9da6-56f4a5302056@kernel.dk>
+ Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>,
+ Eric Biggers <ebiggers@google.com>, drbd-dev@lists.linbit.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260318104858.1868731-1-arnd@kernel.org>
+ <20260318104858.1868731-2-arnd@kernel.org>
 From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
 Content-Language: en-US
-In-Reply-To: <ea558bc4-3efe-4eca-9da6-56f4a5302056@kernel.dk>
+In-Reply-To: <20260318104858.1868731-2-arnd@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-
-
-Am 18.03.26 um 20:05 schrieb Jens Axboe:
-> On 3/16/26 2:25 PM, Colin Ian King wrote:
->> There are a couple of typos in drbd_info and drbd_err messages.
->> Fix them.
+Am 18.03.26 um 11:48 schrieb Arnd Bergmann:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Doesn't apply against for-next?
+> The TLS handshake code is optional and has to be enabled for DRBD:
 > 
+> ERROR: modpost: "tls_handshake_cancel" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_server_hello_x509" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_client_hello_x509" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_get_record_type" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> ERROR: modpost: "tls_alert_recv" [drivers/block/drbd/drbd_transport_tcp.ko] undefined!
+> 
+> Select the option whenever DRBD is eanbled and rework the dependency in
+> the symbol so it can be selected more easily.
+> 
+> Fixes: fa8ef6960ebd ("drbd: add TCP transport implementation")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/block/drbd/Kconfig | 1 +
+>  net/Kconfig                | 4 +---
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/block/drbd/Kconfig b/drivers/block/drbd/Kconfig
+> index 29ec6ed84251..de9e232d6479 100644
+> --- a/drivers/block/drbd/Kconfig
+> +++ b/drivers/block/drbd/Kconfig
+> @@ -11,6 +11,7 @@ config BLK_DEV_DRBD
+>  	depends on PROC_FS && INET
+>  	select LRU_CACHE
+>  	select CRC32
+> +	select NET_HANDSHAKE
+>  	help
+>  
+>  	  NOTE: In order to authenticate connections you have to select
+> diff --git a/net/Kconfig b/net/Kconfig
+> index 62266eaf0e95..769880113740 100644
+> --- a/net/Kconfig
+> +++ b/net/Kconfig
+> @@ -92,9 +92,7 @@ source "drivers/dibs/Kconfig"
+>  source "net/xdp/Kconfig"
+>  
+>  config NET_HANDSHAKE
+> -	bool
+> -	depends on SUNRPC || NVME_TARGET_TCP || NVME_TCP
+> -	default y
+> +	def_bool SUNRPC || NVME_TARGET_TCP || NVME_TCP
+>  
+>  config NET_HANDSHAKE_KUNIT_TEST
+>  	tristate "KUnit tests for the handshake upcall mechanism" if !KUNIT_ALL_TESTS
 
-This is against the drbd-next tree, which is included in linux-next
-since a few days.
+Thanks for the fix, I applied it to our drbd-next tree (which should end
+up in linux-next).
 
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Next/Trees#n267
+I would prefer to squash these kinds of fixups to keep the history in
+our patch series clean.
+Arnd, does that work for you? How do you prefer we handle attribution?
 
-I realize this is a bit awkward, since there is no way to really know
-which patches target linux-next and which block/for-next.
-Is there any specific way we could handle this to make it easier for you?
+Unfortunately I couldn't really find a clear precedence pattern for
+this, how is this usually handled?
 
 -- 
 Christoph Böhmwalder
