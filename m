@@ -1,146 +1,150 @@
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC4527467F;
-	Wed, 18 Mar 2026 15:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B675292B54
+	for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 15:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773847914; cv=none; b=XdqvuTFFhS+64oTZY/aA1RYol0p5mwVI29kapIXrH56QHiCMO8IYZEEKCQnZ4bZ3Uw/lZjYLOs37STXd851/MuusAvG9P6qqbF+eTSZZmJHnLb+Tjo5M2UJYifB4X/E7PGjJ0qZ1K+l2qIp+YUlQwOmaqV1xkoywuMcTFMfj3fM=
+	t=1773848200; cv=none; b=SkoLBB0FhWt5wom+ugezrlXVmz0QLpBN9S/jMI5v+QMEah9Kstjsax6zrkNeIBPmO79TsDr0zVShVEPLARnx0nTYLAVe0hyUfYGOcEBC7oRMimkDct8WMqvtq32/5MYjIkkhFs7eHykNcBKVI7sJ0n+FNQm9YwQxuSfVyqvfCsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773847914; c=relaxed/simple;
-	bh=5dIHpEMD32L3Y4aBmGnf7pzbjxkbjCOH09VbDilVYaI=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=LWpdFsiD6zjGhoD136LH1W+XE9owRrAqFQtfzd4b5WyCUPmv6+8C402mY1DYLON1FH0vyTns+zDWng2g0YsKGdWsmjL5T1LiVndn3ZSQe8DrSedAvHSHjEd01M646lZx22ZlIXy0LJ8bi3+9qIvZ1heNV+XoApyZTBLM7Fi700U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=fLWGErnR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aIMKriI1; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1773848200; c=relaxed/simple;
+	bh=Gq09rieLcY90X+GsgHoSdT6R4xhIe2SjI4qCEjUpk6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MH8l0KoxlkgD6oz+DS6rk+CSPMbby+dLctjrmbMNjvuVlf2eN90jegc1zqrqfbcCBtiYVxo2W/del/ofgdl8gZKdETI/QkKkogMT6wbyftgNKexCppUVR0YY6+Ip6KKxr+4OSl4wFICHerAyTZxoD8V53rSQjGr+H5nUb1IWmE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=Pnzh8CVy; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="fLWGErnR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aIMKriI1"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id E38DA1400207;
-	Wed, 18 Mar 2026 11:31:51 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Wed, 18 Mar 2026 11:31:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1773847911;
-	 x=1773934311; bh=VhTfRphbBnsJvwAd3yj8HVImQRdR9MPCJ5vawPXeXdg=; b=
-	fLWGErnRy0MeynlyX8TS05DxZeARPqeIErZkyhB6OLTkGa5AFFq9ovwY1nwjUhIG
-	uSsiS5YvQ/X3+GuTRXsywk5YUx4PFNWGWUyNaUOjLNLKtfMb0fhAQdukVRSt0e6j
-	OrwZy3bKRDRtLnWmifL1nrWnldjswOGVyRPW2H2hafrwLZT84hd29PwxnXN3UtFT
-	xSzJG4phTK1DKCeGZCQVb7Q6JjBXFGvD+OED5aJbh1vS2hhIKS35ywjw3RFSbPTr
-	CggzeodE7aI7NjkNaylvLXZrAlUW1iMw8roWqrOw61KKmJowlcCMyT1CxmO4EBXw
-	N7S1OYM7lmCZG94MAf9R6Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773847911; x=
-	1773934311; bh=VhTfRphbBnsJvwAd3yj8HVImQRdR9MPCJ5vawPXeXdg=; b=a
-	IMKriI1zkArgnEptsJWgS2DSoaBwOY6WCzcy+KnUlJdL5FF9NdFUYrvegv2G0tYP
-	b0k7zsRMHdWpQ/Ag5bmuqZQ/LWUodKFxPYjigUTcPdSuSc/m1YFyFGGbxhrTAbuA
-	L8cfDhk8MSoETZfEqXUmH9blLCIlIw9Af1uhJBz8WnS+64W552FFAbOdHE0NMNLe
-	Hs+UGbJs1sEpqEMY8Tl9bypD9gzZaiD8bBY6py/WlrI9ekdiHXytJaYh6ksLoLb9
-	i3K33iyvXfoz9aKy7nmgDbX2/fS2JOF9H82XqD5xD6GJEKc7hrB54bOz/WUrfquf
-	NPjcc+7XWwfgBfRT2nQlg==
-X-ME-Sender: <xms:Z8W6aeCadJ6iY3actVlSfAvbj_K79wOqNRk9HF6v7WfcCVKVSV9h8Q>
-    <xme:Z8W6aTUF2hxeidn1xZPL956lzrewmau3YstOESs6HxH9JCIYVJiW7QptWujNaCUZz
-    FTHm7UzF5ug6ZD0n7Hlie3o-SU4UnOOK34Tza0MpK7KHB37Mzb_8g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdeghedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhepvdfhvdekueduveffffetgfdvveefvdelhedvvdegjedvfeehtdeggeevheefleej
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopegvsghighhgvghrshesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
-    eprgigsghovgeskhgvrhhnvghlrdgukhdprhgtphhtthhopegrrhgusgeskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtoheprghrnhgusehkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    gthhhrihhsthhophhhrdgsohgvhhhmfigrlhguvghrsehlihhnsghithdrtghomhdprhgt
-    phhtthhopehlrghrshdrvghllhgvnhgsvghrgheslhhinhgsihhtrdgtohhmpdhrtghpth
-    htohepphhhihhlihhpphdrrhgvihhsnhgvrheslhhinhgsihhtrdgtohhmpdhrtghpthht
-    ohepughrsgguqdguvghvsehlihhsthhsrdhlihhnsghithdrtghomhdprhgtphhtthhope
-    hmrghrthhinhdrphgvthgvrhhsvghnsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:Z8W6aep7OlOF0hFruCvLZPe7QACtElAPm3ym0pYzGyDv8zKPfXn-9A>
-    <xmx:Z8W6aYdpJOBB2-Brg9hjiB7dwPJBW94YFi9NWvrwrVIAYVW3vfobgQ>
-    <xmx:Z8W6aelxFUmBkpzBYeCiR7RvU9tqmyPxrc_aK6Hp99FfDHvqqWg2sw>
-    <xmx:Z8W6aXYT86Wwcp2yk-6pZhrZ4k-ClTlpRB7SEb8GXJfxcxCdslvA1A>
-    <xmx:Z8W6aSuJIg-RYegGBM77cR8KQ7S7lkLWn3vPGsUz7hgGviXeIgLFjm6P>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 678A9700069; Wed, 18 Mar 2026 11:31:51 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="Pnzh8CVy"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4852afd42ceso59725635e9.2
+        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 08:36:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773848195; x=1774452995; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2z7/lL0P74ieZc6NvB+xXjYjCxDI3Y0Z54tFhE7jN5g=;
+        b=Pnzh8CVyhoWFyD8PLuFrxhZEmnVplnSTxIZy41G0yMyCd1HMYd6HlfwM2vP3DPhNmx
+         Yq94vT5Ukqv15po4XCRqVMlAxAvYi+/ld6KL6aB0FKu1O4VmvrFDqhht7p6sYioZ/ubY
+         jum9xmrVshZbyVJ6LcG4kxG0Bw10p6K+9XAF5At8TLB64fdVU7zz1Qo3pnG0mARzUncv
+         fOYnzdqZexo2BsE31nI5xf/DyoIv+ynNBGPog054a/gfwPX37As/fqS1gy0D+wLBJhk2
+         +kYF3mJMXgcw8L1AoaZ1HvkpY9VV0wylTKXwun75q9NDXfeppB+zKAWuPosmnp0Ha9+6
+         ZTwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773848195; x=1774452995;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2z7/lL0P74ieZc6NvB+xXjYjCxDI3Y0Z54tFhE7jN5g=;
+        b=axw/fMIK+Rqj9I9YomIml2ckaNBDsSIUsJ7Ph1SlAPtAyuQPuRb0C1cLeFHBVw6pjt
+         Wn1X2M9FIBNYhqBCxw52SNqV2/4ATEMOjSkBPeQDt7wmJZN2jYQHFrZWYF3nSCbqCvSJ
+         bRo7BJcz6mN5goaKYHa7EJPG91YUCgX/SFZAA0V4PE8sgLXIKVhLNozg7Gxe6KtFkRwL
+         6Om2HfIPLkqO/rs/YBhKMWE/fVsaifqLgUZWuE9dkn1Okdn1YJGk3oAfTrbbiZuuMNkE
+         R4PECLEbAzbFZQ/PRQqzRfPgg5FKf6fi1D2y4pp+bAzN/MjDsKmap/ITihuVkUEB2E4G
+         kJeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIurcSbM2dVACjnTTzKjVzEyiFQTiWDG00+ra+RqcaugPi7u0H20YvKWspvh6DCqH83i1VMDIOW5V2TQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWIPqYqngU2R5ejqRI98E88XduTYIp4AsHHZVKYC/2mOpPycbJ
+	NPvRkka9N1pll1PHEMnY2d0ITYEaWVppMs16yew8OAUTx0MjPUjEtotA4Ztn7XyG79k=
+X-Gm-Gg: ATEYQzzHsQJUkvltuAJpUxevdSMrfAglHRPutX8WfBgr10BGtbp1wewTUkvVd1nYEvu
+	fxyhFpVLyHGb4thxJCdAQCCWETozMzLuyETPUkjV6Bjcv1mYqhMfs3bFbrdkhT0nUmyZ4rH4SyO
+	Lz4+SOwynkaaiL0XCvmJRqwDvNyWiAjGfJ9c3pslyZVIuzMGgS8Eo0qugIYiBQ9Iv7mcaOidYw6
+	7b6HAwrHewQEBCVI3QBkjISDWSak23r/0Bz2vdLB6fh0m2eegnwcrinq9XEi2820VC4rw1aCiSi
+	+aWzgWibbI8622L4RDUrL6gdwjXSnAg78dzC1X84GIk6J9gUlxFhTiYLlKKvSH5Jlx1fvBVl9gy
+	Ji3c5RxisAE1DoCieUy9+jCPah7q4IO5RnrFvkNzcOVOMowv1dAiPhUaXKmcCrteS4DnicZNXZ9
+	+Ylfyvd+U2nc/gDG9OMMMmGEkAilxv32V3I9LNv6Yak4v4iVzGcEm+hLrFKDlR3H7saIS6nz5tg
+	Yc92cw3bBmmM2U=
+X-Received: by 2002:a05:600c:34d5:b0:485:40fd:8390 with SMTP id 5b1f17b1804b1-486f4457b0fmr61544675e9.26.1773848195353;
+        Wed, 18 Mar 2026 08:36:35 -0700 (PDT)
+Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f45f7e96sm44031415e9.0.2026.03.18.08.36.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Mar 2026 08:36:33 -0700 (PDT)
+Message-ID: <faf5b12f-03a2-4d8c-b333-7fc275ec3191@linbit.com>
+Date: Wed, 18 Mar 2026 16:36:32 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A41OPxdFoFu7
-Date: Wed, 18 Mar 2026 16:31:31 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- "Arnd Bergmann" <arnd@kernel.org>,
- "Philipp Reisner" <philipp.reisner@linbit.com>,
- "Lars Ellenberg" <lars.ellenberg@linbit.com>, "Jens Axboe" <axboe@kernel.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] drbd: fix rdma dependency
+To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>
 Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- "Ard Biesheuvel" <ardb@kernel.org>, "Eric Biggers" <ebiggers@google.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@google.com>,
  drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org
-Message-Id: <c3daa9b5-3741-4a18-9bbc-7bad1a2e0c1b@app.fastmail.com>
-In-Reply-To: <eeb73048-d5ae-4fbd-9920-1395a3ca51eb@linbit.com>
 References: <20260318104858.1868731-1-arnd@kernel.org>
  <eeb73048-d5ae-4fbd-9920-1395a3ca51eb@linbit.com>
-Subject: Re: [PATCH 1/2] drbd: fix rdma dependency
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ <c3daa9b5-3741-4a18-9bbc-7bad1a2e0c1b@app.fastmail.com>
+From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Content-Language: en-US
+In-Reply-To: <c3daa9b5-3741-4a18-9bbc-7bad1a2e0c1b@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 18, 2026, at 16:24, Christoph B=C3=B6hmwalder wrote:
-> Am 18.03.26 um 11:48 schrieb Arnd Bergmann:
->
-> Seems like we raced here, I already (supposedly?) fixed this on the
-> drbd-next branch.
+Am 18.03.26 um 16:31 schrieb Arnd Bergmann:
+> On Wed, Mar 18, 2026, at 16:24, Christoph Böhmwalder wrote:
+>> Am 18.03.26 um 11:48 schrieb Arnd Bergmann:
+>>
+>> Seems like we raced here, I already (supposedly?) fixed this on the
+>> drbd-next branch.
+> 
+> Ok, I assume that will be in linux-next
 
-Ok, I assume that will be in linux-next
+Correct, should land there today.
 
-> My fix is this Kconfig:
->
-> config BLK_DEV_DRBD_RDMA
-> 	tristate "DRBD RDMA transport"
-> 	depends on BLK_DEV_DRBD && INFINIBAND_ADDR_TRANS
-> 	help
->
-> 	  RDMA transport support for DRBD. This enables DRBD replication
-> 	  over RDMA-capable networks for lower latency and higher throughput.
->
-> 	  If unsure, say N.
->
-> And then just this in the Makefile:
->
-> obj-$(CONFIG_BLK_DEV_DRBD_RDMA) +=3D drbd_transport_rdma.o
->
-> That should be equivalent, right?
+> 
+>> My fix is this Kconfig:
+>>
+>> config BLK_DEV_DRBD_RDMA
+>> 	tristate "DRBD RDMA transport"
+>> 	depends on BLK_DEV_DRBD && INFINIBAND_ADDR_TRANS
+>> 	help
+>>
+>> 	  RDMA transport support for DRBD. This enables DRBD replication
+>> 	  over RDMA-capable networks for lower latency and higher throughput.
+>>
+>> 	  If unsure, say N.
+>>
+>> And then just this in the Makefile:
+>>
+>> obj-$(CONFIG_BLK_DEV_DRBD_RDMA) += drbd_transport_rdma.o
+>>
+>> That should be equivalent, right?
+> 
+> It's close but not the same: 
+> 
+> - INFINIBAND_ADDR_TRANS is a 'bool' symbol that can still be =y
+>   when CONFIG_INFINIBAND=m, so you'd still fail to build
+>   BLK_DEV_DRBD_RDMA. You still need a dependency on INFINIBAND
+>   (the tristate symbol) itself, though you probably also
+>   need the INFINIBAND_ADDR_TRANS one that I missed
+> 
+> - I incorrectly assumed from the earlier Makefile logic
+>   that the rdma transport exports symbols that are used
+>   by the common drbd code, but I now see that the opposite
+>   is the case. The difference is that for the case of
+>   BLK_DEV_DRBD=y, CONFIG_INFINIBAND=m, my version force-disabled
+>   the RDMA transport, while it should be in a loadable module.
+> 
+> It seems both versions are wrong then, but just adding
+> 'depends on INFINIBAND' on top of yours should fix it.
 
-It's close but not the same:=20
+Yes, ADDR_TRANS is needed because we need the infiniband "cm"
+infrastructure (for rdma_connect et al).
+Right, I did not catch that we need CONFIG_INFINIBAND separately as
+well, but that seems logical.
+I applied the combined fix now.
 
-- INFINIBAND_ADDR_TRANS is a 'bool' symbol that can still be =3Dy
-  when CONFIG_INFINIBAND=3Dm, so you'd still fail to build
-  BLK_DEV_DRBD_RDMA. You still need a dependency on INFINIBAND
-  (the tristate symbol) itself, though you probably also
-  need the INFINIBAND_ADDR_TRANS one that I missed
+Thanks,
+Christoph
 
-- I incorrectly assumed from the earlier Makefile logic
-  that the rdma transport exports symbols that are used
-  by the common drbd code, but I now see that the opposite
-  is the case. The difference is that for the case of
-  BLK_DEV_DRBD=3Dy, CONFIG_INFINIBAND=3Dm, my version force-disabled
-  the RDMA transport, while it should be in a loadable module.
+-- 
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
 
-It seems both versions are wrong then, but just adding
-'depends on INFINIBAND' on top of yours should fix it.
-
-        Arnd
