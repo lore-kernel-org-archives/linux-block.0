@@ -1,150 +1,135 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B675292B54
-	for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 15:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7F33C5DDF
+	for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 16:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773848200; cv=none; b=SkoLBB0FhWt5wom+ugezrlXVmz0QLpBN9S/jMI5v+QMEah9Kstjsax6zrkNeIBPmO79TsDr0zVShVEPLARnx0nTYLAVe0hyUfYGOcEBC7oRMimkDct8WMqvtq32/5MYjIkkhFs7eHykNcBKVI7sJ0n+FNQm9YwQxuSfVyqvfCsY=
+	t=1773850794; cv=none; b=WUjETVeuSbG7j9PBINTqk52uPGeT65HXwcgS2Dkic8uadr/LqYunmt7aLYd1x+rXIoO3xYH880DoQHi3VuMjanzHhkIML9zjhuAXZmy4p2bMrLi52rXfbT3XJSktBEMAVuUmIqnJGzP6GQufYsz85Qhb8OTxE086spwXzc8GAKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773848200; c=relaxed/simple;
-	bh=Gq09rieLcY90X+GsgHoSdT6R4xhIe2SjI4qCEjUpk6o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MH8l0KoxlkgD6oz+DS6rk+CSPMbby+dLctjrmbMNjvuVlf2eN90jegc1zqrqfbcCBtiYVxo2W/del/ofgdl8gZKdETI/QkKkogMT6wbyftgNKexCppUVR0YY6+Ip6KKxr+4OSl4wFICHerAyTZxoD8V53rSQjGr+H5nUb1IWmE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=Pnzh8CVy; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1773850794; c=relaxed/simple;
+	bh=kzRONgv2jUIvFEv5Wuazr/ErBR6PBl89Ps0oxtmZR+o=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=mKsAMDoGawrl2oKTFbpVQH2Z/3yeLnuDTuDu2fBwq6rXkXV340laCcTzb68PMW+r+TtkdeEF6rfOWlKNKHQJgeDNtXAiwy02+UhpNASY3XXSrngiMrSQ6p2a0tP0o0prQIWh6NIzWxi/Ah9HWAWEUqAJCFNZP9eo7f0puzQ8DLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R6EB57nq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="Pnzh8CVy"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4852afd42ceso59725635e9.2
-        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 08:36:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1773848195; x=1774452995; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2z7/lL0P74ieZc6NvB+xXjYjCxDI3Y0Z54tFhE7jN5g=;
-        b=Pnzh8CVyhoWFyD8PLuFrxhZEmnVplnSTxIZy41G0yMyCd1HMYd6HlfwM2vP3DPhNmx
-         Yq94vT5Ukqv15po4XCRqVMlAxAvYi+/ld6KL6aB0FKu1O4VmvrFDqhht7p6sYioZ/ubY
-         jum9xmrVshZbyVJ6LcG4kxG0Bw10p6K+9XAF5At8TLB64fdVU7zz1Qo3pnG0mARzUncv
-         fOYnzdqZexo2BsE31nI5xf/DyoIv+ynNBGPog054a/gfwPX37As/fqS1gy0D+wLBJhk2
-         +kYF3mJMXgcw8L1AoaZ1HvkpY9VV0wylTKXwun75q9NDXfeppB+zKAWuPosmnp0Ha9+6
-         ZTwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773848195; x=1774452995;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2z7/lL0P74ieZc6NvB+xXjYjCxDI3Y0Z54tFhE7jN5g=;
-        b=axw/fMIK+Rqj9I9YomIml2ckaNBDsSIUsJ7Ph1SlAPtAyuQPuRb0C1cLeFHBVw6pjt
-         Wn1X2M9FIBNYhqBCxw52SNqV2/4ATEMOjSkBPeQDt7wmJZN2jYQHFrZWYF3nSCbqCvSJ
-         bRo7BJcz6mN5goaKYHa7EJPG91YUCgX/SFZAA0V4PE8sgLXIKVhLNozg7Gxe6KtFkRwL
-         6Om2HfIPLkqO/rs/YBhKMWE/fVsaifqLgUZWuE9dkn1Okdn1YJGk3oAfTrbbiZuuMNkE
-         R4PECLEbAzbFZQ/PRQqzRfPgg5FKf6fi1D2y4pp+bAzN/MjDsKmap/ITihuVkUEB2E4G
-         kJeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIurcSbM2dVACjnTTzKjVzEyiFQTiWDG00+ra+RqcaugPi7u0H20YvKWspvh6DCqH83i1VMDIOW5V2TQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWIPqYqngU2R5ejqRI98E88XduTYIp4AsHHZVKYC/2mOpPycbJ
-	NPvRkka9N1pll1PHEMnY2d0ITYEaWVppMs16yew8OAUTx0MjPUjEtotA4Ztn7XyG79k=
-X-Gm-Gg: ATEYQzzHsQJUkvltuAJpUxevdSMrfAglHRPutX8WfBgr10BGtbp1wewTUkvVd1nYEvu
-	fxyhFpVLyHGb4thxJCdAQCCWETozMzLuyETPUkjV6Bjcv1mYqhMfs3bFbrdkhT0nUmyZ4rH4SyO
-	Lz4+SOwynkaaiL0XCvmJRqwDvNyWiAjGfJ9c3pslyZVIuzMGgS8Eo0qugIYiBQ9Iv7mcaOidYw6
-	7b6HAwrHewQEBCVI3QBkjISDWSak23r/0Bz2vdLB6fh0m2eegnwcrinq9XEi2820VC4rw1aCiSi
-	+aWzgWibbI8622L4RDUrL6gdwjXSnAg78dzC1X84GIk6J9gUlxFhTiYLlKKvSH5Jlx1fvBVl9gy
-	Ji3c5RxisAE1DoCieUy9+jCPah7q4IO5RnrFvkNzcOVOMowv1dAiPhUaXKmcCrteS4DnicZNXZ9
-	+Ylfyvd+U2nc/gDG9OMMMmGEkAilxv32V3I9LNv6Yak4v4iVzGcEm+hLrFKDlR3H7saIS6nz5tg
-	Yc92cw3bBmmM2U=
-X-Received: by 2002:a05:600c:34d5:b0:485:40fd:8390 with SMTP id 5b1f17b1804b1-486f4457b0fmr61544675e9.26.1773848195353;
-        Wed, 18 Mar 2026 08:36:35 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f45f7e96sm44031415e9.0.2026.03.18.08.36.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Mar 2026 08:36:33 -0700 (PDT)
-Message-ID: <faf5b12f-03a2-4d8c-b333-7fc275ec3191@linbit.com>
-Date: Wed, 18 Mar 2026 16:36:32 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R6EB57nq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773850787;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C6R/1YLyLICQ4z9VxUYSZ+F3e/Wff1qaA0xIe7nH7oc=;
+	b=R6EB57nqI9MDnehWjdmlseNiilD3VoaJ8gDUS1ppr2knMf2GUfWr3sLlpZ9tHDh4N16bPE
+	jJRpOTUqlboJmtovbH4OYzwfjK2bR2RKu/xQ5AxKppruCexnsrQNP4bTWkjz8APIkWzXCh
+	Ck0NH2FF9JLsLhHad3p9RzVL1/cCQ7s=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-141-fpSoWRztMr2aBEgMv_Sraw-1; Wed,
+ 18 Mar 2026 12:19:45 -0400
+X-MC-Unique: fpSoWRztMr2aBEgMv_Sraw-1
+X-Mimecast-MFC-AGG-ID: fpSoWRztMr2aBEgMv_Sraw_1773850784
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65FD41955D61;
+	Wed, 18 Mar 2026 16:19:44 +0000 (UTC)
+Received: from [10.44.32.29] (unknown [10.44.32.29])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4671F1800761;
+	Wed, 18 Mar 2026 16:19:42 +0000 (UTC)
+Date: Wed, 18 Mar 2026 17:19:39 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Keith Busch <kbusch@meta.com>
+cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, snitzer@kernel.org, 
+    Keith Busch <kbusch@kernel.org>
+Subject: Re: [RESEND PATCHv3 1/2] dm-crypt: allow unaligned bio_vecs for
+ direct io
+In-Reply-To: <20260316150229.1771884-1-kbusch@meta.com>
+Message-ID: <7cc4892a-5a2f-09b7-1f32-320acac4c797@redhat.com>
+References: <20260316150229.1771884-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] drbd: fix rdma dependency
-To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@google.com>,
- drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260318104858.1868731-1-arnd@kernel.org>
- <eeb73048-d5ae-4fbd-9920-1395a3ca51eb@linbit.com>
- <c3daa9b5-3741-4a18-9bbc-7bad1a2e0c1b@app.fastmail.com>
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Content-Language: en-US
-In-Reply-To: <c3daa9b5-3741-4a18-9bbc-7bad1a2e0c1b@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Am 18.03.26 um 16:31 schrieb Arnd Bergmann:
-> On Wed, Mar 18, 2026, at 16:24, Christoph Böhmwalder wrote:
->> Am 18.03.26 um 11:48 schrieb Arnd Bergmann:
->>
->> Seems like we raced here, I already (supposedly?) fixed this on the
->> drbd-next branch.
-> 
-> Ok, I assume that will be in linux-next
+Hi
 
-Correct, should land there today.
 
-> 
->> My fix is this Kconfig:
->>
->> config BLK_DEV_DRBD_RDMA
->> 	tristate "DRBD RDMA transport"
->> 	depends on BLK_DEV_DRBD && INFINIBAND_ADDR_TRANS
->> 	help
->>
->> 	  RDMA transport support for DRBD. This enables DRBD replication
->> 	  over RDMA-capable networks for lower latency and higher throughput.
->>
->> 	  If unsure, say N.
->>
->> And then just this in the Makefile:
->>
->> obj-$(CONFIG_BLK_DEV_DRBD_RDMA) += drbd_transport_rdma.o
->>
->> That should be equivalent, right?
-> 
-> It's close but not the same: 
-> 
-> - INFINIBAND_ADDR_TRANS is a 'bool' symbol that can still be =y
->   when CONFIG_INFINIBAND=m, so you'd still fail to build
->   BLK_DEV_DRBD_RDMA. You still need a dependency on INFINIBAND
->   (the tristate symbol) itself, though you probably also
->   need the INFINIBAND_ADDR_TRANS one that I missed
-> 
-> - I incorrectly assumed from the earlier Makefile logic
->   that the rdma transport exports symbols that are used
->   by the common drbd code, but I now see that the opposite
->   is the case. The difference is that for the case of
->   BLK_DEV_DRBD=y, CONFIG_INFINIBAND=m, my version force-disabled
->   the RDMA transport, while it should be in a loadable module.
-> 
-> It seems both versions are wrong then, but just adding
-> 'depends on INFINIBAND' on top of yours should fix it.
+On Mon, 16 Mar 2026, Keith Busch wrote:
 
-Yes, ADDR_TRANS is needed because we need the infiniband "cm"
-infrastructure (for rdma_connect et al).
-Right, I did not catch that we need CONFIG_INFINIBAND separately as
-well, but that seems logical.
-I applied the combined fix now.
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Many storage devices can handle DMA for data that is not aligned to the
+> sector block size. The block and filesystem layers have introduced
+> updates to allow that kind of memory alignment flexibility when
+> possible.
+> 
+> dm-crypt, however, currently constrains itself to aligned memory because
+> it sends a single scatterlist element for the in/out list to the encrypt
+> and decrypt algorithms. This forces applications that have unaligned
+> data to copy through a bounce buffer, increasing CPU and memory
+> utilization.
+> 
+> Use multiple scatterlist elements to relax the memory alignment
+> requirement. To keep this simple, this more flexible constraint is
+> enabled only for certain encryption and initialization vector types,
+> specifically the ones that don't have additional use for the request
+> base scatterlist elements beyond holding decrypted data.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+>  
+> +	if (!unaligned_allowed) {
+> +		cc->io_alignment = cc->sector_size - 1;
+> +	} else {
+> +		set_bit(CRYPT_DISCONTIGUOUS_SEGS, &cc->cipher_flags);
+> +		cc->io_alignment = 3;
+> +	}
+>  	return 0;
+>  }
 
-Thanks,
-Christoph
+Why is "3" there? Should there be the dma_alignment of the underlying 
+block device instead?
 
--- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+> @@ -3722,7 +3761,11 @@ static void crypt_io_hints(struct dm_target *ti, struct queue_limits *limits)
+>  	limits->physical_block_size =
+>  		max_t(unsigned int, limits->physical_block_size, cc->sector_size);
+>  	limits->io_min = max_t(unsigned int, limits->io_min, cc->sector_size);
+> -	limits->dma_alignment = limits->logical_block_size - 1;
+> +
+> +	if (test_bit(CRYPT_DISCONTIGUOUS_SEGS, &cc->cipher_flags))
+> +		limits->dma_alignment = cc->io_alignment;
+> +	else
+> +		limits->dma_alignment = limits->logical_block_size - 1;
+>  
+>  	/*
+>  	 * For zoned dm-crypt targets, there will be no internal splitting of
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index dc2eff6b739df..aecb19a6913db 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -1767,6 +1767,7 @@ int dm_calculate_queue_limits(struct dm_table *t,
+>  	bool zoned = false;
+>  
+>  	dm_set_stacking_limits(limits);
+> +	limits->dma_alignment = 0;
+>  
+>  	t->integrity_supported = true;
+>  	for (unsigned int i = 0; i < t->num_targets; i++) {
+
+dm-integrity doesn't set dma_alignment if it is using 512-byte sector size 
+(assuming that there is default 511). This should be fixed in dm-integrity 
+before making this change.
+
+Other device mapper targets should also be reviewed to make sure that this 
+change doens't break them.
+
+Mikulas
 
