@@ -1,105 +1,130 @@
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7623B19CC28
-	for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 01:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14AD1D9A66
+	for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 01:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773797578; cv=none; b=iBVJzpz1ZkMqWCMmmnscu5PBbqOXkiOvqR1M+qTeoETyQp6n/ymw0Q5JPdOHrscYQQIUNAcwDhhNdZiniTq0tcZ2blV5sGsMNkzXuhXCII6uwje1PwK0zMbGdokHWl8FayTjzoKRCoYv8knom4BEV+NUjTgMz1qGezub0hyu8HI=
+	t=1773797735; cv=none; b=VZrx1Dn8cdC+mD84FwtTC4Sbw6AuzEA/ryAY+iooce4BPlXQCB588zKhO64CkH8ZhwYQE0iy5+M2e6HKR3p39osA30Ex1OX36gJO150bb0pW66yt1gkZvs7FKmOj8lgUUE52Rib4eMW2e0CEeBz6mCn7oTIRAsDXPGBLXq4Z6dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773797578; c=relaxed/simple;
-	bh=GRstfBVXNlbiYAxkAU3SHSfOiFMDR6YnMSauQ2q6p+U=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=XjMtjhQG1jIz90ahUeesMFc0uiiwFfnpHQ+h6uT8ivphpg+BUTQ8pshpQnsw474zfy7ui7D4kwYA03PzcGSiuvVbKhnS1BBtWNgSuWY8MUMD9X0uRjgf4xi8rr26Sm+hc+m2VOE7N6CjIpJBz0OkHsnoQgzXcrEP132lmTIcPpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bPgpq7S8; arc=none smtp.client-ip=209.85.161.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1773797735; c=relaxed/simple;
+	bh=2svO7ANRoavkXX03zVdJ6rQ13oBZ4sElxrn9G2qa3hY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W4vJzZwHI5dO1mI2eXbrJGWEYLZMyZ1/QWIBe6/NKbnR9spXBFUKq26GZ/OgMrt4lv5VXMa/8ZapSTknpSUmFXaxo5aUHptgxjZD33PpDxtXvys8ywOmwr1H5q5uCALTyCRzmpRzdLppk7lQQjZ/Pl/be32Ce1zB1+udJZB85mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R2r5YQBR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bPgpq7S8"
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-67bb5e4d06eso2220722eaf.1
-        for <linux-block@vger.kernel.org>; Tue, 17 Mar 2026 18:32:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1773797576; x=1774402376; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HLfhLlYzRdtJlSsGGbMPLpW3sMVv8KiDOySz/m154e8=;
-        b=bPgpq7S8OX6ruhD9/Poy0Ac5fuL52BD8oidqgl5OTrOo48Gu+gfrabpg4ViBnH0TjK
-         BK1DPrAv6mCcrdv+3K/VnrqasDyUwAVNqvXvyW2wOnUAPHyEnAQakMSiB6gm7y2hbG8n
-         EdCLNkbtKsKORt6N8SpAxruDSk2f4seFgZgWDfv/3MD5hpZ/or6fWeGK/mvTnrtMj5a9
-         uezAR+lzxfUbvv3y2TxY1WHE7L+9GJe5S8Eg+Qw8mYoSK6JLhCpL7atRi1hhYDt279q+
-         WHjihurxJxJ1PFKHCzlLctBbBqkzZEByjLXI4CefT3CROCCUhtEZPqslAtc6qZhYserE
-         /ydQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773797576; x=1774402376;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HLfhLlYzRdtJlSsGGbMPLpW3sMVv8KiDOySz/m154e8=;
-        b=eXLkp7WY0ln9xKYBedHjxWvO9QGP3c4uTIU7erVOs0ycizf4o9UtMe0UXcknPg35zf
-         OxAXcRbDHm6Fif8T01GKwuhnH/2iV2Nlk6ymvHp/MhOiyuY+hfq/kgcXfur74vZ4p9t1
-         RGMKNrADhH0fJ3KNIX4Lx4Aatv9K3suFPncM6ioNbhUFPj+eMTdpHYVglqDs6gWVun4Y
-         4k+ipIlRNtLjDX98B48oalyLzdwn7taXV92f+vZsQdHX3VFfU5WemkdvzLQtBpMFtqvo
-         9BbqscgH3gpDM6KVLSq5tzkOAUDTWCvVijQ9/O/Z2RmcyU7HzqZxvWsGdIBm6oog9STY
-         rz5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVJCBVxPYuJwg0MhYRvLZ8mEzjYu5q6Q3gjwTbBcnazJaKVB0xRnXH+ZiV6oPiEg0+JYAR3gT8jnA3WYw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz71TYk5SIYtJ7U+Iy7AJky6onoA2TmjiMqp7+Fw1k7L46u+NEm
-	ffNCB3JQjiwIjKu/bxygiD8Xq+xQGe//xZ4d54yxE2/OWn5uO4BS9+lKSY/j3sfGGh7ZbkyGHE7
-	a1StkQug=
-X-Gm-Gg: ATEYQzxe+kjV5GU19jFBFczA5SzW/RfY7zsuuqSonFDXwNjeqmaEhp2S46UtY4ySf2A
-	L2AbFzbk3QzxJmWYU7e8GKGyj+6mRvkNRTRtZt4A1y+1bJpjuA6k6xMHXqh4b0pTGhqhg8PBhBn
-	Lbv/t7auzjCE9X8y5ehlutaAgE/2C0iKPfBV26Bgo9dlv5dRPK50iGYGcgQrV+tlJFyUBOWPRH8
-	cYiB3yl2yiM2Y3HQTrWO+nq3lc6ueLLkzW6A/6j/OzP73H0l7hu6L7lfS9com32TQVrvEKgAWIT
-	7Uij8lrur3sRjq4O5XIEZYscNP39116DXWayBesd0aQ1WCYBDDd2yS2rxpp/Sx2ZSjDLJabiTa9
-	6KMogsZifK/OppaGrg8Hd1lT5oaTmQ9whNt8wtljGEJxDYsVxVUfBVsBCYtkwSrl8h4crpY1aYV
-	62/BYpAl3dxT1AgoB5R8MwMWTaKGwVpFrkEmw8DqLX5ZXDzFGjAUAuqtmEzr+MuEPHXSZHBqox8
-	M+5+GmozXk/a2k=
-X-Received: by 2002:a05:6820:2d43:b0:67b:ba75:3eaa with SMTP id 006d021491bc7-67c0da9512emr992362eaf.11.1773797576434;
-        Tue, 17 Mar 2026 18:32:56 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-41bd288d791sm1441221fac.7.2026.03.17.18.32.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2026 18:32:55 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org, 
- Qu Wenruo <wqu@suse.com>
-In-Reply-To: <bc2223c080f38d0b63f968f605c918181c840f40.1773734749.git.wqu@suse.com>
-References: <bc2223c080f38d0b63f968f605c918181c840f40.1773734749.git.wqu@suse.com>
-Subject: Re: [PATCH v2] block: reject zero length in bio_add_page()
-Message-Id: <177379757513.1036731.13768359483777366854.b4-ty@kernel.dk>
-Date: Tue, 17 Mar 2026 19:32:55 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R2r5YQBR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773797733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CqFzHcb2df96RmQfDBr72f2by0y/t+p/YTVOoCXpzdE=;
+	b=R2r5YQBR7MKscjnBIyyHIDkzMbk4TzjCnPIKXu5JnpzYyXf6g9bRspO4FZCoDol/5/W+z2
+	FqtyVQ9K7lOcCa1+AjCY1rUKlwVYtF0vxykrUK2Js5iyGkD4wBsJq6M7gkJpw9rR2aS0Nr
+	OrWiFxuVBac9irbMDxw+yMDok9DAmHQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-5D8pHsBeMcWUJOkStvAmWg-1; Tue,
+ 17 Mar 2026 21:35:29 -0400
+X-MC-Unique: 5D8pHsBeMcWUJOkStvAmWg-1
+X-Mimecast-MFC-AGG-ID: 5D8pHsBeMcWUJOkStvAmWg_1773797728
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2156F180034E;
+	Wed, 18 Mar 2026 01:35:28 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.147])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B42E51800351;
+	Wed, 18 Mar 2026 01:35:26 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>,
+	Mehul Rao <mehulrao@gmail.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 6.18.y] ublk: fix NULL pointer dereference in ublk_ctrl_set_size()
+Date: Wed, 18 Mar 2026 09:35:17 +0800
+Message-ID: <20260318013517.3124637-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
+From: Mehul Rao <mehulrao@gmail.com>
 
-On Tue, 17 Mar 2026 18:36:34 +1030, Qu Wenruo wrote:
-> The function bio_add_page() returns the number of bytes added to the
-> bio, and if that failed it should return 0.
-> 
-> However there is a special quirk, if a caller is passing a page with
-> length 0, that function will always return 0 but with different results:
-> 
-> - The page is added to the bio
->   If there is enough bvec slot or the folio can be merged with the last
->   bvec.
-> 
-> [...]
+commit 25966fc097691e5c925ad080f64a2f19c5fd940a upstream.
 
-Applied, thanks!
+ublk_ctrl_set_size() unconditionally dereferences ub->ub_disk via
+set_capacity_and_notify() without checking if it is NULL.
 
-[1/1] block: reject zero length in bio_add_page()
-      commit: 643893647cac7317bafca4040dd0cfb815b510d4
+ub->ub_disk is NULL before UBLK_CMD_START_DEV completes (it is only
+assigned in ublk_ctrl_start_dev()) and after UBLK_CMD_STOP_DEV runs
+(ublk_detach_disk() sets it to NULL). Since the UBLK_CMD_UPDATE_SIZE
+handler performs no state validation, a user can trigger a NULL pointer
+dereference by sending UPDATE_SIZE to a device that has been added but
+not yet started, or one that has been stopped.
 
-Best regards,
+Fix this by checking ub->ub_disk under ub->mutex before dereferencing
+it, and returning -ENODEV if the disk is not available.
+
+Fixes: 98b995660bff ("ublk: Add UBLK_U_CMD_UPDATE_SIZE")
+Cc: stable@vger.kernel.org
+Signed-off-by: Mehul Rao <mehulrao@gmail.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 965460d4fc76..2729b1556e81 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -3604,15 +3604,22 @@ static int ublk_ctrl_get_features(const struct ublksrv_ctrl_cmd *header)
+ 	return 0;
+ }
+ 
+-static void ublk_ctrl_set_size(struct ublk_device *ub, const struct ublksrv_ctrl_cmd *header)
++static int ublk_ctrl_set_size(struct ublk_device *ub, const struct ublksrv_ctrl_cmd *header)
+ {
+ 	struct ublk_param_basic *p = &ub->params.basic;
+ 	u64 new_size = header->data[0];
++	int ret = 0;
+ 
+ 	mutex_lock(&ub->mutex);
++	if (!ub->ub_disk) {
++		ret = -ENODEV;
++		goto out;
++	}
+ 	p->dev_sectors = new_size;
+ 	set_capacity_and_notify(ub->ub_disk, p->dev_sectors);
++out:
+ 	mutex_unlock(&ub->mutex);
++	return ret;
+ }
+ 
+ struct count_busy {
+@@ -3902,8 +3909,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 		ret = ublk_ctrl_end_recovery(ub, header);
+ 		break;
+ 	case UBLK_CMD_UPDATE_SIZE:
+-		ublk_ctrl_set_size(ub, header);
+-		ret = 0;
++		ret = ublk_ctrl_set_size(ub, header);
+ 		break;
+ 	case UBLK_CMD_QUIESCE_DEV:
+ 		ret = ublk_ctrl_quiesce_dev(ub, header);
 -- 
-Jens Axboe
-
-
+2.47.0
 
