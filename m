@@ -1,87 +1,67 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642841ADC7E
-	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 04:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70B3148850
+	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 06:02:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773893161; cv=none; b=YayVBNj8srb40rJ4CLuq7O5fBuUFHdbwwQ6yAhR+FjEFYuaVzp6Jr2Uz1gmszKjQz5yoy/4qAxxP5JqIwU6aPAxpZ998uUTVXD3aRpXstCDH6PkbD4+s8lTaCC36avC3FZRhgavwijKNOkRDSezC8JJRwVzKISFUQNQu8emxdYE=
+	t=1773900180; cv=none; b=S0woqpuu5PVA7eRkhAdEo9EWk/vU6E4Hp0ZSzoEjTDYoVSNfFyMKArK3mL22fUwLZ9rnFG97PF+P8jGBsJUFMFJN6slQiCyXvzNeNhTgZ1JBs1Ookl86x9Wk7LxdVIrxELxeodTf9bwtUedby4N2hWBsBZ2sqWkHlRl7czSZqiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773893161; c=relaxed/simple;
-	bh=R2xPo+g1LMyPcUc9CmkvXv+xwDlkoKwjnBtO4usK8ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HRhioO+T2B8vR6DxBkhkMiP4SiVG8micc6M8QTURgJYEoCYyfxw4+q0IbKRgSSubmx95LEOgHnAqhZfl9hc0x6cYy8BNN3EH18qsqzPFM5u30+5nj2uStuFT15r9GB8CyhTWc89zS7T5k5/fuDnsiPQWArn8nARSH9/tOUqcanU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=kLGMkOGb; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1773900180; c=relaxed/simple;
+	bh=pvv6opc+B7Fc8ZiQApE371/g4IV6oD4de1b9prQ8ruw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aVCeNlgwfocYgYWBNuN2QycGd4GD9IJA1US8RfY83MtM7wBrAOm5If7awNTMtQGCoQJaNIckz8vFjU4+0L14GZBkNmpYpF16ZguOJpa682qyyxvEXBoI3i0diPX4NGkSCL8KFrv+8076NLFAAZctCN6WmTTxwyyW1ARbcvklE3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0Uxtkj8c; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kLGMkOGb"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-35bb9070644so290974a91.2
-        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 21:06:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1773893160; x=1774497960; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zHOwjv3YhlkQefFz19R3DRihRwLiRVCyfnjzhTGc9sI=;
-        b=kLGMkOGbxgnbT7tMqxlRT60kqeXqSsF+EmNQgEoXmTCPe0bIQfPLxm9rWCApmRZZzj
-         UjpQMY2LYtdHiCdPgcDcg3Z6bHahntkk5EiFJc+YaBoC9ta6y7857GlWllsdRPwRjtuF
-         T6/Xvx2zR+tKiH5E6Iw4tuPap5BIMcX6dhStQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773893160; x=1774497960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zHOwjv3YhlkQefFz19R3DRihRwLiRVCyfnjzhTGc9sI=;
-        b=HvI9UuQP48HV8LthQjWpFkhKqMU9DY7i1ZdDb1poO0yTH211JG4xZ0Ow/G/g1djJ1Y
-         f8hxIzRoUSSnvRhXetWZIuT3lWG6w7ebz99KDNIWWlUxCVzqSggz7y9Z6aZJm4rPvrld
-         CleTJfkNetPc9jkYYyxAy47nbLbgT04OcWAiI5jA8GiIgIfWL0bBG4zo5wR1jFP09Oe3
-         QSyRAW6ge4apATFCmEGzFja0j4e2g4HifRtzwbAqbzcarzlQ+9kkpyOWn18iw1M0onoT
-         OJsXQFNWdYLZs7cWyot4CzxYKiBNql5crMNT1H44etbsve+zENnhm4skloJzKjSPXE8n
-         mm/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXH9igSXPbSOhePLPr070UooR/vxrEnCwbW2ZVAfvpsi04TrIQ8KJ7pt5R2V0iOajrENtaTlQ0vJ8yRkg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWX3Gl4K3R+iuFalz6HTid6NZjnpacp3AJmSK9pbw/T1BAUb3p
-	+cf1BQSQK/Y9Eg872VHz3eS7kGljcCTuK7DgrVhSDmMd6BbQFqqlT6gAGAj6GUsNHg==
-X-Gm-Gg: ATEYQzxKwLQIYgWjHJZ6q0lgekwzN+tm4OzVtO1mDYXiU4MGfV8qRfNk4lTggWHe6dt
-	y7V21XgC6bYLbpq+7Z95SdUvN3rTSv11QkF9bKpFLdK/dm88e3ilY1vsC1kNIofKRp6nPspKoNE
-	mZBkGgvknIgOub6vjNdkmefl3JJ0y2xFQGYtLzko4PL9/EOeNvMQ0QH/y/8Mcr4UjfA2A7iKXUL
-	ELB7t05urlUVOKlOgJB/ZWbxtOGoHwiRLo0ABWBaPCeAPoKpM48UuHsPFxfdKH5A2kJvN9Ld9/h
-	iWPIbLOe2DnZ1PFke6Wwc1UqnCZvV5etWZek015rYu3iPBIT1X4alEohAqOHT/mAv4aIBfrINaa
-	ITgrSxZDepE1YxBKVbJKIpOU72CZikujyWwq3UdUwvV0Z5J5CudfQHsq2MMgHTTrKDPAPjMB45L
-	I95pc7+Gj6qTtNhL7vLQJSVtq8QIxbCC+g/e8mZRTN8EMf1Vp39UD5oODiFQBLxQU=
-X-Received: by 2002:a17:90b:4d0a:b0:359:8eaa:7f42 with SMTP id 98e67ed59e1d1-35bb9ef601cmr4835762a91.18.1773893159754;
-        Wed, 18 Mar 2026 21:05:59 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:13e1:7517:52f3:cfc8])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bc6017492sm1281973a91.5.2026.03.18.21.05.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 21:05:59 -0700 (PDT)
-Date: Thu, 19 Mar 2026 13:05:55 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Minchan Kim <minchan@kernel.org>, Brian Geffon <bgeffon@google.com>, 
-	Richard Chang <richardycc@google.com>, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] zram: do not slot_free() written-back slots
-Message-ID: <abt1dsjsT9826Ewy@google.com>
-References: <20260319034912.1894770-1-senozhatsky@chromium.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0Uxtkj8c"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=3GoUsnN/OfoYiL3wL5ZUYVTNJULYAkTJEALph9OrziY=; b=0Uxtkj8c0ezTe5pAa1bGF89uo0
+	/APxuA9V6Ci8x8xUF9dUMR5BNhrKTe2DJpRZ+58nrkSaJ7ZxJ2sESGxnOC5UlNAfEdgXkg7hmUBf2
+	qLtWbAu1EjQNwCAlcDhslPREuhUCIOO8D9cPtlu4N4ksQCulz77+HOjN4yAipRe/KQDS/RFLEfc2f
+	i2yrtfZlvyUiWLrAk2o06Rz727+x1ZTTOFCy+pqFbVCXQO8OpKxjboY0npRLddPWVdAq+1kkCETZc
+	WMg47wgmQH34NIH1ZvdmRqimyr5lQtCFrQZYTKB/oziM5Ek0xviG5+GWzwoaeTwnLI+ehWEKVi5oE
+	jDvBe9AQ==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w36T4-00000009yU9-1ZvE;
+	Thu, 19 Mar 2026 06:02:50 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Subject: add a "discard cache" debug option to zloop v2
+Date: Thu, 19 Mar 2026 07:02:35 +0100
+Message-ID: <20260319060246.2084931-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260319034912.1894770-1-senozhatsky@chromium.org>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-As a side note:
+Hi all,
 
-On (26/03/19 12:44), Sergey Senozhatsky wrote:
-> -	slot_free(zram, index);
-[..]
-> -		if (huge)
-> -			set_slot_flag(zram, index, ZRAM_HUGE);
+this series adds a new option to zloop to lose data not committed to
+stable storage using a flush operation on device removal.  The idea is
+to help testing that file system code does the right thing in face of
+volatile write caches.  For conventional devices, this can be tested
+using dm-log-writes, but the concepts there don't work for sequential
+write required zones.  Instead this adds an option to zloop, which
+records the write pointer at the last cache flush for each zone file in
+an xattr, and truncates the files down to that value on removal,
+simulating losing the contents of the volatile write cache.
 
-Original code had a bug.  slot_free() would decrement ->huge_pages,
-then writeback completion would restore the HUGE flag, so when slot
-would get freed for real slot_free() would decrement ->huge_pages
-again, leading to underflow.
+Changes since v1:
+ - fix up the documentation
+
+Diffstat:
+ Documentation/admin-guide/blockdev/zoned_loop.rst |    5 
+ drivers/block/zloop.c                             |  337 ++++++++++++++--------
+ 2 files changed, 226 insertions(+), 116 deletions(-)
