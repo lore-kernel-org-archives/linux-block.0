@@ -1,159 +1,87 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685532D248B
-	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 03:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642841ADC7E
+	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 04:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773892162; cv=none; b=q42XCajJL/FYCmgsT3fDQcBGc+rqrIlA+awKSsKcl7AlapVSG4+A4GZ8ASIFRNjCER02mLfoW1bJBE6Mi3sA8kKaypQVzF17iof300YO9CYg7/cwG+BlokOnAKtssbD2lkrAPM377+Frr5EGdPi7cjvouu4yKOmyYW1H7GtUbFo=
+	t=1773893161; cv=none; b=YayVBNj8srb40rJ4CLuq7O5fBuUFHdbwwQ6yAhR+FjEFYuaVzp6Jr2Uz1gmszKjQz5yoy/4qAxxP5JqIwU6aPAxpZ998uUTVXD3aRpXstCDH6PkbD4+s8lTaCC36avC3FZRhgavwijKNOkRDSezC8JJRwVzKISFUQNQu8emxdYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773892162; c=relaxed/simple;
-	bh=zynCVvvV1bVokM1Om58nzCK0BDQ/QhLKD6HS/mye804=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GYtF+FFJNOLJqggUPHBDRkE/LDXj8oGzahs18ZQn4sw3XtRHChd5cF0kRE1h/2uoOVwYU7kENBud7Fa5Btukt3/cDQrIZH2OQuWyYx0I/5CkMmDov1XyRkhsn4aNiMyNalSkxTnqQVFyuQWKXcW4Hs12b1ys6XhLZK3z5lyL/KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GX5KuwfS; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1773893161; c=relaxed/simple;
+	bh=R2xPo+g1LMyPcUc9CmkvXv+xwDlkoKwjnBtO4usK8ao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HRhioO+T2B8vR6DxBkhkMiP4SiVG8micc6M8QTURgJYEoCYyfxw4+q0IbKRgSSubmx95LEOgHnAqhZfl9hc0x6cYy8BNN3EH18qsqzPFM5u30+5nj2uStuFT15r9GB8CyhTWc89zS7T5k5/fuDnsiPQWArn8nARSH9/tOUqcanU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=kLGMkOGb; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GX5KuwfS"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-829759ca646so331011b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 20:49:21 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kLGMkOGb"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-35bb9070644so290974a91.2
+        for <linux-block@vger.kernel.org>; Wed, 18 Mar 2026 21:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1773892161; x=1774496961; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TVqouUGbfIurHs4KmCF5QDFnRGSjDBtw8/+7JcMGzE=;
-        b=GX5KuwfSf45CSp7ooPtN2+cuxLQR2BnkX0XYQjE9bnt5kAqD570J+YO2sg1Juuq0D0
-         h1sUC8BzqakPkuizvjNZERRqSjLXagPXMj2T5ppBWt844LqbFokbnbyE66IK73RTSiTu
-         UrMi0gPnQ7SBhOAOJ65RmxwhC3us8PLTOgUH8=
+        d=chromium.org; s=google; t=1773893160; x=1774497960; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zHOwjv3YhlkQefFz19R3DRihRwLiRVCyfnjzhTGc9sI=;
+        b=kLGMkOGbxgnbT7tMqxlRT60kqeXqSsF+EmNQgEoXmTCPe0bIQfPLxm9rWCApmRZZzj
+         UjpQMY2LYtdHiCdPgcDcg3Z6bHahntkk5EiFJc+YaBoC9ta6y7857GlWllsdRPwRjtuF
+         T6/Xvx2zR+tKiH5E6Iw4tuPap5BIMcX6dhStQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773892161; x=1774496961;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/TVqouUGbfIurHs4KmCF5QDFnRGSjDBtw8/+7JcMGzE=;
-        b=KdTkgQsD0UY5Y8We4hfOLIE59UjnbfgIlj9DxNbEtRf0dEc/x4FEmk2Uv3t2sP1gr1
-         ZSIFLTEMsez788iV2wBu9Pt/eIxZpqqACxdUDhntcjLpi7mJ7Tb7378T4ndnWWI2QoHG
-         bCnDwLZONIXE6a/t4AucArf1EWUSGb5MPCXIok6qGFzl2xjZVX0fO3S6/kzf2oiOISGD
-         AkRCxunL0LQB7I4hm3z4ObFzH4pN9oUeNAAuISyMztSw9zkMTHTRcUB62ICN+VAizauZ
-         cbwgAWFjmE/8zlIOqDwozQGjTtZ8s1GIGTG1J3DnF4u366Ju98iDQkCXb6cX7XNA97Sb
-         kj3w==
-X-Gm-Message-State: AOJu0YwZVnQ8MI4JCFK0A5GRChetBJevJ9QmLqyFVQnW2b6vJNxyHlVC
-	XUg12TKAJ2Z9LDRrQ4UNldcmM12g3kSAaF9f5mX/SlKGzjhsA3RhC1xFqvr65wbjdQ==
-X-Gm-Gg: ATEYQzxZKR0yDdYGxgB6Zk3CH+KjYFoGMdyPbwey+rrlYwHp8xna0oaKDyQSbRTs2o+
-	y0ZMiCgxee2K2U3Z0HWcagc/7Ix7RnaPTysL9DhQ881EeL+Wd4DUsAUkPixECBVYpl0DaiTo9d0
-	9hehF6jtoRQkjXwUNDc592CCYTzsJ1Lsg+J7GDPHdzhJ4+dU8dIxtSLegA62XN1vVkKWIXzjwTL
-	ERyjlLxys1OUpSI3HxhFrNByVqa/niIN8K4hUYIkYCW2o9qzi5vg1hgmCV11BXMGqM4IlWb6OyD
-	WCi4LslWRCO7EoLME92hre2DEbwagDfwOzgPV1+yQmAIwTG2/ZwHpDQYm4SWd10zy3oyeC/yFo9
-	eRI0dnUl0Zg+0XooAJ8ns2X4BuaSE4Lkn/P8iomdmyD3YASnAsa8DFST1ZTjh1MBGQD2yMbOdU7
-	G+LiG3t/H5I+TKWj1VQUui5aKPxyGIJaTGQsB7GcIqDw3G4MbYAUEoyu1mPHo8reWIKJB9TImV5
-	EvEEL+gMrvzVg==
-X-Received: by 2002:a05:6a00:98a:b0:827:2dea:8840 with SMTP id d2e1a72fcca58-82a6aee8af9mr5419132b3a.56.1773892160688;
-        Wed, 18 Mar 2026 20:49:20 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:13e1:7517:52f3:cfc8])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82a6bbb985csm4240566b3a.38.2026.03.18.20.49.19
+        d=1e100.net; s=20251104; t=1773893160; x=1774497960;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zHOwjv3YhlkQefFz19R3DRihRwLiRVCyfnjzhTGc9sI=;
+        b=HvI9UuQP48HV8LthQjWpFkhKqMU9DY7i1ZdDb1poO0yTH211JG4xZ0Ow/G/g1djJ1Y
+         f8hxIzRoUSSnvRhXetWZIuT3lWG6w7ebz99KDNIWWlUxCVzqSggz7y9Z6aZJm4rPvrld
+         CleTJfkNetPc9jkYYyxAy47nbLbgT04OcWAiI5jA8GiIgIfWL0bBG4zo5wR1jFP09Oe3
+         QSyRAW6ge4apATFCmEGzFja0j4e2g4HifRtzwbAqbzcarzlQ+9kkpyOWn18iw1M0onoT
+         OJsXQFNWdYLZs7cWyot4CzxYKiBNql5crMNT1H44etbsve+zENnhm4skloJzKjSPXE8n
+         mm/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXH9igSXPbSOhePLPr070UooR/vxrEnCwbW2ZVAfvpsi04TrIQ8KJ7pt5R2V0iOajrENtaTlQ0vJ8yRkg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWX3Gl4K3R+iuFalz6HTid6NZjnpacp3AJmSK9pbw/T1BAUb3p
+	+cf1BQSQK/Y9Eg872VHz3eS7kGljcCTuK7DgrVhSDmMd6BbQFqqlT6gAGAj6GUsNHg==
+X-Gm-Gg: ATEYQzxKwLQIYgWjHJZ6q0lgekwzN+tm4OzVtO1mDYXiU4MGfV8qRfNk4lTggWHe6dt
+	y7V21XgC6bYLbpq+7Z95SdUvN3rTSv11QkF9bKpFLdK/dm88e3ilY1vsC1kNIofKRp6nPspKoNE
+	mZBkGgvknIgOub6vjNdkmefl3JJ0y2xFQGYtLzko4PL9/EOeNvMQ0QH/y/8Mcr4UjfA2A7iKXUL
+	ELB7t05urlUVOKlOgJB/ZWbxtOGoHwiRLo0ABWBaPCeAPoKpM48UuHsPFxfdKH5A2kJvN9Ld9/h
+	iWPIbLOe2DnZ1PFke6Wwc1UqnCZvV5etWZek015rYu3iPBIT1X4alEohAqOHT/mAv4aIBfrINaa
+	ITgrSxZDepE1YxBKVbJKIpOU72CZikujyWwq3UdUwvV0Z5J5CudfQHsq2MMgHTTrKDPAPjMB45L
+	I95pc7+Gj6qTtNhL7vLQJSVtq8QIxbCC+g/e8mZRTN8EMf1Vp39UD5oODiFQBLxQU=
+X-Received: by 2002:a17:90b:4d0a:b0:359:8eaa:7f42 with SMTP id 98e67ed59e1d1-35bb9ef601cmr4835762a91.18.1773893159754;
+        Wed, 18 Mar 2026 21:05:59 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:13e1:7517:52f3:cfc8])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35bc6017492sm1281973a91.5.2026.03.18.21.05.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2026 20:49:20 -0700 (PDT)
+        Wed, 18 Mar 2026 21:05:59 -0700 (PDT)
+Date: Thu, 19 Mar 2026 13:05:55 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Brian Geffon <bgeffon@google.com>,
-	Richard Chang <richardycc@google.com>
-Cc: linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH] zram: do not slot_free() written-back slots
-Date: Thu, 19 Mar 2026 12:44:56 +0900
-Message-ID: <20260319034912.1894770-1-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.53.0.851.ga537e3e6e9-goog
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Minchan Kim <minchan@kernel.org>, Brian Geffon <bgeffon@google.com>, 
+	Richard Chang <richardycc@google.com>, linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH] zram: do not slot_free() written-back slots
+Message-ID: <abt1dsjsT9826Ewy@google.com>
+References: <20260319034912.1894770-1-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260319034912.1894770-1-senozhatsky@chromium.org>
 
-slot_free() basically completely resets the slots by clearing
-all of its flags and attributes.  While zram_writeback_complete()
-restores some of flags back (those that are necessary for async
-read decompression) we still lose a lot of slot's metadata.  For
-example, slot's ac-time, or ZRAM_INCOMPRESSIBLE.
+As a side note:
 
-Do not slot_free() on writeback, instead clear only those
-flags/attrs that we need to clear.
+On (26/03/19 12:44), Sergey Senozhatsky wrote:
+> -	slot_free(zram, index);
+[..]
+> -		if (huge)
+> -			set_slot_flag(zram, index, ZRAM_HUGE);
 
-Fixes: d38fab605c667 ("zram: introduce compressed data writeback")
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- drivers/block/zram/zram_drv.c | 39 +++++++++++++----------------------
- 1 file changed, 14 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 1b0e1c02ece7..5ecc4ba40e9d 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -917,9 +917,8 @@ static void zram_account_writeback_submit(struct zram *zram)
- 
- static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
- {
--	u32 size, index = req->pps->index;
--	int err, prio;
--	bool huge;
-+	u32 index = req->pps->index;
-+	int err;
- 
- 	err = blk_status_to_errno(req->bio.bi_status);
- 	if (err) {
-@@ -946,28 +945,13 @@ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
- 		goto out;
- 	}
- 
--	if (zram->compressed_wb) {
--		/*
--		 * ZRAM_WB slots get freed, we need to preserve data required
--		 * for read decompression.
--		 */
--		size = get_slot_size(zram, index);
--		prio = get_slot_comp_priority(zram, index);
--		huge = test_slot_flag(zram, index, ZRAM_HUGE);
--	}
--
--	slot_free(zram, index);
--	set_slot_flag(zram, index, ZRAM_WB);
-+	clear_slot_flag(zram, index, ZRAM_IDLE);
-+	if (test_slot_flag(zram, index, ZRAM_HUGE))
-+		atomic64_dec(&zram->stats.huge_pages);
-+	atomic64_sub(get_slot_size(zram, index), &zram->stats.compr_data_size);
-+	zs_free(zram->mem_pool, get_slot_handle(zram, index));
- 	set_slot_handle(zram, index, req->blk_idx);
--
--	if (zram->compressed_wb) {
--		if (huge)
--			set_slot_flag(zram, index, ZRAM_HUGE);
--		set_slot_size(zram, index, size);
--		set_slot_comp_priority(zram, index, prio);
--	}
--
--	atomic64_inc(&zram->stats.pages_stored);
-+	set_slot_flag(zram, index, ZRAM_WB);
- 
- out:
- 	slot_unlock(zram, index);
-@@ -2030,8 +2014,13 @@ static void slot_free(struct zram *zram, u32 index)
- 	set_slot_comp_priority(zram, index, 0);
- 
- 	if (test_slot_flag(zram, index, ZRAM_HUGE)) {
-+		/*
-+		 * Writeback completion decrements ->huge_pages but keeps
-+		 * ZRAM_HUGE flag for deferred decompression path.
-+		 */
-+		if (!test_slot_flag(zram, index, ZRAM_WB))
-+			atomic64_dec(&zram->stats.huge_pages);
- 		clear_slot_flag(zram, index, ZRAM_HUGE);
--		atomic64_dec(&zram->stats.huge_pages);
- 	}
- 
- 	if (test_slot_flag(zram, index, ZRAM_WB)) {
--- 
-2.53.0.851.ga537e3e6e9-goog
-
+Original code had a bug.  slot_free() would decrement ->huge_pages,
+then writeback completion would restore the HUGE flag, so when slot
+would get freed for real slot_free() would decrement ->huge_pages
+again, leading to underflow.
