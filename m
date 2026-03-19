@@ -1,173 +1,84 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD32430F7FB
-	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 14:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1CC3ED5C6
+	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 16:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773929638; cv=none; b=B7ulg85MvZoGd6ZKljPg8IuEMBb3KdDKD49Z0bAK6gOM6BJazd3hMgRJAic0ADHxVxA0tFHTQBYNVgrHXt4PC76iocq4+4pBWIg1g46B4or+Utf85YnLSo9bWgVIWx98JstnAdSmVdzH5y8DigL6KBC1Q+/CvNAfgq2//WByKUY=
+	t=1773937022; cv=none; b=Bn/KIMXJCV50d0n9OVLWSne3nzkWdSIYmqaTWU5VovRursEXugPY9r0S0/AYYV0AFeJORKzclimzOSpBdLzq7ADiq2/H7IuBnLoU5ECij4td+76GRBYJS13DztVD5Pf1yUxKBRZlpHsAuOLwUH+XQ0TbZGrhoIdeT+CkkyuF3ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773929638; c=relaxed/simple;
-	bh=4zAon2/wL1xkF183JwLxXVvEK05OvlwLI29zwOFhq2E=;
+	s=arc-20240116; t=1773937022; c=relaxed/simple;
+	bh=NFunWSO+VSZTwYNfXCiNilKXFoeZ+uy/5BIhyaLkaW0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gdX3TClzEJ7puoMJ8pSUzhn2Ungnpk6I+S/rth6U+x8XohFiY6vt6zIPDJpRwjulI7EYLUUJwotUMSnvDkbn2HNgQyizt9snvuOP6BS4TWIckfXGPmJIyC74MZ8XisGdMY1Pl0L9LjTSFUJEhrcNBvov42JnJRSOeR3jBZLpTbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=qJFdgiFw; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4jpB79yc; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=OrcSAEzL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=HXVk5/yP; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=QOmNZU/kbFiKnfujIWJ0HN+eN/Ju7JEN3TP0gUVS5SVHPLcJYk7haER4SNb6aikS8MuN+9kH2Xc6X28ZCjC8d6Mdc8l4wczrDc9jfOJTeQzfitx0qcE7z3zPWdLPyo5mt4VScjOsUJx/TYnJoXGsYKZwBd14oaHKi96X4CH9ZVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tF6/iWos; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qJFdgiFw";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4jpB79yc";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="OrcSAEzL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="HXVk5/yP"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 233AB5BD4B;
-	Thu, 19 Mar 2026 14:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1773929632; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
-	b=qJFdgiFwZof840urwELAyJUPmqr5R5KSb1T4rwYuc7bb8XNbCm/kv+M5FkrKSBEOM1bZiu
-	/MGyuwm/OFnFKmJm/t/Uz/+GbEcAEAQCMtEWioCbgwKOh4DWZ0qNVZOg9g66xDY+m4U+fD
-	w9Xqoe30eNI+goFz62hSwZMzWorThdA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1773929632;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
-	b=4jpB79ycXSQsxOkgtV3HKUa6Dm/vQ/wRir8pmFsiYnB6qgK3LbPe12RtulXb4tol7/E3ij
-	faYPra8B4GTfZjDQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1773929631; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
-	b=OrcSAEzL/6c4UDB40dZmtUkHL2UKN/t418W/3/WLfRE3VUYtttdOTA1LBRs2LexriSZBXr
-	IUCLAcO9QxQoLCNXA0PSitgNb7BC5cuH9t+EXroQLbXGhfbC1mTChSWj64vc6V41FfYy8R
-	mio6pb/J12e+5TPnOnmBoDRex83ce1A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1773929631;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4fUFXPph0d+U/6GDmGbgLZ/FXBjYuxpYsgD69WTKZEc=;
-	b=HXVk5/yPJtxIjyky0dtujMNvVHE9KONXRU8D1O6wb4LBxoqwDaKPYOnkGEkCrYDJmYyVOA
-	klxEA++oJw6AsaAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 14B714273B;
-	Thu, 19 Mar 2026 14:13:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id TmUEBZ8EvGlPZwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 19 Mar 2026 14:13:51 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id C850FA0B32; Thu, 19 Mar 2026 15:13:46 +0100 (CET)
-Date: Thu, 19 Mar 2026 15:13:46 +0100
-From: Jan Kara <jack@suse.cz>
-To: Philipp Hahn <phahn-oss@avm.de>
-Cc: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com, 
-	bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr, 
-	dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org, gfs2@lists.linux.dev, 
-	intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linux-mm@kvack.org, linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org, linux-phy@lists.infradead.org, 
-	linux-pm@vger.kernel.org, linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org, linux-sound@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, ntfs3@lists.linux.dev, 
-	samba-technical@lists.samba.org, sched-ext@lists.linux.dev, target-devel@vger.kernel.org, 
-	tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev, Jan Kara <jack@suse.com>
-Subject: Re: [PATCH 12/61] quota: Prefer IS_ERR_OR_NULL over manual NULL check
-Message-ID: <ol2d7c5z7yfyuwo5tyfxurgqedruhr6bzmuv37bx5phhrmmoyh@4zjspbtexid3>
-References: <20260310-b4-is_err_or_null-v1-0-bd63b656022d@avm.de>
- <20260310-b4-is_err_or_null-v1-12-bd63b656022d@avm.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tF6/iWos"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=KFJ0oFu6V09nh/SllpDZ2DjkxhLxKMr+gGZSzCnqtf4=; b=tF6/iWosJz+255slWZWWr4K0ey
+	gmNH7YkAG9mqYxvcQvxZvdKHMnfPkWJaESgUrq/XL743SfxhX0zsxkRnm/N/Xk8LWaWN6/nnomfyI
+	PkUEAIQ2jRb5OVIZp9FOpqw87NOu1kXNmcqCsErC0Z+3OP8Xzn0Zc/vKQlyMSVIOKS29thj4Y6uIH
+	x/fBNJWL5lQTR42ufr+9xMcxhUqTVFxQXgXtYOcE6zOj3r/e0h6osxXMt2zbqj89FuMFgUiS8SYfj
+	7TY+rDOlzSswqJvoyi25/V6JsnoVHtx9jdyVvPxO2WhDFz15N0lHPky2YbzciUqByItjdhV7xDiHb
+	MnjNDVKg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w3G3I-0000000B3Bt-1xiX;
+	Thu, 19 Mar 2026 16:16:52 +0000
+Date: Thu, 19 Mar 2026 09:16:52 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Fabio Fantoni <fantonifabio@tiscali.it>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk,
+	Christoph Hellwig <hch@infradead.org>,
+	Sergei Shtepa <sergei.shtepa@veeam.com>
+Subject: Re: blksnap: no feedback received on latest patchset - any concerns?
+Message-ID: <abwhdNB-j6GOQGRv@infradead.org>
+References: <5459ee8c-075f-453f-8999-19219f9a6fdc@tiscali.it>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260310-b4-is_err_or_null-v1-12-bd63b656022d@avm.de>
-X-Spam-Score: -2.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLck44p98ib5bmd95s13xxw3gp)];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCPT_COUNT_GT_50(0.00)[55];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email]
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5459ee8c-075f-453f-8999-19219f9a6fdc@tiscali.it>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue 10-03-26 12:48:38, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
-> 
-> Change generated with coccinelle.
-> 
-> To: Jan Kara <jack@suse.com>
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+Hi Fabio,
 
-Thanks for the patch but frankly I find the original variant clearer wrt
-what is going on. So I prefer to keep the code as is.
+a 2 year old patchset has been paged out of everyones mind.  I still
+think functionality like it would be useful, but it needs to be resend
+to get fresh eyes.
 
-								Honza
-
-> ---
->  fs/quota/quota.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Mar 19, 2026 at 01:06:10PM +0100, Fabio Fantoni wrote:
+> Hi Jens, hi all,
 > 
-> diff --git a/fs/quota/quota.c b/fs/quota/quota.c
-> index 33bacd70758007129e0375bab44d7431195ec441..2e09fc247d0cf45b9e83a4f8a0be7ea694c8c2a1 100644
-> --- a/fs/quota/quota.c
-> +++ b/fs/quota/quota.c
-> @@ -965,7 +965,7 @@ SYSCALL_DEFINE4(quotactl, unsigned int, cmd, const char __user *, special,
->  	else
->  		drop_super_exclusive(sb);
->  out:
-> -	if (pathp && !IS_ERR(pathp))
-> +	if (!IS_ERR_OR_NULL(pathp))
->  		path_put(pathp);
->  	return ret;
->  }
+> The blksnap v7 patchset was posted in February 2024 and has received no
+> response so far. As someone who has followed this project closely, I wanted
+> to ask directly: is there a reason this patchset is not being considered?
 > 
-> -- 
-> 2.43.0
+> This is a module for non-persistent block device snapshots, useful for
+> backup on filesystems like ext4 that don't have their own snapshot
+> mechanism. It went through 7 revision cycles with review of some people and
+> substantial contributions from Christoph Hellwig. The amount of work that
+> Sergei Shtepa and Christoph put into this has been remarkable.
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> The silence after v7 seems to have led the developer to abandon the upstream
+> effort entirely, which is unfortunate because seems to me there's still a
+> need for a block-level snapshot capabilities module integrated upstream, or
+> am I wrong?
+> 
+> I fully understand if there are technical objections, but could you please
+> share what they are? Even a definitive rejection, accompanied by clear
+> reasoning, would help the community understand whether it’s better to take a
+> different approach or address specific concerns in similar cases.
+> 
+> Thank you for your time.
+> 
+---end quoted text---
