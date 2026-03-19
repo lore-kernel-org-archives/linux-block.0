@@ -1,25 +1,26 @@
 Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022105.outbound.protection.outlook.com [52.101.96.105])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5741377ECD;
-	Thu, 19 Mar 2026 22:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05363806A3;
+	Thu, 19 Mar 2026 22:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.105
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773958810; cv=fail; b=oVPXg2FWmjwC4bycrGecFCfjheNXuv860Dg3t0kxmLwVWZRJdIB1ZuXq49LLxRL+LIbSD2GUxqodNtgV6fRhxR40f7XG25BcQ4RSU5NwRUcBsrr4XSZdmIsLFPGPfkiq6ZaIlA7hFSWlkmLY+qeENuWH4X7Ek8efCZ+hCWy6jhU=
+	t=1773958813; cv=fail; b=Y8jPJNohhQYtIe7PJFFseZIqtjcaH+yNCctr/JELK1WCuTKtGXqpUkvQzxiWfZUl8cMcGgKLnX+u4hRNOGeK2utZvnvRl7Gk7xk4H6C/Zkzt5qqWCV/juwuMS2AvQ8DRQfN3GCXlHMftgzFAXO+36SuaJxBc95Y06kcFyC8RaiM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773958810; c=relaxed/simple;
-	bh=CqEN9e7TzikPKt5vTgjQ+oXCUXipTj63Ge3CA6yVrJ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=MFi7JzENN/cMVHB+75CuEb0Hxn2TVvc6htHq76rTwR3Zzll2eAbjruoen2zvsxexcEkZ7KDc11oyeUX7szMfk1fVSeFEE3nrLWy516je33WIvsJ/nixiNYbpnVclHGtoPHUqxE/sfCRoOFjYoFixclBW2gxm1DrRHsCAVsJu0sY=
+	s=arc-20240116; t=1773958813; c=relaxed/simple;
+	bh=DcUMG/mFHiJSMbnOo8LHGCIX2Rj6v2bHaQYibl8DHgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uRLP62QANajM3xhLaBYaX+qalSTDfdMC2mG/5Wc1KcsVb+ogDPMHDOXT4mQh5RGxsNGrX97UVIK5vLyPelvWlaB7ZcCaD+blVqvrX/D/vJI6X+gNTKtp8bKyhBckvdkb0OFOKPXSnGDhq+F5bffScnvLjbInMO1G1UL+1PU+iBE=
 ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.96.105
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MSDi8xaVzCOrbFqwHRp3u/wKLW9TH/QM+sWa5JwIGl51hlMBeg5FEnMJsxxpQeZ3u8n2vNvUHyk9LCeOz8EZuZBYXVZmDcdQ4C2nZOM7iT9StEtYAFcZ7F0RKIfvIrJ6B5LhfW8Jb6N0kuoiLf8FCQ1+/Cb6f1MXwTTIU05xeaVUEgCgMQ55ZurCRhoVW7QTHVHL77njFSjOzT+ZxwC3Thte5cE6+YKHwQY7AQyhTlN5tsUfEXadXhep+fuxJ+0I1fIMgHPcaKR7Q8tphgAPe6uI6xCIra1TvFUBIae51Hqbc9MWznKSZ5lLDZF0om9qm1SHRtnbxchASnzvCIHmhQ==
+ b=UlpEFzVTOy7YunfcFTXHejHqbxGwqApNkk6/V4vG8Pf6U8phGT9OL03acBfJXnn7sG1DsVYUHdPfAoP1CQ/xA0lgcNKSvt3kzmcjPV/S0Q7xOo2bIzH650KDv8QEiHWU+LssEiQbQ7oGy7mVtMtONEKTLNOAEsEEMohS8QKURkFbugCDcvrfo1UjAFJHD10s41KGQ6m8A6qSioLpQtAjjEhippxkuV5TLhzvneczwqRrs1Pbd8Py7Tp08yO7r40ep/RW4/Z3kZrEzwvFT1/uIvyvFGEJSSRzR/W+0QhPr6Es6Gv42nJ+/o/3YvdsJjQ/38OZ9moxUCWjr7k8aunomw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jGusQqkJ6jaLdH9ZxnbPWshfgMW4H5ac4x2kHYAm5F4=;
- b=rruob19FfOaB7p/E8ubVN6Da3gscO8ttgKrf3jmCHRrpCN7AUHAv+B/N7U22jKkGcx51oXLlOpzcoraCxHz9nVSMDDGCj+O4l6vUk8NRCXRFwSS9YrUd2OyJISDYcFFKjRmytctIpmkXTY8DeohM4CgNxA+8Df0rk1AHR8UkuN7k4OezPkzr+UuOuLTZI5/O/W1N++/WmYpMY9yhClgemSKBgjKTAF9W+qOI340ExOnUidnYn3oldlJVZF2qOkCAxIFJAkKs50XL0yhSLcdGe54V5QBCPGL/vfjl2zVXVwfb9/oIhikLDgNiSqZylWnR4UFmREmpA6lUbh/Es7wMsw==
+ bh=A708yZEe1c1rgOksMrwGYIzKsIR0+YQekVfsQwvvwFk=;
+ b=uK4JJ02WHJ8Cu6uPRWWqvfJs5YrFeRi9wtqiEPh67djDHPQScxQlvpGtjyXmnDQKiAaGBRmxPo3WyjME30QRhMcwEs+O3v+pybv+fVESMRgwMgF6NgNbtpQtiGK3KX1Q/AxWJBXYrmE8Cvzf1zl9fKtn02Ob4hNqunS1XcANqwM0GWbxaEQl8KWaIGLkVUaqfmcle1GiYHTC8fqh85Fa4N8lQxnbQX1zATN68QV7+B8y/j3Byzsnyy0fMC5wMTJlmPhLKop5Dyxg22iN87DQRKSfXmxSoMXpwHZ+FnZc3E/fa/d+/1nRUnrtnT7THKFQQqtp+hztYv0uz7w5RGaEaQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
  dkim=pass header.d=atomlin.com; arc=none
@@ -29,11 +30,11 @@ Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
  by LO4P123MB6712.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:2e2::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.22; Thu, 19 Mar
- 2026 22:20:01 +0000
+ 2026 22:20:06 +0000
 Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 22:20:01 +0000
+ 22:20:07 +0000
 From: Aaron Tomlin <atomlin@atomlin.com>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -52,14 +53,16 @@ Cc: johannes.thumshirn@wdc.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v3 0/2] blk-mq: introduce tag starvation observability
-Date: Thu, 19 Mar 2026 18:19:54 -0400
-Message-ID: <20260319221956.332770-1-atomlin@atomlin.com>
+Subject: [PATCH v3 1/2] blk-mq: add tracepoint block_rq_tag_wait
+Date: Thu, 19 Mar 2026 18:19:55 -0400
+Message-ID: <20260319221956.332770-2-atomlin@atomlin.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260319221956.332770-1-atomlin@atomlin.com>
+References: <20260319221956.332770-1-atomlin@atomlin.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: PH8PR21CA0006.namprd21.prod.outlook.com
- (2603:10b6:510:2ce::18) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-ClientProxiedBy: PH7PR17CA0003.namprd17.prod.outlook.com
+ (2603:10b6:510:324::23) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -69,108 +72,169 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|LO4P123MB6712:EE_
-X-MS-Office365-Filtering-Correlation-Id: be994c5b-03ff-4e2d-de97-08de8605a9b9
+X-MS-Office365-Filtering-Correlation-Id: f10967d6-016b-449f-e05a-08de8605ad06
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|18002099003|56012099003;
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|18002099003|56012099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	Mm0sU+3Wuxp5y8UT1Os9Uu+DXYon9IvYO9mZGNAw5BHFVTXfM1H04QVQ+9WMe24nimSSuhY8j3W5hv46uKORhIEEa/Chorpgl7/fcq7wx1FDxLgfCE3vrHTZ+A9K5jPeM4ry4QftK39S+BT0XAW0UAFfU3eLE1O1v7QESQAOI0HoZc4kR3OxDXOmrczTni6Tx0IgDcTRw1IYE/lZXnWS47jX67WiXLvhAgAltKiH9cK62/2Rt4NtnSK3JN1ebNc7Vw2MGPItH0NnGKwS2/Tf4wZUmdYv+RZ7xIGgpyvuT3PePDwdo6z63MBO5qgDRiXgQE+ZQdyq72xUE181SP3aT0AzVF0z/bOj8MRoHIznv1iYra1AKZ2HkeevTPyneFiW0qyw9JR66W6KidlyhJkJtIZt+VyBCx6bFTDSNjspIxRsp6KYXoC0CKimqAYF34j/2efXn190Vzya8FEFx1uCOz8g66LsLsapHTs55WQRvIYUw/F+lswZPDLa4t5Bk1I9Zf9acuLmkuG0XZnOCBxGznA4qcDxdebGDRcuH1+jKSRyfoyRZHTVIbwupz8sSHVdYnnigxIbl1A0esdKgAXOv3BJk1iw6DjygetMlbb3J6/OarpeMByhRkEYP5GeUtSucpqo26X3e3nmR1bG+G0ZmlVrGu5wYnpfPu8aE8xVojBGuGX26oyRWu2Xmqa/r7pil3iX08ffzRWq4M+ixoeQjh9exR7R5FR+viG2ic3kP6g=
+	mcxPELL6ngFXNa7IUiq+WtsYi9q8Ssj4x8Xe2F92DOp4EMe+uc2m2Gujqkho5/5YynnelfghRzN8MzPqI7RjVncoVrolpI/F+zbYVSIyvazKeWTEtNTIiGoXMevITYhT+PFoC9I9zQjPFNrTXLOr7atBnf0trIhTp/fB27S7AGvY7L8a6tz+Qp/sdZkIqkt4A0LgiDC/1NWteiqzA7PCswMZ0M3UWH2QwWt5lbPuP54hUahDp+y6PqGd4VmeBfHCJA3172JDJEF5aohLvAPci5Ge8UlH3KS2OVoOBEek2fO4xkL+KaenXNooI/xNpoq2BoW+EA4bLyXVAntMPEtgvLX211nsKl0UBfKlQdsQj307+rD4x8tdORHhhpg0pLebrUSdxqIRh+13YaEXQQ4T7SFiRbRbAJUnbqc+1wDGID57AFm8cofrPoz1+eF27VPoVm+dk8KIMSvlCtMJG2BpU164c8Bl5aQavRK4/V2Qiw7hne9QC2Sv9WJh54XDxMS5WkYxkogjNl3x/T+PMhvsxXxsRo5XpO8aHOfs6pcwwE/9hqX0pBBwB5aqPJi/8mXfeTI5vl1eHM+QUMSoWjwrundo7ahcJN3PLs+GJl46EDIHS1k+9Kclw1xHcB1awcnHS878G1Gzlpv7TojstontwXtt2zH2QvBL9BXzuT+4Ms25BdhRqmdlFM7gg+J3MqYjJVE2notmez3MQxGgHGuvZFarOM8qYDBd0Z1MTRe+nFQ=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(18002099003)(56012099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+zs1bDNNjbSKCTVlFgmXmB6k13Upv89k/u0fdCeB7Xt/lDmPrgNYnjm+gPay?=
- =?us-ascii?Q?4waG7XYd0q5+zZbpgDu8gjpG0HnEukoyKJZycaYSDQUk+KgHXzVrhl/3if/h?=
- =?us-ascii?Q?FMTrWgmSeWVIOaG/25w+H9EqD9/emUNNFm9a4ZLTT+oPlIFGYzrMkvrZpRg6?=
- =?us-ascii?Q?kXrXi+VefYJ17bOnLMb9DJzhPDZaYF7Rc/7/B2fVqyIWzBfnVWXvICOwplm+?=
- =?us-ascii?Q?XbE315YQC68Pnne+RltOaHUg8RYdaIbGcI859Lp7l7E0HSTNP9to42YBI7Wb?=
- =?us-ascii?Q?a0R538ohdFofmL8D9H/jdZHnzTqCN5CEDgm2WZiUjYoJ5KdjHb4qkIH2l5yn?=
- =?us-ascii?Q?vVITODY2QH2gmt9+NcnlODfOe7VPyLJ26ws9/uojMmbtzRvG9lfcHpES06p5?=
- =?us-ascii?Q?Vg8rXuF9B/+VRcAsRDN1LEjp9w8//8VVUaWKNJTAuNNjAycckWSpebp4S9oS?=
- =?us-ascii?Q?K7caQJhFRyKWu3GCYYs19sPkLjCIoqH101l1XZZ7UtS2oYIovqXKO0LDbDLG?=
- =?us-ascii?Q?Jtn3ata0aIf9Dhl27ndap/cMMRModnI7+7GGyJq1RlCGDLakMSF21ayfNXo0?=
- =?us-ascii?Q?3wDMR0RO2fuvP3JzMjEChMu0auk9ln4Vmn5GVsnthh9q/sKw1UaAZjLQd+oo?=
- =?us-ascii?Q?JV5sPpAIVU4SEAMk2CV3IowWkF6qUAwbb9n/kMMKVWKG3cC1LeEjQujJGIpS?=
- =?us-ascii?Q?w3EPiQrEs8APB9+8EtxiJ/6gw4gVSLPXv3JDPgiY0Nndy/gJuIMpba7mMfxT?=
- =?us-ascii?Q?QX/RBAF8FzRhLlNEHL0B2CGGwG1GM1hM/2Z77SNHUnNagDFLlO6lIxyq2dS5?=
- =?us-ascii?Q?MgV0HdEiQn9g0lg7Ho8CWXKUgIhSX+POu0SJ2tOZrzdgs2mNAp7YP9Av4YJK?=
- =?us-ascii?Q?dPYguSo8Nju3WX4d20O5mf8L/d9GRaHBCOLg4NIIL+atdUAZjXluZmhFUnrn?=
- =?us-ascii?Q?kFSFjWbhGPBA0EChkur2A+Awjju/A6FrULcFLYhpVEXDp0hOY/XBt86+bMKz?=
- =?us-ascii?Q?CdALVNbdA6zt85akI9bkqJVMNy/y9lD0f76je50H8N5Gd0XkVpOhr3ARDv7c?=
- =?us-ascii?Q?n8Ktp8Mym1tURl2KkJpuo+CJKuI8tKNDw6KMou7jaiTSq8/GWpLCaeF0fGZJ?=
- =?us-ascii?Q?uxbyjeZFuWaP2CW3RXFuUQnfaWiFZHItrmOw/6XAMO4I7YOfrnqEzK4M5Y3J?=
- =?us-ascii?Q?tOi2sbMJXYWXY389p+xA/QBFC8r+T3YwcVpacgUCb8hTPhkB67dhxv59wofY?=
- =?us-ascii?Q?WBQt5DKKBlgZuxKzFkDoYZ+CcQS8VybSPzHUJk7Ni75Bxk3/bX5B66Ij7pot?=
- =?us-ascii?Q?gt4VgDaSmiYWDVXBg8ZiCCx7Cc6jcdGbeXoLKlvv5ssFzFA5GE6jAu0PM8m+?=
- =?us-ascii?Q?461Ed5ZKL7sKvP9hQUCAnjmNXSrTqdIcgLAeurPBbhRB7t+8/k8RaYsgJcFd?=
- =?us-ascii?Q?iOsceF1l/AXDFvT01ehepyX8ijFeIUGZl1+73T6lrYZK0sP/wmJwGbUlfX1i?=
- =?us-ascii?Q?YHz3WE/AWxTDGNaJIWIr9flw6t5AKhnDNoLJcGcIsQNgY6Pq4G6lvXNMSY/3?=
- =?us-ascii?Q?nWhv/7rNHUzo/vCur3RwdVuICZ9iGOu8b1KLGZltd2JXr29K+0XDTrPcT9SE?=
- =?us-ascii?Q?6FxbWVjYM6anw4PI/RO6WIzbVzBgjRAgVaEQlbwCumwCqbum7Yo9fpsLnqJW?=
- =?us-ascii?Q?2psc/+6OI4JMehHGrCW3+4CI8aYsfG643FDtNjgH5+3155yEs6ERFB5TWGOw?=
- =?us-ascii?Q?aFk2WPO4qQ=3D=3D?=
+	=?us-ascii?Q?ToQOPpcCY9A64HOHRivgfoRscB7QVW/1BF2D1uwhrfB7/VqV8yg89o9nY/Zd?=
+ =?us-ascii?Q?gwOfUn5fz7fPBgx642m6T27Mhuy7/B3ef7qu7dZ+6CPOcOKRlwWGayJj3FA+?=
+ =?us-ascii?Q?c4sLkIwycDDMO0sFbo2kOhTr4fxepZzUKVzOz2t41SmsA+4W1hwqcgHfG7Da?=
+ =?us-ascii?Q?6b2bkS2m52gPAvWx8Qo+Y2VYWabvFlaJkPn6UOTnwMVBcKjnEDmiVaXWUOdT?=
+ =?us-ascii?Q?X8Q3g+a4IVsw8XYI1LpMBgo9V7zXCAWi35XY9eZYqLBOtMFfGO5aNSi5/N+0?=
+ =?us-ascii?Q?wfxIiRNSYC0dZ6Mmrbl4FkFjvi7/vo355hZ5sJCgOGw0/nQ5wScVFPAvfdq2?=
+ =?us-ascii?Q?hVw/PiBDqjJWef9kspn1ZlQ/qaWDv5jwT5rVBd89xKcEQJeyzsHl7X1UWsCk?=
+ =?us-ascii?Q?VxsgfQlbJwJVo2CixiuD4yVTZjuK3QL1kIoTcz+98bX0MZSSd98aIrTOJrt5?=
+ =?us-ascii?Q?TDxcx7fvzD2ZAWhVWW+AMQMX9vC/01W0iKrNE4SIcCSAHQUXIcIqRMYGzIBl?=
+ =?us-ascii?Q?l0DNgCz5dPVMnKo7OZBFDdYp3BAtNQ8b38n2r+Ax2JEYTfinIcG3U4dka4+I?=
+ =?us-ascii?Q?S5pJPq9Jqx9aoX4U2F2Bg0Es7NPbgG2h+OQ7AZWQ2y0zzZBxL1dcVy5B4o7U?=
+ =?us-ascii?Q?dsLnxmeyVoQWU7gBsHfdRMX/sWOsR3qTUuHJfP8bnVTby82+K0lEGlSnEGBi?=
+ =?us-ascii?Q?mmrpazfdbev4AT8Quxnipc66H6FzonX0gVZ+sh1t86sCAjTM4QDPvN6MfJTv?=
+ =?us-ascii?Q?RMrHwwfSovPV9dzYaju/8CmgJSm5xnd0esX3DOsZ/WL/LoqjGmWMrlmO+8X8?=
+ =?us-ascii?Q?WicaaKpXyQ8mYLuLxy+wBC3vgAu9ajqUYA/XByLD4JZxdwBubaWoNv7KAr43?=
+ =?us-ascii?Q?sW3364RjOnCcfBjHk2AGsIATCmdvZ5R2zOdBaWA2WvLngxPNrbt06GQZWaGc?=
+ =?us-ascii?Q?xNP+Yn8ZmgCiysfN655sm3Xg42PGUF1FK1ehJVsnfays2zW8dCZaGNGvsqsB?=
+ =?us-ascii?Q?6cDHKf6aHS4+SdroRiVFvhM4LpxOpbYwHJIXrSOMZ6HoTAoMHOuidtQ3Yoeb?=
+ =?us-ascii?Q?/OIvxQNDKPT2bmLSw11SbAEN+Dgn8g+Xfu8E4+hlIvTPnKdxPirTTL/j78kJ?=
+ =?us-ascii?Q?EIyv5Cu7B6wmFFeorr8wZJOVsiVBA56hWxn9pPnLBwEeJ8U9j6Yi7ORWlBk9?=
+ =?us-ascii?Q?W9PDVusQIaCqhe7MZWPuC5taFjuDuQbHa2fnMTMIyDeUmd868XrVYLI8LGah?=
+ =?us-ascii?Q?Mh8GTlYmyMES0ZNBWCiuaXRETiBuG96+bMLhdyDEPWTkgfWIVVKhwNzc68QU?=
+ =?us-ascii?Q?IHnQsvV3WnVvAOCSWWAPzuD68nVxJ+ZK4PH4iOlnOaXHfKzL5e6+BYY0TF2n?=
+ =?us-ascii?Q?EXzTKS7Kc3JPJJghxjUeUalAReffRVtjR3ttl/D1M6HH7ZxZTQyLbOkjzNzO?=
+ =?us-ascii?Q?LCP/Hm6jZKUW4MM81Zttt26nufnyZz+dTRVFAYdEU9Cv22eNu9a02V1iocig?=
+ =?us-ascii?Q?lq7v7WvlO3yp5W5Q1Jae6YPj7dJfztbLcAVjIhi3EBX8v7EkwzHGP336X4Dt?=
+ =?us-ascii?Q?OE3ZR/I+z709rppyzRfOxyqiIC/hXI9hJAvgBA+15rbKgIQ6FKIpz1LAAKYK?=
+ =?us-ascii?Q?sdbl3YQS8LzV5D4mioaOrU1EpH9n/9HFM3YBqb5E1klk0PeeI+2Jfh/NqO9N?=
+ =?us-ascii?Q?XeTRse4gUp1TlH9Pn4Rsws8CyMqVk+1Xk+aDB4l8kH/FnxgyN88XPdPuQOGX?=
+ =?us-ascii?Q?lDWmO8L1sw=3D=3D?=
 X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be994c5b-03ff-4e2d-de97-08de8605a9b9
+X-MS-Exchange-CrossTenant-Network-Message-Id: f10967d6-016b-449f-e05a-08de8605ad06
 X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 22:20:01.4791
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 22:20:07.0969
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jxb76CCeJeig9ujgKF6haREOsvGHxcNJ/rBIXpdcRZ1Oh+6j5GEXswL/T30ZLw8EpdrELDXZPbu+zUBgwMTShQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: z9hpfluLK/r2QKLj61r9J0W6R8q1e68QsTJ+6rZodF8fudQq0bMUed8fsTsZmNXgxt6/8CvC2sh7JJ4C3xe99w==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P123MB6712
 
-Hi Jens, Steve, Masami,
+In high-performance storage environments, particularly when utilising
+RAID controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED), severe
+latency spikes can occur when fast devices (SSDs) are starved of hardware
+tags when sharing the same blk_mq_tag_set.
 
-In high-performance storage environments, particularly when utilising RAID 
-controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED), severe latency
-spikes can occur when fast devices are starved of available tags.
-Currently, diagnosing this specific queue contention requires deploying
-dynamic kprobes or inferring sleep states, which lacks a simple,
-out-of-the-box diagnostic path.
+Currently, diagnosing this specific hardware queue contention is
+difficult. When a CPU thread exhausts the tag pool, blk_mq_get_tag()
+forces the current thread to block uninterruptible via io_schedule().
+While this can be inferred via sched:sched_switch or dynamically
+traced by attaching a kprobe to blk_mq_mark_tag_wait(), there is no
+dedicated, out-of-the-box observability for this event.
 
-This short series introduces dedicated, low-overhead observability for tag 
-exhaustion events in the block layer:
+This patch introduces the block_rq_tag_wait trace point in the tag
+allocation slow-path. It triggers immediately before the thread yields
+the CPU, exposing the exact hardware context (hctx) that is starved, the
+specific pool experiencing starvation (hardware or software scheduler),
+and the total pool depth.
 
-  - Patch 1 introduces the "block_rq_tag_wait" tracepoint in the tag
-    allocation slow-path to capture precise, event-based starvation.
+This provides storage engineers and performance monitoring agents
+with a zero-configuration, low-overhead mechanism to definitively
+identify shared-tag bottlenecks and tune I/O schedulers or cgroup
+throttling accordingly.
 
-  - Patch 2 complements this by exposing "wait_on_hw_tag" and 
-    "wait_on_sched_tag" atomic counters via debugfs for quick, 
-    point-in-time cumulative polling.
+Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Laurence Oberman <loberman@redhat.com>
+Tested-by: Laurence Oberman <loberman@redhat.com>
+---
+ block/blk-mq-tag.c           |  4 ++++
+ include/trace/events/block.h | 43 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
 
-Together, these provide storage engineers with zero-configuration 
-mechanisms to definitively identify shared-tag bottlenecks.
-
-Please let me know your thoughts.
-
-
-Changes since v2 [1]:
- - Added "Reviewed-by:" and "Tested-by:" tags for patch 1
- - Evaluate is_sched_tag directly within TP_fast_assign (Steven Rostedt)
- - Introduced atomic counters via debugfs 
-
-Changes since v1 [2]:
- - Improved the description of the trace point (Damien Le Moal)
- - Removed the redundant "active requests" (Laurence Oberman)
- - Introduced pool-specific starvation tracking
-
-[1]: https://lore.kernel.org/lkml/20260319015300.287653-1-atomlin@atomlin.com/
-[2]: https://lore.kernel.org/lkml/20260317182835.258183-1-atomlin@atomlin.com/
-
-Aaron Tomlin (2):
-  blk-mq: add tracepoint block_rq_tag_wait
-  blk-mq: expose tag starvation counts via debugfs
-
- block/blk-mq-debugfs.c       | 56 ++++++++++++++++++++++++++++++++++++
- block/blk-mq-debugfs.h       |  7 +++++
- block/blk-mq-tag.c           |  8 ++++++
- include/linux/blk-mq.h       | 10 +++++++
- include/trace/events/block.h | 43 +++++++++++++++++++++++++++
- 5 files changed, 124 insertions(+)
-
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 33946cdb5716..66138dd043d4 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -13,6 +13,7 @@
+ #include <linux/kmemleak.h>
+ 
+ #include <linux/delay.h>
++#include <trace/events/block.h>
+ #include "blk.h"
+ #include "blk-mq.h"
+ #include "blk-mq-sched.h"
+@@ -187,6 +188,9 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		if (tag != BLK_MQ_NO_TAG)
+ 			break;
+ 
++		trace_block_rq_tag_wait(data->q, data->hctx,
++					data->rq_flags & RQF_SCHED_TAGS);
++
+ 		bt_prev = bt;
+ 		io_schedule();
+ 
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 6aa79e2d799c..71554b94e4d0 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -226,6 +226,49 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
+ );
+ 
++/**
++ * block_rq_tag_wait - triggered when a request is starved of a tag
++ * @q: request queue of the target device
++ * @hctx: hardware context of the request experiencing starvation
++ * @is_sched_tag: indicates whether the starved pool is the software scheduler
++ *
++ * Called immediately before the submitting context is forced to block due
++ * to the exhaustion of available tags (i.e., physical hardware driver tags
++ * or software scheduler tags). This trace point indicates that the context
++ * will be placed into an uninterruptible state via io_schedule() until an
++ * active request completes and relinquishes its assigned tag.
++ */
++TRACE_EVENT(block_rq_tag_wait,
++
++	TP_PROTO(struct request_queue *q, struct blk_mq_hw_ctx *hctx, bool is_sched_tag),
++
++	TP_ARGS(q, hctx, is_sched_tag),
++
++	TP_STRUCT__entry(
++		__field( dev_t,		dev			)
++		__field( u32,		hctx_id			)
++		__field( u32,		nr_tags			)
++		__field( bool,		is_sched_tag		)
++	),
++
++	TP_fast_assign(
++		__entry->dev		= disk_devt(q->disk);
++		__entry->hctx_id	= hctx->queue_num;
++		__entry->is_sched_tag	= is_sched_tag;
++
++		if (is_sched_tag)
++			__entry->nr_tags = hctx->sched_tags->nr_tags;
++		else
++			__entry->nr_tags = hctx->tags->nr_tags;
++	),
++
++	TP_printk("%d,%d hctx=%u starved on %s tags (depth=%u)",
++		  MAJOR(__entry->dev), MINOR(__entry->dev),
++		  __entry->hctx_id,
++		  __entry->is_sched_tag ? "scheduler" : "hardware",
++		  __entry->nr_tags)
++);
++
+ /**
+  * block_rq_insert - insert block operation request into queue
+  * @rq: block IO operation request
 -- 
 2.51.0
 
