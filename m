@@ -1,127 +1,120 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3893B47CE
-	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 09:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2243CD8B4
+	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 12:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773911735; cv=none; b=kdnNyD/7hcuA1oZtwGIg/Ch2KVyd7so2ZglM1gmO51hgYywP3zNeslVxdf0yHscgiGFnx1mgoF1tRL1LtaDRRYoaD5qflFpJVPh0F+1OZFbyZswq+zTc42xuYiuVHwP8qq8lAJVAbOz86999rheJM4/SOxRkGoHLdwSczhiIlyo=
+	t=1773921766; cv=none; b=HIV4NsdwgSZvLMHtwFnIIc5vIvTx8ky/hSJIU0MLRuOHt1efh68G95LbT15eX5A2anv9JokwKe4JzOKOcjTb2wiOkWcjy1xb3wAgHw+oithWw5RDktZXw7PZUWEr/MkPdWndwAZ0fGNQ/6NcInAKve1u2kZAY09at3LSaBKRzrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773911735; c=relaxed/simple;
-	bh=1dmeRQal/ZpVm0L/ivgF5rD0HGR4kfmAEzevbZOVQvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=r9r2HpErEiIIAYwkhG3f8iRNy/5yRnYYxVavCwch4q5mPd32BpKRr9aThGopLC9HZl4vXvtrUu14WUmtM5rN4c2GWzM2cZXRLbIPcVr0PAOAgSDSmwLi+8y5vC+WSx2a/95brzWWOv324fYOmn1y0N9U70IGYlwbwcxtXyF2BvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wzf8yC86; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1773921766; c=relaxed/simple;
+	bh=HZucGe+tXtLs6arl7n+/zfcUX95wZN5puvhi2kKITJM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GwRRfhjB0ueET5ZrG0yY3RGvkLWHTAnycaaqoE4U8FpzhXKBwsd4cHMvdbCeCQtHl6e0nY8FagvQ4pjiSTkPUrsjtRNj8net5vfpzKDi0GeA1ZctRqzW9lTZ9RsSkDyLvLCs19enT6dxCLnNkTUXyqeLwWJt+k1U1j652DDTvw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DftRCptV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=m17oNBcj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wzf8yC86"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4856cd3f1ffso7033425e9.3
-        for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 02:15:32 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DftRCptV";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="m17oNBcj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1773921763;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kmtXuPZqg0u0KuwJyVBzjey4ZPEavJp9+pXBdZV2bRw=;
+	b=DftRCptVfsHJVpoVtjowxPdGFz2Mr9CNOfhH4ISGbykKrY5tkQIAXPXsDPN938NsUxegQs
+	1qlU6vJPm3EqgNmat+qtUN9MRwl/3j2yA0T5NBbbXKP7q3saVEAYPs6WerdhnrjeMqANX0
+	Na5boTX4mh2Le98Zcm22SqqFQhzFX7g=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-496-BF_k86WSNJ-IV5pkhHzYLA-1; Thu, 19 Mar 2026 08:02:40 -0400
+X-MC-Unique: BF_k86WSNJ-IV5pkhHzYLA-1
+X-Mimecast-MFC-AGG-ID: BF_k86WSNJ-IV5pkhHzYLA_1773921760
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-89c4b118740so17656936d6.3
+        for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 05:02:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1773911731; x=1774516531; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YUSCDB83co7ppHJl5GhGBtIfWncyhJhoxXMzlAxCrYI=;
-        b=wzf8yC86DpJtwdWhAnDFGK/3yf2FrBYrtXmXESk/4rbB3QDQZ/6AXY+5ccQq1lJI+g
-         lRFNrYEQUkUo9gf0kQRMB8GQzNVYYhHsS7rQlW3iRRRdurWMdlJMw6H1GHkTjuIkPz38
-         1BRn1FDtqrLOyqqlDXGA3o4kjnGww+nZ5F1n6yrav7HxdzL13IPuHWnCvd9G0UOSam2f
-         dFUw2zZ03dpucbAxV0KcW0FID7sT/8bY5dv27EDIW1xLx23/sDmMe/GkWhzb021X6YOh
-         CdBJYOgVjhhfZp+oE1EOxFQkFv+qLfPirUDHcRA0aRDVHIV+41ssBmx/ChL9vMvxhpdp
-         CyHA==
+        d=redhat.com; s=google; t=1773921760; x=1774526560; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kmtXuPZqg0u0KuwJyVBzjey4ZPEavJp9+pXBdZV2bRw=;
+        b=m17oNBcjIbctpTqfZlu+lzHHLneZTUXmE9bkJuGuwitXtmW2CaCLZ//LSmZpFO8eVg
+         v93WI92CU0yVrjUNu3wjqiHVG8FKKdhWbXL6te+3KrYKR66r4Xic7bYbtSQDpoVmbDCY
+         OG+iwuHP3jziMEo+gonE7D55aelQf/0gmAQMR3xiZX6o35PV/UrdZDGNYj0LJtN4g+x8
+         N2c4+Mt0rF9C6aW/51TsJtakkSbEkB1NgeU6SL6orBksf8MVTq+lfthjuR1ROOzhGRSN
+         o3vG4pSQeJBcQ8kspOgRg2rZqg0mFZEj7zmkMFbKMptsZh/R8Ihv/EWIAjPdoLu7R3W7
+         Xmnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773911731; x=1774516531;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YUSCDB83co7ppHJl5GhGBtIfWncyhJhoxXMzlAxCrYI=;
-        b=UV3O8LiqPLkm7bHf1CT8UxGca4NQKn37Ki+waNTeRAcUY/y35H5C6kyPzIdl1ZuD2Z
-         qSToo511kJ6B9IUeFfiM0CW1xceh3958MmScrIsR7LyiCUyjQbw0zt0RGNcnpgBNwitO
-         mBRCuT/051mIkwjxbxXy1Ko/4sXLAzZ3h2jcW4jLe5YLQbwYIDET1icAPC3Eg9jBkkx0
-         vVTfkoMIcroWaEkrKOx4Jjwag6JHJiljfhpobhUrwWvZoVFQQmQcQIxq/rX2GA8rtvPr
-         gqLVaSSdSdWT1zX6RghSrEQW+9a023XH0w68MeBGCyAKWvZJBDqu/7VdqRcCSeN3XUV5
-         3+UA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJYokud55dU8IH9LMP+djhcQ3yz4HCnUxBK1elcgbeUY+Wr+kGP4ptnCXp2C1Ejxa17YMiTUJchWY5+w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yztg7fNbFOI/lQwFT8UpH4Ro/RXYn2aBYqHfIkc6lYWSoQEm3tv
-	gtlDfNxEQ2su1afW1zNg/2muZe3DOW+6h4hiaaTI7bYfnbn1iiL/nK7sG/5ndGv+fNo=
-X-Gm-Gg: ATEYQzx86J9WR2fBb3u9OIFUmltR+RlcK2clslsyAWOdGOf6NoIOdr9ZQtrSd+94YAi
-	Z/3tD6LKqBfLgM18lZEpaANTqnq3jcWCIzbPkcg1maiimLD62upg5ZkSLWnaL/FKTIBeQaaO0gq
-	xAiI+HIn0YN9feTk2M073kKsiLXQ3KCtEwosK3719C/WiNKuXqtfk/ojn7GrEO1OhSmdcAHaDEx
-	uNZ6xUYf+qTD3YTzdserWFcuAPXFAFMS9ntcYghmxZVdjLAi3Wwsex2UQrQxhGZvmZ6STv+4f/v
-	ZZc9j9qut/M56ixn/GTzMYpiCQt5oO/XOwbR5gYci3e6sZiBMc+5d1B3JUONoH57Rg+Hp2tAXIc
-	vtPrZEBNxOVzwfXMZDiNV9hEe7ADz9jEy8xyMGcb4aXv7dxdhkYI5g5bVjxt8SBEZXZdHR0gkqO
-	Qx0JfRGSPJ6LRxDKP0EVXiXzF53sDm1boYRM/PGnk=
-X-Received: by 2002:a05:600c:6994:b0:483:79ad:f3b9 with SMTP id 5b1f17b1804b1-486f445facdmr102611195e9.28.1773911731261;
-        Thu, 19 Mar 2026 02:15:31 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486f4b818aasm36720405e9.16.2026.03.19.02.15.29
+        d=1e100.net; s=20251104; t=1773921760; x=1774526560;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kmtXuPZqg0u0KuwJyVBzjey4ZPEavJp9+pXBdZV2bRw=;
+        b=KnKK9ZyjGWN1qiKYAtrdyyT8bscYY++0T0VMoZJYZ8iAdkgnGdkosVkUMSaBXoSUvo
+         ZNeKr+VjBH1CqpBJlxWdfHoMg9cBuhUM6mtba3Vj8RyDKkj+E+CFgi1t+dur9WNhtGdS
+         oZT0PCYWSCHvvIk48LPFXUQ6aoZLkQoEV2R39Nn4Mu2gG4L56mrg1XUn21fVM3I0EKgK
+         bt8lATq4b3Yc/AEbuE9OYryJ6aQgq4D95586h8Tl1l7mwicqz4lSIRr0eOgmZ6nvqfX9
+         7TWvX8xhDyspe/QKntQE9KNBk7fou6dnfzpG5EYeNvcFTFOrtB8FmywaNoNTXOaRuyb5
+         LBQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUR4fFmrG6daM7S20pDLEOnZnviRfjOjOuMa3U4YCEVcqAsgcGuozaYLB7YngVy/K93RSdgWCNGy5SPsA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBW8cyvahi0McuzOmf7OZIyptpfqd5OHtu6V75QvtOMxIiFWAV
+	ZZtqBXknJhz/X86uOc0KbgufMSAXVUOEN0MNoHn2gtxtyo3hgtjilg0XC5fyMpooxtQgL8/Ssp2
+	sL4EADyw505vahashLg7E2cNBFlUkmUTo3FXvZoMXMAXVxcltOqMOXUTHJcp8gqbY
+X-Gm-Gg: ATEYQzwzcYAgLPCzRb7AHH9gqwVNaXTEynz5MgUEea+P9O3Xif3wnmmpBgzfhfkXKEF
+	wOfH9MWVNOzteWuo5BIiT9gQcCOZcHLLnaGNR6QxxQNuckWgcm7QsqOeB4+4PAv8WKa251tDhpw
+	F4fhw8BDp1aFBBRzCdGinK2dlhWMYAD+LX5I1Ytfo0sIkFyKwGyWAaYGhnd2zVHUviIoVaqJCRY
+	fUZwZVb8jfXZ03EDftthoxaDlDl/CbmYqGCV5/MFlE8IDieAokAgcpoNhS2O2ll5PBThHWqkl0m
+	z8ZjSSgAs+8V21Ybvm24mNJx+1RscfazR68u3ycZeV9R1+bTX0UbqhN8gRi1CnXe4u8P+xDOg3L
+	X5Eq3D0mAKKnCHvIpmL+FIf9APR8MWf9Is4Ie8wOc408DcKEnaOWFzr7hpEQ=
+X-Received: by 2002:ad4:5ded:0:b0:89a:666:ad2b with SMTP id 6a1803df08f44-89c6b56bcf5mr102002986d6.27.1773921760078;
+        Thu, 19 Mar 2026 05:02:40 -0700 (PDT)
+X-Received: by 2002:ad4:5ded:0:b0:89a:666:ad2b with SMTP id 6a1803df08f44-89c6b56bcf5mr102002236d6.27.1773921759463;
+        Thu, 19 Mar 2026 05:02:39 -0700 (PDT)
+Received: from loberman-thinkpadp16gen3.rmtusma.csb ([2600:6c64:4e7f:603b:aa2b:ddff:fe88:da74])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89c6b8e0a5bsm43875346d6.6.2026.03.19.05.02.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2026 02:15:30 -0700 (PDT)
-Date: Thu, 19 Mar 2026 12:15:26 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [linux-next:master 6496/7246]
- drivers/block/drbd/drbd_legacy_84.c:466 drbd_conn_str_84() error: buffer
- overflow 'drbd_conn_s_names' 24 <= u32max
-Message-ID: <202603190716.h5QMTLBc-lkp@intel.com>
+        Thu, 19 Mar 2026 05:02:38 -0700 (PDT)
+Message-ID: <9d6ca1c6c919de0999c64628feabf1e677f7e759.camel@redhat.com>
+Subject: Re: [PATCH v2] blk-mq: add tracepoint block_rq_tag_wait
+From: Laurence Oberman <loberman@redhat.com>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, Aaron Tomlin
+	 <atomlin@atomlin.com>, "axboe@kernel.dk" <axboe@kernel.dk>, 
+ "rostedt@goodmis.org"
+	 <rostedt@goodmis.org>, "mhiramat@kernel.org" <mhiramat@kernel.org>, 
+ "mathieu.desnoyers@efficios.com"
+	 <mathieu.desnoyers@efficios.com>
+Cc: "kch@nvidia.com" <kch@nvidia.com>, "bvanassche@acm.org"
+ <bvanassche@acm.org>,  "dlemoal@kernel.org"	 <dlemoal@kernel.org>,
+ "ritesh.list@gmail.com" <ritesh.list@gmail.com>,  "neelx@suse.com"	
+ <neelx@suse.com>, "sean@ashe.io" <sean@ashe.io>, "mproche@gmail.com"	
+ <mproche@gmail.com>, "chjohnst@gmail.com" <chjohnst@gmail.com>, 
+ "linux-block@vger.kernel.org"	 <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org"	 <linux-kernel@vger.kernel.org>,
+ "linux-trace-kernel@vger.kernel.org"	 <linux-trace-kernel@vger.kernel.org>
+Date: Thu, 19 Mar 2026 08:02:36 -0400
+In-Reply-To: <63dfc26d-7d9d-4530-bf85-4f07fbcf240a@wdc.com>
+References: <20260319015300.287653-1-atomlin@atomlin.com>
+	 <63dfc26d-7d9d-4530-bf85-4f07fbcf240a@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-head:   8e42d2514a7e8eb8d740d0ba82339dd6c0b6463f
-commit: 7d6deec50773e43a5840f798ea0a730f20f74700 [6496/7246] drbd: remove BROKEN for DRBD
-config: openrisc-randconfig-r072-20260319 (https://download.01.org/0day-ci/archive/20260319/202603190716.h5QMTLBc-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 14.3.0
-smatch: v0.5.0-9004-gb810ac53
+On Thu, 2026-03-19 at 07:32 +0000, Johannes Thumshirn wrote:
+> Looks good,
+>=20
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202603190716.h5QMTLBc-lkp@intel.com/
+Looks good now.
 
-New smatch warnings:
-drivers/block/drbd/drbd_legacy_84.c:466 drbd_conn_str_84() error: buffer overflow 'drbd_conn_s_names' 24 <= u32max
-drivers/block/drbd/drbd_transport_tcp.c:742 dtt_wait_for_connect() warn: variable dereferenced before check 'path' (see line 751)
-drivers/block/drbd/drbd_transport_tcp.c:1297 dtt_connect() error: we previously assumed 'csocket' could be null (see line 1179)
-drivers/block/drbd/drbd_transport_tcp.c:1339 dtt_connect() error: we previously assumed 'dsocket' could be null (see line 1179)
-drivers/block/drbd/drbd_req.c:995 mod_rq_state() error: we previously assumed 'peer_device' could be null (see line 924)
-drivers/block/drbd/drbd_req.c:1245 __req_mod() error: we previously assumed 'peer_device' could be null (see line 1155)
-drivers/block/drbd/drbd_req.c:1996 drbd_unplug() warn: variable dereferenced before check 'req' (see line 1993)
-drivers/block/drbd/drbd_sender.c:551 w_e_send_csum() warn: missing error code 'err'
-drivers/block/drbd/drbd_sender.c:2341 w_e_end_ov_req() warn: missing error code 'err'
-drivers/block/drbd/drbd_state.c:5178 change_cluster_wide_state() error: we previously assumed 'target_connection' could be null (see line 5170)
-drivers/block/drbd/drbd_state.c:6305 calc_data_accessible() warn: variable dereferenced before check 'nc' (see line 6303)
-drivers/block/drbd/drbd_main.c:4575 drbd_init() warn: missing error code 'err'
-drivers/block/drbd/drbd_nl.c:689 drbd_khelper() warn: variable dereferenced before check 'connection' (see line 585)
-drivers/block/drbd/drbd_receiver.c:280 drbd_sync_rule_str() error: buffer overflow 'sync_rule_names' 22 <= 22
-drivers/block/drbd/drbd_receiver.c:289 strategy_descriptor() error: buffer overflow 'sync_descriptors' 18 <= 18
-
-vim +/drbd_conn_s_names +466 drivers/block/drbd/drbd_legacy_84.c
-
-a5747bff1fbd8c Christoph Böhmwalder 2025-12-16  463  static const char *drbd_conn_str_84(enum drbd_conn_state s)
-a5747bff1fbd8c Christoph Böhmwalder 2025-12-16  464  {
-a5747bff1fbd8c Christoph Böhmwalder 2025-12-16  465  	/* enums are unsigned... */
-a5747bff1fbd8c Christoph Böhmwalder 2025-12-16 @466  	return (int)s > (int)L_BEHIND ? "TOO_LARGE" : drbd_conn_s_names[s];
-
-We *want* them to be unsigned.  Now if someone passes a negative s
-value then it will result in an out of bounds read where if we removed
-the casts to (int) then we can easily verify the code is safe.
-
-a5747bff1fbd8c Christoph Böhmwalder 2025-12-16  467  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Laurence Oberman <loberman@redhat.com>
+Tested-by:   Laurence Oberman <loberman@redhat.com>
 
