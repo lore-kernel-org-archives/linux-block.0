@@ -1,78 +1,75 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571D023D2A1
-	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 21:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBF137DE9D;
+	Thu, 19 Mar 2026 21:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773955104; cv=none; b=TqdYYTUf59hBDVTRzX2INHqM12CNI2CGKbp1WjiDpn2oi5d652d8rb9RMEmDWRn2Wsq1HhcvQ9nhcFOG9Yvihh4WCoikPxsp62N5lNuPPlJ6BkwEWnrjgDbiasa37XjdauuiXoOpxBPVaolVLOyoEUR8VY6+9UtEA9yeAVIe49o=
+	t=1773957145; cv=none; b=PE01qX41a18BsGLBzc74lYf2c14lgoDKAYxRwYKCI7YXV/5XfF+lISqLlktfTGqp8cusz6biQWTnCLp4pCXGk2gjcX+rOgA4rs1ugwdTYyZfWxWGdfIQh0Pta1FmUbQ8XfDkpQHI4OgV1x6YekSeWWnBhICPXfin/ukJMgxVInk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773955104; c=relaxed/simple;
-	bh=OjPHejI0ISfk18csC75FRhA7+tY20ANSZMAywihGRMg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cVBjLkIeh6i9xsI9CSrZ0R2j/3TEHxrYcEfJEKa9TzNDpyUPKYKePtXB8siihkYxre4ji0w3yf/Y7Bqr1TE3p3+DUaJSpIwKOfKiHjqkiaVuyX2jvkvt6GzpO20DE+4owWLuFwudubjASMTwpj3pDS6sSiYUUriAxN6h8bEJnrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=N04XPbzz; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="N04XPbzz"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fcJTB6LPpzlgqsJ;
-	Thu, 19 Mar 2026 21:18:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1773955100; x=1776547101; bh=xaNiNhFVKjE5IkNWjRLyTL7X
-	JgxbSfLdk63kLvZF+w0=; b=N04XPbzzBGjwqSBCnxgQtK5CCxwigRI13PS9x/1F
-	oq61cttaZvERZUJr4GHKJPT3sen09D+g/YArvTh26si3Ngl8CfJVYWYO038Ccnlu
-	UCjM0xPVawZl09Pna330XEkfpJubag9QbPnNTJZDacOyjKG3MAhSawQfe5X4IPzE
-	DNladgbgQkcAnQ7ec82Wxt0WLDdYppaUZsre5n3540YZ4+4bigoG9++NbmdMQR3h
-	oi/GkZoHBZZuizK+AGviLRw+glghXvUDgi/51OVi0B76gh0ihEQGukvc3su7tLy8
-	cW/+4OxSAyl84s4t5dnPEfGm/aGdY49uFgiBaCxFD6t7lw==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id iu5Fsm32VdGH; Thu, 19 Mar 2026 21:18:20 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fcJT740C7zlfvq8;
-	Thu, 19 Mar 2026 21:18:19 +0000 (UTC)
-Message-ID: <91069086-95c4-4cd6-95ba-4d59d57bf001@acm.org>
-Date: Thu, 19 Mar 2026 14:18:18 -0700
+	s=arc-20240116; t=1773957145; c=relaxed/simple;
+	bh=jwHlAMcakKM7yr7h5bK6LR1kqKdekHOHX8yg5Kd0UYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UdLR2G42Kjo1dA6j4ugTXFNEhQMz8BBEmIQ47o4ffhZxTTdtqZEporKMprJAkOX0601Hwhp8Yo253dVnlL8bKofmzi0XuD2endCOZlf8i3rlE/Pmkr6GWg4E52IO4w4rB+xk84lPCUVus87aunsHmo/kOM5qPiuS2p0Qndk94HE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf07.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay10.hostedemail.com (Postfix) with ESMTP id EB6DAC2541;
+	Thu, 19 Mar 2026 21:52:21 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf07.hostedemail.com (Postfix) with ESMTPA id B755C20024;
+	Thu, 19 Mar 2026 21:52:18 +0000 (UTC)
+Date: Thu, 19 Mar 2026 17:52:49 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ johannes.thumshirn@wdc.com, kch@nvidia.com, bvanassche@acm.org,
+ dlemoal@kernel.org, ritesh.list@gmail.com, neelx@suse.com, sean@ashe.io,
+ mproche@gmail.com, chjohnst@gmail.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] blk-mq: add tracepoint block_rq_tag_wait
+Message-ID: <20260319175249.560f27a7@gandalf.local.home>
+In-Reply-To: <20260319015300.287653-1-atomlin@atomlin.com>
+References: <20260319015300.287653-1-atomlin@atomlin.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: add a "discard cache" debug option to zloop v2
-To: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
- Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-References: <20260319060246.2084931-1-hch@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260319060246.2084931-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamout05
+X-Rspamd-Queue-Id: B755C20024
+X-Stat-Signature: ybsiqziohnm5mnu6k7ob5fy77cqg1k7y
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX18w67Qx9JCBQNzxkMc6Scfc/RwIcQpmo7I=
+X-HE-Tag: 1773957138-993911
+X-HE-Meta: U2FsdGVkX18VVuBuyNRdg/5iHdETKgJJHF7V7Y611KbHR8XvNmDoIh4rAJofCWupGBuAaQSy88l/OSXgcgdrVRcPVMNbDU+Oib9cT6O1VFko/h9gk5N9/Y4Eo2cu0xB8jicw+o5d1wXdjOmab6XOibA4LOZeTVSpqZIKC1nZYnTWbU32Q0XJc5b028MDtU7RiDWoVyUZRGVfWHI7RARlFFdKWR7mkc3wLVWKBIJaiX60wEosmOOHXMvb15a/g2q8UJnUAQV5LlQLmONH7uhlmm0/jh7Weg47A2IxHqv6dm90A3iE6QdJsro5DAb/H5TlyYrkjI5z8nPdPLVtEuj3m78h2J606vhkcP2HPLhq8b9E1nn6wNWr4bL16/lv7kGZ
 
-On 3/18/26 11:02 PM, Christoph Hellwig wrote:
-> this series adds a new option to zloop to lose data not committed to
-> stable storage using a flush operation on device removal.  The idea is
-> to help testing that file system code does the right thing in face of
-> volatile write caches.  For conventional devices, this can be tested
-> using dm-log-writes, but the concepts there don't work for sequential
-> write required zones.  Instead this adds an option to zloop, which
-> records the write pointer at the last cache flush for each zone file in
-> an xattr, and truncates the files down to that value on removal,
-> simulating losing the contents of the volatile write cache.
+On Wed, 18 Mar 2026 21:53:00 -0400
+Aaron Tomlin <atomlin@atomlin.com> wrote:
 
-For the series:
+> +	TP_fast_assign(
+> +		__entry->dev		= disk_devt(q->disk);
+> +		__entry->hctx_id	= hctx->queue_num;
+> +		__entry->is_sched_tag	= is_sched_tag;
+> +
+> +		if (__entry->is_sched_tag)
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Nit, but why use __entry->is_sched_tag instead of is_sched_tag.
 
+Not sure if the compiler will optimize it (likely it will), but it seems
+cleaner to use the variable directly and not the one assigned.
+
+Perhaps the compiler is smart enough to use one register for both updates.
+
+-- Steve
+
+
+> +			__entry->nr_tags = hctx->sched_tags->nr_tags;
+> +		else
+> +			__entry->nr_tags = hctx->tags->nr_tags;
+> +	),
+> +
