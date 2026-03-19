@@ -1,42 +1,45 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70B3148850
-	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 06:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D401E7C23
+	for <linux-block@vger.kernel.org>; Thu, 19 Mar 2026 06:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773900180; cv=none; b=S0woqpuu5PVA7eRkhAdEo9EWk/vU6E4Hp0ZSzoEjTDYoVSNfFyMKArK3mL22fUwLZ9rnFG97PF+P8jGBsJUFMFJN6slQiCyXvzNeNhTgZ1JBs1Ookl86x9Wk7LxdVIrxELxeodTf9bwtUedby4N2hWBsBZ2sqWkHlRl7czSZqiU=
+	t=1773900181; cv=none; b=C1azj1UYPvcFqqIxecmnjAxkTmAKwS2UwLKt77uoH1Zm1GctVdPkLeh/D1AI+v1CKSMN64yPz4vFpiSKaCM8aYeSC+goforBkaSaI+sOLfXqs/2rDdJ2UMyyFoEvnB2Hd484+VHmdTUKmvxiEUDqZ67qLMJ/rd0nzQYNzNl9wkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773900180; c=relaxed/simple;
-	bh=pvv6opc+B7Fc8ZiQApE371/g4IV6oD4de1b9prQ8ruw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aVCeNlgwfocYgYWBNuN2QycGd4GD9IJA1US8RfY83MtM7wBrAOm5If7awNTMtQGCoQJaNIckz8vFjU4+0L14GZBkNmpYpF16ZguOJpa682qyyxvEXBoI3i0diPX4NGkSCL8KFrv+8076NLFAAZctCN6WmTTxwyyW1ARbcvklE3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0Uxtkj8c; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1773900181; c=relaxed/simple;
+	bh=rBjJ/RJYx8t/EZPwGc9Mo6TA2onJWUMMQLX7eqdzaU8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kV7TtiGvm7law0lwyWON/vuL7kGlxMj+Mqu8XkyBu3XaULooR3H95Kqz1wT5AdKTg+rTLLPNGH/RCyQUDfxP8dhLC6bezxUL1tKRY8VQ8OFdGlodbGj5i/roXRIYAxeg5dzNFp+hCZinL4uHasfZ/UpZCVS8YoHL7hQNXfSQHfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4AmtAQnV; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0Uxtkj8c"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4AmtAQnV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=3GoUsnN/OfoYiL3wL5ZUYVTNJULYAkTJEALph9OrziY=; b=0Uxtkj8c0ezTe5pAa1bGF89uo0
-	/APxuA9V6Ci8x8xUF9dUMR5BNhrKTe2DJpRZ+58nrkSaJ7ZxJ2sESGxnOC5UlNAfEdgXkg7hmUBf2
-	qLtWbAu1EjQNwCAlcDhslPREuhUCIOO8D9cPtlu4N4ksQCulz77+HOjN4yAipRe/KQDS/RFLEfc2f
-	i2yrtfZlvyUiWLrAk2o06Rz727+x1ZTTOFCy+pqFbVCXQO8OpKxjboY0npRLddPWVdAq+1kkCETZc
-	WMg47wgmQH34NIH1ZvdmRqimyr5lQtCFrQZYTKB/oziM5Ek0xviG5+GWzwoaeTwnLI+ehWEKVi5oE
-	jDvBe9AQ==;
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=WzWQ49BHOxdRoH1Oz4fhuixZcaLToIDOICH3+sFTWFU=; b=4AmtAQnVWF83GW7/ExxjUEnnTp
+	Tk+vKCj05ZQKjVu4u2B2ywCULmsFfxHK1VHrCHRmZoF7Ch5l2dBdH9MLqz+Tgu54ixQ9yWSEoNxA3
+	AjMm56H1z1AqG1iT+a0o+ereo+sPqTtxH5GZPc6WKrwqbdAt5xRZYmSj+zMitv370S6pyue2mhne4
+	ldUf3Sbnn7vEShfy3ey87x6L1bVrqH9z+MUmkRsoGZKmX9D+S87bBX9cdgZNOX+R4AUR9XgjOl0aA
+	x8xfZuN0aEmOTC8y8j7pE4z6oetmaD8IY1dfYaiBWPP3rZU3IJn6gdRhH6M51lMgvXBQ/ws9jreAS
+	jkaTKNPQ==;
 Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w36T4-00000009yU9-1ZvE;
-	Thu, 19 Mar 2026 06:02:50 +0000
+	id 1w36T7-00000009yUJ-0jia;
+	Thu, 19 Mar 2026 06:02:53 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Damien Le Moal <dlemoal@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
-Subject: add a "discard cache" debug option to zloop v2
-Date: Thu, 19 Mar 2026 07:02:35 +0100
-Message-ID: <20260319060246.2084931-1-hch@lst.de>
+Subject: [PATCH 1/2] zloop: refactor zloop_rw
+Date: Thu, 19 Mar 2026 07:02:36 +0100
+Message-ID: <20260319060246.2084931-2-hch@lst.de>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260319060246.2084931-1-hch@lst.de>
+References: <20260319060246.2084931-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,22 +49,290 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi all,
+Split out two helpers functions to make the function more readable and
+to avoid conditional locking.
 
-this series adds a new option to zloop to lose data not committed to
-stable storage using a flush operation on device removal.  The idea is
-to help testing that file system code does the right thing in face of
-volatile write caches.  For conventional devices, this can be tested
-using dm-log-writes, but the concepts there don't work for sequential
-write required zones.  Instead this adds an option to zloop, which
-records the write pointer at the last cache flush for each zone file in
-an xattr, and truncates the files down to that value on removal,
-simulating losing the contents of the volatile write cache.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ drivers/block/zloop.c | 240 ++++++++++++++++++++++--------------------
+ 1 file changed, 124 insertions(+), 116 deletions(-)
 
-Changes since v1:
- - fix up the documentation
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 51c043342127..8ca37ca1935a 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -378,125 +378,22 @@ static void zloop_rw_complete(struct kiocb *iocb, long ret)
+ 	zloop_put_cmd(cmd);
+ }
+ 
+-static void zloop_rw(struct zloop_cmd *cmd)
++static int zloop_do_rw(struct zloop_cmd *cmd)
+ {
+ 	struct request *rq = blk_mq_rq_from_pdu(cmd);
++	int rw = req_op(rq) == REQ_OP_READ ? ITER_DEST : ITER_SOURCE;
++	unsigned int nr_bvec = blk_rq_nr_bvec(rq);
+ 	struct zloop_device *zlo = rq->q->queuedata;
+-	unsigned int zone_no = rq_zone_no(rq);
+-	sector_t sector = blk_rq_pos(rq);
+-	sector_t nr_sectors = blk_rq_sectors(rq);
+-	bool is_append = req_op(rq) == REQ_OP_ZONE_APPEND;
+-	bool is_write = req_op(rq) == REQ_OP_WRITE || is_append;
+-	int rw = is_write ? ITER_SOURCE : ITER_DEST;
++	struct zloop_zone *zone = &zlo->zones[rq_zone_no(rq)];
+ 	struct req_iterator rq_iter;
+-	struct zloop_zone *zone;
+ 	struct iov_iter iter;
+-	struct bio_vec tmp;
+-	unsigned long flags;
+-	sector_t zone_end;
+-	unsigned int nr_bvec;
+-	int ret;
+-
+-	atomic_set(&cmd->ref, 2);
+-	cmd->sector = sector;
+-	cmd->nr_sectors = nr_sectors;
+-	cmd->ret = 0;
+-
+-	if (WARN_ON_ONCE(is_append && !zlo->zone_append)) {
+-		ret = -EIO;
+-		goto out;
+-	}
+-
+-	/* We should never get an I/O beyond the device capacity. */
+-	if (WARN_ON_ONCE(zone_no >= zlo->nr_zones)) {
+-		ret = -EIO;
+-		goto out;
+-	}
+-	zone = &zlo->zones[zone_no];
+-	zone_end = zone->start + zlo->zone_capacity;
+-
+-	/*
+-	 * The block layer should never send requests that are not fully
+-	 * contained within the zone.
+-	 */
+-	if (WARN_ON_ONCE(sector + nr_sectors > zone->start + zlo->zone_size)) {
+-		ret = -EIO;
+-		goto out;
+-	}
+-
+-	if (test_and_clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags)) {
+-		mutex_lock(&zone->lock);
+-		ret = zloop_update_seq_zone(zlo, zone_no);
+-		mutex_unlock(&zone->lock);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	if (!test_bit(ZLOOP_ZONE_CONV, &zone->flags) && is_write) {
+-		mutex_lock(&zone->lock);
+-
+-		spin_lock_irqsave(&zone->wp_lock, flags);
+-
+-		/*
+-		 * Zone append operations always go at the current write
+-		 * pointer, but regular write operations must already be
+-		 * aligned to the write pointer when submitted.
+-		 */
+-		if (is_append) {
+-			/*
+-			 * If ordered zone append is in use, we already checked
+-			 * and set the target sector in zloop_queue_rq().
+-			 */
+-			if (!zlo->ordered_zone_append) {
+-				if (zone->cond == BLK_ZONE_COND_FULL ||
+-				    zone->wp + nr_sectors > zone_end) {
+-					spin_unlock_irqrestore(&zone->wp_lock,
+-							       flags);
+-					ret = -EIO;
+-					goto unlock;
+-				}
+-				sector = zone->wp;
+-			}
+-			cmd->sector = sector;
+-		} else if (sector != zone->wp) {
+-			spin_unlock_irqrestore(&zone->wp_lock, flags);
+-			pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
+-			       zone_no, sector, zone->wp);
+-			ret = -EIO;
+-			goto unlock;
+-		}
+-
+-		/* Implicitly open the target zone. */
+-		if (zone->cond == BLK_ZONE_COND_CLOSED ||
+-		    zone->cond == BLK_ZONE_COND_EMPTY)
+-			zone->cond = BLK_ZONE_COND_IMP_OPEN;
+-
+-		/*
+-		 * Advance the write pointer, unless ordered zone append is in
+-		 * use. If the write fails, the write pointer position will be
+-		 * corrected when the next I/O starts execution.
+-		 */
+-		if (!is_append || !zlo->ordered_zone_append) {
+-			zone->wp += nr_sectors;
+-			if (zone->wp == zone_end) {
+-				zone->cond = BLK_ZONE_COND_FULL;
+-				zone->wp = ULLONG_MAX;
+-			}
+-		}
+-
+-		spin_unlock_irqrestore(&zone->wp_lock, flags);
+-	}
+-
+-	nr_bvec = blk_rq_nr_bvec(rq);
+ 
+ 	if (rq->bio != rq->biotail) {
+-		struct bio_vec *bvec;
++		struct bio_vec tmp, *bvec;
+ 
+ 		cmd->bvec = kmalloc_objs(*cmd->bvec, nr_bvec, GFP_NOIO);
+-		if (!cmd->bvec) {
+-			ret = -EIO;
+-			goto unlock;
+-		}
++		if (!cmd->bvec)
++			return -EIO;
+ 
+ 		/*
+ 		 * The bios of the request may be started from the middle of
+@@ -522,7 +419,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
+ 		iter.iov_offset = rq->bio->bi_iter.bi_bvec_done;
+ 	}
+ 
+-	cmd->iocb.ki_pos = (sector - zone->start) << SECTOR_SHIFT;
++	cmd->iocb.ki_pos = (cmd->sector - zone->start) << SECTOR_SHIFT;
+ 	cmd->iocb.ki_filp = zone->file;
+ 	cmd->iocb.ki_complete = zloop_rw_complete;
+ 	if (!zlo->buffered_io)
+@@ -530,12 +427,123 @@ static void zloop_rw(struct zloop_cmd *cmd)
+ 	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
+ 
+ 	if (rw == ITER_SOURCE)
+-		ret = zone->file->f_op->write_iter(&cmd->iocb, &iter);
+-	else
+-		ret = zone->file->f_op->read_iter(&cmd->iocb, &iter);
+-unlock:
+-	if (!test_bit(ZLOOP_ZONE_CONV, &zone->flags) && is_write)
++		return zone->file->f_op->write_iter(&cmd->iocb, &iter);
++	return zone->file->f_op->read_iter(&cmd->iocb, &iter);
++}
++
++static int zloop_seq_write_prep(struct zloop_cmd *cmd)
++{
++	struct request *rq = blk_mq_rq_from_pdu(cmd);
++	struct zloop_device *zlo = rq->q->queuedata;
++	unsigned int zone_no = rq_zone_no(rq);
++	sector_t nr_sectors = blk_rq_sectors(rq);
++	bool is_append = req_op(rq) == REQ_OP_ZONE_APPEND;
++	struct zloop_zone *zone = &zlo->zones[zone_no];
++	sector_t zone_end = zone->start + zlo->zone_capacity;
++	unsigned long flags;
++	int ret = 0;
++
++	spin_lock_irqsave(&zone->wp_lock, flags);
++
++	/*
++	 * Zone append operations always go at the current write pointer, but
++	 * regular write operations must already be aligned to the write pointer
++	 * when submitted.
++	 */
++	if (is_append) {
++		/*
++		 * If ordered zone append is in use, we already checked and set
++		 * the target sector in zloop_queue_rq().
++		 */
++		if (!zlo->ordered_zone_append) {
++			if (zone->cond == BLK_ZONE_COND_FULL ||
++			    zone->wp + nr_sectors > zone_end) {
++				ret = -EIO;
++				goto out_unlock;
++			}
++			cmd->sector = zone->wp;
++		}
++	} else {
++		if (cmd->sector != zone->wp) {
++			pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
++			       zone_no, cmd->sector, zone->wp);
++			ret = -EIO;
++			goto out_unlock;
++		}
++	}
++
++	/* Implicitly open the target zone. */
++	if (zone->cond == BLK_ZONE_COND_CLOSED ||
++	    zone->cond == BLK_ZONE_COND_EMPTY)
++		zone->cond = BLK_ZONE_COND_IMP_OPEN;
++
++	/*
++	 * Advance the write pointer, unless ordered zone append is in use. If
++	 * the write fails, the write pointer position will be corrected when
++	 * the next I/O starts execution.
++	 */
++	if (!is_append || !zlo->ordered_zone_append) {
++		zone->wp += nr_sectors;
++		if (zone->wp == zone_end) {
++			zone->cond = BLK_ZONE_COND_FULL;
++			zone->wp = ULLONG_MAX;
++		}
++	}
++out_unlock:
++	spin_unlock_irqrestore(&zone->wp_lock, flags);
++	return ret;
++}
++
++static void zloop_rw(struct zloop_cmd *cmd)
++{
++	struct request *rq = blk_mq_rq_from_pdu(cmd);
++	struct zloop_device *zlo = rq->q->queuedata;
++	unsigned int zone_no = rq_zone_no(rq);
++	sector_t nr_sectors = blk_rq_sectors(rq);
++	bool is_append = req_op(rq) == REQ_OP_ZONE_APPEND;
++	bool is_write = req_op(rq) == REQ_OP_WRITE || is_append;
++	struct zloop_zone *zone;
++	int ret = -EIO;
++
++	atomic_set(&cmd->ref, 2);
++	cmd->sector = blk_rq_pos(rq);
++	cmd->nr_sectors = nr_sectors;
++	cmd->ret = 0;
++
++	if (WARN_ON_ONCE(is_append && !zlo->zone_append))
++		goto out;
++
++	/* We should never get an I/O beyond the device capacity. */
++	if (WARN_ON_ONCE(zone_no >= zlo->nr_zones))
++		goto out;
++
++	zone = &zlo->zones[zone_no];
++
++	/*
++	 * The block layer should never send requests that are not fully
++	 * contained within the zone.
++	 */
++	if (WARN_ON_ONCE(cmd->sector + nr_sectors >
++			 zone->start + zlo->zone_size))
++		goto out;
++
++	if (test_and_clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags)) {
++		mutex_lock(&zone->lock);
++		ret = zloop_update_seq_zone(zlo, zone_no);
+ 		mutex_unlock(&zone->lock);
++		if (ret)
++			goto out;
++	}
++
++	if (!test_bit(ZLOOP_ZONE_CONV, &zone->flags) && is_write) {
++		mutex_lock(&zone->lock);
++		ret = zloop_seq_write_prep(cmd);
++		if (!ret)
++			ret = zloop_do_rw(cmd);
++		mutex_unlock(&zone->lock);
++	} else {
++		ret = zloop_do_rw(cmd);
++	}
+ out:
+ 	if (ret != -EIOCBQUEUED)
+ 		zloop_rw_complete(&cmd->iocb, ret);
+-- 
+2.47.3
 
-Diffstat:
- Documentation/admin-guide/blockdev/zoned_loop.rst |    5 
- drivers/block/zloop.c                             |  337 ++++++++++++++--------
- 2 files changed, 226 insertions(+), 116 deletions(-)
