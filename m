@@ -1,327 +1,176 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64223301704
-	for <linux-block@vger.kernel.org>; Fri, 20 Mar 2026 15:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4FA38D01A
+	for <linux-block@vger.kernel.org>; Fri, 20 Mar 2026 22:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774019340; cv=none; b=UTANEWIgDnvcWXai1dIIJpfZ+LpA0wSX3f9C7MdfN6KrcVZveDmQ70IKqkwx7slDCFgVT7dQCt/OBADJZB0dLcMqUrlphe2MXsvSderrIr7xatnK8e2gIr0+j9+cbEB6fMIW3vKXCt6Eg1h07IiCDqD5Ab8mvI+HG0aatfcAp6Y=
+	t=1774046671; cv=none; b=eCWSabZVf603zBzaYJ7E9wSwcbLHG5lZ/gCRWCvzI1XIjit9EMBAyssY3dOWksiPkWF+dxEQHnm6h5dOVrid3mC+7BzOeFiHr6biu+RQNJ+5B963tIb4GiSlpbjqwXrWB+dwoxxpZEmfWYDpEYmZLHQsjeE6wm3EFA9RAFzIHFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774019340; c=relaxed/simple;
-	bh=Gf2xo6EztxR/JeCfjqfjM56Ztig+zO/66D1b/h1hO2w=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TPZBXJnwstWveFA4dbtJq2bQZinzKFpPpV4dcJDHwyLB3JdQ7EdGKX0lQ6nYsR5R7DVmyirvHlz+se40R6BkMNT6qMBaJ+JuaVMw+puQ0oRY6OsF5ZO/Z0P99kZhhW6aOnUXEjCgCi74239kXs3g47oR4d7L587HKwRlv3v1jWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hy5wefvb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jcGylTlu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hy5wefvb";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jcGylTlu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774019338;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dd0KHrH7sbzENLhTFKGbOZqkvnECORpg3J+lU5pEMk0=;
-	b=hy5wefvbJaqf/foFORTm8UKOheczjaBYYAPIFm1obYirKlnms8/esmrosHQGFxEtEIMD9i
-	MoWt6Tun9wjT3n2y5UIE5KRIgV2OnmrFHdxRTBxqIaiRU2F80es3LDpNZm9URbs4PxcwtN
-	OGiNRCyyhX3chFKYtOTfOTHMY7DTfXo=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-e7V4c0pUPVyDz5NNPiERqw-1; Fri, 20 Mar 2026 11:08:57 -0400
-X-MC-Unique: e7V4c0pUPVyDz5NNPiERqw-1
-X-Mimecast-MFC-AGG-ID: e7V4c0pUPVyDz5NNPiERqw_1774019337
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-50b4031b86dso30245951cf.0
-        for <linux-block@vger.kernel.org>; Fri, 20 Mar 2026 08:08:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774019337; x=1774624137; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dd0KHrH7sbzENLhTFKGbOZqkvnECORpg3J+lU5pEMk0=;
-        b=jcGylTluTAB/qF8epxZw/orZxe++5kULpPxReJu1Qh2n7pue6u3aq/mMTDjYw6bB7T
-         Vw57hmoZI9ORYgTL/qpqZq9rCkn8w/kTZjibDXjSmd/3g301vwhHImMUPwGF31A+SG7j
-         WjrBNbGBkRCzufLziVOd9s5soRCF4+W5ZPsjUAWfh6piRqZKzWD7sVdh+X23HCWasUhz
-         s7DQoSB+a91yW0TAxguq3VzpZ2wkaLMfhdlmx/iL+XfeFP6jwVk35pPn4Jx9YmrRjUds
-         Ai08H/RVT5LAIEsjfoiawan3WyajuNvtIAi3N+zdwGTvj57Mowir3F4weaBWgmoeTFE5
-         OTxg==
+	s=arc-20240116; t=1774046671; c=relaxed/simple;
+	bh=6qEZp8VS8dBegmlsP8ZbHVK/SCZzpWrnZg6aIG8yAT8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=h+3N6XcOxE9jZLyfIQtiy5nx+eYbShWMxyNiL0r+my8x8az9wmgUlkuoCtQANb5yUu04U36IzT6D9MJVgD0yAFAnhLMlEb8LacrTd9vlzAohPtJYHu1OirxebZ4vFdJWekxmgzb09BXd+JQJOhYBeZZheVXWzWsVCd1k1ZMbvpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-46705762d7eso3782830b6e.2
+        for <linux-block@vger.kernel.org>; Fri, 20 Mar 2026 15:44:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774019337; x=1774624137;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dd0KHrH7sbzENLhTFKGbOZqkvnECORpg3J+lU5pEMk0=;
-        b=V1IdKq9jd+XTpqAvh/5X4I2eZfEo1mg2/y4DKir7NgsFfHLC+KaAvSGEwCOCdyFCzz
-         ErrcliNBSYFFiU9kP62xjQZ8uVSkfH+lmL8O10BzpBYmm1vAzNbupmi/0BGQwTJxx8p7
-         788nhT948GWBNjEKWs9JzlC8a48plOtK8XfH7UTFRRNkNIiwo7CW7PJ6mzDFJlS/99fZ
-         WI7haccsxMHy92gLFs3NzMxxu8QZ66KVAvvFYlAqRNjGthksbu6yLcmFRoA57jBr5UP0
-         95im+sOzII17Tlay44zgmZX6mg8wqwK27tsLxOkxJtVXEGsXzqECELn9PNYdooJhWobv
-         Ly8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWR30/MLGAYTJ2egWsSG/Fk9Mh5ZMXYdWkV9q9l7uu9bIqR52jE3Llr+X4dWgoa2exorB2MoLKpel4gow==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDzBLh40PadaKo2Qr0pbWm9TVipcEi5GEhuV3vCXQhhBAvupCr
-	USNn2WDniFk66i4wybKRdZfswkWB01aiDe+2mnUhOH08ox04HFccKHkuwhoFV3hCWaAa0mWit2r
-	LCkMTt0w7R0ddPJ7BT3RRnrlnVF65B0KycuQXOvMF862Ir8XwviNf54f/SmcgT0TF
-X-Gm-Gg: ATEYQzziU1UCCIx75lyJQfIeSpQQIcxMDeTPUC1wlqVdWINw5sYm4ZEwRrTdrPqowjS
-	9J5CttPQMYYXPlS86vOabXIqBMQL2QpOij6E1ybV9g6ynS11yoXoT/0P+BmcFi3CcPE5ti6FQJ4
-	Hi3ZQvbOBh8iAjGCFnZAat+ftAhdocpaGB0mhcg8taeArwEVPIVdll0s2/r0QQ+MYUwLZX6Yzrx
-	ZuScBg/dDjJRvyLanZb+quVaeRk8agdSO6bSpu3pCMwBxYP+TBCaPFnzAZLoWS8/znSfQw8xnqp
-	r/LBphFPQK3UFENfWYn7/tzRDB8ioYl9nKGZ6+tIC6W78mgjBom8M+wTzsD+mkdVTceBVXXOIkm
-	55z5esj/lIiID1WofkZugMgO9LHfO8GY5jUSn0kabh2jcqRZuLtjVjWT/Ou0=
-X-Received: by 2002:a05:622a:438e:b0:509:350e:744d with SMTP id d75a77b69052e-50b373ea3dbmr39119491cf.8.1774019336708;
-        Fri, 20 Mar 2026 08:08:56 -0700 (PDT)
-X-Received: by 2002:a05:622a:438e:b0:509:350e:744d with SMTP id d75a77b69052e-50b373ea3dbmr39118731cf.8.1774019335960;
-        Fri, 20 Mar 2026 08:08:55 -0700 (PDT)
-Received: from loberman-thinkpadp16gen3.rmtusma.csb ([2600:6c64:4e7f:603b:aa2b:ddff:fe88:da74])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b36ebae51sm23744961cf.31.2026.03.20.08.08.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2026 08:08:55 -0700 (PDT)
-Message-ID: <ed7473fc9a9115f2c23cfa4ef7514589dfbdc70b.camel@redhat.com>
-Subject: Re: [PATCH v3 2/2] blk-mq: expose tag starvation counts via debugfs
-From: Laurence Oberman <loberman@redhat.com>
-To: Aaron Tomlin <atomlin@atomlin.com>, axboe@kernel.dk,
- rostedt@goodmis.org, 	mhiramat@kernel.org, mathieu.desnoyers@efficios.com
-Cc: johannes.thumshirn@wdc.com, kch@nvidia.com, bvanassche@acm.org, 
-	dlemoal@kernel.org, ritesh.list@gmail.com, neelx@suse.com, sean@ashe.io, 
-	mproche@gmail.com, chjohnst@gmail.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Date: Fri, 20 Mar 2026 11:08:53 -0400
-In-Reply-To: <20260319221956.332770-3-atomlin@atomlin.com>
-References: <20260319221956.332770-1-atomlin@atomlin.com>
-	 <20260319221956.332770-3-atomlin@atomlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+        d=1e100.net; s=20251104; t=1774046669; x=1774651469;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=R1PiOvaG19DzrIcgf3//luJbSwJAeT0XnXRjUjrtTQQ=;
+        b=A6qlX1iX091bDMV75zPaJ+1RlaLWrzzjr3toyvvJ6xrehh2BrsNsfkSYmCUeyRdaMW
+         W/r8zHv29VczD7qfySo6eWcq1rU2kMS5lqlLy8/hEJxgjiGKd+iZ2Wvv/uzvBwFv8e7+
+         tJdiq3EIDkm5Il9K0BLTrw8WEgAWUD7u4OEwMvuv9QaVzNbe+yKy+iB1qxWzrjKqw2mj
+         2H2J2R4iPj2qakfPAg9I7mO/1ETlmv5lSKCmUlEBE4bKYfvUYue5AZHN0oHK9ilpUiCc
+         AEfbZsRyojaOJAdK3qthdw5MZ9grY7P67hA4eI4qbey1kWUd2M+rBfRycGmABgJowgMc
+         NsrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvRobSUg9tlxQYTUS8A5xT6sEXj39R57TVNkbMH+iHB1pFEpt7M9rni0JHyUigbFIzEu2kAhJ0fV6WJQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy71xsxi8dpZH3s0NkdvTQ/o+y+KLPLqUlzfRMw/rhILG7U3Am
+	TJOTvwcqpe8dQ0EJMD+zy8z2+c42OjUPw22gZptStcZKvG8/NjICVlzxoeQTjjAQROtDs5XtEgL
+	YPAoFqZQNxGzZQqAoKwcHVTAvgJJb29wl64col77rSe6wbw2Kb57ZoBlY5as=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6808:308e:b0:467:f636:23bd with SMTP id
+ 5614622812f47-467f6368f86mr1381577b6e.42.1774046669559; Fri, 20 Mar 2026
+ 15:44:29 -0700 (PDT)
+Date: Fri, 20 Mar 2026 15:44:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69bdcdcd.050a0220.3bf4de.0030.GAE@google.com>
+Subject: [syzbot] [block?] general protection fault in bio_add_page
+From: syzbot <syzbot+ed8bc247f231c1a48e21@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2026-03-19 at 18:19 -0400, Aaron Tomlin wrote:
-> In high-performance storage environments, particularly when utilising
-> RAID controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED),
-> severe
-> latency spikes can occur when fast devices are starved of available
-> tags.
->=20
-> This patch introduces two new debugfs attributes for each block
-> hardware queue:
-> =C2=A0 - /sys/kernel/debug/block/[device]/hctxN/wait_on_hw_tag
-> =C2=A0 - /sys/kernel/debug/block/[device]/hctxN/wait_on_sched_tag
->=20
-> These files expose atomic counters that increment each time a
-> submitting
-> context is forced into an uninterruptible sleep via io_schedule() due
-> to
-> the complete exhaustion of physical driver tags or software scheduler
-> tags, respectively.
->=20
-> To guarantee zero performance overhead for production kernels
-> compiled
-> without debugfs, the underlying atomic_t variables and their
-> associated
-> increment routines are strictly guarded behind CONFIG_BLK_DEBUG_FS.
-> When this configuration is disabled, the tracking logic compiles down
-> to a safe no-op.
->=20
-> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
-> ---
-> =C2=A0block/blk-mq-debugfs.c | 56
-> ++++++++++++++++++++++++++++++++++++++++++
-> =C2=A0block/blk-mq-debugfs.h |=C2=A0 7 ++++++
-> =C2=A0block/blk-mq-tag.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 4 +++
-> =C2=A0include/linux/blk-mq.h | 10 ++++++++
-> =C2=A04 files changed, 77 insertions(+)
->=20
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 28167c9baa55..078561d7da38 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -483,6 +483,42 @@ static int hctx_dispatch_busy_show(void *data,
-> struct seq_file *m)
-> =C2=A0	return 0;
-> =C2=A0}
-> =C2=A0
-> +/**
-> + * hctx_wait_on_hw_tag_show - display hardware tag starvation count
-> + * @data: generic pointer to the associated hardware context (hctx)
-> + * @m: seq_file pointer for debugfs output formatting
-> + *
-> + * Prints the cumulative number of times a submitting context was
-> forced
-> + * to block due to the exhaustion of physical hardware driver tags.
-> + *
-> + * Return: 0 on success.
-> + */
-> +static int hctx_wait_on_hw_tag_show(void *data, struct seq_file *m)
-> +{
-> +	struct blk_mq_hw_ctx *hctx =3D data;
-> +
-> +	seq_printf(m, "%d\n", atomic_read(&hctx->wait_on_hw_tag));
-> +	return 0;
-> +}
-> +
-> +/**
-> + * hctx_wait_on_sched_tag_show - display scheduler tag starvation
-> count
-> + * @data: generic pointer to the associated hardware context (hctx)
-> + * @m: seq_file pointer for debugfs output formatting
-> + *
-> + * Prints the cumulative number of times a submitting context was
-> forced
-> + * to block due to the exhaustion of software scheduler tags.
-> + *
-> + * Return: 0 on success.
-> + */
-> +static int hctx_wait_on_sched_tag_show(void *data, struct seq_file
-> *m)
-> +{
-> +	struct blk_mq_hw_ctx *hctx =3D data;
-> +
-> +	seq_printf(m, "%d\n", atomic_read(&hctx-
-> >wait_on_sched_tag));
-> +	return 0;
-> +}
-> +
-> =C2=A0#define CTX_RQ_SEQ_OPS(name,
-> type)					\
-> =C2=A0static void *ctx_##name##_rq_list_start(struct seq_file *m, loff_t
-> *pos) \
-> =C2=A0	__acquires(&ctx-
-> >lock)						\
-> @@ -598,6 +634,8 @@ static const struct blk_mq_debugfs_attr
-> blk_mq_debugfs_hctx_attrs[] =3D {
-> =C2=A0	{"active", 0400, hctx_active_show},
-> =C2=A0	{"dispatch_busy", 0400, hctx_dispatch_busy_show},
-> =C2=A0	{"type", 0400, hctx_type_show},
-> +	{"wait_on_hw_tag", 0400, hctx_wait_on_hw_tag_show},
-> +	{"wait_on_sched_tag", 0400, hctx_wait_on_sched_tag_show},
-> =C2=A0	{},
-> =C2=A0};
-> =C2=A0
-> @@ -814,3 +852,21 @@ void blk_mq_debugfs_unregister_sched_hctx(struct
-> blk_mq_hw_ctx *hctx)
-> =C2=A0	debugfs_remove_recursive(hctx->sched_debugfs_dir);
-> =C2=A0	hctx->sched_debugfs_dir =3D NULL;
-> =C2=A0}
-> +
-> +/**
-> + * blk_mq_debugfs_inc_wait_tags - increment the tag starvation
-> counters
-> + * @hctx: hardware context associated with the tag allocation
-> + * @is_sched: boolean indicating whether the starved pool is the
-> software scheduler
-> + *
-> + * Evaluates the exhausted tag pool and increments the appropriate
-> debugfs
-> + * starvation counter. This is invoked immediately before the
-> submitting
-> + * context is forced into an uninterruptible sleep via
-> io_schedule().
-> + */
-> +void blk_mq_debugfs_inc_wait_tags(struct blk_mq_hw_ctx *hctx,
-> +				=C2=A0 bool is_sched)
-> +{
-> +	if (is_sched)
-> +		atomic_inc(&hctx->wait_on_sched_tag);
-> +	else
-> +		atomic_inc(&hctx->wait_on_hw_tag);
-> +}
-> diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-> index 49bb1aaa83dc..2cda555d5730 100644
-> --- a/block/blk-mq-debugfs.h
-> +++ b/block/blk-mq-debugfs.h
-> @@ -34,6 +34,8 @@ void blk_mq_debugfs_register_sched_hctx(struct
-> request_queue *q,
-> =C2=A0void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx
-> *hctx);
-> =C2=A0
-> =C2=A0void blk_mq_debugfs_register_rq_qos(struct request_queue *q);
-> +void blk_mq_debugfs_inc_wait_tags(struct blk_mq_hw_ctx *hctx,
-> +				=C2=A0 bool is_sched);
-> =C2=A0#else
-> =C2=A0static inline void blk_mq_debugfs_register(struct request_queue *q)
-> =C2=A0{
-> @@ -77,6 +79,11 @@ static inline void
-> blk_mq_debugfs_register_rq_qos(struct request_queue *q)
-> =C2=A0{
-> =C2=A0}
-> =C2=A0
-> +static inline void blk_mq_debugfs_inc_wait_tags(struct blk_mq_hw_ctx
-> *hctx,
-> +						bool is_sched)
-> +{
-> +}
-> +
-> =C2=A0#endif
-> =C2=A0
-> =C2=A0#if defined(CONFIG_BLK_DEV_ZONED) && defined(CONFIG_BLK_DEBUG_FS)
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 66138dd043d4..3cc6a97a87a0 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -17,6 +17,7 @@
-> =C2=A0#include "blk.h"
-> =C2=A0#include "blk-mq.h"
-> =C2=A0#include "blk-mq-sched.h"
-> +#include "blk-mq-debugfs.h"
-> =C2=A0
-> =C2=A0/*
-> =C2=A0 * Recalculate wakeup batch when tag is shared by hctx.
-> @@ -191,6 +192,9 @@ unsigned int blk_mq_get_tag(struct
-> blk_mq_alloc_data *data)
-> =C2=A0		trace_block_rq_tag_wait(data->q, data->hctx,
-> =C2=A0					data->rq_flags &
-> RQF_SCHED_TAGS);
-> =C2=A0
-> +		blk_mq_debugfs_inc_wait_tags(data->hctx,
-> +					=C2=A0=C2=A0=C2=A0=C2=A0 data->rq_flags &
-> RQF_SCHED_TAGS);
-> +
-> =C2=A0		bt_prev =3D bt;
-> =C2=A0		io_schedule();
-> =C2=A0
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 18a2388ba581..f3d8ea93b23f 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -453,6 +453,16 @@ struct blk_mq_hw_ctx {
-> =C2=A0	struct dentry		*debugfs_dir;
-> =C2=A0	/** @sched_debugfs_dir:	debugfs directory for the
-> scheduler. */
-> =C2=A0	struct dentry		*sched_debugfs_dir;
-> +	/**
-> +	 * @wait_on_hw_tag: Cumulative counter incremented each time
-> a submitting
-> +	 * context is forced to block due to physical hardware
-> driver tag exhaustion.
-> +	 */
-> +	atomic_t		wait_on_hw_tag;
-> +	/**
-> +	 * @wait_on_sched_tag: Cumulative counter incremented each
-> time a submitting
-> +	 * context is forced to block due to software scheduler tag
-> exhaustion.
-> +	 */
-> +	atomic_t		wait_on_sched_tag;
-> =C2=A0#endif
-> =C2=A0
-> =C2=A0	/**
+Hello,
 
-For [PATCH v3 2/2] blk-mq: expose tag starvation counts via debugfs
+syzbot found the following issue on:
 
-Tested-by: Laurence Oberman <loberman@redhat.com>
+HEAD commit:    8e42d2514a7e Add linux-next specific files for 20260318
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=139b34ba580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1da705b17f2649a3
+dashboard link: https://syzkaller.appspot.com/bug?extid=ed8bc247f231c1a48e21
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=108d7352580000
 
-Every 10.0s: grep . /sys/kernel/debug/block/nvme0n1/hctx0/wait_on_*  =20
-rhel95: Fri Mar 20 11:04:15 2026
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/64c940773401/disk-8e42d251.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/aa7a94376665/vmlinux-8e42d251.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5a7ab603c859/bzImage-8e42d251.xz
 
-/sys/kernel/debug/block/nvme0n1/hctx0/wait_on_hw_tag:103260 <---
-cumulative=20
-/sys/kernel/debug/block/nvme0n1/hctx0/wait_on_sched_tag:0
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ed8bc247f231c1a48e21@syzkaller.appspotmail.com
 
-The patch to me looks good, but will need others to confirm
-Reviewed-by: Laurence Oberman <loberman@redhat.com>
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 UID: 0 PID: 35 Comm: kworker/u8:2 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+Workqueue: writeback wb_workfn (flush-8:0)
+RIP: 0010:bvec_set_page include/linux/bvec.h:44 [inline]
+RIP: 0010:__bio_add_page block/bio.c:992 [inline]
+RIP: 0010:bio_add_page+0x462/0x6e0 block/bio.c:1048
+Code: fd 48 8b 1b 48 8b 44 24 30 42 0f b6 04 30 84 c0 0f 85 c3 01 00 00 48 8b 14 24 0f b7 02 c1 e0 04 48 01 c3 48 89 d8 48 c1 e8 03 <42> 80 3c 30 00 74 0c 48 89 df e8 5f da a3 fd 48 8b 14 24 48 8b 44
+RSP: 0000:ffffc90000ab6b80 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88801eac3d00
+RDX: ffff88802cd6ea78 RSI: 00000000ffffefff RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffea0001b06147 R09: 1ffffd4000360c28
+R10: dffffc0000000000 R11: fffff94000360c29 R12: 1ffff110059add4f
+R13: 0000000000001000 R14: dffffc0000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888124de1000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9bc55ed6b8 CR3: 00000000769ea000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ bio_add_folio+0x64/0x90 block/bio.c:1084
+ io_submit_add_bh fs/ext4/page-io.c:465 [inline]
+ ext4_bio_write_folio+0x1446/0x1ea0 fs/ext4/page-io.c:603
+ mpage_map_and_submit_buffers fs/ext4/inode.c:2326 [inline]
+ mpage_map_and_submit_extent fs/ext4/inode.c:2516 [inline]
+ ext4_do_writepages+0x207e/0x46e0 fs/ext4/inode.c:2928
+ ext4_writepages+0x241/0x3b0 fs/ext4/inode.c:3022
+ do_writepages+0x32e/0x550 mm/page-writeback.c:2554
+ __writeback_single_inode+0x133/0x11a0 fs/fs-writeback.c:1750
+ writeback_sb_inodes+0x992/0x1a20 fs/fs-writeback.c:2042
+ __writeback_inodes_wb+0x111/0x240 fs/fs-writeback.c:2118
+ wb_writeback+0x46a/0xb70 fs/fs-writeback.c:2229
+ wb_check_start_all fs/fs-writeback.c:2355 [inline]
+ wb_do_writeback fs/fs-writeback.c:2381 [inline]
+ wb_workfn+0x95b/0xf50 fs/fs-writeback.c:2414
+ process_one_work+0x9ab/0x1780 kernel/workqueue.c:3288
+ process_scheduled_works kernel/workqueue.c:3379 [inline]
+ worker_thread+0xba8/0x11e0 kernel/workqueue.c:3465
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bvec_set_page include/linux/bvec.h:44 [inline]
+RIP: 0010:__bio_add_page block/bio.c:992 [inline]
+RIP: 0010:bio_add_page+0x462/0x6e0 block/bio.c:1048
+Code: fd 48 8b 1b 48 8b 44 24 30 42 0f b6 04 30 84 c0 0f 85 c3 01 00 00 48 8b 14 24 0f b7 02 c1 e0 04 48 01 c3 48 89 d8 48 c1 e8 03 <42> 80 3c 30 00 74 0c 48 89 df e8 5f da a3 fd 48 8b 14 24 48 8b 44
+RSP: 0000:ffffc90000ab6b80 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88801eac3d00
+RDX: ffff88802cd6ea78 RSI: 00000000ffffefff RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffea0001b06147 R09: 1ffffd4000360c28
+R10: dffffc0000000000 R11: fffff94000360c29 R12: 1ffff110059add4f
+R13: 0000000000001000 R14: dffffc0000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888124ee1000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005577be56a168 CR3: 000000002552e000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess):
+   0:	fd                   	std
+   1:	48 8b 1b             	mov    (%rbx),%rbx
+   4:	48 8b 44 24 30       	mov    0x30(%rsp),%rax
+   9:	42 0f b6 04 30       	movzbl (%rax,%r14,1),%eax
+   e:	84 c0                	test   %al,%al
+  10:	0f 85 c3 01 00 00    	jne    0x1d9
+  16:	48 8b 14 24          	mov    (%rsp),%rdx
+  1a:	0f b7 02             	movzwl (%rdx),%eax
+  1d:	c1 e0 04             	shl    $0x4,%eax
+  20:	48 01 c3             	add    %rax,%rbx
+  23:	48 89 d8             	mov    %rbx,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
+  2f:	74 0c                	je     0x3d
+  31:	48 89 df             	mov    %rbx,%rdi
+  34:	e8 5f da a3 fd       	call   0xfda3da98
+  39:	48 8b 14 24          	mov    (%rsp),%rdx
+  3d:	48                   	rex.W
+  3e:	8b                   	.byte 0x8b
+  3f:	44                   	rex.R
 
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
