@@ -1,60 +1,46 @@
-Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2301236073E;
-	Fri, 20 Mar 2026 10:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFD63242D7;
+	Fri, 20 Mar 2026 13:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774001592; cv=none; b=GAz+Pf+6IYoNGUpGCn+fmxiAWpbKrNst2VNUORXDLEm5bwpAa2c0YnemiG0D+qOoVdfwD0992RIcFJFkqMq1+Ryxwq3PcVft7JEuzX3JVSVj5xztLzpEVtOKndCOQcCqbqlz4PyxPun/fmQD7FrceibjG8iZ6ovL+f8MCjlZdos=
+	t=1774012707; cv=none; b=OFEqSpexlpGXJM71FnPb6MYDyXduBWBaiGNXtOfn49GVhlbBC/XvGMC/k+vE/FmE4lqUbP2/LEtc7uyYmKvbiB5Sc96lR6RhDnGLUSCEG8dWAtvnACbNuQee19QAkKkOwUxcTN6CQt0m/ddHfxELlGfSD8xNvWUHhpC1lFhEY/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774001592; c=relaxed/simple;
-	bh=dX+eT7xvufDx1jKCPAj5RDUzINyOG4OSSznMMJIff9c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sjebQmpgy67+LnYvjJJWy28JoI6wAqMDpR6zjB1u8zuLf4d72J05WNunPhMBRwNj2XIpSqZylpoKCzylwTqyKw+yz0JscgP1PxMuLTQcIiiMLz0zr9dcNfdbN5mWufYM5TSWj6ioPQDZ5hcDDmoLA1e9FDtnu9S9/aGIIU8Av3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LMZXOl7K; arc=none smtp.client-ip=52.35.192.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1774012707; c=relaxed/simple;
+	bh=4sPTUfoxE3kV/qz5USHCE4h36wm3p31ori5Q7svJuiY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Bj0GLHyUcZkoqJOCxY6elrSVpz3/mUgKvMfZd+H+yZyiGkVHsqeKgbq8Twa9APZgLL2v+tDltsM5vMiZrS9I2vohHKp0fkMnWWXsmD4kZVUgzapSnmadoJ5lQQGYoeA8RI1cQAELLAy5oR4AJI090rhvZoTIRUbff49ipEoOMBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SK04WNMO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LMZXOl7K"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1774001591; x=1805537591;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TlMYjIuu/LHL8EiAYGeh75q8FapIgkSOCVkmR5FeWfo=;
-  b=LMZXOl7K1NFJmtvVr1OjXnw4vRTAA8726IlmXovQMNQsfFtjB1PDwESb
-   qQvt0CrsplyJMWHA16Cg7qXomONIXLTTlziufC0XXpc7F2e+geQcH4dcL
-   oMG6S7Tu89FqKch/wrDWE/RmCsFpQa05pYOr0ao8DdaVIGPy/39Y+Qnuo
-   hnINGOps9hBF9LDckXYvyAIW/PG5sCgn3cU3ssvcGqIyMyQwFlT31lcFe
-   tt6sJJRrzv9KVAiksK5JEY20o+5maB3ihIi3yuMmO6TcUen5UntoMKO3S
-   QuzpNT/0aHPi8u7Z50fFaEVuwjID80ADJCNNPMrCHPWIyWwco8nAMGsGC
-   w==;
-X-CSE-ConnectionGUID: OsL1spoJSlCWOquU4ifXsg==
-X-CSE-MsgGUID: 81koqMNuTMO2Qf8d91a+iA==
-X-IronPort-AV: E=Sophos;i="6.23,130,1770595200"; 
-   d="scan'208";a="15233012"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 10:13:06 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:30292]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.27:2525] with esmtp (Farcaster)
- id 6358c2a7-38f7-4912-88b8-933743ac20ff; Fri, 20 Mar 2026 10:13:06 +0000 (UTC)
-X-Farcaster-Flow-ID: 6358c2a7-38f7-4912-88b8-933743ac20ff
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Fri, 20 Mar 2026 10:13:06 +0000
-Received: from c889f3b07a0a (10.106.83.32) by EX19D001UWA001.ant.amazon.com
- (10.13.138.214) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Fri, 20 Mar 2026
- 10:13:04 +0000
-Date: Fri, 20 Mar 2026 10:13:01 +0000
-From: Yuto Ohnuki <ytohnuki@amazon.com>
-To: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-block@vger.kernel.org>, kernel test robot <lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SK04WNMO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDA85C4CEF7;
+	Fri, 20 Mar 2026 13:18:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774012706;
+	bh=4sPTUfoxE3kV/qz5USHCE4h36wm3p31ori5Q7svJuiY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=SK04WNMOxU0BJz6pG1T1XWcuxKAjFQD/Vw33sQX4Bx+seRSDmd1IdFNWR43L6Xivn
+	 ysIVMD2CnrgS6HDectcsGxjDnLJiiJ/RXhnGLJHjPP/Of5HQQ574kqSxeVZsAnHIB3
+	 h+kPaSqDT35WRIUejHR/lp9AUbj0iVVP8iQ6qGHk/2Bhi7BfS6YGAv6WcOL0omRyKy
+	 UsjQRgqCJl4dbMFOPHHrEnzxbrS6YD76PvG6QqxcxUCJxfNC8VHGNPss9ksuLhhzVM
+	 fsmhDdIzkm2N9px5S1XJ3MCbbwNedHxCh4KFwjNJ4LA14t58DETpRW9Fp2OXgAiz+f
+	 MaJ/cA6sHKlkA==
+From: Christian Brauner <brauner@kernel.org>
+To: Yuto Ohnuki <ytohnuki@amazon.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	kernel test robot <lkp@intel.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>
 Subject: Re: [PATCH v2] fs: remove stale and duplicate forward declarations
-Message-ID: <ab0drSuEZJ2WC_RJ@c889f3b07a0a>
+Date: Fri, 20 Mar 2026 14:18:14 +0100
+Message-ID: <20260320-garen-radeln-63a7183a08bd@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260226201857.27310-2-ytohnuki@amazon.com>
 References: <20260226201857.27310-2-ytohnuki@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -62,13 +48,12 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260226201857.27310-2-ytohnuki@amazon.com>
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1217; i=brauner@kernel.org; h=from:subject:message-id; bh=4sPTUfoxE3kV/qz5USHCE4h36wm3p31ori5Q7svJuiY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTu9ZR1FuMo1fQqLa5atffFVscr4nuWp+6cs4/5rWPr+ 39JpxQMOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACZiKsTIcOdxizS3g9rGT0fF 7UMEpL6nPr54Y/LBFdEv7nnN7Vu0cSfDP721849vfsd84gXbWmOPj0/TspU+mvEoW9ZqJh47qbL uPhcA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 26, 2026 at 08:18:58PM +0000, Yuto Ohnuki wrote:
+On Thu, 26 Feb 2026 20:18:58 +0000, Yuto Ohnuki wrote:
 > Remove the following unnecessary forward declarations from fs.h, which
 > improves maintainability.
 > 
@@ -77,93 +62,22 @@ On Thu, Feb 26, 2026 at 08:18:58PM +0000, Yuto Ohnuki wrote:
 >   ("[PATCH] move block_device_operations to blkdev.h"). The forward
 >   declaration is now added to blkdev.h where it is actually used.
 > 
-> - struct iovec: became unused when aio_read/aio_write were removed in
->   commit 8436318205b9 ("->aio_read and ->aio_write removed")
-> 
-> - struct iov_iter: duplicate forward declaration. This removes the
->   redundant second declaration, added in commit 293bc9822fa9
->   ("new methods: ->read_iter() and ->write_iter()")
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202512301303.s7YWTZHA-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202512302139.Wl0soAlz-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202512302105.pmzYfmcV-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202512302125.FNgHwu5z-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202512302108.nIV8r5ES-lkp@intel.com/
-> Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
-> ---
-> Changes in v2:
-> - Add forward declaration of struct hd_geometry to blkdev.h to fix
->   build errors reported by kernel test robot.
-> - Verified with allmodconfig build and all configs reported by 
->   kernel test robot.
-> 
-> v1: https://lore.kernel.org/lkml/20251229071401.98146-1-ytohnuki@amazon.com/
-> ---
->  include/linux/blkdev.h | 1 +
->  include/linux/fs.h     | 3 ---
->  2 files changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index d463b9b5a0a5..0b5942e08754 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -38,6 +38,7 @@ struct blk_flush_queue;
->  struct kiocb;
->  struct pr_ops;
->  struct rq_qos;
-> +struct hd_geometry;
->  struct blk_report_zones_args;
->  struct blk_queue_stats;
->  struct blk_stat_callback;
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 8b3dd145b25e..75c97faf8799 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -55,8 +55,6 @@ struct bdi_writeback;
->  struct bio;
->  struct io_comp_batch;
->  struct fiemap_extent_info;
-> -struct hd_geometry;
-> -struct iovec;
->  struct kiocb;
->  struct kobject;
->  struct pipe_inode_info;
-> @@ -1917,7 +1915,6 @@ struct dir_context {
->   */
->  #define COPY_FILE_SPLICE		(1 << 0)
->  
-> -struct iov_iter;
->  struct io_uring_cmd;
->  struct offset_ctx;
->  
-> -- 
-> 2.50.1
-> 
-> 
-> 
-> 
-> Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
-> 
-> Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
-> 
-> 
->
+> [...]
 
-Gentle ping on this patch.
+Applied to the vfs-7.1.misc branch of the vfs/vfs.git tree.
+Patches in the vfs-7.1.misc branch should appear in linux-next soon.
 
-It has a Reviewed-by from Jan Kara.
-Please let me know if there is anythins else needed for this
-to be applied.
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-Thanks,
-Yuto 
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.1.misc
 
-Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
-
-Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
-
-
-
+[1/1] fs: remove stale and duplicate forward declarations
+      https://git.kernel.org/vfs/vfs/c/3d6bb84f6bb3
