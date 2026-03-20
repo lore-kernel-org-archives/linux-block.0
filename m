@@ -1,160 +1,169 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDEB355F21
-	for <linux-block@vger.kernel.org>; Fri, 20 Mar 2026 06:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773989261; cv=fail; b=rmMmiCjiWoeyiQ4Ql6GR5/KjIJSlzC0kOavczsrzn+wDK8tzZhbEhtCLJnjkIbyOKNwz6SZv2b0YTttsIMwBr3EIUjqwZ3akamMZrmHh5I/d+jWpzkYaqPwQT+rbLs74blWp+mfuBWbkMauru9cpYDdt4vRxXu1DO3PUGEJb7Yg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773989261; c=relaxed/simple;
-	bh=7of173tzT2nPYwXdzxfXD2q3EAmxBBQ4mNX6vkP7yRY=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=EgT79Fh7ISmlFKHY4X0Fvsc+IlJRol+vJlL8+bv+56HjJCTU3qavbldOelBPuu45+09V3Fe4cDqYBC5+wbDvwEupd0k8Fel/mQrPPv6fsG7e5kwC4DxjNzlOn+sUu5wRLrtYL8Q6dRnX4wX4ShJo5Dty0wQNHQNIMAOmh191MuA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=OL86lVJb; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=vfXqWiw6; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2301236073E;
+	Fri, 20 Mar 2026 10:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774001592; cv=none; b=GAz+Pf+6IYoNGUpGCn+fmxiAWpbKrNst2VNUORXDLEm5bwpAa2c0YnemiG0D+qOoVdfwD0992RIcFJFkqMq1+Ryxwq3PcVft7JEuzX3JVSVj5xztLzpEVtOKndCOQcCqbqlz4PyxPun/fmQD7FrceibjG8iZ6ovL+f8MCjlZdos=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774001592; c=relaxed/simple;
+	bh=dX+eT7xvufDx1jKCPAj5RDUzINyOG4OSSznMMJIff9c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sjebQmpgy67+LnYvjJJWy28JoI6wAqMDpR6zjB1u8zuLf4d72J05WNunPhMBRwNj2XIpSqZylpoKCzylwTqyKw+yz0JscgP1PxMuLTQcIiiMLz0zr9dcNfdbN5mWufYM5TSWj6ioPQDZ5hcDDmoLA1e9FDtnu9S9/aGIIU8Av3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LMZXOl7K; arc=none smtp.client-ip=52.35.192.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OL86lVJb";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="vfXqWiw6"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1773989258; x=1805525258;
-  h=from:to:subject:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version;
-  bh=7of173tzT2nPYwXdzxfXD2q3EAmxBBQ4mNX6vkP7yRY=;
-  b=OL86lVJbz7RtITx6ks0WroZOJK1PvK07cIs+kLEHQsif+Cd4euEKjkH/
-   VF6ej3WLqTjnDLIxPjt/kK69POAaZVw/YbauiiZaUF01dHziXKaQAtB+I
-   v+JjXQ9gGmpWG04uvBD0s/IQ6NWP3CgM60KXSAPD7j4Hp3J9z0wWqa7cq
-   0mr7DhLkKVd5d9ReMRXlfvqKlOV/ZuTHYhXs8uXecgQl1S/5sItliDCI2
-   lSwK2gY9UgIdQO9qlZguv+PnJsw08M+DRpysbZMTtOnKS1WM9GgBnxqbs
-   sr1/WhiG+5WQxWekGAbxzrjmR+rDvC7XP5/ODiXriZho4Hk/N1Olw3V9O
-   w==;
-X-CSE-ConnectionGUID: HFzGcQt3Re6bBY9fT6wOSw==
-X-CSE-MsgGUID: LLBIDhAxQN+D8vd0JwXPqg==
-X-IronPort-AV: E=Sophos;i="6.23,130,1770566400"; 
-   d="scan'208";a="139229249"
-Received: from mail-westus3azon11011070.outbound.protection.outlook.com (HELO PH0PR06CU001.outbound.protection.outlook.com) ([40.107.208.70])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Mar 2026 14:47:31 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oTk1hGT8QdI7VCx7x7lnXx7ezPvyBTNu6dDGyKiy3ABy6xNs4asHU8ExcBJ2pucPYVTreeE27wOf/cIZa1Fl4WXj/b/MGh+izTfgokK0JUg4miB1B+srDNdIdfO4VoURUVIRBUoycOex366t513blLPx0Is2u4QOLenaaVjiZ3WJFiYP1Le/ZqnO0CPE7WHDkyXwy93CXuo9g33DTQKQmVujWnx4Kri10wtMNBNCMAQtcXJMFkTmzzpdd3ZnUt9MDvn/cnJIZcBOxJbP9CjqOUiLZ5IFgcks3khc+SJXlTvbveSfQIW85uveNBD/QfBElvftbWXmBxJhH72+MfMFLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7of173tzT2nPYwXdzxfXD2q3EAmxBBQ4mNX6vkP7yRY=;
- b=yDIIKeXRneOaWacjfvDq7Y3hHnqRn5JLh9BZ05ZZXatT7gQ/o+qKenwz6Rl8Jlh9AwrXi6Ztu+Sbw008q+4AhCRGMLP1niZxPu3QC/25hJqWfgKj5rMkX62boq3exlP+eSO9Z59ul+95ZZjixv5qRjeoIv60ytZ6h/nRGeAaBfJwLHHgvMxskha9sf0ZBdfBqC0iihwJrZmknzSicQcWluOtwFAcNelLi9Lv/2TZv7TLyLfdqE7MYMfXNBho7iVamOyCjTJcyEH7WT+5o8QekCyYlZYeZpI9eCO3GHBnFtnS8XwuBoCTPxtzHTpymFvFaUsqatn6w2TmD44EYy6HJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LMZXOl7K"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7of173tzT2nPYwXdzxfXD2q3EAmxBBQ4mNX6vkP7yRY=;
- b=vfXqWiw6PGX7x2CyKcYABWX8jLB8ns1AnFQl6wKu/dlHa8wn+tNiiWEKxg1pPZSit6hlUBl5CQqlAg1jZRTWKntxuJ5GbN3XnMUKsgBPeYWy3V3OLmsyJOXFw3maJ02G2OlXVg6gIe72+CJIwW4fBTmMUuHaa3MUI/FzSq8pcaU=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by BL3PR04MB8105.namprd04.prod.outlook.com (2603:10b6:208:348::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.23; Fri, 20 Mar
- 2026 06:47:19 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9723.018; Fri, 20 Mar 2026
- 06:47:27 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] check: check kmemleak before test run start
-Thread-Topic: [PATCH blktests] check: check kmemleak before test run start
-Thread-Index: AQHcsuOUl1piwUOXcEOAwy5L8Ut/HbW3BQ4A
-Date: Fri, 20 Mar 2026 06:47:26 +0000
-Message-ID: <abztIkelWzNHC1jB@shinmob>
-References: <20260313121855.3666215-1-shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20260313121855.3666215-1-shinichiro.kawasaki@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|BL3PR04MB8105:EE_
-x-ms-office365-filtering-correlation-id: dafd843e-41f4-42a4-1d36-08de864c8ce3
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|19092799006|376014|22082099003|56012099003|18002099003|38070700021;
-x-microsoft-antispam-message-info:
- 9Tc0t37y6OpKCBduXFup/uJ2MOJk5PW+7maDFrj5oOqzNx+fN7hm1RJKIm1v+ikAp1sRdGSu99ItUUqWG5Kj/T9n9yYOVCrZydh6wJr5BMmqaKYoKQNjWeTvh+eCPa4R0ENTjopTVz6XqV8YaE/su8yoKdDjhK1Otgf2RpesY6I2zfbgDmtiTcXubXhpbE5Z+R2FKaRZSbVbXz0+HfP0mUSxHgbxQCerpxIHan1ALsHCGM/tokfiu/O/oHPd3tB4WdN9bvLigP3QTqrTEOhxK+L4Ur+4Zbv1F1pOLWWv5Ynv9iV4hZ8d3G9IisMwpKww/htb2CYMQqtiimQPfXgCRvtiWIjoP/rWSD3kBK4Ij7RzDGtBJe4+WMKc3mRs/oqc8W7fUrrLi1gWg/CdtGBb4Zch0D+pVEZZWq35Brhg1OOFeMi+jsgMbac38KmPUzaGlaifm4nBygZr4TlpEidbGXU5jcTLIb1VbuGJDNVbQwya0rVNAr2Z2BNb2IZ2lr8lOkURGpxqokRVoXNKdzupFNPTDF519VsYkYU/JI6dtthQZ7xgCca/D4tHG+XqUndTpSd8ZytiVTGid4u0ef8sSZA7QxggaoOSfIIw2fw3NciHgjxDK6EfRQatb9ucrJ1EY67NAWlIQpO8DoabQNTcq3KwXAtJgCtf6KbnF6IT12c/X3maAzw7FRFhtkfaR9NnKoup48i2i1eMZ6ZsiNctN2HSOOIZ4P+WwzOGEqIPKZ9Z5k5/v/UeBbCO9nXouI1Ktv43h7+LviPHsGSG+6d2pv+9nFfvSDUUrVShHfoJrhc=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(376014)(22082099003)(56012099003)(18002099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?88PPrgjgX/cpGhHNJRmRvtLezMG1Fpf13O8qOcNzVXyfyA0sUz+04u6ROZ4m?=
- =?us-ascii?Q?WZqLl3/Vhxq+lM9J5WIp+LLDOZNwt1pMHEt7ob2s4Geyp1e1q+5VjU8LansR?=
- =?us-ascii?Q?y6acBqGczZ4iDa3MxbXhfBl4Wa8hI4VaaxEnl77B4wTmznHj4Dm91nnkseR+?=
- =?us-ascii?Q?ZYg4NDO4qjowKyjg4n2HfchfdCELNaEPFUrypMcxyqppWKo5HmXlAEeLHv39?=
- =?us-ascii?Q?Vc9bZJHSZjrMAOD2AiYRj/Mz+0Ak8q7sTMESdh+3gDZjDDWokRNQ8wRlLndP?=
- =?us-ascii?Q?qrMLoO2TGlU9zKMG5lk0YCqoR9B88NQRRLgmkUi5lF8ZGMi81FFxHAj3uKKz?=
- =?us-ascii?Q?ghvKV5seEsemqxx3C/8TU33oE2HVub5wVywNmd1MBBRyA5rK5FQg1JWp4G+V?=
- =?us-ascii?Q?pLOlsuEiQYF99FPd8MmsE+FffIS1Qv7/ZmtBO1e05Yy8BZOGX1gNjKxEsfY5?=
- =?us-ascii?Q?bNum7NKjCAWank3sq5W8/4R3kcGOzxGoQD10X5JeKaboql1QooFw7zL287FL?=
- =?us-ascii?Q?p1nvICSQVEHYrsGu/1+EZjebbVKKO5+5wGU5uzEBiULp1/kPho0NCM5zfYU3?=
- =?us-ascii?Q?3ZdIdM2Rl7FgwOE9Qqqgn9DwoDjERQa5MlEALBpxndFhnsQLAriojDlwAalA?=
- =?us-ascii?Q?SaFg/EVKPpmH9wd61jp35Xy0zaHE0Fj4Jr5q/1x/1iUrCeE4Cj+wQGch8zkH?=
- =?us-ascii?Q?PZC1sXne9fqG/K34l0nLZf17hSj71gLwPeYkyndEeJTaATT6MeS4IQMzVHZ7?=
- =?us-ascii?Q?umeXRJw07qDVpb+gi5lY+yEkP/37IwP45akrrHU94qxfDLv6qKGcGC6tq8PK?=
- =?us-ascii?Q?CuEh5YAFjJ7XoN155mmboylhj1sWOGaukhewzheeJsYJ9+Spn3LFVBTj+dZV?=
- =?us-ascii?Q?OyhWyxOXjW/N9A1FB3Q/EhtKOUaTE5dV2DVA1cwZKWmuL+i9nOKUL+0DAiSu?=
- =?us-ascii?Q?7tgpagUHaIFaKGHBiJ3IVN8Zjy30pQNp3ftk3C1CtYbDIfaoYO2RwnGoXZbc?=
- =?us-ascii?Q?3tEmiW3vkGA9nOX82DIHttPSbvd+oL+6CU+E4fY1D/c1AP/iSyuhWNDzrdXt?=
- =?us-ascii?Q?uuSYyUItV2JXawNHuetzqdoW1xUCKLb5/HcgYEoG9zO+9UbDZgA3oB9MqE5G?=
- =?us-ascii?Q?i3nSZOOf/dBGW191pZidCUXSn9XrU4s+hn0HpM/eeWC6GkXUYoIqzj8+lbE/?=
- =?us-ascii?Q?Ch/CSwye/50arBQylkl67GrCBoS9HOyQ7TISMdwhAWy0HACYIm3wy+I47oLg?=
- =?us-ascii?Q?TBSHK7OrcY+yRZQP7Xew/EXUKQAfCdZT6SmnUCq/tFJWXnYl9BXl5F8+zCmr?=
- =?us-ascii?Q?3zEF12Ymt/M8W3f+Vn2qwuU3/lDNAUEhjEjR1TiDcca5k4Y/dOrLU5Iq263p?=
- =?us-ascii?Q?TglrlbS+DsJO4Ysa1SvuwmetrT1j7BLgwlHjkjv3HYoeqd4P5LJvOhmUEXr8?=
- =?us-ascii?Q?5bDZpcKrk+EjloY0S2d4upXT/kXD9ZCiOSCnVZ9BQGTNgCD0WrNf+oHMJjL3?=
- =?us-ascii?Q?YW4i46skLqPvKGQTQJULdfYcyivuLGqbMpL9swkQKPhXBPGwgWwj5pfiy93A?=
- =?us-ascii?Q?/DmVqlrL17qmJXTt/4vEd4zIGNHCnfysjIs5vh4vhaPW8f5AYdbImbErgYeF?=
- =?us-ascii?Q?5BuKcbKZbBnLIxxTVXyToPwGNYGg6h9IN26NM/9Ra7MabxlxFQ4jypzkX4xV?=
- =?us-ascii?Q?G92XQE+4fkA1Bc/Jv1jBVvtiXIAlSjqyzd4mKj0BKvtZhYf/bnmaVij5e/vg?=
- =?us-ascii?Q?NhWOS0Io1+le6R3sVqMuIet0K3m0HxE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7560A6E7508E4C4884E01DC3FD70C4FB@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1774001591; x=1805537591;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TlMYjIuu/LHL8EiAYGeh75q8FapIgkSOCVkmR5FeWfo=;
+  b=LMZXOl7K1NFJmtvVr1OjXnw4vRTAA8726IlmXovQMNQsfFtjB1PDwESb
+   qQvt0CrsplyJMWHA16Cg7qXomONIXLTTlziufC0XXpc7F2e+geQcH4dcL
+   oMG6S7Tu89FqKch/wrDWE/RmCsFpQa05pYOr0ao8DdaVIGPy/39Y+Qnuo
+   hnINGOps9hBF9LDckXYvyAIW/PG5sCgn3cU3ssvcGqIyMyQwFlT31lcFe
+   tt6sJJRrzv9KVAiksK5JEY20o+5maB3ihIi3yuMmO6TcUen5UntoMKO3S
+   QuzpNT/0aHPi8u7Z50fFaEVuwjID80ADJCNNPMrCHPWIyWwco8nAMGsGC
+   w==;
+X-CSE-ConnectionGUID: OsL1spoJSlCWOquU4ifXsg==
+X-CSE-MsgGUID: 81koqMNuTMO2Qf8d91a+iA==
+X-IronPort-AV: E=Sophos;i="6.23,130,1770595200"; 
+   d="scan'208";a="15233012"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2026 10:13:06 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:30292]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.27:2525] with esmtp (Farcaster)
+ id 6358c2a7-38f7-4912-88b8-933743ac20ff; Fri, 20 Mar 2026 10:13:06 +0000 (UTC)
+X-Farcaster-Flow-ID: 6358c2a7-38f7-4912-88b8-933743ac20ff
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Fri, 20 Mar 2026 10:13:06 +0000
+Received: from c889f3b07a0a (10.106.83.32) by EX19D001UWA001.ant.amazon.com
+ (10.13.138.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Fri, 20 Mar 2026
+ 10:13:04 +0000
+Date: Fri, 20 Mar 2026 10:13:01 +0000
+From: Yuto Ohnuki <ytohnuki@amazon.com>
+To: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+CC: <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-block@vger.kernel.org>, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2] fs: remove stale and duplicate forward declarations
+Message-ID: <ab0drSuEZJ2WC_RJ@c889f3b07a0a>
+References: <20260226201857.27310-2-ytohnuki@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	VWoHeNaG1kZh0WjCXeTD+SaxK9cGGOaC31AgsxFUPIt2kZN8ni7F2XtbRjVaTp6TKhDRqWYeZybm/x7sqMugWAVU8SBzuEc4OFw2gGPAYqDTZ3t5/dHqNRfMBZ7Rc/QCJ+uLnFljQOxTqrWoIwCa4J+GhP/XC3AszRSiIx0u+O7LZiAOKH6c4xdcMo0BnvCPqNC4StIYb0FlUznlmAoDszcKSXXRL+kq2pQxEQcObOtAVBsMhThtLfS0nR0MV9Yq45XxkuHhMFGXlhBHHGcwVkn52JtLBBCoQkskDEEuDJX0TnoAWjFGXqY74ccy6/VZ3vMMSw6szHalm1AQVc8Yzw==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	Nhnx8zAy3kD6mkxn/PzoZKUYIWVGESCqLU0uxg4ZDK6+xWLGBs15ExVBgzNN8JHSs8AfT/vwIbjhxz3p1kIRyAIVTSTnXSUkDshmv8MZJKiX9+vpAnsISpZTlLalRfeqyR+ZNDrtx77kintyvLzwSo2XmlPWYgD1qlhoq8gm1p7iuFyE35F+hKHHCEHjfIPFZz2kXz7k/ggDV/qBff2avd4KP8pTnVk2+mAChKaNxN+YXXoODn5wHZRDBlCrxQIsCZBhKNBkaIljJICvliN2PdrnKO0F44wvbhIpEtFPitA8HTMyN03xOb4YJtbPzRJQfKKpWuy9pXwXlMAN9uwQePSxCYS4kVPOlC6srdaFHGk1L4uEMqutM5kJKus1NaY3/mpaYxJcRMgYVwOT8/zFQN1moxh4+RrGTQjDBaprpJlJAwYbS5QRP1+d2LS/njyC8LlQPQxXUfdSNMaI8YkNU7u6Qvpbl/BUnGssq4JUFtugxHdVesMKwuH+U90ZK4DoyjToSLvPSjikF9XWdtNOQWEiy6A2fn+hfYqSRpTf4nCjk3snRwJiVmM2+pyRFg5IDGthFhX2waeCXbpLn1bCaG/Bou5DhjOkru3oQknf8rXQkuGQpL7V799HOPJkCIZw
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dafd843e-41f4-42a4-1d36-08de864c8ce3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2026 06:47:27.1954
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lTPOjoLeT0Wzj06u+wUMHx83ZOPD1Y45LJf3TMat5RgueIu/rM7iiB5Y74JgCb6i6T6rk1FCswd27TiCNkuEmKXY8PHS4dMLVgNIHaq+qCc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR04MB8105
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260226201857.27310-2-ytohnuki@amazon.com>
+X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Mar 13, 2026 / 21:18, Shin'ichiro Kawasaki wrote:
-> When the kernel enables kmemleak, the check script scans for memory
-> leaks at the end of every test case run. However, if memory has already
-> leaked before the blktests test run starts, the leak is detected at the
-> end of the first test case. This makes it look as if the leak happend
-> during the firest test case, which is confusing.
->=20
-> To avoid this, check for memory leaks once before staring blktests. If
-> any leaks are found, report them separately.
->=20
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+On Thu, Feb 26, 2026 at 08:18:58PM +0000, Yuto Ohnuki wrote:
+> Remove the following unnecessary forward declarations from fs.h, which
+> improves maintainability.
+> 
+> - struct hd_geometry: became unused in fs.h when
+>   block_device_operations was moved to blkdev.h in commit 08f858512151
+>   ("[PATCH] move block_device_operations to blkdev.h"). The forward
+>   declaration is now added to blkdev.h where it is actually used.
+> 
+> - struct iovec: became unused when aio_read/aio_write were removed in
+>   commit 8436318205b9 ("->aio_read and ->aio_write removed")
+> 
+> - struct iov_iter: duplicate forward declaration. This removes the
+>   redundant second declaration, added in commit 293bc9822fa9
+>   ("new methods: ->read_iter() and ->write_iter()")
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202512301303.s7YWTZHA-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202512302139.Wl0soAlz-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202512302105.pmzYfmcV-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202512302125.FNgHwu5z-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202512302108.nIV8r5ES-lkp@intel.com/
+> Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
+> ---
+> Changes in v2:
+> - Add forward declaration of struct hd_geometry to blkdev.h to fix
+>   build errors reported by kernel test robot.
+> - Verified with allmodconfig build and all configs reported by 
+>   kernel test robot.
+> 
+> v1: https://lore.kernel.org/lkml/20251229071401.98146-1-ytohnuki@amazon.com/
+> ---
+>  include/linux/blkdev.h | 1 +
+>  include/linux/fs.h     | 3 ---
+>  2 files changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index d463b9b5a0a5..0b5942e08754 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -38,6 +38,7 @@ struct blk_flush_queue;
+>  struct kiocb;
+>  struct pr_ops;
+>  struct rq_qos;
+> +struct hd_geometry;
+>  struct blk_report_zones_args;
+>  struct blk_queue_stats;
+>  struct blk_stat_callback;
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 8b3dd145b25e..75c97faf8799 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -55,8 +55,6 @@ struct bdi_writeback;
+>  struct bio;
+>  struct io_comp_batch;
+>  struct fiemap_extent_info;
+> -struct hd_geometry;
+> -struct iovec;
+>  struct kiocb;
+>  struct kobject;
+>  struct pipe_inode_info;
+> @@ -1917,7 +1915,6 @@ struct dir_context {
+>   */
+>  #define COPY_FILE_SPLICE		(1 << 0)
+>  
+> -struct iov_iter;
+>  struct io_uring_cmd;
+>  struct offset_ctx;
+>  
+> -- 
+> 2.50.1
+> 
+> 
+> 
+> 
+> Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
+> 
+> Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
+> 
+> 
+>
 
-FYI, I applied this patch.=
+Gentle ping on this patch.
+
+It has a Reviewed-by from Jan Kara.
+Please let me know if there is anythins else needed for this
+to be applied.
+
+Thanks,
+Yuto 
+
+
+
+Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
+
+Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
+
+
+
