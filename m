@@ -1,48 +1,48 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56863BE625
-	for <linux-block@vger.kernel.org>; Fri, 20 Mar 2026 13:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29DE3BE63B
+	for <linux-block@vger.kernel.org>; Fri, 20 Mar 2026 13:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774014238; cv=none; b=BU+pM6qMteQJhWUME5Y/fWVmbQZj1bAYWb3h46SAgY2pN328QXHOAr/e3Wz9lkHnGXeDXSy2Ldw/TN19HMgaMBWenxra60+s1pvF8AJlDiM7sdyJQFqr7VVsyLydOivjjuqTe9qn7zFbZh8ZtYklBN1fi5ZtpYdjBBYUjenB7RE=
+	t=1774014245; cv=none; b=G+aK4E7SItaIgY7XUdyTknUf+m160UOKh7kzR1JWqJHznpbZwtaDO0RrpheOQQyd+23p87No47vWyuJ3eLwbCfEnzdVACc210d4omRNn67ORV4Aspb3ldVdocOrWhAyj7EPqpNaqr3Zhpkxt6iImPz6oMBZ5lnWovgoE4EYMJTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774014238; c=relaxed/simple;
-	bh=+gI0d7ZrtcYpFe/TC2/HuBnlqIdH/Oa/KzrJSvIm3yQ=;
+	s=arc-20240116; t=1774014245; c=relaxed/simple;
+	bh=DJy04KzOTAHLt2Q8A41znoZw5jiuyyUoHyU/z/FMsN8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rs1mmRvY10huLL2xvIS+wRxZXlHlzSFY6DPiyH59CMU8+6iqVGH60IJinHtPMxcJX3cEm53OBYdKg/I8PgqAJHKxhsYwOXCJzl6nFONGRv0y9TRTY0Wj2ygDfekZoqJx6dzEcDKbc3SWat8vdd+wXOHw6a63v9hDKC9AJggPenY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=B3H+34OR; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8NMPmkdz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=B3H+34OR; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8NMPmkdz; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version; b=J4gFSo8I7QHBMBs122izPQjLFte3WKdxB21HFjP8oXLobegYHnNsCBSl52XQs7DoXV6eUUQloqBq+eQwguPtqvjpw6vifkUhkRqOhI121B7i2nAk+X5lU724ZwaP30pscpqXz0cQraxumvIH7PQaA2AvnGChA2f93GVgrGd5exk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=K7atea3O; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=x9kAHBeg; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=K7atea3O; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=x9kAHBeg; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="B3H+34OR";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8NMPmkdz";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="B3H+34OR";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8NMPmkdz"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="K7atea3O";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="x9kAHBeg";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="K7atea3O";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="x9kAHBeg"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id DD0994D42F;
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D0B054D42B;
 	Fri, 20 Mar 2026 13:41:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
 	t=1774014105; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9N+7lwH2O29FCtDOcIXWRdMiWLy2V1231o6QfK0KGUE=;
-	b=B3H+34ORny/VVsDdq8Hr62tOD3TnB05ou7dq3kq7LNbLASIjTFCdRxBQNcu2Pa8RHshM+q
-	TyvQP5xnk4t0aptuHnqnTCcO9no0olVm366n8MnzI6lGP+jJVAGfTzd+p09bjSCwKI3/5k
-	m+N050d5p527ntCrlprIYFtsh9cjyTg=
+	bh=15AyEt562Yj8xfCrU9lYdId+wQwRrF0p1KOr9Q3MCPA=;
+	b=K7atea3O7rueqnmBBlRaANpaBogGZ9dEV19ncL9UpYCtUUMZ6/I/JjNhWABbymbmaMSrVk
+	u6/rkYn+kDLQNqH2+z4+5Bajgh23BSDk0eSe3RzWFbWAvZBDhzOw+NpA9vUH2GlO6lt7MH
+	8Lg6unjaAdLmBaLOE5YYXc/tQ03tHK8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
 	s=susede2_ed25519; t=1774014105;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9N+7lwH2O29FCtDOcIXWRdMiWLy2V1231o6QfK0KGUE=;
-	b=8NMPmkdz0WLinFHfZNQJiWxpyJdx2WXgfJRzXVkTTx+49ftxttZwgSP+bPWH1gUYtaJIvE
-	NrueAE3gP6yUVtDw==
+	bh=15AyEt562Yj8xfCrU9lYdId+wQwRrF0p1KOr9Q3MCPA=;
+	b=x9kAHBeg31q7XIC87LXA2jkpWSEgr1GHsO1C36gZm3/f8EyN/EH4fwoYPU/d80yDzPXM6+
+	XX8hvtTD/ZLSkcAA==
 Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
@@ -50,31 +50,31 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9N+7lwH2O29FCtDOcIXWRdMiWLy2V1231o6QfK0KGUE=;
-	b=B3H+34ORny/VVsDdq8Hr62tOD3TnB05ou7dq3kq7LNbLASIjTFCdRxBQNcu2Pa8RHshM+q
-	TyvQP5xnk4t0aptuHnqnTCcO9no0olVm366n8MnzI6lGP+jJVAGfTzd+p09bjSCwKI3/5k
-	m+N050d5p527ntCrlprIYFtsh9cjyTg=
+	bh=15AyEt562Yj8xfCrU9lYdId+wQwRrF0p1KOr9Q3MCPA=;
+	b=K7atea3O7rueqnmBBlRaANpaBogGZ9dEV19ncL9UpYCtUUMZ6/I/JjNhWABbymbmaMSrVk
+	u6/rkYn+kDLQNqH2+z4+5Bajgh23BSDk0eSe3RzWFbWAvZBDhzOw+NpA9vUH2GlO6lt7MH
+	8Lg6unjaAdLmBaLOE5YYXc/tQ03tHK8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
 	s=susede2_ed25519; t=1774014105;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9N+7lwH2O29FCtDOcIXWRdMiWLy2V1231o6QfK0KGUE=;
-	b=8NMPmkdz0WLinFHfZNQJiWxpyJdx2WXgfJRzXVkTTx+49ftxttZwgSP+bPWH1gUYtaJIvE
-	NrueAE3gP6yUVtDw==
+	bh=15AyEt562Yj8xfCrU9lYdId+wQwRrF0p1KOr9Q3MCPA=;
+	b=x9kAHBeg31q7XIC87LXA2jkpWSEgr1GHsO1C36gZm3/f8EyN/EH4fwoYPU/d80yDzPXM6+
+	XX8hvtTD/ZLSkcAA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C6E884281B;
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C366242819;
 	Fri, 20 Mar 2026 13:41:45 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Q2iOMJlOvWmYCQAAD6G6ig
+	id IQjGL5lOvWmXCQAAD6G6ig
 	(envelope-from <jack@suse.cz>); Fri, 20 Mar 2026 13:41:45 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 93760A0B4A; Fri, 20 Mar 2026 14:41:45 +0100 (CET)
+	id 8A00CA0B2E; Fri, 20 Mar 2026 14:41:45 +0100 (CET)
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: <linux-block@vger.kernel.org>,
@@ -92,9 +92,9 @@ Cc: <linux-block@vger.kernel.org>,
 	linux-aio@kvack.org,
 	Benjamin LaHaise <bcrl@kvack.org>,
 	Jan Kara <jack@suse.cz>
-Subject: [PATCH 37/41] minix: Track metadata bhs in fs-private inode part
-Date: Fri, 20 Mar 2026 14:41:32 +0100
-Message-ID: <20260320134100.20731-78-jack@suse.cz>
+Subject: [PATCH 36/41] udf: Track metadata bhs in fs-private inode part
+Date: Fri, 20 Mar 2026 14:41:31 +0100
+Message-ID: <20260320134100.20731-77-jack@suse.cz>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260320131728.6449-1-jack@suse.cz>
 References: <20260320131728.6449-1-jack@suse.cz>
@@ -104,9 +104,11 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4755; i=jack@suse.cz; h=from:subject; bh=+gI0d7ZrtcYpFe/TC2/HuBnlqIdH/Oa/KzrJSvIm3yQ=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBpvU6MP3cCFiT/aLD5vOor13PcWVO8kCRuMRMaX zt7IMI92lWJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCab1OjAAKCRCcnaoHP2RA 2QR8CAClXg3d+N3/bqNiRRpe2IrNUXfjQdOVc7lGcDotv64qqab3rTiKZdlmdv8Bd2KcoRnaomQ Myg7leYfa2Nvnic5ekMzWTGqL9RLKhGSRJzI49lITxoSrnS9lrifmtbZe9pvWIOa70EvsU9vh+W fEhXM65Ol7LLcCo4roNxXflza9tT6vBfa91zvXlYSTjT7kmttW7Dzd5UIJY25KGOqydR1MLP9Xn EAvZ0wvTq/gvje2MjjL70nwEfNY51q+eNMkHYnvT3vdFHvLD3677QT8X8U4w0TO6XwxIhNBW4D1 YbqRl1TQno6ZT9HAR5QEqXW3ZDMOeiK1jjpgUQ0o/UsnAkoy
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7289; i=jack@suse.cz; h=from:subject; bh=DJy04KzOTAHLt2Q8A41znoZw5jiuyyUoHyU/z/FMsN8=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGDL3+nU/OhbXI6Mw+5OJbs+LK70e29uPbM43CHmhbZV0X UHGP+JkJ6MxCwMjB4OsmCLL6siL2tfmGXVtDdWQgRnEygQyhYGLUwAm4h3EwTB5B8cHN5t0C8OC My6bHczO7rlz5cCrIpb1DOayz9cvDOtjaNDbqSNdtUhcpUxtzdoPc/ctmD5vcqDCuYanyxyK5h/ JCyycdqZBwEz37NGtOrp3c4wK+eVVCqx2eSgYaM1L+NrVwrfvVsI/jfJwK980sedn9SIykq7aLC uMUg3XFLDkXLSpNNmt2n2i3Jdkg5Mf12eJNXcFhjkflPnyS3G9nqzUq4Y514+ItfNI9/k8OL9y4 x+97hTTlymFxU37Us7nC8xtNM5N/PC+Yt5+92f7bNM3lRpk9zyTWr4rUGGRu+6JKuZ0pmf2z07N PjdPJ1AuKy+OY7oS691zJ1wPJm9k/fWVuaj2RQ+3V74CAA==
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
+X-Spam-Score: -5.30
+X-Spam-Level: 
 X-Spamd-Result: default: False [-5.30 / 50.00];
 	REPLY(-4.00)[];
 	BAYES_HAM(-3.00)[100.00%];
@@ -114,7 +116,7 @@ X-Spamd-Result: default: False [-5.30 / 50.00];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
 	MIME_GOOD(-0.10)[text/plain];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,ZenIV.linux.org.uk,mit.edu,gmail.com,suse.com,mail.parknet.co.jp,linux.dev,suse.de,kvack.org,suse.cz];
@@ -126,158 +128,216 @@ X-Spamd-Result: default: False [-5.30 / 50.00];
 	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:mid,suse.cz:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid,suse.cz:email,imap1.dmz-prg2.suse.org:helo];
 	FROM_EQ_ENVFROM(0.00)[];
 	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	RCVD_COUNT_THREE(0.00)[3];
-	R_RATELIMIT(0.00)[to_ip_from(RLck8brw5hxmszoarioc7838it),to(RLpnp1psq57oqao6ocwdpbxen9)];
+	R_RATELIMIT(0.00)[to(RLpnp1psq57oqao6ocwdpbxen9),to_ip_from(RLck8brw5hxmszoarioc7838it)];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Flag: NO
-X-Spam-Score: -5.30
-X-Spam-Level: 
 
 Track metadata bhs for an inode in fs-private part of the inode.
 
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/minix/dir.c          |  2 +-
- fs/minix/file.c         | 10 +++++++++-
- fs/minix/inode.c        |  6 ++++--
- fs/minix/itree_common.c | 11 +++++++----
- fs/minix/minix.h        |  3 +++
- 5 files changed, 24 insertions(+), 8 deletions(-)
+ fs/udf/dir.c       |  2 +-
+ fs/udf/directory.c |  5 +++--
+ fs/udf/file.c      |  9 ++++++++-
+ fs/udf/inode.c     | 16 ++++++++--------
+ fs/udf/namei.c     |  2 +-
+ fs/udf/super.c     |  1 +
+ fs/udf/truncate.c  |  2 +-
+ fs/udf/udf_i.h     |  1 +
+ fs/udf/udfdecl.h   |  1 +
+ 9 files changed, 25 insertions(+), 14 deletions(-)
 
-diff --git a/fs/minix/dir.c b/fs/minix/dir.c
-index a74d000327fa..361d26d87d2e 100644
---- a/fs/minix/dir.c
-+++ b/fs/minix/dir.c
-@@ -23,7 +23,7 @@ const struct file_operations minix_dir_operations = {
- 	.llseek		= generic_file_llseek,
- 	.read		= generic_read_dir,
- 	.iterate_shared	= minix_readdir,
--	.fsync		= generic_buffers_fsync,
-+	.fsync		= minix_fsync,
+diff --git a/fs/udf/dir.c b/fs/udf/dir.c
+index a1705aedac46..ebc9f6a379fe 100644
+--- a/fs/udf/dir.c
++++ b/fs/udf/dir.c
+@@ -157,6 +157,6 @@ const struct file_operations udf_dir_operations = {
+ 	.read			= generic_read_dir,
+ 	.iterate_shared		= udf_readdir,
+ 	.unlocked_ioctl		= udf_ioctl,
+-	.fsync			= generic_buffers_fsync,
++	.fsync			= udf_fsync,
+ 	.setlease		= generic_setlease,
  };
+diff --git a/fs/udf/directory.c b/fs/udf/directory.c
+index 632453aa3893..83edd04ca6fa 100644
+--- a/fs/udf/directory.c
++++ b/fs/udf/directory.c
+@@ -430,9 +430,10 @@ void udf_fiiter_write_fi(struct udf_fileident_iter *iter, uint8_t *impuse)
+ 	if (iinfo->i_alloc_type == ICBTAG_FLAG_AD_IN_ICB) {
+ 		mark_inode_dirty(iter->dir);
+ 	} else {
+-		mark_buffer_dirty_inode(iter->bh[0], iter->dir);
++		mmb_mark_buffer_dirty(iter->bh[0], &iinfo->i_metadata_bhs);
+ 		if (iter->bh[1])
+-			mark_buffer_dirty_inode(iter->bh[1], iter->dir);
++			mmb_mark_buffer_dirty(iter->bh[1],
++					      &iinfo->i_metadata_bhs);
+ 	}
+ 	inode_inc_iversion(iter->dir);
+ }
+diff --git a/fs/udf/file.c b/fs/udf/file.c
+index 627b07320d06..bce3667fa2d4 100644
+--- a/fs/udf/file.c
++++ b/fs/udf/file.c
+@@ -198,6 +198,13 @@ static int udf_file_mmap(struct file *file, struct vm_area_struct *vma)
+ 	return 0;
+ }
  
- /*
-diff --git a/fs/minix/file.c b/fs/minix/file.c
-index 282b3cd1fea3..bc0be789343a 100644
---- a/fs/minix/file.c
-+++ b/fs/minix/file.c
-@@ -7,8 +7,16 @@
-  *  minix regular file handling primitives
-  */
- 
-+#include <linux/buffer_head.h>
- #include "minix.h"
- 
-+int minix_fsync(struct file *file, loff_t start, loff_t end, int datasync)
++int udf_fsync(struct file *file, loff_t start, loff_t end, int datasync)
 +{
 +	return generic_mmb_fsync(file,
-+			&minix_i(file->f_mapping->host)->i_metadata_bhs,
++			&UDF_I(file->f_mapping->host)->i_metadata_bhs,
 +			start, end, datasync);
 +}
 +
- /*
-  * We have mostly NULLs here: the current defaults are OK for
-  * the minix filesystem.
-@@ -18,7 +26,7 @@ const struct file_operations minix_file_operations = {
- 	.read_iter	= generic_file_read_iter,
- 	.write_iter	= generic_file_write_iter,
- 	.mmap_prepare	= generic_file_mmap_prepare,
--	.fsync		= generic_buffers_fsync,
-+	.fsync		= minix_fsync,
- 	.splice_read	= filemap_splice_read,
- };
- 
-diff --git a/fs/minix/inode.c b/fs/minix/inode.c
-index ab7c06efb139..adba14628d1b 100644
---- a/fs/minix/inode.c
-+++ b/fs/minix/inode.c
-@@ -49,9 +49,9 @@ static void minix_evict_inode(struct inode *inode)
- 		inode->i_size = 0;
- 		minix_truncate(inode);
- 	} else {
--		sync_mapping_buffers(&inode->i_data);
-+		mmb_sync_buffers(&minix_i(inode)->i_metadata_bhs);
+ const struct file_operations udf_file_operations = {
+ 	.read_iter		= generic_file_read_iter,
+ 	.unlocked_ioctl		= udf_ioctl,
+@@ -205,7 +212,7 @@ const struct file_operations udf_file_operations = {
+ 	.mmap			= udf_file_mmap,
+ 	.write_iter		= udf_file_write_iter,
+ 	.release		= udf_release_file,
+-	.fsync			= generic_buffers_fsync,
++	.fsync			= udf_fsync,
+ 	.splice_read		= filemap_splice_read,
+ 	.splice_write		= iter_file_splice_write,
+ 	.llseek			= generic_file_llseek,
+diff --git a/fs/udf/inode.c b/fs/udf/inode.c
+index 739b190ca4e9..6b6b0116cf90 100644
+--- a/fs/udf/inode.c
++++ b/fs/udf/inode.c
+@@ -155,8 +155,8 @@ void udf_evict_inode(struct inode *inode)
  	}
+ 	truncate_inode_pages_final(&inode->i_data);
+ 	if (!want_delete)
+-		sync_mapping_buffers(&inode->i_data);
 -	invalidate_inode_buffers(inode);
-+	mmb_invalidate_buffers(&minix_i(inode)->i_metadata_bhs);
++		mmb_sync_buffers(&iinfo->i_metadata_bhs);
++	mmb_invalidate_buffers(&iinfo->i_metadata_bhs);
  	clear_inode(inode);
- 	if (!inode->i_nlink)
- 		minix_free_inode(inode);
-@@ -85,6 +85,8 @@ static struct inode *minix_alloc_inode(struct super_block *sb)
- 	ei = alloc_inode_sb(sb, minix_inode_cachep, GFP_KERNEL);
- 	if (!ei)
- 		return NULL;
-+	mmb_init(&ei->i_metadata_bhs, &ei->vfs_inode.i_data);
-+
- 	return &ei->vfs_inode;
- }
- 
-diff --git a/fs/minix/itree_common.c b/fs/minix/itree_common.c
-index dad131e30c05..c3cd2c75af9c 100644
---- a/fs/minix/itree_common.c
-+++ b/fs/minix/itree_common.c
-@@ -98,7 +98,7 @@ static int alloc_branch(struct inode *inode,
- 		*branch[n].p = branch[n].key;
+ 	kfree(iinfo->i_data);
+ 	iinfo->i_data = NULL;
+@@ -1263,7 +1263,7 @@ struct buffer_head *udf_bread(struct inode *inode, udf_pblk_t block,
+ 		memset(bh->b_data, 0x00, inode->i_sb->s_blocksize);
  		set_buffer_uptodate(bh);
  		unlock_buffer(bh);
 -		mark_buffer_dirty_inode(bh, inode);
-+		mmb_mark_buffer_dirty(bh, &minix_i(inode)->i_metadata_bhs);
- 		parent = nr;
++		mmb_mark_buffer_dirty(bh, &UDF_I(inode)->i_metadata_bhs);
+ 		return bh;
  	}
- 	if (n == num)
-@@ -135,7 +135,8 @@ static inline int splice_branch(struct inode *inode,
  
- 	/* had we spliced it onto indirect block? */
- 	if (where->bh)
--		mark_buffer_dirty_inode(where->bh, inode);
-+		mmb_mark_buffer_dirty(where->bh,
-+				      &minix_i(inode)->i_metadata_bhs);
+@@ -2011,7 +2011,7 @@ int udf_setup_indirect_aext(struct inode *inode, udf_pblk_t block,
+ 	memset(bh->b_data, 0x00, sb->s_blocksize);
+ 	set_buffer_uptodate(bh);
+ 	unlock_buffer(bh);
+-	mark_buffer_dirty_inode(bh, inode);
++	mmb_mark_buffer_dirty(bh, &UDF_I(inode)->i_metadata_bhs);
  
- 	mark_inode_dirty(inode);
- 	return 0;
-@@ -328,14 +329,16 @@ static inline void truncate (struct inode * inode)
- 		if (partial == chain)
- 			mark_inode_dirty(inode);
+ 	aed = (struct allocExtDesc *)(bh->b_data);
+ 	if (!UDF_QUERY_FLAG(sb, UDF_FLAG_STRICT)) {
+@@ -2106,7 +2106,7 @@ int __udf_add_aext(struct inode *inode, struct extent_position *epos,
  		else
--			mark_buffer_dirty_inode(partial->bh, inode);
-+			mmb_mark_buffer_dirty(partial->bh,
-+					      &minix_i(inode)->i_metadata_bhs);
- 		free_branches(inode, &nr, &nr+1, (chain+n-1) - partial);
+ 			udf_update_tag(epos->bh->b_data,
+ 					sizeof(struct allocExtDesc));
+-		mark_buffer_dirty_inode(epos->bh, inode);
++		mmb_mark_buffer_dirty(epos->bh, &iinfo->i_metadata_bhs);
  	}
- 	/* Clear the ends of indirect blocks on the shared branch */
- 	while (partial > chain) {
- 		free_branches(inode, partial->p + 1, block_end(partial->bh),
- 				(chain+n-1) - partial);
--		mark_buffer_dirty_inode(partial->bh, inode);
-+		mmb_mark_buffer_dirty(partial->bh,
-+				      &minix_i(inode)->i_metadata_bhs);
- 		brelse (partial->bh);
- 		partial--;
+ 
+ 	return 0;
+@@ -2190,7 +2190,7 @@ void udf_write_aext(struct inode *inode, struct extent_position *epos,
+ 				       le32_to_cpu(aed->lengthAllocDescs) +
+ 				       sizeof(struct allocExtDesc));
+ 		}
+-		mark_buffer_dirty_inode(epos->bh, inode);
++		mmb_mark_buffer_dirty(epos->bh, &iinfo->i_metadata_bhs);
+ 	} else {
+ 		mark_inode_dirty(inode);
  	}
-diff --git a/fs/minix/minix.h b/fs/minix/minix.h
-index 7e1f652f16d3..f2025c9b5825 100644
---- a/fs/minix/minix.h
-+++ b/fs/minix/minix.h
-@@ -19,6 +19,7 @@ struct minix_inode_info {
- 		__u16 i1_data[16];
- 		__u32 i2_data[16];
- 	} u;
+@@ -2398,7 +2398,7 @@ int8_t udf_delete_aext(struct inode *inode, struct extent_position epos)
+ 			else
+ 				udf_update_tag(oepos.bh->b_data,
+ 						sizeof(struct allocExtDesc));
+-			mark_buffer_dirty_inode(oepos.bh, inode);
++			mmb_mark_buffer_dirty(oepos.bh, &iinfo->i_metadata_bhs);
+ 		}
+ 	} else {
+ 		udf_write_aext(inode, &oepos, &eloc, elen, 1);
+@@ -2415,7 +2415,7 @@ int8_t udf_delete_aext(struct inode *inode, struct extent_position epos)
+ 			else
+ 				udf_update_tag(oepos.bh->b_data,
+ 						sizeof(struct allocExtDesc));
+-			mark_buffer_dirty_inode(oepos.bh, inode);
++			mmb_mark_buffer_dirty(oepos.bh, &iinfo->i_metadata_bhs);
+ 		}
+ 	}
+ 
+diff --git a/fs/udf/namei.c b/fs/udf/namei.c
+index 5f2e9a892bff..4ef2ff014170 100644
+--- a/fs/udf/namei.c
++++ b/fs/udf/namei.c
+@@ -638,7 +638,7 @@ static int udf_symlink(struct mnt_idmap *idmap, struct inode *dir,
+ 		memset(epos.bh->b_data, 0x00, bsize);
+ 		set_buffer_uptodate(epos.bh);
+ 		unlock_buffer(epos.bh);
+-		mark_buffer_dirty_inode(epos.bh, inode);
++		mmb_mark_buffer_dirty(epos.bh, &iinfo->i_metadata_bhs);
+ 		ea = epos.bh->b_data + udf_ext0_offset(inode);
+ 	} else
+ 		ea = iinfo->i_data + iinfo->i_lenEAttr;
+diff --git a/fs/udf/super.c b/fs/udf/super.c
+index 27f463fd1d89..e02775007c46 100644
+--- a/fs/udf/super.c
++++ b/fs/udf/super.c
+@@ -166,6 +166,7 @@ static struct inode *udf_alloc_inode(struct super_block *sb)
+ 	ei->cached_extent.lstart = -1;
+ 	spin_lock_init(&ei->i_extent_cache_lock);
+ 	inode_set_iversion(&ei->vfs_inode, 1);
++	mmb_init(&ei->i_metadata_bhs, &ei->vfs_inode.i_data);
+ 
+ 	return &ei->vfs_inode;
+ }
+diff --git a/fs/udf/truncate.c b/fs/udf/truncate.c
+index b4071c9cf8c9..41b2bfd30449 100644
+--- a/fs/udf/truncate.c
++++ b/fs/udf/truncate.c
+@@ -186,7 +186,7 @@ static void udf_update_alloc_ext_desc(struct inode *inode,
+ 		len += lenalloc;
+ 
+ 	udf_update_tag(epos->bh->b_data, len);
+-	mark_buffer_dirty_inode(epos->bh, inode);
++	mmb_mark_buffer_dirty(epos->bh, &UDF_I(inode)->i_metadata_bhs);
+ }
+ 
+ /*
+diff --git a/fs/udf/udf_i.h b/fs/udf/udf_i.h
+index 312b7c9ef10e..fdaa88c49c2b 100644
+--- a/fs/udf/udf_i.h
++++ b/fs/udf/udf_i.h
+@@ -50,6 +50,7 @@ struct udf_inode_info {
+ 	struct kernel_lb_addr	i_locStreamdir;
+ 	__u64			i_lenStreams;
+ 	struct rw_semaphore	i_data_sem;
 +	struct mapping_metadata_bhs i_metadata_bhs;
- 	struct inode vfs_inode;
- };
+ 	struct udf_ext_cache cached_extent;
+ 	/* Spinlock for protecting extent cache */
+ 	spinlock_t i_extent_cache_lock;
+diff --git a/fs/udf/udfdecl.h b/fs/udf/udfdecl.h
+index d159f20d61e8..6d951e05c004 100644
+--- a/fs/udf/udfdecl.h
++++ b/fs/udf/udfdecl.h
+@@ -137,6 +137,7 @@ static inline unsigned int udf_dir_entry_len(struct fileIdentDesc *cfi)
  
-@@ -57,6 +58,8 @@ unsigned long minix_count_free_blocks(struct super_block *sb);
- int minix_getattr(struct mnt_idmap *, const struct path *,
- 		struct kstat *, u32, unsigned int);
- int minix_prepare_chunk(struct folio *folio, loff_t pos, unsigned len);
-+struct mapping_metadata_bhs *minix_get_metadata_bhs(struct inode *inode);
-+int minix_fsync(struct file *file, loff_t start, loff_t end, int datasync);
+ /* file.c */
+ extern long udf_ioctl(struct file *, unsigned int, unsigned long);
++int udf_fsync(struct file *file, loff_t start, loff_t end, int datasync);
  
- extern void V1_minix_truncate(struct inode *);
- extern void V2_minix_truncate(struct inode *);
+ /* inode.c */
+ extern struct inode *__udf_iget(struct super_block *, struct kernel_lb_addr *,
 -- 
 2.51.0
 
