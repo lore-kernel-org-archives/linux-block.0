@@ -1,154 +1,125 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58883176EF
-	for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 13:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774098006; cv=pass; b=NGfHDORXdSE2le8Vif7TaB7NMqQRXXsjPExdhU10EmSKKKsDNPpKqRw8V8+cDewXtkD8X9zJfP/9qq/OGe4jev9Hhc+Wqo1ATrTqRe9mdgcxLoydQPKaiC/kUbHWK+Z1+X9bCx9THX/3LcEY3gVC+hwZGMgRBJUYOT8e4gYOpAY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774098006; c=relaxed/simple;
-	bh=CTaIqIBFIA6pi+cP3QOq7Q9L4YHN3NX1A7us/XizAXw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=d9UecvRICDjHI5EdTps3KJlVjt5MTEySdjZXKh3SCFbUB9YCCi41mMD+koSQJh8ljD/LGyi90y/o9HKlNwZjXFSZQsdtgEmgniefy/tNnPKlP66p+WoITYJ1LSWzEi34sDg4FELjRoHDg8OWDWlgkmlGoCogzE+DO8HAAasRWFQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Krt1zCBB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aBkCR1k6; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A46E2BFC60
+	for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 14:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774102632; cv=none; b=TTaS/JSWvtKD9H3A294MPsqecQc8VzBOAY2/pCs42lAYY1mXpL88GuU9gf5VszaUjWfaCs3JTYZtbpEmRMJqW8sNnj5sBnqFr4DJW7v2TFNzMLHssvCM+9fxkFzv2EH2T4qSTV2BBnxQdrAziJjb3667IJYcZgduDry7KcQAqBg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774102632; c=relaxed/simple;
+	bh=jIjVWHD4K3Z76E0xRL2wHaV+Q1FXvL8BMhJYLB8JpjQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GHRjF2e4JFSMCWaNb9WpDd1kOZpnclmFDefdhFVv3pWskayEBy/wpNPu08dSSdQAeKZyvZiZQd/xn39FMUxFLwEoBkNS1kBNoTSd2D0TfGpR/a+VtK2on7rp3HgLv8xCKs1HDEpZ0VYdmOoAnt7UdbH9aJpdD46fYkhnoceEo04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ayjnIJum; arc=none smtp.client-ip=209.85.160.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Krt1zCBB";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBkCR1k6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774098003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Fpbs8XKDfDNQTyz41ElS+DRL3VdtzXxmCp20GhbayqU=;
-	b=Krt1zCBB1xE0YmmbLSh5f6vtiYqKcgpdCDkbKTXq+vN+zjo0UoXXTh6qS51qZr3/WcUYt8
-	wqPTm2X3nLg8+fk24KfrDbmGLzPYbvfQsHzxr1WO75UGhk7aGu7TWOXOffg7NN/AODi76O
-	nPbFpqClYqjVzkVqQCC/UxVPz2FNhJ8=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-bhSyS9y4Pc2DTdmqJclvVg-1; Sat, 21 Mar 2026 09:00:02 -0400
-X-MC-Unique: bhSyS9y4Pc2DTdmqJclvVg-1
-X-Mimecast-MFC-AGG-ID: bhSyS9y4Pc2DTdmqJclvVg_1774098000
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-59e28288067so2162614e87.2
-        for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 06:00:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774097999; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iQDeFZwAqFt/YOJCsz8OPoQkYSJEhXSOC76Mvmgkagql2OG7qm47uvX2l6Wtp8cPQc
-         9msyNJ5EDYwXRjOsCMcTaLQstUfs0dihp7cUhAW+KN7iD02pK3pI3c0DQNYuzdWVsswF
-         Ub1X1SqoHdqvlP5LJho87PdhOzh6Z3wk+7sS9Ysr6guBUTZdf+5WE2XVGqnKZ+kCwQ9l
-         uDu71FFwO7g2/lVIaBdQzCVTnT7QOUCwbtGfPP/AsF2+5jEWaFQeFzcEwAAQ29FgN5Um
-         aK7OSMgLm2KrlUoT42XNxXB8Kp2Q1ls+jHxswMBClk/SdzivTHOvllowzi1MoBLLw9Q4
-         at1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=Fpbs8XKDfDNQTyz41ElS+DRL3VdtzXxmCp20GhbayqU=;
-        fh=DyWa9vFJ6CrGea9tuenLRRPHDIULoWrow40H3zm7JTM=;
-        b=aG0hb+2ECU8h5zOHvP/iYPd2kHOhpKQjIvbi440OzHgjY5f6InogZ0D3Py9YDZDWDz
-         S3RyxhJ0PLL8xJKsubGhx79eo4lfhpivBcKKsIImFHcTJkMHzLsY7RcUGczWnn4w4/D3
-         WTXqcximbEZbQ6+yDGU/XX/+8KirIH1kXhbMsmCOjkZaYEWFAetrgSNlmWYNDXBAlBj/
-         f+XQxT9Fvgl0ZckCxuWBXcHp0pFWnaM1jsu5Ql02rivTXB45jYeb/E219Zy57S567o1L
-         VPSGkZG5ENXIwz1p4dH8kjGYhTqHJC822mpzyXiEIJh7AYyfhVyujEME2yAIhe6FqvPm
-         ITMg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ayjnIJum"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-417400afaeeso2810750fac.1
+        for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 07:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774097999; x=1774702799; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Fpbs8XKDfDNQTyz41ElS+DRL3VdtzXxmCp20GhbayqU=;
-        b=aBkCR1k6E5JOyw+u6AiMbD58ZUnxqvebYwlROd6nezs/oyDHxYTUvQzJqnF4kHAj0s
-         gQrCHVPwqyqq3LYrUAGAGEZ+Jl/QdUQi4YkuwQE4C1ufrtcoAgn5KQeVNHkjb8BcT0G3
-         DYEgR1si/vi7FujVbXqmM5AGCCNEpO1DoW+/YC65En0CyQDUxrPWdFgSEjITXHrpZa8e
-         +t+qdjxSj99gOW5LmhqkGToYxk9H7FC328QmuZFNd68RaudrcqES87Cz5A/3Mrf+8RRx
-         XjDuLxEJKeLGJwLGsOEgViYW9bHNoMza6GsF51ToEumC1OrpqFp3yOYeF7V7dIqGse5M
-         gzow==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774102629; x=1774707429; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zN8h/8PEssBPso2SBRlWLVHgaakG3DP1RYR9BO+q+dM=;
+        b=ayjnIJum2Jd26qMIq5mWuBdAA2xwCjAWlZ6k05CB1/PSG6C5EkEgDXpLY9at183phD
+         2IDgabUi9tINxoP0qqtZDYOzZ8RHx+tOBBZXjY0ArHaFJBncS+H1MS+YThfxUvXL1Umd
+         QKu23YB3INscYPhV7OwnXPRPpI3CA+YDL8RvTWLxGtCKw4E4KI0Mc1wnRrwzRHjOzHyD
+         4YmdHry7MyYm+oE7FInZXdDUx7nj0s0b5TorYxUbyG4VYHyC5Z+31nKzge+kK5HgkQuC
+         4I9mA46yE52aLO02nzSk77kb1DKErqtUah1vow2PWq8o01C9s8NC6e5kFKp1u5HBXvsE
+         bbVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774097999; x=1774702799;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fpbs8XKDfDNQTyz41ElS+DRL3VdtzXxmCp20GhbayqU=;
-        b=G01azt4FLhl5blLZL6jF0k61nwGzKx785oTIvkxU8lqC+iIe9HVuP5a0OpPGwSS4P0
-         CERThXkJEE6twjqKvmMmNuiIRf2s73dS6PtV1rlmpAudDJrE7Ax75M/7JhUgLKq/FIBF
-         AIgs2lVfS5H2dmxv1qdDEq7vjdAR2jKaUEqkQxR++nXC69cpM6NKkZ6Ls1ogC1c94DKv
-         1azycM5brIC3dVhA3+Vm83pGMLDiterhbeVpTy65WPHZXNPuUTCSoUg3ljLA58DqaTY3
-         HzUzTLyW4Yf0UnE2obC6+HFoYvj0ahB9+ixWayfx33ZSgtoJJy8esF5vnrj5LweIIPCL
-         XPBg==
-X-Gm-Message-State: AOJu0YzEnHJ0pHKlio6Yw7Uee8MnsGtASW9QKwOTGL2ZLqO2COpRogWY
-	+nSd7RBmYYJm+xuNRsOCtjNuwDzTOUQxkC4yLIWZomnaXaEo9kKYqgCxLv+eJr2On3c8bThcAnL
-	5FPdBucNWB4NaY8iX1beAkQVYFreq1cy9wxv7XzAViOrGk7WrMS6AzpLWvO9MUCa3pKGBP7UmTb
-	s80q61Pi0kVozkF0jhiigMxGZDS1ltugUJrNDShf4hBnepr0nFNBCF
-X-Gm-Gg: ATEYQzw/OE8VWeVbGZ0WvQ3PfRE22TYTGqPRlyVRhQxztf39FaQstaBixfUeBUgSNFb
-	ee6ujZvtl1dVLDE9iN4eV/Us6rKM16wB26lzWzYzJzzauvzpd3c0To1P27I3L/qFFwFKTNymhFv
-	kt8yWO+avATcsGhY+cAJSD2BXdq0nZiCCihOCDoSOHluuimvyBlwFxsoXtHgGnE+V9R1GAAdsb7
-	gkuqXoWvieA+//Im173dnLtJHNtzDB/UdQCed05TPRps11HDXc=
-X-Received: by 2002:a05:6512:3b13:b0:5a2:77d4:1043 with SMTP id 2adb3069b0e04-5a285b54b7dmr2161528e87.22.1774097998585;
-        Sat, 21 Mar 2026 05:59:58 -0700 (PDT)
-X-Received: by 2002:a05:6512:3b13:b0:5a2:77d4:1043 with SMTP id
- 2adb3069b0e04-5a285b54b7dmr2161516e87.22.1774097998114; Sat, 21 Mar 2026
- 05:59:58 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774102629; x=1774707429;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zN8h/8PEssBPso2SBRlWLVHgaakG3DP1RYR9BO+q+dM=;
+        b=kQzbYEp3OFS8ttfMuYHhRyfZ15jAQjbvIG1Z9o1rE67lGp/iE7nuG5AQJko1hDi0GC
+         zNnDgSfwhl8oCIcvo17UvOTlopNJf0UF9elYeFh2FSYKLPCOeqBNA79FaYRDZx+8l2p0
+         XHLlrEopcWetSVvJGQxs85m+G0CAZSmk9u4TG21117y5RJl+HkFXi9/y19UGJq1D3CAd
+         I/POUyunb4KFSyKtYr03DOJJZ/MQDw5N+KSjZKdASHdIo9yxuRttAvFZ3Nx8xH3quW2B
+         gASv9uV8L1kzYuGoK1x58R3ecuUCEhy2Mql5xQAQ2jsezshQhkloqL7Rc3zbq/nSVWa5
+         MFFw==
+X-Gm-Message-State: AOJu0YxVNmQ6KrJCfxKDJ0SmY2M/NeSqQL4JOQebsXwMaVc6CRo0YDPi
+	Tt4UvV6Bz9nW+fX+zyTgesugQHcoSdGVidbcR5QVVQgaFlTbWTVGcZiSmIUVe0uhVWc=
+X-Gm-Gg: ATEYQzyjEzmmUhzOfckW/nADaP1aKcvKfRVZ/+7R4G3Cdtqo8y9GcNAAUiBsB8pJCgt
+	cdttJzHB0qyKOg5N/GJO6TSFp+sZ5GX54B2HPEw3ayN3kQF1OLXxi2HUjvzvIsw/nh02kpzHs9+
+	3vrfjCTXHx15KI8npDhujnqc+ksk6iZIklAiOIPWtv5DDOBe4diI8iIDOKUWUm5Kw5kwPDjQbZ7
+	vx8wEdVn/D3lDEuK3vKcfNApUCRyozlqDYUekLcw8I4wmkhvGqXWnau3flCwkxzOblmNgWS+6/z
+	kaQB3JKvXWkjsq6kFryGUYPeZGdTZZIaWKnzo1AzCL7yg7q+Yj5cDvCvanlRP0PDXPcFIXJRDec
+	BJn8YKGLnK7al5pfgVLTdd/9TDIaWpc9NaHz7lAjck72yoPpat0Ivv72dvEcjjsYC6ocvUbH/vx
+	58j5dvMfd6qlD5jOGP7nwjtqvkL3oKZ4IcIsmb9Avs8Y5SzrVgy3bHIbottwl+zxLTII+cHZYF5
+	3YKis3JXAFwFrzonrVW
+X-Received: by 2002:a05:6820:138e:b0:67b:ba86:2dce with SMTP id 006d021491bc7-67c23668bfdmr3637888eaf.36.1774102629055;
+        Sat, 21 Mar 2026 07:17:09 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-67c252dbd05sm2925294eaf.6.2026.03.21.07.17.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Mar 2026 07:17:08 -0700 (PDT)
+Message-ID: <ca49c74d-7192-4189-8afb-96ea86054f50@kernel.dk>
+Date: Sat, 21 Mar 2026 08:17:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Sat, 21 Mar 2026 20:59:44 +0800
-X-Gm-Features: AaiRm53nCjG1SMtYW6vATYs1MPuPXdKMcmY1xxod-_bWiOlq2HPekrZ5kufAKj4
-Message-ID: <CAHj4cs_mRpS=uqW=2NF8RdzW2jjgu+3LhmCFiSK2kahRmTS-tw@mail.gmail.com>
-Subject: [bug report] blktests rnbd/001 hang on s390x server
-To: linux-block <linux-block@vger.kernel.org>
-Cc: haris.iqbal@ionos.com, jinpu.wang@ionos.com, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
-	"Zhijian Li (Fujitsu)" <lizhijian@fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH next] block: mempool alloc fail due to insufficient memory
+To: Edward Adam Davis <eadavis@qq.com>,
+ syzbot+09ddb593eea76a158f42@syzkaller.appspotmail.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <69bdcdcd.050a0220.3bf4de.002f.GAE@google.com>
+ <tencent_B483B24447B77B776C66D11362A37BE96505@qq.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <tencent_B483B24447B77B776C66D11362A37BE96505@qq.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi
+On 3/21/26 2:36 AM, Edward Adam Davis wrote:
+> Add a failure check for mempool_alloc() in the slowpath.
+> 
+> [1]
+> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+> Workqueue: writeback wb_workfn (flush-8:0)
+> RIP: 0010:bio_init block/bio.c:214 [inline]
+> RIP: 0010:bio_init_inline include/linux/bio.h:435 [inline]
+> RIP: 0010:bio_alloc_bioset+0x664/0xc10 block/bio.c:593
+> Call Trace:
+>  bio_alloc include/linux/bio.h:373 [inline]
+>  submit_bh_wbc+0x22d/0x650 fs/buffer.c:2816
+> 
+> Fixes: b520c4eef83d ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
+> Reported-by: syzbot+09ddb593eea76a158f42@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=09ddb593eea76a158f42
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> ---
+>  block/bio.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 5057047194c4..0a870979bd41 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -582,6 +582,9 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
+>  		opf &= ~REQ_ALLOC_CACHE;
+>  
+>  		p = mempool_alloc(&bs->bio_pool, gfp);
+> +		if (unlikely(!p))
+> +			return NULL;
+> +
 
-I found this issue when I running blktests rnbd/ on s390x server,
-please help check it and let me know if you need any info, thanks.
-
-dmesg:
-[   72.319120] rdma_rxe: loaded
-[   72.358181] rtrs_server L2371: Loading module rtrs_server, proto
-2.0: (max_chunk_size: 131072 (pure IO 126976, headers 4096) ,
-sess_queue_depth: 512, always_invalidate: 1)
-[   72.380277] loop: module loaded
-[   72.399060] run blktests rnbd/001 at 2026-03-21 08:42:02
-[   72.408570] infiniband enc600_rxe: set active
-[   72.408573] infiniband enc600_rxe: added enc600
-[   72.422914] rnbd_client L607: Mapping device /dev/loop0 on session
-blktest, (access_mode: rw, nr_poll_queues: 0)
-[   72.488056] rnbd_client L1192: [session=blktest] mapped 2/2
-default/read queues.
-[   72.488199] rtrs_server L1058: <blktest>: Processing read request
-failed, invalid message
-
-# uname -r
-7.0.0-0.rc4.260317g2d1373e4246d.37.fc45.s390x
-
-# ps aux | grep rnbd
-root        1492  0.0  0.0   8276  4436 pts/0    S+   08:42   0:00
-/bin/bash ./check rnbd/001
-root        1521  0.0  0.0   8288  3292 pts/0    S+   08:42   0:00
-/bin/bash ./check rnbd/001
-root        1523  0.0  0.0   8424  3664 pts/0    D+   08:42   0:00
-/bin/bash ./check rnbd/001
-
-# cat /proc/1523/stack
-[<0>] send_usr_msg+0x120/0x170 [rnbd_client]
-[<0>] send_msg_sess_info+0x1d2/0x210 [rnbd_client]
-[<0>] find_and_get_or_create_sess+0x274/0x2f0 [rnbd_client]
-[<0>] rnbd_clt_map_device+0xf6/0x7b0 [rnbd_client]
-[<0>] rnbd_clt_map_device_store+0x228/0x320 [rnbd_client]
-[<0>] kernfs_fop_write_iter+0x168/0x220
-[<0>] vfs_write+0x282/0x450
-[<0>] ksys_write+0x84/0x110
-[<0>] __do_syscall+0x166/0x600
-[<0>] system_call+0x6e/0x90
+Doesn't look right at all. You dropped the backtrace, which shows this is
+off __block_write_full_folio() -> submit_bh_wbc() which allocates a bio
+from the mempool with GFP_NOIO. That should allow blocking, and hence
+mempool_alloc() should NEVER return NULL for that case. If it does,
+it's broken, and your change is just papering around that issue.
 
 -- 
-Best Regards,
-  Yi Zhang
+Jens Axboe
 
