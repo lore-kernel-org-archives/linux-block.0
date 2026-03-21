@@ -1,118 +1,102 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BA51A682C
-	for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 08:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F7F274FFD;
+	Sat, 21 Mar 2026 08:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774081370; cv=none; b=gGUMe1lIkqTuXEAdBesY4otkTEvc1l4ht+5391nEYacz33WmmLe4ov57Xq1KiTXeWMPU7vI7MJB4cY1jWS8fNTOqo92Q/JKBl9CJucq7QCDNohLUih1d5anTAYDLzd5I75117j1z9i4FirgXvUT7Oigj36eOyL/TYcwd3AZ6vxc=
+	t=1774082183; cv=none; b=t/yc/hdGjme0O8ptdPDPntQp6sMmI5rkG5siYXgAp0qBXMUmOnrJJv/scJSsm8w+meek24RNf2C720NIdlLUdDY7eWpDCYmDW7Dkr6wlcTo5Es2cf94qvrAGBF9AtBUyieNlpI2eeqUugILAJPmEZMM8nEZLC/DtVhDNC1Y5MW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774081370; c=relaxed/simple;
-	bh=o185dR7GcK1G3JlJOBtrgm1Du+CxvHKqi/LdjToWpDQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=nd8qnwmGV31achREx/3w4Ikgp8hnpMKGju6QjHbt57AqLlyOuBgUyFTz6emIb+WeKF5J6pRoB6g6JpLgo0zBY4X0cH2qujRPc9LmFPWaTt3cZA/f1+u//ko9N5nyPUCbL3IqPIKYUfcNoY4VNGtmKyY4tpb1rqo+zqNe9ctgK7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=px2kYhVD; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1774082183; c=relaxed/simple;
+	bh=ZTViAiiA+XJBFMMiVDA8D02frQmFJZ59q8N5GFh7keg=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=YDisINiq6/JfB4zDu41//buVsdLPlQpwyBisMt75k0dj44MlIWXcgc9RYETIxy0we0Crjdx2139hwyHiv916d1LHifvGM0mHwn10L634MwfV4wAimsegAuqI5OVvrhl6j2/K5ok7BVzQXlUpVYOgtpuWolS1KQ+BR59W6xRC4jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=B4tci7oJ; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="px2kYhVD"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-486fd27754bso17701775e9.3
-        for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 01:22:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1774081367; x=1774686167; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6QapcZiZKmzc/L5G+0kT/84EOk/SJve3kRBM9k5Ue3U=;
-        b=px2kYhVDtNswWLDa6o3fbegY8gJGwsxyDiXC5Wo0dHT58bbZMx2+vzgI8XZwC2ujg+
-         W/vx477HqsUgELImhHHdpFy9lWE3mgGJRYI5JHnwU5LfwdshyPrrqJyVrVPh7AXF2dxq
-         5M+5ZxE5N0CEIyD55NrImwjhHxW3kOgYzvArq+e+2XZxNX7yhy7Iaf2jDcd+fg/oEhSG
-         borXKZ/nKL7qgcSTmMs49oW6xlxKAl4gn5Vu5+Xn0jTkCvtLJZpZpv3p9LL1BX0olOEe
-         mWOUmxJqsXYWRho6VgPdiWh1VqzRdM/hnp7e/QMdlnlYmlw7uTVzMpT67sKqTocX08di
-         PwFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774081367; x=1774686167;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6QapcZiZKmzc/L5G+0kT/84EOk/SJve3kRBM9k5Ue3U=;
-        b=oGB+ZQouqH5AIvxnN4/ZcUZvY298mgkuVqT9W48eGfKlPjIAsPog0+UcPKoYqFcKDe
-         pY5St7HeB51R0gZsDPWC5tOrfZ/k78MHLHXJtiOjC5nsyZMhUvYMpwA08OLRab3YWRgg
-         FHla5J2sIcLr91t0BMPXD6FhRqFSYqdKANewIjO6e/hbXU0miWV/2Ai+PiSf8Mt2w0Ck
-         0sDt13HGnAn5IyKbMcWB+htOzZCQkOQr5Rt8IBNJsaNzgqtZGpM64PFCk6YoACn2XW/z
-         xOSQN4dKMXeaQg42sXY542sbOyGGnbOjWoV+C8GEzJM2zyS64piZbq3TBR/0d6i7GOhX
-         ofig==
-X-Forwarded-Encrypted: i=1; AJvYcCUKQTM+Ol8Q/ZahyIxdb0vGV17HUVWNTIFkRfP8UdZCpdv2I2n4zvJkt51eTX4W2k8xdp/nCkMpshhVAQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEoWVGVuRyvxrvytnb7Cr9E5aX4sd+ePuRo216dmy042+1f40y
-	xuExIqdxoIMpN+YVLGu3ALPf3Hkzc8zaSfwFdWG0E7zHDhZp81iWtP31KaiXf0eciLw=
-X-Gm-Gg: ATEYQzw9ftunONApiBYgNiDgI7TooOnvzpclXxdADaPeH07M3OFT/RJb93I/IsAV7y8
-	0q9lf9HMxqCnzPQQwb2N0VURXGsvVcJLQuHCvqWm5t3T8SiqU2wgTbeaIiXtejnwtED3jAk4tmD
-	ALAdIbh0eGUQBAfwxeGXW1cG13d7VJ3tvRDyB5s58awm7GUiLXDeOmAuXloh/Gx7AtWC0pZA4XN
-	w/3wp42k6sAb8bh7EldEw/POzW5BGH37k1inYCCpixBCwdA+8NltUlW8Zt4NVRBExFUP8attb6Z
-	10eE5wb2A2j+QcdBAdNs2tAl9gxKDwVeO8fZAftwp7rDszmuiAR6fS029BVlJgFLsbmHqcUXXDq
-	TXVhvbbykWiSX67e0nEO+6qQiKlF1O/VMIqITwO6PnDPR7rn907tcajAbYVFqxqEhsymqtPVDHM
-	UCGl9eNO/EzZWL19q9UHtQRKRpr8pU
-X-Received: by 2002:a05:600c:524e:b0:486:f634:ef3 with SMTP id 5b1f17b1804b1-486ff01efcdmr79549725e9.32.1774081366958;
-        Sat, 21 Mar 2026 01:22:46 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48703e26408sm48164995e9.11.2026.03.21.01.22.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Mar 2026 01:22:46 -0700 (PDT)
-Date: Sat, 21 Mar 2026 11:22:43 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [linux-next:master 6465/7971] drivers/block/drbd/drbd_debugfs.c:336
- drbd_get_peer_request_state() warn: bitwise AND condition is false here
-Message-ID: <202603210529.IutAxKNP-lkp@intel.com>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="B4tci7oJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1774082176; bh=4hIrFGGd1lKPhUI0ePYRPdK5b9tVv8J4wvKu8eitP1A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=B4tci7oJ00IiGpm4sH+zsDQeqBnbVGP8PQQac8n3FASNMHKhbbYK/gJdvEj4EHN35
+	 o9FURNvV87FYsSOlVgtpTU3zU1QtdaUFgj+eZ96uAUnVlvKMPza9/Gmi/ot6JWvtsG
+	 Dqf/ttDDIr76HjdEsmN29iqpF+kjCwVqM1OVF3QY=
+Received: from lxu-ped-host.. ([111.198.231.89])
+	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
+	id 90D8B8B6; Sat, 21 Mar 2026 16:36:13 +0800
+X-QQ-mid: xmsmtpt1774082173tpyikc4cv
+Message-ID: <tencent_B483B24447B77B776C66D11362A37BE96505@qq.com>
+X-QQ-XMAILINFO: OcN56dxiYj5T+5aX1PQJgzJMbSSN+cVh44qsFWHFr/UAdEFD7URAm3HopIwypQ
+	 gGjbvbDHUosTxWEzmZ/ENdcsa9WrBeBaQf/AskIxnut6j3+1zf+DZrKx+vaW8ZF7tSo8UD1W5Ggt
+	 BkG5mrdUbiuod7E5d/KWfreBF3P4RLQ+1VbprRgKYUnsWu4IPCq9q7YEFupEMNUQVrd2GebDPrGp
+	 G6qoNZVrfQrt9u6PFynjZRwO5j+9cnwxHOWrMbISKlpvRxgiRu44obYern81464YzNj4FAa/7GRw
+	 BB3vX/XfqBHfw/SRf6JlioqQtwOumyF3NLoRU6TFpsi7dW4uudUZ7IwAHTY7MB/f+ZqmzUjykuOl
+	 Tr9lc9TmwMyT8zdBWdjmYRrbyl0dBcgG7QCgzQDU2QN4Arc6rhpjLBM0vIQDbIARwWHsbv6wu+yy
+	 Ay0fWAFhsADPwN0PCWkdgIV5AgpJxSBO6dF3E5IRAsbP0pd3YQWdvhJ1VDO+FQKKgtC8XlIkCkmg
+	 rgsEkF5rRPR/jYEOMvVccUoWFxDP9TurqSgR/JUg82Qe2hR9AIS4dsXHcwEyU4h6mENdm1fqWP3t
+	 tDK6sO2CdVqb1jKSFXXR5ghQGIsa+yqFohAQEJl//J2iP7bhww7ivaU5z1Y7V0QdTeno77roJ52V
+	 tfS/QsK/R+upmEoJNm7/dmZTTgT+p0QJd2ks2jzQDD1zDiDD0lLqL1FmxNnANToBMba/vjfh/NaC
+	 eltLrU2BnKflQ/5Q3gVC4TSHs6Vhp3oN1NVkf4f76i1uQYXJ7HUtrzg0b4Qi5kRuzuchgJ/xfkNw
+	 n+A0I7CdGtgVBEQH0QiZ2c+P0Vm+/vP6ioXYW6lvYm9uMPDK5fgyiYKNDFNP5FCVxFZ9zR7FvAy/
+	 hG8tCU08Difo06pV0QlBwwxDQ3yPwrsCLKx/zjqip+cQFOgCdUXnyOBqF7EMFQuw/zYiI3T0kx8r
+	 1GZDiHh+857G1oT9QBp89DDx0JCCKfRjttxgj3up++BU1Plc8TV1morpJAoELnkUVx3ruZDNNAts
+	 eTp1bNuuCYcKsfFZGNNlXcSwgU/p4=
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+09ddb593eea76a158f42@syzkaller.appspotmail.com
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH next] block: mempool alloc fail due to insufficient memory
+Date: Sat, 21 Mar 2026 16:36:14 +0800
+X-OQ-MSGID: <20260321083613.350744-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <69bdcdcd.050a0220.3bf4de.002f.GAE@google.com>
+References: <69bdcdcd.050a0220.3bf4de.002f.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-head:   785f0eb2f85decbe7c1ef9ae922931f0194ffc2e
-commit: 945807e66a140e5ee0f919d04e15eadd4cc294be [6465/7971] drbd: remove BROKEN for DRBD
-config: nios2-randconfig-r073-20260321 (https://download.01.org/0day-ci/archive/20260321/202603210529.IutAxKNP-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 10.5.0
-smatch: v0.5.0-9004-gb810ac53
+Add a failure check for mempool_alloc() in the slowpath.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202603210529.IutAxKNP-lkp@intel.com/
+[1]
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+Workqueue: writeback wb_workfn (flush-8:0)
+RIP: 0010:bio_init block/bio.c:214 [inline]
+RIP: 0010:bio_init_inline include/linux/bio.h:435 [inline]
+RIP: 0010:bio_alloc_bioset+0x664/0xc10 block/bio.c:593
+Call Trace:
+ bio_alloc include/linux/bio.h:373 [inline]
+ submit_bh_wbc+0x22d/0x650 fs/buffer.c:2816
 
-smatch warnings:
-drivers/block/drbd/drbd_debugfs.c:336 drbd_get_peer_request_state() warn: bitwise AND condition is false here
+Fixes: b520c4eef83d ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
+Reported-by: syzbot+09ddb593eea76a158f42@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=09ddb593eea76a158f42
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ block/bio.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-vim +336 drivers/block/drbd/drbd_debugfs.c
-
-0c897516a4856d Christoph Böhmwalder 2025-12-16  329  static enum drbd_peer_request_state drbd_get_peer_request_state(struct drbd_peer_request *peer_req)
-f418815f7adad4 Lars Ellenberg       2014-05-05  330  {
-0c897516a4856d Christoph Böhmwalder 2025-12-16  331  	unsigned long interval_flags = peer_req->i.flags;
-0c897516a4856d Christoph Böhmwalder 2025-12-16  332  
-0c897516a4856d Christoph Böhmwalder 2025-12-16  333  	if (interval_flags & INTERVAL_SUBMITTED)
-0c897516a4856d Christoph Böhmwalder 2025-12-16  334  		return PRS_SUBMITTED;
-0c897516a4856d Christoph Böhmwalder 2025-12-16  335  
-0c897516a4856d Christoph Böhmwalder 2025-12-16 @336  	if (interval_flags & INTERVAL_SENT)
-
-This should be if (interval_flags & BIT(INTERVAL_SENT)) or
-test_bit(INTERVAL_SENT, &interval_flags).
-
-0c897516a4856d Christoph Böhmwalder 2025-12-16  337  		return PRS_SENT;
-0c897516a4856d Christoph Böhmwalder 2025-12-16  338  
-0c897516a4856d Christoph Böhmwalder 2025-12-16  339  	return PRS_NEW;
-0c897516a4856d Christoph Böhmwalder 2025-12-16  340  }
-
+diff --git a/block/bio.c b/block/bio.c
+index 5057047194c4..0a870979bd41 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -582,6 +582,9 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
+ 		opf &= ~REQ_ALLOC_CACHE;
+ 
+ 		p = mempool_alloc(&bs->bio_pool, gfp);
++		if (unlikely(!p))
++			return NULL;
++
+ 		bio = p + bs->front_pad;
+ 		if (nr_vecs > BIO_INLINE_VECS) {
+ 			nr_vecs = BIO_MAX_VECS;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
 
