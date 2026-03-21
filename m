@@ -1,125 +1,113 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A46E2BFC60
-	for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 14:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B0A192590
+	for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 14:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774102632; cv=none; b=TTaS/JSWvtKD9H3A294MPsqecQc8VzBOAY2/pCs42lAYY1mXpL88GuU9gf5VszaUjWfaCs3JTYZtbpEmRMJqW8sNnj5sBnqFr4DJW7v2TFNzMLHssvCM+9fxkFzv2EH2T4qSTV2BBnxQdrAziJjb3667IJYcZgduDry7KcQAqBg=
+	t=1774103267; cv=none; b=DZiqd40HyVz02YmVjWcg++7Y0YeOPxPESpD7npIDxxjZjfAmppiHVGrhT96v9O2fr2XzZYrw50rv25qKqZSemFI+THjwdWgfS3xO233W5jardNCUNFAs7ZsqkzOpnGLH4YNJN9EwfSrj6QvCiWVYUBzAchzkCxWHw0b7NOlSjEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774102632; c=relaxed/simple;
-	bh=jIjVWHD4K3Z76E0xRL2wHaV+Q1FXvL8BMhJYLB8JpjQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GHRjF2e4JFSMCWaNb9WpDd1kOZpnclmFDefdhFVv3pWskayEBy/wpNPu08dSSdQAeKZyvZiZQd/xn39FMUxFLwEoBkNS1kBNoTSd2D0TfGpR/a+VtK2on7rp3HgLv8xCKs1HDEpZ0VYdmOoAnt7UdbH9aJpdD46fYkhnoceEo04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ayjnIJum; arc=none smtp.client-ip=209.85.160.41
+	s=arc-20240116; t=1774103267; c=relaxed/simple;
+	bh=XbJvTOd1ukwPGu2B9QSbSkII0ybcEyvvDNPe4pFXwFw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=F32zrugBVKxTuMY2DDFYTH9zDfO7C2tZFooo7U/V5PJ0O0HO1/jZ5PLDm23t/+AJx2kdtIcDqm/wMUdprO4ljDzLm5Epc5MlE2dw0AJ3JDjlc4pMQTOtwZ7P2+NvYowvvla8lp/wu2K/VYAoNMGlgk4tDCEaHyZ7ZPEnDdhbS2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mGBersy6; arc=none smtp.client-ip=209.85.167.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ayjnIJum"
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-417400afaeeso2810750fac.1
-        for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 07:17:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mGBersy6"
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-4670676ba03so951857b6e.1
+        for <linux-block@vger.kernel.org>; Sat, 21 Mar 2026 07:27:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774102629; x=1774707429; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zN8h/8PEssBPso2SBRlWLVHgaakG3DP1RYR9BO+q+dM=;
-        b=ayjnIJum2Jd26qMIq5mWuBdAA2xwCjAWlZ6k05CB1/PSG6C5EkEgDXpLY9at183phD
-         2IDgabUi9tINxoP0qqtZDYOzZ8RHx+tOBBZXjY0ArHaFJBncS+H1MS+YThfxUvXL1Umd
-         QKu23YB3INscYPhV7OwnXPRPpI3CA+YDL8RvTWLxGtCKw4E4KI0Mc1wnRrwzRHjOzHyD
-         4YmdHry7MyYm+oE7FInZXdDUx7nj0s0b5TorYxUbyG4VYHyC5Z+31nKzge+kK5HgkQuC
-         4I9mA46yE52aLO02nzSk77kb1DKErqtUah1vow2PWq8o01C9s8NC6e5kFKp1u5HBXvsE
-         bbVA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774103265; x=1774708065; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=By+r1Fe/YcOBcCg/TUP/Rfl3T3jnspwWgDUfbTqj4k4=;
+        b=mGBersy6NNuVGCzzex1I7u3IC6ckORW3S5x3pPRjUsQgq2WNIPS1fUUxi7klBu309v
+         LuFeUd4PEbb0fnTBDEoPwTB4pacYiXus2ZdD4Lr1lh2EhRqfHkwi/CqYnDTRxAkt1YvO
+         +fHEGoE07oTYSeZxZxxqZD62Lgz5PbJb6NSQN4R0OOkZWLNuP8IgpBx2VHjO+Uppy6fp
+         Np2aLa/9fUgEhHQ69KbRK0TabRl2oeu5QnBYQ57RgKQRd0/pnDuzDaKwDqDkVTrMgSiV
+         GpNZzXpxFwgkD7gkifWSSKFVUkDKDkC4zh08w6uerFTjhdjdklJnKU6CI+eTl0ua1ln/
+         wu9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774102629; x=1774707429;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zN8h/8PEssBPso2SBRlWLVHgaakG3DP1RYR9BO+q+dM=;
-        b=kQzbYEp3OFS8ttfMuYHhRyfZ15jAQjbvIG1Z9o1rE67lGp/iE7nuG5AQJko1hDi0GC
-         zNnDgSfwhl8oCIcvo17UvOTlopNJf0UF9elYeFh2FSYKLPCOeqBNA79FaYRDZx+8l2p0
-         XHLlrEopcWetSVvJGQxs85m+G0CAZSmk9u4TG21117y5RJl+HkFXi9/y19UGJq1D3CAd
-         I/POUyunb4KFSyKtYr03DOJJZ/MQDw5N+KSjZKdASHdIo9yxuRttAvFZ3Nx8xH3quW2B
-         gASv9uV8L1kzYuGoK1x58R3ecuUCEhy2Mql5xQAQ2jsezshQhkloqL7Rc3zbq/nSVWa5
-         MFFw==
-X-Gm-Message-State: AOJu0YxVNmQ6KrJCfxKDJ0SmY2M/NeSqQL4JOQebsXwMaVc6CRo0YDPi
-	Tt4UvV6Bz9nW+fX+zyTgesugQHcoSdGVidbcR5QVVQgaFlTbWTVGcZiSmIUVe0uhVWc=
-X-Gm-Gg: ATEYQzyjEzmmUhzOfckW/nADaP1aKcvKfRVZ/+7R4G3Cdtqo8y9GcNAAUiBsB8pJCgt
-	cdttJzHB0qyKOg5N/GJO6TSFp+sZ5GX54B2HPEw3ayN3kQF1OLXxi2HUjvzvIsw/nh02kpzHs9+
-	3vrfjCTXHx15KI8npDhujnqc+ksk6iZIklAiOIPWtv5DDOBe4diI8iIDOKUWUm5Kw5kwPDjQbZ7
-	vx8wEdVn/D3lDEuK3vKcfNApUCRyozlqDYUekLcw8I4wmkhvGqXWnau3flCwkxzOblmNgWS+6/z
-	kaQB3JKvXWkjsq6kFryGUYPeZGdTZZIaWKnzo1AzCL7yg7q+Yj5cDvCvanlRP0PDXPcFIXJRDec
-	BJn8YKGLnK7al5pfgVLTdd/9TDIaWpc9NaHz7lAjck72yoPpat0Ivv72dvEcjjsYC6ocvUbH/vx
-	58j5dvMfd6qlD5jOGP7nwjtqvkL3oKZ4IcIsmb9Avs8Y5SzrVgy3bHIbottwl+zxLTII+cHZYF5
-	3YKis3JXAFwFrzonrVW
-X-Received: by 2002:a05:6820:138e:b0:67b:ba86:2dce with SMTP id 006d021491bc7-67c23668bfdmr3637888eaf.36.1774102629055;
-        Sat, 21 Mar 2026 07:17:09 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-67c252dbd05sm2925294eaf.6.2026.03.21.07.17.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Mar 2026 07:17:08 -0700 (PDT)
-Message-ID: <ca49c74d-7192-4189-8afb-96ea86054f50@kernel.dk>
-Date: Sat, 21 Mar 2026 08:17:06 -0600
+        d=1e100.net; s=20251104; t=1774103265; x=1774708065;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=By+r1Fe/YcOBcCg/TUP/Rfl3T3jnspwWgDUfbTqj4k4=;
+        b=aRHNuYpWhli2WldaFUQPGGVWijul4JLj3kjdILSHE1tgPf2F0gEDKF+8Vq5EVNbDDj
+         ASB47PYCRBaM2exB5ThXLUc3PxHnu41THEAbnYncAHyRyupugY+q0filI/uU0NvumJBi
+         59cU170OS3m5gl9oj35dyveKredqHdnsYZNoiM0IgWJQ28zoZpzb4u+XaOBzw5PIdEtT
+         JxGGfeoyJsFh2FkaOsFmA/9qM9UyE0g9wF7J6wUBNkuqlhkpZhBZZK9pg8dfqj5F0oxd
+         rzcpiOpZDtOXEPjIUF32WG7t2QvkmTFN5/UjEBye8ddOiZ4DEaPA4KFk7oR0Ji5a3/al
+         LeXg==
+X-Forwarded-Encrypted: i=1; AJvYcCV8cAFkZVjCaaRV/O1UQV+4bSYZ2Ui7J0UFH8kpmBPrneU6bUEc9gKokc+Ljl2JL1ggEe5wHyRoLo1rhQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSBbmn56O/kklAASThnOTlljErQEYENap2jOhiFKJpnTCk51Mm
+	MEttrlajXTxe13/ZwV1SaKT/pYBPxdlR+wDPlRC1nRWmPtgZ0cgkogFfpZIopDVKR2I=
+X-Gm-Gg: ATEYQzxDx27UGu1z7ODpipLVHFeliFT1wnBcfjg08EbYc9+GldL8k5Tub+xVBDIy5iI
+	ipInXfgSaTiMYkN79uDvalhZOVF/xRa5eN0fzLyaFMYQDdI7IAaIWt3+AyJr7ODvUWKch4zLdEN
+	L9hheSlwHM5L+Vqh3UO0Cev3BjI5vJ16HDCN/M2UW20fsNnDVHsnJ4BpAn89kQOA7o/CdcXr0Kh
+	cZ279HcUCBJIr11uihEvyJ+GjdgJYsIStWj4T6r0saPTj++xEHzhjOM7JkjXVXVKFbijWNuaZUZ
+	jmZSqwh2TqffLyCJPd8DBur5BhfVEihxGvdNoRLeKVeCTPewgSCVlim0xuoyKnNR1HqMSjCgUhC
+	WZOzgSWF+CjyrZx3mhjafFgvhbtErEMbT9oz+4LrWHpnLYecfwhW5q7qWI0dFHBOZRydAj+Wjfn
+	USasb9WebmZCne/4LkzPoTZQPYcYCinORc2sKsHP/ZQ5ZNQys3E3CLOy7RqV14GF4pLgCOxipRI
+	w6h
+X-Received: by 2002:a05:6808:1392:b0:467:255a:7453 with SMTP id 5614622812f47-467e5d9638fmr3487371b6e.14.1774103264871;
+        Sat, 21 Mar 2026 07:27:44 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-467e7f131b2sm3215075b6e.15.2026.03.21.07.27.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Mar 2026 07:27:44 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Kees Cook <kees@kernel.org>
+Cc: Josh Law <objecting@objecting.org>, Davidlohr Bueso <dave@stgolabs.net>, 
+ Stefan Haberland <sth@linux.ibm.com>, Jan Hoeppner <hoeppner@linux.ibm.com>, 
+ "Richard Russon (FlatCap)" <ldm@flatcap.org>, 
+ Thorsten Blum <thorsten.blum@linux.dev>, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, linux-efi@vger.kernel.org, 
+ linux-s390@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net, 
+ linux-hardening@vger.kernel.org
+In-Reply-To: <20260321004840.work.670-kees@kernel.org>
+References: <20260321004840.work.670-kees@kernel.org>
+Subject: Re: [PATCH] block: partitions: Replace pp_buf with struct seq_buf
+Message-Id: <177410326319.185838.7918397412644396915.b4-ty@b4>
+Date: Sat, 21 Mar 2026 08:27:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH next] block: mempool alloc fail due to insufficient memory
-To: Edward Adam Davis <eadavis@qq.com>,
- syzbot+09ddb593eea76a158f42@syzkaller.appspotmail.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <69bdcdcd.050a0220.3bf4de.002f.GAE@google.com>
- <tencent_B483B24447B77B776C66D11362A37BE96505@qq.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <tencent_B483B24447B77B776C66D11362A37BE96505@qq.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.0
 
-On 3/21/26 2:36 AM, Edward Adam Davis wrote:
-> Add a failure check for mempool_alloc() in the slowpath.
-> 
-> [1]
-> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> Workqueue: writeback wb_workfn (flush-8:0)
-> RIP: 0010:bio_init block/bio.c:214 [inline]
-> RIP: 0010:bio_init_inline include/linux/bio.h:435 [inline]
-> RIP: 0010:bio_alloc_bioset+0x664/0xc10 block/bio.c:593
-> Call Trace:
->  bio_alloc include/linux/bio.h:373 [inline]
->  submit_bh_wbc+0x22d/0x650 fs/buffer.c:2816
-> 
-> Fixes: b520c4eef83d ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
-> Reported-by: syzbot+09ddb593eea76a158f42@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=09ddb593eea76a158f42
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> ---
->  block/bio.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 5057047194c4..0a870979bd41 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -582,6 +582,9 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
->  		opf &= ~REQ_ALLOC_CACHE;
->  
->  		p = mempool_alloc(&bs->bio_pool, gfp);
-> +		if (unlikely(!p))
-> +			return NULL;
-> +
 
-Doesn't look right at all. You dropped the backtrace, which shows this is
-off __block_write_full_folio() -> submit_bh_wbc() which allocates a bio
-from the mempool with GFP_NOIO. That should allow blocking, and hence
-mempool_alloc() should NEVER return NULL for that case. If it does,
-it's broken, and your change is just papering around that issue.
+On Fri, 20 Mar 2026 17:48:44 -0700, Kees Cook wrote:
+> In preparation for removing the strlcat API[1], replace the char *pp_buf
+> with a struct seq_buf, which tracks the current write position and
+> remaining space internally. This allows for:
+> 
+> - Direct use of seq_buf_printf() in place of snprintf()+strlcat()
+>   pairs, eliminating local tmp buffers throughout.
+> - Adjacent strlcat() calls that build strings piece-by-piece
+>   (e.g., strlcat("["); strlcat(name); strlcat("]")) to be collapsed
+>   into single seq_buf_printf() calls.
+> - Simpler call sites: seq_buf_puts() takes only the buffer and string,
+>   with no need to pass PAGE_SIZE at every call.
+> 
+> [...]
 
+Applied, thanks!
+
+[1/1] block: partitions: Replace pp_buf with struct seq_buf
+      commit: c2d466b9fe1913f8dbe2701156c38719c94188f7
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
