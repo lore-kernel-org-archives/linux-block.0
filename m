@@ -1,142 +1,129 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from sender-of-o57.zoho.eu (sender-of-o57.zoho.eu [136.143.169.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0583B9613;
-	Mon, 23 Mar 2026 15:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774278356; cv=none; b=Len1ftKF9EuizZgDFJ0aLUFSAxhYDp9NS+8PRbl+PAl5y2heLfv7CAzZqkXBQoEcl8l3wnkzIFTrBP7mKWm+KCjfs/mb10lPVAeftpWDKhsCiTjfhZPKjhtTs6eCbC86T9iQeTgCDG4G6SOQicVfGyH5n0TnhHTwb2st25RbCAE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774278356; c=relaxed/simple;
-	bh=38fmMNiWvDfyXTwBdfTFl0XJCwc8gv/bEC9L+BzNIxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kqzw+Psz0sLEE3L3ShVBL6W0IueP3uzeNKGRymKxho3LhysNlV5MbG4v6jBtDo8m3X8OgNYUd/5J7SS4C92WEhyDYJNsPxOA4Daz/joh4dQVms/jFRzImrfqYP3vEcgeIHcfVVwygIIKnjdS3uC0AfmpSe0RVRrVBCAGJFe7yao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PqlWyf5o; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF8E24CEEA;
+	Mon, 23 Mar 2026 15:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774279006; cv=pass; b=cZcEC+rQ/jwJj/qrZQo4rex6wKVSGgFfA4ynkuZpbrQMYrKpQTdt0Rz5YeWiZnLjoCbrhwAMMgPw4qkwXIDkfB740mKOl+HT1p9QH7tsoVUflWr/E6J/FKrRpALBlpoESBYD7BGMm0PEOREQniroj7vvfy3mUOTFXQCPMQD9YZI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774279006; c=relaxed/simple;
+	bh=Efhjtp0APHmK3K9OuiG3mT/JRTCx6Z6YLMqTHztfeXA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=Z7Pnrybg7/WIPZVHuqodd6p86kZtK6m0UvaACP6R2Df3/mDLiJZ81+H85sb/3kHqORgfdrm6QpMzCrpsYEt9dy0pmpMWGYtmZUY39kRgNMNynwT8thFEZIie9lJ9MngPHnchrsoxhG0wpJT2E3ZscB2ON9y1sX30m37ynyTxEMI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=objecting.org; spf=pass smtp.mailfrom=objecting.org; dkim=pass (1024-bit key) header.d=objecting.org header.i=objecting@objecting.org header.b=Ej0NmHHI; arc=pass smtp.client-ip=136.143.169.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=objecting.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=objecting.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PqlWyf5o"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774278356; x=1805814356;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=38fmMNiWvDfyXTwBdfTFl0XJCwc8gv/bEC9L+BzNIxw=;
-  b=PqlWyf5oG9XXqNQGIo0Z2wvaJJTc7Y7gvZlekgS6LjxaXkzyjgbyxdS8
-   qScWaz9/FKFfS+ctqLNWVNiGgGEaEc7eEr/BSRGTylM32KlAefrUsFZap
-   X3gUJs9JpmL2+H5ecJ9TEnX0FF6jGheDoA/KlaTK4AaV5hv9+OgEVWrvc
-   q9JTb4+OG8C9wFNkm4nD40QZ60XbTaWh4cgQkw8wjx7RdF/UgFFRnN7kR
-   a3zrxHy206fdjqc6g89zHX4GmDYISWc0HJdLhzYbV7Y6e3fe0xvOkeKSE
-   /dVoYR0Ua55efnCplsWY57yonBH9GY14f90Z3dNmoZwZE/cV8eWiANRPQ
-   A==;
-X-CSE-ConnectionGUID: hUpeyiliQSyofMs1lqrrtg==
-X-CSE-MsgGUID: YgExWvhITCWCXbRIjAN8hQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11738"; a="75345863"
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="75345863"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 08:05:55 -0700
-X-CSE-ConnectionGUID: E4WzUs5wSn6ltlycGc4Wxw==
-X-CSE-MsgGUID: pIOZugwYSHKF9UKaG+q9FQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,137,1770624000"; 
-   d="scan'208";a="247084583"
-Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.244.22])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2026 08:05:52 -0700
-Date: Mon, 23 Mar 2026 17:05:49 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Kees Cook <kees@kernel.org>
-Cc: Josh Law <objecting@objecting.org>, Jens Axboe <axboe@kernel.dk>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Stefan Haberland <sth@linux.ibm.com>,
-	Jan Hoeppner <hoeppner@linux.ibm.com>,
-	"Richard Russon (FlatCap)" <ldm@flatcap.org>,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] block: partitions: Replace pp_buf with struct seq_buf
-Message-ID: <acFWzUYlNE2k2aca@ashevche-desk.local>
-References: <20260321004840.work.670-kees@kernel.org>
- <acD_IIEXmhnVlO0C@ashevche-desk.local>
+	dkim=pass (1024-bit key) header.d=objecting.org header.i=objecting@objecting.org header.b="Ej0NmHHI"
+ARC-Seal: i=1; a=rsa-sha256; t=1774278991; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=NqsTc3ZJJyigeXu519WqsnbWqhhcjh1It5TAJrn/i/UxA7gQ/kkalZgRLAXjVdrrfUsJTJtWSTIR0Gvf0PTFQynwqvSFkQOqXISFhSMeKA0+Ue+O+TK4vWP/tKuSZI/jYWAQsP2goLMGMNHAAt96uJDiSTof6CkaRRnC/j8Nwg8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1774278991; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=6R6h2nPCW6/5Ti/l+o6nr4dWLFSlaRLqeUUlVkl8Mu4=; 
+	b=jPqXduo46Yf3aqnI+1OOG8+F2DGVqHhWsekwBOYI2gemnqBeF0hKJKjXzFZj3va4/23Iut1fyXyz8IS139ILyiLBxUN3hJiMxZypk5AwYUse3Vk/ZdjkpQvq1QJwCFv8h7W5eO2TmhmEQKSjindTNblOms61SBXi2lULywrgO6E=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=objecting.org;
+	spf=pass  smtp.mailfrom=objecting@objecting.org;
+	dmarc=pass header.from=<objecting@objecting.org>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1774278991;
+	s=zmail; d=objecting.org; i=objecting@objecting.org;
+	h=Date:Date:From:From:To:To:CC:Subject:Subject:In-Reply-To:References:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To:Cc;
+	bh=6R6h2nPCW6/5Ti/l+o6nr4dWLFSlaRLqeUUlVkl8Mu4=;
+	b=Ej0NmHHIUJPmdBozM2Sl51UPqtfKHw4chSOkQadPYVzUKXVk96un8nqtnkwPJN3U
+	GwfumdM+wjZZ/Pu2l3b6uM7C2WBbmsCpPM+dela7zVt830TpM5Nx+BrdH6Jyg9BvlLd
+	tKFqW+1Dq9zb1kndiS+Py6/wG38gti8Gg33bNH/Q=
+Received: by mx.zoho.eu with SMTPS id 1774278989700420.2170527576808;
+	Mon, 23 Mar 2026 16:16:29 +0100 (CET)
+Date: Mon, 23 Mar 2026 15:16:22 +0000
+From: Josh Law <objecting@objecting.org>
+To: Christian Brauner <brauner@kernel.org>
+CC: Andrew Morton <akpm@linux-foundation.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_3/7=5D_lib/iov=5Fiter=3A_fix_misplaced_?=
+ =?US-ASCII?Q?parenthesis_in_iov=5Fiter=5Frestore=28=29_kvec_check?=
+User-Agent: Thunderbird for Android
+In-Reply-To: <20260323-wirtschaften-mittragen-5217e168da05@brauner>
+References: <20260313181038.30018-1-objecting@objecting.org> <20260313181038.30018-4-objecting@objecting.org> <20260323-wirtschaften-mittragen-5217e168da05@brauner>
+Message-ID: <6876729A-2510-4C02-AD84-63C7B587A48C@objecting.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acD_IIEXmhnVlO0C@ashevche-desk.local>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
-
-On Mon, Mar 23, 2026 at 10:51:49AM +0200, Andy Shevchenko wrote:
-> On Fri, Mar 20, 2026 at 05:48:44PM -0700, Kees Cook wrote:
-
-...
-
-> > -			char tmp[42];
-> >  
-> >  			__be32 *dt = (__be32 *)dostype;
-> >  			*dt = pb->pb_Environment[16];
-> >  			if (dostype[3] < ' ')
-> > -				snprintf(tmp, sizeof(tmp), " (%c%c%c^%c)",
-> > -					dostype[0], dostype[1],
-> > -					dostype[2], dostype[3] + '@' );
-> > +				seq_buf_printf(&state->pp_buf,
-> > +					       " (%c%c%c^%c)",
-> > +					       dostype[0], dostype[1],
-> > +					       dostype[2],
-> > +					       dostype[3] + '@');
-> >  			else
-> > -				snprintf(tmp, sizeof(tmp), " (%c%c%c%c)",
-> > -					dostype[0], dostype[1],
-> > -					dostype[2], dostype[3]);
-> > -			strlcat(state->pp_buf, tmp, PAGE_SIZE);
-> > -			snprintf(tmp, sizeof(tmp), "(res %d spb %d)",
-> > -				be32_to_cpu(pb->pb_Environment[6]),
-> > -				be32_to_cpu(pb->pb_Environment[4]));
-> > -			strlcat(state->pp_buf, tmp, PAGE_SIZE);
-> > +				seq_buf_printf(&state->pp_buf,
-> > +					       " (%c%c%c%c)",
-> > +					       dostype[0], dostype[1],
-> > +					       dostype[2], dostype[3]);
-> 
-> Wouldn't
-> 				seq_buf_printf(&state->pp_buf, " (%.4s)", dostype);
-> 
-> work?
-> 
-> But probably okay as in the previous branch it needs more work to follow,
-> something like
-> 
-> 			char dostype[8];
-> 			...
-> 			if (dostype[3] < ' ') {
-> 				/* Escape control character */
-> 				dostype[4] = dostype[3] + '@';
-> 				dostype[3] = '^';
-> 				seq_buf_printf(&state->pp_buf, " (%.5s)", dostype);
-> 			} else {
-> 				seq_buf_printf(&state->pp_buf, " (%.4s)", dostype);
-> 			}
-
-Or maybe even replace the whole conditional with
-
-			seq_buf_printf(&state->pp_buf, " (%4pE)", dostype);
-
-What do you think?
-
-> Taking how invasive is this, it might be better to done separately.
-> 
-> > +			seq_buf_printf(&state->pp_buf, "(res %d spb %d)",
-> > +				       be32_to_cpu(pb->pb_Environment[6]),
-> > +				       be32_to_cpu(pb->pb_Environment[4]));
-
--- 
-With Best Regards,
-Andy Shevchenko
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-ZohoMailClient: External
 
 
+
+On 23 March 2026 12:39:10 GMT, Christian Brauner <brauner@kernel=2Eorg> wr=
+ote:
+>On Fri, Mar 13, 2026 at 06:10:34PM +0000, Josh Law wrote:
+>> When restoring a kvec-backed iterator after a short write in a kernel
+>> socket sendmsg path (e=2Eg=2E an NFS client resending an RPC call), the
+>> WARN_ON_ONCE guard fires a spurious warning on every first call=2E
+>>=20
+>> The closing parenthesis of WARN_ON_ONCE is after !iter_is_ubuf(i),
+>> leaving !iov_iter_is_kvec(i) as a separate && operand outside the
+>> macro:
+>>=20
+>>   WARN_ON_ONCE(!bvec && !iovec && !ubuf) && !kvec
+>>=20
+>> For kvec iterators this evaluates as WARN_ON_ONCE(true) && false =E2=80=
+=94 the
+>> warning fires but the return is skipped, so execution proceeds correctl=
+y=2E
+>> The warning is the only visible symptom, but it is confusing and may
+>> mask real issues=2E
+>>=20
+>> Found through code review of the operator precedence in the condition
+>> expression and confirmed by tracing the macro expansion=2E
+>>=20
+>> Move the closing parenthesis to include the kvec check inside
+>> WARN_ON_ONCE so the warning only fires for genuinely unsupported
+>> iterator types=2E
+>>=20
+>> Signed-off-by: Josh Law <objecting@objecting=2Eorg>
+>> ---
+>>  lib/iov_iter=2Ec | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/lib/iov_iter=2Ec b/lib/iov_iter=2Ec
+>> index 325669b103ed=2E=2E6a7959bfc849 100644
+>> --- a/lib/iov_iter=2Ec
+>> +++ b/lib/iov_iter=2Ec
+>> @@ -1471,7 +1471,7 @@ EXPORT_SYMBOL_GPL(import_ubuf);
+>>  void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state=
+)
+>>  {
+>>  	if (WARN_ON_ONCE(!iov_iter_is_bvec(i) && !iter_is_iovec(i) &&
+>> -			 !iter_is_ubuf(i)) && !iov_iter_is_kvec(i))
+>> +			 !iter_is_ubuf(i) && !iov_iter_is_kvec(i)))
+>>  		return;
+>>  	i->iov_offset =3D state->iov_offset;
+>>  	i->count =3D state->count;
+>
+>Look=2E=2E=2E the placement is intentional as is easily identifiable by
+>looking at the history of the commits=2E This clearly is AI generated
+>and you don't have the capacity at the moment to meaningfully argue or
+>present the technical changes you are proposing - if you are an actual
+>person at all=2E As such I see no reason to engage with this=2E
+
+
+
+1: i am a real human
+2: For code written by AI, i use Assisted-by: , i wrote the commit descrip=
+tion with ai (thats why its so long)
+
+
+Sorry for wasting your time
+
+V/R
+
+
+Josh Law
