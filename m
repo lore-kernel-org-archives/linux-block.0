@@ -1,83 +1,93 @@
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563F13909BD
-	for <linux-block@vger.kernel.org>; Mon, 23 Mar 2026 10:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD162DE6F1;
+	Mon, 23 Mar 2026 12:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774262965; cv=none; b=IHvH2EcKMNPzkC3Y5QGYlIdLJe0/Kx48P1h7X32EbZkTspC3vJLU2pxPf9rkRfrZEfqgCbdrMb2q50zyqtor/rwAehD5QLS70wD4BgyEpKhs+89a+Ihxg8MKhEoLaEHKrgb3YT2Td8OQdcN3IZ+qJaPRie+2i35BoIh8iv2t5SA=
+	t=1774267702; cv=none; b=lYkCb7x9od7qjjSSQanR9LBFtnyXVAPpNc1yEKz5tCbGEbEkIZEECwV/SzScUPWClvTFwJoZdaov2bEl5pW8EgWJWb8Nge8XeY8e0rrnomuCwaFVR8BvDl6XRXXfuoD+84owlu2dfDBo+nmKUux8MREBaWZZxWGiFswL88CAkEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774262965; c=relaxed/simple;
-	bh=ae9PvXuev953CuWVB/nEsO5aTRcQGjF0ayPurTV1hZU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kvEsZJ28ICSPle4LUByBnDbrEeiJT8y1BDmC8FuTh7FN9a43yblqMDOpW0mB6wzKabKsGMBzNDR+dOCTqXfi5Far1otZJfhVAXXtWHe+K7n6JjMNH7Pvvjzch0yK/+TKiO7fdE/hqTzbg1ynKhP+/LZQ6IWvauK0iVaG7MPOcaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-66308f16ea1so56416eaf.2
-        for <linux-block@vger.kernel.org>; Mon, 23 Mar 2026 03:49:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774262963; x=1774867763;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t+F/uP0hCrF08RwIunjWB/vAhy2zWhsGOC1vnA6Wtr0=;
-        b=cBPwQvttxF3qeK8t8AW/oLqSMBwOusw/3OgLQnQoYLOi0bscaRtPEouPYHM4KAyUwm
-         11Mne8DsyxAahAXttDEZhJTDPoAXoHRbVwfiBbmP3Q6iV7L0QQAZjU1vTHkODmKRO4WI
-         sA2nXpMWP+z/RXl+Hv3ZxICeC5pIh6Jk55H7E0hyDNZ9paokb4aJpbWkMAlYf9udozGQ
-         E2opOLlHz70ILRLQurju/5G8U4mWChUFuNrsXzS/aiagDlzcNEC2pkJH1WcczTZrI21N
-         wPMOqx691kIoF4dxqr9xo/rOifRZNP5UP0Jq9ozkMQC5zTrZsMR5u6tOsSeKIEjkZyS+
-         3NUA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7gdeYmNjasZ8+8lsK9qNTrjrMnZoUyfTM85yOxMAM7StSiLciM+M3eut2dI94+EWThg3tetcFTHCV9A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWfIDdq8fM7M1y7ViHO00ao+OU1xyDEAGvY1zjl1x6O5cubkmT
-	/zBWEUiz0njDidnW+mpiJxU/LljKOFBeefzbI2E3j11YPgUO3sc2UrSFweBQEWL/jgNeHvtu70/
-	3diStS0LpHmsWH+07NsFXAxmAf6avmRPfvGH2IZahJWF5Hqr4SdiRV0yovAE=
+	s=arc-20240116; t=1774267702; c=relaxed/simple;
+	bh=Q7c7YRUKbJB7h3AZniygI8hUU3h+dXr9eLDt713Z4Wo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Tcdxt67qcNi3+fLsX6uBpwmeG6KyX1hU/SR5Hqzwk6PdzRSceSIX4DaZU0EHtZ4HzWkzVAYn8/MtJN+5tBsUyaolfAjpogssZ5RDbbBU7R36+lDTGuPEuut9He55kVPWo82Sf6eN53lMAIanzIOl5570NkEf78ITOc+kCes5rnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UMpoQMqH; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMpoQMqH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4AF2C4CEF7;
+	Mon, 23 Mar 2026 12:08:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774267702;
+	bh=Q7c7YRUKbJB7h3AZniygI8hUU3h+dXr9eLDt713Z4Wo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=UMpoQMqHQpm7Lt6rdcCSDM3Qt7iufMTBL2PLg2t836OcL31jTd38g1/hWUUmkQr6C
+	 BXGgrMe84kl19LRKekTspkCCzyVgqCBTXdNAG7z/fogi1teOof5l0z14e6+yTpiPtv
+	 aJ/GDzQDltsqPhYId2yr2ZpjNXTd3rHNA1pRqT2A8xlgC21eTp8j4OW61MHhDm8Glw
+	 vZnyAD05Zg+LyRazFM6/PNhZXiVPtU/g0STcRZPeUgWat/pC1Q/4PLcZ0koEiQ7OYS
+	 otN3wGnrTLkFcWz1fRNmHcO7pJw/KugCRF8623wWzWfoZ4RHsCfC9ghBv/ZMSvV11w
+	 L1Bou7d4+8l5Q==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, Miguel
+ Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6?=
+ =?utf-8?Q?rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor Gross
+ <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, FUJITA Tomonori
+ <fujita.tomonori@gmail.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz
+ <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Lorenzo Stoakes
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 05/79] block: rust: change `queue_rq` request type to
+ `Owned`
+In-Reply-To: <abfU_itQLa4jDy5L@google.com>
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
+ <20260216-rnull-v6-19-rc5-send-v1-5-de9a7af4b469@kernel.org>
+ <abfU_itQLa4jDy5L@google.com>
+Date: Mon, 23 Mar 2026 13:08:08 +0100
+Message-ID: <87ikamrbo7.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2d0c:b0:67d:e5f5:24fe with SMTP id
- 006d021491bc7-67de5f525e2mr3243551eaf.3.1774262963290; Mon, 23 Mar 2026
- 03:49:23 -0700 (PDT)
-Date: Mon, 23 Mar 2026 03:49:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69c11ab3.050a0220.3bf4de.0098.GAE@google.com>
-Subject: [syzbot] Monthly nbd report (Mar 2026)
-From: syzbot <syzbot+list13600ca525397f269b78@syzkaller.appspotmail.com>
-To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hello nbd maintainers/developers,
+Alice Ryhl <aliceryhl@google.com> writes:
 
-This is a 31-day syzbot report for the nbd subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nbd
+> On Mon, Feb 16, 2026 at 12:34:52AM +0100, Andreas Hindborg wrote:
+>> Simplify the reference counting scheme for `Request` from 4 states to 3
+>> states. This is achieved by coalescing the zero state between block layer
+>> owned and uniquely owned by driver.
+>> 
+>> Implement `Ownable` for `Request` and deliver `Request` to drivers as
+>> `Owned<Request>`. In this process:
+>> 
+>>  - Move uniqueness assertions out of `rnull` as these are now guaranteed by
+>>    the `Owned` type.
+>>  - Move `start_unchecked`, `try_set_end` and `end_ok` from `Request` to
+>>    `Owned<Request>`, relying on type invariant for uniqueness.
+>> 
+>> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+>
+> It would be a lot cleaner if we could implement HrTimerPointer for
+> Owned<Request> and entirely get rid of the refcount in request so we
+> don't need ARef<Request> at all.
+>
+> Is there a reason we *need* ARef here?
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 9 have already been fixed.
+There is. Real drivers will need to dma map the data buffers in
+ `Request` to a device. This requires taking a reference on the pages to
+ be mapped, which in turn requires taking a reference on the `Request`.
 
-Some of the still happening issues:
+We could split up the reference counts into multiple fields, but that
+would be less efficient.
 
-Ref Crashes Repro Title
-<1> 3562    Yes   possible deadlock in pcpu_alloc_noprof (2)
-                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
-<2> 639     Yes   INFO: task hung in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
-<3> 87      Yes   possible deadlock in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Best regards,
+Andreas Hindborg
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
