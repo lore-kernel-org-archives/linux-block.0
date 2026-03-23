@@ -1,45 +1,33 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162658C1F;
-	Mon, 23 Mar 2026 06:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761792BE63F;
+	Mon, 23 Mar 2026 06:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774246682; cv=none; b=Y0R1a8sZYMg/2M/1pTpfI1svrQ//VhzrIqddfa7Mq6JEvGr0WgGwXsw+7qxjt+meGnV3GPCcV9Re8wQ11qjoxDiv/ti1YhCrAaw1cA1PzIfeGlOi3hkXpgOXBhyisUQrW4utnD1SIBfVthRnz/douw4DS43nffWK0jqhlNn6WRg=
+	t=1774248263; cv=none; b=VESU4/Gu5yqNhAxsG0e0/py/B/4AFHbcNOwWNjzIKRmTAgUB7E54KK6yF4L7fm1LaKoIWVmnLiVrhg6tI9D+PwR1VEN7DV1hTcRQOhFUCopHEnC5MDVZJ2OapGsfM06hETMVgcUTMnDVSiLC5oYuYqyvV8WJziqillP5ekFt1/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774246682; c=relaxed/simple;
-	bh=cr+kahZ2/t2EpUMpwrP2N5H3I2zs3nZxr7LjchR9w7k=;
+	s=arc-20240116; t=1774248263; c=relaxed/simple;
+	bh=FZ3Pis2uRLgT04RfGMxx78Df96VS14JIQP0mkVvBkLo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=coyJCLSppcmsadZ0GB+PTVRkLUPKuXnZT52FcSMbGYl95z2+ggkS1t2sNm2Q8lCdnkWJrJa7cKtG5X3fLOqXo9fzsSQDsAeVxPVx8FZYv5VuA9v0CQzQBkuZwjHu9HrteMFG7R63YIE++hrxhcrseEcL30uI4cnZ1emeieDPgqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aFKWEqmZ; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aFKWEqmZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=qq9Ch574Mk78jIY+CDuu0xPMYpbUQ/02GbhKWjWT7tk=; b=aFKWEqmZjoUnAND7Oti8tRqFQS
-	rRZiwEit2/yijbx8iey0wIMzpgKjPl1m7nAQzI1/YDvgtZzG0C6QpxiPEkNgUY6Kg7gC7dBd4S5/M
-	7UroMAEmjQ1meU679Gq9EkgFQau7t617hdNyC51Su41igcnkvbIFijYgQMtrtWrjs0pVtBcNBtKqT
-	VIZX6YC5nD/gDr0WJFajhqCtkhxVi87+SxXgBDUiDjYQzchvxHLUrpoA79Q+VhG27WT075MlooZtN
-	PJvLyndjjXT9Boal1Tp5BsnWXU4ynLF7IL9gIE+Yw1xE9LCusQhnOfxWjRnoJ8beOt5QeaRDJQS1n
-	PCEjLusQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w4Ybu-0000000G7UV-3pwN;
-	Mon, 23 Mar 2026 06:17:58 +0000
-Date: Sun, 22 Mar 2026 23:17:58 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: Zorro Lang <zlang@redhat.com>, linux-xfs@vger.kernel.org,
-	Tal Zussman <tz2294@columbia.edu>, axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Subject: Re: [Bug][xfstests xfs/556] inconsistent {HARDIRQ-ON-W} ->
- {IN-HARDIRQ-W} usage
-Message-ID: <acDbFtQw0mom798e@infradead.org>
-References: <20260319194303.efw4wcu7c4idhthz@doltdoltdolt>
- <20260320163444.GE6223@frogsfrogsfrogs>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Id8TT6jo4mKFm3KAUSV/y6XEl8scu5u4lkgObfmGiCw935iFCbrLvuJkeU0tMv7Pvl/0hJ7wx8xO0vtlcvLCNJdPI6flBmsqBvBeo6DzgtwewX0pNf+gvcxxjCVChh6FkcUZdPWJcRtMj18zRMozH5CoP8munqa579V1A6ZKBJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id D7AA368BEB; Mon, 23 Mar 2026 07:44:17 +0100 (CET)
+Date: Mon, 23 Mar 2026 07:44:17 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	syzbot <syzbot+09ddb593eea76a158f42@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] block: fix bio_alloc_bioset slowpath GFP handling
+Message-ID: <20260323064417.GA24833@lst.de>
+References: <69bdcdcd.050a0220.3bf4de.002f.GAE@google.com> <p01.gc6e9ad5845ad.ttca29g@ub.hpns>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,26 +36,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260320163444.GE6223@frogsfrogsfrogs>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <p01.gc6e9ad5845ad.ttca29g@ub.hpns>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Mar 20, 2026 at 09:34:44AM -0700, Darrick J. Wong wrote:
-> --- a/fs/iomap/bio.c
-> +++ b/fs/iomap/bio.c
-> @@ -8,7 +8,15 @@
->  #include "internal.h"
->  #include "trace.h"
->  
-> -static void iomap_read_end_io(struct bio *bio)
-> +struct iomap_failed_bio {
-> +	struct list_head io_list;
-> +	struct bio *bio;
-> +};
+On Sun, Mar 22, 2026 at 03:35:10AM +0100, Vasily Gorbik wrote:
+> bio_alloc_bioset() first strips __GFP_DIRECT_RECLAIM from the optimistic
+> fast allocation attempt with try_alloc_gfp(). If that fast path fails,
+> the slowpath checks saved_gfp to decide whether blocking allocation is
+> allowed, but then still calls mempool_alloc() with the stripped gfp mask.
+> That can lead to a NULL bio pointer being passed into bio_init().
+> 
+> Fix the slowpath by using saved_gfp for the bio and bvec mempool
+> allocations.
 
-Between this and the blockdev dontcache work I really wish we could
-have a generic offload using a percpu lit and workqueue.
+Looks good, thanks:
 
-Also I don't think we need the separate list here, a linked list using
-bi_next should be sufficient and avoid the allocation in the failure
-path.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
