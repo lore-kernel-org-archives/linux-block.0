@@ -1,101 +1,202 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F012027470
-	for <linux-block@vger.kernel.org>; Mon, 23 Mar 2026 01:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239A127470
+	for <linux-block@vger.kernel.org>; Mon, 23 Mar 2026 01:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774227851; cv=none; b=u/fgaNRIEiE7gNJRIZIYfDYHKD7c43O10HmK2LtlXjYnRhwSIaQmCh33w1OFLsoONjPOfp/NKqPD6a50cjuiqtmkBh6LploZmgNPdTp5lNY80stMM5Llug8FwM4dvtot9ZrHkZDnvbMrfm7a5Za6cNdNZLYOCTT9eZupcKYEQEI=
+	t=1774227879; cv=none; b=mYFwkug7lbJiHtak98cm3/OiJy68s62LF5+9RDREwPeUPalla5RQnrBufpI6037SGCxVLkBquOHAadgMIIw2hOwf48+/OWA9tvw+1QqgpdrnZSv3DjcuhA9LIB509JwFA1LrH9jS1wHMP+Ghh4Gg+eRxtyuuxxnSaWkYcxRq1R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774227851; c=relaxed/simple;
-	bh=b/A7j0hjNvSSGHgfep4ZD16Ax506S8Hl9U3vdY/MDtM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=pU1kLIgeFPng4hfLZ+y3l3FHqOCcqJ2qNRN7/1Om/BJSWYP1Yhvyi/eGkamw+gsf5kFrCRnEsA8dEQKD+w+ElNZ/UumquNVMflpNqZp4pxm0StTwRH99VpYjRucn7aAb1LowLynaophkLtbO9QFuyFA3PgNN2o+EmlfKTHUmNhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Zh78KXNH; arc=none smtp.client-ip=209.85.167.182
+	s=arc-20240116; t=1774227879; c=relaxed/simple;
+	bh=1858aEuXQCDBFZbM6Amq89zSY2nlYPEvVwLAwgsvue0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J52yU7cWL66keVGkitccvcg3KyKMmdqqPwSEjos5bo+iqPl7uYRoVojySnoRxTMxaga79j6mDECPFWddCdqNAvebn906fZC9fFnJqXSbFyxuNRuO/g5sHy90kgLoeqfnA7y+VI+T0FqaEK4svdihIvI87oJgu1cmwS/a6GEQ8Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=G9Kyc+v2; arc=none smtp.client-ip=209.85.167.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Zh78KXNH"
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-464bba3a9easo2122962b6e.0
-        for <linux-block@vger.kernel.org>; Sun, 22 Mar 2026 18:04:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="G9Kyc+v2"
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-464ba2bb3aeso2344671b6e.1
+        for <linux-block@vger.kernel.org>; Sun, 22 Mar 2026 18:04:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774227848; x=1774832648; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mqewgqaY2Dk1rx9G2gglNoiCFwHVc4lRod/pELYCXPc=;
-        b=Zh78KXNHaG2ooWVVelASEOXq5S58U9WJ958kcj3WjFmUod7BKSG5fdgzKoJJePGmVa
-         fmV2ebJVI+DMCHlxOQx3y/rvr0N9Y429EK+4SPJkwJn77K1R+9bNI/nlBLiNCLedDoiJ
-         iOehH0sAPFjv3wVeKH0N6r5k02oercYzZctaG1d8kbz+H/PwobrRQ3OQc/f8ko2Wbn50
-         zkUsgSyCw1HHFxHhe9Pjn6mxPahj2umM/cfblpXSgD2zKmUDYFUVzqCBc3VDI2dVvyNL
-         +NstFqRQupHbehCKpk/ztEz/HoU+em+pgVAR5D4ga0+W/b+9CagbX/rixqFbzKYmUKzZ
-         3ksQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774227877; x=1774832677; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w1B1Svo5mktAT8Mqk4J/FNWcbOe8c+HvGIGaqad1TNU=;
+        b=G9Kyc+v2awZBS+/v26IKHJ21bcY4Pc7iQIY4ZLvnZQSZDDO+yi5WyUqyFsOTSOrYsy
+         +Vvh/9qDsOEOX5gF/Q9mpwN0V4O7unQq0DzdjmFcixVbiX24vXAcRtZVWqN1HlC8U8r0
+         rsKMogLqSigh3GmEpQQwDJnvX7p9lCso1ifUbJl2S7ckcu6Ogxg1c9b3vg+gh4C9W3qm
+         Ev9GUKAmMcKfe5KvC03vwY8Y5uZBb3LRm4LJ+dM36X1OX0WzVpioDmUc3RdV6sB8K+qp
+         xKO0yZ9saxndv4tnjalLI8YiFUbymfVfZxpkd9FAPcamxy0s385VdfldmWDXMwC+4KSC
+         FceA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774227848; x=1774832648;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mqewgqaY2Dk1rx9G2gglNoiCFwHVc4lRod/pELYCXPc=;
-        b=gTDZV3xb96UiUPsfOHm+78Y2iNfpyKGyNdhNSIcUisJiFYBw+ZTRgNOqASsp+rPKQY
-         2c1AIDH2XRUuivcRil1f/WSVYrldaVasz14BnckkCrQYoWAS4iNS9JAztaTAzTXw1lkO
-         nAgNtqzfi+YKvIPfxi+zWO1HP+6p1PzMxpyPZPCSODflxq4ySMiOTCphDNIQ0P+jYl6s
-         4o6F/fZfT5SG7iJi4QnfDPGpRN6fBDhZUlz9ogi5RZv7p8Pibsd63pWo9Gf+VU+F/+fe
-         p7u1OUKwFzbbgLi/jfTu6w9yVPueHFW5cege2YJjvtv6qTWcTFWp+ZnfLtv31AcGkX48
-         JzAA==
-X-Gm-Message-State: AOJu0Yzuv47GRDxul4MmC0peLqwtqpEvNfMnU58Pm9tug6hj8W7QCrBO
-	foOY8npl+anTsN2u+Y32Q4wWKcG8rGv6u/CkSM9XvGlpj6RxfGhbVRO5frIyYRYRCkc=
-X-Gm-Gg: ATEYQzwt5x6C6NxJdiYuL3n4V1BPkYYR7dBHUZGeqavnK23RYenNeIOq7WEXBNFb/WO
-	InBWUBZPKdTUYVt8qDdfIZi1ZbjYjoLkNIythy5zy0Vpt1gjz9wRTS5IJovUdf7+cDr2EHxZjYI
-	Va1eWBZwCV5n7uSwWWl6wZ06Do95kO2r9p9TV6Q3fFcLTspzZYw6B+MXp7CFhGPtJiBbgw3WZ6Z
-	WYSuBhd3R4HyQ+i0iWFMuVSp/a4XG673k0z6EoV5EDLO4P1ExkLe5jddXTPQlYKV7hjMRh0LSbr
-	nF3BfdWcQNCts/DfimCZm1XOvcLYLnJBHeoONJR+pt8NeBUy91+jrAQ4NYDM2wtFOff6rno3yUf
-	6vTbLhZkjnxjca1cHnz9Dwm2QnxJmG6gs9jU4pmIa+0oMNBlCq6prhBjMQcuju/JSQerXXEjKgj
-	ewgEN5jz2Gp+gFySbfHSSXCZH7HLYSgwpmqkqnf8IoAT8EGAXSBAvxXAlx68eN+2I6CNXBlL8SU
-	/tf
-X-Received: by 2002:a05:6808:4fd0:b0:467:32c1:ad08 with SMTP id 5614622812f47-467e6032eadmr6047673b6e.56.1774227847857;
-        Sun, 22 Mar 2026 18:04:07 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-467e7f131b2sm5711115b6e.15.2026.03.22.18.04.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Mar 2026 18:04:07 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>
-In-Reply-To: <20260318014112.3125432-1-ming.lei@redhat.com>
-References: <20260318014112.3125432-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] ublk: move cold paths out of __ublk_batch_dispatch()
- for icache efficiency
-Message-Id: <177422784683.359752.710935782488869559.b4-ty@b4>
-Date: Sun, 22 Mar 2026 19:04:06 -0600
+        d=1e100.net; s=20251104; t=1774227877; x=1774832677;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w1B1Svo5mktAT8Mqk4J/FNWcbOe8c+HvGIGaqad1TNU=;
+        b=GscxQI8PPHmt8t2YlMuFsTvqW69dc5oI9fyTKJZajnwZ72UJlb0RIxsr4DQelPeISu
+         qtfXD9nQq24vkHDifYaFq79OX6orgp1J/oQ/O0XggFCv/tccFAQ6x9hgC3xhpe6oJP9l
+         ME8v1UAXrBFKXPWIHb2MWFHnZuPdGCeZiGN+AREgMGqzcNdmLbzUQsjy4bvLMYsB5/3B
+         k8FZGsmjy+7Cj8PAtCAC5trKmUk3A6clr2j5wMIUhd9rbnM4GJAP0IrQvRp7EfnP7g0+
+         puWmUtrPJsU8pHU6vxf3Iolfjc621suON7mrgvfLlLO+Ty2ZLDX3zFI6KmDA31oqDh50
+         a16w==
+X-Gm-Message-State: AOJu0YzBsyIKiTz3hXgevKLr1kWpupRO/lWbmUv+BMXFwcnuP8qYrPIo
+	peig1Zb/IlAvU9J++8ZrVc9tk19leUU1DSZyufXS+bbfAewa+5hLzDFdpgTMdyTTSuc=
+X-Gm-Gg: ATEYQzxbgHaBRKsC/lRIAFFePAEPyObYm4bCrVFsNLZdEZhf00EZ+tk6G8NKY0kf2FD
+	26ft0t1IgcZK921GpM/nKWFc5Mx1ZwiiTF93cD08yk9RgEAfYV1FMYtYWctwrw7Me+fHLeHzwuk
+	m63is4Q058KTH/gxgrQHskyXbGCucs1x16fJ4hF/TKcanm595VtENZVoN97uNLigal21xZBVP/5
+	Vx6Xw1ogWZLIuuRLO3Q3lUfxzxNMOg5TBHYYo5xoOV8ztRHYWQwtv0E9MrWqBO4tNmTVwBKASis
+	uOPS4ydrIUqUp0lcDDPYma4DHQAbJrGvCoPd+PqxvzXlnI6SX0+MQK/zeasePrHdvw4wO1pbft8
+	A+ZRYy+QReMwlhxNWJt5SUh9NnTOw3NOVEITtEUV9dwQEegrE6agn89atH0+mQQzSkN2BeFy9Jo
+	6OQ2B5ENwfBlksgSQrB4y8k1+ygs/noT/cK8a8Ozy51qnDW6HpDnV9Ox23L5XKZ8JA3aCOoIDxI
+	UUyMY4hng==
+X-Received: by 2002:a05:6808:1926:b0:467:fb12:c9f6 with SMTP id 5614622812f47-467fb12caf7mr4373668b6e.14.1774227877031;
+        Sun, 22 Mar 2026 18:04:37 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-41c14d63e29sm8851293fac.12.2026.03.22.18.04.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Mar 2026 18:04:36 -0700 (PDT)
+Message-ID: <6fab0722-cf39-4081-a337-0be8e6ffc26d@kernel.dk>
+Date: Sun, 22 Mar 2026 19:04:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch] bsg: initialize request and reply payloads in
+ bsg_prepare_job
+To: jonghwi.rha@samsung.com, Hannes Reinecke <hare@suse.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "hch@lst.de" <hch@lst.de>, =?UTF-8?B?6rmA7KCV7YOc?=
+ <jt1217.kim@samsung.com>, =?UTF-8?B?7KCV7Zic7Jew?= <hyeon.chung@samsung.com>
+References: <CGME20260318102030epcms2p7b2daaab73032a6a26eca9c8307a7322e@epcms2p7>
+ <20260318102030epcms2p7b2daaab73032a6a26eca9c8307a7322e@epcms2p7>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260318102030epcms2p7b2daaab73032a6a26eca9c8307a7322e@epcms2p7>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.0
 
-
-On Wed, 18 Mar 2026 09:41:12 +0800, Ming Lei wrote:
-> Mark ublk_filter_unused_tags() as noinline since it is only called from
-> the unlikely(needs_filter) branch. Extract the error-handling block from
-> __ublk_batch_dispatch() into a new noinline ublk_batch_dispatch_fail()
-> function to keep the hot path compact and icache-friendly. This also
-> makes __ublk_batch_dispatch() more readable by separating the error
-> recovery logic from the normal dispatch flow.
+On 3/18/26 4:20 AM, ??? wrote:
+> On 2/6/26 13:58 PM, ??? wrote:
+>> On 2/6/26 00:45, Hannes Reinecke wrote:
+>>> On 2/5/26 14:42, Jens Axboe wrote:
+>>>> On 2/4/26 10:32 PM, ??? wrote:
+>>>>> bsg: initialize request and reply payloads in bsg_prepare_job
+>>>>>
+>>>>> struct bsg_job payloads contain fields that are only populated by
+>>>>> certain commands, such as sg_list pointers.
+>>>>>
+>>>>> Because struct bsg_job is allocated with kmalloc(), memory may be
+>>>>> reused across requests. If a command does not populate all payload
+>>>>> fields, stale state from a previous job may remain and later be
+>>>>> misinterpreted during cleanup, potentially leading to use-after-free
+>>>>> or double-free issues.
+>>>>>
+>>>>> Initialize both request and reply payloads at the beginning of job
+>>>>> preparation to ensure a clean state for all commands.
+>>>>>
+>>>>> Signed-off-by: Jonghwi Rha 
+>>>>>
+>>>>> diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+>>>>> index 32da4a4429ce..0fbf8e311c03 100644
+>>>>> --- a/block/bsg-lib.c
+>>>>> +++ b/block/bsg-lib.c
+>>>>> @@ -234,6 +234,12 @@ static bool bsg_prepare_job(struct device *dev, struct request *req)
+>>>>>          struct bsg_job *job = blk_mq_rq_to_pdu(req);
+>>>>>          int ret;
+>>>>>
+>>>>> +      /* Clear stale SG state since bsg_job is reused as a request PDU */
+>>>>> +      job->request_payload.sg_list = NULL;
+>>>>> +      job->request_payload.sg_cnt = 0;
+>>>>> +      job->reply_payload.sg_list = NULL;
+>>>>> +      job->reply_payload.sg_cnt = 0;
+>>>>> +
+>>>>>          job->timeout = req->timeout;
+>>>>>
+>>>>>          if (req->bio) {
+>>>>
+>>>> The patch is white-space damaged, tabs are spaces. But I can fix that
+>>>> up. Do we just want to do a memset(job, 0, sizeof(*job)) here to avoid
+>>>> any oddities like this in the future?
+>>>>
+>>>
+>>> That might indeed be better.
+>>
+>> The suggested method impairs normal operation. If bsg_prepare_job performs
+>> a zero?memset for the job structure, all request?related information set on
+>> the driver side before the call will be lost. Therefore, if it runs as is,
+>> it will go to ufs_bsg_request and cause a null?pointer access.
+>>
+>> Currently, the original patch has no functional impact.
+>>
+>> The blank problem seems to be due to a mistake I made while copying and pasting
+>> the patch. I am reattaching the patch below. If needed, I can attach the patch
+>> and resend the new email.
+>>
+>>
+>> [PATCH] bsg: initialize request and reply payloads in bsg_prepare_job
+>>
+>> struct bsg_job payloads contain fields that are only populated by
+>> certain commands, such as sg_list pointers.
+>>
+>> Because struct bsg_job is allocated with kmalloc(), memory may be
+>> reused across requests. If a command does not populate all payload
+>> fields, stale state from a previous job may remain and later be
+>> misinterpreted during cleanup, potentially leading to use-after-free
+>> or double-free issues.
+>>
+>> Initialize both request and reply payloads at the beginning of job
+>> preparation to ensure a clean state for all commands.
+>>
+>> Signed-off-by: Jonghwi Rha 
+>> ---
+>>  block/bsg-lib.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+>> index 32da4a4429ce..0fbf8e311c03 100644
+>> --- a/block/bsg-lib.c
+>> +++ b/block/bsg-lib.c
+>> @@ -234,6 +234,12 @@ static bool bsg_prepare_job(struct device *dev, struct request *req)
+>>  	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+>>  	int ret;
+>>  
+>> +	/* Clear stale SG state since bsg_job is reused as a request PDU */
+>> +	job->request_payload.sg_list = NULL;
+>> +	job->request_payload.sg_cnt = 0;
+>> +	job->reply_payload.sg_list = NULL;
+>> +	job->reply_payload.sg_cnt = 0;
+>> +
+>> 	job->timeout = req->timeout;
+>>
+>> 	if (req->bio) {
+>> -- 
 > 
-> [...]
+>> Regards,
+>> Jonghwi,
+> 
+> --
+> 
+> Since there was no reply, I am resending the email as a reminder.
+> First, I have confirmed in my environment that, as you suggested,
+> memset?as 0 for all 'job' struct elements eventually results an error.
+> The reason is, as I mentioned above, that the request/reply gets lost
+> before re-using.
+> 
+> Also, since other elements in the structure are reused, so they are
+> not relevant to the current issue.
+> 
+> If the code execution point is not ideal, there is also the option of
+> zeroising after freeing the memory allocation.
 
-Applied, thanks!
+Just send it out as a proper patch and we can take a look at it again.
 
-[1/1] ublk: move cold paths out of __ublk_batch_dispatch() for icache efficiency
-      commit: 24d4c90286b9a36a2b72d1e0ceeae237d427f975
-
-Best regards,
 -- 
 Jens Axboe
-
-
-
