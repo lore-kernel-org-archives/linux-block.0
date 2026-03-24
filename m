@@ -1,188 +1,199 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40703F9F27
-	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 12:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774355701; cv=none; b=XPyiPH+9T1eQR30ZSSBAUWyzDz/mONAQVN97kQBz90pronIlqWit34ZU3A5qchvVhv83egoaLTggdCt8+8Q8Tws1CXz73q1NUXu98KreEh3gdxOhd3XaxvOrsrGOYSLNyrOouIZsCrLM28+9XwKMqtBKy/418HE/XS6P0CAoJU0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774355701; c=relaxed/simple;
-	bh=YT7j6G4VqHFba9JjfTn91xb08wb3JpE1uvJdfi/F5fA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZUXW5hBpnbK5WqJzO5/7XnXbESa3rNd7BDgxZ15PZ/ciXUIpcU7cf6Q/NWQ2TFDCFmo/tFgOGJIYWphYVniG799ub8ae5X+1EDK61AQQgPdFtW6UXhH+L3L6zSeJjS93FPABqk2S/fCk93fDz2uSGz1/PHGkLdNUrDH4nMr3InY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=c1xtsd9g; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=04c7WcS3; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=c1xtsd9g; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=04c7WcS3; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBE325C818
+	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 12:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774356306; cv=pass; b=SVU45h8/dpdofjKyj4d8FikTgPL+jpMrhS1dRXieUREDMXS5MwA7BByQUBa/wF3dFXm63/vCggvIs6sK8pBhtKZUHgYh+9zNesuIvo3RfA8CbMhkmmDM8Y1CDmd1OXoQLSwFVSkDZP24Y3y98sQfsrP9vTI53adQQu2X5Sag3RM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774356306; c=relaxed/simple;
+	bh=yqTSsXn3Tf0bFbAjwSIJvuO1YqDq8DGlfkp/JXwCRSY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zhj1GYbkbbA+cjgoruuHVgPEYhdQkwNtntwUFeXEwbv21EQSlt/BjkbZRWpz9mfrYFEIzrGTwqXOzBSoPX9GhS8WioIGgZL6dL5ary/2d7zUf+q3p0mpcBl8yv38khaQ/bob2V9YD9b0N6b+3pWCoRo/z7estXgjU5izPKFUQCY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fAgAj3VR; arc=pass smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="c1xtsd9g";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="04c7WcS3";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="c1xtsd9g";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="04c7WcS3"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3E3EB4D372;
-	Tue, 24 Mar 2026 12:34:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774355698; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kOD5J3EgQ3eewOupxViyCrtb2bK/f0J4VPnZdwhvBJ8=;
-	b=c1xtsd9gHrgpbaU/tq8WoUFUL3pyzhwgH/OnjBvkZ7vthOkASyofP3Jf1csg9/K7Xqz316
-	zh/mM3d8HzS4ga0c0PyIVCXLKGqT4uTG1ps1wkDzgVuvjNaTJvlnGQib2ogbYQO6TW5ZFT
-	nxPxqQAsscaJzmWuBsFFe1vrUczB334=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774355698;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kOD5J3EgQ3eewOupxViyCrtb2bK/f0J4VPnZdwhvBJ8=;
-	b=04c7WcS3KaAArdHv83GxCHNeWZxVlnvpswo6/zkGMwnQHfXT3GjX9Eze8EbUi4SNRHNvjm
-	REyfdEiPv7jg5jBQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774355698; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kOD5J3EgQ3eewOupxViyCrtb2bK/f0J4VPnZdwhvBJ8=;
-	b=c1xtsd9gHrgpbaU/tq8WoUFUL3pyzhwgH/OnjBvkZ7vthOkASyofP3Jf1csg9/K7Xqz316
-	zh/mM3d8HzS4ga0c0PyIVCXLKGqT4uTG1ps1wkDzgVuvjNaTJvlnGQib2ogbYQO6TW5ZFT
-	nxPxqQAsscaJzmWuBsFFe1vrUczB334=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774355698;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kOD5J3EgQ3eewOupxViyCrtb2bK/f0J4VPnZdwhvBJ8=;
-	b=04c7WcS3KaAArdHv83GxCHNeWZxVlnvpswo6/zkGMwnQHfXT3GjX9Eze8EbUi4SNRHNvjm
-	REyfdEiPv7jg5jBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 355E543E3A;
-	Tue, 24 Mar 2026 12:34:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4JAFDfKEwmlhcQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 24 Mar 2026 12:34:58 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id EF8C1A0B32; Tue, 24 Mar 2026 13:34:57 +0100 (CET)
-Date: Tue, 24 Mar 2026 13:34:57 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>, linux-ext4@vger.kernel.org, Ted Tso <tytso@mit.edu>, 
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>, David Sterba <dsterba@suse.com>, 
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, linux-mm@kvack.org, 
-	linux-aio@kvack.org, Benjamin LaHaise <bcrl@kvack.org>
-Subject: Re: [PATCH 12/41] fs: Drop sync_mapping_buffers() from
- __generic_file_fsync()
-Message-ID: <ezdm6d34jqdrcohk7o6wycxvvlgtf6aqenwx5ffr3plfagdbzi@gibz7xwr6yhr>
-References: <20260320131728.6449-1-jack@suse.cz>
- <20260320134100.20731-53-jack@suse.cz>
- <acIjxUzWFstarlwv@infradead.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fAgAj3VR"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5a27dddecb0so7304950e87.2
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 05:45:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774356304; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OsxeKHGqRzugnu5R605kT5P3gi6fRde8uyC8yK2rPSf3XjKOXzYFIU8ozta7E1p6Ug
+         hlnajwnmPG4Nd5mtG1Pr8fF17R/Hde//Y7jAAEK8xwnGupZIIuIyboA79N/Se7ccJ99k
+         AWskSfBcSGxBXwsGNS+ere0yXLrId1CuFoidT4I+bBfD3slJJPtcpjDQU/u34lwwGWqf
+         nkYzhEO82e9OK+foRlcO5hWaHu7l5h+mZjDTc0hfjvO1Z946e6iB3RUzp5QzkDglNtTk
+         bRmlyUc87cp+BHBjazuFjPyKSXKQrKa9Qojm/nwnCrL1gFfuXSzj8HuFlI/hMk0hmmTB
+         xSrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=t5fYTCkjrAgQURSIIg0HU6EB9FGTRkSpxZH93SzCPw8=;
+        fh=IxbL6Ugw3/0rNO2IIcTZ4hBNP4NRxi+ZgMlElmxwVp4=;
+        b=HTtunow6+EchxYuNpJYkhyhDR/NAauM6EnDdYxF9CpUxRyvGuJfygxUADLGoY2TroR
+         mug6zF6fhxukMeQ83OJ0e7U3riM7PD2+NfbZEYyvm08eAiD4EVd8k6ifBgjtBNSaj+jG
+         7YxacjpTGYckFhdiICkAhC+LaUgDGDTblrvQSfGhxA8sqmsvT9LtnV2ApBYcdJpCUrPa
+         aVLF/r9QcO1oiOg/EOr53QXgZksVvsDewlLZHzlbL160cVrOEHfx2sieIXBgYJsXNgj+
+         TjJA1xWRuChrmN2c/XPiXvtHC9d4Jqt2p2nQPqywwjUohgUQaMNQG5xwQs56Fw910wmo
+         g7GQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1774356304; x=1774961104; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=t5fYTCkjrAgQURSIIg0HU6EB9FGTRkSpxZH93SzCPw8=;
+        b=fAgAj3VR/2wpkKs1SpN01z9BDGgtwW8hI43hRZo2+Ztdw/xveAMkn0rUgO8H5cfux9
+         k73FNPbOV5JL9rKQYJK1QQdwZR7dk2RZ1NK0sNuAteSBRklZSj/k7uQ3hQjoxgirokEx
+         EzQVW2wckcVlHKn1gJDOy/MPIzXiV8Gp9ajFuuEvQMyqpEbc/CoH5AWooO7aBFKWZkA4
+         2osCVlGVqCHOAkzRNOkyAA+hSaEsOlgCsLheDeWcxN/dU2wGJKqUQMi0x6nOqp5n7Z21
+         NzQuJrEBxCR0HKhBY5xbfnsrceoKPXFZJrahkpVQpiLXpuDE6eERQ35zzqAN5v6Z3cIi
+         QHFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774356304; x=1774961104;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t5fYTCkjrAgQURSIIg0HU6EB9FGTRkSpxZH93SzCPw8=;
+        b=mXV3U4m4Ex+ycbEQLPwgsJ17xSZdnrqz8LyA8A0Rvx6Z76T7rNQPNQXowkAuPYMDVT
+         xbp0S3zpNOx9kEVrn+QqczvuzIHJPDS0PbvP/2iaOxlEevDeG4ZrmAqm6QfQ5J5IbZc4
+         76sVxxk5JQwHX+RWcKUfGO4V9YzJIKb/rH70nofPuAM+Cde8s2di1JxgIEEnIqhZ9Pys
+         T8J6KCI8V1JsycM/i8HLOCw5QrCddNsR2vmuYkSoVz0qBm2biKDYkXU0d61i7X3GDFOy
+         DwT2j5cSuAjcf0FwRlKtTWlA1sDr6RKQjbUJ6wSd/wwqInQziDOvb2J+bYjc/hTIwCji
+         TvVA==
+X-Gm-Message-State: AOJu0Yy1lAdMmURU4FCVJEJyb2PRmDXZRoek/ihQG+NUtoYgGwhqVPFX
+	ZLe+looxEZL0Gay8ULVArEk8k1vYKfTFsc54nIkjQPz1XH7+tADW+mHA4LaTCSj9+asF26qeIuf
+	Lz2vekeXuOuWYo7UL97BiqT2nfwFe7EAbDenK/ZVuww==
+X-Gm-Gg: ATEYQzyGBqdnXbvajIlyLXZm6W5WZiRxlehO/9ggKg6aQuv6MxMhVTNURtddvQ1419/
+	dD3KJ5v9UHKGJa1HqYf05fgjOrTWVBq8EjbirBqeK52IW1vAjajWkmjgb4JSWf7uqqhXMp2kTxp
+	5HsfBmI49od2oR6nHbTiBtC5x7XTFx2jGv0r8AOMIHM1WH0asPDGANN4kcFFZR/GOYaAZVG5WLk
+	HDrJVeQNEshhLDBGRxe4ifuONs9Q7/8PTPR6ossY921f075wbl0HY/yVuEvAqn/xT1k+XqSK9yB
+	8lBx9/F3
+X-Received: by 2002:a05:6512:609:20b0:5a2:864a:bebb with SMTP id
+ 2adb3069b0e04-5a2864abeffmr3572286e87.20.1774356303463; Tue, 24 Mar 2026
+ 05:45:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acIjxUzWFstarlwv@infradead.org>
-X-Spam-Score: -2.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email,suse.cz:email];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_RCPT(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[suse.cz,vger.kernel.org,kernel.org,zeniv.linux.org.uk,mit.edu,gmail.com,suse.com,mail.parknet.co.jp,linux.dev,suse.de,kvack.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email]
-X-Spam-Flag: NO
+References: <20260310160408.3976760-1-b-liu@ti.com> <CAPDyKFrM92eAxCxU9E1eDNfXMdOC4JvAOXYgY=HcmFG2YfrQEg@mail.gmail.com>
+ <20260316162241.2zry4hjmufiwphmg@iaqt7>
+In-Reply-To: <20260316162241.2zry4hjmufiwphmg@iaqt7>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 24 Mar 2026 13:44:27 +0100
+X-Gm-Features: AQROBzBIVyK8PtCTVLrDRNOS2gRTfn-qhdFv6gGKbTwAiOJKddMixLXpA7wQmq8
+Message-ID: <CAPDyKFrHnhoUB4LqXV6RU6i=it4GcM_OXAzD2YeGK8rPq3cQ_w@mail.gmail.com>
+Subject: Re: [PATCH] mmc: block: use single block write in retry
+To: Bin Liu <b-liu@ti.com>
+Cc: linux-block@vger.kernel.org, linux-mmc@vger.kernel.org, axboe@kernel.dk
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon 23-03-26 22:40:21, Christoph Hellwig wrote:
-> On Fri, Mar 20, 2026 at 02:41:07PM +0100, Jan Kara wrote:
-> > No filesystem calling __generic_file_fsync() uses metadata bh tracking.
-> > Drop sync_mapping_buffers() call from __generic_file_fsync() as it's
-> > pointless now.
-> 
-> Given how much this changed, maybe rename it to simple_fsync now to
-> provide an obvious breakage for anyone trying to use it?  That name
-> is probably also better as it's not all that generic.
+On Mon, 16 Mar 2026 at 17:23, Bin Liu <b-liu@ti.com> wrote:
+>
+> Hi Ulf,
+>
+> On Mon, Mar 16, 2026 at 04:01:38PM +0100, Ulf Hansson wrote:
+> > On Tue, 10 Mar 2026 at 17:04, Bin Liu <b-liu@ti.com> wrote:
+> > >
+> > > Due to errata i2493[0], multi-block write would still fail in retries.
+> > >
+> > > This patch reuses recovery_mode flag, and switches to single-block
+> > > write in retry when multi-block write fails. It covers both CQE and
+> > > non-CQE cases.
+> > >
+> > > [0] https://www.ti.com/lit/pdf/sprz582
+> >
+> > It's great that a link like the above can be provided, still it would
+> > be nice to explain a bit more about the problem in the commit message
+> > too. Can you please do that?
+>
+> Sure I will add the errata details in the commit message in v2.
+>
+> >
+> > > Signed-off-by: Bin Liu <b-liu@ti.com>
+> > > ---
+> > >  block/blk-mq-debugfs.c   |  1 +
+> > >  drivers/mmc/core/block.c | 12 ++++++++++--
+> > >  include/linux/blk-mq.h   |  3 +++
+> > >  3 files changed, 14 insertions(+), 2 deletions(-)
 
-I'm fine with simple_fsync() name for the helper with the trivial behavior
-of writing out the mapping and the inode. Code wise this will look somewhat
-different given what you've suggested for the last patch.
+Please split this patch into two, one for the blk-mq core and one for mmc core.
 
-								Honza
+> > >
+> > > diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> > > index 28167c9baa55..5f97d07fa3c8 100644
+> > > --- a/block/blk-mq-debugfs.c
+> > > +++ b/block/blk-mq-debugfs.c
+> > > @@ -243,6 +243,7 @@ static const char *const rqf_name[] = {
+> > >         RQF_NAME(ZONE_WRITE_PLUGGING),
+> > >         RQF_NAME(TIMED_OUT),
+> > >         RQF_NAME(RESV),
+> > > +       RQF_NAME(XFER_SINGLE_BLK),
+> > >  };
+> > >  #undef RQF_NAME
+> > >
+> > > diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> > > index 05ee76cb0a08..00016584d70d 100644
+> > > --- a/drivers/mmc/core/block.c
+> > > +++ b/drivers/mmc/core/block.c
+> > > @@ -1401,6 +1401,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
+> > >                     rq_data_dir(req) == WRITE &&
+> > >                     (md->flags & MMC_BLK_REL_WR);
+> > >
+> > > +       if (req->rq_flags & RQF_XFER_SINGLE_BLK)
+> > > +               recovery_mode = 1;
+> > > +
+> >
+> > I don't get this, sorry.
+>
+> No worries, the logic of this solution is not that obvious.
+>
+> In summary of this patch, in both CQE-enabled and non-CQE cases, in
+> *_complete_rq(), flag RQF_XFER_SINGLE_BLK is set in req->rq_flags when
+> WRITE request fails. This is to mark that single-block write, according
+> to errata i2493, should be used in retrying this WRITE request.
+>
+> In retrying, mmc_blk_data_prep() is called again with
+> RQF_XFER_SINGLE_BLK set, this makes recovery_mode to be forced to 1,
+>
+> then a few lines down in mmc_blk_data_prep():
+>
+>         if (recovery_mode)
+>                 brq->data.blocks = queue_physical_block_size(mq->queue) >> 9;
+>
+> The req block size is set to 1 to use single block write.
+>
+> Please let me know if this explains the logic of this patch.
 
-> 
-> > 
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >  fs/libfs.c | 8 ++------
-> >  1 file changed, 2 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/fs/libfs.c b/fs/libfs.c
-> > index 74134ba2e8d1..548e119668df 100644
-> > --- a/fs/libfs.c
-> > +++ b/fs/libfs.c
-> > @@ -1555,23 +1555,19 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
-> >  {
-> >  	struct inode *inode = file->f_mapping->host;
-> >  	int err;
-> > -	int ret;
-> > +	int ret = 0;
-> >  
-> >  	err = file_write_and_wait_range(file, start, end);
-> >  	if (err)
-> >  		return err;
-> >  
-> >  	inode_lock(inode);
-> > -	ret = sync_mapping_buffers(inode->i_mapping);
-> >  	if (!(inode_state_read_once(inode) & I_DIRTY_ALL))
-> >  		goto out;
-> >  	if (datasync && !(inode_state_read_once(inode) & I_DIRTY_DATASYNC))
-> >  		goto out;
-> >  
-> > -	err = sync_inode_metadata(inode, 1);
-> > -	if (ret == 0)
-> > -		ret = err;
-> > -
-> > +	ret = sync_inode_metadata(inode, 1);
-> >  out:
-> >  	inode_unlock(inode);
-> >  	/* check and advance again to catch errors after syncing out buffers */
-> > -- 
-> > 2.51.0
-> > 
-> > 
-> ---end quoted text---
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Yes, that makes more sense now, thanks for clarifying!
+
+>
+> >
+> > Under what circumstances do we need to fall back to using "single
+> > block"? Or is this just for debugging?
+>
+> When multiple block write fails, use single block write. This is
+> the software workaround documented in the errata i2493.
+>
+> This is not for debugging. When multiple block write fails, switching
+> to single block write will sccuseed.
+
+Okay, again, thanks for clarifying!
+
+[...]
+
+I noticed your conversation with Shawn, where he pointed out, that we
+already have something similar for READ, which is implemented
+internally within the mmc block device driver.
+
+I don't have a strong opinion on how to do this, so assuming Jens is
+okay with the approach in $subject patch, I am happy to proceed.
+
+If we decide to move forward with this, perhaps we should re-work the
+internal MMC fallback for READ to align with this approach too.
+
+Kind regards
+Uffe
