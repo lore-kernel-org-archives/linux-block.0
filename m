@@ -1,162 +1,139 @@
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012065.outbound.protection.outlook.com [40.93.195.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A80387372;
-	Tue, 24 Mar 2026 14:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED78A3C279B
+	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 14:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774362930; cv=fail; b=suae+DJnVgQAo7hAZ+N19ONqHGFSPg1qIUAQsM47Q9iC41agPTs4EsONe+xqZJ2Yd5yE3AxyrXYIo5HaeMZ7uT58CuGY8EpSvHwdJGi/fT5MZkJcmJzGKndxMgyWqiDH5kJY/YykQ5HZWUPQ+1pUv5Oc6MFK1j4iQpY+8j2sEJA=
+	t=1774364283; cv=pass; b=WGkfXHExsaOC0CgzTQuEJMXvrs+4n2Jj6CiFCc3Nbwy8Ci606yOC5Xqc2QYUNJIlID9cUXAkAdgKB40OfSlRJ6U2uVgHTak+p2d88NtB2OsBvwl6OQbiIhFnjtIc6f90hsmVDWDbzkQr1E/pWT3jRnD7e3MB4uUYVWckVLlMkBk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774362930; c=relaxed/simple;
-	bh=uaRXE1AQ+4d0I8li1QaIR0xTOjuJK+5iZm8ToaZnc2I=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uj5pYRRSWhNIjyL+ZZdXsC3tjwRR9TOyzYYW6gBVR/I0u4bQlfQiWpssK310cW2WJYRSmIGhn+7geUz29feb6PQX56LlmJtnJ9e3aHqS9hnjZjTO28V4ywGGYJzKWB788lk0XA3o2xkIaUgd/Fr5qmBrhl11bg+1qApn7Enmry0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=WV9fTq0Z; arc=fail smtp.client-ip=40.93.195.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1774364283; c=relaxed/simple;
+	bh=6xljpOJUIZOjxqkc8IsQtg/dDMs5h0JMsZuQ2r9xges=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nm9aKR9j7iiqh192Z0sW9JWIFxx6FGZjyDx2BQgLZ/bC3FLM/jFPckK2HJE9cWKOl1K3xeeZi7lkzJU7QCs0pt8LDY7hGiCHJy/TERMTmtaNApQbCYm97g5FEApMMLzSx03mNjaYQEXQEVIaOiGkDxVxHyH4UQqR1ou4FZCqKgU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ownxWEHE; arc=pass smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WV9fTq0Z"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GlXdVO+zWf735ZB7Nu4ndcVJ296ifUrLZe/yADG/ylmMApVvJTQl8YHnmcUD/rIiN84/KVon2RVgvmBbG3J0pOgcBTA7Jc1SvG1tUSmpZ9aBzaVmtUw1typlsWOcAMW0tLIQmjEykzV3+zW2jF7dHj2MqS35cCUsPHwW27dR5kmUNEcyuWPRUzJkG6lgP5EP4UDcZh8gkpssse9gjMOsvsTEHhs4Rhkj3HiQBs1WSHQFOfyBFsHYZqUc3ACPHtsNActjVgjxwUzqCeNWL5317WKX0AUDYi65F40Zv5PlO9mbx1avT1QkKRW9JhQcmW8XytZb4HjN2jAHNcJEacy7tA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a8tOZWZnSyBXHUKu9+s7zAhXxMZI3BbbeGmEo4LTbPk=;
- b=C4Rkjg2Pc122WE32j1d7e11TdOepweDWjYOjN+0nVkcBIi5Izfymx3I5LhATwGrCuWqfG8FJdAl/Bgi4wUtyf3D0pVmxtps7nF3giVoY5gK1bkbCHPkYLZ3Lcw0pJ6djH3oVyazmGjPWR8ahKh1GYbjHxSTy62CQ/tiZkH7F/Gx3yD6EQcSw61Wz7K5YXUil8S6eJYOQPcU2j2aM5lGwQrc234iOZiZFjZIQmyaM9mBuvGlpYPqt8NuCHAynDISdjp9+uVhKkTnT/e/iMg7YGPK/CLfQvRUyBYc56UtJpkt6ALMJ1v4O6wsuJdaQSme2FyfCvqDW1oVRPwkvNMEhrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.194) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a8tOZWZnSyBXHUKu9+s7zAhXxMZI3BbbeGmEo4LTbPk=;
- b=WV9fTq0Z89tLi5Y/IVRKsRGkmuLExOLUnWhyz+JUljrSddbsMMEFuNiqHIuYL0ncvbwtiWtTg5yFGZBSgWYM/J7WOXivvyL05/jSrSHwumc1rp3QZlpu8RWlo0mXf+6VAgMxq9pkbAWV92UKuHni2qQyvr7fJeUU4zlCMf/4wuU=
-Received: from PH7PR17CA0039.namprd17.prod.outlook.com (2603:10b6:510:323::18)
- by DM4PR10MB6862.namprd10.prod.outlook.com (2603:10b6:8:105::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.25; Tue, 24 Mar
- 2026 14:35:18 +0000
-Received: from SJ1PEPF000023D6.namprd21.prod.outlook.com
- (2603:10b6:510:323:cafe::f4) by PH7PR17CA0039.outlook.office365.com
- (2603:10b6:510:323::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Tue,
- 24 Mar 2026 14:35:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
-Received: from flwvzet200.ext.ti.com (198.47.21.194) by
- SJ1PEPF000023D6.mail.protection.outlook.com (10.167.244.71) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9769.0 via Frontend Transport; Tue, 24 Mar 2026 14:35:16 +0000
-Received: from DFLE206.ent.ti.com (10.64.6.64) by flwvzet200.ext.ti.com
- (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Mar
- 2026 09:34:48 -0500
-Received: from DFLE201.ent.ti.com (10.64.6.59) by DFLE206.ent.ti.com
- (10.64.6.64) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Mar
- 2026 09:34:48 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE201.ent.ti.com
- (10.64.6.59) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Tue, 24 Mar 2026 09:34:48 -0500
-Received: from uda0271908.dhcp.ti.com (uda0271908.dhcp.ti.com [128.247.77.70])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62OEYmfb2786579;
-	Tue, 24 Mar 2026 09:34:48 -0500
-From: Bin Liu <b-liu@ti.com>
-To: <linux-block@vger.kernel.org>, <linux-mmc@vger.kernel.org>
-CC: <ulf.hansson@linaro.org>, <axboe@kernel.dk>, <shawn.lin@linux.dev>, "Bin
- Liu" <b-liu@ti.com>
-Subject: [PATCH v2 1/2] block: define new rqf_flags RQF_XFER_SINGLE_BLK
-Date: Tue, 24 Mar 2026 09:34:47 -0500
-Message-ID: <20260324143448.2631888-2-b-liu@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260324143448.2631888-1-b-liu@ti.com>
-References: <20260310160408.3976760-1-b-liu@ti.com>
- <20260324143448.2631888-1-b-liu@ti.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ownxWEHE"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5a13a06fc85so4363288e87.1
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 07:58:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774364279; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JVlklICELVtGHRUsHJpWcpfIc3GeexhU2X3AgHILLk3aF9t+VgmqEMxiU4XXovhzh3
+         0ucAkJThtD3vYh3SKfqtEyJuL94DdE0DwWSNeEsf1L0qBXAKyB6nsWfEl/zt/oSrDuyg
+         FMSrCN8ukhXD8M4fPQCOLFTQVOHuyR17cZi6HMGO/COrhgiK2KyPWgdbqALG2peeHR1V
+         /Evp13XHlhurb4Yw/R2ptKRlNuOk4J7XEYOaa45FZ0BFpdk7pRB8pCiGIX5RF2+nYFSN
+         exzA4wUCY8Kpjn/6uHglZc6tzWWXNtRPvPsI4zGlzr62PPwkXT+1n9JyCHXSWcoMqB/n
+         9j7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=7+/JT4EIQokEZ3mYpEqQ0slSjAC+QW8qaLJ/zLQY22Y=;
+        fh=DHt/bGoQcTTT9BkgS5akojar6qTOxye1pRTx2wHFGgc=;
+        b=azfn0+dZ35nkaOQ9P2/lj094Sq74vz9iKP8gfE62wdmVvNWwl/ZLvRcJYMqPfRcVtG
+         g6HoKPsAVleBmnGaQcM9+1W+Jmamn29zPkcJbBgD3VIaF3b4LkAR3D6UpPV1IrCHv9F9
+         3rOvbdvf9qft8WuffKdJ0tir10Vn3feOZZ6bRdrvtFHxHV5A35c7YL9tWTzwgV6E1Kyc
+         dBDcO5xgBeVQoLTg3DlH++pbwnp8648oCwkxcmoBNX5lvgUHKua8h4Oob1aef6kK4mKO
+         2QQNsuuIW9LF6TDHs15w9+I0gXWRKFnaU7Rvpo88Eb3D4I+7bJLhTeQSVN9fRwEe6QrZ
+         5opw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1774364279; x=1774969079; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7+/JT4EIQokEZ3mYpEqQ0slSjAC+QW8qaLJ/zLQY22Y=;
+        b=ownxWEHEYYC2jomQTGrwaJXdMgBuFy9zPJHCyk0ZOaVZ7KBxtoCkQi5lcEgK0Zow+y
+         gDDdZD0pxLTd1WHB509FfsI0Le28Gq62YegpDITmR/WEc3dTsl5YXqIHorXXuPpmEQ91
+         p2tohFk66GYqeWchk5uaA38ZjV4WfcjgBn+QTXcpVnAUlG2MxMuWOwjnmacgqU4kmEA0
+         F1HGP/4k3lRGUjCU1xbeNV9ZohHu3RNWNJ5fqnW/XKfi/SZPknR/rz+wvl/8d9Ma44Y/
+         1pC4Harh84vFo9O570h8oUMoBSTapUUH5ktajQEAsEoXHFYJsgkMZXhrtt+YxSrLDp9K
+         0WJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774364279; x=1774969079;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7+/JT4EIQokEZ3mYpEqQ0slSjAC+QW8qaLJ/zLQY22Y=;
+        b=j88RbQGIx6DfXf4S2StjLiKgEC2EISzUqa1FbzokSssjo1a/2IA7egjFX6AIlU1L+H
+         JgJsa8vpuB7vaTlk6dywXzB+uO79mkDHCtEhQtXLYA5ukWM4MC5aC8jQUgRKZvgsiu1t
+         2seaXiqXJjbjabfVqss7hIYgh3NYhLzQUV9JZUng0YzNdxDNH8prFxQriVb/dpw7l7/s
+         sdg9TWoEbftnNkSRiB+IxCYZGMIHIo1vcXKavsdrHec68cwNnss8/KIjko6+z+PEYWCr
+         0gYs/947FZMp5ys2ZyxfSl4C8Plfn/8SHK52Oxe8E2CGdBbAP0NyFQwbnnShIyoxUQJ2
+         qrfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUhvWklXEmH+MPQOVAW6a6wxB0nSrRNYtrnqy8mpCyqxpc+yasWmqmYBgDoFicItWFVuWCGGSyH9v+b2Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmvzxJ94Z9MUxkJRbpasIXWYMVWEBwRauDQwk0cZGskkSMAskf
+	EPMVgK7aqMGyup5j3YEBP2fKhvnD/NywiLmDSzgvNoKLoCLq82XNOT5vC7cYEZq3OS84BB79FXB
+	Jp9YSLLd1fO6US+0jWwRsm0IQUxGIbv8SsHp1z27F90NEIBO2O9M+A3s=
+X-Gm-Gg: ATEYQzx1KPYLnfEsm0xlbuvcl1rxtx6K/Ob/i3dqjK4FuML3BE+bdYZO/dqEeIgRq4n
+	tPqOI2zpDscyILA8dhXDjARANdU3EZwXf/OhRemVhjpg/ujmjDnduem7IY+FtHV/AR/A0q26T4D
+	pGqJZZ++dRwEY71CpVBtHlc8nX/50ybE0Rwz/VZhaL/qrwpB2r0fB15WLJppeTajB0X7ne7dRgI
+	hpiP3d4/hqvke9s+kKrBQG0TJEedsgn4J9tDo9ritbKM6ese2kweyMu6MT2h/sVKVs3F7i12zFg
+	yFaruYZ/U6t5sFbjTIg=
+X-Received: by 2002:a05:6512:3501:b0:5a1:42c9:d978 with SMTP id
+ 2adb3069b0e04-5a285af967cmr5754009e87.1.1774364279081; Tue, 24 Mar 2026
+ 07:57:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D6:EE_|DM4PR10MB6862:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8570fa48-99d2-4cb6-87cd-08de89b29120
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|1800799024|376014|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	H5+w4LZOiqKlHLxRxowk5VjdXCNUi2F01WWlvqzmLkizdqenWZk7paVplU7hIJMxuFThUOP8HBgDGgVHY/sxZMYJixhAVQdH2/QjXuYOckqlcoehqVuGJswW707mt37Rb8t4MQIDn9FAJsRE6QgCiOV5ZoKwv0pAR+v2/cJLODPGsntw+ZTxqLnw7w4hem/1k7xDxuHPdWytH4OcL43YpJ1z0cbh+JZoTZfQzprgiemqB6QE4DmL8GKBOD2udZNrsAAHTmwPEEswO6zbMmkDBDSUf2/jYBvyhu2toTLqT6FwtnoNujYo7VYzOaJ2LZpMboIvUXkdNm/fGEAG8sP3i5Us694XZ3LHIvKQMewmUxOPU7merNbli7Pf46lJrTWhsdwx99zoMcIaRgdUQv/OjsaA2EbWyo93TR8CwxsWTQAJ80qEnrX1hG8UWQwWbG96Xn3e4aSzrAE2yIU4YC12XCCqX+J6lnM4TKDHJuolk9f7VWqXO2vUxhJysHfAVLg0AmQJWnKCUbovtBrbHH9zcv44ZeHTXwW0THJ4d6XB692RgZ7CllUrEQt0mJ9B/URyUGwYr4qcaowugtjje38hGjVwm1+vcQGbfoyrySYKUDEDur77N83IfSNNQi8Ci1ojvqwc5FBLai9DyY+xXre5uKBFPDekQuCvV9tULu/qgtHqWOr0RvePhtty1Gihp6tJW0w2fwyjJVzz9jMrOlVBebvU4r00sc8KkxCpltC8pcON782hvFnwAYxkuSQtXHldiYdS6djVVQRcjVqoITQ0Xg==
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(1800799024)(376014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	eySVEUaJIUsWG41pJ+iCIWgEWHj36wIpbIJsfgFJuGmRRSy2K/+YORKIABFQNUZYZ/d2n1smZuhv6faazsV+TG7gVp7zzBjxKuA7EbIKKWlXsPGGkmqi4uNsYmuVy2iUfzyGEeECivv/n8n6cRvmftaPzcP+DxJhWJHEfQdiQb0Q9khKTdYQHu/UdQPRwjRUYGTtxio5jRyU3g8cWNupWahMi2nu0mAgQi9X3I0gNolA4WVWLJWsfudUeO6bI3CehJlACRvpoCL9j01+kwcCRcjEu1vuCnlPEkbjBBPlICXISBU4793Ilnt7VIXdlWGAwfgrRhagB61DULOfwbiHlPTus9OyUfhXJ8GZPo2QWwyua81JcDLVM9C/6nDbctubRdmaukBT3wCgWXHgYqq2jzIyRl7eztF1l0ExPR7QqU9Y75FEsZXsIqaoshpuhxMS
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2026 14:35:16.3880
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8570fa48-99d2-4cb6-87cd-08de89b29120
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D6.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6862
+References: <20260310160408.3976760-1-b-liu@ti.com> <20260324143448.2631888-1-b-liu@ti.com>
+In-Reply-To: <20260324143448.2631888-1-b-liu@ti.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 24 Mar 2026 15:57:22 +0100
+X-Gm-Features: AQROBzBoKLSC5g41HZ9oD8gxep-eNNKjSY-hwFAbhml6t5GCMNqJZlpxQ2HWs0k
+Message-ID: <CAPDyKFo5h57uiym=WuKBLji-VwcDtCiCBu434RpmZdYTWzSm_w@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] mmc: block: use single block write in retry
+To: axboe@kernel.dk
+Cc: Bin Liu <b-liu@ti.com>, linux-block@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	shawn.lin@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-This new flag will be used to handle multi-block transfer failure, in
-which case single-block transfer will be used.
+On Tue, 24 Mar 2026 at 15:34, Bin Liu <b-liu@ti.com> wrote:
+>
+> Due to errata i2493[0], multi-block write would still fail in retries.
+>
+> With i2493, the MMC interface has the potential of write failures when
+> issuing multi-block writes operating in HS200 mode with excessive IO
+> supply noise.
+>
+> While the errata provides guidance in hardware design and layout to
+> minimize the IO supply noise, in theory the write failure cannot be
+> resolved in hardware. The software solution to ensure the data integrity
+> is to add minimum 5us delay between block writes. Single-block write is
+> the practical way to introduce the delay.
+>
+> This patch set reuses recovery_mode flag, and switches to single-block
+> write in retry when multi-block write fails. It covers both CQE and
+> non-CQE cases.
+>
+> link to v1:
+>     https://lore.kernel.org/linux-mmc/20260310160408.3976760-1-b-liu@ti.com/T/#u
+>
+> [0] https://www.ti.com/lit/pdf/sprz582
+> Signed-off-by: Bin Liu <b-liu@ti.com>
+>
+> Bin Liu (2):
+>   block: define new rqf_flags RQF_XFER_SINGLE_BLK
+>   mmc: block: use single block write in retry
+>
+>  block/blk-mq-debugfs.c   |  1 +
+>  drivers/mmc/core/block.c | 12 ++++++++++--
+>  include/linux/blk-mq.h   |  3 +++
+>  3 files changed, 14 insertions(+), 2 deletions(-)
+>
+> --
+> 2.34.1
+>
 
-Signed-off-by: Bin Liu <b-liu@ti.com>
----
-v2: new patch, separate the new flag definition.
+Jens, if you think this approach is okay, feel free to take the series
+via your tree. Or if you prefer me to handle it, please let me know.
 
- block/blk-mq-debugfs.c | 1 +
- include/linux/blk-mq.h | 3 +++
- 2 files changed, 4 insertions(+)
+For the series:
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 28167c9baa55..5f97d07fa3c8 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -243,6 +243,7 @@ static const char *const rqf_name[] = {
- 	RQF_NAME(ZONE_WRITE_PLUGGING),
- 	RQF_NAME(TIMED_OUT),
- 	RQF_NAME(RESV),
-+	RQF_NAME(XFER_SINGLE_BLK),
- };
- #undef RQF_NAME
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 18a2388ba581..06b6e1c4fca3 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -64,6 +64,7 @@ enum rqf_flags {
- 	/* ->timeout has been called, don't expire again */
- 	__RQF_TIMED_OUT,
- 	__RQF_RESV,
-+	__RQF_XFER_SINGLE_BLK,
- 	__RQF_BITS
- };
- 
-@@ -85,6 +86,8 @@ enum rqf_flags {
- 			((__force req_flags_t)(1 << __RQF_ZONE_WRITE_PLUGGING))
- #define RQF_TIMED_OUT		((__force req_flags_t)(1 << __RQF_TIMED_OUT))
- #define RQF_RESV		((__force req_flags_t)(1 << __RQF_RESV))
-+#define RQF_XFER_SINGLE_BLK	\
-+			((__force req_flags_t)(1 << __RQF_XFER_SINGLE_BLK))
- 
- /* flags that prevent us from merging requests: */
- #define RQF_NOMERGE_FLAGS \
--- 
-2.34.1
-
+Kind regards
+Uffe
