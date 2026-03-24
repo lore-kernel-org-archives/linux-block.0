@@ -1,249 +1,151 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FFB3DC4D9
-	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 09:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4B43A4511
+	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 10:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.174
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774345022; cv=pass; b=etxtx/uFOds5b+I3Z9XiAT+QZdftfYgAUijjwD4eWHHPP4SwmImzCsybpJYbFvrC8WX+dryvqJeoiLMG63NoYqgnSxDSHFHZp4GrWF6fgX2ox2XuTBOC7WUwWutaJfAVBhOnePf/PgfdoVuhjelWH/s3WSscS4jcVS//bcLG+38=
+	t=1774347024; cv=pass; b=FlLfTRm/tdTGS0W285ZkS8OssxzIBfOR9BpAo5ObFE18tnHvKr5lz72KVnkK//Jenbc8sOMC9sCfUllwt6LD4VVYKKEn6CICpEw8NdaqQAGciLodpVIhRz8vsxF14dRd5EQt5dweNgOl6RWltf1H/6nnoRrhi01aZKd3S5XToIE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774345022; c=relaxed/simple;
-	bh=JV481TRX/Dx8xXrjNX9tltXZwt52q0seBxFVj0eKdEg=;
+	s=arc-20240116; t=1774347024; c=relaxed/simple;
+	bh=9Ek7AJI4xdm8ormJKdTuU+K0CnPhIRmyXsrFat6ksds=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D9G5EI4++jGNi3eLQ50lMZW6AIjORqASM5oNdbeC+doU8Gd5XyYh/DgzdGlYIPkTSUlr4e3G9sI5juBcxv4TPGsy8gd9cqKxSqa963bxqUvdXTspvD5VtNQvxF1xbM5ZW5v8u4eCvL60wcMNWNubV0hS84CHeBhmZyhZbr5FAa4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LR/xx7SI; arc=pass smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 To:Cc:Content-Type; b=QDC+D4EaWRyuZAVowO6knKO6AGsRqVUrXX6O6cuVl4tg3jtEiKcsnvk4gTC44D4LJJ/6SJeT1HscXnaEDqvT+R4Di1I9P1yJfPoUDP8UqCipP3NJsKZJ1/5YKV5bd0f2XQYiKGSjcGtP878sVXFR2sSoXjUuq6D8tvNFOn16Pw8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=APzdwePv; arc=pass smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="LR/xx7SI"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43a03cb1df9so1139189f8f.1
-        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 02:36:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774345017; cv=none;
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="APzdwePv"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-3878de20527so27289791fa.3
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 03:10:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774347019; cv=none;
         d=google.com; s=arc-20240605;
-        b=LjyxEE4Gy5ePauWOWPvOmdOpviyUEkwYtadz3t0NROhte/3cLFK+t6AT7eHHdl6KiS
-         k601bjkxsZl5pblKsmADKvPZPLOxR3tj42oXUIOU1/jkHP80WG49QYMC+ML29huQPZX7
-         3kVg8Ge3iVGVASKj4Yfjnj3WZrNsEgr+Q2mjYMjp4xwFBL5dlWxLpZnsIN82q9RkUU6f
-         T3sWGXTeN18+QxnPCumNXDOhuxPVoAOugwnmodDX0QFiTXyO57LMcxas0aXg6f3vtHC/
-         itX00pEJqixIkOeTWQSf9O8r2LBCPCGvD6rRxXOSIFKYPuYjVyJyQdeo1FnyY507mkw7
-         Xmow==
+        b=fQn0qfEVVGM/4sSKAGVlL6jyKvCQ5eiaxR3dYqoWZwPy+hasFlvT6ZWFi+VBsiHu4i
+         tfOPYICfy4jTkko5m+mkPvrU9TWNl5lqbMyvQIfyvmQ1qJwpXqVeUtfyObk+qX1g4t22
+         YJW1JDFmQbCSMJieYuULTOJ9KOdOtScoT5fdQVq51Ok8okx8aHZdWXsN/2NCbqpJWDJN
+         hvprS9qo+1fdhs+MK8WcM1M5mGwC/rNpmkfJIAH5oHU2Wd8PSgqQMZZb00o0nTMLwMC8
+         G+O4zrMcgqetXjvwTU7WKd2S6aqPY6SUSu9KYuZ+XW8xHem1w44bKBWrpPymWPjSakhw
+         jvbw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=ub5wN9amaO/DAAvFXES2RrEzabJn769sowl2xsPaADQ=;
-        fh=2pjpW8y8063Y/yDZ3LJlQZqSfjq5Wt5FEkRC9kUMN20=;
-        b=jsrGqH+ZrKdmEWP8NKQCWyd2fWSzT08okBh/qjpylIV9HO3ueBWf6Ax8q72dFL70p1
-         hHYY1+FUoXfYrNPujuBLPyZBdi1WYVDsjBXqf6BtXonehrhSi+AWUmjXwacADMvQDi5z
-         h4+yPSJlMVY5JfRtkaUIQMICazcfY2PH46LgfT6dlzr0yIysf+MeH68yWDdRKcYSaEvx
-         S12cX1z0TuAo8QDOkD/RccqYckTTg1Bz1AmvTrrsKo3NSpqGyPuVzu7D7e+PeBE4AaMp
-         mldbdgKyIoSG5xFZYM2lr898+MUTs+ckDdmfDnPMCm9LKaTrLLpsfrqRG/tb1MH/s9Ao
-         +QZg==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=EPF+TV96jiFOeR963Kh3r/N94rHBy9mldlcZSNoUqI8=;
+        fh=J9aGrwLIDyQhEXMVPXc2XH/TCtDrLgh8d3l2wl1Hwsw=;
+        b=Vek3tlYSODeN1qILoY27yo2u+oZcJP4R6zcrAricjUWzpAabN2e1VSnjBvzs6vbnE0
+         DOLxI8dCRzuSujxVFvY4hGVm/aX+f/w9/koFI5TLSad5FG8IoxbefLQPBzPea29jraiM
+         yqNRyUYEh4xR8+qd6Ax+jhnAFMZ1SDzujwkbCifTxYbXi01jpwgkJAOxL1q1a0+b12B0
+         hTWDHJgEPjKdm5au/P4+Ac7mV5j/inG6JCwdyfSgDonC/GS+/YpD+FUZeutsZCYMWK9o
+         6amw4r1XYnUkKgJsvJsA8c6znjgTAwp090LQhx2ZZxfeVzvjFx6GYc4WiC2etm5AvHLM
+         2Xnw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1774345017; x=1774949817; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ub5wN9amaO/DAAvFXES2RrEzabJn769sowl2xsPaADQ=;
-        b=LR/xx7SI5kncamtwfDMCZsdLzL9v2Vv+1wsvvSda4nYW33Dgt20Mwkq1nG278aI1h3
-         QfOJpdmD6BSzA3Oqrr3lvmc3YSishR6XKUjKNqErydpJB/08lKKtkRrR7fjOn+K20yA0
-         f2mEuXbkDWSUeT+FDPsVFKUMP73alN7cNy8NHTMcCLqsrGqwrl6mvm8vZbYK+o4a/+wM
-         pZF8CyL72yj0UlFTqcGIoq4aj2alY/7p46cWd+QrxCNXGrZjAoJ5kZDzZ94RZEocUmOM
-         Qx86u2UQbXXm6eYKnp6FD9sf2RK4r9xew6NLUI2bkBgA5jHBRygvDTuFNmq4DGnlVjIy
-         eCJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774345017; x=1774949817;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=ionos.com; s=google; t=1774347019; x=1774951819; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ub5wN9amaO/DAAvFXES2RrEzabJn769sowl2xsPaADQ=;
-        b=mAVC9QB8ci4zIeBOQHP7ckyeZ+C/l+oMOzKhBE5vrmv7FbMuS2OK+UKmnFrZ/0OTAc
-         Yz/7eZxqCyNsKpY809A+hJx5EMXyMSLSlZcNLXDU/oDvuHqujo8hH1EwNZJSzFlVeisn
-         YKHY4GwU0SP6pCjfFpltop3miz4sD9PNBLJfNMnUymwuOi1xlqMMCBpEQlNQDhGv+upH
-         TsjIX+uERS/EdSxJ7BSdbiqIVheEzvYi7TYCE46ZpOEY0E2kIlRvOjIdc2Za+9gytjgE
-         yhH+jsDIL/0jhzvcjfx7s57Z9CGL+p2DsPCfNYXz4/SO6fSd+BnGpDZnIqkA/HpcnDa0
-         cExQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRCQRJNTQ9/glxD+XMJ+yzTWZSqmdUWcGasnQsSXkOCXYiWzzZzgkRWVFCNHrMHTlgx+9TRE33Lkgw9w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr+TwvUflSiAXEkJ5+LGrTNCW6Zu03Kc5ax1ySGPnLleoI9OJF
-	ufZoLL143GEeVgZhzSBKrXAM/izFZgC7lCpRF8QpcUjhAbTiuacFE/8x9Qxy8RnN3TB8EOG9B9+
-	P+XnpsAtbyvCeicdFD8VT/3aPzkRbBWzvlC10hZXZoA==
-X-Gm-Gg: ATEYQzydHZjjz+pyp73P69NPuWSzRdXkADpcBg+SrJZLihMxoTHXR8D9fjBRH8RSStD
-	9TmpMf1mmlfqaFOm+xNdj3qrCqKRQiaPTiM5kciBnig2fhM/6w2Mpek2XnSa8l13pHojQQbAP6z
-	74m9OV0Sj5d80xSOldpXsvU1/com7YnWd1pxz6BSOykEHJv2u1VtDLXkwImUeDnONQ4E6tG2369
-	ZPfahHBXJRyitEPHF16P4W1Z7x2RxhYJatnFMFDK2QBmCWHRKD8BPLHpiP/J7BRaq06o1PsK00+
-	4M7Cxn63+MQpyo6WIiT2OEVBcv414hLVscguPuGFGciVh2eMG5fn0JVpkTA4+k8082j5FDUBjU2
-	KsXE6
-X-Received: by 2002:a05:6000:22c2:b0:43b:3caa:a20e with SMTP id
- ffacd0b85a97d-43b6426b68emr24185879f8f.32.1774345017497; Tue, 24 Mar 2026
- 02:36:57 -0700 (PDT)
+        bh=EPF+TV96jiFOeR963Kh3r/N94rHBy9mldlcZSNoUqI8=;
+        b=APzdwePvyiZhp5VS0zRI4PsAddmlhdtCFQojq1TTWFHv1E3gvfpp/LKzhjGwBYca4m
+         6NyIosrxjhxXOkpSfNn0aAm1harHSUXGprxbeQ93BgNDaAD846yzWQnZ1S6c2bHV0zPm
+         XnN0VCXe1ZZau1R5JCc23MEqDu2c7j4cYSUCsF0nvmNntGJmcQ8ttoCr4rFjMZy23oxi
+         18Txsuik6nuzeNVvKrYmrFpJbf1ScDcI5QR3UbGODaHf4bOO0GIbHhwvKjWrIJ+yhOot
+         L91g6BMTzRvm+c5RjShvp5zNilYBAPeXOvsafJVEOzDCqCpIE0ZewyT784cZr9mCBKvC
+         s9mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774347019; x=1774951819;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EPF+TV96jiFOeR963Kh3r/N94rHBy9mldlcZSNoUqI8=;
+        b=r/uVwfCO+iUhjEW2JRa405QKDe35nIEcM4LszXGn8K7OD/SGnojG+XGx7OZuXtNzWX
+         Kh2f2Qs+LlqMLikD5d8ISSZ/WTl/vv4K48sFG41V0hW1WzMvJ8/R3Vl0nmPuqyT+6Urs
+         n/FNSqNnXb+/dBW8EGAPpzXy8/CAisB5oLvlvRVrWiwHY8KWd+mndxEPziQCW84gSS0N
+         VsXhtWU3TeZPKXmCwfaCx7CzdYUkGP3YUTCkbwCS8HQGCUANwgQFTl4xQnPhfx9LGs4p
+         spxJa6DVGYPUk5yunMHUVh9Mn5RXsgW7jDJHnKLwhQvZO9xnQUMKQF31Xg7W1reUy/9x
+         Y6nQ==
+X-Gm-Message-State: AOJu0Yy8JMCWzS7T6xVFmd3OGbUsM2cO2ClcyGAniUOp8jQOFjuKSbev
+	6+hgNRx8ILVXwvLXKzoj6EgqUNe4Wv33B2gRj5iveQtJOi+hljQVIc+eKjhCZbnrSnjK8MOcCKV
+	9jUNdf6zxzy5WHpZ2sZ/jd5sBYvyhXDRgvKKo53VDs4u+Il7/u6n7
+X-Gm-Gg: ATEYQzz4VfDxw1ZgjztZOTFn8ecUVNzCzVTZdlCCz92LvVA+/vK6NUbUdmIPS97PN8Y
+	LVyW5ioc/0f4d8JumHnNsy2/uwvPxTNaoTcsO4xeTOT6qnJew+nvz4brAeIN+gCq6Ery1NcCcH9
+	Y8Fo2mM6l6WPBb9x5r0KUAIsL2E+fnRxcRQA4TbYhirTqOV6wC7w8fE+lIJH/DIkp6wvfrszq24
+	UBSnh7Mpd7NS8iRFdAykPONNslReqVBSgB6KKex/F88VG+ErG762OVdn03lj94DAbOMNmHbZLaD
+	bcLMVT7tyZqxNYYLL5AqOSOKyFhnpHXYXaw0pv+UgQ7F/mFNK+wyCiAeSso5AyNtiKPs
+X-Received: by 2002:a2e:be11:0:b0:38b:e305:a03b with SMTP id
+ 38308e7fff4ca-38bf96ddf1cmr49020941fa.30.1774347018896; Tue, 24 Mar 2026
+ 03:10:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-33-neelx@suse.com>
- <20260208151126.3129410-1-clm@meta.com>
-In-Reply-To: <20260208151126.3129410-1-clm@meta.com>
-From: Daniel Vacek <neelx@suse.com>
-Date: Tue, 24 Mar 2026 10:36:46 +0100
-X-Gm-Features: AQROBzAcrSb8NLZh900STza2vyMCNtV9c0i8E1h6tC3jXGjIJZj-4KJUOFxGeHU
-Message-ID: <CAPjX3FchHbyQMUqogjyf4tUpT49HnO==_E6Uj=Zz7BXYUhJvsg@mail.gmail.com>
-Subject: Re: [PATCH v6 32/43] btrfs: implement process_bio cb for fscrypt
-To: Chris Mason <clm@meta.com>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <CAHj4cs_mRpS=uqW=2NF8RdzW2jjgu+3LhmCFiSK2kahRmTS-tw@mail.gmail.com>
+In-Reply-To: <CAHj4cs_mRpS=uqW=2NF8RdzW2jjgu+3LhmCFiSK2kahRmTS-tw@mail.gmail.com>
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Tue, 24 Mar 2026 11:10:01 +0100
+X-Gm-Features: AQROBzAKCOd3b1KWlVmDIptuhRqjXLCQO7kKHpoXhHy-IkmRsf-em7cfPKsqJm4
+Message-ID: <CAJpMwyjAQhL9H_5Odz3zg12D-ja3VdsbZbwE2TxuLEsaP5KQbg@mail.gmail.com>
+Subject: Re: [bug report] blktests rnbd/001 hang on s390x server
+To: Yi Zhang <yi.zhang@redhat.com>
+Cc: linux-block <linux-block@vger.kernel.org>, jinpu.wang@ionos.com, 
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+	"Zhijian Li (Fujitsu)" <lizhijian@fujitsu.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 8 Feb 2026 at 16:12, Chris Mason <clm@meta.com> wrote:
-> Daniel Vacek <neelx@suse.com> wrote:
-> > From: Josef Bacik <josef@toxicpanda.com>
-> >
-> > We are going to be checksumming the encrypted data, so we have to
-> > implement the ->process_bio fscrypt callback.  This will provide us with
-> > the original bio and the encrypted bio to do work on.  For WRITE's this
-> > will happen after the encrypted bio has been encrypted.  For READ's this
-> > will happen after the read has completed and before the decryption step
-> > is done.
-> >
-> > For write's this is straightforward, we can just pass in the encrypted
-> > bio to btrfs_csum_one_bio and then the csums will be added to the bbio
-> > as normal.
-> >
-> > For read's this is relatively straightforward, but requires some care.
-> > We assume (because that's how it works currently) that the encrypted bio
-> > match the original bio, this is important because we save the iter of
-> > the bio before we submit.  If this changes in the future we'll need a
-> > hook to give us the bi_iter of the decryption bio before it's submitted.
-> > We check the csums before decryption.  If it doesn't match we simply
-> > error out and we let the normal path handle the repair work.
+On Sat, Mar 21, 2026 at 2:00=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wrot=
+e:
 >
-> Hi everyone,
+> Hi
 >
-> I'm running the btrfs for-next branch, along with the encryption patch set
-> through my AI review prompts:
->
-> https://github.com/masoncl/review-prompts
->
-> I'm working on some btrfs specific instructions, but hopefully these reviews
-> are already useful.  I've kept the headers to make it easier to double check
-> that I'm actually replying to the right email, but please let me know if any
-> parts of this are incorrect:
->
-> commit 2b25418669e46c939ff864b1144e2c27d618920c
-> Author: Josef Bacik <josef@toxicpanda.com>
->
-> btrfs: implement process_bio cb for fscrypt
->
-> This commit implements the ->process_bio fscrypt callback for btrfs,
-> enabling checksum verification of encrypted data before decryption and
-> checksum generation after encryption.
->
-> > diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
-> > index 3b420866f3b82..c28f3f53bad28 100644
-> > --- a/fs/btrfs/bio.c
-> > +++ b/fs/btrfs/bio.c
-> > @@ -300,6 +300,34 @@ static struct btrfs_failed_bio *repair_one_sector(struct btrfs_bio *failed_bbio,
-> >       return fbio;
-> >  }
-> >
-> > +blk_status_t btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio, struct bio *enc_bio)
-> > +{
-> > +     struct btrfs_inode *inode = bbio->inode;
-> > +     struct btrfs_fs_info *fs_info = inode->root->fs_info;
-> > +     struct bvec_iter iter = bbio->saved_iter;
-> > +     struct btrfs_device *dev = bbio->bio.bi_private;
-> > +     const u32 step = min(fs_info->sectorsize, PAGE_SIZE);
-> > +     const u32 nr_steps = iter.bi_size / step;
-> > +     phys_addr_t paddrs[BTRFS_MAX_BLOCKSIZE / PAGE_SIZE];
->
-> Can paddrs[] overflow here? BTRFS_MAX_BLOCKSIZE is 64KB, so the array
-> has 16 elements (64KB / 4KB). However, nr_steps is calculated from
-> iter.bi_size which can be much larger than 64KB for merged bios.
->
-> If a bio has bi_size > 64KB, the loop below will write beyond the array
-> bounds when filling paddrs[slot].
+> I found this issue when I running blktests rnbd/ on s390x server,
+> please help check it and let me know if you need any info, thanks.
 
-Indeed, that's very true and I can easily reproduce it.
+Thanks for reporting.
+We'll take a look and come back.
 
-> > +     phys_addr_t paddr;
-> > +     unsigned int slot = 0;
-> > +
-> > +     /*
-> > +      * We have to use a copy of iter in case there's an error,
-> > +      * btrfs_check_read_bio will handle submitting the repair bios.
-> > +      */
-> > +     btrfs_bio_for_each_block(paddr, enc_bio, &iter, step) {
-> > +             ASSERT(slot < nr_steps);
-> > +             paddrs[slot] = paddr;
-> > +             slot++;
-> > +     }
-> > +     if (!btrfs_data_csum_ok(bbio, dev, 0, paddrs))
 >
-> Does this verify checksums for all sectors in the bio? Looking at
-> btrfs_data_csum_ok() in inode.c, it verifies one sector's worth of data
-> (one blocksize). The function is called with bio_offset=0, meaning it
-> only checksums the first sector.
+> dmesg:
+> [   72.319120] rdma_rxe: loaded
+> [   72.358181] rtrs_server L2371: Loading module rtrs_server, proto
+> 2.0: (max_chunk_size: 131072 (pure IO 126976, headers 4096) ,
+> sess_queue_depth: 512, always_invalidate: 1)
+> [   72.380277] loop: module loaded
+> [   72.399060] run blktests rnbd/001 at 2026-03-21 08:42:02
+> [   72.408570] infiniband enc600_rxe: set active
+> [   72.408573] infiniband enc600_rxe: added enc600
+> [   72.422914] rnbd_client L607: Mapping device /dev/loop0 on session
+> blktest, (access_mode: rw, nr_poll_queues: 0)
+> [   72.488056] rnbd_client L1192: [session=3Dblktest] mapped 2/2
+> default/read queues.
+> [   72.488199] rtrs_server L1058: <blktest>: Processing read request
+> failed, invalid message
 >
-> However, the bio can contain multiple sectors (iter.bi_size could be
-> much larger than one sectorsize). If the bio has multiple sectors,
-> shouldn't this call btrfs_data_csum_ok() for each sector, or pass the
-> actual bio size so all sectors are verified?
+> # uname -r
+> 7.0.0-0.rc4.260317g2d1373e4246d.37.fc45.s390x
 >
-> The existing btrfs_check_read_bio() function loops through all sectors
-> and verifies each one individually.
-
-This is also correct. Both points fixed this way:
-
---- a/fs/btrfs/bio.c
-+++ b/fs/btrfs/bio.c
-@@ -343,11 +343,13 @@ blk_status_t
-btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio, struct bio *
-     struct btrfs_fs_info *fs_info = inode->root->fs_info;
-     struct bvec_iter iter = bbio->saved_iter;
-     struct btrfs_device *dev = bbio->bio.bi_private;
--    const u32 step = min(fs_info->sectorsize, PAGE_SIZE);
-+    const u32 blocksize = fs_info->sectorsize;
-+    const u32 step = min(blocksize, PAGE_SIZE);
-     const u32 nr_steps = iter.bi_size / step;
-     phys_addr_t paddrs[BTRFS_MAX_BLOCKSIZE / PAGE_SIZE];
-     phys_addr_t paddr;
-     unsigned int slot = 0;
-+    u32 offset = 0;
-
-     /*
-      * We have to use a copy of iter in case there's an error,
-@@ -357,9 +359,13 @@ blk_status_t
-btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio, struct bio *
-         ASSERT(slot < nr_steps);
-         paddrs[slot] = paddr;
-         slot++;
-+        offset += step;
-+        if (IS_ALIGNED(offset, blocksize)) {
-+            if (!btrfs_data_csum_ok(bbio, dev, offset - blocksize, paddrs))
-+                return BLK_STS_IOERR;
-+            slot = 0;
-+        }
-     }
--    if (!btrfs_data_csum_ok(bbio, dev, 0, paddrs))
--            return BLK_STS_IOERR;
-
-     /*
-      * Read repair is slightly different for encrypted bio's.  This
-
-Thanks!
-
---nX
-
-
-> > +                     return BLK_STS_IOERR;
-> > +
-> > +     bbio->csum_ok = true;
-> > +     return BLK_STS_OK;
-> > +}
+> # ps aux | grep rnbd
+> root        1492  0.0  0.0   8276  4436 pts/0    S+   08:42   0:00
+> /bin/bash ./check rnbd/001
+> root        1521  0.0  0.0   8288  3292 pts/0    S+   08:42   0:00
+> /bin/bash ./check rnbd/001
+> root        1523  0.0  0.0   8424  3664 pts/0    D+   08:42   0:00
+> /bin/bash ./check rnbd/001
 >
-> [ ... ]
+> # cat /proc/1523/stack
+> [<0>] send_usr_msg+0x120/0x170 [rnbd_client]
+> [<0>] send_msg_sess_info+0x1d2/0x210 [rnbd_client]
+> [<0>] find_and_get_or_create_sess+0x274/0x2f0 [rnbd_client]
+> [<0>] rnbd_clt_map_device+0xf6/0x7b0 [rnbd_client]
+> [<0>] rnbd_clt_map_device_store+0x228/0x320 [rnbd_client]
+> [<0>] kernfs_fop_write_iter+0x168/0x220
+> [<0>] vfs_write+0x282/0x450
+> [<0>] ksys_write+0x84/0x110
+> [<0>] __do_syscall+0x166/0x600
+> [<0>] system_call+0x6e/0x90
 >
+> --
+> Best Regards,
+>   Yi Zhang
 >
