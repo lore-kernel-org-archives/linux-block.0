@@ -1,138 +1,249 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179831DC985
-	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 09:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774342864; cv=none; b=R+QFOTC7eQDv5lh9F6z8d7i7vObO714YB5MHakRrpC3P6wgGzpbPGDuuP6TYH6p3Ii2Q0AZk2L0LSds3OK2uOW5HU12Rqz6eJxQ6RtknS+23W9gWD9Mf4HJAPV8XB3XfhagWK7xHqFtZqO5AjcvYX6j2yTo7gW0cWUn5bxQilHE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774342864; c=relaxed/simple;
-	bh=NUCt9499jjNNkuEEykHY4WzmSJ+p9GFYgLXZ1YnXaWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BQd9wkcgCPGDIdN3qw0nMi1+UhsQE/KIRVyobdhw2T9W8udOJdeat3siNkjO6IhlYmDFPPHUbEEKxruhVMPvXiwpgLm+QMjx6JZywcCOwVxLgiIZ+uLhK0ysAjzJRBNhul5QO55Tglf27TRm2pvx/LllJSrIyBjStu7aKLzo0Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J083fDTN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FFB3DC4D9
+	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 09:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774345022; cv=pass; b=etxtx/uFOds5b+I3Z9XiAT+QZdftfYgAUijjwD4eWHHPP4SwmImzCsybpJYbFvrC8WX+dryvqJeoiLMG63NoYqgnSxDSHFHZp4GrWF6fgX2ox2XuTBOC7WUwWutaJfAVBhOnePf/PgfdoVuhjelWH/s3WSscS4jcVS//bcLG+38=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774345022; c=relaxed/simple;
+	bh=JV481TRX/Dx8xXrjNX9tltXZwt52q0seBxFVj0eKdEg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D9G5EI4++jGNi3eLQ50lMZW6AIjORqASM5oNdbeC+doU8Gd5XyYh/DgzdGlYIPkTSUlr4e3G9sI5juBcxv4TPGsy8gd9cqKxSqa963bxqUvdXTspvD5VtNQvxF1xbM5ZW5v8u4eCvL60wcMNWNubV0hS84CHeBhmZyhZbr5FAa4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LR/xx7SI; arc=pass smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J083fDTN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774342861;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GAFdc90vtERiRN159wE1VgpqPHexiDdaSJGXbwhit1k=;
-	b=J083fDTNNC9LxmjWwo5lySawsKA0/IDf4XQ2WMhrwH2wTO0eArOXQ7xmlC+c9jUhfIiC1m
-	AJwB/nCrkGF4uzTGmiWnaj+LZzq/UB7Ic4TESH3IbFqiAfOhLRZ7r9tkI27BVPbH7tPe0S
-	1hfxKmPewvYnv7x9sAS2WNWFBedp0GM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-2-RxjzfJo3NYqPteGTj33nqQ-1; Tue,
- 24 Mar 2026 05:00:59 -0400
-X-MC-Unique: RxjzfJo3NYqPteGTj33nqQ-1
-X-Mimecast-MFC-AGG-ID: RxjzfJo3NYqPteGTj33nqQ_1774342858
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6917A18002DC;
-	Tue, 24 Mar 2026 09:00:58 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.133])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 38A18180035F;
-	Tue, 24 Mar 2026 09:00:56 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH] bio: fix kmemleak false positives from percpu bio alloc cache
-Date: Tue, 24 Mar 2026 17:00:52 +0800
-Message-ID: <20260324090052.1782766-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="LR/xx7SI"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43a03cb1df9so1139189f8f.1
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 02:36:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774345017; cv=none;
+        d=google.com; s=arc-20240605;
+        b=LjyxEE4Gy5ePauWOWPvOmdOpviyUEkwYtadz3t0NROhte/3cLFK+t6AT7eHHdl6KiS
+         k601bjkxsZl5pblKsmADKvPZPLOxR3tj42oXUIOU1/jkHP80WG49QYMC+ML29huQPZX7
+         3kVg8Ge3iVGVASKj4Yfjnj3WZrNsEgr+Q2mjYMjp4xwFBL5dlWxLpZnsIN82q9RkUU6f
+         T3sWGXTeN18+QxnPCumNXDOhuxPVoAOugwnmodDX0QFiTXyO57LMcxas0aXg6f3vtHC/
+         itX00pEJqixIkOeTWQSf9O8r2LBCPCGvD6rRxXOSIFKYPuYjVyJyQdeo1FnyY507mkw7
+         Xmow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=ub5wN9amaO/DAAvFXES2RrEzabJn769sowl2xsPaADQ=;
+        fh=2pjpW8y8063Y/yDZ3LJlQZqSfjq5Wt5FEkRC9kUMN20=;
+        b=jsrGqH+ZrKdmEWP8NKQCWyd2fWSzT08okBh/qjpylIV9HO3ueBWf6Ax8q72dFL70p1
+         hHYY1+FUoXfYrNPujuBLPyZBdi1WYVDsjBXqf6BtXonehrhSi+AWUmjXwacADMvQDi5z
+         h4+yPSJlMVY5JfRtkaUIQMICazcfY2PH46LgfT6dlzr0yIysf+MeH68yWDdRKcYSaEvx
+         S12cX1z0TuAo8QDOkD/RccqYckTTg1Bz1AmvTrrsKo3NSpqGyPuVzu7D7e+PeBE4AaMp
+         mldbdgKyIoSG5xFZYM2lr898+MUTs+ckDdmfDnPMCm9LKaTrLLpsfrqRG/tb1MH/s9Ao
+         +QZg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1774345017; x=1774949817; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ub5wN9amaO/DAAvFXES2RrEzabJn769sowl2xsPaADQ=;
+        b=LR/xx7SI5kncamtwfDMCZsdLzL9v2Vv+1wsvvSda4nYW33Dgt20Mwkq1nG278aI1h3
+         QfOJpdmD6BSzA3Oqrr3lvmc3YSishR6XKUjKNqErydpJB/08lKKtkRrR7fjOn+K20yA0
+         f2mEuXbkDWSUeT+FDPsVFKUMP73alN7cNy8NHTMcCLqsrGqwrl6mvm8vZbYK+o4a/+wM
+         pZF8CyL72yj0UlFTqcGIoq4aj2alY/7p46cWd+QrxCNXGrZjAoJ5kZDzZ94RZEocUmOM
+         Qx86u2UQbXXm6eYKnp6FD9sf2RK4r9xew6NLUI2bkBgA5jHBRygvDTuFNmq4DGnlVjIy
+         eCJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774345017; x=1774949817;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ub5wN9amaO/DAAvFXES2RrEzabJn769sowl2xsPaADQ=;
+        b=mAVC9QB8ci4zIeBOQHP7ckyeZ+C/l+oMOzKhBE5vrmv7FbMuS2OK+UKmnFrZ/0OTAc
+         Yz/7eZxqCyNsKpY809A+hJx5EMXyMSLSlZcNLXDU/oDvuHqujo8hH1EwNZJSzFlVeisn
+         YKHY4GwU0SP6pCjfFpltop3miz4sD9PNBLJfNMnUymwuOi1xlqMMCBpEQlNQDhGv+upH
+         TsjIX+uERS/EdSxJ7BSdbiqIVheEzvYi7TYCE46ZpOEY0E2kIlRvOjIdc2Za+9gytjgE
+         yhH+jsDIL/0jhzvcjfx7s57Z9CGL+p2DsPCfNYXz4/SO6fSd+BnGpDZnIqkA/HpcnDa0
+         cExQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRCQRJNTQ9/glxD+XMJ+yzTWZSqmdUWcGasnQsSXkOCXYiWzzZzgkRWVFCNHrMHTlgx+9TRE33Lkgw9w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr+TwvUflSiAXEkJ5+LGrTNCW6Zu03Kc5ax1ySGPnLleoI9OJF
+	ufZoLL143GEeVgZhzSBKrXAM/izFZgC7lCpRF8QpcUjhAbTiuacFE/8x9Qxy8RnN3TB8EOG9B9+
+	P+XnpsAtbyvCeicdFD8VT/3aPzkRbBWzvlC10hZXZoA==
+X-Gm-Gg: ATEYQzydHZjjz+pyp73P69NPuWSzRdXkADpcBg+SrJZLihMxoTHXR8D9fjBRH8RSStD
+	9TmpMf1mmlfqaFOm+xNdj3qrCqKRQiaPTiM5kciBnig2fhM/6w2Mpek2XnSa8l13pHojQQbAP6z
+	74m9OV0Sj5d80xSOldpXsvU1/com7YnWd1pxz6BSOykEHJv2u1VtDLXkwImUeDnONQ4E6tG2369
+	ZPfahHBXJRyitEPHF16P4W1Z7x2RxhYJatnFMFDK2QBmCWHRKD8BPLHpiP/J7BRaq06o1PsK00+
+	4M7Cxn63+MQpyo6WIiT2OEVBcv414hLVscguPuGFGciVh2eMG5fn0JVpkTA4+k8082j5FDUBjU2
+	KsXE6
+X-Received: by 2002:a05:6000:22c2:b0:43b:3caa:a20e with SMTP id
+ ffacd0b85a97d-43b6426b68emr24185879f8f.32.1774345017497; Tue, 24 Mar 2026
+ 02:36:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-33-neelx@suse.com>
+ <20260208151126.3129410-1-clm@meta.com>
+In-Reply-To: <20260208151126.3129410-1-clm@meta.com>
+From: Daniel Vacek <neelx@suse.com>
+Date: Tue, 24 Mar 2026 10:36:46 +0100
+X-Gm-Features: AQROBzAcrSb8NLZh900STza2vyMCNtV9c0i8E1h6tC3jXGjIJZj-4KJUOFxGeHU
+Message-ID: <CAPjX3FchHbyQMUqogjyf4tUpT49HnO==_E6Uj=Zz7BXYUhJvsg@mail.gmail.com>
+Subject: Re: [PATCH v6 32/43] btrfs: implement process_bio cb for fscrypt
+To: Chris Mason <clm@meta.com>
+Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-When a bio is allocated from the mempool with REQ_ALLOC_CACHE set and
-later completed, bio_put() places it into the per-cpu bio_alloc_cache
-via bio_put_percpu_cache() instead of freeing it back to the
-mempool/slab. The slab allocation remains tracked by kmemleak, but the
-only reference to the bio is through the percpu cache's free_list,
-which kmemleak fails to trace through percpu memory. This causes
-kmemleak to report the cached bios as unreferenced objects.
+On Sun, 8 Feb 2026 at 16:12, Chris Mason <clm@meta.com> wrote:
+> Daniel Vacek <neelx@suse.com> wrote:
+> > From: Josef Bacik <josef@toxicpanda.com>
+> >
+> > We are going to be checksumming the encrypted data, so we have to
+> > implement the ->process_bio fscrypt callback.  This will provide us with
+> > the original bio and the encrypted bio to do work on.  For WRITE's this
+> > will happen after the encrypted bio has been encrypted.  For READ's this
+> > will happen after the read has completed and before the decryption step
+> > is done.
+> >
+> > For write's this is straightforward, we can just pass in the encrypted
+> > bio to btrfs_csum_one_bio and then the csums will be added to the bbio
+> > as normal.
+> >
+> > For read's this is relatively straightforward, but requires some care.
+> > We assume (because that's how it works currently) that the encrypted bio
+> > match the original bio, this is important because we save the iter of
+> > the bio before we submit.  If this changes in the future we'll need a
+> > hook to give us the bi_iter of the decryption bio before it's submitted.
+> > We check the csums before decryption.  If it doesn't match we simply
+> > error out and we let the normal path handle the repair work.
+>
+> Hi everyone,
+>
+> I'm running the btrfs for-next branch, along with the encryption patch set
+> through my AI review prompts:
+>
+> https://github.com/masoncl/review-prompts
+>
+> I'm working on some btrfs specific instructions, but hopefully these reviews
+> are already useful.  I've kept the headers to make it easier to double check
+> that I'm actually replying to the right email, but please let me know if any
+> parts of this are incorrect:
+>
+> commit 2b25418669e46c939ff864b1144e2c27d618920c
+> Author: Josef Bacik <josef@toxicpanda.com>
+>
+> btrfs: implement process_bio cb for fscrypt
+>
+> This commit implements the ->process_bio fscrypt callback for btrfs,
+> enabling checksum verification of encrypted data before decryption and
+> checksum generation after encryption.
+>
+> > diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
+> > index 3b420866f3b82..c28f3f53bad28 100644
+> > --- a/fs/btrfs/bio.c
+> > +++ b/fs/btrfs/bio.c
+> > @@ -300,6 +300,34 @@ static struct btrfs_failed_bio *repair_one_sector(struct btrfs_bio *failed_bbio,
+> >       return fbio;
+> >  }
+> >
+> > +blk_status_t btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio, struct bio *enc_bio)
+> > +{
+> > +     struct btrfs_inode *inode = bbio->inode;
+> > +     struct btrfs_fs_info *fs_info = inode->root->fs_info;
+> > +     struct bvec_iter iter = bbio->saved_iter;
+> > +     struct btrfs_device *dev = bbio->bio.bi_private;
+> > +     const u32 step = min(fs_info->sectorsize, PAGE_SIZE);
+> > +     const u32 nr_steps = iter.bi_size / step;
+> > +     phys_addr_t paddrs[BTRFS_MAX_BLOCKSIZE / PAGE_SIZE];
+>
+> Can paddrs[] overflow here? BTRFS_MAX_BLOCKSIZE is 64KB, so the array
+> has 16 elements (64KB / 4KB). However, nr_steps is calculated from
+> iter.bi_size which can be much larger than 64KB for merged bios.
+>
+> If a bio has bi_size > 64KB, the loop below will write beyond the array
+> bounds when filling paddrs[slot].
 
-Use symmetric kmemleak_free()/kmemleak_alloc() calls to properly track
-bios across percpu cache transitions:
+Indeed, that's very true and I can easily reproduce it.
 
- - bio_put_percpu_cache: call kmemleak_free() when a bio enters the
-   cache, unregistering it from kmemleak tracking.
+> > +     phys_addr_t paddr;
+> > +     unsigned int slot = 0;
+> > +
+> > +     /*
+> > +      * We have to use a copy of iter in case there's an error,
+> > +      * btrfs_check_read_bio will handle submitting the repair bios.
+> > +      */
+> > +     btrfs_bio_for_each_block(paddr, enc_bio, &iter, step) {
+> > +             ASSERT(slot < nr_steps);
+> > +             paddrs[slot] = paddr;
+> > +             slot++;
+> > +     }
+> > +     if (!btrfs_data_csum_ok(bbio, dev, 0, paddrs))
+>
+> Does this verify checksums for all sectors in the bio? Looking at
+> btrfs_data_csum_ok() in inode.c, it verifies one sector's worth of data
+> (one blocksize). The function is called with bio_offset=0, meaning it
+> only checksums the first sector.
+>
+> However, the bio can contain multiple sectors (iter.bi_size could be
+> much larger than one sectorsize). If the bio has multiple sectors,
+> shouldn't this call btrfs_data_csum_ok() for each sector, or pass the
+> actual bio size so all sectors are verified?
+>
+> The existing btrfs_check_read_bio() function loops through all sectors
+> and verifies each one individually.
 
- - bio_alloc_percpu_cache: call kmemleak_alloc() when a bio is taken
-   from the cache for reuse, re-registering it so that genuine leaks
-   of reused bios remain detectable.
+This is also correct. Both points fixed this way:
 
- - __bio_alloc_cache_prune: call kmemleak_alloc() before bio_free() so
-   that kmem_cache_free()'s internal kmemleak_free() has a matching
-   allocation to pair with.
+--- a/fs/btrfs/bio.c
++++ b/fs/btrfs/bio.c
+@@ -343,11 +343,13 @@ blk_status_t
+btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio, struct bio *
+     struct btrfs_fs_info *fs_info = inode->root->fs_info;
+     struct bvec_iter iter = bbio->saved_iter;
+     struct btrfs_device *dev = bbio->bio.bi_private;
+-    const u32 step = min(fs_info->sectorsize, PAGE_SIZE);
++    const u32 blocksize = fs_info->sectorsize;
++    const u32 step = min(blocksize, PAGE_SIZE);
+     const u32 nr_steps = iter.bi_size / step;
+     phys_addr_t paddrs[BTRFS_MAX_BLOCKSIZE / PAGE_SIZE];
+     phys_addr_t paddr;
+     unsigned int slot = 0;
++    u32 offset = 0;
 
-Cc: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+     /*
+      * We have to use a copy of iter in case there's an error,
+@@ -357,9 +359,13 @@ blk_status_t
+btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio, struct bio *
+         ASSERT(slot < nr_steps);
+         paddrs[slot] = paddr;
+         slot++;
++        offset += step;
++        if (IS_ALIGNED(offset, blocksize)) {
++            if (!btrfs_data_csum_ok(bbio, dev, offset - blocksize, paddrs))
++                return BLK_STS_IOERR;
++            slot = 0;
++        }
+     }
+-    if (!btrfs_data_csum_ok(bbio, dev, 0, paddrs))
+-            return BLK_STS_IOERR;
 
-diff --git a/block/bio.c b/block/bio.c
-index d80d5d26804e..093006e5aba0 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -18,6 +18,7 @@
- #include <linux/highmem.h>
- #include <linux/blk-crypto.h>
- #include <linux/xarray.h>
-+#include <linux/kmemleak.h>
- 
- #include <trace/events/block.h>
- #include "blk.h"
-@@ -504,6 +505,9 @@ static struct bio *bio_alloc_percpu_cache(struct block_device *bdev,
- 	cache->nr--;
- 	put_cpu();
- 
-+	kmemleak_alloc((void *)bio - bs->front_pad,
-+		       kmem_cache_size(bs->bio_slab), 1, gfp);
-+
- 	if (nr_vecs)
- 		bio_init_inline(bio, bdev, nr_vecs, opf);
- 	else
-@@ -765,6 +769,9 @@ static int __bio_alloc_cache_prune(struct bio_alloc_cache *cache,
- 	while ((bio = cache->free_list) != NULL) {
- 		cache->free_list = bio->bi_next;
- 		cache->nr--;
-+		kmemleak_alloc((void *)bio - bio->bi_pool->front_pad,
-+			       kmem_cache_size(bio->bi_pool->bio_slab),
-+			       1, GFP_KERNEL);
- 		bio_free(bio);
- 		if (++i == nr)
- 			break;
-@@ -828,6 +835,7 @@ static inline void bio_put_percpu_cache(struct bio *bio)
- 		bio->bi_bdev = NULL;
- 		cache->free_list = bio;
- 		cache->nr++;
-+		kmemleak_free((void *)bio - bio->bi_pool->front_pad);
- 	} else if (in_hardirq()) {
- 		lockdep_assert_irqs_disabled();
- 
-@@ -835,6 +843,7 @@ static inline void bio_put_percpu_cache(struct bio *bio)
- 		bio->bi_next = cache->free_list_irq;
- 		cache->free_list_irq = bio;
- 		cache->nr_irq++;
-+		kmemleak_free((void *)bio - bio->bi_pool->front_pad);
- 	} else {
- 		goto out_free;
- 	}
--- 
-2.53.0
+     /*
+      * Read repair is slightly different for encrypted bio's.  This
 
+Thanks!
+
+--nX
+
+
+> > +                     return BLK_STS_IOERR;
+> > +
+> > +     bbio->csum_ok = true;
+> > +     return BLK_STS_OK;
+> > +}
+>
+> [ ... ]
+>
+>
