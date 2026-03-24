@@ -1,53 +1,53 @@
 Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECD83A542D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9D23A5E75
 	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 05:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774331424; cv=none; b=RJW0z9TJn9UIIUOyjIdHQL0W/N5BWubWu+6QhwyhFwgl20FpfBGMxKXhYeiVh8G/uXLhErkVJj8k8FR6Qo+e+984qeYbBjFc/aHsPKFJWg/UW5X0tQGPo9XLRnqSv20V76WzxC3TGhQujwfYwLqjuf0qD+OUwpxJFauHy2JqL1o=
+	t=1774331424; cv=none; b=U3KwfTeQMRL4tvxlgsrAoUAjS8VZFXkakbjKnQ7lW0A9Nu2d4wCdcaaOrM0CZJBSgBUgrBTzfUWswkX6ghccoBOuRZ9urIJkjYZTyGK4IiAUg9KIRz5vXdYnVOnEvcwhUudlTezKjQIoNF5BmdN7LvPxBPTOwufL+54N1ROH6+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774331424; c=relaxed/simple;
-	bh=dOQ2efWiEfuBdcPn5qd278jHXzByWNJZ9a9xKGNV2Z8=;
+	bh=9zsTq3JkQTmr+vDmo9NRlJ8WM+iWNWUrc1xSnNWfWXo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Au1jLwd+Fjgl4vXOn0dw3yBVXq0OrMlx3zb8fy1uj1xeHPsU5q7eHZTioWHd6P7wLOH/sRplTk6FFG60qFixshs6gUuVZJHOCtLiBo5lAdR9ImJAytYVbnCeNiGBctAdjsmQZh+p66pDBOOLVRDgy2w/bcaAldJCyMiiZ69lTWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=K4Hm7lLQ; arc=none smtp.client-ip=216.71.153.141
+	 MIME-Version; b=g0hL1JJzfi0dB39zA9Ljy34mYdhpzT5EvaK1lO0KSGZmfZ5LFWZaxfJvqg2u3TTjjbj3DUwAmckvA4JhBTgYpXUbkCswtaNa9EDZmV3Ij+JC7PneEmEPdLRJ34MI3OuMQu/3NBWR0HTJ8zEBPfo2lQ/Dg3r8gZeHZNJ/rtSwFeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Js1yqf4m; arc=none smtp.client-ip=216.71.153.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="K4Hm7lLQ"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Js1yqf4m"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
   t=1774331421; x=1805867421;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dOQ2efWiEfuBdcPn5qd278jHXzByWNJZ9a9xKGNV2Z8=;
-  b=K4Hm7lLQ1Beo1x8OVINM9DDl068T8ZHGx2trr85SYgqpiy0MVpHPuDQJ
-   4o3xY8IJ0Qz2FJSR9AY3cwI+DOpnbCMj3ZVEhm3wEJwAHqkUXY8UNFFzI
-   Brs3HgpdItMm/df4XSxGSfcat6h8apCX/lcuyhIaIF62ZoNuJWUPlT2mQ
-   CW8FFH+0T/ot3r+FiaPOlgLL33cLy5NDiopMU9NVvtjBfosCKZYOnsdCn
-   cK7pwkMCb192jej6IZiqyTDiDyom8krkKryqhlG8AInv1lBIH7q4ZyfTh
-   Rb22WNXw7SwBNyaynZ9/gITgQc97DubXCryeZ9laIoSLPnmqhNfAWoNUh
-   A==;
-X-CSE-ConnectionGUID: MJuY0u4dTGW4LcG/21dU5g==
-X-CSE-MsgGUID: bMcS/YFkSoyGamOErwZxng==
+  bh=9zsTq3JkQTmr+vDmo9NRlJ8WM+iWNWUrc1xSnNWfWXo=;
+  b=Js1yqf4m7oeKdST5BCKer6fS44Teng8uljU70QIozgyXwrBgWFNKeW0K
+   eU79srZSxEWQNCdtzkCqyRqDb4JFC+Ub5VOkTDUYM3VbfANxN+ZeJlGSO
+   ZwDmxR+pRZ+C6qho11ZBnpF5GtTFlpJUBhzxfvSKQLZgAP3xjPTWIc3w7
+   f+EVz5QFwRpdRTe7hwEqcLSlcgh+Fc5O93EtUTLH+b7nMwYU+bQwCGa+c
+   NBU5u7MvDwABo7ZNIBU9KWS7DIayhjNYsZz4QtnxTggQd4sUyHvFdJK3O
+   YFqK13Ojup9zlBBR0c5GSgBvcbLpvUX5AtZcoHdKNwFws9dVuKJxF4tDa
+   g==;
+X-CSE-ConnectionGUID: /fsDcNKIQSmXrFIVkPyOdg==
+X-CSE-MsgGUID: XIAAHCnmSk+KtohC/gFc9A==
 X-IronPort-AV: E=Sophos;i="6.23,138,1770566400"; 
-   d="scan'208";a="143614101"
+   d="scan'208";a="143614102"
 Received: from unknown (HELO uls-op-cesaep03.wdc.com) ([199.255.45.15])
   by ob1.hgst.iphmx.com with ESMTP; 24 Mar 2026 13:50:07 +0800
-IronPort-SDR: 69c22603_r7wD5R1qXE5DlbcbbRbGHi3+2F6XIdsmRKBbfCRhdjyymXX
- YVxDn8apons//2cM0cHXVFPUT8kZm+dDoHQl+ew==
+IronPort-SDR: 69c22603_1v+MGB50r8GbxffcTeO8N3tXtdjgrG0+1+MzcCvqbEyL8Xx
+ CBOV2BrSSak7+EWDzTqAcPcum9vU8qiaJhPA3Jw==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Mar 2026 22:49:55 -0700
+  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Mar 2026 22:49:56 -0700
 WDCIronportException: Internal
 Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.67.30])
-  by uls-op-cesaip01.wdc.com with ESMTP; 23 Mar 2026 22:49:55 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 23 Mar 2026 22:49:56 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 6/7] common/scsi_debug: ensure scsi_debug is loadable before loading it
-Date: Tue, 24 Mar 2026 14:49:48 +0900
-Message-ID: <20260324054949.3821569-7-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 7/7] zbd/012: add missing scsi_debug check
+Date: Tue, 24 Mar 2026 14:49:49 +0900
+Message-ID: <20260324054949.3821569-8-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20260324054949.3821569-1-shinichiro.kawasaki@wdc.com>
 References: <20260324054949.3821569-1-shinichiro.kawasaki@wdc.com>
@@ -59,28 +59,27 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, _have_scsi_debug_group_number_stats() assumes that scsi_debug
-is loadable. This does not work when scsi_debug is built-in. Before
-loading scsi_debug in the function, ensure that scsi_debug is loadable.
+The test case uses loadable scsi_debug, but it misses the check for it.
+Add the missing check.
 
+Fixes: 3ca2657f94b8 ("zbd/012: Test requeuing of zoned writes and queue freezing")
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- common/scsi_debug | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/zbd/012 | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/common/scsi_debug b/common/scsi_debug
-index 97a65c2..6aa7420 100644
---- a/common/scsi_debug
-+++ b/common/scsi_debug
-@@ -49,6 +49,8 @@ _scsi_debug_key_path() {
- _have_scsi_debug_group_number_stats() {
- 	local ret=0
+diff --git a/tests/zbd/012 b/tests/zbd/012
+index b2bda5c..c2e47f3 100755
+--- a/tests/zbd/012
++++ b/tests/zbd/012
+@@ -13,6 +13,7 @@ TIMED=1
  
-+	_have_loadable_scsi_debug || return 1
-+
- 	modprobe -qr scsi_debug >&/dev/null
- 	modprobe -q scsi_debug delay=0 >&/dev/null
- 	if ! [[ -e ${SD_PSEUDO_PATH}/group_number_stats ]]; then
+ requires() {
+ 	_have_fio_zbd_zonemode
++	_have_loadable_scsi_debug
+ }
+ 
+ toggle_iosched() {
 -- 
 2.49.0
 
