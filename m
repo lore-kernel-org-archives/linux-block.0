@@ -1,57 +1,42 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BD9386C38;
-	Tue, 24 Mar 2026 15:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009C91A6827;
+	Tue, 24 Mar 2026 17:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774367669; cv=none; b=DRnHbGQ7vA7Y2i+2imT79xlVj0T1nD1P0FEfSJH7oX4DNdMP5ZNFXV2Shrg7BtajubWCmI67ioxrm7qgfc/M+gO70I7dqtYNVtBhM9HbcxlOHKn8HgqdBrn6TY94Axz3NX8VZW8d+DoI2EaFnn0wXdgSmgdwoKZkUS+mpyfdHUg=
+	t=1774371989; cv=none; b=DK+NGSSBstO2TlPV6NRoOd2c1zfMxurL+HmnOsIJGGvHCQNQc7GCKDOFK986pdh3L91w5FleCXdqDK/4Ib3HqWJr7yERq9TPyx0QmvXGBRMq5TapFEx4m8lzYk93wKgnL13rZXqNBfTeYoiHW/Fph2jUmC3FsnEo1VfQuG78M70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774367669; c=relaxed/simple;
-	bh=KbYmkEWDX5xCI96hmXaNT9f7KUtmIZhSGdAp9nzN7/s=;
+	s=arc-20240116; t=1774371989; c=relaxed/simple;
+	bh=3do5ookdd0VXSf3OwjE/LYpsosNLUXlPOPQeT3MWgkg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a+u5V8On+V1d1zkRbMh9isSIlwxBfnSGClGOzkzswzBHgFF00qjHdKt4Xoi8JOj9zOBa+Kqx4Pd77IPMspjvnvwAOBdgyMmkZpDs6SP4TFvXPaVFIPJWZA19lBo3e6K3xcusia2Ke439Bl13DC9lXYXvBVWf7fOO5vmQdCItYi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SFRR2AU2; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=ej3M8JX73kAkca6Zcbu6TxHfh/SypTkxAvZ25IhqWPxltFuyCd0MI5WuAEFOs/ts9H8MQk0MGbunIY56mqHqEiWFo2c/bA0Wz4HPnl59sA4g2W98rwIAfRKi6mpriFzOp2xh0OVgRr9Sx/ONTL+VrKEibhZb3h2bZIgGnlAFUDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O14t2Tbo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SFRR2AU2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0OJwGIwkcTDehRPnixVOyfTvqxydByh7rJFCM6sQA7s=; b=SFRR2AU25aXwGVjJvwFLF3gDgO
-	CbdZeKb/9jBMzKy//cI8sVP8V51izbKH4hpRVvaHwZbOh82i7nQikRYyuBXjMYeYC967m3zMLJHy8
-	6fVM0TP4GYzJpa7ESSVcTUm9ozOeEK03eAAsAy5Fzb13DOlWRhyOPfJK2gPJInrQKVW0Zs0SGpQ5m
-	gGQrFqYn0+XosNl5gdgE/zUCzR3PuGtomDL14UimKDey4wIeHnhBuYZxW2hKBf0HwS2XZam2L1NpT
-	d9+5W8CgiiDjPzRCvAGIiKiyJIp81T9jngiiv21p8l/Uld1yt1cl/xmOYjyoqD1TE5xWtWSAZTI3y
-	bZNRjwVQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w545G-00000001nIU-1AG0;
-	Tue, 24 Mar 2026 15:54:22 +0000
-Date: Tue, 24 Mar 2026 08:54:22 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>, linux-ext4@vger.kernel.org,
-	Ted Tso <tytso@mit.edu>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	David Sterba <dsterba@suse.com>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	David Hildenbrand <david@kernel.org>, linux-mm@kvack.org,
-	linux-aio@kvack.org, Benjamin LaHaise <bcrl@kvack.org>
-Subject: Re: [PATCH 12/41] fs: Drop sync_mapping_buffers() from
- __generic_file_fsync()
-Message-ID: <acKzrqjnKFNK0xmh@infradead.org>
-References: <20260320131728.6449-1-jack@suse.cz>
- <20260320134100.20731-53-jack@suse.cz>
- <acIjxUzWFstarlwv@infradead.org>
- <ezdm6d34jqdrcohk7o6wycxvvlgtf6aqenwx5ffr3plfagdbzi@gibz7xwr6yhr>
- <acKO3NRw852FdGUO@infradead.org>
- <rsftk7gdlamfryksv63vhmewdi6etvvfyi6as5m2zs75ctvzkq@fnoiwumyfdsv>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O14t2Tbo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A587C19424;
+	Tue, 24 Mar 2026 17:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774371988;
+	bh=3do5ookdd0VXSf3OwjE/LYpsosNLUXlPOPQeT3MWgkg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O14t2TboVb6WHnoQTD5GV+63wQR81LdwqDeGEPG5/3yEUFRpc1w2mzOWvZ4dvmCsS
+	 G2P+CBZhvywHJxxZIYw0i5ix843VOgtMsPeICayr+wOj/UyFxjKOONim7IzNXjzm2V
+	 rVr22NcInyyscEYm17Y+ktWFcuOWsBAOADwlbA6OcjVE7Q6ae8roDEX6LI3D1vJ2uL
+	 FkNkZkrVXGPWtcSDDmKKKLEGt2Xf4f8Xf7Jum5m91WOtE6vXzSHqoDh+UnKeYNZEcJ
+	 9j3jS/d1tPg9okVPAkrRl58f60B5211wR6EcUCI98LK6P4wIYUq8Qomyl3e0zcu94z
+	 192O8lQR9j58w==
+Date: Tue, 24 Mar 2026 10:06:27 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>, Zorro Lang <zlang@redhat.com>,
+	linux-xfs@vger.kernel.org, Tal Zussman <tz2294@columbia.edu>,
+	axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH] iomap: fix lockdep complaint when reads fail
+Message-ID: <20260324170627.GP6223@frogsfrogsfrogs>
+References: <20260323210017.GL6223@frogsfrogsfrogs>
+ <20260324-zurechnen-sturheit-10ba083e2f06@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,20 +45,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <rsftk7gdlamfryksv63vhmewdi6etvvfyi6as5m2zs75ctvzkq@fnoiwumyfdsv>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20260324-zurechnen-sturheit-10ba083e2f06@brauner>
 
-On Tue, Mar 24, 2026 at 02:36:53PM +0100, Jan Kara wrote:
-> Leaving the two implementations separate certainly works for me as well
-> (that's why I've put that patch to the end because I've expected some
-> discussions around it :)). Just the amount of common trivial calls you need
-> to do (fdatawrite(), sync_inode_metadata(),
-> file_check_and_advance_wb_err(), blkdev_issue_flush()) looked high enough
-> to me to be worth merging the implementations. But I don't feel strongly
-> either way.
+On Tue, Mar 24, 2026 at 09:15:10AM +0100, Christian Brauner wrote:
+> On Mon, 23 Mar 2026 14:00:17 -0700, Darrick J. Wong wrote:
+> > Zorro Lang reported the following lockdep splat:
+> > 
+> > "While running fstests xfs/556 on kernel 7.0.0-rc4+ (HEAD=04a9f1766954),
+> > a lockdep warning was triggered indicating an inconsistent lock state
+> > for sb->s_type->i_lock_key.
+> > 
+> > "The deadlock might occur because iomap_read_end_io (called from a
+> > hardware interrupt completion path) invokes fserror_report, which then
+> > calls igrab.  igrab attempts to acquire the i_lock spinlock. However,
+> > the i_lock is frequently acquired in process context with interrupts
+> > enabled. If an interrupt occurs while a process holds the i_lock, and
+> > that interrupt handler calls fserror_report, the system deadlocks.
+> > 
+> > [...]
+> 
+> Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+> Patches in the vfs.fixes branch should appear in linux-next soon.
+> 
+> Please report any outstanding bugs that were missed during review in a
+> new review to the original patch series allowing us to drop it.
+> 
+> It's encouraged to provide Acked-bys and Reviewed-bys even though the
+> patch has now been applied. If possible patch trailers will be updated.
+> 
+> Note that commit hashes shown below are subject to change due to rebase,
+> trailer updates or similar. If in doubt, please check the listed branch.
+> 
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+> branch: vfs.fixes
+> 
+> [1/1] iomap: fix lockdep complaint when reads fail
 
-I don't really feel either way, and I really should not micro-manage
-the series either.  So go for what you think works best.  The important
-part is to have the fsync changes early and to avoid hardcoding
-buffer_head knowledge into libfs.c.
+Hey Christian,
 
+Is it not too late to rename this patch to:
+
+"iomap: fix potential deadlock when buffered reads fail"
+
+--D
+
+>       https://git.kernel.org/vfs/vfs/c/f621324dfb3d
