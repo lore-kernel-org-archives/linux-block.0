@@ -1,112 +1,71 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BDA1C84CB
-	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 02:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A128823BCE3;
+	Tue, 24 Mar 2026 05:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774318983; cv=none; b=ISJAsTg3jkUv3sqLj2SnTuqHLuZKtEiKs3n7DjdqPPYvAXnwl+C8ESDzFyKUajOFKHkWlm2hlUKYrXr9ITn9tX2StKfy0RHtCimIyL+RA8gIdl0gjhDsKXaPzkhuCxyBalFmTChO757weqQeg46bVmUSkUR4IO+VC/YSK8QdIfQ=
+	t=1774330695; cv=none; b=abFHBGDnUUsXhlsBDAlFdtwXWyZnpOzAqywhrM3i/4QGV2xgNjJtrCrnaAgufz0WOHICMtSBVLWWAdvo4fo1APFM/yskh0fBC7FKnPjG4oI5g0zaqXHrvKOSrwEyCMfY6jC5IsK6t1tH4U+iBwnawXMc6E036OB0+2InbKwlTo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774318983; c=relaxed/simple;
-	bh=CUDin1c3uX+pGK2V1PKkyejQ5db7Cxs7H5j0Hf4bmC4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CWbP8dVg4Qu2e1zdYR+QQiukJsfiB0YbpVFLRtLJSaRaxh+E58qJiCb1JXJfYxJ06jC6liYjvgJudghm8e8TfYJdYGj1sCQKGDqLzdiMcCev9/W3aJc5h0kE049s7CKbzoI8k3Ju4EfERNcJSAAdwPzHlcrC0S3Syj9xZtnoed8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=teYCGbmj; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1774330695; c=relaxed/simple;
+	bh=SvW94Q3F7Uj2MFDIrHLxUUC1KVfjuY3Zsi+gmKl/Z1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmKFHnO4+RbyIQqf38vv+XbMpDq3e/rEkPkNwoMkQ/XD4cSjsBhA8IEzkDJKmBXSiOMc0xhTkmFDiuDDHFu4Y+o5mt2ITwwpJehkWnQf/w5SQrUthUMqLby6/+cDac9vK7cQmVec6tZGR8rexQrjxLfdBdBQsymcGzQ52mkVU9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Lz9EGP21; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="teYCGbmj"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774318979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tWkEaNCiuvEQnfJ4w1FKyXFMXNvJXDxjRZMdazAAOIY=;
-	b=teYCGbmj2r2k0MgB5t3S2JgSaeBNjoiMgx608N2GqV9NLwXCWi6czG9X/TLikHeMGpoH+6
-	EpJeIZDIUqPMFZYkKMsnaKgPJ9NfbgNLt1aMYB49266p3AEn+snz3Vz+PHgjN4SJ2Cx9Ss
-	q4iG4Ed+8mtfB3PMviRJQfNS0+Cj/jg=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: linux-block@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] blk-mq: fix slab-out-of-bounds in blk_mq_free_rqs on nr_hw_queues update
-Date: Tue, 24 Mar 2026 10:22:51 +0800
-Message-ID: <20260324022252.315050-1-jiayuan.chen@linux.dev>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lz9EGP21"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=lVQa6cRqLks0P01rcxaIrLnv8Mgq3ZwrRJH1SzRJAHQ=; b=Lz9EGP21r3Ckl7whnnUBaDo15q
+	FO0M82HZT+fhnwVrNphEXkrWPHkrfbfmds2myTY+EFBGuJksvmWya7ISOOA3mFNCzfhHTSVL21gYd
+	kIZF0EXvxeOGjeIZIQWp+pbZmeMmz3oEe60N+FYSaVm06E8iQIsEDBtP34DnBKcomlUkzvvaVsQwp
+	/xenBeGw+jpHtqoB/KDeeI3k6LmSMIr4HImpYLxVxnPRZafonpuRyIoXZ+qDCxZRsRX/AaX6FyJD2
+	4jzU+9M133RjoBO//tiVMxD1U671rLErGmyPMLyCNiLvEh0Rqm/ejAO+Qb6eelJLhHcwbcS14iWMq
+	b91AyDXw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w4uSv-00000000bK8-0TYN;
+	Tue, 24 Mar 2026 05:38:09 +0000
+Date: Mon, 23 Mar 2026 22:38:09 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, linux-ext4@vger.kernel.org,
+	Ted Tso <tytso@mit.edu>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	David Sterba <dsterba@suse.com>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@kernel.org>, linux-mm@kvack.org,
+	linux-aio@kvack.org, Benjamin LaHaise <bcrl@kvack.org>
+Subject: Re: [PATCH 08/41] udf: Switch to generic_buffers_fsync()
+Message-ID: <acIjQVRICiVBndVr@infradead.org>
+References: <20260320131728.6449-1-jack@suse.cz>
+ <20260320134100.20731-49-jack@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260320134100.20731-49-jack@suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-When __blk_mq_update_nr_hw_queues() increases nr_hw_queues, it first
-pre-allocates scheduler resources via blk_mq_alloc_sched_res_batch()
-with the new (larger) queue count, then removes the elevator via
-blk_mq_elv_switch_none(), and finally expands set->tags via
-blk_mq_prealloc_tag_set_tags().
+On Fri, Mar 20, 2026 at 02:41:03PM +0100, Jan Kara wrote:
+> UDF uses metadata bh list attached to inode. Switch it to
+> generic_buffers_fsync() instead of generic_file_fsync().
 
-If blk_mq_prealloc_tag_set_tags() fails, the code jumps to switch_back
-which re-attaches the elevator using the pre-allocated resources
-(ctx->res.et) whose nr_hw_queues is the new larger value. But
-set->tags was never expanded, so when the elevator is later freed,
-blk_mq_free_sched_tags() iterates et->nr_hw_queues entries and
-blk_mq_free_rqs() accesses set->tags[hctx_idx] beyond its allocated
-size, causing a slab-out-of-bounds.
+Can you explain this a bit more?  Right now the only difference between
+generic_file_fsync and generic_buffers_fsync is that the former takes
+i_rwsem and the other does not.  I'd expect the commit log to explain
+why dropping the lock is safe and desirable.
 
-Fix this by moving blk_mq_prealloc_tag_set_tags() before
-blk_mq_elv_switch_none(). If the tags allocation fails, the elevator
-has not been removed yet, so we simply free the pre-allocated scheduler
-resources and exit cleanly without entering the switch_back path.
-
-Note that blk_mq_elv_switch_none() practically cannot fail today (it
-only fails via WARN_ON_ONCE on xa_load returning NULL), so
-blk_mq_prealloc_tag_set_tags() is the only realistic failure point
-that could reach switch_back. Moving it before the elevator removal
-eliminates the problematic path entirely.
-
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- block/blk-mq.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3da2215b2912..2183142b4568 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -5141,6 +5141,18 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	if (blk_mq_alloc_sched_res_batch(&elv_tbl, set, nr_hw_queues) < 0)
- 		goto out_free_ctx;
- 
-+	/*
-+	 * Pre-allocate the new tags array before removing the elevator,
-+	 * so that if allocation fails we can exit cleanly without having
-+	 * modified the elevator state.
-+	 */
-+	new_tags = blk_mq_prealloc_tag_set_tags(set, nr_hw_queues);
-+	if (IS_ERR(new_tags)) {
-+		new_tags = NULL;
-+		blk_mq_free_sched_res_batch(&elv_tbl, set);
-+		goto out_free_ctx;
-+	}
-+
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_debugfs_unregister_hctxs(q);
- 		blk_mq_sysfs_unregister_hctxs(q);
-@@ -5155,10 +5167,6 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 		if (blk_mq_elv_switch_none(q, &elv_tbl))
- 			goto switch_back;
- 
--	new_tags = blk_mq_prealloc_tag_set_tags(set, nr_hw_queues);
--	if (IS_ERR(new_tags))
--		goto switch_back;
--
- 	list_for_each_entry(q, &set->tag_list, tag_set_list)
- 		blk_mq_freeze_queue_nomemsave(q);
- 	queues_frozen = true;
--- 
-2.43.0
+Same for the other similar patches.
 
