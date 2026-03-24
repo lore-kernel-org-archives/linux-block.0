@@ -1,91 +1,151 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91852ECD3A;
-	Tue, 24 Mar 2026 13:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774358242; cv=none; b=aorZ/sK4uJBUA7Rf4Z1uvz1rIkkLp1AaHecgyqc+9/oaD3gPPLsqAlRXnE8IFv0+8huSUsmYWamgE71UhXTbAf3DAQFlJlcvL+FExlXr+bevrDowgCxRyeDJz2QVAPpGCU9tyzuMz97IyS/+U237qGbecKrKmnrB/jHlc78pXLY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774358242; c=relaxed/simple;
-	bh=lqaMRZ91pT74ndkwoEb0c3rlcHmDC5LsqtFmQEmUIsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b+7MRb+zBU/AxfQVu9qLQ1HH46WItpyvcb8mjXP3/aLBafIE3LrrJEWudytgXJJ34JQuzVvXqVJ5uEP5OzUXxi38ySzsAo0UJCYZS9LaeDqZ9lWqsHqeoHqYH1wuW4jNkwq862b7atRljZli/edIxg+lAy9etbGvgqYeGd3ArRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=c4MIb9Qk; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708653F9F5D
+	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 13:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774358847; cv=pass; b=uflG93drM09uVmaOKFyPsD9AsMZdGm1pKUAWNZsxHjGI8w0SEIhs7TZ6Qyzy6SHxf2onIa3Fc9tIaFK4bzqAkOMpWDlvHIcuJWC+27cONoFYWhecsE/MeZ0iOUgaWoDaz7BoFqik3QQm5T1u7cCePhhm1AeZGGBUdUf1FPg7Y8M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774358847; c=relaxed/simple;
+	bh=BINvtLCBAGvMj9bi2l2TPbrC05xIHlcYiDwfuMX07iE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IR4yhUDTAS0axiOxsKKCSJ5wf+/zwbtiWBQIXc0D/yLN7OGaYsANgDprmxTcMFl4JtDhIoKFPjNMz53hXBXaXjPZZve/XYxoM7wOE2lyqXU2N/TfVKVo3kcyzpvvYGBBm39B7X/yKF1ZC/aCEnVT6QmDUuD3Dg/vzg5Go0Mu/wk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M9fBPQsZ; arc=pass smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="c4MIb9Qk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2r2P0EuXUIpFebfcqs+V2aJI6SFcZOJexfLphbr7J9s=; b=c4MIb9Qk/bHbiz4wX6m2X6msJr
-	oxY4CmAVyhXkZn2ex8skBdsVMy6D9fHjgZGKyDoZhixt+T6XNn4ZuCPCY4RodYRopRi6Up8Cx35gV
-	ksmFcaJu7gz5f0Zgd6McYixFQc6T++IH/jHp7rATGG9fJIvVL2R0Ml80Ry/Y9cVKqRRPn+WPAajUZ
-	tMFv8tbnZ1kC0DTmK9CGA9Nv4WNohsUA/HrMyF5rNQ353MYz7h1fSM0R0/niBS53UuVp3u5Y5um0p
-	XYJpneQzDASBCOWBAFFFIOjxNfzgzXTm9A5xbpwlXZxSZ2biNZcmoO1+TLZNvnb6KcU/M2lMHEjqU
-	U7uzKpsg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w51dE-00000001WkF-24HP;
-	Tue, 24 Mar 2026 13:17:16 +0000
-Date: Tue, 24 Mar 2026 06:17:16 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>, linux-ext4@vger.kernel.org,
-	Ted Tso <tytso@mit.edu>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	David Sterba <dsterba@suse.com>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	David Hildenbrand <david@kernel.org>, linux-mm@kvack.org,
-	linux-aio@kvack.org, Benjamin LaHaise <bcrl@kvack.org>
-Subject: Re: [PATCH 12/41] fs: Drop sync_mapping_buffers() from
- __generic_file_fsync()
-Message-ID: <acKO3NRw852FdGUO@infradead.org>
-References: <20260320131728.6449-1-jack@suse.cz>
- <20260320134100.20731-53-jack@suse.cz>
- <acIjxUzWFstarlwv@infradead.org>
- <ezdm6d34jqdrcohk7o6wycxvvlgtf6aqenwx5ffr3plfagdbzi@gibz7xwr6yhr>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M9fBPQsZ"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-439b9b190easo1054945f8f.2
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 06:27:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774358844; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X2tHXwtGBzr2yl3EXNH6LPtKJtqwyYW4MH369+bspDSFS4XQy/pnvSUuL1I1z7TH+R
+         yXRaBEfZsQWeJeept7Fu0WgOjzJRVaTnFL3cHgRHieNAztxSQR99lttAbWAFDe0AmOsT
+         nK0/ExfXlKtQxurPqYy2qxgaftAA3RNTZog2stBNcP704L5hR22iMcaAG1kafVxTUHIg
+         2Gz1/EFxdYeWwlN+L8VeZTs3IQTfn1ttqHn35TABmxehbrKqfC7i+VG/2Cl9875Kb5LQ
+         y1NpyamJAvVZYSYhgM4A2rO/3NAui1z470jiPP5lq6JzItTTi077ihF4BFGxHBK9isf4
+         PtVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=VAVyjs7BfIwZAVkKntYRgyhMAqaKjTB8tChCQpQIM34=;
+        fh=2HR9Cc/+1by+NvNRCVCWISuATEPTeqa787LQNuOpEw0=;
+        b=iSeh7Vp2Fcpu7bqk/IobRPVmwvm9QoHmCzyShM0FXOcdoSQ6LkjE9+8l8M7t+gATTw
+         7JUcDOaHqosIy9t5KsC47dCQ60HilEPdnw6ZzNP2M+NnWGnGzXezy/hv6ys2wTgHKJgs
+         xV4mbVe3dOa3DQj3AbH7ngeYeAEpurCw9AGbGP1eZR+gM2CribsTv5wK1RixQ52EnHz2
+         rUUYXCoIzEWvkEi4ax9rfLn12JPT+BaKrftJ03mTiUBnvCN6WNx8zslxczYEPF9JwvzZ
+         9bYGHS2xEbYhxPlaFBzv7IGhiRfsXKsv/zDkUNWnwqK+P3R6L91R7UnnYBnS6SOv/Sns
+         8esQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774358844; x=1774963644; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VAVyjs7BfIwZAVkKntYRgyhMAqaKjTB8tChCQpQIM34=;
+        b=M9fBPQsZveGYCeu10Ws6GLTLa4NAnHq+4iJ07uU1vh9wqScY82fk5yvHMMEZu3aOtH
+         2aNITIVWbnXgvkVARTlH3+kxJcxqohG6+JHP42LkHPjOurBik1WF/P33E9im8ltLlRGD
+         1uC7eg8mDxL5nFnQjUdcBkurUWT9T3bgkTPI2l5Dg49OahMmze2rWHWLxguevDDhKoez
+         nDkCGxblurLhlcaYByA5p6wQWKEvVKN6sEimcuBE7NfdtnQjaRjcU0XfXnKKlaFbeRsF
+         6hDjgrXJOdVWfK/A1Kp96nQC5oyhiJYr8hZa5QwkqEk6Fh1ZtoOd8OcR0nDIcZWa/rOz
+         O5CQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774358844; x=1774963644;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VAVyjs7BfIwZAVkKntYRgyhMAqaKjTB8tChCQpQIM34=;
+        b=CkPo+Oca79Md3XEuIM1M2qxCoMVzZ6uNMx+O8knWeSw31bqni8QpUEQSakbDZQIYGP
+         oq+X+vrJERwRGCBZZf5Tzy5s93zmhsiBWPcWOiwWdzNzpWRlN++Bn2WtBgH1hBPMt0qS
+         mAVebaF7hX+5o+53g6i7w9D1l+8ew9FvEZBLlz9UMIy/W5NnlcVYYkaZK7gtwek77edl
+         82XDqFBeBg1A3SYR7dvpUPxHkLeoQPsI8icvmO1YXPVLcYJO6JbnF8f9o/ox0f0WHh0o
+         BU24AFOA8zbsD/O6no42/YysgMPxHi1nMtYeEH3Y8pCWNStlYz9jEYWpt9tEANqGonox
+         iCBw==
+X-Forwarded-Encrypted: i=1; AJvYcCVi17YGbJvugsk5metEsrd/Ul/QajcOMMnydZPSBkkIzOWEum0QodxpR12eAh6LQWpXsv5axabeJQmg8Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOT+6Oet9izKnQT5lS8IRihDVXGFKDJBilBJoO9sxbewfp/KPV
+	7Xo41uXDc9k4kCI8epwtV0l/316c2mDMRSywInwQSvqlHIbDcSHM2YxDC85lDxWEEyxpkpVtk4o
+	OZUCjHKeioKJCsykqofl/01rItRXI4XZojiLeaFiN
+X-Gm-Gg: ATEYQzxwzUiKP77jsUBx93ITPFdWJbUFkGOYTu1y1pq8iJgJOSuJ4dQjS6MdpBGxSIs
+	4eETtaAYywP76a0NSqw4XTeY7GXR3YMAMKmtH6ZRTP5g92tFgzwMKY/Bz0aIP1SUBeH1fB8u0wz
+	iv7NiK8s2aSmQCSzjKeMyB1PyXnr1GDavKPIQ2zyu5ELBX9I4fpXAqjEs9BDxsXE/KW72eLL2cm
+	gyuZCUccMsJUj9Qas13swqHBsG702Uwa3g8fmgNccPJYhL7/oKhu3mdNpqNue4CLKDFZhJDLgdb
+	uc/pL/ShahMoJOJRoLefDrb5aRMSTTnAR/oGZNF7GOOdGGRA
+X-Received: by 2002:a5d:5d82:0:b0:439:b3ff:9ab9 with SMTP id
+ ffacd0b85a97d-43b642919b2mr25933211f8f.48.1774358843215; Tue, 24 Mar 2026
+ 06:27:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ezdm6d34jqdrcohk7o6wycxvvlgtf6aqenwx5ffr3plfagdbzi@gibz7xwr6yhr>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
+ <20260216-rnull-v6-19-rc5-send-v1-5-de9a7af4b469@kernel.org>
+ <abfU_itQLa4jDy5L@google.com> <87ikamrbo7.fsf@kernel.org>
+In-Reply-To: <87ikamrbo7.fsf@kernel.org>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Tue, 24 Mar 2026 14:27:10 +0100
+X-Gm-Features: AQROBzDq-YxIP2yXojVICe3lT7Gw23jBxgQOd3OOjRsR5pVnUNgTkbDxmHX_7ss
+Message-ID: <CAH5fLggq-1pReNsRtgRfm0Y_PiQvUsXbMMkPkyO9kuhqzB3wrA@mail.gmail.com>
+Subject: Re: [PATCH 05/79] block: rust: change `queue_rq` request type to `Owned`
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+	Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	John Stultz <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 24, 2026 at 01:34:57PM +0100, Jan Kara wrote:
-> I'm fine with simple_fsync() name for the helper with the trivial behavior
-> of writing out the mapping and the inode. Code wise this will look somewhat
-> different given what you've suggested for the last patch.
+On Mon, Mar 23, 2026 at 1:08=E2=80=AFPM Andreas Hindborg <a.hindborg@kernel=
+.org> wrote:
+>
+> Alice Ryhl <aliceryhl@google.com> writes:
+>
+> > On Mon, Feb 16, 2026 at 12:34:52AM +0100, Andreas Hindborg wrote:
+> >> Simplify the reference counting scheme for `Request` from 4 states to =
+3
+> >> states. This is achieved by coalescing the zero state between block la=
+yer
+> >> owned and uniquely owned by driver.
+> >>
+> >> Implement `Ownable` for `Request` and deliver `Request` to drivers as
+> >> `Owned<Request>`. In this process:
+> >>
+> >>  - Move uniqueness assertions out of `rnull` as these are now guarante=
+ed by
+> >>    the `Owned` type.
+> >>  - Move `start_unchecked`, `try_set_end` and `end_ok` from `Request` t=
+o
+> >>    `Owned<Request>`, relying on type invariant for uniqueness.
+> >>
+> >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> >
+> > It would be a lot cleaner if we could implement HrTimerPointer for
+> > Owned<Request> and entirely get rid of the refcount in request so we
+> > don't need ARef<Request> at all.
+> >
+> > Is there a reason we *need* ARef here?
+>
+> There is. Real drivers will need to dma map the data buffers in
+>  `Request` to a device. This requires taking a reference on the pages to
+>  be mapped, which in turn requires taking a reference on the `Request`.
+>
+> We could split up the reference counts into multiple fields, but that
+> would be less efficient.
 
-Yeah, the pitfalls of going sequentially through the series :)
+So how exactly is the refcount used here? Can you elaborate?
 
-But sketching this out I'm not even sure all this makes sense any more.
-Maybe instad of the allback we should just have a helper for checking the
-inode state like:
+With regards to the Owned series, I still think we should split it up
+so that the patches making ARef+Owned work like Arc/UniqueArc is
+separate follow-up series.
 
-static inline bool inode_need_fsync(struct inode *inode, bool datasync)
-{
-	enum inode_state_flags_enum state = inode_state_read_once(inode);
-
-	if (!(state & I_DIRTY_ALL))
-                return false;
-        if (datasync && !(state & I_DIRTY_DATASYNC))
-                retun false;
-	return true;
-}
-
-and otherwise just open code the calls int the two implementations
-without any callbacks, as it feels cleaner to avoid the entanglement.
-
-This helper might also be useful for other fs-specific implementations
-later on.
-
+Alice
