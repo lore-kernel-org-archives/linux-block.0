@@ -1,88 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FF421255A;
-	Tue, 24 Mar 2026 08:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179831DC985
+	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 09:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774340117; cv=none; b=alqYjY9EwSSuGFazmFkD5QXTMnaFo8iU7/89sCIDDx4Lrp6A/zI5df6wDaXh82AzhcJiO2ff1uFi3OiLcEc82zVGwj58JHcT7WMMohv3j1zpZ3yFt3N5yBUVv7BG21ddsGk416AxP0njv6aJJ3kNlAcmHH2xWV4fctftp/SN/8M=
+	t=1774342864; cv=none; b=R+QFOTC7eQDv5lh9F6z8d7i7vObO714YB5MHakRrpC3P6wgGzpbPGDuuP6TYH6p3Ii2Q0AZk2L0LSds3OK2uOW5HU12Rqz6eJxQ6RtknS+23W9gWD9Mf4HJAPV8XB3XfhagWK7xHqFtZqO5AjcvYX6j2yTo7gW0cWUn5bxQilHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774340117; c=relaxed/simple;
-	bh=5MYqorQudYffiTKGRTSo9+dnbAoLAr5nxTBkcx7TgPA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GbisSFY1nLq1heJDXrnY7xnShC9oMDEDeP178IfaMEpJWb5Rxq0du4Bai5BiHb+DjOHpHnmAOrAF5L5zoiO79UzAR171h2OUi5oKld271uCTBGcvg8qIGAwN0/eF3nMleLkd+UawFO5M7Kf0CSlG8GlY86HX1KPoq3FUNWvnfCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/vOtotT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774342864; c=relaxed/simple;
+	bh=NUCt9499jjNNkuEEykHY4WzmSJ+p9GFYgLXZ1YnXaWc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BQd9wkcgCPGDIdN3qw0nMi1+UhsQE/KIRVyobdhw2T9W8udOJdeat3siNkjO6IhlYmDFPPHUbEEKxruhVMPvXiwpgLm+QMjx6JZywcCOwVxLgiIZ+uLhK0ysAjzJRBNhul5QO55Tglf27TRm2pvx/LllJSrIyBjStu7aKLzo0Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J083fDTN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/vOtotT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAE17C19424;
-	Tue, 24 Mar 2026 08:15:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774340116;
-	bh=5MYqorQudYffiTKGRTSo9+dnbAoLAr5nxTBkcx7TgPA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=r/vOtotTLc/rSEfGnEAAfhYptViAS2McS3oaZFXf4283vE7G5VOTZpQ0bbGCNT2cP
-	 kRH3XjgCbcWjktvkP48VnGdUshHi9y9BKn3v26ytIA0Al9NThs2NceTg5mFJTR+Zg7
-	 ubVX3Z1p9Yu3U+kq5XY7NXh/LIdwlvcLdKOAERuGKhKD5tY6TPNDpOeB24X1XyqNgG
-	 a0wpwXowOxVdjmmRbQMOO6jE+Bcn5eCZfARIzq2BPuYK7lbQsJrw86OnbUnD5f1k0C
-	 TlvQW3gq93001lOo1VU3A5W4/pBZALJXLSeHPN0lUfv2mIkWTgDE4C3mnmF7nkPp67
-	 QMpjK6piliJhA==
-From: Christian Brauner <brauner@kernel.org>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Zorro Lang <zlang@redhat.com>,
-	linux-xfs@vger.kernel.org,
-	Tal Zussman <tz2294@columbia.edu>,
-	axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH] iomap: fix lockdep complaint when reads fail
-Date: Tue, 24 Mar 2026 09:15:10 +0100
-Message-ID: <20260324-zurechnen-sturheit-10ba083e2f06@brauner>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260323210017.GL6223@frogsfrogsfrogs>
-References: <20260323210017.GL6223@frogsfrogsfrogs>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J083fDTN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774342861;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GAFdc90vtERiRN159wE1VgpqPHexiDdaSJGXbwhit1k=;
+	b=J083fDTNNC9LxmjWwo5lySawsKA0/IDf4XQ2WMhrwH2wTO0eArOXQ7xmlC+c9jUhfIiC1m
+	AJwB/nCrkGF4uzTGmiWnaj+LZzq/UB7Ic4TESH3IbFqiAfOhLRZ7r9tkI27BVPbH7tPe0S
+	1hfxKmPewvYnv7x9sAS2WNWFBedp0GM=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-2-RxjzfJo3NYqPteGTj33nqQ-1; Tue,
+ 24 Mar 2026 05:00:59 -0400
+X-MC-Unique: RxjzfJo3NYqPteGTj33nqQ-1
+X-Mimecast-MFC-AGG-ID: RxjzfJo3NYqPteGTj33nqQ_1774342858
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6917A18002DC;
+	Tue, 24 Mar 2026 09:00:58 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.133])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 38A18180035F;
+	Tue, 24 Mar 2026 09:00:56 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH] bio: fix kmemleak false positives from percpu bio alloc cache
+Date: Tue, 24 Mar 2026 17:00:52 +0800
+Message-ID: <20260324090052.1782766-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1504; i=brauner@kernel.org; h=from:subject:message-id; bh=5MYqorQudYffiTKGRTSo9+dnbAoLAr5nxTBkcx7TgPA=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQe8uCXlQlZMtfz1r7nD3bpuxh3f+ko5l91RWbX1dXPW XfO2pWzuKOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAiN8wZ/vt85HLfcm3H7Ksb 1Y9EGb9ZPWOP/NPDFqcsMuP75Jn91SIZ/hdrbhSUiTrRvvHSbTuD4NTrAXL/2CcnyR/bdyv/T2i APz8A
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, 23 Mar 2026 14:00:17 -0700, Darrick J. Wong wrote:
-> Zorro Lang reported the following lockdep splat:
-> 
-> "While running fstests xfs/556 on kernel 7.0.0-rc4+ (HEAD=04a9f1766954),
-> a lockdep warning was triggered indicating an inconsistent lock state
-> for sb->s_type->i_lock_key.
-> 
-> "The deadlock might occur because iomap_read_end_io (called from a
-> hardware interrupt completion path) invokes fserror_report, which then
-> calls igrab.  igrab attempts to acquire the i_lock spinlock. However,
-> the i_lock is frequently acquired in process context with interrupts
-> enabled. If an interrupt occurs while a process holds the i_lock, and
-> that interrupt handler calls fserror_report, the system deadlocks.
-> 
-> [...]
+When a bio is allocated from the mempool with REQ_ALLOC_CACHE set and
+later completed, bio_put() places it into the per-cpu bio_alloc_cache
+via bio_put_percpu_cache() instead of freeing it back to the
+mempool/slab. The slab allocation remains tracked by kmemleak, but the
+only reference to the bio is through the percpu cache's free_list,
+which kmemleak fails to trace through percpu memory. This causes
+kmemleak to report the cached bios as unreferenced objects.
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Use symmetric kmemleak_free()/kmemleak_alloc() calls to properly track
+bios across percpu cache transitions:
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+ - bio_put_percpu_cache: call kmemleak_free() when a bio enters the
+   cache, unregistering it from kmemleak tracking.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+ - bio_alloc_percpu_cache: call kmemleak_alloc() when a bio is taken
+   from the cache for reuse, re-registering it so that genuine leaks
+   of reused bios remain detectable.
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+ - __bio_alloc_cache_prune: call kmemleak_alloc() before bio_free() so
+   that kmem_cache_free()'s internal kmemleak_free() has a matching
+   allocation to pair with.
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
+Cc: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-[1/1] iomap: fix lockdep complaint when reads fail
-      https://git.kernel.org/vfs/vfs/c/f621324dfb3d
+diff --git a/block/bio.c b/block/bio.c
+index d80d5d26804e..093006e5aba0 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -18,6 +18,7 @@
+ #include <linux/highmem.h>
+ #include <linux/blk-crypto.h>
+ #include <linux/xarray.h>
++#include <linux/kmemleak.h>
+ 
+ #include <trace/events/block.h>
+ #include "blk.h"
+@@ -504,6 +505,9 @@ static struct bio *bio_alloc_percpu_cache(struct block_device *bdev,
+ 	cache->nr--;
+ 	put_cpu();
+ 
++	kmemleak_alloc((void *)bio - bs->front_pad,
++		       kmem_cache_size(bs->bio_slab), 1, gfp);
++
+ 	if (nr_vecs)
+ 		bio_init_inline(bio, bdev, nr_vecs, opf);
+ 	else
+@@ -765,6 +769,9 @@ static int __bio_alloc_cache_prune(struct bio_alloc_cache *cache,
+ 	while ((bio = cache->free_list) != NULL) {
+ 		cache->free_list = bio->bi_next;
+ 		cache->nr--;
++		kmemleak_alloc((void *)bio - bio->bi_pool->front_pad,
++			       kmem_cache_size(bio->bi_pool->bio_slab),
++			       1, GFP_KERNEL);
+ 		bio_free(bio);
+ 		if (++i == nr)
+ 			break;
+@@ -828,6 +835,7 @@ static inline void bio_put_percpu_cache(struct bio *bio)
+ 		bio->bi_bdev = NULL;
+ 		cache->free_list = bio;
+ 		cache->nr++;
++		kmemleak_free((void *)bio - bio->bi_pool->front_pad);
+ 	} else if (in_hardirq()) {
+ 		lockdep_assert_irqs_disabled();
+ 
+@@ -835,6 +843,7 @@ static inline void bio_put_percpu_cache(struct bio *bio)
+ 		bio->bi_next = cache->free_list_irq;
+ 		cache->free_list_irq = bio;
+ 		cache->nr_irq++;
++		kmemleak_free((void *)bio - bio->bi_pool->front_pad);
+ 	} else {
+ 		goto out_free;
+ 	}
+-- 
+2.53.0
+
