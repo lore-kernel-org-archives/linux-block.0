@@ -1,92 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009C91A6827;
-	Tue, 24 Mar 2026 17:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06BD3BE15F
+	for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 18:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774371989; cv=none; b=DK+NGSSBstO2TlPV6NRoOd2c1zfMxurL+HmnOsIJGGvHCQNQc7GCKDOFK986pdh3L91w5FleCXdqDK/4Ib3HqWJr7yERq9TPyx0QmvXGBRMq5TapFEx4m8lzYk93wKgnL13rZXqNBfTeYoiHW/Fph2jUmC3FsnEo1VfQuG78M70=
+	t=1774378097; cv=none; b=luTkpjAjtzCXZf9XxYLW3dFo5kAA3nr5Gfs/I+8GdFAL1her8wuS/VkTdJJYxSr5gIXmhF0H/emhjiDYtlMv5kwVwGVeFS3w4WkhGpfRa0O8crHq+dAGKRbzEmvwCeh7rxEBssN+mpOgfIMFULr9dpWMYYMyRxMpDpfSpzp3IT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774371989; c=relaxed/simple;
-	bh=3do5ookdd0VXSf3OwjE/LYpsosNLUXlPOPQeT3MWgkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ej3M8JX73kAkca6Zcbu6TxHfh/SypTkxAvZ25IhqWPxltFuyCd0MI5WuAEFOs/ts9H8MQk0MGbunIY56mqHqEiWFo2c/bA0Wz4HPnl59sA4g2W98rwIAfRKi6mpriFzOp2xh0OVgRr9Sx/ONTL+VrKEibhZb3h2bZIgGnlAFUDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O14t2Tbo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774378097; c=relaxed/simple;
+	bh=u6oOk1X0S26SCObLglImxKOc7Oz481CGlkuridd3b6Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aL5pmcnffIcq3XCnRinGjDUkZ6hbCf4ovbRHlKwBdG4w0BIyH2NUiK1kftRlXJU0soaSRoG/0GEEpedTqiyxjHZmglEvX5vu4pjrCquuS0Dl5ukJ8NXhmR+a/xVaMiru+Q/dgGLy/OS4Xj04V4/8S07+Y+j4lGuD5UxaQUhW8vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JSWuw/Fe; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O14t2Tbo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A587C19424;
-	Tue, 24 Mar 2026 17:06:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774371988;
-	bh=3do5ookdd0VXSf3OwjE/LYpsosNLUXlPOPQeT3MWgkg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O14t2TboVb6WHnoQTD5GV+63wQR81LdwqDeGEPG5/3yEUFRpc1w2mzOWvZ4dvmCsS
-	 G2P+CBZhvywHJxxZIYw0i5ix843VOgtMsPeICayr+wOj/UyFxjKOONim7IzNXjzm2V
-	 rVr22NcInyyscEYm17Y+ktWFcuOWsBAOADwlbA6OcjVE7Q6ae8roDEX6LI3D1vJ2uL
-	 FkNkZkrVXGPWtcSDDmKKKLEGt2Xf4f8Xf7Jum5m91WOtE6vXzSHqoDh+UnKeYNZEcJ
-	 9j3jS/d1tPg9okVPAkrRl58f60B5211wR6EcUCI98LK6P4wIYUq8Qomyl3e0zcu94z
-	 192O8lQR9j58w==
-Date: Tue, 24 Mar 2026 10:06:27 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Zorro Lang <zlang@redhat.com>,
-	linux-xfs@vger.kernel.org, Tal Zussman <tz2294@columbia.edu>,
-	axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH] iomap: fix lockdep complaint when reads fail
-Message-ID: <20260324170627.GP6223@frogsfrogsfrogs>
-References: <20260323210017.GL6223@frogsfrogsfrogs>
- <20260324-zurechnen-sturheit-10ba083e2f06@brauner>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JSWuw/Fe"
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7d744d9acbeso1699406a34.1
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 11:48:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774378093; x=1774982893; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SmJZ2IWyqe9C+y8W974uEjXLq2yLBMVnY6/rqpsVLYU=;
+        b=JSWuw/FeNBtzQtbW4Bdnh2QvwNj89+LGzfnG3X/NI3RoXCyZKcr92JSH+2DdCYGnvg
+         8cWyjHTq4eGYdRcxJ/0oC4dxBiXoIMzrlQ9IadW7uwOsIHvLzRKkNlN3mod2hMbFQIAy
+         yZYoeFPw+NBj3GBYoSVSPRGf6JjRQzgiDUT25HnMtJmnPqByEJhlCbbf4RJyucN5Eqn6
+         2cbKQ2SEBuJ3aZ+UmuP9GdSzsX3sn3OeIfNKExtlblyiN5DvW0tltXnO5j/e+R6bO27W
+         SPmKHtATr4oPRM15UjcDwF2bVsdbnYxbz6klBL7866RQDJ7CdGfNhcuAv1/HpldYlAGA
+         lZKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774378093; x=1774982893;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SmJZ2IWyqe9C+y8W974uEjXLq2yLBMVnY6/rqpsVLYU=;
+        b=k/BZyuUD2JTzW19/mj8ZABi5YZ+nx+jcrYtgd/+56bJzpk0kGw+DAIaFPEUIeGoqjF
+         3ALMmscH0J232UCwzJbgYrAtI9QgwzjvEvbdrMJ1oIA6/p82vhgniBmPIiXfikKBWD9I
+         HwUMe0CoJXULxyqiUqh0f9Kvzdsi4LDKc4NdsqCxA5N9evL1R4K8IjK4anXOZmBX3aIs
+         Fq2HfCb3/9MqJgURhXpdB7Kr06c/R/Rh35bSPcqhgt5WqnPDSjhE+Rz4WURIxdwLUxib
+         oauyI4juUelzbXdut8nrJGBRF0qpJnoE1RFYu80YlkeJI6G5Bm1tqrbVy8llSckjwLoj
+         7XTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWN7PVEnYBd2iei+B7qnAq8Fk/uqS/0uxAoJ0qFUFuffzHJbIv//76bw4P8KneE4tCR0wGRQumQzH7tcQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf4JYfvOkdXttp1sPqgv4Yf4wjozpLtks8n4Q9pfu9CoZpBr+u
+	QCL9yo6wiOkl8NM83yVDzyhPfWSjc3iXVxgNl4/3KuMGCrxh6X3NZbj/pB9a2IGOyKw=
+X-Gm-Gg: ATEYQzz9lglbg2xz1bYJWOZqeigL4Wq3IpRwqxI2BnXVX6DNilkhJX460HeP+ZEwKwH
+	ZzPPdNKXH4vamS0syFHPHpw31PXEcwEWiEDV3NycIlD89dRsjfb/S0ZRzL1Cy7gFB4sBmsRXZ86
+	cuKev5v1j36vDYOMlJIYmktHzXcU46CIqbhD/Ako3/CIjDs+fIZYg+8yzaAHyr+6PdJYEJL+bsU
+	v8pvMbwEk1U2FfzTedaFAU49aQGmGMMPWKmw2tXXx7buNYPaVO3BlJfsICD9CG6ughs1b4Mv4+w
+	1aBOJNtUtfnYYjBRihduQwKT1WHqLTEIfo3m4qupROiOe7XiYRnkQZQEFvmEPiKIuF0Jok9Myre
+	iOObSkqoMlcNju93PCqaQco2EEsZ0EI7vtNdX6wdnr1R0o9SAbEZxVj1nXRUiuEE7TGEWpVPvYE
+	UCZHm5U9g3+e9iE3KIYMO10lug5BINLwDRJ0hAuWlrEXjR3bHbYUO4tkqfywLCabTbUJMyeSQZ2
+	PeV7fiUbv5B8MJY7OM=
+X-Received: by 2002:a05:6830:258d:b0:7d9:9e43:b8c2 with SMTP id 46e09a7af769-7d9d68fce31mr269547a34.22.1774378093231;
+        Tue, 24 Mar 2026 11:48:13 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d7eae1c959sm12274619a34.23.2026.03.24.11.48.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2026 11:48:12 -0700 (PDT)
+Message-ID: <5c12f6f8-5962-4d66-8414-8f5185438ecb@kernel.dk>
+Date: Tue, 24 Mar 2026 12:48:11 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260324-zurechnen-sturheit-10ba083e2f06@brauner>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] block: define new rqf_flags RQF_XFER_SINGLE_BLK
+To: Bin Liu <b-liu@ti.com>, linux-block@vger.kernel.org,
+ linux-mmc@vger.kernel.org
+Cc: ulf.hansson@linaro.org, shawn.lin@linux.dev
+References: <20260310160408.3976760-1-b-liu@ti.com>
+ <20260324143448.2631888-1-b-liu@ti.com>
+ <20260324143448.2631888-2-b-liu@ti.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260324143448.2631888-2-b-liu@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 24, 2026 at 09:15:10AM +0100, Christian Brauner wrote:
-> On Mon, 23 Mar 2026 14:00:17 -0700, Darrick J. Wong wrote:
-> > Zorro Lang reported the following lockdep splat:
-> > 
-> > "While running fstests xfs/556 on kernel 7.0.0-rc4+ (HEAD=04a9f1766954),
-> > a lockdep warning was triggered indicating an inconsistent lock state
-> > for sb->s_type->i_lock_key.
-> > 
-> > "The deadlock might occur because iomap_read_end_io (called from a
-> > hardware interrupt completion path) invokes fserror_report, which then
-> > calls igrab.  igrab attempts to acquire the i_lock spinlock. However,
-> > the i_lock is frequently acquired in process context with interrupts
-> > enabled. If an interrupt occurs while a process holds the i_lock, and
-> > that interrupt handler calls fserror_report, the system deadlocks.
-> > 
-> > [...]
-> 
-> Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-> Patches in the vfs.fixes branch should appear in linux-next soon.
-> 
-> Please report any outstanding bugs that were missed during review in a
-> new review to the original patch series allowing us to drop it.
-> 
-> It's encouraged to provide Acked-bys and Reviewed-bys even though the
-> patch has now been applied. If possible patch trailers will be updated.
-> 
-> Note that commit hashes shown below are subject to change due to rebase,
-> trailer updates or similar. If in doubt, please check the listed branch.
-> 
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-> branch: vfs.fixes
-> 
-> [1/1] iomap: fix lockdep complaint when reads fail
+On 3/24/26 8:34 AM, Bin Liu wrote:
+> This new flag will be used to handle multi-block transfer failure, in
+> which case single-block transfer will be used.
 
-Hey Christian,
+Maybe I missed this in previous discussions, but why can't this flag go
+into struct mmc_queue_req?
 
-Is it not too late to rename this patch to:
-
-"iomap: fix potential deadlock when buffered reads fail"
-
---D
-
->       https://git.kernel.org/vfs/vfs/c/f621324dfb3d
+-- 
+Jens Axboe
