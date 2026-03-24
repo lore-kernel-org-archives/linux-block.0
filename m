@@ -1,52 +1,50 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322733A6B62;
-	Tue, 24 Mar 2026 05:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556CB38239F;
+	Tue, 24 Mar 2026 06:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774331794; cv=none; b=HOt1va1X+aRgHtWw9fzmrOfmTLooCVZgttopcEd6IY/i1/ZmHrJuGORcSiSHNvMx0PP8W5OAm//o9qLCtsW24koT+2nGmnL3HwXkljs8duO/9INbmcbGDsdun0izwo4SaXGzDSDHXBbPeUc0Q6w8nLirxFshjOHCosBKNFc3hbM=
+	t=1774332854; cv=none; b=jWgbCd76MRzrtA7bjQlerFHp18bQO4WK6KwD1jChHAcq94CIUCNuBZFRBHLM4gHPcK2NlpZvtTS5vVcvJMw0wA/nEa1hGgjV7U0BA4hFlQ5ox9EoSj6iB/PbRxl+0IRO6IFVH/MfocPAD2r1A/VlPNqU3I7SdobBhQegxwbu+hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774331794; c=relaxed/simple;
-	bh=/95oFOjhTgKmq+1zsKFw6HDfMgURvP9+0Jq3M/BVzd4=;
+	s=arc-20240116; t=1774332854; c=relaxed/simple;
+	bh=fKeFWp32Umkk6X74Q7wF1usE9xg1tJTJL4OuOegHo/o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gWcUVkGpl2ODGWuL3SEo3XnNdmakLlwsudNJsMUJKhiABOvcDH3IokNHuxEUyiRVVVdAtuYhxuLOmrvHFWHKODCHb0icooxUJR4yak1vhVT9Zs7qtzXBBzziGXeh7bEBQ1guudWsn4tocbS3A1IxbnUselLiNgEr2egW+SCN7To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VnGsK9o0; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=ookwoZG7d18B2ub7AaG3fDVneFWp9/d+N8KJYHAM8NhAbI0kKjnC6AL0m/hkmxiTznBE9Mdli8wQmeLSS3Uo7jZqdlAAQlEQWvQVwNAHvhDnkIhCrQiayVK5gVMCA7cADehFOuqoR9GqIvV2neGNWB6kuCkOmM7wi5zJM/j7Wzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NhSC/ruv; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VnGsK9o0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NhSC/ruv"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=MtO3UkezvPYDI1WseWZT+CQteeNIipdQ8FHfP2vxTes=; b=VnGsK9o0awm0/1LzaVAbykaRkw
-	qZDn4CDccSHCQiyLLsYSKCs1xHas4u9P1CpUmZMFnOO6qAS5xYwUi2Eisf2wzMuDKZ8sc5olGjvMf
-	40fdgQnRay2l7/FL8S1+WyeQf3fSMj5CZxMslBWSABpvxhmL+7cg4uYS9y7uqHvoAwXoHcX+WgHf7
-	iuguqbxqwODOSesNkJkHbtM02yFjpAcnJI3ZgPr5ZFVSTzal78Sw0YTko04XwYvDi5x2DWIle26Rd
-	dttrRYD7Jj5ZAzA0oUVF+Dy8pl1LEb0eGQlgNz3L6sRF2gYJesDj1NSosj6cRRm5BHvGMXzrhXFfc
-	jKbz3UMQ==;
+	bh=Crr+X6KwjNL0HCNmaM8qbxRjBmp1XbbViBei2eWk5v0=; b=NhSC/ruvxC0kYketPGWJoUfPmv
+	wVyvaHr9vZuAXbdeRDeCmBgbEZL9pQZLJ9P/A15468W6K56ER69m5ACsPQtKB1mvgyxqy06BnANTU
+	dWmu0YuK8GAdi9RAmJ1uRY5B2MIP7P1HtdqAocqKgXWpnB7iO8Gaq+j4g/y5HSo+D+B3UVG7EKRsV
+	pf1VAPLhNnSX165Nh5pa/iaAKPKdGnKReX1uFKdYShMTnlweYPGcVLhFkHDTIcfS3N0f74E7RIgar
+	JlSwf7CVxAiHskkEYZ1kHSi3E4tKo7FFHTSHdN0+rqtKyp1EsNJlQO4abterIBYd97zWri8SWbn0y
+	vMJROn3w==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w4ukg-00000000coL-40EL;
-	Tue, 24 Mar 2026 05:56:30 +0000
-Date: Mon, 23 Mar 2026 22:56:30 -0700
+	id 1w4v1o-00000000fLT-2GCF;
+	Tue, 24 Mar 2026 06:14:12 +0000
+Date: Mon, 23 Mar 2026 23:14:12 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>, linux-ext4@vger.kernel.org,
-	Ted Tso <tytso@mit.edu>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	David Sterba <dsterba@suse.com>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	David Hildenbrand <david@kernel.org>, linux-mm@kvack.org,
-	linux-aio@kvack.org, Benjamin LaHaise <bcrl@kvack.org>
-Subject: Re: [PATCH 41/41] fs: Unify generic_file_fsync() with mmb methods
-Message-ID: <acInjoDTJAz62eUp@infradead.org>
-References: <20260320131728.6449-1-jack@suse.cz>
- <20260320134100.20731-82-jack@suse.cz>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Zorro Lang <zlang@redhat.com>, linux-xfs@vger.kernel.org,
+	Tal Zussman <tz2294@columbia.edu>, axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH] iomap: fix lockdep complaint when reads fail
+Message-ID: <acIrtFpASaBmFZPU@infradead.org>
+References: <20260319194303.efw4wcu7c4idhthz@doltdoltdolt>
+ <20260320163444.GE6223@frogsfrogsfrogs>
+ <acDbFtQw0mom798e@infradead.org>
+ <20260323152231.GG6223@frogsfrogsfrogs>
+ <20260323210017.GL6223@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,29 +53,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260320134100.20731-82-jack@suse.cz>
+In-Reply-To: <20260323210017.GL6223@frogsfrogsfrogs>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Mar 20, 2026 at 02:41:36PM +0100, Jan Kara wrote:
-> Taking inode lock when writing out the inode seems pointless in
-> particular because there are lots of places (most notably sync(2) path)
-> that don't do that so hardly anything can depend on it.
+Please reword the subject - your are not fixing a lockdep complain,
+but the underlying issue of calling code from the wrong context.
+Lockdeps as usual is just the messenger.
 
-This is really something that needs to stand out clearly for bisecting
-and documentation.  I.e. make this a patch on its own and preferably
-before all the other refactoring that already is affected by moving
-between the implementations at the beginning of the series.
+> Zorro's diagnosis makes sense, so the solution is to kick the failed
+> read handling to a workqueue much like we added for writeback ioends in
+> commit 294f54f849d846 ("fserror: fix lockdep complaint when igrabbing
+> inode").
 
-> So let's remove __generic_file_fsync() and use
-> generic_mmb_fsync_noflush() instead to reduce code duplication. Arguably
-> this leaks a bit of buffer_head knowledge into fs/libfs.c which is not
-> great but avoiding the duplication seems worth it.
+The code looks ok, although I'd much prefer generalizing it.  I guess
+we're too late in the 7.0-cycle for that, so:
 
-You could just pass a callback to the generic version.  The cost of an
-indirect call should not matter compared to the rest of the fsync code.
-That would also be a nice thing before all the renaming, as that means
-we could add the version with the callback first to unify the
-implementations and then the file systems are switched away from
-the buffers fsync variant to explicitly pass a callback, or to not
-pass a callback when they currently get the default one.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
