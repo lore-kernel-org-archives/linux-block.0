@@ -1,149 +1,154 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4D13CF663
-	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 15:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774451279; cv=none; b=ingq66p4bT9c4LYTIbLHa75WyDg/n+vAmXb6D+QdGg2A7tHxqhNdkzCdaoSr1cKjT4F2aHpkKs0OUL3TNao+BNIB3O0G4ZmK2KrQDwtx8kJlRFXxwPZ8C0LXqekxtKNyQ+tCYL7mG8v2vndnSwTJkwSX/aF/JYFrxUqVwx9vyCo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774451279; c=relaxed/simple;
-	bh=ERTKbMW2EDP8gO2WT3niUZYSBC+7slMKattX6iw7cG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b1i8RTa6rudlyj45ViL2qSxBDHM7RqWynZt/R3EFNWVpnPl/p8o44B3npd7NQ4OQqWOKOZldfcOKUKrysIlE6xBJSP9yUKi++ALsbm8vmz/YuD9fk/TKheJhQMgt8xILN2XOH8+5Z0+nDLXluqkYb9dgA8nuMidGZVRWgnLyoA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DMVI0bj+; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79653A75B2
+	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 15:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774452175; cv=pass; b=JjFKofes1KF7+f/O1xBmVdj50JYd1ePrzqd4jFQbk7qAAX1NlvztxZlszKVyEZLOqG8ZHDwZ/GURRO8tCKQfemkd8CckU/dnFZSQHhyXA7aHyjROBcOtllR0otY/A19hdD3c+O8ovvv1ea6nQhrN8nwmRfKV7j1INiRNFVtLdXE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774452175; c=relaxed/simple;
+	bh=RUJDFl6Gban5iD0F66YO21DeJVocE58P9DeIsTNEYu0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UW3fLOg1OycM9W3MVejFJcx2ngYJ9jVWu6pVEjyzSP0uKC/B4YZ/peWSFItbYJT7W1mj8O0wE6Du+E7qJ/TlHgKJ11Km3gKIGrebuhtcQM1SXgWaiqfRYU5frQRQOCiG061PYaqFG/hI1ZKcKnNs1EgDczJEVhyiSAnyASJ9yNM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yqph32wb; arc=pass smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DMVI0bj+"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43b4915161fso4975619f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 08:07:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yqph32wb"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5a12c19affeso1890195e87.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 08:22:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774452172; cv=none;
+        d=google.com; s=arc-20240605;
+        b=K435ImeGT7t8VsFcJmYpbpjF1+hiNPl0pgKb0v/oytZeKAhc5ChOXfq/YqheUAYO85
+         6NSmtsBgP0MH2VZvYIAsEEN1F7vjmgWHKjfLK7B9U0CUTx7kh1G6LJSJKcnUM2j1+URF
+         6FacQfp/03uec2P3LCIBubjyrNCgWKxrUOHckN+g2iowIJpJRoK0VPqwwIH1kJ0V5riZ
+         z1aLaTaKXOyzWYksbqpgmYhWiDB3E+ZsqogofLmOW7jiaPdvPWpZ/NirU0PP75IhIZUT
+         ANmKAxRfOe4OM2Xoz7L0ZcwlHrhX8ejuGO+nTkFC/W+SqYHQv2YPVbGUDwHAvPlBMChS
+         lRkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Voi57QZb4DLbcW1Q8dUVtdAWGCKnIvlCceAEVq0+sg4=;
+        fh=w22f7Xw1Z81EfNB9EI8d+o2tpP5U99vUd6STgdEcrfw=;
+        b=kfNEDynvGIbsnJDrbMOhFCLn/2cgEgnlLDj50TKBce//wf4p0nh9arMHPNziT+3Ke/
+         pIKbIstoW+JX3vqAim7oWbCjJVE57zf05Oc9DUrXx9PAVTLHJpuhQvHQq0biI0WFhj+H
+         kXRK5tPPapDydQjXLGbsxPznFJR665BI+l+rpl/OIVUs9qtnbHQb7AOfiA9Kaax2xN6z
+         EknOTyzagtPPe/mI+b4yZOrNp5UvAvanR2l/4I3QQTNXUR9DMHmFYFoaZeeiGlQTxax7
+         /wuYJRZdsKZm4bAgeO8/rnanPYdb2pfAtIbcBxAHwKz7w2jwAQMgkeMPiet6xEvG7On9
+         NmPg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774451277; x=1775056077; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ERTKbMW2EDP8gO2WT3niUZYSBC+7slMKattX6iw7cG8=;
-        b=DMVI0bj+PMyJzocetKPqkjC0FHq8c6yIhM0M1Jf8A6yIzZOJiXHdWjMGLlVa+KF54o
-         zUuw9oexDYwK3oydqY0s2BPFqt5UPLsnNV/ELSDabk6VQEFQFCOA40WcRlsXi9Zqakor
-         uMH0rCxCqE6SUGpX271pTYQ8e/oF4+DnSMiyAeXERrybwKcfD/u+9dBP2ugp16ABHV49
-         0PfJVKys8iW/r6C3phYxvDgkIV0//jH0vNAxQLTuNNsj6lJoz6VtXTGjpWYrxLhuCOHt
-         m8wLgcXTMO5G8wtNqW5Y89v8DrxNAGrDxTp7it3/iLJ6wRK4q9ZQvNpQwUC/OVPcZzst
-         qCeA==
+        d=linaro.org; s=google; t=1774452172; x=1775056972; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Voi57QZb4DLbcW1Q8dUVtdAWGCKnIvlCceAEVq0+sg4=;
+        b=yqph32wbSIb4yHcFm4pgpz9R4qFWRjZZra8jq4nBWbilvY5aF/WYei7ZhlSdO8pu0b
+         dxCD8zhoc9juF+u+9XA48GYt+Eb9HFlaAJ/9la12AzStvtL97rbC1dxO8vBKg/jjUSdM
+         d+KWDb2h1eGyYuSBXpO+/hFG5ovp9eTis+wLcO+V/0SD0IBTajFotNACiPshbzef8KdM
+         F5WTm0Vlog2CdjhepceQY4Aw1LfeeKhxNMsNQ3H7Dvw3rd+PuMHaNfcUZc6apI+RNQyO
+         02GkOFmwCzQgnzgp4cz2HyIMQvBVmRLEpmLjKNnuZqB0fq9RmaMA0ZLhBjG0KOZgtNRG
+         z5bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774451277; x=1775056077;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1774452172; x=1775056972;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ERTKbMW2EDP8gO2WT3niUZYSBC+7slMKattX6iw7cG8=;
-        b=kJX/uC0xQcgWifbV5nRTwfgkAu5gE2Rho4gjMpO+3Q05kcdZk3NnDdbFocF3jktEbg
-         QltEANkMQbmV6v/g/drEmiJ3QBZm1GKSelgbwKGQNa/slM76WdvinPOrILAIW5RCMJfz
-         eVgfwL3eJD61llCjgVRwgCUoi9QCraJsSJsk1fxPaz0GT8f6Q7jjIr1WDpwYG7o2ek/6
-         5oM0gB03JE4phNZwRuMzTynDikb9JDRN+1t8arUKDvq/GoKU9CACw1GdWtIguBK1H1ke
-         4hZ9jozloNOXCE7ZMSiXAUz6aee+uGW+PXLbgavyMILbolPlpuVXA3Dqt7uFQzCyD/qs
-         SQng==
-X-Gm-Message-State: AOJu0YzQ/03Dv8TFtTa46iPUgMzenWkhnt/r4nDA6g2gUxX4fBmMC1Uk
-	8g2n9/JcYl7+2fPqm/LPwTeSQxcQrGKStWCbWgfUrgDmfxsZOuN7w2OE
-X-Gm-Gg: ATEYQzwK/LL67hT95jVGEJPllgr4qCI2SIokPBAs+hMmrcs7HC56l3viaMLbxscdAC4
-	yMknF5+3V3nIaaZihu33e3wBLKiacs9H8vi5XqvF4VaBZhv+rTeP1CYNEOdyVH8pt7qhQaK3ugi
-	gsh91lUGxW4QN8EFjsEAUo+fjMgwF+c8RgZAjdu3LvLx3+bka0fTCNGUByz2yBpjGg1lWjPU23t
-	0r7V42voZmAKqoVewU0kCqZGPCNhWn8vILFA5DmgLSX0D4t6KmSFhbTsfiq+xVILoVU0g6Wa0Cz
-	LkfdBHcMyDwipqi8bT+mDSJ/2lT38VqI3/a6M9fMpqj89Fe8V2O5pvzVbDSWoT2rxsyI5cg1/Cx
-	TwsujmjXpGAO9btXvqDXQ9dzeFukmEg9q9hpqU0xGEmrr/4nUwYL7YyVH4FQgVZfWkVPYCYGnYu
-	HTuE1BqQaXi4rRU8/CbqMEO5ZqZK8x
-X-Received: by 2002:a5d:64e7:0:b0:43b:3c05:d7fb with SMTP id ffacd0b85a97d-43b88a39b7amr5607269f8f.54.1774451276557;
-        Wed, 25 Mar 2026 08:07:56 -0700 (PDT)
-Received: from [192.168.1.116] ([176.74.141.242])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b919cf1c4sm340955f8f.23.2026.03.25.08.07.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2026 08:07:56 -0700 (PDT)
-Message-ID: <ca0c8b55-a600-4067-9477-79f4664a916a@gmail.com>
-Date: Wed, 25 Mar 2026 16:07:53 +0100
+        bh=Voi57QZb4DLbcW1Q8dUVtdAWGCKnIvlCceAEVq0+sg4=;
+        b=ZAsSRnkLm9aC5+1jLEMJe8ywia8Hro53p3X7PHcy+Up/0dPX8ZGVNkXWE6mKU1ACjG
+         fQuvcnR/b1CAGtGarBwZdfves8sseTWjF6ZkguJ3uLt7kxkLs6chuqGhE0z81WhNeIqW
+         Bk7MICQQtpCHz+1bk70jRyqzTw+8jIam9ACmCGP3M/tp/NYVtSxav2OwOX0ceIX/WfpD
+         92+moU6+lvjAPcR6XsvkOxeup1lbKfdeZ+QIxVBVTZTHNgc9Z9Cd1Q1fAOw1VyXkpQsa
+         Swn2axZdaWT771ZNcXxe5m2mCefyaU4PA2LT7eCIjzT9vEDPPY/qDgLFTnGeA7huDQkJ
+         +J0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXYfBtA4VbgL0L7iC+5glwuboKD1dCAC4EY3WXS1ESYxeVBHrUxkDhkmG39Yfj1yiWy3IpzG/CRAlaZDA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY9HmjIIOFLNrzv4wixiqcahvJxqive8gXG6nX2Hs9jKndIiP2
+	JV4CgjV3o/35ooFhZQj2s+JJdUy5PrG54MYpxpI90AgXTNSMjR5JHn3illavSoGXN3NY15jL73w
+	CShtHa26yk6vKj/dZ0klYjTLXK/0SCHpqyV6DtnZfvQ==
+X-Gm-Gg: ATEYQzwkEfbxCPz/NtJRfYlYDqAT3LGoLXc9OE56HJk8OFKfBY42u+TOEIWOCP0u9+T
+	63Cf35/Uz7/cK2WRYdHvjbtwdE8h8MFnhBBfbpaNeKctC+wyo4wn7s8UpbfJbZ4GRV+ZzXWs6jY
+	l8ydi/bFAZEAgH3IsaPVGfUIdp5XzpUySe0Mxr2SU8YdpIlpXw9AD1iUKv6LWoQgLA55LX57oOZ
+	tk19zob+XD0g+b9dz+Gd6k6bjBq7R8V4qrL01mIf/ODArPFnTzON+j1z4Q7TX2gVXQ1JfhFbP+s
+	jzmo5/Ec
+X-Received: by 2002:a05:6512:220f:b0:5a2:7901:a513 with SMTP id
+ 2adb3069b0e04-5a2961fd1a1mr2666933e87.7.1774452172016; Wed, 25 Mar 2026
+ 08:22:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/3] dm-inlinecrypt: add target for inline block device
- encryption
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>,
- Mikulas Patocka <mpatocka@redhat.com>, Eric Biggers <ebiggers@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- adrianvovk@gmail.com, dm-devel@lists.linux.dev, quic_mdalam@quicinc.com,
- israelr@nvidia.com
-References: <20260304121729.1532469-1-linlin.zhang@oss.qualcomm.com>
- <20260304121729.1532469-3-linlin.zhang@oss.qualcomm.com>
- <20260312070110.GD2359@sol> <5a310122-bd7e-d10e-653e-bc7e09681478@redhat.com>
- <7f613001-fc2b-44e3-ac14-7e661cf52fdd@gmail.com>
- <c86ff571-092e-4181-9bd9-3e99f7c4b1b2@oss.qualcomm.com>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <c86ff571-092e-4181-9bd9-3e99f7c4b1b2@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260324143448.2631888-1-b-liu@ti.com> <20260325134947.2799552-1-b-liu@ti.com>
+ <b4c84630-ff69-4d1c-8b82-815679d3fa72@kernel.dk> <20260325142106.j2uiurbkgac6xw52@iaqt7>
+ <91fffaac-587b-46bd-9ce9-f3c354d89b6d@kernel.dk> <20260325142759.gnwhbnnffgyppu7l@iaqt7>
+In-Reply-To: <20260325142759.gnwhbnnffgyppu7l@iaqt7>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Wed, 25 Mar 2026 16:22:15 +0100
+X-Gm-Features: AQROBzCWYR9Y7EaVEdVe96tudlobOWrTDVpPwwPWxo0sxiy9Z24mT9JI_TwfnLE
+Message-ID: <CAPDyKFpWL3HPnZOxrhZYni2Hc23LySqxu12tq2ee9wOkm_=KLQ@mail.gmail.com>
+Subject: Re: [PATCH v3] mmc: block: use single block write in retry
+To: Bin Liu <b-liu@ti.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	shawn.lin@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, 25 Mar 2026 at 15:28, Bin Liu <b-liu@ti.com> wrote:
+>
+> On Wed, Mar 25, 2026 at 08:23:29AM -0600, Jens Axboe wrote:
+> > On 3/25/26 8:21 AM, Bin Liu wrote:
+> > > On Wed, Mar 25, 2026 at 08:12:36AM -0600, Jens Axboe wrote:
+> > >> On 3/25/26 7:49 AM, Bin Liu wrote:
+> > >>> diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
+> > >>> index 1498840a4ea0..c254e6580afd 100644
+> > >>> --- a/drivers/mmc/core/queue.h
+> > >>> +++ b/drivers/mmc/core/queue.h
+> > >>> @@ -61,6 +61,8 @@ enum mmc_drv_op {
+> > >>>   MMC_DRV_OP_GET_EXT_CSD,
+> > >>>  };
+> > >>>
+> > >>> +#define  MQRQ_XFER_SINGLE_BLOCK          BIT(0)
+> > >>> +
+> > >>>  struct mmc_queue_req {
+> > >>>   struct mmc_blk_request  brq;
+> > >>>   struct scatterlist      *sg;
+> > >>> @@ -69,6 +71,7 @@ struct mmc_queue_req {
+> > >>>   void                    *drv_op_data;
+> > >>>   unsigned int            ioc_count;
+> > >>>   int                     retries;
+> > >>> + u32                     flags;
+> > >>>  };
+> > >>>
+> > >>>  struct mmc_queue {
+> > >>
+> > >> I'm assuming retries is a pretty small number (didn't check), so if you
+> > >> care about layout/space in mmc_queue_req, you could make this:
+> > >>
+> > >>    u16 retries;
+> > >>    u16 flags;
+> > >
+> > > I quickly went throught block.c, it appears retries would be only a
+> > > single digit number. I will update the patch to use u16.
+> >
+> > Note that this is just my suggestion, it's down to Ulf. But what I would
+> > do is a prep patch that makes retries u16 and ensures that's sane, then
+> > do your flags patch on top of that. I think that's better than making
+> > that unrelated size change for retries in your patch that isn't related
+> > to that at all. It just sets you up to not grow the struct after your
+> > change.
+>
+> Okay I will wait for Ulf's decision to make the u16 change or not.
 
-On 3/25/26 12:57 PM, Linlin Zhang wrote:
-> I understood that supporting keyring here is to ensure no raw key exposed to
-> dm table. As implied by the name dm-inlinecrypt, the key used by dm-inlinecyrpt
-> is a wrapped key, rather raw key. Can we keep the wrapped key inside the mapping
-> table?
+I have no strong opinion, before or after works for me, while I
+certainly thinks it makes sense to do the optimization.
 
-Whatever key it is, it allows activation of the encrypted device. And it does not
-need to be cached inside device-mapper layer (in DM table).
+Even ioc_count can be changed. From a brief analyze it looks like this
+(needs to be double checked).
+ioc_count <= 255
+retries <= max 5
 
-> In other word, can dm-inlinecrypt support both keyring and hex key(key in mapping
-> table)?
+So maybe u8 is good enough :-)
 
-Yes, support both. There are situations user must use hexkey directly.
-But IMO, keyring option should be supported from the beginning.
-
-Thanks,
-Milan
-
+Kind regards
+Uffe
