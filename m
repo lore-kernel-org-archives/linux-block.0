@@ -1,159 +1,127 @@
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010021.outbound.protection.outlook.com [52.101.46.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511E93BD645;
-	Wed, 25 Mar 2026 14:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774448471; cv=fail; b=eA9KbkBMPVGfpAp4ZGj2dAQs0r7nrIjej/KSo9Z23z3BStfBWCBtz4lfNPWQqtt3SzZ0GwIh06Y97y1Rb50dJFuOmWxUWS4dcrlVqdYiimjg89NTw++tQ0rOXvuvYfCKkQqbcyD2tm5wwdTcw7PLIV+g12n5+9QkVSePHgCeHc4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774448471; c=relaxed/simple;
-	bh=41AIcONo9SzhjGVg3J9wQ0alEEkSy9cnslg+ZVInenw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VucwuUotQGS1Ya9HMe2Y8uGXH4ZkFTJQpTrj4BHZIw7wO0FAtOYab8QHQtBmFFwNp+R127E87Ffy+jCBoMp0ZWyB91q0MOBTsi7yb3APmEvWVDaYgsNUCR6hbutLrlIV+zSPXi2TNhzhdOWjzPYXmcrgxawQxURC1x6Opwo67KI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fxSZMVqw; arc=fail smtp.client-ip=52.101.46.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AF43DFC6C
+	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 14:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774448614; cv=none; b=skdVw0Uq/4jzz5x52+cQr9QldxVJpLNlSc7wm4pG+9xMDmo7UeQi4nmVT4cAR66oinVsqsXnhsCfWQphZD421WmYBubkOAc7s3buB0hN7nihywoih4f2UtA+sKQb5MkTdoLAfHnY4XJ5fFeJYgly0PD6mLnwPRqmiq5bRWFJXC8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774448614; c=relaxed/simple;
+	bh=6k/3DRfSULXerh+4WzXd+PR/y1S6YeoK6HC9RW8MWJc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YSV7227g4gSZJ1IlZPOx1BElO6ZF5ycaveif3iOIWqIBuXDbUVhhspUOrzyfUQp2tKXaeAkRl0wxIw6FOYIioFAetR1fajlqWphBaRniC5eLdrlfvPQS9nL+kzVLUcPt9/kziohBbeLjLsRhCDnvwHP5O4fIH7bC37Ma/UOnwDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gFulcITP; arc=none smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fxSZMVqw"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jlD4hbwPfTMnqU9ACCtLLqWda+5k2p/8Hz0ziI4VWXAVJdrQ7z/oPNiup52U5TKKEnodEn++u6Oxt005nY+sHxemm7K+VFaLDEMkFUsXISEstXw9yStKEPJeLKrnuIo0WXjezZ/kVG3R9f5nOVXsknryJsxXHn5tC1FPF5avlApU7UAKoJPoQ6bLNeu/hq2EPFiR/2VasPZiSt751ui5hgnLpryKkDTer/y5xl9ilfuHYBgr8oXdhjdJi7ckhjNNlR2np3IDvAdFoTjmag9fZ1UwC8Fcv8Lsup+8T8I0RAmh2z/K9BqEv16ZwT53tdaZB0umaoHd1rMAbK9wDXIXRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JGg1zkiTSpZIVSM3888j1oINospk4BgP/cCiiI5H9DM=;
- b=vtKHd2Gsm8ZIHCj6hYJ1lI0ekeURyNg4alaSvMeejXV4pqS2+QpVHkBvBlj5lVZeXZlBA8RpJVCCMyQY5Kr/VD58wwbKMPr64gJTVG521JAhJJhjtNgT/3Qa+zFZC5PM4QXKroXTG3ORoCEfSaXQoT8yo992GYarJeCL9I01w2U5ajR0jPiwzS4nnH3rDCG0FZ/UF9SgU8o5y8ymYaOb1A1kSGW7LgT0ZjKIvjUx76nXnCde5TVhixB+CqyRLbBB4rKuAysBm3MkxcE/JXCiEKKrp+GbW6ra0l/cpz5PPsSTkY+9hmyrFfm8H2e9+af2vYIEdMIvWk6y784LHpD2Xg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.195) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JGg1zkiTSpZIVSM3888j1oINospk4BgP/cCiiI5H9DM=;
- b=fxSZMVqwO9i0cuQratFNrNZvbjWKsUzpT38RLmNPq9ZLFxvOhXY73dZRo/aYsMtfvmoAOnbZv4DrurATNlW4LHXeHkppMZDmuXCSaeVQgGtbxIssF639+e1ne43lcEEiQ1IVTZOct/iqiPCCWXiNP9+nbPY3cWp8JMX8fOG3GG8=
-Received: from SJ0PR03CA0150.namprd03.prod.outlook.com (2603:10b6:a03:33c::35)
- by CY5PR10MB6263.namprd10.prod.outlook.com (2603:10b6:930:41::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Wed, 25 Mar
- 2026 14:21:08 +0000
-Received: from CO1PEPF000066ED.namprd05.prod.outlook.com
- (2603:10b6:a03:33c:cafe::52) by SJ0PR03CA0150.outlook.office365.com
- (2603:10b6:a03:33c::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Wed,
- 25 Mar 2026 14:20:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
-Received: from lewvzet201.ext.ti.com (198.47.23.195) by
- CO1PEPF000066ED.mail.protection.outlook.com (10.167.249.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9723.19 via Frontend Transport; Wed, 25 Mar 2026 14:21:06 +0000
-Received: from DLEE200.ent.ti.com (157.170.170.75) by lewvzet201.ext.ti.com
- (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
- 2026 09:21:06 -0500
-Received: from DLEE209.ent.ti.com (157.170.170.98) by DLEE200.ent.ti.com
- (157.170.170.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
- 2026 09:21:06 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE209.ent.ti.com
- (157.170.170.98) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Wed, 25 Mar 2026 09:21:06 -0500
-Received: from localhost (uda0271908.dhcp.ti.com [128.247.77.70])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62PEL6sx4152384;
-	Wed, 25 Mar 2026 09:21:06 -0500
-Date: Wed, 25 Mar 2026 09:21:06 -0500
-From: Bin Liu <b-liu@ti.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-	<ulf.hansson@linaro.org>, <shawn.lin@linux.dev>
-Subject: Re: [PATCH v3] mmc: block: use single block write in retry
-Message-ID: <20260325142106.j2uiurbkgac6xw52@iaqt7>
-References: <20260324143448.2631888-1-b-liu@ti.com>
- <20260325134947.2799552-1-b-liu@ti.com>
- <b4c84630-ff69-4d1c-8b82-815679d3fa72@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gFulcITP"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-41c4d660b19so1100344fac.1
+        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 07:23:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774448611; x=1775053411; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=h4l8y9iNEk5A2ZRpO0P1tlpUCebqepZBhl1n1HuoxaE=;
+        b=gFulcITPR6lRlf+TdVA/50cHNevE2SkpymVoDvPHSy7uwvN3z3XQPrV0xw74yGu/U+
+         uFU/MXuYhjPNXS9MjRRACDSp29F0tX0+Qnhxzr7KFTfPx7CMnwHWxNQfTA+fVFb5Fi5L
+         hu317HqwT5UW3YrDo2GBGuKQNbLLhJPmQwoJ8FEXZraryRYOmcWp0lSeCbWx7a7uL9eq
+         ovyt1HRW1mUbZUOwwor9rISe8Gvq7FcQZsatZ8ohtBRr8OYhEnUk88uL24CO04EaTgqW
+         az+HyRyq7Kgm1HC54q16zPCb5Wf5E4POG406q0Yt8IG69xOJTlgikIvoHpPlL1N91jF/
+         i6Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774448611; x=1775053411;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h4l8y9iNEk5A2ZRpO0P1tlpUCebqepZBhl1n1HuoxaE=;
+        b=onvCCbrc0raMmUXv2tvOV0ar8S/MHcx+HGEjOmVjsqv8v6rKLn39ao3KEfnfwYLJ4e
+         n9Ho/Z6BddyGz1HLArsCtWeIehkETaqDNN4PMTmHD7fEwzZVfF+J2KjHiDuKckUZuDRo
+         WcTn/LMVD5sauMf0Y3Q1bPEbo6exN1PU9XrT/MDfAveOWCAV7CJudklMHc2Ir37CDZCr
+         a4dRTsVVT6kr3gZXdzuWWfvrZ7VBhahgS7waAlNWuUj+sfgC0/TQ7iyyJsovU6PDR+3H
+         vp4+up9u4u4Bldd93NFJhBxdQ8Xh8QV/yixAkTpHTx7oJZj28qFC5czucyKa04NZVpvV
+         J34Q==
+X-Gm-Message-State: AOJu0YzxJGGIQM/tYGpKOhzl32micbinK3xv0FCa+vuMlbVi0EtdHGKX
+	jAsPF89Zc5c4/S2dGjcufM/+QEPhpgr3F7ojm3GXEZQjssmGOa/yQwd3dtIS4qtjTu0=
+X-Gm-Gg: ATEYQzxvbvDCohwABT2VU5r1L4qrv4gAVveHYcyN7iSX3skBTWhifUKXy337Jcw8/Gp
+	4VfmzIENI/gMpXvx9Ci/d7e9i7w4IEYyI4zLSarOXLQIoIYxtYXZBh6RP1UODGwADlSagGX4Geq
+	bFCp3JnuovTfc6Sh62B3b6yDnLENo0Ak8q+IIknC/CkcgZsrHJJ06EeU226cCGy3IwsNPSlQTvi
+	OlDMWbLCrSkdgkR/JSmbsnZdb2nMqGrFWlqLC2T6mOBmCibn8TL6BZReOKqPqBtVtPsT8jyOSRr
+	eA4NWuUnRbyvWpsQWmv2iYAj2b7cc4wEz97m0qAFIP7oP0KJghTnDsEG04A4qKwgadA99Rtk+Yb
+	6CAF41D7vydGiUrxWgq+JCTIPpuvWsuTtc6MWbiwvr6acPQo69Vn0v5Hxc4kJM4bngtZIBK5mI0
+	S2zqPIIYzmlTXP04rR3rpB72Tx/wT865kJnidt1utuCx04rffyJpT2RU6uu/LIV0MeqAJfUMO4I
+	hDd90VGi4IjUc0MResp
+X-Received: by 2002:a05:6870:3261:b0:41c:305b:14e1 with SMTP id 586e51a60fabf-41ca6fe29f4mr2170091fac.28.1774448610748;
+        Wed, 25 Mar 2026 07:23:30 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-41c14ddbca8sm16862796fac.15.2026.03.25.07.23.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Mar 2026 07:23:30 -0700 (PDT)
+Message-ID: <91fffaac-587b-46bd-9ce9-f3c354d89b6d@kernel.dk>
+Date: Wed, 25 Mar 2026 08:23:29 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <b4c84630-ff69-4d1c-8b82-815679d3fa72@kernel.dk>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000066ED:EE_|CY5PR10MB6263:EE_
-X-MS-Office365-Filtering-Correlation-Id: 73048a8b-8b10-4720-4e10-08de8a79c125
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700016|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	5iD6ZGbsOw8eSAFBkX71n/WYFfsW0JkpTVzZOLhBT0dh8qnWE9cfuM3b9Ogc5qbQimQ1kTPXg9tdgfs8l4lew4GfQIOSadXm0L9ZdNbDfEJqKirRnksPSKfoBO2H0kvM62SbxRtVFkSqy34Fi5dmc//7TWEUKT8MPenFev1bOvIgZciHnmnKcweTFEUoXUyCQpApsPP3Wfz5PxI2ZRUGInPa1I2rtsKPQNATkT4sq6VMbw55MZcroG/WxDOR7MjZN6wCDdtUEAXbKMIIyKnyGWE7SynTUa5FwCz4+AO2xFxu/OTZjXx33/tqLZXLECpaqMR7HNm7i6/JJfDdi3ngXF41xohJbiOq65EpDunpXCc9P8ejwBQTJHFh07G50WAjoZg4sMpWPoeC7lt9/SfCuOOJWxpCukfEpiPnPoflyIadntpO/r58ysLq1x+6RbkcuVXTd6ZU95vf3fYSYz+ttPbjOhlE0cjbDYuBCucm7oIVFRQrORrf/YZ2yz+L9PJexQU0xcLzy41tLZbzDvVkzN6rdoUgpbTkyBTpg+s8hNev3gXLlQzrLePQPmhsP1dO5wgqPv58XfyIqGvObGSP855JxQBQHC3Ya1TZ4UH1SceO9GLDo1GdoeK2AkA2QEjpsS/f174NJavwJqRypunbNQj/GWd3LYoIEplUF3y1IiIkuVFg0/ebmfhE6hZRpeAWMSVMUoZqOh6BvdSrrzbZUc1oLm4UQx6FqD2zBgd38XQt/A6L0ly4kEmZhjO6RGOv26xmPM/Bn2ZA9pnzlNzoGg==
-X-Forefront-Antispam-Report:
-	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	aLBWVlrDluobHT3OjYDr/+7ZAVM3eIOgI210ctvGOPwnMOxluOGYIGZa6v74rR8EunhxYdDVH3Od7cXjpBi0Y85wKGIDCrPrHKw7LiYtFpgNeKYQQGIwcPEFv+Wn0MgJ5rZaO6yKLtqLLl+bsh5Nna6sLwKzY84IDpj5sbpZYR7+r0TGadyq0rDTegP/JHxDY+QugROHumTtvpYCFls1LNaqtXatsuX7HacEw0PGEAmyNLp9N+QNZM87sq1CuAVT2tIxK33tzYPZP5GNyUCg4w78ZWJL5ynn6GvELQBjbLZjzqh9esIegy0CCTGs/5fq4fq4Qly8Wpcb5jeO6D/A/GHj/bi1CGJJeZ1oJumh7jnz9688LcAuV1/8/QHRm2r8fBvdxhuNaLs0fWiZj8w43An3dXhkX6jyF2KfYBlUjWBK+0vZG38xQYf9JwYuvxZ8
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 14:21:06.8028
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73048a8b-8b10-4720-4e10-08de8a79c125
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000066ED.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR10MB6263
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] mmc: block: use single block write in retry
+To: Bin Liu <b-liu@ti.com>
+Cc: linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+ ulf.hansson@linaro.org, shawn.lin@linux.dev
+References: <20260324143448.2631888-1-b-liu@ti.com>
+ <20260325134947.2799552-1-b-liu@ti.com>
+ <b4c84630-ff69-4d1c-8b82-815679d3fa72@kernel.dk>
+ <20260325142106.j2uiurbkgac6xw52@iaqt7>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260325142106.j2uiurbkgac6xw52@iaqt7>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 25, 2026 at 08:12:36AM -0600, Jens Axboe wrote:
-> On 3/25/26 7:49 AM, Bin Liu wrote:
-> > diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-> > index 1498840a4ea0..c254e6580afd 100644
-> > --- a/drivers/mmc/core/queue.h
-> > +++ b/drivers/mmc/core/queue.h
-> > @@ -61,6 +61,8 @@ enum mmc_drv_op {
-> >  	MMC_DRV_OP_GET_EXT_CSD,
-> >  };
-> >  
-> > +#define	MQRQ_XFER_SINGLE_BLOCK		BIT(0)
-> > +
-> >  struct mmc_queue_req {
-> >  	struct mmc_blk_request	brq;
-> >  	struct scatterlist	*sg;
-> > @@ -69,6 +71,7 @@ struct mmc_queue_req {
-> >  	void			*drv_op_data;
-> >  	unsigned int		ioc_count;
-> >  	int			retries;
-> > +	u32			flags;
-> >  };
-> >  
-> >  struct mmc_queue {
+On 3/25/26 8:21 AM, Bin Liu wrote:
+> On Wed, Mar 25, 2026 at 08:12:36AM -0600, Jens Axboe wrote:
+>> On 3/25/26 7:49 AM, Bin Liu wrote:
+>>> diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
+>>> index 1498840a4ea0..c254e6580afd 100644
+>>> --- a/drivers/mmc/core/queue.h
+>>> +++ b/drivers/mmc/core/queue.h
+>>> @@ -61,6 +61,8 @@ enum mmc_drv_op {
+>>>  	MMC_DRV_OP_GET_EXT_CSD,
+>>>  };
+>>>  
+>>> +#define	MQRQ_XFER_SINGLE_BLOCK		BIT(0)
+>>> +
+>>>  struct mmc_queue_req {
+>>>  	struct mmc_blk_request	brq;
+>>>  	struct scatterlist	*sg;
+>>> @@ -69,6 +71,7 @@ struct mmc_queue_req {
+>>>  	void			*drv_op_data;
+>>>  	unsigned int		ioc_count;
+>>>  	int			retries;
+>>> +	u32			flags;
+>>>  };
+>>>  
+>>>  struct mmc_queue {
+>>
+>> I'm assuming retries is a pretty small number (didn't check), so if you
+>> care about layout/space in mmc_queue_req, you could make this:
+>>
+>> 	u16 retries;
+>> 	u16 flags;
 > 
-> I'm assuming retries is a pretty small number (didn't check), so if you
-> care about layout/space in mmc_queue_req, you could make this:
-> 
-> 	u16 retries;
-> 	u16 flags;
+> I quickly went throught block.c, it appears retries would be only a
+> single digit number. I will update the patch to use u16.
 
-I quickly went throught block.c, it appears retries would be only a
-single digit number. I will update the patch to use u16.
+Note that this is just my suggestion, it's down to Ulf. But what I would
+do is a prep patch that makes retries u16 and ensures that's sane, then
+do your flags patch on top of that. I think that's better than making
+that unrelated size change for retries in your patch that isn't related
+to that at all. It just sets you up to not grow the struct after your
+change.
 
-Thanks,
--Bin.
-
-> 
-> and not grow the size of it by 8 bytes with that addition.
-> 
-> Not a huge deal, obviously, but always good to consider things like that
-> to avoid wasting memory for nothing.
-> 
-> -- 
-> Jens Axboe
+-- 
+Jens Axboe
