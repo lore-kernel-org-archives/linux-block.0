@@ -1,46 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0062777EA
-	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 21:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F93381B1D
+	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 21:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774475142; cv=none; b=sR3jZU2NScdenTJ85C6zPZ87YDco1rP9ux6z4GJgBjbijrTHIhU449XCPusseroC2tLjkg92EE7L0G1nnm860FQUpOooSRqmpKDi44Irq0Z/maYM1r7tYbEcGYsSej7axxEUymSsk81Hu8DZYL4nGxVHpDEwrCGprMog41olMOM=
+	t=1774475148; cv=none; b=MzH6zAsPf9z3f/mPaxusFD4lpFMDtxZDLxxdS5LMqZgOaCeMjgFXYy2UuFtbx+TRjJ4KOVqy8vdPzAQ6O3IEcA/+6fK17Xs+1a6qlM6qroXuWGuVcUM1bliMX2AGN1/hO/OPN9GFyX2AdYhw/iQKnMroNFZJtpjwKQSGunaA+PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774475142; c=relaxed/simple;
-	bh=9859yVUBPbHrWH+vXuj5WX+OCvnKCZtwaIjgCvsdcKo=;
+	s=arc-20240116; t=1774475148; c=relaxed/simple;
+	bh=dQ5a0VTo+WmfhfFrhnR6R0WHNRGw5r9UJ5URdoZCBb4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dpoTBGXHlcP4E21h/xeypLDprFDEmb5Et6hIsyDwhCNKR7Zng0GMJjpp6WuXcyUMt3YR4Mo1pH5UDfvXBfUe4wKRPjkJcCNNXwdQx9cGttwhfyZGEhQCVljlXm8r0FUxlkUjnie0AJ2LL2P2G6bKr7pt54Yv1B0T+6haJ2b5kx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2B5fQkvx; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=kcyHhWMC2mExI1uogORg74/slG+8Zsxdhn6sh32Q3d+Lqu/FIMEvkEA41E8XwiSxO57mRYxB8hg3nqjeufKPl2Yqo/QSBKdF0O6tITuWmu52Lt0MS0Cwh4Dbb1f7RbGrUvnL+ooF1yvuPq0jkZuRZ9vH1xiUfpb4+VFX4eBL3Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=IP6KGxAC; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2B5fQkvx"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="IP6KGxAC"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fh0nx11h1zlgyG8;
-	Wed, 25 Mar 2026 21:45:41 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fh0p15kpdzlgyGT;
+	Wed, 25 Mar 2026 21:45:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1774475135; x=1777067136; bh=8D9wQ
-	C5v1sqM2tbz0NBQDIrHIKFR6Om5fW+o1fke7Nk=; b=2B5fQkvxsGawn9uxGoo2H
-	y0Vuqm27kW2VqFco/fhms5CeIw4FPnz7crx9Z89YgRZ62V73Th0ce5xv/SKt0p3m
-	ESpt/pPL95Gn7ErXxP9BfNb24v2g1I84L0xBOsdRRGvoyszj/6bl78Fjqej+akGm
-	qmnTtjF4JQU8k5PtgFJrtWNvuB84SPcMN1fAwyAIgB0aiNwJDdM0NML1XTRnfpiH
-	jrLfqF0ehbqgnGoAnMYwrla3mPf4xv728UcTOBFiqXnhj3cJ0EvA4Y1Pdvkk+L61
-	DxE6cCSN0g5e2yiaj0kvqZOokIPa6WjZSPe/gTEe2DZhoIKj6ZoSgWjE3UQRH2mz
-	w==
+	:received:received; s=mr01; t=1774475141; x=1777067142; bh=lZWj3
+	rrMk8w4MDdfwG3sjYe7+6Y+E7sQzMpdCqhBmrY=; b=IP6KGxACPDQSI/OUe3pmd
+	rhJ5i4OtGLx9tELwsCk/ZWPY/YhOrowBM9ejrpcli6U2Y17gNeXfVxMm2dN9gMeG
+	QupoboX53ClpmgkvNpRR4ehTjObgVsefE1gg1jWIEhqr1pc4RUdKX5SPvTBQ+opW
+	ttYDC+kN1rsy0kZxciI1Jfhb3svpLG19kj8rve3nmeBRziHi64fjjyNYNp/tRv+i
+	i4naIsWsF8R9TA2qr8y8ct0sCDHvuTWfMsRRxO2w9q1e17ZLBYV12RNE2r75krzA
+	QGFUx/C0H06sqywDKFtwG3rP/CcQz6BTreWubYhqvPwS9Jwya7OCZqy58HSsa4Gd
+	A==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Si0jMLBGFOtm; Wed, 25 Mar 2026 21:45:35 +0000 (UTC)
+ id qo2_k9R624Bb; Wed, 25 Mar 2026 21:45:41 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fh0nn2cG2zlgyGQ;
-	Wed, 25 Mar 2026 21:45:33 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fh0nv2ZcrzlfpMC;
+	Wed, 25 Mar 2026 21:45:39 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -48,11 +48,10 @@ Cc: linux-block@vger.kernel.org,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Tejun Heo <tj@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Yu Kuai <yukuai@fnnas.com>,
 	Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v2 03/26] block/cgroup: Split blkg_conf_prep()
-Date: Wed, 25 Mar 2026 14:44:44 -0700
-Message-ID: <20260325214518.2854494-4-bvanassche@acm.org>
+Subject: [PATCH v2 05/26] block/cgroup: Modify the blkg_conf_open_bdev_frozen() calling convention
+Date: Wed, 25 Mar 2026 14:44:46 -0700
+Message-ID: <20260325214518.2854494-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
 In-Reply-To: <20260325214518.2854494-1-bvanassche@acm.org>
 References: <20260325214518.2854494-1-bvanassche@acm.org>
@@ -64,113 +63,89 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Move the blkg_conf_open_bdev() call out of blkg_conf_prep() to make it
-possible to add lock context annotations to blkg_conf_prep(). Change an
-if-statement in blkg_conf_open_bdev() into a WARN_ON_ONCE() call. Export
-blkg_conf_open_bdev() because it is called by the BFQ I/O scheduler and
-the BFQ I/O scheduler may be built as a kernel module.
+Instead of returning either a negative error number or a positive memory
+flags value, pass a memory flags pointer as an argument and return zero
+upon success. This patch prepares for adding thread-safety annotations
+by changing the calling convention into something that is supported by
+__cond_acquires().
 
 Cc: Tejun Heo <tj@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/bfq-cgroup.c |  4 ++++
- block/blk-cgroup.c | 16 ++++++----------
- block/blk-iocost.c |  4 ++++
- 3 files changed, 14 insertions(+), 10 deletions(-)
+ block/blk-cgroup.c | 12 +++++-------
+ block/blk-cgroup.h |  4 +++-
+ block/blk-iocost.c |  6 +++---
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index ac83b0668764..38396df9dce7 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1051,6 +1051,10 @@ static ssize_t bfq_io_set_device_weight(struct ker=
-nfs_open_file *of,
-=20
- 	blkg_conf_init(&ctx, buf);
-=20
-+	ret =3D blkg_conf_open_bdev(&ctx);
-+	if (ret)
-+		goto out;
-+
- 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_bfq, &ctx);
- 	if (ret)
- 		goto out;
 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 2d7b18eb7291..8cfdbe9fffdc 100644
+index 8c4052babffb..5b246020aced 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -771,10 +771,7 @@ EXPORT_SYMBOL_GPL(blkg_conf_init);
-  * @ctx->input and get and store the matching bdev in @ctx->bdev. @ctx->=
-body is
-  * set to point past the device node prefix.
-  *
-- * This function may be called multiple times on @ctx and the extra call=
-s become
-- * NOOPs. blkg_conf_prep() implicitly calls this function. Use this func=
-tion
-- * explicitly if bdev access is needed without resolving the blkcg / pol=
-icy part
-- * of @ctx->input. Returns -errno on error.
-+ * Returns: -errno on error.
-  */
- int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- {
-@@ -783,8 +780,7 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- 	struct block_device *bdev;
- 	int key_len;
-=20
--	if (ctx->bdev)
--		return 0;
-+	WARN_ON_ONCE(ctx->bdev);
-=20
- 	if (sscanf(input, "%u:%u%n", &major, &minor, &key_len) !=3D 2)
- 		return -EINVAL;
-@@ -813,6 +809,8 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- 	ctx->bdev =3D bdev;
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(blkg_conf_open_bdev);
-+
- /*
+@@ -815,14 +815,12 @@ EXPORT_SYMBOL_GPL(blkg_conf_open_bdev);
   * Similar to blkg_conf_open_bdev, but additionally freezes the queue,
   * ensures the correct locking order between freeze queue and q->rq_qos_=
 mutex.
-@@ -857,7 +855,7 @@ unsigned long __must_check blkg_conf_open_bdev_frozen=
-(struct blkg_conf_ctx *ctx)
-  * following MAJ:MIN, @ctx->bdev points to the target block device and
-  * @ctx->blkg to the blkg being configured.
   *
-- * blkg_conf_open_bdev() may be called on @ctx beforehand. On success, t=
-his
-+ * blkg_conf_open_bdev() must be called on @ctx beforehand. On success, =
-this
-  * function returns with queue lock held and must be followed by
-  * blkg_conf_exit().
+- * This function returns negative error on failure. On success it return=
+s
+- * memflags which must be saved and later passed to
+- * blkg_conf_close_bdev_frozen() for restoring the memalloc scope.
++ * Returns: a negative error on failure or zero if successful.
   */
-@@ -870,9 +868,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
-blkcg_policy *pol,
- 	struct blkcg_gq *blkg;
+-unsigned long __must_check blkg_conf_open_bdev_frozen(struct blkg_conf_c=
+tx *ctx)
++int blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx,
++			       unsigned long *memflags)
+ {
  	int ret;
+-	unsigned long memflags;
 =20
--	ret =3D blkg_conf_open_bdev(ctx);
--	if (ret)
--		return ret;
-+	WARN_ON_ONCE(!ctx->bdev);
+ 	if (ctx->bdev)
+ 		return -EINVAL;
+@@ -838,10 +836,10 @@ unsigned long __must_check blkg_conf_open_bdev_froz=
+en(struct blkg_conf_ctx *ctx)
+ 	 */
+ 	mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
 =20
- 	disk =3D ctx->bdev->bd_disk;
- 	q =3D disk->queue;
+-	memflags =3D blk_mq_freeze_queue(ctx->bdev->bd_queue);
++	*memflags =3D blk_mq_freeze_queue(ctx->bdev->bd_queue);
+ 	mutex_lock(&ctx->bdev->bd_queue->rq_qos_mutex);
+=20
+-	return memflags;
++	return 0;
+ }
+=20
+ /**
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index f0a3af520c55..f56fab637093 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -220,7 +220,9 @@ struct blkg_conf_ctx {
+ void blkg_conf_init(struct blkg_conf_ctx *ctx, char *input);
+ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
+ 	__cond_acquires(0, &ctx->bdev->bd_queue->rq_qos_mutex);
+-unsigned long blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx);
++int blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx,
++			       unsigned long *memflags)
++	__cond_acquires(0, &ctx->bdev->bd_queue->rq_qos_mutex);
+ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		   struct blkg_conf_ctx *ctx)
+ 	__cond_acquires(0, &ctx->bdev->bd_disk->queue->queue_lock);
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index d145db61e5c3..7c90241a1dbd 100644
+index e435ac0c41e5..9f8bdae5a4b3 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -3129,6 +3129,10 @@ static ssize_t ioc_weight_write(struct kernfs_open=
-_file *of, char *buf,
+@@ -3232,9 +3232,9 @@ static ssize_t ioc_qos_write(struct kernfs_open_fil=
+e *of, char *input,
 =20
- 	blkg_conf_init(&ctx, buf);
+ 	blkg_conf_init(&ctx, input);
 =20
-+	ret =3D blkg_conf_open_bdev(&ctx);
+-	memflags =3D blkg_conf_open_bdev_frozen(&ctx);
+-	if (IS_ERR_VALUE(memflags))
+-		return memflags;
++	ret =3D blkg_conf_open_bdev_frozen(&ctx, &memflags);
 +	if (ret)
-+		goto err;
-+
- 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_iocost, &ctx);
- 	if (ret)
- 		goto err;
++		return ret;
+=20
+ 	body =3D ctx.body;
+ 	disk =3D ctx.bdev->bd_disk;
