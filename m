@@ -1,154 +1,112 @@
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011030.outbound.protection.outlook.com [52.101.52.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8B42ED84C;
-	Tue, 24 Mar 2026 20:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774384923; cv=fail; b=UL9bGspEWw6Y0kJO1+hOA+A3TG1C3JwA9WhI4Tzx7SWgaByfgsySJ9cAFffz+Qg4MO9s5YaajkT1Wg/UneDgROdO1OxC7UP21V8/laWcNXteZV7Zflr6w9c0rGqWDKbU4I0Yw0ZKK6iQaXQbcRm0kKwEgS2bAZYrij4fyJCYy1Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774384923; c=relaxed/simple;
-	bh=4UpAm8yR94aA1E3vXgYT41RWKiaGZvtaoG6+lvB8IlE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=esCgDEITlQHKT/YQpVNUbotkwOlzKETcJdIa3ao/sRwkQaLWK4yhl3X2erYjDo56XFq5HUwZZd+oI875a3k9eRZlIDjM32l5eDX2mlUai1Tcgorup1hP4izbMh1HToOlOow7dSiwxwEtPJQp5Hk8gB2rHGWTCznJEaUuTpFW1Io=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=DIIQioVh; arc=fail smtp.client-ip=52.101.52.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF9C1D63F0
+	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 00:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774397790; cv=none; b=jVleAFTk6pDG1kITpXbRsVylRld4wqamHIYPVy2Sxva5WRsMnVtiMdEe9MbwFgF6H6Cd4ejwEsIk86OGhXh7wOIXGrVYyG12T4dqRoiTpB5P/daJ8exT9NNCZxpPFmzAJgHCIwFM4H0VFwwLGmWdLnczGjmek4MzwAcNxmwwXqw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774397790; c=relaxed/simple;
+	bh=MoLrdbwuxoKO2kYMSDxtCJV83ayachj6VWNdw0sH+RA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MpE9dRUwUCraCnkBlqoabExhQXANFPCw+5rC1821QmJHbMShnC+YRzgBxdUIsXAATwq+oUTRDVVsv5ZiprgtL27x+Tygp5I5Vsi8hql2oP5K3mBM3g8oGRipDWMRAj8UIjlSsbdqR0XUTthxrjL2dL/AqrbWcy4mQHDWxo2s7Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SYf+r95P; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="DIIQioVh"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gvdf+2YL85pAaK4PBKhaVabRfSVJSuotKFNxny8OkQ1xqQEVLFAZvw+mIvj7apu0gqERt8wFdqPwVEwfEjCtRYNdi8JNt/AG9fSIL5JfuRrDI+E1FUMEyiMqqxr7rAu9bO3Nxqdm04n/LUdW1u4+C+m/ax+LaBXmuM7dhKPXm3Uh0q235cRBVrTlSKDwMy5Q7bsOBaiLS48YxUvkiD0wnnsXBABoO6UggjQuL3PsJfuhXs913Z28Wc5/6u5H229Brdqc1uACkLsQCgQy2Zo7looSwYHmJLB0P08/w+bpsWnZHwqzq5oWc+2grYNubrNZDVbaD6GXtfC3IenuO3AyWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qOip9xjd1QIfaQz9gxUrDT3o7YNDLt4xn+CVe+waKYM=;
- b=eJGGNLvgFv+8RtxsxrWgIzLhg6hCVVlHA48OiSTXaVIUjnNdEuOuoVkl74/OxWI0lVwVU3Odf4UB/qPEZ3/CJUxgt0J9Aw1PCi6KeKa15XGe5ee1XQgF9wTBNVjypJqsaFD2RwQ8gBT1TleeJduw7g8aXDk4LGmvduqBXKKDQxwBPnQ7ugImVSE5kqiiZzIYtoC9hOxUv6kbFvE8KWjuqjjIKaKXvU4JgK65Gc/L4Hhcok2Jsxy4mRmfd6SXsQkrqBhD71Y4mP20AicifAJ8CgFjs7mUMEr7bsqQQa539BrpfgFfUGuuOQeg50CA891+SzNze0uGursD/ePD/lt04A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.194) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qOip9xjd1QIfaQz9gxUrDT3o7YNDLt4xn+CVe+waKYM=;
- b=DIIQioVhdtD2+nXIhKzWnS4TGc3L+szfryvsUlDPYDhlzSlutkqlrYtb9Dwa6hFFTdDOuzLbjP5lSl732IYmMPKXLaesidsueJpB/+y9/BxR28QeB8a9A1edyCYzBn08V8ng63gytSR4DKg9wJPHaugmrPILnEAhqIfDDToodaY=
-Received: from BN0PR08CA0011.namprd08.prod.outlook.com (2603:10b6:408:142::33)
- by DS7PR10MB5165.namprd10.prod.outlook.com (2603:10b6:5:297::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Tue, 24 Mar
- 2026 20:41:57 +0000
-Received: from BL02EPF0002992C.namprd02.prod.outlook.com
- (2603:10b6:408:142:cafe::f1) by BN0PR08CA0011.outlook.office365.com
- (2603:10b6:408:142::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Tue,
- 24 Mar 2026 20:41:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.194)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
-Received: from flwvzet200.ext.ti.com (198.47.21.194) by
- BL02EPF0002992C.mail.protection.outlook.com (10.167.249.57) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9723.19 via Frontend Transport; Tue, 24 Mar 2026 20:41:56 +0000
-Received: from DFLE204.ent.ti.com (10.64.6.62) by flwvzet200.ext.ti.com
- (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Mar
- 2026 15:41:53 -0500
-Received: from DFLE211.ent.ti.com (10.64.6.69) by DFLE204.ent.ti.com
- (10.64.6.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Mar
- 2026 15:41:53 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE211.ent.ti.com
- (10.64.6.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Tue, 24 Mar 2026 15:41:53 -0500
-Received: from localhost (uda0271908.dhcp.ti.com [128.247.77.70])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62OKfrvA3261696;
-	Tue, 24 Mar 2026 15:41:53 -0500
-Date: Tue, 24 Mar 2026 15:41:53 -0500
-From: Bin Liu <b-liu@ti.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-	<ulf.hansson@linaro.org>, <shawn.lin@linux.dev>
-Subject: Re: [PATCH v2 1/2] block: define new rqf_flags RQF_XFER_SINGLE_BLK
-Message-ID: <20260324204153.a77cieh5kti7ydla@iaqt7>
-References: <20260310160408.3976760-1-b-liu@ti.com>
- <20260324143448.2631888-1-b-liu@ti.com>
- <20260324143448.2631888-2-b-liu@ti.com>
- <5c12f6f8-5962-4d66-8414-8f5185438ecb@kernel.dk>
- <20260324191126.kfhwuw4njinh2vrw@iaqt7>
- <33177597-8df5-4494-830e-6e287bb8188a@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SYf+r95P"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7d7f9285560so2163003a34.1
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 17:16:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774397785; x=1775002585; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nUE46PPV8ZBQbSpBMaJf2P+/9B1olmom1CQ0qLARqFs=;
+        b=SYf+r95PWmYPO1n7S4yEVApA92diDLGXIPneKoub13/8urv4UW65pHpy7F4JHtAEA+
+         R3f6hdyMDSGmO4Tds0VFrI6pYtW1NpIleRv/oF2T8YQ1Jp6AqGbv/XCOrOSrNczV5suz
+         9iE9z43zJrEnfAjpMIB7FaHArsxFNos4nItFpJpck7uyg2uxuK+9jdOrln9Suas8Xval
+         tHEm5QRW2F2e3q50poeKOANZlSGPwVDmqSL68vwYQG2QhaZ/JMUle7UINTpSYr5n7s+g
+         81OjuIAGSa/zmgMtPh0FDm+q6funlL2oOySjo0rg8pqUQNFLDkWQX67oymjyKZOpSoDF
+         LFRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774397785; x=1775002585;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nUE46PPV8ZBQbSpBMaJf2P+/9B1olmom1CQ0qLARqFs=;
+        b=CkMveqqv2LCLceeGEgWGBiGEnajdzdK+KZYiXmv+5nle9WDn+GzhTZY1oruN7ftKVa
+         3GupiNBx0wvvb8iJt+FGmJzVWlBaSvcbEDVESwpWsQLrAhS1kihVzXa6M9CYQytvSfm5
+         MFEXB2rz7dEhIz5b0Z9AWveK3szyoPS6szTelNfMOKuiD8a7v7TaIwTH/xDv5V92wTze
+         awIU8OW9tXli55KbVvOC/JBqBkXZZd3BZ2+mJq03DZWru12HbNh6RcHJzD9cGsojesZ8
+         HV78E4pwCxVp/UoIFA+9h52z+3seYxJA8H5QS9dKsBFqAhF/uX0mPPZV9/5WO6+RD/ZZ
+         brjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWU6CUGiUusT/7bsnLZqAeqbbA7d1Dv9AcB3wY7NkerDvLbFXKo/S8XvUQCFMg5ySNeI0MFkxQ/EwGxtA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXCsUnuV2nfAQ6rVIi0nos5CSWUN/UkUdujYyimCSYp6vtMVHc
+	TOQhqu/Qkk+lQ4owmpk8z2LIMZ05I3OW8BqcL7tW48uqai7/i5HuIxH1KlrYb6rFRx8=
+X-Gm-Gg: ATEYQzwv4lAepTfS/LOYSCYiOtrzdFPyFVGbFk6SZOAoZWaR6yowqG3py7b1rzi8Lqm
+	SOchh1AviNux4ce9yjhXTAq0EBzle8/aCCVgGQ92Lf+ok8TFHRCHOwUt17pAx1zxz0FomJV1yW+
+	NVVqWgN1Cw3dn1402xW0qAgMhmC5D9buKuxd9muoSjJpQ0IylBUHh+KCFJ4UAf9AC/B5Ki+fqli
+	P5pnuilHf5mEoAwL2oibSVULKAYP9QYdAawBqWBUCZ0ylOTwKzL3eKe3R37me5smEOchN4xwY/x
+	Dvyx+X+dArrZzzWVtpJAPHYh0t5Vsf7RwS5DD88YbX+IHsrHiPBE1iKplysRGZIdvNndCXvzPF9
+	qBJ7dedIQ0Up20kbOGZNck2LIoSijV5bPwB0sNFGg+R4jEIcmQkzoA+0OHq1r0I0GoHp0YW+1la
+	SJhYOwlofvZh3GzwQSL7MW6VA73UIwFmao3ICXUeKKbNbH1ZmLVNPu4xqY3BdTP127XBu9qznw0
+	NAnGBOlyQ==
+X-Received: by 2002:a05:6820:206:b0:67c:2bab:bf54 with SMTP id 006d021491bc7-67dff5f7978mr793373eaf.62.1774397785456;
+        Tue, 24 Mar 2026 17:16:25 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-41c57bdf2b0sm9253351fac.7.2026.03.24.17.16.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2026 17:16:24 -0700 (PDT)
+Message-ID: <1ec0b46f-a1b2-43f6-98ae-43bb87d0e59f@kernel.dk>
+Date: Tue, 24 Mar 2026 18:16:23 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <33177597-8df5-4494-830e-6e287bb8188a@kernel.dk>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0002992C:EE_|DS7PR10MB5165:EE_
-X-MS-Office365-Filtering-Correlation-Id: 416887ac-2866-4b93-b97f-08de89e5ca37
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700016|56012099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	i3xOXpiJHFF1eWrHPJH3VpbSEcRvb16jiB++ojUppFpdB7HxcWgrv7tKRps1hBQsbVzGffKRkaojXsTGBLYzo6FBkLxee+ZK1izzzgeioUZHml3FJfw3MEMFCzVVuWhx+kQfcR/eTXcYj4cjQoz5gYzDK88yiCPQDI3rJ99oJ1oRiVENDBQhhvVlS7dIR0XpOYc2f6r9ggX4i44haZgTTDYVG8EptU5vnfasXjJsw+1GHda+HgJDT3JC00dyCXJcLio72uuRCSw8eevSxvWCgF1kKRcgMM3TPIJ5/32v/Rde2NCeHDcoEbKS1hAyfc8ceKpacLhoiLEjPIa/5gNLnMeIVulSjyFnCwu2g7sDoMrt/wHBVwUtNHj0fJ4f22vWbuumiZ8jEFhd8GLTN+gopB/wJBBcNMuPw5LC0t9pFJk8/yEuwL9yURSePTbDm4RWwJyMc2+/ueFQKfE1pUPCeplKrmLskGbC8fcI8762fyvq4YJnYXan7tLZhsm/Uv81Gc2vcuOdgrfq5MhrkSxaI77/UVvMpoZwG77jCchDPbZ2NhlDoGcyyzXlpl5FUHzkmN2oLFQpD+3kvKGzme6BLT1ngnA+76KS8qhdhsS8HbSFbxnlqBl+onm5FmD/Yt7WNMqUza3qeSkSItgwmOWzOGv/NlFn+IlhinIEjkduZHm7S+E3A4dcLrQjLnRfRZmCOTxil0HbSHNP/68d4cY0B8L/cfUnhp5sKCHw3IIhJa/BNK8eYmoi9KXPpEzQ2loe6GY0ukFjvBqDT9Cr4m5jsQ==
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700016)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	p6C8hawromMHGK13Oi0/EHb8QqfQOw+QeUVIQHQBygGhkOQWJjNk2O5i3Cb6gazZWnqKL8Jlfrt14wEaajZvkkH//LpkHvh3QlQrHd/LQrueIHks/RUdTUbAH2ZRIYq/cT4oY6a/qRgCNSf/AJ0PdvyX97ZElNYmqHNwDQm8HniNKszM6psRvr0UZKoXCevu9fI0u+jmRBlamvKD/BoyayJ5Hua+AaPLknKdB77G9qkKe49f4bFYLEZrZK9dGOJJ657rmS+zqMeNxDAhZAvXgcDRw3VJ8ix15hYNRRWANpPeLeerG2knFdttkeZGpw+jXms+jN4hhwmFaynF9df1oj5Of0OkhtMXiKbZ3fRdeVGDyjKlNFbRuPBMmjpiBWNsWOPBVAR6INl4Aks9Tk7lwGrlH6nkVvonlClLSfWT4zTfwF2qWKk8E7UjxcfWMZw5
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2026 20:41:56.5167
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 416887ac-2866-4b93-b97f-08de89e5ca37
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0002992C.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5165
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] iomap: fix lockdep complaint when reads fail
+To: Christoph Hellwig <hch@infradead.org>, "Darrick J. Wong"
+ <djwong@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>, Zorro Lang <zlang@redhat.com>,
+ linux-xfs@vger.kernel.org, Tal Zussman <tz2294@columbia.edu>,
+ linux-block@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>
+References: <20260319194303.efw4wcu7c4idhthz@doltdoltdolt>
+ <20260320163444.GE6223@frogsfrogsfrogs> <acDbFtQw0mom798e@infradead.org>
+ <20260323152231.GG6223@frogsfrogsfrogs>
+ <20260323210017.GL6223@frogsfrogsfrogs> <acIrtFpASaBmFZPU@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <acIrtFpASaBmFZPU@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Jens,
-
-On Tue, Mar 24, 2026 at 01:16:34PM -0600, Jens Axboe wrote:
-> On 3/24/26 1:11 PM, Bin Liu wrote:
-> > Hi Jens,
-> > 
-> > On Tue, Mar 24, 2026 at 12:48:11PM -0600, Jens Axboe wrote:
-> >> On 3/24/26 8:34 AM, Bin Liu wrote:
-> >>> This new flag will be used to handle multi-block transfer failure, in
-> >>> which case single-block transfer will be used.
-> >>
-> >> Maybe I missed this in previous discussions, but why can't this flag go
-> >> into struct mmc_queue_req?
-> > 
-> > You didn't miss anything. We didn't discuss about it until now.
-> > 
-> > I added the flag in struct request because it already has rq_flags to
-> > host all the flag bits. But I don't see struct mmc_queue_req has any
-> > member for this flag purpose. Do you mean we should add a new flag
-> > member into struct mmc_queue_req?
+On 3/24/26 12:14 AM, Christoph Hellwig wrote:
+> Please reword the subject - your are not fixing a lockdep complain,
+> but the underlying issue of calling code from the wrong context.
+> Lockdeps as usual is just the messenger.
 > 
-> It's a bad idea to add driver specific flag to the core flags,
-> particularly when you already have per-rq data associated with the
-> driver. Then it should surely go there. The block layer doesn't care
-> about RQF_XFER_SINGLE_BLK, that's strictly a device property. Hence it
-> should go in the driver, NOT in the block layer.
+>> Zorro's diagnosis makes sense, so the solution is to kick the failed
+>> read handling to a workqueue much like we added for writeback ioends in
+>> commit 294f54f849d846 ("fserror: fix lockdep complaint when igrabbing
+>> inode").
 > 
-> So yes, add a bool or flags or whatever you need on the driver side.
+> The code looks ok, although I'd much prefer generalizing it.  I guess
 
-Sure I will add a variable in struct mmc_queue_req to carry this flag.
-Thank you for the comments.
+I'll take a stab at it. This one is fine since it's an error handling
+path, but previous tests I did with this kind of approach for every IO
+hitting this path have been utterly terrible.
 
--Bin.
-> 
-> -- 
-> Jens Axboe
+Once done though, we can swap stuff like this too.
+
+IOW, for this one:
+
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+
+-- 
+Jens Axboe
+
