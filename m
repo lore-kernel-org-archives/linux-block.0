@@ -1,251 +1,159 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010021.outbound.protection.outlook.com [52.101.46.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4C73CF678
-	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 14:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511E93BD645;
+	Wed, 25 Mar 2026 14:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.21
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774448276; cv=pass; b=QUOfUVkdxT2uI2eQr1kDWgQ0UibjjQADyvxxhPSdMF1/E3wXigzYx4OdIZe0E6WV4Oifxbqb6nQ1n+IrFQYnN9WhgSnEL/U+hgj/630jkm/y3lvS2M4pDHA1bFQIvcjGxPkdTAnrdbHVXmIbefWFlFx5lDnh7faPrA4Z6MFSUWY=
+	t=1774448471; cv=fail; b=eA9KbkBMPVGfpAp4ZGj2dAQs0r7nrIjej/KSo9Z23z3BStfBWCBtz4lfNPWQqtt3SzZ0GwIh06Y97y1Rb50dJFuOmWxUWS4dcrlVqdYiimjg89NTw++tQ0rOXvuvYfCKkQqbcyD2tm5wwdTcw7PLIV+g12n5+9QkVSePHgCeHc4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774448276; c=relaxed/simple;
-	bh=JI+TEE49zQK3cKPmCz6svi6GFaT2s7u6w0MtCQyVKb4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EyOwyeTtns5XSCP8AgC0xyaF7pGCvfeKp+Et8yhRGhUtVNrBzWDSL8ba7Fio1fd0ydkiN0YGMh1fueV349tq4tB3CW4KwH8OmkuiqEnKGIywT76hKcsxGGAasv+6lLGWKUO02nNjU2Mh53UDubEZtnaIhoF0rOPRLEH6ilioIKc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=He8b1eWY; arc=pass smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1774448471; c=relaxed/simple;
+	bh=41AIcONo9SzhjGVg3J9wQ0alEEkSy9cnslg+ZVInenw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VucwuUotQGS1Ya9HMe2Y8uGXH4ZkFTJQpTrj4BHZIw7wO0FAtOYab8QHQtBmFFwNp+R127E87Ffy+jCBoMp0ZWyB91q0MOBTsi7yb3APmEvWVDaYgsNUCR6hbutLrlIV+zSPXi2TNhzhdOWjzPYXmcrgxawQxURC1x6Opwo67KI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fxSZMVqw; arc=fail smtp.client-ip=52.101.46.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="He8b1eWY"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-439b9cf8cb5so2827291f8f.0
-        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 07:17:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774448273; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Oby6yUsgyl0Q4TTeFcAVjdA9+KMY3XN9NMmRnCyZNK18k/y54v03pbGY7WAe5yo2Vz
-         rEm7bOLZJY5986/YnuK1G84JL4kUvSxKHaV4z/hL7v3MScp98sAwzvN+z9ZnhXCFo0Hn
-         YM91WAPQDth1D75vwc9ggMCmvNB9PmL7pmWnbIKWDfC6rHjoxv+vra+1gM+sKfaePYqq
-         4dTWqXVUGsFjjcgSm7675h2TVLZr4KxDJ8KLBFfNC8qspWcUfYsZnySbtU8dZ8uNc7dB
-         Y8DZiOBYItZXOK4GgM1iF0zyRihPRR8SJCpGJ8fsn1wavm5XiA7M/KkYQuiXPHhmGjY6
-         +inw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=5n8QXWW6p9E8l82xzEfoMSbTtP2cvmaz+gb8I7NDwzo=;
-        fh=q2I1VM9qePZLSKAUk5ngMVsm5q5To3ioXVvJSIEv3bQ=;
-        b=GsoiWc5dxDm260tG1U6edhl3Z3FGXCdBhxRWXyz8pThdPx0Bnyc7XzZkjAGPkvNURn
-         HQWOAHi6pTicP6w8ugrsKyAz5VvP6WUB7RtIOEZMHoQb/OyXGGT0CtR8c7U2iVvqsAmL
-         iqfZFcdwE1upPcKdb1uFnm4aJ37RwNOniOkQ9hU7wrmx5b1e546e+C/2buT4HYHTvlUp
-         /rsL1e8Dwf3/LIyQmeMz6aVG2aYd1/0lSYykxGcOzp532iQkgOE0ggXAKkeSoLGnrZLn
-         nYcUlCTyFlsqiKUJkGl4PcJ3PWv7UCrvA5dR/45SAn+bpkBJdLlzJmWC2B/pvyoLxqw3
-         5qwA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1774448273; x=1775053073; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5n8QXWW6p9E8l82xzEfoMSbTtP2cvmaz+gb8I7NDwzo=;
-        b=He8b1eWY0jASt4uLuF6oCfL1o9EBtkcoL/seGoFNRov2X0T2vI57qN9LsdTbolUsjd
-         gGdJf7M7Cpzy7/8lRIQmGMlPM2n4D4RRRn4dG8mSEv5WcDNj4ZfrnXfpo7TPheCsTLrn
-         cSiDQVqBLIgxCq/4ndiP4aSrw98h3YOalF/b0D+DhCJEN+2J/w0VCt+5dT6x4xohB+We
-         zeoYEQSoVE4z691qKVDVObHLbxFHW/zIyXLK4VQGTLMTG2oqrSfBjJt/34V4HaUAoxOl
-         8SYfF9tJnyLr9uxo/Ifuhy5V7mCUdhCpy1Lod4EBRcutAx/cEtrAP29TMps1udKBPcR5
-         NilQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774448273; x=1775053073;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5n8QXWW6p9E8l82xzEfoMSbTtP2cvmaz+gb8I7NDwzo=;
-        b=GpwluAfloZM/5TbFG5+BaP49iF3guGKKbhNCjJFWqxJPxeX0ftSo74sJhVRCL5n/ON
-         svxpL9uhfz3Mmky7Q8W8fZOC5YyZ/V+ARFgDe/mqErKlQARj23aHtDYdPlstV+ydpI6F
-         VsvTRGTVkZqqDXqhf7/sAeyG7hquw1mQolw//XZW1RvaWTX1GdczRpLJxH/CrzTuUiJ4
-         9OPn1AfSAIfupoULzHgBRiazIN/v4RbBpOOLYKSDjV692thzUWkt9/3M+BH2TBOiRzcK
-         y/LT0YBkk/GF1tKe9lYqb80wQxHyx1QD5oLvX8dczCD60U8wyYzUYBHvR3n5Vt0Xk5AX
-         FNlg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQQellp60UW59FLR2A/QefCil1pNzQWvphq8WSGBvCIVewo/XisYXS04SC8AwBEiu+PXoRvyMzCIPvjA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+u7RXlWyGSnAHkUmSQe5vicDgaaeKMK2/0IPoxIrMCJWS/X+x
-	EE7xdZbNXQYeNMsC3jNtW4bb0NRi19RBSRwKytmF6DxzLoUy+w6PdDEmwHaakBUhLHV3qvb7ovK
-	h4bwsNJy3v0zOsCHbHGlCZ7EggXBehDDGu3ayAA5Uuw==
-X-Gm-Gg: ATEYQzxjtczp7O8BwUvYDO4wyUhTPw4NIF6AwjeMqsicXekoNDcLWMKnyxyZJeFKtsK
-	odbYBGLXhF+aR1Z+bx9oMJ8KSU9XhEvE040RL1qeDtRczCwD/hAEzjw89dADm06xE3E6CQSIY9S
-	BSUc4jmVF0iMmLjpCYE1PUq7IOEtdH/tjFjGSGr1c36iTvTQJMvbNNEjed3A2cJzHuVacrVe2aT
-	qqfd0yEcxI3RyV6Ne2xExAD8sNGkyY2Uuhpqb6qcoAjtHedpQ92Sph+zxd8cwAQLXrjFejy888I
-	yYp/IqlE89NSU8k9dxKH27a4q0YQdBUhr26n5JsUUUD1bR73BYIrw9u0PU+yf1bkCSr1psJ3imW
-	FswMK
-X-Received: by 2002:a05:6000:2084:b0:43b:3f2d:7d3c with SMTP id
- ffacd0b85a97d-43b88a21758mr5567679f8f.2.1774448273072; Wed, 25 Mar 2026
- 07:17:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fxSZMVqw"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jlD4hbwPfTMnqU9ACCtLLqWda+5k2p/8Hz0ziI4VWXAVJdrQ7z/oPNiup52U5TKKEnodEn++u6Oxt005nY+sHxemm7K+VFaLDEMkFUsXISEstXw9yStKEPJeLKrnuIo0WXjezZ/kVG3R9f5nOVXsknryJsxXHn5tC1FPF5avlApU7UAKoJPoQ6bLNeu/hq2EPFiR/2VasPZiSt751ui5hgnLpryKkDTer/y5xl9ilfuHYBgr8oXdhjdJi7ckhjNNlR2np3IDvAdFoTjmag9fZ1UwC8Fcv8Lsup+8T8I0RAmh2z/K9BqEv16ZwT53tdaZB0umaoHd1rMAbK9wDXIXRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JGg1zkiTSpZIVSM3888j1oINospk4BgP/cCiiI5H9DM=;
+ b=vtKHd2Gsm8ZIHCj6hYJ1lI0ekeURyNg4alaSvMeejXV4pqS2+QpVHkBvBlj5lVZeXZlBA8RpJVCCMyQY5Kr/VD58wwbKMPr64gJTVG521JAhJJhjtNgT/3Qa+zFZC5PM4QXKroXTG3ORoCEfSaXQoT8yo992GYarJeCL9I01w2U5ajR0jPiwzS4nnH3rDCG0FZ/UF9SgU8o5y8ymYaOb1A1kSGW7LgT0ZjKIvjUx76nXnCde5TVhixB+CqyRLbBB4rKuAysBm3MkxcE/JXCiEKKrp+GbW6ra0l/cpz5PPsSTkY+9hmyrFfm8H2e9+af2vYIEdMIvWk6y784LHpD2Xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JGg1zkiTSpZIVSM3888j1oINospk4BgP/cCiiI5H9DM=;
+ b=fxSZMVqwO9i0cuQratFNrNZvbjWKsUzpT38RLmNPq9ZLFxvOhXY73dZRo/aYsMtfvmoAOnbZv4DrurATNlW4LHXeHkppMZDmuXCSaeVQgGtbxIssF639+e1ne43lcEEiQ1IVTZOct/iqiPCCWXiNP9+nbPY3cWp8JMX8fOG3GG8=
+Received: from SJ0PR03CA0150.namprd03.prod.outlook.com (2603:10b6:a03:33c::35)
+ by CY5PR10MB6263.namprd10.prod.outlook.com (2603:10b6:930:41::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Wed, 25 Mar
+ 2026 14:21:08 +0000
+Received: from CO1PEPF000066ED.namprd05.prod.outlook.com
+ (2603:10b6:a03:33c:cafe::52) by SJ0PR03CA0150.outlook.office365.com
+ (2603:10b6:a03:33c::35) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Wed,
+ 25 Mar 2026 14:20:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ CO1PEPF000066ED.mail.protection.outlook.com (10.167.249.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9723.19 via Frontend Transport; Wed, 25 Mar 2026 14:21:06 +0000
+Received: from DLEE200.ent.ti.com (157.170.170.75) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
+ 2026 09:21:06 -0500
+Received: from DLEE209.ent.ti.com (157.170.170.98) by DLEE200.ent.ti.com
+ (157.170.170.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 25 Mar
+ 2026 09:21:06 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE209.ent.ti.com
+ (157.170.170.98) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Wed, 25 Mar 2026 09:21:06 -0500
+Received: from localhost (uda0271908.dhcp.ti.com [128.247.77.70])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62PEL6sx4152384;
+	Wed, 25 Mar 2026 09:21:06 -0500
+Date: Wed, 25 Mar 2026 09:21:06 -0500
+From: Bin Liu <b-liu@ti.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+	<ulf.hansson@linaro.org>, <shawn.lin@linux.dev>
+Subject: Re: [PATCH v3] mmc: block: use single block write in retry
+Message-ID: <20260325142106.j2uiurbkgac6xw52@iaqt7>
+References: <20260324143448.2631888-1-b-liu@ti.com>
+ <20260325134947.2799552-1-b-liu@ti.com>
+ <b4c84630-ff69-4d1c-8b82-815679d3fa72@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-34-neelx@suse.com>
- <20260208150854.3090411-1-clm@meta.com>
-In-Reply-To: <20260208150854.3090411-1-clm@meta.com>
-From: Daniel Vacek <neelx@suse.com>
-Date: Wed, 25 Mar 2026 15:17:41 +0100
-X-Gm-Features: AQROBzCA2SzXEdLH4PwF7MzsDSpXTmv7zxyVpq6_W8dQnpHa9Q-YU8fXQyJUEFs
-Message-ID: <CAPjX3Fc28BffC9C2Fbd7S_+4Ch7xvX18k6MpehPy_fm+02cA8w@mail.gmail.com>
-Subject: Re: [PATCH v6 33/43] btrfs: implement read repair for encryption
-To: Chris Mason <clm@meta.com>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <b4c84630-ff69-4d1c-8b82-815679d3fa72@kernel.dk>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000066ED:EE_|CY5PR10MB6263:EE_
+X-MS-Office365-Filtering-Correlation-Id: 73048a8b-8b10-4720-4e10-08de8a79c125
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700016|22082099003|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	5iD6ZGbsOw8eSAFBkX71n/WYFfsW0JkpTVzZOLhBT0dh8qnWE9cfuM3b9Ogc5qbQimQ1kTPXg9tdgfs8l4lew4GfQIOSadXm0L9ZdNbDfEJqKirRnksPSKfoBO2H0kvM62SbxRtVFkSqy34Fi5dmc//7TWEUKT8MPenFev1bOvIgZciHnmnKcweTFEUoXUyCQpApsPP3Wfz5PxI2ZRUGInPa1I2rtsKPQNATkT4sq6VMbw55MZcroG/WxDOR7MjZN6wCDdtUEAXbKMIIyKnyGWE7SynTUa5FwCz4+AO2xFxu/OTZjXx33/tqLZXLECpaqMR7HNm7i6/JJfDdi3ngXF41xohJbiOq65EpDunpXCc9P8ejwBQTJHFh07G50WAjoZg4sMpWPoeC7lt9/SfCuOOJWxpCukfEpiPnPoflyIadntpO/r58ysLq1x+6RbkcuVXTd6ZU95vf3fYSYz+ttPbjOhlE0cjbDYuBCucm7oIVFRQrORrf/YZ2yz+L9PJexQU0xcLzy41tLZbzDvVkzN6rdoUgpbTkyBTpg+s8hNev3gXLlQzrLePQPmhsP1dO5wgqPv58XfyIqGvObGSP855JxQBQHC3Ya1TZ4UH1SceO9GLDo1GdoeK2AkA2QEjpsS/f174NJavwJqRypunbNQj/GWd3LYoIEplUF3y1IiIkuVFg0/ebmfhE6hZRpeAWMSVMUoZqOh6BvdSrrzbZUc1oLm4UQx6FqD2zBgd38XQt/A6L0ly4kEmZhjO6RGOv26xmPM/Bn2ZA9pnzlNzoGg==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	aLBWVlrDluobHT3OjYDr/+7ZAVM3eIOgI210ctvGOPwnMOxluOGYIGZa6v74rR8EunhxYdDVH3Od7cXjpBi0Y85wKGIDCrPrHKw7LiYtFpgNeKYQQGIwcPEFv+Wn0MgJ5rZaO6yKLtqLLl+bsh5Nna6sLwKzY84IDpj5sbpZYR7+r0TGadyq0rDTegP/JHxDY+QugROHumTtvpYCFls1LNaqtXatsuX7HacEw0PGEAmyNLp9N+QNZM87sq1CuAVT2tIxK33tzYPZP5GNyUCg4w78ZWJL5ynn6GvELQBjbLZjzqh9esIegy0CCTGs/5fq4fq4Qly8Wpcb5jeO6D/A/GHj/bi1CGJJeZ1oJumh7jnz9688LcAuV1/8/QHRm2r8fBvdxhuNaLs0fWiZj8w43An3dXhkX6jyF2KfYBlUjWBK+0vZG38xQYf9JwYuvxZ8
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2026 14:21:06.8028
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 73048a8b-8b10-4720-4e10-08de8a79c125
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000066ED.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR10MB6263
 
-On Sun, 8 Feb 2026 at 16:09, Chris Mason <clm@meta.com> wrote:
-> Daniel Vacek <neelx@suse.com> wrote:
-> > From: Josef Bacik <josef@toxicpanda.com>
-> >
-> > In order to do read repair we will allocate sectorsize bio's and read
-> > them one at a time, repairing any sectors that don't match their csum.
-> > In order to do this we re-submit the IO's after it's failed, and at this
-> > point we still need the fscrypt_extent_info for these new bio's.
-> >
-> > Add the fscrypt_extent_info to the read part of the union in the
-> > btrfs_bio, and then pass this through all the places where we do reads.
-> > Additionally add the orig_start, because we need to be able to put the
-> > correct extent offset for the encryption context.
-> >
-> > With these in place we can utilize the normal read repair path.  The
-> > only exception is that the actual repair of the bad copies has to be
-> > triggered from the ->process_bio callback, because this is the encrypted
-> > data.  If we waited until the end_io we would have the decrypted data
-> > and we don't want to write that to the disk.  This is the only change to
-> > the normal read repair path, we trigger the fixup of the broken sectors
-> > in ->process_bio, and then we skip that part if we successfully repair
-> > the sector in ->process_bio once we get to the endio.
->
-> Hi everyone,
->
-> I'm running the btrfs for-next branch, along with the encryption patch set
-> through my AI review prompts:
->
-> https://github.com/masoncl/review-prompts
->
-> I'm working on some btrfs specific instructions, but hopefully these reviews
-> are already useful.  I've kept the headers to make it easier to double check
-> that I'm actually replying to the right email, but please let me know if any
-> parts of this are incorrect:
->
-> commit 096c17a6a951ed0c1100e863c4ee3a95bab0ad51
-> Author: Josef Bacik <josef@toxicpanda.com>
->
-> btrfs: implement read repair for encryption
->
-> This commit implements read repair functionality for encrypted btrfs
-> files by adding fscrypt_extent_info tracking to the btrfs_bio structure
-> and handling repair operations before decryption occurs.
->
-> > diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
-> > index c28f3f53bad28..e82de96b533cb 100644
-> > --- a/fs/btrfs/bio.c
-> > +++ b/fs/btrfs/bio.c
->
-> [ ... ]
->
-> > @@ -293,6 +323,13 @@ static struct btrfs_failed_bio *repair_one_sector(struct btrfs_bio *failed_bbio,
-> >       repair_bbio = btrfs_bio(repair_bio);
-> >       btrfs_bio_init(repair_bbio, failed_bbio->inode, failed_bbio->file_offset + bio_offset,
-> >                      NULL, fbio);
-> > +     repair_bbio->fscrypt_info = fscrypt_get_extent_info(failed_bbio->fscrypt_info);
-> > +     repair_bbio->orig_start = failed_bbio->orig_start;
+On Wed, Mar 25, 2026 at 08:12:36AM -0600, Jens Axboe wrote:
+> On 3/25/26 7:49 AM, Bin Liu wrote:
+> > diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
+> > index 1498840a4ea0..c254e6580afd 100644
+> > --- a/drivers/mmc/core/queue.h
+> > +++ b/drivers/mmc/core/queue.h
+> > @@ -61,6 +61,8 @@ enum mmc_drv_op {
+> >  	MMC_DRV_OP_GET_EXT_CSD,
+> >  };
+> >  
+> > +#define	MQRQ_XFER_SINGLE_BLOCK		BIT(0)
 > > +
-> > +     btrfs_set_bio_crypt_ctx_from_extent(repair_bio, repair_bbio->inode,
-> > +                                         failed_bbio->fscrypt_info,
-> > +                                         repair_bbio->file_offset -
-> > +                                         failed_bbio->orig_start);
-> >
-> >       mirror = next_repair_mirror(fbio, failed_bbio->mirror_num);
-> >       btrfs_debug(fs_info, "submitting repair read to mirror %d", mirror);
->
-> [ ... ]
->
-> > @@ -214,17 +244,17 @@ static void btrfs_end_repair_bio(struct btrfs_bio *repair_bbio,
-> >                       goto done;
-> >               }
-> >
-> > +             btrfs_set_bio_crypt_ctx_from_extent(&repair_bbio->bio,
-> > +                                                 repair_bbio->inode,
-> > +                                                 repair_bbio->fscrypt_info,
-> > +                                                 repair_bbio->file_offset -
-> > +                                                 repair_bbio->orig_start);
-> > +
-> >               btrfs_submit_bbio(repair_bbio, mirror);
-> >               return;
-> >       }
-> >
-> > -     do {
-> > -             mirror = prev_repair_mirror(fbio, mirror);
-> > -             btrfs_repair_io_failure(fs_info, btrfs_ino(inode),
-> > -                               repair_bbio->file_offset, fs_info->sectorsize,
-> > -                               logical, paddrs, step, mirror);
-> > -     } while (mirror != fbio->bbio->mirror_num);
-> > -
-> > +     handle_repair(repair_bbio, paddrs);
-> >  done:
-> >       btrfs_repair_done(fbio);
-> >       bio_put(&repair_bbio->bio);
->
-> Does this leak the fscrypt_extent_info reference acquired at line 326?
-> In repair_one_sector(), repair_bbio->fscrypt_info is set via
-> fscrypt_get_extent_info(failed_bbio->fscrypt_info), but when
-> btrfs_end_repair_bio() completes at the done label, it calls
-> bio_put(&repair_bbio->bio) without calling
-> fscrypt_put_extent_info(repair_bbio->fscrypt_info) first.
+> >  struct mmc_queue_req {
+> >  	struct mmc_blk_request	brq;
+> >  	struct scatterlist	*sg;
+> > @@ -69,6 +71,7 @@ struct mmc_queue_req {
+> >  	void			*drv_op_data;
+> >  	unsigned int		ioc_count;
+> >  	int			retries;
+> > +	u32			flags;
+> >  };
+> >  
+> >  struct mmc_queue {
+> 
+> I'm assuming retries is a pretty small number (didn't check), so if you
+> care about layout/space in mmc_queue_req, you could make this:
+> 
+> 	u16 retries;
+> 	u16 flags;
 
-repair_one_sector() is called from btrfs_check_read_bio() which always
-has (bbio a.k.a. failed_bbio)->fscrypt_info NULL. So there is no
-object which could leak due to refcounting imbalance. Encrypted read
-bbio passes through btrfs_check_encrypted_read_bio() instead which
-does not yet implement repair.
+I quickly went throught block.c, it appears retries would be only a
+single digit number. I will update the patch to use u16.
 
-Moreover btrfs_end_repair_bio() is called before repair_one_sector().
-And when it is called btrfs_check_read_bio() returns and no
-repair_one_sector() is caled at all.
-The fscrypt_put_extent_info() is eventually called from
-btrfs_simple_end_io() => simple_end_io_work() => btrfs_bio_end_io().
-So this looks clean, unless I missed something.
+Thanks,
+-Bin.
 
-> > diff --git a/fs/btrfs/bio.h b/fs/btrfs/bio.h
-> > index 456d32db9e9e9..7a8ff4378cba0 100644
-> > --- a/fs/btrfs/bio.h
-> > +++ b/fs/btrfs/bio.h
->
-> [ ... ]
->
-> > diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-> > index 5a39f707c2933..afc461d7642e4 100644
-> > --- a/fs/btrfs/compression.c
-> > +++ b/fs/btrfs/compression.c
-> > @@ -562,6 +562,8 @@ void btrfs_submit_compressed_read(struct btrfs_bio *bbio)
-> >       cb->compress_type = btrfs_extent_map_compression(em);
-> >       cb->orig_bbio = bbio;
-> >       cb->bbio.csum_search_commit_root = bbio->csum_search_commit_root;
-> > +     cb->bbio.fscrypt_info = fscrypt_get_extent_info(em->fscrypt_info);
-> > +     cb->bbio.orig_start = 0;
-> >
-> >       btrfs_set_bio_crypt_ctx_from_extent(&cb->bbio.bio, inode, em->fscrypt_info, 0);
-> >       btrfs_free_extent_map(em);
->
-> Does this leak the fscrypt_extent_info reference in the compressed read
-> path? At line 565, fscrypt_get_extent_info() acquires a reference and
-> stores it in cb->bbio.fscrypt_info. Looking at end_bbio_compressed_read()
-> in compression.c, it calls btrfs_bio_end_io(cb->orig_bbio, status) which
-> releases the ORIGINAL bbio's fscrypt_info, but then calls bio_put(cb_bio)
-> without calling fscrypt_put_extent_info(cb->bbio.fscrypt_info). The error
-> path in cleanup_compressed_bio() also calls bio_put() without releasing
-> the cb->bbio.fscrypt_info reference.
-
-IIUC, the fscrypt_info is put in btrfs_bio_end_io() before calling
-end_bbio_compressed_read(). So again, this looks clean to me.
-
---nX
-
-> [ ... ]
->
->
+> 
+> and not grow the size of it by 8 bytes with that addition.
+> 
+> Not a huge deal, obviously, but always good to consider things like that
+> to avoid wasting memory for nothing.
+> 
+> -- 
+> Jens Axboe
