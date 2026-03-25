@@ -1,173 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C94405AA6;
-	Wed, 25 Mar 2026 17:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6739740B6D9;
+	Wed, 25 Mar 2026 17:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774459604; cv=none; b=Jy4UusPTiwUAJ+wpkI1U7ky0oT4MeUy/F4CDiBXjzC75quFW2okmcwqTzFyNIHahCID0um8/qs8MTVMD775NZ8rCsUn3tPbBfSFPCThErHqjLV+8T3FyyDOfHP2XIvDruLmfOMlgNfXI290jVApBGxvADokSnUfAbqe5XYn0dvo=
+	t=1774461376; cv=none; b=oKFRMV1JDdQBYf+ImtxnT8xSsfkM9UNujqrmKNka51NIbVwJFOBBnd/YewhhFVRRuzYJ1iNq26xWs/7Xtv12FpHvO+UNTnuhhId8pCPrSEG/5DPt16ak2cbs0zKCTxyKfRlU0R9ypF/Homb/7EHoZxflc2WlHZlDcnT9Zu9SPFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774459604; c=relaxed/simple;
-	bh=8MKiB5e+7wU5JMRzvptDLH6dhESil3VUSqbtlMcTZuo=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=gO2iNtkVbvNhL0TvzE/itYhZUhIHCAx2hSr3LHU4REwgDukveiqT8ydKDh/6+4eeREWnMG52bO4ZVFQixwMICMGXjjaedGRmweWpyZbkKSndIFWq3ZLz4uspOhfNxRIdQWiddWh9XPDRJXUAXgQRhbTNCWdHgV7U2xL8bpwQ7ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2KgyqFj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774461376; c=relaxed/simple;
+	bh=qIDB0pkXXhpWuA6IMGIwjkFUKCqT5y7d6umUfVlCn5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GsRtsD2NSu1ScERAP90d88NbBrEth/IQJVirbMgka1kCzQ5HTOcDHaE9s0wMNrJf+SBRv9Y9ciV+Y0RsHoXazyT0ShjcZsoT+sWUTxDrzxakb0ZgJUYTBWbfXakw4aCInJP77e3iUPQQD1gPOH6RVddaMdTNuxo0Ss/XX3CJbQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=YBpqKbsh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qyY290+x; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2KgyqFj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38504C4CEF7;
-	Wed, 25 Mar 2026 17:26:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774459603;
-	bh=8MKiB5e+7wU5JMRzvptDLH6dhESil3VUSqbtlMcTZuo=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=e2KgyqFjz6lx9UPb1Acn7jv987HppCSYpFVXquvg7iB4GYqk7WWOs56LHWoBcByjs
-	 Q3qg9wuNNMfNmx4Z2zTreksSuBMSF0UENwBddzM2090FC7LQt+bFJD/EtqiXP851GJ
-	 aZk+dFvepJ1z0vo4BV7ZVzHT4fKWL8LcX5WRecltj9jUDCOXFaLNTxH5aBlQt1BMtc
-	 TknlxWKbaLm3FUTAC+vLNTYpSzdYh9I885rUnCspFKnxl0R5Mw7iFAWh3E9odMazoJ
-	 W46alJmfyxn+HpyhEL0URuJuXoPbAWw9oppwa2x68JZ4PcemzOpJP2FJ73m/73PxLb
-	 fTUgc/vPNYfmA==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 1B705F4006E;
-	Wed, 25 Mar 2026 13:26:42 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Wed, 25 Mar 2026 13:26:42 -0400
-X-ME-Sender: <xms:0RrEadAZVvCcZD5UoJjuYkc2UKomG5u8aIZIDmA1aMvD_lsLgBYqxw>
-    <xme:0RrEaWWxKLcDk3WpBUpYgfrTOuDupuNsqp659RvsL4oxBF5JTEErGLKsUy_Dt6AUJ
-    irO6MRRGvhU1n8jRbGkhDkQfnIPTlL1T4FiuBYM0FJ5GSJT-UM44x8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvdehtdeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
-    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
-    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
-    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
-    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
-    hilhdrtghomhdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtohepghhushhtrghvohgrrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvg
-    gvsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghhuhgtkhdrlhgvvhgvrhesohhr
-    rggtlhgvrdgtohhmpdhrtghpthhtoheplhhinhhugidqsghlohgtkhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhfshguvghvvghlsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqhhgrrhguvghnihhnghesvh
-    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidroh
-    hrghdruhhk
-X-ME-Proxy: <xmx:0hrEaciY_Eefhlg7ZXsfQz56aA9-v4gO6O7hd1-ic03dRQdmbYqxqA>
-    <xmx:0hrEaRmk_FfkqLRKZDroLRG6i3HcrWdtEbjgAnFWYWDYPEL5eGiPCA>
-    <xmx:0hrEaYiNstqPBqa3noi3DhTwKjnmJW_03_WYtB1nHvbfdQ0VDq8yuQ>
-    <xmx:0hrEaUF0AyO5FiQPVc94gS_2soX9DtEt6NO1xl20JQWZ56PZq3kXMA>
-    <xmx:0hrEaau99OhYO1WQlm846Zq84gmzP4vVpFDK8bFF4TLPC4LTvGEz2ALD>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id D77E2780075; Wed, 25 Mar 2026 13:26:41 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="YBpqKbsh";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qyY290+x"
+Date: Wed, 25 Mar 2026 18:56:10 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1774461372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nIqxshH5v/kqlkka5Fys70biUG8RbxH1oZ71KulCzLQ=;
+	b=YBpqKbshdPlJu3AcoWLnrzsRC6Ae0uS2dqj2hZm8sV6kAQm3/9diR/7/tSvamk/9Pkdoz/
+	wlR2YU5NWAUDcQPIpkRnrAAfRuyzHYT4QsYzDJA8dLamlFNRPMZZMJkgsumccvDxFNZaMq
+	cB98imsYRGVW8rE/9ZAxMHMlWVEZgxhJM11Tw8sb0A7gDjCt4HUnIjFl9yD8/WNlzncSJn
+	jSyp8mt860DgWw4Tvmh6xil4RZ6uZFYWySQU4MDIUJJUgPVVkXteBRGkpyEZSAo1zTyopO
+	bJy6d4+BFz8BGh/5ScpGP2u/eoqDGNxhzUZgw6SA1U5ZyKHR8k6cyvfnLRHCyQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1774461372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nIqxshH5v/kqlkka5Fys70biUG8RbxH1oZ71KulCzLQ=;
+	b=qyY290+xc963pc4I0oYLTElTPEXP2NuJR8oeKQMMe8AFVQx8op8IjKmEt8+Qbck1ImR392
+	W+6IV1teDdeXYVAg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Daniel Wagner <wagi@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Aaron Tomlin <atomlin@atomlin.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Costa Shulyupin <costa.shul@redhat.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com,
+	linux-scsi@vger.kernel.org, storagedev@microchip.com,
+	virtualization@lists.linux.dev,
+	GR-QLogic-Storage-Upstream@marvell.com
+Subject: Re: [PATCH v8 00/12] blk: honor isolcpus configuration
+Message-ID: <20260325175610.eY-VHHPS@linutronix.de>
+References: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AyMVdAmERJ9c
-Date: Wed, 25 Mar 2026 13:26:21 -0400
-From: "Chuck Lever" <cel@kernel.org>
-To: "Alexander Viro" <viro@zeniv.linux.org.uk>, kees@kernel.org,
- gustavoars@kernel.org
-Cc: linux-hardening@vger.kernel.org,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
- "Chuck Lever" <chuck.lever@oracle.com>
-Message-Id: <cc8ff9a7-d7f6-4588-82ba-e77c99574e93@app.fastmail.com>
-In-Reply-To: <20260303162932.22910-1-cel@kernel.org>
-References: <20260303162932.22910-1-cel@kernel.org>
-Subject: Re: [RFC PATCH] iov: Bypass usercopy hardening for kernel iterators
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
 
+On 2025-09-05 16:59:46 [+0200], Daniel Wagner wrote:
+> The main changes in this version are
+>=20
+>   - merged the mapping algorithm into the existing code
+>   - dropping a bunch of SCSI drivers update
+>=20
+> With the merging of the isolcpus-aware mapping code, there is a change in
+> how the resulting CPU=E2=80=93hctx mapping looks for systems with identic=
+al CPUs
+> (non-hyperthreaded CPUs). My understanding is that it shouldn't matter,
+> but the devil is in the details.
+=E2=80=A6
 
+I have been just made aware of this. It is still not merged so let me
+ask the questions before it is too late.
+What is purpose of managed_irq? Doesn't this sort of aligns with this?
+It was originally introduce to limit the number of nvme interrupts which
+can have multiple interrupts but don't need to use all of them. virtio
+is using it.  Yet I don't see an affect if I use isolcpus=3Dmanaged_irq,X.
 
-On Tue, Mar 3, 2026, at 11:29 AM, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
->
-> Profiling NFSD under an iozone workload showed that hardened
-> usercopy checks consume roughly 1.3% of CPU in the TCP receive
-> path. The runtime check in check_object_size() validates that
-> copy buffers reside in expected slab regions, which is
-> meaningful when data crosses the user/kernel boundary but adds
-> no value when both source and destination are kernel addresses.
->
-> Split check_copy_size() so that copy_to_iter() can bypass the
-> runtime check_object_size() call for kernel-only iterators
-> (ITER_BVEC, ITER_KVEC). Existing callers of check_copy_size()
-> are unaffected; user-backed iterators still receive the full
-> usercopy validation.
->
-> This benefits all kernel consumers of copy_to_iter(), including
-> the TCP receive path used by the NFS client and server,
-> NVMe-TCP, and any other subsystem that uses ITER_BVEC or
-> ITER_KVEC receive buffers.
->
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->  include/linux/ucopysize.h | 10 +++++++++-
->  include/linux/uio.h       |  9 +++++++--
->  2 files changed, 16 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/ucopysize.h b/include/linux/ucopysize.h
-> index 41c2d9720466..b3eacb4869a8 100644
-> --- a/include/linux/ucopysize.h
-> +++ b/include/linux/ucopysize.h
-> @@ -42,7 +42,7 @@ static inline void copy_overflow(int size, unsigned 
-> long count)
->  }
-> 
->  static __always_inline __must_check bool
-> -check_copy_size(const void *addr, size_t bytes, bool is_source)
-> +check_copy_size_nosec(const void *addr, size_t bytes, bool is_source)
->  {
->  	int sz = __builtin_object_size(addr, 0);
->  	if (unlikely(sz >= 0 && sz < bytes)) {
-> @@ -56,6 +56,14 @@ check_copy_size(const void *addr, size_t bytes, bool 
-> is_source)
->  	}
->  	if (WARN_ON_ONCE(bytes > INT_MAX))
->  		return false;
-> +	return true;
-> +}
-> +
-> +static __always_inline __must_check bool
-> +check_copy_size(const void *addr, size_t bytes, bool is_source)
-> +{
-> +	if (!check_copy_size_nosec(addr, bytes, is_source))
-> +		return false;
->  	check_object_size(addr, bytes, is_source);
->  	return true;
->  }
-> diff --git a/include/linux/uio.h b/include/linux/uio.h
-> index a9bc5b3067e3..f860529abfbe 100644
-> --- a/include/linux/uio.h
-> +++ b/include/linux/uio.h
-> @@ -216,8 +216,13 @@ size_t copy_page_to_iter_nofault(struct page 
-> *page, unsigned offset,
->  static __always_inline __must_check
->  size_t copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
->  {
-> -	if (check_copy_size(addr, bytes, true))
-> -		return _copy_to_iter(addr, bytes, i);
-> +	if (user_backed_iter(i)) {
-> +		if (check_copy_size(addr, bytes, true))
-> +			return _copy_to_iter(addr, bytes, i);
-> +	} else {
-> +		if (check_copy_size_nosec(addr, bytes, true))
-> +			return _copy_to_iter(addr, bytes, i);
-> +	}
->  	return 0;
->  }
-> 
-> -- 
-> 2.53.0
+I would expect that it limits the number of used interrupts as intended
+by this series. The only affect I see is that once the CPU goes off/on
+the assigned CPU mask is restored.
 
-Ping: Any further thoughts on this? Al, Kees, Gustavo?
+What do I miss?
 
-
--- 
-Chuck Lever
+Sebastian
