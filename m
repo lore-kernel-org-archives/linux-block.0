@@ -1,102 +1,69 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6739740B6D9;
-	Wed, 25 Mar 2026 17:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AF9314B8F;
+	Wed, 25 Mar 2026 18:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774461376; cv=none; b=oKFRMV1JDdQBYf+ImtxnT8xSsfkM9UNujqrmKNka51NIbVwJFOBBnd/YewhhFVRRuzYJ1iNq26xWs/7Xtv12FpHvO+UNTnuhhId8pCPrSEG/5DPt16ak2cbs0zKCTxyKfRlU0R9ypF/Homb/7EHoZxflc2WlHZlDcnT9Zu9SPFc=
+	t=1774463690; cv=none; b=p8eS303kcX5Scqf2TY515ruVTIBZModL0gQCznQkkFP2GHTSDzGFUpBVDY5eY9lAGegNqFJOqlXCyEkXNzPs/v/5zzgC3kixpN8CaWQkesINcloBbq3+51pR8LxIivuEwEhp3u8Mpyi75sI675pq0yy6CTBCEhba4+nO4ITwLD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774461376; c=relaxed/simple;
-	bh=qIDB0pkXXhpWuA6IMGIwjkFUKCqT5y7d6umUfVlCn5U=;
+	s=arc-20240116; t=1774463690; c=relaxed/simple;
+	bh=gFdhIT7zohDFHph+YzuIffzKIM3BcR+OhAMRrbLwYmk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GsRtsD2NSu1ScERAP90d88NbBrEth/IQJVirbMgka1kCzQ5HTOcDHaE9s0wMNrJf+SBRv9Y9ciV+Y0RsHoXazyT0ShjcZsoT+sWUTxDrzxakb0ZgJUYTBWbfXakw4aCInJP77e3iUPQQD1gPOH6RVddaMdTNuxo0Ss/XX3CJbQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=YBpqKbsh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qyY290+x; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=tn1Np6aduL1yqE+8N+aI1yNehVMHoMfKytciAg7peoyN2Jhdf2T+e0QrUikaa278ux2NtliN2PDzw6fjHpjey3sBtHVU+ven72jzpyUniYo6YeWXqofFjhVAl7uziUXFtABr7kgp4b/dMdwps59m6Zc2PPxHxoVxO3cMaGo657U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MGXd8KxY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="YBpqKbsh";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qyY290+x"
-Date: Wed, 25 Mar 2026 18:56:10 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1774461372;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nIqxshH5v/kqlkka5Fys70biUG8RbxH1oZ71KulCzLQ=;
-	b=YBpqKbshdPlJu3AcoWLnrzsRC6Ae0uS2dqj2hZm8sV6kAQm3/9diR/7/tSvamk/9Pkdoz/
-	wlR2YU5NWAUDcQPIpkRnrAAfRuyzHYT4QsYzDJA8dLamlFNRPMZZMJkgsumccvDxFNZaMq
-	cB98imsYRGVW8rE/9ZAxMHMlWVEZgxhJM11Tw8sb0A7gDjCt4HUnIjFl9yD8/WNlzncSJn
-	jSyp8mt860DgWw4Tvmh6xil4RZ6uZFYWySQU4MDIUJJUgPVVkXteBRGkpyEZSAo1zTyopO
-	bJy6d4+BFz8BGh/5ScpGP2u/eoqDGNxhzUZgw6SA1U5ZyKHR8k6cyvfnLRHCyQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1774461372;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nIqxshH5v/kqlkka5Fys70biUG8RbxH1oZ71KulCzLQ=;
-	b=qyY290+xc963pc4I0oYLTElTPEXP2NuJR8oeKQMMe8AFVQx8op8IjKmEt8+Qbck1ImR392
-	W+6IV1teDdeXYVAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Daniel Wagner <wagi@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Aaron Tomlin <atomlin@atomlin.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Costa Shulyupin <costa.shul@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Waiman Long <llong@redhat.com>, Ming Lei <ming.lei@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, megaraidlinux.pdl@broadcom.com,
-	linux-scsi@vger.kernel.org, storagedev@microchip.com,
-	virtualization@lists.linux.dev,
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH v8 00/12] blk: honor isolcpus configuration
-Message-ID: <20260325175610.eY-VHHPS@linutronix.de>
-References: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MGXd8KxY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62E72C19423;
+	Wed, 25 Mar 2026 18:34:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774463689;
+	bh=gFdhIT7zohDFHph+YzuIffzKIM3BcR+OhAMRrbLwYmk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MGXd8KxYJf4fgBG6VwiOt5iufYXHRH7MWHTrzV2OIbYeBM7yRbx1RK/h1WjVojN3L
+	 LDl/ABFiCgesosTt0C3A7sr8SE71c6JqHzg0j/azYeARRTRWojpQfXnbk+AOKMPqq7
+	 ZUJDlbFXtVb15z8vszsX8CxIS3FzHOeSQmAbsc5itkWnJNDlt6PNxUWudYlppJ7nOk
+	 ySg3rkj4M1+gXkofITpBHiDcrwtx9Gmj/WGuJFD6VJut0dMfUpjTduXyVkP1P92HM6
+	 POqTNq40OMKGUDteQ/rWZqZXwsXQttFZy1fVm+CTxLJrWhyAT6JZ38SL7JLvATdDFo
+	 La+0Nhmdjd52A==
+Date: Wed, 25 Mar 2026 12:34:47 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Keith Busch <kbusch@meta.com>, dm-devel@lists.linux.dev,
+	linux-block@vger.kernel.org, snitzer@kernel.org
+Subject: Re: [RESEND PATCHv3 1/2] dm-crypt: allow unaligned bio_vecs for
+ direct io
+Message-ID: <acQqx_gCjHmP8BGR@kbusch-mbp>
+References: <20260316150229.1771884-1-kbusch@meta.com>
+ <7cc4892a-5a2f-09b7-1f32-320acac4c797@redhat.com>
+ <abrjgdttXBHCFh34@kbusch-mbp>
+ <fa0978af-398b-a212-73bc-80f0f2c375a4@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250905-isolcpus-io-queues-v8-0-885984c5daca@kernel.org>
+In-Reply-To: <fa0978af-398b-a212-73bc-80f0f2c375a4@redhat.com>
 
-On 2025-09-05 16:59:46 [+0200], Daniel Wagner wrote:
-> The main changes in this version are
->=20
->   - merged the mapping algorithm into the existing code
->   - dropping a bunch of SCSI drivers update
->=20
-> With the merging of the isolcpus-aware mapping code, there is a change in
-> how the resulting CPU=E2=80=93hctx mapping looks for systems with identic=
-al CPUs
-> (non-hyperthreaded CPUs). My understanding is that it shouldn't matter,
-> but the devil is in the details.
-=E2=80=A6
+On Wed, Mar 18, 2026 at 07:06:40PM +0100, Mikulas Patocka wrote:
+> 
+> If we have dm-integrity with 512-byte sector size on the top of a device 
+> that has dma_alignment less than 512, the code would set 
+> limits->dma_alignment to the value of the underlying block device and 
+> break dm-integrity (which assumes sector-aligned bios).
+> 
+> But that's a problem of dm-integrity - this "if (ic->sectors_per_block > 
+> 1)" condition in dm_integrity_io_hints is weird, it should be dropped and 
+> the limits should be properly merged.
 
-I have been just made aware of this. It is still not merged so let me
-ask the questions before it is too late.
-What is purpose of managed_irq? Doesn't this sort of aligns with this?
-It was originally introduce to limit the number of nvme interrupts which
-can have multiple interrupts but don't need to use all of them. virtio
-is using it.  Yet I don't see an affect if I use isolcpus=3Dmanaged_irq,X.
+Looks like dm-integrity is a bit weird for other reasons, too. If a user
+creates a dm-integrity device with block size of 1k or 2k, but the
+backing device is 4k logical size, we'll have a mismatch from what the
+dm-integrity block device reports compared to what it can actually do.
 
-I would expect that it limits the number of used interrupts as intended
-by this series. The only affect I see is that once the CPU goes off/on
-the assigned CPU mask is restored.
-
-What do I miss?
-
-Sebastian
+The pattern needed to get it right is repeated several times, so a
+helper is probably warranted. I'll put a series together as a prep and
+fix up.
