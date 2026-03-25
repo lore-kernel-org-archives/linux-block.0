@@ -1,62 +1,65 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA07351C37
-	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 06:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A271F3563C4
+	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 06:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774420729; cv=none; b=BEtYkvho0zzUFpjrJysFqsDvZZe4rP+JxQIZElOBdLVKfaix7uarxPd9/aGu6Vgr4polHcmYsGlC1XHlOSixUy3OqHsV2btE9pWFeUjuqEIX57wNUbHkEsOY3tZelxtqJl10m7/wTnc5RJVrBE0guG5FdSrrg7orVIvjyVBMmUg=
+	t=1774420735; cv=none; b=rkk2OTszLxcM0F/miR2aI1cmGYMD0DZRksX09d6qOWGzyBIH7ZM1uNR4xzghCO4KqPuMntUMkj3RiZjwjNzz1el37+4nzUDoihYIg4WB6Si3gDaovvQZFo8qh6nDX5Ja+DRxhPpik95CItowXXImOKgbu7l/fXX4PLpbjnnnpH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774420729; c=relaxed/simple;
-	bh=G4aUuv5IRjPHJ6XkBrei8QQPcxcp4XaxNuNC+DQhCwM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GHP+KTQ48K5A5Nh3sK5ePRji2mltwIykbORwH1mAKc1ngiJIqNa/KVQxlc9CckAVAikK+KQAnYzxsj7dc4+vpc9JbgdoTxlY3hjpZmzzSlR1QncEcj++KRv+dZIckswKLqSTHj9vtw0J5H4wb+Kk+5I/WKoFJT5LMDcDJmC3IHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m1VTbo2q; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1774420735; c=relaxed/simple;
+	bh=Dvk5vhl0CIvLArJHpPcg4CQ7xAl0HOrfl9NgAH6cT1s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Ti3HMLME1hSYGYlJA1EqJQRnYaSGgUqpq0JNdFUFxJWiF6rkKnJBxPQYOvINULsL4gRLylP5DXUnYw/oPbdC449X9PdWe/R44G8MvfraUvkGFtMpxl08ypHyTK39R46141Qtq/euOGZymL4xgn3H+twxjm4saRp/0ZNr3nJTWJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dVIJWWkH; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m1VTbo2q"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82c6929bd26so2500645b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 23:38:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dVIJWWkH"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35b991171deso4281428a91.3
+        for <linux-block@vger.kernel.org>; Tue, 24 Mar 2026 23:38:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774420728; x=1775025528; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ps9jyH80iSRUMtuSLZrvtXUJpNI4M5Ryo0aSIRfQLmU=;
-        b=m1VTbo2qpdnd5ygOgTnjLXTzutkZvyEB38IqONUSlrrnF+2Le5zmJFUGLUVleznO08
-         tirRrpOFbqqNmKoPGRb0CeOqBpCvLjIMYa1ced+Xcmy+qYUvJ2k7rBZ5okJTKtERKW8P
-         GQUEFJxFAJ/Xe07unUS4Y7/JkpVGl96v0n8c1kK5boA+pzo4/iyKDb8bwkB1y4p263v4
-         DTGfo6ilpTzNbRu7rLSEl9j8ktjPaIqrf76SfmzxEOQ8P5VA+dzbZajP+Q6QUMh0N8tI
-         q+p71ssLLPZJLpY8dstKvdCuPpGo2dYtFaTrFwc5XOLAOaGqkQ5YxGCP7vMr62N6G+d2
-         YXJQ==
+        d=google.com; s=20251104; t=1774420734; x=1775025534; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fe7lwzU/0LJm5TPvDH/KfFTCZrDEcrbFnFZJiKYD2Dg=;
+        b=dVIJWWkHI0+UrjpBMaV80kUi31Kk8Oqk4UkSkPJwDw8TnjyjqFUL0QLXl5Y21piddB
+         nbJ08c52Guq9AN3nXmDhpeRTCxfcJIvoHP+44t88hhjULjEcjyVELNV/21d6XH2lKny5
+         vhHfSm9DPuTFUkiCzEYo1FNNJoemdjrKACA3BOPpWRxCgUhl0Lz/cjjyo2GjAcPmlFhe
+         pfiQmzU5Iw9pH/OhfAXf0XX9EKqfJaKZjmPgidQZj/B7OIbG27AU5ghTfLHLdOu4HXbJ
+         IFe1/FCzqTJR7Zbqr8Mqo4NLPNKfZuyHsN7KSfsA+VReEuFo/zSWN5jz6/wwqauOl3SH
+         ejgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774420728; x=1775025528;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ps9jyH80iSRUMtuSLZrvtXUJpNI4M5Ryo0aSIRfQLmU=;
-        b=hgOLLZ9wrZNhQOfvIjmnK+xTFVqoxGh8UCCQQWVmVbSOYFAmLmH3Q61fHlFAZilRjZ
-         JKvggXORrY01kJS6oK+aXrAqfpiAJDPa4DEeCzfo+gbBZ3Y2G5p5fH0FN48MjACFg8U3
-         p236OaQCkOHobBlm5JXRveE4kY/3Q/VuDs3kdUoF4gDlk4wxHaBo1i/J7qG6a8UaXQuR
-         nj4GwpUJt+lI6cCUd1rawagu7w3F8fC0CqhWs6B5+jF8uzzhXK7HGlyjbMkaAiViwC80
-         cqUVtAGnQFxI2FWj0wuUtfybG7cXET27Wt74TWpictxTpTmN+YinnENoXrEgFdyON3mR
-         QeNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmURv8x7Zs1n17sEi2NiMDTefoJsOUweiJQVC60Qp9ANSP9+7qPZV4eSkjgh67C7az6jCQ4aiLRbxJQQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrBJuHXEKpf6VYivG1RteD/937pMLj2l1Y5dj1salP2CRTT0rB
-	1tgpa/L/q306danGX+XNncEhJfu/ev/UXN7O/0sCw5xK1dMqiJ4jX7PLcOESEKvey+MERnrS+Mk
-	AukAh+g==
-X-Received: from pfbdf8.prod.google.com ([2002:a05:6a00:4708:b0:829:94bc:6c15])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4489:b0:82a:899b:d804
- with SMTP id d2e1a72fcca58-82c6dfa883cmr2464688b3a.38.1774420727444; Tue, 24
- Mar 2026 23:38:47 -0700 (PDT)
-Date: Wed, 25 Mar 2026 06:38:21 +0000
+        d=1e100.net; s=20251104; t=1774420734; x=1775025534;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fe7lwzU/0LJm5TPvDH/KfFTCZrDEcrbFnFZJiKYD2Dg=;
+        b=dp5PyQsfScqlh0d8TrL8GxzwF2aigidObSzRqotj3DwFZOH9FRPGFHF2GYVpo6sziz
+         B8lF+pJCfBdO9q6DUCof3MRQpTJzi+IGI5YpB2o4i3kPO5goucQRAVa3aK1DE/wRwDXN
+         qllMBjEML75MXkdqBZv6dSnvEbf2QQevG4P8O91Rc/ouVjsyGbh8/GaIkQk81WZulMYw
+         mqpA1xDMAA4vPRhG53BmJxYAMMmK/a8gFYyg+13f/P30+h7TwPRVNTfL+xBplHCRy8Bm
+         pXjAT1RTWnGp7qcLPGEvVbyVEEdL4SV5KIOkzSpQ2CE9tGOD38QALMNZz5XY5DKU6nWs
+         s8Qg==
+X-Forwarded-Encrypted: i=1; AJvYcCWF29A/mSxIioX8kIWQc1to+ET+MjgJT8exV80xT2wxc6rJPp8amVKXEoCX8xbBqECv6dvwErycHN8+Lw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGVWyvuid2HjVsJxBczQWll5582bVgZ7Jl7HCGlAbND9zBxZd+
+	HL58xccdS65l5Xsqt4ZDreQ7hh5zFp4Bv2fMph5AntYNDXyqtrp22PKDqi5JSK+UKJXPhK+05bM
+	YgzMDaQ==
+X-Received: from pjbfz5.prod.google.com ([2002:a17:90b:245:b0:35b:8f3f:2b30])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:35cf:b0:359:f77f:8cff
+ with SMTP id 98e67ed59e1d1-35c0dd6a759mr2063094a91.19.1774420733796; Tue, 24
+ Mar 2026 23:38:53 -0700 (PDT)
+Date: Wed, 25 Mar 2026 06:38:22 +0000
+In-Reply-To: <20260325063843.1790782-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260325063843.1790782-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
-Message-ID: <20260325063843.1790782-1-kuniyu@google.com>
-Subject: [PATCH 0/5] nbd: Fix deadlock during fs reclaim under lock_sock().
+Message-ID: <20260325063843.1790782-2-kuniyu@google.com>
+Subject: [PATCH 1/5] nbd: Remove redundant sock->ops->shutdown() check in nbd_get_socket().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
 	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -66,40 +69,39 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Recently, syzbot has reported 100+ possible deadlock splats
-involving NBD, typically following this pattern:
+Since commit 9f7c02e03157 ("nbd: restrict sockets to TCP
+and UDP") (s/UDP/AF_UNIX/), NBD only accepts TCP and AF_UNIX
+SOCK_STREAM sockets as backend.
 
-  lock_sock(sk)
-  -> GFP_KERNEL memory allocation
-     -> fs reclaim
-        -> lock_sock(sk) at NBD
+nbd_get_socket() currently checks if sock->ops->shutdown()
+is sock_no_shutdown(), but sock->ops->shutdown() is always
+inet_shutdown() or unix_shutdown() for these socket types.
 
-Instead of spreading memalloc_noio_{save,restore} over the
-networking code, we want to fix it in the NBD layer.
+Let's remove the redundant check.
 
-This series introduces a try-lock version of lock_sock() and
-use it in NBD to fix the deadlock.
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ drivers/block/nbd.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-The try-lock variant should not fail in practice because while
-the socket remain exposed to userspace even after being handed
-over to NBD, the socket should not be touched by userspace.
-
-The series can be applied cleanly on block-7.0 and net.git.
-
-
-Kuniyuki Iwashima (5):
-  nbd: Remove redundant sock->ops->shutdown() check in nbd_get_socket().
-  nbd: Reject unconnected sockets in nbd_get_socket().
-  net: Introduce lock_sock_try().
-  inet: Add inet_shutdown_locked().
-  nbd: Use lock_sock_try() for TCP sendmsg() and shutdown().
-
- drivers/block/nbd.c       | 44 ++++++++++++++++++++++++++++++++++-----
- include/net/inet_common.h |  1 +
- include/net/sock.h        | 31 +++++++++++++++++++++++++++
- net/ipv4/af_inet.c        | 43 ++++++++++++++++++++++++++++----------
- 4 files changed, 103 insertions(+), 16 deletions(-)
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index fe63f3c55d0d..fc714cba1f23 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1228,13 +1228,6 @@ static struct socket *nbd_get_socket(struct nbd_device *nbd, unsigned long fd,
+ 		return NULL;
+ 	}
+ 
+-	if (sock->ops->shutdown == sock_no_shutdown) {
+-		dev_err(disk_to_dev(nbd->disk), "Unsupported socket: shutdown callout must be supported.\n");
+-		*err = -EINVAL;
+-		sockfd_put(sock);
+-		return NULL;
+-	}
+-
+ 	return sock;
+ }
+ 
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
