@@ -1,74 +1,72 @@
 Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BB32D97B8
-	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 19:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A111E35970F
+	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 19:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774467556; cv=none; b=Kdra3yKkUJDbu2QfYHq+70oXsB92GlgyQGySxaAzYM4pBZ55cVdRFM36oWfhSbT26fspNpL3NCD8wKoS39VThBes1TsOdc8qV6VO/XDkVA7s6C4IkO1pv9h9LttBLeQevFbHdqgAQjs9oxSSrYKhY4p9Ek20Ko57LN1SgJ3VoMY=
+	t=1774467676; cv=none; b=ADac42WlbJP/h0RK4enD615jKUoHOK72EfPle0MVGIyJ4xg3gKk8Ao6awAcLs0r2fApQtlt0XOe5uptpJY5JX9C47lGfcaZrQFFA+6/TDwnXtyziGdmneAUygO2mN3LncepMgJKdZjJ+8ueoPPL9fpmPfDTSclPOtri6gCupzeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774467556; c=relaxed/simple;
-	bh=/KDtCfPcROGMHktI+sYIoy1sJXxmr+t5YwMIoFyxNlk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=S+RPCHG+zSiBGTDeVVajaUQy9Je+9QGrY/v7ZImH9sQUw2NRxv5w0M3IwkrqFX6l4E1MSvvgWwG9CPpLU6OedD6pYDCzOe7eoRl7QzCSjjVB1sTpaT/KKGGGVaMPx7o24f35dlVtdFxj4Q3Waq1Bkg1TaToB19aXQxciVXWOfLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=W1TdmHAg; arc=none smtp.client-ip=148.163.139.74
+	s=arc-20240116; t=1774467676; c=relaxed/simple;
+	bh=SDa413NBu0hIgtXUq9skjN+ObizbWtqbWL36k4Lizgg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=COx9wZoDD4L6iAGwIAkcWElBX0UTP7LDPmqIkdRy9fq2s2AvOOUkTyyYf9WYRlbQiBoGNKLUzO/P80BWnTTXr88XmiwUSBr+FQBVwSlWxpz4/+YQJF5OQ+027YzqBsD62diGW8J5pKABdDJpqC/32rJhWR4+R4sT+I5YKw/Sr2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=DQGQun1h; arc=none smtp.client-ip=148.163.139.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="W1TdmHAg"
-Received: from pps.filterd (m0167077.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62PJSdV23355663
-	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 15:30:41 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="DQGQun1h"
+Received: from pps.filterd (m0167075.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62PJSjZo3609733
+	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 15:30:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=hCcp
-	+9kU8miIdEe20LAeTwI4JkSmuzG2q+hEwpZi3Vg=; b=W1TdmHAgxdl1P3Jt415K
-	mDMuXC1UZ38fH1pCdmPKkiGohuKsIY1BtpAKPFqF+lIJQhgQdYdxNmq0tBln+Sxi
-	fPo2lZn/xTrr7aF03NAH5D7o5dhQ7+BnqTNuev7JxaZBdfr7G70Mgv6aC67YHW6I
-	jiNkss/3Gc3BnDCLsPz4kOq4H0P3arP/tm4ywo+FaBzzT+wYpZi3+xYTVHK+aRCm
-	JPQkw9rJlEHkxRJkqF13de3U36pc5j9+MK4SNkjL0L6/hXAbd+/klpJMM5KCVdqx
-	7xFJfUckpL/QeBuUOmtLU/DH2jbtDRoN06GcP8GdoC+DVlnJMZbwsJFM28SMa1+f
-	IA==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4d4f6vc4wd-1
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pps01; bh=HA8D23GhyMmgO7Ma7d4u4MjK11
+	kduWqDfN99ZCazVFY=; b=DQGQun1hSa+QSSxUr1i8su6bffWvkVZW2sXUVXgnlt
+	spnIeP4au9kWZU6PdGp9HPtniIjnetnIaBZ/4Hit3Koj7U7ggQPK9cq5xePIQU77
+	YlFwwGlCOaWH4hrsUEsr6/uSlFegWdbd0iMlu24ImT3aWBqZWHzRJg7xvZ5bTEu1
+	weYJ8Uu1Jy+hPpNC/TiiyQHTRZWyIgj09wbccT+4egTjtLVkeqs4I16mYSCFUf+K
+	fXBQuxcnDsxRTIzsQqwBxNXEQvUnHkGkbJwvMgMLXIzDGFZEiKixwOlC8nFIvy+D
+	i7HLIHgQ5vueOIACUJxRXYmWRuwGCH9OOV6nGTk2h7GA==
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4d4dnrmmad-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
 	for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 15:30:41 -0400 (EDT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-50b2cbe7223so8776731cf.2
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-50b4b81c632so10002901cf.1
         for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 12:30:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1774467041; x=1775071841;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hCcp+9kU8miIdEe20LAeTwI4JkSmuzG2q+hEwpZi3Vg=;
-        b=jVYEYirATjxdCtnhu2EYpy05zLFKrB5+YYcVXWCejyfH0RWOWgtRa7jjUKR00OJiEo
-         8j9A+PzBiN6MkGTSL+yZiCedjnxwyqtBehV+PG8PLI+VZRvQCcw8ywpZ/X+lfkSXnfC7
-         WRZJMKd27u2tBzDtqUkkUtJpUr6iW4MEDS6N1zF98OFzsjRxdLlSQ983ndTbChF0ztsz
-         IZeLVX6HEBnE7QqZPjgAJBV/OqB6Bd8LdhLItAJxaDn4dpzC4AnP4sMYLYapspmEPTUX
-         9YOx23DZ+IhdRXeF7xLWBLeNoxt7M9H0WfWPd4rS/iQJjWVyabp5LfnU/J03SXE2imbd
-         4KuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaH5JSYNShX66qsWHpjUjeEYC3zkViKFUZ2PEEIIhBCtvQasGs7bY1aaqIWI1gMQ2W9ltcugiMd6DA7w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFdaVJ0BMVtHScJtpV1/58xh4BvlPHy2+hEiLDX1pPAVr8JRTx
-	0lFRFB1REA70lrCqBnhUaodVF4N4dX1kIfcJlMsDBETw/Td1Kc8yv2rAQgt4DYs9hbGS//jvsBm
-	cmtD+ubLzH5HhUSwHhBw5d+3sb4RvDBRP5JQSmf32ZdinWC4QLYGRXLi3FOjI
-X-Gm-Gg: ATEYQzyNcSYTGwXIk8xkYR7SOnJiOx8LipnXgjODUABs/RK0TVBvrLbKYwxDssTvY+9
-	wIVzoHr4zdazUiyM78PVlVl2rIG6VFOFBavh5YNEwwcdjRIhngv5iVtNf9H3mfie8CLlLe87L4d
-	4B6gZy6E4IS9VPqBtzIgziNIStUjE7pnUGzmzNenQj6zxRDglf3XbmtCDUpl8s5X13GFBvItH5Y
-	cC8UTXbqF5WLjOwYCJ0R98mWPxlQazkLKj41qMv8+eJ59du6Xned7z5xqI3ill7IPV0PTY+R13z
-	k3P4N9CFUNH6GKEsmBxAD/7wekahsFEDMRvH24twuJrtzpVz9lB3ioOphmAjoBC8SzPD7nhmL/N
-	sg1dgQcue+KLtpv0zMambF2yEPNSQoM8kblNj4g==
-X-Received: by 2002:a05:622a:8356:b0:50b:4f75:c925 with SMTP id d75a77b69052e-50b80d34c05mr57540511cf.24.1774467040642;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HA8D23GhyMmgO7Ma7d4u4MjK11kduWqDfN99ZCazVFY=;
+        b=GFamPz0TcKH5ApDEawaglvnjpkAEB360q7r6qJsRx5xxDeplXZ/EJW+6suMLlhbtCN
+         2y1m0B8kVBNGH90Y2pTCOH2vYGy+BLNSNaaDTDVKgCROpblSL0m9HxYHPWuGdOcW0LNo
+         9DkW0zvY/cflzZnG+MXedO2LF9QOQc75o71HZoujgXUFQ9MH5dJYkHpRZHPl7rLXvgG5
+         LWqncJP6cFH7wSlPPKqGGma23DgwTguuTLAokkqx6ONi82jEYIPu7casBxCa95gKbIyh
+         kHTJXeDh2a0dcrJ13WylPPnku2b7uFEaSZDegryvKiixga504j24Jieo5L3ekvt+m10E
+         /O+g==
+X-Forwarded-Encrypted: i=1; AJvYcCX+5ZD3WimjY9fFWGfZwkfJuRo0qdQsZNZrg2RtW8Q9pdVGu6BF6U4afGRfuW5lCENzaJ6z1Rhjt1Rc6Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3+O4hUWHlAf1Cg7Zxh/Y+25ymeEyULkGZuuDFZz153zTAd4YD
+	92d72EwfByT9hfQpt1fos8Hj+/86Tdnkrk71AbFbWe33bZX40up2L81MsZ5w/il9IK00DvslpY/
+	L7+wkAdjRwKnU4SIhX42ZjdtuTxkKQ62V9LdZVl9Sp6ZaT3e3yJuhBFyaE/4x
+X-Gm-Gg: ATEYQzxK5fYe7YztFzRmIfHHNjPKeDs6dc7vOdeiE4DY/1ypUDwv//HhrUgsI7W+wJe
+	5JryGUPgCZt0YDX4IP8lM4fQfrl65LeEDCto0Dgm2iLF6AJ+cLGB8nN5MVWh70D6lMAGNG7QNWw
+	14gHe0xXNtbq6eRivH6RqBXYbpt10gWPdHnRqfH6dA7VvZWE+JJ1LP5JsXB1ACr0nGko189uvWt
+	IcsZnOMwMf5p1afSlIvOFZP+eWdHuarVTdzJyyC/JpYRfFemyelmxKKDL0HnNuIvkGAhhXBrV2j
+	OGYPJJuT1DcvXacOx02Np7cIzKlc/rrOEzmvxQMHXakrcpy5K+viFjZTHeBc9pVhP5lXw8Pj7N0
+	MKpcVJxr/VoAwJhfO1KsOKQG56lNycKvAw5ptYQ==
+X-Received: by 2002:ac8:660b:0:b0:509:3cd:b243 with SMTP id d75a77b69052e-50b80d1817fmr51207711cf.21.1774467040960;
         Wed, 25 Mar 2026 12:30:40 -0700 (PDT)
-X-Received: by 2002:a05:622a:8356:b0:50b:4f75:c925 with SMTP id d75a77b69052e-50b80d34c05mr57539811cf.24.1774467040081;
-        Wed, 25 Mar 2026 12:30:40 -0700 (PDT)
-Received: from [127.0.1.1] ([129.236.226.199])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b9234e3a3sm5534221cf.19.2026.03.25.12.30.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+X-Received: by 2002:ac8:660b:0:b0:509:3cd:b243 with SMTP id d75a77b69052e-50b80d1817fmr51206021cf.21.1774467039043;
         Wed, 25 Mar 2026 12:30:39 -0700 (PDT)
+Received: from [127.0.1.1] ([129.236.226.199])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50b9234e3a3sm5534221cf.19.2026.03.25.12.30.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2026 12:30:38 -0700 (PDT)
 From: Tal Zussman <tz2294@columbia.edu>
-Date: Wed, 25 Mar 2026 14:43:00 -0400
-Subject: [PATCH RFC v4 1/3] block: add BIO_COMPLETE_IN_TASK for
- task-context completion
+Subject: [PATCH RFC v4 0/3] block: enable RWF_DONTCACHE for block devices
+Date: Wed, 25 Mar 2026 14:42:59 -0400
+Message-Id: <20260325-blk-dontcache-v4-0-c4b56db43f64@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,9 +75,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260325-blk-dontcache-v4-1-c4b56db43f64@columbia.edu>
-References: <20260325-blk-dontcache-v4-0-c4b56db43f64@columbia.edu>
-In-Reply-To: <20260325-blk-dontcache-v4-0-c4b56db43f64@columbia.edu>
+X-B4-Tracking: v=1; b=H4sIALMsxGkC/3XNTQrCMBAF4KtI1kby0zbVlSB4ALfiIp1MbLC20
+ rRBKb27IatSdPne8L6ZiMfeoSeHzUR6DM67ro0h224I1Lq9I3UmZiKYKJjgJa2aBzVdO4CGGqm
+ UJZfSGJblSOLm1aN17+RdyeV8IrdY1s4PXf9JPwJPpz9c4JRTq01RqByt4vYIXTM+K6d3aMaEB
+ bEARL4GBGVUMVQasrhn5Q9ALgG1BmQEwEi2BzB5WayBeZ6/w0/PZzQBAAA=
+X-Change-ID: 20260218-blk-dontcache-338133dd045e
 To: Jens Axboe <axboe@kernel.dk>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Christian Brauner <brauner@kernel.org>,
@@ -91,194 +91,157 @@ Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         Tal Zussman <tz2294@columbia.edu>
 X-Mailer: b4 0.14.3-dev-d7477
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1774464193; l=4684;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774464193; l=4705;
  i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
- bh=/KDtCfPcROGMHktI+sYIoy1sJXxmr+t5YwMIoFyxNlk=;
- b=yUgCWQ4ZcEeNTx5iojZlwuLJ75/zRFsFdFta96TVVGE0YTzeH6B4RKXjHrIwyFGw3hTK3rhgt
- gf2gbHu8FZ6CWKrHyJPeTOd+yuu9FyglPNZhfk8bDp7xeu7U5SJLlSh
+ bh=SDa413NBu0hIgtXUq9skjN+ObizbWtqbWL36k4Lizgg=;
+ b=rVqeNMymQnbkbA09jjFwfm2fWjVL0ioo1AkqXQ5jcutSE4d0XRwJmwhfNzYW1IkNqhZq2eWVM
+ qHy178rbPMXAdte8ZiWpsnVx+A2KACM+e+P4EnG/GBnw2X8s/dYeyYJ
 X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
  pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
-X-Authority-Analysis: v=2.4 cv=MohfKmae c=1 sm=1 tr=0 ts=69c437e1 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=QOUmeeuX5y9IvSxXHa6D2A==:17
+X-Proofpoint-GUID: 2OFzDcCZmrxfwUIl94_uQMnvfDFYK1LF
+X-Proofpoint-ORIG-GUID: 2OFzDcCZmrxfwUIl94_uQMnvfDFYK1LF
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI1MDE0MiBTYWx0ZWRfX3AcDYOopkT87
+ WS1MNy/qIIsu06nhOBcx90MG4ynmUcUguNAZXu8SyZK+c1pmoeLQP0AW95K00d+h6rdFA2iq27H
+ E4DOY0mz7DnkYbG0mcK4YT5UR0GVEY71tLOyAkReJXsyXVVOZf/f0lur1MoF3ZoBYXrmDassx9L
+ iAmsnA0fYZqIAHgN8mXJMlRLGwSmCltkeLk8BydT5O+YCNzPts4EMCTeypFD9yUvLznwi0JJRNu
+ VBjmxJgoZjmnwKDmsiiPtPJCbLh93DnpbKnJxOxufo9OTUg5OcuSK5DgH77VyeS/uB0xbOVvpoF
+ 8zchg2r5lR7l6waeLF5AWBV9rtXdQG50q388KjkmbsYIk3kgfNVnEl05EdxNIY+20vz7QOC1KMg
+ 904N6FmuWScGo1CB8yTbriVcFOKuOYToxI1Qg85PbUWLF4xFoRm7zqdnBc1rwPz5x+J3YptIQv3
+ JY2z7n1X039HUoKb+Lw==
+X-Authority-Analysis: v=2.4 cv=JMw2csKb c=1 sm=1 tr=0 ts=69c437e1 cx=c_pps
+ a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=QOUmeeuX5y9IvSxXHa6D2A==:17
  a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=QOCMdifcju39GKoXhKua:22
- a=JfrnYn6hAAAA:8 a=QQSmTEQkt36Rj1JXOw4A:9 a=QEXdDO2ut3YA:10
- a=kacYvNCVWA4VmyqE58fU:22 a=1CNFftbPRP8L7MoqJWF3:22
-X-Proofpoint-ORIG-GUID: RXR_9B0cy9UtwdHchyJael89Z7VpMAOg
-X-Proofpoint-GUID: RXR_9B0cy9UtwdHchyJael89Z7VpMAOg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI1MDE0MiBTYWx0ZWRfX8e2DW9nYBkSx
- VTa9eit6tjIZfx/P27SzwvTDk7rDFSBNcaeR80XCqYBHzSk3/mwCYEGVrPESyf+1oM3y6VM+WtG
- Y6ePK2cHU8UcwqgG4VgaQZ2cYbvAYt2BOX70r2HsgcR5pK0dYZXbmNJoSmpOS/wVS7M8VQNbuqZ
- +9jJzCBOGmteA4rPqQWfTPq5mfO8UUzBiX8uOGaHsQNKe/eTcuH7ZDsfXpkB2iRY1sc18665UoX
- imSPuJSEGDekf70aqiLffKty6yC2LviunCPitq7ynP5OhIbg1DOVo0yjSImRFa/DAIG1o3Cf0hk
- 53WNzU43OPxORJyoLuO/LgLDwwHc293KRKClXDANKu4HVtsQsg7J/5W2DQDoRXZEjEoltWCnr8U
- mfrHgV7Ip1p5JfPPRT78bJ1c71g+OvHrEnyuAZl8l5xq0UAn6F60EPC39DXscasc6FFGnmZirOj
- FJ1bo0723Ceh+/UirXw==
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=HpS3TJQ9O3Ob1ozEcmik:22
+ a=VwQbUJbxAAAA:8 a=tzuM4wBP0trzEmBACekA:9 a=QEXdDO2ut3YA:10
+ a=dawVfQjAaf238kedN5IG:22
 X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11740
  signatures=596818
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=10 spamscore=0
- suspectscore=0 clxscore=1015 bulkscore=10 malwarescore=0 impostorscore=10
+ clxscore=1015 priorityscore=1501 impostorscore=10 suspectscore=0 adultscore=0
+ phishscore=0 spamscore=0 malwarescore=0 bulkscore=10 lowpriorityscore=10
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603250142
 
-Some bio completion handlers need to run in task context but bio_endio()
-can be called from IRQ context (e.g. buffer_head writeback). Add a
-BIO_COMPLETE_IN_TASK flag that bio submitters can set to request
-task-context completion of their bi_end_io callback.
+Add support for using RWF_DONTCACHE with block devices.
 
-When bio_endio() sees this flag and is running in non-task context, it
-queues the bio to a per-cpu list and schedules a work item to call
-bi_end_io() from task context. A CPU hotplug dead callback drains any
-remaining bios from the departing CPU's batch.
+Dropbehind pruning needs to be done in non-IRQ context, but block
+devices complete writeback in IRQ context.
 
-This will be used to enable RWF_DONTCACHE for block devices, and could
-be used for other subsystems like fscrypt that need task-context bio
-completion.
+To fix this, we can defer dropbehind invalidation to task context. We
+introduce a new BIO_COMPLETE_IN_TASK flag that allows the bio submitter
+to request task-context completion of bi_end_io. When bio_endio() sees
+this flag in non-task context, it queues the bio to a per-CPU list and
+schedules a work item to do bio completion.
 
-Suggested-by: Matthew Wilcox <willy@infradead.org>
-Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+Patch 1 adds the BIO_COMPLETE_IN_TASK infrastructure in the block
+layer.
+
+Patch 2 wires BIO_COMPLETE_IN_TASK into iomap writeback for DONTCACHE
+folios and removes the DONTCACHE workqueue deferral from XFS.
+
+Patch 3 enables RWF_DONTCACHE for block devices, setting
+BIO_COMPLETE_IN_TASK in submit_bh_wbc() for the CONFIG_BUFFER_HEAD
+path.
+
+This support is useful for databases that operate on raw block devices,
+among other userspace applications.
+
+I tested this (with CONFIG_BUFFER_HEAD=y) for reads and writes on a
+single block device on a VM, so results may be noisy.
+
+Reads were tested on the root partition with a 45GB range (~2x RAM).
+Writes were tested on a disabled swap parition (~1GB) in a memcg of size
+244MB to force reclaim pressure.
+
+Results:
+
+===== READS (/dev/nvme0n1p2) =====
+ sec   normal MB/s  dontcache MB/s
+----  ------------  --------------
+   1        1098.6          1609.0
+   2        1270.3          1506.6
+   3        1093.3          1576.5
+   4        1141.8          2393.9
+   5        1365.3          2793.8
+   6        1324.6          2065.9
+   7         879.6          1920.7
+   8        1434.1          1662.4
+   9        1184.9          1857.9
+  10        1166.4          1702.8
+  11        1161.4          1653.4
+  12        1086.9          1555.4
+  13        1198.5          1718.9
+  14        1111.9          1752.2
+----  ------------  --------------
+ avg        1173.7          1828.8  (+56%)
+
+==== WRITES (/dev/nvme0n1p3) =====
+ sec   normal MB/s  dontcache MB/s
+----  ------------  --------------
+   1         692.4          9297.7
+   2        4810.8          9342.8
+   3        5221.7          2955.2
+   4         396.7          8488.3
+   5        7249.2          9249.3
+   6        6695.4          1376.2
+   7         122.9          9125.8
+   8        5486.5          9414.7
+   9        6921.5          8743.5
+  10          27.9          8997.8
+----  ------------  --------------
+ avg        3762.5          7699.1  (+105%)
+
 ---
- block/bio.c               | 84 ++++++++++++++++++++++++++++++++++++++++++++++-
- include/linux/blk_types.h |  1 +
- 2 files changed, 84 insertions(+), 1 deletion(-)
+Changes in v4:
+- 1/3: Move dropbehind deferral from folio-level to bio-level using
+  BIO_COMPLETE_IN_TASK, per Matthew and Jan.
+- 1/3: Work function yields on need_resched() to avoid hogging the CPU,
+  per Jan.
+- 2/3: New patch. Set BIO_COMPLETE_IN_TASK on iomap writeback bios for
+  DONTCACHE folios, removing the need for XFS-specific workqueue
+  deferral.
+- 3/3: Set BIO_COMPLETE_IN_TASK in submit_bh_wbc() for buffer_head
+  path.
+- 3/3: Update commit message to mention CONFIG_BUFFER_HEAD=n path.
+- Link to v3: https://lore.kernel.org/r/20260227-blk-dontcache-v3-0-cd309ccd5868@columbia.edu
 
-diff --git a/block/bio.c b/block/bio.c
-index 8203bb7455a9..69ee0d93041f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -18,6 +18,7 @@
- #include <linux/highmem.h>
- #include <linux/blk-crypto.h>
- #include <linux/xarray.h>
-+#include <linux/local_lock.h>
- 
- #include <trace/events/block.h>
- #include "blk.h"
-@@ -1714,6 +1715,60 @@ void bio_check_pages_dirty(struct bio *bio)
- }
- EXPORT_SYMBOL_GPL(bio_check_pages_dirty);
- 
-+struct bio_complete_batch {
-+	local_lock_t lock;
-+	struct bio_list list;
-+	struct work_struct work;
-+};
-+
-+static DEFINE_PER_CPU(struct bio_complete_batch, bio_complete_batch) = {
-+	.lock = INIT_LOCAL_LOCK(lock),
-+};
-+
-+static void bio_complete_work_fn(struct work_struct *w)
-+{
-+	struct bio_complete_batch *batch;
-+	struct bio_list list;
-+
-+again:
-+	local_lock_irq(&bio_complete_batch.lock);
-+	batch = this_cpu_ptr(&bio_complete_batch);
-+	list = batch->list;
-+	bio_list_init(&batch->list);
-+	local_unlock_irq(&bio_complete_batch.lock);
-+
-+	while (!bio_list_empty(&list)) {
-+		struct bio *bio = bio_list_pop(&list);
-+		bio->bi_end_io(bio);
-+	}
-+
-+	local_lock_irq(&bio_complete_batch.lock);
-+	batch = this_cpu_ptr(&bio_complete_batch);
-+	if (!bio_list_empty(&batch->list)) {
-+		local_unlock_irq(&bio_complete_batch.lock);
-+
-+		if (!need_resched())
-+			goto again;
-+
-+		schedule_work_on(smp_processor_id(), &batch->work);
-+		return;
-+	}
-+	local_unlock_irq(&bio_complete_batch.lock);
-+}
-+
-+static void bio_queue_completion(struct bio *bio)
-+{
-+	struct bio_complete_batch *batch;
-+	unsigned long flags;
-+
-+	local_lock_irqsave(&bio_complete_batch.lock, flags);
-+	batch = this_cpu_ptr(&bio_complete_batch);
-+	bio_list_add(&batch->list, bio);
-+	local_unlock_irqrestore(&bio_complete_batch.lock, flags);
-+
-+	schedule_work_on(smp_processor_id(), &batch->work);
-+}
-+
- static inline bool bio_remaining_done(struct bio *bio)
- {
- 	/*
-@@ -1788,7 +1843,9 @@ void bio_endio(struct bio *bio)
- 	}
- #endif
- 
--	if (bio->bi_end_io)
-+	if (!in_task() && bio_flagged(bio, BIO_COMPLETE_IN_TASK))
-+		bio_queue_completion(bio);
-+	else if (bio->bi_end_io)
- 		bio->bi_end_io(bio);
- }
- EXPORT_SYMBOL(bio_endio);
-@@ -1974,6 +2031,21 @@ int bioset_init(struct bio_set *bs,
- }
- EXPORT_SYMBOL(bioset_init);
- 
-+/*
-+ * Drain a dead CPU's deferred bio completions. The CPU is dead so no locking
-+ * is needed -- no new bios will be queued to it.
-+ */
-+static int bio_complete_batch_cpu_dead(unsigned int cpu)
-+{
-+	struct bio_complete_batch *batch = per_cpu_ptr(&bio_complete_batch, cpu);
-+	struct bio *bio;
-+
-+	while ((bio = bio_list_pop(&batch->list)))
-+		bio->bi_end_io(bio);
-+
-+	return 0;
-+}
-+
- static int __init init_bio(void)
- {
- 	int i;
-@@ -1988,6 +2060,16 @@ static int __init init_bio(void)
- 				SLAB_HWCACHE_ALIGN | SLAB_PANIC, NULL);
- 	}
- 
-+	for_each_possible_cpu(i) {
-+		struct bio_complete_batch *batch =
-+			per_cpu_ptr(&bio_complete_batch, i);
-+
-+		bio_list_init(&batch->list);
-+		INIT_WORK(&batch->work, bio_complete_work_fn);
-+	}
-+
-+	cpuhp_setup_state(CPUHP_BP_PREPARE_DYN, "block/bio:complete:dead",
-+				NULL, bio_complete_batch_cpu_dead);
- 	cpuhp_setup_state_multi(CPUHP_BIO_DEAD, "block/bio:dead", NULL,
- 					bio_cpu_dead);
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 8808ee76e73c..d49d97a050d0 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -322,6 +322,7 @@ enum {
- 	BIO_REMAPPED,
- 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
- 	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
-+	BIO_COMPLETE_IN_TASK, /* complete bi_end_io() in task context */
- 	BIO_FLAG_LAST
- };
- 
+Changes in v3:
+- 1/2: Convert dropbehind deferral to per-CPU folio_batches protected by
+  local_lock using per-CPU work items, to reduce contention, per Jens.
+- 1/2: Call folio_end_dropbehind_irq() directly from
+  folio_end_writeback(), per Jens.
+- 1/2: Add CPU hotplug dead callback to drain the departing CPU's folio
+  batch.
+- 2/2: Introduce block_write_begin_iocb(), per Christoph.
+- 2/2: Dropped R-b due to changes.
+- Link to v2: https://lore.kernel.org/r/20260225-blk-dontcache-v2-0-70e7ac4f7108@columbia.edu
 
+Changes in v2:
+- Add R-b from Jan Kara for 2/2.
+- Add patch to defer dropbehind completion from IRQ context via a work
+  item (1/2).
+- Add initial performance numbers to cover letter.
+- Link to v1: https://lore.kernel.org/r/20260218-blk-dontcache-v1-1-fad6675ef71f@columbia.edu
+
+---
+Tal Zussman (3):
+      block: add BIO_COMPLETE_IN_TASK for task-context completion
+      iomap: use BIO_COMPLETE_IN_TASK for dropbehind writeback
+      block: enable RWF_DONTCACHE for block devices
+
+ block/bio.c                 | 84 ++++++++++++++++++++++++++++++++++++++++++++-
+ block/fops.c                |  5 +--
+ fs/buffer.c                 | 22 ++++++++++--
+ fs/iomap/ioend.c            |  2 ++
+ fs/xfs/xfs_aops.c           |  4 ---
+ include/linux/blk_types.h   |  1 +
+ include/linux/buffer_head.h |  3 ++
+ 7 files changed, 111 insertions(+), 10 deletions(-)
+---
+base-commit: 2961f841b025fb234860bac26dfb7fa7cb0fb122
+change-id: 20260218-blk-dontcache-338133dd045e
+
+Best regards,
 -- 
-2.39.5
+Tal Zussman <tz2294@columbia.edu>
 
