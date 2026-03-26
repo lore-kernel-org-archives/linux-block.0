@@ -1,266 +1,156 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13FD3793DB
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 16:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774541799; cv=pass; b=kArWslURINRkC94DIRq3E4yA/BxKESDA4t/xI8aY+Voc3rGRkigutYtknhk5UCUU2muuldBL8mmL5d+FHe71U7Ha7X76Wa0xa0gKwrfxRtwB/8+teaq/mW3IYbgdadp+LmQClLi6kr7Z3fXXxNpk9ymbdd0qlQOqDZ1j4KkB0gY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774541799; c=relaxed/simple;
-	bh=ZmMWtIGFF3qX/n1FkEv/i0UMSWQYCnjKW/3sG5XVFYI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GMGodANamE+l8FndIiAkviNVW3BHRkBy/qtw3g1UfkkzPFyQOyAsMs6fBpO0A2VzzghoMpzmbnweS/tDqcXdG6yBTrkbovtM4T9VUTX32ZHIBxwMdBkT52GO1UT9yO6YtlburfD3cK6Qb2Zg1KlVuJdr/6brc2EGVyvZTHojWGw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GHTzb5YE; arc=pass smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CFC379964;
+	Thu, 26 Mar 2026 16:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774542918; cv=none; b=KtXjpBFiXNy9lqnYAduwr8EfGyVZ3ariDQjdtL67uhKNyIXMztq7ixA0Mqn0bp2lusdubChoxT2DSewCoXQb1LrgLxmuE5tkmaK/9PNbtwELVFImV5rXsKTwQZFhwRCA148xEDwA10U9TT4n1aWzjB2XDtX/OD/He0deSHhplgY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774542918; c=relaxed/simple;
+	bh=lNcn0E3VMojZ854R4ribg1Wy0NIvUp4CXgCeS9R4LLg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SwF56qoYNOYSL62qfjRupqqUmht+oH5s+L9GIwqqQ+gUW1wDBoa+Cf1CBlepSVcoCR/rUhB/OlA1pxraVe84A9eeHXggGbAmKKq184VdbpVdvtPRtDZQW7c7ZNVKiaWtuOgprg8OaaagnSaQYjCSchU7dcAOxLwUgbDMWmXaVJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NDAphzSE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GHTzb5YE"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-439fe4985efso897974f8f.3
-        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 09:16:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774541796; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jKFq3dNiaMbCRpk+YeAcpRM/Lm/bwzCdaTT2Almw6Zey1OffGTkd92fhkpM0I0YCmJ
-         yyi/kYQz38QvCp8v9BP7QKpWx3QMYMKkljZ8hFjRzpMyYxYXeWb4305WiKFSdqkzdsyP
-         caOYpwew9r5+Ez4UBKWu8N+RS48GIcUeRVhPHlMCNHO/CSESgEIHbg0yyJYGKrZtyvsQ
-         AH/1aeFXkvEFo2yKApb1KrG1u5Pe8fcbANes64B5LL46I+o5NoNI7E6js8Vl2VAuSwxb
-         +bP7zl2hBew6tdmfq7wNRcUPRFw/cqNVhTMJ+OdGvQTgf0/OEaopIO0MMuN970mV57aO
-         zMYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=vKJ5HSJrXHj5MUrcSTPs6jehjmYmFEBs1HNYTNjir5w=;
-        fh=c3V+ZYHACDSVqYGvqMI5FZ/SEcTXt+47UPf/PdyvWKM=;
-        b=Ih98WWTz6MqkrISBEowkqbrDlC2e5ObnXNS6j68ybygywSBKygqVcrt0Q24eComgB1
-         LW84l6JX9WqY5S2umzZicBD5uPilqHunRr5gLXTfl/0O9bRjnGKMK465nawkHVC45ipp
-         MeT+hY3P6lDPiqEBUo8nFFmKG4N8tydlSrHhw15gg0JYkWOo15weP9i+zzIQERCeM4lO
-         d87Ym6c2MAEoRdRW9GwBcYpHzHxwEi+2NZyUe8m9oUXJvyIhTxGQcN7V7sJiFqqeeETg
-         6+dEDZUoc5G+ze6meDGtuy8SGdJuiMtcrWcj+Pe3+vHJU5cvyJ/+TDG7SaGfaHf7Uo30
-         NwGA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1774541796; x=1775146596; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vKJ5HSJrXHj5MUrcSTPs6jehjmYmFEBs1HNYTNjir5w=;
-        b=GHTzb5YE5S2TLbpNpKL7/TdJUNcdkN7Xx38InyQjmvAm+KS0xaWnOet2OeXU8XeI8h
-         RgdeLCaSyQGw8mCrvxTfVc6UKjKQD3gUteeUW79xC4+6EVNbZJyHcbrHgEuPmT7sFnHh
-         pPqe45bbdL7ucog9QcAHA3UuMQyCbIh0IYtKkeNOU8TaNi/aNZgq9xj5P5VP1ZJzfnF6
-         6H8w1qmC9w9MuGfJmiopq0ubsOW94rZOlYYGN+UuCHsi1xLMcUxK+akD+M7FDGedWsy6
-         IlWAKpSGWOS7fzethAADcagjGcgKIv9IltbQY4/fM2w2mqzwN6VhNCvMSaEwztVWyBdm
-         4yFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774541796; x=1775146596;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vKJ5HSJrXHj5MUrcSTPs6jehjmYmFEBs1HNYTNjir5w=;
-        b=dayj8YBbWXDLJXBtiYyUo9ZKhpQCL4Oa7QE0QcBRxGoNWnlWMXpXkoWhxOa77++VO+
-         KOdiZFfXjRCB2qRfjnQoXgqtfQhxMoHZLRYjMez/+MG6bsaUs5Es0qFCCHdSu84p7biq
-         OrASokCWiKMnaT7cfCvv+ZODG7t9mMYHZBLTKGJTdhoxlLqtkPFD21ibBtHnvCux2k7d
-         +t8WbnMx14h0I8Fx4UUkGKSTUpz7aSHVrnp5al1lNScOi9U4OqJbY7T+GgtlZbuT84cW
-         BSSV4D7st4MOI2RQFxAlXC6Jjlb2by5UPXti++GGZ9JT9RPYxsQ1DAs+O/ASQWD5eYlG
-         yXnA==
-X-Forwarded-Encrypted: i=1; AJvYcCV48KklhIAL1dSxeVuIczfb82ykTV2NbvUj0gsvAJBae9fLHhlyjuUqyKt5FbR5lTVIi+KFnvBv1zD57A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKPGOP9AY3cWKJCpqf9/IzfLUNZhMOT6m68wwjzRwjOFzafm0R
-	YEBPWCnQWZ2Bb/DWh/QfAVIqWsfdC6mnqLi0n9JD4PTh4hZ9F7BmhTZmRU24u6SXp9hMCvoIlYz
-	ttnge3Pwjo9Y218tsNtAZitLXGwfRMmhJq05xaJmujw==
-X-Gm-Gg: ATEYQzxszZfQw0afqvwrlXITmM1hJmhOTTmvBpKFLkMlniRmRjSE9PsD+l5IUuVgxgb
-	1fdz3b1iy8vBDgjvfcjRaHSML/hQRuVqBzkhC6xCV6UbZmt6OTpQGx+eBe3yqjhM8k12cDpqbdQ
-	8UIR8nA5RxLbyDfQfAWKI0OFyFhGi2psscv+sOdkpQ3ox62pm35NMtKlYvsg7JSuAjL8eqO5hvf
-	K5pWR0N9Hfi7CBXa6E6WfNNMZHkcm+zmsZa9ZloCFqyNENnnYMJLkTQc7NKdZHiGrxeK9y1aqJz
-	nJX3vyvyW0dyS83IY3jzKgyd+FohTLGWRD2/W4wnhuqNnNbFWQ5Yd1FiDx0IjarYYo2rsxgLAS7
-	8TWOS
-X-Received: by 2002:a05:6000:2890:b0:43b:41b5:e023 with SMTP id
- ffacd0b85a97d-43b88995466mr13647132f8f.1.1774541795781; Thu, 26 Mar 2026
- 09:16:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDAphzSE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16C6AC116C6;
+	Thu, 26 Mar 2026 16:35:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774542917;
+	bh=lNcn0E3VMojZ854R4ribg1Wy0NIvUp4CXgCeS9R4LLg=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=NDAphzSEVva7WNVpg0HwsnN5+4gHzEooRsnQlpG2r9Zda4EasskbgYo53muUezWi5
+	 5CHyb/blTHUbw9GGazNdb8ze02+yUYw/tned8LtsgJbUuVDciKDe7c+0+VXDeMqHgb
+	 0fQ6W0Wqog38baGalVnX9QY2y4auQnl1/yDx7rAKxVdKx3xhqZV0a8JYCNVFEuWbkW
+	 8x20Bx5OHAzjOAv85w+2uRQEAdrralhAgLcmK/lgTL+qRmVIHzoAAL6OhdskdRHWYY
+	 e94nC9atFtsRJ7ce7bMviq9YCJ0gS7KA37qcuYZaUvUhVm/qqe/Xml2MiHkfF4IhLh
+	 561VKTiGsxbUQ==
+Message-ID: <33582a86daf135336f6bc0d5260d8de0501abadd.camel@kernel.org>
+Subject: Re: A comparison of the new nfsd iomodes (and an experimental one)
+From: Jeff Layton <jlayton@kernel.org>
+To: Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Date: Thu, 26 Mar 2026 12:35:15 -0400
+In-Reply-To: <d453add6-ed23-4d61-af95-d80133b0e456@oracle.com>
+References: <4ebbd194ccfb3bcea6225d926b4c9f339e21c813.camel@kernel.org>
+	 <d453add6-ed23-4d61-af95-d80133b0e456@oracle.com>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-43-neelx@suse.com>
- <20260208131745.2173841-1-clm@meta.com>
-In-Reply-To: <20260208131745.2173841-1-clm@meta.com>
-From: Daniel Vacek <neelx@suse.com>
-Date: Thu, 26 Mar 2026 17:16:24 +0100
-X-Gm-Features: AQROBzAGdUPAvZg0YU6QTXKdWZ2x7caOrhRysbF5k8uC5LR-I02VBBB483yNqVk
-Message-ID: <CAPjX3FexW6D4m23OQQ0bNZRCJRfx0Armr3Lb8nvDR_qNMx_PeA@mail.gmail.com>
-Subject: Re: [PATCH v6 42/43] btrfs: disable encryption on RAID5/6
-To: Chris Mason <clm@meta.com>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 8 Feb 2026 at 14:18, Chris Mason <clm@meta.com> wrote:
-> Daniel Vacek <neelx@suse.com> wrote:
-> > From: Josef Bacik <josef@toxicpanda.com>
-> >
-> > The RAID5/6 code will re-arrange bios and submit them through a
-> > different mechanism.  This is problematic with inline encryption as we
-> > have to get the bio and csum it after it's been encrypted, and the
-> > radi5/6 bio's don't have the btrfs_bio embedded, so we have no way to
-> > get the csums put on disk.
-> >
-> > This isn't an unsolvable problem, but would require a bit of reworking.
-> > Since we discourage users from using this code currently simply don't
-> > allow encryption on RAID5/6 setups.  If there's sufficient demand in the
-> > future we can add the support for this.
-> >
->
-> Hi everyone,
->
-> I'm running the btrfs for-next branch, along with the encryption patch set
-> through my AI review prompts:
->
-> https://github.com/masoncl/review-prompts
->
-> I'm working on some btrfs specific instructions, but hopefully these reviews
-> are already useful.  I've kept the headers to make it easier to double check
-> that I'm actually replying to the right email, but please let me know if any
-> parts of this are incorrect:
->
->
-> commit 6a39a21e95e116ad02c6ce9f832838acc111692f
-> Author: Josef Bacik <josef@toxicpanda.com>
->
-> btrfs: disable encryption on RAID5/6
->
-> The RAID5/6 code will re-arrange bios and submit them through a
-> different mechanism to handle parity. This is problematic with inline
-> encryption as we have to get the bio and csum it after it's been
-> encrypted, and the RAID5/6 bios don't have the btrfs_bio embedded, so
-> there's no way to get the csums put on disk.
->
-> > commit 6a39a21e95e116ad02c6ce9f832838acc111692f
-> > Author: Josef Bacik <josef@toxicpanda.com>
-> > Date:   Fri Feb 6 19:23:14 2026 +0100
-> >
-> >     btrfs: disable encryption on RAID5/6
-> >
-> >     The RAID5/6 code will re-arrange bios and submit them through a
-> >     different mechanism.  This is problematic with inline encryption as we
-> >     have to get the bio and csum it after it's been encrypted, and the
-> >     radi5/6 bio's don't have the btrfs_bio embedded, so we have no way to
->                                                                        ^^^^
->
-> This isn't a bug, but there's a typo: 'radi5/6' should be 'raid5/6'.
->
-> [ ... ]
->
-> >
-> > diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-> > index a8adf99ad0a81..1bade8fea16e8 100644
-> > --- a/fs/btrfs/ioctl.c
-> > +++ b/fs/btrfs/ioctl.c
-> > @@ -5198,6 +5198,10 @@ long btrfs_ioctl(struct file *file, unsigned int
-> >                       return -EOPNOTSUPP;
-> >               if (sb_rdonly(fs_info->sb))
-> >                       return -EROFS;
-> > +             if (btrfs_fs_incompat(fs_info, RAID56)) {
-> > +                     btrfs_warn(fs_info, "can't enable encryption with RAID5/6");
-> > +                     return -EINVAL;
-> > +             }
->
-> This check prevents enabling encryption when RAID56 is already active,
-> but does NOT prevent converting to RAID5/6 after encryption is enabled.
-> The check_raid56_incompat_flag() function in fs/btrfs/volumes.c:5558
-> sets the RAID56 flag during balance operations without checking if
-> ENCRYPT is already set. This allows users to:
->
-> 1. Enable encryption via FS_IOC_SET_ENCRYPTION_POLICY (sets ENCRYPT at
->    line 5210 in this function)
-> 2. Later run btrfs balance to convert to RAID5/6 (sets RAID56 flag at
->    volumes.c:5558)
-> 3. End up with both ENCRYPT and RAID56 flags set
+On Thu, 2026-03-26 at 11:30 -0400, Chuck Lever wrote:
+> On 3/26/26 11:23 AM, Jeff Layton wrote:
+> > I've been doing some benchmarking of the new nfsd iomodes, using
+> > different fio-based workloads.
+> >=20
+> > The results have been interesting, but one thing that stands out is
+> > that RWF_DONTCACHE is absolutely terrible for streaming write
+> > workloads. That prompted me to experiment with a new iomode that added
+> > some optimizations (DONTCACHE_LAZY).
+> >=20
+> > The results along with Claude's analysis are here:
+> >=20
+> >     https://markdownpastebin.com/?id=3D387375d00b5443b3a2e37d58a062331f
+> >=20
+> > He gets a bit out over his skis on the upstream plan, but tl;dr is that
+> > DONTCACHE_LAZY (which is DONTCACHE with some optimizations) outperforms
+> > the other write iomodes.
+>=20
+> The analysis of the write modes seems plausible. I'm interested to hear
+> what Mike and Jens have to say about that.
+>=20
+> One thing I'd like to hear more about is why Claude felt that disabling
+> splice read was beneficial. My own benchmarking in that area has shown
+> that splice read is always a win over not using splice.
+>=20
 
-Indeed this should be sealed. I think this will do:
+Good catch. That turns out to be a mistake in Claude's writeup.
 
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -5742,6 +5742,11 @@ struct btrfs_block_group
-*btrfs_create_chunk(struct btrfs_trans_handle *trans,
-
-     lockdep_assert_held(&info->chunk_mutex);
-
-+    if (btrfs_fs_incompat(info, ENCRYPT)) {
-+        btrfs_warn(info, "RAID5/6 not yet supported on encrypted filesystem");
-+        return ERR_PTR(-EINVAL);
-+    }
-+
-     if (!alloc_profile_is_valid(type, 0)) {
-         DEBUG_WARN("invalid alloc profile for type %llu", type);
-         return ERR_PTR(-EINVAL);
-
-> The commit message states "simply don't allow encryption on RAID5/6
-> setups" which implies preventing the incompatible state entirely, not
-> just one entry path. The volumes.c code path needs a corresponding
-> check:
->
-> static void check_raid56_incompat_flag(struct btrfs_fs_info *info, u64 type)
-> {
->         if (!(type & BTRFS_BLOCK_GROUP_RAID56_MASK))
->                 return;
->         // MISSING: check for ENCRYPT flag here
->         btrfs_set_fs_incompat(info, RAID56);
-> }
->
-> Without this check, data corruption can occur via the RAID5/6 bio path
-> that cannot handle encrypted data properly, as explained in the commit
-> message.
->
-> > diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-> > index 4a2887147ead4..aefcbe56e85ad 100644
-> > --- a/fs/btrfs/super.c
-> > +++ b/fs/btrfs/super.c
-> > @@ -734,6 +734,12 @@ bool btrfs_check_options(const struct btrfs_fs_info *info,
-> >       if (btrfs_check_mountopts_zoned(info, mount_opt))
-> >               ret = false;
-> >
-> > +     if (btrfs_fs_incompat(info, RAID56) &&
-> > +         btrfs_raw_test_opt(*mount_opt, TEST_DUMMY_ENCRYPTION)) {
-> > +             btrfs_err(info, "cannot use test_dummy_encryption with RAID5/6");
-> > +             ret = false;
-> > +     }
-> > +
->
-> Similar to the ioctl.c issue, this prevents mounting with
-> test_dummy_encryption when RAID56 is already active, but does NOT
-> prevent converting to RAID5/6 after mounting with test_dummy_encryption.
->
-> The check_raid56_incompat_flag() function in fs/btrfs/volumes.c:5558
-> sets the RAID56 flag during balance operations without checking if
-> test_dummy_encryption is in use. Since test_dummy_encryption cannot be
-> changed after mount (enforced by btrfs_check_test_dummy_encryption at
-> line 1547-1560), a user can:
->
-> 1. Mount filesystem with -o test_dummy_encryption
-> 2. Later run btrfs balance to convert to RAID5/6 (sets RAID56 flag)
-> 3. End up with both test_dummy_encryption active and RAID56 flag set
->
-> While test_dummy_encryption is primarily a testing/development feature,
-> the patch explicitly protects against this combination, indicating it's
-> an important incompatibility. The volumes.c code path needs a check for
-> the TEST_DUMMY_ENCRYPTION mount option:
->
-> static void check_raid56_incompat_flag(struct btrfs_fs_info *info, u64 type)
-> {
->         if (!(type & BTRFS_BLOCK_GROUP_RAID56_MASK))
->                 return;
->         // MISSING: check for TEST_DUMMY_ENCRYPTION mount option
->         btrfs_set_fs_incompat(info, RAID56);
-> }
->
-> Does this allow the same encrypted bio / RAID5/6 bio incompatibility
-> described in the commit message?
-
-The above fix also covers this case.
-
-Thanks.
-
---nX
+The test scripts left splice reads enabled for buffered reads, and the
+results in the analysis reflect that. I (and it) have no idea why it
+would recommend disabling them, when the testing all left them enabled
+for buffered reads.
+--=20
+Jeff Layton <jlayton@kernel.org>
