@@ -1,81 +1,80 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2013BE652
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 09:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC9B3BF686
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 09:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774518925; cv=none; b=fqu6D2P5kdt2YwYMsU9HKDQGH1pR67vZk88Qj5lw4qB8ct2t65vEOh9xhi/F+5M4JJQzCCi0uY+VQ2OXgAtNzR+cGH7wh9jUGGCtszPjaFEayJ7z95K6hLvNjx2fIGhwhIOZejPKTuwciLaVjYpmkhidR+1Kiv5bx3E95Bu2FR4=
+	t=1774518933; cv=none; b=MQO2HNMejm8x8IaeEmPIuZ3dfAVNuGLctfh+gvC7ENVnGs+9NQLsXHyrg9K1yZedXLT/5ArB/4h7dzPy0oxVp4ydAO2bW8GiSSSzMzWJ6bPwDp90e0s0Umvg7m1hYkl2x008fMX0/QbhSrx365EN3c7nKj364U0vh6bseMoZcGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774518925; c=relaxed/simple;
-	bh=wPJ9zVJ4lqUpVYC5Ni5nLLn32cvu5QyHuHetHoyfP48=;
+	s=arc-20240116; t=1774518933; c=relaxed/simple;
+	bh=fPJkdtE9HIUWD963RofAKXHTr9yY2ungJEXA11VPK4c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p3vdaMlnIAWec/Xsy0wwLXD8AP8+XDZyooUUltlkBy8diD/KF7EuhYMjivqZIaXLfvxbNcrQVUJUI6UHbDTMht6YAvYVJIq4QrS9fYxpV82Xa0ToAFTTAm58vYRlKGoSED9M8DD5iF1pcyU83sBmuqkjxPcJ043dnfjYQKySUlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=RKAYyvE8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MUY2AvQC; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=RKAYyvE8; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MUY2AvQC; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version; b=XH74PGNxeGuw5PKyazjzXU64H+JRctMtd6y5fHtDY0SJLECPofQ7DPd0dWgURI7BkCd4vweIJ8T1/2TiH1+sEj63OZhKnegAypUiSU1DF5t/NAY87nnfg+HmJxB3UUinPspfHyyeZjuKxXSMiTGLda3E4lp8/vWgQK3mdx5k+Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=kZE4RrNN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ftluw92P; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=kZE4RrNN; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ftluw92P; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="RKAYyvE8";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MUY2AvQC";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="RKAYyvE8";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MUY2AvQC"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="kZE4RrNN";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ftluw92P";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="kZE4RrNN";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ftluw92P"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1AD4D4D27A;
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 2EE2A4D27F;
 	Thu, 26 Mar 2026 09:54:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
 	t=1774518897; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+17yxWIPn6CuZn9atnS4u2W8d1qElD0J/x0UJG76tOI=;
-	b=RKAYyvE8f4rg/xqehe+0qMO8q96iHmEjacdvA5xfQxeG6OoDugtqnd+nk83HsWXLJYdSFW
-	aQEaBqv+T7cqE1qLrNMByVNP5OHaEZ7oQ7667RfJ7P/8YTgLDyBFjKC99X4WAUYRY6ba/Z
-	+IraS9pP6I7VsmJC0xiMTgZnd++iuHg=
+	bh=rW80C6AuNNamkUQ9haKOUGA55hbQ71BVZqxu2HXjQpY=;
+	b=kZE4RrNNdLTLuWN5RPCoxgFYXXE9zDXKfCGafFlMmh+Cu8e0Ol+lfoYL75PfV/EAOe/trO
+	tgh9xQKddQpLaot8fSgcxmjjPD34PbZZSKwxMNGKur9cUu+nHuRXRijku6eiaxVo2NE6VC
+	lJ0rETumkD3FR0Y6tlr+t/13pnqvLgY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
 	s=susede2_ed25519; t=1774518897;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+17yxWIPn6CuZn9atnS4u2W8d1qElD0J/x0UJG76tOI=;
-	b=MUY2AvQCtqIM9oSeXHbXt8K1YIsq3z7FNM23k3EeGt3UEm/Kk7qC/hCA/Ox2FI21aSDQcQ
-	o7MbgRwCbMxQFqCw==
+	bh=rW80C6AuNNamkUQ9haKOUGA55hbQ71BVZqxu2HXjQpY=;
+	b=ftluw92PLfQAyjYGTv9/iNz1MGwGCLQvby/dsMa6kTyax8l6sQkvF6htKDRUrw7GRU7YMs
+	UH5H4g3kmK5FskAg==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=RKAYyvE8;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=MUY2AvQC
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
 	t=1774518897; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+17yxWIPn6CuZn9atnS4u2W8d1qElD0J/x0UJG76tOI=;
-	b=RKAYyvE8f4rg/xqehe+0qMO8q96iHmEjacdvA5xfQxeG6OoDugtqnd+nk83HsWXLJYdSFW
-	aQEaBqv+T7cqE1qLrNMByVNP5OHaEZ7oQ7667RfJ7P/8YTgLDyBFjKC99X4WAUYRY6ba/Z
-	+IraS9pP6I7VsmJC0xiMTgZnd++iuHg=
+	bh=rW80C6AuNNamkUQ9haKOUGA55hbQ71BVZqxu2HXjQpY=;
+	b=kZE4RrNNdLTLuWN5RPCoxgFYXXE9zDXKfCGafFlMmh+Cu8e0Ol+lfoYL75PfV/EAOe/trO
+	tgh9xQKddQpLaot8fSgcxmjjPD34PbZZSKwxMNGKur9cUu+nHuRXRijku6eiaxVo2NE6VC
+	lJ0rETumkD3FR0Y6tlr+t/13pnqvLgY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
 	s=susede2_ed25519; t=1774518897;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+17yxWIPn6CuZn9atnS4u2W8d1qElD0J/x0UJG76tOI=;
-	b=MUY2AvQCtqIM9oSeXHbXt8K1YIsq3z7FNM23k3EeGt3UEm/Kk7qC/hCA/Ox2FI21aSDQcQ
-	o7MbgRwCbMxQFqCw==
+	bh=rW80C6AuNNamkUQ9haKOUGA55hbQ71BVZqxu2HXjQpY=;
+	b=ftluw92PLfQAyjYGTv9/iNz1MGwGCLQvby/dsMa6kTyax8l6sQkvF6htKDRUrw7GRU7YMs
+	UH5H4g3kmK5FskAg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0E41E4A0AB;
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 225944A0AE;
 	Thu, 26 Mar 2026 09:54:57 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 1Gt5A3ECxWm3YAAAD6G6ig
+	id rhFiCHECxWnDYAAAD6G6ig
 	(envelope-from <jack@suse.cz>); Thu, 26 Mar 2026 09:54:57 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id B8B85A0B6C; Thu, 26 Mar 2026 10:54:48 +0100 (CET)
+	id E6087A0BC4; Thu, 26 Mar 2026 10:54:48 +0100 (CET)
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: <linux-block@vger.kernel.org>,
@@ -93,9 +92,9 @@ Cc: <linux-block@vger.kernel.org>,
 	linux-aio@kvack.org,
 	Benjamin LaHaise <bcrl@kvack.org>,
 	Jan Kara <jack@suse.cz>
-Subject: [PATCH 09/42] udf: Switch to generic_buffers_fsync()
-Date: Thu, 26 Mar 2026 10:54:03 +0100
-Message-ID: <20260326095354.16340-51-jack@suse.cz>
+Subject: [PATCH 14/42] fs: Rename generic_file_fsync() to simple_fsync()
+Date: Thu, 26 Mar 2026 10:54:08 +0100
+Message-ID: <20260326095354.16340-56-jack@suse.cz>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260326082428.31660-1-jack@suse.cz>
 References: <20260326082428.31660-1-jack@suse.cz>
@@ -105,82 +104,241 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1242; i=jack@suse.cz; h=from:subject; bh=wPJ9zVJ4lqUpVYC5Ni5nLLn32cvu5QyHuHetHoyfP48=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBpxQI5xxrhitQ8Q7p/SWVFyx65EWrf4RlTbHdVU N0+Km8nwOOJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCacUCOQAKCRCcnaoHP2RA 2dbUB/94BEZI5325tW+32n40xA8r9pbA84uXKhxYWGc4KSRwy1oU3pQ7ix2Ccou7tPo0oNFst/r 92A+QmB3LrqQKmKEQLWTz6INJ8w+lOGJWIsGr5nu/P/90KixvGNewBCeyGW4foOdlohHzfdskZt CCWa5tTW9VB41hqMQZPDkJoXJeZHvu1eeoXwVTzif9qrXTjrqyR7OBLW+T6SsalFUfbUfbHCqIh 7G1hbwIx9udjV1a4HMMkOTP6XG8usJ82XWVNU0Ix2RnYbFP5iY9DW/J7CtNJmMYDHuY6AE6bHwj S2dUY9xxcsIL1jPSojV/APkX1Q4Z/ylX8E/eg+yax+BXShz9
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7169; i=jack@suse.cz; h=from:subject; bh=fPJkdtE9HIUWD963RofAKXHTr9yY2ungJEXA11VPK4c=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBpxQI+K+GSrneinOSDRxrfJGqm8QflH7K2MAw1q Oaj6xF4l2iJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCacUCPgAKCRCcnaoHP2RA 2W+wB/98NzHfSwSJB7lub0JKUpOYSs9hmi+KgU8jgNUW4ZNt8Dvov5SZ6Vuf6qZG+36h934dLmb Sx11SvYjaomANJ7bsoYnIpXbQGz99ty0YagA4wCpLsxsMxQgjS9s6KdnSRdR9G+Z5q6bQkx28KJ W5RNJTckz8VLEioNsxnyolpncbHBvBCkMi5jPg3r2aS20eg7OMoR5hQV1iluSy464I1k8KgTBd5 HdRh5ke2sGJjbPtMafeUrh9OvMpDXhc2ojR+mK5EH+KaS5ebyhnJLDhcw+MSCAiYtlyScEJdTSR 6jIkHipx+aSKVmiE1xGHebNSKCzaIUtVaehZIPGtLea3B9al
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.51 / 50.00];
+X-Spam-Score: -1.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-1.30 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	ARC_NA(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLhafujjw6m7bafrsz8p45s31g)];
 	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,ZenIV.linux.org.uk,mit.edu,gmail.com,suse.com,mail.parknet.co.jp,linux.dev,suse.de,kvack.org,suse.cz];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	TO_DN_SOME(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLck8brw5hxmszoarioc7838it)];
 	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
+	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Rspamd-Action: no action
 X-Spam-Flag: NO
-X-Spam-Score: -1.51
-X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 1AD4D4D27A
 
-UDF uses metadata bh list attached to inode. Switch it to
-generic_buffers_fsync() instead of generic_file_fsync() as we'll be
-removing metadata bh handling from generic_file_fsync().
+The implementation is now really basic so rename generic_file_fsync()
+simple_fsync() and __generic_file_fsync() to simple_fsync_noflush().
 
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/udf/dir.c  | 2 +-
- fs/udf/file.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/adfs/dir.c      |  2 +-
+ fs/adfs/file.c     |  2 +-
+ fs/exfat/file.c    |  2 +-
+ fs/libfs.c         | 26 ++++++++++++--------------
+ fs/omfs/file.c     |  2 +-
+ fs/qnx4/dir.c      |  2 +-
+ fs/qnx6/dir.c      |  2 +-
+ fs/ufs/dir.c       |  2 +-
+ fs/ufs/file.c      |  2 +-
+ include/linux/fs.h |  4 ++--
+ 10 files changed, 22 insertions(+), 24 deletions(-)
 
-diff --git a/fs/udf/dir.c b/fs/udf/dir.c
-index 5bf75638f352..a1705aedac46 100644
---- a/fs/udf/dir.c
-+++ b/fs/udf/dir.c
-@@ -157,6 +157,6 @@ const struct file_operations udf_dir_operations = {
- 	.read			= generic_read_dir,
- 	.iterate_shared		= udf_readdir,
- 	.unlocked_ioctl		= udf_ioctl,
--	.fsync			= generic_file_fsync,
-+	.fsync			= generic_buffers_fsync,
- 	.setlease		= generic_setlease,
+diff --git a/fs/adfs/dir.c b/fs/adfs/dir.c
+index 493500f37cb9..b8e23e8124ed 100644
+--- a/fs/adfs/dir.c
++++ b/fs/adfs/dir.c
+@@ -389,7 +389,7 @@ const struct file_operations adfs_dir_operations = {
+ 	.read		= generic_read_dir,
+ 	.llseek		= generic_file_llseek,
+ 	.iterate_shared	= adfs_iterate,
+-	.fsync		= generic_file_fsync,
++	.fsync		= simple_fsync,
  };
-diff --git a/fs/udf/file.c b/fs/udf/file.c
-index 32ae7cfd72c5..627b07320d06 100644
---- a/fs/udf/file.c
-+++ b/fs/udf/file.c
-@@ -205,7 +205,7 @@ const struct file_operations udf_file_operations = {
- 	.mmap			= udf_file_mmap,
- 	.write_iter		= udf_file_write_iter,
- 	.release		= udf_release_file,
--	.fsync			= generic_file_fsync,
-+	.fsync			= generic_buffers_fsync,
- 	.splice_read		= filemap_splice_read,
- 	.splice_write		= iter_file_splice_write,
- 	.llseek			= generic_file_llseek,
+ 
+ static int
+diff --git a/fs/adfs/file.c b/fs/adfs/file.c
+index cd13165fd904..4a1828b3f88f 100644
+--- a/fs/adfs/file.c
++++ b/fs/adfs/file.c
+@@ -26,7 +26,7 @@ const struct file_operations adfs_file_operations = {
+ 	.llseek		= generic_file_llseek,
+ 	.read_iter	= generic_file_read_iter,
+ 	.mmap_prepare	= generic_file_mmap_prepare,
+-	.fsync		= generic_file_fsync,
++	.fsync		= simple_fsync,
+ 	.write_iter	= generic_file_write_iter,
+ 	.splice_read	= filemap_splice_read,
+ };
+diff --git a/fs/exfat/file.c b/fs/exfat/file.c
+index 90cd540afeaa..4e8d34a75b66 100644
+--- a/fs/exfat/file.c
++++ b/fs/exfat/file.c
+@@ -577,7 +577,7 @@ int exfat_file_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
+ 	if (unlikely(exfat_forced_shutdown(inode->i_sb)))
+ 		return -EIO;
+ 
+-	err = __generic_file_fsync(filp, start, end, datasync);
++	err = simple_fsync_noflush(filp, start, end, datasync);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/fs/libfs.c b/fs/libfs.c
+index e67e43c6509a..327d8108ed9f 100644
+--- a/fs/libfs.c
++++ b/fs/libfs.c
+@@ -1538,19 +1538,18 @@ struct dentry *generic_fh_to_parent(struct super_block *sb, struct fid *fid,
+ EXPORT_SYMBOL_GPL(generic_fh_to_parent);
+ 
+ /**
+- * __generic_file_fsync - generic fsync implementation for simple filesystems
++ * simple_fsync_noflush - generic fsync implementation for simple filesystems
+  *
+  * @file:	file to synchronize
+  * @start:	start offset in bytes
+  * @end:	end offset in bytes (inclusive)
+  * @datasync:	only synchronize essential metadata if true
+  *
+- * This is a generic implementation of the fsync method for simple
+- * filesystems which track all non-inode metadata in the buffers list
+- * hanging off the address_space structure.
++ * This function is an fsync handler for simple filesystems. It writes out
++ * dirty data, inode (if dirty), but does not issue a cache flush.
+  */
+-int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
+-				 int datasync)
++int simple_fsync_noflush(struct file *file, loff_t start, loff_t end,
++			 int datasync)
+ {
+ 	struct inode *inode = file->f_mapping->host;
+ 	int err;
+@@ -1573,30 +1572,29 @@ int __generic_file_fsync(struct file *file, loff_t start, loff_t end,
+ 		ret = err;
+ 	return ret;
+ }
+-EXPORT_SYMBOL(__generic_file_fsync);
++EXPORT_SYMBOL(simple_fsync_noflush);
+ 
+ /**
+- * generic_file_fsync - generic fsync implementation for simple filesystems
+- *			with flush
++ * simple_fsync - fsync implementation for simple filesystems with flush
+  * @file:	file to synchronize
+  * @start:	start offset in bytes
+  * @end:	end offset in bytes (inclusive)
+  * @datasync:	only synchronize essential metadata if true
+  *
++ * This function is an fsync handler for simple filesystems. It writes out
++ * dirty data, inode (if dirty), and issues a cache flush.
+  */
+-
+-int generic_file_fsync(struct file *file, loff_t start, loff_t end,
+-		       int datasync)
++int simple_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+ {
+ 	struct inode *inode = file->f_mapping->host;
+ 	int err;
+ 
+-	err = __generic_file_fsync(file, start, end, datasync);
++	err = simple_fsync_noflush(file, start, end, datasync);
+ 	if (err)
+ 		return err;
+ 	return blkdev_issue_flush(inode->i_sb->s_bdev);
+ }
+-EXPORT_SYMBOL(generic_file_fsync);
++EXPORT_SYMBOL(simple_fsync);
+ 
+ /**
+  * generic_check_addressable - Check addressability of file system
+diff --git a/fs/omfs/file.c b/fs/omfs/file.c
+index 49a1de5a827f..28f3b113340e 100644
+--- a/fs/omfs/file.c
++++ b/fs/omfs/file.c
+@@ -334,7 +334,7 @@ const struct file_operations omfs_file_operations = {
+ 	.read_iter = generic_file_read_iter,
+ 	.write_iter = generic_file_write_iter,
+ 	.mmap_prepare = generic_file_mmap_prepare,
+-	.fsync = generic_file_fsync,
++	.fsync = simple_fsync,
+ 	.splice_read = filemap_splice_read,
+ };
+ 
+diff --git a/fs/qnx4/dir.c b/fs/qnx4/dir.c
+index 6402715ab377..a9038d231be4 100644
+--- a/fs/qnx4/dir.c
++++ b/fs/qnx4/dir.c
+@@ -71,7 +71,7 @@ const struct file_operations qnx4_dir_operations =
+ 	.llseek		= generic_file_llseek,
+ 	.read		= generic_read_dir,
+ 	.iterate_shared	= qnx4_readdir,
+-	.fsync		= generic_file_fsync,
++	.fsync		= simple_fsync,
+ 	.setlease	= generic_setlease,
+ };
+ 
+diff --git a/fs/qnx6/dir.c b/fs/qnx6/dir.c
+index ae0c9846833d..135fb42f6936 100644
+--- a/fs/qnx6/dir.c
++++ b/fs/qnx6/dir.c
+@@ -275,7 +275,7 @@ const struct file_operations qnx6_dir_operations = {
+ 	.llseek		= generic_file_llseek,
+ 	.read		= generic_read_dir,
+ 	.iterate_shared	= qnx6_readdir,
+-	.fsync		= generic_file_fsync,
++	.fsync		= simple_fsync,
+ 	.setlease	= generic_setlease,
+ };
+ 
+diff --git a/fs/ufs/dir.c b/fs/ufs/dir.c
+index 43f1578ab866..f611f965cb96 100644
+--- a/fs/ufs/dir.c
++++ b/fs/ufs/dir.c
+@@ -652,7 +652,7 @@ const struct file_operations ufs_dir_operations = {
+ 	.release	= ufs_dir_release,
+ 	.read		= generic_read_dir,
+ 	.iterate_shared	= ufs_readdir,
+-	.fsync		= generic_file_fsync,
++	.fsync		= simple_fsync,
+ 	.llseek		= ufs_dir_llseek,
+ 	.setlease	= generic_setlease,
+ };
+diff --git a/fs/ufs/file.c b/fs/ufs/file.c
+index 809c7a4603f8..85c509ced7f9 100644
+--- a/fs/ufs/file.c
++++ b/fs/ufs/file.c
+@@ -41,7 +41,7 @@ const struct file_operations ufs_file_operations = {
+ 	.write_iter	= generic_file_write_iter,
+ 	.mmap_prepare	= generic_file_mmap_prepare,
+ 	.open           = generic_file_open,
+-	.fsync		= generic_file_fsync,
++	.fsync		= simple_fsync,
+ 	.splice_read	= filemap_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.setlease	= generic_setlease,
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 8b3dd145b25e..0fc0cb23000e 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3295,8 +3295,8 @@ void simple_offset_destroy(struct offset_ctx *octx);
+ 
+ extern const struct file_operations simple_offset_dir_operations;
+ 
+-extern int __generic_file_fsync(struct file *, loff_t, loff_t, int);
+-extern int generic_file_fsync(struct file *, loff_t, loff_t, int);
++extern int simple_fsync_noflush(struct file *, loff_t, loff_t, int);
++extern int simple_fsync(struct file *, loff_t, loff_t, int);
+ 
+ extern int generic_check_addressable(unsigned, u64);
+ 
 -- 
 2.51.0
 
