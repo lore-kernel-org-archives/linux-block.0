@@ -1,283 +1,131 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8669B3C6A29
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 09:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9693EB803
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 10:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774519082; cv=none; b=CnDhNqKjcUsFTeH2KN+HWy+7xSYIdRSs7P0vBVH3E4hi7xUweBtp66xc4pb/UaEPBEaki8Hee8aQ109943RghCOZKoSTXZjCnY2fGtPfhkFb34g888JU0Kmp4DBibdVTFqfU7Oer6MhpnILN3W+XAauSEY3ZSfC74yE9+IcphMk=
+	t=1774522073; cv=none; b=ZU9UVegEKn7ExdgqRsHV/RaxAp4AEDpvGDmT3O8DR+6z1GicTmC1fgLoPs0UvTqmEn2hYrNKciYr53dGkY0wd2Z7OAK5AdCODvgxAc8ZuQ0ru6Emf8DD/kVOfiwTYJDSh31rIunsHLoKBMXwEwd03b61URe8g/MuYEp2FHm0OKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774519082; c=relaxed/simple;
-	bh=LB5f9ZM6VTG6f7M+4eM1ibxL/c9eLkxT6oy6CEVQ+ic=;
+	s=arc-20240116; t=1774522073; c=relaxed/simple;
+	bh=d/QV1SH+wpf5nvu0aaDNzTntlFkR0C0xmiVkP37V+M0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JU8sZveBECi2hBpPgOoi0o2XnTl+4tu/G+nrUobA3OpYRxZU0/xlzp+Q4KZ98ruhBpuCYkgekm7LB5bWcOwso5dmyPh7L38Ny5alZB+I2prGZJas2XADMFucTHilGM8vCAh7wXKfpTXbg7cP9yxU+NMXjBQtKv+pO05n6hzfd3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k2IXJsi0; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+Cu1Sqrs; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k2IXJsi0; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+Cu1Sqrs; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 MIME-Version; b=QFObxLFQUSXibL0P+EBvbKlK3QzjbCHzNb8Sr92JW6VxXephbDhzv6Sqyfq6vsUY7X2PfxY6Xb9O8rdvehr8UnoQ8RQqWZ/c61tK8Jh3CQH3YKrzWOn50N1wZU8u6ZK2fMhN1xpdpLrEa0Rl92hS9EcC69jh8WXif+5yUXo2hYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KiFpuMlh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k2IXJsi0";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+Cu1Sqrs";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k2IXJsi0";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+Cu1Sqrs"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KiFpuMlh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774522070;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RdkzjxA4QBFdZtq86b0WloDVthjPMHtDr3k2b6G769Q=;
+	b=KiFpuMlhGAEAQRWxBi831SKfB/r9h3e/H2H1FYl5P13Jkc97LqKbL0rmj8p6wQXbhpXIcY
+	uxg48TQIgftpTTv3zSXS07Lx1T6Pe/NTyPy9nA9aI3KDrR54Jo31BpOnO5S3mHPzfZy63T
+	5AEOQVyCnj1x8mP0dGWDoBYTVB2Au7E=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-185-U8WL4ac-PTenCaRZTbwENg-1; Thu,
+ 26 Mar 2026 06:47:46 -0400
+X-MC-Unique: U8WL4ac-PTenCaRZTbwENg-1
+X-Mimecast-MFC-AGG-ID: U8WL4ac-PTenCaRZTbwENg_1774522063
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id BBDDF5BDD3;
-	Thu, 26 Mar 2026 09:55:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774518901; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7q8Kx1FkVvzvC3Q+vN0M/TZAWD4PkwxVk8bUtCe8P+o=;
-	b=k2IXJsi0SUU38wKdBvypl6ZnpttNNVynrB3dl8xeNInC4Con3yagBcilXHWfutQEEJbsMC
-	L98tWf6D/jTdUcM9c1tX7bH8gbUF2eeuGhvAXeX7DsfeYoQqqN0sfiYM0AgAlxETMglZWg
-	agE7qYC0vhveRgQOY7kAluMopfxQHDs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774518901;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7q8Kx1FkVvzvC3Q+vN0M/TZAWD4PkwxVk8bUtCe8P+o=;
-	b=+Cu1Sqrs9JhQuPOKTkxkGxMDSyqfn0ulyrAC4vq9Q6SIu1uXxzDRpvXlp7Kp2pP2AaLPXE
-	PHwbdO3200g7UqDA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774518901; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7q8Kx1FkVvzvC3Q+vN0M/TZAWD4PkwxVk8bUtCe8P+o=;
-	b=k2IXJsi0SUU38wKdBvypl6ZnpttNNVynrB3dl8xeNInC4Con3yagBcilXHWfutQEEJbsMC
-	L98tWf6D/jTdUcM9c1tX7bH8gbUF2eeuGhvAXeX7DsfeYoQqqN0sfiYM0AgAlxETMglZWg
-	agE7qYC0vhveRgQOY7kAluMopfxQHDs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774518901;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7q8Kx1FkVvzvC3Q+vN0M/TZAWD4PkwxVk8bUtCe8P+o=;
-	b=+Cu1Sqrs9JhQuPOKTkxkGxMDSyqfn0ulyrAC4vq9Q6SIu1uXxzDRpvXlp7Kp2pP2AaLPXE
-	PHwbdO3200g7UqDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A5F274A0AB;
-	Thu, 26 Mar 2026 09:55:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9gGRKHUCxWkGYQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 26 Mar 2026 09:55:01 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id D678FA0C7F; Thu, 26 Mar 2026 10:54:49 +0100 (CET)
-From: Jan Kara <jack@suse.cz>
-To: <linux-fsdevel@vger.kernel.org>
-Cc: <linux-block@vger.kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>,
-	<linux-ext4@vger.kernel.org>,
-	Ted Tso <tytso@mit.edu>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	David Sterba <dsterba@suse.com>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	David Hildenbrand <david@kernel.org>,
-	linux-mm@kvack.org,
-	linux-aio@kvack.org,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 39/42] minix: Track metadata bhs in fs-private inode part
-Date: Thu, 26 Mar 2026 10:54:33 +0100
-Message-ID: <20260326095354.16340-81-jack@suse.cz>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260326082428.31660-1-jack@suse.cz>
-References: <20260326082428.31660-1-jack@suse.cz>
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 30E8B18002C7;
+	Thu, 26 Mar 2026 10:47:43 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.33.121])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 484543000223;
+	Thu, 26 Mar 2026 10:47:36 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 11/26] Add a function to kmap one page of a multipage bio_vec
+Date: Thu, 26 Mar 2026 10:45:26 +0000
+Message-ID: <20260326104544.509518-12-dhowells@redhat.com>
+In-Reply-To: <20260326104544.509518-1-dhowells@redhat.com>
+References: <20260326104544.509518-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4731; i=jack@suse.cz; h=from:subject; bh=LB5f9ZM6VTG6f7M+4eM1ibxL/c9eLkxT6oy6CEVQ+ic=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBpxQJTqj+aOzlKcPkCimm7IqpQm2fU61zijKeKW 5HhKtDTckGJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCacUCUwAKCRCcnaoHP2RA 2TCJB/490VA3we2/AivSVCUBWocvHEyG25ixMq2H4qxIqT2Kd/r8p/4yiXj8YEXR3cO4jiD0KX/ pofRf+wwtm3lsZyz4ScERTu11HFuTm40DjhGPiJ24IHIo90+iANsl7fNt777dCSU0VWbJliaWQJ D/QBlJhGbKvE6k1GJEmb1ifthzuddz473YVtw3fBo4dJ9Wfqj6CAiYTyK0iIGI/k48DYVe5ENlk eQ5ILiyrBw/Zz/i+kH2ELXLuvluJKGeLnjQOMG2LtuiSmuWa6N1YDiFL66rlbovT5eMI7EslIZz 67ugOsQXYmuIUBf9i1KIjiefsjCTwrw+vMGNu0WLpksqgJps
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -1.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-1.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,ZenIV.linux.org.uk,mit.edu,gmail.com,suse.com,mail.parknet.co.jp,linux.dev,suse.de,kvack.org,suse.cz];
-	R_RATELIMIT(0.00)[to_ip_from(RLck8brw5hxmszoarioc7838it),to(RLpnp1psq57oqao6ocwdpbxen9)];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Flag: NO
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Track metadata bhs for an inode in fs-private part of the inode.
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: linux-block@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
 ---
- fs/minix/dir.c          |  2 +-
- fs/minix/file.c         | 10 +++++++++-
- fs/minix/inode.c        |  6 ++++--
- fs/minix/itree_common.c | 11 +++++++----
- fs/minix/minix.h        |  3 +++
- 5 files changed, 24 insertions(+), 8 deletions(-)
+ include/linux/bvec.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/fs/minix/dir.c b/fs/minix/dir.c
-index a74d000327fa..361d26d87d2e 100644
---- a/fs/minix/dir.c
-+++ b/fs/minix/dir.c
-@@ -23,7 +23,7 @@ const struct file_operations minix_dir_operations = {
- 	.llseek		= generic_file_llseek,
- 	.read		= generic_read_dir,
- 	.iterate_shared	= minix_readdir,
--	.fsync		= generic_buffers_fsync,
-+	.fsync		= minix_fsync,
- };
- 
- /*
-diff --git a/fs/minix/file.c b/fs/minix/file.c
-index 282b3cd1fea3..86e5943cd2ff 100644
---- a/fs/minix/file.c
-+++ b/fs/minix/file.c
-@@ -7,8 +7,16 @@
-  *  minix regular file handling primitives
-  */
- 
-+#include <linux/buffer_head.h>
- #include "minix.h"
- 
-+int minix_fsync(struct file *file, loff_t start, loff_t end, int datasync)
-+{
-+	return mmb_fsync(file,
-+			&minix_i(file->f_mapping->host)->i_metadata_bhs,
-+			start, end, datasync);
-+}
-+
- /*
-  * We have mostly NULLs here: the current defaults are OK for
-  * the minix filesystem.
-@@ -18,7 +26,7 @@ const struct file_operations minix_file_operations = {
- 	.read_iter	= generic_file_read_iter,
- 	.write_iter	= generic_file_write_iter,
- 	.mmap_prepare	= generic_file_mmap_prepare,
--	.fsync		= generic_buffers_fsync,
-+	.fsync		= minix_fsync,
- 	.splice_read	= filemap_splice_read,
- };
- 
-diff --git a/fs/minix/inode.c b/fs/minix/inode.c
-index ab7c06efb139..63f378f38d43 100644
---- a/fs/minix/inode.c
-+++ b/fs/minix/inode.c
-@@ -49,9 +49,9 @@ static void minix_evict_inode(struct inode *inode)
- 		inode->i_size = 0;
- 		minix_truncate(inode);
- 	} else {
--		sync_mapping_buffers(&inode->i_data);
-+		mmb_sync(&minix_i(inode)->i_metadata_bhs);
- 	}
--	invalidate_inode_buffers(inode);
-+	mmb_invalidate(&minix_i(inode)->i_metadata_bhs);
- 	clear_inode(inode);
- 	if (!inode->i_nlink)
- 		minix_free_inode(inode);
-@@ -85,6 +85,8 @@ static struct inode *minix_alloc_inode(struct super_block *sb)
- 	ei = alloc_inode_sb(sb, minix_inode_cachep, GFP_KERNEL);
- 	if (!ei)
- 		return NULL;
-+	mmb_init(&ei->i_metadata_bhs, &ei->vfs_inode.i_data);
-+
- 	return &ei->vfs_inode;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 06fb60471aaf..9788bfd52818 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -308,4 +308,25 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
  }
  
-diff --git a/fs/minix/itree_common.c b/fs/minix/itree_common.c
-index dad131e30c05..c3cd2c75af9c 100644
---- a/fs/minix/itree_common.c
-+++ b/fs/minix/itree_common.c
-@@ -98,7 +98,7 @@ static int alloc_branch(struct inode *inode,
- 		*branch[n].p = branch[n].key;
- 		set_buffer_uptodate(bh);
- 		unlock_buffer(bh);
--		mark_buffer_dirty_inode(bh, inode);
-+		mmb_mark_buffer_dirty(bh, &minix_i(inode)->i_metadata_bhs);
- 		parent = nr;
- 	}
- 	if (n == num)
-@@ -135,7 +135,8 @@ static inline int splice_branch(struct inode *inode,
- 
- 	/* had we spliced it onto indirect block? */
- 	if (where->bh)
--		mark_buffer_dirty_inode(where->bh, inode);
-+		mmb_mark_buffer_dirty(where->bh,
-+				      &minix_i(inode)->i_metadata_bhs);
- 
- 	mark_inode_dirty(inode);
- 	return 0;
-@@ -328,14 +329,16 @@ static inline void truncate (struct inode * inode)
- 		if (partial == chain)
- 			mark_inode_dirty(inode);
- 		else
--			mark_buffer_dirty_inode(partial->bh, inode);
-+			mmb_mark_buffer_dirty(partial->bh,
-+					      &minix_i(inode)->i_metadata_bhs);
- 		free_branches(inode, &nr, &nr+1, (chain+n-1) - partial);
- 	}
- 	/* Clear the ends of indirect blocks on the shared branch */
- 	while (partial > chain) {
- 		free_branches(inode, partial->p + 1, block_end(partial->bh),
- 				(chain+n-1) - partial);
--		mark_buffer_dirty_inode(partial->bh, inode);
-+		mmb_mark_buffer_dirty(partial->bh,
-+				      &minix_i(inode)->i_metadata_bhs);
- 		brelse (partial->bh);
- 		partial--;
- 	}
-diff --git a/fs/minix/minix.h b/fs/minix/minix.h
-index 7e1f652f16d3..f2025c9b5825 100644
---- a/fs/minix/minix.h
-+++ b/fs/minix/minix.h
-@@ -19,6 +19,7 @@ struct minix_inode_info {
- 		__u16 i1_data[16];
- 		__u32 i2_data[16];
- 	} u;
-+	struct mapping_metadata_bhs i_metadata_bhs;
- 	struct inode vfs_inode;
- };
- 
-@@ -57,6 +58,8 @@ unsigned long minix_count_free_blocks(struct super_block *sb);
- int minix_getattr(struct mnt_idmap *, const struct path *,
- 		struct kstat *, u32, unsigned int);
- int minix_prepare_chunk(struct folio *folio, loff_t pos, unsigned len);
-+struct mapping_metadata_bhs *minix_get_metadata_bhs(struct inode *inode);
-+int minix_fsync(struct file *file, loff_t start, loff_t end, int datasync);
- 
- extern void V1_minix_truncate(struct inode *);
- extern void V2_minix_truncate(struct inode *);
--- 
-2.51.0
++/**
++ * kmap_local_bvec - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
++ */
++static inline void *kmap_local_bvec(struct bio_vec *bvec, size_t offset)
++{
++#ifdef CONFIG_HIGHMEM
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + offset / PAGE_SIZE) + offset % PAGE_SIZE;
++#else
++	return bvec_virt(bvec) + offset;
++#endif
++}
++
+ #endif /* __LINUX_BVEC_H */
 
