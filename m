@@ -1,237 +1,146 @@
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011042.outbound.protection.outlook.com [52.101.57.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF932848A7;
-	Thu, 26 Mar 2026 13:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAD92DB7BF
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 13:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774532521; cv=fail; b=T0ksqz3bOTUAEChq5R/MGCwwWmcHdiJ+ytOwS4ReVls4Pu2FD+8Q4i6EGmrZGjeKVvRGQyXmagsRB8AqGnsryTHUJD1EBMgCrABJ6F0/7plFOIEQF1T2otEu3TDuq400KsNca4mkOuRBvc/q+d2vco082dp86KCctKYKIsWsmjo=
+	t=1774532739; cv=pass; b=G5gRRKu9qpjLAgNO6fWnWM9JrNvgOchzTTKpy5/+FzmYW71QdvUTSuyrdphqqsVu8Aa1rzviIKtC3L1IbV0yrk8HYXOez8MLOnjk4VwLEdiibIpcjaH3ffBsytCJ29TAXhp1yAROQj2DTcgDtE7e2MmSmuLpydmxOvQ62qmDHbI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774532521; c=relaxed/simple;
-	bh=UyFigOeNmUje7dkKXuPCPEliH6tuth2cbC7g8EqvwaE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azSTVFIh/JBbuI80lCrOPtNnR1+DurzwnISG158pcvTbNpmgep0kz5O2g2qf7anwcbfpXJYA+F+Nxb/VaCo+NO2Dzv6aWUBQFG9lABAuIQunBQIFXWuldlx/CHfMXUB/ZqFPdXq0I9NyVR0Jg9QFNxIIjDTOGpm9b1s2Yv4dkUo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZzAbpPA4; arc=fail smtp.client-ip=52.101.57.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1774532739; c=relaxed/simple;
+	bh=/IpBYyVL9HvPcm43E3yQo2TCjyXHBQsh6m4UNgtUnH0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fLPzhswxivMSgdx7AaoV4kBT0Dmi2o+E5roo+AtMFFMe5QBnLjjawNaS+JHQISBNddwwYeQUALQNqMS6GKnNOItxeLCIdqnNnRc22yJXTpBFdkWmwA14ZWGaIfVTL15ZvTuVfkHwVK39nLnFonrj2caI2WKIpdLrndEzc4EwPkU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JdBcuyQ0; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jM+xKEcR; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ZzAbpPA4"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TYziz0/k9PrM+gIz8zzD1VqfgeIFqh0F67BxRIAuFF4Dawk658XQ3I2ngbEP3ug6tzxed8sk8damhPX5TbYNdgFcRcKilvTVuliR8MNpFfbw4czxlYbuAIVk27KbC4QwtNrVMapXjey8Ajfc5P9wtGgWB4NEi8X5Cxc1chT+DTLmIk7ohhHL02mOYtZFWBB+d4ku/r6iiuDShsfFtVtp1dkhAYigUNzb4LXhnAF19erYPIMkomFTqUezbxOA6p3aTO4JgdlERAW9s+u812VTE7tlmvq0astUWkLcjAJdZUf23wS3njuWl9DPnZeP15E4BlrIbvPPnpZ6qYsLVO79Fw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OaE6CsYp2LtBBY0zo7cF1GxKstT0ND5sZEb/26xCbDU=;
- b=V8BWurVjF+yF0jXHqsoHYhZ3iUI90y1voN3EB8oS0aaRr5vNXHWL2PbgkUVuN8RgYV6e19gzNqGv0RD9Ok8dimkpy/UCCRHNb+kRqudQAVU2150Dml3N+dKe/ZP4692/bbD1AFPmpnxr/XsmuIlqSct89lRJ8cY+7d+P8OWu/zE9xNnsM17rdCZrunaEwBv9GK/vzb0ObuDpw9Q9YokU4KFgQrHsPY/YUB27a2HjogfMx5ucLvjoV+gvyopJ+0GqpvHi01BnT4jRNCpsR/iSJaseSOIA9i/d3mMuMidSoHOWo9FPkO0hNZUAQsa3t7KKYyGHAXA3eNcmEmoXhVGQ0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.195) smtp.rcpttodomain=linux.dev smtp.mailfrom=ti.com; dmarc=pass
- (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OaE6CsYp2LtBBY0zo7cF1GxKstT0ND5sZEb/26xCbDU=;
- b=ZzAbpPA4xbZKBoCJwC4xLnQAwYZiAbispnKOSQ6zggXoXKXMzhygcm+FVhWeoaOfHgzxpYZHi5doK3niAwqeYiJKmJ4Sq/AFc6fJcisv5io4jkdiO+fGpU8ZK41dreTLYu08gEvspNnBPlfBJJmOm83rLO+MtV6FgsxD271ObaU=
-Received: from CH5PR04CA0007.namprd04.prod.outlook.com (2603:10b6:610:1f4::7)
- by DS4PPFAEF42CAE1.namprd10.prod.outlook.com (2603:10b6:f:fc00::d40) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.20; Thu, 26 Mar
- 2026 13:41:56 +0000
-Received: from CH1PEPF0000A34B.namprd04.prod.outlook.com
- (2603:10b6:610:1f4:cafe::d4) by CH5PR04CA0007.outlook.office365.com
- (2603:10b6:610:1f4::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.22 via Frontend Transport; Thu,
- 26 Mar 2026 13:41:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
-Received: from flwvzet201.ext.ti.com (198.47.21.195) by
- CH1PEPF0000A34B.mail.protection.outlook.com (10.167.244.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.21 via Frontend Transport; Thu, 26 Mar 2026 13:41:55 +0000
-Received: from DFLE207.ent.ti.com (10.64.6.65) by flwvzet201.ext.ti.com
- (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 26 Mar
- 2026 08:41:28 -0500
-Received: from DFLE206.ent.ti.com (10.64.6.64) by DFLE207.ent.ti.com
- (10.64.6.65) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 26 Mar
- 2026 08:41:27 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE206.ent.ti.com
- (10.64.6.64) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Thu, 26 Mar 2026 08:41:27 -0500
-Received: from localhost (uda0271908.dhcp.ti.com [128.247.77.70])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 62QDfRQD1738026;
-	Thu, 26 Mar 2026 08:41:27 -0500
-Date: Thu, 26 Mar 2026 08:41:27 -0500
-From: Bin Liu <b-liu@ti.com>
-To: Ulf Hansson <ulf.hansson@linaro.org>
-CC: <linux-block@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-	<axboe@kernel.dk>, <shawn.lin@linux.dev>
-Subject: Re: [PATCH v3] mmc: block: use single block write in retry
-Message-ID: <20260326134127.fne3kykgi572qfep@iaqt7>
-References: <20260324143448.2631888-1-b-liu@ti.com>
- <20260325134947.2799552-1-b-liu@ti.com>
- <CAPDyKFq42GDC6V4WZpax_tFM69JPafB9_UOAsfkJN1ZxAP7LeQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JdBcuyQ0";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jM+xKEcR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774532737;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
+	b=JdBcuyQ0y4tTjV+rUg10TEwepsj91GU3RI+XEL2Cfk6Nu7n9exutQg6h33hFWItYckzRKs
+	TKmYinJHzfzQsKOFZYjFioDRjv164RgiY+vV+vpb/3iaKAG0Llwg+1UgbIYpkUSxS3nuTI
+	qRZF4MNipOHZJK8MjtzjKunNqQHSMsE=
+Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
+ [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-359-15VQU-JNOoeDfQPfzcsxRA-1; Thu, 26 Mar 2026 09:45:35 -0400
+X-MC-Unique: 15VQU-JNOoeDfQPfzcsxRA-1
+X-Mimecast-MFC-AGG-ID: 15VQU-JNOoeDfQPfzcsxRA_1774532735
+Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-56b7252fd7dso6262203e0c.1
+        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 06:45:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774532735; cv=none;
+        d=google.com; s=arc-20240605;
+        b=B/y79+CumlV/O+Ozyub03A0f5sBfN5az4gq9sqjO98JTxr2vd1y1D1Unvth4hvkQqG
+         6VtxR4SH0PFW9Y2BUUIvkfUMgzB0eukNZHtgY9w77xuj7cpR8RW+Vib5oQkUDqN1pTun
+         FZdjQHCYfeXxVb/mZXf+yx4JP6PLxQwLIcXepiSo7xu5MRabdtbwG5ihEaoNp970Xq9U
+         u1LigAmjFMGIxCJ2XpIkyzcu5GKTWYrRDjRHaawDjW+yidewjYkVrN7oswjKua53G0oh
+         I6qEyiOd7gPU9HTFUEi40ExTJ8PXyTmEKbvLwJVVfx2M23hEij5CaKTtAp7igbgb2CYj
+         LwTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
+        fh=zje60Ue8WN8q6U89qeh0OU5U0Lau8UM5sZVnNFg9eM8=;
+        b=bPwNxXmmq/ZVMKj/1GcJeU4rDw2ieKCoXBa+s/6e17NkIQ0hKRHrimSqZKfboRFLGQ
+         KOaGrVNKre1yHxjnGv0WcdKl0YSq1iGnEJ8vFa7w0maOg9VAfcWtZmcPbhND9lba1SMS
+         ENdmAql84JcZpRo8Y5J/6lGqB0XZpy5mfFWH9FE4XtMYGxwNeSc6OL2dzH+5zovg6kyp
+         i2xb0BJVjow9QG5VYt17FYnpq+Fx7ra/aQHXsi0Uk1lBwlDFD0QjXsydONoxXuBLPVHo
+         YUQCyY5Mhpt7u5GOYp08OrCwEHNIeWpJR1eU4XqXKJCV6uHCWYDLgFN9Jw/cNXK3MHdZ
+         bvkw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774532735; x=1775137535; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
+        b=jM+xKEcRi9Lz1UmdOxw7hFB1hSx7FOhzYH7zEQyY4U2lRMHA0II5HTSoRqAUtGYVDO
+         WodYl/y9nwuNPorGpSXY0e13eRPqY9E154bSGdbSrdZxiReFqi0by2nXZjy/3uwV4QNA
+         YOjugJFO/IPblQm9qmD/wvlG5TrkFclD4XG1gSoKWTP069NmX7wGMkwhMlxEOYojhf2P
+         CnPHaKb8ciHB+a4NW15PCsiI7ApsV2rrnYEv7dF0bz4zpihNEOIF2u6sb7gQjpBIjiTR
+         JlnVnSCIi1y7VRgcpM3PBYGV2L8FrW20O8QOHRbkQTwr1Rmx4V/55cerwcpwWe3z/a3/
+         kz2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774532735; x=1775137535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
+        b=YKx/+/LGtJZWa6VDjNYJjyz1jysi8UwQKJ9eP/AcoCR2s+EwrXy00eUqA8/2HK/lIW
+         tEhkLeX80rVCVEQkXCxCLcW+4kZ7qFnhgXDEveiCZpvnBbVHtaabpJI/kA5rPXnzhaw4
+         HaXTalHLqYM/r6VYVfniuM3qS1bM6csvUp+b0oGO7BFtpSyLLldK1/izmUtcAjn8A+GN
+         Bf1QSh6qDqhJC5Y8WJO7O9tMFR0LtZ4R28ONEB4bWyGIJda8Ar9AM/3XZiWECeQ6AtYP
+         YB/I/GUaP/GTonUXrkP2lqIZU7Fg3tSQNO//RwX34k4EDsKMLj8+RG1ZAF9eeeGcplVM
+         SbBQ==
+X-Gm-Message-State: AOJu0Ywf3+mxHIX6CNgtMbHpYYl+R4hZCo1LKMzh4A8oWC5K/bdYOuLY
+	9TFzuwyiw7eXLttP2A6T+6YHhINjMh9jKGOOpKYa1gxEkXcnOVFNpGw4tNaeYpsxHzwTk5DD+7V
+	YI0TaBizCGInm+YT+hKwHhwq6afeUmaGAxZd9bvlwQp+jKWfU/4zD2o6eMYGxfapt+2aPGPS6wI
+	hTqLBbR7xw+Z/nzETm2uNUwCO5D/GYrG0wyYYfsig=
+X-Gm-Gg: ATEYQzwBR5f8ZzflMJSlL+PsH66E3HNztdH92VmZM6K50FmGEcIiLBC+O8EwFgDHXqh
+	xSpHfspW2L/nmBHAiVmzOTz9ezTyesj/Ma/TqriM0vuYSj7cq0tz7id3T5EgzL/90X3cDr5aAtp
+	j2g0gYIsImyiLz6UYbyik2/G4QiGhflu0Mt10fiEZD6cwAEHWaWHvKfc4ofhokbEIX34LhtbM1o
+	JWasLepL9IulgxIAIw1Bwb/rDz2WoYrIfFgW4o=
+X-Received: by 2002:a05:6122:8283:b0:56b:72f6:1b9e with SMTP id 71dfb90a1353d-56d3d6e4d87mr557775e0c.8.1774532734701;
+        Thu, 26 Mar 2026 06:45:34 -0700 (PDT)
+X-Received: by 2002:a05:6122:8283:b0:56b:72f6:1b9e with SMTP id
+ 71dfb90a1353d-56d3d6e4d87mr557768e0c.8.1774532734311; Thu, 26 Mar 2026
+ 06:45:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAPDyKFq42GDC6V4WZpax_tFM69JPafB9_UOAsfkJN1ZxAP7LeQ@mail.gmail.com>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A34B:EE_|DS4PPFAEF42CAE1:EE_
-X-MS-Office365-Filtering-Correlation-Id: be21907c-b286-4aad-d92f-08de8b3d7202
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700016|82310400026|1800799024|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	r0Lu3ZsmoDdbUnOfDNU1YynHQkcvXE8ldzDzgBjmUewO9JsSxBB3m+6ceFXF8wBnE2jAhG7EiiP7KtHu0Me/TM2g9YSERax/4CzJZz7/x/nBQEjqA8XhYKfiF4Oz65AwOXsMZlpW5/x7kgUo4ir3yR5VLnvuc7Jwwx0hTb0/CMxx1OFQg1ApLCVDAGPpSXEAzo71jDsOL/drCLhipfkYWvp+vRlYzLgXOqQpgnS8xtucm+FwRABkD84tLoOUN2M64GBcKdgtcymIuih8QJY8AJ+Gh6fLOW8XArULZivttGuTu8B8UAU1V3CmOs3f8CNhVqyJcqAgi9b2om+7iI2CZQ/Ft8mNRw4T7WG5SvGqIO2tJSmYwRuAbf1vsmEq2W+/HpbJOYgrvgtQd5PV0x5BJxiEoWYU96JJHLqap0OJ42/ZsXiNTBq93m+4I1POSmv0QJ6nK2xBYr8nlEcH66djvVaZk+1XbU0/MmlV8D46NNEgRfOCyUnoHyvVm+f+c5StpkYQ00JJeCw0Y2Mi4kYf9+WvtZYTUEGh1wqIUKf4MlI6wC7PUgKl1WXyM7c2awKNM3JQiySJleSAOxxT72xUzdp3x8NZr1wkMzlSB6wEdMsxQ1y3zd1/gtRzAc0nB+gdSUcpCpOfJTBNuTa82iDF4Q3Zil1/WbJlH8+4jY/BpvWFGvx+mmXOko4h8EeUWyfA0EHWcTxDd2mc1/cQs87vr2YKs+XtuLFDM47k8IsJQ7F4d1c+h4WacLk0ns+VN/82egdMwn8rTCqsNIz1cmA+lBw161l5W9w9y96X2CTzRLk=
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(376014)(36860700016)(82310400026)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	yHYF+xM2PZmwKMF/3wX3Kr5i6d3jJjYi24FTxW86vISnJUyeoMfpIHVeXrb7tc4mWqgAoD5RWdkAv5BOdH0Q7oXee5re5DKnB1vrMdtiFACS7jZJ3MAtIe/o9t/kviBIgTyteX2ZYHolT9phFyvKBERo3L21gjFRx/4btZNjAA1ycssWLM1X2zoMazMpMfYKJz1OcndDbzIcaWgu83xKBpuUPiOk/Eux+JirmdyjW/63FIeN2SMUelPihAThz1M7Fnh82uZlyjQSqIoYZ51uN+B+JZUdlTXDT0p4E7OQuv8+jEULMeI2hz6hGpzvUbM4cYxSEbE1/l3XeAIz8FoDaZ3GyLbKfWl+O8c6ZfMwS1h8bmFT8hGE6GYzWrJCGmaJS+WYt44ieSRMV4OCqJzvACvjrg06OE5JcAGLRJ4KzFQAc09NjavnNROfzEQeVnsu
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 13:41:55.4368
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: be21907c-b286-4aad-d92f-08de8b3d7202
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A34B.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPFAEF42CAE1
+References: <20260324090052.1782766-1-ming.lei@redhat.com> <c0c9becb-7ec7-4774-99f4-a265f53166e4@kernel.dk>
+In-Reply-To: <c0c9becb-7ec7-4774-99f4-a265f53166e4@kernel.dk>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Thu, 26 Mar 2026 21:45:21 +0800
+X-Gm-Features: AQROBzA4wLMKdCUBht9HDO_wqDz1zySGPCCVrxJoXrRfzROAAlmsD-y27s6oN2U
+Message-ID: <CAFj5m9++xK4dS99+cukn5QvH9YaafHUAYnnb-iou-9ZUf1t+Tg@mail.gmail.com>
+Subject: Re: [PATCH] bio: fix kmemleak false positives from percpu bio alloc cache
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ulf,
+On Thu, Mar 26, 2026 at 9:29=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 3/24/26 3:00 AM, Ming Lei wrote:
+> > When a bio is allocated from the mempool with REQ_ALLOC_CACHE set and
+> > later completed, bio_put() places it into the per-cpu bio_alloc_cache
+> > via bio_put_percpu_cache() instead of freeing it back to the
+> > mempool/slab. The slab allocation remains tracked by kmemleak, but the
+> > only reference to the bio is through the percpu cache's free_list,
+> > which kmemleak fails to trace through percpu memory. This causes
+> > kmemleak to report the cached bios as unreferenced objects.
+> >
+> > Use symmetric kmemleak_free()/kmemleak_alloc() calls to properly track
+> > bios across percpu cache transitions:
+> >
+> >  - bio_put_percpu_cache: call kmemleak_free() when a bio enters the
+> >    cache, unregistering it from kmemleak tracking.
+> >
+> >  - bio_alloc_percpu_cache: call kmemleak_alloc() when a bio is taken
+> >    from the cache for reuse, re-registering it so that genuine leaks
+> >    of reused bios remain detectable.
+> >
+> >  - __bio_alloc_cache_prune: call kmemleak_alloc() before bio_free() so
+> >    that kmem_cache_free()'s internal kmemleak_free() has a matching
+> >    allocation to pair with.
+>
+> Looks fine to me, but can you please do it against for-7.1/block
+> instead? It's not a huge issue, and I'd rather not introduce a merge
+> conflict by shoving it into 7.0 if that can be avoided.
 
-On Thu, Mar 26, 2026 at 01:33:58PM +0100, Ulf Hansson wrote:
-> On Wed, 25 Mar 2026 at 14:49, Bin Liu <b-liu@ti.com> wrote:
-> >
-> > Due to errata i2493[0], multi-block write would still fail in retries.
-> >
-> > With i2493, the MMC interface has the potential of write failures when
-> > issuing multi-block writes operating in HS200 mode with excessive IO
-> > supply noise.
-> >
-> > While the errata provides guidance in hardware design and layout to
-> > minimize the IO supply noise, in theory the write failure cannot be
-> > resolved in hardware. The software solution to ensure the data integrity
-> > is to add minimum 5us delay between block writes. Single-block write is
-> > the practical way to introduce the delay.
-> >
-> > This patch reuses recovery_mode flag, and switches to single-block
-> > write in retry when multi-block write fails. It covers both CQE and
-> > non-CQE cases.
-> >
-> > [0] https://www.ti.com/lit/pdf/sprz582
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Bin Liu <b-liu@ti.com>
-> 
-> Applied for next and by adding a suggested-by tag from Jens, thanks!
+Sure, will send v2 against for-7.1.
 
-Thanks.
+Thanks
 
-> 
-> Please consider sending a patch on top, that decreases the data size
-> of struct mmc_queue_req.
-
-Will do, in a few days or next week.
-
--Bin.
-
-> 
-> Kind regards
-> Uffe
-> 
-> 
-> 
-> > ---
-> > v3: move the flag to struct mmc_queue_req to reduce the scope
-> >     cc stable@
-> >
-> > v2: add errata details in the commit message.
-> >
-> > link to v2:
-> >     https://lore.kernel.org/linux-mmc/20260310160408.3976760-1-b-liu@ti.com/T/#mb201075c9c466a78b58dbb0bf1f39139f0928591
-> >
-> > link to v1:
-> >     https://lore.kernel.org/linux-mmc/20260310160408.3976760-1-b-liu@ti.com/T/#u
-> >
-> >  drivers/mmc/core/block.c | 12 ++++++++++--
-> >  drivers/mmc/core/queue.h |  3 +++
-> >  2 files changed, 13 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-> > index 05ee76cb0a08..db8c99c73a61 100644
-> > --- a/drivers/mmc/core/block.c
-> > +++ b/drivers/mmc/core/block.c
-> > @@ -1401,6 +1401,9 @@ static void mmc_blk_data_prep(struct mmc_queue *mq, struct mmc_queue_req *mqrq,
-> >                     rq_data_dir(req) == WRITE &&
-> >                     (md->flags & MMC_BLK_REL_WR);
-> >
-> > +       if (mqrq->flags & MQRQ_XFER_SINGLE_BLOCK)
-> > +               recovery_mode = 1;
-> > +
-> >         memset(brq, 0, sizeof(struct mmc_blk_request));
-> >
-> >         mmc_crypto_prepare_req(mqrq);
-> > @@ -1540,10 +1543,13 @@ static void mmc_blk_cqe_complete_rq(struct mmc_queue *mq, struct request *req)
-> >                 err = 0;
-> >
-> >         if (err) {
-> > -               if (mqrq->retries++ < MMC_CQE_RETRIES)
-> > +               if (mqrq->retries++ < MMC_CQE_RETRIES) {
-> > +                       if (rq_data_dir(req) == WRITE)
-> > +                               mqrq->flags |= MQRQ_XFER_SINGLE_BLOCK;
-> >                         blk_mq_requeue_request(req, true);
-> > -               else
-> > +               } else {
-> >                         blk_mq_end_request(req, BLK_STS_IOERR);
-> > +               }
-> >         } else if (mrq->data) {
-> >                 if (blk_update_request(req, BLK_STS_OK, mrq->data->bytes_xfered))
-> >                         blk_mq_requeue_request(req, true);
-> > @@ -2085,6 +2091,8 @@ static void mmc_blk_mq_complete_rq(struct mmc_queue *mq, struct request *req)
-> >         } else if (!blk_rq_bytes(req)) {
-> >                 __blk_mq_end_request(req, BLK_STS_IOERR);
-> >         } else if (mqrq->retries++ < MMC_MAX_RETRIES) {
-> > +               if (rq_data_dir(req) == WRITE)
-> > +                       mqrq->flags |= MQRQ_XFER_SINGLE_BLOCK;
-> >                 blk_mq_requeue_request(req, true);
-> >         } else {
-> >                 if (mmc_card_removed(mq->card))
-> > diff --git a/drivers/mmc/core/queue.h b/drivers/mmc/core/queue.h
-> > index 1498840a4ea0..c254e6580afd 100644
-> > --- a/drivers/mmc/core/queue.h
-> > +++ b/drivers/mmc/core/queue.h
-> > @@ -61,6 +61,8 @@ enum mmc_drv_op {
-> >         MMC_DRV_OP_GET_EXT_CSD,
-> >  };
-> >
-> > +#define        MQRQ_XFER_SINGLE_BLOCK          BIT(0)
-> > +
-> >  struct mmc_queue_req {
-> >         struct mmc_blk_request  brq;
-> >         struct scatterlist      *sg;
-> > @@ -69,6 +71,7 @@ struct mmc_queue_req {
-> >         void                    *drv_op_data;
-> >         unsigned int            ioc_count;
-> >         int                     retries;
-> > +       u32                     flags;
-> >  };
-> >
-> >  struct mmc_queue {
-> > --
-> > 2.34.1
-> >
