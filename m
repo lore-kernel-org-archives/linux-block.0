@@ -1,146 +1,175 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAD92DB7BF
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 13:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774532739; cv=pass; b=G5gRRKu9qpjLAgNO6fWnWM9JrNvgOchzTTKpy5/+FzmYW71QdvUTSuyrdphqqsVu8Aa1rzviIKtC3L1IbV0yrk8HYXOez8MLOnjk4VwLEdiibIpcjaH3ffBsytCJ29TAXhp1yAROQj2DTcgDtE7e2MmSmuLpydmxOvQ62qmDHbI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774532739; c=relaxed/simple;
-	bh=/IpBYyVL9HvPcm43E3yQo2TCjyXHBQsh6m4UNgtUnH0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fLPzhswxivMSgdx7AaoV4kBT0Dmi2o+E5roo+AtMFFMe5QBnLjjawNaS+JHQISBNddwwYeQUALQNqMS6GKnNOItxeLCIdqnNnRc22yJXTpBFdkWmwA14ZWGaIfVTL15ZvTuVfkHwVK39nLnFonrj2caI2WKIpdLrndEzc4EwPkU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JdBcuyQ0; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jM+xKEcR; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C52634B1BE;
+	Thu, 26 Mar 2026 14:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774534038; cv=none; b=NiOvpXl7TraVR3SqCLzojziHMIAjss1rTBd+EF6ncpZDqIOGRDPLg9Ag9LnQP5jntzEjbif1YzttYQVAXTL4sJgOm0D83otKzen+ve7Y1RwYzEqF/+kut0sxzVR0tHzbdIB8ljYwxJbMjxt91FTiQL8e9drTvUPYyar5aLf8Joo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774534038; c=relaxed/simple;
+	bh=nAMqc3HhiEGW5PQEX6C6n3tkO/8TUO5fRKgbFNWd/Qw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FCrxH+zSLjRPM0ObSyukdSOxzHcC+pJ06Kn9IDdLEZKzDK1tOKz4nHvRfsriL5BRJGGOuvebTIk0AgS65NxO67jN9DFOWZ714dbD7wHCuiN8fcR4r+cQXsf6qeMWny/s1ENR5D6Mq9zdB4IhfA/Y+PK++8Z+neR4DDcyxj8w2OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gf/EJZ+s; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JdBcuyQ0";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jM+xKEcR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774532737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
-	b=JdBcuyQ0y4tTjV+rUg10TEwepsj91GU3RI+XEL2Cfk6Nu7n9exutQg6h33hFWItYckzRKs
-	TKmYinJHzfzQsKOFZYjFioDRjv164RgiY+vV+vpb/3iaKAG0Llwg+1UgbIYpkUSxS3nuTI
-	qRZF4MNipOHZJK8MjtzjKunNqQHSMsE=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-359-15VQU-JNOoeDfQPfzcsxRA-1; Thu, 26 Mar 2026 09:45:35 -0400
-X-MC-Unique: 15VQU-JNOoeDfQPfzcsxRA-1
-X-Mimecast-MFC-AGG-ID: 15VQU-JNOoeDfQPfzcsxRA_1774532735
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-56b7252fd7dso6262203e0c.1
-        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 06:45:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774532735; cv=none;
-        d=google.com; s=arc-20240605;
-        b=B/y79+CumlV/O+Ozyub03A0f5sBfN5az4gq9sqjO98JTxr2vd1y1D1Unvth4hvkQqG
-         6VtxR4SH0PFW9Y2BUUIvkfUMgzB0eukNZHtgY9w77xuj7cpR8RW+Vib5oQkUDqN1pTun
-         FZdjQHCYfeXxVb/mZXf+yx4JP6PLxQwLIcXepiSo7xu5MRabdtbwG5ihEaoNp970Xq9U
-         u1LigAmjFMGIxCJ2XpIkyzcu5GKTWYrRDjRHaawDjW+yidewjYkVrN7oswjKua53G0oh
-         I6qEyiOd7gPU9HTFUEi40ExTJ8PXyTmEKbvLwJVVfx2M23hEij5CaKTtAp7igbgb2CYj
-         LwTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
-        fh=zje60Ue8WN8q6U89qeh0OU5U0Lau8UM5sZVnNFg9eM8=;
-        b=bPwNxXmmq/ZVMKj/1GcJeU4rDw2ieKCoXBa+s/6e17NkIQ0hKRHrimSqZKfboRFLGQ
-         KOaGrVNKre1yHxjnGv0WcdKl0YSq1iGnEJ8vFa7w0maOg9VAfcWtZmcPbhND9lba1SMS
-         ENdmAql84JcZpRo8Y5J/6lGqB0XZpy5mfFWH9FE4XtMYGxwNeSc6OL2dzH+5zovg6kyp
-         i2xb0BJVjow9QG5VYt17FYnpq+Fx7ra/aQHXsi0Uk1lBwlDFD0QjXsydONoxXuBLPVHo
-         YUQCyY5Mhpt7u5GOYp08OrCwEHNIeWpJR1eU4XqXKJCV6uHCWYDLgFN9Jw/cNXK3MHdZ
-         bvkw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774532735; x=1775137535; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
-        b=jM+xKEcRi9Lz1UmdOxw7hFB1hSx7FOhzYH7zEQyY4U2lRMHA0II5HTSoRqAUtGYVDO
-         WodYl/y9nwuNPorGpSXY0e13eRPqY9E154bSGdbSrdZxiReFqi0by2nXZjy/3uwV4QNA
-         YOjugJFO/IPblQm9qmD/wvlG5TrkFclD4XG1gSoKWTP069NmX7wGMkwhMlxEOYojhf2P
-         CnPHaKb8ciHB+a4NW15PCsiI7ApsV2rrnYEv7dF0bz4zpihNEOIF2u6sb7gQjpBIjiTR
-         JlnVnSCIi1y7VRgcpM3PBYGV2L8FrW20O8QOHRbkQTwr1Rmx4V/55cerwcpwWe3z/a3/
-         kz2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774532735; x=1775137535;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DTimboBJQQ2xN7bbA2vn6JxnGMI53LWgNaqdDkUrhgI=;
-        b=YKx/+/LGtJZWa6VDjNYJjyz1jysi8UwQKJ9eP/AcoCR2s+EwrXy00eUqA8/2HK/lIW
-         tEhkLeX80rVCVEQkXCxCLcW+4kZ7qFnhgXDEveiCZpvnBbVHtaabpJI/kA5rPXnzhaw4
-         HaXTalHLqYM/r6VYVfniuM3qS1bM6csvUp+b0oGO7BFtpSyLLldK1/izmUtcAjn8A+GN
-         Bf1QSh6qDqhJC5Y8WJO7O9tMFR0LtZ4R28ONEB4bWyGIJda8Ar9AM/3XZiWECeQ6AtYP
-         YB/I/GUaP/GTonUXrkP2lqIZU7Fg3tSQNO//RwX34k4EDsKMLj8+RG1ZAF9eeeGcplVM
-         SbBQ==
-X-Gm-Message-State: AOJu0Ywf3+mxHIX6CNgtMbHpYYl+R4hZCo1LKMzh4A8oWC5K/bdYOuLY
-	9TFzuwyiw7eXLttP2A6T+6YHhINjMh9jKGOOpKYa1gxEkXcnOVFNpGw4tNaeYpsxHzwTk5DD+7V
-	YI0TaBizCGInm+YT+hKwHhwq6afeUmaGAxZd9bvlwQp+jKWfU/4zD2o6eMYGxfapt+2aPGPS6wI
-	hTqLBbR7xw+Z/nzETm2uNUwCO5D/GYrG0wyYYfsig=
-X-Gm-Gg: ATEYQzwBR5f8ZzflMJSlL+PsH66E3HNztdH92VmZM6K50FmGEcIiLBC+O8EwFgDHXqh
-	xSpHfspW2L/nmBHAiVmzOTz9ezTyesj/Ma/TqriM0vuYSj7cq0tz7id3T5EgzL/90X3cDr5aAtp
-	j2g0gYIsImyiLz6UYbyik2/G4QiGhflu0Mt10fiEZD6cwAEHWaWHvKfc4ofhokbEIX34LhtbM1o
-	JWasLepL9IulgxIAIw1Bwb/rDz2WoYrIfFgW4o=
-X-Received: by 2002:a05:6122:8283:b0:56b:72f6:1b9e with SMTP id 71dfb90a1353d-56d3d6e4d87mr557775e0c.8.1774532734701;
-        Thu, 26 Mar 2026 06:45:34 -0700 (PDT)
-X-Received: by 2002:a05:6122:8283:b0:56b:72f6:1b9e with SMTP id
- 71dfb90a1353d-56d3d6e4d87mr557768e0c.8.1774532734311; Thu, 26 Mar 2026
- 06:45:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gf/EJZ+s"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93F9CC116C6;
+	Thu, 26 Mar 2026 14:07:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774534038;
+	bh=nAMqc3HhiEGW5PQEX6C6n3tkO/8TUO5fRKgbFNWd/Qw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=gf/EJZ+sZSc6B0Si328/7/oiwuUxy/Nte51P6k4nQ6b2VbtDp7CxAajNzpj8iR5Wp
+	 JFZKLfEQzYUBPXPD2DvtgNqECZ3l+ptF2tfg5PDstV3hHTt4c25cim9XjuF5MGUFWV
+	 n3QVjtzMJBGeoHFeDUeR5jwV2hT6Vt0P7he4b+ffuwyK2PayWDW6eZqVBnbOAgqN1L
+	 HyLadVsnGIxixFfKI0ZolFV7io0Tc534F1IAfqY6KCpHv+d1eX9Tku3/CDw0XXY1L8
+	 AT74Sms0ViYyOwLE+WNRtfCPN2U6mRA20wt4AqeEoHBSM8ndHiAFK1UWtfdfV9Q5xf
+	 40pG/V/mnPOAw==
+From: Christian Brauner <brauner@kernel.org>
+To: linux-fsdevel@vger.kernel.org,
+	Jan Kara <jack@suse.cz>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-block@vger.kernel.org,
+	Al Viro <viro@ZenIV.linux.org.uk>,
+	linux-ext4@vger.kernel.org,
+	Ted Tso <tytso@mit.edu>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	David Sterba <dsterba@suse.com>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@kernel.org>,
+	linux-mm@kvack.org,
+	linux-aio@kvack.org,
+	Benjamin LaHaise <bcrl@kvack.org>
+Subject: Re: [PATCH v3 0/42] fs: Move metadata bh tracking from address_space
+Date: Thu, 26 Mar 2026 15:06:47 +0100
+Message-ID: <20260326-obstgarten-ausrechnen-34d66c2df7a7@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260326082428.31660-1-jack@suse.cz>
+References: <20260326082428.31660-1-jack@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260324090052.1782766-1-ming.lei@redhat.com> <c0c9becb-7ec7-4774-99f4-a265f53166e4@kernel.dk>
-In-Reply-To: <c0c9becb-7ec7-4774-99f4-a265f53166e4@kernel.dk>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Thu, 26 Mar 2026 21:45:21 +0800
-X-Gm-Features: AQROBzA4wLMKdCUBht9HDO_wqDz1zySGPCCVrxJoXrRfzROAAlmsD-y27s6oN2U
-Message-ID: <CAFj5m9++xK4dS99+cukn5QvH9YaafHUAYnnb-iou-9ZUf1t+Tg@mail.gmail.com>
-Subject: Re: [PATCH] bio: fix kmemleak false positives from percpu bio alloc cache
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6163; i=brauner@kernel.org; h=from:subject:message-id; bh=nAMqc3HhiEGW5PQEX6C6n3tkO/8TUO5fRKgbFNWd/Qw=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQete0zZn9/bY2enadhMb/Dn7XlFjJqeUUdXrs3zr9/+ 13oFEuWjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgImoLmP4Z77hJOOhA27uv264 fWzKCvh/U3it+8LXimqXgpom5n1zYGVkeLNwbqT/LXbG8KYDh9b4hxwUr+Tsu/m2fY+OA+9S8Sp 2dgA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 26, 2026 at 9:29=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 3/24/26 3:00 AM, Ming Lei wrote:
-> > When a bio is allocated from the mempool with REQ_ALLOC_CACHE set and
-> > later completed, bio_put() places it into the per-cpu bio_alloc_cache
-> > via bio_put_percpu_cache() instead of freeing it back to the
-> > mempool/slab. The slab allocation remains tracked by kmemleak, but the
-> > only reference to the bio is through the percpu cache's free_list,
-> > which kmemleak fails to trace through percpu memory. This causes
-> > kmemleak to report the cached bios as unreferenced objects.
-> >
-> > Use symmetric kmemleak_free()/kmemleak_alloc() calls to properly track
-> > bios across percpu cache transitions:
-> >
-> >  - bio_put_percpu_cache: call kmemleak_free() when a bio enters the
-> >    cache, unregistering it from kmemleak tracking.
-> >
-> >  - bio_alloc_percpu_cache: call kmemleak_alloc() when a bio is taken
-> >    from the cache for reuse, re-registering it so that genuine leaks
-> >    of reused bios remain detectable.
-> >
-> >  - __bio_alloc_cache_prune: call kmemleak_alloc() before bio_free() so
-> >    that kmem_cache_free()'s internal kmemleak_free() has a matching
-> >    allocation to pair with.
->
-> Looks fine to me, but can you please do it against for-7.1/block
-> instead? It's not a huge issue, and I'd rather not introduce a merge
-> conflict by shoving it into 7.0 if that can be avoided.
+On Thu, 26 Mar 2026 10:53:54 +0100, Jan Kara wrote:
+> here is a next revision of the patchset cleaning up buffer head metadata
+> tracking and use of address_space's private_list and private_lock. Functionally
+> this should be identical to v2, most of the changes were in improving
+> changelogs, patch ordering, function names, etc. The patches have survived some
+> testing with fstests and ltp however I didn't test AFFS and KVM guest_memfd
+> changes so a help with testing those would be very welcome.  Thanks.
+> 
+> [...]
 
-Sure, will send v2 against for-7.1.
+Fwiw, a fixup series on top would have sufficed this late in the cycle. :)
 
-Thanks
+---
 
+Applied to the vfs-7.1.bh.metadata branch of the vfs/vfs.git tree.
+Patches in the vfs-7.1.bh.metadata branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.1.bh.metadata
+
+[01/42] ext4: Use inode_has_buffers()
+        https://git.kernel.org/vfs/vfs/c/ab856368582b
+[02/42] gfs2: Don't zero i_private_data
+        https://git.kernel.org/vfs/vfs/c/7e5ccdd88c5a
+[03/42] ntfs3: Drop pointless sync_mapping_buffers() and invalidate_inode_buffers() calls
+        https://git.kernel.org/vfs/vfs/c/ddd6761f8777
+[04/42] ocfs2: Drop pointless sync_mapping_buffers() calls
+        https://git.kernel.org/vfs/vfs/c/70450fcfd28a
+[05/42] bdev: Drop pointless invalidate_inode_buffers() call
+        https://git.kernel.org/vfs/vfs/c/f9480ecf939d
+[06/42] ufs: Drop pointless invalidate_mapping_buffers() call
+        https://git.kernel.org/vfs/vfs/c/09a23f3a0401
+[07/42] exfat: Drop pointless invalidate_inode_buffers() call
+        https://git.kernel.org/vfs/vfs/c/2cbfeb4c8a43
+[08/42] fs: Remove inode lock from __generic_file_fsync()
+        https://git.kernel.org/vfs/vfs/c/ba31a330b4c1
+[09/42] udf: Switch to generic_buffers_fsync()
+        https://git.kernel.org/vfs/vfs/c/f3216337d96e
+[10/42] minix: Switch to generic_buffers_fsync()
+        https://git.kernel.org/vfs/vfs/c/f3873f90b4c8
+[11/42] bfs: Switch to generic_buffers_fsync()
+        https://git.kernel.org/vfs/vfs/c/235cddee8590
+[12/42] fat: Switch to generic_buffers_fsync_noflush()
+        https://git.kernel.org/vfs/vfs/c/635aa2f67817
+[13/42] fs: Drop sync_mapping_buffers() from __generic_file_fsync()
+        https://git.kernel.org/vfs/vfs/c/aec4fe7cce0c
+[14/42] fs: Rename generic_file_fsync() to simple_fsync()
+        https://git.kernel.org/vfs/vfs/c/5f36c9ca3333
+[15/42] fat: Sync and invalidate metadata buffers from fat_evict_inode()
+        https://git.kernel.org/vfs/vfs/c/63f1f4b6c9c8
+[16/42] udf: Sync and invalidate metadata buffers from udf_evict_inode()
+        https://git.kernel.org/vfs/vfs/c/153e5960450a
+[17/42] minix: Sync and invalidate metadata buffers from minix_evict_inode()
+        https://git.kernel.org/vfs/vfs/c/61aa62ddfb5d
+[18/42] ext2: Sync and invalidate metadata buffers from ext2_evict_inode()
+        https://git.kernel.org/vfs/vfs/c/4211dc89c31c
+[19/42] ext4: Sync and invalidate metadata buffers from ext4_evict_inode()
+        https://git.kernel.org/vfs/vfs/c/77ff1ff2f3c5
+[20/42] bfs: Sync and invalidate metadata buffers from bfs_evict_inode()
+        https://git.kernel.org/vfs/vfs/c/4a7fd1823efc
+[21/42] affs: Sync and invalidate metadata buffers from affs_evict_inode()
+        https://git.kernel.org/vfs/vfs/c/23dae9e189de
+[22/42] fs: Ignore inode metadata buffers in inode_lru_isolate()
+        https://git.kernel.org/vfs/vfs/c/972b9dd4e418
+[23/42] fs: Stop using i_private_data for metadata bh tracking
+        https://git.kernel.org/vfs/vfs/c/0f46a9e2743c
+[24/42] hugetlbfs: Stop using i_private_data
+        https://git.kernel.org/vfs/vfs/c/2811f2a82faf
+[25/42] aio: Stop using i_private_data and i_private_lock
+        https://git.kernel.org/vfs/vfs/c/3833d335d7be
+[26/42] fs: Remove i_private_data
+        https://git.kernel.org/vfs/vfs/c/cd336f2e275d
+[27/42] kvm: Use private inode list instead of i_private_list
+        https://git.kernel.org/vfs/vfs/c/d15c987d1226
+[28/42] fs: Drop osync_buffers_list()
+        https://git.kernel.org/vfs/vfs/c/cae6b7a03c7e
+[29/42] fs: Fold fsync_buffers_list() into sync_mapping_buffers()
+        https://git.kernel.org/vfs/vfs/c/8fed8176312b
+[30/42] fs: Move metadata bhs tracking to a separate struct
+        https://git.kernel.org/vfs/vfs/c/521bea7cec8a
+[31/42] fs: Make bhs point to mapping_metadata_bhs
+        https://git.kernel.org/vfs/vfs/c/c86f5d25514c
+[32/42] fs: Switch inode_has_buffers() to take mapping_metadata_bhs
+        https://git.kernel.org/vfs/vfs/c/025c9af1a20c
+[33/42] fs: Provide functions for handling mapping_metadata_bhs directly
+        https://git.kernel.org/vfs/vfs/c/a8c8122a3dac
+[34/42] ext2: Track metadata bhs in fs-private inode part
+        https://git.kernel.org/vfs/vfs/c/b0439bbc29f0
+[35/42] affs: Track metadata bhs in fs-private inode part
+        https://git.kernel.org/vfs/vfs/c/6874973e720f
+[36/42] bfs: Track metadata bhs in fs-private inode part
+        https://git.kernel.org/vfs/vfs/c/b0806ac078e2
+[37/42] fat: Track metadata bhs in fs-private inode part
+        https://git.kernel.org/vfs/vfs/c/439959848b40
+[38/42] udf: Track metadata bhs in fs-private inode part
+        https://git.kernel.org/vfs/vfs/c/d0874a580a4b
+[39/42] minix: Track metadata bhs in fs-private inode part
+        https://git.kernel.org/vfs/vfs/c/caaa184b4243
+[40/42] ext4: Track metadata bhs in fs-private inode part
+        https://git.kernel.org/vfs/vfs/c/41189b49bcf1
+[41/42] fs: Drop mapping_metadata_bhs from address space
+        https://git.kernel.org/vfs/vfs/c/cb6d109b9ccc
+[42/42] fs: Drop i_private_list from address_space
+        https://git.kernel.org/vfs/vfs/c/f219798ce294
