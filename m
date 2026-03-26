@@ -1,150 +1,125 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9895125776
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 06:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774507365; cv=none; b=Ycn6XRla1NFTnLSJUByolJ6PC8YliKOCdsdAl6X4vJ84Yl0Q9cVR4reLadoAPu0J8tJYsBejazc43cz4BIkl7hqGVL/P9aAso3DY1fRT7TMcH8/mWITdkfFY8pR1I0R7iAgVjkykNZG+dDeieDBMrb/xX+NmCETdZ+FAyhCqZdE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774507365; c=relaxed/simple;
-	bh=ftNBq7/p9OU6CGlLtac2IhrmzluXOuKkzay9bsyEyCI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aESz3jZkD1RJSK5jNUCv6VWTfqmu8N/vzr3PakFan6rF4wQklI0BcPA4J+PwklY2v6pxYXF77qkbFqciXR/+/HsxKRkh7y8AK+WFMCkO0K4+pNaYfXV0YM0ovoiAwVU9quYVHjf9IEXFe8t7s2Cy26p770Xtw6ftZTqZDHK7UyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id C158568C4E; Thu, 26 Mar 2026 07:42:39 +0100 (CET)
-Date: Thu, 26 Mar 2026 07:42:39 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
-	Tejun Heo <tj@kernel.org>, Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH v2 09/26] block/blk-zoned: Add lock context annotations
-Message-ID: <20260326064239.GA24534@lst.de>
-References: <20260325214518.2854494-1-bvanassche@acm.org> <20260325214518.2854494-10-bvanassche@acm.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EB138E5F6
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 06:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774508345; cv=pass; b=f/KkIA+5H02GjMZRmTFdKVHuirMWuuU3jDdZh3uUqF1rHCfoU4blcWi+E0VLSxBE0Q99eLyN+qQdQTUJn+k/lvxz9voRcT5O8MZs0dMkMgeWF/8G3XEcHEv9wkDI7lTWHnxzV3R6tepVqT36Zy7AReWsWy7nsBHxi8W7w3Zs3Wk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774508345; c=relaxed/simple;
+	bh=x+y5p6kbctWnERgNgUgu9T+qQ8dWB1UZlWknjPh3g8g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GbTGEiy+3mEWkKDdGHcXWwz5FAeGfr/h7xkVVqRrgfvBeFWUNEnmBd2liwwkN/j+JNyGmFsAT09+Vzvpf7JP5ytpwAa1RoiP8Hff+/Bp8q5U/8tOn9C5zhmt6HzshfXNnfe+fAkzM73Ja4Ym4TuqgZx6LCj13BVJq7dxnU+ixHo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=bFzo4d+K; arc=pass smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="bFzo4d+K"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-66a87f29614so129368a12.2
+        for <linux-block@vger.kernel.org>; Wed, 25 Mar 2026 23:59:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774508342; cv=none;
+        d=google.com; s=arc-20240605;
+        b=B2icGYXAUkBBXyVkEX2pKJROaejtLhtjeTmlquyZmXSUcjAkg50zq9c5CmoCquWs33
+         7Wsmrm9g1McOrHNJd7QMEF0YQbPBDjp82DTgDD6ncNvwMUwqghETCPuvAMM0PqWrdb9c
+         sL+l/BvR+affPtWG5g6Zss9nNa4dP/4oWdq2vSsQzH21GWCS4RoKX/GKJtG/Ux6sAiCS
+         hrjDUg0n8MShr+q5gm1rFDBhXVbIyDE+H+gMlJmicWcpt62Wdjy7avZHUBPLKCI+WISA
+         zlXE5ZqE3w+XhEju+kJV+TkCAC+SNd5RHIEu2lW0Fb+3AXomslPmx2S42PVcGWPzwD9e
+         rHTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IdUcrKjMUfAdqWnWyjhXmvxYFjE633xWeZn2/aGTBeo=;
+        fh=txKoBBwG0vrLwvd1t+yY9Rfe05QXbM903xRcOdsSmFs=;
+        b=hokKpU+TpHu2roNzfkQFmOZDhT6ylnakTJIHtnrb3NMntsRlmteCJHm3ubkN4ctb9L
+         Y8JNKOWPV0Mw0tqLIVHR3OP/3xpSqKOkqvkLCSXFEL49qvlAf4AMo6/d0kT9uZ5HTpyk
+         GvdsmJBewVG2RzMAG1nW4vrv1LSkUSSMfWlRAmdGuEaZUSmHtXEq5Ddo1C0gm0rkQWfm
+         4bEnqi0GkMnfFk/22xeZnLUy3oCC6NYpbw33i/9KtybvahnEvemxTia3jdvW5MWBIANc
+         MbU8AIjyPg1MCcLE1mh8N/NlihjoJMKCcYf2TCwH6LVx4CFPpqM0qHpWVJu8fFEBn91P
+         wjvg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1774508342; x=1775113142; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IdUcrKjMUfAdqWnWyjhXmvxYFjE633xWeZn2/aGTBeo=;
+        b=bFzo4d+KJcn59MB7pJTBz0+ncHmxWocYaJ5SMu96Z8UrZsDbhvs1g/wRvrSndDoQD4
+         +y+4Ar/ZVxg73BwDN65J5CE5TyL1VYg2Mh7YKsApLYG64DLV62IUuyr5tAoHBcIZHqmG
+         Ui5h4lyELubeB/LO4YQQmAH4ADx5BsKkhM7hiSo8ov3LU/NT9DJKfQkZ0/3ZgLtQntY2
+         AU8+GjrcFVfsyxPyxd9TEmSkbWESC3JJapo1DkhKQyTXUeQykKXyJ6jjpAw0OqFIsLM3
+         T/Oj0otfidg/bWB4msj2AQDG1jW7+rDPPr44xF8ocNd9hmnUlH0ao5RD4g+ZsgBpEi1b
+         P/xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774508342; x=1775113142;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IdUcrKjMUfAdqWnWyjhXmvxYFjE633xWeZn2/aGTBeo=;
+        b=YhAag2XfYZGjOzLFBUPyPIyBLuwQrw1WHKRuWmN40CakWDG+PLTPXMXWsF+yIjbpY5
+         nIrmDEnJMDuiFagN9PjurTObU0vewyh2FnT5nT29Iq0cxlpBvqXGLiiSeFRUtU6BYNwr
+         nPm9p9XsLSa7VCNdMr/3pQHDwhVvrt9ylB4T1eAV2pMDHC4X3XxVM/F9K/UnpydPy0MA
+         Fd+Pfq45LiK7m9OEAx5W0hu91+TyfnuMeGUqkJrQB+mS0OzEk3Vp1Pv1Rc7mcSNrRAqS
+         VFkn/uCa662o7on52KToJzZpiI16Wk11Flz8hI3TnKFQn5MeLV4ttxFvyfX2aW1NmmlX
+         HAFg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLq2BE6tpdjO5ePxDhxDPHB9qTMwsgyvRoHYdFCWTcx4oqLKheSLMfLBIQ3SAXCuVnQWddl1LiZErHEA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YydAZk+4cfP6w92U5jssb09TGcCRWdjTEy3Anb+byY39hanlDzq
+	bL8ObbCVnxpSIKtRCPqzWWtByby1HEBqvRnWZ3vQ1OWiSWHSplBdEamfTi028g7cwQPebq+vOgc
+	bCSXjOn0sFqSUIMWG0YZeQG7L44HPgNXCnEDPzGY02g==
+X-Gm-Gg: ATEYQzzC5zmWz+VQeQa7YjpKyCRO4+t/JXLOrjGvMfZQb/5bR1/QgL+J9Gb6ZRhXl0h
+	HNJ77uqD8JppEcs8uHS4AqnT5r8DszsmCiwrqFfGWxFvRPPdl6g+j8/zcYIj2A7OwnmpLX39wVR
+	b89rnOdUD3a94qxf8fdQuQKqQ40lJF9moVMQqc78vj+zg0HKcGS4rhEGLhBfn40dufkE9soAvnK
+	aa6Uy3wm+OSdrNc5aG6LeeVpSOmyRK0Rweat9Q8xkc4Y2QlwCGWQHtmbwGhNOf5gFkap4DkFjUG
+	6AFIFfo7j76jw5s78vSvyny6IXvNBZo+nvKRoC8=
+X-Received: by 2002:a17:907:7b9f:b0:b97:4e42:23cb with SMTP id
+ a640c23a62f3a-b9a3f138b21mr184509566b.2.1774508341817; Wed, 25 Mar 2026
+ 23:59:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260325214518.2854494-10-bvanassche@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <20260325214518.2854494-1-bvanassche@acm.org> <20260325214518.2854494-26-bvanassche@acm.org>
+In-Reply-To: <20260325214518.2854494-26-bvanassche@acm.org>
+From: Jinpu Wang <jinpu.wang@ionos.com>
+Date: Thu, 26 Mar 2026 07:58:50 +0100
+X-Gm-Features: AQROBzBNzk2rmHUtL8EMWIZJNKe8fCzo6ukNZnc-FnUqxjEw1aORywM90l5OoTg
+Message-ID: <CAMGffEmo7fGBkyFFZyPf+7-Fkd5vmOxLC_WYzGfbQu30f1JaCA@mail.gmail.com>
+Subject: Re: [PATCH v2 25/26] rnbd: Enable lock context analysis
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>, Nathan Chancellor <nathan@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 25, 2026 at 02:44:50PM -0700, Bart Van Assche wrote:
->  int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
->  			   unsigned int cmd, unsigned long arg)
-> +	__cond_acquires(0, bdev->bd_mapping->host->i_rwsem)
->  {
->  	void __user *argp = (void __user *)arg;
->  	struct blk_zone_range zrange;
+On Wed, Mar 25, 2026 at 10:46=E2=80=AFPM Bart Van Assche <bvanassche@acm.or=
+g> wrote:
+>
+> Let Clang verify lock and unlock calls. Enable lock context analysis in t=
+he
+> Makefile.
+>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
 
-This looks wrong, the lock is just conditionally taken inside the
-function and dropped again.  This cleanup should fix the lock annotation
-issues:
 
----
-From 99e701882a9026f56cf6940d858e92ce51d86638 Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Thu, 26 Mar 2026 07:37:43 +0100
-Subject: block: refactor blkdev_zone_mgmt_ioctl
-
-Split the zone reset case into a separate helper so that the conditional
-locking goes away.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-zoned.c | 41 ++++++++++++++++++-----------------------
- 1 file changed, 18 insertions(+), 23 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 9d1dd6ccfad7..d370d871d019 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -412,20 +412,32 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, unsigned int cmd,
- 	return 0;
- }
- 
--static int blkdev_truncate_zone_range(struct block_device *bdev,
--		blk_mode_t mode, const struct blk_zone_range *zrange)
-+static int blkdev_reset_zone(struct block_device *bdev, blk_mode_t mode,
-+			     struct blk_zone_range *zrange)
- {
- 	loff_t start, end;
-+	int ret = -EINVAL;
- 
-+	inode_lock(bdev->bd_mapping->host);
-+	filemap_invalidate_lock(bdev->bd_mapping);
- 	if (zrange->sector + zrange->nr_sectors <= zrange->sector ||
- 	    zrange->sector + zrange->nr_sectors > get_capacity(bdev->bd_disk))
- 		/* Out of range */
--		return -EINVAL;
-+		goto out_unlock;
- 
- 	start = zrange->sector << SECTOR_SHIFT;
- 	end = ((zrange->sector + zrange->nr_sectors) << SECTOR_SHIFT) - 1;
- 
--	return truncate_bdev_range(bdev, mode, start, end);
-+	ret = truncate_bdev_range(bdev, mode, start, end);
-+	if (ret)
-+		goto out_unlock;
-+
-+	ret = blkdev_zone_mgmt(bdev, REQ_OP_ZONE_RESET, zrange->sector,
-+			       zrange->nr_sectors);
-+out_unlock:
-+	filemap_invalidate_unlock(bdev->bd_mapping);
-+	inode_unlock(bdev->bd_mapping->host);
-+	return ret;
- }
- 
- /*
-@@ -438,7 +450,6 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	void __user *argp = (void __user *)arg;
- 	struct blk_zone_range zrange;
- 	enum req_op op;
--	int ret;
- 
- 	if (!argp)
- 		return -EINVAL;
-@@ -454,15 +465,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 
- 	switch (cmd) {
- 	case BLKRESETZONE:
--		op = REQ_OP_ZONE_RESET;
--
--		/* Invalidate the page cache, including dirty pages. */
--		inode_lock(bdev->bd_mapping->host);
--		filemap_invalidate_lock(bdev->bd_mapping);
--		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
--		if (ret)
--			goto fail;
--		break;
-+		return blkdev_reset_zone(bdev, mode, &zrange);
- 	case BLKOPENZONE:
- 		op = REQ_OP_ZONE_OPEN;
- 		break;
-@@ -476,15 +479,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		return -ENOTTY;
- 	}
- 
--	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
--
--fail:
--	if (cmd == BLKRESETZONE) {
--		filemap_invalidate_unlock(bdev->bd_mapping);
--		inode_unlock(bdev->bd_mapping->host);
--	}
--
--	return ret;
-+	return blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
- }
- 
- static bool disk_zone_is_last(struct gendisk *disk, struct blk_zone *zone)
--- 
-2.47.3
-
+>
+> ---
+>  drivers/block/rnbd/Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/block/rnbd/Makefile b/drivers/block/rnbd/Makefile
+> index 208e5f865497..42c2cccdb53d 100644
+> --- a/drivers/block/rnbd/Makefile
+> +++ b/drivers/block/rnbd/Makefile
+> @@ -1,5 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-or-later
+>
+> +CONTEXT_ANALYSIS :=3D y
+> +
+>  ccflags-y :=3D -I$(srctree)/drivers/infiniband/ulp/rtrs
+>
+>  rnbd-client-y :=3D rnbd-clt.o \
