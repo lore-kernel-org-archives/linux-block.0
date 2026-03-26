@@ -1,72 +1,80 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64D93BED1B
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 09:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6413BF696
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 09:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774518913; cv=none; b=RJ9dpAF67dbmrHVhvN5iEfhawTYEtsLMrM1uZIQosVFWWAhM+d9NIbQIL70kV32JVJLud6VGIThyhjQL0jCQJIP5i2rl6gbyQYnObavEVh995vwLQLeAiB+lGS7fHbL9SbRYc8sb4zlVx8cHrKPaV+OsaqkiCY/hRDZ/vWosMn4=
+	t=1774518919; cv=none; b=AXwjHEg9cBGWn8NGEzHM2MLltLeh77kq8ksp+j3sYhWeRbsEvzxp/6uhYtYVQk+iQyMFwrB/sLc//PUG8TME+bhMTHKLu65UbyNkBrF7Lyts7IlAar3XtDQ35DWOwKiA1BWsRy6s/mW73Zvc8Ear0MXYr9v4lokExBsV7nrNT7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774518913; c=relaxed/simple;
-	bh=OcbPNXnG/ezx6KsPDRBMMef9MCYy/KlpWJbDBHz3UEY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k9DVOcVdv18OAt+YQDByorWcdDxu0onH091/gDv+1jko2b5FXN0GazzEy/9rx7fjqxcsgc55O1D1B2aILyRt0VCa2SNYXoTsejF5sQjMID1EgJPIgzIfAwcowNxsWKARSXjmt38jQP75m531IiWPwDGQygMF89UrMu3gGieMLgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mMw9FFYi; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mxnNgLTD; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mMw9FFYi; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mxnNgLTD; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1774518919; c=relaxed/simple;
+	bh=RkkBpF3L87rXPRrGMrmQZXeEBfTEFrhE0WIyjhBNgtA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GIOzJRcqGkIWJxOM+D8ofPPdb9rFjA3MRCHqCMwis0dYjhohQgM2Ud2lQdJ1UHsGPucqxGZG6qHu0T/fTblZan4YL3ePNXW7MqnyrJV+yGyaoBVbzffmEo962nkVR8ekTkUigNGHuQvUeFuhr1OZ59GO8w17V1SgQGj6HwgaIvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FP0IFOVL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=BmTYABnQ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FP0IFOVL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=BmTYABnQ; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mMw9FFYi";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mxnNgLTD";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mMw9FFYi";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mxnNgLTD"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FP0IFOVL";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="BmTYABnQ";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FP0IFOVL";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="BmTYABnQ"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D268A4D279;
-	Thu, 26 Mar 2026 09:54:56 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0C49E5BD8A;
+	Thu, 26 Mar 2026 09:54:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774518896; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=aRkR63p1jpFA0esSQKuE1SlJEZWNddmmmMLZ5RvIZyY=;
-	b=mMw9FFYiJgTxvm2jOoucSvEKz2U7CWOrgzoVrYMEGvgYO0FGfAB2yFocxUaY+FxiEi4+sm
-	fiNUs6Vwt3Yf25EW3iASny5GWdj+U/7+jMxHQxUIincKucdzTko0bFAcmnNJ8fP8Enhsb9
-	yYtmoNsJNWG1SfV6u+1nH/K2lxYQ+Wo=
+	t=1774518897; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UKch3cA360fq6oe1hSv7172yeidWMBNx7GuKOSTC8+c=;
+	b=FP0IFOVLysghcpqVbJ03MdX6UHraRclKDo3dlVL1UFh8G6/BbnR71znq4V05rL1CfNpjvl
+	0rqQOnijioZD5b8+J3ZmHcvF/8kKjTbGoZU7O4GNM0CL48bJkfTJSP2mO0MWZia+f1CKbR
+	IvjdtnIOkZ6DdTR9bTvu9Oc2amsQg2Q=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774518896;
+	s=susede2_ed25519; t=1774518897;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=aRkR63p1jpFA0esSQKuE1SlJEZWNddmmmMLZ5RvIZyY=;
-	b=mxnNgLTDh78L6iaUILUrTIWzmlO0FdM/XohW5IMysSSlwlXT+3PbizvPRt0y30KMYRyFzS
-	audeizPvgreVrhAA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=mMw9FFYi;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=mxnNgLTD
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UKch3cA360fq6oe1hSv7172yeidWMBNx7GuKOSTC8+c=;
+	b=BmTYABnQ95hB3DqtwiWJ0l4pzqyRfE8C6ZKjEVy7eCjj7bHeAr5UwAoolgptjYwzKFscX1
+	DdERTvCfF5PONRDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774518896; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=aRkR63p1jpFA0esSQKuE1SlJEZWNddmmmMLZ5RvIZyY=;
-	b=mMw9FFYiJgTxvm2jOoucSvEKz2U7CWOrgzoVrYMEGvgYO0FGfAB2yFocxUaY+FxiEi4+sm
-	fiNUs6Vwt3Yf25EW3iASny5GWdj+U/7+jMxHQxUIincKucdzTko0bFAcmnNJ8fP8Enhsb9
-	yYtmoNsJNWG1SfV6u+1nH/K2lxYQ+Wo=
+	t=1774518897; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UKch3cA360fq6oe1hSv7172yeidWMBNx7GuKOSTC8+c=;
+	b=FP0IFOVLysghcpqVbJ03MdX6UHraRclKDo3dlVL1UFh8G6/BbnR71znq4V05rL1CfNpjvl
+	0rqQOnijioZD5b8+J3ZmHcvF/8kKjTbGoZU7O4GNM0CL48bJkfTJSP2mO0MWZia+f1CKbR
+	IvjdtnIOkZ6DdTR9bTvu9Oc2amsQg2Q=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774518896;
+	s=susede2_ed25519; t=1774518897;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=aRkR63p1jpFA0esSQKuE1SlJEZWNddmmmMLZ5RvIZyY=;
-	b=mxnNgLTDh78L6iaUILUrTIWzmlO0FdM/XohW5IMysSSlwlXT+3PbizvPRt0y30KMYRyFzS
-	audeizPvgreVrhAA==
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UKch3cA360fq6oe1hSv7172yeidWMBNx7GuKOSTC8+c=;
+	b=BmTYABnQ95hB3DqtwiWJ0l4pzqyRfE8C6ZKjEVy7eCjj7bHeAr5UwAoolgptjYwzKFscX1
+	DdERTvCfF5PONRDg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B39D94A0A6;
-	Thu, 26 Mar 2026 09:54:56 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 034824A0A6;
+	Thu, 26 Mar 2026 09:54:57 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id P54yK3ACxWmeYAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 26 Mar 2026 09:54:56 +0000
+	id 6IvLAHECxWmyYAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Thu, 26 Mar 2026 09:54:57 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 6A209A0976; Thu, 26 Mar 2026 10:54:48 +0100 (CET)
+	id 9BEA6A0B63; Thu, 26 Mar 2026 10:54:48 +0100 (CET)
 From: Jan Kara <jack@suse.cz>
 To: <linux-fsdevel@vger.kernel.org>
 Cc: <linux-block@vger.kernel.org>,
@@ -84,151 +92,71 @@ Cc: <linux-block@vger.kernel.org>,
 	linux-aio@kvack.org,
 	Benjamin LaHaise <bcrl@kvack.org>,
 	Jan Kara <jack@suse.cz>
-Subject: [PATCH v3 0/42] fs: Move metadata bh tracking from address_space
-Date: Thu, 26 Mar 2026 10:53:54 +0100
-Message-ID: <20260326082428.31660-1-jack@suse.cz>
+Subject: [PATCH 06/42] ufs: Drop pointless invalidate_mapping_buffers() call
+Date: Thu, 26 Mar 2026 10:54:00 +0100
+Message-ID: <20260326095354.16340-48-jack@suse.cz>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260326082428.31660-1-jack@suse.cz>
+References: <20260326082428.31660-1-jack@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4261; i=jack@suse.cz; h=from:subject:message-id; bh=OcbPNXnG/ezx6KsPDRBMMef9MCYy/KlpWJbDBHz3UEY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBpxQIxTA34/xtU7IgqXiNrsxzCFcUYmjrIjwuOu RDjeyFNXc6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCacUCMQAKCRCcnaoHP2RA 2flRCADUBXWyzZCdBg87axquExTTc4wlsGjblaPAMJfU3zifFLDeVwWmLLmik7Pj8xaFEGkNv5c 7NcDloLN9y1e16RUdr3IuzqynO9S5A0uYJo6eXgwpuhZPSlqFBmpTwTCuPPQ1xzrctDqN/mUqc9 w6L1SNBE+z+S4V3uxEtqURRIo08bTJqMh0K7XajYSiscBEVomuwoFqhHlTzN6utd6Vee57pZBRU 1EQUCunm6C7HIkc5q63JnTAZnFz60X5t1BwDoxjkebaad2qFmmf1hIRpFn0/zB8u2Yxw5IdNCWN 9OLAVCh8JXchU1pisDLogFOi+h50+5jyFV+M3wstbDEipslp
+X-Developer-Signature: v=1; a=openpgp-sha256; l=595; i=jack@suse.cz; h=from:subject; bh=RkkBpF3L87rXPRrGMrmQZXeEBfTEFrhE0WIyjhBNgtA=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBpxQI31WeqiG0jNa0YkM8N4dWqoWPubtNi4LGzk SOQHx+qqECJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCacUCNwAKCRCcnaoHP2RA 2UfKB/9DDO+b9sLudpGGjgiD2JAI03bZrlps0G27v4opMDq49NWLPuD0MGyMo58IrZj79u3Vr9j UDgz7kBwQj7J5sdNzmUQs3BgQOtRV5VqWak/r/DNnWYtASVZnIsKc2o85PdBR1a7myJuBamquJh xEoaUu8rAh48Sd/3d/bTPHtVpTfpgx57KSBwuLBTeMwv0j2ROLNGSqjOBk1F1JJLV6K7i8XPQF7 4BGfq8UYL3RDrjL+STwQSRl5GqfPTF15xYnU+778k6o7XklGuIjUeKf7Pu10RiUp6o9hHcKHr/B N+L0I+LYymR6f0g9C/bgDKRreCpF1IYMjXFv97na0cMbkdzY
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.51 / 50.00];
+X-Spamd-Result: default: False [-1.30 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	ARC_NA(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	FROM_EQ_ENVFROM(0.00)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,ZenIV.linux.org.uk,mit.edu,gmail.com,suse.com,mail.parknet.co.jp,linux.dev,suse.de,kvack.org,suse.cz];
-	TO_DN_SOME(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLck8brw5hxmszoarioc7838it)];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
+	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Rspamd-Action: no action
 X-Spam-Flag: NO
-X-Spam-Score: -1.51
+X-Spam-Score: -1.30
 X-Spam-Level: 
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: D268A4D279
 
-Hello,
+UFS doesn't call mark_buffer_dirty_inode() and thus
+invalidate_mapping_buffers() never has anything to drop. Remove the
+pointless call.
 
-here is a next revision of the patchset cleaning up buffer head metadata
-tracking and use of address_space's private_list and private_lock. Functionally
-this should be identical to v2, most of the changes were in improving
-changelogs, patch ordering, function names, etc. The patches have survived some
-testing with fstests and ltp however I didn't test AFFS and KVM guest_memfd
-changes so a help with testing those would be very welcome.  Thanks.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/ufs/inode.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Changes since v2:
-* Added Reviewed-by tags from Christoph
-* Dropped the patch unifying fsync implementation in fs/libfs.c and fs/buffer.c
-* Put fsync locking change into a separate commit
-* Reordered series to place all fsync path modifications close together
-* Improved some changelogs
-* Renamed some functions based on Christoph's feedback
+diff --git a/fs/ufs/inode.c b/fs/ufs/inode.c
+index e2b0a35de2a7..77617a31d517 100644
+--- a/fs/ufs/inode.c
++++ b/fs/ufs/inode.c
+@@ -853,7 +853,6 @@ void ufs_evict_inode(struct inode * inode)
+ 		ufs_update_inode(inode, inode_needs_sync(inode));
+ 	}
+ 
+-	invalidate_inode_buffers(inode);
+ 	clear_inode(inode);
+ 
+ 	if (want_delete)
+-- 
+2.51.0
 
-Changes since v1:
-* Fixed hugetlbfs handling of root directory
-* Reworked mapping_metadata_bhs handling functions to get the tracking
-  structure as an argument so we now don't need iops method to fetch the struct
-  from the inode
-* Reordered patches into more sensible order
-* Added patch to merge two mostly duplicate generic fsync implementations
-* Added Reviewed-by tags
-* Couple more minor changes that were requested during review
-
-Original cover letter:
-
-this patch series cleans up the mess that has accumulated over the years in
-metadata buffer_head tracking for inodes, moves the tracking into dedicated
-structure in filesystem-private part of the inode (so that we don't use
-private_list, private_data, and private_lock in struct address_space), and also
-moves couple other users of private_data and private_list so these are removed
-from struct address_space saving 3 longs in struct inode for 99% of inodes.  I
-would like to get rid of private_lock in struct address_space as well however
-the locking changes for buffer_heads are non-trivial there and the patch series
-is long enough as is. So let's leave that for another time.
-
- block/bdev.c                |    1 
- fs/affs/affs.h              |    2 
- fs/affs/dir.c               |    1 
- fs/affs/file.c              |    1 
- fs/affs/inode.c             |    2 
- fs/affs/super.c             |    6 
- fs/affs/symlink.c           |    1 
- fs/aio.c                    |   78 +++++++-
- fs/bfs/bfs.h                |    2 
- fs/bfs/dir.c                |    1 
- fs/bfs/file.c               |    4 
- fs/bfs/inode.c              |    9 +
- fs/buffer.c                 |  387 +++++++++++++++++---------------------------
- fs/ext2/ext2.h              |    2 
- fs/ext2/file.c              |    1 
- fs/ext2/inode.c             |    3 
- fs/ext2/namei.c             |    2 
- fs/ext2/super.c             |    6 
- fs/ext2/symlink.c           |    2 
- fs/ext4/ext4.h              |    4 
- fs/ext4/file.c              |    1 
- fs/ext4/inode.c             |    9 -
- fs/ext4/namei.c             |    2 
- fs/ext4/super.c             |    9 -
- fs/ext4/symlink.c           |    3 
- fs/fat/fat.h                |    2 
- fs/fat/file.c               |    1 
- fs/fat/inode.c              |   16 +
- fs/fat/namei_msdos.c        |    1 
- fs/fat/namei_vfat.c         |    1 
- fs/gfs2/glock.c             |    1 
- fs/hugetlbfs/inode.c        |   10 -
- fs/inode.c                  |   24 +-
- fs/minix/file.c             |    1 
- fs/minix/inode.c            |   10 +
- fs/minix/minix.h            |    2 
- fs/minix/namei.c            |    1 
- fs/ntfs3/file.c             |    3 
- fs/ocfs2/dlmglue.c          |    1 
- fs/ocfs2/namei.c            |    3 
- fs/udf/file.c               |    1 
- fs/udf/inode.c              |    2 
- fs/udf/namei.c              |    1 
- fs/udf/super.c              |    6 
- fs/udf/symlink.c            |    1 
- fs/udf/udf_i.h              |    1 
- fs/udf/udfdecl.h            |    1 
- include/linux/buffer_head.h |    6 
- include/linux/fs.h          |   11 -
- include/linux/hugetlb.h     |    1 
- mm/hugetlb.c                |   10 -
- virt/kvm/guest_memfd.c      |   12 -
- 52 files changed, 360 insertions(+), 309 deletions(-)
-
-								Honza
-
-Previous versions:
-Link: http://lore.kernel.org/r/20260303101717.27224-1-jack@suse.cz # v1
-Link: http://lore.kernel.org/r/20260320131728.6449-1-jack@suse.cz # v2
