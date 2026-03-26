@@ -1,121 +1,154 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E293F99CD
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 14:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75499364049
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 14:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774535181; cv=none; b=Y0JycUVolS8MVmkIsEB2YDRhLoP7+3Je0//Djc7CfchsPgOQHz7/Moa1Wr0LTlE55DChpJzImEgetW15B/QWLt0V5cS+G6lxGKSmj3k1ta1FHTtsjudkXCW1B0cgxZNre6qJA7ILT6s9O3hbws//h+7Tj37T5dwISlfEwA9swxU=
+	t=1774536071; cv=none; b=Ctkk0qhtsKiOSHA22GM2Bvs9o4giEmFGb4QSLXVJK3If7gazamNdyaQzMllu2zP+/bInOP/dJ/OhiTFx0ZDXkmbXbZJ51krehEhPJqeNi/uHMuNa15aJYEwrdADRnDrEU/LId62eoQEE6ET2zYXUGCvcMuwnypr9Ovkn/YLg2bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774535181; c=relaxed/simple;
-	bh=6Hv9yoKIKwxTtz3CTjyWdTAt9zBbZOsdr/QjKnf0beI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rddtSfP2V8a3CEOWYsex43sQE9a04A40730OvjD2cABE3V6M/92rjDxp3xQAV/fAzVXukBScvDmguk1XW16LPLEmO7YxGxpNz6hfv626614ccZuCrG0EHgreC/SwznjLQz6UtxVKppeDBotQ8FKv4hrHBPfatvgxCX2mzFHuDG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=miiofPK1; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1774536071; c=relaxed/simple;
+	bh=N3tNyF++LQGvDb388xzI0rH9GxGkrrzCY5McsCsoLXI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uQGjyPkwkk2f6DTkYa2fGrE7ba2ZUBbVoLRUtFLEmSF05VGcpw5rPmUF0fZXe5fi4WeSK9R+kP5F+pad0sZPEzFIoCu0DtZ3eom6QS+C9TS/FgAZRvYpcR8MU82EJ+ZkTvW0Fi6Zp7a5Xa0WLf+gxdNlSnUV4f22CEAbqcxgtQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QelhRizN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="miiofPK1"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-439b9b190easo715934f8f.2
-        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 07:26:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1774535177; x=1775139977; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D2Q2L6QPYD77pFkuLTamPUn8SCwVh3rf5WS9Lfg0NYM=;
-        b=miiofPK1ysa6TeJaSG4fhhRa2ofxi/fWIPkBT7GE+L3kBoztwLURixxUIxP382VmKS
-         LzjE0infn6o8jrwjjy0qdIwXLUBy7ayGQT/9MLNEboW5A4fv5LAQPyLKavzqg2cq5BDJ
-         z9fzlMfKase65GyHnrWC4J+iDrKrPbtbkTwbapRqEiAKmZ4X5PJlLLM2y+LKbr4drA2/
-         wWDH1CzLR4h/IOttgkjbmnEmrb2tMdiA2kRIqbERgmceN68qobLKFst6W2xMaSg7tNAP
-         ibNojiB52RthRAsHa1GBRC/I8K5RZAHCbjIWWViTHbmXaUbjef8axTuJLnEtOTlQmGFr
-         WGFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774535177; x=1775139977;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D2Q2L6QPYD77pFkuLTamPUn8SCwVh3rf5WS9Lfg0NYM=;
-        b=NS+8lMWvZKB/BrzHqo7en1MDN1coElqTLC42MeABxhXSOieBk/rEk3gXrgdlEtovGn
-         4d2yNZrUO1AxNhzh+JZcrN3u5vKReoFiTu8WgHS2BWm9ff1OU1g14KSy+nleRgMz/n8u
-         rxol4lP1iWHLJsOVf5u0SsCg3sJmdjlzSiliEXRFa1cpaP95iG93EsJSx6HB1c8uIYsD
-         Rixj03GtXxX4czBYltFGITiEb0TNhPMJwcMJQNCF7QHVROn3szKjArlrzV0J+Z4y2hWr
-         lMQ6UUY4koHcS0tHbGMB3W87Ny8T1ZJ5orAQpse9pQVkWGU1tDk+x7KL7z3sFajiUHNh
-         oxcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdt04dbI9IOijU8oKe9VfKdVffmaRFMcu+UuwP3GIWEErstrENMK41L63eX8us/jwJooc6ctdZFeusHA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtWR6aOs2dbHv0p6LqE50X1WRDh/WvZAweqbw6/cKv9ZuFfmvG
-	4fijIDKvEknUEE0OHj6073z35CkmtQekRiV8VkEAG3BV/lsI6EMzplD/4Vk1wI0MSvk=
-X-Gm-Gg: ATEYQzxpqZG6EvZKVmi9Fdpfyo7GFh5H5+bhsBtxldFbmwKVpV3gnZutx4Flie1IiV+
-	rAwfAdx/gRBV93HEUFMfgtgLtxtgAEbl9sqpmiX12auTKpV2lBO4Ood3lTvr4i5qLu8msT4icFA
-	EoW9ojKqjog0EslK0pxzI/h4kckZ3BIhmta12bpswnimSUD5AKN8HTbuNlB2VWazyuSGgcAcJuL
-	iRWnhWUdmCDew6WKOTPJYIBuqgaCw6abkf+VVUbYsmiOqD5TRjlg6AD7wCyJTzCHwEgiQ3EZVj6
-	RtaMylvWwNZSzADuq3wfiiIwnzy4BJKTitLEYc5srNOr8TR9IAYvegzidC2yDo7oBZISdZN4xH9
-	6CEi75vmoVbo6DUB+Uk3zf2t2kA3zHDFMinRf3Tua7/ULdDtfm6/QsuwcXBPWPj0DO3AAJIle+V
-	ccUPAHzU57fGE/157IIQRb0hxRPqf6RockEh6g2XGdI+cfqBGZlHg3BACYCB90H8aniv5lRWbuK
-	B7U6B88bse4blMuELo=
-X-Received: by 2002:a5d:5f83:0:b0:43b:4273:a6d2 with SMTP id ffacd0b85a97d-43b889af3f6mr11954568f8f.13.1774535176699;
-        Thu, 26 Mar 2026 07:26:16 -0700 (PDT)
-Received: from [10.43.5.171] (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b919df85csm11907248f8f.28.2026.03.26.07.26.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2026 07:26:16 -0700 (PDT)
-Message-ID: <af0dab46-3a73-4756-bea6-7cef66bb8d5e@linbit.com>
-Date: Thu, 26 Mar 2026 15:26:14 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QelhRizN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774536068;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2tHVA1Ng8MAmkH4viRjejvgap4agzC3k6mGhfxyOjhY=;
+	b=QelhRizNxR+gozrUcd1o7vpzSTmy4rRtmXUw16pd6zAxfvTEtvC0mnGyTsPqP9z56rapkv
+	wXzAcOq/yzHZTiAEyujXjpalU2FIlelIUWKlhcbCrC45cn8vPqTaFr7scPnfl4ELJ+RIPC
+	9PAQ35vaOHSF69dBpHHR77ZQfZ7OgEE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-515-CR_kASp4PB2HaAbi5UjRig-1; Thu,
+ 26 Mar 2026 10:41:06 -0400
+X-MC-Unique: CR_kASp4PB2HaAbi5UjRig-1
+X-Mimecast-MFC-AGG-ID: CR_kASp4PB2HaAbi5UjRig_1774536066
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC6E51800620;
+	Thu, 26 Mar 2026 14:41:05 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.100])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6BC601800765;
+	Thu, 26 Mar 2026 14:41:03 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH V2] bio: fix kmemleak false positives from percpu bio alloc cache
+Date: Thu, 26 Mar 2026 22:40:58 +0800
+Message-ID: <20260326144058.2392319-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] drbd: Add check for error pointer
-To: Ethan Tidmore <ethantidmore06@gmail.com>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260317232318.18923-1-ethantidmore06@gmail.com>
- <20260317232318.18923-5-ethantidmore06@gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-In-Reply-To: <20260317232318.18923-5-ethantidmore06@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 3/18/26 00:23, Ethan Tidmore wrote:
-> The function find_cfg_context_attr() can return an error pointer or NULL
-> in its error path.
-> 
-> Change NULL check to IS_ERR_OR_NULL().
-> 
-> Detected by Smatch:
-> drivers/block/drbd/drbd_nl.c:6571 drbd_adm_dump_paths() error:
-> 'resource_filter' dereferencing possible ERR_PTR()
-> 
-> Fixes: 626c95b0e2a23 ("drbd: rework netlink interface for DRBD 9 multi-peer config")
-> Signed-off-by: Ethan Tidmore <ethantidmore06@gmail.com>
-> ---
->   drivers/block/drbd/drbd_nl.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-> index c5e253820ccf..1f458eb972e9 100644
-> --- a/drivers/block/drbd/drbd_nl.c
-> +++ b/drivers/block/drbd/drbd_nl.c
-> @@ -6566,7 +6566,7 @@ static int drbd_adm_dump_paths(struct sk_buff *skb, struct netlink_callback *cb)
->   	resource = (struct drbd_resource *)cb->args[0];
->   	if (!cb->args[0]) {
->   		resource_filter = find_cfg_context_attr(cb->nlh, T_ctx_resource_name);
-> -		if (resource_filter) {
-> +		if (!IS_ERR_OR_NULL(resource_filter)) {
->   			retcode = ERR_RES_NOT_KNOWN;
->   			resource = drbd_find_resource(nla_data(resource_filter));
->   			if (!resource)
+When a bio is allocated from the mempool with REQ_ALLOC_CACHE set and
+later completed, bio_put() places it into the per-cpu bio_alloc_cache
+via bio_put_percpu_cache() instead of freeing it back to the
+mempool/slab. The slab allocation remains tracked by kmemleak, but the
+only reference to the bio is through the percpu cache's free_list,
+which kmemleak fails to trace through percpu memory. This causes
+kmemleak to report the cached bios as unreferenced objects.
 
-find_cfg_context_attr is also called identically in 3 other cases, so 
-these have the same issue.
-I've also fixed these 3 cases in my squash.
+Use symmetric kmemleak_free()/kmemleak_alloc() calls to properly track
+bios across percpu cache transitions:
 
-Regards,
-Christoph
+ - bio_put_percpu_cache: call kmemleak_free() when a bio enters the
+   cache, unregistering it from kmemleak tracking.
+
+ - bio_alloc_percpu_cache: call kmemleak_alloc() when a bio is taken
+   from the cache for reuse, re-registering it so that genuine leaks
+   of reused bios remain detectable.
+
+ - __bio_alloc_cache_prune: call kmemleak_alloc() before bio_free() so
+   that kmem_cache_free()'s internal kmemleak_free() has a matching
+   allocation to pair with.
+
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- rebase on for-7.1/block
+	- add helper of bio_slab_addr()
+
+ block/bio.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/block/bio.c b/block/bio.c
+index 77067fa346d3..c8234d347fc5 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -18,6 +18,7 @@
+ #include <linux/highmem.h>
+ #include <linux/blk-crypto.h>
+ #include <linux/xarray.h>
++#include <linux/kmemleak.h>
+ 
+ #include <trace/events/block.h>
+ #include "blk.h"
+@@ -116,6 +117,11 @@ static inline unsigned int bs_bio_slab_size(struct bio_set *bs)
+ 	return bs->front_pad + sizeof(struct bio) + bs->back_pad;
+ }
+ 
++static inline void *bio_slab_addr(struct bio *bio)
++{
++	return (void *)bio - bio->bi_pool->front_pad;
++}
++
+ static struct kmem_cache *bio_find_or_create_slab(struct bio_set *bs)
+ {
+ 	unsigned int size = bs_bio_slab_size(bs);
+@@ -486,6 +492,9 @@ static struct bio *bio_alloc_percpu_cache(struct bio_set *bs)
+ 	cache->nr--;
+ 	put_cpu();
+ 	bio->bi_pool = bs;
++
++	kmemleak_alloc(bio_slab_addr(bio),
++		       kmem_cache_size(bs->bio_slab), 1, GFP_NOIO);
+ 	return bio;
+ }
+ 
+@@ -728,6 +737,9 @@ static int __bio_alloc_cache_prune(struct bio_alloc_cache *cache,
+ 	while ((bio = cache->free_list) != NULL) {
+ 		cache->free_list = bio->bi_next;
+ 		cache->nr--;
++		kmemleak_alloc(bio_slab_addr(bio),
++			       kmem_cache_size(bio->bi_pool->bio_slab),
++			       1, GFP_KERNEL);
+ 		bio_free(bio);
+ 		if (++i == nr)
+ 			break;
+@@ -791,6 +803,7 @@ static inline void bio_put_percpu_cache(struct bio *bio)
+ 		bio->bi_bdev = NULL;
+ 		cache->free_list = bio;
+ 		cache->nr++;
++		kmemleak_free(bio_slab_addr(bio));
+ 	} else if (in_hardirq()) {
+ 		lockdep_assert_irqs_disabled();
+ 
+@@ -798,6 +811,7 @@ static inline void bio_put_percpu_cache(struct bio *bio)
+ 		bio->bi_next = cache->free_list_irq;
+ 		cache->free_list_irq = bio;
+ 		cache->nr_irq++;
++		kmemleak_free(bio_slab_addr(bio));
+ 	} else {
+ 		goto out_free;
+ 	}
+-- 
+2.53.0
+
