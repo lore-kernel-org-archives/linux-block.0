@@ -1,152 +1,438 @@
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A473009F2
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 19:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774553927; cv=pass; b=TA7eTTwAHTnhnCClXG39qbzKJareA4pdb4mkC6etg6WKLsqaXgkMR+EylqSiEk/5QsrcnTbM9wXsjqWQUTvIH/eFuoPD0i9WU4o85y+SxbIUhwa8Q85cmRc4YULbvZyWZUYjVeXm4XbDb2m0/sGVWZL3yZfZJX5LrMKRnG30JZQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774553927; c=relaxed/simple;
-	bh=Db4TAAnVc2T0Rf7Wc2cEY/pwtSDY+KMo+MImooH/kK4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L0bXIXt2+oR/ZMJgANlSybc0xZPaXlkSdQcny5FvzExTXm/zUOGt5ugafLUrKp+ryBhCBc7Sk/oIoHOuJmyB0OHnxbU+qdBAnB/HDUp7GjTf1ONJkwmjrrbS0rhxhZGD83SNnWCyIMzinP7z0zcQIJK+VlyncHm1z+m4tY9TeYE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EDA+SkwS; arc=pass smtp.client-ip=74.125.82.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563F439A7F6
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 20:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774557514; cv=none; b=R5E4gB3t9dPYTqRO8rJgl3OubpHKBxe4tVk+axwtLX2U8Lif2sinTOn1Vc0luFeLrdbF7BWQOM2yEHp93v7ojw8EC77d1sM0Ouggo2S+g94BbTvWPlAV6wNLFYEAN27KhYKZ+k2C09TuuNLP3XnLlKIn6gecWrrsNPcjHyKl2dk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774557514; c=relaxed/simple;
+	bh=Rz7xNSJdryFFh0PBCrn3nH8lMAC1chxZW8AEQ00QK74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TbtCQhFw0/iVTD64PdUw+JldhFeMiE7T2IANA5SnEPjh0tdKd6F3EQ+7b0Gpzd/Xt+636AHBfwCHBSagqLaeezzwXVXcy7jD8YgYRyyBu8p4fKcp8NFXKOsIU38z1YLpK0CYfPfQQ1IBmaW5sprdJTxzWumqiwXhAVssD6hvYAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIpjoCs4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EDA+SkwS"
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-1273349c56bso1761942c88.0
-        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 12:38:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774553923; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ixwAOdye/GtM+EGUXeEBLB8b9U/wovEfSWtYSB+CY0C9djPMWthSQ9rJAySbmQp/8o
-         nShrqUD0R+ktOAvwhdDT+DjvtZxCtet6GXQEr4Fd9HJ3pfyZy+YgvRf8AVZUToENRwhj
-         A0cAeNtcqIjfthLIoBYbL6176TBq/ZhCAjNJbJ1Ov+n9fgiT8lu9F9IBvhjOW+dVNzhX
-         yw5zQ8P0ABlGBblCh78/+mCQi7XHx2fGm/EfdvW0NuZV8XqWKwytU2AQ2qYxGAnTbVh/
-         GH2JhDBNPYgqaOkNPNozJjC4jnwjhWlaY3D+W2O9hJEceWa0P8oE7jG2H/ovsp7nit2L
-         OdsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6mCMJ7IYsFJz0Hh2fdQYOLxKjKcxltIu2zRqwDNj3FY=;
-        fh=NMsIEFgw96sMojPQvcSdDOpyGZ02Flm9OhWMmlqwucQ=;
-        b=M31qRoF5O8WRjGCTeQt3+q+48gnw7DKxy+WfGevRZbHvYLtqHzXS7T2HBQ+8dYI644
-         JYO7YuNFtzHreCToPLs+svuzAriwbQkcc/nljqwpDnW+wYqB4OyRCgmBq3kwD+9i3Pto
-         bfMDdrcPzcavdGRG/AFdqjzOHnyTow9H/zXDst1Rh9WrOzsUUAkeTpwJ7iHq5VDVmqFQ
-         XcNCT9bKM914LAEz77osd31WdxzjHBKpVSuPnh2GkDw6oXYCKRIwwrgjA9Fwo9ttl1bq
-         FnmWGwkwyqvj9wvMG+5UotzLs1w58738t5ViVALo5RC1Jrc+0c3cTzzyudy2dAeUTwDq
-         a0bA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774553923; x=1775158723; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6mCMJ7IYsFJz0Hh2fdQYOLxKjKcxltIu2zRqwDNj3FY=;
-        b=EDA+SkwS9Skn6lYNPPcUJLgJvB0g2H2zN0O0bU6sVAOrOJEV5gJBx/H269PKR7xNZy
-         t2RV9cW/kpdumIBYYfGDND2y1IYmVvqE5oEi/c1JUz9x4FFp9IepN+bDU/SFqKca6aXk
-         G3w10Ot1BKwp1fvdTdA2cDt+C2CcQtuho4Ze8hPrPIbvM7yA/IRwW/tIzDCvjFVa3ldJ
-         3f3H++J8vIfznls60hPlIfaEoQWcJbTJH8ioAzEVIqpx/t7Yl7Sey2GIhmA2aOW4cIzd
-         rZPewUy7/65pw2oxSrqr8zhoVGE0dQK13uH+kLBXeSW2cYPKn0BtfsTf3DYGABQdV0Uy
-         QVJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774553923; x=1775158723;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6mCMJ7IYsFJz0Hh2fdQYOLxKjKcxltIu2zRqwDNj3FY=;
-        b=BWI415TK4ImMQ3KmTIMDxGTFxHCx1HQ6uxEd5FuTP0ScglHuBDXEXXQEdvPgLTl7Ju
-         bT2I91T9/f9HnmpUscSNxknie5bboVbTrhU9fxqFK6GMok4skzIkvcRtx5cIxQvvVHKA
-         YE6kH9brGmZWsBjnCm34RfmIQQbsukhEhw1ETdfiX31VNa1MrorbSiw7AkbhALawJMp6
-         r92xRhUaJRe4F3yCTLVWvYnctUv7LfOsMjpDDxWayqgVS+qM0guvgZI4CbPdzbiaYxh6
-         N2OH7VseMQqY7oOqysE/5pv8ntXLfPx8xSpiVyeD0dpzgwBQ6RsoqIQSSPx9FSqOM6C9
-         IkXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhDE9QWm+NuV5SZEC6Fv1HDzqy32oioGZ7BfzA3W7CKmwQsZU8X1vDgvlDuTZTJNBDRSjky292fTwDmQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuK3qMamOtMZ+z0WGSPz4G/wweA240HPFUxzSqnTKx1l3kW64F
-	iBHIfM8mZYRYCV85YQ117qrCvyv28Sw9gxSgfJBpp0o2iY8B/ruoEggZuNYILG6/BK4/unGrt0T
-	N+2uJKSIzwXJT9p7QtiCZ69FLhRbN9hUrfLz9ERiC
-X-Gm-Gg: ATEYQzz6tx/wFBAVsDzadFF8T5mBMNM+wt1WA2r/X7BO2oHkVVoFaRYyU4SpQx7IXk/
-	j9Xg8VgItLTaOycL/gGgfdoJWJCapdILw24CzNGZihqnKCf2JEGaHHpQT1QrD4/EEgVFthiN32C
-	XL4uAUGKOon6fpzGuxJwpXoHXkeRU2yU28NZqqhCcfwxPquP6VZTWHXxRU+11LUgFAa8ZzW21xB
-	gOjg9mIit6oTBwfPhkyNyKO0UoLI/1id8ozUSYGDmRZ5Rbd0/XZXgYSvh4bcfY6yYVrZr/dMi6Z
-	ItEplm9fDGYpZKJSLyn+YEMGS0kcDP0DQ7ONB1FRSmLFcZbh+8sQaJDv4mKDWgIxSr25ow==
-X-Received: by 2002:a05:7022:ff45:b0:128:d51a:5157 with SMTP id
- a92af1059eb24-12a96f09443mr4300359c88.33.1774553923052; Thu, 26 Mar 2026
- 12:38:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIpjoCs4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7361C116C6;
+	Thu, 26 Mar 2026 20:38:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774557514;
+	bh=Rz7xNSJdryFFh0PBCrn3nH8lMAC1chxZW8AEQ00QK74=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cIpjoCs4pdby3Dv7l/zaNzCTJJeoU9BDk7mMGYytvdZw42MSNMNpWG9MWCZEB0MuG
+	 acWMDMgyiNzSqNoDhyPX7fuC4h00A/+5DuvDkNNBg8JovGJVuUNZ/XhzxRkMaGlOJp
+	 BdjaX5MhklcsZJo6sNd/Dyr4BLXlvFSHR30ewzt5E0WfkstyxPswGwDNAvGBjyBUdw
+	 MT50ECMW8YB8AnkAbxLpuOURq3P3o7lD15DovRWR+iXG3XdszXsmBZjrcuIML3EUmn
+	 PLczod4qV5Hd88RRhlMiKAP8jelLUVhFJI+qakwwUuS8Aypi0xivKFV7uldYonZooE
+	 DQ7Vx0Fyh814Q==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] zloop: add max_open_zones option
+Date: Fri, 27 Mar 2026 05:32:45 +0900
+Message-ID: <20260326203245.946830-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260325063843.1790782-6-kuniyu@google.com> <202603270301.kJulQgkT-lkp@intel.com>
-In-Reply-To: <202603270301.kJulQgkT-lkp@intel.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 26 Mar 2026 12:38:31 -0700
-X-Gm-Features: AQROBzC56kOOvilMQ9x7JfCrqjezesmORZsrlXxqw-kdyJdYRmxiltxnB1IbvvY
-Message-ID: <CAAVpQUBdco4wFmdVFdi4yQbH38fDCNLL-SUD=udBUy8uJ0spqQ@mail.gmail.com>
-Subject: Re: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and shutdown().
-To: kernel test robot <lkp@intel.com>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, llvm@lists.linux.dev, 
-	oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>, 
-	linux-block@vger.kernel.org, nbd@other.debian.org, netdev@vger.kernel.org, 
-	syzbot+7b4f368d3955d2c9950e@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 26, 2026 at 12:14=E2=80=AFPM kernel test robot <lkp@intel.com> =
-wrote:
->
-> Hi Kuniyuki,
->
-> kernel test robot noticed the following build errors:
->
-> [auto build test ERROR on axboe/for-next]
-> [also build test ERROR on linus/master v7.0-rc5]
-> [cannot apply to next-20260325]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/=
-nbd-Remove-redundant-sock-ops-shutdown-check-in-nbd_get_socket/20260325-175=
-457
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git f=
-or-next
-> patch link:    https://lore.kernel.org/r/20260325063843.1790782-6-kuniyu%=
-40google.com
-> patch subject: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and=
- shutdown().
-> config: x86_64-buildonly-randconfig-004-20260326 (https://download.01.org=
-/0day-ci/archive/20260327/202603270301.kJulQgkT-lkp@intel.com/config)
-> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0=
-227cb60147a26a1eeb4fb06e3b505e9c7261)
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20260327/202603270301.kJulQgkT-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202603270301.kJulQgkT-lkp=
-@intel.com/
->
-> All errors (new ones prefixed by >>):
->
-> >> ld.lld: error: undefined symbol: inet_shutdown_locked
->    >>> referenced by nbd.c
->    >>>               drivers/block/nbd.o:(nbd_mark_nsock_dead) in archive=
- vmlinux.a
-> --
-> >> ld.lld: error: undefined symbol: tcp_sendmsg_locked
->    >>> referenced by nbd.c
->    >>>               drivers/block/nbd.o:(__sock_xmit) in archive vmlinux=
-.a
+Introduce the new max_open_zones option to allow specifying a limit on
+the maximum number of open zones of a zloop device. This change allows
+creating a zloop device that can more closely mimick the characteristics
+of a physical SMR drive.
 
-ah, CONFIG_INET=3Dn.  Will fix it in v2.
+When set to a non zero value, only up to max_open_zones zones can be in
+the implicit open (BLK_ZONE_COND_IMP_OPEN) and explicit open
+(BLK_ZONE_COND_EXP_OPEN) conditions at any time. The transition to the
+implicit open condition of a zone on a write operation can result in an
+implicit close of an already implicitly open zone. This is handled in
+the function zloop_do_open_zone(). This function also handles
+transitions to the explicit open condition. Implicit close transitions
+are handled using an LRU ordered list of open zones which is managed
+using the helper functions zloop_lru_rotate_open_zone() and
+zloop_lru_remove_open_zone().
 
-Thanks
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ .../admin-guide/blockdev/zoned_loop.rst       |   5 +-
+ drivers/block/zloop.c                         | 180 ++++++++++++++++--
+ 2 files changed, 168 insertions(+), 17 deletions(-)
+
+diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
+index a01f857b36ad..f4f1f3121bf9 100644
+--- a/Documentation/admin-guide/blockdev/zoned_loop.rst
++++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
+@@ -62,7 +62,7 @@ The options available for the add command can be listed by reading the
+ /dev/zloop-control device::
+ 
+ 	$ cat /dev/zloop-control
+-        add id=%d,capacity_mb=%u,zone_size_mb=%u,zone_capacity_mb=%u,conv_zones=%u,base_dir=%s,nr_queues=%u,queue_depth=%u,buffered_io
++        add id=%d,capacity_mb=%u,zone_size_mb=%u,zone_capacity_mb=%u,conv_zones=%u,max_open_zones=%u,base_dir=%s,nr_queues=%u,queue_depth=%u,buffered_io,zone_append=%u,ordered_zone_append,discard_write_cache
+         remove id=%d
+ 
+ In more details, the options that can be used with the "add" command are as
+@@ -80,6 +80,9 @@ zone_capacity_mb      Device zone capacity (must always be equal to or lower
+ conv_zones            Total number of conventioanl zones starting from
+                       sector 0
+                       Default: 8
++max_open_zones        Maximum number of open sequential write required zones
++                      (0 for no limit).
++                      Default: 0
+ base_dir              Path to the base directory where to create the directory
+                       containing the zone files of the device.
+                       Default=/var/local/zloop.
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 86a1324c27b3..8baf642037fd 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -36,6 +36,7 @@ enum {
+ 	ZLOOP_OPT_ZONE_APPEND		= (1 << 9),
+ 	ZLOOP_OPT_ORDERED_ZONE_APPEND	= (1 << 10),
+ 	ZLOOP_OPT_DISCARD_WRITE_CACHE	= (1 << 11),
++	ZLOOP_OPT_MAX_OPEN_ZONES	= (1 << 12),
+ };
+ 
+ static const match_table_t zloop_opt_tokens = {
+@@ -51,6 +52,7 @@ static const match_table_t zloop_opt_tokens = {
+ 	{ ZLOOP_OPT_ZONE_APPEND,	"zone_append=%u"	},
+ 	{ ZLOOP_OPT_ORDERED_ZONE_APPEND, "ordered_zone_append"	},
+ 	{ ZLOOP_OPT_DISCARD_WRITE_CACHE, "discard_write_cache" },
++	{ ZLOOP_OPT_MAX_OPEN_ZONES,	"max_open_zones=%u"	},
+ 	{ ZLOOP_OPT_ERR,		NULL			}
+ };
+ 
+@@ -59,6 +61,7 @@ static const match_table_t zloop_opt_tokens = {
+ #define ZLOOP_DEF_ZONE_SIZE		((256ULL * SZ_1M) >> SECTOR_SHIFT)
+ #define ZLOOP_DEF_NR_ZONES		64
+ #define ZLOOP_DEF_NR_CONV_ZONES		8
++#define ZLOOP_DEF_MAX_OPEN_ZONES	0
+ #define ZLOOP_DEF_BASE_DIR		"/var/local/zloop"
+ #define ZLOOP_DEF_NR_QUEUES		1
+ #define ZLOOP_DEF_QUEUE_DEPTH		128
+@@ -76,6 +79,7 @@ struct zloop_options {
+ 	sector_t		zone_size;
+ 	sector_t		zone_capacity;
+ 	unsigned int		nr_conv_zones;
++	unsigned int		max_open_zones;
+ 	char			*base_dir;
+ 	unsigned int		nr_queues;
+ 	unsigned int		queue_depth;
+@@ -99,7 +103,12 @@ enum zloop_zone_flags {
+ 	ZLOOP_ZONE_SEQ_ERROR,
+ };
+ 
++/*
++ * Zone descriptor.
++ * Locking order: z.lock -> z.wp_lock -> zlo.open_zones_lock
++ */
+ struct zloop_zone {
++	struct list_head	open_zone_entry;
+ 	struct file		*file;
+ 
+ 	unsigned long		flags;
+@@ -133,8 +142,13 @@ struct zloop_device {
+ 	sector_t		zone_capacity;
+ 	unsigned int		nr_zones;
+ 	unsigned int		nr_conv_zones;
++	unsigned int		max_open_zones;
+ 	unsigned int		block_size;
+ 
++	spinlock_t		open_zones_lock;
++	struct list_head	open_zones_lru_list;
++	unsigned int		nr_open_zones;
++
+ 	struct zloop_zone	zones[] __counted_by(nr_zones);
+ };
+ 
+@@ -158,6 +172,122 @@ static unsigned int rq_zone_no(struct request *rq)
+ 	return blk_rq_pos(rq) >> zlo->zone_shift;
+ }
+ 
++/*
++ * Open an already open zone. This is mostly a no-op, except for the imp open ->
++ * exp open condition change that may happen. We also move a zone at the tail of
++ * the list of open zones so that if we need to
++ * implicitly close one open zone, we can do so in LRU order.
++ */
++static inline void zloop_lru_rotate_open_zone(struct zloop_device *zlo,
++					      struct zloop_zone *zone)
++{
++	if (zlo->max_open_zones) {
++		spin_lock(&zlo->open_zones_lock);
++		list_move_tail(&zone->open_zone_entry,
++			       &zlo->open_zones_lru_list);
++		spin_unlock(&zlo->open_zones_lock);
++	}
++}
++
++static inline void zloop_lru_remove_open_zone(struct zloop_device *zlo,
++					      struct zloop_zone *zone)
++{
++	if (zone->cond == BLK_ZONE_COND_IMP_OPEN ||
++	    zone->cond == BLK_ZONE_COND_EXP_OPEN) {
++		spin_lock(&zlo->open_zones_lock);
++		list_del_init(&zone->open_zone_entry);
++		zlo->nr_open_zones--;
++		spin_unlock(&zlo->open_zones_lock);
++	}
++}
++
++static inline bool zloop_can_open_zone(struct zloop_device *zlo)
++{
++	return !zlo->max_open_zones || zlo->nr_open_zones < zlo->max_open_zones;
++}
++
++/*
++ * If we have reached the maximum open zones limit, attempt to close an
++ * implicitly open zone (if we have any) so that we can implicitly open another
++ * zone without exceeding the maximum number of open zones.
++ */
++static bool zloop_close_imp_open_zone(struct zloop_device *zlo)
++{
++	struct zloop_zone *zone;
++
++	lockdep_assert_held(&zlo->open_zones_lock);
++
++	if (zloop_can_open_zone(zlo))
++		return true;
++
++	list_for_each_entry(zone, &zlo->open_zones_lru_list, open_zone_entry) {
++		if (zone->cond == BLK_ZONE_COND_IMP_OPEN) {
++			zone->cond = BLK_ZONE_COND_CLOSED;
++			list_del_init(&zone->open_zone_entry);
++			zlo->nr_open_zones--;
++			return true;
++		}
++	}
++
++	return false;
++}
++
++static bool zloop_open_closed_or_empty_zone(struct zloop_device *zlo,
++					    struct zloop_zone *zone,
++					    bool explicit)
++{
++	spin_lock(&zlo->open_zones_lock);
++
++	if (explicit) {
++		/*
++		 * Explicit open: we cannot allow this if we have reached the
++		 * maximum open zones limit.
++		 */
++		if (!zloop_can_open_zone(zlo))
++			goto fail;
++		zone->cond = BLK_ZONE_COND_EXP_OPEN;
++	} else {
++		/*
++		 * Implicit open case: if we have reached the maximum open zones
++		 * limit, try to close an implicitly open zone first.
++		 */
++		if (!zloop_close_imp_open_zone(zlo))
++			goto fail;
++		zone->cond = BLK_ZONE_COND_IMP_OPEN;
++	}
++
++	zlo->nr_open_zones++;
++	list_add_tail(&zone->open_zone_entry,
++		      &zlo->open_zones_lru_list);
++
++	spin_unlock(&zlo->open_zones_lock);
++
++	return true;
++
++fail:
++	spin_unlock(&zlo->open_zones_lock);
++
++	return false;
++}
++
++static bool zloop_do_open_zone(struct zloop_device *zlo,
++			       struct zloop_zone *zone, bool explicit)
++{
++	switch (zone->cond) {
++	case BLK_ZONE_COND_IMP_OPEN:
++	case BLK_ZONE_COND_EXP_OPEN:
++		if (explicit)
++			zone->cond = BLK_ZONE_COND_EXP_OPEN;
++		zloop_lru_rotate_open_zone(zlo, zone);
++		return true;
++	case BLK_ZONE_COND_EMPTY:
++	case BLK_ZONE_COND_CLOSED:
++		return zloop_open_closed_or_empty_zone(zlo, zone, explicit);
++	default:
++		return false;
++	}
++}
++
+ static int zloop_update_seq_zone(struct zloop_device *zlo, unsigned int zone_no)
+ {
+ 	struct zloop_zone *zone = &zlo->zones[zone_no];
+@@ -191,13 +321,17 @@ static int zloop_update_seq_zone(struct zloop_device *zlo, unsigned int zone_no)
+ 
+ 	spin_lock_irqsave(&zone->wp_lock, flags);
+ 	if (!file_sectors) {
++		zloop_lru_remove_open_zone(zlo, zone);
+ 		zone->cond = BLK_ZONE_COND_EMPTY;
+ 		zone->wp = zone->start;
+ 	} else if (file_sectors == zlo->zone_capacity) {
++		zloop_lru_remove_open_zone(zlo, zone);
+ 		zone->cond = BLK_ZONE_COND_FULL;
+ 		zone->wp = ULLONG_MAX;
+ 	} else {
+-		zone->cond = BLK_ZONE_COND_CLOSED;
++		if (zone->cond != BLK_ZONE_COND_IMP_OPEN &&
++		    zone->cond != BLK_ZONE_COND_EXP_OPEN)
++			zone->cond = BLK_ZONE_COND_CLOSED;
+ 		zone->wp = zone->start + file_sectors;
+ 	}
+ 	spin_unlock_irqrestore(&zone->wp_lock, flags);
+@@ -221,19 +355,8 @@ static int zloop_open_zone(struct zloop_device *zlo, unsigned int zone_no)
+ 			goto unlock;
+ 	}
+ 
+-	switch (zone->cond) {
+-	case BLK_ZONE_COND_EXP_OPEN:
+-		break;
+-	case BLK_ZONE_COND_EMPTY:
+-	case BLK_ZONE_COND_CLOSED:
+-	case BLK_ZONE_COND_IMP_OPEN:
+-		zone->cond = BLK_ZONE_COND_EXP_OPEN;
+-		break;
+-	case BLK_ZONE_COND_FULL:
+-	default:
++	if (!zloop_do_open_zone(zlo, zone, true))
+ 		ret = -EIO;
+-		break;
+-	}
+ 
+ unlock:
+ 	mutex_unlock(&zone->lock);
+@@ -264,6 +387,7 @@ static int zloop_close_zone(struct zloop_device *zlo, unsigned int zone_no)
+ 	case BLK_ZONE_COND_IMP_OPEN:
+ 	case BLK_ZONE_COND_EXP_OPEN:
+ 		spin_lock_irqsave(&zone->wp_lock, flags);
++		zloop_lru_remove_open_zone(zlo, zone);
+ 		if (zone->wp == zone->start)
+ 			zone->cond = BLK_ZONE_COND_EMPTY;
+ 		else
+@@ -305,6 +429,7 @@ static int zloop_reset_zone(struct zloop_device *zlo, unsigned int zone_no)
+ 	}
+ 
+ 	spin_lock_irqsave(&zone->wp_lock, flags);
++	zloop_lru_remove_open_zone(zlo, zone);
+ 	zone->cond = BLK_ZONE_COND_EMPTY;
+ 	zone->wp = zone->start;
+ 	clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
+@@ -352,6 +477,7 @@ static int zloop_finish_zone(struct zloop_device *zlo, unsigned int zone_no)
+ 	}
+ 
+ 	spin_lock_irqsave(&zone->wp_lock, flags);
++	zloop_lru_remove_open_zone(zlo, zone);
+ 	zone->cond = BLK_ZONE_COND_FULL;
+ 	zone->wp = ULLONG_MAX;
+ 	clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
+@@ -478,9 +604,10 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
+ 	}
+ 
+ 	/* Implicitly open the target zone. */
+-	if (zone->cond == BLK_ZONE_COND_CLOSED ||
+-	    zone->cond == BLK_ZONE_COND_EMPTY)
+-		zone->cond = BLK_ZONE_COND_IMP_OPEN;
++	if (!zloop_do_open_zone(zlo, zone, false)) {
++		ret = -EIO;
++		goto out_unlock;
++	}
+ 
+ 	/*
+ 	 * Advance the write pointer, unless ordered zone append is in use. If
+@@ -490,6 +617,7 @@ static int zloop_seq_write_prep(struct zloop_cmd *cmd)
+ 	if (!is_append || !zlo->ordered_zone_append) {
+ 		zone->wp += nr_sectors;
+ 		if (zone->wp == zone_end) {
++			zloop_lru_remove_open_zone(zlo, zone);
+ 			zone->cond = BLK_ZONE_COND_FULL;
+ 			zone->wp = ULLONG_MAX;
+ 		}
+@@ -746,6 +874,7 @@ static bool zloop_set_zone_append_sector(struct request *rq)
+ 	rq->__sector = zone->wp;
+ 	zone->wp += blk_rq_sectors(rq);
+ 	if (zone->wp >= zone_end) {
++		zloop_lru_remove_open_zone(zlo, zone);
+ 		zone->cond = BLK_ZONE_COND_FULL;
+ 		zone->wp = ULLONG_MAX;
+ 	}
+@@ -943,6 +1072,7 @@ static int zloop_init_zone(struct zloop_device *zlo, struct zloop_options *opts,
+ 	int ret;
+ 
+ 	mutex_init(&zone->lock);
++	INIT_LIST_HEAD(&zone->open_zone_entry);
+ 	spin_lock_init(&zone->wp_lock);
+ 	zone->start = (sector_t)zone_no << zlo->zone_shift;
+ 
+@@ -1063,12 +1193,20 @@ static int zloop_ctl_add(struct zloop_options *opts)
+ 		goto out;
+ 	}
+ 
++	if (opts->max_open_zones > nr_zones - opts->nr_conv_zones) {
++		pr_err("Invalid maximum number of open zones %u\n",
++		       opts->max_open_zones);
++		goto out;
++	}
++
+ 	zlo = kvzalloc_flex(*zlo, zones, nr_zones);
+ 	if (!zlo) {
+ 		ret = -ENOMEM;
+ 		goto out;
+ 	}
+ 	WRITE_ONCE(zlo->state, Zlo_creating);
++	spin_lock_init(&zlo->open_zones_lock);
++	INIT_LIST_HEAD(&zlo->open_zones_lru_list);
+ 
+ 	ret = mutex_lock_killable(&zloop_ctl_mutex);
+ 	if (ret)
+@@ -1096,6 +1234,7 @@ static int zloop_ctl_add(struct zloop_options *opts)
+ 		zlo->zone_capacity = zlo->zone_size;
+ 	zlo->nr_zones = nr_zones;
+ 	zlo->nr_conv_zones = opts->nr_conv_zones;
++	zlo->max_open_zones = opts->max_open_zones;
+ 	zlo->buffered_io = opts->buffered_io;
+ 	zlo->zone_append = opts->zone_append;
+ 	if (zlo->zone_append)
+@@ -1143,6 +1282,7 @@ static int zloop_ctl_add(struct zloop_options *opts)
+ 	lim.logical_block_size = zlo->block_size;
+ 	if (zlo->zone_append)
+ 		lim.max_hw_zone_append_sectors = lim.max_hw_sectors;
++	lim.max_open_zones = zlo->max_open_zones;
+ 
+ 	zlo->tag_set.ops = &zloop_mq_ops;
+ 	zlo->tag_set.nr_hw_queues = opts->nr_queues;
+@@ -1326,6 +1466,7 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
+ 	opts->capacity = ZLOOP_DEF_ZONE_SIZE * ZLOOP_DEF_NR_ZONES;
+ 	opts->zone_size = ZLOOP_DEF_ZONE_SIZE;
+ 	opts->nr_conv_zones = ZLOOP_DEF_NR_CONV_ZONES;
++	opts->max_open_zones = ZLOOP_DEF_MAX_OPEN_ZONES;
+ 	opts->nr_queues = ZLOOP_DEF_NR_QUEUES;
+ 	opts->queue_depth = ZLOOP_DEF_QUEUE_DEPTH;
+ 	opts->buffered_io = ZLOOP_DEF_BUFFERED_IO;
+@@ -1404,6 +1545,13 @@ static int zloop_parse_options(struct zloop_options *opts, const char *buf)
+ 			}
+ 			opts->nr_conv_zones = token;
+ 			break;
++		case ZLOOP_OPT_MAX_OPEN_ZONES:
++			if (match_uint(args, &token)) {
++				ret = -EINVAL;
++				goto out;
++			}
++			opts->max_open_zones = token;
++			break;
+ 		case ZLOOP_OPT_BASE_DIR:
+ 			p = match_strdup(args);
+ 			if (!p) {
+-- 
+2.53.0
+
