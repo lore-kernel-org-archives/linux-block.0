@@ -1,85 +1,101 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF66D283C9D
-	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 21:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E162BDC27
+	for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 22:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774561647; cv=none; b=bnhmIoSu01CUmqENh2F7kj5yLiKSot4fQ1LNBAG0wubmgCTQSNkw3YKQRlHPcpUZNQyCyyn96qLiOoseXBNo5+XiQhHUkuKRDL2uAJPQ3QLyt2/lJC8vCnyqxRCa9qI1o3bnmEjq00+C/FFl/GWzdz8H/rEhjHoQcV5HoGU8Lio=
+	t=1774562718; cv=none; b=LsfSeoYLONT/+vv8wYrdB47nlRZQSgeyQsctJ2RtLDvdRX6r3z4HAdmiKOufzTXfBMdiZ6xqLWr2NX5zSS9nGPhFyu7THuTcOwDpnotCjEqKmQyj2ek5vb1rPPvHks9dHaI5GlrG9ajlN+egq0w9n9N8d9H8QKzI+nXG5f3+tuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774561647; c=relaxed/simple;
-	bh=DVROGPV+cSRdvmeQ6gUv1LsxvjcOX+qP7J5cjG3Bk6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GJPjb8mjsIEyofPYLOpYGi9Pjc+Oi1jAKHJ/M8Zk2DfX9tHHPVyFB4xjqxEJgBOwhTutSVZEcZF1Ys3PBbiazUj8hebhZykOTGT2fZRXqlCQ3BAHIIvDSdJFq68s1oRMeXZsH4Ys6b35wXlv0j0Oqc/5JBEcs8ZO97UrtqsqVFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=NwOoVEpn; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1774562718; c=relaxed/simple;
+	bh=pw4oIpJsw/eNjWtpWsvNA6eZYUwnDB/qbEt9Xw+fE30=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=bsfF2Cl+1i0x7r7vG4d/ewZlAyy3K3q/snZ3CgEpL13cutFJhvNd9PXzeo4RLfffVzKOIyFVj9PZCoSZ0ywC8hyU0I8ICJK3RhtCvw5oDDGooBE7dKjULyMO0MpS0/X+fAQ+wjOWJjbTb2k/gGtOjcDAumf8Sa1qthZoHXXeJ1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=x4M1j4W+; arc=none smtp.client-ip=209.85.160.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="NwOoVEpn"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fhcnL4012zlfc9G;
-	Thu, 26 Mar 2026 21:47:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1774561635; x=1777153636; bh=Q1qTa8qaBEJcl53re+C+UF++
-	/Fy0WTURsjvIM3D//Y8=; b=NwOoVEpnW+9TUvkT6zarZvoja8YQFSPxexIJWaxu
-	xaNOTFeQPFwnFWxH68ZLFG/C+0qGC01pwtUnGQDn0YhplQxMfmdoPgPi0BVREkyM
-	x2zIVvQkIahN7hTiRKJ4A1vyvnxLkYcmQ1jbDMReP45B5HIatCr7ga3LQKYtt3B3
-	Sxz3NF/dtbfafW0snkU8i3lv+DEfAxCR1grscScA3yHzTdRQFDGpAlcuf//hcg/f
-	Nph0SOqmLhEmkeDwZ72zVQApke4TxceYQ7+QQm4gRj6npbmhYOpCaJ+y2nsJGiV+
-	ITffBjYK7Qx0KjbIoJNGTow5cqekGCoO6D72sgsRURRwYg==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id oRoZzHrwpC3A; Thu, 26 Mar 2026 21:47:15 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fhcnF0ZGxzlfftf;
-	Thu, 26 Mar 2026 21:47:12 +0000 (UTC)
-Message-ID: <fe778bf7-74dc-49c6-9267-fd41ad9e592c@acm.org>
-Date: Thu, 26 Mar 2026 14:47:12 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="x4M1j4W+"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-40f1ffba6a0so914639fac.0
+        for <linux-block@vger.kernel.org>; Thu, 26 Mar 2026 15:05:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774562714; x=1775167514; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NfghWZookPC3u1x/npY6NFL9na2jkGZMpNCSPrR61Ls=;
+        b=x4M1j4W+plH4XRzsZRrUhBgkO1skw394ytTW4Gglz9JgtFhxTQpWZOZcW89/h7NTWV
+         4zDq67vpzCIbX2TAjGkl54gonkCh6jl0N8bFW63ZOqi4iTXtTA5fAbbavCwgClx7Vo9Q
+         49/RQmK9KOAI6vE6ijzdmlXs4R68+6VQ8M8wmoQLmBEXSlINiOztsU8n8pcqXFoAJb1l
+         BIgkNXFqsk7wRkllFOq4g354fgAqp7DKdepXucW04YWXzEwob+l+uviU86CeKAMVsWeg
+         hmKgpy6b22bjNkTeJCrHDd2qyCVCl2UDOSB3Yd0sVMyUhGwnNCYuiwKh343DuGALCGFn
+         qUJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774562714; x=1775167514;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NfghWZookPC3u1x/npY6NFL9na2jkGZMpNCSPrR61Ls=;
+        b=CsrVJsvdV1hY5rgOw9D/d5wNBYVv32eLN+9qb7ZRMNZ98MG0yYDGdIcZ5JgwR4/H9R
+         ALJ5MVThWmnSv4iyE9i++Rh0MRV50k512B13Ez6plgQEndD3o9mTjqahXmKQEElrEa8r
+         evBt254Emotfa1GN1ODg8HVwRPXzZtFhYOhS/D5y72aOAUstdrclrznZViG5DNnVoLpf
+         gsO5LkhZLBPXxSFm0pIM/tVKsFfWMIOKzhbIcjnjmmlD+HGSiwkJ2e7/s1DqN3q/C7jx
+         X1gJ28pXawPYKdUJpErUXAa/FliNiSHS9qiZgEdCKGiw1vsvL+EhhzAKXpwPFTGyGhIU
+         1A6w==
+X-Gm-Message-State: AOJu0YzAy9q862apxYEqCqb/h3WizKURw0sCXDZQcFV88MjxSl9v+9yR
+	nb2lspzDDtwqmfOSyGDV87t+FMK2T6WZMbSGDdzjjjhhH4wYENf0oeHEYKHt52lbOfAtPNylvZi
+	H5YGX
+X-Gm-Gg: ATEYQzydi6VL8GxbfW7FfPCI74Vch2Q/WHO6rYdOhRMtS9Vt9CbR8JOsxuZfWKzOcM9
+	i96s9rJfsnDRjd3OScmhNOVpkMy7hSINsNiY/nX6IjjcocHvFmmYxewP5oGIUOjFwLOs4JJkVyJ
+	fWrdYxZlFXDhZMRO0DRGSKS8BA9fap6Fyd0TtxH2J65KjwjFi8b7z/USYtvuQ71RwgPw2hgKtp5
+	1mUjXJxT4ds77Vti9UMbABxl5MQcez7m4nUfCeGAxu1TlugVg2e4gFFtIzPU4upvOq05nssP5pT
+	vXGPYn4Din0ZbNZAknWAc9tMFuJ7QKPH+Jz1YzSJewRmNn02RZ12axOSnnL59sDIr9rLHPy9JaK
+	PZMYX8H1irliKOGTIGZcJqZWyYSJrMCRFjA6g4YuYGC63eONwsL5twQg7+RfPeQkoOMzuOEHTnK
+	rBkLeDk5692ySyd+7DiK7+4t36PB5597f3HCbDZIxRzguDCSDRrBUCaXTJ23LJ3XC5ZxvmTYAa0
+	Mll
+X-Received: by 2002:a05:6870:ff83:b0:417:1347:8ec4 with SMTP id 586e51a60fabf-41cec452027mr7013fac.44.1774562714148;
+        Thu, 26 Mar 2026 15:05:14 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-41cc7b3e55fsm3519936fac.14.2026.03.26.15.05.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2026 15:05:13 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ =?utf-8?q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>, 
+ Andreas Gruenbacher <agruenba@redhat.com>, 
+ Philipp Reisner <philipp.reisner@linbit.com>, 
+ Lars Ellenberg <lars.ellenberg@linbit.com>, 
+ Nathan Chancellor <nathan@kernel.org>
+In-Reply-To: <20260326214054.284593-1-bvanassche@acm.org>
+References: <20260326214054.284593-1-bvanassche@acm.org>
+Subject: Re: [PATCH] drbd: Balance RCU calls in drbd_adm_dump_devices()
+Message-Id: <177456271312.177084.14797760001381378963.b4-ty@b4>
+Date: Thu, 26 Mar 2026 16:05:13 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] drbd: Balance RCU calls in drbd_adm_dump_devices()
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Andreas Gruenbacher <agruenba@redhat.com>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- Nathan Chancellor <nathan@kernel.org>
-References: <20260326214054.284593-1-bvanassche@acm.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260326214054.284593-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.1
 
-On 3/26/26 2:40 PM, Bart Van Assche wrote:
+
+On Thu, 26 Mar 2026 14:40:54 -0700, Bart Van Assche wrote:
 > Make drbd_adm_dump_devices() call rcu_read_lock() before
 > rcu_read_unlock() is called. This has been detected by the Clang
 > thread-safety analyzer.
 
-(replying to my own email)
+Applied, thanks!
 
-Since it is the third time this patch is posted, the changelog is as
-follows:
+[1/1] drbd: Balance RCU calls in drbd_adm_dump_devices()
+      commit: 2b31e86387e60b3689339f0f0fbb4d3623d9d494
 
-Changes compared to v2:
-  - Added Christoph Hellwig's Reviewed-by tag.
-  - Extracted this patch from a larger series.
+Best regards,
+-- 
+Jens Axboe
 
-Changes compared to v1:
-  - Added Christoph B=C3=B6hmwalder's Tested-by tag.
 
-Bart.
+
