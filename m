@@ -1,42 +1,40 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8E43DA5D6
-	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 09:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A2325EFBE;
+	Fri, 27 Mar 2026 09:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774602041; cv=none; b=GSrbApjjo6Q+6yEnFXNr2OaHgTBsFg6dMtZpsn7mhnz8exby+Yd6ShbtV8Q4Xz7C+5V64ePzQb2LDwfnUcPjTamAvk8vS+IhGzY5v0cFA5UmKtMR0aWMsoY26fSH7XgvNWdOsWIuLkY0qWAYfK935EXRO+Z7+poJhZlbvsRiEjs=
+	t=1774603453; cv=none; b=fdgY9Z4oyRlooTz3+nHvavdEwLUtkfn870FqFKbe4JLXrDxjPZslq5SPYigfhSd6fnX5jDEbnCi/GaaiK8gj61LKf9vgq14HALaKw8/xT0q8KqD+euCHCooayIBfHTAx3n1+YDoLwUanP5KR4Iuo1eq/6YiqSAm9K1Zqyv9zli4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774602041; c=relaxed/simple;
-	bh=qGHFPxFCGglVw0f56nxUUg5Et8ozFasA9da9EvsXMq0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZOGn3NFf+06ELnAUyAkFSQtgnLmKiX+AgymVOyesjSAE2N6/zYQmN34dYr5iBIfQvEf1yLXL4jRGsg+tUV38bfq0nddNklBqAeV1Byzt4TpHzxKa1R+raRp43gMNz3Dxlo+PrZIG5O6hW11ADWCHj+7M43jfBmkaxMPFVTMDgOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sQLp5YYt; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sQLp5YYt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=qU5NnwyNFowTMx9H8UQmWwbhg91Uh7EQc+vyVe0pN60=; b=sQLp5YYtWPAX58MvJykFd9YAhO
-	AH4QSLigwsp5minMHF7TK3pf8tAWBM9KC/hDxlNMdGs8FDUpZOx8smsQ0tidIxpOFs5eENcSXpwgt
-	X8/3YAtbwJNXfZm4KGT0tZRjra5BrIM5H61n5zL3rgA0SBUD7yFCJ0IkbWG6625mgouiX5tlYuGsi
-	2xcQeJ2kRrw5ExPTVhmoyGQJA+QNlty2nw7GPaJK8WVu/gtL4occGLeHaNkqC2Jt77XOXQpOdN501
-	a+ZA1IN3OpiarutA5zGDycwKKrsm7DlOFf9RfNLvDRq2jB4yK1KaEJrixwQRM8aDcf0QBeH+mWNwF
-	b08EL9TA==;
-Received: from [213.208.157.36] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w633W-000000071Xr-0QR9;
-	Fri, 27 Mar 2026 09:00:38 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	dlemoal@kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] block: refactor blkdev_zone_mgmt_ioctl
-Date: Fri, 27 Mar 2026 10:00:32 +0100
-Message-ID: <20260327090032.3722065-1-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1774603453; c=relaxed/simple;
+	bh=PgAJeijFmYqZtbSCGfY/BTgjXI2R5AGFITDN/TTs1Jw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VyQ/FPiVDzYO69HCq2McMwUl/L0zBIdC1cJetDljRgOXv+Doc+3NiZ+1KXhs/4epAaPqo16y4Q7kIT7tYWjVYj4bk2iWz2jR7ml/y0aCkugBZgCnXweAz6OjdPhRCUFgr81wN0lt5PFWiyYR3+fCYkVKyzr0YCLsGUiG/MV16Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4fhwDT5NrNzKHMk3;
+	Fri, 27 Mar 2026 17:23:21 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 5A7914056E;
+	Fri, 27 Mar 2026 17:24:03 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.129])
+	by APP1 (Coremail) with SMTP id cCh0CgAHC9uyTMZpTlaWCQ--.27625S4;
+	Fri, 27 Mar 2026 17:24:03 +0800 (CST)
+From: leo.lilong@huaweicloud.com
+To: josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: leo.lilong@huawei.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	lonuxli.64@gmail.com
+Subject: [PATCH 0/4] nbd: replace socks pointer array with xarray to eliminate queue freeze
+Date: Fri, 27 Mar 2026 17:12:19 +0800
+Message-Id: <20260327091223.4147956-1-leo.lilong@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,99 +42,64 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-CM-TRANSID:cCh0CgAHC9uyTMZpTlaWCQ--.27625S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ar4rGr1DXFWDWFy5CF1fXrb_yoW8Wr4xpF
+	ZIk3Z3Cw1vqr43Gr9ayay0ka1fWw48J3yUGw1fWw48ZrZ8ZF97ZF429r4rCFyYkryvkw12
+	vw1jgw48ua48ua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr1j6F4UJwAm72CE4I
+	kC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v2
+	6r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
+	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUFXo7DU
+	UUU
+X-CM-SenderInfo: hohrhzxlor0w46kxt4xhlfz01xgou0bp/
 
-Split the zone reset case into a separate helper so that the conditional
-locking goes away.
+From: Long Li <leo.lilong@huawei.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-zoned.c | 41 ++++++++++++++++++-----------------------
- 1 file changed, 18 insertions(+), 23 deletions(-)
+Hi,
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 9d1dd6ccfad7..d370d871d019 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -412,20 +412,32 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, unsigned int cmd,
- 	return 0;
- }
- 
--static int blkdev_truncate_zone_range(struct block_device *bdev,
--		blk_mode_t mode, const struct blk_zone_range *zrange)
-+static int blkdev_reset_zone(struct block_device *bdev, blk_mode_t mode,
-+			     struct blk_zone_range *zrange)
- {
- 	loff_t start, end;
-+	int ret = -EINVAL;
- 
-+	inode_lock(bdev->bd_mapping->host);
-+	filemap_invalidate_lock(bdev->bd_mapping);
- 	if (zrange->sector + zrange->nr_sectors <= zrange->sector ||
- 	    zrange->sector + zrange->nr_sectors > get_capacity(bdev->bd_disk))
- 		/* Out of range */
--		return -EINVAL;
-+		goto out_unlock;
- 
- 	start = zrange->sector << SECTOR_SHIFT;
- 	end = ((zrange->sector + zrange->nr_sectors) << SECTOR_SHIFT) - 1;
- 
--	return truncate_bdev_range(bdev, mode, start, end);
-+	ret = truncate_bdev_range(bdev, mode, start, end);
-+	if (ret)
-+		goto out_unlock;
-+
-+	ret = blkdev_zone_mgmt(bdev, REQ_OP_ZONE_RESET, zrange->sector,
-+			       zrange->nr_sectors);
-+out_unlock:
-+	filemap_invalidate_unlock(bdev->bd_mapping);
-+	inode_unlock(bdev->bd_mapping->host);
-+	return ret;
- }
- 
- /*
-@@ -438,7 +450,6 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	void __user *argp = (void __user *)arg;
- 	struct blk_zone_range zrange;
- 	enum req_op op;
--	int ret;
- 
- 	if (!argp)
- 		return -EINVAL;
-@@ -454,15 +465,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 
- 	switch (cmd) {
- 	case BLKRESETZONE:
--		op = REQ_OP_ZONE_RESET;
--
--		/* Invalidate the page cache, including dirty pages. */
--		inode_lock(bdev->bd_mapping->host);
--		filemap_invalidate_lock(bdev->bd_mapping);
--		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
--		if (ret)
--			goto fail;
--		break;
-+		return blkdev_reset_zone(bdev, mode, &zrange);
- 	case BLKOPENZONE:
- 		op = REQ_OP_ZONE_OPEN;
- 		break;
-@@ -476,15 +479,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		return -ENOTTY;
- 	}
- 
--	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
--
--fail:
--	if (cmd == BLKRESETZONE) {
--		filemap_invalidate_unlock(bdev->bd_mapping);
--		inode_unlock(bdev->bd_mapping->host);
--	}
--
--	return ret;
-+	return blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors);
- }
- 
- static bool disk_zone_is_last(struct gendisk *disk, struct blk_zone *zone)
+Commit b98e762e3d ("nbd: freeze the queue while we're adding
+connections") introduced blk_mq_freeze_queue() in the add-socket path
+to prevent use-after-free when krealloc() relocates the config->socks
+array while I/O is in flight. However, freezing the queue on every
+connection setup introduces significant latency when establishing a
+large number of connections.
+
+This series eliminates the queue freeze by replacing the
+krealloc-based struct nbd_sock **socks array with a struct xarray.
+The xarray provides RCU-safe pointer publishing: each nbd_sock is
+fully initialized before being stored via xa_store(), and concurrent
+readers access individual entries through xa_load() without ever
+holding a reference to the array itself. This removes the possibility
+of UAF on array reallocation, making the queue freeze unnecessary.
+
+The following test was performed with 256 connections on a local
+nbd-server:
+
+  nbd-server -M 256 -C /etc/nbd-server/config
+  time nbd-client 127.0.0.1 10809 /dev/nbd0 -N myexport -C 256
+
+  Before:  real 4.510s  user 0.004s  sys 0.038s
+  After:   real 0.263s  user 0.009s  sys 0.032s
+
+Connection setup time is reduced by ~94%.
+
+Long Li (4):
+  nbd: simplify find_fallback() by removing redundant logic
+  nbd: replace socks pointer array with xarray
+  nbd: remove redundant num_connections boundary checks
+  nbd: remove queue freeze in nbd_add_socket
+
+ drivers/block/nbd.c | 201 +++++++++++++++++++++++---------------------
+ 1 file changed, 106 insertions(+), 95 deletions(-)
+
 -- 
-2.47.3
+2.39.2
 
