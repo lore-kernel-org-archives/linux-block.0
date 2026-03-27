@@ -1,218 +1,210 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837BF3264FA
-	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 21:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A413890F4
+	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 22:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774646074; cv=none; b=jriKVi2TwJenADSKmS+Sse1tH5jzNtThnl9bl95gRsXDaWrYN35W7tpNhg1ihaPHN+5WYEfZrdu98ibE0pyMHKfS6ETMWxCnSxzfu7uhX1dj4y5Wxs5AUJigPlyoYv8Yt28ELFnocWFWjRih2BCfjxuXxpIAAi6J1IqijcR8jGo=
+	t=1774651130; cv=none; b=HI8vnglaV3cu+gcDRiFlOmIcOYDFJ8DQY1OrUgu+qpeWwKjnxDZ1vwKePqvU65iU8QGqtcZJUSQVa3Kj46mcpLNL5+sl2QpsxQhR+68I4P/5EzXfokvhxBZienXBlIn/RlTKK5P6S4E7z0G030XkLVpeFZh4Ll3pLqzcbatdys0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774646074; c=relaxed/simple;
-	bh=IJiaKf9dpzCPsKjFVld6H8pg5IZJwyl9iXgObDj0y7w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HKGMKEdGje2iKUdKh4xnP2avsHUQ65jjXafnVPfEPyiNC+p0HTYn4lf3mDWXPc5hy+hl5DrMoTE7WltblzlzFzKL9E2bkINdVNAhQlNYfwysJAr9e+sKcUMILEOQMlfTVqyQq7/FTAcHudbxTuIaAwJdAqexX2+EA4wq+NVPPd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=sNagp7Vj; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1774651130; c=relaxed/simple;
+	bh=/iAP3nD06jYRWcdSsS1v9RRiexileYML3/JfvHlOvCc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tjY6Q3M81NfzJYIhmYyjqPodm9f6rMGOHnSDBOsdsdk6nCRbvBdXLm+qYrRulDQlEIL4haznhyAS62glkJ0oy/V1ACFzWcN1ta3HhBVB3hvceEUT60ZhssvvQTxCIanGJ1Pi9sz6wn/aiPM9FOKNsILcYvoyRDDDLAt9UX+Au3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=NzF9KD/F; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="sNagp7Vj"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fjD150XSrzlfvq4;
-	Fri, 27 Mar 2026 21:14:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1774646058; x=1777238059; bh=jMTmE
-	SdzD/Kur7zHz14kWcWb0BpuhM6IWSAWJ814Asw=; b=sNagp7Vjl/q0Aqw/vHS8u
-	gDqNHFWPgmk8m2S/YIXWVJElV07nStt5Vo3Amteq7srFZTqiRysL8rARE2Co/HML
-	+dyqVNRWzYOLSFPeIVrjLz2Id8SN9mesOnBvwjNGIjXQpX9/KI3TeO3FjVwtohkP
-	hcwPNFsNSKPh5UeXnqtk1ner8OR4vG9RWrR6M6jwDLBJpYztXYYdapkLaqkFLykM
-	crfZw70fo2gVBXla9vkWjkKtMXUnkFpB2mVYtavPtzvQOHWx92ULHhyGC2EW5+vM
-	dez7r6Qgm0IX7E4eBMuCfuUfav4i8XnCd/ybNqeBIsAdF9f4nkQTxwI701ly/DAR
-	g==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 7Tzg3h4c0RUb; Fri, 27 Mar 2026 21:14:18 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fjD0j28SfzlfvqD;
-	Fri, 27 Mar 2026 21:14:13 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="NzF9KD/F"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-486fb112c09so26483365e9.1
+        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 15:38:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1774651126; x=1775255926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ah7Jc7k71YR5et9OmCfsg+DC7q9Eb/m1sFtjVOghFI=;
+        b=NzF9KD/FrcENJ7kwCe+h2+64epNZIKqwrCXVy6eN88KL3n1WWw/vl2ifwNc/Xz+GWA
+         kX40d6NWo2ENMFEnl2yZUHi1lYVI9Qu5A8d78kjoF6Czh3N9mjAQPuB7ggmFUtAaFNj8
+         QBCQllRmnrVI4U3iVQFDY56MrBlZ1udlMpO4FQC2JATTTEC/F06VTQTP/g1eztt9qqjK
+         6m8yf8kUaEZcrnjLdY2sDmYWqe+QobQlJDECtt99fTyfAeJ5cYCxpMHgC77JoFbQ7w6Q
+         Pllfa+mrFFFunrgYPjlJpZMJ1OBgdeLiUzpkpwdeHNS1JS5wy1PhbmTkp86f/gnWEpqc
+         PSVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774651126; x=1775255926;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ah7Jc7k71YR5et9OmCfsg+DC7q9Eb/m1sFtjVOghFI=;
+        b=hhG8/K5u0Jvx4Ja8Cre60r7ll/QdDncQJc6TtAapdlUzdEh/ixgU90edpM1sNLR/3G
+         hWcdp68Tt8WFw0MjgqBl0oPbdIMX1fft0ny6s7Wp5VK/psRmeBoZWVhws4++mo0kHjTu
+         F8kVZHDHncyddZoZ182L30BGTBuopMkKCjlGqLgsgm0aZRVhOg1lRXmNqKX3QJeI6xan
+         i64yejOiztsjwsR6z9baZsOw2D++otH7ONHhP1MybHgiYEWxuKM/iCh4xlyR92UI+63G
+         DTOKmikgIfAG6ML7/SJ8I8MN1JETi/nAfiRZU8oA+KJ1HLTf1HJlvozGovN11JEacEKp
+         RyrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvhmpZBWcSqfJ/iKPSZXhYU7DPCrUAdob8yzVIR//y1HADu4Qr3jyEDl6N1KUAdU74qb0FQ2/A2UR7IA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrtyygMhDlbYlbuv3b7p4pm7uLB+0hFPU7bms/sO1HO6fhpbi5
+	K4vHC/ZDK5131UtVhfOow5gSMSASCGKpX6W94raXF/6kLotdRCgqcShb14sCTKfZARFYYBXx6nS
+	LYqUx
+X-Gm-Gg: ATEYQzwO9nEfFKdbZU32Qa5kCWnsu1sYoE9xiQrgbAF1yVt525oVCjkFaLAxT40awo7
+	6WW1OdxKT4VtfUWx/lPe5DAzxLtFwihMlr04UfRoIhG0DaKZ7ljEJbshyQZLQoj15TCP0P9bniO
+	gguHAs+A33oncKiHWk+YOVqopNYSbbj02CBy/pf1ppPsDj79nevoOTnZ//fsjlTAdxUrU3eVqT/
+	ZnFKE9tC18va5yPjEbb2dO1vZ9q8yh94+A9RH+YCVTHVBfd3h+8XHBMLaFXIJJ8wnPgfmK8Ytlk
+	RO5WsK5OtomubINwWgC45xzNz1VTFdu9Nt9WFyHgYKzPb5rUgbKmMiTybSAEJIa+amSBQxo8tPn
+	rs8QZXsJHdlQQizpIoRuzo6mW2zD1rW/UZ91VxW4bxaoEL0lLf1o/iAQ3dCRaY5cXKNmVl7gTsb
+	OTTA5EDhKo7EKljnPHiYo7jadlSKSa0UM3THuRhxqkXE/3J5txrPV01uzvFoOSvgqG0+VxUq1iC
+	HgdRwFUcPioxed0saDawA==
+X-Received: by 2002:a05:6000:2006:b0:43b:41df:705e with SMTP id ffacd0b85a97d-43b9ea77850mr7212627f8f.49.1774651126061;
+        Fri, 27 Mar 2026 15:38:46 -0700 (PDT)
+Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf247079esm998990f8f.25.2026.03.27.15.38.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Mar 2026 15:38:45 -0700 (PDT)
+From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Hans Holmberg <hans.holmberg@wdc.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Kees Cook <kees@kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v3 5/6] null_blk: Support configuring the maximum DMA segment size
-Date: Fri, 27 Mar 2026 14:13:45 -0700
-Message-ID: <20260327211349.2239633-6-bvanassche@acm.org>
-X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
-In-Reply-To: <20260327211349.2239633-1-bvanassche@acm.org>
-References: <20260327211349.2239633-1-bvanassche@acm.org>
+Cc: drbd-dev@lists.linbit.com,
+	linux-kernel@vger.kernel.org,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	linux-block@vger.kernel.org,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Subject: [PATCH 00/20] DRBD 9 rework
+Date: Fri, 27 Mar 2026 23:38:00 +0100
+Message-ID: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Add support for configuring the maximum DMA segment size. The maximum DMA
-segment size may be set to a value smaller than the virtual memory page
-size. Reject invalid max_segment_size values.
+As discussed (context: [0]), here is the first version of our DRBD 9
+rework series, intended for for-next via for-7.1/drbd.
 
-Since rq_for_each_segment() may yield bvecs larger than the maximum DMA
-segment size, add code in the rq_for_each_segment() loop that restricts
-the bvec length to the maximum DMA segment size.
+This replays about 10-15 years of active out-of-tree development work
+[1], depending on your way of counting. The out-of-tree module has
+severely diverged from the in-tree version over the years, which is
+what we are aiming to fix now.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/null_blk/main.c     | 43 +++++++++++++++++++++++++++++++
- drivers/block/null_blk/null_blk.h |  1 +
- 2 files changed, 44 insertions(+)
+Hopefully that somewhat excuses (or at least explains) the massive
+diffs -- we've tried to come up with a way to group the changes by
+topic, but I realize it's still not exactly trivial to review.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
-c
-index f8c0fd57e041..d5fbbc5d63ed 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -169,6 +169,32 @@ static int g_max_sectors;
- module_param_named(max_sectors, g_max_sectors, int, 0444);
- MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sector=
-s)");
-=20
-+static unsigned int g_max_segment_size =3D BLK_MAX_SEGMENT_SIZE;
-+
-+static int nullb_set_max_segment_size(const char *val,
-+				      const struct kernel_param *kp)
-+{
-+	int res;
-+
-+	res =3D kstrtouint(val, 0, &g_max_segment_size);
-+	if (res < 0)
-+		return res;
-+
-+	if (g_max_segment_size < BLK_MIN_SEGMENT_SIZE)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static const struct kernel_param_ops max_segment_size_ops =3D {
-+	.set =3D nullb_set_max_segment_size,
-+	.get =3D param_get_uint,
-+};
-+
-+module_param_cb(max_segment_size, &max_segment_size_ops, &g_max_segment_=
-size,
-+		0444);
-+MODULE_PARM_DESC(max_segment_size, "Maximum size of a DMA segment in byt=
-es");
-+
- static unsigned int nr_devices =3D 1;
- module_param(nr_devices, uint, 0444);
- MODULE_PARM_DESC(nr_devices, "Number of devices to register");
-@@ -442,6 +468,14 @@ static int nullb_apply_poll_queues(struct nullb_devi=
-ce *dev,
- 	return ret;
- }
-=20
-+static int nullb_apply_max_segment_size(struct nullb_device *dev,
-+					unsigned int max_segment_size)
-+{
-+	if (max_segment_size < BLK_MIN_SEGMENT_SIZE)
-+		return -EINVAL;
-+	return 0;
-+}
-+
- NULLB_DEVICE_ATTR(size, ulong, NULL);
- NULLB_DEVICE_ATTR(completion_nsec, ulong, NULL);
- NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
-@@ -450,6 +484,7 @@ NULLB_DEVICE_ATTR(home_node, uint, NULL);
- NULLB_DEVICE_ATTR(queue_mode, uint, NULL);
- NULLB_DEVICE_ATTR(blocksize, uint, NULL);
- NULLB_DEVICE_ATTR(max_sectors, uint, NULL);
-+NULLB_DEVICE_ATTR(max_segment_size, uint, nullb_apply_max_segment_size);
- NULLB_DEVICE_ATTR(irqmode, uint, NULL);
- NULLB_DEVICE_ATTR(hw_queue_depth, uint, NULL);
- NULLB_DEVICE_ATTR(index, uint, NULL);
-@@ -608,6 +643,7 @@ static struct configfs_attribute *nullb_device_attrs[=
-] =3D {
- 	&nullb_device_attr_index,
- 	&nullb_device_attr_irqmode,
- 	&nullb_device_attr_max_sectors,
-+	&nullb_device_attr_max_segment_size,
- 	&nullb_device_attr_mbps,
- 	&nullb_device_attr_memory_backed,
- 	&nullb_device_attr_no_sched,
-@@ -805,6 +841,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->queue_mode =3D g_queue_mode;
- 	dev->blocksize =3D g_bs;
- 	dev->max_sectors =3D g_max_sectors;
-+	dev->max_segment_size =3D g_max_segment_size;
- 	dev->irqmode =3D g_irqmode;
- 	dev->hw_queue_depth =3D g_hw_queue_depth;
- 	dev->blocking =3D g_blocking;
-@@ -1248,6 +1285,9 @@ static blk_status_t null_transfer(struct nullb *nul=
-lb, struct page *page,
- 	unsigned int valid_len =3D len;
- 	void *p;
-=20
-+	WARN_ONCE(len > dev->max_segment_size, "%u > %u\n", len,
-+		  dev->max_segment_size);
-+
- 	p =3D kmap_local_page(page) + off;
- 	if (!is_write) {
- 		if (dev->zoned) {
-@@ -1295,6 +1335,8 @@ static blk_status_t null_handle_data_transfer(struc=
-t nullb_cmd *cmd,
- 	spin_lock_irq(&nullb->lock);
- 	rq_for_each_segment(bvec, rq, iter) {
- 		len =3D bvec.bv_len;
-+		len =3D min(bvec.bv_len, nullb->dev->max_segment_size);
-+		bvec.bv_len =3D len;
- 		if (transferred_bytes + len > max_bytes)
- 			len =3D max_bytes - transferred_bytes;
- 		err =3D null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
-@@ -1958,6 +2000,7 @@ static int null_add_dev(struct nullb_device *dev)
- 		.logical_block_size	=3D dev->blocksize,
- 		.physical_block_size	=3D dev->blocksize,
- 		.max_hw_sectors		=3D dev->max_sectors,
-+		.max_segment_size	=3D dev->max_segment_size,
- 		.dma_alignment		=3D 1,
- 	};
-=20
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/n=
-ull_blk.h
-index 6c4c4bbe7dad..43dc47789718 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -93,6 +93,7 @@ struct nullb_device {
- 	unsigned int queue_mode; /* block interface */
- 	unsigned int blocksize; /* block size */
- 	unsigned int max_sectors; /* Max sectors per command */
-+	unsigned int max_segment_size; /* Max size of a single DMA segment. */
- 	unsigned int irqmode; /* IRQ completion handler */
- 	unsigned int hw_queue_depth; /* queue depth */
- 	unsigned int index; /* index of the disk, only valid with a disk */
+We've been polishing this series for a while now, and we have taken
+great care to make it as "upstream-presentable" as possible. That said,
+there are still probably imperfections. It's a start -- feedback welcome!
+
+The main blocker that still remains is that this technically breaks
+userspace: some ancient versions of the DRBD userspace utilities will
+not be able to talk to this version of the driver (v8 and v9 genetlink
+families are completely incompatible).
+We will fix that by introducing a completely new genetlink family (think
+"drbd2") that follows all modern conventions. Then we can register both
+families, going through a compat layer for the old family.
+
+A prerequisite for that is converting the genl_magic macro
+infrastructure we use now to YNL. That is already in the pipeline, we
+expect to have it ready by the 7.2 merge window.
+
+The plan is to submit one new version of this series for every merge
+window, which should end up in linux-next. Within a few kernel
+releases, we will hopefully be close enough to get this over the line
+and submitted for real.
+
+Thanks,
+Christoph
+
+[0] https://lore.kernel.org/linux-next/899e0337-9642-4ca6-9050-aeab14fa22ef@kernel.dk/
+[1] https://github.com/LINBIT/drbd
+
+Christoph Böhmwalder (20):
+  drbd: mark as BROKEN during DRBD 9 rework
+  drbd: extend wire protocol definitions for DRBD 9
+  drbd: introduce DRBD 9 on-disk metadata format
+  drbd: add transport layer abstraction
+  drbd: add TCP transport implementation
+  drbd: add RDMA transport implementation
+  drbd: add load-balancing TCP transport
+  drbd: add DAX/PMEM support for metadata access
+  drbd: add optional compatibility layer for DRBD 8.4
+  drbd: rename drbd_worker.c to drbd_sender.c
+  drbd: rework sender for DRBD 9 multi-peer
+  drbd: replace per-device state model with multi-peer data structures
+  drbd: rewrite state machine for DRBD 9 multi-peer clusters
+  drbd: rework activity log and bitmap for multi-peer replication
+  drbd: rework request processing for DRBD 9 multi-peer IO
+  drbd: rework module core for DRBD 9 transport and multi-peer
+  drbd: rework receiver for DRBD 9 transport and multi-peer protocol
+  drbd: rework netlink management interface for DRBD 9
+  drbd: update monitoring interfaces for multi-peer topology
+  drbd: remove BROKEN for DRBD
+
+ drivers/block/drbd/Kconfig                    |    58 +
+ drivers/block/drbd/Makefile                   |     9 +-
+ drivers/block/drbd/drbd_actlog.c              |  1122 +-
+ drivers/block/drbd/drbd_bitmap.c              |  1824 +--
+ drivers/block/drbd/drbd_buildtag.c            |     2 +-
+ drivers/block/drbd/drbd_config.h              |    38 +
+ drivers/block/drbd/drbd_dax_pmem.c            |   158 +
+ drivers/block/drbd/drbd_dax_pmem.h            |    40 +
+ drivers/block/drbd/drbd_debugfs.c             |  1657 ++-
+ drivers/block/drbd/drbd_debugfs.h             |     2 +
+ .../block/drbd}/drbd_genl_api.h               |    19 +-
+ drivers/block/drbd/drbd_int.h                 |  3278 +++--
+ drivers/block/drbd/drbd_interval.c            |    35 +-
+ drivers/block/drbd/drbd_interval.h            |   156 +-
+ drivers/block/drbd/drbd_legacy_84.c           |   564 +
+ drivers/block/drbd/drbd_legacy_84.h           |    27 +
+ drivers/block/drbd/drbd_main.c                |  6008 +++++---
+ drivers/block/drbd/drbd_meta_data.h           |   126 +
+ drivers/block/drbd/drbd_nl.c                  |  7248 ++++++---
+ drivers/block/drbd/drbd_nla.c                 |     2 +-
+ drivers/block/drbd/drbd_nla.h                 |     7 +-
+ drivers/block/drbd/drbd_polymorph_printk.h    |   265 +-
+ drivers/block/drbd/drbd_proc.c                |   320 +-
+ drivers/block/drbd/drbd_protocol.h            |   519 +-
+ drivers/block/drbd/drbd_receiver.c            | 12258 +++++++++++-----
+ drivers/block/drbd/drbd_req.c                 |  2990 ++--
+ drivers/block/drbd/drbd_req.h                 |   303 +-
+ drivers/block/drbd/drbd_sender.c              |  3871 +++++
+ drivers/block/drbd/drbd_state.c               |  7724 +++++++---
+ drivers/block/drbd/drbd_state.h               |   298 +-
+ drivers/block/drbd/drbd_state_change.h        |    66 +-
+ drivers/block/drbd/drbd_strings.c             |   219 +-
+ drivers/block/drbd/drbd_strings.h             |    25 +-
+ drivers/block/drbd/drbd_transport.c           |   403 +
+ drivers/block/drbd/drbd_transport.h           |   340 +
+ drivers/block/drbd/drbd_transport_lb-tcp.c    |  1905 +++
+ drivers/block/drbd/drbd_transport_rdma.c      |  3496 +++++
+ drivers/block/drbd/drbd_transport_tcp.c       |  1670 +++
+ drivers/block/drbd/drbd_transport_template.c  |   160 +
+ drivers/block/drbd/drbd_worker.c              |  2223 ---
+ include/linux/drbd.h                          |   190 +-
+ include/linux/drbd_config.h                   |    16 -
+ include/linux/drbd_genl.h                     |   352 +-
+ include/linux/drbd_limits.h                   |   112 +-
+ include/linux/genl_magic_func.h               |    50 +-
+ 45 files changed, 45891 insertions(+), 16264 deletions(-)
+ create mode 100644 drivers/block/drbd/drbd_config.h
+ create mode 100644 drivers/block/drbd/drbd_dax_pmem.c
+ create mode 100644 drivers/block/drbd/drbd_dax_pmem.h
+ rename {include/linux => drivers/block/drbd}/drbd_genl_api.h (68%)
+ create mode 100644 drivers/block/drbd/drbd_legacy_84.c
+ create mode 100644 drivers/block/drbd/drbd_legacy_84.h
+ create mode 100644 drivers/block/drbd/drbd_meta_data.h
+ create mode 100644 drivers/block/drbd/drbd_sender.c
+ create mode 100644 drivers/block/drbd/drbd_transport.c
+ create mode 100644 drivers/block/drbd/drbd_transport.h
+ create mode 100644 drivers/block/drbd/drbd_transport_lb-tcp.c
+ create mode 100644 drivers/block/drbd/drbd_transport_rdma.c
+ create mode 100644 drivers/block/drbd/drbd_transport_tcp.c
+ create mode 100644 drivers/block/drbd/drbd_transport_template.c
+ delete mode 100644 drivers/block/drbd/drbd_worker.c
+ delete mode 100644 include/linux/drbd_config.h
+
+
+base-commit: 67807fbaf12719fca46a622d759484652b79c7c3
+-- 
+2.53.0
+
