@@ -1,63 +1,64 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A413890F4
-	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 22:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A67394470
+	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 22:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774651130; cv=none; b=HI8vnglaV3cu+gcDRiFlOmIcOYDFJ8DQY1OrUgu+qpeWwKjnxDZ1vwKePqvU65iU8QGqtcZJUSQVa3Kj46mcpLNL5+sl2QpsxQhR+68I4P/5EzXfokvhxBZienXBlIn/RlTKK5P6S4E7z0G030XkLVpeFZh4Ll3pLqzcbatdys0=
+	t=1774651131; cv=none; b=YZPNKoslg9Bvtj/XIv3CrPfmAnNiPjRkf27wurQ/CcrHBzxrOHwjK5iJpW1DXiChuaP1Z+y+gPDY6GS8Q1qoTyhhP+YN2Gq5UrbnkilxajjWu2FQZLlKarwEcWNIjXxZZvAnPWmTPqTi91GBf5IXUGgEZ1C5pIcJedXuHN5i/3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774651130; c=relaxed/simple;
-	bh=/iAP3nD06jYRWcdSsS1v9RRiexileYML3/JfvHlOvCc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tjY6Q3M81NfzJYIhmYyjqPodm9f6rMGOHnSDBOsdsdk6nCRbvBdXLm+qYrRulDQlEIL4haznhyAS62glkJ0oy/V1ACFzWcN1ta3HhBVB3hvceEUT60ZhssvvQTxCIanGJ1Pi9sz6wn/aiPM9FOKNsILcYvoyRDDDLAt9UX+Au3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=NzF9KD/F; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1774651131; c=relaxed/simple;
+	bh=WSb/Dar7CuUZusCwHnM/NiM1oo4nZTZnSW8WdbK11CA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ifPot/5qxvAR3YWaWyY2jbK6eQK8pIBPx7Hj4DidDdvoTWo2gXMP9I/1QNEG4l/YcXg1Wqxytk6xh+YorSHgByp6wJ3dLBD8HnVTz5owmbr0BZ10Vvejc/gzVkBjYH5HmIzej1j0l0RQ76ikvAaveRGsNMm3pZtC2Znr033mWWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=05WJ3/i2; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="NzF9KD/F"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-486fb112c09so26483365e9.1
-        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 15:38:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="05WJ3/i2"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43b87970468so2436461f8f.3
+        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 15:38:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1774651126; x=1775255926; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+ah7Jc7k71YR5et9OmCfsg+DC7q9Eb/m1sFtjVOghFI=;
-        b=NzF9KD/FrcENJ7kwCe+h2+64epNZIKqwrCXVy6eN88KL3n1WWw/vl2ifwNc/Xz+GWA
-         kX40d6NWo2ENMFEnl2yZUHi1lYVI9Qu5A8d78kjoF6Czh3N9mjAQPuB7ggmFUtAaFNj8
-         QBCQllRmnrVI4U3iVQFDY56MrBlZ1udlMpO4FQC2JATTTEC/F06VTQTP/g1eztt9qqjK
-         6m8yf8kUaEZcrnjLdY2sDmYWqe+QobQlJDECtt99fTyfAeJ5cYCxpMHgC77JoFbQ7w6Q
-         Pllfa+mrFFFunrgYPjlJpZMJ1OBgdeLiUzpkpwdeHNS1JS5wy1PhbmTkp86f/gnWEpqc
-         PSVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774651126; x=1775255926;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1774651128; x=1775255928; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+ah7Jc7k71YR5et9OmCfsg+DC7q9Eb/m1sFtjVOghFI=;
-        b=hhG8/K5u0Jvx4Ja8Cre60r7ll/QdDncQJc6TtAapdlUzdEh/ixgU90edpM1sNLR/3G
-         hWcdp68Tt8WFw0MjgqBl0oPbdIMX1fft0ny6s7Wp5VK/psRmeBoZWVhws4++mo0kHjTu
-         F8kVZHDHncyddZoZ182L30BGTBuopMkKCjlGqLgsgm0aZRVhOg1lRXmNqKX3QJeI6xan
-         i64yejOiztsjwsR6z9baZsOw2D++otH7ONHhP1MybHgiYEWxuKM/iCh4xlyR92UI+63G
-         DTOKmikgIfAG6ML7/SJ8I8MN1JETi/nAfiRZU8oA+KJ1HLTf1HJlvozGovN11JEacEKp
-         RyrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWvhmpZBWcSqfJ/iKPSZXhYU7DPCrUAdob8yzVIR//y1HADu4Qr3jyEDl6N1KUAdU74qb0FQ2/A2UR7IA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrtyygMhDlbYlbuv3b7p4pm7uLB+0hFPU7bms/sO1HO6fhpbi5
-	K4vHC/ZDK5131UtVhfOow5gSMSASCGKpX6W94raXF/6kLotdRCgqcShb14sCTKfZARFYYBXx6nS
-	LYqUx
-X-Gm-Gg: ATEYQzwO9nEfFKdbZU32Qa5kCWnsu1sYoE9xiQrgbAF1yVt525oVCjkFaLAxT40awo7
-	6WW1OdxKT4VtfUWx/lPe5DAzxLtFwihMlr04UfRoIhG0DaKZ7ljEJbshyQZLQoj15TCP0P9bniO
-	gguHAs+A33oncKiHWk+YOVqopNYSbbj02CBy/pf1ppPsDj79nevoOTnZ//fsjlTAdxUrU3eVqT/
-	ZnFKE9tC18va5yPjEbb2dO1vZ9q8yh94+A9RH+YCVTHVBfd3h+8XHBMLaFXIJJ8wnPgfmK8Ytlk
-	RO5WsK5OtomubINwWgC45xzNz1VTFdu9Nt9WFyHgYKzPb5rUgbKmMiTybSAEJIa+amSBQxo8tPn
-	rs8QZXsJHdlQQizpIoRuzo6mW2zD1rW/UZ91VxW4bxaoEL0lLf1o/iAQ3dCRaY5cXKNmVl7gTsb
-	OTTA5EDhKo7EKljnPHiYo7jadlSKSa0UM3THuRhxqkXE/3J5txrPV01uzvFoOSvgqG0+VxUq1iC
-	HgdRwFUcPioxed0saDawA==
-X-Received: by 2002:a05:6000:2006:b0:43b:41df:705e with SMTP id ffacd0b85a97d-43b9ea77850mr7212627f8f.49.1774651126061;
-        Fri, 27 Mar 2026 15:38:46 -0700 (PDT)
+        bh=k+4sneUti/b8Rpw1YtgfXCWa4T3JT6LBHzjjUYkhTX8=;
+        b=05WJ3/i2rTwV0/T3lZpiEAxZEFjwHig37bGQcGH5O18kyGtQEx7V1lFKGER3QK9QDz
+         OxNj8aXxigaw+eRcn0c5WnBkqpEO9Sxu8QlwkhWXIHF9J4Z1o3qxKu9/i0RO68Qvv4l3
+         sR//c890KFxvNu6sFejPg4ACbjdQiFF0Ws+e3DtAFwnZlqIHdSZdDwBGfvsxBydE12Vq
+         ZUDNYVgyDRsz5gFpuDj2cmDEDMCJPzF2ZZ/8QOwZYnnEE9cLbk0iYlRRFV+SaMcNCu8W
+         htF6bwOHRAtCEt/oue0LqS8GXqwN+8iwAPSJHcOAQe582xifHXZUsvG+6aFTBKDaq4L2
+         VqqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774651128; x=1775255928;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=k+4sneUti/b8Rpw1YtgfXCWa4T3JT6LBHzjjUYkhTX8=;
+        b=N/O2Yqv5C+aRku32ILcUuyrX0F5kztSQzaIEVzFjUfgYLg3NdyBWV4tdeX3DXCXtSC
+         t/SQUuai+jjrc+EGILNIVYTwMgGUkkIRiTaotF034AVBTW3HjS445P5+mFSo2Wp+OjFd
+         cQw7am76zqHXDMwVfnylSCcVsYlu8x1gGB3pNnurqnO2hBfLOP4RfsafQ8Js0Uatr9o3
+         wZUPjE0TDZPrOrO1cX7MPXMtLYZ8XqCOmNiIlPKVydfxKwBYJXoEnB3u60sMPuxlDYUF
+         Va376EYa9tWWX4iP+8BOAkMachflQK5DF0voNRQMzrw6UxcZ3/jCmiGHIHvY9x8L3Ah8
+         Dl1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWPP6Si+Z03Q7H8Ew/FC+fQWTHqe4ux9yRjP0G9aBynu11Co0HDtZ1HHnYOTy6M6OmUgmCxgidZTLsi9w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4CyYVrf0AyAOEQmk0LLwTjr+0lxPrsf3CkveOY/cQ8tcEJiro
+	WLNCJUd/LwYlUJpImFlSKzdiKkXcH0GAsZw5nGav4KY+Vz0sXd4y5PJ+0zrN1wjtM+E=
+X-Gm-Gg: ATEYQzw2K6EcHM2FP3q80iRVgWrUePli6DCsyUcYXA7uAswG/+ztaI2qKH12+22g13y
+	7wmzoxshPAcfxmlG+tVLxIHXu0dOGPR+/mzq7Ijb7VxgowET4FYn67949Ef9ufJBowCi4dAkb7P
+	mZMkrGfstvlh+/rNX2J8+/KjnycHn3jLsYh8L26lcvAjXtgXTMRrfgDF7yvhbJv+IFC2Q1DimZ6
+	ueNXleqA/1z9lPZZPhYJUoKiO0sEVv6dTflyiR28HM9k3bMF6pVxuTqNf2g4jwB+RIv1KUznymh
+	7HURFRkj3AX/S0u8wi8eWfa+ljOvxCC3Hy3cG9N6vt+gLkZzAMGWES5uTXNl0LsAR0/zja8eDP7
+	u3bdR49Z57a6xYDgRjEcO/yMuSVaXuj9daPP37Bd8zUFmRvWyiyd96KqnhmLWph1O4jmh4o6PhV
+	xpxHJxQcdHzjM/V7kx8KcowRlSwJQ0f8d4bFx/n2r8LE4DAySJDHXdcSI45NWvlF9ADxYGonXwk
+	UzUZ9tdtSBQcX2b9Ar0SQ==
+X-Received: by 2002:a05:6000:22c3:b0:439:b114:60c0 with SMTP id ffacd0b85a97d-43b9ea9afcemr7594435f8f.35.1774651127984;
+        Fri, 27 Mar 2026 15:38:47 -0700 (PDT)
 Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf247079esm998990f8f.25.2026.03.27.15.38.45
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf247079esm998990f8f.25.2026.03.27.15.38.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Mar 2026 15:38:45 -0700 (PDT)
+        Fri, 27 Mar 2026 15:38:46 -0700 (PDT)
 From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: drbd-dev@lists.linbit.com,
@@ -66,10 +67,12 @@ Cc: drbd-dev@lists.linbit.com,
 	Philipp Reisner <philipp.reisner@linbit.com>,
 	linux-block@vger.kernel.org,
 	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Subject: [PATCH 00/20] DRBD 9 rework
-Date: Fri, 27 Mar 2026 23:38:00 +0100
-Message-ID: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
+Subject: [PATCH 01/20] drbd: mark as BROKEN during DRBD 9 rework
+Date: Fri, 27 Mar 2026 23:38:01 +0100
+Message-ID: <20260327223820.2244227-2-christoph.boehmwalder@linbit.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
+References: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,132 +82,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-As discussed (context: [0]), here is the first version of our DRBD 9
-rework series, intended for for-next via for-7.1/drbd.
+Mark DRBD as BROKEN while the driver is being reworked for DRBD 9
+multi-peer support. The following commits restructure the driver
+extensively, and intermediate states do not compile. DRBD will be
+re-enabled once the rework is complete.
 
-This replays about 10-15 years of active out-of-tree development work
-[1], depending on your way of counting. The out-of-tree module has
-severely diverged from the in-tree version over the years, which is
-what we are aiming to fix now.
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+---
+ drivers/block/drbd/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-Hopefully that somewhat excuses (or at least explains) the massive
-diffs -- we've tried to come up with a way to group the changes by
-topic, but I realize it's still not exactly trivial to review.
-
-We've been polishing this series for a while now, and we have taken
-great care to make it as "upstream-presentable" as possible. That said,
-there are still probably imperfections. It's a start -- feedback welcome!
-
-The main blocker that still remains is that this technically breaks
-userspace: some ancient versions of the DRBD userspace utilities will
-not be able to talk to this version of the driver (v8 and v9 genetlink
-families are completely incompatible).
-We will fix that by introducing a completely new genetlink family (think
-"drbd2") that follows all modern conventions. Then we can register both
-families, going through a compat layer for the old family.
-
-A prerequisite for that is converting the genl_magic macro
-infrastructure we use now to YNL. That is already in the pipeline, we
-expect to have it ready by the 7.2 merge window.
-
-The plan is to submit one new version of this series for every merge
-window, which should end up in linux-next. Within a few kernel
-releases, we will hopefully be close enough to get this over the line
-and submitted for real.
-
-Thanks,
-Christoph
-
-[0] https://lore.kernel.org/linux-next/899e0337-9642-4ca6-9050-aeab14fa22ef@kernel.dk/
-[1] https://github.com/LINBIT/drbd
-
-Christoph Böhmwalder (20):
-  drbd: mark as BROKEN during DRBD 9 rework
-  drbd: extend wire protocol definitions for DRBD 9
-  drbd: introduce DRBD 9 on-disk metadata format
-  drbd: add transport layer abstraction
-  drbd: add TCP transport implementation
-  drbd: add RDMA transport implementation
-  drbd: add load-balancing TCP transport
-  drbd: add DAX/PMEM support for metadata access
-  drbd: add optional compatibility layer for DRBD 8.4
-  drbd: rename drbd_worker.c to drbd_sender.c
-  drbd: rework sender for DRBD 9 multi-peer
-  drbd: replace per-device state model with multi-peer data structures
-  drbd: rewrite state machine for DRBD 9 multi-peer clusters
-  drbd: rework activity log and bitmap for multi-peer replication
-  drbd: rework request processing for DRBD 9 multi-peer IO
-  drbd: rework module core for DRBD 9 transport and multi-peer
-  drbd: rework receiver for DRBD 9 transport and multi-peer protocol
-  drbd: rework netlink management interface for DRBD 9
-  drbd: update monitoring interfaces for multi-peer topology
-  drbd: remove BROKEN for DRBD
-
- drivers/block/drbd/Kconfig                    |    58 +
- drivers/block/drbd/Makefile                   |     9 +-
- drivers/block/drbd/drbd_actlog.c              |  1122 +-
- drivers/block/drbd/drbd_bitmap.c              |  1824 +--
- drivers/block/drbd/drbd_buildtag.c            |     2 +-
- drivers/block/drbd/drbd_config.h              |    38 +
- drivers/block/drbd/drbd_dax_pmem.c            |   158 +
- drivers/block/drbd/drbd_dax_pmem.h            |    40 +
- drivers/block/drbd/drbd_debugfs.c             |  1657 ++-
- drivers/block/drbd/drbd_debugfs.h             |     2 +
- .../block/drbd}/drbd_genl_api.h               |    19 +-
- drivers/block/drbd/drbd_int.h                 |  3278 +++--
- drivers/block/drbd/drbd_interval.c            |    35 +-
- drivers/block/drbd/drbd_interval.h            |   156 +-
- drivers/block/drbd/drbd_legacy_84.c           |   564 +
- drivers/block/drbd/drbd_legacy_84.h           |    27 +
- drivers/block/drbd/drbd_main.c                |  6008 +++++---
- drivers/block/drbd/drbd_meta_data.h           |   126 +
- drivers/block/drbd/drbd_nl.c                  |  7248 ++++++---
- drivers/block/drbd/drbd_nla.c                 |     2 +-
- drivers/block/drbd/drbd_nla.h                 |     7 +-
- drivers/block/drbd/drbd_polymorph_printk.h    |   265 +-
- drivers/block/drbd/drbd_proc.c                |   320 +-
- drivers/block/drbd/drbd_protocol.h            |   519 +-
- drivers/block/drbd/drbd_receiver.c            | 12258 +++++++++++-----
- drivers/block/drbd/drbd_req.c                 |  2990 ++--
- drivers/block/drbd/drbd_req.h                 |   303 +-
- drivers/block/drbd/drbd_sender.c              |  3871 +++++
- drivers/block/drbd/drbd_state.c               |  7724 +++++++---
- drivers/block/drbd/drbd_state.h               |   298 +-
- drivers/block/drbd/drbd_state_change.h        |    66 +-
- drivers/block/drbd/drbd_strings.c             |   219 +-
- drivers/block/drbd/drbd_strings.h             |    25 +-
- drivers/block/drbd/drbd_transport.c           |   403 +
- drivers/block/drbd/drbd_transport.h           |   340 +
- drivers/block/drbd/drbd_transport_lb-tcp.c    |  1905 +++
- drivers/block/drbd/drbd_transport_rdma.c      |  3496 +++++
- drivers/block/drbd/drbd_transport_tcp.c       |  1670 +++
- drivers/block/drbd/drbd_transport_template.c  |   160 +
- drivers/block/drbd/drbd_worker.c              |  2223 ---
- include/linux/drbd.h                          |   190 +-
- include/linux/drbd_config.h                   |    16 -
- include/linux/drbd_genl.h                     |   352 +-
- include/linux/drbd_limits.h                   |   112 +-
- include/linux/genl_magic_func.h               |    50 +-
- 45 files changed, 45891 insertions(+), 16264 deletions(-)
- create mode 100644 drivers/block/drbd/drbd_config.h
- create mode 100644 drivers/block/drbd/drbd_dax_pmem.c
- create mode 100644 drivers/block/drbd/drbd_dax_pmem.h
- rename {include/linux => drivers/block/drbd}/drbd_genl_api.h (68%)
- create mode 100644 drivers/block/drbd/drbd_legacy_84.c
- create mode 100644 drivers/block/drbd/drbd_legacy_84.h
- create mode 100644 drivers/block/drbd/drbd_meta_data.h
- create mode 100644 drivers/block/drbd/drbd_sender.c
- create mode 100644 drivers/block/drbd/drbd_transport.c
- create mode 100644 drivers/block/drbd/drbd_transport.h
- create mode 100644 drivers/block/drbd/drbd_transport_lb-tcp.c
- create mode 100644 drivers/block/drbd/drbd_transport_rdma.c
- create mode 100644 drivers/block/drbd/drbd_transport_tcp.c
- create mode 100644 drivers/block/drbd/drbd_transport_template.c
- delete mode 100644 drivers/block/drbd/drbd_worker.c
- delete mode 100644 include/linux/drbd_config.h
-
-
-base-commit: 67807fbaf12719fca46a622d759484652b79c7c3
+diff --git a/drivers/block/drbd/Kconfig b/drivers/block/drbd/Kconfig
+index 495a72da04c6..b907b07468bb 100644
+--- a/drivers/block/drbd/Kconfig
++++ b/drivers/block/drbd/Kconfig
+@@ -8,6 +8,7 @@ comment "DRBD disabled because PROC_FS or INET not selected"
+ 
+ config BLK_DEV_DRBD
+ 	tristate "DRBD Distributed Replicated Block Device support"
++	depends on BROKEN
+ 	depends on PROC_FS && INET
+ 	select LRU_CACHE
+ 	select CRC32
 -- 
 2.53.0
 
