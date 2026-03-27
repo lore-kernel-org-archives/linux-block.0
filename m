@@ -1,128 +1,61 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272B43EB7F6
-	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 14:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774621330; cv=pass; b=rRtlfLpHDlVNoaVLNBUFuss53xe3kUKI5l5I6/bojPSNr1/EVYbIoI3LsGs4vTecOEGiR799nvkR/3q3MZauBpJ1Gd+ZmqjuUEoo+E547tkPkdTB/MqLZhv74EKBniu47f6Iy6jgjCtFg2ncef3YoB5AgMvNJRSRqXv2O/rfedo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774621330; c=relaxed/simple;
-	bh=KTDK3vOxt1fIVdHhRs3HNHtD5rFi66H7oz+TrzUybAM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YTMBgq/lScUklGL6ex3mpQL9Ptt33CGqBXDsLIp5RXILeu7dz1W/isVSIbREPzQbbyuJXSlf4savevzTOAdZ+6rXBYTujs7HmUz20VsxEJWq1kSfSUaH06EzDRsNjMChBFLi1OYaZ7h/3fm7VXvu6UAVRZscryK7xPf5Xwd8P70=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ID41B3kO; arc=pass smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F73E3F54AA
+	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 14:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774622126; cv=none; b=kXbXr52m1jrtTkpqkbj+VIAnT0sGDo0yYm/7zdxGGlTmhqOavFYFlL1/W4qNZIdrIlnuTI69JMP7Kjhf3DkcmuH/NYW4YmVDInPNb1tgVt/fppmR4GONka30CPF8QYooj+FQjfHGPILcPIQjRsBMj8VMkVJ6xY/PU2rq0zCssfk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774622126; c=relaxed/simple;
+	bh=6gt4mIuCNglYV0gvoInF8PrydGqnKI1b7UtZkcogXVo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l39PTSVX5gTyCBAAxONhuf6nQLtrpjZe4dc6AiKukbGTlmDWTP3qC4rkFfZeSpudOY2C7Ia6wsXQaeldH+cn1oop93JGB6NnMGb9Vk9ua5JC6fhZ/qSpATAP4Bqhc6DUFHd9K6XT2KE43f6n1Bo8a/lnbP2FcgMAbNrRpLufWT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kupUsVVO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ID41B3kO"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-486fba7ce4cso22600905e9.3
-        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 07:22:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774621327; cv=none;
-        d=google.com; s=arc-20240605;
-        b=E0iuIQIzkVAKbHN9SmIlhBTvuwcddCVsovhmwAgdmjaWhnKWL6oOG8q+0oN2yTWxFW
-         93s3T2nOlMrpOYxglmP50jqY0IFgP7uvL7agWlFLgIwVvBnFeJpASTXz7Ze27hNh6uw1
-         JX9NMRUl5O6h0hYkbNqBvZMORPgHRjG3rYL0yYV5mrnNfjFYeazVWY3Qbxxl0AXAe3bV
-         8D+FwnyDPkpskzRc1kyS5kWukzm3dgPqnY94dQ511KLZpUA3FrT46Vng/neHzcBDtHei
-         HAIrwQd0MZ8zpn9uGdPX4JqBdsELKq85wRcd+FMiM4n1oeKwWbrN7jNZ0uj+e3vo9QtR
-         JDCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ms382mXmeMfyEZXo+JDpLmvuZwZ5tlyqI074nqlFpZI=;
-        fh=EqVGw7aT/WG8pFSnNp0rpf1MDfY+h1IkZjWxJtveQxE=;
-        b=dA3hhZoVrxGBuc5IU3mf99xfQsuij0aIRa9L242bhIchxiH8dKbL6pDp3LoEEN9wn+
-         OtURcNl4wihsZ1OlzwAGRxqrWvzb92eP5QLg01/Si37d/Miptm85GiXR2Q3cdxTL/L0z
-         Y3KIDF2Hr6Nbur4La9P9yuj0K5xCRKW0QeHy+HYWth4k52cZ+GgnBvUB+ck0BMV2rcVI
-         Iwd7UBZxB+Zeoe+9Uk8AWhtMRWyuuopfwBGWhJuzO9mA7MdIJ8/+9+COOu3yFm7lr7Xn
-         RPNffsH2i+0rvr6FgsxfCEk+rbcrUVhieRe4h5MfeKHF8A4sktpnUqFYkufO5AmtkuAZ
-         mwAA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774621327; x=1775226127; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ms382mXmeMfyEZXo+JDpLmvuZwZ5tlyqI074nqlFpZI=;
-        b=ID41B3kOeFeMQf6qz/FF7kGQvO9qo9l1SDlO2Hs/teWIpjaa68X4pXuzQaSFe80yGy
-         dZ5ZXKzqbZyFKx/32kPuei4PrzJ/xUqRAKHlezgiEfbEhZV7sbljVBNYafTUJ6U/jD/C
-         KeyZNqycrLT0xHJYsQx+XDNPW1mytftFmTasne8vb9pC2/9sKj6Hur52fAn0ugDbTIOP
-         MPajGDu/f8j+9wKwCT29dVsD8t7akE56tdEIPRqcIQSzS3B0zlZElbb4BUyuNxKYDPAT
-         En6wgibJHr8IL8+CBWpiEBgV1WcYYklfOliek5xF0Hd7PNSjAMwn2UVDVqXZqbJoX7NV
-         jhHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774621327; x=1775226127;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ms382mXmeMfyEZXo+JDpLmvuZwZ5tlyqI074nqlFpZI=;
-        b=HLd+fC17/xjTot/gwLio4QGEySgmHuBwEtyZnt2OUBBlNJK6o1YV4myYWie8VI40vd
-         L3zczUuQ4VaBHdy1hgkblw2/kNR+V8dkIT6rhpmRjSXm6UEQRhzuXMI0DsC6E3NZur3e
-         7ISpTI7YsZ7Nd6fudga4X4xAnPYdsU7s5iC36J8VaNWofuEd6oa+/V342aoCHkJ7ozLb
-         4ZklvUH59O/D+cN0hYhynC2GBGLEwkxgLkNCvL2VTE9s3QsfAiQLU23ZS3PPljVgMMSl
-         ggPS0PSHyvt3n/Rwr3s1ely+HUNkcD5JrtqmsYcAcSfpkea2bvH2IhWs90lVRaz/pr5O
-         IgEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUPGj+lk8hsjgGEtAxBfD5NkZPs0KGAQdR+PoymexlnR5x62GtU6lGGxrUFSr+pBHwizhzHd1BcvT/O+A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXZaUMj3ZLjRWwsMcOv52xXHXXGfAE1is+19dvGTTM2qGIVm7c
-	lTsm2gPQTEWW6GBbmXCB4+Pw/BzvJReDevuXc+1nDMIR9Zzra1lp30l+80L+043EWKyiU+Qr7aL
-	TgklpW/uvo6OZZQ2jkrSo5pVKcit62dw=
-X-Gm-Gg: ATEYQzzxLQeeST5Gwu/YxAQBdMZa1Hv+4OaoMVXMYaXktZuc4LJ2kmiu+TOuW1K905G
-	y0pc2dg1H9tT/XgNN4SC0Uzig4tJlE53pYDygLjVlWAAvpx8SAxnQHZKfKkvaXDJe6iY6qO78HR
-	0F3MRkzxd9DDqLqnEX8j/Asf2b0SHEyKkD5GkY6bLIsQzJ2sbsQrafQSn5EoOQ5uiMVEMM5nifM
-	xT7wl090Je2Lm2KuJkl0ylcvexFdvTfQwiIw8HTW15qtFwqO5kJ0OZRNpdtY4jimayXzjM2WN+s
-	ldFAPdKQJZh2ZeJ+UBjIKN+Dq5A4+jp/f8OkMuTv3yEB5IGUvG+adFTICteeQMC06Yv1FTv3qKz
-	Mmz9BewWBdrxsEXMK0rfkDmKegw==
-X-Received: by 2002:a05:600c:4f91:b0:486:f634:ef1 with SMTP id
- 5b1f17b1804b1-48727eda549mr46648885e9.17.1774621327165; Fri, 27 Mar 2026
- 07:22:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kupUsVVO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4446C2BC87;
+	Fri, 27 Mar 2026 14:35:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774622126;
+	bh=6gt4mIuCNglYV0gvoInF8PrydGqnKI1b7UtZkcogXVo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kupUsVVOuamVESFiTbFVHu47X77bTrkAqGAZdgMHV6gf0n5DFVjXomGwlMch+SS5O
+	 Sgx4sVrbhFl8/gwmTETGvRMymRno5ZRFB/x/lg15gLnhxnitdX4anFY7h+SanhQkjZ
+	 TfaBrPNXJtIZH/BP68vKd2RgNCCFZVQMhQXSNnoTbG2cUIPR1Ga8yNM5wm1/hK7Wf3
+	 bSuOzifLt/iImBIRTPou2kfK8QJsTbr696Pf7LD3/z3b+q1l8dTPSL9lQC3cuGsyW+
+	 e8bVTEBLcR1J/Ij2i2TKyclMg6EBGxonAWV2Nc7qhgYoXnRasLzLfrgO9wulnljwZU
+	 qCn9jfjS3EZbQ==
+Message-ID: <4795774a-9888-482e-aa8a-472809aee47b@kernel.org>
+Date: Fri, 27 Mar 2026 07:35:19 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260327114741.91500-1-pilgrimtao@gmail.com> <20260327114741.91500-2-pilgrimtao@gmail.com>
-In-Reply-To: <20260327114741.91500-2-pilgrimtao@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 27 Mar 2026 07:21:56 -0700
-X-Gm-Features: AQROBzBIPfZAUsMrDB7LBzUtbbmaH79IMxVvd9bzKdqKC91ZGulsOHpJpWVa3Bc
-Message-ID: <CAADnVQJizm+Y8_AE0rjJnBCrvNc+ThiWdbc-ZuUZqYTLtf=MOA@mail.gmail.com>
-Subject: Re: [RFC 1/2] block: Introduce the UFQ I/O scheduler
-To: Chengkaitao <pilgrimtao@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, pjw@kernel.org, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alex Ghiti <alex@ghiti.fr>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, bjorn3_gh@protonmail.com, 
-	lossin@kernel.org, a.hindborg@kernel.org, Alice Ryhl <aliceryhl@google.com>, 
-	tmgross@umich.edu, Danilo Krummrich <dakr@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, linux-block@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, 
-	rust-for-linux <rust-for-linux@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	clang-built-linux <llvm@lists.linux.dev>, Kaitao Cheng <chengkaitao@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: refactor blkdev_zone_mgmt_ioctl
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+References: <20260327090032.3722065-1-hch@lst.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260327090032.3722065-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 27, 2026 at 4:49=E2=80=AFAM Chengkaitao <pilgrimtao@gmail.com> =
-wrote:
->
-> +
-> +__bpf_kfunc bool bpf_request_put(struct request *rq)
-> +{
-> +       if (req_ref_put_and_test(rq))
-> +               return false;
-> +
-> +       return true;
-> +}
+On 2026/03/27 2:00, Christoph Hellwig wrote:
+> Split the zone reset case into a separate helper so that the conditional
+> locking goes away.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-...
+Looks good.
 
-> +BTF_ID_FLAGS(func, bpf_request_put)
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-I bet you knew this is not safe and despite that you still
-decided to hack it this way.
-This corner cutting is a red flag for this patchset and
-your link list patches.
-Since you got caught doing this you need to prove much harder
-that you know what you're doing and there are no other safety issues.
+-- 
+Damien Le Moal
+Western Digital Research
