@@ -1,62 +1,62 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD6338F24A
-	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 11:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E921C38F25A
+	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 11:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774612099; cv=none; b=QNLoFPuxOGSRcJUxcZpOtgPYmlxgGqJZRj7FpZMR+nCmGyFcaDNUz476CoAXuoSDoXQQ5zBkswVm51By7lPy0zQrs7kJUz/O6KtLVdcA+T99OSCiwlcQCiyVl05cKOz/zV4Jgm3rSFzSuV6ApLQ4aAmTip9MBLuLN5JKbz0Z2yA=
+	t=1774612106; cv=none; b=NKSLmMjA8mt7NzawokgRhDADaLAfJf+2limirrqafdFRGLQT9h+eJ4BM/XtAw9HPyC73xiod/bzHGVCDEZFKUta4anqlnSZHfNgbm3EmOS4zBtqRZTpSKJ/O1nT4y9xlYqUHbbjXjsI9KJpwte9pbt3nSxNATN2AgM2to/AFNZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774612099; c=relaxed/simple;
-	bh=dKCR7pybUyAPWG3tJyNF5cYzi+Msf0/5LLEP7cUr6+w=;
+	s=arc-20240116; t=1774612106; c=relaxed/simple;
+	bh=x/eBU39nWUXP7kFunJS4TuBHFF7qqLUdPek65MZLnBQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n0Vt8dJ4ADMHnY3TPjvpCcPO6xf79C6baF+Ct0pXU8olg1iQNAzHLoMtr4lPcVAD1RHuJmfEnegiHmLWCSq49Mi64fFb4sog13NHGsP/SjBgFnPX9fTKJ9/1YH7VMN1UdDSpOgQYg39rfmxLDgq4NdopdtKbnWRGiKJzf/tBQQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=onDsU6fC; arc=none smtp.client-ip=209.85.210.173
+	 MIME-Version; b=WGKYDJ4AZd32X/s9c6uNa4JoW2hIwLygKiOzgA/fxtHRioTF/p9GsQPFrweoIDBDWMVQCbtUbdp9UP/SRW+vGpDXY/R6SivLZDjtr+x8xz8jQFJIQfxagh6E4iNp6UGNFFcb3GPUa7GgwAtSlrWPNPrEuYikUhSH2bwi+MnLfIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CyFostus; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="onDsU6fC"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-827270d50d4so1848995b3a.3
-        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 04:48:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CyFostus"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8298fad2063so1201191b3a.3
+        for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 04:48:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774612089; x=1775216889; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774612100; x=1775216900; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eTgArwDFua9Bni/2aeQGmjeoKAPdB8oefON+7G3CfUE=;
-        b=onDsU6fCczL3pJjelkA1TyrlTg03UhkBaq5cVX4Pqk67XxEBYTiOCspkNeloBjDhrI
-         wW/4s3mFF6kU3fYsjcumlu6v+Lm4suBAiQoZSmih/n9WDNeQ8lLv0LVfChcvuE9gQnnh
-         KGfH6PgRXf5Dofdrrav7ozmsu9wjxYETEPdQ9AQ2bxqUuM9ItF50SdB5o6u7T345nCBU
-         MB2y2LNVbu3PeAm+IJv3ezA6ei+yZp5BVmddw1vpPYv62MtNFOSOsGLGx1x4XrK6X85h
-         5azv17JTB+vvAWSIgPue1brMi+qPuvfUFkFbiGzogJqyPFl69W+iXxk8mFfqQkEWrwbX
-         pesw==
+        bh=bVoIY6pTYZDOqm8IuntqRqHezyaa7BDdVZSXw3DwDtQ=;
+        b=CyFostusHGbSQfRd6MV9cHQsmjHxDxh3i7sxpy7IdOrxNhvFrpFaCgNoLz/BBjsvXM
+         gZg9nzE/rKMh2FgU8SYNmZ9rXoqw3zmpA6j3GdHw/DOpbu0PuNIFop3FH22jopT/NIlm
+         x+hc7mRDZHbCZ/w1NOOY4e6/aYywFs8ez2sNQr9LVrcqk0iOjg0m54WcXJuH6wrr0uk2
+         1LE1fRO4EVhmrpizV8B5xzm+iWRcAAoVaCVlLaspUSMmHcACHy7QPsgRUiP//ped+ki8
+         wzsfFdvYYjG1NzNYxfSkjjpOk31Az7zLlLouqZ0kaQENwNc1LJBJzlldK+lJAdzD4XaC
+         dVCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774612089; x=1775216889;
+        d=1e100.net; s=20251104; t=1774612100; x=1775216900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=eTgArwDFua9Bni/2aeQGmjeoKAPdB8oefON+7G3CfUE=;
-        b=ZRaYMoLLIdCI0sZCW+aeia2cd3yfFpXpbMRDx1Q5V978PrBzNMBe9zVvR32J0PjBzP
-         X/NzkRl6orXFW2ST14iVxRLVsNUmx8GtpJl2UxiIxR2ie87kTdk9Dv/PXxSEycOGfhjE
-         aCKofGLn3k62lDEIjjHdDLIxsV+r0px2APuT6IdmL/qjmT7Mygx3pcjgMHaYpc385AOD
-         vlE10xaFmcdOFJghSO5/YXn0wDRfAjPcrXRekp5nBCHe1a9viWSJHXIiDGOAPs1NjowK
-         2KZFjsNHASuX3qcHgTFZmrxS9bAL0X+D0txJEmpIEai0fe+d4LzsVwx4Sskha2R8fI7z
-         1AVA==
-X-Gm-Message-State: AOJu0Yz6fV3A9zX0bmNO+8XC/mvqVqr6JKDHCDeA2Fbdb5LRwzcmuwNx
-	NoKjr74KKlYj1JZdcfLo3hP4JjYb/kOHFHkn1DnrGGbTlrYNeesdF9iP
-X-Gm-Gg: ATEYQzz0FN5SxedNLsK4we34ns4oK++1429sQLgzgdPhjZ6qRV47EKQ2TlVX2f6XmZK
-	Y4jUve5nSJbx+wApCdeKUD05clIIV6V4JHwxxWS/HgauN1GNgDlCyjwa3jEq4lSIcXyWDWoIl/o
-	3ym4Nbs2eO+qEttX/HwHE+Pd+quEq3YnFqo5GGmfO8o9gjjPzYpd0Z7ajre77oUltPgbW4gXpg4
-	UZrRgZ5ZTkDJiZhpu4FzWLoYMiqWia8fuc3ZdGfkHGwzUCaJOWHxm0UfwoXm5bMfUeqn/oKxCuE
-	IWsMKDUuJOSYyqHY2vS8dQXRP1BsJ63M6ZG0D3kvAZEPRfu4dXyo884AJmnTNhID+GQrlMYMadN
-	GU2UfZzw1LRWdoOxKycE0oVps05OgiRQUMx0uFfGU/PVNtGWwjxL358USM0sw9aCxiHanrq7h5P
-	mRu1m1G96jKOoVWRC9L3v11fM7DSnzgOn11aIXyIhZxQODygq3JwSO7g==
-X-Received: by 2002:a05:6a00:27a0:b0:81e:12f1:d8a with SMTP id d2e1a72fcca58-82c95ebecabmr2416695b3a.34.1774612089285;
-        Fri, 27 Mar 2026 04:48:09 -0700 (PDT)
+        bh=bVoIY6pTYZDOqm8IuntqRqHezyaa7BDdVZSXw3DwDtQ=;
+        b=gnQfHJa5JVyBZdD7US86DdC8NR5tMBWiNsMU7npbOa5WCEVd1m+Px3wVNsfqPw5310
+         P1WGK73ggMu7vaQpS98NIE6ZW8rVtSPdGn1ycTue7o74XqXv5bxRjidR5dmKU1TsoGFt
+         3TT7MOPJqTeyQ0OzD0ekUZYVoX+E5x57KI/mhY4EZjHyCJDl94dbPl7GI2wA7eiTCsGN
+         vUWp+8o9+4LN0WOoTvwNgxZkQEhGIDhNM4P3teQbM0Gth0NZxXwNFFqX4LYrQlGjYWoA
+         Y0NkJNS09mIWqCXd/vvfSo+zRdJdZ6PxVrFkX2aqPYHmrM3ID9Jo1rsBGEPBgzCU7ON2
+         7UKQ==
+X-Gm-Message-State: AOJu0YwvOMZUR1kNyLXDNaFDHfJYNB6pVZNATaCMPgnCw9s6g6vBJf5m
+	68uDClum8kLnbCPk8yDP4I/MaYaeBEUpMViivVG4Mhc4Q8mTRy8R5/KP
+X-Gm-Gg: ATEYQzzUu/59ayHYjW1cM5OqhW0+NXpaW5EAm3njWY7a74XrzVJRsmVldt0tBb2ZaIG
+	/CEVs4jbDzyc9XMTc7AJYSEt2WKMWL9MmmV0kNHK26P8ok+bG8TQnXRrozbIoWXq1iMypLSkucE
+	SI80a/IMGzG8SQO7nQP58CE/ZSd2yd8el18datbkbrhOKIj20BFeFnyE+zB5++iiVVWp/TYl5ih
+	5bbHmfFEQcg0mvn1MErMtcdkYcSF7j0Lxfluq6hILB64HFu5KHqXvzoAsjFSJWrEyVFxY+2FIM1
+	h60n3z9EA2XD0jqKfI+FWv+fqfZmKet97N5zmcA9rMnsutqVoMEKBVYyRbWkzvxrTIC6JzdueBN
+	1p6YAG59v7yhdp01lX9sVQ9rj7huHIzxZHovdN6hUHiisGaPJe1dqQ0tliyNPqMOSpWTnUSznFz
+	CYQGTUslKKTLJsomhZCL2wUxsVOLrebew/B2OnWzG66FH2zlLaa1HtCg==
+X-Received: by 2002:a05:6a00:2294:b0:82a:7ad8:75f2 with SMTP id d2e1a72fcca58-82c960d5574mr2414880b3a.56.1774612099844;
+        Fri, 27 Mar 2026 04:48:19 -0700 (PDT)
 Received: from localhost.localdomain ([116.128.244.171])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82c7d3c289dsm5235572b3a.47.2026.03.27.04.47.59
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82c7d3c289dsm5235572b3a.47.2026.03.27.04.48.09
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 27 Mar 2026 04:48:08 -0700 (PDT)
+        Fri, 27 Mar 2026 04:48:19 -0700 (PDT)
 From: Chengkaitao <pilgrimtao@gmail.com>
 To: axboe@kernel.dk,
 	pjw@kernel.org,
@@ -83,9 +83,9 @@ Cc: linux-block@vger.kernel.org,
 	bpf@vger.kernel.org,
 	llvm@lists.linux.dev,
 	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [RFC 1/2] block: Introduce the UFQ I/O scheduler
-Date: Fri, 27 Mar 2026 19:47:40 +0800
-Message-ID: <20260327114741.91500-2-pilgrimtao@gmail.com>
+Subject: [RFC 2/2] tools/ufq_iosched: add BPF example scheduler and build scaffolding
+Date: Fri, 27 Mar 2026 19:47:41 +0800
+Message-ID: <20260327114741.91500-3-pilgrimtao@gmail.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260327114741.91500-1-pilgrimtao@gmail.com>
 References: <20260327114741.91500-1-pilgrimtao@gmail.com>
@@ -95,1121 +95,1252 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
-Introduce IOSCHED_UFQ, a blk-mq elevator ("ufq: User-programmable
-Flexible Queueing") whose policy is supplied by an eBPF program via
-struct_ops (insert, dispatch, merge, finish, etc.).
+Add ufq_iosched as a simple example for the UFQ block I/O scheduler,
+In the ufq_simple example, we implement the eBPF struct_ops hooks the
+kernel exposes so we can exercise and validate the behavior and stability
+of the kernel UFQ scheduling framework. The Makefile and directory
+layout are modeled after sched_ext.
 
-When no eBPF program is attached, the UFQ I/O scheduler uses a simple,
-per-ctx queueing policy (similar to none). After an eBPF program is
-attached, the user-defined scheduling policy replaces UFQ’s built-in
-queueing policy, while per-ctx queues remain available as a fallback
-mechanism.
+This mirrors the sched_ext examples pattern so developers can experiment
+with user-defined queueing policies on top of IOSCHED_UFQ.
 
 Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
 ---
- block/Kconfig.iosched |   8 +
- block/Makefile        |   1 +
- block/blk-merge.c     |  49 +++-
- block/blk-mq-sched.h  |   4 +
- block/blk-mq.c        |   8 +-
- block/blk-mq.h        |   2 +-
- block/blk.h           |   2 +
- block/ufq-bpfops.c    | 213 +++++++++++++++++
- block/ufq-iosched.c   | 526 ++++++++++++++++++++++++++++++++++++++++++
- block/ufq-iosched.h   |  38 +++
- block/ufq-kfunc.c     |  91 ++++++++
- 11 files changed, 934 insertions(+), 8 deletions(-)
- create mode 100644 block/ufq-bpfops.c
- create mode 100644 block/ufq-iosched.c
- create mode 100644 block/ufq-iosched.h
- create mode 100644 block/ufq-kfunc.c
+ tools/ufq_iosched/.gitignore                  |   2 +
+ tools/ufq_iosched/Makefile                    | 262 +++++++++++
+ tools/ufq_iosched/README.md                   | 136 ++++++
+ .../include/bpf-compat/gnu/stubs.h            |  12 +
+ tools/ufq_iosched/include/ufq/common.bpf.h    |  73 +++
+ tools/ufq_iosched/include/ufq/common.h        |  91 ++++
+ tools/ufq_iosched/include/ufq/simple_stat.h   |  21 +
+ tools/ufq_iosched/ufq_simple.bpf.c            | 445 ++++++++++++++++++
+ tools/ufq_iosched/ufq_simple.c                | 118 +++++
+ 9 files changed, 1160 insertions(+)
+ create mode 100644 tools/ufq_iosched/.gitignore
+ create mode 100644 tools/ufq_iosched/Makefile
+ create mode 100644 tools/ufq_iosched/README.md
+ create mode 100644 tools/ufq_iosched/include/bpf-compat/gnu/stubs.h
+ create mode 100644 tools/ufq_iosched/include/ufq/common.bpf.h
+ create mode 100644 tools/ufq_iosched/include/ufq/common.h
+ create mode 100644 tools/ufq_iosched/include/ufq/simple_stat.h
+ create mode 100644 tools/ufq_iosched/ufq_simple.bpf.c
+ create mode 100644 tools/ufq_iosched/ufq_simple.c
 
-diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-index 27f11320b8d1..56afc425cc52 100644
---- a/block/Kconfig.iosched
-+++ b/block/Kconfig.iosched
-@@ -44,4 +44,12 @@ config BFQ_CGROUP_DEBUG
- 	Enable some debugging help. Currently it exports additional stat
- 	files in a cgroup which can be useful for debugging.
- 
-+config IOSCHED_UFQ
-+	tristate "UFQ I/O scheduler"
-+	default y
-+	help
-+	The UFQ I/O scheduler is a programmable I/O scheduler. When
-+	enabled, an out-of-kernel I/O scheduler based on eBPF can be
-+	designed to interact with it, leveraging its customizable
-+	hooks to redefine I/O scheduling policies.
- endmenu
-diff --git a/block/Makefile b/block/Makefile
-index c65f4da93702..9bb9144079aa 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -24,6 +24,7 @@ obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
- obj-$(CONFIG_MQ_IOSCHED_KYBER)	+= kyber-iosched.o
- bfq-y				:= bfq-iosched.o bfq-wf2q.o bfq-cgroup.o
- obj-$(CONFIG_IOSCHED_BFQ)	+= bfq.o
-+obj-$(CONFIG_IOSCHED_UFQ)	+= ufq-iosched.o ufq-bpfops.o ufq-kfunc.o
- 
- obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o \
- 				   bio-integrity-auto.o
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index fcf09325b22e..8bdc459ae631 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -774,8 +774,8 @@ u8 bio_seg_gap(struct request_queue *q, struct bio *prev, struct bio *next,
-  * For non-mq, this has to be called with the request spinlock acquired.
-  * For mq with scheduling, the appropriate queue wide lock should be held.
-  */
--static struct request *attempt_merge(struct request_queue *q,
--				     struct request *req, struct request *next)
-+static struct request *attempt_merge(struct request_queue *q, struct request *req,
-+				     struct request *next, bool nohash)
- {
- 	if (!rq_mergeable(req) || !rq_mergeable(next))
- 		return NULL;
-@@ -842,7 +842,7 @@ static struct request *attempt_merge(struct request_queue *q,
- 
- 	req->__data_len += blk_rq_bytes(next);
- 
--	if (!blk_discard_mergable(req))
-+	if (!nohash && !blk_discard_mergable(req))
- 		elv_merge_requests(q, req, next);
- 
- 	blk_crypto_rq_put_keyslot(next);
-@@ -868,7 +868,7 @@ static struct request *attempt_back_merge(struct request_queue *q,
- 	struct request *next = elv_latter_request(q, rq);
- 
- 	if (next)
--		return attempt_merge(q, rq, next);
-+		return attempt_merge(q, rq, next, false);
- 
- 	return NULL;
- }
-@@ -879,11 +879,17 @@ static struct request *attempt_front_merge(struct request_queue *q,
- 	struct request *prev = elv_former_request(q, rq);
- 
- 	if (prev)
--		return attempt_merge(q, prev, rq);
-+		return attempt_merge(q, prev, rq, false);
- 
- 	return NULL;
- }
- 
-+struct request *bpf_attempt_merge(struct request_queue *q, struct request *rq,
-+				  struct request *next)
-+{
-+	return attempt_merge(q, rq, next, true);
-+}
-+
- /*
-  * Try to merge 'next' into 'rq'. Return true if the merge happened, false
-  * otherwise. The caller is responsible for freeing 'next' if the merge
-@@ -892,7 +898,7 @@ static struct request *attempt_front_merge(struct request_queue *q,
- bool blk_attempt_req_merge(struct request_queue *q, struct request *rq,
- 			   struct request *next)
- {
--	return attempt_merge(q, rq, next);
-+	return attempt_merge(q, rq, next, false);
- }
- 
- bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
-@@ -1169,3 +1175,34 @@ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- 	}
- }
- EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
-+
-+bool blk_mq_sched_merge_fn(struct request_queue *q, struct bio *bio,
-+		unsigned int nr_segs, struct request **merged_request,
-+		struct request *rq, enum elv_merge type, void (*fn)
-+		(struct request_queue *, struct request *, enum elv_merge))
-+{
-+	switch (type) {
-+	case ELEVATOR_BACK_MERGE:
-+		if (!blk_mq_sched_allow_merge(q, rq, bio))
-+			return false;
-+		if (bio_attempt_back_merge(rq, bio, nr_segs) != BIO_MERGE_OK)
-+			return false;
-+		*merged_request = attempt_back_merge(q, rq);
-+		if (!*merged_request)
-+			fn(q, rq, ELEVATOR_BACK_MERGE);
-+		return true;
-+	case ELEVATOR_FRONT_MERGE:
-+		if (!blk_mq_sched_allow_merge(q, rq, bio))
-+			return false;
-+		if (bio_attempt_front_merge(rq, bio, nr_segs) != BIO_MERGE_OK)
-+			return false;
-+		*merged_request = attempt_front_merge(q, rq);
-+		if (!*merged_request)
-+			fn(q, rq, ELEVATOR_FRONT_MERGE);
-+		return true;
-+	case ELEVATOR_DISCARD_MERGE:
-+		return bio_attempt_discard_merge(q, rq, bio) == BIO_MERGE_OK;
-+	default:
-+		return false;
-+	}
-+}
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 5678e15bd33c..e5f7187044c4 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -7,6 +7,10 @@
- 
- #define MAX_SCHED_RQ (16 * BLKDEV_DEFAULT_RQ)
- 
-+bool blk_mq_sched_merge_fn(struct request_queue *q, struct bio *bio,
-+		unsigned int nr_segs, struct request **merged_request,
-+		struct request *rq, enum elv_merge type, void (*fn)
-+		(struct request_queue *, struct request *, enum elv_merge));
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
- 		unsigned int nr_segs, struct request **merged_request);
- bool blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3da2215b2912..b8282f9a534b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -796,7 +796,7 @@ static void blk_mq_finish_request(struct request *rq)
- 	}
- }
- 
--static void __blk_mq_free_request(struct request *rq)
-+void __blk_mq_free_request(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
-@@ -1844,6 +1844,12 @@ static bool dispatch_rq_from_ctx(struct sbitmap *sb, unsigned int bitnr,
- 		if (list_empty(&ctx->rq_lists[type]))
- 			sbitmap_clear_bit(sb, bitnr);
- 	}
-+
-+	if (dispatch_data->rq) {
-+		dispatch_data->rq->rq_flags |= RQF_STARTED;
-+		if (hctx->queue->last_merge == dispatch_data->rq)
-+			hctx->queue->last_merge = NULL;
-+	}
- 	spin_unlock(&ctx->lock);
- 
- 	return !dispatch_data->rq;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index aa15d31aaae9..3f85cae7bf57 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -56,7 +56,7 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
- struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_ctx *start);
- void blk_mq_put_rq_ref(struct request *rq);
--
-+void __blk_mq_free_request(struct request *rq);
- /*
-  * Internal helpers for allocating/freeing the request map
-  */
-diff --git a/block/blk.h b/block/blk.h
-index f6053e9dd2aa..2da3958ec27b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -449,6 +449,8 @@ static inline unsigned get_max_segment_size(const struct queue_limits *lim,
- 
- int ll_back_merge_fn(struct request *req, struct bio *bio,
- 		unsigned int nr_segs);
-+struct request *bpf_attempt_merge(struct request_queue *q, struct request *rq,
-+				  struct request *next);
- bool blk_attempt_req_merge(struct request_queue *q, struct request *rq,
- 				struct request *next);
- unsigned int blk_recalc_rq_segments(struct request *rq);
-diff --git a/block/ufq-bpfops.c b/block/ufq-bpfops.c
+diff --git a/tools/ufq_iosched/.gitignore b/tools/ufq_iosched/.gitignore
 new file mode 100644
-index 000000000000..c293ed834829
+index 000000000000..d6264fe1c8cd
 --- /dev/null
-+++ b/block/ufq-bpfops.c
-@@ -0,0 +1,213 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2026 KylinSoft Corporation.
-+ * Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
-+ */
-+#include <linux/init.h>
-+#include <linux/types.h>
-+#include <linux/bpf_verifier.h>
-+#include <linux/bpf.h>
-+#include <linux/btf.h>
-+#include <linux/btf_ids.h>
-+#include <linux/string.h>
-+#include "ufq-iosched.h"
-+
-+struct ufq_iosched_ops ufq_ops;
-+
-+static const struct bpf_func_proto *
-+bpf_ufq_get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
-+{
-+	return bpf_base_func_proto(func_id, prog);
-+}
-+
-+static bool bpf_ufq_is_valid_access(int off, int size,
-+				    enum bpf_access_type type,
-+				    const struct bpf_prog *prog,
-+				    struct bpf_insn_access_aux *info)
-+{
-+	if (type != BPF_READ)
-+		return false;
-+	if (off < 0 || off >= sizeof(__u64) * MAX_BPF_FUNC_ARGS)
-+		return false;
-+	if (off % size != 0)
-+		return false;
-+
-+	/*
-+	 * merge_req's third argument is int *type.  btf_ctx_access() treats
-+	 * pointers that are not "pointer to struct" as scalars (no reg_type),
-+	 * so loading the pointer from ctx leaves a SCALAR and *type stores
-+	 * fail verification.  Model it as a read/write buffer of merge_type.
-+	 */
-+	if (off == 16 && size == sizeof(__u64) &&
-+	    prog->aux->attach_func_name &&
-+	    !strcmp(prog->aux->attach_func_name, "merge_req")) {
-+		if (!btf_ctx_access(off, size, type, prog, info))
-+			return false;
-+		info->reg_type = PTR_TO_BUF;
-+		return true;
-+	}
-+
-+	return btf_ctx_access(off, size, type, prog, info);
-+}
-+
-+static const struct bpf_verifier_ops bpf_ufq_verifier_ops = {
-+	.get_func_proto = bpf_ufq_get_func_proto,
-+	.is_valid_access = bpf_ufq_is_valid_access,
-+};
-+
-+static int bpf_ufq_init_member(const struct btf_type *t,
-+			       const struct btf_member *member,
-+			       void *kdata, const void *udata)
-+{
-+	const struct ufq_iosched_ops *uops = udata;
-+	struct ufq_iosched_ops *ops = kdata;
-+	u32 moff = __btf_member_bit_offset(t, member) / 8;
-+	int ret;
-+
-+	switch (moff) {
-+	case offsetof(struct ufq_iosched_ops, name):
-+		ret = bpf_obj_name_cpy(ops->name, uops->name,
-+				       sizeof(ops->name));
-+		if (ret < 0)
-+			return ret;
-+		if (ret == 0)
-+			return -EINVAL;
-+		return 1;
-+	/* other var adding .... */
-+	}
-+
-+	return 0;
-+}
-+
-+static int bpf_ufq_check_member(const struct btf_type *t,
-+				const struct btf_member *member,
-+				const struct bpf_prog *prog)
-+{
-+	return 0;
-+}
-+
-+static int bpf_ufq_enable(struct ufq_iosched_ops *ops)
-+{
-+	ufq_ops = *ops;
-+	return 0;
-+}
-+
-+static void bpf_ufq_disable(struct ufq_iosched_ops *ops)
-+{
-+	memset(&ufq_ops, 0, sizeof(ufq_ops));
-+}
-+
-+static int bpf_ufq_reg(void *kdata, struct bpf_link *link)
-+{
-+	return bpf_ufq_enable(kdata);
-+}
-+
-+static void bpf_ufq_unreg(void *kdata, struct bpf_link *link)
-+{
-+	bpf_ufq_disable(kdata);
-+}
-+
-+static int bpf_ufq_init(struct btf *btf)
-+{
-+	return 0;
-+}
-+
-+static int bpf_ufq_update(void *kdata, void *old_kdata, struct bpf_link *link)
-+{
-+	/*
-+	 * UFQ does not support live-updating an already-attached BPF scheduler:
-+	 * partial failure during callback setup (e.g. init_sched) would be hard
-+	 * to reason about, and update can race with unregister/teardown.
-+	 */
-+	return -EOPNOTSUPP;
-+}
-+
-+static int bpf_ufq_validate(void *kdata)
-+{
-+	return 0;
-+}
-+
-+static int init_sched_stub(struct request_queue *q)
-+{
-+	return -EPERM;
-+}
-+
-+static int exit_sched_stub(struct request_queue *q)
-+{
-+	return -EPERM;
-+}
-+
-+static int insert_req_stub(struct request_queue *q, struct request *rq,
-+			   blk_insert_t flags)
-+{
-+	return 0;
-+}
-+
-+static struct request *dispatch_req_stub(struct request_queue *q)
-+{
-+	return NULL;
-+}
-+
-+static bool has_req_stub(struct request_queue *q, int rqs_count)
-+{
-+	return rqs_count > 0;
-+}
-+
-+static void finish_req_stub(struct request *rq)
-+{
-+}
-+
-+static struct request *former_req_stub(struct request_queue *q, struct request *rq)
-+{
-+	return NULL;
-+}
-+
-+static struct request *next_req_stub(struct request_queue *q, struct request *rq)
-+{
-+	return NULL;
-+}
-+
-+static struct request *merge_req_stub(struct request_queue *q, struct request *rq,
-+				      int *type)
-+{
-+	*type = ELEVATOR_NO_MERGE;
-+	return NULL;
-+}
-+
-+static void req_merged_stub(struct request_queue *q, struct request *rq,
-+			    int type)
-+{
-+}
-+
-+static struct ufq_iosched_ops __bpf_ops_ufq_ops = {
-+	.init_sched	= init_sched_stub,
-+	.exit_sched	= exit_sched_stub,
-+	.insert_req	= insert_req_stub,
-+	.dispatch_req	= dispatch_req_stub,
-+	.has_req	= has_req_stub,
-+	.former_req	= former_req_stub,
-+	.next_req	= next_req_stub,
-+	.merge_req	= merge_req_stub,
-+	.req_merged	= req_merged_stub,
-+	.finish_req	= finish_req_stub,
-+};
-+
-+static struct bpf_struct_ops bpf_iosched_ufq_ops = {
-+	.verifier_ops = &bpf_ufq_verifier_ops,
-+	.reg = bpf_ufq_reg,
-+	.unreg = bpf_ufq_unreg,
-+	.check_member = bpf_ufq_check_member,
-+	.init_member = bpf_ufq_init_member,
-+	.init = bpf_ufq_init,
-+	.update = bpf_ufq_update,
-+	.validate = bpf_ufq_validate,
-+	.name = "ufq_iosched_ops",
-+	.owner = THIS_MODULE,
-+	.cfi_stubs = &__bpf_ops_ufq_ops
-+};
-+
-+int bpf_ufq_ops_init(void)
-+{
-+	return register_bpf_struct_ops(&bpf_iosched_ufq_ops, ufq_iosched_ops);
-+}
-+
-diff --git a/block/ufq-iosched.c b/block/ufq-iosched.c
++++ b/tools/ufq_iosched/.gitignore
+@@ -0,0 +1,2 @@
++tools/
++build/
+diff --git a/tools/ufq_iosched/Makefile b/tools/ufq_iosched/Makefile
 new file mode 100644
-index 000000000000..8c10e0d74b0e
+index 000000000000..7dc37d9172aa
 --- /dev/null
-+++ b/block/ufq-iosched.c
-@@ -0,0 +1,526 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2026 KylinSoft Corporation.
-+ * Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
-+ */
-+#include <linux/kernel.h>
-+#include <linux/fs.h>
-+#include <linux/blkdev.h>
-+#include <linux/bio.h>
-+#include <linux/module.h>
-+#include <linux/slab.h>
-+#include <linux/init.h>
-+#include <linux/compiler.h>
-+#include <linux/sbitmap.h>
-+
-+#include <trace/events/block.h>
-+
-+#include "elevator.h"
-+#include "blk.h"
-+#include "blk-mq.h"
-+#include "blk-mq-sched.h"
-+#include "blk-mq-debugfs.h"
-+#include "ufq-iosched.h"
-+
-+/* For testing and debugging */
-+struct ufq_ops_stats {
-+	atomic_t dispatch_ok_count;
-+	atomic64_t dispatch_ok_sectors;
-+	atomic_t dispatch_null_count;
-+	atomic_t insert_ok_count;
-+	atomic64_t insert_ok_sectors;
-+	atomic_t insert_err_count;
-+	atomic_t merge_ok_count;
-+	atomic64_t merge_ok_sectors;
-+	atomic_t finish_ok_count;
-+	atomic64_t finish_ok_sectors;
-+};
-+
-+struct ufq_data {
-+	struct request_queue *q;
-+	u32 async_depth;
-+	atomic_t rqs_count;
-+	struct ufq_ops_stats ops_stats;
-+};
-+
-+enum ufq_priv_state {
-+	UFQ_PRIV_NOT_IN_SCHED = 0,
-+	UFQ_PRIV_IN_BPF = 1,
-+	UFQ_PRIV_IN_UFQ = 2,
-+	UFQ_PRIV_IN_SCHED = 3,
-+};
-+
-+static void ufq_request_merged(struct request_queue *q, struct request *req,
-+			       enum elv_merge type)
-+{
-+	if (ufq_ops.req_merged)
-+		ufq_ops.req_merged(q, req, (int)type);
-+}
-+
-+static struct request *ufq_dispatch_request(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct ufq_data *ufq = hctx->queue->elevator->elevator_data;
-+	struct blk_mq_ctx *ctx;
-+	struct request *rq = NULL;
-+	unsigned short idx;
-+
-+	if (ufq_ops.dispatch_req) {
-+		rq = ufq_ops.dispatch_req(hctx->queue);
-+		if (!rq) {
-+			atomic_inc(&ufq->ops_stats.dispatch_null_count);
-+			return NULL;
-+		}
-+		atomic_inc(&ufq->ops_stats.dispatch_ok_count);
-+		atomic64_add(blk_rq_sectors(rq), &ufq->ops_stats.dispatch_ok_sectors);
-+
-+		ctx = rq->mq_ctx;
-+		spin_lock(&ctx->lock);
-+		list_del_init(&rq->queuelist);
-+		rq->rq_flags |= RQF_STARTED;
-+		if (hctx->queue->last_merge == rq)
-+			hctx->queue->last_merge = NULL;
-+		if (list_empty(&ctx->rq_lists[rq->mq_hctx->type]))
-+			sbitmap_clear_bit(&rq->mq_hctx->ctx_map,
-+					  ctx->index_hw[rq->mq_hctx->type]);
-+		spin_unlock(&ctx->lock);
-+		rq->elv.priv[0] = (void *)((uintptr_t)rq->elv.priv[0]
-+				  & ~UFQ_PRIV_IN_UFQ);
-+	} else {
-+		ctx = READ_ONCE(hctx->dispatch_from);
-+		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
-+		if (rq) {
-+			idx = rq->mq_ctx->index_hw[hctx->type];
-+			if (++idx == hctx->nr_ctx)
-+				idx = 0;
-+			WRITE_ONCE(hctx->dispatch_from, hctx->ctxs[idx]);
-+		}
-+	}
-+
-+	if (rq)
-+		atomic_dec(&ufq->rqs_count);
-+	return rq;
-+}
-+
-+/*
-+ * Called by __blk_mq_alloc_request(). The shallow_depth value set by this
-+ * function is used by __blk_mq_get_tag().
-+ */
-+static void ufq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
-+{
-+	struct ufq_data *ufq = data->q->elevator->elevator_data;
-+
-+	/* Do not throttle synchronous reads. */
-+	if (op_is_sync(opf) && !op_is_write(opf))
-+		return;
-+
-+	/*
-+	 * Throttle asynchronous requests and writes such that these requests
-+	 * do not block the allocation of synchronous requests.
-+	 */
-+	data->shallow_depth = ufq->async_depth;
-+}
-+
-+static void ufq_depth_updated(struct request_queue *q)
-+{
-+	struct ufq_data *ufq = q->elevator->elevator_data;
-+
-+	ufq->async_depth = q->nr_requests;
-+	q->async_depth = q->nr_requests;
-+	blk_mq_set_min_shallow_depth(q, 1);
-+}
-+
-+static int ufq_init_sched(struct request_queue *q, struct elevator_queue *eq)
-+{
-+	struct ufq_data *ufq;
-+
-+	ufq = kzalloc_node(sizeof(*ufq), GFP_KERNEL, q->node);
-+	if (!ufq)
-+		return -ENOMEM;
-+
-+	eq->elevator_data = ufq;
-+	ufq->q = q;
-+
-+	blk_queue_flag_set(QUEUE_FLAG_SQ_SCHED, q);
-+	q->elevator = eq;
-+
-+	q->async_depth = q->nr_requests;
-+	ufq->async_depth = q->nr_requests;
-+
-+	if (ufq_ops.init_sched)
-+		ufq_ops.init_sched(q);
-+
-+	ufq_depth_updated(q);
-+	return 0;
-+}
-+
-+static void ufq_exit_sched(struct elevator_queue *e)
-+{
-+	struct ufq_data *ufq = e->elevator_data;
-+
-+	if (ufq_ops.exit_sched)
-+		ufq_ops.exit_sched(ufq->q);
-+
-+	WARN_ON_ONCE(atomic_read(&ufq->rqs_count));
-+
-+	kfree(ufq);
-+}
-+
-+static void ufq_merged_request(struct request_queue *q, struct request *rq,
-+		enum elv_merge type)
-+{
-+	struct elevator_queue *e = q->elevator;
-+
-+	if (e->type->ops.request_merged)
-+		e->type->ops.request_merged(q, rq, type);
-+
-+	q->last_merge = rq;
-+}
-+
-+static bool ufq_sched_try_merge(struct request_queue *q, struct bio *bio,
-+		unsigned int nr_segs, struct request **merged_request)
-+{
-+	enum elv_merge type = ELEVATOR_NO_MERGE;
-+	struct request *rq = NULL, *last;
-+	bool ret;
-+
-+
-+	/*
-+	 * Levels of merges:
-+	 *	nomerges:  No merges at all attempted
-+	 *	noxmerges: Only simple one-hit cache try
-+	 *	merges:    All merge tries attempted
-+	 */
-+	if (blk_queue_nomerges(q) || !bio_mergeable(bio))
-+		return false;
-+
-+	last = q->last_merge;
-+	if (last) {
-+		spin_lock(&last->mq_ctx->lock);
-+		if (last == q->last_merge && elv_bio_merge_ok(last, bio)) {
-+			type = blk_try_merge(last, bio);
-+			if (type != ELEVATOR_NO_MERGE) {
-+				rq = last;
-+				goto merge;
-+			}
-+		}
-+		spin_unlock(&last->mq_ctx->lock);
-+	}
-+
-+	if (blk_queue_noxmerges(q))
-+		return false;
-+
-+	if (ufq_ops.find_req_from_sector) {
-+		rq = ufq_ops.find_req_from_sector(q, bio->bi_iter.bi_sector,
-+						    bio_end_sector(bio));
-+		if (rq && elv_bio_merge_ok(rq, bio))
-+			type = blk_try_merge(rq, bio);
-+		else
-+			return false;
-+	}
-+
-+	if (!rq || type == ELEVATOR_NO_MERGE)
-+		return false;
-+
-+	spin_lock(&rq->mq_ctx->lock);
-+merge:
-+	ret = blk_mq_sched_merge_fn(q, bio, nr_segs, merged_request, rq,
-+				    type, ufq_merged_request);
-+	spin_unlock(&rq->mq_ctx->lock);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Attempt to merge a bio into an existing request. This function is called
-+ * before @bio is associated with a request.
-+ */
-+static bool ufq_bio_merge(struct request_queue *q, struct bio *bio,
-+		unsigned int nr_segs)
-+{
-+	struct ufq_data *ufq = q->elevator->elevator_data;
-+	struct request *free = NULL;
-+	bool ret;
-+
-+	ret = ufq_sched_try_merge(q, bio, nr_segs, &free);
-+
-+	if (free) {
-+		blk_mq_free_request(free);
-+		atomic_dec(&ufq->rqs_count);
-+	}
-+
-+	return ret;
-+}
-+
-+static enum elv_merge ufq_try_insert_merge(struct request_queue *q,
-+					   struct request **new)
-+{
-+	struct request *target = NULL, *free = NULL, *last, *rq = *new;
-+	struct ufq_data *ufq = q->elevator->elevator_data;
-+	enum elv_merge type = ELEVATOR_NO_MERGE;
-+	int merge_type = ELEVATOR_NO_MERGE;
-+
-+	if (!rq_mergeable(rq))
-+		return ELEVATOR_NO_MERGE;
-+
-+	if (blk_queue_nomerges(q))
-+		return ELEVATOR_NO_MERGE;
-+
-+	last = q->last_merge;
-+	if (last) {
-+		spin_lock(&last->mq_ctx->lock);
-+		if (last == q->last_merge && bpf_attempt_merge(q, last, rq)) {
-+			spin_unlock(&last->mq_ctx->lock);
-+			type = ELEVATOR_BACK_MERGE;
-+			free = rq;
-+			*new = NULL;
-+			goto end;
-+		}
-+		spin_unlock(&last->mq_ctx->lock);
-+	}
-+
-+	if (blk_queue_noxmerges(q))
-+		return ELEVATOR_NO_MERGE;
-+
-+	if (ufq_ops.merge_req) {
-+		target = ufq_ops.merge_req(q, rq, &merge_type);
-+		type = (enum elv_merge)merge_type;
-+	}
-+
-+	if (type == ELEVATOR_NO_MERGE || !target) {
-+		return ELEVATOR_NO_MERGE;
-+	} else if (type == ELEVATOR_FRONT_MERGE) {
-+		spin_lock(&target->mq_ctx->lock);
-+		free = bpf_attempt_merge(q, rq, target);
-+		if (!free) {
-+			spin_unlock(&target->mq_ctx->lock);
-+			pr_err("ufq-iosched: front merge failed\n");
-+			return ELEVATOR_NO_MERGE;
-+		}
-+		rq->elv.priv[0] = (void *)((uintptr_t)rq->elv.priv[0]
-+				  | UFQ_PRIV_IN_UFQ);
-+		list_replace_init(&target->queuelist, &rq->queuelist);
-+		rq->fifo_time = target->fifo_time;
-+		q->last_merge = rq;
-+	} else if (type == ELEVATOR_BACK_MERGE) {
-+		spin_lock(&target->mq_ctx->lock);
-+		free = bpf_attempt_merge(q, target, rq);
-+		if (!free) {
-+			spin_unlock(&target->mq_ctx->lock);
-+			pr_err("ufq-iosched: back merge failed\n");
-+			return ELEVATOR_NO_MERGE;
-+		}
-+		*new = target;
-+		q->last_merge = target;
-+	}
-+
-+	spin_unlock(&target->mq_ctx->lock);
-+end:
-+	atomic_inc(&ufq->ops_stats.merge_ok_count);
-+	atomic64_add(blk_rq_sectors(free), &ufq->ops_stats.merge_ok_sectors);
-+	blk_mq_free_request(free);
-+	return type;
-+}
-+
-+static void ufq_insert_requests(struct blk_mq_hw_ctx *hctx,
-+			       struct list_head *list,
-+			       blk_insert_t flags)
-+{
-+	struct request_queue *q = hctx->queue;
-+	struct ufq_data *ufq = q->elevator->elevator_data;
-+	struct blk_mq_ctx *ctx;
-+	enum elv_merge type;
-+	int bit, ret = 0;
-+
-+	while (!list_empty(list)) {
-+		struct request *rq;
-+
-+		rq = list_first_entry(list, struct request, queuelist);
-+		list_del_init(&rq->queuelist);
-+
-+		type = ufq_try_insert_merge(q, &rq);
-+		if (type == ELEVATOR_NO_MERGE) {
-+			rq->fifo_time = jiffies;
-+			ctx = rq->mq_ctx;
-+			rq->elv.priv[0] = (void *)((uintptr_t)rq->elv.priv[0]
-+					  | UFQ_PRIV_IN_UFQ);
-+			spin_lock(&ctx->lock);
-+			if (flags & BLK_MQ_INSERT_AT_HEAD)
-+				list_add(&rq->queuelist, &ctx->rq_lists[hctx->type]);
-+			else
-+				list_add_tail(&rq->queuelist,
-+					&ctx->rq_lists[hctx->type]);
-+
-+			bit = ctx->index_hw[hctx->type];
-+			if (!sbitmap_test_bit(&hctx->ctx_map, bit))
-+				sbitmap_set_bit(&hctx->ctx_map, bit);
-+			q->last_merge = rq;
-+			spin_unlock(&ctx->lock);
-+			atomic_inc(&ufq->rqs_count);
-+		}
-+
-+		if (rq && ufq_ops.insert_req) {
-+			rq->elv.priv[0] = (void *)((uintptr_t)rq->elv.priv[0]
-+				  | UFQ_PRIV_IN_BPF);
-+			ret = ufq_ops.insert_req(q, rq, flags);
-+			if (ret) {
-+				atomic_inc(&ufq->ops_stats.insert_err_count);
-+				pr_err("ufq-iosched: bpf insert_req error (%d)\n", ret);
-+			} else {
-+				atomic_inc(&ufq->ops_stats.insert_ok_count);
-+				atomic64_add(blk_rq_sectors(rq), &ufq->ops_stats.insert_ok_sectors);
-+			}
-+		}
-+	}
-+}
-+
-+static void ufq_prepare_request(struct request *rq)
-+{
-+	rq->elv.priv[0] = (void *)(uintptr_t)UFQ_PRIV_NOT_IN_SCHED;
-+}
-+
-+static void ufq_finish_request(struct request *rq)
-+{
-+	struct ufq_data *ufq = rq->q->elevator->elevator_data;
-+
-+	/*
-+	 * The block layer core may call ufq_finish_request() without having
-+	 * called ufq_insert_requests(). Skip requests that bypassed I/O
-+	 * scheduling.
-+	 */
-+	if (!((uintptr_t)rq->elv.priv[0] & UFQ_PRIV_IN_BPF))
-+		return;
-+
-+	if (ufq_ops.finish_req)
-+		ufq_ops.finish_req(rq);
-+
-+	atomic_inc(&ufq->ops_stats.finish_ok_count);
-+	atomic64_add(blk_rq_stats_sectors(rq), &ufq->ops_stats.finish_ok_sectors);
-+}
-+
-+static struct request *ufq_find_next_request(struct request_queue *q, struct request *rq)
-+{
-+	if (ufq_ops.next_req)
-+		return ufq_ops.next_req(q, rq);
-+
-+	return NULL;
-+}
-+
-+static struct request *ufq_find_former_request(struct request_queue *q, struct request *rq)
-+{
-+	if (ufq_ops.former_req)
-+		return ufq_ops.former_req(q, rq);
-+
-+	return NULL;
-+}
-+
-+static bool ufq_has_work(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct ufq_data *ufq = hctx->queue->elevator->elevator_data;
-+	int rqs_count = atomic_read(&ufq->rqs_count);
-+
-+	WARN_ON_ONCE(rqs_count < 0);
-+	if (ufq_ops.has_req)
-+		return ufq_ops.has_req(hctx->queue, rqs_count);
-+
-+	return rqs_count > 0;
-+}
-+
-+#ifdef CONFIG_BLK_DEBUG_FS
-+static int ufq_ops_stats_show(void *data, struct seq_file *m)
-+{
-+	struct request_queue *q = data;
-+	struct ufq_data *ufq = q->elevator->elevator_data;
-+	struct ufq_ops_stats *s = &ufq->ops_stats;
-+
-+	/* for debug */
-+	seq_printf(m, "dispatch_ok_count %d\n",
-+		   atomic_read(&s->dispatch_ok_count));
-+	seq_printf(m, "dispatch_ok_sectors %lld\n",
-+		   (long long)atomic64_read(&s->dispatch_ok_sectors));
-+	seq_printf(m, "dispatch_null_count %d\n",
-+		   atomic_read(&s->dispatch_null_count));
-+	seq_printf(m, "insert_ok_count %d\n",
-+		   atomic_read(&s->insert_ok_count));
-+	seq_printf(m, "insert_ok_sectors %lld\n",
-+		   (long long)atomic64_read(&s->insert_ok_sectors));
-+	seq_printf(m, "insert_err_count %d\n",
-+		   atomic_read(&s->insert_err_count));
-+	seq_printf(m, "merge_ok_count %d\n",
-+		   atomic_read(&s->merge_ok_count));
-+	seq_printf(m, "merge_ok_sectors %lld\n",
-+		   (long long)atomic64_read(&s->merge_ok_sectors));
-+	seq_printf(m, "finish_ok_count %d\n",
-+		   atomic_read(&s->finish_ok_count));
-+	seq_printf(m, "finish_ok_sectors %lld\n",
-+		   (long long)atomic64_read(&s->finish_ok_sectors));
-+	return 0;
-+}
-+
-+static const struct blk_mq_debugfs_attr ufq_iosched_debugfs_attrs[] = {
-+	{"ops_stats", 0400, ufq_ops_stats_show},
-+	{},
-+};
-+#endif
-+
-+static struct elevator_type ufq_iosched_mq = {
-+	.ops = {
-+		.depth_updated		= ufq_depth_updated,
-+		.limit_depth		= ufq_limit_depth,
-+		.insert_requests	= ufq_insert_requests,
-+		.dispatch_request	= ufq_dispatch_request,
-+		.prepare_request	= ufq_prepare_request,
-+		.finish_request		= ufq_finish_request,
-+		.next_request		= ufq_find_next_request,
-+		.former_request		= ufq_find_former_request,
-+		.bio_merge		= ufq_bio_merge,
-+		.request_merged		= ufq_request_merged,
-+		.has_work		= ufq_has_work,
-+		.init_sched		= ufq_init_sched,
-+		.exit_sched		= ufq_exit_sched,
-+	},
-+
-+#ifdef CONFIG_BLK_DEBUG_FS
-+	.queue_debugfs_attrs = ufq_iosched_debugfs_attrs,
-+#endif
-+	.elevator_name = "ufq",
-+	.elevator_alias = "ufq_iosched",
-+	.elevator_owner = THIS_MODULE,
-+};
-+MODULE_ALIAS("ufq-iosched");
-+
-+static int __init ufq_init(void)
-+{
-+	int ret;
-+
-+	ret = elv_register(&ufq_iosched_mq);
-+	if (ret)
-+		return ret;
-+
-+	ret = bpf_ufq_kfunc_init();
-+	if (ret) {
-+		pr_err("ufq-iosched: Failed to register kfunc sets (%d)\n", ret);
-+		elv_unregister(&ufq_iosched_mq);
-+		return ret;
-+	}
-+
-+	ret = bpf_ufq_ops_init();
-+	if (ret) {
-+		pr_err("ufq-iosched: Failed to register struct_ops (%d)\n", ret);
-+		elv_unregister(&ufq_iosched_mq);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void __exit ufq_exit(void)
-+{
-+	elv_unregister(&ufq_iosched_mq);
-+}
-+
-+module_init(ufq_init);
-+module_exit(ufq_exit);
-+
-+MODULE_AUTHOR("Kaitao Cheng <chengkaitao@kylinos.cn>");
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("User-programmable Flexible Queueing");
-diff --git a/block/ufq-iosched.h b/block/ufq-iosched.h
++++ b/tools/ufq_iosched/Makefile
+@@ -0,0 +1,262 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (c) 2026 KylinSoft Corporation.
++# Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
++include ../build/Build.include
++include ../scripts/Makefile.arch
++include ../scripts/Makefile.include
++
++all: all_targets
++
++ifneq ($(LLVM),)
++ifneq ($(filter %/,$(LLVM)),)
++LLVM_PREFIX := $(LLVM)
++else ifneq ($(filter -%,$(LLVM)),)
++LLVM_SUFFIX := $(LLVM)
++endif
++
++CLANG_TARGET_FLAGS_arm          := arm-linux-gnueabi
++CLANG_TARGET_FLAGS_arm64        := aarch64-linux-gnu
++CLANG_TARGET_FLAGS_hexagon      := hexagon-linux-musl
++CLANG_TARGET_FLAGS_m68k         := m68k-linux-gnu
++CLANG_TARGET_FLAGS_mips         := mipsel-linux-gnu
++CLANG_TARGET_FLAGS_powerpc      := powerpc64le-linux-gnu
++CLANG_TARGET_FLAGS_riscv        := riscv64-linux-gnu
++CLANG_TARGET_FLAGS_s390         := s390x-linux-gnu
++CLANG_TARGET_FLAGS_x86          := x86_64-linux-gnu
++CLANG_TARGET_FLAGS              := $(CLANG_TARGET_FLAGS_$(ARCH))
++
++ifeq ($(CROSS_COMPILE),)
++ifeq ($(CLANG_TARGET_FLAGS),)
++$(error Specify CROSS_COMPILE or add '--target=' option to lib.mk)
++else
++CLANG_FLAGS     += --target=$(CLANG_TARGET_FLAGS)
++endif # CLANG_TARGET_FLAGS
++else
++CLANG_FLAGS     += --target=$(notdir $(CROSS_COMPILE:%-=%))
++endif # CROSS_COMPILE
++
++CC := $(LLVM_PREFIX)clang$(LLVM_SUFFIX) $(CLANG_FLAGS) -fintegrated-as
++else
++CC := $(CROSS_COMPILE)gcc
++endif # LLVM
++
++CURDIR := $(abspath .)
++TOOLSDIR := $(abspath ..)
++LIBDIR := $(TOOLSDIR)/lib
++BPFDIR := $(LIBDIR)/bpf
++TOOLSINCDIR := $(TOOLSDIR)/include
++BPFTOOLDIR := $(TOOLSDIR)/bpf/bpftool
++APIDIR := $(TOOLSINCDIR)/uapi
++GENDIR := $(abspath ../../include/generated)
++GENHDR := $(GENDIR)/autoconf.h
++
++ifeq ($(O),)
++OUTPUT_DIR := $(CURDIR)/build
++else
++OUTPUT_DIR := $(O)/build
++endif # O
++OBJ_DIR := $(OUTPUT_DIR)/obj
++INCLUDE_DIR := $(OUTPUT_DIR)/include
++BPFOBJ_DIR := $(OBJ_DIR)/libbpf
++UFQOBJ_DIR := $(OBJ_DIR)/ufq_iosched
++BINDIR := $(OUTPUT_DIR)/bin
++BPFOBJ := $(BPFOBJ_DIR)/libbpf.a
++ifneq ($(CROSS_COMPILE),)
++HOST_BUILD_DIR		:= $(OBJ_DIR)/host/obj
++HOST_OUTPUT_DIR		:= $(OBJ_DIR)/host
++HOST_INCLUDE_DIR	:= $(HOST_OUTPUT_DIR)/include
++else
++HOST_BUILD_DIR		:= $(OBJ_DIR)
++HOST_OUTPUT_DIR		:= $(OUTPUT_DIR)
++HOST_INCLUDE_DIR	:= $(INCLUDE_DIR)
++endif
++HOST_BPFOBJ := $(HOST_BUILD_DIR)/libbpf/libbpf.a
++RESOLVE_BTFIDS := $(HOST_BUILD_DIR)/resolve_btfids/resolve_btfids
++DEFAULT_BPFTOOL := $(HOST_OUTPUT_DIR)/sbin/bpftool
++
++VMLINUX_BTF_PATHS ?= $(if $(O),$(O)/vmlinux)					\
++		     $(if $(KBUILD_OUTPUT),$(KBUILD_OUTPUT)/vmlinux)		\
++		     ../../vmlinux						\
++		     /sys/kernel/btf/vmlinux					\
++		     /boot/vmlinux-$(shell uname -r)
++VMLINUX_BTF ?= $(abspath $(firstword $(wildcard $(VMLINUX_BTF_PATHS))))
++ifeq ($(VMLINUX_BTF),)
++$(error Cannot find a vmlinux for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)")
++endif
++
++BPFTOOL ?= $(DEFAULT_BPFTOOL)
++
++ifneq ($(wildcard $(GENHDR)),)
++  GENFLAGS := -DHAVE_GENHDR
++endif
++
++CFLAGS += -g -O2 -rdynamic -pthread -Wall -Werror $(GENFLAGS)			\
++	  -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)				\
++	  -I$(TOOLSINCDIR) -I$(APIDIR) -I$(CURDIR)/include
++
++# Silence some warnings when compiled with clang
++ifneq ($(LLVM),)
++CFLAGS += -Wno-unused-command-line-argument
++endif
++
++LDFLAGS += -lelf -lz -lpthread
++
++IS_LITTLE_ENDIAN = $(shell $(CC) -dM -E - </dev/null |				\
++			grep 'define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__')
++
++# Get Clang's default includes on this system, as opposed to those seen by
++# '-target bpf'. This fixes "missing" files on some architectures/distros,
++# such as asm/byteorder.h, asm/socket.h, asm/sockios.h, sys/cdefs.h etc.
++#
++# Use '-idirafter': Don't interfere with include mechanics except where the
++# build would have failed anyways.
++define get_sys_includes
++$(shell $(1) -v -E - </dev/null 2>&1 \
++	| sed -n '/<...> search starts here:/,/End of search list./{ s| \(/.*\)|-idirafter \1|p }') \
++$(shell $(1) -dM -E - </dev/null | grep '__riscv_xlen ' | awk '{printf("-D__riscv_xlen=%d -D__BITS_PER_LONG=%d", $$3, $$3)}')
++endef
++
++BPF_CFLAGS = -g -D__TARGET_ARCH_$(SRCARCH)					\
++	     $(if $(IS_LITTLE_ENDIAN),-mlittle-endian,-mbig-endian)		\
++	     -I$(CURDIR)/include -I$(CURDIR)/include/bpf-compat			\
++	     -I$(INCLUDE_DIR) -I$(APIDIR)					\
++	     -I../../include							\
++	     $(call get_sys_includes,$(CLANG))					\
++	     -Wall -Wno-compare-distinct-pointer-types				\
++	     -Wno-microsoft-anon-tag						\
++	     -fms-extensions							\
++	     -O2 -mcpu=v3
++
++# sort removes libbpf duplicates when not cross-building
++MAKE_DIRS := $(sort $(OBJ_DIR)/libbpf $(HOST_BUILD_DIR)/libbpf			\
++	       $(HOST_BUILD_DIR)/bpftool $(HOST_BUILD_DIR)/resolve_btfids	\
++	       $(INCLUDE_DIR) $(UFQOBJ_DIR) $(BINDIR))
++
++$(MAKE_DIRS):
++	$(call msg,MKDIR,,$@)
++	$(Q)mkdir -p $@
++
++ifneq ($(CROSS_COMPILE),)
++$(BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)			\
++	   $(APIDIR)/linux/bpf.h						\
++	   | $(OBJ_DIR)/libbpf
++	$(Q)$(MAKE) $(submake_extras) CROSS_COMPILE=$(CROSS_COMPILE) 		\
++		    -C $(BPFDIR) OUTPUT=$(OBJ_DIR)/libbpf/			\
++		    EXTRA_CFLAGS='-g -O0 -fPIC'					\
++		    LDFLAGS="$(LDFLAGS)"					\
++		    DESTDIR=$(OUTPUT_DIR) prefix= all install_headers
++endif
++
++$(HOST_BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)		\
++	   $(APIDIR)/linux/bpf.h						\
++	   | $(HOST_BUILD_DIR)/libbpf
++	$(Q)$(MAKE) $(submake_extras) -C $(BPFDIR) 				\
++		    OUTPUT=$(HOST_BUILD_DIR)/libbpf/				\
++		    ARCH= CROSS_COMPILE= CC="$(HOSTCC)" LD=$(HOSTLD)		\
++		    EXTRA_CFLAGS='-g -O0 -fPIC'					\
++		    DESTDIR=$(HOST_OUTPUT_DIR) prefix= all install_headers
++
++$(DEFAULT_BPFTOOL): $(wildcard $(BPFTOOLDIR)/*.[ch] $(BPFTOOLDIR)/Makefile)	\
++		    $(HOST_BPFOBJ) | $(HOST_BUILD_DIR)/bpftool
++	$(Q)$(MAKE) $(submake_extras)  -C $(BPFTOOLDIR)				\
++		    ARCH= CROSS_COMPILE= CC="$(HOSTCC)" LD=$(HOSTLD)		\
++		    EXTRA_CFLAGS='-g -O0'					\
++		    OUTPUT=$(HOST_BUILD_DIR)/bpftool/				\
++		    LIBBPF_OUTPUT=$(HOST_BUILD_DIR)/libbpf/			\
++		    LIBBPF_DESTDIR=$(HOST_OUTPUT_DIR)/				\
++		    prefix= DESTDIR=$(HOST_OUTPUT_DIR)/ install-bin
++
++$(INCLUDE_DIR)/vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
++ifeq ($(VMLINUX_H),)
++	$(call msg,GEN,,$@)
++	$(Q)$(BPFTOOL) btf dump file $(VMLINUX_BTF) format c > $@
++else
++	$(call msg,CP,,$@)
++	$(Q)cp "$(VMLINUX_H)" $@
++endif
++
++$(UFQOBJ_DIR)/%.bpf.o: %.bpf.c $(INCLUDE_DIR)/vmlinux.h include/ufq/*.h		\
++		       | $(BPFOBJ) $(UFQOBJ_DIR)
++	$(call msg,CLNG-BPF,,$(notdir $@))
++	$(Q)$(CLANG) $(BPF_CFLAGS) -target bpf -c $< -o $@
++
++$(INCLUDE_DIR)/%.bpf.skel.h: $(UFQOBJ_DIR)/%.bpf.o $(INCLUDE_DIR)/vmlinux.h $(BPFTOOL)
++	$(eval sched=$(notdir $@))
++	$(call msg,GEN-SKEL,,$(sched))
++	$(Q)$(BPFTOOL) gen object $(<:.o=.linked1.o) $<
++	$(Q)$(BPFTOOL) gen object $(<:.o=.linked2.o) $(<:.o=.linked1.o)
++	$(Q)$(BPFTOOL) gen object $(<:.o=.linked3.o) $(<:.o=.linked2.o)
++	$(Q)diff $(<:.o=.linked2.o) $(<:.o=.linked3.o)
++	$(Q)$(BPFTOOL) gen skeleton $(<:.o=.linked3.o) name $(subst .bpf.skel.h,,$(sched)) > $@
++	$(Q)$(BPFTOOL) gen subskeleton $(<:.o=.linked3.o) name $(subst .bpf.skel.h,,$(sched)) > $(@:.skel.h=.subskel.h)
++
++UFQ_COMMON_DEPS := include/ufq/common.h include/ufq/simple_stat.h | $(BINDIR)
++
++c-sched-targets = ufq_simple
++
++$(addprefix $(BINDIR)/,$(c-sched-targets)): \
++	$(BINDIR)/%: \
++		$(filter-out %.bpf.c,%.c) \
++		$(INCLUDE_DIR)/%.bpf.skel.h \
++		$(UFQ_COMMON_DEPS)
++	$(eval sched=$(notdir $@))
++	$(CC) $(CFLAGS) -c $(sched).c -o $(UFQOBJ_DIR)/$(sched).o
++	$(CC) -o $@ $(UFQOBJ_DIR)/$(sched).o $(BPFOBJ) $(LDFLAGS)
++
++$(c-sched-targets): %: $(BINDIR)/%
++
++install: all
++	$(Q)mkdir -p $(DESTDIR)/usr/local/bin/
++	$(Q)cp $(BINDIR)/* $(DESTDIR)/usr/local/bin/
++
++clean:
++	rm -rf $(OUTPUT_DIR) $(HOST_OUTPUT_DIR)
++	rm -f *.o *.bpf.o *.bpf.skel.h *.bpf.subskel.h
++	rm -f $(c-sched-targets)
++
++help:
++	@echo   'Building targets'
++	@echo   '================'
++	@echo   ''
++	@echo   '  all		  - Compile all schedulers'
++	@echo   ''
++	@echo   'Alternatively, you may compile individual schedulers:'
++	@echo   ''
++	@printf '  %s\n' $(c-sched-targets)
++	@echo   ''
++	@echo   'For any scheduler build target, you may specify an alternative'
++	@echo   'build output path with the O= environment variable. For example:'
++	@echo   ''
++	@echo   '   O=/tmp/ufq_iosched make all'
++	@echo   ''
++	@echo   'will compile all schedulers, and emit the build artifacts to'
++	@echo   '/tmp/ufq_iosched/build.'
++	@echo   ''
++	@echo   ''
++	@echo   'Installing targets'
++	@echo   '=================='
++	@echo   ''
++	@echo   '  install	  - Compile and install all schedulers to /usr/bin.'
++	@echo   '		    You may specify the DESTDIR= environment variable'
++	@echo   '		    to indicate a prefix for /usr/bin. For example:'
++	@echo   ''
++	@echo   '                     DESTDIR=/tmp/ufq_iosched make install'
++	@echo   ''
++	@echo   '		    will build the schedulers in CWD/build, and'
++	@echo   '		    install the schedulers to /tmp/ufq_iosched/usr/bin.'
++	@echo   ''
++	@echo   ''
++	@echo   'Cleaning targets'
++	@echo   '================'
++	@echo   ''
++	@echo   '  clean		  - Remove all generated files'
++
++all_targets: $(c-sched-targets)
++
++.PHONY: all all_targets $(c-sched-targets) clean help
++
++# delete failed targets
++.DELETE_ON_ERROR:
++
++# keep intermediate (.bpf.skel.h, .bpf.o, etc) targets
++.SECONDARY:
+diff --git a/tools/ufq_iosched/README.md b/tools/ufq_iosched/README.md
 new file mode 100644
-index 000000000000..c717362eab31
+index 000000000000..d831bae7a326
 --- /dev/null
-+++ b/block/ufq-iosched.h
-@@ -0,0 +1,38 @@
++++ b/tools/ufq_iosched/README.md
+@@ -0,0 +1,136 @@
++UFQ IOSCHED EXAMPLE SCHEDULERS
++============================
++
++# Introduction
++
++This directory contains a simple example of the ufq IO scheduler. It is meant
++to illustrate the different kinds of IO schedulers you can build with ufq;
++new schedulers will be added as the project evolves across releases.
++
++# Compiling the examples
++
++There are a few toolchain dependencies for compiling the example schedulers.
++
++## Toolchain dependencies
++
++1. clang >= 16.0.0
++
++The schedulers are BPF programs, and therefore must be compiled with clang. gcc
++is actively working on adding a BPF backend compiler as well, but are still
++missing some features such as BTF type tags which are necessary for using
++kptrs.
++
++2. pahole >= 1.25
++
++You may need pahole in order to generate BTF from DWARF.
++
++3. rust >= 1.70.0
++
++Rust schedulers uses features present in the rust toolchain >= 1.70.0. You
++should be able to use the stable build from rustup, but if that doesn't
++work, try using the rustup nightly build.
++
++There are other requirements as well, such as make, but these are the main /
++non-trivial ones.
++
++## Compiling the kernel
++
++In order to run a ufq scheduler, you'll have to run a kernel compiled
++with the patches in this repository, and with a minimum set of necessary
++Kconfig options:
++
++```
++CONFIG_BPF=y
++CONFIG_IOSCHED_UFQ=y
++CONFIG_BPF_SYSCALL=y
++CONFIG_BPF_JIT=y
++CONFIG_DEBUG_INFO_BTF=y
++```
++
++It's also recommended that you also include the following Kconfig options:
++
++```
++CONFIG_BPF_JIT_ALWAYS_ON=y
++CONFIG_BPF_JIT_DEFAULT_ON=y
++CONFIG_PAHOLE_HAS_SPLIT_BTF=y
++CONFIG_PAHOLE_HAS_BTF_TAG=y
++```
++
++There is a `Kconfig` file in this directory whose contents you can append to
++your local `.config` file, as long as there are no conflicts with any existing
++options in the file.
++
++## Getting a vmlinux.h file
++
++You may notice that most of the example schedulers include a "vmlinux.h" file.
++This is a large, auto-generated header file that contains all of the types
++defined in some vmlinux binary that was compiled with
++[BTF](https://docs.kernel.org/bpf/btf.html) (i.e. with the BTF-related Kconfig
++options specified above).
++
++The header file is created using `bpftool`, by passing it a vmlinux binary
++compiled with BTF as follows:
++
++```bash
++$ bpftool btf dump file /path/to/vmlinux format c > vmlinux.h
++```
++
++`bpftool` analyzes all of the BTF encodings in the binary, and produces a
++header file that can be included by BPF programs to access those types.  For
++example, using vmlinux.h allows a scheduler to access fields defined directly
++in vmlinux
++
++The scheduler build system will generate this vmlinux.h file as part of the
++scheduler build pipeline. It looks for a vmlinux file in the following
++dependency order:
++
++1. If the O= environment variable is defined, at `$O/vmlinux`
++2. If the KBUILD_OUTPUT= environment variable is defined, at
++   `$KBUILD_OUTPUT/vmlinux`
++3. At `../../vmlinux` (i.e. at the root of the kernel tree where you're
++   compiling the schedulers)
++3. `/sys/kernel/btf/vmlinux`
++4. `/boot/vmlinux-$(uname -r)`
++
++In other words, if you have compiled a kernel in your local repo, its vmlinux
++file will be used to generate vmlinux.h. Otherwise, it will be the vmlinux of
++the kernel you're currently running on. This means that if you're running on a
++kernel with ufq support, you may not need to compile a local kernel at
++all.
++
++### Aside on CO-RE
++
++One of the cooler features of BPF is that it supports
++[CO-RE](https://nakryiko.com/posts/bpf-core-reference-guide/) (Compile Once Run
++Everywhere). This feature allows you to reference fields inside of structs with
++types defined internal to the kernel, and not have to recompile if you load the
++BPF program on a different kernel with the field at a different offset.
++
++## Compiling the schedulers
++
++Once you have your toolchain setup, and a vmlinux that can be used to generate
++a full vmlinux.h file, you can compile the schedulers using `make`:
++
++```bash
++$ make -j($nproc)
++```
++
++## ufq_simple
++
++A simple IO scheduler that provides an example of a minimal ufq scheduler.
++Populates commonly used kernel-exposed BPF interfaces for testing the UFQ
++scheduler framework in the kernel.
++
++### llvm: [OFF]
++
++You may see the following output when building the schedulers:
++
++```
++Auto-detecting system features:
++...                         clang-bpf-co-re: [ on  ]
++...                                    llvm: [ OFF ]
++...                                  libcap: [ on  ]
++...                                  libbfd: [ on  ]
++```
++
++Seeing `llvm: [ OFF ]` here is not an issue. You can safely ignore.
+diff --git a/tools/ufq_iosched/include/bpf-compat/gnu/stubs.h b/tools/ufq_iosched/include/bpf-compat/gnu/stubs.h
+new file mode 100644
+index 000000000000..f200ac0f6ccd
+--- /dev/null
++++ b/tools/ufq_iosched/include/bpf-compat/gnu/stubs.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Dummy gnu/stubs.h. clang can end up including /usr/include/gnu/stubs.h when
++ * compiling BPF files although its content doesn't play any role. The file in
++ * turn includes stubs-64.h or stubs-32.h depending on whether __x86_64__ is
++ * defined. When compiling a BPF source, __x86_64__ isn't set and thus
++ * stubs-32.h is selected. However, the file is not there if the system doesn't
++ * have 32bit glibc devel package installed leading to a build failure.
++ *
++ * The problem is worked around by making this file available in the include
++ * search paths before the system one when building BPF.
++ */
+diff --git a/tools/ufq_iosched/include/ufq/common.bpf.h b/tools/ufq_iosched/include/ufq/common.bpf.h
+new file mode 100644
+index 000000000000..96832d317464
+--- /dev/null
++++ b/tools/ufq_iosched/include/ufq/common.bpf.h
+@@ -0,0 +1,73 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + * Copyright (c) 2026 KylinSoft Corporation.
 + * Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
 + */
-+#ifndef _BLOCK_UFQ_IOSCHED_H
-+#define _BLOCK_UFQ_IOSCHED_H
++#ifndef __UFQ_COMMON_BPF_H
++#define __UFQ_COMMON_BPF_H
 +
-+#include "elevator.h"
-+#include "blk-mq.h"
-+
-+#ifndef BPF_IOSCHED_NAME_MAX
-+#define BPF_IOSCHED_NAME_MAX	16
++#ifdef LSP
++#define __bpf__
++#include "../vmlinux/vmlinux.h"
++#else
++#include "vmlinux.h"
 +#endif
 +
-+struct ufq_iosched_ops {
-+	int (*init_sched)(struct request_queue *q);
-+	int (*insert_req)(struct request_queue *q, struct request *rq,
-+			blk_insert_t flags);
-+	int (*exit_sched)(struct request_queue *q);
-+	bool (*has_req)(struct request_queue *q, int rqs_count);
-+	void (*req_merged)(struct request_queue *q, struct request *rq, int type);
-+	void (*finish_req)(struct request *rq);
-+	struct request *(*merge_req)(struct request_queue *q, struct request *rq,
-+			int *type);
-+	struct request *(*find_req_from_sector)(struct request_queue *q,
-+			sector_t start, sector_t end);
-+	struct request *(*former_req)(struct request_queue *q, struct request *rq);
-+	struct request *(*next_req)(struct request_queue *q, struct request *rq);
-+	struct request *(*dispatch_req)(struct request_queue *q);
-+	char name[BPF_IOSCHED_NAME_MAX];
-+};
-+extern struct ufq_iosched_ops ufq_ops;
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++#include <bpf/bpf_core_read.h>
++#include <asm-generic/errno.h>
++#include "simple_stat.h"
 +
-+int bpf_ufq_ops_init(void);
-+int bpf_ufq_kfunc_init(void);
++#define BPF_STRUCT_OPS(name, args...)					\
++	SEC("struct_ops/" #name) BPF_PROG(name, ##args)
 +
-+#endif /* _BLOCK_UFQ_IOSCHED_H */
-diff --git a/block/ufq-kfunc.c b/block/ufq-kfunc.c
++/* Define struct ufq_iosched_ops for .struct_ops.link in the BPF object */
++#define UFQ_OPS_DEFINE(__name, ...)					\
++	SEC(".struct_ops.link")						\
++	struct ufq_iosched_ops __name = {				\
++		__VA_ARGS__,						\
++	}
++
++/* list and rbtree */
++#define __contains(name, node) __attribute__((btf_decl_tag("contains:" #name ":" #node)))
++
++struct request *bpf_request_acquire(struct request *rq) __ksym;
++bool bpf_request_put(struct request *rq) __ksym;
++void bpf_request_release(struct request *rq) __ksym;
++
++void *bpf_obj_new_impl(__u64 local_type_id, void *meta) __ksym;
++void bpf_obj_drop_impl(void *kptr, void *meta) __ksym;
++
++#define bpf_obj_new(type) ((type *)bpf_obj_new_impl(bpf_core_type_id_local(type), NULL))
++#define bpf_obj_drop(kptr) bpf_obj_drop_impl(kptr, NULL)
++
++int bpf_list_push_front_impl(struct bpf_list_head *head,
++				    struct bpf_list_node *node,
++				    void *meta, __u64 off) __ksym;
++#define bpf_list_push_front(head, node) bpf_list_push_front_impl(head, node, NULL, 0)
++
++int bpf_list_push_back_impl(struct bpf_list_head *head,
++				   struct bpf_list_node *node,
++				   void *meta, __u64 off) __ksym;
++#define bpf_list_push_back(head, node) bpf_list_push_back_impl(head, node, NULL, 0)
++
++struct bpf_list_node *bpf_list_pop_front(struct bpf_list_head *head) __ksym;
++struct bpf_list_node *bpf_list_pop_back(struct bpf_list_head *head) __ksym;
++bool bpf_list_empty(struct bpf_list_head *head) __ksym;
++struct bpf_list_node *bpf_list_del(struct bpf_list_head *head,
++				   struct bpf_list_node *node) __ksym;
++
++struct bpf_rb_node *bpf_rbtree_remove(struct bpf_rb_root *root,
++				      struct bpf_rb_node *node) __ksym;
++int bpf_rbtree_add_impl(struct bpf_rb_root *root, struct bpf_rb_node *node,
++			bool (less)(struct bpf_rb_node *a, const struct bpf_rb_node *b),
++			void *meta, __u64 off) __ksym;
++#define bpf_rbtree_add(head, node, less) bpf_rbtree_add_impl(head, node, less, NULL, 0)
++
++struct bpf_rb_node *bpf_rbtree_first(struct bpf_rb_root *root) __ksym;
++
++void *bpf_refcount_acquire_impl(void *kptr, void *meta) __ksym;
++#define bpf_refcount_acquire(kptr) bpf_refcount_acquire_impl(kptr, NULL)
++
++#endif	/* __UFQ_COMMON_BPF_H */
+diff --git a/tools/ufq_iosched/include/ufq/common.h b/tools/ufq_iosched/include/ufq/common.h
 new file mode 100644
-index 000000000000..35acc98fd979
+index 000000000000..c537c9e34056
 --- /dev/null
-+++ b/block/ufq-kfunc.c
++++ b/tools/ufq_iosched/include/ufq/common.h
 @@ -0,0 +1,91 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2026 KylinSoft Corporation.
++ * Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
++ */
++#ifndef __UFQ_IOSCHED_COMMON_H
++#define __UFQ_IOSCHED_COMMON_H
++
++#ifdef __KERNEL__
++#error "Should not be included by BPF programs"
++#endif
++
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <stdint.h>
++#include <errno.h>
++#include <bpf/bpf.h>
++#include "simple_stat.h"
++
++typedef uint8_t u8;
++typedef uint16_t u16;
++typedef uint32_t u32;
++typedef uint64_t u64;
++typedef int8_t s8;
++typedef int16_t s16;
++typedef int32_t s32;
++typedef int64_t s64;
++
++#define UFQ_ERR(__fmt, ...)							\
++	do {									\
++		fprintf(stderr, "[UFQ_ERR] %s:%d", __FILE__, __LINE__);		\
++		if (errno)							\
++			fprintf(stderr, " (%s)\n", strerror(errno));		\
++		else								\
++			fprintf(stderr, "\n");					\
++		fprintf(stderr, __fmt __VA_OPT__(,) __VA_ARGS__);		\
++		fprintf(stderr, "\n");						\
++										\
++		exit(EXIT_FAILURE);						\
++	} while (0)
++
++#define UFQ_ERR_IF(__cond, __fmt, ...)						\
++	do {									\
++		if (__cond)							\
++			UFQ_ERR((__fmt) __VA_OPT__(,) __VA_ARGS__);		\
++	} while (0)
++
++/*
++ * struct ufq_iosched_ops can grow over time. With common.bpf.h::UFQ_OPS_DEFINE()
++ * and UFQ_OPS_LOAD()/UFQ_OPS_ATTACH(), libbpf performs struct_ops attachment.
++ */
++#define UFQ_OPS_OPEN(__ops_name, __ufq_name) ({					\
++	struct __ufq_name *__skel;						\
++										\
++	__skel = __ufq_name##__open();						\
++	UFQ_ERR_IF(!__skel, "Could not open " #__ufq_name);			\
++	(void)__skel->maps.__ops_name;						\
++	__skel;									\
++})
++
++#define UFQ_OPS_LOAD(__skel, __ops_name, __ufq_name) ({				\
++	(void)(__skel)->maps.__ops_name;					\
++	UFQ_ERR_IF(__ufq_name##__load((__skel)), "Failed to load skel");	\
++})
++
++/*
++ * New versions of bpftool emit additional link placeholders for BPF maps,
++ * and set up BPF skeleton so libbpf can auto-attach BPF maps (v1.5+). Old
++ * libbpf ignores those links. Disable autoattach on newer libbpf to avoid
++ * attaching twice when we attach struct_ops explicitly.
++ */
++#if LIBBPF_MAJOR_VERSION > 1 ||							\
++	(LIBBPF_MAJOR_VERSION == 1 && LIBBPF_MINOR_VERSION >= 5)
++#define __UFQ_OPS_DISABLE_AUTOATTACH(__skel, __ops_name)			\
++	bpf_map__set_autoattach((__skel)->maps.__ops_name, false)
++#else
++#define __UFQ_OPS_DISABLE_AUTOATTACH(__skel, __ops_name) do {} while (0)
++#endif
++
++#define UFQ_OPS_ATTACH(__skel, __ops_name, __ufq_name) ({			\
++	struct bpf_link *__link;						\
++	__UFQ_OPS_DISABLE_AUTOATTACH(__skel, __ops_name);			\
++	UFQ_ERR_IF(__ufq_name##__attach((__skel)), "Failed to attach skel");	\
++	__link = bpf_map__attach_struct_ops((__skel)->maps.__ops_name);		\
++	UFQ_ERR_IF(!__link, "Failed to attach struct_ops");			\
++	__link;									\
++})
++
++#endif	/* __UFQ_IOSCHED_COMMON_H */
++
+diff --git a/tools/ufq_iosched/include/ufq/simple_stat.h b/tools/ufq_iosched/include/ufq/simple_stat.h
+new file mode 100644
+index 000000000000..286d5999a457
+--- /dev/null
++++ b/tools/ufq_iosched/include/ufq/simple_stat.h
+@@ -0,0 +1,21 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2026 KylinSoft Corporation.
++ * Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
++ */
++#ifndef __UFQ_SIMPLE_STAT_H
++#define __UFQ_SIMPLE_STAT_H
++
++enum ufq_simp_stat_index {
++	UFQ_SIMP_INSERT_CNT,
++	UFQ_SIMP_INSERT_SIZE,
++	UFQ_SIMP_DISPATCH_CNT,
++	UFQ_SIMP_DISPATCH_SIZE,
++	UFQ_SIMP_MERGE_CNT,
++	UFQ_SIMP_MERGE_SIZE,
++	UFQ_SIMP_FINISH_CNT,
++	UFQ_SIMP_FINISH_SIZE,
++	UFQ_SIMP_STAT_MAX,
++};
++
++#endif /* __UFQ_SIMPLE_STAT_H */
+diff --git a/tools/ufq_iosched/ufq_simple.bpf.c b/tools/ufq_iosched/ufq_simple.bpf.c
+new file mode 100644
+index 000000000000..63edd7772600
+--- /dev/null
++++ b/tools/ufq_iosched/ufq_simple.bpf.c
+@@ -0,0 +1,445 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2026 KylinSoft Corporation.
 + * Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
 + */
-+#include <linux/init.h>
-+#include <linux/types.h>
-+#include <linux/bpf_verifier.h>
-+#include <linux/bpf.h>
-+#include <linux/btf.h>
-+#include <linux/btf_ids.h>
-+#include <trace/events/block.h>
-+#include "blk.h"
-+#include "ufq-iosched.h"
++#include <ufq/common.bpf.h>
 +
-+__bpf_kfunc_start_defs();
++char _license[] SEC("license") = "GPL";
 +
-+__bpf_kfunc struct request *bpf_request_from_id(struct request_queue *q,
-+						sector_t offset)
++#define UFQ_DISK_SUM		20
++#define BLK_MQ_INSERT_AT_HEAD	0x01
++#define REQ_OP_MASK		((1 << 8) - 1)
++#define SECTOR_SHIFT		9
++
++struct {
++	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
++	__uint(key_size, sizeof(u32));
++	__uint(value_size, sizeof(u64));
++	__uint(max_entries, UFQ_SIMP_STAT_MAX);
++} stats SEC(".maps");
++
++enum ufq_simp_data_dir {
++	UFQ_SIMP_READ,
++	UFQ_SIMP_WRITE,
++	UFQ_SIMP_DIR_COUNT
++};
++
++struct queue_list_node {
++	struct bpf_list_node node;
++	struct request __kptr * req;
++};
++
++struct sort_tree_node {
++	struct bpf_refcount ref;
++	struct bpf_rb_node rb_node;
++	struct bpf_list_node list_node;
++	u64 key;
++	struct request __kptr * req;
++};
++
++struct ufq_simple_data {
++	struct bpf_spin_lock lock;
++	struct bpf_rb_root sort_tree_read __contains(sort_tree_node, rb_node);
++	struct bpf_rb_root sort_tree_write __contains(sort_tree_node, rb_node);
++	struct bpf_list_head dispatch __contains(queue_list_node, node);
++	struct bpf_list_head fifo_list __contains(sort_tree_node, list_node);
++};
++
++struct {
++	__uint(type, BPF_MAP_TYPE_HASH);
++	__uint(max_entries, UFQ_DISK_SUM);
++	__type(key, s32);
++	__type(value, struct ufq_simple_data);
++} ufq_map SEC(".maps");
++
++static void stat_add(u32 idx, u32 val)
 +{
-+	return elv_rqhash_find(q, offset);
++	u64 *cnt_p = bpf_map_lookup_elem(&stats, &idx);
++
++	if (cnt_p)
++		(*cnt_p) += val;
 +}
 +
-+__bpf_kfunc struct request *bpf_request_acquire(struct request *rq)
++static void stat_sub(u32 idx, u32 val)
 +{
-+	if (req_ref_inc_not_zero(rq))
-+		return rq;
++	u64 *cnt_p = bpf_map_lookup_elem(&stats, &idx);
++
++	if (cnt_p)
++		(*cnt_p) -= val;
++}
++
++static bool sort_tree_less(struct bpf_rb_node *a, const struct bpf_rb_node *b)
++{
++	struct sort_tree_node *node_a, *node_b;
++
++	node_a = container_of(a, struct sort_tree_node, rb_node);
++	node_b = container_of(b, struct sort_tree_node, rb_node);
++
++	return node_a->key < node_b->key;
++}
++
++static struct ufq_simple_data *dd_init_sched(struct request_queue *q)
++{
++	struct ufq_simple_data ufq_sd = {}, *ufq_sp;
++	int ret, id = q->id;
++
++	bpf_printk("ufq_simple init sched!");
++	ret = bpf_map_update_elem(&ufq_map, &id, &ufq_sd, BPF_NOEXIST);
++	if (ret) {
++		bpf_printk("ufq_simple/init_sched: update ufq_map err %d", ret);
++		return NULL;
++	}
++
++	ufq_sp = bpf_map_lookup_elem(&ufq_map, &id);
++	if (!ufq_sp) {
++		bpf_printk("ufq_simple/init_sched: lookup queue id %d in ufq_map failed", id);
++		return NULL;
++	}
++
++	return ufq_sp;
++}
++
++int BPF_STRUCT_OPS(ufq_simple_init_sched, struct request_queue *q)
++{
++	if (dd_init_sched(q))
++		return 0;
++	else
++		return -EPERM;
++}
++
++int BPF_STRUCT_OPS(ufq_simple_exit_sched, struct request_queue *q)
++{
++	int id = q->id;
++
++	bpf_printk("ufq_simple exit sched!");
++	bpf_map_delete_elem(&ufq_map, &id);
++	return 0;
++}
++
++int BPF_STRUCT_OPS(ufq_simple_insert_req, struct request_queue *q,
++		   struct request *rq, blk_insert_t flags,
++		   struct list_head *freeq)
++{
++	struct ufq_simple_data *ufq_sd;
++	struct queue_list_node *qnode;
++	struct sort_tree_node *snode, *lnode;
++	int id = q->id, ret = 0;
++	struct request *acquired, *old;
++	enum ufq_simp_data_dir dir = ((rq->cmd_flags & REQ_OP_MASK) & 1) ?
++				   UFQ_SIMP_WRITE : UFQ_SIMP_READ;
++
++	ufq_sd = bpf_map_lookup_elem(&ufq_map, &id);
++	if (!ufq_sd) {
++		ufq_sd = dd_init_sched(q);
++		if (!ufq_sd) {
++			bpf_printk("ufq_simple/insert_req: dd_init_sched failed");
++			return -EPERM;
++		}
++	}
++
++	if (flags & BLK_MQ_INSERT_AT_HEAD) {
++		/* create queue_list_node */
++		qnode = bpf_obj_new(typeof(*qnode));
++		if (!qnode) {
++			bpf_printk("ufq_simple/insert_req: qnode alloc failed");
++			return -ENOMEM;
++		}
++
++		acquired = bpf_request_acquire(rq);
++		if (!acquired) {
++			bpf_obj_drop(qnode);
++			bpf_printk("ufq_simple/head-insert_req: request_acquire failed");
++			return -EPERM;
++		}
++
++		/* Set request for queue_list_node */
++		old = bpf_kptr_xchg(&qnode->req, acquired);
++		if (old)
++			bpf_request_release(old);
++
++		/* Add queue_list_node to dispatch list */
++		bpf_spin_lock(&ufq_sd->lock);
++		ret = bpf_list_push_back(&ufq_sd->dispatch, &qnode->node);
++		bpf_spin_unlock(&ufq_sd->lock);
++	} else {
++		/* create sort_tree_node */
++		snode = bpf_obj_new(typeof(*snode));
++		if (!snode) {
++			bpf_printk("ufq_simple/insert_req: sort_tree_node alloc failed");
++			return -ENOMEM;
++		}
++
++		/* Use request's starting sector as sort key */
++		snode->key = rq->__sector;
++
++		/*
++		 * Acquire request reference again for sort_tree_node (each node
++		 * needs independent reference)
++		 */
++		acquired = bpf_request_acquire(rq);
++		if (!acquired) {
++			bpf_obj_drop(snode);
++			bpf_printk("ufq_simple/insert_req: bpf_request_acquire failed");
++			return -EPERM;
++		}
++
++		/* Set request for sort_tree_node */
++		old = bpf_kptr_xchg(&snode->req, acquired);
++		if (old)
++			bpf_request_release(old);
++
++		/* Add sort_tree_node to red-black tree and list_node to fifo_list */
++		bpf_spin_lock(&ufq_sd->lock);
++		if (dir == UFQ_SIMP_READ)
++			bpf_rbtree_add(&ufq_sd->sort_tree_read, &snode->rb_node, sort_tree_less);
++		else
++			bpf_rbtree_add(&ufq_sd->sort_tree_write, &snode->rb_node, sort_tree_less);
++
++		/* Acquire reference count since the node is also added to fifo_list */
++		lnode = bpf_refcount_acquire(snode);
++		if (!lnode) {
++			struct bpf_rb_root *tree = (dir == UFQ_SIMP_READ) ?
++				&ufq_sd->sort_tree_read : &ufq_sd->sort_tree_write;
++			struct bpf_rb_node *rb_node;
++
++			rb_node = bpf_rbtree_remove(tree, &snode->rb_node);
++			bpf_spin_unlock(&ufq_sd->lock);
++			if (rb_node)
++				bpf_obj_drop(container_of(rb_node, struct sort_tree_node, rb_node));
++			bpf_printk("ufq_simple/insert_req: bpf_refcount_acquire failed");
++			return -EPERM;
++		}
++
++		ret = bpf_list_push_back(&ufq_sd->fifo_list, &lnode->list_node);
++		bpf_spin_unlock(&ufq_sd->lock);
++	}
++
++	if (!ret) {
++		stat_add(UFQ_SIMP_INSERT_CNT, 1);
++		stat_add(UFQ_SIMP_INSERT_SIZE, rq->__data_len);
++	}
++	return ret;
++}
++
++struct request *BPF_STRUCT_OPS(ufq_simple_dispatch_req, struct request_queue *q)
++{
++	struct request *rq = NULL;
++	struct bpf_list_node *list_node;
++	struct bpf_rb_node *rb_node = NULL;
++	struct queue_list_node *qnode;
++	struct sort_tree_node *snode, *lnode;
++	struct ufq_simple_data *ufq_sd;
++	int id = q->id;
++
++	ufq_sd = bpf_map_lookup_elem(&ufq_map, &id);
++	if (!ufq_sd) {
++		bpf_printk("ufq_simple/dispatch_req: ufq_map lookup %d failed", id);
++		return NULL;
++	}
++
++	bpf_spin_lock(&ufq_sd->lock);
++	list_node = bpf_list_pop_front(&ufq_sd->dispatch);
++
++	if (list_node) {
++		qnode = container_of(list_node, struct queue_list_node, node);
++		rq = bpf_kptr_xchg(&qnode->req, NULL);
++		bpf_spin_unlock(&ufq_sd->lock);
++		bpf_obj_drop(qnode);
++	} else {
++		rb_node = bpf_rbtree_first(&ufq_sd->sort_tree_read);
++		if (rb_node) {
++			rb_node = bpf_rbtree_remove(&ufq_sd->sort_tree_read, rb_node);
++		} else {
++			rb_node = bpf_rbtree_first(&ufq_sd->sort_tree_write);
++			if (rb_node)
++				rb_node = bpf_rbtree_remove(&ufq_sd->sort_tree_write, rb_node);
++		}
++
++		if (!rb_node) {
++			bpf_spin_unlock(&ufq_sd->lock);
++			goto out;
++		}
++
++		snode = container_of(rb_node, struct sort_tree_node, rb_node);
++
++		/* Get request from sort_tree_node (this will be returned) */
++		rq = bpf_kptr_xchg(&snode->req, NULL);
++
++		/* Remove list_node from fifo_list (must be done while holding lock) */
++		list_node = bpf_list_del(&ufq_sd->fifo_list, &snode->list_node);
++		bpf_spin_unlock(&ufq_sd->lock);
++
++		if (list_node) {
++			lnode = container_of(list_node, struct sort_tree_node, list_node);
++			bpf_obj_drop(lnode);
++		}
++		bpf_obj_drop(snode);
++	}
++	if (!rq)
++		bpf_printk("ufq_simple/dispatch_req: no request to dispatch");
++
++out:
++	if (rq) {
++		stat_add(UFQ_SIMP_DISPATCH_CNT, 1);
++		stat_add(UFQ_SIMP_DISPATCH_SIZE, rq->__data_len);
++	}
++
++	return rq;
++}
++
++bool BPF_STRUCT_OPS(ufq_simple_has_req, struct request_queue *q, int rqs_count)
++{
++	struct ufq_simple_data *ufq_sd;
++	bool has;
++	int id = q->id;
++
++	ufq_sd = bpf_map_lookup_elem(&ufq_map, &id);
++	if (!ufq_sd) {
++		bpf_printk("ufq_simple/has_req: ufq_map lookup %d failed", id);
++		return false;
++	}
++
++	bpf_spin_lock(&ufq_sd->lock);
++	has = !bpf_list_empty(&ufq_sd->dispatch) ||
++	      bpf_rbtree_root(&ufq_sd->sort_tree_read) ||
++	      bpf_rbtree_root(&ufq_sd->sort_tree_write);
++	bpf_spin_unlock(&ufq_sd->lock);
++
++	return has;
++}
++
++void BPF_STRUCT_OPS(ufq_simple_finish_req, struct request *rq)
++{
++	if (rq) {
++		stat_add(UFQ_SIMP_FINISH_CNT, 1);
++		stat_add(UFQ_SIMP_FINISH_SIZE, rq->__data_len);
++		bpf_request_put(rq);
++	}
++}
++
++struct request *BPF_STRUCT_OPS(ufq_simple_next_req, struct request_queue *q,
++			       struct request *rq)
++{
 +	return NULL;
 +}
 +
-+__bpf_kfunc bool bpf_request_put(struct request *rq)
++struct request *BPF_STRUCT_OPS(ufq_simple_former_req, struct request_queue *q,
++			       struct request *rq)
 +{
-+	if (req_ref_put_and_test(rq))
-+		return false;
-+
-+	return true;
++	return NULL;
 +}
 +
-+__bpf_kfunc void bpf_request_release(struct request *rq)
++struct request *BPF_STRUCT_OPS(ufq_simple_merge_req, struct request_queue *q,
++				struct request *rq, int *type)
 +{
-+	if (req_ref_put_and_test(rq))
-+		__blk_mq_free_request(rq);
++	struct sort_tree_node *snode = NULL, *lnode = NULL;
++	sector_t rq_start, rq_end, other_start, other_end;
++	enum elv_merge mt = ELEVATOR_NO_MERGE;
++	struct bpf_list_node *list_node = NULL;
++	struct bpf_rb_node *rb_node = NULL;
++	struct ufq_simple_data *ufq_sd;
++	struct request *targ = NULL;
++	enum ufq_simp_data_dir dir;
++	struct bpf_rb_root *tree;
++	int id = q->id;
++	int count = 0;
++
++	*type = ELEVATOR_NO_MERGE;
++	dir = ((rq->cmd_flags & REQ_OP_MASK) & 1) ? UFQ_SIMP_WRITE : UFQ_SIMP_READ;
++	ufq_sd = bpf_map_lookup_elem(&ufq_map, &id);
++	if (!ufq_sd)
++		return NULL;
++
++	/* Calculate current request position and end */
++	rq_start = rq->__sector;
++	rq_end = rq_start + (rq->__data_len >> SECTOR_SHIFT);
++
++	if (dir == UFQ_SIMP_READ)
++		tree = &ufq_sd->sort_tree_read;
++	else
++		tree = &ufq_sd->sort_tree_write;
++
++	bpf_spin_lock(&ufq_sd->lock);
++	rb_node = bpf_rbtree_root(tree);
++	if (!rb_node) {
++		bpf_spin_unlock(&ufq_sd->lock);
++		return NULL;
++	}
++
++	while (mt == ELEVATOR_NO_MERGE && rb_node && count < 100) {
++		count++;
++		snode = container_of(rb_node, struct sort_tree_node, rb_node);
++		targ = bpf_kptr_xchg(&snode->req, NULL);
++		if (!targ)
++			break;
++
++		other_start = targ->__sector;
++		other_end = other_start + (targ->__data_len >> SECTOR_SHIFT);
++
++		targ = bpf_kptr_xchg(&snode->req, targ);
++		if (targ) {
++			bpf_spin_unlock(&ufq_sd->lock);
++			bpf_request_release(targ);
++			return NULL;
++		}
++
++		if (rq_start > other_end)
++			rb_node = bpf_rbtree_right(tree, rb_node);
++		else if (rq_end < other_start)
++			rb_node = bpf_rbtree_left(tree, rb_node);
++		else if (rq_end == other_start)
++			mt = ELEVATOR_FRONT_MERGE;
++		else if (other_end == rq_start)
++			mt = ELEVATOR_BACK_MERGE;
++		else
++			break;
++
++		if (mt) {
++			rb_node = bpf_rbtree_remove(tree, rb_node);
++			if (rb_node) {
++				snode = container_of(rb_node,
++					struct sort_tree_node, rb_node);
++				targ = bpf_kptr_xchg(&snode->req, NULL);
++
++				list_node = bpf_list_del(&ufq_sd->fifo_list,
++							 &snode->list_node);
++				bpf_spin_unlock(&ufq_sd->lock);
++				if (targ) {
++					*type = mt;
++					stat_add(UFQ_SIMP_MERGE_CNT, 1);
++					stat_add(UFQ_SIMP_MERGE_SIZE, targ->__data_len);
++					stat_sub(UFQ_SIMP_INSERT_CNT, 1);
++					stat_sub(UFQ_SIMP_INSERT_SIZE, targ->__data_len);
++				}
++
++				if (list_node) {
++					lnode = container_of(list_node,
++						struct sort_tree_node, list_node);
++					bpf_obj_drop(lnode);
++				}
++
++				bpf_obj_drop(snode);
++			} else {
++				bpf_spin_unlock(&ufq_sd->lock);
++				*type = ELEVATOR_NO_MERGE;
++			}
++			return targ;
++		}
++	}
++	bpf_spin_unlock(&ufq_sd->lock);
++
++	return NULL;
 +}
 +
-+__bpf_kfunc_end_defs();
++UFQ_OPS_DEFINE(ufq_simple_ops,
++	.init_sched		= (void *)ufq_simple_init_sched,
++	.exit_sched		= (void *)ufq_simple_exit_sched,
++	.insert_req		= (void *)ufq_simple_insert_req,
++	.dispatch_req		= (void *)ufq_simple_dispatch_req,
++	.has_req		= (void *)ufq_simple_has_req,
++	.finish_req		= (void *)ufq_simple_finish_req,
++	.next_req		= (void *)ufq_simple_next_req,
++	.former_req		= (void *)ufq_simple_former_req,
++	.merge_req		= (void *)ufq_simple_merge_req,
++	.name			= "ufq_simple");
+diff --git a/tools/ufq_iosched/ufq_simple.c b/tools/ufq_iosched/ufq_simple.c
+new file mode 100644
+index 000000000000..3e043e475461
+--- /dev/null
++++ b/tools/ufq_iosched/ufq_simple.c
+@@ -0,0 +1,118 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2026 KylinSoft Corporation.
++ * Copyright (c) 2026 Kaitao Cheng <chengkaitao@kylinos.cn>
++ */
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <signal.h>
++#include <libgen.h>
++#include <bpf/bpf.h>
++#include <ufq/common.h>
++#include "ufq_simple.bpf.skel.h"
 +
-+#if defined(CONFIG_X86_KERNEL_IBT)
-+static const void * const __used __section(".discard.ibt_endbr_noseal")
-+__ibt_noseal_bpf_request_release = (void *)bpf_request_release;
-+#endif
++const char help_fmt[] =
++"A simple ufq scheduler.\n"
++"\n"
++"Usage: %s [-v] [-d] [-h]\n"
++"\n"
++"  -v            Print version\n"
++"  -d            Print libbpf debug messages\n"
++"  -h            Display this help and exit\n";
 +
-+BTF_KFUNCS_START(ufq_kfunc_set_ops)
-+BTF_ID_FLAGS(func, bpf_request_from_id, KF_RET_NULL)
-+BTF_ID_FLAGS(func, bpf_request_acquire, KF_ACQUIRE | KF_RET_NULL)
-+BTF_ID_FLAGS(func, bpf_request_put)
-+BTF_ID_FLAGS(func, bpf_request_release, KF_RELEASE)
-+BTF_KFUNCS_END(ufq_kfunc_set_ops)
++#define UFQ_SIMPLE_VERSION "0.1.0"
++#define TIME_INTERVAL 3
++static bool verbose;
++static volatile int exit_req;
++__u64 old_stats[UFQ_SIMP_STAT_MAX];
 +
-+static const struct btf_kfunc_id_set bpf_ufq_kfunc_set = {
-+	.owner			= THIS_MODULE,
-+	.set			= &ufq_kfunc_set_ops,
-+};
-+
-+BTF_ID_LIST(bpf_ufq_dtor_kfunc_ids)
-+BTF_ID(struct, request)
-+BTF_ID(func, bpf_request_release)
-+
-+int bpf_ufq_kfunc_init(void)
++static int libbpf_print_fn(enum libbpf_print_level level, const char *format, va_list args)
 +{
-+	int ret;
-+	const struct btf_id_dtor_kfunc bpf_ufq_dtor_kfunc[] = {
-+		{
-+		  .btf_id       = bpf_ufq_dtor_kfunc_ids[0],
-+		  .kfunc_btf_id = bpf_ufq_dtor_kfunc_ids[1]
-+		},
-+	};
++	if (level == LIBBPF_DEBUG && !verbose)
++		return 0;
++	return vfprintf(stderr, format, args);
++}
 +
-+	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_ufq_kfunc_set);
-+	if (ret)
-+		return ret;
-+	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_SYSCALL, &bpf_ufq_kfunc_set);
-+	if (ret)
-+		return ret;
-+	ret = register_btf_id_dtor_kfuncs(bpf_ufq_dtor_kfunc,
-+					  ARRAY_SIZE(bpf_ufq_dtor_kfunc),
-+					  THIS_MODULE);
-+	if (ret)
-+		return ret;
++static void sigint_handler(int simple)
++{
++	exit_req = 1;
++}
++
++static void read_stats(struct ufq_simple *skel, __u64 *stats)
++{
++	int nr_cpus = libbpf_num_possible_cpus();
++	__u64 cnts[UFQ_SIMP_STAT_MAX][nr_cpus];
++	__u32 idx;
++
++	memset(stats, 0, sizeof(stats[0]) * UFQ_SIMP_STAT_MAX);
++
++	for (idx = 0; idx < UFQ_SIMP_STAT_MAX; idx++) {
++		int ret, cpu;
++
++		ret = bpf_map_lookup_elem(bpf_map__fd(skel->maps.stats),
++					  &idx, cnts[idx]);
++		if (ret < 0)
++			continue;
++		for (cpu = 0; cpu < nr_cpus; cpu++)
++			stats[idx] += cnts[idx][cpu];
++	}
++}
++
++int main(int argc, char **argv)
++{
++	struct ufq_simple *skel;
++	struct bpf_link *link;
++	__u32 opt;
++
++	libbpf_set_print(libbpf_print_fn);
++	signal(SIGINT, sigint_handler);
++	signal(SIGTERM, sigint_handler);
++
++	skel = UFQ_OPS_OPEN(ufq_simple_ops, ufq_simple);
++
++	while ((opt = getopt(argc, argv, "vdh")) != -1) {
++		switch (opt) {
++		case 'v':
++			printf("ufq_simple version: %s\n", UFQ_SIMPLE_VERSION);
++			return 0;
++		case 'd':
++			verbose = true;
++			break;
++		default:
++			fprintf(stderr, help_fmt, basename(argv[0]));
++			return opt != 'h';
++		}
++	}
++
++	UFQ_OPS_LOAD(skel, ufq_simple_ops, ufq_simple);
++	link = UFQ_OPS_ATTACH(skel, ufq_simple_ops, ufq_simple);
++
++	printf("ufq_simple loop ...\n");
++	while (!exit_req) {
++		__u64 stats[UFQ_SIMP_STAT_MAX];
++
++		printf("--------------------------------\n");
++		read_stats(skel, stats);
++		printf("bps:%lluk  iops:%llu\n",
++		       (stats[UFQ_SIMP_FINISH_SIZE] -
++			old_stats[UFQ_SIMP_FINISH_SIZE]) / 1024 / TIME_INTERVAL,
++		       (stats[UFQ_SIMP_FINISH_CNT] -
++			old_stats[UFQ_SIMP_FINISH_CNT]) / TIME_INTERVAL);
++		printf("(insert:   cnt=%llu size=%llu) (merge:  cnt=%llu size=%llu)\n",
++				stats[UFQ_SIMP_INSERT_CNT], stats[UFQ_SIMP_INSERT_SIZE],
++				stats[UFQ_SIMP_MERGE_CNT], stats[UFQ_SIMP_MERGE_SIZE]);
++		printf("(dispatch: cnt=%llu size=%llu) (finish: cnt=%llu size=%llu)\n",
++			stats[UFQ_SIMP_DISPATCH_CNT], stats[UFQ_SIMP_DISPATCH_SIZE],
++			stats[UFQ_SIMP_FINISH_CNT], stats[UFQ_SIMP_FINISH_SIZE]);
++		memcpy(old_stats, stats, sizeof(old_stats));
++		sleep(TIME_INTERVAL);
++	}
++
++	printf("ufq_simple loop exit ...\n");
++	bpf_link__destroy(link);
++	ufq_simple__destroy(skel);
 +
 +	return 0;
 +}
