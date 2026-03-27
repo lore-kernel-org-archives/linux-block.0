@@ -1,27 +1,27 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C30E3DB64B;
-	Fri, 27 Mar 2026 09:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9E629D29E;
+	Fri, 27 Mar 2026 09:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774603457; cv=none; b=nN0lnrXzh2huY6DRp0p2CCdRUJWFiaCIg1aANgAISTeCGanjpbmpJSkLKHa8AQP9a3D8XJbws2VgLLLGBnFfR6Jv7dAta7J3zzuu5FxWlu7UXC0wzr8bIqE8ud06vZvWOcfUWk5GRheIDdEEtjCHhUK6ygmBkT78WfyiWtOyNc0=
+	t=1774603458; cv=none; b=hDlZMBJ1ipWcaE4Q8lXp/9EXoVVI5dKDNWhtt1Md5DXKetfPrgfAU6Mn+11RXkuTVc1UJ3tK+aaYXlSOb2hjkD/CVkHDKKSi7smGqgHts56GLW+MuHWgujn7aMhP4+0ni+Q0C9McByUr/UeCacS1ErbLy6dI/jrvIJB/PaZaoAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774603457; c=relaxed/simple;
-	bh=YOLokWSdToD8kI4grwc+wFe7gCSIYg9o99s09E+DHHU=;
+	s=arc-20240116; t=1774603458; c=relaxed/simple;
+	bh=Wpgs7Jw4AKDqCnA6eG8+j0JWhZ8t4B4Ze7no1TgzV9s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=naWmYtU+pAGLpU6w/13ST4OEysxV30WzhGm6IZZQfvpKTZhNICOmxMsu79o+2S5TiqqxUfTNLPRb8GFj7r3QEGANnaIK2emgpy4r+//QLrpfi34QrE+276Na7UGtaGwyamL0vsqYwMG+dHHkFsq5I9kS1SzA13xLFNhOM6jE0eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=LjAxds6C7W9eAEWoryy7po+qOOowbGujAsewcY0/D09f7sHAu0TVTvi61F7S8V8uQjwwEseWnMkWR54k04aleNSAfe0hZUnJxGgcYfEwyHA3ymo4gznuFET+6G+wQPy29tKT+Npn3Ri06Lh0qPCQ3lk1+nLxZAR1wWGtAFlYQxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4fhwDg4WKxzKHMkH;
-	Fri, 27 Mar 2026 17:23:31 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.177])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fhwFC63HqzYQvDS;
+	Fri, 27 Mar 2026 17:23:59 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 3BDB040574;
+	by mail.maildlp.com (Postfix) with ESMTP id 5C31D4058D;
 	Fri, 27 Mar 2026 17:24:13 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.50.87.129])
-	by APP1 (Coremail) with SMTP id cCh0CgAHC9uyTMZpTlaWCQ--.27625S5;
+	by APP1 (Coremail) with SMTP id cCh0CgAHC9uyTMZpTlaWCQ--.27625S7;
 	Fri, 27 Mar 2026 17:24:13 +0800 (CST)
 From: leo.lilong@huaweicloud.com
 To: josef@toxicpanda.com,
@@ -32,9 +32,9 @@ Cc: leo.lilong@huawei.com,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com,
 	lonuxli.64@gmail.com
-Subject: [PATCH 1/4] nbd: simplify find_fallback() by removing redundant logic
-Date: Fri, 27 Mar 2026 17:12:20 +0800
-Message-Id: <20260327091223.4147956-2-leo.lilong@huaweicloud.com>
+Subject: [PATCH 3/4] nbd: remove redundant num_connections boundary checks
+Date: Fri, 27 Mar 2026 17:12:22 +0800
+Message-Id: <20260327091223.4147956-4-leo.lilong@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20260327091223.4147956-1-leo.lilong@huaweicloud.com>
 References: <20260327091223.4147956-1-leo.lilong@huaweicloud.com>
@@ -45,13 +45,13 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAHC9uyTMZpTlaWCQ--.27625S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1fCF48uFW7tryUuFWkCrg_yoW8tFy7pF
-	WfZFyfKryUJ3W3ur43Za1UuF15Cws3Ga1UGFW8Ja4xuryUCryUuFZ3tF1ftay5JrZxZFyq
-	vF1UWFy7CFn8Gw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBCb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGw
-	A2048vs2IY020Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+X-CM-TRANSID:cCh0CgAHC9uyTMZpTlaWCQ--.27625S7
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ar1rArWkGw1furW7tFyrWFg_yoW8AF4UpF
+	45uay0krWUJF1fZF4FyaykWryUAanxGa97W3W8Aa1IyFy5ury0kFZ8KFyIgFyUJrZ5ZrZF
+	vFs8GF1rAF17GrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBCb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWw
+	A2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
 	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
 	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
 	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
@@ -61,80 +61,62 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1fCF48uFW7tryUuFWkCrg_yoW8tFy7pF
 	JVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7V
 	AKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j
 	6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42
-	IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7zuWDUUUU
+	IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFMKZDUUUU
 X-CM-SenderInfo: hohrhzxlor0w46kxt4xhlfz01xgou0bp/
 
 From: Long Li <leo.lilong@huawei.com>
 
-Remove the intermediate new_index variable and return -1 directly.
-The second conditional checking nsock->fallback_index validity is the
-logical inverse of the first, so drop it and let execution fall through
-naturally. Consolidate the two identical dev_err_ratelimited() + return
-paths into a single no_fallback label to reduce duplication.
+Now that config->socks uses xarray instead of a plain array, explicit
+bounds checking against num_connections is no longer necessary.
+xa_load() returns NULL for any out-of-range or missing index, and
+xa_for_each() is a no-op on an empty xarray, making these guards
+redundant.
 
 Signed-off-by: Long Li <leo.lilong@huawei.com>
 ---
- drivers/block/nbd.c | 37 ++++++++++++++-----------------------
- 1 file changed, 14 insertions(+), 23 deletions(-)
+ drivers/block/nbd.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index fe63f3c55d0d..f26ad2f1f3ff 100644
+index 728db2e832f8..1606cdaa868d 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1061,40 +1061,31 @@ static int find_fallback(struct nbd_device *nbd, int index)
- 	int new_index = -1;
- 	struct nbd_sock *nsock = config->socks[index];
- 	int fallback = nsock->fallback_index;
-+	int i;
+@@ -1094,7 +1094,7 @@ static int find_fallback(struct nbd_device *nbd, int index)
+ 		goto no_fallback;
  
- 	if (test_bit(NBD_RT_DISCONNECTED, &config->runtime_flags))
- 		return new_index;
- 
--	if (config->num_connections <= 1) {
--		dev_err_ratelimited(disk_to_dev(nbd->disk),
--				    "Dead connection, failed to find a fallback\n");
--		return new_index;
--	}
-+	if (config->num_connections <= 1)
-+		goto no_fallback;
- 
- 	if (fallback >= 0 && fallback < config->num_connections &&
- 	    !config->socks[fallback]->dead)
- 		return fallback;
- 
--	if (nsock->fallback_index < 0 ||
--	    nsock->fallback_index >= config->num_connections ||
--	    config->socks[nsock->fallback_index]->dead) {
--		int i;
--		for (i = 0; i < config->num_connections; i++) {
--			if (i == index)
--				continue;
--			if (!config->socks[i]->dead) {
--				new_index = i;
--				break;
--			}
--		}
--		nsock->fallback_index = new_index;
--		if (new_index < 0) {
--			dev_err_ratelimited(disk_to_dev(nbd->disk),
--					    "Dead connection, failed to find a fallback\n");
--			return new_index;
-+	for (i = 0; i < config->num_connections; i++) {
-+		if (i != index && !config->socks[i]->dead) {
-+			new_index = i;
-+			break;
- 		}
+ 	fallback = nsock->fallback_index;
+-	if (fallback >= 0 && fallback < config->num_connections) {
++	if (fallback >= 0) {
+ 		fallback_nsock = xa_load(&config->socks, fallback);
+ 		if (fallback_nsock && !fallback_nsock->dead)
+ 			return fallback;
+@@ -1149,12 +1149,6 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *cmd, int index)
+ 		return BLK_STS_IOERR;
  	}
--	new_index = nsock->fallback_index;
-+	nsock->fallback_index = new_index;
-+	if (new_index >= 0)
-+		return new_index;
-+
-+no_fallback:
-+	dev_err_ratelimited(disk_to_dev(nbd->disk),
-+			    "Dead connection, failed to find a fallback\n");
- 	return new_index;
- }
+ 
+-	if (index >= config->num_connections) {
+-		dev_err_ratelimited(disk_to_dev(nbd->disk),
+-				    "Attempted send on invalid socket\n");
+-		nbd_config_put(nbd);
+-		return BLK_STS_IOERR;
+-	}
+ 	cmd->status = BLK_STS_OK;
+ again:
+ 	nsock = xa_load(&config->socks, index);
+@@ -1475,11 +1469,9 @@ static void nbd_config_put(struct nbd_device *nbd)
+ 		}
+ 		nbd_clear_sock(nbd);
+ 
+-		if (config->num_connections) {
+-			xa_for_each(&config->socks, i, nsock) {
+-				sockfd_put(nsock->sock);
+-				kfree(nsock);
+-			}
++		xa_for_each(&config->socks, i, nsock) {
++			sockfd_put(nsock->sock);
++			kfree(nsock);
+ 		}
+ 		xa_destroy(&config->socks);
  
 -- 
 2.39.2
