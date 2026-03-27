@@ -1,46 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556DA2989B0
-	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 21:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837BF3264FA
+	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 21:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774646069; cv=none; b=QvmFkJGtGa+ME8vozZQi0o+EKo+bfakQ7rVrO1Xe2YFE6Un8i+xcuEkZMnxpvl5GWECcG6AgO925YptD5H6XrOux2IJqHsrR2/EhIYy/4WvVvUAmwwRuBu4a/lHWlWNFJSFurSLd9if6thaG/GKlJDJAuIkHTiNr3TyR5jY79Dw=
+	t=1774646074; cv=none; b=jriKVi2TwJenADSKmS+Sse1tH5jzNtThnl9bl95gRsXDaWrYN35W7tpNhg1ihaPHN+5WYEfZrdu98ibE0pyMHKfS6ETMWxCnSxzfu7uhX1dj4y5Wxs5AUJigPlyoYv8Yt28ELFnocWFWjRih2BCfjxuXxpIAAi6J1IqijcR8jGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774646069; c=relaxed/simple;
-	bh=cioRfBElDCSyVci+xEwbEBQRLEC6yDAx0nkXFhT7BxA=;
+	s=arc-20240116; t=1774646074; c=relaxed/simple;
+	bh=IJiaKf9dpzCPsKjFVld6H8pg5IZJwyl9iXgObDj0y7w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ev8QLRuwDQ/CSXWbxRS4gle0Vui8ZxKgpNwMD52ZLwCFx8Wg+d5D8MD2FPmJRgcoj1zTzEkqiWVq8cr2uYbtXJTGZX+Xzv5gbcGcGWUUf8pcBmO+d3ewsK/mrEClLnhw7UnwAN1qQ/fgH6VHdDrdhxh7uHotKtq89XfBRKYNf7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=oXPh9tsj; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=HKGMKEdGje2iKUdKh4xnP2avsHUQ65jjXafnVPfEPyiNC+p0HTYn4lf3mDWXPc5hy+hl5DrMoTE7WltblzlzFzKL9E2bkINdVNAhQlNYfwysJAr9e+sKcUMILEOQMlfTVqyQq7/FTAcHudbxTuIaAwJdAqexX2+EA4wq+NVPPd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=sNagp7Vj; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="oXPh9tsj"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="sNagp7Vj"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fjD0z6HwXzlh2r7;
-	Fri, 27 Mar 2026 21:14:27 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fjD150XSrzlfvq4;
+	Fri, 27 Mar 2026 21:14:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1774646061; x=1777238062; bh=csd6q
-	nAdtIdMORboelzn7ZrNsg1I79Cv8/cZX8kLYTs=; b=oXPh9tsjMnp4FBC+vLGRA
-	S4Z/OQ9RX9s0TqPt7k9VviBn7IxThrUKVXrUlUip3cNxE93q+qlQzrPAcZ63BOPj
-	7hjr8fD8t0PmiOJ4WOel0/7ABLM6+NdekbQpfWfXZFF1o5Rur6d4cNRvTxVBSkQf
-	4EVSx10HPbCZ3964bc6uY5KHBxN+U+W8Opu4v4YXzGi0JEZ48tLYS+QKD/OwU+kB
-	pasSy/Ab04iltfj/4BS6lwPjmxe7uNX10Ux9GyVLwYhieMcIfMpXBj2IZ1fLkoZF
-	FiLTN154g4FwUw4zi8OdaWdAnGlJ4zSyMp0abMpxwxt3gUpKC7E+zBEZbubN9dNr
-	A==
+	:received:received; s=mr01; t=1774646058; x=1777238059; bh=jMTmE
+	SdzD/Kur7zHz14kWcWb0BpuhM6IWSAWJ814Asw=; b=sNagp7Vjl/q0Aqw/vHS8u
+	gDqNHFWPgmk8m2S/YIXWVJElV07nStt5Vo3Amteq7srFZTqiRysL8rARE2Co/HML
+	+dyqVNRWzYOLSFPeIVrjLz2Id8SN9mesOnBvwjNGIjXQpX9/KI3TeO3FjVwtohkP
+	hcwPNFsNSKPh5UeXnqtk1ner8OR4vG9RWrR6M6jwDLBJpYztXYYdapkLaqkFLykM
+	crfZw70fo2gVBXla9vkWjkKtMXUnkFpB2mVYtavPtzvQOHWx92ULHhyGC2EW5+vM
+	dez7r6Qgm0IX7E4eBMuCfuUfav4i8XnCd/ybNqeBIsAdF9f4nkQTxwI701ly/DAR
+	g==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id UOVpB4wBf03T; Fri, 27 Mar 2026 21:14:21 +0000 (UTC)
+ id 7Tzg3h4c0RUb; Fri, 27 Mar 2026 21:14:18 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fjD0p45TGzlh2rl;
-	Fri, 27 Mar 2026 21:14:18 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fjD0j28SfzlfvqD;
+	Fri, 27 Mar 2026 21:14:13 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -48,13 +48,21 @@ Cc: linux-block@vger.kernel.org,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Ming Lei <ming.lei@redhat.com>,
 	Bart Van Assche <bvanassche@acm.org>,
-	John Garry <john.g.garry@oracle.com>,
-	Doug Gilbert <dgilbert@interlog.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Hans Holmberg <hans.holmberg@wdc.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Kees Cook <kees@kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
 	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v3 6/6] scsi_debug: Support configuring the maximum segment size
-Date: Fri, 27 Mar 2026 14:13:46 -0700
-Message-ID: <20260327211349.2239633-7-bvanassche@acm.org>
+Subject: [PATCH v3 5/6] null_blk: Support configuring the maximum DMA segment size
+Date: Fri, 27 Mar 2026 14:13:45 -0700
+Message-ID: <20260327211349.2239633-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
 In-Reply-To: <20260327211349.2239633-1-bvanassche@acm.org>
 References: <20260327211349.2239633-1-bvanassche@acm.org>
@@ -66,99 +74,145 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add a kernel module parameter for configuring the maximum segment size.
-Reject invalid max_segment_size values.
+Add support for configuring the maximum DMA segment size. The maximum DMA
+segment size may be set to a value smaller than the virtual memory page
+size. Reject invalid max_segment_size values.
 
-This patch enables testing SCSI support for segments smaller than the
-page size.
+Since rq_for_each_segment() may yield bvecs larger than the maximum DMA
+segment size, add code in the rq_for_each_segment() loop that restricts
+the bvec length to the maximum DMA segment size.
 
-Cc: John Garry <john.g.garry@oracle.com>
-Cc: Doug Gilbert <dgilbert@interlog.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc: Chaitanya Kulkarni <kch@nvidia.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/scsi_debug.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ drivers/block/null_blk/main.c     | 43 +++++++++++++++++++++++++++++++
+ drivers/block/null_blk/null_blk.h |  1 +
+ 2 files changed, 44 insertions(+)
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 1515495fd9ea..7e5e171bfcda 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -915,6 +915,7 @@ static int sdebug_host_max_queue;	/* per host */
- static int sdebug_lowest_aligned =3D DEF_LOWEST_ALIGNED;
- static int sdebug_max_luns =3D DEF_MAX_LUNS;
- static int sdebug_max_queue =3D SDEBUG_CANQUEUE;	/* per submit queue */
-+static unsigned int sdebug_max_segment_size =3D UINT_MAX;
- static unsigned int sdebug_medium_error_start =3D OPT_MEDIUM_ERR_ADDR;
- static int sdebug_medium_error_count =3D OPT_MEDIUM_ERR_NUM;
- static int sdebug_ndelay =3D DEF_NDELAY;	/* if > 0 then unit is nanoseco=
-nds */
-@@ -1041,6 +1042,26 @@ static const int condition_met_result =3D SAM_STAT=
-_CONDITION_MET;
- static struct dentry *sdebug_debugfs_root;
- static ASYNC_DOMAIN_EXCLUSIVE(sdebug_async_domain);
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
+c
+index f8c0fd57e041..d5fbbc5d63ed 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -169,6 +169,32 @@ static int g_max_sectors;
+ module_param_named(max_sectors, g_max_sectors, int, 0444);
+ MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sector=
+s)");
 =20
-+static int sdebug_set_max_segment_size(const char *val,
-+				       const struct kernel_param *kp)
++static unsigned int g_max_segment_size =3D BLK_MAX_SEGMENT_SIZE;
++
++static int nullb_set_max_segment_size(const char *val,
++				      const struct kernel_param *kp)
 +{
 +	int res;
 +
-+	res =3D kstrtouint(val, 0, &sdebug_max_segment_size);
++	res =3D kstrtouint(val, 0, &g_max_segment_size);
 +	if (res < 0)
 +		return res;
 +
-+	if (sdebug_max_segment_size < BLK_MIN_SEGMENT_SIZE)
++	if (g_max_segment_size < BLK_MIN_SEGMENT_SIZE)
 +		return -EINVAL;
 +
 +	return 0;
 +}
 +
 +static const struct kernel_param_ops max_segment_size_ops =3D {
-+	.set =3D sdebug_set_max_segment_size,
++	.set =3D nullb_set_max_segment_size,
 +	.get =3D param_get_uint,
 +};
 +
- static u32 sdebug_get_devsel(struct scsi_device *sdp)
- {
- 	unsigned char devtype =3D sdp->type;
-@@ -7366,6 +7387,8 @@ module_param_named(lowest_aligned, sdebug_lowest_al=
-igned, int, S_IRUGO);
- module_param_named(lun_format, sdebug_lun_am_i, int, S_IRUGO | S_IWUSR);
- module_param_named(max_luns, sdebug_max_luns, int, S_IRUGO | S_IWUSR);
- module_param_named(max_queue, sdebug_max_queue, int, S_IRUGO | S_IWUSR);
-+module_param_cb(max_segment_size, &max_segment_size_ops,
-+		&sdebug_max_segment_size, S_IRUGO);
- module_param_named(medium_error_count, sdebug_medium_error_count, int,
- 		   S_IRUGO | S_IWUSR);
- module_param_named(medium_error_start, sdebug_medium_error_start, int,
-@@ -7449,6 +7472,7 @@ MODULE_PARM_DESC(lowest_aligned, "lowest aligned lb=
-a (def=3D0)");
- MODULE_PARM_DESC(lun_format, "LUN format: 0->peripheral (def); 1 --> fla=
-t address method");
- MODULE_PARM_DESC(max_luns, "number of LUNs per target to simulate(def=3D=
-1)");
- MODULE_PARM_DESC(max_queue, "max number of queued commands (1 to max(def=
-))");
-+MODULE_PARM_DESC(max_segment_size, "max bytes in a single DMA segment");
- MODULE_PARM_DESC(medium_error_count, "count of sectors to return follow =
-on MEDIUM error");
- MODULE_PARM_DESC(medium_error_start, "starting sector number to return M=
-EDIUM error");
- MODULE_PARM_DESC(ndelay, "response delay in nanoseconds (def=3D0 -> igno=
-re)");
-@@ -9539,7 +9563,6 @@ static const struct scsi_host_template sdebug_drive=
-r_template =3D {
- 	.sg_tablesize =3D		SG_MAX_SEGMENTS,
- 	.cmd_per_lun =3D		DEF_CMD_PER_LUN,
- 	.max_sectors =3D		-1U,
--	.max_segment_size =3D	-1U,
- 	.module =3D		THIS_MODULE,
- 	.skip_settle_delay =3D	1,
- 	.track_queue_depth =3D	1,
-@@ -9566,6 +9589,7 @@ static int sdebug_driver_probe(struct device *dev)
- 	}
- 	hpnt->can_queue =3D sdebug_max_queue;
- 	hpnt->cmd_per_lun =3D sdebug_max_queue;
-+	hpnt->max_segment_size =3D sdebug_max_segment_size;
- 	if (!sdebug_clustering)
- 		hpnt->dma_boundary =3D PAGE_SIZE - 1;
++module_param_cb(max_segment_size, &max_segment_size_ops, &g_max_segment_=
+size,
++		0444);
++MODULE_PARM_DESC(max_segment_size, "Maximum size of a DMA segment in byt=
+es");
++
+ static unsigned int nr_devices =3D 1;
+ module_param(nr_devices, uint, 0444);
+ MODULE_PARM_DESC(nr_devices, "Number of devices to register");
+@@ -442,6 +468,14 @@ static int nullb_apply_poll_queues(struct nullb_devi=
+ce *dev,
+ 	return ret;
+ }
 =20
++static int nullb_apply_max_segment_size(struct nullb_device *dev,
++					unsigned int max_segment_size)
++{
++	if (max_segment_size < BLK_MIN_SEGMENT_SIZE)
++		return -EINVAL;
++	return 0;
++}
++
+ NULLB_DEVICE_ATTR(size, ulong, NULL);
+ NULLB_DEVICE_ATTR(completion_nsec, ulong, NULL);
+ NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
+@@ -450,6 +484,7 @@ NULLB_DEVICE_ATTR(home_node, uint, NULL);
+ NULLB_DEVICE_ATTR(queue_mode, uint, NULL);
+ NULLB_DEVICE_ATTR(blocksize, uint, NULL);
+ NULLB_DEVICE_ATTR(max_sectors, uint, NULL);
++NULLB_DEVICE_ATTR(max_segment_size, uint, nullb_apply_max_segment_size);
+ NULLB_DEVICE_ATTR(irqmode, uint, NULL);
+ NULLB_DEVICE_ATTR(hw_queue_depth, uint, NULL);
+ NULLB_DEVICE_ATTR(index, uint, NULL);
+@@ -608,6 +643,7 @@ static struct configfs_attribute *nullb_device_attrs[=
+] =3D {
+ 	&nullb_device_attr_index,
+ 	&nullb_device_attr_irqmode,
+ 	&nullb_device_attr_max_sectors,
++	&nullb_device_attr_max_segment_size,
+ 	&nullb_device_attr_mbps,
+ 	&nullb_device_attr_memory_backed,
+ 	&nullb_device_attr_no_sched,
+@@ -805,6 +841,7 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->queue_mode =3D g_queue_mode;
+ 	dev->blocksize =3D g_bs;
+ 	dev->max_sectors =3D g_max_sectors;
++	dev->max_segment_size =3D g_max_segment_size;
+ 	dev->irqmode =3D g_irqmode;
+ 	dev->hw_queue_depth =3D g_hw_queue_depth;
+ 	dev->blocking =3D g_blocking;
+@@ -1248,6 +1285,9 @@ static blk_status_t null_transfer(struct nullb *nul=
+lb, struct page *page,
+ 	unsigned int valid_len =3D len;
+ 	void *p;
+=20
++	WARN_ONCE(len > dev->max_segment_size, "%u > %u\n", len,
++		  dev->max_segment_size);
++
+ 	p =3D kmap_local_page(page) + off;
+ 	if (!is_write) {
+ 		if (dev->zoned) {
+@@ -1295,6 +1335,8 @@ static blk_status_t null_handle_data_transfer(struc=
+t nullb_cmd *cmd,
+ 	spin_lock_irq(&nullb->lock);
+ 	rq_for_each_segment(bvec, rq, iter) {
+ 		len =3D bvec.bv_len;
++		len =3D min(bvec.bv_len, nullb->dev->max_segment_size);
++		bvec.bv_len =3D len;
+ 		if (transferred_bytes + len > max_bytes)
+ 			len =3D max_bytes - transferred_bytes;
+ 		err =3D null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
+@@ -1958,6 +2000,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 		.logical_block_size	=3D dev->blocksize,
+ 		.physical_block_size	=3D dev->blocksize,
+ 		.max_hw_sectors		=3D dev->max_sectors,
++		.max_segment_size	=3D dev->max_segment_size,
+ 		.dma_alignment		=3D 1,
+ 	};
+=20
+diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/n=
+ull_blk.h
+index 6c4c4bbe7dad..43dc47789718 100644
+--- a/drivers/block/null_blk/null_blk.h
++++ b/drivers/block/null_blk/null_blk.h
+@@ -93,6 +93,7 @@ struct nullb_device {
+ 	unsigned int queue_mode; /* block interface */
+ 	unsigned int blocksize; /* block size */
+ 	unsigned int max_sectors; /* Max sectors per command */
++	unsigned int max_segment_size; /* Max size of a single DMA segment. */
+ 	unsigned int irqmode; /* IRQ completion handler */
+ 	unsigned int hw_queue_depth; /* queue depth */
+ 	unsigned int index; /* index of the disk, only valid with a disk */
