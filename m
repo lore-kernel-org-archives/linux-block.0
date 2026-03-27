@@ -1,91 +1,45 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10BF35B125
-	for <linux-block@vger.kernel.org>; Fri, 27 Mar 2026 16:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B4B35F5E4;
+	Fri, 27 Mar 2026 16:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774628824; cv=none; b=gw0zelJYTEIfdFrswHgiHi3QgPFGBBWp3TQnCQiRirFb6d+HwQ3/VB3jYmOCS9PWBUfJDc0/UWseGw4ydIa2FwR3hE0muerknaxvJ71brkDSYTU2pQwBD5V/TLjX34Bcn1LfazM3sVhYUrrldyKCxrie/rr4HI8qR1syfr5AhLw=
+	t=1774630660; cv=none; b=DYi+6HIZb3CNv20ELh1bkR0s2Pxxh4X3PFQB7MhnK5LH1xq69GCMYwz+4K+q6nWmU9vEe0ZkqqFOuqhWMkEr14OHqWwh0IwRHVtniX25oy8k0ZweIKT26lf1/F/mrVQabUoCIY4YMKFJAPm9yImScTCQP8pX8GssQ8b9Kdirj3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774628824; c=relaxed/simple;
-	bh=H6BFM46QAO9JXeDjUblDjIr7SHr/MFDykB777mwlxPI=;
+	s=arc-20240116; t=1774630660; c=relaxed/simple;
+	bh=/2qgyc/J6vbHzNXCgM+0N71x7LuvuOBT8ngipuSzcUQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KLB67kjhEleNTNAKT2D08D3HYfeHtSKnY2MVSo0xVmDVFBmOAYGhy0qnuuEefzQXNLuYRvfhwp0Kr/C/IvAyRKsr70dtmvTKEiL7LE3AjVb9QML/Ny6szzwPlg+bcdJgf2lBecqvplsMmkNiLhBpj0qPUUV5YD8F9eh3HvNaCto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=PWIRwc8r; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=aHy7/HrQ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=JdZTa2nF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=4tn+bHEd; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=GxYdyjlLvIELCUc7C5/GXFULyAnBEXh5BUORc56b0+04ovr76AU1DQRbWdT2vOTxfP2CrN7ydpdp9/djJv/UQ+Wf0/zzY+rIVLyJM82rMTkIzbNc8bZTMfvXqONAsvk4fP2YdMuY+00tUJ7FNsknnEuTlTHUzhTcEMbQHNX3y2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCAnPo3q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="PWIRwc8r";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="aHy7/HrQ";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="JdZTa2nF";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="4tn+bHEd"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E83785BDED;
-	Fri, 27 Mar 2026 16:27:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774628822; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GFjcJQasStRPcNI6PQK9qh0uIXtRvK1Btt+CTwCqo3A=;
-	b=PWIRwc8rOn9Nb4fu2FlwjtSXS1qkXG0tjm/SzAXF8JeibADY9YCwpulSakhZ9HEai4VzWq
-	RcLicvOGKKXUgTc+/f7Ly1MITdhSOlfzYOsT4udpnbmj+3ESJx75D9CmE9de75tAao8tLu
-	0iojcawi6Be59m8CiJSr+pgwVrdYaxE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774628822;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GFjcJQasStRPcNI6PQK9qh0uIXtRvK1Btt+CTwCqo3A=;
-	b=aHy7/HrQ2QdAR4JQb/JErLh8xEBvQrwFvXxGaRsi+mCfX+f8aK+cDqc/cqOxstbbH/5D9u
-	VP7Z3RP2uGuw0wAQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1774628821; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GFjcJQasStRPcNI6PQK9qh0uIXtRvK1Btt+CTwCqo3A=;
-	b=JdZTa2nFwYlx7Yz4v0Z1m4tXCmDoIzNzOJNW+8xEWeP8KwfAwRmuW6eBPI9Y4cuUjeAX/l
-	tCv7i6kBMRuIOSP+jljGRT7CpbaFnd37x0zUwqg81DbBCJLnjPD9dXPI6iYvqnzSCXv4HD
-	z7iMh9qWp9Db6GOOlplSxiGIi58kq90=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1774628821;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GFjcJQasStRPcNI6PQK9qh0uIXtRvK1Btt+CTwCqo3A=;
-	b=4tn+bHEdrwopjN6Dk8ZMfXdEshhQTlIfghPu9FONoDvawdc8IUbttoyLrGr2hyy1XwXLDI
-	+SyoNvyVCOyLf9DQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DAEAD4A0A2;
-	Fri, 27 Mar 2026 16:27:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 3v5vNdWvxml5SgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Fri, 27 Mar 2026 16:27:01 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 9A9C2A0976; Fri, 27 Mar 2026 17:26:57 +0100 (CET)
-Date: Fri, 27 Mar 2026 17:26:57 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>, 
-	Al Viro <viro@zeniv.linux.org.uk>, linux-ext4@vger.kernel.org, Ted Tso <tytso@mit.edu>, 
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>, David Sterba <dsterba@suse.com>, 
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, David Hildenbrand <david@kernel.org>, linux-mm@kvack.org, 
-	linux-aio@kvack.org, Benjamin LaHaise <bcrl@kvack.org>
-Subject: Re: [PATCH 14/42] fs: Rename generic_file_fsync() to simple_fsync()
-Message-ID: <szke56tw43bq2wyv3rai3akrewxbpclbj3finajrwtubkzbgbz@zgj7cc7h2sr2>
-References: <20260326082428.31660-1-jack@suse.cz>
- <20260326095354.16340-56-jack@suse.cz>
- <acYiH4ByDc1-nPqD@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCAnPo3q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F8EC19424;
+	Fri, 27 Mar 2026 16:57:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774630660;
+	bh=/2qgyc/J6vbHzNXCgM+0N71x7LuvuOBT8ngipuSzcUQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WCAnPo3qsTS0bmwkHedM7k0tywz5q/cqGsL4bXNJ48KOg+Cql74HJn4i00Jm3by99
+	 WioHwQRuNyNXr1ywEFN+vT7IWyBETWJtzH+qsXKuh0BIL7u381sSWjWg9aK639zBFe
+	 S8ovXi3CDklC9iKtBSABiD2Fu3vTP456Q8PU7eZ7Y74MXjyx8iPxFjyY5nY6Gb3Tz8
+	 evGSM3DWDyRGXicHZw8sJEHYjpVy1B679b48VKbPUK0cpRGLfpBQegoIFf309tEswf
+	 RVFboxeYSjk1fCBNgt9hYwcwXpphkz4TGI8mCIB9ad4W65nDysKg70QmZZiMB36pCE
+	 NKo1ozgPIxzAQ==
+Date: Fri, 27 Mar 2026 12:57:38 -0400
+From: Mike Snitzer <snitzer@kernel.org>
+To: Chuck Lever <chuck.lever@oracle.com>
+Cc: Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, jonathan.flynn@hammerspace.com
+Subject: Re: A comparison of the new nfsd iomodes (and an experimental one)
+Message-ID: <aca3ApIPUGAovh_7@kernel.org>
+References: <4ebbd194ccfb3bcea6225d926b4c9f339e21c813.camel@kernel.org>
+ <d453add6-ed23-4d61-af95-d80133b0e456@oracle.com>
+ <33582a86daf135336f6bc0d5260d8de0501abadd.camel@kernel.org>
+ <acWbrlvt_dUB9X3R@kernel.org>
+ <70e9c23a97d94a3dad5aa7f03f5a22c0950b00bf.camel@kernel.org>
+ <43921656-e0c3-4b55-ad1f-4965ff40f1f4@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -94,52 +48,42 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <acYiH4ByDc1-nPqD@infradead.org>
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_CC(0.00)[suse.cz,vger.kernel.org,kernel.org,zeniv.linux.org.uk,mit.edu,gmail.com,suse.com,mail.parknet.co.jp,linux.dev,suse.de,kvack.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
-X-Spam-Level: 
+In-Reply-To: <43921656-e0c3-4b55-ad1f-4965ff40f1f4@oracle.com>
 
-On Thu 26-03-26 23:22:23, Christoph Hellwig wrote:
-> > -extern int __generic_file_fsync(struct file *, loff_t, loff_t, int);
-> > -extern int generic_file_fsync(struct file *, loff_t, loff_t, int);
-> > +extern int simple_fsync_noflush(struct file *, loff_t, loff_t, int);
-> > +extern int simple_fsync(struct file *, loff_t, loff_t, int);
+On Fri, Mar 27, 2026 at 09:19:07AM -0400, Chuck Lever wrote:
+> On 3/27/26 7:32 AM, Jeff Layton wrote:
+> > On Thu, 2026-03-26 at 16:48 -0400, Mike Snitzer wrote:
+> >
+> >> Your bandwidth for 1MB sequential IO of 793 MB/s for O_DIRECT and
+> >> 4,952 MB/s for buffered and dontcache is considerably less than the 72
+> >> GB/s offered in Jon's testbed.  Your testing isn't exposing the
+> >> bottlenecks (contention) of the MM subsystem for buffered IO... not
+> >> yet put my finger on _why_ that is.
+> > 
+> > That may very well be, but not everyone has a box as large as the one
+> > you and Jon were working with.
+>
+> Right, and this is kind of a blocker for us. Practically speaking, Jon's
+> results are not reproducible.
 > 
-> Please drop the pointless externs, and maybe also add the parameter names
-> when you touch it.
-> 
-> Otherwise looks good.
+> It would be immensely helpful if the MM-tipover behavior could be
+> reproduced on smaller systems. Reduced physical memory size, lower
+> network and storage speed, and so on, so that Jeff and I can study the
+> issue on our own systems.
 
-I believe Christian has a patch from Jeff in his tree cleaning up the whole
-fs.h header in this way. Not sure how Christian ended up resolving the
-conflict but we can clean this up after the merge window if some externs
-are still left there.
+Hammerspace still has the same performance lab setup, so we can
+certainly reproduce if needed (and try to scale it down, etc) but
+unfortunately its currently tied up with other important work. Jon
+Flynn's testing was "only" with 2 systems (the NFS server has 16 fast
+NVMe, client system connecting over 400 GbE with RDMA). But I'll see
+about shaking a couple systems loose...
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Might be useful for us to document the setup of the NFS server side
+and give pointers for how to mount from the client system and then run
+fio commandline.
+
+I think Jens has a couple beefy servers with lots of fast NVMe. Maybe
+he'd be open to testing NFS server scalability when he isn't touring
+around the country watching his kid win motorsports events.. JENS!? ;)
+
+Mike
