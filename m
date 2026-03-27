@@ -1,126 +1,110 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D97125EFBE;
-	Fri, 27 Mar 2026 09:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2533C5DAB;
+	Fri, 27 Mar 2026 10:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774603459; cv=none; b=U4seKdFTXSUIQOBcFMr9ZNDLfM6V5wiG7lUmmnOeRdUlhNkaHxFcd39N+1j3JJbQmjt7R68IC1gTEB5EKS9OFz/Z3yn5H8a2FhJQX0zQgyIsfCMXTe2dWHDyoqODaIIO0INOZ/xPhfCcvdFn7SBetPm7YOCXzLjo+k1bP5jMsmA=
+	t=1774608093; cv=none; b=Dc0GLWUDjlvRWqCZ2QENrJ5MYyLrYZ1ctw2dEHlJSRDc+6xUMnnd5m8Htc6Xh2r7Vjgr5kJHbSiCQ0bpEDTkSxrhjfgKexkaKteu1CJO37U2bQkWWUVKlXYKXZctwqwp2we3q1F9PYK7SNwKydPdjngXzDn5wwhZBCUuu8W4mns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774603459; c=relaxed/simple;
-	bh=UCisZ4qEhhpNY8uzul2+Xkm4y2bCuPqQmPEJxuXiDuk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CeuSHWBMc91gEj7oJj3eHnwQGoX/V3hrInPfovcgjSGDkyOGgt7QTCfImeCwLFWxxhganW2eS9/JiEaFg9OLsKEVlChbVHwQxBDmsSl6mhloSP9dVoXqR+z1FWLPgQvJ6maUcrg2IAYyluMLfE6R3Hz6viM4dP9Zb0vo8s/Vdls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fhwFC6gLYzYQvDQ;
-	Fri, 27 Mar 2026 17:23:59 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 706D140573;
-	Fri, 27 Mar 2026 17:24:13 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.87.129])
-	by APP1 (Coremail) with SMTP id cCh0CgAHC9uyTMZpTlaWCQ--.27625S8;
-	Fri, 27 Mar 2026 17:24:13 +0800 (CST)
-From: leo.lilong@huaweicloud.com
-To: josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: leo.lilong@huawei.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	lonuxli.64@gmail.com
-Subject: [PATCH 4/4] nbd: remove queue freeze in nbd_add_socket
-Date: Fri, 27 Mar 2026 17:12:23 +0800
-Message-Id: <20260327091223.4147956-5-leo.lilong@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20260327091223.4147956-1-leo.lilong@huaweicloud.com>
-References: <20260327091223.4147956-1-leo.lilong@huaweicloud.com>
+	s=arc-20240116; t=1774608093; c=relaxed/simple;
+	bh=jWe6OEhA34gE7fEyHsXA6R0diYZ11O4QgBijUwIUAVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=puptnprdzY7Yp07MSyRQQluzlk5BMzn9AkctjYpUh12kQeWmTaYWuQgG+hSU4+/TyrCs3jYe01YYoTVXA6BK5ONVnlaYspMuK/Pt1X0venT/ZedkavVR+HZmgk2T/Nns7mrRdFR0U7ICzkMPJ/OwfHWHsleARjsL7osNzkuM0jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bm7BpwL1; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bm7BpwL1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774608092; x=1806144092;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jWe6OEhA34gE7fEyHsXA6R0diYZ11O4QgBijUwIUAVI=;
+  b=Bm7BpwL1tUU/sKnQ/sdScO1csjB7tM8DAoyRVa41XERmkQwAA2PvYv9/
+   GSHq3JNJ7H+5J/KjZvDnY7mN5WbS8l3LTLZdbmJGivhjwaSKB+scnmOgd
+   KlwUTjeGRXCfXxRFXD3ai5VLuD1wjV9BTS0oN1xhNxKmoAymRYW0MXCxH
+   czMUVkFVSzljmkDxeTS/+lRmF7Iq3S7UsxSm+OXRWY3JmF4ZSS148NnaB
+   rqMYlMzZhR7EapB+Zpp7dZpE/BjdnMeOsngclxZjB+A6WU7+5hZAAGuoi
+   Z09GOgOJmD5Orx6gw7M5mKv4W+ydrj5lOhfXla9b9TD9HyMjGN/Y/QyuB
+   w==;
+X-CSE-ConnectionGUID: E3UtSoSgTt6S3o5nopMxJw==
+X-CSE-MsgGUID: AJFEhCJmSrC8+lR5vFtaWg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="85986959"
+X-IronPort-AV: E=Sophos;i="6.23,144,1770624000"; 
+   d="scan'208";a="85986959"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 03:41:31 -0700
+X-CSE-ConnectionGUID: 5kkWXhs2TKi8vmT27S42Lg==
+X-CSE-MsgGUID: UZ64OI1qT/qx1vNhpOuskg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,144,1770624000"; 
+   d="scan'208";a="225202172"
+Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 27 Mar 2026 03:41:25 -0700
+Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w64cz-00000000AAp-16RM;
+	Fri, 27 Mar 2026 10:41:21 +0000
+Date: Fri, 27 Mar 2026 18:40:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>, linux-block@vger.kernel.org,
+	nbd@other.debian.org, netdev@vger.kernel.org,
+	syzbot+7b4f368d3955d2c9950e@syzkaller.appspotmail.com
+Subject: Re: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and
+ shutdown().
+Message-ID: <202603271810.hoQGfrEp-lkp@intel.com>
+References: <20260325063843.1790782-6-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgAHC9uyTMZpTlaWCQ--.27625S8
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZrWxuryUtw4DCw48Ww1xZrb_yoW8ArWfpF
-	WDCay7GrWUKF4UurW0ya97WFyfKws7K347KayxJa40vrZ8CFySvFyIya4rWrWrtrykZF17
-	Zay5KF4vk3WUGFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPjb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8Jr0_Cr1UMcvjeVCFs4IE
-	7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_JF
-	0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
-	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
-	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
-	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwID7UUUU
-	U
-X-CM-SenderInfo: hohrhzxlor0w46kxt4xhlfz01xgou0bp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260325063843.1790782-6-kuniyu@google.com>
 
-From: Long Li <leo.lilong@huawei.com>
+Hi Kuniyuki,
 
-The queue freeze was originally needed to prevent concurrent requests
-from accessing config->socks while the backing array was being
-reallocated. Since config->socks is now an xarray, insertions are
-safe under RCU without freezing the queue.
+kernel test robot noticed the following build errors:
 
-This significantly reduces connection setup time when using a large
-number of connections (-C 256):
+[auto build test ERROR on axboe/for-next]
+[also build test ERROR on linus/master v7.0-rc5]
+[cannot apply to next-20260326]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-  before: real 4.510s
-  after:  real 0.263s
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/nbd-Remove-redundant-sock-ops-shutdown-check-in-nbd_get_socket/20260325-175457
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
+patch link:    https://lore.kernel.org/r/20260325063843.1790782-6-kuniyu%40google.com
+patch subject: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and shutdown().
+config: arm64-randconfig-003-20260326 (https://download.01.org/0day-ci/archive/20260327/202603271810.hoQGfrEp-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 13.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260327/202603271810.hoQGfrEp-lkp@intel.com/reproduce)
 
-Signed-off-by: Long Li <leo.lilong@huawei.com>
----
- drivers/block/nbd.c | 9 ---------
- 1 file changed, 9 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603271810.hoQGfrEp-lkp@intel.com/
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1606cdaa868d..24aa65c723af 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1263,7 +1263,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	struct nbd_config *config = nbd->config;
- 	struct socket *sock;
- 	struct nbd_sock *nsock;
--	unsigned int memflags;
- 	unsigned int index;
- 	int err;
- 
-@@ -1274,12 +1273,6 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	if (!sock)
- 		return err;
- 
--	/*
--	 * We need to make sure we don't get any errant requests while we're
--	 * reallocating the ->socks array.
--	 */
--	memflags = blk_mq_freeze_queue(nbd->disk->queue);
--
- 	if (!netlink && !nbd->task_setup &&
- 	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
- 		nbd->task_setup = current;
-@@ -1316,12 +1309,10 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 
- 	config->num_connections++;
- 	atomic_inc(&config->live_connections);
--	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
- 
- 	return 0;
- 
- put_socket:
--	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
- 	sockfd_put(sock);
- 	return err;
- }
+All errors (new ones prefixed by >>):
+
+   aarch64-linux-ld: Unexpected GOT/PLT entries detected!
+   aarch64-linux-ld: Unexpected run-time procedure linkages detected!
+   aarch64-linux-ld: drivers/block/nbd.o: in function `nbd_mark_nsock_dead':
+>> nbd.c:(.text+0x1238): undefined reference to `inet_shutdown_locked'
+   aarch64-linux-ld: drivers/block/nbd.o: in function `__sock_xmit':
+>> nbd.c:(.text+0x4fbc): undefined reference to `tcp_sendmsg_locked'
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
