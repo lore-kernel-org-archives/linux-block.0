@@ -1,156 +1,107 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090EB30FC23
-	for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 13:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774705209; cv=pass; b=pISft4kCgYjCrSMY+F0heymbP2QXP8CdAtWaIh07v4V1e/r4Hvie5emp9PhEep+FUKOlQ4dfDHWY+Nx3QlHv+Tbhps27w9QMOmhirpxzwpDWm9l2lh7wrD7vcz5QQaJJo2AHvXV1FNw1y0NLNBJGlrZp4ZyRRYUZ3g44XmasQUk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774705209; c=relaxed/simple;
-	bh=5ZtQ2cHIQnNPmhkNNEc2uIDy13fXSNOA9me1ZOCMupg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jme3eauz3aJ7P7XNSqlXEq/8cAbPtUw8a6j8oikKF4RW1Y1Am66M+zw1cgENxVqKVKWp0Xq55wns+Ijg0dAGy1iZMPj4cAY+UEscY5fiAkbeDBPWL+0QmBsJABkGOdbnah7XdmyNsk/jQMHUouAu9LNURkx6pyrRTvGi4HkebK0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDEvyPuV; arc=pass smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817F43128B8
+	for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 13:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774705441; cv=none; b=lDmyZM4BxcBAiMjgbbKvVcCsnIJABwxvOczh1WRmikObAuyaPPdUCdrLoAyhgNUR0KzMI9uLPPNg7OofrM2LTPKiWigaBdYXDio3SRF244QAQmrC0p+SxWNQNXXjzZMrU/lApWIP/eXw/2WAcDn9fkUVen2eFZz2YYN6lE0onnA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774705441; c=relaxed/simple;
+	bh=dBS1jEN74cSP5BUBbT0mGe6DurOTRJxaG5PFnVWgcJQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A47ou1W/ETv7pIUxs6l3YEP1sy8vg6NiAb9hiGwk3QUH47FUwxnV2KoKplVd1BcZZtS3L5IoqOPnSPhkproMsNYKZpsZnuj5MvDYQv8wZB8PDQYXYxxCKuKRkIfdJQQl1sUSqZUV9vqveCZE6cOx5TcwR4Yih2PXJMqhxV5jImo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wuq9Obt+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDEvyPuV"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8296d553142so1507039b3a.3
-        for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 06:40:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774705207; cv=none;
-        d=google.com; s=arc-20240605;
-        b=AoS1+0suKczYwTsJSpPhnfnp35PLsLywoW1CVK8Qg4m6Ee5c75NQSUks8y4qVs44LC
-         tQ6CSCvm/5+M+HqFoIYktC/isiX+v4WfFL2N3OqHDIBXz/HrIhLlVt7vq09iufqZrU6S
-         Wx3c6eSGbOsU6M3o+kbot6J+lGE+O8Of2BgdRSxfVFdNHb+ZQGeSnp+kCmNSpz3IPuDf
-         b3aQ0hmUnhadbf7PhPOc6lVH28unQbXlsG+vZehorQezxOG2wLeLecnEHBL6wmVjEQsU
-         e/Q6kUvFE6zxQwlP5YKR5nS2UnjIXYUKZYpp9FGozpMtPzxOYlxPh4DHR0p04LrbGgbE
-         LHxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=5ZtQ2cHIQnNPmhkNNEc2uIDy13fXSNOA9me1ZOCMupg=;
-        fh=LUg4VYeo4QEpVMep8e9Y2bSfDcN/FOw/da8wJrNsyVk=;
-        b=ljOJyrDySOCWc2cxWAadBvSRDsB8qlAiEAkv7LLFSTAGsl+gwKP/K3IpDckJ+3m9PA
-         RS78Jy8knTJuTk85xMq7+UECnwaIBItU1h1gO6oxrCnRpsUamDqs8997+vLszkLDhTup
-         krihPuSEpyHN1HZueO580tz8Dh3zhOUoBLyRBhWQlCC7V7Q+MtZUAHV1T7EQd0vZbHyI
-         70B22sXt5AYWZHAmxhlGB1NfkkuDw+c4e/5sDZgOb1GPH3gHjPYmfoMSAUPmpE2sH+5n
-         e5euDFfKhd+r+K3C2CvTNW1JYERZjPtxeEAAHjqD5h/jOMYT/+5/9EyhaCiBsB6cVogA
-         YeHA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774705207; x=1775310007; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5ZtQ2cHIQnNPmhkNNEc2uIDy13fXSNOA9me1ZOCMupg=;
-        b=CDEvyPuVDoJAurm6Ipy4sC0g77FY7WX7Hj7Y0GX3ZfTfB0oCEiNy0zPGyhMzkqDs2a
-         YJebyPFJkM7dGctnxi8GJnbebKI4KfWZ9yJcGayBTdCyhq0KtiN64xSg5P6ckQhsaEeQ
-         HOezVtlhhm0s76fO4C8aOGGWd4kSdN9wVLIioC0a3Jj3in+zrSOea2/MKnvk7ayend4M
-         Fdjbykq/PnURVDnMC3nYSk6vwydevXT4bWizpwlqw31jKu9XY4TP9RLlo5312OxYQkgt
-         +014sUSospkbg8lpNzwmFML32EFxCNKXMFy3cARWUNqbnqpW0qbMirq5Bddq6bNE7hEi
-         RgVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774705207; x=1775310007;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5ZtQ2cHIQnNPmhkNNEc2uIDy13fXSNOA9me1ZOCMupg=;
-        b=oLNLMqhNUFuoMJUGyGf3aD+yREp1Ap+UBKhLxDCVOB1gymUWyxNaAhKVyyV84Hzly4
-         d19yMvCrpVCD00a08XkifV2u1uJgolsA85/OkJ/9Hswlh7S2KIKwC8RPiO7s9+/kR2ua
-         wuQnI84g3KYzP4MvjnEEujgDTQbEQ/K2UZ2JuzNMB1FMoECM/dlxNIjcIwQaYCLF6j9a
-         6MuTX/N6g1Up3G5OniBsMU8igYs043HRTR4nDmALxeSX7XbKooh0RTMIyAjF0zIwM/og
-         zAjFwgDd7PPaM00jY6hgF3ZGsUXjqA7JPf8U9UopwBlB0BYHa4bOBY4Fpjh5RuXkEOON
-         Yo0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUz6MSvu0Ea1znXyDO5KpvEcqiLvcNnTjpzB7GdTXJ1yoTOyDhn4DAp+rkNdFtKE1VHD3S7uU59T5fr/g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuJcyBbwerG3er5r/F3AFVkov4I4RH0KcI67lpj/7bIyobqaM7
-	DEE2wfMAwKdnuCHM8wlVE723VdN4beEFlsMIvWzHjgjnGdH2xL5eMqrwlDIjcdd6nckQD+9q1MS
-	6hvO8o8QK96B2CJxvC5I+MvY9fYFHuEA=
-X-Gm-Gg: ATEYQzzukGYjAajJDcBgVgMleqaS232OvjRsDdFaGbWWBx4b1dRnPKEZqW0UsPk7Elt
-	pPMjssWduPAtg/sDSTPk25R358buUMRn2rub/EW+pMPGSyZ7X9OwlQtj6dPaOXJCOJ3H9QL0r7s
-	ZEER3v9Su019Iktq0FIrn6Csq4vLyQQyAxWbLXagJNiUkfANNwDsC+wjWeWHdKAQgm1fz1+LuW8
-	j2x1fA9a/1Z7XId2QOUieJfhWQzM/bjeVbrkULOX5AvH84t9im4W6No1vUimFtKWaS6IEzocKHp
-	3aF5VBg=
-X-Received: by 2002:a05:6a00:1789:b0:82a:6de8:fa50 with SMTP id
- d2e1a72fcca58-82c95e45d30mr6453604b3a.18.1774705207164; Sat, 28 Mar 2026
- 06:40:07 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wuq9Obt+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774705438;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2eDtEhTnwnXNShIqXDKgUgJ4rYT93O28MiI6MbYUIBQ=;
+	b=Wuq9Obt+nbzTwpEhN+waiqVUJ8SzZQO1nMfCabxu+0lC/zLJp2cZp/pdrBAnnxDURKQUTx
+	y7EOWdejcIJz+wdffohPBgLBELBOE/7lRYaDRva3Ueek2G9zUJHWhXRZWFAkmEdbkwJaM/
+	oycw9+ow9/QdofX7EA9e9CFXAPpsuEE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-471-K9mHE9RYMea_6pZGL0P5Rw-1; Sat,
+ 28 Mar 2026 09:43:55 -0400
+X-MC-Unique: K9mHE9RYMea_6pZGL0P5Rw-1
+X-Mimecast-MFC-AGG-ID: K9mHE9RYMea_6pZGL0P5Rw_1774705434
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 62BB419560AA;
+	Sat, 28 Mar 2026 13:43:54 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.100])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 45DC71955D84;
+	Sat, 28 Mar 2026 13:43:52 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] ublk: use unchecked copy helpers for bio page data
+Date: Sat, 28 Mar 2026 21:42:58 +0800
+Message-ID: <20260328134258.3206825-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260327114741.91500-1-pilgrimtao@gmail.com> <91bacd7d-6ec0-4888-be0d-f11a6607f38f@acm.org>
-In-Reply-To: <91bacd7d-6ec0-4888-be0d-f11a6607f38f@acm.org>
-From: Chengkaitao <pilgrimtao@gmail.com>
-Date: Sat, 28 Mar 2026 21:39:55 +0800
-X-Gm-Features: AQROBzBTENtnZtQhxmzRNb76sGSIhzOCRnc5fvzKUgEMLoc4tyX_zU5SvhHxtug
-Message-ID: <CAAWJmAZe+pyfju+37-dfjYUdwRR1ae6Rq8OJjZea76d2CPkEMA@mail.gmail.com>
-Subject: Re: [RFC 0/2] block: Introduce a BPF-based I/O scheduler
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: axboe@kernel.dk, pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	alex@ghiti.fr, ojeda@kernel.org, boqun@kernel.org, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, lossin@kernel.org, a.hindborg@kernel.org, 
-	aliceryhl@google.com, tmgross@umich.edu, dakr@kernel.org, nathan@kernel.org, 
-	nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, rust-for-linux@vger.kernel.org, 
-	bpf@vger.kernel.org, llvm@lists.linux.dev, 
-	Kaitao Cheng <chengkaitao@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Fri, Mar 27, 2026 at 11:48=E2=80=AFPM Bart Van Assche <bvanassche@acm.or=
-g> wrote:
->
-> On 3/27/26 4:47 AM, Chengkaitao wrote:
-> > I have been working on adding a new BPF-based I/O scheduler. It has bot=
-h
-> > kernel and user-space parts. In kernel space, using per-ctx,
->
-> Does "ctx" perhaps refer to struct blk_mq_hw_ctx? If so, please use the
-> abbreviation "hctx" to prevent confusion with struct blk_mq_ctx (block
-> layer software queue).
+Bio pages may originate from slab caches that lack SLAB_USERCOPY
+(e.g. jbd2 frozen metadata buffers allocated via jbd2_alloc()).
+When CONFIG_HARDENED_USERCOPY is enabled, copy_to_iter() calls
+check_copy_size() which rejects these slab pages, triggering a
+kernel BUG in usercopy_abort().
 
-Here, ctx refers to struct blk_mq_ctx. The intent is: when no eBPF
-policy is attached, the new I/O scheduler behaves like the none
-scheduler; when an eBPF policy is attached, the blk_mq_ctx queues
-maintained by the new I/O scheduler serve as backup and fallback
-for the eBPF program.
+This is a false positive: the data is ordinary block I/O content —
+the same data the loop/nbd driver writes to its backing file via
+vfs_iter_write().  The bvec length is always trusted, so the size
+check in check_copy_size() is not needed either.
 
-> For what type of block devices is this new type of I/O scheduler
-> intended? This new type of I/O scheduler is not appropriate for hard
-> disks. To schedule I/O effectively for harddisks, an I/O scheduler must
-> be aware of all pending I/O requests. This is why the mq-deadline I/O
-> scheduler maintains a single list of requests across all hardware
-> queues.
+Switch to _copy_to_iter()/_copy_from_iter() which skip the
+check_copy_size() wrapper while the underlying copy_to_user()
+remains unchanged.
 
-This new I/O scheduler targets mechanical hard disks. The scheduler
-can be aware of all pending I/O requests, and users can maintain a
-single list of requests in an eBPF program.
+Fixes: 2299ceec364e ("ublk: use copy_{to,from}_iter() for user copy")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-> Additionally, this new I/O scheduler is not appropriate for the fastest
-> block devices. For very fast block devices, any I/O scheduler incurs a
-> measurable overhead.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 06ba8b441e5f..5f4a53216619 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1322,10 +1322,18 @@ static bool ublk_copy_user_bvec(const struct bio_vec *bv, unsigned *offset,
+ 
+ 	len = bv->bv_len - *offset;
+ 	bv_buf = kmap_local_page(bv->bv_page) + bv->bv_offset + *offset;
++	/*
++	 * Bio pages may originate from slab caches without SLAB_USERCOPY
++	 * (e.g. jbd2 frozen metadata buffers).  This is the same data that
++	 * the loop driver writes to its backing file — no exposure risk.
++	 * The bvec length is always trusted, so the size check in
++	 * check_copy_size() is not needed either.  Use the unchecked
++	 * helpers to avoid false positives on slab pages.
++	 */
+ 	if (dir == ITER_DEST)
+-		copied = copy_to_iter(bv_buf, len, uiter);
++		copied = _copy_to_iter(bv_buf, len, uiter);
+ 	else
+-		copied = copy_from_iter(bv_buf, len, uiter);
++		copied = _copy_from_iter(bv_buf, len, uiter);
+ 
+ 	kunmap_local(bv_buf);
+ 
+-- 
+2.53.0
 
-For the fastest block devices, avoiding extra scheduling policy is
-often the best policy. In some customized workloads, however, extra
-policy may be needed, for example priority scheduling, cgroup-aware
-differentiation, or fine-grained metrics. Those scenarios have not
-been validated with real demos yet, but the approach seems viable.
-
-> > I implemented
-> > a simple elevator that exposes a set of BPF hooks. The goal is to move =
-the
-> > policy side of I/O scheduling out of the kernel and into user space,
->
-> What does "into user space" mean in this context? As you know BPF code
-> runs in kernel context.
-
-Sorry, my wording was inaccurate. It would be more appropriate to
-phrase it as "into user-defined BPF programs".
-
---=20
-Yours,
-Chengkaitao
