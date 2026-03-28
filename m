@@ -1,53 +1,53 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9291230149F
-	for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 13:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261B140DFA3
+	for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 13:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774705791; cv=none; b=axzxBmf782EcYN+nILsYUlm+dNKMTKwWJ5imD9tRsae6PYlw6y/CRxmEzqFL3wDOucw+yF5qHgpkxvf/iQDa5zVi3BCjwS6+UP2AEBgBq2idRKnhScB0LjDme1OmQECOJ2r1sD5DfFmKtPhbRCyfSBZzlYxuAmSO/uNNR7PQZGg=
+	t=1774705796; cv=none; b=O6KH9QbVrbGAEbsEpjQIGlgBs/EYxtp1mrkWn3F7V2AmZI5AIvhgMmWNqSqBPgQjcz1wa1aTnZFcEnZyMNOPaYgvJAp/vPTCAkOxCmiSi4SYo6a5qjXvejJ0/PlW9UvHTaWeYqvRlx97C59TsilaovIgLZQWLhlyf7YGlFYJWtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774705791; c=relaxed/simple;
-	bh=uuz/s5IMWi2pnyBSMYAtTJ+Hp86/bZ7NgVIIsOaVnv0=;
+	s=arc-20240116; t=1774705796; c=relaxed/simple;
+	bh=k1Vl+40mAdiZtNSilwUn86HiAsyc7sJc+uHQiBVAzrw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Re8ywIM/MstNkLI/hCqka0v8BUvoXR52cxL6BtuKRNDrPJJACMyug5NmG6m2iTY2T5Nc7oO+cOpCxMSahgehrwVYoDI8bHG16Q9BefTWFzjOoWUhtHPk8k6Cl2voJKGEc0z29/BgnJ1UcF7ZV64i7NUoU9nQ7AmR5z9ssOjdR1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E7hB9NVt; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=I5I0x4FpnhOBn28HBkonjmmED+Rjlc0NmtQqhdDZSCAdAhEdUnW06Og9q4Kx8d/DNcMHOzj/iitiZOilWCzOF/+xgLn27ZKD+iemHY2S0KD9vqXyBMK2kFVChQYV927C0Z9S6nHsBRr/dYG9BMD99au1LmHjAwibN/2gnCPd6GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ciu3GgKN; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7hB9NVt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ciu3GgKN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774705787;
+	s=mimecast20190719; t=1774705794;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GXM0xd3YI7cKRyDxZ8iK8+gs+ArVsF1QCe17bqcPVmM=;
-	b=E7hB9NVtoOlUqXUfblwa1fEXQAzz2qK1C9qubSyTOChFpJrUlYU8gPeGCggKBWZPll9p/Y
-	5HvF0I8OuFwnGR6U1035n1qRPWh3qbNaY3iUIcfEhLm52ERBrlQkoqN+3CKOcd3lQwIX+k
-	kU4vUVM2ye+qk6M+OazShY3RgADvT8k=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=xXy5FHQ3tdWLg43w1qYNYdyjJSmNzPE5Qr9VQ6TCCDg=;
+	b=ciu3GgKNmNcbl1NAUrRAlqTvjUY/mnDPpIVwdy1Md1rwwEG+08F8rWPQdr7sEVIBKGREPW
+	YW7tK2JkoS14WIUfpzJ8lPHLjy5PeevwtU8GctvfVZflCr9TS3AGtPbsQsYAvfEGS8g9Ch
+	beyTXL0sfW3HprrRhwy7aQyv3XYxOoM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-J_QJ3mvwNLOJlZ0hk_iiwQ-1; Sat,
- 28 Mar 2026 09:49:44 -0400
-X-MC-Unique: J_QJ3mvwNLOJlZ0hk_iiwQ-1
-X-Mimecast-MFC-AGG-ID: J_QJ3mvwNLOJlZ0hk_iiwQ_1774705783
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-584-Pv5JMiRrNOis8QfewH0ofA-1; Sat,
+ 28 Mar 2026 09:49:50 -0400
+X-MC-Unique: Pv5JMiRrNOis8QfewH0ofA-1
+X-Mimecast-MFC-AGG-ID: Pv5JMiRrNOis8QfewH0ofA_1774705789
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4DF7F19560AB;
-	Sat, 28 Mar 2026 13:49:43 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 85C3918005B0;
+	Sat, 28 Mar 2026 13:49:49 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.100])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C422330001A1;
-	Sat, 28 Mar 2026 13:49:41 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A6D4030001A1;
+	Sat, 28 Mar 2026 13:49:48 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 4/8] selftests/ublk: add shared memory zero-copy support in kublk
-Date: Sat, 28 Mar 2026 21:48:59 +0800
-Message-ID: <20260328134909.3207377-5-ming.lei@redhat.com>
+Subject: [PATCH 5/8] selftests/ublk: add UBLK_F_SHMEM_ZC support for loop target
+Date: Sat, 28 Mar 2026 21:49:00 +0800
+Message-ID: <20260328134909.3207377-6-ming.lei@redhat.com>
 In-Reply-To: <20260328134909.3207377-1-ming.lei@redhat.com>
 References: <20260328134909.3207377-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -56,453 +56,79 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Add infrastructure for UBLK_F_SHMEM_ZC shared memory zero-copy:
+Add loop_queue_shmem_zc_io() which handles I/O requests marked with
+UBLK_IO_F_SHMEM_ZC. When the kernel sets this flag, the request data
+lives in a registered shared memory buffer — decode index + offset
+from iod->addr and use the server's mmap as the I/O buffer.
 
-- kublk.h: struct ublk_shmem_entry and table for tracking registered
-  shared memory buffers
-- kublk.c: per-device unix socket listener that accepts memfd
-  registrations from clients via SCM_RIGHTS fd passing. The listener
-  mmaps the memfd and registers the VA range with the kernel for PFN
-  matching. Also adds --shmem_zc command line option.
-- kublk.c: --htlb <path> option to open a pre-allocated hugetlbfs
-  file, mmap it with MAP_SHARED|MAP_POPULATE, and register it with
-  the kernel via ublk_ctrl_reg_buf(). Any process that mmaps the same
-  hugetlbfs file shares the same physical pages, enabling zero-copy
-  without socket-based fd passing.
+The dispatch check in loop_queue_tgt_rw_io() routes SHMEM_ZC requests
+to this new function, bypassing the normal buffer registration path.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/kublk.c | 339 ++++++++++++++++++++++++++-
- tools/testing/selftests/ublk/kublk.h |  14 ++
- 2 files changed, 351 insertions(+), 2 deletions(-)
+ tools/testing/selftests/ublk/file_backed.c | 38 ++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index e1c3b3c55e56..f5e58ad6a192 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/fs.h>
-+#include <sys/un.h>
- #include "kublk.h"
- 
- #define MAX_NR_TGT_ARG 	64
-@@ -1085,13 +1086,312 @@ static int ublk_send_dev_event(const struct dev_ctx *ctx, struct ublk_dev *dev,
+diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
+index 228af2580ac6..d28da98f917a 100644
+--- a/tools/testing/selftests/ublk/file_backed.c
++++ b/tools/testing/selftests/ublk/file_backed.c
+@@ -27,6 +27,40 @@ static int loop_queue_flush_io(struct ublk_thread *t, struct ublk_queue *q,
+ 	return 1;
  }
  
- 
 +/*
-+ * Shared memory registration socket listener.
-+ *
-+ * The parent daemon context listens on a per-device unix socket at
-+ * /run/ublk/ublkb<dev_id>.sock for shared memory registration requests
-+ * from clients. Clients send a memfd via SCM_RIGHTS; the server
-+ * registers it with the kernel, mmaps it, and returns the assigned index.
++ * Shared memory zero-copy I/O: when UBLK_IO_F_SHMEM_ZC is set, the
++ * request's data lives in a registered shared memory buffer. Decode
++ * index + offset from iod->addr and use the server's mmap of that
++ * buffer as the I/O buffer for the backing file.
 + */
-+#define UBLK_SHMEM_SOCK_DIR	"/run/ublk"
-+
-+/* defined in kublk.h, shared with file_backed.c (loop target) */
-+struct ublk_shmem_entry shmem_table[UBLK_BUF_MAX];
-+int shmem_count;
-+
-+static void ublk_shmem_sock_path(int dev_id, char *buf, size_t len)
++static int loop_queue_shmem_zc_io(struct ublk_thread *t, struct ublk_queue *q,
++				  const struct ublksrv_io_desc *iod, int tag)
 +{
-+	snprintf(buf, len, "%s/ublkb%d.sock", UBLK_SHMEM_SOCK_DIR, dev_id);
-+}
++	unsigned ublk_op = ublksrv_get_op(iod);
++	enum io_uring_op op = ublk_to_uring_op(iod, 0);
++	__u64 file_offset = iod->start_sector << 9;
++	__u32 len = iod->nr_sectors << 9;
++	__u32 shmem_idx = ublk_shmem_zc_index(iod->addr);
++	__u32 shmem_off = ublk_shmem_zc_offset(iod->addr);
++	struct io_uring_sqe *sqe[1];
++	void *addr;
 +
-+static int ublk_shmem_sock_create(int dev_id)
-+{
-+	struct sockaddr_un addr = { .sun_family = AF_UNIX };
-+	char path[108];
-+	int fd;
-+
-+	mkdir(UBLK_SHMEM_SOCK_DIR, 0755);
-+	ublk_shmem_sock_path(dev_id, path, sizeof(path));
-+	unlink(path);
-+
-+	fd = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0);
-+	if (fd < 0)
-+		return -1;
-+
-+	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", path);
-+	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-+		close(fd);
-+		return -1;
-+	}
-+
-+	listen(fd, 4);
-+	ublk_dbg(UBLK_DBG_DEV, "shmem socket created: %s\n", path);
-+	return fd;
-+}
-+
-+static void ublk_shmem_sock_destroy(int dev_id, int sock_fd)
-+{
-+	char path[108];
-+
-+	if (sock_fd >= 0)
-+		close(sock_fd);
-+	ublk_shmem_sock_path(dev_id, path, sizeof(path));
-+	unlink(path);
-+}
-+
-+/* Receive a memfd from a client via SCM_RIGHTS */
-+static int ublk_shmem_recv_fd(int client_fd)
-+{
-+	char buf[1];
-+	struct iovec iov = { .iov_base = buf, .iov_len = sizeof(buf) };
-+	union {
-+		char cmsg_buf[CMSG_SPACE(sizeof(int))];
-+		struct cmsghdr align;
-+	} u;
-+	struct msghdr msg = {
-+		.msg_iov = &iov,
-+		.msg_iovlen = 1,
-+		.msg_control = u.cmsg_buf,
-+		.msg_controllen = sizeof(u.cmsg_buf),
-+	};
-+	struct cmsghdr *cmsg;
-+
-+	if (recvmsg(client_fd, &msg, 0) <= 0)
-+		return -1;
-+
-+	cmsg = CMSG_FIRSTHDR(&msg);
-+	if (!cmsg || cmsg->cmsg_level != SOL_SOCKET ||
-+	    cmsg->cmsg_type != SCM_RIGHTS)
-+		return -1;
-+
-+	return *(int *)CMSG_DATA(cmsg);
-+}
-+
-+/* Register a shared memory buffer: store fd, mmap it, return index */
-+static int ublk_shmem_register(int shmem_fd)
-+{
-+	off_t size;
-+	void *base;
-+	int idx;
-+
-+	if (shmem_count >= UBLK_BUF_MAX)
-+		return -1;
-+
-+	size = lseek(shmem_fd, 0, SEEK_END);
-+	if (size <= 0)
-+		return -1;
-+
-+	base = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED,
-+		    shmem_fd, 0);
-+	if (base == MAP_FAILED)
-+		return -1;
-+
-+	idx = shmem_count++;
-+	shmem_table[idx].fd = shmem_fd;
-+	shmem_table[idx].mmap_base = base;
-+	shmem_table[idx].size = size;
-+
-+	ublk_dbg(UBLK_DBG_DEV, "shmem registered: index=%d fd=%d size=%zu\n",
-+		 idx, shmem_fd, (size_t)size);
-+	return idx;
-+}
-+
-+static void ublk_shmem_unregister_all(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < shmem_count; i++) {
-+		if (shmem_table[i].mmap_base) {
-+			munmap(shmem_table[i].mmap_base,
-+			       shmem_table[i].size);
-+			close(shmem_table[i].fd);
-+			shmem_table[i].mmap_base = NULL;
-+		}
-+	}
-+	shmem_count = 0;
-+}
-+
-+static int ublk_ctrl_reg_buf(struct ublk_dev *dev, void *addr, size_t size)
-+{
-+	struct ublk_buf_reg buf_reg = {
-+		.addr = (unsigned long)addr,
-+		.len = size,
-+	};
-+	struct ublk_ctrl_cmd_data data = {
-+		.cmd_op = UBLK_U_CMD_REG_BUF,
-+		.flags = CTRL_CMD_HAS_BUF,
-+		.addr = (unsigned long)&buf_reg,
-+		.len = sizeof(buf_reg),
-+	};
-+
-+	return __ublk_ctrl_cmd(dev, &data);
-+}
-+
-+/*
-+ * Handle one client connection: receive memfd, mmap it, register
-+ * the VA range with kernel, send back the assigned index.
-+ */
-+static void ublk_shmem_handle_client(int sock_fd, struct ublk_dev *dev)
-+{
-+	int client_fd, memfd, idx, ret;
-+	int32_t reply;
-+	off_t size;
-+	void *base;
-+
-+	client_fd = accept(sock_fd, NULL, NULL);
-+	if (client_fd < 0)
-+		return;
-+
-+	memfd = ublk_shmem_recv_fd(client_fd);
-+	if (memfd < 0) {
-+		reply = -1;
-+		goto out;
-+	}
-+
-+	/* mmap the memfd in server address space */
-+	size = lseek(memfd, 0, SEEK_END);
-+	if (size <= 0) {
-+		reply = -1;
-+		close(memfd);
-+		goto out;
-+	}
-+	base = mmap(NULL, size, PROT_READ | PROT_WRITE,
-+		    MAP_SHARED | MAP_POPULATE, memfd, 0);
-+	if (base == MAP_FAILED) {
-+		reply = -1;
-+		close(memfd);
-+		goto out;
-+	}
-+
-+	/* Register server's VA range with kernel for PFN matching */
-+	ret = ublk_ctrl_reg_buf(dev, base, size);
-+	if (ret < 0) {
-+		ublk_dbg(UBLK_DBG_DEV,
-+			 "shmem_zc: kernel reg failed %d\n", ret);
-+		munmap(base, size);
-+		close(memfd);
-+		reply = ret;
-+		goto out;
-+	}
-+
-+	/* Store in table for I/O handling */
-+	idx = ublk_shmem_register(memfd);
-+	if (idx >= 0) {
-+		shmem_table[idx].mmap_base = base;
-+		shmem_table[idx].size = size;
-+	}
-+	reply = idx;
-+out:
-+	send(client_fd, &reply, sizeof(reply), 0);
-+	close(client_fd);
-+}
-+
-+struct shmem_listener_info {
-+	int dev_id;
-+	int stop_efd;		/* eventfd to signal listener to stop */
-+	int sock_fd;		/* listener socket fd (output) */
-+	struct ublk_dev *dev;
-+};
-+
-+/*
-+ * Socket listener thread: runs in the parent daemon context alongside
-+ * the I/O threads. Accepts shared memory registration requests from
-+ * clients via SCM_RIGHTS. Exits when stop_efd is signaled.
-+ */
-+static void *ublk_shmem_listener_fn(void *data)
-+{
-+	struct shmem_listener_info *info = data;
-+	struct pollfd pfds[2];
-+
-+	info->sock_fd = ublk_shmem_sock_create(info->dev_id);
-+	if (info->sock_fd < 0)
-+		return NULL;
-+
-+	pfds[0].fd = info->sock_fd;
-+	pfds[0].events = POLLIN;
-+	pfds[1].fd = info->stop_efd;
-+	pfds[1].events = POLLIN;
-+
-+	while (1) {
-+		int ret = poll(pfds, 2, -1);
-+
-+		if (ret < 0)
-+			break;
-+
-+		/* Stop signal from parent */
-+		if (pfds[1].revents & POLLIN)
-+			break;
-+
-+		/* Client connection */
-+		if (pfds[0].revents & POLLIN)
-+			ublk_shmem_handle_client(info->sock_fd, info->dev);
-+	}
-+
-+	return NULL;
-+}
-+
-+static int ublk_shmem_htlb_setup(const struct dev_ctx *ctx,
-+				 struct ublk_dev *dev)
-+{
-+	int fd, idx, ret;
-+	struct stat st;
-+	void *base;
-+
-+	fd = open(ctx->htlb_path, O_RDWR);
-+	if (fd < 0) {
-+		ublk_err("htlb: can't open %s\n", ctx->htlb_path);
-+		return -errno;
-+	}
-+
-+	if (fstat(fd, &st) < 0 || st.st_size <= 0) {
-+		ublk_err("htlb: invalid file size\n");
-+		close(fd);
++	if (shmem_idx >= UBLK_BUF_MAX || !shmem_table[shmem_idx].mmap_base)
 +		return -EINVAL;
-+	}
 +
-+	base = mmap(NULL, st.st_size, PROT_READ | PROT_WRITE,
-+		    MAP_SHARED | MAP_POPULATE, fd, 0);
-+	if (base == MAP_FAILED) {
-+		ublk_err("htlb: mmap failed\n");
-+		close(fd);
++	addr = shmem_table[shmem_idx].mmap_base + shmem_off;
++
++	ublk_io_alloc_sqes(t, sqe, 1);
++	if (!sqe[0])
 +		return -ENOMEM;
-+	}
 +
-+	ret = ublk_ctrl_reg_buf(dev, base, st.st_size);
-+	if (ret < 0) {
-+		ublk_err("htlb: reg_buf failed: %d\n", ret);
-+		munmap(base, st.st_size);
-+		close(fd);
-+		return ret;
-+	}
-+
-+	if (shmem_count >= UBLK_BUF_MAX) {
-+		munmap(base, st.st_size);
-+		close(fd);
-+		return -ENOMEM;
-+	}
-+
-+	idx = shmem_count++;
-+	shmem_table[idx].fd = fd;
-+	shmem_table[idx].mmap_base = base;
-+	shmem_table[idx].size = st.st_size;
-+
-+	ublk_dbg(UBLK_DBG_DEV, "htlb registered: index=%d size=%zu\n",
-+		 idx, (size_t)st.st_size);
-+	return 0;
++	io_uring_prep_rw(op, sqe[0], ublk_get_registered_fd(q, 1),
++			 addr, len, file_offset);
++	io_uring_sqe_set_flags(sqe[0], IOSQE_FIXED_FILE);
++	sqe[0]->user_data = build_user_data(tag, ublk_op, 0, q->q_id, 1);
++	return 1;
 +}
 +
- static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
+ static int loop_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
+ 				const struct ublksrv_io_desc *iod, int tag)
  {
- 	const struct ublksrv_ctrl_dev_info *dinfo = &dev->dev_info;
-+	struct shmem_listener_info linfo = {};
- 	struct ublk_thread_info *tinfo;
- 	unsigned long long extra_flags = 0;
- 	cpu_set_t *affinity_buf;
- 	unsigned char (*q_thread_map)[UBLK_MAX_QUEUES] = NULL;
-+	uint64_t stop_val = 1;
-+	pthread_t listener;
- 	void *thread_ret;
- 	sem_t ready;
- 	int ret, i;
-@@ -1180,15 +1480,44 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 		goto fail_start;
- 	}
+@@ -41,6 +75,10 @@ static int loop_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
+ 	void *addr = io->buf_addr;
+ 	unsigned short buf_index = ublk_io_buf_idx(t, q, tag);
  
-+	if (ctx->htlb_path) {
-+		ret = ublk_shmem_htlb_setup(ctx, dev);
-+		if (ret < 0) {
-+			ublk_err("htlb setup failed: %d\n", ret);
-+			ublk_ctrl_stop_dev(dev);
-+			goto fail_start;
-+		}
-+	}
++	/* shared memory zero-copy path */
++	if (iod->op_flags & UBLK_IO_F_SHMEM_ZC)
++		return loop_queue_shmem_zc_io(t, q, iod, tag);
 +
- 	ublk_ctrl_get_info(dev);
- 	if (ctx->fg)
- 		ublk_ctrl_dump(dev);
- 	else
- 		ublk_send_dev_event(ctx, dev, dev->dev_info.dev_id);
- fail_start:
--	/* wait until we are terminated */
--	for (i = 0; i < dev->nthreads; i++)
-+	/*
-+	 * Wait for I/O threads to exit. While waiting, a listener
-+	 * thread accepts shared memory registration requests from
-+	 * clients via a per-device unix socket (SCM_RIGHTS fd passing).
-+	 */
-+	linfo.dev_id = dinfo->dev_id;
-+	linfo.dev = dev;
-+	linfo.stop_efd = eventfd(0, 0);
-+	if (linfo.stop_efd >= 0)
-+		pthread_create(&listener, NULL,
-+			       ublk_shmem_listener_fn, &linfo);
-+
-+	for (i = 0; i < (int)dev->nthreads; i++)
- 		pthread_join(tinfo[i].thread, &thread_ret);
-+
-+	/* Signal listener thread to stop and wait for it */
-+	if (linfo.stop_efd >= 0) {
-+		write(linfo.stop_efd, &stop_val, sizeof(stop_val));
-+		pthread_join(listener, NULL);
-+		close(linfo.stop_efd);
-+		ublk_shmem_sock_destroy(dinfo->dev_id, linfo.sock_fd);
-+	}
-+	ublk_shmem_unregister_all();
- 	free(tinfo);
-  fail:
- 	for (i = 0; i < dinfo->nr_hw_queues; i++)
-@@ -1790,6 +2119,8 @@ int main(int argc, char *argv[])
- 		{ "safe",		0,	NULL,  0 },
- 		{ "batch",              0,      NULL, 'b'},
- 		{ "no_auto_part_scan",	0,	NULL,  0 },
-+		{ "shmem_zc",		0,	NULL,  0  },
-+		{ "htlb",		1,	NULL,  0  },
- 		{ 0, 0, 0, 0 }
- 	};
- 	const struct ublk_tgt_ops *ops = NULL;
-@@ -1905,6 +2236,10 @@ int main(int argc, char *argv[])
- 				ctx.safe_stop = 1;
- 			if (!strcmp(longopts[option_idx].name, "no_auto_part_scan"))
- 				ctx.flags |= UBLK_F_NO_AUTO_PART_SCAN;
-+			if (!strcmp(longopts[option_idx].name, "shmem_zc"))
-+				ctx.flags |= UBLK_F_SHMEM_ZC;
-+			if (!strcmp(longopts[option_idx].name, "htlb"))
-+				ctx.htlb_path = strdup(optarg);
- 			break;
- 		case '?':
- 			/*
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 02f0c55d006b..20d0a1eab41f 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -95,6 +95,8 @@ struct dev_ctx {
- 	/* for 'update_size' command */
- 	unsigned long long size;
- 
-+	char *htlb_path;
-+
- 	union {
- 		struct stripe_ctx 	stripe;
- 		struct fault_inject_ctx fault_inject;
-@@ -599,6 +601,18 @@ static inline void ublk_queued_tgt_io(struct ublk_thread *t, struct ublk_queue *
- 	}
- }
- 
-+/* shared memory zero-copy support */
-+#define UBLK_BUF_MAX		256
-+
-+struct ublk_shmem_entry {
-+	int fd;
-+	void *mmap_base;
-+	size_t size;
-+};
-+
-+extern struct ublk_shmem_entry shmem_table[UBLK_BUF_MAX];
-+extern int shmem_count;
-+
- extern const struct ublk_tgt_ops null_tgt_ops;
- extern const struct ublk_tgt_ops loop_tgt_ops;
- extern const struct ublk_tgt_ops stripe_tgt_ops;
+ 	if (iod->op_flags & UBLK_IO_F_INTEGRITY) {
+ 		ublk_io_alloc_sqes(t, sqe, 1);
+ 		/* Use second backing file for integrity data */
 -- 
 2.53.0
 
