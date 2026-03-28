@@ -1,53 +1,53 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261B140DFA3
-	for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 13:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424A140DFA3
+	for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 13:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774705796; cv=none; b=O6KH9QbVrbGAEbsEpjQIGlgBs/EYxtp1mrkWn3F7V2AmZI5AIvhgMmWNqSqBPgQjcz1wa1aTnZFcEnZyMNOPaYgvJAp/vPTCAkOxCmiSi4SYo6a5qjXvejJ0/PlW9UvHTaWeYqvRlx97C59TsilaovIgLZQWLhlyf7YGlFYJWtA=
+	t=1774705801; cv=none; b=D+uqpf/VBSPbb6CpEN5WEtFaWlB46qvGafQQdkNmMoDhAzcXQgZU/k2xVCO1Jvg71ZMVWnCY2UswqUjeGGQM1s8BbbZ10E6y/zmVVV8cmC9uWOdnvaAVgG5v1P7q2+FVUsj5v94fU6lIt+ncGbQHZKZHnu/WFYGB32lNcUOAIOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774705796; c=relaxed/simple;
-	bh=k1Vl+40mAdiZtNSilwUn86HiAsyc7sJc+uHQiBVAzrw=;
+	s=arc-20240116; t=1774705801; c=relaxed/simple;
+	bh=gLqGZaIvuI9W61nRVMemrKdmsMRPdgFAyAAFiYrtR68=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I5I0x4FpnhOBn28HBkonjmmED+Rjlc0NmtQqhdDZSCAdAhEdUnW06Og9q4Kx8d/DNcMHOzj/iitiZOilWCzOF/+xgLn27ZKD+iemHY2S0KD9vqXyBMK2kFVChQYV927C0Z9S6nHsBRr/dYG9BMD99au1LmHjAwibN/2gnCPd6GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ciu3GgKN; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=U0Rn0QFOVNnvjBjFB+kRuBpTL+RBcagud3KF5C4e1Epgp3BhH/4kOWOGc62cqIgIEwnP6eC3y0GnVyNiysY2Efavh/3w7X/RxZ03R26C3UPQahJB2ISKEqIrx7GwgeZEJfbIO3bXUk/MO/hwH/264NCcogBbEJ6MATL4hvpXVfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EfoxZEzs; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ciu3GgKN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EfoxZEzs"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774705794;
+	s=mimecast20190719; t=1774705799;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xXy5FHQ3tdWLg43w1qYNYdyjJSmNzPE5Qr9VQ6TCCDg=;
-	b=ciu3GgKNmNcbl1NAUrRAlqTvjUY/mnDPpIVwdy1Md1rwwEG+08F8rWPQdr7sEVIBKGREPW
-	YW7tK2JkoS14WIUfpzJ8lPHLjy5PeevwtU8GctvfVZflCr9TS3AGtPbsQsYAvfEGS8g9Ch
-	beyTXL0sfW3HprrRhwy7aQyv3XYxOoM=
+	bh=nnp4DZZaJA7P7oCJBmeimBW5M0m6C/JrtYMNIZUDsPY=;
+	b=EfoxZEzsGLtnKw7Fc4R3VZzYvYxTmy1mYFV24Q6I1RLsuyNXaBYsRy3VtWsrca0m/5xFRR
+	PlFYIQMbV64U4r0hvavRHbsNcCwLGsEr5dXpa0gBYXhLVWrHmWBdlJDdrgEnnkf1tQw7Ag
+	gAkcQMVADroNY2Ui9xvmNPhfU7qhJps=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-584-Pv5JMiRrNOis8QfewH0ofA-1; Sat,
- 28 Mar 2026 09:49:50 -0400
-X-MC-Unique: Pv5JMiRrNOis8QfewH0ofA-1
-X-Mimecast-MFC-AGG-ID: Pv5JMiRrNOis8QfewH0ofA_1774705789
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-lVi5gti8MLKvA5NvE2FceQ-1; Sat,
+ 28 Mar 2026 09:49:57 -0400
+X-MC-Unique: lVi5gti8MLKvA5NvE2FceQ-1
+X-Mimecast-MFC-AGG-ID: lVi5gti8MLKvA5NvE2FceQ_1774705796
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 85C3918005B0;
-	Sat, 28 Mar 2026 13:49:49 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E7EC180047F;
+	Sat, 28 Mar 2026 13:49:56 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.100])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A6D4030001A1;
-	Sat, 28 Mar 2026 13:49:48 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8057930001A1;
+	Sat, 28 Mar 2026 13:49:55 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 5/8] selftests/ublk: add UBLK_F_SHMEM_ZC support for loop target
-Date: Sat, 28 Mar 2026 21:49:00 +0800
-Message-ID: <20260328134909.3207377-6-ming.lei@redhat.com>
+Subject: [PATCH 6/8] selftests/ublk: add shared memory zero-copy test
+Date: Sat, 28 Mar 2026 21:49:01 +0800
+Message-ID: <20260328134909.3207377-7-ming.lei@redhat.com>
 In-Reply-To: <20260328134909.3207377-1-ming.lei@redhat.com>
 References: <20260328134909.3207377-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -56,79 +56,115 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Add loop_queue_shmem_zc_io() which handles I/O requests marked with
-UBLK_IO_F_SHMEM_ZC. When the kernel sets this flag, the request data
-lives in a registered shared memory buffer — decode index + offset
-from iod->addr and use the server's mmap as the I/O buffer.
+Add test_shmem_zc_01.sh which tests UBLK_IO_F_SHMEM_ZC on the null
+target using a hugetlbfs shared buffer. Both kublk (--htlb) and fio
+(--mem=mmaphuge:<path>) mmap the same hugetlbfs file with MAP_SHARED,
+sharing physical pages. The kernel PFN match enables zero-copy I/O.
 
-The dispatch check in loop_queue_tgt_rw_io() routes SHMEM_ZC requests
-to this new function, bypassing the normal buffer registration path.
+Uses standard fio --mem=mmaphuge:<path> (supported since fio 1.10),
+no patched fio required.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/file_backed.c | 38 ++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ tools/testing/selftests/ublk/Makefile         |  2 +
+ .../testing/selftests/ublk/test_shmemzc_01.sh | 72 +++++++++++++++++++
+ 2 files changed, 74 insertions(+)
+ create mode 100755 tools/testing/selftests/ublk/test_shmemzc_01.sh
 
-diff --git a/tools/testing/selftests/ublk/file_backed.c b/tools/testing/selftests/ublk/file_backed.c
-index 228af2580ac6..d28da98f917a 100644
---- a/tools/testing/selftests/ublk/file_backed.c
-+++ b/tools/testing/selftests/ublk/file_backed.c
-@@ -27,6 +27,40 @@ static int loop_queue_flush_io(struct ublk_thread *t, struct ublk_queue *q,
- 	return 1;
- }
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 8ac2d4a682a1..001b7dccf3c6 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -51,6 +51,8 @@ TEST_PROGS += test_stripe_06.sh
+ TEST_PROGS += test_part_01.sh
+ TEST_PROGS += test_part_02.sh
  
-+/*
-+ * Shared memory zero-copy I/O: when UBLK_IO_F_SHMEM_ZC is set, the
-+ * request's data lives in a registered shared memory buffer. Decode
-+ * index + offset from iod->addr and use the server's mmap of that
-+ * buffer as the I/O buffer for the backing file.
-+ */
-+static int loop_queue_shmem_zc_io(struct ublk_thread *t, struct ublk_queue *q,
-+				  const struct ublksrv_io_desc *iod, int tag)
-+{
-+	unsigned ublk_op = ublksrv_get_op(iod);
-+	enum io_uring_op op = ublk_to_uring_op(iod, 0);
-+	__u64 file_offset = iod->start_sector << 9;
-+	__u32 len = iod->nr_sectors << 9;
-+	__u32 shmem_idx = ublk_shmem_zc_index(iod->addr);
-+	__u32 shmem_off = ublk_shmem_zc_offset(iod->addr);
-+	struct io_uring_sqe *sqe[1];
-+	void *addr;
++TEST_PROGS += test_shmemzc_01.sh
 +
-+	if (shmem_idx >= UBLK_BUF_MAX || !shmem_table[shmem_idx].mmap_base)
-+		return -EINVAL;
+ TEST_PROGS += test_stress_01.sh
+ TEST_PROGS += test_stress_02.sh
+ TEST_PROGS += test_stress_03.sh
+diff --git a/tools/testing/selftests/ublk/test_shmemzc_01.sh b/tools/testing/selftests/ublk/test_shmemzc_01.sh
+new file mode 100755
+index 000000000000..47210af2aa20
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_shmemzc_01.sh
+@@ -0,0 +1,72 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Test: shmem_zc with hugetlbfs buffer on null target
++#
++# kublk and fio both mmap the same hugetlbfs file (MAP_SHARED),
++# so they share physical pages.  The kernel PFN match enables
++# zero-copy I/O without socket-based fd passing.
 +
-+	addr = shmem_table[shmem_idx].mmap_base + shmem_off;
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
 +
-+	ublk_io_alloc_sqes(t, sqe, 1);
-+	if (!sqe[0])
-+		return -ENOMEM;
++ERR_CODE=0
 +
-+	io_uring_prep_rw(op, sqe[0], ublk_get_registered_fd(q, 1),
-+			 addr, len, file_offset);
-+	io_uring_sqe_set_flags(sqe[0], IOSQE_FIXED_FILE);
-+	sqe[0]->user_data = build_user_data(tag, ublk_op, 0, q->q_id, 1);
-+	return 1;
-+}
++_prep_test "shmem_zc" "null target hugetlbfs shmem zero-copy test"
 +
- static int loop_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
- 				const struct ublksrv_io_desc *iod, int tag)
- {
-@@ -41,6 +75,10 @@ static int loop_queue_tgt_rw_io(struct ublk_thread *t, struct ublk_queue *q,
- 	void *addr = io->buf_addr;
- 	unsigned short buf_index = ublk_io_buf_idx(t, q, tag);
- 
-+	/* shared memory zero-copy path */
-+	if (iod->op_flags & UBLK_IO_F_SHMEM_ZC)
-+		return loop_queue_shmem_zc_io(t, q, iod, tag);
++if ! _have_program fio; then
++	echo "SKIP: fio not available"
++	exit "$UBLK_SKIP_CODE"
++fi
 +
- 	if (iod->op_flags & UBLK_IO_F_INTEGRITY) {
- 		ublk_io_alloc_sqes(t, sqe, 1);
- 		/* Use second backing file for integrity data */
++if ! grep -q hugetlbfs /proc/filesystems; then
++	echo "SKIP: hugetlbfs not supported"
++	exit "$UBLK_SKIP_CODE"
++fi
++
++# Allocate hugepages
++OLD_NR_HP=$(cat /proc/sys/vm/nr_hugepages)
++echo 10 > /proc/sys/vm/nr_hugepages
++NR_HP=$(cat /proc/sys/vm/nr_hugepages)
++if [ "$NR_HP" -lt 2 ]; then
++	echo "SKIP: cannot allocate hugepages"
++	echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
++	exit "$UBLK_SKIP_CODE"
++fi
++
++# Mount hugetlbfs
++HTLB_MNT=$(mktemp -d "${UBLK_TEST_DIR}/htlb_mnt_XXXXXX")
++if ! mount -t hugetlbfs none "$HTLB_MNT"; then
++	echo "SKIP: cannot mount hugetlbfs"
++	rmdir "$HTLB_MNT"
++	echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
++	exit "$UBLK_SKIP_CODE"
++fi
++
++HTLB_FILE="$HTLB_MNT/ublk_buf"
++fallocate -l 4M "$HTLB_FILE"
++
++dev_id=$(_add_ublk_dev -t null --shmem_zc --htlb "$HTLB_FILE")
++_check_add_dev $TID $?
++
++fio --name=htlb_zc \
++	--filename=/dev/ublkb"${dev_id}" \
++	--ioengine=io_uring \
++	--rw=randwrite \
++	--direct=1 \
++	--bs=4k \
++	--size=4M \
++	--iodepth=32 \
++	--mem=mmaphuge:"$HTLB_FILE" \
++	> /dev/null 2>&1
++ERR_CODE=$?
++
++# Delete device first so daemon releases the htlb mmap
++_ublk_del_dev "${dev_id}"
++
++rm -f "$HTLB_FILE"
++umount "$HTLB_MNT"
++rmdir "$HTLB_MNT"
++echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
++
++_cleanup_test "shmem_zc"
++
++_show_result $TID $ERR_CODE
 -- 
 2.53.0
 
