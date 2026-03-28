@@ -1,210 +1,109 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB2F40DFA3
-	for <linux-block@vger.kernel.org>; Sat, 28 Mar 2026 13:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774705823; cv=none; b=GkOMd/qdhhD4QtRhlQyANxRODHdrxgxDJYsPBINKVy7lj8ZPnCDxR0RL3Llal9U4U/mmqIZcxdwnMTlR5VvZfsx3HyvXPemNxMdhbVpGx7VrRqx9gPIuiytHcsmzsLHtxCx1jPXKco02O/EMsVnWNxEZ6BexPZS4quQ8a7x3Kic=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774705823; c=relaxed/simple;
-	bh=pOtAcw2Xylmb5Jsh46ayF6ZRc0G1mq8AdjtsJh/neC4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZszkZ5JGjNUGRK/QggoCnrgO1Cy7eeSesGOUkKi5O8BlMnHvuCm8Nz35lScQfTbFO7uCE86PYh7y1BNPiIJaZ3mj+TM4uhjzpeH8yhhpZbx2nSOfx2xOonsrEpEW1AZrIuQyTE2FO00joxrVekDX1T9tNXb5ihZAwwPobhLnSx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XUNpqxBY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUNpqxBY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774705821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=avGyQ0a4uU15KXaiBgyAYyHCBb8/xL9NuxCKcruWjd0=;
-	b=XUNpqxBYUMOu4AGD6XyshavScfBtTsKP4wXsm2lPIWyyXn+vU8ofKzUzKJdtPBEQ4AuQWd
-	ZnIwmZxiFrzsIlz8ew8Bra/fYdafVqrplrlzzFf9Je+Rkhmlz0PfhHVkSnh9kK6MWbH0f8
-	O8Ej9xxDdozTghQT+aX2mJ/uHqMyfx0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-554-1sO2wxENO1GwYr1fagmMjw-1; Sat,
- 28 Mar 2026 09:50:17 -0400
-X-MC-Unique: 1sO2wxENO1GwYr1fagmMjw-1
-X-Mimecast-MFC-AGG-ID: 1sO2wxENO1GwYr1fagmMjw_1774705816
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51D281956048;
-	Sat, 28 Mar 2026 13:50:16 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.100])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2F7B918001FE;
-	Sat, 28 Mar 2026 13:50:14 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 8/8] selftests/ublk: add filesystem fio verify test for shmem_zc
-Date: Sat, 28 Mar 2026 21:49:03 +0800
-Message-ID: <20260328134909.3207377-9-ming.lei@redhat.com>
-In-Reply-To: <20260328134909.3207377-1-ming.lei@redhat.com>
-References: <20260328134909.3207377-1-ming.lei@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1C430E0F8;
+	Sat, 28 Mar 2026 14:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774707249; cv=none; b=lgzGEMaT4nMXioPyNRddh/wRsXLEl86Opgtx45va4zft9/s8+LEEApvr/YH1mpb1hM4nlEowEVcFHwXAZr2MZklCwQynSVqzhbjvsS51LWcVSvLqIS9BV/YBOlQKTztBgF8PkwqyYahIdq+yvKEQVxSQlDfFHSPEnVBTpTIO91s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774707249; c=relaxed/simple;
+	bh=/BGl0+Oz49k5tPl3ySgr/pb+u1t6ujQqJ5mp27HxMDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t0CL7u5TcQVKSD2obxCnYEz8ifAF6h7Bvc+0/f7GY89uaQz8EFYwO2hNmpNizMMxdVIYV9LCeoc8TmJ2HEm2uDmwiFJgL8UTnkrRCcMBsH/p5RDNhRXtvHXlQPCbAIR03pw8JWjytCplYhWehPQZJrpkB/MGXpTzTcXXLyb8VGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y3ODqVsq; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y3ODqVsq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774707247; x=1806243247;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/BGl0+Oz49k5tPl3ySgr/pb+u1t6ujQqJ5mp27HxMDw=;
+  b=Y3ODqVsquWlyJFtGWX/gafDt/72nPIzLw/mw9Q/+D82hMrbu4AZysEOO
+   CiVapRyHWIE+D0jtGfo3dI+gHRX/Ar/eooSxluY5/7zQJEbkpeWgd9Q4o
+   xx8CUiFRvReLJqnke1cGNYpsQ8tM7jwrVW5NMn2x+GINRafgB/Cl05NyB
+   KFdjwh2ZUrm4WLSoxMruxXCub761la9c2JS9+Rsg2gti1wFZnkwPxzUEs
+   +/45CL76JqkCQRXEGDkbzUrdk5NgXMbI/dTIWPJkSZfCqJDNoUsYu4y1Q
+   PYVoxHo1aDfY2xtL4dFKHkpKIkhnNzMQmKVezkpdND9xB9LAuq6pYexF/
+   w==;
+X-CSE-ConnectionGUID: 9WBj1l+XRSmS+7J5Eabfww==
+X-CSE-MsgGUID: 6Ah1qm/SQPyjoJOCcQ4/0A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11742"; a="74794144"
+X-IronPort-AV: E=Sophos;i="6.23,146,1770624000"; 
+   d="scan'208";a="74794144"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2026 07:14:06 -0700
+X-CSE-ConnectionGUID: xU7hdjRVT2C/niVXf//eRg==
+X-CSE-MsgGUID: 43dgNcz4TJGPHkxmuhIwYA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,146,1770624000"; 
+   d="scan'208";a="227187146"
+Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
+  by fmviesa004.fm.intel.com with ESMTP; 28 Mar 2026 07:14:03 -0700
+Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w6UQL-000000007gb-2MoE;
+	Sat, 28 Mar 2026 14:14:01 +0000
+Date: Sat, 28 Mar 2026 15:13:44 +0100
+From: kernel test robot <lkp@intel.com>
+To: Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: oe-kbuild-all@lists.linux.dev, drbd-dev@lists.linbit.com,
+	linux-kernel@vger.kernel.org,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	linux-block@vger.kernel.org,
+	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Joel Colledge <joel.colledge@linbit.com>
+Subject: Re: [PATCH 02/20] drbd: extend wire protocol definitions for DRBD 9
+Message-ID: <202603281537.rTtvjPOL-lkp@intel.com>
+References: <20260327223820.2244227-3-christoph.boehmwalder@linbit.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260327223820.2244227-3-christoph.boehmwalder@linbit.com>
 
-Add test_shmemzc_03.sh which exercises shmem_zc through the full
-filesystem stack: mkfs ext4 on the ublk device, mount it, then run
-fio verify on a file inside the filesystem with --mem=mmaphuge.
+Hi Christoph,
 
-Extend _mkfs_mount_test() to accept an optional command that runs
-between mount and umount. The function cd's into the mount directory
-so the command can use relative file paths. Existing callers that
-pass only the device are unaffected.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/Makefile         |  1 +
- tools/testing/selftests/ublk/test_common.sh   | 15 ++--
- .../testing/selftests/ublk/test_shmemzc_03.sh | 69 +++++++++++++++++++
- 3 files changed, 81 insertions(+), 4 deletions(-)
- create mode 100755 tools/testing/selftests/ublk/test_shmemzc_03.sh
+[auto build test WARNING on 67807fbaf12719fca46a622d759484652b79c7c3]
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 271fe11d8d0f..3d1ad1730d93 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -53,6 +53,7 @@ TEST_PROGS += test_part_02.sh
- 
- TEST_PROGS += test_shmemzc_01.sh
- TEST_PROGS += test_shmemzc_02.sh
-+TEST_PROGS += test_shmemzc_03.sh
- 
- TEST_PROGS += test_stress_01.sh
- TEST_PROGS += test_stress_02.sh
-diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
-index 163a40007910..af2ea4fa1111 100755
---- a/tools/testing/selftests/ublk/test_common.sh
-+++ b/tools/testing/selftests/ublk/test_common.sh
-@@ -88,6 +88,7 @@ _remove_tmp_dir() {
- _mkfs_mount_test()
- {
- 	local dev=$1
-+	shift
- 	local err_code=0
- 	local mnt_dir;
- 
-@@ -99,12 +100,17 @@ _mkfs_mount_test()
- 	fi
- 
- 	mount -t ext4 "$dev" "$mnt_dir" > /dev/null 2>&1
-+	if [ $# -gt 0 ]; then
-+		cd "$mnt_dir" && "$@"
-+		err_code=$?
-+		cd - > /dev/null
-+	fi
- 	umount "$dev"
--	err_code=$?
--	_remove_tmp_dir "$mnt_dir"
--	if [ $err_code -ne 0 ]; then
--		return $err_code
-+	if [ $err_code -eq 0 ]; then
-+		err_code=$?
- 	fi
-+	_remove_tmp_dir "$mnt_dir"
-+	return $err_code
- }
- 
- _check_root() {
-@@ -132,6 +138,7 @@ _prep_test() {
- 	local base_dir=${TMPDIR:-./ublktest-dir}
- 	mkdir -p "$base_dir"
- 	UBLK_TEST_DIR=$(mktemp -d ${base_dir}/${TID}.XXXXXX)
-+	UBLK_TEST_DIR=$(realpath ${UBLK_TEST_DIR})
- 	UBLK_TMP=$(mktemp ${UBLK_TEST_DIR}/ublk_test_XXXXX)
- 	[ "$UBLK_TEST_QUIET" -eq 0 ] && echo "ublk $type: $*"
- 	echo "ublk selftest: $TID starting at $(date '+%F %T')" | tee /dev/kmsg
-diff --git a/tools/testing/selftests/ublk/test_shmemzc_03.sh b/tools/testing/selftests/ublk/test_shmemzc_03.sh
-new file mode 100755
-index 000000000000..db967a9ffe81
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_shmemzc_03.sh
-@@ -0,0 +1,69 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Test: shmem_zc with fio verify over filesystem on loop target
-+#
-+# mkfs + mount ext4 on the ublk device, then run fio verify on a
-+# file inside that filesystem.  Exercises the full stack:
-+# filesystem -> block layer -> ublk shmem_zc -> loop target backing file.
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+ERR_CODE=0
-+
-+_prep_test "shmem_zc" "loop target hugetlbfs shmem zero-copy fs verify test"
-+
-+if ! _have_program fio; then
-+	echo "SKIP: fio not available"
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+if ! grep -q hugetlbfs /proc/filesystems; then
-+	echo "SKIP: hugetlbfs not supported"
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+# Allocate hugepages
-+OLD_NR_HP=$(cat /proc/sys/vm/nr_hugepages)
-+echo 10 > /proc/sys/vm/nr_hugepages
-+NR_HP=$(cat /proc/sys/vm/nr_hugepages)
-+if [ "$NR_HP" -lt 2 ]; then
-+	echo "SKIP: cannot allocate hugepages"
-+	echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+# Mount hugetlbfs
-+HTLB_MNT=$(mktemp -d "${UBLK_TEST_DIR}/htlb_mnt_XXXXXX")
-+if ! mount -t hugetlbfs none "$HTLB_MNT"; then
-+	echo "SKIP: cannot mount hugetlbfs"
-+	rmdir "$HTLB_MNT"
-+	echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+HTLB_FILE="$HTLB_MNT/ublk_buf"
-+fallocate -l 4M "$HTLB_FILE"
-+
-+_create_backfile 0 256M
-+BACKFILE="${UBLK_BACKFILES[0]}"
-+
-+dev_id=$(_add_ublk_dev -t loop --shmem_zc --htlb "$HTLB_FILE" "$BACKFILE")
-+_check_add_dev $TID $?
-+
-+_mkfs_mount_test /dev/ublkb"${dev_id}" \
-+	_run_fio_verify_io --filename=testfile \
-+		--size=128M \
-+		--mem=mmaphuge:"$HTLB_FILE"
-+ERR_CODE=$?
-+
-+# Delete device first so daemon releases the htlb mmap
-+_ublk_del_dev "${dev_id}"
-+
-+rm -f "$HTLB_FILE"
-+umount "$HTLB_MNT"
-+rmdir "$HTLB_MNT"
-+echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
-+
-+_cleanup_test "shmem_zc"
-+
-+_show_result $TID $ERR_CODE
+url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-B-hmwalder/drbd-mark-as-BROKEN-during-DRBD-9-rework/20260328-153634
+base:   67807fbaf12719fca46a622d759484652b79c7c3
+patch link:    https://lore.kernel.org/r/20260327223820.2244227-3-christoph.boehmwalder%40linbit.com
+patch subject: [PATCH 02/20] drbd: extend wire protocol definitions for DRBD 9
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+docutils: docutils (Docutils 0.21.2, Python 3.13.5, on linux)
+reproduce: (https://download.01.org/0day-ci/archive/20260328/202603281537.rTtvjPOL-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603281537.rTtvjPOL-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   Warning: Documentation/translations/zh_CN/networking/xfrm_proc.rst references a file that doesn't exist: Documentation/networking/xfrm_proc.rst
+   Warning: Documentation/translations/zh_CN/scsi/scsi_mid_low_api.rst references a file that doesn't exist: Documentation/Configure.help
+   Warning: MAINTAINERS references a file that doesn't exist: Documentation/ABI/testing/sysfs-platform-ayaneo
+   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/display/bridge/megachips-stdpxxxx-ge-b850v3-fw.txt
+   Warning: arch/powerpc/sysdev/mpic.c references a file that doesn't exist: Documentation/devicetree/bindings/powerpc/fsl/mpic.txt
+>> Warning: drivers/block/drbd/drbd_protocol.h references a file that doesn't exist: Documentation/application-resync-synchronization.rst
+   Warning: rust/kernel/sync/atomic/ordering.rs references a file that doesn't exist: srctree/tools/memory-model/Documentation/explanation.txt
+   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: Documentation/virtual/lguest/lguest.c
+   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: m,\b(\S*)(Documentation/[A-Za-z0-9
+   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: Documentation/devicetree/dt-object-internal.txt
+   Warning: tools/docs/documentation-file-ref-check references a file that doesn't exist: m,^Documentation/scheduler/sched-pelt
+
 -- 
-2.53.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
