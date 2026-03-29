@@ -1,134 +1,301 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B632FD7D3
-	for <linux-block@vger.kernel.org>; Sun, 29 Mar 2026 14:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774795479; cv=none; b=oFcfzXEPjGF3tka3vvSVCdKctakr0gpmaXx+MiklE1+9O8revb+b6s3Q3I12L7g7yG34N7BROybeRt8mbmFuj4neoGWRcsYSdsDoXjBwoj54qOFcrK6TYtiOE77ZlBrA2Vsn7jdDAMQz6hFCteEAxCOsAz4lnm9SAKLXCZ1y+d0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774795479; c=relaxed/simple;
-	bh=tYH6G+xNvmWKg3Bd11UmwPlUy3RaQCw8rvsQox8ZKGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FPopB+NlAYcagMiPjDe2BHge5UgdNOAgLpubT9lTb3BpC/qBnJeHJWSlSSqZgIHRwuXYSJ4VrAzQ6OtReJ3z0dq1NkQOKtyoP7v/2NbzjziEmNEBZcnOMjFQIcRq8F+ooy8MAC8xtZaghN+5XHpRIIRM7YvDhi+Xg2mADUuqNfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SKN64cf3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKN64cf3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774795477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FKQq8nVliTj15X0Mppcmsnlag5NmdtYafNWnEAL6Gl4=;
-	b=SKN64cf3LvzgVHmu8MMmPnS7ZinGjm6rTYlgl5HZNGja8puwZ0qTcFmvMQPLQk9GjIdJkr
-	eJ4N8JH6cHspfKAB+LI+ldA+nFWCfGfEFuhdg8qx3quS16fPSBc9I2qcjNFZoZN96DVdd7
-	fpioCNgTHLHAzcwYWi4jCHixmdAXUDM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-jEKr-xmcOv24gyeQmDpSWQ-1; Sun,
- 29 Mar 2026 10:44:33 -0400
-X-MC-Unique: jEKr-xmcOv24gyeQmDpSWQ-1
-X-Mimecast-MFC-AGG-ID: jEKr-xmcOv24gyeQmDpSWQ_1774795472
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EABEA180044D;
-	Sun, 29 Mar 2026 14:44:31 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D6A2D30001A1;
-	Sun, 29 Mar 2026 14:44:28 +0000 (UTC)
-Date: Sun, 29 Mar 2026 22:44:23 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] ublk: use unchecked copy helpers for bio page data
-Message-ID: <ack6x5tm2pc4hslL@fedora>
-References: <20260328134258.3206825-1-ming.lei@redhat.com>
- <CADUfDZo2pbwTsp_uJcTG+GYyBFmoU-5UPYu6dvAguRfgB_QWCA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCE331CA4E
+	for <linux-block@vger.kernel.org>; Sun, 29 Mar 2026 15:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774798883; cv=none; b=BY3G8q1os9i0t/1EQKxuGrfmj2bYWn57yOKi0vn1du6qYRF6xsYh8SNBUSSSACCv3T8Q9HVzvy3eCwG2MZVUJDs1icxPcR3j/SDHM1rNTuQOABj+iTk8LeOJfgCHKYavo2pjOpU69nH5y39Q+5HyHQYoOR///x8G8TTMO/J8cHE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774798883; c=relaxed/simple;
+	bh=0UxYwmWrWT4FOWXddN0QIWyeclk0j70twaLLE+szpko=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Da6qPl+ipFoH6Z3R1LF6rUw0imLSUCyvAiuhW7S+AxjmCmTkbdaJsXi4GYGQ/IftShUQCMPgFcaMctZPFFG2/Nxni74g2AKSF/a6S+D1h7UhGw4fMEgUK2pw+7ia3BQgdvj32dMSTzSTVZVWSm9D+17vLtQm6edAMtptMF+URfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cxEDUx9V; arc=none smtp.client-ip=209.85.215.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxEDUx9V"
+Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-c741db5d610so1577718a12.3
+        for <linux-block@vger.kernel.org>; Sun, 29 Mar 2026 08:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774798881; x=1775403681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cn2DYOVpo8bOTJ2a/G22aIN/JEjANtXiC08Q2WS+2PA=;
+        b=cxEDUx9V+kfwEh6ULc5CrdZBBKpsAQ1wo9uG5hXSJgb0h7aln75QK5L/ZRxKTzqNiu
+         STegWL3HGRgV43Oz2KVQxIUlM1WKUM7bebWHV9NqU2gzBYLjj08q7nwsbojPtkzp4vo2
+         wFJ0amYIF7QnfsJbxly3sVWF/FN9uuiWDT79TQK60KmsDB/ELfE5+rSNXJEASRUPE9z1
+         jlsN8+KpuH8J1bgEsaOSijBFun7JzeKhHDI0c4//Z9yWwJNYpqArIPdSnEnv7GOcWNd4
+         o15oNhEB21tfBVgS4G0wqwNWDdE7mK0wWaPt7/CjpCAIOcCPKtJ9Ellr1TukbZxfkZ/h
+         0k4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774798881; x=1775403681;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cn2DYOVpo8bOTJ2a/G22aIN/JEjANtXiC08Q2WS+2PA=;
+        b=qVioamqBeGXXoIR/pBWZcMWCURNgTtU6l5k1uvoP0iS+AM+g3GGInjDx9GPHEd1SWH
+         Ee7cs3avDr4UZVAntFzMVxkhMpZozHi06hAcdW2Y3mFABC93BTZGXoPAidEb/EyGb6YN
+         Bu4pLHMgtsO0kwmH4scS/OXTTuX9NYSKbpGyscJ0jii1P+y/zAxuQRVMsYQd4CidvPdb
+         TfaMwfeu+la7sIpFaCROBkcr8l+3LejpVYc1PtfzLKnMXg10+dtr/7AFNAlrXIKLcdXk
+         S/I+wTwsBuxZDCOdWNTvJp4rROHAefKI6ucxj4Tu5ulKs/GnUhg2LdkHZcAX5WMcrkwM
+         E3FA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJz/5JvqZDC5ZT5YCFgzTJCUdDaplXB2oSV6APX/HIpKRYxa0fvON/gCxYRLmSw8QdcZdoAOZe3Vt+KQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywpr3p4SofajBAbEJRTHpG8hszdTwEQrJ8/bQ1bCoJIVCXRPD4k
+	BUMGe0JAw4Ylac30U29yISlSntom7JshMAxpZtE9VPW2UwtQjhf31AGt
+X-Gm-Gg: ATEYQzxw/EhUB/+vvHIxvhirZJTu6UGp/l1Mc51lCxAqbi7wgy1JvfuQQBMOE7vXbr5
+	PsgR8+l5CLDkwCM7uT18fQkOP0CPTDJH1yUZFBRWGaQqCt6VyfaIJRLAr3u/R+Zpn+LK4Aaz1v2
+	+wGlD1PwuEnQNWavoDdyHMPM5SNcgXCZrUWv1iEVpKjHW2a9EUYOXFjfcJ+pwisi+8AV1Ue+I2/
+	Au866q9w+97tr2Hz1Jp/vlmjzqF4n+5T7RY1SDMCT3frn9NtATjHpAc8Tg3hEoRhzEYJ6rAsYKv
+	D5MZ9ytPT9RDtlYqOsJJgTOLMLaPPVzXsxUXM4jVL1Dcpq+uMil00LN8X5/NXUbiOLmTttLTqfq
+	2i+WeC1mpMLDFUCJgd0FoFFZ8Y7saY6cWa2Kqdes5FeKPiMxHV24OSNW1Kk37u1ESAs2fZiUU0i
+	zRedZB0bcpIEblxE+WN+RcnAwey6rxdXskJA==
+X-Received: by 2002:a05:6300:210c:b0:39b:d9f1:6cff with SMTP id adf61e73a8af0-39c87b6af38mr9436144637.47.1774798880807;
+        Sun, 29 Mar 2026 08:41:20 -0700 (PDT)
+Received: from archwsl.localdomain ([116.232.56.124])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76916cce42sm4111879a12.9.2026.03.29.08.41.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Mar 2026 08:41:20 -0700 (PDT)
+From: Jialin Wang <wjl.linux@gmail.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wjl.linux@gmail.com
+Subject: [PATCH v2] blk-iocost: fix busy_level reset when no IOs complete
+Date: Sun, 29 Mar 2026 15:41:12 +0000
+Message-ID: <20260329154112.526679-1-wjl.linux@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZo2pbwTsp_uJcTG+GYyBFmoU-5UPYu6dvAguRfgB_QWCA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Sat, Mar 28, 2026 at 10:40:31AM -0700, Caleb Sander Mateos wrote:
-> On Sat, Mar 28, 2026 at 6:43 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Bio pages may originate from slab caches that lack SLAB_USERCOPY
-> 
-> What is SLAB_USERCOPY? The only references to it I can find are in
-> comments in commit aa981a665d587 ("lkdtm: add usercopy tests").
-> 
+When a disk is saturated, it is common for no IOs to complete within a
+timer period. Currently, in this case, rq_wait_pct and missed_ppm are
+calculated as 0, the iocost incorrectly interprets this as meeting QoS
+targets and resets busy_level to 0.
 
-Oops, I should have included the panic log here:
+This reset prevents busy_level from reaching the threshold (4) needed
+to reduce vrate. On certain cloud storage, such as Azure Premium SSD,
+we observed that iocost may fail to reduce vrate for tens of seconds
+during saturation, failing to mitigate noisy neighbor issues.
 
-[   41.604744] usercopy: Kernel memory exposure attempt detected from SLUB object 'jbd2_1k' (offset 0, size 1024)!
-[   41.607063] ------------[ cut here ]------------
-[   41.607290] kernel BUG at mm/usercopy.c:102!
-[   41.607502] Oops: invalid opcode: 0000 [#1] SMP NOPTI
-[   41.607794] CPU: 0 UID: 0 PID: 2020 Comm: kublk Not tainted 7.0.0-rc3_next+ #616 PREEMPT(full)
-[   41.608261] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.17.0-8.fc42 06/10/2025
-[   41.608722] RIP: 0010:usercopy_abort+0x7a/0x7c
-[   41.608995] Code: 48 c7 c6 ab 55 2c 8b eb 0e 48 c7 c7 b0 92 2e 8b 48 c7 c6 b9 87 2b 8b 52 48 89 fa 48 c7 c7 30 73 1f 8b 50 41 52 e8 66 25 fe ff <0f> 0b 48 89 d9 49 89 e8 44 89 f2 31 f6 48 29 c1 48 c7 c7 00 56 2c
-[   41.609985] RSP: 0018:ffffd3dcca79fae0 EFLAGS: 00010246
-[   41.610286] RAX: 0000000000000063 RBX: ffff8d87ec655000 RCX: 0000000000000000
-[   41.610707] RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff8d87b5c1d440
-[   41.611111] RBP: 0000000000000400 R08: 0000000000000000 R09: 00000000fffeffff
-[   41.611556] R10: ffffffff8bc8c040 R11: ffffd3dcca79f968 R12: ffff8d87ec655400
-[   41.611913] R13: 0000000000000000 R14: 0000000000000001 R15: ffff8d85c400b000
-[   41.612375] FS:  00007f2ef3f066c0(0000) GS:ffff8d8828a82000(0000) knlGS:0000000000000000
-[   41.612832] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   41.613186] CR2: 00007f2efc137000 CR3: 000000032c7f2006 CR4: 0000000000772ef0
-[   41.613623] PKRU: 55555554
-[   41.613811] Call Trace:
-[   41.613973]  <TASK>
-[   41.614108]  __check_heap_object+0xb8/0xd0
-[   41.614345]  __check_object_size+0x1b8/0x250
-[   41.614639]  ublk_copy_user_bvec.isra.0+0x65/0xf0 [ublk_drv]
-[   41.614981]  ublk_copy_user_pages.isra.0+0xc5/0x130 [ublk_drv]
-[   41.615360]  ublk_start_io+0xff/0x160 [ublk_drv]
-[   41.615669]  ublk_dispatch_req+0x99/0x240 [ublk_drv]
-[   41.615969]  ublk_cmd_list_tw_cb+0x2d/0x40 [ublk_drv]
-[   41.616248]  __io_run_local_work_loop+0x7c/0x80
-[   41.616449]  __io_run_local_work+0x159/0x230
-[   41.616634]  io_run_local_work+0x31/0x50
-[   41.616977]  io_cqring_wait+0x28e/0x680
-[   41.617292]  ? __io_issue_sqe+0x3b/0x1b0
-[   41.617607]  ? __pfx_io_wake_function+0x10/0x10
-[   41.617894]  __do_sys_io_uring_enter+0x601/0x8b0
-[   41.618183]  do_syscall_64+0x11c/0x15d0
-[   41.618443]  ? switch_fpu_return+0x56/0xf0
-[   41.618719]  ? do_syscall_64+0x2d6/0x15d0
-[   41.618994]  ? do_syscall_64+0x11c/0x15d0
-[   41.619262]  ? do_syscall_64+0x11c/0x15d0
-[   41.619525]  ? clear_bhb_loop+0x30/0x80
-[   41.619785]  ? clear_bhb_loop+0x30/0x80
-[   41.620049]  ? clear_bhb_loop+0x30/0x80
-[   41.620302]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   41.620598] RIP: 0033:0x7f2f045876fc
-[   41.620853] Code: 0f b6 c0 48 8b 79 20 8b 3f 83 e7 01 44 0f 45 d0 41 83 ca 01 8b b9 cc 00 00 00 45 31 c0 41 b9 08 00 00 00 b8 aa 01 00 00 0f 05 <c3> 0f 1f 00 89 30 eb 9b 0f 1f 40 00 41 f6 c2 04 74 32 44 89 d0 41
-[   41.621710] RSP: 002b:00007f2ef3f05c38 EFLAGS: 00000246 ORIG_RAX: 00000000000001aa
-[   41.622112] RAX: ffffffffffffffda RBX: 00007f2ef3f05cc0 RCX: 00007f2f045876fc
-[   41.622493] RDX: 0000000000000001 RSI: 0000000000000001 RDI: 0000000000000000
-[   41.622901] RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000008
-[   41.623281] R10: 0000000000000011 R11: 0000000000000246 R12: 0000000000000002
-[   41.623649] R13: 0000000000000001 R14: 00007f2f0410c558 R15: 00000000000a6042
-[   41.624015]  </TASK>
-[   41.624239] Modules linked in: iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi target_core_pscsi target_core_file target_core_iblock iscsi_target_mod target_core_mod isofs nfsd auth_rpcgss nfs_acl lockd grace nfs_localio sunrpc vfat fat intel_rapl_msr intel_rapl_common kvm_intel kvm ppdev virtio_gpu virtio_net parport_pc parport net_failover i2c_i801 rapl i2c_smbus failover virtio_dma_buf bochs joydev vfio_pci vfio_pci_core vfio_iommu_type1 vfio irqbypass ublk_drv configs loop zram nvme uas nvme_core usb_storage virtio_scsi ghash_clmulni_intel virtio_blk nvme_keyring nvme_auth serio_raw scsi_dh_rdac scsi_dh_emc scsi_dh_alua fuse dm_multipath qemu_fw_cfg
-[   41.626838] Dumping ftrace buffer:
-[   41.627085]    (ftrace buffer empty)
-[   41.627354] ---[ end trace 0000000000000000 ]---
+Fix this by tracking the number of IO completions (nr_done) in a period.
+If nr_done is 0, we adjust the logic:
 
+* If there are lagging IOs, the saturation status is unknown, so we try
+  to keep busy_level unchanged. To avoid drastic vrate oscillations, we
+  clamp it between -4 and 4.
+* If there are shortages but no lagging IOs, the vrate might be too low
+  to issue any IOs. We should allow vrate to increase but not decrease.
+* Otherwise, reset busy_level to 0.
 
-Thanks,
-Ming
+Note that when nr_done is 0 and nr_lagging is 0, the adjustment logic
+is nearly identical to the "QoS targets are being met with >25% margin"
+state, which minimizes the risk of regressions.
+
+The issue is consistently reproducible on Azure Standard_D8as_v5 (Dasv5)
+VMs with 512GB Premium SSD (P20) using the script below. It was not
+observed on GCP n2d VMs (100G pd-ssd and 1.5T local-ssd), and no
+regressions were found with this patch. In this script, cgA saturates
+the device. The iocost is expected to throttle it so that cgB's
+completion latency remains low.
+
+  BLK_DEVID="8:0"
+  MODEL="rbps=173471131 rseqiops=3566 rrandiops=3566 wbps=173333269 wseqiops=3566 wrandiops=3566"
+  QOS="rpct=90.00 rlat=3500 wpct=90 wlat=3500 min=80 max=10000"
+
+  echo "$BLK_DEVID ctrl=user model=linear $MODEL" > /sys/fs/cgroup/io.cost.model
+  echo "$BLK_DEVID enable=1 ctrl=user $QOS" > /sys/fs/cgroup/io.cost.qos
+
+  CG_A="/sys/fs/cgroup/cgA"
+  CG_B="/sys/fs/cgroup/cgB"
+
+  FILE_A="/data0/A.fio.testfile"
+  FILE_B="/data0/B.fio.testfile"
+  RESULT_DIR="./iocost_results_$(date +%Y%m%d_%H%M%S)"
+
+  mkdir -p "$CG_A" "$CG_B" "$RESULT_DIR"
+
+  get_result() {
+    local file=$1
+    local label=$2
+
+    local results=$(jq -r '
+    .jobs[0].mixed |
+    ( .iops | tonumber | round ) as $iops |
+    ( .bw_bytes / 1024 / 1024 ) as $bps |
+    ( .clat_ns.mean / 1000000 ) as $avg |
+    ( .clat_ns.max / 1000000 ) as $max |
+    ( .clat_ns.percentile["90.000000"] / 1000000 ) as $p90 |
+    ( .clat_ns.percentile["99.000000"] / 1000000 ) as $p99 |
+    ( .clat_ns.percentile["99.900000"] / 1000000 ) as $p999 |
+    ( .clat_ns.percentile["99.990000"] / 1000000 ) as $p9999 |
+    "\($iops)|\($bps)|\($avg)|\($max)|\($p90)|\($p99)|\($p999)|\($p9999)"
+    ' "$file")
+
+    IFS='|' read -r iops bps avg max p90 p99 p999 p9999 <<<"$results"
+    printf "%-8s %-6s %-7.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f\n" \
+           "$label" "$iops" "$bps" "$avg" "$max" "$p90" "$p99" "$p999" "$p9999"
+  }
+
+  run_fio() {
+    local cg_path=$1
+    local filename=$2
+    local name=$3
+    local bs=$4
+    local qd=$5
+    local out=$6
+    shift 6
+    local extra=$@
+
+    (
+      pid=$(sh -c 'echo $PPID')
+      echo $pid >"${cg_path}/cgroup.procs"
+      fio --name="$name" --filename="$filename" --direct=1 --rw=randrw --rwmixread=50 \
+          --ioengine=libaio --bs="$bs" --iodepth="$qd" --size=4G --runtime=10 \
+          --time_based --group_reporting --unified_rw_reporting=mixed \
+          --output-format=json --output="$out" $extra >/dev/null 2>&1
+    ) &
+  }
+
+  echo "Starting Test ..."
+
+  for bs_b in "4k" "32k" "256k"; do
+    echo "Running iteration: BS=$bs_b"
+    out_a="${RESULT_DIR}/cgA_1m.json"
+    out_b="${RESULT_DIR}/cgB_${bs_b}.json"
+
+    # cgA: Heavy background (BS 1MB, QD 128)
+    run_fio "$CG_A" "$FILE_A" "cgA" "1m" 128 "$out_a"
+    # cgB: Latency sensitive (Variable BS, QD 1, Read/Write IOPS limit 100)
+    run_fio "$CG_B" "$FILE_B" "cgB" "$bs_b" 1 "$out_b" "--rate_iops=100"
+
+    wait
+    SUMMARY_DATA+="$(get_result "$out_a" "cgA-1m")"$'\n'
+    SUMMARY_DATA+="$(get_result "$out_b" "cgB-$bs_b")"$'\n\n'
+  done
+
+  # Final Output
+  echo -e "\nFinal Results Summary:\n"
+
+  printf "%-8s %-6s %-7s %-8s %-8s %-8s %-8s %-8s %-8s\n\n" \
+         "CGROUP" "IOPS" "MB/s" "Avg(ms)" "Max(ms)" "P90(ms)" "P99" "P99.9" "P99.99"
+  echo "$SUMMARY_DATA"
+
+  echo "Results saved in $RESULT_DIR"
+
+Before:
+  CGROUP   IOPS   MB/s    Avg(ms)  Max(ms)  P90(ms)  P99      P99.9    P99.99
+
+  cgA-1m   167    167.02  748.65   1641.43  960.50   1551.89  1635.78  1635.78
+  cgB-4k   5      0.02    190.57   806.84   742.39   809.50   809.50   809.50
+
+  cgA-1m   166    166.36  751.38   1744.31  994.05   1451.23  1736.44  1736.44
+  cgB-32k  4      0.14    225.71   1057.25  759.17   1061.16  1061.16  1061.16
+
+  cgA-1m   166    165.91  751.48   1610.94  1010.83  1417.67  1602.22  1619.00
+  cgB-256k 5      1.26    198.50   1046.30  742.39   1044.38  1044.38  1044.38
+
+After:
+  CGROUP   IOPS   MB/s    Avg(ms)  Max(ms)  P90(ms)  P99      P99.9    P99.99
+
+  cgA-1m   159    158.59  769.06   828.52   809.50   817.89   826.28   826.28
+  cgB-4k   200    0.78    2.01     26.11    2.87     6.26     12.39    26.08
+
+  cgA-1m   147    146.84  832.05   985.80   943.72   960.50   985.66   985.66
+  cgB-32k  200    6.25    2.82     71.05    3.42     15.40    50.07    70.78
+
+  cgA-1m   114    114.47  1044.98  1294.48  1199.57  1283.46  1300.23  1300.23
+  cgB-256k 200    50.00   4.01     34.49    5.08     15.66    30.54    34.34
+
+Signed-off-by: Jialin Wang <wjl.linux@gmail.com>
+---
+v2:
+- Handle more edge cases to prevent potential regressions.
+
+v1: https://lore.kernel.org/all/20260318163351.394528-1-wjl.linux@gmail.com/
+
+ block/blk-iocost.c | 35 +++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index d145db61e5c3..5184c6e25a0c 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1596,7 +1596,8 @@ static enum hrtimer_restart iocg_waitq_timer_fn(struct hrtimer *timer)
+ 	return HRTIMER_NORESTART;
+ }
+ 
+-static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p)
++static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p,
++			 u32 *nr_done)
+ {
+ 	u32 nr_met[2] = { };
+ 	u32 nr_missed[2] = { };
+@@ -1633,6 +1634,8 @@ static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p
+ 
+ 	*rq_wait_pct_p = div64_u64(rq_wait_ns * 100,
+ 				   ioc->period_us * NSEC_PER_USEC);
++
++	*nr_done = nr_met[READ] + nr_met[WRITE] + nr_missed[READ] + nr_missed[WRITE];
+ }
+ 
+ /* was iocg idle this period? */
+@@ -2250,12 +2253,12 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 	u64 usage_us_sum = 0;
+ 	u32 ppm_rthr;
+ 	u32 ppm_wthr;
+-	u32 missed_ppm[2], rq_wait_pct;
++	u32 missed_ppm[2], rq_wait_pct, nr_done;
+ 	u64 period_vtime;
+ 	int prev_busy_level;
+ 
+ 	/* how were the latencies during the period? */
+-	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct);
++	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct, &nr_done);
+ 
+ 	/* take care of active iocgs */
+ 	spin_lock_irq(&ioc->lock);
+@@ -2397,9 +2400,29 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 	 * and should increase vtime rate.
+ 	 */
+ 	prev_busy_level = ioc->busy_level;
+-	if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
+-	    missed_ppm[READ] > ppm_rthr ||
+-	    missed_ppm[WRITE] > ppm_wthr) {
++	if (!nr_done) {
++		if (nr_lagging)
++			/*
++			 * When there are lagging IOs but no completions, we
++			 * don't know if the IO latency will meet the QoS
++			 * targets. The disk might be saturated or not. We
++			 * should not reset busy_level to 0 (which would
++			 * prevent vrate from scaling up or down), but rather
++			 * try to keep it unchanged. To avoid drastic vrate
++			 * oscillations, we clamp it between -4 and 4.
++			 */
++			ioc->busy_level = clamp(ioc->busy_level, -4, 4);
++		else if (nr_shortages)
++			/*
++			 * The vrate might be too low to issue any IOs. We
++			 * should allow vrate to increase but not decrease.
++			 */
++			ioc->busy_level = min(ioc->busy_level, 0);
++		else
++			ioc->busy_level = 0;
++	} else if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
++		   missed_ppm[READ] > ppm_rthr ||
++		   missed_ppm[WRITE] > ppm_wthr) {
+ 		/* clearly missing QoS targets, slow down vrate */
+ 		ioc->busy_level = max(ioc->busy_level, 0);
+ 		ioc->busy_level++;
+-- 
+2.53.0
 
