@@ -1,162 +1,112 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DA130C601
-	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 14:34:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774881249; cv=pass; b=S9x9/2UjGko+S9SHn+nDHbF0DtE99CxwowIcs3Toh13bdIVGUWwEsCTlw2EloQnYqRKCt8GqVTEZx7T/qfGLo9XFJ8ES7iDB8fWStsMJcrRTIZXb4QL6rVAtsF0nSpichXp+2thcMjm28XJqvCj6cOpm9rq53NJybwqOY5Px8nI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774881249; c=relaxed/simple;
-	bh=I79gy/L1iUtPeR9Sx5svfxAJiYGA/IeaDqYZS24HXHI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R0NcSgSNC0s5cVqpDAScvaqqWZvPvseoqrnBVbjNpLgR7DE/DAPhlYgd3dQj+6roTKmXXIgCWKnT8qsyisfG2MFSkRwmJik/N6puaXKJBcC9X1rexHcXdCPpTKWHjuYdTPTqzwXDdyO51DKu0+/mLbdqpDrxrQXsJyH2wtPioT0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W2wieVhn; arc=pass smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C60E3064A3;
+	Mon, 30 Mar 2026 14:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774881407; cv=none; b=pVMa/TN1Uj2TTAcbY+ULOd6a+WgKE0F2PVCKyvZZh+2RZmvUA1PLx7tgepFjiRkgAkkLtUvTbjPU9pOU1lt8x01YqmJQDtrP+6n/aemvBSbr8VtAlgei72+vAd2aSmY4FvG0IZ6I7bs2lWoH0tL5VfDXpLY6PoUgJ43wknlNxLo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774881407; c=relaxed/simple;
+	bh=oHxTxG2Nh5IuTVNHul4winSqHGDUCAQCu25ksvmIBVM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NHWox4FYB2pGHy5LJRZnuEut2XSBhVs/FpdiayiVEKYdLt0MZ8/TnXRN7s1Jdx9lMJXmdLJ0IzxPmhUeQDLx7ByzU66J80SLRi6JkaxvTd2j2ChRCmJgtVzeqX/GDOPIzPz/R/4wlIaAycMPTDAC67gOPhHkWbbPjIVT7/N+nj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j7PakSWL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W2wieVhn"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64ee82e853cso4523298d50.3
-        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 07:34:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774881247; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bHp9KLmsB5BZbsBn7kbH/0JuUgSKI3LrBgPLKl/wSTH9LNGvCSb2ENmh2bXVW7o9ro
-         uZW9SLAwKwwm2mcjc1DVAFsYgPCHtXRWGBIJO88soXp6y9/DxsUHjFHrAXubsEqY466m
-         FYZrqVWa6A5sxy2lY9yQ4zud4/sa0eJ2HnJcjj7hxEusuuF3esZtoHpnUa6lGUiPUNz+
-         5mOfQ9+9rvA+vg+tTokc5CFEBvoHL0rfmCO0zDuYvgyWhN3YJt31xMN9pDhYNnGL00Gt
-         suPb0wZ2HybGl04jRtiUp+yjOl02CpETZYb6lbOcwS12HVyW4ZSlX4gCg38TbPrXSN/a
-         2mXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=IIA8D0ff4y+v3OdWEO6D1Oc2rbEBX2dD2f4Uu2Jsj7Y=;
-        fh=ZbXEiKgKSoN4qaI9q2oPXXSKGHVeQnv3T+UHb6u/fbs=;
-        b=A9rAP5CgKyTj8cdTElLrBvp1yEwwHKvv9RkaA0Id9z6K/u7OrIRDDJ+1FXobbaKjAM
-         Q1QJQYXNRy6XxXPURM/qurxx4ZQ6jPSIpzk5vn4JiRhSAPGVUN5ESd+RoMRMWp0cEZF7
-         0RDHFTAX7UUgKwzY3+Ozi9m0heJworVWqfzqqrrUiNTy5CQea1zA1DlPegzUi6tmwyHR
-         1X+yjn7exKz9DGNSibGuu2g3v6nFBE9S/t7SPTdBnB/+pNCWpZD8rlwCXOQ+sSsEabVH
-         6ObGQSpq8c+zLIYnU88kciXjuH3UEr6zQHl4G4IGpchEb8Ox0g7p5qrMU9L58ki3jU/b
-         Ri/g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774881247; x=1775486047; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IIA8D0ff4y+v3OdWEO6D1Oc2rbEBX2dD2f4Uu2Jsj7Y=;
-        b=W2wieVhn5xWfAUuy6TNnJWCZQTGIqG2iw+if9Q7IaeK2CX2lPDFAMNyUvfY1Wt72xp
-         SCMR0tYq008xOM4AOyAVHMVkHFUJfGHuNyybsplFXTpKGCz6ZbwoFxFsK6QpCnIXvPjF
-         SflsMcKnH3DrOoZLDBfv+KOwSACmJXxnSTUKA4qLp4+zaism0boLIbWjjjfPqVZmJtnu
-         RSGHRHw70qXvToO77oc3Hln4iFoio8VKQREALJ/e+cwnN2NqATTq2Yl1wiEILQ+nj7vd
-         lNRbzZkmyZ/0xTWfuyIpO+rKj2J7u2aJaSkT/hBh6AfzGGYcfGeP/+OlcFOQoyPMSaHI
-         3b6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774881247; x=1775486047;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IIA8D0ff4y+v3OdWEO6D1Oc2rbEBX2dD2f4Uu2Jsj7Y=;
-        b=iViqv6zensZpEaLA06eYcQof0LkrV7j3E+UxaR0LWKXFv0gRZT6Id5slaOnt4FybsF
-         hn89V0QIE9hk4wSPYWDbE/JEcAlxN/GwTXBc8VGrnYCILix2nV/qpV2Cy9jIWYknaQnM
-         jYWShuy581YDePUxJZClZOS1aMNir9i/MWcICaIrXJFinOTUTL+XIweyMVQLV00F4usm
-         H4PNDECzrlpN3NbXxav+fjmKeC/+GIfGcApb0S/ldo4GH6E2o25mmGvAyd0M+QTA7SfG
-         3sgDK1FfmSsHAHCV1kUuTUug6j2yuU0LDjZxmIDUK51YWd/jzUjYFGS9P4pyZAGqz8gY
-         mOjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWPo4VN0ri8zsEJePUt8fSVpr62Eix6y8cLrwIzlOzkFCZufG+hePyWdwJ5gg9QE0+olzoF6jj3KEsbHQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9VHC25bMG5H7jfobR6L3EhIB7+OXOjbZyCNuVctZ4IuhyIvDQ
-	9t9dK4OG307wdT1VbRh49wh5wmLHZZctBKNq4ByOgCXVSnYwPoxNhz/jw9mAClr7Khx5UQAmWX7
-	b4UDSLixdpjOO4lbgvmGRGSHCSGksCxs=
-X-Gm-Gg: ATEYQzwz/BhrB+TAlfMwkNLe0aP7nQNWH0xKp7cVccQsdn7fSGhfxi3CoHxRGEB7Ufv
-	0KGnCeU2rHtliUtfylooVdsMGeJBUhWs6fo8MeWXk+nBRLgaDO/WTaCqwfdwIil3KFUqeXXYbpP
-	oxrz9wdRCR+99pbdY60iLiS4g6rhXINDms7ZfPPI1fiRy5/7EA6V8fMNSPrD3i8jvuYHiBb2fwk
-	hJxiQ4lHVkIfFIyeb4BkT8aqM6Gm9GkpKY2g9MGfC84CWtAg1uyKHfeM8JtRuzkZvVk2oDqttGv
-	rjsj6vOqTAwSt60xwxYkD5sUPq5A+pR5DO38hKRCmyniXPhE74phXiymLIWfyLPrkG7Hu/fH
-X-Received: by 2002:a05:690c:10c:b0:79c:3e94:808f with SMTP id
- 00721157ae682-79c3e948553mr99440527b3.3.1774881247188; Mon, 30 Mar 2026
- 07:34:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j7PakSWL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A4E5C4CEF7;
+	Mon, 30 Mar 2026 14:36:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774881407;
+	bh=oHxTxG2Nh5IuTVNHul4winSqHGDUCAQCu25ksvmIBVM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=j7PakSWLOFyQ9f13rZmL3pOGcETVRjYYKiEVAgy8v78aYsDD8H+CxaoGROn3MayUx
+	 doXXPzdnOb1bZuw3w+WaEH/YhIySAdLjOssUVEQ3DSC6fVdlqK9P8JlRvXYXx8qGTU
+	 h/I7MTARSMPI1b8W02tplyKm7KrS2D3h6ecBm9+H3AvMG2fLWdUCXxTzqbvPeitohq
+	 eBdCr8ca2nquBUQCRb+toYcSM7YR51lSvAkp2c0Vv0ICP9cjC6LSeAH5muW310GOpn
+	 DuRjYusnqDKJRm23r43UCdNG0VJbQDKH/82usAWx6sVsdPrt3t+twwn4InRwcnkgal
+	 GRnf5Gbmi30IQ==
+From: Chuck Lever <cel@kernel.org>
+Subject: [PATCH v2 0/2] Bypass usercopy hardening for kernel-only iterators
+Date: Mon, 30 Mar 2026 10:36:29 -0400
+Message-Id: <20260330-bypass-user-copy-v2-0-f236179e7fd6@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260330044334.373480-1-kartikey406@gmail.com>
- <acoQBLwdc1PqIb0m@infradead.org> <20260330133800.GC22278@macsyma.local>
-In-Reply-To: <20260330133800.GC22278@macsyma.local>
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-Date: Mon, 30 Mar 2026 20:03:55 +0530
-X-Gm-Features: AQROBzC5DFrpcRbDJwyotZPLQ_bBOfvI5OeF6bTQGNecm3qxL0J9raOMmDCZ4Nk
-Message-ID: <CADhLXY6Cu+O_jeL9xxORtLg-LU6pdBxFb29yhS=d2rTtgbA2tw@mail.gmail.com>
-Subject: Re: [PATCH] loop: block loop reconfiguration of offset/sizelimit on
- mounted device
-To: Theodore Tso <tytso@mit.edu>
-Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk, dvyukov@google.com, 
-	adilger.kernel@dilger.ca, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org, 
-	syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAG2KymkC/yWMQQrCMBBFr1Jm7WCaQEWvIi6ScWxHMAmZViyld
+ zfR5fv89zZQLsIKl26Dwm9RSbGCPXRAk48jo9wrgzV2MM4OGNbsVXGpHlLKKzo+uX7oic4mQNV
+ y4Yd8fsnr7c+6hCfT3DrtEbwyhuIjTW1KRUaJx5fXmQvs+xe5Jh4IlAAAAA==
+X-Change-ID: 20260326-bypass-user-copy-3e73161cc90b
+To: Al Viro <viro@zeniv.linux.org.uk>, Kees Cook <kees@kernel.org>, 
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: linux-hardening@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+ Chuck Lever <chuck.lever@oracle.com>
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1753;
+ i=chuck.lever@oracle.com; h=from:subject:message-id;
+ bh=oHxTxG2Nh5IuTVNHul4winSqHGDUCAQCu25ksvmIBVM=;
+ b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBpyop1Jk/zlwbCvkynME26o1jUl+31D3JmnYXkj
+ RD9wDp9nhmJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCacqKdQAKCRAzarMzb2Z/
+ lw1QD/9kD5ulEQARWAHavD0+hXtMU0Ng5VqMewVWz7E7mSSOEoGmlLwwlE22m+JOzl5D299UJac
+ QqtZnRnLv7pCt8c7TdVpxHb8EliZS39Thlm7xJggrIo4zu3SdLbAI3frihW+Pp52k3KrQ50yBka
+ tHh1gOnzD6bH+T+vR2KiFXuZs+Cixd5f1VsaMF7PylVYX6jXPim2shkNr5CVLatOsUateABBfe1
+ xG6QRAFwph7eseyV3G71KQuDhdEdhkBQX9r76UFPdLvG73DtA1BUzkApFE1pJWtDGougMnye5qL
+ mKnxAe9hGenFNz/Z+B6R/PJyv7SOS1jfc+1LWpJpPldb1Z19y01nRvLc6hNJodVLEqGpoIKz0kx
+ ieMwFUm3fCiVHakyzTtZFRU9BMioiQfwx5RwZ4aJTe72WqSTyr/InpNio8hZYompQNQnsi7mYDY
+ c3cks8TRfdqIuoxnYp3whvcjXqKsNbR43GiRhxP+S9GOfMolUdmjgO5pOzs8YffKTYmwGjue64N
+ MdMzfEaUCn5nhRWO4VuqhhhEx5l35mwIp610M8365zxW5uJqqZI/jREYqhKP5x+sO65HdhEwtis
+ 6rgM8HJmx80zct0jVo2YYcQ+BmW+PhLwua7NMc5IAy59bTTMAUNwDKssNNNRvPGpCsNersJtROY
+ V8qS+Be9A/xaGAA==
+X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
+ fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
 
-On Mon, Mar 30, 2026 at 7:08=E2=80=AFPM Theodore Tso <tytso@mit.edu> wrote:
->
-> The patch was missing the...
->
->   #ifndef CONFIG_BLK_DEV_WRITE_MOUNTED)
->
-> ... in loop.c which was in my original sketch of a patch which I sent
-> to Deepanshu.
->
-> The intent was to suppress Syzkaller noise.  Inherent in my assumption
-> was that changing either lo_offset or lo_sizelimit parameter was going
-> to mutate the loop device when it was mounted, which was the intent of
-> !CONFIG_BLK_DEV_WRITE_MOUNTED.  I also assumed that at least for now,
-> the only user of !CONFIG_BLK_DEV_WRITE_MOUNTED was syzkaller, since
-> there are file systems (in particular ext4) that are commonly in use
-> whose userspace utilities fundamentally assume that you can write to
-> the block device.  Even after we promulgate the tune2fs changes to use
-> the new EXT4_IOC_SET_TUNE_SB_PARAM ioctl and we can assume that it is
-> common use in deployed kernels, some grub operations still assume they
-> can modify the block device where the second-stage grub bootloader is
-> located.
->
-> In the long term, when ext4 can start assuming that we can suppress
-> writes to the block device (and we find a solution to the grub issue),
-> we'll probably want to have a way to suppress write access to block
-> devices on a per-super basis, without clearing the Kconfig
-> CONFIG_BLK_DEV_WRITE_MOUNTED.   But that's a problem for another day...
->
-> Cheers,
->
->                                                 - Ted
+Profiling NFSD under an iozone workload showed that hardened
+usercopy checks consume roughly 1.3% of CPU in the TCP receive
+path. The runtime check in check_object_size() validates that
+copy buffers reside in expected slab regions, which is
+meaningful when data crosses the user/kernel boundary but adds
+no value when both source and destination are kernel addresses.
 
+The fix splits check_copy_size() into two variants: the
+existing full check, and a new __compiletime_check_copy_size()
+that retains the compile-time object size assertion and the
+runtime overflow check but omits check_object_size(). A
+user_backed_iter() test at each call site selects between
+them, so user-backed iterators continue to receive the full
+validation.
 
-Hi Ted, Christoph,
+Patch 1 applies this to copy_to_iter(). Patch 2 applies the
+same change to copy_from_iter(). copy_from_iter_nocache() is
+left unchanged because all current callers pass user-space
+addresses; the bypass there is deferred until that changes.
 
-Thank you both for the feedback. Based on your suggestions, I'll
-submit a v2 with the following approach:
+---
+Changes since v1:
+- Updated commit message for clarity and completeness
+- Rename the check_copy_size() function (Kees)
+- Added __compiletime_check_copy_size() stub to
+  tools/virtio/linux/ucopysize.h
+- Add second patch to convert copy_from_iter()
 
-- Use #ifndef CONFIG_BLK_DEV_WRITE_MOUNTED as Ted originally
-  intended, since this is meant to suppress syzkaller noise
-- Check bd_writers directly instead of exporting
-  bdev_writes_blocked(), addressing Christoph's concern
-- No changes to block/bdev.c or include/linux/blkdev.h, keeping
-  the patch minimal and limited to drivers/block/loop.c
+---
+Chuck Lever (2):
+      iov: Bypass usercopy hardening for copy_to_iter()
+      iov: Bypass usercopy hardening for copy_from_iter()
 
-The check would be:
+ include/linux/ucopysize.h      | 16 +++++++++++++++-
+ include/linux/uio.h            | 18 ++++++++++++++----
+ tools/virtio/linux/ucopysize.h |  6 ++++++
+ 3 files changed, 35 insertions(+), 5 deletions(-)
+---
+base-commit: 7aaa8047eafd0bd628065b15757d9b48c5f9c07d
+change-id: 20260326-bypass-user-copy-3e73161cc90b
 
-#ifndef CONFIG_BLK_DEV_WRITE_MOUNTED
-if ((lo->lo_offset !=3D info->lo_offset ||
-     lo->lo_sizelimit !=3D info->lo_sizelimit) &&
-    lo->lo_device->bd_writers < 0) {
-err =3D -EBUSY;
-goto out_unlock;
-}
-#endif
+Best regards,
+--  
+Chuck Lever
 
-Regarding Christoph's point about increasing lo_sizelimit being
-safe - should I narrow the check to only block shrinking and
-offset changes?
-
-Thanks,
-Deepanshu
