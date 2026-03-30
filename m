@@ -1,167 +1,85 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961D3362151
-	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 04:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE4D3822B7;
+	Mon, 30 Mar 2026 05:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774845823; cv=none; b=Uuzs5ApHGOq0pSrvnHbwAbgw9kpg87a7T6XlwW08T6Skj7pkFVmPTF2Cv8dvdBU9o0NjpeNc7h8rOIC/W8fFAbH9IzK3s/hURJ22w1qy8uLTdc7tBDL5B3V1R/cW0efinP28/KzbCfZBvGa0ZW8EyX6rBNxrWrKkmaey0r6vZwA=
+	t=1774850057; cv=none; b=j1rtV01Td7MTMsqCSKRRHNIZBr7saa4s2AF6z76NXluEaurqcEzbj01Y56QzZz8RX2+c+vFsOJ8wcRw11qOIfvNp5JxPqY5ewG/0+dFFx39zdb/icMfEJcgCN5+yGdKYs8ecoj7kTLb5gM5Z0/Tr8R1rINHK9s/BELo+Cm3KHKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774845823; c=relaxed/simple;
-	bh=I/LoCE7ghR2fhykvvR2K6LR8ap7mzobL/J0+U6S3zt8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NgeKzVk5b1Nv+Lp0D2Yj6jLLUYCPt3grjUUOUY+2HnxQSQLj9YtyCR4RhDgBDaarQdYXUQkQv4g08DTVc1bCycvQKlupIvJKU38eNJoSLfwZHyLxDRsz+BkXhQ8JnmtouD/KEn6prMzGWrGTjiTQAVHCK7/VF55ntjCEtt4Ibhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pMK0iePC; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774850057; c=relaxed/simple;
+	bh=NHWPgqV1btByZ8njy+xCE6DkjybPkhDIcaQOUutjxLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ij4tWae+9ezqO5wsVpGMQY5MpCBJGfrTLEzOiegbYez1YjUxE0tZw1PN9c15GustmfWL1wIxAQolTMwmWy0v4xprwoeVUpzXZ5rlRgHHa1jMtd7Y6yC+opIrKoCiJtLlzTzt+OfPw9LGI37BoRDZ8Fwc4m7FCnO+Efi53eyNWNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ps7a8/6j; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pMK0iePC"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82a07738118so2226888b3a.0
-        for <linux-block@vger.kernel.org>; Sun, 29 Mar 2026 21:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774845822; x=1775450622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RVoLlmJXuoZFlO/T8+1qY4HcBw6xf89P3loI3tBHNJg=;
-        b=pMK0iePCS5aflif8zwUM+BeK5h6mjM7yWshMb/Wjo3apEL74HB7aJY4SsW/peIEx1o
-         DgvSW+BiXdCQXjJsJ2a9VjnF7TA8NLj00Z+AKQYeKzU2tNGJCTBHFtbEuD0MSMTfSZn2
-         gm5Ak9CJ4CEca8pR3Bzt7XX3/Ar106N+0gpDzLaGMexUJWwsLI35mmCCKBkCJFzYtKti
-         8Hd52F7zKOxql6I/OfRR3ua775/HvJmeQdQDSEQCwtPkHQnPZzXWmDsHr7QwLMxhP/li
-         yIryBxCd+LG7rz/JMGifF13yYzRQYzwdgJrOcRm6waE+kMO8IxwA6bpZ0eudHCbDCU3Z
-         8xOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774845822; x=1775450622;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RVoLlmJXuoZFlO/T8+1qY4HcBw6xf89P3loI3tBHNJg=;
-        b=QBIY6I89w89tvorpz8EadB083A+HWD/WzWOxhcBUEtLIOg/bunoBzpP/f1GD741MUP
-         EUKLh2ouxlR7KgOF7UyO1LY4WJQyQ1wKiDJW8QgKAYQB9s/Gx/lknoEy4Hefkgnqe86e
-         p+btcUHtA9mJPoRopZ054NKlacJC05dnJspT/v/WgwT5nBgPqNH0+9NqdEjdLmjUWqE9
-         bn5yQ+akRC54si6XTF/1csN4nUoWqwscWCNkgToe7RaLWtSL58CmjqnU8XmgbHXVgsLc
-         a6dB7pK0fTNpDIlDziyLVwQrZG2FkFBD/xrxoYnYrhGKB6rKkzdE88jjp7ptwrFK8f1C
-         TK0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVfcLp9xKYnSUFjUzae50AbI0t3VG/3SShFNSK8POB2QagHxlkg153EjAYOfB+yBrenpsWD9afqqh3FEQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYXQJvkvd0FfPn3+28pioqODz6k2ZX+1db68FDS3DnyxBPvdE1
-	BgeorPMQZXIpySiyD2tlWLDw7I0QF/gB38+1LL4HOHBrLVJPqU31r973
-X-Gm-Gg: ATEYQzw0c50H3iTF+TmsxNMTx2BuM68nrYGn87f2UuNmVHNu7Hf7vUfby+F24dcfhyd
-	MxB1AL3Ewisnt3oK8mw13b5CYSdBYs8AdCOr5VeTzbQD7Cl5xDZWSkxKOcbWEwsgMlYZabafT9+
-	ADUvKVRwiwqAjwCVMYtiGNzbHeJ8CkF01BDwZHYWQ68mU+Ej+TMlGz+aNpCtevpFWbGK9HoVKOm
-	8vAHc5FJvWcu5d4yj87YbZT1wV5Yu4/LRNPPtqFiiTglkGeElpE6TjHhJi/HwrwsX1q19RVbnP/
-	7Y8CwElf6Ln6edvZ4OuUJhqEr72wdgkj5wLja50ypantFUvxK5n0WevF2Gay1PiSS5nZGn/7FOF
-	XkFKlTKl0m6eIbTgC44ZXQLLYfKA1u9D7qpYYtUuZEExpnEbw7Cs8TMiVO1C6HvDVy5sdeCMCrb
-	YQRnyTfPhLqEhjhEqEISmkgeOqSR3gQh39ZeyNNbP1eCAteLXKTfv4uyVrdmOJkh3zq8zUgGjsO
-	tzaUpw=
-X-Received: by 2002:a05:6a00:b95:b0:81f:9b4c:81c0 with SMTP id d2e1a72fcca58-82c9608696cmr10223841b3a.41.1774845821829;
-        Sun, 29 Mar 2026 21:43:41 -0700 (PDT)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:d8f3:146b:e2bb:b2f0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca8464576sm6075154b3a.14.2026.03.29.21.43.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 21:43:41 -0700 (PDT)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: axboe@kernel.dk,
-	tytso@mit.edu,
-	dvyukov@google.com
-Cc: adilger.kernel@dilger.ca,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ps7a8/6j"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=u+tB+tGqHbUR2XbDZ+9FZ2AtR3hlrKUVkjTatYkvfrI=; b=Ps7a8/6j+LxeNHrOOVUBchTkfT
+	u/e88TPStACBI942r6SARmhAkqhdW71uRrrmb8+ebVl94o66nlA7n4+hyIQ48pK9v99n6vp8xGvnW
+	koUePpmUJhbkUut7Pfjb8b59QulIpyYUiNzvOafhNZl4pOz8wXphE8gBcgB/YWxfyohDkvWoQqoJl
+	gMQ6YyZ6TEuY9PhBbV4c57N90SGjNkeESyTg/qarzjS3Jm0UlAR+4yWFv1R5QtaY3N8li0sh/2KhE
+	phv9eE1v3q0i98lPXFuu8wgfbPMVHN8VTgG0AW+dMuEj28jvc1H7TBYnHDJFOP0ADiJfnkTBJ8mlE
+	5R3LOjJQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w75Zk-0000000AelF-3jfF;
+	Mon, 30 Mar 2026 05:54:12 +0000
+Date: Sun, 29 Mar 2026 22:54:12 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Deepanshu Kartikey <kartikey406@gmail.com>
+Cc: axboe@kernel.dk, tytso@mit.edu, dvyukov@google.com,
+	adilger.kernel@dilger.ca, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
 	syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
-Subject: [PATCH] loop: block loop reconfiguration of offset/sizelimit on mounted device
-Date: Mon, 30 Mar 2026 10:13:34 +0530
-Message-ID: <20260330044334.373480-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Subject: Re: [PATCH] loop: block loop reconfiguration of offset/sizelimit on
+ mounted device
+Message-ID: <acoQBLwdc1PqIb0m@infradead.org>
+References: <20260330044334.373480-1-kartikey406@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330044334.373480-1-kartikey406@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-LOOP_SET_STATUS{64} allows changing lo_offset and lo_sizelimit while
-a filesystem is mounted on the loop device. This effectively mutates
-the data visible to the mounted filesystem, which is equivalent to
-writing directly to the block device.
+On Mon, Mar 30, 2026 at 10:13:34AM +0530, Deepanshu Kartikey wrote:
+> LOOP_SET_STATUS{64} allows changing lo_offset and lo_sizelimit while
+> a filesystem is mounted on the loop device. This effectively mutates
+> the data visible to the mounted filesystem, which is equivalent to
+> writing directly to the block device.
 
-When bdev_allow_write_mounted is false, direct writes to a mounted
-block device are blocked via bdev_writes_blocked(). However,
-LOOP_SET_STATUS{64} bypasses this protection because it modifies
-the loop configuration through an ioctl rather than opening the
-block device for writing.
+Increasing the size certainly does not do that.
 
-Fix this by checking bdev_writes_blocked() before allowing changes
-to lo_offset or lo_sizelimit. If the loop device has writes blocked
-(indicating a filesystem is mounted with write protection), return
--EBUSY. Other loop status fields that do not affect the visible
-data can still be changed while mounted.
+> Export bdev_writes_blocked() so it can be used from the loop driver.
 
-Export bdev_writes_blocked() so it can be used from the loop driver.
+I'm not sure exporting this is a good idea.  Besides the growing the
+device part above, if someone insist on changing the size, they could
+do this just fine with a remove block device, so prohibiting it locally
+just because we can seems odd.  And exporting a helper with obscure
+usage for a strange use case without documenting that is rarely a
+good idea.
 
-Suggested-by: Theodore Ts'o <tytso@mit.edu>
-Reported-by: syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=fb32afec111a7d61b939
-Tested-by: syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
----
- block/bdev.c           |  4 +++-
- drivers/block/loop.c   | 12 ++++++++++++
- include/linux/blkdev.h |  1 +
- 3 files changed, 16 insertions(+), 1 deletion(-)
+> -static bool bdev_writes_blocked(struct block_device *bdev)
+> +bool bdev_writes_blocked(struct block_device *bdev)
+>  {
+>  	return bdev->bd_writers < 0;
+>  }
+> +EXPORT_SYMBOL_GPL(bdev_writes_blocked);
+> +
+>  
+>  static void bdev_block_writes(struct block_device *bdev)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index ed022f8c48c7..96520fac7b2f 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -860,10 +860,12 @@ void blkdev_put_no_open(struct block_device *bdev)
- 	put_device(&bdev->bd_device);
- }
- 
--static bool bdev_writes_blocked(struct block_device *bdev)
-+bool bdev_writes_blocked(struct block_device *bdev)
- {
- 	return bdev->bd_writers < 0;
- }
-+EXPORT_SYMBOL_GPL(bdev_writes_blocked);
-+
- 
- static void bdev_block_writes(struct block_device *bdev)
- {
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0000913f7efc..3f3a29abad1f 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1239,6 +1239,18 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 		goto out_unlock;
- 	}
- 
-+	/*
-+	 * Changing lo_offset or lo_sizelimit on a mounted device is
-+	 * equivalent to modifying the block device contents, block
-+	 * this if writes are blocked on the device.
-+	 */
-+	if ((lo->lo_offset != info->lo_offset ||
-+	     lo->lo_sizelimit != info->lo_sizelimit) &&
-+	    bdev_writes_blocked(lo->lo_device)) {
-+		err = -EBUSY;
-+		goto out_unlock;
-+	}
-+
- 	if (lo->lo_offset != info->lo_offset ||
- 	    lo->lo_sizelimit != info->lo_sizelimit) {
- 		size_changed = true;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d463b9b5a0a5..6b908e9dd035 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -820,6 +820,7 @@ static inline bool bdev_read_only(struct block_device *bdev)
- 	return bdev_test_flag(bdev, BD_READ_ONLY) || get_disk_ro(bdev->bd_disk);
- }
- 
-+bool bdev_writes_blocked(struct block_device *bdev);
- bool set_capacity_and_notify(struct gendisk *disk, sector_t size);
- void disk_force_media_change(struct gendisk *disk);
- void bdev_mark_dead(struct block_device *bdev, bool surprise);
--- 
-2.43.0
+... and if we were to make it public it should be inline, and in a
+separate patch.
+
+And if not this would still add a spurious empty line.
 
