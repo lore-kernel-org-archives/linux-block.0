@@ -1,163 +1,154 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8F53B4E95
-	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 10:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080F23BED7D
+	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 11:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774866565; cv=none; b=RSS/zCs6SA/CCzYJKIGzkuM7r17hb2Thq/8/VOX1mZtsBneCNRgNFtHyhSxI05H7tvjv6nm+De1P2pXQbJM6GsVqBJnP+P7cf8tLT9uoidwcSTif0IK6ADZ0bkVtZ4Qxb6hyvPrAfk5cWoz8hMgIw6ctm1jbrhyXPsFIIqnlxt4=
+	t=1774868642; cv=none; b=Y5VXKRu+jO0dqES51azb8h4fGHOVf9SCW8jKPqKZUhjVQzOo3lFRi+dSpDBW4xyL+MnAFbQWDVL4Me9fD41mJkKO8CfTCxKpSchH1LdoISDznIvYySaW7rgY5lZi5XpaRgKUzrC8lBa53v1bKfd/a3Pkws6T3aAqdMwESQtwEVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774866565; c=relaxed/simple;
-	bh=27DAYMsHiRQ2JXYdySFB2ZLgIzc5ho+XCQIZYVHeUQc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q/n+W8vHb+lfrPuI/8NnWyU42fYsbg1CeFnK7Zy7TOjyL9q57kVOiJC1/df1minkuVHXMuO4VAb41JoyOJDabbjmpShgCN2M0jw4nCnDsXViUFkD4ewi495P01URlMjdeGkYNtJEkS/Zd1rwHkJBl7GIYJwoeBqFlrz+ZIQGck0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=exUIAZwA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1774868642; c=relaxed/simple;
+	bh=0lqwVC1HIgt2opSItuicncR4ft5/y7a61Vfkp9tZ0qE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jKsCwMfVn7KUcp51i/5hMQtX6JcDlCi2velwS3crLWj/Gfmj6iAsOPFI5TUF6d436+eBSzTtCha66k4Xqey9OoDHuJlqsbdxTLINKsRV4G+uFBkEYlLK1CerdPvCXE5Ktl/a9q7XxkkA3WCYmk7GcBfDjp13yqmlAajNkz951kE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MTTDdEdM; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="exUIAZwA"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62TMSeYp523647;
-	Mon, 30 Mar 2026 10:23:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=lmFm0m
-	WZcQ9fLesy2hkNR7RPQmBNWWBxil232QQpgnc=; b=exUIAZwA+AE6dgPAMCHjYQ
-	bKS26ocLUtTnq+KvjBZW3DfMIfB2nhzKD4bm/eEaXcNq5D82O3f6POGL0Xo8hSZn
-	vcg/XvWYg0LDK+k0hdAKiQcxnNHEnSSOVWAbQ6nb0AIGRwp4XBR98hyN5z7F6iGw
-	l8tbPKfwf34wC8aMAPMGNWR7rlA1PG6g/+8URziCYcPPQAKfog6ObRXGcHbbxahC
-	moA6NF8/MsTzer58wUbH05u66v+FBcqJk6CvygnYYqg9gJohWEUBAmXxEjRL0Llp
-	UpobyLKt0tde9vqQdGbY3Bco5F3WGTkMnI8C1QMlXJjguwkyycXm0Fnfindpm10g
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d66g1pbae-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Mar 2026 10:23:37 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62U5rZAQ013919;
-	Mon, 30 Mar 2026 10:23:36 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d6ttkcb67-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Mar 2026 10:23:36 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62UANZ0657344460
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Mar 2026 10:23:35 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 52C5C5805A;
-	Mon, 30 Mar 2026 10:23:35 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E92E358056;
-	Mon, 30 Mar 2026 10:23:31 +0000 (GMT)
-Received: from [9.123.2.203] (unknown [9.123.2.203])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Mar 2026 10:23:31 +0000 (GMT)
-Message-ID: <b9cbbd2b-4c2a-497a-84f8-f1bda0e7c40f@linux.ibm.com>
-Date: Mon, 30 Mar 2026 15:53:30 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MTTDdEdM"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-486fb439299so39494085e9.0
+        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 04:03:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774868634; x=1775473434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vbB7+wEg8oN0RjFk4pVX0frZsh3Ewm3r7Nox/AIsRDk=;
+        b=MTTDdEdMv5aDGwFGAEPaIxVPBfjE/Qkd9xjuoX1KF/e7RKSOWk4v0YyooAxzMopvY/
+         ofZVdspSpk3OGAx8TXbIKkDDc1bzs3b16a0z96azeFsyMZ6gmLsGalKzASWP2zjUpEda
+         ZwXBa4lXUm0QIyFOC3UJXr6JT4Z9wALQQN3wsIPuXP6fctJ8R/veuxdaB/xHbsfKE7M/
+         2TqdElkYuLFYOuCjnJxj3DxI6gBKR4HtvcwPxvirykecJRA7kYjc11v+anbhesfGAKYK
+         5Ms028FLzKW6Mki5uoHqMf1UHa7GwoGNx2KG2SZK4A5IVxH6+pFNYP5IcQBYnjMBSlFG
+         tPIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774868634; x=1775473434;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vbB7+wEg8oN0RjFk4pVX0frZsh3Ewm3r7Nox/AIsRDk=;
+        b=cUgYHxWMg/gEeWTblidham/X2iICIKEk5e4rM1u7yTCd1Jp3dffGoRI9XHBFVk5NML
+         /Lz+KEoyZq2bHzlCPpJSjvB6fYO8TCX8Vu6ZmWq7VdVTSAH4l8t+DoD+wXA146/siFD2
+         /RkSOSH6QJeltB69i1aW721ptWUHXUT/7ej9c7nrL41cagfpxYeBZL6+GajBDEZyZAsE
+         qG64fmun82uJypP+G+THoxzm6FLCaJ/04nHeyp8fQxkzt4O1a6qR0jjiIPdg4v/SDTaJ
+         aPvGyEFb0aVL+ASIFWEwA6oUH2SnDaSNinCi6BrYxLXAyDo2Q64N1bHw+kxtuzQi7We4
+         8nag==
+X-Gm-Message-State: AOJu0Yyng417HchvjxKiBYta7R/LY0xPq8JoyW+i/ggCzSLHvSe0adQi
+	GVrRyUEruu8bbQu/T+eGszr9h1VzVPALixNeA07kx8/foh+PuDFo36uAfEkqpw==
+X-Gm-Gg: ATEYQzzhDYKqncgF6Nvj6ujr9GlzLXIjMwTIMRtg/NhUkHpLgxdogg889+vL3h5OMXP
+	2GklvkpxlrovpdDmW3aD0xvCL4d58E+qXT0qJUYKjwfaEUrETkxkFULTKE8mQb7QbbwYlynCeBf
+	xEwtOHcID8+MBwzE4vb/qOW9oDtChbgYpv1WZFxHSpiX0rtrKY4nQICpnA5YmCdj29uUys+lAu1
+	zqzIR+yEGHe2OreILRBS5y88dow09dX98rwrsea+s1WriV6SOhwpBj6NGMwu4PAGjyMCFXg40pV
+	KkLBfwBfdsdmUITCuE3JWMnEnqKaPeJF49mn0+KIogqWWKkO3EeOkA6USRJayGRxiaNWDIHyRte
+	t5evMpFgRS7Ne9j4I0LnPed6LH6c7YuSRXd/QV9mrCyqOk0N+RV5Gz+lm/rcPnOs75pDW8J4TDZ
+	ogBBgF1Qtq0y365sAAlLZJd2L2QglWEDTQsI1eLe4s6gxnpagbisp0ytqqlcF5sPufmHT+7PAzC
+	pFvTD5+GrJcaOfJstptHf8Cats/KG7GLdilwX2brkiFrd+sHSbckSbyvNJJZNFA0p6b5VvxliNT
+	LkS3mcKPkEzb9Q/wd/Yhxo7/yZBSwow=
+X-Received: by 2002:a05:600d:e:b0:485:5812:bb9e with SMTP id 5b1f17b1804b1-48727d31801mr178115695e9.0.1774868634168;
+        Mon, 30 Mar 2026 04:03:54 -0700 (PDT)
+Received: from particle-0df3-d360 (2a02-1810-950a-eb00-f9cf-2393-cb7f-6fd9.ip6.access.telenet.be. [2a02:1810:950a:eb00:f9cf:2393:cb7f:6fd9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48725d9bca0sm79067425e9.2.2026.03.30.04.03.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 04:03:53 -0700 (PDT)
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+X-Google-Original-From: Daan De Meyer <daan@amutable.com>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	brauner@kernel.org,
+	Daan De Meyer <daan@amutable.com>
+Subject: [PATCH v2] loop: fix partition scan race between udev and loop_reread_partitions()
+Date: Mon, 30 Mar 2026 11:03:10 +0000
+Message-ID: <20260330110310.692144-1-daan@amutable.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260330081819.652890-1-daan@amutable.com>
+References: <20260330081819.652890-1-daan@amutable.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 20/26] null_blk: Enable lock context analysis
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Keith Busch <kbusch@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Kees Cook
- <kees@kernel.org>, Genjian Zhang <zhanggenjian@kylinos.cn>
-References: <20260325214518.2854494-1-bvanassche@acm.org>
- <20260325214518.2854494-21-bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20260325214518.2854494-21-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Fdo6BZ+6 c=1 sm=1 tr=0 ts=69ca4f29 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=N54-gffFAAAA:8
- a=3x_4u_fpsufModc6hdkA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: HvKnIXfIcU2C3V_C9bbHSVcvOsvPxm7g
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMwMDA4MSBTYWx0ZWRfX03z7Qf+C/SwR
- fdquvR8wSNMoJa/w4tuCYCOggdPm6dBP2tcDq+78/vhsofCRnonfsDL884sFI+VBS1ExSHTxrpW
- LDesBzw+gxFsm1hF9SdyG2WQtKZgWRra2HXw36kO/SZlS5luVSqcv79ZJGolNTK1+p4BIAcGY9d
- ovl+iv0aOIg7f+UWLFDvYmVvCb4WdFFBrf1cs21mJ8ktDeBXoMX6MHHp85G1eAR7LikgoxGDKsz
- tfx/CSsC+p7iSkq6VN8HjsYb/zw1SE/H7hZEprI4YnC0Fy+Y44uN8AGXCHqQGoCYZq5lPnX3zrm
- LBZznG04gGnwQguy15yR7P1LbMrdGnv5hjOJ3+SEBNXJrp9adSdXzi91L+7j76crxSXmm7P90QA
- iLP+PjM3W/4c1S08eAMEjwwpqpNVW0Vh9WVxvEXSqVD5EVuBYYeCOTnPeHAcq0MVI63LgkpWLRc
- URCZ0gmDSTmxwpHobjA==
-X-Proofpoint-GUID: HvKnIXfIcU2C3V_C9bbHSVcvOsvPxm7g
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-29_05,2026-03-28_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1011 bulkscore=0 suspectscore=0 priorityscore=1501
- adultscore=0 malwarescore=0 phishscore=0 spamscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603300081
+Content-Transfer-Encoding: 8bit
 
-On 3/26/26 3:15 AM, Bart Van Assche wrote:
-> Convert __releases() __acquires() into __must_hold(). Add __must_hold()
-> annotations where these are missing. Annotate two functions that use
-> conditional locking with __no_context_analysis. Enable lock context
-> analysis in the Makefile.
-> 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/block/null_blk/Makefile | 2 ++
->   drivers/block/null_blk/main.c   | 7 +++++--
->   drivers/block/null_blk/zoned.c  | 2 ++
->   3 files changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/Makefile b/drivers/block/null_blk/Makefile
-> index 84c36e512ab8..282b0d51a477 100644
-> --- a/drivers/block/null_blk/Makefile
-> +++ b/drivers/block/null_blk/Makefile
-> @@ -1,5 +1,7 @@
->   # SPDX-License-Identifier: GPL-2.0
->   
-> +CONTEXT_ANALYSIS := y
-> +
->   # needed for trace events
->   ccflags-y			+= -I$(src)
->   
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index f8c0fd57e041..677ac829ef80 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1004,8 +1004,7 @@ static struct nullb_page *null_lookup_page(struct nullb *nullb,
->   
->   static struct nullb_page *null_insert_page(struct nullb *nullb,
->   					   sector_t sector, bool ignore_cache)
-> -	__releases(&nullb->lock)
-> -	__acquires(&nullb->lock)
-> +	__must_hold(&nullb->lock)
+When LOOP_CONFIGURE is called with LO_FLAGS_PARTSCAN, the following
+sequence occurs:
 
-This function temporarily drops the &nullb->lock and requires it.
-So why do we need to replace __releases/__acquires with __must_hold?
-This is not clear.
+  1. disk_force_media_change() sets GD_NEED_PART_SCAN
+  2. Uevent suppression is lifted and a KOBJ_CHANGE uevent is sent
+  3. loop_global_unlock() releases the lock
+  4. loop_reread_partitions() calls bdev_disk_changed() to scan
 
-[...]
+There is a race between steps 2 and 4: when udev receives the uevent
+and opens the device before loop_reread_partitions() runs,
+blkdev_get_whole() in bdev.c sees GD_NEED_PART_SCAN set and calls
+bdev_disk_changed() for a first scan. Then loop_reread_partitions()
+does a second scan. The open_mutex serializes these two scans, but
+does not prevent both from running.
 
-> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-> index 384bdce6a9b7..a7f94e76034f 100644
-> --- a/drivers/block/null_blk/zoned.c
-> +++ b/drivers/block/null_blk/zoned.c
-> @@ -32,6 +32,7 @@ static inline void null_init_zone_lock(struct nullb_device *dev,
->   
->   static inline void null_lock_zone(struct nullb_device *dev,
->   				  struct nullb_zone *zone)
-> +	__no_context_analysis /* conditional locking */
+The second scan in bdev_disk_changed() drops all partition devices
+from the first scan (via blk_drop_partitions()) before re-adding
+them, causing partition block devices to briefly disappear. This
+breaks any systemd unit with BindsTo= on the partition device: systemd
+observes the device going dead, fails the dependent units, and does
+not retry them when the device reappears.
 
-I see we already have __context_unsafe(comment) macro defined
-which may be used instead for inline comment.
+Fix this by clearing GD_NEED_PART_SCAN before sending the uevent when
+LO_FLAGS_PARTSCAN is set. Since loop_reread_partitions() will perform
+the authoritative partition scan, the lazy on-open scan triggered by
+GD_NEED_PART_SCAN is redundant. With the flag cleared, udev opening
+the device no longer triggers a scan in blkdev_get_whole(), and only
+the single explicit scan from loop_reread_partitions() runs.
 
-Thanks,
---Nilay
+When LO_FLAGS_PARTSCAN is not set, GD_NEED_PART_SCAN is left as-is
+since loop_reread_partitions() will not be called and GD_SUPPRESS_PART_SCAN
+remains set, preventing the lazy scan path from triggering anyway.
+
+Fixes: 9f65c489b68d ("loop: raise media_change event")
+Signed-off-by: Daan De Meyer <daan@amutable.com>
+---
+ drivers/block/loop.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0000913f7efc..4e87d65c45e0 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1085,9 +1085,25 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
+ 	if (part_shift)
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+-	if (partscan)
++	if (partscan) {
+ 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+ 
++		/*
++		 * disk_force_media_change() above sets GD_NEED_PART_SCAN to
++		 * trigger a partition scan on the next device open. However,
++		 * when LO_FLAGS_PARTSCAN is set, loop_reread_partitions() below
++		 * will do the scan explicitly. If we leave GD_NEED_PART_SCAN
++		 * set, the uevent we're about to send causes udev to open the
++		 * device, which triggers blkdev_get_whole() to scan first, and
++		 * then loop_reread_partitions() scans again. The second scan
++		 * drops all partitions from the first scan before re-adding
++		 * them, causing partition devices to briefly disappear. Clear
++		 * the flag to prevent this since loop_reread_partitions() will
++		 * handle the scan.
++		 */
++		clear_bit(GD_NEED_PART_SCAN, &lo->lo_disk->state);
++	}
++
+ 	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+ 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
+ 
+-- 
+2.53.0
 
