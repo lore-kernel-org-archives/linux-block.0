@@ -1,105 +1,162 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0363B6BE5
-	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 13:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774877908; cv=none; b=GZr9v9nye6j3HnQkMZD+41bIKBGG9ArPXx/bSIsaNSf1MG2cWMpqc/DDE5TOzTwPGP4mui8PVebv7ibqUt6UMaoxtaToOmkVClklCyOPD2V1iClt77QlxnGW9E/1yRaCtVs/zbW8raUuXr+0hPoIJ9PhFS6lN6E4kGQVdv6lsYg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774877908; c=relaxed/simple;
-	bh=5I3685CjXQuqK5dhrwDdVKDMDNbm/PLucafT3sV7jOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VHh8OdKgB7bB7Vho7b0XYZhUkrSI3k2HpqnzTDNlSFwSB+jt49wuVKPqx5BLuUexnxBKhcGfh/qmsRhld+v0Aql4eTOJXsX9f23gKVkU7W/ekupdlH54AHrzXxajv4CtY7JgsSCDgUVQqVhujT8QM2JdnQ1GkVwSWXdO+A2gww4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=Q7rK8ICm; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DA130C601
+	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 14:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774881249; cv=pass; b=S9x9/2UjGko+S9SHn+nDHbF0DtE99CxwowIcs3Toh13bdIVGUWwEsCTlw2EloQnYqRKCt8GqVTEZx7T/qfGLo9XFJ8ES7iDB8fWStsMJcrRTIZXb4QL6rVAtsF0nSpichXp+2thcMjm28XJqvCj6cOpm9rq53NJybwqOY5Px8nI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774881249; c=relaxed/simple;
+	bh=I79gy/L1iUtPeR9Sx5svfxAJiYGA/IeaDqYZS24HXHI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R0NcSgSNC0s5cVqpDAScvaqqWZvPvseoqrnBVbjNpLgR7DE/DAPhlYgd3dQj+6roTKmXXIgCWKnT8qsyisfG2MFSkRwmJik/N6puaXKJBcC9X1rexHcXdCPpTKWHjuYdTPTqzwXDdyO51DKu0+/mLbdqpDrxrQXsJyH2wtPioT0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W2wieVhn; arc=pass smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="Q7rK8ICm"
-Received: from macsyma.thunk.org ([104.135.218.80])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 62UDc0YL004731
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Mar 2026 09:38:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1774877883; bh=oKoVb8nuXmkEGj7x7bnWyG1ytu/H133rG6H1d3IV8Kk=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=Q7rK8ICm/M0dEs0535BIJaLTn8OO/msn808vNCYXkPSDGt6KuVU0ndCoouD5pgRpw
-	 o6kiSv096M7XzumF2IAsf5R/xHh2QHJ73Ni65ovHS63DEhwSQpG6S3JH+hKNwwNuDI
-	 P2j8OKL+1U5MGGoU6CRINdFIuKI0caeXPI146TISAtmqzMMR04zb/D+rNHzkcBgQ/R
-	 FJ7hEw5uK35ny4RP+YuGi8jT/kT+eDeYFyOWL8v7Y/4PquBvjSAMeeas6nGpu11/bC
-	 oWDtGm9lrTiUTfufvYzwIKlwiI6SqQgRJZiWnbbw0XwnyXZD0aulW4GQE1TxWpb+gm
-	 /z7DKv+QeDFMg==
-Received: by macsyma.thunk.org (Postfix, from userid 15806)
-	id 4948F60035F7; Mon, 30 Mar 2026 09:38:00 -0400 (EDT)
-Date: Mon, 30 Mar 2026 09:38:00 -0400
-From: "Theodore Tso" <tytso@mit.edu>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Deepanshu Kartikey <kartikey406@gmail.com>, axboe@kernel.dk,
-        dvyukov@google.com, adilger.kernel@dilger.ca,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ext4@vger.kernel.org,
-        syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
-Subject: Re: [PATCH] loop: block loop reconfiguration of offset/sizelimit on
- mounted device
-Message-ID: <20260330133800.GC22278@macsyma.local>
-References: <20260330044334.373480-1-kartikey406@gmail.com>
- <acoQBLwdc1PqIb0m@infradead.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W2wieVhn"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64ee82e853cso4523298d50.3
+        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 07:34:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774881247; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bHp9KLmsB5BZbsBn7kbH/0JuUgSKI3LrBgPLKl/wSTH9LNGvCSb2ENmh2bXVW7o9ro
+         uZW9SLAwKwwm2mcjc1DVAFsYgPCHtXRWGBIJO88soXp6y9/DxsUHjFHrAXubsEqY466m
+         FYZrqVWa6A5sxy2lY9yQ4zud4/sa0eJ2HnJcjj7hxEusuuF3esZtoHpnUa6lGUiPUNz+
+         5mOfQ9+9rvA+vg+tTokc5CFEBvoHL0rfmCO0zDuYvgyWhN3YJt31xMN9pDhYNnGL00Gt
+         suPb0wZ2HybGl04jRtiUp+yjOl02CpETZYb6lbOcwS12HVyW4ZSlX4gCg38TbPrXSN/a
+         2mXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IIA8D0ff4y+v3OdWEO6D1Oc2rbEBX2dD2f4Uu2Jsj7Y=;
+        fh=ZbXEiKgKSoN4qaI9q2oPXXSKGHVeQnv3T+UHb6u/fbs=;
+        b=A9rAP5CgKyTj8cdTElLrBvp1yEwwHKvv9RkaA0Id9z6K/u7OrIRDDJ+1FXobbaKjAM
+         Q1QJQYXNRy6XxXPURM/qurxx4ZQ6jPSIpzk5vn4JiRhSAPGVUN5ESd+RoMRMWp0cEZF7
+         0RDHFTAX7UUgKwzY3+Ozi9m0heJworVWqfzqqrrUiNTy5CQea1zA1DlPegzUi6tmwyHR
+         1X+yjn7exKz9DGNSibGuu2g3v6nFBE9S/t7SPTdBnB/+pNCWpZD8rlwCXOQ+sSsEabVH
+         6ObGQSpq8c+zLIYnU88kciXjuH3UEr6zQHl4G4IGpchEb8Ox0g7p5qrMU9L58ki3jU/b
+         Ri/g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774881247; x=1775486047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IIA8D0ff4y+v3OdWEO6D1Oc2rbEBX2dD2f4Uu2Jsj7Y=;
+        b=W2wieVhn5xWfAUuy6TNnJWCZQTGIqG2iw+if9Q7IaeK2CX2lPDFAMNyUvfY1Wt72xp
+         SCMR0tYq008xOM4AOyAVHMVkHFUJfGHuNyybsplFXTpKGCz6ZbwoFxFsK6QpCnIXvPjF
+         SflsMcKnH3DrOoZLDBfv+KOwSACmJXxnSTUKA4qLp4+zaism0boLIbWjjjfPqVZmJtnu
+         RSGHRHw70qXvToO77oc3Hln4iFoio8VKQREALJ/e+cwnN2NqATTq2Yl1wiEILQ+nj7vd
+         lNRbzZkmyZ/0xTWfuyIpO+rKj2J7u2aJaSkT/hBh6AfzGGYcfGeP/+OlcFOQoyPMSaHI
+         3b6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774881247; x=1775486047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IIA8D0ff4y+v3OdWEO6D1Oc2rbEBX2dD2f4Uu2Jsj7Y=;
+        b=iViqv6zensZpEaLA06eYcQof0LkrV7j3E+UxaR0LWKXFv0gRZT6Id5slaOnt4FybsF
+         hn89V0QIE9hk4wSPYWDbE/JEcAlxN/GwTXBc8VGrnYCILix2nV/qpV2Cy9jIWYknaQnM
+         jYWShuy581YDePUxJZClZOS1aMNir9i/MWcICaIrXJFinOTUTL+XIweyMVQLV00F4usm
+         H4PNDECzrlpN3NbXxav+fjmKeC/+GIfGcApb0S/ldo4GH6E2o25mmGvAyd0M+QTA7SfG
+         3sgDK1FfmSsHAHCV1kUuTUug6j2yuU0LDjZxmIDUK51YWd/jzUjYFGS9P4pyZAGqz8gY
+         mOjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPo4VN0ri8zsEJePUt8fSVpr62Eix6y8cLrwIzlOzkFCZufG+hePyWdwJ5gg9QE0+olzoF6jj3KEsbHQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9VHC25bMG5H7jfobR6L3EhIB7+OXOjbZyCNuVctZ4IuhyIvDQ
+	9t9dK4OG307wdT1VbRh49wh5wmLHZZctBKNq4ByOgCXVSnYwPoxNhz/jw9mAClr7Khx5UQAmWX7
+	b4UDSLixdpjOO4lbgvmGRGSHCSGksCxs=
+X-Gm-Gg: ATEYQzwz/BhrB+TAlfMwkNLe0aP7nQNWH0xKp7cVccQsdn7fSGhfxi3CoHxRGEB7Ufv
+	0KGnCeU2rHtliUtfylooVdsMGeJBUhWs6fo8MeWXk+nBRLgaDO/WTaCqwfdwIil3KFUqeXXYbpP
+	oxrz9wdRCR+99pbdY60iLiS4g6rhXINDms7ZfPPI1fiRy5/7EA6V8fMNSPrD3i8jvuYHiBb2fwk
+	hJxiQ4lHVkIfFIyeb4BkT8aqM6Gm9GkpKY2g9MGfC84CWtAg1uyKHfeM8JtRuzkZvVk2oDqttGv
+	rjsj6vOqTAwSt60xwxYkD5sUPq5A+pR5DO38hKRCmyniXPhE74phXiymLIWfyLPrkG7Hu/fH
+X-Received: by 2002:a05:690c:10c:b0:79c:3e94:808f with SMTP id
+ 00721157ae682-79c3e948553mr99440527b3.3.1774881247188; Mon, 30 Mar 2026
+ 07:34:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acoQBLwdc1PqIb0m@infradead.org>
+References: <20260330044334.373480-1-kartikey406@gmail.com>
+ <acoQBLwdc1PqIb0m@infradead.org> <20260330133800.GC22278@macsyma.local>
+In-Reply-To: <20260330133800.GC22278@macsyma.local>
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+Date: Mon, 30 Mar 2026 20:03:55 +0530
+X-Gm-Features: AQROBzC5DFrpcRbDJwyotZPLQ_bBOfvI5OeF6bTQGNecm3qxL0J9raOMmDCZ4Nk
+Message-ID: <CADhLXY6Cu+O_jeL9xxORtLg-LU6pdBxFb29yhS=d2rTtgbA2tw@mail.gmail.com>
+Subject: Re: [PATCH] loop: block loop reconfiguration of offset/sizelimit on
+ mounted device
+To: Theodore Tso <tytso@mit.edu>
+Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk, dvyukov@google.com, 
+	adilger.kernel@dilger.ca, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 29, 2026 at 10:54:12PM -0700, Christoph Hellwig wrote:
-> On Mon, Mar 30, 2026 at 10:13:34AM +0530, Deepanshu Kartikey wrote:
-> > LOOP_SET_STATUS{64} allows changing lo_offset and lo_sizelimit while
-> > a filesystem is mounted on the loop device. This effectively mutates
-> > the data visible to the mounted filesystem, which is equivalent to
-> > writing directly to the block device.
-> 
-> Increasing the size certainly does not do that.
-> 
-> > Export bdev_writes_blocked() so it can be used from the loop driver.
-> 
-> I'm not sure exporting this is a good idea.  Besides the growing the
-> device part above, if someone insist on changing the size, they could
-> do this just fine with a remove block device, so prohibiting it locally
-> just because we can seems odd.  And exporting a helper with obscure
-> usage for a strange use case without documenting that is rarely a
-> good idea.
+On Mon, Mar 30, 2026 at 7:08=E2=80=AFPM Theodore Tso <tytso@mit.edu> wrote:
+>
+> The patch was missing the...
+>
+>   #ifndef CONFIG_BLK_DEV_WRITE_MOUNTED)
+>
+> ... in loop.c which was in my original sketch of a patch which I sent
+> to Deepanshu.
+>
+> The intent was to suppress Syzkaller noise.  Inherent in my assumption
+> was that changing either lo_offset or lo_sizelimit parameter was going
+> to mutate the loop device when it was mounted, which was the intent of
+> !CONFIG_BLK_DEV_WRITE_MOUNTED.  I also assumed that at least for now,
+> the only user of !CONFIG_BLK_DEV_WRITE_MOUNTED was syzkaller, since
+> there are file systems (in particular ext4) that are commonly in use
+> whose userspace utilities fundamentally assume that you can write to
+> the block device.  Even after we promulgate the tune2fs changes to use
+> the new EXT4_IOC_SET_TUNE_SB_PARAM ioctl and we can assume that it is
+> common use in deployed kernels, some grub operations still assume they
+> can modify the block device where the second-stage grub bootloader is
+> located.
+>
+> In the long term, when ext4 can start assuming that we can suppress
+> writes to the block device (and we find a solution to the grub issue),
+> we'll probably want to have a way to suppress write access to block
+> devices on a per-super basis, without clearing the Kconfig
+> CONFIG_BLK_DEV_WRITE_MOUNTED.   But that's a problem for another day...
+>
+> Cheers,
+>
+>                                                 - Ted
 
-The patch was missing the...
 
-  #ifndef CONFIG_BLK_DEV_WRITE_MOUNTED)
+Hi Ted, Christoph,
 
-... in loop.c which was in my original sketch of a patch which I sent
-to Deepanshu.
+Thank you both for the feedback. Based on your suggestions, I'll
+submit a v2 with the following approach:
 
-The intent was to suppress Syzkaller noise.  Inherent in my assumption
-was that changing either lo_offset or lo_sizelimit parameter was going
-to mutate the loop device when it was mounted, which was the intent of
-!CONFIG_BLK_DEV_WRITE_MOUNTED.  I also assumed that at least for now,
-the only user of !CONFIG_BLK_DEV_WRITE_MOUNTED was syzkaller, since
-there are file systems (in particular ext4) that are commonly in use
-whose userspace utilities fundamentally assume that you can write to
-the block device.  Even after we promulgate the tune2fs changes to use
-the new EXT4_IOC_SET_TUNE_SB_PARAM ioctl and we can assume that it is
-common use in deployed kernels, some grub operations still assume they
-can modify the block device where the second-stage grub bootloader is
-located.
+- Use #ifndef CONFIG_BLK_DEV_WRITE_MOUNTED as Ted originally
+  intended, since this is meant to suppress syzkaller noise
+- Check bd_writers directly instead of exporting
+  bdev_writes_blocked(), addressing Christoph's concern
+- No changes to block/bdev.c or include/linux/blkdev.h, keeping
+  the patch minimal and limited to drivers/block/loop.c
 
-In the long term, when ext4 can start assuming that we can suppress
-writes to the block device (and we find a solution to the grub issue),
-we'll probably want to have a way to suppress write access to block
-devices on a per-super basis, without clearing the Kconfig 
-CONFIG_BLK_DEV_WRITE_MOUNTED.   But that's a problem for another day...
+The check would be:
 
-Cheers,
+#ifndef CONFIG_BLK_DEV_WRITE_MOUNTED
+if ((lo->lo_offset !=3D info->lo_offset ||
+     lo->lo_sizelimit !=3D info->lo_sizelimit) &&
+    lo->lo_device->bd_writers < 0) {
+err =3D -EBUSY;
+goto out_unlock;
+}
+#endif
 
-						- Ted
+Regarding Christoph's point about increasing lo_sizelimit being
+safe - should I narrow the check to only block shrinking and
+offset changes?
+
+Thanks,
+Deepanshu
