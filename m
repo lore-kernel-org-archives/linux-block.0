@@ -1,301 +1,207 @@
-Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCE331CA4E
-	for <linux-block@vger.kernel.org>; Sun, 29 Mar 2026 15:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA3319C546
+	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 02:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774798883; cv=none; b=BY3G8q1os9i0t/1EQKxuGrfmj2bYWn57yOKi0vn1du6qYRF6xsYh8SNBUSSSACCv3T8Q9HVzvy3eCwG2MZVUJDs1icxPcR3j/SDHM1rNTuQOABj+iTk8LeOJfgCHKYavo2pjOpU69nH5y39Q+5HyHQYoOR///x8G8TTMO/J8cHE=
+	t=1774837445; cv=none; b=H502s8O5+Sbg2HMTf0qbS5TJfCQLN+mN/WFbfZgQ6GWQ2XohteTTtsHLK4qpKsNUSsfLKGz5Lf35MPAueYrerRF2yhOU0fZl8Ua/QAxL8KdXMs5X5k/kO2u0Ued2SGIUkNo+u5nY+xQPR0OQ3UVbAh0jQ1H5rHDvqyHddnJgre0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774798883; c=relaxed/simple;
-	bh=0UxYwmWrWT4FOWXddN0QIWyeclk0j70twaLLE+szpko=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Da6qPl+ipFoH6Z3R1LF6rUw0imLSUCyvAiuhW7S+AxjmCmTkbdaJsXi4GYGQ/IftShUQCMPgFcaMctZPFFG2/Nxni74g2AKSF/a6S+D1h7UhGw4fMEgUK2pw+7ia3BQgdvj32dMSTzSTVZVWSm9D+17vLtQm6edAMtptMF+URfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cxEDUx9V; arc=none smtp.client-ip=209.85.215.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774837445; c=relaxed/simple;
+	bh=v4sgZ+v/+e3HN0H4/Zo7HV8wnFpnJQV0JXvuJcgrfAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=INiOVMwAtgLLGt2R3ko3BGLZA1Is06DxPREePubJ2Lb8Na6tw8U0nxH3wa74OCP1h+nH2DKgtrTZehBJ1HRI06S2SFk5OlV1mk6zNFcbr79NA/7AA1TUU8kwr1DAbIARo/wlIza2HE21VxA2RenN7fwbNfVkB6BG8hlZME3daPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WVJatYg3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxEDUx9V"
-Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-c741db5d610so1577718a12.3
-        for <linux-block@vger.kernel.org>; Sun, 29 Mar 2026 08:41:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774798881; x=1775403681; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cn2DYOVpo8bOTJ2a/G22aIN/JEjANtXiC08Q2WS+2PA=;
-        b=cxEDUx9V+kfwEh6ULc5CrdZBBKpsAQ1wo9uG5hXSJgb0h7aln75QK5L/ZRxKTzqNiu
-         STegWL3HGRgV43Oz2KVQxIUlM1WKUM7bebWHV9NqU2gzBYLjj08q7nwsbojPtkzp4vo2
-         wFJ0amYIF7QnfsJbxly3sVWF/FN9uuiWDT79TQK60KmsDB/ELfE5+rSNXJEASRUPE9z1
-         jlsN8+KpuH8J1bgEsaOSijBFun7JzeKhHDI0c4//Z9yWwJNYpqArIPdSnEnv7GOcWNd4
-         o15oNhEB21tfBVgS4G0wqwNWDdE7mK0wWaPt7/CjpCAIOcCPKtJ9Ellr1TukbZxfkZ/h
-         0k4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774798881; x=1775403681;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cn2DYOVpo8bOTJ2a/G22aIN/JEjANtXiC08Q2WS+2PA=;
-        b=qVioamqBeGXXoIR/pBWZcMWCURNgTtU6l5k1uvoP0iS+AM+g3GGInjDx9GPHEd1SWH
-         Ee7cs3avDr4UZVAntFzMVxkhMpZozHi06hAcdW2Y3mFABC93BTZGXoPAidEb/EyGb6YN
-         Bu4pLHMgtsO0kwmH4scS/OXTTuX9NYSKbpGyscJ0jii1P+y/zAxuQRVMsYQd4CidvPdb
-         TfaMwfeu+la7sIpFaCROBkcr8l+3LejpVYc1PtfzLKnMXg10+dtr/7AFNAlrXIKLcdXk
-         S/I+wTwsBuxZDCOdWNTvJp4rROHAefKI6ucxj4Tu5ulKs/GnUhg2LdkHZcAX5WMcrkwM
-         E3FA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJz/5JvqZDC5ZT5YCFgzTJCUdDaplXB2oSV6APX/HIpKRYxa0fvON/gCxYRLmSw8QdcZdoAOZe3Vt+KQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywpr3p4SofajBAbEJRTHpG8hszdTwEQrJ8/bQ1bCoJIVCXRPD4k
-	BUMGe0JAw4Ylac30U29yISlSntom7JshMAxpZtE9VPW2UwtQjhf31AGt
-X-Gm-Gg: ATEYQzxw/EhUB/+vvHIxvhirZJTu6UGp/l1Mc51lCxAqbi7wgy1JvfuQQBMOE7vXbr5
-	PsgR8+l5CLDkwCM7uT18fQkOP0CPTDJH1yUZFBRWGaQqCt6VyfaIJRLAr3u/R+Zpn+LK4Aaz1v2
-	+wGlD1PwuEnQNWavoDdyHMPM5SNcgXCZrUWv1iEVpKjHW2a9EUYOXFjfcJ+pwisi+8AV1Ue+I2/
-	Au866q9w+97tr2Hz1Jp/vlmjzqF4n+5T7RY1SDMCT3frn9NtATjHpAc8Tg3hEoRhzEYJ6rAsYKv
-	D5MZ9ytPT9RDtlYqOsJJgTOLMLaPPVzXsxUXM4jVL1Dcpq+uMil00LN8X5/NXUbiOLmTttLTqfq
-	2i+WeC1mpMLDFUCJgd0FoFFZ8Y7saY6cWa2Kqdes5FeKPiMxHV24OSNW1Kk37u1ESAs2fZiUU0i
-	zRedZB0bcpIEblxE+WN+RcnAwey6rxdXskJA==
-X-Received: by 2002:a05:6300:210c:b0:39b:d9f1:6cff with SMTP id adf61e73a8af0-39c87b6af38mr9436144637.47.1774798880807;
-        Sun, 29 Mar 2026 08:41:20 -0700 (PDT)
-Received: from archwsl.localdomain ([116.232.56.124])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76916cce42sm4111879a12.9.2026.03.29.08.41.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 08:41:20 -0700 (PDT)
-From: Jialin Wang <wjl.linux@gmail.com>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wjl.linux@gmail.com
-Subject: [PATCH v2] blk-iocost: fix busy_level reset when no IOs complete
-Date: Sun, 29 Mar 2026 15:41:12 +0000
-Message-ID: <20260329154112.526679-1-wjl.linux@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVJatYg3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774837443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wnvivTus6JIrHbSWvEQYMyY/rwWFDb3mZzzucQ2w4FY=;
+	b=WVJatYg364N2uiz7IJPh0OTtCgiqtk8CFHRdOpScIZ2RnWlqV7O7KFYs889zCYxsJrOLdt
+	OFjqCcvEpqzQ56X6B0C83u7QcktuzMELo/Ju86ZG0MpnKE9lvKVyOwokyLHbMUYutrFJev
+	XJQZE1aQVlBnJY9AJCxrnjn0251s2cw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-151-1SDvaFHNOXKI-O4YYwGwZA-1; Sun,
+ 29 Mar 2026 22:24:01 -0400
+X-MC-Unique: 1SDvaFHNOXKI-O4YYwGwZA-1
+X-Mimecast-MFC-AGG-ID: 1SDvaFHNOXKI-O4YYwGwZA_1774837439
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8E7EC180047F;
+	Mon, 30 Mar 2026 02:23:58 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.5])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A2C31955D84;
+	Mon, 30 Mar 2026 02:23:49 +0000 (UTC)
+Date: Mon, 30 Mar 2026 10:23:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Hans Holmberg <hans.holmberg@wdc.com>, Kees Cook <kees@kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v3 5/6] null_blk: Support configuring the maximum DMA
+ segment size
+Message-ID: <acnesO__-9NRkpgY@fedora>
+References: <20260327211349.2239633-1-bvanassche@acm.org>
+ <20260327211349.2239633-6-bvanassche@acm.org>
+ <c084beea-6c42-41f3-8f85-bf477ab0d893@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c084beea-6c42-41f3-8f85-bf477ab0d893@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-When a disk is saturated, it is common for no IOs to complete within a
-timer period. Currently, in this case, rq_wait_pct and missed_ppm are
-calculated as 0, the iocost incorrectly interprets this as meeting QoS
-targets and resets busy_level to 0.
+On Sun, Mar 29, 2026 at 06:00:31PM +0530, Nilay Shroff wrote:
+> On 3/28/26 2:43 AM, Bart Van Assche wrote:
+> > Add support for configuring the maximum DMA segment size. The maximum DMA
+> > segment size may be set to a value smaller than the virtual memory page
+> > size. Reject invalid max_segment_size values.
+> > 
+> > Since rq_for_each_segment() may yield bvecs larger than the maximum DMA
+> > segment size, add code in the rq_for_each_segment() loop that restricts
+> > the bvec length to the maximum DMA segment size.
+> > 
+> > Cc: Christoph Hellwig<hch@lst.de>
+> > Cc: Ming Lei<ming.lei@redhat.com>
+> > Cc: Damien Le Moal<damien.lemoal@opensource.wdc.com>
+> > Cc: Chaitanya Kulkarni<kch@nvidia.com>
+> > Signed-off-by: Bart Van Assche<bvanassche@acm.org>
+> > ---
+> >   drivers/block/null_blk/main.c     | 43 +++++++++++++++++++++++++++++++
+> >   drivers/block/null_blk/null_blk.h |  1 +
+> >   2 files changed, 44 insertions(+)
+> > 
+> > diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+> > index f8c0fd57e041..d5fbbc5d63ed 100644
+> > --- a/drivers/block/null_blk/main.c
+> > +++ b/drivers/block/null_blk/main.c
+> > @@ -169,6 +169,32 @@ static int g_max_sectors;
+> >   module_param_named(max_sectors, g_max_sectors, int, 0444);
+> >   MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sectors)");
+> > +static unsigned int g_max_segment_size = BLK_MAX_SEGMENT_SIZE;
+> > +
+> > +static int nullb_set_max_segment_size(const char *val,
+> > +				      const struct kernel_param *kp)
+> > +{
+> > +	int res;
+> > +
+> > +	res = kstrtouint(val, 0, &g_max_segment_size);
+> > +	if (res < 0)
+> > +		return res;
+> > +
+> > +	if (g_max_segment_size < BLK_MIN_SEGMENT_SIZE)
+> > +		return -EINVAL;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static const struct kernel_param_ops max_segment_size_ops = {
+> > +	.set = nullb_set_max_segment_size,
+> > +	.get = param_get_uint,
+> > +};
+> > +
+> > +module_param_cb(max_segment_size, &max_segment_size_ops, &g_max_segment_size,
+> > +		0444);
+> > +MODULE_PARM_DESC(max_segment_size, "Maximum size of a DMA segment in bytes");
+> > +
+> >   static unsigned int nr_devices = 1;
+> >   module_param(nr_devices, uint, 0444);
+> >   MODULE_PARM_DESC(nr_devices, "Number of devices to register");
+> > @@ -442,6 +468,14 @@ static int nullb_apply_poll_queues(struct nullb_device *dev,
+> >   	return ret;
+> >   }
+> > +static int nullb_apply_max_segment_size(struct nullb_device *dev,
+> > +					unsigned int max_segment_size)
+> > +{
+> > +	if (max_segment_size < BLK_MIN_SEGMENT_SIZE)
+> > +		return -EINVAL;
+> > +	return 0;
+> > +}
+> > +
+> >   NULLB_DEVICE_ATTR(size, ulong, NULL);
+> >   NULLB_DEVICE_ATTR(completion_nsec, ulong, NULL);
+> >   NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
+> > @@ -450,6 +484,7 @@ NULLB_DEVICE_ATTR(home_node, uint, NULL);
+> >   NULLB_DEVICE_ATTR(queue_mode, uint, NULL);
+> >   NULLB_DEVICE_ATTR(blocksize, uint, NULL);
+> >   NULLB_DEVICE_ATTR(max_sectors, uint, NULL);
+> > +NULLB_DEVICE_ATTR(max_segment_size, uint, nullb_apply_max_segment_size);
+> >   NULLB_DEVICE_ATTR(irqmode, uint, NULL);
+> >   NULLB_DEVICE_ATTR(hw_queue_depth, uint, NULL);
+> >   NULLB_DEVICE_ATTR(index, uint, NULL);
+> > @@ -608,6 +643,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
+> >   	&nullb_device_attr_index,
+> >   	&nullb_device_attr_irqmode,
+> >   	&nullb_device_attr_max_sectors,
+> > +	&nullb_device_attr_max_segment_size,
+> >   	&nullb_device_attr_mbps,
+> >   	&nullb_device_attr_memory_backed,
+> >   	&nullb_device_attr_no_sched,
+> > @@ -805,6 +841,7 @@ static struct nullb_device *null_alloc_dev(void)
+> >   	dev->queue_mode = g_queue_mode;
+> >   	dev->blocksize = g_bs;
+> >   	dev->max_sectors = g_max_sectors;
+> > +	dev->max_segment_size = g_max_segment_size;
+> >   	dev->irqmode = g_irqmode;
+> >   	dev->hw_queue_depth = g_hw_queue_depth;
+> >   	dev->blocking = g_blocking;
+> > @@ -1248,6 +1285,9 @@ static blk_status_t null_transfer(struct nullb *nullb, struct page *page,
+> >   	unsigned int valid_len = len;
+> >   	void *p;
+> > +	WARN_ONCE(len > dev->max_segment_size, "%u > %u\n", len,
+> > +		  dev->max_segment_size);
+> > +
+> >   	p = kmap_local_page(page) + off;
+> >   	if (!is_write) {
+> >   		if (dev->zoned) {
+> > @@ -1295,6 +1335,8 @@ static blk_status_t null_handle_data_transfer(struct nullb_cmd *cmd,
+> >   	spin_lock_irq(&nullb->lock);
+> >   	rq_for_each_segment(bvec, rq, iter) {
+> >   		len = bvec.bv_len;
+> > +		len = min(bvec.bv_len, nullb->dev->max_segment_size);
+> > +		bvec.bv_len = len;
+> >   		if (transferred_bytes + len > max_bytes)
+> >   			len = max_bytes - transferred_bytes;
+> >   		err = null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
+> 
+> 
+> IMO, since max_segment_size is now configurable, should we consider using
+> blk_rq_map_sg() instead of rq_for_each_segment()?
 
-This reset prevents busy_level from reaching the threshold (4) needed
-to reduce vrate. On certain cloud storage, such as Azure Premium SSD,
-we observed that iocost may fail to reduce vrate for tens of seconds
-during saturation, failing to mitigate noisy neighbor issues.
+blk_rq_map_sg() requires to allocate sgl, actually it can be done in
+request sg iterator way:
 
-Fix this by tracking the number of IO completions (nr_done) in a period.
-If nr_done is 0, we adjust the logic:
+	blk_rq_map_iter_init();
+	while (blk_map_iter_next(rq, &iter, &vec)) {
+		consume each segment;
+	}
 
-* If there are lagging IOs, the saturation status is unknown, so we try
-  to keep busy_level unchanged. To avoid drastic vrate oscillations, we
-  clamp it between -4 and 4.
-* If there are shortages but no lagging IOs, the vrate might be too low
-  to issue any IOs. We should allow vrate to increase but not decrease.
-* Otherwise, reset busy_level to 0.
+Just the two helpers needs to be exported.
 
-Note that when nr_done is 0 and nr_lagging is 0, the adjustment logic
-is nearly identical to the "QoS targets are being met with >25% margin"
-state, which minimizes the risk of regressions.
 
-The issue is consistently reproducible on Azure Standard_D8as_v5 (Dasv5)
-VMs with 512GB Premium SSD (P20) using the script below. It was not
-observed on GCP n2d VMs (100G pd-ssd and 1.5T local-ssd), and no
-regressions were found with this patch. In this script, cgA saturates
-the device. The iocost is expected to throttle it so that cgB's
-completion latency remains low.
-
-  BLK_DEVID="8:0"
-  MODEL="rbps=173471131 rseqiops=3566 rrandiops=3566 wbps=173333269 wseqiops=3566 wrandiops=3566"
-  QOS="rpct=90.00 rlat=3500 wpct=90 wlat=3500 min=80 max=10000"
-
-  echo "$BLK_DEVID ctrl=user model=linear $MODEL" > /sys/fs/cgroup/io.cost.model
-  echo "$BLK_DEVID enable=1 ctrl=user $QOS" > /sys/fs/cgroup/io.cost.qos
-
-  CG_A="/sys/fs/cgroup/cgA"
-  CG_B="/sys/fs/cgroup/cgB"
-
-  FILE_A="/data0/A.fio.testfile"
-  FILE_B="/data0/B.fio.testfile"
-  RESULT_DIR="./iocost_results_$(date +%Y%m%d_%H%M%S)"
-
-  mkdir -p "$CG_A" "$CG_B" "$RESULT_DIR"
-
-  get_result() {
-    local file=$1
-    local label=$2
-
-    local results=$(jq -r '
-    .jobs[0].mixed |
-    ( .iops | tonumber | round ) as $iops |
-    ( .bw_bytes / 1024 / 1024 ) as $bps |
-    ( .clat_ns.mean / 1000000 ) as $avg |
-    ( .clat_ns.max / 1000000 ) as $max |
-    ( .clat_ns.percentile["90.000000"] / 1000000 ) as $p90 |
-    ( .clat_ns.percentile["99.000000"] / 1000000 ) as $p99 |
-    ( .clat_ns.percentile["99.900000"] / 1000000 ) as $p999 |
-    ( .clat_ns.percentile["99.990000"] / 1000000 ) as $p9999 |
-    "\($iops)|\($bps)|\($avg)|\($max)|\($p90)|\($p99)|\($p999)|\($p9999)"
-    ' "$file")
-
-    IFS='|' read -r iops bps avg max p90 p99 p999 p9999 <<<"$results"
-    printf "%-8s %-6s %-7.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f\n" \
-           "$label" "$iops" "$bps" "$avg" "$max" "$p90" "$p99" "$p999" "$p9999"
-  }
-
-  run_fio() {
-    local cg_path=$1
-    local filename=$2
-    local name=$3
-    local bs=$4
-    local qd=$5
-    local out=$6
-    shift 6
-    local extra=$@
-
-    (
-      pid=$(sh -c 'echo $PPID')
-      echo $pid >"${cg_path}/cgroup.procs"
-      fio --name="$name" --filename="$filename" --direct=1 --rw=randrw --rwmixread=50 \
-          --ioengine=libaio --bs="$bs" --iodepth="$qd" --size=4G --runtime=10 \
-          --time_based --group_reporting --unified_rw_reporting=mixed \
-          --output-format=json --output="$out" $extra >/dev/null 2>&1
-    ) &
-  }
-
-  echo "Starting Test ..."
-
-  for bs_b in "4k" "32k" "256k"; do
-    echo "Running iteration: BS=$bs_b"
-    out_a="${RESULT_DIR}/cgA_1m.json"
-    out_b="${RESULT_DIR}/cgB_${bs_b}.json"
-
-    # cgA: Heavy background (BS 1MB, QD 128)
-    run_fio "$CG_A" "$FILE_A" "cgA" "1m" 128 "$out_a"
-    # cgB: Latency sensitive (Variable BS, QD 1, Read/Write IOPS limit 100)
-    run_fio "$CG_B" "$FILE_B" "cgB" "$bs_b" 1 "$out_b" "--rate_iops=100"
-
-    wait
-    SUMMARY_DATA+="$(get_result "$out_a" "cgA-1m")"$'\n'
-    SUMMARY_DATA+="$(get_result "$out_b" "cgB-$bs_b")"$'\n\n'
-  done
-
-  # Final Output
-  echo -e "\nFinal Results Summary:\n"
-
-  printf "%-8s %-6s %-7s %-8s %-8s %-8s %-8s %-8s %-8s\n\n" \
-         "CGROUP" "IOPS" "MB/s" "Avg(ms)" "Max(ms)" "P90(ms)" "P99" "P99.9" "P99.99"
-  echo "$SUMMARY_DATA"
-
-  echo "Results saved in $RESULT_DIR"
-
-Before:
-  CGROUP   IOPS   MB/s    Avg(ms)  Max(ms)  P90(ms)  P99      P99.9    P99.99
-
-  cgA-1m   167    167.02  748.65   1641.43  960.50   1551.89  1635.78  1635.78
-  cgB-4k   5      0.02    190.57   806.84   742.39   809.50   809.50   809.50
-
-  cgA-1m   166    166.36  751.38   1744.31  994.05   1451.23  1736.44  1736.44
-  cgB-32k  4      0.14    225.71   1057.25  759.17   1061.16  1061.16  1061.16
-
-  cgA-1m   166    165.91  751.48   1610.94  1010.83  1417.67  1602.22  1619.00
-  cgB-256k 5      1.26    198.50   1046.30  742.39   1044.38  1044.38  1044.38
-
-After:
-  CGROUP   IOPS   MB/s    Avg(ms)  Max(ms)  P90(ms)  P99      P99.9    P99.99
-
-  cgA-1m   159    158.59  769.06   828.52   809.50   817.89   826.28   826.28
-  cgB-4k   200    0.78    2.01     26.11    2.87     6.26     12.39    26.08
-
-  cgA-1m   147    146.84  832.05   985.80   943.72   960.50   985.66   985.66
-  cgB-32k  200    6.25    2.82     71.05    3.42     15.40    50.07    70.78
-
-  cgA-1m   114    114.47  1044.98  1294.48  1199.57  1283.46  1300.23  1300.23
-  cgB-256k 200    50.00   4.01     34.49    5.08     15.66    30.54    34.34
-
-Signed-off-by: Jialin Wang <wjl.linux@gmail.com>
----
-v2:
-- Handle more edge cases to prevent potential regressions.
-
-v1: https://lore.kernel.org/all/20260318163351.394528-1-wjl.linux@gmail.com/
-
- block/blk-iocost.c | 35 +++++++++++++++++++++++++++++------
- 1 file changed, 29 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index d145db61e5c3..5184c6e25a0c 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1596,7 +1596,8 @@ static enum hrtimer_restart iocg_waitq_timer_fn(struct hrtimer *timer)
- 	return HRTIMER_NORESTART;
- }
- 
--static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p)
-+static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p,
-+			 u32 *nr_done)
- {
- 	u32 nr_met[2] = { };
- 	u32 nr_missed[2] = { };
-@@ -1633,6 +1634,8 @@ static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p
- 
- 	*rq_wait_pct_p = div64_u64(rq_wait_ns * 100,
- 				   ioc->period_us * NSEC_PER_USEC);
-+
-+	*nr_done = nr_met[READ] + nr_met[WRITE] + nr_missed[READ] + nr_missed[WRITE];
- }
- 
- /* was iocg idle this period? */
-@@ -2250,12 +2253,12 @@ static void ioc_timer_fn(struct timer_list *timer)
- 	u64 usage_us_sum = 0;
- 	u32 ppm_rthr;
- 	u32 ppm_wthr;
--	u32 missed_ppm[2], rq_wait_pct;
-+	u32 missed_ppm[2], rq_wait_pct, nr_done;
- 	u64 period_vtime;
- 	int prev_busy_level;
- 
- 	/* how were the latencies during the period? */
--	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct);
-+	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct, &nr_done);
- 
- 	/* take care of active iocgs */
- 	spin_lock_irq(&ioc->lock);
-@@ -2397,9 +2400,29 @@ static void ioc_timer_fn(struct timer_list *timer)
- 	 * and should increase vtime rate.
- 	 */
- 	prev_busy_level = ioc->busy_level;
--	if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
--	    missed_ppm[READ] > ppm_rthr ||
--	    missed_ppm[WRITE] > ppm_wthr) {
-+	if (!nr_done) {
-+		if (nr_lagging)
-+			/*
-+			 * When there are lagging IOs but no completions, we
-+			 * don't know if the IO latency will meet the QoS
-+			 * targets. The disk might be saturated or not. We
-+			 * should not reset busy_level to 0 (which would
-+			 * prevent vrate from scaling up or down), but rather
-+			 * try to keep it unchanged. To avoid drastic vrate
-+			 * oscillations, we clamp it between -4 and 4.
-+			 */
-+			ioc->busy_level = clamp(ioc->busy_level, -4, 4);
-+		else if (nr_shortages)
-+			/*
-+			 * The vrate might be too low to issue any IOs. We
-+			 * should allow vrate to increase but not decrease.
-+			 */
-+			ioc->busy_level = min(ioc->busy_level, 0);
-+		else
-+			ioc->busy_level = 0;
-+	} else if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
-+		   missed_ppm[READ] > ppm_rthr ||
-+		   missed_ppm[WRITE] > ppm_wthr) {
- 		/* clearly missing QoS targets, slow down vrate */
- 		ioc->busy_level = max(ioc->busy_level, 0);
- 		ioc->busy_level++;
--- 
-2.53.0
+thanks,
+Ming
 
