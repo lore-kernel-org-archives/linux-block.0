@@ -1,111 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA78E3126CA;
-	Mon, 30 Mar 2026 14:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B1D26B74A
+	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 16:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774881409; cv=none; b=a4/v/rWf5yXanMo8hChFPLkWM8o9o+SyI9pZEMV+yxBn5Xkb5ldAsV6LkqUcEXewdswAjMEYSDe5UN328xKG0Jyiqs/1stjrpDD4xttGAwCmXH5L66CCpkQ5ckDNQi4Bul0JlFRW8TlJ3jIkoSQTB9ikcYX5Ch/Z0bSXAKv06f8=
+	t=1774887957; cv=none; b=AC3P8uH0S/HIc5V5sJj5ecpWE0dTiB0QlYhaqM9xTz6YooKrxPRwbTnjyvxKwNUq6UBCIqMqdHHtImhugnufDuTEeZPkCIFuIlgYVvCNGihCczvjJbWfXXULMuVCwhgjRlxwpjq5ANcP+QtHjC0JoCY7v2yyPAogx72S8A9j5iI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774881409; c=relaxed/simple;
-	bh=vVpoliyR40NMOAyv7YwOY69cjLV5eHd75JGozhwhf3c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bRS1xA+fkxL1ZST2qbkca6Ta66575uhBZ7jw6pNhx5hFe5eFRjIRKjANPXsGiDsAJJcSQ8Nk0aM+hbKpzPnAIHvxT78Zoh/75LWS9zYZ2YQsB+Ezmrdc9SJjtlFpUpCKJsxUOGUwJDMQxtDPX+m8Tk4wfw7ZE6mNz4cpn0jg/mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g9tVYo+/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774887957; c=relaxed/simple;
+	bh=UNbjnRSF8ltesLQ0/4+poJWy3R1TAZVzpwIUx4iYc6E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h5LegS96mSOkaxtBVI6csigIB0WCipYsW8Pr03yp85QqSjIHQLh/ILbOL0TeBV5Y78oOS/VEHhHBPI7XIXNlhd7M/PEnMogsS2Qag/WKhOZIePSV41j2pR3bYpZ867cPLYHEs348nJR0FT85quwuyyyUplbudNIWD790EiKRG48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=FOXVPjIK; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g9tVYo+/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4091C2BCB9;
-	Mon, 30 Mar 2026 14:36:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774881408;
-	bh=vVpoliyR40NMOAyv7YwOY69cjLV5eHd75JGozhwhf3c=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=g9tVYo+/wxF7ZbFPBy5BrsmsBGxZw6s4WhGQB9/yR/UrQqv5042utiEGm956nG3bf
-	 upr9maz+aE31Qo9e4JhOFPjj8ke8gZBNXNIFzM6elb8qkuEAtErWzN7972MfkOlrEq
-	 Qi9FHffHhHkl/zHk+hc9H81UlBO2zVV6ENP7+Ph0nOfkEcE/ocFHTeOWePLj4t0dkl
-	 YsRlLjo2O4ALSGI+9u8qJ9jbmwiXTfUSAMmvn7D03yuxZl5FBtWid4qQeZJGNinPbh
-	 9bmi/xBfjisA7uw/4WDilevgtyPISJC/IdGdYq1cCameHjsAJfWBhleXpSOthfLQRg
-	 1WqpYy2oG8VYA==
-From: Chuck Lever <cel@kernel.org>
-Date: Mon, 30 Mar 2026 10:36:31 -0400
-Subject: [PATCH v2 2/2] iov: Bypass usercopy hardening for copy_from_iter()
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="FOXVPjIK"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fkxSg66syz1XM6J9;
+	Mon, 30 Mar 2026 16:25:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1774887947; x=1777479948; bh=CMge7B02r5DRm2ZyrAanwcbu
+	udLqdHgzeYaWm1jwYzo=; b=FOXVPjIKGIkLGKOHJb1yCgAGFv1TDM416FuKPtKS
+	LVTqPkh8AdwuF055r2M8dYIFxwkNHX38EJv3bIbxsA5EsBtDyfTImAEA2kXw0BBV
+	4Y/Gt/UY+EyP8iA2wCejbE0ydcHixHvkyREzweDtW3d3lVYAIRtGid7KDefKVL9n
+	ycyEmoLfBpjcdJiKpDhVNLTX16FN1t3EnBZKjcvMpTcSOxsunlTAtpfAGzr7F5St
+	r4YM7u7pYu3cPqiH2ymUo5XuZnTcXyI7NplZiuMmV3BiaVnzbGQ7pMqKC7EP6F8r
+	BtujSbw83sMWPF0XFyuuak0/vOOJ/tXN22imBgLVrJCmdg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id cC5t8NQVLYvf; Mon, 30 Mar 2026 16:25:47 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fkxSS0Mdzz1XM5kt;
+	Mon, 30 Mar 2026 16:25:43 +0000 (UTC)
+Message-ID: <3820ca93-bcdc-419e-92a9-251b8d430cec@acm.org>
+Date: Mon, 30 Mar 2026 09:25:42 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260330-bypass-user-copy-v2-2-f236179e7fd6@oracle.com>
-References: <20260330-bypass-user-copy-v2-0-f236179e7fd6@oracle.com>
-In-Reply-To: <20260330-bypass-user-copy-v2-0-f236179e7fd6@oracle.com>
-To: Al Viro <viro@zeniv.linux.org.uk>, Kees Cook <kees@kernel.org>, 
- "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: linux-hardening@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
- Chuck Lever <chuck.lever@oracle.com>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1509;
- i=chuck.lever@oracle.com; h=from:subject:message-id;
- bh=Evqwgy8Dj/MjDnNEHB1BK5KAeLNE+hXXb/XaBl0KsHA=;
- b=owEBbQKS/ZANAwAKATNqszNvZn+XAcsmYgBpyop+K2m4G+rBi+DZG2kjAF4uEGyVSY8cjPUcV
- oDs9vq/CpWJAjMEAAEKAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCacqKfgAKCRAzarMzb2Z/
- l3/yD/48hBB8nIDGTQs1BDyX3zN/U97ML7/ciF4Tf0fvSOcfGRWpkGCrps93ZW5SOegcnGjAOsA
- R+4ImV+XI0a0m91AALYh3r54PkK4HZHw2EMyNuFt/8H7tLYlh3XGekwB0n+gHGvYgf40Tr3uVKp
- ss7sPtVeTKBusk6UKpHWKTQMKFSMM/MvYcP5Bsp6XGZamGFUDghKwfHy41jyFybfQzry65BpvvA
- eQXOOWn/7Y6+Y5y1hKX4ZRrPNbmHSXUjeiPXEThtTLQpufNFPlXkH9SpMxITqnUbqzONGOaEhfs
- mB3GpbI4C+oZFNPS+BEYhirjK8obBj8yEVmnyFIbDlEIR9Lxqo4SXa5fBBRVEU4jZ6eE9DjZoBM
- oZhwyF+4MFJQ6epIZQl0KFlYou2bSRiReLJCYehYw1AEY63179oRiMY1jX9HZeVTTkkmB9GKl0D
- +4y1Qr/Q33hUqeoV1mQn9t+p7WQB/BmAZzliVY5EUwdso3E4Bm/PeNjCxnPmCqOPS5ZQqEZqv4G
- M3rnqz1woNaEdw0Wa6hR98HBwPGGYZR3bPTGb/7sjx/87nKAuwBwdyVw4Kri9GHnFiZuAH/er8Y
- h9UqGZFUKBPwZ/GzjWKhpRp3a8GIlY6oegwBf+pWAN6xsKB5uKGes61XuKKPa8o0Mmh4B6++TbG
- pLeNu8CBP+cWqcQ==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp;
- fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 20/26] null_blk: Enable lock context analysis
+To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>, Tejun Heo <tj@kernel.org>,
+ Keith Busch <kbusch@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>, Kees Cook
+ <kees@kernel.org>, Genjian Zhang <zhanggenjian@kylinos.cn>,
+ Marco Elver <elver@google.com>
+References: <20260325214518.2854494-1-bvanassche@acm.org>
+ <20260325214518.2854494-21-bvanassche@acm.org>
+ <b9cbbd2b-4c2a-497a-84f8-f1bda0e7c40f@linux.ibm.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <b9cbbd2b-4c2a-497a-84f8-f1bda0e7c40f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-From: Chuck Lever <chuck.lever@oracle.com>
+(+Marco)
 
-The previous patch bypassed runtime usercopy validation in
-copy_to_iter() for kernel-only iterators. The same overhead
-exists in the copy_from_iter() path: check_object_size()
-validates the destination buffer's slab residency on every
-call, even when the iterator source is entirely kernel-backed
-and the user-copy protection is redundant.
+On 3/30/26 3:23 AM, Nilay Shroff wrote:
+> On 3/26/26 3:15 AM, Bart Van Assche wrote:
+>> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/=20
+>> main.c
+>> index f8c0fd57e041..677ac829ef80 100644
+>> --- a/drivers/block/null_blk/main.c
+>> +++ b/drivers/block/null_blk/main.c
+>> @@ -1004,8 +1004,7 @@ static struct nullb_page=20
+>> *null_lookup_page(struct nullb *nullb,
+>> =C2=A0 static struct nullb_page *null_insert_page(struct nullb *nullb,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+sector_t sector, bool ignore_cache)
+>> -=C2=A0=C2=A0=C2=A0 __releases(&nullb->lock)
+>> -=C2=A0=C2=A0=C2=A0 __acquires(&nullb->lock)
+>> +=C2=A0=C2=A0=C2=A0 __must_hold(&nullb->lock)
+>=20
+> This function temporarily drops the &nullb->lock and requires it.
+> So why do we need to replace __releases/__acquires with __must_hold?
+> This is not clear.
 
-Apply the same bypass so that copy_from_iter() calls
-__compiletime_check_copy_size() instead of the full
-check_copy_size() when the iterator is not user-backed.
+__must_hold() has the same meaning as __releases() + __acquires(). The
+only difference between these two annotations is that __must_hold() is
+more compact. I can leave out this change if this change is considered
+confusing.
 
-All current callers of copy_from_iter_nocache() pass user-space
-addresses, so the same change is deferred for that wrapper.
+>> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/=20
+>> zoned.c
+>> index 384bdce6a9b7..a7f94e76034f 100644
+>> --- a/drivers/block/null_blk/zoned.c
+>> +++ b/drivers/block/null_blk/zoned.c
+>> @@ -32,6 +32,7 @@ static inline void null_init_zone_lock(struct=20
+>> nullb_device *dev,
+>> =C2=A0 static inline void null_lock_zone(struct nullb_device *dev,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct nullb_zone *zone)
+>> +=C2=A0=C2=A0=C2=A0 __no_context_analysis /* conditional locking */
+>=20
+> I see we already have __context_unsafe(comment) macro defined
+> which may be used instead for inline comment.
 
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- include/linux/uio.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+context_unsafe() suppresses warnings triggered by __guarded_by() and
+__guarded_by_ptr() but does not suppress analysis of functions in the
+function body annotated with __releases() and __acquired(). If I remove
+the __no_context_analysis annotation and surround the function body with
+context_unsafe(), the following appears:
 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 45b323e4be97..5a6ad2dd5627 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -229,8 +229,13 @@ size_t copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
- static __always_inline __must_check
- size_t copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
- {
--	if (check_copy_size(addr, bytes, false))
--		return _copy_from_iter(addr, bytes, i);
-+	if (user_backed_iter(i)) {
-+		if (check_copy_size(addr, bytes, false))
-+			return _copy_from_iter(addr, bytes, i);
-+	} else {
-+		if (__compiletime_check_copy_size(addr, bytes, false))
-+			return _copy_from_iter(addr, bytes, i);
-+	}
- 	return 0;
- }
- 
+drivers/block/null_blk/zoned.c:37:2: error: spinlock 'zone->.spinlock'=20
+is not held on every path through here [-Werror,-Wthread-safety-analysis]
+    37 |         context_unsafe(
+       |         ^
+./include/linux/compiler-context-analysis.h:201:30: note: expanded from=20
+macro 'context_unsafe'
+   201 | #define context_unsafe(...)             \
+       |                                         ^
+drivers/block/null_blk/zoned.c:39:3: note: spinlock acquired here
+    39 |                 spin_lock_irq(&zone->spinlock);
+       |                 ^
 
--- 
-2.53.0
+drivers/block/null_blk/zoned.c:37:2: error: mutex 'zone->.mutex' is not=20
+held on every path through here [-Werror,-Wthread-safety-analysis]
+    37 |         context_unsafe(
+       |         ^
+./include/linux/compiler-context-analysis.h:201:30: note: expanded from=20
+macro 'context_unsafe'
+   201 | #define context_unsafe(...)             \
+       |                                         ^
+drivers/block/null_blk/zoned.c:41:3: note: mutex acquired here
+    41 |                 mutex_lock(&zone->mutex);
+       |                 ^
+2 errors generated.
 
+Thanks,
+
+Bart.
