@@ -1,96 +1,110 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29C439DBE2
-	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 19:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9B039EF23
+	for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 21:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774900181; cv=none; b=qwvW572oU0TAllSVK7rrBYhwhlREtHKgXkpwGZsZAyD3jsWfWXjdCvXXU8mgms/gHGqo+WVqRYZw1lUuHYarPoMg+xYk41bog02jPSIl91QuiWdja22tzvd6TJOSP2FlZjzvTfvvCmYnr0xJz7YL+O5j9CkfTpCuJfN6petnYQ4=
+	t=1774905096; cv=none; b=JQYkawOEbrFq+q+7uPEkmgfeXGugq5173iKchrNswPtH3940OFHtBQihB2nT2Lcew39ibeoaNuMm/5EFqovMmKBieajrJZR6dfH8BL4iNJpfbdaobSCfF9YkL9qF7tX9Cjh2e+gkMiWIryiUOp14Jkt3ktg3bZsvabihexHwWAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774900181; c=relaxed/simple;
-	bh=Hw4JQfJQsNAJJxhhioKh7J5MFJGvbL42ySFItHY7zKY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eVlfhsgekPnc34tGmEQ/zhZq6j72g8McHyZcGt1oz1unLZDv6mZXFSj5v9IZO6LqNS588Hs6p1bsOMEDEtWCmoiSwp2AyUZJOlClbBjNul2bxX9wuQwNVsMkHsJIlPehcUFjKrbHFGApa0RZ3SwbMBWvLGKIMrmdkpgHWNNqSkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=D1jYBXqX; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1774905096; c=relaxed/simple;
+	bh=WuW4P7HIvCgTqUS/kR2NzM6J7queKF9TF23AviiY0qU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nrix3Jrs5vmHv7syGOTYO2iqzDQx6LPCyLAg6zK4m2Y4MGBw0s4eTrQbIsMxk58BHzXvJOEhpOfY7c6Z/0TgNQQNAPdHegBHP7+kn+PDww4Mqw6m7+5RbR0TMfAMLI1Oo8sh1jio/cF9iTqOpD/ryix21Nva5WXw+umtMlcNqxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HKSgzPkU; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="D1jYBXqX"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4fl1zl1cD5z1XM5kt;
-	Mon, 30 Mar 2026 19:49:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1774900176; x=1777492177; bh=LvQ5DqyAmTOwoewEG7uGd4o/
-	w75iQ8ONt+MxXA2rIvg=; b=D1jYBXqXErp01F4YPqhVE1VnXucXQdqLYFeGB/fH
-	sLn/aGNRpDE0EknOOhRwlPsOriSKiVz12YYe9Cc79/KbSzFYcefi6Bxc9TUjIE/D
-	4mHIj385ynXD22dh/w0suK3ofN2C+NfBxA9SfFAk873kU1Aa46tzTlaTVHlOoH2Y
-	mlT+RKBtmaBILOKUxdvizkq/3ek8hJdJOUWS8HeuMKDvXVZYEPkN5ulYDNI1TrVm
-	rEsyS+g71uP6mmFNFuOpkJ9TruOhvSk84q534EtHr+Vy/7EH7MYeIFRLTiHzCwzc
-	6LTeM2M2DrqDwrbuu6bB78PPGtLSPbfY4qCX82JDbVm6JQ==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 3NsCct1S74U7; Mon, 30 Mar 2026 19:49:36 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4fl1zg1N8Bz1XM5jn;
-	Mon, 30 Mar 2026 19:49:34 +0000 (UTC)
-Message-ID: <7fe454fa-d39b-4d2f-a238-297df2261cdd@acm.org>
-Date: Mon, 30 Mar 2026 12:49:33 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HKSgzPkU"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4873ce69ba9so14933365e9.2
+        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 14:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774905094; x=1775509894; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jc4DvY2MQK88Yewja1MkoO8icKiZ2EexxdGEKN37R00=;
+        b=HKSgzPkUR6Ga3XxtxRJ6sEmp/3MMmp6aTkjsQEWk0y4gALZwmd9xr3krRCXrMwXxse
+         SAnra+o7+prT9bp/EEZSOqV3bMZNMr7qJfnAWtEkomsNbEnhZibtQ3Ukg6a/9JkvITAb
+         NqYe+4o9dzvAlIg4W+dHyclzLtflLYFMRTrJNTNiVoEVJbhFq+a6FIIl0nKUGPp3oLlr
+         quNk2tN+EMK3Al/+7Ck9WlZypk3bnMmIpaMFiahlCs7jgfDQVG4KA6BaRg1IzabcSQ4y
+         6poTSoSeRzBSj+GJnlInp+DuSbhxKAifG+KfgnkgA8Cf4cEZVz/J2RT1Zgj87edQCu+o
+         2r9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774905094; x=1775509894;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Jc4DvY2MQK88Yewja1MkoO8icKiZ2EexxdGEKN37R00=;
+        b=aSqpkCMxQQu/f/u6b4G1Kt/4NbQdPDvRpkfLtLSjd0Q+7gWlN0/aaSui8yFr5TJYyw
+         apCS+VgAVV12/vwqI1/kKgyVg4CDRhxUVo5icgnYovJcr9QaV3IiOshABaED2NYwJ1WB
+         KdjB1XztW87OTzel9BUcCsTm/bKQ9Tz044jY30FyOAejM91g+mXhlyRIvY+eVGHuKzUI
+         AyjdYAvHbZ3LES5jXZlZRbaZoUwdK5kf/YHPWEkhp/MaChaq3wX7V5sEnK9HNcID+gns
+         QQ6+SVInb5hc8ndoX21T+p/Xqlw3njvCJTWbf4zRVlJPwVAz/Xp40CJozxbk/e8rDWPz
+         3JWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqFSXmzxWd5GYGjiyTMfHj1qnAV+TQBPg0z1P1zmbmGZDcwjFPd0zTMbDtFu6KB6BKu3cIwl8K7mYspg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9DwiF+2JC0eeTpZ1sOjZPBWuaTLody8ZxpHufPZPRFzHZe4+s
+	zMh6NiUUG7yhbDrKNtaRswJCEcAhYTE02s9TJR0jYYR+C+v6rve0i7R1
+X-Gm-Gg: ATEYQzxmbT+VC50mwaxUgEy/dV2U2PETebnc700WvCPNG1WCmcd/EGz8AAhEyq/pW6Z
+	H979WeEZplcH8sYrcwRB4WyGfBqOoHF7XidfBU4u6WgVNXgiw8aKJ1IPZ3QvCaTh+VGuEfJQ6zp
+	RMgB5t5NinNCW8nv5aCiEW7caf4OcUS66c8BhMydT8SxfTgcGgl0pX2wXNvbc42IVkorie30oxg
+	yWLGQ7Vnguy7bKdcw0F7/VfZdURnOvJ84OALYus/7nC6qxjJkxdr01hcaJk6DJhUMdW76YKUqH+
+	lilpkY34/6fAZnt8eBmxM1vGRf4nZRd+aBcKzJK4x3QmNWbs7EwHx8vOrEFK6i76hSbK1sOlfHN
+	55ffD1S1zLfYN1i2VwJvWhjlHN0RGuQmfsvbwygENhA9VLdp6gZTAJSuAZ/26p6OuFqNk7YBRk9
+	ZST5mAToxY7afU/G+ePUHBn5XLVd+XGGvjKkExANevTz7DKupT4sGRi4D3wzhy
+X-Received: by 2002:a05:600c:1d1c:b0:483:7903:c3b1 with SMTP id 5b1f17b1804b1-48727efacb3mr225543165e9.20.1774905093642;
+        Mon, 30 Mar 2026 14:11:33 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887ad8d58fsm1787525e9.24.2026.03.30.14.11.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 14:11:33 -0700 (PDT)
+Date: Mon, 30 Mar 2026 22:11:32 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Chuck Lever <cel@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, Kees Cook <kees@kernel.org>, "Gustavo
+ A. R. Silva" <gustavoars@kernel.org>, linux-hardening@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>
+Subject: Re: [PATCH v2 1/2] iov: Bypass usercopy hardening for
+ copy_to_iter()
+Message-ID: <20260330221132.1e1b1387@pumpkin>
+In-Reply-To: <20260330-bypass-user-copy-v2-1-f236179e7fd6@oracle.com>
+References: <20260330-bypass-user-copy-v2-0-f236179e7fd6@oracle.com>
+	<20260330-bypass-user-copy-v2-1-f236179e7fd6@oracle.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] block: Reduce the minimum value for the maximum
- DMA segment size
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
-References: <20260327211349.2239633-1-bvanassche@acm.org>
- <20260327211349.2239633-5-bvanassche@acm.org> <ack5VqUS_gRuxodF@fedora>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ack5VqUS_gRuxodF@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 3/29/26 7:38 AM, Ming Lei wrote:
-> On Fri, Mar 27, 2026 at 02:13:44PM -0700, Bart Van Assche wrote:
->> All block devices that are supported by the Linux kernel have a DMA engine
->> that supports DMA segments of 4 KiB or larger. Allow smaller DMA segment
->> sizes because these are useful for block layer testing. Reject values below
+On Mon, 30 Mar 2026 10:36:30 -0400
+Chuck Lever <cel@kernel.org> wrote:
+
+> From: Chuck Lever <chuck.lever@oracle.com>
 > 
-> Can you share why/what it is useful just for test purpose?
+> Profiling NFSD under an iozone workload showed that hardened
+> usercopy checks consume roughly 1.3% of CPU in the TCP receive
+> path. The runtime check in check_object_size() validates that
+> copy buffers reside in expected kernel memory regions (slab,
+> stack, and non-text), which is meaningful when data crosses
+> the user/kernel boundary but adds no value when both source
+> and destination are kernel addresses.
 
-Your commit 889c57066cee ("block: make segment size limit workable for >
-4K PAGE_SIZE") adds support for devices with a maximum segment size
-limit that is less than the virtual memory page size. With 
-BLK_MIN_SEGMENT_SIZE == 4096, it is not possible to test the code paths
-added by this commit if PAGE_SIZE == 4096. Allowing a segment size limit
-that is less than 4096 bytes makes it possible to test the new code
-paths on systems with PAGE_SIZE == 4096, e.g. an x86 VM.
+I thought the purpose was to avoid accidental overwrites when
+the allocated buffer was the wrong size.
+This is pretty much likely to affect user copies as kernel ones.
 
->>   enum blk_default_limits {
->>   	BLK_MAX_SEGMENTS	= 128,
->>   	BLK_SAFE_MAX_SECTORS	= 255,
->> +	BLK_MIN_SEGMENT_SIZE	= 512,
->>   	BLK_MAX_SEGMENT_SIZE	= 65536,
->>   	BLK_SEG_BOUNDARY_MASK	= 0xFFFFFFFFUL,
-> 
-> This change actually becomes not consistent with previous patch, in which ->seg_boundary_mask
-> can be 4095.
+OTOH the overhead for some socket paths is really horrid.
+IIRC sendmsg/recvmsg does copies where the length depends on
+whether it is a 64bit or compat system call.
+These go through the full horrors of user copy hardening even
+thought there is no way they can ever fail.
+That is the 'control pane' copies - well before you get to
+any actual data.
 
-I will drop the previous patch.
+	David
 
-Thanks,
-
-Bart.
