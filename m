@@ -1,148 +1,151 @@
-Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13903A4F2F;
-	Tue, 31 Mar 2026 10:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7378E3A9623
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 10:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774953614; cv=none; b=Kd053Mtwu3wi+MueAktbCh3fk3or/zeMUFmi/TtQOPFs1nEcsxORY2h1HnJjdrF/FRKIKojQ+wucQzpHWU1negkW9zpiKkEEq0byeuWT/leBMEJSQIryOwFeNvhizLdoxn+hqa+RoDlrfpfTplfoGt/JAJyr7xP+IPUocy+Ogtc=
+	t=1774954307; cv=none; b=fF3Lc9+zCHRCFhYQVQsYrJK7Ei1Vtf7TKKlyY9M8yzr/frZQ+32balB2RDFPlU/+AkecfD5xr8ILWDNElzyUOdLLN2Fq4+mOlSHBw0DCbghr7uiS7ESRN2I0trzhEHhDcBwN3xrsxkz8TNLwND5bdrC7cD2+WPKrlM+eRb7h4ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774953614; c=relaxed/simple;
-	bh=9Nx9On3/A9yUpOPmBiwI3EzprmI9bCiG/OLT9iVkg94=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SdCHvKJNKGOlcKElxDfljBlw4ch8EyNVf8RdLV0ZugzBJn5LCgebo03d5IXL1R8j2j6/i6RqDnn116UhvHIqUAWIJDcgYhWV7gy0ojjjQGo2GKFdc04Cgt5FhBvcmTdy73XIGEGaq6UZ+H5frkfgzH7kE3kBBzkwwmuYXZ63Bdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=RGXImBG9; dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=IkV85c1b; arc=none smtp.client-ip=210.171.160.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
+	s=arc-20240116; t=1774954307; c=relaxed/simple;
+	bh=logZAmhEwKcXhJIQh9W417rKWh6dBrA0tEo887f+GGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LbiZYMJHKKG0Eh+nfyyUAITkf5+ar1NmdLOReUQqvF5HII5uzFPqfOQX3uLaDdS25aVfaq3wPKUCkqWaewjjeJUANZTl/ZgiqLCTSVwClX12DDRly08VQv8SmxOetckcFW6bkEiR+oK56uUsx07tcT6uZh627kNMOsG72LqGS9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=roi9lNdY; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="RGXImBG9";
-	dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="IkV85c1b"
-Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
-	by mail.parknet.co.jp (Postfix) with ESMTPSA id 779F226F7689;
-	Tue, 31 Mar 2026 19:40:02 +0900 (JST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114; t=1774953602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o61ziz1K7RE+vfkx01/BqKbiM2DvTc1gWIWpdSZJsrk=;
-	b=RGXImBG9OkkmJqMaygJ7AQDGsKzIQl9abCecZ1Urgp/oZ2yiBvcZeoE7CFuE+/kvV+iN6D
-	U4swsphXGmlc5MObWhkYovizM+FxkoO6U2EEfzujW5BqBtiQ0r/J752mOChnK4gJbLR1dD
-	1VUSlKrbZJpn48cr/6Z/ap3ks+R41GUVNedpzkFQCJe04B0BLknTNOOiimUB7JUPB+SQ/N
-	4X6OBt/0Ut5bSz7MyVLy+TgrTD28bKJcZgC7ik/AyOmHECVjUd9Vv439R9htdHSYnn55Lv
-	bCx5WQtQ/S9RUkvZ1CIEdGRCrYI8pxGW0DbfMNG8k94uebjKG5i/Rptypu+OKw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114-ed25519; t=1774953602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o61ziz1K7RE+vfkx01/BqKbiM2DvTc1gWIWpdSZJsrk=;
-	b=IkV85c1bt9eSNB1ACUrhM1X1oZJQ7QVVMbbvnBOLSwK7ls9q0Ga6u2jMZrt3U7fvRHGRKO
-	E6TPZwycQpL0rOBA==
-Received: from devron.myhome.or.jp (devron.myhome.or.jp [192.168.0.3])
-	by ibmpc.myhome.or.jp (Postfix) with ESMTPS id 04458E00CC9;
-	Tue, 31 Mar 2026 19:40:02 +0900 (JST)
-Received: by devron.myhome.or.jp (Postfix, from userid 1000)
-	id EABA92200056; Tue, 31 Mar 2026 19:40:01 +0900 (JST)
-From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org,  linux-block@vger.kernel.org,  Christian
- Brauner <brauner@kernel.org>,  Al Viro <viro@zeniv.linux.org.uk>,
-  linux-ext4@vger.kernel.org,  Ted Tso <tytso@mit.edu>,  "Tigran A.
- Aivazian" <aivazian.tigran@gmail.com>,  David Sterba <dsterba@suse.com>,
-  Muchun Song <muchun.song@linux.dev>,  Oscar Salvador <osalvador@suse.de>,
-  David Hildenbrand <david@kernel.org>,  linux-mm@kvack.org,
-  linux-aio@kvack.org,  Benjamin LaHaise <bcrl@kvack.org>
-Subject: Re: [PATCH 15/42] fat: Sync and invalidate metadata buffers from
- fat_evict_inode()
-In-Reply-To: <mjraa5thsnzchejoomqgiahwajx4cs5ryqnmn7zsi3fylzhrrr@5ip65jcrlknn>
-References: <20260326082428.31660-1-jack@suse.cz>
-	<20260326095354.16340-57-jack@suse.cz>
-	<87ldfazqo2.fsf@mail.parknet.co.jp>
-	<3oh5cbnm6dwz6rikc6laably5nvu4c4wtxjqzuu3wymzhpqrtw@skopu327hd7a>
-	<87jyutwo6o.fsf@mail.parknet.co.jp>
-	<mjraa5thsnzchejoomqgiahwajx4cs5ryqnmn7zsi3fylzhrrr@5ip65jcrlknn>
-Date: Tue, 31 Mar 2026 19:40:01 +0900
-Message-ID: <87wlyss2ny.fsf@mail.parknet.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="roi9lNdY"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso46013725e9.3
+        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 03:51:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774954305; x=1775559105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2myqE94HaK/hO6S/5AS19OPX8YCgfFlLAfMjQvqgXEw=;
+        b=roi9lNdY9Xd8vqm5QrKSdOwk+YkjiuCwVPcWgwEZxUgHDXm/41EFvdvFS6OqT8lq7g
+         XxlbtqpOD0aPbfjEI3T5eURKJsIjt/nbopP7QYcyrOFEt/s1uCLTZugghSlldmrNUHmX
+         RJUmMUipHjitsykDq4ciBFCaxSjhgDb8a8zOUOqgnVeNZXePNbOLXcEcZaMi44K1NUG5
+         rZRqI6Gew+0IMyZZODwUkEsro7RedHlHfHOpwDXzSC1lKA9p8ZVzJEmOLuTix8vY1QXK
+         SHd81ef9V0z5/thKbVxuwbAyycpn7vQEkWfhpAXI9D95z7evJjFedq2RaOU0VF78cSDB
+         q6dQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774954305; x=1775559105;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2myqE94HaK/hO6S/5AS19OPX8YCgfFlLAfMjQvqgXEw=;
+        b=RwUm+kv4QnnFdvoI/UkZ+Ev5VbrtKpPIE5FyfdGwL44KARK/cp4lrs0XGEjLFGcRN1
+         +U5Rz5qka9h484nWQbfKBlepVyxwnxrxbLVzUJgzUKx+8+1CsLGuYeVdzMBoPQOb6D6P
+         gkSbWCXh+FJDafSrWrO99F3Wv82FZggxJYVDhGmTgPO/qol/aK9BvDt3eL7fphvBPic0
+         ghzhtJCCAouK+S5kwnV1Y2uGrpnXi/qf4JvSA5RinKBqrDCYIYAQHqydoeDqUNT8h9lY
+         dlB/5RUj69YYLiAO6jiVYsHYirdV7SP8bjNy9ivrPiW2umsUiyPEhLimVe4ABDZx5yDs
+         8s4Q==
+X-Gm-Message-State: AOJu0YwQg4mXmzAO0/mV/qi2xGTxMpmJVuq8HkvJLrHBsuUCPmN2V6Zh
+	9cogSDerB8HbwS7AKuKef/lUtsSnIscpD79SHBt+3Q26xs1Ie6hDSy27D2wTRQ48
+X-Gm-Gg: ATEYQzwH/ihjYf9K1RFwUOrtoMcAmm5VtK9pTvJdVOEMnQG0MMkrfdshJlxbOk6Kwsv
+	is4IWgpJza9oUHuwdJ4xeIGb3bXgodT874d6+YJNLK4IWjhbW22tf8+Rv/8qZ78XVag/I2wXeSv
+	aZveQb0ivu7fD4cDTXq2yJEe7ZSZJxiHrfZsTWLqJl3qfrllnGDHbSNr4WYJmpydp7sGnQeL5v/
+	7qlFRWJes7/JDAcVbmnpqvNOYsRhwU3LptBKzGsxBukrJd7QZPPTX3DFHV2e/LnoCgTotcVza5i
+	G6c1GEZRHReYid4CBOSY2Gsp62FEAebOYpmFkB50J/tm2OZvuO1DrJVCT/vPCfRnhQhs3zCioCV
+	DlwAeZmj/z3GFhBl7Zg5Axiu/L3t7uxtoOvirKPS0a17w+EJyAb29FN0kUMg2u/0WNhtFXO/2pu
+	JepGXbMbCc8mqTBTJnuTmGB9M8H7+AXqOpAR2IwgWiKvYi31Zm0rxHcWdDvRLcyC7fuNwcM0YRb
+	ylWuEQDwu5BL2cRlttD8ZAQ25DwWkkL3hBQPWwGg6eWpsoCuaUxo9dKb+y45TBUMq3vDzi0XDT8
+	wlVurDbQVcFOEeak2KRe
+X-Received: by 2002:a05:600c:3505:b0:485:4135:5c92 with SMTP id 5b1f17b1804b1-48727c7c6e0mr238604425e9.0.1774954304140;
+        Tue, 31 Mar 2026 03:51:44 -0700 (PDT)
+Received: from particle-0df3-d360 (2a02-1810-950a-eb00-f9cf-2393-cb7f-6fd9.ip6.access.telenet.be. [2a02:1810:950a:eb00:f9cf:2393:cb7f:6fd9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e952b0bsm24706635e9.12.2026.03.31.03.51.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 03:51:43 -0700 (PDT)
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+X-Google-Original-From: Daan De Meyer <daan@amutable.com>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	brauner@kernel.org,
+	hch@infradead.org,
+	Daan De Meyer <daan@amutable.com>
+Subject: [PATCH v3 1/3] loop: fix partition scan race between udev and loop_reread_partitions()
+Date: Tue, 31 Mar 2026 10:51:28 +0000
+Message-ID: <20260331105130.1077599-1-daan@amutable.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Jan Kara <jack@suse.cz> writes:
+When LOOP_CONFIGURE is called with LO_FLAGS_PARTSCAN, the following
+sequence occurs:
 
->> >> Hm, why do we have to add this here? For FAT, if buffers are still
->> >> dirty, buffers will be flushed via bdev flush?
->> >
->> > The reason why I've put sync_mapping_buffers() here is the following
->> > sequence:
->> >   fd = open("file")
->> >   write(fd)
->> >   close(fd)
->> >     - now data gets written out, dentry & inode can get evicted from memory
->> >   fd = open("file")
->> >   fsync(fd)
->> >     - this should flush all dirty metadata associated with "file" but if we
->> >       didn't call sync_mapping_buffers() during inode eviction we wouldn't
->> >       have a way to do that.
->> >
->> > So in general I think sync_mapping_buffers() call is indeed needed.
->> 
->> Hm, it looks like not new issue, isn't it? Why we have changed now in
->> this series?
->
-> It isn't a new issue. But so far inode_lru_isolate() was checking whether
-> the metadata buffers list has any dirty buffers and if yes, it skipped the
-> inode. So inodes with dirty buffers in this list could reach .evict method
-> only for deleted inodes or during unmount and either case makes above
-> problem impossible to happen. This is however a layering violation (generic
-> inode handling code shouldn't care about details of buffer heads) and as a
-> result it makes it difficult to abstract the metadata buffer handling this
-> series is doing. And all this for a handful of filesystems which,
-> honestly, aren't used in performace critical settings.
+  1. disk_force_media_change() sets GD_NEED_PART_SCAN
+  2. Uevent suppression is lifted and a KOBJ_CHANGE uevent is sent
+  3. loop_global_unlock() releases the lock
+  4. loop_reread_partitions() calls bdev_disk_changed() to scan
 
-I see, I could understand why you wanted to change though. However, (in
-my thought, this change has disadvantage by below reason) changing this
-behavior because of layering violation is not good way, IMO.
+There is a race between steps 2 and 4: when udev receives the uevent
+and opens the device before loop_reread_partitions() runs,
+blkdev_get_whole() in bdev.c sees GD_NEED_PART_SCAN set and calls
+bdev_disk_changed() for a first scan. Then loop_reread_partitions()
+does a second scan. The open_mutex serializes these two scans, but
+does not prevent both from running.
 
->> It is including trade off write amplification vs reliability (i.e. may
->> not call fsync()), for example. So I think we should not add it easily.
->
-> I expect in practice you'll hardly be able to observe the difference as
-> inodes usually get quite a while to be reclaimed at which point the dirty
-> buffers would be already flushed by background writeback. I don't see how
-> this change would lead specifically to "write amplification" - that would
-> mean frequent redirtying of the same metadata buffer of an inode
-> interleaved with frequent reclaims of the inode and I don't see how that
-> would happen in a realistic setting.
->
-> If someone comes with a realistic workload which would suffer significant
-> regression from this change, then of course we should address it. I have
-> plans for adding an interface for filesystems to expose the information
-> that inode has some pending dirty metadata and a way to flush them from
-> flush worker because that is a common need a lot of filesystems has and
-> doing the flushing from .evict isn't always doable due to locking
-> constraints.
+The second scan in bdev_disk_changed() drops all partition devices
+from the first scan (via blk_drop_partitions()) before re-adding
+them, causing partition block devices to briefly disappear. This
+breaks any systemd unit with BindsTo= on the partition device: systemd
+observes the device going dead, fails the dependent units, and does
+not retry them when the device reappears.
 
-I think it would happen with normal operation, for example, copy many
-files more than total memory. I think this would be much common than
-write=>close=>open=>fsync in your example.  Anyway, with it, reclaimed
-inode metadata will be flushed forcibly and frequently (yeah, may not be
-significant though. but I can't see the benefit for users from this
-change.), and lost to chance combining multiple time of dirty while copy
-many files.
+Fix this by removing the GD_NEED_PART_SCAN set from
+disk_force_media_change() entirely. None of the current callers need
+the lazy on-open partition scan triggered by this flag:
 
-> I'm still thinking about details but this has to be a properly
-> abstracted interface all filesystems can use and not a special hack for a
-> handful of old filesystems.
+  - floppy: sets GENHD_FL_NO_PART, so disk_has_partscan() is always
+    false and GD_NEED_PART_SCAN has no effect.
+  - loop (loop_configure, loop_change_fd): when LO_FLAGS_PARTSCAN is
+    set, loop_reread_partitions() performs an explicit scan. When not
+    set, GD_SUPPRESS_PART_SCAN prevents the lazy scan path.
+  - loop (__loop_clr_fd): calls bdev_disk_changed() explicitly if
+    LO_FLAGS_PARTSCAN is set.
+  - nbd (nbd_clear_sock_ioctl): capacity is set to zero immediately
+    after; nbd manages GD_NEED_PART_SCAN explicitly elsewhere.
 
-Sounds great. How about we delay this behavior change until this
-interface?
+With GD_NEED_PART_SCAN no longer set by disk_force_media_change(),
+udev opening the loop device after the uevent no longer triggers a
+redundant scan in blkdev_get_whole(), and only the single explicit
+scan from loop_reread_partitions() runs.
 
-Thanks.
+A regression test for this bug has been submitted to blktests:
+https://github.com/linux-blktests/blktests/pull/240.
+
+Fixes: 9f65c489b68d ("loop: raise media_change event")
+Signed-off-by: Daan De Meyer <daan@amutable.com>
+---
+ block/disk-events.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/disk-events.c b/block/disk-events.c
+index 9f9f9f8a2d6b..074731ecc3d2 100644
+--- a/block/disk-events.c
++++ b/block/disk-events.c
+@@ -290,13 +290,14 @@ EXPORT_SYMBOL(disk_check_media_change);
+  * Should be called when the media changes for @disk.  Generates a uevent
+  * and attempts to free all dentries and inodes and invalidates all block
+  * device page cache entries in that case.
++ *
++ * Callers that need a partition re-scan should arrange for one explicitly.
+  */
+ void disk_force_media_change(struct gendisk *disk)
+ {
+ 	disk_event_uevent(disk, DISK_EVENT_MEDIA_CHANGE);
+ 	inc_diskseq(disk);
+ 	bdev_mark_dead(disk->part0, true);
+-	set_bit(GD_NEED_PART_SCAN, &disk->state);
+ }
+ EXPORT_SYMBOL_GPL(disk_force_media_change);
+ 
 -- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+2.53.0
+
