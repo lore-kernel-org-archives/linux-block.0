@@ -1,58 +1,71 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D722EB859
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 00:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8E63016F1
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 01:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774918670; cv=none; b=GMCg+u9LUnvLJmfH2p/SyrHRzVRbv2f6p5sMUQmxB7pGP7jI8VAcf3uv2joo1hpzObAxDQnZC5FciupxAM/DKPGU9gGABFDrxEvDWhSo5CmK7yM3N240poDMwbsY6l3WMN2c/fXZHkgR18o6/rX2y0aIYYlPM4fxBD/wCYTPoXc=
+	t=1774918950; cv=none; b=RgNaqqSYfIorFXEkkq0orvzdaqdNZrsteyd/FqPP8ELWBw5LWOMDdvIywxuIGAzE8oebtemqeRWV9oyqkNLPBm74W1LOQ1r0r5jXm9SYBnLINfMyCOIIO5qTbuk7dwNsdfK5jiESlXw7FV9m5QIcCY/H+ETEKBcDrxj0SxJTIk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774918670; c=relaxed/simple;
-	bh=PCa2PS2etpRQFlH/swlzWO2rb659EkMoUsiwySHV/k4=;
+	s=arc-20240116; t=1774918950; c=relaxed/simple;
+	bh=ypRpAL/SOpf+fJx+QABf23+W6rQ4iDe3inTkvlPaqX0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vFrp1jnzSJsT0aRTM42fHRRUJL5ABKcItRMXUjh+iFU2tbjAm4UVx3/ppmIyvH+qU6NEYG4BvDV1QSL5/U3BaYfUlFN8exeMgsDIODhjXakiXPF+W7Ra4lgMoEIXmwO/ccva0xUEFpDgrLL98TN9QYSHaZSR7sFAHPwn95rMcRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HD+B9tjd; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=ROVGPoramEm0aMHmtTKa6kPUHrfV8drx7TeWHCGDkvUYGWYvp5JfuB20pNquVdTnt9mdd08eASQuzVIV6zehZMZFjyVa0vdPd+8K8J2iYC6jpDyxazLp3rAaAkYlda/1RDJ0AK/vpmiCDVY2NavIroraBunhTpFv6AXq2AJSYf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gCBWPc4J; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HD+B9tjd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gCBWPc4J"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774918667;
+	s=mimecast20190719; t=1774918948;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3KyIR523p7rYWqIIZEkyqHFsjWsGiKLRXiLRRYuTMUU=;
-	b=HD+B9tjdr0hZLUjCcceXvpEIBmUJipwrL/I46G92+bWG1OJkP01MjCpKEOV1U2l/q4DiVu
-	zuZkGc8NpTzB032pZPICPEIx3HxXPdopDUgK47fndmKOvRrZUKRk+z6n36bFG5dRR//NqC
-	N/yX7OBRLhZHsJpaPwqmOG/As6AjFfE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=vCyOd8Hq2eAy0S/aAjPXgTm66WXi3qjg5wbQWwZEhK4=;
+	b=gCBWPc4JO1nDdNbac7moVwIWRGtW1Db6VK0NSVpTKycGmMAirIjsLIryvSmmLXpuboWd+Z
+	g2w131QzIMe2r9ZQOyAPzSzBUmFObDeRTlQrKsGEdQgQzZ0ZnOvAkfMBqt1NSJFHsDZFpn
+	MCkFEQXa43gvOmhQ8VDOMiKJGifvZjA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-258-Vkbz3qlqO9OjuuaHyDSTkQ-1; Mon,
- 30 Mar 2026 20:57:44 -0400
-X-MC-Unique: Vkbz3qlqO9OjuuaHyDSTkQ-1
-X-Mimecast-MFC-AGG-ID: Vkbz3qlqO9OjuuaHyDSTkQ_1774918663
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-622-brngCdPJOnCsi5PsAzUHdw-1; Mon,
+ 30 Mar 2026 21:02:23 -0400
+X-MC-Unique: brngCdPJOnCsi5PsAzUHdw-1
+X-Mimecast-MFC-AGG-ID: brngCdPJOnCsi5PsAzUHdw_1774918938
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6331B195608B;
-	Tue, 31 Mar 2026 00:57:43 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F39D1956056;
+	Tue, 31 Mar 2026 01:02:17 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.5])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 586CD1954102;
-	Tue, 31 Mar 2026 00:57:38 +0000 (UTC)
-Date: Tue, 31 Mar 2026 08:57:34 +0800
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 70BB319560AB;
+	Tue, 31 Mar 2026 01:01:52 +0000 (UTC)
+Date: Tue, 31 Mar 2026 09:01:48 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
-Subject: Re: [PATCH v3 4/6] block: Reduce the minimum value for the maximum
- DMA segment size
-Message-ID: <acsb_mLxDz8RpXF1@fedora>
-References: <20260327211349.2239633-1-bvanassche@acm.org>
- <20260327211349.2239633-5-bvanassche@acm.org>
- <ack5VqUS_gRuxodF@fedora>
- <7fe454fa-d39b-4d2f-a238-297df2261cdd@acm.org>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	mst@redhat.com, aacraid@microsemi.com,
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+	liyihang9@h-partners.com, kashyap.desai@broadcom.com,
+	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
+	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com,
+	sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com,
+	ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com,
+	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org,
+	juri.lelli@redhat.com, vincent.guittot@linaro.org,
+	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com,
+	bigeasy@linutronix.de, yphbchou0911@gmail.com, wagi@kernel.org,
+	frederic@kernel.org, longman@redhat.com, chenridong@huawei.com,
+	hare@suse.de, kch@nvidia.com, steve@abita.co, sean@ashe.io,
+	chjohnst@gmail.com, neelx@suse.com, mproche@gmail.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
+	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com
+Subject: Re: [PATCH v9 00/13] blk: honor isolcpus configuration
+Message-ID: <acsc_GHv7Q04U1db@fedora>
+References: <20260330221047.630206-1-atomlin@atomlin.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,32 +74,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7fe454fa-d39b-4d2f-a238-297df2261cdd@acm.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20260330221047.630206-1-atomlin@atomlin.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Mar 30, 2026 at 12:49:33PM -0700, Bart Van Assche wrote:
-> On 3/29/26 7:38 AM, Ming Lei wrote:
-> > On Fri, Mar 27, 2026 at 02:13:44PM -0700, Bart Van Assche wrote:
-> > > All block devices that are supported by the Linux kernel have a DMA engine
-> > > that supports DMA segments of 4 KiB or larger. Allow smaller DMA segment
-> > > sizes because these are useful for block layer testing. Reject values below
-> > 
-> > Can you share why/what it is useful just for test purpose?
+On Mon, Mar 30, 2026 at 06:10:34PM -0400, Aaron Tomlin wrote:
+> Hi Jens, Keith, Christoph, Sagi, Michael,
 > 
-> Your commit 889c57066cee ("block: make segment size limit workable for >
-> 4K PAGE_SIZE") adds support for devices with a maximum segment size
-> limit that is less than the virtual memory page size. With
-> BLK_MIN_SEGMENT_SIZE == 4096, it is not possible to test the code paths
-> added by this commit if PAGE_SIZE == 4096. Allowing a segment size limit
-> that is less than 4096 bytes makes it possible to test the new code
-> paths on systems with PAGE_SIZE == 4096, e.g. an x86 VM.
+> I have decided to drive this series forward on behalf of Daniel Wagner, the
+> original author. This iteration addresses the outstanding architectural and
+> concurrency concerns raised during the previous review cycle, and the series
+> has been rebased on v7.0-rc5-509-g545475aebc2a.
+> 
+> Building upon prior iterations, this series introduces critical
+> architectural refinements to the mapping and affinity spreading algorithms
+> to guarantee thread safety and resilience against concurrent CPU-hotplug
+> operations. Previously, the block layer relied on a shared global static
+> mask (i.e., blk_hk_online_mask), which proved vulnerable to race conditions
+> during rapid hotplug events. This vulnerability was recently highlighted by
+> the kernel test robot, which encountered a NULL pointer dereference during
+> rcutorture (cpuhotplug) stress testing due to concurrent mask modification.
 
-lim->min_segment_size is <= PAGE_SIZE and BLK_MIN_SEGMENT_SIZE is same with
-4096, so 889c57066cee basically changes nothing for 4096 PAGE_SIZE.
+Can you share the bug report link?
 
-What is the exactly code path you are trying to cover by changing
-BLK_MIN_SEGMENT_SIZE?
+IMO, it should be solved as a backportable patch first if possible.
 
-Thanks, 
+
+Thanks,
 Ming
 
