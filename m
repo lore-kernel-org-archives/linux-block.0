@@ -1,134 +1,81 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7BF3845A2
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 06:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BF6146A66
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 07:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774938421; cv=none; b=V57pIGg8AXo0LYIQ6L2VWJwtozNsvrCC925rWpwXyW/2v0Z3MH3db22wEJG84f844vqB0xJJESGGsra7yKyW0KKQuYpbNuwjk3QmCpol/qT1Nhaoceu1zCEDrM2W6RWsS5SiHlVrMMgTCTuqk7B3Cr0MNjxsQEIp/YVhdXW35dw=
+	t=1774940558; cv=none; b=IhHidS6nnMMA6wccu0SJueG055xDNlqQKod0ztzpUdTLg48eoCrYCNwSInSoq3SO46pvkslkyEitIIqVwbgyI+5ey4Dodr0ybP4telAeQfuZEozrHXahU0cDv3QPpB13ZwxtBoqOuD6KQRFbvZ+RqJSGF5RmJ1oio/sjhdc4VwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774938421; c=relaxed/simple;
-	bh=o6ZNdbinZj3iv51nZmZkjpzytsjA9e4T3rhxSg04PYY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pljRRTew/k1HB2BX3whlpePVV3Qou4qPH7EhwW7hJiTgzRpF5K3GW2tQ0EchDsBu32qOvCmw66RXs65t3ZkQK30Wm5xhsO9xzAtoCAa+CH/D9XTYPLv3U3DQzVhloxauG5pQyvxN6KsnR8khecMuuPa+49RBfT6EIdrFRyzowbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=lJ6aASDe; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1774940558; c=relaxed/simple;
+	bh=vfsfPTAFa+cjfR+3AJsOAX51DLByk6M5kVtNWODXYtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r70zU/XegCCvV730lzx16KFAn8SjKcG+yE/DWAth1KP/PBYM9JVPygqgCIAlLuO9Pun20e2x2Iu4cj/PbirCbB+CU4bEPAlkuKinlvJiF4TtAMe8RqlAO5G6fV2JZ8hM6wGsVHt+OTalUgF3DeSzNnmC+LTKRJjzW9y5pI9ZCMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YBEah2FB; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lJ6aASDe"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2aaed195901so23006575ad.0
-        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 23:27:00 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YBEah2FB"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82c4b5dfe6cso2413032b3a.2
+        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 00:02:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1774938420; x=1775543220; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iFuV2hrKChe8VPlJWziIwCmvIdRAMcpeZAmPUEU/b+E=;
-        b=lJ6aASDeOrBFHB6JIViflwvwk8ZmOdGtU1oHCf5Yz5c67U4ljO1KFEtBpz0KuEEBL3
-         hqoAZd8rLu1gYLPQiGYlRZUKB8sKm9+ssT6RhHh8tlT9+tymND8jUkxeY04RxbfmD9CB
-         gUVFvfho2Nk21dC61FleErmAbaMgEphar22SE=
+        d=chromium.org; s=google; t=1774940557; x=1775545357; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O3Es0Jq2Oqy/D3XNICPyfENzALak9AF3Vg+PltBwZmY=;
+        b=YBEah2FB20zapO4U1MFK4dt/8JCwTu5aF1PN9EsHOmVxq7tQtrJoB2vNMKxeuXSoxh
+         W4woFlh7xqF5K4lDpH5DWbPZCQAEqztYRFPxcE5MHNo4wI7XqMFNRlx0Wbz1KGVTBx3j
+         2YWzkor+kOeUinr8uT0EKFMfI3JfmIzauKJg4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774938420; x=1775543220;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iFuV2hrKChe8VPlJWziIwCmvIdRAMcpeZAmPUEU/b+E=;
-        b=fZCIa7amkSQSgHYu52B9XiurAD/4eCiJqs/OPBq/9evUSlaw/dP6p2QYXW6dpKQxaZ
-         JV3KPJI2wBJre7Lv/T+i/LRwvviY4SiTlTD7nQBQmR40PCjZGWyBUGuOHaR6sRffMAVM
-         qkZp/HgKi77/Kgz8yQQ3fsdWrm4PU54ZZpG0BI0Po8fNAClwX/lUauvmqdfGf4ExeADj
-         cqCQnGQ38n8K8xePXPWDgmFzBTYW0ByDAzFf16E+1F5Jyu7D8CKzwl+1Z3FcNNRIQ1+G
-         gJqD0+7jsRoZJpuEGJtacfc4iPp2XGLX9lV4T2Vafl1T5UePZhY7R3qR6SK8WWyRLKFG
-         0gwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVxMHp/Pa/I0HI2iYssuO2HdW+9HW9rd4JqYp8Qch5NLvIE5hp3jLQPowh5IVlYndVQFLFGYPKqJZI/KQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNveSK03x73rDmhMU4XK4EBIP5G8tncFwEd57/r5p8hlsVK6Z3
-	8DZQ3JMGMOKHc7DjNIYk/gPkovER+IKnw+AL5YuSpN43mRPII4t5MM/DqhvrH+gw1A==
-X-Gm-Gg: ATEYQzwwiCzwV3r8yXaHGVxGNdHPCKO4GydeGAfP7iYcQ6sjFvKU1VWMWkIWtaONOvy
-	zJQQUSvUywlZRh2RAyhr2K4G14Mw7u0onM10J5PW/9rYc4HZxi2NZFbHRPbqlQmTrr6GwkOR/mo
-	B/puKa++cfDtEwF02m8J2/twSQl4kVVT4Mk3iZAkkVZZpJHnNT5RlrKJK2AgQ6HeHO25VZV1TtB
-	ABMYMaJ+0Vx3HoTwykwah8YqbC+OBuQoc0Ga4Nf9cQfvCxnlKpfexQZCdIZmz1fWf/YLvXiH78H
-	m7oOO90NxI25R/rMZPlB80mVqVFgu06fRd+okuX5zq9ieNrBb+4AdCSjlDSxaRSK6JtHIpNvJjW
-	ZhbtRWh6EYDRswSLyMC1MgZMFaGLyLdmBhJ1zYTTrSlZisjZ4vaRr7eO2LH4sSyvcEs5oicUHRE
-	jVGaPINE71YoErSKmi+45Cp03V24ZhJ4tUabkntZTCO6hobohcuEg6FlDKTqAfs49lmtWvUN8hH
-	87kpBb+VTjRYQ==
-X-Received: by 2002:a17:903:19eb:b0:2b0:5a4c:726a with SMTP id d9443c01a7336-2b0cdcd55f7mr169704795ad.43.1774938419771;
-        Mon, 30 Mar 2026 23:26:59 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:90ef:61f3:1679:56f5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b24ddc0afbsm90813585ad.64.2026.03.30.23.26.57
+        d=1e100.net; s=20251104; t=1774940557; x=1775545357;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O3Es0Jq2Oqy/D3XNICPyfENzALak9AF3Vg+PltBwZmY=;
+        b=Ql0b6Ip39A/HJZjlJ/j8eQQmnQLbHG6Szqg5CAyi14/dVmrG223tvCMtRmHD1IAlqB
+         XmDnmfQD7n5omJCrSM263BqqNBB5k/057F4pZEJ1uDdMnWTYoo110lzH5KOdV2iBeKzv
+         TQQPOLmOYjKgv0BRgJWhNFzi0CWgrvcMp5d/AmqAcZDD8/eNVGFTkhWBzYRtYxYvY5/G
+         hMW/tpUxhefsbVhFQEqxBRa/9sF1gc/r97OQFD9mh6mStzso5B3cNbJdLT/cZBotN4Dh
+         hjcsAseBgjdUHLo08GMLjeNq2VwIKtMIi29ozGfxneOOR4XRGwjhS/7Gx2mTJioworbz
+         yqWg==
+X-Gm-Message-State: AOJu0YzYj0JlCA9M6SyZlG5M9U5aVLlfhUHlrIQkgQKLgKfEOr859D9x
+	XuOwVYhmAd/9gYHJpuFsdof61K5T+OtN19wEf+y2l08P+UnEJZVaawJP1MKWbTFY6A==
+X-Gm-Gg: ATEYQzziXB9j/5Vk0siORmEraXAvXkMYBFmVW+Zf81WaM2VhRm9yKGcnS8UiHaoKSTa
+	0+GdBKQZQ30iGJ05vsOrLT5KhkqvPm1u+9XGExqQBN3DZ4sZOOMKI2COQJu5OvkxI84AAYK6E7d
+	H1v2W1v1HMXgxuvJEuN8gRXf8SdD5aSUmPjAQM7BVD3mw1BJzYwoS4z9fovI4gx2vJHTVpGauj0
+	nZUEttpuH6vdqRPIcS/JmILzbbBEOF/n8gA6xX2dTqFuNbXSi9LHIFbVb1g6F5ynbIRZuvrHJgO
+	PLCXSRvrS+WsNucB/DtDa5ZEZ2BR4LEAcTHJKZhTo7VGVYIifEaA8whMhqS1qaItZRO03UMa/up
+	qho/QOjdjt5hvSCbmXWL/CTHr+2WFFly6FpohJaLXK+3C+YF15UIOYB3b/nqr1tbZjztswv/V+M
+	rjFoLSWCFu2SAssdfLW8T4QNYc/36ZZnz2arzhrJXDGtHfX3x5vNSABXChR8XH9lE=
+X-Received: by 2002:a05:6a00:b486:b0:82a:7734:8c6a with SMTP id d2e1a72fcca58-82c960a484emr14265866b3a.48.1774940556821;
+        Tue, 31 Mar 2026 00:02:36 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:90ef:61f3:1679:56f5])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cdd04bb0esm865819b3a.38.2026.03.31.00.02.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 23:26:59 -0700 (PDT)
+        Tue, 31 Mar 2026 00:02:36 -0700 (PDT)
+Date: Tue, 31 Mar 2026 16:02:32 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Minchan Kim <minchan@kernel.org>,
-	Brian Geffon <bgeffon@google.com>
-Cc: Richard Chang <richardycc@google.com>,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Suren Baghdasaryan <surenb@google.com>
-Subject: [RFC PATCH] zram: update ac_time of written back slots
-Date: Tue, 31 Mar 2026 15:25:59 +0900
-Message-ID: <20260331062648.596077-1-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+To: Qu Wenruo <wqu@suse.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	minchan@kernel.org, senozhatsky@chromium.org
+Subject: Re: Super slow subpage IO on zram block devices?
+Message-ID: <actwaS1SyKq4ERSp@google.com>
+References: <92361cd3-fb8b-482e-bc89-15ff1acb9a59@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <92361cd3-fb8b-482e-bc89-15ff1acb9a59@suse.com>
 
-This makes it possible to tell how long each particular
-ZRAM_WB slot stays on the disk and, basically, to monitor
-writeback efficiency.
+On (26/03/31 16:15), Qu Wenruo wrote:
+>  # time blkdiscard -p 4k /dev/zram0
+>  [ It takes too long time that exceed my patient ]
 
-Note that the patch factors out a small update_slot_ac_time()
-helper, which we call on writeback completion, instead of
-calling mark_slot_accessed().  The reasons being is that
-mark_slot_accessed() clears ZRAM_PP_SLOT flag ahead of time,
-while we want to keep that flag set as long as the slot is on
-the post-processing list (unless the slot is freed concurrently).
+It's not you, I bet no one has this much patience, because that's
+basically a "deadlock".
 
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Suggested-by: Suren Baghdasaryan <surenb@google.com>
-Suggested-by: Brian Geffon <bgeffon@google.com>
----
- drivers/block/zram/zram_drv.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 5ecc4ba40e9d..dcea703a6766 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -185,15 +185,20 @@ static inline u32 get_slot_comp_priority(struct zram *zram, u32 index)
- 	return prio & ZRAM_COMP_PRIORITY_MASK;
- }
- 
--static void mark_slot_accessed(struct zram *zram, u32 index)
-+static void update_slot_ac_time(struct zram *zram, u32 index)
- {
--	clear_slot_flag(zram, index, ZRAM_IDLE);
--	clear_slot_flag(zram, index, ZRAM_PP_SLOT);
- #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
- 	zram->table[index].attr.ac_time = (u32)ktime_get_boottime_seconds();
- #endif
- }
- 
-+static void mark_slot_accessed(struct zram *zram, u32 index)
-+{
-+	clear_slot_flag(zram, index, ZRAM_IDLE);
-+	clear_slot_flag(zram, index, ZRAM_PP_SLOT);
-+	update_slot_ac_time(zram, index);
-+}
-+
- static inline void update_used_max(struct zram *zram, const unsigned long pages)
- {
- 	unsigned long cur_max = atomic_long_read(&zram->stats.max_used_pages);
-@@ -952,6 +957,7 @@ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
- 	zs_free(zram->mem_pool, get_slot_handle(zram, index));
- 	set_slot_handle(zram, index, req->blk_idx);
- 	set_slot_flag(zram, index, ZRAM_WB);
-+	update_slot_ac_time(zram, index);
- 
- out:
- 	slot_unlock(zram, index);
--- 
-2.53.0.1018.g2bb0e51243-goog
-
+I'll send a patch quickly.  Thanks for the report.
