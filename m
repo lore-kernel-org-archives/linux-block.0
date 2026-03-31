@@ -1,114 +1,217 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9A13ED10A
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 08:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135AD3EAC98
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 08:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774946893; cv=none; b=frsxBGrENFaKjDFiV4cSywbWnHkfxIwk8xN07TdEHInYqWldMU8g5IPj7PkFctt1p9Cn/LcFmOooTXah8W69WU4naCJ2cOA13ebhf89qxnAq1GRVZr9r0zz3QG6f+43cP4wdVg/g3LBdgsle4s7HOUjet9I/foHBh2pVGnkVuW0=
+	t=1774946994; cv=none; b=tHEqZ+N0+YdbFDesN9XkYfVGYxOwA6cZO0KaYYm8rMOPQ4CQgtdhWvvU/FNc6mtPdCv/h5W29x960nbiDpkaBPezLAmkmwp0N//jCQ9/DMepc3Gd/VqLh8PWK7NDgOe0MBP8fPl5u+QPlVhd/MIME7X1FdSJzjMHPIvRtz9rbi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774946893; c=relaxed/simple;
-	bh=PlTKqJERiEcVY4uLb6ivjnfwiQSCNaWeG2bAkWrcsK4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Axp4ffKW1dejmwzeWsUYrfxVqyhfx9X9c3YOXFG5HgQJioffx0gqIp1iijo0Y32BY+dTkLb7lU7okGkPFxA7RCnay27sw+iNmgV8MZC46gSsQFEiJ45U7EKTwd/6mMW7dsfeJJ1F3Miwyi8lN7yN4HKn+yrMvIsxRhJzU5k+BA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZCyoFkrn; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1774946994; c=relaxed/simple;
+	bh=V9J85+pJ3oOy9SYkts0FUJxXf0MZgzzbWINHsVKPSGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tf3MA4yr+iH3bAq//y3e2NvaEJdvxGq8RAnHiKhrjWQLHnBCnazVcrQWqPeYTvBHwBXS7p2KlcZsbhUWCPxyKuBzKKW9++NlnUqYkE5Whp58qbjsNEqijfQQ9CWl/n90R4+B571Edl5h0JvpZE7/bSVR6JoxOLWKf+iEo33igBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wlUIduQE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=uYkD+Mm0; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wlUIduQE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=uYkD+Mm0; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZCyoFkrn"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774946890;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=EYh6qhvMGHaMb53xZ+1xXdMieG0+56GtOQVsAZ2f87g=;
-	b=ZCyoFkrnvQtdfFbLqHvwk7svaBwYvKg9kpXozoqEkHOZr9hjwpwtzQPeITABLDdvoFJJuE
-	7Wc2D3G546B+w839ndOf9AJTLFEAan8aRqPJf+pHpu0P5jrhm/r8IHfYMNosVzwBKvNZ6N
-	YuGzhj/0dbxFUlsh1BTLvCuSBCT7BWM=
-From: Jackie Liu <liu.yun@linux.dev>
-To: dlemoal@kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: fix zones_cond memory leak in blk_revalidate_disk_zones()
-Date: Tue, 31 Mar 2026 16:47:31 +0800
-Message-ID: <20260331084731.45283-1-liu.yun@linux.dev>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wlUIduQE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="uYkD+Mm0";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wlUIduQE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="uYkD+Mm0"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3D0A25BEAB;
+	Tue, 31 Mar 2026 08:49:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1774946990; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GX2f6WWTPTGNYYJhT5VH960zt7uAc7KeEfJwdv7Twi0=;
+	b=wlUIduQEDXoPt3aXNwJT5NDX/0+zCJDMy++1/ggArpX5NSBk6wBRUfCtlKVES1z3gvKpB6
+	WbQHqg44UpEafP6tJlw2QDKkYIqIPlRYyfXjtqI7qotDgtmoFLFJOXX855/EvAkb4hWoZV
+	gBgpQAi8CJ3jxWaSmtfERLt/hmK4dCw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1774946990;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GX2f6WWTPTGNYYJhT5VH960zt7uAc7KeEfJwdv7Twi0=;
+	b=uYkD+Mm0jxgXujM6nk/nyMorbFZ0MFisnVyt5DaDnXGFCdJI/+EzU758M3a5C6YSwDTz/u
+	qJ1NUaQb1+x8MKAA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=wlUIduQE;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=uYkD+Mm0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1774946990; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GX2f6WWTPTGNYYJhT5VH960zt7uAc7KeEfJwdv7Twi0=;
+	b=wlUIduQEDXoPt3aXNwJT5NDX/0+zCJDMy++1/ggArpX5NSBk6wBRUfCtlKVES1z3gvKpB6
+	WbQHqg44UpEafP6tJlw2QDKkYIqIPlRYyfXjtqI7qotDgtmoFLFJOXX855/EvAkb4hWoZV
+	gBgpQAi8CJ3jxWaSmtfERLt/hmK4dCw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1774946990;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GX2f6WWTPTGNYYJhT5VH960zt7uAc7KeEfJwdv7Twi0=;
+	b=uYkD+Mm0jxgXujM6nk/nyMorbFZ0MFisnVyt5DaDnXGFCdJI/+EzU758M3a5C6YSwDTz/u
+	qJ1NUaQb1+x8MKAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2FE254A0A2;
+	Tue, 31 Mar 2026 08:49:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3uejC66Ky2ntMAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 31 Mar 2026 08:49:50 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id DB159A0AFD; Tue, 31 Mar 2026 10:49:41 +0200 (CEST)
+Date: Tue, 31 Mar 2026 10:49:41 +0200
+From: Jan Kara <jack@suse.cz>
+To: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Cc: Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, linux-ext4@vger.kernel.org, Ted Tso <tytso@mit.edu>, 
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>, David Sterba <dsterba@suse.com>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	David Hildenbrand <david@kernel.org>, linux-mm@kvack.org, linux-aio@kvack.org, 
+	Benjamin LaHaise <bcrl@kvack.org>
+Subject: Re: [PATCH 15/42] fat: Sync and invalidate metadata buffers from
+ fat_evict_inode()
+Message-ID: <mjraa5thsnzchejoomqgiahwajx4cs5ryqnmn7zsi3fylzhrrr@5ip65jcrlknn>
+References: <20260326082428.31660-1-jack@suse.cz>
+ <20260326095354.16340-57-jack@suse.cz>
+ <87ldfazqo2.fsf@mail.parknet.co.jp>
+ <3oh5cbnm6dwz6rikc6laably5nvu4c4wtxjqzuu3wymzhpqrtw@skopu327hd7a>
+ <87jyutwo6o.fsf@mail.parknet.co.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87jyutwo6o.fsf@mail.parknet.co.jp>
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[suse.cz,vger.kernel.org,kernel.org,zeniv.linux.org.uk,mit.edu,gmail.com,suse.com,linux.dev,suse.de,kvack.org];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:dkim,suse.cz:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Queue-Id: 3D0A25BEAB
+X-Spam-Flag: NO
+X-Spam-Score: -2.51
+X-Spam-Level: 
 
-From: Jackie Liu <liuyun01@kylinos.cn>
+On Mon 30-03-26 20:29:19, OGAWA Hirofumi wrote:
+> Jan Kara <jack@suse.cz> writes:
+> > On Sun 29-03-26 22:55:09, OGAWA Hirofumi wrote:
+> >> Jan Kara <jack@suse.cz> writes:
+> >> > There are only very few filesystems using generic metadata buffer head
+> >> > tracking and everybody is paying the overhead. When we remove this
+> >> > tracking for inode reclaim code .evict will start to see inodes with
+> >> > metadata buffers attached so write them out and prune them.
+> >> >
+> >> > Signed-off-by: Jan Kara <jack@suse.cz>
+> >> > ---
+> >> >  fs/fat/inode.c | 4 +++-
+> >> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >> >
+> >> > diff --git a/fs/fat/inode.c b/fs/fat/inode.c
+> >> > index 3cc5fb01afa1..ce88602b0d57 100644
+> >> > --- a/fs/fat/inode.c
+> >> > +++ b/fs/fat/inode.c
+> >> > @@ -657,8 +657,10 @@ static void fat_evict_inode(struct inode *inode)
+> >> >  	if (!inode->i_nlink) {
+> >> >  		inode->i_size = 0;
+> >> >  		fat_truncate_blocks(inode, 0);
+> >> > -	} else
+> >> > +	} else {
+> >> > +		sync_mapping_buffers(inode->i_mapping);
+> >> 
+> >> Hm, why do we have to add this here? For FAT, if buffers are still
+> >> dirty, buffers will be flushed via bdev flush?
+> >
+> > The reason why I've put sync_mapping_buffers() here is the following
+> > sequence:
+> >   fd = open("file")
+> >   write(fd)
+> >   close(fd)
+> >     - now data gets written out, dentry & inode can get evicted from memory
+> >   fd = open("file")
+> >   fsync(fd)
+> >     - this should flush all dirty metadata associated with "file" but if we
+> >       didn't call sync_mapping_buffers() during inode eviction we wouldn't
+> >       have a way to do that.
+> >
+> > So in general I think sync_mapping_buffers() call is indeed needed.
+> 
+> Hm, it looks like not new issue, isn't it? Why we have changed now in
+> this series?
 
-Fix memory leaks of args.zones_cond allocated in
-disk_revalidate_zone_resources() on multiple error paths:
+It isn't a new issue. But so far inode_lru_isolate() was checking whether
+the metadata buffers list has any dirty buffers and if yes, it skipped the
+inode. So inodes with dirty buffers in this list could reach .evict method
+only for deleted inodes or during unmount and either case makes above
+problem impossible to happen. This is however a layering violation (generic
+inode handling code shouldn't care about details of buffer heads) and as a
+result it makes it difficult to abstract the metadata buffer handling this
+series is doing. And all this for a handful of filesystems which,
+honestly, aren't used in performace critical settings.
 
-1) When disk_revalidate_zone_resources() itself fails (e.g.
-   disk_alloc_zone_resources() returns an error), blk_revalidate_disk_zones()
-   returns directly without freeing args.zones_cond.
+> It is including trade off write amplification vs reliability (i.e. may
+> not call fsync()), for example. So I think we should not add it easily.
 
-2) When report_zones() fails or the capacity check fails,
-   disk_free_zone_resources() only frees the old disk->zones_cond, not
-   the newly allocated args.zones_cond.
+I expect in practice you'll hardly be able to observe the difference as
+inodes usually get quite a while to be reclaimed at which point the dirty
+buffers would be already flushed by background writeback. I don't see how
+this change would lead specifically to "write amplification" - that would
+mean frequent redirtying of the same metadata buffer of an inode
+interleaved with frequent reclaims of the inode and I don't see how that
+would happen in a realistic setting.
 
-3) When the nr_conv_zones validation fails in disk_update_zone_resources(),
-   the code jumps to unfreeze before disk_set_zones_cond_array() transfers
-   ownership of args->zones_cond to disk->zones_cond.
+If someone comes with a realistic workload which would suffer significant
+regression from this change, then of course we should address it. I have
+plans for adding an interface for filesystems to expose the information
+that inode has some pending dirty metadata and a way to flush them from
+flush worker because that is a common need a lot of filesystems has and
+doing the flushing from .evict isn't always doable due to locking
+constraints. I'm still thinking about details but this has to be a properly
+abstracted interface all filesystems can use and not a special hack for a
+handful of old filesystems.
 
-Fix cases 1 and 2 by adding a free_zones_cond label at the end of
-blk_revalidate_disk_zones() to centralize the cleanup. Fix case 3 by
-moving disk_set_zones_cond_array() before the nr_conv_zones check in
-disk_update_zone_resources() so that ownership is transferred early and
-disk_free_zone_resources() at the unfreeze label properly frees it.
-
-Fixes: 6e945ffb6555 ("block: use zone condition to determine conventional zones")
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- block/blk-zoned.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 9d1dd6ccfad7..2ea790e4f320 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -1956,6 +1956,8 @@ static int disk_update_zone_resources(struct gendisk *disk,
- 	memflags = blk_mq_freeze_queue(q);
- 
- 	disk->nr_zones = args->nr_zones;
-+	disk_set_zones_cond_array(disk, args->zones_cond);
-+
- 	if (args->nr_conv_zones >= disk->nr_zones) {
- 		queue_limits_cancel_update(q);
- 		pr_warn("%s: Invalid number of conventional zones %u / %u\n",
-@@ -1966,7 +1968,6 @@ static int disk_update_zone_resources(struct gendisk *disk,
- 
- 	disk->zone_capacity = args->zone_capacity;
- 	disk->last_zone_capacity = args->last_zone_capacity;
--	disk_set_zones_cond_array(disk, args->zones_cond);
- 
- 	/*
- 	 * Some devices can advertise zone resource limits that are larger than
-@@ -2239,7 +2240,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	ret = disk_revalidate_zone_resources(disk, &args);
- 	if (ret) {
- 		memalloc_noio_restore(noio_flag);
--		return ret;
-+		goto free_zones_cond;
- 	}
- 
- 	ret = disk->fops->report_zones(disk, 0, UINT_MAX, &rep_args);
-@@ -2268,6 +2269,8 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	disk_free_zone_resources(disk);
- 	blk_mq_unfreeze_queue(q, memflags);
- 
-+free_zones_cond:
-+	kfree(args.zones_cond);
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_revalidate_disk_zones);
+								Honza
 -- 
-2.51.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
