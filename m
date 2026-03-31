@@ -1,45 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10723BE164;
-	Tue, 31 Mar 2026 07:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35E5362156
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 07:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774941741; cv=none; b=ZnvPIfYSQLqfDfPPfwjnwwDOmw0Xrdq76myPhRvBHds8SaOK8rGc2yo91Ccy9zQw8/4A9kJroHv8D4QzdIesOZEEf8KMZAQ+RsgET3rKelGcJsnjsleBOdByVHTr4d0MzwNTLtKXxGBYQe0ogxcSWl+Ych+NAO4Bknwb/UXAOlc=
+	t=1774941825; cv=none; b=SCcGka++wze2JLeCfRB0Kgr90JgdageZq25OdS4rlwpaJSZK3TN0QTvag97jJtTAYMMB3qBTFO3AaLCSANPh6DXMKohUP02V7R2ntIJDkFwejLU5nFM0D+vDxd13f1yvMHJ0ULv4AEPe7hVlmCBC3fnNPE976MkKoRDuEzFK7Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774941741; c=relaxed/simple;
-	bh=zTh4XjHfKWL7ba0b9Sqw4lC8D6/IJW57Qewykt/JDe8=;
+	s=arc-20240116; t=1774941825; c=relaxed/simple;
+	bh=S5MGcAplwPBdenJVaQOFQrkCx12JxcbCv4ZLkf1lIe0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J/AMaUcGG73cCBl/dKmQS5CQMdlwRe7JwntcQWFswoHIyOeiseZ7OmfWt+TrHv8vsF9VXwO2s0yeqNbUOC0Zf5NTuzIWkiICTd2zWUXdkhCYGn/w5o0PymiPdW9lgoxrzXQoJoUppJxHIlE02PXYoHtPLMrRpV/nP77yBjdKtdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bZPQHvnU; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dkv8MuodmicMPxOSITtjRoB9LZXLPUjDSfqsHxzYmyl8w7P4+ltk+y5KecXXzbLrXPR+p5DcPA4CNJI1EmOmwHGswo1QMOgZLMueOjcFtl+xLRPI6CYOVKnuuEeRVubCnyJgdqwBijQY7GjwzQgMYB4tYvtfHaVL/stZSP2uwSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=If9ARQR+; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bZPQHvnU"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="If9ARQR+"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=wOq9u+YEnP2L13BOaUj5IPbaOeet7/3oUdvcT9/aWCc=; b=bZPQHvnUrDtWA+gMJPs4cWWiiA
-	01YI0a8SV44oNVZtQM9AzNXqjjrbGGZAZt8zZrYy8MkebdywN/oEGIJvewwA/6Rb5US8WAN2JGzfS
-	y1nfG3Z8eJbrGi5hZsOEU4ZVamR082WPu6273ctBRrAbxGa+qluQ0t7SjbqjdlMZNdGSWvrfPlMQl
-	9nKHwA+dAA2x1tEDTwpy+MAMLY8DsBtAJJZZ34qUjNi9LVMmrYG1EQWfm08bU4WOx5bHPZpyBf4AN
-	Ekz8saZ+/YqikimWR0TOD53omrKha9TRqTlexX88w3LElCfYkBaUzCaIP3AqMSFazxLQgVsl9aQ3X
-	n88D63nQ==;
+	bh=8+Cn9Zs+wANnLplQQyLHmeNLRBUOFUncFZHUw9ImQbY=; b=If9ARQR+QCKWWCfgGHhQOi/0DY
+	5sUrat6YehU/vLTjP7wrpjLnnN9wjcl57CrG9/WpzQlq9RaLMtVZLhbfJ9Q0755ASFTJ5bMluZSzy
+	09ueVbI2Te0d7kiohWBtgkkzzcZZXSBAajIaHpfzELpbOy9lJ89dZm2COFS2JKnNggXV2X6CJaSZ5
+	TCgxow6ryD3FZYhZT+5YtrQKTVIYcb2jbu01l4q1Ex8Uaj5CkTjgeMeYSKmfMAMURd8MK23YnuyC1
+	ZlofoVixCi7BYXl7Ujtq+/tWH6GvfEmz/7szrMUqE21k0im+5gkbrFrTQZiB1S9AsgE43n/EbRVra
+	g9lNivqA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w7TQY-0000000CTBn-1kjl;
-	Tue, 31 Mar 2026 07:22:18 +0000
-Date: Tue, 31 Mar 2026 00:22:18 -0700
+	id 1w7TRv-0000000CTQx-0uGs;
+	Tue, 31 Mar 2026 07:23:43 +0000
+Date: Tue, 31 Mar 2026 00:23:43 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Deepanshu Kartikey <kartikey406@gmail.com>
-Cc: axboe@kernel.dk, tytso@mit.edu, hch@infradead.org, dvyukov@google.com,
-	adilger.kernel@dilger.ca, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] loop: block changing lo_offset/lo_sizelimit on
- mounted device
-Message-ID: <act2Kh8u2I5HPVlv@infradead.org>
-References: <20260331054648.4548-1-kartikey406@gmail.com>
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, brauner@kernel.org,
+	Daan De Meyer <daan@amutable.com>
+Subject: Re: [PATCH v2] loop: fix partition scan race between udev and
+ loop_reread_partitions()
+Message-ID: <act2f6C86rIHuwsC@infradead.org>
+References: <20260330081819.652890-1-daan@amutable.com>
+ <20260330110310.692144-1-daan@amutable.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,34 +47,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260331054648.4548-1-kartikey406@gmail.com>
+In-Reply-To: <20260330110310.692144-1-daan@amutable.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Mar 31, 2026 at 11:16:48AM +0530, Deepanshu Kartikey wrote:
-> LOOP_SET_STATUS{64} allows changing lo_offset and shrinking
-> lo_sizelimit while a filesystem is mounted on the loop device.
-> This effectively mutates the data visible to the mounted filesystem,
-> which is equivalent to writing directly to the block device.
-> 
-> When CONFIG_BLK_DEV_WRITE_MOUNTED is disabled, direct writes to a
-> mounted block device are blocked. However, LOOP_SET_STATUS{64}
-> bypasses this protection because it modifies the loop configuration
-> through an ioctl rather than opening the block device for writing.
-> 
-> Fix this by checking bdev_writes_blocked() before allowing changes
-> to lo_offset or shrinking lo_sizelimit. If the loop device has
-> writes blocked, return -EBUSY. Increasing lo_sizelimit is still
-> allowed since growing the device is harmless and has legitimate
-> use cases such as online resize.
-> 
-> Move bdev_writes_blocked() from block/bdev.c to
-> include/linux/blk_types.h as a static inline function so it can
-> be used from the loop driver without exporting a symbol.
+On Mon, Mar 30, 2026 at 11:03:10AM +0000, Daan De Meyer wrote:
+> Fix this by clearing GD_NEED_PART_SCAN before sending the uevent when
+> LO_FLAGS_PARTSCAN is set. Since loop_reread_partitions() will perform
+> the authoritative partition scan, the lazy on-open scan triggered by
+> GD_NEED_PART_SCAN is redundant. With the flag cleared, udev opening
+> the device no longer triggers a scan in blkdev_get_whole(), and only
+> the single explicit scan from loop_reread_partitions() runs.
 
-I still think this is a very bad idea for the reasons explained before.
+Setting the flag and instantly clearing them seems like a bad idea.
+So add a variant that doesn't set it instead, or audit the callers
+for who even needs the flag set.  floppy doesn't because it doesn't
+support partitions, and the other callers in loop also look
+suspicious.
 
-And I would not be surprised if this breaks something in blktests or
-xfstests as they heavily rely on resizing block devices.  Did you
-do full runs of those?  Especially with xfs and btrfs for xfstests
-as they do a lot more loop based tests?
-
+Also can you wire up a test for this in blktests?
