@@ -1,293 +1,148 @@
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3E23A6B6F
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 10:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13903A4F2F;
+	Tue, 31 Mar 2026 10:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774951523; cv=none; b=QLQQA09A2cRIvH77dHVu6GfAcHgG9uAuxLZxFzHU6RNxxS2uIQ5W044d8KN2imoQqZN69VKiWvpwpKHNhGmlzBiTEECJi/r6I8wDQ52oRMG+lb/ir9DbS328TKonA+AaZ5+OCDBRFfwzDl83rAc3TjH+Q9/jGCKSR5+nMf840Ks=
+	t=1774953614; cv=none; b=Kd053Mtwu3wi+MueAktbCh3fk3or/zeMUFmi/TtQOPFs1nEcsxORY2h1HnJjdrF/FRKIKojQ+wucQzpHWU1negkW9zpiKkEEq0byeuWT/leBMEJSQIryOwFeNvhizLdoxn+hqa+RoDlrfpfTplfoGt/JAJyr7xP+IPUocy+Ogtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774951523; c=relaxed/simple;
-	bh=brmGGIuWRtCDRtEnvbIzJrncb+vmaxIfIoZnwKQffBY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EKnxC4W3QSsp3HU8OhiP1rS3HWXcDUTkiLOjB+ry968wSBOojrjFNHqA4y/jI+dY391nZTzfQc+/7V0Uwf2mXwviMp5SPDQhKGEjgBxjLCKL4Myyu66XHm8DF1PChxyG/ajeWYC39wzVDJ2uTF6aIDp3caQerwMEyAwhHi9nB/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ReWgzyiC; arc=none smtp.client-ip=209.85.210.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774953614; c=relaxed/simple;
+	bh=9Nx9On3/A9yUpOPmBiwI3EzprmI9bCiG/OLT9iVkg94=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=SdCHvKJNKGOlcKElxDfljBlw4ch8EyNVf8RdLV0ZugzBJn5LCgebo03d5IXL1R8j2j6/i6RqDnn116UhvHIqUAWIJDcgYhWV7gy0ojjjQGo2GKFdc04Cgt5FhBvcmTdy73XIGEGaq6UZ+H5frkfgzH7kE3kBBzkwwmuYXZ63Bdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=RGXImBG9; dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=IkV85c1b; arc=none smtp.client-ip=210.171.160.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ReWgzyiC"
-Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-82cdb4ab547so234347b3a.2
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 03:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774951522; x=1775556322; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y8stTflUqBWilNXQtRU2bQyAp9yk4sf72e3JD82g2ns=;
-        b=ReWgzyiCg0/p0tqK64NLn9gHegbDMLu+ZIy2e+U6BQ9V5ZhhPEaKPHTzwS2d6hApT0
-         Ad81WTByXgCp4S1wl6xoolgqjBbmGL6qJs3HIVmF0ImAQ3CEKjYfbUgxq3lqV97WEfef
-         R/ub2xvw8gHSDC8r+yw2fcwpC2BGOjxBTMzZM43QuDvBeP14pMYD6WgGVu3r2D61L+wl
-         qZpAOdpgI5zwpsLpScYC8EOd5lhI6trmL6AHieAKpYEh7D/z42ZSGoycXBs9XWoCSFPK
-         0mnK/SedUfsIGg2CeRuVZyBLsDlfrqpBjYCHIHSz/2chxmTxeldNfYY0/unlwQcZKbKY
-         htJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774951522; x=1775556322;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=y8stTflUqBWilNXQtRU2bQyAp9yk4sf72e3JD82g2ns=;
-        b=NYRT2zVOI3YkNSukMgKOMfBdqO7itOQVN9uLYIuqCAgdEoshgPKcI1mPqbORfkoYfm
-         nJD9jPllcCc3o+eJyglK7QpBBS7Gofly1KkXbXEC4GidDSyGhZ5vBnKDC2PFyh0Xb7FE
-         1aFkB1PI4q8iUULO0Z3Avq4dv0L0S8WhNLm8tByhUyseVc8ia4X7Xub4tIOVk8Ys1F5R
-         cucxOy8oWzOkBf8Jp8bZRDH3m6AwgILERGmFd/jKSEhMW974YM3PXM1LZqWUwxlA2jPp
-         RqRvM15FcPwlSynuuuiCpUUqalOzc36mkRpWrCx8LOCnNmbWj2vQxZzzB30PmoMkX6e8
-         ZM8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXSov/TEOK7RCJxHQel+eSHPYVCX0D3IDcmg/F/ES8JfhckAJ8Y3L7uLf7BHXztj0P3yIXTMSdk5w6Qbw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxgj6CPpVte+8ewoP5zxvdjfwPy8VOitq9ceL/yzwHptqBIKD2T
-	Kft8EqFdMoOjVaQ6KBqtSRMBzM5ky908+fqCJAjsvbbe2iEAdfUI+3WX
-X-Gm-Gg: ATEYQzxmVH6RrCfS/5uMjqDZBo2KOtVzzaIhaa0iQJERxFOOzNHm5gAzTELkHkqNDzn
-	2Wxf26SOu6wTImgVqUMfuYxDMjP7yZnDQZVQdg8s7GJY9HLPab/kfsjnZASDG7hlj1sei0p3+q2
-	0c58rqJe//dqChafgi5ul2gJXBdk8FqR1UvVx6mJDYGRxQbIErIpShEizsjZ5xeFdiFlTRFKhvq
-	9faQR46dSIsOGn0w2BETzUmfqYCDVW3I1IGUK1Kt4VoVR3infQdiEV7f6yr4Mhv5+4seGJMBPnt
-	MCirqRFPQFAnvqeQZHT1YiDFURHPShf0TEEy2eKmAVjPD/FyZaExrOCCvApEgcBiztmR137Ce2+
-	n4x87MtdKicl3bkTW9xp3zSyn5MoroB0vnJJmjMzRLupcGWUd34ZlTyV8XJAj9HvN9MCbZXhuxM
-	zkRnDUyPGO9SyOKl+INp6j9DJAlgmklWR7iA==
-X-Received: by 2002:a05:6a00:438a:b0:801:eee2:45b6 with SMTP id d2e1a72fcca58-82c95e7c457mr14501172b3a.24.1774951521532;
-        Tue, 31 Mar 2026 03:05:21 -0700 (PDT)
-Received: from archwsl.localdomain ([116.232.56.124])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca860b125sm9758914b3a.50.2026.03.31.03.05.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 03:05:21 -0700 (PDT)
-From: Jialin Wang <wjl.linux@gmail.com>
-To: wjl.linux@gmail.com
-Cc: axboe@kernel.dk,
-	cgroups@vger.kernel.org,
-	josef@toxicpanda.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org
-Subject: [PATCH v3] blk-iocost: fix busy_level reset when no IOs complete
-Date: Tue, 31 Mar 2026 10:05:09 +0000
-Message-ID: <20260331100509.182882-1-wjl.linux@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260329154112.526679-1-wjl.linux@gmail.com>
-References: <20260329154112.526679-1-wjl.linux@gmail.com>
+	dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="RGXImBG9";
+	dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="IkV85c1b"
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+	by mail.parknet.co.jp (Postfix) with ESMTPSA id 779F226F7689;
+	Tue, 31 Mar 2026 19:40:02 +0900 (JST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=parknet.co.jp;
+	s=20250114; t=1774953602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o61ziz1K7RE+vfkx01/BqKbiM2DvTc1gWIWpdSZJsrk=;
+	b=RGXImBG9OkkmJqMaygJ7AQDGsKzIQl9abCecZ1Urgp/oZ2yiBvcZeoE7CFuE+/kvV+iN6D
+	U4swsphXGmlc5MObWhkYovizM+FxkoO6U2EEfzujW5BqBtiQ0r/J752mOChnK4gJbLR1dD
+	1VUSlKrbZJpn48cr/6Z/ap3ks+R41GUVNedpzkFQCJe04B0BLknTNOOiimUB7JUPB+SQ/N
+	4X6OBt/0Ut5bSz7MyVLy+TgrTD28bKJcZgC7ik/AyOmHECVjUd9Vv439R9htdHSYnn55Lv
+	bCx5WQtQ/S9RUkvZ1CIEdGRCrYI8pxGW0DbfMNG8k94uebjKG5i/Rptypu+OKw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=parknet.co.jp;
+	s=20250114-ed25519; t=1774953602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o61ziz1K7RE+vfkx01/BqKbiM2DvTc1gWIWpdSZJsrk=;
+	b=IkV85c1bt9eSNB1ACUrhM1X1oZJQ7QVVMbbvnBOLSwK7ls9q0Ga6u2jMZrt3U7fvRHGRKO
+	E6TPZwycQpL0rOBA==
+Received: from devron.myhome.or.jp (devron.myhome.or.jp [192.168.0.3])
+	by ibmpc.myhome.or.jp (Postfix) with ESMTPS id 04458E00CC9;
+	Tue, 31 Mar 2026 19:40:02 +0900 (JST)
+Received: by devron.myhome.or.jp (Postfix, from userid 1000)
+	id EABA92200056; Tue, 31 Mar 2026 19:40:01 +0900 (JST)
+From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org,  linux-block@vger.kernel.org,  Christian
+ Brauner <brauner@kernel.org>,  Al Viro <viro@zeniv.linux.org.uk>,
+  linux-ext4@vger.kernel.org,  Ted Tso <tytso@mit.edu>,  "Tigran A.
+ Aivazian" <aivazian.tigran@gmail.com>,  David Sterba <dsterba@suse.com>,
+  Muchun Song <muchun.song@linux.dev>,  Oscar Salvador <osalvador@suse.de>,
+  David Hildenbrand <david@kernel.org>,  linux-mm@kvack.org,
+  linux-aio@kvack.org,  Benjamin LaHaise <bcrl@kvack.org>
+Subject: Re: [PATCH 15/42] fat: Sync and invalidate metadata buffers from
+ fat_evict_inode()
+In-Reply-To: <mjraa5thsnzchejoomqgiahwajx4cs5ryqnmn7zsi3fylzhrrr@5ip65jcrlknn>
+References: <20260326082428.31660-1-jack@suse.cz>
+	<20260326095354.16340-57-jack@suse.cz>
+	<87ldfazqo2.fsf@mail.parknet.co.jp>
+	<3oh5cbnm6dwz6rikc6laably5nvu4c4wtxjqzuu3wymzhpqrtw@skopu327hd7a>
+	<87jyutwo6o.fsf@mail.parknet.co.jp>
+	<mjraa5thsnzchejoomqgiahwajx4cs5ryqnmn7zsi3fylzhrrr@5ip65jcrlknn>
+Date: Tue, 31 Mar 2026 19:40:01 +0900
+Message-ID: <87wlyss2ny.fsf@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-When a disk is saturated, it is common for no IOs to complete within a
-timer period. Currently, in this case, rq_wait_pct and missed_ppm are
-calculated as 0, the iocost incorrectly interprets this as meeting QoS
-targets and resets busy_level to 0.
+Jan Kara <jack@suse.cz> writes:
 
-This reset prevents busy_level from reaching the threshold (4) needed
-to reduce vrate. On certain cloud storage, such as Azure Premium SSD,
-we observed that iocost may fail to reduce vrate for tens of seconds
-during saturation, failing to mitigate noisy neighbor issues.
+>> >> Hm, why do we have to add this here? For FAT, if buffers are still
+>> >> dirty, buffers will be flushed via bdev flush?
+>> >
+>> > The reason why I've put sync_mapping_buffers() here is the following
+>> > sequence:
+>> >   fd = open("file")
+>> >   write(fd)
+>> >   close(fd)
+>> >     - now data gets written out, dentry & inode can get evicted from memory
+>> >   fd = open("file")
+>> >   fsync(fd)
+>> >     - this should flush all dirty metadata associated with "file" but if we
+>> >       didn't call sync_mapping_buffers() during inode eviction we wouldn't
+>> >       have a way to do that.
+>> >
+>> > So in general I think sync_mapping_buffers() call is indeed needed.
+>> 
+>> Hm, it looks like not new issue, isn't it? Why we have changed now in
+>> this series?
+>
+> It isn't a new issue. But so far inode_lru_isolate() was checking whether
+> the metadata buffers list has any dirty buffers and if yes, it skipped the
+> inode. So inodes with dirty buffers in this list could reach .evict method
+> only for deleted inodes or during unmount and either case makes above
+> problem impossible to happen. This is however a layering violation (generic
+> inode handling code shouldn't care about details of buffer heads) and as a
+> result it makes it difficult to abstract the metadata buffer handling this
+> series is doing. And all this for a handful of filesystems which,
+> honestly, aren't used in performace critical settings.
 
-Fix this by tracking the number of IO completions (nr_done) in a period.
-If nr_done is 0 and there are lagging IOs, the saturation status is
-unknown, so we keep busy_level unchanged.
+I see, I could understand why you wanted to change though. However, (in
+my thought, this change has disadvantage by below reason) changing this
+behavior because of layering violation is not good way, IMO.
 
-The issue is consistently reproducible on Azure Standard_D8as_v5 (Dasv5)
-VMs with 512GB Premium SSD (P20) using the script below. It was not
-observed on GCP n2d VMs (with 100G pd-ssd and 1.5T local-ssd), and no
-regressions were found with this patch. In this script, cgA performs
-large IOs with iodepth=128, while cgB performs small IOs with iodepth=1
-rate_iops=100 rw=randrw. With iocost enabled, we expect it to throttle
-cgA, the submission latency (slat) of cgA should be significantly higher,
-cgB can reach 200 IOPS and the completion latency (clat) should below.
+>> It is including trade off write amplification vs reliability (i.e. may
+>> not call fsync()), for example. So I think we should not add it easily.
+>
+> I expect in practice you'll hardly be able to observe the difference as
+> inodes usually get quite a while to be reclaimed at which point the dirty
+> buffers would be already flushed by background writeback. I don't see how
+> this change would lead specifically to "write amplification" - that would
+> mean frequent redirtying of the same metadata buffer of an inode
+> interleaved with frequent reclaims of the inode and I don't see how that
+> would happen in a realistic setting.
+>
+> If someone comes with a realistic workload which would suffer significant
+> regression from this change, then of course we should address it. I have
+> plans for adding an interface for filesystems to expose the information
+> that inode has some pending dirty metadata and a way to flush them from
+> flush worker because that is a common need a lot of filesystems has and
+> doing the flushing from .evict isn't always doable due to locking
+> constraints.
 
-  BLK_DEVID="8:0"
-  MODEL="rbps=173471131 rseqiops=3566 rrandiops=3566 wbps=173333269 wseqiops=3566 wrandiops=3566"
-  QOS="rpct=90 rlat=3500 wpct=90 wlat=3500 min=80 max=10000"
+I think it would happen with normal operation, for example, copy many
+files more than total memory. I think this would be much common than
+write=>close=>open=>fsync in your example.  Anyway, with it, reclaimed
+inode metadata will be flushed forcibly and frequently (yeah, may not be
+significant though. but I can't see the benefit for users from this
+change.), and lost to chance combining multiple time of dirty while copy
+many files.
 
-  echo "$BLK_DEVID ctrl=user model=linear $MODEL" > /sys/fs/cgroup/io.cost.model
-  echo "$BLK_DEVID enable=1 ctrl=user $QOS" > /sys/fs/cgroup/io.cost.qos
+> I'm still thinking about details but this has to be a properly
+> abstracted interface all filesystems can use and not a special hack for a
+> handful of old filesystems.
 
-  CG_A="/sys/fs/cgroup/cgA"
-  CG_B="/sys/fs/cgroup/cgB"
+Sounds great. How about we delay this behavior change until this
+interface?
 
-  FILE_A="/path/to/sda/A.fio.testfile"
-  FILE_B="/path/to/sda/B.fio.testfile"
-  RESULT_DIR="./iocost_results_$(date +%Y%m%d_%H%M%S)"
-
-  mkdir -p "$CG_A" "$CG_B" "$RESULT_DIR"
-
-  get_result() {
-    local file=$1
-    local label=$2
-
-    local results=$(jq -r '
-    .jobs[0].mixed | 
-    ( .iops | tonumber | round ) as $iops |
-    ( .bw_bytes / 1024 / 1024 ) as $bps |
-    ( .slat_ns.mean / 1000000 ) as $slat |
-    ( .clat_ns.mean / 1000000 ) as $avg |
-    ( .clat_ns.max / 1000000 ) as $max |
-    ( .clat_ns.percentile["90.000000"] / 1000000 ) as $p90 |
-    ( .clat_ns.percentile["99.000000"] / 1000000 ) as $p99 |
-    ( .clat_ns.percentile["99.900000"] / 1000000 ) as $p999 |
-    ( .clat_ns.percentile["99.990000"] / 1000000 ) as $p9999 |
-    "\($iops)|\($bps)|\($slat)|\($avg)|\($max)|\($p90)|\($p99)|\($p999)|\($p9999)"
-    ' "$file")
-
-    IFS='|' read -r iops bps slat avg max p90 p99 p999 p9999 <<<"$results"
-    printf "%-8s %-6s %-7.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f\n" \
-           "$label" "$iops" "$bps" "$slat" "$avg" "$max" "$p90" "$p99" "$p999" "$p9999"
-  }
-
-  run_fio() {
-    local cg_path=$1
-    local filename=$2
-    local name=$3
-    local bs=$4
-    local qd=$5
-    local out=$6
-    shift 6
-    local extra=$@
-
-    (
-      pid=$(sh -c 'echo $PPID')
-      echo $pid >"${cg_path}/cgroup.procs"
-      fio --name="$name" --filename="$filename" --direct=1 --rw=randrw --rwmixread=50 \
-          --ioengine=libaio --bs="$bs" --iodepth="$qd" --size=4G --runtime=10 \
-          --time_based --group_reporting --unified_rw_reporting=mixed \
-          --output-format=json --output="$out" $extra >/dev/null 2>&1
-    ) &
-  }
-
-  echo "Starting Test ..."
-
-  for bs_b in "4k" "32k" "256k"; do
-    echo "Running iteration: BS=$bs_b"
-    out_a="${RESULT_DIR}/cgA_1m.json"
-    out_b="${RESULT_DIR}/cgB_${bs_b}.json"
-
-    # cgA: Heavy background (BS 1MB, QD 128)
-    run_fio "$CG_A" "$FILE_A" "cgA" "1m" 128 "$out_a"
-    # cgB: Latency sensitive (Variable BS, QD 1, Read/Write IOPS limit 100)
-    run_fio "$CG_B" "$FILE_B" "cgB" "$bs_b" 1 "$out_b" "--rate_iops=100"
-
-    wait
-    SUMMARY_DATA+="$(get_result "$out_a" "cgA-1m")"$'\n'
-    SUMMARY_DATA+="$(get_result "$out_b" "cgB-$bs_b")"$'\n\n'
-  done
-
-  echo -e "\nFinal Results Summary:\n"
-
-  printf "%-8s %-6s %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s\n" \
-          "" "" "" "slat" "clat" "clat" "clat" "clat" "clat" "clat"
-  printf "%-8s %-6s %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s\n\n" \
-          "CGROUP" "IOPS" "MB/s" "avg(ms)" "avg(ms)" "max(ms)" "P90(ms)" "P99" "P99.9" "P99.99"
-  echo "$SUMMARY_DATA"
-
-  echo "Results saved in $RESULT_DIR"
-
-Before:
-                          slat     clat     clat     clat     clat     clat     clat    
-  CGROUP   IOPS   MB/s    avg(ms)  avg(ms)  max(ms)  P90(ms)  P99      P99.9    P99.99  
-  
-  cgA-1m   166    166.37  3.44     748.95   1298.29  977.27   1233.13  1300.23  1300.23 
-  cgB-4k   5      0.02    0.02     181.74   761.32   742.39   759.17   759.17   759.17  
-  
-  cgA-1m   167    166.51  1.98     748.68   1549.41  809.50   1451.23  1551.89  1551.89 
-  cgB-32k  6      0.18    0.02     169.98   761.76   742.39   759.17   759.17   759.17  
-  
-  cgA-1m   166    165.55  2.89     750.89   1540.37  851.44   1451.23  1535.12  1535.12 
-  cgB-256k 5      1.30    0.02     191.35   759.51   750.78   759.17   759.17   759.17  
-
-After:
-                          slat     clat     clat     clat     clat     clat     clat    
-  CGROUP   IOPS   MB/s    avg(ms)  avg(ms)  max(ms)  P90(ms)  P99      P99.9    P99.99  
-  
-  cgA-1m   162    162.48  6.14     749.69   850.02   826.28   834.67   843.06   851.44  
-  cgB-4k   199    0.78    0.01     1.95     42.12    2.57     7.50     34.87    42.21   
-  
-  cgA-1m   146    146.20  6.83     833.04   908.68   893.39   901.78   910.16   910.16  
-  cgB-32k  200    6.25    0.01     2.32     31.40    3.06     7.50     16.58    31.33   
-  
-  cgA-1m   110    110.46  9.04     1082.67  1197.91  1182.79  1199.57  1199.57  1199.57 
-  cgB-256k 200    49.98   0.02     3.69     22.20    4.88     9.11     20.05    22.15   
-
-Signed-off-by: Jialin Wang <wjl.linux@gmail.com>
----
-Changes in v3:
-- Handle only the !nr_done && nr_lagging case and leave the other cases
-  as they are.
-Changes in v2:
-- Handle more edge cases to prevent potential regressions.
-
-v2: https://lore.kernel.org/all/20260329154112.526679-1-wjl.linux@gmail.com/
-v1: https://lore.kernel.org/all/20260318163351.394528-1-wjl.linux@gmail.com/
-
-
- block/blk-iocost.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index d145db61e5c3..0cca88a366dc 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1596,7 +1596,8 @@ static enum hrtimer_restart iocg_waitq_timer_fn(struct hrtimer *timer)
- 	return HRTIMER_NORESTART;
- }
- 
--static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p)
-+static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p,
-+			 u32 *nr_done)
- {
- 	u32 nr_met[2] = { };
- 	u32 nr_missed[2] = { };
-@@ -1633,6 +1634,8 @@ static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p
- 
- 	*rq_wait_pct_p = div64_u64(rq_wait_ns * 100,
- 				   ioc->period_us * NSEC_PER_USEC);
-+
-+	*nr_done = nr_met[READ] + nr_met[WRITE] + nr_missed[READ] + nr_missed[WRITE];
- }
- 
- /* was iocg idle this period? */
-@@ -2250,12 +2253,12 @@ static void ioc_timer_fn(struct timer_list *timer)
- 	u64 usage_us_sum = 0;
- 	u32 ppm_rthr;
- 	u32 ppm_wthr;
--	u32 missed_ppm[2], rq_wait_pct;
-+	u32 missed_ppm[2], rq_wait_pct, nr_done;
- 	u64 period_vtime;
- 	int prev_busy_level;
- 
- 	/* how were the latencies during the period? */
--	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct);
-+	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct, &nr_done);
- 
- 	/* take care of active iocgs */
- 	spin_lock_irq(&ioc->lock);
-@@ -2397,9 +2400,17 @@ static void ioc_timer_fn(struct timer_list *timer)
- 	 * and should increase vtime rate.
- 	 */
- 	prev_busy_level = ioc->busy_level;
--	if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
--	    missed_ppm[READ] > ppm_rthr ||
--	    missed_ppm[WRITE] > ppm_wthr) {
-+	if (!nr_done && nr_lagging) {
-+		/*
-+		 * When there are lagging IOs but no completions, we don't
-+		 * know if the IO latency will meet the QoS targets. The
-+		 * disk might be saturated or not. We should not reset
-+		 * busy_level to 0 (which would prevent vrate from scaling
-+		 * up or down), but rather to keep it unchanged.
-+		 */
-+	} else if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
-+		   missed_ppm[READ] > ppm_rthr ||
-+		   missed_ppm[WRITE] > ppm_wthr) {
- 		/* clearly missing QoS targets, slow down vrate */
- 		ioc->busy_level = max(ioc->busy_level, 0);
- 		ioc->busy_level++;
+Thanks.
 -- 
-2.53.0
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
