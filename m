@@ -1,151 +1,195 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7378E3A9623
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 10:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03739258EC2
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 10:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774954307; cv=none; b=fF3Lc9+zCHRCFhYQVQsYrJK7Ei1Vtf7TKKlyY9M8yzr/frZQ+32balB2RDFPlU/+AkecfD5xr8ILWDNElzyUOdLLN2Fq4+mOlSHBw0DCbghr7uiS7ESRN2I0trzhEHhDcBwN3xrsxkz8TNLwND5bdrC7cD2+WPKrlM+eRb7h4ls=
+	t=1774954581; cv=none; b=PFrwhFDD6fKGvGKP/a8JnUjlasusnjFUIndAjZiiwTEw9eFrH8wptYY6GI3oWDcpQDwavV1zNLOg+Rh6f6zFmYEk7YGT/3GKfjS9ubIkkdg1UxIsJ2gz1suegW9SILUA/MT2QfhcbA2gsPgLisxIpHWlnF0Wb7wl4+PH1J8yLms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774954307; c=relaxed/simple;
-	bh=logZAmhEwKcXhJIQh9W417rKWh6dBrA0tEo887f+GGs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LbiZYMJHKKG0Eh+nfyyUAITkf5+ar1NmdLOReUQqvF5HII5uzFPqfOQX3uLaDdS25aVfaq3wPKUCkqWaewjjeJUANZTl/ZgiqLCTSVwClX12DDRly08VQv8SmxOetckcFW6bkEiR+oK56uUsx07tcT6uZh627kNMOsG72LqGS9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=roi9lNdY; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1774954581; c=relaxed/simple;
+	bh=+Yawmb3hmej1rVYsaMQVZpye71Ct8oqQ7SSZaoa3GEo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I6SCoBwWeXZPItiYVIUPgvu/TaHzqeO6GwZpY8NYySO3/QW+n3GCc1anmI0tZEPriUvZn2mIo03NJ2el+qUZ9HUhmXXGhvJY6WrqG4hUVECwFnNCluRHk3yny7vmjyxcY8IFmQ1SdNmgLF5ECXaSUP5fdDKzzs9kb0Yw0n/u/1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AeF6mk+w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="roi9lNdY"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso46013725e9.3
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 03:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774954305; x=1775559105; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2myqE94HaK/hO6S/5AS19OPX8YCgfFlLAfMjQvqgXEw=;
-        b=roi9lNdY9Xd8vqm5QrKSdOwk+YkjiuCwVPcWgwEZxUgHDXm/41EFvdvFS6OqT8lq7g
-         XxlbtqpOD0aPbfjEI3T5eURKJsIjt/nbopP7QYcyrOFEt/s1uCLTZugghSlldmrNUHmX
-         RJUmMUipHjitsykDq4ciBFCaxSjhgDb8a8zOUOqgnVeNZXePNbOLXcEcZaMi44K1NUG5
-         rZRqI6Gew+0IMyZZODwUkEsro7RedHlHfHOpwDXzSC1lKA9p8ZVzJEmOLuTix8vY1QXK
-         SHd81ef9V0z5/thKbVxuwbAyycpn7vQEkWfhpAXI9D95z7evJjFedq2RaOU0VF78cSDB
-         q6dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774954305; x=1775559105;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2myqE94HaK/hO6S/5AS19OPX8YCgfFlLAfMjQvqgXEw=;
-        b=RwUm+kv4QnnFdvoI/UkZ+Ev5VbrtKpPIE5FyfdGwL44KARK/cp4lrs0XGEjLFGcRN1
-         +U5Rz5qka9h484nWQbfKBlepVyxwnxrxbLVzUJgzUKx+8+1CsLGuYeVdzMBoPQOb6D6P
-         gkSbWCXh+FJDafSrWrO99F3Wv82FZggxJYVDhGmTgPO/qol/aK9BvDt3eL7fphvBPic0
-         ghzhtJCCAouK+S5kwnV1Y2uGrpnXi/qf4JvSA5RinKBqrDCYIYAQHqydoeDqUNT8h9lY
-         dlB/5RUj69YYLiAO6jiVYsHYirdV7SP8bjNy9ivrPiW2umsUiyPEhLimVe4ABDZx5yDs
-         8s4Q==
-X-Gm-Message-State: AOJu0YwQg4mXmzAO0/mV/qi2xGTxMpmJVuq8HkvJLrHBsuUCPmN2V6Zh
-	9cogSDerB8HbwS7AKuKef/lUtsSnIscpD79SHBt+3Q26xs1Ie6hDSy27D2wTRQ48
-X-Gm-Gg: ATEYQzwH/ihjYf9K1RFwUOrtoMcAmm5VtK9pTvJdVOEMnQG0MMkrfdshJlxbOk6Kwsv
-	is4IWgpJza9oUHuwdJ4xeIGb3bXgodT874d6+YJNLK4IWjhbW22tf8+Rv/8qZ78XVag/I2wXeSv
-	aZveQb0ivu7fD4cDTXq2yJEe7ZSZJxiHrfZsTWLqJl3qfrllnGDHbSNr4WYJmpydp7sGnQeL5v/
-	7qlFRWJes7/JDAcVbmnpqvNOYsRhwU3LptBKzGsxBukrJd7QZPPTX3DFHV2e/LnoCgTotcVza5i
-	G6c1GEZRHReYid4CBOSY2Gsp62FEAebOYpmFkB50J/tm2OZvuO1DrJVCT/vPCfRnhQhs3zCioCV
-	DlwAeZmj/z3GFhBl7Zg5Axiu/L3t7uxtoOvirKPS0a17w+EJyAb29FN0kUMg2u/0WNhtFXO/2pu
-	JepGXbMbCc8mqTBTJnuTmGB9M8H7+AXqOpAR2IwgWiKvYi31Zm0rxHcWdDvRLcyC7fuNwcM0YRb
-	ylWuEQDwu5BL2cRlttD8ZAQ25DwWkkL3hBQPWwGg6eWpsoCuaUxo9dKb+y45TBUMq3vDzi0XDT8
-	wlVurDbQVcFOEeak2KRe
-X-Received: by 2002:a05:600c:3505:b0:485:4135:5c92 with SMTP id 5b1f17b1804b1-48727c7c6e0mr238604425e9.0.1774954304140;
-        Tue, 31 Mar 2026 03:51:44 -0700 (PDT)
-Received: from particle-0df3-d360 (2a02-1810-950a-eb00-f9cf-2393-cb7f-6fd9.ip6.access.telenet.be. [2a02:1810:950a:eb00:f9cf:2393:cb7f:6fd9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e952b0bsm24706635e9.12.2026.03.31.03.51.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 03:51:43 -0700 (PDT)
-From: Daan De Meyer <daan.j.demeyer@gmail.com>
-X-Google-Original-From: Daan De Meyer <daan@amutable.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	brauner@kernel.org,
-	hch@infradead.org,
-	Daan De Meyer <daan@amutable.com>
-Subject: [PATCH v3 1/3] loop: fix partition scan race between udev and loop_reread_partitions()
-Date: Tue, 31 Mar 2026 10:51:28 +0000
-Message-ID: <20260331105130.1077599-1-daan@amutable.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AeF6mk+w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 204A6C19423;
+	Tue, 31 Mar 2026 10:56:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774954580;
+	bh=+Yawmb3hmej1rVYsaMQVZpye71Ct8oqQ7SSZaoa3GEo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AeF6mk+wjG+18t8iaVBzFRcHjvd9KWuQiN4TdHFi9pDJJEJuFcpsXtysSvyFdb2IJ
+	 1ZuPjb+c9E9F8gXMpn7D34fhEOsYWV72j1z95YUno53gZVXwtBJ06g9jeBpF3Jo6sw
+	 HJ8cUZ6lyiCDqt/AWDabwpVccasgUKNOdGV3t3J8O4sqbpGqjS9yhzjeieMDK6dcdb
+	 wyAyoOHvvtB8KC2NguhKorXpVMcj81JlxeAfJN9rYxbtHLN3FrKax0mj7y1Brq78yN
+	 S/MwvDHA7ob0BXp5y3wg8qPCjtfpG02yqImsRgtkC2zEm/KV1FIZWYFrG8VH6ZiiIK
+	 k8TuScSaYT0eg==
+Message-ID: <786d65d1-acc9-4843-995d-07f0a33c937a@kernel.org>
+Date: Tue, 31 Mar 2026 19:56:18 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: fix zones_cond memory leak in
+ blk_revalidate_disk_zones()
+To: Jackie Liu <liu.yun@linux.dev>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+References: <20260331100103.82085-1-liu.yun@linux.dev>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260331100103.82085-1-liu.yun@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When LOOP_CONFIGURE is called with LO_FLAGS_PARTSCAN, the following
-sequence occurs:
+On 3/31/26 19:01, Jackie Liu wrote:
+> From: Jackie Liu <liuyun01@kylinos.cn>
+> 
+> Fix memory leaks of args.zones_cond allocated in
+> disk_revalidate_zone_resources() on multiple error paths:
+> 
+> 1) When disk_revalidate_zone_resources() itself fails (e.g.
+>    disk_alloc_zone_resources() returns an error), blk_revalidate_disk_zones()
+>    returns directly without freeing args.zones_cond.
+> 
+> 2) When report_zones() fails or the capacity check fails,
+>    disk_free_zone_resources() only frees the old disk->zones_cond, not
+>    the newly allocated args.zones_cond.
+> 
+> 3) When the nr_conv_zones validation fails in disk_update_zone_resources(),
+>    the code jumps to unfreeze before disk_set_zones_cond_array() transfers
+>    ownership of args->zones_cond to disk->zones_cond.
+> 
+> Fix this by freeing args->zones_cond at each error site: in
+> blk_revalidate_disk_zones() when disk_revalidate_zone_resources() or zone
+> reporting fails, and in disk_update_zone_resources() before jumping to
+> the unfreeze label.
+> 
+> Fixes: 6e945ffb6555 ("block: use zone condition to determine conventional zones")
+> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+> ---
+>  block/blk-zoned.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 9d1dd6ccfad7..be99ab785dcd 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -1960,6 +1960,7 @@ static int disk_update_zone_resources(struct gendisk *disk,
+>  		queue_limits_cancel_update(q);
+>  		pr_warn("%s: Invalid number of conventional zones %u / %u\n",
+>  			disk->disk_name, args->nr_conv_zones, disk->nr_zones);
+> +		kfree(args->zones_cond);
 
-  1. disk_force_media_change() sets GD_NEED_PART_SCAN
-  2. Uevent suppression is lifted and a KOBJ_CHANGE uevent is sent
-  3. loop_global_unlock() releases the lock
-  4. loop_reread_partitions() calls bdev_disk_changed() to scan
+Let's keep the cleanups together. So move this before pr_warn().
+Also, the call to queue_limits_commit_update() may fail, so you need a free
+after the unfreeze label in that function too.
 
-There is a race between steps 2 and 4: when udev receives the uevent
-and opens the device before loop_reread_partitions() runs,
-blkdev_get_whole() in bdev.c sees GD_NEED_PART_SCAN set and calls
-bdev_disk_changed() for a first scan. Then loop_reread_partitions()
-does a second scan. The open_mutex serializes these two scans, but
-does not prevent both from running.
+>  		ret = -ENODEV;
+>  		goto unfreeze;
+>  	}
+> @@ -2239,6 +2240,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+>  	ret = disk_revalidate_zone_resources(disk, &args);
+>  	if (ret) {
+>  		memalloc_noio_restore(noio_flag);
+> +		kfree(args.zones_cond);
 
-The second scan in bdev_disk_changed() drops all partition devices
-from the first scan (via blk_drop_partitions()) before re-adding
-them, causing partition block devices to briefly disappear. This
-breaks any systemd unit with BindsTo= on the partition device: systemd
-observes the device going dead, fails the dependent units, and does
-not retry them when the device reappears.
+This should be in disk_revalidate_zone_resources().
 
-Fix this by removing the GD_NEED_PART_SCAN set from
-disk_force_media_change() entirely. None of the current callers need
-the lazy on-open partition scan triggered by this flag:
+>  		return ret;
+>  	}
+>  
+> @@ -2264,6 +2266,7 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+>  
+>  	pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
+>  
+> +	kfree(args.zones_cond);
+>  	memflags = blk_mq_freeze_queue(q);
+>  	disk_free_zone_resources(disk);
+>  	blk_mq_unfreeze_queue(q, memflags);
 
-  - floppy: sets GENHD_FL_NO_PART, so disk_has_partscan() is always
-    false and GD_NEED_PART_SCAN has no effect.
-  - loop (loop_configure, loop_change_fd): when LO_FLAGS_PARTSCAN is
-    set, loop_reread_partitions() performs an explicit scan. When not
-    set, GD_SUPPRESS_PART_SCAN prevents the lazy scan path.
-  - loop (__loop_clr_fd): calls bdev_disk_changed() explicitly if
-    LO_FLAGS_PARTSCAN is set.
-  - nbd (nbd_clear_sock_ioctl): capacity is set to zero immediately
-    after; nbd manages GD_NEED_PART_SCAN explicitly elsewhere.
+I thinks something like this may be cleaner as it avoids having that kfree() all
+over the place:
 
-With GD_NEED_PART_SCAN no longer set by disk_force_media_change(),
-udev opening the loop device after the uevent no longer triggers a
-redundant scan in blkdev_get_whole(), and only the single explicit
-scan from loop_reread_partitions() runs.
-
-A regression test for this bug has been submitted to blktests:
-https://github.com/linux-blktests/blktests/pull/240.
-
-Fixes: 9f65c489b68d ("loop: raise media_change event")
-Signed-off-by: Daan De Meyer <daan@amutable.com>
----
- block/disk-events.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/disk-events.c b/block/disk-events.c
-index 9f9f9f8a2d6b..074731ecc3d2 100644
---- a/block/disk-events.c
-+++ b/block/disk-events.c
-@@ -290,13 +290,14 @@ EXPORT_SYMBOL(disk_check_media_change);
-  * Should be called when the media changes for @disk.  Generates a uevent
-  * and attempts to free all dentries and inodes and invalidates all block
-  * device page cache entries in that case.
-+ *
-+ * Callers that need a partition re-scan should arrange for one explicitly.
-  */
- void disk_force_media_change(struct gendisk *disk)
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 10655213e8e1..18cd9a1c6c53 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -2028,6 +2028,7 @@ static int disk_revalidate_zone_resources(struct gendisk
+*disk,
  {
- 	disk_event_uevent(disk, DISK_EVENT_MEDIA_CHANGE);
- 	inc_diskseq(disk);
- 	bdev_mark_dead(disk->part0, true);
--	set_bit(GD_NEED_PART_SCAN, &disk->state);
- }
- EXPORT_SYMBOL_GPL(disk_force_media_change);
- 
--- 
-2.53.0
+        struct queue_limits *lim = &disk->queue->limits;
+        unsigned int pool_size;
++       int ret = 0;
 
+        args->disk = disk;
+        args->nr_zones =
+@@ -2050,10 +2051,13 @@ static int disk_revalidate_zone_resources(struct gendisk
+*disk,
+                pool_size =
+                        min(BLK_ZONE_WPLUG_DEFAULT_POOL_SIZE, args->nr_zones);
+
+-       if (!disk->zone_wplugs_hash)
+-               return disk_alloc_zone_resources(disk, pool_size);
++       if (!disk->zone_wplugs_hash) {
++               ret = disk_alloc_zone_resources(disk, pool_size);
++               if (ret)
++                       kfree(args->zones_cond);
++       }
+
+-       return 0;
++       return ret;
+ }
+
+ /*
+@@ -2085,6 +2089,7 @@ static int disk_update_zone_resources(struct gendisk *disk,
+        disk->zone_capacity = args->zone_capacity;
+        disk->last_zone_capacity = args->last_zone_capacity;
+        disk_set_zones_cond_array(disk, args->zones_cond);
++       args->zones_cond = NULL;
+
+        /*
+         * Some devices can advertise zone resource limits that are larger than
+@@ -2365,21 +2370,30 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+        }
+        memalloc_noio_restore(noio_flag);
+
++       if (ret <= 0)
++               goto free_resources;
++
+        /*
+         * If zones where reported, make sure that the entire disk capacity
+         * has been checked.
+         */
+-       if (ret > 0 && args.sector != capacity) {
++       if (args.sector != capacity) {
+                pr_warn("%s: Missing zones from sector %llu\n",
+                        disk->disk_name, args.sector);
+                ret = -ENODEV;
++               goto free_resources;
+        }
+
+-       if (ret > 0)
+-               return disk_update_zone_resources(disk, &args);
++       ret = disk_update_zone_resources(disk, &args);
++       if (ret)
++               goto free_resources;
++
++       return 0;
+
++free_resources:
+        pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
+
++       kfree(args.zones_cond);
+        memflags = blk_mq_freeze_queue(q);
+        disk_free_zone_resources(disk);
+        blk_mq_unfreeze_queue(q, memflags);
+
+-- 
+Damien Le Moal
+Western Digital Research
