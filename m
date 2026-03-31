@@ -1,130 +1,98 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EEC3B52EE
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 11:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBC93DBD76
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 11:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774955591; cv=none; b=JgvKNm7kmn7IA4o9YzDwZmGnLfAiFXTOdZn5AVgnt2VOtOkzxcSx52Y4ezPDeaja52NrG/RZywTC6oojRjzVXK2J0BJfWhvC0wqogyGQCmCSmuQF/OYDvVVXis7ViJ5uhyPMoKsC+FXzLRS5Oz/Ou1RXIn2jQSJRPCUd/Ulo1lU=
+	t=1774957523; cv=none; b=hefwDPOPAAocAsva7ccjWyYAeEFu+BfZJfgPnOxQVc+5WL31u7ld4t/G6SCdqtu3pT1PNLVdr8H7SDyyiBp57PdP1krY5A/SYlzhX6n5toivib2eO7SKEENugMcN8BbHC7yolqqCrgcKmwfdhyi+iPAcUu/Ez2iXkJPJQGCFLvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774955591; c=relaxed/simple;
-	bh=rjIaNuNO1AJtED+G4F9LAS5MfAAcge7rOSFjLmkXFZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=byvdtqaCrnqG638l91/J8MRm/rvbiVvbAO4WUC+0EcEKBlKcLgLYW4KcSPTPf5lmLBEM1VkUoYBkkCD2Uo1UDaQiP8feiJ7cv2qdGEvtgoO/YV+GNM3se02nsz2a3TPrrNzN4ugmaIgEDJFv2ZTOoi4b/tRUi6pUk31IdF35wYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vYR0VFEm; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1774957523; c=relaxed/simple;
+	bh=Sf4/FflJwV2aPRX5vnkfVvX/evGPRTypvDkhAGsXmdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PnN6VPf48s7UinpBlVxf9hJ+B9DL1Fi5PHO8SY862m8GKx7gN9ztfOj8WUqN8cicPTSvNtX6NzTLK+QCwJTVCd3l0CAiuDqQep56RzBUfhy2MJ3po38LmSGSdk08VArfWBnZ9iOi5ZP5X1Wh+o731jZgwLq39Nsv47yhX+EjoaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rx1FcDq7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vYR0VFEm"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774955586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MKEEzO6l0+D+mGX7YfKKWb6NrwZQIYwtHK8fKRjb5k8=;
-	b=vYR0VFEml7VUDcoNyeVLFWTHPlMMbgq7wprjvN/zVjrco4bd+d3cdilVWR54IBlhoXVkDD
-	gGt0E4E0bXHZWQib2796eJet1cKHKmaFhFNqkBZsfJTAZ74XwqY4omrcaqei85VgdNr8aJ
-	dnVurT5w2RmgDm7VKKk6S3RG/Q6dN+w=
-From: Jackie Liu <liu.yun@linux.dev>
-To: dlemoal@kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH v3] block: fix zones_cond memory leak on zone revalidation error paths
-Date: Tue, 31 Mar 2026 19:12:16 +0800
-Message-ID: <20260331111216.24242-1-liu.yun@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rx1FcDq7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB802C19423;
+	Tue, 31 Mar 2026 11:45:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774957523;
+	bh=Sf4/FflJwV2aPRX5vnkfVvX/evGPRTypvDkhAGsXmdU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rx1FcDq7k6dC4eNzRsLkeWNFIKhLhbXC3EbDuX0QZms4cU3OAo7jZcm0TmonPBTNE
+	 lYF2ew9pk73EdVTIs/RJgmNDnDsj+2F/Hml8+cB5W0Dngv1G1v/HZxbzin6cY7Dx8h
+	 LRYckRt1/RhxRn+0peXEybBAPLAPsIHlNMdT1kn7HOuKrdhvS9OkW86Uiys7gwO1rZ
+	 Oko11+Tt3y+Ib4aR+h7PyYBIkxKGVkfd2BQuHdIBEEPgdg1kYdbIA0iXnoMsQHaTOO
+	 8U0IqWnFtYLW+VN0qzLPlJ/mFvyp0Ew4FD4Wg/CxNr8wKFdVSP+9MaHGKFZ3orB/Zt
+	 Q9uBj8Lu+xWCw==
+Date: Tue, 31 Mar 2026 13:45:19 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@infradead.org, 
+	Daan De Meyer <daan@amutable.com>
+Subject: Re: [PATCH v3 1/3] loop: fix partition scan race between udev and
+ loop_reread_partitions()
+Message-ID: <20260331-vertagen-formgebend-1036bb16302e@brauner>
+References: <20260331105130.1077599-1-daan@amutable.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260331105130.1077599-1-daan@amutable.com>
 
-From: Jackie Liu <liuyun01@kylinos.cn>
+On Tue, Mar 31, 2026 at 10:51:28AM +0000, Daan De Meyer wrote:
+> When LOOP_CONFIGURE is called with LO_FLAGS_PARTSCAN, the following
+> sequence occurs:
+> 
+>   1. disk_force_media_change() sets GD_NEED_PART_SCAN
+>   2. Uevent suppression is lifted and a KOBJ_CHANGE uevent is sent
+>   3. loop_global_unlock() releases the lock
+>   4. loop_reread_partitions() calls bdev_disk_changed() to scan
+> 
+> There is a race between steps 2 and 4: when udev receives the uevent
+> and opens the device before loop_reread_partitions() runs,
+> blkdev_get_whole() in bdev.c sees GD_NEED_PART_SCAN set and calls
+> bdev_disk_changed() for a first scan. Then loop_reread_partitions()
+> does a second scan. The open_mutex serializes these two scans, but
+> does not prevent both from running.
+> 
+> The second scan in bdev_disk_changed() drops all partition devices
+> from the first scan (via blk_drop_partitions()) before re-adding
+> them, causing partition block devices to briefly disappear. This
+> breaks any systemd unit with BindsTo= on the partition device: systemd
+> observes the device going dead, fails the dependent units, and does
+> not retry them when the device reappears.
+> 
+> Fix this by removing the GD_NEED_PART_SCAN set from
+> disk_force_media_change() entirely. None of the current callers need
+> the lazy on-open partition scan triggered by this flag:
+> 
+>   - floppy: sets GENHD_FL_NO_PART, so disk_has_partscan() is always
+>     false and GD_NEED_PART_SCAN has no effect.
+>   - loop (loop_configure, loop_change_fd): when LO_FLAGS_PARTSCAN is
+>     set, loop_reread_partitions() performs an explicit scan. When not
+>     set, GD_SUPPRESS_PART_SCAN prevents the lazy scan path.
+>   - loop (__loop_clr_fd): calls bdev_disk_changed() explicitly if
+>     LO_FLAGS_PARTSCAN is set.
+>   - nbd (nbd_clear_sock_ioctl): capacity is set to zero immediately
+>     after; nbd manages GD_NEED_PART_SCAN explicitly elsewhere.
+> 
+> With GD_NEED_PART_SCAN no longer set by disk_force_media_change(),
+> udev opening the loop device after the uevent no longer triggers a
+> redundant scan in blkdev_get_whole(), and only the single explicit
+> scan from loop_reread_partitions() runs.
+> 
+> A regression test for this bug has been submitted to blktests:
+> https://github.com/linux-blktests/blktests/pull/240.
+> 
+> Fixes: 9f65c489b68d ("loop: raise media_change event")
+> Signed-off-by: Daan De Meyer <daan@amutable.com>
+> ---
 
-When blk_revalidate_disk_zones() fails after disk_revalidate_zone_resources()
-has allocated args.zones_cond, the memory is leaked because no error path
-frees it.
-
-Fixes: 6e945ffb6555 ("block: use zone condition to determine conventional zones")
-Suggested-by: Damien Le Moal <dlemoal@kernel.org>
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- block/blk-zoned.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 9d1dd6ccfad7..42b9a10138c3 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -1910,6 +1910,7 @@ static int disk_revalidate_zone_resources(struct gendisk *disk,
- {
- 	struct queue_limits *lim = &disk->queue->limits;
- 	unsigned int pool_size;
-+	int ret = 0;
- 
- 	args->disk = disk;
- 	args->nr_zones =
-@@ -1932,10 +1933,13 @@ static int disk_revalidate_zone_resources(struct gendisk *disk,
- 		pool_size =
- 			min(BLK_ZONE_WPLUG_DEFAULT_POOL_SIZE, args->nr_zones);
- 
--	if (!disk->zone_wplugs_hash)
--		return disk_alloc_zone_resources(disk, pool_size);
-+	if (!disk->zone_wplugs_hash) {
-+		ret = disk_alloc_zone_resources(disk, pool_size);
-+		if (ret)
-+			kfree(args->zones_cond);
-+	}
- 
--	return 0;
-+	return ret;
- }
- 
- /*
-@@ -1967,6 +1971,7 @@ static int disk_update_zone_resources(struct gendisk *disk,
- 	disk->zone_capacity = args->zone_capacity;
- 	disk->last_zone_capacity = args->last_zone_capacity;
- 	disk_set_zones_cond_array(disk, args->zones_cond);
-+	args->zones_cond = NULL;
- 
- 	/*
- 	 * Some devices can advertise zone resource limits that are larger than
-@@ -2249,21 +2254,30 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 	}
- 	memalloc_noio_restore(noio_flag);
- 
-+	if (ret <= 0)
-+		goto free_resources;
-+
- 	/*
- 	 * If zones where reported, make sure that the entire disk capacity
- 	 * has been checked.
- 	 */
--	if (ret > 0 && args.sector != capacity) {
-+	if (args.sector != capacity) {
- 		pr_warn("%s: Missing zones from sector %llu\n",
- 			disk->disk_name, args.sector);
- 		ret = -ENODEV;
-+		goto free_resources;
- 	}
- 
--	if (ret > 0)
--		return disk_update_zone_resources(disk, &args);
-+	ret = disk_update_zone_resources(disk, &args);
-+	if (ret)
-+		goto free_resources;
-+
-+	return 0;
- 
-+free_resources:
- 	pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
- 
-+	kfree(args.zones_cond);
- 	memflags = blk_mq_freeze_queue(q);
- 	disk_free_zone_resources(disk);
- 	blk_mq_unfreeze_queue(q, memflags);
--- 
-2.51.1
-
+Looks good to me,
+Acked-by: Christian Brauner <brauner@kernel.org>
