@@ -1,135 +1,184 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6A140DFCA
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 05:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E22283FD4
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 05:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774935923; cv=none; b=DxM69cjLueasXN6vZJU6HkoxPnglHD0vM+Z3I0krm3S1FBhpOzlwQl3xzFSH9fG4eB5EWbcMAYCsf+3sgP3xovbfNkzrv8Zekemf1lT11M1gYKaYRFm65B9xHWw7ShMbyKbrq3dmlLLugODx5V1REVLgFceO+lhGpuW+kakN5Yo=
+	t=1774936018; cv=none; b=fHSTRvCqY4vp+cEUvk5P2Vn+2C6MFrHCVj95EWqSlvNiy2HVBS+riho8nki7hVVum/vvtmBj1rrXqXth4GhqomJoEZ6C79+c+TmxeC3u2QeRNxw9Z0rlMqLbxgy7GPNNcFJUdqK8t5UfJGuPocMTmn7dLCbdYlXnIVS9mCjaPss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774935923; c=relaxed/simple;
-	bh=SypVQSVxi5XtQW51gLDuEakKT6HxcKdTC7Kv+CrbHA0=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=DqXY1eI8IbYzIuUD+qnw3f6MyUwRUXrF+Ut7CGYVjWTTtm94ZMFXlqaJ0qTngCQrNrLckCzh20VWgpRSV8yqobAClwDYjs0Czpxu0WFMkVYvCCOaT6ZVnW7zCSkiowEZ3ctpOpcM6cL1lJA31SVx40Vx4GPofIbwtzpjqbMYCG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=cS/9fG2W; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1774936018; c=relaxed/simple;
+	bh=FPTpwHFg45tD18LXEsesNQ+bWQLa44VC2D/E/Z2npAA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QfyDEmeAT1adrt1LAWt5mA9/oi8MoP5UyHhwLJqT+g08+gjo+eDSTiE/75vEAglgq92Hfp1Q3dJs3FvUlQ4LdK4xpjqzkkKZeUa3UuVGhet3Tha+whu/fs8yIrHczKHrxM1NQtlJHD7dEdXmZeZl5zLWfpuKS7EX8zek6K/0NK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lO3+08Py; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="cS/9fG2W"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-486ff201041so51635925e9.1
-        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 22:45:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lO3+08Py"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-35d932cc948so1854812a91.2
+        for <linux-block@vger.kernel.org>; Mon, 30 Mar 2026 22:46:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1774935920; x=1775540720; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PV+pClYWl9n9dOUQFJPU8EbBwTvdv7sBmpGNoz6Ln18=;
-        b=cS/9fG2WQbq81NpCu/oQniw8w4wroO1jajXvOp2SAOE0BMt4M4MxVt3p7tTP+ku5Tv
-         kJ1hjRSe2XsCEsfDeojn5yChnNVDH/ZGRg/REY861ZIataIwwlDK3uOEtRWK5dChat2P
-         yuLGZU9ywn9nq0h7jCiwExxzMkhz0wS429s41EslchR9SSF6qczLibgEIbK7iDh0Nuqf
-         KAbZbZyhrXxmwEw1CDtxilbKmsWmQfuoZlrUQbtv6h/arltvr7aFpPp8qSJ8iwPrpwdZ
-         cy045qHDSdo3iWmh9hD/xR8oZzmEUWZjnGx9Tt395F96KWufOpFCqLZS44PkIGqH9vX5
-         dNUA==
+        d=gmail.com; s=20251104; t=1774936016; x=1775540816; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lXKA5ht7Zy9JGAaY2KftORONRs9LiZlrvJ7zU95HnyE=;
+        b=lO3+08PyG0A5poB5VM1h84UsuOtSjvwsMUHFRZwQ3t3njvLBdUw4FhHoZtcS6wbohZ
+         XoK+1dKDPJb5JWkW2Cfhk75KoxCCpWes9pwKm0119QmrTsn1kDhrmfpk+QQlr6KJofqT
+         S4kGFaIrXO+Kw2k7T9yd+MAcp47crIwRUcwRRKIjojq6Dhxtm/SLfDQX0x8MEI+JkRiE
+         O6f4mDLF+NHUqyamuu9Ir1T7IcFJbtX4FpWDBV10NE3pAjacl+/kkRDxj2fRAqFFVaNL
+         VF043L1Y1cCbyb8mFidLdALfNewyhXNAAmmRFBnLDGnuCUopSIJa/VfwbuzczvBfUr9i
+         01cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774935920; x=1775540720;
-        h=content-transfer-encoding:autocrypt:subject:from:to
-         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PV+pClYWl9n9dOUQFJPU8EbBwTvdv7sBmpGNoz6Ln18=;
-        b=ZFPHBBrqJU/7VcPNpL8hrFtQu+kbe9bkNI8NOAAwoWzMDbd/eg4W580/ki9CbpBous
-         uKBjFXwu4TVEOG7ElmjyKOtzcQ2B4Ghx/9M+8AjQMk/TfNFHK3iU9MCApRstT/7ecwEh
-         HLowrdtQhG+risSZUOwnzHIlKTAn7ucjOrmQHr7XF48M+MedHUNww3yvjlzWIWE01PPP
-         /6UWEyl05IE0MpEuxe85Lzb+K4uhzsxYSuy2S+tk5ZYFkQJz7cd02rpju0d6pZOHPod6
-         DIxGV9PIHv4F/GpzKz8my7q0z7Jr/5yTUYxa07yd4wr6eoBEh/fzEql/H00H/Wrj1Sja
-         97YQ==
-X-Gm-Message-State: AOJu0YwYfZ3hb0yDag9QyWUCKsdVJPAnL6blWgNLxoY6YHXu0E599tHo
-	R8e/ZpBcAZ/K9GZ6eQiP5wY2G+N1ZVc8qDCjAy4tt1Mm9uay7brEdGq/A4hv1Iy/gbaTL8RasXn
-	5H9g0naA=
-X-Gm-Gg: ATEYQzy+/Q+Gv35zIewhEoH16rZdqNLQDJj48VgdKftBkXyUEkjoQLDZLMXmyQS/pHj
-	bEoBGL1l2mBpDkTumUBBlO/c3GK+TfQZ3A4mf0WorkdjixgNIrNnTosU9Upz/wL2CwmiXhwTlE6
-	YWivQIXJEWtsvP5+tFOVyPHaoENU0UZVef4iyXhjq5GuEema4xXRdjcItIcc86zD9iBGLLQIK3Y
-	g4uvOd5OzwboEUWjIfvA8mXYKEwSMIHYK2niMrGCdDy9Mnwt3cUJdd8X0J/1zyCfJ6yYUad2ZIr
-	AV7WG/UiZrfn3HUeNFbiLULONluunX6Ezz3M9AdLrTxKFdeNUs50/QbuAActV4xXOlTCG0zZDtS
-	pZAVDbdxZhml1lG/1JLvrnhk2qoBcCegAS7jE7BdWm07BEwACJYXg/wMy/jFQSlb6l7kNmmJEKa
-	skYjjWEPJRjXkLJ6CcHJ43wqP9F0cIlDSXgP0HRKvHH556dOcXqrU=
-X-Received: by 2002:a05:600c:41c4:b0:486:fc5f:1ab9 with SMTP id 5b1f17b1804b1-48727d8410cmr167946465e9.14.1774935919750;
-        Mon, 30 Mar 2026 22:45:19 -0700 (PDT)
-Received: from ?IPV6:2403:580d:fda1::299? (2403-580d-fda1--299.ip6.aussiebb.net. [2403:580d:fda1::299])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b242676e13sm102522115ad.28.2026.03.30.22.45.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Mar 2026 22:45:18 -0700 (PDT)
-Message-ID: <92361cd3-fb8b-482e-bc89-15ff1acb9a59@suse.com>
-Date: Tue, 31 Mar 2026 16:15:14 +1030
+        d=1e100.net; s=20251104; t=1774936016; x=1775540816;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lXKA5ht7Zy9JGAaY2KftORONRs9LiZlrvJ7zU95HnyE=;
+        b=rzK+m9DXP8h931i/z4vprFidM8MnjJZurEFffLtK7kY1BWf+U9W9TwzRUlY4ITx7Pk
+         T5eNIM1YX6hb1Uirqr8iSksUYuF7lFOYpu6pyzjHH0oVT8ioVcchOreH4l0dp9ngroir
+         OK4byGh1sn/PYv4HMi6S13tWtecgum5wALNSr038SqlOVfQjUhwLtkj3auWSNTWOCDBE
+         ZQFgxbh9uiRmTVj/z3YkC+TcVD0FJEkd1eG6/Wht6hBeG7dlhBX5SrQgn/QjblBwTjRx
+         R3niKwE7HOr3iMY2LvN4Bdeb9veVvLaJJTzNF3eNVogtWPxE+bKEiBhQsC2btcXnKxVp
+         Y0DA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2nREk9Q3JzpajGuy3J3GPgL4mkZALx8ZLJ7qP4q1FidPf6ZsvXWASshvtR7Rpm4OGm2jLyDeyFa7n8A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yymbje9CA58HUVolAoLF7EG3TvvIvdhQkssfLMzkaQqrMhDFtJO
+	Bc/wo0WebVxhZ0oTj7XCKJqwj14ezF5CUSsU+w3C3/xduCWem3UEqmTl
+X-Gm-Gg: ATEYQzz1XYsftanF9S4jfoFZpsaPhC99B6Oznfl3bM9Yp50csddF1cJrw32TwHhbvFd
+	9JLMwl+cU7M+OcCUz3XbPSsEuk9zOG5cDWgEWSu3GZkZLDs3vnMT/f8emP0OMqD9CD+huq9vQaC
+	XBF2N7moxP/HzGk3j3AZclW99G5XVuViUojEEjuanQgEZn+qlixDnBcZIZLcq745n5vYXXiynpT
+	o1sXHAMsFuZScW3k5PgGPf9Ttvgy9eqlDbtzH/9/9RkfnQN/IXXS7kgZONCMRkiStZ6Bxfaz2by
+	QZ/6/nAuJFLHErkskYU5z9F4g+gtiwNMR4+9Mi84Qah3BLLnHYeO36jojNl2FL9lT7wZyRNqrEO
+	atnb5DDkhWfauBWQG8sO/Cte6iIZ/Xar466arUsiYnXri21XUSZ3470t/h//lXVca+Ioo46sT1D
+	QAGqtmcwUwIf6oHmvmfXNPPv10zsGysSatIMnJa8W0zHY65zOkc56Sb9kcHVqmM4HzUOInj+8dE
+	I9O63SxSrcmUfD8Yg==
+X-Received: by 2002:a17:90a:10c9:b0:35d:9bb3:2a31 with SMTP id 98e67ed59e1d1-35d9bb32c11mr5161896a91.25.1774936016165;
+        Mon, 30 Mar 2026 22:46:56 -0700 (PDT)
+Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:f56f:ac5b:85d4:f51d])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dbe624756sm527176a91.5.2026.03.30.22.46.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 22:46:55 -0700 (PDT)
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+To: axboe@kernel.dk,
+	tytso@mit.edu,
+	hch@infradead.org
+Cc: dvyukov@google.com,
+	adilger.kernel@dilger.ca,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
+Subject: [PATCH v2] loop: block changing lo_offset/lo_sizelimit on mounted device
+Date: Tue, 31 Mar 2026 11:16:48 +0530
+Message-ID: <20260331054648.4548-1-kartikey406@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- minchan@kernel.org, senozhatsky@chromium.org
-From: Qu Wenruo <wqu@suse.com>
-Subject: Super slow subpage IO on zram block devices?
-Autocrypt: addr=wqu@suse.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
- FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
- Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
- fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
- 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
- V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
- rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
- rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
- Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
- E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
- vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
- g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
- AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
- cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
- qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
- /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
- o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
- JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+LOOP_SET_STATUS{64} allows changing lo_offset and shrinking
+lo_sizelimit while a filesystem is mounted on the loop device.
+This effectively mutates the data visible to the mounted filesystem,
+which is equivalent to writing directly to the block device.
 
-Not sure if it's a regression or not, but on the latest 7.0-rc kernels, 
-the discard is unacceptable slow on zram devices, if the block size is 
-smaller than page size:
+When CONFIG_BLK_DEV_WRITE_MOUNTED is disabled, direct writes to a
+mounted block device are blocked. However, LOOP_SET_STATUS{64}
+bypasses this protection because it modifies the loop configuration
+through an ioctl rather than opening the block device for writing.
 
-  # uname -a
-  Linux btrfs-aarch64 7.0.0-rc5-custom-64k+ #7 SMP PREEMPT_DYNAMIC Tue 
-Mar 24 13:38:13 ACDT 2026 aarch64 GNU/Linux
+Fix this by checking bdev_writes_blocked() before allowing changes
+to lo_offset or shrinking lo_sizelimit. If the loop device has
+writes blocked, return -EBUSY. Increasing lo_sizelimit is still
+allowed since growing the device is harmless and has legitimate
+use cases such as online resize.
 
-  # getconf PAGESIZE
-  65536
+Move bdev_writes_blocked() from block/bdev.c to
+include/linux/blk_types.h as a static inline function so it can
+be used from the loop driver without exporting a symbol.
 
-  # zramctl
-  NAME       ALGORITHM DISKSIZE DATA COMPR TOTAL STREAMS MOUNTPOINT
-  /dev/zram0 zstd          128M   0B    0B    0B
+Suggested-by: Theodore Ts'o <tytso@mit.edu>
+Reported-by: syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=fb32afec111a7d61b939
+Tested-by: syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
+Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+---
+v2:
+  - Use #ifndef CONFIG_BLK_DEV_WRITE_MOUNTED instead of exporting
+    bdev_writes_blocked(), as suggested by Ted Ts'o
+  - Move bdev_writes_blocked() to include/linux/blk_types.h as
+    static inline instead of exporting from block/bdev.c, as
+    suggested by Christoph Hellwig
+  - Allow increasing lo_sizelimit since growing the device is
+    harmless, as pointed out by Christoph Hellwig
+  - Remove spurious empty line
+---
+ block/bdev.c              |  5 -----
+ drivers/block/loop.c      | 16 ++++++++++++++++
+ include/linux/blk_types.h |  5 +++++
+ 3 files changed, 21 insertions(+), 5 deletions(-)
 
-  # time blkdiscard -p 4k /dev/zram0
-  [ It takes too long time that exceed my patient ]
+diff --git a/block/bdev.c b/block/bdev.c
+index ed022f8c48c7..e0bace1a6c27 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -860,11 +860,6 @@ void blkdev_put_no_open(struct block_device *bdev)
+ 	put_device(&bdev->bd_device);
+ }
+ 
+-static bool bdev_writes_blocked(struct block_device *bdev)
+-{
+-	return bdev->bd_writers < 0;
+-}
+-
+ static void bdev_block_writes(struct block_device *bdev)
+ {
+ 	bdev->bd_writers--;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0000913f7efc..34bbbf3bcb36 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1239,6 +1239,22 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 		goto out_unlock;
+ 	}
+ 
++#ifndef CONFIG_BLK_DEV_WRITE_MOUNTED
++	/*
++	 * Changing lo_offset or shrinking lo_sizelimit on a mounted
++	 * device is equivalent to modifying the block device contents.
++	 * Block this if writes to the device are blocked.
++	 */
++	if ((lo->lo_offset != info->lo_offset ||
++	     (info->lo_sizelimit &&
++	      (lo->lo_sizelimit == 0 ||
++	       info->lo_sizelimit < lo->lo_sizelimit))) &&
++	    bdev_writes_blocked(lo->lo_device)) {
++		err = -EBUSY;
++		goto out_unlock;
++	}
++#endif
++
+ 	if (lo->lo_offset != info->lo_offset ||
+ 	    lo->lo_sizelimit != info->lo_sizelimit) {
+ 		size_changed = true;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 8808ee76e73c..82ece8737b85 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -84,6 +84,11 @@ struct block_device {
+ #define bdev_whole(_bdev) \
+ 	((_bdev)->bd_disk->part0)
+ 
++static inline bool bdev_writes_blocked(struct block_device *bdev)
++{
++	return bdev->bd_writers < 0;
++}
++
+ #define dev_to_bdev(device) \
+ 	container_of((device), struct block_device, bd_device)
+ 
+-- 
+2.43.0
 
-After a reboot, if discarding using page size (64K), it finishes in seconds:
-
-  # time blkdiscard -p 64k /dev/zram0
-
-  real	0m0.024s
-  user	0m0.004s
-  sys	0m0.011s
-
-I understand that using block size smaller than page size would cause 
-some overhead, but seemingly eternal is beyond my expectation of "overhead".
-
-Is this a known bug or something else?
-
-Thanks,
-Qu
