@@ -1,71 +1,73 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23313DBD53
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 13:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E36E3CB2E0
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 13:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774962448; cv=none; b=uaoeqI5rOFwntbB8mdkhnXUCXXKVe4w99M1BvkyTbenMk6cxQ8ZrmKEelmcuYzU8D63empo5C6uoO1hzLBI0ATvQDdjPccGddw1QPeeFNLl5iTDy6uOTQlhUVxecps9SR2XiNiDm2rxNMnDyTH4DcTMPSSFbnf0z4NkCtfu8ms8=
+	t=1774962449; cv=none; b=DZKalANNZ/Iounkjq+wP+B4nsicWM0UInD81tyJfXvsM0QFKDbLs9Wt5Dc21HbE/z2TqCdtBqtHDLlqwPo/Kq1XevtEF74FJ9NENDsz87srByyw55AmWmANwNnPne9wFLo81e2GQXHZhGPSV4m1U1lTURzaYc4BgPmY6GwBKpJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774962448; c=relaxed/simple;
-	bh=3mcJkD4vKqnObHqLS3Vh/zwg4vB8bfTdmHHDXR+zskI=;
+	s=arc-20240116; t=1774962449; c=relaxed/simple;
+	bh=j9U61ILI49d1aKj4jK0JLNF5o6WGHXnfr7TNTgci+58=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=inVt401zslk7KiCNytULl8x0NVpe+2QBnVL9urWqPJB1bgIpJb7SESM9i44a14bYLkV6Dc4VOYQgXDG/D8WbTP83XT7s8AqrXeXz3pH3ugc0/1Kdk5K80sgava5fOkBbVGfMaF55QgsYVPrPFtGGKTERMuOmi07ubRXftgbW0B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=WMZXHA8t; arc=none smtp.client-ip=209.85.210.53
+	 MIME-Version:Content-Type; b=lq0P7oHi4+/ERMrg/bsk2O+b4CQsYoB56FQC2N1a9deVEwXPnfQt9tnsHsEdktO5RMhJmXNf3XTyYmVkGdNnXXJbc/JgrEiOTtOeo+dN8nuZhbMyHSnbYk8kAszyU5gevb3Yftdy1zXGnXkTtDK1V5GdpGhpvf0f+5n5xgO/Dds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=As+s7xit; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="WMZXHA8t"
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7d556c1a79eso5808984a34.3
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 06:07:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="As+s7xit"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7d7653db148so3055912a34.2
+        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 06:07:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774962444; x=1775567244; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1774962446; x=1775567246; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0AUuDp7qRRFNh+jkpUI3TamYrmgDFQIePYtpyrxIyfI=;
-        b=WMZXHA8tbCRbciOa/MrfJai7rHZk1zfmMeP8SfPxHomJk5IRGqvOb6HOx3MxhC/I8A
-         h0+igbkgkuYQvG+dZZ7FCt/LHIgSk3++n4VPJqZ+ZLzLfoYHwwgPX5TJqsJ7xyj9Okhg
-         baL5uYDA/Ta5MjsKVJynx6CKmixw89dAJQnmIL/+mBI5o3NnsKpNAcT1RlPRUoyfUr3y
-         BDwNDYXZJ2Da2Y8la3tLlbD3i6CGlY+fb++FUdnJeJMxGgd2fldsM40jdv9yvZoVpGR3
-         wxrfg1W4c203go4idmkdz98nc8qxILYfhuuW3GueOGatphw2DXQzehvayLLSIRBv8iCj
-         WYng==
+        bh=+luZrtmJ+KQw8Pgvb+YDR6Xmi7DpQBHnXamiACyhX3Y=;
+        b=As+s7xitQZbBOLqQ2LW1trNPW5biMUJ5Gl+uy9fBcuMJqCPy1zoMhAOQbWU+sDqBFk
+         mk2AWMstLIRZJKlWn6OXbT4YdjWfvVK/vPDLm2uEYTuWGYVeGN/yYHiGm0LdJogCo3oe
+         +c4HXkgn8AsYFX3JqkMVBQRR6S+ud5Yin5xbjl0sBgvVCIJFWeQo6mS45R1tmQXqya5v
+         /u6wTq0TGGHoWWS/qPPAPxbLbVACpUjNC7gdgq4H1c5y3hwFZB2NJhnv8IfwDl6WTTR8
+         sYko0PBl2Nyh5vj/rGPt3ArXPOhVIvfz4DroUXY3v4jHFqJl8U8xFPIyj6CDjlIDVO+Y
+         la3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774962444; x=1775567244;
+        d=1e100.net; s=20251104; t=1774962446; x=1775567246;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0AUuDp7qRRFNh+jkpUI3TamYrmgDFQIePYtpyrxIyfI=;
-        b=nEwWZeIFrdfEDEs+NDYQj9MjlG+qOx72jnItc9nnAWaUn+4h0KCqKj0suiyMjM/knM
-         4DZXlq8Pvm0L/c+6vAlv2VniRCMjVjDlAwG4KDcXQKu6jr1NIzLVy2v8az2ZWC6Wb0QY
-         JytYcv+lYx8kbylWc01RDqgKLBxJRD7XIltV0k3qXOqqqBwNk3YW5zGJRzBzPx52qh9h
-         WM2BVA0CjYg+o77w+HodELxLj3R4/8qgOR8NO3XSot/wV3EbAhGhr6TWxaKoTbYnDfCm
-         m4MOqn0mINOkOzdrQayj5R0ePMnMgCdLesJjggpeOfmvVYGD7G3TRSoTogbC3GGlp7W2
-         ELUg==
-X-Gm-Message-State: AOJu0YymuQH6I0lfS9SWtd500FQBa/GCgKij/buJJi9V9VOycpTCm3PU
-	vrGgqaCkrhlIjXlspaVg6Je6usw5KAKbV5SAz9+GmhGbT/9JJPrj0QWr5jtH7kzYtvE=
-X-Gm-Gg: ATEYQzyYRW7elbIcFzKnQR0IGSw6rK7s6PftPgjAVJZaOo6SsHeA2yfK3b+O7BaOwkC
-	glJwQy+5DdouvsrnXZZIJSyfvTecHraBydM4wUtSjMfVknQ6kC1yaBS+VJXeK0lPHtXOuyjKvJz
-	m+CQbcEtEiSpnyybxiDrRbRs6+g1YEtKzr2NJViwzjA6ahLt50z/XFDcw8IOM8dTHJLVVX3jBjn
-	mH6lqQs+yAewogXmYeoe3Wo5BRVMh84awwmEeS+BLRXlJTpRW7+K30lYuEZJDLLUjnpii6/hbqL
-	Bde27oFBdVOxTeRP5x2rm4zeLSUOCqm9Owgt0tzh9QC2JMsg1Sbkr1ixT/LacekPpGuLZKfQKQc
-	dBxP4zsTAKgc8ShquAQfFjylLGLBsKW8xKktZ+3szc0QhjNRET+d+j1mxNcKHzvHrE6h+7usThu
-	B7L5Mz6IJvoF7Yjygjou3on5xD2ekgnc2ceqggu8rLkclE10EOKIThYWeNSju8I7X2mtcjY+nHP
-	EYz
-X-Received: by 2002:a05:6830:7102:b0:7d7:5559:3d1c with SMTP id 46e09a7af769-7d9fad8c6a8mr9556898a34.1.1774962444499;
-        Tue, 31 Mar 2026 06:07:24 -0700 (PDT)
+        bh=+luZrtmJ+KQw8Pgvb+YDR6Xmi7DpQBHnXamiACyhX3Y=;
+        b=eKqOfZDYN1Gggv8SWvWSTM/hr2kAave+wWufvQgGr+06BV5R6Ib/bsFPOrG2C3RckJ
+         aWGgAXkz7VWpLiFeDbh94/wwG0zLiBpiGGHAlEOblr6hoCv6IYd9lIYDegWyzhtwH0QD
+         JyDfwCdibk1IrHOZdCR7/gCvLwqCFqyq8PqWTXBf8xQ2pdfO/XzoNfXlaAjDlYa2zjRJ
+         HK/QsgEnt2Iax9ur3R+cdGHMic53O4vqFIz9aU8uJjCquZ9oJhtK4QaZDsqG44KV/ge9
+         wiHH1QpSxFu7Ug5jCM3PcmzCg6NxaSaIoTKYzhbjINva9uLhX+jMBmPKtfvQcf0RCQgt
+         NOCg==
+X-Gm-Message-State: AOJu0Yy+XwB4qxnMiz5lsIOicy1pFz3EXxfN7Ck5eSqZKbLAYx+r26sS
+	CsNWstG7DExfBpgQiguL+CfxAeCJCJuwECYo7/tjqOuEaQmWox4tTFDS9/z39UiDveo=
+X-Gm-Gg: ATEYQzxduUAu9adJKncnLlB2g3Cc2RQdckzvvZX43mquB+MxPImTZoqCVOe7xiheUNN
+	8kIeVPmWWmP9WGg1c6CxPVlpflQ+2HzQ/9Dth4PWiq2CGJBTbOxk1pLEnmYbeYhJNMa8NUI0cEJ
+	oEUXs0vy8ATtNFsZpW9UytHD7NTbZBRIolchELo2hdCeeHKHL9JdcowoH/KoId4Fuco7nKVBELG
+	WvvhDZSSDn3TAYco+S686K7VnyCmC8GxNt+7zlE6FkjnQBWc976/OnioMlnh+1NQzBnz887L4m0
+	weUlUY7MENMpP6Rzk6E0H4TwcTrAAp7u6xuhjCGbud4ezw2On3J8NUUFX1uQijW3zMp+YYE7ZU/
+	jeDELY9vk3U8cc377GWgbGJdeC+5PuZfeetDSlXMIO4ck/U5QYIjQyUwvHzz1Wq3+aZImeR1vsR
+	jP8fNLZ6oaPW49wK3SuI6HPJERX2l1avrpGYJONX1WPS+4W8LrqQtNkF7wKYIeSMh9G8AEEN5AU
+	GNhVtBMDoavg2c=
+X-Received: by 2002:a05:6830:370b:b0:7d7:b701:ef54 with SMTP id 46e09a7af769-7d9faf64220mr9852235a34.29.1774962446300;
+        Tue, 31 Mar 2026 06:07:26 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7da0a335414sm7901689a34.6.2026.03.31.06.07.23
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7da0a335414sm7901689a34.6.2026.03.31.06.07.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 06:07:23 -0700 (PDT)
+        Tue, 31 Mar 2026 06:07:24 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Milan Broz <gmazyland@gmail.com>
-Cc: jonathan.derrick@linux.dev, okozina@redhat.com
-In-Reply-To: <20260310095349.411287-1-gmazyland@gmail.com>
-References: <20260310095349.411287-1-gmazyland@gmail.com>
-Subject: Re: [PATCH] sed-opal: Add STACK_RESET command
-Message-Id: <177496244365.811501.16816774352932254478.b4-ty@b4>
-Date: Tue, 31 Mar 2026 07:07:23 -0600
+To: linux-block@vger.kernel.org, Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: brauner@kernel.org, hch@infradead.org, 
+ Daan De Meyer <daan@amutable.com>
+In-Reply-To: <20260331105130.1077599-1-daan@amutable.com>
+References: <20260331105130.1077599-1-daan@amutable.com>
+Subject: Re: [PATCH v3 1/3] loop: fix partition scan race between udev and
+ loop_reread_partitions()
+Message-Id: <177496244468.811501.3934411568463650977.b4-ty@b4>
+Date: Tue, 31 Mar 2026 07:07:24 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,22 +79,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.1
 
 
-On Tue, 10 Mar 2026 10:53:49 +0100, Milan Broz wrote:
-> The TCG Opal device could enter a state where no new session can be
-> created, blocking even Discovery or PSID reset. While a power cycle
-> or waiting for the timeout should work, there is another possibility
-> for recovery: using the Stack Reset command.
+On Tue, 31 Mar 2026 10:51:28 +0000, Daan De Meyer wrote:
+> When LOOP_CONFIGURE is called with LO_FLAGS_PARTSCAN, the following
+> sequence occurs:
 > 
-> The Stack Reset command is defined in the TCG Storage Architecture Core
-> Specification and is mandatory for all Opal devices (see Section 3.3.6
-> of the Opal SSC specification).
+>   1. disk_force_media_change() sets GD_NEED_PART_SCAN
+>   2. Uevent suppression is lifted and a KOBJ_CHANGE uevent is sent
+>   3. loop_global_unlock() releases the lock
+>   4. loop_reread_partitions() calls bdev_disk_changed() to scan
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] sed-opal: Add STACK_RESET command
-      commit: 499d2d2f4cf9f16634db47b06dee9676611b897f
+[1/3] loop: fix partition scan race between udev and loop_reread_partitions()
+      commit: 267ec4d7223a783f029a980f41b93c39b17996da
 
 Best regards,
 -- 
