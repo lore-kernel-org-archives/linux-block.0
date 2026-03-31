@@ -1,118 +1,113 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD3926A1B5
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 07:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DAA26A1B5;
+	Tue, 31 Mar 2026 07:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774941356; cv=none; b=r1zHMGoaQXdRlRS99ZtLNpQSeqX8QmqMFfrn4cBesGjnJS/jy0rmQldQFnGktm4SwJI05Pm7AhjJ2TTLsQqrp9bf3OKi7+eQ/VVQSQe22EglpLXTIZenhk4Dn0VIDFZORKUhMVP+C9LD28eukEj7UIuML+9taW7yicN1Hfy2bxo=
+	t=1774941381; cv=none; b=prsEuLiM4CJzH1oX6D4Tf/ixqXu7TrIkryreXkZxRH8jNWPPflARbOEfvUly3E95MBbmALy4VmDwE/iK1CZ9lDu+1Kmrd2wGZVSTFsAIyHxrqH4AEK+KMYfMVC7zaCTZRkbFapOSEgOL9bijqmqwHTIvOnBdSn7rspMr4WFZHOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774941356; c=relaxed/simple;
-	bh=vZnqaOKBg5QBXcBcccl4gk4m60ewFLzqNDe1PJUoPe0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h/UYVNVcgqH3VHK1gmC7I8eUgjASXgBqH3lDSElSNBCUW/BEejM5648pYEAtjcztN82qGN/6ge4dLC4zwNLfJ8lC8wl/ABKaNv3iHdskR0yUo3/5Jcps3XR+ET/GdZN1nigw9jydu9g08Fmg1LpL0fh9lsCalwNeKyeD19Vkz9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=WypDN9AX; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1774941381; c=relaxed/simple;
+	bh=sgPebN8LAxTscPZNbI7LSfjm9u99fuk+TlEywW+T3V4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UG0+P1b7atQhoQQEGPTySXp8J/dtG3SlVZaYQME3IehHN1oWnfX0uhSNzQmq4VBSFDidHK01LL4TpouZoBXmonX70QxmVqAaHzxyxqIr1812mxtjOgZ3LcuFCIUwOVq5YndafyW+U6rV0sFVUKilQnO9Os4hNLDvM3blDVYqi/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mJRyacST; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WypDN9AX"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-35c238f1063so2651434a91.1
-        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 00:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1774941355; x=1775546155; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hBZW9JjlCCiEdLUd24hKtYoeuSUNPJmQ9yAz6YgyHRY=;
-        b=WypDN9AXdPut59ImC3rqdckrJyJ3Ygu9bm46qkVxjl+mOXLnWCeQhXvqbpNWDzox+E
-         ndiduC2NcQTmTmU4eu2D2Ep/7ggwYYv/RtbAS4lWFAxRbHnhMiYG9q/z98prLajSdywT
-         X/1hq4Z9lnpIBWuOyoXlqDQjWfLz2r/wbDPuY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774941355; x=1775546155;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hBZW9JjlCCiEdLUd24hKtYoeuSUNPJmQ9yAz6YgyHRY=;
-        b=ObzgFAumSeJhNoVcz6936vFL/pN2Du+kqPQnv7daELg9PcxoiiOwbc1x9m/eY/2ej6
-         GGv2A6zY01gAfBZSYksLQ6KyBw70hFN6PBDy3eHgJqc1pQDDyH5hw41qCk85NAiOMG6u
-         eUv/ZwAfU/Pa2oTyPWVi3jNzz7MFt8wh8oItnIO8A5s0Q2sevZdmgVI4zJcUJ+XQnQ3g
-         yne2L+v4HC5L4XcHJluv+oPKJoASujDqPgAOeu4DLYJCodoO/wn5MiDuX8KrhXcrA0PW
-         wLzMs+cmATdz36S7ehMW/+oaRJLsCiItIDPoNqTP01DXeHkYVLXklYYjtyrKcxQiHYfw
-         zK+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVNW26L4wLQOahbmUQKVDBrsVKr5HpSHptSgIgOAA9Nh7Cv8Sv2kyvtXyTqNlpuOX7dAOJE4vid2jPPbQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh46BzMvyJJZ70CBxoH3UWj7SySfjzFuP0NrGs1O2rybZt6rQY
-	AlvZpBjmLxa8Ad8tCQz6H3dPPIqWB7GLUjjSLYU3PYxq+h7mRd5rWzdQwQ8D6Ruuxw==
-X-Gm-Gg: ATEYQzzBp5PYBJFOwDqxOhaV2ZRGNfdxKmq+3DDcL3QoTxcFMiv0RVOzVpXx2Ka1uC0
-	6aZzNpTfFADX+tVwAYfnENn8hWKvzNGXtTGqVM32UuSN7vBBxa8edD6b8GVSLC5ST0iCWI/iOhE
-	CBLl71DNY8toZ41gVnnLfjAQNWjoZviibs4k8/BY/EZHLJgicBsqQ0EC+5poOcdF/OadMx9GrYB
-	AyWbcsdK4A4MjTcoc9liSF0yHzx13RdkjhhS9JbLF1Wd1wT/b6x+Z8+qDqNeE49qCBxy1FOAiD4
-	K05p/aPFBkJoJDQ+pOOhIzjLCSesLbyT0s2eO7cR+G0gHOodPcxs7D/H/wMXP9F3A+5KUTq1hd+
-	y71zLbBwqUrRXPZTj8vI59ORbQKWUDNcoQq1YlY9Vu8xBsfOkOoaeUnax8B/en6KSEf+4JpSAif
-	CDgbyIRB5KhQ5KyKfd6PcgpMcCvIINJdDKiPXq4tWnCSSju3l8bMZUJ/HwyQY41OywU/kTWgIZx
-	KrgklWLd6NwFg==
-X-Received: by 2002:a17:90b:3c8a:b0:35b:952c:43b9 with SMTP id 98e67ed59e1d1-35c2ff8b257mr13908581a91.10.1774941354917;
-        Tue, 31 Mar 2026 00:15:54 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:90ef:61f3:1679:56f5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dbba1daf5sm331975a91.14.2026.03.31.00.15.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 00:15:54 -0700 (PDT)
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Minchan Kim <minchan@kernel.org>,
-	Brian Geffon <bgeffon@google.com>,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Qu Wenruo <wqu@suse.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] zram: do not forget to endio for partial discard requests
-Date: Tue, 31 Mar 2026 16:15:06 +0900
-Message-ID: <20260331071537.706139-1-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mJRyacST"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0ttq0UrYAQ2lg3jmVM+5pPYGqrXfSL0rw9xPytSPqPo=; b=mJRyacSTFm939GZfeysPc/tF6C
+	1ahqJ7PyddWBIkVUdK9t8hf4e4DZikdLVBI1fHb3oTMZ+/aDHZbSHirmfcNFsgoxnrKjSZvVddwzb
+	fv7g4BwGqCLig29awqcpS0dscbvGKfca8Th6CuIZMnHVIvd9L6F/DasokEE5HuTMf9f16Ti3ekyYi
+	WTcr2kY/FNxJTh42DswOMRzzAEfxmkITWL7Odg/WjGIDX96rrxRpuAa5IUhVEYGic+VJAMqfn5CbS
+	5iRFR2VIey6vutHYAXb7Sbp4CuOxB1er5/DlNkJ671vvZNHwOlEJ682PINqD1PB70BEESXPGJGERf
+	ZdVmr+SQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w7TKi-0000000CSSm-07Hr;
+	Tue, 31 Mar 2026 07:16:16 +0000
+Date: Tue, 31 Mar 2026 00:16:16 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Sungwoo Kim <iam@sung-woo.kim>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Chao Shi <cshi008@fiu.edu>, Weidong Zhu <weizhu@fiu.edu>,
+	Dave Tian <daveti@purdue.edu>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] block: Fix general protection fault in
+ bio_integrity_map_user()
+Message-ID: <act0wKGUHCcQvAN8@infradead.org>
+References: <20260330230256.4160820-2-iam@sung-woo.kim>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330230256.4160820-2-iam@sung-woo.kim>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-As reported by Qu Wenruo, the following
+On Mon, Mar 30, 2026 at 07:02:56PM -0400, Sungwoo Kim wrote:
+> pin_user_pages_fast() can partially succeed and return the number of
+> pages that were actually pinned. However, the bio_integrity_map_user()
+> does not handle this partial pinning. This leads to a general protection
+> fault since bvec_from_pages() dereferences an unpinned page address,
+> which is 0.
 
- getconf PAGESIZE
- 65536
- blkdiscard -p 4k /dev/zram0
+Can you share the reproducer, or even better wire it up to blktests?
 
-takes literally forever to complete.  zram doesn't support
-partial discards and just returns immediately w/o doing any
-discard work in such cases.  The problem is that we forget
-to endio on our way out, so blkdiscard sleeps forever in
-submit_bio_wait().  Fix this by adding a missing bio_endio()
-call.
+> 
+> To fix this, add a check to verify that all requested memory is pinned.
+> 
+> KASAN splat:
+> 
+> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
+> KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+> RIP: 0010:_compound_head home/wukong/fuzznvme/linux/./include/linux/page-flags.h:240 [inline]
+> RIP: 0010:bvec_from_pages home/wukong/fuzznvme/linux/block/bio-integrity.c:290 [inline]
+> 
+> Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
+> Acked-by: Chao Shi <cshi008@fiu.edu>
+> Acked-by: Weidong Zhu <weizhu@fiu.edu>
+> Acked-by: Dave Tian <daveti@purdue.edu>
+> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+> ---
+> V1: https://lore.kernel.org/linux-block/20260308001358.1675543-2-iam@sung-woo.kim/T/#u
+> V1->V2:
+> - v1 incorrectly assumed pin_user_pages_fast() returns bytes. Fixed.
+> 
+>  block/bio-integrity.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+> index 20f5d301d32d..992ce39e8ab9 100644
+> --- a/block/bio-integrity.c
+> +++ b/block/bio-integrity.c
+> @@ -338,6 +338,15 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+>  					extraction_flags, &offset);
+>  	if (unlikely(ret < 0))
+>  		goto free_bvec;
+> +	if (unlikely(ret != nr_vecs)) {
+> +		for (int i = 0; i < ret; i++)
+> +			unpin_user_page(pages[i]);
 
-Fixes: 0120dd6e4e202 ("zram: make zram_bio_discard more self-contained")
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Reported-by: Qu Wenruo <wqu@suse.com>
-Closes: https://lore.kernel.org/linux-block/92361cd3-fb8b-482e-bc89-15ff1acb9a59@suse.com
-Cc: Christoph Hellwig <hch@lst.de>
----
- drivers/block/zram/zram_drv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I guess this works fine even for a negative ret, but it looks really
+odd.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index dcea703a6766..b0637423953b 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2683,8 +2683,10 @@ static void zram_bio_discard(struct zram *zram, struct bio *bio)
- 	 * skipping this logical block is appropriate here.
- 	 */
- 	if (offset) {
--		if (n <= (PAGE_SIZE - offset))
-+		if (n <= (PAGE_SIZE - offset)) {
-+			bio_endio(bio);
- 			return;
-+		}
- 
- 		n -= (PAGE_SIZE - offset);
- 		index++;
--- 
-2.53.0.1018.g2bb0e51243-goog
+> +		if (pages != stack_pages)
+> +			kvfree(pages);
+> +		ret = -EFAULT;
+> +		goto free_bvec;
+
+This now loses the original return value if it alredy was
+negative.
+
+I think the better fix here would be to switch to
+iov_iter_extract_bvecs, but that might be a bit too big for
+a backportable bugfix, so I guess we should merge your patch
+first once it is fixed up.
 
