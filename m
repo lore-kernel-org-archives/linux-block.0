@@ -1,79 +1,168 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CCC3E8C75
-	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 16:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774973586; cv=none; b=FMcJvaVDRRbelvQjc2jQETSmjOPMljGe1dRUOoTNt/bllWdYefAoX6McpOE55g4rcQC5PDiETIFcgPpf1uFrmmsS0DxLMM0QVMlQzZZjxb4LaeMEO7yJptYv7oT7fHFyafCuRUJD5nkUbxvfbqpoQZ3t68w+MbZRpDwz7JumgJg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774973586; c=relaxed/simple;
-	bh=NH51tSOZOgzrxTGgcxWpGi8u14xDpOKoRu+KYTr+FMU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dhzfj7E5iQWgfOTWIcemYIBwWXap7P80p3UY/47+5obE5cQgdmgl3LYD+YorTVqUmLVc6KXyQ+lgaYE3EzxeU4vXYjvpUEO7gfbK5O3UbJ/dmyOMLqjc8NDVBVIASx3KHmceXo8NZ1rsIdbh8truZbUVdfgDHOV6QbC73K1HyAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=DKXp/rky; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912242FF669
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 17:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774976506; cv=pass; b=ndmMH8tAQ2y+JhtJyCDm9i7EsxzthzzLojuAPTe7DN/yp++/WDgq/mEnDGXh0PMp1WtigEOvnzWSO8CI5vMnouAmYAT/Goi0stJ34dX8m5dgrUNXr2gfqJ4pDqTxlvASBgQpm6TVJqP/DG2TcQGNNa6EBrzooNGrlT283LInPjM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774976506; c=relaxed/simple;
+	bh=Sf457Uog04A2wbdJfRkGVXUbpPpLNsrBCURdmZQ2jJU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B5i0vXvDsu/awEHQO0m8fUtRevPTc2QM6kPQGA+Gc3p5u1LMSMrCSJs2u9vDRgKLU5ZY6gOyCoR0mzvKXd0wbx2EmNR+iKB/53VkzjPC0FQ0MEGJZi/SiIhi8BqLOtRu+n6tNB3TSbCRnbe/fLz+0/Qxq6IHoFwl2kADJ3TPFic=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DsFhMAWb; arc=pass smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="DKXp/rky"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4flY7H0hz4z1XMFkQ;
-	Tue, 31 Mar 2026 16:12:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1774973576; x=1777565577; bh=4nX0bCMlfiGwV6a9jPMFZWlv
-	Prgt6fCHGDib2EbYTiI=; b=DKXp/rkyxNGu7ULvUPzZWrLE98efCxfkb/bkGEGN
-	LynGo4oTdnv4kVh/8SnSECEMIdKPzt16N7QoqUVGsncPBrLaMkGvSrFdndepZ1sM
-	Muk/cPsVaIRx+iM0Vvhqg5slCIJ6gWa6DDTCCyWBRaR7POMphUJYiJ9CdILkgSJi
-	0jF1/9B8cPvvunD1vsdPcIkVeSilGILIAQsPUKQQpJomh+BkrpuEjytJVeSjxH3z
-	1qnP4IEUi73AEe4XHvtoqREX24XN4iq/YMUKvIhwawXpuVJLYbdYgo/CxedZHhDr
-	LAfnMRUqeubnM3HbFaOvkfy7xEpiibVh/b7MIOgFbmMKLg==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id YXj08l__SEH7; Tue, 31 Mar 2026 16:12:56 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4flY7C1BlJz1XMFwZ;
-	Tue, 31 Mar 2026 16:12:54 +0000 (UTC)
-Message-ID: <70b6d783-fdd3-4dce-807a-80b0967906a3@acm.org>
-Date: Tue, 31 Mar 2026 09:12:54 -0700
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DsFhMAWb"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-509069a7a7fso714981cf.0
+        for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 10:01:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774976503; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Wlel59T80jVlVoywZVq9+3QzFkrRoVgXyBdqenje80g+JKCyO1SM+IV/mf6jbLTw0N
+         IsRjpt/gvqJLgMkjzOUR9wsDwWMB3KvcocFngDU551QjR7T9p7//EVx5fHcukAur9K8A
+         OuHuVQnbXeByoGYpiZY/GITW2Ylrp2QgmS2sHTMj23G6P5zgqOFpjaNOH1/Spade0uXw
+         v8sYVHYG7O452HdkaHrRK1Aj2auiABXew5qpOXr7CGb7/dFYuQxe33SgHGi4kY8lQT5P
+         BJTfXULAvWid6iNLErUX+vsodi4xwEnLQoDuQCAWjcmpNaARbAnOfTZKV+g085JjPVJF
+         noEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Ham5ev+UebYvvEaY28poSjgTGYZxX5cFNpBczGAP7zU=;
+        fh=hlv5UMtlG8EkAzav4jCsRFt8hBNzzwSo8TdminCSUkU=;
+        b=cez4pppVU2ITymw/2NjMwPII88Fcln0OUEP9LvJUM0CaIWCM9caDj9jY4IrneL9tI4
+         MUIsoEjgzbX/f9+qer91ujxbI9Y05yHn4Y5rxnXXcNmz+F0iyN7z9zmGF3afUucIEXJ2
+         MeE1SjNGw0Yw0CpglN8Q1ODiN5HKmGHdFccBuMdsDJE/hO+WGpNiugOYGjF6PomTwdCi
+         nR5bQ8G2voKbFfw9a+8E4LDkNalV9XPlCKUpc9mWcDOVkk7UIUzXOCdot3azH/mTKE74
+         UBWGzSvKPv8f6zbosHGPIE3rYyiDdAH5PQrDLZoi+E1tFPgmDg0S+DUt8I81cgMnWrab
+         ueSA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774976503; x=1775581303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ham5ev+UebYvvEaY28poSjgTGYZxX5cFNpBczGAP7zU=;
+        b=DsFhMAWbVQr54iSHE88Gas7R96HB2MiQFVf2cL4N+rb4DEAl83HfTxLF9pUYZwN+mi
+         ZgM8hEiDjOWPRnWqYb5TFIqR8588DS0PqIeayxiTgoYtgMNPCiluPp39yPdRyG0jOgCl
+         KDyoJGmfAdyq+Img/MaVqe3BGqn2rw/gIzsT1NvaMRY+FMHquvepYQO9878L7zFBA0yN
+         04R8+e2FHCmejlJN0N28UGe/oBJJFDDRDs0H1N2h7NsFVtKRDjiiOVPVrobR5sCThF+R
+         f+4XXT7nN+4Zsk5b0i9cKO4z6BFWAuI3WnZTlnBIpEg4p8Gs2YMZBUw2qEGelqpn/u0R
+         +ufg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774976503; x=1775581303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ham5ev+UebYvvEaY28poSjgTGYZxX5cFNpBczGAP7zU=;
+        b=hfAgCrAfcJxmXm/m0N7ygrRWe0wMkDKBldDOe/EWKBJYX9Du1gizSCdrtgBayJbD6/
+         1RfZ+l7mwfm9B4h2yGr+i/FwRmQA3yvaA4rnsu9ukYOhZISjgZe52qyM/84V0Msd+4Or
+         CV7G0Y1rlla6HcexPPJwLmqjQqCSFlbE5//ffyk4qeWf+3vdGr43bRAPUVIx5TGkhlRO
+         1cf2rwkr0LjdDXpE+hdHPBmfAurMsS21mNR9tQchzwisO5eYWwT+CJ8On634BZ8DfAsY
+         yDOF/alU8/V+JnVRrZ1S4jp0Y0vorGjWb8Z3FWgVV6Fq8XITuRhX5q8YEkBJY6DHu/ew
+         /nig==
+X-Forwarded-Encrypted: i=1; AJvYcCUNu6b+mWu6lkt5VCVlhy8YAJHzrdLS8oeCE+7CMCdoldJn4V7ztpRLe6ha5g1Fz0HOFnbf0s4KlnMRyg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMPgYWf4QH6xR5f4/O3rOsFN2Ejbqon6vTxLUfzREZ7sZTbGqE
+	uKGAuqfDFOmgTZEyS+XuTp4vqT1/34g+R4hyyKrvWleSPZIRP9fm6S9ugzsG2OtUWB5pxSCMEX8
+	Yf7Fyj5TPirRTwzVlElTiVIrYk/bB9jykG2M2bVmW
+X-Gm-Gg: ATEYQzz2lv61T1daoMH8Veb8SSRRNtlkvy+uRTRrOXPUBrlyM11sM/SBm7UEtZmTDJ0
+	FYfTDDXRgHBfAHTAUdEqsJ2hfwwmDkj/aNbzkymeY2QLGOkkG43Pb9HEIIVQfD5GWHGSl2fY2G8
+	32CxdhBEaq63DZ3ltcPla8Ek1RlkKpVFalEzPrcv5i0iQtXlXDh0GDhcAfeMTU3POX/uZySXaF0
+	/cmEHCcwfH6CVCvZhCocmXg9TY06vYK9I7DZmufe7hvr/C1IZ4qnWGGaZ0D0EOWDwKZxFCoJtHT
+	3Gwtwtslj2wnyK/IOUs7J/Vr0XECa3bKgDpLYrkaLmW+53+o7XlLHkCVeuMuIu1fb7m9K7XEjL+
+	0U7t8Ofm4jjEbP1Py+iDJzf+4
+X-Received: by 2002:a05:622a:aa05:20b0:4fb:e3b0:aae6 with SMTP id
+ d75a77b69052e-50d3b7238eemr1956911cf.1.1774976501176; Tue, 31 Mar 2026
+ 10:01:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] block: Reduce the minimum value for the maximum
- DMA segment size
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
-References: <20260327211349.2239633-1-bvanassche@acm.org>
- <20260327211349.2239633-5-bvanassche@acm.org> <ack5VqUS_gRuxodF@fedora>
- <7fe454fa-d39b-4d2f-a238-297df2261cdd@acm.org> <acsb_mLxDz8RpXF1@fedora>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <acsb_mLxDz8RpXF1@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260331062648.596077-1-senozhatsky@chromium.org>
+In-Reply-To: <20260331062648.596077-1-senozhatsky@chromium.org>
+From: Brian Geffon <bgeffon@google.com>
+Date: Tue, 31 Mar 2026 13:01:02 -0400
+X-Gm-Features: AQROBzD0u_5CmV7Kfe03IQ8eGCjuAdzCH9_TPr0t8uU79dqySJTdhvGybaYcyPg
+Message-ID: <CADyq12yGuOg-Q9MbakWtsevLTDxvk-bSbVyCm9igAmVBA-Po5A@mail.gmail.com>
+Subject: Re: [RFC PATCH] zram: update ac_time of written back slots
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
+	Richard Chang <richardycc@google.com>, linux-block@vger.kernel.org, linux-mm@kvack.org, 
+	Suren Baghdasaryan <surenb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/30/26 5:57 PM, Ming Lei wrote:
-> What is the exactly code path you are trying to cover by changing
-> BLK_MIN_SEGMENT_SIZE?
+On Tue, Mar 31, 2026 at 2:27=E2=80=AFAM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> This makes it possible to tell how long each particular
+> ZRAM_WB slot stays on the disk and, basically, to monitor
+> writeback efficiency.
+>
+> Note that the patch factors out a small update_slot_ac_time()
+> helper, which we call on writeback completion, instead of
+> calling mark_slot_accessed().  The reasons being is that
+> mark_slot_accessed() clears ZRAM_PP_SLOT flag ahead of time,
+> while we want to keep that flag set as long as the slot is on
+> the post-processing list (unless the slot is freed concurrently).
+>
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Suggested-by: Suren Baghdasaryan <surenb@google.com>
+> Suggested-by: Brian Geffon <bgeffon@google.com>
 
-In the solution I came up with and that we are no longer using in 
-Android (we switched to the upstream approach) there were code paths
-that are only triggered if max_segment_size < PAGE_SIZE (see also
-https://lore.kernel.org/linux-block/20230522222554.525229-1-bvanassche@acm.org/).
-I'm not sure there are any such code paths left?
+Acked-by: Brian Geffon <bgeffon@google.com>
 
-Thanks,
-
-Bart.
+>
+> ---
+>  drivers/block/zram/zram_drv.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
+c
+> index 5ecc4ba40e9d..dcea703a6766 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -185,15 +185,20 @@ static inline u32 get_slot_comp_priority(struct zra=
+m *zram, u32 index)
+>         return prio & ZRAM_COMP_PRIORITY_MASK;
+>  }
+>
+> -static void mark_slot_accessed(struct zram *zram, u32 index)
+> +static void update_slot_ac_time(struct zram *zram, u32 index)
+>  {
+> -       clear_slot_flag(zram, index, ZRAM_IDLE);
+> -       clear_slot_flag(zram, index, ZRAM_PP_SLOT);
+>  #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
+>         zram->table[index].attr.ac_time =3D (u32)ktime_get_boottime_secon=
+ds();
+>  #endif
+>  }
+>
+> +static void mark_slot_accessed(struct zram *zram, u32 index)
+> +{
+> +       clear_slot_flag(zram, index, ZRAM_IDLE);
+> +       clear_slot_flag(zram, index, ZRAM_PP_SLOT);
+> +       update_slot_ac_time(zram, index);
+> +}
+> +
+>  static inline void update_used_max(struct zram *zram, const unsigned lon=
+g pages)
+>  {
+>         unsigned long cur_max =3D atomic_long_read(&zram->stats.max_used_=
+pages);
+> @@ -952,6 +957,7 @@ static int zram_writeback_complete(struct zram *zram,=
+ struct zram_wb_req *req)
+>         zs_free(zram->mem_pool, get_slot_handle(zram, index));
+>         set_slot_handle(zram, index, req->blk_idx);
+>         set_slot_flag(zram, index, ZRAM_WB);
+> +       update_slot_ac_time(zram, index);
+>
+>  out:
+>         slot_unlock(zram, index);
+> --
+> 2.53.0.1018.g2bb0e51243-goog
+>
