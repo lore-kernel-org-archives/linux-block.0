@@ -1,45 +1,45 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DAA26A1B5;
-	Tue, 31 Mar 2026 07:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10723BE164;
+	Tue, 31 Mar 2026 07:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774941381; cv=none; b=prsEuLiM4CJzH1oX6D4Tf/ixqXu7TrIkryreXkZxRH8jNWPPflARbOEfvUly3E95MBbmALy4VmDwE/iK1CZ9lDu+1Kmrd2wGZVSTFsAIyHxrqH4AEK+KMYfMVC7zaCTZRkbFapOSEgOL9bijqmqwHTIvOnBdSn7rspMr4WFZHOA=
+	t=1774941741; cv=none; b=ZnvPIfYSQLqfDfPPfwjnwwDOmw0Xrdq76myPhRvBHds8SaOK8rGc2yo91Ccy9zQw8/4A9kJroHv8D4QzdIesOZEEf8KMZAQ+RsgET3rKelGcJsnjsleBOdByVHTr4d0MzwNTLtKXxGBYQe0ogxcSWl+Ych+NAO4Bknwb/UXAOlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774941381; c=relaxed/simple;
-	bh=sgPebN8LAxTscPZNbI7LSfjm9u99fuk+TlEywW+T3V4=;
+	s=arc-20240116; t=1774941741; c=relaxed/simple;
+	bh=zTh4XjHfKWL7ba0b9Sqw4lC8D6/IJW57Qewykt/JDe8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UG0+P1b7atQhoQQEGPTySXp8J/dtG3SlVZaYQME3IehHN1oWnfX0uhSNzQmq4VBSFDidHK01LL4TpouZoBXmonX70QxmVqAaHzxyxqIr1812mxtjOgZ3LcuFCIUwOVq5YndafyW+U6rV0sFVUKilQnO9Os4hNLDvM3blDVYqi/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mJRyacST; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=J/AMaUcGG73cCBl/dKmQS5CQMdlwRe7JwntcQWFswoHIyOeiseZ7OmfWt+TrHv8vsF9VXwO2s0yeqNbUOC0Zf5NTuzIWkiICTd2zWUXdkhCYGn/w5o0PymiPdW9lgoxrzXQoJoUppJxHIlE02PXYoHtPLMrRpV/nP77yBjdKtdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bZPQHvnU; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mJRyacST"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bZPQHvnU"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0ttq0UrYAQ2lg3jmVM+5pPYGqrXfSL0rw9xPytSPqPo=; b=mJRyacSTFm939GZfeysPc/tF6C
-	1ahqJ7PyddWBIkVUdK9t8hf4e4DZikdLVBI1fHb3oTMZ+/aDHZbSHirmfcNFsgoxnrKjSZvVddwzb
-	fv7g4BwGqCLig29awqcpS0dscbvGKfca8Th6CuIZMnHVIvd9L6F/DasokEE5HuTMf9f16Ti3ekyYi
-	WTcr2kY/FNxJTh42DswOMRzzAEfxmkITWL7Odg/WjGIDX96rrxRpuAa5IUhVEYGic+VJAMqfn5CbS
-	5iRFR2VIey6vutHYAXb7Sbp4CuOxB1er5/DlNkJ671vvZNHwOlEJ682PINqD1PB70BEESXPGJGERf
-	ZdVmr+SQ==;
+	bh=wOq9u+YEnP2L13BOaUj5IPbaOeet7/3oUdvcT9/aWCc=; b=bZPQHvnUrDtWA+gMJPs4cWWiiA
+	01YI0a8SV44oNVZtQM9AzNXqjjrbGGZAZt8zZrYy8MkebdywN/oEGIJvewwA/6Rb5US8WAN2JGzfS
+	y1nfG3Z8eJbrGi5hZsOEU4ZVamR082WPu6273ctBRrAbxGa+qluQ0t7SjbqjdlMZNdGSWvrfPlMQl
+	9nKHwA+dAA2x1tEDTwpy+MAMLY8DsBtAJJZZ34qUjNi9LVMmrYG1EQWfm08bU4WOx5bHPZpyBf4AN
+	Ekz8saZ+/YqikimWR0TOD53omrKha9TRqTlexX88w3LElCfYkBaUzCaIP3AqMSFazxLQgVsl9aQ3X
+	n88D63nQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w7TKi-0000000CSSm-07Hr;
-	Tue, 31 Mar 2026 07:16:16 +0000
-Date: Tue, 31 Mar 2026 00:16:16 -0700
+	id 1w7TQY-0000000CTBn-1kjl;
+	Tue, 31 Mar 2026 07:22:18 +0000
+Date: Tue, 31 Mar 2026 00:22:18 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Sungwoo Kim <iam@sung-woo.kim>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Chao Shi <cshi008@fiu.edu>, Weidong Zhu <weizhu@fiu.edu>,
-	Dave Tian <daveti@purdue.edu>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] block: Fix general protection fault in
- bio_integrity_map_user()
-Message-ID: <act0wKGUHCcQvAN8@infradead.org>
-References: <20260330230256.4160820-2-iam@sung-woo.kim>
+To: Deepanshu Kartikey <kartikey406@gmail.com>
+Cc: axboe@kernel.dk, tytso@mit.edu, hch@infradead.org, dvyukov@google.com,
+	adilger.kernel@dilger.ca, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] loop: block changing lo_offset/lo_sizelimit on
+ mounted device
+Message-ID: <act2Kh8u2I5HPVlv@infradead.org>
+References: <20260331054648.4548-1-kartikey406@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,66 +48,34 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260330230256.4160820-2-iam@sung-woo.kim>
+In-Reply-To: <20260331054648.4548-1-kartikey406@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Mar 30, 2026 at 07:02:56PM -0400, Sungwoo Kim wrote:
-> pin_user_pages_fast() can partially succeed and return the number of
-> pages that were actually pinned. However, the bio_integrity_map_user()
-> does not handle this partial pinning. This leads to a general protection
-> fault since bvec_from_pages() dereferences an unpinned page address,
-> which is 0.
-
-Can you share the reproducer, or even better wire it up to blktests?
-
+On Tue, Mar 31, 2026 at 11:16:48AM +0530, Deepanshu Kartikey wrote:
+> LOOP_SET_STATUS{64} allows changing lo_offset and shrinking
+> lo_sizelimit while a filesystem is mounted on the loop device.
+> This effectively mutates the data visible to the mounted filesystem,
+> which is equivalent to writing directly to the block device.
 > 
-> To fix this, add a check to verify that all requested memory is pinned.
+> When CONFIG_BLK_DEV_WRITE_MOUNTED is disabled, direct writes to a
+> mounted block device are blocked. However, LOOP_SET_STATUS{64}
+> bypasses this protection because it modifies the loop configuration
+> through an ioctl rather than opening the block device for writing.
 > 
-> KASAN splat:
+> Fix this by checking bdev_writes_blocked() before allowing changes
+> to lo_offset or shrinking lo_sizelimit. If the loop device has
+> writes blocked, return -EBUSY. Increasing lo_sizelimit is still
+> allowed since growing the device is harmless and has legitimate
+> use cases such as online resize.
 > 
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-> RIP: 0010:_compound_head home/wukong/fuzznvme/linux/./include/linux/page-flags.h:240 [inline]
-> RIP: 0010:bvec_from_pages home/wukong/fuzznvme/linux/block/bio-integrity.c:290 [inline]
-> 
-> Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
-> Acked-by: Chao Shi <cshi008@fiu.edu>
-> Acked-by: Weidong Zhu <weizhu@fiu.edu>
-> Acked-by: Dave Tian <daveti@purdue.edu>
-> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
-> ---
-> V1: https://lore.kernel.org/linux-block/20260308001358.1675543-2-iam@sung-woo.kim/T/#u
-> V1->V2:
-> - v1 incorrectly assumed pin_user_pages_fast() returns bytes. Fixed.
-> 
->  block/bio-integrity.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> index 20f5d301d32d..992ce39e8ab9 100644
-> --- a/block/bio-integrity.c
-> +++ b/block/bio-integrity.c
-> @@ -338,6 +338,15 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
->  					extraction_flags, &offset);
->  	if (unlikely(ret < 0))
->  		goto free_bvec;
-> +	if (unlikely(ret != nr_vecs)) {
-> +		for (int i = 0; i < ret; i++)
-> +			unpin_user_page(pages[i]);
+> Move bdev_writes_blocked() from block/bdev.c to
+> include/linux/blk_types.h as a static inline function so it can
+> be used from the loop driver without exporting a symbol.
 
-I guess this works fine even for a negative ret, but it looks really
-odd.
+I still think this is a very bad idea for the reasons explained before.
 
-> +		if (pages != stack_pages)
-> +			kvfree(pages);
-> +		ret = -EFAULT;
-> +		goto free_bvec;
-
-This now loses the original return value if it alredy was
-negative.
-
-I think the better fix here would be to switch to
-iov_iter_extract_bvecs, but that might be a bit too big for
-a backportable bugfix, so I guess we should merge your patch
-first once it is fixed up.
+And I would not be surprised if this breaks something in blktests or
+xfstests as they heavily rely on resizing block devices.  Did you
+do full runs of those?  Especially with xfs and btrfs for xfstests
+as they do a lot more loop based tests?
 
