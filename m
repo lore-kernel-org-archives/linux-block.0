@@ -1,48 +1,45 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BF63FB051;
-	Tue, 31 Mar 2026 15:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA0A3DEAE6
+	for <linux-block@vger.kernel.org>; Tue, 31 Mar 2026 15:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774969364; cv=none; b=PeZa5E3Lh+TMp0Edyi0TH0jP2bsxAUrPT0EKnJxo6a35g5KAbMIDBahg4RsfGWdQFloOBwcbew3+y1S4PMLuwSNisv8SdSJnxX2YLdygZ4A+Ibzk5MdCmuqC6j3uo+CkLuFDV+esMuTAuAazEw8jonBmrkdadLsru3GXZuUJrxE=
+	t=1774969663; cv=none; b=Hc94KVnLJPP2I9xeB5szh5P370z63rSBYsr/WfCDFyBNBMK7oBUEe5GiFC/5WEBYfSuGbgkXmqaKqu1s0sLYeehjsqLuVTpUurrxD8BX57GMKx3YEl/fRWQN1oYzOYNcVKpRcGcVQmEY0X1Jnmv5qbjjUxonPS7n82HQr/5gNlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774969364; c=relaxed/simple;
-	bh=TnFqPxS+nne4CNvOdZqaK21h6+DMjiAvm5cHKnlgihk=;
+	s=arc-20240116; t=1774969663; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YjQJhEJseommB3sFG1qdebSFldO37jUFF4GSjroV9qdiCT/b56j5zBvDBS/AqBA5r+2Skszwi59IwPNeIClNIqwHRMvyakEPOhZHT46q/lsiA4c9mDYHyhP/z38zrTDmnzH7amvACRWCyrcvXjCGUSZJkZAONViT1oYvn1ijIWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NfaVlKpa; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=dIFQqwwEtsSCD44SwlMt/qKWHhz+rd37IT4e7NcVsUmAcQcMRXC/oa66gDy7jPAzk5y58lnuXBZ1CmMnJdAvowfHvy2x3R/pvUU4Ln47bgbb+gA+yhbuAfm+ni3w9KPFzYCvospqT3PxcXoRvpsSgA2Pj0SzpowDv5Uhp67H4EY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=b1vfivYB; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NfaVlKpa"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="b1vfivYB"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=WASmCAWx1UhfnKlYBZL3c+urkfeQsSetCQn2fwEVnx4=; b=NfaVlKpabFacyAs01YZ6CnLmLo
-	RzRIY6HG0V6sl2ORkyPgai8L9Nb/vs+hFfpk9vwLFiuKEKZKeQ5aXfrFaQuBlNlYwWyrxUwcvY2Xy
-	DIVzLLtSUHUyNYrqB98PPJUcrc8flWGEjRHzHv7AGqRuwMBif8GumfIaNbgEs8jeV87LLHcthBTva
-	6pgaGP0awiy4tSLrQFudx4FMjbi2GM3WOlwdStOIaXMQinrWnw5eJuhgmYrOgGVgyCExr0gETG280
-	XOIAJw0S5b8FqLenuWgQf/rHp/L6sbkuyiSifcw4xP4CgDdSks0xDp8KV9Gp1jf0rCQpR2RQLIk6y
-	zWxaSpbg==;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=b1vfivYBRqsffpDGrrry2hl7rs
+	TWqN/8pxHnzFI+7zDqTtLOR8vd7GUT5SC1xd+zDe/6lY4ydI7fVynYKGsheSSe+ortUjbBN3dBX1s
+	OvuMx2MjEiSxwDgFvwosmrPWI8hkD66JXL5bMjE9DK/LXeoHW0TiPAKYE/Q7Xqnieuo36PgleYrfS
+	wkvsCypJ+oIi4XGw2CO3ph5HyDAPeYDv2QHDazAGpRZoL0f9YID7a4tFg1l11/DYz46+3wRbtvs6K
+	zfxwbMzA/5stuMRlLmQToPY3bxUL3YqOtKMTAsn+b6UG8c+ek8lOmYbtuPa6m+TTiA3Zz+an3+P7p
+	X1BB98fA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w7ac4-0000000D8u0-0i6K;
-	Tue, 31 Mar 2026 15:02:40 +0000
-Date: Tue, 31 Mar 2026 08:02:40 -0700
+	id 1w7agt-0000000D9BB-46d5;
+	Tue, 31 Mar 2026 15:07:40 +0000
+Date: Tue, 31 Mar 2026 08:07:39 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Theodore Tso <tytso@mit.edu>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Deepanshu Kartikey <kartikey406@gmail.com>, axboe@kernel.dk,
-	dvyukov@google.com, adilger.kernel@dilger.ca,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+fb32afec111a7d61b939@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] loop: block changing lo_offset/lo_sizelimit on
- mounted device
-Message-ID: <acviEBik3OrtfiRV@infradead.org>
-References: <20260331054648.4548-1-kartikey406@gmail.com>
- <act2Kh8u2I5HPVlv@infradead.org>
- <20260331122408.GB74409@macsyma-wired.lan>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>, Brian Geffon <bgeffon@google.com>,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	Qu Wenruo <wqu@suse.com>, Avinesh Kumar <avinesh.kumar@suse.com>
+Subject: Re: [PATCH v3] zram: do not forget to endio for partial discard
+ requests
+Message-ID: <acvjOxXdmMRebccm@infradead.org>
+References: <20260331074255.777019-1-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,21 +48,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260331122408.GB74409@macsyma-wired.lan>
+In-Reply-To: <20260331074255.777019-1-senozhatsky@chromium.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Mar 31, 2026 at 08:24:08AM -0400, Theodore Tso wrote:
-> Do we expect people to seriously be running with
-> !CONFIG_BLK_DEV_WRITE_MOUNTED? 
+Looks good:
 
-Yes, it's the only sane option.
-
-> I view this as a syzkaller noise
-> suppression only.  As I mentioned earlier this option will very likely
-> break grub.
-
-Yes, the horrible things grub does won't work with this.  But I thought
-with EFI-based systems people had mostly stopped using the access
-to the root file system misfeature in grub.  And a lot of specialized
-distros seem to stop using grub entirely.
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
