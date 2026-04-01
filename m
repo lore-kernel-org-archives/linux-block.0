@@ -1,96 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A948481AA2;
-	Wed,  1 Apr 2026 23:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCCD31714F
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 23:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775084523; cv=none; b=q7A0lN/1FZ8w6cMTRiyvF/ud37/xrzYoy44eQWoMpm3aRoCDqsw2Ck0Z/gEE3KKyOIeJsrIwytelqrjBOClVau2roCmJS2BqyHkTUeMK9vn5mMh2zyN3jZn+mL95zqTxE3WqasgnSAOFl0Zp6CMNHOjVvaBskqVogloU1tZVsO8=
+	t=1775086327; cv=none; b=jPr+Z5gQySV/tIElsdLj9sl6XhU7sbAc5g7UFoGTWmH/ZnVfqkLMvs0Ri5DVnWdZL6hod5tEOkYZct4rBK6VG/f3AuU05F+A+du4YkJvWqtW/oe6cAV6m+5bOQVN3j/oH2H/7ZGsikQL5q+9kuHC9HuAReGhBUhHRLmnWIYvltc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775084523; c=relaxed/simple;
-	bh=mIoLqdGB6FEaivDOYbSVC5sMk8eFMcAZ8xp8MdTnV0k=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=EnUueJXsbNkT5FuDlfIP18VERE38VEVHSIjRB0uqM619OnSvXCWEZ1iLj0FA/QQZnvkSifBGINvwkE41KvWrSFV9WxWvhnIu9EdTwMT0IARsv6Xph/+cRG0/UaEQgkLDyx1FbDQoVH58Iwq7CUAGr73PlScOrFNyfRYt36BVYvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXyGeWKi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775086327; c=relaxed/simple;
+	bh=8Km389EKYA/nHLJ6fv7aemC2MSc1lXxEjR15aLz7mjY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eOS+HLsWlZyIrLDw40kfOf9o53TMfiqETPRfwZ/6RNjNEvTea8g5ypB09KVFYc8hEJKNrYhOVsBNqjT2NPAnTNiAHveDgHxp5C3U101Liiqk6HxCzd64yuINNbbJIyg90lA7BH0Uoq8bN6r1oiAB8zxM0OZeggquw8y2R5ESBpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cRU9QQma; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXyGeWKi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03BBFC2BCB0;
-	Wed,  1 Apr 2026 23:01:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cRU9QQma"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952BBC4CEF7;
+	Wed,  1 Apr 2026 23:32:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775084522;
-	bh=mIoLqdGB6FEaivDOYbSVC5sMk8eFMcAZ8xp8MdTnV0k=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=ZXyGeWKi13Ct8X9D0547XxKoA9LfoDtpV+LhRj3iXOQd+bnjQ22veAr1KWQzEnIDA
-	 kCTGsTKkVr/gscyEmrZwOvWOWJ7En260oBqHLZzHIzEAlkTuiEm6eUc5UILdqgZy+H
-	 HXAequvu6ZpIY4U3LMW8wzpcshrEKczrtsPGEnHRqS7XkcXKcwcDDz47C4fWwDAXKO
-	 OIQVKkdK/nf9H0jRFaReCDhlcyWz4+4QQtQPnKMye0CMmsL4cTMnrf7NbrpD+fnPzG
-	 ktDfNcL8YfxyQiu9pd7SwNmlkrwL9bKsRyvSsH9EF8GOZzd/XyeyosIPxWhon0MbUH
-	 E+D3sywT0mp+Q==
+	s=k20201202; t=1775086326;
+	bh=8Km389EKYA/nHLJ6fv7aemC2MSc1lXxEjR15aLz7mjY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cRU9QQmaBZ+aDB8piqTOUOIZYBJF92yEvcYQXX3ZEBOsDnWyywU/B4stxs8VkKuhH
+	 kQAGyCrsOsc0AEbxtMMyBk49TlayL5w5B/aNAiCbDdA8aEU9UTMXb5P7ngl3d+O9m9
+	 03EcfbDPyFjZPoZOEl6DykXwtWfx1CGxz+Avb96hKJ1MzYX/XIo+OySJObBvJiVkx2
+	 nCct0BDOfTwZ9zGy1nCchF/sAggho6pVCCBjVvCdDBQGfXKPhv1T/+oGeLb7ogOH/V
+	 nr5RZE87mQ405Jht/CJcIZHQg0cHNLFcV1nw3tk1VZsNmKXVvujsJCFWirW+iUbIa/
+	 NQkKUpp6nzb4Q==
+Message-ID: <4473917f-c8e8-4679-a762-f7518a43b1d0@kernel.org>
+Date: Thu, 2 Apr 2026 08:31:58 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] block: Increase BLK_DEF_MAX_SECTORS_CAP
+To: Keith Busch <kbusch@kernel.org>
+Cc: Mira Limbeck <m.limbeck@proxmox.com>, axboe@kernel.dk, hch@lst.de,
+ linux-block@vger.kernel.org, martin.petersen@oracle.com,
+ Friedrich Weber <f.weber@proxmox.com>
+References: <20250618060045.37593-1-dlemoal@kernel.org>
+ <291f78bf-4b4a-40dd-867d-053b36c564b3@proxmox.com>
+ <ff5e2877-840b-4eb6-b449-bb64fb2e4097@kernel.org>
+ <ac2256a0-25ce-4453-8c47-04cb7716d46a@proxmox.com>
+ <7a0cfc66-3131-4b94-87f2-cbb96595ebb6@kernel.org>
+ <ac2GOOLzui0U0BTJ@kbusch-mbp>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ac2GOOLzui0U0BTJ@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 33/33] rust: kbuild: allow `clippy::precedence` for
- Rust < 1.86.0
-From: Tamir Duberstein <tamird@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
- Danilo Krummrich <dakr@kernel.org>, 
- Andreas Hindborg <a.hindborg@kernel.org>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Courbot <acourbot@nvidia.com>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, 
- Todd Kjos <tkjos@android.com>, Christian Brauner <christian@brauner.io>, 
- Carlos Llamas <cmllamas@google.com>, Alice Ryhl <aliceryhl@google.com>, 
- Jonathan Corbet <corbet@lwn.net>, Boqun Feng <boqun@kernel.org>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
- rust-for-linux@vger.kernel.org, linux-kbuild@vger.kernel.org, 
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
- Vlastimil Babka <vbabka@kernel.org>, 
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
- Uladzislau Rezki <urezki@gmail.com>, linux-block@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, Alexandre Ghiti <alex@ghiti.fr>, 
- linux-riscv@lists.infradead.org, nouveau@lists.freedesktop.org, 
- dri-devel@lists.freedesktop.org, Rae Moar <raemoar63@gmail.com>, 
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
- Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-In-Reply-To: <20260401114540.30108-34-ojeda@kernel.org>
-References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-34-ojeda@kernel.org>
-Date: Wed, 01 Apr 2026 18:59:04 -0400
-Message-Id: <177508434476.73816.11744805605122440072.b4-review@b4>
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=490; i=tamird@kernel.org;
- h=from:subject:message-id; bh=mIoLqdGB6FEaivDOYbSVC5sMk8eFMcAZ8xp8MdTnV0k=;
- b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnF7s6hUfb+jyd9vbK0ZWKNtIml3vZzdZu5eWV+2r4r
- rMtuaq8YyILgxgXg6WYIkui6KG96am398hmvjsOM4eVCWSItEgDAxCwMPDlJuaVGukY6ZlqG+oZ
- GukY6BgzcHEKwFSr3mdk+LXi1KaghwuXvXvryuIh3xizmzukzafohmvWRgutvqoD3IwMq9NSuvc
- +cVOd5nUvf9cfyV0no/Naz6wyyv7a/lP08aU4HgA=
-X-Developer-Key: i=tamird@kernel.org; a=openpgp;
- fpr=5A6714204D41EC844C50273C19D6FF6092365380
 
-On Wed, 01 Apr 2026 13:45:40 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
-> The Clippy `precedence` lint was extended in Rust 1.85.0 to include
-> bitmasking and shift operations [1]. However, because it generated
-> many hits, in Rust 1.86.0 it was split into a new `precedence_bits`
-> lint which is not enabled by default [2].
+On 2026/04/02 5:55, Keith Busch wrote:
+> On Thu, Apr 02, 2026 at 05:02:22AM +0900, Damien Le Moal wrote:
+>> On 4/1/26 19:32, Mira Limbeck wrote:
+>>>
+>>> Apr 01 11:41:19 pve-test-hba kernel: sd 9:2:2:0: [sdc] tag#3962 page boundary curr_buff: 0x00000000f4d7cfce
+>>> Apr 01 11:41:19 pve-test-hba kernel: BUG: unable to handle page fault for address: ff3a241243d70000
+>>> Apr 01 11:41:19 pve-test-hba kernel: #PF: supervisor write access in kernel mode
+>>> Apr 01 11:41:19 pve-test-hba kernel: #PF: error_code(0x0002) - not-present page
+>>> Apr 01 11:41:19 pve-test-hba kernel: PGD 100010067 P4D 10066d067 PUD 10066e067 PMD 11f0fa067 PTE 0
+>>> Apr 01 11:41:19 pve-test-hba kernel: Oops: Oops: 0002 [#3] SMP NOPTI
+>>> Apr 01 11:41:19 pve-test-hba kernel: CPU: 15 UID: 0 PID: 6695 Comm: vgs Tainted: G      D W   E       7.0.0-rc6 #19 PREEMPT(full)
+>>> Apr 01 11:41:19 pve-test-hba kernel: Tainted: [D]=DIE, [W]=WARN, [E]=UNSIGNED_MODULE
+>>> Apr 01 11:41:19 pve-test-hba kernel: Hardware name: <snip>
+>>> Apr 01 11:41:19 pve-test-hba kernel: RIP: 0010:_base_build_sg_scmd_ieee+0x478/0x590 [mpt3sas]
+>>
+>> There may be an issue with the mpt3sas driver with large commands.
+>>
+>> However, I am using that driver all day long and doing lots of testing with
+>> gigantic read/write commands all the time. I have never seen any issues.
+>> The difference is that I am using the SAS-SATA FW for the Broadcom HBA, so no
+>> NVMe support, and my target devices are SAS or SATA HDDs, not SSDs.
+> 
+> It's only the NVMe attached ones that use base_make_prp_nvme, and it
+> looks like the ioc->pcie_sgl_dma_pool that provides the buffer for the
+> entries is too small for a transfer larger than 2MB. So it's overrunning
+> the allocated buffer.
 
-Might be good to retain some of this in a code comment.
+Keith,
 
-Reviewed-by: Tamir Duberstein <tamird@kernel.org>
+Thanks for checking. I had not look at the code yet. Given this, this should be
+fairly straightforward to fix. I will have a look and send a patch.
+
 
 -- 
-Tamir Duberstein <tamird@kernel.org>
+Damien Le Moal
+Western Digital Research
