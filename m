@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B92405ACD;
-	Wed,  1 Apr 2026 11:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAD54070F9;
+	Wed,  1 Apr 2026 11:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775044247; cv=none; b=h/ge4FqojgXlMZhRq0OUz5FSyB+ht4wvzoovtU1aBkZ2E98SIybOr0gX7sw26Yabt9x74C5EsmxMqOXUGjGPdsW6MV1H8qve0T5zSz8ywxaSi9KJfDxlUYqrBOBKlOgBagGJmKEAl+uLSXHiWpf8WNnrxY7uBKy1SkHk92f4Fjg=
+	t=1775044259; cv=none; b=ZHns8hhisxnkBkCk1H5EXBkUY8YKhjWe19TaO8v2OOMKfC9cliWCq+xuG3zQnLmdhbv7Vo6wsLxPrzzhkxIIebqBE3PwtlYgG+thybU/UzxpA9UhWXUSZqIP1rubRTO+F+7BecXB65NuINu0Jow6tKO3/abSVh7pV7vNc/7gcM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775044247; c=relaxed/simple;
-	bh=gdqep/CIy3f2tHlGVIduJ54heItiKNgLxJWrndWddZg=;
+	s=arc-20240116; t=1775044259; c=relaxed/simple;
+	bh=ZrS7YCyshnbs/lG/9j9L7W/ZUrAuF338JPwI0nwq6Ho=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r2qXi0PvexWWLmSaZun8h3k3pkCVAl1azbrCRFwUDvFtNpW/W5UUgod2uAA5nKH0PDYQAfci8VxW33AP0mJWSxR9A9EH/YqBOxx4kBotdHXDQuonGXiFsQ5mYA60gcb6HfDOD4w0TntzqwaESTMunWWEgfwBHkSBFU76Nzs8UtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+Hhh1an; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=kxOe1TDL6hOW8pqozZANUPCg86D68IJ0kfDHClQ8z3J4kgK++6tuWQhqvwE/fRGgqNg+uP8bMdNKL+fJedhAKWep65ovOcuPShq0ZJIic/BhHe2rTS/ettGgnVf4RGDEzAstumXL45Vs7CPPeHeqX05M0CNTgkVZjUznrkKacIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYUKktNt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+Hhh1an"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7DB0C4CEF7;
-	Wed,  1 Apr 2026 11:50:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYUKktNt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A793C4CEF7;
+	Wed,  1 Apr 2026 11:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775044247;
-	bh=gdqep/CIy3f2tHlGVIduJ54heItiKNgLxJWrndWddZg=;
+	s=k20201202; t=1775044258;
+	bh=ZrS7YCyshnbs/lG/9j9L7W/ZUrAuF338JPwI0nwq6Ho=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O+Hhh1anJc+19GFocBbrXlmEQQSkj943VY8/0XHji23fuRQZsWqQAH+1TSazaKmiL
-	 qIo6GTr7gQXcIVZ17+Mt5jLGu8cpZaFYiedii3pg0W6olOnWbfza9XhlEVRwZ98yx0
-	 LcXVWwJgYRdsT/s5pj5faIm2xA8SiH42BTO7/qQTMkiUf3alp8Cdu8qqXXHghDJdG/
-	 ZqKeehF27SbWaYSWGlBEsyIr+orFdLth2J7uIk+9AfP92IrtdGMKAQRdG/dhvr8O8B
-	 TOGYY/rqEnbd4s7uEUlRNJC+4aYbShoioRKpA/J5CM4OvzM/TxjoPZsAOk1Hqu0iFq
-	 UYI5ugbEIjfxg==
+	b=fYUKktNtjBtnO2jEekVdFzAXCPxvMmq8cOZ/wimER2kJOuz26TYi2q5bk91NF6CFY
+	 V3uRQuToa4yd5/BlRrJuDUAvl/Ng8LmL71ojncQB2XFtcInSO8RsXWX1UcDolbNEKf
+	 Vr7CCsu4JLP8hJ8Kq7urO0JEocaF0r6VbZa+42Sdln5aiR3/s6R5CaAOkIYDTOBYFN
+	 jQ19XQq/9YUv1eHqK24bolOhTgYGxRPfjpfeAX42W17zK+3HMCGkzXRWdt2m3/51bF
+	 jzN98RjCjBcK57ESqOPlvU09ERPYNtXiyClFAHc+QnLlv5x2uSLTqHwOePbncyE2kZ
+	 tpwl4A5SNvXTg==
 From: Miguel Ojeda <ojeda@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -76,9 +76,9 @@ Cc: Boqun Feng <boqun@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	linux-doc@vger.kernel.org
-Subject: [PATCH 24/33] docs: rust: quick-start: update minimum Ubuntu version
-Date: Wed,  1 Apr 2026 13:45:31 +0200
-Message-ID: <20260401114540.30108-25-ojeda@kernel.org>
+Subject: [PATCH 25/33] docs: rust: quick-start: add Ubuntu 26.04 LTS and remove subsection title
+Date: Wed,  1 Apr 2026 13:45:32 +0200
+Message-ID: <20260401114540.30108-26-ojeda@kernel.org>
 In-Reply-To: <20260401114540.30108-1-ojeda@kernel.org>
 References: <20260401114540.30108-1-ojeda@kernel.org>
 Precedence: bulk
@@ -89,34 +89,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Ubuntu 25.04 is out of support [1], and Ubuntu 25.10 is the latest
-supported one.
+Ubuntu 26.04 LTS (Resolute Raccoon) is scheduled to be released in a few
+weeks [1], and it has a recent enough Rust toolchain, just like Ubuntu
+25.10 has [2][3].
 
-Moreover, Ubuntu 25.10 is the first that provides a recent enough Rust
-given the minimum bump -- they provide 1.85.1 [2].
+We could update the title and the paragraph, but to simplify and to
+make it more consistent with the other distributions' sections, let's
+instead just remove that title. It will also reduce the differences
+later on to keep it updated. Eventually, when we remove the remaining
+subsection for older LTSs, Ubuntu should be a small section like the
+other distributions.
 
-Thus update it.
+Thus remove the title and add the mention of Ubuntu 26.04 LTS.
 
-Link: https://ubuntu.com/about/release-cycle [1]
+Link: https://documentation.ubuntu.com/release-notes/26.04/schedule/#resolute-raccoon-schedule [1]
 Link: https://packages.ubuntu.com/search?keywords=rustc&searchon=names&exact=1&suite=all&section=all [2]
+Link: https://packages.ubuntu.com/search?keywords=bindgen&searchon=names&exact=1&suite=all&section=all [3]
 Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- Documentation/rust/quick-start.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Documentation/rust/quick-start.rst | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/Documentation/rust/quick-start.rst b/Documentation/rust/quick-start.rst
-index 54fe491deb7d..34c39f208333 100644
+index 34c39f208333..db08c3a03a4f 100644
 --- a/Documentation/rust/quick-start.rst
 +++ b/Documentation/rust/quick-start.rst
-@@ -90,7 +90,7 @@ they should generally work out of the box, e.g.::
+@@ -90,10 +90,7 @@ they should generally work out of the box, e.g.::
  Ubuntu
  ******
  
--25.04
-+25.10
- ~~~~~
+-25.10
+-~~~~~
+-
+-The latest Ubuntu releases provide recent Rust releases and thus they should
++Ubuntu 25.10 and 26.04 LTS provide recent Rust releases and thus they should
+ generally work out of the box, e.g.::
  
- The latest Ubuntu releases provide recent Rust releases and thus they should
+ 	apt install rustc rust-src bindgen rustfmt rust-clippy
 -- 
 2.53.0
 
