@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED22A40627B;
-	Wed,  1 Apr 2026 23:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE0547F2CE;
+	Wed,  1 Apr 2026 23:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775084446; cv=none; b=L0cdH8b6Rg/G08lCzI57loPoTb8ZKcmPxjgqGB7NNNY3hD351K/4M3oJuIxlvXJxRyI+yn7uJtTn0gDK0RzHD+bA48tEejUS53Psio5jtO9Pyod4gq5P7HyLm7urQ0pAWJe1Q+rYslgH3koRdDTYsGtoFL9RSvf5m2pg4kVoccw=
+	t=1775084451; cv=none; b=FHmYj/aCuJ0qqw6ivUBCospPsYVGXLQ0y5fg8YBLhaBhidtuzjrWsAgHYvDIA5a64ujYGxRcTj0Danb7ASPI5suQSjTivjmQfh36TJP1NaAgbqzu3AvNnzWHFyqsw2R7ULxLza8FOQMJz9d0ITThrnvGSXCr1gjW0VrBtycgtMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775084446; c=relaxed/simple;
-	bh=PBFIVlb3y/4+vIcT00tcSiDAg1EkUAKYUzmV5YKhJnM=;
+	s=arc-20240116; t=1775084451; c=relaxed/simple;
+	bh=L8JME5DgePBPrx4n+T2YtWB9P6u86oez5ABp2z3CNBA=;
 	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=ijaV5OndRy0JX0u749jmph9Op9QF9rcQee+S95L7zEnqHhq0Sd/D+ufcJU0v0snRD+iJTZrUoAIRp1bRh2hKxFyRMhrntKZiNy420sJmdT2r/VZ56/9E2On57xXJjSsUbY3+NB8sSWa1PbA1x3oXU1jqqLXN6pezNk503mQvNOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJatFFFk; arc=none smtp.client-ip=10.30.226.201
+	 References:Date:Message-Id; b=rDZg7SJx0o4TFxhU7u1bwvBHBcneEVH4GA7XOPn9MjN+l69bLRVTbpcLDABMLR/SUWmRYXLJAmFcSXD/bQs1nuifaWPdbrrgXlLKefG+415hlzkYQuahiE5vznc9K6Jp9t+fsdajMHCAxkBbQkz09zP5uy49DHcgD77/R8oBSpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XQSUAheh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJatFFFk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D37C2BCB2;
-	Wed,  1 Apr 2026 23:00:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XQSUAheh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F8BC2BCB3;
+	Wed,  1 Apr 2026 23:00:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775084445;
-	bh=PBFIVlb3y/4+vIcT00tcSiDAg1EkUAKYUzmV5YKhJnM=;
+	s=k20201202; t=1775084450;
+	bh=L8JME5DgePBPrx4n+T2YtWB9P6u86oez5ABp2z3CNBA=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=ZJatFFFkz2ZScBb/S4TpqCqmlU5CEjZqBFSOV2A6WNBXX8frktEMOQxLuaJ2zui7K
-	 TxLAQ++0MI0i/ejdo+T8y3DBO4V58gFNwTbymjm5fDwu6axUpsx0S626SSYNAzrXui
-	 e1eIupdeP7FHJUCMfFMrQDaczv1/dJhrNI7saTL0pBZvrmcWTrW0nafC7OliJNtKOF
-	 AuSpTcBjZLGhiHOQICoxolcyoBXDzybeR0miWUG0/UGrBi/GbuRVRt8SPH6kA2Tus8
-	 oRRSlmlRfvrM80vHQZInm2Y0P7R7TlqrqSzkmPpxE9E4S4Z+eVpQiiDUtv9UUCP830
-	 eMM7ek2JPRPYw==
+	b=XQSUAhehK0geqbt+sp4fwR2MHzqQqgmyyza2UnqK99FLKtZPX8PbhFgagoLwnWdAi
+	 A9uW7qhg1C+WKQNNQJ4vNBoC8JXS68HsTSryHtezbW548hEJOquK/PM01kl/j89c/f
+	 ih8g3oNWTWFO1MaLODitg52leiBGTbkxz6aYWXplYU8puqoYtpqPyG7/ywmv6jdkg4
+	 AyB4hcxDwgZeGNJgnI9m68RvOZW/AzDoZ8pLjYB1WsSkifuvQnIeNfN/pFZtBdF4K6
+	 0PalwENmSLkuvFHYnm6l5DnOL2jZ9sMtoZUArx9XSiQcwfnoLzFHlQYB3YabNlWmEO
+	 jrlC7XHARUJRw==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,8 +34,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 17/33] rust: kbuild: update `bindgen --rust-target`
- version and replace comment
+Subject: Re: [PATCH 18/33] rust: kbuild: remove "dummy parameter"
+ workaround for `bindgen` < 0.71.1
 From: Tamir Duberstein <tamird@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>
 Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -67,33 +67,26 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-In-Reply-To: <20260401114540.30108-18-ojeda@kernel.org>
+In-Reply-To: <20260401114540.30108-19-ojeda@kernel.org>
 References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-18-ojeda@kernel.org>
+ <20260401114540.30108-19-ojeda@kernel.org>
 Date: Wed, 01 Apr 2026 18:59:04 -0400
-Message-Id: <177508434455.73816.15756486388132647025.b4-review@b4>
+Message-Id: <177508434456.73816.17651402081142880831.b4-review@b4>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=637; i=tamird@kernel.org;
- h=from:subject:message-id; bh=PBFIVlb3y/4+vIcT00tcSiDAg1EkUAKYUzmV5YKhJnM=;
- b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnFzs3fD173aT8/5+Ovnr2PRYiG1bqrWPgMY6xttK4q
- /CrtKSxYyILgxgXg6WYIkui6KG96am398hmvjsOM4eVCWSItEgDAxCwMPDlJuaVGukY6ZlqG+oZ
- GukY6BgzcHEKwFQ/LWD4w7kwWW/VxU2zXts438gISVTrqop+9/KT1f6iG8v5bDV9exkZurQMMt7
- 6i16cW2b/YP3LZT9l/vRpFWZm6OW9Dvo5UTiIFQA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=315; i=tamird@kernel.org;
+ h=from:subject:message-id; bh=L8JME5DgePBPrx4n+T2YtWB9P6u86oez5ABp2z3CNBA=;
+ b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnF7tsuPi/M7kgl+fS9lvTjjNurz7ibmbL2VVoZaIdt
+ un9n7tMHRNZGMS4GCzFFFkSRQ/tTU+9vUc2891xmDmsTCBDpEUaGICAhYEvNzGv1EjHSM9U21DP
+ 0EjHQMeYgYtTAKb6VCgjw4v/PZN5Nk0NjzqeHyr4dklm/dxVmTFP/8cu6j8cxxydxMHI8DJEqva
+ J+w4L6+f+33+wndDmXuhZ3uDQ1f5l0UW7+TdO8QIA
 X-Developer-Key: i=tamird@kernel.org; a=openpgp;
  fpr=5A6714204D41EC844C50273C19D6FF6092365380
 
-On Wed, 01 Apr 2026 13:45:24 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
-> As the comment in the `Makefile` explains, previously, we needed to
-> limit ourselves to the list of Rust versions known by `bindgen` for its
-> `--rust-target` option.
+On Wed, 01 Apr 2026 13:45:25 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
+> Until the version bump of `bindgen`, we needed to pass a dummy parameter
+> to avoid failing the `--version` call.
 > 
-> In other words, we needed to consult the versions known by the minimum
-> version of `bindgen` that we supported.
-> 
-> Now that we bumped the minimum version of `bindgen`, that limitation
-> does not apply anymore.
-
-Some citations pointing to the upstream changes would be good.
+> Thus remove it.
 
 Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 
