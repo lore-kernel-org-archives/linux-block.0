@@ -1,39 +1,39 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9FD37266D
-	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 07:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC81F36606C
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 07:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775027310; cv=none; b=Msmo315o7m/vKA7/lZzx8QUoY0K99K5519lPEdP2c0WfK51JNxCo6QqNUkHZDtTaW+CG5QUUeCxhqWzxehfAV0CF25IWPuJmCn2YiBzpuNmyoBUrKOPnfbs/bE98324By2nwHf1MAAcb2h73E0vDuSOQGEbzSEEsew+nTtiSku4=
+	t=1775027311; cv=none; b=CTVp9dTZBCcinYkdvFUjX+1aZkAP+s7SUyiZPInJ4nMUCJAo2WLA87i64xUrJMCrwHYd477W7nWV3bM2CPkmnw8N+SMyLEBnA7M1ZfBWEgfItUqbw8xfT93xGGkGrUN6cxPUkQAZUHfY1flJoRwzWI/wqea6ad27uNEvRnzuIbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775027310; c=relaxed/simple;
-	bh=6od36+OMQnUO4/0BygQNuBsxUKQyYXsSJeC0Bx0haP0=;
+	s=arc-20240116; t=1775027311; c=relaxed/simple;
+	bh=aIR1i1AhI8IM3hXxRsNKk3nQwxdaSOXWhn6SjAjkYEI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=darxT1TkZ5QjNubZ5+w/1e9t3z4nVjrVrllNrZNNs8P88GALVrQnViSeJYOw0fsGshnkldgXDQD7khmrg+77fo7PaM/G9ANsUPd9uLMorXyiKhQ3kp2/8Zzd118Cx/mBb0YIFrilWj/2lqfHccoZNECdYIPNM5wth2sFvtxIrEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ixSurqp7; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=bbGQ+tez3gBXkfi6n3k1uT0uOeBN+qVSSYIU+SrgxT2tf3J/lhRkpZ+MqiN4Be49cnAqTjFITm2p5c0uZ5hxP324uFBwDnfPOfHaANjM2ZJifUQMf1eFQx+bS5k7rof7dXL4K0E2IY6hKjPDOdOD44iEOspq2bfUBNTjRBsUw9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uxKq/L/z; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ixSurqp7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uxKq/L/z"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775027306;
+	t=1775027308;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MSPvAoKEDfYOw3yY3dYFftQ3BdwnQ+Au8YNJldJOy30=;
-	b=ixSurqp7eOGk5TlvIdcNbotH+DnB5GHlc6lKATsf/Foz39USAVhWqq1kbW2UnJ17xkznHs
-	IQ464kGlBdRAv35LKKhfWctohCNPqRzmEO+i2jfCSVX0D9VBI+Q836W+pi8RDhzMnnCGFR
-	nS9bsxiSxwxKF+OOdRRHZWuHjvA8PZ0=
+	bh=ZqGCUphJZZQdjRwVT5rPciyI7UC6eXwjE2s2m4B+2ms=;
+	b=uxKq/L/zf5tZKcddwYF30E8relBCbT0lccwzkbI5JxQwNf63EX9Wpex0jnDAB/0KGXrur/
+	XTfDO5pfaSuc9c1ZTEXIXUq8MrvrZgSR/UEaKK3nrJ4OesLs3GbZyOPpbKVDzx/drlY33h
+	eREqDJR9wsQt7R9afqFnxp8lFrzwIEQ=
 From: Jackie Liu <liu.yun@linux.dev>
 To: axboe@kernel.dk,
 	yukuai@fnnas.com
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 09/10] block: replace simple_strtoul() with kstrtoint() in part_timeout_store()
-Date: Wed,  1 Apr 2026 15:07:15 +0800
-Message-ID: <20260401070716.991-10-liu.yun@linux.dev>
+Subject: [PATCH 10/10] block: replace sscanf() with kstrtoint() in part_fail_store()
+Date: Wed,  1 Apr 2026 15:07:16 +0800
+Message-ID: <20260401070716.991-11-liu.yun@linux.dev>
 In-Reply-To: <20260401070716.991-1-liu.yun@linux.dev>
 References: <20260401070716.991-1-liu.yun@linux.dev>
 Precedence: bulk
@@ -47,45 +47,43 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Jackie Liu <liuyun01@kylinos.cn>
 
-simple_strtoul() is deprecated. Switch to kstrtoint() which also
-removes the need for the const-discarding cast and the if (count)
-wrapper.
+sscanf() is overly lenient for parsing a single integer from sysfs.
+Use kstrtoint() which also properly rejects malformed input and
+makes the count > 0 guard unnecessary.
 
 Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
 ---
- block/blk-timeout.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ block/genhd.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-timeout.c b/block/blk-timeout.c
-index eab6422fad4b..ea3c5451d6cf 100644
---- a/block/blk-timeout.c
-+++ b/block/blk-timeout.c
-@@ -49,18 +49,16 @@ ssize_t part_timeout_store(struct device *dev, struct device_attribute *attr,
- 			   const char *buf, size_t count)
+diff --git a/block/genhd.c b/block/genhd.c
+index 7d6854fd28e9..369bd8c13bbf 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1186,14 +1186,16 @@ ssize_t part_fail_store(struct device *dev,
+ 			struct device_attribute *attr,
+ 			const char *buf, size_t count)
  {
- 	struct gendisk *disk = dev_to_disk(dev);
-+	struct request_queue *q = disk->queue;
- 	int val;
- 
--	if (count) {
--		struct request_queue *q = disk->queue;
--		char *p = (char *) buf;
+-	int i;
++	int val;
++
 +	if (kstrtoint(buf, 10, &val))
 +		return -EINVAL;
- 
--		val = simple_strtoul(p, &p, 10);
--		if (val)
--			blk_queue_flag_set(QUEUE_FLAG_FAIL_IO, q);
--		else
--			blk_queue_flag_clear(QUEUE_FLAG_FAIL_IO, q);
--	}
++
 +	if (val)
-+		blk_queue_flag_set(QUEUE_FLAG_FAIL_IO, q);
++		bdev_set_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
 +	else
-+		blk_queue_flag_clear(QUEUE_FLAG_FAIL_IO, q);
++		bdev_clear_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
  
+-	if (count > 0 && sscanf(buf, "%d", &i) > 0) {
+-		if (i)
+-			bdev_set_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
+-		else
+-			bdev_clear_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
+-	}
  	return count;
  }
+ 
 -- 
 2.51.1
 
