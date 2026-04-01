@@ -1,39 +1,39 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592B8316192
-	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 07:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2076E367F21
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 07:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775027299; cv=none; b=HAWzYN+IuZARm7d9jgX7LI1fXrb/T7mgDxBwwSdcLOAfN5nDF0bsjOMF1Z7MZQdya22Qc14hdteUfLQlk6hBoQ0uXs1nsAts3B3GKzX00ImCbw0riASCcjgB3KHwDx5xqSmZbtURdFekU36Zgy4fnI38KtkAVmghBtU97/xS+nE=
+	t=1775027302; cv=none; b=cRLnaNSAOhJG3ACnzjEqLpOrFjZeGNMhB16/w+M++KrYZ1b6pXiQ5BV8Y3OKDGKh+uIiCOVLK/tFTv/P50CHoHb9SXBK2w+5UyIyjIithC17Ii9wSh6LXWtW2URV2ApZ6eDbpubnFLA9PI+/mTlKxmc3ffkpAA5NUICOf3U9y78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775027299; c=relaxed/simple;
-	bh=FmsgOzA4Ov+ILlrhkIUoX+wjLojdSovaUyLX4i8WvRQ=;
+	s=arc-20240116; t=1775027302; c=relaxed/simple;
+	bh=iQ9QVQG2CydO7XwuH1f8mGeLUQrVMU1F6To01zBZHx8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=idzUqp7p0nhJlURBVCTINyJ/EB4fheQSvXzVbXrFvskQY7t4B35vhvo4WDa3s2rrJEB3Frr2da59B1bsCZa3bIrPkmZQKOCbPtMXLiyAnbpYO68uIYuzYKi/pb3v9vXW4ZvyquQ0OGvqKrwSx+wm599Z3F8A2vefnQsHNwXKCYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GeQjp5MR; arc=none smtp.client-ip=95.215.58.189
+	 MIME-Version; b=UHeJS4QDF4YJWf8lW9WmIUhMo8E5vbNRqCBdCiw6q0wY6weXSPYCIFPvhFUiYdczoa3L25sIJUBboZVyE7V0fUrJIGcbh686h6n72h9GMZTCRYxf2pOwFbggFTd5SH+yk8OINFFmKc/JDotwqr0zsRZ59IxGBhBgFicKV4MXvB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P9yan/Wp; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GeQjp5MR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P9yan/Wp"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775027296;
+	t=1775027299;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S/IfrVmUQwn9qMTANWSGsDCsmzVXbV+YoQ0w+FCjA5A=;
-	b=GeQjp5MRrhxfr74pWPgtq9c1yUvcp7lSagN0f5jgbayGfpdfjFMcJV53XY0QiTxdk/z203
-	Yp3LmNGBdhuo+Up97bF7juzGzVqBC1OEwurXTmwqk+AleSID+ulUP61ZznKdHMAisGgpMy
-	HdYz/Z73wTQGdw8XLsHlUp2ou/Hv0jM=
+	bh=MeD88qOGFlY5dzKpFrWges5S0+Es8cq5SSHjo23Rw78=;
+	b=P9yan/WpgdiOafeOuvMbGoW+QPBLiSD4K1qC6klGQl+uYjCKtjwRcMiXyusJIdozgOtUAQ
+	fRPkBr35PJpVnCSU9eohuXRgyTpCRDuWl0KM2QB2lJdb/sQlbt5ZS7luj8euKzv+52h1qz
+	KZjqp4eA+i9Km5Kt8wKo1arlrb4V0Xs=
 From: Jackie Liu <liu.yun@linux.dev>
 To: axboe@kernel.dk,
 	yukuai@fnnas.com
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 02/10] block: convert blk-mq hw sysfs show to sysfs_emit/sysfs_emit_at
-Date: Wed,  1 Apr 2026 15:07:08 +0800
-Message-ID: <20260401070716.991-3-liu.yun@linux.dev>
+Subject: [PATCH 03/10] block: convert disk events sysfs show to sysfs_emit/sysfs_emit_at
+Date: Wed,  1 Apr 2026 15:07:09 +0800
+Message-ID: <20260401070716.991-4-liu.yun@linux.dev>
 In-Reply-To: <20260401070716.991-1-liu.yun@linux.dev>
 References: <20260401070716.991-1-liu.yun@linux.dev>
 Precedence: bulk
@@ -47,66 +47,45 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Jackie Liu <liuyun01@kylinos.cn>
 
-Use sysfs_emit() for nr_tags and nr_reserved_tags, and convert
-cpus_show to use sysfs_emit_at() which also drops the manual
-PAGE_SIZE tracking.
+Use sysfs_emit()/sysfs_emit_at() instead of sprintf() for the disk
+events sysfs attributes.
 
 Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
 ---
- block/blk-mq-sysfs.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ block/disk-events.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 58ec293373c6..ed9546de7466 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -69,36 +69,37 @@ static ssize_t blk_mq_hw_sysfs_show(struct kobject *kobj,
- static ssize_t blk_mq_hw_sysfs_nr_tags_show(struct blk_mq_hw_ctx *hctx,
- 					    char *page)
- {
--	return sprintf(page, "%u\n", hctx->tags->nr_tags);
-+	return sysfs_emit(page, "%u\n", hctx->tags->nr_tags);
+diff --git a/block/disk-events.c b/block/disk-events.c
+index 9f9f9f8a2d6b..b1680d6a1027 100644
+--- a/block/disk-events.c
++++ b/block/disk-events.c
+@@ -329,12 +329,12 @@ static ssize_t __disk_events_show(unsigned int events, char *buf)
+ 
+ 	for (i = 0; i < ARRAY_SIZE(disk_events_strs); i++)
+ 		if (events & (1 << i)) {
+-			pos += sprintf(buf + pos, "%s%s",
+-				       delim, disk_events_strs[i]);
++			pos += sysfs_emit_at(buf, pos, "%s%s",
++					     delim, disk_events_strs[i]);
+ 			delim = " ";
+ 		}
+ 	if (pos)
+-		pos += sprintf(buf + pos, "\n");
++		pos += sysfs_emit_at(buf, pos, "\n");
+ 	return pos;
  }
  
- static ssize_t blk_mq_hw_sysfs_nr_reserved_tags_show(struct blk_mq_hw_ctx *hctx,
- 						     char *page)
- {
--	return sprintf(page, "%u\n", hctx->tags->nr_reserved_tags);
-+	return sysfs_emit(page, "%u\n", hctx->tags->nr_reserved_tags);
+@@ -361,8 +361,8 @@ static ssize_t disk_events_poll_msecs_show(struct device *dev,
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 
+ 	if (!disk->ev)
+-		return sprintf(buf, "-1\n");
+-	return sprintf(buf, "%ld\n", disk->ev->poll_msecs);
++		return sysfs_emit(buf, "-1\n");
++	return sysfs_emit(buf, "%ld\n", disk->ev->poll_msecs);
  }
  
- static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
- {
--	const size_t size = PAGE_SIZE - 1;
- 	unsigned int i, first = 1;
--	int ret = 0, pos = 0;
-+	int ret, pos = 0;
- 
- 	for_each_cpu(i, hctx->cpumask) {
- 		if (first)
--			ret = snprintf(pos + page, size - pos, "%u", i);
-+			ret = sysfs_emit_at(page, pos, "%u", i);
- 		else
--			ret = snprintf(pos + page, size - pos, ", %u", i);
-+			ret = sysfs_emit_at(page, pos, ", %u", i);
- 
--		if (ret >= size - pos)
-+		if (ret <= 0)
- 			break;
- 
- 		first = 0;
- 		pos += ret;
- 	}
- 
--	ret = snprintf(pos + page, size + 1 - pos, "\n");
--	return pos + ret;
-+	ret = sysfs_emit_at(page, pos, "\n");
-+	if (ret > 0)
-+		pos += ret;
-+	return pos;
- }
- 
- static struct blk_mq_hw_ctx_sysfs_entry blk_mq_hw_sysfs_nr_tags = {
+ static ssize_t disk_events_poll_msecs_store(struct device *dev,
 -- 
 2.51.1
 
