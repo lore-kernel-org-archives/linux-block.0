@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C70A3F0770;
-	Wed,  1 Apr 2026 23:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C079F47DF93;
+	Wed,  1 Apr 2026 23:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775084497; cv=none; b=AW9uUstgd6Lp9INm/8Vjj42DAxbn9SBGR1kgQo7Yq0/6E0Vr4IlcPJc13nRyzZ5x+btQ+KRukt0IHHemaU4OWUfR6Fb1m+yMLuP0t9NYaempcXQPAZQoqRb6WsKbVDbOmw/cIcwR9f6GaBRH+T0ly09140KS65i7wMChTTF5PSQ=
+	t=1775084502; cv=none; b=GLny9dMjTMTTqqpyh5OB1Op+yFbDbBWQKOqrI2rm2O/K4cdC/ghTUYSpHcjKCfgscWCf6pa9Z5EGvKDdZyfycWChdmkEKh4icj0HEVRsgRGIZpqfvkqNqJ8UVB9Nb0rVtJQ2rYGdbUYH97dTsZE+3VzC3TGUJF0P5/rih1e+79M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775084497; c=relaxed/simple;
-	bh=RA9AY2T7mVYiT1QmYiaR63Kmx/C/myQ45rJJ7MBbsDY=;
+	s=arc-20240116; t=1775084502; c=relaxed/simple;
+	bh=Gkp7xZZSJnjNLA6k6/JP5dygiZIRCC7PAi3ux8OxhkE=;
 	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=Y1SOLlovygkWIaE7gvbbJwKIIhkfqvwGFuF0XjgpWEVn51xtMbRb6rzZBsA2kCiDtwCmLplTM9p90/AHjQfiMxibNUhHyirNBqlP9gRwgglkj92mBpr033xjo2kZcUdP6bzsi6upNDB0e4EjFGIi8Dseht1PuFHlWCw5+2SCgYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b+P4xKOI; arc=none smtp.client-ip=10.30.226.201
+	 References:Date:Message-Id; b=f+afUk77St+pm7/gDyWkcGZfjpGSMSoj02H76k194VWmpjGtFLQfPZMrjUrwYhGjjcBcp1/1dO7kFi5AD8M+JCvxMsW69/KRabs0FNx7zupnKXYbeDib/blWsc7k9klXx9L4SjRSvw2YD2kNexkglxlOpG1UI1lm8MWSldGLlzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jfQkTaxf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b+P4xKOI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58F05C4CEF7;
-	Wed,  1 Apr 2026 23:01:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jfQkTaxf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EE51C2BC9E;
+	Wed,  1 Apr 2026 23:01:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775084497;
-	bh=RA9AY2T7mVYiT1QmYiaR63Kmx/C/myQ45rJJ7MBbsDY=;
+	s=k20201202; t=1775084502;
+	bh=Gkp7xZZSJnjNLA6k6/JP5dygiZIRCC7PAi3ux8OxhkE=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=b+P4xKOIyko3WWJnIYJ8bI4W3dAIUeSADYc1CtoxAYohAjbtUpCM+F8kOdFfxZKKO
-	 sKtCiL0N0/I/hhMG9tSPK8eLcdclKVmFAmqphjjRs64lczzUsYFXLSrVx0o1ANBjbA
-	 PbMgmXdW64lIPpiSS5apdOGrwLFbf/sdj3jK8v79AsQQCqhZ2+UDs0xMKHbB0T+jVZ
-	 pLDv1Ey/utUtJq7DWrEa9I+r+fSckCS2v9ym/rg/yPSw1uFXr+JGyOalgAFUoFqwVa
-	 S22IWI21qZsPP3SimeuLhGqA1ycVVG1dgW1QmvLjJyIAme4x0KlKjOt7MTnABWpVyd
-	 ShLMS1qUDPGYA==
+	b=jfQkTaxfpKSFrtjDj4wnczInb5geAhQ2NuZC4j8sza8AlCVkY9hHmgdzVVY0yxijN
+	 7EW6reI1bW+030I9qVO1zAZWx+TBGJpZq2WXPsyX988sOHkUOfvE5JFqjeS8LLGJDJ
+	 sMBtfvAC1aWjcgdjQO4wCkz4llResctlvtQSOUTi/MQ4UERmNSZUez0osJLGfMr5EI
+	 g24ohqM/3TlB/6le+jylXy3Co/4SrRTbHn7b+3FMiRVhLd0rshwI3jTt8Lnp+iaIbO
+	 9TnizhTMXYNZRHkHYFSXlyA//fjj8hUx35vtyH7WnPpvnb2KJI9CQVhdR8cuHVfGAZ
+	 Dx6iv3k7KPbJQ==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,8 +34,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 27/33] docs: rust: quick-start: remove Nix "unstable
- channel" note
+Subject: Re: [PATCH 28/33] docs: rust: quick-start: remove GDB/Binutils
+ mention
 From: Tamir Duberstein <tamird@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>
 Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -67,26 +67,34 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-In-Reply-To: <20260401114540.30108-28-ojeda@kernel.org>
+In-Reply-To: <20260401114540.30108-29-ojeda@kernel.org>
 References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-28-ojeda@kernel.org>
+ <20260401114540.30108-29-ojeda@kernel.org>
 Date: Wed, 01 Apr 2026 18:59:04 -0400
-Message-Id: <177508434469.73816.1901858850945168226.b4-review@b4>
+Message-Id: <177508434470.73816.10527840819544688551.b4-review@b4>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=352; i=tamird@kernel.org;
- h=from:subject:message-id; bh=RA9AY2T7mVYiT1QmYiaR63Kmx/C/myQ45rJJ7MBbsDY=;
- b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnF7vyr5hm9V0/abVJ2uNHjxWjGhKvpydNmi2seGWam
- OiVJj31joksDGJcDJZiiiyJoof2pqfe3iOb+e44zBxWJpAh0iINDEDAwsCXm5hXaqRjpGeqbahn
- aKRjoGPMwMUpAFMdHsXwP2Dt4lu9uvlf/ENv7+GrKJzyWPj4JL1Td13lw681ME/a6svIMGHtDbW
- Hc6vi0/gEvt/n71IVU5sz7WhmpbvD//JX+9XesAIA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=721; i=tamird@kernel.org;
+ h=from:subject:message-id; bh=Gkp7xZZSJnjNLA6k6/JP5dygiZIRCC7PAi3ux8OxhkE=;
+ b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnF7vWLzx8ca7ltK/c1jLRjOeETCKjKi1llmeceLZaM
+ Eeobu+HjoksDGJcDJZiiiyJoof2pqfe3iOb+e44zBxWJpAh0iINDEDAwsCXm5hXaqRjpGeqbahn
+ aKRjoGPMwMUpAFOt8ZDhn3G/2qInK/N5PgTvrNczbGrWTNn6eB5rvFXwgfbkN2m7pjD84fjhu3e
+ 73acXMn2zzllc+jYhUfrXFuEdU8Ny5T+nLj53iwkA
 X-Developer-Key: i=tamird@kernel.org; a=openpgp;
  fpr=5A6714204D41EC844C50273C19D6FF6092365380
 
-On Wed, 01 Apr 2026 13:45:34 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
-> Nix does not need the "unstable channel" note, since its packages are
-> recent enough even in the stable channel [1][2].
+On Wed, 01 Apr 2026 13:45:35 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
+> The versions provided nowadays by even a distribution like Debian Stable
+> (and Debian Old Stable) are newer than those mentioned [1].
 > 
-> Thus remove it to simplify the documentation.
+> Thus remove the workaround.
+> 
+> Note that the minimum binutils version in the kernel is still 2.30, so
+> one could argue part of the note is still relevant, but it is unlikely
+> a kernel developer using such an old binutils is enabling Rust on a
+> modern kernel, especially when using distribution toolchains, e.g. the
+> Rust minimum version is not satisfied by Debian Old Stable.
+> 
+> [...]
 
 Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 
