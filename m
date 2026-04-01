@@ -1,149 +1,202 @@
-Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
+Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021095.outbound.protection.outlook.com [52.101.95.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B373F789D;
-	Wed,  1 Apr 2026 12:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775047853; cv=none; b=JRyxgez7TNwtXEzDMTsrBlA1qHEMWaidnGEWbM8ak+M62t+6vLn/5xhyzb3uKGthFBv6jGTW7vVs5l6P31sKeC3bbHKLUXaJJxFHLo9fXLLomit9ZcCkqfc3Ue+MLPtOaalM2D4FP3VkbE7traeGlpGGdfjoAhI8pGloot4Xfj4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775047853; c=relaxed/simple;
-	bh=BsLij+Inir+eVqCujpIoZfmvsH+pSeSH1zmE+upHFa8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hjOsBQOgfvBrXmNKSyj8XdBJTmVrhbFFlz4kbMKtqi1e/AJWS7eYfBlAdOZHEqio6wFwAzKQXOTYlAD0GEdLe/sD6NMnxul6ZkEaorJGLMbG00eSahl4RO/QF++EPzDh5/Tp5H/i8wRAEnR0kOg0/axbstAKEuUAZDwRDkinXEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=dqJQ7ruY; dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=KdnBEHm+; arc=none smtp.client-ip=210.171.160.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA2A40B6E7;
+	Wed,  1 Apr 2026 13:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.95
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775049125; cv=fail; b=UdExSfvBlzPkn228z3++mtFo8RZ6qxsNziX9e0mJ3Rgn9swYKUpj5T69im4hOEX6XhLJRwwDUqgcc7eZ778WgGT9xPJUWci+ljna1h8xP/KzEWTfWJzNPE6533gAG9g2XShIgB+ng2ew/0Phu3LoG4fEWaxY4ZDz3C/XHoZ9qTQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775049125; c=relaxed/simple;
+	bh=kQe3PThORM37uMO9FRKFNBDm03jkegre773EGxTeZp8=;
+	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
+	 In-Reply-To:MIME-Version; b=Et3X8oBFdeh8eo7OCCoaUG0BNYp+INmB76uAYLBiYlBExuWTELqv5bIqNBIRJJAgfuNhXLaXP1apEW7rVKWb1mzkGAG6QRZNyz8iFPZq9TOs6nSitKrV9PJmXuukEKiXlnJecZhctcLAoivn+bdIz937tdK1J9/WW6LUpVg5UDw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=iXuBq52T; arc=fail smtp.client-ip=52.101.95.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="dqJQ7ruY";
-	dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="KdnBEHm+"
-Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
-	by mail.parknet.co.jp (Postfix) with ESMTPSA id 24E7B26F7689;
-	Wed,  1 Apr 2026 21:50:43 +0900 (JST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114; t=1775047843;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RPBKhpUGjbLqOjWvgyGXvIWOd2G5DG6+OKURw8r5aLw=;
-	b=dqJQ7ruYdeTaqITPpRQwovMgoXJZ//3rBhfHEUSXZntxLfEOaeiYcGiQUlShaVrh+6Y/C1
-	cXCtW+2x8iNBS+HhYDZf5uwKex/VghtmyYQIpNi3pnmPBCS/dHVsShuFLVen+q71uOPSHp
-	BbuzlxZwTnPUo0xyp67UBqN++fojFVt+xCWgW3n4TYAx+ZFpJlmGZKSo4YAaWC5ln8nz/9
-	dqoaw+wJ6rRfwxZbc1XkdN61C8TX5HXOH2vrM2FEutEOJuT9fNG+bM3dw2w8k5N42NXZ6p
-	4dYp6/2f9q7dBNZOuR0Q/14mHKwaQiLCreBNi7hj8e1ukp4S4UU9Tu7tJ77pTA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114-ed25519; t=1775047843;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RPBKhpUGjbLqOjWvgyGXvIWOd2G5DG6+OKURw8r5aLw=;
-	b=KdnBEHm+ZL35BY6ZddX41t3UtdD8vFGWCtWTzqWFFxQfI/Z1PMRw16SdSTOVgUcbO7Yi/b
-	nuCfjQXN3PMGuiAA==
-Received: from devron.myhome.or.jp (devron.myhome.or.jp [192.168.0.3])
-	by ibmpc.myhome.or.jp (Postfix) with ESMTPS id A77B4E004BB;
-	Wed, 01 Apr 2026 21:50:42 +0900 (JST)
-Received: by devron.myhome.or.jp (Postfix, from userid 1000)
-	id 93D6622001D9; Wed, 01 Apr 2026 21:50:42 +0900 (JST)
-From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-fsdevel@vger.kernel.org,  linux-block@vger.kernel.org,  Christian
- Brauner <brauner@kernel.org>,  Al Viro <viro@zeniv.linux.org.uk>,
-  linux-ext4@vger.kernel.org,  Ted Tso <tytso@mit.edu>,  "Tigran A.
- Aivazian" <aivazian.tigran@gmail.com>,  David Sterba <dsterba@suse.com>,
-  Muchun Song <muchun.song@linux.dev>,  Oscar Salvador <osalvador@suse.de>,
-  David Hildenbrand <david@kernel.org>,  linux-mm@kvack.org,
-  linux-aio@kvack.org,  Benjamin LaHaise <bcrl@kvack.org>
-Subject: Re: [PATCH 15/42] fat: Sync and invalidate metadata buffers from
- fat_evict_inode()
-In-Reply-To: <dvo2jvc6upmzrgqxx3n6er3e2gvujheongtzkihzmllwxqiyuq@h3qrrnwxlwo4>
-References: <20260326082428.31660-1-jack@suse.cz>
-	<20260326095354.16340-57-jack@suse.cz>
-	<87ldfazqo2.fsf@mail.parknet.co.jp>
-	<3oh5cbnm6dwz6rikc6laably5nvu4c4wtxjqzuu3wymzhpqrtw@skopu327hd7a>
-	<87jyutwo6o.fsf@mail.parknet.co.jp>
-	<mjraa5thsnzchejoomqgiahwajx4cs5ryqnmn7zsi3fylzhrrr@5ip65jcrlknn>
-	<87wlyss2ny.fsf@mail.parknet.co.jp>
-	<gkwyh4z45xglmq7jmam4yfvkecivipr23trzjkbyfolm6pdzre@d5huocjf55ew>
-	<87tstvc90b.fsf@mail.parknet.co.jp>
-	<dvo2jvc6upmzrgqxx3n6er3e2gvujheongtzkihzmllwxqiyuq@h3qrrnwxlwo4>
-Date: Wed, 01 Apr 2026 21:50:42 +0900
-Message-ID: <87pl4ideu5.fsf@mail.parknet.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="iXuBq52T"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JzrT5PFISsJeeudpdwl+yluCFEjSvF4fzNUxM5fXWB072zeY6tYv36qk3VHMGyfw59x89K5380PFkVPXJXL/Zt1lWOR5owQjonm07VTSS+72vqfT2oT511UaOCnbC4GibJ1OV3yq8hZ2DzvVAuC3xTOWmd2pmkRk3Ta1m1u81uV1QVPx0MPly+HUCbQZX/ckC+8ouPkv3tNX3u2mGK6if84itbj1AWNXs9shgOoP7oy613rTkVHf4qrD9OKZiu+FdZrjX+voqmxCZmsPC90tEqy7yvANCNhX3HrLDWG1sj6F7NJywbCcRdQam0jnXNSJPcrP9pywRQTWl9UWYRNWsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VRe6BWFx3OJaQCJOjVLECkujwRpjZedzEYsv0GD0Xac=;
+ b=U2ei/Pvpcpaw0jXcQwYR6iP7KhwUbN/sQ0nG+tNflndq5JMlApWknnqWe8ULe1QHb6jCwVBoI7ssXBfLk+4xf49qdslDEOGuEPqLa3NH/vHZ6pIf+SEI98SymBdQANE/ou/5jpOPcNMHUxwKFwDsdihg7HB3fMt8NCG8KvH+HV696rtgzoaYlTt+SaIsh/T7eBbauiBM5uMsT8IAymzLFj4r/tnJxBNs/0G+/l3vM0KwBlPhUn90F0LebnBrjZPatwLlWP6vbM3jmwR+j4eHtqtYsM5lltabvMi1xhRkZUqagRNdhctlQVWG9vPRSQeSq5MqNZdgCgTx9+epvPyjXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VRe6BWFx3OJaQCJOjVLECkujwRpjZedzEYsv0GD0Xac=;
+ b=iXuBq52TOEpwPII18iZiVgEDJ0vD7Slqg+yCpdIw/rBtxM/HZNXX2Rc8bv8IlrhMF1bX6oeDaN3GonOE0veiz8AjjCf3DuUlkSEWxTMr2YcQxnBaEbOXYtypyKsu7nvW5cGdSdCEdfgoeu671DXtDj2KiNKz6+MfKrpR1hHTnUM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by LO2P265MB3390.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:198::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Wed, 1 Apr
+ 2026 13:11:58 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.20.9769.014; Wed, 1 Apr 2026
+ 13:11:58 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 01 Apr 2026 14:11:57 +0100
+Message-Id: <DHHUEB0VHJUN.3GRAJAJXWUTTS@garyguo.net>
+Cc: "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <lossin@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
+ <rust-for-linux@vger.kernel.org>, <linux-kbuild@vger.kernel.org>, "Lorenzo
+ Stoakes" <lorenzo.stoakes@oracle.com>, "Vlastimil Babka"
+ <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ "Uladzislau Rezki" <urezki@gmail.com>, <linux-block@vger.kernel.org>,
+ "moderated for non-subscribers" <linux-arm-kernel@lists.infradead.org>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, <linux-riscv@lists.infradead.org>,
+ <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>, "Rae
+ Moar" <raemoar63@gmail.com>, <linux-kselftest@vger.kernel.org>,
+ <kunit-dev@googlegroups.com>, "Nick Desaulniers"
+ <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
+ "Justin Stitt" <justinstitt@google.com>, <llvm@lists.linux.dev>,
+ <linux-kernel@vger.kernel.org>, "Shuah Khan" <skhan@linuxfoundation.org>,
+ <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH 01/33] rust: bump Rust minimum supported version to
+ 1.85.0 (Debian Trixie)
+From: "Gary Guo" <gary@garyguo.net>
+To: "Miguel Ojeda" <ojeda@kernel.org>, "Nathan Chancellor"
+ <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Danilo Krummrich"
+ <dakr@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Catalin
+ Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>, "Paul
+ Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
+ Ou" <aou@eecs.berkeley.edu>, "Alexandre Courbot" <acourbot@nvidia.com>,
+ "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
+ "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
+ <david@davidgow.net>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, "Todd Kjos"
+ <tkjos@android.com>, "Christian Brauner" <christian@brauner.io>, "Carlos
+ Llamas" <cmllamas@google.com>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Jonathan Corbet" <corbet@lwn.net>
+X-Mailer: aerc 0.21.0
+References: <20260401114540.30108-1-ojeda@kernel.org>
+ <20260401114540.30108-2-ojeda@kernel.org>
+In-Reply-To: <20260401114540.30108-2-ojeda@kernel.org>
+X-ClientProxiedBy: LO4P123CA0004.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:150::9) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO2P265MB3390:EE_
+X-MS-Office365-Filtering-Correlation-Id: ddc8c23e-a9a1-47c0-7caf-08de8ff04112
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|10070799003|366016|1800799024|921020|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	skft0gZtrgyaB/OMfTcR5syYq0VeLL33ToBSXOG8VDCY+xkFzUhR/8kBih6c9mOsalaaA0B4U92DeOn1/ZPeL77KQ+xfm5aos+b5B/Fm2HPWPnS53f3U5rNw96UshWEE7qYHKydKWqvxB32Em3lySMAM+HwJIgyezeHdgPeDupA43Icui101qjtHmjuos8fgCT/1o/QD6nOxPo9rH6uwmX/3GX2zMLuZ9br4xrtXqIEJvsOCOE5+OpZPwY/namg9QPNOvafIVE76xylsZfYsYPfElFr5dxQLqOXKBtQMRmLMq9i+kj8rA21tz9MnBmaeRi2Wyh/NrjXEaHhFMlN/2hgR81RrSQ/gP7yfegmbF/+iqWxc3k0PEvr/SnYEVxtygda3HUkIF/4NMwNIiKIr3QsAoyV+8dc5IPhGbhmtdvEeXR9QsSvQ2GBBD/pOXSzGCO3kJ0ohz9gFT5nIoRTYV0tMygv7OJJNKP5EnAXpQAMoZ6/2pGjYfty0Ze2gQKw16GyypbCiZfe1rP74JUO0wl1ndDgseHeh+9Bttf5C/NBJ3U8zKbJyXd5Z68mJIQNrIDhXZCNAHB160M2dM+dYzQeGVx5L4Rf2PbV9/SPO2pU1YFhkCZowLJCm5esCGUraFCY0JBQxwouWNhaESDoQTKa7qAKBf5b6AOKAiEqwv0UFpwm+yosEMDW+VN0LTwqHaUfCZf4LUg19vPcvh7U9utC/hFO98R0JFtV/BWHhRbc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(10070799003)(366016)(1800799024)(921020)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NDEyejRGZmNRMExJQnlOUzBodVJ6enlzNm15Uy8xYWl4RlVqellyM2tQako3?=
+ =?utf-8?B?L0c0N3JXZTg5Ky95dTFiR2FzQTF0MjRPNWppaDFEcG8rcGZ5NkFFR21BY1Z4?=
+ =?utf-8?B?Q1N1c0pCZ2RmdXJrend2QklhYkUwc2VSZGVqWXNtQmJhVkFkVGJxaXNzWmF1?=
+ =?utf-8?B?K1kxWE11YUJVTnpKWE9rbysyMEs4cG1hNmJ0eU96TmoxQ3lENVppWkYxamU5?=
+ =?utf-8?B?WW95YlNQZHM3N1JzZGo5UzFRck4ydHpZbWJaMDhjekNVZ016QXNXMFlTVnNw?=
+ =?utf-8?B?MWhWTEVQUElmV3BrNlNySFVsZFl6VXg4NVk1d1N5NnR3U3huL1ZkU0lDOFpv?=
+ =?utf-8?B?cGh2MFdMNm1aQzYxU3BhZEJMZ09jTUZuVGxaL3I3YnJ1ZXNJZjE0Yk9PbmVM?=
+ =?utf-8?B?MTlXU2dvV0V5M2U4V2UvNjhxL3lnWkRrd3djNjYyT3NVaFlVdWdBOWkzVmlP?=
+ =?utf-8?B?T0lBRTJ3SExML1VUbXhjKzdIYmRNSVY0Vk1pdnp0UmI4Y3ZHWkdKeUNuQkpF?=
+ =?utf-8?B?aVJaVUx0YmRQbVZ0QUpFNTVvRWRvNVAxNjlHQkU4SnhoU2JjNFUwT3A0QmY0?=
+ =?utf-8?B?WjF6NFVKd0RnMzN0dWxxc1lYMG9HeVVQRWJYejJTS1BSRUdVSnNsZ0ZRUXZp?=
+ =?utf-8?B?SjZ1U2N3WmFEN0RMemlLT2h3TWNVWTdnaTk5NXdZRnV0dm1XVUdCSVBFL1dj?=
+ =?utf-8?B?UkRFOVYvQWNsOTlDZ2xHNDdQQnE3Yk9LS3UyMmhqVnRMbWhkVE5aTGpVNmM1?=
+ =?utf-8?B?UTlYa3o1WkRid1RCZDg2OWwvMjg3ejRmZytleVFTSjdadEFnb2FUUHhuTDNw?=
+ =?utf-8?B?d0JwanhNcnc0SFh5THlDZnY2RXF1d2FONUVxNDdYODRIbmF3TTB5YkJxTEpq?=
+ =?utf-8?B?TUVlZWVMNE5uMEErT00vVE5QWkNaVjBRVGV3cXJJaGZYQ282YlhRcmRrRnJ3?=
+ =?utf-8?B?VXhkaW9pR3ZMOGo2dTh1UVFtQ2VYbWtBZWpHbEwwekw2eTRmZGpaYUlIRU1q?=
+ =?utf-8?B?ZFpVVjFmZ1BFZVk1U0syRm1leTVRZElXVmw1NFVYNVZDZXRobThGTUtNaUJC?=
+ =?utf-8?B?eHNXakdXMzMwako3eFJRQnl6UVB4YW1RVmswZncyZXV4cVI0N1g1NTRFUStw?=
+ =?utf-8?B?N0JHMGFIdnhtSmZOT0JReXNPa2RHbkQzUmh3TGthSTUvVi8yd3BmSm8xTG9B?=
+ =?utf-8?B?QkxOek8yL2xIbTVBV0JsQjJSSEZaclhXN2lvWHRRSS9CQXZ4RHdhVHRob0la?=
+ =?utf-8?B?c1c1WVNDSXJhSUJzdHh5NSs4eXJaYXY5TTk0MWk1am9BRFVCK0dZT2JQcHpY?=
+ =?utf-8?B?ZU0zL3Z1eHNMTFFEdElPOHF4am53NjhpTzdWWDJtL1ZoU3dybkpEZ3FpZ3ZR?=
+ =?utf-8?B?Ukg3RUFWRXUwRUxYUHZIL1hzZWVEQUJUcU5vYlkvaFQzTzR4Tk9tdW14dDZB?=
+ =?utf-8?B?TGtrRTBQYUpiV0hrMUZ5SWl2YlI4bWdnWFJuSnZpNVlVWTl0U2tUbE5KOHlN?=
+ =?utf-8?B?dm8vNEtjMFNwSk8vUXU0c3BSNE16VFAzbUN1ZDNQZUlieTJReW1LdENzTnUy?=
+ =?utf-8?B?Q1VEWDkzZysvN05LZmNEbDF4RWpGT3ZsMVI4Q2hXZFJVVVU0bVlDSEpVREE3?=
+ =?utf-8?B?YzNJL0h3MUx0TlA1VGEvcnlmaVRuTGN1TDAydnUxUjhRUzFxVjhVOHNRRUxY?=
+ =?utf-8?B?cEpiNHhPb2FFR0hUMVpTQ1RnYVErSk01UE02aWFyTjlVTmdZQjhod0o3S3U3?=
+ =?utf-8?B?eDVkbnYrOFVTUDdGQmh0SXNwS3A3VWpBR2JlRTh2U1VYb3MrZ3puVE5YRStX?=
+ =?utf-8?B?SWg1ZllJbVlVM1F3ZGgydHI3a1FUOW93M3VOYVZLMDZING9aVXJJS0xZRndx?=
+ =?utf-8?B?K1BpamZRUTRac1JvODhUVjRmWlRLSnF5TGdvbFJnck9pSDBMdFM1alFVQU9G?=
+ =?utf-8?B?cjdMR2htTy9NZHk4L2hFZmlqQ1p1aTdTL2R1cFB2RERBNHQzT2Q5dFlsSmg2?=
+ =?utf-8?B?eWRZcG5tc1U1enNlR1R5d2VzT2psT1BMbFZwMThaaFRSa1NmYUZzSGcxa3lZ?=
+ =?utf-8?B?dk1STkhsZ2VnK2RnNm5WYmkxaGhiV2lLbmdoNURrWHZkUW40dUpPRGYzUVJl?=
+ =?utf-8?B?eW1sZ3dGRnM5MERhdk52UzUzNWtkT2lzemdzMmxBdDBqeHgrcmhQcVhZS082?=
+ =?utf-8?B?QVBtUld3bFN6ZXRER3N2VVRUL0hwMy9PZXU4d0tON1RyZ1NzTHlzRUoycUlR?=
+ =?utf-8?B?SE1WYkZLU0ROSEx1NWdkNGpYSjVUeVNkN1JDTE5scEVlSWxQd1hYUHJLampK?=
+ =?utf-8?B?eFJlL01mTE5EdDcwQ1JUT21wL2sxNEJzTHJkQ1FsMW1GNmxHK3JoQT09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddc8c23e-a9a1-47c0-7caf-08de8ff04112
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 13:11:58.0852
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hdnlOuEOAmqqhTGmpIJkJrsH/P98TN9Q0x/arNTWezDET/2VkZaThY7iZg+XxLzJhuVnKp4Fc+oh+8OwjDeuog==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P265MB3390
 
-Jan Kara <jack@suse.cz> writes:
+On Wed Apr 1, 2026 at 12:45 PM BST, Miguel Ojeda wrote:
+> As proposed in the past in e.g. LPC 2025 and the Maintainers Summit [1],
+> we are going to follow Debian Stable's Rust versions as our minimum
+> supported version.
+>=20
+> Debian Trixie was released with a Rust 1.85.0 toolchain [2], which it
+> still uses to this day [3] (i.e. no update to Rust 1.85.1).
+>=20
+> Debian Trixie's release happened on 2025-08-09 [4], which means that a
+> fair amount of time has passed since its release for kernel developers
+> to upgrade.
+>=20
+> Thus bump the minimum to the new version.
+>=20
+> Then, in later commits, clean up most of the workarounds and other bits
+> that this upgrade of the minimum allows us.
+>=20
+> pin-init was left as-is since the patches come from upstream. And the
+> vendored crates are unmodified, since we do not want to change those.
+>=20
+> Note that the minimum LLVM major version for Rust 1.85.0 is LLVM 18 (the
+> Rust upstream binaries use LLVM 19.1.7), thus e.g. `RUSTC_LLVM_VERSION`
+> tests can also be updated, but there are no suitable ones to simplify.
+>=20
+> Ubuntu 25.10 also has a recent enough Rust toolchain [5], and they also
+> provide versioned packages with a Rust 1.85.1 toolchain even back to
+> Ubuntu 22.04 LTS [6].
+>=20
+> Link: https://lwn.net/Articles/1050174/ [1]
+> Link: https://www.debian.org/releases/trixie/release-notes/whats-new.en.h=
+tml#desktops-and-well-known-packages [2]
+> Link: https://packages.debian.org/trixie/rustc [3]
+> Link: https://www.debian.org/releases/trixie/ [4]
+> Link: https://packages.ubuntu.com/search?suite=3Dall&searchon=3Dnames&key=
+words=3Drustc [5]
+> Link: https://launchpad.net/ubuntu/+source/rustc-1.85 [6]
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 
->> Hm, metadata block is shared by several inodes. So earlier flush
->> makes fewer chance to combining multiple dirties.
->> 
->> For example,
->>   create dir-A
->>   reclaimed and flushed dir-A
->>   add new entries to dir-A
->>   lost chance to combining re-dirty of dir-A
->
-> Yes, but for this to be possible you would have to:
-> 1) stop using dir-A between dir create & file creates
-> 2) create enough memory pressure to cycle the dentry of dir-A through the
-> LRU and reclaim it
-> 3) continue memory pressure to cycle the inode for dir-A through the LRU
-> and reclaim it
->
-> So the amount of work that already has to happen to trigger flushing of
-> a single block is so large that IMHO that flush will be lost in the noise.
->  
->> >> Anyway, with it, reclaimed
->> >> inode metadata will be flushed forcibly and frequently (yeah, may not be
->> >> significant though. but I can't see the benefit for users from this
->> >> change.), and lost to chance combining multiple time of dirty while copy
->> >> many files.
->> >
->> > The benefit for users is 24 bytes saved for the majority of inodes that are
->> > there in the system - all the virtual inodes on sysfs / proc filesystem,
->> > all tmpfs inodes, all XFS inodes, all ext4 inodes when using journal (once I
->> > optimize ext4 code a bit), etc. So actually quite a bit of kernel memory
->> > saved in common configurations.
->> >
->> > Another win is that with metadata buffer head tracking now separated, I can
->> > modify that code (which will require growing the tracking structure) to
->> > properly track buffer head containing the inode and flush it on fsync(2).
->> > Currently there's a race that if flush worker writes out inode before
->> > fsync(2), then fsync(2) does not writeout the buffer containing the inode
->> > at all and thus data is not really persistent. This is actually my initial
->> > motivation for this refactoring since growing inode for everybody to fix
->> > data consistency issues of FAT/ext2/udf isn't popular these days...
->> 
->> Agree, it is good.  I'm only saying about the flushing earlier. To
->> implement it, is the flush earlier really necessary?
->
-> Yes, to separate metadata buffer head tracking into a separate structure we
-> must remove the handling of buffer head list from generic inode reclaim (as
-> the filesystem has no way to provide the separate tracking structure there).
-> Of course we could add a filesystem hook to inode reclaim to allow for
-> handling of metadata bhs but:
->
-> a) I'd rather do that in a way that is usable also for other issues
-> filesystems have with inode reclaim as I mentioned in this thread before
->
-> b) I don't think it's warranted for FAT etc. at this point as I don't think
-> the possible overhead of metadata bh flushing on inode reclaim will be a
-> problem in practice.
->
-> But of course we can reevaluate if my gut feeling is wrong and someone
-> comes with a workload which significantly regresses due to these changes.
+Acked-by: Gary Guo <gary@garyguo.net>
 
-OK.  I'm still thinking we should go the way to reduce the amplification
-for performance and storage lifetime if possible, not increasing.
+> ---
+>  Documentation/process/changes.rst | 2 +-
+>  scripts/min-tool-version.sh       | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-However discussion looks like enough for us, and looks like we just
-voted to different priority.
-
-Thanks.
--- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
