@@ -1,209 +1,159 @@
-Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020137.outbound.protection.outlook.com [52.101.195.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844F936EA9F;
-	Wed,  1 Apr 2026 15:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1676A3A7F54
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 15:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775056514; cv=fail; b=WuaGfB8VElxkAHJtcMGdlxfIkXwxOYK8zWR3FCf7Lx8xd1lvW5h0qWevv3Y8HOSfeCRamBRONKaPRWlGbDigs/iC7BwJygjDx292JqS2JZosUrlTOcUFuE0Q1ykNsBYgRCfSl/WGFXKUmAu6wx532x6eO2xPFpazp963UiRapMA=
+	t=1775056544; cv=pass; b=qCUQJfmc7kg+I61xtGT7uKokXM7AUcNrtSIdwJ4CStB1mMVj6YXl3wrUzS2fVOvTwOCx0V4iSeay+veIjU3cL/OiHiwM/BUYqMF2y3WWTkRN0TYBfOAcMEGiVCaZUXvLZNBxvOwsZOa6dzyAai4xnTwYWIEfqT2cMqcK2CJBCTo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775056514; c=relaxed/simple;
-	bh=dFwJ/yLjEK76Xp9mf8qnM5tm+uuBXgGAF+2qsw60CxM=;
-	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=V3zuclGa0EcGwF6rFcCq9df6R/0Ad/IpiOkKvWx0Cs7pZS3yHj1aVtz/JGCTDwvPVuibNDGpTfvZRfn8lPrPxGafDBlFR+EGZ/oBcaII41GNUrYOvFQb2j/Pz8iE8+Y07tHkXmV17/D1XCe0DI/d5m9vzmYPRUZenKLZK/BU0K8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=jYXDi7P7; arc=fail smtp.client-ip=52.101.195.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	s=arc-20240116; t=1775056544; c=relaxed/simple;
+	bh=0yG2dc6853NehxlMBj7gvQwc469xs0sgQBHv5fQqk0g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kZHR6ZKC33XPANglFgp8RJb+BH1t5puI+S0x7KLLIcA+GG8188cUfJauOnWTAIEL1U7q1j0UpJGiCA6/W/ikDcYB3facs0faklazBMD8Vbd+0D6sjVk35gPmNS+jvw8pBtuaal6WKQI2LIO8TVBMe9yV/iOUxyDdwt/OpoFwiHQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fT4w1ecE; arc=pass smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="jYXDi7P7"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zL86eoyHSdG3dJwxvbvs+i0QOHpFmU0EgAsBjQ35GUrSAuDrdds1+L5WBJms7ImyPuZbFXp33a+We9pTSudwAkBv2Zx7vW/JgT7tzLZ5UzLurpCYgOYDtwZUQYhv17A4SRqdkRWZJptieiRnTyG2Tl1SfpWnlecEPGdkgBjYy/DDYdygGQKBkdxnZxXacGYn3yp6ZE9oLp0thGs1XGS8Rc9EavY8qdHrobtc35ABhUr/fzacqDo+ExXPiqXR/vLhpkoahnG7JNcWlG9RN8zIl6bZcD37R15SS7ReYR2u8xyYpFNDVBkWUEUhwaPsiWrTQS3/AhhblauyFHHDsabLbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JIveiotkeGlE192c9KG+dumBiPtlgN2ju7yaOPdld0M=;
- b=ZMGkUlXrQSz7GPEHTqFapKwyaZ5E+eUbm/QFOyuLvZqiwCtC3/f2FC5tg/iwgzt3M+WY+cHK2mQ0u3hUqyGAEVSwc+7FX75TTtXE04LO02Q2HF9x+OpKVLS2+04Hu9b8AB9+mHSyIiXtr1lzVpj9kUbmsZtT78cRxscrK2tihULTYRp1jRl4Bl0jhjxHB9aodc2m+cD8L2gUy4YpTXZfkB+lNclWV+X+l3O099siFNEcCmFA5fd/77rYRfExGGqgAjLXcDqrDA9p5INIV45xH01I1QCvp8n/5mkLn7Emkwlhd0G0tsmqqdeLXpSkjos5Oj/5y99n9BNlliPRH/WX9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JIveiotkeGlE192c9KG+dumBiPtlgN2ju7yaOPdld0M=;
- b=jYXDi7P7W0SYPlxUPzvKi4vktHuqnu1f9Nkr4YFU5PmuPHwMeHJHAPjL1qV4P+l0OVPkFXvWcHbi9ok93ntuiQaq8mXuB8Rt+3PnIcIvNXX2RKTbq1bLI724Ib+YFHcJqFdiBYVQxe1Tb2nhHYQ/3i1naEV8W38CL5cnzUTFxB0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by CWXP265MB5651.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:158::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Wed, 1 Apr
- 2026 15:15:07 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.20.9769.014; Wed, 1 Apr 2026
- 15:15:07 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 01 Apr 2026 16:15:06 +0100
-Message-Id: <DHHX0LG9K10F.3NNW0OGTARLLK@garyguo.net>
-Cc: "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
- <rust-for-linux@vger.kernel.org>, <linux-kbuild@vger.kernel.org>, "Lorenzo
- Stoakes" <lorenzo.stoakes@oracle.com>, "Vlastimil Babka"
- <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
- "Uladzislau Rezki" <urezki@gmail.com>, <linux-block@vger.kernel.org>,
- "moderated for non-subscribers" <linux-arm-kernel@lists.infradead.org>,
- "Alexandre Ghiti" <alex@ghiti.fr>, <linux-riscv@lists.infradead.org>,
- <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>, "Rae
- Moar" <raemoar63@gmail.com>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, "Nick Desaulniers"
- <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
- "Justin Stitt" <justinstitt@google.com>, <llvm@lists.linux.dev>,
- <linux-kernel@vger.kernel.org>, "Shuah Khan" <skhan@linuxfoundation.org>,
- <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH 28/33] docs: rust: quick-start: remove GDB/Binutils
- mention
-From: "Gary Guo" <gary@garyguo.net>
-To: "Miguel Ojeda" <ojeda@kernel.org>, "Nathan Chancellor"
- <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Danilo Krummrich"
- <dakr@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Catalin
- Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>, "Paul
- Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
- Ou" <aou@eecs.berkeley.edu>, "Alexandre Courbot" <acourbot@nvidia.com>,
- "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
- "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
- <david@davidgow.net>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, "Todd Kjos"
- <tkjos@android.com>, "Christian Brauner" <christian@brauner.io>, "Carlos
- Llamas" <cmllamas@google.com>, "Alice Ryhl" <aliceryhl@google.com>,
- "Jonathan Corbet" <corbet@lwn.net>
-X-Mailer: aerc 0.21.0
-References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-29-ojeda@kernel.org>
-In-Reply-To: <20260401114540.30108-29-ojeda@kernel.org>
-X-ClientProxiedBy: LO4P123CA0323.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:197::22) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fT4w1ecE"
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7d74872c5b1so480993a34.2
+        for <linux-block@vger.kernel.org>; Wed, 01 Apr 2026 08:15:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775056540; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TW4hp0s9syPD5K6IosP67AVWGFP2kpYVoTsaXWJTxZXQgGGACpE2fNuBabc25XLr25
+         bFCWMj0Nrq/oPop4V6nekz526Jk7hIVEbmo8fZqNckP4G2D4wxB5cwTT5BJsSXcWkMO+
+         vL0l9a/RT1GCCGl1gfBggE3MhNlVf06ClB4lqJkpt54hiGfR3eKlwSYBFTMQOm+J5ejg
+         NwB71lx+43WCgGjAomTHh9Q60EOqcad026GutTNXZtuBI1PA/eLPXRQ2yQldrcQHiMqY
+         9QPcsAN70gAtuv/3J0gHzVNKZKSnVn+Gl4lnFe5/j+Mdhc/XJUZKadm5KqQmqqZRc0sf
+         jzVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=pwjhrFgpgjvrVUUm2pugqLVQkP7/K/w7OUmyJWkCH5E=;
+        fh=q9982tpK7lTYBUA071ukmea5DGmF1IgUZn10VZ2rmgE=;
+        b=DSiQGreX0m2c9torf++9vc/vdkgtUVWitk+po5MtPiCbo5OGM31bbTveUtVRcZXxg/
+         tmZh75c36o9Jp2BHrLpvY+ZjydRaftZIq1Xcmynzy5NBhFNmREyvOzJmw3oLPoqG702J
+         8hqX3O6m+DxiHmmHwYuCDMl0D4ODz2umy8lTBnYDK+BvlRFHluKhHABQzeYBp3jth1An
+         Mui9eOi+GwFCSqpQ9sdpM9TgX4HjIfuw9YX8aCj2eIUwynXQZ/KejZyfmuxNjWWByDXE
+         AJxbKKECRsKfVLxZXXhOdnful4M2J6r0GEpj1S65c4YLE8JkNQf5MNadf5/ztTM84bxM
+         sy6g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1775056540; x=1775661340; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pwjhrFgpgjvrVUUm2pugqLVQkP7/K/w7OUmyJWkCH5E=;
+        b=fT4w1ecEuLKxi8zjCWZ2bN/4im7aDDOA4MipGWIHQYjCtMfFweUeGdBfGBe//sBdxA
+         44Z0UYDaaVYMnE6wYecs/oPlGyyx574POvktaVXDE25JW0XPzobhwUcI5nrEo38rsfVb
+         bO0oWC/masdI2C6pGee5RZx19QbNecu4VlmpucAI9yDiCLfoqsUy6klXm+QG7Id9Q4Mf
+         rYtbzKiy+H32F4SUwMpAVd0nfgXRBIBSA+7eLgXJSaxt7yKKl/qccXuSAKfrVkF1HEdZ
+         BMzT8hVOux7+t3WRWB9ubeGeD2WHnCTPUQSOJr9v/Fzv5oT0dNTygxt5nVhWU/tnWJ50
+         e5tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775056540; x=1775661340;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pwjhrFgpgjvrVUUm2pugqLVQkP7/K/w7OUmyJWkCH5E=;
+        b=Y2ONY0gSHtagDYV9924jbSCDlgsimRzeZMmymm2bevGgTFcAMFAxNoxxZ3MjS1kGO7
+         Ghqrmix97onb6gvUcWkr9eUxc4PGEiSuIBGYfmBGznuNtw8nE4jkTv2mYeWRbqfs+X+o
+         MvZKFOxNAGIA0AYLQsblt9BgHRktkkwwx4JshD5fTTl4Wq8KL4cA3jzNo12uoSeljZky
+         icyj1C831QUE7KJGhyqdGPhGE1287NAGtzxCOSV2OZ2JxwR88ywply99HhBzG1DdLzLQ
+         Ytdm7p0NWe6DCJf5WrpAl9K4P3g5cxagco73vgRLyZ0nvQguV4IanShpIYLmOr2fFhg+
+         eWbg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8AB3y8oyZDMctc/eJIDL8E9aaEjLPe5ZpxBx9D6qptLH9KxwwKTvkOc0RqI0psmjdI5LB0hWDI5s+gQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+RZTOvQdbHFC6fLMDzzTprgK1U9eG+pseOIOsUkB2L/hty30l
+	qqLHW86l/LIpArDbmuqWUIl6j12fxHwVyn7n+JJwktgjfsGNJgVTOlqgIYidLcsGUi4Hj2RXFZM
+	Kvle9xzw7uC81g4vNtR3cegn42b7+XDUa5t+OgL9tkDwLDtnW+hG9RBsQ0g==
+X-Gm-Gg: ATEYQzx/W/NBS30/pd87aunMCprG7El1wr4nwo93F49Ha6v13QpscX1lU9PvuGY4KIO
+	uw+gB407wMw1fi3mrASKTi4nDBluZy2G6BDItnasnKqL0g9s+rpnvmFiDuENHpKVJ0ji959ToBP
+	oqr0ceQX9qJy5bj8jvOkUpRPCeyO22AlJIR8De+wlBQko18Ttc+P59V7OLO7LHRG3rfA7x3qJ0A
+	/qE+ZLy0mvdaHlu7huOGobgaOJMnTScmtkSjsfcJgZ4RxYLiI9sSap65eoFaYOXO2cdzg+wdSCG
+	5wFKLEuS8i6bO3G4Ug==
+X-Received: by 2002:a05:6830:4410:b0:7d9:3895:563 with SMTP id
+ 46e09a7af769-7db993fbc70mr1704623a34.7.1775056539515; Wed, 01 Apr 2026
+ 08:15:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CWXP265MB5651:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3b00ac4-bdfc-4313-0636-08de90017539
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|10070799003|366016|376014|7416014|921020|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	OYr5ZvfguCLkWwH7cRnSLnKVQ02OwxukuobmX820gGDbWFv1hdkRoFF1TbqYHusSuMcsA3sAJdG8EhXwinS01u0UGaCSg9XsJxVCu1f57XJnfL7wHzIyZDIHmHJJtDTbUEEa4jOQDvM7aXWJ2MjGIGoYRojcZdTgthR9pYgDhfnS42549v79xDSdUM1Cfm1QHAD9vM7eQ7ZvpfiUYlRXM1oyOA/dDhrcMMfimrhkPT6yT+0CVwoRTyqroUIQJB2anBpaXO3vFQCwMZnEHQLdZqjbLnnQ4uYGPlRT/oldrotTw1aLyU0xJOd7skePyQ8WLGrygmzgK9ViueXYU6bsDkFmHex8ldpMW4iJCsnrNRyZfuZWX9FQBSbLygZ0nu9R4uYhKaC+7mJrloDqadmpyxsz0O0xfjiV4OkOc36Gg48R+14sgVysYTyX+ZCQP84BS43GGgYjI2tFAz7pguTNQxmFKZkA5x8RoHOLqrMmc1eNcOZhCmR1WTDsCsitkjeZgBmx/WPnAQ5iwVEQiygQPSKbU1Ca9RUDhjd1wIS5lGv0Uf+bRI7niedrbGGNSZ80C7Vr3oTyRlDpFgkRjwXVZ+5fzhDA+1xICEawJTtLjaEVix7UtDPlQ9o27ovf24NRbP40sv8Orlxl3/bC66Mo2hj3YItnqPNwnNFCY0jLyt73G3BfiOvHAanLWfc913u6wpy+xwB+g9F2GA6+fzBxc+VXCeSWUp5bVIqZ5tO8Gc7lezzMohreoB9HHisGE13jzKu+4AQgxAWrfqB7qhSbhg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(10070799003)(366016)(376014)(7416014)(921020)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NVN1WWhsZFl6ak5QRzU2RExaQnpqQ2ZVTkxrU3k3Uy85dnk2cy93c2tidTlk?=
- =?utf-8?B?NmE1cFovcU9MMGlwVk9vV0hEUURabWxSeWxHanFpWGZLMEZ1NlB3UmVUOG1q?=
- =?utf-8?B?ckZLNjZJT21UNWhzR3NRalE1YnNFeDNCUGNTdlFWNEw4YUNRTEJzd0NyYWdy?=
- =?utf-8?B?QU96bjkyYmZra3ErSG12M3JIMmFNbnlzYmJRVlBQSk9qd0pWWjVVVy9zci9w?=
- =?utf-8?B?djdsS0dwemNnbHNTTnFNWFV5VGl0YUdWYzFrZGtPNURyNWxGRjBzbnRvUExz?=
- =?utf-8?B?dVBMR0dYOXdXTm5Gbi9OMWNrSWtEdlpHaTRienUyWHNpT3kveTBrcEltRzl4?=
- =?utf-8?B?azRJTWR1aDlaSGdUQ245QTB2Z0hrRmVTMWR6N0lRTndRQTl6RmdncWlNQU5Q?=
- =?utf-8?B?dmRpbVJqTzVpdjVOZkYzWEUycEpUQzNhdGJzUjcyREw2T0JEVTNiMzdjam5s?=
- =?utf-8?B?YlF3U0dXNVpHTmttSDA0ZkJ0Q2VTbTF4b0MzU29zWlhUY0g2a0s3aWcxSjYz?=
- =?utf-8?B?b1Z6b2lHWUdYME5KVzZUWEt6cjZySE1pUjNxWTF3SFBDeEpLMG1UTXdQK2V3?=
- =?utf-8?B?NHdaNmR1bHAvSGhxcUpWZVJzY3E5NzR6ZE5YZXo3N0pTRktTZ3FZSFBQQlZD?=
- =?utf-8?B?OU80M2E2TVlCOEdmS1JrMmFidHRVQ290Qm94aHJCRm42em9UYmwzQnQ5SUMw?=
- =?utf-8?B?bGFvRG9rYjJxRFk1Zll5cEMyeTY4NjZjNDlwRHlUU056UHUwQlQ1OFZMbGlD?=
- =?utf-8?B?bmNIMWdGdGswaHFzeGxIejY2RmtobHRXUUg3K3RONDFEcDZFZ1BEdnpLc1F6?=
- =?utf-8?B?Zi92bTZ2cm5CRkdIZXF3MXdZMTZmQTVIVjUyUGhsTEh2d08waWtaUWRsQlBZ?=
- =?utf-8?B?SDBGaUYzSU9FUkFQdEgyNW1ma0NMd0ZLZUU2Q1F6UU1YNmU0ZGRFQWRqbDhz?=
- =?utf-8?B?RmlUMGJrVytaR1dGWEtoOHVNYjVNRnU3aEl1Z0RYQlk5OUFxYk1odWc0WE1n?=
- =?utf-8?B?Yzg1VG5NT1BYU0RZaTFUL0Ruakd4OVFlZS9aYW1aaFE5YVpOdmdlSnJoVUVF?=
- =?utf-8?B?V3RZZ0dUYlNpN3NCelRTL0ltNnN2M1pxT2hTOElUS2ptUkVJbVZ2aElXMWRX?=
- =?utf-8?B?SXZUUkVWVlZJbGtGdjQyWW5HanUxakxYWnNUZXc3dVBXTlM4ZFFDT1BnY1lG?=
- =?utf-8?B?SGNxTjRrUjVoZDVZT0psKy9DL1BZOGF1N05aN21nVTl4ZzV2eUZzNzdibXA3?=
- =?utf-8?B?eFZMTFMrVHhtaDNObXdMSUpuKzZKL0FvRVFjZTQ1dFN3MjhFM1JJQ3lLM0Nw?=
- =?utf-8?B?SGg3MWQ3Z3BqNDRmaDBYV0ZPeXlnOEZYZFZ2dmtrUjlBVlQ1OWM1dmRMZkkw?=
- =?utf-8?B?d3dzR0NiUXNHRHp4TUlhRU5rc1ZiUHB1aTR6TkhSZDVUUWtLTUpVbmlKY1JM?=
- =?utf-8?B?VGlKa2hzYjlVUzZxbmxxZ1p1SGNzRVBsZHNCWE54T05pMHZ4NXdUWnZEYXda?=
- =?utf-8?B?WmZCTXNPR0cxNER4a3NLN2lzSElxS2dMUkczdDBTL3hTajh2TWpob1YrTEdv?=
- =?utf-8?B?dmxEL3lwRkhOcnhPak9GdUkrTlRDTHRCeVBsVm1WaGhMWHBkbUIwdWNSU3B6?=
- =?utf-8?B?U0Z2NUh5NXFFMS9XRmEyOUJZZmpVOUllSTVFakdydWhSeTNheFdySjZnRnJQ?=
- =?utf-8?B?RjJPbE9OOHVmbGNWTE5tNHlSajgyWG11cFdZd2lpUmsxYlVNa3JOenlzSXEx?=
- =?utf-8?B?Ny9zKzFLdFZKZWxUVUhzc0dwSllQdlZhWjN4WFJpWVhVa3JGVDdJb1ZjS0Nj?=
- =?utf-8?B?MmY1VUZnejdiYURSUEs3enhPNkRZZmFWQ21pZkpITkpCY0k5K0hBMTJDUE0z?=
- =?utf-8?B?MW1OODNmVnAvb0pLVFBUT1IvS0IvRzQ5aG45aDNJQjB0RERPTDBZMU1xZ1J5?=
- =?utf-8?B?ak9yUWJoWTVNTE96cmNtUFk5Um9wN3lUQmtoK3gweWdNZTZkY0MvczlJNlVi?=
- =?utf-8?B?QVdaM0FTVkNCajRnUmY5TFRWYmZ5OEdwdGgvQXlXOTI4OUlaZGdEcXV5WHE4?=
- =?utf-8?B?OVZrUVpMblRjVklmbWRCbzMzMFNDTEh4ZVlxZlRpem9YWm00aU04S0Vsc0tn?=
- =?utf-8?B?RFJwQlNVMVU3c0d4RUVWYmpzd1NTcnBhZ2cvSGhxQUZuQnlTNVZDM3FzSEt3?=
- =?utf-8?B?cmN4ZWl2dkNNaHREQkMrb1B3c1M5ekNabjVUTUxEZDV1c3BQTG1YVlFuM3o5?=
- =?utf-8?B?RUp3WEFrZDJXaklrUkdpL3hjVkR2NXJRQzU4OVU0YTVVdUlUNk5VQmdMbUdN?=
- =?utf-8?B?L2N2S0RLR29yWFBNOUZKeWhQOElXcU00aWJpWmdVaU56bVRVSWh2dz09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3b00ac4-bdfc-4313-0636-08de90017539
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 15:15:06.9954
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3lHflWd9u7AoLIoFJ49pndNMlb5mo4KUN7L4Yv+bYf3FuKZ7e2r+1U5oqTt9AQtzsC76N53PD3YPfie7Ht+YmQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP265MB5651
+References: <20260401012401.3653194-1-ming.lei@redhat.com>
+In-Reply-To: <20260401012401.3653194-1-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 1 Apr 2026 08:15:28 -0700
+X-Gm-Features: AQROBzCSe_1942evdn0XA7IXmX5RNgMGaPIWvKsnGb0kRpeltmSB6t-Ec--cJi0
+Message-ID: <CADUfDZrecMcb_C3UiTh12e4YK62XbZgd14FGEpxPopTih9QM8Q@mail.gmail.com>
+Subject: Re: [PATCH V2] ublk: use unchecked copy helpers for bio page data
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed Apr 1, 2026 at 12:45 PM BST, Miguel Ojeda wrote:
-> The versions provided nowadays by even a distribution like Debian Stable
-> (and Debian Old Stable) are newer than those mentioned [1].
+On Tue, Mar 31, 2026 at 6:24=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
 >
-> Thus remove the workaround.
+> Bio pages may originate from slab caches that lack a usercopy region
+> (e.g. jbd2 frozen metadata buffers allocated via jbd2_alloc()).
+> When CONFIG_HARDENED_USERCOPY is enabled, copy_to_iter() calls
+> check_copy_size() which rejects these slab pages, triggering a
+> kernel BUG in usercopy_abort().
 >
-> Note that the minimum binutils version in the kernel is still 2.30, so
-> one could argue part of the note is still relevant, but it is unlikely
-> a kernel developer using such an old binutils is enabling Rust on a
-> modern kernel, especially when using distribution toolchains, e.g. the
-> Rust minimum version is not satisfied by Debian Old Stable.
+> This is a false positive: the data is ordinary block I/O content =E2=80=
+=94
+> the same data the loop/nbd driver writes to its backing file via
+> vfs_iter_write().  The bvec length is always trusted, so the size
+> check in check_copy_size() is not needed either.
+>
+> Switch to _copy_to_iter()/_copy_from_iter() which skip the
+> check_copy_size() wrapper while the underlying copy_to_user()
+> remains unchanged.
+>
+> Fixes: 2299ceec364e ("ublk: use copy_{to,from}_iter() for user copy")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-I suppose people could have been using an old LTS distro + rustup and run i=
-nto
-this issue. Albeit it's probably quite unlikely.
+Acked-by: Caleb Sander Mateos <csander@purestorage.com>
 
-Reviewed-by: Gary Guo <gary@garyguo.net>
-
->
-> So we are at the point where keeping the docs short and relevant for
-> essentially everyone is probably the better trade-off.
->
-> Link: https://packages.debian.org/search?suite=3Dall&searchon=3Dnames&key=
-words=3Dbinutils [1]
-> Link: https://lore.kernel.org/all/CANiq72mCpc9=3D2TN_zC4NeDMpFQtPXAFvyiP+=
-gRApg2vzspPWmw@mail.gmail.com/
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 > ---
->  Documentation/rust/quick-start.rst | 9 ---------
->  1 file changed, 9 deletions(-)
+> V2:
+>         - update commit log (Caleb Sander Mateos)
 >
-> diff --git a/Documentation/rust/quick-start.rst b/Documentation/rust/quic=
-k-start.rst
-> index 5bbe059a8fa3..a6ec3fa94d33 100644
-> --- a/Documentation/rust/quick-start.rst
-> +++ b/Documentation/rust/quick-start.rst
-> @@ -352,12 +352,3 @@ Hacking
->  To dive deeper, take a look at the source code of the samples
->  at ``samples/rust/``, the Rust support code under ``rust/`` and
->  the ``Rust hacking`` menu under ``Kernel hacking``.
-> -
-> -If GDB/Binutils is used and Rust symbols are not getting demangled, the =
-reason
-> -is the toolchain does not support Rust's new v0 mangling scheme yet.
-> -There are a few ways out:
-> -
-> -- Install a newer release (GDB >=3D 10.2, Binutils >=3D 2.36).
-> -
-> -- Some versions of GDB (e.g. vanilla GDB 10.1) are able to use
-> -  the pre-demangled names embedded in the debug info (``CONFIG_DEBUG_INF=
-O``).
-
+>  drivers/block/ublk_drv.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 2e475bdc54dd..3e329906ae19 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1322,10 +1322,18 @@ static bool ublk_copy_user_bvec(const struct bio_=
+vec *bv, unsigned *offset,
+>
+>         len =3D bv->bv_len - *offset;
+>         bv_buf =3D kmap_local_page(bv->bv_page) + bv->bv_offset + *offset=
+;
+> +       /*
+> +        * Bio pages may originate from slab caches without a usercopy re=
+gion
+> +        * (e.g. jbd2 frozen metadata buffers).  This is the same data th=
+at
+> +        * the loop driver writes to its backing file =E2=80=94 no exposu=
+re risk.
+> +        * The bvec length is always trusted, so the size check in
+> +        * check_copy_size() is not needed either.  Use the unchecked
+> +        * helpers to avoid false positives on slab pages.
+> +        */
+>         if (dir =3D=3D ITER_DEST)
+> -               copied =3D copy_to_iter(bv_buf, len, uiter);
+> +               copied =3D _copy_to_iter(bv_buf, len, uiter);
+>         else
+> -               copied =3D copy_from_iter(bv_buf, len, uiter);
+> +               copied =3D _copy_from_iter(bv_buf, len, uiter);
+>
+>         kunmap_local(bv_buf);
+>
+> --
+> 2.53.0
+>
