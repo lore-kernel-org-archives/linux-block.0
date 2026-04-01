@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CD247DFAC;
-	Wed,  1 Apr 2026 23:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B354847ECE9;
+	Wed,  1 Apr 2026 23:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775084430; cv=none; b=B8hxKxo+Ga0mqgcqyCp4DEvhnIJwjuuClBMY+mBXtoxJFvAWeGJyTVopsvtqhQH8CnsTcGofaYCrAZV7h+BDbpcCqjppZJHocZGzGkzL24b2v7Qw02k0e3CamlKawpW4OXEoxEpryxibuq23qbvIh+rl1uzhXpBTPWifVABc3+c=
+	t=1775084435; cv=none; b=EXuf7RGYbmMpDKEWbduO4MG/cYx7J0Mvr4BDfJ2AvR2k1iDyy/I2elbBTiYQafCaR3dHTjsst0NrUmmeozSZjfkGYM5NMk3RPaejAJZ+TfwK+EReGG1/RalmJQbDgAe3JP0hxHuHTaVz9BwFCO4kAP5fPCMYvTaR7Nw2q5U4Ef4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775084430; c=relaxed/simple;
-	bh=07RYmc68kwWSWXlQHk2byVEKgYJe5lGIx1f5DfAeNR8=;
+	s=arc-20240116; t=1775084435; c=relaxed/simple;
+	bh=5jL6Cgr9B/cQDMKe8W8Oi3jZLGmF290jWZfZNh8UAco=;
 	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=rK12hyze0MxH/6YTjVeltf0nV+FkVUrNb6XxA6TLlP7r9zl6/Cq5cK1LqqO2VNfrONLt2CVOzKfocZOqfsSBTh5tsOTXgMPd8PEo+Dr09Y6ceJ3q+IbWwmfVrUfPlN3ubIF7UwpLaMYxwnPlEWAUGc+DoKb75u0OF6nUJOZhTdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQYA3r0d; arc=none smtp.client-ip=10.30.226.201
+	 References:Date:Message-Id; b=eaS/AvZLn3bP7qnkycBefo4e6xbFRRQpftano7Ms6CYF2yWv+ez9lC6mnQub7pSwqczwo83Uw+2KxbVSsZEIjjVbF6LNSQkJ9SzMPITrXdCXRZofupUYVz24E12hYyfUPb0/3ijenRvsgrsOAtxpl8LKSeHoljNemT31P27AE60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AiWfjHCn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQYA3r0d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65AE7C116C6;
-	Wed,  1 Apr 2026 23:00:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AiWfjHCn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76429C4CEF7;
+	Wed,  1 Apr 2026 23:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775084430;
-	bh=07RYmc68kwWSWXlQHk2byVEKgYJe5lGIx1f5DfAeNR8=;
+	s=k20201202; t=1775084435;
+	bh=5jL6Cgr9B/cQDMKe8W8Oi3jZLGmF290jWZfZNh8UAco=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=oQYA3r0dixjm9P3ZtxnbQd5Qm7hyROO+WINura1cRHdUPhRA7R3yadcP3RfFPj8/C
-	 VxdVfpNuao1M98yeOweVob0wX7hSjpdZnAkdUUSMxxZHq7/Ho4aEEbvHXx2NzbMw+r
-	 ngeKEPtWKPoglM5x3QXxyZd2FilyiQMxvUqGET4JqdEgDwemFUKon6+OPpCVN3k1st
-	 YYX9c0Fz4JJUjLgctF+IxiuBaFUIVSWCpmCHfBib/EzS1ySslb1waFcGTPEvkZu72B
-	 Sc69/XHEhnunRgcEBsXdBvhB/7Bfax8vnWVBXIMvKmUoDyhqrFUDNM1BZwqGd5tGym
-	 78v5bJAkafldQ==
+	b=AiWfjHCn0LbePkx8weJeF9kybFxpL7pbvGk7oPwZXpKGkPrQ4kVSeWNHWcI0JO0jP
+	 VkEUq4sqCcJ68V1LuUiXPlb60tp2YQquyYgRRygRNazcZTvr0E7d/IjjbsvS/R3nwh
+	 lZpFhTh5oC/RhsggJmruJU8Cs+RtdKfproaVRGYUVaAhjli8JhnK3sSTfGJ/4ACjL9
+	 U3co6kXCh8yCE9mZvmUiNxiHmps35D2g7Q8vHjGHumvlKSHcjbux0H0SaiByW83HPp
+	 rxn+rMtn2ep3UDCC6ksCw0QOFXajSQOW4O/E06nlj3BOVRh5RWHRFQgMsOKIP9PReZ
+	 HYTSK6V2Nmx2w==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,8 +34,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 14/33] rust: bump `bindgen` minimum supported version
- to 0.71.1 (Debian Trixie)
+Subject: Re: [PATCH 15/33] rust: rust_is_available: remove warning for
+ 0.66.[01] buggy versions
 From: Tamir Duberstein <tamird@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>
 Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -67,32 +67,28 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-In-Reply-To: <20260401114540.30108-15-ojeda@kernel.org>
+In-Reply-To: <20260401114540.30108-16-ojeda@kernel.org>
 References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-15-ojeda@kernel.org>
+ <20260401114540.30108-16-ojeda@kernel.org>
 Date: Wed, 01 Apr 2026 18:59:04 -0400
-Message-Id: <177508434452.73816.1986421844891352038.b4-review@b4>
+Message-Id: <177508434452.73816.14314388454595627623.b4-review@b4>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=455; i=tamird@kernel.org;
- h=from:subject:message-id; bh=07RYmc68kwWSWXlQHk2byVEKgYJe5lGIx1f5DfAeNR8=;
- b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnFzuHGq5eNNeDNfy/YX5tXUT8+rxFB1c9WKVtk9V+6
- 59d8PcNHRNZGMS4GCzFFFkSRQ/tTU+9vUc2891xmDmsTCBDpEUaGICAhYEvNzGv1EjHSM9U21DP
- 0EjHQMeYgYtTAKZa8zDDP/WDMQ2dy+9seaB/Ozs88+d6jkCrt8I5tjybTXZznZ2vacHw38l5SlM
- qh5u4yn6brzm9hmd1kk5d3H3k2ad/9kWHPKKX8gMA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=376; i=tamird@kernel.org;
+ h=from:subject:message-id; bh=5jL6Cgr9B/cQDMKe8W8Oi3jZLGmF290jWZfZNh8UAco=;
+ b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnFzv/lShpUW158d9cz9w6+6hZQugUYTWHw7lRvP2Vz
+ /81PVPomMjCIMbFYCmmyJIoemhveurtPbKZ747DzGFlAhkiLdLAAAQsDHy5iXmlRjpGeqbahnqG
+ RjoGOsYMXJwCMNWvdzD84Vzx+Of69/ESu2PD3Dpf9B++ujJ5e3q1gVVUX00TQ1WHBiPDRvFJCTr
+ C5U9cxIJnu7z80Og5c7pg5fk+ll+yD7+c6nvDCgA=
 X-Developer-Key: i=tamird@kernel.org; a=openpgp;
  fpr=5A6714204D41EC844C50273C19D6FF6092365380
 
-On Wed, 01 Apr 2026 13:45:21 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
-> As proposed in the past in e.g. LPC 2025 and the Maintainers Summit [1],
-> we are going to follow Debian Stable's `bindgen` versions as our minimum
-> supported version.
+On Wed, 01 Apr 2026 13:45:22 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
+> It is not possible anymore to fall into the issue that this warning was
+> alerting about given the `bindgen` version bump.
 > 
-> Debian Trixie was released with `bindgen` 0.71.1, which it still uses
-> to this day [2].
-> 
-> [...]
+> Thus simplify by removing the machinery behind it, including tests.
 
-Acked-by: Tamir Duberstein <tamird@kernel.org>
+Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 
 -- 
 Tamir Duberstein <tamird@kernel.org>
