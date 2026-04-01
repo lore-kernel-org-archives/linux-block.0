@@ -1,41 +1,45 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC81F36606C
-	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 07:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860DD3914F5;
+	Wed,  1 Apr 2026 08:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775027311; cv=none; b=CTVp9dTZBCcinYkdvFUjX+1aZkAP+s7SUyiZPInJ4nMUCJAo2WLA87i64xUrJMCrwHYd477W7nWV3bM2CPkmnw8N+SMyLEBnA7M1ZfBWEgfItUqbw8xfT93xGGkGrUN6cxPUkQAZUHfY1flJoRwzWI/wqea6ad27uNEvRnzuIbc=
+	t=1775031817; cv=none; b=DPLSX2VbSPpE4IxykK8GWF+0BY4BCqffil1KawOcMJUOuo/tHdRE2qgT+K6i37xo1fkeuimY1bDMLG0rLlVRQhPEf/dmSxDI/EB3bv3Rrw3ASTKugbYA6g84o5M1XKlEjBhqpe1nTfWmUtDL6WbsJn0c2BsZgmriw7z5LaJyxag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775027311; c=relaxed/simple;
-	bh=aIR1i1AhI8IM3hXxRsNKk3nQwxdaSOXWhn6SjAjkYEI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bbGQ+tez3gBXkfi6n3k1uT0uOeBN+qVSSYIU+SrgxT2tf3J/lhRkpZ+MqiN4Be49cnAqTjFITm2p5c0uZ5hxP324uFBwDnfPOfHaANjM2ZJifUQMf1eFQx+bS5k7rof7dXL4K0E2IY6hKjPDOdOD44iEOspq2bfUBNTjRBsUw9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uxKq/L/z; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1775031817; c=relaxed/simple;
+	bh=L7vanUhTm1pbOGW3Dn6g32AVFzgZD2RY+7jhifNatzc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TPidrlMafJd+40+61HxEsiLEOr2M5RyHOqclf7q369zLhPENygAL2s2G2ncSbtAUBqBTnfSae5tXNSdUe3uxlWWxU02P/6XCHnIIZ0+LQEvmZ7+fAtPBrIXKRpJIgcET+62nCUspwIJ057Bo2c7EZX6oa6KjWpjeFTv2CubtCTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=KhLQD0u2; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uxKq/L/z"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775027308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZqGCUphJZZQdjRwVT5rPciyI7UC6eXwjE2s2m4B+2ms=;
-	b=uxKq/L/zf5tZKcddwYF30E8relBCbT0lccwzkbI5JxQwNf63EX9Wpex0jnDAB/0KGXrur/
-	XTfDO5pfaSuc9c1ZTEXIXUq8MrvrZgSR/UEaKK3nrJ4OesLs3GbZyOPpbKVDzx/drlY33h
-	eREqDJR9wsQt7R9afqFnxp8lFrzwIEQ=
-From: Jackie Liu <liu.yun@linux.dev>
-To: axboe@kernel.dk,
-	yukuai@fnnas.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 10/10] block: replace sscanf() with kstrtoint() in part_fail_store()
-Date: Wed,  1 Apr 2026 15:07:16 +0800
-Message-ID: <20260401070716.991-11-liu.yun@linux.dev>
-In-Reply-To: <20260401070716.991-1-liu.yun@linux.dev>
-References: <20260401070716.991-1-liu.yun@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="KhLQD0u2"
+Received: from CPC-namja-026ON.redmond.corp.microsoft.com (unknown [4.213.232.23])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 64EEF20B6F01;
+	Wed,  1 Apr 2026 01:23:33 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 64EEF20B6F01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1775031816;
+	bh=Upqu2rNJQjIJ6zpSjtTn7xB9Fu8YX/5O81h78w4m0UQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KhLQD0u2GvNc1POzzcMRGd0/7Blxl3C9ohaqguZ4/2gZKvqDNTK4Mh0gJvpmTJm4y
+	 99MbWjOtvjRgXC46zwG+9yzY4F+V++zcF+uEBaAxWAOzJHZu14yGCGn6xPf9QwqAWt
+	 nwtT24/UojOCAv+WVyxmav2mrd8hUEBMOWkGiyv4=
+From: Naman Jain <namjain@linux.microsoft.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Saurabh Sengar <ssengar@linux.microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	namjain@linux.microsoft.com
+Subject: [PATCH 0/2] block: fix pgmap handling for zone device pages in bio merge paths
+Date: Wed,  1 Apr 2026 08:23:27 +0000
+Message-ID: <20260401082329.1602328-1-namjain@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -43,47 +47,42 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-From: Jackie Liu <liuyun01@kylinos.cn>
+When zone device memory is registered in multiple chunks, each chunk
+gets its own dev_pagemap. A single bio can contain bvecs from different
+pgmaps -- iov_iter_extract_bvecs() breaks at pgmap boundaries but the
+outer loop in bio_iov_iter_get_pages() continues filling the same bio.
 
-sscanf() is overly lenient for parsing a single integer from sysfs.
-Use kstrtoint() which also properly rejects malformed input and
-makes the count > 0 guard unnecessary.
+There are two problems with the current code:
 
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
----
- block/genhd.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+1. biovec_phys_mergeable() has no pgmap check, so the request merge,
+   DMA mapping, and integrity merge paths can coalesce physically
+   contiguous bvec segments from different pgmaps. This makes it
+   impossible to recover the correct pgmap for the merged segment
+   via page_pgmap().
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 7d6854fd28e9..369bd8c13bbf 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1186,14 +1186,16 @@ ssize_t part_fail_store(struct device *dev,
- 			struct device_attribute *attr,
- 			const char *buf, size_t count)
- {
--	int i;
-+	int val;
-+
-+	if (kstrtoint(buf, 10, &val))
-+		return -EINVAL;
-+
-+	if (val)
-+		bdev_set_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
-+	else
-+		bdev_clear_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
- 
--	if (count > 0 && sscanf(buf, "%d", &i) > 0) {
--		if (i)
--			bdev_set_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
--		else
--			bdev_clear_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL);
--	}
- 	return count;
- }
- 
+2. bio_add_page() and bio_integrity_add_page() reject pages from a
+   different pgmap entirely (returning 0), rather than just skipping
+   the merge and adding them as new bvec entries. This forces callers
+   to start a new bio unnecessarily.
+
+Patch 1 fixes the merge-path gap by adding a pgmap check to
+biovec_phys_mergeable().
+
+Patch 2 fixes the bio_add_page() and bio_integrity_add_page() API
+behavior, moving the pgmap check into the merge conditional so
+different-pgmap pages can be added as separate bvec entries. This
+depends on patch 1 being in place.
+
+Naman Jain (2):
+  block: add pgmap check to biovec_phys_mergeable
+  block: allow different-pgmap pages as separate bvecs in bio_add_page
+
+ block/bio-integrity.c | 6 ++----
+ block/bio.c           | 6 ++----
+ block/blk.h           | 2 ++
+ 3 files changed, 6 insertions(+), 8 deletions(-)
+
 -- 
-2.51.1
+2.43.0
 
