@@ -1,134 +1,113 @@
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEA73090CC
-	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 17:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775065562; cv=pass; b=sSQjqesB4tjQldoJN//XRvicTR1YRXmb82WG/LPJa5FgAzvC79ZK25/ydrXCqqfGFvo1wr0lGu6jJMWLj3QNuxQdUgxZLAB/f7k0nffGvKafqcXjKS9eKh1V+j2X8VJiiCTKdXLkSZc7dlrau1k95brwBK85QE2HAhKQCxP/Hz8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775065562; c=relaxed/simple;
-	bh=QI4ZvYmbpYFMS5F4DxWr2Qtcv3EtByJoEsfGF8Isxow=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GfnnQ6Uol8OxGeUg+ifuHBqc2Gfp5RaFouwkmfOsCYj7av9jYwuiKvtQlz0QcoOZmBdoiZeB4fUgKmwDiwsGFzGXP0CYTkusVBhXxpr+tFxz6aeCwiXMS/pWJBzTddlUO3pznEFZlvUPQDaYiGzhGBz2Lk7eOw7wvw+CnFlOkq0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KuSB1yrt; arc=pass smtp.client-ip=74.125.82.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4910233F58A
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 19:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775070346; cv=none; b=kNqoDD+DecPtUYJ4ReJ2bgd8WQgqDF3KLim+AhnZ/0zmyRJMYYOEJrR4LsxbeFUfRks1B2SXgKNvReVL5MV3SiorupWATwl4gOpASvcl/YAajqf5enpA3OYDFv+ilfOVM+JMqT5luTNjt4h128EKZvzIlmNtRZHZURIDgwHiPMo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775070346; c=relaxed/simple;
+	bh=wW8PJiB2WunGtowCjXzATpDa3T2NiSBGzCktX2oKtNk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f0FIbsNhepAFW2urqAzUsmyAaTsf+lDq9C6vvmsNbU9xrARblfpzgpWt9KDNHWnFWjR+/rZw7i1kllgjNPKy5sqDShBRCwpYK0i4m3UHkKjLZ33C1aeAWYX/e5RI4oaAAW1rMMKiSgI4R5lVU6xaAVPzIyJFrtsqDA12tVvWPPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chhC9Ol5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuSB1yrt"
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2c645e399ffso2847eec.3
-        for <linux-block@vger.kernel.org>; Wed, 01 Apr 2026 10:46:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775065560; cv=none;
-        d=google.com; s=arc-20240605;
-        b=KCHgNoNsddOFP0P50k3yb6zsN24PGa9d3ygAS+aRWqbv+bDOQTXrOz7U0VhUwF8ZYy
-         jnBnzq2MMGOCh1SG4hExAmol3AjlY+GienvyIJ4/IFhWdjQJtd7U8PLRdCzZ75N1Gjr3
-         QtMigARPrI2ldrR8494VgozdUt4fLZRWgjFf30dajw/bLgTLETtP9B/0jaRI3au5dOvH
-         HXvYGoCpZDrD3/1/1ry9rAFa+slzeUKNaZvov+kzondHru0MOOeONNuhc2fi3AOjNOmz
-         Br8dmM0aRhkUx3yrQDKF+6iPaVSvjumfqlMyu6mF3ccoAwB1SVAGtwi/eFnNihNrdmNT
-         dhiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=QI4ZvYmbpYFMS5F4DxWr2Qtcv3EtByJoEsfGF8Isxow=;
-        fh=FbSCmcRuIbe8FfBfJXjVSzx52yyBR+S+D7zyXLbmLrk=;
-        b=kHW4SJ2/0Y/+53gdFbrgR8oFbbbG0nogBD+j6uONOpwS4wH4B8Xj39F2DwvdXzRfcK
-         pr5Xy2KLeAX+EfSjJzDR2LOe95FEgcoVvNihXIR/3hPIeyxlRSMN2LAL6LmZxzir5X8J
-         q26qoNK8xm8NBhk1XzdpQCpCnPVAyJ2ZC8TkbLQYHXC4BGooF1AVOVPQJLV88eU/vdu6
-         RxqVQmcjj1H5uDBkhIi1hnoJPqomrBS52QosmiP2I3xW/QbpaauU7MWl/7r3x8exNSgC
-         o/O8tA3VnIw2G/1b4GKeki195kdBy0t3N5El+S2j41Z2uid2mYsKfF576EnPlAEsFtLy
-         vpLg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775065560; x=1775670360; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QI4ZvYmbpYFMS5F4DxWr2Qtcv3EtByJoEsfGF8Isxow=;
-        b=KuSB1yrtfd8BjsI6YjeWCq5wxXfLwBoKXUpCsrVo6QhIUPYZyH8YZscFQf+sEFQGSa
-         TZa26pVuuui5NNTB3TMLCTlNQdZUd5bNv5ckyZGKLMzmdHhcy7khKoBsPqwALzvfTqMx
-         Tx4YahpYBU96LprRTqv163LXmagSQ2UWTUI5fXIc45fHuZJGblCH1AeRl57i/ejTj5Mm
-         qxEZ/P7i0pLCCFWwjWNVkYKtF4Ldade03b80tf2gtS6iOo6Vr4UtiKUQABYe6b0oT8sT
-         YwPzJUkCLIYKqge/KqQi71RrOh4/b3n6UY1Gp9QJ2fd5NIK8vlg3P30n21TqlTrKxzN/
-         SiHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775065560; x=1775670360;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QI4ZvYmbpYFMS5F4DxWr2Qtcv3EtByJoEsfGF8Isxow=;
-        b=VhdkTK7enagfpe+g3Hiz2rz6pdee7wgLENoB+v/6K8KvpSmrMKDRL5OK/6AjJw1QpR
-         nM6+n9xnu35nPY+P2Mb7pqeumtGXk7gZ63wqVgDPPTZfvMPwhImEtR+WspfBnf1zM9uQ
-         9w9q4J9BMCXGHxbqStLSLcuhOR9U7Sxa+DTdGEC2MCLYC0M+kg1A7A4uFrrVeTC7e2I8
-         MH2N8ZZ2TqmuUNF/DS9TEBm0SGsTAS+MAMvjsE2E8rGzNI0N9ouvpAmtmr7gIJTAVd8E
-         0iLCqftxYKvXX7dgyiVsLECYrFwr58P1QJNo/jfXVujMt2ImYSvG0MnwJGLNP3N9bxqo
-         ZW8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUCCnr3+k0In1aIPiDMChBB5N8HAeGul9GlqLUvFe3oPbkYmnT82cn1FSmi0LDvgJA9BETTU8j5pFX+xA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1+Af1NF9OAo+rPbMJInRmY+MZzdfqfb5uZvWsJGhletMqG5eJ
-	GMcCwHOfHiKdevamXA9nj+i0CL3mbyPlKi+CzBTUcVTHahAEnrZ1k34FRXSZ7SXeJjh8Ge7j76F
-	5KD+S9gt5ma2qpikejBc/THt2xuRB2H0=
-X-Gm-Gg: ATEYQzxbyX6M15QSPrxFsDz1RIKzrgbqF1hra05Cv7YT/pssk+/AwHiCvRXd2iM8Gu9
-	PY+akr3hI7CAQ3nbM6ITMXN2nndKNauHuBTo5n26wfNLv+UK7DkaWN65nU9nahr6nhdlqHfvL3X
-	ocJYw/mW7FDHScZuxiPXofgj/mRmFkyTuLbMRA+l9XFfvuv3cO63Wz+sv3QGfQHWsMX4etPr73L
-	aa2f1iKd23EBYw19Z0y17xMYaEFRGY6AxjYTGEaqc6aJOctoaeM5mLi0M1L6hvsHoXF9BMwgPUQ
-	1vs0tgOMZEMaynByYd3XKqsjvejeq6/m4qagkhKJMD8UMdvBvIGpHh9+ibPzFce8iH3dxoMNhhp
-	JOwGVV2RXusSHcOb+D+URnXdqNG/donr17A==
-X-Received: by 2002:a05:7301:2c05:b0:2c6:7f49:a840 with SMTP id
- 5a478bee46e88-2c930798a4dmr1033595eec.1.1775065559731; Wed, 01 Apr 2026
- 10:45:59 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chhC9Ol5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775070344;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/3sAJ1FdjGwRu+DMqvGIwhQdYQkK9kW2zWLcKVGLOXc=;
+	b=chhC9Ol504m9LLSg19g9pQQva5ICkHzw8ifGFbdHAuSseFpTv+BzJruv1UYy8+GQOder+e
+	N2OEz46VGqbn9S3c+gspvKDKUteLoajZ+ZJuuI6x5+u0pbs9Y9taU+u64kYrMvNcqvG9EA
+	rU1aV+eH91SKax9/zyGoGwu1QQBMrrI=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-463-gdXDJV8FOZaZNkUCfQRb2A-1; Wed,
+ 01 Apr 2026 15:05:41 -0400
+X-MC-Unique: gdXDJV8FOZaZNkUCfQRb2A-1
+X-Mimecast-MFC-AGG-ID: gdXDJV8FOZaZNkUCfQRb2A_1775070333
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8FF8D1955D4D;
+	Wed,  1 Apr 2026 19:05:31 +0000 (UTC)
+Received: from [10.22.81.104] (unknown [10.22.81.104])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B2C8F180035F;
+	Wed,  1 Apr 2026 19:05:22 +0000 (UTC)
+Message-ID: <5e6aa61e-0ad0-4027-bba9-cd906ab0d7e8@redhat.com>
+Date: Wed, 1 Apr 2026 15:05:21 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260401114540.30108-1-ojeda@kernel.org> <20260401114540.30108-13-ojeda@kernel.org>
- <DHHVSX66206Y.3E7I9QUNTCJ8I@garyguo.net>
-In-Reply-To: <DHHVSX66206Y.3E7I9QUNTCJ8I@garyguo.net>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 1 Apr 2026 19:45:44 +0200
-X-Gm-Features: AQROBzDasvNfwm3irNcxLclKgLrVzocIHNQudR_c4deB-93-CSbalwIa-aYY_TU
-Message-ID: <CANiq72=8eVKk0gqyvgWM_-VSsRZY1s2e7gx9AbAg+q0dRRYO=Q@mail.gmail.com>
-Subject: Re: [PATCH 12/33] rust: macros: update `extract_if` MSRV TODO comment
-To: Gary Guo <gary@garyguo.net>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Courbot <acourbot@nvidia.com>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <christian@brauner.io>, 
-	Carlos Llamas <cmllamas@google.com>, Alice Ryhl <aliceryhl@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Boqun Feng <boqun@kernel.org>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
-	Uladzislau Rezki <urezki@gmail.com>, linux-block@vger.kernel.org, 
-	moderated for non-subscribers <linux-arm-kernel@lists.infradead.org>, Alexandre Ghiti <alex@ghiti.fr>, 
-	linux-riscv@lists.infradead.org, nouveau@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, Rae Moar <raemoar63@gmail.com>, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 09/13] isolation: Introduce io_queue isolcpus type
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+ mst@redhat.com, aacraid@microsemi.com,
+ James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+ liyihang9@h-partners.com, kashyap.desai@broadcom.com,
+ sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
+ chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com,
+ sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com,
+ ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com, tglx@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, akpm@linux-foundation.org, maz@kernel.org,
+ ruanjinjie@huawei.com, yphbchou0911@gmail.com, wagi@kernel.org,
+ frederic@kernel.org, chenridong@huawei.com, hare@suse.de, kch@nvidia.com,
+ ming.lei@redhat.com, steve@abita.co, sean@ashe.io, chjohnst@gmail.com,
+ neelx@suse.com, mproche@gmail.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+ MPT-FusionLinux.pdl@broadcom.com
+References: <20260330221047.630206-1-atomlin@atomlin.com>
+ <20260330221047.630206-10-atomlin@atomlin.com>
+ <20260401124947.-d4D5Cr-@linutronix.de>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <20260401124947.-d4D5Cr-@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Apr 1, 2026 at 4:18=E2=80=AFPM Gary Guo <gary@garyguo.net> wrote:
+On 4/1/26 8:49 AM, Sebastian Andrzej Siewior wrote:
+> On 2026-03-30 18:10:43 [-0400], Aaron Tomlin wrote:
+>> From: Daniel Wagner <wagi@kernel.org>
+>>
+>> Multiqueue drivers spread I/O queues across all CPUs for optimal
+>> performance. However, these drivers are not aware of CPU isolation
+>> requirements and will distribute queues without considering the isolcpus
+>> configuration.
+>>
+>> Introduce a new isolcpus mask that allows users to define which CPUs
+>> should have I/O queues assigned. This is similar to managed_irq, but
+>> intended for drivers that do not use the managed IRQ infrastructure
+> I set down and documented the behaviour of managed_irq at
+> 	https://lore.kernel.org/all/20260401110232.ET5RxZfl@linutronix.de/
 >
-> When I write the comment the intention is to enable the unstable feature =
-and
-> switch.
+> Could we please clarify whether we want to keep it and this
+> additionally or if managed_irq could be used instead. This adds another
+> bit. If networking folks jump in on managed_irqs, would they need to
+> duplicate this with their net sub flag?
 
-Yeah, that is what I meant as the alternative in the commit message.
-
-I am OK with either.
-
-(By the way, I wondered why you mentioned 1.85 in the comment, I guess
-it was supposed to be 1.86 instead originally, i.e. "above" as in >
-1.86)
+Yes, I will very much prefer to reuse an existing HK cpumask like 
+managed_irqs for this purpose, if possible, rather than adding another 
+cpumask that we need to manage. Note that we are in the process of 
+making these housekeeping cpumasks modifiable at run time in the near 
+future.
 
 Cheers,
-Miguel
+Longman
+
