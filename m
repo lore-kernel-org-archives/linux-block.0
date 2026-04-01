@@ -1,273 +1,154 @@
-Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021117.outbound.protection.outlook.com [52.101.100.117])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDEF52701CF;
-	Wed,  1 Apr 2026 17:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCF046AF34
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 17:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775063771; cv=fail; b=iRhlY0RK3eAxuquvrYPzdz9gQ49pwO7C14vUguaAw4KhJmmDTmkhYORkNbasKr8J+b5Bs7osG1YqxbyTpq1/ZNyIId1KoKAHfNfnQy0qxDOdgrpzPRFm9j81VYoCn2VYdUjnW2Q04kQlTF5jm3F66p0X2s4ImuOynihlMmNkZKA=
+	t=1775065000; cv=pass; b=KxcdNpwtzXtOMqhxH2PNDDmboRY+1RFPUp3kdCGmfn7vUoWv+zkQpXraS2vGjn0L5AH2CoBtUkJdrEBDPK90CJ/un2bsNv9j/ZVLpiQqJ4TrNCCQHXnYpTaR4kEDdHelYvGyN+AebQ5JxJEBHXRPKeZR8tHwAvr2CZHLcBq2uxo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775063771; c=relaxed/simple;
-	bh=Fz9KQZbhrK92wXYAgaRcsbbwvocQLEgWGf/CBJdEwe4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=H0Ti5DYYUm/i3sTzBG3fxSJDCtPlBWZaN3INFRVkLa+EHctCgLHIh+ayGD0+Bbht4QDSkhERRBmy+PXPN9GQOQnMXLn2DNWuxZHE7gIhPj2WvrKzbBNPuCcwmc7K1aX9VMrNllnub0ff6jSkyVxB0y5zmlhkVKuBPv/DBFlIpYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.100.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ugGGjpI0kq/BoJf4ye4IP8ewSnQO1rcVZ0X1nFkoeQjWC4RWVeigakWPMK8ooLeX5uD9ImE4jI+D+ug0pjA+h/Mbf3xOnYdDc26P2ruoSEu6sV89fQWMV/oYJeMCPaHECSwmYpLHoaMQq+BuviMUi+g2YTlSsNe6tm6GXzvkl855PYHkEAaTNIhxwFOKxNU3+HkL8Ndh8oXau0LjZow8WwS0/pp8500G2CzqayMF8tcD7kKwcoEtzvZyC53ChCOmIIyUGRaVklEHA9kNEzFTdjhkeSun6OC3wxD8pgmwY7q2loiXj9Ox6l4qbgXnwOqx9h46uInIk5x9BETfPnjb+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ViFuGnQRClp15nxUgalV4RixSyoqtr58UhCBZEW+Aw0=;
- b=RfRADah3WuAgPm2mdUw+6pzkqiu+XIfcPo7GkqYdPVSeMY87XbUXgs7c4lmB9ubBraL/p055rJ/twOMjED7NTvcQhVruMfb+V9Zf0+f0+nFnIKea37sTHKU82P1fCzQqQPWJ3iq7HypM3CkaURIlvkOwTQamDue1R7ErIULAPFZdRi04X9ogfAGYvIirSVqFeZdYMwjGVeKWFA+jarEib1xJBZCcPI4fY7DVLHEJWFxLTfhy6kiz24ZkDh+9/ESeKNsLsXEsg6zVIMOp3MYIMwA97WpuCHGryRtaIoIuRFxY74MTSfLvI2XmEkyHwyOBiX0ov/q5cDwdpL0+UVRj8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
- dkim=pass header.d=atomlin.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=atomlin.com;
-Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
- by LO6P123MB7367.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:37e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Wed, 1 Apr
- 2026 17:16:06 +0000
-Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
- ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
- ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9769.016; Wed, 1 Apr 2026
- 17:16:06 +0000
-Date: Wed, 1 Apr 2026 13:16:02 -0400
-From: Aaron Tomlin <atomlin@atomlin.com>
-To: Keith Busch <kbusch@kernel.org>
-Cc: axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, mst@redhat.com, 
-	aacraid@microsemi.com, James.Bottomley@hansenpartnership.com, 
-	martin.petersen@oracle.com, liyihang9@h-partners.com, kashyap.desai@broadcom.com, 
-	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com, 
-	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com, sreekanth.reddy@broadcom.com, 
-	suganath-prabu.subramani@broadcom.com, ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com, 
-	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
-	vincent.guittot@linaro.org, akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com, 
-	bigeasy@linutronix.de, yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org, 
-	longman@redhat.com, chenridong@huawei.com, hare@suse.de, kch@nvidia.com, 
-	ming.lei@redhat.com, steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com, 
-	mproche@gmail.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, 
-	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com, 
-	MPT-FusionLinux.pdl@broadcom.com
-Subject: Re: [PATCH v9 10/13] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-Message-ID: <guielleeqpvy754g4453pqjzs2jo6yn6463oafoqct2bedl76l@wv2n7t7m24ag>
-References: <20260330221047.630206-1-atomlin@atomlin.com>
- <20260330221047.630206-11-atomlin@atomlin.com>
- <acxTI2CJlq3npMVa@kbusch-mbp>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="riyilwvjpctyspcu"
-Content-Disposition: inline
-In-Reply-To: <acxTI2CJlq3npMVa@kbusch-mbp>
-X-ClientProxiedBy: BN0PR04CA0102.namprd04.prod.outlook.com
- (2603:10b6:408:ec::17) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:400:70::10)
+	s=arc-20240116; t=1775065000; c=relaxed/simple;
+	bh=Madpyzu+7zvyLSmbgHorRXu83g1kA3bqkxQ/QKvvzXA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bWZC0YERdfOJ13u4gPXlFLbijEK7ujvnCzxGV4/aJRrRLUqUeagUYVeDzdcq93mAUmc/pAvcqX7Bv1PPdvCTfbiWr4deHc01m7XrBgIcTRh+rWNprkYjvUzhwCI/hdFkhrN4lUdB6MyrtUWx42KZMiKBPWZg2C3BN5dluTRtdeY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m47/sJ8V; arc=pass smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m47/sJ8V"
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-12736a0147cso7331c88.1
+        for <linux-block@vger.kernel.org>; Wed, 01 Apr 2026 10:36:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775064998; cv=none;
+        d=google.com; s=arc-20240605;
+        b=FgXdhvAjk/ZnfksK1saremJYl1NjTfO8ojvQBnlqPTx2SH+9JacRtyHSUzb6McTIjK
+         IPObTNMSR//q++h2Gi55t/dURQxsPLzz8YTXyBOHGYUbjHtNE5RjjDkZ3a18DEESIPvn
+         VBR/wa84I9Y6qNt+sGC1TL9TW81pLky6dPWsFTfVE2zJfBxlPahEuPGgZCia4nc7mRLn
+         hhb3qRatPPMFI6sM7E24tajI/64vCrADaG2uTUFJwT0ANliBMRIXCMLXIw3dIa6QnxbN
+         fXaKWEt+FBbNZHQtJjbWWFRVS3vQIwh16WbFukmFh1xd/2EuRAzgeFmCZqvCs+AfTWSW
+         t7+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Madpyzu+7zvyLSmbgHorRXu83g1kA3bqkxQ/QKvvzXA=;
+        fh=OILY/y1maTgTOZF0NWA8IXgneXoqTTEtMZtzGX6jdO4=;
+        b=QnHM8izpdG56GvnIz/EydcIszvHc25OAjn6zzjsTtLADVXrVJjOZJEvd1KCUmussp2
+         e7PsR+v2nnbJEVSWRQHZiD5iQGL13U0veNWoRFqwxNKuVmIivEMcRalTwte5PYRcP6aH
+         3ddolaNj2Lkbb7bFtXs5kbbCWTpRJcrxfB5/jTXr5/us1UqBNk0OlOUDpy+vbnKrEaco
+         iGzp9nXqppWNsQxOl8NoOem3mWl2L4+LihAsmR4R2/+Z9Vcp1dpe7fzRt6UM44f/jMG1
+         vkrbGLfMy4wNNJvq+h+Q69wZd2w3/GOKoVTcQUCLFRfSub3xcCD3i/LIVQCiDNivdd8/
+         zsdw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775064998; x=1775669798; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Madpyzu+7zvyLSmbgHorRXu83g1kA3bqkxQ/QKvvzXA=;
+        b=m47/sJ8VF5zmkEbgvymxRwXRqMU1Z/SMQ1njp0gn1sBAbbZeHHcDZwn9Ov5QCfkASU
+         IYCyXdshryWiChJCSKlCTLKnWq+cjV+SueJ0RS1kudCFliXnb1YcC/VNmS/glt0Ym+18
+         i/hh7HaxM41rZ4fLKiMBtU+DCN5UMWtHllNzl0Lq2ZOhVCOgWKY9f3iMAc/ckyFgm2bC
+         phA0/vIEnZ/8ZF/59f6s1sC6QR0J1Nfm78sLyH4nFLXJ5D/XhZh3PjfHWL6vp/vFlaYb
+         FqY/DKSgpkqYWCMJ9Pt96U66Bk6BJy9seltRXj/JzBJfl/oFXs38w7bGYUrJGgoyxxWP
+         wbcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775064998; x=1775669798;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Madpyzu+7zvyLSmbgHorRXu83g1kA3bqkxQ/QKvvzXA=;
+        b=COlezzc6prl4mlxGgLZ8AduVkbfJM47FCdTrzOWIXGaWamqkK7ScGaGoRWiGCFJ8/D
+         2AepTcWjH7aRB9fGYSf7RBdddiBO3GvpBgDlX0kbbmE4Sfab62XL5n3b9tBtjsmFm1gn
+         YFR2qq6xMOLpSax3Jt9FiKsp5U/rerX1eN9W4qvVWvnnBgzaQpjhlLlUGjpP0fMeDUGj
+         V6yrQAPwYMW2tAOc7SOf17CbQG0J7NGTYyAA94gbRBa/57V44GfMfkhs9q2NRbcvptPM
+         bRQDVwppI7a8D79ksXzX7YQazTabz+CLmt9LXqMh8C1riNo1f1KFgHdS642B4HW0wk6+
+         Pm5g==
+X-Forwarded-Encrypted: i=1; AJvYcCX4MiQFzW+5WoJtBqCJHqg8KzoE1tXxwk1T6RhUmLk6gJR9m5jW1yGaI4wllG8hHLnqyzNy9ZpB6yY6dA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBzHV+iIOm3RZ1UzpHcv38erT8g6paW/2mJp3FmxywHHDmiEm7
+	TZnXtRn8vmyef0E7nD0iYPpduqLfg8J61hwobzHpx6zSc64wyDEdUiDubudxsqfyxB977kGLLNw
+	txSJ7VM7i/WPVsOx8dlCQW4fgXbK83/s=
+X-Gm-Gg: ATEYQzwXtMiL6a0ibBtSyuihIHHz92Be1+MSVy7QS0PnF+ARs+Ns9WXsQTBNVpfRc2y
+	TGPuj9LQbQtZUDBOtM3pmUznVqk1yJO8/O8Ia64mB/22BA4nDFG7Gxqc0EGWtbEZ4FMKYtJ7nDD
+	yzUKqMtUiEM48OAD5KVXyJU7Sgatt/94kn7GzvN9arrnYVLUeKJXzP9td2P1Xc3F26MUBrHw8/W
+	Ye5WrIqRnZGovUGF8IlzgddjjMK7ODUHcMOmZ8Lo2IfUUpxU41UjZqMVgNVBAyZMBhDbNep/pDF
+	t0D+Q/vc3zGwP9mgVgItdAjKZIj9B7YxIkRiHqKJ/m5rjf4XvNyo4OKxUFdNes51dYztZz5z5so
+	96/i/kkuch1adDecvtVdF7h0=
+X-Received: by 2002:a05:693c:2c97:b0:2c7:2cac:8162 with SMTP id
+ 5a478bee46e88-2c9326aa500mr1010168eec.5.1775064998156; Wed, 01 Apr 2026
+ 10:36:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|LO6P123MB7367:EE_
-X-MS-Office365-Filtering-Correlation-Id: af501b52-6589-44c5-40b5-08de90125bba
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	jb0mzuvxVS4Jy9029WVEuazu0iS90+cYwZi1oyRDavDeazD1+5aJkA5weKPpyrfqzrzmcMxBXaicd8nxja07d7YOMNkcZPxV5ebWdLR9DulCp7qhseoln3xQwfRctI50H6NPPV9Wr224O9eOTFv0H2R/7ilDJdpQE+uGa2Lc/1ZApfnf5MG1dnGSc6uAFp+6bNXP94q4RrUkvTLt+5YC22vy5OxetHH3BmPEaF4mUqPYorWGOodoe2nkmpneXoUBkXgZs4ZCfkIrC3FrgHzC6qW/fNw/30IzuUJ2jsd16nIS/rkqXNyyCUIzM+rN9tJ5r5p2/N/ORYrmsh6xAZv+DAu6c0QzVxqzVZbR3pSs0+SQA/YAB3tihoshwgf1MlVIY6EH3T8WXFOo+XuJSv8MpltALEE+xV0V+90Ll8rzcOT2N6sx/VZoMGPw0qUug1H6wtKBl20en2zMAsKhWHNXDnHstoHeAcripfmyRal19MxO4vjdXXUrHwYS2rkJde9wEvpNRNdfHelH321D4MjbC/sdpiVeBBkjr0LS5zQXF9TR1IKhkdsVVXTPWQ+UgYpZbhi5qsmAfhbwcc/otg+Uvt7ViADNGb+L0yRgezRpNSySkkik8fa8DW+UQJcPZRawI9xtUIFhg9GiT5AlBSyW+zECHFwBYgNf6tgA52ZqrMprWIBDVl900lFSdrVEjIRsw3NzP0NlE3NrUosrg3WvbIfiTt+yWz296ZoUZK/hMuk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YTd6TE1hTW9SNW90b0dKcHFybmFNZWMxODMyZFVVSk1ITEJKSnc4ZHJFMHVp?=
- =?utf-8?B?ZXUwZFlwakZEY2hrZ0Q0RDYyT2Jya1hWUHVyeDY1NDV3Sk5oTHovaWdGa2pP?=
- =?utf-8?B?aXQxOWZpdFM3Vzc0cWtycUptemU2MU9wZkJQYjdRUTFTbTlRYUwvWjgwYk0y?=
- =?utf-8?B?VDd3MWV2eDJpWEJQN3pLOGc0eTFOWFpEcCt5ZjhTcTkwa3ZPQ3Z4S2JYTTJo?=
- =?utf-8?B?WWhtZ2pKNWI0cU1KdWM1VDdOL1FwbUlKa3NYR1FjVkZtblorN043MlFKMUJl?=
- =?utf-8?B?NDRiNFJKTFZHdklVU0NBbTNMK3dDV3p2MklDRFMva1h0VFMySWNvelJ5Y2F4?=
- =?utf-8?B?TDlkblh5RXJCTkpUQnBqeGdJL3VqbkpMRlVYZmxRWTBXcFZDUE1tSlFlbzVO?=
- =?utf-8?B?dmhQOWp0bTRMSmxZQlZSSCtycEdGYWpaMXl2NE1aaWhnV2ZvWmNMdzR6b0d4?=
- =?utf-8?B?U3R5aGZLanJKeHZkMlVnR2JDbWg3T290ZVh3eTd6cmxUb1IyNjloQXBlYmJr?=
- =?utf-8?B?VVlQVGxWNHhhQkdmYWdDR1d0aEhjelNpRmYzWVRRYm42enpEU3pEMGJZMnVR?=
- =?utf-8?B?L1FaUVZlVXlaSTVaTlZNWVpvZWdlNGx5LytGN21hMnQvQktTT2xXREJHRitG?=
- =?utf-8?B?RGQvNmQzaTJKOFlDVTU1U3ZHdGdhY0tObEVHMkc2Z2tlZXI0eEFyTmNoOHh1?=
- =?utf-8?B?MjhTdmJmNmdBNWR1aEZ5QkY1cDNoRWRDOW5BY1hlVHplWTlrbmVVUWlleDls?=
- =?utf-8?B?ZnpQWHpMaTZ4RnVPblhUaHZldDdvZXRMQndmeE5OeGlUL0RkdGlnbTlOeXRJ?=
- =?utf-8?B?V0k2WE9rYUZQVFJSaitQeWw5U0FwU0JQdWxIOHNHaFg5MVdZOVVJUmJsdk1G?=
- =?utf-8?B?ZCtsWFZoMWxJSGg3VHFkeHJUeFRkZlQyZ09seGFHbXpwWVB1MGoybUN2OGE1?=
- =?utf-8?B?b0VoUHhRRUJ5UWlMOC8zSUZtLytsMERuRzVoUStHT003ODNTeFZuQVlxUjNl?=
- =?utf-8?B?SGZxTUxsV3o3ZndZS3R3RDZKa3c1WTdObGpYSkYrY0g5dzVoNDRyYVhqYlB6?=
- =?utf-8?B?SWd1a0tuRklNRTM3Q1Izb1pnTy96NDBoV29hOXhTVnhtMUdwY1dKWGFMQVN2?=
- =?utf-8?B?ald3V2FTWE1QcDNRcU1yNWYrL3BPNnU2aUxHdXNBbmdURHJ4MWFTR0s3U3JU?=
- =?utf-8?B?dUw3RmFSbnVoVjVKWGx5RnA2WFlzengxc2F1anZSODJQQVRlZHdWQ3FRbjM3?=
- =?utf-8?B?NDFrM1RSeU1iaGRTeGFpcWpTa3A1UlJ1RmRqOW1rM20yL05BYm1BS28vbUhJ?=
- =?utf-8?B?cVRWQzFmRDZ0b0NTbXg1bWNMdG5OdjZ3bHM1Q0pPblhueTI0MWdZQWRreWcr?=
- =?utf-8?B?VjNNMnhxZks0SmVtWXoxNHYzL21MOC80d2wrNHdjZVVPcWp3YnNmOUV6Qlg5?=
- =?utf-8?B?Qm9CTCs1R3o1b2NmTlBuZG9SbTRJcU5BaW5JMFdwY0xrZEFMQ0svT1lVSmtN?=
- =?utf-8?B?THZmeExRWHVBcVFESVh5N1NtdVJsS1VieTNYNHVFNnpQUURFeUFycWFtUWZM?=
- =?utf-8?B?bEVIVk03c1RFSktjcTdQMWJDbnRmMm5iWmE0VUlnK0dhUnZpSnRSMDh3OVRs?=
- =?utf-8?B?SU1qaWVidXN3UXE4QTY3QTd2M1BjMEhmNTVtemI0MFZmUEVzZ3lGOEFBcGpN?=
- =?utf-8?B?M09HRDdJQkZpQ2Z6WW9wVXcrU0dtYkpSeVRSR2tDdk11MUYrNmk0aVl0MVdR?=
- =?utf-8?B?QitMK0VheDRyVTJuSXRMaXVqSWZBUkloR29SZGpNU2xCczhLZ1l1SGJBZ04v?=
- =?utf-8?B?U0RjWjlzSXQzSlVON0ZDTGZmajVQRWNIaWdSMmszZUJZR0Q3aEx1VWQ5OXhw?=
- =?utf-8?B?MjdTaUVPVFBSaDBlZVFZVXRIWFJZZzJPSWJKWEFhNzFwTUhzQjBOdDNIai9v?=
- =?utf-8?B?N3B5cXcrSUxxeGRsZkR6NElqb1pnNGJLTVhIVzZuSVNhVDdFZEwrTkhMaGxn?=
- =?utf-8?B?VVVYbWRxMzhJYVdQRG4rTnFvRmlsVWZRZm1qMFJvUmdFUW00MTBOTmtGRkN3?=
- =?utf-8?B?WkFpb0tld3VYdnlwZ2d1S0lnbGxMbjA3R3IydFk2alFOM2xSSm94OGdIZTJD?=
- =?utf-8?B?RmZUWHh6ZVN0KzUvZVNnYWlEYkh1UGN0cmkvZmVXaE8xMzd5SFRrS0ZXL0hq?=
- =?utf-8?B?MXgza09Db2lvRmxwRDUrZ3ZDdE51b1VOckVldkNnc2hUT3dUZ3M3OEFrNTVL?=
- =?utf-8?B?cGpUN1B4ODUyaTFKYUNYL2hMOFFia3dTNkV4N1BNcW9ZT0JhV1QwL1JhNGNj?=
- =?utf-8?B?NjcrWkIxcm5Kak1vT0JENGEvZFZ3OUkzOEpzZExLTUNObllYY2plQT09?=
-X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af501b52-6589-44c5-40b5-08de90125bba
-X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 17:16:05.9246
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S5qv7mWV4tMOxSF3k4hcLmIvzt/Jz2MBDC1crBt4Uwo5Id9C4Jtg3gACBSsrUKSCTXV7GQ2+8A1CrnOKvJ73Gw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO6P123MB7367
-
---riyilwvjpctyspcu
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+References: <20260401114540.30108-1-ojeda@kernel.org> <20260401114540.30108-9-ojeda@kernel.org>
+ <DHHVEPJHLGDW.1E6KDP9BUFG5U@garyguo.net>
+In-Reply-To: <DHHVEPJHLGDW.1E6KDP9BUFG5U@garyguo.net>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 1 Apr 2026 19:36:25 +0200
+X-Gm-Features: AQROBzBeO_yfCUmMruxpBPrHPRt9Z-RBtWsQqT4MIRVUyc-eOkOj6bAx0WG8aNs
+Message-ID: <CANiq72mnnro6UD3SYgTOG+kipwkTBvbEAGH+jXUa3kLTUNje2A@mail.gmail.com>
+Subject: Re: [PATCH 08/33] rust: kbuild: simplify `--remap-path-prefix` workaround
+To: Gary Guo <gary@garyguo.net>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Courbot <acourbot@nvidia.com>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <christian@brauner.io>, 
+	Carlos Llamas <cmllamas@google.com>, Alice Ryhl <aliceryhl@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Boqun Feng <boqun@kernel.org>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, rust-for-linux@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
+	Uladzislau Rezki <urezki@gmail.com>, linux-block@vger.kernel.org, 
+	moderated for non-subscribers <linux-arm-kernel@lists.infradead.org>, Alexandre Ghiti <alex@ghiti.fr>, 
+	linux-riscv@lists.infradead.org, nouveau@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, Rae Moar <raemoar63@gmail.com>, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v9 10/13] blk-mq: use hk cpus only when isolcpus=io_queue
- is enabled
-MIME-Version: 1.0
 
-On Tue, Mar 31, 2026 at 05:05:07PM -0600, Keith Busch wrote:
-> > +static bool blk_mq_validate(struct blk_mq_queue_map *qmap,
-> > +			    const struct cpumask *active_hctx)
-> > +{
-> > +	/*
-> > +	 * Verify if the mapping is usable when housekeeping
-> > +	 * configuration is enabled
-> > +	 */
-> > +
-> > +	for (int queue =3D 0; queue < qmap->nr_queues; queue++) {
-> > +		int cpu;
+On Wed, Apr 1, 2026 at 3:59=E2=80=AFPM Gary Guo <gary@garyguo.net> wrote:
+>
+> I'm not sure that I parse this. You do remove the filter-out completely b=
+elow?
 
-Hi Keith,
+(I see you saw the other commit)
 
-Thank you for taking the time to review and test.
+> Looks like this is going to conflict with rust-fixes (which adds the
+> --remap-path-scope). Perhaps worth doing a back merge?
 
-> > +
-> > +		if (cpumask_test_cpu(queue, active_hctx)) {
-> > +			/*
-> > +			 * This htcx has at least one online CPU thus it
->=20
-> Typo, should say "hctx".
+It would be only a couple lines conflicting, so it should be fine.
 
-Acknowledged.
+Having said that, when I was doing this, I wondered if we should even
+consider keeping the workaround. In other words, locally for
+`rust-next`, the "normal" commit would be to remove the workaround
+entirely because there the flag doesn't exist to begin with (i.e. the
+workaround should have been removed back when the revert landed).
 
-> > +			 * is able to serve any assigned isolated CPU.
-> > +			 */
-> > +			continue;
-> > +		}
-> > +
-> > +		/*
-> > +		 * There is no housekeeping online CPU for this hctx, all
-> > +		 * good as long as all non houskeeping CPUs are also
->=20
-> Typo, "housekeeping".
+Then, when conflict happens in linux-next, we can just keep the
+addition of the flag from your commit -- the rest can say as-is, i.e.
+no workaround needed, because you only enable both flags in a version
+(1.95.0) where there is no need for the workaround (which was for <
+1.87.0).
 
-Acknowledged.
+It is also why I added the second commit here, i.e. the "make it
+conditional", because I was testing that indeed we didn't need the
+workaround anymore.
 
-> ...
->=20
-> >  void blk_mq_map_queues(struct blk_mq_queue_map *qmap)
-> >  {
-> > -	const struct cpumask *masks;
-> > +	struct cpumask *masks __free(kfree) =3D NULL;
-> > +	const struct cpumask *constraint;
-> >  	unsigned int queue, cpu, nr_masks;
-> > +	cpumask_var_t active_hctx;
-> > =20
-> > -	masks =3D group_cpus_evenly(qmap->nr_queues, &nr_masks);
-> > -	if (!masks) {
-> > -		for_each_possible_cpu(cpu)
-> > -			qmap->mq_map[cpu] =3D qmap->queue_offset;
-> > -		return;
-> > -	}
-> > +	if (!zalloc_cpumask_var(&active_hctx, GFP_KERNEL))
-> > +		goto fallback;
-> > +
-> > +	if (housekeeping_enabled(HK_TYPE_IO_QUEUE))
-> > +		constraint =3D housekeeping_cpumask(HK_TYPE_IO_QUEUE);
-> > +	else
-> > +		constraint =3D cpu_possible_mask;
-> > +
-> > +	/* Map CPUs to the hardware contexts (hctx) */
-> > +	masks =3D group_mask_cpus_evenly(qmap->nr_queues, constraint, &nr_mas=
-ks);
-> > +	if (!masks)
-> > +		goto free_fallback;
-> > =20
-> >  	for (queue =3D 0; queue < qmap->nr_queues; queue++) {
-> > -		for_each_cpu(cpu, &masks[queue % nr_masks])
-> > -			qmap->mq_map[cpu] =3D qmap->queue_offset + queue;
-> > +		unsigned int idx =3D (qmap->queue_offset + queue) % nr_masks;
-> > +
-> > +		for_each_cpu(cpu, &masks[idx]) {
-> > +			qmap->mq_map[cpu] =3D idx;
->=20
-> I think there's something off with this when we have multiple queue maps.=
- The
-> wrapping loses the offset when we've isolated CPUs, so I think the index =
-would
-> end up incorrect.
->=20
-> Trying this series out when "nvme.poll_queues=3D2" with isolcpus set, I am
-> getting a kernel panic:
+So it may just simpler to do that. What I thought was that perhaps the
+workaround is good even if we ourselves don't pass the flag, e.g.
+someone else may be passing it. But the chances are very low,
+restricted to a couple versions, and the error is obvious and at build
+time anyway.
 
-To resolve this comprehensively, I have made the following adjustments:
-
-    1.  qmap->mq_map now strictly stores the absolute hardware index
-        (qmap->queue_offset + queue) across both the primary assignment
-        loop and the unassigned CPU fallback loop.
-
-    2.  The active_hctx cpumask now strictly tracks the relative index
-        (queue) for the current map being processed, preventing
-        out-of-bounds mask tracking.
-
-    3.  The validation check within blk_mq_validate() has been updated to
-        correctly compare the absolute index stored in mq_map against the
-        offset-adjusted queue index.
-
-I shall fold these corrections directly into the next series.
-
-
-Best regards,
---=20
-Aaron Tomlin
-
---riyilwvjpctyspcu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEeQaE6/qKljiNHm6b4t6WWBnMd9YFAmnNUs0ACgkQ4t6WWBnM
-d9bwwRAArG+mD7cntRzDM5s4MrtIevTU2rwU42jGlmcZEycR87jgRV0kclgbslmd
-VfNkfbl2nPqeG/GNRy4XIsIhWnP6LThpOMZGwD5R3EEiQssd0Jhllox6s7HjH3VS
-/J0Um32Ds+Os2u2GZVUvRDZOO0GozMsxrQbSFFwFRFM/3uvk+vT1hfKIMrQx0w4w
-wWGBkbS4rxCQN3ZY0zdWz0/3oZKNr7W+PanK8utQgmpphuejejW7QvL8ykCiAAof
-R++nw7HdnQShHGjPMLJBiEshwSNeanEv/h3Wwz1A9WrhNua7xAF5+9/1wXlbjBmZ
-QMUfNiPsqGDN2TJYEPsFBOCLQyhNfk+pVE2rSIV3sg7WE0pKaU2sUgYyXZeO4qrA
-w9C7ZuQV08x4SegZiEGyNFN1OuMkvEDtDh+4moHmc1nKWuvEClvbKVw0G2e80qDe
-I/w56G/dpKalUviPzJT1mc1kUh8pVrm3plEUf2ZEwb4ehfC4p8sLXctOacLKXEbU
-WBm3soCXTvoVxaAyAsUDRzVoWT531SPxz0+YTvIIxNcx1PVXirFdW9RXXISKA1P7
-YFrlqJM1Gq2zM3hgMRfBGN/UjiboWUw1vU9DkUmR4FzSyESWfazXG6EEkIwsd4kz
-pXkhR+aJQDhoyvAuS1rBxK/jggzeMo9TwqRuWf9G7nHxoLPhfIw=
-=cH5L
------END PGP SIGNATURE-----
-
---riyilwvjpctyspcu--
+Cheers,
+Miguel
