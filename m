@@ -1,143 +1,99 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26F44035C2
-	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 12:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775047142; cv=pass; b=VZiPGUzwMp0L0vXDqUGIyWeBrBkmbIaiShClF3YCnRp/5y63oyOolUd8DH/j2HsRdEQDH+X6eDenWYbUlkcUFnGRkgoXxtM0nx7ZO1q2IHx0u7qBKqpmskphItnc1b0v99vPF0euK8LbonfPcSuh4QycgCYQUJ2aZui4zP1zGck=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775047142; c=relaxed/simple;
-	bh=GodnwCNRPwhTIOZcCkQ43DAq+lvsz0DfYPnKri1+5dQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DL/IrveRGk87qfvSHibVUMGtcEEYJTCCR8Y6oHgEroPTXtQYkQvmiUHL//6GUq4VNtQeHRSWPWVcbD56K5Cq51H8IWMpQ3MhpL1XoIXUxawvCZFHAaS/JvivlFQUbaIi/oqji6r8A5qkXnpO9QjtfMfeMIOlsili/8VhFWYN8RQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ty6k57Rd; arc=pass smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB37D1A6828;
+	Wed,  1 Apr 2026 12:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775047792; cv=none; b=qFWt9Ykxf55iPDgZXzPKQdX7oUeR1A33w4yBgnk4uOyq7BKDwDZ2Z5Cz/LdocvmPhKp8Z/a7pK7WPACkolY4ZrSHOHXZytug1/CVbvQFDnmMILdcCxA5CJu3/j6vHCN0YxJAH+7+KZwfN4Tnjw4JvdZwAf7VZao7psrUczBwUWQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775047792; c=relaxed/simple;
+	bh=XP9atdCCk8+U8bxPV2+5SWG4EjBA7tmxDzurusg8f6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bHoJTKlRDqlE/fVb4gfP+mlWZLAxLL6iRgF0LyHixTR4W8hxuQfeRFp0TTM+VfaT6dQTv8V/BtTw1AxlJa5YCDq9bLblcsSnUfvhQH8QrRc2syv4OAyDaIuYN7J9p0wjEAP+iQ528Rjlj8U/98WExDOgg19yooitVRwFKnQyJPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tMGD0fM5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7XrOgOoK; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ty6k57Rd"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2bd5658b901so279406eec.3
-        for <linux-block@vger.kernel.org>; Wed, 01 Apr 2026 05:39:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775047140; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X5C5cmY3MF62H1zlTvwLx6BczfP5WHn7H/cx4JFV+/z7Ew6h51wNxWUBMQdgJI3HH4
-         Jk0VSfsUFk5iEeliKJvtwwE4HzVWuf/3HCYwa4xuHJMbogvr4HtKP0ljFPSlCYtzHgQ4
-         h65k6m4mbIA3gQZnsODJz20B7RzhAJPQOHHLLCDwcoWx+meUOYOL+/gysdnQjkN8LA9C
-         7EP+I9JfRDq+svTmQhQfTFZHkmSILFCf/blDPKouTQhn/0JUIVoK8Q83KzF19DtXL095
-         05q9TC/xLscm2/YCSlhRLU1pTtRRodfc2NHCz+tklstr/AMl3ctLxS+2TZNvw9scdZHG
-         DmJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=C50p4ZX1kB4/qlngVjB93jucX5ZFw4nyYPOJ+NDGmJQ=;
-        fh=miHSN13TlTA+Ik8qI+IKv03LRV8wpelGlaGpCtTkTxY=;
-        b=WVcCuUBnL10osmH+4cs/6Y24OE6XOZ6aOIlg423cvWsoYFe6KN0VRVFqGyJOkT91cI
-         brMFKhYy5v5v8UpU9yWGlVQyxzKeB5Ca560fKxe6juvjCsmCColIpH10odVXtsNA0pFw
-         a/8AxAabQNdSC4dRleIJk7FOsMaCTGDWrct7x2yXz9cx+RQDaCBCj0qDLcFv8897Jr6o
-         aE7ksIxSTPMZslLM1/35Q6m8gUWkb431TjXFJ+3tXqMRuDzSY+0biD7U5ENc5830H4Up
-         Oft2h9PFEHieO80N3CCNZj+s4wLs6S6YMVIxrAG/yD1lnCbtVSiF5sgQdj7CJiHifqb/
-         NQLQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775047140; x=1775651940; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C50p4ZX1kB4/qlngVjB93jucX5ZFw4nyYPOJ+NDGmJQ=;
-        b=Ty6k57Rd2b/j+l5SXT6wVtwVPCofZk6GKODuiID9Bw3DAg+mRwi7ZLqWyKUaY/F6YM
-         NoA7tYlp7e7vj9yvAAnK6JUUKVsZuGQEDRy8Kk2VcKRM15hwDVNvDqKKYiugVNhP4Th3
-         MM6AG71UacD6q+z9Z9DjlpZT+7Ferlmc4ZwbnQECzBSFC2yCpWCehJBygWufqD+E7Kmp
-         19yTa2FPCd+7wB1vpq0YLo0qRK3jOFfh8n4m05FM9+fPCmmEHS0UYOorDiu2exuQrqzT
-         UAmbuxKEi6TdpLW0Zn5cDAA8H4L2qKGzbxHskdXbg+o92URUDiHxvCoGu1tBMM7aXg0t
-         EqgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775047140; x=1775651940;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=C50p4ZX1kB4/qlngVjB93jucX5ZFw4nyYPOJ+NDGmJQ=;
-        b=ViMRHgBdF2P4SBdsU/FeKd1JilrIpdm04kFuJ8IzjwGI5/g2IB3GYRHQxHgiCkERyq
-         VX0yVhO2JyBAWJ4lqU8se27sRW6htNfRO3x93+RHbScbNnWxVknLARwb1aTA+nyCR9tY
-         4V+kC0mNBL2/nCkDyGowXH1YGbl7kkSqqr5FzwC7gv2JlzhjbLavOwUketw42IpZPD3N
-         iszWGRqw/LKO8XikMEDv+/92IsMgNmpChvEKwXpcdjZcsPhNWKiHoZJ+Il4RkMpZeZga
-         FWqOuUUENsMKQZQXYkgqHu9neMZ4/rt6DCfzeVxezrcm4NGATUNeIc0uTLht8FIeNUVQ
-         iCTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW6gJUwMOp3l+VaaUBP6yAZHL3jCvLHGfZcLQadDGSC724Y7R6CA6h0UQVMR8jbok2cEZkCxQsarUmGzA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdexsU37MkUpRLTG2g0uv4l1tuHTtOBt8aBC4p1kYTGHn74a15
-	13vfPmgel569ql8F0eM7LU43DHz4x3wjDaKnd/+Jh0jRzwAVf9xjkO2xaIekjOLTaU01xi4VYCQ
-	mJ5y53zE48VD++JbKV9qsnqMU7dTnedU=
-X-Gm-Gg: ATEYQzySJcCu6LR2a7YaB3LQGDR1twxqmAZWBwuKfXCqvJQNM7zkO40eAFFfMbkmEUE
-	BxWfPfdXpf3V39SAF40dzhyLiZK02fLGf9JZCR5PIBlK2E+soSSNtIGT9uCd4psUxFF01Ql3qjI
-	xbgXkJ6rcnGgtpz0msqnyT8fQLrX12n66T6tuK5KujdFozfSPx59+Ag0PlyL+c5vGxujDcyq0YZ
-	vFbsC1KlTRW2a8ld9ZbF0KkzXZ/kyLkT9AvtKD6/JJsiNvkuUAn01p/j1t/LXA6OGKzaJDdnT2/
-	GgP5vbNapj7ZlQOTe9JBbfCgKMvfeTxBb4ppshv1ZpLFnfhZ83byI75hRi1XSZGmuaFxeYpfTlc
-	l1xAkZazllW7sp5rEtyJmH1c=
-X-Received: by 2002:a05:7301:6790:b0:2c1:6416:2a07 with SMTP id
- 5a478bee46e88-2c9321b7bf4mr857984eec.4.1775047139826; Wed, 01 Apr 2026
- 05:38:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tMGD0fM5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7XrOgOoK"
+Date: Wed, 1 Apr 2026 14:49:47 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1775047789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=heh8sartkKNgZ+WLyImAeywZBZ6rowJ27Jlk2mhT55Q=;
+	b=tMGD0fM5BtkS7s8cjOH47FMWF3KkLGze4xZtLaWbeCpXHa2kqwWKWYOpKMw//zUuD2iAT2
+	83uUeOH9zdrB5jBgSZUCQUgvFA4RQ/ggm0Oal5gSLaVGzrROt/qZO9slTh7wl5IiVDrHIP
+	pXAnhsEbkR9qNnrUF6G1CWHLtRWjDeDFjsSdSbyFJSuV4IMmfu6KHN8JvWfX2iRI/SOMIE
+	qHq5RU5e/fLzWnuBYCqo1sQjYCTuowGyazTt/s9pER8G866XYw5QouLhjCWXsmpYHn7on5
+	JikL7RxLG/Bfw6TWurpZVUlR8ZXlOD1PGFWzkwFcfqezJvWCrHWQubGn78Lkig==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1775047789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=heh8sartkKNgZ+WLyImAeywZBZ6rowJ27Jlk2mhT55Q=;
+	b=7XrOgOoKRW9yP/eZHYEGzv9pb+kR/oqptIdAFt5MegErsbxzrViWbc6gCXoT8o43/1PW4F
+	/EY01dHq/YdviTAQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	mst@redhat.com, aacraid@microsemi.com,
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+	liyihang9@h-partners.com, kashyap.desai@broadcom.com,
+	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
+	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com,
+	sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com,
+	ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com,
+	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org,
+	juri.lelli@redhat.com, vincent.guittot@linaro.org,
+	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com,
+	yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org,
+	longman@redhat.com, chenridong@huawei.com, hare@suse.de,
+	kch@nvidia.com, ming.lei@redhat.com, steve@abita.co, sean@ashe.io,
+	chjohnst@gmail.com, neelx@suse.com, mproche@gmail.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
+	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com
+Subject: Re: [PATCH v9 09/13] isolation: Introduce io_queue isolcpus type
+Message-ID: <20260401124947.-d4D5Cr-@linutronix.de>
+References: <20260330221047.630206-1-atomlin@atomlin.com>
+ <20260330221047.630206-10-atomlin@atomlin.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260401114540.30108-1-ojeda@kernel.org> <20260401114540.30108-2-ojeda@kernel.org>
- <ac0Ol1PaRTWNK6O9@google.com>
-In-Reply-To: <ac0Ol1PaRTWNK6O9@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 1 Apr 2026 14:38:46 +0200
-X-Gm-Features: AQROBzB47ncfBs2Gvn4IVyEtA2T5y2xBZyqDi53mewiERXnAT8KcWfCgLbx6lUg
-Message-ID: <CANiq72nk8Ti1bcjCO+5nPacz7JaH=x4+uTi3-+iu4H2ZfwfVrw@mail.gmail.com>
-Subject: Re: [PATCH 01/33] rust: bump Rust minimum supported version to 1.85.0
- (Debian Trixie)
-To: Alice Ryhl <aliceryhl@google.com>, 
-	=?UTF-8?Q?Fabian_Gr=C3=BCnbichler?= <debian@fabian.gruenbichler.email>, 
-	=?UTF-8?Q?Fabian_Gr=C3=BCnbichler?= <fabiang@debian.org>, 
-	=?UTF-8?Q?Fabian_Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>, 
-	NoisyCoil <noisycoil@disroot.org>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Courbot <acourbot@nvidia.com>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <christian@brauner.io>, 
-	Carlos Llamas <cmllamas@google.com>, Jonathan Corbet <corbet@lwn.net>, Boqun Feng <boqun@kernel.org>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
-	Uladzislau Rezki <urezki@gmail.com>, linux-block@vger.kernel.org, 
-	moderated for non-subscribers <linux-arm-kernel@lists.infradead.org>, Alexandre Ghiti <alex@ghiti.fr>, 
-	linux-riscv@lists.infradead.org, nouveau@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, Rae Moar <raemoar63@gmail.com>, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260330221047.630206-10-atomlin@atomlin.com>
 
-On Wed, Apr 1, 2026 at 2:25=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> wr=
-ote:
->
-> Debian really *should* pick up 1.85.1. It contains bugfixes serious
-> enough that the Rust team decided it was reasonble to release a point
-> release.
+On 2026-03-30 18:10:43 [-0400], Aaron Tomlin wrote:
+> From: Daniel Wagner <wagi@kernel.org>
+> 
+> Multiqueue drivers spread I/O queues across all CPUs for optimal
+> performance. However, these drivers are not aware of CPU isolation
+> requirements and will distribute queues without considering the isolcpus
+> configuration.
+> 
+> Introduce a new isolcpus mask that allows users to define which CPUs
+> should have I/O queues assigned. This is similar to managed_irq, but
+> intended for drivers that do not use the managed IRQ infrastructure
 
-I asked them about their policy yesterday here:
+I set down and documented the behaviour of managed_irq at
+	https://lore.kernel.org/all/20260401110232.ET5RxZfl@linutronix.de/
 
-  https://lore.kernel.org/rust-for-linux/20260331190053.482607-1-ojeda@kern=
-el.org/
+Could we please clarify whether we want to keep it and this
+additionally or if managed_irq could be used instead. This adds another
+bit. If networking folks jump in on managed_irqs, would they need to
+duplicate this with their net sub flag?
 
-Perhaps they just prefer to apply patches on top.
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Aaron Tomlin <atomlin@atomlin.com>
+> Signed-off-by: Daniel Wagner <wagi@kernel.org>
 
-The issue linked above is the only one I noticed so far, and it is
-quite specific.
-
-Anyway, it is up to them.
-
-Cheers,
-Miguel
+Sebastian
