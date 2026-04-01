@@ -1,186 +1,136 @@
-Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021138.outbound.protection.outlook.com [52.101.95.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5123E4657F1;
-	Wed,  1 Apr 2026 15:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.138
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775056609; cv=fail; b=swWhdxLr0JaIs3v4wm4NSUfK/Ndu5Sz+SpBWAMLoz4B4ocV3F9Ss7rmZ5AkzhIaMwf3hjUlxhKX9t9wkva2+hS6HklxPY2T9Nnvd2FsaVnxfkLr0PnNUEhQc4+0+YcAf9XbsMgm7giN2zq1y0HX7ODXQw01JQmK2sRjHYQT16G0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775056609; c=relaxed/simple;
-	bh=vKPGlbrAC0FjHh+h8ikxPUP3woOftw4F0uYzogR7B40=;
-	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=TZ36D0u4JPj7PzzJxvL4BjsYVwohtXMwDzwy7Clsszn59IdplFdDb6XTDR+c7+/ZowqNwlZU+eM8VMqq+xN8GoM8J7PjvherMrCa/k409xw2WTVbQDciF5sV6OuloUyeVY9sHy+8sPLoNboPfeKdTMf6bje6m3pA0gYT6U9rXx4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=HIjw0t0x; arc=fail smtp.client-ip=52.101.95.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567D735836C
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 15:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775056769; cv=none; b=VCoTuwJ1t+r8jnaRTcecoXR+Bxj5BuwNcClb7M7DVZ5MnfRO94mzmPlv+ECesRP9JumDIU0oc7TKjHLkMSf6L10iWlTQrLnnZa1y5Bl7LFhsRU/1RyUG5fg9WGVKnU2USS2kgqLZNoHD+hKVCHt1/wJ6C662OG8rVtsPHGSLeiQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775056769; c=relaxed/simple;
+	bh=cq3uQKFeKjafBze1o/fWC/jcny3yRlVf//B9QgBCPNs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OMNRXT/rBrLZyRJhBHr/kuaJUAGNtBJmMU8eTjse+j7OR1Fq5FH5RM4dixzaz7hZul/D780qsrAw7aw1J4isqCpyuZpZ7+4OCRorEcclRVQvmZ9+YS/lMsdxfcC79HBiEWuhZiJDUHuiusSWeR4zjz//+gNjbzPTW/D1BIgdVIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=D0pcgmaM; arc=none smtp.client-ip=209.85.161.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="HIjw0t0x"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qRkDM5YEhCkFDwamfeYvTwsSjy7VArHyrGTX7LE+Yk+V4D5cLVgP6B0Dgeg/DGWCiy+WT7ByEe+RVaHjNM/EOeePVtgVdRnRIdkFGwVjKSwTIWNXWzAZSCtvtcXG8w3KKNf+HRi2tKZU9ASVuVd0MH9gHoK8CTveRVVtsoft1ZAnue45Y5GpoT78qdTgI+xTE5E60ep8U4wkdA4AmB95nrsquLuvfEIPDGuRerLNyaNUjo2PNqZ1HvIo7OaGfcOlyPXFhi1TuDg2tvt/hUimHGKkV3a6gId6DOHNhn9A66Ogv8+o1YpwH1g535uZSmn865CHP8ysqOpBzlbQXoqXgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fZ3kpJ4BfJ0VcxgMNDiiTD/LhwBf6gr3xl6GloBED3c=;
- b=LuKcf6/tgd2APXjEGQj8dVuNfBMXAhqyw/IqqsxCgGymYjNlq2CYybCURb33FXVG2Mu79iFet5og5F3GJhbTUzrevyHFv+3lBlEBOARXeeOWCf6rL3jt8HDK16V1cPQ3HeEOKIPaesrL9sZJKNvD/IDvBHaDiI0dXjaJeNE9wu8kbzlOobNckw6PWEfnwYbjZ8TZ4LEOmfpYNzvJIRoibUrBL9mDFj4eIz2aotu6IWFeQCvtX0i2AIY9VtFR0eLFh6PuebqBNrshywR6iC58fWZPDignnyz9QBi1VZq1LBAXnHWV/zzUmBPDj1qjok5DtieIh1chmgpiOlGNl83/CQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fZ3kpJ4BfJ0VcxgMNDiiTD/LhwBf6gr3xl6GloBED3c=;
- b=HIjw0t0xYMR+RuNn+eYnj6uaHTMH4H9olJZuhqyH1xZZfxiXqYssWdHilu0kUABU/6ONsZIiXwajPDP46SH2LDBnPPbJXOohNpOp5QQ3uFnCQggbIrvHQIbYn0CygPkdG9ugwjhJetdxqNCZcGOBviwV+bM/03aq5RCK4tiNClA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by CWLP265MB3172.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:bd::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Wed, 1 Apr
- 2026 15:16:45 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.20.9769.014; Wed, 1 Apr 2026
- 15:16:45 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 01 Apr 2026 16:16:44 +0100
-Message-Id: <DHHX1USN2EFX.LEASH5FW1GP2@garyguo.net>
-Cc: "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
- <rust-for-linux@vger.kernel.org>, <linux-kbuild@vger.kernel.org>, "Lorenzo
- Stoakes" <lorenzo.stoakes@oracle.com>, "Vlastimil Babka"
- <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
- "Uladzislau Rezki" <urezki@gmail.com>, <linux-block@vger.kernel.org>,
- "moderated for non-subscribers" <linux-arm-kernel@lists.infradead.org>,
- "Alexandre Ghiti" <alex@ghiti.fr>, <linux-riscv@lists.infradead.org>,
- <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>, "Rae
- Moar" <raemoar63@gmail.com>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, "Nick Desaulniers"
- <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
- "Justin Stitt" <justinstitt@google.com>, <llvm@lists.linux.dev>,
- <linux-kernel@vger.kernel.org>, "Shuah Khan" <skhan@linuxfoundation.org>,
- <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH 30/33] docs: rust: general-information: use real example
-From: "Gary Guo" <gary@garyguo.net>
-To: "Miguel Ojeda" <ojeda@kernel.org>, "Nathan Chancellor"
- <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Danilo Krummrich"
- <dakr@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Catalin
- Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>, "Paul
- Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
- Ou" <aou@eecs.berkeley.edu>, "Alexandre Courbot" <acourbot@nvidia.com>,
- "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
- "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
- <david@davidgow.net>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, "Todd Kjos"
- <tkjos@android.com>, "Christian Brauner" <christian@brauner.io>, "Carlos
- Llamas" <cmllamas@google.com>, "Alice Ryhl" <aliceryhl@google.com>,
- "Jonathan Corbet" <corbet@lwn.net>
-X-Mailer: aerc 0.21.0
-References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-31-ojeda@kernel.org>
-In-Reply-To: <20260401114540.30108-31-ojeda@kernel.org>
-X-ClientProxiedBy: LO2P265CA0490.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:13a::15) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D0pcgmaM"
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-66f747175d8so4299960eaf.0
+        for <linux-block@vger.kernel.org>; Wed, 01 Apr 2026 08:19:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1775056766; x=1775661566; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vowzyU0SrHEAHYUrDuyIU9MIx98uSZTg1/2EM+Z8IKY=;
+        b=D0pcgmaMUmJ6+v7ae5y1XndVSHJTPhNXABeuqLW7w6kQf6mDqtwouJ/Ww05MqCBggj
+         gTWT/TIRZywpU8cg4033xULn7VebSUqR9/1O/lcDdQrcwvDtNztpaD2H9kvELaWnJGke
+         LZN09FL6ARwD3GQtF3RrHzizU94X3Id5obzZyelxbBPCn+nbKzxhS1JoWdPMSRjsbyNB
+         vaoPgk/YlSikuikTbkFroW5XsFslDclN6ibnf5aXd0xICNaXGNxhOtOi7fejDkIq526O
+         M9/a7kcadFZsA7xe0ywuhSDVTWTt/I99j3n9mJgyd0pg3/+Tjop7IgPIyqkyOVLcFvwr
+         YlnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775056766; x=1775661566;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vowzyU0SrHEAHYUrDuyIU9MIx98uSZTg1/2EM+Z8IKY=;
+        b=IxXMAm5ClJhq9EIMCJnmQI6FLII0IkiTEQtDwpp2j+JRdWRjqrS6Bt+rkKHHe7PxNS
+         5e1KwMErceggue5FPN1tovx/CkpXcAC4KueW5j9LAQ+SAi7pClLK5RJ5Lds96luT5bQ7
+         /CFaF2iioTbSOppkBpgUcEMTv8eim0mMLYpimbSKM8Fgxjht5aEMBClDUPp+UVNSCav1
+         m3qS4BrJuXCBUJn504LCwxZyiz/XeuBff1PQroXKlkK0QyPT98GcDLfUGD+oGCBVt4b9
+         6c6vnEliuw37d3bwMNgPK/3vzGzMerKicpWi3KHM+upm8i2WRJSptqG3YSleYi0TJLEA
+         vdLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKekEEvpDIJ8djkTcxKiyt2DYAEzclVkIs84JdZ6popVCz5yPrYlJ64uXaOCOmQa8MViY/1st19Ipbsg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBqhUmA1rEa+EKIBcY7TUfNpd67wJXNqqc5K/0JXhyisiNj6f+
+	41S5QyBgFznB5koh749R+W9WAeicTpAbVuV23CZxZH2uOQFO8j4ttyiFWRWSdrRHpoc=
+X-Gm-Gg: ATEYQzyXMyKQeI9PBcnFNuMRAOzoN3XtRDucu4I53QtTHx+IJYJNjxFfZD8GJrG3TxJ
+	wtjH962t7tSGJ1vaJu3nelXqzWHpE8ZzS0sZLHbDg0LAP3po+3J+wJ0KGJasVnkCrHS2GDD1F7m
+	zD3pO4hxIEuIw1N+UDJQPvpqyfcBPmSLCO5pPNjnrJ5D/Q1wI1ENC2q9h1pgurXeJrMvIa4LCWh
+	AMhGK2dqy6MXwkQAKEcCl/7vwKPe51uhVxKBmJxamJHsqTUmeZBquh4h766v8/wOoUmr3d6A1bj
+	UPlq+ZryQL5jGhB+rixI3SGvX7eY0R8pPJK4a9NOOToNNFCFI1ciafZA5zMs33/OonK9tBv1BMb
+	RsJyBz8iD40r1quTCvwphLymA5eFuV6BaFfS41CKqINmA76otgeEEiKbzk2/xxkH0IsH0A3y3Se
+	nUpaV/vXGLQrNzRY1gmhAsa4FRukm5bH+7h0zXtyEcuw8YiBW4xMSOxKyZZzItuYpkBMLf2nxct
+	XTQZJGs
+X-Received: by 2002:a05:6820:1519:b0:67b:ab68:b5e2 with SMTP id 006d021491bc7-67fabc059afmr2150025eaf.18.1775056766301;
+        Wed, 01 Apr 2026 08:19:26 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-68037976cafsm530119eaf.9.2026.04.01.08.19.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Apr 2026 08:19:25 -0700 (PDT)
+Message-ID: <f10b5a3d-33f9-486c-b8e9-6d9286448f69@kernel.dk>
+Date: Wed, 1 Apr 2026 09:19:23 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CWLP265MB3172:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6870eb53-ec33-4eed-2b20-08de9001b017
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|10070799003|921020|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	AIyn4ea2YK/YpXUgayz/ximTIPiqKfTEJbYUrHryLGFvQu0OsOTWbrxQgZvyQHEguGIYxAfIIzM4JOWmDuoou7+uTkjofihrpFt3rGCzk6QvaScdI/5BCXpySxpq6kNPcILDyLgGfchrVtxXELbWUlk+A+aIJFeRpjEM0LygoUBBoWpJY7pxHPqwZLSAcwshEXrWSY56bT5xqV80iZ3bGsaE5/n5ssWtGlV5TI93gCmUYJJIjUW8TWn7vyE8kHwexmxK+jEOZW9tgjssXUyvAUgDLkXRAfCviQCqs8EtS/Og1a0bUTojDNO4HKF/pYxQvd97fkvCxGY+v0IU5s5N0kU23Ni2qLES1rc7DnvowXkqy1vqA+QLOcVfTRYvgx4axBpmfSMzVhW4YMz8y/mmVOYdH0p4uUKqIvYdNNIB6aWsJVgz9zlB3xer53+LGuM3PVqZ0U+fE1RVx2vih1sSdteYMnTTgfCQBTM6MCvheAnwKAmS+hBh+05cGMiRs+Kz1CGkDYWXekvavhaYw0pRuKrwoIHfczGJePmNdW7C+X+6ykhKpD9LJi3ytJkI0Gxd8ELT2MM2ktlN8boybEUTkALsR7+51ZBusUHlwu3i67P1Ak/4T3F/8RKyzMACub0fHM0eyXw2xFK5y/WwfieIVxRv7vZKffvREWHsiTTKQq9mufrshMpf5jx1qSgiOOJ7fjnRF/WwuIWxgDXxX/G3XxeEo7UrrjeoaKyK7tCT3iin6w6OvjsvkIPoe/2OCcFOlcV6nb3jM1jBNmtkiTZuLg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(10070799003)(921020)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RjFwVmRUaEpJdkZwNUlZaWlObTQ5YmZYMFdSUjhzcXVWOUliZHFSc0hTcVMz?=
- =?utf-8?B?MUQ0NkR2SVlYM0kxSlpFNnBtTHZkK3VtQVNYZndGSUpMY1FZdmx6c1hhREpL?=
- =?utf-8?B?RVV4RFlpcWM0RVhtODF6ZCtFS1FKaHB6VUwrZXVpV2F2cHJ6QUdUcEk2SWdN?=
- =?utf-8?B?NzJGZ2NCUTJ3eVFBRTRNYlpUZWRvTzBUcXIvTmdXSDI0ZTU2TFlma2Ixc1BE?=
- =?utf-8?B?cXJmM1pOSXhtVW9UWVRoS0dnVys2SWhuM0lhZUEyenFzaXBGTk9WUG11NFpz?=
- =?utf-8?B?L1BiR3hzYXYvcTFEcE9JeWllcHNndEIzZ3Focjh2OEMxVGluY2FoWVJEZzlt?=
- =?utf-8?B?YUh5dGZmSmFKWXJVakw1Y0M4RzlzaDdGNGUrdTdRWGw2V3ZtckxNalg1a2Zu?=
- =?utf-8?B?MTVDUjBVMnV3K3E0MEdVclFGVVZ5MzlJRUFwd1h3Mjd2TVlxMy96QTUxSmtW?=
- =?utf-8?B?TG5CR3NTdHh0YllGWmp0ZjIxNy9NNzJJK1hNS3lPd1dNcUk0dDhnWTJLNWlj?=
- =?utf-8?B?RGhxa3hQcHZLaS85akYzR0Y3cEdzWC92ZkdBODNKUncxT1JiYUovTEdCMEx4?=
- =?utf-8?B?WEQ1SXNCR00yVFBFQ29qc0lCbW5idmQvUnBWTnVtNXozTU5ZcG14c0pJdGky?=
- =?utf-8?B?ZnQ3MnF1ZFhDQ3VFZXMrYSs5MFBSUlRXMlVPYy9vYmdtcW8zU05haHo1RjN3?=
- =?utf-8?B?VFhCTy85dDgyS3FrU1g5UWtjNXdEZ2dxQ0dLNndHTXdTYUg4dGs4M1BhY05F?=
- =?utf-8?B?ZDVvU2xoZ0ZEaTZuWktQeHE5dFJGVmVqaG04NVFRV3oxcytGN1R2bXRWdVhB?=
- =?utf-8?B?a212YUVZTXNnQ1pkVzFvRTlzWnQydmo2czFVcFlPdUdzY0N2TmhiOTIrNVhL?=
- =?utf-8?B?VGd5dklUYUQ3eC8yS1NJV0Fxd1hMaVhiMDFkdGlvNWNiWHo4QnF3T01VMUty?=
- =?utf-8?B?Q3R5Q3BYV25yNEp2ZHhFK0s4MjlpRDVacUlWV2lZL0JBSTFGSzE1YnZtRWYr?=
- =?utf-8?B?TmJwa21hNWpTd0ZIMktWNG1oNlVwTjdCampVdlRrNGRjWXJBb0lPdC9uYjRy?=
- =?utf-8?B?YnZVNlpGMDBYR25UTUNXeWp6Y2pqN3pRTVR1eVNQd0JRcmxJbHZ4YUY5MGgy?=
- =?utf-8?B?VHlwTzB4U2w2RXpoRFZrNVpQUFdreWRBcEJpb3FaUUJubkNSM29PM0RQeE9L?=
- =?utf-8?B?a1NVdlBhNjZOUzFhMnNzS3VQdkxHNllqOUt2WUQ4Qm5oZjhrNk1laHpOMkFT?=
- =?utf-8?B?eFczaVIyZmQ5MTBCVVNSRi9jLy94aGdySU01akpIRGdsRFhlT0ZXY1VsbnV1?=
- =?utf-8?B?dnk0bmpma1lvS3VYeitvdExCSGNqd0VYN1R2M3ZBVFB6bloreHh2NzdXWTV0?=
- =?utf-8?B?Y3p5MGxMQVJRdVlPaC9ja1pLclhyQkdlbUZuSU44eHY3K1F3WDdzL0V0OEVz?=
- =?utf-8?B?RDZZV05YTjdaSS8wMHhWSFZxQ2RtR08rY1BOOXgrYXRzU3dab3Jla0xlclhh?=
- =?utf-8?B?cWZKQ29zTkpiUy9jYnYweGpiNysreWxsZDVZT0UxRGppQzZZem1SVWZRTEly?=
- =?utf-8?B?K3htYTdaQ2ZQZGl6eTB5V01MWll4YlgrN0JINm5BaFF4YmRFYnFDQXRPRUs2?=
- =?utf-8?B?ZE5tWE8yaXpEcCt5WUFKSFBOczZob3U2Y1hSZ25ZanpnaTVuNGg4VEE3eHlD?=
- =?utf-8?B?cWlaZlpqMnFOdW5mR24zNlpvYTJadTF2dlZqVWxQeTkxckRUaWYwUlZDNE1j?=
- =?utf-8?B?N253TXBRdDRmeG1MOU0yd1NPU3JvNXJPVmxKdWh2d29Ld2hnZDJsV2VVc0dL?=
- =?utf-8?B?Si9vQlM1bS9PcTM5anBwY0NoaVlqZDdRcnk4dHAyL1paSVpPbVpyZTdJcm5T?=
- =?utf-8?B?V3Q5K3JFTmJwMm83ZGgwT2NySTd1N2xzQSsyQVBXeXIwRWJYRy92VHFwYitM?=
- =?utf-8?B?Y25BSHpkZTMwL1VPMmVUVElxVGc4QjhpNUdDNE9xT2k3WjQvODJPbk9hUlhU?=
- =?utf-8?B?ODBaSVN4elRRc3kzQVVDNjExOFlUK29rb3ZtdGRWL0Z2TlZJSG1aQmpZSFM4?=
- =?utf-8?B?WFZoWXN6VFdHQW10T3JKTlhCL0FWWVY1K1l2SFl4Z25yNGxIbGFqS055NDFJ?=
- =?utf-8?B?ZEJiUlFtRU1JZVdFM0lCUE50emZadUl2SWZmNzlsSzRHODgxOFpiUGNPZ1I3?=
- =?utf-8?B?c0svb0U1QzR2OEQxUG95SCt6VFh5eWtJeEJWeDZUeC8vQTh3MHNMMlBXWHFa?=
- =?utf-8?B?eGtoRWJPUnRJblh6dFJabFc2dU9LSzFPbG9Oc0ZVSzQ1RHBEU2xCZGEwUito?=
- =?utf-8?B?K2pIOEFuUU4vdys3SmZqb3pkUlVPUHdYQUFVam9hcmhlVEg0eHBwZz09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6870eb53-ec33-4eed-2b20-08de9001b017
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 15:16:45.7464
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C6gCAMDRsyHTn+zlxNsQwTqT9V2JFau9QJ1BP0H1G/Bzw/HwcGxMt90lHY9w2Y1kCvM2NLKw0ZqqqaoILDIkTQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP265MB3172
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] ublk: use unchecked copy helpers for bio page data
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>
+References: <20260401012401.3653194-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260401012401.3653194-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed Apr 1, 2026 at 12:45 PM BST, Miguel Ojeda wrote:
-> Currently the example in the documentation shows a version-based name
-> for the Kconfig example:
->=20
->     RUSTC_VERSION_MIN_107900
->=20
-> The reason behind it was to possibly avoid repetition in case several
-> features used the same minimum.
->=20
-> However, we ended up preferring to give them a descriptive name for each
-> feature added even if that could lead to some repetition. In practice,
-> the repetition has not happened so far, and even if it does at some point=
-,
-> it is not a big deal.
->=20
-> Thus replace the example in the documentation with one of our current
-> examples (after removing previous ones from the bump), to show how they
-> actually look like, and in case someone `grep`s for it.
->=20
-> In addition, it has the advantage that it shows the `RUSTC_HAS_*`
-> pattern we follow in `init/Kconfig`, similar to the C side.
->=20
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
-
-Reviewed-by: Gary Guo <gary@garyguo.net>
-
+On 3/31/26 7:24 PM, Ming Lei wrote:
+> Bio pages may originate from slab caches that lack a usercopy region
+> (e.g. jbd2 frozen metadata buffers allocated via jbd2_alloc()).
+> When CONFIG_HARDENED_USERCOPY is enabled, copy_to_iter() calls
+> check_copy_size() which rejects these slab pages, triggering a
+> kernel BUG in usercopy_abort().
+> 
+> This is a false positive: the data is ordinary block I/O content ?
+> the same data the loop/nbd driver writes to its backing file via
+> vfs_iter_write().  The bvec length is always trusted, so the size
+> check in check_copy_size() is not needed either.
+> 
+> Switch to _copy_to_iter()/_copy_from_iter() which skip the
+> check_copy_size() wrapper while the underlying copy_to_user()
+> remains unchanged.
+> 
+> Fixes: 2299ceec364e ("ublk: use copy_{to,from}_iter() for user copy")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  Documentation/rust/general-information.rst | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> V2:
+> 	- update commit log (Caleb Sander Mateos)
+> 
+>  drivers/block/ublk_drv.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 2e475bdc54dd..3e329906ae19 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1322,10 +1322,18 @@ static bool ublk_copy_user_bvec(const struct bio_vec *bv, unsigned *offset,
+>  
+>  	len = bv->bv_len - *offset;
+>  	bv_buf = kmap_local_page(bv->bv_page) + bv->bv_offset + *offset;
+> +	/*
+> +	 * Bio pages may originate from slab caches without a usercopy region
+> +	 * (e.g. jbd2 frozen metadata buffers).  This is the same data that
+> +	 * the loop driver writes to its backing file ? no exposure risk.
+> +	 * The bvec length is always trusted, so the size check in
+> +	 * check_copy_size() is not needed either.  Use the unchecked
+> +	 * helpers to avoid false positives on slab pages.
+> +	 */
+>  	if (dir == ITER_DEST)
+> -		copied = copy_to_iter(bv_buf, len, uiter);
+> +		copied = _copy_to_iter(bv_buf, len, uiter);
+>  	else
+> -		copied = copy_from_iter(bv_buf, len, uiter);
+> +		copied = _copy_from_iter(bv_buf, len, uiter);
+>  
+>  	kunmap_local(bv_buf);
 
+Is this just a jbd2 issue? Because we can just get the slab marked
+appropriately to not trigger these warnings.
+
+-- 
+Jens Axboe
