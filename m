@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A97421EEA;
-	Wed,  1 Apr 2026 11:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0822423A62;
+	Wed,  1 Apr 2026 11:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775044341; cv=none; b=pmVJKa7MHnPU1XdskoWN54l4I9pvLfvhgN+MEZ63+7Wb7Da0F2T1/OWi6no94axl1F2sAfcCaT+hhqqBUYfwuCA8qfxIqpmqLu79kkwu6PBsXhIO5Yd+POFIwWHleVrlEyrXoLEsVFzuXUBX10m9c7wg83LsC7OpIYmQ9mW95K8=
+	t=1775044354; cv=none; b=AS3PdwR8qa52ezhTI9OehUPBHm45GH2MjcOIWgF531JOb4RNnXMAArj8vdj/ooucmbOVsixSoluAqt68kiu23d93kSmcwXj4YAUUANUP/TELa+6WJCCm9ZYvw8+6cr81FlgXORJKk3aPw47aAv8KKr7KIJvhgTNgZo4jN4FQmCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775044341; c=relaxed/simple;
-	bh=rmbcm0lGdPnutdStnqg0waumItTikO0U9rMNdtnv3yc=;
+	s=arc-20240116; t=1775044354; c=relaxed/simple;
+	bh=63eNaBb7HhBHNGZHs2ck4m5j8n+byLJscGHPx3NKsmQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Puot5NmiKlzST5EjfVGdkYikXoedd9EhHaWEt14fox1ieSP9Kd1ojhpl+3BOEz3dcfteJwSbQ2SO6RUHaaRnGI5Mqnwhc+tH8kmcKxbwmSI1gdaKoOhH0cmIsrpP9BUNdZMfNCOKQ+qIlYtWlfxytTaRpkjqDpiDVHq8/J6RUAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcBvoubs; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=EKHFY72YrY4qP3mToOVqJwJ2/ZF4AIu+QNBhJ6PGfn0IEsfUdYDTNjzXVXFEXo4gn+pAhDxRwaUSylnbhU8i21pW7EkZMF4Kxt0UR4QqLm2lcpwTOpGF4bv1/tWloeUTrK5cb8WErSBwTBkzOKxftjeRm+R6vtE0vdJecKYy13g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P4KiRkYx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TcBvoubs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45C32C2BCB2;
-	Wed,  1 Apr 2026 11:52:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4KiRkYx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D18AC116C6;
+	Wed,  1 Apr 2026 11:52:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775044341;
-	bh=rmbcm0lGdPnutdStnqg0waumItTikO0U9rMNdtnv3yc=;
+	s=k20201202; t=1775044353;
+	bh=63eNaBb7HhBHNGZHs2ck4m5j8n+byLJscGHPx3NKsmQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TcBvoubspcdQyo/6SD8RpK23KLdBlZmlyr+Q8oe4E3dFkmpEEorBsmt3GesO7Nl9q
-	 YWS4m1in4cZ+dOT++Q1J8Ig3gXZ3l/Hig5Eq0rMW9FYKtKQyhyMus1JqK0WZx6+cBF
-	 JUayEvXxkm9IOj16k6bywJiawbKZPnONK55YY01FSqb/NrgkEyVGWBIPdo/SvIYWic
-	 U4AVc/BrZqDX7suU+KqtSQ4Q52UqYwQ2LYV11NVcOdsn5R4QiS61WDhULH+KewBvAe
-	 /h+DQTiY+hPt11we7Vp7ycNYeVm2Tn/oACaSi3eP098GkbftxBkTZa4EkAWaXiFg9t
-	 Bec4c3Sfzej1A==
+	b=P4KiRkYx+9pR8FcDn58eZ58Tl+l8DaXIaKnBFFMxFh3P+IXQUnqgEGZH8vAunNvs4
+	 BLd1TybjNwHbXADCPR4z7Vj6dtmKy7ji1oU2bzwWLnPbbnFVZYCEMjSB2UQpls/Ouo
+	 pYPJfGFA7EPUSZecOxj+EVb7CtgpF1zN5Tw8IewblUNyc/Ie7LYX5Lt+C5FMZplSJ6
+	 xbIWlfeyv6YRSlqqa7C9IoWKbjP/NbQH9T4QOWe/CgvypooqpdHo0TWO2wHyf2zcvI
+	 RVJtUt/y5WBbMgeocVhCwVhlVD3aiintQfQGjzicRa8XTpUjFXmucwr/KWim4JVpaV
+	 E6XIy24XYnOiA==
 From: Miguel Ojeda <ojeda@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -76,9 +76,9 @@ Cc: Boqun Feng <boqun@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	linux-doc@vger.kernel.org
-Subject: [PATCH 32/33] rust: kbuild: support global per-version flags
-Date: Wed,  1 Apr 2026 13:45:39 +0200
-Message-ID: <20260401114540.30108-33-ojeda@kernel.org>
+Subject: [PATCH 33/33] rust: kbuild: allow `clippy::precedence` for Rust < 1.86.0
+Date: Wed,  1 Apr 2026 13:45:40 +0200
+Message-ID: <20260401114540.30108-34-ojeda@kernel.org>
 In-Reply-To: <20260401114540.30108-1-ojeda@kernel.org>
 References: <20260401114540.30108-1-ojeda@kernel.org>
 Precedence: bulk
@@ -89,50 +89,84 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sometimes it is useful to gate global Rust flags per compiler version.
-For instance, we may want to disable a lint that has false positives in
-a single version [1].
+The Clippy `precedence` lint was extended in Rust 1.85.0 to include
+bitmasking and shift operations [1]. However, because it generated
+many hits, in Rust 1.86.0 it was split into a new `precedence_bits`
+lint which is not enabled by default [2].
 
-We already had helpers like `rustc-min-version` for that, which we use
-elsewhere, but we cannot currently use them for `rust_common_flags`,
-which contains the global flags for all Rust code (kernel and host),
-because `rustc-min-version` depends on `CONFIG_RUSTC_VERSION`, which
-does not exist when `rust_common_flags` is defined.
+In other words, only Rust 1.85 has a different behavior. For instance,
+it reports:
 
-Thus, to support that, introduce `rust_common_flags_per_version`,
-defined after the `include/config/auto.conf` inclusion (where
-`CONFIG_RUSTC_VERSION` becomes available), and append it to
-`rust_common_flags`, `KBUILD_HOSTRUSTFLAGS` and `KBUILD_RUSTFLAGS`.
+    warning: operator precedence can trip the unwary
+      --> drivers/gpu/nova-core/fb/hal/ga100.rs:16:5
+       |
+    16 | /     u64::from(regs::NV_PFB_NISO_FLUSH_SYSMEM_ADDR::read(bar).adr_39_08()) << FLUSH_SYSMEM_ADDR_SHIFT
+    17 | |         | u64::from(regs::NV_PFB_NISO_FLUSH_SYSMEM_ADDR_HI::read(bar).adr_63_40())
+    18 | |             << FLUSH_SYSMEM_ADDR_SHIFT_HI
+       | |_________________________________________^
+       |
+       = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#precedence
+       = note: `-W clippy::precedence` implied by `-W clippy::all`
+       = help: to override `-W clippy::all` add `#[allow(clippy::precedence)]`
+    help: consider parenthesizing your expression
+       |
+    16 ~     (u64::from(regs::NV_PFB_NISO_FLUSH_SYSMEM_ADDR::read(bar).adr_39_08()) << FLUSH_SYSMEM_ADDR_SHIFT) | (u64::from(regs::NV_PFB_NISO_FLUSH_SYSMEM_ADDR_HI::read(bar).adr_63_40())
+    17 +             << FLUSH_SYSMEM_ADDR_SHIFT_HI)
+       |
 
-An alternative is moving all those three down, but that would mean
-separating them from the other `KBUILD_*` variables.
+    warning: operator precedence can trip the unwary
+       --> drivers/gpu/nova-core/vbios.rs:511:17
+        |
+    511 | /                 u32::from(data[29]) << 24
+    512 | |                     | u32::from(data[28]) << 16
+    513 | |                     | u32::from(data[27]) << 8
+        | |______________________________________________^
+        |
+        = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#precedence
+    help: consider parenthesizing your expression
+        |
+    511 ~                 u32::from(data[29]) << 24
+    512 +                     | u32::from(data[28]) << 16 | (u32::from(data[27]) << 8)
+        |
 
-Link: https://lore.kernel.org/rust-for-linux/CANiq72mWdFU11GcCZRchzhy0Gi1QZShvZtyRkHV2O+WA2uTdVQ@mail.gmail.com/ [1]
-Link: https://patch.msgid.link/20260307170929.153892-1-ojeda@kernel.org
+    warning: operator precedence can trip the unwary
+       --> drivers/gpu/nova-core/vbios.rs:511:17
+        |
+    511 | /                 u32::from(data[29]) << 24
+    512 | |                     | u32::from(data[28]) << 16
+        | |_______________________________________________^ help: consider parenthesizing your expression: `(u32::from(data[29]) << 24) | (u32::from(data[28]) << 16)`
+        |
+        = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#precedence
+
+While so far we try our best to keep all versions Clippy-clean, the
+minimum (which is now Rust 1.85.0 after the bump) and the latest stable
+are the most important ones; and this may be considered "false positives"
+with respect to the behavior in other versions.
+
+Thus allow this lint for this version using the per-version flags
+mechanism introduced in the previous commit.
+
+Link: https://github.com/rust-lang/rust-clippy/issues/14097 [1]
+Link: https://github.com/rust-lang/rust-clippy/pull/14115 [2]
 Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- Makefile | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 1a219bf1c771..20c8179d96ee 100644
+index 20c8179d96ee..a0d6ed050c8a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -834,6 +834,14 @@ endif # CONFIG_TRACEPOINTS
+@@ -836,7 +836,8 @@ export WARN_ON_UNUSED_TRACEPOINTS
  
- export WARN_ON_UNUSED_TRACEPOINTS
+ # Per-version Rust flags. These are like `rust_common_flags`, but may
+ # depend on the Rust compiler version (e.g. using `rustc-min-version`).
+-rust_common_flags_per_version :=
++rust_common_flags_per_version := \
++    $(if $(call rustc-min-version,108600),,-Aclippy::precedence)
  
-+# Per-version Rust flags. These are like `rust_common_flags`, but may
-+# depend on the Rust compiler version (e.g. using `rustc-min-version`).
-+rust_common_flags_per_version :=
-+
-+rust_common_flags += $(rust_common_flags_per_version)
-+KBUILD_HOSTRUSTFLAGS += $(rust_common_flags_per_version)
-+KBUILD_RUSTFLAGS += $(rust_common_flags_per_version)
-+
- include $(srctree)/arch/$(SRCARCH)/Makefile
- 
- ifdef need-config
+ rust_common_flags += $(rust_common_flags_per_version)
+ KBUILD_HOSTRUSTFLAGS += $(rust_common_flags_per_version)
 -- 
 2.53.0
 
