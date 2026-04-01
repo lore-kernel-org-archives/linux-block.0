@@ -1,39 +1,39 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312C037267D
-	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 07:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9FD37266D
+	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 07:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775027310; cv=none; b=M18zLKWsbTVHrpq9ufbJEYQ7ee+FyYFaDfbGkziQHNsu4shekF4QfU27Sxzn0EQQJ3lH8I19LfJxNQXi71a6UbrMFhHV5GfzCZQKxlQKhvVqZcOJKoLFWwOu+7PFq4Ji7KN9SsnKe2jOarxMEu3NBRP5lWOXgRtL8lAeZDlikYM=
+	t=1775027310; cv=none; b=Msmo315o7m/vKA7/lZzx8QUoY0K99K5519lPEdP2c0WfK51JNxCo6QqNUkHZDtTaW+CG5QUUeCxhqWzxehfAV0CF25IWPuJmCn2YiBzpuNmyoBUrKOPnfbs/bE98324By2nwHf1MAAcb2h73E0vDuSOQGEbzSEEsew+nTtiSku4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775027310; c=relaxed/simple;
-	bh=QEN8lQbdI/uItw0gbHklfLLuY1eeLRHuUX0e6enQplw=;
+	bh=6od36+OMQnUO4/0BygQNuBsxUKQyYXsSJeC0Bx0haP0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J3g8i/0C4O2iXWUcXa1AlnAVW+PiCzzMISvbHlSFfIMJkkxqB1eqFMm9Dm/DkZNABS0cDfWPpaoqKCfl3By7dZS/HJfE2dMyGH8h33nEQHCfJ9zDWUgun4JRhjRwfDGIURxcNTSOnWXiJ0UA0yp3SjOunGZjIbKrph2sOSFCkBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oMQlf2X3; arc=none smtp.client-ip=95.215.58.188
+	 MIME-Version; b=darxT1TkZ5QjNubZ5+w/1e9t3z4nVjrVrllNrZNNs8P88GALVrQnViSeJYOw0fsGshnkldgXDQD7khmrg+77fo7PaM/G9ANsUPd9uLMorXyiKhQ3kp2/8Zzd118Cx/mBb0YIFrilWj/2lqfHccoZNECdYIPNM5wth2sFvtxIrEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ixSurqp7; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oMQlf2X3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ixSurqp7"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775027305;
+	t=1775027306;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nr1n9v/ZqKwCH/0pJM4LXsn1wB/oYe7BcDbH2Y3zEeQ=;
-	b=oMQlf2X3aqLjn2a2SGDA7xOoni3IOHswQThhysVqOr1rE6gtshl117JIxWEtL+kT+VYICW
-	cVTBRoynpJPlADGjj8iaBERqN9bPnzqIT8RkAmir2imcXpt8lqFmJpXxAYrNnI9eJIHNmZ
-	N5nxD+5BfSf4v/htWug1Pi1wmJNqXko=
+	bh=MSPvAoKEDfYOw3yY3dYFftQ3BdwnQ+Au8YNJldJOy30=;
+	b=ixSurqp7eOGk5TlvIdcNbotH+DnB5GHlc6lKATsf/Foz39USAVhWqq1kbW2UnJ17xkznHs
+	IQ464kGlBdRAv35LKKhfWctohCNPqRzmEO+i2jfCSVX0D9VBI+Q836W+pi8RDhzMnnCGFR
+	nS9bsxiSxwxKF+OOdRRHZWuHjvA8PZ0=
 From: Jackie Liu <liu.yun@linux.dev>
 To: axboe@kernel.dk,
 	yukuai@fnnas.com
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 08/10] block: use kstrtol() instead of sscanf() in disk_events_poll_msecs_store()
-Date: Wed,  1 Apr 2026 15:07:14 +0800
-Message-ID: <20260401070716.991-9-liu.yun@linux.dev>
+Subject: [PATCH 09/10] block: replace simple_strtoul() with kstrtoint() in part_timeout_store()
+Date: Wed,  1 Apr 2026 15:07:15 +0800
+Message-ID: <20260401070716.991-10-liu.yun@linux.dev>
 In-Reply-To: <20260401070716.991-1-liu.yun@linux.dev>
 References: <20260401070716.991-1-liu.yun@linux.dev>
 Precedence: bulk
@@ -47,28 +47,45 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Jackie Liu <liuyun01@kylinos.cn>
 
-kstrtol() is the preferred way to parse a single integer from sysfs
-input. It also makes the !count check unnecessary since kstrtol()
-returns -EINVAL on empty or malformed strings.
+simple_strtoul() is deprecated. Switch to kstrtoint() which also
+removes the need for the const-discarding cast and the if (count)
+wrapper.
 
 Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
 ---
- block/disk-events.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-timeout.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/block/disk-events.c b/block/disk-events.c
-index b1680d6a1027..b6233b0d5575 100644
---- a/block/disk-events.c
-+++ b/block/disk-events.c
-@@ -372,7 +372,7 @@ static ssize_t disk_events_poll_msecs_store(struct device *dev,
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index eab6422fad4b..ea3c5451d6cf 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -49,18 +49,16 @@ ssize_t part_timeout_store(struct device *dev, struct device_attribute *attr,
+ 			   const char *buf, size_t count)
+ {
  	struct gendisk *disk = dev_to_disk(dev);
- 	long intv;
++	struct request_queue *q = disk->queue;
+ 	int val;
  
--	if (!count || !sscanf(buf, "%ld", &intv))
-+	if (kstrtol(buf, 10, &intv))
- 		return -EINVAL;
+-	if (count) {
+-		struct request_queue *q = disk->queue;
+-		char *p = (char *) buf;
++	if (kstrtoint(buf, 10, &val))
++		return -EINVAL;
  
- 	if (intv < 0 && intv != -1)
+-		val = simple_strtoul(p, &p, 10);
+-		if (val)
+-			blk_queue_flag_set(QUEUE_FLAG_FAIL_IO, q);
+-		else
+-			blk_queue_flag_clear(QUEUE_FLAG_FAIL_IO, q);
+-	}
++	if (val)
++		blk_queue_flag_set(QUEUE_FLAG_FAIL_IO, q);
++	else
++		blk_queue_flag_clear(QUEUE_FLAG_FAIL_IO, q);
+ 
+ 	return count;
+ }
 -- 
 2.51.1
 
