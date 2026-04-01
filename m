@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A193E9298;
-	Wed,  1 Apr 2026 22:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3D73F075C;
+	Wed,  1 Apr 2026 22:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775084378; cv=none; b=J3i6WzlxhrsER0CNnJ/q6rJ2zzuvzoxMEfsWRKrCZ5OOukx5xweARsDwrOqesy1nZLEmulI94hNWSjx17Umvbmb+qNjH1qNmVICG+MDHQOOA2oIJ5dSxP/kNmPuOLKwVzg0KjyNtT39/ahB+yMcFTJiNxm0l9Gx1XGc87iZnTyk=
+	t=1775084383; cv=none; b=kVV57TSX4XOfKHzUipXaFzKGWdgcSKeBkckYc7wxyarY9+khBfrPJTdKfxpOBP9CE4/cFgBpaKpQQyFnRrpwsXN5mqy4+KIjTDNtph6MnCacOvmZDWA4S9pfmS1o933rsf6ao76I9/xHkdsY4p9GMJO+wsKagh9qZTVl/dZDyhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775084378; c=relaxed/simple;
-	bh=kNWPNZPv5AJZXsbuPes0ElScqifYmuQXsRJThydCrms=;
+	s=arc-20240116; t=1775084383; c=relaxed/simple;
+	bh=0MM8/3CTNZDnO2QJpUmaXqxHB1Rvcg/ziIyw641Wqc0=;
 	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=OIHgVE4iNu0XNQpGkvD7lEWdd5w4cihG/9FP3NZR41oCw9MDQlz5BN+BiccAk9dD/7AyUD/4+rTKQs5GJQLxByflJvUlxRH6cEp9oUMrt+JUclIq4CIVE/0YCXEPopUQdVY32Zjcyy/2HGFcyGay8jTywuoxt4GsAW5oytBfgn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpxQlYzd; arc=none smtp.client-ip=10.30.226.201
+	 References:Date:Message-Id; b=iwOcx8uwMIfoJu1fyZSB/GgHIGNe0TqQpqS48gBQN3AiTZaRA5okXskLQa+0fMFwhFzQasVqEUkzYtt93/OaYlcxlLy0aBYLshF/HEeqANvT2haIEVL0J0Aj8csZ/Frz9IQaI5nfeCgJsGIASTf0mBB0kmbTQdd8Fe/rm2wSFkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGRYhbV4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpxQlYzd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B8A9C116C6;
-	Wed,  1 Apr 2026 22:59:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGRYhbV4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EA88C4CEF7;
+	Wed,  1 Apr 2026 22:59:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775084378;
-	bh=kNWPNZPv5AJZXsbuPes0ElScqifYmuQXsRJThydCrms=;
+	s=k20201202; t=1775084383;
+	bh=0MM8/3CTNZDnO2QJpUmaXqxHB1Rvcg/ziIyw641Wqc0=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=SpxQlYzd4uQJCDoo3G1uLsZbGWv+MIW76Y01oAor/ISn8VhAzL8ca8LVPPgm5wJ7k
-	 1IYnRaDxl6TCtaogMicQwqVu7t6a3KtRtWMRwk3Z3UF1PihJzRQvVHikJNsU6/8BLF
-	 N2f3V437pqOD0OyYPS1JBD6eSIuqHQyNGr0yfJ/NRWdtzqXHnXADkmhAzYJGTOXadZ
-	 oFSgKCzeUx0R3N30L0LXacIoJjkcRCSUKJLk/krBOBS4njzvdxSOEArxX/zs9G8Z4S
-	 PcS7uUCx73rsiwR7sv0/kZgJQF/7hZETY3nE7bJFU9unkvdaW6MtX/vDRJ0IcCFGEn
-	 mdj7JT6ErlYwg==
+	b=EGRYhbV4HQSbzNtKzfTww5lA+Uerrsg7IL+49jk5/fWwiQGmws0MFMhs8KmPYz0bF
+	 3hpRw9q7h5+2vsLnlgC8jieG/3JmIARlD8LqGGxCtDEsOdOBbWTv/En/Z/2cYLAJ/g
+	 KFjsHZnFL9/lOaqiBVjiOUmt3S211fe3JvmErJhlpKeBwep4sg/58vKaN+T1X2ZJIj
+	 IXfJxWhpfJRuYHAo5iZpPOMvh3OuelV4yFlkJ3iT397bKazKJdSXENYbbXIHAdGnHU
+	 ada09pio/4900X3hmHEj0e1yW+yEOAoruxQR92rFOFjCm6P7F+vzIHw2KdG6BFCIQS
+	 SUk7ZWvKLfHKg==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,7 +34,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 04/33] rust: remove `RUSTC_HAS_SLICE_AS_FLATTENED` and
+Subject: Re: [PATCH 05/33] rust: remove `RUSTC_HAS_COERCE_POINTEE` and
  simplify code
 From: Tamir Duberstein <tamird@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>
@@ -67,30 +67,30 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-In-Reply-To: <20260401114540.30108-5-ojeda@kernel.org>
+In-Reply-To: <20260401114540.30108-6-ojeda@kernel.org>
 References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-5-ojeda@kernel.org>
+ <20260401114540.30108-6-ojeda@kernel.org>
 Date: Wed, 01 Apr 2026 18:59:04 -0400
-Message-Id: <177508434435.73816.12811715375635165629.b4-review@b4>
+Message-Id: <177508434436.73816.122481804122122631.b4-review@b4>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=532; i=tamird@kernel.org;
- h=from:subject:message-id; bh=kNWPNZPv5AJZXsbuPes0ElScqifYmuQXsRJThydCrms=;
- b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnFzttDbkgadD08O8m0yXvWGMrZpq9En74+dEvzrtLE
- 43n3bq0v2MiC4MYF4OlmCJLouihvempt/fIZr47DjOHlQlkiLRIAwMQsDDw5SbmlRrpGOmZahvq
- GRrpGOgYM3BxCsBUW7UyMjxtd/0svceDyUvuQs3pRdufG7m33rbc+6V4s6KZhq1voDkjw09uhYk
- nbhzsP8oqPW9PSdojxgrtssiDOicvCrqdmD0xjAcA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=534; i=tamird@kernel.org;
+ h=from:subject:message-id; bh=0MM8/3CTNZDnO2QJpUmaXqxHB1Rvcg/ziIyw641Wqc0=;
+ b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnFzsVnH0zxWC9R/ANvpJUecsms4XCUiWnE8NnXbaJM
+ e9U1snrmMjCIMbFYCmmyJIoemhveurtPbKZ747DzGFlAhkiLdLAAAQsDHy5iXmlRjpGeqbahnqG
+ RjoGOsYMXJwCMNX+LAx/uJbsjFg3f+LhiIYgi5c3D9v0XNCTe7U7u0BV8Zd9a8apLwz/K5gL3IJ
+ uV04KNozfPuWL62X+Tw3F2+5yhDU41dklfM9lAAA=
 X-Developer-Key: i=tamird@kernel.org; a=openpgp;
  fpr=5A6714204D41EC844C50273C19D6FF6092365380
 
-On Wed, 01 Apr 2026 13:45:11 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
-> With the Rust version bump in place, the `RUSTC_HAS_SLICE_AS_FLATTENED`
+On Wed, 01 Apr 2026 13:45:12 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
+> With the Rust version bump in place, the `RUSTC_HAS_COERCE_POINTEE`
 > Kconfig (automatic) option is always true.
 > 
 > Thus remove the option and simplify the code.
 > 
-> In particular, this includes removing the `slice` module which contained
-> the temporary slice helpers, i.e. the `AsFlattened` extension trait and
-> its `impl`s.
+> In particular, this includes removing our use of the predecessor unstable
+> features we used with Rust < 1.84.0 (`coerce_unsized`, `dispatch_from_dyn`
+> and `unsize`).
 > 
 > [...]
 
