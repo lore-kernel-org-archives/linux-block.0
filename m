@@ -1,136 +1,216 @@
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021129.outbound.protection.outlook.com [52.101.100.129])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567D735836C
-	for <linux-block@vger.kernel.org>; Wed,  1 Apr 2026 15:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775056769; cv=none; b=VCoTuwJ1t+r8jnaRTcecoXR+Bxj5BuwNcClb7M7DVZ5MnfRO94mzmPlv+ECesRP9JumDIU0oc7TKjHLkMSf6L10iWlTQrLnnZa1y5Bl7LFhsRU/1RyUG5fg9WGVKnU2USS2kgqLZNoHD+hKVCHt1/wJ6C662OG8rVtsPHGSLeiQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775056769; c=relaxed/simple;
-	bh=cq3uQKFeKjafBze1o/fWC/jcny3yRlVf//B9QgBCPNs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OMNRXT/rBrLZyRJhBHr/kuaJUAGNtBJmMU8eTjse+j7OR1Fq5FH5RM4dixzaz7hZul/D780qsrAw7aw1J4isqCpyuZpZ7+4OCRorEcclRVQvmZ9+YS/lMsdxfcC79HBiEWuhZiJDUHuiusSWeR4zjz//+gNjbzPTW/D1BIgdVIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=D0pcgmaM; arc=none smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF8A2DC32C;
+	Wed,  1 Apr 2026 15:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.129
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775056807; cv=fail; b=ov6IWmxEXgI9S7lYMdV3HE47wP1pcWKLDENbGI/5V7ye5DxoaGAy18Vxe68G3jvJT31T9zyGTPVa0U3/+7wD4koLgv8Ffhe7ooy6TDGYj3ZgWLK30zjxPZjtpYDvMvCCJp5r0e6uHVPZgyM5pi1y3RQYqErEVdegFooCi9P41j4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775056807; c=relaxed/simple;
+	bh=P2ToGj5BHB/uYw5zN2h31KuF4CjlANhihbY+Iw3sZso=;
+	h=Content-Type:Date:Message-Id:Subject:From:To:Cc:References:
+	 In-Reply-To:MIME-Version; b=YnfLy2h10lymeUGaAOm3peYtdkriRrVQfDVfUl6oCY3aI65hHSaTq4GLhOpqRCsz3CgI2Oa+hunFu9uG8ZQQEw2qaNmRae0zPsIkR3GkCRnzZ6wyo08KWSaVxt8X1BjIYgMGlLpD9sYS3iakWlHriy3ul6O3enN2NexgV05B9T8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=lk4/785a; arc=fail smtp.client-ip=52.101.100.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D0pcgmaM"
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-66f747175d8so4299960eaf.0
-        for <linux-block@vger.kernel.org>; Wed, 01 Apr 2026 08:19:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1775056766; x=1775661566; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vowzyU0SrHEAHYUrDuyIU9MIx98uSZTg1/2EM+Z8IKY=;
-        b=D0pcgmaMUmJ6+v7ae5y1XndVSHJTPhNXABeuqLW7w6kQf6mDqtwouJ/Ww05MqCBggj
-         gTWT/TIRZywpU8cg4033xULn7VebSUqR9/1O/lcDdQrcwvDtNztpaD2H9kvELaWnJGke
-         LZN09FL6ARwD3GQtF3RrHzizU94X3Id5obzZyelxbBPCn+nbKzxhS1JoWdPMSRjsbyNB
-         vaoPgk/YlSikuikTbkFroW5XsFslDclN6ibnf5aXd0xICNaXGNxhOtOi7fejDkIq526O
-         M9/a7kcadFZsA7xe0ywuhSDVTWTt/I99j3n9mJgyd0pg3/+Tjop7IgPIyqkyOVLcFvwr
-         YlnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775056766; x=1775661566;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vowzyU0SrHEAHYUrDuyIU9MIx98uSZTg1/2EM+Z8IKY=;
-        b=IxXMAm5ClJhq9EIMCJnmQI6FLII0IkiTEQtDwpp2j+JRdWRjqrS6Bt+rkKHHe7PxNS
-         5e1KwMErceggue5FPN1tovx/CkpXcAC4KueW5j9LAQ+SAi7pClLK5RJ5Lds96luT5bQ7
-         /CFaF2iioTbSOppkBpgUcEMTv8eim0mMLYpimbSKM8Fgxjht5aEMBClDUPp+UVNSCav1
-         m3qS4BrJuXCBUJn504LCwxZyiz/XeuBff1PQroXKlkK0QyPT98GcDLfUGD+oGCBVt4b9
-         6c6vnEliuw37d3bwMNgPK/3vzGzMerKicpWi3KHM+upm8i2WRJSptqG3YSleYi0TJLEA
-         vdLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKekEEvpDIJ8djkTcxKiyt2DYAEzclVkIs84JdZ6popVCz5yPrYlJ64uXaOCOmQa8MViY/1st19Ipbsg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBqhUmA1rEa+EKIBcY7TUfNpd67wJXNqqc5K/0JXhyisiNj6f+
-	41S5QyBgFznB5koh749R+W9WAeicTpAbVuV23CZxZH2uOQFO8j4ttyiFWRWSdrRHpoc=
-X-Gm-Gg: ATEYQzyXMyKQeI9PBcnFNuMRAOzoN3XtRDucu4I53QtTHx+IJYJNjxFfZD8GJrG3TxJ
-	wtjH962t7tSGJ1vaJu3nelXqzWHpE8ZzS0sZLHbDg0LAP3po+3J+wJ0KGJasVnkCrHS2GDD1F7m
-	zD3pO4hxIEuIw1N+UDJQPvpqyfcBPmSLCO5pPNjnrJ5D/Q1wI1ENC2q9h1pgurXeJrMvIa4LCWh
-	AMhGK2dqy6MXwkQAKEcCl/7vwKPe51uhVxKBmJxamJHsqTUmeZBquh4h766v8/wOoUmr3d6A1bj
-	UPlq+ZryQL5jGhB+rixI3SGvX7eY0R8pPJK4a9NOOToNNFCFI1ciafZA5zMs33/OonK9tBv1BMb
-	RsJyBz8iD40r1quTCvwphLymA5eFuV6BaFfS41CKqINmA76otgeEEiKbzk2/xxkH0IsH0A3y3Se
-	nUpaV/vXGLQrNzRY1gmhAsa4FRukm5bH+7h0zXtyEcuw8YiBW4xMSOxKyZZzItuYpkBMLf2nxct
-	XTQZJGs
-X-Received: by 2002:a05:6820:1519:b0:67b:ab68:b5e2 with SMTP id 006d021491bc7-67fabc059afmr2150025eaf.18.1775056766301;
-        Wed, 01 Apr 2026 08:19:26 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-68037976cafsm530119eaf.9.2026.04.01.08.19.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Apr 2026 08:19:25 -0700 (PDT)
-Message-ID: <f10b5a3d-33f9-486c-b8e9-6d9286448f69@kernel.dk>
-Date: Wed, 1 Apr 2026 09:19:23 -0600
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="lk4/785a"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GuBnE6fSzF73JePcmFRnP7TU8/oyNueuxJKX8EICNi9XvSutU4pWlcEgWNhujzfzho/IQLsBZausdW2BGlE1itOQ4/d+MNB17DAI6iym3s/sOk7dmMRtJTRdV23H7esU9E3VMbg/5YciVJ29MY7VIGVnjZz4At3b0aAfptJLx7g4W1GTrYQh+D3+i349St0j+UBqvP3dAkHB8yFVWXsjr9t0x6DcRZ39VyABSHkr2MikKYZ11/ryrwq8eH64B3C689C/BuDmeXolpc4Go7HKncSR7IL0K4P/JMQWRpZWocn8qZYrD+gmn1EqlK0aEQEK3kgm1584bz7Et9qNMF4Fzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kU9pNSkEyFCEfMmb9x+tSzogN4+aIGbrPvpIkkd6HiQ=;
+ b=kOYRlRbIrQ5iYJrrsVgrWMufpaNnjJf/Qab62mSIo67kHIHgsSy7x2W7ekt7bueX1a4bNJina4Cln6VF5w3JZxQB3jlFviUevMdeuu7UfeKcFE43Iyj9l40wFe6Ct46NRLfWj79MPYrFCEXK7ROtdi23cAgWoKAApuzXMCzRiu7hR3vCIggfgi4SF1UPs9dSvVuc9cpWN9wPpQBDp8xhpzYZpe8FKbKE1N7F0An7X5pJjNbg9dCH4At5nyt7FtJ2hCz94aUd1NwCqqiYtrTdM/w7OTtIteXmZ2RhR7bDuRkPzOFh4YqSNsRpDHNfjoxvKu9m4pt7s6YG1URZcTFyDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kU9pNSkEyFCEfMmb9x+tSzogN4+aIGbrPvpIkkd6HiQ=;
+ b=lk4/785aByLlNM5MVkiQL2HAXBoFoO6Sr021VLjxRQ3UpOrxZLlAHDMMP2PVbURvTqkquIfMtOzIHWo1s2vTx1b79LhNXV/QTpJEc1CyG85y++BqfnuB6cqex4NxDJnB6FXBFm1vDMc1k9l3YIaqECPYvV4B7uGeCudEb8EaESA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by LO4P265MB6603.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:2f7::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Wed, 1 Apr
+ 2026 15:20:01 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.20.9769.014; Wed, 1 Apr 2026
+ 15:20:01 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 01 Apr 2026 16:20:00 +0100
+Message-Id: <DHHX4CIURW6F.3MHAW3E4AJY1I@garyguo.net>
+Subject: Re: [PATCH 31/33] rust: declare cfi_encoding for lru_status
+From: "Gary Guo" <gary@garyguo.net>
+To: "Miguel Ojeda" <ojeda@kernel.org>, "Nathan Chancellor"
+ <nathan@kernel.org>, "Nicolas Schier" <nsc@kernel.org>, "Danilo Krummrich"
+ <dakr@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Catalin
+ Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>, "Paul
+ Walmsley" <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
+ Ou" <aou@eecs.berkeley.edu>, "Alexandre Courbot" <acourbot@nvidia.com>,
+ "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
+ "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
+ <david@davidgow.net>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ =?utf-8?q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, "Todd Kjos"
+ <tkjos@android.com>, "Christian Brauner" <christian@brauner.io>, "Carlos
+ Llamas" <cmllamas@google.com>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Jonathan Corbet" <corbet@lwn.net>
+Cc: "Boqun Feng" <boqun@kernel.org>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <lossin@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
+ <rust-for-linux@vger.kernel.org>, <linux-kbuild@vger.kernel.org>, "Lorenzo
+ Stoakes" <lorenzo.stoakes@oracle.com>, "Vlastimil Babka"
+ <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ "Uladzislau Rezki" <urezki@gmail.com>, <linux-block@vger.kernel.org>,
+ "moderated for non-subscribers" <linux-arm-kernel@lists.infradead.org>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, <linux-riscv@lists.infradead.org>,
+ <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>, "Rae
+ Moar" <raemoar63@gmail.com>, <linux-kselftest@vger.kernel.org>,
+ <kunit-dev@googlegroups.com>, "Nick Desaulniers"
+ <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
+ "Justin Stitt" <justinstitt@google.com>, <llvm@lists.linux.dev>,
+ <linux-kernel@vger.kernel.org>, "Shuah Khan" <skhan@linuxfoundation.org>,
+ <linux-doc@vger.kernel.org>
+X-Mailer: aerc 0.21.0
+References: <20260401114540.30108-1-ojeda@kernel.org>
+ <20260401114540.30108-32-ojeda@kernel.org>
+In-Reply-To: <20260401114540.30108-32-ojeda@kernel.org>
+X-ClientProxiedBy: LO4P123CA0527.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c5::11) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] ublk: use unchecked copy helpers for bio page data
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>
-References: <20260401012401.3653194-1-ming.lei@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260401012401.3653194-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO4P265MB6603:EE_
+X-MS-Office365-Filtering-Correlation-Id: 08688cdc-8241-4a6f-eb53-08de90022479
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|10070799003|366016|921020|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	+64nV6FZLEKmVoc3rTtuM1gFvUJHoL8C+BwCXV3ddq/apgnynC0e8TT/mxtxM6JdjWPcweQ3vF1J9bUfOiNfgrryX9O5Yj6KdkdcafjH2Qvvf7Z8iERBJzadsJ9cxS80Z0ejfRFIeMFc3zu6NIzjxQ/l4bg71voDAa2yoMhDkEqDB5ItesQQScBFQi0EH2UD4jm+uwqTmcab5FpMmXZs5WjkrJtVQmZ/pyB579bJcknxCnF2iqrVj5b22aSLlFmyCOeom+r84skulFuO9tEzPhhq+ueDKXxacYYr/E1LFDoQkhWgOuWkPjiKF2jGHnTrEZQLLA1s2vL2cYo5LVsaxdzR0SeCNZl702DbeM3WaxdgCmE99FHh9AL0OXWkYbjCYOb2Ada5++lxRog7AQ32IMJCdyoNpD8TSwXhlrhyYMrUPQ/hLfQkTPjn8oJwPTmXSmXEizR5rVcUFTzmcOhbw2PvRvHXHxo2HKLXMMZn3QwCCKVvKx1Ap1jg8BSuBtiXiOxeUlN5h2LFDGMvEC7m0qiOE4UvaA+u04sD8hV7XCiSSIxk3EUvk2arSQhV2oRVvt3P+a/2QE5anIvjQAz2QpBoKwaiusq9ZSQAIm4AFaWYxaQ9/OEE2t/zVMe/RzkHOqRNskEuGJGeiwCQp9vTJqIOMr7PuPO34a8s4lAK80vJYLl03QsnOeZcUiCfRPJOPgeIcv2vMHzSKBGXpJNmKLlgfafF9xoHER2OrcIdQFc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(10070799003)(366016)(921020)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VUJyeTNFOVlDYzdxTTl3c2xRaVkvbWVPWGd1UGhHVGQ3Vm84MndxbGF6a3J2?=
+ =?utf-8?B?bGlncHVWdWN6NFd3K2wvQkJ1ajk4SlErNnJzeUh3SGlFV3p3NEN6UWNPMHAr?=
+ =?utf-8?B?TlpZMzFqWU9ReW9yblM2VWVyckhpSmdKM1VtV05kbVBYL0JHVnViUzhuUUk4?=
+ =?utf-8?B?M1pnR1ViYTRHTmh4ZVVqRjZUM29XbEYxclpmRTJsejB5WVNweVhaSlF6U0Jl?=
+ =?utf-8?B?VjlXTVZDRDJPRGFpbGNNMTkzbjhCMmpCaFdKSXU2RWFFZm1OR1piL3c4MnFH?=
+ =?utf-8?B?ZC8vVUI2SmlEUTdBSTZvWWQ2SEt1WnVnMjdUVlZCS2kvUS8ycVpDQnJuVTl4?=
+ =?utf-8?B?MDF5d3pXT1lhSTNXanFGbUg5UWZtTHBrOUc1VmdwREpPOW1MV052R1piaHZB?=
+ =?utf-8?B?NmhvTGdzKzRpdXhFTitpa25laGd2ajJWR2tnNGtLTytVSFdmZ1lNVVN4ZjQr?=
+ =?utf-8?B?Q0FoaHl0K2JSV3daWGZ3U2lMbzNILzQrQ0g1UFpOOEwwOEFQbk9oZm1qN20w?=
+ =?utf-8?B?WFNqZktwYk5jL0JhRndWMEk5MzZPY3FKV3VMQXcrTEpiZW1VS3BqRmhVQlFr?=
+ =?utf-8?B?WERVcUJubGR6c01Kc2RuQStaVEdBb1hvUnFESmdFM2hWVm8rSFBtdjhXN1ly?=
+ =?utf-8?B?VlhoTWk2cmFzTFdLMlF4T05aSmZnRzNVZGpIYWxPWkFzSGswUkZyMWc1YkR4?=
+ =?utf-8?B?MG5pSlVpRUptZUsvbE5TbC9xYiswN1NDTE1qQ0ZUT0s0anZ1akhMQTJxZjVT?=
+ =?utf-8?B?M1l1QjkrUG1ZTERpSTgxT21reU42T2pjZS9hZkZXbXBaaWplYjhDTVZTOC9J?=
+ =?utf-8?B?ZkhrZjcxTVREODNEcXZNZnJBWHpNcklJakE0WUtZeFBCMHlways0U1FiUHFB?=
+ =?utf-8?B?UWlQTUFtT0t5M0pDam04U3l4b0plQU9qajkzcWlDaG4rU05OSzEzQ0EyZE9p?=
+ =?utf-8?B?b1loY0JuYnJZUkFMaE5DYVo0M1NLcFpXRkRCK1BuZ1RhQmtyWjB6SDJhWFAz?=
+ =?utf-8?B?STR1aVRNTUt0NzNZaTRUNDFWc0FPLzhJRitkYnhDV2ZsNXYrZ0tCbWY1dkpO?=
+ =?utf-8?B?ZVdGTnNYZUljaWRLNEREWXVVSURNVE50cSt0MW5OVlpIR0R3U0M2YUFuekY3?=
+ =?utf-8?B?V200ZFNBdVBUdEh4Zm1QZTRXbS9nU3RDWDZZVm5IUXVsQk5reG5nckd4WHJS?=
+ =?utf-8?B?UmNxZnNpLzhqbGFlcU43T1NpTVNWZkxWNFRBZnV5aVlOdW5PeHRKcDM4dXdw?=
+ =?utf-8?B?WTRFYlVGa3FSblk1QTAzcTFUNGJnRXpIYkpRWTRXaEx1dGtYczhjZmxKM1pL?=
+ =?utf-8?B?TGdPeWRIUk84aHdkWW1EcGc2TkR0NGhnS2hmdWRMYkNtOFhwVi9qSCtVa3B6?=
+ =?utf-8?B?TXUyUjJpRThsM0ErSDZJQzJtVlA2U1dBQXJ3VXYwb3A5blFiTTZENTRSbk5O?=
+ =?utf-8?B?TGhEOEM4VHdYa01VcE5HWklRb05HS012dG1jZFBZVFFYS2gyQkdHTU1KcnV3?=
+ =?utf-8?B?MHJUR0V0RHhnZnV5NmJjcVJaWmFDdjA5ckRxR2ZCTDVPR3BFd1NBVVdOZHB4?=
+ =?utf-8?B?am5TSVRDRmsxSXl6NWRwa3VhY3J4L3B1TWJWdklvWGV3Z3hCOG9KbzNGcUVF?=
+ =?utf-8?B?MStnYWVycWRLaFg5U0tGUUZ2S3d5VTFZdkVPekw0WmFuVmdNNEdqdWUyditq?=
+ =?utf-8?B?bzlyMHBTK3hzdk5lMVNnK2czSXF2b2JXajVSRzgxajZ3N1hxOVdCV2RpTzNO?=
+ =?utf-8?B?aXlnT1hjRHN3M1hGbW10YnErZmNpSnhia1c3VEtkMHcyWU9BNEZBMWI1aStx?=
+ =?utf-8?B?a2IwUUMwN2MrNHYyUVh3eGo3TmgwSG0xU2w2N2VKR2gwWGZaT2U4WFdVTmF6?=
+ =?utf-8?B?MWNVOHFHcnFzd0g3TDdkOUhqVHk0c21jYkk2Mmo0OWU3eit5cTZUTEhVc2Jk?=
+ =?utf-8?B?UlFFeHNaenZvck41bkZDSmhJbjhqWEgzQm9paCtpcW1pdmdmekxWZGUrWnFO?=
+ =?utf-8?B?T2JuNEg3eSsrVTU3aGtxMDRxQXNRWkZBbGJjV2Z2aE5JREw1UlQyNzhFMXJv?=
+ =?utf-8?B?Nm0zUkgzR3prUzY2dzJoVmlmUUJZU0M4dHIrZmVNeGg2R0hnSCt2cXpBU3R6?=
+ =?utf-8?B?R3pqTVhJR0M1ejNNb3o5NW5ORGd5VWFPQ01TTkFFY09oSDFZU3g3bDFzWmpQ?=
+ =?utf-8?B?L1dJOTYvbzMvYkdlNlNCVll5OWlqOVlxRzE4SWFuSCtZZmpoWFVQbTFvSUhV?=
+ =?utf-8?B?UmlyakdvMTJjNE02Rzk2ZUtqNlBMR1BVUE12TEZLMTZjUll5dHhiVTJSUkJM?=
+ =?utf-8?B?VjNYMmNwbFFYMlRUQm5XeXMxRmZpVHIvaTdTZGNIYURwdC9sR09Mdz09?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08688cdc-8241-4a6f-eb53-08de90022479
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 15:20:01.0220
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kEyQBBH6y5608rbAIzwULHaoIlj1LNP2+1gaCNHjQbJotNBO9flucwzzP98jGWZLI/EL58uZkRSUQq3MoLXlhw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P265MB6603
 
-On 3/31/26 7:24 PM, Ming Lei wrote:
-> Bio pages may originate from slab caches that lack a usercopy region
-> (e.g. jbd2 frozen metadata buffers allocated via jbd2_alloc()).
-> When CONFIG_HARDENED_USERCOPY is enabled, copy_to_iter() calls
-> check_copy_size() which rejects these slab pages, triggering a
-> kernel BUG in usercopy_abort().
-> 
-> This is a false positive: the data is ordinary block I/O content ?
-> the same data the loop/nbd driver writes to its backing file via
-> vfs_iter_write().  The bvec length is always trusted, so the size
-> check in check_copy_size() is not needed either.
-> 
-> Switch to _copy_to_iter()/_copy_from_iter() which skip the
-> check_copy_size() wrapper while the underlying copy_to_user()
-> remains unchanged.
-> 
-> Fixes: 2299ceec364e ("ublk: use copy_{to,from}_iter() for user copy")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On Wed Apr 1, 2026 at 12:45 PM BST, Miguel Ojeda wrote:
+> From: Alice Ryhl <aliceryhl@google.com>
+>=20
+> By default bindgen will convert 'enum lru_status' into a typedef for an
+> integer. For the most part, an integer of the same size as the enum
+> results in the correct ABI, but in the specific case of CFI, that is not
+> the case. The CFI encoding is supposed to be the same as a struct called
+> 'lru_status' rather than the name of the underlying native integer type.
+>=20
+> To fix this, tell bindgen to generate a newtype and set the CFI type
+> explicitly. Note that we need to set the CFI attribute explicitly as
+> bindgen is using repr(transparent), which is otherwise identical to the
+> inner type for ABI purposes.
+>=20
+> This allows us to remove the page range helper C function in Binder
+> without risking a CFI failure when list_lru_walk calls the provided
+> function pointer.
+>=20
+> The --with-attribute-custom-enum argument requires bindgen v0.71 or
+> greater.
+>=20
+> [ In particular, the feature was added in 0.71.0 [1][2].
+>=20
+>   In addition, `feature(cfi_encoding)` has been available since
+>   Rust 1.71.0 [3].
+>=20
+>   Link: https://github.com/rust-lang/rust-bindgen/issues/2520 [1]
+>   Link: https://github.com/rust-lang/rust-bindgen/pull/2866 [2]
+>   Link: https://github.com/rust-lang/rust/pull/105452 [3]
+>=20
+>     - Miguel ]
+>=20
+> My testing procedure was to add this to the android17-6.18 branch and
+> verify that rust_shrink_free_page is successfully called without crash,
+> and verify that it does in fact crash when the cfi_encoding is set to
+> other values. Note that I couldn't test this on android16-6.12 as that
+> branch uses a bindgen version that is too old.
+>=20
+> Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+> Link: https://patch.msgid.link/20260223-cfi-lru-status-v2-1-89c6448a63a4@=
+google.com
+> [ Rebased on top of the minimum Rust version bump series which provide
+>   the required `bindgen` version. - Miguel ]
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+
+Reviewed-by: Gary Guo <gary@garyguo.net>
+
 > ---
-> V2:
-> 	- update commit log (Caleb Sander Mateos)
-> 
->  drivers/block/ublk_drv.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2e475bdc54dd..3e329906ae19 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1322,10 +1322,18 @@ static bool ublk_copy_user_bvec(const struct bio_vec *bv, unsigned *offset,
->  
->  	len = bv->bv_len - *offset;
->  	bv_buf = kmap_local_page(bv->bv_page) + bv->bv_offset + *offset;
-> +	/*
-> +	 * Bio pages may originate from slab caches without a usercopy region
-> +	 * (e.g. jbd2 frozen metadata buffers).  This is the same data that
-> +	 * the loop driver writes to its backing file ? no exposure risk.
-> +	 * The bvec length is always trusted, so the size check in
-> +	 * check_copy_size() is not needed either.  Use the unchecked
-> +	 * helpers to avoid false positives on slab pages.
-> +	 */
->  	if (dir == ITER_DEST)
-> -		copied = copy_to_iter(bv_buf, len, uiter);
-> +		copied = _copy_to_iter(bv_buf, len, uiter);
->  	else
-> -		copied = copy_from_iter(bv_buf, len, uiter);
-> +		copied = _copy_from_iter(bv_buf, len, uiter);
->  
->  	kunmap_local(bv_buf);
+>  drivers/android/binder/Makefile            |  3 +--
+>  drivers/android/binder/page_range.rs       |  6 +++---
+>  drivers/android/binder/page_range_helper.c | 24 ----------------------
+>  drivers/android/binder/page_range_helper.h | 15 --------------
+>  rust/bindgen_parameters                    |  4 ++++
+>  rust/bindings/bindings_helper.h            |  1 -
+>  rust/bindings/lib.rs                       |  1 +
+>  rust/uapi/lib.rs                           |  1 +
+>  8 files changed, 10 insertions(+), 45 deletions(-)
+>  delete mode 100644 drivers/android/binder/page_range_helper.c
+>  delete mode 100644 drivers/android/binder/page_range_helper.h
 
-Is this just a jbd2 issue? Because we can just get the slab marked
-appropriately to not trigger these warnings.
-
--- 
-Jens Axboe
