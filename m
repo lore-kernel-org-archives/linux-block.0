@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF5547DD76;
-	Wed,  1 Apr 2026 23:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A948481AA2;
+	Wed,  1 Apr 2026 23:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775084518; cv=none; b=KfOV8MTv4PM9PH+5yfVcaKqW1nk6c7NgXzctVlnTv2in/rnWAOqcMQEtnIWQHt7SGV320PlerHjcLAgmV76j24Uebh+CVarAQOe6eukst7sgStvG4XVgzQPQlTrqsfDCFS42c4N9pDTO4PbaF9XD7vQ4PRLNtkyGq9YZVtbrZwk=
+	t=1775084523; cv=none; b=q7A0lN/1FZ8w6cMTRiyvF/ud37/xrzYoy44eQWoMpm3aRoCDqsw2Ck0Z/gEE3KKyOIeJsrIwytelqrjBOClVau2roCmJS2BqyHkTUeMK9vn5mMh2zyN3jZn+mL95zqTxE3WqasgnSAOFl0Zp6CMNHOjVvaBskqVogloU1tZVsO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775084518; c=relaxed/simple;
-	bh=U0z1f7WmJb1y4dfJmsmO4rtz8iO1tJNxLkugN/iERrs=;
+	s=arc-20240116; t=1775084523; c=relaxed/simple;
+	bh=mIoLqdGB6FEaivDOYbSVC5sMk8eFMcAZ8xp8MdTnV0k=;
 	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=Kp9wot/+RsdXiyl33cOT4HS6Pq26unJd9uKAa2XwEOt+2YDIUR8wZJl5SfEcrnIxW5OSL0AWvDgBK0/1HFPqVKRlTht9JA2vblIwyGUU64y7HJ9dRoYq/EB5y3Z4oRkYh46qFawkT2mjzFMydeGgd7BCF3XDxlRAlaxi1l6FNVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UMSgCFmp; arc=none smtp.client-ip=10.30.226.201
+	 References:Date:Message-Id; b=EnUueJXsbNkT5FuDlfIP18VERE38VEVHSIjRB0uqM619OnSvXCWEZ1iLj0FA/QQZnvkSifBGINvwkE41KvWrSFV9WxWvhnIu9EdTwMT0IARsv6Xph/+cRG0/UaEQgkLDyx1FbDQoVH58Iwq7CUAGr73PlScOrFNyfRYt36BVYvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXyGeWKi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMSgCFmp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8523C2BC9E;
-	Wed,  1 Apr 2026 23:01:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXyGeWKi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03BBFC2BCB0;
+	Wed,  1 Apr 2026 23:01:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775084517;
-	bh=U0z1f7WmJb1y4dfJmsmO4rtz8iO1tJNxLkugN/iERrs=;
+	s=k20201202; t=1775084522;
+	bh=mIoLqdGB6FEaivDOYbSVC5sMk8eFMcAZ8xp8MdTnV0k=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=UMSgCFmpPFESaRAbvbhDhQiCJwvV4rRI29EQmB0081nHG47VaoK9DsZ87N20ilTx/
-	 obHtZ+aT5eDe/3CUF+QYMPNqdkzwcsrBaGB1uzVm0pfcDYp1VJCmo1jL/0HIoM5RNj
-	 iTgu7PyZZxOsj1m6IjusGOJ8iwfJNFnzHmJfDNcZtTbfSTgPXc+UHvwPqOeAhJLE9x
-	 9u7MJDThp4/mCBjG1VZ4wucl6sy1ZHstjCSifT+LAuUqrMCVKULTuDsCABCCXg5Pcu
-	 NYCkfoRZxaFdEAWjprgGpGCncCf/8BXJkgVTpuN4aIwNu5Zj1mJbJXZWpJ0DCEQqMU
-	 VoIcuuTDapCwA==
+	b=ZXyGeWKi13Ct8X9D0547XxKoA9LfoDtpV+LhRj3iXOQd+bnjQ22veAr1KWQzEnIDA
+	 kCTGsTKkVr/gscyEmrZwOvWOWJ7En260oBqHLZzHIzEAlkTuiEm6eUc5UILdqgZy+H
+	 HXAequvu6ZpIY4U3LMW8wzpcshrEKczrtsPGEnHRqS7XkcXKcwcDDz47C4fWwDAXKO
+	 OIQVKkdK/nf9H0jRFaReCDhlcyWz4+4QQtQPnKMye0CMmsL4cTMnrf7NbrpD+fnPzG
+	 ktDfNcL8YfxyQiu9pd7SwNmlkrwL9bKsRyvSsH9EF8GOZzd/XyeyosIPxWhon0MbUH
+	 E+D3sywT0mp+Q==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,7 +34,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH 32/33] rust: kbuild: support global per-version flags
+Subject: Re: [PATCH 33/33] rust: kbuild: allow `clippy::precedence` for
+ Rust < 1.86.0
 From: Tamir Duberstein <tamird@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>
 Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -66,33 +67,30 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-In-Reply-To: <20260401114540.30108-33-ojeda@kernel.org>
+In-Reply-To: <20260401114540.30108-34-ojeda@kernel.org>
 References: <20260401114540.30108-1-ojeda@kernel.org>
- <20260401114540.30108-33-ojeda@kernel.org>
+ <20260401114540.30108-34-ojeda@kernel.org>
 Date: Wed, 01 Apr 2026 18:59:04 -0400
-Message-Id: <177508434474.73816.6769206170563558152.b4-review@b4>
+Message-Id: <177508434476.73816.11744805605122440072.b4-review@b4>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=622; i=tamird@kernel.org;
- h=from:subject:message-id; bh=U0z1f7WmJb1y4dfJmsmO4rtz8iO1tJNxLkugN/iERrs=;
- b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnF7tyXN4UGNjIVv7Oan+7TIj6c2bpm5kOwsVmLFFFf
- 8NvnHXomMjCIMbFYCmmyJIoemhveurtPbKZ747DzGFlAhkiLdLAAAQsDHy5iXmlRjpGeqbahnqG
- RjoGOsYMXJwCMNVZoYwMb+bI30yW8DzreTVxsqJRzf+lz5/tNI542cmT8HXZjAvVExn+h3398Mm
- ieVJUs0Cb2/LGPIbW10HT78y/fv6PU+iXZ/O/MwIA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=490; i=tamird@kernel.org;
+ h=from:subject:message-id; bh=mIoLqdGB6FEaivDOYbSVC5sMk8eFMcAZ8xp8MdTnV0k=;
+ b=owGbwMvMwCV2wYdPVfy60HTG02pJDJlnF7s6hUfb+jyd9vbK0ZWKNtIml3vZzdZu5eWV+2r4r
+ rMtuaq8YyILgxgXg6WYIkui6KG96am398hmvjsOM4eVCWSItEgDAxCwMPDlJuaVGukY6ZlqG+oZ
+ GukY6BgzcHEKwFSr3mdk+LXi1KaghwuXvXvryuIh3xizmzukzafohmvWRgutvqoD3IwMq9NSuvc
+ +cVOd5nUvf9cfyV0no/Naz6wyyv7a/lP08aU4HgA=
 X-Developer-Key: i=tamird@kernel.org; a=openpgp;
  fpr=5A6714204D41EC844C50273C19D6FF6092365380
 
-On Wed, 01 Apr 2026 13:45:39 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
-> [...]
-> defined after the `include/config/auto.conf` inclusion (where
-> `CONFIG_RUSTC_VERSION` becomes available), and append it to
-> `rust_common_flags`, `KBUILD_HOSTRUSTFLAGS` and `KBUILD_RUSTFLAGS`.
-> 
-> An alternative is moving all those three down, but that would mean
-> separating them from the other `KBUILD_*` variables.
+On Wed, 01 Apr 2026 13:45:40 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
+> The Clippy `precedence` lint was extended in Rust 1.85.0 to include
+> bitmasking and shift operations [1]. However, because it generated
+> many hits, in Rust 1.86.0 it was split into a new `precedence_bits`
+> lint which is not enabled by default [2].
 
-My prefernece is avoiding duplication over grouping, but either choice
-should be justified by a code comment that acknowledges the
-duplication/inconsisntecy.
+Might be good to retain some of this in a code comment.
+
+Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 
 -- 
 Tamir Duberstein <tamird@kernel.org>
