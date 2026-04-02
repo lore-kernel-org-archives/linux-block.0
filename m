@@ -1,203 +1,102 @@
-Received: from iad-out-010.esa.us-east-1.outbound.mail-perimeter.amazon.com (iad-out-010.esa.us-east-1.outbound.mail-perimeter.amazon.com [34.197.254.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D15F3E51D1;
-	Thu,  2 Apr 2026 12:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.197.254.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1683E557D
+	for <linux-block@vger.kernel.org>; Thu,  2 Apr 2026 13:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775133130; cv=none; b=gUAmpfk9F9uxAl1+/eRI1fe1DYgsRPBu6avXygg1fbGO+1rsBjwWueZl7c9bVaGL0xaySvUdX9C/w4Eb22xgelnyYn73QH/JJxVcNnA2DnBBLxDPlMW3CW6v2LmEtrHqq78gXdc1d0bFEq6FAszQ+xZzpQRXv4JiCqGVso5744c=
+	t=1775135374; cv=none; b=CmUEmX0t7DaMJg0lkXEFb0kl5lyIdZygkY+XPhPfyduNJvQKfv64sqg05WTU9nFqY3ybC2RYf0cXBhLDlHpscWGo8Q7J1EeIVHOYlwU1Zv77G+HEM31w/4sRNJKffdwo7YAiFudO7DLj384uPVOuAhKtCp4ilNGQ7LhzULBzhus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775133130; c=relaxed/simple;
-	bh=aDYtmSvd0EEN3gRzBnxf/nlkESwF4ea02ohRXl6ElJc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KqC3rvJqECPr4IDyxfz0a9lkSGyq37WnYLdWOgxPBmpGXVprkUc580ff3E0O5nDCCyF/8Tn5+qfxZheXYSLXuL0H/lgSHU8IOFCHmmOw4dXXVxAIFnsT6s+7K5VaYH/nWIr6aVLsavLqQa2x+6qXd1AQ+lk43osHH1n7eFPGt14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=TLJNze09; arc=none smtp.client-ip=34.197.254.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1775135374; c=relaxed/simple;
+	bh=4iFix6D8C00qseOI7VMpapSZqyIO0esNsEJTNbeO85k=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mpyk9xSbBHKwddebmTnON6BTGbcvBFcK/tItzHdTUUN9IHmcZvb8UtWgEkFcEsOUwmC4iJ0EYkP8+Vwj/OBcB7jnjdFc69Bui7ZbCVPaRFp0P9cb0ztfTbIYblz6oGzlmEit1VrOwrTyHsyYS6lNBZOzOMtaajzOJ4dCjbAn6GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=y3vCxsGP; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="TLJNze09"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="y3vCxsGP"
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-4670bcc40d7so267967b6e.2
+        for <linux-block@vger.kernel.org>; Thu, 02 Apr 2026 06:09:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1775133125; x=1806669125;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=6w3HUVHSmjm01LKzbzqMd/c0WGfyb9c7ge6p63vHYQI=;
-  b=TLJNze09s90omXNwh/EVneUqNcRFVos12lrBVwuckpj9mjeoIw8krJk5
-   0ggvx4lKPUQ5Q9HDmfTRZpfkfAvpzX2r8rDa78d85sZsjASqwS1pCvYoE
-   SBXeygTpvn2Qbqe1NCC30sBzasFu4OKifydxG+NuwiXsVT2MLDmvTZD08
-   4xBKFyoYPsLjnwHwo289oFCga7x65r3Fh6r02wkgIU35FOfhFQipxvnjQ
-   wmsQZdB4f30IKsOyAnpdw2Y9tZs6XTWbImWxuhOF8zrRdaUVTpv5P31LM
-   khAR66KtXQiVA/KkSfAolQHHgqW3G24AZYDak4oAX6nqdnw1V/ctpoO/t
-   g==;
-X-CSE-ConnectionGUID: DdekA+7kT0eMkTYJA1rRng==
-X-CSE-MsgGUID: /6glz+8BSwe83yXe9ZoY8A==
-X-IronPort-AV: E=Sophos;i="6.23,155,1770595200"; 
-   d="scan'208";a="15095409"
-Received: from ip-10-4-10-75.ec2.internal (HELO smtpout.naws.us-east-1.prod.farcaster.email.amazon.dev) ([10.4.10.75])
-  by internal-iad-out-010.esa.us-east-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 12:32:00 +0000
-Received: from EX19MTAUEC002.ant.amazon.com [72.21.196.66:23526]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.8.197:2525] with esmtp (Farcaster)
- id aa9e9018-8b88-44d4-9916-7172c14268fc; Thu, 2 Apr 2026 12:32:00 +0000 (UTC)
-X-Farcaster-Flow-ID: aa9e9018-8b88-44d4-9916-7172c14268fc
-Received: from EX19D012UEC003.ant.amazon.com (10.252.135.160) by
- EX19MTAUEC002.ant.amazon.com (10.252.135.253) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 2 Apr 2026 12:32:00 +0000
-Received: from EX19D012UEC003.ant.amazon.com (10.252.135.160) by
- EX19D012UEC003.ant.amazon.com (10.252.135.160) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Thu, 2 Apr 2026 12:31:59 +0000
-Received: from EX19D012UEC003.ant.amazon.com ([fe80::67ea:859:1e17:25a9]) by
- EX19D012UEC003.ant.amazon.com ([fe80::67ea:859:1e17:25a9%3]) with mapi id
- 15.02.2562.037; Thu, 2 Apr 2026 12:31:59 +0000
-From: "Heyne, Maximilian" <mheyne@amazon.de>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-CC: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, Sven Peter
-	<sven@svenpeter.dev>, Chaitanya Kulkarni <kch@nvidia.com>, Keith Busch
-	<kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Hector Martin
-	<marcan@marcan.st>, Alyssa Rosenzweig <alyssa@rosenzweig.io>, "James E.J.
- Bottomley" <jejb@linux.ibm.com>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Alim Akhtar <alim.akhtar@samsung.com>, "Avri
- Altman" <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, "Sasha
- Levin" <sashal@kernel.org>, Peter Wang <peter.wang@mediatek.com>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, Seunghui Lee
-	<sh043.lee@samsung.com>, Sanjeev Yadav <sanjeev.y@mediatek.com>, Wonkon Kim
-	<wkon.kim@samsung.com>, Brian Kao <powenkao@google.com>, Hannes Reinecke
-	<hare@suse.de>, Ming Lei <ming.lei@redhat.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "asahi@lists.linux.dev"
-	<asahi@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH 6.1.y 5/8] nvme-apple: remove an extra queue reference
-Thread-Topic: [PATCH 6.1.y 5/8] nvme-apple: remove an extra queue reference
-Thread-Index: AQHcwpyzTCv4ZXIhp0SsQfFW9ZSeHw==
-Date: Thu, 2 Apr 2026 12:31:59 +0000
-Message-ID: <20260402-anti-cuba-1ea02cea@mheyne-amazon>
-References: <20260401-pliny-ashley-ff03a0b6@mheyne-amazon>
- <20260401232116-53765a086f3855a30962fb81-pchelkin@ispras>
-In-Reply-To: <20260401232116-53765a086f3855a30962fb81-pchelkin@ispras>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <772100EB31401D4090226323D02A6503@amazon.com>
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1775135369; x=1775740169; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ISZns7dWr0dgAWVKs0UiAOopA0bjHEqzp3XZWkBpXyQ=;
+        b=y3vCxsGP4smeoc7THiwr2rZHVjV+9CZpgwMshTK7MxojWrM22f0xMTG/NjeAq6TSuY
+         bp2e28EZBz2qKWdcLhFVNkjSoLVYDOZPn1E7DPNnCAWq6zNOafm/4OteHUZ8CDh/iV6i
+         ca5GSe8HX3dSQ6htVGaJ457VT0i7PdifisR/c+f/US1z9IDvrbcWC6W+pin+7D9bGoat
+         HlV3TInGd2Thi3xK9mK0oHM8HHDrfgqVd1Xe2amvLI0D4NEuUzMP9QR7wTIwbmun4ZAs
+         +phEwwrIP//eoNHCyhJo4NEeqSxeL70CXGxWGhN5YxFyrK7/4OpkcX2wHN2X7ePyXeYX
+         2u3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775135369; x=1775740169;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ISZns7dWr0dgAWVKs0UiAOopA0bjHEqzp3XZWkBpXyQ=;
+        b=e8mrdgO98CjPQ87nDvZI6v0rKYLngV94DPPV9VDh0OPv8l+0pQkr97KymmQ97xB7YR
+         Crx6JLCXJ5Xe7N/BDuS7fbDzwiSogqUXvrEK6PnG5ZWkeXSPjoZP5COP3Egkc1lfSZql
+         pdf5qxtDtXZwUk7cHNwfdC1/MfRU5FF2+C7aV2/+9q0/VX+QTCy4NKj9ta7rjHjcV9gP
+         go0CRH2i3IEx7NUDMQhnQRFVEBObnlfI10Xkuo2U4rxLRMPWx27MMEYvefeSbgNJsqIM
+         ZN++fuByjG81GvS/rv7dfRYsEl181AMnXspj9eerON42Le2huZyE1Aq6dthpyTfH40FV
+         35BQ==
+X-Gm-Message-State: AOJu0YyxaxJuMrmFYMkQX2H6Gsc/4zUMO+e9RvvWE5H9nw3Bmc2jj6jy
+	GyYbKBYw5c3mb6AzTrw/jh5x2HY6g4VD7oXo2gLdAk8FBeRRanfpr51gWeQnjAi7y4Y=
+X-Gm-Gg: ATEYQzzyahxZkeh23bLTvQGJ9XD2UlHwyP9lJGdroN6Cn/nSLWbhZ+4aOFjFQh/GlMD
+	bab09/+c+S77zRTeKaS/lVm480U/Q4omyzs5WD2dKMt4eDw9YmyJ1dALoSV36EmDK5EzBhrxYpB
+	E/BJUfrwhhaeMdXj0jd9IUMFJSVGWH+AAoPOe28RY0NIsYv5+rYy5tzgPpnlQMK0DxhIgcXvbFG
+	RGcxyFwM1BQGhoTYoYbknkqMhGsQgIBtbc0qDOYHNDMje9dbTLWI1aJy94WVK+aMeDK4GhjRTCv
+	1D3gpjyrnW20NvCuB+qnMG/1cWTzyBjErCi+xOniQscUKUl3twZ5LL/Tm4rgbJR4p5qFAvQtgt/
+	o9sPh44EZ5Eu0bEiqMG3mqTUVVeajsfBM9U2d0g1w6lfY8OU0AVzCrE1Pt1cGRYu9RXUQM97aeV
+	CsVHmZnVt6/TuzspCcmFa6TZTPq60XyeELdWPNu94VLA5lHqBfE7bt3oix5iTwFgOpA1cFCzt7e
+	GMsoq3Zs7VYFeU=
+X-Received: by 2002:a05:6808:3a05:b0:46c:cdf4:1bd9 with SMTP id 5614622812f47-46d87f35d56mr1758950b6e.10.1775135368717;
+        Thu, 02 Apr 2026 06:09:28 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-46d9387a763sm1593841b6e.18.2026.04.02.06.09.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 06:09:28 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Yi Zhang <yi.zhang@redhat.com>
+In-Reply-To: <20260326144058.2392319-1-ming.lei@redhat.com>
+References: <20260326144058.2392319-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2] bio: fix kmemleak false positives from percpu bio
+ alloc cache
+Message-Id: <177513536759.175771.5675283254051100252.b4-ty@b4>
+Date: Thu, 02 Apr 2026 07:09:27 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 01, 2026 at 11:45:57PM +0300, Fedor Pchelkin wrote:
-> Hello,
-> =
-
-> "Heyne, Maximilian" <mheyne@amazon.de> wrote:
-> > From: Christoph Hellwig <hch@lst.de>
-> > =
-
-> > [ Upstream commit 941f7298c70c7668416e7845fa76eb72c07d966b ]
-> > =
-
-> > Now that blk_mq_destroy_queue does not release the queue reference, the=
-re
-> > is no need for a second admin queue reference to be held by the
-> > apple_nvme structure.
-> =
-
-> This patch is probably buggy in upstream.  It removes extra reference
-> ->get, but doesn't remove the corresponding ->put which is located
-> inside apple_nvme_free_ctrl().
-
-Now I'm seeing this as well. Has the same problem as the pci driver in
-6.1 where blk_put_queue is called from nvme_free_ctrl() and again from
-apple_nvme_free_ctrl(). Thank you for catching this. I don't have the
-hardware to test this.
-
-Are you going to send a fix upstream? It's looks to be broken on master,
-too.
-
-> =
-
-> I'm reporting here currently just for the heads up - was looking at the
-> same nvme regression problem at 6.1.y, found this thread, and the
-> nvme-apple changes appeared suspicious.
-> =
-
-> nvme-apple patch is not required to fix the regression (this also holds
-> true for [PATCH 6.1.y 3/8] scsi: remove an extra queue reference).  Maybe
-> they shouldn't go to stable.
-
-I think, I'll send a v2 of the patch set without these 2 patches. It's
-probably easier for Greg to apply.
-
-> =
-
-> That said, the other part of the backport series FWIW looks good to me,
-> and I've also verified it resolves the 6.1.y regression.
-
-You may leave a Tested-by if you want ;-)
-
-> =
-
-> Thanks.
-> =
-
-> > =
-
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> > Reviewed-by: Sven Peter <sven@svenpeter.dev>
-> > Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> > Reviewed-by: Keith Busch <kbusch@kernel.org>
-> > Link: https://lore.kernel.org/r/20221018135720.670094-5-hch@lst.de
-> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> > Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
-> > ---
-> >  drivers/nvme/host/apple.c | 9 ---------
-> >  1 file changed, 9 deletions(-)
-> > =
-
-> > diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
-> > index c5fc293c22123..c84ebfcfdeb88 100644
-> > --- a/drivers/nvme/host/apple.c
-> > +++ b/drivers/nvme/host/apple.c
-> > @@ -1507,15 +1507,6 @@ static int apple_nvme_probe(struct platform_devi=
-ce *pdev)
-> >  		goto put_dev;
-> >  	}
-> >  =
-
-> > -	if (!blk_get_queue(anv->ctrl.admin_q)) {
-> > -		nvme_start_admin_queue(&anv->ctrl);
-> > -		blk_mq_destroy_queue(anv->ctrl.admin_q);
-> > -		blk_put_queue(anv->ctrl.admin_q);
-> > -		anv->ctrl.admin_q =3D NULL;
-> > -		ret =3D -ENODEV;
-> > -		goto put_dev;
-> > -	}
-> > -
-> >  	nvme_reset_ctrl(&anv->ctrl);
-> >  	async_schedule(apple_nvme_async_probe, anv);
-> >  =
-
-> > -- =
-
-> > 2.50.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.1
 
 
+On Thu, 26 Mar 2026 22:40:58 +0800, Ming Lei wrote:
+> When a bio is allocated from the mempool with REQ_ALLOC_CACHE set and
+> later completed, bio_put() places it into the per-cpu bio_alloc_cache
+> via bio_put_percpu_cache() instead of freeing it back to the
+> mempool/slab. The slab allocation remains tracked by kmemleak, but the
+> only reference to the bio is through the percpu cache's free_list,
+> which kmemleak fails to trace through percpu memory. This causes
+> kmemleak to report the cached bios as unreferenced objects.
+> 
+> [...]
 
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
+Applied, thanks!
+
+[1/1] bio: fix kmemleak false positives from percpu bio alloc cache
+      commit: c691e4b0d80be423f0a7443b53898eafe9c8754b
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
