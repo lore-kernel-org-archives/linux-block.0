@@ -1,44 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61B23EE1D5
-	for <linux-block@vger.kernel.org>; Thu,  2 Apr 2026 18:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03D33CCFC3
+	for <linux-block@vger.kernel.org>; Thu,  2 Apr 2026 18:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775155210; cv=none; b=MBgoXCxcJrUkAgD49ZT40/ObV+P3JQ15SgusHoAI9d4kz4Vai7mueDnHza4jjLZxp4C/GEaKqw/IbgLcV/mYxcBWc2Tubh5GMvn7Vruii8ykfTol8Wp33dD65pEnl8rdFNP1bLYsMJy4ZH14edSHzqPgZQnzeo3mKKYaJ2J3awc=
+	t=1775155212; cv=none; b=CODSKK1QX9w5D7MCPz2+ffD7MGyzthysEA8loxaph4ZSNGfZA8dKvPfw7Y/dx4uz+uQ+uaCxhyO4SwUraQEzOrXcfKtuJWQ+wqjZSOXTc01YzklxtCBMgLCm3oQJaQeTJ9qf3zsJbcJHY7KA590i0ZxQ5I1RBr4EsN8kXk1otBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775155210; c=relaxed/simple;
-	bh=xAW6MqMKsL+3SMPbbAXDSHRYMZdQFnkIVMpW9uCI5Qw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=orFaXwoY98q16RN8YE6nCWprHEeoUu03cDSZxgpGUTAwO0pn30zShFy443qi91OcwWnRgF+g/LithqBa99mHX2fe1RpG55zGytdAW5r/U6GLJ/hvyoe5MikzbWoyPxzLk766oUaIaL1vZG+X4rHadS1Lgku1ZSyPUW3o7fGYOl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=muUlIljR; arc=none smtp.client-ip=199.89.1.16
+	s=arc-20240116; t=1775155212; c=relaxed/simple;
+	bh=yBKZv1tF5ZCEDFWu8GkqYBMIfONgspQbHNS4QYuDPOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=loMhObcGJb7JwMM6TAbzbVbdxWcVukSoC2IzWrQ9sOL0IjJt7/0RQwa2eFfZl8vXN9XPNMqXoBH6njlLAYtUFE3wNHhxhzxioXBW04zvLRmx8HNXIUDjgONhnvw94OXdhSsQa/iEth4FYby4Z0swWsliHCKgE1pUcEniKaBXiiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=hsirNiuU; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="muUlIljR"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="hsirNiuU"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fmrJ66y27zlfwJB;
-	Thu,  2 Apr 2026 18:40:06 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fmrJ85FWyzlh2fy;
+	Thu,  2 Apr 2026 18:40:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1775155202; x=1777747203; bh=oF/QAgU5uKZyKo+nERUz58pY18k75G+p3cu
-	E1cmO4D0=; b=muUlIljRmdtaWj4mL2EVMoT6vc0AX4OcM1MdFNY5gUqKNbIZpoy
-	OBJQmv+3gMmWmz+OWYxATgu0QgNs/7bne0Xk72IuWtbRBuH3cvJpNGtaBxdNG7fh
-	Qwi3ACTqFkmJS/uEshB4s8PrZLAL3ynO3HEek/p3D7Tt82yzpxzaWe1QYzO5skaR
-	bDDg3NEkU4oqV8pwGg8Ec4vGuxP/v9kjGuyapREHU8QPXP7FcUt5WDNGRoS5n0Vl
-	CRTvsMQ1IyY6WRdYYAb3lfDrzdYLPVGih0dHi0Ocje9rlGHalnXVsLyLLijYIKoz
-	r7Dvq28dy0rS7LCmxbc1wtMRWgrahw6mL2A==
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1775155205; x=1777747206; bh=07Z2i
+	mVd8wLgETNytZrWyToOFdE/uaqZHKxWv72EBJU=; b=hsirNiuUh24VFa/SgCLBh
+	IgTTDBktM+TuWbT1CjDU8+IdZLlHMYsqUCuXfZlpgRsBNafeOghDh/7CyjHGNFxy
+	2AgOsAYebNZm8ENaRmG28n+ofFyUsQ6Z7vDMvVL4LE7ChvHQMNceKfUtZ7+PdMP4
+	JMHhjujho+dykp9wTfJU+It5m+WNPLmmMag0UP7ydF2dHbwKxLxNJ1d5Oa6hW11e
+	cbMFq3Qp1Uqlyh+gIp1oz7VeZFMKsdnKy/W9locL1+70ZG2J7wpY7+WYu2annyOW
+	a09Kk3V/igAbFtlTWquWmywO1YNs7oagMaUv4P+HEvQ42l8ix3X4oGrmb0ZabUVr
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 43BzVidAiNrN; Thu,  2 Apr 2026 18:40:02 +0000 (UTC)
+ id Zbfe2peIK43U; Thu,  2 Apr 2026 18:40:05 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fmrJ05y2kzlfvqC;
-	Thu,  2 Apr 2026 18:40:00 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fmrJ33wPLzlfwHM;
+	Thu,  2 Apr 2026 18:40:03 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -46,10 +48,12 @@ Cc: linux-block@vger.kernel.org,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Marco Elver <elver@google.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v3 00/12] Enable lock context analysis
-Date: Thu,  2 Apr 2026 11:39:32 -0700
-Message-ID: <20260402183950.3626956-1-bvanassche@acm.org>
+Subject: [PATCH v3 01/12] block: Annotate the queue limits functions
+Date: Thu,  2 Apr 2026 11:39:33 -0700
+Message-ID: <20260402183950.3626956-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+In-Reply-To: <20260402183950.3626956-1-bvanassche@acm.org>
+References: <20260402183950.3626956-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,86 +62,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jens,
+Let the thread-safety checker verify whether every start of a queue
+limits update is followed by a call to a function that finishes a queue
+limits update.
 
-During the most recent merge window the following patch series has been m=
-erged:
-[PATCH v5 00/36] Compiler-Based Context- and Locking-Analysis
-(https://lore.kernel.org/lkml/20251219154418.3592607-1-elver@google.com/)=
-. That
-patch series drops support for verifying lock context annotations with sp=
-arse
-and introduces support for verifying lock context annotations with Clang.=
- The
-support in Clang for lock context annotation and verification is better t=
-han
-that in sparse. As an example, __cond_acquires() and __guarded_by() are
-supported by Clang but not by sparse. Hence this patch series that enable=
-s lock
-context analysis for the block layer core and all block drivers.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ include/linux/blkdev.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Please consider this patch series for the next merge window.
-
-Thanks,
-
-Bart.
-
-Changes compared to v2:
- - Retained the block layer core patches and left out the block driver pa=
-tches.
- - Inlined blkg_conf_open_bdev_frozen() and blkg_conf_close_bdev_frozen()=
-.
- - In blkg_conf_open_bdev(), added a return statement if the
-   WARN_ON_ONCE() statement triggers.
- - Replaced the "block/ioctl: Add lock context annotations" patch with a
-   __release() annotation.
- - Replaced the blk-zoned patch with a patch from Christoph.
-
-Changes compared to v1:
- - Rebased this patch series on top of Jens' for-next branch.
- - Included two patches that split blkg_conf_prep() and blkg_conf_exit().
- - Modified how patches are split. Split the block layer core patch into
-   multiple patches and moved the CONTEXT_ANALYSIS :=3D y assignments int=
-o the
-   block driver patches.
- - Made the new source code comments easier to comprehend.
- - Introduced macros in the mq-deadline and Kyber I/O schedulers to make =
-the
-   __acquires() expressions easier to read.
- - Removed the changes from this series that are not block layer changes.
-
-Bart Van Assche (11):
-  block: Annotate the queue limits functions
-  block/bdev: Annotate the blk_holder_ops callback invocations
-  block/cgroup: Split blkg_conf_prep()
-  block/cgroup: Split blkg_conf_exit()
-  block/cgroup: Inline blkg_conf_{open,close}_bdev_frozen()
-  block/crypto: Annotate the crypto functions
-  block/blk-iocost: Add lock context annotations
-  block/blk-mq-debugfs: Improve lock context annotations
-  block/kyber: Make the lock context annotations compatible with Clang
-  block/mq-deadline: Make the lock context annotations compatible with
-    Clang
-  block: Enable lock context analysis
-
-Christoph Hellwig (1):
-  block/blk-zoned: Refactor blkdev_zone_mgmt_ioctl()
-
- block/Makefile             |  2 +
- block/bdev.c               | 10 +++-
- block/bfq-cgroup.c         | 11 ++++-
- block/blk-cgroup.c         | 98 ++++++++++----------------------------
- block/blk-cgroup.h         | 13 +++--
- block/blk-crypto-profile.c |  2 +
- block/blk-iocost.c         | 96 +++++++++++++++++++++++--------------
- block/blk-iolatency.c      | 19 ++++----
- block/blk-mq-debugfs.c     | 12 ++---
- block/blk-throttle.c       | 34 +++++++------
- block/blk-zoned.c          | 41 +++++++---------
- block/blk.h                |  4 ++
- block/ioctl.c              |  6 ++-
- block/kyber-iosched.c      |  7 ++-
- block/mq-deadline.c        | 12 +++--
- include/linux/blkdev.h     |  9 ++--
- 16 files changed, 195 insertions(+), 181 deletions(-)
-
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index b8e7f42aee71..57b256948ee9 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1092,15 +1092,17 @@ static inline unsigned int blk_boundary_sectors_l=
+eft(sector_t offset,
+  */
+ static inline struct queue_limits
+ queue_limits_start_update(struct request_queue *q)
++	__acquires(&q->limits_lock)
+ {
+ 	mutex_lock(&q->limits_lock);
+ 	return q->limits;
+ }
+ int queue_limits_commit_update_frozen(struct request_queue *q,
+-		struct queue_limits *lim);
++		struct queue_limits *lim) __releases(&q->limits_lock);
+ int queue_limits_commit_update(struct request_queue *q,
+-		struct queue_limits *lim);
+-int queue_limits_set(struct request_queue *q, struct queue_limits *lim);
++		struct queue_limits *lim) __releases(&q->limits_lock);
++int queue_limits_set(struct request_queue *q, struct queue_limits *lim)
++	__must_not_hold(&q->limits_lock);
+ int blk_validate_limits(struct queue_limits *lim);
+=20
+ /**
+@@ -1112,6 +1114,7 @@ int blk_validate_limits(struct queue_limits *lim);
+  * starting update.
+  */
+ static inline void queue_limits_cancel_update(struct request_queue *q)
++	__releases(&q->limits_lock)
+ {
+ 	mutex_unlock(&q->limits_lock);
+ }
