@@ -1,101 +1,105 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24E03EDAA2;
-	Thu,  2 Apr 2026 15:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768263C9424
+	for <linux-block@vger.kernel.org>; Thu,  2 Apr 2026 16:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775145542; cv=none; b=pSpch07rPdrebk65Ls5fBppC0hkH3lJdb0mWLC9ukWG+w8WlmFuK9QnKA0L9KocmHJuZzWphLjZ0k0nZISpt3uyDKfT1xQNGZX12ZNLy2ttACI9/FD/upnS0iWOTnAK2y40KoMIrF7WmruVy1mjHnOC5mXSfQuw+v6iblXgFywo=
+	t=1775148712; cv=none; b=mLO/tpYBDiIE1E6dZlGs1Lo9gqcUcbbSGHT1N6LTCmD3uuEEy02qBmrvNQHk4GyWfi9xpyFHnHYXf9YXRixjiKwaBQFIreNHuhSDc4PiM4XJKyLMe8tnDExH0sOct6XfB4h0l8sa5AvdKuH359Oa+WjOtNufG9bkMZkQUebsI4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775145542; c=relaxed/simple;
-	bh=zynPblNX9L58TOxMGYvGCOFTI0aFili2wwrBvB/P/8I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LhMw+eU4GLLO+WrqnUJgLMvWX0sDPnaTohf/Lf5B2um/dwp/cBJIzBjlIVAauEf4ulamhaJdDhNUhxh08lxVGzhzGdVLP3xR38KHgeuymQMUaeB5iawcvy1BMKkUX+8whZxGhvcjzD6E4TuGk9aIt4Ztxml62cVHzC391UrTUuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=e2zuwvar; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1775148712; c=relaxed/simple;
+	bh=7+ebTfKNmoY0GJbcW4ffsXXZItEMbgpQ6j+s1RZFbzY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P8e3yyecPQsfHdmEcm8PmwnG/JbD8L17EeP6sP4RDK1+HyTUoJZJ49L8x16B4O22Uof8VCypc/ErJTEK+1cL06GWbzuztFXufURFYWM/HYznNPUn+fSuTb0q2lEZ+a7bJbcULQkR5dJQGmoUjME2dgJu5KEtW5dJZKKvJU+5klc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u51YtbSz; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="e2zuwvar"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fmmkB31rpzlfvqC;
-	Thu,  2 Apr 2026 15:58:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1775145534; x=1777737535; bh=R5R9nbvY7fSoLU03i5BEPe1r
-	38HHMw0mj0T8TG98QMo=; b=e2zuwvarzCZdzfH4hP31TXBr8tY/6yPDaBmgCAD/
-	wjl2GLQQXNfKSYWSYqhhSdXvs+ykwg7BSbAzAxsYOndfNAvLegxxkY69mBZ+vTFr
-	dauHKb/f5uYLrpQCgqQraiHFKi1vF0E+n9AzHdLgB1ypIO5jAck24V1a0PUj771U
-	rZ7YnLC/iSeSpmf3DY09JxBGPTUUmbMZA5aA69m2W6bftfE29EBOwr+PUPJT8YbZ
-	TmIf42WfnUNY2W0R12IwOnmQzmOW0bhQiw+kIvbkek+fsqXOrqnZm/an877ZJVU5
-	tdBAgYNoOvwoAWkP88kA6mR/qIGM+j0NkXhjniG9Rp2NWA==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id cMatIIXUEUY5; Thu,  2 Apr 2026 15:58:54 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fmmk36859zlfvq7;
-	Thu,  2 Apr 2026 15:58:51 +0000 (UTC)
-Message-ID: <fd582bae-a090-48d4-a4eb-b2db6c10c26c@acm.org>
-Date: Thu, 2 Apr 2026 08:58:50 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u51YtbSz"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775148695;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=e4OY0pFHQqF1taLpbuoZ/S+1gfsYOaYB6e+6qLBiwC8=;
+	b=u51YtbSzkO9g4gp7z68UAp7pDnTk8CB3ln+PVWRTV7oW82r8aOpzSIOW5CLDL5lpOMy/HZ
+	fGg2RDRo2EXZLugfGWVke2uIsjcusuar6yYXNxwsRtWIgdGidjVl7nDCBy3vyR+4ghjRXg
+	GQHcPsBx0qbLPpz3FA6VEkyvCVzRGp4=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>,
+	Kees Cook <kees@kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND] block: use sysfs_emit in sysfs show functions
+Date: Thu,  2 Apr 2026 18:50:00 +0200
+Message-ID: <20260402164958.894879-4-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] scsi: align scsi_device iodone_cnt to avoid cache
- line contention
-To: Sumit Saxena <sumit.saxena@broadcom.com>, martin.petersen@oracle.com,
- axboe@kernel.dk
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- mpi3mr-linuxdrv.pdl@broadcom.com, James Rizzo <james.rizzo@broadcom.com>
-References: <20260402074637.92417-1-sumit.saxena@broadcom.com>
- <20260402074637.92417-4-sumit.saxena@broadcom.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260402074637.92417-4-sumit.saxena@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2186; i=thorsten.blum@linux.dev; h=from:subject; bh=nPckZVY05Ya9LYXM78UJ3KicfyNlpcwy07PqJzw0dyY=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJnn5pl12c3Zqq3a6znPW2H5zrkdFze8PM58icX0qGO0R b1O6lmmjhIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZjITglGhpk18ot+SF7jUe6Y 63R5rlvw/Rk7AlSsRJzio9esZk5Yv4bhu2P1sp3nY4/YvmiWrDm0JOLYjlnXGbKL2qbJVVgarrv JAAA=
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 4/2/26 12:46 AM, Sumit Saxena wrote:
-> From: James Rizzo <james.rizzo@broadcom.com>
-> 
-> Place iodone_cnt on its own cache line so it does not share a cache line
-> with iorequest_cnt, avoiding significant performance hits from false
-> sharing when request and completion paths update these counters on some
-> CPU architectures.
-> 
-> Signed-off-by: James Rizzo <james.rizzo@broadcom.com>
-> Signed-off-by: Sumit Saxena <sumit.saxena@broadcom.com>
-> ---
->   include/scsi/scsi_device.h | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-> index 9c2a7bbe5891..86c2a3a6b206 100644
-> --- a/include/scsi/scsi_device.h
-> +++ b/include/scsi/scsi_device.h
-> @@ -272,7 +272,9 @@ struct scsi_device {
->   #define SCSI_DEFAULT_DEVICE_BLOCKED	3
->   
->   	atomic_t iorequest_cnt;
-> -	atomic_t iodone_cnt;
-> +	/* ensure iorequest_cnt and iodone_cnt are on different cache lines to avoid significant
-> +	   performance hits on cache line contention on some CPU architectures */
-> +	atomic_t iodone_cnt ____cacheline_aligned_in_smp;
->   	atomic_t ioerr_cnt;
->   	atomic_t iotmo_cnt;
+Replace sprintf() with sysfs_emit() in sysfs show functions.
+sysfs_emit() is preferred for formatting sysfs output because it
+provides safer bounds checking.
 
-Has it been considered to change both iorequest_cnt and iodone_cnt into
-per-cpu counters?
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ block/partitions/core.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Thanks,
-
-Bart.
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 740228750aaf..02ec8f663e6a 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -8,6 +8,7 @@
+ #include <linux/major.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
++#include <linux/sysfs.h>
+ #include <linux/ctype.h>
+ #include <linux/vmalloc.h>
+ #include <linux/raid/detect.h>
+@@ -177,31 +178,31 @@ static struct parsed_partitions *check_partition(struct gendisk *hd)
+ static ssize_t part_partition_show(struct device *dev,
+ 				   struct device_attribute *attr, char *buf)
+ {
+-	return sprintf(buf, "%d\n", bdev_partno(dev_to_bdev(dev)));
++	return sysfs_emit(buf, "%d\n", bdev_partno(dev_to_bdev(dev)));
+ }
+ 
+ static ssize_t part_start_show(struct device *dev,
+ 			       struct device_attribute *attr, char *buf)
+ {
+-	return sprintf(buf, "%llu\n", dev_to_bdev(dev)->bd_start_sect);
++	return sysfs_emit(buf, "%llu\n", dev_to_bdev(dev)->bd_start_sect);
+ }
+ 
+ static ssize_t part_ro_show(struct device *dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+-	return sprintf(buf, "%d\n", bdev_read_only(dev_to_bdev(dev)));
++	return sysfs_emit(buf, "%d\n", bdev_read_only(dev_to_bdev(dev)));
+ }
+ 
+ static ssize_t part_alignment_offset_show(struct device *dev,
+ 					  struct device_attribute *attr, char *buf)
+ {
+-	return sprintf(buf, "%u\n", bdev_alignment_offset(dev_to_bdev(dev)));
++	return sysfs_emit(buf, "%u\n", bdev_alignment_offset(dev_to_bdev(dev)));
+ }
+ 
+ static ssize_t part_discard_alignment_show(struct device *dev,
+ 					   struct device_attribute *attr, char *buf)
+ {
+-	return sprintf(buf, "%u\n", bdev_discard_alignment(dev_to_bdev(dev)));
++	return sysfs_emit(buf, "%u\n", bdev_discard_alignment(dev_to_bdev(dev)));
+ }
+ 
+ static DEVICE_ATTR(partition, 0444, part_partition_show, NULL);
