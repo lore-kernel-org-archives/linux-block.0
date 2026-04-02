@@ -1,153 +1,203 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from iad-out-010.esa.us-east-1.outbound.mail-perimeter.amazon.com (iad-out-010.esa.us-east-1.outbound.mail-perimeter.amazon.com [34.197.254.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A9A3A3E74
-	for <linux-block@vger.kernel.org>; Thu,  2 Apr 2026 09:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775123248; cv=pass; b=RsSP1NAoh17H7UV+0y29PSncLfZ9KsYMlNMFekxkyBA6UrOOW0H67d0w3WK8OrHvzb3VCkFaxv2T2scfXCOJekKQtYZ38yTPZ0FORzW79j/M558mZw2EWSxIeMaEHc/ZSCj0Xj2gz0SY3CjxOXzIuamP+xuqUO7aGJG854JVB+I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775123248; c=relaxed/simple;
-	bh=+9fRcog3ZU7tezfUjPEFmOcqhgFL4fet31l7xH8YuOY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xex8c/5q8X6g9bpuYYSYsku0ztngaoHSxgBktJ1i0e2DynMlTE1vsbGY/NK6gR9h7SN4acYdtRuNABrSZhDdvQVRq8uaCixnMPVmvhAPLEbzzMawMvoorJQw6zIOk5cxFV6HmGkmfiglxmphGkDofMgL99G5cihoIGGTm3pgIR4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IJ245kdO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jaucXP4d; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D15F3E51D1;
+	Thu,  2 Apr 2026 12:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.197.254.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775133130; cv=none; b=gUAmpfk9F9uxAl1+/eRI1fe1DYgsRPBu6avXygg1fbGO+1rsBjwWueZl7c9bVaGL0xaySvUdX9C/w4Eb22xgelnyYn73QH/JJxVcNnA2DnBBLxDPlMW3CW6v2LmEtrHqq78gXdc1d0bFEq6FAszQ+xZzpQRXv4JiCqGVso5744c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775133130; c=relaxed/simple;
+	bh=aDYtmSvd0EEN3gRzBnxf/nlkESwF4ea02ohRXl6ElJc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KqC3rvJqECPr4IDyxfz0a9lkSGyq37WnYLdWOgxPBmpGXVprkUc580ff3E0O5nDCCyF/8Tn5+qfxZheXYSLXuL0H/lgSHU8IOFCHmmOw4dXXVxAIFnsT6s+7K5VaYH/nWIr6aVLsavLqQa2x+6qXd1AQ+lk43osHH1n7eFPGt14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=TLJNze09; arc=none smtp.client-ip=34.197.254.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJ245kdO";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jaucXP4d"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775123240;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n4qDMFtRmKlGdlbffBUpJm7co946MEllLL5NRqeKXts=;
-	b=IJ245kdOoALhTVoiAVXvtqoNmVKxi1bBLFrE9It8IDlhZvhuF0AQk6IBmEldn+W8P4nXvf
-	IquEEnHQf5Wx2WGIy24QleiuUtZSGoFKH+o6zznqfDFqCAbgVj67pBAyFJvnCTInhvb6Mm
-	KO2KivzQWbq4W2cd69VY6s6JXxGSVoo=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-6YeCSFpQN7GZN1bt3w7DnA-1; Thu, 02 Apr 2026 05:47:19 -0400
-X-MC-Unique: 6YeCSFpQN7GZN1bt3w7DnA-1
-X-Mimecast-MFC-AGG-ID: 6YeCSFpQN7GZN1bt3w7DnA_1775123238
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-604e9bdda95so904596137.3
-        for <linux-block@vger.kernel.org>; Thu, 02 Apr 2026 02:47:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775123238; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YZl2lpjD1YkZr54iypBXtzt2KHk6AFYXo5J2in4fwqYARHXTX8SXtIOOImjnXEfwxR
-         m78CP4LryayTRqWO3J8tj75FwYYsEs/ywUKH9EM3BDMQlls+7kRqJkMA6xvI8xe0G7AL
-         z4KyMqvMx6eu5wHGfQV5P520NTxdN1UZgaGGrUCRO/zPtZ404GzLyfTrtxf0ATZ+Ih4l
-         XjvTLpSO0fNl0amnrTFibewbV8jk4x0VrMFOO+ztW9cYvOwFeKSC1jRKwAmXnGKx3f7x
-         dTZ6oj+FlkNuAo8ySB2vGDMrHYh+L7kTA20alysQDMYUN1huK6o0uMxz8QM9kAA4wooU
-         jO1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=n4qDMFtRmKlGdlbffBUpJm7co946MEllLL5NRqeKXts=;
-        fh=q5KXspk5DhbQwFVKtKnx785vT6Qm7cWilhY1l0OOfX8=;
-        b=ZhGOGF3xytPaxZffIx6hCQCH7siB+HvgS3ZXBPYEJrzHz6sV9v3k0Fu/hXLuYBOsd5
-         UQ8Es/cq4J8lWa2ZDA6MdC9aBBbQZ7eDpKQ6hfvLDTTGQYs0ceJ8ZE/SlK2J74fMFwtj
-         8FY76r4cTxFRhSAY3EAoE96X7LmGaFc8xY65E9HBwd6ZrQvHeQMZNujz6OFH/Xi//CBX
-         SKZFk4m2d8FkUn4NvuUSUg/8OOTUPO50/M71ZDUb778oCN3cZ/SiOPk7Pt8w9TVCOb/6
-         SnE8oZg0rhBZpt9OvDEYmvS3U+V2rU4pQVeq29f6mM7CLWtcE03fkmhTxBBpOG/t1blH
-         k1LA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="TLJNze09"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775123238; x=1775728038; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n4qDMFtRmKlGdlbffBUpJm7co946MEllLL5NRqeKXts=;
-        b=jaucXP4dcYPSV0vUuRXA97q4nCRIpynOAD8zM759rfUMyeUJ1sLuCOIAR66f/HU/+W
-         OgISfi0pF6DFD/72xgIqoMoUm/EvseZnWqnQYA5gGJITv7nLfkpCUVSTCd+sWMpV0RGU
-         9olLb7ob+q8MtgxZFFGTSYIm96ToHch5VH0meMiOOhDzZmBON9i6fBaasqyLy9fQpWiN
-         AgNv7JrBeI9K2stuXoCOS/egnNFOWdsGm+EW/diHD2jsNOhgJ/WmHScf6usPURQFJFzi
-         K+KjJGb6DYVH1btlYR0UKTQko6QUvufrQE1Ts2/5brCLUhOq/9AE9RAU42FqcFeRQReq
-         xgZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775123238; x=1775728038;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=n4qDMFtRmKlGdlbffBUpJm7co946MEllLL5NRqeKXts=;
-        b=h3cehCqGiC7wqMIk3STYSbnmcHL+SwdVocbsPLLBVIMahbDlkuBjeN6Ys7KxK1GDiO
-         oRQko8clVylLAad4PGcOhRTyaXwh0nsVZzsnk+wPZR+YljSR1BwcWpvXEQwIVcAJ48c1
-         ghCgoVUvSyZxpawFLOB+HoaU+Nzqn3XFyQQoq/xASS0CA8IRQy/z6DA/B7UlNcea7qCm
-         Hi5oKkpn92rjePQw78dXY1BTyaqdf4so3Ckd6vq7bgL8Gv6yEfs3xtOnXn9wA/4Kp0yC
-         Ci8Ozqw60P2tNbXQFu0Fd9Nl9TYLH8+iIXBY/E6Z0YidnKk0Cu+mbGdtTzmbO3NCwT5G
-         o7CA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4Q3TD6VrI2IYdGkN5lGc0V398himieI8wThS45/L0pIZWHkglJcb3GBoaxV6tLsUDMRssYYnAi/uXfg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YylPpsnxWLQqJEKJjy9m23WQAZxcQ56EYvGAxNpwudyP+m2KTWU
-	+hvGImAp64vuvF1bbvr0E8MMLpnYKLBxXAdyZvUjbn82Ayi9yB2p64V75P1dZpe8qZqNel9LcGI
-	cuCTov/Xx/vq3h2M8k5e/GLKpTY5SwtqgJEwtw/bLySLtk2D8SAofNoniwL+gc2vrSlel7fwy4D
-	mOZ2JfaiiQz/eA0J5yiQp/EbgChZu0lcybfRVL/1M=
-X-Gm-Gg: ATEYQzw6Ln1GixVRkhjXR5B05yiet59lR3iiTCdfT73lzQR+UZTaLhepZkBDG2QxAsE
-	JwH24lHZQAn1zCG4O+9MIoHBMK6+TmtTfK0YmzjOBzJ5vO+e++nyk7NFs1C+fJtzSw530Vu4Im+
-	zAuxRnMczTJ6A7D1790lemW8iugEWRjB2liIp4svQSjAbYe87S0bEpeiLo7hCaF5OS1ffZvT/D2
-	sRSew9+/vSB2XF7ImlA0jp99a8WNBI3+SP7WAU=
-X-Received: by 2002:a05:6102:26d1:b0:602:7a74:fbcc with SMTP id ada2fe7eead31-60567ec81aamr2988557137.15.1775123238399;
-        Thu, 02 Apr 2026 02:47:18 -0700 (PDT)
-X-Received: by 2002:a05:6102:26d1:b0:602:7a74:fbcc with SMTP id
- ada2fe7eead31-60567ec81aamr2988549137.15.1775123238002; Thu, 02 Apr 2026
- 02:47:18 -0700 (PDT)
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1775133125; x=1806669125;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:mime-version:
+   content-transfer-encoding;
+  bh=6w3HUVHSmjm01LKzbzqMd/c0WGfyb9c7ge6p63vHYQI=;
+  b=TLJNze09s90omXNwh/EVneUqNcRFVos12lrBVwuckpj9mjeoIw8krJk5
+   0ggvx4lKPUQ5Q9HDmfTRZpfkfAvpzX2r8rDa78d85sZsjASqwS1pCvYoE
+   SBXeygTpvn2Qbqe1NCC30sBzasFu4OKifydxG+NuwiXsVT2MLDmvTZD08
+   4xBKFyoYPsLjnwHwo289oFCga7x65r3Fh6r02wkgIU35FOfhFQipxvnjQ
+   wmsQZdB4f30IKsOyAnpdw2Y9tZs6XTWbImWxuhOF8zrRdaUVTpv5P31LM
+   khAR66KtXQiVA/KkSfAolQHHgqW3G24AZYDak4oAX6nqdnw1V/ctpoO/t
+   g==;
+X-CSE-ConnectionGUID: DdekA+7kT0eMkTYJA1rRng==
+X-CSE-MsgGUID: /6glz+8BSwe83yXe9ZoY8A==
+X-IronPort-AV: E=Sophos;i="6.23,155,1770595200"; 
+   d="scan'208";a="15095409"
+Received: from ip-10-4-10-75.ec2.internal (HELO smtpout.naws.us-east-1.prod.farcaster.email.amazon.dev) ([10.4.10.75])
+  by internal-iad-out-010.esa.us-east-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 12:32:00 +0000
+Received: from EX19MTAUEC002.ant.amazon.com [72.21.196.66:23526]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.8.197:2525] with esmtp (Farcaster)
+ id aa9e9018-8b88-44d4-9916-7172c14268fc; Thu, 2 Apr 2026 12:32:00 +0000 (UTC)
+X-Farcaster-Flow-ID: aa9e9018-8b88-44d4-9916-7172c14268fc
+Received: from EX19D012UEC003.ant.amazon.com (10.252.135.160) by
+ EX19MTAUEC002.ant.amazon.com (10.252.135.253) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Thu, 2 Apr 2026 12:32:00 +0000
+Received: from EX19D012UEC003.ant.amazon.com (10.252.135.160) by
+ EX19D012UEC003.ant.amazon.com (10.252.135.160) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Thu, 2 Apr 2026 12:31:59 +0000
+Received: from EX19D012UEC003.ant.amazon.com ([fe80::67ea:859:1e17:25a9]) by
+ EX19D012UEC003.ant.amazon.com ([fe80::67ea:859:1e17:25a9%3]) with mapi id
+ 15.02.2562.037; Thu, 2 Apr 2026 12:31:59 +0000
+From: "Heyne, Maximilian" <mheyne@amazon.de>
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+CC: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, Sven Peter
+	<sven@svenpeter.dev>, Chaitanya Kulkarni <kch@nvidia.com>, Keith Busch
+	<kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Hector Martin
+	<marcan@marcan.st>, Alyssa Rosenzweig <alyssa@rosenzweig.io>, "James E.J.
+ Bottomley" <jejb@linux.ibm.com>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, Alim Akhtar <alim.akhtar@samsung.com>, "Avri
+ Altman" <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, "Sasha
+ Levin" <sashal@kernel.org>, Peter Wang <peter.wang@mediatek.com>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, Seunghui Lee
+	<sh043.lee@samsung.com>, Sanjeev Yadav <sanjeev.y@mediatek.com>, Wonkon Kim
+	<wkon.kim@samsung.com>, Brian Kao <powenkao@google.com>, Hannes Reinecke
+	<hare@suse.de>, Ming Lei <ming.lei@redhat.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "asahi@lists.linux.dev"
+	<asahi@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>
+Subject: Re: [PATCH 6.1.y 5/8] nvme-apple: remove an extra queue reference
+Thread-Topic: [PATCH 6.1.y 5/8] nvme-apple: remove an extra queue reference
+Thread-Index: AQHcwpyzTCv4ZXIhp0SsQfFW9ZSeHw==
+Date: Thu, 2 Apr 2026 12:31:59 +0000
+Message-ID: <20260402-anti-cuba-1ea02cea@mheyne-amazon>
+References: <20260401-pliny-ashley-ff03a0b6@mheyne-amazon>
+ <20260401232116-53765a086f3855a30962fb81-pchelkin@ispras>
+In-Reply-To: <20260401232116-53765a086f3855a30962fb81-pchelkin@ispras>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <772100EB31401D4090226323D02A6503@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326144058.2392319-1-ming.lei@redhat.com>
-In-Reply-To: <20260326144058.2392319-1-ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Thu, 2 Apr 2026 17:47:07 +0800
-X-Gm-Features: AQROBzCexU9L3edGhUQL6F48f5_6dnAnnmS_QLeUXIAOAY4fwbwRn2mCIAvIecw
-Message-ID: <CAFj5m9L26JbwCv-njhGts4VqBFUbEb9rFgfUvH1Qv6GtMT_9_Q@mail.gmail.com>
-Subject: Re: [PATCH V2] bio: fix kmemleak false positives from percpu bio
- alloc cache
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Yi Zhang <yi.zhang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 26, 2026 at 10:41=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wro=
-te:
->
-> When a bio is allocated from the mempool with REQ_ALLOC_CACHE set and
-> later completed, bio_put() places it into the per-cpu bio_alloc_cache
-> via bio_put_percpu_cache() instead of freeing it back to the
-> mempool/slab. The slab allocation remains tracked by kmemleak, but the
-> only reference to the bio is through the percpu cache's free_list,
-> which kmemleak fails to trace through percpu memory. This causes
-> kmemleak to report the cached bios as unreferenced objects.
->
-> Use symmetric kmemleak_free()/kmemleak_alloc() calls to properly track
-> bios across percpu cache transitions:
->
->  - bio_put_percpu_cache: call kmemleak_free() when a bio enters the
->    cache, unregistering it from kmemleak tracking.
->
->  - bio_alloc_percpu_cache: call kmemleak_alloc() when a bio is taken
->    from the cache for reuse, re-registering it so that genuine leaks
->    of reused bios remain detectable.
->
->  - __bio_alloc_cache_prune: call kmemleak_alloc() before bio_free() so
->    that kmem_cache_free()'s internal kmemleak_free() has a matching
->    allocation to pair with.
->
-> Tested-by: Yi Zhang <yi.zhang@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
->         - rebase on for-7.1/block
->         - add helper of bio_slab_addr()
+On Wed, Apr 01, 2026 at 11:45:57PM +0300, Fedor Pchelkin wrote:
+> Hello,
+> =
 
-Hello Jens,
+> "Heyne, Maximilian" <mheyne@amazon.de> wrote:
+> > From: Christoph Hellwig <hch@lst.de>
+> > =
 
-Ping...
+> > [ Upstream commit 941f7298c70c7668416e7845fa76eb72c07d966b ]
+> > =
 
-Thanks,
+> > Now that blk_mq_destroy_queue does not release the queue reference, the=
+re
+> > is no need for a second admin queue reference to be held by the
+> > apple_nvme structure.
+> =
+
+> This patch is probably buggy in upstream.  It removes extra reference
+> ->get, but doesn't remove the corresponding ->put which is located
+> inside apple_nvme_free_ctrl().
+
+Now I'm seeing this as well. Has the same problem as the pci driver in
+6.1 where blk_put_queue is called from nvme_free_ctrl() and again from
+apple_nvme_free_ctrl(). Thank you for catching this. I don't have the
+hardware to test this.
+
+Are you going to send a fix upstream? It's looks to be broken on master,
+too.
+
+> =
+
+> I'm reporting here currently just for the heads up - was looking at the
+> same nvme regression problem at 6.1.y, found this thread, and the
+> nvme-apple changes appeared suspicious.
+> =
+
+> nvme-apple patch is not required to fix the regression (this also holds
+> true for [PATCH 6.1.y 3/8] scsi: remove an extra queue reference).  Maybe
+> they shouldn't go to stable.
+
+I think, I'll send a v2 of the patch set without these 2 patches. It's
+probably easier for Greg to apply.
+
+> =
+
+> That said, the other part of the backport series FWIW looks good to me,
+> and I've also verified it resolves the 6.1.y regression.
+
+You may leave a Tested-by if you want ;-)
+
+> =
+
+> Thanks.
+> =
+
+> > =
+
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+> > Reviewed-by: Sven Peter <sven@svenpeter.dev>
+> > Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> > Reviewed-by: Keith Busch <kbusch@kernel.org>
+> > Link: https://lore.kernel.org/r/20221018135720.670094-5-hch@lst.de
+> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+> > ---
+> >  drivers/nvme/host/apple.c | 9 ---------
+> >  1 file changed, 9 deletions(-)
+> > =
+
+> > diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
+> > index c5fc293c22123..c84ebfcfdeb88 100644
+> > --- a/drivers/nvme/host/apple.c
+> > +++ b/drivers/nvme/host/apple.c
+> > @@ -1507,15 +1507,6 @@ static int apple_nvme_probe(struct platform_devi=
+ce *pdev)
+> >  		goto put_dev;
+> >  	}
+> >  =
+
+> > -	if (!blk_get_queue(anv->ctrl.admin_q)) {
+> > -		nvme_start_admin_queue(&anv->ctrl);
+> > -		blk_mq_destroy_queue(anv->ctrl.admin_q);
+> > -		blk_put_queue(anv->ctrl.admin_q);
+> > -		anv->ctrl.admin_q =3D NULL;
+> > -		ret =3D -ENODEV;
+> > -		goto put_dev;
+> > -	}
+> > -
+> >  	nvme_reset_ctrl(&anv->ctrl);
+> >  	async_schedule(apple_nvme_async_probe, anv);
+> >  =
+
+> > -- =
+
+> > 2.50.1
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
