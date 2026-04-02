@@ -1,617 +1,99 @@
-Received: from server.eikel.org (server.eikel.org [178.77.101.203])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A47E36E46D;
-	Thu,  2 Apr 2026 07:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.77.101.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723E9235C01;
+	Thu,  2 Apr 2026 07:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775115348; cv=none; b=XzaLNFNL9AmLZTgnHSqBF/bR+XCfxf18u2vAL+aOg6yhFjMq72Pf05soBxH2wpZzQSicIYS3SXHjfgQ0kcMBluymUrI4MnQLnoqryLPyMb1IDKeu2SJ5gwdzW0qrUj42mKRCPGPUQ76OA1c3lJSsTq83OHoWwBv5G04XFRO9Cfw=
+	t=1775116695; cv=none; b=XcFU43zjnPlDoL63xUsTxEAOe0K/LfEuyGfbMYBp68skpgQ7boWbhtU29KJURvjEnxqz8/3CgOKperW3ubbs9XtUJsG6K9a28yvB26O/Pblv6hEu8fIGwGOQWDXEBqc3l0GWWGvgAp9v955SpNnl8c9Qz9dyaAqT76c2bF6Sowg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775115348; c=relaxed/simple;
-	bh=nYSAM2Lnu7FC6QuM/PLeRVuEp7nXU1kzgI4FP6N3wpc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wm+z2NA0XT9iGAJqn2iG8b70AZ5KWFjjPd4VIB5s22jfOx/53LRz+GaiFayrunZ7tTDciPLf+G3Ada0kv60sTROSw6d+y3Tm2dmMwajATCyIl3Uu/qs+31Tp3lMFItt5mw8HkK74VeiTCFYlh5YlDWV/psLkYGyYmQqfyx+Ba7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=eikel.org; spf=fail smtp.mailfrom=eikel.org; dkim=pass (1024-bit key) header.d=eikel.org header.i=@eikel.org header.b=cnkmK14W; arc=none smtp.client-ip=178.77.101.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=eikel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=eikel.org
+	s=arc-20240116; t=1775116695; c=relaxed/simple;
+	bh=vHibcFiXOv8GrYg6f/bqFV+bVmQHYs2HrK6rxD8gKiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJJDPIsoQj65HEVmkL+LVgNjlYH8/sMdDQmV9M8Q6UtHmD+JYJMN6UgBL5MZ7U6v4I6qDGZGKeuSYp9adp6rZsoI/ZoTRvhZZPsyReN+JZPqSea66cKiim7iM7/Ie5dpf/+ppOAyIe1cIesrKjf7bO3WM2KrGp58J2WGwohtrMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2VGbfWPi; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RCSzIAOv; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=eikel.org header.i=@eikel.org header.b="cnkmK14W"
-Received: from thinkpad-benjamin.localnet (p200300fd1f05f100447f61f950b53eb3.dip0.t-ipconnect.de [IPv6:2003:fd:1f05:f100:447f:61f9:50b5:3eb3])
-	by server.eikel.org (Postfix) with ESMTPSA id 6D78B1F631;
-	Thu,  2 Apr 2026 09:35:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=eikel.org;
-	s=default; t=1775115336;
-	bh=Eg2xsA2S2/jK9mgFSfOI1p5EFNHsaOXxfZPgvuVWqTk=; h=From:To:Subject;
-	b=cnkmK14W6S/hou5wBZrfiIJx9bt0vDCahJ7yVSM3aw+ecgpuF9vLjTrk3Eau0W2Kr
-	 Smeays2VP5Pkl/O23LXGdRO8mFpozRcG3+GB+yfpsI1DKgHZwP51RuYh/QNM6s4ZUb
-	 42Q6B9tJux7RA1rwlHbRJRA49BOr8XD2DkKUwBm0=
-Authentication-Results: server.eikel.org;
-        spf=pass (sender IP is 2003:fd:1f05:f100:447f:61f9:50b5:3eb3) smtp.mailfrom=debian@eikel.org smtp.helo=thinkpad-benjamin.localnet
-Received-SPF: pass (server.eikel.org: connection is authenticated)
-From: Benjamin Eikel <debian@eikel.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org,
- Linux kernel regressions list <regressions@lists.linux.dev>
-Subject: 
- Re: [BUG] RCU stall in blk_mq_timeout_work (potentially a regression in
- 6.19.7 or 6.19.8)
-Date: Thu, 02 Apr 2026 09:33:42 +0200
-Message-ID: <5090885.31r3eYUQgx@thinkpad-benjamin>
-In-Reply-To: <b9262818-14e7-4902-af6c-6c7d3560ac4c@leemhuis.info>
-References: 
- <21608811.f9utdCOAlc@thinkpad-benjamin>
- <b9262818-14e7-4902-af6c-6c7d3560ac4c@leemhuis.info>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2VGbfWPi";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RCSzIAOv"
+Date: Thu, 2 Apr 2026 09:58:10 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1775116692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8ds3u4+6LAQIo5JXRSrJAOTU+FbNVAjarQWEAuaA6KI=;
+	b=2VGbfWPiuvIl7w8Nm7Vgl/McrfOt8PG119L5zLfE6KMnhE2hHWKESbQsFDcFTHLjuYKwQS
+	Wi1quhUFsXmA4k/me9cksXxi4JcuROmE6HgQDaBYkaqnq0Wb1wJZsxYt4qjmJ1hGTZJ8I7
+	8jpOs1/qSDlEVPLNCtXPo3bEM33sh4phWlQMT44Hcq3W6TyjRH5pOpeWOTdLYAhOK0zcNy
+	k+1v8X7OjaUweZYskkitoDEBSEPqj52PBfX6Xlh1DV1LziwRpHiyHBa8uWdfkyXvjb4/fJ
+	e0RUpvyouMdKCc93cNwUHYKHlGIgHDtjMpicuVtsTfY1BIxq8Y97/kuZAonMrw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1775116692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8ds3u4+6LAQIo5JXRSrJAOTU+FbNVAjarQWEAuaA6KI=;
+	b=RCSzIAOvGwKMDpOL3oHmxXQbRFkbngSE2GOk9Z6lL7gUflAeNOI03DkohbZb4f4Y/KLJvz
+	vCwwY7N6gwweLsDw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Waiman Long <longman@redhat.com>
+Cc: Aaron Tomlin <atomlin@atomlin.com>, axboe@kernel.dk, kbusch@kernel.org,
+	hch@lst.de, sagi@grimberg.me, mst@redhat.com, aacraid@microsemi.com,
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+	liyihang9@h-partners.com, kashyap.desai@broadcom.com,
+	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
+	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com,
+	sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com,
+	ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com,
+	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org,
+	juri.lelli@redhat.com, vincent.guittot@linaro.org,
+	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com,
+	yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org,
+	chenridong@huawei.com, hare@suse.de, kch@nvidia.com,
+	ming.lei@redhat.com, steve@abita.co, sean@ashe.io,
+	chjohnst@gmail.com, neelx@suse.com, mproche@gmail.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
+	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com
+Subject: Re: [PATCH v9 09/13] isolation: Introduce io_queue isolcpus type
+Message-ID: <20260402075810.w0GVbX0Z@linutronix.de>
+References: <20260330221047.630206-1-atomlin@atomlin.com>
+ <20260330221047.630206-10-atomlin@atomlin.com>
+ <20260401124947.-d4D5Cr-@linutronix.de>
+ <5e6aa61e-0ad0-4027-bba9-cd906ab0d7e8@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5e6aa61e-0ad0-4027-bba9-cd906ab0d7e8@redhat.com>
 
-Hi Thorsten and others,
+On 2026-04-01 15:05:21 [-0400], Waiman Long wrote:
+> > Could we please clarify whether we want to keep it and this
+> > additionally or if managed_irq could be used instead. This adds another
+> > bit. If networking folks jump in on managed_irqs, would they need to
+> > duplicate this with their net sub flag?
+> 
+> Yes, I will very much prefer to reuse an existing HK cpumask like
+> managed_irqs for this purpose, if possible, rather than adding another
+> cpumask that we need to manage. Note that we are in the process of making
+> these housekeeping cpumasks modifiable at run time in the near future.
 
-Am Dienstag, 31. M=C3=A4rz 2026, 10:32:30 Mitteleurop=C3=A4ische Sommerzeit=
- schrieb Thorsten Leemhuis:
-> [CCing the regressions list and Jens, the Block layer maintainer, who
-> might have an idea what's wrong here and/or how to best debug it]
->=20
-> On 3/27/26 20:28, Benjamin Eikel wrote:
-> > Dear Linux kernel developers,
-> >=20
-> > I experience repeated RCU stalls in blk_mq_timeout_work causing system
-> > freezes. The NVMe drive (more info at the end) shows no errors or
-> > controller resets in the kernel log: the hardware appears healthy. No I=
-/O
-> > timeout messages precede the stalls.
-> >=20
-> > The stall cascades: khugepaged blocks on __lru_add_drain_all waiting fo=
-r a
-> > workqueue flush that cannot complete, and additional kworkers block on a
-> > mutex held by the kblockd rescuer thread. The system becomes noticeably
-> > unresponsive and then I notice it in the logs.
-> >=20
-> > In case the logs are too condensed, please tell me and I can provide th=
-em
-> > fully. If you have pointers on how this could be reproduced and a commit
-> > range,>=20
-> >  I could try to bisect the problem.
->=20
-> A bisection with mainline would help a lot. Maybe doing it between
-> 6.19.6 and 6.19.8 (which would be quicker) might work out, too (but
-> normally it's best to focus on mainline).
+Now if you want to change it at run time, it would mean to reconfigure
+the interrupts, device and so on. Not sure if this useful _or_ if it
+would be "easier" to just the tell upper layer (block in case of I/O)
+not to perform any request on this CPU. Then we would have an interrupt
+on that CPU but it wouldn't do anything.
+It would only become a problem if you would have less queues than CPUs
+and you would like to migrate things.
 
-I have not yet done this because I do not have a reliable way to reproduce =
-it.
+> Cheers,
+> Longman
 
->=20
-> And this is not my area of expertise, but I noticed that some RCU fixes
-> went into -rc6, so might be wise to try that first.
-
-I encountered this issue with -rc6 (see log below, same config). I suspect =
-that
-this only happens after the notebook has previously been suspended.
-
-Kind regards
-Benjamin
-
-=3D=3D Trace from Linux version 7.0.0-rc6 (1=E2=80=932 April) =3D=3D
-
-Apr 01 20:36:59 thinkpad-benjamin kernel: Linux version 7.0.0-rc6-70-rc6 (b=
-enjamin@thinkpad-benjamin) (gcc (Debian 15.2.0-16) 15.2.0, GNU ld (GNU Binu=
-tils for Debian) 2.46) #24 SMP PREEMPT_DYNAMIC Tue Mar 31 14:36:43 CEST 2026
-Apr 01 20:36:59 thinkpad-benjamin kernel: Command line: BOOT_IMAGE=3D/vmlin=
-uz-7.0.0-rc6-70-rc6 root=3D/dev/mapper/thinkpad--benjamin--vg-root ro quiet
-[=E2=80=A6]
-Apr 01 21:06:54 thinkpad-benjamin kernel: PM: suspend entry (s2idle)
-[=E2=80=A6]
-Apr 02 08:44:55 thinkpad-benjamin kernel: PM: suspend exit
-[=E2=80=A6]
-Apr 02 08:50:59 thinkpad-benjamin kernel: INFO: task khugepaged:138 blocked=
- for more than 120 seconds.
-Apr 02 08:50:59 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:50:59 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:50:59 thinkpad-benjamin kernel: task:khugepaged      state:D stac=
-k:0     pid:138   tgid:138   ppid:2      task_flags:0x200040 flags:0x000800=
-00
-Apr 02 08:50:59 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:50:59 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:50:59 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:50:59 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:50:59 thinkpad-benjamin kernel:  schedule_timeout+0xbd/0x100
-Apr 02 08:50:59 thinkpad-benjamin kernel:  wait_for_completion+0x8a/0x140
-Apr 02 08:50:59 thinkpad-benjamin kernel:  __flush_work+0x276/0x3b0
-Apr 02 08:50:59 thinkpad-benjamin kernel:  ? __pfx_wq_barrier_func+0x10/0x10
-Apr 02 08:50:59 thinkpad-benjamin kernel:  __lru_add_drain_all+0x198/0x2b0
-Apr 02 08:50:59 thinkpad-benjamin kernel:  khugepaged+0x65/0x950
-Apr 02 08:50:59 thinkpad-benjamin kernel:  ? __pfx_autoremove_wake_function=
-+0x10/0x10
-Apr 02 08:50:59 thinkpad-benjamin kernel:  ? __pfx_khugepaged+0x10/0x10
-Apr 02 08:50:59 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:50:59 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:50:59 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:50:59 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:50:59 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:50:59 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:53:00 thinkpad-benjamin kernel: INFO: task khugepaged:138 blocked=
- for more than 241 seconds.
-Apr 02 08:53:00 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:53:00 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:53:00 thinkpad-benjamin kernel: task:khugepaged      state:D stac=
-k:0     pid:138   tgid:138   ppid:2      task_flags:0x200040 flags:0x000800=
-00
-Apr 02 08:53:00 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:53:00 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:53:00 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:53:00 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:53:00 thinkpad-benjamin kernel:  schedule_timeout+0xbd/0x100
-Apr 02 08:53:00 thinkpad-benjamin kernel:  wait_for_completion+0x8a/0x140
-Apr 02 08:53:00 thinkpad-benjamin kernel:  __flush_work+0x276/0x3b0
-Apr 02 08:53:00 thinkpad-benjamin kernel:  ? __pfx_wq_barrier_func+0x10/0x10
-Apr 02 08:53:00 thinkpad-benjamin kernel:  __lru_add_drain_all+0x198/0x2b0
-Apr 02 08:53:00 thinkpad-benjamin kernel:  khugepaged+0x65/0x950
-Apr 02 08:53:00 thinkpad-benjamin kernel:  ? __pfx_autoremove_wake_function=
-+0x10/0x10
-Apr 02 08:53:00 thinkpad-benjamin kernel:  ? __pfx_khugepaged+0x10/0x10
-Apr 02 08:53:00 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:53:00 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:53:00 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:53:00 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:53:00 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:53:00 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:55:00 thinkpad-benjamin kernel: INFO: task khugepaged:138 blocked=
- for more than 362 seconds.
-Apr 02 08:55:00 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:55:00 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:55:00 thinkpad-benjamin kernel: task:khugepaged      state:D stac=
-k:0     pid:138   tgid:138   ppid:2      task_flags:0x200040 flags:0x000800=
-00
-Apr 02 08:55:00 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:55:00 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:55:00 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:55:00 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:55:00 thinkpad-benjamin kernel:  schedule_timeout+0xbd/0x100
-Apr 02 08:55:00 thinkpad-benjamin kernel:  wait_for_completion+0x8a/0x140
-Apr 02 08:55:00 thinkpad-benjamin kernel:  __flush_work+0x276/0x3b0
-Apr 02 08:55:00 thinkpad-benjamin kernel:  ? __pfx_wq_barrier_func+0x10/0x10
-Apr 02 08:55:00 thinkpad-benjamin kernel:  __lru_add_drain_all+0x198/0x2b0
-Apr 02 08:55:00 thinkpad-benjamin kernel:  khugepaged+0x65/0x950
-Apr 02 08:55:00 thinkpad-benjamin kernel:  ? __pfx_autoremove_wake_function=
-+0x10/0x10
-Apr 02 08:55:00 thinkpad-benjamin kernel:  ? __pfx_khugepaged+0x10/0x10
-Apr 02 08:55:00 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:55:00 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:55:00 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:55:00 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:55:00 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:55:00 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:57:01 thinkpad-benjamin kernel: INFO: task khugepaged:138 blocked=
- for more than 483 seconds.
-Apr 02 08:57:01 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:57:01 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:57:01 thinkpad-benjamin kernel: task:khugepaged      state:D stac=
-k:0     pid:138   tgid:138   ppid:2      task_flags:0x200040 flags:0x000800=
-00
-Apr 02 08:57:01 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:57:01 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:57:01 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:57:01 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:57:01 thinkpad-benjamin kernel:  schedule_timeout+0xbd/0x100
-Apr 02 08:57:01 thinkpad-benjamin kernel:  wait_for_completion+0x8a/0x140
-Apr 02 08:57:01 thinkpad-benjamin kernel:  __flush_work+0x276/0x3b0
-Apr 02 08:57:01 thinkpad-benjamin kernel:  ? __pfx_wq_barrier_func+0x10/0x10
-Apr 02 08:57:01 thinkpad-benjamin kernel:  __lru_add_drain_all+0x198/0x2b0
-Apr 02 08:57:01 thinkpad-benjamin kernel:  khugepaged+0x65/0x950
-Apr 02 08:57:01 thinkpad-benjamin kernel:  ? __pfx_autoremove_wake_function=
-+0x10/0x10
-Apr 02 08:57:01 thinkpad-benjamin kernel:  ? __pfx_khugepaged+0x10/0x10
-Apr 02 08:57:01 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:57:01 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:57:01 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:57:01 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:57:01 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:57:01 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:14:126 blo=
-cked for more than 120 seconds.
-Apr 02 08:59:02 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:59:02 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/u64:14  state:D stac=
-k:0     pid:126   tgid:126   ppid:2      task_flags:0x4208060 flags:0x00080=
-000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Workqueue: events_unbound idle_cu=
-ll_fn
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule_preempt_disabled+0x15/0=
-x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __mutex_lock.constprop.0+0x54b/0=
-xac0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? ttwu_queue_wakelist+0x13c/0x230
-Apr 02 08:59:02 thinkpad-benjamin kernel:  idle_cull_fn+0x3e/0x170
-Apr 02 08:59:02 thinkpad-benjamin kernel:  process_one_work+0x19d/0x3a0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_thread+0x1af/0x320
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_worker_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:14:126 is =
-blocked on a mutex likely owned by task kworker/R-kbloc:139.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/R-kbloc state:R  run=
-ning task     stack:0     pid:139   tgid:139   ppid:2      task_flags:0x420=
-8060 flags:0x00080000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  preempt_schedule_irq+0x38/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  asm_common_interrupt+0x26/0x40
-Apr 02 08:59:02 thinkpad-benjamin kernel: RIP: 0010:affine_move_task+0x198/=
-0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel: Code: 00 49 8b 36 48 8d bb ec 0d =
-00 00 e8 22 8a d9 00 45 85 ff 44 8b 04 24 0f 84 21 02 00 00 65 ff 0d 4e 73 =
-8b 02 0f 84 6f 03 00 00 <41> 83 e0 04 49 8d 7c 24 08 75 3e e8 18 09 d9 00 b=
-8 ff ff ff ff f0
-Apr 02 08:59:02 thinkpad-benjamin kernel: RSP: 0018:ffffcc5f4063fcd8 EFLAGS=
-: 00000246
-Apr 02 08:59:02 thinkpad-benjamin kernel: RAX: 0000000000000001 RBX: ffff8a=
-f641ab2180 RCX: 0000000000000004
-Apr 02 08:59:02 thinkpad-benjamin kernel: RDX: 0000000000000000 RSI: 000000=
-0000000283 RDI: ffff8af640c08dec
-Apr 02 08:59:02 thinkpad-benjamin kernel: RBP: ffff8b04a1eb2100 R08: 000000=
-0000000000 R09: 0000000000000283
-Apr 02 08:59:02 thinkpad-benjamin kernel: R10: 0000000000000002 R11: 000000=
-0000000000 R12: ffffcc5f4063fd28
-Apr 02 08:59:02 thinkpad-benjamin kernel: R13: ffffcc5f4063fd28 R14: ffffcc=
-5f4063fde0 R15: 0000000000000000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x50c/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? srso_alias_return_thunk+0x5/0x=
-fbef5
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? set_next_entity+0xe7/0x270
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_migration_cpu_stop+0x10/=
-0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x3c8/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __set_cpus_allowed_ptr+0x66/0xc0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  set_cpus_allowed_ptr+0x3a/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_attach_to_pool+0x5f/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  rescuer_thread+0x12d/0x5d0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_rescuer_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task khugepaged:138 blocked=
- for more than 604 seconds.
-Apr 02 08:59:02 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:59:02 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:khugepaged      state:D stac=
-k:0     pid:138   tgid:138   ppid:2      task_flags:0x200040 flags:0x000800=
-00
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule_timeout+0xbd/0x100
-Apr 02 08:59:02 thinkpad-benjamin kernel:  wait_for_completion+0x8a/0x140
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __flush_work+0x276/0x3b0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_wq_barrier_func+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __lru_add_drain_all+0x198/0x2b0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  khugepaged+0x65/0x950
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_autoremove_wake_function=
-+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_khugepaged+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:16:5369 bl=
-ocked for more than 120 seconds.
-Apr 02 08:59:02 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:59:02 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/u64:16  state:D stac=
-k:0     pid:5369  tgid:5369  ppid:2      task_flags:0x4208060 flags:0x00080=
-000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Workqueue: events_unbound idle_cu=
-ll_fn
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule_preempt_disabled+0x15/0=
-x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __mutex_lock.constprop.0+0x54b/0=
-xac0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? finish_task_switch.isra.0+0x96=
-/0x2c0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  idle_cull_fn+0x3e/0x170
-Apr 02 08:59:02 thinkpad-benjamin kernel:  process_one_work+0x19d/0x3a0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_thread+0x1af/0x320
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_worker_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:16:5369 is=
- blocked on a mutex likely owned by task kworker/R-kbloc:139.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/R-kbloc state:R  run=
-ning task     stack:0     pid:139   tgid:139   ppid:2      task_flags:0x420=
-8060 flags:0x00080000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __schedule+0x484/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? preempt_schedule_irq+0x38/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? asm_common_interrupt+0x26/0x40
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x198/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x50c/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? srso_alias_return_thunk+0x5/0x=
-fbef5
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? set_next_entity+0xe7/0x270
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_migration_cpu_stop+0x10/=
-0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x3c8/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __set_cpus_allowed_ptr+0x66/0x=
-c0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? set_cpus_allowed_ptr+0x3a/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? worker_attach_to_pool+0x5f/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? rescuer_thread+0x12d/0x5d0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_rescuer_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:12:9088 bl=
-ocked for more than 120 seconds.
-Apr 02 08:59:02 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:59:02 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/u64:12  state:D stac=
-k:0     pid:9088  tgid:9088  ppid:2      task_flags:0x4208060 flags:0x00080=
-000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Workqueue: events_unbound idle_cu=
-ll_fn
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule_preempt_disabled+0x15/0=
-x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __mutex_lock.constprop.0+0x54b/0=
-xac0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  idle_cull_fn+0x3e/0x170
-Apr 02 08:59:02 thinkpad-benjamin kernel:  process_one_work+0x19d/0x3a0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_thread+0x1af/0x320
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_worker_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:12:9088 is=
- blocked on a mutex likely owned by task kworker/R-kbloc:139.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/R-kbloc state:R  run=
-ning task     stack:0     pid:139   tgid:139   ppid:2      task_flags:0x420=
-8060 flags:0x00080000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  preempt_schedule_irq+0x38/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  asm_common_interrupt+0x26/0x40
-Apr 02 08:59:02 thinkpad-benjamin kernel: RIP: 0010:affine_move_task+0x198/=
-0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel: Code: 00 49 8b 36 48 8d bb ec 0d =
-00 00 e8 22 8a d9 00 45 85 ff 44 8b 04 24 0f 84 21 02 00 00 65 ff 0d 4e 73 =
-8b 02 0f 84 6f 03 00 00 <41> 83 e0 04 49 8d 7c 24 08 75 3e e8 18 09 d9 00 b=
-8 ff ff ff ff f0
-Apr 02 08:59:02 thinkpad-benjamin kernel: RSP: 0018:ffffcc5f4063fcd8 EFLAGS=
-: 00000246
-Apr 02 08:59:02 thinkpad-benjamin kernel: RAX: 0000000000000001 RBX: ffff8a=
-f641ab2180 RCX: 0000000000000004
-Apr 02 08:59:02 thinkpad-benjamin kernel: RDX: 0000000000000000 RSI: 000000=
-0000000283 RDI: ffff8af640c08dec
-Apr 02 08:59:02 thinkpad-benjamin kernel: RBP: ffff8b04a1eb2100 R08: 000000=
-0000000000 R09: 0000000000000283
-Apr 02 08:59:02 thinkpad-benjamin kernel: R10: 0000000000000002 R11: 000000=
-0000000000 R12: ffffcc5f4063fd28
-Apr 02 08:59:02 thinkpad-benjamin kernel: R13: ffffcc5f4063fd28 R14: ffffcc=
-5f4063fde0 R15: 0000000000000000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x50c/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? srso_alias_return_thunk+0x5/0x=
-fbef5
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? set_next_entity+0xe7/0x270
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_migration_cpu_stop+0x10/=
-0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x3c8/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __set_cpus_allowed_ptr+0x66/0xc0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  set_cpus_allowed_ptr+0x3a/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_attach_to_pool+0x5f/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  rescuer_thread+0x12d/0x5d0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_rescuer_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:22:10249 b=
-locked for more than 120 seconds.
-Apr 02 08:59:02 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:59:02 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/u64:22  state:D stac=
-k:0     pid:10249 tgid:10249 ppid:2      task_flags:0x4208060 flags:0x00080=
-000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Workqueue: events_unbound idle_cu=
-ll_fn
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule_preempt_disabled+0x15/0=
-x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __mutex_lock.constprop.0+0x54b/0=
-xac0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? finish_task_switch.isra.0+0x96=
-/0x2c0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  idle_cull_fn+0x3e/0x170
-Apr 02 08:59:02 thinkpad-benjamin kernel:  process_one_work+0x19d/0x3a0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_thread+0x1af/0x320
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_worker_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:22:10249 i=
-s blocked on a mutex likely owned by task kworker/R-kbloc:139.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/R-kbloc state:R  run=
-ning task     stack:0     pid:139   tgid:139   ppid:2      task_flags:0x420=
-8060 flags:0x00080000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  preempt_schedule_irq+0x38/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  asm_common_interrupt+0x26/0x40
-Apr 02 08:59:02 thinkpad-benjamin kernel: RIP: 0010:affine_move_task+0x198/=
-0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel: Code: 00 49 8b 36 48 8d bb ec 0d =
-00 00 e8 22 8a d9 00 45 85 ff 44 8b 04 24 0f 84 21 02 00 00 65 ff 0d 4e 73 =
-8b 02 0f 84 6f 03 00 00 <41> 83 e0 04 49 8d 7c 24 08 75 3e e8 18 09 d9 00 b=
-8 ff ff ff ff f0
-Apr 02 08:59:02 thinkpad-benjamin kernel: RSP: 0018:ffffcc5f4063fcd8 EFLAGS=
-: 00000246
-Apr 02 08:59:02 thinkpad-benjamin kernel: RAX: 0000000000000001 RBX: ffff8a=
-f641ab2180 RCX: 0000000000000004
-Apr 02 08:59:02 thinkpad-benjamin kernel: RDX: 0000000000000000 RSI: 000000=
-0000000283 RDI: ffff8af640c08dec
-Apr 02 08:59:02 thinkpad-benjamin kernel: RBP: ffff8b04a1eb2100 R08: 000000=
-0000000000 R09: 0000000000000283
-Apr 02 08:59:02 thinkpad-benjamin kernel: R10: 0000000000000002 R11: 000000=
-0000000000 R12: ffffcc5f4063fd28
-Apr 02 08:59:02 thinkpad-benjamin kernel: R13: ffffcc5f4063fd28 R14: ffffcc=
-5f4063fde0 R15: 0000000000000000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x50c/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? srso_alias_return_thunk+0x5/0x=
-fbef5
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? set_next_entity+0xe7/0x270
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_migration_cpu_stop+0x10/=
-0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x3c8/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __set_cpus_allowed_ptr+0x66/0xc0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  set_cpus_allowed_ptr+0x3a/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_attach_to_pool+0x5f/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  rescuer_thread+0x12d/0x5d0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_rescuer_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:31:10258 b=
-locked for more than 120 seconds.
-Apr 02 08:59:02 thinkpad-benjamin kernel:       Not tainted 7.0.0-rc6-70-rc=
-6 #24
-Apr 02 08:59:02 thinkpad-benjamin kernel: "echo 0 > /proc/sys/kernel/hung_t=
-ask_timeout_secs" disables this message.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/u64:31  state:D stac=
-k:0     pid:10258 tgid:10258 ppid:2      task_flags:0x4208060 flags:0x00080=
-000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Workqueue: events_unbound idle_cu=
-ll_fn
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __schedule+0x47c/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule+0x27/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  schedule_preempt_disabled+0x15/0=
-x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  __mutex_lock.constprop.0+0x54b/0=
-xac0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? ttwu_queue_wakelist+0x13c/0x230
-Apr 02 08:59:02 thinkpad-benjamin kernel:  idle_cull_fn+0x3e/0x170
-Apr 02 08:59:02 thinkpad-benjamin kernel:  process_one_work+0x19d/0x3a0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  worker_thread+0x1af/0x320
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_worker_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: INFO: task kworker/u64:31:10258 i=
-s blocked on a mutex likely owned by task kworker/R-kbloc:139.
-Apr 02 08:59:02 thinkpad-benjamin kernel: task:kworker/R-kbloc state:R  run=
-ning task     stack:0     pid:139   tgid:139   ppid:2      task_flags:0x420=
-8060 flags:0x00080000
-Apr 02 08:59:02 thinkpad-benjamin kernel: Call Trace:
-Apr 02 08:59:02 thinkpad-benjamin kernel:  <TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __schedule+0x484/0x1000
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? preempt_schedule_irq+0x38/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? asm_common_interrupt+0x26/0x40
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x198/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x50c/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? srso_alias_return_thunk+0x5/0x=
-fbef5
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? set_next_entity+0xe7/0x270
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_migration_cpu_stop+0x10/=
-0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? affine_move_task+0x3c8/0x580
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __set_cpus_allowed_ptr+0x66/0x=
-c0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? set_cpus_allowed_ptr+0x3a/0x60
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? worker_attach_to_pool+0x5f/0xd0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? rescuer_thread+0x12d/0x5d0
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_rescuer_thread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? kthread+0xe3/0x120
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? ret_from_fork+0x2c9/0x360
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? __pfx_kthread+0x10/0x10
-Apr 02 08:59:02 thinkpad-benjamin kernel:  ? ret_from_fork_asm+0x1a/0x30
-Apr 02 08:59:02 thinkpad-benjamin kernel:  </TASK>
-Apr 02 08:59:02 thinkpad-benjamin kernel: Future hung task reports are supp=
-ressed, see sysctl kernel.hung_task_warnings
-[=E2=80=A6]
-Apr 02 09:05:10 thinkpad-benjamin kernel: rcu_tasks_wait_gp: rcu_tasks grac=
-e period number 9 (since boot) is 2583 jiffies old.
-Apr 02 09:05:40 thinkpad-benjamin kernel: rcu_tasks_wait_gp: rcu_tasks grac=
-e period number 9 (since boot) is 10136 jiffies old.
-[=E2=80=A6]
-Apr 02 09:07:11 thinkpad-benjamin kernel: rcu_tasks_wait_gp: rcu_tasks grac=
-e period number 9 (since boot) is 32832 jiffies old.
-[=E2=80=A6]
-Apr 02 09:08:09 thinkpad-benjamin kernel: sysrq: Emergency Sync
-Apr 02 09:08:09 thinkpad-benjamin kernel: Emergency Sync complete
-Apr 02 09:08:09 thinkpad-benjamin kernel: sysrq: Emergency Remount R/O
-
-
-
+Sebastian
