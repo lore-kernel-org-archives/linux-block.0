@@ -1,74 +1,81 @@
-Received: from mail-vs1-f98.google.com (mail-vs1-f98.google.com [209.85.217.98])
+Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39173603F6
-	for <linux-block@vger.kernel.org>; Fri,  3 Apr 2026 18:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F07337BB5
+	for <linux-block@vger.kernel.org>; Fri,  3 Apr 2026 19:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775242281; cv=none; b=VydBL4CAu4iHZ9jl0g3tTRdN8d6jWHlRJ7F6yJzjTIXrpsi46+aIL+2dONrkPi/1MOdFVExtf6Byd6CqkhaOTGGd+0j2vYmiz957i0he/UZyNosHO/fkCTababS1Y7mgASNAmXeMORkZqk126tlhjMB8i2cn3e/QDw+qLizvPqM=
+	t=1775245283; cv=none; b=TzKwG0/xlXPxo8gEM8e5bgDt2yWdpMKRKd3DcKSPjKqiH1gI0pBnI4qZAZt+Khz0wfIr3xResmJM0Tt2vzcFALA8wR64F+N3Ru1sfujH6aP6gxgmCvozJmiIOAdS6UtROodRWLyhxqunGNSi5aHn36ujHVpE9xuQMMTb1Y/wmEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775242281; c=relaxed/simple;
-	bh=CHli6OjyyhVH17GdfDhyFur2TDwkqD++6jM26jVUMvg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sYHrJG2DKOxs9pmeiN630sH9ImHG6leXAWeEzb6k0de0L4KQdjQftX0fQtgP0zNkLHYZGzrG8qto/zsG+Fz/+04jr4dwUOeVAAqFIEXkR5Ht/RgZV0F51si29gSymPT5Ts1RccRVosdXgVYgh8iL0EaDzUKaKJ3SDdH1N03wB2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=DFZG+5/0; arc=none smtp.client-ip=209.85.217.98
+	s=arc-20240116; t=1775245283; c=relaxed/simple;
+	bh=s7a0+emFgbEKsMfKwqFAYZyCvfuCzCFK+lgraS8d/hY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TMtlUmqCETpGPLCbNRED6RdXoxljidNUlImwwZJw50IjofhHw4yRC24uAvBdaXYpyP6TMlSP7O9ULzTtw9zx70GBghgpC1Ri7J/rFabipZSPfOlJi+gqintz1L2Rd2SrQPFUVQUq8jxy1AQCnS0l0PmR5/H6oWNu9iQv87GBLQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=X732gt4d; arc=none smtp.client-ip=209.85.215.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="DFZG+5/0"
-Received: by mail-vs1-f98.google.com with SMTP id ada2fe7eead31-604fe79aa84so124210137.1
-        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2026 11:51:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="X732gt4d"
+Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-c76c90716ccso70708a12.1
+        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2026 12:41:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1775242279; x=1775847079; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1775245281; x=1775850081; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7NsxmQyQRU2oQ25rx8KXDJ5ez3Qqo6sfbE7pEowz1h8=;
-        b=DFZG+5/0pFhOlwHGQECflvX1NuQLM54+oS5yXzIYy5VN8THHSttubuR0WCf8egWYB6
-         qWR3iyW9MY+GVWJc7KyOAFsnsX6HQ/LVH0mVTJnWEIjWz8DGdvVm6Pnyf1C3enX8AOrt
-         XElzyULnjvudK9jthf0MvC3+jOsS+vBVi27lGaCEzBY8Vrz+K/yi3JPmZ5Cytmbu0IVh
-         /ZeC4ki+FnHr3lrCX+ybhfbaoHoFNyCiVGHi1F2zm/ztgUIGC2HSL/3bvPWdiyQxN0cz
-         ElCJM+zpmcQk7uYLZofvPVJdGfaJEjpInT31KW8kRJSm1TijVqqjx5HaCWuMMZABHH3r
-         pxUQ==
+        bh=M7691Rpd885rtdqhZsGvsmlwE0WhG23SmYwp1iH7phM=;
+        b=X732gt4dYDZzpBF8SuUQOx8NkFdM1i6ui7jdBAYvQe2ifH/A+vh9D5jpdIh0KgpEs4
+         fZtxi34Ik5ZVDX2IIqhCIDGtSSmokaQgy5KN1ILrSz/QAmfz2cLAHARVsyNxbN0C31eG
+         7rLkiYfVUhwX8lWuXZoYtMs0nZfdgjLcgyS0kSnsvsDLq4/YPVTdO2MLJqssdwwgKlug
+         M4wfJ/BHnC1lcHyHHYSNyO7kswBYNLGf+bugvgBdfFa+NWolNp/Ie5Pp62rjh6fnRqLV
+         tUlcFoCnceB9lXZPpqItu2Mks0m8QIEIVLr80iYFLyIWkFivMH3GNlCjK1nj6I2rvdwF
+         9x8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775242279; x=1775847079;
+        d=1e100.net; s=20251104; t=1775245281; x=1775850081;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7NsxmQyQRU2oQ25rx8KXDJ5ez3Qqo6sfbE7pEowz1h8=;
-        b=cMAAokxQImnjre5AMKW9ZsjaQkRh7EIyyx87TWpqPtvLMGwLiMPM7BBIvuvKxNloTd
-         FD0zRHm4vV20KDt4TEEcz9fSn/9eqLkRoIs0y/BxMXy5QWDm18qcWRYKJ6YNV24wiGqp
-         TNRj24Y7u7ME8fa13RvQ/KNeIkoPJ9d4Fr/PJPLkiGDbnXiV+HyLSy9rLqnpK6pkL2n3
-         X8XZ0H9AyMOODF6NwsdTMnRKxa25AeU+o7k86iMT7FdLBsu7aLVc5WY7rXXSeZquz5Aa
-         SJXFyB31U8P1Ggo4qwF4XbHcJDwOlIWgvpwpDffORpzDtt/EeZIQPEc85XVJ7oLoj24J
-         aeaQ==
-X-Gm-Message-State: AOJu0YzxrEeWDiS9XEO5vR+Igv+KsjroSWZxg7BT8NokJPin1Om5GIUA
-	m56NG716BUm6/l0rx2CDclTzV36yYvHO/L6Q/5BqpeFXEPf/Ca+pTKR2wjR2h3dxqCZ/w812TpX
-	uNlEUPWvB+BkV247tSIg+NwSTGEoDW7wjw3yagvDFJP7FyEdKFoh/
-X-Gm-Gg: AeBDieu35f+naMHGUGWslKdXORbhPQ7Yx1qWmplI+yMGim3gsSgo/265jJxsgea1I8f
-	INmMS+IAl2bnt+Fuv22cc3nAc1HM9QvQcc2HtF7rf4oO0y/p3T09QphHE/RXWjhlCQ71g8CI4zS
-	vmCX1gDZGRfFWcP6WIM95MTrWUBym4+vE9hF4gHwvhQVTZ315/2c0tZ7r5FWJcfdfChd7v5vTtQ
-	Ih66WVJrIYfZDyxMvoDOXchD6sOvzOB4dGxBjAZwbOZJ88W0yH1fTzLVhYaEg2QZpF6fzSyePSz
-	qC2hSBPvh0+cPe/QhVyGPH9/IvuJXIJRKs7vnD1SmJLZxuME7zsztSyDhy/2poWdzECUL1eWf+5
-	ZDZzSlMTmS5RIv3eITNWureOUVbSfCbonu5uJuKw=
-X-Received: by 2002:a05:6102:358d:b0:605:53cd:302b with SMTP id ada2fe7eead31-605a5136da2mr750854137.8.1775242278740;
-        Fri, 03 Apr 2026 11:51:18 -0700 (PDT)
+        bh=M7691Rpd885rtdqhZsGvsmlwE0WhG23SmYwp1iH7phM=;
+        b=lBcOXSrGiot7wSio2vp7Fhc4k1YDDOFbW1b9D8E2myqdMZ8MYau7UReVTc7aHFWThQ
+         dawzMULEg91IjnrQh8ZoTMLYtFNKwWWMo/zYgIgT2X1W/4eLyAzzUs7HO/Xd/kobJuMA
+         k5cSDPJSjXwkm1hvQw6TkRgZKI/VpUYttGEy/RWPGtZsc9fhRDQ81+WfkcB9+fWOkfVS
+         PcjCG6xc55Imh1UJvsUGd39mh2t87SmEDBfKvYXW+EIjrqhHLaF6cupCW2AN/1FsBQJV
+         KaMsrDOMbjh+3U/Oq68bDTRs9vHQ+MBp7Nmx1MUe9pLZBLj0kKNMD50Vc1txffOc3ted
+         k7QQ==
+X-Gm-Message-State: AOJu0YzZAg1DRByrxNsnwD9UiW2p6Yc9xFSaO6eVRcgObwgMYzYAZwKb
+	HijjbLGWpg8c2WPchppFR+YYOuU8adhiTgs++J9ub9f8sxECEiSW4hbNLQ74HmgXttLZzfphIWN
+	OttA9UA5sIpkNLTVQ+yqmDJyrAgAzLPiW4iLuXfdd5fpUnbvw7J+i
+X-Gm-Gg: AeBDieutJ+Zy42uB6N7hKvgiHMOSZZY7cKifZyl/bK6LBxJoSqm0D8fvv5XhM91xhLJ
+	WJc3hDBBefgTqfHQ+4pOibchteqROivZFMLEJA1i5lCPjuvBks6XWbj6SkUPrgiBVSKEnUcq6RR
+	DXi7uwUp8dnyqwVoNL08jCJGRKt0Co0THoPpiMHxpuiXG7KsTdzeGOqaiW4NoCGodioOvfSBlqm
+	qFrfRCs24H06cXR9InXFMeL0AaznqDqwwhXA3SKnhbvt42lZTLDVizYVyt0s8GziVsZoonin155
+	Kbsju5RklDqUFL9sfzQw2eff3eMDpucChQHF3uTTsN9lBwVJpTF6htaZsikl1em1YShmTtWVHIg
+	fdNiNz1A9ITB9L7aeOdXwSZ2a++P4gnDoeMlVAFA=
+X-Received: by 2002:a05:6a00:2d12:b0:82c:66ba:5f80 with SMTP id d2e1a72fcca58-82d0db7b707mr2480662b3a.4.1775245281177;
+        Fri, 03 Apr 2026 12:41:21 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-60582fe7990sm504170137.14.2026.04.03.11.51.18
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-82cf9c40eadsm676630b3a.8.2026.04.03.12.41.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 11:51:18 -0700 (PDT)
+        Fri, 03 Apr 2026 12:41:21 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 2AA9E34071E;
-	Fri,  3 Apr 2026 12:51:18 -0600 (MDT)
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 8432334014E;
+	Fri,  3 Apr 2026 13:41:20 -0600 (MDT)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 0F14FE41BC6; Fri,  3 Apr 2026 12:51:18 -0600 (MDT)
+	id 6A065E41AC2; Fri,  3 Apr 2026 13:41:20 -0600 (MDT)
 From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>
 Cc: linux-block@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] t10-pi: reduce ref tag code duplication
-Date: Fri,  3 Apr 2026 12:51:00 -0600
-Message-ID: <20260403185101.2172135-1-csander@purestorage.com>
+	linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: [PATCH 0/6] block: fix integrity offset/length conversions
+Date: Fri,  3 Apr 2026 13:41:03 -0600
+Message-ID: <20260403194109.2255933-1-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -78,62 +85,35 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-t10_pi_ref_tag() and ext_pi_ref_tag() are identical except for the final
-truncation of the ref tag to 32 or 48 bits. Factor out a helper
-full_pi_ref_tag() to return the untruncated ref tag and use it in
-t10_pi_ref_tag() and ext_pi_ref_tag().
+The block layer's integrity code currently sets the seed (initial
+reference tag) in units of 512-byte sectors but increments it in units
+of integrity intervals. Not only do the T10 DIF formats require ref tags
+to be the lower bits of the logical block address, but mixing the two
+units means the ref tags used for a particular logical block vary based
+on its offset within a read/write request. This looks to be a
+longstanding bug affecting block devices that support integrity with
+block sizes > 512 bytes; I'm surprised it wasn't noticed before.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- include/linux/t10-pi.h | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Also fix the newly added fs_bio_integrity_verify() to pass
+bio_integrity_verify() a struct bdev_iter representing the data instead
+of the integrity. Most of the integrity data is currently being skipped.
 
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 2c59fe3efcd4..c6fe5db47c7a 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -35,18 +35,23 @@ struct t10_pi_tuple {
- };
- 
- #define T10_PI_APP_ESCAPE cpu_to_be16(0xffff)
- #define T10_PI_REF_ESCAPE cpu_to_be32(0xffffffff)
- 
--static inline u32 t10_pi_ref_tag(struct request *rq)
-+static inline u64 full_pi_ref_tag(struct request *rq)
- {
- 	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
- 
- 	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
- 	    rq->q->limits.integrity.interval_exp)
- 		shift = rq->q->limits.integrity.interval_exp;
--	return blk_rq_pos(rq) >> (shift - SECTOR_SHIFT) & 0xffffffff;
-+	return blk_rq_pos(rq) >> (shift - SECTOR_SHIFT);
-+}
-+
-+static inline u32 t10_pi_ref_tag(struct request *rq)
-+{
-+	return full_pi_ref_tag(rq) & 0xffffffff;
- }
- 
- struct crc64_pi_tuple {
- 	__be64 guard_tag;
- 	__be16 app_tag;
-@@ -62,14 +67,9 @@ static inline u64 lower_48_bits(u64 n)
- 	return n & ((1ull << 48) - 1);
- }
- 
- static inline u64 ext_pi_ref_tag(struct request *rq)
- {
--	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
--
--	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
--	    rq->q->limits.integrity.interval_exp)
--		shift = rq->q->limits.integrity.interval_exp;
--	return lower_48_bits(blk_rq_pos(rq) >> (shift - SECTOR_SHIFT));
-+	return lower_48_bits(full_pi_ref_tag(rq));
- }
- 
- #endif
+Caleb Sander Mateos (6):
+  blk-integrity: take sector_t in bio_integrity_intervals()
+  block: use integrity interval instead of sector as seed
+  bio-integrity-fs: pass data iter to bio_integrity_verify()
+  bio-integrity-fs: use integrity interval instead of sector as seed
+  t10-pi: use bio_integrity_intervals() helper
+  target: use bio_integrity_intervals() helper
+
+ block/bio-integrity-fs.c            |  5 +++--
+ block/bio-integrity.c               |  2 +-
+ block/t10-pi.c                      |  4 ++--
+ drivers/nvme/target/io-cmd-bdev.c   |  3 +--
+ drivers/target/target_core_iblock.c |  3 +--
+ include/linux/blk-integrity.h       | 12 ++++++------
+ 6 files changed, 14 insertions(+), 15 deletions(-)
+
 -- 
 2.45.2
 
