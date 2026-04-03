@@ -1,95 +1,107 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875D4315D53
-	for <linux-block@vger.kernel.org>; Fri,  3 Apr 2026 11:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB403603CD
+	for <linux-block@vger.kernel.org>; Fri,  3 Apr 2026 13:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775214706; cv=none; b=YBBSeLECDtJJNUpqlUB4+N9Y6N2p9TRFxrFxVItPKZXMgftwdAhgEaQ6Yaj/+LF+uEzmQBXzTxRMzyP1wGbGcc5IZI1tksumfN7kKh1yetUXuAFQPTFqW0vPqXxweXJOOthJ00C+QqpyR64k9Itr8/S8iur3+wazIE7kqmZmsoU=
+	t=1775222684; cv=none; b=D6/9fcAhXQQrqs4S9KLnS+7kvBvEBBMDjuWY+LndLS1iey2qWQAJdw1LYYE9FqOEpB6MeHUCBaNpkMdSEpG2sZAGpJI8L9efRwQ2J1RXS8pNk2EPR72LbSyrdUJQbiVIO6nI1PUuobD2oDMf7QYg3Ix95RWM2stC3dGBIMVM5Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775214706; c=relaxed/simple;
-	bh=G4q9ytr89+oXUGexoVndJFmle1kbwPhQOoCijTkgCkk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=WWW0ktA/yeicBv5Xoassqne5GEOlv3NAYkehZWeVgz+8iOnbPC/4cBAO5R/j1lCOHWylU5TGwy+KHSDvr+0KIUEzFswRZuxlqKgdbK6t2WL++6gFYECiaOLZ1vE5Jnp2EGMKdi7+REwkrC45X0kSOjaQwbhcy/meEP15sgdiMJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=s/IC2oQb; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1775222684; c=relaxed/simple;
+	bh=eH531hMqnoDhQ/nPqc+HwtFQ/7BavVdxPoga2NPj/r0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RA9ko+z7CDAoHJwTRZZVdWz0qNdvSWQ/mguxl3mQVPJPejCPasYHJjuTRkBw6Q+FtiSIXKVYqic9IXtIvq13zgzvo0K8Mp76FwbYEz8ifwv/5Yu1+Ti18PxmzCsfstBBgKFQF0ZkdYnZvCkTPJQdKVHt+kAWJW7asE8ElbIGYKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=fgSCD2cD; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="s/IC2oQb"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-40ede943bf0so1060281fac.2
-        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2026 04:11:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="fgSCD2cD"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-48896199cbaso11119365e9.1
+        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2026 06:24:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1775214703; x=1775819503; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M+JSpJKmntFQiCLi1vmyrSGOFgxbMGTn21g2RZIXNcs=;
-        b=s/IC2oQbJ1bhmRWG/8E+eQcmQXMAAGqdWxY/tNxU2ZOa4twR8whRVH6+spmMM6vRyp
-         BpzuZp6DjyW9QHG5Gd1geUicee7J8TfcsF/lE89hb2zsJ1YVOvxvGLNiRRkeyc8kX46L
-         vVC85bNuEVOslvYMLKe5NGmzW8Yh9QNkjYFpqUWfXS3T47Ns78ZiJyiot5Nd47EXXE6E
-         Ji5j6gLpNsNa7LKDtSO4BOuw2QhrC7nwlLYE3QWrJhpWE8JNhlYEaVU7xyZNEZo+rt50
-         HSB2Wvzh8Kq8/2G3R0UeOwXgNBbLyn92dVoiVMWvQMcnZafX2nkGkjDNk/TQSjxOjhtc
-         53dQ==
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1775222681; x=1775827481; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6n47rxNp9qQZiQDl+S0Q6ioYNQWFTnZXhemat2t0O4Y=;
+        b=fgSCD2cD5ZBKiHRTSEL6nB7PtOcHZ4CPNkeI7JRPKfWEee02e2NQUdOW3TckVbsnTO
+         I+lKo7RIrXlXlW77eJ2wB31tNWshccYCOb+uGNtSeKRkMX0IJW3axxxhK/gTPI5e8/K9
+         OppXx78HLPGjJdmHIIq6e8UcZ2cSLqRAT19JtjAJUJ/VpCbFOqrPm5eft7p0+xpH72uy
+         bOB70rF9v2+o4j7Sw4fksJf1Z/BKf/pZy9Li0sthTTyoMyqGsZ/SsXl0+9BC14A5m1YE
+         lMP2Sd1qLeAchXxAxi7+IDWkFPMePus6dcOgbwQdbSJps4lCFRMbqvdMee013zHglMYs
+         WyiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775214703; x=1775819503;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=M+JSpJKmntFQiCLi1vmyrSGOFgxbMGTn21g2RZIXNcs=;
-        b=Xeyf4BWCWhjzIq5CrdPYHgdGkOfE8SuNuHI3udmwTi9TMJv/jFONsI0z+ml8/VYHcr
-         /UYec4hdbzcyAKe4CcxjQxhLxc3jeo8A4EBsRH5gEa7bpRMPSLEaukng+EeygcrhN2GP
-         kC+LwpEYDbi4ewfKdiFQRFmmr+WpKVmkyrPWqyPoDuE7W1mBfvGVIknS7CPmhQ73NMY8
-         GQ0MovOMRbqbCPI0vXC7f29UAJ59BckGk1nuYg4zb3x0xJsmxZZQUrKmMV3vsst9LaHh
-         QmMxtmR248Cj1ozrjjOUGEVM016TGO7IQ75/4n3Cuc03fyNw+86vPNuHZm4o7K9yQfzR
-         Vlvg==
-X-Gm-Message-State: AOJu0Yz4KYUNEJnHY5jBXxUlExHPT9TqXsj9ciJEXOkdPjaGrCnC0P7y
-	8/PY42snj5MbB5ZMdCKds7wpTlZu/LnsuK6TzhDSN69E5gg24/YO4FtiVV0qQb5arWI=
-X-Gm-Gg: AeBDiesdgsimqx2DXY+GN/uil+5j093YgX0OU8LeBetRfNnK26TdICw4cVfWhc+Zvc+
-	8FTjZm6ONhX/WaYkSuWU8nX+5DsfwSgcQnSSEb9AnuCxIi/PggGffUqlzY9GafMJhjZ3RqTAfk5
-	1t+25b71klejOaseemfwV7Ed1yp45UJphkE4onDLgshgTSTScmhP6KpDdVtAHN+GNF9xkRwFQ7n
-	U5nTBGVzP/iW30PlK5xUxqEhhjEYfrsfp887Cc6lyjl9VgDNS64qdKVjEw5ZPHK18JzTyj1/X6d
-	bb3whCd+62fZuHm9w5pPRqgvHf1bbdCEdh2GPk2eoGKjokHXG5RTPqD1jDxeqvXcPGViQdG31iS
-	oShbbLIKmzFQs7+lMWQTLj+0F/q1cTQAVInQroixj0H5ldBtLnRjb3PGHzPk1e9ERVNAlzowwmw
-	Wl+8rn6u73Fy09Y6aPDNUJ97u3mTmcsexAv7MnScpooQbPcEcQXhQzk2UGBXJ0MvxSNzSud3a81
-	vqxYSIkz05uBqI=
-X-Received: by 2002:a05:6871:d0:b0:3e8:92a5:3287 with SMTP id 586e51a60fabf-4230fc0bd11mr1273866fac.1.1775214703414;
-        Fri, 03 Apr 2026 04:11:43 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-422eaf2c7c3sm4487097fac.5.2026.04.03.04.11.42
+        d=1e100.net; s=20251104; t=1775222681; x=1775827481;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6n47rxNp9qQZiQDl+S0Q6ioYNQWFTnZXhemat2t0O4Y=;
+        b=ExSQ0037nwYxz1ou7EaQdu8x9KYq1wGHeREcdBkhH6mDTk84nhqiADE72KbVvcMqRh
+         vE8mnxEGMwxcjzff6wztmnw0Nhu/bNqupY1c84IrPbBaWax0/lMUEZOBcFY8hr1AsZBS
+         KUJEgowgZGgIH+ZPSr61d3y8J0ILyxzdSqBxIntfuGDIsE3u/38pQOylQCBXn0ueHyI+
+         8gp//0xf37Me5myW6dsP6Jji0Pp40b4Z7XvcqMQ//xBpQ5nhTOAcELosdSNaW9DEl5dd
+         JPrdcPVfmTZVywWLXEOserM6ncAR0+WgJyvH0KMvjQqLl/TszFptY8pbJm3SNbHBsGQB
+         RQtA==
+X-Forwarded-Encrypted: i=1; AJvYcCVkPjMNS8GsXFJ0Vsv/SdzFiVQVjK3HzkcyQ1wZ1jP53JuoheAL17FXWn4y7Xb5+UScPCpDT6PbMiB8TA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZZwRCXNBxKZYKywGKhgeMGI18ZDznWH3ApCanQz9CWRfjW8+5
+	dtYts28+cbwNpJTyp2ZCR+9d79O839GX4woJpsn71jv6qit4VJ2N8TCd93LGdrBj+A0=
+X-Gm-Gg: ATEYQzxMbDeGXpQOo5ZdA0iVKeOY3J7YEgM+cjFdlzh/qCl0BANzWkkLRy8nSNhIvdQ
+	WA7UouzxPPcB+cYutCryahiwUZnw9Ne+xEHnvO8Uq3j3lsxo/XqmNcpllriymvxUFsLgX89N6QK
+	A12uZpNEcgdJA1tZnhcXanep4IwTa6LkkdG0Fz3WIeVWqyN2uLzMBY/H5s0YcmiAIART3hmXF3q
+	pST7rzgnlzRLBYRkWRXtPscC4fJYy7mvoOODTBs7lSPw1LRoDC5CIw/v9kfIULNUrvzWwRtiKVJ
+	KTH7x5C9GnYNINNAjFw+P+p+eztXg/Ivzu1jBpLJNftKgJOEMO6/JVlkE9tTckNiW9Ow2wBoha7
+	2QzCMTIgrYlSHXbJaE0KiBkyKM3JVRkVBwkdD8bkNFP4ea4NrLxBbFE+agrCa77L+tdEXlBAfHe
+	QTDvZoyMQZTnqJRPrVLLoux2f/7cDWVKtalS7HRFtdkHBKzmNynFWPZrXqfMdxaqTZtaVqR2pRg
+	s0S8Q==
+X-Received: by 2002:a05:600c:8b34:b0:487:1fb4:7e1 with SMTP id 5b1f17b1804b1-488997d530fmr48133275e9.22.1775222681521;
+        Fri, 03 Apr 2026 06:24:41 -0700 (PDT)
+Received: from localhost (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48897fdd2cesm24952245e9.4.2026.04.03.06.24.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 04:11:42 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Kees Cook <kees@kernel.org>, Thorsten Blum <thorsten.blum@linux.dev>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260402164958.894879-4-thorsten.blum@linux.dev>
-References: <20260402164958.894879-4-thorsten.blum@linux.dev>
-Subject: Re: [PATCH RESEND] block: use sysfs_emit in sysfs show functions
-Message-Id: <177521470205.492849.18182684068159783392.b4-ty@b4>
-Date: Fri, 03 Apr 2026 05:11:42 -0600
+        Fri, 03 Apr 2026 06:24:40 -0700 (PDT)
+Date: Fri, 3 Apr 2026 15:24:39 +0200
+From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org, 
+	Lars Ellenberg <lars.ellenberg@linbit.com>, Philipp Reisner <philipp.reisner@linbit.com>, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 00/20] DRBD 9 rework
+Message-ID: <ac-_fAsaSk-E_80R@localhost.localdomain>
+Mail-Followup-To: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, 
+	linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org
+References: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
+ <ecf00b4b-c3f8-4161-a97d-3d23b423cabf@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.1
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ecf00b4b-c3f8-4161-a97d-3d23b423cabf@kernel.dk>
 
+On Thu, Apr 02, 2026 at 07:30:35PM -0600, Jens Axboe wrote:
+>On 3/27/26 4:38 PM, Christoph Böhmwalder wrote:
+>> As discussed (context: [0]), here is the first version of our DRBD 9
+>> rework series, intended for for-next via for-7.1/drbd.
+>
+>Will you fixup the kerneldoc (nits) and the assigned-but-not-read
+>issues and send out a new version? Also looks this series doesn't
+>actually apply to for-7.1/block, patch 12 fails.
+>
+>-- 
+>Jens Axboe
 
-On Thu, 02 Apr 2026 18:50:00 +0200, Thorsten Blum wrote:
-> Replace sprintf() with sysfs_emit() in sysfs show functions.
-> sysfs_emit() is preferred for formatting sysfs output because it
-> provides safer bounds checking.
+Right, the recent genl changes now cause a conflict. I'm rebasing now.
+The nits are already incorporated and will land with v2.
 
-Applied, thanks!
+Just for my own planning: what does your timing cycle look like for the
+-next branch? I assume you also want to have that ready before the merge
+window opens? Or is the schedule for -next more liberal?
 
-[1/1] block: use sysfs_emit in sysfs show functions
-      commit: a175ee8273319547a4be7584da03831a2fb2f835
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Thanks,
+Christoph
