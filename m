@@ -1,324 +1,173 @@
-Received: from mail-qk1-f226.google.com (mail-qk1-f226.google.com [209.85.222.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA32D2D949C
-	for <linux-block@vger.kernel.org>; Sat,  4 Apr 2026 03:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.226
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775273040; cv=none; b=D8/EQ65W+hQi+ZVzdyC1D4/WQxER8y4s3tisavugJRUkHhlkyIxgKo5k5y6czdWis/K7jxH12UoS4ydqUTb+tLdX9WAPT8Z6EG4TQIBeI/i77mayViUi3VqW7C9sF0mhNJLPpbXS79+OctM09KyUe1tkcefUxeQvtKYHHLU1QcY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775273040; c=relaxed/simple;
-	bh=EtIon0eFvVS3O6Xdg0WbBq1qhCViHvnzFkQSYVO/8H8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VN4zsWw99MDX35g/he1Pa1qL4YHS+3D61/1gb2Lw0ObWryicJ8FJU1Wxu9etxD5q/+0cBI3DXdvgeiuQGXuLJIOg9ZFzkYWVapAjEHCIvlktGp9O/2pmZpr/DtAa4+z6dotZuVGeH663ZdMbaHwFrCZ1vwxbTZc0U0tVTdAuQ1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IKxg+0yK; arc=none smtp.client-ip=209.85.222.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842232848A8
+	for <linux-block@vger.kernel.org>; Sat,  4 Apr 2026 08:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775289987; cv=fail; b=j3B+thTHyRR/pvzuYLz5RmST17Mc25RlyM8IMYk5NXvhobikETW4ywVIHR0eiu0BYUp1mFUQUdMTEDz3f86QzzPU8MR40kwYDT1BJmb+2ZxBsAIkLCa3W7Nu6ZB5GJlFHfWMH+oHVDIlVMFaWUe6Eub5f6sBk5254RBaAecr4wM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775289987; c=relaxed/simple;
+	bh=q8COnbylYCfoJ5RohnioD16aYbMl6NhxdQ5WNlYhMNo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gAsd5zZJxSnnP6XmCAuTDcbWpybTBqbMq4aPEW1d/Y5x9DG9oNtUGq/HAtcd3gj17f3qaLpO+EEZznJGztCX+XpaYzeDZp8akV7WhN4NLuv3JpsBE1Gvh+Wn6bu0Vv4wGRdVTnYeEOXweTVYcqCZ3DyGZeGQV2atbgEvbM2UKhw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=D+6Soesx; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=ugCOMWoN; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IKxg+0yK"
-Received: by mail-qk1-f226.google.com with SMTP id af79cd13be357-8cfd44fa075so332102085a.0
-        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2026 20:23:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="D+6Soesx";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ugCOMWoN"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1775289987; x=1806825987;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=q8COnbylYCfoJ5RohnioD16aYbMl6NhxdQ5WNlYhMNo=;
+  b=D+6SoesxBJHUOufO2JbAwmn+mVnLL0o0INda65tQyQBEC2fdv72DDF9z
+   PohRW8S6qV4l6zIaYkfavwi9bBDK5h7gAA3ILe12DyosRxu7gNxenS2wX
+   xqtBvrq6mvCkRWjupXZqmny8KQbVYrnoSuV/Y+T3J50jht8XQtjTOIBlt
+   CK4J62JbCuGBai16sIISsY4wjjhxO6OS3omWp0GKoIm4EOmq8jN0+ED6a
+   fgV0avw1P9rAlzMgvE50Hwc6k1XGBafp7Axi7kf5/ZdjVw0OF4tPiT8AR
+   QBal8cbtL4bdQziKVVSwTptL8eIFHcSoSiiNxTfRclZBDbjLZJEEzlQ9t
+   w==;
+X-CSE-ConnectionGUID: 7vm7CE8pSi6Bf1SwFBnvcg==
+X-CSE-MsgGUID: ZD/FPQoEQTafoNX++kvs8A==
+X-IronPort-AV: E=Sophos;i="6.23,159,1770566400"; 
+   d="scan'208";a="145006319"
+Received: from mail-westusazon11010010.outbound.protection.outlook.com (HELO BYAPR05CU005.outbound.protection.outlook.com) ([52.101.85.10])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Apr 2026 16:06:20 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=I0PeI6XEEaEGpIh1KbVQ4UG5xAE9ZKIGREeMXkNG2B256TFmPOu5HElM7osDcqWmjhod2IPe5d7KtpX+L10ipZcgEwoI5ml85J0Cf8q8N9dLRcFG1RBFDuYfuNqJedxj+829Li7kP6WbO+kF88rRc9NnHDwEGIQjVjPcNtik6DkKHiSVoVT5c9pv13Z4ON26a/8o+u3dVagupCNLFQrC8jlIPg0vctt2Ayyw6Sw+lzP15cM48MJwxwMdVX6xGQzUF3pkNsvPUHVgCYs5Dmc64dXXUGfwWm6DMvWRsP9L/qab4r0Mb9j2aIEdaxvYfp8kDbL/GRzet25ikx4vLvRphg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q8COnbylYCfoJ5RohnioD16aYbMl6NhxdQ5WNlYhMNo=;
+ b=Ci+hkIidQd4AtAH/bWJkFWbFFQKJ/MS/XWNklKnqOtinCgMez4O/BIBj537iMB63KIgrKufkx8BYJ6Ilzvid+EprjgG/CXn4192AQuNi0U28w4QuB0JOmiOFHMosF8CdsB3BBtSbrWhSxoDMDGccw+wFdxdIxhtKki8/8yoSDz7A7ifAJEdIgdIOrQArdwyKYYGJlk56hvOppnmnRzxyTJOYmzkQvoRWmpabTrscDGKXA0dfeEZcP3eHgbzaxEBJmy1qgBYSjzSufpcCu+f+mzVepQ71jpzNuZe1bJ5jXbjyuKN8gFBAfi1NyMg8a1yqIrqKvjP2K2NbarvoKOg3yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1775273037; x=1775877837; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zX/5TzotSq2dC2MEEK2IilrTISaWwcCASj/MEFDm/KQ=;
-        b=IKxg+0yKYnRx0xrQxTq2BUklL4qslZDAxzyBoX2Te+WSySbT7pTy+txia0A6iw/iPn
-         c1OkBFmjyrR610TIPp+x5GSyoD5VgVbgCLOqLunLumW3FSQeHeANHMLEJVwK/JyfEwyP
-         SpcW/yfTRwq72ozOt0FQ2wIyvbA0jBEVzxmP1o57nAKM0fvhMfGlWyqgEHp4wLN3exMB
-         p20SLbxMmYAEQAnJHSGUYP8etn4qV66Tb8qyCV4cf2sZu1Z33lM2YtxWL2E/7NooCU7M
-         iPvbfN9tYzIsc4JTs6cQ49qjONijWXZEa7bR9BOtWlJvT7Ow2WKwCjhYLDbOE4xn26Zu
-         IAXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775273037; x=1775877837;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zX/5TzotSq2dC2MEEK2IilrTISaWwcCASj/MEFDm/KQ=;
-        b=Jp4qIbmfh7Rf6T+e0dR0Z4p18D6cM3tAl9vZzGO5f9+xtoyMtpQ0gKt+7L4V29Zp64
-         6NQqiJ4hzWKhk6fc4tRs6d1ap9nShye9vT3Ye39+wJzt3w5mZToBcTV1IQeycTBlRjge
-         GwD2I6a5O0bCXnC58sbjdx9EQ5rnJHUnlGIPsnIgzf/bs+Y7HL6obRDjVNcMyWWbVHEO
-         zscsirFIYUsvNVarSZTTHxniyPb9upjcTOQIYxeP6PfZ8tK8qK15xXGMNnMdahoU9Pqg
-         95JdKyqn4ZM1w+ThGrw7Iqbc5l0ckp5vV7fCj1XBgWX/imNUvA9uTcwlQP0Bn5upFSkN
-         cbSg==
-X-Gm-Message-State: AOJu0Yw7noMpic6/9saTDWlaI/sPJ+fAC41ctTJOLVG9rwe+aLVY/RFW
-	5EhYHYA1HcsGfYTrcDxIHDE46wGM9QR5n3orKxhaQdIFBPtYRQGBglwwMarBEX9Rk9TUfwWIvtX
-	TsLvWGuo+ZqukP9o912NGQCEoUrGHb8Xf1jJj
-X-Gm-Gg: AeBDievNqLnZo7rh+y5jeRVaSJVCAelkSTlc3EKIPdz3m7j3M/F2mut5DEohXv2bfTI
-	rEyXb9Aoh1dVKItLlvByett0JDHqdR4ApT1cAdsBMaxf4qY5nNS9NYp4Y0qmPIjP0aRlH34mQxw
-	UBcuNH3dyxSV+of2weZIK/xitLX4gM8QHQQldC07/AQfoQcHPRh9K0Q6ateS6gYssCVREg7RPAO
-	S83sPslXZQ1F5lMSr90exCiV9Ecn9x70Zsd7EK1Kr2SmqKttNcWkp6sk7Qhlf6It2eCSN9Yg0Kq
-	Whn6r7GNTrS5Cy8qkzowGEB8607KAj2vQNd+ZoHTC3TpTIfzKCanHpVaGWVQyc4c2sGrhnzWWeX
-	BSHv/ZAPU3h7rH75cpx2Y37Wsf8nQGmjg/16AwBFeCvlKsolzJTJH3zE=
-X-Received: by 2002:a05:620a:171f:b0:8c6:ff8f:58af with SMTP id af79cd13be357-8d41e244447mr749101685a.51.1775273037502;
-        Fri, 03 Apr 2026 20:23:57 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id af79cd13be357-8d2a6de9b33sm28188485a.5.2026.04.03.20.23.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 20:23:57 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id A2F783405FB;
-	Fri,  3 Apr 2026 21:23:55 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id BFA81E54F5B; Fri,  3 Apr 2026 21:23:55 -0600 (MDT)
-From: Uday Shankar <ushankar@purestorage.com>
-Date: Fri, 03 Apr 2026 21:23:56 -0600
-Subject: [PATCH 2/2] selftests: ublk: test that teardown after incomplete
- recovery completes
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q8COnbylYCfoJ5RohnioD16aYbMl6NhxdQ5WNlYhMNo=;
+ b=ugCOMWoNocOCEA5Y28D0wdEEWgUfJc2B12N+/GY5orAFsiqMn8Iy1Cd7ffy6K/w6eLNDO0aqO4CCLk99+NtwyDNatbVDTyhCpPeS+JqK0n5C/Xafbrppg2o4OcqOJKfkgh/m/zG/tzEu0nKvaAC+F163HAQJoISvyLsv4pzlkYM=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by CO1PR04MB8284.namprd04.prod.outlook.com (2603:10b6:303:153::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.18; Sat, 4 Apr
+ 2026 08:06:17 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9769.016; Sat, 4 Apr 2026
+ 08:06:16 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC: "disgoel@linux.ibm.com" <disgoel@linux.ibm.com>
+Subject: Re: [PATCH blktests 0/7] Skip tests if scsi_debug module is already
+ loaded and in use
+Thread-Topic: [PATCH blktests 0/7] Skip tests if scsi_debug module is already
+ loaded and in use
+Thread-Index: AQHcu1IJoQiJ7sltZ0ShmyJGlttMa7XOnS2A
+Date: Sat, 4 Apr 2026 08:06:16 +0000
+Message-ID: <adDGLCMM3oc4Pkm_@shinmob>
+References: <20260324054949.3821569-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20260324054949.3821569-1-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|CO1PR04MB8284:EE_
+x-ms-office365-filtering-correlation-id: 6f49aed4-8bf8-45ac-3bd5-08de92210c22
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|18002099003|22082099003|56012099003|38070700021;
+x-microsoft-antispam-message-info:
+ am/LHREw9Gk55VQwTP9FzbbEloaLj368+YWh+d+YbU5VeO6cEDU5kqgRjBk0ApWnYOIkBeIdcN6ngBO12QzaFBzkpaF1PceUndEbWxOYfSib9A0lyXu1J6NQmpUu/SDGvfNRtRh3mDoa3rxWcCMg/C34x6Eka7GdypYyLRGuXDd78nz11iUMyKyvLGm3tWIEkU/Di91PoVaNbO+q37WTkYeL87/1lhJpdHdZ6g27z5cBk8VUlwYSdkaT+/j6C5y2NAkmNBqLUm1i7yg0u6QrILnXRCciWcRbXquaRtJrJKYxLyidFuTbMtf6suVFi5NGHr8DdEPj2ySHQV/meNr+Fhs3ShSjf9zXBwQg+OlX2YwM0djx2ZznxiTlPMzXLKChOWpGLc5xn+dljx8xpKiBzfFt5dcHmVoglrc1VMpnS2EvCaAlqGH84WJ0lJGMQOBaLdSZRQrXlJuPZgwtVDfw8zFqokqb6CrnhLnXZY1aCV9+ZvdNP4VvMLo/E7GlDAwF+P5he9MOu+Pn4HB+SHhjkapAxM3BMpmVtE4SvK6h0E4a8u0p8w4+U8IvR34vzZ1pnfaO/tXu1a7QNBoPzzqf6QN5SYoGuYrRPBSt1KFA51COdA2iZnwcAm+uh3Xg9cp1/0R1pK0F34SyLrh3aoIWHtYo2c0upa7tj+g5zniRG+WOMc7uJkTgDPfk65vGNzqJzTrIdpKm6iUym8JkxC99i7HRbH198KQHgwaPuMupIfAM3XwBaSJzJpuTU9lcSsv3jMF1KJ9MgRlFl33RBLd/D0IzWx5rAo72M3mZC1lduc8=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(18002099003)(22082099003)(56012099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?2y2npH+3ZeU3iG7ouLHi1I8SFRj3Bc0H8zU1z7UkhXjEjCUwpCcs7iHCJHu+?=
+ =?us-ascii?Q?D5dRTW3vI2yPwBSOR+AAbV+db7pEJQGuyVH4RsdSvXggn0AFw3h5MfMM0d4C?=
+ =?us-ascii?Q?gTuVBT7IjyqbG9KRmW/SLEgpwvwgKqL7Y/mNYqyelOY/fuVIHEHB1oRsSCKI?=
+ =?us-ascii?Q?WVr0RaycIxQdepgO6utEPtmmf34b+3U7gzQCOsyq5rCGGr2nUksLIu202qfs?=
+ =?us-ascii?Q?pZC37j0imAhNNxY4fEkjGNfc5I7Ftreju5xHey78aJSEBUlJe90xEY3pP9Y0?=
+ =?us-ascii?Q?kcMfVtrGGCHXF53Ea/BEZJH5pBxoBJ1imUB+gCPOiUVgq3/yY4HjLKwYHhVf?=
+ =?us-ascii?Q?1Dc9ZpyGTIG0YECS8wZ94ReP9LLXRIBCTxiM3KAK5oGIOlorlG7UTJKfDUVL?=
+ =?us-ascii?Q?qG+QQJ7Jrv9Jlylrv5pDlAd6cuRBXIAbgxh3CzTRbtX0cJzal9P8tPyRmZQs?=
+ =?us-ascii?Q?6+rpDvdj0M2i5LwF7ms9xXd3rMxkhdD/t/8Omeg6zt4RIVutL2RrKjSZy9UM?=
+ =?us-ascii?Q?UUReMSIFhVhgCMZyBClCEKvD8ai4/WivZcxNighfcjimC8NDRkiY9WtJnGuL?=
+ =?us-ascii?Q?b/lZqEl+RK0/MvskiNBo1SjBp6pldaYHDku3HllJY9GpFHCQ4Gx61Gm/OB6L?=
+ =?us-ascii?Q?dlk6G59wkwS9OT9WJieXQaT9Ti8ckNlUbQ+Ty7bZfJDP3D1r7HCytzUNONdb?=
+ =?us-ascii?Q?NvYRkkpvRZiX/Nxck6pbl7GAnOH0keY6W+X/gtdhxmFAFB5jfTy6wdk7iHj+?=
+ =?us-ascii?Q?C6WfwCkr67SJIellcDSi1GjaMfqL1sookHDlawWaGIc4ZjX59UZLNeh0Espt?=
+ =?us-ascii?Q?I+kaqXZ/til+DGUgQFsvILwAAwJ/5ePGh6j4JTE3d+r1gYM6T7Q2a5/x8O4U?=
+ =?us-ascii?Q?JhaWAvK2M1FzDE3pZwUIF7A+5WTWUmPM+vEN7Od4KKHjA6wg3aqPa/+r3KE5?=
+ =?us-ascii?Q?A7UGK+mZQIxrOBN79HASz5kQwP5yzvNQ1Zd5d9Su5mHe2s5thWnpicrnDRvB?=
+ =?us-ascii?Q?uPcaj7flAVijK1XjqC+KrFbJrwoRlzoDkUzuU1FTG00jWwgoD44SkDrMznak?=
+ =?us-ascii?Q?feXiYTKYC0c8n/36SE0tFwDMQP8TGNyH/y8K9gYi4ExdAdrPDnoKp1ph3Hgb?=
+ =?us-ascii?Q?uMq3UQEEGDHK1tlFA+YV+ME/Ixg0lqggKKDnDwPMgLztgTzP2iMmBHiEhieD?=
+ =?us-ascii?Q?YGwd5tVudaIIy/EezO3mtWg1EhtZgWB8ixkKsDGv4qJw7+U3y0kVjlb7fX+W?=
+ =?us-ascii?Q?K267KEcPremW6szhCTQ1VfK5H5c6XvRsbmsEhz/g5SS30DJNB3jIW1TMbjGz?=
+ =?us-ascii?Q?dr888O4KtwcxbyNhFMxChH5y8R2fIQXfsF8XfFV2dzEtJODysc9sdCcHnHpP?=
+ =?us-ascii?Q?SJ7drN3V2Y4g27cTgTVCHtLfGiRbO2Qt7W5XzMkgP+UcNGwDD3dBmDtGXjqT?=
+ =?us-ascii?Q?8oJ02JfnBanKjnn1k8GMYnqeohATcoR98qpAuZt/lgcRCQB/pUwO2cUQxvEz?=
+ =?us-ascii?Q?BoD6JIrbYB/vfCvNqzhldBPJuhDQsVpwDjjIjB1qFyKbyi1vry1Grw8HcRm2?=
+ =?us-ascii?Q?CPtjr6M47bcHDEpkemRSCh1BBldPYgE66NYNlTh6tMq+6Ni/diON1XB1cvIz?=
+ =?us-ascii?Q?yH1G0EV89OAgaXPhZfMmk4h+nyJHlkinWapu0Sx+Fa688GOLUT/8WNb6PN6I?=
+ =?us-ascii?Q?FmGsvYk+sBQoMfa+iL2IvCLIEJMhpxob9Khc+t8D4XkfgI7eLuujZcnEjjPa?=
+ =?us-ascii?Q?PpBdIrPhK9VcG+bZ95sj49VVNqQMRLA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <5C620016EB235043A5819619278BFD70@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-cancel-v1-2-86e5a6b3d3af@purestorage.com>
-References: <20260403-cancel-v1-0-86e5a6b3d3af@purestorage.com>
-In-Reply-To: <20260403-cancel-v1-0-86e5a6b3d3af@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>, Jens Axboe <axboe@kernel.dk>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
-X-Mailer: b4 0.14.2
+X-Exchange-RoutingPolicyChecked:
+	gvh17uE8kwuMcWJJSQ6iWQK/6klwYNcY29eGiRrBPruy0GVypj4XJOGLsJNR1XEpK1Y7wZAoC8km3PkcLIonsyXOSsnw78EPW+fGWOJAb7dqRwwSJc6K1mAu5xW5+nk52wKRTQsDBViRAAhbl0/aWY6whDQOxTk0C8e+yCJ4WBM0JblHzl7PgFyubiiNMe4fCUJfH4/Vb9aLZLNTjKloaSui9n1DtpMVfMxHZNZ0IhK5Qfk+wA53ZXKD4rrK31dOUkVvjROoCJnVvzPHhRSZffgraGezEO8ID/pzAMw6jHrG27kiQ8CeDUVw/oGRE6Cw3IfxANjf5g9ldn/iVMzSLw==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	c1OjXNjncQzR3+WwL4vLE+d5vnf7FH+VMEqUvoD68pLsOHxm83+UkVT7TACwgL6SJ71g7oajKYKm6p0jccuEsg7ORdXX1GFZb9ItsrwmvYzt4WyvDacJiDaFRJq7vdIJoArOrtBg2dv6ik0HHNUJMfB25q9mNT1k4jXa3XTOYZLoVBSgTYgDJhRfG3gU0WiYpPcz7rYL2KMtpSNK+rvr1sNgZLdYPFOFGVcjfzCW1dqix+A6dWMrddt8z8ldNeYjAo8qVWygn52SJ6QeRTGEBSqX/dpW5zBXM0TNWVmDk0b54H1gtbuGA/IK/5tLKw+USM9Xc83AqGAL0UthuoEPwlcKiAWiUlqf+AvdUvwA51gCEOKd4x2DUZK1adpZwC8MN/d49Z/joAJJfvZCMDhEHsijtA6IO9I81T9DlRF0VicgCa+va9YmSgN0Zw3S+qk7fYymLIdKOoKTpU0DE4o5FLGokBvuK5UsRiVSGpqEjh/isL2uGPoofmooFpgXDn/T2z3ydXsYoJCXyjgO2HNit7Rd/e4pndUFfSMXsfXkeeZpukp7gNeuGqZl6eEWCbq0QtwR0dA/rPRPO1csZZcaYu2KgL5sKunyWQlliVYPSxBokE69EqfAhxkMp0lhRs3e
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f49aed4-8bf8-45ac-3bd5-08de92210c22
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Apr 2026 08:06:16.7982
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: e3TZKfRrIXJorjMmVtjRodlKmo/xUql7lnTeXNu1xhKaSOQ5MarzV9R1wiAUcNR47ZC1TYI4VrxegO2SPAmrgVeiJcsFBfahhGffxZxJMb8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR04MB8284
 
-Before the fix, teardown of a ublk server that was attempting to recover
-a device, but died when it had submitted a nonempty proper subset of the
-fetch commands to any queue would loop forever. Add a test to verify
-that, after the fix, teardown completes. This is done by:
+On Mar 24, 2026 / 14:49, Shin'ichiro Kawasaki wrote:
+> When blktests users have scsi_debug devices configured for purposes other=
+ than
+> blktests, running blktests currently unloads scsi_debug unconditionally a=
+nd
+> breaks the existing setup. To avoid disrupting such configurations, this =
+patch
+> series improves blktests to check whether the scsi_debug module is alread=
+y
+> loaded and in use, and to skip test cases that require scsi_debug in that
+> situation.
+>=20
+> This series was originally proposed as a GitHub Pull Request [1]. Disha G=
+oel and
+> I worked on the patches. The first four patches fix pre-existing problems=
+ found
+> while working on this series. The fifth patch implements the improvement
+> described above. The last two patches fix two additional problems that we=
+re
+> found during this work.
 
-- Adding a new argument to the fault_inject target that causes it die
-  after fetching a nonempty proper subset of the IOs to a queue
-- Using that argument in a new test while trying to recover an
-  already-created device
-- Attempting to delete the ublk device at the end of the test; this
-  hangs forever if teardown from the fault-injected ublk server never
-  completed.
-
-It was manually verified that the test passes with the fix and hangs
-without it.
-
-Signed-off-by: Uday Shankar <ushankar@purestorage.com>
----
- tools/testing/selftests/ublk/Makefile           |  1 +
- tools/testing/selftests/ublk/fault_inject.c     | 51 +++++++++++++++++++++++--
- tools/testing/selftests/ublk/kublk.c            |  4 ++
- tools/testing/selftests/ublk/kublk.h            |  3 ++
- tools/testing/selftests/ublk/test_generic_17.sh | 35 +++++++++++++++++
- 5 files changed, 91 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 8ac2d4a682a1768fb1eb9d2dd2a5d01294a67a03..d338668c5a5fbd73f6d70165455a3551ab13e894 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -18,6 +18,7 @@ TEST_PROGS += test_generic_10.sh
- TEST_PROGS += test_generic_12.sh
- TEST_PROGS += test_generic_13.sh
- TEST_PROGS += test_generic_16.sh
-+TEST_PROGS += test_generic_17.sh
- 
- TEST_PROGS += test_batch_01.sh
- TEST_PROGS += test_batch_02.sh
-diff --git a/tools/testing/selftests/ublk/fault_inject.c b/tools/testing/selftests/ublk/fault_inject.c
-index 3b897f69c014cc73b4b469d816e80284dd21b577..228a9605053409c84baaf255f97c4abc271a8bfd 100644
---- a/tools/testing/selftests/ublk/fault_inject.c
-+++ b/tools/testing/selftests/ublk/fault_inject.c
-@@ -10,11 +10,17 @@
- 
- #include "kublk.h"
- 
-+struct fi_opts {
-+	long long delay_ns;
-+	bool die_during_fetch;
-+};
-+
- static int ublk_fault_inject_tgt_init(const struct dev_ctx *ctx,
- 				      struct ublk_dev *dev)
- {
- 	const struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
- 	unsigned long dev_size = 250UL << 30;
-+	struct fi_opts *opts = NULL;
- 
- 	if (ctx->auto_zc_fallback) {
- 		ublk_err("%s: not support auto_zc_fallback\n", __func__);
-@@ -35,17 +41,51 @@ static int ublk_fault_inject_tgt_init(const struct dev_ctx *ctx,
- 	};
- 	ublk_set_integrity_params(ctx, &dev->tgt.params);
- 
--	dev->private_data = (void *)(unsigned long)(ctx->fault_inject.delay_us * 1000);
-+	opts = calloc(1, sizeof(*opts));
-+	if (!opts) {
-+		ublk_err("%s: couldn't allocate memory for opts\n", __func__);
-+		return -ENOMEM;
-+	}
-+
-+	opts->delay_ns = ctx->fault_inject.delay_us * 1000;
-+	opts->die_during_fetch = ctx->fault_inject.die_during_fetch;
-+	dev->private_data = opts;
-+
- 	return 0;
- }
- 
-+static void ublk_fault_inject_pre_fetch_io(struct ublk_thread *t,
-+					   struct ublk_queue *q, int tag)
-+{
-+	struct fi_opts *opts = q->dev->private_data;
-+
-+	if (!opts->die_during_fetch)
-+		return;
-+
-+	/*
-+	 * Each queue fetches its IOs in increasing order of tags, so
-+	 * dying just before we're about to fetch tag 1 (regardless of
-+	 * what queue we're on) guarantees that we've fetched a nonempty
-+	 * proper subset of the tags on that queue.
-+	 */
-+	if (tag == 1) {
-+		/*
-+		 * Ensure our commands are actually live in the kernel
-+		 * before we die.
-+		 */
-+		io_uring_submit(&t->ring);
-+		raise(SIGKILL);
-+	}
-+}
-+
- static int ublk_fault_inject_queue_io(struct ublk_thread *t,
- 				      struct ublk_queue *q, int tag)
- {
- 	const struct ublksrv_io_desc *iod = ublk_get_iod(q, tag);
- 	struct io_uring_sqe *sqe;
-+	struct fi_opts *opts = q->dev->private_data;
- 	struct __kernel_timespec ts = {
--		.tv_nsec = (long long)q->dev->private_data,
-+		.tv_nsec = opts->delay_ns,
- 	};
- 
- 	ublk_io_alloc_sqes(t, &sqe, 1);
-@@ -77,29 +117,34 @@ static void ublk_fault_inject_cmd_line(struct dev_ctx *ctx, int argc, char *argv
- {
- 	static const struct option longopts[] = {
- 		{ "delay_us", 	1,	NULL,  0  },
-+		{ "die_during_fetch", 1, NULL, 0  },
- 		{ 0, 0, 0, 0 }
- 	};
- 	int option_idx, opt;
- 
- 	ctx->fault_inject.delay_us = 0;
-+	ctx->fault_inject.die_during_fetch = false;
- 	while ((opt = getopt_long(argc, argv, "",
- 				  longopts, &option_idx)) != -1) {
- 		switch (opt) {
- 		case 0:
- 			if (!strcmp(longopts[option_idx].name, "delay_us"))
- 				ctx->fault_inject.delay_us = strtoll(optarg, NULL, 10);
-+			if (!strcmp(longopts[option_idx].name, "die_during_fetch"))
-+				ctx->fault_inject.die_during_fetch = strtoll(optarg, NULL, 10);
- 		}
- 	}
- }
- 
- static void ublk_fault_inject_usage(const struct ublk_tgt_ops *ops)
- {
--	printf("\tfault_inject: [--delay_us us (default 0)]\n");
-+	printf("\tfault_inject: [--delay_us us (default 0)] [--die_during_fetch 1]\n");
- }
- 
- const struct ublk_tgt_ops fault_inject_tgt_ops = {
- 	.name = "fault_inject",
- 	.init_tgt = ublk_fault_inject_tgt_init,
-+	.pre_fetch_io = ublk_fault_inject_pre_fetch_io,
- 	.queue_io = ublk_fault_inject_queue_io,
- 	.tgt_io_done = ublk_fault_inject_tgt_io_done,
- 	.parse_cmd_line = ublk_fault_inject_cmd_line,
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index e1c3b3c55e565c8cad6b6fe9b9b764cd244818c0..8260c96a39c05584065f41a52f3d9050614454c6 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -796,6 +796,8 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
- 			q = &t->dev->q[q_id];
- 			io = &q->ios[tag];
- 			io->buf_index = j++;
-+			if (q->tgt_ops->pre_fetch_io)
-+				q->tgt_ops->pre_fetch_io(t, q, tag);
- 			ublk_queue_io_cmd(t, io);
- 		}
- 	} else {
-@@ -807,6 +809,8 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
- 		for (i = 0; i < q->q_depth; i++) {
- 			io = &q->ios[i];
- 			io->buf_index = i;
-+			if (q->tgt_ops->pre_fetch_io)
-+				q->tgt_ops->pre_fetch_io(t, q, i);
- 			ublk_queue_io_cmd(t, io);
- 		}
- 	}
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 02f0c55d006b4c791fea4456687d0d8757be7be2..f784946144ad3d6e347a867fb1389a8e057766a0 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -60,6 +60,7 @@ struct stripe_ctx {
- struct fault_inject_ctx {
- 	/* fault_inject */
- 	unsigned long   delay_us;
-+	bool die_during_fetch;
- };
- 
- struct dev_ctx {
-@@ -138,6 +139,8 @@ struct ublk_tgt_ops {
- 	int (*init_tgt)(const struct dev_ctx *ctx, struct ublk_dev *);
- 	void (*deinit_tgt)(struct ublk_dev *);
- 
-+	void (*pre_fetch_io)(struct ublk_thread *t, struct ublk_queue *q,
-+			     int tag);
- 	int (*queue_io)(struct ublk_thread *, struct ublk_queue *, int tag);
- 	void (*tgt_io_done)(struct ublk_thread *, struct ublk_queue *,
- 			    const struct io_uring_cqe *);
-diff --git a/tools/testing/selftests/ublk/test_generic_17.sh b/tools/testing/selftests/ublk/test_generic_17.sh
-new file mode 100755
-index 0000000000000000000000000000000000000000..2278b5fc9dba523bb1bf8411d22f4f95a28da905
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_generic_17.sh
-@@ -0,0 +1,35 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+ERR_CODE=0
-+
-+_prep_test "fault_inject" "teardown after incomplete recovery"
-+
-+# First start and stop a ublk server with device configured for recovery
-+dev_id=$(_add_ublk_dev -t fault_inject -r 1)
-+_check_add_dev $TID $?
-+state=$(__ublk_kill_daemon "${dev_id}" "QUIESCED")
-+if [ "$state" != "QUIESCED" ]; then
-+        echo "device isn't quiesced($state) after $action"
-+        ERR_CODE=255
-+fi
-+
-+# Then recover the device, but use --die_during_fetch to have the ublk
-+# server die while a queue has some (but not all) I/Os fetched
-+${UBLK_PROG} recover -n "${dev_id}" --foreground -t fault_inject --die_during_fetch 1
-+RECOVER_RES=$?
-+# 137 is the result when dying of SIGKILL
-+if (( RECOVER_RES != 137 )); then
-+        echo "recover command exited with unexpected code ${RECOVER_RES}!"
-+        ERR_CODE=255
-+fi
-+
-+# Clean up the device. This can only succeed once teardown of the above
-+# exited ublk server completes. So if teardown never completes, we will
-+# time out here
-+_ublk_del_dev "${dev_id}"
-+
-+_cleanup_test "fault_inject"
-+_show_result $TID $ERR_CODE
-
--- 
-2.34.1
-
+FYI, I applied this series.=
