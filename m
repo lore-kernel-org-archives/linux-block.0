@@ -1,71 +1,72 @@
-Received: from mail-dy1-f227.google.com (mail-dy1-f227.google.com [74.125.82.227])
+Received: from mail-qk1-f226.google.com (mail-qk1-f226.google.com [209.85.222.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131142868A7
-	for <linux-block@vger.kernel.org>; Sat,  4 Apr 2026 03:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA32D2D949C
+	for <linux-block@vger.kernel.org>; Sat,  4 Apr 2026 03:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775273040; cv=none; b=G5W7rCtaISDYq2U4tdn3lPAPlrbt0WOO7PC4H6STSqK5LhceZKEpVxaU5DxqG+pfC78DDeP0KDvrJcZBO46OraJxyUd9bViAWsBh329IxHWAnrKBm7m+QAYGz6M5KyVB+pBNaIzu01sFFVlmbSZm/SeAykMD9wxG+LlIRKWB+hI=
+	t=1775273040; cv=none; b=D8/EQ65W+hQi+ZVzdyC1D4/WQxER8y4s3tisavugJRUkHhlkyIxgKo5k5y6czdWis/K7jxH12UoS4ydqUTb+tLdX9WAPT8Z6EG4TQIBeI/i77mayViUi3VqW7C9sF0mhNJLPpbXS79+OctM09KyUe1tkcefUxeQvtKYHHLU1QcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775273040; c=relaxed/simple;
-	bh=GxzP0crHuoLNsQ25wbUfZ0tt2BhG4K8QmO1b7YEBuI8=;
+	bh=EtIon0eFvVS3O6Xdg0WbBq1qhCViHvnzFkQSYVO/8H8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=s3C02qu5x0x3ljEEXjKtA10Ys57IWjoDaUu9BNrUhHdrsvGI3Odd1a8CXVQdIGQeZr4gC6S9X6b1nRIG0LlnBEOYWf0JqUaAyYYyyVVUrBdLfZFklOo5RK1a477GTFxfJrfa7QvVBzUGkqjWj35YIx58r1LU0QW5qmz/K9NSFY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=go8Xio4g; arc=none smtp.client-ip=74.125.82.227
+	 In-Reply-To:To:Cc; b=VN4zsWw99MDX35g/he1Pa1qL4YHS+3D61/1gb2Lw0ObWryicJ8FJU1Wxu9etxD5q/+0cBI3DXdvgeiuQGXuLJIOg9ZFzkYWVapAjEHCIvlktGp9O/2pmZpr/DtAa4+z6dotZuVGeH663ZdMbaHwFrCZ1vwxbTZc0U0tVTdAuQ1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=IKxg+0yK; arc=none smtp.client-ip=209.85.222.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="go8Xio4g"
-Received: by mail-dy1-f227.google.com with SMTP id 5a478bee46e88-2ba895adfeaso2713961eec.0
-        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2026 20:23:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="IKxg+0yK"
+Received: by mail-qk1-f226.google.com with SMTP id af79cd13be357-8cfd44fa075so332102085a.0
+        for <linux-block@vger.kernel.org>; Fri, 03 Apr 2026 20:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1775273037; x=1775877837; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EDuvDbXHwkEle99hrrUH04L5WbIEpbGMjepkPBSVZYU=;
-        b=go8Xio4ghx3eymfjvTYS/YN/FGss6bGia32mXJuZrDwwHpirJj4oz2ObVWfAqfgTzd
-         1dL5+pq4N0Z2o2dVufKBCVqOZTVyfwnCkjIvlgYFGQhD9CRWwECToQVPySRwBZWkcVfd
-         xs8ivljxd3vTpXa+x+iwtsKZiUxeEG2QjuSs5TOc8nNLrLg36R4JBus62UY+FvVTXs64
-         5L1uwb4dK31WNcjwkDx0M+SIgdoSOUP1OAnU3SLOyXeUyjifc5Y3SyB3s+Dn6Ote3zWL
-         WpB12OnuT/nuH7x84kW4ll1wwW0izSDIMlrvHlYCiiOSXqSjSdoBO7zL8HGIQkUeZITJ
-         qKBw==
+        bh=zX/5TzotSq2dC2MEEK2IilrTISaWwcCASj/MEFDm/KQ=;
+        b=IKxg+0yKYnRx0xrQxTq2BUklL4qslZDAxzyBoX2Te+WSySbT7pTy+txia0A6iw/iPn
+         c1OkBFmjyrR610TIPp+x5GSyoD5VgVbgCLOqLunLumW3FSQeHeANHMLEJVwK/JyfEwyP
+         SpcW/yfTRwq72ozOt0FQ2wIyvbA0jBEVzxmP1o57nAKM0fvhMfGlWyqgEHp4wLN3exMB
+         p20SLbxMmYAEQAnJHSGUYP8etn4qV66Tb8qyCV4cf2sZu1Z33lM2YtxWL2E/7NooCU7M
+         iPvbfN9tYzIsc4JTs6cQ49qjONijWXZEa7bR9BOtWlJvT7Ow2WKwCjhYLDbOE4xn26Zu
+         IAXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1775273037; x=1775877837;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=EDuvDbXHwkEle99hrrUH04L5WbIEpbGMjepkPBSVZYU=;
-        b=nRaOqUZKUBj7f1iGHkdUcLQcUJ03ctAt2wvGbMYTfcsOTYHEHh8yQflvpXnkHuVgYV
-         WFnkOe2mZ9YDZn6cLhr5VYyT/ygc1BfeUPTHj1mM2zIB73geX2ZhpdCmakrS0zGuEAJ3
-         Bq676h7yx2DCcn6BylGbo5Aj2Wlhxh3hF6embapEvcOJUejCaOgO58bhfYQ+XkdwrtQR
-         9htgBLZXWWhQl8ZitTmFWc6pTtMe/Ew+pkCkjdZUU5CVywnQc5eEwy71YWw2oLoKapBy
-         FZWGVEFjSMKp5HGLoQvAtDGgj2v/yPeIJnxgNmGtrJtDhbP/UrK758GI3a2vqFtKHyB3
-         nh6g==
-X-Gm-Message-State: AOJu0YxaEVYk2HIdhVE0N5sbq4WBEAUjRHweBGP9bjferbBdQ0OwEnZN
-	QnfgusNhJO/o7hZtUuTCA0qkSqZghwpfjJZukoJ0JlTrhhMDfeEo5YkJ/nW8vTbq7F8gw/KjKqz
-	5u78JslLA0OG11FojU8feGf3Gs4fzbnVfsEst
-X-Gm-Gg: AeBDietfkr0XHJNCtnFb92qA7EVTEE+pwN5T6VmOdJNTUFlvaPywuF44HTLaAFSUCPH
-	2sqlxoKIO5R8z0B+xcsCkwsaxHLeNY/BdFQdin7uOT72O49yDE5dTlefxdZHPC005nR0K6lFO+5
-	bhg0+kcLD3ZGOnteRcT9JXOXrELfLNLmJEt2jPdXUo0ygR/9jkAD0zImmuGAib9AwL39fJZXdF5
-	TwYlYogMzCi59O4lbv9zGmPQAVkchMjOY8nndDwiQObH/YU93H5CnfAOAqEHiHuWmd9hr1yjzF0
-	o6vfYs/i04JJM7S69QPXrLP0qFZHX4JFAfmkM4KABwJnqQX85UExyvL+YZPCXoQgA3iNZtO0hpg
-	sFvzsTLKcUb412MtPzO3J3T2LAx6B+Zb01ZmrkXmDSlUTu4ATvFxDYnA=
-X-Received: by 2002:a05:7300:bc86:b0:2cb:53f5:553e with SMTP id 5a478bee46e88-2cbf64ab2c5mr2500520eec.0.1775273037061;
+        bh=zX/5TzotSq2dC2MEEK2IilrTISaWwcCASj/MEFDm/KQ=;
+        b=Jp4qIbmfh7Rf6T+e0dR0Z4p18D6cM3tAl9vZzGO5f9+xtoyMtpQ0gKt+7L4V29Zp64
+         6NQqiJ4hzWKhk6fc4tRs6d1ap9nShye9vT3Ye39+wJzt3w5mZToBcTV1IQeycTBlRjge
+         GwD2I6a5O0bCXnC58sbjdx9EQ5rnJHUnlGIPsnIgzf/bs+Y7HL6obRDjVNcMyWWbVHEO
+         zscsirFIYUsvNVarSZTTHxniyPb9upjcTOQIYxeP6PfZ8tK8qK15xXGMNnMdahoU9Pqg
+         95JdKyqn4ZM1w+ThGrw7Iqbc5l0ckp5vV7fCj1XBgWX/imNUvA9uTcwlQP0Bn5upFSkN
+         cbSg==
+X-Gm-Message-State: AOJu0Yw7noMpic6/9saTDWlaI/sPJ+fAC41ctTJOLVG9rwe+aLVY/RFW
+	5EhYHYA1HcsGfYTrcDxIHDE46wGM9QR5n3orKxhaQdIFBPtYRQGBglwwMarBEX9Rk9TUfwWIvtX
+	TsLvWGuo+ZqukP9o912NGQCEoUrGHb8Xf1jJj
+X-Gm-Gg: AeBDievNqLnZo7rh+y5jeRVaSJVCAelkSTlc3EKIPdz3m7j3M/F2mut5DEohXv2bfTI
+	rEyXb9Aoh1dVKItLlvByett0JDHqdR4ApT1cAdsBMaxf4qY5nNS9NYp4Y0qmPIjP0aRlH34mQxw
+	UBcuNH3dyxSV+of2weZIK/xitLX4gM8QHQQldC07/AQfoQcHPRh9K0Q6ateS6gYssCVREg7RPAO
+	S83sPslXZQ1F5lMSr90exCiV9Ecn9x70Zsd7EK1Kr2SmqKttNcWkp6sk7Qhlf6It2eCSN9Yg0Kq
+	Whn6r7GNTrS5Cy8qkzowGEB8607KAj2vQNd+ZoHTC3TpTIfzKCanHpVaGWVQyc4c2sGrhnzWWeX
+	BSHv/ZAPU3h7rH75cpx2Y37Wsf8nQGmjg/16AwBFeCvlKsolzJTJH3zE=
+X-Received: by 2002:a05:620a:171f:b0:8c6:ff8f:58af with SMTP id af79cd13be357-8d41e244447mr749101685a.51.1775273037502;
         Fri, 03 Apr 2026 20:23:57 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 5a478bee46e88-2ca793f55d3sm518145eec.11.2026.04.03.20.23.56
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id af79cd13be357-8d2a6de9b33sm28188485a.5.2026.04.03.20.23.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 03 Apr 2026 20:23:57 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::2c94])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 9F4AA3405EC;
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id A2F783405FB;
 	Fri,  3 Apr 2026 21:23:55 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id BC324E54EC9; Fri,  3 Apr 2026 21:23:55 -0600 (MDT)
+	id BFA81E54F5B; Fri,  3 Apr 2026 21:23:55 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Fri, 03 Apr 2026 21:23:55 -0600
-Subject: [PATCH 1/2] ublk: reset per-IO canceled flag on each fetch
+Date: Fri, 03 Apr 2026 21:23:56 -0600
+Subject: [PATCH 2/2] selftests: ublk: test that teardown after incomplete
+ recovery completes
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,7 +75,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-cancel-v1-1-86e5a6b3d3af@purestorage.com>
+Message-Id: <20260403-cancel-v1-2-86e5a6b3d3af@purestorage.com>
 References: <20260403-cancel-v1-0-86e5a6b3d3af@purestorage.com>
 In-Reply-To: <20260403-cancel-v1-0-86e5a6b3d3af@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>, 
@@ -84,90 +85,239 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
 X-Mailer: b4 0.14.2
 
-If a ublk server starts recovering devices but dies before issuing fetch
-commands for all IOs, cancellation of the fetch commands that were
-successfully issued may never complete. This is because the per-IO
-canceled flag can remain set even after the fetch for that IO has been
-submitted - the per-IO canceled flags for all IOs in a queue are reset
-together only once all IOs for that queue have been fetched. So if a
-nonempty proper subset of the IOs for a queue are fetched when the ublk
-server dies, the IOs in that subset will never successfully be canceled,
-as their canceled flags remain set, and this prevents ublk_cancel_cmd
-from actually calling io_uring_cmd_done on the commands, despite the
-fact that they are outstanding.
+Before the fix, teardown of a ublk server that was attempting to recover
+a device, but died when it had submitted a nonempty proper subset of the
+fetch commands to any queue would loop forever. Add a test to verify
+that, after the fix, teardown completes. This is done by:
 
-Fix this by resetting the per-IO cancel flags immediately when each IO
-is fetched instead of waiting for all IOs for the queue (which may never
-happen).
+- Adding a new argument to the fault_inject target that causes it die
+  after fetching a nonempty proper subset of the IOs to a queue
+- Using that argument in a new test while trying to recover an
+  already-created device
+- Attempting to delete the ublk device at the end of the test; this
+  hangs forever if teardown from the fault-injected ublk server never
+  completed.
+
+It was manually verified that the test passes with the fix and hangs
+without it.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 ---
- drivers/block/ublk_drv.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ tools/testing/selftests/ublk/Makefile           |  1 +
+ tools/testing/selftests/ublk/fault_inject.c     | 51 +++++++++++++++++++++++--
+ tools/testing/selftests/ublk/kublk.c            |  4 ++
+ tools/testing/selftests/ublk/kublk.h            |  3 ++
+ tools/testing/selftests/ublk/test_generic_17.sh | 35 +++++++++++++++++
+ 5 files changed, 91 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3ba7da94d31499590a06a8b307ed151919a027cb..92dabeb820344107c9fadfae94396082b933d84e 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2916,22 +2916,26 @@ static void ublk_stop_dev(struct ublk_device *ub)
- 	ublk_cancel_dev(ub);
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 8ac2d4a682a1768fb1eb9d2dd2a5d01294a67a03..d338668c5a5fbd73f6d70165455a3551ab13e894 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -18,6 +18,7 @@ TEST_PROGS += test_generic_10.sh
+ TEST_PROGS += test_generic_12.sh
+ TEST_PROGS += test_generic_13.sh
+ TEST_PROGS += test_generic_16.sh
++TEST_PROGS += test_generic_17.sh
+ 
+ TEST_PROGS += test_batch_01.sh
+ TEST_PROGS += test_batch_02.sh
+diff --git a/tools/testing/selftests/ublk/fault_inject.c b/tools/testing/selftests/ublk/fault_inject.c
+index 3b897f69c014cc73b4b469d816e80284dd21b577..228a9605053409c84baaf255f97c4abc271a8bfd 100644
+--- a/tools/testing/selftests/ublk/fault_inject.c
++++ b/tools/testing/selftests/ublk/fault_inject.c
+@@ -10,11 +10,17 @@
+ 
+ #include "kublk.h"
+ 
++struct fi_opts {
++	long long delay_ns;
++	bool die_during_fetch;
++};
++
+ static int ublk_fault_inject_tgt_init(const struct dev_ctx *ctx,
+ 				      struct ublk_dev *dev)
+ {
+ 	const struct ublksrv_ctrl_dev_info *info = &dev->dev_info;
+ 	unsigned long dev_size = 250UL << 30;
++	struct fi_opts *opts = NULL;
+ 
+ 	if (ctx->auto_zc_fallback) {
+ 		ublk_err("%s: not support auto_zc_fallback\n", __func__);
+@@ -35,17 +41,51 @@ static int ublk_fault_inject_tgt_init(const struct dev_ctx *ctx,
+ 	};
+ 	ublk_set_integrity_params(ctx, &dev->tgt.params);
+ 
+-	dev->private_data = (void *)(unsigned long)(ctx->fault_inject.delay_us * 1000);
++	opts = calloc(1, sizeof(*opts));
++	if (!opts) {
++		ublk_err("%s: couldn't allocate memory for opts\n", __func__);
++		return -ENOMEM;
++	}
++
++	opts->delay_ns = ctx->fault_inject.delay_us * 1000;
++	opts->die_during_fetch = ctx->fault_inject.die_during_fetch;
++	dev->private_data = opts;
++
+ 	return 0;
  }
  
-+static void ublk_reset_io_flags(struct ublk_queue *ubq, struct ublk_io *io)
++static void ublk_fault_inject_pre_fetch_io(struct ublk_thread *t,
++					   struct ublk_queue *q, int tag)
 +{
-+	/* UBLK_IO_FLAG_CANCELED can be cleared now */
-+	spin_lock(&ubq->cancel_lock);
-+	io->flags &= ~UBLK_IO_FLAG_CANCELED;
-+	spin_unlock(&ubq->cancel_lock);
++	struct fi_opts *opts = q->dev->private_data;
++
++	if (!opts->die_during_fetch)
++		return;
++
++	/*
++	 * Each queue fetches its IOs in increasing order of tags, so
++	 * dying just before we're about to fetch tag 1 (regardless of
++	 * what queue we're on) guarantees that we've fetched a nonempty
++	 * proper subset of the tags on that queue.
++	 */
++	if (tag == 1) {
++		/*
++		 * Ensure our commands are actually live in the kernel
++		 * before we die.
++		 */
++		io_uring_submit(&t->ring);
++		raise(SIGKILL);
++	}
 +}
 +
- /* reset per-queue io flags */
- static void ublk_queue_reset_io_flags(struct ublk_queue *ubq)
+ static int ublk_fault_inject_queue_io(struct ublk_thread *t,
+ 				      struct ublk_queue *q, int tag)
  {
--	int j;
--
--	/* UBLK_IO_FLAG_CANCELED can be cleared now */
- 	spin_lock(&ubq->cancel_lock);
--	for (j = 0; j < ubq->q_depth; j++)
--		ubq->ios[j].flags &= ~UBLK_IO_FLAG_CANCELED;
- 	ubq->canceling = false;
- 	spin_unlock(&ubq->cancel_lock);
- 	ubq->fail_io = false;
- }
+ 	const struct ublksrv_io_desc *iod = ublk_get_iod(q, tag);
+ 	struct io_uring_sqe *sqe;
++	struct fi_opts *opts = q->dev->private_data;
+ 	struct __kernel_timespec ts = {
+-		.tv_nsec = (long long)q->dev->private_data,
++		.tv_nsec = opts->delay_ns,
+ 	};
  
- /* device can only be started after all IOs are ready */
--static void ublk_mark_io_ready(struct ublk_device *ub, u16 q_id)
-+static void ublk_mark_io_ready(struct ublk_device *ub, u16 q_id,
-+	struct ublk_io *io)
- 	__must_hold(&ub->mutex)
+ 	ublk_io_alloc_sqes(t, &sqe, 1);
+@@ -77,29 +117,34 @@ static void ublk_fault_inject_cmd_line(struct dev_ctx *ctx, int argc, char *argv
  {
- 	struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
-@@ -2940,6 +2944,7 @@ static void ublk_mark_io_ready(struct ublk_device *ub, u16 q_id)
- 		ub->unprivileged_daemons = true;
+ 	static const struct option longopts[] = {
+ 		{ "delay_us", 	1,	NULL,  0  },
++		{ "die_during_fetch", 1, NULL, 0  },
+ 		{ 0, 0, 0, 0 }
+ 	};
+ 	int option_idx, opt;
  
- 	ubq->nr_io_ready++;
-+	ublk_reset_io_flags(ubq, io);
- 
- 	/* Check if this specific queue is now fully ready */
- 	if (ublk_queue_ready(ubq)) {
-@@ -3202,7 +3207,7 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
- 	if (!ret)
- 		ret = ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
- 	if (!ret)
--		ublk_mark_io_ready(ub, q_id);
-+		ublk_mark_io_ready(ub, q_id, io);
- 	mutex_unlock(&ub->mutex);
- 	return ret;
+ 	ctx->fault_inject.delay_us = 0;
++	ctx->fault_inject.die_during_fetch = false;
+ 	while ((opt = getopt_long(argc, argv, "",
+ 				  longopts, &option_idx)) != -1) {
+ 		switch (opt) {
+ 		case 0:
+ 			if (!strcmp(longopts[option_idx].name, "delay_us"))
+ 				ctx->fault_inject.delay_us = strtoll(optarg, NULL, 10);
++			if (!strcmp(longopts[option_idx].name, "die_during_fetch"))
++				ctx->fault_inject.die_during_fetch = strtoll(optarg, NULL, 10);
+ 		}
+ 	}
  }
-@@ -3610,7 +3615,7 @@ static int ublk_batch_prep_io(struct ublk_queue *ubq,
- 	ublk_io_unlock(io);
  
- 	if (!ret)
--		ublk_mark_io_ready(data->ub, ubq->q_id);
-+		ublk_mark_io_ready(data->ub, ubq->q_id, io);
- 
- 	return ret;
+ static void ublk_fault_inject_usage(const struct ublk_tgt_ops *ops)
+ {
+-	printf("\tfault_inject: [--delay_us us (default 0)]\n");
++	printf("\tfault_inject: [--delay_us us (default 0)] [--die_during_fetch 1]\n");
  }
+ 
+ const struct ublk_tgt_ops fault_inject_tgt_ops = {
+ 	.name = "fault_inject",
+ 	.init_tgt = ublk_fault_inject_tgt_init,
++	.pre_fetch_io = ublk_fault_inject_pre_fetch_io,
+ 	.queue_io = ublk_fault_inject_queue_io,
+ 	.tgt_io_done = ublk_fault_inject_tgt_io_done,
+ 	.parse_cmd_line = ublk_fault_inject_cmd_line,
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index e1c3b3c55e565c8cad6b6fe9b9b764cd244818c0..8260c96a39c05584065f41a52f3d9050614454c6 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -796,6 +796,8 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
+ 			q = &t->dev->q[q_id];
+ 			io = &q->ios[tag];
+ 			io->buf_index = j++;
++			if (q->tgt_ops->pre_fetch_io)
++				q->tgt_ops->pre_fetch_io(t, q, tag);
+ 			ublk_queue_io_cmd(t, io);
+ 		}
+ 	} else {
+@@ -807,6 +809,8 @@ static void ublk_submit_fetch_commands(struct ublk_thread *t)
+ 		for (i = 0; i < q->q_depth; i++) {
+ 			io = &q->ios[i];
+ 			io->buf_index = i;
++			if (q->tgt_ops->pre_fetch_io)
++				q->tgt_ops->pre_fetch_io(t, q, i);
+ 			ublk_queue_io_cmd(t, io);
+ 		}
+ 	}
+diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
+index 02f0c55d006b4c791fea4456687d0d8757be7be2..f784946144ad3d6e347a867fb1389a8e057766a0 100644
+--- a/tools/testing/selftests/ublk/kublk.h
++++ b/tools/testing/selftests/ublk/kublk.h
+@@ -60,6 +60,7 @@ struct stripe_ctx {
+ struct fault_inject_ctx {
+ 	/* fault_inject */
+ 	unsigned long   delay_us;
++	bool die_during_fetch;
+ };
+ 
+ struct dev_ctx {
+@@ -138,6 +139,8 @@ struct ublk_tgt_ops {
+ 	int (*init_tgt)(const struct dev_ctx *ctx, struct ublk_dev *);
+ 	void (*deinit_tgt)(struct ublk_dev *);
+ 
++	void (*pre_fetch_io)(struct ublk_thread *t, struct ublk_queue *q,
++			     int tag);
+ 	int (*queue_io)(struct ublk_thread *, struct ublk_queue *, int tag);
+ 	void (*tgt_io_done)(struct ublk_thread *, struct ublk_queue *,
+ 			    const struct io_uring_cqe *);
+diff --git a/tools/testing/selftests/ublk/test_generic_17.sh b/tools/testing/selftests/ublk/test_generic_17.sh
+new file mode 100755
+index 0000000000000000000000000000000000000000..2278b5fc9dba523bb1bf8411d22f4f95a28da905
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_generic_17.sh
+@@ -0,0 +1,35 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++
++ERR_CODE=0
++
++_prep_test "fault_inject" "teardown after incomplete recovery"
++
++# First start and stop a ublk server with device configured for recovery
++dev_id=$(_add_ublk_dev -t fault_inject -r 1)
++_check_add_dev $TID $?
++state=$(__ublk_kill_daemon "${dev_id}" "QUIESCED")
++if [ "$state" != "QUIESCED" ]; then
++        echo "device isn't quiesced($state) after $action"
++        ERR_CODE=255
++fi
++
++# Then recover the device, but use --die_during_fetch to have the ublk
++# server die while a queue has some (but not all) I/Os fetched
++${UBLK_PROG} recover -n "${dev_id}" --foreground -t fault_inject --die_during_fetch 1
++RECOVER_RES=$?
++# 137 is the result when dying of SIGKILL
++if (( RECOVER_RES != 137 )); then
++        echo "recover command exited with unexpected code ${RECOVER_RES}!"
++        ERR_CODE=255
++fi
++
++# Clean up the device. This can only succeed once teardown of the above
++# exited ublk server completes. So if teardown never completes, we will
++# time out here
++_ublk_del_dev "${dev_id}"
++
++_cleanup_test "fault_inject"
++_show_result $TID $ERR_CODE
 
 -- 
 2.34.1
