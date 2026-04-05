@@ -1,151 +1,88 @@
-Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com [209.85.215.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2A017736;
-	Sat,  4 Apr 2026 14:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4910B663
+	for <linux-block@vger.kernel.org>; Sun,  5 Apr 2026 01:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775314610; cv=none; b=Emh5nmFRwt6FvyQxuNEceIG+9dcB5q3qO9ALTSTn3uefsX/gDnT2OPRYNZcv/CVq+ujeqOZSy/3w2kHE1zZslKHtnG8kqx3eiYvfUgzGXIuLIJmvL4ZjtQlfZIgJe2PKVnSxseHVNnZ+QPKWklcYBoDJxkdRyxVLutx29iwax3E=
+	t=1775350962; cv=none; b=hz5fEl0K5rLO8645kSiuFLejAhM87TRxHwyujUtrP+qi6JfC28t2XoRLTwnuqBS7KM632xbiW1Dq5dQlmmq91EY0v9iA87t8kQSSbLrAQIh3fkK9cRjDQlE85ndMdSp+tSd1PfjcUAjOv/E0H8zo6qKexBY42CuMvOWMPxdLXls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775314610; c=relaxed/simple;
-	bh=dYGShZFkY7WMvCEQOprEXlZRljUzeHsaXKf543GVGxY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CG/IxNI4vVqWnUQMoC/osqmrUNWexzsNXFiq0rBiM5pqeFLyVXTtyYBDhZD51Pdqfupf04d3lBTJSUBHCvccOOIkEBG21kGtcMWytJOazS75deiUGsG1M7TGdDup7SvcVkGmHATKZouSYgDuSVqE6KSFJT+Kbzdv8/toOG0B7nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LiKAVH0U; arc=none smtp.client-ip=44.245.243.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1775350962; c=relaxed/simple;
+	bh=RkkpgAgAsSSrkQx43Xwidf/ttpShpZFawi7OuU9ei6Y=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:Subject:MIME-Version:
+	 Content-Type; b=PLdQbbDoi3rzO6z0H+23kCGkWdEA1TJRqPEn4Ro5xJhRHyx4F4juvTTeRZI8/enky3ngrNtg/H6bE3owy0JkprX0LsGe3IpbSfAAPTGaDT7PueHX5kk+9/53TETAU6xZxhk2fF6c/MahXLSlMdBmn9c3VnL2eKctQWVAGcnbXFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NgCSk2GJ; arc=none smtp.client-ip=209.85.215.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LiKAVH0U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NgCSk2GJ"
+Received: by mail-pg1-f193.google.com with SMTP id 41be03b00d2f7-c70f91776fcso1093350a12.0
+        for <linux-block@vger.kernel.org>; Sat, 04 Apr 2026 18:02:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1775314609; x=1806850609;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=to+dCsiAJOn5NKrXIabvJMaSZFa+wgsrBFDn7UWxqFI=;
-  b=LiKAVH0UdprAFx7dmiCzhW2XKi7GPXhGWCXAiqhkkSJGc/e9aLgYwn/K
-   k11U0NmcQZk8NDVDHf2lJEgWuV+dPwfzpk7lGbxsobqtSLkT+xE4P6Ydq
-   Lme7J2ZVz9ewy7jfiHbwo1QPgB/KfGYm+zZo3clpa69O9VAbCnTWrx+cm
-   8YNmHxhAOpgPTbjzZyPsbsIth6G1mp2fObvw3lvAPWiqm3PKPrEPNrUS7
-   daE+9Uv0CHvnGKhSNvnZjsLLgAhYqRdYKGXO9tbFVfa89fZQrwTHCEDgU
-   Nse9Yqj0v6CJXsJZztlPpnnfQ/kk6i/u8M1GIxvgv0NsaMlkuURH+0y/Q
-   w==;
-X-CSE-ConnectionGUID: +5ZFlH5tTeGrFKw0KaZtMg==
-X-CSE-MsgGUID: Nrn4LLaGQ9m91P3Cd2aPOQ==
-X-IronPort-AV: E=Sophos;i="6.23,159,1770595200"; 
-   d="scan'208";a="16069985"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Apr 2026 14:56:46 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.53:18493]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.226:2525] with esmtp (Farcaster)
- id 2cc671a3-973e-46b3-abcc-ff6ca43b5fae; Sat, 4 Apr 2026 14:56:45 +0000 (UTC)
-X-Farcaster-Flow-ID: 2cc671a3-973e-46b3-abcc-ff6ca43b5fae
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Sat, 4 Apr 2026 14:56:45 +0000
-Received: from c889f3b07a0a.ant.amazon.com (10.106.82.24) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Sat, 4 Apr 2026 14:56:44 +0000
-Date: Sat, 4 Apr 2026 15:56:41 +0100
-From: Yuto Ohnuki <ytohnuki@amazon.com>
-To: Jens Axboe <axboe@kernel.dk>
-CC: Yu Kuai <yukuai@fnnas.com>, Nilay Shroff <nilay@linux.ibm.com>, Ming Lei
-	<ming.lei@redhat.com>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com>
-Subject: Re: [PATCH v2] blk-wbt: remove WARN_ON_ONCE from
- wbt_init_enable_default()
-Message-ID: <adEmqQWgtJmZy27u@c889f3b07a0a.ant.amazon.com>
-References: <20260316070358.65225-2-ytohnuki@amazon.com>
+        d=gmail.com; s=20251104; t=1775350961; x=1775955761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:in-reply-to
+         :message-id:cc:to:from:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fiTt0Fj3wfOXNAWpy/sFPtcd5f5ZN7PSVBwEcFw7PXw=;
+        b=NgCSk2GJ8eHC+KRxgGtbB7tjxWBUyIqZQN50hMOrbdBtFrlWxn4wYxFR8xFy4QDbVS
+         zE862BT8Cby9YQOYhTxnY6vkWqofRIgUGJVQ695S8P50KxU5/5ZzvAjbyHAAG+ooGVhB
+         Y/nHvuJb8Y4B8FzzXUlrmvSr0XUbsz9AzvWUfiEY/1qk51c4xXCa9zb8sdcHIFn8OS6r
+         Hooqr44aXe2diEfkawIlIV1pLURVM0di5Vp/dBuv8R5tZH0rYqFpIhbKiGboqCouoc5x
+         hlUkFstvYEUlFu2gfKDTax/sylhrdiZelrIY2ovQewkQMY2OIkzlax4qYBOOWt2aisLP
+         T3Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775350961; x=1775955761;
+        h=content-transfer-encoding:mime-version:subject:in-reply-to
+         :message-id:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fiTt0Fj3wfOXNAWpy/sFPtcd5f5ZN7PSVBwEcFw7PXw=;
+        b=qZPmSMOfeURW4scs/4CWjL4QP1MmxQh4cAHus+jIZJikfqRnvzOqGXwllhkQrDudN3
+         d7lxLUXWuqgrdHjXWbUuXJuJI4wpsn4PebWmo49oneMJYuR6MJjPkSFXk67g0vDjop0s
+         3dOgq/5y3zDaNff4mXjA89prZFg8ccRrbywbxmGyBqh1JZWJkApgShxMuj1a9dYkzobl
+         P/jd2n/H8TerU+Kpbdw3kfbGl/r5REdTgLrwJDyA62Cjg/KVInByKQoclLHu/KM5DUx4
+         wb3CKWowSqJKS3gKkI4nlXsqqWvZiR8DghQh9GIXfezfk7lmQS05BT1kfivUHO01/huL
+         eW6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUTZv1cl2iKhC3HLs3WYwUNal3+qHQx3dijllCYQH6mtu1ZDeW37wGIS06m3jDf6VcGRcx0xeKsMQNpCg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywxcmy0jNvHyxU3NGD3UEYX346FJ14GNQeFZwfwRifjwhOaIOU6
+	F9CJlKOWO49Qvl24cDH0Op3GzVknaV1RFOKMluG+aol8x63S6un6CaXL
+X-Gm-Gg: AeBDievz9IjVLneHj0r73hjSqCqGWiYYws4OrT7zOryqJF3Dk5KyFUNCjtyZdxMLsZ4
+	zTr3PAmR7fnyYOw15JDLfKYsuUlVqBTUzZicaST31YW3JfDEQSwhuBUsf8NrVgTXcZ/dGVFB4qY
+	LUgenUbYL6Gd6Hzk/0LZL1b1flo2TxFU0tZjNJ+XAki7fsXSJkCtqPPBXyR+RxFLVoOtPgPcmkH
+	2ypQEj5VrEjzFy13B3PQ4d1EtnK33b9PfAXzFOuVr8GCo3Ed6WHuhbhrlmpt1ivhCAyoCbet2UK
+	KGAt1c2pCJT7Sb2fESy23bq8b7t6KDVREcP6ymSORKk14noG9u5V7um5iyhYdV2PjceMRlX8NJl
+	lnJLAtwZhNSeGsCjUcawDM2fmqE5tK7h6WR803mKchYAo2u1OICnjOWJxNX8B0g+0Ho+Mr2mz5J
+	MRJK3dRJfRnUYeyETSXZtzxfE=
+X-Received: by 2002:a05:6a20:a11a:b0:398:9301:b9ae with SMTP id adf61e73a8af0-39f2f11b8a1mr8103554637.52.1775350960975;
+        Sat, 04 Apr 2026 18:02:40 -0700 (PDT)
+Received: from [127.0.0.1] ([142.91.102.47])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c6477bbcsm8552260a12.3.2026.04.04.18.02.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 04 Apr 2026 18:02:40 -0700 (PDT)
+Date: Sun, 5 Apr 2026 09:02:30 +0800
+From: zhang <zhangweize9@gmail.com>
+To: ming.lei@redhat.com
+Cc: axboe@kernel.dk, csander@purestorage.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	shuah@kernel.org, ushankar@purestorage.com
+Message-ID: <46c04059-03a0-4488-a4a5-4bb93aa46a1e@gmail.com>
+In-Reply-To: <adER-jg0JfkE4I8n@fedora>
+Subject: Re: [PATCH 1/2] ublk: reset per-IO canceled flag on each fetch
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260316070358.65225-2-ytohnuki@amazon.com>
-X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Correlation-ID: <46c04059-03a0-4488-a4a5-4bb93aa46a1e@gmail.com>
 
-On Mon, Mar 16, 2026 at 07:03:59AM +0000, Yuto Ohnuki wrote:
-> wbt_init_enable_default() uses WARN_ON_ONCE to check for failures from
-> wbt_alloc() and wbt_init(). However, both are expected failure paths:
-> 
-> - wbt_alloc() can return NULL under memory pressure (-ENOMEM)
-> - wbt_init() can fail with -EBUSY if wbt is already registered
-> 
-> syzbot triggers this by injecting memory allocation failures during MTD
-> partition creation via ioctl(BLKPG), causing a spurious warning.
-> 
-> wbt_init_enable_default() is a best-effort initialization called from
-> blk_register_queue() with a void return type. Failure simply means the
-> disk operates without writeback throttling, which is harmless.
-> 
-> Replace WARN_ON_ONCE with plain if-checks, consistent with how
-> wbt_set_lat() in the same file already handles these failures. Add a
-> pr_warn() for the wbt_init() failure to retain diagnostic information
-> without triggering a full stack trace.
-> 
-> Reported-by: syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=71fcf20f7c1e5043d78c
-> Fixes: 41afaeeda509 ("blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under q_usage_counter")
-> Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
-> ---
-> Changes in v2:
-> - Add pr_warn() for wbt_init() failure as suggested by Yu Kuai
-> - Link to v1: https://lore.kernel.org/all/20260315143137.13547-2-ytohnuki@amazon.com/
-> ---
->  block/blk-wbt.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> index 33006edfccd4..dcc2438ca16d 100644
-> --- a/block/blk-wbt.c
-> +++ b/block/blk-wbt.c
-> @@ -782,10 +782,11 @@ void wbt_init_enable_default(struct gendisk *disk)
->  		return;
->  
->  	rwb = wbt_alloc();
-> -	if (WARN_ON_ONCE(!rwb))
-> +	if (!rwb)
->  		return;
->  
-> -	if (WARN_ON_ONCE(wbt_init(disk, rwb))) {
-> +	if (wbt_init(disk, rwb)) {
-> +		pr_warn("%s: failed to enable wbt\n", disk->disk_name);
->  		wbt_free(rwb);
->  		return;
->  	}
-> -- 
-> 2.50.1
-> 
-> 
-> 
-> 
-> Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
-> 
-> Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
-> 
-> 
->
+Dear Ming Lei:
 
-Gentle ping on this patch.
- 
-It has a Reviewed-by from Nilay Shroff and Yu Kuai.
-Please let me know if there is anything else needed for this
-to be applied.
- 
-Thank you in advance,
-Yuto 
+I just looked at your solution, which is to reset immediately after each IO is claimed. This solution can indeed effectively solve the blocking problem. However, if there is a task that is repeated and exactly the same, then the process may run repeatedly many times. Do you think we should add some logic to handle repeated tasks?
 
+Reviewed-by: zhang, the-essence-of-life.
 
+-- 
 
-Amazon Web Services EMEA SARL, 38 avenue John F. Kennedy, L-1855 Luxembourg, R.C.S. Luxembourg B186284
-
-Amazon Web Services EMEA SARL, Irish Branch, One Burlington Plaza, Burlington Road, Dublin 4, Ireland, branch registration number 908705
-
-
-
+the-essence-of-life
