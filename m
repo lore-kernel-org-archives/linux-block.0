@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E85342538;
-	Sun,  5 Apr 2026 23:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64055342538;
+	Sun,  5 Apr 2026 23:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775433298; cv=none; b=ajcMwYp7ecb8KyQf5/idw1YFvZ+aOvo8NYOAqW+oe5E2YMEKT9AMLpFAZO7uFpLclXyaPbKkQ61se01PspVVGNHnuxT7hhDd/ooWRMJ4aQVjVNLrx56yLE2cw/z2duQOD0D6KumpcsPRx39TFO7/CkFQ1W99qQK09ZOVaykoe8A=
+	t=1775433309; cv=none; b=VbAMUnUdBnIds1YgOfm8A0/7N2Fx3AMwldSnI2+n8/XlC1KkkGuZels3u12qirV2cihewKYUUXIBSjF7fFW4Z1F1Hf3GGxuX95CPoQEWaZcF/7HitzvpeV187bXCn6bbAnAnj5coGkeJr6P2uC/FmCUIn+Wcyfx2jIV6KmHZzwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775433298; c=relaxed/simple;
-	bh=zEAiIku4X7Y0hc7v9DxS7dQT5lhAUdf4bcfA9WafsEM=;
+	s=arc-20240116; t=1775433309; c=relaxed/simple;
+	bh=nKHljoFNdh6GE6jo8Il2V+4MwOz3gplkmJ7uy9RqO8E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BxmdDFRWTOfrnQBRnX0NxNxzVW5n8r5QxuNJcrTwg07qHCjXMLK9eclauj4MG1i0zR9qWP3IzHshveOWQoSIxQWkexOBpMkBwnGqH0ZbUzGJRr2IRSObPgqJ18xOVCrNMoaUIZ42wdWpAXxgd156S2qNZ64f81k1wNevqIkTA9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkarVOMv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=C55b7I44Pj8zx30bl2lDxBzkhPbQxcFH4nFMdZl5MGzCl9ngtgW/Xm0OlrgORbGt9TWnl9mFV7TihYlDViPHGx904PEkeNDPWpaIeBNBFH0RKUOOUa5aIxHKUG52/N8HHx7jkuNSDvzZNp2JNOszR09lzTKng2HGd0AI+scdVmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8O6kikO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkarVOMv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36B6AC19425;
-	Sun,  5 Apr 2026 23:54:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8O6kikO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B924C116C6;
+	Sun,  5 Apr 2026 23:54:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775433297;
-	bh=zEAiIku4X7Y0hc7v9DxS7dQT5lhAUdf4bcfA9WafsEM=;
+	s=k20201202; t=1775433309;
+	bh=nKHljoFNdh6GE6jo8Il2V+4MwOz3gplkmJ7uy9RqO8E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KkarVOMv/eAWnbZswNfp2WIVyzZhZOaVT1moxhBROgr7XlggS7b9KhTq1UgpP++Zx
-	 Alotrr0bPvvYyo4kq6FyVc9YElH+P1TTlCs4ZJDoaQatZbjqXB+wmP3owqg14Of61w
-	 QgM2JYhZrkhdKFrFlvY2f4jGUHLEFksjOsoVEnBASEJqGV2AarC0Em5BCe5CzlS47S
-	 j5Wd5drcDjr9h3/HuN0p6YfhD8sEk6Y7iHcXTD8oeWf04xG4U8DAtYM0tEKntTSdCh
-	 MkAPdwq8G2+AFZ7GM7tcJHA678KuZN10hpC7WsUXu2VGc3XKFcIpwDOF2q8lXJJmsT
-	 bPpndWVVj+S2Q==
+	b=C8O6kikOLR/V/02C2dby6Y/oProcMBLuoWXI5fMzDgnA9/gNHDmG5OW3v12U4+ApI
+	 M7D5j3PQs8Qn+TqxBWio6NqZavJX48yjJQcSrZWhm8UkapxbQBbJSMLn6Rr4hL+BcU
+	 oBrMFthjMoPxGtYqz9gtVtvfzl1E29Z2GrDcd8+s/AFhsdXRbbFjVuYvp+FvDnANfA
+	 WiH9Ua8ujabe8zcqKO6Z20ebB8N4ELMduY+UjyCpId461mgHnIQFj2ULWzmdcI+jvd
+	 2FtIsQzI1tFD6BdmI8fKDyTf0fLsclaDPgIVP/+AuFxyuGsxjKdhSm5o8sCv314tib
+	 yJ/keu9ic/DVg==
 From: Miguel Ojeda <ojeda@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -77,9 +77,9 @@ Cc: Boqun Feng <boqun@kernel.org>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	linux-doc@vger.kernel.org,
 	Tamir Duberstein <tamird@kernel.org>
-Subject: [PATCH v2 08/33] rust: simplify `RUSTC_VERSION` Kconfig conditions
-Date: Mon,  6 Apr 2026 01:52:44 +0200
-Message-ID: <20260405235309.418950-9-ojeda@kernel.org>
+Subject: [PATCH v2 09/33] rust: remove `RUSTC_HAS_SLICE_AS_FLATTENED` and simplify code
+Date: Mon,  6 Apr 2026 01:52:45 +0200
+Message-ID: <20260405235309.418950-10-ojeda@kernel.org>
 In-Reply-To: <20260405235309.418950-1-ojeda@kernel.org>
 References: <20260405235309.418950-1-ojeda@kernel.org>
 Precedence: bulk
@@ -90,88 +90,118 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With the Rust version bump in place, several Kconfig conditions based on
-`RUSTC_VERSION` are always true.
+With the Rust version bump in place, the `RUSTC_HAS_SLICE_AS_FLATTENED`
+Kconfig (automatic) option is always true.
 
-Thus simplify them.
+Thus remove the option and simplify the code.
 
-The minimum supported major LLVM version by our new Rust minimum version
-is now LLVM 18, instead of LLVM 16. However, there are no possible
-cleanups for `RUSTC_LLVM_VERSION`.
+In particular, this includes removing the `slice` module which contained
+the temporary slice helpers, i.e. the `AsFlattened` extension trait and
+its `impl`s.
 
 Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 Reviewed-by: Gary Guo <gary@garyguo.net>
 Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- arch/Kconfig       | 3 +--
- arch/arm64/Kconfig | 8 --------
- arch/riscv/Kconfig | 3 ---
- init/Kconfig       | 2 --
- 4 files changed, 1 insertion(+), 15 deletions(-)
+ init/Kconfig           |  3 ---
+ rust/kernel/lib.rs     |  1 -
+ rust/kernel/prelude.rs |  3 ---
+ rust/kernel/slice.rs   | 49 ------------------------------------------
+ 4 files changed, 56 deletions(-)
+ delete mode 100644 rust/kernel/slice.rs
 
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 102ddbd4298e..84089e80584b 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -968,10 +968,9 @@ config HAVE_CFI_ICALL_NORMALIZE_INTEGERS
- config HAVE_CFI_ICALL_NORMALIZE_INTEGERS_RUSTC
- 	def_bool y
- 	depends on HAVE_CFI_ICALL_NORMALIZE_INTEGERS
--	depends on RUSTC_VERSION >= 107900
- 	depends on ARM64 || X86_64
- 	# With GCOV/KASAN we need this fix: https://github.com/rust-lang/rust/pull/129373
--	depends on (RUSTC_LLVM_VERSION >= 190103 && RUSTC_VERSION >= 108200) || \
-+	depends on RUSTC_LLVM_VERSION >= 190103 || \
- 		(!GCOV_KERNEL && !KASAN_GENERIC && !KASAN_SW_TAGS)
- 
- config CFI_PERMISSIVE
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 38dba5f7e4d2..c91130c7fba1 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -291,14 +291,6 @@ config ARM64
- config RUSTC_SUPPORTS_ARM64
- 	def_bool y
- 	depends on CPU_LITTLE_ENDIAN
--	# Shadow call stack is only supported on certain rustc versions.
--	#
--	# When using the UNWIND_PATCH_PAC_INTO_SCS option, rustc version 1.80+ is
--	# required due to use of the -Zfixed-x18 flag.
--	#
--	# Otherwise, rustc version 1.82+ is required due to use of the
--	# -Zsanitizer=shadow-call-stack flag.
--	depends on !SHADOW_CALL_STACK || RUSTC_VERSION >= 108200 || RUSTC_VERSION >= 108000 && UNWIND_PATCH_PAC_INTO_SCS
- 
- config CLANG_SUPPORTS_DYNAMIC_FTRACE_WITH_ARGS
- 	def_bool CC_IS_CLANG
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 90c531e6abf5..ddc534402400 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -232,9 +232,6 @@ config RISCV
- config RUSTC_SUPPORTS_RISCV
- 	def_bool y
- 	depends on 64BIT
--	# Shadow call stack requires rustc version 1.82+ due to use of the
--	# -Zsanitizer=shadow-call-stack flag.
--	depends on !SHADOW_CALL_STACK || RUSTC_VERSION >= 108200
- 
- config CLANG_SUPPORTS_DYNAMIC_FTRACE
- 	def_bool CC_IS_CLANG
 diff --git a/init/Kconfig b/init/Kconfig
-index 36d32ea44594..b8a1ab0d49d4 100644
+index b8a1ab0d49d4..c38f49228157 100644
 --- a/init/Kconfig
 +++ b/init/Kconfig
-@@ -2193,9 +2193,7 @@ config RUST
- 	depends on !DEBUG_INFO_BTF || (PAHOLE_HAS_LANG_EXCLUDE && !LTO)
- 	depends on !CFI || HAVE_CFI_ICALL_NORMALIZE_INTEGERS_RUSTC
- 	select CFI_ICALL_NORMALIZE_INTEGERS if CFI
--	depends on !CALL_PADDING || RUSTC_VERSION >= 108100
- 	depends on !KASAN_SW_TAGS
--	depends on !(MITIGATION_RETHUNK && KASAN) || RUSTC_VERSION >= 108300
- 	help
- 	  Enables Rust support in the kernel.
+@@ -178,9 +178,6 @@ config LD_CAN_USE_KEEP_IN_OVERLAY
+ 	# https://github.com/llvm/llvm-project/pull/130661
+ 	def_bool LD_IS_BFD || LLD_VERSION >= 210000
  
+-config RUSTC_HAS_SLICE_AS_FLATTENED
+-	def_bool RUSTC_VERSION >= 108000
+-
+ config RUSTC_HAS_COERCE_POINTEE
+ 	def_bool RUSTC_VERSION >= 108400
+ 
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 138d846f798d..621cae75030c 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -140,7 +140,6 @@
+ pub mod security;
+ pub mod seq_file;
+ pub mod sizes;
+-pub mod slice;
+ #[cfg(CONFIG_SOC_BUS)]
+ pub mod soc;
+ #[doc(hidden)]
+diff --git a/rust/kernel/prelude.rs b/rust/kernel/prelude.rs
+index e9d37f307f2a..44edf72a4a24 100644
+--- a/rust/kernel/prelude.rs
++++ b/rust/kernel/prelude.rs
+@@ -107,6 +107,3 @@
+ // `super::std_vendor` is hidden, which makes the macro inline for some reason.
+ #[doc(no_inline)]
+ pub use super::dbg;
+-
+-#[cfg(not(CONFIG_RUSTC_HAS_SLICE_AS_FLATTENED))]
+-pub use super::slice::AsFlattened;
+diff --git a/rust/kernel/slice.rs b/rust/kernel/slice.rs
+deleted file mode 100644
+index ca2cde135061..000000000000
+--- a/rust/kernel/slice.rs
++++ /dev/null
+@@ -1,49 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-
+-//! Additional (and temporary) slice helpers.
+-
+-/// Extension trait providing a portable version of [`as_flattened`] and
+-/// [`as_flattened_mut`].
+-///
+-/// In Rust 1.80, the previously unstable `slice::flatten` family of methods
+-/// have been stabilized and renamed from `flatten` to `as_flattened`.
+-///
+-/// This creates an issue for as long as the MSRV is < 1.80, as the same functionality is provided
+-/// by different methods depending on the compiler version.
+-///
+-/// This extension trait solves this by abstracting `as_flatten` and calling the correct method
+-/// depending on the Rust version.
+-///
+-/// This trait can be removed once the MSRV passes 1.80.
+-///
+-/// [`as_flattened`]: https://doc.rust-lang.org/std/primitive.slice.html#method.as_flattened
+-/// [`as_flattened_mut`]: https://doc.rust-lang.org/std/primitive.slice.html#method.as_flattened_mut
+-#[cfg(not(CONFIG_RUSTC_HAS_SLICE_AS_FLATTENED))]
+-pub trait AsFlattened<T> {
+-    /// Takes a `&[[T; N]]` and flattens it to a `&[T]`.
+-    ///
+-    /// This is an portable layer on top of [`as_flattened`]; see its documentation for details.
+-    ///
+-    /// [`as_flattened`]: https://doc.rust-lang.org/std/primitive.slice.html#method.as_flattened
+-    fn as_flattened(&self) -> &[T];
+-
+-    /// Takes a `&mut [[T; N]]` and flattens it to a `&mut [T]`.
+-    ///
+-    /// This is an portable layer on top of [`as_flattened_mut`]; see its documentation for details.
+-    ///
+-    /// [`as_flattened_mut`]: https://doc.rust-lang.org/std/primitive.slice.html#method.as_flattened_mut
+-    fn as_flattened_mut(&mut self) -> &mut [T];
+-}
+-
+-#[cfg(not(CONFIG_RUSTC_HAS_SLICE_AS_FLATTENED))]
+-impl<T, const N: usize> AsFlattened<T> for [[T; N]] {
+-    #[allow(clippy::incompatible_msrv)]
+-    fn as_flattened(&self) -> &[T] {
+-        self.flatten()
+-    }
+-
+-    #[allow(clippy::incompatible_msrv)]
+-    fn as_flattened_mut(&mut self) -> &mut [T] {
+-        self.flatten_mut()
+-    }
+-}
 -- 
 2.53.0
 
