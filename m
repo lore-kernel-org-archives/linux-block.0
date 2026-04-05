@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E192D3845CB;
-	Sun,  5 Apr 2026 23:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E94264A65;
+	Sun,  5 Apr 2026 23:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775433376; cv=none; b=RBSP8U2ZprePrnNZd+2v78ETDcN3BANo8CWEzczLMW/d8wCnGAiKZUVb8DCgbOeQspEOT3Ow1pNbK0hsKylMGZ5+7kdMJVkS6qK83+wgA3TnU0ic+joMX3eFZJfF0gBiJyd7ZS3u9dzNnbYTBblS2w7MjyMKH7XyV0DyNZhgmuw=
+	t=1775433387; cv=none; b=OdLaFsntKJ+oAvxqWUPlgPOdoxjpns4Or2uUc0FnFKQ72nmZdI3h7AtjcdZDPpve46Ybg5Mzy7hE5Ab69HO33/Oy4GZs+iCvkUltF2RVce72kyU7kl7ymsRZcMCyu3Q+n48ZwL/JL6KHynXqc37v8h3aSqKeB42uISMm0OY0T8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775433376; c=relaxed/simple;
-	bh=k9fgvKqzt3CcMjpByOnUKIVw60bYTXCQ8WCT/cyECdY=;
+	s=arc-20240116; t=1775433387; c=relaxed/simple;
+	bh=epQs3AsyxZ8hhy5ISUPTkOTvgvbeYkZEdG041MVzF80=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BUDMTq70p4g4mrTh870XnKUcJpW02pVW3vCEYUSWtPXNwW5s+mPteGAF2XxgyU+AOR24el5FmueqXl215VEIEpruxvBe66mQ3+PyDK2I3AvewOJ8fqbmXrVSLBPpd8is473hzOgeMf8eL5NCp/KyGrK1WtVEfPqvYpJeKuExI14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZaVpVUGO; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VScC9PULCUJ/wtkwKdPpjcZwo2j20IG7FTcXhDiT7KV0tkrEciIZc8UOr1M55jxcQ+NC4gQwgSsq7W0Qf4MOzbVspHj/wn4d249hkw97RsDZlrIO1UUnikBb91NE3R74PL2M5sI93xW5KxPfeWH+top5EI8SZSLKGbVTXdqMSsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5Jq/KNe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZaVpVUGO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AA99C116C6;
-	Sun,  5 Apr 2026 23:56:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5Jq/KNe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4322DC2BC9E;
+	Sun,  5 Apr 2026 23:56:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775433375;
-	bh=k9fgvKqzt3CcMjpByOnUKIVw60bYTXCQ8WCT/cyECdY=;
+	s=k20201202; t=1775433386;
+	bh=epQs3AsyxZ8hhy5ISUPTkOTvgvbeYkZEdG041MVzF80=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZaVpVUGO29xolVVSHHDaY6zc64XoWTVURD4wmowEYx41c+Wyvxg2ZvbRUDBr5NSQM
-	 qnQ7znq5xPGmdnTPdcYVaZC7vnG5CdMVAK8esq+ZQUqP5fhEE9eEYKap4bE1TE6jn4
-	 tBmF/lQcMvqLIbmPK7hFkihBrJN3xVu01fVsz+MN4SzEjt8l16fIDNn69GQncl9Yl+
-	 Iz0ORhzjuBLkOlJxT/Q92ItzFvNRq1IEAlPAFGwQoUdailI/ja4qppsGHHJ+cazKlw
-	 zeuH4jXdUNlzyLPBG4DfcSUb8nvgueaNnyXHPAthjZQRgSoxFxQLDP6Ba6EFq9edcZ
-	 rD1Bo7j0WdTjg==
+	b=D5Jq/KNe79Oh6OGcaoN5PmN2FFcrPk6GXdZcnPkCCDQp2UqHYQ9SjPNHV1332T+nF
+	 T+EMIfEl65JCvssoBOyMtZZKNAxU8TmRe5HaKPPwK+gBHmI/vYuqdH1BJv358cKnCs
+	 j84VKway/sOwJ1457dvilIKK/J+Q/OQaHKwpmKO95nCh4B7yrwTBxi9e0NrjaZTtt9
+	 crDuyneI/9sBvcynswhVdLKgIKdEhefPzcWdNZgBm/jAYpMGU+0smar730LDYpqwvX
+	 AJij9W0+y1c22mbCnukDGTJao+rlNiw93Km7Z7OnP8ZZkoqeUHZ03Xxf7FbRHImwOl
+	 bXVw24EbqtJYQ==
 From: Miguel Ojeda <ojeda@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -75,10 +75,11 @@ Cc: Boqun Feng <boqun@kernel.org>,
 	llvm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v2 15/33] rust: macros: simplify code using `feature(extract_if)`
-Date: Mon,  6 Apr 2026 01:52:51 +0200
-Message-ID: <20260405235309.418950-16-ojeda@kernel.org>
+	linux-doc@vger.kernel.org,
+	Tamir Duberstein <tamird@kernel.org>
+Subject: [PATCH v2 16/33] rust: block: update `const_refs_to_static` MSRV TODO comment
+Date: Mon,  6 Apr 2026 01:52:52 +0200
+Message-ID: <20260405235309.418950-17-ojeda@kernel.org>
 In-Reply-To: <20260405235309.418950-1-ojeda@kernel.org>
 References: <20260405235309.418950-1-ojeda@kernel.org>
 Precedence: bulk
@@ -89,59 +90,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-`feature(extract_if)` [1] was stabilized in Rust 1.87.0 [2], and the last
-significant change happened in Rust 1.85.0 [3] when the range parameter
-was added.
+`feature(const_refs_to_static)` was stabilized in Rust 1.83.0 [1].
 
-That is, with our new minimum version, we can start using the feature.
+Thus update the comment to reflect that.
 
-Thus simplify the code using the feature and remove the TODO comment.
-
-Suggested-by: Gary Guo <gary@garyguo.net>
-Link: https://lore.kernel.org/rust-for-linux/DHHVSX66206Y.3E7I9QUNTCJ8I@garyguo.net/
-Link: https://github.com/rust-lang/rust/issues/43244 [1]
-Link: https://github.com/rust-lang/rust/pull/137109 [2]
-Link: https://github.com/rust-lang/rust/pull/133265 [3]
+Link: https://github.com/rust-lang/rust/pull/129759 [1]
+Reviewed-by: Tamir Duberstein <tamird@kernel.org>
+Reviewed-by: Gary Guo <gary@garyguo.net>
 Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- rust/macros/kunit.rs | 9 +++++----
- rust/macros/lib.rs   | 3 +++
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ rust/kernel/block/mq/gen_disk.rs | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/rust/macros/kunit.rs b/rust/macros/kunit.rs
-index 6be880d634e2..ae20ed6768f1 100644
---- a/rust/macros/kunit.rs
-+++ b/rust/macros/kunit.rs
-@@ -87,10 +87,11 @@ pub(crate) fn kunit_tests(test_suite: Ident, mut module: ItemMod) -> Result<Toke
-             continue;
-         };
- 
--        // TODO: Replace below with `extract_if` when MSRV is bumped above 1.85.
--        let before_len = f.attrs.len();
--        f.attrs.retain(|attr| !attr.path().is_ident("test"));
--        if f.attrs.len() == before_len {
-+        if f.attrs
-+            .extract_if(.., |attr| attr.path().is_ident("test"))
-+            .count()
-+            == 0
-+        {
-             processed_items.push(Item::Fn(f));
-             continue;
-         }
-diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-index 0c36194d9971..2cfd59e0f9e7 100644
---- a/rust/macros/lib.rs
-+++ b/rust/macros/lib.rs
-@@ -6,6 +6,9 @@
- // and thus add a dependency on `include/config/RUSTC_VERSION_TEXT`, which is
- // touched by Kconfig when the version string from the compiler changes.
- 
-+// Stable since Rust 1.87.0.
-+#![feature(extract_if)]
-+//
- // Stable since Rust 1.88.0 under a different name, `proc_macro_span_file`,
- // which was added in Rust 1.88.0. This is why `cfg_attr` is used here, i.e.
- // to avoid depending on the full `proc_macro_span` on Rust >= 1.88.0.
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index c8b0ecb17082..912cb805caf5 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -140,9 +140,7 @@ pub fn build<T: Operations>(
+             devnode: None,
+             alternative_gpt_sector: None,
+             get_unique_id: None,
+-            // TODO: Set to THIS_MODULE. Waiting for const_refs_to_static feature to
+-            // be merged (unstable in rustc 1.78 which is staged for linux 6.10)
+-            // <https://github.com/rust-lang/rust/issues/119618>
++            // TODO: Set to `THIS_MODULE`.
+             owner: core::ptr::null_mut(),
+             pr_ops: core::ptr::null_mut(),
+             free_disk: None,
 -- 
 2.53.0
 
