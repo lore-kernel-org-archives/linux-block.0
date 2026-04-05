@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A795B3845CB;
-	Sun,  5 Apr 2026 23:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBEA264A65;
+	Sun,  5 Apr 2026 23:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775433331; cv=none; b=r1uYyzux0VLdKyZo1XnwNcFiArcb2quHNw4/KJvqj9mTA/fD2d5Ir3DzsVBLb5bV0lc8qvhPWUelV9X/n9AcpE0RGjRtHpuPpAwquT3AVPUDR7nME670pDY6c3kXjoBYtzhXCOfWFsdbim4fx2EZR634Whxb52kiCScBsF2T3bk=
+	t=1775433343; cv=none; b=BLKu+t13uTEys+8nzMIjzI66/jSz5qNUFZG402dxTBid+mHxt+U3M3gVToP0SgVNOJOQF0ovPAVRTN+9D6mrq35IzTRvjbI2XtqVwKnuYJnH5PXDkQZ71entVUvmbxvj4ixtyneKQxc2ezw0Q12jhCxigKcaN2hxfm1Iyo5aVP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775433331; c=relaxed/simple;
-	bh=y9tHNT9LLwvCnIp2g8KfzIzoqrv/gM7tQZbqTUN0GxU=;
+	s=arc-20240116; t=1775433343; c=relaxed/simple;
+	bh=rhX3GqYQx8Jl+4tNpW2dKwQfeZlDw97dCDSWyN1kX4M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=URuckKw5wV9u8gUxH76Kq+65Zax9e4E96EXF9g8CwvkUFcazXKqfcZMnPIehrlPuRE8ZM5Tgl6dmTkIQVIVWs3Cc6qhRlktfDoV4ggK1FnMd9xSPmBy29Q3chP8e7rdFR5NudURbpDMOtgTawnoWnOUIqIqP/yCNZFSpBm5Z1W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PWyM8OyK; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=FvP8n/BDZmDPHGEmXrqFwW/wTYZ0YtcLdTyjBvTdd3uBv1W7BNA5ugiNvYFDJnWP7hmc+N/NN+h+7p4a2GlfAwfcPaNeaO60sFSYu9Z9zB54PB8jt8ng7b5rcvBiZ5F2YAAX+/jwhB701ngSRGYSNbRhSyXiSgf2D8ejP0R058w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9uNPKIn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PWyM8OyK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD4E1C2BCB0;
-	Sun,  5 Apr 2026 23:55:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9uNPKIn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2C13C19425;
+	Sun,  5 Apr 2026 23:55:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775433331;
-	bh=y9tHNT9LLwvCnIp2g8KfzIzoqrv/gM7tQZbqTUN0GxU=;
+	s=k20201202; t=1775433342;
+	bh=rhX3GqYQx8Jl+4tNpW2dKwQfeZlDw97dCDSWyN1kX4M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PWyM8OyKxUz2TNjL8+e0G5SaNub5kKLoxTD9YqzS8KN12eDUh3ZxxS1ZwAzbPmbfi
-	 nDroB+Dw6RlYMaIL1hnynDku4rObXrjTriUfRg/LjdBlpJ5OogQ+hXxDqZ5iAO3GAK
-	 e23RwquOxN6ersxOC2v4Ca/qVybz5FXHmP0vq4U7f/+JsRHgs3qrHbTqzV1ypTAys0
-	 UfpfwtLB8OR4qY8z6MRfaqIIuEmSd/QnTRo3ZGXmJFgkIE5hy3PpAGlENeQma7W6Kh
-	 TbGlWD7OxbQ+ffRD4Uktwmuh8O2wehF4rKRblvXpaWPq7wb8e0PQQD7ybIk0+Jhh7V
-	 ALQrawJ7O1w1A==
+	b=k9uNPKIn7BIlbZBmyZCrn8YA4s8vt211ZS4DryUsRUPtxc5Ce8n1gRoz4IJwAZAOM
+	 Dqp6WAkHoyNQ5zLX/rFldY3wmp5C0ZX9hMiMmyPCl23fRGYclj6I0liqouATnE4LD5
+	 pcFG9FLiF8HJvJFDEPMbFqVuOs1Sev37pt+zIjJGlujkwagUUjAkqve/cRsglEd1ZT
+	 YiS3IliuGDO6QuzIfUhTNpdbpp9ewjzWfepATKG30fXTF2uazRnxese4dQeQwSvagT
+	 fgaN2tp5c1O58eBWINvTswa4V0NA7jTUtPANRuwj1H8I0rNnXGdb+lFXnGYIzYtfvK
+	 caK/MHh2zv9WQ==
 From: Miguel Ojeda <ojeda@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -77,9 +77,9 @@ Cc: Boqun Feng <boqun@kernel.org>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	linux-doc@vger.kernel.org,
 	Tamir Duberstein <tamird@kernel.org>
-Subject: [PATCH v2 11/33] rust: kbuild: remove skipping of `-Wrustdoc::unescaped_backticks`
-Date: Mon,  6 Apr 2026 01:52:47 +0200
-Message-ID: <20260405235309.418950-12-ojeda@kernel.org>
+Subject: [PATCH v2 12/33] rust: kbuild: remove `feature(...)`s that are now stable
+Date: Mon,  6 Apr 2026 01:52:48 +0200
+Message-ID: <20260405235309.418950-13-ojeda@kernel.org>
 In-Reply-To: <20260405235309.418950-1-ojeda@kernel.org>
 References: <20260405235309.418950-1-ojeda@kernel.org>
 Precedence: bulk
@@ -90,42 +90,90 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Back in Rust 1.82.0, I cleaned the `rustdoc::unescaped_backticks` lint in
-upstream Rust and added tests so that hopefully it would not regress [1].
+Now that the Rust minimum version is 1.85.0, there is no need to enable
+certain features that are stable.
 
-Thus we can remove it from our side given the Rust minimum version bump.
+Thus clean them up.
 
-Link: https://github.com/rust-lang/rust/pull/128307 [1]
 Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 Reviewed-by: Gary Guo <gary@garyguo.net>
 Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 ---
- rust/Makefile | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ rust/Makefile          |  2 --
+ rust/kernel/lib.rs     | 21 ---------------------
+ scripts/Makefile.build |  6 +-----
+ 3 files changed, 1 insertion(+), 28 deletions(-)
 
 diff --git a/rust/Makefile b/rust/Makefile
-index 16ea720e0a8e..5dc8b4cc89d1 100644
+index 5dc8b4cc89d1..54498cb5b851 100644
 --- a/rust/Makefile
 +++ b/rust/Makefile
-@@ -75,8 +75,7 @@ core-edition := $(if $(call rustc-min-version,108700),2024,2021)
+@@ -86,10 +86,8 @@ proc_macro2-cfgs := \
+     wrap_proc_macro \
+     $(if $(call rustc-min-version,108800),proc_macro_span_file proc_macro_span_location)
  
- core-skip_flags := \
-     --edition=2021 \
--    -Wunreachable_pub \
--    -Wrustdoc::unescaped_backticks
-+    -Wunreachable_pub
+-# Stable since Rust 1.79.0: `feature(proc_macro_byte_character,proc_macro_c_str_literals)`.
+ proc_macro2-flags := \
+     --cap-lints=allow \
+-    -Zcrate-attr='feature(proc_macro_byte_character,proc_macro_c_str_literals)' \
+     $(call cfgs-to-flags,$(proc_macro2-cfgs))
  
- core-flags := \
-     --edition=$(core-edition) \
-@@ -209,8 +208,6 @@ rustdoc-macros: $(src)/macros/lib.rs rustdoc-clean rustdoc-proc_macro2 \
-     rustdoc-quote rustdoc-syn FORCE
- 	+$(call if_changed,rustdoc)
+ quote-cfgs := \
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 66a09d77a2c4..b48221a5b4ec 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -16,27 +16,6 @@
+ // Please see https://github.com/Rust-for-Linux/linux/issues/2 for details on
+ // the unstable features in use.
+ //
+-// Stable since Rust 1.79.0.
+-#![feature(generic_nonzero)]
+-#![feature(inline_const)]
+-#![feature(pointer_is_aligned)]
+-//
+-// Stable since Rust 1.80.0.
+-#![feature(slice_flatten)]
+-//
+-// Stable since Rust 1.81.0.
+-#![feature(lint_reasons)]
+-//
+-// Stable since Rust 1.82.0.
+-#![feature(raw_ref_op)]
+-//
+-// Stable since Rust 1.83.0.
+-#![feature(const_maybe_uninit_as_mut_ptr)]
+-#![feature(const_mut_refs)]
+-#![feature(const_option)]
+-#![feature(const_ptr_write)]
+-#![feature(const_refs_to_cell)]
+-//
+ // Expected to become stable.
+ #![feature(arbitrary_self_types)]
+ #![feature(derive_coerce_pointee)]
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 0b0245106d01..57cff77c2897 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -310,17 +310,13 @@ $(obj)/%.lst: $(obj)/%.c FORCE
  
--# Starting with Rust 1.82.0, skipping `-Wrustdoc::unescaped_backticks` should
--# not be needed -- see https://github.com/rust-lang/rust/pull/128307.
- rustdoc-core: private skip_flags = $(core-skip_flags)
- rustdoc-core: private rustc_target_flags = $(core-flags)
- rustdoc-core: $(RUST_LIB_SRC)/core/src/lib.rs rustdoc-clean FORCE
+ # The features in this list are the ones allowed for non-`rust/` code.
+ #
+-#   - Stable since Rust 1.79.0: `feature(inline_const)`.
+-#   - Stable since Rust 1.81.0: `feature(lint_reasons)`.
+-#   - Stable since Rust 1.82.0: `feature(asm_const)`,
+-#     `feature(offset_of_nested)`, `feature(raw_ref_op)`.
+ #   - Stable since Rust 1.87.0: `feature(asm_goto)`.
+ #   - Expected to become stable: `feature(arbitrary_self_types)`.
+ #   - To be determined: `feature(used_with_arg)`.
+ #
+ # Please see https://github.com/Rust-for-Linux/linux/issues/2 for details on
+ # the unstable features in use.
+-rust_allowed_features := asm_const,asm_goto,arbitrary_self_types,inline_const,lint_reasons,offset_of_nested,raw_ref_op,used_with_arg
++rust_allowed_features := arbitrary_self_types,asm_goto,used_with_arg
+ 
+ # `--out-dir` is required to avoid temporaries being created by `rustc` in the
+ # current working directory, which may be not accessible in the out-of-tree
 -- 
 2.53.0
 
