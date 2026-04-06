@@ -1,150 +1,134 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65CF2DECBF
-	for <linux-block@vger.kernel.org>; Mon,  6 Apr 2026 11:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775474350; cv=none; b=hOrwF3lVY9N761EWPr+Gm7IwSJksLA6GskCATvhoccN2BYtwY0Lb815co6j9q7nTLbit2FgShjVYCO4z+zxAZudAh9ZfWyn5BnzI2TWwQay0rCTDvOmZLmUl6XRVnP807GT4te7kD5+TMuwUvzU5Xr+D3b/wDk6gTXgI0vAmmT8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775474350; c=relaxed/simple;
-	bh=0fTE5hJ4OmvSYvMfbM5i2+wX1Cp2WMJNiJRgIOYue+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PYTzVWC/aa34Q8teWjzQKTWMV99/Yg9LkWzWxSCxJhkvxghPWuGP4thWh5IZlAj/dSGRHweZhncos3imWwt/0SVxxV09y+hXX6l+koPqyC7rE8Td+8ezKmm54UlP9qXB6+0AQ9evYpYrv6DNqJk3R/BwVZIOYQhERuLC6dya4vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UX9fTMFq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D04D18AE2
+	for <linux-block@vger.kernel.org>; Mon,  6 Apr 2026 13:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775481690; cv=pass; b=A+VKzxExEPVDHEppoizqxZQWlWQiotMmWSHa7lgY6JUWZYo5DqIzqo/2Amy+Dy8ZLdtx2ARlpdvIus4Ur8sx0D19I5fuyjm9L3IlVO7qrZjVeCLn2T8Rrz0wAdnrZUlXYkk4INRJPdiDithZlrwNYrbpri9O/AN2ZRQH01+fHfo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775481690; c=relaxed/simple;
+	bh=Xy7FALhcYqLgXu4fKO0MtrrfIdEU0qZJHPfoz//MdsY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Od3Sl8y+EfuNZoKTasErAdkBA/FOiV3IxSZoya0HTYw0UtPDhFDnDOJ/KMSK5JO+qpeDC4G0zbRwLySXQIMPO4HNAJwUT1tkms9skAd8MNOZrbclNPVueDTd60sVUEm0ZefSgaGN8IM/gP55sNB/RUKKgjDdgbkngFkawaXWY0U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q3tAGxOy; arc=pass smtp.client-ip=74.125.82.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UX9fTMFq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775474347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B3lNXgeF8NTfQx7RPDea3gZ7bhNGXxc/SPzuLtgX7QI=;
-	b=UX9fTMFq1YLj7srpPadem79apFn9lgLV38TDTneh9Z4gWdO7keGbmfK32yJoZDELXLjIrU
-	Nq69Jx4CiyfPaaFZiltmKEouYFip6HjTq6H6nHK8XmNEon1z8uuP0ghtE/EVKRaCXV71jz
-	MGTo93diu/pSMZQkDSLwn9aroln/fjo=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-474-MYsPR_L0P9GYcUm9yIL8OA-1; Mon,
- 06 Apr 2026 07:19:01 -0400
-X-MC-Unique: MYsPR_L0P9GYcUm9yIL8OA-1
-X-Mimecast-MFC-AGG-ID: MYsPR_L0P9GYcUm9yIL8OA_1775474340
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50E821800283;
-	Mon,  6 Apr 2026 11:19:00 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.2])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 39DE5300019F;
-	Mon,  6 Apr 2026 11:18:53 +0000 (UTC)
-Date: Mon, 6 Apr 2026 19:18:48 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	"zhang, the-essence-of-life" <zhangweize9@gmail.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] ublk: reset per-IO canceled flag on each fetch
-Message-ID: <adOWmG2fGLM-43cl@fedora>
-References: <20260405-cancel-v2-0-02d711e643c2@purestorage.com>
- <20260405-cancel-v2-1-02d711e643c2@purestorage.com>
- <53aec093-5494-4b4b-a103-bc166381f236@suse.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q3tAGxOy"
+Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-12736a0147cso216404c88.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2026 06:21:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775481689; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JYFcdIy5AaGorCk+NUIJQ9uH/bh34c3wTod/2wY6xZvJZLIRPSnDEK5CPyfIQBhz/m
+         s4S166eFndfWTIve02fDeCUkic/B2bouYKMtKOpzFeRs0GSyjvsth7zS/dH5w4PwFd1N
+         /4IBql37R66X7L/iQEUBQhwBA4rvb9TFuDwIwdqEGcRSC90+ZE07SUJ6DHTVblyIAsfo
+         fF7sCBP0J+8l2f5pIVH5TX5sb66F9nOuUZzPlw8moWVJ71ATSwzpPhetZkgKEkrvlAzV
+         mP/XTXgEzWBPUc0BGa27yll3m0HxlICDpbE57ZrEQtOOJvAGFGGoAtyHpkBIADs5F1hP
+         kGAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Xy7FALhcYqLgXu4fKO0MtrrfIdEU0qZJHPfoz//MdsY=;
+        fh=TQxQY/OIebHrdKOuBeeRs78PW6wHVFBKSzUkFxHZJK0=;
+        b=lh8X926n3WWqTC/9mjMIqfFm6W4JrdAKbGnSgaVd8ub7GQT5FovUK3eX+QP/T2B5mC
+         fC1vOCV/2owBydIDc1iOdvM/lEA+EwZRNlLfkTeLOONRx5R4gW5tafpjSyZK1KDhucFQ
+         CH5CSZjkbIfVYHVPTJ4WY4natlNNmgPMhk6hne86QbYRsegREIkkGQ5v+Ie8SyhQNHVr
+         VNzBB0BZ/J1CYZlLJAOTR2onZYMqMBUqjcYGnkmtZp/B5X1ckKtocQy4kEyE10SW79PM
+         kpVV7DUvgXD3qd7OUyauv7Q2Fkt7P/D2RLGRwh1FIvvJE/kle0tUzkhDGi7FTZvFu+P9
+         XcYw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775481689; x=1776086489; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xy7FALhcYqLgXu4fKO0MtrrfIdEU0qZJHPfoz//MdsY=;
+        b=q3tAGxOyAaMZ92oiBATu8FQ/6qRm0r9euxaNK8TPoIYKXv+sip60zW3/mf/067CojG
+         I91sgXn7EWKEojoel0sfV0c2x47kc1MhplILMewUkwkZaBCCr0pwNk93ApwnYy0wO6yk
+         wzk4NsK4gNw4WQ5HLxHU+akS5jt/VzZUPL7mw5Z8fzT8N/hLAXQzM5TXL+PsqtJbutvi
+         8uYoJs3WHDvwOVOtXEYQeWWHvCxe1gwgZnfpVYwrKTEHNlI01LkDdq0Wvn9M2UetAjbD
+         lUoBO1OKkgxrsLb7uoE6JiAt9LFTPTHQt2L5Jm/D7L6biFMlveXZMrm6ibprSlWxXpbe
+         +9PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775481689; x=1776086489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Xy7FALhcYqLgXu4fKO0MtrrfIdEU0qZJHPfoz//MdsY=;
+        b=CQBrfiuW7kkq7wk/PMtk1bigDgrS+VOzGBVR+g5wGEf+vS8uZw31+nTvQ2oqpW2Ty3
+         GqG50YNC9nFBgZm6YmB9fo74Is7hlGRJ6DME6jbfH+DSRyM0EWz8Nlz5hD+P6K0jdtcc
+         LltNB1yMqfMWRUeijODub2yn38pwEpZczAL4BGCYLD2/phElky4dKwLoXAgSDvNSt5IF
+         WXlZyzVjDxpiJQ8D1usnrJkNI8CcCHoJOXmMW2kT0rYOHe+rJdnQSXdGgpQ9A3PqkRTZ
+         1RQPAmeuW7h/YHrW/TiG3Ee4wVusKXOBLROMBfAOkGzTK6fJF8bGnhldgrHM/rajNYGi
+         JXWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLHQeoufZDfLOx9s8yvo0fy/q70hjhyOTIUXlglnS95yyXlXkpCvJLyHP6gq3HOx50cx61X6KX1L3Upg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzgQ/+1CGEDnVO80rNJAD4adbiFWApv2BvQi5LB6oYyzQu9YC4
+	t8xPmh1C4X1QZXU/dPXpnbe5px6uQvEwn7z227Zovp80+fS1XDwIG/88LdUrKt+9kF19KcFGoF+
+	QNlF07vK7Etyq5f1Wuice/UsgmaoERzQ=
+X-Gm-Gg: AeBDiet4I5BepTAOYrnPjPAXc+J9LXWinMCEv1RTatrDfYnVGolh213I3fhHHBIll9i
+	GXEUDg4/XrtU75+rJhmZVpotaIkq6hUR38baVKt6OCTpz2hhaFtfNYAphNt5PwYW+pkMUPbx01/
+	VEOnWYkgzj9jojgxL5r82tO1frfDU0IF1tf6A/5brXMpWpxJaH9jFZJJRe+joGDof884D59lsxz
+	dN5wrTEZORInaRE/S7jzyxuSni1cU9UXfdvvpt22ARUCjQCnACrEWKDwKKvkYZPpyTba4hezmfm
+	XBV8QFlNrkZZJvKqx4ldUvBx/3WTlkpjJCThnpUQBIu6Uyxy7CYvw50JNzVHUX+VsT+4kvYWnnU
+	Fo9PGpg0Z9BykDO6D9T71quQ=
+X-Received: by 2002:a05:7301:1007:b0:2be:298c:a11 with SMTP id
+ 5a478bee46e88-2cbfcf52a13mr2965052eec.3.1775481688630; Mon, 06 Apr 2026
+ 06:21:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53aec093-5494-4b4b-a103-bc166381f236@suse.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20260401114540.30108-1-ojeda@kernel.org> <20260401114540.30108-34-ojeda@kernel.org>
+ <177508434476.73816.11744805605122440072.b4-review@b4>
+In-Reply-To: <177508434476.73816.11744805605122440072.b4-review@b4>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 6 Apr 2026 15:21:15 +0200
+X-Gm-Features: AQROBzA0LUfPYuEZWH9uKj1KexaW3DTNKfQ_If4tWD7xnq1YUXDcYUMRbV47V4E
+Message-ID: <CANiq72=25GRao7NciojymdbZN_=f-U3hp2+2qBMjb4VCaOgR2w@mail.gmail.com>
+Subject: Re: [PATCH 33/33] rust: kbuild: allow `clippy::precedence` for Rust < 1.86.0
+To: Tamir Duberstein <tamird@kernel.org>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Courbot <acourbot@nvidia.com>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <christian@brauner.io>, 
+	Carlos Llamas <cmllamas@google.com>, Alice Ryhl <aliceryhl@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, rust-for-linux@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
+	Uladzislau Rezki <urezki@gmail.com>, linux-block@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Alexandre Ghiti <alex@ghiti.fr>, 
+	linux-riscv@lists.infradead.org, nouveau@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, Rae Moar <raemoar63@gmail.com>, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 06, 2026 at 09:22:13AM +0200, Hannes Reinecke wrote:
-> On 4/6/26 06:25, Uday Shankar wrote:
-> > If a ublk server starts recovering devices but dies before issuing fetch
-> > commands for all IOs, cancellation of the fetch commands that were
-> > successfully issued may never complete. This is because the per-IO
-> > canceled flag can remain set even after the fetch for that IO has been
-> > submitted - the per-IO canceled flags for all IOs in a queue are reset
-> > together only once all IOs for that queue have been fetched. So if a
-> > nonempty proper subset of the IOs for a queue are fetched when the ublk
-> > server dies, the IOs in that subset will never successfully be canceled,
-> > as their canceled flags remain set, and this prevents ublk_cancel_cmd
-> > from actually calling io_uring_cmd_done on the commands, despite the
-> > fact that they are outstanding.
-> > 
-> > Fix this by resetting the per-IO cancel flags immediately when each IO
-> > is fetched instead of waiting for all IOs for the queue (which may never
-> > happen).
-> > 
-> > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> > Fixes: 728cbac5fe21 ("ublk: move device reset into ublk_ch_release()")
-> > Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> > Reviewed-by: zhang, the-essence-of-life <zhangweize9@gmail.com>
-> > ---
-> >   drivers/block/ublk_drv.c | 21 +++++++++++++--------
-> >   1 file changed, 13 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 3ba7da94d31499590a06a8b307ed151919a027cb..92dabeb820344107c9fadfae94396082b933d84e 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -2916,22 +2916,26 @@ static void ublk_stop_dev(struct ublk_device *ub)
-> >   	ublk_cancel_dev(ub);
-> >   }
-> > +static void ublk_reset_io_flags(struct ublk_queue *ubq, struct ublk_io *io)
-> > +{
-> > +	/* UBLK_IO_FLAG_CANCELED can be cleared now */
-> > +	spin_lock(&ubq->cancel_lock);
-> > +	io->flags &= ~UBLK_IO_FLAG_CANCELED;
-> > +	spin_unlock(&ubq->cancel_lock);
-> > +}
-> > +
-> One wonders why we can't use 'set_bit' here, or, rather,
-> convert 'flags' usage to set_bit().
+On Thu, Apr 2, 2026 at 1:02=E2=80=AFAM Tamir Duberstein <tamird@kernel.org>=
+ wrote:
+>
+> Might be good to retain some of this in a code comment.
 
-It isn't necessary, because UBLK_F_PER_IO_DAEMON is enabled.
+Bah, I missed this note among the rest, sorry (I didn't reply to the
+ones where the commit went away due to the changes in v2) -- I agree
+it wouldn't hurt to remember why it is there, even if it is already in
+the Git log.
 
-> The spinlock feels a bit silly as it's now per-io, and one would think
-> that we don't have concurrent accesses to the same io...
+I will probably add it for tomorrow, especially if I have to rebase.
 
-UBLK_IO_FLAG_CANCELED is only used in slow path, yes, it is supposed to be
-accessed concurrently.
+Thanks!
 
-It could be moved out of io->flags, but we do want to make `struct ublk_io`
-held in single cache line.
-
-> 
-> >   /* reset per-queue io flags */
-> >   static void ublk_queue_reset_io_flags(struct ublk_queue *ubq)
-> >   {
-> > -	int j;
-> > -
-> > -	/* UBLK_IO_FLAG_CANCELED can be cleared now */
-> >   	spin_lock(&ubq->cancel_lock);
-> > -	for (j = 0; j < ubq->q_depth; j++)
-> > -		ubq->ios[j].flags &= ~UBLK_IO_FLAG_CANCELED;
-> >   	ubq->canceling = false;
-> >   	spin_unlock(&ubq->cancel_lock);
-> >   	ubq->fail_io = false;
-> >   }
-> Similar here; as we don't loop anymore, why do we need the spinlock?
-> Isn't WRITE_ONCE() sufficient here?
-
-WRITE_ONCE() isn't enough, because we have to make sure that io->cmd is
-only completed once, please see ublk_cancel_cmd().
-
-Anyway, all these comments should belong to improvement or new issue,
-not a blocker for current bug fix.
-
-
-Thanks,
-Ming
-
+Cheers,
+Miguel
