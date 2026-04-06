@@ -1,150 +1,107 @@
-Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD2E353EC1
-	for <linux-block@vger.kernel.org>; Mon,  6 Apr 2026 19:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775502110; cv=pass; b=u4vVSIcQFsy7mx571a0s9DlHKEqJ1S/4YFvN2sgJIclxUGopa35YgQUjNRHLsph+hdow2B3ywguyzbqkMU7Zvoc3RAY38JL5rWsaECe0xqq1T5dPEwJWPuzolCbIoRop1+V6nXZC3c/yU7+doAps9OI5ihC/zvAdqQfkelEc/U0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775502110; c=relaxed/simple;
-	bh=WRVPBP1r3UEupcj81ppPFlfizIU+h6eu8Pvb+T1BfIE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WsRG9egQvZ1SbIoIj8RUL1WB0yvy51LKnVf8YtIm/2wbdiUkynNlqiB2DA76b9hTe3NRhXm5eHrOyaJLDM+ysx9pdSXtHycAq4ob2ZffHO7Irj9qospbnDo4E28Or8S/NaI6ggKS5wvYakHZO7guQT21laDvenucHnpqPJI2mMo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xn7sFvfz; arc=pass smtp.client-ip=74.125.82.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0396145FE0
+	for <linux-block@vger.kernel.org>; Mon,  6 Apr 2026 19:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775502192; cv=none; b=KcfbM7CzpUaRZwYc3WZFIMFr37U7ycgL9MFoxsGHXiSBWY6CkenCFaxF27r1YQQlnank6lfzcD/qu6tNIYrMNuluftqeM2dXv82jux8umCAOzMkXjnti6MH7b5wPs4C6N9Bkj5brxjD9KYQivbyLr1vsrWCGpce9J7o8wLOCPpg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775502192; c=relaxed/simple;
+	bh=4qtnzY7yt4Fw0Nj9Wrfa/Bgnn3/2B7SDHiRFkEOSKM4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=aTVIN/njQ4TN3uEcTypt2u68RwIl3VpWIGvWqNbWtpkOvm3zRdjXF0Y/5u3H3Tf1SFny/pt52e5tw0nKDrPeMxW9k2ubFLcyx0bB10TAbgYpaeSutKG13CtzNmFz2fZpeVK+zZeDVOX7O3nuypVd0cFU4xi2qhWva+Ti1SHaVPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=UjK/tP1M; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xn7sFvfz"
-Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-2cc43ca447aso146058eec.1
-        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2026 12:01:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775502108; cv=none;
-        d=google.com; s=arc-20240605;
-        b=LhD9RjJhY8Kfe1XD8veuISnhnRs5f3+pJNmyZmAGD1yZRAwGV9N+a55oWjEKuKKIOm
-         nxexRzPQLmrpk3AW2VNYlZGSuHsQJcJM/SxbJdOTUrOE8GBUF12BoRX0Kd4ojDte/O35
-         KWymLhBrjLpTvrkfjOGG1QbTmanAXgIjEijoIdAgV4sWPMGF/aWkt76fPY72WBWFT+bg
-         wSmqSVdM7j48ohGIPa/dYRaVlQCT0y+gzDjwUX+CMXQ2oHD7bGcH+IpF5CBQgyEo+IBJ
-         XjCOD9x/cnKm6m2xWBHkdk+5p3AffAQCl6kBqWAi+FcJve2X5cM/FJ9rfj66e0oqzi2g
-         sy6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gf3VuwShgbYg5PZ/J/6LyKGap1JcrY8bWhqVawvmQIs=;
-        fh=uianQ0UD3HniLCkJERxPJihtykuVIybZmTnz8h001HA=;
-        b=iSBmweRazv/f87iX9XiIG9cP9PDj8iUWZaHd410pner8FPX88JbixjP1c906Y7LlRJ
-         V39C/UkqRcTf2n7LUm8JLcKF6dK2APw8IbV4I3JPdoMHr8zZT2cCbLpV0RN6NyMQdgIv
-         SU69DD9HqWEh9EcOqXNoVj0N86vl0L9ZaUBcfE9AU2hNWp+AETcFGm2wKj/BpCHn+nOw
-         iibSQCtNEAG0QquAYlWEhpehhxk+LykcOPH5tqDBD/vm6cV6RhQE9o0PEYqxk88uQrRk
-         G7ArceVO1sTKkC+Xhy/ad6xXQYgUfdMlm6m6QPBCjhZBHfZmWwKQ74+D/PV0JhgxM3SQ
-         SL8A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="UjK/tP1M"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-46f0fa0e398so1797266b6e.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Apr 2026 12:03:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775502108; x=1776106908; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1775502189; x=1776106989; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gf3VuwShgbYg5PZ/J/6LyKGap1JcrY8bWhqVawvmQIs=;
-        b=Xn7sFvfzRt9G0FrCZPuRREVKeZOHqh/la5bppkaKs8mMh4RHCWrQNCcSCneN+bMK5W
-         1Y/dTLBK8jVnry4fmyC6KTYSpgc/2nf0BaC/v1XafHg3IqhVICMt5dA6Bgy6J9hNN5el
-         xKLZxlGoENIhb9GcLr1vkwEszZrHpge/OVzkiMhoB/2H24BFDaQ8OA/MooOP/S6tc0uA
-         HwvkyesOG4D1To9WLTTQnWG+ixbv8ZGY9bYJU4sS3VHu24coyiphoELx1MtMKsppQzV5
-         IDD9W7su2vaUf4wW4+NTW0vk42O5er7xMJR7a+4MWeoefRbQDYGiIN023PdpUsVkgia3
-         LTfw==
+        bh=rsklDZIYYXRBb0csXpkqv7Ub2Ip/XJSylYFg6FvL3/I=;
+        b=UjK/tP1MZziWRPYVWE3g9Ib/GWhq1tPJYIL6SIyrhKww9i6yKfohTLYL9WTsNIOLPC
+         kTEafcswiHZQ8IZpC3VxTP8WqlPAYaXXa/SWMf5OGFWcrP/i9zc0UGsJwdTl9M+IGlC4
+         iwKXdH1HuSNr87zLxXvwObjPwwQhnhNtGbdm9xtKj07+QZA5cDjXjP7IH3VJh0xoR4/X
+         nN7g+0SJz2u84szhJReENk5EIFcPgeqiM1ScexlRjGcrw+vmcGRwy8Yptz5jbTdcvLwD
+         ybsUSP/+KDxEYygDbf3+Thmjcvrcox9aY+FetPUWSFMoKAKTm8pvea00OEYUJIgQenF1
+         8x+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775502108; x=1776106908;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1775502189; x=1776106989;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=gf3VuwShgbYg5PZ/J/6LyKGap1JcrY8bWhqVawvmQIs=;
-        b=FcXyws6Hi0zZukKGNja42lBOyzTmekzCy5PU3QsYY+RfX4kPfZ9LUAS33hlrWgnD4i
-         miQ/KaUPND+HGmCryKDiN2cXyZKZtfsN5n3bJ/5dckobwkfLjcIuBnn+98QbNa/ZEGyc
-         kmwPgzHaKW8Pp7dkS1Pz/3iZvRgy5EUTsdvCWTAMyiWQJEMiq2s4We3uG0jlfdD71CuO
-         YHYL+w4KaFVu+clU6gwdRPlhKckm+0ZxwB+kABj6iH0l+oW6BFJaGKo4k/CbucUY5uJG
-         fhs86EHo8PYMyMny4PEfOAZnQDMbuRj+uMPW5Y5Kq4cUXVA+lQXJbSTsWA3Hcf0Ny2yI
-         NWRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXE8mQslTl9TZJ/YvrUudg+9qhQFcjFqO2u1NjUkRf7mualKN/YFMc5XbNUYeRtxVYkC/ZkIz5Az2x1FA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgxqbBXE+MGKT+8i3EUTo36sueh+H9KBa9WuwoUnPuL6f+QcGF
-	IpuvHHmyrgXLAqrejZoQMLFs/DeZO5fqAUmRRrFe+XLoVOcbqZLVM42AN9kB3eHRdUwn/2uDs87
-	Mvv321DdtOdsgQ/QxE7dA40revWPPH2U=
-X-Gm-Gg: AeBDietsYVXEc2Xeo7lUOaoTwqsd1hYxHrNKGZgEmisRd2sgtsD0/JkTGzKx8PQMm2C
-	j2C2dGcygXsqPWFj7L6gzGLd+0eOaTQeRL8XeiAevdm+W4jvsw3TjBtWwARi7scCsPhE+KE8Fpy
-	WnbeLUMM7AEUcT7p/8zoZdKnzxSw25Rev/3e3PRLQFX0Zj69MsDPagktU9bfaKBDi+/mo0o8Ca/
-	UNhbB85MJbvpEAhXJLjKN8RH2vwrxStOWNKcKCk+bU1JtFWX69JBiBMztq/Lg85rXRD87IxbTdL
-	yI9BpVfrEWivchi+irFX/VQ3K9pMZrQSrXr7pgipYaYBx9jb0z2KwiURtp7bWPEdie4YVm4WsCE
-	dQTeO+tCx3xn0s0ApowkzFes=
-X-Received: by 2002:a05:693c:2b02:b0:2cb:6653:ea05 with SMTP id
- 5a478bee46e88-2cbfcf5295fmr2949463eec.4.1775502107727; Mon, 06 Apr 2026
- 12:01:47 -0700 (PDT)
+        bh=rsklDZIYYXRBb0csXpkqv7Ub2Ip/XJSylYFg6FvL3/I=;
+        b=MUAtsr5un/y4yq0Hjc9VTjFtdDCi7Zf+6Nc1kaMFgJKSCddsGXC6hbLXAAMs6ey+rD
+         pCJOMCq/0oyJe4eLf9TaoumJWYA3VyZQmsfA6dPbv8bkzgP+VjCpLG+c42IpD25ny9P7
+         QksWFeARb2taX0gV3RNEqQ3EHVAqK2mHCoswrLl9JAUimwmKf2ZQpcr9CHuRblrl+FT5
+         /lhneEnllfCu6sOxc1hp/f5Fgwx+kRGrA/7knqdU7VM3BvPf+kh+L0WokPqKHg6yr26a
+         yDRFTIolAHY+sMZ96k5Zvn+kZmHzNKHdW97l2gGLJPpq47L/IRPXOzA19KwquRu2HBz/
+         6laA==
+X-Forwarded-Encrypted: i=1; AJvYcCUj2aelcLEc0dgXs1YaP0dlNlN5AFumgVTGpToiXfHjsxpzlHx/oumMlLTO/8hAMRkKS72iV6ZQiCinSw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+YKWRT08Xa+RZbLKZ2kwnE1hMC7bfact/Ev7YsOk6Q73N0Bhe
+	8BWPfDoCYE1wadg0Ye/qbzfptT3iI6NrZbZJg6ZSMA9Fc1AdSrfRyJ5iwMPAWTxRyzk=
+X-Gm-Gg: AeBDievtuF4DvSl5HQ8K1JePN0WdbxhKnl3rL3jX+cGrOpCZUvaeOt/rfxJFWZErdty
+	/p1u+ZFL2sEXaCD1f8HG/M+i5TyRvKJL/GkEXVtlu9KrFma/aOvHsZ3oFbmW5p5izOsK1BJabGz
+	4fXTJ9nC4lwcVZLNNsqYvMnPeKZwXWNBoCzGxKIAj/g8ZpORg5UQ8AQcjKErQY5hF9jm1MyYHcq
+	oxK34cXtmqdGRheyunsCIUomyZLd7WiOVwQSeC2c/YXiyRCBG1ZTZnd3EV4Gbk+bcOiKsZtGmiL
+	PZHwUqFRTXvoj6GyJQ/BVGWqw7L9b1lv2bvYb4z8BIL9XNFjIha0yaKjLf34CAFZq/ryFNU29UD
+	KQ/NOJ1KQuvSL2alrbRgslHSTGJopuoiZGasR0aurjfmzApkJ+BsL0ylRk6VQHXAHrJHc9kZ+Og
+	xxW3cAdrcBqc2VUXveWGfNYh8XjMVWTZvjpSeGC2rswzpGehN77qgh1Y7gs8bMXqSvSoXtmfPUD
+	N8=
+X-Received: by 2002:a05:6808:c238:b0:46a:7c00:5cd8 with SMTP id 5614622812f47-46ef65f1abbmr7294874b6e.22.1775502189566;
+        Mon, 06 Apr 2026 12:03:09 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-422eb25acbesm14181086fac.11.2026.04.06.12.03.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2026 12:03:08 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Yuto Ohnuki <ytohnuki@amazon.com>
+Cc: Yu Kuai <yukuai@fnnas.com>, Nilay Shroff <nilay@linux.ibm.com>, 
+ Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com
+In-Reply-To: <20260316070358.65225-2-ytohnuki@amazon.com>
+References: <20260316070358.65225-2-ytohnuki@amazon.com>
+Subject: Re: [PATCH v2] blk-wbt: remove WARN_ON_ONCE from
+ wbt_init_enable_default()
+Message-Id: <177550218778.118434.343351238020066783.b4-ty@b4>
+Date: Mon, 06 Apr 2026 13:03:07 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260405235309.418950-1-ojeda@kernel.org> <CANiq72mnGArtgAbe7xXZCYW1x7Zd5hozfnzoftaGy9rxoLO4ew@mail.gmail.com>
- <cf28afe0-ede5-4d1a-9824-65a1448f8161@nvidia.com>
-In-Reply-To: <cf28afe0-ede5-4d1a-9824-65a1448f8161@nvidia.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 6 Apr 2026 21:01:35 +0200
-X-Gm-Features: AQROBzAfx15_qleB1FpEnqVT3LDjlhAucDNDkuNXvaEMC2J19jPyg217OqF9cWw
-Message-ID: <CANiq72n4tmTzqbcHCnzUBFyLVmJzB-AJng_1FgELJCWr7hDg4A@mail.gmail.com>
-Subject: Re: [PATCH v2 00/33] rust: bump minimum Rust and `bindgen` versions
-To: John Hubbard <jhubbard@nvidia.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Courbot <acourbot@nvidia.com>, Simona Vetter <simona@ffwll.ch>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <christian@brauner.io>, 
-	Carlos Llamas <cmllamas@google.com>, Alice Ryhl <aliceryhl@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, rust-for-linux@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
-	Uladzislau Rezki <urezki@gmail.com>, linux-block@vger.kernel.org, 
-	moderated for non-subscribers <linux-arm-kernel@lists.infradead.org>, Alexandre Ghiti <alex@ghiti.fr>, 
-	linux-riscv@lists.infradead.org, nouveau@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, Rae Moar <raemoar63@gmail.com>, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.1
 
-On Mon, Apr 6, 2026 at 8:51=E2=80=AFPM John Hubbard <jhubbard@nvidia.com> w=
-rote:
->
-> Looks good from the perspective of this patchset. I am seeing
-> one remaining problem that we previously came up with a fix for,
-> so I expect that that fix is staged in another branch. But in
-> case it's not, here is the report:
->
-> On today's rust-next, using rustc 1.85.0, at commit 232e79c72f57
-> ("rust: kbuild: allow `clippy::precedence` for Rust < 1.86.0"):
->
->   CLIPPY [M] drivers/gpu/drm/nova/nova.o
-> warning: consider removing unnecessary double parentheses
->     --> rust/doctests_kernel_generated.rs:4240:14
->      |
-> 4240 |     pr_info!("The policy details are: {:?}\n", (policy.cpu(), poli=
-cy.cur()));
->      |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->      |
->      =3D help: for further information visit https://rust-lang.github.io/=
-rust-clippy/master/index.html#double_parens
->      =3D note: `-W clippy::double-parens` implied by `-W clippy::all`
->      =3D help: to override `-W clippy::all` add `#[allow(clippy::double_p=
-arens)]`
->
-> warning: 1 warning emitted
 
-That is already fixed and in mainline: 487f9b3dc6e5 ("rust: cpufreq:
-suppress clippy::double_parens in Policy doctest").
+On Mon, 16 Mar 2026 07:03:59 +0000, Yuto Ohnuki wrote:
+> wbt_init_enable_default() uses WARN_ON_ONCE to check for failures from
+> wbt_alloc() and wbt_init(). However, both are expected failure paths:
+> 
+> - wbt_alloc() can return NULL under memory pressure (-ENOMEM)
+> - wbt_init() can fail with -EBUSY if wbt is already registered
+> 
+> syzbot triggers this by injecting memory allocation failures during MTD
+> partition creation via ioctl(BLKPG), causing a spurious warning.
+> 
+> [...]
 
-Cheers,
-Miguel
+Applied, thanks!
+
+[1/1] blk-wbt: remove WARN_ON_ONCE from wbt_init_enable_default()
+      commit: e9b004ff83067cdf96774b45aea4b239ace99a2f
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
