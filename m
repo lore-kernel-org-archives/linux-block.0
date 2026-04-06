@@ -1,59 +1,66 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EEA3112AB;
-	Mon,  6 Apr 2026 06:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A965E2E1722;
+	Mon,  6 Apr 2026 06:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775457420; cv=none; b=HpTXepdNZm/JNwXYYSD327kc9p3K9Zwv+Kw2Sn7cUfnKBBRag3Gd7iqNMvxzYuKVz/AhaZaCNPQkwg0OthCHMm7fwaqTTrFbjydr40lbLJC+NN+og7qQvDMo33EB1S+2qrymsJYoaIubuDDS26oJCnGKHlpQbqThCq+rApqMH2Q=
+	t=1775458779; cv=none; b=E0NHQ0vcXR+X2S0WTJ9lpHLybYiGfC41jo58/ydODkdAl+g4ReRVia4XrMeQAIXbvRC1vzfCPZEHy8hphYCVxxfd5y0ioAidMimnKgzzcPkjn3ZIKQTKKYZ7T8ZpK7CZ4ss5JFoHJrQTaQLc948nZxiI6W1bCmtIIxrwdVOMwM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775457420; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wq2aswLrASpnubpP+NI6fd0I6zzMhtQVexJOLNCHMbS8dyXiTs5LM5X/R29x1g/5QkD24VSjNQaw02hwT8QNDsaga4aJxf0YHJnhxfHX0wpcOzZ6fgngHxfcodb2JtI18m6pN7DwhDNchFR809b79pnS8HJDmrV+s9OQpbxWTgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gO3lyvoS; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1775458779; c=relaxed/simple;
+	bh=TINOOEzYXZk6Uyul8GJb/de3g2f7kAZbZ5P/QnqTTIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XsbYRQLe/9ulhCV1EbyYCFO3jJAIEN/vHWmYxiRgoT2jLHQbjuyjporLQuLr6j5TgnwH6rD3ORKq2qOOMXHNmPC+nf270izIQpoKFd0bLCGILVTDqqCZ18f6aCWfRvc72k7KtC8enVoxQEH2X0GwPPm9+I1eG8DDjGpQoVf4HEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IL7BpSmT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gO3lyvoS"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=gO3lyvoS9UJGEWVMGq3xDYFSGI
-	kG6seJbsOUkkAIMlxvMd97k3HReMtqO86NpQUqmfVg5ps7Y3uzRZoTpyZFIANbXLZDteCpafUJ1cg
-	Sjq9SArofOecitu7UvoX4PVF53OoPYOQWpjqHfwvqM1VbYB4VpuoRM4lt82coHzV+0NnTQzXNd3O5
-	0aFEck1FT8O3GB+aZO1X75wY4NsOoeWHhdMSQq5Oe3ccZTDmGGZCsEAIdUEY0HMzaFSTT9grM1j5z
-	fXBi8JIm35wrqMo5s12nNqCtog+0RMGIRVYZScTrS0JX00jFVfXj19otWrhFGxTzsu9yXQ9gDShUL
-	yDhVoJ7w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w9dZy-00000004r1z-1ksI;
-	Mon, 06 Apr 2026 06:36:58 +0000
-Date: Sun, 5 Apr 2026 23:36:58 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org
-Subject: Re: [PATCH 5/6] t10-pi: use bio_integrity_intervals() helper
-Message-ID: <adNUih3CWyA4Nj5f@infradead.org>
-References: <20260403194109.2255933-1-csander@purestorage.com>
- <20260403194109.2255933-6-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IL7BpSmT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74D0AC4CEF7;
+	Mon,  6 Apr 2026 06:59:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775458779;
+	bh=TINOOEzYXZk6Uyul8GJb/de3g2f7kAZbZ5P/QnqTTIg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IL7BpSmTnlnaTWOvOcWyXSjKE+hOwx9vA2ojDNS9lYDWTVvKlJedDG14OG/vBIRbq
+	 ASLwGnENjQ22YZGbM1Luw8PcrAIg7YrJbNzqE1v3m0bljjV5XNMFGfPSeEIEvGen7G
+	 BrFMuVo6+zYlR8Onag77o5zmMLZgNnjRAPPHk3OkUfqI4VuaDXcVyFEchCiOtufSsW
+	 TL556mill9znmaDcMtKALwyCt5Eg9cfwQV2U8Lo1bTmvn/UPxjGFLYqrk7zF7xGENP
+	 dk+bHU9F2F92sjnoasxRzACl9TpV749XU1CXalKfg/T6RhVHD/pa/f6CyemUDwXJHf
+	 Tot3fq4a1ZKuA==
+Message-ID: <5327b55d-d66f-4830-abc7-6a890ebbfef4@kernel.org>
+Date: Mon, 6 Apr 2026 08:59:35 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260403194109.2255933-6-csander@purestorage.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] block: unify the synchronous bi_end_io callbacks
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Carlos Maiolino <cem@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
+ linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
+References: <20260406055728.472919-1-hch@lst.de>
+ <20260406055728.472919-2-hch@lst.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260406055728.472919-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Looks good:
+On 2026/04/06 7:57, Christoph Hellwig wrote:
+> Put the bio in bio_await_chain after waiting for the completion, and
+> share the now identical callbacks between submit_bio_wait and
+> bio_await_chain.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Looks good to me.
 
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+
+-- 
+Damien Le Moal
+Western Digital Research
