@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA083803EB;
-	Mon,  6 Apr 2026 14:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA90537FF64;
+	Mon,  6 Apr 2026 14:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775485757; cv=none; b=EKYU3BdCEFUFkNJlR+EkJWuw51eGfE+xlxG+esQpAD1soEf83TJNdVpqHdH9NoKYpZIdReC998jzO8VMn+W3tXPZF/k0X351bYDCctF2XQqTO530YM8rIiV6CKK8/ZT9ctpFkh5a4D73mVx4reXfjQfHtp85lieN4nl1GmOfGhw=
+	t=1775485761; cv=none; b=mQ7VK418IXssjAvJZM42gXzPWrUcHhH72oaSxzWibCe5SzqXY4ikHMmP0ERYiOjrI1quSGAN85+XTkrmvjCc91GbbMdZQQD8svQQTwyIwwmDQueWGZhtI7w6w2AMN/Lf2zM70aub54R5hWRiZXJah5oZa4Aif5e2ElkKAoBjf1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775485757; c=relaxed/simple;
-	bh=hQs1Tn9TC/fuoSSmmMaVRc8aMtneqBIGGyK2dnscFmo=;
+	s=arc-20240116; t=1775485761; c=relaxed/simple;
+	bh=mq7jaFSupKdEJsnxgCQqUuadHGtAR9I1r4rs0c7hHHQ=;
 	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=PnU4xoTqzz98MStxasSqekVtzJIA95bxjXNX7hbqzYZoB3zw/R8ebyXRs9LxhDBPfBV9H1t8rY8+aEG/5w4U09+AQOfmV2hhjqnTHBmO8Pj8LCntXBLxxBNpb4SsUopAwBiltMfm0IOWBA1DOQYY+bhz18+cHMHc7yrd0yZoBpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dRSvnYgZ; arc=none smtp.client-ip=10.30.226.201
+	 References:Date:Message-Id; b=mMhlDuRv0ldSx/4YRxbtaarUVDdeDdp73AFgnHZRzHG7+HVwJp6U2OJw8ZjvrFxbsmMLj7lIXOksD0fjtmu+fhrJ9wl9OMsTqxz3ieOejV3uUj05LTJl+voLh6X5CGbHgM4qYTTowMe2VDlAQ2gpsR5WlmwZGJlUmJTXQewKp7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+As036J; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dRSvnYgZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 976F9C2BC9E;
-	Mon,  6 Apr 2026 14:29:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+As036J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18640C4CEF7;
+	Mon,  6 Apr 2026 14:29:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775485756;
-	bh=hQs1Tn9TC/fuoSSmmMaVRc8aMtneqBIGGyK2dnscFmo=;
+	s=k20201202; t=1775485761;
+	bh=mq7jaFSupKdEJsnxgCQqUuadHGtAR9I1r4rs0c7hHHQ=;
 	h=Subject:From:To:Cc:In-Reply-To:References:Date:From;
-	b=dRSvnYgZ8y+9NiMZOjUfwe4OjJV72M3gHcEolR8tMg0+XKG0e7wy8sJJa1vgsFLdw
-	 c5CFD3Xucwz/io7Rpsfq1thQFQcPIRkLYLUPP7Y1y4I9b9KPB/G7mQhVM5TuGcd6gm
-	 6j4o/t5E0/msw22ksl7ZTZX5i+G9zAy7YYwtPYx221YGT0Z9FD9uUy74kjVaXqtm3Y
-	 n2mq1cThIix8w3e/hkBH9UlVKC3bY2TG7D15bvqQZPmyIzlg6q00tW5pIHF305QHMZ
-	 T98GigKLXQQCyZiVCE86iP0fUgWjV2j28zjziqxOJTxW4KHZ7g2VhFATQ86+Kfh3KS
-	 phsh/0bbvPSlQ==
+	b=e+As036J1OE0LRbTE+udyTNDvuoDowrAh30WCvKKTZxym8JYzXrGS3G26uVdSwDP6
+	 mK3MA9FuaKrw2yn6f4O66Z1zhBrF83QZGaW2/46S36F1e6+tbLI+XC7JYbZzu9Ff2r
+	 Vc9MuNOWNw+/xBZ4JS1jso2x8nUy5yuCaECtI4kKEB+tx7ukCV87lbA0JAlLkDmp68
+	 5qUbmQ7T+w79KOxCzYtbCnYkoItoAf9EdIcuSMqk4t18yFBWMycOAV32nSBypHspnL
+	 g2OeTE7e+5JZx9HvznWqHMpzI2q+cViUAFIk3S0nmqEP7lP8RFEUbEhMLbJzveYwbK
+	 H+dQk2i2obNKw==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,8 +34,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v2 15/33] rust: macros: simplify code using
- `feature(extract_if)`
+Subject: Re: [PATCH v2 32/33] rust: kbuild: support global per-version
+ flags
 From: Tamir Duberstein <tamird@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>
 Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
@@ -67,29 +67,31 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
  Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
  llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
-In-Reply-To: <20260405235309.418950-16-ojeda@kernel.org>
+In-Reply-To: <20260405235309.418950-33-ojeda@kernel.org>
 References: <20260405235309.418950-1-ojeda@kernel.org>
- <20260405235309.418950-16-ojeda@kernel.org>
-Date: Mon, 06 Apr 2026 10:28:56 -0400
-Message-Id: <177548573698.95472.15531781806867412060.b4-review@b4>
+ <20260405235309.418950-33-ojeda@kernel.org>
+Date: Mon, 06 Apr 2026 10:28:57 -0400
+Message-Id: <177548573700.95472.352775942128786057.b4-review@b4>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=508; i=tamird@kernel.org;
- h=from:subject:message-id; bh=hQs1Tn9TC/fuoSSmmMaVRc8aMtneqBIGGyK2dnscFmo=;
- b=owGbwMvMwCV2wYdPVfy60HTG02pJDJmXD+u/jDBy4Oa9bJk4w2M9B7fk4YfP510ojuW9dtlDK
- 8//gb11x0QWBjEuBksxRZZE0UN701Nv75HNfHccZg4rE8gQaZEGBiBgYeDLTcwrNdIx0jPVNtQz
- NNIx0DFm4OIUgKnWM2JkmPtPyHGS6crEmrgGbgvtnyq6OeqXoizabv3atXTD0XW/fzEyfK7+xT2
- 9UPeX0uOlbpUiO+eET1rG+2bCuhV3GffYBAk+5AMA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=710; i=tamird@kernel.org;
+ h=from:subject:message-id; bh=mq7jaFSupKdEJsnxgCQqUuadHGtAR9I1r4rs0c7hHHQ=;
+ b=owGbwMvMwCV2wYdPVfy60HTG02pJDJmXD+tzWYj+6dTpkBWbUfp7wsO/m/iYktnfTG+7aHHYb
+ GZpoV1Bx0QWBjEuBksxRZZE0UN701Nv75HNfHccZg4rE8gQaZEGBiBgYeDLTcwrNdIx0jPVNtQz
+ NNIx0DFm4OIUgKl+5czwP+PqFPMTQeFWGn039hd23v20JE567dHFIme6jpjbVEjwr2RkuOrsmlm
+ kEVS0PyKl+13SNTPpN+1S8XIH9s/y+Sn8aJMrFwA=
 X-Developer-Key: i=tamird@kernel.org; a=openpgp;
  fpr=5A6714204D41EC844C50273C19D6FF6092365380
 
-On Mon, 06 Apr 2026 01:52:51 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
-> `feature(extract_if)` [1] was stabilized in Rust 1.87.0 [2], and the last
-> significant change happened in Rust 1.85.0 [3] when the range parameter
-> was added.
+On Mon, 06 Apr 2026 01:53:08 +0200, Miguel Ojeda <ojeda@kernel.org> wrote:
+> Sometimes it is useful to gate global Rust flags per compiler version.
+> For instance, we may want to disable a lint that has false positives in
+> a single version [1].
 > 
-> That is, with our new minimum version, we can start using the feature.
-> 
-> Thus simplify the code using the feature and remove the TODO comment.
+> We already had helpers like `rustc-min-version` for that, which we use
+> elsewhere, but we cannot currently use them for `rust_common_flags`,
+> which contains the global flags for all Rust code (kernel and host),
+> because `rustc-min-version` depends on `CONFIG_RUSTC_VERSION`, which
+> does not exist when `rust_common_flags` is defined.
 > 
 > [...]
 
