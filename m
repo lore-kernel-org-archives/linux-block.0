@@ -1,71 +1,70 @@
-Received: from mail-dl1-f98.google.com (mail-dl1-f98.google.com [74.125.82.98])
+Received: from mail-yw1-f226.google.com (mail-yw1-f226.google.com [209.85.128.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451AE30E82D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1830531C567
 	for <linux-block@vger.kernel.org>; Mon,  6 Apr 2026 04:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.98
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775449535; cv=none; b=NgM3DdVni2c6c6COFu9sGR6MdmE2FZ9byeyUIvWO9ypvT44QSw8HNCuJIlfNI6B6yUMai4c7end57P2q8QH8t3XzVcLLKBMDT97jU+z1bFlnzeN3HgDmkJNDsZXzCtawXd4LEbDPei3gHnRIGpJ3m55T/0M7FSvA0JGobMzX+Is=
+	t=1775449536; cv=none; b=sxgxWGzHkr3gvdp1z4UCAo2zP6EiBYHfeDt4QFWbmOJ4/jO0Qp3zHexGkrE1hNZJuzNhSr9ZWB8ftbxxB9f2sjP0yULIoTdZDJ63tfKN5E/7LAlDnE585wKY3JIdySLgsiR4Nyr616UHfhoF7Eo4wJe7tklj+8aNo86F0+Ol16k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775449535; c=relaxed/simple;
-	bh=NYiNrf1m+usN85Dbh0+F0m5BpO5qZqMWkcz20OKnhR0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hW8iNqAKXZ0uzj9jtbH7EMA2Gb3M42maDpFmK8s2+XuX19Nzz33XpUBwPvasCWo7aRy5TZbrLqwyNz6BMCvenUXFZwamDNK2qQpDILbgmdsaL0iv+Q9FLmDpErzI4e4vvINBB6l+L6YX5FYktsg/7rPFSXsB7BiCMf/O1nzIyr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NB32vq8q; arc=none smtp.client-ip=74.125.82.98
+	s=arc-20240116; t=1775449536; c=relaxed/simple;
+	bh=B7ofdFU5/Qy4lPbjF538KUTGBJ46Nu05u1pF0sMbD88=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=sbfscj9mMXd6X682U5UxrN4ASGzX8Zp26RzYnftC8RwDjTMxGZ7IJKjDN5BKqFHGaN1ElMuyvKjO35p63FLcS1j9SYY8aplm7jvNWyBHAewVkOFA5+Em0Q3Mz3kSswZzsDPmqKuytMmcIUUzC6nM4NiS77zdWNkZ+DEMG00UN50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FndBHQzf; arc=none smtp.client-ip=209.85.128.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NB32vq8q"
-Received: by mail-dl1-f98.google.com with SMTP id a92af1059eb24-12bfa7fe691so437009c88.0
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FndBHQzf"
+Received: by mail-yw1-f226.google.com with SMTP id 00721157ae682-79a2ee65171so50168297b3.2
         for <linux-block@vger.kernel.org>; Sun, 05 Apr 2026 21:25:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1775449532; x=1776054332; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=62bRSDeTpVA3G/ejEet2ndeFOHy2K2YoDaPpaJqQpXw=;
-        b=NB32vq8qk2bdqsJMLO0dqJ4VdjQqInLro20BhHVc9pfQjxAliHmDySbdDJRPeKzJOm
-         cTNw0i3tkXND5RmcbYa9r7Vo2TnTcNiWStQgoagp2LCaw0636/NhOLRtXWOuVpbxseta
-         sONSfAhrxwkbwfTGPIwPgaTNB8rJafBO78AlbxkiLqMlrLCS/Kx04jCZsgGc18qqhKTI
-         yrYBh3gizfzL8TJ9LqK5DGl4d41Vhekm0VjKm/6n+Mwhg8rfIZJnnyank7ZtlijOEuSA
-         PIwrXFkkzeSOendVfqFdo8l/Hc5kFDQLti6hBohbGSIR7Yozey9IS/Yvlff4fqGQwEpX
-         MwHA==
+        d=purestorage.com; s=google2022; t=1775449533; x=1776054333; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bFnOSG3cnYhHQlH8ga8KT9MBbSlP+Iab17pKo/eMRDc=;
+        b=FndBHQzfHsshdKtdD+n+FYVEFG0o7KPjAMLd71cqf2ve9gYQ8Y6PuG0TtZz5vfAF7Y
+         lYRNbtVU67VBNWcPAl7+MEHXOx2ftwylrmASXz7J0tEyvrs4a6iBXIgZtmpuTK1NSLS6
+         nMj9hMukXdKei4oEYTDxeuxnO8qr3K9GzXDz9X7os8agswhh5yGyua9z+JBbZ3YdVoiP
+         5VKS81xH2rGKgo0bHnnzIIrPu9SCnp73uy2dn5KPuNQ6zEGHLdtvwvmaoFDdz9Qxnw7L
+         jFhCcmvHs9rZCUOrumwknophS17qgG+bfjCNSd+g2YLbaMmIbCgo3741ua4GUBWpD0iK
+         ftjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775449532; x=1776054332;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=62bRSDeTpVA3G/ejEet2ndeFOHy2K2YoDaPpaJqQpXw=;
-        b=jW5q2u2Nw9cKYQkU/ALoNDBayVXfe8KShAyme5t0ASwQUh78Uo8fD3ou7slNUMYum+
-         Abo1iTtAMdnkCphgOs5Cck9LxD6xZU5d5WzWtIYKOEzeS25WDie/CFITKcfMe33p2a5/
-         DNbDEkCQyumU5JemRSjlZ2rplew5PR0WQ08tEIbI6Vl1VgA2RBiPce7mvZDm6tnnNh1F
-         SzgND4zW843iDb+YlhV1oFuHaEJyXbn3XwJUsKqgzp7m8UEXYniDCvw5xbN3Mh+pbl2w
-         R0awBRQWBW2Ur7VGjX/gVVzoVbT+6lpD1orgd5fjq+KatRBBFOqjn1s2AVWK3tpNllBF
-         iRAw==
-X-Gm-Message-State: AOJu0YyKUhaIKF2aurNTLBp2xF3UrdLP/5culyl8Qz7Urwyq7cGSJg3p
-	eCMY1FfF73P9gOp6TGlgYpMeuETnPm37sr8BoGFly6/LrxDO/VqWsz1JiMvLdHGln7A4+KVDw/R
-	fC6IAMo16V1ZtCOq0P+gF3fhrSD5zNv6svPef
-X-Gm-Gg: AeBDievgnlZNBoROvcHj4b7URDigdUu1JeqKINh3a9oNQTZk8mhAyi3UIK7sd4YBU+A
-	Pe4SAWQ5YKa+hn4IOYEVgTD69c3dJhJfJ3jEfWFUAqPVQzpKN/7KXS6284igKSPzKHSql6LStBd
-	cXFJ/xqNUVjdKIteGU+fBL7lh5zHDjfse8jIbLjgpcLMcc5VmTQ5nwrsU1xwHjN9Apt8XQD8DAc
-	B8xHk/opFv/aSi+psDFev8/A2R9x8ikeaITqsK5JkRvDWNzHJ3QyWReOZgAT8RTqf1ZzoXy9z/k
-	y+TMWltDBVfQoH9xbaGTHx6FvgRQ15v6ix6mJJaIGUU885tzGtQvmb9B1ON8GeUIGTZtBY1ZYmg
-	5hqLmy/k04uYzVprj7pwhMjhasc5MUiHQJhWjDCQU2EKkNJhaEpn8EGw=
-X-Received: by 2002:a05:7022:43aa:b0:12a:6c84:6054 with SMTP id a92af1059eb24-12bfb770514mr5207916c88.35.1775449532246;
-        Sun, 05 Apr 2026 21:25:32 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775449533; x=1776054333;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bFnOSG3cnYhHQlH8ga8KT9MBbSlP+Iab17pKo/eMRDc=;
+        b=FUGgjst3lRUijUmASWFc3WG/X1WVb2ZDFlJ8OHUQVlp8AKpsBw15kJKXP+vhi2bysl
+         W48jQQUg02QKJybJGytuGkQcEtxcIZIhKKX6V5Bvfd6MyqGliFgj2h2tDELib+Kgi76Z
+         mL2Yajp/kWHpAzMVV8i4ZiI9zcSHKU3iOAlydd6bEYZITVlBKWGz62CK9r/XDf+m0SNd
+         MBkF1CHjIwpq1EtOJrAXJ22SxYM8393aDESBITQlZeCBEo0hav9ZYLHnlszqzOwPbdQS
+         fQVDkX51dOgkdj4o7s+b3H8SvQVQgoBBBXJGcoVxgin0KGyacfaIdve7iUVRpT8cjZk/
+         JFHw==
+X-Gm-Message-State: AOJu0YzUS3uMKNIkdH2ELnFUE3yD9UVppiCaHi9Y5H7oFiumYN7OYPz5
+	b2bfBZj8tYOJhsr3/wNYM1qnDOSCzZVHYuaEgmGfGj1079wEr6PFZVZNighXa6hz6FPhFTUVKEM
+	7bfN0oehiqNlb6xzikHIdxdAWh6x6Q28c0pxZ
+X-Gm-Gg: AeBDieuUQNZ5uAo/sdrvmreeSKcvWvDNckKM1gw1Kdhel7buw5VjyaW+6mmwFfMpNpv
+	Gwyr2wCkU6kOm5bcRDZQggIv1rfyHDgteC0lQP2GyXz2wff8GqBxH59oyO3iaXo7ND3p15rekPp
+	6TVNtiLG4Mk76ztQ4T8KEV0zYbdkOZVZ7o89gc3ZA4rlqn01W4xrTkCgGeyS8GkBD8aK1vgFPe4
+	45CPUQkNdqfT5YFH0a9F5QZnP2AE9wuKXoRCnCJ9uhdMTcw+zAv0IFxrHK7T/ZXd28C3waDrz1r
+	S9gmb2DQiIseLmfJkvRBTr+tbTyxRJtMGT7WjKiHvP81KkUu5TI4CfeO3jZbChSID82JrEOiehW
+	PrC7TDLRWsVtVBsLbEzb1ef+LbqLKbDrqXQtefdeGu2Wn5OZs7r0bvAU=
+X-Received: by 2002:a05:690c:d91:b0:7a3:e167:14f3 with SMTP id 00721157ae682-7a4d3dc6489mr118980747b3.17.1775449533048;
+        Sun, 05 Apr 2026 21:25:33 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-12c03576f99sm261142c88.4.2026.04.05.21.25.31
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-7a3703113ecsm8745177b3.14.2026.04.05.21.25.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Apr 2026 21:25:32 -0700 (PDT)
+        Sun, 05 Apr 2026 21:25:33 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::2c94])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 6D05D34018F;
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 7106C34057B;
 	Sun,  5 Apr 2026 22:25:31 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 56750E4010B; Sun,  5 Apr 2026 22:25:31 -0600 (MDT)
+	id 51BC5E54F2C; Sun,  5 Apr 2026 22:25:31 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Sun, 05 Apr 2026 22:25:30 -0600
-Subject: [PATCH v2 1/2] ublk: reset per-IO canceled flag on each fetch
+Subject: [PATCH v2 0/2] ublk: fix infinite loop in ublk server teardown
+Date: Sun, 05 Apr 2026 22:25:29 -0600
+Message-Id: <20260405-cancel-v2-0-02d711e643c2@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,9 +73,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260405-cancel-v2-1-02d711e643c2@purestorage.com>
-References: <20260405-cancel-v2-0-02d711e643c2@purestorage.com>
-In-Reply-To: <20260405-cancel-v2-0-02d711e643c2@purestorage.com>
+X-B4-Tracking: v=1; b=H4sIALk102kC/2WMyw6CMBBFf4XM2po+oFFX/Idh0ZYBJtGWtNpoS
+ P/dwtblubnnbJAwEia4NRtEzJQo+Ary1IBbjJ+R0VgZJJeat1wxZ7zDB7NWGyGvslOtg3peI07
+ 0OUL3ofJC6RXi9+hmsa9/iSwYZxeNndFWjcpM/fqOuGtmxrMLTxhKKT/pkSuiogAAAA==
+X-Change-ID: 20260403-cancel-bb6a1292534c
 To: Ming Lei <ming.lei@redhat.com>, 
  "zhang, the-essence-of-life" <zhangweize9@gmail.com>, 
  Caleb Sander Mateos <csander@purestorage.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -85,94 +85,33 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>
 X-Mailer: b4 0.14.2
 
-If a ublk server starts recovering devices but dies before issuing fetch
-commands for all IOs, cancellation of the fetch commands that were
-successfully issued may never complete. This is because the per-IO
-canceled flag can remain set even after the fetch for that IO has been
-submitted - the per-IO canceled flags for all IOs in a queue are reset
-together only once all IOs for that queue have been fetched. So if a
-nonempty proper subset of the IOs for a queue are fetched when the ublk
-server dies, the IOs in that subset will never successfully be canceled,
-as their canceled flags remain set, and this prevents ublk_cancel_cmd
-from actually calling io_uring_cmd_done on the commands, despite the
-fact that they are outstanding.
-
-Fix this by resetting the per-IO cancel flags immediately when each IO
-is fetched instead of waiting for all IOs for the queue (which may never
-happen).
+Fix an infinite loop in ublk server teardown which can arise when a ublk
+server dies while recovering a device. Also add a test which
+demonstrates the problem and verifies the fix.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-Fixes: 728cbac5fe21 ("ublk: move device reset into ublk_ch_release()")
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: zhang, the-essence-of-life <zhangweize9@gmail.com>
 ---
- drivers/block/ublk_drv.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+Changes in v2:
+- Add support for batched fetch in pre_fetch_io (Ming Lei)
+- Link to v1: https://lore.kernel.org/r/20260403-cancel-v1-0-86e5a6b3d3af@purestorage.com
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3ba7da94d31499590a06a8b307ed151919a027cb..92dabeb820344107c9fadfae94396082b933d84e 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2916,22 +2916,26 @@ static void ublk_stop_dev(struct ublk_device *ub)
- 	ublk_cancel_dev(ub);
- }
- 
-+static void ublk_reset_io_flags(struct ublk_queue *ubq, struct ublk_io *io)
-+{
-+	/* UBLK_IO_FLAG_CANCELED can be cleared now */
-+	spin_lock(&ubq->cancel_lock);
-+	io->flags &= ~UBLK_IO_FLAG_CANCELED;
-+	spin_unlock(&ubq->cancel_lock);
-+}
-+
- /* reset per-queue io flags */
- static void ublk_queue_reset_io_flags(struct ublk_queue *ubq)
- {
--	int j;
--
--	/* UBLK_IO_FLAG_CANCELED can be cleared now */
- 	spin_lock(&ubq->cancel_lock);
--	for (j = 0; j < ubq->q_depth; j++)
--		ubq->ios[j].flags &= ~UBLK_IO_FLAG_CANCELED;
- 	ubq->canceling = false;
- 	spin_unlock(&ubq->cancel_lock);
- 	ubq->fail_io = false;
- }
- 
- /* device can only be started after all IOs are ready */
--static void ublk_mark_io_ready(struct ublk_device *ub, u16 q_id)
-+static void ublk_mark_io_ready(struct ublk_device *ub, u16 q_id,
-+	struct ublk_io *io)
- 	__must_hold(&ub->mutex)
- {
- 	struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
-@@ -2940,6 +2944,7 @@ static void ublk_mark_io_ready(struct ublk_device *ub, u16 q_id)
- 		ub->unprivileged_daemons = true;
- 
- 	ubq->nr_io_ready++;
-+	ublk_reset_io_flags(ubq, io);
- 
- 	/* Check if this specific queue is now fully ready */
- 	if (ublk_queue_ready(ubq)) {
-@@ -3202,7 +3207,7 @@ static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
- 	if (!ret)
- 		ret = ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
- 	if (!ret)
--		ublk_mark_io_ready(ub, q_id);
-+		ublk_mark_io_ready(ub, q_id, io);
- 	mutex_unlock(&ub->mutex);
- 	return ret;
- }
-@@ -3610,7 +3615,7 @@ static int ublk_batch_prep_io(struct ublk_queue *ubq,
- 	ublk_io_unlock(io);
- 
- 	if (!ret)
--		ublk_mark_io_ready(data->ub, ubq->q_id);
-+		ublk_mark_io_ready(data->ub, ubq->q_id, io);
- 
- 	return ret;
- }
+---
+Uday Shankar (2):
+      ublk: reset per-IO canceled flag on each fetch
+      selftests: ublk: test that teardown after incomplete recovery completes
 
+ drivers/block/ublk_drv.c                        | 21 ++++++----
+ tools/testing/selftests/ublk/Makefile           |  1 +
+ tools/testing/selftests/ublk/fault_inject.c     | 52 +++++++++++++++++++++++--
+ tools/testing/selftests/ublk/kublk.c            |  7 ++++
+ tools/testing/selftests/ublk/kublk.h            |  3 ++
+ tools/testing/selftests/ublk/test_generic_17.sh | 35 +++++++++++++++++
+ 6 files changed, 108 insertions(+), 11 deletions(-)
+---
+base-commit: cdd71b7feb3674d14c5edd9c133242ddf9a363f2
+change-id: 20260403-cancel-bb6a1292534c
+
+Best regards,
 -- 
-2.34.1
+Uday Shankar <ushankar@purestorage.com>
 
