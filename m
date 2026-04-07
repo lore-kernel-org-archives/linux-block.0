@@ -1,119 +1,95 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9073B892B;
-	Tue,  7 Apr 2026 14:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ECC33B8BD1
+	for <linux-block@vger.kernel.org>; Tue,  7 Apr 2026 14:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775570768; cv=none; b=rsDQO3sSxRSQf1sA1CbL2MRsc8hWiJHSFUX5Z+SIYDIIWomxBiX0tGtc9RdNQ1XhZ0ojyQ+2fIuxEbzuJwbB+rdoZrkg8VZ8KXB8tljOIEU/nfMZwB6RUuJD8i4USJf9UBPuUlF0QuUiZxBYjQ/sv77BekWgabwVyeinJqFNM+I=
+	t=1775571199; cv=none; b=d3oeQWUlzVr5ayP8SLvCSDORTBLSPTy6vLEfTk6fUzMskEkcybbaR6iM6d9tBcv5EDbptRh1zEMQsRyYnN5LQ/B7LzMZb/2GFYvxyp7flBRPrGtUCUbRAUt1o9Km8h+XwIeZwuQXsFf8Lo1RPDhyPtg8VXZXESbTvXk01z8zL6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775570768; c=relaxed/simple;
-	bh=beNL+OpQSveUr+zvLCoqjR/RUBHr2gsVYBzUJnwxOlY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kg6zkIFfzbcgIPdRtE0QCO3xaeQtOeHRtNAxR3nlOMrAG73sMXj+SCwT0XmLmAwJpG6FjvfxRlYLW2gIVaJak4sD5yZvdis6fI9q65zniCMqFj9IBH7Za54ELIUKJ42cj/egjgP4KCYEPlUAw8EFILAW0VuYGKkc/kStiIzzRts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IBwDF9OS; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1775571199; c=relaxed/simple;
+	bh=5mucqtRqZUC32Ucba3hcpr0TYw4Hx9sPWSW0EAmo2Qk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ClZ+njAdhrM2Mt9RfHhkwXN5C/ASOMrhNpNBtIamNOpQeWvpcsHhG+jlGhiY4Ctq8jxoMSEI2yGq4F4Axao8rcXKQc1XRPpuP1dOPv13dUlHj0j19ayfbhi6oOHUq/uBTdkkflmvnaOOjp+Jrwi1UHY3vIL42819KYNn2jBZHOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gEucaIos; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IBwDF9OS"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=h5Fr/Lbu7+HBFLT6YRZ3beK2otaI/ShIhiGQh1kzoYw=; b=IBwDF9OShS3QsrK57nxpMeroBb
-	MW3Ag9wGLM4r72CcLhBrVHwjpvP69qVzO0rbUGFT21TSY5ZZxuE7APf17pHeSCatg/KI0VuK7xmDl
-	zJvKkF6brLzEvJr0lo9yAJA9uoJkWbJ3zPYk7BuXQxdiCCBDomFNMeRYswMC2FDu3B0LCJ0oSQpq3
-	hDEb3FKSIMXLTJ9mwe15zCon5uCuFfCb0t65qtoDLrT+ARP7RXuYeSOiF6rCYz10zf4w+tcxUufLM
-	GcQlMBj0ai1vDAc6Js3ugenqMAuCRcolT82ifrNHfx44Bp4P3PJtPjnMhUbXYJ91cjiDB68WtbH5i
-	ARtXtOsA==;
-Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wA74A-00000006YyU-0AJK;
-	Tue, 07 Apr 2026 14:06:06 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Carlos Maiolino <cem@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: [PATCH 5/5] xfs: use bio_await in xfs_zone_gc_reset_sync
-Date: Tue,  7 Apr 2026 16:05:28 +0200
-Message-ID: <20260407140538.633364-6-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260407140538.633364-1-hch@lst.de>
-References: <20260407140538.633364-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gEucaIos"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 552EAC2BCB4
+	for <linux-block@vger.kernel.org>; Tue,  7 Apr 2026 14:13:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775571199;
+	bh=5mucqtRqZUC32Ucba3hcpr0TYw4Hx9sPWSW0EAmo2Qk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=gEucaIosHM9b3uXIg9wCIDGrIN+QFR/6iPwXQnWdFH9HWtMNSWt3HnRH18WyUTQpJ
+	 s4umHD45tbjfhln8lAimbMNko8WzgfUQDHagpK5O5HB0bTIScDMv2ww+UgBRgkwiqd
+	 IRpFehScAdjq8204q/+sCn+ZIHPw+22qUrQNrb3JyH8+zCNdKy3liqkjAvk8WeRpM8
+	 gb9416wPR3BQbGzj3b+S3F3dUN9WQF1hw9T8EguZWupT+YQu8uF/mwY1YlJ7eF6Oj+
+	 00geFQ0nmAc07pftQft657gbDmcjFQDJjODzgg5FqLvePA1Fq11yxK9ldCXqXvijeM
+	 coQR79hDwKq/Q==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59e5aa4ca41so5668462e87.2
+        for <linux-block@vger.kernel.org>; Tue, 07 Apr 2026 07:13:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUUVhNmxcmWqX8mDyzY/PhANXRkpLZZbTTlCEy6urclT/p+aP5I9RvNrafF0NRaW4OMVetcLxkuYwzaqA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5BMzdQPVfE30gDU6XMowOXIVc+nS/8D/H1ERoaMVEg9C5IO9r
+	uXq4oHMD7587MIvJt7BnliUf85/XdXEQNHrFsanlG9MCg9mXi8jXDs797FPRbAMrXiJs/qTmaaS
+	nWPiBDX05v+RZh1gVOAPjON+IusCzvww=
+X-Received: by 2002:a05:6512:1385:b0:5a2:a8ab:ab5a with SMTP id
+ 2adb3069b0e04-5a337584899mr6421611e87.30.1775571197439; Tue, 07 Apr 2026
+ 07:13:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20260405235309.418950-1-ojeda@kernel.org> <20260405235309.418950-8-ojeda@kernel.org>
+ <177548573697.95472.13544191227699996309.b4-review@b4> <CANiq72ne_JYPodnROckyNto10ZF0PqadRxSrng5-mZyqVovxFg@mail.gmail.com>
+ <CAJ-ks9kbHz_KYAXx02vgW1dN2pfb5MFoaSoU1HbJbJg2O8EUaw@mail.gmail.com> <CANiq72mJTT7xFnhm-CeOZM_3ZwGdaQ8F2zUbONpPbqJ8g7DokQ@mail.gmail.com>
+In-Reply-To: <CANiq72mJTT7xFnhm-CeOZM_3ZwGdaQ8F2zUbONpPbqJ8g7DokQ@mail.gmail.com>
+From: Tamir Duberstein <tamird@kernel.org>
+Date: Tue, 7 Apr 2026 10:12:41 -0400
+X-Gmail-Original-Message-ID: <CAJ-ks9kqhQ7De+faY20PxGS3pYAyuRM6A6NVtNdNvdn_t9vwGA@mail.gmail.com>
+X-Gm-Features: AQROBzCOb76MPiztEakAab4vOA01AReuQXW6N_U0hZ8trRfXq-PYQWgznDgWpRA
+Message-ID: <CAJ-ks9kqhQ7De+faY20PxGS3pYAyuRM6A6NVtNdNvdn_t9vwGA@mail.gmail.com>
+Subject: Re: [PATCH v2 07/33] rust: allow globally `clippy::incompatible_msrv`
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Courbot <acourbot@nvidia.com>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
+	Todd Kjos <tkjos@android.com>, Christian Brauner <christian@brauner.io>, 
+	Carlos Llamas <cmllamas@google.com>, Alice Ryhl <aliceryhl@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Trevor Gross <tmgross@umich.edu>, rust-for-linux@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
+	Uladzislau Rezki <urezki@gmail.com>, linux-block@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Alexandre Ghiti <alex@ghiti.fr>, 
+	linux-riscv@lists.infradead.org, nouveau@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, Rae Moar <raemoar63@gmail.com>, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, llvm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Replace the open-coded bio wait logic with the new bio_await helper.
+On Tue, Apr 7, 2026 at 4:37=E2=80=AFAM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> On Mon, Apr 6, 2026 at 5:31=E2=80=AFPM Tamir Duberstein <tamird@kernel.or=
+g> wrote:
+> >
+> > You're welcome! Actually it seems the lint was already improved
+> > upstream, starting with 1.90.0.
+> >
+> > Link: https://github.com/rust-lang/rust-clippy/commit/c0dc3b61 [0]
+>
+> Indeed, I had the PR linked in
+> https://github.com/Rust-for-Linux/linux/issues/349, and it is nicer,
+> but it would still fire in a case like this patch :(
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
- fs/xfs/xfs_zone_gc.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
-
-diff --git a/fs/xfs/xfs_zone_gc.c b/fs/xfs/xfs_zone_gc.c
-index eebe6f4fee1f..b2626a482563 100644
---- a/fs/xfs/xfs_zone_gc.c
-+++ b/fs/xfs/xfs_zone_gc.c
-@@ -900,9 +900,10 @@ xfs_zone_gc_finish_reset(
- 
- static void
- xfs_submit_zone_reset_bio(
--	struct xfs_rtgroup	*rtg,
--	struct bio		*bio)
-+	struct bio		*bio,
-+	void			*priv)
- {
-+	struct xfs_rtgroup	*rtg = priv;
- 	struct xfs_mount	*mp = rtg_mount(rtg);
- 
- 	trace_xfs_zone_reset(rtg);
-@@ -934,26 +935,16 @@ xfs_submit_zone_reset_bio(
- 	submit_bio(bio);
- }
- 
--static void xfs_bio_wait_endio(struct bio *bio)
--{
--	complete(bio->bi_private);
--}
--
- int
- xfs_zone_gc_reset_sync(
- 	struct xfs_rtgroup	*rtg)
- {
--	DECLARE_COMPLETION_ONSTACK(done);
- 	struct bio		bio;
- 	int			error;
- 
- 	bio_init(&bio, rtg_mount(rtg)->m_rtdev_targp->bt_bdev, NULL, 0,
- 			REQ_OP_ZONE_RESET | REQ_SYNC);
--	bio.bi_private = &done;
--	bio.bi_end_io = xfs_bio_wait_endio;
--	xfs_submit_zone_reset_bio(rtg, &bio);
--	wait_for_completion_io(&done);
--
-+	bio_await(&bio, rtg, xfs_submit_zone_reset_bio);
- 	error = blk_status_to_errno(bio.bi_status);
- 	bio_uninit(&bio);
- 	return error;
-@@ -990,7 +981,7 @@ xfs_zone_gc_reset_zones(
- 		chunk->data = data;
- 		WRITE_ONCE(chunk->state, XFS_GC_BIO_NEW);
- 		list_add_tail(&chunk->entry, &data->resetting);
--		xfs_submit_zone_reset_bio(rtg, bio);
-+		xfs_submit_zone_reset_bio(bio, rtg);
- 	} while (next);
- }
- 
--- 
-2.47.3
-
+Ah, that is possibly https://github.com/rust-lang/rust-clippy/issues/14827.
