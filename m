@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041A5378824;
-	Tue,  7 Apr 2026 19:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407883783DE;
+	Tue,  7 Apr 2026 19:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775590798; cv=none; b=hYn7ntWSrpKumBMLEbzny5JZSOds4Wve6RVEbOzXGtMBmVXZP9iGactAAetZWVRBwmZki/mqR59l5tsPWBP5iB3Jax32X752AAyOTizSqcQ8M6rNgKg3C6RrvkAhpOaCJbwK2Xqx4dR9KPxtZuuj828mApg2lI9UtptCwsl9H/0=
+	t=1775590800; cv=none; b=HXh4EC0zhlbxlNvMO+YLZeAW5HwM9b07LlkEROMKtxzVzUGRXQtcYRgGw8wQKYpkSKvWKD62Rd85SizKA1xhV91x9DKrjtY+8iN2EPYYOojTYRj5dFJymthlTAfATjAFROvEay1XTWjv4MxTRcDw9AbFE0PQrooVLt0v3DvaYHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775590798; c=relaxed/simple;
-	bh=Sno46JhFI760NPkogQ116vAaZuCkAaZXDubMzxmwzfg=;
+	s=arc-20240116; t=1775590800; c=relaxed/simple;
+	bh=L3Rfg+8z09e8keiE7bpGEjenYKXFDv21kTEZM7E6AaA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qGPZpKSUnLvE4/Gw8shsaZpEKCo4U2cVEBEOKf4pvjbsE3S4v6dFyH7QT8ioSYqWMfNK6f6vVpB+s+hbRmuZf2/AkPsFXiDg4mOmLzpoFCEQf6Z8a8ioHKxoyB0mEEr2V/seZYzUNwjNpv11Tx0ABlV3wI9snWn7wCIqYR6jomA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNUSwfNE; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=mJQyux2SP2x8EBbSlDFkio7r3GsoLvMLRRisXBpWnACl+kmixdlKm6wqHtAO2XFBlwS0vXK+3UEK8gc8VMrwJKBWfIvCZXE/xp5pIkaAT5tj8RvrLpV+b1rllyooKgwnTf12pRj3+5/Yj9QTSXdzJvOQcIOfwMBhn80MVII2JJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+XKs1nT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNUSwfNE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9EA9C19421;
-	Tue,  7 Apr 2026 19:39:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+XKs1nT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7665FC19421;
+	Tue,  7 Apr 2026 19:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775590797;
-	bh=Sno46JhFI760NPkogQ116vAaZuCkAaZXDubMzxmwzfg=;
+	s=k20201202; t=1775590800;
+	bh=L3Rfg+8z09e8keiE7bpGEjenYKXFDv21kTEZM7E6AaA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nNUSwfNEZw9bDkNaJQHNj/OmlPYGhEuAmgwCiLbEq0YbJ35JTmIBAg41OgPiBiYW5
-	 y+tiiQMPtG6lsbLfrlATM0a/GEVzNZu7+XbUY6ZKWRjpygjgvqofNny9vnsMHC80lC
-	 w537C3CqDTW/2eTLBlAwgZXxHQ6pJYUcKTVcA+uvu5jRMPD4cvGe03Q7E8rCx6GMNM
-	 3vC7kC0gMiPq96BMfBQhmbRkgzlPnJUm6Etp+KGaBMKzReWQIOU/IJoMcbZY14NzUI
-	 E3fD8KE7um5EhWNYCiyZm/Lv3GZhsA7tNbobA3ck87xl50/FttLLv5rgqh67Hk7ENi
-	 CGofMKdTBZMpQ==
-Date: Tue, 7 Apr 2026 21:37:54 +0200
+	b=l+XKs1nTqXITUzVO9V7ZcgbUKwdnwTFr3L2FCLHY2KQo86k0Ffjt8OL1/JRtkSDa3
+	 yNBwGPy69Qr91P26LAHEK1+rZfI5CToJT/zHAcNUCaWarkT5tjiCiRrgjcgleZ82i2
+	 RAt0ogBD0uHApgE3oFsyhNUam/qX/iD1x6pRvm43Q4Iw5xWGX7cWXIJicOEm828y5B
+	 55nqWXirst8RsbiNBuVI6dXtBatMxgvAUKG04HGQ8GcjMnE9vAOu2CBdQ4m7SQse8C
+	 W1jYywMzoAaOGnuLv2xcDaPbBqhp+7vjf9ZKmdzFfBwerHgNt4NKfTHi12+fv/HkF7
+	 JDYjm5yTda1Nw==
+Date: Tue, 7 Apr 2026 21:38:32 +0200
 From: Nicolas Schier <nsc@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>
 Cc: Nathan Chancellor <nathan@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Nathan Chancellor <nathan@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org,
 	Tamir Duberstein <tamird@kernel.org>
-Subject: Re: [PATCH v2 24/33] docs: rust: quick-start: update minimum Ubuntu
- version
-Message-ID: <adVdEsZEJanbkec4@levanger>
+Subject: Re: [PATCH v2 25/33] docs: rust: quick-start: add Ubuntu 26.04 LTS
+ and remove subsection title
+Message-ID: <adVdOOTJ0Iku8A3g@levanger>
 Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
 	Miguel Ojeda <ojeda@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -107,7 +107,7 @@ Mail-Followup-To: Nicolas Schier <nsc@kernel.org>,
 	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org,
 	Tamir Duberstein <tamird@kernel.org>
 References: <20260405235309.418950-1-ojeda@kernel.org>
- <20260405235309.418950-25-ojeda@kernel.org>
+ <20260405235309.418950-26-ojeda@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -116,24 +116,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260405235309.418950-25-ojeda@kernel.org>
+In-Reply-To: <20260405235309.418950-26-ojeda@kernel.org>
 
-On Mon, Apr 06, 2026 at 01:53:00AM +0200, Miguel Ojeda wrote:
-> Ubuntu 25.04 is out of support [1], and Ubuntu 25.10 is the latest
-> supported one.
+On Mon, Apr 06, 2026 at 01:53:01AM +0200, Miguel Ojeda wrote:
+> Ubuntu 26.04 LTS (Resolute Raccoon) is scheduled to be released in a few
+> weeks [1], and it has a recent enough Rust toolchain, just like Ubuntu
+> 25.10 has [2][3].
 > 
-> Moreover, Ubuntu 25.10 is the first that provides a recent enough Rust
-> given the minimum bump -- they provide 1.85.1 [2].
+> We could update the title and the paragraph, but to simplify and to
+> make it more consistent with the other distributions' sections, let's
+> instead just remove that title. It will also reduce the differences
+> later on to keep it updated. Eventually, when we remove the remaining
+> subsection for older LTSs, Ubuntu should be a small section like the
+> other distributions.
 > 
-> Thus update it.
+> Thus remove the title and add the mention of Ubuntu 26.04 LTS.
 > 
-> Link: https://ubuntu.com/about/release-cycle [1]
+> Link: https://documentation.ubuntu.com/release-notes/26.04/schedule/#resolute-raccoon-schedule [1]
 > Link: https://packages.ubuntu.com/search?keywords=rustc&searchon=names&exact=1&suite=all&section=all [2]
+> Link: https://packages.ubuntu.com/search?keywords=bindgen&searchon=names&exact=1&suite=all&section=all [3]
 > Reviewed-by: Tamir Duberstein <tamird@kernel.org>
 > Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 > ---
->  Documentation/rust/quick-start.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  Documentation/rust/quick-start.rst | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 > 
 
 Reviewed-by: Nicolas Schier <nsc@kernel.org>
