@@ -1,68 +1,223 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A957A3BB4A;
-	Wed,  8 Apr 2026 05:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10911D88D7;
+	Wed,  8 Apr 2026 05:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775625478; cv=none; b=dC3O7IERFjNI9jn4h9iY4KrpEeX2OxYAhjnCMPkrpmKHyFN0NmhshWymRB6xrvFgyUlfiWF3eLDWhkPKghUgGZQoVVaMNTXGxKxEEe85B4Vt725IvLOEZwjQj0ZIUMb4LzMWZaL6MrTQgowVbmgOYdRXzXBRvxh9mfZwkNT7XV0=
+	t=1775626977; cv=none; b=kNALbZ/I/KQJEoTjyL1wPRUgQJX5pk04fgfoGtdadHVLI6YUK92LRvcaza/cXSEtyvLXLwdfF/nEmm1tV/VsZr3QuyKS8PhCMykoke5zjWl4zQCTFaxgSAt27R69reh+NzSEeT7y0VkKpbzYSQQPwz+smSgjZ+Z83XqLrY4on5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775625478; c=relaxed/simple;
-	bh=AvKsivDtHvgBw6YESEd969tQX9qxDI4tHJVTF9hUaOA=;
+	s=arc-20240116; t=1775626977; c=relaxed/simple;
+	bh=V5fZV5BfHSr+Ac5FRNYMhTfgY4qnFWzkV7vgykf9dYw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FaXN9qjyNLO1192BgaC62yIGmOH2i7trHwG2wDO7SBaM9JZa1As2WLpT8EaLRjpkwRG4WJ/gSJ0N5fgj0jt80dnlwZH3FJIXGMc8+BBNGCBFhXzxs7+WCUajadRrQQrgwDUAPXlhcNX+wv5BKE8tuTlhft7V1DeHYu9B8J3UHv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WyJc/fKW; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=OQC81IEWs3DBX8Mh10hRROom+fYRI1REHVlSSoRZITo3uf2rpyPSOYxha9KMiOG4orf2kskw2S26grfKpRZcL1dUh0rgeDJEeNzR/X58Pbd4MTc21pYxOA5PEazqTDeOMhHt63TpNDbvCm4kJiJV/bcgVwNMSi19YsRD8VB1TMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Lcnz2lKi; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WyJc/fKW"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lcnz2lKi"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=2iO/eYli0MZ+1t9Myyo/dAixMD8J4gebm1v3LO7tDTU=; b=WyJc/fKW7z5rI6Fq1W6c5Fvi+f
-	hR9wBm0jGGDSh1fYORDczeORWSs2NUVW7uZ9BMv0ujlDLrqnB2kD0oAjjWo8+1gK6PtsgUG80ek8N
-	r1sQeHnGvJ4W3yF3/OkSJlee+NDdVzBUru5j7HhlU8pws8jjvV4yISvkIqcyRn/f/eZauVbX0rJe5
-	y74Hiian/bj4BRfGuR3H26tymaZCOtO+HKa4dYmy6cAJ5cXfpjWD/9JXRbm+XrF8g7Wpe6y1EJmvR
-	W28tGoIIIPgisLg23EOqiYHHTH306zRBrfLx6DtF6S0K0OUjY9Bk3ZKEJIO5rLuRW28JsvRkhr8QA
-	ZXkeGtcw==;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=kf5GZujZLwj7kmPoteEI3NuMDANbKVGMElkUOE0WUNM=; b=Lcnz2lKik+BZ4qqDoc8cZaC0Ie
+	+luXDaMV745g4zRp3e8YWhR4ktWoP5x1uba5qFwYlXdZ6eV4n/acHz005qYC/9bnx7x325lOGK0J8
+	TTPEV2WK+IOh8pbfrlTHLLrZjF+PSrx/ormZbY2R6Bg4AM3GgzwUeP6HkiwDXoxWStpoCPMuKftN7
+	/C9Z94tleMvgdDeAm06jod7KVjinqSjJJuD4I+MlfHYEF4yPxnVVhlT7IyVOTwQn4VpU/uCKHyPJT
+	VjA1MBxV4sG65DP8xdrfKRQVtKW7JBpb4JVAjzJedkgVI9m6itEiHeRAuejSjETRhqQRIryxpdy9l
+	a6gZPeJA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wALIU-00000008HXY-2Hap;
-	Wed, 08 Apr 2026 05:17:50 +0000
-Date: Tue, 7 Apr 2026 22:17:50 -0700
+	id 1wALgl-00000008INa-0hdL;
+	Wed, 08 Apr 2026 05:42:55 +0000
+Date: Tue, 7 Apr 2026 22:42:55 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+To: Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
+	linux-kernel@vger.kernel.org,
 	Lars Ellenberg <lars.ellenberg@linbit.com>,
 	Philipp Reisner <philipp.reisner@linbit.com>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 00/20] DRBD 9 rework
-Message-ID: <adXk_m3SbRcWTOIC@infradead.org>
+	linux-block@vger.kernel.org,
+	Joel Colledge <joel.colledge@linbit.com>,
+	linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH 06/20] drbd: add RDMA transport implementation
+Message-ID: <adXq36pbGLXMZc2r@infradead.org>
 References: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
- <ecf00b4b-c3f8-4161-a97d-3d23b423cabf@kernel.dk>
+ <20260327223820.2244227-7-christoph.boehmwalder@linbit.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ecf00b4b-c3f8-4161-a97d-3d23b423cabf@kernel.dk>
+In-Reply-To: <20260327223820.2244227-7-christoph.boehmwalder@linbit.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Apr 02, 2026 at 07:30:35PM -0600, Jens Axboe wrote:
-> On 3/27/26 4:38 PM, Christoph Böhmwalder wrote:
-> > As discussed (context: [0]), here is the first version of our DRBD 9
-> > rework series, intended for for-next via for-7.1/drbd.
-> 
-> Will you fixup the kerneldoc (nits) and the assigned-but-not-read
-> issues and send out a new version? Also looks this series doesn't
-> actually apply to for-7.1/block, patch 12 fails.
+You really need to add the RDMA mailing list before adding new RDMA
+code.  I'll try to review the bits I still remember, but you also
+need a maintainer ACK.
 
-Looks like all this went in without any review?  Since when have we
-started these grand replacements anyway, as they are known to cause
-bugs and regressions?
+> +#ifndef SENDER_COMPACTS_BVECS
+> +/* My benchmarking shows a limit of 30 MB/s
+> + * with the current implementation of this idea.
+> + * cpu bound, perf top shows mainly get_page/put_page.
+> + * Without this, using the plain send_page,
+> + * I achieve > 400 MB/s on the same system.
+> + * => disable for now, improve later.
+> + */
+> +#define SENDER_COMPACTS_BVECS 0
+> +#endif
+
+Nothing explains what "this idea" is.  And we do not add dead code as
+a rule of thumb anyway.
+
+> +/* Nearly all data transfer uses the send/receive semantics. No need to
+
+Please use the normal kernel command style:
+
+/*
+ * Blah, blah, blah.
+ */
+
+> +int allocation_size;
+> +/* module_param(allocation_size, int, 0664);
+> +   MODULE_PARM_DESC(allocation_size, "Allocation size for receive buffers (page size of peer)");
+> +
+> +   That needs to be implemented in dtr_create_rx_desc() and in dtr_recv() and dtr_recv_pages() */
+> +
+> +/* If no recvbuf_size or sendbuf_size is configured use 1M plus two pages for the DATA_STREAM */
+> +/* Actually it is not a buffer, but the number of tx_descs or rx_descs we allow,
+> +   very comparable to the socket sendbuf and recvbuf sizes */
+
+Please don't add random unused code.
+
+Also while the kernel coding style has an exception for overly long
+lines for selected lines where the improve readability, that by
+definition can't apply to block comments.
+
+> +/* Assuming that a singe 4k write should be at the highest scatterd over 8
+> +   pages. I.e. has no parts smaller than 512 bytes.
+> +   Arbitrary assumption. It seems that Mellanox hardware can do up to 29
+> +   ppc64 page size might be 64k */
+> +#if (PAGE_SIZE / 512) > 28
+> +# define DTR_MAX_TX_SGES 28
+> +#else
+> +# define DTR_MAX_TX_SGES (PAGE_SIZE / 512)
+> +#endif
+
+All this looks complete bollocks.  We had multi-page bvecs for years,
+aso the page size should not apply for the I/O path.
+
+> +union dtr_immediate {
+> +	struct {
+> +#if defined(__LITTLE_ENDIAN_BITFIELD)
+> +		unsigned int sequence:SEQUENCE_BITS;
+> +		unsigned int stream:2;
+> +#elif defined(__BIG_ENDIAN_BITFIELD)
+> +		unsigned int stream:2;
+> +		unsigned int sequence:SEQUENCE_BITS;
+> +#else
+> +# error "this endianness is not supported"
+> +#endif
+> +	};
+> +	unsigned int i;
+> +};
+
+Bitfields for on-the-write structures are an anti-pattern,  Please
+use proper masking and shifting like just about everyone else in modern
+code.
+
+> +static int dtr_init(struct drbd_transport *transport);
+> +static void dtr_free(struct drbd_transport *transport, enum drbd_tr_free_op);
+> +static int dtr_prepare_connect(struct drbd_transport *transport);
+> +static int dtr_connect(struct drbd_transport *transport);
+> +static void dtr_finish_connect(struct drbd_transport *transport);
+
+The code structure here is totally messed up if you need all these
+dozens of forward declarations.  Please reshuffled it that you only
+need those actually required,
+
+> +static struct drbd_transport_class rdma_transport_class = {
+> +	.name = "rdma",
+> +	.instance_size = sizeof(struct dtr_transport),
+> +	.path_instance_size = sizeof(struct dtr_path),
+> +	.listener_instance_size = sizeof(struct dtr_listener),
+> +	.ops = (struct drbd_transport_ops) {
+
+nested struct initializers don't need casts.
+
+> +static bool atomic_inc_if_below(atomic_t *v, int limit)
+> +{
+> +	int old, cur;
+> +
+> +	cur = atomic_read(v);
+> +	do {
+> +		old = cur;
+> +		if (old >= limit)
+> +			return false;
+> +
+> +		cur = atomic_cmpxchg(v, old, old + 1);
+> +	} while (cur != old);
+> +
+> +	return true;
+> +}
+
+Don't add you own atomics, please talk to the atomics maintainers
+instead of adding hacks like this.
+
+> +	err = -ENOMEM;
+> +	tx_desc = kzalloc(sizeof(*tx_desc) + sizeof(struct ib_sge), gfp_mask);
+> +	if (!tx_desc)
+> +		goto out_put;
+
+This is supposed to use the new flex kmalloc family of functions
+(as much as I hate them).
+
+> +	send_buffer = kmalloc(size, gfp_mask);
+> +	if (!send_buffer) {
+> +		kfree(tx_desc);
+> +		goto out_put;
+> +	}
+> +	memcpy(send_buffer, buf, size);
+
+and this is a kmemdup.
+
+> +	if (err) {
+> +		kfree(tx_desc);
+> +		kfree(send_buffer);
+> +		goto out_put;
+> +	}
+
+And please use proper gotos to unwind.
+
+> +static int dtr_recv(struct drbd_transport *transport, enum drbd_stream stream, void **buf, size_t size, int flags)
+> +{
+> +	struct dtr_transport *rdma_transport;
+> +	int err;
+> +
+> +	if (!transport)
+> +		return -ECONNRESET;
+
+How can this be NULL?
+
+> +static int dtr_path_prepare(struct dtr_path *path, struct dtr_cm *cm, bool active)
+> +{
+> +	struct dtr_cm *cm2;
+> +	int i, err;
+> +
+> +	cm2 = cmpxchg(&path->cm, NULL, cm); // RCU xchg
+
+Wht's that comment supposed to mean?  If it is a rcu_replace_pointer,
+use that.  If not the comment looks really odd.
+
+> +	err = dtr_cm_alloc_rdma_res(cm);
+> +
+> +	return err;
+
+You can return the value directly here.
+
+Giving up for now.  I think this needs a sweep for basic sanity an
+a review from the RDMA maintainers before we can go into more details.
 
