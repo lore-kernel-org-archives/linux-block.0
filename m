@@ -1,347 +1,674 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16071373BFC
-	for <linux-block@vger.kernel.org>; Tue,  7 Apr 2026 19:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775591429; cv=pass; b=hp40ozfxtAACzyICMANMK1H0jzppWZEbL5x9O1T9sdoZ5Xzk2cOoHTA1goq9XKS+DY3pnZ+Jr90jBKHaD7OdCWlVL+7iK5D29PQqkPU4hyzuYUyompYpLETJ+eBWKMTL2WOS3iXKxbpJ5GnbXOSr0E/3o9UrWymAncEQ1xbW28U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775591429; c=relaxed/simple;
-	bh=nxXg8ZjDTy5euimDKPmBAGVHIBoQA61IqKrzlQd6tmY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Eef66oMlNijMxTN/sWZQ2BSo3nwwMwKA01nIi8Lc3SAXvUNtnvSaW/1JdMC/HmiwprOkkuILJH5fG3MsjE8Y5rVruQMQJ5/5ZQ8XQkbMCKACguf2BZdHuUfFYvEVacI0nTgRfRy7cNCMQM6OjrCXFBQQceFArtjB2iKTvxhx3mU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Q4u5H9UC; arc=pass smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47AC31CA4E
+	for <linux-block@vger.kernel.org>; Wed,  8 Apr 2026 02:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775615027; cv=none; b=kvpqp9HL9SOocKPLxLAehvnvdPF9LQvVGZI9dEJk3NwikZhr3CTVPeo+PfeWkDbYkH8lADprjtV1cKiq2muT+43iDySbmR1Ykhcod5c9I6iEYrMTgeCXOqpxXjfsj8wJPiCai4roD0DmtUaB/agV4eaI+vtwqHnKKVIbjMdlydc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775615027; c=relaxed/simple;
+	bh=WhM1SgeYhuxx+nwWf5gADo0hSuBE89Veyjh8KhNKem8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=is98SFDkaHjZVOJ7qtUWE5yIGIBXcgZIjHX1AHO7hLNicpbqRwNSDazzdl35imkYsB1WWc8qeI0whuW7tC5QMHI8LXetiDbqSeA16aBfvLQcrXn2MN4jkpZ0R6WOyT5UMZK0vXF14rzoyLa4H0SWRKXK1TiT00iVYkppYUXLRgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YdJhZ7Me; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Q4u5H9UC"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7dbd7a1e989so447051a34.1
-        for <linux-block@vger.kernel.org>; Tue, 07 Apr 2026 12:50:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775591427; cv=none;
-        d=google.com; s=arc-20240605;
-        b=jd4B6hr8PHbMi/VmZU3ZXxUmYdo6T1lcAo7JFPhqF90ZnrnKmxlWOip9i8hEVPHCbT
-         PoYkTysZtCnNhY5WBYqlScZAvzGTls4zATQill8NxtYEFEwx2lEckXGQvvJjJirQcUge
-         RMoEcFGgMLDjHuNARPD1iU2v9PHFxC/F5AWVzV80GQ6/hpFMtUXJbcSfSlbIjpjHu99b
-         3LSzabqvK6o1hza4pNHw4MQzqbM7cRRuBRh3sbwlmYACZ4Pf7PWxsoYkH3w3/lySu8qN
-         r/cf5BGvzn+jv35Ii+kjKi7mbZEOxZxUuXsskKPtt3Yrpxl6nAV4gqFGMvX0U6c1CXys
-         BkxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=lN2rqgQtMSakNfu3wzBnaSjEsLx2QLE8HgNct2INBH4=;
-        fh=7wW+3hm5TzNEaChY+Bb2AlJ3Jll+jhxIb52Fykk25aU=;
-        b=Wiu3yNV0andlN5V18AMvnnNJn3TRTOKqi/RiFeJvU/WbbJQkR3h1QLqFreXw6T7Fiz
-         cMYcodqpQWuFhjL15yXCNlr9yhwVJjqhp3dJQyTAjB1TcDjgWyxEHKre2BbKNWNr4fxB
-         6tMe1Y03ImIamuXODf3rqSl7TYkAt1rY6SNntQawINoYfxyKHOtvj8qLFtAIiTGpVGwC
-         HcnFaH9Jlz7TNvOViMIXUeHB5wpo6CtbADfQwIZ/grAqqyJ+7Tnn6qdLKhzE4LIc6Vet
-         UGFkNp8s0l756OH5xzzVH4m9SsABHUjRaTxtnggb1oay/WM4cw6TmtrPf8K4b0QyzCv3
-         TVfg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1775591427; x=1776196227; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lN2rqgQtMSakNfu3wzBnaSjEsLx2QLE8HgNct2INBH4=;
-        b=Q4u5H9UCHCbTVWUA4pfgjoU5NOd73yWABc+hVgcexthXGsMeCdJlUb70k7C5zYkvER
-         B7IRrF/A4JbGJEM0YI3GNWi+xBjjO6fhWJw1lNa8KBHZQkliMmqEmTYtJrcHQ9d/ENTL
-         Xzrj0r6PfD0j1eYnlUQNzfZkQAJhalVU4NzRLgn902TQMyRODqQMTNRD/UCMzPLI88A5
-         U7sRz8yHkjLt7fheIMx3y0lhjLX3BDxAGGoKbXBlmaU8Vptx/w+O4iya4MIFrn1FL3wU
-         qhBFOcJnOLH5c3eBhSqMHheqUUKUtvTst4QheOpIBeyU1bzRR18sluZGslBHTLvIxrf8
-         Hbbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775591427; x=1776196227;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lN2rqgQtMSakNfu3wzBnaSjEsLx2QLE8HgNct2INBH4=;
-        b=lhvfPYCaMgX8QT479iFAQ9bIKSoM0lXBDpIWXUz86CtKouBG/jkZq/JQPw9C6uhADy
-         wx2pIToRst0DXTdR+8tmYKT+/xrmIB1VkOcqY/Krrnqw3l6XOR5a9KfTTCNWq/zBQJeg
-         0qameMKYeuZS90ZUquHRPkqAKi0lk8rf6Tsxz3Pi0JZwdhpt18RBbNbseobSpFm6d4x6
-         eW3dOsVDMPia1qBY+EOmyJ1n9leiM/4k+0R2LxiCV0pfyv4nADzGWmGCMYWpVFBU7Pez
-         PGoatYb57G6jS7A4fLtl60lL/f5B4NQa50WuS1c5aiHzQBhqW9A3093zbePGieeIeH9+
-         xfew==
-X-Forwarded-Encrypted: i=1; AJvYcCUliQxxkP4Hbm5Db0q839favy8lp7utQMChmAEArfGqfk4hNc1Isp6qJzisXAib7wAtterfQZynu2FA+w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzD1+x8QoisI/sJBN1PA0y+sw1hSzHSVaxOLIS5WfeS8rrsM/lR
-	ZwAc+LOhPINBuQbEHgKbI5T0sVuwLby2SPjPwjBz5q8ORtiasFDcFwZTqLSrxwlXWEfGlUQeC8H
-	zWXomJWGC5CJ07Ns9w1t5t+XB+bmRDYoMz5+D7bxStQ==
-X-Gm-Gg: AeBDieuJgKepwXg5+gCljlcgQqdJ1JmdzyzYWZtDcbv1F4IBywbSRDzJNeHNEQ3+qen
-	rXZ3ScDpfmrkaCoAecwbOXcwD9Zleb9P5dK+MyvC44/dSgoxPvGOoawowpxpVmwKV+hHKuJlJr2
-	bNbQcPVPTn23KD8ROXBdP6bJB5nUSQqngNYKOufShJJicwA8W/vw1usVmwsrjYVtXITmVs2tybE
-	4uJsvAO/cLJ9ndX/S/hMRPQaAkOEGOup3x+q5rq1HzyQyJFzNyho8cHagrgOeEyhEvRQgQ//ar7
-	xes2jLBm
-X-Received: by 2002:a05:6830:2549:b0:7d9:3895:563 with SMTP id
- 46e09a7af769-7dc0484a82cmr689720a34.7.1775591426812; Tue, 07 Apr 2026
- 12:50:26 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YdJhZ7Me"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775615023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ibjzmhxr7c3+YHTtfR3GQI23YLqZ2lzSYQgVgN0SQrY=;
+	b=YdJhZ7Me4pMQzKrHVPwHw0nQD7z++K32XBWc3Hdfgx7ODo+WZCSX1RyVSk3yovOuYWEEIk
+	+hSX8P8Q6s9ycGezcxSgurERqnPnPFbAjXMoOiJaYQW6oUVbyEuyfXvGe/ilTrxcXc8zku
+	292fXv3+pSkNoNWpzeC3GePCRywBRI0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-586-fsf05wEDN1OSvMaWVBGItg-1; Tue,
+ 07 Apr 2026 22:23:41 -0400
+X-MC-Unique: fsf05wEDN1OSvMaWVBGItg-1
+X-Mimecast-MFC-AGG-ID: fsf05wEDN1OSvMaWVBGItg_1775615020
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB2C7180047F;
+	Wed,  8 Apr 2026 02:23:39 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.2])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17078180035F;
+	Wed,  8 Apr 2026 02:23:36 +0000 (UTC)
+Date: Wed, 8 Apr 2026 10:23:31 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 01/10] ublk: add UBLK_U_CMD_REG_BUF/UNREG_BUF control
+ commands
+Message-ID: <adW8I8RpSD471iFy@fedora>
+References: <20260331153207.3635125-1-ming.lei@redhat.com>
+ <20260331153207.3635125-2-ming.lei@redhat.com>
+ <CADUfDZpUbses5NNR19M+81ZwDxSAb6ktz0+2f9GfkOL8yzEh+w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331153207.3635125-1-ming.lei@redhat.com> <20260331153207.3635125-5-ming.lei@redhat.com>
-In-Reply-To: <20260331153207.3635125-5-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 7 Apr 2026 12:50:15 -0700
-X-Gm-Features: AQROBzCjGo6ygNQNj4o8xYTjp_BB0S2BvZuW51WJ_O5Uif_DOKsfgcKfigkwveQ
-Message-ID: <CADUfDZow_gmwzQk41kn=Hw4w4bhsF9ogm2ZPGNgRuz9d5aF_kQ@mail.gmail.com>
-Subject: Re: [PATCH v2 04/10] ublk: eliminate permanent pages[] array from
- struct ublk_buf
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZpUbses5NNR19M+81ZwDxSAb6ktz0+2f9GfkOL8yzEh+w@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Mar 31, 2026 at 8:32=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> The pages[] array (kvmalloc'd, 8 bytes per page =3D 2MB for a 1GB buffer)
-> was stored permanently in struct ublk_buf but only needed during
-> pin_user_pages_fast() and maple tree construction. Since the maple tree
-> already stores PFN ranges via ublk_buf_range, struct page pointers can
-> be recovered via pfn_to_page() during unregistration.
->
-> Make pages[] a temporary allocation in ublk_ctrl_reg_buf(), freed
-> immediately after the maple tree is built. Rewrite __ublk_ctrl_unreg_buf(=
-)
-> to iterate the maple tree for matching buf_index entries, recovering
-> struct page pointers via pfn_to_page() and unpinning in batches of 32.
-> Simplify ublk_buf_erase_ranges() to iterate the maple tree by buf_index
-> instead of walking the now-removed pages[] array.
->
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c | 87 +++++++++++++++++++++++++---------------
->  1 file changed, 55 insertions(+), 32 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index c2b9992503a4..2e475bdc54dd 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -296,7 +296,6 @@ struct ublk_queue {
->
->  /* Per-registered shared memory buffer */
->  struct ublk_buf {
-> -       struct page **pages;
->         unsigned int nr_pages;
->  };
+On Tue, Apr 07, 2026 at 12:35:49PM -0700, Caleb Sander Mateos wrote:
+> On Tue, Mar 31, 2026 at 8:32 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Add control commands for registering and unregistering shared memory
+> > buffers for zero-copy I/O:
+> >
+> > - UBLK_U_CMD_REG_BUF (0x18): pins pages from userspace, inserts PFN
+> >   ranges into a per-device maple tree for O(log n) lookup during I/O.
+> >   Buffer pointers are tracked in a per-device xarray. Returns the
+> >   assigned buffer index.
+> >
+> > - UBLK_U_CMD_UNREG_BUF (0x19): removes PFN entries and unpins pages.
+> >
+> > Queue freeze/unfreeze is handled internally so userspace need not
+> > quiesce the device during registration.
+> >
+> > Also adds:
+> > - UBLK_IO_F_SHMEM_ZC flag and addr encoding helpers in UAPI header
+> >   (16-bit buffer index supporting up to 65536 buffers)
+> > - Data structures (ublk_buf, ublk_buf_range) and xarray/maple tree
+> > - __ublk_ctrl_reg_buf() helper for PFN insertion with error unwinding
+> > - __ublk_ctrl_unreg_buf() helper for cleanup reuse
+> > - ublk_support_shmem_zc() / ublk_dev_support_shmem_zc() stubs
+> >   (returning false — feature not enabled yet)
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c      | 300 ++++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/ublk_cmd.h |  72 ++++++++
+> >  2 files changed, 372 insertions(+)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 71c7c56b38ca..ac6ccc174d44 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -46,6 +46,8 @@
+> >  #include <linux/kref.h>
+> >  #include <linux/kfifo.h>
+> >  #include <linux/blk-integrity.h>
+> > +#include <linux/maple_tree.h>
+> > +#include <linux/xarray.h>
+> >  #include <uapi/linux/fs.h>
+> >  #include <uapi/linux/ublk_cmd.h>
+> >
+> > @@ -58,6 +60,8 @@
+> >  #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
+> >  #define UBLK_CMD_QUIESCE_DEV   _IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
+> >  #define UBLK_CMD_TRY_STOP_DEV  _IOC_NR(UBLK_U_CMD_TRY_STOP_DEV)
+> > +#define UBLK_CMD_REG_BUF       _IOC_NR(UBLK_U_CMD_REG_BUF)
+> > +#define UBLK_CMD_UNREG_BUF     _IOC_NR(UBLK_U_CMD_UNREG_BUF)
+> >
+> >  #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
+> >  #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
+> > @@ -289,6 +293,20 @@ struct ublk_queue {
+> >         struct ublk_io ios[] __counted_by(q_depth);
+> >  };
+> >
+> > +/* Per-registered shared memory buffer */
+> > +struct ublk_buf {
+> > +       struct page **pages;
+> > +       unsigned int nr_pages;
+> > +};
+> > +
+> > +/* Maple tree value: maps a PFN range to buffer location */
+> > +struct ublk_buf_range {
+> > +       unsigned long base_pfn;
+> > +       unsigned short buf_index;
+> > +       unsigned short flags;
+> > +       unsigned int base_offset;       /* byte offset within buffer */
+> > +};
+> > +
+> >  struct ublk_device {
+> >         struct gendisk          *ub_disk;
+> >
+> > @@ -323,6 +341,10 @@ struct ublk_device {
+> >
+> >         bool                    block_open; /* protected by open_mutex */
+> >
+> > +       /* shared memory zero copy */
+> > +       struct maple_tree       buf_tree;
+> > +       struct xarray           bufs_xa;
+> > +
+> >         struct ublk_queue       *queues[];
+> >  };
+> >
+> > @@ -334,6 +356,7 @@ struct ublk_params_header {
+> >
+> >  static void ublk_io_release(void *priv);
+> >  static void ublk_stop_dev_unlocked(struct ublk_device *ub);
+> > +static void ublk_buf_cleanup(struct ublk_device *ub);
+> >  static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq);
+> >  static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+> >                 u16 q_id, u16 tag, struct ublk_io *io);
+> > @@ -398,6 +421,16 @@ static inline bool ublk_dev_support_zero_copy(const struct ublk_device *ub)
+> >         return ub->dev_info.flags & UBLK_F_SUPPORT_ZERO_COPY;
+> >  }
+> >
+> > +static inline bool ublk_support_shmem_zc(const struct ublk_queue *ubq)
+> > +{
+> > +       return false;
+> > +}
+> > +
+> > +static inline bool ublk_dev_support_shmem_zc(const struct ublk_device *ub)
+> > +{
+> > +       return false;
+> > +}
+> > +
+> >  static inline bool ublk_support_auto_buf_reg(const struct ublk_queue *ubq)
+> >  {
+> >         return ubq->flags & UBLK_F_AUTO_BUF_REG;
+> > @@ -1460,6 +1493,7 @@ static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
+> >         iod->op_flags = ublk_op | ublk_req_build_flags(req);
+> >         iod->nr_sectors = blk_rq_sectors(req);
+> >         iod->start_sector = blk_rq_pos(req);
+> > +
+> 
+> nit: unrelated whitespace change?
+> 
+> >         iod->addr = io->buf.addr;
+> >
+> >         return BLK_STS_OK;
+> > @@ -1665,6 +1699,7 @@ static bool ublk_start_io(const struct ublk_queue *ubq, struct request *req,
+> >  {
+> >         unsigned mapped_bytes = ublk_map_io(ubq, req, io);
+> >
+> > +
+> 
+> nit: unrelated whitespace change?
+> 
+> >         /* partially mapped, update io descriptor */
+> >         if (unlikely(mapped_bytes != blk_rq_bytes(req))) {
+> >                 /*
+> > @@ -4206,6 +4241,7 @@ static void ublk_cdev_rel(struct device *dev)
+> >  {
+> >         struct ublk_device *ub = container_of(dev, struct ublk_device, cdev_dev);
+> >
+> > +       ublk_buf_cleanup(ub);
+> >         blk_mq_free_tag_set(&ub->tag_set);
+> >         ublk_deinit_queues(ub);
+> >         ublk_free_dev_number(ub);
+> > @@ -4625,6 +4661,8 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+> >         mutex_init(&ub->mutex);
+> >         spin_lock_init(&ub->lock);
+> >         mutex_init(&ub->cancel_mutex);
+> > +       mt_init(&ub->buf_tree);
+> > +       xa_init_flags(&ub->bufs_xa, XA_FLAGS_ALLOC);
+> >         INIT_WORK(&ub->partition_scan_work, ublk_partition_scan_work);
+> >
+> >         ret = ublk_alloc_dev_number(ub, header->dev_id);
+> > @@ -5168,6 +5206,260 @@ static int ublk_char_dev_permission(struct ublk_device *ub,
+> >         return err;
+> >  }
+> >
+> > +/*
+> > + * Drain inflight I/O and quiesce the queue. Freeze drains all inflight
+> > + * requests, quiesce_nowait marks the queue so no new requests dispatch,
+> > + * then unfreeze allows new submissions (which won't dispatch due to
+> > + * quiesce). This keeps freeze and ub->mutex non-nested.
+> > + */
+> > +static void ublk_quiesce_and_release(struct gendisk *disk)
+> > +{
+> > +       unsigned int memflags;
+> > +
+> > +       memflags = blk_mq_freeze_queue(disk->queue);
+> > +       blk_mq_quiesce_queue_nowait(disk->queue);
+> > +       blk_mq_unfreeze_queue(disk->queue, memflags);
+> > +}
+> > +
+> > +static void ublk_unquiesce_and_resume(struct gendisk *disk)
+> > +{
+> > +       blk_mq_unquiesce_queue(disk->queue);
+> > +}
+> > +
+> > +/*
+> > + * Insert PFN ranges of a registered buffer into the maple tree,
+> > + * coalescing consecutive PFNs into single range entries.
+> > + * Returns 0 on success, negative error with partial insertions unwound.
+> > + */
+> > +/* Erase coalesced PFN ranges from the maple tree for pages [0, nr_pages) */
+> > +static void ublk_buf_erase_ranges(struct ublk_device *ub,
+> > +                                 struct ublk_buf *ubuf,
+> > +                                 unsigned long nr_pages)
+> > +{
+> > +       unsigned long i;
+> > +
+> > +       for (i = 0; i < nr_pages; ) {
+> > +               unsigned long pfn = page_to_pfn(ubuf->pages[i]);
+> > +               unsigned long start = i;
+> > +
+> > +               while (i + 1 < nr_pages &&
+> > +                      page_to_pfn(ubuf->pages[i + 1]) == pfn + (i - start) + 1)
+> > +                       i++;
+> > +               i++;
+> > +               kfree(mtree_erase(&ub->buf_tree, pfn));
+> > +       }
+> > +}
+> > +
+> > +static int __ublk_ctrl_reg_buf(struct ublk_device *ub,
+> > +                              struct ublk_buf *ubuf, int index,
+> > +                              unsigned short flags)
+> > +{
+> > +       unsigned long nr_pages = ubuf->nr_pages;
+> > +       unsigned long i;
+> > +       int ret;
+> > +
+> > +       for (i = 0; i < nr_pages; ) {
+> > +               unsigned long pfn = page_to_pfn(ubuf->pages[i]);
+> > +               unsigned long start = i;
+> > +               struct ublk_buf_range *range;
+> > +
+> > +               /* Find run of consecutive PFNs */
+> > +               while (i + 1 < nr_pages &&
+> > +                      page_to_pfn(ubuf->pages[i + 1]) == pfn + (i - start) + 1)
+> > +                       i++;
+> > +               i++;    /* past the last page in this run */
+> 
+> Move this increment to the for loop so you don't need the "- 1" in the
+> mtree_insert_range() call?
 
-It looks like nr_pages doesn't need to be stored either, it could just
-be passed to __ublk_ctrl_reg_buf(). Then I think we could get rid of
-struct ublk_buf and the xarray entirely. We really just need a bitmap
-for allocating buffer indices.
+Good catch!
 
->
-> @@ -5261,27 +5260,25 @@ static void ublk_unquiesce_and_resume(struct gend=
-isk *disk)
->   * coalescing consecutive PFNs into single range entries.
->   * Returns 0 on success, negative error with partial insertions unwound.
->   */
-> -/* Erase coalesced PFN ranges from the maple tree for pages [0, nr_pages=
-) */
-> -static void ublk_buf_erase_ranges(struct ublk_device *ub,
-> -                                 struct ublk_buf *ubuf,
-> -                                 unsigned long nr_pages)
-> +/* Erase coalesced PFN ranges from the maple tree matching buf_index */
-> +static void ublk_buf_erase_ranges(struct ublk_device *ub, int buf_index)
->  {
-> -       unsigned long i;
-> -
-> -       for (i =3D 0; i < nr_pages; ) {
-> -               unsigned long pfn =3D page_to_pfn(ubuf->pages[i]);
-> -               unsigned long start =3D i;
-> +       MA_STATE(mas, &ub->buf_tree, 0, ULONG_MAX);
-> +       struct ublk_buf_range *range;
->
-> -               while (i + 1 < nr_pages &&
-> -                      page_to_pfn(ubuf->pages[i + 1]) =3D=3D pfn + (i - =
-start) + 1)
-> -                       i++;
-> -               i++;
-> -               kfree(mtree_erase(&ub->buf_tree, pfn));
-> +       mas_lock(&mas);
-> +       mas_for_each(&mas, range, ULONG_MAX) {
-> +               if (range->buf_index =3D=3D buf_index) {
-> +                       mas_erase(&mas);
-> +                       kfree(range);
-> +               }
->         }
-> +       mas_unlock(&mas);
->  }
->
->  static int __ublk_ctrl_reg_buf(struct ublk_device *ub,
-> -                              struct ublk_buf *ubuf, int index,
-> +                              struct ublk_buf *ubuf,
-> +                              struct page **pages, int index,
->                                unsigned short flags)
->  {
->         unsigned long nr_pages =3D ubuf->nr_pages;
-> @@ -5289,13 +5286,13 @@ static int __ublk_ctrl_reg_buf(struct ublk_device=
- *ub,
->         int ret;
->
->         for (i =3D 0; i < nr_pages; ) {
-> -               unsigned long pfn =3D page_to_pfn(ubuf->pages[i]);
-> +               unsigned long pfn =3D page_to_pfn(pages[i]);
->                 unsigned long start =3D i;
->                 struct ublk_buf_range *range;
->
->                 /* Find run of consecutive PFNs */
->                 while (i + 1 < nr_pages &&
-> -                      page_to_pfn(ubuf->pages[i + 1]) =3D=3D pfn + (i - =
-start) + 1)
-> +                      page_to_pfn(pages[i + 1]) =3D=3D pfn + (i - start)=
- + 1)
->                         i++;
->                 i++;    /* past the last page in this run */
->
-> @@ -5320,7 +5317,7 @@ static int __ublk_ctrl_reg_buf(struct ublk_device *=
-ub,
->         return 0;
->
->  unwind:
-> -       ublk_buf_erase_ranges(ub, ubuf, i);
-> +       ublk_buf_erase_ranges(ub, index);
->         return ret;
->  }
->
-> @@ -5335,6 +5332,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub=
-,
->         void __user *argp =3D (void __user *)(unsigned long)header->addr;
->         struct ublk_shmem_buf_reg buf_reg;
->         unsigned long addr, size, nr_pages;
-> +       struct page **pages =3D NULL;
->         unsigned int gup_flags;
->         struct gendisk *disk;
->         struct ublk_buf *ubuf;
-> @@ -5371,9 +5369,8 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub=
-,
->                 goto put_disk;
->         }
->
-> -       ubuf->pages =3D kvmalloc_array(nr_pages, sizeof(*ubuf->pages),
-> -                                    GFP_KERNEL);
-> -       if (!ubuf->pages) {
-> +       pages =3D kvmalloc_array(nr_pages, sizeof(*pages), GFP_KERNEL);
-> +       if (!pages) {
->                 ret =3D -ENOMEM;
->                 goto err_free;
->         }
-> @@ -5382,7 +5379,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub=
-,
->         if (!(buf_reg.flags & UBLK_SHMEM_BUF_READ_ONLY))
->                 gup_flags |=3D FOLL_WRITE;
->
-> -       pinned =3D pin_user_pages_fast(addr, nr_pages, gup_flags, ubuf->p=
-ages);
-> +       pinned =3D pin_user_pages_fast(addr, nr_pages, gup_flags, pages);
->         if (pinned < 0) {
->                 ret =3D pinned;
->                 goto err_free_pages;
-> @@ -5406,7 +5403,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub=
-,
->         if (ret)
->                 goto err_unlock;
->
-> -       ret =3D __ublk_ctrl_reg_buf(ub, ubuf, index, buf_reg.flags);
-> +       ret =3D __ublk_ctrl_reg_buf(ub, ubuf, pages, index, buf_reg.flags=
-);
->         if (ret) {
->                 xa_erase(&ub->bufs_xa, index);
->                 goto err_unlock;
-> @@ -5414,6 +5411,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub=
-,
->
->         mutex_unlock(&ub->mutex);
->
-> +       kvfree(pages);
->         ublk_unquiesce_and_resume(disk);
->         ublk_put_disk(disk);
->         return index;
-> @@ -5422,9 +5420,9 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub=
-,
->         mutex_unlock(&ub->mutex);
->         ublk_unquiesce_and_resume(disk);
->  err_unpin:
-> -       unpin_user_pages(ubuf->pages, pinned);
-> +       unpin_user_pages(pages, pinned);
->  err_free_pages:
-> -       kvfree(ubuf->pages);
-> +       kvfree(pages);
->  err_free:
->         kfree(ubuf);
->  put_disk:
-> @@ -5433,11 +5431,36 @@ static int ublk_ctrl_reg_buf(struct ublk_device *=
-ub,
->  }
->
->  static void __ublk_ctrl_unreg_buf(struct ublk_device *ub,
-> -                                 struct ublk_buf *ubuf)
-> +                                 struct ublk_buf *ubuf, int buf_index)
+> 
+> > +
+> > +               range = kzalloc(sizeof(*range), GFP_KERNEL);
+> 
+> Not sure kzalloc() is necessary; all the fields are initialized below
 
-ubuf is only passed to kfree() now, maybe it would make sense to move
-that to the caller so the argument can be dropped?
+Yeah, kmalloc() is fine, and we shouldn't add more fields to `range` in
+future.
 
-Best,
-Caleb
+> 
+> > +               if (!range) {
+> > +                       ret = -ENOMEM;
+> > +                       goto unwind;
+> > +               }
+> > +               range->buf_index = index;
+> > +               range->flags = flags;
+> > +               range->base_pfn = pfn;
+> > +               range->base_offset = start << PAGE_SHIFT;
+> > +
+> > +               ret = mtree_insert_range(&ub->buf_tree, pfn,
+> > +                                        pfn + (i - start) - 1,
+> > +                                        range, GFP_KERNEL);
+> > +               if (ret) {
+> > +                       kfree(range);
+> > +                       goto unwind;
+> > +               }
+> > +       }
+> > +       return 0;
+> > +
+> > +unwind:
+> > +       ublk_buf_erase_ranges(ub, ubuf, i);
+> > +       return ret;
+> > +}
+> > +
+> > +/*
+> > + * Register a shared memory buffer for zero-copy I/O.
+> > + * Pins pages, builds PFN maple tree, freezes/unfreezes the queue
+> > + * internally. Returns buffer index (>= 0) on success.
+> > + */
+> > +static int ublk_ctrl_reg_buf(struct ublk_device *ub,
+> > +                            struct ublksrv_ctrl_cmd *header)
+> > +{
+> > +       void __user *argp = (void __user *)(unsigned long)header->addr;
+> > +       struct ublk_shmem_buf_reg buf_reg;
+> > +       unsigned long addr, size, nr_pages;
+> 
+> size and nr_pages could be u32
 
->  {
-> -       ublk_buf_erase_ranges(ub, ubuf, ubuf->nr_pages);
-> -       unpin_user_pages(ubuf->pages, ubuf->nr_pages);
-> -       kvfree(ubuf->pages);
-> +       MA_STATE(mas, &ub->buf_tree, 0, ULONG_MAX);
-> +       struct ublk_buf_range *range;
-> +       struct page *pages[32];
-> +
-> +       mas_lock(&mas);
-> +       mas_for_each(&mas, range, ULONG_MAX) {
-> +               unsigned long base, nr, off;
-> +
-> +               if (range->buf_index !=3D buf_index)
-> +                       continue;
-> +
-> +               base =3D range->base_pfn;
-> +               nr =3D mas.last - mas.index + 1;
-> +               mas_erase(&mas);
-> +
-> +               for (off =3D 0; off < nr; ) {
-> +                       unsigned int batch =3D min_t(unsigned long,
-> +                                                  nr - off, 32);
-> +                       unsigned int j;
-> +
-> +                       for (j =3D 0; j < batch; j++)
-> +                               pages[j] =3D pfn_to_page(base + off + j);
-> +                       unpin_user_pages(pages, batch);
-> +                       off +=3D batch;
-> +               }
-> +               kfree(range);
-> +       }
-> +       mas_unlock(&mas);
->         kfree(ubuf);
->  }
->
-> @@ -5468,7 +5491,7 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *=
-ub,
->                 return -ENOENT;
->         }
->
-> -       __ublk_ctrl_unreg_buf(ub, ubuf);
-> +       __ublk_ctrl_unreg_buf(ub, ubuf, index);
->
->         mutex_unlock(&ub->mutex);
->
-> @@ -5483,7 +5506,7 @@ static void ublk_buf_cleanup(struct ublk_device *ub=
-)
->         unsigned long index;
->
->         xa_for_each(&ub->bufs_xa, index, ubuf)
-> -               __ublk_ctrl_unreg_buf(ub, ubuf);
-> +               __ublk_ctrl_unreg_buf(ub, ubuf, index);
->         xa_destroy(&ub->bufs_xa);
->         mtree_destroy(&ub->buf_tree);
->  }
-> --
-> 2.53.0
->
+Yeah, it was caused by internal change on `ublk_shmem_buf_reg`.
+
+> 
+> > +       unsigned int gup_flags;
+> > +       struct gendisk *disk;
+> > +       struct ublk_buf *ubuf;
+> > +       long pinned;
+> 
+> pinned could be int to match the return type of pin_user_pages_fast()
+
+OK.
+
+> 
+> > +       u32 index;
+> > +       int ret;
+> > +
+> > +       if (!ublk_dev_support_shmem_zc(ub))
+> > +               return -EOPNOTSUPP;
+> > +
+> > +       memset(&buf_reg, 0, sizeof(buf_reg));
+> > +       if (copy_from_user(&buf_reg, argp,
+> > +                          min_t(size_t, header->len, sizeof(buf_reg))))
+> > +               return -EFAULT;
+> > +
+> > +       if (buf_reg.flags & ~UBLK_SHMEM_BUF_READ_ONLY)
+> > +               return -EINVAL;
+> > +
+> > +       addr = buf_reg.addr;
+> > +       size = buf_reg.len;
+> 
+> nit: don't see much value in these additional variables that are just
+> copies of buf_reg fields
+> 
+> > +       nr_pages = size >> PAGE_SHIFT;
+> > +
+> > +       if (!size || !PAGE_ALIGNED(size) || !PAGE_ALIGNED(addr))
+> > +               return -EINVAL;
+> > +
+> > +       disk = ublk_get_disk(ub);
+> > +       if (!disk)
+> > +               return -ENODEV;
+> 
+> So buffers can't be registered before the ublk device is started? Is
+> there a reason why that's not possible? Could we just make the
+> ublk_quiesce_and_release() and ublk_unquiesce_and_resume() conditional
+> on disk being non-NULL? I guess we'd have to hold the ublk_device
+> mutex before calling ublk_get_disk() to prevent it from being assigned
+> concurrently.
+
+Here `disk` is used for freeze & quiesce queue.
+
+But the implementation can be a bit more complicated given the dependency
+between ub->mutex and freeze queue should be avoided.
+
+Anyway, it is one nice requirement, I will try to relax the constraint.
+
+> 
+> > +
+> > +       /* Pin pages before quiescing (may sleep) */
+> > +       ubuf = kzalloc(sizeof(*ubuf), GFP_KERNEL);
+> > +       if (!ubuf) {
+> > +               ret = -ENOMEM;
+> > +               goto put_disk;
+> > +       }
+> > +
+> > +       ubuf->pages = kvmalloc_array(nr_pages, sizeof(*ubuf->pages),
+> > +                                    GFP_KERNEL);
+> > +       if (!ubuf->pages) {
+> > +               ret = -ENOMEM;
+> > +               goto err_free;
+> > +       }
+> > +
+> > +       gup_flags = FOLL_LONGTERM;
+> > +       if (!(buf_reg.flags & UBLK_SHMEM_BUF_READ_ONLY))
+> > +               gup_flags |= FOLL_WRITE;
+> > +
+> > +       pinned = pin_user_pages_fast(addr, nr_pages, gup_flags, ubuf->pages);
+> > +       if (pinned < 0) {
+> > +               ret = pinned;
+> > +               goto err_free_pages;
+> > +       }
+> > +       if (pinned != nr_pages) {
+> > +               ret = -EFAULT;
+> > +               goto err_unpin;
+> > +       }
+> > +       ubuf->nr_pages = nr_pages;
+> > +
+> > +       /*
+> > +        * Drain inflight I/O and quiesce the queue so no new requests
+> > +        * are dispatched while we modify the maple tree. Keep freeze
+> > +        * and mutex non-nested to avoid lock dependency.
+> > +        */
+> > +       ublk_quiesce_and_release(disk);
+> > +
+> > +       mutex_lock(&ub->mutex);
+> 
+> Looks like the xarray and maple tree do their own spinlocking, is this needed?
+
+Right, looks it isn't needed now, and it was added from beginning with plain
+array.
+
+> 
+> > +
+> > +       ret = xa_alloc(&ub->bufs_xa, &index, ubuf, xa_limit_16b, GFP_KERNEL);
+> > +       if (ret)
+> > +               goto err_unlock;
+> > +
+> > +       ret = __ublk_ctrl_reg_buf(ub, ubuf, index, buf_reg.flags);
+> > +       if (ret) {
+> > +               xa_erase(&ub->bufs_xa, index);
+> > +               goto err_unlock;
+> > +       }
+> > +
+> > +       mutex_unlock(&ub->mutex);
+> > +
+> > +       ublk_unquiesce_and_resume(disk);
+> > +       ublk_put_disk(disk);
+> > +       return index;
+> > +
+> > +err_unlock:
+> > +       mutex_unlock(&ub->mutex);
+> > +       ublk_unquiesce_and_resume(disk);
+> > +err_unpin:
+> > +       unpin_user_pages(ubuf->pages, pinned);
+> > +err_free_pages:
+> > +       kvfree(ubuf->pages);
+> > +err_free:
+> > +       kfree(ubuf);
+> > +put_disk:
+> > +       ublk_put_disk(disk);
+> > +       return ret;
+> > +}
+> > +
+> > +static void __ublk_ctrl_unreg_buf(struct ublk_device *ub,
+> > +                                 struct ublk_buf *ubuf)
+> > +{
+> > +       ublk_buf_erase_ranges(ub, ubuf, ubuf->nr_pages);
+> > +       unpin_user_pages(ubuf->pages, ubuf->nr_pages);
+> > +       kvfree(ubuf->pages);
+> > +       kfree(ubuf);
+> > +}
+> > +
+> > +static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
+> > +                              struct ublksrv_ctrl_cmd *header)
+> > +{
+> > +       int index = (int)header->data[0];
+> > +       struct gendisk *disk;
+> > +       struct ublk_buf *ubuf;
+> > +
+> > +       if (!ublk_dev_support_shmem_zc(ub))
+> > +               return -EOPNOTSUPP;
+> > +
+> > +       disk = ublk_get_disk(ub);
+> > +       if (!disk)
+> > +               return -ENODEV;
+> > +
+> > +       /* Drain inflight I/O before modifying the maple tree */
+> > +       ublk_quiesce_and_release(disk);
+> > +
+> > +       mutex_lock(&ub->mutex);
+> > +
+> > +       ubuf = xa_erase(&ub->bufs_xa, index);
+> > +       if (!ubuf) {
+> > +               mutex_unlock(&ub->mutex);
+> > +               ublk_unquiesce_and_resume(disk);
+> > +               ublk_put_disk(disk);
+> > +               return -ENOENT;
+> > +       }
+> > +
+> > +       __ublk_ctrl_unreg_buf(ub, ubuf);
+> > +
+> > +       mutex_unlock(&ub->mutex);
+> > +
+> > +       ublk_unquiesce_and_resume(disk);
+> > +       ublk_put_disk(disk);
+> > +       return 0;
+> > +}
+> > +
+> > +static void ublk_buf_cleanup(struct ublk_device *ub)
+> > +{
+> > +       struct ublk_buf *ubuf;
+> > +       unsigned long index;
+> > +
+> > +       xa_for_each(&ub->bufs_xa, index, ubuf)
+> > +               __ublk_ctrl_unreg_buf(ub, ubuf);
+> 
+> This looks quadratic in the number of registered buffers. Can we do a
+> single pass over the xarray  and the maple tree?
+
+It can be done two passes: first pass walks maple tree for unpinning
+pages, the 2nd pass is for freeing buffers in xarray, which looks more
+clean.
+
+But the current way can reuse __ublk_ctrl_unreg_buf(), also
+ublk_buf_cleanup() is only called one-shot in device release handler, so we can
+leave it for future optimization.
+
+> 
+> > +       xa_destroy(&ub->bufs_xa);
+> > +       mtree_destroy(&ub->buf_tree);
+> > +}
+> > +
+> > +
+> > +
+> >  static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+> >                 u32 cmd_op, struct ublksrv_ctrl_cmd *header)
+> >  {
+> > @@ -5225,6 +5517,8 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+> >         case UBLK_CMD_UPDATE_SIZE:
+> >         case UBLK_CMD_QUIESCE_DEV:
+> >         case UBLK_CMD_TRY_STOP_DEV:
+> > +       case UBLK_CMD_REG_BUF:
+> > +       case UBLK_CMD_UNREG_BUF:
+> >                 mask = MAY_READ | MAY_WRITE;
+> >                 break;
+> >         default:
+> > @@ -5350,6 +5644,12 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+> >         case UBLK_CMD_TRY_STOP_DEV:
+> >                 ret = ublk_ctrl_try_stop_dev(ub);
+> >                 break;
+> > +       case UBLK_CMD_REG_BUF:
+> > +               ret = ublk_ctrl_reg_buf(ub, &header);
+> > +               break;
+> > +       case UBLK_CMD_UNREG_BUF:
+> > +               ret = ublk_ctrl_unreg_buf(ub, &header);
+> > +               break;
+> >         default:
+> >                 ret = -EOPNOTSUPP;
+> >                 break;
+> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> > index a88876756805..52bb9b843d73 100644
+> > --- a/include/uapi/linux/ublk_cmd.h
+> > +++ b/include/uapi/linux/ublk_cmd.h
+> > @@ -57,6 +57,44 @@
+> >         _IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
+> >  #define UBLK_U_CMD_TRY_STOP_DEV                \
+> >         _IOWR('u', 0x17, struct ublksrv_ctrl_cmd)
+> > +/*
+> > + * Register a shared memory buffer for zero-copy I/O.
+> > + * Input:  ctrl_cmd.addr points to struct ublk_buf_reg (buffer VA + size)
+> > + *         ctrl_cmd.len  = sizeof(struct ublk_buf_reg)
+> > + * Result: >= 0 is the assigned buffer index, < 0 is error
+> > + *
+> > + * The kernel pins pages from the calling process's address space
+> > + * and inserts PFN ranges into a per-device maple tree. When a block
+> > + * request's pages match registered pages, the driver sets
+> > + * UBLK_IO_F_SHMEM_ZC and encodes the buffer index + offset in addr,
+> > + * allowing the server to access the data via its own mapping of the
+> > + * same shared memory — true zero copy.
+> > + *
+> > + * The memory can be backed by memfd, hugetlbfs, or any GUP-compatible
+> > + * shared mapping. Queue freeze is handled internally.
+> > + *
+> > + * The buffer VA and size are passed via a user buffer (not inline in
+> > + * ctrl_cmd) so that unprivileged devices can prepend the device path
+> > + * to ctrl_cmd.addr without corrupting the VA.
+> > + */
+> > +#define UBLK_U_CMD_REG_BUF             \
+> > +       _IOWR('u', 0x18, struct ublksrv_ctrl_cmd)
+> > +/*
+> > + * Unregister a shared memory buffer.
+> > + * Input:  ctrl_cmd.data[0] = buffer index
+> > + */
+> > +#define UBLK_U_CMD_UNREG_BUF           \
+> > +       _IOWR('u', 0x19, struct ublksrv_ctrl_cmd)
+> > +
+> > +/* Parameter buffer for UBLK_U_CMD_REG_BUF, pointed to by ctrl_cmd.addr */
+> > +struct ublk_shmem_buf_reg {
+> > +       __u64   addr;   /* userspace virtual address of shared memory */
+> > +       __u32   len;    /* buffer size in bytes (page-aligned, max 4GB) */
+> > +       __u32   flags;
+> > +};
+> > +
+> > +/* Pin pages without FOLL_WRITE; usable with write-sealed memfd */
+> > +#define UBLK_SHMEM_BUF_READ_ONLY       (1U << 0)
+> >  /*
+> >   * 64bits are enough now, and it should be easy to extend in case of
+> >   * running out of feature flags
+> > @@ -370,6 +408,7 @@
+> >  /* Disable automatic partition scanning when device is started */
+> >  #define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
+> >
+> > +
+> >  /* device state */
+> >  #define UBLK_S_DEV_DEAD        0
+> >  #define UBLK_S_DEV_LIVE        1
+> > @@ -469,6 +508,12 @@ struct ublksrv_ctrl_dev_info {
+> >  #define                UBLK_IO_F_NEED_REG_BUF          (1U << 17)
+> >  /* Request has an integrity data buffer */
+> >  #define                UBLK_IO_F_INTEGRITY             (1UL << 18)
+> > +/*
+> > + * I/O buffer is in a registered shared memory buffer. When set, the addr
+> > + * field in ublksrv_io_desc encodes buffer index and byte offset instead
+> > + * of a userspace virtual address.
+> > + */
+> > +#define                UBLK_IO_F_SHMEM_ZC              (1U << 19)
+> >
+> >  /*
+> >   * io cmd is described by this structure, and stored in share memory, indexed
+> > @@ -743,4 +788,31 @@ struct ublk_params {
+> >         struct ublk_param_integrity     integrity;
+> >  };
+> >
+> > +/*
+> > + * Shared memory zero-copy addr encoding for UBLK_IO_F_SHMEM_ZC.
+> > + *
+> > + * When UBLK_IO_F_SHMEM_ZC is set, ublksrv_io_desc.addr is encoded as:
+> > + *   bits [0:31]  = byte offset within the buffer (up to 4GB)
+> > + *   bits [32:47] = buffer index (up to 65536)
+> > + *   bits [48:63] = reserved (must be zero)
+> 
+> I wonder whether the "buffer index" is necessary. Can iod->addr and
+> UBLK_U_CMD_UNREG_BUF refer to the buffer by the virtual address used
+> with UBLK_U_CMD_REG_BUF? Then struct ublksrv_io_desc's addr field
+> would retain its meaning. We would also avoid needing to compare the
+> range buf_index values in ublk_try_buf_match(). And the xarray
+> wouldn't be necessary to allocate buffer indices.
+
+There are several reasons for choosing "buffer index":
+
+- avoid to add extra storage in `struct ublk_buf_range`, extra
+  `vaddr` field is required for returning virtual address; otherwise one extra
+  lookup from buffer index is needed in fast path of ublk_try_buf_match()
+
+- I want ublk server to know the difference between shmem_zc buffer and the
+  plain IO buffer clearly, both two shouldn't be mixed, otherwise it is easy to
+  cause data corruption. For example, client is using buf A, but the
+  ublk server fallback code path may be using it at the same time.
+
+- total registered buffers can be limited naturally by `u16` buffer_index
+
+- it is proved that buffer index is one nice pattern wrt. buffer
+  registration, such as io_uring fixed buffer; and it helps userspace
+  to manage multiple buffers, given each one has unique ID.
+
+
+Thanks, 
+Ming
+
