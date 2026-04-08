@@ -1,244 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72EC73BB9E1;
-	Wed,  8 Apr 2026 11:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5EF3BB9F3
+	for <linux-block@vger.kernel.org>; Wed,  8 Apr 2026 12:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775649289; cv=none; b=CEABTiappWsqXZowg4983qe9cOk1CBVnuNtyhhKkpfzcGVk0wB/dL7kXjtcxJATpyZiW8KMoFjpTDwplkyVXN1oIBMjtaLbNWyG62RPpoS9v3shnw89TsIHc5eaL0lb2tw+w4g8rLfKV3Brs/iNaAcFbDDB5zNhCXEVE+kI8aWc=
+	t=1775649709; cv=none; b=dAlYFV7RBB69MVntmcPNt0XbMJ1Sb6KlrCYbOXIwNXRKALGg3XWzehEioH9fGZohYc5U/F7FiKgPLP1o/0p8+BRZ4A/A3KF6W4hUsmvEfxhziwEk/y0bUfOREOegvcz13Aeh/wK2vx9K2mbJwn0970bMFceLvzDOY3bg19UPYOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775649289; c=relaxed/simple;
-	bh=MA4d5fmu8ycPYDqnj6TGa+JGYzSgcY/0NWIkLvFzBgc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=renYW3csHmcSc/4GxTJWy8C1KZI34ha2+l0aHibRVmXB6ENGT4RkrRt7g0u3diBepjnlwN5PPq7oDgprjTsatqhXYIKE6t8yR4ip80ucWiT6qrsoh+MEwtVTXVJ39ryG1aO6jmlYcvSVMFWXop7ZN85JbNOtC5gTzUdQZeihzx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSpon30t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775649709; c=relaxed/simple;
+	bh=UEdb6b6Z5iQlGQJZPDCcB5rUaLckwRSveh0FGowiTB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kl/hdD6qE2vMzZyZaAf9pl9nJFRC4Bnk8nwt+s6wBr70uzxWa3mq+2NpkwSFG+a2rQU75ju76V1aKIdXOih5Z1c4ouFkKRwPrizl7KhgV+sIoXy7yDs9N4AAHj0BVqq8NeMomTuMSJXihcroD/gkd5bMb+QNqOSgWI0ZNWExYdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=mliC2jwX; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSpon30t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70368C19421;
-	Wed,  8 Apr 2026 11:54:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775649289;
-	bh=MA4d5fmu8ycPYDqnj6TGa+JGYzSgcY/0NWIkLvFzBgc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=uSpon30tvzkTfS7qtJ3EEJ/MmbBlGC7JQxCib7bKKB9Hx5QZ5zBnKqt0BWOuXoHpF
-	 0ZqGrd/gni34h1C6GP0iagG+vdvDa/zuYJU9zefs3X9GgSlqJuPo3Qe78yQGdo0Fbd
-	 GDRb0Wpw28RQKRtt86wQ9B0V2JUuYqJV/6SE807lC96NIVCkfHqhBJ+2FH72Bq1QjJ
-	 Ob6dnX9w1r9luRnZ2h8Jr3db6fkmm1ehN/vkMUENuRM4hzV7c49MUEdczgp0rIGQyZ
-	 WLk3qKZUrAEWRj8kJVse6ggIazbN+DClwtYpeDtrfTvXq6P6gbYWagmNsbUAv3rkZb
-	 TgY3HvvBXGM/w==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, Miguel
- Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6?=
- =?utf-8?Q?rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor Gross
- <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, FUJITA Tomonori
- <fujita.tomonori@gmail.com>, Frederic Weisbecker <frederic@kernel.org>,
- Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Lorenzo Stoakes
- <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 05/79] block: rust: change `queue_rq` request type to
- `Owned`
-In-Reply-To: <CAH5fLggq-1pReNsRtgRfm0Y_PiQvUsXbMMkPkyO9kuhqzB3wrA@mail.gmail.com>
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
- <20260216-rnull-v6-19-rc5-send-v1-5-de9a7af4b469@kernel.org>
- <abfU_itQLa4jDy5L@google.com> <87ikamrbo7.fsf@kernel.org>
- <CAH5fLggq-1pReNsRtgRfm0Y_PiQvUsXbMMkPkyO9kuhqzB3wrA@mail.gmail.com>
-Date: Wed, 08 Apr 2026 13:54:35 +0200
-Message-ID: <87qzopwttw.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="mliC2jwX"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43cf5fbacc9so408593f8f.1
+        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2026 05:01:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1775649707; x=1776254507; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zKYv/92g4USBYnuvjQ2o6KcGgYeWGPu2ptasrtf+UBI=;
+        b=mliC2jwXaNGrsu/QC/M5rKsg2cnQu95WnGY381hlLcLLO7rcDiYWRysk1TrzBllamY
+         vFv3SneOsCU38DBmtJYyrIiAyn0FfHGsasgDGiqj54AGZj8FtPS9Jej5ULgc07u7F/as
+         EC+RxgI453J2kf7ql7QeZKsIE+D7Wvd+EN81Snvnw3mt9VZuRq8QwVwcb1R9U9Uv+Ye2
+         ZK1i2efYgowdGJxhN5gd7pLK5fGlD2QwczufcN3GHi1LP+Uc6N9fSWcZZUghYf15y7qW
+         EUu3j+B3oOp2C5HVzeNBANw1atqr/H03oBsQPsOK6xFfGGXyTsATqLySTlTkYJKDfpmq
+         e7vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775649707; x=1776254507;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zKYv/92g4USBYnuvjQ2o6KcGgYeWGPu2ptasrtf+UBI=;
+        b=W1q1W43dIgSw4jfBtDHbMK6o8iazxmRbd566MQXE3ptBTBxBn15wWtZnw0BKN6sk96
+         W8myx37h/GsRIUobmwCxHFoq9Z9mhPf9Vuj2Mtk14DJKO53V1SQ2Nl8Z5E1h+aFbkaqr
+         E4ntF2WQ2IPVtjTnFQtT3VIAi6oPxZ0/rVjV376/if4FGOLGkxzV2zzWCP1mvla2xCyQ
+         C6c6v3I5jU+H+nYnaGJsf8KhcShzr2TQk9Poq2nr+rBv+TszGP9kp4qfIHcBKadiT9Ro
+         656//0/qL7TO0R1IpWhhPUA/LTwfSMhfIkLy4VHzf0LC33msAXz7BD1NorRTqcsnC0qh
+         1Dbw==
+X-Forwarded-Encrypted: i=1; AJvYcCXVyh/L/FIPTPWzq0Re5fcGYwHC2p+VTzmZtVE1cu70zaQSRR35+5UjB3Yw1XB/JYHKfeEsP4siNDPRLg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWvDyQktsIaW3ByNRKUMF0gRXe5GxB3d+oTs+WzNr4Wye7qgRG
+	CHeVejDxoJODuIwehRcoJUV6eks7Sw1lt3eQR7wINzYTWSYa1+G7lbLJtJ/FF5A8LZKz9zPWMPy
+	/YU7Sjzw=
+X-Gm-Gg: AeBDievEoGtu/kQVbMHXuEs8KPSpTU4xSU+hY0RGMfJj9rORTmxa/HyAr3wnJ1SZ1F3
+	tzvxLseP4dvDKt7GcLOI59rweWgYKO5gLdXaunACJANiJaoJXJ2qYNttAUmusW6SPiuyqAL2ttB
+	Rcg0RONApotQ+evWcT9J4VP+5POrkyau+kLvPBH+fZx1PT/ur5/nGGJEZl/ZCuKvp+uj8shHqpN
+	MkzZydrmhJ2x6scuGZ6C6szgIWTBagR/adECBVuNS7TWRKGfWlSAHqu760Lh4S7VnFZ71O2/T4I
+	RHWNBa46l7yqjtI4vEMnLBXxxJS6XnYOJoOzysFcxU2DqLFf/PTEOAYspV67SLVNTSBd8JeaSxV
+	zYKbJRyySMVdE0hOZP8gb5mH5RbXU8OyxBXPyx2vXKi/knOuuTWE+y2aMwUEyXv5FXDpZZlMCBH
+	9fhgFED1BrkL6PjdXoAJG4qJ7lC5WeUQ/pmXWU5JqrqMKpUudFwkCzrvB8BICpKYYdO2DAGNqUh
+	2k5lw==
+X-Received: by 2002:a5d:5d0a:0:b0:43c:fac5:d382 with SMTP id ffacd0b85a97d-43d2118dc50mr36398359f8f.12.1775649706776;
+        Wed, 08 Apr 2026 05:01:46 -0700 (PDT)
+Received: from localhost (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4f5294sm54605833f8f.35.2026.04.08.05.01.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Apr 2026 05:01:45 -0700 (PDT)
+Date: Wed, 8 Apr 2026 14:01:43 +0200
+From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, 
+	linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org, 
+	Joel Colledge <joel.colledge@linbit.com>, linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH 06/20] drbd: add RDMA transport implementation
+Message-ID: <adZCPanS7iZlcPE9@localhost.localdomain>
+Mail-Followup-To: Christoph Hellwig <hch@infradead.org>, 
+	Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org, 
+	Lars Ellenberg <lars.ellenberg@linbit.com>, Philipp Reisner <philipp.reisner@linbit.com>, 
+	linux-block@vger.kernel.org, Joel Colledge <joel.colledge@linbit.com>, 
+	linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>
+References: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
+ <20260327223820.2244227-7-christoph.boehmwalder@linbit.com>
+ <adXq36pbGLXMZc2r@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <adXq36pbGLXMZc2r@infradead.org>
 
-Alice Ryhl <aliceryhl@google.com> writes:
+On Tue, Apr 07, 2026 at 10:42:55PM -0700, Christoph Hellwig wrote:
+>You really need to add the RDMA mailing list before adding new RDMA
+>code.  I'll try to review the bits I still remember, but you also
+>need a maintainer ACK.
 
-> On Mon, Mar 23, 2026 at 1:08=E2=80=AFPM Andreas Hindborg <a.hindborg@kern=
-el.org> wrote:
->>
->> Alice Ryhl <aliceryhl@google.com> writes:
->>
->> > On Mon, Feb 16, 2026 at 12:34:52AM +0100, Andreas Hindborg wrote:
->> >> Simplify the reference counting scheme for `Request` from 4 states to=
- 3
->> >> states. This is achieved by coalescing the zero state between block l=
-ayer
->> >> owned and uniquely owned by driver.
->> >>
->> >> Implement `Ownable` for `Request` and deliver `Request` to drivers as
->> >> `Owned<Request>`. In this process:
->> >>
->> >>  - Move uniqueness assertions out of `rnull` as these are now guarant=
-eed by
->> >>    the `Owned` type.
->> >>  - Move `start_unchecked`, `try_set_end` and `end_ok` from `Request` =
-to
->> >>    `Owned<Request>`, relying on type invariant for uniqueness.
->> >>
->> >> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> >
->> > It would be a lot cleaner if we could implement HrTimerPointer for
->> > Owned<Request> and entirely get rid of the refcount in request so we
->> > don't need ARef<Request> at all.
->> >
->> > Is there a reason we *need* ARef here?
->>
->> There is. Real drivers will need to dma map the data buffers in
->>  `Request` to a device. This requires taking a reference on the pages to
->>  be mapped, which in turn requires taking a reference on the `Request`.
->>
->> We could split up the reference counts into multiple fields, but that
->> would be less efficient.
->
-> So how exactly is the refcount used here? Can you elaborate?
+Thanks for the hint and your detailed feedback. I'll address all that
+in v2 (plus some other similar fixes).
 
-I can try to be more clear.
-
-`Request` objects are created when a driver initializes a device. A
-driver initializes a number `Request` equal to the queue depth the
-driver supports. That is, if a driver/device supports 16 in-flight
-requests, the driver allocates and initializes 16 `Request` objects up
-front.
-
-When the kernel wants to issue IO to a block device, it finds an idle
-`Request` object and sets it up for the IO operation. Then:
-
-1. The block layer hands off the request to the driver. Ownership of the
-request is transferred to the driver. At this point, the driver has a
-unique reference to the request (`Owned<Request>`).
-
-2. The driver DMA maps the pages of the request. We have to make sure
-the request is not handed back to the block layer while the pages are
-mapped. To this end, we take a refcount on the request. The reference
-that the driver holds is no longer unique (`ARef<Request>`).
-
-3. The driver instructs a device to carry out the request. The driver
-releases its refcount on the request and the device takes a refcount.
-
-4. When the device finishes processing the request, ownership is
-transferred back to the driver. The device releases it's refcount and
-the driver takes a refcount.
-
-5. DMA mappings are torn down. The refcount associated with the DMA
-mappings is released.
-
-6. The driver transfers ownership of the request back to the block
-layer. To do this, the request must be uniquely owned by the driver.
-
-When the device is done processing a request and we have to transfer
-ownership of the request back to the driver, we use an API function
-called `tag_to_rq`. This function takes an integer tag and may return a
-request reference. For this function to be safe, we have to be able to
-assert that the integer tag passed to the function is naming a request
-object that it is valid to obtain a reference to. It is not sound to
-create references to requests that are not currently in flight. Thus, we
-must be able to know this information. The current implementation relies
-on the refcount to discover this information:
-
-/// There are three states for a request that the Rust bindings care about:
-///
-/// - 0: The request is owned by C block layer or is uniquely referenced (b=
-y [`Owned<_>`]).
-/// - 1: The request is owned by Rust abstractions but is not referenced.
-/// - 2+: There is one or more [`ARef`] instances referencing the request.
-
-So, we are using 1 refcount field to encode all the information we need.
-
-Further, in the current implementation, for step 3, the device does not
-actually take a refcount on the request. If a driver drops all
-references to a request, the refcount lands on 1. We use this to
-indicate that the request has been leaked and to know that `tag_to_rq`
-is safe. In a situation where the request is DMA mapped, the refcount
-would be 2 while the device is processing the request.
-
-Here is a sequence diagram of the flow:
-
-  Block Layer            Driver                 Device
-  =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80            =E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80                 =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80
-      |                     |                      |
-      |                     |                      |
-  (1) |  hand off request   |                      |
-      |-------------------->|                      |
-      |                     |  Owned<Request>      |
-      |                     |  refcount =3D 0        |
-      |                     |                      |
-      |                     |                      |
-  (2) |                DMA map pages               |
-      |                     |---------.            |
-      |                     |  into_shared()       |
-      |                     |  ARef<Request>       |
-      |                     |  refcount =3D 2        |
-      |                     |  map_pages()         |
-      |                     |  refcount =3D 3        |
-      |                     |                      |
-      |                     |                      |
-  (3) |              submit to device              |
-      |                     |--------------------->|
-      |                     |  (drop driver ref)   |
-      |                     |  refcount =3D 2        |
-      |                     |  (DMA ref remains)   |
-      |                     |                      |
-      |                     |                      |
-      |                     |  .----------------.  |
-      |                     |  |  Device does   |  |
-      |                     |  |  DMA to/from   |  |
-      |                     |  |  mapped pages  |  |
-      |                     |  '----------------'  |
-      |                     |                      |
-      |                     |                      |
-  (4) |              completion IRQ                |
-      |                     |<---------------------|
-      |                     |  refcount =3D 2        |
-      |                     |  tag_to_rq(tag)      |
-      |                     |  ARef<Request>       |
-      |                     |  refcount =3D 3        |
-      |                     |                      |
-      |                     |                      |
-  (5) |            tear down DMA mappings          |
-      |                     |---------.            |
-      |                     |  (drop DMA ref)      |
-      |                     |  refcount =3D 2        |
-      |                     |                      |
-      |                     |                      |
-  (6) |  hand back request  |                      |
-      |<--------------------|                      |
-      |                     |  try_from_shared()   |
-      |                     |  cmpxchg(2 -> 0)     |
-      |                     |  Owned<Request>      |
-      |                     |  refcount =3D 0        |
-      |                     |  end_ok()            |
-      |                     |                      |
-
-
-We might be able to get by without shared references (`ARef<Request>`)
-and only use an owned reference (`Owned<Request>`) if we add additional
-fields to the `Reqeuest` structure. We need to track if the request is
-in a state where we can return an `Owned<Requst>` from `tag_to_rq` , and
-we need to track if any of the pages of the request are mapped for DMA,
-so that we can end the request.
-
-I am not convinced that having the additional fields is worth it for
-simplifying the reference counting scheme.
-
-> With regards to the Owned series, I still think we should split it up
-> so that the patches making ARef+Owned work like Arc/UniqueArc is
-> separate follow-up series.
-
-I'll take that into consideration when sending the next spin of that series.
-
-
-Best regards,
-Andreas Hindborg
-
-
-
+Thanks,
+Christoph
