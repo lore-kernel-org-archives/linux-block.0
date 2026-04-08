@@ -1,110 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4ED51F30BB;
-	Wed,  8 Apr 2026 05:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC2B1A683C;
+	Wed,  8 Apr 2026 05:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775624731; cv=none; b=EgYFygcGyJiTxjo0XL3DPGQoXR1bdsza2y/Ea+ZOz7FZAn725KQ+c63FXjsEisLJ+suXn36I1+DlZq1haDvIQABD3Y9Y8dn3/ANnHVjXEKZtOjirPGoXbAHKbpMZ8lihB/zJVfZz93qiz/JEpmICW56zbq7zLatif7HM/taSuQ4=
+	t=1775625023; cv=none; b=qPD24YDSPm/11cuHodoiwnNzEkBrnZz2xx7y02HOpVBHSZZCqNjbVSYQdFxuuIzPlw590AR69IBAnBJ3qwkYRqpkl2Vnu4KfDKLfNxatY8ONIeNHPPHXHCeqCGLn+C+e2uF2ViCMUoEjHGeSS5gOg6cwoDKc6vg+hURcrSb2zDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775624731; c=relaxed/simple;
-	bh=aOq3weOCjYOBcfMYYLZ4HWs33PSYb3j7H62F9mMVHLo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rdf15onEJSOoZ0Dqbq79hOx8n5C7TsBLDTc78S4UKxatS6GDG7KO1B/zOmLlqcrLxxax96o79RRP+aEP08mM/kyD+QGOxoAvbQmTbMRX/WO3XsDE5mZU/lQ4bfL0prIlFs0x/+ylvyEodacnPiWKylhGGYS/KgnCJAIjVPGV5V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D90CC19424;
-	Wed,  8 Apr 2026 05:05:27 +0000 (UTC)
-From: Yu Kuai <yukuai@fnnas.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	song@kernel.org,
-	linan122@huawei.com,
-	abd.masalkhi@gmail.com,
-	chiamingc@synology.com,
-	gourry@gourry.net,
-	moonafterrain@outlook.com,
-	xni@redhat.com,
-	yukuai@fnnas.com
-Subject: [GIT PULL] md-7.1-20260407
-Date: Wed,  8 Apr 2026 13:05:17 +0800
-Message-ID: <20260408050517.2109269-1-yukuai@fnnas.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1775625023; c=relaxed/simple;
+	bh=KyU2yJR9V/uUR9MwJTA9doEM3RTgBTYUaHwHPzvWfpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LlcqNOYY8wblrkM1HdY7QywoYDF+sKdYIT/qo90lHx4D9GUtVrbioi4HB3LM/J6Fc+K9c7MJruv4zNybvjwIi4kEj5GAOKjddWgY3q1iZjqFA1/fA7G9V/54MzLyYIgfrR3K2dg7iUgWWGcXav4FxVT0h8RelTfQiv6BxOiARP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aKRH8jvX; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aKRH8jvX"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=FGVZvsJ7+aFUi9R2AonAN1Szz4uf3rqKeEpjoICbM3I=; b=aKRH8jvXvX1teD1XeQODhCogn1
+	IkV6DyseyZRbC8aIwAjUzBwg1X9sch2mrOXvKkdJX1o/rmwK6gqTgqIMn1mrwJzNBIVFyhBAKqXNc
+	8agURruUzK/tbbRO6Bdyfr9+7nvhcx4tY2EjH/MtJqxTwkRAjT9JqRyUd1EEJbfhaygRoLLOuFX2s
+	cwTrJM3i85pkYTJuvPhmHSZA81ot5LOLzIbe4QQa3qAPz+ZH7hKzxuFcvNcCgifQkFqpVNBLZESEu
+	F+tqxWBMBmJzgIBtYIdpHDbCUJ2ubk+Sj51npE0LeBiHPZm739OAdvYNbPOWwVEe1i0i6P1lAxzEm
+	mZdAfNIw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wALBD-00000008GxA-3rp7;
+	Wed, 08 Apr 2026 05:10:19 +0000
+Date: Tue, 7 Apr 2026 22:10:19 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org
+Subject: Re: [PATCH 2/6] block: use integrity interval instead of sector as
+ seed
+Message-ID: <adXjO5y6tLLVz77C@infradead.org>
+References: <20260403194109.2255933-1-csander@purestorage.com>
+ <20260403194109.2255933-3-csander@purestorage.com>
+ <adNUE67FpIGF_x7Q@infradead.org>
+ <CADUfDZqHyTDO6aYed+mtChU9m3iPgW=hghwfifuCV8Z_CzxoFQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqHyTDO6aYed+mtChU9m3iPgW=hghwfifuCV8Z_CzxoFQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi Jens,
+On Tue, Apr 07, 2026 at 09:48:52AM -0700, Caleb Sander Mateos wrote:
+> On Sun, Apr 5, 2026 at 11:35 PM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Fri, Apr 03, 2026 at 01:41:05PM -0600, Caleb Sander Mateos wrote:
+> > >  void bio_integrity_setup_default(struct bio *bio)
+> > >  {
+> > >       struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
+> > >       struct bio_integrity_payload *bip = bio_integrity(bio);
+> > >
+> > > -     bip_set_seed(bip, bio->bi_iter.bi_sector);
+> > > +     bip_set_seed(bip, bio_integrity_intervals(bi, bio->bi_iter.bi_sector));
+> >
+> > Should we simply switch bip_set_seed to take a bio bvec_iter argument and
+> > lift all this logic into it?  That feels a lot less fragile.
+> 
+> Perhaps I'm misunderstanding the suggestion, but how would that work
+> for initializing the seed from struct uio_meta in
+> bio_integrity_map_iter()?
+> 
+> bip_set_seed(bio_integrity(bio), meta->seed);
 
-Please consider pulling the following changes into your for-7.1/block branch.
+Just open code the assignment there as the code must be build with
+blk-integrityu support?
 
-This pull request contains:
-
-Bug Fixes:
-- avoid a sysfs deadlock when clearing array state (Yu Kuai)
-- validate raid5 journal payloads before reading metadata (Junrui Luo)
-- fall back to the correct bitmap operations after version mismatches (Yu Kuai)
-- serialize overlapping writes on writemostly raid1 disks (Xiao Ni)
-- wake raid456 reshape waiters before suspend (Yu Kuai)
-- prevent retry_aligned_read() from triggering soft lockups (Chia-Ming Chang)
-
-Improvements:
-- switch raid0 strip zone and devlist allocations to kvmalloc helpers (Gregory Price)
-- track clean unwritten stripes for proactive RAID5 parity building (Yu Kuai)
-- speed up initial llbitmap sync with write_zeroes_unmap support (Yu Kuai)
-
-Cleanups:
-- remove the unused static md workqueue definition (Abd-Alrhman Masalkhi)
-
-Thanks,
-Kuai
-
----
-
-The following changes since commit 8b155f2e4a91f3507951e6ace4b413688ac28b96:
-
-  block: remove unused BVEC_ITER_ALL_INIT (2026-04-04 08:10:37 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux.git tags/md-7.1-20260407
-
-for you to fetch changes up to 7f9f7c697474268d9ef9479df3ddfe7cdcfbbffc:
-
-  md/raid5: fix soft lockup in retry_aligned_read() (2026-04-07 15:13:52 +0800)
-
-----------------------------------------------------------------
-Abd-Alrhman Masalkhi (1):
-      md: remove unused static md_wq workqueue
-
-Chia-Ming Chang (1):
-      md/raid5: fix soft lockup in retry_aligned_read()
-
-Gregory Price (1):
-      md/raid0: use kvzalloc/kvfree for strip_zone and devlist allocations
-
-Junrui Luo (1):
-      md/raid5: validate payload size before accessing journal metadata
-
-Xiao Ni (1):
-      md/raid1: serialize overlap io for writemostly disk
-
-Yu Kuai (5):
-      md: fix array_state=clear sysfs deadlock
-      md: add fallback to correct bitmap_ops on version mismatch
-      md/md-llbitmap: add CleanUnwritten state for RAID-5 proactive parity building
-      md/md-llbitmap: optimize initial sync with write_zeroes_unmap support
-      md: wake raid456 reshape waiters before suspend
-
- drivers/md/md-llbitmap.c | 202 ++++++++++++++++++++++++++++++++++++++++++++---
- drivers/md/md.c          | 139 +++++++++++++++++++++++++++++---
- drivers/md/md.h          |   5 +-
- drivers/md/raid0.c       |  18 ++---
- drivers/md/raid1.c       |  47 ++++++++---
- drivers/md/raid5-cache.c |  48 +++++++----
- drivers/md/raid5.c       |   8 +-
- 7 files changed, 405 insertions(+), 62 deletions(-)
