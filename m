@@ -1,71 +1,72 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CB62D29C8
-	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 13:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C3C332601
+	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 13:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775741453; cv=none; b=DrNfu1PIh2LhmaW8xMsiLmlA6kSCAPGOBqXpxliajT3TKemE2D+VjS8Nu8ngrBc5lRJbN3Phy/GKNeD8H3JVi8DNJ1Fz+suXja6O7XY48hxpwSbrcA9s1iGAgNFg+nz6Eo5PxSYjkKEdAKCpzGrWX5dQI1qUgWyXF/j5acXRYak=
+	t=1775741457; cv=none; b=fgzQh6FMzDdtiUsU9NNjYlIQREyW3z431FiF67FmdI37whbi25ygNsu1C3xF67Z5HndKrXm2sN3OHur56NtEekdvUnyrqaGJGpN6mEPT/9tnXTX9ZDfDpzGY+4vhtpMPLlqVOsjNXTn2YGo7idaLix5VqyERQdgIU5q1a/eZ2H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775741453; c=relaxed/simple;
-	bh=u6QP0q4Pm7easOFpuu1jyJmPJ91tFSoY63m6b/xrEAM=;
+	s=arc-20240116; t=1775741457; c=relaxed/simple;
+	bh=bLZ7nvU3srGPAY03hE2GPOwyVSNU6swjgIE3T4bIV2c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sHfiARRHavNzAX7rgaTuUL4lMACKFc4aawtdvKZjlf/4H31VxKPGNZZuMur2mEBnbFz3l2OwOqgPRTPLpf3FMBgvkeo0wP7wdXnF5zRxyhHFggwPd9z2RyDQEc7R6x/MvLJ/SFR3HBSufKN9iCc2v665ig7htTzbj26cVxg7J7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EYhkIkDo; arc=none smtp.client-ip=209.85.215.170
+	 MIME-Version:Content-Type; b=bBufuL7T8OQ+bQadLo/p7DkISmEnG0TkPaLsYXTR/hCfOG9UvsJA6kaX39S1SFolHVN2ti2Rer4cZZrSvVujRnd3tVq5bMKgI6YRNL9ngSI1L9tuCpvf0B1yfBu2tSTxlW6T1Sx7uTZq3Vvee9Z9GuG3VJRdaLtBAPd8pcQtSt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bzUaEn7l; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EYhkIkDo"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c76af79f029so376579a12.3
-        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 06:30:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bzUaEn7l"
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c766a95a72dso648130a12.1
+        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 06:30:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775741452; x=1776346252; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775741455; x=1776346255; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5RfjnMCd/AF7bBdOrwDqyxNxMK9P28G5mGjUvtSq2DM=;
-        b=EYhkIkDog8IYxUt/dtIs40HsMwGjttLz9dWChT+ejjhGzyuW/7bGavASJkZ8f+czwr
-         5MbBVpDWkNN24tGFRqtXMHnpv7MaanHNTAmqo+m5YsVtT1a3B+0Nav33oZycqx61nDWx
-         n4+MSrAK1UIXI4TfTtHrW+2rMOC93k2o0+76PUlee3HUrPLNC3bflrny9z3ZsPRByugq
-         I1/gK0/7tnINmNn/tksGScvM8SMgZKDhYidiUwSClpqJhIcCTFbPClwm7sn1Z9jWfeFI
-         gblYOMyTLMA1ivKmDG82PbTOdj1AhRIjyKta3AveLl6+0AXh6LxzS3rgsKGg5ZavnONI
-         8c4A==
+        bh=/yNXaTDPa3SSoxM8NEwCREbqmQmrVjvVuq5mh5HT7mQ=;
+        b=bzUaEn7llPNJOJxVqEjBvOi6Db1RIpsV44Z4OADN5griTvW61L9B82DZqAlK5KJz/E
+         WVSitHQKGi98EkepOozGKyvMiyKqFGpzgDohXe2gpgkU0OqKabPEa3RxnHuDPzqQKpfS
+         F9BKSpd3nyRDgvjInlHU8UYeg8mWegoTl80Ikc31cwhVOypSMvgV3zXXcJbbHhzpm6qQ
+         dv/w/bMRvzuMo/L81ORoVL8Lx5CGzjYjs8YN7bY5YbgXu8ES1mdjBQ3Wc7j7Xb5y8GpR
+         PfsI9FZdeBPLeZXjCEqkGipQumQzbfs9M/pNQtj2zXFqkndhQshbqTymARplChEdIMpM
+         xUIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775741452; x=1776346252;
+        d=1e100.net; s=20251104; t=1775741455; x=1776346255;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=5RfjnMCd/AF7bBdOrwDqyxNxMK9P28G5mGjUvtSq2DM=;
-        b=KdjW4o1A65TLD4IocnD8HDsgEosWX22bGRNQHL6nRKVuTiqyWf1tqyoWE/0XSagL/Q
-         mRvZYTNg5CPp7GoYvtmdAQ5clBF/zN7Pb0B142XZ7CDMg1fQWgdQ8wNB/bUXa5TOyN78
-         VexE7KhAx2ihMHZichk6T3Y/BRC3rBVjmd6RvlKKUT1EjRnwCZQkLrCSW0lcsArXnd1a
-         /1hwi3r+mpxY7G4gU+HOnoevbKBp/+k2V6b5kLtwJ62+TiodYL1QmyKaGOJh5b1PQg/y
-         GZFffs0JWDS4XbliPjDdmalIM5LVgZ3nDnpdTrP86g2zohPySwkT74SfoR6E6EksbmcK
-         EBGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZE1y/x2on2/xLEwltfZ78+D1inshtAQAFbqq5Wwizb+FRDdQDSWnaWPh2w/IxthsYZoFzb3Aj2LvnWg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbbzZBLVIFmONYUxg/9JD3gAMB8eZ57wGHVSZNAyVb/RuF59FL
-	d7iJbItDckjfkOLiJ2pZCMFRz136OA24s8SBdAdtAMRiiB6/6MlIY306NyGYGiXEvEXGxQ==
-X-Gm-Gg: AeBDieuej2ZPxHI6ISwQ59LnUFl6A8DJ1U47aNljSibrXqAp5AEAOrMLrXPA+pgHGnZ
-	1Z0zWTUOMNHDlPb2kK3VDqlOLidwKIVqYGHhuDmY77uzHZVSLUt+s9s7kZGJjG6/TwiW7KZorBH
-	5vwZXXWCgBoORB+OHHQXYbTEZqKTQL2Rl7yCbCRC+q9wFrn/ES7f+XdhomzP9rQvP8Uq77u/2KV
-	xM8xppMw0J8NqlXSvk1ImcRvGPm3jEldRqFtbPLd8Ci5GU6D88Be9KkfaeXuDcXzFLB0ofarv/Y
-	bxwtHAmQVKCBCuEC6+BAOvmbaiXYu9OcnLRbtjDuhzv4qak5/PRdQJjSt/C0jvxTp7N1alj0n+2
-	QEyqJdWvHijeU5f1eJKQrQp9rozxxFhXrGNge1F9fVLpOAuxVlaLGpJ+UVxR0DvkgyGTA8y1dqv
-	Ti/EY0uCOcv+TAmBr08SvO6H3Z9PdEvJ+gRcBVipb9txpPrsn2a8hRaFkxXi/bLKK1Ww==
-X-Received: by 2002:a05:6a20:a11a:b0:398:9301:b9ae with SMTP id adf61e73a8af0-39f2f11b8a1mr27001073637.52.1775741451877;
-        Thu, 09 Apr 2026 06:30:51 -0700 (PDT)
+        bh=/yNXaTDPa3SSoxM8NEwCREbqmQmrVjvVuq5mh5HT7mQ=;
+        b=njMrstPRI0+dC/5WZw3aSLGSqfTVEEw1HIKg7W3VxdYbdGzqyC7v7vo9XkaXdvgX0B
+         2QVN1ChXsD/qnBsu18VV/ShobXMmRcqUFg/fZZ0SgF0KgceCtDuTdUJXPAa4VLn7otqy
+         VyDcDxSTykwWwEF/O3iqO+Xm5R3aCq0aT2KgchDXiyHcwqWZI1dpJ79PEhrj3RlKkQh0
+         WxmXVFY2km8tTkFxn2tmizfK3i5iJcuXRzvqgq4GSCdjc8eKAAO0G+w3PacrFZZHWuIz
+         6tc8krFPOIheBR3tWGibmE1+WM/CRoJqmbSr1mDUoMgZetCnymRlqyHA2nslXcM7f7cw
+         Nu1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVqJGYn62qDdHWPl6HK9Emxyjenb+0SIm7S9D3klVnEgtdCVFBVI+5yerD+PkL+Zic5rRLDK0eC0TmRiw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQFdYBX16Gp/PYlaxlIdSGVQZ0I9uIq4mAJ1mH2d+F/M/GH0Nj
+	dLNVi6Z0O7wAokqJoWATrmP0zuhzPEYzpZYAhs0hdFg7XC05E3BP6nOB
+X-Gm-Gg: AeBDiev9bZMZOegllzKJIKG/E/xTQrUKcLpYCJxc/x8zdOWq8G7zytt0DZ9SQYAujdb
+	I9yOvC3nRkyxr0CDDg2BxXmZh2V1sY5WdqJpOqrhGMJXEoaLHT2NtTGB2gI5s26RJsuU4OVsc65
+	Sl8zHxicgJJTrtf1BsRG7r2c4HBsu3GyR8/JOI8uhyxLEhRsspRYGT+xVnylbkjfGgMqUCrE8Pj
+	FTVSbExJjN5aZLsqdD3FF69uNqXQtRiCk0HVkKPFroC/Tq1XnPAc3kcnn9v1BhamnwtjY9fp4bx
+	uS+U37hQpmyUuAEz5MpHuYJQFfUUmh3ai60CBmHU+78aoQrPgHy3c8lYZjNfNSdg71Rw+LqkRqS
+	mSNEESRv8l67uRAK1bU2vRMYVcMo4d1l/ulcaL3g2gZ8T/ssC44LbfdFs8p81Z2kVUc84SzOz85
+	fPc0TypKxziDJy7YLXpzpzVywV9kdkVdvGk0OHFWKeVSUNraEl0pyE8xfSR0wsb8LMi2FZEQPqR
+	cmq
+X-Received: by 2002:a05:6a20:3952:b0:39f:29ab:b35a with SMTP id adf61e73a8af0-39f2edf4f56mr26708670637.16.1775741455202;
+        Thu, 09 Apr 2026 06:30:55 -0700 (PDT)
 Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c657dfb7sm21021166a12.24.2026.04.09.06.30.49
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c657dfb7sm21021166a12.24.2026.04.09.06.30.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 06:30:51 -0700 (PDT)
+        Thu, 09 Apr 2026 06:30:54 -0700 (PDT)
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 5/7] ublk: allow buffer registration before device is started
-Date: Thu,  9 Apr 2026 21:30:17 +0800
-Message-ID: <20260409133020.3780098-6-tom.leiming@gmail.com>
+Subject: [PATCH 6/7] Documentation: ublk: address review comments for SHMEM_ZC docs
+Date: Thu,  9 Apr 2026 21:30:18 +0800
+Message-ID: <20260409133020.3780098-7-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260409133020.3780098-1-tom.leiming@gmail.com>
 References: <20260409133020.3780098-1-tom.leiming@gmail.com>
@@ -75,181 +76,57 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Before START_DEV, there is no disk, no queue, no I/O dispatch, so
-the maple tree can be safely modified under ub->mutex alone without
-freezing the queue.
-
-Add ublk_lock_buf_tree()/ublk_unlock_buf_tree() helpers that take
-ub->mutex first, then freeze the queue if device is started. This
-ordering (mutex -> freeze) is safe because ublk_stop_dev_unlocked()
-already holds ub->mutex when calling del_gendisk() which freezes
-the queue.
+- Use "physical pages" instead of "page frame numbers (PFNs)" for
+  clarity
+- Remove "without any per-I/O overhead" claim from zero-copy
+  description
+- Add scatter/gather limitation: each I/O's data must be contiguous
+  within a single registered buffer
 
 Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/ublk_drv.c | 82 +++++++++++++---------------------------
- 1 file changed, 27 insertions(+), 55 deletions(-)
+ Documentation/block/ublk.rst | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 8b686e70cf28..79178f13f198 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -5233,30 +5233,31 @@ static int ublk_char_dev_permission(struct ublk_device *ub,
- }
+diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+index a818e09a4b66..c39d111af2d2 100644
+--- a/Documentation/block/ublk.rst
++++ b/Documentation/block/ublk.rst
+@@ -492,8 +492,8 @@ The ``UBLK_F_SHMEM_ZC`` feature provides an alternative zero-copy path
+ that works by sharing physical memory pages between the client application
+ and the ublk server. Unlike the io_uring fixed buffer approach above,
+ shared memory zero copy does not require io_uring buffer registration
+-per I/O — instead, it relies on the kernel matching page frame numbers
+-(PFNs) at I/O time. This allows the ublk server to access the shared
++per I/O — instead, it relies on the kernel matching physical pages
++at I/O time. This allows the ublk server to access the shared
+ buffer directly, which is unlikely for the io_uring fixed buffer
+ approach.
  
- /*
-- * Drain inflight I/O and quiesce the queue. Freeze drains all inflight
-- * requests, quiesce_nowait marks the queue so no new requests dispatch,
-- * then unfreeze allows new submissions (which won't dispatch due to
-- * quiesce). This keeps freeze and ub->mutex non-nested.
-+ * Lock for maple tree modification: acquire ub->mutex, then freeze queue
-+ * if device is started. If device is not yet started, only mutex is
-+ * needed since no I/O path can access the tree.
-+ *
-+ * This ordering (mutex -> freeze) is safe because ublk_stop_dev_unlocked()
-+ * already holds ub->mutex when calling del_gendisk() which freezes the queue.
-  */
--static void ublk_quiesce_and_release(struct gendisk *disk)
-+static unsigned int ublk_lock_buf_tree(struct ublk_device *ub)
- {
--	unsigned int memflags;
-+	unsigned int memflags = 0;
+@@ -507,8 +507,7 @@ tells the server where the data already lives.
  
--	memflags = blk_mq_freeze_queue(disk->queue);
--	blk_mq_quiesce_queue_nowait(disk->queue);
--	blk_mq_unfreeze_queue(disk->queue, memflags);
-+	mutex_lock(&ub->mutex);
-+	if (ub->ub_disk)
-+		memflags = blk_mq_freeze_queue(ub->ub_disk->queue);
-+
-+	return memflags;
- }
+ ``UBLK_F_SHMEM_ZC`` can be thought of as a supplement for optimized client
+ applications — when the client is willing to allocate I/O buffers from
+-shared memory, the entire data path becomes zero-copy without any per-I/O
+-overhead.
++shared memory, the entire data path becomes zero-copy.
  
--static void ublk_unquiesce_and_resume(struct gendisk *disk)
-+static void ublk_unlock_buf_tree(struct ublk_device *ub, unsigned int memflags)
- {
--	blk_mq_unquiesce_queue(disk->queue);
-+	if (ub->ub_disk)
-+		blk_mq_unfreeze_queue(ub->ub_disk->queue, memflags);
-+	mutex_unlock(&ub->mutex);
- }
+ Use Cases
+ ~~~~~~~~~
+@@ -584,6 +583,9 @@ Limitations
+   the page cache, which allocates its own pages. These kernel-allocated
+   pages will never match the registered shared buffer. Only ``O_DIRECT``
+   puts the client's buffer pages directly into the block I/O.
++- **Contiguous data only**: each I/O request's data must be contiguous
++  within a single registered buffer. Scatter/gather I/O that spans
++  multiple non-adjacent registered buffers cannot use the zero-copy path.
  
--/*
-- * Insert PFN ranges of a registered buffer into the maple tree,
-- * coalescing consecutive PFNs into single range entries.
-- * Returns 0 on success, negative error with partial insertions unwound.
-- */
- /* Erase coalesced PFN ranges from the maple tree matching buf_index */
- static void ublk_buf_erase_ranges(struct ublk_device *ub, int buf_index)
- {
-@@ -5327,7 +5328,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 	unsigned long addr, size, nr_pages;
- 	struct page **pages = NULL;
- 	unsigned int gup_flags;
--	struct gendisk *disk;
-+	unsigned int memflags;
- 	long pinned;
- 	int index;
- 	int ret;
-@@ -5354,16 +5355,10 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 	    !PAGE_ALIGNED(size) || !PAGE_ALIGNED(addr))
- 		return -EINVAL;
- 
--	disk = ublk_get_disk(ub);
--	if (!disk)
--		return -ENODEV;
--
--	/* Pin pages before quiescing (may sleep) */
-+	/* Pin pages before any locks (may sleep) */
- 	pages = kvmalloc_array(nr_pages, sizeof(*pages), GFP_KERNEL);
--	if (!pages) {
--		ret = -ENOMEM;
--		goto put_disk;
--	}
-+	if (!pages)
-+		return -ENOMEM;
- 
- 	gup_flags = FOLL_LONGTERM;
- 	if (!(buf_reg.flags & UBLK_SHMEM_BUF_READ_ONLY))
-@@ -5379,14 +5374,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 		goto err_unpin;
- 	}
- 
--	/*
--	 * Drain inflight I/O and quiesce the queue so no new requests
--	 * are dispatched while we modify the maple tree. Keep freeze
--	 * and mutex non-nested to avoid lock dependency.
--	 */
--	ublk_quiesce_and_release(disk);
--
--	mutex_lock(&ub->mutex);
-+	memflags = ublk_lock_buf_tree(ub);
- 
- 	index = ida_alloc_max(&ub->buf_ida, USHRT_MAX, GFP_KERNEL);
- 	if (index < 0) {
-@@ -5400,22 +5388,16 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 		goto err_unlock;
- 	}
- 
--	mutex_unlock(&ub->mutex);
--
-+	ublk_unlock_buf_tree(ub, memflags);
- 	kvfree(pages);
--	ublk_unquiesce_and_resume(disk);
--	ublk_put_disk(disk);
- 	return index;
- 
- err_unlock:
--	mutex_unlock(&ub->mutex);
--	ublk_unquiesce_and_resume(disk);
-+	ublk_unlock_buf_tree(ub, memflags);
- err_unpin:
- 	unpin_user_pages(pages, pinned);
- err_free_pages:
- 	kvfree(pages);
--put_disk:
--	ublk_put_disk(disk);
- 	return ret;
- }
- 
-@@ -5459,7 +5441,7 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
- 			       struct ublksrv_ctrl_cmd *header)
- {
- 	int index = (int)header->data[0];
--	struct gendisk *disk;
-+	unsigned int memflags;
- 	int ret;
- 
- 	if (!ublk_dev_support_shmem_zc(ub))
-@@ -5468,23 +5450,13 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
- 	if (index < 0 || index > USHRT_MAX)
- 		return -EINVAL;
- 
--	disk = ublk_get_disk(ub);
--	if (!disk)
--		return -ENODEV;
--
--	/* Drain inflight I/O before modifying the maple tree */
--	ublk_quiesce_and_release(disk);
--
--	mutex_lock(&ub->mutex);
-+	memflags = ublk_lock_buf_tree(ub);
- 
- 	ret = __ublk_ctrl_unreg_buf(ub, index);
- 	if (!ret)
- 		ida_free(&ub->buf_ida, index);
- 
--	mutex_unlock(&ub->mutex);
--
--	ublk_unquiesce_and_resume(disk);
--	ublk_put_disk(disk);
-+	ublk_unlock_buf_tree(ub, memflags);
- 	return ret;
- }
- 
+ Control Commands
+ ~~~~~~~~~~~~~~~~
 -- 
 2.53.0
 
