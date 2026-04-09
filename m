@@ -1,94 +1,94 @@
-Received: from mail-pj1-f99.google.com (mail-pj1-f99.google.com [209.85.216.99])
+Received: from mail-vs1-f100.google.com (mail-vs1-f100.google.com [209.85.217.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C093093CF
-	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 06:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1DB2F99BD
+	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 06:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.100
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775715253; cv=pass; b=sHoyzk7KoiVr9lP9tdn4qU9Qn0SGrMsT5rmqI+mztcyWSi/L3qTLmheFq9A29ZZ26Wo2o1PfR30b8rYp1ctaw00IzUNuXgmpPqbJMcF0Lgme/BIXXli5ROzgoASmDSgQ/fKPPH/cHsHzobW+/YLcP4BTC0nTck6dRzKUJcE+pz0=
+	t=1775715478; cv=pass; b=NecwsTCMpHEX8bd7hTyD6U8Re3KOq+leR22hhkaFN4055Hsv/Dx23sByP98vjgAQX1m+5WBCJnhIDF/XB0C+6QZHCHv4xJuc137QsKV6rzd6okjeblk4pD1546+BRtIWqTF5m7GPADi6897q8tCf1HQxQwaW0vqsEfqXfCx5ngo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775715253; c=relaxed/simple;
-	bh=x8VrKS6HIWkkDV3g81RAsAaRpE1iHQtCFFxkhbl+5wY=;
+	s=arc-20240116; t=1775715478; c=relaxed/simple;
+	bh=9veiu4A589Q2Np45N/RNb6SDHUDnWQsvsoeOSQNVTKo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jJfCPZri2jmbIUUJPst05jtiF6ftM1NABzkk7ZjAbUg6q4YNprZ7ZqUOzcHjxAi+M/zWEsi4O7hOGe5QuG2d+KnWqBifCgZHZlR+tn0/BOBgELI2R00kBQCqdN74cN5rd08Q/79lwJfjDcQ1FHDCvZdzxfaCw210UOWDlPNb6Og=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=K6R8D0oW; arc=pass smtp.client-ip=209.85.216.99
+	 To:Cc:Content-Type; b=eR5mzWEWooTF6Q+1P4tR6RCH23ffbwYg9/IK8GU0Sq7jlXs1U94C+wgTdlY3KMkpGYqTvUfWquZFkrkZsSWuYbpLttX8TdKxcA4cohIoItVtp5w4h2QTPoWUk0rjtu1zMpnqOG7tVGSAfF1QgKpSymKnlVEFCMFxlCBqfNaLHQQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RqJHMdy7; arc=pass smtp.client-ip=209.85.217.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="K6R8D0oW"
-Received: by mail-pj1-f99.google.com with SMTP id 98e67ed59e1d1-35d9749c26dso549998a91.2
-        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2026 23:14:12 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RqJHMdy7"
+Received: by mail-vs1-f100.google.com with SMTP id ada2fe7eead31-605def5b7f8so303492137.1
+        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2026 23:17:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775715251; x=1776320051;
+        d=1e100.net; s=20251104; t=1775715477; x=1776320277;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=x8VrKS6HIWkkDV3g81RAsAaRpE1iHQtCFFxkhbl+5wY=;
-        b=Xq04DgHwWGolUwdR6leopRwE2RamTHAvdyneUGFI/FC6wrrxcgFTDsOHBDmRHMrnql
-         /UoPbs9IvsqGD42Wk4oPZd41+akL2rRaIZyUupD3ZvyzWEPXXqdTTICit+oKAF2IQBqA
-         gY1bXZm16xRxyU5L/eItquyfCGPdUUPWAQqI3wWeQGjVCA+Xi865jE9kZJ89UndmaJEU
-         PE/kGy9z2y0NBUpG5DpCj5WHj/WVYfK+PgObJ+7RFqkwuytmqR0ey/BvdyJ1j48F9yhx
-         d9Osri4X0SWXDENSnP9/3zsEB7sydBQUdybRTLkCLfI7e5XF/wCua4D0FhMfHw94rx9s
-         y7RQ==
-X-Forwarded-Encrypted: i=2; AJvYcCV25cH941kXzVWLky0/Qq3jcjxoupgwklU5HV69HTnXXnSEZsfSV+fjzi7jNllYZRbGOv6nf2ee9Eu9gQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTr9nH4Z9N7/hRt0z3XJ1Z7W4UeyP1u7hLqkMibkqY38zoVL3o
-	GrGka8h6Wskha0i8hn4bt1DwczPlbMNNzD8/MANbAE8eCjZyr2lY7vvqU1HAgHabrbjTgWarAJr
-	LPlXePpFUqNwYvzIokQk1OXULVuh0/poNPEIwj4Paq/nE9YRxsLmea8Z7RgRLpaFH3ZV3v/lcNf
-	X1kyUMaJ6tH/5jOs36KcMB6f7XkV8DPVVTiG5YMiDZ3Hn11houHaWT5fOSwoeCKN7k+CIpCRrvY
-	Xv2TTLlnxtRd+F3Lw==
-X-Gm-Gg: AeBDietJ/jE1/dIFEMaSVm2EM8BOiGZSgSZ//V2gwrRsTeWeUu5KXWwV4vzGb1kmfuz
-	IEvumWXYdVJz153PWcSqlKsYY8kBZTsGi0rInjRsWEF4JEMrNWuHinn08/6S+7/OdXtMZJh0KzF
-	z9QaKkfHD8GYf5qhmu2WDNc3odmNXySZBaGkWvyD29l1vD0EDIgc7oVJKxd7klnSniX0uUUuKW0
-	9ebzjckrlXoPfOthpwI+pKs4/lkjCV9S29IkjSnUUQOdQlk7uQzIAjlkTv8jyTrD/6BBvsHqgWv
-	BOc87HfBILZRqPHJOCyGOX4NHsg0xd+HDU3jFPUqCiLOra7Jz5Aem9Pio8U8bYw9EXR6v2ig8vm
-	3HNTkY4bl3f8qpkqoUnSAdKoOZQJgcc8SbPr6Ar4tu5dfPgHrP2ozrL6doiewBpuHinb7ei3wOt
-	uIf1VuJ23k65L9XK4uNoKODW6lkj2su98ZlxFBHHnnIedaAQr8VFQ9YU5R
-X-Received: by 2002:a17:903:2ec7:b0:2b0:4554:9c24 with SMTP id d9443c01a7336-2b2817a20e9mr253695255ad.32.1775715251323;
-        Wed, 08 Apr 2026 23:14:11 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-29.dlp.protect.broadcom.com. [144.49.247.29])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b2748a189bsm14795435ad.25.2026.04.08.23.14.10
+        bh=9veiu4A589Q2Np45N/RNb6SDHUDnWQsvsoeOSQNVTKo=;
+        b=m6mO3E0W7Xg65GRB9t2653f04jvOHs44tUujWmZAgHQXZAbjlPQrkq7u+7b/5u7dQb
+         6QRXYyQZnQD63PE6XBWD4M7NJ5D0FIQHu8ty4DZD903CbotUhk7HAunbNN6spNpmAgCu
+         tMC8PCT9mxpQfVl8OmADhlsV3cEK4jFdy7M1gDnXXVEVSyc+Qv4nFHWaHdBkU3yU+FuQ
+         G9b+1L3Bo1GkIk5NBYn6WkG8dJJOM8qb22HviT/SXv0xabmo9+xptL+/vIs8PeSkeXKv
+         uS/+b85sBF66pTTX6sRCNzujjEVedr0uhO3zlyHox+u4wyurhvaMEFKuBdOZz17VXFQW
+         Se+g==
+X-Forwarded-Encrypted: i=2; AJvYcCWa1hNFiI/vDTjOA9U/GHqwI7F1ug3gdSaNZyjEwCv2TCJe2yhvNmbQ8B+RLxq2A72SJJXKEhZ+8BjhsA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHQb3jGKhv2Q9OqDTVU1GzYheZBzx7Z0UbdJ0/oY1Qn48BQIH2
+	wx8JL6iclPpn6e6Nsbuiqbz4B1y2cot61HTrsQC9HKr0TSA0cHgwkNqqLNQ6/CgREI043ymeydT
+	RjtCSxLM5xUmxzvPYZGn5/p+kTfZkmZE4iQcnVgdHfrd1W312e7USrN1HxhUuxkBbXa+xpUWwHK
+	WDFwQIUriXIUM8u66EsH8aTpDn5YDRolUBjuNuJ+D3fCnhqlpUE1g33WrffME6fdjptm1twZ0EF
+	qHKOKF+6jZW5BixEQ==
+X-Gm-Gg: AeBDiev/bBB1DKGhHtXUlrGq+YjX2XEGV5tZA7aQdt/lbZIefMizH25zHeOFw6u9GyB
+	+ZfZA6GR9ogBJcOzL00scgER20UrA+x6A+rKmhL2aAPF5tLsJauJFnihA6zA921J7n70sjo9sX5
+	Jbe7qbDbb1k+cHG84UburhmbNw0tu1uSDlEUdAA6iDTjdkDYw2pFrgZmOf8nizQciaGL6CtpI7Q
+	aUK4FVQw5AnvzGZVW9dP+zE7wBP+j4IhBrxyJChQ2L9xVc55SvGFAKxKv7yTw5iCV2/X1NARBJw
+	Wk10IFAUmn7pDmf7CXUnfhrPvHOfSh6Vuo3r0seMbnTWKjVRLTXEGaxGVctNgLV+t3nZ8uLw+/6
+	wHRn1W5ndUqNOL2i3/Ge0O+652qPZExMHv5pUR3bV+O2rUR757ZR79xGWlXu/g4hP0CoGNScDFP
+	CUgUmv2N95MqmyXVNMJhEXJzlEIU9vogOzcnwLSz9ihPdEuJ4Imw3SlSWm
+X-Received: by 2002:a67:ef52:0:b0:607:4fe2:d3e1 with SMTP id ada2fe7eead31-6074fe32c26mr3016088137.13.1775715476696;
+        Wed, 08 Apr 2026 23:17:56 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
+        by smtp-relay.gmail.com with ESMTPS id ada2fe7eead31-605830754f7sm1748540137.27.2026.04.08.23.17.55
         for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 Apr 2026 23:14:11 -0700 (PDT)
+        Wed, 08 Apr 2026 23:17:56 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-59e11fb980fso334422e87.2
-        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2026 23:14:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775715249; cv=none;
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5a12514a844so317457e87.2
+        for <linux-block@vger.kernel.org>; Wed, 08 Apr 2026 23:17:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775715473; cv=none;
         d=google.com; s=arc-20240605;
-        b=lE5VuDaI9ekj4q1ggpY28+B0GzBgsyUPxnUNNdt+Kzg/lXizLbcVPrn0fXxUcAVVdj
-         ljDPvWIG3kY96RL+v0gaGHo5gBV1ykMZsE8yq8fOv6PRtPIrgZhvqHckVO871+jRgdOU
-         lMCy2vbHke/F1VCK0hrQ6LOHWDnqxRtgN2ZKBg+dQTmbJV7A7DGbVHykkMRuqxYzYnpi
-         bmND1kk5XaW5CUe51LySjkrUtQIdhqeRm4zORntLNk6iQBTY7zSSfKIaRItaRnXBHm2J
-         bT4mesAUTeaa1L7qxFAvG8axDNk+s/QjDMIcKTlh6Ulpzhy70JWAAPEl5zH2RNVdYF1S
-         X6Xg==
+        b=MKeEvEBB8Qo5Tc7wEmkKgJ63qMpo258N2qghb24jwM5wIPspgUMAqCsSVzLhC6FEm8
+         qtmpDXghBi1TUgsLlZMpR/ILBBMMGe27kAzb5KBUWVQKtI/og31PGqYzr3erQwTHbpNP
+         +un6vs8cj+sX8SxovoJ6CY3eGQjZBifSSWYIvM9IHyN8lHOas309J4NFzMj1gzJUPJhW
+         sfXi3y0+91R6928rhs0Qsu8En7/1P78MLjyW7I8CX6HtTmaJvHuzyFoLakTgo07QX3G4
+         ecWMzX/0VdNgQ5RDIzGkz74joiAZGZ353tzdGM6Dh2AbnMhyCUupGTJMBgAX0itSIdlX
+         hiRQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=x8VrKS6HIWkkDV3g81RAsAaRpE1iHQtCFFxkhbl+5wY=;
-        fh=Ex3I4MDQhhEiuZqq63WIlcpibNQ21K5I0T3iT+0ch98=;
-        b=hdhew/H8PvR3hvSqU2Z/gcn9O59elTpnyRDxbJ7eARfIHmg1+NemfHq+5aSIMsG8it
-         OFM19mhMZZwhRYGowWVbigAdZFF8laQVbbE/eOqxxeQWn4bchkZfymszSp1rx2ARpoAN
-         gTiyTHCmYEawRHT9cIKjFxt0GSPDblKXcjxn/sTYXa9wSJI59st4dcI9oaekhTRK0Oqk
-         ckpz37A0ACzpxW4tOmk02WtfnKWax9qz5b1i9uJ5JMrLjNFtXMMhO+phETYLA5Y5gVAa
-         /gQWDFU6kovdGNL1QpoVc4MEoHGPk4I1Vb0yyUdpQSVvPTqZoi5ypQL8FrtjRnvxumr+
-         f8QQ==;
+        bh=9veiu4A589Q2Np45N/RNb6SDHUDnWQsvsoeOSQNVTKo=;
+        fh=jprhk4HXUiZnyKxkuZFaKQR5cjETKQlPzxj++jQwMzk=;
+        b=XK8HjVChOw6Cng9AyCe7FuLk3LnvDoximuJ9ZT6wmjs0hadhOuI1a7q1MX/ve5zyXg
+         IR5n9b039NmLvV9ZdvcjKf1YkZkgtF/L/oocKVGEi6kqbCN+yFH6b3fKn9XLCMc5brIy
+         64tFjFyIozSsk2nGBdC0F68QXM/ZZzqV+4z77XJtjJYtWCCAPY9GPXReTVbkoquDsjP6
+         8Tt3pKeOWRo1mfEA0p7mFhfz3E1l/Bfgi1YP3KHgB4og1zQiow1RD1jHGvqNHeL3D0aP
+         6O1dVPwQ2KPSfNMDVvsz5YGpKhvtPneJ+695JwWphfcOoUYJ8JjYY0/B7jEun5hyd5mS
+         rlNQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775715249; x=1776320049; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1775715473; x=1776320273; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=x8VrKS6HIWkkDV3g81RAsAaRpE1iHQtCFFxkhbl+5wY=;
-        b=K6R8D0oWZUHgp3bz8mjl0CxmvwJSybUsr4dNODN2Z+fMyvJDk6gbcdntUShkCWYIlR
-         uri1NTWJAyoBlhUP+kOvhZDiM4cyuNVimf59QBtKngSRXujffzIXISEGaSpNfhFt/qGH
-         OKkTdb8mcnoG66qgX4ksw494iwNQrTgjqg1bY=
-X-Forwarded-Encrypted: i=1; AJvYcCXkJW0WBkcUxOwIut+7OKtOFpbBvq6Oc+1B+tIEcurnoTbQXhiLm7qGBhCd3eFtt+5OtHVr5s87VepGFg==@vger.kernel.org
-X-Received: by 2002:a05:6512:3408:b0:5a3:d1d0:543d with SMTP id 2adb3069b0e04-5a3d1d055femr7496204e87.27.1775715248845;
-        Wed, 08 Apr 2026 23:14:08 -0700 (PDT)
-X-Received: by 2002:a05:6512:3408:b0:5a3:d1d0:543d with SMTP id
- 2adb3069b0e04-5a3d1d055femr7496193e87.27.1775715248294; Wed, 08 Apr 2026
- 23:14:08 -0700 (PDT)
+        bh=9veiu4A589Q2Np45N/RNb6SDHUDnWQsvsoeOSQNVTKo=;
+        b=RqJHMdy7yYwB2WSctqy4jkvUlJ/0Z8WbFbnAZAIljBmcdku8yDhnchwLJwsvG0lQ2K
+         eeAF8utls0Vd+tLUgEf6dyrtdOjLeJSYqujXO0z4J33WKrZ8joALcod/EYbeVYhzpHgP
+         ZemYL09SSiKFe5sPXL8dh4PCKWjhC+wkCAK1o=
+X-Forwarded-Encrypted: i=1; AJvYcCV0imDkEeT2EWDbmEbDk82qunisJUt0hNfitCoDYJYutJPAYWYiWuFiSOhcbCSqsPeisSDwJUCsapnW8Q==@vger.kernel.org
+X-Received: by 2002:a05:6512:39c4:b0:5a0:f95a:1602 with SMTP id 2adb3069b0e04-5a3e7a1b3abmr728030e87.17.1775715473516;
+        Wed, 08 Apr 2026 23:17:53 -0700 (PDT)
+X-Received: by 2002:a05:6512:39c4:b0:5a0:f95a:1602 with SMTP id
+ 2adb3069b0e04-5a3e7a1b3abmr728014e87.17.1775715472968; Wed, 08 Apr 2026
+ 23:17:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -96,35 +96,35 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260402074637.92417-1-sumit.saxena@broadcom.com>
- <20260402074637.92417-3-sumit.saxena@broadcom.com> <1d0d35fe-5e9d-44b7-9dcd-48289f9d9f53@acm.org>
-In-Reply-To: <1d0d35fe-5e9d-44b7-9dcd-48289f9d9f53@acm.org>
+ <20260402074637.92417-4-sumit.saxena@broadcom.com> <fd582bae-a090-48d4-a4eb-b2db6c10c26c@acm.org>
+In-Reply-To: <fd582bae-a090-48d4-a4eb-b2db6c10c26c@acm.org>
 From: Sumit Saxena <sumit.saxena@broadcom.com>
-Date: Thu, 9 Apr 2026 11:43:42 +0530
-X-Gm-Features: AQROBzCVjmKw5QHlEaQJks9SwSAuJmE0_wfvSzYRI3X6FIYaKsKaSGMO2VQiGqw
-Message-ID: <CAL2rwxrU=pW9yhXGGh_Vd67OdSHp4tDGDxQtxcE=GZvfYb4j3w@mail.gmail.com>
-Subject: Re: [PATCH 2/3] block: align nr_active_requests_shared_tags to avoid
- cache line contention
+Date: Thu, 9 Apr 2026 11:47:26 +0530
+X-Gm-Features: AQROBzDUquBm5kMJ6J7syFlVbc5mzRztWCArYbjMRZL4e7qdDMCJme1mb4poIFc
+Message-ID: <CAL2rwxryLK1_kna6Ho4EFoSMxzJgfznZkU-6NgUACczP_GV79Q@mail.gmail.com>
+Subject: Re: [PATCH 3/3] scsi: align scsi_device iodone_cnt to avoid cache
+ line contention
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: martin.petersen@oracle.com, axboe@kernel.dk, linux-scsi@vger.kernel.org, 
 	linux-block@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com, 
 	James Rizzo <james.rizzo@broadcom.com>
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a84c2f064f00ecb6"
+	boundary="0000000000000bd361064f00fac6"
 
---000000000000a84c2f064f00ecb6
+--0000000000000bd361064f00fac6
 Content-Type: text/plain; charset="UTF-8"
 
-> A possible alternative is this patch that removes
-> nr_active_requests_shared_tags:
->
-> https://lore.kernel.org/linux-block/20240529213921.3166462-1-bvanassche@acm.org/
-Sorry for the late reply. Let me test with your patch.
+> Has it been considered to change both iorequest_cnt and iodone_cnt into
+> per-cpu counters?
+We're testing with per-cpu counters, initial results look good. Once
+the testing is complete,
+I will post the next version.
 
 Thanks,
 Sumit
 
---000000000000a84c2f064f00ecb6
+--0000000000000bd361064f00fac6
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -217,13 +217,13 @@ dYm4Ph9QYI0sm+Xitx8MkdOJtq5mcPWowGi8UiCgkOidv4ki1SA0wptfquUhbfS9b2M3XUHCEIUX
 4ECvIjR3f+E0NbBIfPccWfYUaDLvo2qhLYS3KQbhKdXcJ83ha17mbVNZbDDo9upNcLO/oPyDbCNF
 J6UpXZmis1wnCynhK4kQfwFhW7H+MYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
 ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMdI2Nfq/Vk8dzZMUnMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCC5g+Ru
-SZduGCUX3w1NFAYVk9axkv6EyptltRtbS+4ScDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjA0MDkwNjE0MDlaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MjAyMwIMdI2Nfq/Vk8dzZMUnMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCOIq1q
+zWts6fUqqIlaUKTHtNH1yGnQG90NUWlIst8FLDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA0MDkwNjE3NTNaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
 MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBGrGCvsAps332SgXjzwKL7pCpKEsgql2mXacMG1Zd5
-zayn32vq811td8yQXJX3WAlO1h+1Buj428LhdjjTkDB4+GZiABEY5QQCghrSFhicYbBE0HqEFDY2
-JpJoTALqIoKck2JsBPZnmpUXaWuIZyiIZyLEa8546opemJdiNUnef1QCUftr2fDvjEI7OZaZIDIn
-uHV7xUGghYVZxKXvlve0NRjMU7fEOcDCSfFGXi057KnYHK1uvORh9sIADXBn0tUlLbki2E6m5UKi
-5g7XpSKJZCl91bAoX85IxDX1r0EWbb/JSoD1khmo+tNDqGDBDAGwWzw52hxEeF/nfnd4TJVJ
---000000000000a84c2f064f00ecb6--
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCfk4edYgzjs74uNdMkE3M/HHCNJC5g1uLPzTwDKIBu
+0PzhB8MQ9vaSVs8ODVEVNvpV6e92pd4PwEWWKz63mOwxTrmOGjwTVrNr3xkpfUVY9KxDyCCykJuj
+eyeH1A/iw53g4Q+yugbXjunxRAp9tYf9gMSEjnD43NIC0gEeoQY3CUN4EF5Ecr9BSTM055N2GZOr
+ACb+p/LNB/u1UKQx2VGF2/skd3/dG2AUulv/YGklo/A46O/rzHVJn8E+PGVS3Mb4cY8GV/PUI7xz
+eVGUtEN7HOZkBFp+LUzrIRoH643Rq+j7xmM1k6G7t/0raxZP+RuvTSiFmGxTUMLxdO2g/HCW
+--0000000000000bd361064f00fac6--
