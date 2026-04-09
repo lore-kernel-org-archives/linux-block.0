@@ -1,71 +1,71 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE002C11FD
-	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 13:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC5B40DFA4
+	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 13:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775741441; cv=none; b=i72swJdS2IV3d176FHie3kIqIl63JXZCExsSu2i/+LzJloX/IPkMxaebyifUQTYFSjmBJV9cM/0iQ2MJJyy1TwXaa46/cR5Ycjdff6SctaZreRcZpZ3zAH3GvuU38KKH0ONc5+r8pJDgxGYKKFsRwdc3DqRinyxO3X9MuCIrWeM=
+	t=1775741445; cv=none; b=Gn8a+IK0mFfFzgHPFtiKH+6wVnPbDNQ/xR0mBriB+VzV5jof1tkOIs62cttayUUD+mNcEFb2i/M6BS9v0oaXhmAFh+hVXW/GCDMqpWRTaicI8lr9ZVf/6zooOwptAIs0W2hsQlKcorYdj7Jdi7eF6zYRqBifQ2Qfviy43ec+sN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775741441; c=relaxed/simple;
-	bh=hNoYfRfTH01oflc9UzkcxGZ48tEqFZv6H36DwUg70no=;
+	s=arc-20240116; t=1775741445; c=relaxed/simple;
+	bh=bgzKs6mbLQhLGavu0hwKVH6mLdIrXI6uzhfcWZta3hI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nGRlkx+gYiPzn/E79fTJf2IfoUy9pz/+kbn3UuFPBJbKUj0K65QINEe8f/nAnyEiRw7n9NkUTFNFaq+8vDvOHvIIgq8jReRpR1YfKgQasCYjpuYIZaHrkInRBWC+tlb31rx8uED+rSx3+cZgICnLLMkcPe9eUm3QAmhvhPQV+s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LX7t9b0C; arc=none smtp.client-ip=209.85.216.41
+	 MIME-Version; b=Cir9nAGWbS7trDKi8FjpC0hQ+ofYfw2/gfI/34FoDO0y99vDzbqfOgrF6/vMvnBmqKpXadBBByAAHlOwah2sDxXDK7ggEVWPFUuTkYG8CqqAECQO6+vbR/TnJJhetTE+G9nLYlJSfQXNpqbuMLrPUHQRgKN8GUR92sco9RoWtAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KE4KWwU7; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LX7t9b0C"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-354a18c48b5so859487a91.1
-        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 06:30:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KE4KWwU7"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-35691a231a7so668471a91.3
+        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 06:30:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775741439; x=1776346239; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775741444; x=1776346244; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BVm6kN83Pf5g8LGKvAJBiPdplk9IeuEltPFsklHaiIA=;
-        b=LX7t9b0CU5Yxgd1o+rd9V9fLtHCJnfyozHpW9JD3aDnrP2p2VUickQkn06BB5EcCcV
-         lZSXNqo9Dp+dxoGEU8W5HZk0Q+LAGKGkVR2LY1XPZopjoBivADl5dzDh0K90HrkXEhMj
-         rEJQYciKHMWqhufuBapnXH30Ji7YPGpFrWcu5O6GKUmmywBP4omBIysxtjhwZSU6M2IV
-         VjbSMzwDxLngayRoKePt7m3MwQ7LugBF+mAl/Sk7JK8q02OcM43bB4b+fZj0WwwhpSQQ
-         GVl45tfhY/W3XetIm3MkPSw1iqiJsCkXZuIbHnsXUA2qqVo9eSnuEPcGT6KUBcK9ys3f
-         2rfQ==
+        bh=MelbjYoWc1d9uyNY8B2BpPObxBTBrZhkXDjyAQtB4wI=;
+        b=KE4KWwU74mpA2qMgHrYeJuQm+5r8T9rFaV8PIS5VmeLXG6h5ztaKoxJ04cVW4mrRZr
+         4GTdNyUDlwYSdlp9f4IhdMijCCKBg/Pyg3tZnBwZ85e+mW/agjPGAk4KytqPdpJgJ5vX
+         XbYpuF/0qvsCM9fH/d9Xol5xiwe+DudT1IJtxyUhq0BFB3Bv6NLsShs165VLcmwG2CkE
+         +gQFxOs8zUqbtUno+vNvd1S68i49f3ql0404slryiv/5mAPpqsIVPNXBN71rltwSyJ9z
+         yST9dX0PuB9jFRZx8O/EsgCu2gfblm0pLQ9U92He5bIjjdOlkMAPv4y64Nkinl3LRqG4
+         uZyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775741439; x=1776346239;
+        d=1e100.net; s=20251104; t=1775741444; x=1776346244;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=BVm6kN83Pf5g8LGKvAJBiPdplk9IeuEltPFsklHaiIA=;
-        b=O3egfPJP6WssBtJZPj36bx90mmYT9+JEoFDRWqs9yO33NEO7JzijYxTDfWRBcL1oMA
-         oqj3V76Vf+GTvggNE9+2on3cDCVzBu3ElrVi+PWxwfRHznTJCC9tfeMTBDCV/MsIirwQ
-         iX/AfwDUD1BoIczSJw3jTAkzkZV3SHfEIQwpR5/Dz6FqjRV03ecTGNB+vLNa4jnlLPSd
-         C7udmrzMpL0i/ih4N65SluyhEHuYEJbSYLujaEq4IEtGe+CFgIU2crJEln1Bqqh+MKd3
-         WPzcGZ3Pv+tOnjvy50MZUCT4gqZuGfZSsjJqDkDkSRuA2H9kKi6OOBK7oPjR87t6+dzI
-         zrqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXY0bWipAgAKZ0LB3j0CtVfPE46GffGzrk68NRgXnkrCom9s80wFIIS7Jg90nSuRvi2dLKq4lvWgRNPJg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUCXZHu7NdIl9LIamDhqizyyBZbUZd1OqupUno+1/ckfYk3jiI
-	KdkSXrb4WTJPFXeSvsna/sjWW6xHYy138Dg+ZH9Nql9+csg7zLkrszRA/amuSV4z1plmhQ==
-X-Gm-Gg: AeBDiescugYZZOT3pKdsoDpJuaITw1i2Bv/eBcJGtzchA4qBmtN6LGFxSNY6rzdqdgV
-	9tyfz9aS7sEY4SN3wUXGWNGuMcC7fPQv9h/scgliltHcRnw2/tvlW+kl9nkq/skshwdr981550n
-	u+MVUyBOa+17SVu+iYR8lmeBm3S59pXzUfzDbtdt1YgFy3nRRfTHf+2BPi8JMjYq3+PEu4sbY4l
-	LB4P0uJ8lI5Ma0PYRMkpp7Qqyd1SXvwdkSjSfHDUUJ+iW3IoECWQUIlLbIAstlJZsMaP4IAKEOM
-	zAR8QvGoby7knASpiuN/zkTrQO7BtQtMB7tZq9QiHOA7gHoSUDriwz9RpOuTi7Mgoz4REF3RckH
-	iAYYsPkkfS9YsLdWRoksvn+8mlOZqwPgCLD5hF5a4mWjcFIqGKBtQXt+NulgACDBkuEjKcPK7yA
-	dSV1IxNYS/vwukONcDJtQU/BaDi7liQA/rct9zz9vTOhAIOqc5mzMhhL2pzsdssiWttw==
-X-Received: by 2002:a17:90b:4a48:b0:35d:a861:36dd with SMTP id 98e67ed59e1d1-35de691b2fdmr24777780a91.25.1775741439293;
-        Thu, 09 Apr 2026 06:30:39 -0700 (PDT)
+        bh=MelbjYoWc1d9uyNY8B2BpPObxBTBrZhkXDjyAQtB4wI=;
+        b=S0Fmqpg37gkpMy81+JjwDk0nFi37OxDr/qeBtrHrOs/401uei7IEYZMtACSFoY8mWB
+         kwQHMJQultzqLO6yFKvcBh1IVd/pdj8HStMVmFhOQQJZ3B+CSsUtj37DcjNH0so1/mLp
+         14Mhn8YHbGKnJesw2t7x0LAbnPqnseTFCiRG/S/SSzUac3Wunme0cj6rq2rlqoTkvu4y
+         xEYx1aXg/5AgjNvQ6Sgxs+2OMcHkgi4mDHM1DADXPpWnGG2u9Zqwzy6oofZXcbHtpL/L
+         Dcex22jG4Wj6i1zgHRV3RYs/o3ovZ7Ix5bWU4HU08iPfa4eiJJAp/7eUfRjbZWtYXSOZ
+         p7QA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTyiKHjLxTE+oDSmaGValc3Jzbw1fsM964r9TWfJjSACKV6U8GD1DKlv29nNBgr1G13EwS+Df3g/zU+A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUPnPUD3VlGlpTQqTzCsRCkJHXBzjsEFiNczmFkRHNqCv8uYNH
+	uVeHme04I36ydmhnOToilUd+r9FZu5gF7EHj2TBuyZzj5J+cw9ibJa4Y
+X-Gm-Gg: AeBDiesCbZ7lhj6nRs23Lvev80c/q5aHX/2RvDEGNfzaZE6/2+64pApjaEaqPpriPk9
+	Wf7TlFdh+SECKV0k16lPbI1MAtuQD56pwDnsE8c0mf16LMtdNpy2QAsTLOLr4ZCFdtxbKS32itD
+	lma3jXUtoBpbb/E45SpbXhVj5E7okaEgtg6KqkIvW8EkZ2pm/srvfH6Jng+SsBLL2lxXeDgrJDV
+	nIc/Vc5UuMmiVxjWoZP0o7nxZD4pg9bUmQka1fU0Vi+zJ2dnEwgbei08CGn8nYQFVJkmljIHqDy
+	wYVScYtY1A3ZWJEOSHyJmm9kcm96Q3NLz3ESsxN9NMDDaTKvMtVRX9xKEwf9ZLRplclSU0h7N30
+	rEryWTTufc6OM/8eUvDg6iy3qLruu5QQ4WmpJTzUa0WdRDK8/PzZBp8wNp47nVJRUut1eAc4y/e
+	xkVZ/WqPBUnmSCT9MfqvV5q1RkfD8cNpIgwmvWZudVY6C/jaxhUeyCtmO2/Z2WqAIPSQ==
+X-Received: by 2002:a05:6a20:72a9:b0:39c:241:65a3 with SMTP id adf61e73a8af0-39f2eda9e74mr25822268637.1.1775741442345;
+        Thu, 09 Apr 2026 06:30:42 -0700 (PDT)
 Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c657dfb7sm21021166a12.24.2026.04.09.06.30.36
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c657dfb7sm21021166a12.24.2026.04.09.06.30.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 06:30:38 -0700 (PDT)
+        Thu, 09 Apr 2026 06:30:41 -0700 (PDT)
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 1/7] ublk: widen ublk_shmem_buf_reg.len to __u64 for 4GB buffer support
-Date: Thu,  9 Apr 2026 21:30:13 +0800
-Message-ID: <20260409133020.3780098-2-tom.leiming@gmail.com>
+Subject: [PATCH 2/7] ublk: verify all pages in multi-page bvec fall within registered range
+Date: Thu,  9 Apr 2026 21:30:14 +0800
+Message-ID: <20260409133020.3780098-3-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260409133020.3780098-1-tom.leiming@gmail.com>
 References: <20260409133020.3780098-1-tom.leiming@gmail.com>
@@ -77,66 +77,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The __u32 len field cannot represent a 4GB buffer (0x100000000
-overflows to 0). Change it to __u64 so buffers up to 4GB can be
-registered. Add a reserved field for alignment and validate it
-is zero.
+rq_for_each_bvec() yields multi-page bvecs where bv_page is only the
+first page. ublk_try_buf_match() only validated the start PFN against
+the maple tree, but a bvec can span multiple pages past the end of a
+registered range.
 
-The kernel enforces a default max of 4GB (UBLK_SHMEM_BUF_SIZE_MAX)
-which may be increased in future.
+Use mas_walk() instead of mtree_load() to obtain the range boundaries
+stored in the maple tree, and check that the bvec's end PFN does not
+exceed the range. Also remove base_pfn from struct ublk_buf_range
+since mas.index already provides the range start PFN.
 
+Reported-by: Caleb Sander Mateos <csander@purestorage.com>
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/ublk_drv.c      | 9 ++++++++-
- include/uapi/linux/ublk_cmd.h | 3 ++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ drivers/block/ublk_drv.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2e475bdc54dd..ada9a2e32ea9 100644
+index ada9a2e32ea9..f990c10e963a 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -63,6 +63,9 @@
- #define UBLK_CMD_REG_BUF	_IOC_NR(UBLK_U_CMD_REG_BUF)
- #define UBLK_CMD_UNREG_BUF	_IOC_NR(UBLK_U_CMD_UNREG_BUF)
+@@ -304,7 +304,6 @@ struct ublk_buf {
  
-+/* Default max shmem buffer size: 4GB (may be increased in future) */
-+#define UBLK_SHMEM_BUF_SIZE_MAX	(1ULL << 32)
+ /* Maple tree value: maps a PFN range to buffer location */
+ struct ublk_buf_range {
+-	unsigned long base_pfn;
+ 	unsigned short buf_index;
+ 	unsigned short flags;
+ 	unsigned int base_offset;	/* byte offset within buffer */
+@@ -5306,7 +5305,6 @@ static int __ublk_ctrl_reg_buf(struct ublk_device *ub,
+ 		}
+ 		range->buf_index = index;
+ 		range->flags = flags;
+-		range->base_pfn = pfn;
+ 		range->base_offset = start << PAGE_SHIFT;
+ 
+ 		ret = mtree_insert_range(&ub->buf_tree, pfn,
+@@ -5451,8 +5449,8 @@ static void __ublk_ctrl_unreg_buf(struct ublk_device *ub,
+ 		if (range->buf_index != buf_index)
+ 			continue;
+ 
+-		base = range->base_pfn;
+-		nr = mas.last - mas.index + 1;
++		base = mas.index;
++		nr = mas.last - base + 1;
+ 		mas_erase(&mas);
+ 
+ 		for (off = 0; off < nr; ) {
+@@ -5531,15 +5529,22 @@ static bool ublk_try_buf_match(struct ublk_device *ub,
+ 
+ 	rq_for_each_bvec(bv, rq, iter) {
+ 		unsigned long pfn = page_to_pfn(bv.bv_page);
++		unsigned long end_pfn = pfn +
++			((bv.bv_offset + bv.bv_len - 1) >> PAGE_SHIFT);
+ 		struct ublk_buf_range *range;
+ 		unsigned long off;
++		MA_STATE(mas, &ub->buf_tree, pfn, pfn);
+ 
+-		range = mtree_load(&ub->buf_tree, pfn);
++		range = mas_walk(&mas);
+ 		if (!range)
+ 			return false;
+ 
++		/* verify all pages in this bvec fall within the range */
++		if (end_pfn > mas.last)
++			return false;
 +
- #define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
- #define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
+ 		off = range->base_offset +
+-			(pfn - range->base_pfn) * PAGE_SIZE + bv.bv_offset;
++			(pfn - mas.index) * PAGE_SIZE + bv.bv_offset;
  
-@@ -5351,11 +5354,15 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 	if (buf_reg.flags & ~UBLK_SHMEM_BUF_READ_ONLY)
- 		return -EINVAL;
- 
-+	if (buf_reg.reserved)
-+		return -EINVAL;
-+
- 	addr = buf_reg.addr;
- 	size = buf_reg.len;
- 	nr_pages = size >> PAGE_SHIFT;
- 
--	if (!size || !PAGE_ALIGNED(size) || !PAGE_ALIGNED(addr))
-+	if (!size || size > UBLK_SHMEM_BUF_SIZE_MAX ||
-+	    !PAGE_ALIGNED(size) || !PAGE_ALIGNED(addr))
- 		return -EINVAL;
- 
- 	disk = ublk_get_disk(ub);
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index ecd258847d3d..66d93efccd51 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -89,8 +89,9 @@
- /* Parameter buffer for UBLK_U_CMD_REG_BUF, pointed to by ctrl_cmd.addr */
- struct ublk_shmem_buf_reg {
- 	__u64	addr;	/* userspace virtual address of shared memory */
--	__u32	len;	/* buffer size in bytes (page-aligned, max 4GB) */
-+	__u64	len;	/* buffer size in bytes, page-aligned, default max 4GB */
- 	__u32	flags;
-+	__u32	reserved;
- };
- 
- /* Pin pages without FOLL_WRITE; usable with write-sealed memfd */
+ 		if (first) {
+ 			/* Read-only buffer can't serve READ (kernel writes) */
 -- 
 2.53.0
 
