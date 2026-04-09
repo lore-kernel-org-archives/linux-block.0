@@ -1,72 +1,71 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9CF2C21DD
-	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 13:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CB62D29C8
+	for <linux-block@vger.kernel.org>; Thu,  9 Apr 2026 13:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775741451; cv=none; b=ZgDMUkriFlW8BsjyMpWmVj2JeXTfvfjwU9bR5C9laxaXSqTV9msVVP0AlmY2/3KZMDGidnPKPDsAlH2mwB+lCOGuzpwWareE5XDXFv8iGL8Znufb+L4Ey89nF3nl2pAC38Rh1XrfbeJQe3Hzuc2OVkPFQvTSmS0FxR6VUw2or7s=
+	t=1775741453; cv=none; b=DrNfu1PIh2LhmaW8xMsiLmlA6kSCAPGOBqXpxliajT3TKemE2D+VjS8Nu8ngrBc5lRJbN3Phy/GKNeD8H3JVi8DNJ1Fz+suXja6O7XY48hxpwSbrcA9s1iGAgNFg+nz6Eo5PxSYjkKEdAKCpzGrWX5dQI1qUgWyXF/j5acXRYak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775741451; c=relaxed/simple;
-	bh=uoBokHy8pk8sBfhJ74h7PBVf2ICF6CeuxMxjDnnSHt8=;
+	s=arc-20240116; t=1775741453; c=relaxed/simple;
+	bh=u6QP0q4Pm7easOFpuu1jyJmPJ91tFSoY63m6b/xrEAM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PNzfxgi8CSJl/jWZP2+ZrllcNX3wlYDRKI6hc3cGT6wMPQe1PERceDn4Y+T9QQoYr0tknz8ZaoijyJXLBqnSdjavQEIDEINecv4YgJTByQLBbwc7rVkaQXLt5z0Y3a4B+KLqZ7WrNxvYiESS4On2kPKrL3gyxcsdhuXPNGtJOak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HhkimeBN; arc=none smtp.client-ip=209.85.215.174
+	 MIME-Version; b=sHfiARRHavNzAX7rgaTuUL4lMACKFc4aawtdvKZjlf/4H31VxKPGNZZuMur2mEBnbFz3l2OwOqgPRTPLpf3FMBgvkeo0wP7wdXnF5zRxyhHFggwPd9z2RyDQEc7R6x/MvLJ/SFR3HBSufKN9iCc2v665ig7htTzbj26cVxg7J7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EYhkIkDo; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhkimeBN"
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c76d797b180so441688a12.2
-        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 06:30:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EYhkIkDo"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c76af79f029so376579a12.3
+        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 06:30:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775741449; x=1776346249; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775741452; x=1776346252; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QXdVhWK6ZkFpMh17g5RRD/prbc/+uR0BFH2zEbbEkN0=;
-        b=HhkimeBNjXAYvwFniDW66bMkI0rskKa77F4QMLTJTB7E+32kYekNP5A1J4Wozlo+to
-         nrj2sbjyZBpPkTVs1qLYgHjgq5kx85QPBJcToo1ZqhGE12Vr2LQqGU17hkTT1FxUXmps
-         FPKsjeX09tstAe5OW7B3ATbJ8APZxYiThO036LupkoLgTkPWpUry2N/lj8DnkZh2NAt5
-         sdHYt424xbuwuGsksAk3mfrFmgYQMR2hG9X/KNNVWs6FxA/frMck4Z7d0Oiht+4E2FX+
-         jSkqTOFbWI7SBTX/DZq0cM8855Q78zN5/sgS7K2rdQCSGdFHvYhBVz7goofz1/0t+BBP
-         5stg==
+        bh=5RfjnMCd/AF7bBdOrwDqyxNxMK9P28G5mGjUvtSq2DM=;
+        b=EYhkIkDog8IYxUt/dtIs40HsMwGjttLz9dWChT+ejjhGzyuW/7bGavASJkZ8f+czwr
+         5MbBVpDWkNN24tGFRqtXMHnpv7MaanHNTAmqo+m5YsVtT1a3B+0Nav33oZycqx61nDWx
+         n4+MSrAK1UIXI4TfTtHrW+2rMOC93k2o0+76PUlee3HUrPLNC3bflrny9z3ZsPRByugq
+         I1/gK0/7tnINmNn/tksGScvM8SMgZKDhYidiUwSClpqJhIcCTFbPClwm7sn1Z9jWfeFI
+         gblYOMyTLMA1ivKmDG82PbTOdj1AhRIjyKta3AveLl6+0AXh6LxzS3rgsKGg5ZavnONI
+         8c4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775741449; x=1776346249;
+        d=1e100.net; s=20251104; t=1775741452; x=1776346252;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QXdVhWK6ZkFpMh17g5RRD/prbc/+uR0BFH2zEbbEkN0=;
-        b=VRZjoZ/QgvC0HR7DXvv6h/J1gSDlZAcG7nJ6+l2bk04b99UL2bMVWqRyP0OZqsYK8n
-         RvUg5DiC0jGCh8rQwTbwcthiJJUHrXZI0tq65KbBS5MtNvHKuhfEHfkrUmYY/RunwKMu
-         v/2bju+gDX7lPRKa7VHFcgBK4+56a1DqB0MqDStetJ26z/zsvjl+fZi4rqDcs43y5cyT
-         PkdNf/79rx5ggqn4blv7FFuZVD7t1pvCUI3iWianrg9U8tFb+qiJCNkT7TN974oOpHkf
-         dQ2vzS0boo3DW5xzT1mrRdLntdxSrTNfO17pMop3yX4SJkv5ep+dt9YwZ73L5N0hVd88
-         NoOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIMh8zaTmFNSGyxdb/HizTmXAKoaLOvwvN2Qjo5Wlvot5P3b9nI8awFBM2mG0oKnhhEnB1wFF7+QHIFw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkyKKfx708akJVsKeipJ+DtRQjkUOdab6uUKzVIjQnOyETtXfc
-	m58xWeBbmNX3BGhTBYVEvlKXlZ7A+DPYwTOfHiSmovOPR9dqr9u/f7PK3FVQPKln6u2CqQ==
-X-Gm-Gg: AeBDietzxEjaNYZuMrPKG8QHT17tPtkGkAGWCL/ZcQGboc4qrIMEZT0ji3HPut8Sj2T
-	luDbvJrc8edDIGw1J94P+KNTzAwnGrJfWZ4G2XfJuNQbH51lKYkpzC5+i/9id9iDpOxBIy1R9Bd
-	pyqetDgE3X4P4IIcAcM/kov2JzmB4lHEnfEBmHtZrl0S4hkbpT5fb8NAWi43NuwgKkZ1h35voPJ
-	cNmlxaLMilsrmYPXV2EzCzDOQ06Dr/pDLjaWyttLKmyaq7CEBPIjSl7pS0kJ2kLYerxN2w45XSF
-	HN47+wCV9yCedZVYaaQ84SB3jfL/t1Rrhoyg1T68T2z4rrN7mX4eJvSAQX/2xaWrPmA2CP7nH4u
-	CGutIwumgsqzvQ/mqaaLzCllHsRHUoLk5eE1OQsOIt4/C8c+qJTogaclpH6i+3kiEc0Wta67NKG
-	EM+7BvmmbRKpsN+XBuYJvu1u+Tu/DCv4a/XS9Kt8jyPKv1gKspyLxiw6rV874zSxprhSJb0DGNJ
-	fn8
-X-Received: by 2002:a05:6a20:12cd:b0:39f:a42:9251 with SMTP id adf61e73a8af0-39fc8149691mr4233912637.22.1775741448852;
-        Thu, 09 Apr 2026 06:30:48 -0700 (PDT)
+        bh=5RfjnMCd/AF7bBdOrwDqyxNxMK9P28G5mGjUvtSq2DM=;
+        b=KdjW4o1A65TLD4IocnD8HDsgEosWX22bGRNQHL6nRKVuTiqyWf1tqyoWE/0XSagL/Q
+         mRvZYTNg5CPp7GoYvtmdAQ5clBF/zN7Pb0B142XZ7CDMg1fQWgdQ8wNB/bUXa5TOyN78
+         VexE7KhAx2ihMHZichk6T3Y/BRC3rBVjmd6RvlKKUT1EjRnwCZQkLrCSW0lcsArXnd1a
+         /1hwi3r+mpxY7G4gU+HOnoevbKBp/+k2V6b5kLtwJ62+TiodYL1QmyKaGOJh5b1PQg/y
+         GZFffs0JWDS4XbliPjDdmalIM5LVgZ3nDnpdTrP86g2zohPySwkT74SfoR6E6EksbmcK
+         EBGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVZE1y/x2on2/xLEwltfZ78+D1inshtAQAFbqq5Wwizb+FRDdQDSWnaWPh2w/IxthsYZoFzb3Aj2LvnWg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbbzZBLVIFmONYUxg/9JD3gAMB8eZ57wGHVSZNAyVb/RuF59FL
+	d7iJbItDckjfkOLiJ2pZCMFRz136OA24s8SBdAdtAMRiiB6/6MlIY306NyGYGiXEvEXGxQ==
+X-Gm-Gg: AeBDieuej2ZPxHI6ISwQ59LnUFl6A8DJ1U47aNljSibrXqAp5AEAOrMLrXPA+pgHGnZ
+	1Z0zWTUOMNHDlPb2kK3VDqlOLidwKIVqYGHhuDmY77uzHZVSLUt+s9s7kZGJjG6/TwiW7KZorBH
+	5vwZXXWCgBoORB+OHHQXYbTEZqKTQL2Rl7yCbCRC+q9wFrn/ES7f+XdhomzP9rQvP8Uq77u/2KV
+	xM8xppMw0J8NqlXSvk1ImcRvGPm3jEldRqFtbPLd8Ci5GU6D88Be9KkfaeXuDcXzFLB0ofarv/Y
+	bxwtHAmQVKCBCuEC6+BAOvmbaiXYu9OcnLRbtjDuhzv4qak5/PRdQJjSt/C0jvxTp7N1alj0n+2
+	QEyqJdWvHijeU5f1eJKQrQp9rozxxFhXrGNge1F9fVLpOAuxVlaLGpJ+UVxR0DvkgyGTA8y1dqv
+	Ti/EY0uCOcv+TAmBr08SvO6H3Z9PdEvJ+gRcBVipb9txpPrsn2a8hRaFkxXi/bLKK1Ww==
+X-Received: by 2002:a05:6a20:a11a:b0:398:9301:b9ae with SMTP id adf61e73a8af0-39f2f11b8a1mr27001073637.52.1775741451877;
+        Thu, 09 Apr 2026 06:30:51 -0700 (PDT)
 Received: from fedora.redhat.com ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c657dfb7sm21021166a12.24.2026.04.09.06.30.45
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c657dfb7sm21021166a12.24.2026.04.09.06.30.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 06:30:48 -0700 (PDT)
+        Thu, 09 Apr 2026 06:30:51 -0700 (PDT)
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH 4/7] ublk: replace xarray with IDA for shmem buffer index allocation
-Date: Thu,  9 Apr 2026 21:30:16 +0800
-Message-ID: <20260409133020.3780098-5-tom.leiming@gmail.com>
+Subject: [PATCH 5/7] ublk: allow buffer registration before device is started
+Date: Thu,  9 Apr 2026 21:30:17 +0800
+Message-ID: <20260409133020.3780098-6-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260409133020.3780098-1-tom.leiming@gmail.com>
 References: <20260409133020.3780098-1-tom.leiming@gmail.com>
@@ -78,240 +77,179 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove struct ublk_buf which only contained nr_pages that was never
-read after registration. Use IDA for pure index allocation instead
-of xarray. Make __ublk_ctrl_unreg_buf() return int so the caller
-can detect invalid index without a separate lookup.
+Before START_DEV, there is no disk, no queue, no I/O dispatch, so
+the maple tree can be safely modified under ub->mutex alone without
+freezing the queue.
 
-Simplify ublk_buf_cleanup() to walk the maple tree directly and
-unpin all pages in one pass, instead of iterating the xarray by
-buffer index.
+Add ublk_lock_buf_tree()/ublk_unlock_buf_tree() helpers that take
+ub->mutex first, then freeze the queue if device is started. This
+ordering (mutex -> freeze) is safe because ublk_stop_dev_unlocked()
+already holds ub->mutex when calling del_gendisk() which freezes
+the queue.
 
 Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/ublk_drv.c | 92 ++++++++++++++++++++--------------------
- 1 file changed, 46 insertions(+), 46 deletions(-)
+ drivers/block/ublk_drv.c | 82 +++++++++++++---------------------------
+ 1 file changed, 27 insertions(+), 55 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index efbb22fe481c..8b686e70cf28 100644
+index 8b686e70cf28..79178f13f198 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -297,11 +297,6 @@ struct ublk_queue {
- 	struct ublk_io ios[] __counted_by(q_depth);
- };
- 
--/* Per-registered shared memory buffer */
--struct ublk_buf {
--	unsigned int nr_pages;
--};
--
- /* Maple tree value: maps a PFN range to buffer location */
- struct ublk_buf_range {
- 	unsigned short buf_index;
-@@ -345,7 +340,7 @@ struct ublk_device {
- 
- 	/* shared memory zero copy */
- 	struct maple_tree	buf_tree;
--	struct xarray		bufs_xa;
-+	struct ida		buf_ida;
- 
- 	struct ublk_queue       *queues[];
- };
-@@ -4693,7 +4688,7 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
- 	spin_lock_init(&ub->lock);
- 	mutex_init(&ub->cancel_mutex);
- 	mt_init(&ub->buf_tree);
--	xa_init_flags(&ub->bufs_xa, XA_FLAGS_ALLOC);
-+	ida_init(&ub->buf_ida);
- 	INIT_WORK(&ub->partition_scan_work, ublk_partition_scan_work);
- 
- 	ret = ublk_alloc_dev_number(ub, header->dev_id);
-@@ -5279,11 +5274,9 @@ static void ublk_buf_erase_ranges(struct ublk_device *ub, int buf_index)
+@@ -5233,30 +5233,31 @@ static int ublk_char_dev_permission(struct ublk_device *ub,
  }
  
- static int __ublk_ctrl_reg_buf(struct ublk_device *ub,
--			       struct ublk_buf *ubuf,
--			       struct page **pages, int index,
--			       unsigned short flags)
-+			       struct page **pages, unsigned long nr_pages,
-+			       int index, unsigned short flags)
+ /*
+- * Drain inflight I/O and quiesce the queue. Freeze drains all inflight
+- * requests, quiesce_nowait marks the queue so no new requests dispatch,
+- * then unfreeze allows new submissions (which won't dispatch due to
+- * quiesce). This keeps freeze and ub->mutex non-nested.
++ * Lock for maple tree modification: acquire ub->mutex, then freeze queue
++ * if device is started. If device is not yet started, only mutex is
++ * needed since no I/O path can access the tree.
++ *
++ * This ordering (mutex -> freeze) is safe because ublk_stop_dev_unlocked()
++ * already holds ub->mutex when calling del_gendisk() which freezes the queue.
+  */
+-static void ublk_quiesce_and_release(struct gendisk *disk)
++static unsigned int ublk_lock_buf_tree(struct ublk_device *ub)
  {
--	unsigned long nr_pages = ubuf->nr_pages;
- 	unsigned long i;
- 	int ret;
+-	unsigned int memflags;
++	unsigned int memflags = 0;
  
-@@ -5335,9 +5328,8 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
+-	memflags = blk_mq_freeze_queue(disk->queue);
+-	blk_mq_quiesce_queue_nowait(disk->queue);
+-	blk_mq_unfreeze_queue(disk->queue, memflags);
++	mutex_lock(&ub->mutex);
++	if (ub->ub_disk)
++		memflags = blk_mq_freeze_queue(ub->ub_disk->queue);
++
++	return memflags;
+ }
+ 
+-static void ublk_unquiesce_and_resume(struct gendisk *disk)
++static void ublk_unlock_buf_tree(struct ublk_device *ub, unsigned int memflags)
+ {
+-	blk_mq_unquiesce_queue(disk->queue);
++	if (ub->ub_disk)
++		blk_mq_unfreeze_queue(ub->ub_disk->queue, memflags);
++	mutex_unlock(&ub->mutex);
+ }
+ 
+-/*
+- * Insert PFN ranges of a registered buffer into the maple tree,
+- * coalescing consecutive PFNs into single range entries.
+- * Returns 0 on success, negative error with partial insertions unwound.
+- */
+ /* Erase coalesced PFN ranges from the maple tree matching buf_index */
+ static void ublk_buf_erase_ranges(struct ublk_device *ub, int buf_index)
+ {
+@@ -5327,7 +5328,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
+ 	unsigned long addr, size, nr_pages;
  	struct page **pages = NULL;
  	unsigned int gup_flags;
- 	struct gendisk *disk;
--	struct ublk_buf *ubuf;
+-	struct gendisk *disk;
++	unsigned int memflags;
  	long pinned;
--	u32 index;
-+	int index;
+ 	int index;
  	int ret;
+@@ -5354,16 +5355,10 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
+ 	    !PAGE_ALIGNED(size) || !PAGE_ALIGNED(addr))
+ 		return -EINVAL;
  
- 	if (!ublk_dev_support_shmem_zc(ub))
-@@ -5367,16 +5359,10 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 		return -ENODEV;
- 
- 	/* Pin pages before quiescing (may sleep) */
--	ubuf = kzalloc(sizeof(*ubuf), GFP_KERNEL);
--	if (!ubuf) {
+-	disk = ublk_get_disk(ub);
+-	if (!disk)
+-		return -ENODEV;
+-
+-	/* Pin pages before quiescing (may sleep) */
++	/* Pin pages before any locks (may sleep) */
+ 	pages = kvmalloc_array(nr_pages, sizeof(*pages), GFP_KERNEL);
+-	if (!pages) {
 -		ret = -ENOMEM;
 -		goto put_disk;
 -	}
--
- 	pages = kvmalloc_array(nr_pages, sizeof(*pages), GFP_KERNEL);
- 	if (!pages) {
- 		ret = -ENOMEM;
--		goto err_free;
-+		goto put_disk;
- 	}
++	if (!pages)
++		return -ENOMEM;
  
  	gup_flags = FOLL_LONGTERM;
-@@ -5392,7 +5378,6 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 		ret = -EFAULT;
+ 	if (!(buf_reg.flags & UBLK_SHMEM_BUF_READ_ONLY))
+@@ -5379,14 +5374,7 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
  		goto err_unpin;
  	}
--	ubuf->nr_pages = nr_pages;
  
- 	/*
- 	 * Drain inflight I/O and quiesce the queue so no new requests
-@@ -5403,13 +5388,15 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
+-	/*
+-	 * Drain inflight I/O and quiesce the queue so no new requests
+-	 * are dispatched while we modify the maple tree. Keep freeze
+-	 * and mutex non-nested to avoid lock dependency.
+-	 */
+-	ublk_quiesce_and_release(disk);
+-
+-	mutex_lock(&ub->mutex);
++	memflags = ublk_lock_buf_tree(ub);
  
- 	mutex_lock(&ub->mutex);
- 
--	ret = xa_alloc(&ub->bufs_xa, &index, ubuf, xa_limit_16b, GFP_KERNEL);
--	if (ret)
-+	index = ida_alloc_max(&ub->buf_ida, USHRT_MAX, GFP_KERNEL);
-+	if (index < 0) {
-+		ret = index;
- 		goto err_unlock;
-+	}
- 
--	ret = __ublk_ctrl_reg_buf(ub, ubuf, pages, index, buf_reg.flags);
-+	ret = __ublk_ctrl_reg_buf(ub, pages, nr_pages, index, buf_reg.flags);
- 	if (ret) {
--		xa_erase(&ub->bufs_xa, index);
-+		ida_free(&ub->buf_ida, index);
+ 	index = ida_alloc_max(&ub->buf_ida, USHRT_MAX, GFP_KERNEL);
+ 	if (index < 0) {
+@@ -5400,22 +5388,16 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
  		goto err_unlock;
  	}
  
-@@ -5427,19 +5414,17 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
+-	mutex_unlock(&ub->mutex);
+-
++	ublk_unlock_buf_tree(ub, memflags);
+ 	kvfree(pages);
+-	ublk_unquiesce_and_resume(disk);
+-	ublk_put_disk(disk);
+ 	return index;
+ 
+ err_unlock:
+-	mutex_unlock(&ub->mutex);
+-	ublk_unquiesce_and_resume(disk);
++	ublk_unlock_buf_tree(ub, memflags);
+ err_unpin:
  	unpin_user_pages(pages, pinned);
  err_free_pages:
  	kvfree(pages);
--err_free:
--	kfree(ubuf);
- put_disk:
- 	ublk_put_disk(disk);
+-put_disk:
+-	ublk_put_disk(disk);
  	return ret;
  }
  
--static void __ublk_ctrl_unreg_buf(struct ublk_device *ub,
--				  struct ublk_buf *ubuf, int buf_index)
-+static int __ublk_ctrl_unreg_buf(struct ublk_device *ub, int buf_index)
- {
- 	MA_STATE(mas, &ub->buf_tree, 0, ULONG_MAX);
- 	struct ublk_buf_range *range;
- 	struct page *pages[32];
-+	int ret = -ENOENT;
- 
- 	mas_lock(&mas);
- 	mas_for_each(&mas, range, ULONG_MAX) {
-@@ -5448,6 +5433,7 @@ static void __ublk_ctrl_unreg_buf(struct ublk_device *ub,
- 		if (range->buf_index != buf_index)
- 			continue;
- 
-+		ret = 0;
- 		base = mas.index;
- 		nr = mas.last - base + 1;
- 		mas_erase(&mas);
-@@ -5465,7 +5451,8 @@ static void __ublk_ctrl_unreg_buf(struct ublk_device *ub,
- 		kfree(range);
- 	}
- 	mas_unlock(&mas);
--	kfree(ubuf);
-+
-+	return ret;
- }
- 
- static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
-@@ -5473,11 +5460,14 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
+@@ -5459,7 +5441,7 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
+ 			       struct ublksrv_ctrl_cmd *header)
  {
  	int index = (int)header->data[0];
- 	struct gendisk *disk;
--	struct ublk_buf *ubuf;
-+	int ret;
+-	struct gendisk *disk;
++	unsigned int memflags;
+ 	int ret;
  
  	if (!ublk_dev_support_shmem_zc(ub))
- 		return -EOPNOTSUPP;
+@@ -5468,23 +5450,13 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
+ 	if (index < 0 || index > USHRT_MAX)
+ 		return -EINVAL;
  
-+	if (index < 0 || index > USHRT_MAX)
-+		return -EINVAL;
-+
- 	disk = ublk_get_disk(ub);
- 	if (!disk)
- 		return -ENODEV;
-@@ -5487,32 +5477,42 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
- 
- 	mutex_lock(&ub->mutex);
- 
--	ubuf = xa_erase(&ub->bufs_xa, index);
--	if (!ubuf) {
--		mutex_unlock(&ub->mutex);
--		ublk_unquiesce_and_resume(disk);
--		ublk_put_disk(disk);
--		return -ENOENT;
--	}
+-	disk = ublk_get_disk(ub);
+-	if (!disk)
+-		return -ENODEV;
 -
--	__ublk_ctrl_unreg_buf(ub, ubuf, index);
-+	ret = __ublk_ctrl_unreg_buf(ub, index);
-+	if (!ret)
-+		ida_free(&ub->buf_ida, index);
+-	/* Drain inflight I/O before modifying the maple tree */
+-	ublk_quiesce_and_release(disk);
+-
+-	mutex_lock(&ub->mutex);
++	memflags = ublk_lock_buf_tree(ub);
  
- 	mutex_unlock(&ub->mutex);
+ 	ret = __ublk_ctrl_unreg_buf(ub, index);
+ 	if (!ret)
+ 		ida_free(&ub->buf_ida, index);
  
- 	ublk_unquiesce_and_resume(disk);
- 	ublk_put_disk(disk);
--	return 0;
-+	return ret;
+-	mutex_unlock(&ub->mutex);
+-
+-	ublk_unquiesce_and_resume(disk);
+-	ublk_put_disk(disk);
++	ublk_unlock_buf_tree(ub, memflags);
+ 	return ret;
  }
  
- static void ublk_buf_cleanup(struct ublk_device *ub)
- {
--	struct ublk_buf *ubuf;
--	unsigned long index;
-+	MA_STATE(mas, &ub->buf_tree, 0, ULONG_MAX);
-+	struct ublk_buf_range *range;
-+	struct page *pages[32];
-+
-+	mas_for_each(&mas, range, ULONG_MAX) {
-+		unsigned long base = mas.index;
-+		unsigned long nr = mas.last - base + 1;
-+		unsigned long off;
- 
--	xa_for_each(&ub->bufs_xa, index, ubuf)
--		__ublk_ctrl_unreg_buf(ub, ubuf, index);
--	xa_destroy(&ub->bufs_xa);
-+		for (off = 0; off < nr; ) {
-+			unsigned int batch = min_t(unsigned long,
-+						   nr - off, 32);
-+			unsigned int j;
-+
-+			for (j = 0; j < batch; j++)
-+				pages[j] = pfn_to_page(base + off + j);
-+			unpin_user_pages(pages, batch);
-+			off += batch;
-+		}
-+		kfree(range);
-+	}
- 	mtree_destroy(&ub->buf_tree);
-+	ida_destroy(&ub->buf_ida);
- }
- 
- /* Check if request pages match a registered shared memory buffer */
 -- 
 2.53.0
 
