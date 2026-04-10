@@ -1,67 +1,67 @@
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC32D31691C
-	for <linux-block@vger.kernel.org>; Fri, 10 Apr 2026 01:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257E2315D50
+	for <linux-block@vger.kernel.org>; Fri, 10 Apr 2026 01:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775783536; cv=none; b=QMZN4UKtsCgNXly48Xv+sUo7NEfA0cNsGZgZ32c5prqlhz+pjzQSxvex7a9fiYpZnHL/0ulXu3/4jE/WOMfDXvYoLgGF44/zBhEIPHG0Z+djR2nMrG8KIGK8nKzrqCVLfWtsv6fkh1YByL5odkJjVBFtz8wRJYt2l9XCy/aONw0=
+	t=1775783678; cv=none; b=QOPS6CL5O+m9XPKwXWeytcaLHVlu2xWxBlocswRptEBlSXaeZkGuzvdn/Hi6wspUD4VkmN1QGV2n3H2S5q6udssyyeUL8/csuJfkZuZyID3LffuPZCByeHsoKii0Um9y4NIfm2U59gJ98y7ptvzQmUZmjnVoYx0xxocLwiu+vCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775783536; c=relaxed/simple;
-	bh=R7elkKqzIEvnBn9bIM7EJPGEKhNDQxMkBGDun0sNrQQ=;
+	s=arc-20240116; t=1775783678; c=relaxed/simple;
+	bh=Fz0Ie/fLQ7NC8c8S6jwUgJBk98jnjIjnGedk34Ydxvc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KOp1Xbg8cfD9Z2PM2b6z/m3gL2vJEoXYM9N3IX21QXgnMxxUHbqEVDYPXr81+LoZkUMkIZtIzN8LgwBBRNVg3LdmvDUSYS3koAdSCTvg84oLXTALjw1vypBNw+QIeDQJDreLTg7WSz5SfhHbOq0mcQ/cmj1vyKCRq9WUIRnX2Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=vshAjb7h; arc=none smtp.client-ip=74.125.82.179
+	 In-Reply-To:Content-Type; b=tB4vVgTtX2bEOmXeefozbvEhUgPHkvsRT+zIx/f3FrgOm477jNHrpDy5/S/6yTq1scNO8pJO2WC+bVJeVBafz2xpUGUHYEwOgZS7gSSOmzYPX4dLpytBnjqnQ6Rxgc3WlfNQsmOD0DMqDvu2qZsTisAdW/FHvmTALgYzpJRfLiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=AN3Q7BI5; arc=none smtp.client-ip=74.125.82.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="vshAjb7h"
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2bdd40d3c61so1281833eec.1
-        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 18:12:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="AN3Q7BI5"
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2ba895adfeaso1483761eec.0
+        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 18:14:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1775783534; x=1776388334; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1775783676; x=1776388476; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=7wicgY9NcgT/3UjIzdAZt3rganAsem03G6NL+TmYL0E=;
-        b=vshAjb7hQ6wNFovj5gKMkF+ZvA9y35a/WyHJUBdEUyjJFx0QUaFjKbXheKdUUa03pl
-         KNbg7RWg/CNnSjOjlg30BgPcrOCNv4SWN/qLFkgtugL2WiveUMJ2jmhzgIcxlNZro+qD
-         VSnt64Ls5lrNqrqkz3NGfbyenf289HyqzyeURExiDgKM4JYvCSissTVSQ+pghC0qpztd
-         ae59pnIzZIAl5rYgRdz6/9+hHnxfYE/i87JGAmCU+PqV8DuZoCYm43RlrhETsPal597a
-         nQswCV2w0kidZy3LA/WsHhdPc3jJYhH/Wr6N4FcHze21JwiheTCV5YyRfGe6QXzP6PZi
-         VB/g==
+        bh=hX2F5vH0vhGHSEsyxW1VmGmKOMoX7KwT4uNWvZ8qcRo=;
+        b=AN3Q7BI5ZZue7xDTW2juya11ekPPGbtNSHhgW5J8sNXNkp+gNNokCCnS85Wh/+ap47
+         g0nsXFNmw5cEIRI4nSJkW1JL9qDGQKmcdb3IxzX3CC+wajcTqAEhcW09hlhFdJD5Z5PP
+         QTJukJzy9atpnIZInx0TQiA8azP7SchuzXcecVyD/PWxOSc4k1alLAqg2hfDllJxeLzp
+         FGzP2Ii2+TJ3YqSvrJ+tcEEH5w+Ie25O6B9f/d0vSo3qQ0Xs4TCo5u6uv13y///1sk+s
+         nCIFQO6XEAr0S7seVz7jJLA7pQvGS8DkS0KGxlYMJpIQe8LGFRG9StZQuOzqVC6nyBh6
+         hhUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775783534; x=1776388334;
+        d=1e100.net; s=20251104; t=1775783676; x=1776388476;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7wicgY9NcgT/3UjIzdAZt3rganAsem03G6NL+TmYL0E=;
-        b=rbKB82U6fJ9OZLCz8+JpcCfjh+05lGgfT61qba4sAqKU2LD6QDslJdabm9/tAfJ6Gg
-         fK2w977rLA8mtBvQpDD/UnWXzNtDDzzty4ZrrK6ZD4NheLtjLlbBrUPl3irFTQ3vaZBm
-         iAAL+dfXsiGll1qAl48qVbZ/wNufPNdqPZASVrSU5FntlQwCK8WZJWdOBTXAPx/uJWqz
-         Ph6vuItIwqrLHt1p2ZfQ8Et7xpAhIVGerKwJWwrk/yl/8xNd4b2Xsu9KrTd80qAwgyK7
-         1J0hOkx4izpdcJKtlpmWxwcdHYFh29SXBa9znl0avTXgDXfFT1bPf3OT0ZyHywmbvZcs
-         I1UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4oBU7JTnLe/ZvQ4mdnoxEwyqlSiQWDhEpYVbjgiVVBOtTo29iuT4i8TwySQmRzQLZXFrZv6m4pEhcEA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWkV8C6qSVeKIMAD5p+JUzLySlvt6FEjirjEFs1bWsp3uV56f1
-	SI3hZGATzX6U4uqX9tk6RoJjOnu1kH9Or3K/8m/f5lVrzo4pIzcfRJUQbVk7uYImm00=
-X-Gm-Gg: AeBDietc/PxLD0w40JrSZjUi26JBJ7gKwZeH4dsLAyh9UI8Wi+dUqVeYTSFXg//0X6c
-	ITlgLQlpmEd58bSbgu7PWB0JpMtb5iATxasntYAKAt+Irp+7CuhHTrfIVfisCciARUBnd1f39R4
-	OXdPMq6zWdRcfnnHRG11q/rO5cCx3fUfcrFeWTZhRAi2A3EYFwomVuw0Ujef7UtLMwNm4pvaXjB
-	dVSTay095sfEKQFQ3kHK1dM0TJ9mp/hjn3FXR48ri4eZ/GQPxXjzpxbGtaixYQQkb1xKLgRGVhr
-	stDx76V7bC4wbsxvF6IrgzsX70lFYVMbiJHiPB0fi8t7sNr0MI/N2jOo1i6F6I+yzJX6b0+AAFz
-	xVVQl+iSmEIEvcWF0feHhXridQblP4elB23ba/sqQ+SeJn/4Ip9z8Muy+JauAhRXjTvaJ22emYQ
-	l6bqwnpvkVR6bkMW+jjszDOOUf4TkeKVzhEcSpoCMXKxZ4Z2iCNzWZ0xy4+8pE9lhML81UAZJZI
-	sZp1bkDaHYICbdoUu2n+/BtWx7ImYavsHgBKBmFCXYg1XE9eCRFfkY=
-X-Received: by 2002:a05:7300:a287:b0:2c1:3f85:747 with SMTP id 5a478bee46e88-2d5894628demr646992eec.21.1775783534159;
-        Thu, 09 Apr 2026 18:12:14 -0700 (PDT)
+        bh=hX2F5vH0vhGHSEsyxW1VmGmKOMoX7KwT4uNWvZ8qcRo=;
+        b=bp/tpmw2UUYPDmVaC3u8Laube0D4BcPzy8ap3yY/1ZwEaBx6jwn60nNwkZIhGo73O6
+         XY5YDe8jUVgJNQ4ew6q14JkKf6138l33wFBGEGLroS0B43END35sOc6bFeBl+s++gNu6
+         QyTIrW3mwcWXvaE5LUopfmachmkoptTwJE6kLqAwe7Fzk3lceUn5OgSg/GwD+2P5ug69
+         diyrWJ9U3WrviwizCpNUf6dDHtElOqfudI/bQ0ESVZKZa0KU+lfTSVkv5sOX/JkN0luc
+         CeI9lJfoxblOwjnzIWsGpwLLp8Vp5ov6ScxwF1h6UdWlv1b5QMQsjLinqu+6/AhJeZ/N
+         eAvw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+qWr4OPRcTHImDBNfZ1JsxtuNf0pw7Q+MdkouX+PeCT+S9baZRnXUNBWm5SDZHM29GL6kjNOX9Osc3g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuRhZoRH7cWlAQR1XNa55xLTAo3p//7L+a6IdEOw5nVinzaaV6
+	PojP8bSZquEKteEOB14+J08YcRLqCQopNtOtbdh108S5h3eKrW8H5rsfFblhVJ8rAio=
+X-Gm-Gg: AeBDievjVjZtugwATEvHOk/NrEnyPW/agpKHfpIFnz17jw4bh+AHBRPSehwSB6snUeo
+	inSm0StUq5jUuSduVj0rXnrCs8aIkQPd+RJODnGE7uSthGaNpnx4zOemMUYvaEMzT/T+rwv/jJ5
+	PIVnY+j7BnbcH0snz8kmC7/v5Uiur1fD5etpENVMnzda7YhpZqCf3bO7jIgjTjj/8d5HTCFJfwL
+	TrCMSZgkccwMaqMenoZ7hEyMJkXcNp+Zx/AQbxoShyeI4eYsfSc59wFUH2SwzLGtXWPMUWT7NzX
+	XflzqyPmkK56RmoJttzRkXYBWI4aaZxmNy8ZEibfOVVK000La2iUuhMVjuWp5S9mf6iLDAf6TMv
+	3pXfJgdpgkPbNKYb/lbw7Flkr1wUvSgKgT2mvIm3FjcCyRhJH9DTvviw3V95U1VC2oU9Pfk760P
+	VToSjkCA6O0GhhqgSx1HgFSpBvp5+4+DySd87BfZOCqGT/luwEqiekFe//Yp8e+cP84uxKpQcey
+	mBmKh0YABW1YSXeyxWgG+rM1VCaYKSXCOJxYlMqC/2WPHvvIurLt8k=
+X-Received: by 2002:a05:7300:bc10:b0:2c8:1d56:340c with SMTP id 5a478bee46e88-2d58946284amr593276eec.23.1775783676253;
+        Thu, 09 Apr 2026 18:14:36 -0700 (PDT)
 Received: from ?IPV6:2600:380:873e:380f:e9e5:ea98:a905:9cbb? ([2600:380:873e:380f:e9e5:ea98:a905:9cbb])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55ce46a65sm2198745eec.0.2026.04.09.18.12.13
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d561bde68bsm2097787eec.17.2026.04.09.18.14.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Apr 2026 18:12:13 -0700 (PDT)
-Message-ID: <24a86901-18c0-4ca9-89de-92f4fe131fe8@kernel.dk>
-Date: Thu, 9 Apr 2026 19:12:12 -0600
+        Thu, 09 Apr 2026 18:14:35 -0700 (PDT)
+Message-ID: <0cf7c152-a341-40e3-8359-23a633c812c6@kernel.dk>
+Date: Thu, 9 Apr 2026 19:14:34 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,39 +69,63 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/7] ublk: followup fixes for SHMEM_ZC
-To: Ming Lei <tom.leiming@gmail.com>, linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>
-References: <20260409133020.3780098-1-tom.leiming@gmail.com>
+Subject: Re: [PATCH 00/20] DRBD 9 rework
+To: Christoph Hellwig <hch@infradead.org>
+Cc: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+ drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org
+References: <20260327223820.2244227-1-christoph.boehmwalder@linbit.com>
+ <ecf00b4b-c3f8-4161-a97d-3d23b423cabf@kernel.dk>
+ <adXk_m3SbRcWTOIC@infradead.org>
+ <c92d5318-8c8e-434f-835e-61cf1fae4edf@kernel.dk>
+ <addJ6uTc8Zo4GKpW@infradead.org>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260409133020.3780098-1-tom.leiming@gmail.com>
+In-Reply-To: <addJ6uTc8Zo4GKpW@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/9/26 7:30 AM, Ming Lei wrote:
-> Hello Jens,
-> 
-> Followup fixes for the SHMEM_ZC (shared memory zero copy) patch series,
-> addressing review feedback from Caleb Sander Mateos.
-> 
-> - Widen ublk_shmem_buf_reg.len to __u64 so 4GB buffers can be registered
->   (the __u32 field overflowed to 0 for exactly 4GB)
-> - Verify all pages in multi-page bvecs fall within the registered maple
->   tree range, removing base_pfn from ublk_buf_range since mas.index
->   provides the range start PFN
-> - Simplify the PFN range coalescing loop in __ublk_ctrl_reg_buf
-> - Replace xarray with IDA for buffer index allocation, removing the
->   unnecessary struct ublk_buf
-> - Allow buffer registration before device is started by taking ub->mutex
->   before freezing the queue (same ordering as ublk_stop_dev_unlocked)
-> - Address documentation review comments
-> - Update MAINTAINERS email
+On 4/9/26 12:40 AM, Christoph Hellwig wrote:
+> First an apology, I thought it was in your tree, but it looks like
+> the drbd branch just has minor fixes.  So a lot less urgency.
 
-Applied, but I'm unsure what base you used, I'm guessing your old base
-rather than my for-7.1/block which already had fixups for the issues I
-mentioned? In any case, just ensure that future updates are against the
-actual tree, not on top of your previous tree.
+No worries, figured you hadn't seen the previous discussion.
+
+> On Wed, Apr 08, 2026 at 06:58:58AM -0600, Jens Axboe wrote:
+>> See the previous discussion,
+> 
+> Do you have a pointer to that discussion?  I can't remember one.
+
+I'm on pretty poor connectivity right now, but find some of my complaining
+on linux-block in response to a previous Christian email.
+
+>> the goal is to sync the two drbd code
+>> bases. It's followed the "usual" pattern of the in-kernel driver being
+>> neglected and development and users pushed to the out-of-tree one,
+>> which is highly annoying.
+> 
+> I don't think that's a a usual pattern.  Also the new version looks
+> like a complete rewrite and not something incremental:
+> 
+>  45 files changed, 45891 insertions(+), 16264 deletions(-)
+> 
+> For a code base that is "29482 total".
+> 
+> I think reviewing it would be easier by just adding an new drbd9 driver
+> and then steering people toward it carefully, as that is actually
+> reviewable compared to non-bisectable patches changing large chunks
+> of code in a non-atomic way.
+
+That is another approach we could take, but I don't think that would
+make it any easier to review, to be honest. Nobody reviews a full
+driver, their eyes just kind of gloss over.
+
+Heads up - OOO for 1 week, will prep merge window stuff to the best
+of my abilities, but won't be super responsive outside of that. As
+this particular driver isn't going anywhere right now, there's no
+urgency on that side of things.
 
 -- 
 Jens Axboe
+
