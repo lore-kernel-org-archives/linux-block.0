@@ -1,94 +1,68 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0383DD52A;
-	Fri, 10 Apr 2026 15:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-m1973173.qiye.163.com (mail-m1973173.qiye.163.com [220.197.31.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA7F4A3E;
+	Fri, 10 Apr 2026 15:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775835272; cv=none; b=FtiEON1ZITzmGYthu/kgKGkbS0hd5p7MHto+21sw6OoZjsEa8akk7zeYdBPyVsgX8w0jG2IcFhCAdg+zOaRp9Ydn+fiPmaqCXnOJXUrtjxq0c8YEkIpajFgp9lL8ZsYSfW8TWYC52KlYG6oZ0AB/DI3vxtkmRR148k1LiEGjFyI=
+	t=1775836321; cv=none; b=gtt8vmWIuEy2Wk9OOFj9X+AOWvXGHz2mxAayGigDqJIFDOzXFvWKKqto4+kJdla15Unb16eixeHZCR/40XyLwhoo1kfmoTG4bqSguXVYEDLFJEMvGnotFF4sYfqsTadx6yUBgiJBOAFSTU8mAcrUL0ylRLQxZSK/iDRvTivqhRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775835272; c=relaxed/simple;
-	bh=eGzaipayHpKDEOEdTlY1lonzGqc+tNdB9WEcN3BqO0Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=C1D6oJ4KrTm+vRqX1OG+FEJ87eJzcP8zrdSPXmlTI7iFkGTllTNPxbGbVTjjV/qndWRMhLi7m2LnmKDrpZ4MUq0+KFkPMJLI5/ebzEhdzxhR8uobuivh5rgL9jbo7mpi/QK3Eqm7HlLTO13+ltqEEqNmV5+zu31g4r1wgxnopq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=l5I/CLHU; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1775836321; c=relaxed/simple;
+	bh=DaSOOne3MZ6RXz5zv8K5Y50bmoWVSFyXSN3ib7MuYSc=;
+	h=Content-Type:Message-ID:To:Cc:Subject:MIME-Version:From:Date; b=L6ZTbwM6+GPGhgb37XuEoZ57bhqZ7MpnLoPW4nY26jKnrX0ah9TRor52TVguE+kmkFXtZp0c9KTQje1hsMwSsFRnz0RaOziTQ850sJBBSRC4gHHPeKz+SckdstrbODkmTTYJaZrVFe62Iji3dlsUcUJKpglzIV0VzXKtlPjEtmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn; spf=pass smtp.mailfrom=ruc.edu.cn; dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b=co5cHlJr; arc=none smtp.client-ip=220.197.31.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ruc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="l5I/CLHU"
-Received: from CPC-namja-026ON.redmond.corp.microsoft.com (unknown [4.213.232.20])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 5D51B20B7129;
-	Fri, 10 Apr 2026 08:34:22 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5D51B20B7129
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1775835265;
-	bh=Uu//OTzFLmaanXhj3JUq0IrWVw0HVHD5keaWVPbjlkQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l5I/CLHUs9q1OZ4vFIiO/9ihnaLZwgzOrHOpXLctQELxl1NodQFbAS5TmtJMxLcRl
-	 6ZObPmibP5GOQtibsrMHe+6VKf2fUe+7GIjUcENcRxNUp93ATMzei8m6B5+GAxMzdC
-	 dZSj3UnHpt3pJf0FJgnxaCbmEtU7RmBzYvznjfQ8=
-From: Naman Jain <namjain@linux.microsoft.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Saurabh Sengar <ssengar@linux.microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Michael Kelley <mhklinux@outlook.com>,
-	namjain@linux.microsoft.com
-Subject: [PATCH v2 1/2] block: add pgmap check to biovec_phys_mergeable
-Date: Fri, 10 Apr 2026 15:34:13 +0000
-Message-ID: <20260410153414.4159050-2-namjain@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260410153414.4159050-1-namjain@linux.microsoft.com>
-References: <20260410153414.4159050-1-namjain@linux.microsoft.com>
+	dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b="co5cHlJr"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+Message-ID: <ANIA6QDpKJDgGvi6bWi53Krz.1.1775836309095.Hmail.2023000929@ruc.edu.cn>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: axboe@kernel.dk, ojeda@kernel.org, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, bjorn3_gh@protonmail.com, 
+	aliceryhl@google.com, lossin@kernel.org, boqun@kernel.org, 
+	dakr@kernel.org, gary@garyguo.net, sunke@kylinos.cn, 
+	tmgross@umich.edu, linux-kernel@vger.kernel.org
+Subject: =?UTF-8?B?UmU6UmU6IFtSRkMgUEFUQ0ggMC8yXSBydXN0IGJsb2NrLW1xIFRhZ1NldCBmbGFncyBwbHVtYmluZyBhbmQgcm51bGwgYmxvY2tpbmcgd2lyaW5n?=
+X-Priority: 3
+X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com web
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from 2023000929@ruc.edu.cn( [18.182.34.76] ) by ajax-webmail ( [127.0.0.1] ) ; Fri, 10 Apr 2026 23:51:49 +0800 (GMT+08:00)
+From: wenzhaoliao <wenzhaoliao@ruc.edu.cn>
+Date: Fri, 10 Apr 2026 23:51:49 +0800 (GMT+08:00)
+X-HM-Tid: 0a9d78173f9c09bdkunm0c220953dc9c
+X-HM-MType: 1
+X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMf2U5gprSpllrVBCJYClE3duRf49djg1aYGfsM
+	uZDiMwtzOTgseqkTCl3w8jN398Giy5ocFzHtsEG3i/9zKX/w+B4dupYrmbpLz4+h6H8iRUtrMUW8
+	kE5tJbiPSQpaUu4EuWxVBaR/AKTYFMShDXN+Q=
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaTE1PVkxLQxgZHR5DQ0lKQlYVFAkWGhdVEwETFh
+	oSFyQUDg9ZV1kYEgtZQVlKQ1VKQ0lVSE9VTE1ZV1kWGg8SFR0UWUFZT0tIVUpLSUJNS0pVSktLVU
+	tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=co5cHlJr+5F7F/iDz5o3Zmo+ZMRcK6XMyxUEkrtQ0j6K1Q0olubQB/4QACe+abFJQZ0ZYUMJJe+7xXCtXlbZ187L61iOMFGAL/MUJ6ciCTU/rBsxuUle5IdVuHlrx3Or70sE5zOjNKNMl6fLQs4rpmYj+0RdEphjW2k6+sGHcAc=; c=relaxed/relaxed; s=default; d=ruc.edu.cn; v=1;
+	bh=DaSOOne3MZ6RXz5zv8K5Y50bmoWVSFyXSN3ib7MuYSc=;
+	h=date:mime-version:subject:message-id:from;
 
-biovec_phys_mergeable() is used by the request merge, DMA mapping,
-and integrity merge paths to decide if two physically contiguous
-bvec segments can be coalesced into one. It currently has no check
-for whether the segments belong to different dev_pagemaps.
-
-When zone device memory is registered in multiple chunks, each chunk
-gets its own dev_pagemap. A single bio can legitimately contain
-bvecs from different pgmaps -- iov_iter_extract_bvecs() breaks at
-pgmap boundaries but the outer loop in bio_iov_iter_get_pages()
-continues filling the same bio. If such bvecs are physically
-contiguous, biovec_phys_mergeable() will coalesce them, making it
-impossible to recover the correct pgmap for the merged segment
-via page_pgmap().
-
-Add a zone_device_pages_have_same_pgmap() check to prevent merging
-bvec segments that span different pgmaps.
-
-Fixes: 49580e690755 ("block: add check when merging zone device pages")
-Cc: stable@vger.kernel.org
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
----
- block/blk.h | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/block/blk.h b/block/blk.h
-index ec4674cdf2ead..50a41db039133 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -127,6 +127,8 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
- 
- 	if (addr1 + vec1->bv_len != addr2)
- 		return false;
-+	if (!zone_device_pages_have_same_pgmap(vec1->bv_page, vec2->bv_page))
-+		return false;
- 	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
- 		return false;
- 	if ((addr1 | mask) != ((addr2 + vec2->bv_len - 1) | mask))
--- 
-2.43.0
-
+CgoKSGkgQW5kcmVhcywKCgpUaGFua3MgZm9yIHBvaW50aW5nIG1lIHRvIHRoYXQgcGF0Y2ggc2Vy
+aWVzISBJIHdpbGwgZGVmaW5pdGVseSB0YWtlIGEgY2xvc2VyIGxvb2sgYW5kIGhlbHAgdGVzdC9y
+ZXZpZXcgdGhlIHBhdGNoZXMgb3ZlciB0aGVyZSB0byBzdXBwb3J0IGdldHRpbmcgdGhpcyBmdW5j
+dGlvbmFsaXR5IG1lcmdlZC4KCgpKdXN0IHRvIG1ha2Ugc3VyZSB3ZSBkb24ndCBkdXBsaWNhdGUg
+YW55IG90aGVyIG9uZ29pbmcgd29yaywgZG9lcyB0aGF0IHNlcmllcyAob3IgYW55IG9mIHlvdXIg
+cGVuZGluZyBicmFuY2hlcykgYWxyZWFkeSBjb3ZlciB0aGUgYmxrX21xX29wcy0+dGltZW91dCBi
+bG9jayBkZXZpY2UgY2FsbGJhY2sgYW5kIHRoZSBlbnVtIGJsa19laF90aW1lcl9yZXR1cm4gYWJz
+dHJhY3Rpb24/IElmIG5vdCwgd2UgdGhvdWdodCB0aGF0IG1pZ2h0IGJlIGEgZ29vZCBuZXh0IGNh
+bmRpZGF0ZSB0byB0YWNrbGUuCgoKT24gYSBicm9hZGVyIG5vdGUsIENvdWxkIHlvdSByZWNvbW1l
+bmQgYW55IHNwZWNpZmljIG1pc3NpbmcgYWJzdHJhY3Rpb25z4oCUZWl0aGVyIGluIHRoZSBibG9j
+ayBzdWJzeXN0ZW0sIGNvbmZpZ2ZzLCBvciBlbHNld2hlcmXigJR0aGF0IHRoZSBSRkwgcHJvamVj
+dCBjdXJyZW50bHkgbmVlZHM/IEFsdGVybmF0aXZlbHksIGlzIHRoZXJlIGEgc3BlY2lmaWMgVE9E
+TyBsaXN0IG9yIHRyYWNraW5nIHJlcG9zaXRvcnkgeW91IHdvdWxkIHJlY29tbWVuZCB1cyB0byBs
+b29rIGF0IHNvIHdlIGNhbiBwaWNrIHVwIHRoZSByaWdodCB0YXNrcyB3aXRob3V0IHN0ZXBwaW5n
+IG9uIGFueW9uZSdzIHRvZXM/CgoKVGhhbmtzIGFnYWluIGZvciB5b3VyIHRpbWUgYW5kIGd1aWRh
+bmNlIQoKCkJlc3QgcmVnYXJkcywKV2VuemhhbyBMaWFv
