@@ -1,94 +1,87 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E6231ED7C;
-	Fri, 10 Apr 2026 03:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BD01D5CC9
+	for <linux-block@vger.kernel.org>; Fri, 10 Apr 2026 05:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775792311; cv=none; b=OO2gs8HjF7u1RHGRoFkytx3+BiyE9OOwgKnBkcRbhdp6YnXp/0533ydrUdQcmu7JcRTgzycLvwaBi5jrSLOB+GFFqIczhVJacYjVbNkGqnWWrAtqdiIwOvzgEuqD6QVIiRa5jKGIDgF/2CjOJ0z6MEQAU8Dph3JAhkWhkUDHTG4=
+	t=1775799034; cv=none; b=fZwZbhrPBIDJyzpug5mfZ6Ib1P1MWkzMLaXUfudGiAjHvLCQWyBHxq/zHmJD+FhVN9n2X8WYzVA+HjXf+t6elWY3mPJKpjp3TavTASWj+3amV9lRdXg3C/Rke4T3mD2VbegG2nzI3RbPC1R6lhE3uiUPZMEP/UfCQdUkf1nX2Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775792311; c=relaxed/simple;
-	bh=5d6dhpV31KvNc4bStrc9O5kfWsbNNzg3rN1k3m7kvgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iMCPb0TKl3hbF6TtkSbotvLZXf/0U+2evLBITZJCH/BY3v5LuQ49b7d4kiwkMYPbWbCOQSmGePxoglYlWebhzO2YpoKF9Cakz0yCIy/9j9t+HOy7zW15bsjDC6qgypTTSy0CLV45jn/M4QTXIMCh/1mTW8T6Ru4phYy/Kn2BeEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=QC8ul+Ab; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1775799034; c=relaxed/simple;
+	bh=0kHRCkKR7w5qCs7SPG64TzR5yrr/Dh+Q6UR8sGjPAk8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JTBkyEfweyIdAJWJfnl/7t/kmxihc/uVgVq39gWFC8bd+BhnoggxyRme6veqo2K1ghLyL0SmftO0JcO4qySpZ7A2ZKpByB1uURTaSk9rdzp9jVqu4AcMMu8Jl+cvk1AiS4XgozkHW/UwPovbCMF8oF1Jn1FV/D7zIuUQLpFO3J0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=TZ5PSNj0; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QC8ul+Ab"
-Received: from [100.67.208.126] (unknown [52.163.222.1])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 656A520B710C;
-	Thu,  9 Apr 2026 20:38:26 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 656A520B710C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1775792309;
-	bh=/PFBHBQZRsG6lAj3Mf2YsSQjznw4IhcHi7euPbD1izc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QC8ul+Ab1e5vh5oY5IOu3ia7YiN+/K5TZUkR+1phZI3I1Y8WyA3Io9mZTXRVMTp3+
-	 q43FH6hJ0IKkLABuj/PdoJ2Vnw78xalbLeU8YfzS3ih2l6/LNJhzO1b9QwaS1aRQXC
-	 C3He1+uuqQIQb/ICFB84Lne3/RcmQ6r3JKogx/4E=
-Message-ID: <2dd7926b-6bcb-4828-9a89-de429a5efd93@linux.microsoft.com>
-Date: Fri, 10 Apr 2026 09:08:22 +0530
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TZ5PSNj0"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1775799033; x=1807335033;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0kHRCkKR7w5qCs7SPG64TzR5yrr/Dh+Q6UR8sGjPAk8=;
+  b=TZ5PSNj0JYjiPcGdWLtDAZYYdBBvrQOk/9omco6/n0IGC4r4z5UgIhsH
+   zqsXliW7g+B9yQcTzvfq3vTYd5ad+DCnb9GNUCxNnebjLaAhkYOu36CAa
+   f1CpjZzemQ8t+JQ9z6oKGI8NcwR9p3IJm0Nu41mpsz+SJpKcZVdzSfvaY
+   mWI+tzCpmqlQIScTyV5xyTzdxq/4oTo7hQ6aMs5nWlDT7qwXdRxxPNp5g
+   kL+9D2I4v8y3EVCH3CT2OUtX+HKM2nVvYJ/b5HDSOHn4WXTLxqVWzQ1iC
+   PG6EyY1kQZ/e/OPr03GTOzcmDYehnJyTDFxScyobg4mc4iXdkeN2cRt35
+   A==;
+X-CSE-ConnectionGUID: TGVDGGyCSze/DKOyTmOwCQ==
+X-CSE-MsgGUID: j9oAmYQMQs+748YCskhu4Q==
+X-IronPort-AV: E=Sophos;i="6.23,171,1770566400"; 
+   d="scan'208";a="144259547"
+Received: from unknown (HELO uls-op-cesaep03.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Apr 2026 13:30:27 +0800
+IronPort-SDR: 69d88ae9_BhZiNXIu0VuGI2XnKXSpYvKpmqXru+1roLIwod0ONPFk3X7
+ R8Xtrs8zPcX5XZ66dAAl2qtbwdlnxFKTBI94nRQ==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Apr 2026 22:30:17 -0700
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.67.30])
+  by uls-op-cesaip01.wdc.com with ESMTP; 09 Apr 2026 22:30:17 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: Yi Zhang <yi.zhang@redhat.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 1/1] common/scsi_debug: use _patient_rmmod() to unload scsi_debug
+Date: Fri, 10 Apr 2026 14:30:16 +0900
+Message-ID: <20260410053016.4013504-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: allow different-pgmap pages as separate bvecs
- in bio_add_page
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Chaitanya Kulkarni <kch@nvidia.com>,
- John Hubbard <jhubbard@nvidia.com>, Logan Gunthorpe <logang@deltatee.com>,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- Saurabh Sengar <ssengar@linux.microsoft.com>, Long Li
- <longli@microsoft.com>, Michael Kelley <mhklinux@outlook.com>
-References: <20260401082329.1602328-1-namjain@linux.microsoft.com>
- <20260401082329.1602328-3-namjain@linux.microsoft.com>
- <20260401140850.GC21703@lst.de>
- <70c82c3a-d135-4877-ab46-c15d329815f5@linux.microsoft.com>
- <20260402053057.GA11783@lst.de>
- <d48427c2-9aa3-42a2-a8d7-43a7a3b3b685@linux.microsoft.com>
- <20260407055247.GA6405@lst.de>
- <6106a655-2d4b-4ebf-b269-459e3bd3efd4@linux.microsoft.com>
- <20260408060825.GA24532@lst.de>
-Content-Language: en-US
-From: Naman Jain <namjain@linux.microsoft.com>
-In-Reply-To: <20260408060825.GA24532@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+The helper _have_scsi_debug_group_number_stats() loads and unloads
+scsi_debug to check parameters of scsi_debug. However, the unload is too
+soon after the load, then it often fails. To avoid such unload failures,
+use _patient_rmmod() to unload scsi_debug.
 
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Closes: https://github.com/linux-blktests/blktests/issues/241
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ common/scsi_debug | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 4/8/2026 11:38 AM, Christoph Hellwig wrote:
-> Hi Naman,
-> 
-> On Tue, Apr 07, 2026 at 12:38:30PM +0530, Naman Jain wrote:
->>> So the zone_device_pages_have_same_pgmap check should go into
->>> zone_device_pages_compatible and we need to stop building the bio
->>> as well in that case.
->>
->> Ok, so rest all things same, from my last email, but my previous compatible
->> function would look like this:
->>
->> static inline bool zone_device_pages_compatible(const struct page *a,
->>                          const struct page *b)
->> {
->>      if (is_pci_p2pdma_page(a) || is_pci_p2pdma_page(b))
->>          return zone_device_pages_have_same_pgmap(a, b);
->>      return true;
->> }
->>
->> This would prevent two P2PDMA pages from different pgmaps (different PCI
->> devices) passing the compatible check and both get added to the bio.
->> Please correct me if that is not what you meant. I'll wait for a couple
->> more days and send the next version with this, and we can review this
->> again.
-> 
-> This looks good modulo the tabs vs spaces in the indentation.
-
-Hi,
-Thanks.
-
-Regards,
-Naman
+diff --git a/common/scsi_debug b/common/scsi_debug
+index 6aa7420..86ea3f4 100644
+--- a/common/scsi_debug
++++ b/common/scsi_debug
+@@ -57,7 +57,7 @@ _have_scsi_debug_group_number_stats() {
+ 		SKIP_REASONS+=("scsi_debug does not support group number statistics")
+ 		ret=1
+ 	fi
+-	modprobe -qr scsi_debug >&/dev/null
++	_patient_rmmod scsi_debug >&/dev/null
+ 	return ${ret}
+ }
+ 
+-- 
+2.49.0
 
