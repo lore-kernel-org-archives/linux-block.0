@@ -1,94 +1,102 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55E23E63A7
-	for <linux-block@vger.kernel.org>; Fri, 10 Apr 2026 15:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858233D9DD2;
+	Fri, 10 Apr 2026 15:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775834425; cv=none; b=B6l6YlphcCk2lvN39HN3EOKDw/7BbPMPTkNpUlCpZoMwXGc1+62ZBJl6hobJiJ8hz6c5I7EWa2d9E2yCqvAjKBGbVxn6owUDqR+Tr+SA7tSVo3qBXD4kJRAcX7UHkeksV5plHzZ82y0WtX0U2mvtXfofVEe1Vf6ZEcSRVfI3cx4=
+	t=1775835268; cv=none; b=THu+WhcHSfsEdpls7LsCmPuojcZuzi7+5xL1mYyWDzauaS9CLaKAzmLmWCRSCTuR3xxGNA1oVmN7YHXrCe+oiLf93NMhda0Yff+tMxg0XSQggDobvW8KfiN/j9rjl+e/4EkQ1haSsiXpb+4LSZpXoS52f23/+a6hXPi7l+My1uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775834425; c=relaxed/simple;
-	bh=2PJcapuxUWWHQgHKuYh+AB0Bg9+uWPE8WWtuj/kl/pY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C1Rhfo0yfopwJbNaH/lYQIVTzrz8GqhDWIosRtQysxmpb3UponVKTA6WrtpO/G04E9ZrSs3gbX9lEHsbMsBjIv3NR2Hh5Z/w4q49RZBjekMbfG5M+f6su7EUO0M93Chd+bjcWyAFfaYUGnHva0NrE00IsP2GdvMqzmhNnhkSWr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=VM9pR3FU; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	s=arc-20240116; t=1775835268; c=relaxed/simple;
+	bh=PvbmIdzeb9wjKZVgfkDb4H3sqoijSdhO8pVpgiUrhwo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yoz9wXmYbNpygpMAfvcCJ2WDoH/NFJI6I5vb5XXoeQW/82pXcthZizj2hAMA26+sjzKoT35R1Kl7GXYPubVrmOp+uTq4OMROpsH1Vy27JoJ9E95QplN95eTLccr+JKclyXE7DW6vMXksYjFCCgmLNM+cMcFltkEuGDF11IwGDn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VKVEIrls; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="VM9pR3FU"
-Received: from trampoline.thunk.org (pool-173-48-116-90.bstnma.fios.verizon.net [173.48.116.90])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 63AFIonm015842
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Apr 2026 11:18:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1775834338; bh=eTlXD+fEi5OyNbu4TxRTwpDmEzFd2ThBwniicSqJG9M=;
-	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=VM9pR3FUqiyu4dGQLYjxtn5fwtIzfU7ySZMp0abbH18xV6/gDABRi9uB743lXz8hh
-	 DLg+D58JGiw6cmfTe96qrNZsfI1LrX8CH4Z4SZsryjUI4LnJNSYnME68kmTAWN0bac
-	 +APmObxjmRctPfSGmHJbriSXfrkN55pWYIbiVRfu2y0ECqpOPHSJun6K+BHM+LkVI2
-	 DM7T+QYmlRWbU/sqPlO03FdXluf2F9iRmmuiDmCsbPLwL4U9izV2zs90P/AyWnNi7/
-	 WJE2W3FtW9KojAgen2wKI5w3YJJGh4CS8IuF5T47bMgUta6WPQzUW9F7QaunmIRgXz
-	 enYXQQPwNnobw==
-Received: by trampoline.thunk.org (Postfix, from userid 15806)
-	id 0D7462E00E1; Fri, 10 Apr 2026 11:18:48 -0400 (EDT)
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: amd-gfx@lists.freedesktop.org, apparmor@lists.ubuntu.com,
-        bpf@vger.kernel.org, ceph-devel@vger.kernel.org, cocci@inria.fr,
-        dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
-        gfs2@lists.linux.dev, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-modules@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-phy@lists.infradead.org, linux-pm@vger.kernel.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-sh@vger.kernel.org,
-        linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        ntfs3@lists.linux.dev, samba-technical@lists.samba.org,
-        sched-ext@lists.linux.dev, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, v9fs@lists.linux.dev,
-        Philipp Hahn <phahn-oss@avm.de>
-Cc: "Theodore Ts'o" <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>
-Subject: Re: [PATCH 04/61] ext4: Prefer IS_ERR_OR_NULL over manual NULL check
-Date: Fri, 10 Apr 2026 11:18:40 -0400
-Message-ID: <177583430870.2758959.6171961359325912353.b4-ty@b4>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260310-b4-is_err_or_null-v1-4-bd63b656022d@avm.de>
-References: <20260310-b4-is_err_or_null-v1-4-bd63b656022d@avm.de>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VKVEIrls"
+Received: from CPC-namja-026ON.redmond.corp.microsoft.com (unknown [4.213.232.20])
+	by linux.microsoft.com (Postfix) with ESMTPSA id B9A1420B710C;
+	Fri, 10 Apr 2026 08:34:18 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B9A1420B710C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1775835261;
+	bh=nJauujAtXOqpY8xeMLBmssIBHZiVywJc9ACUArZxTLA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VKVEIrlslwUJ+/jIuLvpPHB2k/jnIgvPn39AdzD180BLTuTV90gJXT9nN8f5iIxzP
+	 rETQYl5aMCuBfMzlVCcjvwqQm/iGoyKp2F2nrSdNETxcLUZDYbVKRMelY0+wI56VGu
+	 2AcvqzCGBan48/dkNpRzda4wLi9QgKWzo5iPEZfY=
+From: Naman Jain <namjain@linux.microsoft.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Saurabh Sengar <ssengar@linux.microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	namjain@linux.microsoft.com
+Subject: [PATCH v2 0/2] block: fix pgmap handling for zone device pages in bio merge paths
+Date: Fri, 10 Apr 2026 15:34:12 +0000
+Message-ID: <20260410153414.4159050-1-namjain@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+When zone device memory is registered in multiple chunks, each chunk
+gets its own dev_pagemap. A single bio can contain bvecs from different
+pgmaps -- iov_iter_extract_bvecs() breaks at pgmap boundaries but the
+outer loop in bio_iov_iter_get_pages() continues filling the same bio.
 
-On Tue, 10 Mar 2026 12:48:30 +0100, Philipp Hahn wrote:
-> Prefer using IS_ERR_OR_NULL() over using IS_ERR() and a manual NULL
-> check.
-> 
-> Change generated with coccinelle.
+There are two problems with the current code:
 
-Applied, thanks!
+1. biovec_phys_mergeable() has no pgmap check, so the request merge,
+   DMA mapping, and integrity merge paths can coalesce physically
+   contiguous bvec segments from different pgmaps. This makes it
+   impossible to recover the correct pgmap for the merged segment
+   via page_pgmap().
 
-[04/61] ext4: Prefer IS_ERR_OR_NULL over manual NULL check
-        commit: 1d749e110277ce4103f27bd60d6181e52c0cc1e3
+2. bio_add_page() and bio_integrity_add_page() reject pages from a
+   different pgmap entirely (returning 0), rather than just skipping
+   the merge and adding them as new bvec entries. This forces callers
+   to start a new bio unnecessarily.
 
-Best regards,
+Patch 1 fixes the merge-path gap by adding a pgmap check to
+biovec_phys_mergeable().
+
+Patch 2 introduces zone_device_pages_compatible() which replaces the
+blanket zone_device_pages_have_same_pgmap() rejection in bio_add_page()
+and bio_integrity_add_page(). Pages that are safe to coexist as separate
+bvec entries (e.g. MEMORY_DEVICE_GENERIC from different pgmaps) are now
+accepted, while P2PDMA pages from different pgmaps or mixed P2PDMA and
+non-P2PDMA pages are still rejected, since the DMA iterator caches the
+P2PDMA mapping state from the first segment.
+zone_device_pages_have_same_pgmap() is kept as a merge guard so pages
+from different pgmaps are not coalesced into the same bvec segment.
+
+Changes since v1:
+https://lore.kernel.org/all/20260401082329.1602328-1-namjain@linux.microsoft.com/
+- Reworked patch 2 to introduce zone_device_pages_compatible() which
+  rejects P2PDMA pages from different pgmaps at the bio-building level,
+  not just at merge time. The previous version only moved the pgmap check
+  into the merge conditional without preventing incompatible pages from
+  being added as separate bvec entries. (Christoph Hellwig)
+
+Naman Jain (2):
+  block: add pgmap check to biovec_phys_mergeable
+  block: relax pgmap check in bio_add_page for compatible zone device
+    pages
+
+ block/bio-integrity.c |  6 +++---
+ block/bio.c           |  6 +++---
+ block/blk.h           | 21 +++++++++++++++++++++
+ 3 files changed, 27 insertions(+), 6 deletions(-)
+
 -- 
-Theodore Ts'o <tytso@mit.edu>
+2.43.0
+
