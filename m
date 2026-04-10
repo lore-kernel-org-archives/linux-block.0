@@ -1,84 +1,87 @@
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0162D5C8E
-	for <linux-block@vger.kernel.org>; Fri, 10 Apr 2026 01:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC32D31691C
+	for <linux-block@vger.kernel.org>; Fri, 10 Apr 2026 01:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775783483; cv=none; b=P5Q5SHKxlibbGimAIFVI5LflsK6V3w/MLgUqMSsf1R2cpBH0r4Eds6muCaYJFSvI4zMCraMiaQa+1RgMwequ7g6MPjX4pN8b5AqieVGdaInT2K+X6koc5yak2JGUmgZLsj28eKK4Aw1+bap5d2qaVtlAjnlgXvudIDGhhUMMZp4=
+	t=1775783536; cv=none; b=QMZN4UKtsCgNXly48Xv+sUo7NEfA0cNsGZgZ32c5prqlhz+pjzQSxvex7a9fiYpZnHL/0ulXu3/4jE/WOMfDXvYoLgGF44/zBhEIPHG0Z+djR2nMrG8KIGK8nKzrqCVLfWtsv6fkh1YByL5odkJjVBFtz8wRJYt2l9XCy/aONw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775783483; c=relaxed/simple;
-	bh=FLqv1MPCw/yWdJO9BTp34ptrOXgv+tQnf/D0Sd0i/Z8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=HbBge1rS1h6VesCsuCjfm6E3COP2WanUAVMMHYEJw4QIcYGEgsGWOLx1MUsziJZKLXfY7hVdB/GMeHxfYQNgTZwkoVRSeqKRaKrdPP4D3kalrpmTjEHq5VA/O9RS5a73eiGz5ddPxwF3UiEP8RHg3bG8fc5YA5LjJpB+g0KGMvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=W+ZeAieI; arc=none smtp.client-ip=74.125.82.170
+	s=arc-20240116; t=1775783536; c=relaxed/simple;
+	bh=R7elkKqzIEvnBn9bIM7EJPGEKhNDQxMkBGDun0sNrQQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KOp1Xbg8cfD9Z2PM2b6z/m3gL2vJEoXYM9N3IX21QXgnMxxUHbqEVDYPXr81+LoZkUMkIZtIzN8LgwBBRNVg3LdmvDUSYS3koAdSCTvg84oLXTALjw1vypBNw+QIeDQJDreLTg7WSz5SfhHbOq0mcQ/cmj1vyKCRq9WUIRnX2Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=vshAjb7h; arc=none smtp.client-ip=74.125.82.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="W+ZeAieI"
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2b6b0500e06so2168510eec.1
-        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 18:11:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="vshAjb7h"
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-2bdd40d3c61so1281833eec.1
+        for <linux-block@vger.kernel.org>; Thu, 09 Apr 2026 18:12:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1775783479; x=1776388279; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5D9UITiClzw+Ud2bwsY5/xcCroP5xGUK3d4IAAtUen0=;
-        b=W+ZeAieIOBysYDrpEpq2AZXSQAfgy7refCJT6jjnY0eXPBb62WpkQ7CNRG0WOdJxl7
-         D6fzydTZCMtX3xUHQT9Qg0KSY1na+pqKTCXfLGKPMVHjhOxw5NYB4/X2jrgIlT3BO1La
-         MTn5+mng1TkWKomDbiRlvw5hmhpLC/0ddJcTONCys8j2wbbOJ6euLw2sMnUCyIQ4LuBE
-         mzuVnN01isnRwQI0u4593tPLkJ6rbG25UwX2IMF9d4lS0t/SZ5Sc2xmerpPN6xkik9Z4
-         DK+ds5qhqHZZBEKe6zZDIGGGbCsy2DBnj4gU17iKMhd5fWjoyW2TLuDB9qTrzxKBzjr0
-         8nAw==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1775783534; x=1776388334; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7wicgY9NcgT/3UjIzdAZt3rganAsem03G6NL+TmYL0E=;
+        b=vshAjb7hQ6wNFovj5gKMkF+ZvA9y35a/WyHJUBdEUyjJFx0QUaFjKbXheKdUUa03pl
+         KNbg7RWg/CNnSjOjlg30BgPcrOCNv4SWN/qLFkgtugL2WiveUMJ2jmhzgIcxlNZro+qD
+         VSnt64Ls5lrNqrqkz3NGfbyenf289HyqzyeURExiDgKM4JYvCSissTVSQ+pghC0qpztd
+         ae59pnIzZIAl5rYgRdz6/9+hHnxfYE/i87JGAmCU+PqV8DuZoCYm43RlrhETsPal597a
+         nQswCV2w0kidZy3LA/WsHhdPc3jJYhH/Wr6N4FcHze21JwiheTCV5YyRfGe6QXzP6PZi
+         VB/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775783479; x=1776388279;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5D9UITiClzw+Ud2bwsY5/xcCroP5xGUK3d4IAAtUen0=;
-        b=UEmeb/87a6OEkg6WLDIOBe+/ccYYfdB2aR5BL9kf3/YWt0CHihAD9cnOP54DSRHgX0
-         76WJ75X6HtuozAjhtS96JTAufh+qE/J2qZLaxxewW/Ym4ctk3rAXUFvVG7mdHmpP9Ees
-         /2BqV3TA7tUGoxn6Rl2DUwkhOYtRFCCqbmE29d1wG4VjlYJ1/OWbY00EdAz4tRH1P5Ix
-         aTCpO7JQOtF59h01xr4Vg0npXGAcGTEsiNQFqsRaC7QD/rtbpoGserXrFmg6fObVDPuD
-         Lb5UYr9fU1VfUQf58Twz6t5SgRTCyGFvN2yY3K+0uEgo5EQwhEYfqfa2cYIP0+XIBQkY
-         EyyQ==
-X-Gm-Message-State: AOJu0Yzks4DTySHr6X58uU7zB2qD3L4ErCKrOP68Ve1eY5ZdF64hiKjS
-	pE3eVn3BW6B+0wMN2Sq+GnZ2L/JClo+spl0LTQJojk/msi97bUElMqb9guHLcA3L2j8vyMscpwl
-	PIT/4
-X-Gm-Gg: AeBDieu24xJFYvUD99g2Mlxwdv9C6HGqUrzfd8T+6DXYNv8HCehiBqjSc4/1zr9Mqc5
-	K1z2DSAoPk8rCrnGqtw4dIEXW9+jBl9L9UXvCbg7/ci8KesjYxLt4+suW2WOKX9cIMxRzd0E99J
-	wS2z+6OjrkVX9utTuj8ro8lfot88CiKlBycXe/U6pXh8hsRG9Q1N2ABfkZLJxu4yLIQtny47//8
-	FeO5mIK51/QHIlAYumBL8/15UV/2eA2nC5ybwOtcbJjusfq1pDZ8+VV3kdaWqOnU7y7nbOJ7cMj
-	eGun/VhbUSQIeko7cvGhNZksvfgxMxtFASUWqBpUTG2Yki+uuo1f4Qkn5r051mfDcbYL0Jzi7q4
-	R+vqkdm0YqNxiEhz9QuQwiYKTi/5wjTgJXf5FDj8LF+nyx0kc2oMVkG6LS5ruyshQvvUlI0q2p1
-	q9mkhuRSzxxFlwX7HkpA1gCy/cv4t+jJD+WQKjBcHIx6XlaDjw0m0z23oBPlMHF1Y7oVEbOoby7
-	sB+BEY2fQ==
-X-Received: by 2002:a05:7022:fd01:b0:128:d23d:81a2 with SMTP id a92af1059eb24-12c34eeb982mr674969c88.29.1775783479337;
-        Thu, 09 Apr 2026 18:11:19 -0700 (PDT)
-Received: from [127.0.0.1] ([2600:380:873e:380f:e9e5:ea98:a905:9cbb])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55faa571csm2462450eec.10.2026.04.09.18.11.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Apr 2026 18:11:18 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>
-In-Reply-To: <20260409133020.3780098-1-tom.leiming@gmail.com>
-References: <20260409133020.3780098-1-tom.leiming@gmail.com>
-Subject: Re: [PATCH 0/7] ublk: followup fixes for SHMEM_ZC
-Message-Id: <177578347806.487779.11672124480014086344.b4-ty@b4>
-Date: Thu, 09 Apr 2026 19:11:18 -0600
+        d=1e100.net; s=20251104; t=1775783534; x=1776388334;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7wicgY9NcgT/3UjIzdAZt3rganAsem03G6NL+TmYL0E=;
+        b=rbKB82U6fJ9OZLCz8+JpcCfjh+05lGgfT61qba4sAqKU2LD6QDslJdabm9/tAfJ6Gg
+         fK2w977rLA8mtBvQpDD/UnWXzNtDDzzty4ZrrK6ZD4NheLtjLlbBrUPl3irFTQ3vaZBm
+         iAAL+dfXsiGll1qAl48qVbZ/wNufPNdqPZASVrSU5FntlQwCK8WZJWdOBTXAPx/uJWqz
+         Ph6vuItIwqrLHt1p2ZfQ8Et7xpAhIVGerKwJWwrk/yl/8xNd4b2Xsu9KrTd80qAwgyK7
+         1J0hOkx4izpdcJKtlpmWxwcdHYFh29SXBa9znl0avTXgDXfFT1bPf3OT0ZyHywmbvZcs
+         I1UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW4oBU7JTnLe/ZvQ4mdnoxEwyqlSiQWDhEpYVbjgiVVBOtTo29iuT4i8TwySQmRzQLZXFrZv6m4pEhcEA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWkV8C6qSVeKIMAD5p+JUzLySlvt6FEjirjEFs1bWsp3uV56f1
+	SI3hZGATzX6U4uqX9tk6RoJjOnu1kH9Or3K/8m/f5lVrzo4pIzcfRJUQbVk7uYImm00=
+X-Gm-Gg: AeBDietc/PxLD0w40JrSZjUi26JBJ7gKwZeH4dsLAyh9UI8Wi+dUqVeYTSFXg//0X6c
+	ITlgLQlpmEd58bSbgu7PWB0JpMtb5iATxasntYAKAt+Irp+7CuhHTrfIVfisCciARUBnd1f39R4
+	OXdPMq6zWdRcfnnHRG11q/rO5cCx3fUfcrFeWTZhRAi2A3EYFwomVuw0Ujef7UtLMwNm4pvaXjB
+	dVSTay095sfEKQFQ3kHK1dM0TJ9mp/hjn3FXR48ri4eZ/GQPxXjzpxbGtaixYQQkb1xKLgRGVhr
+	stDx76V7bC4wbsxvF6IrgzsX70lFYVMbiJHiPB0fi8t7sNr0MI/N2jOo1i6F6I+yzJX6b0+AAFz
+	xVVQl+iSmEIEvcWF0feHhXridQblP4elB23ba/sqQ+SeJn/4Ip9z8Muy+JauAhRXjTvaJ22emYQ
+	l6bqwnpvkVR6bkMW+jjszDOOUf4TkeKVzhEcSpoCMXKxZ4Z2iCNzWZ0xy4+8pE9lhML81UAZJZI
+	sZp1bkDaHYICbdoUu2n+/BtWx7ImYavsHgBKBmFCXYg1XE9eCRFfkY=
+X-Received: by 2002:a05:7300:a287:b0:2c1:3f85:747 with SMTP id 5a478bee46e88-2d5894628demr646992eec.21.1775783534159;
+        Thu, 09 Apr 2026 18:12:14 -0700 (PDT)
+Received: from ?IPV6:2600:380:873e:380f:e9e5:ea98:a905:9cbb? ([2600:380:873e:380f:e9e5:ea98:a905:9cbb])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2d55ce46a65sm2198745eec.0.2026.04.09.18.12.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Apr 2026 18:12:13 -0700 (PDT)
+Message-ID: <24a86901-18c0-4ca9-89de-92f4fe131fe8@kernel.dk>
+Date: Thu, 9 Apr 2026 19:12:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/7] ublk: followup fixes for SHMEM_ZC
+To: Ming Lei <tom.leiming@gmail.com>, linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>
+References: <20260409133020.3780098-1-tom.leiming@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260409133020.3780098-1-tom.leiming@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
 
-
-On Thu, 09 Apr 2026 21:30:12 +0800, Ming Lei wrote:
+On 4/9/26 7:30 AM, Ming Lei wrote:
+> Hello Jens,
+> 
 > Followup fixes for the SHMEM_ZC (shared memory zero copy) patch series,
 > addressing review feedback from Caleb Sander Mateos.
 > 
@@ -94,29 +97,11 @@ On Thu, 09 Apr 2026 21:30:12 +0800, Ming Lei wrote:
 >   before freezing the queue (same ordering as ublk_stop_dev_unlocked)
 > - Address documentation review comments
 > - Update MAINTAINERS email
-> 
-> [...]
 
-Applied, thanks!
+Applied, but I'm unsure what base you used, I'm guessing your old base
+rather than my for-7.1/block which already had fixups for the issues I
+mentioned? In any case, just ensure that future updates are against the
+actual tree, not on top of your previous tree.
 
-[1/7] ublk: widen ublk_shmem_buf_reg.len to __u64 for 4GB buffer support
-      commit: 23b3b6f0b584b70a427d5bb826d320151890d7da
-[2/7] ublk: verify all pages in multi-page bvec fall within registered range
-      commit: 211ff1602b67e26125977f8b2f369d7c2847628c
-[3/7] ublk: simplify PFN range loop in __ublk_ctrl_reg_buf
-      commit: 8ea8566a9aeef746699d8c84bed3ac44edbfaa0e
-[4/7] ublk: replace xarray with IDA for shmem buffer index allocation
-      commit: 5e864438e2853ef5112d7905fadcc3877e2be70a
-[5/7] ublk: allow buffer registration before device is started
-      commit: 365ea7cc62447caac508706b429cdf031cc15a9f
-[6/7] Documentation: ublk: address review comments for SHMEM_ZC docs
-      commit: 289653bb76c46149f88939c3cfef55cdb236ace2
-[7/7] MAINTAINERS: update ublk driver maintainer email
-      commit: b774765fb804045ee774476ded8e52482ae5ecb7
-
-Best regards,
 -- 
 Jens Axboe
-
-
-
