@@ -1,114 +1,137 @@
-Received: from mail-m19731110.qiye.163.com (mail-m19731110.qiye.163.com [220.197.31.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C7E17B43F;
-	Sat, 11 Apr 2026 13:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.110
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775914635; cv=none; b=MSSDofq7UOEdogN4h7gVkdkfRKjyZc4RXx6UfXb9tlLjv0P7Md7MIci/pPYJoJxvO5wzvuGmlDaw85/EAwAPP0wEc4WlG1u1yqBF6eFJsKKdo/XVycl0lv5d3rVbgggez1Vj2y96NHB1Ay/ol3iJnd3GvUT7LJ+gJED08TAFymo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775914635; c=relaxed/simple;
-	bh=GrATDavK9JvbNOxUOHNK1y5LcEj/mEB6++KYis9NUnw=;
-	h=Content-Type:Message-ID:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:From:Date; b=DQ4FVu/ODktjV5SY2Gc7aQLYAOoJahWTya2NG++s7N+Hvxsr9KUZUbjKDtk4c1H7ca0UnjTs6HuPCIyYcEChRNZK5MAhA6T01YnXMrJ0kqntmVlKV2ysxxyxybOFMq5SdO8HTxsq+i5E2Byjq02Dt4Rgz+8QSum759B6tlbUxIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn; spf=pass smtp.mailfrom=ruc.edu.cn; dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b=KxBdsRA2; arc=none smtp.client-ip=220.197.31.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ruc.edu.cn
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530E01DF74F
+	for <linux-block@vger.kernel.org>; Sat, 11 Apr 2026 22:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775947686; cv=pass; b=mfUVA+U0CUnc7XJ0LC/xIAmKufUxRFfF4SxuG4Zd+xUWiQR+sy5wXEZL8zN+Ob8xrz9333Q22NHDpQOZDDd9Mpi79DIXfYk7M1RPJpVyMBfsLshZ8GvXC+JiazeW7s7WmlqZhcIbpBBNPr9lLl9+JVgK7BQ2cjoSgZw8JoefAnE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775947686; c=relaxed/simple;
+	bh=hfI7WZixWr8hfh5FgBWMpYIgkb3WvfVlVAFZ8mrBIQM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=igMKEmvy1LDz0NGCX/MlBKMBOucWFcR3d2d19ro+p9J5dxbcEgnnnQ49zP+QAkUrYI/aTuQrNqvbd9hMyKKhQppzMSkH9dR1IgK6jXF26/+EUlrzqCE74GxsAll3nWez033Y5bcsaslR9ahqCqNhgENedg1ZbiAo2LupZDEq1Sw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kzWz7qVE; arc=pass smtp.client-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b="KxBdsRA2"
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Message-ID: <ABUAdgD1KKnjiCpcrxWXD4pE.3.1775914622691.Hmail.2023000929@ruc.edu.cn>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, 
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	linux-kernel@vger.kernel.org
-Subject: =?UTF-8?B?UmU6UmU6IFtSRkMgUEFUQ0ggMC8yXSBydXN0OiBibG9jazogYWRkIGEgYm9ycm93ZWQgYmxrLW1xIHRpbWVvdXQgY2FsbGJhY2s=?=
-X-Priority: 3
-X-Mailer: HMail Webmail Server V2.0 Copyright (c) 2016-163.com web
-In-Reply-To: <87ldetx01d.fsf@kernel.org>
-References: <YpOxb7raN9ztoDEyfT5M8S4KZA74Ua0I9VLcImKPi_lJ6K5xWugbgbzKmQcl0rz2XdRw0cXOYrDpOYjz9q62Dw==@protonmail.internalid> <20260410164704.1986859-1-wenzhaoliao@ruc.edu.cn> <87ldetx01d.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kzWz7qVE"
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1277863a912so196959c88.0
+        for <linux-block@vger.kernel.org>; Sat, 11 Apr 2026 15:48:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775947684; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CTi1ZaRc7qdWf5R7SxGcrYkSedkLgfRmn9jCtYh0byei9RLVcmNR3tBC0qcht76n3R
+         JN9HQgUHI7ijy1zK+5tx/OOHMSJtl1b9SbSKR5x6JnrrLoMy64nKo3jHwD0AUx+GSEd3
+         nU3cu9Gzp0Fbdt65k1A40GsvyCrpD0aVvJOhsL9tNan0cHa+OmaFEa4n84b1VHPrpZha
+         gO3LWD/QHOX78Vjzeg/eMBXaB+b98XhgpAOKxmkA/ZJcuh5eMRyUqapPtlq1zJ76Nc4A
+         avRzPu8rYERxYBCRpRxOHN3h3Mn12YA7lk7l4804kYeF5n9AycRJ3dG5HYSUaI0h0Rjc
+         iWeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hfI7WZixWr8hfh5FgBWMpYIgkb3WvfVlVAFZ8mrBIQM=;
+        fh=A+tjhrIQT4qA4kUZ255EllFF4CDpjP0Y2fVBGU7SSwE=;
+        b=TKN++XoUcZ4oC2rinHj2sUduIvlB3XMi8EoIGug0n91YanG6NmmBCG38j91JevvPMN
+         wXskbOrLI2+NGx9q2j0G3CGD9YZ/YKdISR6BYJc5TMDARKsn4ay+yfo/nifddakvAgOQ
+         J2KlAHV/lVBWPIJUSPEJeJC/+heDLfBGoOXsyCPs4bETYE7tKifSoaoL2WTYNFmBzIrN
+         BWzoEO6j3SjQHCJijuSyubco3Mw24icBRG0aUuAZbiousgAffd6pIkXV801yG04quX3R
+         Q18xOeZJolOpzaPQ0+olpLISzdZaEcWZCgQyLbl9l1hpwCX+IzJ3GPRcv+ha1i7kg7/R
+         J6GA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775947684; x=1776552484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hfI7WZixWr8hfh5FgBWMpYIgkb3WvfVlVAFZ8mrBIQM=;
+        b=kzWz7qVEaJPLNUIrtdhKrQycNx4cB3e7XrU4Q7c4iT1db1n77iVSVnaB+kKeQTqaW7
+         ucIwHumMuRXfyLmDGN2Mpzm4U6BtshlHXtP+7R3wcnIvZ8pCYfDeFJKPFfsDNFbI9baT
+         euCs9wtcktEepCYKI0SK5sRmbQAYCfeI2onvMDmIHGa2NVmk38L/aDaAGTNypx2d0l0K
+         XGi9zUNPVaoEDgKctltAsVTPL77jM5+10iOxJXEreCOAnNMMAEZ2xwl1ryIMw1kqTDC3
+         Fm8FOeQwdXJp3/GJ75zfzNfFQji9eYsrQfvyhuXSXQm9NhQ2d4F1CQC8EyUoa/Zt1I83
+         SbOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775947684; x=1776552484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hfI7WZixWr8hfh5FgBWMpYIgkb3WvfVlVAFZ8mrBIQM=;
+        b=gC37yD5Fl6VULmRmsu6hCyq7Wl+Id59GBDalxgQ8juyOrMwWRmLsu9sC5BX2VHHd1g
+         xSIUN3TYWrNpaQUldhym8EGhmBaN/smmlst60YWnSKOBt1CaQdo/SbLAcSBX35C3tUPl
+         06jNnr1o5P7lIJFoXHNUuKFZxOQn6rL7jgHmvs7HOtYX2QDfFVmDKj/wtJAYU8DPBqVB
+         ALa0wE2lUa7IG9wq/vwXjvxUgZfTNaWe96O3XMti1Onm+G3usNPbqwesFl3agJJyPCLg
+         eYhE8aZSzugtKG2LW75ykLxFjPutMEnbL0bavrQXf5sPyOta3OGn8JqRD8SxoCLB81A5
+         wFrg==
+X-Forwarded-Encrypted: i=1; AFNElJ9flpo9wc1dL+jThdeDYwYG+x11wKCeoyOr8SljtJhJ/t06/8yN4hQ/2ZF7JWXHrQpaapa8dR9NgBFLfA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yycbx8fVD6dqEqhYQYWgGiJd+OBxewMKG4HuZwYk/lbVlfoYkPb
+	BRDiWmgdMww9FO1+EgCtfZvM9XaA8X9gBiRsBYPSwsSPULzupvMymbNtekv963Id3tVCMGZYxjd
+	TkYYp77ecqzKJbPZkuVkhNsMZRxPccas=
+X-Gm-Gg: AeBDievfRnMWGT85hVOKRXrrhQFSYkur4FiRl5qZipewyhyAVEzDbOPHEFgCw8Jaxh0
+	tm36tEt/2hgt4GkUOnazTQFw9vlhbz3xpRKxF7ceb/AZeWqyn1fwJdT09CuTotMmpps9SMq3GBU
+	JSgEeFds8UoNnAVoFuZRbgR4mj1VojozPfbnOGec+JJ3CJE9MVDxL3PAXsq2zvxj9yQCOCgb8Qi
+	G6F8HrGyVXPkIQs3geDRvkAo0HSJuz1+2X7dbftlsVjERkRu8m3ntAOzCQ4jg4KPTmrul7wmmfM
+	sX0wEZ6VEmlC8wreCLOXfTYF5dURs6ow/KkRdAaeN9FMw6QS8giq7OlItbm8tgapFocz+5EBnZi
+	+4tvh0ynYzhlmgKLGSPmUq+5DAuIlww7ddA==
+X-Received: by 2002:a05:7300:6da6:b0:2d1:9b35:4f03 with SMTP id
+ 5a478bee46e88-2d589ca7743mr1992099eec.5.1775947684276; Sat, 11 Apr 2026
+ 15:48:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: from 2023000929@ruc.edu.cn( [13.230.183.156] ) by ajax-webmail ( [127.0.0.1] ) ; Sat, 11 Apr 2026 21:37:02 +0800 (GMT+08:00)
-From: wenzhaoliao <wenzhaoliao@ruc.edu.cn>
-Date: Sat, 11 Apr 2026 21:37:02 +0800 (GMT+08:00)
-X-HM-Tid: 0a9d7cc25a4a09bdkunm57c736a6f0be
-X-HM-MType: 1
-X-HM-NTES-SC: AL0_4z5B86Wr4Tz9jdMF+bhXMf2U5gprSpllrVBCJYClE3duRf49djg1aYGfsM
-	uZDiMwUADN0vC6aaY9uZI0LsOBrQyqlCWwggkiqzeZH3w+gDnqSBvnh5dVHNOq+rQ/D4W6j3lYsm
-	ua0VcrT/mWqDANDUuWxVBaR/AKTYFMShDXN+Q=
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDTksZVklKGUNPQ0tKSE1MQ1YVFAkWGhdVEwETFh
-	oSFyQUDg9ZV1kYEgtZQVlKSFVJSEtVSkNIVUpOTVlXWRYaDxIVHRRZQVlPS0hVSktJQkNDTFVKS0
-	tVS1kG
-DKIM-Signature: a=rsa-sha256;
-	b=KxBdsRA22aMHXQQGFOjuX9hFRBhY0iKMzDbIsXX03ynrhxdj6NAJvMLpv9fkEjkfWO/2NJ5D0umtB5N9DviP6DTWb1gLJA4Z/nnL+h2voyGhXbABRcibSFm6wYX4kTWA4rfMvLY8tQgux8SQa1lnYGA8Mja+kJ2zlNUhiVqB2RQ=; c=relaxed/relaxed; s=default; d=ruc.edu.cn; v=1;
-	bh=GrATDavK9JvbNOxUOHNK1y5LcEj/mEB6++KYis9NUnw=;
-	h=date:mime-version:subject:message-id:from;
+References: <YpOxb7raN9ztoDEyfT5M8S4KZA74Ua0I9VLcImKPi_lJ6K5xWugbgbzKmQcl0rz2XdRw0cXOYrDpOYjz9q62Dw==@protonmail.internalid>
+ <20260410164704.1986859-1-wenzhaoliao@ruc.edu.cn> <87ldetx01d.fsf@kernel.org> <ABUAdgD1KKnjiCpcrxWXD4pE.3.1775914622691.Hmail.2023000929@ruc.edu.cn>
+In-Reply-To: <ABUAdgD1KKnjiCpcrxWXD4pE.3.1775914622691.Hmail.2023000929@ruc.edu.cn>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sun, 12 Apr 2026 00:47:51 +0200
+X-Gm-Features: AQROBzBJf75ZdfXiiC9J0iti4_SQ4JgL8eo_clRRhwnKg6Y8oacC5LbCeYbWwUU
+Message-ID: <CANiq72nuy-KoA1oQewOX9EgrUOo7H-9UhWB0TkzhfAZWpnUUDQ@mail.gmail.com>
+Subject: Re: Re: [RFC PATCH 0/2] rust: block: add a borrowed blk-mq timeout callback
+To: wenzhaoliao <wenzhaoliao@ruc.edu.cn>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, linux-block@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, Boqun Feng <boqun@kernel.org>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-CkhpIEdyZWcsCgoKVGhhbmsgeW91IHNvIG11Y2ggZm9yIHRha2luZyB0aGUgdGltZSB0byByZXZp
-ZXcgdGhpcyBwYXRjaCBhbmQgZm9yIHlvdXIgdmFsdWFibGUgZ3VpZGFuY2UuCgoKVG8gYmUgY29t
-cGxldGVseSBob25lc3QsIHdlIGRvIG5vdCBoYXZlIGEgc3BlY2lmaWMgZHJpdmVyIHVzZSBjYXNl
-IGZvciB0aGlzIGZlYXR1cmUgYXQgdGhlIG1vbWVudC4gT3VyIG92ZXJhcmNoaW5nIGdvYWwgaXMg
-c2ltcGx5IHRvIGxlYXJuIHRoZSBrZXJuZWwgZGV2ZWxvcG1lbnQgcHJvY2VzcyBhbmQgZmluZCB3
-YXlzIHRvIGdlbnVpbmVseSBjb250cmlidXRlIHRvIHRoZSBSdXN0LWZvci1MaW51eCBwcm9qZWN0
-LsKgCgoKUmVjZW50bHksIHdlIHN1Ym1pdHRlZCBhIHBhdGNoIHRoYXQgdW5mb3J0dW5hdGVseSBk
-dXBsaWNhdGVkIGV4aXN0aW5nIHdvcmsuIEluIHRoYXQgdGhyZWFkLCBBbmRyZWFzIEhpbmRib3Jn
-IGtpbmRseSBwb2ludGVkIHVzIHRvIGEgbmV3IHRhc2sgd2l0aCB0aGlzIGV4YWN0IHN1Z2dlc3Rp
-b246CgoKIklmIHlvdSByZWFsbHkgd2FudCB0byB1c2UgeW91ciB0b2tlbnMgdG8gaW1wcm92ZSB0
-aGUga2VybmVsLCBJIHdvdWxkIHN1Z2dlc3QgYWRkaW5nIGJvb2xlYW4gcGFyYW1ldGVyIHN1cHBv
-cnQgdG8gdGhlIFJ1c3QgbW9kdWxlIHBhcmFtZXRlciBwYXJzZXIgY29kZS4iCihodHRwczovL2xv
-cmUua2VybmVsLm9yZy9ydXN0LWZvci1saW51eC8yMDI2MDIxNi1ybnVsbC12Ni0xOS1yYzUtc2Vu
-ZC12MS0wLWRlOWE3YWY0YjQ2OUBrZXJuZWwub3JnLykKCgpXZSB0b29rIHRoaXMgYXMgYSBnb29k
-ICJmaXJzdCBpc3N1ZSIgdG8gZmFtaWxpYXJpemUgb3Vyc2VsdmVzIHdpdGggdGhlIFJ1c3Qgc3Vi
-c3lzdGVtLCBhbmQgdGhhdCBpcyB0aGUgc29sZSByZWFzb24gd2UgaW1wbGVtZW50ZWQgaXQuwqAK
-CgpMZWFybmluZyBmcm9tIHlvdSB0aGF0IG1vZHVsZSBvcHRpb25zIGFyZSBjb25zaWRlcmVkIDE5
-OTAncyB0ZWNobm9sb2d5IGFuZCBkbyBub3QgZml0IHRoZSBtb2Rlcm4ga2VybmVsIG1vZGVsIGlz
-IGEgZ3JlYXQgbGVzc29uIGZvciB1cy4gSWYgd2UgbWlzdW5kZXJzdG9vZCB0aGUgbWFpbnRhaW5l
-cidzIGludGVudGlvbiwgb3IgaWYgcHVyc3VpbmcgdGhpcyBvdXRkYXRlZCBtZWNoYW5pc20gZ29l
-cyBhZ2FpbnN0IG1vZGVybiBrZXJuZWwgZGVzaWduIHByaW5jaXBsZXMsIHdlIHNpbmNlcmVseSBh
-cG9sb2dpemUgZm9yIHRoZSBub2lzZSBhbmQgZm9yIGFueSBidXJkZW4gdGhpcyBoYXMgY2F1c2Vk
-LgoKCldlIGFyZSBwZXJmZWN0bHkgaGFwcHkgdG8gZHJvcCB0aGlzIHBhdGNoIGlmIHRoaXMgZnVu
-Y3Rpb25hbGl0eSBpcyBubyBsb25nZXIgZGVzaXJlZCBpbiB0aGUgbW9kZXJuIGtlcm5lbC4gV2Ug
-cmVhbGx5IGp1c3Qgd2FudCB0byBoZWxwIGltcHJvdmUgdGhlIGtlcm5lbCwgYW5kIHdlIHdpbGwg
-dHJ5IG91ciBiZXN0IHRvIHN5bmMgd2l0aCB0aGUgbWFpbnRhaW5lcnMgdG8gcGljayB1cCB0YXNr
-cyB0aGF0IGFyZSBtb3JlIGFsaWduZWQgd2l0aCBjdXJyZW50IGtlcm5lbCBzdGFuZGFyZHMgKGxp
-a2Ugc3lzZnMvY29uZmlnZnMpIG5leHQgdGltZS4KCgpCZXN0IHJlZ2FyZHMsCldlbnpoYW8KCgoK
-CgoKCuWPkeS7tuS6uu+8mkFuZHJlYXMgSGluZGJvcmcgPGEuaGluZGJvcmdAa2VybmVsLm9yZz4K
-5Y+R6YCB5pel5pyf77yaMjAyNi0wNC0xMSAxODoyOTozNArmlLbku7bkurrvvJpXZW56aGFvIExp
-YW8gPHdlbnpoYW9saWFvQHJ1Yy5lZHUuY24+LEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4s
-TWlndWVsIE9qZWRhIDxvamVkYUBrZXJuZWwub3JnPixsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5v
-cmcscnVzdC1mb3ItbGludXhAdmdlci5rZXJuZWwub3JnCuaKhOmAgeS6uu+8mkJvcXVuIEZlbmcg
-PGJvcXVuQGtlcm5lbC5vcmc+LEdhcnkgR3VvIDxnYXJ5QGdhcnlndW8ubmV0PiwiQmrDtnJuIFJv
-eSBCYXJvbiIgPGJqb3JuM19naEBwcm90b25tYWlsLmNvbT4sQmVubm8gTG9zc2luIDxsb3NzaW5A
-a2VybmVsLm9yZz4sQWxpY2UgUnlobCA8YWxpY2VyeWhsQGdvb2dsZS5jb20+LFRyZXZvciBHcm9z
-cyA8dG1ncm9zc0B1bWljaC5lZHU+LERhbmlsbyBLcnVtbXJpY2ggPGRha3JAa2VybmVsLm9yZz4s
-bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZwrkuLvpopjvvJpSZTogW1JGQyBQQVRDSCAwLzJd
-IHJ1c3Q6IGJsb2NrOiBhZGQgYSBib3Jyb3dlZCBibGstbXEgdGltZW91dCBjYWxsYmFjaz5IaSBX
-ZW56aGFvLAo+Cj4iV2VuemhhbyBMaWFvIiA8d2Vuemhhb2xpYW9AcnVjLmVkdS5jbj4gd3JpdGVz
-Ogo+Cj4+IFRoaXMgc21hbGwgUkZDIHNlcmllcyBmaWxscyBhIG1pc3NpbmcgYmxrLW1xIGNhbGxi
-YWNrIGluIHRoZSBSdXN0IGJsb2NrCj4+IGxheWVyLiBUb2RheSwgUnVzdCBibG9jayBkcml2ZXJz
-IGNhbm5vdCBwYXJ0aWNpcGF0ZSBpbiByZXF1ZXN0IHRpbWVvdXQKPj4gaGFuZGxpbmcgYmVjYXVz
-ZSB0aGUgUnVzdCBibGstbXEgdnRhYmxlIGhhcmRjb2RlcyBgdGltZW91dDogTm9uZWAuCj4KPkkg
-YWxyZWFkeSBwb2ludGVkIHlvdSB0byBbMV0gbXVsdGlwbGUgdGltZXMuIFBsZWFzZSBtYWtlIHN1
-cmUgdG8gcmVhZAo+dGhhdCBwYXRjaCBzZXJpZXMuIFRoZSBmdW5jdGlvbmFsaXR5IHlvdSBhcmUg
-c3VibWl0dGluZyBpcyBhbHJlYWR5Cj5jb3ZlcmVkIGJ5IHRoYXQgc2VyaWVzLgo+Cj5JZiB5b3Ug
-cmVhbGx5IHdhbnQgdG8gdXNlIHlvdXIgdG9rZW5zIHRvIGltcHJvdmUgdGhlIGtlcm5lbCwgSSB3
-b3VsZAo+c3VnZ2VzdCBhZGRpbmcgYm9vbGVhbiBwYXJhbWV0ZXIgc3VwcG9ydCB0byB0aGUgUnVz
-dCBtb2R1bGUgcGFyYW1ldGVyCj5wYXJzZXIgY29kZS4KPgo+QmUgc3VyZSB0byBjcmVkaXQgeW91
-ciBMTE0gYWNjb3JkaW5nIHRvIFsyXS4gQW5kIHBsZWFzZSBkbyBpbnN0cnVjdCB5b3VyCj5hZ2Vu
-dHMgdG8gZmluZCByZWxhdGVkIGRpc2N1c3Npb24gb24gdGhlIG1haWxpbmcgbGlzdCwgc28gd2Ug
-YXZvaWQKPnNvbHZpbmcgdGhlIHNhbWUgcHJvYmxlbSBvdmVyIGFuZCBvdmVyLgo+Cj5CZXN0IHJl
-Z2FyZHMsCj5BbmRyZWFzIEhpbmRib3JnCj4KPgo+WzFdIGh0dHBzOi8vbG9yZS5rZXJuZWwub3Jn
-L3J1c3QtZm9yLWxpbnV4LzIwMjYwMjE2LXJudWxsLXY2LTE5LXJjNS1zZW5kLXYxLTAtZGU5YTdh
-ZjRiNDY5QGtlcm5lbC5vcmcvCj5bMl0gaHR0cHM6Ly9kb2NzLmtlcm5lbC5vcmcvcHJvY2Vzcy9j
-b2RpbmctYXNzaXN0YW50cy5odG1sCj4KPgo=
+On Sat, Apr 11, 2026 at 3:37=E2=80=AFPM wenzhaoliao <wenzhaoliao@ruc.edu.cn=
+> wrote:
+>
+> Learning from you that module options are considered 1990's technology an=
+d do not fit the modern kernel model is a great lesson for us. If we misund=
+erstood the maintainer's intention, or if pursuing this outdated mechanism =
+goes against modern kernel design principles, we sincerely apologize for th=
+e noise and for any burden this has caused.
+>
+> We are perfectly happy to drop this patch if this functionality is no lon=
+ger desired in the modern kernel. We really just want to help improve the k=
+ernel, and we will try our best to sync with the maintainers to pick up tas=
+ks that are more aligned with current kernel standards (like sysfs/configfs=
+) next time.
+
+It appears you are replying to Andreas' message, not Greg's :)
+
+It is true that kernel module parameters are not something that one
+should generally be used when there are better alternatives, but rnull
+is a bit of a special case, i.e. null block is used for benchmarking,
+and Andreas may want to have parity with the C one for comparison
+purposes.
+
+But since your commit message didn't really say for what this was
+meant for, then Greg rightly pointed it out :)
+
+In any case, I wanted to thank you for reading and following the AI
+and tooling kernel policies I mentioned to you in Zulip! It may also
+be good to disclose the research side, at least just a link to that
+Zulip thread could be good.
+
+Thanks!
+
+Cheers,
+Miguel
