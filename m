@@ -1,208 +1,145 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B6B3B2FC9
-	for <linux-block@vger.kernel.org>; Mon, 13 Apr 2026 09:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776073789; cv=pass; b=tRnqIVy9Lfvj5oXtIVoLmsiamPghVFEz4J7moO9LK1u0vciED8/gnORuSbfL8slHrqjTnhAKE+Q5KYSbB7XdujUZozCiW16FXU7WlxiG+U3ZMfUE2wuLW+Y5Ej74dlFI0y6D5N2q5/y/2QCgQmFsTwdadK6+tyUt6xS/M31TN6Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776073789; c=relaxed/simple;
-	bh=8lgeElSXyvxhzH2zMFtB8aHv49U/LJwVSFrA3vaHTmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PpV08Dw5XmHpaChLJODWUSONk2LBW1mYUuqhgX9pkII+ijwsN8RbsiSpeAP0YKULwQTB1wWLNxvn3YaUh/XQYYSJ4MIXwGX5Uel1G0TbqCrRNjTyPzzdAA/EFpAEKjsMqftBUhEquy5R48O2v9Pg3AczEhFXYIuY9/kFL4X3HMc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=dDruFq1n; arc=pass smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3210832F749
+	for <linux-block@vger.kernel.org>; Mon, 13 Apr 2026 11:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776080917; cv=none; b=p7HPUHZ6yanBQbav50QhZlLeOMXJp09w7ba+LD4l6ezNCvObddPCS5PIfjkr2d5we/Hf6mpoFC0bwKVbQFfaYF/mKWXhLi8QeNGbNY3i5acLZU7ay2+Atufqh6ChOZ2/jI/z7CHx15+W7BiqU9I8HRqLJJdAChBPbzeVruhGhl4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776080917; c=relaxed/simple;
+	bh=GFVg8/9cUAJSWmjbziLE8FfOqMK+JQxCJrHsXIJt/Bc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtBcDmQ2Hyw6qg71jbaCFK2bNz+oy5lvQr8uSxGKJXkX3urEL6XBZjXeZJ2Pi/wWIYapJNb1sU1dVgfmhpEcHIYcdS8gKL8UJoES8EBeaoQ/zHZAyPMKUQ9xNfWo4AoPgidmPMHjkAwIK+wS1sLD2EkZb7JSvx5a4Z0ar6wpNZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=YXOrG8gy; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="dDruFq1n"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-38dd9f0fdc6so39184441fa.0
-        for <linux-block@vger.kernel.org>; Mon, 13 Apr 2026 02:49:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776073785; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ADlAV2Sc9hvicMnJWqhD+zmqsOPpVjPuTKFYXYjFZNaRabEqQWWL+Fhhygg1LtNFFg
-         4+TgcaJ9B0trkp6sqxrsLQAfIj6EklPfYxnkxUZbih9ED279bffOh2vujP59xrZvuZhR
-         /mzhcekMUvH6IPZGywsdnw6WlUzTgcXHW/GeHtXHL56DeSqf2xjUxRZfJnZpR0kNnzki
-         ONEUFXZ+E5Bsz1rsFEgDff6tEu05Ys3wA/t7aOO3+VW1tHJACKt+sZ91+GwAnqnQGvoI
-         WoPExZ/pPCwoTeEhscudkyaNBEIHM8nzjuZbBErx2+jzAEM9NQG9BEj7Mzy/HOdJTVFm
-         IcUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=d+Q9kf8IwjWobAqJl4eE+w2AI+pglZ8Z1eE/4LlJ2dU=;
-        fh=J9aGrwLIDyQhEXMVPXc2XH/TCtDrLgh8d3l2wl1Hwsw=;
-        b=V1eW+90VwfwtdT6TSEYUpHWBGUnD7PtU68eWXf8//DomVduX7tGzx7KOzVwWs8JlMw
-         cI1ytfl+rdz3BRX2I4uLMx1bI3hPWxrMnefXvAs+jKnQDa4U6wQ9p+c87jr22Yu/qAMB
-         uk1NgSPBGZqduNtf/NQrvvhlrGThodyyBrOywTpU66KMH/KMCABdbUYtvwfo22kvsFJh
-         1xQSBLfcKp3hS2AW8wynEqLi6+ljwhiORqDrbUlT3o770Q1Cw8OKUjTwklOE+e03Qkhq
-         UudYaEV3wv+uxwYS7nUG62+ejPFxJzBqhNPbbXLreY0bQ4H5fDaW2/votfzaO+2deIgr
-         szCA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="YXOrG8gy"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43d77f60944so616467f8f.3
+        for <linux-block@vger.kernel.org>; Mon, 13 Apr 2026 04:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1776073785; x=1776678585; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d+Q9kf8IwjWobAqJl4eE+w2AI+pglZ8Z1eE/4LlJ2dU=;
-        b=dDruFq1nLytBzdlW1q5AR7Bt2bGpEdAD7NfKrP5fPgP31MrJL08uHm8BVTXJqpz0S2
-         8IBmeWAndy35r/u0HlIijQ7HlrCvJ0sNsFitU5OG8/jMlXH/ZNJAPeIdnx9ReSJlOmQY
-         TlhFo3b9p4xCHQxPmGnUvosmqA6GytUV9U8HuWJnD1mOVuwk/oPATFcFnuQO9iJi7k5O
-         njuSDTh1PRMRMPN5s2I1xmVK6+0u0cKTrTiw0WXmLKWnZZwo3Xso8ExSnkatHT2wRrjC
-         ZTZTb7IVJ2Sq93Suif78jfVjok6xHbPr7b4YcbZOrY5WU8uBbRJb44moTKPzymcqEHI8
-         GQOw==
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1776080913; x=1776685713; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A0t/PovMpIgnGwUGYbYpIowv0ZhNrCZg5yAKqxRoCRU=;
+        b=YXOrG8gykD6D1myRLXlvr/innTSDrT5iB04mJhEiZKeLc78WOF7rFI25qP5/7D93zF
+         Hb3VNI+5DlCNdc3miWx3yEalu/GUsk7hFU8mr2hUdk5u8qSpjG242cDyeNJQ8ICHSaDY
+         Tubitb+zxu7vuk5VlEf0LVwAqJi4R8ukFZQvVsa8XupsCqtcYUAbEoPg41T/o1W4IveN
+         cpwEKRS3IkzljDLu0B6yF5sqsXS522GlydU9Z98NRG5XJW57ZZkv6srBQAji59+X/3BO
+         fnoaootMVjU7CY0kq6ytNCjuoqHqEKM2lc00lofJsQTjWSeqrrRB3AAhXTLsxIJtJ2lg
+         Xwbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776073785; x=1776678585;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=d+Q9kf8IwjWobAqJl4eE+w2AI+pglZ8Z1eE/4LlJ2dU=;
-        b=Q3Yz8Q2dXDbENYO0v2xvOSZHfSaY+z953tv2M8IWXAD40El5DmIVYuvxVlq3fe/OqU
-         Q14l0fqvLCS3wXrK6XIoqYWSrzaDR0m/NcX/R47IxR6ObHwTKltdtAXD635smtMcTj0A
-         q81rJOwnoTPifJ8u0ZdWg39G2GPbtdGRd91Riy93L93+zYnWTfog+t5gvJwhpI7YZQQ8
-         OS6vMX8qK652evJFJXb6BNNCZF2G8z6cdnYdzAZKFiKbhREwdU7aw9RTM2sbeU9fgpzv
-         yaJbCIx08iNI+QgKoMFrZUJt171Wl38Mzcd/dTXJgKkpUVMTQExSmweKTbUvF81QsNoA
-         Vpzw==
-X-Gm-Message-State: AOJu0YyM5/9zvR1RxpbLtGW40s0Z4sHCUHumvwl/20UhRQ/hz8qQzw5X
-	dTHRNtezhZLfp5LhoV/WblucAyV9wRMfIvWjTMS6qoGfJvwT/IPle7yLQlGmp6acOzRpAfgHKzt
-	OPm2s43QoBWZrKfcF4aromdKGHqIs0kc8QeSg85v2Mg==
-X-Gm-Gg: AeBDies6bL7Ge4BA1KUzeLGuLuGQvyC7JmPI83qBRNKFOBVKPfEf4XSN8Qo8nITz74E
-	j2gCs9l9xUv17IU3J9ixqZzHYn0oDsm4482mzExmMmo5DAuPjMguQubqXZTa2V/WRVyarHaWY7t
-	d3k3h0QG9mmYRot1YnzqYo+9DCrVxaWCIO882W6Db1CxI7pw3L2dCqzEztYkFK8ia6kqA3IfL4S
-	ZpI0Ukz0oV4iUeNQR0AjqSzWSzl+DIOOkNjoN7EZ3c9j2PJ5zQH/KhYPIEMauFL/N4pzgfO1oDc
-	B1Deq8WNFl9n2pI1DqefWusGPqoeiCNCU4cBL7NZai7ZrMGUq/5OAWQ2pbba8IGFm77x
-X-Received: by 2002:a05:651c:4412:20b0:38e:7b89:7eec with SMTP id
- 38308e7fff4ca-38e7b89805emr6977211fa.4.1776073784953; Mon, 13 Apr 2026
- 02:49:44 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776080913; x=1776685713;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A0t/PovMpIgnGwUGYbYpIowv0ZhNrCZg5yAKqxRoCRU=;
+        b=j/TFb7uluQ0iHCq1wrU90kd/TNE2/WNiPYme0uEcp71UHeBlPiKWKDHjUqcJgrB2Cp
+         ywd1obWOfkOSQNNAd7znoRAjx+4yyJmcZcioO1Iez1Mg09zPHS1HqyTeoTwd9/7Rg8rB
+         6E518BIwDwtrgzXmT37qLHyewO2/W2sgg97a2TIsFp286qKqqsGYtGGOfp+UEOqJ3GSd
+         eAr57mS/amt80bn/kogQZJyR8jef/gXZSJ0eN2L6atDfqcU6c/e6rzf6iWARyh91m7po
+         yh61TWWA0Ox9R7b7YozJTxJ+MwZbBzx+lGVUZ50oipeUjF2qKGWyIe9HsPOw+ZIMZLHn
+         6iPg==
+X-Forwarded-Encrypted: i=1; AFNElJ9R+0aEsAKmUi6y6bMTPB2TZXDuS8DEplgbI3eLRkd3fwUi5U4b4g/BRgVtQu746c9bAgqSLEUNwb9fgA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK0AM9PjN3C672MNctAEMUTBhuIaxYFRhviddkwolWdNMzQUvK
+	5GIs4SOYo8vNWgo338nyv2p3xOhlOogSRzaUBDxIuoa/l3GZ82m5aQuBmFPgkg7t0dg=
+X-Gm-Gg: AeBDies1Qm4e04LdwrUJMQ8ealP7bpbKIbXft7xpCg0Ovj1KaLfiDrExpXoCZc7sstu
+	3hZyPPvBCAhlfxiRaOOPC+rkQCIGg9mAgonFdvrDkSAEbpU8PGylrUH3/92HKk1HOq5eB5K5R9s
+	goYmIevVtKpg4IE5F8+QV5/lX+3SMmDXKnvQbbAZ67J/ERuPAhny957xCor4UT1CvwCnT1aSLae
+	fTqLxou2PjuNm+KIS7KeMZvHwhB3IAuSf+NItaqLxdzQqROjawgG2mb7x5cB+TnRQ7MwGyz0sLp
+	yeQrF1TDxHKH+Td5YNWLdAQcsOv1g7LmWJyTo825mavGwSW2OhMexyTKlab/vrva6uPilFeF+cs
+	aG84n2vteQoao2jW99alwaq1ugpdn7L1jK9UDwqdXJkr9PQ44MineExKeoW83J7NiNQhWKBFJAq
+	5EDgF9sg9GaOg4IXfyAEr9L1IEpTOCcCtnfBLps/CRe1xmBt00KIKGr8Xm9JVyRTUaqhVx3Fx+C
+	YBuBw==
+X-Received: by 2002:a05:6000:1788:b0:439:ccd7:cdb6 with SMTP id ffacd0b85a97d-43d642a4dd9mr20596625f8f.14.1776080913515;
+        Mon, 13 Apr 2026 04:48:33 -0700 (PDT)
+Received: from localhost (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d63e50015sm34224996f8f.27.2026.04.13.04.48.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2026 04:48:32 -0700 (PDT)
+Date: Mon, 13 Apr 2026 13:48:32 +0200
+From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, 
+	linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>, 
+	Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/4] tools: ynl-gen-c: optionally emit structs and helpers
+Message-ID: <adzVUdf74CVk2DwJ@localhost.localdomain>
+Mail-Followup-To: Jakub Kicinski <kuba@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org, 
+	Lars Ellenberg <lars.ellenberg@linbit.com>, Philipp Reisner <philipp.reisner@linbit.com>, 
+	linux-block@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+References: <20260407173356.873887-1-christoph.boehmwalder@linbit.com>
+ <20260407173356.873887-3-christoph.boehmwalder@linbit.com>
+ <20260412125502.3f8ff576@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHj4cs_mRpS=uqW=2NF8RdzW2jjgu+3LhmCFiSK2kahRmTS-tw@mail.gmail.com>
- <CAJpMwyjAQhL9H_5Odz3zg12D-ja3VdsbZbwE2TxuLEsaP5KQbg@mail.gmail.com>
-In-Reply-To: <CAJpMwyjAQhL9H_5Odz3zg12D-ja3VdsbZbwE2TxuLEsaP5KQbg@mail.gmail.com>
-From: Haris Iqbal <haris.iqbal@ionos.com>
-Date: Mon, 13 Apr 2026 11:49:33 +0200
-X-Gm-Features: AQROBzDsbhOGqA6zry02Q5UGCgGlutU-MHJE-WdzM7DbMKl9A7IV_mXj-lct3q0
-Message-ID: <CAJpMwyh8CDzN2nOWX7LtP=9QDH2k2d=RydMe_5CP0D5NYTSy1Q@mail.gmail.com>
-Subject: Re: [bug report] blktests rnbd/001 hang on s390x server
-To: Yi Zhang <yi.zhang@redhat.com>
-Cc: linux-block <linux-block@vger.kernel.org>, jinpu.wang@ionos.com, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
-	"Zhijian Li (Fujitsu)" <lizhijian@fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260412125502.3f8ff576@kernel.org>
 
-On Tue, Mar 24, 2026 at 11:10=E2=80=AFAM Haris Iqbal <haris.iqbal@ionos.com=
-> wrote:
+On Sun, Apr 12, 2026 at 12:55:02PM -0700, Jakub Kicinski wrote:
+>On Tue,  7 Apr 2026 19:33:54 +0200 Christoph Böhmwalder wrote:
+>> The new flags in the genetlink-legacy spec that are required for
+>> existing consumers to keep working are:
+>>
+>>   "default": a literal value or C define that sets the default value
+>>   for an attribute, consumed by set_defaults().
+>>
+>>   "required": if true, from_attrs() returns an error when this
+>>   attribute is missing from the request message.
+>>
+>>   "nla-policy-type": can be used to override the NLA type used in
+>>   policy arrays. This is needed when the semantic type differs from
+>>   the wire type for backward compatibility: genl_magic maps s32 fields
+>>   to NLA_U32/nla_get_u32, and existing userspace might depend on this
+>>   encoding. The immediate motivation is DRBD, whose genl spec
+>>   definition predates the addition of signed types in genl. However,
+>>   this is a generic issue that potentially affects multiple families:
+>>   for example, nftables has NFTA_HOOK_PRIORITY as s32 in the spec but
+>>   NLA_U32 in the actual kernel policy.
 >
-> On Sat, Mar 21, 2026 at 2:00=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wr=
-ote:
-> >
-> > Hi
-> >
-> > I found this issue when I running blktests rnbd/ on s390x server,
-> > please help check it and let me know if you need any info, thanks.
->
-> Thanks for reporting.
-> We'll take a look and come back.
->
-> >
-> > dmesg:
-> > [   72.319120] rdma_rxe: loaded
-> > [   72.358181] rtrs_server L2371: Loading module rtrs_server, proto
-> > 2.0: (max_chunk_size: 131072 (pure IO 126976, headers 4096) ,
-> > sess_queue_depth: 512, always_invalidate: 1)
-> > [   72.380277] loop: module loaded
-> > [   72.399060] run blktests rnbd/001 at 2026-03-21 08:42:02
-> > [   72.408570] infiniband enc600_rxe: set active
-> > [   72.408573] infiniband enc600_rxe: added enc600
-> > [   72.422914] rnbd_client L607: Mapping device /dev/loop0 on session
-> > blktest, (access_mode: rw, nr_poll_queues: 0)
-> > [   72.488056] rnbd_client L1192: [session=3Dblktest] mapped 2/2
-> > default/read queues.
-> > [   72.488199] rtrs_server L1058: <blktest>: Processing read request
-> > failed, invalid message
-> >
-> > # uname -r
-> > 7.0.0-0.rc4.260317g2d1373e4246d.37.fc45.s390x
-> >
-> > # ps aux | grep rnbd
-> > root        1492  0.0  0.0   8276  4436 pts/0    S+   08:42   0:00
-> > /bin/bash ./check rnbd/001
-> > root        1521  0.0  0.0   8288  3292 pts/0    S+   08:42   0:00
-> > /bin/bash ./check rnbd/001
-> > root        1523  0.0  0.0   8424  3664 pts/0    D+   08:42   0:00
-> > /bin/bash ./check rnbd/001
-> >
-> > # cat /proc/1523/stack
-> > [<0>] send_usr_msg+0x120/0x170 [rnbd_client]
-> > [<0>] send_msg_sess_info+0x1d2/0x210 [rnbd_client]
-> > [<0>] find_and_get_or_create_sess+0x274/0x2f0 [rnbd_client]
-> > [<0>] rnbd_clt_map_device+0xf6/0x7b0 [rnbd_client]
-> > [<0>] rnbd_clt_map_device_store+0x228/0x320 [rnbd_client]
-> > [<0>] kernfs_fop_write_iter+0x168/0x220
-> > [<0>] vfs_write+0x282/0x450
-> > [<0>] ksys_write+0x84/0x110
-> > [<0>] __do_syscall+0x166/0x600
-> > [<0>] system_call+0x6e/0x90
-> >
-> > --
-> > Best Regards,
-> >   Yi Zhang
+>The series doesn't apply for me (neither to Linus's tree nor
+>to networking trees), so I didn't experiment with this code.
 
-Hi,
+It's based on for-7.1/block in Jens' tree because there are some
+prerequisite commits on there that haven't made it to master yet.
 
-We have the following patch which fixes the crash for us. However, we
-tested the changes in virtualized s390x VM, and observed a few hangs
-initially, which later went away. We are not sure if it was because
-the virtualization was slow or something else. Do you have s390x
-hardware to test and confirm that the below change fixes the issue
-cleanly without any other hangs/crashes?
+If required, I can also send the net-specific patches based on another
+tree, just thought it made sense to keep it all together to have the
+whole context in one place.
 
-From 85f8bb94b7357d50cd9daf5c5eb72a7c39cfdeba Mon Sep 17 00:00:00 2001
-From: Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
-Date: Thu, 9 Apr 2026 13:29:59 +0200
-Subject: [PATCH] RDMA/rtrs-srv: Fix processing messages for Big-Endian arch=
-s
+>Are the new code gen additions purely for the kernel?
 
-Convert msg->sg_cnt from le16 to cpu endianness before processing
-it. This fixes bug processing messages on Big-Endian architectures.
+Yes. The DRBD userspace utilities re-use the kernel headers and manually
+construct messages using libgenl, so we can just do the same for the
+legacy family.
 
-Signed-off-by: Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
-Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
----
- drivers/infiniband/ulp/rtrs/rtrs-srv.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+>Can we just commit the code they output and leave the YNL itself be?
+>Every single legacy family has some weird quirks the point of YNL
+>is to get rid of them, not support them all..
 
-diff --git a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-index 0140bfaed721..978daa69e096 100644
---- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-+++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
-@@ -1044,7 +1044,7 @@ static void process_read(struct rtrs_srv_con *con,
-        struct rtrs_srv_ctx *ctx =3D srv->ctx;
-        struct rtrs_srv_op *id;
+Fair enough, we could also do that. Though the question then becomes
+whether we want to keep the YAML spec for the "drbd" family (patch 3 of
+this series) in Documentation/.
 
--       size_t usr_len, data_len;
-+       size_t usr_len, data_len, sg_cnt;
-        void *data;
-        int ret;
+I would argue it makes sense to keep it around somewhere so that the old
+family is somehow documented, but obviously that yaml file won't work
+with the unmodified generator.
 
-@@ -1054,7 +1054,8 @@ static void process_read(struct rtrs_srv_con *con,
-                             rtrs_srv_state_str(srv_path->state));
-                return;
-        }
--       if (msg->sg_cnt !=3D 1 && msg->sg_cnt !=3D 0) {
-+       sg_cnt =3D le16_to_cpu(msg->sg_cnt);
-+       if (sg_cnt !=3D 1 && sg_cnt !=3D 0) {
-                rtrs_err_rl(s,
-                            "Processing read request failed, invalid
-message\n");
-                return;
---=20
-2.43.0
+Maybe keep it, but with a comment at the top that notes that
+- this family is deprecated and "frozen",
+- the spec is only for documentation purposes, and
+- the spec doesn't work with the upstream parser?
 
-> >
+Thoughts?
