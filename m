@@ -1,159 +1,134 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D7B320CCC
-	for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 20:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D17C33F5B8
+	for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 23:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776198583; cv=none; b=uKpInCZ2pC/QioMLUYqdCsj4kH+f+lCcHWYID1kj3kzxLe84AhQG2xrrX/l0cFS7x5W5WnQFZs5/TvFpvXM3J2+1AFRO876b3gBDq51Yz1QEQh4hDVN8Po4cFaVAjcYA90rP80DUcr8TCBT6AN3MeX3dB/Ktoq5qGWMggTj1Eow=
+	t=1776210552; cv=none; b=oJAea2WSDOXQ1bsah82cGpi6IEpLVThFmtbIHzsjHMiyHrwFwRTJtg9aDsc3jWkYo5X8WzPCgd8W27cet57Jg/wsqQ5UVLjPF/t6kLshK8WFEbfLFOQwu0T6lzk7BKXgRP2/5G1ijVQzaDTkvKX/Tb8FRG4v9gPOmS6V6VSG88M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776198583; c=relaxed/simple;
-	bh=yQFz8DM3su/UkwgPRuXCLRbPCiZ8ugq/3jme6jahFPM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=phBUD4fdcFenw0Riyd3jTN3RDm8OYGzJv//cPesP2IWQ2QhYLPahY2rABMkahaghvNltnf6ETvDUYROXiROcAB2RIKqJbM9XitJxeSSrmC+BACBiTvWEeYlo1Qa6ct6ai2LShbh2vADunorT66npE5umNpaXDNRO7z3llUU6hqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=k22q0YhV; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1776210552; c=relaxed/simple;
+	bh=t6ap3hp2vWlX1xqsGYc+C5ZeRJOlXaYEglZGq8Z5lxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KT3e4tvNblpoEvYAd3JUdnN+cVOYLktWeZ2K+mNrBEk17DBVcZlLoZIDU1UezagIemSVlIXCUDGbxOZ4zoxIO1c6gGgYXSKFlLN90zMLc/NKeGTS8tEa3rInvbr3x9UCUJmaEb/uXpyZR+fKv6es/cMtmO9FAD1jtAKo7THjcHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZSn3aIXG; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="k22q0YhV"
-Received: from pps.filterd (m0167069.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63EKR6hu2500945
-	for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 16:29:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=WXFq
-	nVJ4T9hxAVeyiDV1ooSXjwN82kyD0WFAZyEIayY=; b=k22q0YhVQZiPT7EsK4qY
-	kXKKf20d6Eyoq5zv/bCMosbe1p6ZTAAFqGYN1jql5TMO79N5C7HaZt6Z/cwriJjh
-	i908rxBG1P3Tp2CF3EvYaZY5/Hh5bH5gz+cbWycowOy/ULW12oZEyg7fnlzlbtCW
-	g1tmittXLgbbnNnyoVTcES5p2xk8gc68UqDO+MLS2VTyn0RAe4ulKHNSip2O7W0f
-	wus22rwT2+tQnLCpj7WtrZzSZq7OwUEon5xcKGVHybeez2whx+pca7FQyi3SR4Su
-	EhEEbwNysh4gXoSo/YVDtxTkm4zxUm6aRBUNyXOKjCaGjPahOa1IEuFxK2LP5O6s
-	qg==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4dh85cg1da-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 16:29:35 -0400 (EDT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8cb706313beso140277885a.3
-        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 13:29:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZSn3aIXG"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43d72875729so1990460f8f.3
+        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 16:49:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776210549; x=1776815349; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jJ8x8xR48CmS5hLf24KF5gUf297dGoG6cMflRnDvWCE=;
+        b=ZSn3aIXG5LeBlvbbm961IRWO3AxYsn3KIT7pg3Ci6cEsu1u6bGk1VpgH190q7tOVdU
+         H+mFqe6W1mNEZ6XJM1p+9hTt3rTuMy76WgjPc4evrLbSxYzpYLbzSQYd/LP5c/QzgaTT
+         uttaVp/D3TClANRX1m5/Mth4auV2c2uZ3alwUcTOVNplHTyROT+pPa8lEwIz1ob688Q/
+         L21ADJUBbUAAjcwMwhVnl/DrHOoL3OyWEp+b5XmS3Po0tG1uCWx/sS55SIswVFaqlaXk
+         sRhJggGRLsm5GJSe2p4ef0TPEvI/i0BMXVOlRx6VxLlJAT+cgjyNeyEITwO+8nZLgvBD
+         IvNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776198574; x=1776803374;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WXFqnVJ4T9hxAVeyiDV1ooSXjwN82kyD0WFAZyEIayY=;
-        b=hDTqTfpcJmwm0f0otEUC+QLP/nb9Xd3gLdjYRlUwxzpD29bjpZah2uuLqq0JKT173y
-         b9Rc/QZXG+HOZ1gzukgUck5zZ4pjU955kqFeLrDXpdYkWeBAtxxoPDbPCWfTIJgxHk2U
-         a9vkS87PJDsAt/t7sLwdUF5wzO9CQnpLvkLtGtYHYmXRXUFpvAG1rmGuioxPxfTkshHE
-         wYJO8K7AUmbXvLtvYZkIf61bHtmPOGpaUdOs8d/gipCkRdirZRtFNZHZ3nRiNSimul4Y
-         hn6fpVVm6RO18/Wq+0TBOvsoDnncf1hE7uvRXFg3OtFGsxYEGnSt5c5kvNrE/ESi00jC
-         B8Fg==
-X-Forwarded-Encrypted: i=1; AFNElJ/fptiVJpC/VO3PzmF3lQL3pnoZ3ecVFL3uJO5FWnFzjYb1jtKUTHRE8mD/FW3Jz6SXx2pK8Cu5SNjloQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQb0kooI6MVwQJ5Q5oj70cxRpdkwMCPiEJjQsaMavQ+Gy4oWo5
-	cTarY1Z+iq9yB9nyLJRwWewaJsWJH1KbvFU/ne5nVVWlFv9urycFWniGd4wPEuZAT2v05qSDkDc
-	yOLK+pxSWvtXEuClFkCkDRr0WxGbyFpd54ihR/y8tJnTOxd+0/eQsblyC3230
-X-Gm-Gg: AeBDieth80e0yEF89uDR8+MGV4QWF6OogPkSxUvzmoJaN9exWXAfmjjmzvSggK4BIF6
-	ffyHIVd5dhDZnLpJGUgTB9/fjQ6jT4NWWNsvWVkW9A2pWTJw6bDO4b6QxmAMJWLun2yyYE0gN4H
-	U8tzNo0ysOohaz9RxkoV7Qw4c/By23YnvD8P3YWwaXYm+KYFjdBvetSip9WE1W+0OrV0KxZ9T7f
-	dQu9tdK2lMt5H9tXZ66YIOfaVBWXVjeF5SQLxUbLrIXwahsSvYX38h3dFXedHq7l3TeLYXgiZ0O
-	P22d5l1mhS8Y/1piEE1Q7eKohrXucD/jtUGdWsyVAuzt9atkEenOqNUREwnHwqrFN4vYoLUcuek
-	d3pVqFSg9Pc77SUCY2cVWGGreWVks8UPPBM4BQ2YGFZ9F0Tdk8zsmMob05mQ7JyyKfIted0o=
-X-Received: by 2002:a05:620a:a281:10b0:8de:b9dd:8528 with SMTP id af79cd13be357-8deb9dd85ebmr1694559185a.24.1776198573929;
-        Tue, 14 Apr 2026 13:29:33 -0700 (PDT)
-X-Received: by 2002:a05:620a:a281:10b0:8de:b9dd:8528 with SMTP id af79cd13be357-8deb9dd85ebmr1694555685a.24.1776198573428;
-        Tue, 14 Apr 2026 13:29:33 -0700 (PDT)
-Received: from [192.168.1.62] (dyn-160-39-33-242.dyn.columbia.edu. [160.39.33.242])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8ac849db4e6sm131911086d6.4.2026.04.14.13.29.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Apr 2026 13:29:31 -0700 (PDT)
-Message-ID: <fd94b108-22c1-4eb6-8fb4-b009214976dc@columbia.edu>
-Date: Tue, 14 Apr 2026 16:29:29 -0400
+        d=1e100.net; s=20251104; t=1776210549; x=1776815349;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jJ8x8xR48CmS5hLf24KF5gUf297dGoG6cMflRnDvWCE=;
+        b=SaFGqZ47hG+T7Wh/zGt5WS2rHkrPkiPvu1LiMb6vVuYJkBDi4C/GOrOt/yPgVaEiNI
+         LRmYU8vDqCyCD+VvuchWDd6pGsX+wP0AkUBg/K2E7HhflQzL9x1RE+Q8UBuGLFWHlacL
+         q636teteR6kIU+o8UjWfjOpuFqngZvI6lapB+uENT6GOO/CMQsmno8zCTphvEhx2JYor
+         N7BUHwqoEYJlxs5hffIqkEHO/EaGku9OxjjQTgUw/Z3ZYfIgI2NYYkv1jnkC3pwf9dNG
+         ON4QDVkigwvaxf2o2dyFuK0hrPVpcp/Gwph5BFKeT8z795Azo3qTgNA/pWCsA70j0Cg6
+         o5kw==
+X-Forwarded-Encrypted: i=1; AFNElJ8aSfR8g5s60rKkALyOsLfNYDfqls2NrFqUZLOzEs4we5XhG1vrYE8Rqk12A/CgC2Ejd+CWV26GSQ5QTQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN6Z2Gy4COZgxbH6QaUWELivT9qbDr6nKy9oLotqMeIrRU69Wu
+	ifFWJC/FaBy2QE1HI+KXHf5z3phfgoc/0iJI2W/OCIizNoOchk0FlsRp
+X-Gm-Gg: AeBDietmYrLxmgR5Dh0aznxDhNfu6c+vXJoo/9S3BzMyZjUq0LbEKwx+i8yTiH7Qub3
+	hrte3fUQuB3bVNjgRrjDpC30S4oJrmOleJ6nKJuLCufJRbJXvydLtCYXO5C71XWCbUNgvbrCR0Z
+	M5dmAQYnHNB9YVKY6kxFjCj7wF7OQQRGQR2w7oB2xW+eJWFuoHLKE0sEeVRq5S5mTzYePlZAtBt
+	hFJHwIioF2Sh9wBffh41lrHDuf/Fr6AqR54cvnohIOKMakFo/zAswTNJEQOKDmCVGGw862qjZi8
+	yFgON66Pa2LtKWfAk0IACp1qYWOc0trnfYPRMC6TlmSDnSuGgFTszTSRXLO38LHERRXtU80r9od
+	fnS/pnmpdFZbGZy8IOlX2fKde4MwwC05s91zVVr/fj5b+QZ2mktd48e66EDPUtZgqSGOHi2sgKs
+	tSiWhoJS6YlNE43QIA1SEWUnKFewqWstB4z8cJu9ZM+wHenmJ8dFnxU55RqEfQ3bBLfPd5S/DHR
+	e0MHVcr
+X-Received: by 2002:a05:6000:2dc4:b0:43e:a69b:d804 with SMTP id ffacd0b85a97d-43ea69bda0bmr5821111f8f.29.1776210549308;
+        Tue, 14 Apr 2026 16:49:09 -0700 (PDT)
+Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3d5fd6sm58043f8f.24.2026.04.14.16.49.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Apr 2026 16:49:07 -0700 (PDT)
+Date: Wed, 15 Apr 2026 07:49:02 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/7] ublk: widen ublk_shmem_buf_reg.len to __u64 for 4GB
+ buffer support
+Message-ID: <ad7SbiqAtlKlI5xh@fedora>
+References: <20260409133020.3780098-1-tom.leiming@gmail.com>
+ <20260409133020.3780098-2-tom.leiming@gmail.com>
+ <CADUfDZr39RaLObyXg9sijCOpLF4K2+TZH3ygGiCVxO8aAqwTkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 1/3] block: add BIO_COMPLETE_IN_TASK for
- task-context completion
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Matthew Wilcox <willy@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong"
- <djwong@kernel.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-References: <97b81868-6410-4c79-a242-679a9f04f073@columbia.edu>
- <95F28FA1-5CEF-4E80-BBB7-A429B4437D12@kernel.dk>
- <7e468bd2-e52b-4165-95c6-3f04e1dca21e@columbia.edu>
- <fb64ba71-7284-4768-979b-84919f2aa5f0@kernel.dk>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <fb64ba71-7284-4768-979b-84919f2aa5f0@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: WVKdX6zxZ_Ot81B5UMRNl3ghhk-z9cuM
-X-Proofpoint-ORIG-GUID: WVKdX6zxZ_Ot81B5UMRNl3ghhk-z9cuM
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE0MDE5MCBTYWx0ZWRfX7c3Kga2+6icm
- GSCuCPlR+yIsKMsspe/O01JbQ+Pk4TE50mEgcVqsIm/rkRD+ZX5hqvCRRX/+EHsByqEBX4eafpp
- p8Dejn+iB7Y8DiC6iMqF/W2cAjueC0AbiNbtWp6kSSPaXveORXWL5h9oxbKIHNuPVfkheduwx1B
- t28M5WcHp+6HSynsfWV3h/DECQGqVod09Ms1Y5D0REZytdGLhsc5z8CBn9TDSG5ZfVbLq6/rIDT
- 2rZx1vwPyXm9668XifrdabrUUk2a55aOsVBP3uC32J5e7BQgWsLug730rL62xj/qq+7XxwJjjRF
- ZIzVtu0GJNcZV5uzGKgZPz7o+on2pQjp9sLKP6ilWBuR1k24fpZEOudREol1WtfiNphQMF2J0/s
- un5MqKxT3M2KrNEZ4WxFUi0tMDQHvInaYoaNCMIvHbWTA1kpjzzyeIfRIYEb2RiyhrN9Ikdsh+/
- G4i1OlVDsmr02x2JDAA==
-X-Authority-Analysis: v=2.4 cv=RIOD2Yi+ c=1 sm=1 tr=0 ts=69dea3af cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=JR4YdQiviy7OQf72WyZ1:22
- a=g0XPL2zXmNQOemVH8wcA:9 a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22
-X-Proofpoint-Virus-Version: vendor=nai engine=6800 definitions=11759
- signatures=596818
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 bulkscore=10 priorityscore=1501 suspectscore=0
- spamscore=0 phishscore=0 impostorscore=10 clxscore=1015 lowpriorityscore=10
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604140190
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZr39RaLObyXg9sijCOpLF4K2+TZH3ygGiCVxO8aAqwTkw@mail.gmail.com>
 
-
-
-On 4/9/26 8:46 PM, Jens Axboe wrote:
-> On 4/9/26 12:54 PM, Tal Zussman wrote:
->> On 4/8/26 7:36 PM, Jens Axboe wrote:
->>> On Apr 8, 2026, at 4:51PM, Tal Zussman <tz2294@columbia.edu> wrote:
->>>>
->>>> Going to send v5 shortly -- tested with and without the llist reversal and
->>>> it didn't seem to make much of a difference. This was on a single-disk VM
->>>> though, so any stress testing you could do would be very helpful.
->>>>
->>>
->>> With all due respect, a single test like that isn?t going to be that useful. I'd be wary of making that change willy nilly and just thinking it's fine, worked fine on the one case I tested?.
->> 
->> Understood -- unfortunately that's what I have access to at the moment. I
->> can requisition a machine with 2, maybe 3 disks, and test more thoroughly on
->> that before sending the next version, but that'll take a few days. You had
->> previously offered to test on your big box, so was hoping that was still on
->> the table :)
+On Tue, Apr 14, 2026 at 11:40:36AM -0700, Caleb Sander Mateos wrote:
+> On Thu, Apr 9, 2026 at 6:30 AM Ming Lei <tom.leiming@gmail.com> wrote:
+> >
+> > The __u32 len field cannot represent a 4GB buffer (0x100000000
+> > overflows to 0). Change it to __u64 so buffers up to 4GB can be
+> > registered. Add a reserved field for alignment and validate it
+> > is zero.
+> >
+> > The kernel enforces a default max of 4GB (UBLK_SHMEM_BUF_SIZE_MAX)
+> > which may be increased in future.
+> >
+> > Signed-off-by: Ming Lei <tom.leiming@gmail.com>
+> > ---
+> >  drivers/block/ublk_drv.c      | 9 ++++++++-
+> >  include/uapi/linux/ublk_cmd.h | 3 ++-
+> >  2 files changed, 10 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 2e475bdc54dd..ada9a2e32ea9 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -63,6 +63,9 @@
+> >  #define UBLK_CMD_REG_BUF       _IOC_NR(UBLK_U_CMD_REG_BUF)
+> >  #define UBLK_CMD_UNREG_BUF     _IOC_NR(UBLK_U_CMD_UNREG_BUF)
+> >
+> > +/* Default max shmem buffer size: 4GB (may be increased in future) */
+> > +#define UBLK_SHMEM_BUF_SIZE_MAX        (1ULL << 32)
+> > +
+> >  #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
+> >  #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
+> >
+> > @@ -5351,11 +5354,15 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
+> >         if (buf_reg.flags & ~UBLK_SHMEM_BUF_READ_ONLY)
+> >                 return -EINVAL;
+> >
+> > +       if (buf_reg.reserved)
+> > +               return -EINVAL;
+> > +
+> >         addr = buf_reg.addr;
+> >         size = buf_reg.len;
+> >         nr_pages = size >> PAGE_SHIFT;
+> >
+> > -       if (!size || !PAGE_ALIGNED(size) || !PAGE_ALIGNED(addr))
+> > +       if (!size || size > UBLK_SHMEM_BUF_SIZE_MAX ||
 > 
-> I can do that, but I'm OOO for the next week, so won't be until I'm
-> back.
-> 
+> Should be >=? Otherwise, LGTM.
 
-No problem, thanks!
+It should be ">" because we do want to support 4GB size buffer.
 
->> (Although Christoph seems to have proposed moving away from llist again)
-> 
-> I think that's a good idea, not a fan of using llist for this, in case
-> that wasn't clear. These are per-cpu lists anyway, and having a constant
-> overhead is better than needing to reverse an llist. IMHO.
 
-Will change it back for the next version.
-
-> -- 
-> Jens Axboe
-> 
-
+Thanks,
+Ming
