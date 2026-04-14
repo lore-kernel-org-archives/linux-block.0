@@ -1,51 +1,64 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8178A3A1A38;
-	Tue, 14 Apr 2026 08:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EEF3469F6
+	for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 09:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776155053; cv=none; b=cu4529SjWx7eTH4CEnC4M93AYjabUVw/HwEe03Ky6kXbnlMVBRPgADkLJd0K+0VSOJ9f9vE/KU2NPyaXiqoLD2P+rMLgOWIdycEqXji6MQHIRaLxc1pkh4XbEv0ZTLUFYguh6kbzN9ZGicoiLGxhUWRFgIGQPmwUAw1aseXxO2w=
+	t=1776158768; cv=none; b=TB5Cgs/hludatlJlu4QuxrYE5PtHc+/w0a0wEYFXcMAU13FavQSmjDFoK74mqC8FAgYj0/cuNH330d+AiWD+96tXmNcH0m7xKvx/lTQ2ZMM3D/NBE+pQAaB3b/21NLC6+yrRluZr4EtgYIrCEoIYIRWODE10p1uJX4BJLe9topY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776155053; c=relaxed/simple;
-	bh=dTMATmkItMXEV1SQYZZ4P7+Bbt8t3XatvgBmcTSPYJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jS42rLl+nKmdNuo40UBDb06EsTrqKaFiGfGXto4/RYYvNl3DTGYWujUEURMrJ0s2M913Wjy4L3jlZFqxcrzPhgcQi7x42XiOD0myGAt/n35bHiCUbCPhl7tcNz0ml2f+yfuyOIUvdvEn8sB3kfFx3BRQQtPkCIl5cAI/Dy3JJTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 312C768CFE; Tue, 14 Apr 2026 10:24:09 +0200 (CEST)
-Date: Tue, 14 Apr 2026 10:24:08 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 4/5] block: add a bio_submit_or_kill helper
-Message-ID: <20260414082408.GA11656@lst.de>
-References: <20260407140538.633364-1-hch@lst.de> <20260407140538.633364-5-hch@lst.de> <b2e8e413-39bf-4255-8aad-a30d7fd676ea@acm.org>
+	s=arc-20240116; t=1776158768; c=relaxed/simple;
+	bh=m8knM7/obNO7fgMbTos92vtsng+W0RU1LJnSkeeq8rU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zy1C23gqjUTs5GGL0LC+H1JxQZ/MON3+71y6I6+nYQREqAh2v5tVb0pY4c0n7KyBjfARPVl1h6K1/Tk9pxbj6u94EhRoeSBCIo5kNlg2TvqknCwOfP4OHXChRI0Gfnow124I3LNjxldrX5PrmO9IlwkLHkZNYoBlldSGqYJsNoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTixJYNR; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTixJYNR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B69CCC19425;
+	Tue, 14 Apr 2026 09:26:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776158768;
+	bh=m8knM7/obNO7fgMbTos92vtsng+W0RU1LJnSkeeq8rU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iTixJYNRn9czvCSbccbixXAgxIbG07IrzjmoMtg7p1p+rP5QhDpoUAT5yzEjVijLD
+	 +8P8qcMbiQkyLAyQ4WizDz/+IYjyXN7MXU6yRsx+BZKFK/o53OXFPWrn/u6xFU4lIm
+	 phJmIVKOvzcvhiuO7Y+hEYgpuPNC7LKb/zIwTjwpSm1uZqAoxZ+SIb72g9SDv5j/uK
+	 p+317flau5vYJKp7T05+NoSgmKSvAIscMema/5pZUMmIw7+QEalTNPlocomTDlR4h/
+	 4b3tmrPU3OD7RfEYgS9WDQwEPib/Tw4HoW/rzYy11QLwQixRv/lYF1RXi6gch5cMAS
+	 DFGGROhd1i1pQ==
+Message-ID: <5f49393f-a61b-41c4-94bb-aa05390f0307@kernel.org>
+Date: Tue, 14 Apr 2026 11:26:06 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2e8e413-39bf-4255-8aad-a30d7fd676ea@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/6] zloop: fix write pointer calculation in
+ zloop_forget_cache
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+References: <20260414081811.549755-1-hch@lst.de>
+ <20260414081811.549755-2-hch@lst.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260414081811.549755-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 07, 2026 at 11:37:50AM -0700, Bart Van Assche wrote:
-> Without this change, if a fatal signal is pending before the loop starts, 
-> -EINTR is returned. With this patch applied, 0 is returned,
-> isn't it?
+On 4/14/26 10:17, Christoph Hellwig wrote:
+> The write pointer is absolute and in sector units, so we need to
+> convert it to a relative byte address first.
+> 
+> Fixes: c505448748f7 ("zloop: forget write cache on force removal")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I looked at this a bit, and it turns that while this indeed changes the
-behavior for discard, the other ioctls had the return 0 when nothing
-was submitted before the thread got killed behavior, and this makes
-discard match them.
-Given that we won't return from the system call for a fatal kill it
-should not matter.  Adding Keith who wrote all this to confirm.
+Looks good.
 
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+-- 
+Damien Le Moal
+Western Digital Research
