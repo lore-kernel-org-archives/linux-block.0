@@ -1,142 +1,81 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104973CC9EE
-	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 14:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE17B22097;
+	Wed, 15 Apr 2026 14:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776262563; cv=none; b=UcaBrvzMp7T9Q+nt0nElK/+OCfQtkXglzenZRg0CJzjZcRgHa67Kw/rCxe72adkBHvjvf0TY54zjSYPC8O7cU3v6uZJ7f2O/F8ounvughUjfwjxUHHJA7HRt2NoMtFom+H3kbGdnc75f0l1sKRV49Pf0MLlgx/WWyutjNT6omzU=
+	t=1776263453; cv=none; b=u35PENjowrm8RTuEIgisXZJ2dWTsU+C30cD6R9B3Ra8uZlht09Bj0GsoHBJ5iZ5FmTlBVEGcrZr4AlNGYLd7x7KH91VmE3T649/C9mL1VMHE6yBWET6gFGdiCKQncafqzSvoiqddUFqzDFC6Fai41eGPm4NOpdf/vrI9/bJMKjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776262563; c=relaxed/simple;
-	bh=Pdy7Mh+hnfOvCQDqW76dEUcz37KcOEmwFbjUwviC6ew=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nu1zCIKgxhJHBHET+6C6N7m9QM9TWxWbL2+CNgDz7rGnv6qe8IFQ3E7lSnJj+ab79WK9OCXO3Vwzd0F9Q5O7GrpqYLtThR8BmuH3pOMmrAn7sm6XwPCFjz+iAY49ZDaUNGGuxsijKPgCQb6DRIkkUltaV/Xq2BXj6Te+PHRemf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5a3d1561e38so4963196e87.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 07:16:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776262560; x=1776867360;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A9GVK3912ykSKoEN3+mlTPV6LfdyMXA4vXMmtRCWPRU=;
-        b=WrGfnb0Fs6M/qUBEzKsRSPlKpVUzgpphzI4I+hTP5dH+gxTrtiMSdssH6kT4WtnxyJ
-         hBqIHyP/mYuFVOkE42x5nNvfLNxK6UQ0/DleiEltcSp9LNE8nYjWGEUO0BwTDvhC4oYv
-         r45VUGu07BIdpSDOQ1+ADPFy+9bTvrAphFd9dqzGnUsLNiOp14uyatUU/pUNIBNq4oRL
-         bWKrk6r/wtMZDmDRyIIBGYerDuykbT6cHXcCtFRg/VO8Ev6KL9x1h+O7WyZx0LpEgIOa
-         /tlZl3zTpZZBHTwgNNoNhcivSRR0/OUVx3UFB4JyTYX7bjKbknpdgTD0RrE3NS9avwUB
-         3n2Q==
-X-Forwarded-Encrypted: i=1; AFNElJ9gZSEZMZ45acfw5ucFqXgJv4di/pTLf3qc47g4TaGxutVooP8M7KkyvzJ5D8cCTc7YAllpWre+HGJ/ug==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoHZ2GjMBge2ZV0SkMzq1JZbcnh9885zAhCJeku47X9gJnZDDe
-	LmN6M2FU5Vv8Dbj6yCsnTuWIMTdgOmdBbXslOnfR/VJouxCT1YkBq9Ab
-X-Gm-Gg: AeBDies50HKH3louPGYgTToGyHWnfsgfAv1yK90Qn94/lYtFII+UTHFEv1GzkirUC2l
-	yI9Y3pl6KsBjAf7nstGfZh+nN76Ss9HxsznwrXt8tSt2I/pUcB+4GcXpBLfS/XlMO2jrk7q5r7c
-	XiRCrLjr/7O+vyUYreOYWPYmR/pTubn63ouqUQlxyZA0d4rGuIl/PGiPMsJ8P+bDokJzLW7IL3W
-	BalmVAIpu78oeKy7oxB9ciR/vfDIO0kEGxUOh6WjnGYMzXCxph2uMBcqOJhGrb9ILCDspPuJ/yb
-	zHjL+Xyeni+rR+7tYC+sanNd3W8PzW0XxC8onC24/GaWLcXa2kcxWcn9LvzPP7pb5U6QVqD2Hk8
-	z3Ehk+T/0M3SIbuqP7VyianICBmxD8SGvRJXQ9lZnFZXfMhEanr+aMyDUXFx6/VKZ6OJIXckd/1
-	9UgtdOQYwAoiAajVTzdKfbiVal2hawf9Gv+/np0GgH5I4tbiEwOZ9QHodieQxX0rulsioUuxxro
-	xP6jNU=
-X-Received: by 2002:a05:6512:6cb:b0:5a4:50:ac71 with SMTP id 2adb3069b0e04-5a40050adafmr3650399e87.13.1776262559949;
-        Wed, 15 Apr 2026 07:15:59 -0700 (PDT)
-Received: from [10.68.32.41] (bba-86-97-226-202.alshamil.net.ae. [86.97.226.202])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a40a2e71absm503650e87.46.2026.04.15.07.15.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2026 07:15:59 -0700 (PDT)
-Message-ID: <376f0e18-fae3-45d7-b3bf-885e963e6b51@linux.com>
-Date: Wed, 15 Apr 2026 18:15:56 +0400
+	s=arc-20240116; t=1776263453; c=relaxed/simple;
+	bh=J0XDojRw/Mna3BVb3sFZO2YT5UKBAtP4uXxt8eW+m60=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n2RiboNNFfgYYPpIQOmI5gHs2soOpDHikUdYFiGpLhmURGHJ3O/fEvf1DRAUtsseO64fYFP2XrdwL8RuToKaqWw8QEhPka4RIoElT1OU7QJSKIPkHlZMqgSQqOo+GaZKNAavyzNknKdrwL8fUhd56FJpaLowlC98gN9MJ0tdzIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EArKl0On; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EArKl0On"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Uk0JsMQf+CVFWDP/CsyX5sUtLObhpV7jtN+MOYTyvWk=; b=EArKl0OnAG9XoW3gQ9ptsyMcdE
+	b6gh6tQcpyIV8JguJZcbvXRbQ/wsJaYDXB0GU1SP7B1bOsZ8urKsRrJemFZjwxdWctEbvvyjCDbSR
+	wFnLNA7zNVO3RbjZQz7mIIO1dFwBX6AiXbK6oncdHs1kJrzufhytyiSparn7qGacnOTLFmsS066EX
+	wRDcF6P/59+TOksrTxfTvdBX4CgK94PB+IEe5dFi7H8mDyzKiFyd+LtwpF56AggnGniRVd1E/ZRCn
+	Tyn8MTq6BYcEE880k7ujkyDhl7loQbrS/8ZpnNAQx5QtXWHjwdUfXEkYawLopo9a7+JN7gOKd4Oud
+	uCcI9fOw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wD1GI-0000000004t-1aLk;
+	Wed, 15 Apr 2026 14:30:38 +0000
+Date: Wed, 15 Apr 2026 15:30:38 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>, Dave Chinner <dgc@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [PATCH 4/8] FOLD: block: change the defer in task context
+ interface to be procedural
+Message-ID: <ad-hDv8QoeTmlPW9@casper.infradead.org>
+References: <20260409160243.1008358-1-hch@lst.de>
+ <20260409160243.1008358-5-hch@lst.de>
+ <adgJqiA0vivaW7NA@casper.infradead.org>
+ <20260410061725.GA24667@lst.de>
+ <adj6iibxNot-yc9X@casper.infradead.org>
+ <20260415054407.GA26893@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH] floppy: fix reference leak on platform_device_register()
- failure
-To: Guangshuo Li <lgs201920130244@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@suse.de>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20260413153114.3040093-1-lgs201920130244@gmail.com>
- <8afc6b6b-399e-4f77-82e8-3c0e717f765e@linux.com>
- <CANUHTR9MQ8GGpgtGDgRCmjQL_D0jW4E-2OER4Q784xbGd+nJSw@mail.gmail.com>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <CANUHTR9MQ8GGpgtGDgRCmjQL_D0jW4E-2OER4Q784xbGd+nJSw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415054407.GA26893@lst.de>
 
+On Wed, Apr 15, 2026 at 07:44:07AM +0200, Christoph Hellwig wrote:
+> On Fri, Apr 10, 2026 at 02:26:34PM +0100, Matthew Wilcox wrote:
+> > > Yes.  On the other hand we can actually use it when we don't know if
+> > > we need to offload beforehand, which enabls the two later conversions
+> > > and probably more.
+> > 
+> > I don't understand why we need to remove _this_ way to defer completions
+> > to take context in order to _add_ the ability to defer completions
+> > inside the bi_end_io handler.
+> 
+> I don't need to, but we'd better have very strong reasons for two ways
+> to do the same thing, and I don't really see it here.  But I can give it
+> a try if the consensus is that we want to way to do it, and we're not
+> worried about people getting the bio-flag one wrong as we could set it
+> from ->bi_end_io, but it would not do anything.
 
-
-On 15/04/2026 17:54, Guangshuo Li wrote:
-> Hi Denis,
-> 
-> Thank you for the review.
-> 
-> On Wed, 15 Apr 2026 at 21:00, Denis Efremov (Oracle) <efremov@linux.com> wrote:
->>
->> 1. Let's use platform_device_put()
->>
->>>                       goto out_remove_drives;
->>> +             }
->>>
->>>               registered[drive] = true;
->>>
-> 
-> My understanding is:
-> 
-> For the platform_device_register() failure case, we should use
-> platform_device_put() instead of put_device(), so the failure path
-> would look like:
-> 
-> err = platform_device_register(&floppy_device[drive]);
-> if (err) {
->         platform_device_put(&floppy_device[drive]);
->         goto out_remove_drives;
-> }
-> registered[drive] = true;
-
-Yes, correct.
-
-> 
->>                 err = device_add_disk(&floppy_device[drive].dev,
->>                                       disks[drive][0], NULL);
->>                 if (err)
->>                         goto out_remove_drives;
->>
->> 2. We also need to fix this case.
->>
->> platform_device_unregister()
->> registered[drive] = false;
->> goto ...
->>
->> Thanks,
->> Denis
-> We also need to handle the device_add_disk() failure case for the
-> current drive, since out_remove_drives only cleans up previously
-> registered drives. So this path should explicitly unregister the
-> current platform device before jumping to the common cleanup path, for
-> example:
-> 
-> err = device_add_disk(&floppy_device[drive].dev, disks[drive][0], NULL);
-> if (err) {
->         platform_device_unregister(&floppy_device[drive]);
->         registered[drive] = false;
->         goto out_remove_drives;
-> }
-> 
-> 
-> Is my understanding correct? If so, I will prepare and send a v2
-> following this pattern.
-
-Yes, correct. Please, send v2.
-
-> 
-> Thanks,
-> Guangshuo
-
+I want to make all writebacks complete in task context so we can change
+the i_pages.xa_lock from being irq-disabling to a plain spinlock.
