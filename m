@@ -1,111 +1,171 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-qk1-f225.google.com (mail-qk1-f225.google.com [209.85.222.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC3A38553A
-	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 20:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B34373C04
+	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 21:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776283394; cv=none; b=k5INysK/gnspFYZZafbLKxtb8ubenP3yzEbKvJ9iO44fMtiTUxrLrd4bc8OEiwjuADk4N2gsUkd59S7a24g/gITBh9yEQV2eCTj/TTscyBRcjC0QueP3PwpQ04HVwL74AzEpau+A0ud5lISjI6bLnDmBVN0XwAKTQkWVUiCkVuc=
+	t=1776287347; cv=none; b=k1ujOrjyWBinsu/DGiT+/5dcIINq/ohaoOdMia8g1X+iKselXlXz27XnGOudKHtcLz8csRYdZIC7nKTqci6Ja97i2v3vFu0aY990DkUTikFLYNCLyVdjJUEzOGs2tcinsrA3F++nK3CH7jZxqaldBZxXaNp5+zqpw2muXd3wTTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776283394; c=relaxed/simple;
-	bh=QwnIoSx+NFa26l883A5GU6Qyv8g81u8hotNjjQdwuns=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Tt9cCivpBnkoQsXxUcVLHa5WKpmVdv4LRWax3Zj9rFUg06PAzKyf9ZQPrLO3MkflEIpnSP8ZcoQVDGqLpFDcP8lZZmAzcnKLZVxxkeYzySYyJQcNSMv6ejXTb2pVj5a47tq3OSK3tRFt1Dtk3KTZeNoEzvUCmhE83/6eGa7LxZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=ZQH2nBVJ; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1776287347; c=relaxed/simple;
+	bh=l7fTE9VlEFfSmy2pkBm+F7/Ddm+IndMlmmOpoX2i7Zs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ikHDwqWQ2bqFdYJnTYSleMyYDwDVlERBPmrlRAOqoaHZzLD12PJoi7YbmzOca8n7IbUyOowOlE6LmrYcsMEUAxQEQZybtiy6EG6FdwxZ7byR/zdPtV8gC/+kTxafzZFkRwL+SdV6zy53KQ8qGH1aSqq2QmHlQbsyswva3REgeIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZEfZBtoi; arc=none smtp.client-ip=209.85.222.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="ZQH2nBVJ"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-46f0fa0e398so4087881b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 13:03:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZEfZBtoi"
+Received: by mail-qk1-f225.google.com with SMTP id af79cd13be357-8cfbd15ce4aso100626085a.1
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 14:09:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1776283390; x=1776888190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=77ONDZQCCftX3XxcbFt9tIQsnnWoI+QubP/0FPx7tMU=;
-        b=ZQH2nBVJsNg1sgFNuVU7284Ym22ikzS/XCmalRyqXetPWQsK+8ZK4r1Zew5vPysuJ0
-         b48SavcerRwPPMJvYGd4uXpdi1fj+IaTe7F0ObeiAbzHBHpDpWVPpvI2dFSqsv5VJgXR
-         W2U0wOE8yJJr5LX2/Wrm13iCl0QRuDW8BR5NhNm+B43jQ6ykz/27exfMxA6648uC0CiM
-         libG3zQMy27EJV/nIhZoAD+AthDiQsxICDCPaxqYd0jMWPOe1fBFckp+8LX2n9eTCHZk
-         T4PEOXy9s9CxjOFq5vVVoYoF3JoIYcuoP+9UrjTjOZchiY9iYRq5EzSMO2RyX+vZT++M
-         pjgA==
+        d=purestorage.com; s=google2022; t=1776287345; x=1776892145; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=clfooq9Q24UaZz/+kvIBa0YK7z/4tl+VbHOgN6J1VGk=;
+        b=ZEfZBtoijdDo4e4egBrTPZihkg6LaDGXyoiPw8v2UCGMkaTLCXwYdFg4GgsCn+7A04
+         FfZ7xdOp3Cj5mrWyhBgxeKSU7tsikrCBilykb3xLVuSe1kO2xkURBFA6Slek3hogtlw/
+         /DRlWuaJ3CgTh5LfdHvFe6lSBM73wxkvSZCmS1zvG+Zjb5wtNB5hxScHAPlP9Vy4+oSN
+         xyMB+NeQUgGmhgmE7PO+JU5BN/HUr40Nnxadxfj74FRNICEmYuQp1ztobTao2fiOsyIA
+         Kpd9STeUbR2G/xB/gWnK0vzUI7LUu2vqIhzyvV4rAQjXyEkjE6uPtn1XSTxVMLv03MsK
+         vqHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776283390; x=1776888190;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=77ONDZQCCftX3XxcbFt9tIQsnnWoI+QubP/0FPx7tMU=;
-        b=GyutIdf0qd0j6B8nZcg92KYwXH1Pnw/MIlEpfZwOwsZD7cQg4v4JK/clqh2VH2Tj8I
-         Yu28fzYGlEbs9sX2b0AMiZuKuO3EhlFRPxxitTh59K3S116oX1Vi1dnVf4UmJIQogtlt
-         o2axsHjkXuoejPiTbvOJWbcgbUzC4k/ibrdroRxSFEQL2S/efK/fjknaMZ43nBCM+1gZ
-         +/BJXzdOMoGYkkr/aUlqeFFkDVFC1BL/o7L+TPit3g5XWSQzfvE+R/pjMjJ9+1BdSBaU
-         hHEjzX/YEsfr5Rdjmr4PhhmSzFWWsQGQH38J4KnYCby9RlsCV/4qocfTC5Y7KFlfeW/X
-         b64A==
-X-Gm-Message-State: AOJu0YxIUaTkQ2QSSouj6Ts+p4ospz7GjWBgTma3FxZBiTzikj4+DkUi
-	CJZoLDry/EXHr/RKm7aHOyGWB5BGUr9ioeyeVksYvCHqL0sksp10qGGyk1tgX9uNzURi+IqKPvp
-	8K1vG
-X-Gm-Gg: AeBDietXJzQAkJSKuSQ+d1N8AeAlDnn18wJ34vuU5lhcn7Y/eYfITPdA9/rj57a2k0e
-	Rl76IF/ZZHnTPorsHRdMhfYmj9becN4CkqNpTgSWQXGk6qvx4Fd9vdL+6QB3PUwRGB72D1xrNAN
-	gpuDBk/aDQGJSJ94PILtxaGgkbPy8oU38VXxfJQ7xCwFv8rtnh4qkkwc3Gq9/D+yYNrdpcEyb52
-	Nb2UoMx0v811a2LAFgkkYGVb+T6CP2RSeBzSdlm7lHGO6+IQiFHQq4xf1e+eqW2jp42jCb7C43K
-	IbN+J/ndgZ68sMSN0RI+M74qitO7nqvzgIYA5VjEbjWY6woR5T+F3hDgSzcL/0I03s87QcvtJx2
-	7ldnKq+WESgvZrXEc5wDyv2zIyhK0QR0soo1DwlKkD8Z9pk55d6Ye4DKRTCYaOkTow7hqK28SA2
-	l8FonynMRTV7MQGdDhZKmmgRXULU5mwj9+yuqrzprJipg2XsyVZzI759GnvbJntaJLA3m1QgNYB
-	f+6yaJQYAyjAElQPi3zQW7ORr+2nzNpOIUCtaG4
-X-Received: by 2002:a05:6808:181d:b0:44f:6a19:433e with SMTP id 5614622812f47-4789d14fff8mr12493909b6e.15.1776283389578;
-        Wed, 15 Apr 2026 13:03:09 -0700 (PDT)
-Received: from [127.0.0.1] ([72.170.223.83])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4797a07cfe0sm1396321b6e.0.2026.04.15.13.03.06
+        d=1e100.net; s=20251104; t=1776287345; x=1776892145;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=clfooq9Q24UaZz/+kvIBa0YK7z/4tl+VbHOgN6J1VGk=;
+        b=mRTZgZXGIXVXohWow3s1VUtXsS/yJaDXau6wz8i5hkGxzSWjEHfYXjzk2TXg+jpTIY
+         2w4HvKj70aj+t4t1UJybH0GGDryscYyAC+3dMTxN8pVBK3ReqD+D1NjuaaK4d5KyOdEM
+         t5lzHNPTU9gXcrdavDOAjqN1+jFoduDKQZ0uzCl766U0CCU7ZmVk4yKXTAmVNX+jdiz1
+         gtt4oz8T6hVY+aHRJoTgAxQmpC8NozkOoEq/AiCL2pJByhwU3ceImq4CI3Q4exdLdV7t
+         X4MfGhBnyzIeuFZ4bo3cJ619bpwm24nEWSsQ4vBWjxE+PL38AJr7vlMEHGFCANhwktPU
+         bcxQ==
+X-Gm-Message-State: AOJu0Yxoe8PrBv4vP+4+f20wzpDBXsZQO1uKzyVOpm5GHJqPNS137YTs
+	jSgeauY9kfLoJKJHYnGlO68lTHWvqfapDv5wlmP1RMUWL1XsXxGwUaWuVla3Pfd1M2aPdmXjo8T
+	+T97moUTTNNxiJxI/+1jUVGQ8rBj2KcaCPWWn
+X-Gm-Gg: AeBDietvOM/jPMRrq/ABg0wffM0JfxMu/zcbflHLuEhZztPAapNf3wxNpsGX4hdyvfL
+	Da9hz0wwg1RzQkHc3a4psUANQrBJus108HwI/FyDOl2ToSo4tCNm2W3+BcaNeC4IGNhCsg+MfMj
+	D8NJBgXd6b8AJHVyNXouizlAd3BrxH8pQ7nVeZYaaiV4bkVJ0u7qH2szkI3AX7AdqajDRteCgnp
+	mpZXJfsLG2HNXoHFVl66jD2b/E3BeTpug4oLg32fPEn9hZMsPDdbJNzykESEzlNm71DopQqSSEI
+	O6Uq/RvBjrFYjBw3V0f5EZyiNe3WZsR+f6jqdjoCv+Vvm8+BAg04q62H0otJ8SwzvcP9HfrX22i
+	4LGijsct34BnEvuXwry9+8EosCz2pRGERUw6QRxM0Q8tNCOtKmZYeOBq1R0EYl3h7
+X-Received: by 2002:ad4:5bc7:0:b0:89a:46fd:3001 with SMTP id 6a1803df08f44-8ae6a7661a6mr54472946d6.0.1776287344509;
+        Wed, 15 Apr 2026 14:09:04 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8ae6cbb3922sm2142356d6.23.2026.04.15.14.09.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 13:03:08 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20260414081811.549755-1-hch@lst.de>
-References: <20260414081811.549755-1-hch@lst.de>
-Subject: Re: zloop fixes
-Message-Id: <177628338575.677272.10107205640807328326.b4-ty@b4>
-Date: Wed, 15 Apr 2026 14:03:05 -0600
+        Wed, 15 Apr 2026 14:09:04 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id DD78F34078F;
+	Wed, 15 Apr 2026 15:09:03 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id D1C18E496F7; Wed, 15 Apr 2026 15:09:01 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Anuj Gupta <anuj20.g@samsung.com>
+Subject: [PATCH v2] t10-pi: reduce ref tag code duplication
+Date: Wed, 15 Apr 2026 15:08:47 -0600
+Message-ID: <20260415210847.1730016-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
 
+t10_pi_ref_tag() and ext_pi_ref_tag() are identical except for the final
+truncation of the ref tag to 32 or 48 bits. Factor out a helper
+full_pi_ref_tag() to return the untruncated ref tag and use it in
+t10_pi_ref_tag() and ext_pi_ref_tag().
 
-On Tue, 14 Apr 2026 10:17:45 +0200, Christoph Hellwig wrote:
-> this series fixes a bad bug and a few minor issues in the new zloop code
-> queued up for 7.1.
-> 
-> Diffstat:
->  zloop.c |  123 ++++++++++++++++++++++++++++++----------------------------------
->  1 file changed, 59 insertions(+), 64 deletions(-)
-> 
-> [...]
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+---
+v2:
+- Move full_pi_ref_tag() earlier (Christoph)
+- Use lower_32_bits() (Christoph)
 
-Applied, thanks!
+ include/linux/t10-pi.h | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-[1/6] zloop: fix write pointer calculation in zloop_forget_cache
-      commit: 32be3c01c3b8e948a4326ab7e76c1c63dd3e27bc
-[2/6] zloop: use vfs_truncate
-      commit: 14e0077911e3d5e11e94417861e700cbb521a107
-[3/6] zloop: improve the unaligned write pointer warning
-      commit: 6466b211f797ae88073b5826dd764a6a98b67edb
-[4/6] zloop: set RQF_QUIET when completing requests on deleted devices
-      commit: 5b680d7afc4a2fefa0b4f584462c7540de56e2e4
-[5/6] zloop: factor out zloop_mark_{full,empty} helpers
-      commit: ec5c045f6cc879637cb52c9902d5fb7d419bdf47
-[6/6] zloop: remove irq-safe locking
-      commit: 64b437c4a96ae088d46c7d9930c35e77ee1b5b21
-
-Best regards,
+diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
+index 2c59fe3efcd4..b6c2496866ea 100644
+--- a/include/linux/t10-pi.h
++++ b/include/linux/t10-pi.h
+@@ -2,10 +2,11 @@
+ #ifndef _LINUX_T10_PI_H
+ #define _LINUX_T10_PI_H
+ 
+ #include <linux/types.h>
+ #include <linux/blk-mq.h>
++#include <linux/wordpart.h>
+ 
+ /*
+  * A T10 PI-capable target device can be formatted with different
+  * protection schemes.	Currently 0 through 3 are defined:
+  *
+@@ -23,10 +24,20 @@ enum t10_dif_type {
+ 	T10_PI_TYPE1_PROTECTION = 0x1,
+ 	T10_PI_TYPE2_PROTECTION = 0x2,
+ 	T10_PI_TYPE3_PROTECTION = 0x3,
+ };
+ 
++static inline u64 full_pi_ref_tag(const struct request *rq)
++{
++	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
++
++	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
++	    rq->q->limits.integrity.interval_exp)
++		shift = rq->q->limits.integrity.interval_exp;
++	return blk_rq_pos(rq) >> (shift - SECTOR_SHIFT);
++}
++
+ /*
+  * T10 Protection Information tuple.
+  */
+ struct t10_pi_tuple {
+ 	__be16 guard_tag;	/* Checksum */
+@@ -37,16 +48,11 @@ struct t10_pi_tuple {
+ #define T10_PI_APP_ESCAPE cpu_to_be16(0xffff)
+ #define T10_PI_REF_ESCAPE cpu_to_be32(0xffffffff)
+ 
+ static inline u32 t10_pi_ref_tag(struct request *rq)
+ {
+-	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
+-
+-	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
+-	    rq->q->limits.integrity.interval_exp)
+-		shift = rq->q->limits.integrity.interval_exp;
+-	return blk_rq_pos(rq) >> (shift - SECTOR_SHIFT) & 0xffffffff;
++	return lower_32_bits(full_pi_ref_tag(rq));
+ }
+ 
+ struct crc64_pi_tuple {
+ 	__be64 guard_tag;
+ 	__be16 app_tag;
+@@ -62,14 +68,9 @@ static inline u64 lower_48_bits(u64 n)
+ 	return n & ((1ull << 48) - 1);
+ }
+ 
+ static inline u64 ext_pi_ref_tag(struct request *rq)
+ {
+-	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
+-
+-	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
+-	    rq->q->limits.integrity.interval_exp)
+-		shift = rq->q->limits.integrity.interval_exp;
+-	return lower_48_bits(blk_rq_pos(rq) >> (shift - SECTOR_SHIFT));
++	return lower_48_bits(full_pi_ref_tag(rq));
+ }
+ 
+ #endif
 -- 
-Jens Axboe
-
-
+2.45.2
 
