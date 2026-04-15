@@ -1,202 +1,176 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3B0392811;
-	Wed, 15 Apr 2026 08:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776240136; cv=fail; b=k2tKnp4ARhOd5yfia9Ba0KOdeoLy6+/VM06RAZurS2h5dnNewP2mz5YuVi5N6diqxW3uwnjsjV5yW/k2PNMahedNWBJqYU+RzAnNZT/CfTAsBhD8SFiRIeDzh9GrelqAK7lOZq4cWZmioyZ7+p3yO9yoSLY7LDhZVaAlYII3RuA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776240136; c=relaxed/simple;
-	bh=YIevjR6BggoxJzv7kXAwIBZE7N7Q2FUiNMxOD31eXgQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YTAaALPNtcNk4a1gfHldo23vxA/e4f7LuX2sr8kq+7FhRUeNr5LnYfobhDxGNBHoHeN6XcFOAvclxnj7ftunxSQb5pnxtXU82gWo9MVeRmvf/TuZS9AFk7Q1HPv9sFNSB/eQ13FW9qY0n6TC1TiTdhs4jorqkeC/E2Vz9Skc7PY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=PTzLsHcu; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=NAfZONbS; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74E33CF69C
+	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 08:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776241689; cv=none; b=j0fNnu7kbZEvvUnMizU3Rf3g8Eg+K4xiEI8WcCQa/TuhA/oLkrFN3jpQbGvw1u6pCINAp1j3Mb8bBj71+3zaKz7hXgH8sSYSDBTwNswKxCAuiCK6ymJ1O61iaw20/Gm2Qnx6ToBGl6uzmRivYcK2I9kz+S2ev6RvcT6KhOdwPMw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776241689; c=relaxed/simple;
+	bh=KZ31+iVuJ3hjGiVu2o5PRH1lxsvTWH4MQ3mopx32FA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mkDY46MRrMhyq6w1AQSc2Z7cGlJ/HjkMSPfAzu0AmNa9+d31v2Wts7I1bvrqCxd2lcf+4UtsE61HX0VZJwTD7M3QqFXRceOKx3yNxOmWXAB8E7wEcWbBtRl9nNeZ3JYVzhTAmpERvlRwcxQ9RoQk16Bd4MfI2RqrXNNyuIHOQ7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VJFpsSxf; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PTzLsHcu";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="NAfZONbS"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63ENS9Ae625888;
-	Wed, 15 Apr 2026 08:02:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=kgopEb4JOQx9wfKpy8sfxL8VV9szYYqI2aQDqJAexvQ=; b=
-	PTzLsHcuQEBIibAwZwNx0l3++MUQljRudtnVoxFF6C0mx3/Ch46+M0M3DFqSBklT
-	EmYpq/TqTYt48VYCsTBfwYiA/2xo0L4IGpsEfoNOdncAndLGvkf6vAjcBQv52job
-	iZTa3ic2behBiIJg6I2jv7dD6DXr06BUEWIlJok32AH9DjdGpmVhzOUHjwpP1C60
-	mqcC2U+xCisvExX6Ep0tNzn/pPx2VXc4t6U2YV/CqS5NJ1DXHcwerghgaA7oGKtJ
-	pWEk0aOwiViFmEMfpnc+/B3deHQItZMoQdlZatS/Jt8p0QYL83GhfhzFoLQ0NAvr
-	QXzxvm8FN3EdInNHPEUmlg==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4dh87h4dtg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 Apr 2026 08:02:09 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 63F7xUSM033096;
-	Wed, 15 Apr 2026 08:02:07 GMT
-Received: from ch5pr02cu005.outbound.protection.outlook.com (mail-northcentralusazon11012001.outbound.protection.outlook.com [40.107.200.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4dh7nnkg7x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 Apr 2026 08:02:07 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yTmup5FnIVFbXL02vpplZ6+XGNy9CBfpM3RfgPijJeIN7Pla5DufbEj2l4OEQKytPZec2b/Qko6rfLRFhvrKI/lxfOwsjSiu/SH1iDnkG4lqjPTFN+25L/hAl/HP3ccXnKPSLxSh8VXzdiLHCyhKKUbL/vHOA7u/k9w5wAhJKM0VI/clN1a2aHfTmCFlbTUjLOL7A2OLTo4VZsmgHbZ2tEH2WEcJdmT2qw+M/3lknbW9fuIuh/GgnyjWaczG5/QJya5efMJmqGBg5Dt+mlWmWL4f5xsXtRiyyAv2HcgTs6zo2NDKdyJrspDoIqJgPXUCg8uO5GRne90dOyJG1O13pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kgopEb4JOQx9wfKpy8sfxL8VV9szYYqI2aQDqJAexvQ=;
- b=TUF6RiwxUPk1y/RBqM0so5sxP0FbQe78s78jCtYDRgczPPKBZ3sD01wutKNHWjjX9//AMX6CW/IaLTk40HHRZIiuDBLyXVp8TKrdAM8j4iTD1xesVqI5sEH0wQGEQ6Y2Iuj33d6+I2+1djvtMET6OwMo/dejJmwMhwc5+b9YMrEHSQzQXDjWACu2Gmku0NPOCgnqTH38RDnimNEY6Ap3rDZJ3S4cVTvJYr6DwRkthZSJgDKTN/NzafrAbJ4n02LM0H2VbqMTRLWvNbfUDuRBhkDqLYeqxx7t41yeXXQJit1ZB69g8kuMtJD4Avwt4GHd7vizZCiHwsgMWtrFbtWBMw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJFpsSxf"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43cfd1f9fd1so4157458f8f.3
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 01:28:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kgopEb4JOQx9wfKpy8sfxL8VV9szYYqI2aQDqJAexvQ=;
- b=NAfZONbSoXsrnGdYP9A7HUn311aJEqCK82G0UpkdWEVCg1+GKlw7tiagQBw89nBA/miiMyn+lUCxwLnUUNwd15YgP9gplV6qYoS0735sEq3TnfiE7fjmGmdlKXBITHVcjNVyWkIWNAfNmBkjfQe5wMYrbbbT5wrLpR51lVddDBM=
-Received: from DS4PPFEAFA21C69.namprd10.prod.outlook.com
- (2603:10b6:f:fc00::d54) by BN0PR10MB5029.namprd10.prod.outlook.com
- (2603:10b6:408:115::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Wed, 15 Apr
- 2026 08:02:03 +0000
-Received: from DS4PPFEAFA21C69.namprd10.prod.outlook.com
- ([fe80::5266:1601:5598:3f0a]) by DS4PPFEAFA21C69.namprd10.prod.outlook.com
- ([fe80::5266:1601:5598:3f0a%5]) with mapi id 15.20.9769.046; Wed, 15 Apr 2026
- 08:02:03 +0000
-Message-ID: <3d9794f8-971a-424e-be10-11d85374b81e@oracle.com>
-Date: Wed, 15 Apr 2026 09:02:00 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] sg: don't use GFP_ATOMIC in sg_start_req
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20260415060813.807659-1-hch@lst.de>
- <20260415060813.807659-2-hch@lst.de>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20260415060813.807659-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0505.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:13b::12) To DS4PPFEAFA21C69.namprd10.prod.outlook.com
- (2603:10b6:f:fc00::d54)
+        d=gmail.com; s=20251104; t=1776241685; x=1776846485; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0MPHkT8FkNcBtLY+Pw7K92GBLHfnQFXFDeYyX4HYwxI=;
+        b=VJFpsSxfRwLVLraetQXuPhCXJ/73WCQRviZS2LD/YvMRtWLauyQGXyp7chBzw5o/BP
+         j3sTArpIOvAeh/AG7QtkNU89seNBN/oyMgVxRbNK0veSNfOdF9dzaITomy1niersAG8K
+         1IOL8tKldhEl5E83l6KS2DT3CfxGMQbb2WMKtS3HRoCCHqOItQ/vZmGNSvY9y2rng3m7
+         5Sqf2yjGYtExqrYvXW10+YJ6z7eKwD90uUsfzkTXdl9rkysXQS5IQy1IC4eAo/cSGjee
+         NIjeAFkelaFuwPD8LElF2e+4qpZINq3Rl44O0IyK44wj3FSAIqDlVoQcZx6GhiHIqPzE
+         x/6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776241685; x=1776846485;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0MPHkT8FkNcBtLY+Pw7K92GBLHfnQFXFDeYyX4HYwxI=;
+        b=oisw8Xjjso9YkWVE1R0E8kv4sANdQ3fqpXDE1w1tBxuvu0SbqrFw8E24tZHuvU5zee
+         0jx/QsxNRxgH6JeKlPFh5rZdJgcbxmVO2dQM4NjmU1mlMZhXImdlYqnDL68BS7FtFqzQ
+         MllWvRvIspfFlT0hllXv64TICtkp6nVWyLPToVkeux4Z69z2bdnGBt4Gbm9BOb6VEbI1
+         5IOuCNBsefLgmiQ47hcTX5TxDEg9IvaBhiwDGB0u2nBvLcQ985LlEtjXVhgRgAnms5GX
+         HkFMb288KG5I7lsVbjANOCZwo5d0Txqlq7S3lMDjSHCricv3YpAcjO9o2Od4TxgkqjpP
+         /bNw==
+X-Forwarded-Encrypted: i=1; AFNElJ/5/QMmGnlUgCy4FeClN/KtTY5SFlbUxo5etbykR86GFdu3WM2bmYLCgiReJrqpOWHaMoO2z7kHdaXZkQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYQCo4u0/Vgayz8kyHdQ5lLZf5Mk/ganNY1I5rjK8EWAhiLex0
+	Nt5T5UySn7IqFGyj9Iw/JF3YPGyoZqquD3EJx3mKYGCgFNM2Wy+ZsfVp
+X-Gm-Gg: AeBDiet8K8J/6LsuELpXxulbnQsJIFvGtI2G5yMPP6wjMKwS4KGHSa1NCNOUX27mfob
+	esgpodu9krKCbU7KaqFPqsjMM2VipAH8EItBkMdknOygfADahPP+k9AXpZnyA8QvfrsNsGx26T0
+	e4v7WOTeUF/9jW/6pTqHo13+ODoRRAtbT8+wuNk89a9gHZbiHShFtZbrOr8mK3Q7XH582Jrp/LA
+	W1rE+CIsIcOiBU62jLKnvecFMyfMUTgM3ea08L2kk7PUUjGaH1hgpzTo5lz+9lq5pH6PJ+0LLUj
+	Yce50fA8NSnXOjKWhsfm8A4clqcFpkyq+Oxgo6iKqzmrwpP32j2Z8+9zylGTt5DjZRojOBy5DTj
+	6HLVqRu0VQY3J8pCjQraKZ3H8aFuZBq4Durzvs07Nh3aqXZqng25qgb0vPe0wrrZrhQzDQ/mhre
+	M81LdoaeyOGdmVjIFNVw/gCSQGLeYqUThbaB2x9oLjLQ55E8MDHz6Si8aW3dNxcwAx
+X-Received: by 2002:a05:6000:268a:b0:43d:7403:4b60 with SMTP id ffacd0b85a97d-43d74034c72mr20655235f8f.3.1776241684906;
+        Wed, 15 Apr 2026 01:28:04 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3564d8sm3573210f8f.10.2026.04.15.01.28.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 01:28:04 -0700 (PDT)
+Date: Wed, 15 Apr 2026 09:28:02 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Dave Chinner <dgc@kernel.org>
+Cc: Gao Xiang <hsiangkao@linux.alibaba.com>, Christoph Hellwig <hch@lst.de>,
+ Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>, "Matthew
+ Wilcox (Oracle)" <willy@infradead.org>, Christian Brauner
+ <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, Carlos
+ Maiolino <cem@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, Jan Kara
+ <jack@suse.cz>, Bart Van Assche <bvanassche@acm.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, Sandeep Dhavale <dhavale@google.com>
+Subject: Re: [PATCH 8/8] RFC: use a TASK_FIFO kthread for read completion
+ support
+Message-ID: <20260415092802.5864c457@pumpkin>
+In-Reply-To: <ad2RKNo2FGhpzJQp@dread>
+References: <20260409160243.1008358-1-hch@lst.de>
+	<20260409160243.1008358-9-hch@lst.de>
+	<adl1iqhldFvJwSw-@dread>
+	<7f0d072b-97a7-405f-bff5-d3819de2e3dd@linux.alibaba.com>
+	<ad2RKNo2FGhpzJQp@dread>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS4PPFEAFA21C69:EE_|BN0PR10MB5029:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c3704b1-d02d-45df-8bd8-08de9ac5477d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|366016|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	v0Z785/SFDOCa80IAVZO0le2vuMpdsyh2bpHZQDNO/3UbTzTvvuGdEgbT7bu5vjo54DrARyFHiNqzx4wF4hSK/+TVN5zXJlsi2TzvmjjBzlhlZ15hbdkUcCodgdAR5FRYWByx0oyNQxl64AOdVKgG6Opv8dNzq9+DoaueEt5GCAKv/h9xt+QnwsDUjwuBfRKR1T3h9b9CA3q7k5ozN72YgDRkSBTdqzuJVO6Vl51EJuWIE1e3pOM18/z4UgZDwL6dbKWgdeqCxnwuj9lpDHnkq7rx3h4mFzFhIeXT2maAl0qg2ujSv7nzPmu0SC6VOfyhYSfLid+ary57twtrxEIPNcJMQfR0Avcpq7DFfdD1RYFrGhg7RIvQY6OcrhD3DlIdkp7/CMd3SpGrIix3kxrpob5ne8idEw6fB824V3wgE8DDy+q38wZxhtJkRezSPcBlRVGY78RgtxabYJufybxTlk/jUvMmdHCB99hglTlqaf/BIH5xBSxItke9kw30CuJt+YeSH0QXXdpdnAwNTLm5JieOJOMhykq6YpDRM7w230dIpuLCq/MBtY6MsUaKYj9DItD+3jfnWw/OlUucq8+nzVaX7tQWdMiwMRtAwr7fxaOLcjhzthoPo8sMmKFfyj5gxda79d4NhJKb74iXuZLx51EJGcrra/kp6jyFtHLv28fh4RIjdt2qr68BUe4X8rRCo4o+xS8sZtEHIu5nYgXv2srQtzlwXMDiMl277fLOGs=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PPFEAFA21C69.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dmtoR1ZlZkViZDdJT2tUZzg0WG84a2FmRmhMUmJBWVN2Y0tsalFxNUY1Wk53?=
- =?utf-8?B?TWJ6Q21VOXFFV25KUVROb1ZYa2tNa0Z1KzN2THhwU05RdjBNRC9DOWhpTC83?=
- =?utf-8?B?QXlyNitiYU9INUZKd2NNbVlKdDdjWWJLeXNaMXRLZy9GMkhjenlwdWVkODIz?=
- =?utf-8?B?VUs0NnZSZU0wOGhRTDVQd3RyWFVweXNHU0dkYzRGZ0dkNkV4R2gvV0VBMmYw?=
- =?utf-8?B?M0tjVFg2dWwzbklhcERVOTJwVjBFeDhjNnpsNitZMk8wTUUxVnNMa21jNEFn?=
- =?utf-8?B?YTNNNEp0YklCaS85amRvWEVRaW1OR1pQdVdaRWR4SFNmQmUvUUh0dGNLd2pT?=
- =?utf-8?B?TU90eURoYzdRYmlCOW9RN1NySGpMLzZ3U3RRV255RGoxK1hNM1owMDZKck52?=
- =?utf-8?B?NjkwemN4UDBXWCtkQXFaZnN4OUFpVi8ybVdtb0ZQeVpWUzk2NkQrWTh1M3J3?=
- =?utf-8?B?VVRUQUNtbFVuL0ZickpUeGpQTUJWYU9NYTZDZUZkTis5RFdYanRGNTV1U1Nh?=
- =?utf-8?B?RTgvSDdRbzVBN05GcTZrRFltVngvMG5Md1Bwelc3dVZqL0U1Y0lRbUVSVnNj?=
- =?utf-8?B?emZUTHB4OVJyT3UxaDdqcE5tKzZTWURqaStQMXJjYnhyWTdiOUtrRjVtT1dy?=
- =?utf-8?B?L1ZzbG5kMTd3dk01TmFSc2pMOHBGNklTUm95OXNXZnFBaXZQZHpIdkZ1NTRr?=
- =?utf-8?B?TFFmR0ZNdk5sVlZSNGJRNERZTmdNc1lDMi93QW1iV0cxNFd0dld0dnhMVnRM?=
- =?utf-8?B?WEk2eWswa0UzZXl1V2hSWXY3MjRlZWp1MHRSWkIyY1ppSnRpR1hWeDNoWGJt?=
- =?utf-8?B?MWNqci9aMDI2ankxbGNPRUFERHdaZVFQMHR3elhpQTBvbkpJbVArZDZBODBX?=
- =?utf-8?B?Rm1jeHJCZUtLTUlmUjQ3Szcyc3BqeEpBejJJaDZ4eHVLNTlhRCtYaGpDZUZs?=
- =?utf-8?B?NEZNbys2U0FkbGhKZXdGWFhQTVBPYnBWOUFFb3Z2czVlRnJWKzhTbFc1eG01?=
- =?utf-8?B?WkJZd2VYbmJIWVJSVzV0US91UjFlZG1PVTIwUjduYy81UXNsS2RwVG5kUmZY?=
- =?utf-8?B?OWN3TU54RGdVTkFzcU5ZejFOYW1VclFLTmg1cHBIaE1NcWhITVhRUjVoREg2?=
- =?utf-8?B?S3FqTDI3UUJqQ0NCbnVkL09QRjcxNFpDU3hjbEI4a01xNFNrR0NNdTRRdFpZ?=
- =?utf-8?B?OGpFSVVyQTdha3QrdEF2UkZOWTM4blZta0xUeVd2alBkRy9jQXY1empMQmZo?=
- =?utf-8?B?eXlRanBTTzlIYWV4aXdDZzBWcXMyRVlKeWtzdFBJbjNVYVVCM2dQc2x3bjg2?=
- =?utf-8?B?YjdVUnNPWE9FeVVvNWlnUHhwUVkyK2Mza0wySFc3YXBXK1ZNOVpTOG4rTFNW?=
- =?utf-8?B?eUw4NWl4QmZ5eTRyZUg4M1BLZmQxVHpkUVdVckNYT3F0Z25oeGtOL05ER1Yw?=
- =?utf-8?B?bjRtY3RYZmlGbXBWV1RUVVJhTmplQXVadkZEbGtsUDhPbDRJUFFmL2JMS0xh?=
- =?utf-8?B?VS9GL2srRHFQc3Z0b1MxRElQM3BOZzEwdWVGRmw0cUVZczhBblVtSThqeUpT?=
- =?utf-8?B?anFlS0RKazg3eCtVdStXOWhEU2RuQkhmTnIrWHM3MVZPemVNY1U4ejBMRTUx?=
- =?utf-8?B?ZWdieVJmYVRIdytMTmZxU0NrS2lVcWJxa0VaYTlDZXh0NCtJZzZJVWllZ1BF?=
- =?utf-8?B?WVF5SUtkUUd5TTQ5UjlWQUZHY2MvbW5nMDNaZ1NuVWo3TlplalNPSTB0M0VH?=
- =?utf-8?B?UmkwYllRR1U4NkFiLzVKNnN4UWZacUlYaURTMEovZ1JNc2w3eVU4ZCtjR1RE?=
- =?utf-8?B?MEljRlh2YmZTUUtRakZPTmlxM0dwN2l2SWxzSVBvSjRJWkRJYWt3b2QvSmg0?=
- =?utf-8?B?VzM5VFR5aS9PSmoyTmJTOC83d1VBaE5VM2RyUnFxZ0JYd0tEbWhxTk83bERU?=
- =?utf-8?B?bVRnbjVGeVVwdStrZVNHeG5vZVJFaS9kWWtDOEticmJwNEh2YkQ2WjRQZVor?=
- =?utf-8?B?OUQ4SmZaT2hmWVNjRVdwMWVyZ2hlZVl1bVNGSm9aZmVISTBZZzd0dW5nanNh?=
- =?utf-8?B?OFVzMFpjcmNvbFozVXh4Mi85YVd5ZW90cXJrVDRBZTNjZVUvdDk2ZzdtSVR2?=
- =?utf-8?B?S0ZMa0ZlZzVGLzFtZS9QNVVNL09qMEx2VmVsOXhObytlOGRsV1Q2SUdqY3dJ?=
- =?utf-8?B?ZkpEQ1BZS00rRVg2NGhobzF6SGRzanVSZzNsSkJXVmI5NXZxeVArTUFFaTNR?=
- =?utf-8?B?bVhsM2pYWnY5NDdtZklrUnBMT1FGdjJES3lFZXRPVnl3L29RTHhweGJpZVUv?=
- =?utf-8?B?MjdWRlFxWTVmc2N4dGJFeXFmaGJCV0prcHg1WkJqUy9RVnV3VmVYdz09?=
-X-Exchange-RoutingPolicyChecked:
-	TQZ5uwp0abUI0A7S+A5V0DvYD+emsQtMYwyXUY1ZWz798eyYwhq2cupl/9XzfDxUU/s4wIowdesv2Vec7/hpEpEVglOxbFqRDjMiE9XRqiv0njkNybIWgJ1R9D4njdLQ32vr8+tQSjDBmTDX4Pa40l/mAbtq4dYKH9E57xadXU9dA8qRbjAwUGyirAE1JP4Oc8RLYz3k22RmzM29ut9pSfnHTnKDxt4dRDJB4l2SEt9Kz000ODZQDMrzrcjD31tR/gODnsnTJfQoVhSUUPjIHX5yAJ2/HtETVAKfmBkcjlXqUKLXCBEYMYaZkpWQ1NqprjUsGxDfbh1ZPcCYdjxIYQ==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	HF3fueuLrvGCgyAYMReFFaz+tO9jTxqjpQGv6WDIatwvicLnpYBG+MxGinZ/BKviSBw4SW0NylcM7opiMVLAQu2x1vn4JYGls49QgLu+YE705pyMb3OoUWxXwStuBeUyDDdmVT71T/sBTkF64WsSQNhtmF/VaShraOX6IUTiHkhE/gQb0CAwBzlBU2MMLKS/P8jA1lEp8il0yLurtXQWEDfibdWYwtjgK0EszIS63wq31r//WsTCTEf0NL8IP3vPZdGWf7CBbCQgH4UQNMgdIZTBWuKwVO7tfyArNn1mF5TGfbmrfB3wFn0TiX04hVgx6oApWcWc5i0HwyanSBXmNKDHt+7CCE2VvzT0FP0TVgZtTCq77+2LK6IkWhbIwc+zo543Ij4QHJRvMO6j8avSeX72pNHDZ+nXAdlmmvsdmk85zPJunEfOxQYBwNmaYA6Aae8GH0ghNYjb4J6spG06HtipEQwvhcjN0QgxR6tR6dvo2pIKib/U1da9fke4EJJzbUJ4LE+jgXhLpBgO+njsIoi6lovR7SYWkteRM3vmD1KH/2J66trRiWBeQfqxilFWWbazklWhXJtZBw788X4Tuf5Ul62VECdyQncQTps5GF0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c3704b1-d02d-45df-8bd8-08de9ac5477d
-X-MS-Exchange-CrossTenant-AuthSource: DS4PPFEAFA21C69.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2026 08:02:03.3146
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0CeIELVN2CIJl0sIvYmyCj5bC+ysweK7RoCiLBgqZ4jyrWDmE7PdkD3Ab1szXEVtL8pQTMuUNxX1rHdLjMqKMQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB5029
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-14_04,2026-04-13_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999 bulkscore=0
- mlxscore=0 adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2604070000 definitions=main-2604150072
-X-Authority-Analysis: v=2.4 cv=eJUjSnp1 c=1 sm=1 tr=0 ts=69df4601 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=A5OVakUREuEA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=jiCTI4zE5U7BLdzWsZGv:22 a=EIcjfB9IiI4px24ztqRk:22 a=JF9118EUAAAA:8
- a=yPCof4ZbAAAA:8 a=Jqleip0sMEAhYxYqKlkA:9 a=QEXdDO2ut3YA:10
- a=xVlTc564ipvMDusKsbsT:22 cc=ntf awl=host:12291
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE1MDA3MiBTYWx0ZWRfX0E0LGWpckXUD
- igLg1XONZJZz6wnj3nsixltpJqV42g3XJfDqljECSlyEjy9xWuRLFrbCC+MeMuqSeZBHqO2nEMu
- +UjTGWs13n2I0jbDqsf3nHDJyWHj3mOwqRP05FJHLw2K7GPJ0HiZ54EP7WhzlY0wJpUCZeUD0uK
- 3gdRxKP0uCvLTrUzCmpFghVHwlOhtwyCDyXERXZrKKzMB7i+M5x16gqdzsaz1gCVDnCCJyRNIe4
- yMZfplG1CuHJGeXwKZo785dHQLa4B+5mIrbxpe7zSiFZpt/UMgD/z1hes6a04VPSp9UrdAkBxNp
- yxr5E3PIcifq18eVs1VMvK1AxQmKSbhUZBCHnfLIeOt/arioeH98npfxXuJb6uNlT/ETn/+2LVf
- ahPWSG8QanMJ8xqWKnNEAS0zT+DSkTjsTIgeN3ohQ98YPTD406CEIhqbjGx/wYVKyBlGjZ+Xoup
- +d1CsDFAZqFycMJN1KoZm/pQhmnfUliysLDneA+g=
-X-Proofpoint-ORIG-GUID: wvoSxFhF2I3K4B4RlWs7dUjKmOf-Wkpb
-X-Proofpoint-GUID: wvoSxFhF2I3K4B4RlWs7dUjKmOf-Wkpb
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 15/04/2026 07:08, Christoph Hellwig wrote:
-> sg_start_req is called from normal user context and can sleep when
-> waiting for memory.  Switch it to use GFP_KERNEL, which fixes allocation
-> failures seend with the bio_alloc rework.
+On Tue, 14 Apr 2026 10:58:16 +1000
+Dave Chinner <dgc@kernel.org> wrote:
+
+> On Sat, Apr 11, 2026 at 07:44:43AM +0800, Gao Xiang wrote:
+> > 
+> > 
+> > On 2026/4/11 06:11, Dave Chinner wrote:  
+> > > On Thu, Apr 09, 2026 at 06:02:21PM +0200, Christoph Hellwig wrote:  
+> > > > Commit 3fffb589b9a6 ("erofs: add per-cpu threads for decompression as an
+> > > > option") explains why workqueue aren't great for low-latency completion
+> > > > handling.  Switch to a per-cpu kthread to handle it instead.  This code
+> > > > is based on the erofs code in the above commit, but further simplified
+> > > > by directly using a kthread instead of a kthread_work.
+> > > > 
+> > > > Signed-off-by: Christoph Hellwig <hch@lst.de>  
+> > > 
+> > > Can we please not go back to the (bad) old days of individual
+> > > subsystems needing their own set of per-cpu kernel tasks just
+> > > sitting around idle most of of the time?  The whole point of the
+> > > workqueue infrastructure was to get rid of this widely repeated
+> > > anti-pattern.
+> > > 
+> > > If there's a latency problem with workqueue scheduling, then we
+> > > should be fixing that problem rather than working around it in every
+> > > subsystem that thinkgs it has a workqueue scheduling latency
+> > > issue...  
+> > 
+> > It has been "fixed" but never actually get fixed:
+> > https://lore.kernel.org/r/CAB=BE-QaNBn1cVK6c7LM2cLpH_Ck_9SYw-YDYEnNrtwfoyu81Q@mail.gmail.com
+> > 
+> > and workqueues don't have any plan to introduce RT threads;  
 > 
-> Fixes: b520c4eef83d ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
-> Reported-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> They don't need to (or should) introduce RT threads. Per-cpu kernel
+> threads already get priority over normal user tasks on scheduling
+> decisions.  However, they do not pre-empt running kernel tasks of
+> the same priority.
+> 
+> In general, kernel threads should not use RT scheduling at all - if
+> the kernel uses RT prioprity tasks then that can interfere with user
+> scheduled RT tasks. This is especially true in this case where a
+> non-RT tasks issue the IO, and the IO completion is then scheduled
+> with RT priority. IOWs, any unprivileged user can now impact the
+> processing time available to, and the response latency of, other
+> RT scheduled tasks the system is running.
 
-FWIW:
+But might not an IO for a use RT task be sat behind it in the
+completion queue?
+To avoid priority inversion you need to process the completions.
+The non-RT task won't be rescheduled to issue a later request.
+The only other way is to force that completion work be done in
+the context of the thread that issued the request.
 
-Reviewed-by: John Garry <john.g.garry@oracle.com>
+> 
+> Tejun asked Sandeep if setting the workqueue thread priority to
+> -19 through sysfs (i.e. making them higher priority than normal
+> kernel threads) had the same effect on latency as using a dedicated
+> per-cpu RT task thread. THere was no followup.
+> 
+> In theory, this should provide the same benefit, because what RT
+> scheduling is doing is pre-empting any user and kernel task that was
+> running when the interrupt was delivered to execute the completion
+> task immediately.
+> 
+> Setting the workqueue to use kernel threads of a higher scheduler
+> prioirty should do the same thing, without the need to use dedicated
+> per-cpu RT threads.
 
+We had a related issue with the network stack's use of softint and
+threaded napi when trying to receive very high packet rate UDP traffic.
+(IIRC something like 500000 200byte RTP audio packets every second.)
+There is an absolute requirement to run the ethernet rx processing
+in order to avoid dropping packets.
+Now normally the code runs as 'softint' making it higher priority
+that any user process, but under load it switches to using 'normal
+priority' kernel threads which are basically low priority.
+Similarly 'threaded napi' uses 'normal priority' threads.
+The only we made it work was to manually change the threads to be
+a low 'RT FIFO' priority so they got scheduled in preference to
+all user processes.
+A system may need some user RT threads with a lower priority than
+these kernel threads and others with a higher priority.
+So defaulting to a middling RT priority may be best.
+
+	David
 
