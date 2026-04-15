@@ -1,135 +1,92 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F4E3D8116
-	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 14:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01933D8123;
+	Wed, 15 Apr 2026 15:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776265063; cv=none; b=RqmBBRkdKNvKqOZ1QyhEXRvukQW6973gKGGGxYjL7cFnk0vOM5NC7jtJkvju8tUl+6RGZRa/MwCZRPObr7c4TEPEqGbpZ0Ao7IYEXNDafxcLCEQrv7D3BV5B911CnTqGCkJIobzflqBDBmALZzHW+c8r89cu8yxjqrfCyWzDHqU=
+	t=1776266408; cv=none; b=GfM9tzgeafx1o7+G0FdsioktHlBBRHTR97mL3g+ZP4XdWU+9fpo56qMO9gK9xbXxVznaHq6mVWEa+j9IaSjLux0avuqKvoE4KC/ktGgdlboCA3VME5UNcHGWbeD8m20DROMU48dZyKBtJUo+x/Tc+/gFgPgnLeXivxAmZ8yqu18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776265063; c=relaxed/simple;
-	bh=oRPVzB//4GPr8E0X8MsyD2ixptlJ7tiaxlRsENmd+80=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k3ojqAIBk+mMAGv4p9hKBBiyXevhjgZhLM/nOa4XjCLTpEwnwL+G5amNtNp1YueCjPKe3vYnoW/qkzLWe5HrGbNQNaVJY3B17GzZG3GddTPMX8f/FUBD+V9cXDjnzHOghd997jY5pUr9kZrus6fi9WPj0WxNnWrpVexpgjVDbaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOo/peUu; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776266408; c=relaxed/simple;
+	bh=B/Hyg7x8PYnDVSR14340tPKetY3zAVNOK3YI7sycpEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k2GILU/D4ksqchB1zzpCxMVXbYfLum47v4vE7gOy+V/Tp12xhvuV81f1IQKYU0fxsqomZzTI5XQXE9qcyEBnRFsksHSS9uVgRoIl9kvrND6nlb+JhiDFiLRMwenZf6dCey6agJCQFh0gyWm3DdO9gG4Fu59Pj5+U2UcnDmCFznw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QXV/xMAQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOo/peUu"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2ad21f437eeso40968865ad.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 07:57:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776265058; x=1776869858; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s9z9SXjdbKZ8KdYoMVn9DyECDnpTcqUx5ESLC0ZLnEI=;
-        b=kOo/peUu2Xf/w1s6n+FKrKJxtDH71Dk/JwWWrAPcUs9hxeI14ZAEK1Kd0oBkfTA3El
-         1RDZrRimPW+9QVHU1H8n1RUMsuWHrD+AmTGQrZpPKcLkYMEGhpsDKFo8LyNAfXfse9m7
-         XhsByjdXfwrf0GDR1LHZ2zraToMh19nEGk7gWvlhojfetEkNV1rnmj9PK/hGvxvStWy6
-         3Ty9igVKzQkBi+sICugpvHp5d1EBOhe8+ZQT807ViNY8oPz/BAdKj60P+sTcij70IPfs
-         WfFn95u0z4K5gs+pEgXisSraczBbe0ApgKiyUFZyqtKZlHE+khAXSki7tCQgzcSkcNGp
-         kEoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776265058; x=1776869858;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s9z9SXjdbKZ8KdYoMVn9DyECDnpTcqUx5ESLC0ZLnEI=;
-        b=ZMmHJ+iu3n8g3GEzg/qfW1ZeIfRQS4BAyky1RHY3YLcXJz8v0g8l7lXp+18iQvtGBw
-         xXmOFiAZMYSGfXckrqd4ycE+Z74+Vr8Lbh7AvG/49GUQTz2mtN1heVuJs6NJYLRhQ4xb
-         5Ll2EsWE21YIGpQRxO91Cx6JZD4Lia3FnHDUMPm4kiPetwzsIxN0IcqaDxS3A/keKwA3
-         HYupaFoBqppZ4/a5WBVO0dRrpfT7Y/UBOcopsEUZrqirwliT1M5h/88C9dyV/WK2Mmcs
-         gJfcd5q++jLJNR9OUOsmQFQkeQ8kWyvBelS/D0QYgQAxtIbd4UfOfRRzIgmAsrkPJ5kj
-         GpJg==
-X-Forwarded-Encrypted: i=1; AFNElJ+O7VgSUbsMm1lWICzLOtPILBZxd4+B7aZjARA48nK2Pp58/WXOOGEb8fq+QrZNfLSohk6HIEJg4ONsAw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwR+8hqt4dM2/kaevM4eIt9a10cD26KtMdAozRjbzdLtvPZJwyx
-	itNH2VegdeZdnPL6gHQiKr7PYsns4X5LUP2QIDaTzJkB0Yl2H0hV/kpd
-X-Gm-Gg: AeBDietwcEmdXGsbrnUkg4aB2lJozUym0Zpy/r1nX1Z/M+Enm4ymTm710Uf6xvOzngz
-	d2s5MdlF8YJ+WEvd8DUBk1Qd4L5zGTOjegUh0vBpnGgZqDiXWs0Xbe222lZd8p5vAjBrITOaeBK
-	0b+gaIS4UuGU36fo41a8MS4nzXrJBqal2lmhFhMgDfNmovfkIJEsHykpV/2AX2EUGu1LcHzSTZ+
-	Bj7bBgyjTyM7NCOXS9yLOTlY5MGETUMOZJCSO9PEuTnan7XS7ZBHnUg8pUced4zF41LoUZqj1jj
-	GcDqMDADMq8VoWfq5v6Ph5J0a1JzY5Nn0Qm4dyy/UgjgAT9xoXAQOZueoMFMXZYborRP2QkL4sa
-	rob0sHkQQ8CG2m4WqBk69j2nwWyZFUfkeIoMYgwcu/gh6/IBLHwYkYEFvXzUcNUYkKkpDjRUo59
-	LqjC3ISveSaD8R0G6C291TxbuLw0NBkViN
-X-Received: by 2002:a17:902:f64c:b0:2b2:53f5:461f with SMTP id d9443c01a7336-2b2c7384aadmr230409305ad.25.1776265057864;
-        Wed, 15 Apr 2026 07:57:37 -0700 (PDT)
-Received: from lgs.. ([112.224.67.108])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b4782abd6csm23426605ad.63.2026.04.15.07.57.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 07:57:37 -0700 (PDT)
-From: Guangshuo Li <lgs201920130244@gmail.com>
-To: Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@suse.de>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Guangshuo Li <lgs201920130244@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] floppy: fix reference leak on platform_device_register() failure
-Date: Wed, 15 Apr 2026 22:57:08 +0800
-Message-ID: <20260415145708.3331818-1-lgs201920130244@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QXV/xMAQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09927C19424;
+	Wed, 15 Apr 2026 15:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776266408;
+	bh=B/Hyg7x8PYnDVSR14340tPKetY3zAVNOK3YI7sycpEg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QXV/xMAQIT0yjw5vtey1URygslRf4JQte4jVZVEM+w9dKkB3d4LfCa+xG1U+mulX6
+	 iySJxY+mMyQtj01rrAEJggFALLl2u/iY9LcbHo8c1yhUUUOlpKHA/UGadIKKhfryRs
+	 BX6DmatYXXUiou79qMjuGVRAaBM9Px/MJmTyvCA0klwpq77RZc1oVTx9vCnYzmUeG5
+	 wKz0H3Ta2Mc6VHs+eGul3vXrY460eAJEzEmU0AjGzdcxmWWNWuuFqRdHDhM60wBU5j
+	 Ej9CCYztz9L45StPO9XyFBiovg1WkivxH6GmXJgJW/vtQ9nzo6cS4i7K3SNw8aRYIr
+	 POVZDtwgK64RQ==
+Date: Wed, 15 Apr 2026 09:20:06 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: =?iso-8859-1?Q?Tom=E1s?= Trnka <trnka@scm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+	regressions@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: [REGRESSION][BISECTED] Spurious raid1 device failure triggered
+ by qemu direct IO on 6.18+
+Message-ID: <ad-sprBWPA20iola@kbusch-mbp>
+References: <2982107.4sosBPzcNG@electra>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <2982107.4sosBPzcNG@electra>
 
-When platform_device_register() fails in do_floppy_init(), the embedded
-struct device in floppy_device[drive] has already been initialized by
-device_initialize(), but the failure path jumps to out_remove_drives
-without dropping the device reference for the current drive.
+On Wed, Apr 15, 2026 at 02:18:59PM +0200, Tomás Trnka wrote:
+> Since 6.18, booting a VM that is backed by a raid1 LVM LV makes that LV 
+> immediately eject one of the devices. This is apparently because of a direct 
+> IO read by QEMU failing. I have bisected the issue to the following commit and 
+> confirmed that reverting that commit (plus dependencies 
+> 9eab1d4e0d15b633adc170c458c51e8be3b1c553 and 
+> b475272f03ca5d0c437c8f899ff229b21010ec83) on top of 6.19.11 fixes the issue.
+> 
+> commit 5ff3f74e145adc79b49668adb8de276446acf6be
+> Author: Keith Busch <kbusch@kernel.org>
+> Date:   Wed Aug 27 07:12:54 2025 -0700
+> 
+>     block: simplify direct io validity check
+>     
+>     The block layer checks all the segments for validity later, so no need
+>     for an early check. Just reduce it to a simple position and total length
+>     check, and defer the more invasive segment checks to the block layer.
+>     
+>     Signed-off-by: Keith Busch <kbusch@kernel.org>
+>     Reviewed-by: Hannes Reinecke <hare@suse.de>
+>     Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+>     Reviewed-by: Christoph Hellwig <hch@lst.de>
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> The issue looks like this:
+> 
+> md/raid1:mdX: dm-17: rescheduling sector 0
+> md/raid1:mdX: redirecting sector 0 to other mirror: dm-17
+> (snipped 9 repeats of the preceding two lines)
+> md/raid1:mdX: dm-17: Raid device exceeded read_error threshold [cur 21:max 20]
+> md/raid1:mdX: dm-17: Failing raid device
+> md/raid1:mdX: Disk failure on dm-17, disabling device.
+> md/raid1:mdX: Operation continuing on 1 devices.
+> 
+> There's absolutely nothing wrong with the HW, the issue persists even when I 
+> move the mirrors to a different pair of PVs (SAS HDD vs SATA SSD).
 
-Previously registered floppy devices are cleaned up in out_remove_drives,
-but the device for the drive that fails registration is not, leading to
-a reference leak.
+Thanks for the notice and the logs. Sounds likek something is getting
+sent to the block layer that can't form a viable IO. The commit you
+identified should have still error'ed though, just much earlier in the
+call stack.
 
-The issue was identified by a static analysis tool I developed and
-confirmed by manual review. Fix this by calling put_device() for the
-current floppy device before jumping to the common cleanup path.
-
-Fixes: 94fd0db7bfb4a ("[PATCH] Floppy: Add cmos attribute to floppy driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
----
-v2:
-  - Replace put_device() with platform_device_put() in the
-    platform_device_register() failure path
-  - Fix the device_add_disk() failure path by unregistering the current
-    platform device before jumping to out_remove_drives
-
-
- drivers/block/floppy.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 92e446a64371..461e14d19422 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -4724,15 +4724,19 @@ static int __init do_floppy_init(void)
- 		floppy_device[drive].dev.groups = floppy_dev_groups;
- 
- 		err = platform_device_register(&floppy_device[drive]);
--		if (err)
-+		if (err) {
-+			platform_device_put(&floppy_device[drive]);
- 			goto out_remove_drives;
--
-+		}
- 		registered[drive] = true;
- 
- 		err = device_add_disk(&floppy_device[drive].dev,
- 				      disks[drive][0], NULL);
--		if (err)
-+		if (err) {
-+			platform_device_unregister(&floppy_device[drive]);
-+			registered[drive] = false;
- 			goto out_remove_drives;
-+		}
- 	}
- 
- 	return 0;
--- 
-2.43.0
-
+Anyway, I'll take a look if there's something I missed handling with the
+stacking setup you're describing.
