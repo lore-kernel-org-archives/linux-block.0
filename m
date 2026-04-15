@@ -1,134 +1,128 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D17C33F5B8
-	for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 23:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A9513C918
+	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 05:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776210552; cv=none; b=oJAea2WSDOXQ1bsah82cGpi6IEpLVThFmtbIHzsjHMiyHrwFwRTJtg9aDsc3jWkYo5X8WzPCgd8W27cet57Jg/wsqQ5UVLjPF/t6kLshK8WFEbfLFOQwu0T6lzk7BKXgRP2/5G1ijVQzaDTkvKX/Tb8FRG4v9gPOmS6V6VSG88M=
+	t=1776231056; cv=none; b=A4+ZfKiTwtdnpS8eEuw73xgTqH20GqMvUnYcyaw0GbfExQGQoOwnVQzeXrvaQYbrXWZnAeA5b1PsSVnLR1RqMqmWE60P98os2znD8FME2Lj1IPd/36jzmFZvdp1bguTwfIxyEs3JCz4F4Q7cJVhaSzprTmOb5PuZ3ZG+xRys0IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776210552; c=relaxed/simple;
-	bh=t6ap3hp2vWlX1xqsGYc+C5ZeRJOlXaYEglZGq8Z5lxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KT3e4tvNblpoEvYAd3JUdnN+cVOYLktWeZ2K+mNrBEk17DBVcZlLoZIDU1UezagIemSVlIXCUDGbxOZ4zoxIO1c6gGgYXSKFlLN90zMLc/NKeGTS8tEa3rInvbr3x9UCUJmaEb/uXpyZR+fKv6es/cMtmO9FAD1jtAKo7THjcHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZSn3aIXG; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1776231056; c=relaxed/simple;
+	bh=yTnQ5CAqd/UhKMcqDiDVIchriTG9e9wvpYUEVj06UmI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GbZl5Cu8h8Eyd4V+oAsBCiKUXJplRQTexoAckC3N2FvAk04rZ0IEIz9gdjsAPnXmARusfheSKzrFauakId4IZ0A5V+gdFpcvwFjuhlXFwaPpzG1UQcqI6AdP5lMFJm+MSPPVdaySrWv5oT8vMGjQxqGbblw0KLVtiojUkrKIQ6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gompa.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZSn3aIXG"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43d72875729so1990460f8f.3
-        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 16:49:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776210549; x=1776815349; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jJ8x8xR48CmS5hLf24KF5gUf297dGoG6cMflRnDvWCE=;
-        b=ZSn3aIXG5LeBlvbbm961IRWO3AxYsn3KIT7pg3Ci6cEsu1u6bGk1VpgH190q7tOVdU
-         H+mFqe6W1mNEZ6XJM1p+9hTt3rTuMy76WgjPc4evrLbSxYzpYLbzSQYd/LP5c/QzgaTT
-         uttaVp/D3TClANRX1m5/Mth4auV2c2uZ3alwUcTOVNplHTyROT+pPa8lEwIz1ob688Q/
-         L21ADJUBbUAAjcwMwhVnl/DrHOoL3OyWEp+b5XmS3Po0tG1uCWx/sS55SIswVFaqlaXk
-         sRhJggGRLsm5GJSe2p4ef0TPEvI/i0BMXVOlRx6VxLlJAT+cgjyNeyEITwO+8nZLgvBD
-         IvNQ==
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7d4c383f2fcso5184852a34.0
+        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 22:30:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776210549; x=1776815349;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jJ8x8xR48CmS5hLf24KF5gUf297dGoG6cMflRnDvWCE=;
-        b=SaFGqZ47hG+T7Wh/zGt5WS2rHkrPkiPvu1LiMb6vVuYJkBDi4C/GOrOt/yPgVaEiNI
-         LRmYU8vDqCyCD+VvuchWDd6pGsX+wP0AkUBg/K2E7HhflQzL9x1RE+Q8UBuGLFWHlacL
-         q636teteR6kIU+o8UjWfjOpuFqngZvI6lapB+uENT6GOO/CMQsmno8zCTphvEhx2JYor
-         N7BUHwqoEYJlxs5hffIqkEHO/EaGku9OxjjQTgUw/Z3ZYfIgI2NYYkv1jnkC3pwf9dNG
-         ON4QDVkigwvaxf2o2dyFuK0hrPVpcp/Gwph5BFKeT8z795Azo3qTgNA/pWCsA70j0Cg6
-         o5kw==
-X-Forwarded-Encrypted: i=1; AFNElJ8aSfR8g5s60rKkALyOsLfNYDfqls2NrFqUZLOzEs4we5XhG1vrYE8Rqk12A/CgC2Ejd+CWV26GSQ5QTQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN6Z2Gy4COZgxbH6QaUWELivT9qbDr6nKy9oLotqMeIrRU69Wu
-	ifFWJC/FaBy2QE1HI+KXHf5z3phfgoc/0iJI2W/OCIizNoOchk0FlsRp
-X-Gm-Gg: AeBDietmYrLxmgR5Dh0aznxDhNfu6c+vXJoo/9S3BzMyZjUq0LbEKwx+i8yTiH7Qub3
-	hrte3fUQuB3bVNjgRrjDpC30S4oJrmOleJ6nKJuLCufJRbJXvydLtCYXO5C71XWCbUNgvbrCR0Z
-	M5dmAQYnHNB9YVKY6kxFjCj7wF7OQQRGQR2w7oB2xW+eJWFuoHLKE0sEeVRq5S5mTzYePlZAtBt
-	hFJHwIioF2Sh9wBffh41lrHDuf/Fr6AqR54cvnohIOKMakFo/zAswTNJEQOKDmCVGGw862qjZi8
-	yFgON66Pa2LtKWfAk0IACp1qYWOc0trnfYPRMC6TlmSDnSuGgFTszTSRXLO38LHERRXtU80r9od
-	fnS/pnmpdFZbGZy8IOlX2fKde4MwwC05s91zVVr/fj5b+QZ2mktd48e66EDPUtZgqSGOHi2sgKs
-	tSiWhoJS6YlNE43QIA1SEWUnKFewqWstB4z8cJu9ZM+wHenmJ8dFnxU55RqEfQ3bBLfPd5S/DHR
-	e0MHVcr
-X-Received: by 2002:a05:6000:2dc4:b0:43e:a69b:d804 with SMTP id ffacd0b85a97d-43ea69bda0bmr5821111f8f.29.1776210549308;
-        Tue, 14 Apr 2026 16:49:09 -0700 (PDT)
-Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43ead3d5fd6sm58043f8f.24.2026.04.14.16.49.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Apr 2026 16:49:07 -0700 (PDT)
-Date: Wed, 15 Apr 2026 07:49:02 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/7] ublk: widen ublk_shmem_buf_reg.len to __u64 for 4GB
- buffer support
-Message-ID: <ad7SbiqAtlKlI5xh@fedora>
-References: <20260409133020.3780098-1-tom.leiming@gmail.com>
- <20260409133020.3780098-2-tom.leiming@gmail.com>
- <CADUfDZr39RaLObyXg9sijCOpLF4K2+TZH3ygGiCVxO8aAqwTkw@mail.gmail.com>
+        d=1e100.net; s=20251104; t=1776231053; x=1776835853;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=y9GVkYuXTJNpmm1CRCAA50QlNbF7wx2z6REKbWX7K/s=;
+        b=CzAGuBjDh9Df5QfvtkVQjIJJxsX/0WTS08sSW7GhT1/gvep3wvoslUCehbkTtNitOl
+         0hGW0a/sPWpznz+TzCYUzqf6RBcBlxIhWhDWzDLPxTYsltuhGYFJDzkGHHYGUfZvC3EK
+         QfB6IX3hHfxXZRtweRH90pMcOs+7YkLpHfkCGSCQbEUsek84K+G8kt8X9KmAmFapl2ZU
+         g+2MMLtsPhalLdpQWc70P/DfvPhyvvN2S3xXy4tu6fF1yqN6dfodLmIJ2sw1Vw3EESGs
+         9v4f3TpNKEIc6jn+Hz8ubtDYksa0HgqbvSsxnBs78ko2CKPnlJBX/Y4nsrbujMHrqKhF
+         uxfg==
+X-Forwarded-Encrypted: i=1; AFNElJ9KbnTG2OoALt7Dmrwf3A7mGEmnj/3eqmq+6OMhYvYfsmK7lEbqcbzdU7t7gNgGt5XJcHTWhYVwPnLmYg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYz6FRvObtJKkiU3rafFRjblZ9OAB9FcQ1DYNBifXNyMxvx+D/
+	57pmYadEGHYBeFdCTt1vun9VY6ZULPBFDfUoy/es0d3tz/bvxadWQiXMBsps3tc4
+X-Gm-Gg: AeBDietJzRI9hweRkfyK4dh0p3citfJK3QBm1XsEMD9icI2ygMPz78jDgDKI+OIJdLd
+	nRV0Nc1nn7jLiU/87KS9pM4awkRjCGTUBd6Bxu91jDA6NRwHE42zCMWxGMN7gwPANFnFLMRDSE6
+	K2H5+octqpyb1mhOMHX/xH8Bhe1cxjFHt5G3ZjFJhqWH+O/q9IvpHilU+pO9+6YqqMH4fUPF4KB
+	orpR6hYzvbgzV/0kEiIdhPYH9J/WVwp/rozXz9g6HdLS5WOtY/GuoeDloe/6jw6/zNrV5zX+7Q7
+	1o2RViQoe70KP52CQo+5MqF1+v8B2LzOuOsdu3+1nVhCDaSe05vZFhQEaRWRQzzot47lboj6tJ/
+	Z8G0EnYrOY6JxXuQ5q8A2SgQM3DVO8Hk8Zh5f8TwK73NJpb1TGx4Hia/BFN7pvFgrs+GUzfvYp8
+	/eDlagQ/jf712iNIcAC0rlG4dbwgLkrm6iF02CI6oYdQNSEaPrVxxdQ9Hlw0EMng8ypGMVj8rr4
+	KttOCtCknE+CKSKKYx9cw5WfRWLh1PbHvzsqEApdse0ApQFhDUAasF6T4hZ7p17VmyWfpNWeA==
+X-Received: by 2002:a05:6830:3897:b0:7db:ce20:7f56 with SMTP id 46e09a7af769-7dc27f0b2c8mr11891833a34.19.1776231053254;
+        Tue, 14 Apr 2026 22:30:53 -0700 (PDT)
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com. [209.85.210.43])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc76b95a2csm669609a34.22.2026.04.14.22.30.52
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Apr 2026 22:30:53 -0700 (PDT)
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7dbf23885dfso3860233a34.3
+        for <linux-block@vger.kernel.org>; Tue, 14 Apr 2026 22:30:52 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/BJqK9pITeUZ122oFdtOV9/Aqe5i4Vl88KJCE9Dm0E2lRFWQa/ne6X1KtH046zugMV4Ho0QxU61tyA7g==@vger.kernel.org
+X-Received: by 2002:a05:6830:438a:b0:7d7:ef4a:5ba0 with SMTP id
+ 46e09a7af769-7dc27e5fb9cmr12397641a34.12.1776231052630; Tue, 14 Apr 2026
+ 22:30:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZr39RaLObyXg9sijCOpLF4K2+TZH3ygGiCVxO8aAqwTkw@mail.gmail.com>
+References: <20260206182336.1397715-1-neelx@suse.com> <20260221205606.GA23260@quark>
+ <CAPjX3Fet5M2C=1TDNRhrqmanvJ2=aFdtQXfXK7MuxiOkz2rNUw@mail.gmail.com>
+ <CAEg-Je80=M9nS=Dmj3FiGfXTEP_fDYytAv0ouN_iu+GzRrHp+A@mail.gmail.com> <CAPjX3Ff0=OOWcPHWam0WEGUY-xx860NHQt=igfZ9102-Zj1nOw@mail.gmail.com>
+In-Reply-To: <CAPjX3Ff0=OOWcPHWam0WEGUY-xx860NHQt=igfZ9102-Zj1nOw@mail.gmail.com>
+From: Neal Gompa <neal@gompa.dev>
+Date: Wed, 15 Apr 2026 01:30:15 -0400
+X-Gmail-Original-Message-ID: <CAEg-Je9XevtRv1VLPCQtog6+UrLL32ZWY_TzXVd8mU5Vnp+Nzg@mail.gmail.com>
+X-Gm-Features: AQROBzC34OjCDF6LKBnu6dATulz6eZKfdg2cuV20SScBXwf_3JWh73-Zk-aV9jM
+Message-ID: <CAEg-Je9XevtRv1VLPCQtog6+UrLL32ZWY_TzXVd8mU5Vnp+Nzg@mail.gmail.com>
+Subject: Re: [PATCH v6 00/43] btrfs: add fscrypt support
+To: Daniel Vacek <neelx@suse.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 14, 2026 at 11:40:36AM -0700, Caleb Sander Mateos wrote:
-> On Thu, Apr 9, 2026 at 6:30 AM Ming Lei <tom.leiming@gmail.com> wrote:
+On Sat, Feb 28, 2026 at 2:57=E2=80=AFAM Daniel Vacek <neelx@suse.com> wrote=
+:
+>
+> On Fri, 27 Feb 2026 at 23:26, Neal Gompa <ngompa13@gmail.com> wrote:
+> > On Fri, Feb 27, 2026 at 10:55=E2=80=AFAM Daniel Vacek <neelx@suse.com> =
+wrote:
+> > > On Sat, 21 Feb 2026 at 21:56, Eric Biggers <ebiggers@kernel.org> wrot=
+e:
+> > > > On Fri, Feb 06, 2026 at 07:22:32PM +0100, Daniel Vacek wrote:
+> > > > > Hello,
+> > > > >
+> > > > > These are the remaining parts from former series [1] from Omar, S=
+weet Tea
+> > > > > and Josef.  Some bits of it were split into the separate set [2] =
+before.
+> > > > >
+> > > > > Notably, at this stage encryption is not supported with RAID5/6 s=
+etup
+> > > > > and send is also isabled for now.
+> > > >
+> > > > Where does this series apply to?  There's no base-commit or git tre=
+e,
+> > > > and it doesn't apply to mainline or btrfs/for-next.
+> > >
+> > > Hi Eric,
+> > >
+> > > My apologies, I did not explicitly mention the base. I'll do it next =
+time.
+> > > This was based on for-next @20260127 (commit 80dbfe6512d9c).
+> > > Since then, some changes occurred that will require additional
+> > > touches. No wonder it does not apply anymore.
+> > >
 > >
-> > The __u32 len field cannot represent a 4GB buffer (0x100000000
-> > overflows to 0). Change it to __u64 so buffers up to 4GB can be
-> > registered. Add a reserved field for alignment and validate it
-> > is zero.
-> >
-> > The kernel enforces a default max of 4GB (UBLK_SHMEM_BUF_SIZE_MAX)
-> > which may be increased in future.
-> >
-> > Signed-off-by: Ming Lei <tom.leiming@gmail.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 9 ++++++++-
-> >  include/uapi/linux/ublk_cmd.h | 3 ++-
-> >  2 files changed, 10 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 2e475bdc54dd..ada9a2e32ea9 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -63,6 +63,9 @@
-> >  #define UBLK_CMD_REG_BUF       _IOC_NR(UBLK_U_CMD_REG_BUF)
-> >  #define UBLK_CMD_UNREG_BUF     _IOC_NR(UBLK_U_CMD_UNREG_BUF)
-> >
-> > +/* Default max shmem buffer size: 4GB (may be increased in future) */
-> > +#define UBLK_SHMEM_BUF_SIZE_MAX        (1ULL << 32)
-> > +
-> >  #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
-> >  #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
-> >
-> > @@ -5351,11 +5354,15 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
-> >         if (buf_reg.flags & ~UBLK_SHMEM_BUF_READ_ONLY)
-> >                 return -EINVAL;
-> >
-> > +       if (buf_reg.reserved)
-> > +               return -EINVAL;
-> > +
-> >         addr = buf_reg.addr;
-> >         size = buf_reg.len;
-> >         nr_pages = size >> PAGE_SHIFT;
-> >
-> > -       if (!size || !PAGE_ALIGNED(size) || !PAGE_ALIGNED(addr))
-> > +       if (!size || size > UBLK_SHMEM_BUF_SIZE_MAX ||
-> 
-> Should be >=? Otherwise, LGTM.
+> > When you make your next revision, can you also provide a tag or branch
+> > that I can use to grab the patches for testing? It would be easier for
+> > me than trying to yoink them down from the emails with how many of
+> > them there are...
+>
+> Sure
+>
 
-It should be ">" because we do want to support 4GB size buffer.
+Ping to ask about the refreshed patch set. With 7.0 out the door, it'd
+be nice to have an updated set with feedback addressed...
 
 
-Thanks,
-Ming
+
+--=20
+=E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=EF=
+=BC=81/ Always, there's only one truth!
