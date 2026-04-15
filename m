@@ -1,128 +1,153 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FE738B12D
-	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 13:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776258048; cv=none; b=WjXCMF26LjcQ/ehcWXYWeSnI6fjozvxVnRtf9A21NqLx/N1VTX5Vz9DzrpBLg4uXTl7TkdQzs6XhGxfajWZV8+AXw62v18S443dgX7Io/bx9iNrtcoBnsujMroELU4klM5N2r0O4KyQN1f/PIcLid4bsFZzbc25zqKQsbZ6vPn0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776258048; c=relaxed/simple;
-	bh=35BPFHRsAyeryQP2wvqeIo4z1K6AcrSpVNIQgcBWGjA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k3/Jp4Ice33aLvrouIKeH7DGo6ViWRzPlvZZTZhucAAv/iVgMDvt6KNioYNyaAPg5mtQYjnHepcibzUJLrCTeArdCMkrGC00vpi9nkwu0vRtr6aql91Sz29BjkoNvfuvEoa9iN15svNROtfpXiMlr4z2inTrN26M+jycRmgStEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9ECB2620DE
+	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 13:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776261278; cv=pass; b=i9X4yhEJmj7Y2jphmZUznt0UGLtrA2yQtFUcpaD2u3v2XNXLRlqhIUZocyDTRGaxrQ9y8O4eHHXUCQFjeWBGsaBvGyZoXCvJJY2DTA+yIAlHpo5sDDa9xhNW61b7F73KKt7dLt2qbq0Geb/YVKEFoRLEqYZOMcIeaT3NRjMYBOg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776261278; c=relaxed/simple;
+	bh=jjLEeyfM7aLe72MtknknZ7JoDQX1kZPS4u5VhFIwQr4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PziRSROHR39kcsSzkKFL7Swk2gYdzkCSMszfbEHsRn3CSOfIkOXPcgYfa7qUYcGs0MbSX+5yn69hklS3mJRjoZvtNmBd6nNgswlYxIssr01M9TSVxqUAoFaVi2PjMvXQXfM75cSFru5qdfI7mJVeKZCmioPeOVNbnpySDmposPg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T9wON2fC; arc=pass smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-38dd9f11a09so62128151fa.2
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 06:00:46 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T9wON2fC"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-651cfaa21e6so3056164d50.0
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 06:54:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776261276; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IVbzn3O3cK86fViYuHgIggXoxeOPCveeES1WdTbQD822bXc2Sh3pKry/TUSSSO5Y0A
+         M7clJ4YClY5f8i4gIr8caL+nBCFFMvFEf+O+5s5mi+j9yqsNCRSvTBsZjbdV0TDabqEJ
+         PxpMEb/Lt87zkKTpJz7U4WPkpmwiLU2GAR0CqL6mD8pASoXcavTM2/oSE3r4O6kNaoIW
+         M8GmK0uvuO6AS+XlrQyXHPGRRRdIVEPmBeZXtkgHij7zSV3lYfkVtsUj7rOLQLu/Hf1D
+         OEVZIDPY76s30jCNzcvQctV3Ty+WWSkzZNnZAOZwtZ654S6kCJ+yjG58qSmvixoENp7T
+         QnSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=eiU5+/o+Dy2k6wBYHFotkArhw04FNZIcBj1PufHtM34=;
+        fh=FPmerjXhDCWrF3amy/V8OPjYkJFS/7xzpIiZxXwnEmI=;
+        b=V1SJxKFLrylO8X36Zjw6y2/LuCSovcwdp7Mg4PHX8QFmeQId9dw3ItR0sk8qZgn/k/
+         YV91PFqbv4NMLUYr/bx308WTEO8ALEO/6GqtGFDou+i7URtFN9oJDWS1bD4QGwePQc22
+         gQAf0cZ+bCngszd2LRX6E6oI0WVrxU1Of2SY9IT2boIYYvQzJVrBNlXKnl6IdUMk6VAL
+         VietcSdG7/U+M9sQPIE2pcsGcZ+JOtil+VPlSqp53TBuh3FhRnj0871nJnwnJFTpa727
+         n4LeaAxs2rxmwfPaEHbwEQ9u2FlnO6ek1Vh2taOjcxEnsqIxL4EXfJMCDEciXHVjDXea
+         yjJQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776261276; x=1776866076; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=eiU5+/o+Dy2k6wBYHFotkArhw04FNZIcBj1PufHtM34=;
+        b=T9wON2fCDPGw9DksWKXifsoSol4P1ve9Qeo8Q/3XaynYrD69yJOQiWDOa1QXujuVNP
+         RVrnZ7CFU4vf8FILQMXZO6OMK4skmaQ4K4Nnj7oEr5TodBylZVJDGPREhn23u7Cfc7Ud
+         udq1NCY/mDLSBYnYLx9x6yFvOMYyuXvUzwcDr7sb6cMygCb7rCEFOMMZ1bZTTCSyhPMO
+         PaIUq6KJklraoXCygtGp23pCDKWltZ8No2aNMIXvc6hhYOIOEMt7G4nujMEGR4wFfSeF
+         Ge2BXVDmNny5O8K53Ybkdc16iXnohJty0+LfzCFX1PwFBD0W4MTPqTkWFxl66kCplqVS
+         NH8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776258045; x=1776862845;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1776261276; x=1776866076;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QgomoS20HLCqI2HEt2xjHn1d0Vkw6fKblazGndW4B0c=;
-        b=Ck7Kdc/jEv+/MH7IvMw2+t5FTMtYVI6tn3y7CmfuLBxHEdwq1b3/F7C09WHJw1bKFR
-         jPmC0x17bfMkr6jXcscsPUfCzg7QQT2o8cKIiMfeImJLYhkSMVUpxNwUMGYuuY+48Idf
-         1S2DiacdJejYVZcaAveoTNLV04LGxDswYXH0vNany+2NE1aSauX+7Oz/qOc0+N/jE5Kc
-         l08X8hEDAAsWO6t2B/6+70Xpv59hxmpqKNZbBhoR1ZEWgYJnVr0KnybNxMpYrjaUZ26F
-         VjdSIyXWVFrM62ip3ZupV9YD435knOtHc6SmWMWJ+gAAIiVrinks1N7PjOXCE9UBxZl0
-         oMyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9I/Tv9sAJsp2+3jThDUp1PF50cSUFy75tr84PM0NAF4KypsMvricQ21opcfEFubeK6Z37slB66D2h55Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1xTgqhlqqJ0vX0H+4hVDgX3jL2bMUgjFKOGpx2mMsEYpAgnmg
-	sEJAIHvI/Tc7PWk9ZKIrc8JVGG1ouO2G47U+hdG2g3t8BJvvspuYNomo
-X-Gm-Gg: AeBDieszm38B4mTCvUJ/uy9QDBASsy1OgfX/TOxzjb6AW66A8W/l9LO7wp8pk4tRTJV
-	lVPH7mrPPaHgymcBuv5XadQvtqbHG/GjrVxJYCJZMGayNqL3bn5TCr1eb/e6NIKERxQX1hqm7S7
-	WgtELRcBoi9B5sa3cusChUOTncbnvQv/lHy/RQRxilAJyVown49quNsWmynqf/BIMZlhfFeYs/1
-	ZKUHdb63Jhtnb0qRnCVv9t2Z8uKD5Ky1Jbm2rHyAHOgm0bWmlNlnTx6tXHHKXE7F7k6vpSizWfE
-	pDDCVGiZJC6nR4ynf9IHzsCdqSh2wTIOBit9l/FRwuqn81CobJo+X+kw7QMTEZWguaLZZVa/mzo
-	DhLsLxejDcuK7tJDZ0cIWct4p/5CXTfRZGWQNk03L/yii9NKmaTMl7x37TNMmzP3MTKD6sMrLWG
-	cA/u05Vx9FUja4aUPey2hwmxonn1us1lPKzaG1u7XQ7RAySO11KgaEwFPRdNwyPUkRXEgN
-X-Received: by 2002:a2e:9fcb:0:b0:385:9b50:91a8 with SMTP id 38308e7fff4ca-38e4beea127mr72404191fa.15.1776258044331;
-        Wed, 15 Apr 2026 06:00:44 -0700 (PDT)
-Received: from [10.68.32.41] (bba-86-97-226-202.alshamil.net.ae. [86.97.226.202])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38e9e9b83f4sm4070891fa.9.2026.04.15.06.00.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Apr 2026 06:00:43 -0700 (PDT)
-Message-ID: <8afc6b6b-399e-4f77-82e8-3c0e717f765e@linux.com>
-Date: Wed, 15 Apr 2026 17:00:39 +0400
+        bh=eiU5+/o+Dy2k6wBYHFotkArhw04FNZIcBj1PufHtM34=;
+        b=TwVSF7Q3h+ITDu7fbPsenHaYUtK+Vr/lt5OzA4bQ6cc7fIUm5K8+uOVwuItMU2kUjD
+         WiJhcwCFETSGFcHyumVj9ZdtsKs3SKt9t75USrJjBXICHgNzb3OhnQ2k6Il7Wcd2jE0d
+         1ICo+z7R6R+tb0ceOzKkotelHBXZN/u39rfakSpznZ/Mq5PG8le7wQaThszSWoBQUESY
+         mtKh5Yhd3b8PQRPYLCbXUFixJojLWmfvvFz0Tu7K52mG9S9vi8KWqix4YbKhtEH+p9vn
+         kscJgBK0hi7DgZxv4c1URS0wuBf25+NtErTEUoOYnKLFMJL4w+nCs28fse7Y/v2u/DOB
+         bJQA==
+X-Forwarded-Encrypted: i=1; AFNElJ8ty/L/T+05O/ItX+ydEntXRf9K3svsXM+ZRPZK6/tfO8qA8pMuN9yEvGUPkfMYsvM2WA3jUQOKxVqoqQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBVaJ/cl/m5cKPcDNJUSGbtOMmHvK3UwTxD6pvVJ/mHfpCkgrW
+	Vs405T31pcqGQ8u77Ac2mixEraDXbV4pKEvwxBbxLwEgf8k0fhlUo1Vi2rH+rB2dNkuXeAhSZtH
+	w3aZA/BPBuWDy2SQA4+cqAIuWSv1/gAE=
+X-Gm-Gg: AeBDiesEWUaoetOuEYexWp3fITbCOteXx3cxg1pN1KTn2At7TgPjKd2hcjDsxTM4xgc
+	AR5se9xRInmPu5jhsmBK56dV148oHd8q0Jt3BIfaZwJxEIhhNNagtW3FyBYkgn5A1RM8p+xLFxh
+	4V2EOg+/IaNL3szZ5LIiDVil9dGxsqqHj36OEIEBWUzo+snMpMkfUxKDROg9BsCp9q9b0ZjIvbw
+	Rva5v1+Ugbc+x3FuigXqDoWoR3HPR62djArfaLIsoF2my6gryDzwPGQaj9o1SGNMaSa1xUDyppD
+	+lsiF/R6S9GZTasP7VEZ
+X-Received: by 2002:a05:690e:11cc:b0:64a:d3b2:d3a2 with SMTP id
+ 956f58d0204a3-65199096b59mr16518933d50.27.1776261276068; Wed, 15 Apr 2026
+ 06:54:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH] floppy: fix reference leak on platform_device_register()
- failure
-To: Guangshuo Li <lgs201920130244@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Greg Kroah-Hartman <gregkh@suse.de>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-References: <20260413153114.3040093-1-lgs201920130244@gmail.com>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <20260413153114.3040093-1-lgs201920130244@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260413153114.3040093-1-lgs201920130244@gmail.com> <8afc6b6b-399e-4f77-82e8-3c0e717f765e@linux.com>
+In-Reply-To: <8afc6b6b-399e-4f77-82e8-3c0e717f765e@linux.com>
+From: Guangshuo Li <lgs201920130244@gmail.com>
+Date: Wed, 15 Apr 2026 21:54:21 +0800
+X-Gm-Features: AQROBzDx705EQfjAt7PwyLxjDvSpfcDpFcg8DPIUUm7RnvZjSrOx98S0HD6UZyA
+Message-ID: <CANUHTR9MQ8GGpgtGDgRCmjQL_D0jW4E-2OER4Q784xbGd+nJSw@mail.gmail.com>
+Subject: Re: [PATCH] floppy: fix reference leak on platform_device_register() failure
+To: efremov@linux.com
+Cc: Jens Axboe <axboe@kernel.dk>, Greg Kroah-Hartman <gregkh@suse.de>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Hi Denis,
 
-Thank you for the patch,
+Thank you for the review.
 
-On 13/04/2026 19:31, Guangshuo Li wrote:
-> When platform_device_register() fails in do_floppy_init(), the embedded
-> struct device in floppy_device[drive] has already been initialized by
-> device_initialize(), but the failure path jumps to out_remove_drives
-> without dropping the device reference for the current drive.
-> 
-> Previously registered floppy devices are cleaned up in out_remove_drives,
-> but the device for the drive that fails registration is not, leading to
-> a reference leak.
-> 
-> The issue was identified by a static analysis tool I developed and
-> confirmed by manual review. Fix this by calling put_device() for the
-> current floppy device before jumping to the common cleanup path.
-> 
-> Fixes: 94fd0db7bfb4a ("[PATCH] Floppy: Add cmos attribute to floppy driver")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
-> ---
->  drivers/block/floppy.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index c28786e0fe1c..d9afe495d5c2 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -4724,8 +4724,10 @@ static int __init do_floppy_init(void)
->  		floppy_device[drive].dev.groups = floppy_dev_groups;
->  
->  		err = platform_device_register(&floppy_device[drive]);
-> -		if (err)
-> +		if (err) {
-> +			put_device(&floppy_device[drive].dev);
+On Wed, 15 Apr 2026 at 21:00, Denis Efremov (Oracle) <efremov@linux.com> wrote:
+>
+> 1. Let's use platform_device_put()
+>
+> >                       goto out_remove_drives;
+> > +             }
+> >
+> >               registered[drive] = true;
+> >
 
-1. Let's use platform_device_put()
+My understanding is:
 
->  			goto out_remove_drives;
-> +		}
->  
->  		registered[drive] = true;
->  
+For the platform_device_register() failure case, we should use
+platform_device_put() instead of put_device(), so the failure path
+would look like:
 
-                err = device_add_disk(&floppy_device[drive].dev,
-                                      disks[drive][0], NULL);
-                if (err)
-                        goto out_remove_drives;
+err = platform_device_register(&floppy_device[drive]);
+if (err) {
+        platform_device_put(&floppy_device[drive]);
+        goto out_remove_drives;
+}
+registered[drive] = true;
 
-2. We also need to fix this case.
+>                 err = device_add_disk(&floppy_device[drive].dev,
+>                                       disks[drive][0], NULL);
+>                 if (err)
+>                         goto out_remove_drives;
+>
+> 2. We also need to fix this case.
+>
+> platform_device_unregister()
+> registered[drive] = false;
+> goto ...
+>
+> Thanks,
+> Denis
+We also need to handle the device_add_disk() failure case for the
+current drive, since out_remove_drives only cleans up previously
+registered drives. So this path should explicitly unregister the
+current platform device before jumping to the common cleanup path, for
+example:
 
-platform_device_unregister()
-registered[drive] = false;
-goto ...
+err = device_add_disk(&floppy_device[drive].dev, disks[drive][0], NULL);
+if (err) {
+        platform_device_unregister(&floppy_device[drive]);
+        registered[drive] = false;
+        goto out_remove_drives;
+}
+
+
+Is my understanding correct? If so, I will prepare and send a v2
+following this pattern.
 
 Thanks,
-Denis
+Guangshuo
