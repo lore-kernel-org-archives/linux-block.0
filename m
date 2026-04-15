@@ -1,82 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DA93806C1;
-	Wed, 15 Apr 2026 23:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F5B3093D8
+	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 23:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776294000; cv=none; b=Au5qsoKWIdZZjZPmEd/uphRrcOnKlCsJ5liEz7F0COJbCWVmCeRF+nSeDfWeC5roEeeS3y5/pK4gX6nWqh+1HU7sEQLIyNFrc3Q8tScbZGx5qPy9ZIFTMhvlVrE2H+w67Ivad1JYQRyU84XuDj9cNG4lNmO0ePTnFtQJfNZYLyU=
+	t=1776294185; cv=none; b=QvFxMEkP6nUZgY0pGTcwTnmJTkvNckxPmWr8BDLkO0kC7xbJPZhJERv5jZy450ts+7WuN3tH3qw0K2eywHPqSKh0sfw/tGQLwRr8eWRS2p2g4KlsAQfv52+VOh37KWfU2aVJY2rDTR6yMdaV/XDGkwwq8S6IJjJA7vT1jqb3zIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776294000; c=relaxed/simple;
-	bh=pbHjxXBxSfFS93OsSny5m0eUXvkEUQ2GtUMvPIJHplo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V1oh7ZlPougQc3XJiQOWWOaDOyTAzuH0+iPD6RrlE0zlZoqOLpUFVcigiiMKDrtkiJbR+iX/HT6Xd+v9pSOrczj5DQtneTTCXCZDn0Unud4zKeuzAk8zzsdIWJwmKP1fBbnr/3DwH5UvtcCzVNtDIpsUFpEQiv3IzEjj2MpRx4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/TNMlmG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776294185; c=relaxed/simple;
+	bh=rWX9tLpT439ZkUyU5JSklqfAGi1B5jDjnnNFwOI59c4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JgUKg5u1SzVxMRuzbbbm7/Rsm7PU41WP2mNRg7sGw1lv8xAJAkX1MaMqzN+hZdAc+R1GCoap5Y15XKSCLftSgp6lABOu/CmEFibhIFUTVXv1OWljPu1ubi2Z9ST9Z2BRpG0lMdDCdLhUA+0emjfT4nggDfpHQP3ktM4fhwIFgaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sIvIZw+5; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/TNMlmG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF5E0C19424;
-	Wed, 15 Apr 2026 22:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776294000;
-	bh=pbHjxXBxSfFS93OsSny5m0eUXvkEUQ2GtUMvPIJHplo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j/TNMlmGny4Gie0sWmiUZ7EKMRI4X4jnYiUFS54exgVJswRndm1RPi4K06o5KU9I2
-	 iF8VxrSsfW1uSqkWa4G/hiO6K+pro/9ZYPR1Ns1KleOwa093nd3gw/35y95lz/wVwh
-	 2w07d+6otR478J+gUA1I7OO+xvaX68kK693jH6Ory3kL4KF+95YUQDcQjMKwHId18b
-	 kBoubUoo2eesScgsT4Lwu9KWUSwbBRlfUV9xnVQ9XkpIiPoKqqoMhOG76I1I4cUSWW
-	 BKSYWI7eJvLNZ4k8/tLHgYcdR9uR49VF/YpGVLO0kFOmq8zMTSbQHeWXdY97UWQXhL
-	 2SdYIdMRuGShg==
-Date: Wed, 15 Apr 2026 16:59:58 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: =?iso-8859-1?Q?Tom=E1s?= Trnka <trnka@scm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-	regressions@lists.linux.dev, linux-block@vger.kernel.org
-Subject: Re: [REGRESSION][BISECTED] Spurious raid1 device failure triggered
- by qemu direct IO on 6.18+
-Message-ID: <aeAYbuC5v4AgbakT@kbusch-mbp>
-References: <2982107.4sosBPzcNG@electra>
- <ad-sprBWPA20iola@kbusch-mbp>
- <ad-0LIubzaT8M2_O@kbusch-mbp>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sIvIZw+5"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4888375f735so72934295e9.3
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 16:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776294182; x=1776898982; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VuW0UHujS7FYKmPWpTwO67/jv+KNY8d1Yrmd7Hq3jdo=;
+        b=sIvIZw+5260+Nk6NO/l1sAoyvgrd8aLdLDqs5Sf0DM/Sh9Cwi73V/79jztVQr7UVHw
+         sMZ2SDhtY9mCHerX/zuh46+vDdyIM2uWmB/dH7GYPiWLJo4axG+SG3NSoD/APi+TOGnW
+         wlcGUBJMhpkkSPCwravVbSZnaq/O246JU1fid9CAkU1F5TNsLx3tFgG9Eq7FZNKexrUe
+         xUWXCdlIzTaDHBv5vpCCYnxmGXGMCbJQdFzrs+K2j0gRrVmotj4sQo17eyWDvdFxay5d
+         Gicad8fB7YqapSTQqZ9lMRK++Dz13kx9lxcIKrhzssA3/F3cxvz6PBKfPA2L9xEoPTDQ
+         R3dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776294182; x=1776898982;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VuW0UHujS7FYKmPWpTwO67/jv+KNY8d1Yrmd7Hq3jdo=;
+        b=m1HqC4X+jPdXwYvSbBYab5uHOcDhr7ofi6k0/7JspSj0cFSIcDR8RTUwU32yCHD6jb
+         3fgq8jgDGupKoIJBATGA7gW7yNs45Ujq7s/fYJHYjMsQrjbewmrZReCA3LXV6beIAa6X
+         NWaE01Uk/0gHb2eB+ZeyfUFkNU1A2H0s/3TLeSVBcyv3mgbfNFThSOEHGGqzUs5qqrei
+         6AGnP46IWvWzbbad2/QIklQieZolgyQ7rMrqCUZwy3/IUA8M03acmlQvgJI0VujmGNkO
+         Pl3BnxKjS6R7Kh59tW/Gne+F53VDMen6sor1CbgaEhYjhOM/FfLDMJCRfTDW07j/MeBl
+         qTgQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8m6xT7EhF6TG4bn32ARcY/lIEEDBOMD4tyaiO3hYvW66GOFJKwDMC4/yx8xFJIAyngZQB/lm+4M7e5/A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIrTqKqnr/IA7h2omwwPCge+9vvo0gI+eXpFKvxXJzzbMSmN1F
+	6sXGnwuosjxJ6nusCzoe/JRnAyEbvpBDRMi/SajL8D3E6tBmTPEV87QGDYfAjcAt0NpUgEic
+X-Gm-Gg: AeBDievgYUc4F7hmS7vGiD6hl+UTc8Vrd76sLbQlKF07lhad/fod0GrZTzWM2psQ/2U
+	EFu854V4tV9y5MVUx2ZvWzwgVHJQaiERh12gErqlbHV3QEgx3xRSkDWhxUH6ZsgU1f87IwQZyBY
+	iB3yqBowDRxZhHEOd74ru9r8K7/vTIQmzefU1DyNJuHj80VAZDHsWp5ppHsEk4RkmdBl4PmTKlX
+	+n9ma8NzRElc29OaqldK5qWacxzApLEAJbJJ5hNWdMHzOzAHQTOu1U4Y4PkX6kiCTL+KOdwixXx
+	E5kXxY2B0uemV374QMgp1YVrunIvg0ZIYN/daj4U5AR83yYoxG5Z1U0j1hqRuyTYPdRrUgI0Dx1
+	j9HgQfTOOnbrAzVc3yA+PqdmTcTABsJZVP26Som4tPi2IweDcPFbqEzspXtBvQZxP8bYqXR2elB
+	B/a3zY8+CgqgNBqv4g0yzIAmiL4pQo8YdcpxZJhK8l89cYaGuuci4c
+X-Received: by 2002:a05:600c:3546:b0:488:a82f:bbb0 with SMTP id 5b1f17b1804b1-488d6889a3fmr324983535e9.27.1776294182042;
+        Wed, 15 Apr 2026 16:03:02 -0700 (PDT)
+Received: from fedora ([216.131.111.245])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488f5827145sm5809155e9.13.2026.04.15.16.02.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Apr 2026 16:03:01 -0700 (PDT)
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3] ublk: use unchecked copy helpers for bio page data
+Date: Thu, 16 Apr 2026 07:02:46 +0800
+Message-ID: <20260415230246.808176-1-tom.leiming@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad-0LIubzaT8M2_O@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 15, 2026 at 09:52:12AM -0600, Keith Busch wrote:
-> Suggest the stacking layers shouldn't consider BLK_STS_INVAL to be a
-> device error or retryable.
+From: Ming Lei <ming.lei@redhat.com>
 
-I was able to recreate the reported issue (the key is you have to use
-dm-raid, not md-raid), and the below diff tests successfully for me.
-I'll send a formal patch tomorrow.
+Bio pages may originate from slab caches that lack a usercopy region
+(e.g. jbd2 frozen metadata buffers allocated via jbd2_alloc()).
+When CONFIG_HARDENED_USERCOPY is enabled, copy_to_iter() calls
+check_copy_size() which rejects these slab pages, triggering a
+kernel BUG in usercopy_abort().
 
-> ---
-> diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
-> index c33099925f230..cf1c25f290f36 100644
-> --- a/drivers/md/raid1-10.c
-> +++ b/drivers/md/raid1-10.c
-> @@ -293,8 +293,16 @@ static inline bool raid1_should_read_first(struct mddev *mddev,
->   * bio with REQ_RAHEAD or REQ_NOWAIT can fail at anytime, before such IO is
->   * submitted to the underlying disks, hence don't record badblocks or retry
->   * in this case.
-> + *
-> + * BLK_STS_INVAL means the request itself is malformed (e.g. unaligned
-> + * buffers that violate DMA constraints).  Retrying on another mirror will
-> + * fail the same way, and counting it against the device is wrong.
->   */
->  static inline bool raid1_should_handle_error(struct bio *bio)
->  {
-> -	return !(bio->bi_opf & (REQ_RAHEAD | REQ_NOWAIT));
-> +	if (bio->bi_opf & (REQ_RAHEAD | REQ_NOWAIT))
-> +		return false;
-> +	if (bio->bi_status == BLK_STS_INVAL)
-> +		return false;
-> +	return true;
->  }
-> --
-> 
+This is a false positive: the data is ordinary block I/O content —
+the same data the loop driver writes to its backing file via
+vfs_iter_write().  The bvec length is always trusted, so the size
+check in check_copy_size() is not needed either.
+
+Switch to _copy_to_iter()/_copy_from_iter() which skip the
+check_copy_size() wrapper while the underlying copy_to_user()
+remains unchanged.
+
+Acked-by: Caleb Sander Mateos <csander@purestorage.com>
+Fixes: 2299ceec364e ("ublk: use copy_{to,from}_iter() for user copy")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V3:
+	- rebase & add acked-by tag
+V2:
+	- update commit log (Caleb Sander Mateos)
+
+ drivers/block/ublk_drv.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 603a98a30989..ef8a0705e68b 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1319,10 +1319,18 @@ static bool ublk_copy_user_bvec(const struct bio_vec *bv, unsigned *offset,
+ 
+ 	len = bv->bv_len - *offset;
+ 	bv_buf = kmap_local_page(bv->bv_page) + bv->bv_offset + *offset;
++	/*
++	 * Bio pages may originate from slab caches without a usercopy region
++	 * (e.g. jbd2 frozen metadata buffers).  This is the same data that
++	 * the loop driver writes to its backing file — no exposure risk.
++	 * The bvec length is always trusted, so the size check in
++	 * check_copy_size() is not needed either.  Use the unchecked
++	 * helpers to avoid false positives on slab pages.
++	 */
+ 	if (dir == ITER_DEST)
+-		copied = copy_to_iter(bv_buf, len, uiter);
++		copied = _copy_to_iter(bv_buf, len, uiter);
+ 	else
+-		copied = copy_from_iter(bv_buf, len, uiter);
++		copied = _copy_from_iter(bv_buf, len, uiter);
+ 
+ 	kunmap_local(bv_buf);
+ 
+-- 
+2.53.0
+
