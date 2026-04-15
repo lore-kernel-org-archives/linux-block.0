@@ -1,157 +1,165 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA233D6488
-	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 08:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBB1329C6B
+	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 10:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776243508; cv=pass; b=eDxNNuPWow/Cyfs/dUvWtCIcq2Xi9AOdBa9Xg5gRF+UP9ZzvgeI/Jzt8m7t3OIjl0WfdLl1QcSlGggGW4zxrToJGsvHZNb19WEobGuFaAZCWLDKkcj6DorQQ0MmnIYGI9198wl7yR6wP7mDDLlSreF+TehjB7SlgsALKzczm/kk=
+	t=1776248501; cv=pass; b=CxHNZGOioeKayZ2irRydGgx/nR42aNPcv5aF4kaMV+Pa+K77RgxT5AfgtitKlmKyZJYgkKtf5cWG5dzi8eh2lBKXcnlIgLETYxKU+AtpyZtrX9HtnM9ZPbFrewecsuc/fy82UsprXiNWkHolFEkF/I5uFb5AFtO46edzCKNVg3I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776243508; c=relaxed/simple;
-	bh=NmZn8YaVwP7ozh9+ymcLzBd4heHiFWdC0pHFeYEhGzA=;
+	s=arc-20240116; t=1776248501; c=relaxed/simple;
+	bh=Mp45n7gf0bWphbcLLRl8cG/twkgXRBKxmEorex//enk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RGhuvD1tiFsW1q+mxPJCUnWRfSXFMYYMQNZVtKa7sss3RBkUuVh1nYWsZTMgoS4uMQoxeuZ8JDW8eYFOtkqrTlPiUZkYeVwsURg3X+pH1DQJdrZNUbhBX5VKfA0tazHowvyRLQHWTlSOPUvETaiijyZjO3MyvUchWNhRBbLCFZY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiUPt9CS; arc=pass smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=cHSXrNf1nGEB2vIveI41KmtpJQqySEjBRFvTeYtaS4bxQjD7dnVykL4CCQ7VkBIaBxSjCXVcbUTTyk7DGCLGXDEMdQtywnnDhvgfFqV8ywzBYQMkUb9RVuhI51Ik97sX+KfDc2cpn/MbE8hLADvd3q2IhxyYLidrHWg2ewiLL4s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=JHVfTE2d; arc=pass smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiUPt9CS"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-4670464029eso3684071b6e.2
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 01:58:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776243506; cv=none;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="JHVfTE2d"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-43d04fc3bf2so3929909f8f.3
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 03:21:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776248498; cv=none;
         d=google.com; s=arc-20240605;
-        b=bZqDj6zqVVVKJZnbA8qxW4o0i15WqzRsHUICF2iAEc+MprcjJwVrRu3zammzVu8+0A
-         ZgteJhimIawIon4/HHg7wNc+R+ZJwvCi2xXhho78h0v2uVcXM3sdnieFqZQLIeXadeVc
-         J6gfH1xMuQMdwq+M+eLp9D8e2Y+As+D09HsJlKzQL+lmA/siPWLrlQuTmd/Kvh7iKYaN
-         LcpeUCO9/xLvP5LntkIglz0bgZ0BB/LPvPZ2LVklRqZi1QYwSgLhW/opksR7y5s8VXOu
-         03KFKQUNSdG7Q5XBZ/xVXWQHhjKclPVi+uiFoo/Gjoybxz+dG0fcixprLzZRsoCql/Me
-         1bag==
+        b=jjU6h2I3iZxkvzivElIAeSkG21R4POClBcvg18hbOwZZeRsPxMwv6aRuvIkmmIRlYx
+         tkcDSSwWO9fUw4my+h0VRg2adg3B+YBGzYhJwW0Pv/7D1skLHNrKVFs7t/PB71ldLJ8r
+         XjgevHLeNsNUXA6jTCzJcC7H1tsCS/+D60/Fg8VyJoiGEj2JMdc5/s/y9w/9EYRiskuF
+         QxVPx3zgJpthk4JnHcOYXrhJAybmhBDfSNtctbM5c6+jffeuCI4D0fEXM8QHjyjt//8L
+         bI0Lgg2QAAcxSByoHmuv6QaE+hOE47zo3T5DIG5nnAZfpcZBHriYjlleaXEe8YxRLGF1
+         4uqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=NmZn8YaVwP7ozh9+ymcLzBd4heHiFWdC0pHFeYEhGzA=;
-        fh=UaSsELSt2My9OIXm2r+B5Dy0FMG5V4tGwPiW486750s=;
-        b=Ubsw8xL8/TpdMvyAF8E9vBSH41LdWSqnq7O+3mRWuG3lxBoZKqaP9ObGz3mL8H2/hm
-         +yJNDcxSpfbidYCTPSJigCGH3iklM9Vr3wkYSg08DQf6du+Thfp935Xyk2T3WNIYhjph
-         TeFiszxkkNI9kvU/Xg79ADCUeu8FcZalVk/wQMjvVfacpAFf+7boXmTD6fC2d9xN8vsW
-         hyu14J9aQ9ieK7xXYCIv91Xlx+AdFSty/wO7ZYJRqls383BET1YydpD0LkZ7OSFj55vE
-         CMaxJanKfm6tpiKACKFOXo0QyFCz+S+xPE/LH733JrkwqTirXTlTnOyS3vs7BvkR2TWE
-         La4g==;
+        bh=4jJcnoVEJ7leDnc7X0jMMrtOneFaKOo08VlNndQ70BY=;
+        fh=dA8YLNpAFSdbyeheEBRboJ0pSSSMKzUbApH+6QvawJA=;
+        b=k0rOf5Sq31YHqG2Bk+385xJijK6BknW1SAEw2+z38zPnTFZ04Co7mlYb7V1i96l6Yd
+         AgYRwdavWSkKRCUH7u+VQCGOz10x4mjBSORT2lH1qjBItef7grK1HXQZAY+nlq1sk08x
+         743WIFEwrmWVpOnkWr1KgkiP1aRggm1BgVEstF7aUfaIwmv+v2Pt/plPknizK9M+Pn3p
+         +gEMoy7uEHtWxl4m6yXqYPkiS3+oXjqG2FRWgRlAVaQge02xowIR/jBey7TVXc2VJ9ZE
+         tURERJ5cptULkhJ7mTQNKodvzU1rPTqUDzV+DenM9ulvgqnpVNjfl1e6E0FftXedQ9HP
+         IJYg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776243506; x=1776848306; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1776248498; x=1776853298; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NmZn8YaVwP7ozh9+ymcLzBd4heHiFWdC0pHFeYEhGzA=;
-        b=UiUPt9CSQKWVfDF5vSnsZ26CXWIcvyyKj/UN3qAwB0mKS8FL6WyTdf4hW+59Hw2F5J
-         XlAoQi3UNj6LXVdhkLurd1F78Ypy7SuiCHowYci5ZKo2/IfdZIE4V7ZqnSnaX8N7q6Ao
-         rkSE56TTCPIc27+7QpbOx4vcP2cee8V+2K/OTbSBSnF19GgiN8npX1xtMNqvjpGyGBxE
-         fdFHBui+H9NXExzW8IzAmTiIqp2GSXZA/Lti77acnN2z+2LPCuMzSzyYRS4fVgjuFzmH
-         phDCuhML6PZSdfKEwSJl1q6Jl58u60ewAtealQJqEgbLX3uXPPFYla0DwsMZXNfMJigM
-         x7Mg==
+        bh=4jJcnoVEJ7leDnc7X0jMMrtOneFaKOo08VlNndQ70BY=;
+        b=JHVfTE2dXAhTkYAwprQpbt42op74y45gg7jM8KiRePoLE7Ov2U72wArhD41imnii1H
+         NzTNXCFcSWbmkgW9FLaw/MKB6cy1QNrBBSi6WDHUQVoFNtv4P62iYMYuk93htmsrcd+x
+         JcQy9raiOlbyY/9vGP8iovVI9E70dlG/jAHlbs7+uu+qY8gbtFgiRnaKuxW+FxrPKDhb
+         O5LJ3zy9rTw+UL4IqnCKTFvuNfYfrq3zWOS+COqYkyCPNVYsJZffbvm3Y2t16+PsasEE
+         657rpRFRP1azuUN1EH+d/XWA7vX3c8ijyZU1Z34xk2yRCz0Z/cX4YyNeuqT07FPiN8M6
+         LLzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776243506; x=1776848306;
+        d=1e100.net; s=20251104; t=1776248498; x=1776853298;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=NmZn8YaVwP7ozh9+ymcLzBd4heHiFWdC0pHFeYEhGzA=;
-        b=D371lfgTBs7r2iMojKuCZeXLxA4uNvLl8skL//bA0/rxv/AA0+HpSB9gSGcJx1TGqX
-         qq4Dc66jzkg4ivB+O0xQYvCTkaFNj1lT3QR7O0IK/VIr1K/qd8+saj9cruaDs1L3gAJE
-         1gaEQ0wr2+b+p/kAbkTqJtaSUJgI4UrgRO7t7TzYFjvsUARIFCCmWU9LLPvmMJYYWkQZ
-         XhSQ0xFxIQbG7HQYGhif2YHA/PXo67lQ42VErlNXQmrHA/SEZskrj0a75VgrFhEYWq+q
-         uJeFnrk8NvSjQkzGW+1cxePGTczK80+Rp14sontczhPlnDviudEaJCIIh5D6gUfHQaaw
-         iRrQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8YyfOfL4NvZWcSPr3H7u+Wrma1kLHsJXHAy931TDJYVfD+91fODISzf4rNnSYfoECke2khfov/S0FiFA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpAOryErh6d8WV8IsLaaMtULLmgT5aTfQyzUP0Lw2nhI+IFOPH
-	+p2ufXOyIFDk7koqxkx0HS2QMGR9g9ob8efcw9u23vsSjPtH/ewDMLCsN/higEwbvXgrg7rpvAi
-	I/WbqBURTfbLe+pKd+hRfvDmUpuGS7Vc=
-X-Gm-Gg: AeBDievfd//qomSVXKlJHTDGfOVT6hBxfttL6USck4t5mnKtAnjOm3LNXlDPJ6EJFsm
-	0cSk/iLTP6hX1RiRQ2d7QDn7gzTX6vRcAyqih4mmIS3GePJDrJySpiy67xgwBs1RR83OBW8zw8z
-	ajzxZj0PIG5s7QbEceMbz2sPaXAD7iJYtMT2OGfcFU6Fi5+5JbFhk1RjRvYlBjWRh+3Oc/2Y9dO
-	ttszE7Cx+rJTNMFNJwOanc1Ys3Pgg3MfUBCwbJCG7M/GGP/xeH9S/B7TAKMtpsQMPU+fH9yi3Fm
-	8zSJdWlW4o5cr00X60HM3kf+sfiCtzeFwPso2bguHw==
-X-Received: by 2002:a05:6808:c162:b0:467:91:fb26 with SMTP id
- 5614622812f47-4789f111a6dmr9948231b6e.37.1776243505664; Wed, 15 Apr 2026
- 01:58:25 -0700 (PDT)
+        bh=4jJcnoVEJ7leDnc7X0jMMrtOneFaKOo08VlNndQ70BY=;
+        b=o6ZqRlfeRuPiAm+s+5vKR5VZRxQc2xYhsqbP+QXtDhyYTJrDm5WU+2zheFSJgYeCZT
+         gUW0gnSd72AWscWE1VOq+bpjEXtGOE/v37uI8Z1Ootp4VttS76pSsYpaSmFvLwjXR37M
+         GS7w9E9Bb78EaC3Rqxw6Cu0Qvu0irycZVNOhcgppH5UYpyeVqpNfH/1VbR7R7t/DLIvB
+         yovNSUsQiJol0GRDM9WWR5lzsFiATuvmGFal3f7RxHU0M7mpi66vGWkov0gAkmT/HycO
+         K+NRQN1+SxezeWq7/sNDb6eJSa55Ox0tKE5eiICI/15zr16FtS1dyqvucKYU3MwWP/AF
+         SaIw==
+X-Forwarded-Encrypted: i=1; AFNElJ/f/QmxJVW5e/1WD74WDhbpi6yY2NxvHRkm2wptSuinGNvuXXeaxT6rWS/6wibfirbnA7426AAlvbLwKg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJeyHOVrv9x2NeU/tVSmz7BVdwPyF9rK1LK3J05hAfhQ4mxTqt
+	HWXnG1keBG0hG1bSIcbA0GSMvwSXM6pfpccXpWv2EuF37bbsbFAAnjmChB0wCAh0juTDS9n+r7B
+	qzuDJI2lolvZD+xoofDkQ14pP78pSTYPSwLv8nnYlzA==
+X-Gm-Gg: AeBDiev90gU19t1U2nTSSQ2gi8ZTTjJpwgTYkeNuP/4hlkhgpNRWlVBEXksp8vwinLT
+	NapswbZrty7IcHoRfd3UpjEBEunjxM5ywHe0dDO/cWcoz3DxzydzldEPtNzn6ZMYh/YQHkqWxPj
+	pj1SqSiRBfHPQDhCnZbnM2MF81wxmkmK2/rrOYGg2oT/buBhkuQW9rMeH5F8LuAPrf/DeDj/yQ1
+	J7uHxlqX1Nx0ORcClmgJvr2WVXsbQ5yjsNU1fBHb066hn7kuj0kSrgNHmW60YHsX1+MvoOktbGN
+	JK0f4HnYst8iVqFub8ryc0cjRcnwB9P0GZO2niMQZh2oSEgZ1BxHYQRhRcKs9oiULe11afIkxa9
+	hC0hJbgUPqeUhFXo=
+X-Received: by 2002:a05:6000:4203:b0:43d:9bb5:bd97 with SMTP id
+ ffacd0b85a97d-43d9bb5bfa7mr10883975f8f.8.1776248497809; Wed, 15 Apr 2026
+ 03:21:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <nxe24ixebb4lm2d5w4aubhtwr23df6mumqd663axj35oswdiyv@amtqhtsidyr4>
- <adMoon3Zf6gO-UbA@fedora> <zawhqvn53mcp4wf7axsmuq4cg73upxs5h2zgrfta5dpat3sfy4@zctfbz2ttz5m>
- <CAFj5m9JE5e4DRGbzQFxDdZWU76ZPQ3G+C9JpLu0mhTB6aesZ9g@mail.gmail.com>
- <a566smu6morqeefqal23eek4ibezfuiwhs774xtxhyyclpbtsx@uzzwgbzmwdjd>
- <adhj_w11cpMfeEgN@fedora> <dzpxscrhibmi5okkozf5jfull4dcajgpctldvdyfcjgmpeetk5@tkeyqouyabzy>
- <adpD8M8cNu3IZzEL@fedora> <6glgsbk2djsz4cqtbp2ht4274dw4rveq6fojlnpnuvx6zmpjxw@i43jo2l4qlz4>
- <ad0Hk48y5JEeMlFk@fedora> <20260415083458.UD3cF5IQ@linutronix.de>
-In-Reply-To: <20260415083458.UD3cF5IQ@linutronix.de>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Wed, 15 Apr 2026 16:58:14 +0800
-X-Gm-Features: AQROBzBesZ1I4COKhVLm4yVWD97BVXXbWvhA1t-bSTLWqOPST2qVCo792OkUIh8
-Message-ID: <CACVXFVMPO_JZMSbELnsKzUpXZ7M1sF7cHETUtdqEFT73gn9shA@mail.gmail.com>
-Subject: Re: [PATCH v10 13/13] docs: add io_queue flag to isolcpus
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Aaron Tomlin <atomlin@atomlin.com>, Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk, 
-	kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, mst@redhat.com, 
-	aacraid@microsemi.com, James.Bottomley@hansenpartnership.com, 
-	martin.petersen@oracle.com, liyihang9@h-partners.com, 
-	kashyap.desai@broadcom.com, sumit.saxena@broadcom.com, 
-	shivasharan.srikanteshwara@broadcom.com, chandrakanth.patil@broadcom.com, 
-	sathya.prakash@broadcom.com, sreekanth.reddy@broadcom.com, 
-	suganath-prabu.subramani@broadcom.com, ranjan.kumar@broadcom.com, 
-	jinpu.wang@cloud.ionos.com, tglx@kernel.org, mingo@redhat.com, 
-	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
-	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com, 
-	yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org, 
-	longman@redhat.com, chenridong@huawei.com, hare@suse.de, kch@nvidia.com, 
-	steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com, 
-	mproche@gmail.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, 
-	linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com
+References: <20260206182336.1397715-1-neelx@suse.com> <20260221205606.GA23260@quark>
+ <CAPjX3Fet5M2C=1TDNRhrqmanvJ2=aFdtQXfXK7MuxiOkz2rNUw@mail.gmail.com>
+ <CAEg-Je80=M9nS=Dmj3FiGfXTEP_fDYytAv0ouN_iu+GzRrHp+A@mail.gmail.com>
+ <CAPjX3Ff0=OOWcPHWam0WEGUY-xx860NHQt=igfZ9102-Zj1nOw@mail.gmail.com> <CAEg-Je9XevtRv1VLPCQtog6+UrLL32ZWY_TzXVd8mU5Vnp+Nzg@mail.gmail.com>
+In-Reply-To: <CAEg-Je9XevtRv1VLPCQtog6+UrLL32ZWY_TzXVd8mU5Vnp+Nzg@mail.gmail.com>
+From: Daniel Vacek <neelx@suse.com>
+Date: Wed, 15 Apr 2026 12:21:26 +0200
+X-Gm-Features: AQROBzBSgMMSXj8EtJPvx4T66kG_rnjPScVsioJe9OwbOT5kODIuZAteSeQn6x4
+Message-ID: <CAPjX3Fep5ZYLuSUY+zhewtcBqW84a+qYfLcc-20soDfMjvkecA@mail.gmail.com>
+Subject: Re: [PATCH v6 00/43] btrfs: add fscrypt support
+To: Neal Gompa <neal@gompa.dev>
+Cc: Eric Biggers <ebiggers@kernel.org>, Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 15, 2026 at 4:35=E2=80=AFPM Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
->
-> On 2026-04-13 23:11:15 [+0800], Ming Lei wrote:
-> > > > What matters is that IO won't interrupt isolated CPU.
+On Wed, 15 Apr 2026 at 07:30, Neal Gompa <neal@gompa.dev> wrote:
+> On Sat, Feb 28, 2026 at 2:57=E2=80=AFAM Daniel Vacek <neelx@suse.com> wro=
+te:
+> > On Fri, 27 Feb 2026 at 23:26, Neal Gompa <ngompa13@gmail.com> wrote:
+> > > On Fri, Feb 27, 2026 at 10:55=E2=80=AFAM Daniel Vacek <neelx@suse.com=
+> wrote:
+> > > > On Sat, 21 Feb 2026 at 21:56, Eric Biggers <ebiggers@kernel.org> wr=
+ote:
+> > > > > On Fri, Feb 06, 2026 at 07:22:32PM +0100, Daniel Vacek wrote:
+> > > > > > Hello,
+> > > > > >
+> > > > > > These are the remaining parts from former series [1] from Omar,=
+ Sweet Tea
+> > > > > > and Josef.  Some bits of it were split into the separate set [2=
+] before.
+> > > > > >
+> > > > > > Notably, at this stage encryption is not supported with RAID5/6=
+ setup
+> > > > > > and send is also isabled for now.
+> > > > >
+> > > > > Where does this series apply to?  There's no base-commit or git t=
+ree,
+> > > > > and it doesn't apply to mainline or btrfs/for-next.
+> > > >
+> > > > Hi Eric,
+> > > >
+> > > > My apologies, I did not explicitly mention the base. I'll do it nex=
+t time.
+> > > > This was based on for-next @20260127 (commit 80dbfe6512d9c).
+> > > > Since then, some changes occurred that will require additional
+> > > > touches. No wonder it does not apply anymore.
+> > > >
 > > >
-> > > The isolcpus=3Dmanaged_irq acts as a "best effort" avoidance algorith=
-m rather
-> > > than a strict, unbreakable constraint. This is indicated in the propo=
-sed
-> > > changes to Documentation/core-api/irq/managed_irq.rst [1].
+> > > When you make your next revision, can you also provide a tag or branc=
+h
+> > > that I can use to grab the patches for testing? It would be easier fo=
+r
+> > > me than trying to yoink them down from the emails with how many of
+> > > them there are...
 > >
-> > Yes, it is "best effort", but isolated cpu is only take as effective CP=
-U
-> > for the hw queue's irq iff all others are offline. Which is just fine f=
-or typical
-> > use cases, in which IO isn't submitted from isolated CPU.
+> > Sure
+> >
 >
-> Couldn't we tackle this by limiting the number of managed interrupts the
-> device asks for and then limiting the CPUs it could be bound to?
->
-> So if have house keeping CPUs 0/1 and isolated 2-63 then managed_irq=3D i=
-s
-> futile since it use 64 interrupts and map each to one CPU. Even if the
-> device supports less it would map them evenly across available CPUs.
->
-> If the user wishes to initiate I/O from all CPUs but not be bother by
-> interrupts we could limit the device to ask for 2 interrupts instead of
-> 64 (with the consequence of more queue sharing) and then limit those two
-> interrupts to CPU 0 and 1 instead to CPU 0-31 and 32-63 like it would be
-> now the case.
->
-> Wouldn't that be what the io_queue flag tries to do?
+> Ping to ask about the refreshed patch set. With 7.0 out the door, it'd
+> be nice to have an updated set with feedback addressed...
 
-Yes, that is why I call it one optimization, however it does introduce
-cost of CPU offline failure, please see patch 11.
+Hi Neal,
 
-Thanks,
-Ming Lei
+I wanted to post a new iteration last week but I hit some new issues
+that I'm trying to address now.
+The WIP is here if you want to have a peek:
+
+https://github.com/dvacek/linux-btrfs/tree/fscrypt
+
+Note, I'll be force-updating it later so don't take even the v7 tag
+for granted at this point.
+
+--nX
+
+> --
+> =E7=9C=9F=E5=AE=9F=E3=81=AF=E3=81=84=E3=81=A4=E3=82=82=E4=B8=80=E3=81=A4=
+=EF=BC=81/ Always, there's only one truth!
