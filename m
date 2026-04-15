@@ -1,184 +1,137 @@
-Received: from ext7.scm.com (ext7.scm.com [49.12.148.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB00B274B5F;
-	Wed, 15 Apr 2026 12:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.148.225
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776256018; cv=none; b=CkwW5q8by4UHSBcOJ6HZaX0u5oFj0PVChCcer9myXt6RI6i+6XSgiJAB6BEn6ZqrB1JMZfH/ryHaBoOej1H8WsIMkiszJy0fzM75uLgHT7n2qdsjF4CzG7eCO0WBkuuiO9zQBCHbLlnGjt90WnxmKcJCJbUxgRsN4xi2ozG6UWw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776256018; c=relaxed/simple;
-	bh=K70PtLAFEdD5E6f3cPgyHsL9v7wSeWNvccEtt9eCxu0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JCKVOa4mrYimSD6VgrZX/fLYFLCI6/zRookHISBQCxeVALMgPDoCx5+GNvRfbsoqnaIlTk2H5eg6E0UU6HUiai1UML+oAeL1OU85RyjOPWEYeyds15mo1ZFrO7Xn2Z0rYoPdog7ZoWb+YgaHEnb0uDKknbx9z4FzafBCr9wpNMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=scm.com; spf=pass smtp.mailfrom=scm.com; dkim=pass (4096-bit key) header.d=scm.com header.i=@scm.com header.b=GkMLsYJR; arc=none smtp.client-ip=49.12.148.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=scm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859461DE894
+	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 12:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776257412; cv=pass; b=H6SZfHSqltZFVHH9l6gS5QhxsXq6+1y0zTsBfeObJCeieIQxNaOfGrv9cng7AbA391FpsGFgaYNOVh6xRb8uCLfoOILFFvQ3B6yYhQw2yrRyQoz25ZiqR1Okq2AxKcerU7w377CeE6U0D/GfHPPmJ+fG36WndDM+bAw+XxwPLBw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776257412; c=relaxed/simple;
+	bh=ZP4vSTi237WM7Shkp/cJXygtdRvJMxuMDi0qZjIwYCg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f3CboVJFcRG7P/McTjGJxVBWgmEzmi3sdKNHrSyzstCzs5i9Q3rwtnChAhBe8cBZQHTMuzebP6CdMQQ/sbq9+fUyCPAiCokwe1yNBBTlhJlj20qKqQXE5GBHtx42aNLXQl6qTuaVxQKBanzD0O7G/7f7LRLbdhUCOUW8E0D6A0o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U5iWKqd9; arc=pass smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=scm.com header.i=@scm.com header.b="GkMLsYJR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=scm.com;
-	s=ext7dkim24; t=1776255541;
-	bh=Z+funUawOvx0kphI4JS6fSWSZisN2O3iu4tKcYlmH48=;
-	h=From:To:Cc:Subject:Date:From;
-	b=GkMLsYJR1nNfm951kYcihYfOdVuJqeNAhX/g/rFEnZLw+5rur2ApZIE5nlydoDCTD
-	 hHg2CnsenDDPWiKrgPUYEQ0Mw6pXx5zPH8/xeo9WB2EnHWvWI2KzGj18DfqS4XSghU
-	 0vAAxgnZ1AOyLkOx7tdGJUp3uWzPZAf/kIwLG+OnbitFa9Zhx9pL7jo5PX7b2Y0AR3
-	 eXf5lOe1atppgNkNIeK6csMy4wx/jQmHdMSTGCaOz++2DfylkLgg5EfT1UchzJnGyT
-	 E8gh8Da1imlJkd1zehopCIZCwkousWfeFk4eLdppIusODqlqoEjS6QElbxt8W1VJDR
-	 XxPe9FxU+eFAmPIurlBuPbsNPeM8JzeKhnRBjF2ImOAUOMfpQ63HRI1UHMRyLzAB7W
-	 eUGaQ2xzddjcRIJFXeLQtWVXsvfMqWK4sFxEPqPo1VDTRlI0o795B2uJQl19+f4Sqd
-	 6/AowSnaoIIy7xS7n32yQzBLxWf/jUSSBn8/u+lvd1bCJ1LteYAj4yV7fC3YQN0oyO
-	 ajCXAi/mQNAg/aoixcAzY+dTrE46YkhyiOcOBZdPhxKZBdkUpc3KKf3Pk0u8/zS0oF
-	 wdpPWwxq4wQ6MsCqR7jyUJ5YdAuDLDPOUUpUiSJccocosbhocPkxUiN0W8LshTXZac
-	 6QHul1B6bYZTK8YK8s6qL9xA=
-X-Virus-Scanned: Debian amavisd-new at ext7.scm.com
-From: =?UTF-8?B?VG9tw6HFoQ==?= Trnka <trnka@scm.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org
-Cc: regressions@lists.linux.dev, linux-block@vger.kernel.org,
- Keith Busch <kbusch@kernel.org>
-Subject:
- [REGRESSION][BISECTED] Spurious raid1 device failure triggered by qemu direct
- IO on 6.18+
-Date: Wed, 15 Apr 2026 14:18:59 +0200
-Message-ID: <2982107.4sosBPzcNG@electra>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U5iWKqd9"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8a5800772f3so53802246d6.2
+        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 05:50:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776257410; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KoYs2rS/NaJ941QsFsBE+WSALwPdFh4ZjNyo4HRtqxa4SZu8g435DeHRtz3RQsCPX0
+         CNU/NzPWP4Fvq9A9RJvDvfoJ/r/ypXQzD9clIP4xRCAP/Qe4IcVLnDpsqFRB/C80yOjZ
+         hux1EiEX8wnnnmxvBIRv3ua0JDs3AvS5o9N0k7FcnldZLHRbj0ai3vksvSsMFCSVKciv
+         r7qSOAjrWx0yXfXRQidyMmBOeVpc/Iejf3cG0yxYecfW53o8QCzhJKo6YsNpoBOVFARk
+         cBec+KU/bS3Tpqd17uz9G2kFVIcPwMKf3S0xwBGs1wHejaQHtuX7q80FF7FzVkTa9kV4
+         l+YA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=D4tWC3t3xANgqGsaOz03y9MNl8MWkuRMcvKOFAlOirc=;
+        fh=uEq2rD8sHYdPdwz+Qdk2yEb/c3MZjstBiFp3Um9BtCI=;
+        b=Lt9/xZ1VWdN5HE6O2h9ZEBZw/iP28+//iDwfpWaxONhHIfp0jh2DBKgRr5QiR6l5M3
+         ESEP99fALEfvQSMQANa19F5gespUeQDmMmphrzE5yV0kUeH3Sl4znGYxBB+sgMwYQyJ/
+         ftPNv2evkHWZvDZ/rcJBz3/xdUi5C+AZPE09O8zkhlVHHQXbWZvJYscAlrfogRsi9nGy
+         k79AzKm3JNjFpPz6zKIMtLJooUTtI3alDRT9WUZ3Yime47F5Wb0uwbsdbOfCxm9cr6YO
+         vnj/onixWS+1/+1cFB6k6NIPs3qlTfbBKtGGjdquRUq3rxXf9/jKGOlqGNWRpkn5x9wx
+         Ao3w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776257410; x=1776862210; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=D4tWC3t3xANgqGsaOz03y9MNl8MWkuRMcvKOFAlOirc=;
+        b=U5iWKqd9C7K17mIJA9DrwIPET8xAgSIjI2Dt80xmicSUiKIzaYpxe+gAPBNblAuSWZ
+         DfS+CTLbbUiRFEe/2OIJCdvbn6JwJnQ7g6nGwaiMzvYG92hq04dXUiQCOK0Eoykb2HLd
+         +Lf49ORPa7Evp4kGLefWinL34LJAzskx2Z6snitX1Rv6AVyFHdge0ezE9QLgSPx9zXod
+         FVeuIF7O8omcL+i2V4/a4lCBxO602uRsOUg5W+g+9Qi7EjUTXQTmpBqrC7Sqpf72WvLE
+         bqo3c0owFzf9VVKtgZOxhriAdcbn/sj3rIAfY1XpB/TmMXUbfvX+qQp5Kw3NsVVjO3x2
+         HWBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776257410; x=1776862210;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D4tWC3t3xANgqGsaOz03y9MNl8MWkuRMcvKOFAlOirc=;
+        b=CzBmGpZ551udL/Oif49WLSAZVBoOFQsHbRrCNy+1DQhQuBmZ7bBZyD7DAy7PXv8Qf8
+         z3jXbepshyDHJc5pjYq7HZRF3gw4ljAkbO4YajQfy+PHEiHNm8kXmXlkR23QLT/MQuW3
+         GFCbW0tcSxsC3naI5TFsjcoMnvUmny9PQwcZuO8LDdV3tLvVUujLsTD5ULViLDzBv4+k
+         O6G/IykU00iPIm/zJsmn5Fmb3bKOT61/qJlrQo3Q2NCt8PC9cW190n+ZBhAGMD097Vuv
+         vwmB6GJyI0Dh5NAJ1CBsEjmEbRkTFr9prizyIDaJb4xre29SHtK/deovqvSfs4rKKlnw
+         GSow==
+X-Forwarded-Encrypted: i=1; AFNElJ+WoN5nUu0y/UqS69ukErmivOjGl0qJfrXrz5osSps0kOQQPcYZarkkU0zrryxcamiG18/jY5XaoxkzDQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx419rhbCHCMpibwXa2GKH6Ar/LFsi5J1mitMK+GGhP10ZAfRUS
+	+8Ap6h7eLGNSM0YT56AltyPCMmdRwyBqCpDfTUj/9xFPwQZ4+movkXUkgVv/XkLTGgmPPb5zqxm
+	tas6qkyv/6fhYISjY3SqnoIT/uPzFKq4leZOvJRbc
+X-Gm-Gg: AeBDiet3cBaMhEmy+zMvfOVrylr0Fndl0IM0hylhx1dVhpEo4wUgq5hZnrxnyRTS4Cm
+	sq09k0C8FnoTp69Lv+YgwkMG72AQdectDW+3QW8pju3+QGJv20/qTKcO+SOB2N7cbV+j+L++e8W
+	TmtaKA4ue4qIBJ6MhVEwHhHt7bDQH8M0KCKgt54lzH8hLsVG3uai7lew08vWrIfSdPJ4s1Q6LaV
+	pcQ31tBxmGxaR2YQ+eJ5iXOvQsPkuOwHv7DRT7FZ13EPaAcWo/EyIQrwkjLkaYIXqwqY0t0Mp9Y
+	oVUoAT8RTZshq86ktPElOEmmxnSs
+X-Received: by 2002:a0c:f40e:0:b0:89c:ede4:ea35 with SMTP id
+ 6a1803df08f44-8ac8613e90bmr340193926d6.24.1776257409637; Wed, 15 Apr 2026
+ 05:50:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+References: <20260409160243.1008358-1-hch@lst.de> <20260409160243.1008358-9-hch@lst.de>
+ <adl1iqhldFvJwSw-@dread> <7f0d072b-97a7-405f-bff5-d3819de2e3dd@linux.alibaba.com>
+ <ad2RKNo2FGhpzJQp@dread> <a7a74185-df02-4906-a0ec-f87e2394aa5f@linux.alibaba.com>
+In-Reply-To: <a7a74185-df02-4906-a0ec-f87e2394aa5f@linux.alibaba.com>
+From: Sandeep Dhavale <dhavale@google.com>
+Date: Wed, 15 Apr 2026 05:49:58 -0700
+X-Gm-Features: AQROBzBdnyNeg6M7eBa34eLrstKbL-D014vWbc0uebEOU17jGRgdz997IpSMUAE
+Message-ID: <CAB=BE-SObq4hSO9s36H06eVtZzyj5OBPKJSOOYGJDDD38URN8w@mail.gmail.com>
+Subject: Re: [PATCH 8/8] RFC: use a TASK_FIFO kthread for read completion support
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: Dave Chinner <dgc@kernel.org>, Christoph Hellwig <hch@lst.de>, Tal Zussman <tz2294@columbia.edu>, 
+	Jens Axboe <axboe@kernel.dk>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-Since 6.18, booting a VM that is backed by a raid1 LVM LV makes that LV=20
-immediately eject one of the devices. This is apparently because of a direc=
-t=20
-IO read by QEMU failing. I have bisected the issue to the following commit =
-and=20
-confirmed that reverting that commit (plus dependencies=20
-9eab1d4e0d15b633adc170c458c51e8be3b1c553 and=20
-b475272f03ca5d0c437c8f899ff229b21010ec83) on top of 6.19.11 fixes the issue.
+> Basically what we want is to get a non-atomic context instead of
+> using the current softirq context for read post-processing and
+> switch to the task context immediately as you said, because:
+>
+>   - Our post-processing needs to work in task contexts since
+>     advanced features like compression deduplication need it;
+>
+>   - Even regardless of our specific requirement needing task
+>     contexts, using a dedicated task context for read
+>     post-processing is much better than run in the original
+>     softirq context:
+>
+>     - Algorithmic work could take extra time (especially slow
+>       LZMA algorithm could take milliseconds on low devices
+>       (however, we need a common workflow for all algorithms,
+>       including fast algorithms like lz4) and verify work for
+>       example); and long processing time will interfere with
+>       other remaining softirq tasks like sound-playback
+>       / network softirqs;
+>
+>     - If it is then deferred to softirqd, it just makes this
+>       latency issue _worse_.
 
-commit 5ff3f74e145adc79b49668adb8de276446acf6be
-Author: Keith Busch <kbusch@kernel.org>
-Date:   Wed Aug 27 07:12:54 2025 -0700
+Yes, this was the reasoning when I narrowed it down to per-CPU
+kthread approach. Patch has helped reduce app launch times which
+has a direct user impact.
 
-    block: simplify direct io validity check
-   =20
-    The block layer checks all the segments for validity later, so no need
-    for an early check. Just reduce it to a simple position and total length
-    check, and defer the more invasive segment checks to the block layer.
-   =20
-    Signed-off-by: Keith Busch <kbusch@kernel.org>
-    Reviewed-by: Hannes Reinecke <hare@suse.de>
-    Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-    Reviewed-by: Christoph Hellwig <hch@lst.de>
-    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>
+> But anyway, I think nice -19 can be evaluated if Sandeep have time,
+> but such nice value should be set by the filesystem instead of
+> the userspace since the reason is as above.
+>
 
-The issue looks like this:
+I will find some time to re-do this again, including setting nice -19.
 
-md/raid1:mdX: dm-17: rescheduling sector 0
-md/raid1:mdX: redirecting sector 0 to other mirror: dm-17
-(snipped 9 repeats of the preceding two lines)
-md/raid1:mdX: dm-17: Raid device exceeded read_error threshold [cur 21:max =
-20]
-md/raid1:mdX: dm-17: Failing raid device
-md/raid1:mdX: Disk failure on dm-17, disabling device.
-md/raid1:mdX: Operation continuing on 1 devices.
-
-There's absolutely nothing wrong with the HW, the issue persists even when =
-I=20
-move the mirrors to a different pair of PVs (SAS HDD vs SATA SSD).
-
-The following command is enough to trigger the issue:
-
-/usr/bin/qemu-system-x86_64 -blockdev '{"driver":"host_device","filename":"/
-dev/vg_mintaka/lv_test","aio":"native","node-name":"libvirt-1-storage","rea=
-d-
-only":false,"discard":"unmap","cache":{"direct":true,"no-flush":false}}'
-
-According to blktrace below, this seems to be an ordinary direct IO read of=
-=20
-sectors 0-7, but I can't reproduce the issue emulating such a read with dd.
-
-The beginning of blktrace for dm-20 (mirror LV):
-
-252,20   0        3     0.050436097 17815  Q  RS 0 + 8 [qemu-system-x86]
-252,20   4        1     0.053590884 17179  C  RS 0 + 8 [65531]
-252,20   9        1     0.071942534 17843  Q  RS 0 + 1 [worker]
-252,20  10        1     0.077792770 10803  C  RS 0 + 1 [0]
-
-for dm-17 (one of the legs of the raid1 mirror):
-
-252,17   0        3     0.050441207 17815  Q  RS 0 + 8 [qemu-system-x86]
-252,17   0        4     0.050465318 17815  C  RS 0 + 8 [65514]
-252,17   4        1     0.050491948 17179  Q  RS 0 + 8 [mdX_raid1]
-252,17  12        1     0.050695772 12662  C  RS 0 + 8 [0]
-
-for sda1 that holds that leg (raid1 LV on dm-crypt on sda1; bfq messages=20
-snipped):
-
-  8,0    0        7     0.050453828 17815  A  RS 902334464 + 8 <- (252,5)=20
-902301696
-  8,0    0        8     0.050453988 17815  A  RS 902336512 + 8 <- (8,1)=20
-902334464
-  8,1    0        9     0.050454158 17815  Q  RS 902336512 + 8 [qemu-system-
-x86]
-  8,1    0       10     0.050455058 17815  C  RS 902336512 + 8 [65514]
-  8,0    4        1     0.050490699 17179  A  RS 902334464 + 8 <- (252,5)=20
-902301696
-  8,0    4        2     0.050490849 17179  A  RS 902336512 + 8 <- (8,1)=20
-902334464
-  8,1    4        3     0.050491009 17179  Q  RS 902336512 + 8 [mdX_raid1]
-  8,1    4        4     0.050498089 17179  G  RS 902336512 + 8 [mdX_raid1]
-  8,1    4        5     0.050500129 17179  P   N [mdX_raid1]
-  8,1    4        6     0.050500939 17179 UT   N [mdX_raid1] 1
-  8,1    4        7     0.050507439 17179  I  RS 902336512 + 8 [mdX_raid1]
-  8,1    4        8     0.050531999   387  D  RS 902336512 + 8 [kworker/4:1=
-H]
-  8,1   15        1     0.050668902     0  C  RS 902336512 + 8 [0]
-
-for sdb1 (backing the other leg of the mirror):
-
-  8,16   4        1     0.053558754 17179  A  RS 902334464 + 8 <- (252,4)=20
-902301696
-  8,16   4        2     0.053558884 17179  A  RS 902336512 + 8 <- (8,17)=20
-902334464
-  8,17   4        3     0.053559024 17179  Q  RS 902336512 + 8 [mdX_raid1]
-  8,17   4        4     0.053559364 17179  C  RS 902336512 + 8 [65514]
-  8,17   4        0     0.053570484 17179 1,0  m   N bfq [bfq_limit_depth]=
-=20
-wr_busy 0 sync 1 depth 48
-  8,17   4        5     0.053578104   387  D  FN [kworker/4:1H]
-  8,17  15        1     0.053647696 17192  C  FN 0 [0]
-  8,17  15        2     0.053815039   567  D  FN [kworker/15:1H]
-  8,17  15        3     0.053872560 17192  C  FN 0 [0]
-
-=46ull logs can be downloaded from:
-https://is.muni.cz/de/ttrnka/qemu-dio-raid1-fail/dmesg.log
-https://is.muni.cz/de/ttrnka/qemu-dio-raid1-fail/mapped-devs.lst
-https://is.muni.cz/de/ttrnka/qemu-dio-raid1-fail/blktrace.tar.gz
-
-lsblk output (from a different boot, minors might not match mapped-devs.lst=
-):
-
-https://is.muni.cz/de/ttrnka/qemu-dio-raid1-fail/lsblk-t.out
-https://is.muni.cz/de/ttrnka/qemu-dio-raid1-fail/lsblk.out
-
-I can share any other info or logs, test patches, or poke around with ftrac=
-e=20
-or systemtap as needed.
-
-#regzbot introduced: 5ff3f74e145adc79b49668adb8de276446acf6be
-
-Best regards,
-
-Tom=C3=A1=C5=A1
-=2D-=20
-Tom=C3=A1=C5=A1 Trnka
-Software for Chemistry & Materials B.V.
-De Boelelaan 1109
-1081 HV Amsterdam, The Netherlands
-https://www.scm.com
-
-
-
+-Sandeep.
