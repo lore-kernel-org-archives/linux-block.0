@@ -1,171 +1,82 @@
-Received: from mail-qk1-f225.google.com (mail-qk1-f225.google.com [209.85.222.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B34373C04
-	for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 21:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DA93806C1;
+	Wed, 15 Apr 2026 23:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776287347; cv=none; b=k1ujOrjyWBinsu/DGiT+/5dcIINq/ohaoOdMia8g1X+iKselXlXz27XnGOudKHtcLz8csRYdZIC7nKTqci6Ja97i2v3vFu0aY990DkUTikFLYNCLyVdjJUEzOGs2tcinsrA3F++nK3CH7jZxqaldBZxXaNp5+zqpw2muXd3wTTE=
+	t=1776294000; cv=none; b=Au5qsoKWIdZZjZPmEd/uphRrcOnKlCsJ5liEz7F0COJbCWVmCeRF+nSeDfWeC5roEeeS3y5/pK4gX6nWqh+1HU7sEQLIyNFrc3Q8tScbZGx5qPy9ZIFTMhvlVrE2H+w67Ivad1JYQRyU84XuDj9cNG4lNmO0ePTnFtQJfNZYLyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776287347; c=relaxed/simple;
-	bh=l7fTE9VlEFfSmy2pkBm+F7/Ddm+IndMlmmOpoX2i7Zs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ikHDwqWQ2bqFdYJnTYSleMyYDwDVlERBPmrlRAOqoaHZzLD12PJoi7YbmzOca8n7IbUyOowOlE6LmrYcsMEUAxQEQZybtiy6EG6FdwxZ7byR/zdPtV8gC/+kTxafzZFkRwL+SdV6zy53KQ8qGH1aSqq2QmHlQbsyswva3REgeIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZEfZBtoi; arc=none smtp.client-ip=209.85.222.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1776294000; c=relaxed/simple;
+	bh=pbHjxXBxSfFS93OsSny5m0eUXvkEUQ2GtUMvPIJHplo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V1oh7ZlPougQc3XJiQOWWOaDOyTAzuH0+iPD6RrlE0zlZoqOLpUFVcigiiMKDrtkiJbR+iX/HT6Xd+v9pSOrczj5DQtneTTCXCZDn0Unud4zKeuzAk8zzsdIWJwmKP1fBbnr/3DwH5UvtcCzVNtDIpsUFpEQiv3IzEjj2MpRx4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/TNMlmG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZEfZBtoi"
-Received: by mail-qk1-f225.google.com with SMTP id af79cd13be357-8cfbd15ce4aso100626085a.1
-        for <linux-block@vger.kernel.org>; Wed, 15 Apr 2026 14:09:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1776287345; x=1776892145; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=clfooq9Q24UaZz/+kvIBa0YK7z/4tl+VbHOgN6J1VGk=;
-        b=ZEfZBtoijdDo4e4egBrTPZihkg6LaDGXyoiPw8v2UCGMkaTLCXwYdFg4GgsCn+7A04
-         FfZ7xdOp3Cj5mrWyhBgxeKSU7tsikrCBilykb3xLVuSe1kO2xkURBFA6Slek3hogtlw/
-         /DRlWuaJ3CgTh5LfdHvFe6lSBM73wxkvSZCmS1zvG+Zjb5wtNB5hxScHAPlP9Vy4+oSN
-         xyMB+NeQUgGmhgmE7PO+JU5BN/HUr40Nnxadxfj74FRNICEmYuQp1ztobTao2fiOsyIA
-         Kpd9STeUbR2G/xB/gWnK0vzUI7LUu2vqIhzyvV4rAQjXyEkjE6uPtn1XSTxVMLv03MsK
-         vqHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776287345; x=1776892145;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=clfooq9Q24UaZz/+kvIBa0YK7z/4tl+VbHOgN6J1VGk=;
-        b=mRTZgZXGIXVXohWow3s1VUtXsS/yJaDXau6wz8i5hkGxzSWjEHfYXjzk2TXg+jpTIY
-         2w4HvKj70aj+t4t1UJybH0GGDryscYyAC+3dMTxN8pVBK3ReqD+D1NjuaaK4d5KyOdEM
-         t5lzHNPTU9gXcrdavDOAjqN1+jFoduDKQZ0uzCl766U0CCU7ZmVk4yKXTAmVNX+jdiz1
-         gtt4oz8T6hVY+aHRJoTgAxQmpC8NozkOoEq/AiCL2pJByhwU3ceImq4CI3Q4exdLdV7t
-         X4MfGhBnyzIeuFZ4bo3cJ619bpwm24nEWSsQ4vBWjxE+PL38AJr7vlMEHGFCANhwktPU
-         bcxQ==
-X-Gm-Message-State: AOJu0Yxoe8PrBv4vP+4+f20wzpDBXsZQO1uKzyVOpm5GHJqPNS137YTs
-	jSgeauY9kfLoJKJHYnGlO68lTHWvqfapDv5wlmP1RMUWL1XsXxGwUaWuVla3Pfd1M2aPdmXjo8T
-	+T97moUTTNNxiJxI/+1jUVGQ8rBj2KcaCPWWn
-X-Gm-Gg: AeBDietvOM/jPMRrq/ABg0wffM0JfxMu/zcbflHLuEhZztPAapNf3wxNpsGX4hdyvfL
-	Da9hz0wwg1RzQkHc3a4psUANQrBJus108HwI/FyDOl2ToSo4tCNm2W3+BcaNeC4IGNhCsg+MfMj
-	D8NJBgXd6b8AJHVyNXouizlAd3BrxH8pQ7nVeZYaaiV4bkVJ0u7qH2szkI3AX7AdqajDRteCgnp
-	mpZXJfsLG2HNXoHFVl66jD2b/E3BeTpug4oLg32fPEn9hZMsPDdbJNzykESEzlNm71DopQqSSEI
-	O6Uq/RvBjrFYjBw3V0f5EZyiNe3WZsR+f6jqdjoCv+Vvm8+BAg04q62H0otJ8SwzvcP9HfrX22i
-	4LGijsct34BnEvuXwry9+8EosCz2pRGERUw6QRxM0Q8tNCOtKmZYeOBq1R0EYl3h7
-X-Received: by 2002:ad4:5bc7:0:b0:89a:46fd:3001 with SMTP id 6a1803df08f44-8ae6a7661a6mr54472946d6.0.1776287344509;
-        Wed, 15 Apr 2026 14:09:04 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8ae6cbb3922sm2142356d6.23.2026.04.15.14.09.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Apr 2026 14:09:04 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id DD78F34078F;
-	Wed, 15 Apr 2026 15:09:03 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id D1C18E496F7; Wed, 15 Apr 2026 15:09:01 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Anuj Gupta <anuj20.g@samsung.com>
-Subject: [PATCH v2] t10-pi: reduce ref tag code duplication
-Date: Wed, 15 Apr 2026 15:08:47 -0600
-Message-ID: <20260415210847.1730016-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/TNMlmG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF5E0C19424;
+	Wed, 15 Apr 2026 22:59:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776294000;
+	bh=pbHjxXBxSfFS93OsSny5m0eUXvkEUQ2GtUMvPIJHplo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j/TNMlmGny4Gie0sWmiUZ7EKMRI4X4jnYiUFS54exgVJswRndm1RPi4K06o5KU9I2
+	 iF8VxrSsfW1uSqkWa4G/hiO6K+pro/9ZYPR1Ns1KleOwa093nd3gw/35y95lz/wVwh
+	 2w07d+6otR478J+gUA1I7OO+xvaX68kK693jH6Ory3kL4KF+95YUQDcQjMKwHId18b
+	 kBoubUoo2eesScgsT4Lwu9KWUSwbBRlfUV9xnVQ9XkpIiPoKqqoMhOG76I1I4cUSWW
+	 BKSYWI7eJvLNZ4k8/tLHgYcdR9uR49VF/YpGVLO0kFOmq8zMTSbQHeWXdY97UWQXhL
+	 2SdYIdMRuGShg==
+Date: Wed, 15 Apr 2026 16:59:58 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: =?iso-8859-1?Q?Tom=E1s?= Trnka <trnka@scm.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+	regressions@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: [REGRESSION][BISECTED] Spurious raid1 device failure triggered
+ by qemu direct IO on 6.18+
+Message-ID: <aeAYbuC5v4AgbakT@kbusch-mbp>
+References: <2982107.4sosBPzcNG@electra>
+ <ad-sprBWPA20iola@kbusch-mbp>
+ <ad-0LIubzaT8M2_O@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad-0LIubzaT8M2_O@kbusch-mbp>
 
-t10_pi_ref_tag() and ext_pi_ref_tag() are identical except for the final
-truncation of the ref tag to 32 or 48 bits. Factor out a helper
-full_pi_ref_tag() to return the untruncated ref tag and use it in
-t10_pi_ref_tag() and ext_pi_ref_tag().
+On Wed, Apr 15, 2026 at 09:52:12AM -0600, Keith Busch wrote:
+> Suggest the stacking layers shouldn't consider BLK_STS_INVAL to be a
+> device error or retryable.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
----
-v2:
-- Move full_pi_ref_tag() earlier (Christoph)
-- Use lower_32_bits() (Christoph)
+I was able to recreate the reported issue (the key is you have to use
+dm-raid, not md-raid), and the below diff tests successfully for me.
+I'll send a formal patch tomorrow.
 
- include/linux/t10-pi.h | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
-
-diff --git a/include/linux/t10-pi.h b/include/linux/t10-pi.h
-index 2c59fe3efcd4..b6c2496866ea 100644
---- a/include/linux/t10-pi.h
-+++ b/include/linux/t10-pi.h
-@@ -2,10 +2,11 @@
- #ifndef _LINUX_T10_PI_H
- #define _LINUX_T10_PI_H
- 
- #include <linux/types.h>
- #include <linux/blk-mq.h>
-+#include <linux/wordpart.h>
- 
- /*
-  * A T10 PI-capable target device can be formatted with different
-  * protection schemes.	Currently 0 through 3 are defined:
-  *
-@@ -23,10 +24,20 @@ enum t10_dif_type {
- 	T10_PI_TYPE1_PROTECTION = 0x1,
- 	T10_PI_TYPE2_PROTECTION = 0x2,
- 	T10_PI_TYPE3_PROTECTION = 0x3,
- };
- 
-+static inline u64 full_pi_ref_tag(const struct request *rq)
-+{
-+	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
-+
-+	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
-+	    rq->q->limits.integrity.interval_exp)
-+		shift = rq->q->limits.integrity.interval_exp;
-+	return blk_rq_pos(rq) >> (shift - SECTOR_SHIFT);
-+}
-+
- /*
-  * T10 Protection Information tuple.
-  */
- struct t10_pi_tuple {
- 	__be16 guard_tag;	/* Checksum */
-@@ -37,16 +48,11 @@ struct t10_pi_tuple {
- #define T10_PI_APP_ESCAPE cpu_to_be16(0xffff)
- #define T10_PI_REF_ESCAPE cpu_to_be32(0xffffffff)
- 
- static inline u32 t10_pi_ref_tag(struct request *rq)
- {
--	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
--
--	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
--	    rq->q->limits.integrity.interval_exp)
--		shift = rq->q->limits.integrity.interval_exp;
--	return blk_rq_pos(rq) >> (shift - SECTOR_SHIFT) & 0xffffffff;
-+	return lower_32_bits(full_pi_ref_tag(rq));
- }
- 
- struct crc64_pi_tuple {
- 	__be64 guard_tag;
- 	__be16 app_tag;
-@@ -62,14 +68,9 @@ static inline u64 lower_48_bits(u64 n)
- 	return n & ((1ull << 48) - 1);
- }
- 
- static inline u64 ext_pi_ref_tag(struct request *rq)
- {
--	unsigned int shift = ilog2(queue_logical_block_size(rq->q));
--
--	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
--	    rq->q->limits.integrity.interval_exp)
--		shift = rq->q->limits.integrity.interval_exp;
--	return lower_48_bits(blk_rq_pos(rq) >> (shift - SECTOR_SHIFT));
-+	return lower_48_bits(full_pi_ref_tag(rq));
- }
- 
- #endif
--- 
-2.45.2
-
+> ---
+> diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
+> index c33099925f230..cf1c25f290f36 100644
+> --- a/drivers/md/raid1-10.c
+> +++ b/drivers/md/raid1-10.c
+> @@ -293,8 +293,16 @@ static inline bool raid1_should_read_first(struct mddev *mddev,
+>   * bio with REQ_RAHEAD or REQ_NOWAIT can fail at anytime, before such IO is
+>   * submitted to the underlying disks, hence don't record badblocks or retry
+>   * in this case.
+> + *
+> + * BLK_STS_INVAL means the request itself is malformed (e.g. unaligned
+> + * buffers that violate DMA constraints).  Retrying on another mirror will
+> + * fail the same way, and counting it against the device is wrong.
+>   */
+>  static inline bool raid1_should_handle_error(struct bio *bio)
+>  {
+> -	return !(bio->bi_opf & (REQ_RAHEAD | REQ_NOWAIT));
+> +	if (bio->bi_opf & (REQ_RAHEAD | REQ_NOWAIT))
+> +		return false;
+> +	if (bio->bi_status == BLK_STS_INVAL)
+> +		return false;
+> +	return true;
+>  }
+> --
+> 
