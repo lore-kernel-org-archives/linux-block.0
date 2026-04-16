@@ -1,260 +1,87 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E9330C608;
-	Thu, 16 Apr 2026 06:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776321603; cv=fail; b=XDZCG8S6bTZaGAZXxpmxfVgCnUYVLWX/HJGdOyfGVEtj6xIGMv/ecB7pzOBWNkk30Y/xLzEUbWwnW8++2AXDx1zoo9oLcy40212S63p+IC6yqWIMssAMqRQf6fa3AnWq1QIrMu7LxB52gPE+/OS4HjEL1dRednUCUqt8K5/U4Bo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776321603; c=relaxed/simple;
-	bh=sOvftSr8hvESe+OZLhfAEkKTr0PNxfBKAtJaDMaYZFk=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=DmjB6kkPmJpKm2obPNZ7YB6kanj+wPuVsKkl5L9LdKSJ+ubmTelGZ85YxfOB7LAZte/MesYSHPX0Udk9NYA0eu8GPkJYtx09Ah49jmojF94z8FrQJpn2pPNgXqUi5v0/oT+HNTnmZHolZ6+MbLVRygBREjBmo8+EkWE+Wi6QHjY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=ShF3aWhJ; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=XdXswdwm; arc=fail smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C48B303A0A
+	for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 07:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776323285; cv=none; b=FwScIEX/bVbmTLNmA9tvi4kTMjv8qh66USw0BkNW6F9rLqJ+9CcfiONh23zZVlEHuFXGAboGWuUXtvsgndJVEnjTo3X+5UFC0UmSVJczyYig8Oy9l7EcqDhyVxi8D7Nkhq3ebpLZrj8FOIoCEadGa4PGheBO3tvJexnvI08FwTg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776323285; c=relaxed/simple;
+	bh=bAphQT/frAJ66aJxvN3V0iUcLODceJw3lz9oXrdkZII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nbxb24KnCzlR6sT8hjM+1jM5Wa6VVrOi38KKCmV5a3E2gcJ97FCw/G5gYo70MlNE7SIIjhSc12BxVuHxZPWica1ZFIz6Kbde3BYiAj3+S2lqKPFF02VyXuvhdnNoPWP1aiejChJGvqEmTypm2y3wfGrf9ZCtkZEk/r3kjru0llQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=TGpBn7oy; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ShF3aWhJ";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="XdXswdwm"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1776321602; x=1807857602;
-  h=from:to:subject:date:message-id:content-id:
-   content-transfer-encoding:mime-version;
-  bh=sOvftSr8hvESe+OZLhfAEkKTr0PNxfBKAtJaDMaYZFk=;
-  b=ShF3aWhJ7cJk9o+C0nxgxOcjCMml9Y604qhAMSmFjWfJ95J+cudZQIp5
-   B8QqhRYfoz5HyymNaE/mE1A/D/+S+t1STPOd3gCX3EOrzIL4L4aZQ34dQ
-   NngXTb93TJ1sp4WXG9Ww83Fo3NVoWRcDRortsHnKXkCa2vXnk0JtOiw67
-   qX9Cr72j5J1UHtLhGh7TiUn4xOOZ9CWI6z7Fsfjidi3CUIO1bzzuz+62D
-   bZQ3DYaUhIETt2W+WTk701ULq+ppFHV4ZUAr+oM1UtK6DkOuikofVBEiY
-   YXcI4yRhK3jPmgUMfGWqEXpzsL8Hxzf5XVDnu9On0ICx1CGLP8nZo9N9Q
-   A==;
-X-CSE-ConnectionGUID: LHL2HxsETp+qcULeUvA4jA==
-X-CSE-MsgGUID: vW/298JSQ0W27olEU279Qg==
-X-IronPort-AV: E=Sophos;i="6.23,181,1770566400"; 
-   d="scan'208";a="144619433"
-Received: from mail-westus3azon11010025.outbound.protection.outlook.com (HELO PH7PR06CU001.outbound.protection.outlook.com) ([52.101.201.25])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Apr 2026 14:39:55 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QkzBJTX8z1c7P7Hu9or5km6aT0y3LWsBLuLFe10Ah9SuSMyJsSs5O635eWiP2RPXLmr1yHDFwqWHyTvZ+nkp+GbFO8/u/AHUFDRq4VlgxD0z54AKkezY4C/iYJGHhV+fx4OIvC0CRE2yYPtT6g5nRITbnF9d/KW/tkBXqjTkbyy1qZgT14TffNHs6hsluvs9U47pKCbiiOhvaLC9pmWF/iIO/+TctQnIPfgZY0njvuInkW8d/7GuOtyhqrOKjFUbCl/vc4n/dlGi3isKpXYoGPEqCZ6U+LGcCcAYtHIU+nb9SiG1XauFwR6Jxmax27l4a7FVnKstYdb0IhK4f2SVlw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qCWykaewaOkU0KsQqQMBxaI/9URgKBC3eTUp7msqMLg=;
- b=n0Db2OX5qTRcr8UlxmOWwzJtoQUhCsm5BK8/JjEmjdO+rbOeQhVjOhMDsGblXaQni7u6QmV3bUGanyrMrgBOab5KRiCVuM9I6oqoqbtGkm6Ur+S5mAI7vGE773twThiznggjkbcmbqHROsWpSePGswKu425QLpmJci3ASXb/ww+mC3HAObnVzLbmzi1O4OtP92Iq6svtD7DxssLYW9DO/bIbStu1b+2msLOtcZTxrrKLvZiJavf8Lwr+69oVXCK+631GZUwsYj2Gsz66NufwZOhVCjpdLpUcrHgfwr+kR73YMwq0E2VXLRbje+1fIywTSrcSc//vAlVbaJnCyvWicg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TGpBn7oy"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82f41fce3e6so2044124b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 00:08:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qCWykaewaOkU0KsQqQMBxaI/9URgKBC3eTUp7msqMLg=;
- b=XdXswdwmcg8WiOXtKDRbtd4bWfgbWVhZM+GBEnQI09uRkqlGj41qEFRVjnsN1RhRbDbn9Rm+/3KFFMeP+YBuby/d0dTWUhLxmIZjBFVSho60Wi23OrS4aV9tkTiuOozWawE1AsTxOq234A/sDusAelmoRN/39R2GWr4kja3/imA=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by MW6PR04MB8881.namprd04.prod.outlook.com (2603:10b6:303:247::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Thu, 16 Apr
- 2026 06:39:53 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9769.046; Thu, 16 Apr 2026
- 06:39:53 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>
-Subject: blktests failures with v7.0 kernel
-Thread-Topic: blktests failures with v7.0 kernel
-Thread-Index: AQHczWvUD0+ZsAHQ0U2NzyLBL90meg==
-Date: Thu, 16 Apr 2026 06:39:52 +0000
-Message-ID: <aeCDXI5hY_ivSWm4@shinmob>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|MW6PR04MB8881:EE_
-x-ms-office365-filtering-correlation-id: 5ed0ed28-6aa4-44af-5613-08de9b82f752
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|19092799006|366016|1800799024|38070700021|18002099003|56012099003;
-x-microsoft-antispam-message-info:
- he9WO0Th9lo/PPQORPlxK/VWPNSmOcX+eNGaw+tHEjM93fw3cGsvF0LD34sSiI31mOeUDYQkqI+EYQJp/FBHVtWEIcKX3bIIo4eDgvnS/3Tt0kWDGmB+59Scnrzh1axkpnmfbzyTajkLD3QmrT1y6kIgc3O10mIZ+ITL6AwKqFdFnZBUs+4XaONP0cNrbgR4monDNq2lx3HVWze+WvpFe4k7gLCvXR5oHsznaX43yZya6TPuQamOOxmA6DPfe4dyketS/NVsoKAFlGVl+k/7wGPUxVvwDP+EWSPZbSC896JjbUYfXZVVIJAX7fDBqfZb7N1r0JGCkuDKd7J4cx9KO/slq4uRI+z4wyXcM4n24F3KYDxrhauDpJCPiNk8bz0isW7WxFv2N63JxIiNc/ZqBaSnLe/sZG5uXft2w+taLoBJPfKbNBSHdjttAmo0nj2ImUTjk2qVqReUcIdDTxRkk6PGFeBezIUw6Px3HrpOC8woRUaSG50/MbwbK5Y8YallDGfo/rblCYSnpZfRJCa26kCXDHdu/rlS7yMqASB54PJ4qgxxD5M5gOlEbVdeCKSTf7yN7FIWvB7RapNCuAzTve/+hmRvnL1Cqe725iX9HDQBdgWAtkYB3B9WskkmnVjn/6H1J0cm1Aw3ZZeQ/Sh2SWN1TpGyPYyvzwiUBNqK9FaUnLSKgLV7Xhzo3/GTeph28AaN28jpleJsoOShGQMkOhPBA9ycS6yn9Ay5T4Kl5d/iq6GXoMS9GBufp25okWNGMbFoy60q4GHBbOx76QZ2pbskFwtEU2B9cBl9YcaxbJs=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(366016)(1800799024)(38070700021)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?C0DCqlki0Sd7VDbiumcY7uto15AAZUKblHnT9icr6PZN4YH5WGi4MWzh+5Sm?=
- =?us-ascii?Q?xrgkvSZrDeCPGaNmsqE1Itq5ZIX06fDsBkaP1gZh5gVXc2owmaMrAWm8UE5U?=
- =?us-ascii?Q?3XDcofrBdWqtd7xVsyMAoVgQ8CmorkRvFsUNkVaOKQhHVUyXms0eWjV2a0w8?=
- =?us-ascii?Q?p47m+Zcfj2oYbPWzc1+LvyngyLa7BR/OMjEWpbAvHiGqNMX0JiZcL/94bK73?=
- =?us-ascii?Q?QCEspe4EMtK6pFsI4WaCc1pl7GGFMQyJD8X9FxcuywCyLVJA9IsiZoctVwsE?=
- =?us-ascii?Q?PiasT4GT7xH62UuqSRCdfiYVmv+pRoAdLdGn/h6o0yKQAj/mj6tU7gVxFVWe?=
- =?us-ascii?Q?cPg/gL/wRxRM6NkbUELguyyfgKkZAFQg86GoU1CgULuPToOLB/qHKCpXe9Sz?=
- =?us-ascii?Q?ztbT4Qb4spyXSPQSxl/CDIf1njEYuF2JlyLeGwPObtyEI9/qY/WMQNnCZCZl?=
- =?us-ascii?Q?MZw9uXULRJjJyoxZ6Y4QRd9lWHZzIhMJnWjNxYeX+5VejdLf7cPT3WseuBSA?=
- =?us-ascii?Q?jPPE6lvQuABm5Q/6hWnzgOrgYPx0mpCFGR3a/wZXTDvZkGdfqvEopajcrTp7?=
- =?us-ascii?Q?X6/3xCOhEWirz8vc7wOmHQdOvx6BigGLpobUqKcy8ApuoeHj9OgERXDr0dMy?=
- =?us-ascii?Q?MPV6FXrnRBazt6gsB7BJf2OODwrYK+jG4Ephx4WQXB3+92ha+mrYF77oxq6C?=
- =?us-ascii?Q?tuBwwmoxz128vytqEmnmxnIU6SJKp2AeRdzR0Dexq+6DckyqCkvp8nyEeWNq?=
- =?us-ascii?Q?+QgPhNyKLU2DWxamPqQJpCmYf9jj5pzWlpaq+XXceAR4cLavSAR1HPSv1q9c?=
- =?us-ascii?Q?L6lxqxM0G2PY2YFh+4ZeRfjkM9w+GWy5Bp9/q9xljTG4I9ZcMrsqjLEPCNEn?=
- =?us-ascii?Q?DuUELZHWQIoxFCG3RX1m2Lh3e2ot7CZMcVgCVdNT8CZtaLXgVyMmb2C5a4XZ?=
- =?us-ascii?Q?h/GXyWAAd940Kqn7j1JPgR4rs7fDYSzf9LfsYA2KMRXV/5t1DKBTX6uTqPoy?=
- =?us-ascii?Q?uAluj86YvpGUCkhTLws0j3fUFHUyPOd+C4cak4MoZMw5Uwqn6VWFrRdociRo?=
- =?us-ascii?Q?qprnLX7I9kvPGurOdG4erlcQIaSWB9vjBM10+LSsYAGQbzUAEwsDpX+BV3zJ?=
- =?us-ascii?Q?y+47ctbYEf8oMrHUenz4GP+j8txfWk53EzxylbaYYZzfRgHuAee9aYVbT2Vn?=
- =?us-ascii?Q?jpFI2LFRsvfCt/h6GaUshQZ3TDV5OVSStXbaQTRMil6ltFHkZl5OYehQ4Hgf?=
- =?us-ascii?Q?Z1afB61BPdeiT39Cnrq/AA0BFRdsyGrrXg7Xf+gwWh1Luc/A3iH2T147mZ/d?=
- =?us-ascii?Q?JpKQro3yTJpmLSl/AsTGyKE9T2W3TifFTgjIFbrtArs3GvvT0Ras1WgyjJUG?=
- =?us-ascii?Q?lUUlQ3FgEul0WjchjXVQaufJzIr42ZpRawXizg7CXGTsF+Whl4pvJh8sgduL?=
- =?us-ascii?Q?ztq31C8IeFs3M9ud9mNIAZq3BRZS3mVmV610YaKaBsQ8gWdYX3HnwlnAYcmX?=
- =?us-ascii?Q?66CIQo90bdF0GWDpqd/hFy8VYP4SD3DlUNnmhQ4tcNYaEQTBqcs4errtHZU/?=
- =?us-ascii?Q?SQ+E59M0iQZ2DAEQLGRmaVRRMCAhlW57MIR3sfm6HsRhnhslok3RZaL4tIfv?=
- =?us-ascii?Q?rBWBegPUlm0cE/asaIVzHHpxzEtNyYCkCKq6q+fmGW69afRrLX0n7cAjUJ1H?=
- =?us-ascii?Q?OUlqbWNRwleCaq1KmrEx63kUG+AFolTwk97UVGZ38+spaMr7rELRPO824Tsp?=
- =?us-ascii?Q?R6k+0WjumojTXiFdClbcDnt3UAf9Mqo=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E638F93FBBCD1D468AB7D16F0D8DAD62@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=chromium.org; s=google; t=1776323283; x=1776928083; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bAphQT/frAJ66aJxvN3V0iUcLODceJw3lz9oXrdkZII=;
+        b=TGpBn7oyHQGQ64Nfut6ZT0dnKSsOMifJZ9fKZw64h4FnvH9c4l1dwkx3Jjg/fj5A8o
+         /jXate/99pA248GKYA57HeHMVmE8udOQaaxxmSEVuXKTubA0hBfu44lorfVWzwBvd6OB
+         whMi78L2adqHZT+ku40D8+4QAhBMtIdkCw2NY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776323283; x=1776928083;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bAphQT/frAJ66aJxvN3V0iUcLODceJw3lz9oXrdkZII=;
+        b=IZLq/kIrIdxQxm0II+2+9juzTNbddYrwKnuRRQ1OA2Q8MD6flOwkE4VOkpemPjbf9P
+         t5IRL12oafOxUZwVqEO6rv1d+m2pcGaBxIuV3gySA3W/8KWnPFxKHlyXHHFmub7QfLsF
+         BnN0stGgtnz6LRl0ImtZVBuuO8zHFCvhSMNUv9zSABmgkSvYSnN3hO8CWVXZuBTAsGRh
+         1LI+QKHHs/f2ypuWPIOwkbJJecGiu5Hx6to5hlBGRU1BCJjjjdo9XfNodATAO2ZiN6mc
+         92JdwvTe52xcI5PTBnzxQI+Yet2Uh7+Wn2pH4bSVeAO78vkAJRK7CXDsZu4+buwnOrmf
+         3QGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9P4dJDNGP6TdFN32RghgdsN9CU/KDNvjw1KeoCAUWRM9urn6EZg7Ynor0d68exDDTC6cqM3f1OdQgGPQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/wnzVkhs+IfZ9i3gr1zNRIhBBSwJIaYb509UmZmx8vFTCe9Aa
+	I7abYNFotBfvacdZ3ROj+MDW0SNlJU+SkKT3gZ6fUKMbMjj/Gs7hM7oaG1o2gVVO9A==
+X-Gm-Gg: AeBDiesPWknKOzl+p9+8FwF3CiQpym5IMAuVNyAiM42noZ1CfZ+TFDyvq++JmVUvI49
+	fQAcqvoF8MiuFWo7HK0UHvG67DG+QN6mTIjPoHMoB2RhMqS7/y0dBx9X81ULnI0AvOxx1dlpkUp
+	JZvu/KtVKaC+gmsV4rkMf5M2bVZ/CtZ3Q/fGSdfBH6pxkDJdA1npxRMevYvKH96y4S19ikNqU2Q
+	LxxbpPAZ27kKiy7V8T1J6D0MzwwwwoMXqPAbleRBkALGw5pRbuBJUklTAYpbkjbSP6V5r02r+Ie
+	v0Luoy24JLERh4ArDgJ0KF+4nGprB05mLO6lL2bGXPV23a7exA+59TmBT4VbPb5AKvqu72GhsQE
+	eknETjP4wXWRyFyNGRvXthRFL5mLNTt+yq5ZE9ot8uuguDbFKg/RdtmXjY4cPiXYxIrSPJQ72H/
+	rWkVLCg5HNud03SpQewTUWBNGCMaeVQ6pe57b53bzA9Wz8rvUuNcAPDE4Gx0oyumb0Y/5G+47FU
+	w==
+X-Received: by 2002:a05:6a00:ac03:b0:82c:6bcc:f3fa with SMTP id d2e1a72fcca58-82f0c2f7acdmr26693843b3a.35.1776323283603;
+        Thu, 16 Apr 2026 00:08:03 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:63b6:f9e5:485d:ef04])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f6702f8e9sm4102080b3a.5.2026.04.16.00.08.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2026 00:08:03 -0700 (PDT)
+Date: Thu, 16 Apr 2026 16:07:59 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: "qiwu.chen" <qiwuchen55@gmail.com>
+Cc: senozhatsky@chromium.org, axboe@kernel.dk, linux-block@vger.kernel.org, 
+	"qiwu.chen" <qiwu.chen@transsion.com>
+Subject: Re: [PATCH] zram: add accounting for incompressible pages
+Message-ID: <aeCKbSou1_JZw9UK@google.com>
+References: <20260415104356.82248-1-qiwu.chen@transsion.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked:
-	cZGRS/cBdSR0Il4+u8HXpUp0Siw46acA53/1nMcaFbY77GmmQKRze1dArZ+xoVvUuRIxOQol8/Z8ehTqgEfLL/l6LjvxpQVnHTlOCrC2uMp7+vrIYW/HEHjNZyK57FiLHjIZdId0KT4PmE4CaAqOO5ox2bdgsWYiHqUKHUFLkauht0jFny5Vbm27QBu9WXSBKZ8T2hsUtGUIeS3HmDznxsa5GaKs8boX0ENq7gueIuM1Um0HU1wm1JyCv6STZh6aHdgkkXc4TylZx6LrlJtHuwCxzj9X97i2ns/qc1ay7/Ygdm1U06IDlpB4v5r9zZ7pEB4lqYh++AjvDLWyAueVew==
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	ewdmFDx8BQud4q1UOiGC1ooy9ND4c5ZdFeejEpTO+NQ0LTJnsYAZ6bVUBnxHGXmtRNFA0RCcN850eB6o5onrRTFYQ3pfBM+VFmoWLj8zG15FPtc9M+qhVpPAiITVpFM7Ezn3yuDfzpbP7SCzV8LiRDvqXSee/iWnLMsvUe2/UQIUpT+yujiCGikPy5BwizpHoXqor5VIOKTCHaevR1BVRydyZk1J2/RhSS3JQ9NTDyEFNYgOfrJG0Y0S9MwpMXujDfjRYkrQ5CfiBzWY+dqUe9NhAWcS0K8JauGveEvkTWe2hd3Hts3nh7/ytkbWhEZU/aw4Jqrr51uRNAaK7CSdswIpzrMeHmq0rfml+Di3aPgV4Z8vCPr22jmKHpGfRqWeOQSWcmCIgslPLlyP5Q0V5PwEVY6ndTbS+XOKCUPLMc20LWICPlsDi+TXwy7Mb3+ZamhRnahX604nXb4LOf+IjIrk4s8FT/lKls7QeMkkcLtnnTbSxNBkoP89A/DMVafa4bmswV4pMdjB4KJlRaCj2f6XIoje3rLN7RujREUjskzJIdlDfR6fwFqhe7S8d+/VjnBcOEJ+lo7W5Jbqcz2vZlrU6wBZJE2BdO6ShqnYoG9cHa3m8mOBk0vVzPQUSMER
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ed0ed28-6aa4-44af-5613-08de9b82f752
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2026 06:39:53.0189
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4n6l/UC8dS8Z0hRHyJSfUgsVL4UWmZrcT2qXlJLasuDUlrRcp8v93GrO/Z+mr4R7JEQu/NRq7q8MSm9EAyDxL0lkPjT/zoNubH+AvYfqweY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR04MB8881
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260415104356.82248-1-qiwu.chen@transsion.com>
 
-Hi all,
+On (26/04/15 18:43), qiwu.chen wrote:
+> 1. Rename write_incompressible_page to write_huge_page since huge page
+> could be recompressed with secondary algorithms.
 
-I ran the latest blktests (git hash: 255189f0c4e5) with the v7.0 kernel. I
-observed 6 failures listed below. Comparing with the previous report for th=
-e
-v7.0-rc1 kernel [1], 2 failure were resolved (blktrace/002, zbd/009) and th=
-e
-hangs at nvme/058 and nvme/061 are no longer observed. Thank you very much =
-for
-the fixes.
+Please no. "huge_page" is the most confusing term that zram uses.
 
-[1] https://lore.kernel.org/linux-block/aZ_-cH8euZLySxdD@shinmob/
+> 2. Similar to huge page, add incompressible_pages accounting for current
+> incompressible pages, and incompressible_pages_since accounting for
+> incompressible pages since zram set up. The accounting value can be showed
+> by mm_stat.
 
-
-List of failures
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-#1: nvme/005,063 (tcp transport)
-#2: nvme/058 (fc transport)(kmemleak)
-#3: nvme/060
-#4: nvme/061 (rdma transport, siw driver)(kmemleak)
-#5: nvme/061 (fc transport)
-#6: nbd/002
-
-
-Failure description
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-#1: nvme/005,063 (tcp transport)
-
-    The test case nvme/005 and 063 fail for tcp transport due to the lockde=
-p
-    WARN related to the three locks q->q_usage_counter, q->elevator_lock an=
-d
-    set->srcu. Refer to the nvme/063 failure report for v6.16-rc1 kernel [2=
-].
-
-    [2] https://lore.kernel.org/linux-block/4fdm37so3o4xricdgfosgmohn63aa7w=
-j3ua4e5vpihoamwg3ui@fq42f5q5t5ic/
-
-#2: nvme/058 (fc transport)(kmemleak)
-
-    When the test case nvme/058 is repeated for fc transport several times =
-on
-    the kernel with CONFIG_DEBUG_KMEMLEAK enabled, it fails with kmemleak
-    messages. Refer to the report for v7.0-rc1 [1]. This test case had hang=
-ed
-    with v7.0-rc1 kernel. The hang is no longer observed, but still kmemlea=
-k is
-    observed.
-
-#3: nvme/060 (rdma transport)
-
-    When the test case is repeated for rdma transports around 50 times, the=
- test
-    case fails. There are two failure symptoms. Both symptoms does not look
-    kernel side problems, but blktests side problems. I will allocate time =
-to
-    look into them.
-
-  [symptom 1]
-  nvme/060 (tr=3Drdma) (test nvme fabrics target reset)          [failed]
-      runtime    ...  87.444s
-      --- tests/nvme/060.out      2026-02-20 12:15:11.066947841 +0000
-      +++ /home/fedora/blktests/results/nodev_tr_rdma/nvme/060.out.bad    2=
-026-02-20 15:06:44.552705787 +0000
-      @@ -1,2 +1,3 @@
-       Running nvme/060
-      +FAIL: nvme connect return error code
-       Test complete
-
-  [symptom 2]
-  nvme/060 (tr=3Drdma) (test nvme fabrics target reset)          [failed]
-      runtime    ...  22.545s
-      --- tests/nvme/060.out      2025-08-26 21:28:52.798847739 +0900
-      +++ /home/shin/Blktests/blktests/results/nodev_tr_rdma/nvme/060.out.b=
-ad     2026-02-26 15:20:36.973686247 +0900
-      @@ -1,2 +1,3 @@
-       Running nvme/060
-      +_: line 1: /sys/kernel/debug/nvmet/blktests-subsystem-1/ctrl1/state:=
- No such file or directory
-       Test complete
-
-#4: nvme/061 (rdma transport, siw driver)(kmemleak)
-
-    When the test case nvme/061 is repeated twice for the rdma transport an=
-d the
-    siw driver on the kernel v6.19 with CONFIG_DEBUG_KMEMLEAK enabled, it f=
-ails
-    with a kmemleak message. Refer to the nvme/061 failure report for v6.19
-    kernel [3].
-
-    [3] https://lore.kernel.org/linux-block/aY7ZBfMjVIhe_wh3@shinmob/
-
-#5: nvme/061 (fc transport)
-
-    When the test case nvme/061 is repeated around 50 times for the fc
-    transport, the test process fails after Oops and KASAN null-ptr-deref. =
-It
-    had hanged with v7.0-rc1 kernel, but it does not hang with v7.0 kernel =
-:)
-    Further debug is required for the Oops and KASAN. Refer to the kernel
-    report for v6.19 kernel [1].
-
-#6: nbd/002
-
-    The test case nbd/002 fails due to the lockdep WARN related to
-    mm->mmap_lock, sk_lock-AF_INET6 and fs_reclaim. Refer to the nbd/002 fa=
-ilure
-    report for v6.18-rc1 kernel [4].
-
-    [4] https://lore.kernel.org/linux-block/ynmi72x5wt5ooljjafebhcarit3pvu6=
-axkslqenikb2p5txe57@ldytqa2t4i2x/=
+What for?
