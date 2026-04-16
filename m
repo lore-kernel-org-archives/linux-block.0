@@ -1,206 +1,208 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CF1364E96;
-	Thu, 16 Apr 2026 05:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77521DA60D
+	for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 06:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776317010; cv=none; b=jmZ6Zy8ADhW/GfKcwlErxUYQsnaWRCapac1mJn2B8k2vVem5IEBeOw3X8X4bdhNXRY5DY7ms+UqiV8tvu3XhCEm1WqaOyifq++eQ+HJexbJhy/L84FzlISSOk9LEQasnlUSAFvahDmiy83HITIS+j80n9dRS+PrQ5X2hqppuw6w=
+	t=1776320178; cv=none; b=jbZW/ktsMxKeeuEBLsIA+F53zYdG3x3GsVJCTvEMwCpVKFCWSquPj/kbEAQ31LChd6b5emgu+KY3msVpAtqdJnPQXa6PyD9FOPWuF6CkkI3FXGcL9vbd5SE3VoA9tKySBlslz5Gnpu4IOaRYnd2TM5Mu4UyrkbksiSb/L7nXq7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776317010; c=relaxed/simple;
-	bh=J9eNPp2+NId5+4/lXrYfhpWxIcVpkia+bExPRs37KE8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iEiQZe3cb4x1YWmQUeSzwGP84Wfu8KGfQdpnooifSJMam0aZz5lWcpMnk3VioKBCkAXI639jH4kscNC1q0YTCYRMN2yHdqWgrJU66pD6og4zkMoYe2X/1gSbzUvFB4jmoZDgPxQ5Y2naIrn0F+/i4bHDE4pqMmEGEBSriXYd4v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1E5616732A; Thu, 16 Apr 2026 07:23:26 +0200 (CEST)
-Date: Thu, 16 Apr 2026 07:23:25 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v2 6/6] blk-integrity: avoid sector_t in
- bip_{get,set}_seed()
-Message-ID: <20260416052325.GE14950@lst.de>
-References: <20260416002214.2048150-1-csander@purestorage.com> <20260416002214.2048150-7-csander@purestorage.com>
+	s=arc-20240116; t=1776320178; c=relaxed/simple;
+	bh=UWMoArUK2EnVelx7DdIZpUVFJLKVibiVK81zirIWkeE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GhyedH6tKYddBAi6HvILdsW8kuD9uaicGoVTs7AcvXbwqcVZCBONSfDbrXOPN8TmCuILJkQEOtb6OEsYlMFyksmYt51jBaSaStyjgnRpsiKiVh3tFfsbRCTpipAL8hStklQBjUDqaVEgr7ltgcLOd5YqGyTVfiyo1djfyvcsNwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Uh1JFQAW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ds5S99fO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Uh1JFQAW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ds5S99fO; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Uh1JFQAW";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ds5S99fO";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Uh1JFQAW";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ds5S99fO"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CF6585BD23;
+	Thu, 16 Apr 2026 06:16:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1776320175; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ayf3Qca5Ycm9l2bpz9W6+zkdVpYag1La217tkow0nwA=;
+	b=Uh1JFQAWCnJBUZGTTHr/LUGNjZpaFZ47lz+RKiot/Gbz3qr3/PqdmgVkJBjAbbHNF5KqKi
+	pd+y1TlTpl24B2UNvUTtJFdK+dvfyPvJM+Ifn05kH8Q2FLb2XgMp5wgtNZj7u8WdERb9TP
+	GWXf37JUrujNbAdzLJ4u6frwU2Cq6Hs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1776320175;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ayf3Qca5Ycm9l2bpz9W6+zkdVpYag1La217tkow0nwA=;
+	b=ds5S99fOy6hbqvPIa9lnLWOL9YoIP7SaUgiNldocVI0bOzGEeUsIn2uXDF2zvr6zqrsT6L
+	pZCxwL/NO+P5tlDA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Uh1JFQAW;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ds5S99fO
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1776320175; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ayf3Qca5Ycm9l2bpz9W6+zkdVpYag1La217tkow0nwA=;
+	b=Uh1JFQAWCnJBUZGTTHr/LUGNjZpaFZ47lz+RKiot/Gbz3qr3/PqdmgVkJBjAbbHNF5KqKi
+	pd+y1TlTpl24B2UNvUTtJFdK+dvfyPvJM+Ifn05kH8Q2FLb2XgMp5wgtNZj7u8WdERb9TP
+	GWXf37JUrujNbAdzLJ4u6frwU2Cq6Hs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1776320175;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ayf3Qca5Ycm9l2bpz9W6+zkdVpYag1La217tkow0nwA=;
+	b=ds5S99fOy6hbqvPIa9lnLWOL9YoIP7SaUgiNldocVI0bOzGEeUsIn2uXDF2zvr6zqrsT6L
+	pZCxwL/NO+P5tlDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 807DB4BDF6;
+	Thu, 16 Apr 2026 06:16:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id qArQHK5+4Gn2KAAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 16 Apr 2026 06:16:14 +0000
+Message-ID: <959f800d-b92e-406e-a174-680fb09c884e@suse.de>
+Date: Thu, 16 Apr 2026 08:16:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260416002214.2048150-7-csander@purestorage.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nvmet-tcp: Ensure old keys are freed before replacing new
+ ones
+To: alistair23@gmail.com, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
+ kbusch@kernel.org, linux-nvme@lists.infradead.org,
+ linux-kernel@vger.kernel.org, yi.zhang@redhat.com, mlombard@arkamax.eu,
+ linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com, Alistair Francis <alistair.francis@wdc.com>
+References: <20260415230250.2783414-1-alistair.francis@wdc.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260415230250.2783414-1-alistair.francis@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-5.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	DWL_DNSWL_LOW(-1.00)[suse.de:dkim];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_TO(0.00)[gmail.com,lst.de,grimberg.me,nvidia.com,kernel.org,lists.infradead.org,vger.kernel.org,redhat.com,arkamax.eu];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	ASN_FAIL(0.00)[7.9.0.0.4.6.0.0.0.5.1.0.0.1.0.0.4.0.1.0.1.8.2.b.0.4.e.d.7.0.a.2.asn6.rspamd.com:server fail];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	URIBL_BLOCKED(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,wdc.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Queue-Id: CF6585BD23
+X-Spam-Flag: NO
+X-Spam-Score: -5.51
+X-Spam-Level: 
 
-On Wed, Apr 15, 2026 at 06:22:14PM -0600, Caleb Sander Mateos wrote:
-> bip_set_seed() and big_get_seed() take/return a sector_t value that's
-> actually an integrity interval number. This is confusing, so pass
-> struct blk_integrity and struct bio instead to bip_set_seed() and
-> convert the bio's device address to integrity intervals.
+On 4/16/26 01:02, alistair23@gmail.com wrote:
+> From: Alistair Francis <alistair.francis@wdc.com>
 > 
-> Open-code the access to bip->bip_iter.bi_sector in the one caller of
-> bip_set_seed() that doesn't use the bio device address for the seed.
-> Open-code bip_get_seed() in its one caller.
+> Previously after the host sends a REPLACETLSPSK we freed the TLS keys as
+> part of calling nvmet_auth_sq_free() on success. A recent change ensured
+> we don't free the keys, allowing REPLACETLSPSK to work.
 > 
-> Add a comment to struct bvec_iter's bi_sector field explaining its
-> alternate use for bip_iter.
+> But that fix results in a kernel memory leak when running
 > 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> Suggested-by: Christoph Hellwig <hch@infradead.org>
+> ```
+> nvme_trtype=loop ./check nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/051 nvme/052
+> echo scan > /sys/kernel/debug/kmemleak
+> cat /sys/kernel/debug/kmemleak
+> ```
+> 
+> We can't free the keys on a successful DHCHAP operation, otherwise the
+> next REPLACETLSPSK will fail, so instead let's free them before we
+> replace them as part of nvmet_auth_challenge().
+> 
+> This ensures that REPLACETLSPSK works, while also avoiding any memory
+> leaks.
+> 
+> Fixes: 2e6eb6b277f59 ("nvmet-tcp: Don't free SQ on authentication success")
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  block/bio-integrity.c               |  5 ++---
->  block/t10-pi.c                      |  2 +-
->  drivers/nvme/target/io-cmd-bdev.c   |  3 +--
->  drivers/target/target_core_iblock.c |  3 +--
->  include/linux/bio-integrity.h       | 11 -----------
->  include/linux/blk-integrity.h       | 14 ++++++++++++++
->  include/linux/bvec.h                |  1 +
->  7 files changed, 20 insertions(+), 19 deletions(-)
+>   drivers/nvme/target/fabrics-cmd-auth.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
 > 
-> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> index 3ad6a6799f17..e9ae5db99f64 100644
-> --- a/block/bio-integrity.c
-> +++ b/block/bio-integrity.c
-> @@ -103,13 +103,12 @@ void bio_integrity_free_buf(struct bio_integrity_payload *bip)
->  
->  void bio_integrity_setup_default(struct bio *bio)
->  {
->  	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
->  	struct bio_integrity_payload *bip = bio_integrity(bio);
-> -	u64 seed = bio->bi_iter.bi_sector >> (bi->interval_exp - SECTOR_SHIFT);
->  
-> -	bip_set_seed(bip, seed);
-> +	bip_set_seed(bip, bi, bio);
->  
->  	if (bi->csum_type) {
->  		bip->bip_flags |= BIP_CHECK_GUARD;
->  		if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
->  			bip->bip_flags |= BIP_IP_CHECKSUM;
-> @@ -472,11 +471,11 @@ int bio_integrity_map_iter(struct bio *bio, struct uio_meta *meta)
->  
->  	it.count = integrity_bytes;
->  	ret = bio_integrity_map_user(bio, &it);
->  	if (!ret) {
->  		bio_uio_meta_to_bip(bio, meta);
-> -		bip_set_seed(bio_integrity(bio), meta->seed);
-> +		bio_integrity(bio)->bip_iter.bi_sector = meta->seed;
->  		iov_iter_advance(&meta->iter, integrity_bytes);
->  		meta->seed += bio_integrity_intervals(bi, bio_sectors(bio));
->  	}
->  	return ret;
->  }
-> diff --git a/block/t10-pi.c b/block/t10-pi.c
-> index 787950dec50a..71367fd082bd 100644
-> --- a/block/t10-pi.c
-> +++ b/block/t10-pi.c
-> @@ -510,11 +510,11 @@ static void blk_reftag_remap_prepare(struct blk_integrity *bi,
->  static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi,
->  			       unsigned *intervals, u64 *ref, bool prep)
->  {
->  	struct bio_integrity_payload *bip = bio_integrity(bio);
->  	struct bvec_iter iter = bip->bip_iter;
-> -	u64 virt = bip_get_seed(bip);
-> +	u64 virt = bip->bip_iter.bi_sector;
->  	union pi_tuple *ptuple;
->  	union pi_tuple tuple;
->  
->  	if (prep && bip->bip_flags & BIP_MAPPED_INTEGRITY) {
->  		*ref += bio->bi_iter.bi_size >> bi->interval_exp;
-> diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-> index f2d9e8901df4..2c4b312f2f55 100644
-> --- a/drivers/nvme/target/io-cmd-bdev.c
-> +++ b/drivers/nvme/target/io-cmd-bdev.c
-> @@ -218,12 +218,11 @@ static int nvmet_bdev_alloc_bip(struct nvmet_req *req, struct bio *bio,
->  		pr_err("Unable to allocate bio_integrity_payload\n");
->  		return PTR_ERR(bip);
->  	}
->  
->  	/* virtual start sector must be in integrity interval units */
-> -	bip_set_seed(bip, bio->bi_iter.bi_sector >>
-> -		     (bi->interval_exp - SECTOR_SHIFT));
-> +	bip_set_seed(bip, bi, bio);
->  
->  	resid = bio_integrity_bytes(bi, bio_sectors(bio));
->  	while (resid > 0 && sg_miter_next(miter)) {
->  		len = min_t(size_t, miter->length, resid);
->  		rc = bio_integrity_add_page(bio, miter->page, len,
-> diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-> index 1087d1d17c36..4e0fa91a08fd 100644
-> --- a/drivers/target/target_core_iblock.c
-> +++ b/drivers/target/target_core_iblock.c
-> @@ -706,12 +706,11 @@ iblock_alloc_bip(struct se_cmd *cmd, struct bio *bio,
->  		pr_err("Unable to allocate bio_integrity_payload\n");
->  		return PTR_ERR(bip);
->  	}
->  
->  	/* virtual start sector must be in integrity interval units */
-> -	bip_set_seed(bip, bio->bi_iter.bi_sector >>
-> -				  (bi->interval_exp - SECTOR_SHIFT));
-> +	bip_set_seed(bip, bi, bio);
->  
->  	pr_debug("IBLOCK BIP Size: %u Sector: %llu\n", bip->bip_iter.bi_size,
->  		 (unsigned long long)bip->bip_iter.bi_sector);
->  
->  	resid = bio_integrity_bytes(bi, bio_sectors(bio));
-> diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
-> index af5178434ec6..edcd0855abba 100644
-> --- a/include/linux/bio-integrity.h
-> +++ b/include/linux/bio-integrity.h
-> @@ -56,21 +56,10 @@ static inline bool bio_integrity_flagged(struct bio *bio, enum bip_flags flag)
->  		return bip->bip_flags & flag;
->  
->  	return false;
->  }
->  
-> -static inline sector_t bip_get_seed(struct bio_integrity_payload *bip)
-> -{
-> -	return bip->bip_iter.bi_sector;
-> -}
-> -
-> -static inline void bip_set_seed(struct bio_integrity_payload *bip,
-> -				sector_t seed)
-> -{
-> -	bip->bip_iter.bi_sector = seed;
-> -}
-> -
->  void bio_integrity_init(struct bio *bio, struct bio_integrity_payload *bip,
->  		struct bio_vec *bvecs, unsigned int nr_vecs);
->  struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio, gfp_t gfp,
->  		unsigned int nr);
->  int bio_integrity_add_page(struct bio *bio, struct page *page, unsigned int len,
-> diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
-> index 825d777c078b..3a2e55e809c5 100644
-> --- a/include/linux/blk-integrity.h
-> +++ b/include/linux/blk-integrity.h
-> @@ -85,10 +85,24 @@ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
->  					       unsigned int sectors)
->  {
->  	return bio_integrity_intervals(bi, sectors) * bi->metadata_size;
->  }
->  
-> +/**
-> + * bip_set_seed - Set bip reference tag seed from bio device address
-> + * @bip:	struct bio_integrity_payload whose ref tag seed to set
-> + * @bi:		struct blk_integrity profile for device
-> + * @bio:	struct bio whose device address to use for the ref tag seed
-> + */
-> +static inline void bip_set_seed(struct bio_integrity_payload *bip,
-> +				const struct blk_integrity *bi,
-> +				const struct bio *bio)
-> +{
-> +	bip->bip_iter.bi_sector =
-> +		bio_integrity_intervals(bi, bio->bi_iter.bi_sector);
+> diff --git a/drivers/nvme/target/fabrics-cmd-auth.c b/drivers/nvme/target/fabrics-cmd-auth.c
+> index b9ab80c7a6941..58185184478a4 100644
+> --- a/drivers/nvme/target/fabrics-cmd-auth.c
+> +++ b/drivers/nvme/target/fabrics-cmd-auth.c
+> @@ -412,6 +412,13 @@ static int nvmet_auth_challenge(struct nvmet_req *req, void *d, int al)
+>   	int hash_len = nvme_auth_hmac_hash_len(ctrl->shash_id);
+>   	int data_size = sizeof(*d) + hash_len;
+>   
+> +	/*
+> +	 * If replacing the keys then we have previous successful keys
+> +	 * that might be leaked, so we need to free them here.
+> +	 */
+> +	if (req->sq->dhchap_c1)
+> +		nvmet_auth_sq_free(req->sq);
+> +
+>   	if (ctrl->dh_tfm)
+>   		data_size += ctrl->dh_keysize;
+>   	if (al < data_size) {
+I am not sure.
+The authentication variables should be freed as soon as the 
+authentication completes; the session key is ephemeral and
+should not be stored longer than necessary and will _never_
+be used again once authentication completes.
+The TLS key, OTOH, is used throughout the session and needs
+to be present while the session is active
+As such, both sets have vastly different lifetimes, and
+I would argue that this
 
-The bip is pointed to by the bio, so we don't need to pass it separately.
-Same for struct blk_integrity.
+void nvmet_auth_sq_free(struct nvmet_sq *sq)
+{
+	cancel_delayed_work(&sq->auth_expired_work);
+#ifdef CONFIG_NVME_TARGET_TCP_TLS
+	sq->tls_key = NULL;
+#endif
+	kfree(sq->dhchap_c1);
+	sq->dhchap_c1 = NULL;
 
+is actually wrong as we should not modify 'tls_key' here.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
