@@ -1,34 +1,43 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99D41D9A66;
-	Thu, 16 Apr 2026 05:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0595F36604A;
+	Thu, 16 Apr 2026 05:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776316547; cv=none; b=C3ja3k6NSgRC8AfPiuNOFFRHYgAZeIQyNU1d127B+qGzQRu0e1zk12co7eTLYgAZ7Ra7/iKRxc2Y1c99lrgpDQlR1ufG7X5Pw6dnx1fiwct9XEpaFt6TdmeIeqs2p9SDjuEhE1sTY23SQ8h0QQEhEfoqzo2xRP1st+Oate6VZjw=
+	t=1776316735; cv=none; b=WPQi/fahtzNS5cLTvQeMmHHDdYoRWGV6rsaPPUxxfrtJeSCOsvF8D+/pgiAcYOSVjhIK/Y7pSIkees/CznXx5vYhH6NaRfVjuxlFm5jbxCMu1d/iBxUFtIs20fF8YV8HF/+CU/HlQS42Fqbn2M0EFB2K+gltW4G4jGk2yqNMjSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776316547; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1776316735; c=relaxed/simple;
+	bh=GXLuNDlyUwDSTttdvYziVCCk92uHcjuYyw1lxByPbiE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Es5SiHbBx6CiAm7qYI3egFj/LDf0m25llzojjtsObguixoMkvIwxtWJo3TteRI7ih+EdsUMCOP/N5dQIiBrrqAGT50eyNhi3M1psVqAdO8akempgO12rYUbcEfIpKt+hQ+2yvGXhEYEvz35jzjL0Uaj3y7CK9EZYGigKM5JnBgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3BFE768C7B; Thu, 16 Apr 2026 07:15:34 +0200 (CEST)
-Date: Thu, 16 Apr 2026 07:15:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: alistair23@gmail.com
-Cc: hare@suse.de, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
-	kbusch@kernel.org, linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org, yi.zhang@redhat.com,
-	mlombard@arkamax.eu, linux-block@vger.kernel.org,
-	shinichiro.kawasaki@wdc.com,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH] nvmet-tcp: Ensure old keys are freed before replacing
- new ones
-Message-ID: <20260416051533.GB14802@lst.de>
-References: <20260415230250.2783414-1-alistair.francis@wdc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZgRl1cpT8jIAgoWqu3ekU46kf1I8Y24iqXEJhbxiVUjQfX51XnhTZ9rBhUx1cqWs9b51JYKWuMqsCVvdl+ODQbQHHsbspNCl7srO6cV+Vw6/JxUNfW/2qCYDA2BZNkqKpR7M10imADi2Xp/4HrLfDOAxH+nAHVvFxqe7QBT1P80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QVnHStS9; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QVnHStS9"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=XU1X8pEsRJyoL1+OtoUYSm389j5smImoC1MKC6pLOx4=; b=QVnHStS90hFzYNhjFGALlLO1Bq
+	R+HJoB+8AnzKOuvek18Pt9AkMOpwfOWFP0c4d/fKrkfovmAyhf5OzRoppZKWQkY2YX1NSXi6LiFgd
+	LminbaUZMzvUjCIING2fmdSOja5v8GM+9RK9lQEthDQfd5UbOG3D/s8ItDJ5txjCLsqfOF64ClaZB
+	eqmWIGVFFf7F6yyQA2GbsnYvhE+75Zvos50Ih2/ZDsusLZZ7YDJdMeN/yKRX8LGI0EI8YmjOSaC+o
+	YKKM51nSo8Benp71N2hQAhGFBh3i/SV4brSZFYJj84dRFm12/35lfvj6vra5f8vuM2mJwwB2AzLeC
+	dxuMrPgw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wDF7p-00000001zGY-475X;
+	Thu, 16 Apr 2026 05:18:50 +0000
+Date: Wed, 15 Apr 2026 22:18:49 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+	Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH v2] t10-pi: reduce ref tag code duplication
+Message-ID: <aeBxOVmQ2bLli78f@infradead.org>
+References: <20260415210847.1730016-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,10 +46,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260415230250.2783414-1-alistair.francis@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20260415210847.1730016-1-csander@purestorage.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good:
+On Wed, Apr 15, 2026 at 03:08:47PM -0600, Caleb Sander Mateos wrote:
+>  #ifndef _LINUX_T10_PI_H
+>  #define _LINUX_T10_PI_H
+>  
+>  #include <linux/types.h>
+>  #include <linux/blk-mq.h>
+> +#include <linux/wordpart.h>
+
+We must have already gotten this implicitly given that the code
+already uses lower_48_bits.
+
+Otherwise looks good:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-
