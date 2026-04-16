@@ -1,88 +1,177 @@
-Received: from ext7.scm.com (ext7.scm.com [49.12.148.225])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34DF358379;
-	Thu, 16 Apr 2026 10:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.148.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D8617A2EA
+	for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 11:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776334391; cv=none; b=tMNxfit0RASLNdIedvTY5u+uu1HQPajGfcjgkyjWseFMwwUColmy/2+J/bfWLBEv+rDq6rNhD6SHzKhMdOFESOWmmACE3btHfGhx3/OxQXO92zLfP5YjolIvFzl4A3yVyfybXjBw+5O5Wbq+jQhdgjykJv4NoVFDIB+E9WUTiAU=
+	t=1776338341; cv=none; b=ZHOvxUJS9JhylJpizi8onNI1jvDDm9ccJqxTpQe8lVY5wfuvTAX3PTQ9zEmn+OcYgyUUweTkbn3W0bG5ldunrKGt/vSZGgF/nXx+xW7gmCq/YiyycH41BjAZzkDkWfREAWUflWHTI49wAd7w3SZ55hDZJ48l89eRnu+qs/6Gz4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776334391; c=relaxed/simple;
-	bh=NggszBKPMEDc+pF6nRTUeQteeh+voih6R/w3CPD06Vs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qFJ1bHKn4M2lsrA0/U4isiV8xrQiPOB2bo4zX/9kv7XlK033tm69QZk0LNxhEhF01xWp/tYeNLHpWbmbAnxl8d/yUP+36qyX7pa0qw37rP/Bh/8nWhG7tnd7zBxVPeY4mSJ7C8GyTNpWLz92rk/z8wti9DCPioh9RohzvsvzNRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=scm.com; spf=pass smtp.mailfrom=scm.com; dkim=pass (4096-bit key) header.d=scm.com header.i=@scm.com header.b=uYUdVJ81; arc=none smtp.client-ip=49.12.148.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=scm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scm.com
+	s=arc-20240116; t=1776338341; c=relaxed/simple;
+	bh=lxAlBsE6BkTj7EBUhtabxyuglpWdKka00iVXwo9wjoc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SVv96iHzd5QG4/hREOyRvl1IqowBBq0k13lo88WYt3dndH6r3ypNjQ5LP+Wd508I54C1/hhxR/rir4FmEnOcccsOpVKgvhfXxAERB8+2RK2T5MZYyvqPcJN+77Lqxsg4+YVx4tFynWTVgzp21Kf1cNTVIJ28hzHPvdOaJ1/g7QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gpZ079w+; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=scm.com header.i=@scm.com header.b="uYUdVJ81"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=scm.com;
-	s=ext7dkim24; t=1776334385;
-	bh=78twWDv9b7ZPWfAwjWQsmp4OLapanD2Dgd8/clGutKs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uYUdVJ8149TtX8UYeWvN7kksbJM1qmX48Wk9G4nYBbzjoZQFsccKNKR6HjSymGfEV
-	 n3CNvh2X+NqxHWJFAf5dkQlZ73xpfyBqkxrzdNDzg74FQK7ak1q1CltWfdu3MJJTrb
-	 bbhy2ikkUN165FeubKgHmFlaxMzGoSbuI4AQ62w2Y1/VHlggqB5WzkrpHdRQqlcSgY
-	 6qzgQE/a+32CB32mlmCno8quf/7pSwIeqlFeRFxBvw1dAkXpXuojvVaeljGlETRnO6
-	 UfOPRj2MqmJzZeKc+Aa7NwEAuySiFaFUJ992NTn7it4/QkM/RgS35fzUf3hWO9Iic5
-	 HnyCfYV6gwcgAECAo/lDKcfoda9PUXP8kkGIyMJEAJIWQukhOkrXFOYY1K1gqNvfHy
-	 F6GhIIvZQ0tdPcG2j0hfGyjmtjEj4c8r8XjQ8nrwnm25R3VSYC9IlRSxuI0AYTGm5E
-	 IWSL6SGeCjANn1+e9BmP3WNENVSjelgLopU9v117tSOUA0ZB8uJh1dhxjpBsuE7rrD
-	 b10F5fsCzFRmdZDxQZ5PhT6/Z+lfaL//wrFgouTUPECMvrZ8s/T9Cx9yEIiabLgk1X
-	 DlzyC6J/5gqLNwXZu8ZRJSd1t9NPGjODj6mLE6Kk59lM0AkJnA2vWeFSuOvGLXCSac
-	 IV1tWDc/BLPN+o4KKEd2q6nA=
-X-Virus-Scanned: Debian amavisd-new at ext7.scm.com
-From: =?UTF-8?B?VG9tw6HFoQ==?= Trnka <trnka@scm.com>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
- regressions@lists.linux.dev, linux-block@vger.kernel.org
-Subject:
- Re: [REGRESSION][BISECTED] Spurious raid1 device failure triggered by qemu
- direct IO on 6.18+
-Date: Thu, 16 Apr 2026 12:13:03 +0200
-Message-ID: <2211212.9o76ZdvQCi@mintaka.ncbr.muni.cz>
-In-Reply-To: <ad-0LIubzaT8M2_O@kbusch-mbp>
-References:
- <2982107.4sosBPzcNG@electra> <ad-sprBWPA20iola@kbusch-mbp>
- <ad-0LIubzaT8M2_O@kbusch-mbp>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gpZ079w+"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63G2FBjP2130947;
+	Thu, 16 Apr 2026 11:18:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=nzjNxB
+	jB818Z9QavfFiRVUN3lyVCXAzPo83A3NBLejE=; b=gpZ079w+A11qrF/lYURZlF
+	oxRxUxSaU6WeVNAgfm0HlDWX8Ue54u7tINH3NcfQIqmOTdeU1DBZGLIM2yQ91t6Z
+	nT5j6qyQymtI+u5unDQSpNiLJYDodgc+1HpP6uH2VyIOy5EfTMsoZV7gkVf8ek/8
+	9liJ+rPnptjh14vS8OYjAJ1R5Epkp2UtBFjjHjvGjcFWFNAidozZBqRE2b8azIzo
+	U6kfwPz1C7zn4ZtMe/Pd0WPKSYoX4FzRxXTMfYEwilgZEGWXh3AoAsSYb4GwNjVL
+	eUpc/n1EW5/YfVe4mdSALgSfvxAmyjmh1WpT93hbWPaYbtnRZsUYO+lcBqbQAF3Q
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dh89nn3s5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Apr 2026 11:18:56 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 63G7aGpg003581;
+	Thu, 16 Apr 2026 11:18:55 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dg1mnjkar-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Apr 2026 11:18:55 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 63GBIttm1835910
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Apr 2026 11:18:55 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 88E8E58059;
+	Thu, 16 Apr 2026 11:18:55 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1558F5804B;
+	Thu, 16 Apr 2026 11:18:54 +0000 (GMT)
+Received: from [9.123.7.57] (unknown [9.123.7.57])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 16 Apr 2026 11:18:53 +0000 (GMT)
+Message-ID: <c1e9d3b5-c236-4e5c-8cf2-90df5e32005b@linux.ibm.com>
+Date: Thu, 16 Apr 2026 16:48:52 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests] nvme/068: add a test for multipath delayed
+ removal
+To: John Garry <john.g.garry@oracle.com>, shinichiro.kawasaki@wdc.com,
+        linux-block@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org
+References: <20260415104111.1439459-1-john.g.garry@oracle.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20260415104111.1439459-1-john.g.garry@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: AaOw05Dd72kb-l0wraPCpUcfO6dCRgQR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE2MDEwNyBTYWx0ZWRfX5DOaNUdR3zkD
+ TiOHt7fgGRHyFZ0WRQsZdUfCXz57R3MJSWeMx/Ffkfbw+b0PRSMZ4VYGU/Pcw4fRVMBedBCe+Wz
+ R4ah8lxVOqTvCPELEdaVZU0lwUEeYdf3aPvsbNnP7LLRkcajUbiIXt7N+MR9cxWLGMru4eJDaMc
+ +HA+k/BPgjBjQkR1LGqtii3oYJC428w8PK6STdLR8/l817GLf5CtX2ConFD8ihCCQiL8wwvWaA7
+ 9MpXKuffd78hEnHuf3r7OTlbxxJtvbmJ9R2g1cVnRLxvMVMJl+EnsjKKsLPCcf64Eb8vegLCTUG
+ 9hdLU2auW16SP7RAQIRDUTlwWsGCJ21h8d6I+eMrD7NujxEXQl9vWrhImDMjjsODoGIxDr5zzrN
+ 9RVHVaEWKdUpDR9K4n1ZsO2MchmflfemCdUVnuvWVtM0f9JygL5pEEBNr5AFPhiYTx4vHRiZ/Gj
+ CzuT4BlNMi8kUmrg8YA==
+X-Proofpoint-ORIG-GUID: AaOw05Dd72kb-l0wraPCpUcfO6dCRgQR
+X-Authority-Analysis: v=2.4 cv=FY4HAp+6 c=1 sm=1 tr=0 ts=69e0c5a1 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=nsBul3eVbvCJHK_4BqQA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-16_03,2026-04-13_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 spamscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1015 malwarescore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604160107
 
-The proposed patch fixes the issue for me and doesn't cause any visible issues 
-(in normal operation, I didn't test actual device failure). Thanks a lot for 
-such a speedy fix, looking forward for the final version to test as well.
 
-> ---
-> diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
-> index c33099925f230..cf1c25f290f36 100644
-> --- a/drivers/md/raid1-10.c
-> +++ b/drivers/md/raid1-10.c
-> @@ -293,8 +293,16 @@ static inline bool raid1_should_read_first(struct mddev
-> *mddev, * bio with REQ_RAHEAD or REQ_NOWAIT can fail at anytime, before
-> such IO is * submitted to the underlying disks, hence don't record
-> badblocks or retry * in this case.
-> + *
-> + * BLK_STS_INVAL means the request itself is malformed (e.g. unaligned
-> + * buffers that violate DMA constraints).  Retrying on another mirror will
-> + * fail the same way, and counting it against the device is wrong.
->   */
->  static inline bool raid1_should_handle_error(struct bio *bio)
->  {
-> -	return !(bio->bi_opf & (REQ_RAHEAD | REQ_NOWAIT));
-> +	if (bio->bi_opf & (REQ_RAHEAD | REQ_NOWAIT))
-> +		return false;
-> +	if (bio->bi_status == BLK_STS_INVAL)
-> +		return false;
-> +	return true;
->  }
-> --
+> diff --git a/tests/nvme/068 b/tests/nvme/068
+> new file mode 100644
+> index 0000000..e06fd6b
+> --- /dev/null
+> +++ b/tests/nvme/068
+> @@ -0,0 +1,118 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2026 John Garry
+> +#
+> +# Test NVMe multipath delayed removal works as expected
+> +
+Should we also reference the commit 62188639ec16 ("nvme-multipath:
+introduce delayed removal of the multipath head node") which introduced
+this feature in the kernel?
 
+> +. tests/nvme/rc
+> +. common/xfs
+> +
+> +DESCRIPTION="NVMe multipath delayed removal test"
+> +QUICK=1
+> +
+> +requires() {
+> +	_nvme_requires
+> +	_have_loop
+> +	_have_module_param_value nvme_core multipath Y
+> +	_require_nvme_trtype_is_fabrics
+> +}
+> +
+> +set_conditions() {
+> +	_set_nvme_trtype "$@"
+> +}
+> +
+> +_delayed_nvme_reconnect_ctrl() {
+> +	sleep 5
+> +	_nvme_connect_subsys
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	_setup_nvmet
+> +
+> +	local nvmedev
+> +	local ns
+> +	local bytes_written
+> +	local refcnt_orig
+> +	local refcnt
+> +	_nvmet_target_setup
+> +
+> +	_nvme_connect_subsys
+> +
+> +	# Part a: Prove that writes fail when no path returns. Any reads or
+> +	#	  writes are queued during the delayed removal period. If no
+> +	#	  paths return before the timer expires, then those IOs should
+> +	#	  fail.
+> +	#	  During the delayed removal period, ensure that the module
+> +	#	  refcnt is incremented, to prove that we cannot remove the
+> +	#	  driver during this period.
+> +	nvmedev=$(_find_nvme_dev "${def_subsysnqn}")
+> +	ns=$(_find_nvme_ns "${def_subsys_uuid}")
+> +	refcnt=$(_module_use_count nvme_core)
 
+Should the refcount be stored in $refcnt_orig instead of $refcnt?
 
+> +	echo 10 > "/sys/block/"$ns"/delayed_removal_secs"
+> +	refcnt_orig=$(_module_use_count nvme_core)
+
+We may not need to again store refcnt here if we store it
+before enabling delayed_removal_sec above.
+
+Other than above trivial comments, this looks good to me.
+
+Thanks,
+--Nilay
 
