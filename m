@@ -1,145 +1,119 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF2D82866
-	for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 15:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776353268; cv=none; b=rmEpWpHT0h+9avQ0sYETKPCSHRgeLgwMU+JGIQwmW6bo30tyR8llYoUl2gnmQIT+3W4iYf35xrXIbIxEWB/FXMQbAHh4pZqb5ToZ6MfFiSFxDD0ghhxW+fitjaBpmdKZJg+5oFp7QskA+aHmCRxoc8ckJJjUIn/kX5QTaLy3Z1U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776353268; c=relaxed/simple;
-	bh=7O8461+KKSNV4SQKExQrXmF3Zec1VEEVyAMe0lkB4oo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QoOtGs++Vz/Pq2b7K3aIt70cEH2Vlhb/x2yDn3TqX5OY0plRPoE1ofRNhQSCfSRQbDDex+sI4NRG0MhEWk/czl3BZHVgyXiAbAV5UDLw2asE8hElu8m/v0ETmu9bMd/uAUNOY8pUqR1MeMy7rdss2q+O9iU9jzatqbl9tf73U1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fM2fzwTU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEE83E3C6F
+	for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 15:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776353902; cv=pass; b=usns820IAvsn3BXEPfb+cciwANQhKKxdgx6jsAGiCDMeZTTwstw7CSHhsmbpBT+XNaMojBXygnK3eMwRl4HwAyM4MmuY8Pdwfd1xdz2nYJrOshRiYQOqPwe/peMJRGF1boxOQjlkucWHwtASCtYOTDDGLjik2UelZVAH01I+gA8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776353902; c=relaxed/simple;
+	bh=AWxB0J1B6KAtOPYtjfiwdJN7ZhgoPpnQloeJYrsQ2O4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P9+Xpz6szQR6Xq8FSV6LE3RZTWlsjMiOxdXe75fwhRSDi1BoCOgE8X/+tqnDy/pTLO29ZE0weZQtHghhzYnO5sbQZSpQrYzNw/QAolP3htvAUwaThRTvN+z5PwfiyK8vX9WC9YUlm/gQG4uUwImwcizNEKNsCA6ivMdD6g2DCDc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SBa1ougG; arc=pass smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fM2fzwTU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776353265;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vFY8emkWvh+CcCvc2Sq9jqOrMYd8LQx+4a873ps+EKA=;
-	b=fM2fzwTUQHOBH3WlbbzAS2gvv8rGRidB4VefAZ4w1QzzX4aX00H1uEOoNo7m4WxmSbTiHI
-	4EpqnZJgRZGDJ9uytsU7cuYiXJrIT5iRBFnW8rbUIhzC2voYtpb3KebkBeoAgvE6m4xYJl
-	nOxrnlWY8hZYxjAZSm3avYRWOyeq/+E=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-154-RD7OP0XxOxWsppgXoN-JIw-1; Thu,
- 16 Apr 2026 11:27:42 -0400
-X-MC-Unique: RD7OP0XxOxWsppgXoN-JIw-1
-X-Mimecast-MFC-AGG-ID: RD7OP0XxOxWsppgXoN-JIw_1776353260
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F2E11955F07;
-	Thu, 16 Apr 2026 15:27:40 +0000 (UTC)
-Received: from rhel-developer-toolbox-latest (unknown [10.2.16.224])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 46A7530001A4;
-	Thu, 16 Apr 2026 15:27:36 +0000 (UTC)
-Date: Thu, 16 Apr 2026 08:27:35 -0700
-From: Chris Leech <cleech@redhat.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: alistair23@gmail.com, hch@lst.de, sagi@grimberg.me, kch@nvidia.com, 
-	kbusch@kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	yi.zhang@redhat.com, mlombard@arkamax.eu, linux-block@vger.kernel.org, 
-	shinichiro.kawasaki@wdc.com, Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH] nvmet-tcp: Ensure old keys are freed before replacing
- new ones
-Message-ID: <20260416-landlord-encounter-c93f2733de5f@redhat.com>
-References: <20260415230250.2783414-1-alistair.francis@wdc.com>
- <959f800d-b92e-406e-a174-680fb09c884e@suse.de>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SBa1ougG"
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7dbbf1e1058so548210a34.0
+        for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 08:38:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776353899; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SjT8/HKqp1hRlItWmnl3vsmepZwsx1wsSUvewH2CgoAMzk/nX9lbaTW5+qQWYPitXf
+         iWRlce0U1mKSEkzyT+Se1pIutoJ24Byd6f+egQs/BqU4DZYs5DppxzxzyUQOfX4KxGCE
+         tp+47HRnzrqWe6vv4wEopAZ9N+C1pgjAUbpnL9q2moCucv8ZB5sXoG5T2gyrhA9pwjr8
+         E2YzXdisMfFCKxYbg57RmX9Kb3I8VkXGXeKHoGkZXrHkQBIOJPyXImQGosbdm7D+f8WH
+         QLqd0ZpuO4k7ksN+3lb4z4aLLY5l9+T3uNM55rMkhoIcFUHq4cSHPNKSAcF0uheUQdO5
+         YAyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rO65poDPP2TbW/BEGrFidJzuG0j5NALbmB0fqJgYvtc=;
+        fh=4ieScxZLoP92QAfIpXwQ+1KK5rPQk21ukvhb+LkO7I8=;
+        b=UTmj2rUvLx2e9NJ8uaYAk7QkuMNcE7upys/rQpzIqyPBUZCrKUHSp/SDQkJm3DHemG
+         RB+E7exDwkQ3FMdcFnvF3PW1T0JfV9ymVhYkAH/+bYlcx85BzUZoHhG7/kWT433jkr8L
+         xrUyX1ZaRfqbdMarsSGMnJxEGz1cetfYLKQRuUTiUYsRtVNomoqH/aaebeM9huAgrF5+
+         8lphSfm24LrVRoxEX3MA2u0cvHQrPdXNlMAMESvOccgrOJxx1e1pf0ukXXOPvLvmtsvQ
+         zeaaBryt2VbuW08YxX1FyI6sKlFlEvCRCqaHVXjKOCO0KkaVyih2bfvsaVeQl0PKHVLy
+         7kBg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1776353899; x=1776958699; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rO65poDPP2TbW/BEGrFidJzuG0j5NALbmB0fqJgYvtc=;
+        b=SBa1ougGt7Bbg/L4kED8H3h5MfaSe8zEW2zCVcyWDN6Dph84xWvhl9657MApRlQvt+
+         n4hhbkWh7aDtMVG1O3zmKxxi8yUriEd69bkIGjGtZOvogAH1YSO5+oMA63gAwidGkvT1
+         w3tYInhOu/43JJqgVP34tfL0GLwuk0sxSpio8tJwU8YX1McRG6w8dBzSf3aEjEF9Y0lF
+         hm5IY8O+hZtkX/rkdqag9dLTITeYY281rH+B+YVYX+ufk5ignirYLwXzJf8Xmdn0HkYr
+         QkPr3GWe+1drXt2wb4/7l+E2Ku3DNhLMOkPxV2GTXbNQOxEUIHHjFlQI6iZg92DVW3h0
+         ZWxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776353899; x=1776958699;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rO65poDPP2TbW/BEGrFidJzuG0j5NALbmB0fqJgYvtc=;
+        b=IUNRJ7HeOlZyHWxCxqJ9127dtd9CC/y/JwxA3SbL9NRBLPqN0PcXTiPJ5s5urhKZ8j
+         xV98h3skqZF3Dv6MpjXha821jn10c+OCJQIuoSAsZBx1anIbu2aWiTYSjGpL5O/WlI6f
+         50b4Dow9mSo4KgdNj1sRtZB3MMjEhoPazs7C2Ur+YCx4vwQahrHMECBH8ci4EjsSanmK
+         HttLdFHtqJzxkskQ8kF5Dq2VEb+2kvrv9+Mxd6cp1FVTJehaBkP1slk6AA5cNyJoqV05
+         V8KwhYXLgTeu02YM5mEAZfb2VQg7gwnMKPkcci9G5vNj8x7F6ZFi8k7tY1MzxapWacRn
+         ujqg==
+X-Forwarded-Encrypted: i=1; AFNElJ9ElUWp5i+MQfcl6EY0CPibT0bEwfdrVQ+2fazshV+FfTd34ud4SlATtmpinZH+U0vw61WlWF+/QfgqTA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO469mMLV9HH+4UDlTWHvrN0nsmU4t7PD/GKtBIq9FR0NUMEJb
+	bG8o/0yj/DRsTOpKCbRxCKnNHlKKWIsimtbH2aFXdj/HvD+s5agP579aegi1zAPR8skNN1wskOZ
+	Rnv9Jzx0G5Rgykj6P9K4sjscyPotMLjM5zghigrjTZA==
+X-Gm-Gg: AeBDiesDg/KIRt+qy9gX2cGsbWDOVV32a0peJHYUTjSbZ1qZQwRfpVQZq4TSs5pl9pd
+	M7H6Mn93/uw20AJdOcV/4Y/D/nO27UkoK6aU7FG19IQ8I4uJDQYyEH38c+92wgMOqnLB21FoUKn
+	pbR7rtW0+HnCdALyAoS8ALpbFyO+1q2ydAJzOE/73LZZs5JDp3iZbLUxStSfdRKFa1TkqIqX320
+	SZq+QFD6hmawt44kF++GEZx/kxS0liUfqWHT5+qAinEMzV7Vui1sUXF3HKOn+lChZmkjAYFQLpr
+	2s+zBNXN35any+YCUQ==
+X-Received: by 2002:a05:6830:348c:b0:7d9:b338:a669 with SMTP id
+ 46e09a7af769-7dc83cf961dmr1163907a34.2.1776353898946; Thu, 16 Apr 2026
+ 08:38:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <959f800d-b92e-406e-a174-680fb09c884e@suse.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20260415210847.1730016-1-csander@purestorage.com> <aeBxOVmQ2bLli78f@infradead.org>
+In-Reply-To: <aeBxOVmQ2bLli78f@infradead.org>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Thu, 16 Apr 2026 08:38:07 -0700
+X-Gm-Features: AQROBzAYjsmVYKZSSCDVvPyzGlyPCSBq9VE4-_297gBMh499ii0YGZaNdUE1y0s
+Message-ID: <CADUfDZpcNG_GPpZYh9tWKEBjKHD53DVCmQGTrXKQvBpP7PCqsg@mail.gmail.com>
+Subject: Re: [PATCH v2] t10-pi: reduce ref tag code duplication
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 16, 2026 at 08:16:14AM +0200, Hannes Reinecke wrote:
-> On 4/16/26 01:02, alistair23@gmail.com wrote:
-> > From: Alistair Francis <alistair.francis@wdc.com>
-> > 
-> > Previously after the host sends a REPLACETLSPSK we freed the TLS keys as
-> > part of calling nvmet_auth_sq_free() on success. A recent change ensured
-> > we don't free the keys, allowing REPLACETLSPSK to work.
-> > 
-> > But that fix results in a kernel memory leak when running
-> > 
-> > ```
-> > nvme_trtype=loop ./check nvme/041 nvme/042 nvme/043 nvme/044 nvme/045 nvme/051 nvme/052
-> > echo scan > /sys/kernel/debug/kmemleak
-> > cat /sys/kernel/debug/kmemleak
-> > ```
-> > 
-> > We can't free the keys on a successful DHCHAP operation, otherwise the
-> > next REPLACETLSPSK will fail, so instead let's free them before we
-> > replace them as part of nvmet_auth_challenge().
-> > 
-> > This ensures that REPLACETLSPSK works, while also avoiding any memory
-> > leaks.
-> > 
-> > Fixes: 2e6eb6b277f59 ("nvmet-tcp: Don't free SQ on authentication success")
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >   drivers/nvme/target/fabrics-cmd-auth.c | 7 +++++++
-> >   1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/drivers/nvme/target/fabrics-cmd-auth.c b/drivers/nvme/target/fabrics-cmd-auth.c
-> > index b9ab80c7a6941..58185184478a4 100644
-> > --- a/drivers/nvme/target/fabrics-cmd-auth.c
-> > +++ b/drivers/nvme/target/fabrics-cmd-auth.c
-> > @@ -412,6 +412,13 @@ static int nvmet_auth_challenge(struct nvmet_req *req, void *d, int al)
-> >   	int hash_len = nvme_auth_hmac_hash_len(ctrl->shash_id);
-> >   	int data_size = sizeof(*d) + hash_len;
-> > +	/*
-> > +	 * If replacing the keys then we have previous successful keys
-> > +	 * that might be leaked, so we need to free them here.
-> > +	 */
-> > +	if (req->sq->dhchap_c1)
-> > +		nvmet_auth_sq_free(req->sq);
-> > +
-> >   	if (ctrl->dh_tfm)
-> >   		data_size += ctrl->dh_keysize;
-> >   	if (al < data_size) {
-> I am not sure.
-> The authentication variables should be freed as soon as the authentication
-> completes; the session key is ephemeral and
-> should not be stored longer than necessary and will _never_
-> be used again once authentication completes.
-> The TLS key, OTOH, is used throughout the session and needs
-> to be present while the session is active
-> As such, both sets have vastly different lifetimes, and
-> I would argue that this
-> 
-> void nvmet_auth_sq_free(struct nvmet_sq *sq)
-> {
-> 	cancel_delayed_work(&sq->auth_expired_work);
-> #ifdef CONFIG_NVME_TARGET_TCP_TLS
-> 	sq->tls_key = NULL;
-> #endif
-> 	kfree(sq->dhchap_c1);
-> 	sq->dhchap_c1 = NULL;
-> 
-> is actually wrong as we should not modify 'tls_key' here.
+On Wed, Apr 15, 2026 at 10:18=E2=80=AFPM Christoph Hellwig <hch@infradead.o=
+rg> wrote:
+>
+> On Wed, Apr 15, 2026 at 03:08:47PM -0600, Caleb Sander Mateos wrote:
+> >  #ifndef _LINUX_T10_PI_H
+> >  #define _LINUX_T10_PI_H
+> >
+> >  #include <linux/types.h>
+> >  #include <linux/blk-mq.h>
+> > +#include <linux/wordpart.h>
+>
+> We must have already gotten this implicitly given that the code
+> already uses lower_48_bits.
 
-I agree with Hannes, and was just about to respond with the same
-feedback.  I think the freeing of the auth temporaries needs to be
-returned to fix the memleak, and the real problem is the setting of
-tls_key to NULL.  That doesn't seem like the right lifetime for tls_key,
-and it looks to be a reference count leak as well.
+lower_48_bits() is defined (and only used) in this header. Yes,
+wordpart.h is already transitively included by the other headers, but
+I think it's good practice for each file to explicitly include the
+headers defining all the items it uses. It reduces the risk that
+refactoring the other header files in the future will result in a
+compilation error here by dropping the transitive include.
 
-Is the presence of sq->tls_key the best check to see if the socket is
-currently in a kTLS mode?  (it might be, I'm not as up on the target
-code)
-
-- Chris
-
+Thanks,
+Caleb
