@@ -1,67 +1,81 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0A536165C;
-	Fri, 17 Apr 2026 07:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACF935DA67;
+	Fri, 17 Apr 2026 07:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776412511; cv=none; b=pETitB/E6VNTC9AajDSUvCI3kY1mEdgpUcxaSFdT7n1WGBwSC4pytw/+ZwpOAZ5wLO4ISuFZOp/04UJAuWDKfwpPKIr20Etita0dhDcGzYAewjyUIFVndlvfzDh67OXEsFhl0R9rjkbsBRfAL+S6NIKpZUSKyBeuNj8HOt5p+BU=
+	t=1776412617; cv=none; b=sWG4mEdUXB7aQZBxJFydNgzJIwGG1jLB/6SpYxJn6y/Uxk647cKOPuIJucDR8UOvKrOWj+CNBMLibICDlkQ8PWPM9uAAK1/ImbNCRLJxPwMwaPEb//tEDx8mRmTtYb/qExU/wQSn/i0oUPdQ9tricexTz3OUEFnA8JCvpaPgnx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776412511; c=relaxed/simple;
-	bh=ajAVELCEaERjQo6lioB7t9fK+z3PTGZsW7P6NLKstqc=;
+	s=arc-20240116; t=1776412617; c=relaxed/simple;
+	bh=A8ziK+qsemynhD1kTnUEzTLOi5oAwdVlPXv5NP4Z2TI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qWnS2Cr43wAgK655d4ZAAYF8nBxZXYNrY+m5Elqd0MtJjuGkkMg2Fcz6xBDpw4FNTZwjJvp28Z93osURmIjp7XQRYntGylQ37y4necPicKbkYVXvo8u8KJ86KmX+7CPWmX4bC67NDh6wMbyoXxCJn+Q0wRJ2EAriJWzMhsthy18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7A4CF68CFE; Fri, 17 Apr 2026 09:55:07 +0200 (CEST)
-Date: Fri, 17 Apr 2026 09:55:07 +0200
-From: Christoph Hellwig <hch@lst.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pRSXmDa4D+2uajFVruyFpacAOtJdPbqjOPfMj67bDUtO6LBhCA6T4LTr02TfQdmW2xzFDWTiAkdl9GYQZoaD5YXqFjS/t4yZPPq48OFWz/h4r4sTadymfvf9ucBhFEbsHtl63A2aoJdHZhZgMvNqqcGYdIAXepWgPzHqyR1ik9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ldz7IcAM; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ldz7IcAM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=gdKdo6SJ0M9vWrO0nCbv64XTILja2MjM0qSRXND2XuQ=; b=ldz7IcAMooHjJik7zEpBMu+8+3
+	LxDOsQFA3xqEpU0N7p5qCc5oUDt5XftpfrDkYsgnLuOm27n3LjStL+UN0IFukRrSvbc2A+vchcFTR
+	U++yuKE0LIlt2JgJcnUvFuiOHp4mOLliMr8VnwiNZQAXOxkDwR4uPGQHwCGgKp5+261wewW0980Tr
+	zQWlj4pLEbEIyUFeUnLYMUqcXqS6t7mGJF8rityK32Qx8sM+t02ShEidYO/DRhU/ZRaHudEJ8M2wu
+	OQgBye3TfFaDCuklt3/h0SRioI8aYWKPyvuDmwIyRKC7hVQ9wfz7IZYTRTlaRhk1hzj8HbRVtDszb
+	N8O+kdSQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wDe4N-00000003di2-08WL;
+	Fri, 17 Apr 2026 07:56:55 +0000
+Date: Fri, 17 Apr 2026 00:56:55 -0700
+From: Christoph Hellwig <hch@infradead.org>
 To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v2 6/6] blk-integrity: avoid sector_t in
- bip_{get,set}_seed()
-Message-ID: <20260417075507.GD31524@lst.de>
-References: <20260416002214.2048150-1-csander@purestorage.com> <20260416002214.2048150-7-csander@purestorage.com> <20260416052325.GE14950@lst.de> <CADUfDZpbOhO9BUW_mFZYh9-UZU26_o3rFGBffNTpepk0ogJhZw@mail.gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH v2] t10-pi: reduce ref tag code duplication
+Message-ID: <aeHnx2GcBmutcsBW@infradead.org>
+References: <20260415210847.1730016-1-csander@purestorage.com>
+ <aeBxOVmQ2bLli78f@infradead.org>
+ <CADUfDZpcNG_GPpZYh9tWKEBjKHD53DVCmQGTrXKQvBpP7PCqsg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CADUfDZpbOhO9BUW_mFZYh9-UZU26_o3rFGBffNTpepk0ogJhZw@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZpcNG_GPpZYh9tWKEBjKHD53DVCmQGTrXKQvBpP7PCqsg@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Apr 16, 2026 at 06:53:05PM -0700, Caleb Sander Mateos wrote:
-> > > +static inline void bip_set_seed(struct bio_integrity_payload *bip,
-> > > +                             const struct blk_integrity *bi,
-> > > +                             const struct bio *bio)
-> > > +{
-> > > +     bip->bip_iter.bi_sector =
-> > > +             bio_integrity_intervals(bi, bio->bi_iter.bi_sector);
+On Thu, Apr 16, 2026 at 08:38:07AM -0700, Caleb Sander Mateos wrote:
+> On Wed, Apr 15, 2026 at 10:18 PM Christoph Hellwig <hch@infradead.org> wrote:
 > >
-> > The bip is pointed to by the bio, so we don't need to pass it separately.
-> > Same for struct blk_integrity.
+> > On Wed, Apr 15, 2026 at 03:08:47PM -0600, Caleb Sander Mateos wrote:
+> > >  #ifndef _LINUX_T10_PI_H
+> > >  #define _LINUX_T10_PI_H
+> > >
+> > >  #include <linux/types.h>
+> > >  #include <linux/blk-mq.h>
+> > > +#include <linux/wordpart.h>
+> >
+> > We must have already gotten this implicitly given that the code
+> > already uses lower_48_bits.
 > 
-> I did consider that, but all callers already have bip and bi in
-> variables that they also use elsewhere. Seemed like it might be
-> slightly more efficient to just pass the precomputed values instead of
-> looking them up again. Not a big deal either way. I'll go ahead and
-> implement your suggestion.
+> lower_48_bits() is defined (and only used) in this header. Yes,
+> wordpart.h is already transitively included by the other headers, but
+> I think it's good practice for each file to explicitly include the
+> headers defining all the items it uses. It reduces the risk that
+> refactoring the other header files in the future will result in a
+> compilation error here by dropping the transitive include.
 
-In general I much prefer API-simplicity over a little bit more
-efficiency unless we can show it makes a difference that matters.
-And given that this is an inline function where compiler tend to
-avoid duplicate dereferences anyway I doubt we'll see a difference
-here.
+In general pulling in a new header when no new user of it shows up is a
+bit weird.  I don't want to hold the patch up on this, but there are
+folks out there actually dropping not needed includes from headers as
+it can significantly reduce compile time.  Now this is not a heavily
+included header so it's unlikely to make a difference anyway.
 
