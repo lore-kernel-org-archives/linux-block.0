@@ -1,69 +1,69 @@
-Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
+Received: from mail-yx1-f99.google.com (mail-yx1-f99.google.com [74.125.224.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B0829898B
-	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 01:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B1A2DC792
+	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 01:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776391069; cv=none; b=TrWflTuFPD7ZO4MHZQMDGvQe+bhviN+LdrS+IBKldlgTYFLy0egzIIGfE4a8hnO7l3OVqEY3obM0v+bI3tr4fEdelpjaOEwKYT12DHi2TkoInCu1nq988ze9WS0ZNXSaiyjfDYgjpmPodvIHBb97c99tYnCDGpER/Maxi0Mc3S0=
+	t=1776391070; cv=none; b=nAhun4peKGa6VBOLFwpLJfL4FX16sPYgA3Ar0tnJsbDVUhuIl4M3h8y/YAyTKf1zhc+Y1XST7x0Zgr6za1NGGu7OMIQ7FXbtCbw1+Ks0he3EKBeEQUysR8NeG9ZQRmZctoRjRXbo7177ahMJSiqg5rCVk0vTPnk8gtaBZYEw7Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776391069; c=relaxed/simple;
-	bh=fQjdv8zJMdZXPE3+o9HQjjjAYJQi9CMWVL/qH8XIuzU=;
+	s=arc-20240116; t=1776391070; c=relaxed/simple;
+	bh=4rwKcoxtwwyEUMs+lZSg7yRkJNPnm1I0J0geFKeIcpo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rv6LFiOpSBySmLT3c+F856iwB0E8P6suhoIgRgJlh35v2QRZgHnMLJyUzNJiSbvrD9g2A2UQPt57l2Jbp6bF5s4OBIcvRbjdhEmfj7KINtie8a13LD8ffsLZ5HFmi2dgnq+U5zP2cdMc7D4CLdhW4s14+iiUlnFlUNBuDfd7S3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZJZi3M08; arc=none smtp.client-ip=209.85.214.228
+	 MIME-Version; b=NQ1/+czDqoP5JZW217MnCnk2SqOqO7vRKMx8+Lk29F/poEsqVyrpfj3iPIjPhyH59ie9SloURnpaylw5EebBLEtyUKkevbzrcM7hx4moRw3LLeKvAKjPY4QfVT84ucitnfY3CxOVE+0DJA1Y9CmJwDNq8xvvyQhfr1EEUtgCv8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dxq58Rwp; arc=none smtp.client-ip=74.125.224.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZJZi3M08"
-Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-2b240d753ceso416865ad.3
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dxq58Rwp"
+Received: by mail-yx1-f99.google.com with SMTP id 956f58d0204a3-651b17f1bcdso25417d50.3
         for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 18:57:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1776391061; x=1776995861; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zj1lF3dU8n4YC5fdjZZVtRHMdHV4skYCpsqVKv3fQsI=;
-        b=ZJZi3M08LetAVLNfc6qawM3q4dOy/laMdDch3I4DjL5dIjHTKFRadeu7F6qyJFYWbd
-         aneZewcM1s+pCeJHWwskiTfXVwWsO5pfna9DU26vlIvVkmEXH/2UcuaBHwzrNphm6AsE
-         Q1g/XjnXbnOKPAEQbCrEBP39MkaXprf+T7g87ie5VCutlfYLINmCfnBCgx9me79ZRMIa
-         OlRHn46Q4+Jz9n8wBkCSdZlVv8GuZNRIDSb4NAgAU1eimCaJzkUkeTp2Ounkqjh4olxa
-         Mot5BQ8BpM1H6FB1VW7pocA/Cnm4Z8GSq2n/mhKPlNobPgO7LwmDmLmDJNluJrLYDAMr
-         B59A==
+        bh=nVdvVaugSDz6j9AO/nmgKpHbKb4qPtoLkQfjj793Zaw=;
+        b=dxq58RwpRQQBlt04OmbEH1R33EnT3d1TCgA1dmt+LGq32r0ELoA/TIOYRSQEvWuZlZ
+         /clMEcjdCCnXogPb0rQlAKPufdE44kTA6l2oWn6MZfQJ57H5wwKqMjKGq1LxIPZoeEnh
+         H8HoCZM34DNvvaepcGHdySfabteMnvohic2kflq4SLCtYo75/c01bbGnvAtVQv0YAVrr
+         0X+6n+OHnHkCH8puWj/ilZejiiHAfXg8pFaFqQG3UWqK71rSAMtQ+7ylPV8JjtkEjpYO
+         BLV1zktVZeMe+LRHU1QCcyfdw6t8ECeV0ErgrYYGk2JDs4Lqt9xzQwFHkdg3vGWHnA9K
+         8B/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1776391061; x=1776995861;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Zj1lF3dU8n4YC5fdjZZVtRHMdHV4skYCpsqVKv3fQsI=;
-        b=Y3QrkG9V08eaXIrnlbue8C28DeRG85gcGNHPsGmWKfXef9eg3jpiI+XuWgfcTVEUB+
-         Ld9t6ek8CIbmufRpqCBnyOAIXhbNiil8Gvfc78HjHVX4u4qrehX89Egic7HJ8XfTU53B
-         eguhIaxKyPo8fhwBsxKcyyyuXWLPcINFEw858FHXRzhpvLb53MyMxDzjQt+kbxnZQ6oN
-         mIlrYxRO/rkaAv0h1pdK4pYrb6fq8iQhIfiWGvmIx+ChNMkfYCoLCsAGrflzOmzSDR3N
-         Be9I+nzpj/pC0t1l6VtKId3IoKRueoBmMU3ukM1/A63V85uQlEIJwPbhjLg0oIi+7Dtr
-         qB+Q==
-X-Forwarded-Encrypted: i=1; AFNElJ99D7zdHdBQAFha5zzUOIQYHvgHBakHLbfB4p2y4juNUHs2HsSIjRlJamhCLUtmaETPk3VOUIhhaBN95Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh4Sah6Z1LtuoPmlwPx1h9Q0xzNxj6rWX4TpujcfFzEw5i0Etz
-	bfaJJNCGK/xg52JtDLLK832JOwMHky1NJFTkRbbV9+y2yXzyjmf3Xk/uLFQCM9fkI8OyLnNlrR2
-	I0QDW85kkBJQsrvkRieMQF7eL2rG8mipydkfQy2YpB5nwhSaCydCF
-X-Gm-Gg: AeBDietwEw2NClVMSxIJPL2xMLuhOB5JNCE3HwQCFhzmzB+p+kS2Xs/Rql2cx+B94Wc
-	6x1canYFTstiZCfVxJmfpY2Azuz5ssfcNEBWanZ/XJzMhoiM48KMvguoCdMQqxb4an3LAH6TvFG
-	hEKz8u1KraJXBqVceZrMm1Peylm1CC448IptzFnHVmbC/V3prrU3hhPejMiL99Z7MrEcohsAi9+
-	GisFnDu37M7jeNh6TJo6mYB5/tTUbAOKLnZdoHveM7IDSMUqyyFnXYmyxZEmL2dfnMBNaqG+mMR
-	IzbSLiuEfdb4nY/hs6oFsRlvvvtP55DqzTPC0XETD6wVk34HTYMxzkP62P8ug/+AFdvJgX2iSTo
-	tfBrQOhvYKjPhCf8yQzsx7mD/U58DRbTWxxmseXn53wFoHMd9OA==
-X-Received: by 2002:a17:903:3dd2:b0:2b2:57a0:9c08 with SMTP id d9443c01a7336-2b5f9f7bc49mr2795455ad.4.1776391060723;
+        bh=nVdvVaugSDz6j9AO/nmgKpHbKb4qPtoLkQfjj793Zaw=;
+        b=CI/6LpmjRZay/oTeLAr4FnZjZSaW3gK0pbOZjpYzvgEbHlgvU3NRtojjPR2NvqaZoj
+         63uq27EsPmY/vm4j+qnJqDEoUQUsWgJHCl+HqjddGzjy8ZO2nCczuO+fcbhEXo3602Na
+         hqCdLT+63GfGduTjCGfIJ567HV4bRnv2BfKrWGz+Jb172ljogtD17kCRwukpSNUN0Dhh
+         BObVbq/O82k5X65LvOuHmW4/lX1AhiPFEJ/WZUSOswcN8I86lj2fS2/+v3hgDsBGR375
+         vC9uyOZiVsvjL/ca0CgRT+l1pSvnAPctiA6iZYkg0cnPJE99isERmhcTYfaQ59O+frlw
+         KMrA==
+X-Forwarded-Encrypted: i=1; AFNElJ+wyY3iBxcDygCH01qU4D2cnZ67kIt/kaz9ucJjDcH6lyW4HA4Oi8MsC3nID3Uewv0MT9dPZ8xdq3hQhg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWExg4mxiOPMlcQ4EMUcYlwosXbQCRoaU9/h6vN9SqThezcEBX
+	2F2mCqsQBaHkGjGCOWEZsR9uFULQMypa7BSeBNUhpMXO3G59HE/KnkHWEVOslQ9SxpbWb4hAVsV
+	DWJFBUWTBeTGm9io29I/Y7TLNAhk3oiBz5Q96JmidWl/v3o5czS49
+X-Gm-Gg: AeBDiesF3Msc6M7tglHnDLdHlUMF0qIY6CswovLQHMCQP2vSgt6dUVMxJ5dPFPS/R3O
+	hSDTN78RxU/V5U2wgEQE+TpqXiRU5NKqreIto5qyKD6iymVuU8fkFjPn975NfNWIxCVE0/Ns8VO
+	WRtlaHzV/IZfTDQJPrO693vNpJJufAY199u1/d6WA8w3mE3CqROhN8rW2BGgQ3BCP0P+5Nc7pH0
+	r5f36c6cCeiIF+6DzrR/Tv8jUnTDmGjmDNvWFac3PAbbpikZYMSuY/mOa8hFyMeSFtfqgYZi24v
+	SXFxzeQXCumgcBNRQ2DLCFAVczPr4s2KH+Yx1amHvE4Pw60K///OVoBRrDxzBNrmN+nuZ2b6oxb
+	TZ8kAqw7ex7UI1BC3Xwhco3weWmR10j6v4W/7gPFxUqRBGbszpQ==
+X-Received: by 2002:a05:690c:4b0f:b0:79c:ff02:a03e with SMTP id 00721157ae682-7b9ed037d1emr5894277b3.2.1776391060655;
         Thu, 16 Apr 2026 18:57:40 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b5faae2378sm215195ad.25.2026.04.16.18.57.40
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-7b9ee9a8042sm125407b3.21.2026.04.16.18.57.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 16 Apr 2026 18:57:40 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 0333F340B52;
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 295C2340BC4;
 	Thu, 16 Apr 2026 19:57:40 -0600 (MDT)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id F3652E406BE; Thu, 16 Apr 2026 19:57:39 -0600 (MDT)
+	id 25C2DE406BE; Thu, 16 Apr 2026 19:57:40 -0600 (MDT)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
@@ -77,9 +77,9 @@ Cc: Anuj Gupta <anuj20.g@samsung.com>,
 	target-devel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v3 2/6] bio-integrity-fs: pass data iter to bio_integrity_verify()
-Date: Thu, 16 Apr 2026 19:57:28 -0600
-Message-ID: <20260417015732.2692434-3-csander@purestorage.com>
+Subject: [PATCH v3 3/6] blk-integrity: take u64 in bio_integrity_intervals()
+Date: Thu, 16 Apr 2026 19:57:29 -0600
+Message-ID: <20260417015732.2692434-4-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20260417015732.2692434-1-csander@purestorage.com>
 References: <20260417015732.2692434-1-csander@purestorage.com>
@@ -91,50 +91,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bio_integrity_verify() expects the passed struct bvec_iter to be an
-iterator over bio data, not integrity. So construct a separate data
-bvec_iter without the bio_integrity_bytes() conversion and pass it to
-bio_integrity_verify() instead of bip_iter.
+To allow bio_integrity_intervals() to convert an absolute sector to an
+absolute integrity interval, use u64 for its argument and return types.
+Also use SECTOR_SHIFT instead of the magic constant 9.
 
-Fixes: 0bde8a12b554 ("block: add fs_bio_integrity helpers")
 Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio-integrity-fs.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ include/linux/blk-integrity.h | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/block/bio-integrity-fs.c b/block/bio-integrity-fs.c
-index acb1e5f270d2..0daa42d9ead7 100644
---- a/block/bio-integrity-fs.c
-+++ b/block/bio-integrity-fs.c
-@@ -53,21 +53,25 @@ EXPORT_SYMBOL_GPL(fs_bio_integrity_generate);
- 
- int fs_bio_integrity_verify(struct bio *bio, sector_t sector, unsigned int size)
+diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
+index b1b530613c34..825d777c078b 100644
+--- a/include/linux/blk-integrity.h
++++ b/include/linux/blk-integrity.h
+@@ -64,23 +64,23 @@ queue_max_integrity_segments(const struct request_queue *q)
  {
- 	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
-+	struct bvec_iter data_iter = {
-+		.bi_sector	= sector,
-+		.bi_size	= size,
-+	};
- 
- 	/*
- 	 * Reinitialize bip->bip_iter.
- 	 *
- 	 * This is for use in the submitter after the driver is done with the
- 	 * bio.  Requires the submitter to remember the sector and the size.
- 	 */
- 	memset(&bip->bip_iter, 0, sizeof(bip->bip_iter));
- 	bip->bip_iter.bi_sector = sector;
- 	bip->bip_iter.bi_size = bio_integrity_bytes(bi, size >> SECTOR_SHIFT);
--	return blk_status_to_errno(bio_integrity_verify(bio, &bip->bip_iter));
-+	return blk_status_to_errno(bio_integrity_verify(bio, &data_iter));
+ 	return q->limits.max_integrity_segments;
  }
  
- static int __init fs_bio_integrity_init(void)
+ /**
+- * bio_integrity_intervals - Return number of integrity intervals for a bio
++ * bio_integrity_intervals - Convert sectors to integrity intervals
+  * @bi:		blk_integrity profile for device
+- * @sectors:	Size of the bio in 512-byte sectors
++ * @sectors:	Number of 512-byte sectors
+  *
+  * Description: The block layer calculates everything in 512 byte
+  * sectors but integrity metadata is done in terms of the data integrity
+  * interval size of the storage device.  Convert the block layer sectors
+  * to the appropriate number of integrity intervals.
+  */
+-static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
+-						   unsigned int sectors)
++static inline u64 bio_integrity_intervals(const struct blk_integrity *bi,
++					  u64 sectors)
  {
- 	fs_bio_integrity_cache = kmem_cache_create("fs_bio_integrity",
+-	return sectors >> (bi->interval_exp - 9);
++	return sectors >> (bi->interval_exp - SECTOR_SHIFT);
+ }
+ 
+ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
+ 					       unsigned int sectors)
+ {
+@@ -151,12 +151,12 @@ static inline unsigned short
+ queue_max_integrity_segments(const struct request_queue *q)
+ {
+ 	return 0;
+ }
+ 
+-static inline unsigned int bio_integrity_intervals(struct blk_integrity *bi,
+-						   unsigned int sectors)
++static inline u64 bio_integrity_intervals(const struct blk_integrity *bi,
++					  u64 sectors)
+ {
+ 	return 0;
+ }
+ 
+ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
 -- 
 2.45.2
 
