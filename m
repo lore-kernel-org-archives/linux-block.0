@@ -1,88 +1,181 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020108.outbound.protection.outlook.com [52.101.195.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF022FFFA5
-	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 16:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776445098; cv=none; b=FngXjwn0bTHvZCr4tPj3EA3wJlwNf+RdOfm6lrS89Kr4UYdtr284eVrciZohACsyDC6mXrdEf4DNpw17pJDwB/YuLOVMHq4GFumRC311OLAJDaRSNa3N/TpGh/grTxyw5MPB2oYKj0Mo7BM5oURy7cczOqrbM69PFE/mppjhOMo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776445098; c=relaxed/simple;
-	bh=bWW/GnGanoc2swdz1WuPRkprCjHBIK3TuTRWtfg7S0A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R/+8cntWTqqfIKtgPf81PnCUosJh5LGCj5qJZ3iYByhv9QTShURl9kj6bE4FQ+ev4wWCu5TbVowMoTBt/2eLXr/5LLdjNPJTwURv5D0F95IKfPKtpwLdTcHGvBeYdAHVBW04RLxhuTcGjM1M0DIXmlHD0M/i37AWduT6RRVz7J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NVFln2uE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NVFln2uE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1776445096;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aLM10jOwdSOCKnbr47lCVYbynLEmuueYz8PH1kR1jlk=;
-	b=NVFln2uEEl0A7UNq7stOqA1xuSHhVA/8Mc8VukQxt2svguQQ0CSj3prpok8spJ45Xi/8Ld
-	DYiz6yZmz6DiBHXdlLc6utaqLJuv1UD0o4+kO56Mb7dnPh02jUHMm2ZuaJZE8VSChbRpLo
-	A4NrOD41J2Cmy76HqtAtyI1XzM4M0iw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-3qTGo_kRMMyDgF51cl9okQ-1; Fri,
- 17 Apr 2026 12:58:14 -0400
-X-MC-Unique: 3qTGo_kRMMyDgF51cl9okQ-1
-X-Mimecast-MFC-AGG-ID: 3qTGo_kRMMyDgF51cl9okQ_1776445093
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2037E1800282;
-	Fri, 17 Apr 2026 16:58:12 +0000 (UTC)
-Received: from cleech-thinkpadt14sgen2i.rmtusor.csb (unknown [10.2.16.224])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 106C51800660;
-	Fri, 17 Apr 2026 16:58:08 +0000 (UTC)
-Date: Fri, 17 Apr 2026 09:58:08 -0700
-From: Chris Leech <cleech@redhat.com>
-To: alistair23@gmail.com
-Cc: hare@suse.de, hch@lst.de, sagi@grimberg.me, kch@nvidia.com, 
-	kbusch@kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	yi.zhang@redhat.com, mlombard@arkamax.eu, linux-block@vger.kernel.org, 
-	shinichiro.kawasaki@wdc.com, Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH 2/2] nvmet-tcp: Don't clear tls_key when freeing sq
-Message-ID: <20260417-9fecb7f3795b98707372292b@redhat.com>
-References: <20260417004809.2894745-1-alistair.francis@wdc.com>
- <20260417004809.2894745-2-alistair.francis@wdc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE7533DEF9;
+	Fri, 17 Apr 2026 18:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.108
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776449214; cv=fail; b=i48iqR8QCMtMuycZTw7nbpRH9M6E815xsQQR89TUQJWCCG3x1MFEYf7IEJssxC4obLdJzPAh5vMHL9F1eHCWfBUguUCKYzlWCW3KCzxy+eSK4sqmHo4myucicVdWJPQ2eVzARTm4d7+Qw/mP2D+F3c2eQkeAZmMXWkjySTvwrno=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776449214; c=relaxed/simple;
+	bh=vPAaXhBXd7lv1daqcMYZDDTsptjZ97dPCkF6r5fCDZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ePqEG/Lce2cZJHSaVDdMcb8aJA3LWfhnVWnJVJuGg+X+4235XqvVGhZ+ZQABfc2+FVucHRG65n6bsoG+BNyE1ZQ9XG/EGfSXqI7U909hjRBz5k8kh1PEjQ3Gj4niPtSxUMt/usmkrpKunCn8V+DF1nad2MNBFNIJ0vp9orflNXE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.195.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=I9UVLoZeQvZIwNJNGAdFk2skxxuKWJQi46F13aq9ekqe+QCY9Ze5tUlUg+Pqn4BHk/px780z0oZlOdonv1Jn1LDEiNG8TMvvkuWDYbQPB6klFY2+s4r6WalSxa/ZwAWcazOPmEOzKFHRByStDpAYAfS+b6iqDVa9EiWRXpcWnnn7dl873lBvYQXf2hZcIctQIKc4EV5qvq9JkCt4gw8dxdtapnipGxa3SXono1PIeKc3pzGAxZBWe86TcY3ifVBe0b3En9IChiZ/pzbGSFihse/himIUNVAoixnuzpXV7n2fZN0s9OCDh6R1vqZcZSHFjxDqDetQ3d6LKo/wtEDklA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vPAaXhBXd7lv1daqcMYZDDTsptjZ97dPCkF6r5fCDZE=;
+ b=CSYX8AmPFXgUV3uyiy9c6WZireDrfvJcjKPysWcCFf9R97Ci2GuJ/BGbqQl8CuG8iaJHMJa/iYO06LD27xePc7TGEBl03KFOIwXpkhkFo/frQFqbSQt/3Sj5Tjgwdxvom4Bf4ga1Bo/fPNO1LiMxe5+snqVDzEN7u5ZYIwb/7nS0q+0OTryHZpfLsL8i1KExaUPvIfvUTCfUNnuuMkJ1/4JY4umjzmyIoPyz6Xe7KxNWEJwqlU+0qjmXnv7bmy/VBj4FIAiHMG4m92dFnuiwX0590PJtFx8QzuqWa8hxeS6cRfZulKO1v7S/eaqnu8Xpl3FwMmvrx0YpBbApyDk/uw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
+ by LO7P123MB8117.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:450::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.25; Fri, 17 Apr
+ 2026 18:06:44 +0000
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9769.046; Fri, 17 Apr 2026
+ 18:06:44 +0000
+Date: Fri, 17 Apr 2026 14:06:39 -0400
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: Marco Crivellari <marco.crivellari@suse.com>
+Cc: James.Bottomley@hansenpartnership.com, 
+	MPT-FusionLinux.pdl@broadcom.com, aacraid@microsemi.com, akpm@linux-foundation.org, 
+	axboe@kernel.dk, bigeasy@linutronix.de, chandrakanth.patil@broadcom.com, 
+	chenridong@huawei.com, chjohnst@gmail.com, frederic@kernel.org, hare@suse.de, 
+	hch@lst.de, jinpu.wang@cloud.ionos.com, juri.lelli@redhat.com, 
+	kashyap.desai@broadcom.com, kbusch@kernel.org, kch@nvidia.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, 
+	liyihang9@h-partners.com, longman@redhat.com, martin.petersen@oracle.com, maz@kernel.org, 
+	megaraidlinux.pdl@broadcom.com, ming.lei@redhat.com, mingo@redhat.com, 
+	mpi3mr-linuxdrv.pdl@broadcom.com, mproche@gmail.com, mst@redhat.com, neelx@suse.com, 
+	nick.lange@gmail.com, peterz@infradead.org, ranjan.kumar@broadcom.com, 
+	ruanjinjie@huawei.com, sagi@grimberg.me, sathya.prakash@broadcom.com, sean@ashe.io, 
+	shivasharan.srikanteshwara@broadcom.com, sreekanth.reddy@broadcom.com, steve@abita.co, 
+	suganath-prabu.subramani@broadcom.com, sumit.saxena@broadcom.com, tglx@kernel.org, 
+	tom.leiming@gmail.com, vincent.guittot@linaro.org, virtualization@lists.linux.dev, 
+	wagi@kernel.org, yphbchou0911@gmail.com
+Subject: Re: [PATCH v11 11/13] blk-mq: prevent offlining hk CPUs with
+ associated online isolated CPUs
+Message-ID: <cgekb2d2jqw3syuiqk4fyta3iawhjkg7jvoeh5cpq62gcqinbv@77weoahh36oq>
+References: <20260416192942.1243421-12-atomlin@atomlin.com>
+ <20260417161116.373130-1-marco.crivellari@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ecd72ejjb7lu2kts"
+Content-Disposition: inline
+In-Reply-To: <20260417161116.373130-1-marco.crivellari@suse.com>
+X-ClientProxiedBy: BN9PR03CA0934.namprd03.prod.outlook.com
+ (2603:10b6:408:108::9) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|LO7P123MB8117:EE_
+X-MS-Office365-Filtering-Correlation-Id: b67531fa-906b-44c0-3681-08de9cac1530
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	/9os53Ch4xDlsjB5p+X5TXT5PBR48Nj9Fqdl4btTRHZ9lOQ1I/kLWTmDJaqi0/kx7zSQmPUtjVRXyvfytvWTki7vvSa4QwsgaI3+kJN+KKbTENI0yPsphQ6w+kqkLEQ3dztgPYQXRD8MIIZRIsaTvZ5IgtALyAiaXKr3FzM4xZ0Z8QB2a7RkSZZ7851E5iv/axteHCL7C7c5pmgC0DsLqetjAEYoRqywNLjyuI9/tjOHnl0XB+VNPmyd9+m7MV4MDxVqtURjJ7olYnNhXtmtQDaeeIjAo3HgMN2fHPqbYUaTejbU9dks5pO71D4l/hLAc9Gfix5vidmjNr8YUjEqDfmcVoHJ8wvwVF//eNihKBCMxbuhYcV4wPK+dv7o5qH1m0y/3fZVC3mBSD+EhdMRlpb+kNZFBRU0cwDtvp5j5C/Nq0i10kg1nGY1QE2p31vr+6SUPJnOQQfd1HDuN0mbTpcgj9TPbBtfY1TFX4f/Lpe7+2DU7eZTa/xiQMfGNv8pUHnoQcp6VrwgniXYAXVRrb8iLRd3fkNwx2mGZYdn27on/AXCFvR4fUIOob+PpZ7K2SPjjioLs7kyoDUgvceyUeQ2kYFVYa693rs0Yx9Ao1efEvVCyi+a7rKNraeQqjdkVX5jRAcPl0CR+Nyyt3S8CCKQYzcVdVi9CpuzDIi6CVfeos40fqdAKEgy4AIXhH4+cizQyZLYaWiffEyNI4jmI8WeLW9cG9btUNRtZSa0B+Y=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZmU1Sjdwbi9jV2I2eG4wQXI0cXpFQk9aVCtSeHoyR09YbmdmaTRLWkRDSFdZ?=
+ =?utf-8?B?cFdNMVAyNVM2MmRCOEQzWVJmZWJ5WTJmUUJSSVpGb3Q4RlJwNDJydExBd3M3?=
+ =?utf-8?B?WGo0QXpZa3pjVGx6UGZyUmlEZkxZdmVuTmI5VjBoeFk0Ry9RMGNLM2M3OWlE?=
+ =?utf-8?B?OHY3UGdxVGUxeWFsRXRhRFJWaFg0YUFoNCtxM2lONWhaaGxUUUhRQnF1YVRS?=
+ =?utf-8?B?azhlN0VLYTNQTXlNbi9iU0g3b3dGMDQrMXVOYVRBQlJHZWNHNG8vWS8vMEVq?=
+ =?utf-8?B?ZzJFZDdDTFZzSjBXNHArQ3VNWDhPSUhqR2RkY1FEL0VtR1VWYmIySTlnbHdK?=
+ =?utf-8?B?czdscENiSzQ1MWwzOG1HajVIRHdoRWVZK2FhZUZlSUg1aG1LeU1BUTFCdTMr?=
+ =?utf-8?B?S045bzFZZStQeXZiWVBkUCtnY0FaRHc0bFJpUHhZQkZ2ZXhlNVhRSVk5Ykl4?=
+ =?utf-8?B?eUl3bVdmMmlIb3dxMXNwTDVxRXFHREZsOFlKaFpSalNhNUNkWno1RnFWUC9F?=
+ =?utf-8?B?dnY4dExzTEE2Mzk4ZVJUbFFOKzZYQitXUm8vSGxySi9kVFhjSUk0Z280dCt1?=
+ =?utf-8?B?ZVpTQjNoSmpoVFBRVkl0T3ZrOGxKdi9wOXlmSy9ROEN6RVNYVVZKRXArbXc3?=
+ =?utf-8?B?VzJZQ2EyUDhSU1ZlU3FyYXdJR2ZYamJzTFQyU0laVm12K0xkbjNkWXUrSXpZ?=
+ =?utf-8?B?aDBPWTdWMG9xWERCY21jVDk4YUpnVTlQL2w1QVlPVHJhenRhanJVUWFFZ0Rx?=
+ =?utf-8?B?cTVDK2lSaXQwMDViSmxRdGM4aFl0a2U2NndvNEVpN2gyNWs4bE00OVIzOGhX?=
+ =?utf-8?B?V2JCa1dSMFJGVnFlSnhJQm1QeW9FUTdvYlduc1lUUS9LbU9uRWRQR25xOXc1?=
+ =?utf-8?B?c0drQjdqNTZ3V25BOTBVUzNSbWFGaWNsSGNaTDhKSHowYVF4cEI1Wkt5MEZl?=
+ =?utf-8?B?S2NReHFGZ3RnZWh4cWI5cXA3RWRGQ3hvc05lc2hKckUramw0UHo0M0tjTVNT?=
+ =?utf-8?B?ZlVCWm1pbWZMa2JpaUdlSXoyd0tUME1Rc1prZTE0Q011MEg2VHJwSEU2YVZT?=
+ =?utf-8?B?b2FrMjVnMFY5WXdmS05pMU50Wk5rbllCcjB1YmlrU3hyMDMyRVZPaGx2dWdX?=
+ =?utf-8?B?MmpoTTNVakwvS3laT3E2MW8vMEM1blFQSDE5SmhmRGV5VERqRVRXbCtpMHlG?=
+ =?utf-8?B?Rkp2aXoxeEJmcVZuS3lxV2NFaVNkTWhraHRudTFrRU1md3RlcEw0WnFVTDNv?=
+ =?utf-8?B?Y25pNzcvQjBTWHNnd3crd3BGTlpnci9rd0d2aHM2czBZdllIZ2FjbGZWVHp5?=
+ =?utf-8?B?Tk1qaHdRdHJOM1RjSTgxeHFTRjcrSkRyME5UZUtuSThLOGNoc3hjQkxzTmJl?=
+ =?utf-8?B?alFIa3VrVXkvcWZOdnRpeTVaN3BLV3NMeGE1aUJBSzIvVnVhV0lyZE1HQ0l2?=
+ =?utf-8?B?U1VsRWhFa3h1aGhVTkFLMExMT202ZFo4QzN2YWVBVW9FcDAyR2d3STl1NmdX?=
+ =?utf-8?B?MGlCVFpqTWFaTEdSSmZFSURyaDI4REx3MUVvTVlGeE9pVU44YmtLWWprbnhZ?=
+ =?utf-8?B?QWl6VloxZnNKcTVrVHNpSVdydjFsVHppQjdJRmIzYWNYWHNQaExLT0VaVXpL?=
+ =?utf-8?B?TlpCVVJaNEpSNzhkc0w3UnVETDVjLzRsc2NJWDBia0gvc0pwSlpYeXNWMnRT?=
+ =?utf-8?B?dnZ0d05LTFV6MUZmN1c2VkNwVDNoNmFYWm12Q3M5ZnBQbHZTV2c4SUpyQVU1?=
+ =?utf-8?B?ejlad0tjSWJXR0NyTnhxYmpEdlVFaDVNbjhqMzZiQnhHVmdncS9ZU3VtazZN?=
+ =?utf-8?B?b2Rxb2ppR1pHTUFkNjZIejlLcXBzMmdPdTRSY1FKUzUvMGlNTUd4T1VEMXp4?=
+ =?utf-8?B?S2VPY2V6M0VROGFwdEl5SjE4U3llcEVqMGU2UktVSDgvQ0pxVW1kSm90OXlE?=
+ =?utf-8?B?ME95dEZyYkpuOWNpL2l3Y3pXWjc3Mzd6VVhCZ3JDTFlYUWVQVzYxdDM2T2N5?=
+ =?utf-8?B?OU91TS9hamFuMDl0R0hIb2d4U3piRm0zcktvVVJrNUQ0MGwwNXpoaVo0YTVP?=
+ =?utf-8?B?akdzR1VrTE1UcUdhcXlWeng0djkzMjlNejl6QnJhZmIwVnIrN1dvVmNqRWl2?=
+ =?utf-8?B?ei9wS3BwZ1pLV0liSGVpa01IMEhUNitEeEJrWDBwdU81Y0oyMzFWMU1uZW1W?=
+ =?utf-8?B?WHZTb0Izbjd5SFAvdTcra0prUmZ6UjUvS2VKUVZ3RnFESVFsYUY1K09ja3RH?=
+ =?utf-8?B?d0NhWitDb2xVb1JvakxFN2RkT0ZzTE5IZGpWcjhWdkRaRDZoQVBHUFN3bDlx?=
+ =?utf-8?B?WVd3bDlIMGE4ajJQUUFCNGdhMmZYd1FvOTVEZ20rZ243Vmh6eGN1dz09?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b67531fa-906b-44c0-3681-08de9cac1530
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2026 18:06:44.0657
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eJxA/TJi1xyP5X1X0aPA6HPoV9WcxfjfX1Wviia9dfc/1J1Pfv4EXUwaNgKPse3dkE5owLc2Q7lUNjchr09Rjw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO7P123MB8117
+
+--ecd72ejjb7lu2kts
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260417004809.2894745-2-alistair.francis@wdc.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v11 11/13] blk-mq: prevent offlining hk CPUs with
+ associated online isolated CPUs
+MIME-Version: 1.0
 
-On Fri, Apr 17, 2026 at 10:48:09AM +1000, alistair23@gmail.com wrote:
-> From: Alistair Francis <alistair.francis@wdc.com>
-> 
-> Curently after the host sends a REPLACETLSPSK we free the TLS keys as
-> part of calling nvmet_auth_sq_free() on success. This means when the
-> host sends a follow up REPLACETLSPSK we return CONCAT_MISMATCH as the
-> check for !nvmet_queue_tls_keyid(req->sq) fails.
-> 
-> A previous attempt to fix this involed not calling nvmet_auth_sq_free()
-> on successful connections, but that results in memory leaks. Instead we
-> should not clear `tls_key` in nvmet_auth_sq_free(), as that was
-> incorrectly wiping the tls keys which are used for the session.
-> 
-> This patch ensures we correctly free the ephemeral session key on
-> connection, yet we don't free the TLS key unless closing the connection.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  drivers/nvme/target/auth.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+On Fri, Apr 17, 2026 at 06:11:16PM +0200, Marco Crivellari wrote:
+> Hi,
+>=20
+> Seems like the commit log of this patch is duplicated, isn't it?
+> I noticed it's like this from v7.
+>=20
+Hi Marco,
 
-Reviewed-by: Chris Leech <cleech@redhat.com>
+Yes, that is correct. Thank you for bringing this to my attention.
 
+Kind regards,
+--=20
+Aaron Tomlin
+
+--ecd72ejjb7lu2kts
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeQaE6/qKljiNHm6b4t6WWBnMd9YFAmnidq8ACgkQ4t6WWBnM
+d9YjDg/8DZ1Hu1plSV/eCB02YDOOCu7qr7cxF5c+jTOTNrynezJB/arpUh3M5ePD
+gWbhkcl5FQDUQwDPiUcb+6UMJZC+dVLuJBCyPZeyPKAXVGXeLGf1Wx/VIrv6j08S
+t8VLakxJ6kFDl/ftep073/bDvKCnqk7M+YnIpVO9YSBPKJffI7qHRmQwIngeBVvd
+QkF7uL52lQcrD9SHFfgmdmf+A6CYYjsP1bIxP7x15OOShwvrW4lOOJ2O1dp01MFM
+DTrXrZmmI4F2lIRfr0GCRKpPBvV8ruB7A8J1A4axfA17WcIkEbCcfz0QynjnQ5Xu
+Qvvzy7XMfL3lp6FLEqZd3S6T/55kTRAbcZxD1kvZVp4vxw1yMzylpyMpRDFahZCH
+bNoIler73vG/vIycn9bIijuKXi7h0fSJdloDp4ylT9EI/t7MG5QZMoeEyiTc8mo3
++eYN+uJRxI0P2BWB05xtjlR65DPt9KgIuJRqXSt0/oyWNXjPp/xz7wn5YSiUBSph
+EbWOtU4RLKEMPrg0XFcIDa/WIY8qxYlULoO6pyGZ4/9yAMWyOSjaOszgqpPAWg89
+2GJX8M2MdlxRs7megFkxN7B2HKsRIryiru57n7m2mXjsf17lrwQAYosmE/mGGvfc
+rkcse7W6Qx1NEdWfwxtVkIeqNrbkVBebBk9wYEPgqIL59Iva1Lk=
+=C89G
+-----END PGP SIGNATURE-----
+
+--ecd72ejjb7lu2kts--
