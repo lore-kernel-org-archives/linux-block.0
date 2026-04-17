@@ -1,108 +1,260 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A1D34216C
-	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 20:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91381346FAD
+	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 21:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776458371; cv=none; b=XVKDW1VtZSE/U9Nk/q5PCYqtgd+JY0rLz7avBRIf1cKuQUkBnkX+IqR+OdOprqkx+GAbiPcVgzRBEX5OdOB4KetuE7E8hYIAbV//bv+5rmTtOJbRW9gq9PvYdgIenXHxjROjfQ4mji1/ksC1pm0qce9rwhZbUSWqvoKNUZchVks=
+	t=1776463194; cv=none; b=tXhzI51U4aJuJNBlw6SbzVAsiRwOL6DsqTplUDbTHXp5XMBDzlrd/iO0PL/YQradIEXwD+7hGN6gob4mHOykWME9NdY/AJbCD3qDIepbL0/3NrkprQNj4ldxn68xkyWnMWu7hjVlu60WRBz+JBbtMU7/UhuhyAzl4e5xY/slUrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776458371; c=relaxed/simple;
-	bh=R9cfPSOj4lFrYL3++B34Ovkiwrp1hUKfb0CY6CfUYII=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=KN30q7FpopyU6PPVNT+uc2MIjDsi3SEtbO8i/dIBllc0Ggemzl2UnVlcKEe6/dHqVP/RlUN9HM8Z/yIdp3xEZ/xdg5RsElrYhbw7EIWSS6XcAunHzJ7486qLu0zV6IGXgbd/lwqN2QOF58UrfkpFKQ4UQP3f7ZFpXcNfrQmtTUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=F1gt6e6n; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1776463194; c=relaxed/simple;
+	bh=JaCdgcmEUHbDeA2gw7iUfkcJu19kiK3sUUgMzqWDC18=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dLglv18ag2bcN9rY3CiKQ5MxZfM7cgsYw4TfSI2POvbh4qkGXQ17bGMF3fKdeagVmF3xJqOB6Xln2P8AD9BukBMwIO9dYBMgabZ8jN0HSvsD/3ill8moyuHYaD8Z1z5jS52pZUHtniVGjxm88DnLVhfdKZfdzh4FNf44HwYFKkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1bq9x/Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="F1gt6e6n"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7dbdcb85067so1033640a34.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 13:39:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1776458369; x=1777063169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pgN4UqmLQKB8jT5zdq3MW4Yg0/LUcFaPoFS2jnD1LNc=;
-        b=F1gt6e6nWM1RGSiKuE8O5/xowAqkOIcBCM04NTrQCIvO6afZMa41iRUX5UYpbxN/sJ
-         9nVCam3HmMIqFfDPoVKauIT1W4QsUAIgs2m4aQFwCRm2Ga9PH95tjnWsPaxPKPu83kgU
-         KFONJ+jYrZKtFH/ys1or+yBdkphzXPFnA6DmOXyK+IQFtvV+NmY49AIN/mVU8TxoJVmK
-         l5RBhJonXxXBLceFv6qREft013l6uTN6srSiO794YCK05E58JYPkaSsT4TnTP7nPwaX6
-         3HnCugYzPe4G2Zp4kSPTSt0/jHibgy1zbqpKOTor7KSqPxXZg8MWfPnwPV+NalflN31j
-         UUvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776458369; x=1777063169;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pgN4UqmLQKB8jT5zdq3MW4Yg0/LUcFaPoFS2jnD1LNc=;
-        b=KhzzgEN82oAuFFzvEGcvARUBYyrn8gKv8BPs6+2uyhUNcgQPr789/ZdqkHmbVREj2+
-         0cOoSFC40lhldfrV9yBbeg4j8hp1bnEv///Xy25sbKj4M4ucaZAFD7DUxZPwQcRqxf/F
-         PwAemZnMb7AjtyLs0aK1oNLeAIlAK+Z/gJuRlMypW6Ajr4z0fWDPD9iXnA9T6hMwxLjO
-         jVEt0sy9PeI6cN9VG2vFySjoe0gS58+wFNPRU+B73YlHTOcexAPRHC9rwltkh5UTC0/X
-         a7CXdjhMLy0j8vguGp+puiHdRxLNCfZkH3pdNeab4c0mUoTMY+6wKO/TnPf7Ze64sIru
-         ruJw==
-X-Forwarded-Encrypted: i=1; AFNElJ9mBu8txwyq0i9u3DPMhMO7I+jd1xA0MoySW/Ye/2L7pwVSNE9j+pA0kokbt0jhitCxuNJdGdcG2X2ryw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhBTdUlBU5DA8PSeDOGxh1y7ukZsNnHSeaD8XjeFvIJ3XbMN2T
-	0w1gLYE37HRlyqpxGyQQX8QJG6n0oKbBC5tjwLG/T3qM80aE3Vs6vVjHAdB01R3Sjb4=
-X-Gm-Gg: AeBDietnpnmwKPyPRmxcyaPihZv9ET8ZXyHJoKQUlCM705mE7My2Y+AbJh3KGabj+38
-	bUK9+niHNY6kzumXEf2MZeK/X34W1I1ZlSUiVauDeoueyhsMP7NkX36js+eLJTmWKG8Pwv6N3B5
-	AX4v9YFDp7+oT2hhy8bB4KDvQLLv+a/7FCPPhiKZTc56seWCeZBn6cNDwTH6CFnHn9utKRR9cQA
-	C8ZdM5zO0tLw53ASYQNmWlXvqaZqfV/3UPaDdnO6blqEQQPJwjES2R5tPEqy+Chvi/a6jToqOG7
-	v55lS+prBxcCusEOTALqqFEgnqm8asw0UKI/T1+cf+mTAp0ALihwz17V0WXJ4GK4dh8Jb1aw7JS
-	pC8YOTuYbpx6NnQKePhrY4WuattuNXbJGskmm91RxjCKDdYx/utopeocOFsfwSpNL3irNRuec5z
-	Jp5M0vZOwb6uwVJ8NSeH4UB3C23VStocublSyp/TRf73YOHyYeoF2I2Dw7chUNm26XG6mMwQc9/
-	5tJYHxyMNT2AXw=
-X-Received: by 2002:a05:6830:2b0a:b0:7d7:da43:387 with SMTP id 46e09a7af769-7dc9518bfffmr3040335a34.16.1776458368771;
-        Fri, 17 Apr 2026 13:39:28 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dc9759bfa3sm1926469a34.13.2026.04.17.13.39.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Apr 2026 13:39:27 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Naman Jain <namjain@linux.microsoft.com>
-Cc: Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
- John Hubbard <jhubbard@nvidia.com>, Logan Gunthorpe <logang@deltatee.com>, 
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- Saurabh Sengar <ssengar@linux.microsoft.com>, 
- Long Li <longli@microsoft.com>, Michael Kelley <mhklinux@outlook.com>
-In-Reply-To: <20260410153414.4159050-1-namjain@linux.microsoft.com>
-References: <20260410153414.4159050-1-namjain@linux.microsoft.com>
-Subject: Re: [PATCH v2 0/2] block: fix pgmap handling for zone device pages
- in bio merge paths
-Message-Id: <177645836732.906013.8594129071302545302.b4-ty@b4>
-Date: Fri, 17 Apr 2026 14:39:27 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1bq9x/Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A188C2BCF5
+	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 21:59:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776463194;
+	bh=JaCdgcmEUHbDeA2gw7iUfkcJu19kiK3sUUgMzqWDC18=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Z1bq9x/ZiH4MJAoheHkTRVkq4JXTfRg/lftEnj6n88YSLOTjinLLMsKpV34LstEs7
+	 +x4In20NNnbbyk/2txpnLlz8YfcOFlLfw+8sZZhsNm1onZ9xMbaFRLdIEACELoE5CF
+	 aIxsb9ZYbFp7hqk28r1RRGJdCA3dKiPfr466jlsBmWtEJpsTn+Qa4/Zt1ylXIc0Y90
+	 hdHcGZ+s7eqkKC6X23WVLYaV01dzYkv36iKMbqhlQP21GYq1WuK5FOqf1P6T6E9rgU
+	 ih/W9cGMlct7oz86FzDTLDlCpF8/DM0vjzxLXbuhlbprE93o81W0Csq4cukdmba2d6
+	 TGoFWwLM+RVyg==
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8acb3daf2aaso17655126d6.0
+        for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 14:59:54 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+PqfuZAe7MDglcYlFgENXbNAmzAEB5mP2TkTZdRInZhQ8crUQstAgkF0IttGMDlTX4LGlmDrRtPwzmDA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLnkd7thAmsUNvEixt386ymKArvC6Il6NnZKl+Cu0Is/vKfxOI
+	XHbbYV+72LeEGSy2jscai/YaBHOwwgAPNsYnpszWAnFUe6E4FdysWqSC2ufqrd6T0XZBpE2eSxR
+	AobePfCeBrOrJI8F0uUxCW64qLL0BxLk=
+X-Received: by 2002:a05:6214:29e9:b0:89c:6bbd:76d8 with SMTP id
+ 6a1803df08f44-8b0280b2f12mr73952556d6.19.1776463193295; Fri, 17 Apr 2026
+ 14:59:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+References: <20260412060450.15813-1-baohua@kernel.org> <adt3Q_SRToF6fb3W@KASONG-MC4>
+In-Reply-To: <adt3Q_SRToF6fb3W@KASONG-MC4>
+From: Barry Song <baohua@kernel.org>
+Date: Sat, 18 Apr 2026 05:59:41 +0800
+X-Gmail-Original-Message-ID: <CAGsJ_4zSCkDGzvpaBGAqnUSQSWx2ikmrqpihYPBhqdwC-PKDOQ@mail.gmail.com>
+X-Gm-Features: AQROBzC6BuZtWVY0sxybxJ4MxSOu-q_1G8tDdEt1b4FjEKKUjwM1uiPXApMWkwM
+Message-ID: <CAGsJ_4zSCkDGzvpaBGAqnUSQSWx2ikmrqpihYPBhqdwC-PKDOQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] zram: support asynchronous GC for lazy slot freeing
+To: Kairui Song <ryncsn@gmail.com>
+Cc: minchan@kernel.org, senozhatsky@chromium.org, akpm@linux-foundation.org, 
+	linux-mm@kvack.org, axboe@kernel.dk, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kasong@tencent.com, chrisl@kernel.org, 
+	justinjiang@vivo.com, liulei.rjpt@vivo.com, 
+	Xueyuan Chen <xueyuan.chen21@gmail.com>, Wenchao Hao <haowenchao22@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sun, Apr 12, 2026 at 7:48=E2=80=AFPM Kairui Song <ryncsn@gmail.com> wrot=
+e:
+>
+> On Sun, Apr 12, 2026 at 02:04:50PM +0800, Barry Song (Xiaomi) wrote:
+> > Swap freeing can be expensive when unmapping a VMA containing
+> > many swap entries. This has been reported to significantly
+> > delay memory reclamation during Android=E2=80=99s low-memory killing,
+> > especially when multiple processes are terminated to free
+> > memory, with slot_free() accounting for more than 80% of
+> > the total cost of freeing swap entries.
+> >
+> > Two earlier attempts by Lei and Zhiguo added a new thread in the mm cor=
+e
+> > to asynchronously collect and free swap entries [1][2], but the
+> > design itself is fairly complex.
+> >
+> > When anon folios and swap entries are mixed within a
+> > process, reclaiming anon folios from killed processes
+> > helps return memory to the system as quickly as possible,
+> > so that newly launched applications can satisfy their
+> > memory demands. It is not ideal for swap freeing to block
+> > anon folio freeing. On the other hand, swap freeing can
+> > still return memory to the system, although at a slower
+> > rate due to memory compression.
+> >
+> > Therefore, in zram, we introduce a GC worker to allow anon
+> > folio freeing and slot_free to run in parallel, since
+> > slot_free is performed asynchronously, maximizing the rate at
+> > which memory is returned to the system.
+> >
+> > Xueyuan=E2=80=99s test on RK3588 shows that unmapping a 256MB swap-fill=
+ed
+> > VMA becomes 3.4=C3=97 faster when pinning tasks to CPU2, reducing the
+> > execution time from 63,102,982 ns to 18,570,726 ns.
+> >
+> > A positive side effect is that async GC also slightly improves
+> > do_swap_page() performance, as it no longer has to wait for
+> > slot_free() to complete.
+> >
+> > Xueyuan=E2=80=99s test shows that swapping in 256MB of data (each page
+> > filled with repeating patterns such as =E2=80=9C1024 one=E2=80=9D, =E2=
+=80=9C1024 two=E2=80=9D,
+> > =E2=80=9C1024 three=E2=80=9D, and =E2=80=9C1024 four=E2=80=9D) reduces =
+execution time from
+> > 1,358,133,886 ns to 1,104,315,986 ns, achieving a 1.22=C3=97 speedup.
+> >
+> > [1] https://lore.kernel.org/all/20240805153639.1057-1-justinjiang@vivo.=
+com/
+> > [2] https://lore.kernel.org/all/20250909065349.574894-1-liulei.rjpt@viv=
+o.com/
+> >
+> > Tested-by: Xueyuan Chen <xueyuan.chen21@gmail.com>
+> > Signed-off-by: Barry Song (Xiaomi) <baohua@kernel.org>
+>
+> Hi Barry
+>
+> This looks an interesting idea to me.
+>
+> > ---
+> >  drivers/block/zram/zram_drv.c | 56 ++++++++++++++++++++++++++++++++++-
+> >  drivers/block/zram/zram_drv.h |  3 ++
+> >  2 files changed, 58 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_dr=
+v.c
+> > index c2afd1c34f4a..f5c07eb997a8 100644
+> > --- a/drivers/block/zram/zram_drv.c
+> > +++ b/drivers/block/zram/zram_drv.c
+> > @@ -1958,6 +1958,23 @@ static ssize_t debug_stat_show(struct device *de=
+v,
+> >       return ret;
+> >  }
+> >
+> > +static void gc_slots_free(struct zram *zram)
+> > +{
+> > +     size_t num_pages =3D zram->disksize >> PAGE_SHIFT;
+> > +     unsigned long index;
+> > +
+> > +     index =3D find_next_bit(zram->gc_map, num_pages, 0);
+> > +     while (index < num_pages) {
+> > +             if (slot_trylock(zram, index)) {
+> > +                     if (test_bit(index, zram->gc_map))
+> > +                             slot_free(zram, index);
+> > +                     slot_unlock(zram, index);
+> > +                     cond_resched();
+> > +             }
+> > +             index =3D find_next_bit(zram->gc_map, num_pages, index + =
+1);
+> > +     }
+> > +}
+> > +
+>
+> The ideas looks interesting but the implementation looks not that
+> optimal to me. find_next_bit does a O(n) looks up for every gc call
+> looks really expensive if the pending slot is at tail.
 
-On Fri, 10 Apr 2026 15:34:12 +0000, Naman Jain wrote:
-> When zone device memory is registered in multiple chunks, each chunk
-> gets its own dev_pagemap. A single bio can contain bvecs from different
-> pgmaps -- iov_iter_extract_bvecs() breaks at pgmap boundaries but the
-> outer loop in bio_iov_iter_get_pages() continues filling the same bio.
-> 
-> There are two problems with the current code:
-> 
-> [...]
+Agreed. It=E2=80=99s essentially a prototype at this stage to demonstrate t=
+he
+idea.
 
-Applied, thanks!
+>
+> Perhaps a percpu stack can be used, something like the folio batch?
 
-[1/2] block: add pgmap check to biovec_phys_mergeable
-      commit: 13920e4b7b784b40cf4519ff1f0f3e513476a499
-[2/2] block: relax pgmap check in bio_add_page for compatible zone device pages
-      commit: 41c665aae2b5dbecddddcc8ace344caf630cc7a4
+I guess a major difference is that folio batching aims to reduce
+lruvec lock contention. Once a CPU=E2=80=99s slot space is empty, it batche=
+s
+draining folios into the lruvec by checking whether some slots can
+share the same lock. This procedure is synchronous within
+folio_batch_move_lru(this_cpu_ptr(fbatch), move_fn);
 
-Best regards,
--- 
-Jens Axboe
+In our case, we might not want a synchronous procedure, so each CPU
+could launch its own workqueue. I=E2=80=99m not sure whether this is actual=
+ly
+beneficial, as it might trigger the zsmalloc lock contention we are
+trying to eliminate.
 
+If we end up wanting to drain all CPUs together, that would make things
+quite complex again.
 
+So I guess a hierarchical bitmap, an XArray, or even a simple array
+could work. If we cap it at 64MB, the array would be at most 128KB on a
+PAGE_SIZE=3D4KB system.
 
+I am CC=E2=80=99ing Wenchao, who may be interested in further measurements
+and also involved in a more efficient implementation.
+
+>
+> > -     slot_free(zram, index);
+> > +     if (!try_slot_lazy_free(zram, index))
+> > +             slot_free(zram, index);
+>
+> What is making this slot_free so costly? zs_free?
+>
+> >       slot_unlock(zram, index);
+> >  }
+> >
+> > diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_dr=
+v.h
+> > index 08d1774c15db..1f3ffd79fcb1 100644
+> > --- a/drivers/block/zram/zram_drv.h
+> > +++ b/drivers/block/zram/zram_drv.h
+> > @@ -88,6 +88,7 @@ struct zram_stats {
+> >       atomic64_t pages_stored;        /* no. of pages currently stored =
+*/
+> >       atomic_long_t max_used_pages;   /* no. of maximum pages stored */
+> >       atomic64_t miss_free;           /* no. of missed free */
+> > +     atomic64_t gc_slots;            /* no. of queued for lazy free by=
+ gc */
+>
+> Maybe we want to track the size of content being delayed instead
+> of slots number? I saw there is a 30000 hard limit for that.
+
+Yep, definitely we want size, not number of pages, since PAGE_SIZE
+is not constant.
+
+>
+> Perhaps it will make more sense if we have a "buffer size"
+> (e.g. 64M), seems more intuitive to me. e.g. the ZRAM module can occupy
+> at most 64M of memory, so the delayed free won't cause a significant
+> global pressure.
+>
+> Also I think this patch is batching the memory free operations, so the
+> workqueue or design can also be further optimized for batching, for
+> example if the zs_free is the expensive part then maybe we shall just
+> clear the handler for the freeing slot and leave the handler in a
+> percpu stack, then batch free these handlers. zsmalloc might make
+> use some batch optimization based on that too, something like
+> kmem_cache_free_bulk but for zsmalloc?
+
+I=E2=80=99m not really sure a per-CPU approach is the right direction, sinc=
+e
+zsmalloc already has a lot of contention we may want to eliminate. If
+we introduce per-CPU workqueues or similar mechanisms, we might end up
+increasing contention rather than reducing it.
+
+A kmem_cache_free_bulk()-like approach might be a good direction to
+investigate for zsmalloc. I guess Xueyuan is also thinking about it?
+Right now, zsmalloc frequently takes and releases multiple locks for
+each individual.
+
+>
+> if zs_free is not all the expensive part, I took a look at slot_free
+> maybe a lot of read / write of slot data can be merged.
+>
+> This patch currently doesn't reduce the total amount of work, but
+> if above idea works, a lot of redundant operations might be be dropped,
+> result in better performance in every case.
+
+Yep, hopefully we can optimize for every case. Of course, that will
+take a lot of time :-)
+
+>
+> Just my two cents and ideas, not sure if I got everything correct.
+> Looking forward for more disscussion on this :)
+
+Thanks for your suggestions=E2=80=94they are always welcome. We may
+discuss this further.
+
+Best Regards
+Barry
