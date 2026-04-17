@@ -1,276 +1,190 @@
-Received: from mail-pj1-f100.google.com (mail-pj1-f100.google.com [209.85.216.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C002DD5F6
-	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 01:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.100
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776391071; cv=none; b=H3zWJ8KAv9dAzeRpLg5mXdxzO5K+M6ilphPh3PveC24fZZXdi/eAMpYqbQkO7iSeN4ZU7mqYFKg7tBl5crigwg9aKiyGm3I8EFrKUUQ1Q/q33cR1ZXTgCOtuqm3fpTFgigCR5ysaumG+x/qh8DjyWqDPit/Mlyr9KlGamE4b7OM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776391071; c=relaxed/simple;
-	bh=sIarZi4SDoM15BRFouM9vXGrkYDtf3itMS6IncqGb8g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oW+FT0rfxVIGlwldCNmM/lw/l1QatvwaYYBfV0ENo5ACrGzfa4rAOX9Vk+Cl2Jv0YOVb2v3c6PiKewtdwO24vg/87GowTWOWjxRZ7IBjVuxt0hSTmjY7+KnXz8Po2u9O2a3SVvnGs42q1WSXiwkSFyCGtftz+I54gbOgUfVpjk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=bfV/zaSw; arc=none smtp.client-ip=209.85.216.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE4D254B18
+	for <linux-block@vger.kernel.org>; Fri, 17 Apr 2026 02:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776392536; cv=fail; b=lIb4cf/yR2OYVD4VXZPbrl/fVHXYL7IhFY1DhF42KMeDT7hplTtekSLdmMI1tAb0Orb/bn7UPPeslnsdcdLtGlO9GEh9Qkyrn72BVtcQnwX1d1xqjArQT21DwdVZpXCm4ybJVEf886uWeZjxAPcwvQLypasIUdJaFTwkRX8Skm4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776392536; c=relaxed/simple;
+	bh=YtIGuQMLyAV5e6euLdO/L6s3No0rIMtCIsScsLFA7ko=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ks42oY5OlF2dF6bLylPnthynZPgh5Xg+o7IJDuWHY5wzUzDlZ5d6M5PixacF7j1VFSruorAGpG2dgqzsSQGrUQv2MQE5CIWbQ6DJPDw6sPznweWVdzn7XQ4f6mQEgEkGwkdxEqK8dQvAMgbcxnNvdPE0uBWUdhUZsDpWX9Zz390=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=AzHepI+0; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=B7RnJkVe; arc=fail smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="bfV/zaSw"
-Received: by mail-pj1-f100.google.com with SMTP id 98e67ed59e1d1-35e4617924eso36880a91.1
-        for <linux-block@vger.kernel.org>; Thu, 16 Apr 2026 18:57:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AzHepI+0";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="B7RnJkVe"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1776392534; x=1807928534;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=YtIGuQMLyAV5e6euLdO/L6s3No0rIMtCIsScsLFA7ko=;
+  b=AzHepI+0gQ8SvuKTi0RTvo59tabzbbT+/FFUYKPM5vgU1c+5a/Kymrei
+   sMgVCoxp5T9XV5Y2fza0wjP6aoZTm42KNnf6PreiUsMsy3/axVJL2nuAG
+   qIUgz8puODhbkHrAUzqCOq64AFfMKFrXYfj2odRdqAyej+f8Lo8EE6deA
+   b9Ikj05Hpe4ornH16OV2rYTVCqscw1gS6lEPlMLYSE16O9MsFGuwp1usJ
+   PlazQBpGOtZMFw5eRhDvLKr9qS4CfwK2SNVOPXEmAq0kCLPKlv9Yn7Z62
+   wgViIV9vaUEdCtL/OEC/VEVues/siAKx4athyLAm1F0RglvMRMcsjHdNg
+   w==;
+X-CSE-ConnectionGUID: xiobi8cXQSK+nLxzfn9UEw==
+X-CSE-MsgGUID: rcmz8/C5RQGMN1eRF2Bh0w==
+X-IronPort-AV: E=Sophos;i="6.23,183,1770566400"; 
+   d="scan'208";a="144195549"
+Received: from mail-eastusazon11012047.outbound.protection.outlook.com (HELO BL0PR03CU003.outbound.protection.outlook.com) ([52.101.53.47])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Apr 2026 10:22:13 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Id1c7zeMEq/ze/Hg2OtSIhqQ2kNZWEs77SuKCr6N2gceqM5teeSVc6JsM1qw5C2CNEw/8rf6Eoh/Rg+1QVoOetRhAcZP8WsEV0QaFmpbFrmk1mhCRSKRSGUu4WDCFqF6woQjm+Y4syex0tSA84C8YSa3yH6wWswJQ2w2++N0nuw91XVKYmMbG+23hek7Lonx4la88jAtdZ72tVbMmA5fN9R1qQFYv6jXa8SQqq3Ps/SAEj9+LVcpBh42KtynkegkBEAcARV0W5vyTkMzTRX4YtVVa6drNEdeMI6KF1UvV19GgxDBWSScAqaO4a0oaFNwj7VGXBAOxs3Tq2GMMft6TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qmEucg8bgXKQNWWkvd/OlzAPUC7bitG8JLsOCEMvdz8=;
+ b=ZvmTmXNORR67bSXEpaBLpGiEKTlgVCK0QM8+uaXA74EjHhYJW6Q4COQouBF9iqK19toXNNYH014S0PxNrL+EnEL8+1I/xAAwYzgBMDiVO4mhCVq3O5Lb3IYT38Y6KzFZ/AnlBU7proJee60SUMKRXM3S9xIkwqPKRoWIyCAkfc7U1PLgO+ZXtQp3iH1qM0bboAyveL3kFpyD/fyvUpaGyt4zoTdZu7YPBY8fHLIkPqHJmmOZUrwsWqOh7Xotoildg79pQ4iRqjeAgqSUcRiCyckwDYhKTihDlJhK22+ybzsvI5HEuhwXyaC/4/8i2PV3ZclS5s83aRpKNzDdL3seWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1776391061; x=1776995861; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g++H+r0qfX5K115kzK83mAIHId7HSerOrnUwj7zT4F8=;
-        b=bfV/zaSwAaXnUNU7ZVjv+RV/R9vs9wzZxlahN0K+Nr/220ay8aZQ39BIAmF1Y8aKBH
-         eMnX6pX79xeq4D2lyYA/imU8K0QhR9nbkdkH5vQeGMRj5/EIYlErTvJSlT0InLtNjuZQ
-         /PudpGk7rEwNMaja1jZsY1ts1ijH7t1OvCNXGWIQo7dye5fip1lFQbt34Dlsbl+/5RkB
-         g4qO1VbVAMIhxO/vltIb1F51py+NFfvD43kmIXtwEjvcdwt3ANG6uAabDXEECDB9v+eS
-         b8TVSNdzJ3IlUbqKS6lSH+qPt1SFS17INfmsMwDCB1PcUOgZj5z+R1sxRrW/YKCJ6m8i
-         Kk1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776391061; x=1776995861;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=g++H+r0qfX5K115kzK83mAIHId7HSerOrnUwj7zT4F8=;
-        b=jDJEsgaVPTaSAjNpWmWn0+ik+HSqR67n5Xs6d9NKFWpOh3ZTzXUbRNNQZZZH/AjjW5
-         7T4QhkULh9YTkqBGZsWPpQ8Tb1unsvgw/3GwvZ61eab0NOeGc6n7rTYq2x/b+A4atj/8
-         9K6Ug0A4BaM9m7E0Dz9bgsop/3FgL4qK81rP0Yu8o/rpSTW9p9Bx1ZaoWCaCHflNzlya
-         vGQqOJRKPOvARLv52V0Vq24hVrlQqbbqkRBFc13GNqdpJITyGOMhQBeBC+pz9RaFKPuY
-         SQsDzA2V10BMXIy0Mc1VD8/9zhKjvTLFwaBDidL9/1mtkHyxAPKidW+niLK9ksGrl1rX
-         svww==
-X-Forwarded-Encrypted: i=1; AFNElJ9HkzpRHNjnl24t8BxHtSiGAApdEhSxbJcKLWHdJETgbtpI+ohRWHHZ25z95UTPR5n/pp2zMNv9wFyz/g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDa//CHtaCUoP+6y3Uaygb9pifuj9V+XP54mLyEacA5S047zQU
-	K9sZWCQwpDS6uH0Q2HWp6LVMoXqzDNk35YKPkSbly65OsDhT0Vllky0dZKfrh93TcwvSRDIJhi6
-	herTHyAV38MpV9YxfHXELJLG7AxXMvzip0cHi01TN7okiw7BqtStF
-X-Gm-Gg: AeBDievwOszbDON6CeT3d4hRpT7/ayFGVhARSpTT80IWR1eRbV0lDE2GGJzuq9U9k1e
-	NiMaxop1ZYHP0eLn2OXMxFXFMHAkH1vIUYIvrVGiCmtSVNK1Y/N/fc1QTE+Hv/4NqjuGOz9Qp5J
-	H01+z8aF18fb3y5ipEMcJtkwGjFQ8cWLtm1Gg85cwBo7Gb92Tl+hofo7jVresCIPVXv/6m07Ooz
-	1FNDpCLcgIF/+6T8R7W90pKFTEKZIk4Ety0+d34fPzjFAPXm3Xgdcs2FIMI+mIOJbRjuyh61BZF
-	xUZ0axNqUeffpuI5jwWLdsBXwKPT/rFvyOcuRBhQvjPGdAMz80kl/aBbIBJdloEgvq+Z1zLwdGC
-	pjnCrVuvkfa+Kbz1ATo53wccmFE3aSZkp8f3JiWbpo0Dm7kFq9g==
-X-Received: by 2002:a17:90b:268b:b0:35f:b47e:7225 with SMTP id 98e67ed59e1d1-361404991ecmr456269a91.6.1776391061376;
-        Thu, 16 Apr 2026 18:57:41 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-361410a19d3sm38091a91.7.2026.04.16.18.57.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Apr 2026 18:57:41 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 8FFA0341D23;
-	Thu, 16 Apr 2026 19:57:40 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 8601FE499D2; Thu, 16 Apr 2026 19:57:40 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Anuj Gupta <anuj20.g@samsung.com>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH v3 6/6] blk-integrity: avoid sector_t in bip_{get,set}_seed()
-Date: Thu, 16 Apr 2026 19:57:32 -0600
-Message-ID: <20260417015732.2692434-7-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260417015732.2692434-1-csander@purestorage.com>
-References: <20260417015732.2692434-1-csander@purestorage.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qmEucg8bgXKQNWWkvd/OlzAPUC7bitG8JLsOCEMvdz8=;
+ b=B7RnJkVepLjufTfareyG1dML1MzfOtcqIL51YHB3vNGnpQ931CAvmkN3NI3PjLQP04CPHcLnapJ75S+rP4Ih4LTkzGiyzzREbkTpEkTxOjHoIQbUPxStApT23LTmiZRVn7SN14RmIAEpA9znNIEN8CJbXQCBtuVn1rltszZP3Bg=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by PH0PR04MB8549.namprd04.prod.outlook.com (2603:10b6:510:294::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.25; Fri, 17 Apr
+ 2026 02:22:10 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9818.023; Fri, 17 Apr 2026
+ 02:22:09 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: John Garry <john.g.garry@oracle.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"nilay@linux.ibm.com" <nilay@linux.ibm.com>
+Subject: Re: [PATCH blktests] nvme/068: add a test for multipath delayed
+ removal
+Thread-Topic: [PATCH blktests] nvme/068: add a test for multipath delayed
+ removal
+Thread-Index: AQHczMR07HPDR5bpHkiJJCT7jVf2qbXhpaCAgAADvoCAAN8TAA==
+Date: Fri, 17 Apr 2026 02:22:09 +0000
+Message-ID: <aeGYt5LeJFmW2VQD@shinmob>
+References: <20260415104111.1439459-1-john.g.garry@oracle.com>
+ <aeDYE1BfumNvutvS@shinmob> <b00f7f6d-278f-457e-9151-7528ef7d61b4@oracle.com>
+In-Reply-To: <b00f7f6d-278f-457e-9151-7528ef7d61b4@oracle.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|PH0PR04MB8549:EE_
+x-ms-office365-filtering-correlation-id: a3af5f92-826f-471f-2ac8-08de9c2820ed
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|38070700021|22082099003|18002099003|56012099003;
+x-microsoft-antispam-message-info:
+ 8tgd1BAcgYNMdo/VRwjD8oYpcLzJRAV4QpQBJtv2B/8+jWP7qvkSWb4M+08zsK7tCrduYIWSq+Q3SP04+EKnQYYLldv8/n6htvbMXMCRNkF2bA7Am+xzvDvAI6fS3SqXuDJfOg2tdyt/BQ/E01DvfQLOOvAc4zDuBL3rF+V6o5ZuLknXymZqj29E01Edr7ka16aF47ZvtaAOS+9kfva62Sn0VrLSpB/QOSzsJKMemp0mRMl2jk4EIWN5RYrRKu/Pl9qCx4fv0wFzuNs6YcbnoR2aKHyVpnMeegca8I8u0GYgVMrq4rwPs0B+O2cJK9/b0/JOUwEKgESR5sqgs8YWentAKGXWCiPoMcjRL3cSmBCBdTJgF5rwIygI4ePkASeTR15VUnCNwKV3bYewMQGgxTASRcBZ5S74kmkM6iPPxm7lc/K6daqfgGE7ZVqXjptayqDEpkZOWg8kC1oGQVq4yM+4ZywajnBNFXdv7La8itATAr/XHsZLED5UgpmcRZP/9sKKLaW1LtE6L3re9DctRDfbFZ6HlkvyScbwlnFcFiY31UVdCbV/Wz8clLdk59XYo4OiCk9KD+9IE00PVLtbPKlV7noiYaMmeZo5DXi16szKtJjkUgDUGxCtqORVCAFUZhwOUBuZy3cKW9I9dM3PpUjLt8wIYj+7xJhSP0scL5x5yUmPNsImxeGP+trKsSxfUrUg0on/u60UlSE/FMcVpiTbEjrq49O4vlo5oJmzQBBJgaa5xf9JIIU1OHMm5O0F
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?dGUWKrW9WNQhmygsJAkh2f84nZ5XRWx5CNgVMy+bEcKKinlmrOyZkde6bK3E?=
+ =?us-ascii?Q?PplnsbRb0WfVpa5oIq2YU5DOSk/k2C1M6D1k9+eOq1T05V+1+Ehq/OHaz5fi?=
+ =?us-ascii?Q?r5ORFeMPWLDWIIavSt+5SAsW837DCqsWDHk0VbxzU+d6l2szeUm8Orodt0Jr?=
+ =?us-ascii?Q?krPLkvE5KLycQMiP612Za44SgkIdDef1JFszvq0h7VqyGDmzy9zwFU2x6JPF?=
+ =?us-ascii?Q?oo+FLkTDRIOFKCH+E6A8Uw7A/vALJr/JZP75XhG0DqWRcIJ0nhF3WDnFjjBv?=
+ =?us-ascii?Q?JFksR81j4lhMZ5XMtsLTLkKrhlBUHuO9tYIOEHHXFAz1uCjbtBm+wF2LErnM?=
+ =?us-ascii?Q?02f4h4VNL9bUD9QSe1pjMlR8pwHHeFGnsVL9CzMrM3e/rrOYEV9DHdwtx7dA?=
+ =?us-ascii?Q?wRF+urmm7vNAiOYb6MGCYt6c1/Ttklt9RZC4SNs9/CK6O9aCUql+ak22uima?=
+ =?us-ascii?Q?O5LGHnvWRjlzPpww4IQ0q4/ovhxECfLAxhZpKEkCQiOoNxkLBTZXM2Hr79oY?=
+ =?us-ascii?Q?hh0GOP9FvBAjHg0gnDyrs3qvX0LlbzyVv1Tn2QGe2kNjccPmSyUIc0b109SU?=
+ =?us-ascii?Q?mZF6wMV68MU0NkG8DeMLeoRLGBlX+HH5IKs+pgf9RFIRS5pnT7HL78H4f0cS?=
+ =?us-ascii?Q?hHDsJbgQwPEfdvFZAzETmJBYAAkjv0cglQdXFbYzHOarksi4Icx7Fj8YAKgR?=
+ =?us-ascii?Q?JmcfIIjz2n0oJewQoNGCsevz7ETAVJX0a6ic6PrtGni9OySjPP31djPlPYIB?=
+ =?us-ascii?Q?71BSJzX34A3TCUT025iKzJuSiKeddLLyuAUX/AvjlVyAZYJVzW2OMwFtk9u/?=
+ =?us-ascii?Q?Seio3ySCCQAXJYpH64S8Bu/fNHdUv2H3KuPDQTJMCndOzN0kF68zYtMzfvQz?=
+ =?us-ascii?Q?YFhfnIXut1oov+U8ZUv8Y6SFz3vF4cm22nzFF+EHQmvy7rM+fudNyp9P7hEk?=
+ =?us-ascii?Q?u7eSa8htEHzVUiE4z5vw7cJ5+R8C6KKmxef5GobxMHMHeea3zpY22DLafkkj?=
+ =?us-ascii?Q?qyx9Gq0qWETbc0EGtik2UZN5Iyyut8EyI4GFIPl37diTl1cMRlyZdfKNqtrJ?=
+ =?us-ascii?Q?tkUYnuAOTDnq129uzMm809ShPQWzgSR83yKmSExe2+ClT4g+0ta9bPjG9Gac?=
+ =?us-ascii?Q?bO0xbrBeE01nbm4PcZAusMcYsrXfhM85BXx4aBj0bBI5hJplKE4xUrxPBUO3?=
+ =?us-ascii?Q?xKUxWKNtMhRoElPlLoygiFb8SZQqB2g7I6TOw44aK1JcVXt9awUFlehTfxJi?=
+ =?us-ascii?Q?oLPuI4tKstaX0CkMW0Kzep+t8h5Hist9ZP4fJZYHS2KB6rlTaY5xiHqGok6w?=
+ =?us-ascii?Q?kYPwDO6G/nFoPN2v6hEeJ5kh2ZY8qo1Mb37eCYfSx7GMKRG33tTna/pn233q?=
+ =?us-ascii?Q?p7+A9+yqtDLR3Wr7SkwNq7a4ePosa80grDfwzhjd6K+eyOw+KTwCJjCvpdll?=
+ =?us-ascii?Q?P+W8Sh6SclASBx+u3RCbgkD8hYGDoLY9sXXfvxfaXP/XmO5oid9I0x+4PBCp?=
+ =?us-ascii?Q?nkrPtvToAaI/l/3ubrSptqMgv17mi27dD3rHJ9hJHNzWRrbmEr7h/YJnutVM?=
+ =?us-ascii?Q?Jo14f16Od1awmebOhC3mjt1CfLqWRAS3D6bmoRWwHIJyRIvDeUpIF/2ZMq9Z?=
+ =?us-ascii?Q?cLoMZiAbcmZgiU3MswvWUK6069gfPHc3FwfEYImKPhvvP1oDfTDEKdbEgc9j?=
+ =?us-ascii?Q?+/z+cuPWY+V9zdRf5mxa6S0qhRiiT5pC4k3cPM1GDlsewJS7sm/WCk/A16go?=
+ =?us-ascii?Q?mZ2/jGduL6cgivaWJBnVJu5GarOY8c0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <AE1380F98A02904D8E2D10EDDB58B17C@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Exchange-RoutingPolicyChecked:
+	AuXaH+QLG8CltloJjhE0D1sTSMsD0/sEGHMuxgX5cY1ts74NgYjYtQGdXdDe91joaMbTpEsM1/sHAEA1BZ2QrKbo6RaIiJOfa8R9UMbZDfF6+7QwSrPW9uWPyekBzWyu9NUpOCLpd4Kyx7S1eUBcySzxjbiREm2mm2ofew19oBvft1uJw9j9k7c1upZvU8cbmCkGnOxpVGUZcINQWlRY4z0bdCjhc9w2ccAwlO9DDYufNMLcrebmoqNtqWujHoZ1FcxCO/rIuq10nb0SO7l63islq3rvqvsgmnkldCLWaUhTyKgQqxLEOnwj68D1j5G21pJfNeEH7ffLDcOg5SSy4g==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	+93bmx9YLZrIC80X9GV9gTA61UwvcV72B/4Zfci6vMISwlESY+f4bQN3eny5DXkV487IvuSS4zQjoqQ4V179c8S1rDSvHnfrbgtFfo2vTCqDp/FTCgqobBvlza2KRgsy45K7dWXdWRub2JH3xEL6I429IZW2SNMwx2bOGMa9ZO42XZ40bm/A5lL+bzWSiZRMlekWF5ei9/ilhL+FWUjpBy44kRWADeI2JdREPlqqCQn1zcGiDIZh138Ivaf8LMjzxov/FgHuC823oKn7q/D9Wm7X/1hAXzj0oxGDEfCOySsnB6u/eNaW9VAdSlhDNVakyLFbEh5A8DOHXHTPfQMI5vTcssdI/DLXQ5koKLjqFhpAqyeAo8ynJ3wfyJFTlbQfMZHAIYYVHl7YNh69wFsjdOBd2SX1Howb/kUXlgfb3Hqj5tkmOSNmwoBbgZe5UA4LOOEZLmK/rNj12l/tBmH1WqU4tPK8WwtgwSqqUJmvnEVi534H5h+tUIh/68PiCvNJ+yb7+uObjRsEwIGeFB+U9A3mjl3cvxFs90n8C+fSNtRIoDmG1sdRS8YeGlWKprnZElQbwA9XpThbEd8yjFaRNNqS2H4CYFjaIJQX5INmOXaWgtkKRI3Zp480pOKYbRlY
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3af5f92-826f-471f-2ac8-08de9c2820ed
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Apr 2026 02:22:09.7563
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WMlcSvR7oAU+pNKdQ46WJnT4VBCdgXuI/ARv5y5iuXZjdNfZUcQ+E4orNuD2YOBG1osp7HWuKtpcNJUWtu0XGR2IRzQVGtHzGx18e6GirSo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB8549
 
-bip_set_seed() and big_get_seed() take/return a sector_t value that's
-actually an integrity interval number. This is confusing, so pass
-struct bio instead to bip_set_seed() and convert the bio's device
-address to integrity intervals.
+On Apr 16, 2026 / 14:03, John Garry wrote:
+> On 16/04/2026 13:50, Shinichiro Kawasaki wrote:
+[...]
+> > John, thanks for the patch. When I ran the new test case in my test env=
+ironment,
+> > it failed. The reported refcount mismatch looks happening in the Part b=
+.
+> >=20
+> > nvme/068 (tr=3Dloop) (NVMe multipath delayed removal test)     [failed]
+> >      runtime  38.579s  ...  38.770s
+> >      --- tests/nvme/068.out      2026-04-16 20:50:21.228000000 +0900
+> >      +++ /home/shin/Blktests/blktests/results/nodev_tr_loop/nvme/068.ou=
+t.bad     2026-04-16 21:30:36.215000000 +0900
+> >      @@ -1,3 +1,4 @@
+> >       Running nvme/068
+> >       pwrite: Input/output error
+> >      +module refcount not as original
+> >       Test complete
+> >=20
+> > I have no idea why it fails. Do you have any guess about the failure ca=
+use?
+>=20
+> I posted a fix for this here:
+> https://lore.kernel.org/linux-nvme/20260416051459.GA14802@lst.de/T/#m17eb=
+549aba102198009a37621cb45775841639d9
 
-Open-code the access to bip->bip_iter.bi_sector in the one caller of
-bip_set_seed() that doesn't use the bio device address for the seed.
-Open-code bip_get_seed() in its one caller.
+Thanks. With the kenrel fix, I confirmed that the test case passes. Good.
 
-Add a comment to struct bvec_iter's bi_sector field explaining its
-alternate use for bip_iter.
+[...]
 
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- block/bio-integrity.c               |  5 ++---
- block/t10-pi.c                      |  2 +-
- drivers/nvme/target/io-cmd-bdev.c   |  3 +--
- drivers/target/target_core_iblock.c |  3 +--
- include/linux/bio-integrity.h       | 11 -----------
- include/linux/blk-integrity.h       | 13 +++++++++++++
- include/linux/bvec.h                |  1 +
- 7 files changed, 19 insertions(+), 19 deletions(-)
+> About this specific part of the test (checking module refcnt), I was
+> wondering if we should be testing kernel internals like this. But, since =
+it
+> found a problem, I suppose that makes it ok :)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 3ad6a6799f17..8549d9148b0b 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -103,13 +103,12 @@ void bio_integrity_free_buf(struct bio_integrity_payload *bip)
- 
- void bio_integrity_setup_default(struct bio *bio)
- {
- 	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
--	u64 seed = bio->bi_iter.bi_sector >> (bi->interval_exp - SECTOR_SHIFT);
- 
--	bip_set_seed(bip, seed);
-+	bip_set_seed(bio);
- 
- 	if (bi->csum_type) {
- 		bip->bip_flags |= BIP_CHECK_GUARD;
- 		if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
- 			bip->bip_flags |= BIP_IP_CHECKSUM;
-@@ -472,11 +471,11 @@ int bio_integrity_map_iter(struct bio *bio, struct uio_meta *meta)
- 
- 	it.count = integrity_bytes;
- 	ret = bio_integrity_map_user(bio, &it);
- 	if (!ret) {
- 		bio_uio_meta_to_bip(bio, meta);
--		bip_set_seed(bio_integrity(bio), meta->seed);
-+		bio_integrity(bio)->bip_iter.bi_sector = meta->seed;
- 		iov_iter_advance(&meta->iter, integrity_bytes);
- 		meta->seed += bio_integrity_intervals(bi, bio_sectors(bio));
- 	}
- 	return ret;
- }
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 787950dec50a..71367fd082bd 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -510,11 +510,11 @@ static void blk_reftag_remap_prepare(struct blk_integrity *bi,
- static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi,
- 			       unsigned *intervals, u64 *ref, bool prep)
- {
- 	struct bio_integrity_payload *bip = bio_integrity(bio);
- 	struct bvec_iter iter = bip->bip_iter;
--	u64 virt = bip_get_seed(bip);
-+	u64 virt = bip->bip_iter.bi_sector;
- 	union pi_tuple *ptuple;
- 	union pi_tuple tuple;
- 
- 	if (prep && bip->bip_flags & BIP_MAPPED_INTEGRITY) {
- 		*ref += bio->bi_iter.bi_size >> bi->interval_exp;
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index f2d9e8901df4..65fce51b024a 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -218,12 +218,11 @@ static int nvmet_bdev_alloc_bip(struct nvmet_req *req, struct bio *bio,
- 		pr_err("Unable to allocate bio_integrity_payload\n");
- 		return PTR_ERR(bip);
- 	}
- 
- 	/* virtual start sector must be in integrity interval units */
--	bip_set_seed(bip, bio->bi_iter.bi_sector >>
--		     (bi->interval_exp - SECTOR_SHIFT));
-+	bip_set_seed(bio);
- 
- 	resid = bio_integrity_bytes(bi, bio_sectors(bio));
- 	while (resid > 0 && sg_miter_next(miter)) {
- 		len = min_t(size_t, miter->length, resid);
- 		rc = bio_integrity_add_page(bio, miter->page, len,
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 1087d1d17c36..1aeb5be529a8 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -706,12 +706,11 @@ iblock_alloc_bip(struct se_cmd *cmd, struct bio *bio,
- 		pr_err("Unable to allocate bio_integrity_payload\n");
- 		return PTR_ERR(bip);
- 	}
- 
- 	/* virtual start sector must be in integrity interval units */
--	bip_set_seed(bip, bio->bi_iter.bi_sector >>
--				  (bi->interval_exp - SECTOR_SHIFT));
-+	bip_set_seed(bio);
- 
- 	pr_debug("IBLOCK BIP Size: %u Sector: %llu\n", bip->bip_iter.bi_size,
- 		 (unsigned long long)bip->bip_iter.bi_sector);
- 
- 	resid = bio_integrity_bytes(bi, bio_sectors(bio));
-diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
-index af5178434ec6..edcd0855abba 100644
---- a/include/linux/bio-integrity.h
-+++ b/include/linux/bio-integrity.h
-@@ -56,21 +56,10 @@ static inline bool bio_integrity_flagged(struct bio *bio, enum bip_flags flag)
- 		return bip->bip_flags & flag;
- 
- 	return false;
- }
- 
--static inline sector_t bip_get_seed(struct bio_integrity_payload *bip)
--{
--	return bip->bip_iter.bi_sector;
--}
--
--static inline void bip_set_seed(struct bio_integrity_payload *bip,
--				sector_t seed)
--{
--	bip->bip_iter.bi_sector = seed;
--}
--
- void bio_integrity_init(struct bio *bio, struct bio_integrity_payload *bip,
- 		struct bio_vec *bvecs, unsigned int nr_vecs);
- struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio, gfp_t gfp,
- 		unsigned int nr);
- int bio_integrity_add_page(struct bio *bio, struct page *page, unsigned int len,
-diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
-index 825d777c078b..c82b2f6fe194 100644
---- a/include/linux/blk-integrity.h
-+++ b/include/linux/blk-integrity.h
-@@ -85,10 +85,23 @@ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
- 					       unsigned int sectors)
- {
- 	return bio_integrity_intervals(bi, sectors) * bi->metadata_size;
- }
- 
-+/**
-+ * bip_set_seed - Set bip reference tag seed from bio device address
-+ * @bio:	struct bio whose integrity payload's ref tag seed to initialize
-+ */
-+static inline void bip_set_seed(struct bio *bio)
-+{
-+	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
-+	struct bio_integrity_payload *bip = bio_integrity(bio);
-+
-+	bip->bip_iter.bi_sector =
-+		bio_integrity_intervals(bi, bio->bi_iter.bi_sector);
-+}
-+
- static inline bool blk_integrity_rq(const struct request *rq)
- {
- 	return rq->cmd_flags & REQ_INTEGRITY;
- }
- 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index d36dd476feda..3dc88f5cd367 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -76,10 +76,11 @@ static inline void bvec_set_virt(struct bio_vec *bv, void *vaddr,
- 
- struct bvec_iter {
- 	/*
- 	 * Current device address in 512 byte sectors. Only updated by the bio
- 	 * iter wrappers and not the bvec iterator helpers themselves.
-+	 * For bip_iter, this is overloaded to represent the integrity interval.
- 	 */
- 	sector_t		bi_sector;
- 
- 	/*
- 	 * Remaining size in bytes.
--- 
-2.45.2
-
+Agreed, this test case already proved its value :)=
