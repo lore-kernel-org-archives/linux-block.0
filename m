@@ -1,75 +1,39 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE8C373BF4
-	for <linux-block@vger.kernel.org>; Sun, 19 Apr 2026 05:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0E82AF1D;
+	Sun, 19 Apr 2026 09:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776575434; cv=none; b=jrE2LH09e2f2Ds5C4vYfATYXTm7836f+McmfqV58zE0yQ+492av1whZMY55G/zYElTpnJm9wmqaSxaAsfH4JHf42fZBH+Js2ufeZGFekXqFODKUOrEHb95Xdkxlj6e+WqtHI2vnIrP0szasCVY6OhveWuJovVItSF10WFKYgWU8=
+	t=1776591677; cv=none; b=cl12gzwM9X2tCNoN54wBxZHewEeoXBHD2vP6o4nJPgkCS2jBfvE1UCKAYRasiBYP2y2qnHh87FA8KWYOqSd6JxvHuE8t4qPDIvP5DCf0MDepsqoyzEiwI3unJyXnu4XmzmOJ2sVmcysTSc8vaWn7m19KNPqABvVHaU+FANVx65Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776575434; c=relaxed/simple;
-	bh=5MwVA/avRYegt4COjNqWWOOrT0cfgB4W4A2vtGXLGjU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LnIAqsxx6mznUnBqGDviVrX0nknNc1P/m1F5wMmxRKrXzMAAru+xfwI7eDcLIyPAZr/EFpTlISaLBL6EAayD1efr6sMSjNqG87BMsyHfCmDRrpSBMP2T3CDzdylbLxc8p8um0pK21iJYjoWiN9B9qMGbFN9BgXVgYlNH3zPjOpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ime.usp.br; spf=pass smtp.mailfrom=ime.usp.br; dkim=pass (2048-bit key) header.d=usp.br header.i=@usp.br header.b=gVgyP4Hb; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ime.usp.br
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ime.usp.br
+	s=arc-20240116; t=1776591677; c=relaxed/simple;
+	bh=Jr5oUQiELIiQeLQa/7/t58UO5nbL6CQqy7gQ771b/lM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KRuZmuV3V4YncJcPsmV5iyEOn7tNdI9YoQsGSRmdW4LHGjWU/opydOV48gXrZzNEAxoCLK7nO8/XMqFZk+PQhQRqgWeywm0E1cICvqcjZ7JUsr/e0MQezAz9P48ZlAAZyYWl6BvHAFqHI/nc5VqMrcgeCN5jlyBgkp+9EcYMcl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=WvHNclLZ; arc=none smtp.client-ip=101.71.155.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=usp.br header.i=@usp.br header.b="gVgyP4Hb"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2c156c4a9efso2375189eec.1
-        for <linux-block@vger.kernel.org>; Sat, 18 Apr 2026 22:10:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=usp.br; s=usp-google; t=1776575430; x=1777180230; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nfy9Yu3HO+uTZe9CvyyvIAi/v/P3eFhIORnPWGxSiwA=;
-        b=gVgyP4HbwmC642uVFt1vJfuBFIJCsnDNoPle+zTKmFxWBC9GcNKo+B24fwM20zBIgC
-         3ORPbiDdrop+MHMn5uieysdQ+Hsf5wKmVZjAVBuZRTuRwAr4HPvjLa/Kf2eq6QYa8zMq
-         hy1mAP7rYh4W/GyCIB9qLam3ydpzCKIrtWA/pZ80dxhKatvWIy0XEOk1Pf8Zv+tHNE8t
-         q91fVoe5k4y1k3etjZjxwJ/AbzRuWHl9W11JPzVJimUBO1u1PgsJd3f56Uf6V4Tp1/7N
-         R3aswEGyjPqKnVzyPGobbTH/ShDnMN45uAIlr+qkSw6XDcSyLMDBL1jB3odyhmBuolxh
-         MS8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776575430; x=1777180230;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Nfy9Yu3HO+uTZe9CvyyvIAi/v/P3eFhIORnPWGxSiwA=;
-        b=B0YmFVRARL7jRbYdxBKnGwrnN12vSTd+XEYwQzxoN7R0YBmBOziLzStmwq2BCU4BJG
-         GKe0kgTnl7fCwAcQCCCR2peJQQ3vro2SB+QAf346XCuTzo7gmavKXWBj2bFu6vsf4o4c
-         Q3bgzSHVcG+8UUgX2Klj62fNXQtHVgzf9+n6BsPOa1kbFqwiQLgjXX8hR/OKiKZ5eB+p
-         kq40OioLFc2f2yYhQmiLoZ413aAIqg+mpiVlvuZldrqOe0cKzmCsEnPj4BaPJrrm3HC1
-         /zWHj6uwFzTn4bZclvveiaAVg9/gqiBfSZhtWUgRVJ/5y6CyON797UESgT9XRe83rkB/
-         g3tw==
-X-Forwarded-Encrypted: i=1; AFNElJ+w+ewuLZnE11ZEawcoPxoVi97fyIICz6BDjVwlFPEujD+cbOLrwfq10j+UC9xe00m6GcIsaFKBRHYazQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaDego0Jjxr5bzF1+ehBCdbAAqIpqqb/h3ObbaqYqzvXW9PSlU
-	e9iuVgqg4WD9ciCclHdKIGbBCzTX3U/dcqHKEfOWizJd3KCx0mb6bBQRzhBg60SLyWc=
-X-Gm-Gg: AeBDieuBrIVKteCARgOGnJxhpL2IhIFzIJMB9mVNhcAlbLulveC2W8uXF7rSIK+ARs0
-	usnBR18NWLm0hWukA7ZWN/F2sEfmuTb2AXHGWT+a6GRkncsy5VNTAN42LT/4t/cFAk2VysOjIgb
-	irsHB1u+X26WdKGejabZtR9sTQkNXNWNoBf5CmS6LCwEYnWW7qVlyiRMGmvR59T4OHPKhVZIBu7
-	I1USQYjknupKMMfYT2AJHX/2sYz1uhn5xoOjGX3mMEn/7NFV0Yo1AMy/PKZIBOxKF+wSCLud7Lw
-	9dqeyqcl/FQEccw3pVAFrdV2dZSOI7bOQfTpoTgSQmJ1ItCQWXqXHCu9GWvyZy1Ao16ha+F3BZg
-	vz5UCfSjmOZfHNBTNs+f5q8Z3p9dNVBKLxUv6H0oHEaG17/MGPQtCoE8gz1eW+u65A2hCyJtUun
-	oSACJwNKZyoVpxh3CWmraVmhNlp3ca8Al3Gcj/GMUl5zbsXg==
-X-Received: by 2002:a05:7301:4593:b0:2da:1874:f3bd with SMTP id 5a478bee46e88-2e47883907fmr3798140eec.16.1776575429627;
-        Sat, 18 Apr 2026 22:10:29 -0700 (PDT)
-Received: from chrysanthemum.. ([2804:7f0:b081:9846:8d5b:e745:5172:e188])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2e53d8b3dd9sm8745052eec.27.2026.04.18.22.10.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Apr 2026 22:10:29 -0700 (PDT)
-From: Ricardo H H Kojo <ricardo.kojo@ime.usp.br>
-To: axboe@kernel.dk
-Cc: Ricardo H H Kojo <ricardo.kojo@ime.usp.br>,
-	Ellian Carlos <elliancarlos@gmail.com>,
-	Gabriel B L de Oliveira <gabrielblo@ime.usp.br>,
-	linux-block@vger.kernel.org
-Subject: [PATCH v2 2/2] nullblk: zoned: use lock guards
-Date: Sun, 19 Apr 2026 02:10:09 -0300
-Message-Id: <20260419051009.796491-3-ricardo.kojo@ime.usp.br>
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="WvHNclLZ"
+Received: from DESKTOP-SUEFNF9.taila7e912.ts.net (unknown [223.112.146.162])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 3b457dc87;
+	Sun, 19 Apr 2026 17:05:31 +0800 (GMT+08:00)
+From: Dawei Feng <dawei.feng@seu.edu.cn>
+To: idryomov@gmail.com
+Cc: axboe@kernel.dk,
+	dongsheng.yang@linux.dev,
+	mcgrof@kernel.org,
+	ceph-devel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	Dawei Feng <dawei.feng@seu.edu.cn>,
+	stable@vger.kernel.org,
+	Zilin Guan <zilin@seu.edu.cn>
+Subject: [PATCH] rbd: fix null-ptr-deref when device_add_disk() fails
+Date: Sun, 19 Apr 2026 17:03:48 +0800
+Message-Id: <20260419090348.1817082-1-dawei.feng@seu.edu.cn>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260419051009.796491-1-ricardo.kojo@ime.usp.br>
-References: <20260419051009.796491-1-ricardo.kojo@ime.usp.br>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,126 +41,121 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9da4fce98c03a2kunm56c851691d06de
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCSB9DVh5CGkxNTUtITx8dSFYeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVU
+	tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=WvHNclLZKsOl2IPn9Y892RwspSmoi+WoagtbI1A35WAvFzkqdz6k3IGOiaF6EVJIWTMM+LFCFt0BIxQh4pjZm2aDmIBltUr4vii8eQNgv7UqcNIR5VwOpCxt9fKWvaxuFHqPAUzmTw5/hC2nINeADoqKF6XIigjQoUgoEZLiwTU=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=CdmJzqe0YXQQdfal4sK7CioKUZTavqi01VlJKBezrNs=;
+	h=date:mime-version:subject:message-id:from;
 
-Use guard() and scoped_guard() for handling spin locks instead of manually
-locking and unlocking. This prevents forgotten locks due to early exits.
+do_rbd_add() publishes the device with device_add() before calling
+device_add_disk(). If device_add_disk() fails after device_add()
+succeeds, the error path calls rbd_free_disk() directly and then later
+falls through to rbd_dev_device_release(), which calls rbd_free_disk()
+again. This double teardown can leave blk-mq cleanup operating on
+invalid state and trigger a null-ptr-deref in
+__blk_mq_free_map_and_rqs(), reached from blk_mq_free_tag_set().
 
-Signed-off-by: Ricardo H H Kojo <ricardo.kojo@ime.usp.br>
-Co-developed-by: Ellian Carlos <elliancarlos@gmail.com>
-Signed-off-by: Ellian Carlos <elliancarlos@gmail.com>
-Co-developed-by: Gabriel B L de Oliveira <gabrielblo@ime.usp.br>
-Signed-off-by: Gabriel B L de Oliveira <gabrielblo@ime.usp.br>
+Fix this by following the normal remove ordering: call device_del()
+before rbd_dev_device_release() when device_add_disk() fails after
+device_add(). That keeps the teardown sequence consistent and avoids
+re-entering disk cleanup through the wrong path.
+
+The bug was first flagged by an experimental analysis tool we are
+developing for kernel memory-management bugs while analyzing
+v6.13-rc1. The tool is still under development and is not yet publicly
+available.
+
+We reproduced the bug on v7.0 with a real Ceph backend and a QEMU x86_64
+guest booted with KASAN and CONFIG_FAILSLAB enabled. The reproducer
+confines failslab injections to the __add_disk() range and injects
+fail-nth while mapping an RBD image through
+/sys/bus/rbd/add_single_major.
+
+On the unpatched kernel, fail-nth=4 reliably triggered the fault:
+
+	Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
+	KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+	CPU: 0 UID: 0 PID: 273 Comm: bash Not tainted 7.0.0-01247-gd60bc1401583 #6 PREEMPT(lazy)
+	Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+	RIP: 0010:__blk_mq_free_map_and_rqs+0x8c/0x240
+	Code: 00 00 48 8b 6b 60 41 89 f4 49 c1 e4 03 4c 01 e5 45 85 ed 0f 85 0a 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 e9 48 c1 e9 03 <80> 3c 01 00 0f 85 31 01 00 00 4c 8b 6d 00 4d 85 ed 0f 84 e2 00 00
+	RSP: 0018:ff1100000ab0fac8 EFLAGS: 00000246
+	RAX: dffffc0000000000 RBX: ff1100000c4806a0 RCX: 0000000000000000
+	RDX: 0000000000000002 RSI: 0000000000000000 RDI: ff1100000c4806f4
+	RBP: 0000000000000000 R08: 0000000000000001 R09: ffe21c000189001b
+	R10: ff1100000c4800df R11: ff1100006cf37be0 R12: 0000000000000000
+	R13: 0000000000000000 R14: ff1100000c480700 R15: ff1100000c480004
+	FS:  00007f0fbe8fe740(0000) GS:ff110000e5851000(0000) knlGS:0000000000000000
+	CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+	CR2: 00007fe53473b2e0 CR3: 0000000012eef000 CR4: 00000000007516f0
+	PKRU: 55555554
+	Call Trace:
+	 <TASK>
+	 blk_mq_free_tag_set+0x77/0x460
+	 do_rbd_add+0x1446/0x2b80
+	 ? __pfx_do_rbd_add+0x10/0x10
+	 ? lock_acquire+0x18c/0x300
+	 ? find_held_lock+0x2b/0x80
+	 ? sysfs_file_kobj+0xb6/0x1b0
+	 ? __pfx_sysfs_kf_write+0x10/0x10
+	 kernfs_fop_write_iter+0x2f4/0x4a0
+	 vfs_write+0x98e/0x1000
+	 ? expand_files+0x51f/0x850
+	 ? __pfx_vfs_write+0x10/0x10
+	 ksys_write+0xf2/0x1d0
+	 ? __pfx_ksys_write+0x10/0x10
+	 do_syscall_64+0x115/0x690
+	 entry_SYSCALL_64_after_hwframe+0x77/0x7f
+	RIP: 0033:0x7f0fbea15907
+	Code: 10 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+	RSP: 002b:00007ffe22346ea8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+	RAX: ffffffffffffffda RBX: 0000000000000058 RCX: 00007f0fbea15907
+	RDX: 0000000000000058 RSI: 0000563ace6c0ef0 RDI: 0000000000000001
+	RBP: 0000563ace6c0ef0 R08: 0000563ace6c0ef0 R09: 6b6435726d694141
+	R10: 5250337279762f78 R11: 0000000000000246 R12: 0000000000000058
+	R13: 00007f0fbeb1c780 R14: ff1100000c480700 R15: ff1100000c480004
+	 </TASK>
+
+With this fix applied, rerunning the reproducer over fail-nth=1..256
+yields no KASAN reports.
+
+Fixes: 27c97abc30e2 ("rbd: add add_disk() error handling")
+Cc: stable@vger.kernel.org # 5.16+
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
 ---
- drivers/block/null_blk/zoned.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
+ drivers/block/rbd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 384bdce6a9b7..6f59531e9b1d 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -471,13 +471,12 @@ static blk_status_t null_open_zone(struct nullb_device *dev,
- 	}
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index e7da06200c1e..d92730d8c342 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -7165,7 +7165,7 @@ static ssize_t do_rbd_add(const char *buf, size_t count)
  
- 	if (dev->need_zone_res_mgmt) {
--		spin_lock(&dev->zone_res_lock);
-+		guard(spinlock)(&dev->zone_res_lock);
+ 	rc = device_add_disk(&rbd_dev->dev, rbd_dev->disk, NULL);
+ 	if (rc)
+-		goto err_out_cleanup_disk;
++		goto err_out_device_del;
  
- 		switch (zone->cond) {
- 		case BLK_ZONE_COND_EMPTY:
- 			ret = null_check_zone_resources(dev, zone);
- 			if (ret != BLK_STS_OK) {
--				spin_unlock(&dev->zone_res_lock);
- 				return ret;
- 			}
- 			break;
-@@ -487,7 +486,6 @@ static blk_status_t null_open_zone(struct nullb_device *dev,
- 		case BLK_ZONE_COND_CLOSED:
- 			ret = null_check_zone_resources(dev, zone);
- 			if (ret != BLK_STS_OK) {
--				spin_unlock(&dev->zone_res_lock);
- 				return ret;
- 			}
- 			dev->nr_zones_closed--;
-@@ -497,8 +495,6 @@ static blk_status_t null_open_zone(struct nullb_device *dev,
- 		}
+ 	spin_lock(&rbd_dev_list_lock);
+ 	list_add_tail(&rbd_dev->node, &rbd_dev_list);
+@@ -7179,8 +7179,8 @@ static ssize_t do_rbd_add(const char *buf, size_t count)
+ 	module_put(THIS_MODULE);
+ 	return rc;
  
- 		dev->nr_zones_exp_open++;
--
--		spin_unlock(&dev->zone_res_lock);
- 	}
- 
- 	zone->cond = BLK_ZONE_COND_EXP_OPEN;
-@@ -526,7 +522,7 @@ static blk_status_t null_close_zone(struct nullb_device *dev,
- 	}
- 
- 	if (dev->need_zone_res_mgmt) {
--		spin_lock(&dev->zone_res_lock);
-+		guard(spinlock)(&dev->zone_res_lock);
- 
- 		switch (zone->cond) {
- 		case BLK_ZONE_COND_IMP_OPEN:
-@@ -542,7 +538,6 @@ static blk_status_t null_close_zone(struct nullb_device *dev,
- 		if (zone->wp > zone->start)
- 			dev->nr_zones_closed++;
- 
--		spin_unlock(&dev->zone_res_lock);
- 	}
- 
- 	if (zone->wp == zone->start)
-@@ -562,17 +557,15 @@ static blk_status_t null_finish_zone(struct nullb_device *dev,
- 		return BLK_STS_IOERR;
- 
- 	if (dev->need_zone_res_mgmt) {
--		spin_lock(&dev->zone_res_lock);
-+		guard(spinlock)(&dev->zone_res_lock);
- 
- 		switch (zone->cond) {
- 		case BLK_ZONE_COND_FULL:
- 			/* Finish operation on full is not an error */
--			spin_unlock(&dev->zone_res_lock);
- 			return BLK_STS_OK;
- 		case BLK_ZONE_COND_EMPTY:
- 			ret = null_check_zone_resources(dev, zone);
- 			if (ret != BLK_STS_OK) {
--				spin_unlock(&dev->zone_res_lock);
- 				return ret;
- 			}
- 			break;
-@@ -585,13 +578,11 @@ static blk_status_t null_finish_zone(struct nullb_device *dev,
- 		case BLK_ZONE_COND_CLOSED:
- 			ret = null_check_zone_resources(dev, zone);
- 			if (ret != BLK_STS_OK) {
--				spin_unlock(&dev->zone_res_lock);
- 				return ret;
- 			}
- 			dev->nr_zones_closed--;
- 			break;
- 		default:
--			spin_unlock(&dev->zone_res_lock);
- 			return BLK_STS_IOERR;
- 		}
- 
-@@ -611,7 +602,7 @@ static blk_status_t null_reset_zone(struct nullb_device *dev,
- 		return BLK_STS_IOERR;
- 
- 	if (dev->need_zone_res_mgmt) {
--		spin_lock(&dev->zone_res_lock);
-+		guard(spinlock)(&dev->zone_res_lock);
- 
- 		switch (zone->cond) {
- 		case BLK_ZONE_COND_IMP_OPEN:
-@@ -627,11 +618,9 @@ static blk_status_t null_reset_zone(struct nullb_device *dev,
- 		case BLK_ZONE_COND_FULL:
- 			break;
- 		default:
--			spin_unlock(&dev->zone_res_lock);
- 			return BLK_STS_IOERR;
- 		}
- 
--		spin_unlock(&dev->zone_res_lock);
- 	}
- 
- 	zone->cond = BLK_ZONE_COND_EMPTY;
+-err_out_cleanup_disk:
+-	rbd_free_disk(rbd_dev);
++err_out_device_del:
++	device_del(&rbd_dev->dev);
+ err_out_image_lock:
+ 	rbd_dev_image_unlock(rbd_dev);
+ 	rbd_dev_device_release(rbd_dev);
 -- 
 2.34.1
 
