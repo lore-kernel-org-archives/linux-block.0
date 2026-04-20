@@ -1,42 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAB83DFC90;
-	Mon, 20 Apr 2026 13:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F7C3C4557;
+	Mon, 20 Apr 2026 13:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776691467; cv=none; b=G+ZawHwHH+MF4uiJdmRTN3G+YCo5yUluqEaqLtcCB7Ozmx2UPy7C2zSy4+NxHtdRgPFl3kiLEHiNW+pU/FkYnSahMuUQEPR8Zki9mg5cGqlBYNEJqWtsB61FJe6Rfbu+FmCVQ8RMpcGed/g7E4ACoktgAWhXmei7hjS45nrbr3A=
+	t=1776691624; cv=none; b=K3l1jKWbILQU+i8hTSHv89xBcPY/Sx/bc7Ta2l7nVth/JNr/BSySpI6syJY+n7UO+PnIB3AUIOl1CFSSwO/oOdAdpMb4rfmbXDQE2reHZrbKs+oCjDe+t/pD/jdFHh2D6hbXBKbEFG5r9yWtjM8U1lHt0gxXH8o9OoMIONJ/EUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776691467; c=relaxed/simple;
-	bh=IgJq5V+26na4YOff+t5F2K2k2dIbRenoNEI6CsdwQDg=;
+	s=arc-20240116; t=1776691624; c=relaxed/simple;
+	bh=hz57hE/p0A28oIY9p/zSUK6pTcs0E6TaovPB9ItLdg8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nbGu4vp1ZzPOuR4CdUi1Ye38f9NnAeaf3LWOauMakFc70rS2yjHsWF2HdclmIknetZjYWK/LeQtuAZ3CH/hcUmucv+J6TiB/EWdfPiW0as46Tr/6lS3iMgp7bcTaHUqzby/oRdGgdwx5cVby7TjGwGD5b8Bhsfg2iXVVwg3PTkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ArZxFb7y; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=mnSOa8dmP7Rw7a+9T0gMdBFDSeujuNA2stDt8tU1oJk/m73Vw2Q4v4mf9C8w7X6oaV+MO4rx9hyokzvEHQW4Se9eU+q39lH2zBuaVReFpjyLMu42nqWZsjZ43EShKDnjolOkUd+/ATvDFVbT6sezyjN66EMyZy7ELBvcyAFCTLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRCXTIJB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ArZxFb7y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C242C2BCB4;
-	Mon, 20 Apr 2026 13:24:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JRCXTIJB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCA26C2BCC4;
+	Mon, 20 Apr 2026 13:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776691467;
-	bh=IgJq5V+26na4YOff+t5F2K2k2dIbRenoNEI6CsdwQDg=;
+	s=k20201202; t=1776691624;
+	bh=hz57hE/p0A28oIY9p/zSUK6pTcs0E6TaovPB9ItLdg8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ArZxFb7yELXdlHK7VlJH6374RAr4zEGMun3wmK0dk1mkIF+/mJIevA4nlx6uYwAaa
-	 smY5tmIv792ABvhefE3lTBS7Gz0oOn2pjtS4e41UEYiaUrjoEqHbaxUlssYpd1ttut
-	 JQVdEVoi3MfrzOdWnKV8nOPnL2+IYzjsR9BnOzfell/FOeEFgnqXDml9NVaxVQrbu7
-	 zjC02K+mr/fDCc/9Qh5vmzyassi9x3RpBSqcZV2+uJp9PYHxjQDF0PZuDnoAYIlszY
-	 e+x1+VVYbzvI5ycV9+Zbj0F4aGLiDkcpZPAYa5gElpr/8Jr4Igj26f1w4jW6+Lzx7S
-	 hqdb/NQ5sLEnQ==
+	b=JRCXTIJBMV/iwlBOUURK4R8Iz3FnZzIge2i9H/2F8G0BDVaqUh9Tby6tKozLqgibg
+	 DAVbkfR4egpBKfg8fPxrqO7AXR1AMtkzHErOEzXyXrggUjZLeuMIIjKnAl5SMz9RpY
+	 lRiNQBVOJfvKDm5hwj2y6QJS4DgJIiIE2Ie3LsrwACkdQqFRmS+Ax8JQS491srTmQw
+	 y84ulFh0tNewUU+OXXgYiQb20u6qsA1hmKkjGnRVNMVScsRBMnFqzSZrIqbgwq9pmR
+	 Kx5qnM0flvE7bgJCKzRJTjigyn6ba6sKzf85XvSNVG47G7zI5wpoVbluj596BZcL94
+	 ZLG5SO2lo+Khg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Qu Wenruo <wqu@suse.com>,
+Cc: Jialin Wang <wjl.linux@gmail.com>,
+	Tejun Heo <tj@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
+	josef@toxicpanda.com,
+	cgroups@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 7.0] block: reject zero length in bio_add_page()
-Date: Mon, 20 Apr 2026 09:17:20 -0400
-Message-ID: <20260420132314.1023554-46-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 7.0-6.6] blk-iocost: fix busy_level reset when no IOs complete
+Date: Mon, 20 Apr 2026 09:18:52 -0400
+Message-ID: <20260420132314.1023554-138-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420132314.1023554-1-sashal@kernel.org>
 References: <20260420132314.1023554-1-sashal@kernel.org>
@@ -52,318 +55,549 @@ X-stable-base: Linux 7.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Qu Wenruo <wqu@suse.com>
+From: Jialin Wang <wjl.linux@gmail.com>
 
-[ Upstream commit 643893647cac7317bafca4040dd0cfb815b510d4 ]
+[ Upstream commit f91ffe89b2016d280995a9c28d73288b02d83615 ]
 
-The function bio_add_page() returns the number of bytes added to the
-bio, and if that failed it should return 0.
+When a disk is saturated, it is common for no IOs to complete within a
+timer period. Currently, in this case, rq_wait_pct and missed_ppm are
+calculated as 0, the iocost incorrectly interprets this as meeting QoS
+targets and resets busy_level to 0.
 
-However there is a special quirk, if a caller is passing a page with
-length 0, that function will always return 0 but with different results:
+This reset prevents busy_level from reaching the threshold (4) needed
+to reduce vrate. On certain cloud storage, such as Azure Premium SSD,
+we observed that iocost may fail to reduce vrate for tens of seconds
+during saturation, failing to mitigate noisy neighbor issues.
 
-- The page is added to the bio
-  If there is enough bvec slot or the folio can be merged with the last
-  bvec.
+Fix this by tracking the number of IO completions (nr_done) in a period.
+If nr_done is 0 and there are lagging IOs, the saturation status is
+unknown, so we keep busy_level unchanged.
 
-  The return value 0 is just the length passed in, which is also 0.
+The issue is consistently reproducible on Azure Standard_D8as_v5 (Dasv5)
+VMs with 512GB Premium SSD (P20) using the script below. It was not
+observed on GCP n2d VMs (with 100G pd-ssd and 1.5T local-ssd), and no
+regressions were found with this patch. In this script, cgA performs
+large IOs with iodepth=128, while cgB performs small IOs with iodepth=1
+rate_iops=100 rw=randrw. With iocost enabled, we expect it to throttle
+cgA, the submission latency (slat) of cgA should be significantly higher,
+cgB can reach 200 IOPS and the completion latency (clat) should below.
 
-- The page is not added to the bio
-  If the page is not mergeable with the last bvec, or there is no bvec
-  slot available.
+  BLK_DEVID="8:0"
+  MODEL="rbps=173471131 rseqiops=3566 rrandiops=3566 wbps=173333269 wseqiops=3566 wrandiops=3566"
+  QOS="rpct=90 rlat=3500 wpct=90 wlat=3500 min=80 max=10000"
 
-  The return value 0 means page is not added into the bio.
+  echo "$BLK_DEVID ctrl=user model=linear $MODEL" > /sys/fs/cgroup/io.cost.model
+  echo "$BLK_DEVID enable=1 ctrl=user $QOS" > /sys/fs/cgroup/io.cost.qos
 
-Unfortunately the caller is not able to distinguish the above two cases,
-and will treat the 0 return value as page addition failure.
+  CG_A="/sys/fs/cgroup/cgA"
+  CG_B="/sys/fs/cgroup/cgB"
 
-In that case, this can lead to the double releasing of the last page:
+  FILE_A="/path/to/sda/A.fio.testfile"
+  FILE_B="/path/to/sda/B.fio.testfile"
+  RESULT_DIR="./iocost_results_$(date +%Y%m%d_%H%M%S)"
 
-- By the bio cleanup
-  Which normally goes through every page of the bio, including the last
-  page which is added into the bio.
+  mkdir -p "$CG_A" "$CG_B" "$RESULT_DIR"
 
-- By the caller
-  Which believes the page is not added into the bio, thus would manually
-  release the page.
+  get_result() {
+    local file=$1
+    local label=$2
 
-I do not think anyone should call bio_add_folio()/bio_add_page() with zero
-length, but idiots like me can still show up.
+    local results=$(jq -r '
+    .jobs[0].mixed |
+    ( .iops | tonumber | round ) as $iops |
+    ( .bw_bytes / 1024 / 1024 ) as $bps |
+    ( .slat_ns.mean / 1000000 ) as $slat |
+    ( .clat_ns.mean / 1000000 ) as $avg |
+    ( .clat_ns.max / 1000000 ) as $max |
+    ( .clat_ns.percentile["90.000000"] / 1000000 ) as $p90 |
+    ( .clat_ns.percentile["99.000000"] / 1000000 ) as $p99 |
+    ( .clat_ns.percentile["99.900000"] / 1000000 ) as $p999 |
+    ( .clat_ns.percentile["99.990000"] / 1000000 ) as $p9999 |
+    "\($iops)|\($bps)|\($slat)|\($avg)|\($max)|\($p90)|\($p99)|\($p999)|\($p9999)"
+    ' "$file")
 
-So add an extra WARN_ON_ONCE() check for zero length and rejects it
-early to avoid double freeing.
+    IFS='|' read -r iops bps slat avg max p90 p99 p999 p9999 <<<"$results"
+    printf "%-8s %-6s %-7.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f %-8.2f\n" \
+           "$label" "$iops" "$bps" "$slat" "$avg" "$max" "$p90" "$p99" "$p999" "$p9999"
+  }
 
-Signed-off-by: Qu Wenruo <wqu@suse.com>
-Link: https://patch.msgid.link/bc2223c080f38d0b63f968f605c918181c840f40.1773734749.git.wqu@suse.com
+  run_fio() {
+    local cg_path=$1
+    local filename=$2
+    local name=$3
+    local bs=$4
+    local qd=$5
+    local out=$6
+    shift 6
+    local extra=$@
+
+    (
+      pid=$(sh -c 'echo $PPID')
+      echo $pid >"${cg_path}/cgroup.procs"
+      fio --name="$name" --filename="$filename" --direct=1 --rw=randrw --rwmixread=50 \
+          --ioengine=libaio --bs="$bs" --iodepth="$qd" --size=4G --runtime=10 \
+          --time_based --group_reporting --unified_rw_reporting=mixed \
+          --output-format=json --output="$out" $extra >/dev/null 2>&1
+    ) &
+  }
+
+  echo "Starting Test ..."
+
+  for bs_b in "4k" "32k" "256k"; do
+    echo "Running iteration: BS=$bs_b"
+    out_a="${RESULT_DIR}/cgA_1m.json"
+    out_b="${RESULT_DIR}/cgB_${bs_b}.json"
+
+    # cgA: Heavy background (BS 1MB, QD 128)
+    run_fio "$CG_A" "$FILE_A" "cgA" "1m" 128 "$out_a"
+    # cgB: Latency sensitive (Variable BS, QD 1, Read/Write IOPS limit 100)
+    run_fio "$CG_B" "$FILE_B" "cgB" "$bs_b" 1 "$out_b" "--rate_iops=100"
+
+    wait
+    SUMMARY_DATA+="$(get_result "$out_a" "cgA-1m")"$'\n'
+    SUMMARY_DATA+="$(get_result "$out_b" "cgB-$bs_b")"$'\n\n'
+  done
+
+  echo -e "\nFinal Results Summary:\n"
+
+  printf "%-8s %-6s %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s\n" \
+          "" "" "" "slat" "clat" "clat" "clat" "clat" "clat" "clat"
+  printf "%-8s %-6s %-7s %-8s %-8s %-8s %-8s %-8s %-8s %-8s\n\n" \
+          "CGROUP" "IOPS" "MB/s" "avg(ms)" "avg(ms)" "max(ms)" "P90(ms)" "P99" "P99.9" "P99.99"
+  echo "$SUMMARY_DATA"
+
+  echo "Results saved in $RESULT_DIR"
+
+Before:
+                          slat     clat     clat     clat     clat     clat     clat
+  CGROUP   IOPS   MB/s    avg(ms)  avg(ms)  max(ms)  P90(ms)  P99      P99.9    P99.99
+
+  cgA-1m   166    166.37  3.44     748.95   1298.29  977.27   1233.13  1300.23  1300.23
+  cgB-4k   5      0.02    0.02     181.74   761.32   742.39   759.17   759.17   759.17
+
+  cgA-1m   167    166.51  1.98     748.68   1549.41  809.50   1451.23  1551.89  1551.89
+  cgB-32k  6      0.18    0.02     169.98   761.76   742.39   759.17   759.17   759.17
+
+  cgA-1m   166    165.55  2.89     750.89   1540.37  851.44   1451.23  1535.12  1535.12
+  cgB-256k 5      1.30    0.02     191.35   759.51   750.78   759.17   759.17   759.17
+
+After:
+                          slat     clat     clat     clat     clat     clat     clat
+  CGROUP   IOPS   MB/s    avg(ms)  avg(ms)  max(ms)  P90(ms)  P99      P99.9    P99.99
+
+  cgA-1m   162    162.48  6.14     749.69   850.02   826.28   834.67   843.06   851.44
+  cgB-4k   199    0.78    0.01     1.95     42.12    2.57     7.50     34.87    42.21
+
+  cgA-1m   146    146.20  6.83     833.04   908.68   893.39   901.78   910.16   910.16
+  cgB-32k  200    6.25    0.01     2.32     31.40    3.06     7.50     16.58    31.33
+
+  cgA-1m   110    110.46  9.04     1082.67  1197.91  1182.79  1199.57  1199.57  1199.57
+  cgB-256k 200    49.98   0.02     3.69     22.20    4.88     9.11     20.05    22.15
+
+Signed-off-by: Jialin Wang <wjl.linux@gmail.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://patch.msgid.link/20260331100509.182882-1-wjl.linux@gmail.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have enough information for a comprehensive analysis. Let me
-compile my findings.
+I now have all the information needed for a comprehensive analysis. Let
+me compile the findings.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
-**Step 1.1: Subject Line**
-- Subsystem: `block` (core block layer)
-- Action verb: `reject` (defensive fix/hardening)
-- Summary: Reject zero-length pages in `bio_add_page()` to prevent
-  double-free
+### Step 1.1: Subject Line
+- **Subsystem:** `blk-iocost` (block layer IO cost controller)
+- **Action verb:** "fix"
+- **Summary:** Fix incorrect busy_level reset when no IO completions
+  occur within a timer period
+- Record: [blk-iocost] [fix] [busy_level incorrectly reset to 0 when no
+  IOs complete, preventing vrate reduction during saturation]
 
-**Step 1.2: Tags**
-- `Signed-off-by: Qu Wenruo <wqu@suse.com>` - Author, btrfs developer
-- `Link:` patch.msgid.link URL (lore blocked by anti-scraping)
-- `Signed-off-by: Jens Axboe <axboe@kernel.dk>` - Block layer maintainer
-  committed it
-- No `Fixes:` tag (expected for candidates), no `Cc: stable`, no
-  `Reported-by`
+### Step 1.2: Tags
+- **Signed-off-by:** Jialin Wang <wjl.linux@gmail.com> (author)
+- **Acked-by:** Tejun Heo <tj@kernel.org> (blk-iocost creator and
+  maintainer)
+- **Link:**
+  https://patch.msgid.link/20260331100509.182882-1-wjl.linux@gmail.com
+- **Signed-off-by:** Jens Axboe <axboe@kernel.dk> (block layer
+  maintainer)
+- No Fixes: tag (expected for AUTOSEL candidates)
+- No Cc: stable (expected for AUTOSEL candidates)
+- Record: Acked by the subsystem maintainer (Tejun Heo) and merged by
+  the block layer maintainer (Jens Axboe). Strong quality signals.
 
-**Step 1.3: Commit Body Analysis**
-The commit describes a clear bug mechanism:
-- When `len=0` is passed to `bio_add_page()`, return value is always 0
-- But 0 can mean "success with zero bytes" (page added) OR "failure"
-  (page not added)
-- Caller cannot distinguish these two cases, treats return 0 as failure
-- If the page WAS added, the caller releases the page manually (thinking
-  it wasn't added), AND the bio cleanup also releases it → **double-
-  free**
+### Step 1.3: Commit Body Analysis
+- **Bug description:** When a disk is saturated, no IOs may complete
+  within a timer period. When this happens, rq_wait_pct=0 and
+  missed_ppm=0, which iocost incorrectly interprets as "meeting QoS
+  targets."
+- **Symptom:** busy_level gets reset to 0, preventing it from reaching
+  threshold (4) needed to reduce vrate. On certain cloud storage (Azure
+  Premium SSD), iocost can fail to reduce vrate for tens of seconds
+  during saturation, breaking cgroup IO isolation.
+- **Failure mode:** Noisy neighbor problem - heavy IO from one cgroup is
+  not properly throttled, causing high latency for latency-sensitive
+  workloads in other cgroups.
+- **Testing:** Detailed benchmark script provided with before/after
+  results showing dramatic improvement (cgB: 5 IOPS -> 200 IOPS; clat:
+  181ms -> 1.95ms).
+- Record: Clear real-world bug with concrete impact on cloud
+  environments. Reproducible with specific test setup.
 
-The author says: "I do not think anyone should call
-bio_add_folio()/bio_add_page() with zero length, but idiots like me can
-still show up" — referencing his own btrfs zlib bug.
+### Step 1.4: Hidden Bug Fix Detection
+This is explicitly labeled as "fix" - no hidden nature. The commit
+message clearly explains the bug mechanism and the fix approach.
 
-**Step 1.4: Hidden Bug Fix Detection**
-This IS a bug fix. While framed as adding a defensive check, it prevents
-a concrete double-free scenario that was actually triggered in btrfs
-(commit `0dcabcb920a5c`).
-
-Record: [block] [reject] [Adds WARN_ON_ONCE check for zero-length to
-prevent double-free from API ambiguity]
+---
 
 ## PHASE 2: DIFF ANALYSIS
 
-**Step 2.1: Inventory**
-- 1 file changed: `block/bio.c`
-- +2 lines added (only)
-- Function modified: `bio_add_page()`
-- Scope: Single-file, single-function, surgical fix
+### Step 2.1: Inventory
+- **Files changed:** 1 (`block/blk-iocost.c`)
+- **Lines added/removed:** ~15 lines of actual code (plus comments)
+- **Functions modified:** `ioc_lat_stat()` (signature + 1 line),
+  `ioc_timer_fn()` (variable + call site + new branch)
+- **Scope:** Single-file, surgical fix
+- Record: Minimal change in a single file affecting two functions in the
+  same subsystem.
 
-**Step 2.2: Code Flow Change**
-Single hunk: After the BIO_CLONED check, adds:
-```c
-if (WARN_ON_ONCE(len == 0))
-    return 0;
-```
-Before: zero-length pages could be silently added, causing return value
-ambiguity.
-After: zero-length is rejected early with a WARN, returning 0
-unambiguously meaning failure.
+### Step 2.2: Code Flow Change
+**Hunk 1 - `ioc_lat_stat()` signature:**
+- Before: `ioc_lat_stat(ioc, missed_ppm_ar, rq_wait_pct_p)` - 2 output
+  params
+- After: `ioc_lat_stat(ioc, missed_ppm_ar, rq_wait_pct_p, nr_done)` - 3
+  output params
+- Adds computation: `*nr_done = nr_met[READ] + nr_met[WRITE] +
+  nr_missed[READ] + nr_missed[WRITE]`
 
-**Step 2.3: Bug Mechanism**
-Category: Double-free prevention (memory safety fix). The zero-length
-case creates an ambiguous return path where the page can be freed by
-both the bio cleanup and the caller.
+**Hunk 2 - `ioc_timer_fn()` variable:**
+- Adds `u32 nr_done` variable and passes `&nr_done` to `ioc_lat_stat()`.
 
-**Step 2.4: Fix Quality**
-- Obviously correct — nobody should add zero bytes to a bio
-- Minimal — 2 lines
-- No regression risk — no valid caller should pass len=0
-- WARN_ON_ONCE is low-overhead, fires once per boot maximum
+**Hunk 3 - busy_level decision logic:**
+- Before: Directly checks `rq_wait_pct > RQ_WAIT_BUSY_PCT ||
+  missed_ppm...`
+- After: First checks `if (!nr_done && nr_lagging)` - if no completions
+  and lagging IOs exist, skip all busy_level changes (keep unchanged).
+  Otherwise, proceed with existing logic.
+
+### Step 2.3: Bug Mechanism
+This is a **logic/correctness fix**. When no IOs complete during a timer
+period:
+1. `nr_met` and `nr_missed` are both 0 → `missed_ppm = 0`
+2. `rq_wait_ns = 0` → `rq_wait_pct = 0`
+3. All metrics being 0 falls into the "UNBUSY" branch (second condition)
+4. If `nr_shortages = 0`: `busy_level` is reset to 0 (the bug)
+5. This prevents `busy_level` from ever reaching 4, which is required to
+   trigger vrate reduction
+
+The fix adds a guard: when `nr_done == 0 && nr_lagging > 0`, the
+saturation status is truly unknown, so busy_level is preserved
+unchanged.
+
+### Step 2.4: Fix Quality
+- Obviously correct: if we have zero completions, we have zero data to
+  make QoS decisions
+- Minimal/surgical: only adds a new guard condition before the existing
+  logic
+- Regression risk: Very low. The new code path only triggers when
+  `nr_done == 0 && nr_lagging > 0`, and it preserves the previous state
+  rather than making any change.
+- The existing logic is completely unchanged in all other cases.
+
+---
 
 ## PHASE 3: GIT HISTORY INVESTIGATION
 
-**Step 3.1: Blame**
-`bio_add_page()` was refactored by Christoph Hellwig in commit
-`0aa69fd32a5f76` (2018-06-01), but the fundamental function dates back
-to Linus's original `1da177e4c3f41` (2005). The zero-length ambiguity
-has existed since the function's creation.
+### Step 3.1: Blame
+The buggy busy_level decision logic was introduced by:
+- `7caa47151ab2e6` (Tejun Heo, 2019-08-28): Original blk-iocost
+  implementation (v5.4)
+- `81ca627a933063` (Tejun Heo, 2019-10-14): "iocost: don't let vrate run
+  wild while there's no saturation signal" - This commit restructured
+  the busy_level logic and added the `else { ioc->busy_level = 0; }`
+  branch for "Nobody is being throttled." This is the commit that
+  introduced the specific behavior this fix addresses. Present since
+  v5.8.
 
-**Step 3.2: Fixes tag** — No Fixes: tag present. The bug is in the API
-design of `bio_add_page()` itself, not introduced by a specific commit.
+### Step 3.2: Fixes Tag
+No explicit Fixes: tag. However, the buggy behavior was introduced by
+81ca627a933063, which is present in v5.8+ (including all currently
+active stable trees: v5.10, v5.15, v6.1, v6.6, v6.12).
 
-**Step 3.3: File History**
-`block/bio.c` has been actively modified — 159 commits since v6.6.
-Recent refactoring by Christoph Hellwig (`38446014648c9`,
-`12da89e8844ae`) changed the merge logic but didn't address zero-length.
+### Step 3.3: File History
+Recent blk-iocost changes are mostly unrelated (hrtimer_setup, min_t
+cleanup, treewide conversions). No conflicting changes. The busy_level
+decision logic has been stable since 81ca627a933063 with only one minor
+change (065655c862fedf removed `nr_surpluses` check).
 
-**Step 3.4: Author**
-Qu Wenruo is a prolific btrfs developer. He discovered this issue while
-debugging the btrfs zlib crash (`0dcabcb920a5c`), which was reported by
-David Sterba and syzbot. He fixed both the btrfs caller AND added this
-block-level defense.
+### Step 3.4: Author
+Jialin Wang is not the regular blk-iocost maintainer, but the fix was
+acked by Tejun Heo (creator and maintainer of blk-iocost) and merged by
+Jens Axboe (block layer maintainer).
 
-**Step 3.5: Dependencies**
-None. The 2-line check has no prerequisites. It uses only existing
-macros (`WARN_ON_ONCE`).
+### Step 3.5: Dependencies
+No dependencies. The patch is self-contained and the code it modifies is
+identical across all stable trees (v5.10 through current mainline,
+verified by comparing `ioc_lat_stat()` and `ioc_timer_fn()` busy_level
+logic).
+
+---
 
 ## PHASE 4: MAILING LIST RESEARCH
 
-**Step 4.1-4.5:** Lore.kernel.org was blocked by anti-scraping
-protection. However, from examining the related btrfs fix commit
-(`0dcabcb920a5c`), I can confirm:
-- The bug was reported by David Sterba (btrfs maintainer), Jean-
-  Christophe Guillain (user), and syzbot
-- A bugzilla was filed:
-  https://bugzilla.kernel.org/show_bug.cgi?id=221176
-- The root cause was bio_add_folio/bio_add_page accepting zero-length
-- The fix was signed off by Jens Axboe (block maintainer)
+### Step 4.1-4.5
+Lore.kernel.org was blocked by bot protection. Web search found limited
+direct results. However, the commit has strong signals:
+- **Acked-by: Tejun Heo** - the creator and primary maintainer of blk-
+  iocost
+- **Merged by: Jens Axboe** - the block layer maintainer
+- The commit was merged via the standard block tree path
+
+---
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
-**Step 5.1:** Modified function: `bio_add_page()`
+### Step 5.1: Functions Modified
+- `ioc_lat_stat()`: Collects per-CPU IO latency statistics
+- `ioc_timer_fn()`: The main timer callback that evaluates QoS and
+  adjusts vrate
 
-**Step 5.2: Callers**
-`bio_add_page()` is called from 44+ files across the kernel: filesystems
-(btrfs, gfs2, ocfs2, ntfs3, f2fs, squashfs, nfs, erofs, direct-io),
-block layer (blk-map, blk-crypto), device mapper (dm-crypt, dm-io, dm-
-writecache, dm-log-writes, dm-flakey, dm-zoned), RAID (raid1, raid5,
-raid10), NVMe target, SCSI target, drbd, zram, xen-blkback, floppy. This
-is a CORE API.
+### Step 5.2: Callers
+- `ioc_lat_stat()` is called only from `ioc_timer_fn()` (single call
+  site)
+- `ioc_timer_fn()` is the periodic timer callback for the IO cost
+  controller, runs once per period
 
-**Step 5.3:** `bio_add_page` calls `bvec_try_merge_page` and
-`__bio_add_page`, manipulating bio vectors.
+### Step 5.3: Impact Surface
+The `ioc_timer_fn()` timer runs periodically for every block device with
+iocost enabled. The busy_level directly controls vrate adjustment, which
+governs IO throttling for cgroups. This is the core feedback loop of the
+entire iocost controller.
 
-**Step 5.4:** Any filesystem or block driver issuing I/O can reach this
-function. It's on the hot path for ALL block I/O.
+### Step 5.4: Call Chain
+`timer_list callback` → `ioc_timer_fn()` → evaluates QoS → adjusts
+`busy_level` → calls `ioc_adjust_base_vrate()` → adjusts
+`vtime_base_rate`. This path is always active when iocost is enabled.
 
-**Step 5.5:** The same zero-length ambiguity exists in `bio_add_folio()`
-which wraps `bio_add_page()`, so this fix protects both paths.
+---
 
 ## PHASE 6: STABLE TREE ANALYSIS
 
-**Step 6.1:** `bio_add_page()` exists in ALL stable trees (present since
-2005). The zero-length ambiguity has existed since the beginning.
+### Step 6.1: Code Existence in Stable Trees
+Verified the exact busy_level decision logic is **byte-for-byte
+identical** in:
+- v5.10 (line 2272-2310)
+- v5.15 (line 2348-2390)
+- v6.1 (line 2354-2396)
+- v6.6 (line 2381-2420)
+- v7.0 mainline (line 2399-2435)
 
-**Step 6.2: Backport Compatibility**
-- v6.6/v6.12: Function has slightly different structure (uses
-  `same_page` variable, `bvec_try_merge_page` has different signature),
-  but the fix location (after the BIO_CLONED check, before the size
-  check) is identical. Patch should apply cleanly or with trivial
-  context adjustment.
-- v6.1: Function uses `__bio_try_merge_page()` instead. Fix still
-  applies at the top of the function.
-- v5.15: Same as v6.1.
+The `ioc_lat_stat()` function is also identical across all these
+versions.
 
-**Step 6.3:** No related zero-length fix exists in any stable tree.
+### Step 6.2: Backport Complications
+The patch should apply **cleanly** to all active stable trees. The code
+context is identical. In v5.10, `ioc_adjust_base_vrate()` is inline
+rather than a separate function, but the busy_level decision logic
+(where the patch applies) is identical.
+
+### Step 6.3: No Related Fixes Already in Stable
+No prior fix for this specific issue was found in stable trees.
+
+---
 
 ## PHASE 7: SUBSYSTEM CONTEXT
 
-**Step 7.1:** Block layer (`block/`) — **CORE** criticality. Affects all
-users who do any I/O.
+### Step 7.1: Subsystem
+- **Subsystem:** Block layer - IO cost controller (blk-iocost)
+- **Criticality:** IMPORTANT - affects all users of cgroup v2 IO
+  control, widely used in cloud environments (systemd, container
+  orchestrators, cloud VMs)
 
-**Step 7.2:** Actively developed subsystem (20+ recent commits).
+### Step 7.2: Activity
+The subsystem is mature with occasional fixes. The busy_level logic
+hasn't changed since 2020, indicating this is a long-standing bug.
+
+---
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-**Step 8.1:** Universal — every kernel user performs block I/O through
-`bio_add_page()`.
+### Step 8.1: Affected Users
+- All users of cgroup v2 IO cost control during disk saturation
+- Particularly cloud users on virtualized block devices (Azure, etc.)
+- Container environments using IO throttling (Kubernetes, Docker with
+  cgroup v2)
 
-**Step 8.2: Trigger Conditions**
-Currently, the btrfs zlib path (`3d74a7556fba`, only in 7.0+) was the
-known trigger. In stable trees, no known caller currently passes zero-
-length. However, any future backported fix or existing edge case that
-accidentally computes zero-length would trigger the double-free.
+### Step 8.2: Trigger Conditions
+- Disk saturated with large IOs (e.g., 1MB writes at high queue depth)
+- Timer period passes with zero IO completions
+- **Common trigger:** Any scenario where IO completion time exceeds the
+  timer period (~10ms-100ms typically)
+- Reproducible consistently on certain cloud storage types
 
-**Step 8.3: Failure Mode**
-Double-free of a page → memory corruption, crash, or security
-vulnerability. Severity: **CRITICAL** when triggered.
+### Step 8.3: Severity
+- **Failure mode:** IO isolation failure - a noisy neighbor cgroup
+  cannot be properly throttled during saturation
+- **Impact:** Latency-sensitive workloads experience 100x+ higher
+  latency than expected (181ms vs 1.95ms in the benchmark)
+- **Severity:** HIGH - not a crash, but a significant functional failure
+  of the IO controller that defeats its core purpose
 
-**Step 8.4: Risk-Benefit Ratio**
-- BENEFIT: Prevents double-free from API misuse; hardens a core API used
-  by 44+ files
-- RISK: Effectively zero — 2 lines, adds a check for an invalid input
-  that should never occur
-- Ratio: Very favorable
+### Step 8.4: Risk-Benefit
+- **Benefit:** HIGH - Fixes IO isolation during saturation, critical for
+  cloud multi-tenant environments
+- **Risk:** VERY LOW - ~15 lines, only adds a "preserve state" guard
+  condition, all existing paths unchanged
+- **Ratio:** Strongly favorable for backporting
+
+---
 
 ## PHASE 9: FINAL SYNTHESIS
 
-**Step 9.1: Evidence Compilation**
+### Step 9.1: Evidence Summary
 
-FOR backporting:
-- Prevents double-free (memory safety, potential security issue)
-- 2-line fix, obviously correct, zero regression risk
-- Core block layer API used by 44+ files
-- Real bug was triggered (btrfs zlib crash with syzbot report + user
-  reports)
-- Block maintainer (Jens Axboe) signed off
-- The API ambiguity exists in all stable kernels
-- No caller should ever pass zero-length; this enforces a correct
-  invariant
+**FOR backporting:**
+- Fixes a real, reproducible bug with concrete user impact
+- Affects IO isolation in cloud/container environments (high-value use
+  case)
+- Small, surgical fix (~15 lines actual code in 1 file)
+- Obviously correct (no completions = no data = preserve state)
+- Acked by subsystem creator (Tejun Heo)
+- Merged by block maintainer (Jens Axboe)
+- Detailed testing with before/after benchmarks showing 40x improvement
+- Code is identical across all stable trees - clean apply expected
+- Bug present since v5.8 (81ca627a933063), affects v5.10+ stable trees
+- No regression found in testing (including GCP which worked before)
 
-AGAINST backporting:
-- The specific known trigger (btrfs zlib) only exists in 7.0+ code
-- No known caller in stable trees currently passes zero-length
-- Somewhat defensive/hardening in nature for older stable trees
+**AGAINST backporting:**
+- No explicit Cc: stable or Fixes: tag (expected for AUTOSEL)
+- Not a crash/panic - it's a performance/isolation failure
+- The commit message is long (includes test script), but the actual diff
+  is small
 
-**Step 9.2: Stable Rules Checklist**
-1. Obviously correct? **YES** — trivially verifiable
-2. Fixes a real bug? **YES** — double-free is real, demonstrated in
-   btrfs
-3. Important issue? **YES** — double-free = memory corruption/crash
-4. Small and contained? **YES** — 2 lines in 1 file
-5. No new features? **YES** — purely defensive check
-6. Applies to stable? **YES** — with minor context adjustments
+### Step 9.2: Stable Rules Checklist
+1. **Obviously correct?** YES - if zero IOs completed, QoS metrics are
+   meaningless
+2. **Fixes real bug?** YES - IO throttling fails during saturation,
+   breaking cgroup isolation
+3. **Important issue?** YES - significant performance isolation failure
+   in cloud environments
+4. **Small and contained?** YES - ~15 lines in 1 file
+5. **No new features?** CORRECT - only fixes existing logic
+6. **Can apply to stable?** YES - code is identical across all stable
+   trees
 
-**Step 9.3: Exception Categories** — N/A
+### Step 9.3: Exception Categories
+Not an exception category - this is a standard important bug fix.
 
-**Step 9.4: Decision**
-The fix is tiny, obviously correct, and addresses a genuine API-level
-design flaw that leads to double-free when any caller passes zero-
-length. While the known trigger exists only in 7.0+, the underlying API
-ambiguity has existed since 2005 and could be triggered by any of the
-44+ callers if they ever compute a zero-length. The defensive hardening
-of such a critical, widely-used API is appropriate for stable.
+---
 
 ## Verification
 
-- [Phase 1] Parsed tags: Signed-off-by Qu Wenruo (author), Jens Axboe
-  (block maintainer), Link: tag present
-- [Phase 2] Diff analysis: 2 lines added to `bio_add_page()` —
-  WARN_ON_ONCE(len == 0) + return 0
-- [Phase 3] git blame: bio_add_page refactored in 0aa69fd32a5f76 (2018),
-  original from 1da177e (2005); zero-length bug exists since origin
-- [Phase 3] Author check: Qu Wenruo is prolific btrfs developer,
-  discovered bug while fixing btrfs zlib crash (0dcabcb920a5c)
-- [Phase 3] Related commit 0dcabcb920a5c confirmed: btrfs zlib double-
-  free from zero-length bio_add_folio, reported by David Sterba, syzbot,
-  and user
-- [Phase 4] Lore blocked by anti-scraping; patch link confirmed via
-  commit message
-- [Phase 5] grep found 44+ files calling bio_add_page() across fs/,
-  drivers/, block/ — CORE API
-- [Phase 6] bio_add_page in v6.6, v6.1, v5.15 confirmed via git show —
-  function exists in all stable trees; fix applies at same location (top
-  of function)
-- [Phase 6] No existing zero-length check in any stable tree version
-  confirmed
-- [Phase 7] Block layer — CORE subsystem, affects all users
-- [Phase 8] Double-free → memory corruption → CRITICAL severity when
-  triggered; 2-line fix → zero regression risk
-- UNVERIFIED: Could not access lore.kernel.org to read full review
-  discussion due to anti-scraping protection
+- [Phase 1] Parsed tags: Acked-by Tejun Heo (blk-iocost maintainer),
+  Signed-off-by Jens Axboe (block maintainer)
+- [Phase 2] Diff analysis: ~15 lines added in `ioc_lat_stat()` and
+  `ioc_timer_fn()`, adds nr_done tracking and guard condition
+- [Phase 3] git blame: buggy code introduced in 81ca627a933063 (v5.8,
+  "iocost: don't let vrate run wild"), verified present in all stable
+  trees
+- [Phase 3] git show 81ca627a933063: confirmed it added the `else {
+  busy_level = 0 }` branch that causes the bug
+- [Phase 3] git merge-base: confirmed 81ca627a933063 is in v5.8+,
+  present in v5.10, v5.15, v6.1, v6.6
+- [Phase 3] git log --oneline -20: no conflicting or prerequisite
+  changes found
+- [Phase 4] b4 dig: could not find commit (not yet in tree);
+  lore.kernel.org blocked by bot protection
+- [Phase 5] Grep for callers: `ioc_lat_stat()` called only from
+  `ioc_timer_fn()`, single call site
+- [Phase 5] Grep for busy_level: 20 references in file, all consistent
+  with this fix
+- [Phase 6] Compared ioc_lat_stat() across v5.10, v5.15, v6.1, v6.6,
+  v7.0: byte-for-byte identical
+- [Phase 6] Compared busy_level decision logic across v5.10, v5.15,
+  v6.1, v6.6, v7.0: structurally identical
+- [Phase 6] No prior fix for this issue found in any stable tree
+- [Phase 8] Failure mode: IO isolation failure, 40x latency increase for
+  latency-sensitive workloads, severity HIGH
+- UNVERIFIED: Mailing list discussion (lore blocked), but commit has
+  strong trust signals (Acked-by maintainer, merged via standard path)
+
+The fix is small, surgical, obviously correct, acked by the subsystem
+maintainer, fixes a real-world IO isolation failure affecting cloud
+environments, and applies cleanly to all active stable trees. The risk
+is very low (adds only a "preserve state" guard) while the benefit is
+high (restores IO throttling during disk saturation).
 
 **YES**
 
- block/bio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ block/blk-iocost.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index d80d5d26804e3..6048d9382fecf 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1064,6 +1064,8 @@ int bio_add_page(struct bio *bio, struct page *page,
- {
- 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
- 		return 0;
-+	if (WARN_ON_ONCE(len == 0))
-+		return 0;
- 	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)
- 		return 0;
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index d145db61e5c31..0cca88a366dc9 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1596,7 +1596,8 @@ static enum hrtimer_restart iocg_waitq_timer_fn(struct hrtimer *timer)
+ 	return HRTIMER_NORESTART;
+ }
  
+-static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p)
++static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p,
++			 u32 *nr_done)
+ {
+ 	u32 nr_met[2] = { };
+ 	u32 nr_missed[2] = { };
+@@ -1633,6 +1634,8 @@ static void ioc_lat_stat(struct ioc *ioc, u32 *missed_ppm_ar, u32 *rq_wait_pct_p
+ 
+ 	*rq_wait_pct_p = div64_u64(rq_wait_ns * 100,
+ 				   ioc->period_us * NSEC_PER_USEC);
++
++	*nr_done = nr_met[READ] + nr_met[WRITE] + nr_missed[READ] + nr_missed[WRITE];
+ }
+ 
+ /* was iocg idle this period? */
+@@ -2250,12 +2253,12 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 	u64 usage_us_sum = 0;
+ 	u32 ppm_rthr;
+ 	u32 ppm_wthr;
+-	u32 missed_ppm[2], rq_wait_pct;
++	u32 missed_ppm[2], rq_wait_pct, nr_done;
+ 	u64 period_vtime;
+ 	int prev_busy_level;
+ 
+ 	/* how were the latencies during the period? */
+-	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct);
++	ioc_lat_stat(ioc, missed_ppm, &rq_wait_pct, &nr_done);
+ 
+ 	/* take care of active iocgs */
+ 	spin_lock_irq(&ioc->lock);
+@@ -2397,9 +2400,17 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 	 * and should increase vtime rate.
+ 	 */
+ 	prev_busy_level = ioc->busy_level;
+-	if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
+-	    missed_ppm[READ] > ppm_rthr ||
+-	    missed_ppm[WRITE] > ppm_wthr) {
++	if (!nr_done && nr_lagging) {
++		/*
++		 * When there are lagging IOs but no completions, we don't
++		 * know if the IO latency will meet the QoS targets. The
++		 * disk might be saturated or not. We should not reset
++		 * busy_level to 0 (which would prevent vrate from scaling
++		 * up or down), but rather to keep it unchanged.
++		 */
++	} else if (rq_wait_pct > RQ_WAIT_BUSY_PCT ||
++		   missed_ppm[READ] > ppm_rthr ||
++		   missed_ppm[WRITE] > ppm_wthr) {
+ 		/* clearly missing QoS targets, slow down vrate */
+ 		ioc->busy_level = max(ioc->busy_level, 0);
+ 		ioc->busy_level++;
 -- 
 2.53.0
 
