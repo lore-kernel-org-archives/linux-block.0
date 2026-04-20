@@ -1,126 +1,105 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB16C40DFC7
-	for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 02:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92FE1DF256;
+	Mon, 20 Apr 2026 02:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776650719; cv=none; b=ucRBXmtL3g1QtMpIe6nxml6I5xlhKuB64fbVJlP+RB0DQ5/Sa27uFDeRudK/BoUWdQTGRjsGorB3AGgRei/wE9KOHJ7uXEOKpKlWGCMENbtUtfJ1BLW+ZKnS7sujxupWQIMdAwkSUBIlrp7nIJNyjOYEnFSa8lEAENWJRQmr1bo=
+	t=1776653547; cv=none; b=k0egUBbRveEB/oXcEu9KUHCDgBc07ExHZX/Y3cbjBUNiZDOlNu9BDL6NnnrixNJRPyV3t3nLQ+WaymVK153Z3MYn+uY9byCl1w+qJxZE7ZHeFJLpzAzUIorlSC7o3HyeXP5KCGwXT4yv4tnN6tUIVGnmYRJgJ5btOH9W1OkefH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776650719; c=relaxed/simple;
-	bh=jQBR9CkQWQd7EuOKvr6gloNXng7hI1A6WAA1mkPzRsA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AMcuR7NPw+nAZVFDx/eMUMabEfOTJcX1+rm2f1xVbGbL2DUaROub0jKLtSt7BZoxJrFXcd4A9UT7/7P7tI8iDrrT0QIqh+oZi7XOnbsJZC6yNFE0x2IGeqLQA1lsPSBvHlEQy+gGQE6iX2mlwRvhpzCyC4h8mHXwTNFrPibAfo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7b186dfc1d0so33134707b3.1
-        for <linux-block@vger.kernel.org>; Sun, 19 Apr 2026 19:05:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776650717; x=1777255517;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gxw07dZGozsSlHhhVNHLtxH0zskFbDiC5pVnF35l/f4=;
-        b=LEngx1m7KtbjR3xhmPFpB3+vbk6wPbpM/8no3G8I7/S444GQ+cKp2rA8GYx282q8HF
-         gNLZ7rHAnv2hF2IBSMrd0kehbvROiG4Mjz5gbaBw/wsFzIDu3tAXoqV/LqK3bnpyvHzK
-         mYmp1PPumFbrEsHPwBSkbm8vc6B/lCMdOffD3KS2D0ZKA6+ggmjaDbHzK6wkmQms/RbR
-         8m0eqBz9rt3yBAYzncTzop/iHPhYnLoC5i5JTSqEfLVtNeBNUxUrgc3yfEKvedvKc6FY
-         DHCsAz1dgSj7lq+NacMZ6k0FuaZu+xWnrOr/kCUAJHUpXciaqPguUGl/vTUJi2p0P05x
-         N+7g==
-X-Forwarded-Encrypted: i=1; AFNElJ9TSQoF3lMQQ1dJoBC/9DAeb96DuXIQb1atKHryg6dbo8KQgw7Klj7d77RuLf9IXNQgkIef7HM5EoYMww==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQLGquk8r3B5Pin8qdAbCt//6JWeI/n5v4FHtLc8djwpz+9a/V
-	WK41uCvWljd49/Aa6f2RPvmu5qiabQE0Ug9SjQ4VURyXUpTjovjj/7P4
-X-Gm-Gg: AeBDies0bV0KkV6ObwM/OIxFBt/8rUjpsBFmBzpnwOzoeyLGT7J9a/p+/4gZAlYsq5R
-	mywiINv7BJlAwWAE71L2/n2G/6LTzDzNyQJKXju0FGq2W6NfzbUiOgzy/Ic0ZKoRbmz1d+M6YQP
-	EV/aSUqAWTsOPMspzZo375pVTOUOw8r5rtSx5qMOi1SbpEhI39qCXDx9x/RHNWGinEeR5Yt9Z7z
-	4r1GR8UoUg35RykoD08gTc8g/jB2A+ZI4WvzWJ4IOgDZHxCEYKHFRHMTV2B57Tj8lWsERMWTpwT
-	mFDDhTEMf3bnJvRycRo1oco8i1ho6hN7q+h1qgkYXCjGVRP8LMMQ3GKIEEIgpc76vFRdHfPmIWF
-	SngNvLPFx7xQ8FFHMg7Ubf2sJn7lx7VDKiT39XikktzsFbPiXAZC21eEGLQv7HPp92V0zKXK59N
-	dsPW/9tCQIMTWnv8NR/Zy0UozgzTYEFRY=
-X-Received: by 2002:a05:690e:480c:b0:651:b61a:4b5f with SMTP id 956f58d0204a3-65311989a3amr5415786d50.17.1776650716836;
-        Sun, 19 Apr 2026 19:05:16 -0700 (PDT)
-Received: from tofu.. ([128.210.0.165])
-        by smtp.googlemail.com with ESMTPSA id 956f58d0204a3-65314b5faf0sm4518980d50.5.2026.04.19.19.05.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Apr 2026 19:05:16 -0700 (PDT)
-From: Sungwoo Kim <iam@sung-woo.kim>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>
-Cc: Sungwoo Kim <iam@sung-woo.kim>,
-	Chao Shi <cshi008@fiu.edu>,
-	Weidong Zhu <weizhu@fiu.edu>,
-	Dave Tian <daveti@purdue.edu>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] Fix null-ptr-deref in bio_integrity_map_user()
-Date: Sun, 19 Apr 2026 22:03:28 -0400
-Message-ID: <20260420020327.1667156-3-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1776653547; c=relaxed/simple;
+	bh=/6UN8C/UXvxDOrHXifdAQZlfYOXknoihB++HUFwMKng=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dsmm/9LCF2JPSSxva3KazRhRqRdUYq4/FCEvRQwb7OJrIzxHPPMQZKr4mezkW3qoU1tdbb27k/FhokURXudqkQAvF8rdARxJqJdySUdiGu/4RpPkiSwe3KFLD4Xm3YeFGTLx3vHiwx2E1GCRFTMjxpiW/TLBFlmhmEruJnG15j4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=EE/KdQWY; arc=none smtp.client-ip=113.46.200.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b="EE/KdQWY"
+dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=pSkADprham3IfWnGZmeVtnz2GCNjnW9T5Kyx6Lvi8/E=;
+	b=EE/KdQWYGK+GrA9xlm69kMW4y5/8xh/cEGM01x2urv5YJ3UxHT9UKJv5CSDQ3hNCSVxQisaMj
+	AFYuql0BKK0/vHv9/Yn+Bs6HXjtDEAGhD1KMwc4EZlnvUA6aKHaDRhson1DWaTqM8DRHJuoK0lG
+	w5IC6WRnddc1NGN7OblkDkc=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fzVGt0Nd7zKm4w;
+	Mon, 20 Apr 2026 10:45:58 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2D0224056E;
+	Mon, 20 Apr 2026 10:52:21 +0800 (CST)
+Received: from kwepemn100013.china.huawei.com (7.202.194.116) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 20 Apr 2026 10:52:21 +0800
+Received: from localhost (10.50.85.155) by kwepemn100013.china.huawei.com
+ (7.202.194.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 20 Apr
+ 2026 10:52:20 +0800
+Date: Mon, 20 Apr 2026 10:46:21 +0800
+From: Long Li <leo.lilong@huawei.com>
+To: <leo.lilong@huaweicloud.com>, <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yi.zhang@huawei.com>, <yangerkun@huawei.com>, <lonuxli.64@gmail.com>
+Subject: Re: [PATCH 0/4] nbd: replace socks pointer array with xarray to
+ eliminate queue freeze
+Message-ID: <aeWTfZ5G5lXT9lZo@localhost.localdomain>
+References: <20260327091223.4147956-1-leo.lilong@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20260327091223.4147956-1-leo.lilong@huaweicloud.com>
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemn100013.china.huawei.com (7.202.194.116)
 
-pin_user_pages_fast() can partially succeed and return the number of
-pages that were actually pinned. However, the bio_integrity_map_user()
-does not handle this partial pinning. This leads to a general protection
-fault since bvec_from_pages() dereferences an unpinned page address,
-which is 0.
+On Fri, Mar 27, 2026 at 05:12:19PM +0800, leo.lilong@huaweicloud.com wrote:
+> From: Long Li <leo.lilong@huawei.com>
+> 
+> Hi,
+> 
+> Commit b98e762e3d ("nbd: freeze the queue while we're adding
+> connections") introduced blk_mq_freeze_queue() in the add-socket path
+> to prevent use-after-free when krealloc() relocates the config->socks
+> array while I/O is in flight. However, freezing the queue on every
+> connection setup introduces significant latency when establishing a
+> large number of connections.
+> 
+> This series eliminates the queue freeze by replacing the
+> krealloc-based struct nbd_sock **socks array with a struct xarray.
+> The xarray provides RCU-safe pointer publishing: each nbd_sock is
+> fully initialized before being stored via xa_store(), and concurrent
+> readers access individual entries through xa_load() without ever
+> holding a reference to the array itself. This removes the possibility
+> of UAF on array reallocation, making the queue freeze unnecessary.
+> 
+> The following test was performed with 256 connections on a local
+> nbd-server:
+> 
+>   nbd-server -M 256 -C /etc/nbd-server/config
+>   time nbd-client 127.0.0.1 10809 /dev/nbd0 -N myexport -C 256
+> 
+>   Before:  real 4.510s  user 0.004s  sys 0.038s
+>   After:   real 0.263s  user 0.009s  sys 0.032s
+> 
+> Connection setup time is reduced by ~94%.
+> 
+> Long Li (4):
+>   nbd: simplify find_fallback() by removing redundant logic
+>   nbd: replace socks pointer array with xarray
+>   nbd: remove redundant num_connections boundary checks
+>   nbd: remove queue freeze in nbd_add_socket
+> 
+>  drivers/block/nbd.c | 201 +++++++++++++++++++++++---------------------
+>  1 file changed, 106 insertions(+), 95 deletions(-)
+> 
+> -- 
+> 2.39.2
+> 
 
-To fix this, add a check to verify that all requested memory is pinned.
-
-Reproducer in blktest: https://github.com/linux-blktests/blktests/pull/244
-
-Kernel Oops:
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 0 UID: 0 PID: 1061 Comm: nvme-passthroug Not tainted 7.0.0-11783-g90957f9314e8-dirty #16 PREEMPT(lazy)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
-RIP: 0010:bio_integrity_map_user.cold+0x1b0/0x9d6
-
-Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
-Acked-by: Chao Shi <cshi008@fiu.edu>
-Acked-by: Weidong Zhu <weizhu@fiu.edu>
-Acked-by: Dave Tian <daveti@purdue.edu>
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
----
-V2: https://lore.kernel.org/linux-block/20260330230256.4160820-2-iam@sung-woo.kim/
-V2->V3
-- Added a reproducer
-- V2 incorrectly assumed pin_user_pages_fast() returns pages.
-
- block/bio-integrity.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index e79eaf047794..c8cfd15fb589 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -402,6 +402,20 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- 					extraction_flags, &offset);
- 	if (unlikely(ret < 0))
- 		goto free_bvec;
-+	/* Handle partial pinning. This can happen when pin_user_pages_fast()
-+	 * returns fewer pages than requested
-+	 */
-+	if (unlikely(ret != bytes)) {
-+		int npinned = DIV_ROUND_UP(offset + ret, PAGE_SIZE);
-+		int i;
-+
-+		for (i = 0; i < npinned; i++)
-+			unpin_user_page(pages[i]);
-+		if (pages != stack_pages)
-+			kvfree(pages);
-+		ret = -EFAULT;
-+		goto free_bvec;
-+	}
- 
- 	nr_bvecs = bvec_from_pages(bvec, pages, nr_vecs, bytes, offset,
- 				   &is_p2p);
--- 
-2.47.3
-
+Friendly ping ...
