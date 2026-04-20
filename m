@@ -1,128 +1,161 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE62381B0A
-	for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 07:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0F439D6D9
+	for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 11:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776668581; cv=none; b=WqHzhJbg41imhYh2GPVW+D7XT2XAZzuRqKTIc5g7s+G3kTkJAXfMr65jrpLbEqZmJiv5SCRsBCf/EzpJHc2dpUVHK6N+S84b/3VbnUTC/ZYtk3NKOFKjYqC5yLLJkKxwv5DZS3ZHgKzIhobw4wh50EbCbGn34k7DX8ChPof1pQ8=
+	t=1776683374; cv=none; b=aSprcaHAKvbYmuZr7R1nTut2R6D7eXDdTc/RL9AxjZo1j+l7vFWb/YdHpsLzKgdF9PHiiyuML52yCLMxhG1dVYdoMLFjln6oOCVx0WpQirJeeON6Eyrg3aeLXCe8F7B92vxfh93xeYWKesmrjGrlHOehDspsvDue+F/Qwx5xlz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776668581; c=relaxed/simple;
-	bh=Zr4VYv6zq09N6d7GeoSv9myPRkhph819UYWZ6zJQGos=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=chuJFSHRpCVbf7frS2IEZUFYMmqFt3XMbrFGCADHZ2W4CvqsIUA5iNL/fSybaH5+HDDOw9L4u2GyBrRQyxhyfWwEEq8oZghiodSbJTl59O6RPpecwrV3mQMw4lBwuw23kNK9+c9oJ2WFuXILz6zQOkGPU+QLmSn1/W4KqIEe6Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OcKwoGhN; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776683374; c=relaxed/simple;
+	bh=BqiatpiZK82yHpofKxSogwomIgLQIYYScdESQkvH10E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cglE2TqCbKx99US6MKG+c9k28srM/vs/u+gjk0rf/KYgrKkeH3qCvHwGvcy9ctxgIMi/I5WEssEjEH3wa8kxymOlyiCZGcHn4cIAXWfRwsIWrN2q1dpfFLKkA6/CG3hIilC7RjjGVlDwttwmF2I2Xx+1Fb4FuS+stOK8p4hxud8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BT99HENN; arc=none smtp.client-ip=209.85.214.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcKwoGhN"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43cf8d550bdso2407707f8f.0
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 00:02:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776668577; x=1777273377; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ytColbIYt3Rp0RtccuT3actoBUlgarroshZJSkhwQPc=;
-        b=OcKwoGhNmGZj+/glkxrAi1e0qRIdQGjc/yBPnNxy5KkwdW7vZHmY9lX5fEgVLG/iwt
-         Feu1RjguwOrvKv93RdiYrdFixFJ3+qB7iuZcnaRbNdHZyTSaWYVcBO5f9vvmpk40I6QL
-         HzgIilGcZ/wMGjMZQsES4bdT2ArAiR2EAke0f4BNSJxzaVv5x67r6HGVgvgduifRscjQ
-         4OrXqYbugxlP1Y0nVI4fo1XL2mQWlgyVYwBOhfYdaFUoBTknVb0DF5wW+FkD/TXCPzND
-         jOcnjzwq0rM12lJp8HpSeyJIUz2svW6PmMOyQ0x6PuMbtL58XqP8SKiLZpGzSGHDWv06
-         IsFA==
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BT99HENN"
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2b2503753efso28127035ad.0
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 04:09:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776668577; x=1777273377;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ytColbIYt3Rp0RtccuT3actoBUlgarroshZJSkhwQPc=;
-        b=kH+VWpcbww8DH7TcrwjWqeOg1x5HRwd+/S0vYDE5Up2mNiYtLGfNbdg696/h3JbywD
-         JquThVTf9f8UUx4xM4LzpEbg7Z1PXocI2UWStQvfNQSNts/HUI+lMFDzqbQvbDpca2Uf
-         v0GVjF6Ze86mRW5ngcYw/rg2SuvLr4TsIeiiqFl2WTcl5DcrXkI4aDkWcFWkN0yIuG7a
-         RlJtgMU3iCR/+rnkffCq+lP2Iyq5lXr0F97oX7S7gMXjpRfrACe3iCizEgfimp9o1tXM
-         0UZKRc58xu1KKc0Ji99gk824CU648k1JoDb8qxSh7E9NY1mI/jVth5ttv+uUT2upkwkL
-         QHFA==
-X-Gm-Message-State: AOJu0YyYPCwLsBtw099tTVY558A4qTSD795QnqLlc6FVD8mYpmI5sKxS
-	563B8boNit3zhnZK+eiU3S/rOmJP4Lh/CApXh3TKVllvy6B+LwQiYJ1o
-X-Gm-Gg: AeBDieuZPMnIiiiW/fdPJXQSS6cxmsvvG6vybihXl7sR4v2eDR94I16rvROXtsbSxSJ
-	d0IxcdHgM4OHyuC8RXN/Ri128MHzqzKvq9MWW3jIxHBPzck/XoFolqzood7YO44uHbzf5C42hPa
-	xHwYlRW9Ap1xlerCoUU1hgxvpfb+zIRsGh2kWz76AvXdUWbcUWSpIghKJd71mxWbduzXBtCzvwm
-	f9CGmm73eZjPyPHhTuP5nlXpB4r494+ZXi8twDQg48lTEg1onlpQTZQOaRJ4GIEyu/OmZZQnHQ2
-	25zEyRa8DNOzwJrLTOfNE/MkTxdwflgF03UnDNAX5UJmh+pmAVP3mk677r44XC9x7iYTcY9HGOZ
-	k7+3cyep62acrLSeU4PVFkgJxxiNWD0UgGboCzxJBRHxU2auEojhSaIhFwQfxBL4tEpcUjmqYAJ
-	NulKiK+TJc/32jFYxnd4SPc5DhbJaXALJ9Hajd8zWYOezfjKCD3Y+vkuMrz6qYMBz7Y0b3cZ48L
-	ecxuCSQB0URfzgJyN8=
-X-Received: by 2002:a05:6000:184b:b0:43b:3d02:7806 with SMTP id ffacd0b85a97d-43fe3e0bd7fmr19154024f8f.28.1776668576308;
-        Mon, 20 Apr 2026 00:02:56 -0700 (PDT)
-Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4dc24cfsm27212311f8f.16.2026.04.20.00.02.53
+        d=1e100.net; s=20251104; t=1776683366; x=1777288166;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nqaMgTOsYO0gFcKZhql6upDj4RcuT3QIXW9T6oujAMo=;
+        b=kB9B7D2SYzlOwdKAKqDnfoj2sIqM9r1QIAFM4ZL7b66QXU7rDoOooemxpHY8ThmisL
+         rlHXj+5+ejL4Rh+N+lNlqatry6N7W/5EjZcHCKqajwqjmoZ0hnwpbczZf8BObjSv3fxk
+         bnJn8VoX18YVQz7gPzzp9ttKnlE8TSJg7sL81P0nL3M3G89yxMYjZe5pXfJA3wcjHMGx
+         w8ACZ0QoBYIUqXc1iPEsueAjA+06jjYcrwDMvtgaiJYrsJZM3RRtFSU1GFXrz17kvxER
+         AqcwbNQ7sUyzh6/azvHQDykjSnYmqs9NScf85emxGWCAl10rcfP2fPq62Ryc9mCYJGhK
+         RNLQ==
+X-Forwarded-Encrypted: i=1; AFNElJ87PON/2+nqGgvDsMwIxC8/yjjGpj+mKcyTL+cML/0hPZtvlvPNiAKMyWZ0o+DSZAvQUh4DTaZs0KQVhg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzKD7IRlNAbZu01qMA50xEsJ0DYmM4KPWgZIzV4+Wp2jA9HiC8
+	1xwq5tJ3xE5BZRNVj2XRQBjZoq4C8b09KwzNzNPU4k2Q9Jfv3KGezs++lhYMtujVLSKsfEdZCzQ
+	IIeDy0mFNaWimmgfjiSdfnocdzoy7ukx8vTNDxCouOgW+WKDssGMHSgroa8lFmIzXU5awK2PDWR
+	jP+aJy6xph3c8rNQDgL2UPsg+LfVqRCvkEcbPsu6sF742AQEffNcDepfYYyTKYL+8U6yZlWnWay
+	sNhnhAiKB5rNUTdUQ==
+X-Gm-Gg: AeBDievYBRqrcvEQnU1mlbD51ujTvVP8x0XXTeedzjRoFXYjeeOHMc+OW5h0BQXdb8D
+	rd/MImMRV8d5egNJuWLhh08z6MBq5f/ul/G/dHye/Zmx+DsYwZcC8tc1fucrtqhOtOAz72rw+tB
+	6XA3TkN01GXj8AUlRDi7X/NpQ16EXvxZNd+JOvj84ihmBacMYVEKygvhgEa+I9v0rPk2ayaREBK
+	VExXalhKsBzrnL/fHlGiK5oiex1XTtKRIJ6cTGOBveJS5kDjSA7RqC5QAE8NhLcUXVuYHxHjUlg
+	UmgIEFHQ/iG7AuLKZkriGNLkRLsm2rZX/p+5LPyYAG6dJEjAsq6y6pvQn+jtftGtkOiZXPFT/Hh
+	UYsoxm+ue7nXNV1muTDj8feXvHzd0Of51oTQ9IDMwGgBXf16G+1v8yNk6b3sL+lelCJeai9m/Ch
+	74Kp3A5Jk8TP6SbkQSwreo7jLDKNdgFCJ12vxVakFCfdc3hzYObrOTUklkf6yo8ZaaX7I=
+X-Received: by 2002:a17:903:17cb:b0:2b2:67cd:9963 with SMTP id d9443c01a7336-2b5f9fd5c04mr129878765ad.38.1776683366330;
+        Mon, 20 Apr 2026 04:09:26 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-90.dlp.protect.broadcom.com. [144.49.247.90])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b5fa9fb81esm6571735ad.8.2026.04.20.04.09.25
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 Apr 2026 04:09:26 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2b2e8bba2e6so39549875ad.1
+        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 04:09:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1776683364; x=1777288164; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nqaMgTOsYO0gFcKZhql6upDj4RcuT3QIXW9T6oujAMo=;
+        b=BT99HENNdkFPbqIX+H9FN3Yq2y/j9D0lnFMcRO9dWco5nCNgWgKqxOgE9PNfedzQF0
+         qfHUdJjgIphk21frDtTblu7/VQSFhq4mbm5jK0JxbJWbhzx9Wn8LTQOcCRCkDfNX1Sea
+         gFB4i0fr+ty7KYsJLV1VSJjdjEvkATsGIjxGo=
+X-Forwarded-Encrypted: i=1; AFNElJ/REyKyPj8WZuZ8+HqnW+1sR2EQ5qHnBzqhAH0LwCfKNkve7Zr7R8AtLeOYDrj/FigZjVN3VqKXHwrllg==@vger.kernel.org
+X-Received: by 2002:a17:903:1d2:b0:2b2:41a9:8e10 with SMTP id d9443c01a7336-2b5f9f4e110mr143585575ad.23.1776683364392;
+        Mon, 20 Apr 2026 04:09:24 -0700 (PDT)
+X-Received: by 2002:a17:903:1d2:b0:2b2:41a9:8e10 with SMTP id d9443c01a7336-2b5f9f4e110mr143585245ad.23.1776683363864;
+        Mon, 20 Apr 2026 04:09:23 -0700 (PDT)
+Received: from sumit_ws.dhcp.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b5faa1739fsm103115415ad.22.2026.04.20.04.09.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Apr 2026 00:02:55 -0700 (PDT)
-Date: Mon, 20 Apr 2026 15:02:50 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Michael Wu <michael@allwinnertech.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mon, 20 Apr 2026 04:09:23 -0700 (PDT)
+From: Sumit Saxena <sumit.saxena@broadcom.com>
+To: martin.petersen@oracle.com,
 	axboe@kernel.dk
-Subject: Re: [PATCH] block: fix deadlock between blk_mq_freeze_queue and
- blk_mq_dispatch_list
-Message-ID: <aeXPmqS5lcDkG5R-@fedora>
-References: <20260417082744.30124-1-michael@allwinnertech.com>
- <5fec2f0f-97e5-2c7a-73bd-ad2ad95f2e1d@allwinnertech.com>
+Cc: linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	mpi3mr-linuxdrv.pdl@broadcom.com,
+	Sumit Saxena <sumit.saxena@broadcom.com>
+Subject: [PATCH v2 0/3] scsi/block: NUMA-local scan allocations, shared-tag path cleanup, and SCSI I/O counters
+Date: Mon, 20 Apr 2026 17:08:36 +0530
+Message-ID: <20260420113846.1401374-1-sumit.saxena@broadcom.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5fec2f0f-97e5-2c7a-73bd-ad2ad95f2e1d@allwinnertech.com>
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On Mon, Apr 20, 2026 at 02:31:14PM +0800, Michael Wu wrote:
-> I'd like to add some important information:
-> 
-> The three processes I mentioned—Task 1838 (Back-P10-3), Task 619
-> (android.hardwar), and Task 1865 (sp-control-1)—are all in an
-> uninterruptible sleep state. Therefore, once Task 1865 (sp-control-1) is
-> scheduled out using `preempt_schedule_notrace`, it cannot be scheduled back.
-> The reason Task 1865 (sp-control-1) is in an uninterruptible sleep state is
-> because `down_write` is waiting for `io_rwsem`.
-> 
-> My analysis of the upstream kernel code doesn't seem to have found a fix for
-> this issue. This situation should theoretically exist, but I don't have a
-> platform to test this low-probability behavior. However, it's certain that
-> this situation occurs during I/O scheduling algorithm switching and
-> concurrent F2FS write operations.
-> 
-> In this situation, `io_schedule_prepare` is not used. The path used in Task
-> 1865 is `schedule->sched_submit_work->blk_flush_plug->blk_mq_dispatch_list`.
-> 
-> As you said, this method is indeed not good, but I don't have a better idea
-> to handle this deadlock situation.
+This series contains three performance improvements targeting the SCSI
+and block layers on multi-socket NUMA and heavily loaded SMP systems.
 
-Now I got the idea, because blk_flush_plug() is called on a sleeping task,
-that is why the preempted code block can't get run again even though it
-doesn't sleep anywhere.
+On multi-socket NUMA systems we observed extreme I/O throughput variance
+of 50-60% between runs.  This series identifies and fixes two root causes:
+cross-node memory accesses due to NUMA-unaware allocations in the scan
+path, and false sharing between hot atomic counters in struct request_queue
+and struct scsi_device.
 
-Can you try the following change?
+Performance notes:
 
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index b7f77c165a6e..4217aaaa8e47 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -6966,7 +6966,9 @@ static inline void sched_submit_work(struct task_struct *tsk)
-         * If we are going to sleep and we have plugged IO queued,
-         * make sure to submit it to avoid deadlocks.
-         */
-+       preempt_disable_notrace();
-        blk_flush_plug(tsk->plug, true);
-+       preempt_enable_no_resched_notrace();
+Tested on a dual-socket NUMA system (2x 32-core, 256 GB/socket) with
+an mpi3mr HBA, running fio (random read, 4K, QD 64, 16 jobs, 60 s,
+direct I/O).  IOPS figures are in KIOPS (thousands of IOPS):
 
-        lock_map_release(&sched_map);
- }
+  Configuration                    Avg KIOPS   Range (KIOPS)   Spread
+  Baseline                         6,255       4,200 - 6,700   ~37%
+  Baseline + all patches           7,350       7,000 - 7,700    ~10%
 
+Key findings:
 
+These patches combinedly reduces the observed 50-60% run-to-run variance
+to under 10%, significantly improving workload predictability and
+improves IOPs by 16-18%.
 
-thanks,
-Ming
+No functional regressions observed.
+
+This patch series is based on Martin's for-next tree.
+
+Changes in v2
+--------------
+
+  Patch 1 — Same functional goal as v1 patch 1: NUMA-local scsi_device /
+  scsi_target allocations in the scan path so steady-state I/O does not
+  habitually touch remote memory when the host has a fixed DMA/NUMA
+  affinity.
+
+  Patch 2 — Replaces v1’s ____cacheline_aligned_in_smp on
+  nr_active_requests_shared_tags with shared tags removal work done by
+  Bart Van Assche [1], rebased for the current tree; it removes the
+  atomic counter- nr_active_request_shared_tags that motivated the v1
+  false-sharing workaround and, in our testing, improves IOPS on the order
+  of roughly 16–18% for the shared-tag workload exercised.
+  This patch touches include/linux/blkdev.h, so needs review from
+  linux-block@vger.kernel.org; an Acked-by from the block maintainer is
+  requested before merging via the SCSI tree.
+
+  Patch 3 — Replaces v1’s cache-line padding of iodone_cnt with
+  percpu_counter for both iorequest_cnt and iodone_cnt, so submission and
+  completion paths mostly update CPU-local state instead of bouncing a
+  single cache line, without inflating struct scsi_device for SMP
+  alignment.
+
+[1]: https://lore.kernel.org/linux-block/20240529213921.3166462-1-bvanassche@acm.org/
+
+James Rizzo (1):
+  scsi: scan: allocate sdev and starget on the NUMA node of the host adapter
+
+Bart Van Assche (1):
+  block: drop shared-tag fairness throttling
+
+Sumit Saxena (1):
+  scsi: use percpu counters for iorequest_cnt and iodone_cnt
+
+ 12 files changed, 68 insertions(+), 145 deletions(-)
+
+---
+2.43.7
