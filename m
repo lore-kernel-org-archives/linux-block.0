@@ -1,870 +1,245 @@
-Received: from mail-oo1-f99.google.com (mail-oo1-f99.google.com [209.85.161.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D127E3DD52D
-	for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 20:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.99
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776802155; cv=none; b=t32ZtjomId9qK3C0KnTsrlYNLTx4tFIDS3QyOvk1zVk9YuJa14t0E8Cj282/kodJIQhPd9V8PAA2QU71KhEsCKJ4skCMq672MGhEr2DtVQ2xVGGtRKueXfrZFIB5ntDFDRXNA1MjbhDLZnJtCo+t0ArlDELPa/xLbbjr9dvM+3g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776802155; c=relaxed/simple;
-	bh=3bZzptENpoBqzIHXaVa0LkMXfgfRwFVRlUiPmM914Fc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bx5RKxfOW7JZPohWjPqwAYdf7bcQugNZZCQrnlq2t41FBzcMIOXmotk/17oDZVm2JS7+LNAl3D151RGqyjYocWvSxDIHKa17VcnKk6psCG2fBd3EF+KAw17/eQrILxKnsUwk3Dn4xIEO0Pqnds+72RXpYFiPJrIMMFBIUZHBWn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PF20AzFX; arc=none smtp.client-ip=209.85.161.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF87733F58C;
+	Tue, 21 Apr 2026 20:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776803347; cv=fail; b=nR+laZV+COeBKnchhY8IVdhPi+8xMb+9V3BMBS9osRhE7Uu8DZAhsxEa1v0fjYsau+KXozgfBcFsK0FHUZOeCR6oqHTiOfl8V9KM/Qrm/SZ9EwDoN7GwH/+CCwNCU62d4nHrha5780WxCvJgUrLswKyDKpjTVCKwMKNly5NboNI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776803347; c=relaxed/simple;
+	bh=wnXzDvYJZnCFlEw7BW85iKNm//we6E0G1FBvKP/zAZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=MwhUe0MMq61pSuiQjGHte99dJfARluCKlw7Ze8u0rPD/EzactxzPIWbUk2XauGE6uoeYjO2LAChKrPvOplGvADEPvdDBIM0IUBFn/NSE+UI8ju67/10Gdq+5nSrvAWurmkfNWG+iXxoGLnu6UJelY2nYJmSIzgTpfd2TwWnHcVw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=rSK38VVt; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=nOwgJ5sb; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PF20AzFX"
-Received: by mail-oo1-f99.google.com with SMTP id 006d021491bc7-66b0418ebe7so190808eaf.1
-        for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 13:09:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rSK38VVt";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="nOwgJ5sb"
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63LIb2mH4137553;
+	Tue, 21 Apr 2026 20:28:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=F0QZL41byZWdbBJLDS
+	4+958jdwm9Hi97R1vXacHmxyo=; b=rSK38VVt3rH727sQ9fWtvdUZ/3pmnOCJZ7
+	XbxYx7VijKNlzDwtVTDRVATLzu2M4KIqPPlt+NZWseXXHYNSw+YUM7NDwVrdtPUP
+	+L4L67+T3HZUssuarGB0aQ6KSNn89b9B8Dga+11q1ZZQZaXXXShqFHSddludlZ8X
+	YFvkYP40+NaO2h0mo/CouGjNka820JThrjHcgFdtS2mv3Ymvprtrx8isCfthPsXx
+	9qXjE+lk680KeSiNhI+cJXvtekntuQbJSuay8HzQpjuSIiC5+TyDABvby9BoLorM
+	M88+On65nHUKtbdk0O3Lrs3gAHBMqfZ/DoSppPnHVreJbbGoRH2A==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4dpenmg6bd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Apr 2026 20:28:58 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 63LKQLxh020099;
+	Tue, 21 Apr 2026 20:28:57 GMT
+Received: from co1pr03cu002.outbound.protection.outlook.com (mail-westus2azon11010047.outbound.protection.outlook.com [52.101.46.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4dn19gjy71-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Apr 2026 20:28:57 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ORovLWRuxJbb+xBhJZUwONe/pmbtwaPL/Q7tHlyX/FBsLaTV6JVZKC/tzbRsqBB7eYgYXdwPFiQW0bTWDQEu0fUzqVjTR0SZNMAKMwQkQXtE8H5vtWl5LLdAXDh2MauyoebPba6YgpA9aLVjsJV4uOTeEXUVaLz+pQARzPhFTos9kl6ZBPbwhpt2sZcZfFa9oqNz2AZ0BVohgxn5nQ1Lwzw7rT+bSSG+VIcEAeIqe4/8hEZ6SJHXwgwe5SScqYPNUk409nigXTSHZBbEc3cUad9GyAD+kB0OrL8hQBHMP3R+0C99q6XJAYjQ/F1HClYRS/d65pQiMvBcQsefqbmxhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F0QZL41byZWdbBJLDS4+958jdwm9Hi97R1vXacHmxyo=;
+ b=K/vm51RC9oZdpIIroGmB8uAd3Ix2t/aaHAjFlX63/20QFhhdxInaxdOnmARw8qHUow8IU0paJ4uCgQ/5dSv1JpgmZ4iFbz1sCIVZ3fOVh+tKGKekMpJh/wEeeGUMB3jlTRamZzXaIb/BnDJt8QITjOKP80cBg6OiwonNxi0kRRJna7BmMp4xDRgs+ewk+O9Srqnc0DkHTW0CwcRXbU0K8q7K9FiPmrfUwFWO7GCt97sJIOnK/3Bf4sc7QX9F5Nmcqj7cTMJlj+hqQh7uSyKEOVHlbyH/uKVgEqaSz8omm32eg6QbZVdlpE8L5nu+xgy8mVhpsa/p2Xl1SDrUDhFumw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1776802146; x=1777406946; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5HbzcGaNxncNlRgz3rnOziXXo7yuHKny0NAgQHvZ9SM=;
-        b=PF20AzFXke0vC/c2Jm+OzcjFwB5cCZzV7xxuXiTb/uNTquHQIAU4/4mby8ZZKskvHE
-         +epERBGXmHPsmcuhLRTfyObsMjM1Yk7WtDbKlZjAbS9lRa316Gz5MGzVTexOOhgnxJs+
-         /9x546n/Gwv6e1veEKJN36nZezqufUMXu9AmLPlU2KYVYwe+MKOU9YcQmjtQJBUMfezz
-         X8QIMYUWhTXeFr3wQsPvKF/KjSyTphRjVkRVxDSAQYovIpna02GHVxF6Uo5qMNIe58MU
-         nflTJ+ejPVkhMnERXu+uFGnfWMvDhyPHP132I9daVOigrS+FrW1b5TpwR5QNm2b0F++Y
-         a6rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776802146; x=1777406946;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5HbzcGaNxncNlRgz3rnOziXXo7yuHKny0NAgQHvZ9SM=;
-        b=BtbZxHKEsmhQUjoX3RUppFqAzDAFqfWWNGBzdpp2vO59zLKiTvHn/chPUayPby4BJE
-         P8OJhEJ26dXWWSHt3anY3FbAsp+82igLC7MU8lGLjYcyCDpMyWOo60A639FJmxjDkNPN
-         QKHV5zVEJyL8mPkpSNNwC03RkXq8b0J3Ep/BXc5FAcYmAFCtr2D6wbVgPk6NzflWd6Mu
-         Hu2ge8TGZFq2Tad0EVj14BHhgKs63/x782mcja8coBaVx5o+TWLjyAL7Xsl4LVjeIkt5
-         AQA4Sp2fPLBd3Dg4VxH5KsXAk7toJuyFYLqD26JquhylDDg4QN3LRJSc1PyrCdDcLEBq
-         hJpw==
-X-Forwarded-Encrypted: i=1; AFNElJ822wOpXszODXWKeLNIcF56ENZ0Ocg4ojORqwqTjnxrtF4+I0wne6sVH5PpugKUksn79fMzxZ6XuP4PRw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2mpI5i4T0BDClQjBFAh6kJvfWHaMu4+MCob+e5MZabXsU+gHY
-	m44hGLi2LW2dVdo/8HKOMHWTY7tgV+CsCz2NsWjuNkUnQolcsoCtmBd60HtlZxSeiScBCIHGP6h
-	J0yMwK3x1kDI1IgDlV0Zptj8aWdMX/Z1tQYw6
-X-Gm-Gg: AeBDieuciyIAGmqPbsgU4JMJjtNJi7rtnj1pNT6FXr1+1sKOG54vgToGloea9MTuwB8
-	DByx68mUQgZgHoT1YIchU5BmNig3iJWV+lKmOClpOXtIifoTeFU1jSkQ6+s177i82n/e81dv/tM
-	447DHb8iMOOjjrhlDxn1pkwPHI1JYg+ZUpdkWvrUkrRpPsUJzAauCqeOZ937nb6OC91zk74bBEy
-	6tslnPyZx9aP8+aOLKlPSpIRQccAOO/tZiG42xfVjJ7zrndTMn0pWJsygTXVHYtAFJLL1GdvfDt
-	iDgTZ4n24YR23NDB5vsUixVYNVRW/cCjH4urYftZWiat/685Ud50Hgq2tWdr9HYn4r+IXGGjp49
-	ONp1mGTytSDGZKEUKziWdSrkKpOZaXvdW/xptyzaaOKLUtcNc9qFVc8PtK+agi42A
-X-Received: by 2002:a05:6820:638d:b0:687:aaa0:8f59 with SMTP id 006d021491bc7-69462bec543mr3736693eaf.0.1776802145646;
-        Tue, 21 Apr 2026 13:09:05 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 006d021491bc7-694918cf79esm258207eaf.12.2026.04.21.13.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 13:09:05 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 42AF03405FC;
-	Tue, 21 Apr 2026 14:09:05 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 3DBDCE41A9F; Tue, 21 Apr 2026 14:09:05 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <tom.leiming@gmail.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 1/3] selftests: ublk: remove unused argument to _cleanup
-Date: Tue, 21 Apr 2026 14:08:59 -0600
-Message-ID: <20260421200901.1528842-2-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260421200901.1528842-1-csander@purestorage.com>
-References: <20260421200901.1528842-1-csander@purestorage.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F0QZL41byZWdbBJLDS4+958jdwm9Hi97R1vXacHmxyo=;
+ b=nOwgJ5sbXiEMEbf1pzjti2Qa1HAH2b9X9iJbxMbC/HPkkTg3rTAAxU1FT8l/3wAXtiHY5sixdakv5I4MDXhvFyJjdvn/bBCmGTaV4iyWekAQPk4PDuolN/Hu/uWOqrpGfiBAbon9w41C7KpETm66xN/0pAX9qtl8Xzb0GsYAyq8=
+Received: from PH0PR10MB5777.namprd10.prod.outlook.com (2603:10b6:510:128::16)
+ by MN6PR10MB8118.namprd10.prod.outlook.com (2603:10b6:208:4fa::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9818.32; Tue, 21 Apr
+ 2026 20:28:54 +0000
+Received: from PH0PR10MB5777.namprd10.prod.outlook.com
+ ([fe80::4b84:e58d:c708:c8ce]) by PH0PR10MB5777.namprd10.prod.outlook.com
+ ([fe80::4b84:e58d:c708:c8ce%4]) with mapi id 15.20.9818.033; Tue, 21 Apr 2026
+ 20:28:54 +0000
+Date: Tue, 21 Apr 2026 16:28:39 -0400
+From: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <tom.leiming@gmail.com>, io-uring <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: RCU warning off ublk_buf_cleanup() -> mas_for_each()
+Message-ID: <qyob3dbqkicviyjs77q6mmxldtwm6qdpgwznzw6ulipztphlbl@nb4bzctzlsnw>
+References: <0349d72d-dff8-4f9f-b448-919fa5ae96da@kernel.dk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0349d72d-dff8-4f9f-b448-919fa5ae96da@kernel.dk>
+User-Agent: NeoMutt/20250510
+X-ClientProxiedBy: YT4PR01CA0317.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:10a::10) To PH0PR10MB5777.namprd10.prod.outlook.com
+ (2603:10b6:510:128::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB5777:EE_|MN6PR10MB8118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43f1ce41-451d-43aa-ddf6-08de9fe49b54
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	GSqx8HMo2xaTRrlL1iyJSJ3NrPON6ckWj68D/NGEVkchhqRDMeYKeTGHwvamUat3x7Sux3wEA2uxh/JsFAw+LqUhJucQj1HryQTJFR2WyTPuwy4ug4QYlc40RzXFS53GMlwpbrrQw7HBGRoNkGDt4wnAtbSrh+o0JYm6BeD9mPCpuDlA9hWti92jwzttLh1jFm5znXoAAqbg1gWAp7U6P86nkTbIn5PhrpPIOp3NcB5jAsaQtibtgVod1eEVqFbDGiEImiSCYFqq0aetzLecRPf/bCcf+4Kx6Oe5P4GYmbAgKECrT81UebtnHetnj3wqfSNI5zhAtNEZPfaKIEfWhmA12VU5DUXJwcnCFDrYDykuBmvw2oY2gAA6glFe1WIp7JS3Bxuq4K/pgly5SG/GsCp6zusfiBDlOCJprGM88CoM22NScmvfH5/BuvtkVPBo7NJctyiaYgGsZrz8vJxOD7EUbFm7k9alyRZ64Iv6pwuTm9pd/NeZifXrOyXldB0dA7TuxFZC5X2Y2OuroeNZqQN48XTXuNvtswRyzJJLSWjklSlqO+iBr0a1BzE6ZulCzGrtMddgdFZnc2z5CiXMEJESA+UfWYpWTv0PEsAXY1Q4ibFo+AYXHLUl/NTil4l3JrkbiLL5mODr1oY7+fyA90ANd9JmPXM0RUiqvaImxZPnTwVYNRn9kZ6Pw64fBR8pdOwKJ0X8c5g8Kg39KUlhw/8T0QCwdcDfVqbddwzQrXM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5777.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?r3nVuiNiq+rIuZ8lTiFCAsn7xC5VrK8/oiQpSlndv9jRaSpgDch8NDPpJlp1?=
+ =?us-ascii?Q?pfUNEQuKKchpsi19rdn8ZlP0K6RAD/i5eVcBrmtOVmzHDNPoJRmaAgNioKdy?=
+ =?us-ascii?Q?LFkI+wpAVEyrOwHbAJXUJnBK1o9QBeXP8R5wPbOaOJSy4GMHudkiEuyeVYtT?=
+ =?us-ascii?Q?l9dsRJ/7vb2aXJaP/AZcir0ZtHjRB4MjUqoLYVrZw3/dmU81he0oIkdgn193?=
+ =?us-ascii?Q?HEbZUEe1vySyZkCZqt6GFFON56ZJvT5NsR1xS7S1qBNUwynOB6DaVmnBbXK1?=
+ =?us-ascii?Q?4bLej9a5CoxBwfdXFpEVQT/w0Rdi9cQQSYpMYimrZoWu8UyLpywZXldUCnIV?=
+ =?us-ascii?Q?+0MiozUa36GjaSbs4bbxUCPkq6ElHAszbGaHQe7GfIrF7aob0GEYgSsoEfxJ?=
+ =?us-ascii?Q?v0+iy1G4RbsMeiKCHdgFgZGIHARAcJVIj+DBdHYJPOXfMxYJ5dGErpx1OtKS?=
+ =?us-ascii?Q?xuxI55swpAXnIIG87Xxwrm6fI2VeGVd+XjycPDOCOvTd2w/NPMShC2mq7Fgk?=
+ =?us-ascii?Q?iOegJIsZz5mGiQEtLl8abfrGVmP4kKHV38wFb5Svk9AQ/bUtp2DhEAfwU+xk?=
+ =?us-ascii?Q?jRtpHR6jOQcFXN7et+UlFcT5gna4+BCeLXsr/a2kLxAOBwdLpTCmVXdTlqr4?=
+ =?us-ascii?Q?HanBDFbwMYpAKYGhmYYSvMMX8fWgrx5VXbKZABKVBCYdqQ5dwfg8N3Q0xRmk?=
+ =?us-ascii?Q?h/x7Y7xnx6QIkrgdsM32ny7Wa89ZygnYVnZjfCyNFXP9O4vmGBLwSinoMy9K?=
+ =?us-ascii?Q?TIsnXZyKfecKXbahevAE1ISSHG1ZIb0EXgNFWNTCHeMKozq14Yn4WdOVJ57+?=
+ =?us-ascii?Q?RGJai17HC/LnMOnfkpS4/+6ycU5847MELuTaB75dqdNzTGegkY2iRIix715Y?=
+ =?us-ascii?Q?MS5dl6ArZH7IqBPUPpUmxpujytaWSecrRgUwW7dx5bperm7FqTRFTY09cECX?=
+ =?us-ascii?Q?FUl6FNL19qLbKN78/hJ/xMmnOnhQ1Q8zoCwZjx3Jm5vC0h7Txb6nnTG8Cpuf?=
+ =?us-ascii?Q?0xNiC5aj16c/lJszUQHXo3/VJHp1YAuBOEijvMkF8IBlA+XsblD/n/5RyESS?=
+ =?us-ascii?Q?MPF/ZBg0ILSZuddk2WNttyJ8EX1hqj1tWmCTmntZUQt0jJrYRiTGZrSUBR/t?=
+ =?us-ascii?Q?oauGytb+pcjcTkKBS0maQ5SEuxLcuRPXAJynUsDmXVEe6kM6SHa8fJLAmmRs?=
+ =?us-ascii?Q?t+uKrCk2aMa6ytYz7Q8UcbgI9HlcYcDzMM5IlQrswxBp8Kf9+QqRvkS3HUn3?=
+ =?us-ascii?Q?4U0BnUVuPg6mSikQTjrTd2e9WKQdHcp6j68/M7Avfc5Mzg1cjO05oLVRYlgn?=
+ =?us-ascii?Q?SVANCjxok0L4My/OhmRsiSzG6eYUQ556wGLXnta0uQxqw5nP5sx4qNkDWdf2?=
+ =?us-ascii?Q?4JUiHDqtQEZBRika4Bp+z1JQkW21UIPUzMG8QFkQmcxjzZJwV8sLh2LYklrA?=
+ =?us-ascii?Q?Cs25TN3sAoUj3i5vlZ18oYuYVlPeuxt9i6m5ScPYcRWdbnXpjmvE5G/1yV4T?=
+ =?us-ascii?Q?iVQkdoV32Pirabm9lFMwsCoyP21UUIWZj7EZDRillZGxffgRKBr6OCBd1WkL?=
+ =?us-ascii?Q?ey3zAS0xuUoaW42d1TgEBHh6DXdoL2V58DqTJcgBtPsJBZZdlfIKANnIT5QQ?=
+ =?us-ascii?Q?akoejBIW/w2SFBpdRrmfbHDxmNDc9LTcxhdHOf4OW3n99PAIzz1co84V0zc6?=
+ =?us-ascii?Q?7yeIwyUsIRoYcNZ3SZvw288LeSWHfaB8NCPJvMdX1Ai6BetHiZLH/n/okm58?=
+ =?us-ascii?Q?OG9+LuOV1w=3D=3D?=
+X-Exchange-RoutingPolicyChecked:
+	QhwpaoL5VoF0mpptIIKf1wiyr4bPXQpEBsveUDFC3WYL80X5OYqW3LFV/1WbmizK8IFeHL66PRLDHOd2eEn2gNeIsArwE3PHE9G8/SrIsN3M1vsjFo4I/d157UkW8ty87oJ+0YH5SJrF+pLtBHlW+6h6A0u0X7QaDrGwCwJ2efroju/FvObFOY8/dX0CEV4OuPA3D+LRHv3XB2PGi+TUCpBAZ941G9lB3HzJti43g2XeNBSq88+006MhK2KsPyQTS8Jtuof9NhGRiuM7WAyUEZzqxyOUx8paVbLtN4RcrXaTrxUCve8NpYEnwq4THdXpxmVJbXf3Ga/BQCdMmvQa+g==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	KaBsmJBdGZ7Xcy1vKb+NvaItkOSHHlKjJIFAk7JBf08OuLh55rqQvjzNPXYVmCVv1pAegY9mKcees/77h3smmYE+ysMEPDhjFKbfn2sbGQ4By0J46QuAznW1TtqkHqWoF1Bf4P1kabXbeU8P/2YtuYNgDqS8QuEU8KH92LIdyZ93ysjR8GCPNoT0OUm3XSNYPW/HxKOUs5LcYtGOwp+NtxO3HooFtVz7FZ6GnZnHrxfov5ivXkuZnRfquCmDcS3RENBadOcfw5YJvXQOayxm8Vyzk5N4G1i/90vy8mvG6f9AJouVw0JWRTEckBPXKZve6/h5lONce05QIyZJCEzOt2dm4vT0Mh73OK2EuF4AiDLM04xJBZBrlb9g/60AMy2rNuQ5hmT7QCGFbL54sxZSaj7HdJ3QLMwAXhip9lYwPb1+8fJMf5EYA1Ra3DFpRNJZG3JZD5H0wMI4F0yWVOxNC5WP1Uy6fubDmNYQR1FQ8D4o2sMobZgIJvXYiXF1z6eivypB/TApLzlAB/UD74VqGpKGLGWRkuExTj6tegcznA30wxhn19KMObtiFYhbmxgbT5RiJE09DG3fGUtaaHRNmGt93dDZMUYbvWnIn8pQc3A=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43f1ce41-451d-43aa-ddf6-08de9fe49b54
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5777.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2026 20:28:54.2102
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: S2fS9LFDTFcgpO7/qDqi4KEmmfWae7PRMp2fgvSQus0vXrl6h2lVNLgDvErR38P2dX4F6epht5IcAtZ6Vg8Mzw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR10MB8118
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-21_03,2026-04-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 malwarescore=0 spamscore=0 mlxscore=0
+ phishscore=0 bulkscore=0 mlxlogscore=772 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2604070000 definitions=main-2604210203
+X-Authority-Analysis: v=2.4 cv=PsSjqQM3 c=1 sm=1 tr=0 ts=69e7de0a b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=A5OVakUREuEA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jiCTI4zE5U7BLdzWsZGv:22 a=x4eqshVgHu-cdnggieHk:22 a=4FB8OatBTTTgXyZOUkIA:9
+ a=CjuIK1q_8ugA:10 cc=ntf awl=host:12292
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIxMDIwMyBTYWx0ZWRfX1GNdk6lf/Zm+
+ KiKj12DjEh6vTEOfVF4ttl8Juf1ODB7RU7IvoPj6awr7Jv6+K7es7x0vMfXLE2Lp9kLkoGG6hSE
+ IrDOI5CydnuVh++UIF+4ZCmAg3gBFm/Y9w1iUV68FquKm+24VrQCeC1UvcxG9w85DfjMvEnVXrp
+ Yiu10jLkwolw8Sk0sjy0ml3nxmdgOe8U/g3GgCKnvswKecC1ynUV0S4+k3oog6fJtyp3Ya2tNFc
+ rsudfuLGJKCNFwPjiNYCyjExzt0PVVrRDk6JV/JBPHCH8jHYduAcv9gMZhPsnHe1fv2oZpBcLiw
+ aRvG6w58wxRZFkKaqtSLQ4Bimy/ut5T5Sqo/GPCmt2HrE2Dt1Vt7dFamHeyY/WwsI1bVt6VXNqb
+ z/njTaD1koT7XzzDSOYUFnKgAx8NMV3tblYoDNZpEBtkAiZoCirKlsiUAks1Zrxf9kC6SH6UPmd
+ 9x3Jm/GRIVZFpvSxZLEiJC8h+H7cEVB+Its5H3b0=
+X-Proofpoint-GUID: du-uNb0a7l2i815kdpZW2DOdruRGsAqM
+X-Proofpoint-ORIG-GUID: du-uNb0a7l2i815kdpZW2DOdruRGsAqM
 
-The _cleanup helper function doesn't take any arguments, so drop them
-from its callers.
+* Jens Axboe <axboe@kernel.dk> [260421 13:47]:
+> Hi Ming,
+> 
+> Ran into the below running tests on the current tree:
+> 
+> =============================
+> WARNING: suspicious RCU usage
+> 7.0.0+ #16 Tainted: G                 N 
+> -----------------------------
+> lib/maple_tree.c:759 suspicious rcu_dereference_check() usage!
+> 
+> other info that might help us debug this:
+> 
+> 
+> rcu_scheduler_active = 2, debug_locks = 1
+> 1 lock held by iou-wrk-55535/55536:
+>  #0: ffff800085a451a0 (ublk_ctl_mutex){+.+.}-{4:4}, at: ublk_ctrl_del_dev+0xdc/0x2f8
+> 
+> stack backtrace:
+> CPU: 4 UID: 0 PID: 55536 Comm: iou-wrk-55535 Tainted: G                 N  7.0.0+ #16 PREEMPT 
+> Tainted: [N]=TEST
+> Hardware name: linux,dummy-virt (DT)
+> Call trace:
+>  show_stack+0x1c/0x30 (C)
+>  dump_stack_lvl+0x68/0x90
+>  dump_stack+0x18/0x20
+>  lockdep_rcu_suspicious+0x170/0x200
+>  mas_walk+0x3f0/0x6a0
+>  mas_find+0x1b4/0x6b0
+>  ublk_buf_cleanup+0xe0/0x240
+>  ublk_cdev_rel+0x34/0x1b0
+>  device_release+0xa4/0x350
+>  kobject_put+0x138/0x250
+>  put_device+0x18/0x30
+>  ublk_put_device+0x18/0x28
+>  ublk_ctrl_del_dev+0x120/0x2f8
+>  ublk_ctrl_uring_cmd+0x598/0x29b8
+>  io_uring_cmd+0x1e0/0x468
+>  __io_issue_sqe+0xa4/0x748
+>  io_issue_sqe+0x80/0xf68
+>  io_wq_submit_work+0x26c/0xdc8
+>  io_worker_handle_work+0x334/0xf20
+>  io_wq_worker+0x278/0x9e8
+>  ret_from_fork+0x10/0x20
+> Buffer I/O error on dev ublkb0, logical block 0, async page read
+> Buffer I/O error on dev ublkb0, logical block 0, async page read
+>  ublkb0: unable to read partition table
+> Buffer I/O error on dev ublkb0, logical block 0, async page read
+> Buffer I/O error on dev ublkb0, logical block 0, async page read
+> Buffer I/O error on dev ublkb0, logical block 512, async page read
+> Buffer I/O error on dev ublkb0, logical block 512, async page read
+> Buffer I/O error on dev ublkb0, logical block 0, async page read
+> Buffer I/O error on dev ublkb0, logical block 512, async page read
+> 
+> and I briefly looked at it, but then just gave up as a) the maple tree
+> documentation is not that detailed,
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- tools/testing/selftests/ublk/test_batch_01.sh   | 4 ++--
- tools/testing/selftests/ublk/test_batch_02.sh   | 2 +-
- tools/testing/selftests/ublk/test_batch_03.sh   | 2 +-
- tools/testing/selftests/ublk/test_generic_02.sh | 4 ++--
- tools/testing/selftests/ublk/test_generic_03.sh | 2 +-
- tools/testing/selftests/ublk/test_generic_06.sh | 2 +-
- tools/testing/selftests/ublk/test_generic_07.sh | 2 +-
- tools/testing/selftests/ublk/test_generic_08.sh | 4 ++--
- tools/testing/selftests/ublk/test_generic_09.sh | 2 +-
- tools/testing/selftests/ublk/test_generic_10.sh | 2 +-
- tools/testing/selftests/ublk/test_generic_12.sh | 4 ++--
- tools/testing/selftests/ublk/test_generic_13.sh | 2 +-
- tools/testing/selftests/ublk/test_generic_16.sh | 4 ++--
- tools/testing/selftests/ublk/test_generic_17.sh | 2 +-
- tools/testing/selftests/ublk/test_loop_01.sh    | 2 +-
- tools/testing/selftests/ublk/test_loop_02.sh    | 2 +-
- tools/testing/selftests/ublk/test_loop_03.sh    | 2 +-
- tools/testing/selftests/ublk/test_loop_04.sh    | 2 +-
- tools/testing/selftests/ublk/test_loop_05.sh    | 2 +-
- tools/testing/selftests/ublk/test_loop_06.sh    | 2 +-
- tools/testing/selftests/ublk/test_loop_07.sh    | 2 +-
- tools/testing/selftests/ublk/test_null_01.sh    | 2 +-
- tools/testing/selftests/ublk/test_null_02.sh    | 2 +-
- tools/testing/selftests/ublk/test_null_03.sh    | 2 +-
- tools/testing/selftests/ublk/test_part_01.sh    | 4 ++--
- tools/testing/selftests/ublk/test_part_02.sh    | 2 +-
- tools/testing/selftests/ublk/test_recover_01.sh | 2 +-
- tools/testing/selftests/ublk/test_recover_02.sh | 2 +-
- tools/testing/selftests/ublk/test_recover_03.sh | 2 +-
- tools/testing/selftests/ublk/test_recover_04.sh | 2 +-
- tools/testing/selftests/ublk/test_shmemzc_01.sh | 2 +-
- tools/testing/selftests/ublk/test_shmemzc_02.sh | 2 +-
- tools/testing/selftests/ublk/test_shmemzc_03.sh | 2 +-
- tools/testing/selftests/ublk/test_shmemzc_04.sh | 2 +-
- tools/testing/selftests/ublk/test_stress_01.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_02.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_03.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_04.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_05.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_06.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_07.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_08.sh  | 2 +-
- tools/testing/selftests/ublk/test_stress_09.sh  | 2 +-
- tools/testing/selftests/ublk/test_stripe_01.sh  | 2 +-
- tools/testing/selftests/ublk/test_stripe_02.sh  | 2 +-
- tools/testing/selftests/ublk/test_stripe_03.sh  | 2 +-
- tools/testing/selftests/ublk/test_stripe_04.sh  | 2 +-
- tools/testing/selftests/ublk/test_stripe_05.sh  | 2 +-
- tools/testing/selftests/ublk/test_stripe_06.sh  | 2 +-
- 49 files changed, 55 insertions(+), 55 deletions(-)
+Which documentation is lacking?  I will fix it.
 
-diff --git a/tools/testing/selftests/ublk/test_batch_01.sh b/tools/testing/selftests/ublk/test_batch_01.sh
-index a18fb39af8be..6e19303706a9 100755
---- a/tools/testing/selftests/ublk/test_batch_01.sh
-+++ b/tools/testing/selftests/ublk/test_batch_01.sh
-@@ -16,16 +16,16 @@ _create_backfile 1 256M
- 
- dev_id=$(_add_ublk_dev -t loop -q 2 -b "${UBLK_BACKFILES[0]}")
- _check_add_dev $TID $?
- 
- if ! _mkfs_mount_test /dev/ublkb"${dev_id}"; then
--	_cleanup_test "generic"
-+	_cleanup_test
- 	_show_result $TID 255
- fi
- 
- dev_id=$(_add_ublk_dev -t stripe -b --auto_zc "${UBLK_BACKFILES[0]}" "${UBLK_BACKFILES[1]}")
- _check_add_dev $TID $?
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "generic"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_batch_02.sh b/tools/testing/selftests/ublk/test_batch_02.sh
-index 7ca384d11987..7c683f755379 100755
---- a/tools/testing/selftests/ublk/test_batch_02.sh
-+++ b/tools/testing/selftests/ublk/test_batch_02.sh
-@@ -23,7 +23,7 @@ _check_add_dev $TID $?
- # run fio over the ublk disk
- fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite \
- 	--iodepth=32 --size=100M --numjobs=4 > /dev/null 2>&1
- ERR_CODE=$?
- 
--_cleanup_test "generic"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_batch_03.sh b/tools/testing/selftests/ublk/test_batch_03.sh
-index aca9cf144b55..914ccd6a335d 100755
---- a/tools/testing/selftests/ublk/test_batch_03.sh
-+++ b/tools/testing/selftests/ublk/test_batch_03.sh
-@@ -23,7 +23,7 @@ _check_add_dev $TID $?
- # run fio over the ublk disk
- fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite \
- 	--iodepth=32 --size=100M --numjobs=4 > /dev/null 2>&1
- ERR_CODE=$?
- 
--_cleanup_test "generic"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_02.sh b/tools/testing/selftests/ublk/test_generic_02.sh
-index 46b657143fd6..2afc8cdbed8f 100755
---- a/tools/testing/selftests/ublk/test_generic_02.sh
-+++ b/tools/testing/selftests/ublk/test_generic_02.sh
-@@ -27,11 +27,11 @@ for _ in $(seq 100); do
- 	grep -q "BPFTRACE_READY" "$UBLK_TMP" 2>/dev/null && break
- 	sleep 0.1
- done
- 
- if ! kill -0 "$btrace_pid" 2>/dev/null; then
--	_cleanup_test "null"
-+	_cleanup_test
- 	exit "$UBLK_SKIP_CODE"
- fi
- 
- # run fio over this ublk disk (pinned to CPU 0)
- taskset -c 0 fio --name=write_seq \
-@@ -49,7 +49,7 @@ wait
- if grep -q "^out_of_order:" "$UBLK_TMP"; then
- 	echo "I/O reordering detected:"
- 	grep "^out_of_order:" "$UBLK_TMP"
- 	ERR_CODE=255
- fi
--_cleanup_test "null"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_03.sh b/tools/testing/selftests/ublk/test_generic_03.sh
-index 8934ea926762..8e78be860d34 100755
---- a/tools/testing/selftests/ublk/test_generic_03.sh
-+++ b/tools/testing/selftests/ublk/test_generic_03.sh
-@@ -21,7 +21,7 @@ if [ "$max_segments" != "32" ]; then
- 	ERR_CODE=255
- fi
- if [ "$max_segment_size" != "32768" ]; then
- 	ERR_CODE=255
- fi
--_cleanup_test "null"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_06.sh b/tools/testing/selftests/ublk/test_generic_06.sh
-index 14a05054fcd8..a8b3634b6b4b 100755
---- a/tools/testing/selftests/ublk/test_generic_06.sh
-+++ b/tools/testing/selftests/ublk/test_generic_06.sh
-@@ -34,7 +34,7 @@ fi
- if [ $ELAPSED -ge 5 ]; then
-         echo "dd took $ELAPSED seconds to exit (>= 5s tolerance)!"
-         ERR_CODE=255
- fi
- 
--_cleanup_test "fault_inject"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_07.sh b/tools/testing/selftests/ublk/test_generic_07.sh
-index 8dcfd8978f50..d2c5e65bd124 100755
---- a/tools/testing/selftests/ublk/test_generic_07.sh
-+++ b/tools/testing/selftests/ublk/test_generic_07.sh
-@@ -21,7 +21,7 @@ ERR_CODE=$?
- if [ "$ERR_CODE" -eq 0 ]; then
- 	_mkfs_mount_test /dev/ublkb"${dev_id}"
- 	ERR_CODE=$?
- fi
- 
--_cleanup_test "generic"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_08.sh b/tools/testing/selftests/ublk/test_generic_08.sh
-index ce88c31d6b9c..77a18b313f3d 100755
---- a/tools/testing/selftests/ublk/test_generic_08.sh
-+++ b/tools/testing/selftests/ublk/test_generic_08.sh
-@@ -16,16 +16,16 @@ _create_backfile 1 256M
- 
- dev_id=$(_add_ublk_dev -t loop -q 2 --auto_zc "${UBLK_BACKFILES[0]}")
- _check_add_dev $TID $?
- 
- if ! _mkfs_mount_test /dev/ublkb"${dev_id}"; then
--	_cleanup_test "generic"
-+	_cleanup_test
- 	_show_result $TID 255
- fi
- 
- dev_id=$(_add_ublk_dev -t stripe --auto_zc "${UBLK_BACKFILES[0]}" "${UBLK_BACKFILES[1]}")
- _check_add_dev $TID $?
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "generic"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_09.sh b/tools/testing/selftests/ublk/test_generic_09.sh
-index 744d0cdaa242..6c25242f245f 100755
---- a/tools/testing/selftests/ublk/test_generic_09.sh
-+++ b/tools/testing/selftests/ublk/test_generic_09.sh
-@@ -20,8 +20,8 @@ _check_add_dev $TID $?
- 
- # run fio over the two disks
- fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite --iodepth=32 --size=256M > /dev/null 2>&1
- ERR_CODE=$?
- 
--_cleanup_test "null"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_10.sh b/tools/testing/selftests/ublk/test_generic_10.sh
-index 4b4293b9081f..fdabc9d9075e 100755
---- a/tools/testing/selftests/ublk/test_generic_10.sh
-+++ b/tools/testing/selftests/ublk/test_generic_10.sh
-@@ -23,7 +23,7 @@ fi
- new_size=$(_get_disk_size /dev/ublkb"${dev_id}")
- if [ "$new_size" != "$size" ]; then
- 	ERR_CODE=255
- fi
- 
--_cleanup_test "null"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_12.sh b/tools/testing/selftests/ublk/test_generic_12.sh
-index 54b81ddfe9f9..435497f8da8d 100755
---- a/tools/testing/selftests/ublk/test_generic_12.sh
-+++ b/tools/testing/selftests/ublk/test_generic_12.sh
-@@ -23,11 +23,11 @@ dev_t=$(_get_disk_dev_t "$dev_id")
- bpftrace trace/count_ios_per_tid.bt "$dev_t" > "$UBLK_TMP" 2>&1 &
- btrace_pid=$!
- sleep 2
- 
- if ! kill -0 "$btrace_pid" > /dev/null 2>&1; then
--	_cleanup_test "null"
-+	_cleanup_test
- 	exit "$UBLK_SKIP_CODE"
- fi
- 
- # do imbalanced I/O on the ublk device
- # pin to cpu 0 to prevent migration/only target one queue
-@@ -52,7 +52,7 @@ if [[ $NR_THREADS_THAT_HANDLED_IO -ne $NTHREADS ]]; then
-         echo "only $NR_THREADS_THAT_HANDLED_IO handled I/O! expected $NTHREADS"
-         cat "$UBLK_TMP"
-         ERR_CODE=255
- fi
- 
--_cleanup_test "null"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_13.sh b/tools/testing/selftests/ublk/test_generic_13.sh
-index 922115aa14f4..2c1be6286db8 100755
---- a/tools/testing/selftests/ublk/test_generic_13.sh
-+++ b/tools/testing/selftests/ublk/test_generic_13.sh
-@@ -13,7 +13,7 @@ if ${UBLK_PROG} features | grep -q unknown; then
-         echo "# this failure is expected if running an older test suite against"
-         echo "# a newer kernel with new features added"
-         ERR_CODE=255
- fi
- 
--_cleanup_test "null"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_16.sh b/tools/testing/selftests/ublk/test_generic_16.sh
-index 3ef367836ac5..6a4952146ea1 100755
---- a/tools/testing/selftests/ublk/test_generic_16.sh
-+++ b/tools/testing/selftests/ublk/test_generic_16.sh
-@@ -7,11 +7,11 @@ ERR_CODE=0
- 
- _prep_test "null" "stop --safe command"
- 
- # Check if SAFE_STOP_DEV feature is supported
- if ! _have_feature "SAFE_STOP_DEV"; then
--	_cleanup_test "null"
-+	_cleanup_test
- 	exit "$UBLK_SKIP_CODE"
- fi
- 
- # Test 1: stop --safe on idle device should succeed
- dev_id=$(_add_ublk_dev -t null -q 2 -d 32)
-@@ -50,7 +50,7 @@ wait $dd_pid 2>/dev/null
- 
- # Now device should be idle, regular delete should work
- _ublk_del_dev "${dev_id}"
- udevadm settle
- 
--_cleanup_test "null"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_generic_17.sh b/tools/testing/selftests/ublk/test_generic_17.sh
-index 2278b5fc9dba..b483d53a897a 100755
---- a/tools/testing/selftests/ublk/test_generic_17.sh
-+++ b/tools/testing/selftests/ublk/test_generic_17.sh
-@@ -29,7 +29,7 @@ fi
- # Clean up the device. This can only succeed once teardown of the above
- # exited ublk server completes. So if teardown never completes, we will
- # time out here
- _ublk_del_dev "${dev_id}"
- 
--_cleanup_test "fault_inject"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_loop_01.sh b/tools/testing/selftests/ublk/test_loop_01.sh
-index 338a235fd82a..c0f5b619ad6e 100755
---- a/tools/testing/selftests/ublk/test_loop_01.sh
-+++ b/tools/testing/selftests/ublk/test_loop_01.sh
-@@ -18,8 +18,8 @@ _check_add_dev $TID $?
- 
- # run fio over the ublk disk
- _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=256M
- ERR_CODE=$?
- 
--_cleanup_test "loop"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_loop_02.sh b/tools/testing/selftests/ublk/test_loop_02.sh
-index 04c52454e2ec..f4191ea71f50 100755
---- a/tools/testing/selftests/ublk/test_loop_02.sh
-+++ b/tools/testing/selftests/ublk/test_loop_02.sh
-@@ -12,8 +12,8 @@ dev_id=$(_add_ublk_dev -t loop "${UBLK_BACKFILES[0]}")
- _check_add_dev $TID $?
- 
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "loop"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_loop_03.sh b/tools/testing/selftests/ublk/test_loop_03.sh
-index 6e8f649fe93d..aaac0c59a5ad 100755
---- a/tools/testing/selftests/ublk/test_loop_03.sh
-+++ b/tools/testing/selftests/ublk/test_loop_03.sh
-@@ -17,8 +17,8 @@ _check_add_dev $TID $?
- 
- # run fio over the ublk disk
- _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=256M
- ERR_CODE=$?
- 
--_cleanup_test "loop"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_loop_04.sh b/tools/testing/selftests/ublk/test_loop_04.sh
-index 9f6774ec0de6..f584c119f1d2 100755
---- a/tools/testing/selftests/ublk/test_loop_04.sh
-+++ b/tools/testing/selftests/ublk/test_loop_04.sh
-@@ -13,8 +13,8 @@ dev_id=$(_add_ublk_dev -t loop -z "${UBLK_BACKFILES[0]}")
- _check_add_dev $TID $?
- 
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "loop"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_loop_05.sh b/tools/testing/selftests/ublk/test_loop_05.sh
-index 2b8d99e007be..ca1a5df5f9de 100755
---- a/tools/testing/selftests/ublk/test_loop_05.sh
-+++ b/tools/testing/selftests/ublk/test_loop_05.sh
-@@ -18,8 +18,8 @@ _check_add_dev $TID $?
- 
- # run fio over the ublk disk
- _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=256M
- ERR_CODE=$?
- 
--_cleanup_test "loop"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_loop_06.sh b/tools/testing/selftests/ublk/test_loop_06.sh
-index e73f6f4844db..26f710ba9db7 100755
---- a/tools/testing/selftests/ublk/test_loop_06.sh
-+++ b/tools/testing/selftests/ublk/test_loop_06.sh
-@@ -17,8 +17,8 @@ _check_add_dev $TID $?
- 
- # run fio over the ublk disk
- _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=256M
- ERR_CODE=$?
- 
--_cleanup_test "loop"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_loop_07.sh b/tools/testing/selftests/ublk/test_loop_07.sh
-index 264d20e7c530..a9ab0b671cb2 100755
---- a/tools/testing/selftests/ublk/test_loop_07.sh
-+++ b/tools/testing/selftests/ublk/test_loop_07.sh
-@@ -13,8 +13,8 @@ dev_id=$(_add_ublk_dev -t loop -u "${UBLK_BACKFILES[0]}")
- _check_add_dev $TID $?
- 
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "loop"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_null_01.sh b/tools/testing/selftests/ublk/test_null_01.sh
-index eebce8076530..d2c38cbb2dd5 100755
---- a/tools/testing/selftests/ublk/test_null_01.sh
-+++ b/tools/testing/selftests/ublk/test_null_01.sh
-@@ -16,8 +16,8 @@ _check_add_dev $TID $?
- 
- # run fio over the two disks
- fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite --iodepth=32 --size=256M > /dev/null 2>&1
- ERR_CODE=$?
- 
--_cleanup_test "null"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_null_02.sh b/tools/testing/selftests/ublk/test_null_02.sh
-index 654bdff39664..7b205ca56367 100755
---- a/tools/testing/selftests/ublk/test_null_02.sh
-+++ b/tools/testing/selftests/ublk/test_null_02.sh
-@@ -16,8 +16,8 @@ _check_add_dev $TID $?
- 
- # run fio over the two disks
- fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite --iodepth=32 --size=256M > /dev/null 2>&1
- ERR_CODE=$?
- 
--_cleanup_test "null"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_null_03.sh b/tools/testing/selftests/ublk/test_null_03.sh
-index 29cd09f06672..eee7a87a60da 100755
---- a/tools/testing/selftests/ublk/test_null_03.sh
-+++ b/tools/testing/selftests/ublk/test_null_03.sh
-@@ -16,8 +16,8 @@ _check_add_dev $TID $?
- 
- # run fio over the two disks
- fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite --iodepth=32 --size=256M > /dev/null 2>&1
- ERR_CODE=$?
- 
--_cleanup_test "null"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_part_01.sh b/tools/testing/selftests/ublk/test_part_01.sh
-index 8028f6e4b3a5..fa3b1a9af894 100755
---- a/tools/testing/selftests/ublk/test_part_01.sh
-+++ b/tools/testing/selftests/ublk/test_part_01.sh
-@@ -80,11 +80,11 @@ if ! _have_program sfdisk || ! _have_program blockdev; then
- fi
- 
- _prep_test "generic" "test UBLK_F_NO_AUTO_PART_SCAN"
- 
- if ! _have_feature "UBLK_F_NO_AUTO_PART_SCAN"; then
--	_cleanup_test "generic"
-+	_cleanup_test
- 	exit "$UBLK_SKIP_CODE"
- fi
- 
- 
- # Create and format backing file with partition table
-@@ -98,7 +98,7 @@ format_backing_file "${UBLK_BACKFILES[0]}"
- 
- # Test no auto partition scan with manual scan
- [ "$ERR_CODE" -eq 0 ] && test_no_auto_part_scan "${UBLK_BACKFILES[0]}"
- [ $? -ne 0 ] && ERR_CODE=255
- 
--_cleanup_test "generic"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_part_02.sh b/tools/testing/selftests/ublk/test_part_02.sh
-index 7d42ab4d6e83..d9ec06f36aee 100755
---- a/tools/testing/selftests/ublk/test_part_02.sh
-+++ b/tools/testing/selftests/ublk/test_part_02.sh
-@@ -61,7 +61,7 @@ _prep_test "partition_scan" "verify async partition scan prevents IO hang"
- _test_partition_scan_no_hang "no" "DEAD"
- 
- # Test 2: With recovery support - should transition to QUIESCED
- _test_partition_scan_no_hang "yes" "QUIESCED"
- 
--_cleanup_test "partition_scan"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_recover_01.sh b/tools/testing/selftests/ublk/test_recover_01.sh
-index 2672f9c40fa8..1cddc2345dab 100755
---- a/tools/testing/selftests/ublk/test_recover_01.sh
-+++ b/tools/testing/selftests/ublk/test_recover_01.sh
-@@ -38,7 +38,7 @@ wait
- ublk_run_recover_test -t null -q 2 -r 1 -i 1 &
- ublk_run_recover_test -t loop -q 2 -r 1 -i 1 "${UBLK_BACKFILES[0]}" &
- ublk_run_recover_test -t stripe -q 2 -r 1 -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- wait
- 
--_cleanup_test "recover"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_recover_02.sh b/tools/testing/selftests/ublk/test_recover_02.sh
-index bda5064bc31f..9c3f481880d3 100755
---- a/tools/testing/selftests/ublk/test_recover_02.sh
-+++ b/tools/testing/selftests/ublk/test_recover_02.sh
-@@ -42,7 +42,7 @@ wait
- ublk_run_recover_test -t null -q 2 -r 1 -z -i 1 &
- ublk_run_recover_test -t loop -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[0]}" &
- ublk_run_recover_test -t stripe -q 2 -r 1 -z -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- wait
- 
--_cleanup_test "recover"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_recover_03.sh b/tools/testing/selftests/ublk/test_recover_03.sh
-index e0dc0b8fe5d6..2554805e5b02 100755
---- a/tools/testing/selftests/ublk/test_recover_03.sh
-+++ b/tools/testing/selftests/ublk/test_recover_03.sh
-@@ -37,7 +37,7 @@ wait
- ublk_run_quiesce_recover -t null -q 2 -r 1 -i 1 &
- ublk_run_quiesce_recover -t loop -q 2 -r 1 -i 1 "${UBLK_BACKFILES[0]}" &
- ublk_run_quiesce_recover -t stripe -q 2 -r 1 -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- wait
- 
--_cleanup_test "quiesce"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_recover_04.sh b/tools/testing/selftests/ublk/test_recover_04.sh
-index 178443394ca5..4c83c1840c68 100755
---- a/tools/testing/selftests/ublk/test_recover_04.sh
-+++ b/tools/testing/selftests/ublk/test_recover_04.sh
-@@ -33,7 +33,7 @@ wait
- ublk_run_recover_test -t null -q 2 -r 1 -u -i 1 &
- ublk_run_recover_test -t loop -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[0]}" &
- ublk_run_recover_test -t stripe -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- wait
- 
--_cleanup_test "recover"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_shmemzc_01.sh b/tools/testing/selftests/ublk/test_shmemzc_01.sh
-index 47210af2aa20..b244ab3479a2 100755
---- a/tools/testing/selftests/ublk/test_shmemzc_01.sh
-+++ b/tools/testing/selftests/ublk/test_shmemzc_01.sh
-@@ -65,8 +65,8 @@ _ublk_del_dev "${dev_id}"
- rm -f "$HTLB_FILE"
- umount "$HTLB_MNT"
- rmdir "$HTLB_MNT"
- echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
- 
--_cleanup_test "shmem_zc"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_shmemzc_02.sh b/tools/testing/selftests/ublk/test_shmemzc_02.sh
-index aed9262494e9..810dccba6d84 100755
---- a/tools/testing/selftests/ublk/test_shmemzc_02.sh
-+++ b/tools/testing/selftests/ublk/test_shmemzc_02.sh
-@@ -61,8 +61,8 @@ _ublk_del_dev "${dev_id}"
- rm -f "$HTLB_FILE"
- umount "$HTLB_MNT"
- rmdir "$HTLB_MNT"
- echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
- 
--_cleanup_test "shmem_zc"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_shmemzc_03.sh b/tools/testing/selftests/ublk/test_shmemzc_03.sh
-index db967a9ffe81..606362491a32 100755
---- a/tools/testing/selftests/ublk/test_shmemzc_03.sh
-+++ b/tools/testing/selftests/ublk/test_shmemzc_03.sh
-@@ -62,8 +62,8 @@ _ublk_del_dev "${dev_id}"
- rm -f "$HTLB_FILE"
- umount "$HTLB_MNT"
- rmdir "$HTLB_MNT"
- echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
- 
--_cleanup_test "shmem_zc"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_shmemzc_04.sh b/tools/testing/selftests/ublk/test_shmemzc_04.sh
-index 899de088ece4..9a2a6c2e8abe 100755
---- a/tools/testing/selftests/ublk/test_shmemzc_04.sh
-+++ b/tools/testing/selftests/ublk/test_shmemzc_04.sh
-@@ -65,8 +65,8 @@ _ublk_del_dev "${dev_id}"
- rm -f "$HTLB_FILE"
- umount "$HTLB_MNT"
- rmdir "$HTLB_MNT"
- echo "$OLD_NR_HP" > /proc/sys/vm/nr_hugepages
- 
--_cleanup_test "shmem_zc"
-+_cleanup_test
- 
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_01.sh b/tools/testing/selftests/ublk/test_stress_01.sh
-index a9322ce496e9..f91783f27649 100755
---- a/tools/testing/selftests/ublk/test_stress_01.sh
-+++ b/tools/testing/selftests/ublk/test_stress_01.sh
-@@ -27,7 +27,7 @@ _create_backfile 2 128M
- ublk_io_and_remove 8G -t null -q 4 &
- ublk_io_and_remove 256M -t loop -q 4 "${UBLK_BACKFILES[0]}" &
- ublk_io_and_remove 256M -t stripe -q 4 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- wait
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_02.sh b/tools/testing/selftests/ublk/test_stress_02.sh
-index 6c114194f9c9..b128d11658a8 100755
---- a/tools/testing/selftests/ublk/test_stress_02.sh
-+++ b/tools/testing/selftests/ublk/test_stress_02.sh
-@@ -29,7 +29,7 @@ for nr_queue in 1 4; do
- 	ublk_io_and_kill_daemon 256M -t loop -q "$nr_queue" "${UBLK_BACKFILES[0]}" &
- 	ublk_io_and_kill_daemon 256M -t stripe -q "$nr_queue" "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	wait
- done
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_03.sh b/tools/testing/selftests/ublk/test_stress_03.sh
-index 4e81ca0db758..a0f0aba8eebc 100755
---- a/tools/testing/selftests/ublk/test_stress_03.sh
-+++ b/tools/testing/selftests/ublk/test_stress_03.sh
-@@ -47,7 +47,7 @@ if _have_feature "PER_IO_DAEMON"; then
- 	ublk_io_and_remove 256M -t stripe -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallback --nthreads 8 --per_io_tasks &
- 	wait
- fi
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/testing/selftests/ublk/test_stress_04.sh
-index 6c6f44b172bc..896eae68d444 100755
---- a/tools/testing/selftests/ublk/test_stress_04.sh
-+++ b/tools/testing/selftests/ublk/test_stress_04.sh
-@@ -46,7 +46,7 @@ if _have_feature "PER_IO_DAEMON"; then
- 	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback --nthreads 8 --per_io_tasks &
- 	wait
- fi
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_05.sh b/tools/testing/selftests/ublk/test_stress_05.sh
-index 7e9324de2030..d6c00c72080d 100755
---- a/tools/testing/selftests/ublk/test_stress_05.sh
-+++ b/tools/testing/selftests/ublk/test_stress_05.sh
-@@ -77,7 +77,7 @@ if _have_feature "PER_IO_DAEMON"; then
- 	ublk_io_and_remove 256M -t loop -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue" "${UBLK_BACKFILES[0]}" &
- 	ublk_io_and_remove 8G -t null -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue"  &
- fi
- wait
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_06.sh b/tools/testing/selftests/ublk/test_stress_06.sh
-index c72e5d0b14be..9481a273a4b4 100755
---- a/tools/testing/selftests/ublk/test_stress_06.sh
-+++ b/tools/testing/selftests/ublk/test_stress_06.sh
-@@ -32,7 +32,7 @@ wait
- ublk_io_and_remove 8G -t null -q 4 -u --nthreads 8 --per_io_tasks &
- ublk_io_and_remove 256M -t loop -q 4 -u --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
- ublk_io_and_remove 256M -t stripe -q 4 -u --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- wait
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_07.sh b/tools/testing/selftests/ublk/test_stress_07.sh
-index 04c2764d5238..3e01c037cffb 100755
---- a/tools/testing/selftests/ublk/test_stress_07.sh
-+++ b/tools/testing/selftests/ublk/test_stress_07.sh
-@@ -32,7 +32,7 @@ wait
- ublk_io_and_kill_daemon 8G -t null -q 4 -u --nthreads 8 --per_io_tasks &
- ublk_io_and_kill_daemon 256M -t loop -q 4 -u --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
- ublk_io_and_kill_daemon 256M -t stripe -q 4 -u --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- wait
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_08.sh b/tools/testing/selftests/ublk/test_stress_08.sh
-index 37f7d204879a..5f32424d2892 100755
---- a/tools/testing/selftests/ublk/test_stress_08.sh
-+++ b/tools/testing/selftests/ublk/test_stress_08.sh
-@@ -38,7 +38,7 @@ ublk_io_and_remove 8G -t null -q 4 -b &
- ublk_io_and_remove 256M -t loop -q 4 --auto_zc -b "${UBLK_BACKFILES[0]}" &
- ublk_io_and_remove 256M -t stripe -q 4 --auto_zc -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallback -b &
- wait
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stress_09.sh b/tools/testing/selftests/ublk/test_stress_09.sh
-index 53c1e3b2ab30..64cb8d9b0438 100755
---- a/tools/testing/selftests/ublk/test_stress_09.sh
-+++ b/tools/testing/selftests/ublk/test_stress_09.sh
-@@ -37,7 +37,7 @@ ublk_io_and_kill_daemon 8G -t null -q 4 -z -b &
- ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc -b "${UBLK_BACKFILES[0]}" &
- ublk_io_and_kill_daemon 256M -t stripe -q 4 -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback -b &
- wait
- 
--_cleanup_test "stress"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stripe_01.sh b/tools/testing/selftests/ublk/test_stripe_01.sh
-index 3bc821aadad8..9ffce477b461 100755
---- a/tools/testing/selftests/ublk/test_stripe_01.sh
-+++ b/tools/testing/selftests/ublk/test_stripe_01.sh
-@@ -19,7 +19,7 @@ _check_add_dev $TID $?
- 
- # run fio over the ublk disk
- _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=512M
- ERR_CODE=$?
- 
--_cleanup_test "stripe"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stripe_02.sh b/tools/testing/selftests/ublk/test_stripe_02.sh
-index 4a7d2b21a6bf..4c172950a247 100755
---- a/tools/testing/selftests/ublk/test_stripe_02.sh
-+++ b/tools/testing/selftests/ublk/test_stripe_02.sh
-@@ -14,7 +14,7 @@ dev_id=$(_add_ublk_dev -t stripe "${UBLK_BACKFILES[0]}" "${UBLK_BACKFILES[1]}")
- _check_add_dev $TID $?
- 
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "stripe"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stripe_03.sh b/tools/testing/selftests/ublk/test_stripe_03.sh
-index a1c159d54e53..2cdf9f958988 100755
---- a/tools/testing/selftests/ublk/test_stripe_03.sh
-+++ b/tools/testing/selftests/ublk/test_stripe_03.sh
-@@ -19,7 +19,7 @@ _check_add_dev $TID $?
- 
- # run fio over the ublk disk
- _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=512M
- ERR_CODE=$?
- 
--_cleanup_test "stripe"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stripe_04.sh b/tools/testing/selftests/ublk/test_stripe_04.sh
-index 0c30bd6c2b3b..e24120eaca0e 100755
---- a/tools/testing/selftests/ublk/test_stripe_04.sh
-+++ b/tools/testing/selftests/ublk/test_stripe_04.sh
-@@ -14,7 +14,7 @@ dev_id=$(_add_ublk_dev -t stripe -z -q 2 "${UBLK_BACKFILES[0]}" "${UBLK_BACKFILE
- _check_add_dev $TID $?
- 
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "stripe"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stripe_05.sh b/tools/testing/selftests/ublk/test_stripe_05.sh
-index 6ddfa88ad226..f3de2d5cdfe4 100755
---- a/tools/testing/selftests/ublk/test_stripe_05.sh
-+++ b/tools/testing/selftests/ublk/test_stripe_05.sh
-@@ -19,7 +19,7 @@ _check_add_dev $TID $?
- 
- # run fio over the ublk disk
- _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=512M
- ERR_CODE=$?
- 
--_cleanup_test "stripe"
-+_cleanup_test
- _show_result $TID $ERR_CODE
-diff --git a/tools/testing/selftests/ublk/test_stripe_06.sh b/tools/testing/selftests/ublk/test_stripe_06.sh
-index a2c7bf4cc613..3fd5cd902956 100755
---- a/tools/testing/selftests/ublk/test_stripe_06.sh
-+++ b/tools/testing/selftests/ublk/test_stripe_06.sh
-@@ -14,7 +14,7 @@ dev_id=$(_add_ublk_dev -t stripe -u -q 2 "${UBLK_BACKFILES[0]}" "${UBLK_BACKFILE
- _check_add_dev $TID $?
- 
- _mkfs_mount_test /dev/ublkb"${dev_id}"
- ERR_CODE=$?
- 
--_cleanup_test "stripe"
-+_cleanup_test
- _show_result $TID $ERR_CODE
--- 
-2.45.2
+I have user documentation in the Documentation directory while
+technical details are in the code.
 
+
+>and b) other in-tree users also just
+> call mas_for_each() without either a lock held or RCU read side locked.
+
+mas_for_each() must hold a lock of some type.
+
+> 
+> Adding Liam for shedding some light on this...
+> 
+> -- 
+> Jens Axboe
+> 
