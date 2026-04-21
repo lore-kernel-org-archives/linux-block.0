@@ -1,226 +1,239 @@
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4BE1A6834
-	for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 20:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E0D3BB5A;
+	Tue, 21 Apr 2026 02:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776716378; cv=pass; b=hat3gT68To2FMvXIpW17uhwAR7yeq1+uj+CEMrMM+xSTItYVHoRTCVy19rKmQs3O1DOXVAyL7Kb8FqCxCdxEm8ZfwSAc6MPcqNHBtpqY1uz4K3G3sG8Yrb1k/z0Y7xy2JSIQnnkcaLFtwAubjbC0DlL+6i6PsGsM8HZbNhe/7f8=
+	t=1776737359; cv=fail; b=UdpR8pE0Y2ffmSL4xgeGeioZP/kqbyZUKv7O0XDwkxA3ef047LJ5HgRTP3Va0F5y19zHIZn/4RvmPfkhcvANxEWx55eM+XDS8MLiKQ9GK5S7vufgPyDnxKgm/eF+b4l8/9g7mo77BbueVHiMcsgS0duYanJ9HBglNoEqm6ytEBE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776716378; c=relaxed/simple;
-	bh=n6ym533tI9X4A+vTCccKlmH4/q2ObDK27zNE5dOfzKQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dt/xOglb+6uXeIwfijsb7ljV8/IEEMQolonb8OeXdMP0IcaHe5USI/fLbYveAsfuVyvtuRPfBkzZ26Wob1Y76noDhygJMm/64PZ7pEc12VmqUeT0bhMBaZOuHwVqdJTbytk6z3b8bdt6OhKa9/a8Rnw89xLo+KYKWgepg+yBPys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7ffKQy4; arc=pass smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776737359; c=relaxed/simple;
+	bh=YJMRFqEwSGPeKGLJ8BtsEwR0Am9x9Ad3PUSWaHkOxIE=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=WpYF9JL4NxRNqbVF+Hymb2bw7nVKQnzKkPVIjqhVhWHSXn6IJb6y20F1Dx2FNcRZbOXTiODAI08F+azZ3ltZBPZxVpI6Jjw8IH2+Jykmjo4s5Do/IUlSRZEvw6Fvs1/jmdkqDcHzB63LAYBVU1OTdw4sQ6IbrSN57PLitCtigvw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=o8NMC9Rv; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=bcwZnTSv; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7ffKQy4"
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12c7212836bso9160994c88.0
-        for <linux-block@vger.kernel.org>; Mon, 20 Apr 2026 13:19:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776716377; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gMNLar1LFUoTDrFLYd+DLntvUlvPg1CW1EjFGRcWmIgnRvJeVKJHqpCGY0a2bt1vzh
-         qpQc/37QM5fxMMBQtG6yxOhVHgM8tvPLKmpSDGRQDMztEMNhGiS2fOGRu4/XQCo1yRx9
-         qilpKTIIZK9WzQTe4t/YNUk7AZv+vP/zf2ez6jc/WzcVrmCpcMliEJD2uUTlY9pIbnN6
-         2bYvfnvJdNY38lyn3B+IiK9qtlCfTjSQPEGx4riwPwzO1i0Fc5blyLunBkQnhY+eKKZW
-         ckHZTrlYSSYu5KX0DhgyWNMeCCu0EPMyBJ6BHFcoku+KdamgiGCwRdV6y+Sv3LnIaHNh
-         TKRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=FDLi2AIEvf/8R/CKyK1q6WR933rqVLVDLFbXt/wFzeE=;
-        fh=mLurul6Bw/MRYwcmy2OrGBfZ1el0Nj+26R5ctzqqbIc=;
-        b=YY597cdP2i0vwNG0OnUrQV3wsHQRXX9+eK4xaJGnBleD3A83u9tc5XjfJszbf+jp5R
-         oHkimjrKjZ2kEHCPwSoHuj/gi5zl8y6woevu1PVU60UAcnuehbGpGDSi0FfmDd1ngjy+
-         X11JshptC+TkmXBw8fdQ96FwjDrrqxSKtnkyMjlnJ/NXIUluSNSoAe0iz1CLCxFoMMBW
-         7mgqIFWatblZJJrm54enGlHLuRZfEm5L0+QGtYIT3byk2aUEntatYb9/DP8IT/qIZssh
-         VzRVQqJrzqi9i9SGEpvWrQQKrEEoZIfGWYx1D3m7XQKXsSy0RlLiuWRTKBKhn6hsFhhA
-         Czsg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="o8NMC9Rv";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="bcwZnTSv"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63KLuGM8449341;
+	Tue, 21 Apr 2026 02:08:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=axGX/jm2BBNtwYVbmB
+	ez2M+LU5YL9pUEHx/eAmraBHk=; b=o8NMC9RvDrJ74khvof/IXDx4gNNsfo9+Y8
+	6AsMIqApvXHYZ3NZ6hEFtzY94s8SqoyDvogO3n52BQ2XxmEIir6Ekepe9dOmCeFd
+	OVp5idhpLPJgMaURAcw69yj94BY2dW8XhMogjslL32LX/cY634p7tcLlEahX+hAS
+	VfJ07O3HbBFMvV+Gkzcq5Yp8sSjU/KV9Kzq93qNv+mna3sNxIxzatdRla1TjSvTb
+	z4b/y3yoFFHZ0ygfD4v6nCRYBFVb0UQyF/x54RLkGHnGJ8poU5l8RDJbi5oLWJBU
+	h+sUQnGNes/BjsxcEaPqiTp3h5sfpUGrlY4BsZonn6PYtoUCB+hQ==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4dm2cg4ftd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Apr 2026 02:08:51 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 63L26Kx7002722;
+	Tue, 21 Apr 2026 02:08:50 GMT
+Received: from sa9pr02cu001.outbound.protection.outlook.com (mail-southcentralusazon11013027.outbound.protection.outlook.com [40.93.196.27])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4dn176xe4m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Apr 2026 02:08:50 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jxVuZBzfjnXPxTdW2RESJ/EDXAFllcQgPoT4wYCjzyMatyaK+q1gvX1jnk/hZFqdGB0jFpC4O8KoziH9gDMN6njZKpAQaWfz58Jzdu7NVD2fAJswpOaWjq7Ln4LSQrEbvFFw4hVxQRjehQnbitAo9E73s5OtTWzOUsApcA/otXC+m52U6rYKJPIOakLdlYb6wGH46zD4gJ+syS8KSRjEcc0hg5vylKIXus9rRiAkpl59ujsHK5kH2D9cdTKx3V8Noyb4WRsmdJNa0PJAsHZm4QnzCeztazLrPjes3W07MpWUJMndKhVnMqu1Uf+EsGi69zb4HVyE9f+ifbsCYY69kw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=axGX/jm2BBNtwYVbmBez2M+LU5YL9pUEHx/eAmraBHk=;
+ b=bHmU/BsJPZJqod/T7sO/KUyhey3F3YfedVWEHWoAb2hMAMvKPd8/Q3Ci/h1uTifcgCT+sWrJqn7i25TL9GSBpAwANLVt+8b41PIco9/5PvNeQKxeXNJaWBIwQZU0iVaZlK3w/k5gat1gML4GBwYxdLkqUznQBVKz2mRwo7YzaNo30RquCHIAWfzYqeyzdfzb0m2RKH9incIbn2pc2vGcvw8TLE0TK11w7X14LcXc6jWVtYodvrOSNw8koxoB42cqSD2X0gjkqOrzXTAvS3hzmvdVZjeH1v508JAbqib9xX5XWmEagj+yQrIGnk4eULZ9AF6ccaSdqhYeBRYSyTT2Uw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776716377; x=1777321177; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FDLi2AIEvf/8R/CKyK1q6WR933rqVLVDLFbXt/wFzeE=;
-        b=C7ffKQy44m4ZxbpuAU5mPeNwWgUwzmXO7L5cLcQ72XyL9K2REzPgFaZVYwBz+Imo9k
-         3kCcUZBLYZVYwZ0E9/DXoRIQelEPss6G9vbrQ70maGYmDmAV/jeFBOwO/SAWgsW2UDO3
-         KizEnyRxHU3UiW9Yl3We4RlWSoYWmOSZw9swqb7BTN6SL3t4cHziCSVHbIqA1ALwl6EQ
-         m54g8pHAwzMnBIeOfr4ncTtxDIcixXgtbyMx31gyh/9Kd6p5mNlaYIJIQAj0W2YuJpSL
-         yquBk+tn17bSblysF2CP3Rly02NFXHdrL2R1Dishkto7BK3XtjmZxKayBx1IxhdEcYWT
-         eB5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776716377; x=1777321177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FDLi2AIEvf/8R/CKyK1q6WR933rqVLVDLFbXt/wFzeE=;
-        b=dNB/XPgJ+26CFMTVfRp+rtQ4CPgPVgaiLMuVk9gtLcjmsIK27ynmXefC1dKvpl1FXH
-         nkYCvfcckyoe4widmXkJydtCbJzRW1WjekOVfpnw99cTD525/XyJM6QK+lEySw/Kn6Dy
-         +T+eWgGKJhY07WCctLiUv4rqIr2jKlRUfbgtTmTMSvvQceOyktcyFJfU+icNxm/3Y4XY
-         M0ZiyASBfxD9O0vZ5deedUTc76DSWskV9GFLdoW5MxWRo03t+BlxEiRzigq5vof+Tw0K
-         Z+iCbwxvCEuPTPIc6lQicraFKgwLQz3BcE1rlJq8xHRG8xmBRD/08dZPZTsK34bnL9xW
-         bagA==
-X-Forwarded-Encrypted: i=1; AFNElJ+Z+iqF8bIJSmDdqfNBy20YkIK203UKpvnEDQ8eF3TlS3nHypRmQCaZrFPSz6NKCFB2d9IG7IccJuKStA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhFVUrRKYWnoEoXGa2K7VliCW8o1aoOeCmp4zaYmH7PHVCmjOm
-	tliFfFa3aa49t/VjXOjailM/ZjpC+dZ2l/RVZlkp70Rm+ZCI3I8SckdV83Vr0szlX6effS1lm/V
-	+XBNAEVaUSa6nJVABzuVTUWb/3qo8nls=
-X-Gm-Gg: AeBDietLn1KaAI/UdsggSQJcsggZx7IN2/M/ha3DprC3cbYRm4zkX5atB2WLsg8k90s
-	Fs8SPNYVeMLU7Y5LH/NXx4i6gUxTRB7CmnBxpMV7zOIIpPZyUo06tW2VT5fotZq1A4NTDdBY3pr
-	w5Ay8Pk9ukbHqbylkBwozoDbtpushx96U6Y7pnnxaAsdzftv1osVDQhbcOY7UJDQ2iIBIEPWoM3
-	VtZcnfS30pEgDPpnkKmz+NKXFN3Jy6eFhMInhh7WoPNL1zycAwBx3LpHcmmA4oVnb5Bfppei/A0
-	l23AjFq+FNTchZ9Oyw==
-X-Received: by 2002:a05:7022:388f:b0:123:348d:8576 with SMTP id
- a92af1059eb24-12c73f6d905mr8911688c88.6.1776716376624; Mon, 20 Apr 2026
- 13:19:36 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=axGX/jm2BBNtwYVbmBez2M+LU5YL9pUEHx/eAmraBHk=;
+ b=bcwZnTSvsLjvBTyGGVMR4ziITIE7MvZgJFd3f1uO/9msWhNLosAjinvem1WfJK+p1rEOIh9vcNgeQh7gHP6oBiN4vVTh4Vw6QkXp9dH7HKzUYrCkLcE+tI57s9qdgMqmoK5XjQkULUhZvlp/1YdPl0agVwy00PlnQL1CtRteA6E=
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
+ by DM4PR10MB6112.namprd10.prod.outlook.com (2603:10b6:8:b7::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9818.32; Tue, 21 Apr 2026 02:08:46 +0000
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::e525:dd71:b002:6ad5]) by CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::e525:dd71:b002:6ad5%6]) with mapi id 15.20.9818.033; Tue, 21 Apr 2026
+ 02:08:46 +0000
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe
+ <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg
+ <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
+        Anuj Gupta
+ <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/6] block: fix integrity offset/length conversions
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <CADUfDZrwzUTi2TOj6M-+FtBK6u5evMsWSBqRDwJsLb8yLbOGvw@mail.gmail.com>
+	(Caleb Sander Mateos's message of "Fri, 17 Apr 2026 08:10:35 -0700")
+Organization: Oracle Corporation
+Message-ID: <yq15x5lqfdx.fsf@ca-mkp.ca.oracle.com>
+References: <20260417015732.2692434-1-csander@purestorage.com>
+	<yq18qams3re.fsf@ca-mkp.ca.oracle.com>
+	<CADUfDZrwzUTi2TOj6M-+FtBK6u5evMsWSBqRDwJsLb8yLbOGvw@mail.gmail.com>
+Date: Mon, 20 Apr 2026 22:08:44 -0400
+Content-Type: text/plain
+X-ClientProxiedBy: YQZPR01CA0113.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:83::23) To CH0PR10MB5338.namprd10.prod.outlook.com
+ (2603:10b6:610:cb::8)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260419090348.1817082-1-dawei.feng@seu.edu.cn>
-In-Reply-To: <20260419090348.1817082-1-dawei.feng@seu.edu.cn>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Mon, 20 Apr 2026 22:19:24 +0200
-X-Gm-Features: AQROBzDaUIcoZgaW9hqmajL0d6VdpXPApMsC-41ShvD5oOsBEcAdne8_Gp_irWE
-Message-ID: <CAOi1vP9haWQQ5UAGuz1GrtL68Yc=w_od4a9GV8gfVoqKMyVn3Q@mail.gmail.com>
-Subject: Re: [PATCH] rbd: fix null-ptr-deref when device_add_disk() fails
-To: Dawei Feng <dawei.feng@seu.edu.cn>
-Cc: axboe@kernel.dk, dongsheng.yang@linux.dev, mcgrof@kernel.org, 
-	ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn, stable@vger.kernel.org, 
-	Zilin Guan <zilin@seu.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|DM4PR10MB6112:EE_
+X-MS-Office365-Filtering-Correlation-Id: cb2108d1-9948-4d0c-49c0-08de9f4aeb90
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|15056099003|18096099003|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	PubSds6o3sfXEYnbWeEVpD+X4X3On5JEbUrucwzcA2nNrf6Cp+zBAUKX5mKHzxgrmVNfD3FncKvysIikoK0DG0c2xt4soDwHFhlbMDL1kC8UMO/qN+vB1DN5qWxE8xm91AkelLN9BXgmQOb6fzRzJrNH0+gSzggscTXJOv/lqaBOv2D9aHtuQ7FYP/zqmjerTMPMsXcb9r5wf4hKVK3xOJmZn/hq/9mnhN6k0FgJX9rWOLeGgu01htIwCEvteNCkUvW4Z3CoYOWk6pNRFdATB3Ot41XrTvWWztPpacvTOcytwFR8TUd30cCh+S49g9JiqlulWK7xZstCVhYsaswbHRkGKVQimleDm2jLlBNkdnc/TLiQz/SMRWjv5l897Ki8XQmDQmX1nprbZvN5GDfrhik4ICPvfi02q0uj2JBDD1lvwLAoL8uGQi3wLWFAYB5MXliZoKiNjkudPQnqomZOy9/aRiI5S5Sk5PmpW4ZaO2kNTotZPWd1MsVvMqSBeEvdskAIf7mdGJrzlSWpkrfINHlBBLucKzc7jZ1Ni/vZm9GFjDGs8HT2FQn6EyppSXZK0/rvNLW5LW7aSsoc0oIhYVngs3JHAkGxve9Gkrsax30vpVgqPk2ujmn3b/gTSnM71B5G0XMK4bzDZwjsIwJhzIC4/E4g+Ta21JsSgaxMZv41hIW6olIHikUlS27Mv+g3JMNXOca+Y/rPcELxEXoax85LXMr4boI0mNlz4yqETwU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(15056099003)(18096099003)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?EE20Cu49cLokjFhp69JCd/M42m3uTUUq+490Lwdd1CSqXtyqZ5Dv4tb5hGw3?=
+ =?us-ascii?Q?3zfCahtx7w7g9/e2kOq4Z2lV0f5nle0xF5u8XzOIMOTlOFR7IKmQc6UbQKMW?=
+ =?us-ascii?Q?36FHIOmYPYYchm4vHcuvfd2c/XyLeNnu2HuSSmfDFb7Y+MFbZsoLIKSbOA2J?=
+ =?us-ascii?Q?XHZklFDIuHuhkzr0PDlYcTITebN8lwwKjbxmiavIZidXvvCjTi9H3hrfp03z?=
+ =?us-ascii?Q?1BFzNnAPaJF5brQvw8jBefPSVJ65Di7iW0VMjmbE6OZpkFN4Pzs159G6ANnz?=
+ =?us-ascii?Q?b/lq02e30doCrzytRjMm/6CuZf60lSk7/pXiNh1ixpf3Am0gOXzEganUGLTY?=
+ =?us-ascii?Q?PvkcNWcRq0tqfmafkOvTKr4BbkZxyQNTrzgLQGScWR1VWKYX/9EE5TXBsRo5?=
+ =?us-ascii?Q?ATB3VCGgD4rz46jS3ZAwsfo7jb8Kizw6DKBECDfQ32VXAw8fZIqDoJ5J4iK0?=
+ =?us-ascii?Q?aCSj0dRLdGIUqQk1lVfJ415nHkKnypgNobwXO8c3A1Rk/payOfvetUaQNr8Q?=
+ =?us-ascii?Q?/cAStNImWlUf9fhYXkenOUQrGQhabNpprd8BcSs6m3kXwQ4mjvf1xm+nnIG8?=
+ =?us-ascii?Q?IFyE0FXTwmhP/PnUvIWCO/rs7A97WehTz0EcINkPbWA58rkPbPOwWWMkbXED?=
+ =?us-ascii?Q?+05d1SAcFlrdcqYj+tm/eptPTtPfbMBOL2QrfSUSfvFhSMZy1FX0FGUEETOj?=
+ =?us-ascii?Q?YVwE+1SFbFBdf1u1qYTdW+BANFmX+mAGcXl8BDtt1hpyPZpiPJeZyc8J7Wgt?=
+ =?us-ascii?Q?N4sIY2LXcrSOb+80wko0x+RrJ0rjcLdx7pTyVsa+TtQLCfb4oU30/kOnxPOn?=
+ =?us-ascii?Q?7SoQbRP52ACOikOfhYd5/oRlVrKXT2C+h2t7lqldWlxZ5cQKLrKz2U76FfV0?=
+ =?us-ascii?Q?ZLOd0sIpa6Rn1w/ushXdcogKQKXgReZSD8cDuzw4VvcsgbWtzjINgCjrtGsv?=
+ =?us-ascii?Q?omNtNXKyQFTmV84ewANY8HutSPYZSiSY4OolM+4ogmZt3AOIEnbP3cP1LwEI?=
+ =?us-ascii?Q?97wGaisGVW0dS9qMMGp7gGjh7AQ5oC31po6uOsadHyjwqkCRqDQ3OSW6wtSI?=
+ =?us-ascii?Q?FlGkt54+eICAxsU2l8ZixvR4D9DhyG2CnphxUheb2i9RADy2Jw3+lQw8VZDZ?=
+ =?us-ascii?Q?pqK9pPjxh3sm5LZB00SPUvpaCdn2WraWAiQF3V0OahPluvpHlx6JQqyyiAWy?=
+ =?us-ascii?Q?DoaVyLKTsD1ViluYyssjjO5RQ9nfKmV/FMkO9wXR0eNYUXEuoUG6SUUmZimd?=
+ =?us-ascii?Q?4QhnPc7VriiR2uljCNo1PcQLm3eu2ML9x41crDOTx++/uiLfJQk1o390oHv5?=
+ =?us-ascii?Q?kc24M+fAX6ic0fAPkW60AN1xd76PesLaJUL/C+mRHa/Ko2FXkuQYbYguxOUf?=
+ =?us-ascii?Q?kmtTCF4Q8P3mnMtt6HRXIPQIEhOGcs2K3zx2eI5L0PL1Jj3tRkgREXfP/+g8?=
+ =?us-ascii?Q?yoJlvC+hLzybWkdD4LKhO9mJ8vgcJMTb4XTE2srW9em9ns8pnqjBPVc52+aK?=
+ =?us-ascii?Q?RpHQdcY8BjFTNsJSEq04MtKnmejpP+IWhF2EiinG0zAi9tTJEBtMbvyF27vN?=
+ =?us-ascii?Q?0XeZ7ZTDPJ54V+RXodDWijIh3965Ju7cxRcEKyOyyN0rsYm/OKWMZ2hh4gPr?=
+ =?us-ascii?Q?AEdrOKpYcCl0eve56GwRyLHbn4VQZHQ55lWtDLTKgeUltw64TSVnKpMORwYc?=
+ =?us-ascii?Q?RHKtsaIL0kMoZTA9mjOn4PGd0ZMiHCEvZaN+SxfQ10btICoi95St0iyC7kLL?=
+ =?us-ascii?Q?D4dL6IiR4vif/QFykYHFLZx+3o1sBLo=3D?=
+X-Exchange-RoutingPolicyChecked:
+	DUg+8HR8zL0a2rsbH/uPh4ELIxjfTTEKTYK6bEFyCyl0+dvJiwtjMnycTtJxrwOn+N6K9OkgwD0uRx5EP4ZUr5bGVSJQN/F+wGmnGMMzYewGLtGwbd+OvRBQd0Is0IYxavIcXQxMm3nlzlhjNw24dQGUHi2SNZkOvSCiUvOi6xdCCwuoL63gs7VFa4LmRFJQjRA7zMttSUgB4hafckccswYwfzoRgsgyoqvhYf6SGWdIjLaGo1v1LXdIPiP/nvCYtu20U8zOjMOs0vSZIaUCNCwOtFDTBo2p+g8u2q/N6rAuPqMknccu7GCf/d9CX0eVKOCY8/U0gPLC489f6IsC6g==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	qs55IDbyzif0+RvQdG4rT0zWdxX7rljQRmVKjew/J4CNQ/pmN3fZrDvnQksdKGIQyfKLI6GLVXTTW7V8gpXbxKH/jiDh7Lc0Ch3r3XnqBwvmTeyh8iztIovoBvpwZTXXrJHGU0JH4TIFQtT0aw+eazp2xibDBMvQuuLueEQbUaHn783tmEOTFqiXWCsRCswqaho7c6b+r5txT5SCbVvcD7brbQxxLX0d9yU9YH6dS28EeXFvIePdNL1ivifoF2XT88NCQwdqSDf1y5tYgFO8Wps3px/tfp82gm1XIWxe0kHUJfxfGfMQaHnoNgwAdWOdgwwHr/j0sLWmg0Ys/tFKpRQFK2t6bpSy7I6geFYX7InxC9sj+g4IazLdQu6KRJMDSMY3vbIKBt+8BblYm3cJBARQAEBBf3EYhRLEs6SoddJd98cPVOM1pbnJMsQcaNR1UTj2FvalajaboNVnzxUS3dR1Bm78g0D+BTgGSBhh4QMNofJ3oK1HbgOSbzpDIdQh/6mMLTAIDoCKMtQ06YnxtOO0pFdN+PVkbTmYm9cSKco3RikuulPbbN37vP3oBKIwFRdLVPi+BN8a/NEiKZTnzJM1ekCx1NstuTR/J/rqlFE=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb2108d1-9948-4d0c-49c0-08de9f4aeb90
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2026 02:08:46.4643
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o/E9PeDKNNxo2Aj/LxnGlQNVv/RbLv5mfMWODCji/BZQNNo66f19FdV/87pBhicN2lmvH68fCHWwGjWTk1+5XD9sdASv9Auwe/4d+mYuKvI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6112
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-20_05,2026-04-20_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ phishscore=0 mlxscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=999 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2604070000 definitions=main-2604210019
+X-Authority-Analysis: v=2.4 cv=F9FnsKhN c=1 sm=1 tr=0 ts=69e6dc33 cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=A5OVakUREuEA:10
+ a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=RD47p0oAkeU5bO7t-o6f:22 a=QCuCZn1sAYtNoLXJA_UA:9
+X-Proofpoint-ORIG-GUID: dduMPulXVewORYTeL36FbJlcE3oRkbhm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIxMDAxOSBTYWx0ZWRfXxDhm9nXbU0bV
+ 7LVvdLpM+z0nQh49/jPUOzVbUGPg6QKNfub7nAtzqFgjRMAUNk+kmhy/ocd0R151HYwrrDNxwGs
+ z1PHy4Lfsa3qKnk1x4q9rEIJCYbIMdEoq/FQ8/wO4su5HtQr55RjjHWRR19EFnS8GAEiqWvRBnc
+ do46yDSWBuZUCLsGbjoSMlbzuYOuF0Mc+SPP6ZKeLenVyXygJ5pAx34xAhEjC3R2EgRcH8iz64Q
+ SUeYWM92o3nNjKAjmwXJS8GScy7i1IJtNZ7VAHfgoY/7b/M5BdWQIaR26XBFW9f976LOuOCGcpI
+ 2P0sLlboqhcdTcSIvmJ1SOBf7AagSq855i9nM+InOXtr5/++1LUB1UKTVcWJFWrfr6e4YSwhjgj
+ SnM8mDW89/lYZiBZun++imrKpykHDu66S63Xn5L3qi/4CJx9dMCZFIK+XOppRlgwN5B4jMNshJI
+ UwEnW/gaw/CY1fZZ+cA==
+X-Proofpoint-GUID: dduMPulXVewORYTeL36FbJlcE3oRkbhm
 
-On Sun, Apr 19, 2026 at 11:05=E2=80=AFAM Dawei Feng <dawei.feng@seu.edu.cn>=
- wrote:
->
-> do_rbd_add() publishes the device with device_add() before calling
-> device_add_disk(). If device_add_disk() fails after device_add()
-> succeeds, the error path calls rbd_free_disk() directly and then later
-> falls through to rbd_dev_device_release(), which calls rbd_free_disk()
-> again. This double teardown can leave blk-mq cleanup operating on
-> invalid state and trigger a null-ptr-deref in
-> __blk_mq_free_map_and_rqs(), reached from blk_mq_free_tag_set().
->
-> Fix this by following the normal remove ordering: call device_del()
-> before rbd_dev_device_release() when device_add_disk() fails after
-> device_add(). That keeps the teardown sequence consistent and avoids
-> re-entering disk cleanup through the wrong path.
->
-> The bug was first flagged by an experimental analysis tool we are
-> developing for kernel memory-management bugs while analyzing
-> v6.13-rc1. The tool is still under development and is not yet publicly
-> available.
->
-> We reproduced the bug on v7.0 with a real Ceph backend and a QEMU x86_64
-> guest booted with KASAN and CONFIG_FAILSLAB enabled. The reproducer
-> confines failslab injections to the __add_disk() range and injects
-> fail-nth while mapping an RBD image through
-> /sys/bus/rbd/add_single_major.
->
-> On the unpatched kernel, fail-nth=3D4 reliably triggered the fault:
->
->         Oops: general protection fault, probably for non-canonical addres=
-s 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
->         KASAN: null-ptr-deref in range [0x0000000000000000-0x000000000000=
-0007]
->         CPU: 0 UID: 0 PID: 273 Comm: bash Not tainted 7.0.0-01247-gd60bc1=
-401583 #6 PREEMPT(lazy)
->         Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1=
- 04/01/2014
->         RIP: 0010:__blk_mq_free_map_and_rqs+0x8c/0x240
->         Code: 00 00 48 8b 6b 60 41 89 f4 49 c1 e4 03 4c 01 e5 45 85 ed 0f=
- 85 0a 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 e9 48 c1 e9 03 <80> 3c =
-01 00 0f 85 31 01 00 00 4c 8b 6d 00 4d 85 ed 0f 84 e2 00 00
->         RSP: 0018:ff1100000ab0fac8 EFLAGS: 00000246
->         RAX: dffffc0000000000 RBX: ff1100000c4806a0 RCX: 0000000000000000
->         RDX: 0000000000000002 RSI: 0000000000000000 RDI: ff1100000c4806f4
->         RBP: 0000000000000000 R08: 0000000000000001 R09: ffe21c000189001b
->         R10: ff1100000c4800df R11: ff1100006cf37be0 R12: 0000000000000000
->         R13: 0000000000000000 R14: ff1100000c480700 R15: ff1100000c480004
->         FS:  00007f0fbe8fe740(0000) GS:ff110000e5851000(0000) knlGS:00000=
-00000000000
->         CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->         CR2: 00007fe53473b2e0 CR3: 0000000012eef000 CR4: 00000000007516f0
->         PKRU: 55555554
->         Call Trace:
->          <TASK>
->          blk_mq_free_tag_set+0x77/0x460
->          do_rbd_add+0x1446/0x2b80
->          ? __pfx_do_rbd_add+0x10/0x10
->          ? lock_acquire+0x18c/0x300
->          ? find_held_lock+0x2b/0x80
->          ? sysfs_file_kobj+0xb6/0x1b0
->          ? __pfx_sysfs_kf_write+0x10/0x10
->          kernfs_fop_write_iter+0x2f4/0x4a0
->          vfs_write+0x98e/0x1000
->          ? expand_files+0x51f/0x850
->          ? __pfx_vfs_write+0x10/0x10
->          ksys_write+0xf2/0x1d0
->          ? __pfx_ksys_write+0x10/0x10
->          do_syscall_64+0x115/0x690
->          entry_SYSCALL_64_after_hwframe+0x77/0x7f
->         RIP: 0033:0x7f0fbea15907
->         Code: 10 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3=
- 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d =
-00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
->         RSP: 002b:00007ffe22346ea8 EFLAGS: 00000246 ORIG_RAX: 00000000000=
-00001
->         RAX: ffffffffffffffda RBX: 0000000000000058 RCX: 00007f0fbea15907
->         RDX: 0000000000000058 RSI: 0000563ace6c0ef0 RDI: 0000000000000001
->         RBP: 0000563ace6c0ef0 R08: 0000563ace6c0ef0 R09: 6b6435726d694141
->         R10: 5250337279762f78 R11: 0000000000000246 R12: 0000000000000058
->         R13: 00007f0fbeb1c780 R14: ff1100000c480700 R15: ff1100000c480004
->          </TASK>
->
-> With this fix applied, rerunning the reproducer over fail-nth=3D1..256
-> yields no KASAN reports.
->
-> Fixes: 27c97abc30e2 ("rbd: add add_disk() error handling")
-> Cc: stable@vger.kernel.org # 5.16+
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
-> ---
->  drivers/block/rbd.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index e7da06200c1e..d92730d8c342 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -7165,7 +7165,7 @@ static ssize_t do_rbd_add(const char *buf, size_t c=
-ount)
->
->         rc =3D device_add_disk(&rbd_dev->dev, rbd_dev->disk, NULL);
->         if (rc)
-> -               goto err_out_cleanup_disk;
-> +               goto err_out_device_del;
->
->         spin_lock(&rbd_dev_list_lock);
->         list_add_tail(&rbd_dev->node, &rbd_dev_list);
-> @@ -7179,8 +7179,8 @@ static ssize_t do_rbd_add(const char *buf, size_t c=
-ount)
->         module_put(THIS_MODULE);
->         return rc;
->
-> -err_out_cleanup_disk:
-> -       rbd_free_disk(rbd_dev);
-> +err_out_device_del:
-> +       device_del(&rbd_dev->dev);
->  err_out_image_lock:
->         rbd_dev_image_unlock(rbd_dev);
->         rbd_dev_device_release(rbd_dev);
-> --
-> 2.34.1
->
 
-Applied.
+Hi Caleb!
 
-Thanks,
+> NVM Command Set specification 1.1 section 5.3.3 requires the reference
+> tag to increment by 1 per logical block, so that seems to determine
+> the increment unit:
 
-                Ilya
+SCSI allows PI to be interleaved at intervals smaller than the logical
+block size. This was done for PI compatibility in mixed environments
+with both 512[en] and 4Kn disks. Interleaving allows 8 bytes of PI per
+512 bytes of data on devices using 4 KB logical blocks. That is the
+reason why we use the term "integrity interval" instead of assuming
+logical block size.
+
+> The ref tag used for a particular block needs to be consistent. And
+> since reftag(block N) can be computed as the reftag(M) + N - M if
+> block N is accessed as part of an I/O that begins at block M, the
+> function must be of the form reftag(block N) = N + c for some constant
+> c. Thus, the ref tag seed needs to be computed in units of logical
+> blocks (integrity intervals); no other unit (e.g. 512-byte sectors)
+> works.
+
+Whoever attaches the PI decides on the seed value. In the case of the
+block layer it made sense to use block layer sector number since that
+value is inevitably going to be the same for a future read.
+
+Note that with MD, DM, and partitioning in the mix, the sector number
+seen by whoever submits the I/O is going to be different from the LBAs
+on the target devices which eventually receive the I/O. Nobody says
+there is a computable constant offset. Think scattered LVM extent
+allocations. Or RAID stripes placed at mismatched LBA offsets.
+
+> To see the issue with the current approach, consider an example
+> accessing LBA 1 on a device with a 4 KB block size. If the block is
+> written as part of a write that begins at LBA 0, its ref tag in the
+> generated PI will be 1 (sector 0 + 1 integrity interval). If it's
+> later read by a read starting at LBA 1, its expected ref tag will be 8
+> (sector 8 + 0 integrity intervals), and the auto-integrity code will
+> fail the read due to a reftag mismatch.
+
+Something is broken, then. Because the ref tag in the received PI should
+have been remapped to start at 8 in that case.
+
+> I agree, the seed doesn't need to match the final LBA, but it does
+> need to be in *units* of logical blocks, plus some constant offset.
+
+Your concept of "unit" still sends the wrong message. The seed is an
+integer value used to initialize a counter or hardware register. The
+seed only has meaning to whichever entity submits the I/O. To everything
+else it is a value used for remapping ref tags from the I/O submitter's
+point of view to whichever interpretation is mandated by the storage
+hardware's PI format.
+
+> With a ublk device. It should affect any block device that supports
+> integrity and has a logical block size > 512.
+
+It sounds like the seed value is set incorrectly for reads in your
+configuration.
+
+-- 
+Martin K. Petersen
