@@ -1,132 +1,225 @@
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC7D33064D
-	for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 18:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776794650; cv=none; b=dABKcXO7Talm04sd8dz/j0ijdzYYaQe1awSZXzd6SnjBuGTU2rkbLr1eluV/PkeNPSjljGAcpN2JGacCQ7E70rJCmrlOBiVwvIS2rORNyS6mRSJZP2zrWS+0IL1eAzRvHU6eAMjGP11SL6ehPQ73wGswM6T5+K/8gbfVkNWKQNg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776794650; c=relaxed/simple;
-	bh=xl8N6j3b+gz3fqbPmliNSHd0SllX0JUEKr55gqsTKuk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pK6nr8xICxgUgiNZFkqnE8u1oIVsy//bq+9YtjtCyDvxyR7B36cTtzFVipJW45UGnIYe+Bp6qTE4Ar6OLHB2G0i1A3Leb5VfFhaQV4WZT6ZzNesEO9SR7DbFLphLUCZgSJ0JT94CVAhrOSpXrcCsVMmnT/JdBrf65pa4wHriOuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=UOFrQGO2; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5773A5E90
+	for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 18:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776794892; cv=pass; b=Ja9BsqMURsMEzm9XYz9p9akyVfaDIyCzyok8dpAyoLKfkmru/Bs1eCShWtj9Nm/BGHidSOrqxpMfm1o6QK+QGwmIHqmXd0P9JXBHcodIgOvgb1UVx2ZMPwNRsGLqijM+Yk3UEgN1T1YVa7ktPldwY3daUCG1+dXLd2VM5TJ6dxg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776794892; c=relaxed/simple;
+	bh=KsgX9m6C8CxQkQ37nZ4Tnr3XLVgFk8OeqKDAsOzJgs4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wmb36slH2QS9nwKMKZmzCaBIxnHVTf4PwqVNkb0NVkIf+LeEfuxafWl5j1H54r+noCqhBD1x0UelVCqzrP6lsHArzqbbmTm1XUWmQ+uQ0tAUV3hP/d5SYNJxOr73fUDSrH82pOf6Si2u0L6ZNkWZDxm2uQSeFs93PpZcxz2hvU0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J3tPySav; arc=pass smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="UOFrQGO2"
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-694932346a1so672981eaf.3
-        for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 11:04:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J3tPySav"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-43d7badbd7dso2192300f8f.2
+        for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 11:08:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776794889; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WP0YYqRsq8qKCSCTKqezGhQCJCifhcQi6It44D5+9L6WiFm1Sp5+D4+jB9f0HgeXGH
+         dSv+YefQ0eedn8Y3NGeaaUeftCMDYhatqRmCnLNb2PtHQzHzNQRovM2nDIrozuyoohBM
+         6BKdhmUobs6+le209U2x/4hPsWhZeZTRvqNWMSxEiBnkmsM9cDenD4Fy3E8Q0+pnnzly
+         H5JJX5mJ9SP4yrW5w15eKF9Wdy21GGzwGD+4Ipu/wH9DJ9puw8J9G036leAQOvhudVFT
+         Yszih9jyG1TQtyQ4ycoTRoIEgEFL4OYfVo6Vbz14hzsEBelMCeO9mlWfzEOwIq+h+62D
+         2KLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KsgX9m6C8CxQkQ37nZ4Tnr3XLVgFk8OeqKDAsOzJgs4=;
+        fh=kFRAlb6YOqCIM5ccSBTBrdesssd36jxupgU/UCz8/+A=;
+        b=HOE/g27KH4HxbZ/6vI9vp/CZMXRaIwIQvi8zOIL414xn9iQ/qnKxry/MBsTIWdF5mP
+         wVl2OWrmBeRATx3kKgIVilloUpRsOO/nxhOCSt+Kd7UNwoSKtWhGkuyBiQShZ/rwo8f4
+         Bh2BeKyz8Bwo0KKit+WCwThi3+/AU/1nKW19KV7Hny2DDlhqeOpOhZijsoxQFQrJJB+Y
+         P+9GHag3cNiHsyLEBJ1F1jjTvwoeN4Jnnz0SDdFpHSRhmTeU0tx9oTokSblJFL/THJpE
+         2ANIMrnxwwHmp3IX+paPp4rDiCCm4kfx9VnN39NIPhUYvzd5Iscifc5MD4yC4WZfDOIH
+         xsDg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1776794647; x=1777399447; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QlqQWGWciZ3CiRdbLtPd61zSucf5R9oSxSQJb1tHjKY=;
-        b=UOFrQGO2MvO+emIDgebJ657BUMtY4+GNFg4u5TbeK9rXhgTvb3Le9NKpoB1evX64a6
-         mbBqVwlqBeS1pjJSIpWr1KtGFk/yooqIzmr/piFVdCDUTIRuYOXShjjhdm046PT4uVZy
-         lsZedEVovrFvHJknPGgnqQS0toQ4i/ffM9xTSDlYk8XypOAhEWYwiBA69DlewsxGonDk
-         W2KOxP15hagSUxke+iDpbxSW8hYEpym2NX3UyTgpGfk/t8dgNUjPeYtjuyu/9wDqk696
-         2FwTDC+0OmGFuCC6zUf2OO7UOa477qxzCj2m1m0qmpA8t/HkduQ1lwPj2gq/PC7y8d0g
-         cMWw==
+        d=gmail.com; s=20251104; t=1776794889; x=1777399689; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KsgX9m6C8CxQkQ37nZ4Tnr3XLVgFk8OeqKDAsOzJgs4=;
+        b=J3tPySavSeQa+wZ8Qr0Y0IXZI/WjoLSG7aLExZ0H5rHXYzlJdFFvXXBxViKMKzjUZ/
+         JFxXRgCzevUM5Wedn1zYeAFTXcbW5/v/GvUKjDYLfaR3dFnYONbQLA7URkh+J07GcHXc
+         3Ty69+RYzPLtNw6iqx4KuG7doB1zduY+UTYDqaO/BX8L369ugWRGUgU9y64g4nQvZRbU
+         vLCMnjaRaduQt20f47C0rMfAkNHUj0kSesc88tTf+dYDpeYFZIDQfYZpop7w39Irf3me
+         f4ZCSgc0tQnF6yD01bj9rbfg9q8Bi1abqCfO10gZyJqu+cbq0eaX5jGc/3bVCixE2/Zq
+         Ik7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776794647; x=1777399447;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QlqQWGWciZ3CiRdbLtPd61zSucf5R9oSxSQJb1tHjKY=;
-        b=MvqJZwupK8o16nik/WFTHmGxC6T/gELPO1ooDtkUTdO45EL/+uKJN0wNKWMnV+/jLo
-         9HvEjbA77r+oo4kxUX2icmGyeHeqVETC5RO4ezdMh6GZpMotM+Fz7ikWO8HXmHaGJSYw
-         IECNAbW4th39YGe1rK4rvTvtDXWkZVGQn+jXsMMsA5hHFllczMkSQ+qvuO/OL3ZEZwRV
-         vxEL1DHBqZWsE/dX1bKRiVgDXPcWf/1Hqw/NGgOmoBjQae9Qd5KNlEWO6fekGfPy9rtC
-         rBde7OVDL7pzwfinBqOYUVP7j4/JQGvWLnmZeC3D27YcI9FmsJeh+/euO2RxEorxA4TT
-         DlKA==
-X-Forwarded-Encrypted: i=1; AFNElJ/qYU+ImZ/v87D2/YdT4UZ3J9eb8lnwlOZILuCiwX9psYVWNPHzeoLiJGXs/bR1OnVaqvGzPWrLRJZzZw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww5dwfZMFwVXGONRYXFj5QrBP3Iro0nodFEuOI4fEz7Kt1jEgC
-	vPrRMBHH5kDZU1+tlBv2hdtgHeq7Fbfa0Q0AQGQ4IEF+KKKW3md8t06gldwUT3hFqPI=
-X-Gm-Gg: AeBDievfZqnyGfQtXUZH0RjK61biiHfDCWCv/H/yQFA/7UkZXWWVXS0y50OqtfvECk0
-	xt5g2TU3Hf2aGAmwZHol8QhJIC4DFx9vnWgtq8klXC1S7LGoRaUKmArGYMibv8v6YdowI38ABDe
-	twubq6sfXlk1Hx3mclC5kmpGKMf/1e5K+MvWKxb4KNox1+5zLEC2XW//Dl8D4ScsNjIABV9O9Dd
-	suZMh7dV4b5QXEkY8F/dOFSwz0Wdj2TTABFzDy95OPqYJ7Sw8y8DDJoc03UQ3dpxrhqjbGWN77h
-	GKtbqXDQvSdOstaGsfqPTZubVJJnNXqAH3T2GuqqxshJyTqMxqx2d70D0e3PxMxb4lFFV8OmXaz
-	W50SEjiUWhOgKQ7xuY1QdgQYrK0OfEwkHN4YGicbX+8vELpBY3L36FfwyROiPX0EiO0yxpwBoNn
-	gUbIz1UjCk+JejfLe0rWVHHliOGaNA6OG1fp/yztA6AsH2NSqOqE+hkbsovfa5NAnqqTNuhBqrp
-	T4NBM8GcSX9+QSbZvg=
-X-Received: by 2002:a05:6820:62a:b0:67e:2e4d:6c75 with SMTP id 006d021491bc7-69462f084a4mr10863101eaf.41.1776794647115;
-        Tue, 21 Apr 2026 11:04:07 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69464ea14ddsm8661726eaf.6.2026.04.21.11.04.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 11:04:06 -0700 (PDT)
-Message-ID: <a976cbc5-f0ca-4042-a88b-e1b947ed4c29@kernel.dk>
-Date: Tue, 21 Apr 2026 12:04:05 -0600
+        d=1e100.net; s=20251104; t=1776794889; x=1777399689;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KsgX9m6C8CxQkQ37nZ4Tnr3XLVgFk8OeqKDAsOzJgs4=;
+        b=SS+ZhJikXRaD6BbKgl58T8SEidOIPFd2dnS0WR+XOA61Ncr2JlPLbIjvJn3kliytqj
+         njFqdf5vC+IoU9sQC62wZl1dEVRpRBvMIyB9LOLcVhLDUganPyDCrM6zgns5q+ZWgoTa
+         3JgPcQuwXSI7KxoXHSvQp4EQ5IsFyPIDlcodlMGciKdSWf3/DboGB2UOAEcU/599v9CG
+         xmciZ3NUJPBjd/ZpTqGmb+HyxCDdhntzoz/uCDwjA+IImiUHtCWta9ttHDcwiZSpqs29
+         CSc/dwC04VLXKt2Yu9yfhgf0PrkbhrDVV5ps9h6TfXQM2R0BwlpMtJwoGxgc/TcORByt
+         R4Tw==
+X-Forwarded-Encrypted: i=1; AFNElJ/oW4ZgqDX1xeerLvjlWwLHa3okSEnI5I0jxQEZb8wwW+zMetKtdB6dPZU/yHoxAtM5LoHif0SMiyWvww==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqL7fGddBh4TzimKgBZvg38ngYdOUTRNWNqxq7usUkEM77thRg
+	yNYOKnMRetDz7gwtfdDsiGws81pfqvHympB6DVHTJZFuSxBr/f10xfBG4aXI7HNfSH+P7NGFr/m
+	LEqm8FMyfCk68PCjD9mqnwSkKlhbT4OQ=
+X-Gm-Gg: AeBDieube0Y3iTBcZs1NnmDJu8AW1qwFBZ+vs9veIx5xylLzLS2cS1ZCQSAqxsTo/C9
+	7yCbJoCIO5FC0HJcAzBrifnlNQFp+cunlBXTjBT2yOo9W2zGYnDx6WhTGuhf4EdYNTBk7l/h5Hy
+	lxBndgTIXapCApzPQoVtaHneXBGPcDn0X+b43W4LYTrM08Mam10DhPpdVFjdHQDZwVCL0DVmhbI
+	JG3f/ben8PVa/ork5JM60RFNKEavWhrLsGQB/twb76Dknq++rczrtcUmFH05EZHkW1NB98r3KCD
+	Hl9B1n6KaMnOf63w9254ti5kbOpnIkHgLajp6LK0FmX5vWzM7IiDUXX3vZl2WGMnTtpkTzWgFyq
+	a
+X-Received: by 2002:a5d:4b81:0:b0:43f:e721:76ca with SMTP id
+ ffacd0b85a97d-43fe7217864mr16856624f8f.45.1776794888852; Tue, 21 Apr 2026
+ 11:08:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: RCU warning off ublk_buf_cleanup() -> mas_for_each()
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: io-uring <io-uring@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "Liam R. Howlett" <liam.howlett@oracle.com>
-References: <0349d72d-dff8-4f9f-b448-919fa5ae96da@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <0349d72d-dff8-4f9f-b448-919fa5ae96da@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20260421121616.3298845-1-haowenchao@xiaomi.com>
+ <CAKEwX=M5YpR0cQrryX_y4pm_BuxyUWZ_8MbhWodwbf1Fe=gzew@mail.gmail.com> <CAMgjq7Ae_VH6mLQito5MFnxmp7ScZvF9xw4P-yU-yUBkPZ9_YQ@mail.gmail.com>
+In-Reply-To: <CAMgjq7Ae_VH6mLQito5MFnxmp7ScZvF9xw4P-yU-yUBkPZ9_YQ@mail.gmail.com>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Tue, 21 Apr 2026 11:07:56 -0700
+X-Gm-Features: AQROBzDE8Aq5HdmW60NHS0U7vvLQGFi9pUSjLXorhoU341mxwA5GKtAt9XQb5K0
+Message-ID: <CAKEwX=PkFiP+u+ThrzjTKBi+usQf2uuhTZcfB2BNNA8RboOFDQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/4] mm/zsmalloc: reduce zs_free() latency on swap
+ release path
+To: Kairui Song <ryncsn@gmail.com>
+Cc: Wenchao Hao <haowenchao22@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Yosry Ahmed <yosry@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	Barry Song <baohua@kernel.org>, Xueyuan Chen <xueyuan.chen21@gmail.com>, 
+	Wenchao Hao <haowenchao@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/21/26 11:47 AM, Jens Axboe wrote:
-> Hi Ming,
-> 
-> Ran into the below running tests on the current tree:
-> 
-> =============================
-> WARNING: suspicious RCU usage
-> 7.0.0+ #16 Tainted: G                 N 
-> -----------------------------
-> lib/maple_tree.c:759 suspicious rcu_dereference_check() usage!
+On Tue, Apr 21, 2026 at 10:18=E2=80=AFAM Kairui Song <ryncsn@gmail.com> wro=
+te:
+>
+> On Tue, Apr 21, 2026 at 11:55=E2=80=AFPM Nhat Pham <nphamcs@gmail.com> wr=
+ote:
+> >
+>
+> Thanks for adding me to the Cc list :), Barry started this idea with
+> ZRAM, which looks very interesting to me.
+>
+> > On Tue, Apr 21, 2026 at 5:16=E2=80=AFAM Wenchao Hao <haowenchao22@gmail=
+.com> wrote:
+> > >
+> > > Swap freeing can be expensive when unmapping a VMA containing
+> > > many swap entries. This has been reported to significantly
+> > > delay memory reclamation during Android's low-memory killing,
+> > > especially when multiple processes are terminated to free
+> > > memory, with slot_free() accounting for more than 80% of
+> > > the total cost of freeing swap entries.
+> > >
+> > > Two earlier attempts by Lei and Zhiguo added a new thread in the mm c=
+ore
+> > > to asynchronously collect and free swap entries [1][2], but the
+> > > design itself is fairly complex.
+> > >
+> > > When anon folios and swap entries are mixed within a
+> > > process, reclaiming anon folios from killed processes
+> > > helps return memory to the system as quickly as possible,
+> > > so that newly launched applications can satisfy their
+> > > memory demands. It is not ideal for swap freeing to block
+> > > anon folio freeing. On the other hand, swap freeing can
+> > > still return memory to the system, although at a slower
+> > > rate due to memory compression.
+> >
+> > Is this correct? I don't think we do decompression in
+> > zswap_invalidate() path. We do decompression in zswap_load(), but as a
+> > separate step from zswap_invalidate().
+>
+> It's not about decompression. I think what Wenchao means here is that:
+> freeing the swap entry also releases the backing compression data, but
+> compared to freeing an actual folio (which bring back a free folio to
+> reduce memory pressure), you may need to free a lot of swap entries to
+> free one whole folio, because the compressed data could be much
+> smaller than folio and with fragmentation. And swap entry freeing is
+> still not fast enough to be ignored.
 
-FWIW, here's what claude spits out on the maple tree usage for
-ublk. Simply passing it on...
+Ah I see yeah. That's the not "as much bang-for-your-buck" as folio
+freeing category. I agree on this point.
 
-  Issue 1: ublk_buf_cleanup — missing RCU/lock for mas_for_each (line 5489)          
-                                                                                     
-  ublk_buf_cleanup iterates the tree using mas_for_each without holding either       
-  rcu_read_lock or mas_lock. The mas_find() documentation explicitly states: "Must   
-  hold rcu_read_lock or the write lock." Internally, mas_find → mas_next_slot →      
-  mt_slot → rcu_dereference_check(slots[offset], mt_locked(mt)). With neither RCU nor
-   the tree lock held, this will fire a lockdep splat on CONFIG_PROVE_RCU=y kernels. 
+>
+> >
+> > zswap/zsmalloc entry freeing is decoupled from decompression. For
+> > example, on process teardown, we free the zsmalloc memory but never
+> > decompress (if we do then it's a bug to be fixed lol, but I doubt it).
+> >
+> > Zsmalloc freeing might not be worth as much bang-for-your-buck wise
+> > compared to anon folio freeing, but if it's "expensive", then I think
+> > that points to a different root-cause: zsmalloc's poor scalability in
+> > the free path.
+>
+> That's a very nice insight. I had an idea previously that can we have
+> something like a zs free bulk? Freeing handles one by one does seem
+> expensive.
+> https://lore.kernel.org/linux-mm/adt3Q_SRToF6fb3W@KASONG-MC4/
+>
+> It might be tricky to do so though.
+>
+> It will be best if we can speed up everything, doing things async
+> doesn't reduce the total amount of work, and might cause more trouble
+> like worker overhead or delayed freeing causing more memory pressure,
+> if the workqueue didn't run in time. Or maybe a process is almost
+> completely swapped out, then this won't help at all.
+>
+> I'm not against the async idea, they might combine well.
 
-  While functionally safe (exclusive access during device release), the API contract 
-  is violated. Fix: wrap the iteration in rcu_read_lock/unlock, or use
-  mas_lock/unlock.                                                                   
-                                                            
-  Issue 2: __ublk_ctrl_unreg_buf — unpin_user_pages under spinlock (line 5431-5455)  
-  
-  This function holds mas_lock (a spinlock — atomic context) while unpinning         
-  potentially many pages in a loop. For a large registered buffer with many disjoint
-  PFN ranges, this holds the spinlock for an extended period. unpin_user_pages →     
-  gup_put_folio → folio_put could also grab additional locks if the folio's refcount
-  drops to zero.
+Completely agree! I was thinking about batching the free operations
+for zsmalloc. Right now seems like even if we have a contiguous range
+of swap slots to be freed, we call one
+zram_slot_free_notify/zswap_invalidate at a time, which then call
+zs_free one at a time? I wonder if there's any batching opportunity
+here. Might be complicated with the pool lock and class lock dance in
+zs_free() though :)
 
-  A cleaner pattern would be to collect entries, drop mas_lock, then unpin. Compare  
-  with ublk_buf_cleanup which does the same unpinning work outside any lock — the
-  asymmetry is notable.                                                              
-                                                            
-  Issue 3: ublk_buf_cleanup — kfree without mas_erase (line 5504)                    
-   
-  The cleanup function does kfree(range) during iteration without first calling      
-  mas_erase(). This leaves dangling pointers in the tree nodes until mtree_destroy is
-   called on line 5506. Not a bug (no concurrent access, mtree_destroy doesn't       
-  dereference stored entries), but it's inconsistent with ublk_buf_erase_ranges and
-  __ublk_ctrl_unreg_buf which both properly erase before freeing.
+And yeah the async stuff is orthogonal too.
 
+>
+> >
+> > I've stared at this code path for a bit, because my other patch series
+> > (vswap - see [1]) was reported to display regression on the free path
+> > on the usemem benchmark. And one of the issues was the contention
+> > between compaction (both systemwide compaction, i.e zs_page_migrate,
+> > and zsmalloc's internal compaction, but mostly the former).:
+> >
+> > * zs_free read-acquires pool->lock, and compaction write-acquires the
+> > same lock. So the compaction thread will make all zs free-ers wait for
+> > it. I saw this read lock delay when I perfed the free step of usemem.
+> >
+> > * If this lock has fair queue-ing semantics (I have not checked), then
+> > if there a compaction is behind a bunch of zs_free in the queue, then
+> > all the subsequent zs_free's ers are blocked :)
+> >
+> > * I'm also curious about cache-friendliness of this rwlock, bouncing
+> > across CPUs, if you have multiple processes being torn down
+> > concurrently.
+>
+> That's interesting, when I mentioned zs free bulk I was thinking that,
+> if we have a percpu queue, at least we may try read lock that on every
+> enqueue, free the whole queue if successful, then release the lock.
+> I'm sure there are more ways to optimize that, just a random idea :)
 
--- 
-Jens Axboe
+Yep! Would be nice to have some perf trace to pinpoint where the overhead i=
+s.
 
+On my end, I perfed the free phase of usemem. It varies a bit based on
+exact build config, kernel version, or even between runs, but the
+cheapest I've seen for the pool lock contention overhead is about 3%
+of the free phase (this is on baseline, not vswap kernel). That's
+pretty big (bigger than vswap overhead even on the kernels with vswap,
+which is kinda silly). Obviously the host was very overcommitted, so
+compaction was running in the background at the same time, but
+still...
