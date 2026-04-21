@@ -1,96 +1,95 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82B537C937;
-	Tue, 21 Apr 2026 06:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B122772D;
+	Tue, 21 Apr 2026 06:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776751542; cv=fail; b=KsejoGjy2JppCJfSc5YgxrzbyTf9sJRPv7mj6kwLW2na4y8fikzO4Z2UrofcsW1z4H+uJDCPhkHTkZL9vOT14KligvU2P2MAMIdSy+PJsH1o8hlH5b221BVOAXTbqoetS3lh55JFNW5q81vXg1pLQFHY1i8+yMsjnHy+7CJk3jc=
+	t=1776752378; cv=fail; b=qYhidB/7sVY5NKhp2P1dKYG3QCIbvnJxczmM/Y0Pkx11F1lnpbwVa5zcf+H7Q/ErTD2xNBP17nF7BM0zz1DXrYfTnQ9mQR5XWBMwy2fiFhOeOZOA7DlAC7qsy0ZpoCqR2Zyb9ovn26I/REPJqF+BLwdjIqewrFopqF1kzAJTKrc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776751542; c=relaxed/simple;
-	bh=kWPjzstAI4bPw/9R34UKip5Jt2rLjJD2+4fF4CIp/TE=;
+	s=arc-20240116; t=1776752378; c=relaxed/simple;
+	bh=0JHeLH+ASxR1DEb5ncGUCI71ez8nNbqmHmX9VKss+10=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=H+H3LRGrzOo/xtvOJZn6Fmo08yTXUjjplKFhMwxr8s80SZ3RsyB9pCw/ioa+RWO0YDxhFmNGT88f9fwq7xUPHN7DpIf1knGCijhK8aLKvYDCmbdvtHNw7SRs454QrAVALKH4YoU5BnrhJvxjYXATqjCJcCiM3clg5FjaPcycpNI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=PRlTWf+c; dkim=fail (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=IFU+O4bf reason="signature verification failed"; arc=fail smtp.client-ip=68.232.141.245
+	 Content-Disposition:In-Reply-To:MIME-Version; b=HusHutrmG99DcLvEin3Wk8FO1jH3lca295GgfYtnJSpoBpKa8VmcrYJDN83BR8GXLOZvfHyqXWTQSNEIU3Z89ktGKr+mE2uBHqCwbsTbx8NumIbhUNhkkDycsG0PIQj6KIjBkI1H30rquF5RQZtXdOLiRM/SVu1IxkQZgYIzLLw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Rw0cSEPD; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=ffxVspYf; arc=fail smtp.client-ip=216.71.153.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PRlTWf+c";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="IFU+O4bf"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Rw0cSEPD";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ffxVspYf"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1776751539; x=1808287539;
+  t=1776752375; x=1808288375;
   h=date:from:to:cc:subject:message-id:references:
    content-transfer-encoding:in-reply-to:mime-version;
-  bh=kWPjzstAI4bPw/9R34UKip5Jt2rLjJD2+4fF4CIp/TE=;
-  b=PRlTWf+c2omz1QyJdSgsF5mrix6TqluxrIyJYOpCBl5BBRXeX5PCHD5Y
-   a103JYFtLH7+4VB2tW28GAxxQqlmoWSuiPyQATubuW63ZUcfEV3Wsfp1Q
-   lhNhidlNAV4DsFyHbRAiQ0Q9rw9yoiqi0YgUR+8Yvdl/hOsc4nyH7C8kw
-   WC8S9IoUn2dBQjQrMK9QyCofzy6VBrI4cBJfsvHBt6mOPM3CKf8/ft/4U
-   7g2YEeBZ0OZQ390UXDsbdLTgzLdJ3hWxGOwrL7X2WXam24OKAsiVBS+Hx
-   sticVfhskS7q5NW6NWI2y/7Fh2YfB6OApsQvyRGk8GgC95AAQrf1p2zQ0
-   A==;
-X-CSE-ConnectionGUID: tt7lwlYpQnSZT3gB89y6Hg==
-X-CSE-MsgGUID: sndHZEedSPKmGzpvx87soA==
+  bh=0JHeLH+ASxR1DEb5ncGUCI71ez8nNbqmHmX9VKss+10=;
+  b=Rw0cSEPDiKRK7hupXXrkeDJG9GEFIr8E3tN2E6F5FmOd1gSXbHPEFnr0
+   U9k4Xr9Nj0zQCuQiRbrmQd6xDS+ZfaXnZ1k6LrALcnzevY09E2F+GhTHP
+   WBeiuULY0dJOrGSL6Buw21hSqk6aIE9fasnhzurXdox3Ic9MPzYkRNVa/
+   XGq407hvfiI++ezk8noTAiyBOxUSkTM3SCBpRqb0FSWKVRAWpcw+Dr4Zz
+   fG0/Joc/4+OsjrB7ejXgLMvvCSItQ/8QpEBSBhDb+PlDxv/vLItkNbsWw
+   F88lEglmzdguNi8p4JqbpBs+gi+kEvUpc9HASwFj3ijdyfb8L9WiG1Ir3
+   g==;
+X-CSE-ConnectionGUID: 3kVdtP63RkypaQqlmsOStw==
+X-CSE-MsgGUID: Gvp/sku7RrqA9aCy5XdIHg==
 X-IronPort-AV: E=Sophos;i="6.23,191,1770566400"; 
-   d="scan'208,223";a="144907763"
-Received: from mail-eastus2azon11010016.outbound.protection.outlook.com (HELO BN1PR04CU002.outbound.protection.outlook.com) ([52.101.56.16])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Apr 2026 14:05:30 +0800
+   d="scan'208";a="145350666"
+Received: from mail-westus3azon11012011.outbound.protection.outlook.com (HELO PH8PR06CU001.outbound.protection.outlook.com) ([40.107.209.11])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Apr 2026 14:19:27 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wND4iok6PuSA9bdO3Z6N6X8RubHs0pIjdxyJ1YdTKmYSEBicscI0adeBW6QMajNaSqIGFHLmx39zgo1aGjkoWdS/5lYUkPeP44DKR3GT4EdynT/vi1M/NXjlJ6s6qgfSfPQ3JT/CoHcBBkAtLdCPckvcBUcthiHlmmgbYzvNeMBKWwOOyMRfZNxPK+3TqUsX8dBJQojKZkczuwWTP80VM9sYWZdQAX5Mx7gjXIXGEgk6E1Da3Wo19DWYd5eYsZtx33XKolLIbNdhAcvl5F9Uie5Ar2XjxSrQHTr5HpijEwn1BFEZvBcVGHE+cUlChYEE/tBJjCFIhEG6jm/62T2kiw==
+ b=M2Sd/N9qfVtEP1j7mxM2rycA7Ylp5KFElxlGt+HUnaxm8Xhrm5cco9ZNak7U/PlSXiPKNsrDb6GrjAhiCMROJcC4iiprix17rMlhjUGaF/q4F2O/j8WgckFX1uICwoh7GCoImvfytbTEhud9l8Dpb5yZUuDySeSFUU9lqbACdTvBhbCfKeNYSrEAFim7iC6xx+R9uDfYm5lTW8j8D9RKa9kr+/9E6Tcze9lwgw5onVI1pQfKJG8/TpF1L321zux0ogPxNztZdYAN3d3YJom0wiQpEd5Wfchhkajk7mmf0sn2jOcxnDTj2WKWs6WRAfqNPUx48A6z85/Ixn/5ypgDMw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jTfeZxNELQrvs3c6R2dsW9ntHap60Oq7+50mdxRo/Hg=;
- b=No+9l4lMuXrzzypBmhxugDYvKI3w/3EBr9Yk1txCvam0WQuACglShuZi9M8KjRMxNjUYXwPT5CVX0EKUWhfOdQ8yzpvqhY3/nBY+4opPGDZcaEfhFPf2cDUNXfxzprkCHxUIUcWBYuTW0nHkrx45JNr85E8lVFY+CJIU1cJumabHJli9TsJBH0aKwWW79KcC3P8eSVWouThPqh6jbjHnrbmrdbw3UNPz39h1X/jV7OYSiss2WkpM0sILC+0hP03BOjSbmbwKEQdr04jof3de742fVHQyNoZjS08Wx/mj/9GPIdhgAro/F4lhQleIJB1P0ViMWepgCXgJFin4pwGgKg==
+ bh=A7xRne7pOz/7VS7n2Ox6uw7bTByXCX90HjIcYrnlwWg=;
+ b=cz51VdjtMCAgKm3G8K84oeqwJDbG5IcEhQoIlJm2/PcTwh6xK/zZ2IEVrO7B5d5a70nZzT3EnmrdefRRD85SbEyUsBtCdtVbI7v7A5ai3dpREaOQjhhTG4uQI4oBfydOY+sDHO4m9mEu3+whQqNNxQkiea4UVm/FgmgKLZAxn0j8WRq/kn/w/sH2uctlAmnhfcLn/iLKqnhy5s6Qi/a/cpU8WYoeDXdG/ZhK58ufDuk69L8KrDFRCJuYslyQaXruo9faoEBbzD0XUM5fX0SyhOIB5U0gA0lrGESvrxwP3Ku+qHSi8BA82eXPXwrqKdyoB6bfmHqSkIX+q4Il9mZGyA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jTfeZxNELQrvs3c6R2dsW9ntHap60Oq7+50mdxRo/Hg=;
- b=IFU+O4bfsr5RX1wI3VSBADoNTjhugyaFN/cbRwS+egik0ZeK2GeKGLS/lfzavQ12RintHwNsGO4JNCMVUgPnR5aKnA4AZJarjVs2js0d79msfjcC8l2wR6XPJqjz8Ocyrd1NJmcHpiq82+GMyNBLUNBJFhGDFj82Dnah9WPRb3w=
+ bh=A7xRne7pOz/7VS7n2Ox6uw7bTByXCX90HjIcYrnlwWg=;
+ b=ffxVspYfWkbF4IQfFZd4m5PG1TK/592ut3ViQuZS7kJ/m2kgFwHG0uzLe04qZG+7l20hPJMY7Mw/bGdOaV3QQv0vkNwX40qVyUtPu0K5MToRoQGZbnyM10UcEGc6vacD9P0CbJv7am8GGyI/j/jqmH+IVmQj3mrDZhHG70IxT0A=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by CH2PR04MB6981.namprd04.prod.outlook.com (2603:10b6:610:a0::19) with
+ by LV3PR04MB9465.namprd04.prod.outlook.com (2603:10b6:408:285::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.16; Tue, 21 Apr
- 2026 06:05:27 +0000
+ 2026 06:19:27 +0000
 Received: from SN7PR04MB8532.namprd04.prod.outlook.com
  ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
  ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9818.033; Tue, 21 Apr 2026
- 06:05:27 +0000
-Date: Tue, 21 Apr 2026 15:05:18 +0900
+ 06:19:25 +0000
+Date: Tue, 21 Apr 2026 15:19:12 +0900
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc: Haris Iqbal <haris.iqbal@ionos.com>, Daniel Wagner <dwagner@suse.de>, 
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Daniel Wagner <dwagner@suse.de>, 
 	Chaitanya Kulkarni <chaitanyak@nvidia.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
 	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
 	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
 	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, Bart Van Assche <bvanassche@acm.org>, 
 	Hannes Reinecke <hare@suse.de>, hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
 	"sagi@grimberg.me" <sagi@grimberg.me>, "tytso@mit.edu" <tytso@mit.edu>, 
-	Christian Brauner <brauner@kernel.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>, 
-	"willy@infradead.org" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
-	"amir73il@gmail.com" <amir73il@gmail.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	Damien Le Moal <dlemoal@kernel.org>
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, Christian Brauner <brauner@kernel.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>, "willy@infradead.org" <willy@infradead.org>, 
+	Jan Kara <jack@suse.cz>, "amir73il@gmail.com" <amir73il@gmail.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, Damien Le Moal <dlemoal@kernel.org>
 Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
  expansion plan for the storage stack test framework
-Message-ID: <aecQorgpAE9nGcJa@shinmob>
+Message-ID: <aecTw6IYs1fo26EX@shinmob>
 References: <31a2a4c2-8c33-429a-a2b1-e1f3a0e90d72@nvidia.com>
  <459953fa-5330-4eb1-a1b4-7683b04e3d45@flourine.local>
  <aY77ogf5nATlJUg_@shinmob>
- <CAJpMwyis1iZB2dQMC4VC8stVhRhOg0mfauCWQd_Nv8Ojb+X-Yw@mail.gmail.com>
- <ae47ef06-3f66-4aab-b4ab-f3ae2b634f87@wdc.com>
-Content-Type: multipart/mixed; boundary="h373hom54itlhfgm"
+ <901f4daf-3226-416f-8741-dd15573e736b@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ae47ef06-3f66-4aab-b4ab-f3ae2b634f87@wdc.com>
-X-ClientProxiedBy: TYCP286CA0205.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:385::9) To SN7PR04MB8532.namprd04.prod.outlook.com
+In-Reply-To: <901f4daf-3226-416f-8741-dd15573e736b@linux.ibm.com>
+X-ClientProxiedBy: TYCPR01CA0155.jpnprd01.prod.outlook.com
+ (2603:1096:400:2b1::17) To SN7PR04MB8532.namprd04.prod.outlook.com
  (2603:10b6:806:350::6)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -99,260 +98,148 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR04MB8532:EE_|CH2PR04MB6981:EE_
-X-MS-Office365-Filtering-Correlation-Id: 452fc71e-7312-4540-5498-08de9f6bfbdc
+X-MS-TrafficTypeDiagnostic: SN7PR04MB8532:EE_|LV3PR04MB9465:EE_
+X-MS-Office365-Filtering-Correlation-Id: 30972d5c-c00c-43bd-6e9f-08de9f6deda8
 WDCIPOUTBOUND: EOP-TRUE
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|19092799006|366016|6049299003|4053099003|22082099003|18002099003|56012099003;
+	BCL:0;ARA:13230040|1800799024|366016|376014|19092799006|7416014|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	OmH5cS0eJ5Tt2Du4Isyvxv2ynXDVbCV+wNEgbWHdRD18rbDx/An9Zs3ESqPYcV2mLOPy+Z+e+FIZTgUxhTuWMI07jaG5B577OKCbJR7QxfZyOSr6OP7/JuYRGfRJRujFYZlxxsk1FaVJaz8SGVkqXFGSMhciJybY6DBhFgzm3aAK0AdeG4uh5QJuHuO9/172z3z5bZ8k5SSeEZsJyXwaRBLet+6XoM03rKcXniKMFuu5RHFT2xFYbt134RqVsrkJavi+JDwq+jePXdMe4luKunTth3CweV+aRexYXKfOXan4dfnc+q09cLpVOqOvKEsf+7uAAiSCDYWezeX8oNUFqaWJnpRn5QeL+FphsS701EW2QqHTWwr/jSdW25Sbnn0YvWU6OQAgPWCfEhIIRySxjFcZv44EDiICxuFNCEU9l/g6dK6safJIcva5RCSvPIQMmFRI4WycWGTTHwALf1n4GCLZ3vR3Clnbcoge8X2EKlPi+ad5tWR0DoDOBskk7dV8nL+hwCVhVxfyBihBleLKTwj3XGQff1GfrwIbd+6YkoCjrAmuyDTZcry90K3JfbzYTm+2H4hCjP55fOKrBewRQuI1+Vy1ds48F5+2r/qTopNPt0dGxn+1aZS97EKZPzt8dfDXZ+hpbtz71Kq53IplOxdmTVCgX1meMXoezGTrQY27jgu+DECH1c6ZfNrPB/1kFBXWPk/9VN4sThdkGX/8zFeLN4f0jT2lwHt1LFjPXLA=
+	rhDD9fJHCAwjVB8nr2Y2IPd1Jc3Zdq91vdcvlKVj2aq2nykyh4vsSr2e1LesIL1z1aJp+dZFQRKjj/Q0j8jY/Hk7T7c8C2/re8D3WlzRa90hKwqDQpUFpA+ULoyro3JXInSFHNs3RFaRQqVB8jRJ5LxLGfr3AT9XKpFHtIOhUSUspMo+L98Ow8LbPaU/kjkFzCeuDWQZdLZvaUCYOWi8uPCbspJfoSXFQcr2FPGNx3DmQbqPjt5g0Z9hYNeB0/jCy1T00DEOIl6e/AnfR6P+POu500dnJoVfdokWY3YqXiaGdpDWgY/3pRoTqzIbXnRtWIVN5Ql20whc5oDtyDuajBQ4S2SBHejwoSX5xImjltTgk2Xg81Sb3jb+i5Xcis5HaFwPOvtak9wL00CPPAU6iVpZ6pACurZoiEzO7J5WqfPgNCmtFGrWTe9o+bX899QCqAhDYfgnzLuiMXfMJ/Vb5tn1zPtka+lW1PQdmz5ekuxez4FWvmdihPytX0GvffyBjwtpLaPSfONrw475nYgElZdMsrhVEOqWGI3O6k+J4JxF5f/4J578sh39ZX+iBynNCie0P/jiIqAt9j+yI9Ns6zd92Pn83AgExIfe69tsOROOW9uQMIcbJCpYVQmt23v0XSOIyWaSdIV0vIv8hEOenhGU9JgZbqWo5+t2F7N44KkEYAw0XWXrDi8c9LPAfsrs5AZ3izE+PFZ6OIimQrnf4ER+TpdFqD/pSk7MEdZMjq/vNsMjDMKkRKlEd4hUYkEj
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(19092799006)(366016)(6049299003)(4053099003)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(19092799006)(7416014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?kIERulUMOc/ErWdusRcBLh2EKNwU6k+6/6/hxBjnMaeYnWl2iG+KcXGIbD?=
- =?iso-8859-1?Q?H58D+VVa/NsuCdzjMeS3WN6a81ak2SdJrxhTGc4wHe6JvKXu7cp7dw4BTX?=
- =?iso-8859-1?Q?/9HNFZ5RQYw+6PNt87+K85wSM14P6RXLyJHVfMAzaJrbw2TPk2Z/e6ncpZ?=
- =?iso-8859-1?Q?jN3mLFOfihMJTg/Sa4W9O0BuJRVP76dzFkmAm9I5Ze9J9Oencq25CApxRK?=
- =?iso-8859-1?Q?WmIEWjs64TC7RP6pwzKTcqhOQBAQwvCQbo1bhqcmFmpyHdxKu8qA2/YQm0?=
- =?iso-8859-1?Q?BYg/OeOTpxrifaFto3ksTwtkin0ZXklZTijGtLT/Zj4WkYcqVKBtDr7cSo?=
- =?iso-8859-1?Q?jGwAaPlg3p9MEbVuT1Z3CIRuq3z6mKJZVtVa5e77Z6XXo1PMPe2XLcl5NM?=
- =?iso-8859-1?Q?wWE4OLJR5/xqHrOGokq8UzjVYic+m/s4aT4l5uonlfzOugzZBDYI19ISjY?=
- =?iso-8859-1?Q?YeT3tpmKJYDh1fEZmx9mjKV4ojpQD6N030dsAxVAtUZp+CUL7U3VLgerTp?=
- =?iso-8859-1?Q?+56ZkZdKvSHTKRHuWkpF3uatSe0AWfhUIPz9gXzI9hAROd9tIuBCikAoI8?=
- =?iso-8859-1?Q?gYQbgZFM6j6+kdjzRxO0jc+lhfLoMdcqY1APYRBNIW7fc0l/s/2d+8rMjB?=
- =?iso-8859-1?Q?MesSOsmcLXDw5oI+TRk1efG3g3l1owJQsGWKF/4VeRjS+dS4ikigPmsCJm?=
- =?iso-8859-1?Q?7OayeqCWXKfETyQROBSEfHPhRtvGFsCmdN7jhNWY6AKmkV0I+/tbtrsIOf?=
- =?iso-8859-1?Q?PAdyqI4OPtQxa7iUd7a9FLfev9PqLzAYSi55KtsxV0GTXUIPpnFvAzMFIv?=
- =?iso-8859-1?Q?k5y2cJyT5V+UF26hv0yGZkMQv0SGUJxFEGj5t7e1JRNA0CAaRRI0/ZAE8a?=
- =?iso-8859-1?Q?rvXMBuv95R5PhUQmkTJJ6EkPNC/ZyaXwTiq+IukSJu0ckMDILnFlmrmjF0?=
- =?iso-8859-1?Q?VeOoBBtdKvzE0G7ElX21DDS66EzmTUUA8eTNAiDJ7s0N90Ac+NfBCx4D7J?=
- =?iso-8859-1?Q?3mWYyK9YoUAJGBy8KBKN2Gd+h/WjmRlMavtHA/ORnmttc1UWtENfd4i4FX?=
- =?iso-8859-1?Q?M/SRO3n5iaSz7Kak//b1d+XKc34Qi/3eyG+pkt/YG5ZyTWfMgwxMDZfUwZ?=
- =?iso-8859-1?Q?rH7PPn6ni1IZoMRcsBdJBVXsjYeJI1jijoD4sfE3gjsC1yIm2tMbITehoU?=
- =?iso-8859-1?Q?GpcyB4LsVLQatS02EH8KTMnHhdpDyDRjx1kMHj5VJxHkSK8u8OoZmdL5Xm?=
- =?iso-8859-1?Q?dXM1Hzd3qCc4oNd3yvFr1qNVie28kjoU9rpswPgNCXXh1Y/rQ+vGSHJg3D?=
- =?iso-8859-1?Q?LTPOp6z509PtMbC7rodULovlvNhFOdAzn8uSPWfb4rRWQo65vZcsfhpReX?=
- =?iso-8859-1?Q?hRA0cgaMoI/PqhGojnTXYO/YHCywvgwnWGHYM1oh9a2iuksL1NttIfjn6m?=
- =?iso-8859-1?Q?kPMEnZM1SW/ajEAdY29XRNSl1NTCj1R4iKm8RMlrgA01gCcylNFP4T5spT?=
- =?iso-8859-1?Q?Q6ea3MtkAQdBbhyGrYrDtoeQAJ6SepT+gFbfePLxJrvUSk0dnOHpOo9lGZ?=
- =?iso-8859-1?Q?hnNjKn7p9GiTnj4xNOxyXSrhKTuZ5EYAORjCRQmTP+CDpXjed1UCF/I6vG?=
- =?iso-8859-1?Q?qeU3zapHd+T45uKG4dGr+0mAxj4Bb+38pSTI3gMJc2IfR/x93zYu1TB9EB?=
- =?iso-8859-1?Q?wzZg502c1S3snEC6LMS2IiXvMUG6GdAmPXtWreiqs6oKuerXbL8iZgzwXb?=
- =?iso-8859-1?Q?BiW+6y2rBvllk5ePwwMGCt/42aX2cocncBe5sCAdalcQrQqQrpAqVdkUe8?=
- =?iso-8859-1?Q?dqQpTKbLrUy77IG8Arw1phnSr5/v1wo=3D?=
+	=?utf-8?B?KzV6QmQ2cjNZQ2VnWEwrL2ZIQStTQmV4LzdnU1Q3SzhRNUhkc3BJSHAzUEc1?=
+ =?utf-8?B?Y0VaK05xYXFDeVQxSUwzcVJncUJFZWZCKzFsYytwaHhka01wTFJENmRDYVVX?=
+ =?utf-8?B?a0RwRTJzT1FUZE5yZkxGWUFmNVR1cXJlWW9OVXZ4VHIrTG1ZdmN5d2lHVjU5?=
+ =?utf-8?B?Mk1TMXVZZGRDNkVmRWNNTHBMU1BxWGJPak8wQmFSRnBING0wdE91WmpOelFp?=
+ =?utf-8?B?RGVHS0duakJ1NWpLS09mRjV6ZktuYlhhWG96UnA3K0FoWUxaN1U3NGNacGEv?=
+ =?utf-8?B?YldlakVFbm5VaWR3UXduaUl5KzZ4aktUS1k0OEtWdzMvdzZranViR1htZGxD?=
+ =?utf-8?B?TDJUUnBYZHJVK08vcUhESEgycTJuQS9CTkIyQTlaRXlIS2RPOFNSZDlWZmdq?=
+ =?utf-8?B?NEN1NzkyRHZKSGpBSXlIUUdLMzNBMXdUcnJVa015a2hBNG5xZ2hwRlNuYW9U?=
+ =?utf-8?B?RUw4M08zOVhlU1RudTNCSlcyVmtnTXZvTjF4d0xCdloweUQ2TVNmeVdlNHpn?=
+ =?utf-8?B?MERmVER6Vk93TEdRM1YvZ3d2K2NaTVE1NFBQbXUxQnJwN3NQTXVPZzdGSUZp?=
+ =?utf-8?B?OEJ1cGhUYm5Sc1A0algyRjJncXd6QWlCNVRHRlBMcTdJbzVYcC8xZ0VDYTF4?=
+ =?utf-8?B?VklKVnlhNmVITlpDR01naVR3Z2VxeGs0OXRCaG5WVllqaEZrQ1JLSWFoRWhD?=
+ =?utf-8?B?L2JVR1luMzJrSkJ4aDgxL0FRdVVMU0IwRzVtZEZBZTF0KzJFcFBDalZ6WE1P?=
+ =?utf-8?B?TnNlUE1JZlhGYjNKVCtFNmh1MXVpeXdPSDREdkZxT0k3NkJkMWhDYWxqbWM4?=
+ =?utf-8?B?OVJOaVJMK1hSbkFOQkJ4d1VaU2V2NVVxRElIRmZZOFVSaEd5Nit5VElWZjhP?=
+ =?utf-8?B?TENQZnp6YnRmaVgvenpjNGpjQnh0dEQ2b3BZYmhheWZwZG5Ld3F0T25WSjlX?=
+ =?utf-8?B?TXJkM2VLTE9EWGM0MDJGN1VVdUZhTDJCTGR4aFEwZ1FiOUtaWjM5L2hyOVFM?=
+ =?utf-8?B?TzBTUXY2M1B4WlB6M3dpaTZjSWRDQUlKbFVZOUo4TXEwWGhDUVp3VEhRYWRD?=
+ =?utf-8?B?M2lISjZrSmcvTXAxZ2w0SmVkSzltbFZVblZLMkxTZE9FNW1ScHFxRHFGTUNK?=
+ =?utf-8?B?RUY4UzVhL1dtVCtNTmpCZWlxU0dtQm5rTE5DbHo5eTJqaTFNQUVXRmh3Wjgz?=
+ =?utf-8?B?eUROVU9uVU85NEY4aWdOWlFzYmdJT2FHMktGN3Exd2p5cWxyNWt5bG9IcUlT?=
+ =?utf-8?B?WExnMHNXbDd2T0pZaHZJWTBRSGw5S25ST0lNVm8zOW5kRGtDbTRjV05neUw5?=
+ =?utf-8?B?OEFUQ1pNUnR0czE5b2VnOGlhMDZqcWtHL3hPZnJlRXlQZWtDa3FjWlFWQVla?=
+ =?utf-8?B?REg2aHVjbS9BMW5oNW1qSlEyeEVseDE3TFhsQmlveU43My9MTXRnTUlxa2Ni?=
+ =?utf-8?B?M1NNbi9rQm9Ua0tVMUxOVnFiUE9pMlNqWFNSZlgrWDVtZC80YllhcHp3bkhh?=
+ =?utf-8?B?SEsrbVJ2eDRPNTdIdXhQVmhOWU9jRFRWUytyNmgreWFMbHFqa3Y4bFpEYXBN?=
+ =?utf-8?B?UFhBaTF3Z3NhVTZtb0tmNGRXbCtEclNOZnBvaVRKVFpXRjJuTGtBd2ZYVzhi?=
+ =?utf-8?B?eWNhalFONXhtUlorN3BBQjVBOTl3NmlvTDdvR3ZsY3kvYmMwNVBDa0hqSW9s?=
+ =?utf-8?B?bXROZGZLUU5aOWRLZ2NZbmozNVI0N2pTVktuZkU5VXNxYmJnMFB2T1lndUZ0?=
+ =?utf-8?B?UEZQU2QrVmFkVlVsSVh2VkdCOVVOd1M2L2tzTU5jUktvV3NHOGNUcE5ITGhU?=
+ =?utf-8?B?NldhT2VuNFQybG9JRTJKVUxqMGNUS3VKcnZ3UjkxZU1EajNoMkFTd05iUkxK?=
+ =?utf-8?B?V3I5R0lsN2dwK1NEdnMxSmVpTjlWb1llalo0UHhSczhzNnV5MlRodGJ1QVJ0?=
+ =?utf-8?B?NVZ0TW4xbEg0SE42ckZ0SysyYzlVblJBMXBDSWh4enFTR3NzTTB1ODRjTE1T?=
+ =?utf-8?B?dUo4RUp6UkQ5RjFMdTBxbHRnQzBseUR3ck1zNnZNakJxVUJ1RmtMTVVTRFJx?=
+ =?utf-8?B?dnFodXoxekFVOC9vQnV0UyszeDVIMERmUUQzODNGRUoxZmphK3BUUk9CYUo3?=
+ =?utf-8?B?K0R3bHFFUUJBUkRtK0p4V3NWWW02ZDltODl5S3pJeXZSWSt2b0lFeWx2bVEz?=
+ =?utf-8?B?T0JlZmFyQ1dHRklIUEQ3WVhTZkxNMnZnY0dCV0FkRktXTnlWc29OTnVOYzJY?=
+ =?utf-8?B?NG5vZ1htRWlSbERXMnhHMmNjc041Nm5rbnNxSG13MllWakxXMEU3RHBBRmFu?=
+ =?utf-8?B?TUFFMnhkZWozM1dZNjk5blEreEhsb1ExbkxlRHZxWGMrS2R2aFE0czVqWFNF?=
+ =?utf-8?Q?DdrrWKoU6s1F3sEY=3D?=
 X-Exchange-RoutingPolicyChecked:
-	jtWyeCePC46AxDqxDAbdmV70m/fITf6+HeAbt+FZbPIhmDfg088ILGWME7Ap/oIYRHKJkj0NcxJUoXJnbKY1UbIbDMzxv1i0ZcE7vJkmUWuECMbFEriVjH+vLIwLiKpXTmMaGFlEraLnRVaGlBP2In0poRp7fANKpXNwYSwKVnwjo17FioHCu852f62QnzdhjUHPCHOLRTnMEqVAK/BprNTaCXHTl5F6Q3eHNpJwr0mZ0W+mPpijSlsyrGp8yxiEJHVrXdpHtXrSYd7H63I7M4jbfW6tz+21FygJ4HBINd+TNGZFhQ2+YW39VRrzE67jJjtIfXSxqIsC5ggjCqCmaQ==
+	DoB1/F68UlpW7J85GILIOOLFfwYADOF7HvSGbej9xcrTYtPCp7uTu0LpBBVMfkbw1c5QCOptUVoxwa8/9zwmmYZ5UAHHmpuKxeOFJpmZROCcTcKTcWrEn+wnkQVpXM/oBfUzOwQpQFAPD1PS/G+AzsF2ehqhP0TtVMewQOjhMyYpEsxI1L+IssGyPJg0fnwS46rbi7/o2fZMVCjLOZlnVPyfODOLFMyJsK1hCLSC3dbqN9cupJYwE3QzDuWqrNlgbhgg1ikYf8H4bAZc5qGBSg4Dd6owLu6+QBPdVAJBiH+7xnAe56lLjAZeYtu1sNAl8xC/NksRh9Fb6RFRgigvag==
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	Wq0AJEDi3KmxG17cazp0BKboKx6fU/G168tCZH1+syMgwF+V6cwRp0F4GU5sKvtjDHbNLhM8WxPBZm3stzC1WkDx6ptWLKQjbaNqaHuovZOgCjrQcZQiV3pVobct6QjZNmSIlbYuhctYwGvZBpljZLYZD+/gq4Z0396w2g2x07bq7wuUnG47IhHBtXDyhbqmpWG3uGwLsWd8YOGz5McwIqtpvc0Jr1LeqQqxus02UqcQz0iSQwhO57KtpktcwiTpPdf6Ze0quFAQ0jiRqMqzkMhlEby4UIGn6onhw3UMY8BnviEMTVmShvqx7JxfueZmaarQmkCLC7lSJwv06Zx25Nm6xkml4tVXTz8CVdV3MbYWOShf7zUC+uq6bEhFIvNbPtMK3J1EmTJA76Q2T6thqHZFsu9MeqlEyN+DP8I2EQrUQ+44uZECiTz+bq1xIvyUc9Vi/5QrnZarOAMP3TL5BfzbQJ8JEMwgV7zaXHjp+QD1cdHetwVyEX7baMqHoXqLn/7RK8DPdmdcMzuqomdvaOAvREuM2qs5koiXMvpX39HlUU6A0Bg3BqXWZ/kE7KVmNDEH9C9sHJA0crBBnmq2ab+UpFxFRfDGMq146ovv+ZCoG1a6VLdMuTaUH9O9FFj3
+	qOXDjZY9fP/zdOOpxbyEftAYyYSRzv/UM88O5IvuUxE/XwAGoU46MmDY90jvJ4iZB9UjLq/R/BypQicStAWPsk0W/Oa3NWOlZerPzQfG7J39XV9OLCcE5gl8oVDzSL+qCbuZ4I9sba+6G8gXInpFaNFYfqV0Um0NUtf1tWQ73I4x3lvBlElIlrRNzf696FPk6HtrmOwAllcguhrQqnGBgFSY/+PNUhLTy93mUZxfhpuWXmoibKytiidfjgwOmBRgBo7x+c2QoiptHtKZgPBjZDScP4bk8e6gRsHj74WuygWatHQcnoN2eTrQ1umTM+57R0c90Alunkvf34G8wJcAj1FFE6mV07JPlNVuV2jgkAV3Rx2MNFim2MS4928nFq1Z7Tkob2m0ouvVYJ6wkd6sB2BsQpsmkr5RiAj3G1nHtoi8xcq0zOVLk1MNzR20XfObS4ZzrXlQ54xgtbx0lgBRIy3rj3jYgzWP+RmU6t3Z0tmmm4wd19rHSScPXSHHCZBAxdwW31TuMeM7mR1kNeALfVGOoSN5IEdjwOjBXg8Kw6S+gZldjagBrzSsq+jVrhNX/gEgPQQgTk+Y+dfe7xA0dgZimFBwofKuohTaO7gj8YZr2Qn2GttI4oC3yzn3Uw2L
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 452fc71e-7312-4540-5498-08de9f6bfbdc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30972d5c-c00c-43bd-6e9f-08de9f6deda8
 X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2026 06:05:27.4369
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2026 06:19:23.0238
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o9lah2fBDwCpEyoTfkEzcHabB5tE6DYD89r1dh4zmoqqfi/Ln+myUokxmaQ7uh8okiICPmKRofI7vlIAX/ACV0uK4dDRTDktgtRWnv/IsSo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB6981
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1AZD8aBf6qoltFduApXfM6Iqf1yhlwvKKp4bQ8OOgkkr6ET/MN34oputUKnLuu15mGiZNN0dHPG/hkYy/0AkQGXZWFX3zVKnRANPaeiUrFg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR04MB9465
 
---h373hom54itlhfgm
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-
-On Feb 23, 2026 / 07:44, Johannes Thumshirn wrote:
-> On 2/15/26 10:18 PM, Haris Iqbal wrote:
-> >>  From my view, blktests keep on finding kernel bugs. I think it demonstrates the
-> >> value of this community effort, and I'm happy about it. Said that, I find what
-> >> blktests can improve more, of course. Here I share the list of improvement
-> >> opportunities from my view point (I already mentioned the first three items).
-> > A possible feature for blktest could be integration with something
-> > like virtme-ng.
-> > Running on VM can be versatile and fast. The run can be made parallel
-> > too, by spawning multiple VMs simultaneously.
+On Feb 16, 2026 / 00:08, Nilay Shroff wrote:
 > 
-> This is actually rather trivial to solve I have some pre-made things for 
-> fstests and that can be adopted for blktests as well:
 > 
-> vng \
->      --user=root -v --name vng-tcmu-runner \
->      -a loglevel=3 \
->      --run $KDIR \
->      --cpus=8 --memory=8G \
->      --exec "~johannes/src/ci/run-fstests.sh" \
->      --qemu-opts="-device virtio-scsi,id=scsi0 -drive 
-> file=/dev/sda,format=raw,if=none,id=zbc0 -device 
-> scsi-block,bus=scsi0.0,drive=zbc0" \
->      --qemu-opts="-device virtio-scsi,id=scsi1 -drive 
-> file=/dev/sdb,format=raw,if=none,id=zbc1 -device 
-> scsi-block,bus=scsi1.0,drive=zbc1"
+> On 2/13/26 4:53 PM, Shinichiro Kawasaki wrote:
+> > On Feb 12, 2026 / 08:52, Daniel Wagner wrote:
+> >> On Wed, Feb 11, 2026 at 08:35:30PM +0000, Chaitanya Kulkarni wrote:
+> >>>  Â  For the storage track at LSFMMBPF2026, I propose a session dedicated to
+> >>>  Â  blktests to discuss expansion plan and CI integration progress.
+> >>
+> >> Thanks for proposing this topic.
+> > 
+> > Chaitanya, my thank also goes to you.
+> > 
+> Yes thanks for proposing this!
 > 
-> and run-fstests.sh is:
+> >> Just a few random topics which come to mind we could discuss:
+> >>
+> >> - blktests has gain a bit of traction and some folks run on regular
+> >>   basis these tests. Can we gather feedback from them, what is working
+> >>   good, what is not? Are there feature wishes?
+> > 
+> > Good topic, I also would like to hear about it.
+> > 
+> One improvement Iâ€™d like to highlight is related to how blktests are executed
+> today. So far, weâ€™ve been running blktests serially, but if it's possible to 
+> run tests in parallel to improve test turnaround time and make large-scale or
+> CI-based testing more efficient? For instance, adding parallel_safe Tags: Marking tests
+> that don't modify global kernel state so they can be safely offloaded to parallel
+> workers. Marking parallel_safe tags would allow the runner to distinguish:
 > 
-> #!/bin/sh
-> # SPDX-License-Identifier: GPL-2.0
+> Safe Tests: Tests that only perform I/O on a specific, non-shared device or 
+> check static kernel parameters.
 > 
-> DIR="/tmp/"
-> MKFS="mkfs.btrfs -f"
-> FSTESTS_DIR="/home/johannes/src/fstests"
-> HOSTCONF="$FSTESTS_DIR/configs/$(hostname -s)"
-> TESTDEV="$(grep TEST_DEV $HOSTCONF | cut -d '=' -f 2)"
+> Unsafe Tests: Tests that reload kernel modules, modify global /sys or /proc entries,
+> or require exclusive access to specific hardware addresses.
 > 
-> mkdir -p $DIR/{test,scratch,results}
-> $MKFS $TESTDEV
+> Yes adding parallel execution support shall require framework/design changes.
+
+Hi Nilay, thanks for the idea. I understand that shorter test time will make CI
+cycles faster and improve the development efficiency.
+
+Said that, the safe/unsafe testing idea may not be enough. I think majority of
+test case does kernel module set up using null_blk, scsi_debug, or nvme target
+drivers. Then I foresee the majority of the test cases will be "unsafe", and
+cannot be run in parallel.
+
+Also, parallel runs on single system will affect dmesg or kmemleak checking.
+We cannot tell which run caused a dmesg message or a memory leak.
+
+For the runtime reduction by parallel runs, I guess blktests run on VMs might be
+the good approach as Haris pointed out. Anyway, this topic will need more
+discussion.
+
+[...]
+
+> >  4. Long standing failures make test result reports dirty
+> >     - I feel lockdep WARNs are tend to be left unfixed rather long period.
+> >       How can we gather effort to fix them?
 > 
-> cd $FSTESTS_DIR
-> ./check -x raid
-> 
-> I'm not sure it'll make sense to include this into blktests other than 
-> maybe providing an example in the README.
+> I agree regarding lockdep; recently we did see quite a few lockdep splats.
+> That said, I believe the number has dropped significantly and only a small
+> set remains. From what I can tell, most of the outstanding lockdep issues
+> are related to fs-reclaim paths recursing into the block layer while the
+> queue is frozen. We should be able to resolve most of these soon, or at
+> least before the conference. If anything is still outstanding after that,
+> we can discuss it during the conference and work toward addressing it as
+> quickly as possible.
 
-I guess the example can be added in contrib/. This idea interested me, so I did
-some quick scripting and created the patch attached. I did some blktests runs
-with virtme-ng, and found that:
+Taking this chance, I'd like to express my appreciation for the effort to
+resolve the lockdep issues. It is great that a number of lockdeps are already
+fixed. Said that, two lockdep issues are still observed with v7.0 kernel at
+nvme/005 and nbd/002 [1]. I would like to gather attentions to the failures.
 
-- virtme-ng allows to skip kernel installation step. Fast and useful as Haris
-  pointed out.
-- systemd does not look working well with virtme-ng, even when I specify the
-  --systemd option. This will be a condition difference from normal
-  blktests runs.
+[1] https://lore.kernel.org/linux-block/ynmi72x5wt5ooljjafebhcarit3pvu6axkslqenikb2p5txe57@ldytqa2t4i2x/
 
-I hope that the patch will help discussion at the conference.
-
---h373hom54itlhfgm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-contrib-add-scripts-to-run-blktests-with-virtme-ng.patch"
-
-From 4a310c98f674e65218fb7e33e3b176a85d897333 Mon Sep 17 00:00:00 2001
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Date: Tue, 21 Apr 2026 14:26:01 +0900
-Subject: [PATCH blktests RFC] contrib: add scripts to run blktests with
- virtme-ng
-
-It takes rather long time to run blktests repeatedly for debug target
-kernels because of the time to install the test target kernel to the
-test target system. To reduce the turn around time, virtme-ng [1] is
-useful. Add helper scripts to run blktests using virtme-ng per
-suggestion by Johaness [2].
-
-After building a kernel in ~/linux, the command lines below will run
-blktests on the built kernel. With this, kernel installation step is no
-longer required.
-
- $ KDIR=~/linux contrib/run-vng loop/010
- virtme: waiting for virtiofsd to start
- virtme: use 'microvm' QEMU architecture
- early console in setup code
- Probing EDD (edd=off to disable)... ok
- [    0.000000][    T0] Linux version 7.0.0 (shin@shinmob) (gcc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7), GNU ld version 2.45.1-4.fc43) #22 SMP PREEMPT_DYNAMIC Mon Apr 13 15:44:07 JST 2026
- [    0.000000][    T0] Command line: virtme_hostname=vng-blktests-runner nr_open=2147483584 virtme_link_mods=/home/shin/linux/.virtme_mods/lib/modules/0.0.0 virtme_initmount0=tmp virtme_rw_overlay0=/etc virtme_rw_overlay1=/lib virtme_rw_overlay2=/home virtme_rw_overlay3=/opt virtme_rw_overlay4=/srv virtme_rw_overlay5=/usr virtme_rw_overlay6=/var virtme_rw_overlay7=/tmp virtme_console=ttyS0 console=ttyS0 earlyprintk=serial,ttyS0,115200 panic=-1 virtme.exec=`L2hvbWUvc2hpbi9CbGt0ZXN0cy9ibGt0ZXN0cy9jb250cmliL3J1bi1ibGt0ZXN0cy1xdWljayBsb29wLzAwMQ==` virtme.ssh virtme_ssh_channel=vsock virtme_ssh_cache=/home/shin/.cache/virtme-ng/.ssh virtme_chdir=home/shin/Blktests/blktests/contrib debug loglevel=3 init=/usr/lib/python3.14/site-packages/virtme/guest/bin/virtme-ng-init
- [    0.000000][    T0] x86/split lock detection: #DB: warning on user-space bus_locks
- [    0.000000][    T0] BIOS-provided physical RAM map:
- [    0.000000][    T0] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff]  System RAM
- [    0.000000][    T0] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff]  device reserved
- [    0.000000][    T0] BIOS-e820: [gap 0x00000000000a0000-0x00000000000effff]
- [    0.000000][    T0] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff]  device reserved
- [    0.000000][    T0] BIOS-e820: [mem 0x0000000000100000-0x00000000bfffefff]  System RAM
- [    0.000000][    T0] BIOS-e820: [mem 0x00000000bffff000-0x00000000bfffffff]  device reserved
- [    0.000000][    T0] BIOS-e820: [gap 0x00000000c0000000-0x00000000feffbfff]
- [    0.000000][    T0] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff]  device reserved
- [    0.000000][    T0] BIOS-e820: [gap 0x00000000ff000000-0x00000000fffbffff]
- [    0.000000][    T0] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff]  device reserved
- [    0.000000][    T0] BIOS-e820: [mem 0x0000000100000000-0x000000013fffffff]  System RAM
- [    0.000000][    T0] printk: legacy bootconsole [earlyser0] enabled
- Poking KASLR using RDRAND RDTSC...
- Clean up /tmp/results ...
- loop/001 (scan loop device partitions)
- loop/001 (scan loop device partitions)                       [passed]
-     runtime    ...  14.610s
- Run logs:
- [   90.927921][    T1] reboot: Power down
-
-When I ran the script on my Fedora 43 testnode for some test groups, I
-observed hangs at nvme/010 and nvme/012. Also I observed a failure at
-loop/010. Some fixes will be required in blktests and kernel to run the
-new script in stable manner.
-
-Of note is that the script does not support test target block device
-pass-through yet.
-
-[1] https://github.com/arighi/virtme-ng
-[2] https://lore.kernel.org/linux-block/ae47ef06-3f66-4aab-b4ab-f3ae2b634f87@wdc.com/
-
-Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- contrib/run-blktests-quick | 27 +++++++++++++++++++++++++++
- contrib/run-vng            | 18 ++++++++++++++++++
- 2 files changed, 45 insertions(+)
- create mode 100755 contrib/run-blktests-quick
- create mode 100755 contrib/run-vng
-
-diff --git a/contrib/run-blktests-quick b/contrib/run-blktests-quick
-new file mode 100755
-index 0000000..9324c38
---- /dev/null
-+++ b/contrib/run-blktests-quick
-@@ -0,0 +1,27 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2026 Western Digital Corporation or its affiliates.
-+
-+declare DIR LOGDIR BLKTESTS_DIR
-+
-+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-+BLKTESTS_DIR="${DIR}/../"
-+
-+LOGDIR="/tmp/results"
-+
-+if [[ -e $LOGDIR ]]; then
-+	echo "Clean up ${LOGDIR} ..."
-+	rm -rf $LOGDIR
-+fi
-+mkdir -p "$LOGDIR"
-+
-+cd "$BLKTESTS_DIR" || exit
-+
-+cat > config << EOF
-+QUICK_RUN=1
-+TIMEOUT=10
-+EOF
-+
-+./check -o "$LOGDIR" "$@"
-+echo "Run logs: ${LOGIDR}"
-+
-diff --git a/contrib/run-vng b/contrib/run-vng
-new file mode 100755
-index 0000000..9aa4b91
---- /dev/null
-+++ b/contrib/run-vng
-@@ -0,0 +1,18 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2026 Western Digital Corporation or its affiliates.
-+
-+declare DIR
-+declare -a BLKTESTS_OPTS
-+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-+
-+if (($#)); then
-+	BLKTESTS_OPTS=("$@")
-+else
-+	BLKTESTS_OPTS=(block nvme loop scsi)
-+fi
-+
-+vng \
-+ --user=root --verbose --name vng-blktests-runner --cpus=4 --memory=4G \
-+ --append loglevel=3 --run "$KDIR" --ssh \
-+ --rwdir=/tmp --exec "$DIR/run-blktests-quick ${BLKTESTS_OPTS[*]}"
--- 
-2.53.0
-
-
---h373hom54itlhfgm--
