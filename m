@@ -1,87 +1,97 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCED71C28E;
-	Tue, 21 Apr 2026 02:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82B537C937;
+	Tue, 21 Apr 2026 06:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776737855; cv=fail; b=cEWlG28A1zyK7sY2rwxiJ0otsR4cRcTHyUfeHMcVvN8rbJthMvcnzh8MR4azN71GK4ekKfwNbHQCC2xO+1OxUyUzRvTzgV3w3TdKjNizeOu/kvN3cIBp49IvNGEuqFbtnrvPUowclt4U/M68/pndhiTtrdI7UIVdGpv3Wa1WmpI=
+	t=1776751542; cv=fail; b=KsejoGjy2JppCJfSc5YgxrzbyTf9sJRPv7mj6kwLW2na4y8fikzO4Z2UrofcsW1z4H+uJDCPhkHTkZL9vOT14KligvU2P2MAMIdSy+PJsH1o8hlH5b221BVOAXTbqoetS3lh55JFNW5q81vXg1pLQFHY1i8+yMsjnHy+7CJk3jc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776737855; c=relaxed/simple;
-	bh=zbOtSrb4kXNzWlwDE88U0INsl7+ERvTZDvi6En9XBk4=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=h0HHD1B8WaznK2Sm/NbRfkBLaRGK8c/d8doS6zqqG4+9rwPkDIzI+UM93xakz4GGk+V+aN1xFFvh/4PcP55w5yyfTNjdiuspuFXBHOJA1wQKiSq5rWQj072IkN8z2bvnTfkx1td51pZ4v+xSYx8wOlruG7gh9tEM+9Wu19JMwqc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kOpXjuuq; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=FgDSDvqA; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1776751542; c=relaxed/simple;
+	bh=kWPjzstAI4bPw/9R34UKip5Jt2rLjJD2+4fF4CIp/TE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=H+H3LRGrzOo/xtvOJZn6Fmo08yTXUjjplKFhMwxr8s80SZ3RsyB9pCw/ioa+RWO0YDxhFmNGT88f9fwq7xUPHN7DpIf1knGCijhK8aLKvYDCmbdvtHNw7SRs454QrAVALKH4YoU5BnrhJvxjYXATqjCJcCiM3clg5FjaPcycpNI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=PRlTWf+c; dkim=fail (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=IFU+O4bf reason="signature verification failed"; arc=fail smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kOpXjuuq";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="FgDSDvqA"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63KLuG7Y1333528;
-	Tue, 21 Apr 2026 02:17:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=PaENtJn7dvP7sol3gA
-	FCY0Xy3qT/Jwyg1NbdF1Tv8tc=; b=kOpXjuuqSuMkac0V73oH7iFy1fD0GGTKFV
-	482a5doucfGiCEVznQfwN9VA5jx7B4SOvEJxEbs5I9t9P+uWAM1pG2rIBDD/TaIZ
-	smKF52jFEeoe4nCIImRt10r3ZNLR04kLzlk2pcW4nicOo4c2nUD8wB8UfzrM8GPl
-	4V4saEuowESIXaKZAuv+LttE8/PusDephzyhUwFQouAsnUxFPVBHvcRAOacDhjzH
-	PzmWWU9ZpGbZGIl7FtsN6+rXs+2QE/3MlXxs7aHARmHVwBy7nv3DFHS2FxO27hk9
-	b5WVck5O5U7CTKskyp14ZtCeMed2QtderoXdCLcAM/sKtFtNaR8A==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4dm27vvfgr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Apr 2026 02:17:27 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 63L2B9LE029256;
-	Tue, 21 Apr 2026 02:17:27 GMT
-Received: from ch5pr02cu005.outbound.protection.outlook.com (mail-northcentralusazon11012031.outbound.protection.outlook.com [40.107.200.31])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4dn187xx9y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Apr 2026 02:17:27 +0000 (GMT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PRlTWf+c";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="IFU+O4bf"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1776751539; x=1808287539;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=kWPjzstAI4bPw/9R34UKip5Jt2rLjJD2+4fF4CIp/TE=;
+  b=PRlTWf+c2omz1QyJdSgsF5mrix6TqluxrIyJYOpCBl5BBRXeX5PCHD5Y
+   a103JYFtLH7+4VB2tW28GAxxQqlmoWSuiPyQATubuW63ZUcfEV3Wsfp1Q
+   lhNhidlNAV4DsFyHbRAiQ0Q9rw9yoiqi0YgUR+8Yvdl/hOsc4nyH7C8kw
+   WC8S9IoUn2dBQjQrMK9QyCofzy6VBrI4cBJfsvHBt6mOPM3CKf8/ft/4U
+   7g2YEeBZ0OZQ390UXDsbdLTgzLdJ3hWxGOwrL7X2WXam24OKAsiVBS+Hx
+   sticVfhskS7q5NW6NWI2y/7Fh2YfB6OApsQvyRGk8GgC95AAQrf1p2zQ0
+   A==;
+X-CSE-ConnectionGUID: tt7lwlYpQnSZT3gB89y6Hg==
+X-CSE-MsgGUID: sndHZEedSPKmGzpvx87soA==
+X-IronPort-AV: E=Sophos;i="6.23,191,1770566400"; 
+   d="scan'208,223";a="144907763"
+Received: from mail-eastus2azon11010016.outbound.protection.outlook.com (HELO BN1PR04CU002.outbound.protection.outlook.com) ([52.101.56.16])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Apr 2026 14:05:30 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sRJ+0Dh9jpe3jAE7dk11n660JEhwRuLefIWEm8YOONiQazbAlCoshOvH4esasTJf6k18YPoyec2ntfwEMZzcuW1oyo6ykYPK4FGOtTY7m66hkG/oYYBzazFTw90DPwMq61LSoQ4c0lu/Sym+EfCx6F7PH/VoApvflMyaDs/A9p9vtQZbbtX9q55JAVyGr9y/BqSJ0Jao5nXg5Igr5cF6P37nZ5K5nrDCVh0mJhPSUTuYE0Osw9yYLg1/ZBh6PaNFT+QWJnEJ5x1v23Km8yRBwl598PythaHLpCKdmcFpa+wshJR7EZzEMZewo3WNbp4+Ex20sy8gFCpqgHkXQhW1SA==
+ b=wND4iok6PuSA9bdO3Z6N6X8RubHs0pIjdxyJ1YdTKmYSEBicscI0adeBW6QMajNaSqIGFHLmx39zgo1aGjkoWdS/5lYUkPeP44DKR3GT4EdynT/vi1M/NXjlJ6s6qgfSfPQ3JT/CoHcBBkAtLdCPckvcBUcthiHlmmgbYzvNeMBKWwOOyMRfZNxPK+3TqUsX8dBJQojKZkczuwWTP80VM9sYWZdQAX5Mx7gjXIXGEgk6E1Da3Wo19DWYd5eYsZtx33XKolLIbNdhAcvl5F9Uie5Ar2XjxSrQHTr5HpijEwn1BFEZvBcVGHE+cUlChYEE/tBJjCFIhEG6jm/62T2kiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PaENtJn7dvP7sol3gAFCY0Xy3qT/Jwyg1NbdF1Tv8tc=;
- b=RTt3nBQQIcCie8nkddRsUarZL2Ahcj44yUiEKOCTTqxsxhlm9K1UL3BhEUvoPMKSwLCRR/hgsTU84nGfdCIsjepceE2U/E19uzuRF3sKmvN485jsm+N0UhcBA0swn81NHTJeT+9ElqNcxvIHREgu5/mz5nmEymO5Wa4zKG2ZrYSumWVcdDRWGV3CNTHpvunutP9yjg5jlgDtRXJrbpKx6M20sjfxRorym6f59PrKm/Zp7ezYsoFLk/o/5pxzDO6mjc7n0SoTNw/UGTP+6fdjxk5WgzJv+f/3ujDY+aFDGXGJYAje2M/MCIompEYWwkOPoKtPQ+lzF9KZ1K52GF934A==
+ bh=jTfeZxNELQrvs3c6R2dsW9ntHap60Oq7+50mdxRo/Hg=;
+ b=No+9l4lMuXrzzypBmhxugDYvKI3w/3EBr9Yk1txCvam0WQuACglShuZi9M8KjRMxNjUYXwPT5CVX0EKUWhfOdQ8yzpvqhY3/nBY+4opPGDZcaEfhFPf2cDUNXfxzprkCHxUIUcWBYuTW0nHkrx45JNr85E8lVFY+CJIU1cJumabHJli9TsJBH0aKwWW79KcC3P8eSVWouThPqh6jbjHnrbmrdbw3UNPz39h1X/jV7OYSiss2WkpM0sILC+0hP03BOjSbmbwKEQdr04jof3de742fVHQyNoZjS08Wx/mj/9GPIdhgAro/F4lhQleIJB1P0ViMWepgCXgJFin4pwGgKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PaENtJn7dvP7sol3gAFCY0Xy3qT/Jwyg1NbdF1Tv8tc=;
- b=FgDSDvqAAWNTtv8XRe3Lr6w7AV4sKHC0v5f0iLkPZwu9dE6Frg2wGvySxduuXWUlFcgN7gb+ZY4hZ2pFhjkhHLdZqiQIGPTwqjaEzoEtcdHEzQiNzb/ro2ZUByVdKCe9erLc1RXbd/p1/SIGJRwa93kbOGshH36UNfR8Igg9FVI=
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
- by CHAPR10MB997696.namprd10.prod.outlook.com (2603:10b6:610:2f5::15) with
+ bh=jTfeZxNELQrvs3c6R2dsW9ntHap60Oq7+50mdxRo/Hg=;
+ b=IFU+O4bfsr5RX1wI3VSBADoNTjhugyaFN/cbRwS+egik0ZeK2GeKGLS/lfzavQ12RintHwNsGO4JNCMVUgPnR5aKnA4AZJarjVs2js0d79msfjcC8l2wR6XPJqjz8Ocyrd1NJmcHpiq82+GMyNBLUNBJFhGDFj82Dnah9WPRb3w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by CH2PR04MB6981.namprd04.prod.outlook.com (2603:10b6:610:a0::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Tue, 21 Apr
- 2026 02:17:24 +0000
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::e525:dd71:b002:6ad5]) by CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::e525:dd71:b002:6ad5%6]) with mapi id 15.20.9818.033; Tue, 21 Apr 2026
- 02:17:24 +0000
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Doug Gilbert <dgilbert@interlog.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Shin'ichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: fix /dev/sg allocation failures register
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20260415060813.807659-1-hch@lst.de> (Christoph Hellwig's message
-	of "Wed, 15 Apr 2026 08:08:05 +0200")
-Organization: Oracle Corporation
-Message-ID: <yq1y0ihoy69.fsf@ca-mkp.ca.oracle.com>
-References: <20260415060813.807659-1-hch@lst.de>
-Date: Mon, 20 Apr 2026 22:17:23 -0400
-Content-Type: text/plain
-X-ClientProxiedBy: CH0PR03CA0116.namprd03.prod.outlook.com
- (2603:10b6:610:cd::31) To CH0PR10MB5338.namprd10.prod.outlook.com
- (2603:10b6:610:cb::8)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.16; Tue, 21 Apr
+ 2026 06:05:27 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::ce42:7775:2df8:8729%6]) with mapi id 15.20.9818.033; Tue, 21 Apr 2026
+ 06:05:27 +0000
+Date: Tue, 21 Apr 2026 15:05:18 +0900
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: Haris Iqbal <haris.iqbal@ionos.com>, Daniel Wagner <dwagner@suse.de>, 
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, Bart Van Assche <bvanassche@acm.org>, 
+	Hannes Reinecke <hare@suse.de>, hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
+	"sagi@grimberg.me" <sagi@grimberg.me>, "tytso@mit.edu" <tytso@mit.edu>, 
+	Christian Brauner <brauner@kernel.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>, 
+	"willy@infradead.org" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+	"amir73il@gmail.com" <amir73il@gmail.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
+ expansion plan for the storage stack test framework
+Message-ID: <aecQorgpAE9nGcJa@shinmob>
+References: <31a2a4c2-8c33-429a-a2b1-e1f3a0e90d72@nvidia.com>
+ <459953fa-5330-4eb1-a1b4-7683b04e3d45@flourine.local>
+ <aY77ogf5nATlJUg_@shinmob>
+ <CAJpMwyis1iZB2dQMC4VC8stVhRhOg0mfauCWQd_Nv8Ojb+X-Yw@mail.gmail.com>
+ <ae47ef06-3f66-4aab-b4ab-f3ae2b634f87@wdc.com>
+Content-Type: multipart/mixed; boundary="h373hom54itlhfgm"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ae47ef06-3f66-4aab-b4ab-f3ae2b634f87@wdc.com>
+X-ClientProxiedBy: TYCP286CA0205.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:385::9) To SN7PR04MB8532.namprd04.prod.outlook.com
+ (2603:10b6:806:350::6)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -89,102 +99,260 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|CHAPR10MB997696:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8e13226c-2e37-46a7-4439-08de9f4c206a
+X-MS-TrafficTypeDiagnostic: SN7PR04MB8532:EE_|CH2PR04MB6981:EE_
+X-MS-Office365-Filtering-Correlation-Id: 452fc71e-7312-4540-5498-08de9f6bfbdc
+WDCIPOUTBOUND: EOP-TRUE
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|366016|22082099003|56012099003|18002099003|18096099003|11006099003;
+	BCL:0;ARA:13230040|1800799024|376014|7416014|19092799006|366016|6049299003|4053099003|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	x0SCih0JFJLPbM2LAXtMYV2+d6NeWnW6hngNxj1oQS3agWh2Fl3gQGjbHFmUePcq9cQP3qqrjHB+VbaC1006nYSaLs7eLaFAuLvGBE/xQcWv3KXgIEU+B9j6H19SBE5qMD8lgc4IyIX68MWoC8XDkO0mmTNXOoyqmvTC+Lp5A9K6yyMrEWHcKnf40m0DxOTbDLpp1FqPK8w1rnbRHXAkt/5Z4YoVSjRtA6GVrFOU6RpSiJ6fVnEDnJUfOisMjs5iXWH0O5sWtpz/R+9y/JkiXpSVNnvJg2O9IQuIdYge8MyXDKMDJYCmI+lqH8xIkvVyZ+IRdChwIJtl/BP04VSY8FG+XAJQmd4wxxg8AILov5rgiUxsKab1qZudQSgd2CgWv+47/Z+pBapHaQAMbnSOK26sbkr8ztlYsMZXmUNY8j6S3MwBewtdfLDsiRIOG6LZjMg9yJpaLbMx7WlR4UTL7ChsQo3lY7rEuaV1nRF1T10zRnoL/LMfOULvgczaTNcNN6xkRyXScfZ2QlXanHrtn3//uUm3qLSA5YYMD+UpgPpG3mRGFXbpb7MwpwVCFdlPzAojdrFxdz5rJ7D2fe36LBSloUACPLiZrKNxkbkBxWwDg3ARPtvqnK2v36PoleGR39/whWEMRePz3rFAixmQ1jT+bw417FbNNmLEoGboVFhF437l9/c+xcrignwFXjI2Ck7Ln66s7C7YnRGx0dHraxDVVsvmsZadBY1KON4Mhds=
+	OmH5cS0eJ5Tt2Du4Isyvxv2ynXDVbCV+wNEgbWHdRD18rbDx/An9Zs3ESqPYcV2mLOPy+Z+e+FIZTgUxhTuWMI07jaG5B577OKCbJR7QxfZyOSr6OP7/JuYRGfRJRujFYZlxxsk1FaVJaz8SGVkqXFGSMhciJybY6DBhFgzm3aAK0AdeG4uh5QJuHuO9/172z3z5bZ8k5SSeEZsJyXwaRBLet+6XoM03rKcXniKMFuu5RHFT2xFYbt134RqVsrkJavi+JDwq+jePXdMe4luKunTth3CweV+aRexYXKfOXan4dfnc+q09cLpVOqOvKEsf+7uAAiSCDYWezeX8oNUFqaWJnpRn5QeL+FphsS701EW2QqHTWwr/jSdW25Sbnn0YvWU6OQAgPWCfEhIIRySxjFcZv44EDiICxuFNCEU9l/g6dK6safJIcva5RCSvPIQMmFRI4WycWGTTHwALf1n4GCLZ3vR3Clnbcoge8X2EKlPi+ad5tWR0DoDOBskk7dV8nL+hwCVhVxfyBihBleLKTwj3XGQff1GfrwIbd+6YkoCjrAmuyDTZcry90K3JfbzYTm+2H4hCjP55fOKrBewRQuI1+Vy1ds48F5+2r/qTopNPt0dGxn+1aZS97EKZPzt8dfDXZ+hpbtz71Kq53IplOxdmTVCgX1meMXoezGTrQY27jgu+DECH1c6ZfNrPB/1kFBXWPk/9VN4sThdkGX/8zFeLN4f0jT2lwHt1LFjPXLA=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(22082099003)(56012099003)(18002099003)(18096099003)(11006099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(19092799006)(366016)(6049299003)(4053099003)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XQnc7QHYgcCZDorfPvrAiPlY8VO+2mTFNNX2rZMF8rPvhgBbMjReagw5H3B9?=
- =?us-ascii?Q?OOeKK3DCboP9caM6BI03hgHzP1IwRqU5nBvGlklV8eeM3q60+tlRiGrY0o8v?=
- =?us-ascii?Q?DklyR1kgrLNF0O1sdNA9RcTJYoiePz5wV5bX3AZI8v/4Hhb0Uc684yi7tPfn?=
- =?us-ascii?Q?yGYXaMmD7K0KCrcY5GkUkjuCUzrFcUpbjcLL7ELlklefxxdVFd3OaiH8HHx3?=
- =?us-ascii?Q?MiKrbpo2rfaSePLLd9/O2fumjybBPO0QzEH44SoDt4SyNL6mq5gNLm+zYIRg?=
- =?us-ascii?Q?qIg5b/HAOdvhc1Q9VIVx6GT1oJty5R/e5mrAorgsE9GyihfqqOdNEysDxWFO?=
- =?us-ascii?Q?kl8bPfcRwe1GpDzSqYAmuIH1/vu61c7Ue0edmC7E43bJhg5ujEznXT8SS28M?=
- =?us-ascii?Q?XErJn327Ir1WYqq+DvbSIc4l5oWiLv3EQz3GsNsgsMz9Ej9BBWQ5f160qzkU?=
- =?us-ascii?Q?ZBlt34um8xjGjsLDirysQkMct/Rks+ciM9AfGg6j4J+cY98gukS4AtCgYghx?=
- =?us-ascii?Q?KVt+RZbDc7Me+t92pJN6VFaWq0kolULOSXThTbke9WUCIO+2G55Z82m8Flxx?=
- =?us-ascii?Q?WajmI+SoJt7MW3B/y+zIt9wn8P7WkXBX5uadqaMvSSAwNKzm7QBH9Yu5V2Zu?=
- =?us-ascii?Q?Fhv0XEQ1eAyrc1BfD8C2SVYBPO82UfNBVibIyAn9RA8LnBB5rwcCBuw8lNQK?=
- =?us-ascii?Q?T//asNnMDYFwdC3+9eJs/lmnOmWDAVFJ9IBF9pC9MQrhUPSa1+2O0zuMmC4s?=
- =?us-ascii?Q?71wNe61vM0HgxI4HV1yWPvRuZQ+8Zh09ylpUttZUTAV/RGgfoomV0gTfl+qd?=
- =?us-ascii?Q?E8jOpcHcrnj1engDPbfon+hirMzPWkmn1euW/hFczqW8dz9SZpZV6W9O8TDR?=
- =?us-ascii?Q?fdtvdnYLTocJEyxCk11wCeVXd0jSn3MOf+PaxDxJdkNa4iyQE1mee5TI+i/w?=
- =?us-ascii?Q?I1gCZN4/Fzk1uSda+rWcaRZBIHMndZ2polXfWCi5LVPqD/l2ZnmSpoYTFqnQ?=
- =?us-ascii?Q?9p0M7qLY7XuzyEiL2fRcbBHpiEfKibjAcmTftJqxLwGBKkjjSjuENlOGlxGC?=
- =?us-ascii?Q?4UnxQTqoxtENTNW2aE7YdykioOjU6sY37fbxPVKFikgEuPOsW1r/3Wr4D4fZ?=
- =?us-ascii?Q?rM6Sh3YP8aCI/28XDwAdFAE62E3zWURTMRSFEwRrOH/vLqdJv+R8ynY9abIv?=
- =?us-ascii?Q?EsGwOsiNy23Pp87uTEkNo6E/RfhAFKYm3k8UxKC2uZlQkM33L9TTHKNSSIid?=
- =?us-ascii?Q?oOao1Uv2OfeaKvN0sqOhohY3YYBmIGH7E7xeSPkgVu0ay5iATHtOJcwOrOBb?=
- =?us-ascii?Q?ABsfYxmxN02IWTut8rZ3JTy6IX4C+03DDDlepUz2ndAGTax1f3X2Kf/26AMY?=
- =?us-ascii?Q?43jxDwXtYXGsSVsm45oFLUeXpbZPC9HY8vnxn8e/I8+Po5b/4/bwziorup+J?=
- =?us-ascii?Q?aE19J1GILRoe9MQdtk9oa20gUdQEL6o2/+sazWSan2gIneubcLeyPDF0H1Cc?=
- =?us-ascii?Q?oiePcns1J6xoHgTfZjFJa61X0DqjNs7FGCgmjKas46u+LWcWFaGL40qtZ9yA?=
- =?us-ascii?Q?y5E6P2Ofi+EoSL14RmgW8fxtIWZ4F7X+cfVu4xzJZTxVbqS49o8YRNhUv1qQ?=
- =?us-ascii?Q?k8kEvmWx7D/vImA8CwRe68pzs3014aszVIRgAMNCEWoZPhVU4txaMq1mVIpv?=
- =?us-ascii?Q?Pnf3oKG/pUfgdm6O4OL9dNz9fIQvCsDeVCpUOcl8gZfbyom8raAP2ABH8hcG?=
- =?us-ascii?Q?xOHsxkkE9UXiuziPsaLYGNT+AFiMTjM=3D?=
+	=?iso-8859-1?Q?kIERulUMOc/ErWdusRcBLh2EKNwU6k+6/6/hxBjnMaeYnWl2iG+KcXGIbD?=
+ =?iso-8859-1?Q?H58D+VVa/NsuCdzjMeS3WN6a81ak2SdJrxhTGc4wHe6JvKXu7cp7dw4BTX?=
+ =?iso-8859-1?Q?/9HNFZ5RQYw+6PNt87+K85wSM14P6RXLyJHVfMAzaJrbw2TPk2Z/e6ncpZ?=
+ =?iso-8859-1?Q?jN3mLFOfihMJTg/Sa4W9O0BuJRVP76dzFkmAm9I5Ze9J9Oencq25CApxRK?=
+ =?iso-8859-1?Q?WmIEWjs64TC7RP6pwzKTcqhOQBAQwvCQbo1bhqcmFmpyHdxKu8qA2/YQm0?=
+ =?iso-8859-1?Q?BYg/OeOTpxrifaFto3ksTwtkin0ZXklZTijGtLT/Zj4WkYcqVKBtDr7cSo?=
+ =?iso-8859-1?Q?jGwAaPlg3p9MEbVuT1Z3CIRuq3z6mKJZVtVa5e77Z6XXo1PMPe2XLcl5NM?=
+ =?iso-8859-1?Q?wWE4OLJR5/xqHrOGokq8UzjVYic+m/s4aT4l5uonlfzOugzZBDYI19ISjY?=
+ =?iso-8859-1?Q?YeT3tpmKJYDh1fEZmx9mjKV4ojpQD6N030dsAxVAtUZp+CUL7U3VLgerTp?=
+ =?iso-8859-1?Q?+56ZkZdKvSHTKRHuWkpF3uatSe0AWfhUIPz9gXzI9hAROd9tIuBCikAoI8?=
+ =?iso-8859-1?Q?gYQbgZFM6j6+kdjzRxO0jc+lhfLoMdcqY1APYRBNIW7fc0l/s/2d+8rMjB?=
+ =?iso-8859-1?Q?MesSOsmcLXDw5oI+TRk1efG3g3l1owJQsGWKF/4VeRjS+dS4ikigPmsCJm?=
+ =?iso-8859-1?Q?7OayeqCWXKfETyQROBSEfHPhRtvGFsCmdN7jhNWY6AKmkV0I+/tbtrsIOf?=
+ =?iso-8859-1?Q?PAdyqI4OPtQxa7iUd7a9FLfev9PqLzAYSi55KtsxV0GTXUIPpnFvAzMFIv?=
+ =?iso-8859-1?Q?k5y2cJyT5V+UF26hv0yGZkMQv0SGUJxFEGj5t7e1JRNA0CAaRRI0/ZAE8a?=
+ =?iso-8859-1?Q?rvXMBuv95R5PhUQmkTJJ6EkPNC/ZyaXwTiq+IukSJu0ckMDILnFlmrmjF0?=
+ =?iso-8859-1?Q?VeOoBBtdKvzE0G7ElX21DDS66EzmTUUA8eTNAiDJ7s0N90Ac+NfBCx4D7J?=
+ =?iso-8859-1?Q?3mWYyK9YoUAJGBy8KBKN2Gd+h/WjmRlMavtHA/ORnmttc1UWtENfd4i4FX?=
+ =?iso-8859-1?Q?M/SRO3n5iaSz7Kak//b1d+XKc34Qi/3eyG+pkt/YG5ZyTWfMgwxMDZfUwZ?=
+ =?iso-8859-1?Q?rH7PPn6ni1IZoMRcsBdJBVXsjYeJI1jijoD4sfE3gjsC1yIm2tMbITehoU?=
+ =?iso-8859-1?Q?GpcyB4LsVLQatS02EH8KTMnHhdpDyDRjx1kMHj5VJxHkSK8u8OoZmdL5Xm?=
+ =?iso-8859-1?Q?dXM1Hzd3qCc4oNd3yvFr1qNVie28kjoU9rpswPgNCXXh1Y/rQ+vGSHJg3D?=
+ =?iso-8859-1?Q?LTPOp6z509PtMbC7rodULovlvNhFOdAzn8uSPWfb4rRWQo65vZcsfhpReX?=
+ =?iso-8859-1?Q?hRA0cgaMoI/PqhGojnTXYO/YHCywvgwnWGHYM1oh9a2iuksL1NttIfjn6m?=
+ =?iso-8859-1?Q?kPMEnZM1SW/ajEAdY29XRNSl1NTCj1R4iKm8RMlrgA01gCcylNFP4T5spT?=
+ =?iso-8859-1?Q?Q6ea3MtkAQdBbhyGrYrDtoeQAJ6SepT+gFbfePLxJrvUSk0dnOHpOo9lGZ?=
+ =?iso-8859-1?Q?hnNjKn7p9GiTnj4xNOxyXSrhKTuZ5EYAORjCRQmTP+CDpXjed1UCF/I6vG?=
+ =?iso-8859-1?Q?qeU3zapHd+T45uKG4dGr+0mAxj4Bb+38pSTI3gMJc2IfR/x93zYu1TB9EB?=
+ =?iso-8859-1?Q?wzZg502c1S3snEC6LMS2IiXvMUG6GdAmPXtWreiqs6oKuerXbL8iZgzwXb?=
+ =?iso-8859-1?Q?BiW+6y2rBvllk5ePwwMGCt/42aX2cocncBe5sCAdalcQrQqQrpAqVdkUe8?=
+ =?iso-8859-1?Q?dqQpTKbLrUy77IG8Arw1phnSr5/v1wo=3D?=
 X-Exchange-RoutingPolicyChecked:
-	JZJ9SaUmcwq1oUXIXF02HOt58iCSlR48G3iLNQvAKa8JdahXRKs6rresWe/0AZYXpFv30sURI+pqm5dz+JMf3ysD/RPFqqTWiqkjlWWhJaGEkWzpj8cL49Jz46muy3Oj1mtrHooP2qYHQ77pSlmFRCL5obxjwBSGnTMAW9uSJDa4o/nzkT7K1eDzVARYXB+ZAdIR8+q97tNU1+NbokqAHcufZfCZJuhJtNCgFroc+HVA7Ic2T4CCoTT/U0uVK4wvczlYuH7+ggBzk2V/o1yFJ8u9u3whwCtdiDnhZy64jExyZLr/KeWqo1qrL8D+MPcyOTTEuZ3AYz1RJ7tD8c8YYg==
+	jtWyeCePC46AxDqxDAbdmV70m/fITf6+HeAbt+FZbPIhmDfg088ILGWME7Ap/oIYRHKJkj0NcxJUoXJnbKY1UbIbDMzxv1i0ZcE7vJkmUWuECMbFEriVjH+vLIwLiKpXTmMaGFlEraLnRVaGlBP2In0poRp7fANKpXNwYSwKVnwjo17FioHCu852f62QnzdhjUHPCHOLRTnMEqVAK/BprNTaCXHTl5F6Q3eHNpJwr0mZ0W+mPpijSlsyrGp8yxiEJHVrXdpHtXrSYd7H63I7M4jbfW6tz+21FygJ4HBINd+TNGZFhQ2+YW39VRrzE67jJjtIfXSxqIsC5ggjCqCmaQ==
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	QcPH3eG2pMbNaBaMYhPYRI6nbsoHh2VINbNaKXK6bwcUe7V4kmmLHZtNHQYHKlhE6yCDOeCNjbShDudDAOozG7g5PuC36qHd7gKCgN9PrqiY0spFn3Fgn0elD43uY3St3xRmwZhQXAY1ZD0xEHqnkEZVNVnIOBmaO+2rE85M2qFtoFz2FDBDFhtAClkdtzAGclvkSP+l2AKop0/nDXHoumpOds7THMocy0F/IqBTkGck/ACMSpMaYkwqXgqoFJ0/TiLcJFPbDzZqj8uIiuCDBlNXE3+0w0TqwddJ4M+8Foma2zPtTbZ4On5ZdjfttORx71zppbzh/jViq2W4wMYxMtOx0x0CMrCK83yqv8N900ry0zBeLyiz+f8d1lYsX3HA90wDbVahdND91omicTJQDb6z3Kd3QRtMbvmp3My7t6R7qDPdvSlWS9IAHcvitOzn06VHpnMSLM/mdFb15p7h9yEe1D0q4QCa/xCQOEF2EFhNfGEWbXGcNlYLaUEvR7UDOs2GM6AMuXyQINWqLD/W1gn+88s8TqR7szdna9QviRCO+5z/1NepgyoL2qJTTyLO0qV1YeHTkZomYvtljyCN+1a2/sUgwsHdmNt+XJdDi7s=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e13226c-2e37-46a7-4439-08de9f4c206a
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
+	Wq0AJEDi3KmxG17cazp0BKboKx6fU/G168tCZH1+syMgwF+V6cwRp0F4GU5sKvtjDHbNLhM8WxPBZm3stzC1WkDx6ptWLKQjbaNqaHuovZOgCjrQcZQiV3pVobct6QjZNmSIlbYuhctYwGvZBpljZLYZD+/gq4Z0396w2g2x07bq7wuUnG47IhHBtXDyhbqmpWG3uGwLsWd8YOGz5McwIqtpvc0Jr1LeqQqxus02UqcQz0iSQwhO57KtpktcwiTpPdf6Ze0quFAQ0jiRqMqzkMhlEby4UIGn6onhw3UMY8BnviEMTVmShvqx7JxfueZmaarQmkCLC7lSJwv06Zx25Nm6xkml4tVXTz8CVdV3MbYWOShf7zUC+uq6bEhFIvNbPtMK3J1EmTJA76Q2T6thqHZFsu9MeqlEyN+DP8I2EQrUQ+44uZECiTz+bq1xIvyUc9Vi/5QrnZarOAMP3TL5BfzbQJ8JEMwgV7zaXHjp+QD1cdHetwVyEX7baMqHoXqLn/7RK8DPdmdcMzuqomdvaOAvREuM2qs5koiXMvpX39HlUU6A0Bg3BqXWZ/kE7KVmNDEH9C9sHJA0crBBnmq2ab+UpFxFRfDGMq146ovv+ZCoG1a6VLdMuTaUH9O9FFj3
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 452fc71e-7312-4540-5498-08de9f6bfbdc
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2026 02:17:24.4501
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2026 06:05:27.4369
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5hc4gWbt/T1MPAmwBfBiOOVEn86fU4jXqucVDlZG/NC+zVvnMulwmFPC67n12HJR/nH5ss4H9gQcV0hVAOUN92142scjHAz/F+zjMufm0AE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CHAPR10MB997696
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-20_05,2026-04-20_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- spamscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0
- adultscore=0 mlxlogscore=911 suspectscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.19.0-2604070000 definitions=main-2604210020
-X-Authority-Analysis: v=2.4 cv=JYCMa0KV c=1 sm=1 tr=0 ts=69e6de37 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=A5OVakUREuEA:10
- a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
- a=EIcjfB9IiI4px24ztqRk:22 a=GISNUztzvdc1q_S9rGwA:9
-X-Proofpoint-ORIG-GUID: 5cYax6MTqYPefSW5Z283WxkV7xzRX5DU
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIxMDAyMCBTYWx0ZWRfX4XEUF66xL29s
- Z9Dq1fcCfDabmooyNpIaJ2yqFiz9BBDd4rVKh1eMy2TlunBxWxI0cRre2SqJlK0tmZwdoznDm13
- x6fTVQQvk1TEYxhy4x9HdRxPLFSa21thYGSrZLsoHueRfzRmhZjfNZiSiVrSMJEICqdn5qSDTdp
- pdX9dj9YzRUkDUtCJRCIXRR3CHU0fMeeVT+XmtxamZy4iKBrSZOaRPYhL1YuE5W1WTQ2n/zdn8L
- nejQk/KjqEmwUtS+UnFjrGlz6ea1UoDSMabG1KYJ9FAeYXgXyHAiBxy6OjXn9Twy1jDHjgqRhSI
- St4Fxqc45/cbqaHKxbkA6uLrWj8EvtpmR8sIt8scpMwxf1wEsTXDHKxOeJHodPwEaqpV3OcW9gW
- vSzEX/FAHey+OSx63vUNP8mCn29DSTjSg4hcuZY1VRkWjY0vlcB9ps0FpAkQKeu2e50Z4YeoaqW
- WHl43+Cx5QIDpB9jG1w==
-X-Proofpoint-GUID: 5cYax6MTqYPefSW5Z283WxkV7xzRX5DU
+X-MS-Exchange-CrossTenant-UserPrincipalName: o9lah2fBDwCpEyoTfkEzcHabB5tE6DYD89r1dh4zmoqqfi/Ln+myUokxmaQ7uh8okiICPmKRofI7vlIAX/ACV0uK4dDRTDktgtRWnv/IsSo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB6981
 
+--h373hom54itlhfgm
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Christoph,
+On Feb 23, 2026 / 07:44, Johannes Thumshirn wrote:
+> On 2/15/26 10:18 PM, Haris Iqbal wrote:
+> >>  From my view, blktests keep on finding kernel bugs. I think it demonstrates the
+> >> value of this community effort, and I'm happy about it. Said that, I find what
+> >> blktests can improve more, of course. Here I share the list of improvement
+> >> opportunities from my view point (I already mentioned the first three items).
+> > A possible feature for blktest could be integration with something
+> > like virtme-ng.
+> > Running on VM can be versatile and fast. The run can be made parallel
+> > too, by spawning multiple VMs simultaneously.
+> 
+> This is actually rather trivial to solve I have some pre-made things for 
+> fstests and that can be adopted for blktests as well:
+> 
+> vng \
+>      --user=root -v --name vng-tcmu-runner \
+>      -a loglevel=3 \
+>      --run $KDIR \
+>      --cpus=8 --memory=8G \
+>      --exec "~johannes/src/ci/run-fstests.sh" \
+>      --qemu-opts="-device virtio-scsi,id=scsi0 -drive 
+> file=/dev/sda,format=raw,if=none,id=zbc0 -device 
+> scsi-block,bus=scsi0.0,drive=zbc0" \
+>      --qemu-opts="-device virtio-scsi,id=scsi1 -drive 
+> file=/dev/sdb,format=raw,if=none,id=zbc1 -device 
+> scsi-block,bus=scsi1.0,drive=zbc1"
+> 
+> and run-fstests.sh is:
+> 
+> #!/bin/sh
+> # SPDX-License-Identifier: GPL-2.0
+> 
+> DIR="/tmp/"
+> MKFS="mkfs.btrfs -f"
+> FSTESTS_DIR="/home/johannes/src/fstests"
+> HOSTCONF="$FSTESTS_DIR/configs/$(hostname -s)"
+> TESTDEV="$(grep TEST_DEV $HOSTCONF | cut -d '=' -f 2)"
+> 
+> mkdir -p $DIR/{test,scratch,results}
+> $MKFS $TESTDEV
+> 
+> cd $FSTESTS_DIR
+> ./check -x raid
+> 
+> I'm not sure it'll make sense to include this into blktests other than 
+> maybe providing an example in the README.
 
-> This series has two independent patches to fix this from different
-> angles. The first one changes the completely pointless GFP_ATOMIC to
-> use GFP_ATOMIC in sg. The other drops the reduction of the gfp mask in
-> the bio allocator, so that atomic allocations of bios work as
-> expected, even if they are a pretty bad idea as the bio submission
-> actually needs a user context anyway. The only other uses of this
-> seems to be the ocfs2 cluster managed.
+I guess the example can be added in contrib/. This idea interested me, so I did
+some quick scripting and created the patch attached. I did some blktests runs
+with virtme-ng, and found that:
 
-Applied #1 to 7.1/scsi-staging, thanks!
+- virtme-ng allows to skip kernel installation step. Fast and useful as Haris
+  pointed out.
+- systemd does not look working well with virtme-ng, even when I specify the
+  --systemd option. This will be a condition difference from normal
+  blktests runs.
 
-#2 needs to go through block.
+I hope that the patch will help discussion at the conference.
 
+--h373hom54itlhfgm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-contrib-add-scripts-to-run-blktests-with-virtme-ng.patch"
+
+From 4a310c98f674e65218fb7e33e3b176a85d897333 Mon Sep 17 00:00:00 2001
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Date: Tue, 21 Apr 2026 14:26:01 +0900
+Subject: [PATCH blktests RFC] contrib: add scripts to run blktests with
+ virtme-ng
+
+It takes rather long time to run blktests repeatedly for debug target
+kernels because of the time to install the test target kernel to the
+test target system. To reduce the turn around time, virtme-ng [1] is
+useful. Add helper scripts to run blktests using virtme-ng per
+suggestion by Johaness [2].
+
+After building a kernel in ~/linux, the command lines below will run
+blktests on the built kernel. With this, kernel installation step is no
+longer required.
+
+ $ KDIR=~/linux contrib/run-vng loop/010
+ virtme: waiting for virtiofsd to start
+ virtme: use 'microvm' QEMU architecture
+ early console in setup code
+ Probing EDD (edd=off to disable)... ok
+ [    0.000000][    T0] Linux version 7.0.0 (shin@shinmob) (gcc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7), GNU ld version 2.45.1-4.fc43) #22 SMP PREEMPT_DYNAMIC Mon Apr 13 15:44:07 JST 2026
+ [    0.000000][    T0] Command line: virtme_hostname=vng-blktests-runner nr_open=2147483584 virtme_link_mods=/home/shin/linux/.virtme_mods/lib/modules/0.0.0 virtme_initmount0=tmp virtme_rw_overlay0=/etc virtme_rw_overlay1=/lib virtme_rw_overlay2=/home virtme_rw_overlay3=/opt virtme_rw_overlay4=/srv virtme_rw_overlay5=/usr virtme_rw_overlay6=/var virtme_rw_overlay7=/tmp virtme_console=ttyS0 console=ttyS0 earlyprintk=serial,ttyS0,115200 panic=-1 virtme.exec=`L2hvbWUvc2hpbi9CbGt0ZXN0cy9ibGt0ZXN0cy9jb250cmliL3J1bi1ibGt0ZXN0cy1xdWljayBsb29wLzAwMQ==` virtme.ssh virtme_ssh_channel=vsock virtme_ssh_cache=/home/shin/.cache/virtme-ng/.ssh virtme_chdir=home/shin/Blktests/blktests/contrib debug loglevel=3 init=/usr/lib/python3.14/site-packages/virtme/guest/bin/virtme-ng-init
+ [    0.000000][    T0] x86/split lock detection: #DB: warning on user-space bus_locks
+ [    0.000000][    T0] BIOS-provided physical RAM map:
+ [    0.000000][    T0] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff]  System RAM
+ [    0.000000][    T0] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff]  device reserved
+ [    0.000000][    T0] BIOS-e820: [gap 0x00000000000a0000-0x00000000000effff]
+ [    0.000000][    T0] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff]  device reserved
+ [    0.000000][    T0] BIOS-e820: [mem 0x0000000000100000-0x00000000bfffefff]  System RAM
+ [    0.000000][    T0] BIOS-e820: [mem 0x00000000bffff000-0x00000000bfffffff]  device reserved
+ [    0.000000][    T0] BIOS-e820: [gap 0x00000000c0000000-0x00000000feffbfff]
+ [    0.000000][    T0] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff]  device reserved
+ [    0.000000][    T0] BIOS-e820: [gap 0x00000000ff000000-0x00000000fffbffff]
+ [    0.000000][    T0] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff]  device reserved
+ [    0.000000][    T0] BIOS-e820: [mem 0x0000000100000000-0x000000013fffffff]  System RAM
+ [    0.000000][    T0] printk: legacy bootconsole [earlyser0] enabled
+ Poking KASLR using RDRAND RDTSC...
+ Clean up /tmp/results ...
+ loop/001 (scan loop device partitions)
+ loop/001 (scan loop device partitions)                       [passed]
+     runtime    ...  14.610s
+ Run logs:
+ [   90.927921][    T1] reboot: Power down
+
+When I ran the script on my Fedora 43 testnode for some test groups, I
+observed hangs at nvme/010 and nvme/012. Also I observed a failure at
+loop/010. Some fixes will be required in blktests and kernel to run the
+new script in stable manner.
+
+Of note is that the script does not support test target block device
+pass-through yet.
+
+[1] https://github.com/arighi/virtme-ng
+[2] https://lore.kernel.org/linux-block/ae47ef06-3f66-4aab-b4ab-f3ae2b634f87@wdc.com/
+
+Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ contrib/run-blktests-quick | 27 +++++++++++++++++++++++++++
+ contrib/run-vng            | 18 ++++++++++++++++++
+ 2 files changed, 45 insertions(+)
+ create mode 100755 contrib/run-blktests-quick
+ create mode 100755 contrib/run-vng
+
+diff --git a/contrib/run-blktests-quick b/contrib/run-blktests-quick
+new file mode 100755
+index 0000000..9324c38
+--- /dev/null
++++ b/contrib/run-blktests-quick
+@@ -0,0 +1,27 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Western Digital Corporation or its affiliates.
++
++declare DIR LOGDIR BLKTESTS_DIR
++
++DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
++BLKTESTS_DIR="${DIR}/../"
++
++LOGDIR="/tmp/results"
++
++if [[ -e $LOGDIR ]]; then
++	echo "Clean up ${LOGDIR} ..."
++	rm -rf $LOGDIR
++fi
++mkdir -p "$LOGDIR"
++
++cd "$BLKTESTS_DIR" || exit
++
++cat > config << EOF
++QUICK_RUN=1
++TIMEOUT=10
++EOF
++
++./check -o "$LOGDIR" "$@"
++echo "Run logs: ${LOGIDR}"
++
+diff --git a/contrib/run-vng b/contrib/run-vng
+new file mode 100755
+index 0000000..9aa4b91
+--- /dev/null
++++ b/contrib/run-vng
+@@ -0,0 +1,18 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Western Digital Corporation or its affiliates.
++
++declare DIR
++declare -a BLKTESTS_OPTS
++DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
++
++if (($#)); then
++	BLKTESTS_OPTS=("$@")
++else
++	BLKTESTS_OPTS=(block nvme loop scsi)
++fi
++
++vng \
++ --user=root --verbose --name vng-blktests-runner --cpus=4 --memory=4G \
++ --append loglevel=3 --run "$KDIR" --ssh \
++ --rwdir=/tmp --exec "$DIR/run-blktests-quick ${BLKTESTS_OPTS[*]}"
 -- 
-Martin K. Petersen
+2.53.0
+
+
+--h373hom54itlhfgm--
