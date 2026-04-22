@@ -1,334 +1,209 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824AC37F739
-	for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 11:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776857665; cv=none; b=R89TzyD6bStwGUq/oAYG/otV3X6EzZtUWpUDZNgKVpjSBm76/G08BtCECClC7WqIoIRVM0F/TbcC2DkJPtyNKOgfMz18IAsOo9S0CXDmqcMsQ+d2pb9Vff7ckTrX6hQxZa8ern0QUMuvHMXYSvJJnUMBZ0U3M1NLvnacFLC2dnA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776857665; c=relaxed/simple;
-	bh=cLfy64EuVOnwaGXZoYuyOvyOHLOMCKbuEPM3vcxEzP8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fXIE5IAAxT6CVKn5iBoQ71ihx6k4tkxHPsqdFvVBuXjZQuSZmO5hy7RA2zmN05o4sCEw6qZlE82Cj/TpaH4q+3gUYa/pymF5eZscxiii3WSNAHTYHmOHWs9ygyGgACM17/DFEoZGIchyiCWJvoXN3gFCmh5xqj8HWLNKrRupm+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2J9Qo4L; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF95B3ED13B;
+	Wed, 22 Apr 2026 14:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776867703; cv=fail; b=r5H0JTBecRb0vAlaHuKSzDDO3uZFYzuadY2dR+08LvMJZ/oQNYPts0Eg5jzLzU3HaYcVSjjQgzBCxojcEmf6vGsf15QAen5EwiG1ZaIB/pOKvIDF2DKMK9bypXq72NM7S5SANV/mw9p+oLOORbPkUwTUWAi0cJpoTsrPlJXOcoI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776867703; c=relaxed/simple;
+	bh=mS5HCRxn9SdHMI0VLQx6nQ6Otsqf3/2IxkgUFN6EVDM=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=BcJXiE+RRQ/pqLL56nA6OKOH5AYckVQ2VHd1Qh00xTJd3bqHQGs2kQxAivSGWSohGOHa03exohlWNnkWZkw7ZtLV2x0Y7lZ7yt6e5TwIeasPjLMFgINSh/J/PKLPfBV7vKfWB89lrNihRUFEpGKtjLaGOVrFrjNSh50BCNd1OT0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8Hkqa2K; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2J9Qo4L"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43eb05b1875so3150472f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 04:34:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776857662; x=1777462462; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i6Btga714ZD4m11Og+xMBiLOEYrhnYNVJCJYEBm+MhQ=;
-        b=J2J9Qo4LwXGtnnE0/JxBUq5qxq70msfQn7PXMZG+Y1zLeQ3HjCcE11uL2z84PlPGDm
-         tSHP18XR5Y1u2YAXyqzkM6gEEyz2EBTa71/eaLishdAZPfTqyh+F0DJGKbVxVSHfX49j
-         aZ9WyKLcBJaAb3m1jQxVClhpAwe6QQZCkG/TeLIFYOOBc8584nr+yeZ1nvaTz9lfwJn/
-         hYJz3TWCFAwazIQrLI+Mv+zLTyxNR/1vbCAjajCVFMn+owziMkfVUzpkLvAAc4dHFMo8
-         Y6Aw6/CaFDGeq/4GGJS2r7czW9MOqQuvyXlpLIth3gRVG3w8IaRxxmxsxIfamOUsxpAk
-         cQZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776857662; x=1777462462;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=i6Btga714ZD4m11Og+xMBiLOEYrhnYNVJCJYEBm+MhQ=;
-        b=fZRoGlYvmhEk93EvwbNTYpe4p2sMPBpwyiut5oxVO7qipWrer7Q/iDXuizpktbuyN3
-         XJPee1IC0IiVfcoPhUKUIwhsqQmKqysvvyr/cXWWU4XDnqvLH4QRgxRtNAYpGNEwSnc4
-         MgMkpM0m+KmOz6chAJV4RQvW1e5KUvnVPhKVatItz/wEXOzL/4EWFPxA6w09Bb3i/M4v
-         FKouW1KFbKzLXQZfpKaeUq5pRpWGZdRXh5xGAvXtupkgfTk2lWJvVffxg6kuUZjEtULr
-         RriG7DvAt2wWtSV5JL9Ewof+6T+eFTtFSG2ixVb4kdQ7FRmYgRTUmEiZfXoFlRVYoI4+
-         WZsg==
-X-Forwarded-Encrypted: i=1; AFNElJ8SBfix23iAYrQpEBhA46jhCOFDpe66cxKMhJ2x87tlyXx6qGNVba8bbNdwNwRh3hUwUy7ff1YLY643iA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/lLWMVQKD6WB9/r6QnT+u4Qm3n/ia1oBiOIx7mv94vWLD2Jok
-	gydXUDtrSzycZUtz0Yq85OtrkhtY1qYR1EvrV9mp3UxLGEREySfCl3E/
-X-Gm-Gg: AeBDieveCL28/VbIpkXJp3B7t5QCskbr5UZ2ubHS7FuI1CC8peoogwd3DkdXmncTfZW
-	xtLpv57kzfzUcdWveExJp9ezYLdFeag2J9vAocXdnWbTiM/vw4eSFTg35u/x0JJVC5GXOk66Jk0
-	4AUJdUln9kT9LBC6oJidN4DUcazmjH+SsfzDkFyY+vVblZ9bzEIcvXFODTKbb4q5WEWhI/8rckc
-	6VOM5G5UXRheo0adTmwlEy98eUc30NlTFoC23XFtRfxKPFBQFpIB+gkI3sQno5cNZHIPyxtYALS
-	3Plq5Dy3Nu1STUu4FxAOfpFh9oRfue5e1WGdCvoXxlObubOAwXQTrFecDYzU8OixvUTNCRpK644
-	5d+M9GSGYk3DaA1HxAe/Dplay0g7kLUOKECcl/3yB1fa3PZiYmye+kQq8N30lGk/M9V84ycbG6+
-	H6Yqyn+Hhl9DdlVfboObXVoRM9pyszfh1MO32ymH1g09GvEL+aNgH3fWMlRTDTPDLmN/J9MDquU
-	pXNY8uQ1mMhyPymzky8GJ4EdMn/HwI7BBnjX7/gtGGljja13y+WsMGJ9PfE5lOBlCPP49Xveky5
-	aAmN0k7R9+3a
-X-Received: by 2002:a05:6000:184b:b0:43d:6787:993b with SMTP id ffacd0b85a97d-43fe3db3c50mr34278591f8f.6.1776857661510;
-        Wed, 22 Apr 2026 04:34:21 -0700 (PDT)
-Received: from particle-0df3-d360 (d54C349CA.access.telenet.be. [84.195.73.202])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1249sm41959778f8f.5.2026.04.22.04.34.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 04:34:21 -0700 (PDT)
-From: Daan De Meyer <daan.j.demeyer@gmail.com>
-X-Google-Original-From: Daan De Meyer <daan@amutable.com>
-To: phil@philpotter.co.uk,
-	martin.petersen@oracle.com
-Cc: James.Bottomley@HansenPartnership.com,
-	axboe@kernel.dk,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daan De Meyer <daan@amutable.com>
-Subject: [PATCH v2] cdrom, scsi: sr: propagate read-only status to block layer via set_disk_ro()
-Date: Wed, 22 Apr 2026 11:32:06 +0000
-Message-ID: <20260422113206.246267-1-daan@amutable.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260330133403.796330-1-daan@amutable.com>
-References: <20260330133403.796330-1-daan@amutable.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8Hkqa2K"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1776867701; x=1808403701;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=mS5HCRxn9SdHMI0VLQx6nQ6Otsqf3/2IxkgUFN6EVDM=;
+  b=Z8Hkqa2KnpYKOgxVVcfjXmIO+inYZmhzfXqeKJ4Xq9NG36YCvODDJSSp
+   ng/MvcwsNzax2OZwML/LZBSknNJW5K8n+KiuMgV9bHlTFlZ29MO8c9tIy
+   X/5gpCnZ10QwMMutS1lhiWvnYP4fZZ9ceDRfoUPnC51tufITxVwN1v0qf
+   LlCUKtD3lORPYtyzJ+NdxCksJhd/aFwhiyI0SXo2GHark4UiBzaN4RMLE
+   8VfLCelpAuB5H9eDyEM8mhdAH74aiCevDGVvhaPz1vgZZ1DpmiixJ87ze
+   n+s41SS1wQEhun/+1nTL4MuMcafMSM3OSWRvJ+BsWPIYtlEDElrYeRmke
+   A==;
+X-CSE-ConnectionGUID: xu6GUaCtSiG/8WwOoEkjSg==
+X-CSE-MsgGUID: QPXBSt2sQh+I2WqZy1iXvg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11764"; a="95235042"
+X-IronPort-AV: E=Sophos;i="6.23,193,1770624000"; 
+   d="scan'208";a="95235042"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 07:21:40 -0700
+X-CSE-ConnectionGUID: 6Q+oKJXhTjqLKkkhBKSumw==
+X-CSE-MsgGUID: PWA1VsDkR2Ka3F+np0fxyQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,193,1770624000"; 
+   d="scan'208";a="227785906"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2026 07:21:39 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 22 Apr 2026 07:21:39 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 22 Apr 2026 07:21:39 -0700
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.8) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 22 Apr 2026 07:21:39 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O6hceUhsz1aXhDy6ukMiHEMFVchX8a1FvPvXDL8+fIkYBrOZnrEXXUZUYo/pA6wnLC1u9krgmCE90pJmd/xnql5h0XkCH5hZU+SVx0lAkGqUKaGGNZ2EeK+zJtzbJCedYv+IWHTvrsDMblMu5zx18uZZ//8ie5xqWHC667me9R4RJcgU8j+QKXy6lDc9I8+qEsis2S9ecF9YjR1+3Z6osXI8zKRKC1lWtwaDZG4ceZjS8D60K6/Ds1oW0hWd8RfFH/IAWYXvBXW16CI2SdR5X7ggg0Jo+LRIAHmH+cQcnlxHYpFlqYVhZLr5nJfV4hMXGsK/6vY9aQldVGFiUKm0YQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KbBAuJrIc1629az7c3VICQLVQGeCnliUDVFgVzUuNNQ=;
+ b=eerFHWRD/3OWOxudEgSmPsdfPt7XlgBn8tI9Wk40GL8oxYrIgrIUTjqaSZmp9yzZz/nQkr0uMmlIR4GQ2F2/DPernvVM96m6BGLG2q/qODjr9CIDnpEsyD6XhZ0sxU9SYmtXzuvD3J7O9ACMgNYvYV3xorz/nDvyjTLVs/5f/FGBPMV3TEbc8efwa5p3gK99qeD8i2+g7UL/svMoob8JHM5T3q7wL0otpMTHVS0TsBcdME0yUuTBY5Mc6hUHE5rJZfDsMBTTsDtKf+FyXmTCJEeSYGODdiR7PEPvVVKZ4eKHnB1vMu9dm+2B50m6fBBNhkcrLv9i9NRzUiYgfHWrLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5832.namprd11.prod.outlook.com (2603:10b6:510:141::7)
+ by CY5PR11MB6439.namprd11.prod.outlook.com (2603:10b6:930:34::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.20; Wed, 22 Apr
+ 2026 14:21:37 +0000
+Received: from PH0PR11MB5832.namprd11.prod.outlook.com
+ ([fe80::106e:78dd:4c96:d707]) by PH0PR11MB5832.namprd11.prod.outlook.com
+ ([fe80::106e:78dd:4c96:d707%3]) with mapi id 15.20.9846.011; Wed, 22 Apr 2026
+ 14:21:36 +0000
+Date: Wed, 22 Apr 2026 22:21:28 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, <linux-block@vger.kernel.org>,
+	<oliver.sang@intel.com>
+Subject: [linus:master] [block]  b520c4eef8: blktests.scsi/002.fail
+Message-ID: <202604222222.8ddedd9b-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: s-nail v14.9.25
+X-ClientProxiedBy: SG2PR01CA0127.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::31) To PH0PR11MB5832.namprd11.prod.outlook.com
+ (2603:10b6:510:141::7)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5832:EE_|CY5PR11MB6439:EE_
+X-MS-Office365-Filtering-Correlation-Id: fab85403-30e3-46da-f343-08dea07a762c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|13003099007|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info: SYLDIe4mXARLz4bs2VSMQpLgLFyULTpD7E+4wSLDl5IVa4d4c85QpOcMODd9Bo+1X3JaPiT5+f7bU2ygC+SG7FX/Wg2j+oMDpYpDzZ1NlBUP4dkH1gux73QpAOzLxybHFIOa8XqXYfBLkj3ca6xnJsnwcgKX1oRH7t1cZZsG3PX4PZbTVfwi3Zsmj1TI6NnB6VgtgV5LlkFwPtOgiswR+4DhnQodrqhm8C4e0npM8IUAmHzcuGZ9a+07sQ/iZGwRvco8f9S4itfAa0hRUAeYVbiaVp4gCkZm5I++wf/VtGuKQjU5H/6iDDfZBRtKFEF8q2ZbpYwW4GIrhA/7HKbdKcQfOjWwyQA5Wmzcsf1UU/3ziqWJ20lQJUWGLRFCVzxcqUBDkpQKE8g8A1Ynu8reH6vDFdrQAKSlY6emi1klgKUR9xkesOLHCKHrBhB+U6VSVtYr4s0DF9vw+0U2kyd0OhRyBtw9Phyl0TEInXO4B6u4ecKskq3xNPZla96j5pf+06kcoDDIB0q1yQ+rXaYA0ZRiE7eF2NXmsvFxVrss41qaSWLhUagSpTevHESM3g/WXBGsf8WMrFkMWJBs+JVYtg50KIwpe1PzHfB4R3ECBV06CnzMdBEJBGyuqibSCePDju9YHQAedVk8z1+Bd0vDykNlL/4JipgHBidy4Y2y8yGK+BBe6ZUf6rcMokIA1YL7fCdB/Zm8b1DnQaTLcBGGYA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5832.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(13003099007)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jz7voxSy1RLV3a4SpNBrm7DVEes0QQXbNzziE6wE6z9GyrdYX481jVMwPUxx?=
+ =?us-ascii?Q?nuvkyIIRPOFbG29MHoVZATFLb8AiJFlPPOkiSKbLfmP1iTBj4U9RtSweDLmh?=
+ =?us-ascii?Q?irgSOAheIAeZdK74DTGapyT/yI9KKHaco0imGEvqsbY6YhhYFebzQeYSlKXc?=
+ =?us-ascii?Q?axUEOO55yyAQOBp8ZMHmdmmn0u1Z2jZMNkzKGzF2XZ8J03tJibsZaZx8svkG?=
+ =?us-ascii?Q?rIluyyavJNQfshQPuTq95hSq1E/qJCPS1ruIT9Ix89pz4lNtlaoHKhAG2Jw5?=
+ =?us-ascii?Q?LviIT5x0maxw3oxD1ArNbiJg6uMasFJGvzCeUIfMiZsDRFQa5Y9iv9WZIHPm?=
+ =?us-ascii?Q?p8M6fBFd5ivicLdJYSqCvj0kOSQ6MSw6tZOmidI8ubc3zRImlxQuU3a7RLt5?=
+ =?us-ascii?Q?31SQ+0EAEG1X2cQSwOboze95wYkg3y1i6IATzq//O6j5S67QLbCg3RYo017S?=
+ =?us-ascii?Q?w8vp3k0b5/JUxgqtYB6OLeRAcSV6R05xuYGwxUDsj9K2gd4Ef5GWPiJDpLkG?=
+ =?us-ascii?Q?4XraZ2eC3eT0M6K3i143mDylylLRYUkbRiLSeETBNawA1Kns2qciF9V8OIxv?=
+ =?us-ascii?Q?DpA05nnsfxmPukqjzf4Ii82PtOu0bjDyKABGTeTYVeBJyMKZ2J+gPCqCiLoa?=
+ =?us-ascii?Q?Tj/QIL412ESOrP4O6ywsc/OtyhDkX4v66dAtfMA3DYAJUuB6RcwRiFWcQxUa?=
+ =?us-ascii?Q?PoDb9povBKeqnJiPlVH1Ikgt8jQk/0xploILk6Wa0JHieCv9NIijdZc9cn/V?=
+ =?us-ascii?Q?mPsCkLYWEMR3LRsKVQ7B3Jq3peZ0KRDhCcZx5go6j4Rzs0jiFM/guDB6Kfjy?=
+ =?us-ascii?Q?346LmVjUZrUhdzeP2+JGUibvAgqGlYHfEpcJZFM9+ByxL1j8/sbVzgj/fKdr?=
+ =?us-ascii?Q?eey2gdYWLJs6noc27+9W5eFiSo7Ck8rsciSAI4zfVXDeUk8oE57NyxwVdUmO?=
+ =?us-ascii?Q?OiYNPKs8KqHYXbel0lY9LVObnUuZ6r1A0XFrMiah6/GpcCMwnBdrjA8hzaS0?=
+ =?us-ascii?Q?hbytb2cvcBAYdkWs3MP/GHn0kcIw/7KGTdZTGyoJb/976jV3VgwfBsm+qBNL?=
+ =?us-ascii?Q?+vit5FRqLumZOYu2/Z9Ubiqhn6yoT85djcl61HcTyQbKjxilVYkOmiNxL7l6?=
+ =?us-ascii?Q?8zhhjfngJ4U8YrPvSvCdPBX1X6u+nAG9m40FDLNiBaWLPNI4EF4O2DzRCIKG?=
+ =?us-ascii?Q?aU0rE6mDKatBZS00wcjA67ZFlV0ngna0HGASeZqdLYTPjDI508ahaeOqy2vu?=
+ =?us-ascii?Q?K6sLQJfPIeqZmROyCWa6Jz6SJEvx8G1xgQEg0YPBAtsIYO8UMft8V2kpLRUr?=
+ =?us-ascii?Q?lCX8FgxqYUnnRrH7lGXsQfA7YLgUqcWkfDIKdLLk0Bg3ZATPXTjfptkyAtfp?=
+ =?us-ascii?Q?57bKGv9EPhvuNZqqcRpUQ5QwK9DeAky5tESNlCsmxr3nI/nK92GC9GeaWyEr?=
+ =?us-ascii?Q?Ext5m28PpqRSV3SnEs8xXQEbFx4202GfPhMjGss+B8QIa3i2cP9czeDSsjy2?=
+ =?us-ascii?Q?i/Xbb8PcHc/r+tQj0LQRds+mZfXu+o4u5ZjPgMmOSqqyl5cvJqxXfVioc3Tk?=
+ =?us-ascii?Q?EDFy7NWvtdnsEkxEZGap5bO7nVSAPZFrvzifUa2Lm2ZJgQrFnYViENyS+qXt?=
+ =?us-ascii?Q?fYuEOiSVfofNCio21ZOVMocvdNyXlNkk/Zaqeacp7BPbx3/9h/f1LdIItMSG?=
+ =?us-ascii?Q?WWPL5KMCmdymQadJXxu/SZqy5eymZWfM0cx8qb1MNwMpGj2eSn8BoNdLsgM1?=
+ =?us-ascii?Q?Z8U/kqsIsA=3D=3D?=
+X-Exchange-RoutingPolicyChecked: t1d4jdLC+HefvmK0lb/YsJK+Zgs13JlNLVwijRKwV2H8s9UCggmCU3u5Yv6MPclFO6rxvV9jT+4QZBw4GTFSIRGrbGAD7tAkDDd5KyY7Lu1qlrZ/Fb7mnigELrHkuzUvpt8jBupsBNjuRkipWnwje2yChRVvVvvspFpZH/yRjDqoPz5PbSG7iVapXgajxHwCyapiiQXM8/sJViIV5DLMEu4HE5IWpMwAX2/1pYD6aKtHMa15L9B79rlQci3+a2xCO9YcF01b/WlGhN7S7/2cht012dwFzfaRzN4rS8J5Qaj5ioQxLlFTCUMHAIueQDq6KsOtNeiPEO1DAV8bwNOunA==
+X-MS-Exchange-CrossTenant-Network-Message-Id: fab85403-30e3-46da-f343-08dea07a762c
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5832.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2026 14:21:36.7826
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a3Yy+k0XXp5xV/k/O7Gwr16Q4FrJIFECE/DahdINiSCcfUJ20S5ZXAhc0N52ZmRckB8Bv1uwpSoIxOdG4XtiGQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6439
+X-OriginatorOrg: intel.com
 
-The cdrom core never calls set_disk_ro() for a registered device, so
-BLKROGET on a CD-ROM device always returns 0 (writable), even when the
-drive has no write capabilities and writes will inevitably fail. This
-causes problems for userspace that relies on BLKROGET to determine
-whether a block device is read-only. For example, systemd's loop device
-setup uses BLKROGET to decide whether to create a loop device with
-LO_FLAGS_READ_ONLY. Without the read-only flag, writes pass through the
-loop device to the CD-ROM and fail with I/O errors. systemd-fsck
-similarly checks BLKROGET to decide whether to run fsck in no-repair
-mode (-n).
 
-The write-capability bits in cdi->mask come from two different sources:
-CDC_DVD_RAM and CDC_CD_RW are populated by the driver from the MODE
-SENSE capabilities page (page 0x2A) before register_cdrom() is called,
-while CDC_MRW_W and CDC_RAM require the MMC GET CONFIGURATION command
-and were only probed by cdrom_open_write() at device open time. This
-meant that any attempt to compute the writable state from the full
-mask at probe time was incorrect, because the GET CONFIGURATION bits
-were still unset (and cdi->mask is initialized such that capabilities
-are assumed present).
+Hello,
 
-Fix this by factoring the GET CONFIGURATION probing out of
-cdrom_open_write() into a new exported helper,
-cdrom_probe_write_features(), and having sr call it from sr_probe()
-right after get_capabilities() has populated the MODE SENSE bits.
-register_cdrom() then calls set_disk_ro() based on the full
-write-capability mask (CDC_DVD_RAM | CDC_MRW_W | CDC_RAM | CDC_CD_RW)
-so the block layer reflects the drive's actual write support. The
-feature queries used (CDF_MRW and CDF_RWRT via GET CONFIGURATION with
-RT=00) report drive-level capabilities that are persistent across
-media, so a single probe before register_cdrom() is sufficient and the
-redundant probe at open time is dropped.
+kernel test robot noticed "blktests.scsi/002.fail" on:
 
-With set_disk_ro() now accurate, the long-vestigial cd->writeable flag
-in sr can go: get_capabilities() used to set cd->writeable based on
-the same four mask bits, but because CDC_MRW_W and CDC_RAM default to
-"capability present" in cdi->mask and aren't touched by MODE SENSE,
-the condition that gated cd->writeable was always true, making it
-unconditionally 1. Replace the corresponding gate in sr_init_command()
-with get_disk_ro(cd->disk), which turns a previously no-op check into
-a real one and also catches kernel-internal bio writers that bypass
-blkdev_write_iter()'s bdev_read_only() check.
+commit: b520c4eef83dd406591431f936de0908c3ed7fb9 ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
+https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
 
-The sd driver (SCSI disks) does not have this problem because it
-checks the MODE SENSE Write Protect bit and calls set_disk_ro()
-accordingly. The sr driver cannot use the same approach because the
-MMC specification does not define the WP bit in the MODE SENSE
-device-specific parameter byte for CD-ROM devices.
+[test failed on linus/master      c1f49dea2b8f335813d3b348fd39117fb8efb428]
+[test failed on linux-next/master c7275b05bc428c7373d97aa2da02d3a7fa6b9f66]
+[test failed on fix commit        67807fbaf12719fca46a622d759484652b79c7c3]
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Daan De Meyer <daan@amutable.com>
----
-v1 was two separate patches:
-  1. scsi: sr: propagate read-only status to block layer via set_disk_ro()
-     https://lore.kernel.org/linux-scsi/20260330122124.755083-1-daan@amutable.com/
-  2. scsi: sr: exclude CDC_MRW_W and CDC_RAM from writeable check
-     https://lore.kernel.org/linux-scsi/20260330133403.796330-1-daan@amutable.com/
+in testcase: blktests
+version: blktests-x86_64-1d68a36-1_20260417
+with following parameters:
 
-Changes since v1:
-  - Addressed review feedback that the writable-state decision was split
-    between sr.c and cdrom.c. Moved the MMC GET CONFIGURATION probing out
-    of cdrom_open_write() into a new exported helper,
-    cdrom_probe_write_features(), which sr_probe() calls right after
-    get_capabilities(). register_cdrom() now computes the read-only state
-    from the complete mask, so the whole decision lives in cdrom.c.
-  - Since CDF_MRW and CDF_RWRT (GET CONFIGURATION with RT=00) report
-    drive-level capabilities that are persistent across media, a single
-    probe before register_cdrom() is sufficient; the redundant probe at
-    open time is dropped rather than duplicated.
-  - Squashed the two v1 patches into one commit to avoid a bisection
-    window where sr's narrowed mask check disagreed with the yet-to-be-
-    added cdrom.c logic.
-  - Dropped sr's cd->writeable flag entirely. It was always set to 1 in
-    practice (because CDC_MRW_W and CDC_RAM aren't populated by MODE
-    SENSE and default to "present"), so the gate in sr_init_command()
-    never rejected anything. Replaced with get_disk_ro(cd->disk), which
-    is now accurate and also covers kernel-internal bio writers that
-    bypass blkdev_write_iter()'s bdev_read_only() check.
+	disk: 1HDD
+	test: scsi-002
 
- drivers/cdrom/cdrom.c | 73 ++++++++++++++++++++++++++++---------------
- drivers/scsi/sr.c     | 11 ++-----
- drivers/scsi/sr.h     |  1 -
- include/linux/cdrom.h |  1 +
- 4 files changed, 51 insertions(+), 35 deletions(-)
 
-diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-index fc049612d6dc..62934cf4b10d 100644
---- a/drivers/cdrom/cdrom.c
-+++ b/drivers/cdrom/cdrom.c
-@@ -631,6 +631,16 @@ int register_cdrom(struct gendisk *disk, struct cdrom_device_info *cdi)
- 
- 	WARN_ON(!cdo->generic_packet);
- 
-+	/*
-+	 * Propagate the drive's write support to the block layer so BLKROGET
-+	 * reflects actual write capability. Drivers that use GET CONFIGURATION
-+	 * features (CDC_MRW_W, CDC_RAM) must have called
-+	 * cdrom_probe_write_features() before register_cdrom() so the mask is
-+	 * complete here.
-+	 */
-+	set_disk_ro(disk, !CDROM_CAN(CDC_DVD_RAM | CDC_MRW_W | CDC_RAM |
-+				     CDC_CD_RW));
-+
- 	cd_dbg(CD_REG_UNREG, "drive \"/dev/%s\" registered\n", cdi->name);
- 	mutex_lock(&cdrom_mutex);
- 	list_add(&cdi->list, &cdrom_list);
-@@ -742,6 +752,44 @@ static int cdrom_is_random_writable(struct cdrom_device_info *cdi, int *write)
- 	return 0;
- }
- 
-+/*
-+ * Probe write-related MMC features via GET CONFIGURATION and update
-+ * cdi->mask accordingly. Drivers that populate cdi->mask from the MODE SENSE
-+ * capabilities page (e.g. sr) should call this after those MODE SENSE bits
-+ * have been set but before register_cdrom(), so that the full set of
-+ * write-capability bits is known by the time register_cdrom() decides on the
-+ * initial read-only state of the disk.
-+ */
-+void cdrom_probe_write_features(struct cdrom_device_info *cdi)
-+{
-+	int mrw, mrw_write, ram_write;
-+
-+	mrw = 0;
-+	if (!cdrom_is_mrw(cdi, &mrw_write))
-+		mrw = 1;
-+
-+	if (CDROM_CAN(CDC_MO_DRIVE))
-+		ram_write = 1;
-+	else
-+		(void) cdrom_is_random_writable(cdi, &ram_write);
-+
-+	if (mrw)
-+		cdi->mask &= ~CDC_MRW;
-+	else
-+		cdi->mask |= CDC_MRW;
-+
-+	if (mrw_write)
-+		cdi->mask &= ~CDC_MRW_W;
-+	else
-+		cdi->mask |= CDC_MRW_W;
-+
-+	if (ram_write)
-+		cdi->mask &= ~CDC_RAM;
-+	else
-+		cdi->mask |= CDC_RAM;
-+}
-+EXPORT_SYMBOL(cdrom_probe_write_features);
-+
- static int cdrom_media_erasable(struct cdrom_device_info *cdi)
- {
- 	disc_information di;
-@@ -894,33 +942,8 @@ static int cdrom_is_dvd_rw(struct cdrom_device_info *cdi)
-  */
- static int cdrom_open_write(struct cdrom_device_info *cdi)
- {
--	int mrw, mrw_write, ram_write;
- 	int ret = 1;
- 
--	mrw = 0;
--	if (!cdrom_is_mrw(cdi, &mrw_write))
--		mrw = 1;
--
--	if (CDROM_CAN(CDC_MO_DRIVE))
--		ram_write = 1;
--	else
--		(void) cdrom_is_random_writable(cdi, &ram_write);
--	
--	if (mrw)
--		cdi->mask &= ~CDC_MRW;
--	else
--		cdi->mask |= CDC_MRW;
--
--	if (mrw_write)
--		cdi->mask &= ~CDC_MRW_W;
--	else
--		cdi->mask |= CDC_MRW_W;
--
--	if (ram_write)
--		cdi->mask &= ~CDC_RAM;
--	else
--		cdi->mask |= CDC_RAM;
--
- 	if (CDROM_CAN(CDC_MRW_W))
- 		ret = cdrom_mrw_open_write(cdi);
- 	else if (CDROM_CAN(CDC_DVD_RAM))
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 7adb2573f50d..c36c54ecd354 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -395,7 +395,7 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
- 
- 	switch (req_op(rq)) {
- 	case REQ_OP_WRITE:
--		if (!cd->writeable)
-+		if (get_disk_ro(cd->disk))
- 			goto out;
- 		SCpnt->cmnd[0] = WRITE_10;
- 		cd->cdi.media_written = 1;
-@@ -681,6 +681,7 @@ static int sr_probe(struct scsi_device *sdev)
- 	error = -ENOMEM;
- 	if (get_capabilities(cd))
- 		goto fail_minor;
-+	cdrom_probe_write_features(&cd->cdi);
- 	sr_vendor_init(cd);
- 
- 	set_capacity(disk, cd->capacity);
-@@ -899,14 +900,6 @@ static int get_capabilities(struct scsi_cd *cd)
- 	/*else    I don't think it can close its tray
- 		cd->cdi.mask |= CDC_CLOSE_TRAY; */
- 
--	/*
--	 * if DVD-RAM, MRW-W or CD-RW, we are randomly writable
--	 */
--	if ((cd->cdi.mask & (CDC_DVD_RAM | CDC_MRW_W | CDC_RAM | CDC_CD_RW)) !=
--			(CDC_DVD_RAM | CDC_MRW_W | CDC_RAM | CDC_CD_RW)) {
--		cd->writeable = 1;
--	}
--
- 	kfree(buffer);
- 	return 0;
- }
-diff --git a/drivers/scsi/sr.h b/drivers/scsi/sr.h
-index dc899277b3a4..2d92f9cb6fec 100644
---- a/drivers/scsi/sr.h
-+++ b/drivers/scsi/sr.h
-@@ -35,7 +35,6 @@ typedef struct scsi_cd {
- 	struct scsi_device *device;
- 	unsigned int vendor;	/* vendor code, see sr_vendor.c         */
- 	unsigned long ms_offset;	/* for reading multisession-CD's        */
--	unsigned writeable : 1;
- 	unsigned use:1;		/* is this device still supportable     */
- 	unsigned xa_flag:1;	/* CD has XA sectors ? */
- 	unsigned readcd_known:1;	/* drive supports READ_CD (0xbe) */
-diff --git a/include/linux/cdrom.h b/include/linux/cdrom.h
-index b907e6c2307d..260d7968cf72 100644
---- a/include/linux/cdrom.h
-+++ b/include/linux/cdrom.h
-@@ -108,6 +108,7 @@ int cdrom_ioctl(struct cdrom_device_info *cdi, struct block_device *bdev,
- extern unsigned int cdrom_check_events(struct cdrom_device_info *cdi,
- 				       unsigned int clearing);
- 
-+extern void cdrom_probe_write_features(struct cdrom_device_info *cdi);
- extern int register_cdrom(struct gendisk *disk, struct cdrom_device_info *cdi);
- extern void unregister_cdrom(struct cdrom_device_info *cdi);
- 
+config: x86_64-rhel-9.4-func
+compiler: gcc-14
+test machine: 4 threads Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz (Skylake) with 32G memory
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202604222222.8ddedd9b-lkp@intel.com
+
+
+2026-04-21 09:29:51 cd /lkp/benchmarks/blktests
+2026-04-21 09:29:51 echo scsi/002
+2026-04-21 09:29:51 ./check scsi/002
+scsi/002 => sda1 (perform a SG_DXFER_FROM_DEV from the /dev/sg read-write interface)
+scsi/002 => sda1 (perform a SG_DXFER_FROM_DEV from the /dev/sg read-write interface) [failed]
+    runtime    ...  0.016s
+    --- tests/scsi/002.out	2026-04-17 08:24:43.000000000 +0000
+    +++ /lkp/benchmarks/blktests/results/sda1/scsi/002.out.bad	2026-04-21 09:29:51.412382400 +0000
+    @@ -1,3 +1,4 @@
+     Running scsi/002
+    -PASS
+    +write: Cannot allocate memory
+    +FAIL
+     Test complete
+
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20260422/202604222222.8ddedd9b-lkp@intel.com
+
+
+
 -- 
-2.53.0
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
