@@ -1,450 +1,83 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1443320D4FF
-	for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 08:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776845875; cv=pass; b=AjilJ3h04achP9Y0u1/S1w7liuiQgO3tBSbdrW4USZKEwvc9i4hBDZnT+M9/bLzulkeRpfL/06BPO9D1XUD3MNDlXNia0LuZM0eJFRDN8+DHYfrwfsEuf2XVhV0wXGut0udiL/ygW8wYUETXbqN4Dpc8pE9xajDeGpPpSzDXZcI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776845875; c=relaxed/simple;
-	bh=KaBz9kmz24MLjxuuycGABAaLrcm88HhScI6crUPgnTY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ipdd5oKsaBKVcMxsU4PjufgPOR2VxjIpAVXYrEE75aplx/j0YVpxr/Xl2rJhtGQectokOZhXl7xLbNd50pW2dcs/uOIpfrE9gyL2ni9ArEsfgfaFGLMSoWl47g/NQQm24NqlQasm/ftY2xbIpDC/lyI6L7yARREtwoWM4xz0Pb0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dla6Nbl2; arc=pass smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dla6Nbl2"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43d77f6092eso3505447f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 01:17:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776845871; cv=none;
-        d=google.com; s=arc-20240605;
-        b=SUfm1/3TKcAmSJ43i1CevNlrHFNLQ/nx1f9mxRKP8cfNWsb+jG/f2QTv2b2gBtsefE
-         JtE1U74+QWI2eVVj5dw8EjHeaWJWOIDFteDKwq5timIWXMkx7TIAcYmXFG+L/O80DCj+
-         8uOt/ntAwHQNbijvn3uCORSAoyMjJqfXIifNWM1HgsLIGKVL9F/R5avZcE372QOXE6vf
-         xmanTWek15YiUKexHyqKroN/Usg+f0pHvGbtFIh25mFMkuFGdxW879bVwTWDCnp6OrV6
-         8bfPLAP+ECECkZ/BeJUlQaLGJX8xM5sh+W4dyWP3o2P5gO9ukRFXFWMJ/FtrYrcVrrzt
-         PNFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Ed8qgQLZgWWqPjz4Cxq94KupWeY98Dp7kKiY+uA66so=;
-        fh=GT3h9diCfJWwH3d42ucnK23FJKhmlCwRgEnEhUjZ68E=;
-        b=aIrG2sVRUTjrSEQfdRcdXLXCWfHilhIGrFaPHcP70DJtdvH1l4l8lpr12rOaKXO8P8
-         9mGGcqlt+LTnJdeFh4iCZaK+Dq6epmM+DIIL3EVyOsWhR7Yd2tzIHbipLAFpqqngMYcS
-         +EBB0wggZoC9RPlT0NGVABww+zDI3oFtkBKOy5kCjT/1EZweeJYP1XCfGnI1M3lIojxu
-         vyt98p0UeBqX/xwV56zH1MpmKwc4Z3RyBeeKlNTQ9KnjHbpMwCFWTBDPc5dbscR5sOwD
-         mJLEPKYtSWItLHZlax827B9AGcdiHhkP39xBgXJYimEIau3Ni88PeUt9r/Ta0GQkCHMN
-         tUUQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1776845871; x=1777450671; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ed8qgQLZgWWqPjz4Cxq94KupWeY98Dp7kKiY+uA66so=;
-        b=dla6Nbl2Wn0rRM66GMlaM5HW8Bp/LTpnrbyzhiyJ193cB7rOv/DMyuyY2rx8x6rVOE
-         EsAjAFCTm94vYmOES1Ak2SfHRrx2N0ERHBKg5siy4EaLByq/IeF0AbeipmEAllHYiJ31
-         De5G3tY/t0lImy1Vdv7hmH7rNk6kixyckduYLNhWPYtnVbUqE96ePINcpKfmvMERb2SO
-         A3oIhdfIJiOQ6A7/CKMsmzcVnYaxfs20zuzTKg7y1OVDHP0c9nc0W0jP3qGhbrcuqJcx
-         xnpEt9lIDXat8p7mb/r5BBHoCz7xIe1OpY3hIraW6OhbVV4Vf8NIXk/Fbkmm969wx9kb
-         GhxA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C913C141A
+	for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 09:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776848918; cv=none; b=XaUiApQiwt3ZQjA8UkzAbKT6IUUl+wc2u6VBcjRtYw7zZnAVadxvovnjTL+oi3IjdVlceI9YEyXuHkE5y5DHTdGOQSaJnc6/+jj8WHBo91deQgOgBL87SNxncqf4TFAjtS2SPPTM5z7VfJAIlbZPb7YD8uBGa2haHgNVGdAy3Qc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776848918; c=relaxed/simple;
+	bh=fGBL6HHh6SGo9audXZE6dkWBvTSnCq0fq/9WUUDnJs0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EAIJXzokmCNdGiD638KIdKYN+ulcpoXfovj+2PMNlGnYhY1mkEQ939MzxjmT8kev9v0JWiZUDjmkRsTf5oYSRVfnxgFErSF7lMMM4E6FLqwQiooMZKrsVHqfU6xmX+xvWwtmrymqyaT8Zfz25K5aeQsnUypLq+/B8KxyNF6LX0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7dbc56f5290so12514998a34.0
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 02:08:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776845871; x=1777450671;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ed8qgQLZgWWqPjz4Cxq94KupWeY98Dp7kKiY+uA66so=;
-        b=Y7QVe7IuDad7jexRHnIqfbrPR3iJrwoHLVBt/Oaxa9jV7wzPlJyUQF+FJHKquV1/Z7
-         m/4DvFT55gAPUHBhwtdzkE5SqmDHHUBMhkWfK40hKYaaWCnWSlxid0ooXqGv8y/7A0OX
-         AO7w4DaRrR3Iozu8y7QBASsfehw9fdNybls7qU65bGJdhwCMPPvmsQrsXTmeoHaLdMNX
-         3jnzUfdV7T6kjpzsZv5c+eMCE5fs94va3HrXzMktsA98iTpYwXTD4xoI7DTCxbOQ7a4t
-         wlHaC2GVQ4Rd+bDb2WZ4R9jrZ5jARKZIM+fX/veqUpCKXD+ud/X4jhj8xONgreQ2ty/1
-         NvOg==
-X-Forwarded-Encrypted: i=1; AFNElJ9YMQTqYG1PWTa2GOcvtij7vs2fNm8HiMr4KO4m4lcCiq+zSxtjOd2TEfjRduFbaNgHqJF8W9+3LJYdsA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0ChzsnAuvuFmu4AkY31Wu+1tDauD5arycs2dBoQdL1Z+xwlW0
-	MZRPupxc9GIs0ZBgQnmignog5qedBTraLq4t+bUSGGxY5mzLIEQpveyPRTpPWzDDtOU+L3mKGv8
-	j7J7yX/7fqYyQmYQjiJlayzq03i0uqwLesHwQpVUisw==
-X-Gm-Gg: AeBDiev4AQO5MlCPpMtP8U1Yag2j0VdqWD63TgMs292YIrMqx5IDtW0PEDkaMSYJqTj
-	AMW4pFtECXr79y3YkN0rFa4pQT8rwiBFEhPLb/jjVEMWZUF6yvCg1Sa+0RrFAtRwzP6oCSxboMO
-	prJMjohaEthZ9oCj5FAYNLTmOF3paPDT7sgOhncoaaTlrjY1j8AHpfBP5ZsKdy4gx9DYLTng4iD
-	mevPCBf5VLXNvtMQL3GTOCkaJg1CIEKLVwAmduEYp+6AIAGWKdFq6/JsXb5RUC/UhFAw7wGsRqF
-	NVnuaBAQa88CCMDUQJKi+RwIrJS1xvazQoGdYHLnXQrZAGCDNlT3750yetYBeAIAefK4GLECsYU
-	kY8EONh+EVpUAOtA=
-X-Received: by 2002:a05:6000:2909:b0:43d:7403:4b65 with SMTP id
- ffacd0b85a97d-43fe3dbee20mr32442989f8f.6.1776845871298; Wed, 22 Apr 2026
- 01:17:51 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776848915; x=1777453715;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JguPi/7ATNTE9BtiIq8gZF3u2uWzOV/oKtj5SBfscVk=;
+        b=PGfmhrMc/asjNlmE0hT2H8/9WktPilr0UyZPI5kKhHIRE4bgB5OFOR1s4RHcC6awBJ
+         LtKhhsYCSzViwaILwjpfPxNYg7E3lRdlwLMKbc2lq1i68q5fz0LQozo3jexApKQIg2j0
+         Oe6m1DLWOBEX3i55mJg1BlQ0zrIagaIcYVwq2m5mKVAlBKmlzIh/Gz7xs7LJi0SJqva4
+         BjeFZqgQ1z0Hl8QuqTCnmT6WxF3QOx2RcMgKGPmEiEcGTsDOF65nMi+SjBScnmf2BA24
+         ezz+LBplF6wHgDsj7jSBjutMx+33FlWsPa7kYeVyrh82wqVhSnHe/tN21ps0UAESsfpS
+         YYNg==
+X-Forwarded-Encrypted: i=1; AFNElJ+UhVSTX+i2a7lnxtKRgPNQs+CNmDy+uzCgpDIM6E6/FZSC6VrMwcryS4hboRk9IRizKI9oiot2nsDBzA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKx8fiTfdaYGjYSj/VS0uWCwRVbBs14zVpBQajo/u7cYQDEPvA
+	a6C8jEQQltb0qOvj4cBklo4N34ws2lYH7FiKUpshP8cR+VRANwvSVmAGo6r9WCK6N6dBmE8wGdm
+	vd5sDeec/ZSN5/MqHRpcUvtct686W1Ivg2wVvIqDpL63MVsRWwZR9zuvglMw=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-2-neelx@suse.com>
- <20260221221153.GA2123@quark>
-In-Reply-To: <20260221221153.GA2123@quark>
-From: Daniel Vacek <neelx@suse.com>
-Date: Wed, 22 Apr 2026 10:17:40 +0200
-X-Gm-Features: AQROBzDRf6dW9hhOiPElzRm0HdywL3iGKud30yy3mnFfjH0N645a-533K3fMPn0
-Message-ID: <CAPjX3FficsLf2QXFU70sR6PN7h8rj5opz_wntLm+Acd3YLvu+A@mail.gmail.com>
-Subject: Re: [PATCH v6 01/43] fscrypt: add per-extent encryption support
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>, 
-	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6820:604:b0:689:7cd7:259e with SMTP id
+ 006d021491bc7-69462f44c08mr12786544eaf.57.1776848915595; Wed, 22 Apr 2026
+ 02:08:35 -0700 (PDT)
+Date: Wed, 22 Apr 2026 02:08:35 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69e89013.a00a0220.17a17.002a.GAE@google.com>
+Subject: [syzbot] Monthly nbd report (Apr 2026)
+From: syzbot <syzbot+liste3c870f14b55e93ead74@syzkaller.appspotmail.com>
+To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 21 Feb 2026 at 23:11, Eric Biggers <ebiggers@kernel.org> wrote:
-> I lost all my original comments on this patch due to a computer crash,
-> so apologies if this sounds a bit rushed.  (I should know better than to
-> run the latest mainline kernel.  Would be nice if kernel developers
-> focused on quality over new features...)
+Hello nbd maintainers/developers,
 
-Oh, and I somehow missed this email in my mailbox :-/
-I'm sorry about the late reply.
+This is a 31-day syzbot report for the nbd subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nbd
 
-> > +/*
-> > + * fscrypt_extent_context - the encryption context of an extent
-> > + *
-> > + * This is the on-disk information stored for an extent.  The nonce is used as a
-> > + * KDF input in conjuction with the inode context to derive a per-extent key for
-> > + * encryption.
-> > + *
-> > + * With the current implementation, master_key_identifier and encryption mode
-> > + * must match the inode context.  These are here for future expansion where we
-> > + * may want the option of mixing different keys and encryption modes for the
-> > + * same file.
-> > + */
->
-> Above comment should document that this is used only when the filesystem
-> uses per-extent encryption
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 9 have already been fixed.
 
-Good point. I'll amend that.
+Some of the still happening issues:
 
-> > +/**
-> > + * fscrypt_set_bio_crypt_ctx_from_extent() - prepare a file contents bio for
-> > + *                                        inline crypto with extent
-> > + *                                        encryption
-> > + * @bio: a bio which will eventually be submitted to the file
-> > + * @ei: the extent's crypto info
-> > + * @first_lblk: the first file logical block number in the I/O
->
-> first_lblk probably should be 'pos' to match Christoph's pending patches
-> (https://lore.kernel.org/linux-fscrypt/20260218061531.3318130-1-hch@lst.de).
-> Either way, it also needs to be correctly documented to be an offset
-> into the extent, not the file.
+Ref Crashes Repro Title
+<1> 3815    Yes   possible deadlock in pcpu_alloc_noprof (2)
+                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
+<2> 724     Yes   INFO: task hung in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
+<3> 205     Yes   possible deadlock in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
 
-Noted, I'll clean it up for the next version.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> > + * If the contents of the file should be encrypted (or decrypted) with inline
-> > + * encryption, then assign the appropriate encryption context to the bio.
->
-> Above comment was copy-pasted and is misleading in its new context.
-> This function assigns the encryption context unconditionally.
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-With the above cleanup I rather ended up fixing this in the code. For
-some reason, the condition was added later in the series in the
-btrfs-specific helper code which I removed and I put the condition
-right here.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-> > + * Normally the bio should be newly allocated (i.e. no pages added yet), as
-> > + * otherwise fscrypt_mergeable_bio() won't work as intended.
->
-> Likewise, copy-pasted comment that is misleading in the new context.
-> It should refer to fscrypt_mergeable_extent_bio().
-
-Yeah, I also noticed. Agreed and fixed.
-
-> > +void fscrypt_set_bio_crypt_ctx_from_extent(struct bio *bio,
-> > +                                        const struct fscrypt_extent_info *ei,
-> > +                                        u64 first_lblk, gfp_t gfp_mask)
-> > +{
-> > +     u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = { first_lblk };
->
-> Above needs to calculate the DUN correctly when the data unit size is
-> less than the file logical block size, or else the combination of
-> sub-block data units and per-extent encryption needs to be explicitly
-> not supported.  Probably just the latter for now (it can be enforced by
-> fscrypt_supported_v2_policy()).
-
-With the above cleanup I replaced `first_lblk` with `pos >>
-key->data_unit_size_bits`.
-Though this still doesn't look endian-safe to me.
-
-Note, per-extent encryption is only supported with the v2 policy.
-
-> > +/**
-> > + * fscrypt_mergeable_extent_bio() - test whether data can be added to a bio
-> > + * @bio: the bio being built up
-> > + * @ei: the fscrypt_extent_info for this extent
-> > + * @next_lblk: the next file logical block number in the I/O
-> > + *
-> > + * When building a bio which may contain data which should undergo inline
-> > + * encryption (or decryption) via fscrypt, filesystems should call this function
-> > + * to ensure that the resulting bio contains only contiguous data unit numbers.
-> > + * This will return false if the next part of the I/O cannot be merged with the
-> > + * bio because either the encryption key would be different or the encryption
-> > + * data unit numbers would be discontiguous.
-> > + *
-> > + * fscrypt_set_bio_crypt_ctx_from_extent() must have already been called on the
-> > + * bio.
-> > + *
-> > + * This function isn't required in cases where crypto-mergeability is ensured in
-> > + * another way, such as I/O targeting only a single file (and thus a single key)
-> > + * combined with fscrypt_limit_io_blocks() to ensure DUN contiguity.
-> > + *
-> > + * Return: true iff the I/O is mergeable
-> > + */
-> > +bool fscrypt_mergeable_extent_bio(struct bio *bio,
-> > +                               const struct fscrypt_extent_info *ei,
-> > +                               u64 next_lblk)
-> > +{
-> > +     const struct bio_crypt_ctx *bc = bio->bi_crypt_context;
-> > +     u64 next_dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = { next_lblk };
-> > +
-> > +     if (!ei)
-> > +             return true;
-> > +     if (!bc)
-> > +             return true;
-> > +
-> > +     /*
-> > +      * Comparing the key pointers is good enough, as all I/O for each key
-> > +      * uses the same pointer.  I.e., there's currently no need to support
-> > +      * merging requests where the keys are the same but the pointers differ.
-> > +      */
-> > +     if (bc->bc_key != ei->prep_key.blk_key)
-> > +             return false;
-> > +
-> > +     return bio_crypt_dun_is_contiguous(bc, bio->bi_iter.bi_size, next_dun);
-> > +}
-> > +EXPORT_SYMBOL_GPL(fscrypt_mergeable_extent_bio);
->
-> Similar to fscrypt_set_bio_crypt_ctx_from_extent().  The copy-pasted
-> comment needs to be updated to remove no-longer-relevant information
-> specific to per-file encryption and correctly reflect per-extent
-> encryption.  The DUN needs to be calculated correctly for sub-block data
-> units or else the combination of the two needs to be unsupported.
-
-The DUN is fixed as per above. Regarding the comment, it looks quite
-valid to me. What exactly would you like to change?
-
-> > +static struct fscrypt_extent_info *
-> > +setup_extent_info(struct inode *inode, const u8 nonce[FSCRYPT_FILE_NONCE_SIZE])
-> > +{
-> > +     struct fscrypt_extent_info *ei;
-> > +     struct fscrypt_inode_info *ci;
-> > +     struct fscrypt_master_key *mk;
-> > +     u8 derived_key[FSCRYPT_MAX_RAW_KEY_SIZE];
-> > +     int err;
-> > +
-> > +     ci = *fscrypt_inode_info_addr(inode);
-> > +     mk = ci->ci_master_key;
-> > +     if (WARN_ON_ONCE(!mk))
-> > +             return ERR_PTR(-ENOKEY);
-> > +
-> > +     ei = kmem_cache_zalloc(fscrypt_extent_info_cachep, GFP_KERNEL);
-> > +     if (!ei)
-> > +             return ERR_PTR(-ENOMEM);
-> > +
-> > +     refcount_set(&ei->refs, 1);
-> > +     memcpy(ei->nonce, nonce, FSCRYPT_FILE_NONCE_SIZE);
-> > +     ei->sb = inode->i_sb;
-> > +
-> > +     down_read(&mk->mk_sem);
-> > +     /*
-> > +      * We specifically don't check ->mk_present here because if the inode is
-> > +      * open and has a reference on the master key then it should be
-> > +      * available for us to use.
-> > +      */
->
-> Above comment should be reworded to clarify that it is expected for
-> ->mk_present to be either true or false here.  As-is, it can be
-> interpreted as meaning that checking ->mk_present is unnecessary because
-> it is guaranteed to be true.
-
-OK, I'll state that explicitly.
-
-> The comment above struct fscrypt_master_key (which documents the
-> different states the master key can be in) also needs to be updated to
-> document that with filesystems that use per-extent encryption,
-> ->mk_secret isn't wiped when the key is in the incompletely-removed
-> state (and why that needs to be the case).
-
-Right. I'll amend this in the respective patch.
-
-> > +/**
-> > + * fscrypt_prepare_new_extent() - prepare to create a new extent for a file
-> > + * @inode: the possibly-encrypted inode
-> > + *
-> > + * If the inode is encrypted, setup the fscrypt_extent_info for a new extent.
-> > + * This will include the nonce and the derived key necessary for the extent to
-> > + * be encrypted.  This is only meant to be used with inline crypto and on inodes
-> > + * that need their contents encrypted.
-> > + *
-> > + * This doesn't persist the new extents encryption context, this is done later
-> > + * by calling fscrypt_set_extent_context().
-> > + *
-> > + * Return: The newly allocated fscrypt_extent_info on success, -EOPNOTSUPP if
-> > + *      we're not encrypted, or another -errno code
-> > + */
-> > +struct fscrypt_extent_info *fscrypt_prepare_new_extent(struct inode *inode)
-> > +{
-> > +     u8 nonce[FSCRYPT_FILE_NONCE_SIZE];
-> > +
-> > +     if (WARN_ON_ONCE(!*fscrypt_inode_info_addr(inode)))
-> > +             return ERR_PTR(-EOPNOTSUPP);
-> > +     if (WARN_ON_ONCE(!fscrypt_inode_uses_inline_crypto(inode)))
-> > +             return ERR_PTR(-EOPNOTSUPP);
-> > +
-> > +     get_random_bytes(nonce, FSCRYPT_FILE_NONCE_SIZE);
-> > +     return setup_extent_info(inode, nonce);
-> > +}
-> > +EXPORT_SYMBOL_GPL(fscrypt_prepare_new_extent);
->
-> Similarly, there seems to have been a lot of incorrect copy+pasting in
-> the function comment.  This new function requires that the caller *must*
-> provide an encrypted inode, otherwise it WARNs.  It can't be
-> "possibly-encrypted".
-
-That is indeed true.
-
-> > +/**
-> > + * fscrypt_load_extent_info() - create an fscrypt_extent_info from the context
-> > + * @inode: the inode
-> > + * @ctx: the context buffer
-> > + * @ctx_size: the size of the context buffer
-> > + *
-> > + * Create the fscrypt_extent_info and derive the key based on the
-> > + * fscrypt_extent_context buffer that is provided.
-> > + *
-> > + * Return: The newly allocated fscrypt_extent_info on success, -EOPNOTSUPP if
-> > + *      we're not encrypted, or another -errno code
-> > + */
-> > +struct fscrypt_extent_info *fscrypt_load_extent_info(struct inode *inode,
-> > +                                                  u8 *ctx, size_t ctx_size)
->
-> ctx should have type 'const u8 *'
-
-Agreed.
-
-> > +/**
-> > + * fscrypt_set_extent_context() - Set the fscrypt extent context of a new extent
-> > + * @inode: the inode this extent belongs to
-> > + * @ei: the fscrypt_extent_info for the given extent
-> > + * @buf: the buffer to copy the fscrypt extent context into
-> > + *
-> > + * This should be called after fscrypt_prepare_new_extent(), using the
-> > + * fscrypt_extent_info that was created at that point.
-> > + *
-> > + * buf must be at most FSCRYPT_SET_CONTEXT_MAX_SIZE.
-> > + *
-> > + * Return: the size of the fscrypt_extent_context, errno if the inode has the
-> > + *      wrong policy version.
-> > + */
-> > +ssize_t fscrypt_context_for_new_extent(struct inode *inode,
-> > +                                    struct fscrypt_extent_info *ei, u8 *buf)
-> > +{
-> > +     struct fscrypt_extent_context *ctx = (struct fscrypt_extent_context *)buf;
-> > +     const struct fscrypt_inode_info *ci = *fscrypt_inode_info_addr(inode);
-> > +
-> > +     BUILD_BUG_ON(sizeof(struct fscrypt_extent_context) >
-> > +                  FSCRYPT_SET_CONTEXT_MAX_SIZE);
-> > +
-> > +     if (WARN_ON_ONCE(ci->ci_policy.version != 2))
-> > +             return -EINVAL;
-> > +
-> > +     ctx->version = FSCRYPT_EXTENT_CONTEXT_V1;
-> > +     ctx->encryption_mode = ci->ci_policy.v2.contents_encryption_mode;
-> > +     memcpy(ctx->master_key_identifier,
-> > +            ci->ci_policy.v2.master_key_identifier,
-> > +            sizeof(ctx->master_key_identifier));
-> > +     memcpy(ctx->nonce, ei->nonce, FSCRYPT_FILE_NONCE_SIZE);
-> > +     return sizeof(struct fscrypt_extent_context);
-> > +}
-> > +EXPORT_SYMBOL_GPL(fscrypt_context_for_new_extent);
->
-> The documentation "buf must be at most FSCRYPT_SET_CONTEXT_MAX_SIZE" is
-> incorrect.  It must actually be *at least* the size of
-> 'struct fscrypt_extent_context'.
-
-I see. While this looks like a typo, I understand it was meant to say
-that it should never need to be more than that.
-Perhaps something like this can be better worded:
-
-@@ -812,7 +812,7 @@ EXPORT_SYMBOL_GPL(fscrypt_set_context);
-  * This should be called after fscrypt_prepare_new_extent(), using the
-  * fscrypt_extent_info that was created at that point.
-  *
-- * buf must be at most FSCRYPT_SET_CONTEXT_MAX_SIZE.
-+ * buf should be able to fit up to FSCRYPT_SET_CONTEXT_MAX_SIZE bytes.
-  *
-  * Return: the size of the fscrypt_extent_context, errno if the inode has the
-  *        wrong policy version.
-
-> Given that it's a fixed size, it probably would make sense to make the
-> ouptut parameter reflect that: 'u8 out[FSCRYPT_EXTENT_CONTEXT_SIZE]'.
-> Or even just use the struct itself.
-
-Yeah, this looks like more of a future-proof feature. While the size
-is fixed now, if we ever need to define a FSCRYPT_EXTENT_CONTEXT_V2
-with different on-disk format (and size) we can still keep this very
-same API.
-
-> > +     /*
-> > +      * If set then extent based encryption will be used for this file
-> > +      * system, and fs/crypto/ will enforce limits on the policies that are
-> > +      * allowed to be chosen.  Currently this means only plain v2 policies
-> > +      * are supported.
-> > +      */
-> > +     unsigned int has_per_extent_encryption : 1;
->
-> Needs clarification about what is meant by "plain".  Some flags are
-> supported (specifically the filename padding ones), some flags are not.
-> All encryption modes still seem to be supported.
-
-Maybe this?:
-
-@@ -144,8 +144,8 @@ struct fscrypt_operations {
-     /*
-      * If set then extent based encryption will be used for this file
-      * system, and fs/crypto/ will enforce limits on the policies that are
--     * allowed to be chosen.  Currently this means only plain v2 policies
--     * are supported.
-+     * allowed to be chosen.  Currently this means only v2 policies and a
-+     * limited flags are supported.
-      */
-     unsigned int has_per_extent_encryption : 1;
-
-
->
-> > +     if (count > 0 && inode->i_sb->s_cop->has_per_extent_encryption) {
-> > +             fscrypt_warn(inode,
-> > +                          "Encryption flags aren't supported on file systems that use extent encryption");
-> > +             return false;
-> > +     }
->
-> Similarly, this error message needs clarification.  Some encryption
-> flags are supported, some aren't.
-
-Right. This should sound better:
-
-@@ -248,7 +248,7 @@ static bool fscrypt_supported_v2_policy(const
-struct fscrypt_policy_v2 *policy,
-     count += !!(policy->flags & FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32);
-     if (count > 0 && inode->i_sb->s_cop->has_per_extent_encryption) {
-         fscrypt_warn(inode,
--                 "Encryption flags aren't supported on file systems
-that use extent encryption");
-+                 "DIRECT_KEY and IV_INO_LBLK_* encryption flags
-aren't supported on file systems that use extent encryption");
-         return false;
-     }
-     if (count > 1) {
-
-Thanks for looking into it.
-
---nX
-
-> - Eric
+You may send multiple commands in a single email message.
