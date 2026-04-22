@@ -1,215 +1,134 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228EA2A1AA
-	for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 00:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776816557; cv=none; b=ZT/VvfvQCuWnh7dJqXBf/r8U720Nsds40RxG5rIYo0YFYy0YM2AG/iDSHXHKFdKXYxc+KBt0imsKRqcb7IJ07m2m8xjydB/gIsbBc53Es6ZwF9rlK/9Ci/Y2D5RAXYnuSd9s/VltzhuHcvKhWZTkSnumry/eLumFV2k/swRc5sQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776816557; c=relaxed/simple;
-	bh=W/rkiAGRdeBVfq8p8mpoCrKnC1DGGzyz+OwWnEobdWk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTRjlacpAIc0Y3HdwEPbi5nWzWc9xvtrq5Eo2ZUldTpVW0KonQsTOpChxajRBhwyZMYfHai8jjPk+OCSUqloZE92iRj+RvJi30tS9zxRCykikd2LPgGfSYRML7EUfqp0My+tuC3gOrY5VpVldZOr6Mq5uGSxbAlA7k21dNqRD5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KhH/Obdq; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F901096F
+	for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 00:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776817915; cv=pass; b=iN1f7ozGVN4Tfq/z6+JGDyA7OYlo3wVr7p/vf5cq3dGkXmZG9hZf3c3lXB8UIqtGnlcimtfrr9GkdT66s7j+tlPoFhk/EpNS4kkfIF2hWEZEK9JnPlxnmlxfVPxCIm/hsasj0nHGsbx0vjX/d02Nzk8RchZe28yb7vcHxNcv7WI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776817915; c=relaxed/simple;
+	bh=EDBXLy8UQI0j58mwWuFe1M1VHDvjlrsST3WJoz3J/No=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ws9yQqxOu9Oq06gLa4bMsVNnN72f/fF5W8J7y1uOw+ikED/34GD+uZx+zYdPS87erO6caf+oRQrc3AquNDwltdPp3xRoI6rdVo1IbM/Zvdx56ra7aWFPf6qQ3A3su9idt0+9Mq8lpQSG9zPvOCP5S1oOyvCKKpj/0hXF4VciVS4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=L2N7ARJj; arc=pass smtp.client-ip=209.85.161.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KhH/Obdq"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4896c22fcbaso22444185e9.0
-        for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 17:09:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="L2N7ARJj"
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-69489e55b7aso191917eaf.0
+        for <linux-block@vger.kernel.org>; Tue, 21 Apr 2026 17:31:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776817911; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YFo1/L7yJvvSY2KXMmslMNXNDHUYFPREBNi/RZpG6BqCTvoiE5+XlT+8flK8MCPMiK
+         E3bvEv64j0pOj1SibxW68F9KocjXAbHGQ6/Bd/ufKs8l+1AwQT0lap6ZaU1kw/U8TzoM
+         HPOQoUo/E3OIaxjakLZBBxJUofo36t21tyHLe0aCXFZaZ8wFShmDnPOPaQuz7sTA6PUz
+         jOYUfrTvZ3ugcj3Tbed+aQVB3aEnUNwSlVhcdcTsDg8aPpJXYQZgQ0809m3fCF12DYnW
+         U/C6GV0BYBgM1o2R4aIj7O9i6sGMHcabtCpeuRmcMB1lJRTTux/sBBrHZdRgFII5+D8u
+         RTuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=n/JpS5x7LAqkNMSEc/+P1ooLJ8bUzXkHfGX2YeuluD4=;
+        fh=bR9cnqMcRCMJz3euFxnmV3rrf7L56e/UnJo452sayWQ=;
+        b=e+M34tpeiMU/5cLdyA9KyxQrhLawGKkHE1Vv/61PxtfrecF8Ekw1SI8fN8mPeGnvzI
+         KgWyMtpElBt5S58kzrkJeQGNrhpfJkCnYXmtJwkpemiTqJBbhRl3bQ+WoQzSSfzY4uot
+         ujLmY+taVYrefpfOSXwNrpiLHUB1WonpZ2DdY7d/uQxD0r49CX5NAqAmeqoYZo5M59Z+
+         w3oMca6KFZovvML7VgRxcl+WeGC59Lv3W4bLSKOjJ8Z3tU4JPEgsVbMcHnErdkpA3RE7
+         lthplTGU57piuKxLrQADc3YneZHUskaOXXuH1hVmEc9IoGi8vc4484uONwqRXHScC2Nd
+         rhHQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776816554; x=1777421354; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1kOO6hvHEOXUtMcYtOy5QlL9m9H4iNST+fWSKu3oVIA=;
-        b=KhH/ObdqNrBvUlFsn3IEXAorwjnmRAAWlHUccWWPevHdKP2qb1IsJt28X9AOLBxVHM
-         ypCeixp1TV7bKy+rrym3KMWORqfL9cnRyxVkF+Dly8vDjrJw+CRl+RSC/FotJB1c1t+W
-         xQKRLgtjI7DoUtCxl9vyyN3sbvY2aI9lBkd4Gi5eFB6ZpYH/GMUjdwiOexg4fPb6zV+m
-         6+MHXjlNGVgKNLl5rjpp6C/ChIOf6g8d0G1AdAPXRE3ITNzrTbVgP0JtkjBqoX6brtuQ
-         ViqO49zBGmNvnWJhaEPnmx1d4tTpmW3w9i+2oSAW7Ipptza6XcqGhfqv8vjDNbrKllp1
-         BobA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776816554; x=1777421354;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1776817911; x=1777422711; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1kOO6hvHEOXUtMcYtOy5QlL9m9H4iNST+fWSKu3oVIA=;
-        b=Iypb9+lKUe6MxCPkxSW7xvbPTEhG2tiJQAkdyBtYdBOLVEwJFrDuyD69Yf22+DkNWW
-         9Yf/FqqXoKYvaJrqYgfNtqcpNZO+fjbwhZdUzXo5k1IYxcMVBU7jGjHlB4+sONNe8dA0
-         9c04v2568ORWnBVWPqgou0c32GW/CGigoMBNxZ6ga+Y5/EjOycmJn/cY8z92vlOHvTQf
-         PvBP7Lacvb9iJlEXegwzaDyI2AtlF2HpVfXwmH5d+Z/z3jGdGGG5PDhy57kccxW3lqhE
-         T/GyNMVixsDDrTcW+RGkgorBuls/nXcIZ+nY39xSwef1yKsyEdkSM8uwNzyadfaOhHAw
-         Pv/w==
-X-Forwarded-Encrypted: i=1; AFNElJ8vUn9czHyNStRLovoQk4JH/n23B18iUimr8zrJokzv5VN1gTR+XXkcuVuPtIKEm4J6VzDV5toRSnYs4Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwKyCeUPZlleyRKh4lyxjqJDTen8AUGgtFX2SSqFHkMp7q+V8b
-	zlxbIuRpDoTNpqYAjRVHCmqs611AsdryMAOGHaVSHUv1T4KDLLQ08dIM
-X-Gm-Gg: AeBDieve1UlRKmOgCk/6OUpNY/D09sf7ibi3e1gO13W8QwWQBGgQ1IjiRLbDRKAzY5F
-	rX6WxEOCd2RVzH8Kdz4NEyGLs4TToEEDttFAQs8N2szMJ256Yh9fIpz5y1NQL7qVbe/AHSk2Le6
-	+ZwMojm7LGiwps63bPImbaQy/fbH0s36sooaBYMft/yNnNbNXYxEuglBg/UbrS8SJ9G0qDXzl+c
-	oXdsc5KR3yclEY3Yj9Z/BAuohlfO8gMnqF2ZQgJMop+9lGN+U4OOVG7JIl+kaJMDlBqqd9abf0L
-	o1TLfRiLcvqtlVF0uZ1U/irFyoc3EAXSsJ7kqIOjGSowSvY8IxBIA0IbXHYFNoTjpn+PzIBdMfK
-	NymZJD00n2YH41w+FzsUkoBLLTdM6afbvRwnN8yozHnljQCCF4DxUycCZUurblWY30wSflwsbsW
-	dnYUAR/IK0fz3UM4v/qdjT/9en1f989Acqq5RP7eNtT8/gL+GXC9RryIfWbPujVZhzXLr9nedK9
-	h3TY+2UIPF3bb+djjU=
-X-Received: by 2002:a05:600d:14:b0:488:bc6a:5285 with SMTP id 5b1f17b1804b1-488fb7957efmr222279255e9.30.1776816554099;
-        Tue, 21 Apr 2026 17:09:14 -0700 (PDT)
-Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a5499b0edsm97833755e9.14.2026.04.21.17.09.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 17:09:13 -0700 (PDT)
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	"Liam R. Howlett" <liam.howlett@oracle.com>
-Subject: [PATCH] ublk: fix maple tree lockdep warning and unpin under spinlock
-Date: Wed, 22 Apr 2026 08:08:56 +0800
-Message-ID: <20260422000856.2362220-1-tom.leiming@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        bh=n/JpS5x7LAqkNMSEc/+P1ooLJ8bUzXkHfGX2YeuluD4=;
+        b=L2N7ARJjA0f6Ge0ICoJMuUO9BIhtrcpUlvDS+5XmxEmPA1IsN+dHQC6QGQSCb7xDVn
+         5EgzYizWmFn9Z6gkP0v+O/TlgkYOPfEIzFRX2eKfcpQHefSsrMNSwvFiqB+K75VxhUSK
+         gXnpfiTK02N2NhVinYbOegboCeoNzPz5YlLF9TZGFdcWKJuJhnLRvqRWyeDHQCw/E2id
+         GuOGtVTQX40ranJPyU9gmFg39Kdthzm1D5hEA1gD2vE+FKiVjhaDssj5fk3ubgFe1OpV
+         AmFLXh/no0rLF3sj+9oR7GpSLIqD3JbmHwLzimsbfeUerfrQmWvryM7ZKPVucYOsCq+q
+         f7+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776817911; x=1777422711;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=n/JpS5x7LAqkNMSEc/+P1ooLJ8bUzXkHfGX2YeuluD4=;
+        b=j0fOOg/5ZNHnRYYADPuNHfjGe9KnDVThm4Eh1eTO970EcvUBFYU0ZSoKwRs0J96VKF
+         l8m79Mc4s/8nEFqltI7597/V+G1bkaQOAb6CJw5VM72tJIqfWktXtyVhkppbq4QKYdOj
+         tQphh9tirTQxf2v+zLww+UsJq5vGkx0uFy1ZIxYAwwvkS/3CyDZJTPpxF91jETyR1JM1
+         AbrS1PlZDj8Ys7O/fKBhlmQjZnFPOb8fPit+bG8IDpy1IL3lYBm15/aBGIkYd13zOvsu
+         XUvQHwNXYceCqynRD1k/Zac1mt3/vTFmp6UlbPWoE4GN7VGfTCqDz1oKn5yFUA7GaPhL
+         eLEg==
+X-Forwarded-Encrypted: i=1; AFNElJ/VQZG7ftemJEOJWWpF5fw/uCr/qkPX6unxNR29d649dk1f7A9G48CeGlXJdtghLCt64cFfPi7s9P59Ug==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLa4lFzQFKRKUMvcYkt21JeXTsGEs97UQ6rLPAOCW8ajHZcV0N
+	sjpxr0foSUPhZXQXsoomCzOZLhGr1/yDOJCuke5Iuf2RZX4919vJZIoLGfZIEVxXOC/YuSgonsv
+	nHEcVRE2+RjgbZr6ttQu4j0lGoQDsYLl3KxvB8AFASQ==
+X-Gm-Gg: AeBDietRnu8It5HJJx86ezyZvUvoN0dbSC1/ClpHvZD6yT0X9H3mP2E9xsVX0/7G9jw
+	4kUvGxAQUQ0wqogSqUk3DFm0gRdfotSNH2enqYr8tfMrr27QfDZjFczeIC7n2AXcVmeqPViZXRi
+	ic3fzDEMHECkqBVr5t8yqwQhjrGhAfdxFYB6TRLv7GZtc+Yy6HRzG2ZCZua4i/DVwE40pJeUIik
+	QTtVmgBcVsjqYAQTpepOSlzSj1y4hGc3oBOwlgfdDyOrkfYyNM+GZ38mrTxT2ohyA9ih4s7DmOM
+	syBFnqZX3mmgX+b+T50=
+X-Received: by 2002:a05:6808:1993:b0:467:de9:3ea3 with SMTP id
+ 5614622812f47-4799caff080mr8312816b6e.7.1776817911562; Tue, 21 Apr 2026
+ 17:31:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260421194744.1524637-1-csander@purestorage.com> <aegNf5C5-0ccxBPp@fedora>
+In-Reply-To: <aegNf5C5-0ccxBPp@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 21 Apr 2026 17:31:40 -0700
+X-Gm-Features: AQROBzADvKxmcxiRfRvui7D1p5-LQsOkzBfOtBaxxMGQ4k5V3wwwVahU0c4oYnI
+Message-ID: <CADUfDZq3yY2j3j+Jofqab1VLrm8jk+phF24BHPnVjv0hD3vyKg@mail.gmail.com>
+Subject: Re: [PATCH] ublk: optimize ublk_rq_has_data()
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ming Lei <ming.lei@redhat.com>
+On Tue, Apr 21, 2026 at 4:51=E2=80=AFPM Ming Lei <tom.leiming@gmail.com> wr=
+ote:
+>
+> On Tue, Apr 21, 2026 at 01:47:42PM -0600, Caleb Sander Mateos wrote:
+> > ublk_rq_has_data() currently uses bio_has_data(), which involves 2
+> > indirections and several branches. Use blk_rq_bytes() instead, which
+> > performs a single indirection with no branches.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index ef8a0705e68b..5f9b3c3876f4 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -1172,11 +1172,11 @@ static inline struct ublk_queue *ublk_get_queue=
+(struct ublk_device *dev,
+> >       return dev->queues[qid];
+> >  }
+> >
+> >  static inline bool ublk_rq_has_data(const struct request *rq)
+> >  {
+> > -     return bio_has_data(rq->bio);
+> > +     return blk_rq_bytes(rq);
+> >  }
+>
+> blk_rq_bytes() doesn't return the actual payload data bytes, such as,
+> discard command, but bio_has_data() does.
 
-Fix two issues in the shmem buffer maple tree usage:
+So you're saying that on a discard, rq->__data_len is set to
+bio->bi_iter.bi_size, which represents the number of bytes being
+trimmed even though there's no data payload? I guess we could check
+req_op(rq) here to at least avoid the bio indirection.
 
-1) ublk_buf_cleanup() iterates the tree with mas_for_each() without
-   holding rcu_read_lock or mas_lock, triggering a lockdep splat on
-   CONFIG_PROVE_RCU kernels. Add mas_lock/unlock around the iteration.
-
-2) __ublk_ctrl_unreg_buf() calls unpin_user_pages() under mas_lock
-   (a spinlock). unpin_user_pages can be expensive for large buffers
-   and may take additional locks if folio refcount drops to zero.
-   Restructure to drop mas_lock before unpinning, re-acquiring it
-   to continue iteration.
-
-Both functions now use the same pattern: erase under lock, drop lock,
-unpin and free, re-lock to continue. Extract ublk_unpin_range_pages()
-helper to share the page unpinning loop.
-
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Closes: https://lore.kernel.org/linux-block/0349d72d-dff8-4f9f-b448-919fa5ae96da@kernel.dk/
-Cc: Liam R. Howlett <liam.howlett@oracle.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 63 +++++++++++++++++++++++++---------------
- 1 file changed, 39 insertions(+), 24 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 49fb584e392b..0a92569c0c7d 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -5404,16 +5404,39 @@ static int ublk_ctrl_reg_buf(struct ublk_device *ub,
- 	return ret;
- }
- 
-+static void ublk_unpin_range_pages(unsigned long base_pfn,
-+				   unsigned long nr_pages)
-+{
-+#define UBLK_UNPIN_BATCH	32
-+	struct page *pages[UBLK_UNPIN_BATCH];
-+	unsigned long off;
-+
-+	for (off = 0; off < nr_pages; ) {
-+		unsigned int batch = min_t(unsigned long,
-+					   nr_pages - off, UBLK_UNPIN_BATCH);
-+		unsigned int j;
-+
-+		for (j = 0; j < batch; j++)
-+			pages[j] = pfn_to_page(base_pfn + off + j);
-+		unpin_user_pages(pages, batch);
-+		off += batch;
-+	}
-+}
-+
-+/*
-+ * Drop mas_lock during iteration to avoid unpinning pages under spinlock.
-+ * Safe because callers hold ub->mutex (via ublk_lock_buf_tree), preventing
-+ * concurrent tree modifications.
-+ */
- static int __ublk_ctrl_unreg_buf(struct ublk_device *ub, int buf_index)
- {
- 	MA_STATE(mas, &ub->buf_tree, 0, ULONG_MAX);
- 	struct ublk_buf_range *range;
--	struct page *pages[32];
- 	int ret = -ENOENT;
- 
- 	mas_lock(&mas);
- 	mas_for_each(&mas, range, ULONG_MAX) {
--		unsigned long base, nr, off;
-+		unsigned long base, nr;
- 
- 		if (range->buf_index != buf_index)
- 			continue;
-@@ -5422,18 +5445,12 @@ static int __ublk_ctrl_unreg_buf(struct ublk_device *ub, int buf_index)
- 		base = mas.index;
- 		nr = mas.last - base + 1;
- 		mas_erase(&mas);
-+		mas_unlock(&mas);
- 
--		for (off = 0; off < nr; ) {
--			unsigned int batch = min_t(unsigned long,
--						   nr - off, 32);
--			unsigned int j;
--
--			for (j = 0; j < batch; j++)
--				pages[j] = pfn_to_page(base + off + j);
--			unpin_user_pages(pages, batch);
--			off += batch;
--		}
-+		ublk_unpin_range_pages(base, nr);
- 		kfree(range);
-+
-+		mas_lock(&mas);
- 	}
- 	mas_unlock(&mas);
- 
-@@ -5463,29 +5480,27 @@ static int ublk_ctrl_unreg_buf(struct ublk_device *ub,
- 	return ret;
- }
- 
-+/*
-+ * Drop mas_lock during iteration to avoid unpinning pages under spinlock.
-+ * Safe because this is called from device release with exclusive access.
-+ */
- static void ublk_buf_cleanup(struct ublk_device *ub)
- {
- 	MA_STATE(mas, &ub->buf_tree, 0, ULONG_MAX);
- 	struct ublk_buf_range *range;
--	struct page *pages[32];
- 
-+	mas_lock(&mas);
- 	mas_for_each(&mas, range, ULONG_MAX) {
- 		unsigned long base = mas.index;
- 		unsigned long nr = mas.last - base + 1;
--		unsigned long off;
- 
--		for (off = 0; off < nr; ) {
--			unsigned int batch = min_t(unsigned long,
--						   nr - off, 32);
--			unsigned int j;
--
--			for (j = 0; j < batch; j++)
--				pages[j] = pfn_to_page(base + off + j);
--			unpin_user_pages(pages, batch);
--			off += batch;
--		}
-+		mas_erase(&mas);
-+		mas_unlock(&mas);
-+		ublk_unpin_range_pages(base, nr);
- 		kfree(range);
-+		mas_lock(&mas);
- 	}
-+	mas_unlock(&mas);
- 	mtree_destroy(&ub->buf_tree);
- 	ida_destroy(&ub->buf_ida);
- }
--- 
-2.53.0
-
+Thanks,
+Caleb
