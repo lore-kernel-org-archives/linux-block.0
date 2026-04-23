@@ -1,128 +1,161 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC473ED137
-	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 12:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776948961; cv=none; b=RPYKEDJP2viepc27gI36DPupG1tZmFDi/PUrQPhXedy+l+XL9naAge2b3jBIMoZXqiLR6ZRVN2UNT3Wq62WXD3IrOW9bAEecd/I2aSFesyfWbPUlBSTq1jYV1rQ7lh5sgVIHEmkQU/YgpmPuNdjamH3OFrQaqgFS5NWQrT8HyBQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776948961; c=relaxed/simple;
-	bh=gFRQZa+5+6T/UvUfG+iSQp84/qWQUKfeR2MbrBywW4U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ATGS3R3SMoWSVk3nowS6XgtHQoJV/p+8+PBidLz9BBdqrOK9SbubIoMgdFlEU08ssmCQppb58Jg6N6sxQ0atzRrvO90LXt/PGPedQHTIQFZLrdh7OWveozR9iD73QdqvkwXkK+/65V7orpXuixLBhTTHB205svP4o7en/cwghCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=av/y1B1l; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629F337F8A7
+	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 16:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776962434; cv=pass; b=gXK0HsqcGyI9dM595R1e3S39U21OF/41qeP6plYc6KwSrxkeRrpvM0pS36EsU5XZXJjZ+FRe+KD0kSmXEdClTcywS0UWo0DnrCoXJiUqdaAgSq4Wm7yziKUa1FKidrwsCraiGA8BTF1GJgqxdo2kuK39TJ517icS8+qslMiIIHA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776962434; c=relaxed/simple;
+	bh=3PokA5EaZgDdzkAI1t9Qd6gl0E9Yg3pzz/mixh3rkBk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nGU68rlZJont4kHvTrlce5UJN8BPUI4rXOVi+lh8kiIWXj9DTzIjC5ZYpIiFD1sPERqTiKuQqNJWrqlh8oaOvb/5QmQZBJ689sdD7ZCcoTV9VvkLEVNuC7QdQwruyKfdGatWj7llEQYlGObFK+3wF31bo2C8qkhnbjTcsuaw/Aw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IUm5hYkR; arc=pass smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="av/y1B1l"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4890d945eb4so30518615e9.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 05:55:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IUm5hYkR"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488b3f8fa2bso69686475e9.1
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 09:40:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1776962432; cv=none;
+        d=google.com; s=arc-20240605;
+        b=F7FB6zfqTlqBJpGLYsdSncxFqEg23bmZmVhFfnFD/ejFs4jQly0yK+ZQXIp7QrzDnx
+         ckPMqXrl6urSxrmhEhYWhPuhX6EjtqCtkvzwiQ8A8WQTvuqeTUQXVMsIL0kZAWGxBf3V
+         vknlSsoHUehwI75yMuNLZyWG0OzUEgvEToJ/TDcPANcwsT1t0OIUHA3tvrDJUbkm9WNd
+         w7NbBkESyv5evdV9b9YBscv5Rr7bYT1GMWaOG/WeCfOYyX1+QtHLn0blxFEXTJFgzgh0
+         vhWvG8QN7ol6YEHhgTm8W97NYtmqVIiXV72bX3CH4PyFj6aYWoFtvtBD1w0NecdK2DcC
+         uuEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3PokA5EaZgDdzkAI1t9Qd6gl0E9Yg3pzz/mixh3rkBk=;
+        fh=Vf75fmavXV2iKg9uY0PNIiK6M5jWyCRBYlgl/U79Vqw=;
+        b=DsIxPKkzkjLRhmy36TbRGSzAUEq0odlrxC7isiMbErWyZ0cEBfeGWLI/lxk4MDvwaE
+         ks0+L7wpCwQqXpLL6Iw9YFl76cUZkUYySQ1dJlTcHXx8A3nBUAMGFnh+ZLvsRYZVb3iJ
+         klhxiZ9CcbZ2pkfuB5XsFqilcjDuWQkx7mYpGOnPenqHRQBuSeVZ3AdFq94z7BaGE3z/
+         niJbNOrCjMpQUyE1+Beh1D7OvLFTgICEbz2aToWhv3cAJYzAxjw3F19Qv/kAuXr5r2ua
+         qA3uKqqROZwp8+EjLX8sjsunkFrTjpT3N2CBRnOR+cAIC8w+Ty4P/qny6vz0EMKFJn6M
+         3g4w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776948957; x=1777553757; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gnRdDLrWpQ9VAViP+Lb+FjcuP4xTGaJIWlgeZ0peEtU=;
-        b=av/y1B1lrej3T/vobG74hzQ2dW8Ku/bUTC+WW23Qt3Kdh4tQyxZq7TzurPLzove91s
-         RFm0iT9EY23YPcvdX6PpE0GG1nPtv3V7HyRHp/FYAQ+tpjX3jZ3XxAPIyulCcTrojWtL
-         VKWqF3uIQrDphJ0cw1zlBXFh2wpSO4b4OgQXsEBqX4JyI3hIdiAS0R5YwbhmLkPev3gl
-         XrdQTsEBmaUQmbaJ2Il9OCwsSP38sADmAvZo7IWrIl17tFvFvpD23Rrxc9pjnk5szZrk
-         p/f6iFHgsFfqQoyvlRBmwnNz1ep/kiDP8sCJFN4mOVW+I+XY28xLabjdUehad5W7j2r1
-         EKVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776948957; x=1777553757;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1776962432; x=1777567232; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gnRdDLrWpQ9VAViP+Lb+FjcuP4xTGaJIWlgeZ0peEtU=;
-        b=MUm93iLJBDMTTOGIK2rQdnw4P66StL2WmX84336/11JZIq1Xt+gD682iskcljeaFHx
-         0/WKcAZ2+wNUMxCFmb9XC0Ni+JogZNlFV23TfcG6VE7tkCNeO6lvaB3Px/B3VSnmMurg
-         hITrVfJpY203kCe5WQ754zx6KPsA2tud7dxsr0MnY6ujwI2fCmP7KWt0fReUOrDapHB8
-         oMSH/q5EV/Utatn24rf6PmP2R0KNYyoaAWWavQs2dmryw9L6NQUcf/0ZBn7PRbYQwysH
-         qeMDtfOyZe/Zqr2VPnyR8WiNmhDBYDRP/nsav5y0sUegROEOQvXPv2NdtSxsSjqEZaA/
-         AMuA==
-X-Forwarded-Encrypted: i=1; AFNElJ+q0/PsQIDSJkMcjD3y0+qS4FkPJmxalkCIjuIM+sBKFFmPIaDQnrlV9VUNB5BAI1sqgrcHPXL1ETaoOg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlqF5CDynn5CFaHNfIng0Eow4o+EB34hvAFzG/ScX2E2PLHknx
-	P0tSY1sH6t3y3+LyM+9Bb2hDg3x+LOJp+xzRR5+FKx9+6x1n8jalOVHpX7VCimWa7JY=
-X-Gm-Gg: AeBDiet7d02KG8Q2YKdHq53+EVjSTiHYDL6Y6El4yO+QtOf0n+/SCkYG7yLtVUQeXUD
-	ET9diNzU82HAgtG0MVI0A8H30BqjNTqFzHiIkTwdtVQ6XZfZwoT01RQwWAnOmEWxe+9JwdHAOHY
-	AVlz5ahi9Iy0MHs3lEcLl0IfzmEm7wnu44eAjXMW7R9mD8YFLax6ATuGJVZTp5hpI5QPQCRZTY8
-	4xmWXJeMwTQcizujXxvemRXrL9p8+fMiQ5/VQGqZKSAeIdogOGSWJJVwqcFIC/lN3Qxme2AR5XE
-	j1vqZ79hnEqRc60fIS5Ed/Dy6zvrh8rmxDkmWCxPhN1h78J+eMNehsE+kczOFIwVXH+4uSmxD6X
-	MjqAsBz4Lyuh3jNf4spzAXA6Fx6UH7LAQnzZGQOzCgO+qY+wV2zkrcrDv2eFPZZoah6UWnTjKXn
-	prI6UpG913spBfpSUES4ry0wKPAnMjtSC4z61i8rnVDeZMxkjn5fmXN+v9uzHqNL2IkBtlxXdem
-	9pOrn+R07aWLXMwaZs=
-X-Received: by 2002:a05:600c:570f:b0:488:a502:8955 with SMTP id 5b1f17b1804b1-488fb882f13mr284091745e9.4.1776948956507;
-        Thu, 23 Apr 2026 05:55:56 -0700 (PDT)
-Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1176sm54409368f8f.3.2026.04.23.05.55.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 05:55:55 -0700 (PDT)
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ming Lei <tom.leiming@gmail.com>,
-	Michael Wu <michael@allwinnertech.com>
-Subject: [PATCH] sched: disable preemption around blk_flush_plug in sched_submit_work
-Date: Thu, 23 Apr 2026 20:55:28 +0800
-Message-ID: <20260423125528.2917171-1-tom.leiming@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        bh=3PokA5EaZgDdzkAI1t9Qd6gl0E9Yg3pzz/mixh3rkBk=;
+        b=IUm5hYkRdDNxWJImlEDFCJjd2XMfeSLYMP79IcXDLaZ7SZyvzlYnFNZL9nK6/aIzTh
+         010xRBEnPZyiKCXYlTNtnRRO3abCAdso2VLB+JcZk4gGeJIVaG5ory/IigkmN6TwxzgB
+         AW50kJMA0xTk4F4FCLv1bpKXCV8ms3ttlZWlzWfikIt4W/ee5PU/VOdB89y5rGozrdQm
+         aIE1aCQb5K4j+LsTaKFZVnr6N2ny2Frgtp56wFFGNpFQWPJKs5dqY6KoIqEfsY0X+MJ1
+         l9/IOySguOps2v2us8SBAF3b64mJAncEGC2JTFrlC5ffd4Xc4luDcHRPUBKRFOr4BgRb
+         c/Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776962432; x=1777567232;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3PokA5EaZgDdzkAI1t9Qd6gl0E9Yg3pzz/mixh3rkBk=;
+        b=DZ+6sDQjPtiv6CshnsO3Ik9ie3Sf24qdlT6U8/yiTPBqRN39fLbnHTJahgEJcSJwox
+         s9oKOFvCnI8mKAFECORidL4s8SadO0Ei4Sxsf8Euc7b6ZmCF1ZJh5lxseyMAwdvz8/vc
+         Rk0HRD7i2YzAePbJdLD8Ypt4lk9aVAauaOIskCNJcehFutzn5nK0MBNOPCb0OlNoj9fe
+         k4zjkdl+7k/4X4OwqVU+Xz7FZEF/JLb6nSAj3mkg22MBXVFKnF52MBxE5gjqgBGduPyG
+         xONR3NPUz3y+FygO3qTmz5cTt+3Fsd6t/QA/FHRAXTN51QyLnw/bGgeqs+pbGuvzZfD1
+         C/IQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9yT8+WP5g7zi1zWQ34JtN+X2w4mbrbqrftEmVarEZGh2UJY3wAVzJ9EyXEi+tq4OoYLZvOuVi91n3yTw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjpX5rVqbNH2KNmrMZ5VidYDx7LoiYdrqKKkt1xY3avZHwA68F
+	2B3wk8a/RWaCmFRVD2MY4d72wx0NQUHw3swQdAvKIlNd25CTHse+IuORBS5TIDxSEueWFqbUoy8
+	LjrrXXhEZec8LGZQB2nllk585xgIw0Vs=
+X-Gm-Gg: AeBDietDFk7fpnOEQ6PSOu2V6GvpDyLA/2GjdPTxGNUFjAK+kf3QsJvhJSZQDl7b71T
+	qfgbNwnOhX1Z2Iq0YgHkpbOtoArF5tJ8BO+KwfIHyk0Aa9q/2Td7vFUvEoFMzcqVKiyB8TKD3g/
+	22v7sG0VUhlkFA3EHpiV0iV7LsZ5Dv8+RJbYLszClPwmMOrDIRiAZllNtyB9UkakIpkU3N1eGIy
+	JDPIvBxaZjwNJJkoBGwe1vnUrraEvKIHgVKRibNj8ntQOk+jlmxolXqE8lBb9YPekPe01QPbtRq
+	TUelZRM+FEFBGtXPUGcVg89+OS1Y9x9y9JC+jd1iMMX8rtlbJkzgqEkg1bb/
+X-Received: by 2002:a5d:6f13:0:b0:43e:a703:3675 with SMTP id
+ ffacd0b85a97d-43fe40329ecmr37687772f8f.5.1776962431493; Thu, 23 Apr 2026
+ 09:40:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260421121616.3298845-1-haowenchao@xiaomi.com>
+ <20260421121616.3298845-3-haowenchao@xiaomi.com> <CAKEwX=P8_5qyou0KgvwvoPpRsUN4ohwsC7ysxjTW=Fbwk2uSOQ@mail.gmail.com>
+ <CAGsJ_4xosgszLBGXdXGchgYW6ks_XB1vO35scrO0UUiQ1ZvVvQ@mail.gmail.com>
+In-Reply-To: <CAGsJ_4xosgszLBGXdXGchgYW6ks_XB1vO35scrO0UUiQ1ZvVvQ@mail.gmail.com>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Thu, 23 Apr 2026 09:40:20 -0700
+X-Gm-Features: AQROBzDdE4pGGd6mO7mjlt9Pk8Ovl7lU8fEPEqM39shN4JBZIr2r2Cztec_PHnw
+Message-ID: <CAKEwX=PX1yiYuZvQafQ-y0p-JHchdGKMHLpvsB+P-0zPoW4LMA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 2/4] mm/zsmalloc: introduce zs_free_deferred() for
+ async handle freeing
+To: Barry Song <baohua@kernel.org>
+Cc: Wenchao Hao <haowenchao22@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Yosry Ahmed <yosry@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	Xueyuan Chen <xueyuan.chen21@gmail.com>, Wenchao Hao <haowenchao@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On preemptible kernels, a three-way deadlock can occur involving
-blk_mq_freeze_queue and blk_mq_dispatch_list:
+On Tue, Apr 21, 2026 at 2:42=E2=80=AFPM Barry Song <baohua@kernel.org> wrot=
+e:
+> On Wed, Apr 22, 2026 at 3:47=E2=80=AFAM Nhat Pham <nphamcs@gmail.com> wro=
+te:
+> >
+> > On Tue, Apr 21, 2026 at 5:16=E2=80=AFAM Wenchao Hao <haowenchao22@gmail=
+.com> wrote:
+> > >
+> > > zs_free() is expensive due to internal locking (pool->lock, class->lo=
+ck)
+> > > and potential zspage freeing. On the process exit path, the slow
+> > > zs_free() blocks memory reclamation, delaying overall memory release.
+> > > This has been reported to significantly impact Android low-memory
+> > > killing where slot_free() accounts for over 80% of the total swap
+> > > entry freeing cost.
+> > >
+> > > Introduce zs_free_deferred() which queues handles into a fixed-size
+> > > per-pool array for later processing by a workqueue. This allows calle=
+rs
+> > > to defer the expensive zs_free() and return quickly, so the process
+> > > exit path can release memory faster. The array capacity is derived fr=
+om
+> > > a 128MB uncompressed data budget (128MB >> PAGE_SHIFT entries), which
+> > > scales naturally with PAGE_SIZE. When the array reaches half capacity=
+,
+> > > the workqueue is scheduled to drain pending handles.
+> > >
+> > > zs_free_deferred() uses spin_trylock() to access the deferred queue.
+> > > If the lock is contended (e.g. drain in progress) or the queue is ful=
+l,
+> > > it falls back to synchronous zs_free() to guarantee correctness.
+> > >
+> > > Also introduce zs_free_deferred_flush() for use during pool teardown =
+to
+> > > ensure all pending handles are freed.
+> >
+> > Hmmm per-pool workqueue.
+> >
+> > Does that mean that if you only have one zs pool (in the case of
+> > zswap, or if you only have one zram device), you'll have less
+> > concurrency in freeing up zsmalloc memory for process teardown? Would
+> > this be problematic?
+>
+> I believe so, as reported in the original email from Lei and Zhiguo,
+> which proposed introducing a swap entries list for async free.
+>
+> >
+> > I think Kairui was also suggesting per-cpu-fying these batches/queues.
+>
+> I guess a per=E2=80=93size-class workqueue might strike a balance
+> between scalability and reducing lock contention across
+> multiple classes, where the locks actually reside.
 
-- Task A holds a filesystem lock (e.g., f2fs io_rwsem) and enters
-  __bio_queue_enter(), waiting for mq_freeze_depth == 0
-- Task B holds mq_freeze_depth=1 (elevator_change) and waits for
-  q_usage_counter to reach zero in blk_mq_freeze_queue_wait()
-- Task C is going to sleep waiting for the filesystem lock. Before
-  sleeping, schedule() calls sched_submit_work() -> blk_flush_plug()
-  -> blk_mq_dispatch_list(), which acquires q_usage_counter via
-  percpu_ref_get(). If Task C gets preempted before percpu_ref_put(),
-  it will not be scheduled back because the task is already in
-  uninterruptible sleep state (TASK_UNINTERRUPTIBLE). This means it
-  holds the percpu_ref indefinitely, preventing freeze from completing.
+Sounds good! Let the numbers decide :)
 
-This is fundamentally an ABBA deadlock between queue freeze and the
-filesystem lock, exposed by preemption creating an artificial hold
-on q_usage_counter during the plug flush.
-
-Fix by disabling preemption around blk_flush_plug() in
-sched_submit_work(). The _notrace variants are used since this runs
-in scheduler context. preempt_enable_no_resched_notrace() is correct
-because we are already inside __schedule() and about to pick the next
-task.
-
-Fixes: 73c101011926 ("block: initial patch for on-stack per-task plugging")
-Reported-by: Michael Wu <michael@allwinnertech.com>
-Tested-by: Michael Wu <michael@allwinnertech.com>
-Link: https://lore.kernel.org/linux-block/20260417082744.30124-1-michael@allwinnertech.com/
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- kernel/sched/core.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index b7f77c165a6e..4217aaaa8e47 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -6966,7 +6966,9 @@ static inline void sched_submit_work(struct task_struct *tsk)
- 	 * If we are going to sleep and we have plugged IO queued,
- 	 * make sure to submit it to avoid deadlocks.
- 	 */
-+	preempt_disable_notrace();
- 	blk_flush_plug(tsk->plug, true);
-+	preempt_enable_no_resched_notrace();
-
- 	lock_map_release(&sched_map);
- }
---
-2.53.0
-
+>
+> Thanks
+> Barry
