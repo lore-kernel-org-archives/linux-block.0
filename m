@@ -1,72 +1,75 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06237311967
-	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 18:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2E533F5A4
+	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 21:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776968324; cv=none; b=jiBw3KBYlOKM3wlca1c4KbqnM6sOczzklR/OALKXGspZNalaBWo82V5gBg4oL9rNPNGTlhljYwhhzcV6YwAWUNTnTr1Oxq6IvIjdMSgRW5Tlmu72p3Y5bgMzwHG9Slud5xMbT4rQQwvdaOCAxuQpDIebmzkwzkhk2wHEnHGL8ak=
+	t=1776978378; cv=none; b=SKmU1VqmKQ25kWlhIm0LW213XVP6JYgl4kZfplgumzlhnVSCDYghKGnE5/cmlDLVRUV1aLjrKdiO0ikBBl8vEeod1dJgMhUiBYQXsLH/Ts7xy/pTnIfBI3ChoZqL4+q7BNF9M43PuSUsw9Ha+DeEwDNZ5n1dLhvKYK09rb6I3R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776968324; c=relaxed/simple;
-	bh=AhPykmDqKzPiZnCNRx3drsrlWVmZQDCzGevPFw5/SY0=;
+	s=arc-20240116; t=1776978378; c=relaxed/simple;
+	bh=0FwnoU7crsng8ZdY1lihmMOcw4yZIHGTIaj/iUR76Zo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tQZ7rznI3YJvs8QHZ2qG6zwk8uaVQprDCxRVNcPkyvQSR/LGrPnTTnecgsRdxv6EI+yltu7Naj9mheo/yxu4aRtUhOJAnuI8v/rv8QSS+SUUScvGYE/bFnOSDIu16HKzs/mkYR9dNy6gvHs91ms6rFRIGx/Mss/4vOmivNBhJxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com; spf=none smtp.mailfrom=readmodwrite.com; dkim=pass (2048-bit key) header.d=readmodwrite-com.20251104.gappssmtp.com header.i=@readmodwrite-com.20251104.gappssmtp.com header.b=kzIOUC8G; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=readmodwrite.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=At4IXIMPzm8jNZIIBMEoO4FzF11zD/GksckKy5sxV1iRWiCBQJbOm5j7PCd/4dYpk3MAO0A+fg+zJmZ0mczoZXfmCxvCh15AT2b4Nwnry9ESrnRwiT8fwKgefgtCo9CAiDOLJvNbmNCk6hgqgn0JyrkB9intrxEjTchTbyCafh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk; spf=pass smtp.mailfrom=philpotter.co.uk; dkim=pass (2048-bit key) header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.b=LqyluZUJ; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=readmodwrite-com.20251104.gappssmtp.com header.i=@readmodwrite-com.20251104.gappssmtp.com header.b="kzIOUC8G"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-488ff90d6c7so56814395e9.2
-        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 11:18:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.b="LqyluZUJ"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488ab2db91aso96967015e9.3
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 14:06:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=readmodwrite-com.20251104.gappssmtp.com; s=20251104; t=1776968321; x=1777573121; darn=vger.kernel.org;
+        d=philpotter-co-uk.20251104.gappssmtp.com; s=20251104; t=1776978376; x=1777583176; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0wNsqzv/VhvPhxD5VdhDjZ4FmwSvpZ9y0weaOvjolKg=;
-        b=kzIOUC8GTHi1PJlmQjl+4nZai5MOvSkaWyNfPO9cswLc0BcNzmozbRXNGajm8MHuzP
-         +7VFofFGQa8yHopguYZsVrY8silCbXxOwyukyHBBk/tkNQ5ncJhudAH3Dbx9s4XLQ4LW
-         CySFH39jGc5Uak+dtmirwkvGrqajJhtrCxB4Vn1HPL9mnzAMbWodkqPUIxJHuSGMYUs6
-         XsfRqdXdDfOFT0VfGRz9pFZ84W2wa55foF2Tqja5afbvAlEs/nhtzK0tJdOEmRRTmTgj
-         oCHiLEt1yRXpVU0T4iE4RBzBgU5lfbZEIGN+9+jFR+DyDUpFG/sCB1Fg2qDuwHq273L4
-         Oo/g==
+        bh=9oEVVbYJJp7mcAvHLiflerbUEp4PM9+aREz5+ZVnbHk=;
+        b=LqyluZUJs3rOa2H72QmgULEYCpeLS3M9tPk/IwwqOLBpexwm33lPc2mv3fuj1ZSlhL
+         /uruXMAVSD37FJ+7rugnSSrxJx71OA3ovtUatCCOUEyKAFCo8yifrvIljpzU+HWJ/DN4
+         8oVNnfVUeX7SkD9HhlP32mDjzhvrKIoTVAptCiZ9YbDJ71abMlg09JgF3R0rcyPc1lLk
+         A7jKDTSxop/b0neYPCbZa3bRQDY1bqWI0Z0o64nwB9AaC5PXfpGBEqmCdxVXVK/DRNTm
+         hjxCUJYHN8gwzYHtugKBsi+b+MXWcbqNkM/fgUy0D0S6eH7fasVl3oav4MC3Zo19mvER
+         8qjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776968321; x=1777573121;
+        d=1e100.net; s=20251104; t=1776978376; x=1777583176;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0wNsqzv/VhvPhxD5VdhDjZ4FmwSvpZ9y0weaOvjolKg=;
-        b=WWs1e/CP7+39l0gI/mx1Te9E/5+edbcmTMUYfiv1CjuyRXclUCrq07n4DaGPLxrP5N
-         1WDsffuTZ96xBcVJ/kBNt4XWIVtWf0twbg7BH+Ly1MMLEb0mq6YPeRAAxsM2Nvq114Fv
-         0oAVQ8GjF9b993XV8DArd5ERj9O/jr2dK1E6xo5YzMVeUI8+ojsg/Ezexbpo1+5YAf5r
-         kA17FCVQF5trem8dmEoEYlNddcLygYXx7enihuLA5VrhfrDhDyRB17W/ayxCZxjcJrRN
-         QDZZPGx+Dec1/z3C0KZXYrRT7L3G8hUC+lvFPhjeZOLx3brT1R8iQ3zKO8wKslvaSMys
-         NBcA==
-X-Forwarded-Encrypted: i=1; AFNElJ+3gFJciy7pC7QW19QBbAAGyf9fbAX5NG2tTjTosFtNCGMSyp0xDlAVXw9bztTVv20zd1dDgQJ7Vnooew==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5ImMlqNUthiahkxdkBJEUxVGPuxEJ8WNT7xkkrsGmz5VzbE+9
-	8CGrqAQseGnrKThvYzd5vLwhml6fAlWJIUgQLU0MI97TgPXWcZkGQgxOup9A3tyHx8Y=
-X-Gm-Gg: AeBDieuktpYGNTgi2ZyRHqr/8KJC/H9j+/ros+CphRSkKkcqLBi/XK1e6FE/0ZcgZVV
-	+P2s/rtmeRILcCb3XYx7LEpB84sQRjUa+9hwGDLD3sKj1APaiR5KGz6w+dMioW+fDxpcx8SK2MT
-	y9S1KDM5knr2jAk34Ve52EJbQWyCSGrbz7wKcir1MNRAaiykeRJdWuvGa2fyLeRd84iFhT3NF43
-	jFuo0uL7JROj+55tuvYtnyEe1/o/Yv6XEujSa2XmAPZTxJgN5MHanpiPXqQM++HeoweO2XZaTHl
-	+eY6VTteRzZKeAMpOYdvUaYyd+FcZTLyj9xg18NMfT9rtlWDrRIFOpgn8te4aRLMZcGDec4IVT9
-	M194r+/FSN5o4PbKpDAA1It0apcV1LlcuwPe+S4kcu+cPEEWPgAyHPb/JTA8O48P07FumGCjJfo
-	2+XPt7FtdcLVYkh5rVbvU/
-X-Received: by 2002:a05:600c:3483:b0:488:af7f:775f with SMTP id 5b1f17b1804b1-488fb77d343mr384148865e9.18.1776968320896;
-        Thu, 23 Apr 2026 11:18:40 -0700 (PDT)
-Received: from localhost ([2a09:bac6:37a8:1f19::319:ba])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4891c08faffsm586656105e9.1.2026.04.23.11.18.39
+        bh=9oEVVbYJJp7mcAvHLiflerbUEp4PM9+aREz5+ZVnbHk=;
+        b=L7ObTPrs9VffvfX36K1Xs/EJoR/Q5i6U7+q//iNMd3K9fGWmFD7tpKAvng54bXERaW
+         0bh6Vy7IM6Rj4M/plHRAcrIsOM5gnTpJyAurE/VUrxGrOtlvnFI3+t6Mm568d/nkYrep
+         OujvbwF2F85lmUMebbDqcihDjQJ8+5GvICDA6rebcQBCwC9kaGQtE1Ic3pxlFLAKJpcN
+         WYjYnBW/oeBcOX/It5MSf6NwxPXprDwfqbPFkBrULF5b0y2Wwr7+7cuuvnZhDAZorEnk
+         B0SqimnRUl6JG8SP/8ZrQKDaFpmKUfX2ut2VRQoh6C9wv7YW/O7Z0NT+8QLRyZ5ft1SZ
+         vhaA==
+X-Forwarded-Encrypted: i=1; AFNElJ9Hbex49nti25wuwf4EQQSJJJ3B3L/uAftpRq/tvHCLd7BGcajosLebMb4WxrQhN/pNFFV+rr7DxVzXLw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcRf6myNiNEhnJic9XYysWEkQjbCnnA3CdZrbNJBxxU+XL/h8W
+	j9xul4+FsltICYpWTagGy0amk7jzeoPpbOzI3KNyg1QS2wFDa3w59BPXRaX/Mj5cnq8=
+X-Gm-Gg: AeBDietUqxvsTN/BcuevN/Krkx2QEiExcSO3/q6kaG5i0UhIzpM9St/+Uy7Ejm6xvBF
+	YaBO3h3DzR3BY8W4cwXL/nNTrHmt1V4E6+w7/aYTOpKk0sOFl1OnCqTFCk8tbxpJAo5aFQsdRog
+	oWrDtoNIOr/lJBIQIwkP95XkZgPXJJWBFz/GV5ELAIbJFg52ktfQScvDxPBgtirvw+VKk7zRmm5
+	v1LmJsMdLxFyAzKWFxhzVj8GmhJUEB7bAmRz4ieLujBpR0H8YNS8W0DTGx8UhhWawvjfd9KGRiM
+	aQjcD0WKSW/JPPlxh3MCJ3uhLROc/VKCRuhri/VNi7Av2jKP0OGAICy3ZeCkKl9K3XjYX0MbMJ5
+	/oldqCM6QzBRb/Dmjym1aGSwNwc3gitlR4Dyuw9pjzDUa14mtPsi4kwyVs28fM3nwGFqrPYcM6P
+	bk+hfO1u6wQZVcL4VWTbD5PJ54b/vOBJXYYFRwcoJhN2AbkLMBjZH+37YIKX2MpHI9RFY6YGWkF
+	GyulXtlpZlAJtl/9ipdSjXspAi6gZs=
+X-Received: by 2002:a05:600c:a105:b0:485:3a03:ceca with SMTP id 5b1f17b1804b1-488fb7826femr289011485e9.23.1776978375112;
+        Thu, 23 Apr 2026 14:06:15 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488ffad20f2sm268386685e9.0.2026.04.23.14.06.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 11:18:40 -0700 (PDT)
-Date: Thu, 23 Apr 2026 19:18:39 +0100
-From: Matt Fleming <matt@readmodwrite.com>
-To: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Matt Fleming <mfleming@cloudflare.com>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: 10x I/O await times in 6.12
-Message-ID: <aepfV6Gp2uKbHi2N@matt-Precision-5490>
-References: <CAGis_TVSAPjYwVjUyur0_NFsDi9jmJ_oWhBHrJ-bEknG-nJO9Q@mail.gmail.com>
- <dd2db843-843f-db15-c54f-f2c44548dee3@huaweicloud.com>
+        Thu, 23 Apr 2026 14:06:14 -0700 (PDT)
+Date: Thu, 23 Apr 2026 22:06:12 +0100
+From: Phillip Potter <phil@philpotter.co.uk>
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: martin.petersen@oracle.com, James.Bottomley@hansenpartnership.com,
+	axboe@kernel.dk, linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Daan De Meyer <daan@amutable.com>
+Subject: Re: [PATCH v2] cdrom, scsi: sr: propagate read-only status to block
+ layer via set_disk_ro()
+Message-ID: <aeqJxCKP6nm4iZDQ@equinox>
+References: <20260330133403.796330-1-daan@amutable.com>
+ <20260422113206.246267-1-daan@amutable.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,74 +78,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd2db843-843f-db15-c54f-f2c44548dee3@huaweicloud.com>
+In-Reply-To: <20260422113206.246267-1-daan@amutable.com>
 
-Hi Yu and Jens,
-
-On Mon, Apr 21, 2025 at 08:21:13PM +0800, Yu Kuai wrote:
-> If nsecs - plug->cur_ktime is still milliseconds, can you check if
-> the following patch can fix your problem?
+On Wed, Apr 22, 2026 at 11:32:06AM +0000, Daan De Meyer wrote:
+> The cdrom core never calls set_disk_ro() for a registered device, so
+> BLKROGET on a CD-ROM device always returns 0 (writable), even when the
+> drive has no write capabilities and writes will inevitably fail. This
+> causes problems for userspace that relies on BLKROGET to determine
+> whether a block device is read-only. For example, systemd's loop device
+> setup uses BLKROGET to decide whether to create a loop device with
+> LO_FLAGS_READ_ONLY. Without the read-only flag, writes pass through the
+> loop device to the CD-ROM and fail with I/O errors. systemd-fsck
+> similarly checks BLKROGET to decide whether to run fsck in no-repair
+> mode (-n).
 > 
-> Thanks,
-> Kuai
+> The write-capability bits in cdi->mask come from two different sources:
+> CDC_DVD_RAM and CDC_CD_RW are populated by the driver from the MODE
+> SENSE capabilities page (page 0x2A) before register_cdrom() is called,
+> while CDC_MRW_W and CDC_RAM require the MMC GET CONFIGURATION command
+> and were only probed by cdrom_open_write() at device open time. This
+> meant that any attempt to compute the writable state from the full
+> mask at probe time was incorrect, because the GET CONFIGURATION bits
+> were still unset (and cdi->mask is initialized such that capabilities
+> are assumed present).
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ae8494d88897..37197502147e 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1095,7 +1095,9 @@ static inline void blk_account_io_start(struct request
-> *req)
->                 return;
+> Fix this by factoring the GET CONFIGURATION probing out of
+> cdrom_open_write() into a new exported helper,
+> cdrom_probe_write_features(), and having sr call it from sr_probe()
+> right after get_capabilities() has populated the MODE SENSE bits.
+> register_cdrom() then calls set_disk_ro() based on the full
+> write-capability mask (CDC_DVD_RAM | CDC_MRW_W | CDC_RAM | CDC_CD_RW)
+> so the block layer reflects the drive's actual write support. The
+> feature queries used (CDF_MRW and CDF_RWRT via GET CONFIGURATION with
+> RT=00) report drive-level capabilities that are persistent across
+> media, so a single probe before register_cdrom() is sufficient and the
+> redundant probe at open time is dropped.
 > 
->         req->rq_flags |= RQF_IO_STAT;
-> -       req->start_time_ns = blk_time_get_ns();
-> +
-> +       if (!current->plug)
-> +               req->start_time_ns = blk_time_get_ns();
+> With set_disk_ro() now accurate, the long-vestigial cd->writeable flag
+> in sr can go: get_capabilities() used to set cd->writeable based on
+> the same four mask bits, but because CDC_MRW_W and CDC_RAM default to
+> "capability present" in cdi->mask and aren't touched by MODE SENSE,
+> the condition that gated cd->writeable was always true, making it
+> unconditionally 1. Replace the corresponding gate in sr_init_command()
+> with get_disk_ro(cd->disk), which turns a previously no-op check into
+> a real one and also catches kernel-internal bio writers that bypass
+> blkdev_write_iter()'s bdev_read_only() check.
 > 
->         /*
->          * All non-passthrough requests are created from a bio with one
-> @@ -2874,6 +2876,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug,
-> bool from_schedule)
->  {
->         struct request *rq;
->         unsigned int depth;
-> +       u64 now;
+> The sd driver (SCSI disks) does not have this problem because it
+> checks the MODE SENSE Write Protect bit and calls set_disk_ro()
+> accordingly. The sr driver cannot use the same approach because the
+> MMC specification does not define the WP bit in the MODE SENSE
+> device-specific parameter byte for CD-ROM devices.
 > 
->         /*
->          * We may have been called recursively midway through handling
-> @@ -2887,6 +2890,10 @@ void blk_mq_flush_plug_list(struct blk_plug *plug,
-> bool from_schedule)
->         depth = plug->rq_count;
->         plug->rq_count = 0;
-> 
-> +       now = ktime_get_ns();
-> +       rq_list_for_each(&plug->mq_list, rq)
-> +               rq->start_time_ns = now;
-> +
->         if (!plug->multiple_queues && !plug->has_elevator && !from_schedule)
-> {
->                 struct request_queue *q;
-> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Daan De Meyer <daan@amutable.com>
 
-It's April again, and this time we're moving to 6.18.
+Hi Daan,
 
-The I/O accounting bug reported at the start of this thread is still an
-issue for us, and we've been carrying the above patch for 12 months.
+Thank you for the patch. I will properly review it and build test etc.
+this weekend and come back to you, hope that's ok.
 
-Digging into this a bit more, the issue appears to be big writeback
-(e.g. xfsaild invoking xfs_buf_delwri_submit_nowait()), where one plug
-covers hundreds of writes for around 10ms on average.
-
-xfsaild can stay on-CPU for long stretches which leads to inflated I/O
-times in /proc/diskstats. Tracing the requests shows that they're not
-actually any slower than previous kernel versions -- it's purely an
-accounting bug.
-
-Of course it doesn't look to be an XFS thing. It's just tasks doing
-massive writes without getting preempted/interrupted.
-
-Any interest in merging the above patch?
-
-Thanks,
-Matt
+Regards,
+Phil
