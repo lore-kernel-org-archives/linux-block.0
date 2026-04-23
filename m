@@ -1,129 +1,89 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593B4263C7F
-	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 03:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257EF3D6CA0
+	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 03:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776915241; cv=none; b=m0gTYA4Zj+pfA3A04kp27a6nSDcLTnOzDvbhGeeGj3wtq5KvpcDA5xxP4Rmqk9leItMufUOYo52EnU3S8rehuNiy1eH7F5YgpcqfRHiD/ZHiPLjwDOVxXtqdArX+tFTjje+dOPUPUf5Paq2O1TQW05ret7uYw8T2Zq7w45uhF8g=
+	t=1776916620; cv=none; b=o03vWlmpgkRCK5PFBvNbe3ia+B7mGc+2/vQROm9XFL1b8aRzKdGK3y19i5UC9UyeYQ+CZi4uLVTNWOUA8lK1z8BBhqsWL212Y9U0TJ+WWCLnIzy75PT4Maxu72vPrTpQxhKH2NV7+SSpX84FYNU3mdsWBRMhjJJwxZOLiSN7tzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776915241; c=relaxed/simple;
-	bh=4Mi5pvZ9k8mNNJE5H4f7/P/oe6f9B4eoCJGd/FmRJf8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kiAXFYgeZ+jBUv8mCeQJAl5ODhEo6ntDL3C4ujEvWw/wTiaE2o8j15zNWhmn/jH6oa/B1LQG+jy/Yg7iSaUVtzLNEvrODojrHb85DkKhyRyfpRjHA/S/k5Y+Q2cDhqa6cs0Rv8bFbCFijs8GTPBAkfpp3nNGYxRCI6taqnOuRGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+	s=arc-20240116; t=1776916620; c=relaxed/simple;
+	bh=a9AoCeQw2JwtXkhCFyTFgM24eWJEujRL6v97BzFui6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cAZ9DZZu/8BSeNTE1fX0gxFCagdwnF5WXDjGA7U5NXUZ2qbcfdFKKFhw9+vwnJ1XUbUXUmV8q9P3UImSxR0vrLUQa+km6sYrk7D1xDiyFrVKLauG47TqjmJ1c3yFPon1uOizKPpsZ4VWKMuNas9yv6fg81+p2TbDR5QwlsVJz6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UdE5LQiC; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b9c603ec2dfso824082266b.1
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 20:34:00 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UdE5LQiC"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488e1a8ac40so76367215e9.2
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 20:56:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776916616; x=1777521416; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vq5oECfG3mPxzGMQdru72u3Y1jtdks29q83CtSo0t+k=;
+        b=UdE5LQiCVZ1bY8DcbaInSSHfZpfozE6WK2id6KGhqLJEgWel/M/W6JHmQ90OC37tM3
+         B+bitCzYblo6sIAWmm29q/PjG+jsD2lW0G6KBCvUmp+gcjjzNUn8zdVDQFqiKmccumus
+         uRU4CrDlS7+7nFTPK1zMTv/G/gn/rnbZm2r1BgtkecTNF4EUCLsKoVxZXAViIXnNO25D
+         Hwssju1qIwhOY+kNyiTo8BGLxsbG77F296Gle6Rpdrdp8V9CKwZnwsefipFkwOgSl5r+
+         rqKNEceYrfibh9R5yBdB3xczXGszo32Valq5yaE4OhidSXNBC4xqCqDx8mNEZj8O+kGh
+         cKNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776915239; x=1777520039;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+UoV8TJNU9d7JsyCvHY6ZqJ1hKcCCjuQv+G+AT1qn1Y=;
-        b=TWcEtJT5ZSMPeiQ4DvRIUjAScGIpBEMPCKA/OpY3EXcjpN2U1s+LW7JJL8/v5zczl7
-         hHZxQbp7tM4vJn9BITzwQR4kHjCm2Mdk//mMEXXXimwTsXrjV3V+Got7z1P9sbP1oTl+
-         Cvrxnth7jHNdFrGiYyiOLXtDc3uu+fOIvL3zYl9qGcdBedoOf0JyCOejrhfY/dLlMwcT
-         vBxYdH6pisxlqVZ/tU9CuaBppqnDMVs08vNE71iIEwm+AzN2k0+EK1ZWPSs1iIbAGfpW
-         jGdNO9EUxkRv5arQhdtEmeTw7s1l5BP+n3QkGZ/Jnh7bNeW0ifeXQ5eIqW7mNi8bZ80A
-         5Ipg==
-X-Forwarded-Encrypted: i=1; AFNElJ/135LqNATPO6hAqETLt5NmEmT/U3x0TUtPaqEsnPaXvyFw7dP75NOmkNJFdV617sYegtSqKbSrYIG/8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP3chd3y96HNu7hufynlCxmMgdCVT/WuOKcZVt/QXSYiWJSGqb
-	J0Zf6R05zULc86j84rgb3XED9oOG8wApGxHhmUCu92rkoE7AMZwz0dWLsduNe1FO2PTiAA==
-X-Gm-Gg: AeBDies2b9dPD89fdpZDzw77UhNuCNnfpn2tOsqAVjPoWeK7m0prHTobsNW3qqtDvWM
-	/g4jtqWeoEu1OBMHrH6QLRaTCRtYGx21hC/V8S+leqf3VZkzALeW4LYU7yANLz0+mQq5sWhbCur
-	9b994W39cBgLV1yhEJethlXGMluG/jSct/S/4I3S5hTNN1dJuZgwEz84BzdeoYzoYtX5mXHewIs
-	tjyzlQTdtsBuEFUYYwduzATG3+avMXv6aPom+1gFJuZ1d3iwtE3YZgvXnOI5WA5R1TtNZT5cyVp
-	KB0YsoUhtK7o3Eg/wosD/tPLZ28OQXSdjzPzqsDyd9UGqCec1YFcK94af2tzAG8kVN3ENUmRDyO
-	v8OWmUUou2dxU2Er5j0nAnJIR7s3UaoCgWDnDYGw3ALpr6YWkkEP8iYadJJVY1wH2DGK4wU6lni
-	wM/uCZ4BTyTCZDOMfPqFSDBiDMu8cZn+UiKfUoNq3FGM/L0f5FF539MnIOLIHRxscozw==
-X-Received: by 2002:a17:906:4fc5:b0:b9b:ddb2:b1c1 with SMTP id a640c23a62f3a-ba418f7f625mr1133248566b.21.1776915238433;
-        Wed, 22 Apr 2026 20:33:58 -0700 (PDT)
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ba454d1b694sm623897166b.29.2026.04.22.20.33.57
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2026 20:33:58 -0700 (PDT)
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488d2079582so72096395e9.2
-        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 20:33:57 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ/uZd1S0x2R1TDMCdIYJlgxANdWWf0YB1ahSCDO6X1+XCVQvcjIqoycPIqu8F33z8NheHH5H9EVKMfCCg==@vger.kernel.org
-X-Received: by 2002:a05:600c:1f83:b0:488:8840:e5ae with SMTP id
- 5b1f17b1804b1-488fb787afemr351824795e9.24.1776915237499; Wed, 22 Apr 2026
- 20:33:57 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776916616; x=1777521416;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vq5oECfG3mPxzGMQdru72u3Y1jtdks29q83CtSo0t+k=;
+        b=DprArW/vHvW/orDYG+fz6hz9CVhr5P9VgFbj0k0NoFF5ed9u91buHWLiVnNugmAy2Z
+         cxvmqO5+aCFbpeZJHo7xZ4ks/gYFSF+BFL96uYeQDdk4Kp0zccTgnsOQdvAxpBzM4rw6
+         zeX5pUHXbhRr7rzmuQlM+bv3zOSqoP8fkCuHft29zcC2EiN54O5LKsJfyEjbJrvrZ45V
+         Sh7sS16Ckto8ZxhnLkFCWykBL9ths1me8zF4c7JmkViOt8nWwLNANTm4l1hb2EDZXN8m
+         od0kIZoou5Y/W9nsjYC35DLpcpciUID7t5Wjt0nMQO4hm5sGv7lrFJ49gyPL5mbp/nKH
+         4M4Q==
+X-Forwarded-Encrypted: i=1; AFNElJ+G/AIVQpcZHYtqwrOLU3oXkiGLNa92+5RUpZcXAxoOOkOGzfRZsqFS+WkmeOLljoJlg1E0yK+JjXJ38g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsTz+pK2WUo9t8N5S+B+52FSQmvf6GFg7eRGMoSEZoOlhBbMP9
+	nLezPE+dhenenNhn1ZLK0BBVKqiaMOwTvCSyEzXfaC/7sSlSRnt2M7ZH
+X-Gm-Gg: AeBDiev2HwATnRm+MZMaflshdJqSj+HLfVhK+ByMhqa6UhIdH9XssceCh9wVvOLyg6y
+	zrX2MZ1vesPY76K7rHjU03m1CVAaRgVVWBKbMTTXuEde3Ld2+9Nt+TkdW2m/mYp59WHtxf8pQv2
+	RUNJlRpWzrhSLpcBSh/r+TF+0+RXIYc2J+3AZmUHbdq69DwCYRAFQkcsotUeqQnbVjJoy2uRedC
+	FwcFNkhrpkw8OcVbatLzbkaboXB3Bw9oc0sgxsQECC8LKp41V7Nl1lnD1AxdGWVFRN7zLfy0esy
+	fetULIbsjHLKJLwa+e/8Cl6wCrvPFmz1go9fILiIQeLlHg/Q2uWpFwgogzKb9ygQ40a6EerKl6V
+	QokBEOYSXurPYkuslsfQr/kl68sHTkNJlWV6vKS2gL7XxV5+uQRariJzNc4VHFi5fa1MdeM0qNA
+	lZG5ezuVG4G7BstRiaJYh8NlHlm09BiZFIBnn3CkETQqZjDKyfC70yDkGmTt7ermLiVosymN4Ua
+	ZzBtgeEx3FMsvyyRwo=
+X-Received: by 2002:a05:600c:548c:b0:48a:568f:ae6b with SMTP id 5b1f17b1804b1-48a568fafcbmr131049955e9.7.1776916616367;
+        Wed, 22 Apr 2026 20:56:56 -0700 (PDT)
+Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a5c24d82asm38256265e9.7.2026.04.22.20.56.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Apr 2026 20:56:55 -0700 (PDT)
+Date: Thu, 23 Apr 2026 11:56:49 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/3] selftests: ublk: remove unused argument to _cleanup
+Message-ID: <aemYgUX2B1z4Prbf@fedora>
+References: <20260421200901.1528842-1-csander@purestorage.com>
+ <20260421200901.1528842-2-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260420020327.1667156-3-iam@sung-woo.kim>
-In-Reply-To: <20260420020327.1667156-3-iam@sung-woo.kim>
-From: Sungwoo Kim <iam@sung-woo.kim>
-Date: Wed, 22 Apr 2026 23:33:41 -0400
-X-Gmail-Original-Message-ID: <CAJNyHpKSu1eEbuhHsocu7gQ+TbSpk3PeAeeoCxuMPSDFW9iRXg@mail.gmail.com>
-X-Gm-Features: AQROBzAIUDu24DQiw6CZUPNyZnNR9MVgpLfZgnYYANvJ0w5IEXf-9g3LMVc3T14
-Message-ID: <CAJNyHpKSu1eEbuhHsocu7gQ+TbSpk3PeAeeoCxuMPSDFW9iRXg@mail.gmail.com>
-Subject: Re: [PATCH v3] Fix null-ptr-deref in bio_integrity_map_user()
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
-Cc: Chao Shi <cshi008@fiu.edu>, Weidong Zhu <weizhu@fiu.edu>, Dave Tian <daveti@purdue.edu>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260421200901.1528842-2-csander@purestorage.com>
 
-This is a follow-up based on Sashiko's comments.
-https://sashiko.dev/#/patchset/20260420020327.1667156-3-iam%40sung-woo.kim
+On Tue, Apr 21, 2026 at 02:08:59PM -0600, Caleb Sander Mateos wrote:
+> The _cleanup helper function doesn't take any arguments, so drop them
+> from its callers.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-On Sun, Apr 19, 2026 at 10:05=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wro=
-te:
->
+Reviewed-by: Ming Lei <tom.leiming@gmail.com>
 
-[snip]
-
-> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> index e79eaf047794..c8cfd15fb589 100644
-> --- a/block/bio-integrity.c
-> +++ b/block/bio-integrity.c
-> @@ -402,6 +402,20 @@ int bio_integrity_map_user(struct bio *bio, struct i=
-ov_iter *iter)
->                                         extraction_flags, &offset);
->         if (unlikely(ret < 0))
->                 goto free_bvec;
-
-It's pre-existing, though, free_bvec does not kvfree(pages), leading
-to a memory leak.
-
-> +       /* Handle partial pinning. This can happen when pin_user_pages_fa=
-st()
-> +        * returns fewer pages than requested
-> +        */
-> +       if (unlikely(ret !=3D bytes)) {
-> +               int npinned =3D DIV_ROUND_UP(offset + ret, PAGE_SIZE);
-
-If ret =3D=3D 0, npinned becomes 1, whereas there is no actually pinned mem=
-ory
-
-> +               int i;
-> +
-> +               for (i =3D 0; i < npinned; i++)
-> +                       unpin_user_page(pages[i]);
-
-... which results in invalid access here.
-
-Also, pages[i] can be ITER_KVEC, ITER_BVEC, ITER_FOLIOQ, etc., which
-do not pin memory.
-Thus, calling unpin_user_page(pages[i]) unconditionally is incorrect.
-
-To fix this, call unpin_user_page() when user_backed_iter(iter) is true.
-
-> +               if (pages !=3D stack_pages)
-> +                       kvfree(pages);
-> +               ret =3D -EFAULT;
-> +               goto free_bvec;
-> +       }
->
->         nr_bvecs =3D bvec_from_pages(bvec, pages, nr_vecs, bytes, offset,
->                                    &is_p2p);
-> --
-> 2.47.3
->
+Thanks,
+Ming
