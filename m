@@ -1,39 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAB818A6CF
-	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 12:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC473ED137
+	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 12:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776946673; cv=none; b=MaLh56LYIoAopqLyHj0AO7E7HOp7FzKKUSSVIADw9qmc/UxBasBDs4bvaK6wvTShEyTNGwcbyUg+TsAhoJOTi2VoKWKMTbq/BmHo0HscXWBwObxNrYl7lfY+4bb+hmoTQmBqKVJJ4fnZJJixkSTv5d5D7waaNj9dsbXEuvzZCd0=
+	t=1776948961; cv=none; b=RPYKEDJP2viepc27gI36DPupG1tZmFDi/PUrQPhXedy+l+XL9naAge2b3jBIMoZXqiLR6ZRVN2UNT3Wq62WXD3IrOW9bAEecd/I2aSFesyfWbPUlBSTq1jYV1rQ7lh5sgVIHEmkQU/YgpmPuNdjamH3OFrQaqgFS5NWQrT8HyBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776946673; c=relaxed/simple;
-	bh=MZsFcGXKcqIYZOJVjit9xq4t4F/X93oHkysgJTxx5Yo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qtDMm1zT4+d5nd2qskCBERUmmtyE6W8jNDVhh0oaDFGQ0ZWU/s2EiJJMhbXn8xMRD+0qasJ4864cv6CyEIHuwxP+VfwP8C6hZLkFkUC73JK6TP3wkP7Xl/eZ6hwSipkmLVbzRn+0RRjxKTgcanaYf6BtuINCoKcppOamUeUMeJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oI3hslxJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776948961; c=relaxed/simple;
+	bh=gFRQZa+5+6T/UvUfG+iSQp84/qWQUKfeR2MbrBywW4U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ATGS3R3SMoWSVk3nowS6XgtHQoJV/p+8+PBidLz9BBdqrOK9SbubIoMgdFlEU08ssmCQppb58Jg6N6sxQ0atzRrvO90LXt/PGPedQHTIQFZLrdh7OWveozR9iD73QdqvkwXkK+/65V7orpXuixLBhTTHB205svP4o7en/cwghCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=av/y1B1l; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oI3hslxJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D272DC2BCAF;
-	Thu, 23 Apr 2026 12:17:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776946672;
-	bh=MZsFcGXKcqIYZOJVjit9xq4t4F/X93oHkysgJTxx5Yo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oI3hslxJKBcijV5ACPnX3SjXcBDy1ayDPzvJxZqIp7P5PdQ939gpORDoa4/LLFKz7
-	 LNp6G58XQvAnXk9RG9+JH71HZkJoKyeNOlahDb39BpNbAoGbsZJJuPEM2YSYGguGxk
-	 j2vXkoqqP7XxD93Iss6a7RZaioTkdmD0EgRD+wKY58XVzxYjka3MR1/byEXdwXJCCj
-	 zzpCwnnao19nJerfMleNBreJmEg35PFGU6uLqgLnW5LFdbCZx707ubxsP1pQp3M0nI
-	 Wq/NJcPKlqZaNMfLgem/1dA5B9igwioKHHRqkBRgGxsU4UvIwLvt+k/KsW9E600njb
-	 zYNW0vAUSV2sA==
-From: Hannes Reinecke <hare@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCHv3] ublk: persistent device links
-Date: Thu, 23 Apr 2026 14:17:39 +0200
-Message-ID: <20260423121739.7694-1-hare@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="av/y1B1l"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4890d945eb4so30518615e9.0
+        for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 05:55:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776948957; x=1777553757; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gnRdDLrWpQ9VAViP+Lb+FjcuP4xTGaJIWlgeZ0peEtU=;
+        b=av/y1B1lrej3T/vobG74hzQ2dW8Ku/bUTC+WW23Qt3Kdh4tQyxZq7TzurPLzove91s
+         RFm0iT9EY23YPcvdX6PpE0GG1nPtv3V7HyRHp/FYAQ+tpjX3jZ3XxAPIyulCcTrojWtL
+         VKWqF3uIQrDphJ0cw1zlBXFh2wpSO4b4OgQXsEBqX4JyI3hIdiAS0R5YwbhmLkPev3gl
+         XrdQTsEBmaUQmbaJ2Il9OCwsSP38sADmAvZo7IWrIl17tFvFvpD23Rrxc9pjnk5szZrk
+         p/f6iFHgsFfqQoyvlRBmwnNz1ep/kiDP8sCJFN4mOVW+I+XY28xLabjdUehad5W7j2r1
+         EKVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776948957; x=1777553757;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gnRdDLrWpQ9VAViP+Lb+FjcuP4xTGaJIWlgeZ0peEtU=;
+        b=MUm93iLJBDMTTOGIK2rQdnw4P66StL2WmX84336/11JZIq1Xt+gD682iskcljeaFHx
+         0/WKcAZ2+wNUMxCFmb9XC0Ni+JogZNlFV23TfcG6VE7tkCNeO6lvaB3Px/B3VSnmMurg
+         hITrVfJpY203kCe5WQ754zx6KPsA2tud7dxsr0MnY6ujwI2fCmP7KWt0fReUOrDapHB8
+         oMSH/q5EV/Utatn24rf6PmP2R0KNYyoaAWWavQs2dmryw9L6NQUcf/0ZBn7PRbYQwysH
+         qeMDtfOyZe/Zqr2VPnyR8WiNmhDBYDRP/nsav5y0sUegROEOQvXPv2NdtSxsSjqEZaA/
+         AMuA==
+X-Forwarded-Encrypted: i=1; AFNElJ+q0/PsQIDSJkMcjD3y0+qS4FkPJmxalkCIjuIM+sBKFFmPIaDQnrlV9VUNB5BAI1sqgrcHPXL1ETaoOg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlqF5CDynn5CFaHNfIng0Eow4o+EB34hvAFzG/ScX2E2PLHknx
+	P0tSY1sH6t3y3+LyM+9Bb2hDg3x+LOJp+xzRR5+FKx9+6x1n8jalOVHpX7VCimWa7JY=
+X-Gm-Gg: AeBDiet7d02KG8Q2YKdHq53+EVjSTiHYDL6Y6El4yO+QtOf0n+/SCkYG7yLtVUQeXUD
+	ET9diNzU82HAgtG0MVI0A8H30BqjNTqFzHiIkTwdtVQ6XZfZwoT01RQwWAnOmEWxe+9JwdHAOHY
+	AVlz5ahi9Iy0MHs3lEcLl0IfzmEm7wnu44eAjXMW7R9mD8YFLax6ATuGJVZTp5hpI5QPQCRZTY8
+	4xmWXJeMwTQcizujXxvemRXrL9p8+fMiQ5/VQGqZKSAeIdogOGSWJJVwqcFIC/lN3Qxme2AR5XE
+	j1vqZ79hnEqRc60fIS5Ed/Dy6zvrh8rmxDkmWCxPhN1h78J+eMNehsE+kczOFIwVXH+4uSmxD6X
+	MjqAsBz4Lyuh3jNf4spzAXA6Fx6UH7LAQnzZGQOzCgO+qY+wV2zkrcrDv2eFPZZoah6UWnTjKXn
+	prI6UpG913spBfpSUES4ry0wKPAnMjtSC4z61i8rnVDeZMxkjn5fmXN+v9uzHqNL2IkBtlxXdem
+	9pOrn+R07aWLXMwaZs=
+X-Received: by 2002:a05:600c:570f:b0:488:a502:8955 with SMTP id 5b1f17b1804b1-488fb882f13mr284091745e9.4.1776948956507;
+        Thu, 23 Apr 2026 05:55:56 -0700 (PDT)
+Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4cb1176sm54409368f8f.3.2026.04.23.05.55.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Apr 2026 05:55:55 -0700 (PDT)
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ming Lei <tom.leiming@gmail.com>,
+	Michael Wu <michael@allwinnertech.com>
+Subject: [PATCH] sched: disable preemption around blk_flush_plug in sched_submit_work
+Date: Thu, 23 Apr 2026 20:55:28 +0800
+Message-ID: <20260423125528.2917171-1-tom.leiming@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,139 +75,54 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement a 'uuid' parameter to export a device UUID in a sysfs
-attribute 'uuid'. The ublk server is required to set the uuid
-parameter when creating the device.
-This allows udev to create persistent device links for ublk devices
-eg with this rule:
+On preemptible kernels, a three-way deadlock can occur involving
+blk_mq_freeze_queue and blk_mq_dispatch_list:
 
-KERNEL=="ublk*", ATTRS{uuid}=="?*", SYMLINK+="disk/by-id/ublk-$attr{uuid}"
+- Task A holds a filesystem lock (e.g., f2fs io_rwsem) and enters
+  __bio_queue_enter(), waiting for mq_freeze_depth == 0
+- Task B holds mq_freeze_depth=1 (elevator_change) and waits for
+  q_usage_counter to reach zero in blk_mq_freeze_queue_wait()
+- Task C is going to sleep waiting for the filesystem lock. Before
+  sleeping, schedule() calls sched_submit_work() -> blk_flush_plug()
+  -> blk_mq_dispatch_list(), which acquires q_usage_counter via
+  percpu_ref_get(). If Task C gets preempted before percpu_ref_put(),
+  it will not be scheduled back because the task is already in
+  uninterruptible sleep state (TASK_UNINTERRUPTIBLE). This means it
+  holds the percpu_ref indefinitely, preventing freeze from completing.
 
-Signed-off-by: Hannes Reinecke <hare@kernel.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+This is fundamentally an ABBA deadlock between queue freeze and the
+filesystem lock, exposed by preemption creating an artificial hold
+on q_usage_counter during the plug flush.
+
+Fix by disabling preemption around blk_flush_plug() in
+sched_submit_work(). The _notrace variants are used since this runs
+in scheduler context. preempt_enable_no_resched_notrace() is correct
+because we are already inside __schedule() and about to pick the next
+task.
+
+Fixes: 73c101011926 ("block: initial patch for on-stack per-task plugging")
+Reported-by: Michael Wu <michael@allwinnertech.com>
+Tested-by: Michael Wu <michael@allwinnertech.com>
+Link: https://lore.kernel.org/linux-block/20260417082744.30124-1-michael@allwinnertech.com/
+Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/ublk_drv.c      | 55 +++++++++++++++++++++++++++++++++--
- include/uapi/linux/ublk_cmd.h |  6 ++++
- 2 files changed, 59 insertions(+), 2 deletions(-)
+ kernel/sched/core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index eb96010625e5..2c7bbea27cbe 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -92,7 +92,7 @@
- 	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
- 	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
- 	 UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT | \
--	 UBLK_PARAM_TYPE_INTEGRITY)
-+	 UBLK_PARAM_TYPE_INTEGRITY | UBLK_PARAM_TYPE_UUID)
- 
- #define UBLK_BATCH_F_ALL  \
- 	(UBLK_BATCH_F_HAS_ZONE_LBA | \
-@@ -938,6 +938,14 @@ static int ublk_validate_params(const struct ublk_device *ub)
- 			return -EINVAL;
- 	}
- 
-+	if (ub->params.types & UBLK_PARAM_TYPE_UUID) {
-+		const struct ublk_param_uuid *p = &ub->params.uuid;
-+		uuid_t uuid;
-+
-+		import_uuid(&uuid, p->uuid);
-+		if (uuid_is_null(&uuid))
-+			return -EINVAL;
-+	}
- 	return 0;
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index b7f77c165a6e..4217aaaa8e47 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -6966,7 +6966,9 @@ static inline void sched_submit_work(struct task_struct *tsk)
+ 	 * If we are going to sleep and we have plugged IO queued,
+ 	 * make sure to submit it to avoid deadlocks.
+ 	 */
++	preempt_disable_notrace();
+ 	blk_flush_plug(tsk->plug, true);
++	preempt_enable_no_resched_notrace();
+
+ 	lock_map_release(&sched_map);
  }
- 
-@@ -4251,6 +4259,49 @@ static int ublk_add_chdev(struct ublk_device *ub)
- 	return ret;
- }
- 
-+static ssize_t uuid_show(struct device *dev,
-+		struct device_attribute *attr, char *buf)
-+{
-+	struct gendisk *disk = dev_to_disk(dev);
-+	struct ublk_device *ub = disk->private_data;
-+	const struct ublk_param_uuid *p = &ub->params.uuid;
-+	uuid_t uuid;
-+
-+	import_uuid(&uuid, p->uuid);
-+	return sprintf(buf, "%pU\n", &uuid);
-+}
-+
-+static DEVICE_ATTR_RO(uuid);
-+
-+static struct attribute *ublk_attrs[] = {
-+	&dev_attr_uuid.attr,
-+	NULL,
-+};
-+
-+static umode_t ublk_attrs_are_visible(struct kobject *kobj,
-+		struct attribute *a, int n)
-+{
-+	struct device *dev = kobj_to_dev(kobj);
-+	struct gendisk *disk = dev_to_disk(dev);
-+	struct ublk_device *ub = disk->private_data;
-+
-+	if (a == &dev_attr_uuid.attr &&
-+	    (ub->params.types & UBLK_PARAM_TYPE_UUID))
-+		return S_IRUGO;
-+
-+	return a->mode;
-+}
-+
-+static const struct attribute_group ublk_attr_group = {
-+	.attrs = ublk_attrs,
-+	.is_visible = ublk_attrs_are_visible,
-+};
-+
-+static const struct attribute_group *ublk_attr_groups[] = {
-+	&ublk_attr_group,
-+	NULL,
-+};
-+
- /* align max io buffer size with PAGE_SIZE */
- static void ublk_align_max_io_size(struct ublk_device *ub)
- {
-@@ -4446,7 +4497,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
- 			goto out_put_cdev;
- 	}
- 
--	ret = add_disk(disk);
-+	ret = device_add_disk(NULL, disk, ublk_attr_groups);
- 	if (ret)
- 		goto out_put_cdev;
- 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index a88876756805..897848b869df 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -717,6 +717,10 @@ struct ublk_param_integrity {
- 	__u8	pad[5];
- };
- 
-+struct ublk_param_uuid {
-+	__u8	uuid[16];
-+};
-+
- struct ublk_params {
- 	/*
- 	 * Total length of parameters, userspace has to set 'len' for both
-@@ -732,6 +736,7 @@ struct ublk_params {
- #define UBLK_PARAM_TYPE_DMA_ALIGN       (1 << 4)
- #define UBLK_PARAM_TYPE_SEGMENT         (1 << 5)
- #define UBLK_PARAM_TYPE_INTEGRITY       (1 << 6) /* requires UBLK_F_INTEGRITY */
-+#define UBLK_PARAM_TYPE_UUID            (1 << 7)
- 	__u32	types;			/* types of parameter included */
- 
- 	struct ublk_param_basic		basic;
-@@ -741,6 +746,7 @@ struct ublk_params {
- 	struct ublk_param_dma_align	dma;
- 	struct ublk_param_segment	seg;
- 	struct ublk_param_integrity	integrity;
-+	struct ublk_param_uuid		uuid;
- };
- 
- #endif
--- 
-2.51.0
+--
+2.53.0
 
