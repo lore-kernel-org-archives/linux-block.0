@@ -1,120 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023CA32ED40;
-	Wed, 22 Apr 2026 22:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DB3263C7F
+	for <linux-block@vger.kernel.org>; Thu, 23 Apr 2026 03:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776898466; cv=none; b=etU5OFau05BGOXsm99LZWHPiJmflOsPYwmTK/hE+1UpAsOfgttkoxw9U9K+l5NwFI6zA2KIuzgtXFR2JRUCpP7UgZzyw7A8CLLTdMutomZ0hwOKSi1F5VXDECr3DkcMZsl41E1DQPXK+Z+3DKCBI7m5pJk/0DJZa6FOvTomv6Nc=
+	t=1776915084; cv=none; b=Ut9TdBf4zhO1M53byQ0pdsPPoK2HniM9jEnrn8l/s+nhhJhw6EqrRiI+8yLtjiGRzm3lVmGT6NM862gPnOAzUclPsl27aq//L7stNxL3Vo+RPPeA15kX967rKCpTZUB+I1Hy0W4vEW343+ppDUVDuzB1vyBYdHpWVO7NZICNUU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776898466; c=relaxed/simple;
-	bh=Xwdj3WPtuVugPCCdzzAsmUilrlXNct1Zv2lAeA2Zzxg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/9kx20EMI2/QzHszxVVgtq8pxwqd7hSr3qzG2RcJUdCSs4whyQF5qDUKhPdQK0wA1XZSEBxvjTFJvTTCt4Euc7mDWQfaIyiWICEcdReEfZRce2FYkOhMSM0rWPa2BLfPqgxC94hoVin4WFRcjxeRN/z0rrjbPoSHMXOQJnvCK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFESlm5X; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776915084; c=relaxed/simple;
+	bh=QMsiM0ySSNrjfwPeS0PK3Pu9Qsboq6Ail5+VxWLHqSo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VzOjIo/Db+ZN5RNi8CZuGmJOcfAJgiPKO4bszcNhAMA1kmhaGn4OAlvLivnkQsoJVmC6zzDFlRsmVBYMHAFghsfCjrfI7G75hSf6LIMRpwS+Qpkl1MrrMKuJljIofLmpfuugfXtLBByAeYnTnTuVnsDHwEfSCJxr15dUvnrJtP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ouz58vCh; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFESlm5X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853CEC19425;
-	Wed, 22 Apr 2026 22:54:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776898465;
-	bh=Xwdj3WPtuVugPCCdzzAsmUilrlXNct1Zv2lAeA2Zzxg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nFESlm5X3p9423YsQhMhvWhuNIU93mJ3vAInWDA9ykantZvTRsXwxfkwD/exp4d+X
-	 wpwR8pZIA6cmduvSklON9PDdhFUmOFDwhjpbXbRVdrE9GaW2xjkNZf9dNzzDUXw7Q1
-	 Wpe3ubCm97yLTMqe8waKErBGZ94e+Z/7KxdGoUny/LQ1va6PiZiYn2v5bHpDSYb8gj
-	 sn6u9EPhbUkjeQqc8eQQxxGAJ6Qe8OG5tZPPRSCpJFD8aRenVOXRdT0IN30Kg1uneI
-	 +Y1bxXhDJSfrRefYZxsanllXb14+ttOrJY6Mme41mXoLIRbgbjNPnb/ix10x8WOuz0
-	 znQU3BP4UL3fA==
-Date: Wed, 22 Apr 2026 15:53:10 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Daniel Vacek <neelx@suse.com>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 01/43] fscrypt: add per-extent encryption support
-Message-ID: <20260422225310.GB2226@sol>
-References: <20260206182336.1397715-1-neelx@suse.com>
- <20260206182336.1397715-2-neelx@suse.com>
- <20260221221153.GA2123@quark>
- <CAPjX3FficsLf2QXFU70sR6PN7h8rj5opz_wntLm+Acd3YLvu+A@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ouz58vCh"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4852a9c6309so56469285e9.0
+        for <linux-block@vger.kernel.org>; Wed, 22 Apr 2026 20:31:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1776915082; x=1777519882; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ylT2a9o0aMn9vZ27CHmN21NC/r+pum3P0HNR1XgeLHY=;
+        b=Ouz58vChw8qXFbO6J4IWNDlMWs4qu5la3bJAcUQLQ6E3Ot7obCbZf/RnRDyo50dKrD
+         LTIKU6HUJjLZFDB9q2r/1ui22IZ9DlmsynV+BljVV411FVn7xdoBlgAiugroq7hzC8bA
+         KSscamRpylS/SchqXMQEJ6DdUQf/PscGRGDVi3mPsR2eM8IeVDuUv7zidcqpIT/MyFV1
+         jiR6lYaGU/PjDVKhRbvfaVoZWna/dA0sjMvr5W27zvUh47gELH4L23jEcDYqP3O2qvw4
+         1iuKTF1KfidlJDPONN7TYcv98Yq5E1iNpG/0/aFQVC2BTGOXZpIW35G2CfRGkuUQUxe3
+         /biw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776915082; x=1777519882;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ylT2a9o0aMn9vZ27CHmN21NC/r+pum3P0HNR1XgeLHY=;
+        b=TL4wDjvcZz6uIYYMPkwIDVSg1KjnkTxNh8PagxxMNS19zRFVYl0bnU3gfbPHuiV++Y
+         6xORblZMCOMKKLZYxXj8JbiJJntw6cV8SaLvegGvNONdkenjOFxFZtbQ0ro1/t40mEt1
+         XCK+jx0nsMAtJ2Hg0DdeOxZN8YXLqhZsRXcaC5ZtKqYsyXycAR+jtiAk3iM3zRn50LJx
+         3YKPYscYufphPDFovDOaiuVj1CFLNv9XLwDxYS6Dt6wAw3oFTPOhO0TJQatzyKWAJrS0
+         D6s09MNd77jPuHGukr3vKjt3exd3896eWh55yGJTsgIceGVOWUARhAYiLR2odzotwG2E
+         ty9A==
+X-Forwarded-Encrypted: i=1; AFNElJ9Vhx/pSKHAn+14fPtAqsCR1qLvy6HDgmopyaJHcEZ4AieNPNVm/ZjmMdbfarwsDSWOLsnuX/oH8tuC8g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxRD4XJgBrXgLJ0n7ZesqCCrzVVyEOJL7+hSjWdSTGD7G1xjPw
+	kK1L5jkzKM9rH5N8EoSRtUgFLBey3NtitNVO1FuXaA1dcq82K09gH2az
+X-Gm-Gg: AeBDietgXn9zevzRHNooEHhg86PEBapl92FF7y+h8sdmEnWC1AAiWRhNIQ5X1hneygb
+	2RxmeQOwHjXEnf9dCwxXvwUitNbxMV9qixbY85E5NMiO7lqPfD1bELgT6LRkt1FcTCi8f672xig
+	DA0ufCXu5m/mGybNPwSj/K8eBlRcd0Zq7e2YDQv0GvglPVPAWDBSKNxx2lfKkC7M/U4D6uv9z79
+	GKTXadmTIT7F7vXra4/+jtunFQpazX/NvsMpqMdSe5MdZ5WhIrNy81fq6ZI48k4+Qj/Q0MaD3N5
+	qmiYfQO17+sOgwbrVy4E0Qd2LHISnAkxckzn+gANrO/8gIlJ2CuqN/ZzTJxY2H9RWioZyGzqNjW
+	EOA/ku+uzku8G73SfKHMc0IGcqCv4gf3bEUzBXj78Z2D2WAhXNH4NQtbtuWhS3bJOnKyRaGtM9J
+	e5XQ9XDQ34RduBboigYbzC8XKoScIW6q9zfn56KhcPtVr62VQlzVTyz7WHmTcSDBXNWOjnGbypm
+	MgBhcwTld6SsjitrDE=
+X-Received: by 2002:a05:600c:33a6:b0:489:1c1f:35f9 with SMTP id 5b1f17b1804b1-4891c1f38b6mr134229275e9.9.1776915081725;
+        Wed, 22 Apr 2026 20:31:21 -0700 (PDT)
+Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a525a0b1asm104438085e9.2.2026.04.22.20.31.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Apr 2026 20:31:21 -0700 (PDT)
+From: Ming Lei <tom.leiming@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	"Liam R . Howlett" <liam.howlett@oracle.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Ming Lei <tom.leiming@gmail.com>
+Subject: [PATCH 0/3] ublk: fix maple tree lockdep warning and cleanup
+Date: Thu, 23 Apr 2026 11:30:55 +0800
+Message-ID: <20260423033058.2805135-1-tom.leiming@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPjX3FficsLf2QXFU70sR6PN7h8rj5opz_wntLm+Acd3YLvu+A@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 22, 2026 at 10:17:40AM +0200, Daniel Vacek wrote:
-> > > +/**
-> > > + * fscrypt_mergeable_extent_bio() - test whether data can be added to a bio
-> > > + * @bio: the bio being built up
-> > > + * @ei: the fscrypt_extent_info for this extent
-> > > + * @next_lblk: the next file logical block number in the I/O
-> > > + *
-> > > + * When building a bio which may contain data which should undergo inline
-> > > + * encryption (or decryption) via fscrypt, filesystems should call this function
-> > > + * to ensure that the resulting bio contains only contiguous data unit numbers.
-> > > + * This will return false if the next part of the I/O cannot be merged with the
-> > > + * bio because either the encryption key would be different or the encryption
-> > > + * data unit numbers would be discontiguous.
-> > > + *
-> > > + * fscrypt_set_bio_crypt_ctx_from_extent() must have already been called on the
-> > > + * bio.
-> > > + *
-> > > + * This function isn't required in cases where crypto-mergeability is ensured in
-> > > + * another way, such as I/O targeting only a single file (and thus a single key)
-> > > + * combined with fscrypt_limit_io_blocks() to ensure DUN contiguity.
-> > > + *
-> > > + * Return: true iff the I/O is mergeable
-> > > + */
-> > > +bool fscrypt_mergeable_extent_bio(struct bio *bio,
-> > > +                               const struct fscrypt_extent_info *ei,
-> > > +                               u64 next_lblk)
-> > > +{
-> > > +     const struct bio_crypt_ctx *bc = bio->bi_crypt_context;
-> > > +     u64 next_dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = { next_lblk };
-> > > +
-> > > +     if (!ei)
-> > > +             return true;
-> > > +     if (!bc)
-> > > +             return true;
-> > > +
-> > > +     /*
-> > > +      * Comparing the key pointers is good enough, as all I/O for each key
-> > > +      * uses the same pointer.  I.e., there's currently no need to support
-> > > +      * merging requests where the keys are the same but the pointers differ.
-> > > +      */
-> > > +     if (bc->bc_key != ei->prep_key.blk_key)
-> > > +             return false;
-> > > +
-> > > +     return bio_crypt_dun_is_contiguous(bc, bio->bi_iter.bi_size, next_dun);
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(fscrypt_mergeable_extent_bio);
-> >
-> > Similar to fscrypt_set_bio_crypt_ctx_from_extent().  The copy-pasted
-> > comment needs to be updated to remove no-longer-relevant information
-> > specific to per-file encryption and correctly reflect per-extent
-> > encryption.  The DUN needs to be calculated correctly for sub-block data
-> > units or else the combination of the two needs to be unsupported.
-> 
-> The DUN is fixed as per above. Regarding the comment, it looks quite
-> valid to me. What exactly would you like to change?
+Hello Jens,
 
-It's now been a while since I was looking at this, but looking at it
-again now, at least the following parts are incorrect:
+Fix the lockdep warning reported by Jens when running ublk selftests
+with CONFIG_PROVE_RCU=y:
 
-    "the next file logical block number in the I/O"
+  lib/maple_tree.c:759 suspicious rcu_dereference_check() usage!
 
-    "I/O targeting only a single file (and thus a single key)"
+ublk_buf_cleanup() was iterating the maple tree without holding
+mas_lock, triggering the splat from mas_find()'s internal
+rcu_dereference_check().
 
-It's actually the block number in the *extent*.  And it's a single key
-only when the I/O targets a single *extent*.
+Patch 1 fixes the warning by adding mas_lock around the iteration.
+Patch 2 refactors the duplicated walk+erase+unpin loop into a shared
+ublk_shmem_remove_ranges() helper. Patch 3 avoids holding the maple
+tree spinlock across page unpinning by batching erased ranges into a
+temporary xarray.
 
-- Eric
+
+Thanks,
+
+Ming Lei (3):
+  ublk: fix maple tree lockdep warning in ublk_buf_cleanup
+  ublk: refactor common helper ublk_shmem_remove_ranges()
+  ublk: avoid unpinning pages under maple tree spinlock
+
+ drivers/block/ublk_drv.c | 111 ++++++++++++++++++++++++---------------
+ 1 file changed, 70 insertions(+), 41 deletions(-)
+
+-- 
+2.53.0
+
