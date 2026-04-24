@@ -1,73 +1,73 @@
-Received: from mail-qt1-f225.google.com (mail-qt1-f225.google.com [209.85.160.225])
+Received: from mail-pg1-f226.google.com (mail-pg1-f226.google.com [209.85.215.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5AF3A7845
-	for <linux-block@vger.kernel.org>; Fri, 24 Apr 2026 11:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663E93A381D
+	for <linux-block@vger.kernel.org>; Fri, 24 Apr 2026 11:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777029468; cv=none; b=PbjViLlNhMbNT0TGcWOrG279aPbLCvSnCoTtF1K7iWCDixrBvgwmT+JW8ei5bsQppx29eK6NYPD41v8JAnXSpOZHv1xFcsZe7E+XrsS65K5bJEj7lz+6N0I1lCFR4ShOynzdfNVPMhqmFCuUCvu/UwuN1m8qul7arkroQLOQyrY=
+	t=1777030436; cv=none; b=AfvR0J4w963aAN0ZuS2UH7tkSw37vgWjiToFKowsYwR8ylBEMUgEbj6FMk/xxVv1ZpLGjYyiI6I3PTERPswO1sgO0lQk3ego+VJ8mzMwzGQ3qAlYKJhexOJMOn3Qa+ic6kMWBOIdm9TZ3I/y/JnduEV2qkoojlJPwV2zQw5wlL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777029468; c=relaxed/simple;
-	bh=mI6x6lghM+upyqmZeiuk+1I0C5y/P/vkjKtdKZtrc7s=;
+	s=arc-20240116; t=1777030436; c=relaxed/simple;
+	bh=96sbAZPafOa+Bj6MD3f5YLxc3QBZXNK7l8NPedI4rRs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c4RoO4Owv/eGHI8AuJo/C619tXqTYyTv1C3WkPbFZzZP9uUbF00wDG/qOcvL7mKc134eCozWM67Z/GVM6DopJIE/h5R1wDb3QwJldye39VoDirjqgaCUbGYDO88dNh7Ou5BPatLhy3gjoH4ofO0t01oSuJDk3hkeOREzWcCQers=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ImLERabg; arc=none smtp.client-ip=209.85.160.225
+	 To:Cc:Content-Type; b=IFj8XDDJB2YEKVi2mHLU5Qy+H3/i96P1KNq4ddMf7scxlRWXCm95365uJ96WMtrJj9zEhuE+3+EP9R9FrvPxWYGhNrTtV8ua78HutBdWJexLfp23Pr0mPB6gAIIKY+FxxZ1sValcRts4eikFDfppNgHBIW36F4mttNkUeUstI28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FF9pm+za; arc=none smtp.client-ip=209.85.215.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ImLERabg"
-Received: by mail-qt1-f225.google.com with SMTP id d75a77b69052e-50fb18c55beso44385041cf.2
-        for <linux-block@vger.kernel.org>; Fri, 24 Apr 2026 04:17:43 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FF9pm+za"
+Received: by mail-pg1-f226.google.com with SMTP id 41be03b00d2f7-c79506f3c40so2823607a12.1
+        for <linux-block@vger.kernel.org>; Fri, 24 Apr 2026 04:33:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777029462; x=1777634262;
+        d=1e100.net; s=20251104; t=1777030435; x=1777635235;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z2ESk+K3iZglyU7l47HcDi4RQyLRApH0O6vEtgT6ldo=;
-        b=sXNvwINoGQnclrA16WuoFuawEx75b2Mx7NOb6Ewbf6FaaxGin0aLsvDC+/iHCLEkNw
-         RoOW1l9iOMVGGkpnmK/HFbJ9stmyxwQCAJHxnOzC/3tBr5LB/Y4xMA/ltkv+MW5DZRLj
-         dP7OocgKpqFEglNGP9Lc7WIkbTGa4S/o6ro3QMfiXWy6rupGihgebfMZaRfHQjgEPuqK
-         /VtAmYePrsbEPwaLN11GKB1XKIF3ccpkahLfo7AgmZ7QY9jACCffQAN7/xwiJCqhsY1J
-         5cds1jxC6Iq6hnPKTzfwugBuQ0jDFi4cX4lz3tS9hq14QgXJ055oLutvtt6aILdIZHzI
-         AkMQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9HDYf+/qBKlFfLQGnsPwuUnTMtEP0Sr8enuo/QVV9tk0ODefxsz/oOoNlfgu7uU3Udr6ReKHPlh7+mjg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyso62ZIpCAuL9a1S6m3l1ihoykYjfWYxLpfcV9zWDmAVgn0ES4
-	NrcHMFyiJ0O+ZoVW9VVW7sd91RSAC9OfRDMGwmYK19wevX5ssxRBu6tAmu3hddcCMScfBBCJKYP
-	CjbUo6nDURwhOVknjj7Zrraw6szSoBAQuqUYlWERbgcYv3nYm/xyDYgrYDdcG++rtfozRoH4976
-	X42glcjkl/docQpTtZ9OzbcBxS7aVxf7BHgsNJhZw4WmGQpL+D2csYF1uTThNx+cMX4eqSOij+6
-	emQPqFyORaU38n+1w==
-X-Gm-Gg: AeBDieurRQzhp5roHhMLyp7uRWe8G86S+r2nVVkvToCEW1l7oadcpbH5oxUn6JCevQQ
-	wvtyCvuAmnNeqAByMs8kSE8rCWjG32ImLEKDYaL23jFrB0RdanOgMGkAjq+QZGM5PHb1bZOwwnd
-	dNtgwM/8a1enbWats1MAsmuYS0oGW3k03So7mciPbDJzF7CtxRF3It8ZPbGU6FKcQUIjTN6vMXy
-	gxVkU4F2O/oSjl9RkMQyrxCjLPHrAd/71tORFo7YLTTPO23qzad1uHwhMf5KwBytO1bqbkLbkwC
-	6VNv8zb4v1R6405mluGj41/E4sMfjyXzQcMY7XCzqIlIl4viLIM3aock9QCCYtPZoSSe07scTKK
-	QfUOYlttrLYYEBG5k9GnWyCAAetOjIakb3Sz2WtBinC/t/6+qcOBPUWNJK6dIlDNBdEH6/64n6V
-	9vtIdgUju0/u3bmQw=
-X-Received: by 2002:ac8:5851:0:b0:50e:fcbc:6b82 with SMTP id d75a77b69052e-50efcbc6ed3mr281203331cf.15.1777029462177;
-        Fri, 24 Apr 2026 04:17:42 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-50ed32c5d4dsm11772491cf.21.2026.04.24.04.17.41
+        bh=p5klHZw6KHbrjuBGP42J9YX0tNBmMkSZu7UbE2WbLVA=;
+        b=Qz2ByZHuezTQkqJsPpqWlDWXixcRaod+0i/ITHeZ6J4LvxiEz1IDxnshgtGAgfXZE6
+         m2sGtv3LrHPN/eA9z9Q2yh3eqjNqQaJ8duZPlTnxZGhAhbKb3ynJfKQylk9ShzJP2exK
+         u7WueKnmvxSslXisp/7dAqs+AkmDCDndBWUlt6q1tB3sFaWUGpduVVmb+qCIxAeaGGsb
+         70/oKG64iVN69RWxVy9jLILpstfo33ROUIW73BAB9UPydYdT2WbPhtb1yuGnZ15qpMn5
+         sGV1gJPpDMVgaAJSJsiX7cE4SHn6UEzzKntDpV2E628RxHqzuqoG54DBTJz8lKTGbMWm
+         EMMQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9CKFuq4/TLlFNQ6836IiWRqqWuxgTRdmh95hSqZ9fqpssQ/nFN6qyhaGlPI8ekeX0AK5K63SaEv+5b9A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqS079zWNQ7tVBB94kWSSys9up9mGKdDGWL4vWomH1iM/T0fWN
+	9XuROt9VKZEUj4BUpwOFXPmaOdb5ayd/t6xm45aAP3wAhFm47D7hOzEkpuhBEtgGJdXTv4iEvPj
+	0DQO7rpdysC4KZ9qUe6IHpgGX7+zoqTG65u7FF1xatETcKUMi2TkrN5FXfqQdOx242Ag/glwwlz
+	qZMWOcxmbaUTVfbKycgPmSGsgQtTX31XjlkbblmmyTchY9iESZlYWyQg9yV6G6grbuFR/Rg+Dwd
+	bYKpri+opww1/92aA==
+X-Gm-Gg: AeBDievES264JoTqFlDJp2bfsw29yN4vrOaWrrKMYPZ7VMjQLW7lO4bZNKrnilakWxs
+	HBil0HljuXaU/31pQpvIcNdX17jrGZGsXDs79YKRxcve2U1g53G3MVyTIceruSSX648c/Pz+hPX
+	G/EDNXuVdoe+s7foV/0lBox4acC43WF+mVINo0aTO45k4GJBlQJoGX2YBT3mQE24Gt3/i8+XLUq
+	qAsbCNnd8n9W8/cXpLZTwbX1HU19rXPgHmXjCxLUuYtJEIzAzakHCD3msdyBhHUrkedydF47www
+	2m18Axp/GNqYnQ4/XL+r6FBNuXDBYP5NWaMnMTjZ/jAh6hxvvkK7I+lvhgemrnHslwundmf7osA
+	0Yt8/ltmZLQGmcLrVo8qMrv6FvntaD0afIpOGg+AG0iEUARY7CAK5LuTte394pRJDmJN751L1WJ
+	eesrDtRLWuhe3+Tv0KA1twsx7K/g6rgKDwYAQyDGAQ5fHJS+lXAfDdhtyKtr3T00jE56o=
+X-Received: by 2002:a05:6a20:914b:b0:3a2:d79c:415c with SMTP id adf61e73a8af0-3a2d79c43a0mr24278051637.47.1777030434451;
+        Fri, 24 Apr 2026 04:33:54 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-17.dlp.protect.broadcom.com. [144.49.247.17])
+        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-c79770aa764sm959750a12.11.2026.04.24.04.33.53
         for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 24 Apr 2026 04:17:42 -0700 (PDT)
+        Fri, 24 Apr 2026 04:33:54 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-38deda7379dso43369061fa.1
-        for <linux-block@vger.kernel.org>; Fri, 24 Apr 2026 04:17:41 -0700 (PDT)
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5a406666270so6012226e87.0
+        for <linux-block@vger.kernel.org>; Fri, 24 Apr 2026 04:33:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1777029460; x=1777634260; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1777030432; x=1777635232; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z2ESk+K3iZglyU7l47HcDi4RQyLRApH0O6vEtgT6ldo=;
-        b=ImLERabgaTs/u6iEHWUNYoxxN0o1I1KwncDnKPOb1E8kP/yelAKFMlVOWWFSxx+ldy
-         3CX5XrFkuBO5wRn2irHE0cGQacgnz8HvtgaipDkSHNwVFldiLz6FGQJuqsAmoHTofndP
-         1Jg6IgD1lBrWrGllnW/vHaof3Kpa6X0j7bDyI=
-X-Forwarded-Encrypted: i=1; AFNElJ9vjZeZjWQ31zMDL21A1wsvyn4x39aSSTk7jlVHc/m9tfaqGG/9vhPH94rok6ZNGcKkwOwBytuCIfwUFQ==@vger.kernel.org
-X-Received: by 2002:a05:6512:39c8:b0:5a2:b259:5569 with SMTP id 2adb3069b0e04-5a4172a2e01mr8949488e87.15.1777029459861;
-        Fri, 24 Apr 2026 04:17:39 -0700 (PDT)
-X-Received: by 2002:a05:6512:39c8:b0:5a2:b259:5569 with SMTP id
- 2adb3069b0e04-5a4172a2e01mr8949478e87.15.1777029459250; Fri, 24 Apr 2026
- 04:17:39 -0700 (PDT)
+        bh=p5klHZw6KHbrjuBGP42J9YX0tNBmMkSZu7UbE2WbLVA=;
+        b=FF9pm+zaQ7fp/O5reRBlxkREkoCx3j/tu5MBTqt5QLAu774fxhIeK1Dsv6DeQJXxPm
+         z0VOPNp5gfJHGCbisY6HKt6HA4IMsXY3WvmRaCSVxQ2v0FrBAN9gCE+QNQFgJY0y7utJ
+         Qo5nb6gwunr78zBWaBT8cu/WmgAGN7LXnvCiY=
+X-Forwarded-Encrypted: i=1; AFNElJ9kl/ZF5G+T8JncW9//xH4+qHll+fTrf/kdjtR+/sGVXVHdHl3jVdsoEqDUZpqQibNbohD8wG6iaifyeA==@vger.kernel.org
+X-Received: by 2002:a05:6512:36c1:b0:5a4:19df:48d4 with SMTP id 2adb3069b0e04-5a419df49bfmr7069057e87.18.1777030431976;
+        Fri, 24 Apr 2026 04:33:51 -0700 (PDT)
+X-Received: by 2002:a05:6512:36c1:b0:5a4:19df:48d4 with SMTP id
+ 2adb3069b0e04-5a419df49bfmr7069036e87.18.1777030431402; Fri, 24 Apr 2026
+ 04:33:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,250 +75,115 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260420113846.1401374-1-sumit.saxena@broadcom.com>
- <20260420113846.1401374-4-sumit.saxena@broadcom.com> <ab9e8e26-5522-4072-a2fe-07df5cb64441@oracle.com>
-In-Reply-To: <ab9e8e26-5522-4072-a2fe-07df5cb64441@oracle.com>
+ <20260420113846.1401374-2-sumit.saxena@broadcom.com> <a27a04be-6c41-4d7f-b697-b04c4fe9dc8c@oracle.com>
+In-Reply-To: <a27a04be-6c41-4d7f-b697-b04c4fe9dc8c@oracle.com>
 From: Sumit Saxena <sumit.saxena@broadcom.com>
-Date: Fri, 24 Apr 2026 16:47:39 +0530
-X-Gm-Features: AQROBzD3rnS6K0Fzc-rSDLNDGLFFip-b_3tDPXyTB6tt1USTDylIQ_4Yy9FfiuM
-Message-ID: <CAL2rwxrRW-0uf2RKdx7jhLkXy6+AB9WQCOOSVRTk0546BtLAPQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] scsi: use percpu counters for iorequest_cnt and iodone_cnt
+Date: Fri, 24 Apr 2026 17:03:52 +0530
+X-Gm-Features: AQROBzCT5Q_jm9UCw6s7ffiH7xMv26ULaNYD59NPvuZP9VGpfR1Rlq3cw7VNW9M
+Message-ID: <CAL2rwxr+7tD1BfxKJCn70wyPT34=sfFMfUNAV63SAW0BxQ-0Ug@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] scsi: scan: allocate sdev and starget on the NUMA
+ node of the host adapter
 To: John Garry <john.g.garry@oracle.com>
 Cc: martin.petersen@oracle.com, axboe@kernel.dk, linux-scsi@vger.kernel.org, 
 	linux-block@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com, 
-	Bart Van Assche <bvanassche@acm.org>
+	James Rizzo <james.rizzo@broadcom.com>
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000bdcfb9065032e958"
+	boundary="000000000000ade1510650332363"
 
---000000000000bdcfb9065032e958
+--000000000000ade1510650332363
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 21, 2026 at 2:16=E2=80=AFPM John Garry <john.g.garry@oracle.com=
+On Mon, Apr 20, 2026 at 5:40=E2=80=AFPM John Garry <john.g.garry@oracle.com=
 > wrote:
 >
 > On 20/04/2026 12:38, Sumit Saxena wrote:
-> > iorequest_cnt and iodone_cnt are updated on every command dispatch and
-> > completion, often from different CPUs on high queue depth workloads.
-> > Using adjacent atomic_t fields caused cache line contention between the
-> > submission and completion paths.
+> > From: James Rizzo <james.rizzo@broadcom.com>
 > >
-> > Represent these statistics with struct percpu_counter so increments are
-> > mostly local to each CPU, avoiding false sharing without growing
-> > struct scsi_device further for cache-line padding.
+> > When a host adapter is attached to a specific NUMA node, allocating
+> > scsi_device and scsi_target via kzalloc() may place them on a remote
+> > node.  All hot-path I/O accesses to these structures then cross the NUM=
+A
+> > interconnect, adding latency and consuming inter-node bandwidth.
 > >
-> > Suggested-by: Bart Van Assche <bvanassche@acm.org>
+> > Use kzalloc_node() with dev_to_node(shost->dma_dev) so allocations land
+> > on the same node as the HBA, reducing cross-node traffic and improving
+> > I/O performance on NUMA systems.
+>
+> I suppose that this makes sense. We already do this sort of thing in
+> scsi_mq_setup_tags() (in setting numa node) and
+> scsi_realloc_sdev_budget_map() ->
+> sbitmap_init_node(sdev->request_queue->numa_node)
+>
+> For the actual shost allocation, we still use kzalloc() in
+> scsi_host_alloc(). However, shost associated device is often a pci
+> device, and we probe pci devices in the same NUMA node it exists, and we
+> try NUMA local allocations by default, so nothing is needed to change
+> for the shost allocation - is this right?
+shost allocation is not an issue, I will drop changes related to it.
+The tests indicate that at times sdev and starget are allocated to
+remote NUMA node.
+So, I will limit these changes to sdev and starget only.
+>
+> >
+> > Signed-off-by: James Rizzo <james.rizzo@broadcom.com>
 > > Signed-off-by: Sumit Saxena <sumit.saxena@broadcom.com>
 > > ---
-> >   drivers/scsi/scsi_error.c  |  2 +-
-> >   drivers/scsi/scsi_lib.c    |  8 ++++----
-> >   drivers/scsi/scsi_scan.c   |  9 +++++++++
-> >   drivers/scsi/scsi_sysfs.c  | 27 +++++++++++++++++++++++----
-> >   include/scsi/scsi_device.h |  5 +++--
-> >   5 files changed, 40 insertions(+), 11 deletions(-)
+> >   drivers/scsi/scsi_scan.c | 9 ++++++---
+> >   1 file changed, 6 insertions(+), 3 deletions(-)
 > >
-> > diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-> > index 147127fb4db9..c7424ce92f3e 100644
-> > --- a/drivers/scsi/scsi_error.c
-> > +++ b/drivers/scsi/scsi_error.c
-> > @@ -370,7 +370,7 @@ enum blk_eh_timer_return scsi_timeout(struct reques=
-t *req)
-> >        */
-> >       if (test_and_set_bit(SCMD_STATE_COMPLETE, &scmd->state))
-> >               return BLK_EH_DONE;
-> > -     atomic_inc(&scmd->device->iodone_cnt);
-> > +     percpu_counter_inc(&scmd->device->iodone_cnt);
-> >       if (scsi_abort_command(scmd) !=3D SUCCESS) {
-> >               set_host_byte(scmd, DID_TIME_OUT);
-> >               scsi_eh_scmd_add(scmd);
-> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> > index 6e8c7a42603e..0b05cb63f630 100644
-> > --- a/drivers/scsi/scsi_lib.c
-> > +++ b/drivers/scsi/scsi_lib.c
-> > @@ -1554,7 +1554,7 @@ static void scsi_complete(struct request *rq)
-> >
-> >       INIT_LIST_HEAD(&cmd->eh_entry);
-> >
-> > -     atomic_inc(&cmd->device->iodone_cnt);
-> > +     percpu_counter_inc(&cmd->device->iodone_cnt);
-> >       if (cmd->result)
-> >               atomic_inc(&cmd->device->ioerr_cnt);
-> >
-> > @@ -1592,7 +1592,7 @@ static enum scsi_qc_status scsi_dispatch_cmd(stru=
-ct scsi_cmnd *cmd)
-> >       struct Scsi_Host *host =3D cmd->device->host;
-> >       int rtn =3D 0;
-> >
-> > -     atomic_inc(&cmd->device->iorequest_cnt);
-> > +     percpu_counter_inc(&cmd->device->iorequest_cnt);
-> >
-> >       /* check if the device is still usable */
-> >       if (unlikely(cmd->device->sdev_state =3D=3D SDEV_DEL)) {
-> > @@ -1614,7 +1614,7 @@ static enum scsi_qc_status scsi_dispatch_cmd(stru=
-ct scsi_cmnd *cmd)
-> >                */
-> >               SCSI_LOG_MLQUEUE(3, scmd_printk(KERN_INFO, cmd,
-> >                       "queuecommand : device blocked\n"));
-> > -             atomic_dec(&cmd->device->iorequest_cnt);
-> > +             percpu_counter_dec(&cmd->device->iorequest_cnt);
-> >               return SCSI_MLQUEUE_DEVICE_BUSY;
-> >       }
-> >
-> > @@ -1647,7 +1647,7 @@ static enum scsi_qc_status scsi_dispatch_cmd(stru=
-ct scsi_cmnd *cmd)
-> >       trace_scsi_dispatch_cmd_start(cmd);
-> >       rtn =3D host->hostt->queuecommand(host, cmd);
-> >       if (rtn) {
-> > -             atomic_dec(&cmd->device->iorequest_cnt);
-> > +             percpu_counter_dec(&cmd->device->iorequest_cnt);
-> >               trace_scsi_dispatch_cmd_error(cmd, rtn);
-> >               if (rtn !=3D SCSI_MLQUEUE_DEVICE_BUSY &&
-> >                   rtn !=3D SCSI_MLQUEUE_TARGET_BUSY)
 > > diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-> > index 9749a8dbe964..0b4fa89149af 100644
+> > index ef22a4228b85..9749a8dbe964 100644
 > > --- a/drivers/scsi/scsi_scan.c
 > > +++ b/drivers/scsi/scsi_scan.c
-> > @@ -351,6 +351,15 @@ static struct scsi_device *scsi_alloc_sdev(struct =
+> > @@ -34,6 +34,7 @@
+> >   #include <linux/kthread.h>
+> >   #include <linux/spinlock.h>
+> >   #include <linux/async.h>
+> > +#include <linux/topology.h>f
+> >   #include <linux/slab.h>
+> >   #include <linux/unaligned.h>
+> >
+> > @@ -286,9 +287,10 @@ static struct scsi_device *scsi_alloc_sdev(struct =
 scsi_target *starget,
-> >
-> >       scsi_sysfs_device_initialize(sdev);
-> >
-> > +     ret =3D percpu_counter_init(&sdev->iorequest_cnt, 0, GFP_KERNEL);
-> > +     if (ret)
-> > +             goto out_device_destroy;
-> > +     ret =3D percpu_counter_init(&sdev->iodone_cnt, 0, GFP_KERNEL);
-> > +     if (ret) {
-> > +             percpu_counter_destroy(&sdev->iorequest_cnt);
-> > +             goto out_device_destroy;
-> > +     }
+> >       int display_failure_msg =3D 1, ret;
+> >       struct Scsi_Host *shost =3D dev_to_shost(starget->dev.parent);
+> >       struct queue_limits lim;
+> > +     int node =3D dev_to_node(shost->dma_dev);
 >
-> it could be neater to have:
->         if (percpu_counter_init(&sdev->iorequest_cnt, 0, GFP_KERNEL) ||
->             percpu_counter_init(&sdev->iodone_cnt, 0, GFP_KERNEL)) {
->                 err =3D some err;
->                 goto out_device_destroy;
->         }
->
+> this variable is only used once, so we can use
+> dev_to_node(shost->dma_dev) directly
 Ack
-> > +
-> >       if (scsi_device_is_pseudo_dev(sdev))
-> >               return sdev;
-> >
-> > diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-> > index dfc3559e7e04..1f5b2dc156a8 100644
-> > --- a/drivers/scsi/scsi_sysfs.c
-> > +++ b/drivers/scsi/scsi_sysfs.c
-> > @@ -516,6 +516,10 @@ static void scsi_device_dev_release(struct device =
-*dev)
-> >       if (vpd_pgb7)
-> >               kfree_rcu(vpd_pgb7, rcu);
-> >       kfree(sdev->inquiry);
-> > +     if (percpu_counter_initialized(&sdev->iodone_cnt))
-> > +             percpu_counter_destroy(&sdev->iodone_cnt);
-> > +     if (percpu_counter_initialized(&sdev->iorequest_cnt))
-> > +             percpu_counter_destroy(&sdev->iorequest_cnt);
 >
-> Maybe I am wrong, but doesn't percpu_counter_destroy() handle the case
-> of the percpu counter not being initialized? In other words, do we need
-> the percpu_counter_initialized() checks?
-percpu_counter_initialized() checks are not required; I will drop them.
+> >
+> > -     sdev =3D kzalloc(sizeof(*sdev) + shost->transportt->device_size,
+> > -                    GFP_KERNEL);
+> > +     sdev =3D kzalloc_node(sizeof(*sdev) + shost->transportt->device_s=
+ize,
+> > +                    GFP_KERNEL, node);
+> >       if (!sdev)
+> >               goto out;
+> >
+> > @@ -501,8 +503,9 @@ static struct scsi_target *scsi_alloc_target(struct=
+ device *parent,
+> >       struct scsi_target *starget;
+> >       struct scsi_target *found_target;
+> >       int error, ref_got;
+> > +     int node =3D dev_to_node(shost->dma_dev);
 >
-> >       kfree(sdev);
-> >
-> >       if (parent)
-> > @@ -936,11 +940,26 @@ static ssize_t
-> >   show_iostat_counterbits(struct device *dev, struct device_attribute *=
-attr,
-> >                       char *buf)
-> >   {
-> > -     return snprintf(buf, 20, "%d\n", (int)sizeof(atomic_t) * 8);
-> > +     /*
-> > +      * iorequest_cnt and iodone_cnt are per-CPU sums (s64); ioerr_cnt=
- and
-> > +      * iotmo_cnt remain atomic_t.  Report the widest counter for tool=
-s.
-> > +      */
-> > +     return snprintf(buf, 20, "%zu\n", sizeof(s64) * 8);
-> >   }
-> >
-> >   static DEVICE_ATTR(iocounterbits, S_IRUGO, show_iostat_counterbits, N=
-ULL);
-> >
-> > +#define show_sdev_iostat_percpu(field)                                =
-       \
-> > +static ssize_t                                                        =
-       \
-> > +show_iostat_##field(struct device *dev, struct device_attribute *attr,=
-       \
-> > +                 char *buf)                                          \
-> > +{                                                                    \
-> > +     struct scsi_device *sdev =3D to_scsi_device(dev);                =
- \
-> > +     unsigned long long count =3D percpu_counter_sum(&sdev->field);   =
- \
-> > +     return snprintf(buf, 20, "0x%llx\n", count);                    \
-> > +}                                                                    \
-> > +static DEVICE_ATTR(field, 0444, show_iostat_##field, NULL)
-> > +
-> >   #define show_sdev_iostat(field)                                      =
-       \
-> >   static ssize_t                                                       =
-       \
-> >   show_iostat_##field(struct device *dev, struct device_attribute *attr=
-,      \
-> > @@ -950,10 +969,10 @@ show_iostat_##field(struct device *dev, struct de=
-vice_attribute *attr,  \
-> >       unsigned long long count =3D atomic_read(&sdev->field);          =
- \
-> >       return snprintf(buf, 20, "0x%llx\n", count);                    \
-> >   }                                                                   \
-> > -static DEVICE_ATTR(field, S_IRUGO, show_iostat_##field, NULL)
-> > +static DEVICE_ATTR(field, 0444, show_iostat_##field, NULL)
-> >
-> > -show_sdev_iostat(iorequest_cnt);
-> > -show_sdev_iostat(iodone_cnt);
-> > +show_sdev_iostat_percpu(iorequest_cnt);
-> > +show_sdev_iostat_percpu(iodone_cnt);
-> >   show_sdev_iostat(ioerr_cnt);
-> >   show_sdev_iostat(iotmo_cnt);
-> >
-> > diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-> > index 9c2a7bbe5891..ad80b500ced9 100644
-> > --- a/include/scsi/scsi_device.h
-> > +++ b/include/scsi/scsi_device.h
-> > @@ -8,6 +8,7 @@
-> >   #include <linux/blk-mq.h>
-> >   #include <scsi/scsi.h>
-> >   #include <linux/atomic.h>
-> > +#include <linux/percpu_counter.h>
-> >   #include <linux/sbitmap.h>
-> >
-> >   struct bsg_device;
-> > @@ -271,8 +272,8 @@ struct scsi_device {
-> >       unsigned int max_device_blocked; /* what device_blocked counts do=
-wn from  */
-> >   #define SCSI_DEFAULT_DEVICE_BLOCKED 3
-> >
-> > -     atomic_t iorequest_cnt;
-> > -     atomic_t iodone_cnt;
-> > +     struct percpu_counter iorequest_cnt;
-> > +     struct percpu_counter iodone_cnt;
-> >       atomic_t ioerr_cnt;
-> >       atomic_t iotmo_cnt;
-> >
+> same as above
+Ack
 >
-> Would it be simpler to make ioerr_cnt and iotmo_cnt also as
-> percpu_counter? We could then drop some sysfs code for handling atomic_t
-> counter.
-It looks trivial, I will handle it in next revision.
+> >
+> > -     starget =3D kzalloc(size, GFP_KERNEL);
+> > +     starget =3D kzalloc_node(size, GFP_KERNEL, node);
+> >       if (!starget) {
+> >               printk(KERN_ERR "%s: allocation failure\n", __func__);
+> >               return NULL;
 >
-> I noticed that there is a percpu_counter_init_many() - maybe we could
-> use that, and index into the array of counters. Note that I am not
-> fimilar with that API, so it may not be a good idea.
-I need to check this. If it works well, I will handle it in the next versio=
-n.
 
---000000000000bdcfb9065032e958
+--000000000000ade1510650332363
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -411,13 +276,13 @@ dYm4Ph9QYI0sm+Xitx8MkdOJtq5mcPWowGi8UiCgkOidv4ki1SA0wptfquUhbfS9b2M3XUHCEIUX
 4ECvIjR3f+E0NbBIfPccWfYUaDLvo2qhLYS3KQbhKdXcJ83ha17mbVNZbDDo9upNcLO/oPyDbCNF
 J6UpXZmis1wnCynhK4kQfwFhW7H+MYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
 ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMdI2Nfq/Vk8dzZMUnMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCAsJVIs
-imt5i/563g3AtvT5NVYWiKB4vhOrddc8pye+6jAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjA0MjQxMTE3NDBaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MjAyMwIMdI2Nfq/Vk8dzZMUnMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDQP+2m
+9x9KRrwIuow9BAUCi0SzsPbFR6Qnu6EoHyvJ/jAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNjA0MjQxMTMzNTJaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
 MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCcAGsT8Vc9oNjeMyzZ/hlFK0KFTWLf1Rl7oeXwaIe4
-LQvqFtNrIhT8rJV3+2SCOhE0xDYzeI8MtpOdizcDdvOYqtxGO6lz9tTyHBoAfXfzF5l1zH41Nl1U
-Scymdvx26VozTZt7lTtRTiOi/eWScFaFibIjnc0KC+NQ5AVzw8wodWPkC3OI9rUhm5Xe7Jhr2TJi
-UWa3ABkJXTxEnQfdkz3XGb+nLEn2dRnVAEK6iTPORiiiywNXEIrVD6pGJUOLwOXQZ0OGgzsleC5K
-xjWsPfnI1kPk+5mS4uT9FxxX235zTuHuzni3JgDvuu8PHWMe2Mf/9nvU/E7spQDgji36GrAn
---000000000000bdcfb9065032e958--
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBT2d2/m0b7+nvMUo7QmtbouYQFfwRorBwp/atKN0hN
+LD8WTdVClFQ9Xi862pD4MnSBI4f9ht+kls/of3ZdnIBq3zGmik9qHn0Kw34hyyf8G7OJUL0Utdgm
+TGdHXzaM8cc4MMRWc1RHR5FS/DmWMfCxSxGZOehWDqHuMknm9rzWqe5e3hFVBCFJJl6IbNljSWqU
+2Bx1YVMWY9eLEdUpgxvvykIH6kBS44qrEzy4TJLvagjwhc58GbhFr4JZ7mVWWSThsugy5PR3Q4vW
+QXJYRzZtjdAw1Ym0+r1ltCC6LJbfDC94h3UrgUUzZQePffgWMrps7zgVB46jksCqmeOXHhAY
+--000000000000ade1510650332363--
