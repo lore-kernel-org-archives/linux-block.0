@@ -1,80 +1,113 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807AD17C211
-	for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 11:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D65633D4F0
+	for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 14:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777204780; cv=none; b=eGB7vGgra2Abv6iFN0EOnGidXAaPSZOmD9ZPacT9kPEeXYX0s3DYExhTChb+mm+/f3jBViHAdtoUz+UWBhz+pA5mtGknDyOanxs9PYwO6ZbvJDln8QVAAAdDwylPvTm/KzhlsUWMW/oYasfYy69Ep2Bxz/PhhiwiCzNfzPNLIEo=
+	t=1777215348; cv=none; b=pB8Tc78f21uhp7SFrLBnHfRMSvkFPyaKx6FLsvOPrLpxKaT2+/akFQ//BMs+pqGJKOKwf5dTaAdJAv5ii1OOIA4PiRhrew03cZf+XrDTO0yfiey4wcvXqOM40pdmCvJaB6jODOeV+ZbrePD1W+rOW0ugWWDlsqWt6l7BQoLzrko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777204780; c=relaxed/simple;
-	bh=1sJu2a7G2pOtK9V3ZeG4Vta320GSj36dLukg+OMdvvs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JDMlGEXP7FYmAMbQBJZOeYQnKlObVwzQ6eV+KnFjH/z7qzRkRGtxgRXbcHd2PDukz9BAAkeYxfYApZreXVP+MdZe/VoOyyqK7mrjEPDoNMwU8v2v+6VUhsn+8XBWTybMWInvFEjW6sJKX3cTUzBcMxE7Z+RhgsyegSSPE/MLY40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n016QNGD; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1777215348; c=relaxed/simple;
+	bh=dR3QmnLO7ffv3vbjEMfpWpjknR0gSjL/BUhU+hdxeWs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kteWrU2fFEZw6uAmTImg357gUrfb4Pjk1RHiTI1B3hDrKt6AIknHVkM7yfKExgFJAIww09hvvqdspFURnPGCfvp6bZQtvCDKlV9IyARz0sniYhzjWW9gEtv28/Co8ncpDPOFXFLeybDBZEFoKfqBTLXxd3u8isS2Qm/s04itmno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JYiGm2bP; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n016QNGD"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777204776;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Wv3Mo8fCVcczy2Ns3ljqZCrzb/HiULjMkogmx1p7uzA=;
-	b=n016QNGDJyCDauY1c0luMWJiqdELkU3O2UpEqFe84uz+nnemtkIKB6CYMdNp0nSaCdXyFx
-	ADNn2odv6BboXdHBlUvAln1e3t5WY8L6cyiVIJOi64jKID7pMMgij2IK0Yzl0CDTQGt+4Y
-	9nf88PKrqRtJA8yFdme8SMQFjnEAijU=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYiGm2bP"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8296d553142so5183890b3a.3
+        for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 07:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777215346; x=1777820146; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EY64jp7ee1iArzqLD7zWfQPWcLfXhxgOy4Kdnx3r4UI=;
+        b=JYiGm2bPTPbEK/4KUMo0llQzlDWrd6AEIyWN2OriMeadwSlrfWaAJ3BK3Z0ojzGMi/
+         t8fsFKhAoM7Z82pL49/RTEVdW1SML2SaxzlEG2JVzj347cWgyX6HjmPBxDRqfdr0bCuf
+         Y5KjvLrF6Jg0Ti5+K5Gsq7ogbe/6J8XZ4wiALn6ie7RUv85yuPe4HSHBvBfIRebkP0wP
+         c8ochLADFJREtnYcWkypyxdHxCFAShduBOKsIn5qDKlwlYz1JZG5Duc550RYsLaBjqjc
+         bcXqNS94i8XjIrhFEusVtU7Pp32Ddh5vqCAgT8ZiDjbvT0s/Zksdg2l/YNPqIcAw3bla
+         IanA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777215346; x=1777820146;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EY64jp7ee1iArzqLD7zWfQPWcLfXhxgOy4Kdnx3r4UI=;
+        b=C0d0J9hxGSkB1XeY9B0wW5y+TyXJfga8XWt0Hmx9RvIhk7UOzKGsN7RAZ8LvPVz7nE
+         Fgw/KYkmPkPAj4VHIoCYCCSF/hgidXsHoUhPQjOY0oWCW5j0LknXN9RrzlpaBEAZTci/
+         36dYf+UHnEdKQu1lTK71IJYrFmWOMV373rac8chIWqlBf33mdlfAihLAT4kEMjfyuw6u
+         FbYniWQaiktncXXrmTD5PihGBJ1lJFsMZ1qJ8OtHNc5m5prj7dwDBIfCxnx5k2zZXoWi
+         syU5wNZyp6NTPIJnH5rpne9leVH6CCaWfx4YNYVmCUTKtzePhz4wR/kKZ69Ql4coQw84
+         alKQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8XzFlOBHrZKKQmHrw7tClikBzK2jZLk8bf+DvPvETUCUvWWi+oECjScuoMU5Q2QLvVDSJJuxk+c3i5cg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXlr5VakhGgx/U9DCZt60wqpt85YoGcEgKM62PIFvR2P5v0AZ+
+	kaxj4Y5ckKeLhs84+3kPXN0/CQ3q7PuBkkRwpEr+BrUDcCxIWETwPQ4=
+X-Gm-Gg: AeBDietaDW4JXXaLwwATHWv8MLKA+AlCehlQY4thFTo3e4eTvGKJRPsvBjZUWC+dgWo
+	BEt8rAJr+rP4znYnjqvK4R/qHsrO/bNQQ9r2XB3BZD7u09R/LDuqgTiBwNntyYxfr/MjpwFdAIf
+	4S4FnUD+6y3P4ElTfEQjgpwFBv6/VRresZUJKPb/n++PzxKU7VQbqljvYQwUAs9U46KzgPQu2/N
+	Si+Ss0NiNr38WcLLPg6godNsvhChHRePrKsvAguJr40HoWt7X+NNdh4ZkpG3XEHp89oEL6/Tm7y
+	Mp+5k6hJrFpEjegbNpm2T8+qq0xRhe7VJHQdo0Q7MDFWdhh3MUr+sHoQh1k7soWPS3wyOLc4eft
+	8LNoF8m51CShRByWCXfdrSciNWdN8rKb2tqBHXdyqDaKOEe433+LJDjRXZfyz9RROxTdhIkwq4X
+	hoASgoJiR39Mw0TV24uU41LaiUfw/7OU4Sb4AgyUMiynmElU7r6JiQxTy2SKaBk/66rkrb9GETQ
+	KCxWcq8sPmk
+X-Received: by 2002:a05:6a00:439b:b0:82f:8696:5a75 with SMTP id d2e1a72fcca58-82f8c8bb700mr41808977b3a.28.1777215346079;
+        Sun, 26 Apr 2026 07:55:46 -0700 (PDT)
+Received: from coe.tail83f5bd.ts.net ([137.59.92.178])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8e981c12sm35638227b3a.6.2026.04.26.07.55.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Apr 2026 07:55:45 -0700 (PDT)
+From: Ramesh Adhikari <adhikari.resume@gmail.com>
+To: gregkh@linuxfoundation.org
+Cc: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] n64cart: use strscpy() in n64cart_probe
-Date: Sun, 26 Apr 2026 13:59:24 +0200
-Message-ID: <20260426115924.75386-2-thorsten.blum@linux.dev>
+	security@kernel.org,
+	Ramesh Adhikari <adhikari.resume@gmail.com>
+Subject: [PATCH] block: fix infinite loop in badblocks_clear()
+Date: Sun, 26 Apr 2026 20:25:27 +0530
+Message-ID: <20260426145527.589804-1-adhikari.resume@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1157; i=thorsten.blum@linux.dev; h=from:subject; bh=1sJu2a7G2pOtK9V3ZeG4Vta320GSj36dLukg+OMdvvs=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJlv/8nEnpC0LTjTWNd0gcHN419tq4joN1v/G3wqP7VLz ixY57ilo5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACby8wTD//j0tA3pB9d8S7Dg KqwvUfeeciu1f0PlPY3CG9v9Uxe3fmdkOLbpTLycq+RqFvnAPXv7z85kNP38r0jv0hKNmeYKG+3 F2QE=
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-strcpy() has been deprecated¹ because it performs no bounds checking on
-the destination buffer, which can lead to buffer overflows. While the
-current code works correctly, replace strcpy() with the safer strscpy()
-to follow secure coding best practices.
+An infinite loop can occur in _badblocks_clear() when BB_OFFSET(p[prev + 1])
+equals bad.start, resulting in len = 0. This causes the update_sectors loop
+to spin forever without making progress:
 
-¹ https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy
+    s += 0;         // no advancement
+    sectors -= 0;   // stays positive
+    goto re_clear;  // infinite loop
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+After approximately 21 seconds, the RCU stall detector triggers and the
+system becomes completely unresponsive, requiring a hard reboot.
+
+Add a check to ensure len is non-zero before entering the loop.
+
+Signed-off-by: Ramesh Adhikari <adhikari.resume@gmail.com>
 ---
- drivers/block/n64cart.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/badblocks.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
-index b9fdeff31caf..328da73b6f2c 100644
---- a/drivers/block/n64cart.c
-+++ b/drivers/block/n64cart.c
-@@ -12,6 +12,7 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/platform_device.h>
-+#include <linux/string.h>
- 
- enum {
- 	PI_DRAM_REG = 0,
-@@ -145,7 +146,7 @@ static int __init n64cart_probe(struct platform_device *pdev)
- 	disk->flags = GENHD_FL_NO_PART;
- 	disk->fops = &n64cart_fops;
- 	disk->private_data = &pdev->dev;
--	strcpy(disk->disk_name, "n64cart");
-+	strscpy(disk->disk_name, "n64cart");
- 
- 	set_capacity(disk, size >> SECTOR_SHIFT);
- 	set_disk_ro(disk, 1);
+diff --git a/block/badblocks.c b/block/badblocks.c
+index ece64e76fe8..9ea4a067710 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -1151,6 +1151,10 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
+ 	/* Not front overlap, but behind overlap */
+ 	if ((prev + 1) < bb->count && overlap_behind(bb, &bad, prev + 1)) {
+ 		len = BB_OFFSET(p[prev + 1]) - bad.start;
++		if (len == 0) {
++			pr_warn_once("badblocks_clear: zero-length segment detected\n");
++			len = 1;
++		}
+ 		hint = prev + 1;
+ 		/* Clear non-bad range should be treated as successful */
+ 		cleared++;
+-- 
+2.43.0
+
