@@ -1,103 +1,275 @@
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09722264A7
-	for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 17:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325F5283C9D
+	for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 21:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777224618; cv=none; b=esCHIKamUMpRpWLiL1x4N9nX50iRIzW/Ol5RFmj3rtf+GDkZuZRP5eLii17NQKXonp63tEn+Y0qL9LJDdZb6c6Te2TBpDSpXC8UABvWSVWhYf8KnZ1ea4TZ8d4cgs7Hhb5fJzECsvyJ80uuV4pwTWwNQQAO8iAAH8Dd+hclsqxw=
+	t=1777237405; cv=none; b=fCI+XvxAfFZIw0zH8iNpEeJnP8/Bsd2SXVJj+GIo4s84TDAgnBMJ8KnoKAp6fgbPeXW13RdRicaIqnQJ4WCW/3zYz1qR0B/idkJj5eIBZ6CQcieQobEZT4fOKKG1l015G9wYj9zMDh2UOrM7M/VIZZ5Fq+R/hzNlDxWLuqdbU+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777224618; c=relaxed/simple;
-	bh=vOJqPmQkRkbOLf0gmDwYFkcgFT0zo4AtNOFmV8e0+Vw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pwOY+ytgP5ozffDMQ0TFPNo78326ba3z24G5IpEQ4uuUKFbNGKUIlelqOkxWLEkOyNX+5ER7TW5Cp9kHX0e6T2HjWvkNZXQ9w8B9m/YisVkrxfWQUkeEr4GKqVMl1f4OCOcHjpwdDhTgy2QNygsGBtgPSon4V/pqqm5PtsneQ2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=z2zEBVaY; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1777237405; c=relaxed/simple;
+	bh=3N0BTUK4hwMIbU4X17dhSmMuaydlpkauKb/7bBC/ImU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jDImM25RiklXhbpAhY1uKDL85l/8WrdY49+vsKzJnB3A304C3joegu9JW+W6sriJFQm4LcsOsRDYViknsw5gIbul04NpL26MSQPv+jxFTw7OVJNIaqukVMe3q5P7BjCGd8gQG2VXacxwFmNbA8pKs7o1HRfsBWPE/djdgUrnpcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk; spf=pass smtp.mailfrom=philpotter.co.uk; dkim=pass (2048-bit key) header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.b=C8mhFsq8; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="z2zEBVaY"
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d4c12ff3d5so8591184a34.2
-        for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 10:30:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=philpotter-co-uk.20251104.gappssmtp.com header.i=@philpotter-co-uk.20251104.gappssmtp.com header.b="C8mhFsq8"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4852b81c73aso79350945e9.3
+        for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 14:03:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1777224614; x=1777829414; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZxacZ9XFE3eGRFLBp6QTAhdBcotyZaHUpMQ6viY8m9M=;
-        b=z2zEBVaYNvjDQYDZd462zcw1vUsx+HFo1QbmikuUNrsUC4m8hBx1LPtbHQAkQZoI6H
-         /alJm/RUnuMHzEikcKZYwlPSgcR0Jufdga392RnLNLF+bxx2MdoLFpyusTTVZyfzquJE
-         I1hYRn+S4+p6yFvaWFQnbN5NdFxQPgyJUArm9vTqeM3JyI5aS/mvJLgzHjCUyLdg+SmT
-         TyEHQCBZe6HjnYoJxJr41JpjgkbMplgf/mC1AnKDA9Rd1x0K1RXCyaYKXYPix4C35PtC
-         mCxiCXFiUSisijJRW7EQw21O47SX8ErwCmvtd8CpktHxcwKcCojj7f+CeoBelknfU+JD
-         ZQnQ==
+        d=philpotter-co-uk.20251104.gappssmtp.com; s=20251104; t=1777237401; x=1777842201; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=X9eLWtLuKgwqYCUe7plu0gxvPjwLDa7/o9IyiJWuVIU=;
+        b=C8mhFsq8CCSyRz8CjUxOmySjtmEes8hSKvBgz51aVUHmBu0CvsagzXreH8cDFDjlhh
+         qvNPblpHVfnjaNb70nmZC+Fbk+K3KDLwLNxiaQuFgGh5CadoSuXSFhmKo7yH4MzcXsbo
+         BSIy0rgLldlcWxhAUOy/MQObc3ut5n4qnBjQEwc5zEFEgyNz1O+HgGeJgC6GMCR0W0y/
+         yGXnR6c8FYZIwYgLd5TW/4rNBGbkXS9KV2qPGldRIOMneCoio7yCf1El/CfIk7lBIJtL
+         andhby5xTxhSocK2UXq/a6QbMZ51qKDm+whPG5GuO0vV94ED1lGMHZzrqVP3enNB9e3K
+         x6Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777224614; x=1777829414;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZxacZ9XFE3eGRFLBp6QTAhdBcotyZaHUpMQ6viY8m9M=;
-        b=SmvkUt1/i/S55zKmEjFl/EdmkQ5ReN4MxlawYTdgisn10jpJwGzwQv9bsjAhavjTqH
-         uTEV0hsaSaUrL2y1c/S5SvmY3qO5biKl8SHqQmRmRNpTyv1AyNl5cIHOaeJoDrhjXDaR
-         BDVNEYQI1qGHZZrAmqZhhv1gtZlyJ4U5sJQlB7WYPKJl71q/9Hgqe4vZzcHZy+RsxOv3
-         lat5Fme1scQIbGm5M2fgYwwoX4LvxbJCF14w3IdeU0HFeOsulFT10b7EsqcRBQtVo2nZ
-         gQYVyipygajbVJ0x8W5yV7giGSW10XAoAGvBtF7/Uw1ZoD5Vmzwe1ixs/FQYKzKTmLLG
-         BTjQ==
-X-Gm-Message-State: AOJu0Yw99aDOaChx3RvNotZC78nV6KtHQlKPUCS6AgI4TFijtS2X3lkq
-	2d7z9jN4OYF1Fs8rtieDc31OJePrHbBXAK5EOKudqhXgotxZQLSm9sFcISGUm18gJuo=
-X-Gm-Gg: AeBDiesJVjwW75eQTcF8qs7brcQdMet2kB1JqlpMMoloevyhV724ic8XP/THx7o1WtV
-	YMOpADOgcM5cmkGHBZSZyyWrziVSbEvi0dkrHkncT6nKb6fK2Eaoza5e6J08jgL3OFaJDVTYK9v
-	8qvGG3fKcewijb3MLFAwyUy7S2HSEj/V7cWQ5AhDMHOa8LUWXbsT6SMBgKEhq7ArTbtTckCFZMf
-	Y9qvSYYODNibRc39Zpy2l5XXoQBLFBt3RsjE9BUCBD1LOH6yMshzv/+Rjc56+9hrxH9Sm5hLT5J
-	JThmdNL2jNMN1PaAEyDXiaEGvuMmohxK1h+FADjNPAnGzj4M8QK1sHZzbntwqCYam07DPvI01TJ
-	IpNws3p4uitNkUZr+uMs73byKQiTnsccuQ1fpILn2VkofnZv0FVQljU1/qPOBsUjXPilT6u/asm
-	n/zVWZK3XQDbs8YdATW+RdhMt/lZliDtbCljH2M9905HBpq+hT+tKgqeEctkvc97hb1yIoWfB2K
-	1nl5boSVaeXepz3zdmL
-X-Received: by 2002:a05:6830:411a:b0:7d7:eab6:fb23 with SMTP id 46e09a7af769-7dc951fc6admr24522268a34.22.1777224614407;
-        Sun, 26 Apr 2026 10:30:14 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dcc953e39asm18097128a34.15.2026.04.26.10.30.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Apr 2026 10:30:13 -0700 (PDT)
-Message-ID: <b18b61b7-36d6-441b-a666-e38a5e57b37f@kernel.dk>
-Date: Sun, 26 Apr 2026 11:30:12 -0600
+        d=1e100.net; s=20251104; t=1777237401; x=1777842201;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X9eLWtLuKgwqYCUe7plu0gxvPjwLDa7/o9IyiJWuVIU=;
+        b=HhOYEpEwOBF0LcsI2d322D8aJLF7BqtONLEZpv5ohPLpCA6uIM8SA/TfjIEO267m1U
+         VmBfrdk5pVzBeC/14VImOKG+ha15JJk91CRaJVNEHuHOn0rMnY0AZsrniDztnJuAHHz6
+         fVl8++3vkiknqzxY9Aymn0k8G+iNyKf7+NZoV/LW0Eqjil8hK7EKuapU3SO4+ctth+Yh
+         X4myN4xwEdP7aHsh4hpRQeJ8f1thdxeXgjpQ0VlnSc3vWol5m/HeBKoUcZqtbGDu+R0Q
+         v0g74zaNV7vbptA3X+bB0expZFJ2rzWMmSurGkKarFCesdj1zd4AGdAXOHuN4pE+55BP
+         J7iA==
+X-Forwarded-Encrypted: i=1; AFNElJ8VQiLY1uud8gDaiTregNLqLHjdx6LZAdIoIo8FZs2Vcw11bt3vIaKphtS+23AKniRJz5nUPh+ptKGEfQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN6WhenV+4Vyq+Ih+q83BMEo4CcrgNujCMOGXGd9u2+bFp/Cx5
+	rhkC/G/4hArns+LLO+2IdV5CyoNT3+VQVKyuoq9ARYBidYDk6jjIbc9Sii+KYSLzk9ZuQ5R+cwI
+	EU2rw
+X-Gm-Gg: AeBDieulxsRW6czwIkhbfVvMpsyBigESKXfG+38LFnbtfbpvB35Us5mIVpljzu+4rdQ
+	8h3xLZDwTWF+WquyNm2GYxDbYGk2iLzh3h8MTENIMMITdcD3D61eE7Yds9eoBTlHMcXCVjG/OcF
+	TlQuskFcA/S7TfHtDEulwbsXo365wU+aYqx0rrIdb0W/beDpj4qtGPezj/W9oTdCF0HIHi+noLI
+	EcuEqZoF/8XDZTXMGPPcGHDd4Javj0B1TFY3Fvapy9a/fvILYlu16Z5gWSofjCmafLwSv5THmjU
+	dEaAtqHmF5gf3GG9ZECWIKEvSeGV9CPe2dG5XAts6J7vEfUxN/QRWUVsmV80ziqpEUQ1/aCpSkO
+	vmhKGUg4rcCpn18fBXk7iqV/t+Ftoen3WMlEjgFVZhc3rHWPnLLq6f7euOqniI8h0nJo1eB3T3U
+	rcn7rUcN/O0vOo0T+DQ3yGzVeCP2Y0qljTrrWw6qwty3U09oi7c3qkChbwZPpfN+j+VmHUKiCDj
+	ZBm4ULcLwy6seC+/u2u
+X-Received: by 2002:a05:600c:3213:b0:489:149a:f9e6 with SMTP id 5b1f17b1804b1-489149afa07mr257887595e9.28.1777237401017;
+        Sun, 26 Apr 2026 14:03:21 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4891bb3d121sm823690925e9.14.2026.04.26.14.03.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Apr 2026 14:03:20 -0700 (PDT)
+Date: Sun, 26 Apr 2026 22:03:18 +0100
+From: Phillip Potter <phil@philpotter.co.uk>
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: phil@philpotter.co.uk, martin.petersen@oracle.com,
+	James.Bottomley@hansenpartnership.com, axboe@kernel.dk,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Daan De Meyer <daan@amutable.com>
+Subject: Re: [PATCH v2] cdrom, scsi: sr: propagate read-only status to block
+ layer via set_disk_ro()
+Message-ID: <ae59luYMh6npxD09@equinox>
+References: <20260330133403.796330-1-daan@amutable.com>
+ <20260422113206.246267-1-daan@amutable.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] block: fix infinite loop in badblocks_clear() and
- badblocks_check()
-To: Ramesh Adhikari <adhikari.resume@gmail.com>, gregkh@linuxfoundation.org
-Cc: linux-block@vger.kernel.org, security@kernel.org
-References: <20260426145527.589804-1-adhikari.resume@gmail.com>
- <20260426172641.629158-1-adhikari.resume@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260426172641.629158-1-adhikari.resume@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260422113206.246267-1-daan@amutable.com>
 
-On 4/26/26 11:26 AM, Ramesh Adhikari wrote:
-> An infinite loop can occur in both _badblocks_clear() and _badblocks_check()
-> when BB_OFFSET() equals the start position, resulting in len = 0. This causes
-> the update_sectors loop to spin forever without making progress:
+On Wed, Apr 22, 2026 at 11:32:06AM +0000, Daan De Meyer wrote:
 > 
->     s += 0;         // no advancement
->     sectors -= 0;   // stays positive
->     goto re_clear;  // infinite loop
+>  drivers/cdrom/cdrom.c | 73 ++++++++++++++++++++++++++++---------------
+>  drivers/scsi/sr.c     | 11 ++-----
+>  drivers/scsi/sr.h     |  1 -
+>  include/linux/cdrom.h |  1 +
+>  4 files changed, 51 insertions(+), 35 deletions(-)
 > 
-> The bug exists in three code paths:
-> 1. _badblocks_clear() at line 1100 (start before all badblocks)
-> 2. _badblocks_clear() at line 1153 (behind overlap check)
-> 3. _badblocks_check() at line 1240 (behind overlap check)
+> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+> index fc049612d6dc..62934cf4b10d 100644
+> --- a/drivers/cdrom/cdrom.c
+> +++ b/drivers/cdrom/cdrom.c
+> @@ -631,6 +631,16 @@ int register_cdrom(struct gendisk *disk, struct cdrom_device_info *cdi)
+>  
+>  	WARN_ON(!cdo->generic_packet);
+>  
+> +	/*
+> +	 * Propagate the drive's write support to the block layer so BLKROGET
+> +	 * reflects actual write capability. Drivers that use GET CONFIGURATION
+> +	 * features (CDC_MRW_W, CDC_RAM) must have called
+> +	 * cdrom_probe_write_features() before register_cdrom() so the mask is
+> +	 * complete here.
+> +	 */
+> +	set_disk_ro(disk, !CDROM_CAN(CDC_DVD_RAM | CDC_MRW_W | CDC_RAM |
+> +				     CDC_CD_RW));
+> +
+>  	cd_dbg(CD_REG_UNREG, "drive \"/dev/%s\" registered\n", cdi->name);
+>  	mutex_lock(&cdrom_mutex);
+>  	list_add(&cdi->list, &cdrom_list);
+> @@ -742,6 +752,44 @@ static int cdrom_is_random_writable(struct cdrom_device_info *cdi, int *write)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Probe write-related MMC features via GET CONFIGURATION and update
+> + * cdi->mask accordingly. Drivers that populate cdi->mask from the MODE SENSE
+> + * capabilities page (e.g. sr) should call this after those MODE SENSE bits
+> + * have been set but before register_cdrom(), so that the full set of
+> + * write-capability bits is known by the time register_cdrom() decides on the
+> + * initial read-only state of the disk.
+> + */
+> +void cdrom_probe_write_features(struct cdrom_device_info *cdi)
+> +{
+> +	int mrw, mrw_write, ram_write;
+> +
+> +	mrw = 0;
+> +	if (!cdrom_is_mrw(cdi, &mrw_write))
+> +		mrw = 1;
+> +
+> +	if (CDROM_CAN(CDC_MO_DRIVE))
+> +		ram_write = 1;
+> +	else
+> +		(void) cdrom_is_random_writable(cdi, &ram_write);
+> +
+> +	if (mrw)
+> +		cdi->mask &= ~CDC_MRW;
+> +	else
+> +		cdi->mask |= CDC_MRW;
+> +
+> +	if (mrw_write)
+> +		cdi->mask &= ~CDC_MRW_W;
+> +	else
+> +		cdi->mask |= CDC_MRW_W;
+> +
+> +	if (ram_write)
+> +		cdi->mask &= ~CDC_RAM;
+> +	else
+> +		cdi->mask |= CDC_RAM;
+> +}
+> +EXPORT_SYMBOL(cdrom_probe_write_features);
+> +
+>  static int cdrom_media_erasable(struct cdrom_device_info *cdi)
+>  {
+>  	disc_information di;
+> @@ -894,33 +942,8 @@ static int cdrom_is_dvd_rw(struct cdrom_device_info *cdi)
+>   */
+>  static int cdrom_open_write(struct cdrom_device_info *cdi)
+>  {
+> -	int mrw, mrw_write, ram_write;
+>  	int ret = 1;
+>  
+> -	mrw = 0;
+> -	if (!cdrom_is_mrw(cdi, &mrw_write))
+> -		mrw = 1;
+> -
+> -	if (CDROM_CAN(CDC_MO_DRIVE))
+> -		ram_write = 1;
+> -	else
+> -		(void) cdrom_is_random_writable(cdi, &ram_write);
+> -	
+> -	if (mrw)
+> -		cdi->mask &= ~CDC_MRW;
+> -	else
+> -		cdi->mask |= CDC_MRW;
+> -
+> -	if (mrw_write)
+> -		cdi->mask &= ~CDC_MRW_W;
+> -	else
+> -		cdi->mask |= CDC_MRW_W;
+> -
+> -	if (ram_write)
+> -		cdi->mask &= ~CDC_RAM;
+> -	else
+> -		cdi->mask |= CDC_RAM;
+> -
+>  	if (CDROM_CAN(CDC_MRW_W))
+>  		ret = cdrom_mrw_open_write(cdi);
+>  	else if (CDROM_CAN(CDC_DVD_RAM))
+> diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+> index 7adb2573f50d..c36c54ecd354 100644
+> --- a/drivers/scsi/sr.c
+> +++ b/drivers/scsi/sr.c
+> @@ -395,7 +395,7 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
+>  
+>  	switch (req_op(rq)) {
+>  	case REQ_OP_WRITE:
+> -		if (!cd->writeable)
+> +		if (get_disk_ro(cd->disk))
+>  			goto out;
+>  		SCpnt->cmnd[0] = WRITE_10;
+>  		cd->cdi.media_written = 1;
+> @@ -681,6 +681,7 @@ static int sr_probe(struct scsi_device *sdev)
+>  	error = -ENOMEM;
+>  	if (get_capabilities(cd))
+>  		goto fail_minor;
+> +	cdrom_probe_write_features(&cd->cdi);
+>  	sr_vendor_init(cd);
+>  
+>  	set_capacity(disk, cd->capacity);
+> @@ -899,14 +900,6 @@ static int get_capabilities(struct scsi_cd *cd)
+>  	/*else    I don't think it can close its tray
+>  		cd->cdi.mask |= CDC_CLOSE_TRAY; */
+>  
+> -	/*
+> -	 * if DVD-RAM, MRW-W or CD-RW, we are randomly writable
+> -	 */
+> -	if ((cd->cdi.mask & (CDC_DVD_RAM | CDC_MRW_W | CDC_RAM | CDC_CD_RW)) !=
+> -			(CDC_DVD_RAM | CDC_MRW_W | CDC_RAM | CDC_CD_RW)) {
+> -		cd->writeable = 1;
+> -	}
+> -
+>  	kfree(buffer);
+>  	return 0;
+>  }
+> diff --git a/drivers/scsi/sr.h b/drivers/scsi/sr.h
+> index dc899277b3a4..2d92f9cb6fec 100644
+> --- a/drivers/scsi/sr.h
+> +++ b/drivers/scsi/sr.h
+> @@ -35,7 +35,6 @@ typedef struct scsi_cd {
+>  	struct scsi_device *device;
+>  	unsigned int vendor;	/* vendor code, see sr_vendor.c         */
+>  	unsigned long ms_offset;	/* for reading multisession-CD's        */
+> -	unsigned writeable : 1;
+>  	unsigned use:1;		/* is this device still supportable     */
+>  	unsigned xa_flag:1;	/* CD has XA sectors ? */
+>  	unsigned readcd_known:1;	/* drive supports READ_CD (0xbe) */
+> diff --git a/include/linux/cdrom.h b/include/linux/cdrom.h
+> index b907e6c2307d..260d7968cf72 100644
+> --- a/include/linux/cdrom.h
+> +++ b/include/linux/cdrom.h
+> @@ -108,6 +108,7 @@ int cdrom_ioctl(struct cdrom_device_info *cdi, struct block_device *bdev,
+>  extern unsigned int cdrom_check_events(struct cdrom_device_info *cdi,
+>  				       unsigned int clearing);
+>  
+> +extern void cdrom_probe_write_features(struct cdrom_device_info *cdi);
+>  extern int register_cdrom(struct gendisk *disk, struct cdrom_device_info *cdi);
+>  extern void unregister_cdrom(struct cdrom_device_info *cdi);
+>  
+> -- 
+> 2.53.0
+>
 
-1) please calm down with the repostings
-2) sit back, actually take your time, and find all the spots. this
-drive-by-development is not useful.
+Hi Daan,
 
--- 
-Jens Axboe
+I've looked through the patch and it looks good to me. Looks like a
+decent change. I think in this case too, it's unlikely this historically
+broken behaviour is being relied upon (i.e. it seems unlikely to me that
+fixing it would break anything).
 
+In addition, I've build tested and booted/run some read/write tests with
+your patch which worked fine for me too.
+
+Reviewed-by: Phillip Potter <phil@philpotter.co.uk>
+
+One final question from me though, and a purely procedural one:
+The patch was submitted from your gmail address, but signed off by your
+corporate address. Are you happy for me to adjust the submission so that
+the author appears as your corporate address when sending on for
+inclusion? Let me know, thanks.
+
+Regards,
+Phil
