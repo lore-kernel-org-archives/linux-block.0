@@ -1,108 +1,91 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396BB33F8AD;
-	Mon, 27 Apr 2026 15:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596E23D34B7;
+	Mon, 27 Apr 2026 16:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777304061; cv=none; b=jRWPcqBbY5BuVNu6j1t1BVaR383NaFcTlIGnaN/XywZv8pUGoHkp7hdsfepht4YaKUj955gYMYD3hroSVDNIFCm4qhRDbCGsxNCtzsN8KOk0ZfGpCQqe/gRFOyeFSqiWQyJ5mXwDxt121FMWmAJNcSHejMcg82i/aOeq774fUQA=
+	t=1777308073; cv=none; b=T6LHwpkbutBypCu2D8Ndryaot2mVDfRJiV8/f5MKQswfd/qyJJVD8Qzkxm3QKKPJzMCy9sxjncKWihbE3wznNer2472GWI+E55oMi0wAtHe31FlblG3Nirx8d2Qu4llO3hi2D/4CHqDGOdb2qGzTBIdm5K33xrgYccxpe/hU/yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777304061; c=relaxed/simple;
-	bh=DBrzjD58zwiSSp3rrazy1da2LaxjT8/v/qQOT7QVvCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YXaoJGi6YN4/yTDBLoRqyiLU/0pdz2ALix3AAsvhTAbYK8I+oPqu4Jy71eDWZmbqyfa4anNNc+62ri0NaxKHOZsY4wwtD3sHpC33CweNTJ7Yb9AcdOO33wu/Wx9gZr3O0InH8YdUKH9SSdlnuubzwpOw8nn9s7qRKwMvZMPRdKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RRNMynj1; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aUDQhXJ3; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RRNMynj1";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aUDQhXJ3"
-Date: Mon, 27 Apr 2026 17:34:16 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1777304058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FLa6eYHbGlETXhdKZQov353z3h7xOJzxZI3VwyPyfVI=;
-	b=RRNMynj1Qa0/ZFxqoprrF+lV+59v57PURMlHWXd5zVKQ/++xbkIPxKBPjeEs8yH6/38KK3
-	t9BTF92ohu2bpe7aiZh7Y02xPEG8gBZtQsTNa95rtMtb9z1rGNWO4RNTOmBfqDrmP4RbS7
-	F4gucu6e/dQh0V3DJWL0rg1aP1taN51+lmDOG+CaWQp+io9qKXLZ7Zxk4AGZVvW3XvfMzk
-	wYKkbHSGRljgM5sXqXCUCQv5DYoBhATNtlDCupF/OVXjX9f18HkkaEGSKAh2NgGAvuOXgD
-	ANAb4BjEBVZMhG/LsmITYW7vyL4LxHaLjROA+oF/LBESKOQIGCp3jMeRb8QFUQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1777304058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FLa6eYHbGlETXhdKZQov353z3h7xOJzxZI3VwyPyfVI=;
-	b=aUDQhXJ3cDmA67FdQhP07NpAltG1Pvtpl4MeIYhK8VnCGsvxRPIVhTmJ/QINy4t75BK9B4
-	OwA4EIuBM99DVGAQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+	s=arc-20240116; t=1777308073; c=relaxed/simple;
+	bh=0wPH/Fl3RB62b5MLKmyh8mpdOjOulQAC7ohtud3SMP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RJjaQJbwdwEYl9pRWgK71TYp8sH8z1XoQxaMewGF+KaJwhtCZW+KuSEiZVeFNzaQU/dMd7fnjJOip8eEqUbGqcOx0+GlSPmFDAGTXyMN1tgJHpKUu/GzxS6yexRWk7fuyBZICh1TutbygG+74WogWGMqnQfecqBaWHM905qkjpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf11.hostedemail.com (lb01a-stub [10.200.18.249])
+	by unirelay05.hostedemail.com (Postfix) with ESMTP id 3ADDE4052A;
+	Mon, 27 Apr 2026 16:38:40 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf11.hostedemail.com (Postfix) with ESMTPA id 7FE6E2002F;
+	Mon, 27 Apr 2026 16:38:36 +0000 (UTC)
+Date: Mon, 27 Apr 2026 12:38:48 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
 To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	mst@redhat.com, aacraid@microsemi.com,
-	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
-	liyihang9@h-partners.com, kashyap.desai@broadcom.com,
-	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
-	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com,
-	sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com,
-	ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com,
-	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org,
-	juri.lelli@redhat.com, vincent.guittot@linaro.org,
-	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com,
-	yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org,
-	longman@redhat.com, chenridong@huawei.com, hare@suse.de,
-	kch@nvidia.com, ming.lei@redhat.com, tom.leiming@gmail.com,
-	steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com,
-	mproche@gmail.com, nick.lange@gmail.com, marco.crivellari@suse.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
-	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com
-Subject: Re: [PATCH v12 05/13] blk-mq: add
- blk_mq_{online|possible}_queue_affinity
-Message-ID: <20260427153416.MeVS8yxF@linutronix.de>
-References: <20260422185215.100929-1-atomlin@atomlin.com>
- <20260422185215.100929-6-atomlin@atomlin.com>
+Cc: axboe@kernel.dk, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ bvanassche@acm.org, johannes.thumshirn@wdc.com, kch@nvidia.com,
+ dlemoal@kernel.org, ritesh.list@gmail.com, loberman@redhat.com,
+ neelx@suse.com, sean@ashe.io, mproche@gmail.com, chjohnst@gmail.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 1/2] blk-mq: add tracepoint block_rq_tag_wait
+Message-ID: <20260427123848.1e6b63d2@gandalf.local.home>
+In-Reply-To: <20260427020142.358912-2-atomlin@atomlin.com>
+References: <20260427020142.358912-1-atomlin@atomlin.com>
+	<20260427020142.358912-2-atomlin@atomlin.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260422185215.100929-6-atomlin@atomlin.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: c8q7uzk37jdeojro1hdsgzgz8514oasf
+X-Rspamd-Server: rspamout04
+X-Rspamd-Queue-Id: 7FE6E2002F
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1+ezFbHvfao1EGoVLpXuzorTHt2Yl/LyF8=
+X-HE-Tag: 1777307916-952419
+X-HE-Meta: U2FsdGVkX19D95yn3snxCao9QXEhOmUtHRvqZ56CHwoRM3MWL4Zb/dNq77gR4SpiCUAIs+8464BCPdpZmBSq96Y8YAxV59YzomGqBOSkhBIi2FYim19s8WP0OBzD2YrG8xqIqtipiZLT/3sX/mXe6U+bzl8UNo2zytLtFL2hXOUNlff3NhqfU4U2U17MrVGyJxC970UNHxwwYGsaLj9/Rn1MjWA1bWJG0P2Z+v4FuVHX8NZIjRhpaJrKkP0o3T2fBKHPj3SmOrCp3LsCNeAXVQ48mfv+hKQ7KmrzrpkPl/BYp8sIgsYM8+r9J93KKvpd6oY7EmgqVVr1oC6Zyso4XCx1cZmW4kSBJGZbH9xqSU4W2LJ76vgw/xzaDB/o9Rlf
 
-On 2026-04-22 14:52:07 [-0400], Aaron Tomlin wrote:
-> From: Daniel Wagner <wagi@kernel.org>
-> 
-> Introduce blk_mq_{online|possible}_queue_affinity, which returns the
-> queue-to-CPU mapping constraints defined by the block layer. This allows
-> other subsystems (e.g., IRQ affinity setup) to respect block layer
-> requirements.
-> 
-> It is necessary to provide versions for both the online and possible CPU
-> masks because some drivers want to spread their I/O queues only across
-> online CPUs, while others prefer to use all possible CPUs. And the mask
-> used needs to match with the number of queues requested
-> (see blk_num_{online|possible}_queues).
+On Sun, 26 Apr 2026 22:01:41 -0400
+Aaron Tomlin <atomlin@atomlin.com> wrote:
 
-Which driver uses cpu_possible_mask? This mask is assigned at boot time
-once the kernel figured how many CPUs are possible based on ACPI or
-whatever the system uses. This mask does not change.
+> +TRACE_EVENT(block_rq_tag_wait,
+> +
+> +	TP_PROTO(struct request_queue *q, struct blk_mq_hw_ctx *hctx, bool is_sched_tag),
+> +
+> +	TP_ARGS(q, hctx, is_sched_tag),
+> +
+> +	TP_STRUCT__entry(
+> +		__field( dev_t,		dev			)
+> +		__field( u32,		hctx_id			)
+> +		__field( u32,		nr_tags			)
+> +		__field( bool,		is_sched_tag		)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->dev		= q->disk ? disk_devt(q->disk);
 
-I only see drivers/scsi/lpfc/lpfc_init.c using it. Looking at
-cpu_possible_mask might not be the right thing. It is usually the same
-thing as "online" except on system where ACPI thinks that something
-could be added via hotplug _or_ if the admin shuts down a CPU via
-cpuhotplug _or_ boots with less (there a command line option for that). 
+Hmm, does the above even compile?
 
-In case cpu_possible_mask != cpu_online_mask the intention is to
-allocate memory and setup irqs for the offline CPUs?
+-- Steve
 
-> Signed-off-by: Daniel Wagner <wagi@kernel.org>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
-
-Sebastian
+> +		__entry->hctx_id	= hctx->queue_num;
+> +		__entry->is_sched_tag	= is_sched_tag;
+> +
+> +		if (is_sched_tag)
+> +			__entry->nr_tags = hctx->sched_tags->nr_tags;
+> +		else
+> +			__entry->nr_tags = hctx->tags->nr_tags;
+> +	),
+> +
+> +	TP_printk("%d,%d hctx=%u starved on %s tags (depth=%u)",
+> +		  MAJOR(__entry->dev), MINOR(__entry->dev),
+> +		  __entry->hctx_id,
+> +		  __entry->is_sched_tag ? "scheduler" : "hardware",
+> +		  __entry->nr_tags)
+> +);
+> +
