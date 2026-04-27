@@ -1,141 +1,115 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F532857C1;
-	Mon, 27 Apr 2026 15:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC85A29E11D;
+	Mon, 27 Apr 2026 15:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777303271; cv=none; b=egSvH8ZvIzwjTJ/xASPnK0D8yAgbaJVpsgkJx5F4EnfmOpH8OFWft6XdqcDNLbE09YmK0OCLBbOyZ4zr8WPsrLFywI4wkN9qee/YUOnmVancE10a6G83dqLLPx91d7gATQBnXZNyJmeNCeCCnzPqdO04dgBy9q3545beQaKHh34=
+	t=1777303315; cv=none; b=TpM43c4QlS1qCbxVWhUtUKbIDtDq9FxBLmrxL7M7DPOV+20qEpNJzk9MTJqM6CuLtx69obE6tQfeQt8HPB2LiZH4lL2XG5x7ZnzJpt4i24lFvbcZWh7lza8/yPqDZ+zjELawshbTnmh3PrZFvEgoGhbZMjergND176+18/+utQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777303271; c=relaxed/simple;
-	bh=IM0L7Li42Io9EO72Qgi+hTcf6CviEJZMT8JzJOnRHac=;
+	s=arc-20240116; t=1777303315; c=relaxed/simple;
+	bh=WB4zlQm9+FHX+K7g+OB4l8qgcWOrwaIHH/nk762xS9Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uqUoy1fWUTpJpIGo71llRid4OSsKE8Wneu2jqFpytOg8CUn/QeZ5OkWH+7BO26R57zlOWovDC3VYY1v6YizbN2mv6pzQjQ/bZu+5R0YWESlsxXF9vEewBylD0mWWcCPw8k83tYg6NenYONBF4wTyu+2B8NrRCNS4V6Vdk74Uhtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=d2odqkFT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ddMw9PoH; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=gU7qI7XavlvSw918h8hOnk9JGWaGKgjkI8z7kGPZr+aqg+AnNdTEw12jYjc4cFK9K3SGeIUbXay2ecRWFphYAqGFAC5Z9Sb+14GXcjcnzXLzo/jVuYvMRYOuSr3+eja8MxuGh/TAbSBtRF6vPCaBRspn9U2Oh6sKhnwt9W2nJHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B1Z+QPwl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="d2odqkFT";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ddMw9PoH"
-Date: Mon, 27 Apr 2026 17:21:04 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1777303266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HLQrFz5Io0HWrBbPfgkDM3Mh0/GOTFIXHrUB8jjZJ7o=;
-	b=d2odqkFTtOfYMHI6l11Y5qQhA/SgclKDt28mdbZOL4QKwSBMCsVWgOaXpb+D3OD1S8sCMl
-	gp67+l5XCzoRpQ/3oTRyD21Y36dD3Ub7qcGdki+5UEcfdd62f9B02S/9uDFtQdFWWSGZWN
-	m4B9082FAFULSmXJfIGO4UYhh3NWiLHCIjdx2zNx9eCwuuXgUxx0gol0tfTWFMJuxsM78X
-	g1PWOd8cwwJy/dtYhZ9H5KOuEKSu+8d/Eeg6qig54XYbdQXI+ISOcg+7AeXpaIos6slIIq
-	Z0El3jx8p/AjP60KN5+rLkoBMz0Qn8ba3qWJhW0QGjK2ez776mOM8enhTVEQmg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1777303266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HLQrFz5Io0HWrBbPfgkDM3Mh0/GOTFIXHrUB8jjZJ7o=;
-	b=ddMw9PoHj38WUcP0Ahe1qRnWtNk7mF4VE4gCD/um/VTkXCw0TKFpzNLUdzZPWOOEnsfhdo
-	qsix0uECSoYIa/Bg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	mst@redhat.com, aacraid@microsemi.com,
-	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
-	liyihang9@h-partners.com, kashyap.desai@broadcom.com,
-	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
-	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com,
-	sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com,
-	ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com,
-	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org,
-	juri.lelli@redhat.com, vincent.guittot@linaro.org,
-	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com,
-	yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org,
-	longman@redhat.com, chenridong@huawei.com, hare@suse.de,
-	kch@nvidia.com, ming.lei@redhat.com, tom.leiming@gmail.com,
-	steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com,
-	mproche@gmail.com, nick.lange@gmail.com, marco.crivellari@suse.com,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
-	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com
-Subject: Re: [PATCH v12 02/13] lib/group_cpus: remove dead !SMP code
-Message-ID: <20260427152104.WTGAesGs@linutronix.de>
-References: <20260422185215.100929-1-atomlin@atomlin.com>
- <20260422185215.100929-3-atomlin@atomlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B1Z+QPwl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 734FBC19425;
+	Mon, 27 Apr 2026 15:21:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777303315;
+	bh=WB4zlQm9+FHX+K7g+OB4l8qgcWOrwaIHH/nk762xS9Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B1Z+QPwlSzm9DUFf2VXkMegOGbnMpiWlwRjD7F80talUYpO/pyKyC7SO0jHLe13kM
+	 3cmmSFDvWp2MNbCd8jSEl1LLBWs/nGaChpw115gE3SdbtA8gUAtots2MOeFHq4+NP7
+	 uHYP6WLhYs7hfrG0buM4N0/lRP9D8ZzjboSUgzxkoagKLLeoOxJLajtuMGTsh3Xs0r
+	 JkWKeWJTZS/9Ij5RPTGI7SsYgrMNvFQodBmQf02slmNQLUJQeovo0UgnQ7cZmVZZle
+	 qMjrvGXl2FHQle41b1dJu67EKEcX8EB3X6gdLP4+E+9N8ejYYYa/ARbMsIydBvHGwH
+	 GNFj1MZW7JTcg==
+Received: from johan by theta with local (Exim 4.99.1)
+	(envelope-from <johan@kernel.org>)
+	id 1wHNmR-000000004uP-410E;
+	Mon, 27 Apr 2026 17:21:51 +0200
+Date: Mon, 27 Apr 2026 17:21:51 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: "idryomov@gmail.com" <idryomov@gmail.com>,
+	"dongsheng.yang@linux.dev" <dongsheng.yang@linux.dev>,
+	"ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: rbd: switch to dynamic root device
+Message-ID: <ae9_DzhmCX87jkQC@hovoldconsulting.com>
+References: <20260424103931.2616903-1-johan@kernel.org>
+ <ac8ef2a52e42512d17ef3e29cc94353c191c6846.camel@ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260422185215.100929-3-atomlin@atomlin.com>
+In-Reply-To: <ac8ef2a52e42512d17ef3e29cc94353c191c6846.camel@ibm.com>
 
-On 2026-04-22 14:52:04 [-0400], Aaron Tomlin wrote:
-> From: Daniel Wagner <wagi@kernel.org>
+On Fri, Apr 24, 2026 at 06:48:32PM +0000, Viacheslav Dubeyko wrote:
+> On Fri, 2026-04-24 at 12:39 +0200, Johan Hovold wrote:
+> > Driver core expects devices to be dynamically allocated and will, for
+> > example, complain loudly when no release function has been provided.
+> > 
+> > Use root_device_register() to allocate and register the root device
+> > instead of open coding using a static device.
+
+> > @@ -5390,7 +5383,7 @@ static struct rbd_device *__rbd_dev_create(struct rbd_spec *spec)
+> >  
+> >  	rbd_dev->dev.bus = &rbd_bus_type;
+> >  	rbd_dev->dev.type = &rbd_device_type;
+> > -	rbd_dev->dev.parent = &rbd_root_dev;
+> > +	rbd_dev->dev.parent = rbd_root_dev;
+> >  	device_initialize(&rbd_dev->dev);
+> >  
+> >  	return rbd_dev;
+> > @@ -7331,15 +7324,13 @@ static int __init rbd_sysfs_init(void)
+> >  {
+> >  	int ret;
+> >  
+> > -	ret = device_register(&rbd_root_dev);
+> > -	if (ret < 0) {
+> > -		put_device(&rbd_root_dev);
+> > -		return ret;
+> > -	}
+> > +	rbd_root_dev = root_device_register("rbd");
+> > +	if (IS_ERR(rbd_root_dev))
+> > +		return PTR_ERR(rbd_root_dev);
+> >  
+> >  	ret = bus_register(&rbd_bus_type);
+> >  	if (ret < 0)
+> > -		device_unregister(&rbd_root_dev);
+> > +		root_device_unregister(rbd_root_dev);
 > 
-> The support for the !SMP configuration has been removed from the core by
-> commit cac5cefbade9 ("sched/smp: Make SMP unconditional").
+> I think we need to assign NULL here:
 > 
-> While one can technically still compile a uniprocessor kernel, the core
-> scheduler now mandates SMP unconditionally, rendering this particular
-> !SMP fallback handling redundant. Therefore, remove the #ifdef CONFIG_SMP
-> guards and the fallback logic.
+> rbd_root_dev = NULL;
+
+From what I can tell these devices are only created from the bus sysfs
+attribute so this pointer will not be accessed if bus registration
+fails and there is no need to clear it (or add a sanity check to
+__rbd_dev_create()).
+
+> >  	return ret;
+> >  }
+> > @@ -7347,7 +7338,7 @@ static int __init rbd_sysfs_init(void)
+> >  static void __exit rbd_sysfs_cleanup(void)
+> >  {
+> >  	bus_unregister(&rbd_bus_type);
+> > -	device_unregister(&rbd_root_dev);
+> > +	root_device_unregister(rbd_root_dev);
 > 
-> Signed-off-by: Daniel Wagner <wagi@kernel.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> [atomlin: Updated commit message to clarify !SMP removal context]
-
-This look unchanged vs previous submission. You could explain why you
-want to remove the !SMP case. It looks like the !SMP makes things
-easier ;) I don't know how much of this gets removed because of !SMP
-code elsewhere.
-
-The description still does not make sense/ is accurate.
-
-> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
-> ---
->  lib/group_cpus.c | 20 --------------------
->  1 file changed, 20 deletions(-)
+> The same issue here:
 > 
-> diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-> index e6e18d7a49bb..b8d54398f88a 100644
-> --- a/lib/group_cpus.c
-> +++ b/lib/group_cpus.c
-> @@ -9,8 +9,6 @@
->  #include <linux/sort.h>
->  #include <linux/group_cpus.h>
->  
-> -#ifdef CONFIG_SMP
-> -
->  static void grp_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
->  				unsigned int cpus_per_grp)
->  {
-> @@ -564,22 +562,4 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
->  	*nummasks = min(nr_present + nr_others, numgrps);
->  	return masks;
->  }
-> -#else /* CONFIG_SMP */
-> -struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
-> -{
-> -	struct cpumask *masks;
-> -
-> -	if (numgrps == 0)
-> -		return NULL;
-> -
-> -	masks = kzalloc_objs(*masks, numgrps);
-> -	if (!masks)
-> -		return NULL;
-> -
-> -	/* assign all CPUs(cpu 0) to the 1st group only */
-> -	cpumask_copy(&masks[0], cpu_possible_mask);
-> -	*nummasks = 1;
-> -	return masks;
-> -}
-> -#endif /* CONFIG_SMP */
->  EXPORT_SYMBOL_GPL(group_cpus_evenly);
+> rbd_root_dev = NULL;
 
-Sebastian
+So this is not needed either.
+
+Johan
