@@ -1,102 +1,115 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C2D4CB5B
-	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 21:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B6E364E92
+	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 23:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777326740; cv=none; b=NbXRppvSPpNB5cRXIw4KdEOigX1TN7SgpFbqMK0CmXDf9KC6JC6nmFDpwIUOmiYQDgYOfXpiwNrnbsZ4MBjFytWZeyj1c4oYGDA0koXam0WhFeJh+W9FE9+TCiYBK22Uot4ef14fmHrJFU3vENoMe0IcAkQjY0dpyxH4oT7dPnY=
+	t=1777332089; cv=none; b=anXJs/z56VGaGoCZLo1Pwd1mVrFQYUpOc+AzBQfrBgbOmGUHKHOF026KEd3W/dGB4E5n1keXqLVBrf5bL9ZLL4x+1SbBzRlY3gp3gXJLt42YrLe1d5dD5NrZYjBTg47OCiVxtg2cRD0nWiRcsrfjjwgpXQXqHupajjDqTaIznpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777326740; c=relaxed/simple;
-	bh=ZFp5lZPEP8fcAWf5d5C/B/8GAvuW5E10ul4MHJLu1/Y=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=PxWKlZ0R3iKj7UsDt3+s7tKvTmR0WaAmdrN2+GcTjkJU68HxE5uSnpORyFZirjzGeK4UeEkjbyv2B0RowbmjCn7Q6iO8RjmHIh+Cxmt+Q/aRMeZUhC9x5kZURseqsb0AGMllP3sAevP7BAScg9G8kAIMWHlAaaaZIi33t5pFkwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=0SlVeg5Q; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1777332089; c=relaxed/simple;
+	bh=DJghSy1D8zh/PpCR9oWQ3USQY0F+iVWTeMrqRCDL/oY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bIYOqVO/xxoVBtDKpVAMOQaPSF1Ixa5Mr9ttgejVFwBxjcIzrElQRFxmNwcEfngfZuRlzZ78ywHfNQJtpoiXUTqxPtXwDkdAzZuoKPemnx3lWrNJI60FXZ3rYuOSI+ZoQ+OmXfrFPH2/MxZjVoSj7YvZNGn1af3T7JW0jO2Jl7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MHWBnTt3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="0SlVeg5Q"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-4670676ba03so3139036b6e.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 14:52:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1777326737; x=1777931537; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yrm3z7s9VXAebzelrUiRF927dzrrFKEWxgF4nYtzbz4=;
-        b=0SlVeg5QgLoSW+tA1Os9p2WXh27hsMJPqUEG9Ft1I92NvBcLYzTVFhRcajY8EzDaTb
-         j7OeAuSqCFcOGkCEcWtU406YDjBjzbjSQpsBYiEOKNdArM5hfJz4LUqwjX01L2OBPoXK
-         tFGDYgt/gQfGf6p1nWSaaSK1N9N7xw3jTta8WOz+9fvktr4G2p9M5ci3gxoKVZAmlHbu
-         NcCXknbhrx1hKWURrV0SGyG+5nMxWGU/lL6ThJwKEp86umceeOEhawfymwpV3xxG4gxD
-         jqYgSM5PnceR2ZQMX7/LG51qdhH5grSv/7IneN972PuAdN8sSOBgwiY+sXTKTCAYrPwN
-         y6gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777326737; x=1777931537;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Yrm3z7s9VXAebzelrUiRF927dzrrFKEWxgF4nYtzbz4=;
-        b=IGQIYSSjfsGIgXjoxLHIs6xHspiyv/Fc5s8TUGrnbVNjbfTNLOdojk24/NumAq8SjK
-         sk50tTuIu2yOTDJnGcIbFZsLfOfxUa1Ihqelje1dckWjN5knCmGyHv8GadYADb4M20ta
-         tbg7rYBbYjADie/JVtKgeqMFfcW7TjBGKwtjUdofiraw67CcfNdO/hgt/PL7oZtg1tDQ
-         fY3MaMo6WwieaqSEcTYIU90zWrYX3Ob6lvTuwpcYKThq3viQzCPyBwT9arDC779TBlfY
-         cv5qJ4zv2wLrHxzhtjCUzUO8Slj9H+ABFADD9YfBUhkV/wYvGq0/7uHJX47wi0uR9huu
-         reRw==
-X-Gm-Message-State: AOJu0Yyw80BW1LSsrE7SmzfFEP++PV1kG6OFpPPfyJuYzK4JiCD8/WGu
-	V9/TY10Uq5sxnrsUaXM+tfqdaG4u+a5kRdt+es0AaZ+hOKVKhNbVQmJYWvifQOQGWFnv3E2MKJh
-	q6qsgV2I=
-X-Gm-Gg: AeBDiet166b6eBGCRjOPwuhb3F35xwdzYpAnI69kNC8shkd+zjQ8VVDl4vdQFgd4kRt
-	gPeCPmquVkTah0liu03n+J+pXsguPlymyEJzvrtvqpNyQBhu6CehHmD/+S/AdCGdNF1RCULK2ch
-	9M2oH5y8jZEAomNHq9cHVosMr49fAsJbhip2/Rfz2zv9OeqhRT/CA7liqdgchXXbcGxouPuNAmZ
-	MFW9ySsyL7UtZ5/xYkatmRsD4x4qsImijX+PFafL5X8QDeHy98sAcSPHUEhZ/Ej9c71L2ke+TjL
-	zlauCXtOREj/xzfucnE7WrHO7RrKpsJYPIeX6NXYbnf33PzOEmtCLp91Ggx2PkYnNVIwWzeBhUX
-	kaz/ZmjW3vNnLsE8IO1oZiSFB7CNyI2xb7IaWcGTyTuOCKQEEgVWSxkxoRmKB0pPmDXJnwIzRuf
-	O83INQZtKekPOQmiYhIMD2DUFomGwyd52rV3LbEHJO0beanMB29p7pVGYMk0UkN56gPUPOiLo3L
-	kn5WUgadaSUrM8=
-X-Received: by 2002:a05:6808:660f:b0:479:e9d2:26a3 with SMTP id 5614622812f47-47c28ee99d7mr338309b6e.19.1777326737171;
-        Mon, 27 Apr 2026 14:52:17 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-47c291759a3sm223872b6e.11.2026.04.27.14.52.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2026 14:52:16 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Phillip Potter <phil@philpotter.co.uk>
-Cc: linux-block@vger.kernel.org, daan@amutable.com
-In-Reply-To: <20260427210139.1400-1-phil@philpotter.co.uk>
-References: <20260427210139.1400-1-phil@philpotter.co.uk>
-Subject: Re: [PATCH 0/1] cdrom, sr: patch for inclusion
-Message-Id: <177732673632.2004827.11400383080055800365.b4-ty@b4>
-Date: Mon, 27 Apr 2026 15:52:16 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MHWBnTt3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777332087;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QwKMBJOAIVpBKk5S/1EncS9MBw/2GYPqM3cR1GQB/UM=;
+	b=MHWBnTt3OMtasY/u3qWdszCmGsr0UyXbozeW0txxud0cVrqNr9zY4tdQXWJgFP5sJO36fO
+	LDu/0CC6JjATC9IH8XD8czJd6M3HyOeXIAcuguNiwsd+cVje7QtCEM1rCQyex5gwLKtGHX
+	p3jEMCR6gNWCeOi2zrpL93PeH+AFaVI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-315-wwGLtsnHNbiLH6aMO9qNBQ-1; Mon,
+ 27 Apr 2026 19:21:20 -0400
+X-MC-Unique: wwGLtsnHNbiLH6aMO9qNBQ-1
+X-Mimecast-MFC-AGG-ID: wwGLtsnHNbiLH6aMO9qNBQ_1777332079
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7FCC018004A9;
+	Mon, 27 Apr 2026 23:21:18 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB76F1800446;
+	Mon, 27 Apr 2026 23:21:17 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63RNLGLG2738638
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 27 Apr 2026 19:21:16 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63RNLDEl2738637;
+	Mon, 27 Apr 2026 19:21:13 -0400
+Date: Mon, 27 Apr 2026 19:21:13 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
+        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
+        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
+        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
+ device encryption
+Message-ID: <ae_vacHQ75AgZbm_@redhat.com>
+References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
+ <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
+ <ae7yzw-5wz9cqZt8@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae7yzw-5wz9cqZt8@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-
-On Mon, 27 Apr 2026 22:01:38 +0100, Phillip Potter wrote:
-> Please apply the following patch by Daan De Meyer from Amutable, which
-> reworks some code to correct a longstanding issue with propagation of
-> writable status to the block layer. This has been reviewed both by
-> myself and Martin K. Petersen of Oracle, and I have also built and
-> runtime tested it without issue.
+On Mon, Apr 27, 2026 at 01:23:27AM -0400, Benjamin Marzinski wrote:
+> On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > +	/*
+> > +	 * Since we've added an encryption context to the bio and
+> > +	 * blk-crypto-fallback may be needed to process it, it's necessary to
+> > +	 * use the fallback-aware bio submission code rather than
+> > +	 * unconditionally returning DM_MAPIO_REMAPPED.
+> > +	 *
+> > +	 * To get the correct accounting for a dm target in the case where
+> > +	 * __blk_crypto_submit_bio() doesn't take ownership of the bio (returns
+> > +	 * true), call __blk_crypto_submit_bio() directly and return
+> > +	 * DM_MAPIO_REMAPPED in that case, rather than relying on
+> > +	 * blk_crypto_submit_bio() which calls submit_bio() in that case.
+> > +	 */
+> > +	if (__blk_crypto_submit_bio(bio))
 > 
-> Many thanks in advance.
+> This will still double account for fallback writes (which call
+> submit_bio() on the encrypted bios, and return DM_MAPIO_SUBMITTED here). 
+
+Just to clarify, I'm talking about the vmstats accounting. The IO
+originally gets accounted by submit_bio() when the bio is submitted to
+the dm device. For actual inline encryption and fallback reads, dm will
+submit the bio to the underlying device using submit_bio_noacct() to
+avoid double-counting the IO.
+
+For fallback writes, __blk_crypto_submit_bio() will submit the encrypted
+bios to the underlying device with submit_bio(). This adds the IO
+sectors again, even though it's the same IO, only encrypted now.
+
+-Ben
+
 > 
-> [...]
-
-Applied, thanks!
-
-[1/1] cdrom, scsi: sr: propagate read-only status to block layer via set_disk_ro()
-      commit: d1a1c3ecee38c81d0447fc0a06b0a2068d1f099a
-
-Best regards,
--- 
-Jens Axboe
-
-
+> -Ben
+> 
+> > +		return DM_MAPIO_REMAPPED;
+> > +	return DM_MAPIO_SUBMITTED;
+> > +}
+> 
 
