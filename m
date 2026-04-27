@@ -1,175 +1,741 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AD1153BE9
-	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 00:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C96197A7D
+	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 01:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777250121; cv=none; b=L1zGIk2EoFGwLLugJVgmyVOcZhK5omMuxxB/rSdKG5TKGopcKU9i+nfUr2aA4fBBuUUg19CtOX5QcS4BAkrDL/KqL89galsWfeyZ/1SZtuj/9KXOt8wYV5pl8MxIH3WGn/fWZ7omIOVjyMTrmkj7kuJ1thtFEWtczmCTPrX8zxc=
+	t=1777252812; cv=none; b=KVV/mbK0SeU+vStZBToFDidAYl9OHWbfaMwD7VQMXLjzKCr1VLw1GWmFeYMTiYjrkbHkIvDg9uqihy2PK66UaIz949zgWEY5jIFG/1UN3Tu+J76K6siiGqQuUDwUeWeWquZ/wjDc6Y+CgykDS4Fg+B9i5lo3TBVHvL2B0btzyQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777250121; c=relaxed/simple;
-	bh=qCRZIqiWXNSIX+3h/kuw6yzKVaJCunHyh9LGPehHfd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jwW/pEYdMacp32g+AA2po1UNpTdCzsQiJyDxgYD/5+953FQKacMYc+ZB+3/Aoi9Kw4QqL2xP54A3cuPWARdDaaM46B1VwAfkMxg8f8MaihUwklof6pAW9uvlWXcJi5HFKJOMHJzOdfjR/3SFUfmwo9gM8oId1Rh5WqI3cK8iot0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D/clSY2y; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777252812; c=relaxed/simple;
+	bh=LI7uT83oVIjEttnTO5pYJFjfyZW+xnqUdbpC/5yWaAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l+RZQgxg6mwFqiFzjr01Lf6dPOZQMP2JpXQafYPp8tEYdfFmYMnERT04Ac024vABJsbSSwnyok4PWz8H+jaFRT6JdYh8Rl6LVTHyb5N2j0UhqzfpU6P/dXZxrG6FdT9bg4eREUZuXOp5s2MEm7l6d0G3yfz5IN3on5WrvyHY1KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hrHUCs3/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/clSY2y"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56d933b555cso3046487e0c.0
-        for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 17:35:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777250119; x=1777854919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6+zpjgxAVJgKXc24LXLllrzJ6IfhGOraTuvZ7a74jdg=;
-        b=D/clSY2y/us1q+2bN/mAAn76cwIGflZeAj8P/Q8bsR5tLEAH3bb8LAGFa/ZgUhd74R
-         AYa+Ch0tNQ9M04svbffeJpuBzY1quhIym56dARINVu3FPxb6V2el2oTiQpblO4fyZHbN
-         n1p7B75F2vk7wJ7LSwznIGZsPrrMRVUlL5v4jCkU7zwOcDYOutvvNbbRPtt/kVL1x0be
-         BrZpbPP4kerWeoyOgf0/bvyjZNWOrQebW43aKWn47pvq3LqB1yyrYsq3IVsj4AZMOhle
-         Vw0dVR684FsZq4fKuq3eUexNHW+icVlQHbU4VS36nhw2Z9JOMGOBv/xCWOSPOnsWVYik
-         1NdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777250119; x=1777854919;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6+zpjgxAVJgKXc24LXLllrzJ6IfhGOraTuvZ7a74jdg=;
-        b=kSP0MFT7ma4wdAUNwoM+HbsYyeS+pJrF9GJYHqV2yF2xRyZu/g5BjPIevRathEN1tN
-         8A8ueqEpE5WYedbJp51KXBYvg7GtdoMytt8WSc3rtcbqOgw63GswnGXh+KPsMnNXAusa
-         kQ3ILp3QYhI+dJfWd1iBH3OQm574D6pSEGhL4+9/bzcuXHbeRhcGMXEp5m+yTpdw33T0
-         eIgBSYrw7UzkXRzY9ZdH2IR5xpBnsFaI0tzUgeNVzK+Fnla1lv0IYnIUL3fx3CiPs8pD
-         qQfGb+OVTWUIKuj9WxlMUColUzx8TZR/Fe+K7HGCP0coMPkBYzHlefI9TJ9k/PTTVyO+
-         NC8g==
-X-Gm-Message-State: AOJu0Yx+VtI9PueG1lHTPiNPBRim2I6t756ejoRvfXhhgWbPPcdq9IP6
-	CEUq9eGOZE7K10mlnfN3pFQtNCeZxdqNPFcoBjHQMb8SdT4eedBfHA1C
-X-Gm-Gg: AeBDievU7w9o1VyXLiBvSgcinCnvPGjciU2e1w4t2PJQBbu81dFdLMtEnyzwoSuaG5N
-	r90dFwFFiRrryNiea5MEcWSiOWPKxq7uU6bpF4wMcj6GkxyY8ekU8+eLePCEDCqVSll0XLz8Rdz
-	m4ihz3Aip/9ygJt8h1WOi8Lb5y2IZmw7ChDAy5dRvSq0fHPPExoGdxnXfPIGX4AtkIa1dKKBycs
-	UZSAo4TC+2E1IWqjuRzkLuBGLoteZ30LiHxctFnzIuAiH1cyhbqgMll1Vo2Rs3MC9n5I+SCNOLh
-	RSHuafEmHzMQFJwbeh0u8by7WR864p/ultgl+SJ33nr0yOokVJIv64VUa93xjkfwikHiFHt080k
-	MTF6N/tlf2dDz99FCunxbBYZm1/kIGU415g/qJp2JF99JpPEDM+Lzq4KVjw2tUXYo+D5f7Z2Cc5
-	JaXKm7r2dif1vh8/yFZSwVEHcVA7moHG4by/4gy5B0Vu8U38u+9RIq
-X-Received: by 2002:a05:6122:f84:b0:56c:db8b:504e with SMTP id 71dfb90a1353d-56fa59fbc9fmr22750523e0c.13.1777250118829;
-        Sun, 26 Apr 2026 17:35:18 -0700 (PDT)
-Received: from syssplab.cs.fiu.edu (nat1.cs.fiu.edu. [131.94.134.89])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa9351ca8sm16854880e0c.18.2026.04.26.17.35.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Apr 2026 17:35:17 -0700 (PDT)
-From: Chao Shi <coshi036@gmail.com>
-To: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org,
-	hch@lst.de,
-	kbusch@kernel.org,
-	sagi@grimberg.me,
-	axboe@kernel.dk,
-	Chao Shi <coshi036@gmail.com>,
-	Sungwoo Kim <iam@sung-woo.kim>,
-	Dave Tian <daveti@purdue.edu>,
-	Weidong Zhu <weizhu@fiu.edu>
-Subject: [PATCH RFC 2/2] nvme: set integrity metadata size for EXT_LBAS non-PI namespace
-Date: Sun, 26 Apr 2026 20:34:57 -0400
-Message-ID: <20260427003457.1264511-2-coshi036@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260427003457.1264511-1-coshi036@gmail.com>
-References: <20260427003457.1264511-1-coshi036@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrHUCs3/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777252809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c89fDvjWNfw+ww/16N/6uvv8iE3NGx//SCDtEVNSMH4=;
+	b=hrHUCs3/xjgcNPaVv2+zoENiEprMuxVl7oXxUvxt7eGUfsQcba4PO0KBbYwiTARsfxWoNm
+	nRnOA6fweH3/G8yUfcZxLvlM/t+ekVqvDT8GnG96BXmbZzeUIZgYsxLIpTD84SFZMEgyRc
+	AVgAmlWsIfidryZCx/nA7edE9UrHLJA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-VLTG3YUeOc-qjrPgTYJ_RA-1; Sun,
+ 26 Apr 2026 21:20:05 -0400
+X-MC-Unique: VLTG3YUeOc-qjrPgTYJ_RA-1
+X-Mimecast-MFC-AGG-ID: VLTG3YUeOc-qjrPgTYJ_RA_1777252804
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3A20418003FC;
+	Mon, 27 Apr 2026 01:20:03 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8945180045E;
+	Mon, 27 Apr 2026 01:20:01 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63R1K0ZH2704641
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sun, 26 Apr 2026 21:20:00 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63R1Jwsk2704640;
+	Sun, 26 Apr 2026 21:19:58 -0400
+Date: Sun, 26 Apr 2026 21:19:57 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
+        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
+        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
+        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
+ device encryption
+Message-ID: <ae65vfakVKg2aGcp@redhat.com>
+References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
+ <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-This patch is an alternative to patch 1/2: instead of downgrading the
-assertion in nvme_setup_rw(), it addresses the root cause at the
-integrity-profile level so that the assertion is never reached.
+On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add a new device-mapper target "dm-inlinecrypt" that is similar to
+> dm-crypt but uses the blk-crypto API instead of the regular crypto API.
+> This allows it to take advantage of inline encryption hardware such as
+> that commonly built into UFS host controllers.
+> 
+> The table syntax matches dm-crypt's, but for now only a stripped-down
+> set of parameters is supported.  For example, for now AES-256-XTS is the
+> only supported cipher.
+> 
+> dm-inlinecrypt is based on Android's dm-default-key with the
+> controversial passthrough support removed.  Note that due to the removal
+> of passthrough support, use of dm-inlinecrypt in combination with
+> fscrypt causes double encryption of file contents (similar to dm-crypt +
+> fscrypt), with the fscrypt layer not being able to use the inline
+> encryption hardware.  This makes dm-inlinecrypt unusable on systems such
+> as Android that use fscrypt and where a more optimized approach is
+> needed.  It is however suitable as a replacement for dm-crypt.
+> 
+> dm-inlinecrypt supports both keyring key and hex key, the former avoids
+> the key to be exposed in dm-table message. Similar to dm-default-key in
+> Android, it will fallabck to the software block crypto once the inline
+> crypto hardware cannot support the expected cipher.
+> 
+> Test:
+> dmsetup create inlinecrypt_logon --table "0 `blockdev --getsz $1` \
+> inlinecrypt aes-xts-plain64 :64:logon:fde:dminlinecrypt_test_key 0 $1 0"
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+> ---
+>  drivers/md/Kconfig          |  10 +
+>  drivers/md/Makefile         |   1 +
+>  drivers/md/dm-inlinecrypt.c | 559 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 570 insertions(+)
+>  create mode 100644 drivers/md/dm-inlinecrypt.c
+> 
+> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+> index c58a9a8ea54e..aa541cc22ecc 100644
+> --- a/drivers/md/Kconfig
+> +++ b/drivers/md/Kconfig
+> @@ -313,6 +313,16 @@ config DM_CRYPT
+>  
+>  	  If unsure, say N.
+>  
+> +config DM_INLINECRYPT
+> +	tristate "Inline encryption target support"
+> +	depends on BLK_DEV_DM
+> +	depends on BLK_INLINE_ENCRYPTION
+> +	help
+> +	  This device-mapper target is similar to dm-crypt, but it uses the
+> +	  blk-crypto API instead of the regular crypto API. This allows it to
+> +	  take advantage of inline encryption hardware such as that commonly
+> +	  built into UFS host controllers.
+> +
+>  config DM_SNAPSHOT
+>         tristate "Snapshot target"
+>         depends on BLK_DEV_DM
+> diff --git a/drivers/md/Makefile b/drivers/md/Makefile
+> index c338cc6fbe2e..517d1f7d8288 100644
+> --- a/drivers/md/Makefile
+> +++ b/drivers/md/Makefile
+> @@ -55,6 +55,7 @@ obj-$(CONFIG_DM_UNSTRIPED)	+= dm-unstripe.o
+>  obj-$(CONFIG_DM_BUFIO)		+= dm-bufio.o
+>  obj-$(CONFIG_DM_BIO_PRISON)	+= dm-bio-prison.o
+>  obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
+> +obj-$(CONFIG_DM_INLINECRYPT)	+= dm-inlinecrypt.o
+>  obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
+>  obj-$(CONFIG_DM_DUST)		+= dm-dust.o
+>  obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
+> diff --git a/drivers/md/dm-inlinecrypt.c b/drivers/md/dm-inlinecrypt.c
+> new file mode 100644
+> index 000000000000..b6e98fdf8af1
+> --- /dev/null
+> +++ b/drivers/md/dm-inlinecrypt.c
+> @@ -0,0 +1,559 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright 2024 Google LLC
+> + */
+> +
+> +#include <linux/blk-crypto.h>
+> +#include <linux/ctype.h>
+> +#include <linux/device-mapper.h>
+> +#include <linux/hex.h>
+> +#include <linux/module.h>
+> +#include <keys/user-type.h>
+> +
+> +#define DM_MSG_PREFIX	"inlinecrypt"
+> +
+> +static const struct dm_inlinecrypt_cipher {
+> +	const char *name;
+> +	enum blk_crypto_mode_num mode_num;
+> +} dm_inlinecrypt_ciphers[] = {
+> +	{
+> +		.name = "aes-xts-plain64",
+> +		.mode_num = BLK_ENCRYPTION_MODE_AES_256_XTS,
+> +	},
+> +};
+> +
+> +/**
+> + * struct inlinecrypt_ctx - private data of an inlinecrypt target
+> + * @dev: the underlying device
+> + * @start: starting sector of the range of @dev which this target actually maps.
+> + *	   For this purpose a "sector" is 512 bytes.
+> + * @cipher_string: the name of the encryption algorithm being used
+> + * @iv_offset: starting offset for IVs.  IVs are generated as if the target were
+> + *	       preceded by @iv_offset 512-byte sectors.
+> + * @sector_size: crypto sector size in bytes (usually 4096)
+> + * @sector_bits: log2(sector_size)
+> + * @key: the encryption key to use
+> + * @max_dun: the maximum DUN that may be used (computed from other params)
+> + */
+> +struct inlinecrypt_ctx {
+> +	struct dm_dev *dev;
+> +	sector_t start;
+> +	const char *cipher_string;
+> +	unsigned int key_size;
+> +	u64 iv_offset;
+> +	unsigned int sector_size;
+> +	unsigned int sector_bits;
+> +	struct blk_crypto_key key;
+> +	u64 max_dun;
+> +};
+> +
+> +static const struct dm_inlinecrypt_cipher *
+> +lookup_cipher(const char *cipher_string)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(dm_inlinecrypt_ciphers); i++) {
+> +		if (strcmp(cipher_string, dm_inlinecrypt_ciphers[i].name) == 0)
+> +			return &dm_inlinecrypt_ciphers[i];
+> +	}
+> +	return NULL;
+> +}
+> +
+> +static void inlinecrypt_dtr(struct dm_target *ti)
+> +{
+> +	struct inlinecrypt_ctx *ctx = ti->private;
+> +
+> +	if (ctx->dev) {
+> +		if (ctx->key.size)
+> +			blk_crypto_evict_key(ctx->dev->bdev, &ctx->key);
+> +		dm_put_device(ti, ctx->dev);
+> +	}
+> +	kfree_sensitive(ctx->cipher_string);
+> +	kfree_sensitive(ctx);
+> +}
+> +
+> +static bool contains_whitespace(const char *str)
+> +{
+> +	while (*str)
+> +		if (isspace(*str++))
+> +			return true;
+> +	return false;
+> +}
+> +
+> +static int set_key_user(struct key *key, char *bin_key,
+> +			const unsigned int bin_key_size)
+> +{
+> +	const struct user_key_payload *ukp;
+> +
+> +	ukp = user_key_payload_locked(key);
+> +	if (!ukp)
+> +		return -EKEYREVOKED;
+> +
+> +	if (bin_key_size != ukp->datalen)
+> +		return -EINVAL;
+> +
+> +	memcpy(bin_key, ukp->data, bin_key_size);
+> +
+> +	return 0;
+> +}
+> +
+> +static int inlinecrypt_get_keyring_key(const char *key_string, u8 *bin_key,
+> +					const unsigned int bin_key_size)
+> +{
+> +	char *key_desc;
+> +	int ret;
+> +	struct key_type *type;
+> +	struct key *key;
 
-For PCIe namespaces with extended LBAs (NVME_NS_EXT_LBAS set, flbas
-bit 4) but without PI and without NVME_NS_METADATA_SUPPORTED, the early-
-exit branch of nvme_init_integrity() at core.c:1834 returns false
-without populating bi->metadata_size.  As a result blk_get_integrity()
-returns NULL (it checks q->limits.integrity.metadata_size via
-blk_integrity_queue_supports_integrity()), bio_integrity_action() returns
-0, bio_integrity_prep() is never called, and REQ_INTEGRITY is never set
-on bios dispatched to the namespace.  Any such bio that reaches
-nvme_setup_rw() triggers WARN_ON_ONCE because head->ms != 0 but
-blk_integrity_rq() returns false.
+There's nothing forcing CONFIG_KEYS to be set when CONFIG_DM_INLINECRYPT
+is, and without it, struct key won't be defined and this won't compile.
 
-Populate bi->metadata_size = head->ms in the early-exit path for the
-EXT_LBAS non-PI case.  This is sufficient to make blk_get_integrity()
-return non-NULL, which causes bio_integrity_action() to return non-zero,
-which causes bio_integrity_prep() to run and set REQ_INTEGRITY on any
-bio submitted to the namespace.  Requests that reach nvme_setup_rw()
-then satisfy blk_integrity_rq() and the assertion is not reached.
+> +	int (*set_key)(struct key *key, char *bin_key,
+> +				   const unsigned int bin_key_size);
+> +
+> +	/*
+> +	 * Reject key_string with whitespace. dm core currently lacks code for
+> +	 * proper whitespace escaping in arguments on DM_TABLE_STATUS path.
+> +	 */
+> +	if (contains_whitespace(key_string)) {
+> +		DMERR("whitespace chars not allowed in key string");
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* look for next ':' separating key_type from key_description */
+> +	key_desc = strchr(key_string, ':');
+> +	if (!key_desc || key_desc == key_string || !strlen(key_desc + 1))
+> +		return -EINVAL;
+> +
+> +	if (!strncmp(key_string, "logon:", key_desc - key_string + 1)) {
+> +		type = &key_type_logon;
+> +		set_key = set_key_user;
+> +	} else {
+> +		return -EINVAL;
+> +	}
+> +
+> +	key = request_key(type, key_desc + 1, NULL);
+> +	if (IS_ERR(key))
+> +		return PTR_ERR(key);
+> +
+> +	down_read(&key->sem);
+> +
+> +	ret = set_key(key, (char *)bin_key, bin_key_size);
+> +	if (ret < 0) {
 
-blk_validate_integrity_limits() accepts this configuration: with
-csum_type=BLK_INTEGRITY_CSUM_NONE, pi_tuple_size=0, and pi_offset=0,
-all checks pass (pi_offset + pi_tuple_size <= metadata_size, pi_tuple_size
-must be 0 for CSUM_NONE), and interval_exp is auto-filled to
-ilog2(logical_block_size).  No generate/verify callbacks are configured,
-so no actual integrity computation occurs; only the blk_integrity_rq()
-predicate is satisfied.  Capacity is still forced to 0 by
-set_capacity_and_notify(), so new bios are rejected by bio_check_eod()
-before queue entry.
+This does the same commands regardless of whether it takes this branch.
 
-Tested: Compiled on linux-kcov-debug (6.19.0+, KASAN/DEBUG_LIST).
-Boot-tested under FEMU with NVME_SEMANTIC_DATA_MUTATOR=1; ran 4
-concurrent dd processes plus 500 rescan_controller cycles with no WARN,
-BUG, or Oops.  The EXT_LBAS + ms!=0 + !PI combination was not triggered
-during testing (FEMU's mutator varies flbas and lbaf[0].ms independently;
-flbas=0x10 with lbaf_idx=0 was not produced in this run).  The
-bi->metadata_size assignment path was not exercised in testing;
-correctness of blk_validate_integrity_limits() for this configuration
-was verified by code inspection.  Provided as RFC.
+> +		up_read(&key->sem);
+> +		key_put(key);
+> +		return ret;
+> +	}
+> +
+> +	up_read(&key->sem);
+> +	key_put(key);
+> +
+> +	return ret;
+> +}
+> +
+> +static int inlinecrypt_get_key(const char *key_string,
+> +				u8 key[BLK_CRYPTO_MAX_ANY_KEY_SIZE],
+> +				const unsigned int key_size)
+> +{
+> +	int ret = 0;
+> +
+> +	/* ':' means the key is in kernel keyring, short-circuit normal key processing */
+> +	if (key_string[0] == ':') {
+> +		if (key_size > BLK_CRYPTO_MAX_ANY_KEY_SIZE) {
+> +			DMERR("Invalid keysize");
+> +			return -EINVAL;
+> +		}
+> +		/* key string should be :<logon|user>:<key_desc> */
+> +		ret = inlinecrypt_get_keyring_key(key_string + 1, key, key_size);
+> +		goto out;
+> +	}
+> +
+> +	if (key_size > 2 * BLK_CRYPTO_MAX_ANY_KEY_SIZE
 
-Found by FuzzNvme(Syzkaller with FEMU fuzzing framework).
+get_key_size() returns the size of the binary key in this case, so
+shouldn't this check for "key_size > BLK_CRYPTO_MAX_ANY_KEY_SIZE", and
+it seems like the check if the key_size is odd would make more sense in
+get_key_size().
 
-Acked-by: Sungwoo Kim <iam@sung-woo.kim>
-Acked-by: Dave Tian <daveti@purdue.edu>
-Acked-by: Weidong Zhu <weizhu@fiu.edu>
-Signed-off-by: Chao Shi <coshi036@gmail.com>
----
- drivers/nvme/host/core.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+> +		|| key_size  % 2
+> +		|| !key_size) {
+> +		DMERR("Invalid keysize");
+> +		return -EINVAL;
+> +	}
+> +	if (hex2bin(key, key_string, key_size) != 0)
+> +		ret = -EINVAL;
+> +
+> +out:
+> +	return ret;
+> +}
+> +
+> +static int get_key_size(char **key_string)
+> +{
+> +	char *colon, dummy;
+> +	int ret;
+> +
+> +	if (*key_string[0] != ':')
+> +		return strlen(*key_string) >> 1;
+> +
+> +	/* look for next ':' in key string */
+> +	colon = strpbrk(*key_string + 1, ":");
+> +	if (!colon)
+> +		return -EINVAL;
+> +
+> +	if (sscanf(*key_string + 1, "%u%c", &ret, &dummy) != 2 || dummy != ':')
+> +		return -EINVAL;
+> +
+> +	/* remaining key string should be :<logon|user>:<key_desc> */
+> +	*key_string = colon;
+> +
+> +	return ret;
+> +}
+> +
+> +static int inlinecrypt_ctr_optional(struct dm_target *ti,
+> +				    unsigned int argc, char **argv)
+> +{
+> +	struct inlinecrypt_ctx *ctx = ti->private;
+> +	struct dm_arg_set as;
+> +	static const struct dm_arg _args[] = {
+> +		{0, 3, "Invalid number of feature args"},
+> +	};
+> +	unsigned int opt_params;
+> +	const char *opt_string;
+> +	bool iv_large_sectors = false;
+> +	char dummy;
+> +	int err;
+> +
+> +	as.argc = argc;
+> +	as.argv = argv;
+> +
+> +	err = dm_read_arg_group(_args, &as, &opt_params, &ti->error);
+> +	if (err)
+> +		return err;
+> +
+> +	while (opt_params--) {
+> +		opt_string = dm_shift_arg(&as);
+> +		if (!opt_string) {
+> +			ti->error = "Not enough feature arguments";
+> +			return -EINVAL;
+> +		}
+> +		if (!strcmp(opt_string, "allow_discards")) {
+> +			ti->num_discard_bios = 1;
+> +		} else if (sscanf(opt_string, "sector_size:%u%c",
+> +				  &ctx->sector_size, &dummy) == 1) {
+> +			if (ctx->sector_size < SECTOR_SIZE ||
+> +			    ctx->sector_size > 4096 ||
+> +			    !is_power_of_2(ctx->sector_size)) {
+> +				ti->error = "Invalid sector_size";
+> +				return -EINVAL;
+> +			}
+> +		} else if (!strcmp(opt_string, "iv_large_sectors")) {
+> +			iv_large_sectors = true;
+> +		} else {
+> +			ti->error = "Invalid feature arguments";
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+> +	/* dm-inlinecrypt doesn't implement iv_large_sectors=false. */
+> +	if (ctx->sector_size != SECTOR_SIZE && !iv_large_sectors) {
+> +		ti->error = "iv_large_sectors must be specified";
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 4e20c8f08e4..76fb788024f 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1836,8 +1836,29 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
- 	 * insert/strip it, which is not possible for other kinds of metadata.
- 	 */
- 	if (!IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ||
--	    !(head->features & NVME_NS_METADATA_SUPPORTED))
--		return nvme_ns_has_pi(head);
-+	    !(head->features & NVME_NS_METADATA_SUPPORTED)) {
-+		bool has_pi = nvme_ns_has_pi(head);
-+
-+		/*
-+		 * For PCIe EXT_LBAS non-PI namespaces the block layer sets
-+		 * capacity to 0 (we return false) to prevent block I/O, but a
-+		 * cached-rq bio may bypass bio_queue_enter freeze serialisation
-+		 * and reach nvme_setup_rw() with head->ms != 0 and no
-+		 * REQ_INTEGRITY set.  Populate bi->metadata_size so that
-+		 * bio_integrity_action() returns non-zero and bio_integrity_prep()
-+		 * sets REQ_INTEGRITY on any such bio, preventing the WARN_ON_ONCE
-+		 * at nvme_setup_rw() (addressed by patch 1/2).
-+		 *
-+		 * NOTE: only metadata_size is populated; no csum or PI profile is
-+		 * configured.  Actual data integrity for EXT_LBAS non-PI workloads
-+		 * is untested; this patch is RFC for direction discussion.
-+		 */
-+		if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
-+		    (head->features & NVME_NS_EXT_LBAS) &&
-+		    head->ms && !has_pi)
-+			bi->metadata_size = head->ms;
-+		return has_pi;
-+	}
- 
- 	switch (head->pi_type) {
- 	case NVME_NS_DPS_PI_TYPE3:
--- 
-2.43.0
+Since setting sector_size forces setting iv_large_sectors, does it
+really need to be a separate parameter? Can't it just be implied by
+setting a non-512 sector_size. Is this here to futureproof the table
+line?
+
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Construct an inlinecrypt mapping:
+> + * <cipher> [<key>|:<key_size>:<logon>:<key_description>] <iv_offset> <dev_path> <start>
+> + *
+> + * This syntax matches dm-crypt's, but the set of supported functionality has
+> + * been stripped down.
+> + */
+> +static int inlinecrypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+> +{
+> +	struct inlinecrypt_ctx *ctx;
+> +	const struct dm_inlinecrypt_cipher *cipher;
+> +	u8 raw_key[BLK_CRYPTO_MAX_ANY_KEY_SIZE];
+> +	unsigned int dun_bytes;
+> +	unsigned long long tmpll;
+> +	char dummy;
+> +	int err;
+> +
+> +	if (argc < 5) {
+> +		ti->error = "Not enough arguments";
+> +		return -EINVAL;
+> +	}
+> +
+> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+> +	if (!ctx) {
+> +		ti->error = "Out of memory";
+> +		return -ENOMEM;
+> +	}
+> +	ti->private = ctx;
+> +
+> +	/* <cipher> */
+> +	ctx->cipher_string = kstrdup(argv[0], GFP_KERNEL);
+> +	if (!ctx->cipher_string) {
+> +		ti->error = "Out of memory";
+> +		err = -ENOMEM;
+> +		goto bad;
+> +	}
+> +	cipher = lookup_cipher(ctx->cipher_string);
+> +	if (!cipher) {
+> +		ti->error = "Unsupported cipher";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +
+> +	/* <key> */
+> +	ctx->key_size = get_key_size(&argv[1]);
+> +	if (ctx->key_size < 0) {
+> +		ti->error = "Cannot parse key size";
+> +		return -EINVAL;
+> +	}
+> +	err = inlinecrypt_get_key(argv[1], raw_key, ctx->key_size);
+> +	if (err) {
+> +		ti->error = "Malformed key string";
+> +		goto bad;
+> +	}
+> +
+> +	/* <iv_offset> */
+> +	if (sscanf(argv[2], "%llu%c", &ctx->iv_offset, &dummy) != 1) {
+> +		ti->error = "Invalid iv_offset sector";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +
+> +	/* <dev_path> */
+> +	err = dm_get_device(ti, argv[3], dm_table_get_mode(ti->table),
+> +			    &ctx->dev);
+> +	if (err) {
+> +		ti->error = "Device lookup failed";
+> +		goto bad;
+> +	}
+> +
+> +	/* <start> */
+> +	if (sscanf(argv[4], "%llu%c", &tmpll, &dummy) != 1 ||
+> +	    tmpll != (sector_t)tmpll) {
+> +		ti->error = "Invalid start sector";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +	ctx->start = tmpll;
+> +
+> +	/* optional arguments */
+> +	ctx->sector_size = SECTOR_SIZE;
+> +	if (argc > 5) {
+> +		err = inlinecrypt_ctr_optional(ti, argc - 5, &argv[5]);
+> +		if (err)
+> +			goto bad;
+> +	}
+> +	ctx->sector_bits = ilog2(ctx->sector_size);
+> +	if (ti->len & ((ctx->sector_size >> SECTOR_SHIFT) - 1)) {
+> +		ti->error = "Device size is not a multiple of sector_size";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +
+> +	ctx->max_dun = (ctx->iv_offset + ti->len - 1) >>
+> +		       (ctx->sector_bits - SECTOR_SHIFT);
+> +	dun_bytes = DIV_ROUND_UP(fls64(ctx->max_dun), 8);
+> +
+> +	err = blk_crypto_init_key(&ctx->key, raw_key, ctx->key_size,
+> +				  BLK_CRYPTO_KEY_TYPE_RAW,
+> +				  cipher->mode_num, dun_bytes,
+> +				  ctx->sector_size);
+> +	if (err) {
+> +		ti->error = "Error initializing blk-crypto key";
+> +		goto bad;
+> +	}
+> +
+> +	err = blk_crypto_start_using_key(ctx->dev->bdev, &ctx->key);
+> +	if (err) {
+> +		ti->error = "Error starting to use blk-crypto";
+> +		goto bad;
+> +	}
+> +
+> +	ti->num_flush_bios = 1;
+> +
+> +	err = 0;
+> +	goto out;
+> +
+> +bad:
+> +	inlinecrypt_dtr(ti);
+> +out:
+> +	memzero_explicit(raw_key, sizeof(raw_key));
+> +	return err;
+> +}
+> +
+> +static int inlinecrypt_map(struct dm_target *ti, struct bio *bio)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	sector_t sector_in_target;
+> +	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = {};
+> +
+> +	bio_set_dev(bio, ctx->dev->bdev);
+> +
+> +	/*
+> +	 * If the bio is a device-level request which doesn't target a specific
+> +	 * sector, there's nothing more to do.
+> +	 */
+> +	if (bio_sectors(bio) == 0)
+> +		return DM_MAPIO_REMAPPED;
+> +
+> +	/*
+> +	 * The bio should never have an encryption context already, since
+> +	 * dm-inlinecrypt doesn't pass through any inline encryption
+> +	 * capabilities to the layer above it.
+> +	 */
+> +	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
+> +		return DM_MAPIO_KILL;
+> +
+> +	/* Map the bio's sector to the underlying device. (512-byte sectors) */
+> +	sector_in_target = dm_target_offset(ti, bio->bi_iter.bi_sector);
+> +	bio->bi_iter.bi_sector = ctx->start + sector_in_target;
+> +	/*
+> +	 * If the bio doesn't have any data (e.g. if it's a DISCARD request),
+> +	 * there's nothing more to do.
+> +	 */
+> +	if (!bio_has_data(bio))
+> +		return DM_MAPIO_REMAPPED;
+> +
+> +	/* Calculate the DUN and enforce data-unit (crypto sector) alignment. */
+> +	dun[0] = ctx->iv_offset + sector_in_target; /* 512-byte sectors */
+> +	if (dun[0] & ((ctx->sector_size >> SECTOR_SHIFT) - 1))
+> +		return DM_MAPIO_KILL;
+
+If ctx->iv_offset is not a multiple of ctx->sector_size, this will
+always fail. ctx->iv_offset should probably get validated in
+inlinecrypt_ctr()
+
+-Ben
+
+> +	dun[0] >>= ctx->sector_bits - SECTOR_SHIFT; /* crypto sectors */
+> +
+> +	/*
+> +	 * This check isn't necessary as we should have calculated max_dun
+> +	 * correctly, but be safe.
+> +	 */
+> +	if (WARN_ON_ONCE(dun[0] > ctx->max_dun))
+> +		return DM_MAPIO_KILL;
+> +
+> +	bio_crypt_set_ctx(bio, &ctx->key, dun, GFP_NOIO);
+> +
+> +	/*
+> +	 * Since we've added an encryption context to the bio and
+> +	 * blk-crypto-fallback may be needed to process it, it's necessary to
+> +	 * use the fallback-aware bio submission code rather than
+> +	 * unconditionally returning DM_MAPIO_REMAPPED.
+> +	 *
+> +	 * To get the correct accounting for a dm target in the case where
+> +	 * __blk_crypto_submit_bio() doesn't take ownership of the bio (returns
+> +	 * true), call __blk_crypto_submit_bio() directly and return
+> +	 * DM_MAPIO_REMAPPED in that case, rather than relying on
+> +	 * blk_crypto_submit_bio() which calls submit_bio() in that case.
+> +	 */
+> +	if (__blk_crypto_submit_bio(bio))
+> +		return DM_MAPIO_REMAPPED;
+> +	return DM_MAPIO_SUBMITTED;
+> +}
+> +
+> +static void inlinecrypt_status(struct dm_target *ti, status_type_t type,
+> +			       unsigned int status_flags, char *result,
+> +			       unsigned int maxlen)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	unsigned int sz = 0;
+> +	int num_feature_args = 0;
+> +
+> +	switch (type) {
+> +	case STATUSTYPE_INFO:
+> +	case STATUSTYPE_IMA:
+> +		result[0] = '\0';
+> +		break;
+> +
+> +	case STATUSTYPE_TABLE:
+> +		/*
+> +		 * Warning: like dm-crypt, dm-inlinecrypt includes the key in
+> +		 * the returned table.  Userspace is responsible for redacting
+> +		 * the key when needed.
+> +		 */
+> +		DMEMIT("%s %*phN %llu %s %llu", ctx->cipher_string,
+> +		       ctx->key.size, ctx->key.bytes, ctx->iv_offset,
+> +		       ctx->dev->name, ctx->start);
+> +		num_feature_args += !!ti->num_discard_bios;
+> +		if (ctx->sector_size != SECTOR_SIZE)
+> +			num_feature_args += 2;
+> +		if (num_feature_args != 0) {
+> +			DMEMIT(" %d", num_feature_args);
+> +			if (ti->num_discard_bios)
+> +				DMEMIT(" allow_discards");
+> +			if (ctx->sector_size != SECTOR_SIZE) {
+> +				DMEMIT(" sector_size:%u", ctx->sector_size);
+> +				DMEMIT(" iv_large_sectors");
+> +			}
+> +		}
+> +		break;
+> +	}
+> +}
+> +
+> +static int inlinecrypt_prepare_ioctl(struct dm_target *ti,
+> +				     struct block_device **bdev, unsigned int cmd,
+> +				     unsigned long arg, bool *forward)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	const struct dm_dev *dev = ctx->dev;
+> +
+> +	*bdev = dev->bdev;
+> +
+> +	/* Only pass ioctls through if the device sizes match exactly. */
+> +	return ctx->start != 0 || ti->len != bdev_nr_sectors(dev->bdev);
+> +}
+> +
+> +static int inlinecrypt_iterate_devices(struct dm_target *ti,
+> +				       iterate_devices_callout_fn fn,
+> +				       void *data)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +
+> +	return fn(ti, ctx->dev, ctx->start, ti->len, data);
+> +}
+> +
+> +#ifdef CONFIG_BLK_DEV_ZONED
+> +static int inlinecrypt_report_zones(struct dm_target *ti,
+> +				    struct dm_report_zones_args *args,
+> +				    unsigned int nr_zones)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +
+> +	return dm_report_zones(ctx->dev->bdev, ctx->start,
+> +			ctx->start + dm_target_offset(ti, args->next_sector),
+> +			args, nr_zones);
+> +}
+> +#else
+> +#define inlinecrypt_report_zones NULL
+> +#endif
+> +
+> +static void inlinecrypt_io_hints(struct dm_target *ti,
+> +				 struct queue_limits *limits)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	const unsigned int sector_size = ctx->sector_size;
+> +
+> +	limits->logical_block_size =
+> +		max_t(unsigned int, limits->logical_block_size, sector_size);
+> +	limits->physical_block_size =
+> +		max_t(unsigned int, limits->physical_block_size, sector_size);
+> +	limits->io_min = max_t(unsigned int, limits->io_min, sector_size);
+> +	limits->dma_alignment = limits->logical_block_size - 1;
+> +}
+> +
+> +static struct target_type inlinecrypt_target = {
+> +	.name			= "inlinecrypt",
+> +	.version		= {1, 0, 0},
+> +	/*
+> +	 * Do not set DM_TARGET_PASSES_CRYPTO, since dm-inlinecrypt consumes the
+> +	 * crypto capability itself.
+> +	 */
+> +	.features		= DM_TARGET_ZONED_HM,
+> +	.module			= THIS_MODULE,
+> +	.ctr			= inlinecrypt_ctr,
+> +	.dtr			= inlinecrypt_dtr,
+> +	.map			= inlinecrypt_map,
+> +	.status			= inlinecrypt_status,
+> +	.prepare_ioctl		= inlinecrypt_prepare_ioctl,
+> +	.iterate_devices	= inlinecrypt_iterate_devices,
+> +	.report_zones		= inlinecrypt_report_zones,
+> +	.io_hints		= inlinecrypt_io_hints,
+> +};
+> +
+> +module_dm(inlinecrypt);
+> +
+> +MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
+> +MODULE_AUTHOR("Linlin Zhang <linlin.zhang@oss.qualcomm.com>");
+> +MODULE_DESCRIPTION(DM_NAME " target for inline encryption");
+> +MODULE_LICENSE("GPL");
+> -- 
+> 2.34.1
+> 
 
