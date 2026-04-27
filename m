@@ -1,741 +1,191 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C96197A7D
-	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 01:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777252812; cv=none; b=KVV/mbK0SeU+vStZBToFDidAYl9OHWbfaMwD7VQMXLjzKCr1VLw1GWmFeYMTiYjrkbHkIvDg9uqihy2PK66UaIz949zgWEY5jIFG/1UN3Tu+J76K6siiGqQuUDwUeWeWquZ/wjDc6Y+CgykDS4Fg+B9i5lo3TBVHvL2B0btzyQA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777252812; c=relaxed/simple;
-	bh=LI7uT83oVIjEttnTO5pYJFjfyZW+xnqUdbpC/5yWaAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l+RZQgxg6mwFqiFzjr01Lf6dPOZQMP2JpXQafYPp8tEYdfFmYMnERT04Ac024vABJsbSSwnyok4PWz8H+jaFRT6JdYh8Rl6LVTHyb5N2j0UhqzfpU6P/dXZxrG6FdT9bg4eREUZuXOp5s2MEm7l6d0G3yfz5IN3on5WrvyHY1KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hrHUCs3/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDE5244675;
+	Mon, 27 Apr 2026 01:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777253394; cv=fail; b=UMZaDiRXnIzljk9RwX8cun6reIImn1+pnqdoVWZBPC1xfzhykNZU1OaDtyK5NTUAgKLnagbH6wkwYh0xHBFNjNFkvPxNpo6DDlV9csXIWfPNuOi40tHkxFNJ7wzA3DVc0ZSZI4fxoL3O2XVO2dmL4rOvMeA7oJNf/uU7FXlij24=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777253394; c=relaxed/simple;
+	bh=XKddUKwBQORAtRjJKwTEL8IzkpPlMYvsqJKUwpqpCtU=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=XKeqMapSvs1x/YR9l/6VSQC1CEzOlQ68iyiya1WBZWGLHShjbF93uRZHOZTfFHqTne0dK/4kLi8OfVKzMX/6whzswXBzZ1GiC7d9WUdQzPZv1pXKeb5K7vnsvL9aT/uk2H8m9yCWFnFwrDF665tHz/H7wYQ05wGzZ/ywFTlWArs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=RTQfs0+b; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=cOsWnUn3; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrHUCs3/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777252809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c89fDvjWNfw+ww/16N/6uvv8iE3NGx//SCDtEVNSMH4=;
-	b=hrHUCs3/xjgcNPaVv2+zoENiEprMuxVl7oXxUvxt7eGUfsQcba4PO0KBbYwiTARsfxWoNm
-	nRnOA6fweH3/G8yUfcZxLvlM/t+ekVqvDT8GnG96BXmbZzeUIZgYsxLIpTD84SFZMEgyRc
-	AVgAmlWsIfidryZCx/nA7edE9UrHLJA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-VLTG3YUeOc-qjrPgTYJ_RA-1; Sun,
- 26 Apr 2026 21:20:05 -0400
-X-MC-Unique: VLTG3YUeOc-qjrPgTYJ_RA-1
-X-Mimecast-MFC-AGG-ID: VLTG3YUeOc-qjrPgTYJ_RA_1777252804
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3A20418003FC;
-	Mon, 27 Apr 2026 01:20:03 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8945180045E;
-	Mon, 27 Apr 2026 01:20:01 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63R1K0ZH2704641
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 26 Apr 2026 21:20:00 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63R1Jwsk2704640;
-	Sun, 26 Apr 2026 21:19:58 -0400
-Date: Sun, 26 Apr 2026 21:19:57 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
-        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
-        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
-        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
- device encryption
-Message-ID: <ae65vfakVKg2aGcp@redhat.com>
-References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
- <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RTQfs0+b";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="cOsWnUn3"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63QMcJDl2534447;
+	Mon, 27 Apr 2026 01:29:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=X1vAPEqlzu0AnjTcj2
+	IK74fWKoqLDrig8jgs9L/q3/4=; b=RTQfs0+bScR8jbFoc1xEqi8odJ125jarsH
+	ZudA3S0ZAgvCJxg99TKKate+hUrcNKlQTXjFm0dHWXw5sdjz3xpnJHycQaiA/Sab
+	FGikOk+5EtmgrNzna+I/17CB0B4Xxbg12sqSdu9MdLBBxEnyX2BVOy2KZfsFhQos
+	OZGVjFub3gjjCom7pvujkbvHtQrV8XomFncMU/tSVAI6UsZuFyqmbKkUyfdfWGw9
+	isGpZdMThw9lCnagul9ItawCw/sl/r9B/50F3ocX1ghqUM7HEi0yJk8/BRmXCdUs
+	M/P00qCWPa7WteGfMYUh9C8i+gh8XXgH4+KObnElPUiqcp4DkyIg==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4drp5st5dk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 27 Apr 2026 01:29:40 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 63R1QGoZ026286;
+	Mon, 27 Apr 2026 01:29:40 GMT
+Received: from ch5pr02cu005.outbound.protection.outlook.com (mail-northcentralusazon11012053.outbound.protection.outlook.com [40.107.200.53])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4drm2atu6s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 27 Apr 2026 01:29:40 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dDqB83QrdVOdm09ZhzffjM/BfKt46CsZ65mK8A9mctj/yynFju0NHv51CwDMlYj77BDDfiDBp0QfJS8aMEiEOvnQFElvx5T4VOU3r7fgczC6k3vN8q0yLj4kJ+/sLhQR19p9dw0Uj9/47K/yG3Tr6jezfN0UpxTF+QgHWVRN3eFESILL/4O+2QWJ4utcwC3XmFzlkKeWiJ+uTdbYOyrCEvXjBc1h564pL4+6jYgzSI3hKcezRrCdFrrPPkXV7BWutWOa1FBQdc6e4XjZ8gxH7x4SyxdNTW+Qr1xZJZbLiNkNCpZimsoYOwcQCbro2bHv1s2uqLTPzB7bTvGtGbmBYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X1vAPEqlzu0AnjTcj2IK74fWKoqLDrig8jgs9L/q3/4=;
+ b=AMW61sDEPTd6xntgPNW9CNiDCQ8n6BohQ4FZYLLeIg+i6xbDNHQShxxTjt52Qa49m+Z2Hcc+0Ivp5Wp0PjPjUcaWBjpYUWZzCPxrWcHgCkKz4VDrTV1ED+ld2yg5OeQcgTMp0zPy3IQp5U3N67pUaZJQJtVzi4gD68tBExjcWUpqUWPQu+0T+4nMlj7YQkSnaIO6Vt86ReAk1y8VlhOHl14J+xWCOm/Nxfmr6QvM+IwHFhwUO+XFqY/n5sjn4/N3AJgxxQYY3WENv99DECdAd2jZrUZALhvG4CvqoTlOh2LNRTdiwa8M5MhHUxKtV7ZcB/emV6PoVmLysKQ4Ht0yQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=X1vAPEqlzu0AnjTcj2IK74fWKoqLDrig8jgs9L/q3/4=;
+ b=cOsWnUn3o6/Iqua/Qp+DQjLhvowE9fyMJb9RlGswlznvpUjXPIb3jRdlj8GAw7KtP6RE/dDydcTKURckaWpKIIhd0/FuTBO+T+dG4PJ/9wwv2mHMPX+fXSXdx0p3SmhkV28/9ksFqprbI5hRf38hHbNPEC9ew3AekQK2nsT0R4U=
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
+ by BL3PR10MB6161.namprd10.prod.outlook.com (2603:10b6:208:3bc::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.26; Mon, 27 Apr
+ 2026 01:29:37 +0000
+Received: from CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::e525:dd71:b002:6ad5]) by CH0PR10MB5338.namprd10.prod.outlook.com
+ ([fe80::e525:dd71:b002:6ad5%6]) with mapi id 15.20.9846.025; Mon, 27 Apr 2026
+ 01:29:37 +0000
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: phil@philpotter.co.uk, martin.petersen@oracle.com,
+        James.Bottomley@HansenPartnership.com, axboe@kernel.dk,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Daan De Meyer <daan@amutable.com>
+Subject: Re: [PATCH v2] cdrom, scsi: sr: propagate read-only status to block
+ layer via set_disk_ro()
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <20260422113206.246267-1-daan@amutable.com> (Daan De Meyer's
+	message of "Wed, 22 Apr 2026 11:32:06 +0000")
+Organization: Oracle Corporation
+Message-ID: <yq1jytti447.fsf@ca-mkp.ca.oracle.com>
+References: <20260330133403.796330-1-daan@amutable.com>
+	<20260422113206.246267-1-daan@amutable.com>
+Date: Sun, 26 Apr 2026 21:29:35 -0400
+Content-Type: text/plain
+X-ClientProxiedBy: YQZPR01CA0057.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:88::18) To CH0PR10MB5338.namprd10.prod.outlook.com
+ (2603:10b6:610:cb::8)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|BL3PR10MB6161:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91621f16-8f61-4607-1736-08dea3fc71ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	W/yEtOWwZknhpYIOGbzeBSI2r685woPm4YgZut1AcGS7SkeqTAJupAuidXzjT1pmmi+r/VAcrtc5jriqLoZhHtHnQIzjmw2LX5LYagRoAWkL4X7AkpfLTCmnoSOdmuktiW33c9L7gqBwkCNxJyHjiZdSFtvRFOppBfvcG+NtN1jRbNc+e4BWEA1moC+4RNlG6GX7ADeQ7wGSFVuYehjc3XgHcsP/gKMYPOD6cM/N57a/TIDduvwZKdTqZuy8cjKZsKb3bOfhn4Vewi4S0Is8mIV81HYo3wixTlenxsgqsQTJwd8TTHp3Q4QHfcdtl2sjBsfLFvk9ixH+54EALix5zcfk8ts3Pejmv2HG6YU8ZtVkHVbM82AGm4KquXAGbqoXVhbquEoE204KkmWDes0Z3n0922cMcxBMyujvNd5dpR0bQbGiFQ8e+XUeuk201lxUjoyhXVMMLRcsFEQaes5PsvwbTeGC/LAGvaAAYJrZMEU/AyRHhHKJBRhxOkCMXdbuzekhg/16ua02tjcSkaJQPY4wRkb483wUsgIbgW+IGu/zZ5p+P+HzpaMlT6XkZqyQhydeE6MIp9WcLDvAY8R5sDu4hR+PphT7NP6KJpXhpS8VOVFcSevrbqZkcKXn/S5umfxg19Iekx1oNuqdKA35IOL5AWSdmggGdKDFlF8mhvUY+pVAyN9yfzW7OpMtFsl+b3ZrtzwJoddEAJ7mJhx2D5ixqORBRdWSS1WFUj97Pfo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?phgtKvWYkvBIgo7dc8ptrkzDuIZolVG9yltXBpiP9G5xmogSRdo2TNF7DZN7?=
+ =?us-ascii?Q?fJr2Tu7h66wFYQcE2OoZyl/Iko2T6uv45VHIUDuJnFT5Rp8nyFb9nJummbZn?=
+ =?us-ascii?Q?gUgpMjWjQVht6CJfB+6YdogzoyYEWkWXLRRAdunlj3Y5TILp3PMZtyRZX25R?=
+ =?us-ascii?Q?LH7DxX2lBOyy1mgGjlP1WLdQx4of1t8a+thKTvSZaRnPLWMJowVgctpn2a3o?=
+ =?us-ascii?Q?KAPcNiJ+bLlEflxYDd0OyAO1sder8gBJTlUJ8ZeJUgpSMqMUAGHKkxjH8bQu?=
+ =?us-ascii?Q?p36Nodb0PdfIkP3MMx5rI7WaRPxwemS1S1OxqrsYExEfCPEzPMgSATUYQC0j?=
+ =?us-ascii?Q?L7BI0/dQTcvTf54ROb10qY5rwRSBzq5bGONJ8qfUKhhwYpHBR+KYanpyYlQZ?=
+ =?us-ascii?Q?qrNTZ48tbpbX5YUw5ic6pmnfrtjI3AENWsaLEvm9BOB0mPGPpVw4G38Euomd?=
+ =?us-ascii?Q?V63LARnZ7KcfFyVkXaKbQ5etGj0XEPXGPYM318/i1FZwO7FVDsNSHpx2xQGO?=
+ =?us-ascii?Q?Vd87w6x4f94fIcpMMMimNtU9sQ3xXna4myH2CxQTNmnoMCWt0nByHm+uv8JU?=
+ =?us-ascii?Q?G/cMLTKSZ3t6OBlFy/LoNol0v4eScMjwH7FCJPep/OH52BgeiHdOnOBFYigS?=
+ =?us-ascii?Q?z8znorvw7t/j3Nala0jR2aMoZb2cR3q0xVWu2kdWouDUEbE+Vameu4WM0hqf?=
+ =?us-ascii?Q?8PsbAJL5N76cASUnTuHR5VXDwlrvZ2d1b7wCZLb1HYVBk7Bn76C6c/H0z5b/?=
+ =?us-ascii?Q?RDMa+Z58Cy1xWoUvG+usF3S8h4Vyvk36hUU8JzZ+Gqv+TIWbG6c/rEqvu3R5?=
+ =?us-ascii?Q?MT+qRqbHT7nvAn2ro28L1nJf8Ut/MQiPe9sH7G+akGBOGrfYGMG1DFNJqwVR?=
+ =?us-ascii?Q?3gTj5fPk58f0AEA26tH705HDWYYoeM4BiAWHhAddWBb2wlDYB0t6YVmq+QyN?=
+ =?us-ascii?Q?oANAbkZ7/h2pAIf2jIXnWbJxmCqRzHkmDAVjmzQ9HprvVaXo8/JnkeTzDqUN?=
+ =?us-ascii?Q?+pwQOpKiKOC9UpTk8iO21JGowRDANbgLlwgX+E3LBimyMIGj7AKuWCE2Y4Vp?=
+ =?us-ascii?Q?5QdbE2ZW/3AWs0YWimA4BkVBiG5nDUwf+U4/ToJ5fHbcKmkyptd8mJaJt387?=
+ =?us-ascii?Q?pNkZAK04sJvxxivLle1rtMJBYDSPN+huBaP0HhOEKor+zdT694FMDuZn4dVC?=
+ =?us-ascii?Q?EfsEbE2CybtoQ+0w2CrKmj0+KaIQ7YgySnlPTY77Hu9FzxigTkZHUEr3Fw6M?=
+ =?us-ascii?Q?GfPpfgGaNnkH6GJJUspeBcsMx1jl3t/tmF9AfBvxMKXV3OPa7r0s+8fOjAY/?=
+ =?us-ascii?Q?LihxIIew3ckmvX2PIQMps7/3mRySHif0nbs4GX9i36kOOWekC2IWRBxIlgVd?=
+ =?us-ascii?Q?yjjU+UIIT2eHr8Xd0l7d9ktP6uXCAicOZwZskDfOK5Xc7COnsFyd4h4nVCUG?=
+ =?us-ascii?Q?qx0h8vyHYUZ+xAQMou13eFLNmJHwy4cN7PDuTEMoEcmAvynVnP04hP7AzEeH?=
+ =?us-ascii?Q?DVyjj++2lMjQMwm5Dgr4s4DFybE1a6W+AHjVgq5zp5N0Zygy5OHTFNgRfLNO?=
+ =?us-ascii?Q?yKXvPOr0m6rklORwYETGZXtr85AWq3j0lr5jhuKhBHpdipieOUcz5WhB5iAi?=
+ =?us-ascii?Q?APIwmDsa77ZduOZlhs7KceVOGCeWjYV2hr85aRS59Zx/5V32ooOQv722Ji/r?=
+ =?us-ascii?Q?S7r1RM8eNq5XAaj+V0HGhIjsYNvQY+sYsF2uiwHi4EZNk+D7kbMJv8aBJA4G?=
+ =?us-ascii?Q?X4MtZW8J7dSej1tne+bK/I8h490TXsk=3D?=
+X-Exchange-RoutingPolicyChecked:
+	EDigC/sEaBWwXIy8VwkJGsFH7MVDTAHEOVqO+VS4bQkN4GqtgU2hVXDyc5n9eOH2EZBhLlH2dHOPCpPK1FqpiUU2QC4Wd7wHfWeWKbDf8tcRUqYgv53jo1YDQCbsDntOsJq5wbIhWU9v2ywiCi4XSjnVGMb6ZMmTYw5zFM1NeT2lia087WBIh+jTSTfukjNiP369QOvc6kWly355nBoZm+Inlr1FxaScMXTA0BNhW83AHWXPYnW4COi8BSzNZUHHxxNHqLexXCTUnHUgiHEQ69WKTZpQIIaiSm+RX+yKdrBIN1molekaPf2bhR9MNwygvhbxNOEWIwU4ksIPpxVDvA==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	Sr1G+S/paqRLwgMfR23wrMcrxPOgeK4R2UH7Wc9O7A15qG+Qt5uQtqDxzxEimty36Fw4gV/Gfe+lj6+V9l+mrpcP+i8zgLGtq1gSqla322eaPmaH0Agiu7YTGrQMiNR+f9++1Tt4y8oaKrUGVvo9cPt2pWxTnY+p7rJ0BMUfx9QlShhYlZTTjFbAFIPYgrjJJZAO+rrj8Odcq8z64uvtbx8iX6+6soCn1grMTpU0KG+JwpoQC6ov1yZ/GrWHc9bBKlJUjB+tk1hB3I7z7++V0eYiUkkCBNoQNSvfgpAHD17sQETFCZBwzlMKnpxLj8Yn2qCbl/GvgbsixVKf69KpqaUNhVMSonUD4Ytckt2HTYzqB+RNbV+Wqb2PUKPfjbkymhviPPeYLXJTbQDSfCbva6JRRlQj8Qi2gD3BYcKLxrNwZlunTl+i4pJYR+ByBJN8eJVREVuwRMdge+fb0M71Sr1K+f8pmZW+6tfMMRin9EEu3GjaqSKWVmeksYWp/GgZG8R/qQefgAKsQpTMzoFP3AWrgVLGj3geBH9AzCvtxgmm+tUCgEx0zpPTYtiYD9YP7/wCzHv4NhLjuU3m1AhaSyaAezkcWqiBkCn2bUY6Pu8=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91621f16-8f61-4607-1736-08dea3fc71ad
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2026 01:29:36.9474
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6btCML7vIG+lRu5jVnAd4m0562z8TQdtCoVac2ty/0jBKeVFsGSEIEx5ikUBKOMxBHHXiBYRXuStiB9u/LKtl63UEM2ZpYFoZaMuQS6kcFQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR10MB6161
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-26_07,2026-04-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0 adultscore=0
+ phishscore=0 lowpriorityscore=0 spamscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2604200000 definitions=main-2604270013
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI3MDAxMyBTYWx0ZWRfX2wsJnnAg8BMf
+ /uTJZ34MziBwQ6/Vd07f+OXd+JSJcaDO3AJnKLEujxz4zSWEk0ECV5znJctWuUDK3fgZEj9ahvZ
+ WEfrTBsZuNjgLH2OFJeHSIr4JcAfnFjA0D5vfV9jTygaF4QIL1qqI2bqB5kq91v3NGdevR0na/G
+ zAOk9OdMjFHRbc8udgXrgQePgCap2si9UaXFHsWs8v9u0sDIIPVlGsbUzJ/HJNv8go9Xn1TRBBT
+ HqBxa9Ubqzv37w9c2obqUNr9jiJLyitEAndgPco2PzreUSnZcxc2Jcn4NvWnkHMO5qzD+/jtn2E
+ gIePVArkF9nVxhKWvLX77ALl49nVhuboVliE37Wm+x7TWikgkshMWKEomJji15bAHRQsSSbcR9F
+ w1Iz9fdxYPH3J5tYbXlNu9gTeoR2PEgkfqZvMTyX8O9A+Am0s3Fvm937sZmVgQpUYT0RoTJSXrS
+ SRP+4sPxAC5kWTb4QcQ==
+X-Proofpoint-ORIG-GUID: jpHosgqmlm3v6dkxlisNQz8vO295afs2
+X-Proofpoint-GUID: jpHosgqmlm3v6dkxlisNQz8vO295afs2
+X-Authority-Analysis: v=2.4 cv=E7v9Y6dl c=1 sm=1 tr=0 ts=69eebc05 b=1 cx=c_pps
+ a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=A5OVakUREuEA:10
+ a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jiCTI4zE5U7BLdzWsZGv:22
+ a=7Gl3-_t3PgB9XO-mQDs3:22 a=yPCof4ZbAAAA:8 a=BXy-6XygjoaRhVGDgXIA:9
 
-On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Add a new device-mapper target "dm-inlinecrypt" that is similar to
-> dm-crypt but uses the blk-crypto API instead of the regular crypto API.
-> This allows it to take advantage of inline encryption hardware such as
-> that commonly built into UFS host controllers.
-> 
-> The table syntax matches dm-crypt's, but for now only a stripped-down
-> set of parameters is supported.  For example, for now AES-256-XTS is the
-> only supported cipher.
-> 
-> dm-inlinecrypt is based on Android's dm-default-key with the
-> controversial passthrough support removed.  Note that due to the removal
-> of passthrough support, use of dm-inlinecrypt in combination with
-> fscrypt causes double encryption of file contents (similar to dm-crypt +
-> fscrypt), with the fscrypt layer not being able to use the inline
-> encryption hardware.  This makes dm-inlinecrypt unusable on systems such
-> as Android that use fscrypt and where a more optimized approach is
-> needed.  It is however suitable as a replacement for dm-crypt.
-> 
-> dm-inlinecrypt supports both keyring key and hex key, the former avoids
-> the key to be exposed in dm-table message. Similar to dm-default-key in
-> Android, it will fallabck to the software block crypto once the inline
-> crypto hardware cannot support the expected cipher.
-> 
-> Test:
-> dmsetup create inlinecrypt_logon --table "0 `blockdev --getsz $1` \
-> inlinecrypt aes-xts-plain64 :64:logon:fde:dminlinecrypt_test_key 0 $1 0"
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-> ---
->  drivers/md/Kconfig          |  10 +
->  drivers/md/Makefile         |   1 +
->  drivers/md/dm-inlinecrypt.c | 559 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 570 insertions(+)
->  create mode 100644 drivers/md/dm-inlinecrypt.c
-> 
-> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-> index c58a9a8ea54e..aa541cc22ecc 100644
-> --- a/drivers/md/Kconfig
-> +++ b/drivers/md/Kconfig
-> @@ -313,6 +313,16 @@ config DM_CRYPT
->  
->  	  If unsure, say N.
->  
-> +config DM_INLINECRYPT
-> +	tristate "Inline encryption target support"
-> +	depends on BLK_DEV_DM
-> +	depends on BLK_INLINE_ENCRYPTION
-> +	help
-> +	  This device-mapper target is similar to dm-crypt, but it uses the
-> +	  blk-crypto API instead of the regular crypto API. This allows it to
-> +	  take advantage of inline encryption hardware such as that commonly
-> +	  built into UFS host controllers.
-> +
->  config DM_SNAPSHOT
->         tristate "Snapshot target"
->         depends on BLK_DEV_DM
-> diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-> index c338cc6fbe2e..517d1f7d8288 100644
-> --- a/drivers/md/Makefile
-> +++ b/drivers/md/Makefile
-> @@ -55,6 +55,7 @@ obj-$(CONFIG_DM_UNSTRIPED)	+= dm-unstripe.o
->  obj-$(CONFIG_DM_BUFIO)		+= dm-bufio.o
->  obj-$(CONFIG_DM_BIO_PRISON)	+= dm-bio-prison.o
->  obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
-> +obj-$(CONFIG_DM_INLINECRYPT)	+= dm-inlinecrypt.o
->  obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
->  obj-$(CONFIG_DM_DUST)		+= dm-dust.o
->  obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
-> diff --git a/drivers/md/dm-inlinecrypt.c b/drivers/md/dm-inlinecrypt.c
-> new file mode 100644
-> index 000000000000..b6e98fdf8af1
-> --- /dev/null
-> +++ b/drivers/md/dm-inlinecrypt.c
-> @@ -0,0 +1,559 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright 2024 Google LLC
-> + */
-> +
-> +#include <linux/blk-crypto.h>
-> +#include <linux/ctype.h>
-> +#include <linux/device-mapper.h>
-> +#include <linux/hex.h>
-> +#include <linux/module.h>
-> +#include <keys/user-type.h>
-> +
-> +#define DM_MSG_PREFIX	"inlinecrypt"
-> +
-> +static const struct dm_inlinecrypt_cipher {
-> +	const char *name;
-> +	enum blk_crypto_mode_num mode_num;
-> +} dm_inlinecrypt_ciphers[] = {
-> +	{
-> +		.name = "aes-xts-plain64",
-> +		.mode_num = BLK_ENCRYPTION_MODE_AES_256_XTS,
-> +	},
-> +};
-> +
-> +/**
-> + * struct inlinecrypt_ctx - private data of an inlinecrypt target
-> + * @dev: the underlying device
-> + * @start: starting sector of the range of @dev which this target actually maps.
-> + *	   For this purpose a "sector" is 512 bytes.
-> + * @cipher_string: the name of the encryption algorithm being used
-> + * @iv_offset: starting offset for IVs.  IVs are generated as if the target were
-> + *	       preceded by @iv_offset 512-byte sectors.
-> + * @sector_size: crypto sector size in bytes (usually 4096)
-> + * @sector_bits: log2(sector_size)
-> + * @key: the encryption key to use
-> + * @max_dun: the maximum DUN that may be used (computed from other params)
-> + */
-> +struct inlinecrypt_ctx {
-> +	struct dm_dev *dev;
-> +	sector_t start;
-> +	const char *cipher_string;
-> +	unsigned int key_size;
-> +	u64 iv_offset;
-> +	unsigned int sector_size;
-> +	unsigned int sector_bits;
-> +	struct blk_crypto_key key;
-> +	u64 max_dun;
-> +};
-> +
-> +static const struct dm_inlinecrypt_cipher *
-> +lookup_cipher(const char *cipher_string)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(dm_inlinecrypt_ciphers); i++) {
-> +		if (strcmp(cipher_string, dm_inlinecrypt_ciphers[i].name) == 0)
-> +			return &dm_inlinecrypt_ciphers[i];
-> +	}
-> +	return NULL;
-> +}
-> +
-> +static void inlinecrypt_dtr(struct dm_target *ti)
-> +{
-> +	struct inlinecrypt_ctx *ctx = ti->private;
-> +
-> +	if (ctx->dev) {
-> +		if (ctx->key.size)
-> +			blk_crypto_evict_key(ctx->dev->bdev, &ctx->key);
-> +		dm_put_device(ti, ctx->dev);
-> +	}
-> +	kfree_sensitive(ctx->cipher_string);
-> +	kfree_sensitive(ctx);
-> +}
-> +
-> +static bool contains_whitespace(const char *str)
-> +{
-> +	while (*str)
-> +		if (isspace(*str++))
-> +			return true;
-> +	return false;
-> +}
-> +
-> +static int set_key_user(struct key *key, char *bin_key,
-> +			const unsigned int bin_key_size)
-> +{
-> +	const struct user_key_payload *ukp;
-> +
-> +	ukp = user_key_payload_locked(key);
-> +	if (!ukp)
-> +		return -EKEYREVOKED;
-> +
-> +	if (bin_key_size != ukp->datalen)
-> +		return -EINVAL;
-> +
-> +	memcpy(bin_key, ukp->data, bin_key_size);
-> +
-> +	return 0;
-> +}
-> +
-> +static int inlinecrypt_get_keyring_key(const char *key_string, u8 *bin_key,
-> +					const unsigned int bin_key_size)
-> +{
-> +	char *key_desc;
-> +	int ret;
-> +	struct key_type *type;
-> +	struct key *key;
 
-There's nothing forcing CONFIG_KEYS to be set when CONFIG_DM_INLINECRYPT
-is, and without it, struct key won't be defined and this won't compile.
+Daan,
 
-> +	int (*set_key)(struct key *key, char *bin_key,
-> +				   const unsigned int bin_key_size);
-> +
-> +	/*
-> +	 * Reject key_string with whitespace. dm core currently lacks code for
-> +	 * proper whitespace escaping in arguments on DM_TABLE_STATUS path.
-> +	 */
-> +	if (contains_whitespace(key_string)) {
-> +		DMERR("whitespace chars not allowed in key string");
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* look for next ':' separating key_type from key_description */
-> +	key_desc = strchr(key_string, ':');
-> +	if (!key_desc || key_desc == key_string || !strlen(key_desc + 1))
-> +		return -EINVAL;
-> +
-> +	if (!strncmp(key_string, "logon:", key_desc - key_string + 1)) {
-> +		type = &key_type_logon;
-> +		set_key = set_key_user;
-> +	} else {
-> +		return -EINVAL;
-> +	}
-> +
-> +	key = request_key(type, key_desc + 1, NULL);
-> +	if (IS_ERR(key))
-> +		return PTR_ERR(key);
-> +
-> +	down_read(&key->sem);
-> +
-> +	ret = set_key(key, (char *)bin_key, bin_key_size);
-> +	if (ret < 0) {
+> Fix this by factoring the GET CONFIGURATION probing out of
+> cdrom_open_write() into a new exported helper,
+> cdrom_probe_write_features(), and having sr call it from sr_probe()
+> right after get_capabilities() has populated the MODE SENSE bits.
+> register_cdrom() then calls set_disk_ro() based on the full
+> write-capability mask (CDC_DVD_RAM | CDC_MRW_W | CDC_RAM | CDC_CD_RW)
+> so the block layer reflects the drive's actual write support.
 
-This does the same commands regardless of whether it takes this branch.
+LGTM.
 
-> +		up_read(&key->sem);
-> +		key_put(key);
-> +		return ret;
-> +	}
-> +
-> +	up_read(&key->sem);
-> +	key_put(key);
-> +
-> +	return ret;
-> +}
-> +
-> +static int inlinecrypt_get_key(const char *key_string,
-> +				u8 key[BLK_CRYPTO_MAX_ANY_KEY_SIZE],
-> +				const unsigned int key_size)
-> +{
-> +	int ret = 0;
-> +
-> +	/* ':' means the key is in kernel keyring, short-circuit normal key processing */
-> +	if (key_string[0] == ':') {
-> +		if (key_size > BLK_CRYPTO_MAX_ANY_KEY_SIZE) {
-> +			DMERR("Invalid keysize");
-> +			return -EINVAL;
-> +		}
-> +		/* key string should be :<logon|user>:<key_desc> */
-> +		ret = inlinecrypt_get_keyring_key(key_string + 1, key, key_size);
-> +		goto out;
-> +	}
-> +
-> +	if (key_size > 2 * BLK_CRYPTO_MAX_ANY_KEY_SIZE
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-get_key_size() returns the size of the binary key in this case, so
-shouldn't this check for "key_size > BLK_CRYPTO_MAX_ANY_KEY_SIZE", and
-it seems like the check if the key_size is odd would make more sense in
-get_key_size().
-
-> +		|| key_size  % 2
-> +		|| !key_size) {
-> +		DMERR("Invalid keysize");
-> +		return -EINVAL;
-> +	}
-> +	if (hex2bin(key, key_string, key_size) != 0)
-> +		ret = -EINVAL;
-> +
-> +out:
-> +	return ret;
-> +}
-> +
-> +static int get_key_size(char **key_string)
-> +{
-> +	char *colon, dummy;
-> +	int ret;
-> +
-> +	if (*key_string[0] != ':')
-> +		return strlen(*key_string) >> 1;
-> +
-> +	/* look for next ':' in key string */
-> +	colon = strpbrk(*key_string + 1, ":");
-> +	if (!colon)
-> +		return -EINVAL;
-> +
-> +	if (sscanf(*key_string + 1, "%u%c", &ret, &dummy) != 2 || dummy != ':')
-> +		return -EINVAL;
-> +
-> +	/* remaining key string should be :<logon|user>:<key_desc> */
-> +	*key_string = colon;
-> +
-> +	return ret;
-> +}
-> +
-> +static int inlinecrypt_ctr_optional(struct dm_target *ti,
-> +				    unsigned int argc, char **argv)
-> +{
-> +	struct inlinecrypt_ctx *ctx = ti->private;
-> +	struct dm_arg_set as;
-> +	static const struct dm_arg _args[] = {
-> +		{0, 3, "Invalid number of feature args"},
-> +	};
-> +	unsigned int opt_params;
-> +	const char *opt_string;
-> +	bool iv_large_sectors = false;
-> +	char dummy;
-> +	int err;
-> +
-> +	as.argc = argc;
-> +	as.argv = argv;
-> +
-> +	err = dm_read_arg_group(_args, &as, &opt_params, &ti->error);
-> +	if (err)
-> +		return err;
-> +
-> +	while (opt_params--) {
-> +		opt_string = dm_shift_arg(&as);
-> +		if (!opt_string) {
-> +			ti->error = "Not enough feature arguments";
-> +			return -EINVAL;
-> +		}
-> +		if (!strcmp(opt_string, "allow_discards")) {
-> +			ti->num_discard_bios = 1;
-> +		} else if (sscanf(opt_string, "sector_size:%u%c",
-> +				  &ctx->sector_size, &dummy) == 1) {
-> +			if (ctx->sector_size < SECTOR_SIZE ||
-> +			    ctx->sector_size > 4096 ||
-> +			    !is_power_of_2(ctx->sector_size)) {
-> +				ti->error = "Invalid sector_size";
-> +				return -EINVAL;
-> +			}
-> +		} else if (!strcmp(opt_string, "iv_large_sectors")) {
-> +			iv_large_sectors = true;
-> +		} else {
-> +			ti->error = "Invalid feature arguments";
-> +			return -EINVAL;
-> +		}
-> +	}
-> +
-> +	/* dm-inlinecrypt doesn't implement iv_large_sectors=false. */
-> +	if (ctx->sector_size != SECTOR_SIZE && !iv_large_sectors) {
-> +		ti->error = "iv_large_sectors must be specified";
-
-Since setting sector_size forces setting iv_large_sectors, does it
-really need to be a separate parameter? Can't it just be implied by
-setting a non-512 sector_size. Is this here to futureproof the table
-line?
-
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Construct an inlinecrypt mapping:
-> + * <cipher> [<key>|:<key_size>:<logon>:<key_description>] <iv_offset> <dev_path> <start>
-> + *
-> + * This syntax matches dm-crypt's, but the set of supported functionality has
-> + * been stripped down.
-> + */
-> +static int inlinecrypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
-> +{
-> +	struct inlinecrypt_ctx *ctx;
-> +	const struct dm_inlinecrypt_cipher *cipher;
-> +	u8 raw_key[BLK_CRYPTO_MAX_ANY_KEY_SIZE];
-> +	unsigned int dun_bytes;
-> +	unsigned long long tmpll;
-> +	char dummy;
-> +	int err;
-> +
-> +	if (argc < 5) {
-> +		ti->error = "Not enough arguments";
-> +		return -EINVAL;
-> +	}
-> +
-> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-> +	if (!ctx) {
-> +		ti->error = "Out of memory";
-> +		return -ENOMEM;
-> +	}
-> +	ti->private = ctx;
-> +
-> +	/* <cipher> */
-> +	ctx->cipher_string = kstrdup(argv[0], GFP_KERNEL);
-> +	if (!ctx->cipher_string) {
-> +		ti->error = "Out of memory";
-> +		err = -ENOMEM;
-> +		goto bad;
-> +	}
-> +	cipher = lookup_cipher(ctx->cipher_string);
-> +	if (!cipher) {
-> +		ti->error = "Unsupported cipher";
-> +		err = -EINVAL;
-> +		goto bad;
-> +	}
-> +
-> +	/* <key> */
-> +	ctx->key_size = get_key_size(&argv[1]);
-> +	if (ctx->key_size < 0) {
-> +		ti->error = "Cannot parse key size";
-> +		return -EINVAL;
-> +	}
-> +	err = inlinecrypt_get_key(argv[1], raw_key, ctx->key_size);
-> +	if (err) {
-> +		ti->error = "Malformed key string";
-> +		goto bad;
-> +	}
-> +
-> +	/* <iv_offset> */
-> +	if (sscanf(argv[2], "%llu%c", &ctx->iv_offset, &dummy) != 1) {
-> +		ti->error = "Invalid iv_offset sector";
-> +		err = -EINVAL;
-> +		goto bad;
-> +	}
-> +
-> +	/* <dev_path> */
-> +	err = dm_get_device(ti, argv[3], dm_table_get_mode(ti->table),
-> +			    &ctx->dev);
-> +	if (err) {
-> +		ti->error = "Device lookup failed";
-> +		goto bad;
-> +	}
-> +
-> +	/* <start> */
-> +	if (sscanf(argv[4], "%llu%c", &tmpll, &dummy) != 1 ||
-> +	    tmpll != (sector_t)tmpll) {
-> +		ti->error = "Invalid start sector";
-> +		err = -EINVAL;
-> +		goto bad;
-> +	}
-> +	ctx->start = tmpll;
-> +
-> +	/* optional arguments */
-> +	ctx->sector_size = SECTOR_SIZE;
-> +	if (argc > 5) {
-> +		err = inlinecrypt_ctr_optional(ti, argc - 5, &argv[5]);
-> +		if (err)
-> +			goto bad;
-> +	}
-> +	ctx->sector_bits = ilog2(ctx->sector_size);
-> +	if (ti->len & ((ctx->sector_size >> SECTOR_SHIFT) - 1)) {
-> +		ti->error = "Device size is not a multiple of sector_size";
-> +		err = -EINVAL;
-> +		goto bad;
-> +	}
-> +
-> +	ctx->max_dun = (ctx->iv_offset + ti->len - 1) >>
-> +		       (ctx->sector_bits - SECTOR_SHIFT);
-> +	dun_bytes = DIV_ROUND_UP(fls64(ctx->max_dun), 8);
-> +
-> +	err = blk_crypto_init_key(&ctx->key, raw_key, ctx->key_size,
-> +				  BLK_CRYPTO_KEY_TYPE_RAW,
-> +				  cipher->mode_num, dun_bytes,
-> +				  ctx->sector_size);
-> +	if (err) {
-> +		ti->error = "Error initializing blk-crypto key";
-> +		goto bad;
-> +	}
-> +
-> +	err = blk_crypto_start_using_key(ctx->dev->bdev, &ctx->key);
-> +	if (err) {
-> +		ti->error = "Error starting to use blk-crypto";
-> +		goto bad;
-> +	}
-> +
-> +	ti->num_flush_bios = 1;
-> +
-> +	err = 0;
-> +	goto out;
-> +
-> +bad:
-> +	inlinecrypt_dtr(ti);
-> +out:
-> +	memzero_explicit(raw_key, sizeof(raw_key));
-> +	return err;
-> +}
-> +
-> +static int inlinecrypt_map(struct dm_target *ti, struct bio *bio)
-> +{
-> +	const struct inlinecrypt_ctx *ctx = ti->private;
-> +	sector_t sector_in_target;
-> +	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = {};
-> +
-> +	bio_set_dev(bio, ctx->dev->bdev);
-> +
-> +	/*
-> +	 * If the bio is a device-level request which doesn't target a specific
-> +	 * sector, there's nothing more to do.
-> +	 */
-> +	if (bio_sectors(bio) == 0)
-> +		return DM_MAPIO_REMAPPED;
-> +
-> +	/*
-> +	 * The bio should never have an encryption context already, since
-> +	 * dm-inlinecrypt doesn't pass through any inline encryption
-> +	 * capabilities to the layer above it.
-> +	 */
-> +	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
-> +		return DM_MAPIO_KILL;
-> +
-> +	/* Map the bio's sector to the underlying device. (512-byte sectors) */
-> +	sector_in_target = dm_target_offset(ti, bio->bi_iter.bi_sector);
-> +	bio->bi_iter.bi_sector = ctx->start + sector_in_target;
-> +	/*
-> +	 * If the bio doesn't have any data (e.g. if it's a DISCARD request),
-> +	 * there's nothing more to do.
-> +	 */
-> +	if (!bio_has_data(bio))
-> +		return DM_MAPIO_REMAPPED;
-> +
-> +	/* Calculate the DUN and enforce data-unit (crypto sector) alignment. */
-> +	dun[0] = ctx->iv_offset + sector_in_target; /* 512-byte sectors */
-> +	if (dun[0] & ((ctx->sector_size >> SECTOR_SHIFT) - 1))
-> +		return DM_MAPIO_KILL;
-
-If ctx->iv_offset is not a multiple of ctx->sector_size, this will
-always fail. ctx->iv_offset should probably get validated in
-inlinecrypt_ctr()
-
--Ben
-
-> +	dun[0] >>= ctx->sector_bits - SECTOR_SHIFT; /* crypto sectors */
-> +
-> +	/*
-> +	 * This check isn't necessary as we should have calculated max_dun
-> +	 * correctly, but be safe.
-> +	 */
-> +	if (WARN_ON_ONCE(dun[0] > ctx->max_dun))
-> +		return DM_MAPIO_KILL;
-> +
-> +	bio_crypt_set_ctx(bio, &ctx->key, dun, GFP_NOIO);
-> +
-> +	/*
-> +	 * Since we've added an encryption context to the bio and
-> +	 * blk-crypto-fallback may be needed to process it, it's necessary to
-> +	 * use the fallback-aware bio submission code rather than
-> +	 * unconditionally returning DM_MAPIO_REMAPPED.
-> +	 *
-> +	 * To get the correct accounting for a dm target in the case where
-> +	 * __blk_crypto_submit_bio() doesn't take ownership of the bio (returns
-> +	 * true), call __blk_crypto_submit_bio() directly and return
-> +	 * DM_MAPIO_REMAPPED in that case, rather than relying on
-> +	 * blk_crypto_submit_bio() which calls submit_bio() in that case.
-> +	 */
-> +	if (__blk_crypto_submit_bio(bio))
-> +		return DM_MAPIO_REMAPPED;
-> +	return DM_MAPIO_SUBMITTED;
-> +}
-> +
-> +static void inlinecrypt_status(struct dm_target *ti, status_type_t type,
-> +			       unsigned int status_flags, char *result,
-> +			       unsigned int maxlen)
-> +{
-> +	const struct inlinecrypt_ctx *ctx = ti->private;
-> +	unsigned int sz = 0;
-> +	int num_feature_args = 0;
-> +
-> +	switch (type) {
-> +	case STATUSTYPE_INFO:
-> +	case STATUSTYPE_IMA:
-> +		result[0] = '\0';
-> +		break;
-> +
-> +	case STATUSTYPE_TABLE:
-> +		/*
-> +		 * Warning: like dm-crypt, dm-inlinecrypt includes the key in
-> +		 * the returned table.  Userspace is responsible for redacting
-> +		 * the key when needed.
-> +		 */
-> +		DMEMIT("%s %*phN %llu %s %llu", ctx->cipher_string,
-> +		       ctx->key.size, ctx->key.bytes, ctx->iv_offset,
-> +		       ctx->dev->name, ctx->start);
-> +		num_feature_args += !!ti->num_discard_bios;
-> +		if (ctx->sector_size != SECTOR_SIZE)
-> +			num_feature_args += 2;
-> +		if (num_feature_args != 0) {
-> +			DMEMIT(" %d", num_feature_args);
-> +			if (ti->num_discard_bios)
-> +				DMEMIT(" allow_discards");
-> +			if (ctx->sector_size != SECTOR_SIZE) {
-> +				DMEMIT(" sector_size:%u", ctx->sector_size);
-> +				DMEMIT(" iv_large_sectors");
-> +			}
-> +		}
-> +		break;
-> +	}
-> +}
-> +
-> +static int inlinecrypt_prepare_ioctl(struct dm_target *ti,
-> +				     struct block_device **bdev, unsigned int cmd,
-> +				     unsigned long arg, bool *forward)
-> +{
-> +	const struct inlinecrypt_ctx *ctx = ti->private;
-> +	const struct dm_dev *dev = ctx->dev;
-> +
-> +	*bdev = dev->bdev;
-> +
-> +	/* Only pass ioctls through if the device sizes match exactly. */
-> +	return ctx->start != 0 || ti->len != bdev_nr_sectors(dev->bdev);
-> +}
-> +
-> +static int inlinecrypt_iterate_devices(struct dm_target *ti,
-> +				       iterate_devices_callout_fn fn,
-> +				       void *data)
-> +{
-> +	const struct inlinecrypt_ctx *ctx = ti->private;
-> +
-> +	return fn(ti, ctx->dev, ctx->start, ti->len, data);
-> +}
-> +
-> +#ifdef CONFIG_BLK_DEV_ZONED
-> +static int inlinecrypt_report_zones(struct dm_target *ti,
-> +				    struct dm_report_zones_args *args,
-> +				    unsigned int nr_zones)
-> +{
-> +	const struct inlinecrypt_ctx *ctx = ti->private;
-> +
-> +	return dm_report_zones(ctx->dev->bdev, ctx->start,
-> +			ctx->start + dm_target_offset(ti, args->next_sector),
-> +			args, nr_zones);
-> +}
-> +#else
-> +#define inlinecrypt_report_zones NULL
-> +#endif
-> +
-> +static void inlinecrypt_io_hints(struct dm_target *ti,
-> +				 struct queue_limits *limits)
-> +{
-> +	const struct inlinecrypt_ctx *ctx = ti->private;
-> +	const unsigned int sector_size = ctx->sector_size;
-> +
-> +	limits->logical_block_size =
-> +		max_t(unsigned int, limits->logical_block_size, sector_size);
-> +	limits->physical_block_size =
-> +		max_t(unsigned int, limits->physical_block_size, sector_size);
-> +	limits->io_min = max_t(unsigned int, limits->io_min, sector_size);
-> +	limits->dma_alignment = limits->logical_block_size - 1;
-> +}
-> +
-> +static struct target_type inlinecrypt_target = {
-> +	.name			= "inlinecrypt",
-> +	.version		= {1, 0, 0},
-> +	/*
-> +	 * Do not set DM_TARGET_PASSES_CRYPTO, since dm-inlinecrypt consumes the
-> +	 * crypto capability itself.
-> +	 */
-> +	.features		= DM_TARGET_ZONED_HM,
-> +	.module			= THIS_MODULE,
-> +	.ctr			= inlinecrypt_ctr,
-> +	.dtr			= inlinecrypt_dtr,
-> +	.map			= inlinecrypt_map,
-> +	.status			= inlinecrypt_status,
-> +	.prepare_ioctl		= inlinecrypt_prepare_ioctl,
-> +	.iterate_devices	= inlinecrypt_iterate_devices,
-> +	.report_zones		= inlinecrypt_report_zones,
-> +	.io_hints		= inlinecrypt_io_hints,
-> +};
-> +
-> +module_dm(inlinecrypt);
-> +
-> +MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
-> +MODULE_AUTHOR("Linlin Zhang <linlin.zhang@oss.qualcomm.com>");
-> +MODULE_DESCRIPTION(DM_NAME " target for inline encryption");
-> +MODULE_LICENSE("GPL");
-> -- 
-> 2.34.1
-> 
-
+-- 
+Martin K. Petersen
