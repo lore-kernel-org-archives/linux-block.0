@@ -1,91 +1,117 @@
-Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596E23D34B7;
-	Mon, 27 Apr 2026 16:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F394F31E84F
+	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 18:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777308073; cv=none; b=T6LHwpkbutBypCu2D8Ndryaot2mVDfRJiV8/f5MKQswfd/qyJJVD8Qzkxm3QKKPJzMCy9sxjncKWihbE3wznNer2472GWI+E55oMi0wAtHe31FlblG3Nirx8d2Qu4llO3hi2D/4CHqDGOdb2qGzTBIdm5K33xrgYccxpe/hU/yQ=
+	t=1777313849; cv=none; b=tocTY8MqlIrU7oevKErJTltihquxkJ7AqK/AupgLYL3HkO2oo3DLvi2gp9X3s+OKHCV2nU8uor/2D8xzXHStCkuvTAuleDklqLHibJ7Nnjw+aK8s+XmLjszETLV+3CG3i7INOYhhCgt4T+EU1F1ZOT9xZKz1ITPPOFcBWCXe3Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777308073; c=relaxed/simple;
-	bh=0wPH/Fl3RB62b5MLKmyh8mpdOjOulQAC7ohtud3SMP8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RJjaQJbwdwEYl9pRWgK71TYp8sH8z1XoQxaMewGF+KaJwhtCZW+KuSEiZVeFNzaQU/dMd7fnjJOip8eEqUbGqcOx0+GlSPmFDAGTXyMN1tgJHpKUu/GzxS6yexRWk7fuyBZICh1TutbygG+74WogWGMqnQfecqBaWHM905qkjpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf11.hostedemail.com (lb01a-stub [10.200.18.249])
-	by unirelay05.hostedemail.com (Postfix) with ESMTP id 3ADDE4052A;
-	Mon, 27 Apr 2026 16:38:40 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf11.hostedemail.com (Postfix) with ESMTPA id 7FE6E2002F;
-	Mon, 27 Apr 2026 16:38:36 +0000 (UTC)
-Date: Mon, 27 Apr 2026 12:38:48 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Aaron Tomlin <atomlin@atomlin.com>
-Cc: axboe@kernel.dk, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- bvanassche@acm.org, johannes.thumshirn@wdc.com, kch@nvidia.com,
- dlemoal@kernel.org, ritesh.list@gmail.com, loberman@redhat.com,
- neelx@suse.com, sean@ashe.io, mproche@gmail.com, chjohnst@gmail.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 1/2] blk-mq: add tracepoint block_rq_tag_wait
-Message-ID: <20260427123848.1e6b63d2@gandalf.local.home>
-In-Reply-To: <20260427020142.358912-2-atomlin@atomlin.com>
-References: <20260427020142.358912-1-atomlin@atomlin.com>
-	<20260427020142.358912-2-atomlin@atomlin.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1777313849; c=relaxed/simple;
+	bh=FsvLa0WQ+ppWSL2ZBwu07rxJb0VFpJsdirmzSrdOFVw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iZQExy9UBpdNIxuKr8vOzpfon+MmVkG1zWKRyZacL3UTZwj32iMU0QHIIJJOrutSMO86QOvg8d3EcMZEoNCvIxeTqSio6jrOwQlkiTnHK3n19w0wVGnK02VCCDNFTP8okLKar82xm8CxPUaN5EARxAE8bAuc+40WpUNPthL6nVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkHTm9+Y; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkHTm9+Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 948CFC2BCF4
+	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 18:17:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777313848;
+	bh=FsvLa0WQ+ppWSL2ZBwu07rxJb0VFpJsdirmzSrdOFVw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=SkHTm9+YjDbbZVDp5ZuhGykXVSnv8mnZhzMp4lRHTlUB6GdE1cRztG6Ni7bdn41Eu
+	 f2uVqfgSLTGpvGv83QE4MIao3JMkjfXXVDTxy/6Ort+DBKR721YH12zmBOlF04AnM9
+	 UeivVBVFnr7CKqktHdfi9hHlsbHqswZHA8fRmVz1nySVEW02sNBSdCGDiRuPKETIxU
+	 Zihezih6dhde/++xQ1ichw+SBu7uXJLxCTBys3OWD88PBx+4f2Ssaq6TU7zS2wnarm
+	 n5guPMFIOaAtlLpyZdDXF5+rhmBJzIZS5MvmGifiY5x/qmPP+ISs9SC6oKAVEYgU/U
+	 v3PNcft2kMrUw==
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b9382e59c0eso676215666b.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 11:17:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+SsF0XAaQIrzZcfNumk036KrBwQG189borqKFyNe7YBGskzdeK+l4RUFhBwK+0P2Ractc/dyqnTKgKSA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHkrHCnoACkxIKsz6D8agmCyjf2Q+t/+DxjoCN5/r5nRM9Qc2y
+	0YwVhS+phECRRKIH9S/RUfozp1FdUexjnVsJkUBe1ROLNWwawM3Ng1GV/LaKH65DXePOsMR5DN0
+	yrA8rsc5/81b5DdJOJ8mqI4i3TgUJ9eA=
+X-Received: by 2002:a17:907:6c10:b0:bb2:71a9:37d7 with SMTP id
+ a640c23a62f3a-bb7fc6b329amr331966b.39.1777313847341; Mon, 27 Apr 2026
+ 11:17:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: c8q7uzk37jdeojro1hdsgzgz8514oasf
-X-Rspamd-Server: rspamout04
-X-Rspamd-Queue-Id: 7FE6E2002F
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX1+ezFbHvfao1EGoVLpXuzorTHt2Yl/LyF8=
-X-HE-Tag: 1777307916-952419
-X-HE-Meta: U2FsdGVkX19D95yn3snxCao9QXEhOmUtHRvqZ56CHwoRM3MWL4Zb/dNq77gR4SpiCUAIs+8464BCPdpZmBSq96Y8YAxV59YzomGqBOSkhBIi2FYim19s8WP0OBzD2YrG8xqIqtipiZLT/3sX/mXe6U+bzl8UNo2zytLtFL2hXOUNlff3NhqfU4U2U17MrVGyJxC970UNHxwwYGsaLj9/Rn1MjWA1bWJG0P2Z+v4FuVHX8NZIjRhpaJrKkP0o3T2fBKHPj3SmOrCp3LsCNeAXVQ48mfv+hKQ7KmrzrpkPl/BYp8sIgsYM8+r9J93KKvpd6oY7EmgqVVr1oC6Zyso4XCx1cZmW4kSBJGZbH9xqSU4W2LJ76vgw/xzaDB/o9Rlf
+References: <20260421121616.3298845-1-haowenchao@xiaomi.com> <CAOptpSPs-1UrEa8AHg19e590=SiV6bpnex7gCbif8=aY7BtpuA@mail.gmail.com>
+In-Reply-To: <CAOptpSPs-1UrEa8AHg19e590=SiV6bpnex7gCbif8=aY7BtpuA@mail.gmail.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Mon, 27 Apr 2026 11:17:13 -0700
+X-Gmail-Original-Message-ID: <CAO9r8zOjugCwWqHP3zxXPmjp8TwpoROCjCqTZ_uxOBQwVqCWqA@mail.gmail.com>
+X-Gm-Features: AVHnY4LkdWo7aosvwMF_0ub38leF0QqpBslIr0st4sctLN5j8Y2EyELEuoMI2nU
+Message-ID: <CAO9r8zOjugCwWqHP3zxXPmjp8TwpoROCjCqTZ_uxOBQwVqCWqA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/4] mm/zsmalloc: reduce zs_free() latency on swap
+ release path
+To: Wenchao Hao <haowenchao22@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Chengming Zhou <chengming.zhou@linux.dev>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
+	Nhat Pham <nphamcs@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	Barry Song <baohua@kernel.org>, Xueyuan Chen <xueyuan.chen21@gmail.com>, 
+	Wenchao Hao <haowenchao@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 26 Apr 2026 22:01:41 -0400
-Aaron Tomlin <atomlin@atomlin.com> wrote:
+On Sat, Apr 25, 2026 at 9:13=E2=80=AFPM Wenchao Hao <haowenchao22@gmail.com=
+> wrote:
+>
+> On Tue, Apr 21, 2026 at 8:16=E2=80=AFPM Wenchao Hao <haowenchao22@gmail.c=
+om> wrote:
+> >
+> > Swap freeing can be expensive when unmapping a VMA containing
+> > many swap entries. This has been reported to significantly
+> > delay memory reclamation during Android's low-memory killing,
+> > especially when multiple processes are terminated to free
+> > memory, with slot_free() accounting for more than 80% of
+> > the total cost of freeing swap entries.
+> >
+> > Two earlier attempts by Lei and Zhiguo added a new thread in the mm cor=
+e
+> > to asynchronously collect and free swap entries [1][2], but the
+> > design itself is fairly complex.
+> >
+> Hi Nhat, Kairui, Barry, Xueyuan,
+>
+> Thanks for the review. I agree with the direction and have some ideas for
+> an alternative approach.
+>
+> My approach: first eliminate pool->lock from zs_free() itself, then defer
+> free to per-cpu buffers with a lockless handoff, and finally reduce
+> class->lock overhead during drain by exploiting natural class locality.
+> Achieving both per-cpu and per-class is difficult, so the class->lock
+> optimization is a compromise =E2=80=94 but one that works well in practic=
+e.
+>
+> 1. Encode class_idx in obj to eliminate pool->lock
+>
+> OBJ_INDEX_BITS is over-provisioned on 64-bit. For example on arm64
+> (chain_size=3D8): OBJ_INDEX_BITS=3D24 but only 10 bits are actually neede=
+d
+> for obj_idx, leaving 14 spare bits.
+> We can split OBJ_INDEX into class_idx + obj_idx:
+>
+>     obj: [PFN | class_idx (OBJ_CLASS_BITS) | obj_idx (OBJ_IDX_BITS)]
+>
+> OBJ_CLASS_BITS is computed dynamically as `ilog2(ZS_SIZE_CLASSES - 1) + 1=
+`
+> (8 bits for 4K pages, 9 for 64K).
+> Since class_idx is invariant across migration (only PFN changes), zs_free=
+()
+> can extract class_idx locklessly, then acquire class->lock and re-read ob=
+j for a
+> stable PFN. No pool->lock needed.
 
-> +TRACE_EVENT(block_rq_tag_wait,
-> +
-> +	TP_PROTO(struct request_queue *q, struct blk_mq_hw_ctx *hctx, bool is_sched_tag),
-> +
-> +	TP_ARGS(q, hctx, is_sched_tag),
-> +
-> +	TP_STRUCT__entry(
-> +		__field( dev_t,		dev			)
-> +		__field( u32,		hctx_id			)
-> +		__field( u32,		nr_tags			)
-> +		__field( bool,		is_sched_tag		)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->dev		= q->disk ? disk_devt(q->disk);
+How much of the benefit do we get with just these locking improvements
+without having to defer any of the freeing work?
 
-Hmm, does the above even compile?
-
--- Steve
-
-> +		__entry->hctx_id	= hctx->queue_num;
-> +		__entry->is_sched_tag	= is_sched_tag;
-> +
-> +		if (is_sched_tag)
-> +			__entry->nr_tags = hctx->sched_tags->nr_tags;
-> +		else
-> +			__entry->nr_tags = hctx->tags->nr_tags;
-> +	),
-> +
-> +	TP_printk("%d,%d hctx=%u starved on %s tags (depth=%u)",
-> +		  MAJOR(__entry->dev), MINOR(__entry->dev),
-> +		  __entry->hctx_id,
-> +		  __entry->is_sched_tag ? "scheduler" : "hardware",
-> +		  __entry->nr_tags)
-> +);
-> +
+As others have pointed out, I don't want to just defer expensive work
+without understanding why it's expensive and running into limitations
+about why it cannot be improved without deferring.
