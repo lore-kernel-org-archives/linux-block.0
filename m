@@ -1,135 +1,190 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1094D2737F8
-	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 04:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B9A2777FC
+	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 05:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777263015; cv=none; b=ngYAkw87Hr+JTB5ymRzxFVUwoNlJE0LVXrVy3958Depm9tXb2b9OEmZAvG4SMafxBHsq6nTY+MzRc2LmzqqQ7Whv6YOScJDAYMPnWkHzoHXy3zVUqdB91aP3QuFXVbhr5u0D/1fNeHgS4lK+Qzlh/4Zb8z81nfNnUVq0uE8fRtQ=
+	t=1777267422; cv=none; b=LGOLCNTa3aEu6zK07n2iU4syGJEhg0XT8LxFtP5vfgxcgRvisxGnBOKVRRmwugN4Rwq/auBLkxjFBmbIezXYzhONsVSBPdsn4tN5xGX0ZSJ/QQjd8F3p+2d1W2hVPNC3mk7FWSmOQJzt2LwTcheRp2eH0xNU39ZDPiWZQh46v0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777263015; c=relaxed/simple;
-	bh=hD1dIg0Pn8kTzh7W/SVqNi4Q4KZaffb3XL6M8RlhPHs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lLHzq0/bVBije69BrpdFFzFUxoD385gfY9DPXPeAXirhCLcjO9A9m3OHvGHw6lHjU0un9+3JweaNhVKNRU6NpwJbXhstYnsZGGaEfRUMCKvWWCjXtHFLqKtk5hZdSuFzBC6cCq/WVLIL/hGF1M22PsN6p/eT2crSfI2JSx4SDL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79a7109f568so115422927b3.1
-        for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 21:10:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777263013; x=1777867813;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hl0WAnQ535tE4CWpSeGGP4i6YyUr6DuMKmnrzyCP4e0=;
-        b=IkyrA12oOeg9+BCOmzbVnfXx8btYaPjqAt/24V4tZv+gnv87GXbWxDkDU+abFlzyx/
-         Pcfceq5mXWH8dt3Bc5+Whx16J8aIV2bFTh7jWCKgAyV4t+LBbQVzz+RpdekUMT6Q9WUd
-         gfHUzjbwsGouAsCdlnIwzY9LXIgB96vXcOWV2hDnbDOhoS27hOj/Bjz+bQ0oPyuDqVU5
-         uTnNMsfKRF7foeAMvfo+WSkr0rVLuOAmmmeNBHSsMWTTx9+Aw2IsurVAECTDHjWHpwEX
-         R2JOGGBjGSMJTaZh5c8mQcqPEb2zKMYDNzHqqqsDSDST6X5b+IvtR94zVtL6UF51nPIG
-         PwoQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9mwpRgnLLz4ZCs1SFdhcQX+AcWM8rct69aLy9QUXSW9DeiB2Dw2S3z5hDFWrKQvI+qDYSv9GCOXnXUfQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFzTELemJyHKAZdeDOvwEB+GYbYDmvP8fyP/lmKrOSCdsDTCGu
-	4DUIz6gGhj2E6q0z0mhspj5QJJPcU75wWIe8fm+CIvHhScIxo0XhXKLa
-X-Gm-Gg: AeBDiev5Zycvajwnw0TYtRtv63UOl1qE2nqAzcRuZdGNnZyF+zeyClDhb5t1UD5eLSa
-	7c2UTFViSgoLytWKuE/OCYp9vaLYfT+bUyKUoHqkDhs0kq5VJht3O9AX01O1bu9lQTtOZAQ64WC
-	VJuZvvWMRA7a5yWF3J9aO8jnbTHTbKmpAOdN9swJ0GMu9Upo5+oqje2Q1vCX/9Ket5NAK6hHvVQ
-	mrYvgcD7aSjye47B0X1ethmor7WPp+HjN9T/HmnkOYfLPPdLOjF2dtHAMn5Ru8xZKbnMkEYY79L
-	WCE9rwl90NhY+iktBRKez4x2APRBGDnGBNy6QRoMWqFHny8I23kEKpNZzvYrK78JF6toqiITydU
-	YG/ZKbyPMNNfBofsF0D4YRwGCIG8ZNFN86TQfBvpEo1byWW71LGqrNFila6wkDWq4luUC4FRzWC
-	VVH+ngqcXw6T+1Ew63SxPu
-X-Received: by 2002:a05:690c:6e86:b0:7a2:f14d:5a1 with SMTP id 00721157ae682-7b9ed06a19emr407417907b3.49.1777263012862;
-        Sun, 26 Apr 2026 21:10:12 -0700 (PDT)
-Received: from tofu.. ([128.210.0.165])
-        by smtp.googlemail.com with ESMTPSA id 00721157ae682-7b9ee8e2bb7sm120822077b3.22.2026.04.26.21.10.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Apr 2026 21:10:12 -0700 (PDT)
-From: Sungwoo Kim <iam@sung-woo.kim>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>
-Cc: Sungwoo Kim <iam@sung-woo.kim>,
-	Chao Shi <cshi008@fiu.edu>,
-	Weidong Zhu <weizhu@fiu.edu>,
-	Dave Tian <daveti@purdue.edu>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4] block: bio-integrity: Fix null-ptr-deref in bio_integrity_map_user()
-Date: Mon, 27 Apr 2026 00:09:26 -0400
-Message-ID: <20260427040926.987166-3-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1777267422; c=relaxed/simple;
+	bh=TaDJDtde7lmdovAVn4/cN24TnFXlh156C1G+16pV8a0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lWAJMG0vMtq1wWcO/kj3nlzy2dd02TV+aCr4GAtX30DlvNhx54pVixJMSLZSijqoOiqFmYFrUw29tLx7gIEpopIN2JwxLvCrTH5kiXaytyhuJmH6/H7ss5R/tRwiRjFP/3Q4azbK0uvcGDgvXMjcwWnX+ZiSrz2p4KW2L+1D4fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hCbAynu9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hCbAynu9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777267419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RFj+kFX2/CO3wrhbNQi5YAiqCNR9Dlvsv2leYhL2jPo=;
+	b=hCbAynu9julQnhlIJwDXZxju4EWhF3d6m8gv5sPEcn86nE8e0KcWya+qvCNbkIoth7cgcd
+	dF/1v6475Kl6HCeBB5JT0ENatU93nfkgnRoaUrKnTu8TqDMqzmCV4bMRLqnkWH4rIt3gKo
+	eczvmykVde/jP5zj3nkoCN7bya904hs=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-640-sPR_0_h4MGO6rGfMvxZ0Yw-1; Mon,
+ 27 Apr 2026 01:23:36 -0400
+X-MC-Unique: sPR_0_h4MGO6rGfMvxZ0Yw-1
+X-Mimecast-MFC-AGG-ID: sPR_0_h4MGO6rGfMvxZ0Yw_1777267414
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 834D21956089;
+	Mon, 27 Apr 2026 05:23:33 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 56D41180047F;
+	Mon, 27 Apr 2026 05:23:32 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63R5NVg32710994
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 27 Apr 2026 01:23:31 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63R5NRQ92710993;
+	Mon, 27 Apr 2026 01:23:27 -0400
+Date: Mon, 27 Apr 2026 01:23:27 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
+        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
+        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
+        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
+ device encryption
+Message-ID: <ae7yzw-5wz9cqZt8@redhat.com>
+References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
+ <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-pin_user_pages_fast() can partially succeed and return the number of
-pages that were actually pinned. However, the bio_integrity_map_user()
-does not handle this partial pinning. This leads to a general protection
-fault since bvec_from_pages() dereferences an unpinned page address,
-which is 0.
+On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add a new device-mapper target "dm-inlinecrypt" that is similar to
+> dm-crypt but uses the blk-crypto API instead of the regular crypto API.
+> This allows it to take advantage of inline encryption hardware such as
+> that commonly built into UFS host controllers.
+> 
+> The table syntax matches dm-crypt's, but for now only a stripped-down
+> set of parameters is supported.  For example, for now AES-256-XTS is the
+> only supported cipher.
+> 
+> dm-inlinecrypt is based on Android's dm-default-key with the
+> controversial passthrough support removed.  Note that due to the removal
+> of passthrough support, use of dm-inlinecrypt in combination with
+> fscrypt causes double encryption of file contents (similar to dm-crypt +
+> fscrypt), with the fscrypt layer not being able to use the inline
+> encryption hardware.  This makes dm-inlinecrypt unusable on systems such
+> as Android that use fscrypt and where a more optimized approach is
+> needed.  It is however suitable as a replacement for dm-crypt.
+> 
+> dm-inlinecrypt supports both keyring key and hex key, the former avoids
+> the key to be exposed in dm-table message. Similar to dm-default-key in
+> Android, it will fallabck to the software block crypto once the inline
+> crypto hardware cannot support the expected cipher.
+> 
+> Test:
+> dmsetup create inlinecrypt_logon --table "0 `blockdev --getsz $1` \
+> inlinecrypt aes-xts-plain64 :64:logon:fde:dminlinecrypt_test_key 0 $1 0"
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+> ---
+>  drivers/md/Kconfig          |  10 +
+>  drivers/md/Makefile         |   1 +
+>  drivers/md/dm-inlinecrypt.c | 559 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 570 insertions(+)
+>  create mode 100644 drivers/md/dm-inlinecrypt.c
+<snip> 
+> diff --git a/drivers/md/dm-inlinecrypt.c b/drivers/md/dm-inlinecrypt.c
+> new file mode 100644
+> index 000000000000..b6e98fdf8af1
+> --- /dev/null
+> +++ b/drivers/md/dm-inlinecrypt.c
+<snip>
+> +static int inlinecrypt_map(struct dm_target *ti, struct bio *bio)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	sector_t sector_in_target;
+> +	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = {};
+> +
+> +	bio_set_dev(bio, ctx->dev->bdev);
+> +
+> +	/*
+> +	 * If the bio is a device-level request which doesn't target a specific
+> +	 * sector, there's nothing more to do.
+> +	 */
+> +	if (bio_sectors(bio) == 0)
+> +		return DM_MAPIO_REMAPPED;
+> +
+> +	/*
+> +	 * The bio should never have an encryption context already, since
+> +	 * dm-inlinecrypt doesn't pass through any inline encryption
+> +	 * capabilities to the layer above it.
+> +	 */
+> +	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
+> +		return DM_MAPIO_KILL;
+> +
+> +	/* Map the bio's sector to the underlying device. (512-byte sectors) */
+> +	sector_in_target = dm_target_offset(ti, bio->bi_iter.bi_sector);
+> +	bio->bi_iter.bi_sector = ctx->start + sector_in_target;
+> +	/*
+> +	 * If the bio doesn't have any data (e.g. if it's a DISCARD request),
+> +	 * there's nothing more to do.
+> +	 */
+> +	if (!bio_has_data(bio))
+> +		return DM_MAPIO_REMAPPED;
+> +
+> +	/* Calculate the DUN and enforce data-unit (crypto sector) alignment. */
+> +	dun[0] = ctx->iv_offset + sector_in_target; /* 512-byte sectors */
+> +	if (dun[0] & ((ctx->sector_size >> SECTOR_SHIFT) - 1))
+> +		return DM_MAPIO_KILL;
+> +	dun[0] >>= ctx->sector_bits - SECTOR_SHIFT; /* crypto sectors */
+> +
+> +	/*
+> +	 * This check isn't necessary as we should have calculated max_dun
+> +	 * correctly, but be safe.
+> +	 */
+> +	if (WARN_ON_ONCE(dun[0] > ctx->max_dun))
+> +		return DM_MAPIO_KILL;
+> +
+> +	bio_crypt_set_ctx(bio, &ctx->key, dun, GFP_NOIO);
+> +
+> +	/*
+> +	 * Since we've added an encryption context to the bio and
+> +	 * blk-crypto-fallback may be needed to process it, it's necessary to
+> +	 * use the fallback-aware bio submission code rather than
+> +	 * unconditionally returning DM_MAPIO_REMAPPED.
+> +	 *
+> +	 * To get the correct accounting for a dm target in the case where
+> +	 * __blk_crypto_submit_bio() doesn't take ownership of the bio (returns
+> +	 * true), call __blk_crypto_submit_bio() directly and return
+> +	 * DM_MAPIO_REMAPPED in that case, rather than relying on
+> +	 * blk_crypto_submit_bio() which calls submit_bio() in that case.
+> +	 */
+> +	if (__blk_crypto_submit_bio(bio))
 
-To fix this, add a check to verify that all requested memory is pinned.
-If partial pinning occurs, unpin the memory and return -EFAULT.
+This will still double account for fallback writes (which call
+submit_bio() on the encrypted bios, and return DM_MAPIO_SUBMITTED here). 
 
-Reproducer in blktest: https://github.com/linux-blktests/blktests/pull/244
+-Ben
 
-Kernel Oops:
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 0 UID: 0 PID: 1061 Comm: nvme-passthroug Not tainted 7.0.0-11783-g90957f9314e8-dirty #16 PREEMPT(lazy)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
-RIP: 0010:bio_integrity_map_user.cold+0x1b0/0x9d6
-
-Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
-Acked-by: Chao Shi <cshi008@fiu.edu>
-Acked-by: Weidong Zhu <weizhu@fiu.edu>
-Acked-by: Dave Tian <daveti@purdue.edu>
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
----
-V3: https://lore.kernel.org/linux-block/20260420020327.1667156-3-iam@sung-woo.kim/
-
-V3->V4
-- Addressed a sashiko's comments [1], if it makes sense.
-- V3 wrongly assumed that iov_iter_extract_pages() always pins user
-  memory.
-- V3 insufficiently handled the return value range.
-
-[1] https://sashiko.dev/#/patchset/20260420020327.1667156-3-iam%40sung-woo.kim
-
- block/bio-integrity.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index e54c6e06e1cb..766cc2d1d51c 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -403,6 +403,23 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- 	if (unlikely(ret < 0))
- 		goto free_bvec;
- 
-+	/* Handle partial pinning. This can happen when pin_user_pages_fast()
-+	 * returns fewer pages than requested
-+	 */
-+	if (user_backed_iter(iter) && unlikely(ret != bytes)) {
-+		if (0 < ret) {
-+			int npinned = DIV_ROUND_UP(offset + ret, PAGE_SIZE);
-+			int i;
-+
-+			for (i = 0; i < npinned; i++)
-+				unpin_user_page(pages[i]);
-+		}
-+		if (pages != stack_pages)
-+				kvfree(pages);
-+		ret = -EFAULT;
-+		goto free_bvec;
-+	}
-+
- 	nr_bvecs = bvec_from_pages(bvec, pages, nr_vecs, bytes, offset,
- 				   &is_p2p);
- 	if (pages != stack_pages)
--- 
-2.47.3
+> +		return DM_MAPIO_REMAPPED;
+> +	return DM_MAPIO_SUBMITTED;
+> +}
 
