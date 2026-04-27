@@ -1,190 +1,141 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F75271456
-	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 15:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F532857C1;
+	Mon, 27 Apr 2026 15:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777303080; cv=none; b=D5O0V7bLK5/9/O4UcZVdH/H1RqB235vDvVt1KQlOlOl4RLJEmx530x6TZJoFrlbSKtfti0+Ik36f321+9IWNZWh6BsEkVH+Ayg+QILlzJjVTu8GVpwvsOquOehDRieF12ybFPnO2vvXiPTJVCuf2iOU+xznCuyhtTN9TTppCRCM=
+	t=1777303271; cv=none; b=egSvH8ZvIzwjTJ/xASPnK0D8yAgbaJVpsgkJx5F4EnfmOpH8OFWft6XdqcDNLbE09YmK0OCLBbOyZ4zr8WPsrLFywI4wkN9qee/YUOnmVancE10a6G83dqLLPx91d7gATQBnXZNyJmeNCeCCnzPqdO04dgBy9q3545beQaKHh34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777303080; c=relaxed/simple;
-	bh=6D+TEWaN3mkEwQ668PO7zeWRVu4IryQ+5ZG6F3nZ/nM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rBUauYK+XJu6VREwrAP03fXLxPWDVmPGBM6bTn4BlDBNAWagvWXnxYMviZX1NVAtN31Jp9QEKSnlJA8felKOHgMciww0ycl16pn/y6JolEfgEVr+7Pm9uSt3ytZCTBjVA7z2TLcO76Hnie8zYllUZ4HtE+cxVCwJ+2MutxCuYuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l+2gf1V+; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777303271; c=relaxed/simple;
+	bh=IM0L7Li42Io9EO72Qgi+hTcf6CviEJZMT8JzJOnRHac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uqUoy1fWUTpJpIGo71llRid4OSsKE8Wneu2jqFpytOg8CUn/QeZ5OkWH+7BO26R57zlOWovDC3VYY1v6YizbN2mv6pzQjQ/bZu+5R0YWESlsxXF9vEewBylD0mWWcCPw8k83tYg6NenYONBF4wTyu+2B8NrRCNS4V6Vdk74Uhtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=d2odqkFT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ddMw9PoH; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+2gf1V+"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8296dabef74so8585719b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 08:17:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777303078; x=1777907878; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0sCW99wKy9KpKJDh2ElxXQQd9/5nThGNSVsEJ7943P4=;
-        b=l+2gf1V+gHkZnZGfxWmITiUk/XyGuC8kU176gmPda3Yf4YU/6eD1UTyXWZIHHVZkmJ
-         S3aNtztkbuppqmJdc1R2YKPcjYVBjnb30vXWTUdsGIJuxjs4LoXl5T6spOl64X4/1Sjl
-         tTYKLfeZCv4OhywcghpSfsRgQ3jnQfPofW9QGs8bPmxIbGITHplU7le1OmRcn/1dnKU/
-         1H0YO5Ik5VjiSyH0Qvl+/gvcjYPjWi4pjeXr3cnU393UKwJP+f+3EXyOu5CdcT1EgDMX
-         LwtErO/Jr3kLHhPiBbr4euDhbSV8idDr/bwUZMhUhZWybSTBto4s1wIp/tqz5BA7fV6b
-         MXrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777303078; x=1777907878;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0sCW99wKy9KpKJDh2ElxXQQd9/5nThGNSVsEJ7943P4=;
-        b=N1qoKQCU+BtS75UxivjseAusmW2tyb1Ar2OQzgl7jSjRbWhU8dx+07MzDWNYaMsC0a
-         omSzTiWAsOKXJL07vUcLpVlB7eGHMzMMEXGx9buQhfReoBZQoA3qWYWlhC+y60mSTYQP
-         kOhcRPnKJ2gZ4iNh+N1M6CMZONR6B5zYWME3LgUUwN4jttlLKrjYuEjkGVk7BNJaksvO
-         aB1hVreoAJlgHPF6UQrVeHfkp5jgphr1+iUQB0AO6Edkb8G+EerrkS85dqg2wECsj1hS
-         MySokAArk6hakU3YlVrHyap+9Nu1YmenCMHRBu+OBJPvG6w8f+mY6JkJ33IrCYi5llhv
-         +5Sw==
-X-Gm-Message-State: AOJu0Yzn7pONc0J1Afpy/8ZQ9D5obefe4e7MyYnXWhBM8BopNX/cbwrK
-	CuqR61NiKMBmUA5ev/ag+JgiD4FJka1ehYTLSmmqo1uzL8XWjhNCvig=
-X-Gm-Gg: AeBDietM8kb5jWyG4+rPgfm9qW7yyIfKURxmMdRu9HAcRtgdAKglZ+LKca93pKZFKL1
-	FYupYiE5AFVgqPq76ML+gtCfKtk1Knt6ZMjIS9tBHQoTl8Sv/CxHrjEKlPS5GWa4mHtB4umTBwZ
-	Z6rDR2muULG7s6Kabc4ulBEaggSFpjORQ0CcMIDUJo+YE8DzO1McFZDZZrKPjsqtPpVbqVwzCos
-	jWQX1I8BvSDK5QoOKFbl9hE7tQv+3mt3Q/K88NdR+4jgTMDu6o1SbGHqm4F9STgtKpNb7R3r8Hf
-	Ngn6KDLH6MPL8BSZpARs9955hrFPX99H0ZP+mnn4v6BonV5lXlq/nXTwx9zaPh/TOzfndl3/IBL
-	IGYSLfp4RMVBTI0oDFNS/PuH9Gux40s5p9tj7o9mdXyHyQBCgPz+iGg6AZTJIhnN7l2qLKyRikO
-	9hxfgqc+b3tUTeVNBSDv0JwYU6nTZ2v7C+1PN3wgD159S8/0s0u/8KSYgqlm8KeFFqpTZ5gVX3x
-	fRUqMkiGfh8
-X-Received: by 2002:a05:6a00:e1a:b0:82f:2a78:6302 with SMTP id d2e1a72fcca58-82f8c9027b0mr48648306b3a.26.1777303078097;
-        Mon, 27 Apr 2026 08:17:58 -0700 (PDT)
-Received: from coe.tail83f5bd.ts.net ([137.59.92.178])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8ebb38ddsm31755576b3a.34.2026.04.27.08.17.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2026 08:17:57 -0700 (PDT)
-From: Ramesh Adhikari <adhikari.resume@gmail.com>
-To: axboe@kernel.dk,
-	gregkh@linuxfoundation.org
-Cc: linux-block@vger.kernel.org,
-	Ramesh Adhikari <adhikari.resume@gmail.com>
-Subject: [PATCH v4] badblocks: fix infinite loop due to incorrect rounding and overflow
-Date: Mon, 27 Apr 2026 20:47:42 +0530
-Message-ID: <20260427151742.756237-1-adhikari.resume@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="d2odqkFT";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ddMw9PoH"
+Date: Mon, 27 Apr 2026 17:21:04 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1777303266;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HLQrFz5Io0HWrBbPfgkDM3Mh0/GOTFIXHrUB8jjZJ7o=;
+	b=d2odqkFTtOfYMHI6l11Y5qQhA/SgclKDt28mdbZOL4QKwSBMCsVWgOaXpb+D3OD1S8sCMl
+	gp67+l5XCzoRpQ/3oTRyD21Y36dD3Ub7qcGdki+5UEcfdd62f9B02S/9uDFtQdFWWSGZWN
+	m4B9082FAFULSmXJfIGO4UYhh3NWiLHCIjdx2zNx9eCwuuXgUxx0gol0tfTWFMJuxsM78X
+	g1PWOd8cwwJy/dtYhZ9H5KOuEKSu+8d/Eeg6qig54XYbdQXI+ISOcg+7AeXpaIos6slIIq
+	Z0El3jx8p/AjP60KN5+rLkoBMz0Qn8ba3qWJhW0QGjK2ez776mOM8enhTVEQmg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1777303266;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HLQrFz5Io0HWrBbPfgkDM3Mh0/GOTFIXHrUB8jjZJ7o=;
+	b=ddMw9PoHj38WUcP0Ahe1qRnWtNk7mF4VE4gCD/um/VTkXCw0TKFpzNLUdzZPWOOEnsfhdo
+	qsix0uECSoYIa/Bg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+	mst@redhat.com, aacraid@microsemi.com,
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+	liyihang9@h-partners.com, kashyap.desai@broadcom.com,
+	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com,
+	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com,
+	sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com,
+	ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com,
+	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org,
+	juri.lelli@redhat.com, vincent.guittot@linaro.org,
+	akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com,
+	yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org,
+	longman@redhat.com, chenridong@huawei.com, hare@suse.de,
+	kch@nvidia.com, ming.lei@redhat.com, tom.leiming@gmail.com,
+	steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com,
+	mproche@gmail.com, nick.lange@gmail.com, marco.crivellari@suse.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
+	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com
+Subject: Re: [PATCH v12 02/13] lib/group_cpus: remove dead !SMP code
+Message-ID: <20260427152104.WTGAesGs@linutronix.de>
+References: <20260422185215.100929-1-atomlin@atomlin.com>
+ <20260422185215.100929-3-atomlin@atomlin.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260422185215.100929-3-atomlin@atomlin.com>
 
-The roundup() and rounddown() macros return the rounded value but
-do not modify the input in place. In _badblocks_set(), _badblocks_clear(),
-and badblocks_check(), the return values were being discarded, causing
-s and target/next to remain unrounded. This resulted in sectors
-being calculated from unrounded values, which could lead to sectors
-being way too large (or zero), causing infinite loops in the
-re_insert/re_clear/re_check loops.
+On 2026-04-22 14:52:04 [-0400], Aaron Tomlin wrote:
+> From: Daniel Wagner <wagi@kernel.org>
+> 
+> The support for the !SMP configuration has been removed from the core by
+> commit cac5cefbade9 ("sched/smp: Make SMP unconditional").
+> 
+> While one can technically still compile a uniprocessor kernel, the core
+> scheduler now mandates SMP unconditionally, rendering this particular
+> !SMP fallback handling redundant. Therefore, remove the #ifdef CONFIG_SMP
+> guards and the fallback logic.
+> 
+> Signed-off-by: Daniel Wagner <wagi@kernel.org>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> [atomlin: Updated commit message to clarify !SMP removal context]
 
-Additionally, add integer overflow checks (s > ULLONG_MAX - sectors)
-before the s + sectors calculation in all three functions to prevent
-overflow-related issues. Also add early return when sectors becomes
-zero after rounding in badblocks_check().
+This look unchanged vs previous submission. You could explain why you
+want to remove the !SMP case. It looks like the !SMP makes things
+easier ;) I don't know how much of this gets removed because of !SMP
+code elsewhere.
 
-Root cause: When s and sectors have specific values (e.g., from
-syzkaller fuzzing via nvdimm ioctl), the unrounded values cause
-sectors to be incorrectly calculated. In _badblocks_clear(), this
-could result in needing 2^46 iterations to process 2^55 sectors,
-triggering RCU stall warnings and effectively hanging the kernel.
+The description still does not make sense/ is accurate.
 
-Fix by properly capturing the return values from roundup() and
-rounddown(), adding overflow checks before sector arithmetic, and
-handling the zero-sectors case in badblocks_check().
+> Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
+> ---
+>  lib/group_cpus.c | 20 --------------------
+>  1 file changed, 20 deletions(-)
+> 
+> diff --git a/lib/group_cpus.c b/lib/group_cpus.c
+> index e6e18d7a49bb..b8d54398f88a 100644
+> --- a/lib/group_cpus.c
+> +++ b/lib/group_cpus.c
+> @@ -9,8 +9,6 @@
+>  #include <linux/sort.h>
+>  #include <linux/group_cpus.h>
+>  
+> -#ifdef CONFIG_SMP
+> -
+>  static void grp_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
+>  				unsigned int cpus_per_grp)
+>  {
+> @@ -564,22 +562,4 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
+>  	*nummasks = min(nr_present + nr_others, numgrps);
+>  	return masks;
+>  }
+> -#else /* CONFIG_SMP */
+> -struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
+> -{
+> -	struct cpumask *masks;
+> -
+> -	if (numgrps == 0)
+> -		return NULL;
+> -
+> -	masks = kzalloc_objs(*masks, numgrps);
+> -	if (!masks)
+> -		return NULL;
+> -
+> -	/* assign all CPUs(cpu 0) to the 1st group only */
+> -	cpumask_copy(&masks[0], cpu_possible_mask);
+> -	*nummasks = 1;
+> -	return masks;
+> -}
+> -#endif /* CONFIG_SMP */
+>  EXPORT_SYMBOL_GPL(group_cpus_evenly);
 
-Signed-off-by: Ramesh Adhikari <adhikari.resume@gmail.com>
----
-Changes in v4:
-- Complete rewrite of the fix approach
-- Previous v1-v3 incorrectly addressed len==0 as symptoms
-- Root cause identified: roundup()/rounddown() return values discarded
-- Fixed across all three functions (_badblocks_set, _badblocks_clear, badblocks_check)
-- Added ULLONG_MAX overflow checks before sector arithmetic
-- Added proper sectors==0 early return after rounding
- block/badblocks.c | 43 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 34 insertions(+), 9 deletions(-)
-
-diff --git a/block/badblocks.c b/block/badblocks.c
-index ece64e76fe8..a5ffae65a05 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -855,13 +855,21 @@ static bool _badblocks_set(struct badblocks *bb, sector_t s, sector_t sectors,
- 
- 	if (bb->shift) {
- 		/* round the start down, and the end up */
-+		if (s > ULLONG_MAX - sectors)
-+			return false;
- 		sector_t next = s + sectors;
- 
--		rounddown(s, 1 << bb->shift);
--		roundup(next, 1 << bb->shift);
--		sectors = next - s;
-+		s = rounddown(s, 1 << bb->shift);
-+		next = roundup(next, 1 << bb->shift);
-+		if (next < s)
-+			sectors = 0;
-+		else
-+			sectors = next - s;
- 	}
- 
-+	if (sectors == 0)
-+		return false;
-+
- 	write_seqlock_irqsave(&bb->lock, flags);
- 
- 	bad.ack = acknowledged;
-@@ -1070,12 +1078,20 @@ static bool _badblocks_clear(struct badblocks *bb, sector_t s, sector_t sectors)
- 		 * However it is better the think a block is bad when it
- 		 * isn't than to think a block is not bad when it is.
- 		 */
-+		if (s > ULLONG_MAX - sectors)
-+			return false;
- 		target = s + sectors;
--		roundup(s, 1 << bb->shift);
--		rounddown(target, 1 << bb->shift);
--		sectors = target - s;
-+		s = roundup(s, 1 << bb->shift);
-+		target = rounddown(target, 1 << bb->shift);
-+		if (target < s)
-+			sectors = 0;
-+		else
-+			sectors = target - s;
- 	}
- 
-+	if (sectors == 0)
-+		return false;
-+
- 	write_seqlock_irq(&bb->lock);
- 
- 	bad.ack = true;
-@@ -1305,11 +1321,20 @@ int badblocks_check(struct badblocks *bb, sector_t s, sector_t sectors,
- 
- 	if (bb->shift > 0) {
- 		/* round the start down, and the end up */
-+		if (s > ULLONG_MAX - sectors) {
-+			return -EINVAL;
-+		}
- 		sector_t target = s + sectors;
- 
--		rounddown(s, 1 << bb->shift);
--		roundup(target, 1 << bb->shift);
--		sectors = target - s;
-+		s = rounddown(s, 1 << bb->shift);
-+		target = roundup(target, 1 << bb->shift);
-+		if (target < s)
-+			sectors = 0;
-+		else
-+			sectors = target - s;
-+
-+		if (sectors == 0)
-+			return 0;
- 	}
- 
- retry:
--- 
-2.43.0
-
+Sebastian
