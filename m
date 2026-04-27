@@ -1,26 +1,26 @@
-Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021122.outbound.protection.outlook.com [52.101.100.122])
+Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022111.outbound.protection.outlook.com [52.101.96.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C25A26B2D2;
-	Mon, 27 Apr 2026 02:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2986326CE2C;
+	Mon, 27 Apr 2026 02:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.111
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777255313; cv=fail; b=PtXy6QZVulqOfYgX5zNdEPi2GwOohMAjxoQLl7RlbE+3L6DQvojrsNN/+zo95NHgsEqr8W710v1tSbg0k3yZWV8M57NoH+W/3fuBsQEl5Q8OKejLBtcee3Qnu1cpZzv4yqtm2eSlsjM5K5BJFj4CZg+qq9v4+2bSmY0dkE8C3NQ=
+	t=1777255317; cv=fail; b=S2TK4sUQfJBjVhV6lCI72eCszPM22ooO3A9m0OfZl1zjiQ79uP0ayQb3eRvsvwW55QCLXesAljOmWclMBFhDC7PqZKWpBsryd8eugsLXmPc+MA9OdubVAOa8Z/6KdPeiXtF+Lvk6gRFd+9jAF7Y0XgtbYND90lpY4nSngm4h05c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777255313; c=relaxed/simple;
-	bh=q2QNYmiNq7H1WeDeP/yIgeKqvZcM1O3ci30quE3+75k=;
+	s=arc-20240116; t=1777255317; c=relaxed/simple;
+	bh=jNorWFhU7Atlkfzl2xutxitJJhiPQYDyzmpPJGO1baw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Jo1hKPIkf1LKDk5V86GzuCLKZJPC203fMTe4LmtjTCxiC7ydIXVY6+N0NwNJq/dLoYKVUvYF/jOe2u6o+8edDrbOZk938EQzZ7Xqkrr5W+baCpALnoKToELtV61IhFclOMrj6d7KGyfu8Dy2NV1JQ2ltndXXS+AYymN6UB6eg0o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.100.122
+	 Content-Type:MIME-Version; b=eZbg88bzisPRkmQJCDwrXg26R1M+OXLnZRbsFRqbzJ9JY8qj/wz1GLZkIjNBYkq1amYwckNO1Y1lM/pLZJ53CA6EtLDC+szTFRiLMeJoKyjntkXzX+eafkz6Md3EvKx4KZFca0NCRWdohj0mwUT3QFw5V8ZeXtYLIqa/aopAlrg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.96.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=F6p+UAKoFl22fYhH0aHlQ4CwTv1HJH1ZyQSHfzPZ6gDshgQeqNyZF1YOcTDb4jPxyPCyM+uS6XtcuxOnkx6MfXT/qglszMeBqkSbWzvKRKw3SIFKF+flpFWfC2oOKhAMTuUpNKWhMNPF1gUUrALWrUuUHInsKs7mHQmLMkNF1lXw4djSMj3t/lIwAao/7NZI/rzJ2hFg/3ofwIodLVII0/XA4K6ftyhqkg1nq3mYiscXWF+Lq1NJvlgqh30Sh3nxxUe6xoBeSUqDJK0lYQh6LOyGFgi9e4zPDocZ35yv/dwaUZWjt8W/8EnCHXk/xkxxZ+mrwHsk/9n993isdWMATg==
+ b=j8FzOfZflLVGOaKe+3hm4HPKiGDRHj3NZJOV2yGe8nbTz4/Xzcws8JJ9UP0SQ44ihG8mFlbZIjHbzc1+Yw+CmbhpaePuMWmAOltxR3zWFiUNaFwoOiFM4DCXxHgvgkvr4iKR/XhAYcQ/SncFX5Iu6lceVhfwjur+gUznuQqkmeg5cyZSS/WQV2gGUaQDzK0o8OWiPf4oDetDbQPlVyYXZntcLCJUj1LVlkgBwUG1cjt88i9w7BYzqTR8/ZD+z/8KtzZWvTlSFWiPo6HYbgPZI/kc6D0TZingf/oysaNznlrqDHoSzOZgbQbp/5S3N+8dZgZrCsYBVnagtoYW3FZtIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/c17jx8WR4LN+rAuyoLEfcQvQ2NcKtuM73WbKDI0MOM=;
- b=mOcjhfCTplPZcf52EOz9b7y2twVKMfuz2HJGCUwhGu5cf56iFN30rYRCNh413jyfq5jlQOTj3131Ftq3Ot1dOmayuAOhah0zeK7UQo5ov1r9GD0h4uNMSVWxXClp7i0TI6AzeeP3Jh29GBusNcvU1XOZubefkOmwFHgDe2x58m11/+rYGZS95gcRLRwo2W6GODltYsoFo8Pyzdrw+UrSLKNOPFxB0DNzGMRIHIr2COQG75WeOjbbwu861mV2aMLUcxlLrwxRMrvn0UtsRIfZcu1+Z2DvTmb3a7fMumYekx14gvErI0skHYe23Omrb/CKCSO3D4C8qDGTNJDx52/0iQ==
+ bh=MRy6pEIlti4pShW9b5jcwHaRth+gEnbDHPEo2miCoHY=;
+ b=UJA/9edaKpM6QfAOd+j8tAydgi/dHUtB00x3ggFfq1KUx1OGzJwzcGCv+WHLFC/QbNYwhLyHUdCyPDk/Ce3TtEukLAtX0iirW3d6rLnZjnaJwB7KaLiCfg2h2YjgDeopXEVkT7/quVLDEqz2hAUIDUmo0Y6fqCJy6AKZN6d2gYQ4I2YdUgHt9cV5N5Nr9zflViNnul2HYcKC/8PivG1Qez3lKkCtiFQbOMl8b53e/bG6lWMjVcvc5wA/2dFUyOtSLHlfiLgljumERV6CzVrDu8+dnhk6qhofoBV+1b6aQ0GmaGXJeC9OeukksXSzeEMhGa5SF8YnPP+2RhcIBpGyyQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
  dkim=pass header.d=atomlin.com; arc=none
@@ -30,11 +30,11 @@ Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
  by CWXP123MB3559.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:7e::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.26; Mon, 27 Apr
- 2026 02:01:50 +0000
+ 2026 02:01:53 +0000
 Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9846.025; Mon, 27 Apr 2026
- 02:01:50 +0000
+ 02:01:53 +0000
 From: Aaron Tomlin <atomlin@atomlin.com>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -53,16 +53,16 @@ Cc: bvanassche@acm.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v5 1/2] blk-mq: add tracepoint block_rq_tag_wait
-Date: Sun, 26 Apr 2026 22:01:41 -0400
-Message-ID: <20260427020142.358912-2-atomlin@atomlin.com>
+Subject: [PATCH v5 2/2] blk-mq: expose tag starvation counts via debugfs
+Date: Sun, 26 Apr 2026 22:01:42 -0400
+Message-ID: <20260427020142.358912-3-atomlin@atomlin.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260427020142.358912-1-atomlin@atomlin.com>
 References: <20260427020142.358912-1-atomlin@atomlin.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BN0PR03CA0060.namprd03.prod.outlook.com
- (2603:10b6:408:e7::35) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-ClientProxiedBy: BN0PR03CA0045.namprd03.prod.outlook.com
+ (2603:10b6:408:e7::20) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -72,169 +72,353 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|CWXP123MB3559:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4582e41-3c16-44cb-5acd-08dea400f23a
+X-MS-Office365-Filtering-Correlation-Id: ad6d291b-c234-4a31-1ed6-08dea400f43a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|22082099003|18002099003|56012099003;
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|22082099003|18002099003|56012099003|18096099003;
 X-Microsoft-Antispam-Message-Info:
-	JrPt7T/a9vRzcAhp1sM/dRQEQufPz3sJymN/g1sY8NxkiJQ/udGcajOZK7hBqzFbyK1AGSSzIc+LhumEMFYxFjP6QwT21pJF3SbJExCld21oVDlTvYpakfqwq/vik8I169ERej5xypU8rp1hpflzuUMrbtekTyqQB1N+uRUAfw56Itr6Xego3sRVA17XJ+wViBUYppcfRuAt/H8OQQvxLc7uxqhE51dlPsIaY3iHiqzS3eLhlCcw5hmr4i5Pn96iFnjN5dmTUwzPRhr35xTnteMH9sYjAGml634TbRccykFW3pqjJonvAjJbUsJpDi891MPZcbpikWtPpHCZZy1i5SIG3k2BFDYA4X/KblSZmUI2zLBRPjQPqb9FYip4M5ku20SnUaDrnOVgRWdvwOV3IZ2qbtfAoLFDHMF2zGtyurBs72FRQAVpa8rmODfABhqQhPhM+wgN0tmFYkBFnDWnK83sLhg+Ye8CCharoAwO/YyCJ+vAzqNg6T6KBCR8pu3lWOzSKKyRQMKmQiIV08cTj3qN621jjjzfPHMadc9SLutcj+cYp24N5ykcH3HLNB7u+ludGoulg3nGLG5IguUS00OIRq/S+q8i7YP5kQmttrfV1v8HU7fc/EFLylF436sX/YIAIg3Op/DQtqyW6Duc4+ZqMrVnG0IVM1OUG6s0fJC+WX+e00HflP5f7cOYlafp+ozvk0L3ZRJQSLn7t0kDE8OSqzYjgrYJD7aNPLQD+Yg=
+	bCYMV5prS8n5BQWJEB6tGTxgnMGMiBgdDdYiikmiy/LcYQUBOWLHGf2iHZXxud1AX/KpTjWR5gqG7XXldLtN0YH6s4X54HVluleIH8mJEDI//7biFpMqBboID2e/hlVa/aE7TxKdXEkMEwFNIUakRLkraEUZiqgg3d29ghKmD3pam7UBghFfkdhNhtgmaXks1nLLBhY4yqdU8XUP1kpmJpnvzwNn/6vW8VG7J9eY9IQvPUUXS9dki+r7SgsrIcv6OLW22aRo2D0kRPyu0Rhz+fOZEs1wBJzrQQOQiMkJT5/9WU1nRSxEmRaRhRpMVH7PFCV5jS1gzu8hwm4O9LnWrq3trOCDXaSEQZa0HCrXAK4MB8Aa/llYC14TkBX6WckwHqamJYhIkbk7FM46LD0Zxz/6Jup/q1+0oAZoiKiCrizm/Ok0YCRprL8hTwDd0whhCsaGDE3OcmdQjM7HeGjQI22XZw6gXI/tmE6z08iNQFk2mrVQdva3R4DItzINT60pCGL5lszI/CfxyV1FMp1XU6oBrYCSKZsl2TcJEsrkUfZmR8KPmahtJw2f0IKLOe+pkV1W1hNC5SO1PLREtqeFoByr3vNsaD/fmC6UPcsnu7cgAGOzctwWDIOHbF1JH3EQN5z2IJ9awtajzLDQnQz4SJMlS9IXhsEOugc8rlNXVXXE0AVMQogvN/rDN4fVPcywWbMUsYeo5aoFr1cvA8Z2fQ3K7vTDnAaE9l6n1EsHwTg=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(22082099003)(18002099003)(56012099003)(18096099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?c8eFgaxOgRHHHzEzvrKyxfRdKV2H9RwaYx27jVNh5JA6kMLipy3XAIuTaGpG?=
- =?us-ascii?Q?NPErvSr0E/OQBYrSOUjkMlz1vk7B7eNEhs/CsS/IWoLm5+s/uDkG0LckgsMF?=
- =?us-ascii?Q?BsGDvMxx7bbodgZBAesuZh79x/PARlq7G/3UKPtsiE/V4LDEY2QP0QDOds/D?=
- =?us-ascii?Q?taMgxi61/BdckbKzUN5GHL8aRa0THQkLYtqh+GkysULOqCJ1n/DMsZ/dX/dY?=
- =?us-ascii?Q?TZ+fbNOwoGBKks2kDiIfTyBmB1JDR+6+HMNgh8nk19nPgdX7c5t7UYUq03Sb?=
- =?us-ascii?Q?K/OegO6rhrWOC/MesXfAvLYhOrZomux3PYxoZWAnPAw2XEX0O4lqWLflprW3?=
- =?us-ascii?Q?j9kYhSCmo5QWo3574AC8KUjlul/eLCJBdjl+g6LAoe8xddNmEphSzLkNVs5z?=
- =?us-ascii?Q?VXKjXufMaZNdbCFHLq69d/gfhdArWlyI44iDrH4M+Tk3/ItvkKGbsqVR6vAV?=
- =?us-ascii?Q?M+eoXLt29QZezjSwUicPtOrHAB9GoYg2GpHvuz1g+MxV7OqtyUjQg/J6MSls?=
- =?us-ascii?Q?5Y7VgALJiq2lz8QPQICeakHQuMeHdsodR+hr3raCfFQHWf9dk0sJX7L3ZviU?=
- =?us-ascii?Q?WoKVR+paRIb00T+TDiQpCvlTheRtwWp5OZSy96RNjLPSWCUfMiYEyU1LIfm4?=
- =?us-ascii?Q?GKJYC763gRtEReK/gqflAFG5nbmog/LnTC1KuL4fJ82g023vKCMK6D9LN8Ej?=
- =?us-ascii?Q?NE3RLhfxy5EKQm37NcJvotSsoimNEUsrNy8Iplcm6o+ZDn6hNWxl8d4czHv+?=
- =?us-ascii?Q?gwjc+lT9928yknMMYDeljD/l3SvjvToqBvzNCllhaEhmVi2RA+N2ooCrpMXi?=
- =?us-ascii?Q?Dwe0tv4JrIkB4TrFRJUtX0op3B8Ve2sg+JelP1gaRO+RbgWMRsvVV+jnmnMg?=
- =?us-ascii?Q?Cuz/LCrfv9RnwjZCb+3Bi8wb/3H/rbV9yDcDo6+Jn8LFEcpgR3k8LUo61UrV?=
- =?us-ascii?Q?EWlCLBWI9B2+lPhlSn6o7plbrzqhkSaLpUQRDEY4UebbiuMZuGfBgkM9vhvv?=
- =?us-ascii?Q?Rv+AgTUwJXKdMPS6LcCXSqtuJ7nIUWa+01bJuiYfeQrP20kBUil+ntm2na1A?=
- =?us-ascii?Q?JelA9wkkhXhLVyBrb9mCyO5qIoaJVqk/buMT8U2wsi61hRkW8wrfbLLs5EpN?=
- =?us-ascii?Q?yBJYCgUmOP+DjEz2N8eSnlR/XMPhpc1YI7mtQYRqjYMUOtqwh8lAFGBpuzit?=
- =?us-ascii?Q?33vPzCa8MVwbrOi1O5BAQ17EpKCWRGzJMOaSHyLHj5itmgL+44+nrX8G0P47?=
- =?us-ascii?Q?EuXet1iaAOKcJV85IzO1zAKhKMB6M6h/KlrSKnaXWi2D1LfxrTGpytyfpZvk?=
- =?us-ascii?Q?jwVqn749L8rt6cRGhgTJfa/x3GqsifBgijqyjA61AGfG7rPkHpiNIcPOsFc7?=
- =?us-ascii?Q?kSlAtqTA8GGY57iiRftUWYs05CfDqBXYRej8uDcHemIeqriVzxYTJFnJUxix?=
- =?us-ascii?Q?XztOKd6FpETdDrRimfdCDhEedzb2u7xQRFKxXb3PjA1WL+4UV8S6wxCI5NXq?=
- =?us-ascii?Q?OOHnKoqq0MPAmvsAEIxYf0OoHFjsRy0vNYdoe0MQTmAhYBy5Y76GXdDUQsU2?=
- =?us-ascii?Q?1bVVWg+x9TQ87aXioBzfvzKELfjRsgC1Q5vReo4ivIb9zaU8wXbJVyIo2c1y?=
- =?us-ascii?Q?hhD0NWVYDHGlIeu6zAOay+vimXucZXPBBrXwuhh9dcUrKzZznM7lH3UWnZx/?=
- =?us-ascii?Q?aoF8p01u33SGYs4zFDlM2lS4EXEiTh6+jXuuR8P8HTHx9BSpdH395j71dUl1?=
- =?us-ascii?Q?uYpfHocfdQ=3D=3D?=
+	=?us-ascii?Q?npBOVB10Mw9GED+W1MV19v7fLvy3Q87E3W4mpd626fXkst+KjQWVXU5qkTl9?=
+ =?us-ascii?Q?BquTVTF6rRhc3npYhsvhS6C144knPdYmqc2t2zRWXkZMreHMZQlO5pUj5QRe?=
+ =?us-ascii?Q?PPztFkZNJrzyLbHpoQLUO54x8x+O9oYPrWEfviXb1+srD6LvY9oqXfnhTEig?=
+ =?us-ascii?Q?1IN/30MOy+YVt/PJBNnVNVAjuSovEFj86X69DuQ+Jt9Pt+8KRNsBIDlqvxAh?=
+ =?us-ascii?Q?/U7Uj6PKum33IOq1mB1StriIa6DZg/DLP7F0j18Oe6fBXKicYlplVSGUESCB?=
+ =?us-ascii?Q?7/CvJ72gPelP2myqxWYMF5NjZcTNhWCztIETqrRR5mZGdyjc1M0vJA/qCd/x?=
+ =?us-ascii?Q?jYD2Rr0/bpeg6nGVVnhQw5RIXOOQag/LVuDw1I3fL4b0mlEdcpzkGgJJPTbh?=
+ =?us-ascii?Q?QfxxXrLU87707vbbSfkuavf0iG4U8QUT7sN1q3ibIJ3ABM1/Uu2dBE9HhaT4?=
+ =?us-ascii?Q?1FDQlfa8buph16kHuEMMNStJEivE8Ul8Kx3MP7rN6rDWtzt3ZbZ9qVcbxuEV?=
+ =?us-ascii?Q?858dycDfhcvAXVWgEPaV+saQAL4bmP1ZWxubt5N1p+opEb2cJQCYkAN6C0m6?=
+ =?us-ascii?Q?FcCnHwlEq9oLcwXmJnurgcThh+FZ+dA123Z2mFO2Kow944ZSSauTgLmw7jcy?=
+ =?us-ascii?Q?CncCKhbqMAx0ZZhZyEGQyozlZOUgpU60yiuLLWi3QJmBxLK+bt0UzJdngtd7?=
+ =?us-ascii?Q?EMYiVD0uPHYVKUYvCngKmlGeT929+AC6TqmNfxmsUwLADWYBTMD6kLDg4w+T?=
+ =?us-ascii?Q?wZvzhEI9KjGqTqbXG7g/Jj88ewSgE85CHV2nfuLBfWio6WI5MbxzOPnTHcpE?=
+ =?us-ascii?Q?vRoIqSfDS797NHVw/fSNxw+c+6ogF/4pBRuagRNr/m82ena+LxGyD6Ui2zhv?=
+ =?us-ascii?Q?Piz18Fn+Dpp826IXY09inOUv0/TLgnUqNHw3kgmLojHKoy6WFg+99sQsPf67?=
+ =?us-ascii?Q?GiNPYSGLH852eIfJiTES+fpYipJfhd7doGTfAjWa6js+M9xN4I0a4kxhrks9?=
+ =?us-ascii?Q?nobQp9qD/Iprg8ogyLVOGPSfKKpAgmvLFNp5lW1f2FJdr+maFIug4RB5+Q2y?=
+ =?us-ascii?Q?c9jT+CRcgy2zR3Ipm8Zt4y+5yWm7YjG7jr2oRw91TkIhHqfhnox9pIyQ38qu?=
+ =?us-ascii?Q?XxFINYqr4xqYtPyzAiPMxVZxREE9/cxqlsrpWiRU+RX7ZJjPZBo9LvG4W3fX?=
+ =?us-ascii?Q?lj+zLxrWE47t2Tq5K4zkhN2MBrKb8+RLbgTMEtKmgO7q91O+kaMPM9j3xYuj?=
+ =?us-ascii?Q?c7xhmmC862WnWjGjMTX4A++8syOhiqXGttVKsqhXp4eGuLzvCuwVaU9rTwWm?=
+ =?us-ascii?Q?o6zRpjNsQbwvhfyNCnawJlge6bT35acgBkvmj/lDwNXlePkLYI5/6iD8qwFF?=
+ =?us-ascii?Q?boLQXr1yAp0DaCPu3SY1AUZpg1CAax7ORWQLU1DjwDfs3kRBTKbp+3SDf2iX?=
+ =?us-ascii?Q?5Plg/4Z5jfKaOGkNXN+FgKKUN5sKdJt9emWhEcpdGI6SYeh/P4swKkjY+a4K?=
+ =?us-ascii?Q?OQqKJWYAcuZoIqwl4av08noR2ZeNuWxcoxCFz4P9YCtEoAeKPVtJFXtfY4Xr?=
+ =?us-ascii?Q?05TDbjTxxNptccFfbcbhUuohqVKG4ze8aUrP3PryB/NZxJsSFWAjOaNBR/ND?=
+ =?us-ascii?Q?WjR3VTgw22YgIuY2/NZ7zxnxG6cBDxH40YcaLcGqKRG016/htwgQuYRqJdWd?=
+ =?us-ascii?Q?yx9EOWDy3G5CjlbPj4CBcXaU08t3kuL/omLM1bJyBd4huHVHF+CInoUXzg8m?=
+ =?us-ascii?Q?MavKwO2IwA=3D=3D?=
 X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4582e41-3c16-44cb-5acd-08dea400f23a
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad6d291b-c234-4a31-1ed6-08dea400f43a
 X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2026 02:01:50.5903
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2026 02:01:53.8733
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6g2d4QW7vawZ1GnjQzDAuxZrcU054rN+KFt4QrvLcXeYnGUAILb6E+YicPHCLrTVlS89RsUdI614Eb4AqSKoBw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: eEriOKS6Y+R17trAg4tzCvAeC2nB41q66S+1FJ4S7eQqRv3sxKAZRPLEbnaJieCCoqHY2HzCzGoHZ5Jh337vLg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP123MB3559
 
 In high-performance storage environments, particularly when utilising
 RAID controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED), severe
-latency spikes can occur when fast devices (SSDs) are starved of hardware
-tags when sharing the same blk_mq_tag_set.
+latency spikes can occur when fast devices are starved of available
+tags.
 
-Currently, diagnosing this specific hardware queue contention is
-difficult. When a CPU thread exhausts the tag pool, blk_mq_get_tag()
-forces the current thread to block uninterruptible via io_schedule().
-While this can be inferred via sched:sched_switch or dynamically
-traced by attaching a kprobe to blk_mq_mark_tag_wait(), there is no
-dedicated, out-of-the-box observability for this event.
+This patch introduces two new debugfs attributes for each block
+hardware queue:
+  - /sys/kernel/debug/block/[device]/hctxN/wait_on_hw_tag
+  - /sys/kernel/debug/block/[device]/hctxN/wait_on_sched_tag
 
-This patch introduces the block_rq_tag_wait trace point in the tag
-allocation slow-path. It triggers immediately before the thread yields
-the CPU, exposing the exact hardware context (hctx) that is starved, the
-specific pool experiencing starvation (hardware or software scheduler),
-and the total pool depth.
+These files expose atomic counters that increment each time a submitting
+context is forced into an uninterruptible sleep via io_schedule() due to
+the complete exhaustion of physical driver tags or software scheduler
+tags, respectively.
 
-This provides storage engineers and performance monitoring agents
-with a zero-configuration, low-overhead mechanism to definitively
-identify shared-tag bottlenecks and tune I/O schedulers or cgroup
-throttling accordingly.
+To ensure negligible performance overhead even in production
+environments where CONFIG_BLK_DEBUG_FS is actively enabled, this
+tracking logic utilises dynamically allocated per-CPU counters. When
+this configuration is disabled, the tracking logic compiles down to a
+safe no-op.
 
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Laurence Oberman <loberman@redhat.com>
-Tested-by: Laurence Oberman <loberman@redhat.com>
 Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
 ---
- block/blk-mq-tag.c           |  4 ++++
- include/trace/events/block.h | 43 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+)
+ block/blk-mq-debugfs.c | 109 +++++++++++++++++++++++++++++++++++++++++
+ block/blk-mq-debugfs.h |  19 +++++++
+ block/blk-mq-tag.c     |   4 ++
+ block/blk-mq.c         |   5 ++
+ include/linux/blk-mq.h |  12 +++++
+ 5 files changed, 149 insertions(+)
 
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 047ec887456b..1a993bcea5c9 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -7,6 +7,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/build_bug.h>
+ #include <linux/debugfs.h>
++#include <linux/percpu.h>
+ 
+ #include "blk.h"
+ #include "blk-mq.h"
+@@ -484,6 +485,54 @@ static int hctx_dispatch_busy_show(void *data, struct seq_file *m)
+ 	return 0;
+ }
+ 
++/**
++ * hctx_wait_on_hw_tag_show - display hardware tag starvation count
++ * @data: generic pointer to the associated hardware context (hctx)
++ * @m: seq_file pointer for debugfs output formatting
++ *
++ * Prints the cumulative number of times a submitting context was forced
++ * to block due to the exhaustion of physical hardware driver tags.
++ *
++ * Return: 0 on success.
++ */
++static int hctx_wait_on_hw_tag_show(void *data, struct seq_file *m)
++{
++	struct blk_mq_hw_ctx *hctx = data;
++	unsigned long count = 0;
++	int cpu;
++
++	if (hctx->wait_on_hw_tag) {
++		for_each_possible_cpu(cpu)
++			count += *per_cpu_ptr(hctx->wait_on_hw_tag, cpu);
++	}
++	seq_printf(m, "%lu\n", count);
++	return 0;
++}
++
++/**
++ * hctx_wait_on_sched_tag_show - display scheduler tag starvation count
++ * @data: generic pointer to the associated hardware context (hctx)
++ * @m: seq_file pointer for debugfs output formatting
++ *
++ * Prints the cumulative number of times a submitting context was forced
++ * to block due to the exhaustion of software scheduler tags.
++ *
++ * Return: 0 on success.
++ */
++static int hctx_wait_on_sched_tag_show(void *data, struct seq_file *m)
++{
++	struct blk_mq_hw_ctx *hctx = data;
++	unsigned long count = 0;
++	int cpu;
++
++	if (hctx->wait_on_sched_tag) {
++		for_each_possible_cpu(cpu)
++			count += *per_cpu_ptr(hctx->wait_on_sched_tag, cpu);
++	}
++	seq_printf(m, "%lu\n", count);
++	return 0;
++}
++
+ #define CTX_RQ_SEQ_OPS(name, type)					\
+ static void *ctx_##name##_rq_list_start(struct seq_file *m, loff_t *pos) \
+ 	__acquires(&ctx->lock)						\
+@@ -599,6 +648,8 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
+ 	{"active", 0400, hctx_active_show},
+ 	{"dispatch_busy", 0400, hctx_dispatch_busy_show},
+ 	{"type", 0400, hctx_type_show},
++	{"wait_on_hw_tag", 0400, hctx_wait_on_hw_tag_show},
++	{"wait_on_sched_tag", 0400, hctx_wait_on_sched_tag_show},
+ 	{},
+ };
+ 
+@@ -815,3 +866,61 @@ void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx)
+ 	debugfs_remove_recursive(hctx->sched_debugfs_dir);
+ 	hctx->sched_debugfs_dir = NULL;
+ }
++
++/**
++ * blk_mq_debugfs_alloc_hctx_stats - Allocate per-cpu starvation statistics
++ * @hctx: hardware context associated with the tag allocation
++ * @gfp: memory allocation flags
++ *
++ * Allocates the per-cpu memory for tracking hardware and scheduler tag
++ * starvation.
++ */
++void blk_mq_debugfs_alloc_hctx_stats(struct blk_mq_hw_ctx *hctx, gfp_t gfp)
++{
++	if (!hctx->wait_on_hw_tag)
++		hctx->wait_on_hw_tag = alloc_percpu_gfp(unsigned long,
++							gfp);
++	if (!hctx->wait_on_sched_tag)
++		hctx->wait_on_sched_tag = alloc_percpu_gfp(unsigned long,
++							   gfp);
++}
++
++/**
++ * blk_mq_debugfs_free_hctx_stats - Free per-cpu starvation statistics
++ * @hctx: hardware context associated with the tag allocation
++ *
++ * Frees the per-cpu memory used for tracking hardware and scheduler tag
++ * starvation. This must only be called during hardware queue teardown when
++ * the queue is safely frozen and no active I/O submissions can race to
++ * increment the statistics.
++ */
++void blk_mq_debugfs_free_hctx_stats(struct blk_mq_hw_ctx *hctx)
++{
++	free_percpu(hctx->wait_on_hw_tag);
++	hctx->wait_on_hw_tag = NULL;
++	free_percpu(hctx->wait_on_sched_tag);
++	hctx->wait_on_sched_tag = NULL;
++}
++
++/**
++ * blk_mq_debugfs_inc_wait_tags - increment the tag starvation counters
++ * @hctx: hardware context associated with the tag allocation
++ * @is_sched: true if the starved pool is the software scheduler
++ *
++ * Evaluates the exhausted tag pool and safely increments the appropriate
++ * per-cpu debugfs starvation counter.
++ *
++ * Note: The per-cpu pointers are explicitly checked to prevent a NULL
++ * pointer dereference in the event that the system was under heavy memory
++ * pressure and the initial per-cpu allocation failed.
++ */
++void blk_mq_debugfs_inc_wait_tags(struct blk_mq_hw_ctx *hctx,
++				  bool is_sched)
++{
++	unsigned long __percpu *tags = is_sched ?
++			READ_ONCE(hctx->wait_on_sched_tag) :
++			READ_ONCE(hctx->wait_on_hw_tag);
++
++	if (likely(tags))
++		this_cpu_inc(*tags);
++}
+diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+index 49bb1aaa83dc..7a7c0f376a2b 100644
+--- a/block/blk-mq-debugfs.h
++++ b/block/blk-mq-debugfs.h
+@@ -17,6 +17,8 @@ struct blk_mq_debugfs_attr {
+ 	const struct seq_operations *seq_ops;
+ };
+ 
++void blk_mq_debugfs_inc_wait_tags(struct blk_mq_hw_ctx *hctx,
++				  bool is_sched);
+ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
+ int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
+ 
+@@ -26,6 +28,9 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
+ void blk_mq_debugfs_unregister_hctx(struct blk_mq_hw_ctx *hctx);
+ void blk_mq_debugfs_register_hctxs(struct request_queue *q);
+ void blk_mq_debugfs_unregister_hctxs(struct request_queue *q);
++void blk_mq_debugfs_alloc_hctx_stats(struct blk_mq_hw_ctx *hctx,
++				     gfp_t gfp);
++void blk_mq_debugfs_free_hctx_stats(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_debugfs_register_sched(struct request_queue *q);
+ void blk_mq_debugfs_unregister_sched(struct request_queue *q);
+@@ -35,6 +40,11 @@ void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_debugfs_register_rq_qos(struct request_queue *q);
+ #else
++static inline void blk_mq_debugfs_inc_wait_tags(struct blk_mq_hw_ctx *hctx,
++						bool is_sched)
++{
++}
++
+ static inline void blk_mq_debugfs_register(struct request_queue *q)
+ {
+ }
+@@ -56,6 +66,15 @@ static inline void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
+ {
+ }
+ 
++static inline void blk_mq_debugfs_alloc_hctx_stats(struct blk_mq_hw_ctx *hctx,
++						   gfp_t gfp)
++{
++}
++
++static inline void blk_mq_debugfs_free_hctx_stats(struct blk_mq_hw_ctx *hctx)
++{
++}
++
+ static inline void blk_mq_debugfs_register_sched(struct request_queue *q)
+ {
+ }
 diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 33946cdb5716..66138dd043d4 100644
+index 66138dd043d4..3cc6a97a87a0 100644
 --- a/block/blk-mq-tag.c
 +++ b/block/blk-mq-tag.c
-@@ -13,6 +13,7 @@
- #include <linux/kmemleak.h>
- 
- #include <linux/delay.h>
-+#include <trace/events/block.h>
+@@ -17,6 +17,7 @@
  #include "blk.h"
  #include "blk-mq.h"
  #include "blk-mq-sched.h"
-@@ -187,6 +188,9 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 		if (tag != BLK_MQ_NO_TAG)
- 			break;
++#include "blk-mq-debugfs.h"
  
-+		trace_block_rq_tag_wait(data->q, data->hctx,
-+					data->rq_flags & RQF_SCHED_TAGS);
+ /*
+  * Recalculate wakeup batch when tag is shared by hctx.
+@@ -191,6 +192,9 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		trace_block_rq_tag_wait(data->q, data->hctx,
+ 					data->rq_flags & RQF_SCHED_TAGS);
+ 
++		blk_mq_debugfs_inc_wait_tags(data->hctx,
++					     data->rq_flags & RQF_SCHED_TAGS);
 +
  		bt_prev = bt;
  		io_schedule();
  
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 6aa79e2d799c..7c1026d1cb35 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -226,6 +226,49 @@ DECLARE_EVENT_CLASS(block_rq,
- 		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
- );
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4c5c16cce4f8..cd52bf6f82ce 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3991,6 +3991,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+ 			blk_free_flush_queue_callback);
+ 	hctx->fq = NULL;
  
-+/**
-+ * block_rq_tag_wait - triggered when a request is starved of a tag
-+ * @q: request queue of the target device
-+ * @hctx: hardware context of the request experiencing starvation
-+ * @is_sched_tag: indicates whether the starved pool is the software scheduler
-+ *
-+ * Called immediately before the submitting context is forced to block due
-+ * to the exhaustion of available tags (i.e., physical hardware driver tags
-+ * or software scheduler tags). This trace point indicates that the context
-+ * will be placed into an uninterruptible state via io_schedule() until an
-+ * active request completes and relinquishes its assigned tag.
-+ */
-+TRACE_EVENT(block_rq_tag_wait,
++	blk_mq_debugfs_free_hctx_stats(hctx);
 +
-+	TP_PROTO(struct request_queue *q, struct blk_mq_hw_ctx *hctx, bool is_sched_tag),
+ 	spin_lock(&q->unused_hctx_lock);
+ 	list_add(&hctx->hctx_list, &q->unused_hctx_list);
+ 	spin_unlock(&q->unused_hctx_lock);
+@@ -4016,6 +4018,8 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ {
+ 	gfp_t gfp = GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY;
+ 
++	blk_mq_debugfs_alloc_hctx_stats(hctx, gfp);
 +
-+	TP_ARGS(q, hctx, is_sched_tag),
-+
-+	TP_STRUCT__entry(
-+		__field( dev_t,		dev			)
-+		__field( u32,		hctx_id			)
-+		__field( u32,		nr_tags			)
-+		__field( bool,		is_sched_tag		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->dev		= q->disk ? disk_devt(q->disk);
-+		__entry->hctx_id	= hctx->queue_num;
-+		__entry->is_sched_tag	= is_sched_tag;
-+
-+		if (is_sched_tag)
-+			__entry->nr_tags = hctx->sched_tags->nr_tags;
-+		else
-+			__entry->nr_tags = hctx->tags->nr_tags;
-+	),
-+
-+	TP_printk("%d,%d hctx=%u starved on %s tags (depth=%u)",
-+		  MAJOR(__entry->dev), MINOR(__entry->dev),
-+		  __entry->hctx_id,
-+		  __entry->is_sched_tag ? "scheduler" : "hardware",
-+		  __entry->nr_tags)
-+);
-+
- /**
-  * block_rq_insert - insert block operation request into queue
-  * @rq: block IO operation request
+ 	hctx->fq = blk_alloc_flush_queue(hctx->numa_node, set->cmd_size, gfp);
+ 	if (!hctx->fq)
+ 		goto fail;
+@@ -4041,6 +4045,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	blk_free_flush_queue(hctx->fq);
+ 	hctx->fq = NULL;
+  fail:
++	blk_mq_debugfs_free_hctx_stats(hctx);
+ 	return -1;
+ }
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 18a2388ba581..41d61488d683 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -453,6 +453,18 @@ struct blk_mq_hw_ctx {
+ 	struct dentry		*debugfs_dir;
+ 	/** @sched_debugfs_dir:	debugfs directory for the scheduler. */
+ 	struct dentry		*sched_debugfs_dir;
++	/**
++	 * @wait_on_hw_tag: Cumulative per-cpu counter incremented each
++	 * time a submitting context is forced to block due to physical
++	 * hardware tag exhaustion.
++	 */
++	unsigned long __percpu	*wait_on_hw_tag;
++	/**
++	 * @wait_on_sched_tag: Cumulative per-cpu counter incremented each
++	 * time a submitting context is forced to block due to software
++	 * scheduler tag exhaustion.
++	 */
++	unsigned long __percpu	*wait_on_sched_tag;
+ #endif
+ 
+ 	/**
 -- 
 2.51.0
 
