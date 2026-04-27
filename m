@@ -1,60 +1,62 @@
 Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DC240DFAB
-	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 00:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AD1153BE9
+	for <linux-block@vger.kernel.org>; Mon, 27 Apr 2026 00:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777250117; cv=none; b=CH9DI19/m48LitkHksPEVmYhKhXDlbxfPGqn1nVwTTBx6BLyk2b+O71QywBq4L4fbNjAc1cDhtONQH7my9iyfCavoXvBkCNNL0O4+NC4BD6EZRO6hM8cePLtzWZyixljIkkJGwnOr1jzQzemJJTrAkPXzrQLIvkuALqBakfG6Xw=
+	t=1777250121; cv=none; b=L1zGIk2EoFGwLLugJVgmyVOcZhK5omMuxxB/rSdKG5TKGopcKU9i+nfUr2aA4fBBuUUg19CtOX5QcS4BAkrDL/KqL89galsWfeyZ/1SZtuj/9KXOt8wYV5pl8MxIH3WGn/fWZ7omIOVjyMTrmkj7kuJ1thtFEWtczmCTPrX8zxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777250117; c=relaxed/simple;
-	bh=fCvHW7fWCd3Kq2gMA1wDd2US2P2TT4ia9wrBjyDLH3Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HMgcx6uInzo2MpvVn3KFOZadvHjqXMAQVjp28SFqK2RfPriqPHhRypV/5nlxYlji5qDo28I05rRg0xdY++vxNPh76uco9XXUyDZAWYFvOq/Ru5PrFMMvfStYsI49nkbKARgXT4h8EraWH28AZK34wEBwR/iYfN+pN+ZXaikPqBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SVRfMTIe; arc=none smtp.client-ip=209.85.221.181
+	s=arc-20240116; t=1777250121; c=relaxed/simple;
+	bh=qCRZIqiWXNSIX+3h/kuw6yzKVaJCunHyh9LGPehHfd8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jwW/pEYdMacp32g+AA2po1UNpTdCzsQiJyDxgYD/5+953FQKacMYc+ZB+3/Aoi9Kw4QqL2xP54A3cuPWARdDaaM46B1VwAfkMxg8f8MaihUwklof6pAW9uvlWXcJi5HFKJOMHJzOdfjR/3SFUfmwo9gM8oId1Rh5WqI3cK8iot0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D/clSY2y; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVRfMTIe"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56eee0ba462so5883741e0c.1
-        for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 17:35:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/clSY2y"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56d933b555cso3046487e0c.0
+        for <linux-block@vger.kernel.org>; Sun, 26 Apr 2026 17:35:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777250115; x=1777854915; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hlYyxAHFErN0O8bIJbsJS4BCeC/JRIpc/oeR+h/cS4M=;
-        b=SVRfMTIe2g/u3EKUL2I42sjO9S+gHeCv9d/OLKLQD/tgG1YXtOVzypRYKr38LpvGTW
-         Wo2qd+lf73nXMvInrfjlcAKLWZ3uV5KA6f2ex8l/O6o4bmOV31+Efr6nnXQ4PwJ1WbIa
-         rFKOB0cqrmGfNDD8IJz+rzpUhlQLZpMsfAeYDSxRcDSKkvl5aV4WAuchbNXUY5J+1sMF
-         2gFrsFFi5N401W+qrVIjJhgQLNoAuNup5OhQD+a9j1IQXC9Z9Fh9Vs44INeACSNdeQ3Q
-         qof+LDpsPt+cICE7PARfbEzpOLPuaNOghm2WtWgCDGNhDskbo1+pi2tAzh6riXAVHuR3
-         1tKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777250115; x=1777854915;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777250119; x=1777854919; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hlYyxAHFErN0O8bIJbsJS4BCeC/JRIpc/oeR+h/cS4M=;
-        b=F3mPzawNGxMu8d4E/hQhC7RxyBe0i8UfzfOEkr2eVVn0+90rjo3Num/tuMX/kFsr12
-         988GfRJF8Ae/E2ghCoSuIDtdM8eI7c5DklIN5GLU0zOrhigUC0NlIBZ2NJ1nm4PB5xKz
-         C850ykLbEXojkYTJkq77SqZx0G0R9IkkMczKaSWVy4IdHJbwZyE++J1TLwMWrB/fmBWW
-         XVNukx6mR8h7k5ucmlep6jRPg1gcqNg+IgLMz1Cs7/S6rsEnnDhxNrnwFIlCLdukE0m8
-         NexlApd0iL/7oHu+4SNeoiDny5QJg3LX5dWDHlAUVXLtNu7/L6X64XFZ2lxKmtflZbEJ
-         Spzg==
-X-Gm-Message-State: AOJu0YxNYy/qISqzuigKivko9tLiVFGHCkatk3LE1LNEPpfJws+rHitj
-	O5g2O9G3CANXQOGCWRuWEqec7HkzkGKJHHS+kB6D0TYkohIC1Wk865AN7uwSgzM3QVo=
-X-Gm-Gg: AeBDietMFryeUrWevCczeQRjfy1fV3sFBdaJfRPoVGrm4+vpHlpwuf8n/J9c07sInU1
-	vMmVPkbK7ZTuWhZpiQFMuZlHszhNoFRJkdVMaX9zIbrvFrYtOGivWU3+NbwOLv2MUfGRoS4ygV5
-	l9BVOG9OXF2TUlEz20ZBsiZpqh4VD02q+Re4XBOvrjahhs7pdCV+60aJTAwSSnDX9xPvofhtQ8z
-	/9IMRr6nrV9F2nd5jUTi5SZR/i3QE+7PVY33sG+M2wZmeMj3GEJLpyQFykTn2+yWur6RYESJSlU
-	ZftPWfRp7p3nbl6FHRt9Yu1XYSk9wQp0rY5G/m5TZ7z+L4XnpANchVA7jkymYkFyuegSWm3xAKP
-	ZK7v0BjKrL1j4TDnT5jDLvRYVQvyzJgyk+yRQm7EXOOEItAtPC9WjnKNGfbcwuJGkocdykjb6Ng
-	HHhaT2yIsRJuBz9D8jbvzUgh5fqA+ZtPpYYbd9DAw/Q5QUCkMccozV
-X-Received: by 2002:a05:6122:8f87:b0:56b:8ba0:fd58 with SMTP id 71dfb90a1353d-56fa66be43fmr14917079e0c.6.1777250114838;
-        Sun, 26 Apr 2026 17:35:14 -0700 (PDT)
+        bh=6+zpjgxAVJgKXc24LXLllrzJ6IfhGOraTuvZ7a74jdg=;
+        b=D/clSY2y/us1q+2bN/mAAn76cwIGflZeAj8P/Q8bsR5tLEAH3bb8LAGFa/ZgUhd74R
+         AYa+Ch0tNQ9M04svbffeJpuBzY1quhIym56dARINVu3FPxb6V2el2oTiQpblO4fyZHbN
+         n1p7B75F2vk7wJ7LSwznIGZsPrrMRVUlL5v4jCkU7zwOcDYOutvvNbbRPtt/kVL1x0be
+         BrZpbPP4kerWeoyOgf0/bvyjZNWOrQebW43aKWn47pvq3LqB1yyrYsq3IVsj4AZMOhle
+         Vw0dVR684FsZq4fKuq3eUexNHW+icVlQHbU4VS36nhw2Z9JOMGOBv/xCWOSPOnsWVYik
+         1NdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777250119; x=1777854919;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6+zpjgxAVJgKXc24LXLllrzJ6IfhGOraTuvZ7a74jdg=;
+        b=kSP0MFT7ma4wdAUNwoM+HbsYyeS+pJrF9GJYHqV2yF2xRyZu/g5BjPIevRathEN1tN
+         8A8ueqEpE5WYedbJp51KXBYvg7GtdoMytt8WSc3rtcbqOgw63GswnGXh+KPsMnNXAusa
+         kQ3ILp3QYhI+dJfWd1iBH3OQm574D6pSEGhL4+9/bzcuXHbeRhcGMXEp5m+yTpdw33T0
+         eIgBSYrw7UzkXRzY9ZdH2IR5xpBnsFaI0tzUgeNVzK+Fnla1lv0IYnIUL3fx3CiPs8pD
+         qQfGb+OVTWUIKuj9WxlMUColUzx8TZR/Fe+K7HGCP0coMPkBYzHlefI9TJ9k/PTTVyO+
+         NC8g==
+X-Gm-Message-State: AOJu0Yx+VtI9PueG1lHTPiNPBRim2I6t756ejoRvfXhhgWbPPcdq9IP6
+	CEUq9eGOZE7K10mlnfN3pFQtNCeZxdqNPFcoBjHQMb8SdT4eedBfHA1C
+X-Gm-Gg: AeBDievU7w9o1VyXLiBvSgcinCnvPGjciU2e1w4t2PJQBbu81dFdLMtEnyzwoSuaG5N
+	r90dFwFFiRrryNiea5MEcWSiOWPKxq7uU6bpF4wMcj6GkxyY8ekU8+eLePCEDCqVSll0XLz8Rdz
+	m4ihz3Aip/9ygJt8h1WOi8Lb5y2IZmw7ChDAy5dRvSq0fHPPExoGdxnXfPIGX4AtkIa1dKKBycs
+	UZSAo4TC+2E1IWqjuRzkLuBGLoteZ30LiHxctFnzIuAiH1cyhbqgMll1Vo2Rs3MC9n5I+SCNOLh
+	RSHuafEmHzMQFJwbeh0u8by7WR864p/ultgl+SJ33nr0yOokVJIv64VUa93xjkfwikHiFHt080k
+	MTF6N/tlf2dDz99FCunxbBYZm1/kIGU415g/qJp2JF99JpPEDM+Lzq4KVjw2tUXYo+D5f7Z2Cc5
+	JaXKm7r2dif1vh8/yFZSwVEHcVA7moHG4by/4gy5B0Vu8U38u+9RIq
+X-Received: by 2002:a05:6122:f84:b0:56c:db8b:504e with SMTP id 71dfb90a1353d-56fa59fbc9fmr22750523e0c.13.1777250118829;
+        Sun, 26 Apr 2026 17:35:18 -0700 (PDT)
 Received: from syssplab.cs.fiu.edu (nat1.cs.fiu.edu. [131.94.134.89])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa9351ca8sm16854880e0c.18.2026.04.26.17.35.12
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa9351ca8sm16854880e0c.18.2026.04.26.17.35.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Apr 2026 17:35:13 -0700 (PDT)
+        Sun, 26 Apr 2026 17:35:17 -0700 (PDT)
 From: Chao Shi <coshi036@gmail.com>
 To: linux-nvme@lists.infradead.org
 Cc: linux-block@vger.kernel.org,
@@ -66,10 +68,12 @@ Cc: linux-block@vger.kernel.org,
 	Sungwoo Kim <iam@sung-woo.kim>,
 	Dave Tian <daveti@purdue.edu>,
 	Weidong Zhu <weizhu@fiu.edu>
-Subject: [PATCH RFC 1/2] nvme: downgrade WARN in nvme_setup_rw to pr_debug
-Date: Sun, 26 Apr 2026 20:34:56 -0400
-Message-ID: <20260427003457.1264511-1-coshi036@gmail.com>
+Subject: [PATCH RFC 2/2] nvme: set integrity metadata size for EXT_LBAS non-PI namespace
+Date: Sun, 26 Apr 2026 20:34:57 -0400
+Message-ID: <20260427003457.1264511-2-coshi036@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260427003457.1264511-1-coshi036@gmail.com>
+References: <20260427003457.1264511-1-coshi036@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,64 +82,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When an NVMe namespace is configured with embedded metadata (flbas bit 4
-set, NVME_NS_FLBAS_META_EXT) but no Protection Information (dps=0) and
-no NVME_NS_METADATA_SUPPORTED, nvme_setup_rw() fires WARN_ON_ONCE on
-any request that reaches it with REQ_INTEGRITY unset.  The WARN was
-observed repeatedly during NVMe fuzz testing with a FEMU-based fuzzer
-that performs semantic mutation of Identify Namespace responses.
+This patch is an alternative to patch 1/2: instead of downgrading the
+assertion in nvme_setup_rw(), it addresses the root cause at the
+integrity-profile level so that the assertion is never reached.
 
-The trigger requires three conditions to align: (a) a namespace
-transitions through the EXT_LBAS non-PI state (head->ms != 0,
-features & NVME_NS_EXT_LBAS, !(features & NVME_NS_METADATA_SUPPORTED)),
-(b) nvme_init_integrity() returns false through the early-exit branch
-at core.c:1834 without populating bi->metadata_size, leaving the disk
-without an integrity profile (blk_get_integrity() returns NULL), and
-(c) a request that was admitted to the block layer before the namespace
-update reaches nvme_setup_rw() after it.
+For PCIe namespaces with extended LBAs (NVME_NS_EXT_LBAS set, flbas
+bit 4) but without PI and without NVME_NS_METADATA_SUPPORTED, the early-
+exit branch of nvme_init_integrity() at core.c:1834 returns false
+without populating bi->metadata_size.  As a result blk_get_integrity()
+returns NULL (it checks q->limits.integrity.metadata_size via
+blk_integrity_queue_supports_integrity()), bio_integrity_action() returns
+0, bio_integrity_prep() is never called, and REQ_INTEGRITY is never set
+on bios dispatched to the namespace.  Any such bio that reaches
+nvme_setup_rw() triggers WARN_ON_ONCE because head->ms != 0 but
+blk_integrity_rq() returns false.
 
-The admission gap arises in two places.  First, the plug-list flush
-path: a process with dirty pages queued in a plug before the namespace
-update flushes them on file close (blk_finish_plug -> blk_mq_dispatch
--> nvme_setup_rw), bypassing any capacity-zero gate.  Second, the
-cached-rq path: blk_mq_submit_bio() at blk-mq.c:3155 may find a cached
-request; if so, the bio_queue_enter() freeze-serialization guard at
-blk-mq.c:3174-3176 is skipped and the bio is dispatched immediately.
+Populate bi->metadata_size = head->ms in the early-exit path for the
+EXT_LBAS non-PI case.  This is sufficient to make blk_get_integrity()
+return non-NULL, which causes bio_integrity_action() to return non-zero,
+which causes bio_integrity_prep() to run and set REQ_INTEGRITY on any
+bio submitted to the namespace.  Requests that reach nvme_setup_rw()
+then satisfy blk_integrity_rq() and the assertion is not reached.
 
-In both cases the bio was submitted without REQ_INTEGRITY (because
-blk_get_integrity() returned NULL at dispatch time, so
-bio_integrity_action() returned 0 and bio_integrity_prep() was not
-called), and it reaches nvme_setup_rw() for a namespace where
-head->ms != 0.  The existing BLK_STS_NOTSUPP return correctly handles
-this dispatch; the WARN_ON_ONCE is a false positive.
-
-The WARN was reproduced six times over four days of fuzzing (April
-2026).  A representative crash shows the plug-flush path:
-
-  nvme0n1: detected capacity change from 2097152 to 0
-  WARNING: drivers/nvme/host/core.c:1042 at nvme_setup_rw+0x768/0xfd0
-  PID: 785 (systemd-udevd)
-  Call Trace:
-   nvme_setup_cmd / nvme_queue_rq / blk_mq_dispatch_rq_list
-   blk_mq_flush_plug_list / blk_finish_plug / blkdev_writepages
-   sync_blockdev / bdev_release / __fput / sys_close
-
-Replace WARN_ON_ONCE with pr_debug_ratelimited so the condition is
-logged at debug level without splat.  The BLK_STS_NOTSUPP return is
-preserved; I/O to the transitioning namespace is still rejected.
-
-An alternative approach that addresses the root cause at the
-integrity-profile level is proposed in patch 2/2: populate
-bi->metadata_size for EXT_LBAS non-PI namespaces in nvme_init_integrity()
-so that bio_integrity_action() returns non-zero, bio_integrity_prep()
-sets REQ_INTEGRITY, and nvme_setup_rw() never reaches this branch.
-Both patches are sent as RFC for maintainer guidance on the preferred
-direction.
+blk_validate_integrity_limits() accepts this configuration: with
+csum_type=BLK_INTEGRITY_CSUM_NONE, pi_tuple_size=0, and pi_offset=0,
+all checks pass (pi_offset + pi_tuple_size <= metadata_size, pi_tuple_size
+must be 0 for CSUM_NONE), and interval_exp is auto-filled to
+ilog2(logical_block_size).  No generate/verify callbacks are configured,
+so no actual integrity computation occurs; only the blk_integrity_rq()
+predicate is satisfied.  Capacity is still forced to 0 by
+set_capacity_and_notify(), so new bios are rejected by bio_check_eod()
+before queue entry.
 
 Tested: Compiled on linux-kcov-debug (6.19.0+, KASAN/DEBUG_LIST).
-Boot-tested under FEMU with NVME_MALICIOUS_RESPONDER=1
-NVME_SEMANTIC_DATA_MUTATOR=1; ran 4 concurrent dd processes plus 500
-rescan_controller cycles.  No WARN, BUG, or Oops observed.
+Boot-tested under FEMU with NVME_SEMANTIC_DATA_MUTATOR=1; ran 4
+concurrent dd processes plus 500 rescan_controller cycles with no WARN,
+BUG, or Oops.  The EXT_LBAS + ms!=0 + !PI combination was not triggered
+during testing (FEMU's mutator varies flbas and lbaf[0].ms independently;
+flbas=0x10 with lbaf_idx=0 was not produced in this run).  The
+bi->metadata_size assignment path was not exercised in testing;
+correctness of blk_validate_integrity_limits() for this configuration
+was verified by code inspection.  Provided as RFC.
 
 Found by FuzzNvme(Syzkaller with FEMU fuzzing framework).
 
@@ -144,27 +131,45 @@ Acked-by: Dave Tian <daveti@purdue.edu>
 Acked-by: Weidong Zhu <weizhu@fiu.edu>
 Signed-off-by: Chao Shi <coshi036@gmail.com>
 ---
- drivers/nvme/host/core.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/nvme/host/core.c | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index d1711ef59fb..4e20c8f08e4 100644
+index 4e20c8f08e4..76fb788024f 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -1039,8 +1039,12 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		 * namespace capacity to zero to prevent any I/O.
- 		 */
- 		if (!blk_integrity_rq(req)) {
--			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)))
-+			if (!nvme_ns_has_pi(ns->head)) {
-+				pr_debug_ratelimited("nvme: %s: metadata (ms=%u) without PI or integrity request, returning NOTSUPP\n",
-+						     ns->disk->disk_name,
-+						     ns->head->ms);
- 				return BLK_STS_NOTSUPP;
-+			}
- 			control |= NVME_RW_PRINFO_PRACT;
- 			nvme_set_ref_tag(ns, cmnd, req);
- 		}
+@@ -1836,8 +1836,29 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
+ 	 * insert/strip it, which is not possible for other kinds of metadata.
+ 	 */
+ 	if (!IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ||
+-	    !(head->features & NVME_NS_METADATA_SUPPORTED))
+-		return nvme_ns_has_pi(head);
++	    !(head->features & NVME_NS_METADATA_SUPPORTED)) {
++		bool has_pi = nvme_ns_has_pi(head);
++
++		/*
++		 * For PCIe EXT_LBAS non-PI namespaces the block layer sets
++		 * capacity to 0 (we return false) to prevent block I/O, but a
++		 * cached-rq bio may bypass bio_queue_enter freeze serialisation
++		 * and reach nvme_setup_rw() with head->ms != 0 and no
++		 * REQ_INTEGRITY set.  Populate bi->metadata_size so that
++		 * bio_integrity_action() returns non-zero and bio_integrity_prep()
++		 * sets REQ_INTEGRITY on any such bio, preventing the WARN_ON_ONCE
++		 * at nvme_setup_rw() (addressed by patch 1/2).
++		 *
++		 * NOTE: only metadata_size is populated; no csum or PI profile is
++		 * configured.  Actual data integrity for EXT_LBAS non-PI workloads
++		 * is untested; this patch is RFC for direction discussion.
++		 */
++		if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
++		    (head->features & NVME_NS_EXT_LBAS) &&
++		    head->ms && !has_pi)
++			bi->metadata_size = head->ms;
++		return has_pi;
++	}
+ 
+ 	switch (head->pi_type) {
+ 	case NVME_NS_DPS_PI_TYPE3:
 -- 
 2.43.0
 
