@@ -1,159 +1,321 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013018.outbound.protection.outlook.com [40.107.162.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0DB44103C
-	for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 16:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777393245; cv=none; b=pSQa6SXSUbWozj14hVAGGkUbEDHnt4+aCqXOKNg1ZlJWnl+nqdmXaVp+329l3iAhLr+haaF8F3RsVMcvNr/3gmXJ03WulrJ3KMU1YNg5HTbO48EbpXdeHOLBGfh1Q5WYhdyrbWNIEDzkk8gkjIzNHR6bqysbklC7N9ZGrWPjbqk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777393245; c=relaxed/simple;
-	bh=NL42Fgfj3quzU0ajWvj06zGIbM5Mw3K1e6+8xjrW5KM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dJrLSSt4SBgmrzJYipKz8/c7WBs7NO/DkaktUDcWr3hEPRaMHvFRoCfC8M1W5wpxSa1DXXhGj0IvnI6Dw3qA9orI7okCl7U+kqWTkjEqC65rl0IhWSsmfmtzqLGu1OmYPWnVjKIsqHys5cZ8AeMHbZ/DnvQFSdADgRmwjCMyjUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OLKjlbbS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1151ADC7E;
+	Tue, 28 Apr 2026 16:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777393630; cv=fail; b=STbb0WdeLWi7kLZwCF400lRVSfdg45s8YbIg6DQaMu48s9fxHiTTfHf+y2mjBVoOXrjkDQeJw+Xe/ln1eZzn4Vt7ei/whVz4VY+JCF8K22zlxXK73zdTtrWO77rfSzqQR6a2vfz72O6ZUjcDC9/0VPGAT6hPbeqlFIuYOrocfKY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777393630; c=relaxed/simple;
+	bh=czkuRTCbXbBTjUssA7PNwnP3nQDZCmLwMQETFvf6abQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WEEbAAFl8cQ2O9wpNHkpw1nun6oFceG6LHXmRlaLSlcbAGkteiFZl91PMTuk0l0/BM5juOmYsTfeab5uCCv8y6OjrqdXj2OW2ilQ1neLx8BOfmc02gN0Duk6fvpsSqaM99qoSCbvtXinJznMA0xl22BroYV6pLo3q4yQ5HrO5T0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=HC5SaI20; arc=fail smtp.client-ip=40.107.162.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLKjlbbS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777393243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DdvJeyJsOKadMtx46rQLZ1Jkv7h9xz+WU0TCYw8lOjE=;
-	b=OLKjlbbS0dNRu/ZcnzKqRtOEXhTF4cs6ePOSfYj4Ruxk0iDjkVeWJZG3je0XXuQMSparRX
-	8/Ft/hUtyVmZBePkyIqVaJFmAo7axjJN9Ip14Qnyj7s7+Zf/LIb01MqDR7Lv+QTtlkIrJt
-	o3gRu7BCetjD7Xj1QrNOiZHy+bFECII=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-e5VDaWU9OPiQVeqIfezU7A-1; Tue,
- 28 Apr 2026 12:20:39 -0400
-X-MC-Unique: e5VDaWU9OPiQVeqIfezU7A-1
-X-Mimecast-MFC-AGG-ID: e5VDaWU9OPiQVeqIfezU7A_1777393237
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5429B180034F;
-	Tue, 28 Apr 2026 16:20:36 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 79D7C19560AB;
-	Tue, 28 Apr 2026 16:20:35 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63SGKYbn2773321
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 28 Apr 2026 12:20:34 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63SGKWDW2773304;
-	Tue, 28 Apr 2026 12:20:32 -0400
-Date: Tue, 28 Apr 2026 12:20:32 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
-        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
-        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
-        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
- device encryption
-Message-ID: <afDeUNNWEIlxl5HC@redhat.com>
-References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
- <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
- <ae65vfakVKg2aGcp@redhat.com>
- <af84cfb7-b673-404a-a7f9-6efd9d23a08f@oss.qualcomm.com>
- <f92f318b-5c99-4880-906c-136aa180d58c@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="HC5SaI20"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UxYMXwWTW4zb1QsFuyoQrTHJnsUhHxVP7BD4tjOnv4tB64w9Kg2A5EdQhQ2D91tbAYfR1GdsTTUGIUg8eoeEx5/SzNygCwJEAA3hyiYIcTQtz93YuBHYj5BBjD4LrI69o9vNnSqkM0TWzLYVsUSFGMOauvRxzc/fS4IzhIEx7gW7c+kfVV2PMQuHc6H/Dtl1fknoERVGjhB5YN0U+ms39XAUGejZtWlcr+QbR1ZhptX5TtKGc3h8Uw1W33bQs/X92mfaJIpWv7crTRVk71EhVxsLx3WwHsghob8UviMKnwJgGRVYDwufdNpivS/o2Fh/OmE/OWZvhvHIoNxTx5H2Gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+Ww3rMVFVCESbkNYlfhduIl3KcVpeXojhIB9Dy7bdGg=;
+ b=eN0mvJGkfT+d4yp3ze5S10aVDX1QhKF83hT7YsWcNmte3XuImRH0XEkCJ1Gb4cPxHG8k2AiREVXBWC3KeXR1Cbwhs8NI9wOdVXgVT4+/Xkh/nJKoerUvsMnvBshJxmJL/c7d4LPKYm8hzmLHIKEnKjJwc/6Y6TqbvOddzq27hi+9zoh+T6mfMctSvKgK44rXQE8MHrdoWRrBmKH13CosxiIfCaEHSSeusQsBiVdrZoc50j0ZwPbeEBXsoFDcJrzi26lKSESoF8kVDJt8tGmfqk/mY4EQSILZqButGkN+ar2SsK7+3qodOJaQnf9cigBQ3l6xs4OSUo/G4RrLzfDtCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
+ dkim=pass header.d=est.tech; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+Ww3rMVFVCESbkNYlfhduIl3KcVpeXojhIB9Dy7bdGg=;
+ b=HC5SaI201ITeqNkG6K00qF3Q2S52XtVIN4kKsLWLu1mnMGNf/O+Xhi8AHsNBuJyCEgf6yj6PPCq5uuAgZ+7b2YX75S6BuTbesQDcWx4rALEybQeBjFIDu+GpW6JVtTe+HHCCRI5L1XjJarihsRcbW69BwTmZuPPG0mqKmgxqVpg43eEGWkOdGzzdEacvcVQlToRi3WQlMdAfpK2LO9Du7DWicmvwVjMoGnN9FqDrB2odBy9gS8M1dPrbXDFApXMATesWjKHfrbmXE1bYiaDD6/F9wnMfomuMWCwRxQGXgHMzuF43LIIe2SaQcQlA6xcCJ1S7zBwnymjMSSZF94TuhA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=est.tech;
+Received: from AS8P189MB1752.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:39b::19)
+ by DU7PPF6FE197BF0.EURP189.PROD.OUTLOOK.COM (2603:10a6:18:3::ad5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9846.26; Tue, 28 Apr
+ 2026 16:27:03 +0000
+Received: from AS8P189MB1752.EURP189.PROD.OUTLOOK.COM
+ ([fe80::69fc:c4d4:200b:e4b4]) by AS8P189MB1752.EURP189.PROD.OUTLOOK.COM
+ ([fe80::69fc:c4d4:200b:e4b4%7]) with mapi id 15.20.9846.025; Tue, 28 Apr 2026
+ 16:27:03 +0000
+From: Yunseong Kim <yunseong.kim@est.tech>
+To: bagasdotme@gmail.com
+Cc: 2407018371@qq.com,
+	Dai.Ngo@oracle.com,
+	Liam.Howlett@oracle.com,
+	a.hindborg@kernel.org,
+	ada.coupriediaz@arm.com,
+	adilger.kernel@dilger.ca,
+	akpm@linux-foundation.org,
+	alex.gaynor@gmail.com,
+	alexander.shishkin@linux.intel.com,
+	aliceryhl@google.com,
+	amir73il@gmail.com,
+	andi.shyti@kernel.org,
+	andrii@kernel.org,
+	anna@kernel.org,
+	arnd@arndb.de,
+	ast@kernel.org,
+	baolin.wang@linux.alibaba.com,
+	bigeasy@linutronix.de,
+	bjorn3_gh@protonmail.com,
+	boqun.feng@gmail.com,
+	bp@alien8.de,
+	brauner@kernel.org,
+	broonie@kernel.org,
+	bsegall@google.com,
+	byungchul@sk.com,
+	catalin.marinas@arm.com,
+	chenhuacai@kernel.org,
+	chris.p.wilson@intel.com,
+	christian.koenig@amd.com,
+	chuck.lever@oracle.com,
+	cl@linux.com,
+	clrkwllms@kernel.org,
+	corbet@lwn.net,
+	da.gomez@kernel.org,
+	dakr@kernel.org,
+	damien.lemoal@opensource.wdc.com,
+	dan.j.williams@intel.com,
+	daniel.vetter@ffwll.ch,
+	dave.hansen@intel.com,
+	david@fromorbit.com,
+	dennis@kernel.org,
+	dietmar.eggemann@arm.com,
+	djwong@kernel.org,
+	dri-devel@lists.freedesktop.org,
+	duyuyang@gmail.com,
+	dwmw@amazon.co.uk,
+	francesco@valla.it,
+	frederic@kernel.org,
+	gary@garyguo.net,
+	geert+renesas@glider.be,
+	geert@linux-m68k.org,
+	gregkh@linuxfoundation.org,
+	guoweikang.kernel@gmail.com,
+	gustavo@padovan.org,
+	gwan-gyeong.mun@intel.com,
+	hamohammed.sa@gmail.com,
+	hannes@cmpxchg.org,
+	harry.yoo@oracle.com,
+	hch@infradead.org,
+	her0gyugyu@gmail.com,
+	hpa@zytor.com,
+	jack@suse.cz,
+	jglisse@redhat.com,
+	jiangshanlai@gmail.com,
+	jlayton@kernel.org,
+	joel.granados@kernel.org,
+	joel@joelfernandes.org,
+	joelagnelf@nvidia.com,
+	johannes.berg@intel.com,
+	josef@toxicpanda.com,
+	josh@joshtriplett.org,
+	jpoimboe@kernel.org,
+	juri.lelli@redhat.com,
+	kees@kernel.org,
+	kernel-team@lge.com,
+	kernel_team@skhynix.com,
+	kevin.brodsky@arm.com,
+	kristina.martsenko@arm.com,
+	lillian@star-ark.net,
+	linaro-mm-sig@lists.linaro.org,
+	link@vivo.com,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-modules@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev,
+	linux@treblig.org,
+	longman@redhat.com,
+	lorenzo.stoakes@oracle.com,
+	lossin@kernel.org,
+	luto@kernel.org,
+	mark.rutland@arm.com,
+	masahiroy@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	matthew.brost@intel.com,
+	max.byungchul.park@gmail.com,
+	mcgrof@kernel.org,
+	melissa.srw@gmail.com,
+	mgorman@suse.de,
+	mhocko@kernel.org,
+	miguel.ojeda.sandonis@gmail.com,
+	minchan@kernel.org,
+	mingo@redhat.com,
+	mjguzik@gmail.com,
+	neeraj.upadhyay@kernel.org,
+	neil@brown.name,
+	neilb@ownmail.net,
+	netdev@vger.kernel.org,
+	ngupta@vflare.org,
+	ojeda@kernel.org,
+	okorniev@redhat.com,
+	oleg@redhat.com,
+	paulmck@kernel.org,
+	penberg@kernel.org,
+	peterz@infradead.org,
+	petr.pavlu@suse.com,
+	qiang.zhang@linux.dev,
+	rcu@vger.kernel.org,
+	richard.weiyang@gmail.com,
+	rientjes@google.com,
+	rodrigosiqueiramelo@gmail.com,
+	rostedt@goodmis.org,
+	rppt@kernel.org,
+	rust-for-linux@vger.kernel.org,
+	samitolvanen@google.com,
+	sashal@kernel.org,
+	shakeel.butt@linux.dev,
+	sj@kernel.org,
+	sumit.semwal@linaro.org,
+	surenb@google.com,
+	tglx@linutronix.de,
+	thomas.weissschuh@linutronix.de,
+	tim.c.chen@linux.intel.com,
+	tj@kernel.org,
+	tmgross@umich.edu,
+	tom@talpey.com,
+	torvalds@linux-foundation.org,
+	trondmy@kernel.org,
+	tytso@mit.edu,
+	urezki@gmail.com,
+	usamaarif642@gmail.com,
+	vbabka@suse.cz,
+	vdavydov.dev@gmail.com,
+	vincent.guittot@linaro.org,
+	vschneid@redhat.com,
+	wangfushuai@baidu.com,
+	wangkefeng.wang@huawei.com,
+	will@kernel.org,
+	willy@infradead.org,
+	wsa+renesas@sang-engineering.com,
+	x86@kernel.org,
+	yeoreum.yun@arm.com,
+	ysk@kzalloc.com,
+	yunseong.kim@ericsson.com,
+	yuzhao@google.com,
+	ziy@nvidia.com,
+	Yunseong Kim <yunseong.kim@est.tech>
+Subject: [PATCH] dept: update documentation function names to match implementation
+Date: Tue, 28 Apr 2026 18:26:15 +0200
+Message-ID: <20260428162614.786365-2-yunseong.kim@est.tech>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <aTN38kJjBftxnjm9@archie.me>
+References: <aTN38kJjBftxnjm9@archie.me>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: DU2PR04CA0057.eurprd04.prod.outlook.com
+ (2603:10a6:10:234::32) To AS8P189MB1752.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:39b::19)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f92f318b-5c99-4880-906c-136aa180d58c@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8P189MB1752:EE_|DU7PPF6FE197BF0:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24ef4166-f10b-4680-89f8-08dea542fb08
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|366016|376014|1800799024|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	ZrBrcEqsBxWaUtIkXBuaZbiJkK9T5hpQaWEJenFKgDIBh6LrXwWxkyLRJH1vf4sr5zaPWTzey3hnne3VTwhRcxxajiKakAhXivYPo2g4XlUdNm7fGZXcF78ZP34FvcYEqv9CYMVn6pIhJ+gXPPL69jFIxnu8Tld32UK8Gxd71d8EcxG1rBvCLk/45b55qUy4OJygtEZ/t477YXSPOTsvzdQ8z/ANM8X01HY9GGWvjzYMWHLdKv+a34GtB6DE67wWNazWVD2pv0OLmgXR60cqQId/p7xGpeNMcWhL3BYwrLVrgJ+V+f/35BwSUeN6Q6z7NZgIWuBFU79mhlK13giRF2ot65ymf4NtY6IRHobog38B6tXLRPtuJoY520bmhHuPbwV84dxn5Hts0Ho3xepGc650awz9Oe+vK//oKqYgcKSsrbSb8okgfww9Qk4Jo3V2cgq2OiaG8pbFTvkWqzJTsYO71pq3FQqLRmFKH8/0ShJqW1UZJYVw0pqslhPHCuKwUx+UmU0Mk7tCrKh6h7wIvV1GjMiTlt1d/3SE6p97PaxuaEgI9apsXW8h85aaCGcyXi6E1tHAiAZaRZt44JB9QmNJBB4WEaZcf5p0ig0+7iz+o/o2soO4COJM9yAQTk+F2rGoqMlyt2G4iFSaGNGAfkPDcWqrZFyh8V/ld2hO9WAZd0T2C0etisEzEiiSFYtx368RxXq08NgemHMnrEpRZcTZ3zWe0GjGaDHUkt8wo8Q=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8P189MB1752.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?91lmgw6PEF3mTxhj5DqxcL15nmLUTHzQFIuHDYIUWoBFqaq+zm8el+evrjdn?=
+ =?us-ascii?Q?28UDQtpT9yMQl/4XvNpKrehMmjAJv9Sv06+FzCWMe3UH/3RLjmX72RZB0vhT?=
+ =?us-ascii?Q?uk4lmif8aByQ3rDvrf9NInOdoEqEHnYtAyhwkYwyI1Nx+1TJrPqhDnxuVRpk?=
+ =?us-ascii?Q?ZSeu1m2jm0XUDXHoSe+YitRU9kLjswco1ZtUcQwKLR3RCq5AXJy6IL90BVkK?=
+ =?us-ascii?Q?bvRrGITo8It7tx06lZpCQanDaFJ15Px/eQ/7MS7lh98Vs1F5fif17yAr/6eO?=
+ =?us-ascii?Q?mxKZjPZVl2Hy6xLJCNxxKJ914rtvTUARnDXbnOBcUyfXwdT4lWw9pNuQlH2B?=
+ =?us-ascii?Q?Co6c5czkVD2bG6l1OVDFTHjzroTXMRCoOPDjTvSIJkTpL6QKgC8JEB96BQwG?=
+ =?us-ascii?Q?a4FfmfSsicuXtzk11YYEKedZnuxf8vRNhXBUPY2tttFDv8/07HGLxXI4RQMk?=
+ =?us-ascii?Q?7DwXCtza1Rx07hRCucCpJrN5UPwnNoCRUrrM51ilSH/h5QNQ40nXo5R98Ndj?=
+ =?us-ascii?Q?0C2p8wQr0crqrXiZ1O4ycyAJ5d2ztkOseAHyB2+UMUr/mhL2GEem1Jh79U7v?=
+ =?us-ascii?Q?4wxUz+3HBJspZBgccLAg2b+hkv54Q6hiXrfGcfr/PgdxHxKsKLY9dUULN2mN?=
+ =?us-ascii?Q?9Wrx7oSuyqrA17QZ8JlJ9qZC6BnK+mJZDv+uvE4+Z/Fy/w3NFfvA6mUIDRmb?=
+ =?us-ascii?Q?xreACR6m0rirPMF03dVrreoM+EWueapkk7x2GNLywR5mqikiRaCA7v+xNPmW?=
+ =?us-ascii?Q?lEeDpHNh3IQaP3en7zooZnBg0JRQfvSo7WteU32/b9v7fDqiID2Dk2Qbvmcb?=
+ =?us-ascii?Q?qgpwU8QBW0lsiyDdB5RQjETR0tfOxSSKBHQhaikCScpcTfmT7AassI9mo8df?=
+ =?us-ascii?Q?6r7z4Cy00m3cD3KfzL54WaRsD/jLUr5IwRgE5bPCfBXWQ+DSWSLwFb1If6Q4?=
+ =?us-ascii?Q?+XW8twg73C4YKlaE59jX6i60Kc0ECEknZwJefqO8n1xryCKMF+jguOgm3a/p?=
+ =?us-ascii?Q?HCzF7Has/7RJW2j06k4oiZhcknZ51J9YGm44jBtvV58AXifV27DtookFdCSw?=
+ =?us-ascii?Q?b7AI7xBNgosz47FWC8tHwMPw2zUdTJchuIG6I8XC3WQswZh73akCdp1RY9CL?=
+ =?us-ascii?Q?EyxfXpSSWBMTwwkRI1OjYVsxzK14cZ69mWQ7tDZCsu/UTF2dDWyXjwqMqIRY?=
+ =?us-ascii?Q?AZAY4BSPVq+Jf/DqjUU6V2u4AYVkwo6HteAXHdgIL+OdXvmCCW/sqlHV93nC?=
+ =?us-ascii?Q?Lft+jRNp8ER49Q1ol0SuwJZBrndRZ0mDcqvJYzkhIe/BIVMk+XevvBmuKXbM?=
+ =?us-ascii?Q?rjh7SjXVQ4LzcyjloG7PWe9ChgjpZKWY7E2SrQ3iLAhQJE26f3EV/RRJpwD1?=
+ =?us-ascii?Q?zje3l86FJW4KOKGNQ7lRjeQX/W9BV6da016hiAyvi/wBTQR7JORi8MeiMxIX?=
+ =?us-ascii?Q?KgF+v11h/9wcFra4DuO0IUGJlO9BbTTAcHM+I5Rngoc6pSiljdD1CZc3Fy3j?=
+ =?us-ascii?Q?K+2dJGvfIannhR/K1qnUOVwuqSX7oi8Gzt1KJFBjSQqGzt5c0mdcv0C7jLqX?=
+ =?us-ascii?Q?xtm5znIZ13MienE9ICAHRhO87N1G2tvs22yrzi8rEXjgo8EEBu8Hl3HS4hbh?=
+ =?us-ascii?Q?SVhWyWfgQfd8jaHowzNwmhBhzAZB2c0CfbxxY+qYh/fDLryznsybdO7P3fSy?=
+ =?us-ascii?Q?m6hyBEaNJXry1TVAjUZmvRaBunN96OEkbL9EJelsHAOHz0ZuLGc+lH89G5y+?=
+ =?us-ascii?Q?+okl/obTCA=3D=3D?=
+X-OriginatorOrg: est.tech
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24ef4166-f10b-4680-89f8-08dea542fb08
+X-MS-Exchange-CrossTenant-AuthSource: AS8P189MB1752.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2026 16:27:03.2904
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kt3ldRAB6jTICdoR8HAa2yj+Tdv/0cT0k0yKTjliKpO5aSo52R1DNrgIjXb36qyHw7G7gL8UZwLChVuUFUNobw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU7PPF6FE197BF0
 
-On Tue, Apr 28, 2026 at 06:43:08PM +0800, Linlin Zhang wrote:
-> Correct the response to Benjamin's comments.
-> 
-> On 4/27/2026 8:20 PM, Linlin Zhang wrote:
-> > 
-> > 
-> > On 4/27/2026 9:19 AM, Benjamin Marzinski wrote:
-> >> On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
-> >>> From: Eric Biggers <ebiggers@google.com>
-> >>> +
-> >>> +static int inlinecrypt_map(struct dm_target *ti, struct bio *bio)
-> >>> +{
-> >>> +	const struct inlinecrypt_ctx *ctx = ti->private;
-> >>> +	sector_t sector_in_target;
-> >>> +	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = {};
-> >>> +
-> >>> +	bio_set_dev(bio, ctx->dev->bdev);
-> >>> +
-> >>> +	/*
-> >>> +	 * If the bio is a device-level request which doesn't target a specific
-> >>> +	 * sector, there's nothing more to do.
-> >>> +	 */
-> >>> +	if (bio_sectors(bio) == 0)
-> >>> +		return DM_MAPIO_REMAPPED;
-> >>> +
-> >>> +	/*
-> >>> +	 * The bio should never have an encryption context already, since
-> >>> +	 * dm-inlinecrypt doesn't pass through any inline encryption
-> >>> +	 * capabilities to the layer above it.
-> >>> +	 */
-> >>> +	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
-> >>> +		return DM_MAPIO_KILL;
-> >>> +
-> >>> +	/* Map the bio's sector to the underlying device. (512-byte sectors) */
-> >>> +	sector_in_target = dm_target_offset(ti, bio->bi_iter.bi_sector);
-> >>> +	bio->bi_iter.bi_sector = ctx->start + sector_in_target;
-> >>> +	/*
-> >>> +	 * If the bio doesn't have any data (e.g. if it's a DISCARD request),
-> >>> +	 * there's nothing more to do.
-> >>> +	 */
-> >>> +	if (!bio_has_data(bio))
-> >>> +		return DM_MAPIO_REMAPPED;
-> >>> +
-> >>> +	/* Calculate the DUN and enforce data-unit (crypto sector) alignment. */
-> >>> +	dun[0] = ctx->iv_offset + sector_in_target; /* 512-byte sectors */
-> >>> +	if (dun[0] & ((ctx->sector_size >> SECTOR_SHIFT) - 1))
-> >>> +		return DM_MAPIO_KILL;
-> >>
-> >> If ctx->iv_offset is not a multiple of ctx->sector_size, this will
-> >> always fail. ctx->iv_offset should probably get validated in
-> >> inlinecrypt_ctr()
-> > 
-> > ACK
-> > 
-> > Yes, this assumes iv_offset is aligned to sector_size when large crypto
-> > sectors are used. That’s a requirement of dm-inlinecrypt semantics, and
-> > adding an explicit check in inlinecrypt_ctr() would make this fail earlier
-> > and more clearly.
-> 
-> Sorry, the last response is wrong. No need to add check in inlinecrypt_ctr().
-> 
-> iv_offset is the starting offset for IVs that are generated as if the target were
-> preceded by iv_offset 512-byte sectors.
-> 
-> I think this concern is based on an implicit assumption that
-> sector_in_target is always data-unit (crypto sector) aligned. In this
-> target, however, sector_in_target is derived from dm_target_offset() and
-> is in 512-byte sectors, so it is not guaranteed to be a multiple of
-> (sector_size >> SECTOR_SHIFT).
+Synchronize function names in the documentation with the actual
+implementation to fix naming inconsistencies.
 
-sector_in_target should be guaranteed to be sector_size aligned.
-inlinecrypt_io_hints() sets the device logical block size to at least
-ctx->sector_size, and validate_hardware_logical_block_alignment() makes
-sure that the target starts on a logical block boundary. The block
-layer enforces IO to be aligned with the logical block size, so
-an IO that starts 7 sectors into a device with a 4096 ctx->sector_size
-should be impossible. 
+Signed-off-by: Yunseong Kim <yunseong.kim@est.tech>
+---
+ Documentation/dev-tools/dept.rst     | 2 +-
+ Documentation/dev-tools/dept_api.rst | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
--Ben
+diff --git a/Documentation/dev-tools/dept.rst b/Documentation/dev-tools/dept.rst
+index 333166464543..31b2fe629fab 100644
+--- a/Documentation/dev-tools/dept.rst
++++ b/Documentation/dev-tools/dept.rst
+@@ -97,7 +97,7 @@ No.  What about the following?
+ 
+ 			   mutex_lock A
+    mutex_lock A <- DEADLOCK
+-			   wait_for_complete B <- DEADLOCK
++			   wait_for_completion B <- DEADLOCK
+    complete B
+ 			   mutex_unlock A
+    mutex_unlock A
+diff --git a/Documentation/dev-tools/dept_api.rst b/Documentation/dev-tools/dept_api.rst
+index 409116a62849..74e7b1424ad5 100644
+--- a/Documentation/dev-tools/dept_api.rst
++++ b/Documentation/dev-tools/dept_api.rst
+@@ -113,7 +113,7 @@ Do not use these APIs directly.  The raw APIs of dept are:
+    dept_stage_wait(map, key, ip, wait_func, time);
+    dept_request_event_wait_commit();
+    dept_clean_stage();
+-   dept_stage_event(task, ip);
++   dept_ttwu_stage_wait(task, ip);
+    dept_ecxt_enter(map, evt_flags, ip, ecxt_func, evt_func, sub_local);
+    dept_ecxt_holding(map, evt_flags);
+    dept_request_event(map, ext_wgen);
+-- 
+2.53.0
 
