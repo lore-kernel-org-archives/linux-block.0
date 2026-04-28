@@ -1,227 +1,118 @@
-Received: from mail-qt1-f225.google.com (mail-qt1-f225.google.com [209.85.160.225])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5103E3E121B
-	for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 07:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4493ED114
+	for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 07:25:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777360971; cv=none; b=bMsgj3XQrIONJFLWCzfwNrGdCILvwgtPcZGEwkI2AGF0Eu6UAPGiA+YxmgNRuOWecTRi9WO83IfDy8dzRxonCfmgJJviSFJK8WkSUkDus3vbcO1zKLDvGM6wrV45XacOoAanJKdN2kvFZHR2VvP6k2K2S4ZDeQnk+DQxlbg8Q+0=
+	t=1777361108; cv=none; b=fioiqcDeADRIXFKUZT5yFZCpEQGnKkuRKwhj50XU07xzlNGOVm0t6O/ufkHSyA4hXkdF7/2vuP13kCekM36ZimdjoR3Ox8wp90RkPa3Hs+iDuQzkzAbbCFzynRnvjNZqqj038G0CB60CKsptNuTsvgUIlO97/sd1w3MY9Aksou4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777360971; c=relaxed/simple;
-	bh=8BSU0szaTSpMG8Ai97L0x0/Wbw8gvHf73J/GonLPPhY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=puk3gHE1oKqZ0/W/+k7clphQAH+M8Krp6RSMvgzLr9BnSPGP5Lv3uJ0XV+f4Leq15Nr8eRila74WCmw5xN90s7tXmBOadtSOAsgIlXIq2HyNxsMKA6YoqAA+q2RRonH+SWZUVK7MeOYosUwOfwN89Cz8TZtVn5Rx+qu4MkYi6YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=b8UTP7Y3; arc=none smtp.client-ip=209.85.160.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+	s=arc-20240116; t=1777361108; c=relaxed/simple;
+	bh=O01XH8PH7Qd3MMdXjEgJXTtOf8fl/1BmXGJXr4I4IZ8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hWkd6V6/YBnmBKuGQlfPdYgflDxd5Nfa7FDpuhCvqS4ziF2+csQ7I3w5+aCMrEP7oj+HnsTjDcfMTjtrz1xH9WK4awAqYuobIlpjUg1zhacA4UB4cWgzGsSqEQMz35J4kZNGp/7Cryu0y7eyTM2IZV7FPb3d9TXXe1J5NF7rK+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KPrgz2rY; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b8UTP7Y3"
-Received: by mail-qt1-f225.google.com with SMTP id d75a77b69052e-50d880e6fbbso122927201cf.0
-        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 00:22:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777360969; x=1777965769;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8BSU0szaTSpMG8Ai97L0x0/Wbw8gvHf73J/GonLPPhY=;
-        b=B3TUPoT8RxKpYkufje1iwFEjnfEBaUm5yZSEteIbdcDLx96D3eVFJ/6VeXfIt2jVoC
-         pd/hYuZZsYOGqfKLso9ie8cnScp4Xsw2ZKq4TzQ23QBQePYUa1h1abBGTpMdABVQSkl6
-         bqWNM0SapTqvQly3WRKaMqIvDlBTadE3QnDgKYu1yO0HXtP8J0Ey+77RKpKKYtwEuC3z
-         9UncWXUgMLgWB8fR1ZKZ17My1o5h+ekHmUf+ISwR4gbusIJxu0PvprQzbDjl5lR0zuu4
-         YN//Gdmz7lHVNCrihK8uvVi6Nsx877jWOuzZt3otuXPeS9hrmk7Gf3JD/bM4+mRrn1ls
-         mG1g==
-X-Forwarded-Encrypted: i=1; AFNElJ/XjFroBDWagBh5o1btRIELJJj70sblQNFmFekyylCwcEi1k7BrPOiXczOu7OOyo5PuRiH2dVqJfZaiNg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhYANBcRgB/qft5lCjNqp/MaG39pJyJn37dSXwBJAI74k4kjLE
-	c7i/s5+IhGTDGX1Te0wzfJbR57IKDo13myRlauMIBZK4XUTwJfMBjQAtksT3fuOC4mP+OuPgtw+
-	yjd23WDmYnYeiyG97CPX+E845Z7q5qyRNklHKLYov1eJqxHr6mSfWhh/OFCnWSTYJ/Gn6IVyZoT
-	UtmNR9tcKo2ew7eAlRm8bUM0MMVNtFJW6x699NYQmX6JOVIgAW168hqmD6Lj1eum6Fj8PCMHV1g
-	LIepTTs3vR+aAYmSA==
-X-Gm-Gg: AeBDiesdhJ13F/mKsYTB86+bJF1FkVy8KzJeywLpP3rtbhdgQ9OgALNTcbXCPwDbxMi
-	fRa0eWgODaPua6D+TSTE66sJvrLDp59MPzNGO7ujzR7SpROppmoCgby9/dryD0nLGYLYU/cdNcf
-	qnprwf+8q5FAmCWhPyZBeOxkiYkhaQ2Pk2d9W68LI1xDtHl3XieGUCSSjsFTVTTK+JHT70eRlzv
-	FHmNiV4v4T367NDuaog1G+1bkRD+ebV38PSuhdnFePq++uhIuAQDPPiLIWRucWMuoH9M6w3eBYV
-	SskUfdxOFnvI8AeejJat9KkkQRwZzk3RlMTYiIx6WrvRaRmlrEH+2YlUUZUpTXPy/2nS7Erl/mJ
-	ZcAAnkV26R0wlWqzYkfgoDjKHQuPtpVbYeVFpLi45CfEMGokVPTcToc88VTb1YQj7/DWkPP8v2L
-	jJ3ZI5WLib9Pe4WD+XBryocScv95ze93Gpq5t5tCz51U/rBewWN/UNPeV7Ci9XTll1
-X-Received: by 2002:ac8:5d0c:0:b0:50d:6fd3:421 with SMTP id d75a77b69052e-5100dc83390mr25638781cf.6.1777360969128;
-        Tue, 28 Apr 2026 00:22:49 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-5100da45bc1sm1210051cf.6.2026.04.28.00.22.48
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 Apr 2026 00:22:49 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-59e11fb980fso7601373e87.2
-        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 00:22:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KPrgz2rY"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82fb2d0c5d1so5508677b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 00:25:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1777360967; x=1777965767; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8BSU0szaTSpMG8Ai97L0x0/Wbw8gvHf73J/GonLPPhY=;
-        b=b8UTP7Y37awscbXmzrT9/sR4EWezYwFlbl+4qgdWBNB8B3j++ZlHtSH15Cp/YihhFs
-         zV2iggg3I1luptGse5G2lnYYFLTch+vrAv7Qh3d8S4lXhSF9XhYt/b+DPqk5xSR/gLtd
-         1Z9ojWgA+XcWO2q14sL9d/L9bCEfbchFvY0us=
-X-Forwarded-Encrypted: i=1; AFNElJ86h2xhVRtVC2mUTgnSyLaD4wyboV4AzrWyq2Ds+2e7ud0RXQvf/rhJ15ZxZFSmiBeLNxF1J47nyKSgAA==@vger.kernel.org
-X-Received: by 2002:a05:6512:318b:b0:5a3:6d02:846e with SMTP id 2adb3069b0e04-5a74661651emr619575e87.36.1777360967250;
-        Tue, 28 Apr 2026 00:22:47 -0700 (PDT)
-X-Received: by 2002:a05:6512:318b:b0:5a3:6d02:846e with SMTP id
- 2adb3069b0e04-5a74661651emr619555e87.36.1777360966639; Tue, 28 Apr 2026
- 00:22:46 -0700 (PDT)
+        d=gmail.com; s=20251104; t=1777361106; x=1777965906; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ffPK3HGlamwsJhIWk/SXFE+By7GLberSOHXTBlAKTH4=;
+        b=KPrgz2rY94svGBtjG9Bu9iqlocdU3ICKkTusacRaDTc7rlTFBrumCpgVJmEn8/qUx2
+         SXbjPbpTZ5zHirp+i7oeQhGdcwfa93Dpgy1gNyta1BCUeBcPiXQ2eMZsSisJhzl0cxFn
+         HvP793xCRoyrZ1/HK3I7U5YnXhII25zcT4xZrUqmO28X3gITb1BsXJnR5e4k6Bpmnk33
+         LM4pYS/rjrSgDb5fgVux1blleqnln/LTUiij8PuU3Fx5Fa7TDdI+B0dSZp8YqvzgPUUW
+         mo7HlVWQ/U3glvU/x6YKb/Z+cX8YIsxKbUb1uG70kjUe3sXy026A4sCslDyVJEtPSwPZ
+         hblg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777361106; x=1777965906;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ffPK3HGlamwsJhIWk/SXFE+By7GLberSOHXTBlAKTH4=;
+        b=r0IsIgdq+8Je2/oXVPanrXat9lZ+eNzqjf3F0PQf2x6IxtRwK4+QLuUIB/3rebyoIY
+         g2dou2wdM5aWZVSsyaICi+5dL/HKNbCpx2fTrMsamg037W9nsKx29bjtSaXQLn9c2tmC
+         dkpKYM7EO0h69z0IH3IlfYBzzlervEQGXBGb9u8NqbTn2CUQ0ulPiFtoD2UA+WXB4uwz
+         FqJc3/ct5i94zBBfuJDMIo4B7DC3cvQIxdYnZY1cMH94y2D2d+w+6BqjSqNhdo4QsrI5
+         ERlm5OZAhhaAfEJjYJWgQKaUbbtnWmYtEm20TgVCPwVQ0PyfIzaS8UaRLLo5N8vCtbV7
+         yzKA==
+X-Gm-Message-State: AOJu0Yy437U1nsRnGaxEpbFiqLqzk5ENHv9sITZH/SuBe1WacqniMQ0c
+	4XHGpOG/ow7zSp/q03GnNV8UJlRNz7upw559dMOthruxB6IedwjmxdYa
+X-Gm-Gg: AeBDieu0iA73v0V44OoDKmu11xbDhpskcoAsx92mOAKUJEJ8M4Tq7qdpmx4xs9mU62E
+	NLJgefZo3vKkguDPti/RtHhzKm68+2nu0aqEgB1Yt+NMGgJH1MIKWoNCyeb/kBKbG+yo1pluDwb
+	ufQSlxPxcVPU5IogwZ6bfhY+RmVbYWHkZgoj7e2vlHbZP/sIU0l7MoDN1Mn0MXzD+dwzs42e6kN
+	NfhtYlsQvpZ6ktPJdkhBGKFwWZF+BfC/La2UxL4uyTurNNhxKZHTbPUtDiFh82Qzp3kabSTq9TP
+	R4f5fbg0Ybg2dF1xpA8vtVxd9wuE4ABPkDjmvHcas3mAaox2BDBgKZ9/tGJgXeTnYCyO1/IRtdY
+	tn2s4g9nk0sDVOhp9iLiXqehoU12KtX2su87z3XtdhDtzJNg4RO9IM0XJ6UYF4L9HrQok/SDIDC
+	iuLTwc0LwL3PocN0v0/ihSfQ0wjV5pXKPX0AyAtnP9rvlvHmw=
+X-Received: by 2002:a05:6a20:1591:b0:3a2:ed4a:5d81 with SMTP id adf61e73a8af0-3a39c530e28mr2000291637.11.1777361106265;
+        Tue, 28 Apr 2026 00:25:06 -0700 (PDT)
+Received: from yuwhisper-pc. ([49.213.140.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-834dae2249esm1714461b3a.21.2026.04.28.00.25.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 00:25:05 -0700 (PDT)
+From: Hsiu Che Yu <yu.whisper.personal@gmail.com>
+Date: Tue, 28 Apr 2026 15:24:54 +0800
+Subject: [PATCH] rust: block: fix comment referring to states by wrong
+ labels
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260420113846.1401374-1-sumit.saxena@broadcom.com>
- <20260420113846.1401374-2-sumit.saxena@broadcom.com> <a27a04be-6c41-4d7f-b697-b04c4fe9dc8c@oracle.com>
- <CAL2rwxr+7tD1BfxKJCn70wyPT34=sfFMfUNAV63SAW0BxQ-0Ug@mail.gmail.com> <4fa5c202-e884-41ce-8160-f3dcc289293f@oracle.com>
-In-Reply-To: <4fa5c202-e884-41ce-8160-f3dcc289293f@oracle.com>
-From: Sumit Saxena <sumit.saxena@broadcom.com>
-Date: Tue, 28 Apr 2026 12:52:09 +0530
-X-Gm-Features: AVHnY4I_Y2zSeEtpWQMNVK9ClUVulz-5YpSZ6l2phD4u8Er7emLFwcXf6uaM24I
-Message-ID: <CAL2rwxrmp2J89LZK1srVoSnqayOJ8cfiEiHYUzzyyqwNMT-v=w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] scsi: scan: allocate sdev and starget on the NUMA
- node of the host adapter
-To: John Garry <john.g.garry@oracle.com>
-Cc: martin.petersen@oracle.com, axboe@kernel.dk, linux-scsi@vger.kernel.org, 
-	linux-block@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com, 
-	James Rizzo <james.rizzo@broadcom.com>
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001d70710650801915"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260428-fix-docs-mq-req-v1-1-260079853836@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAMVg8GkC/yXM3QpAQBCG4VvRHJva3YTcihywOxjlbwcpuXeLw
+ 6e+771AyDMJFNEFng4WnqcAHUdg+3rqCNkFg1EmVYnJseUT3WwFxxU9rehMrVrSTZpkGsJr8RQ
+ mX7GsfsveDGS3NwP3/QCzhM3TcwAAAA==
+X-Change-ID: 20260428-fix-docs-mq-req-d2a0fe1b6471
+To: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+ "Peter Zijlstra (Intel)" <peterz@infradead.org>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Hsiu Che Yu <yu.whisper.personal@gmail.com>
+X-Mailer: b4 0.15.2
 
---0000000000001d70710650801915
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The comment in `Request` describing the four ownership states referred
+to states 2 and 3 as "B" and "C", which are inconsistent with the
+numbering scheme used throughout the same comment block.
 
-On Mon, Apr 27, 2026 at 1:57=E2=80=AFPM John Garry <john.g.garry@oracle.com=
-> wrote:
->
-> On 24/04/2026 12:33, Sumit Saxena wrote:
-> >> For the actual shost allocation, we still use kzalloc() in
-> >> scsi_host_alloc(). However, shost associated device is often a pci
-> >> device, and we probe pci devices in the same NUMA node it exists, and =
-we
-> >> try NUMA local allocations by default, so nothing is needed to change
-> >> for the shost allocation - is this right?
-> > shost allocation is not an issue, I will drop changes related to it.
->
-> But you have not made any changes related shost allocation and I am
-> questioning why.
-Yes, sorry for the confusion.
->
-> Further to what I was saying, even though most shosts are based on PCI
-> device, not all are and I think that it is worth making this same change
-> for shost allocation.
-Ok, I will add similar changes for shost allocation in v3.
->
-> > The tests indicate that at times sdev and starget are allocated to
-> > remote NUMA node.
-> > So, I will limit these changes to sdev and starget only.
->
+Update the labels to use "2" and "3" to match the existing numbered list.
 
---0000000000001d70710650801915
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Fixes: a307bf1db5448 ("rust: block: convert `block::mq` to use `Refcount`")
+Signed-off-by: Hsiu Che Yu <yu.whisper.personal@gmail.com>
+---
+ rust/kernel/block/mq/request.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-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
-ifscJ8gSasrjdgcsGC9lCyPXLwfNEU5C3Mbnua8OK6sTBpf6mvY88HW/6AoKiSpfo5jxCZQOm4Zz
-oJWD5ea7ThJ2XdDk1rRtGUkwFgN9GRNfOoiIwkkA7EdEfV0eQkVqNgkqUyBSABXcduul2sd4/JQO
-SsVmTdSKid7L6yZsqk5b3Xj+GMJwPdRfeKP2SRoys0SVnajc9Di+9Jy7uGKxxtb562egZauDFX/0
-o0UgYfZrbwWfzJDYMLKzlrOD0M8yGkD8BnyIiVECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZc3VtaXQuc2F4ZW5hQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQURSmmYGaiq6dg3CEvXQGHEXJF
-8xwwDQYJKoZIhvcNAQELBQADggIBAAl0pcCjujKdwmgtiGl2naEY5wB4G601Kuu3032tR7wmgZLg
-k+lg9fhAA0boPsi1FE1Pwb93YDBGr/naS/oQ9JglSMeEVzeRvCqjFS4FpouBAFHB77c8w3ZwJ3+t
-FSRJW9SbW0DADBn5t8GAjv2aSm5vDorqFe9MKOYEe50yYDQEUAsEt5QkrLTcEx9ntvVb25MxI8vM
-bdfqna+/TyCmFmnGAz58jiw5DxLn++6wMmAk0SeUEuMrAlRIyhte6BBSBQ5cL1P+DWSqQbm/pwCq
-NhySSLNtTi2dKJvvg6Ax9au913KiJj6uZfPlh6/0kaVKM5GhIABUcm3c6g2qD7ITJxB/p1kjYKLa
-hVrtrjK7000lHKTPFr6MWB4Ggx7yKQ9yIlPMKKF/Lj8FabYCqeM5ovG7kaK8FYXug5vjNjN0nedR
-X3P8o+8aL6WFIAAAKm2DqZh3252Gcken8v5c+f0SXWSJFvemfFNgrJiQFnFVrOE5v7qwvM/KvVCA
-dYm4Ph9QYI0sm+Xitx8MkdOJtq5mcPWowGi8UiCgkOidv4ki1SA0wptfquUhbfS9b2M3XUHCEIUX
-4ECvIjR3f+E0NbBIfPccWfYUaDLvo2qhLYS3KQbhKdXcJ83ha17mbVNZbDDo9upNcLO/oPyDbCNF
-J6UpXZmis1wnCynhK4kQfwFhW7H+MYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMdI2Nfq/Vk8dzZMUnMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCAzTlJQ
-YNTJM70HIKQCX6DcAw3sV6rERomQr84S9F83cDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjA0MjgwNzIyNDdaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAA/8LX1oU002tUIr5hRJZh563wxboTOjui3Cu3YrUl
-xusGqQ73zO9Vlq1gSOWhFMdJi2W2AcDfHbwkercgAuLDNTc5qZGaTFXaTZgXpB2cEtOTiXnehEcr
-udhtbCNQyKCjX3/kSOMBvd2WRJ8+cpq5qvnQn36H7ppt415p8m+tqR5KRx57o5Lw+xM7pczBZ5SX
-DCHlEAlM2y6ghQBC6izmxgfIi6lO681ZtaZpgHydJn+hVVV7m4zbhuN+XPyWK0gCl0+sDsFWghXq
-tQ5p3rrUGiRkfdDHckBhJA0l1/eUrXWLEeZgMRc3d7hpciu4e4KJO3RYh6uoOtcHWlgLqDmo
---0000000000001d70710650801915--
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index ce3e30c81cb5..75d3fdf896e0 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -39,7 +39,7 @@
+ /// back ownership to the block layer.
+ ///
+ /// Note that the driver can still obtain new `ARef` even if there is no `ARef`s in existence by
+-/// using `tag_to_rq`, hence the need to distinguish B and C.
++/// using `tag_to_rq`, hence the need to distinguish 2 and 3.
+ ///
+ /// The states are tracked through the private `refcount` field of
+ /// `RequestDataWrapper`. This structure lives in the private data area of the C
+
+---
+base-commit: b4e07588e743c989499ca24d49e752c074924a9a
+change-id: 20260428-fix-docs-mq-req-d2a0fe1b6471
+
+Best regards,
+--  
+Hsiu Che Yu <yu.whisper.personal@gmail.com>
+
