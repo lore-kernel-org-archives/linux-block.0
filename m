@@ -1,121 +1,159 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABDD42B746
-	for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 14:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0DB44103C
+	for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 16:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777387326; cv=none; b=rsNCP5XqBmsulxN3FTSbLptHRIcexTzfquVc8sws3ufeXHx1ruchoMRCFvCTHbDZc09UZgsLs86nvZGnS14+HbV25t49RVNFhjkPVHDec7PPx8kfl10FB3QN0WRUgY/Q/pBT/xz9RhXxjja3tGHY1Iue84AnxcXL0kd0SFEZfcI=
+	t=1777393245; cv=none; b=pSQa6SXSUbWozj14hVAGGkUbEDHnt4+aCqXOKNg1ZlJWnl+nqdmXaVp+329l3iAhLr+haaF8F3RsVMcvNr/3gmXJ03WulrJ3KMU1YNg5HTbO48EbpXdeHOLBGfh1Q5WYhdyrbWNIEDzkk8gkjIzNHR6bqysbklC7N9ZGrWPjbqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777387326; c=relaxed/simple;
-	bh=2V0vjuyXy6kypG+oH5jFBocr0VPTC18fKm+B9G1R/N8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ULP72fuOHEpKEN96OTCfEDJZY3NFO9fkyge8/aUXU8lX0yqr9EsMthNwgnEYljZHi6/3OLKhzDrGqRGdw4OkezbHPBwLrziZ/iuIBJKlkTAE5B7UVMI5RzWvjraMlbQcEMiFf79D2+8mM6+x5OibVvnz7Re6mbK2lO9s4D2CffI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=nNpHN7By; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1777393245; c=relaxed/simple;
+	bh=NL42Fgfj3quzU0ajWvj06zGIbM5Mw3K1e6+8xjrW5KM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dJrLSSt4SBgmrzJYipKz8/c7WBs7NO/DkaktUDcWr3hEPRaMHvFRoCfC8M1W5wpxSa1DXXhGj0IvnI6Dw3qA9orI7okCl7U+kqWTkjEqC65rl0IhWSsmfmtzqLGu1OmYPWnVjKIsqHys5cZ8AeMHbZ/DnvQFSdADgRmwjCMyjUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OLKjlbbS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="nNpHN7By"
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-404254ffe8aso8336920fac.0
-        for <linux-block@vger.kernel.org>; Tue, 28 Apr 2026 07:41:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1777387316; x=1777992116; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=crdUSZaMOcLRVl8zoeEkk4g0iNo7njp/hRFe4REvY7o=;
-        b=nNpHN7ByVkqbD9hDMOQ8bifILBGqFTDMA0VESPvyBqcY1k2CAtycZjuNtPUBTeIJGi
-         hS/yVEDbHSl5mUlRfxvh8XbQCrNvnEUxNYBbHHU9GMmBbBnTHI67PwPDEbmPtB5AafIh
-         PHFbjIBqdagli2KdnuFVz0yacXJOcXpQ9VCivcLqOLry0bzydTES0piFdvUj//xSjfch
-         2qid6YyzLYVA3MIn6mBwCvtPaEqz+HNJugNFrmOISGcrlbjKGMU2PqP9Xh518/YM0oP4
-         +tmhijqGX3N4V6111JbB7R5oPbi7EBhkAwC5Vfvawl2XC65io9kuBC9DeXs2HeDK1BZN
-         svPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777387316; x=1777992116;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=crdUSZaMOcLRVl8zoeEkk4g0iNo7njp/hRFe4REvY7o=;
-        b=WY5MJ+fmIHvVUHQmzLA9eYIqBRxhRUlndlD8UVhXXwp5oC/BniWZc6eP/ozSQQyuOL
-         lbMmrZpPn5+ZSFhjFDJhBN0OViMQt0jXBKHD2OQzYlyMFekp3ITmRVoNkDN7596CKhym
-         tlvlj4b228Njwy5KtJHXjgYyIsy1GQI0Y/zX+9bN1AeR/sOTmgpTKNGdcpS5KboFJ/u2
-         mCwALUMdFuP91n80PRzq+zEnNOEiu91IhjGbyXdKs93FVAgv5nB4wfnbEZ95PpsMszbB
-         HQz/4bqM9GuL0Mk1IvA9fbAes7+otE3HXvdn6Om3652ZtOGRW0tjYLednNKFdO38zvfD
-         BFuQ==
-X-Gm-Message-State: AOJu0Yybi9oy7yz0UbbuDNRlkER2DtkJkZijcv8/ynTsS8BhX5B+fSQp
-	S/t8Tfl9z6P47FqHlP8deA5w0WfTrcuHv10EYqc1E2pOb/mkC99FqcPfKVqBp9HD2rQ=
-X-Gm-Gg: AeBDieuJUeWkq/nUfAvRqBvy3vB3x+75xWNiq4qskQ6eAGUWQdcwJlw4ABb+A/izKtn
-	q3S+5yT4WtJ/Fk8y5B0J/pWw6WZXS9P059IZZyFwE3ItNl7xbKRFRa1UJNaQtuKkdKe4/LnDoC/
-	br712EpKwoiMAjj0yL91ypciyM5iUNPiM9DOvt906QQtFvnAQVu1JtmQe9Q/yEtEnnJ10OJiB+t
-	dwwxnoJJY1g6ClhFjTkE4AweH0p2yRhhU5W33k2XDb85EQbAiGXGezI9JCKppjO4CuZs6zfrqs6
-	JCSTYZM0xeaHDXgAqvSDtMcRVjhPd48qPy1SgvQ0fpagjdo7F44FV45dzCJwbXNoIj/paVY1AAy
-	ysl76MmpPMtNbxGZOKEYjIWBE63iyMzt+sg5z+Kqefy9beJeU5HxLMxO6Nhn8NB8eh7T47Fh8hM
-	iPK45IeYyhK12oWDlZOLHnj0TqZbGMOuzdXo/mvDDyFLM5tylQW6jZU+GfEiYpXiiMfWf5Y786v
-	DAzp0642T0pzRXT0yxfFDw6K9cemg==
-X-Received: by 2002:a05:6871:781b:b0:404:2e44:18b6 with SMTP id 586e51a60fabf-433f1f393e9mr1575881fac.16.1777387315738;
-        Tue, 28 Apr 2026 07:41:55 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-433efbf1d8dsm2015750fac.6.2026.04.28.07.41.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Apr 2026 07:41:55 -0700 (PDT)
-Message-ID: <982f5bcc-8caf-465d-99c7-3b457cab20c7@kernel.dk>
-Date: Tue, 28 Apr 2026 08:41:53 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLKjlbbS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777393243;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DdvJeyJsOKadMtx46rQLZ1Jkv7h9xz+WU0TCYw8lOjE=;
+	b=OLKjlbbS0dNRu/ZcnzKqRtOEXhTF4cs6ePOSfYj4Ruxk0iDjkVeWJZG3je0XXuQMSparRX
+	8/Ft/hUtyVmZBePkyIqVaJFmAo7axjJN9Ip14Qnyj7s7+Zf/LIb01MqDR7Lv+QTtlkIrJt
+	o3gRu7BCetjD7Xj1QrNOiZHy+bFECII=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-e5VDaWU9OPiQVeqIfezU7A-1; Tue,
+ 28 Apr 2026 12:20:39 -0400
+X-MC-Unique: e5VDaWU9OPiQVeqIfezU7A-1
+X-Mimecast-MFC-AGG-ID: e5VDaWU9OPiQVeqIfezU7A_1777393237
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5429B180034F;
+	Tue, 28 Apr 2026 16:20:36 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 79D7C19560AB;
+	Tue, 28 Apr 2026 16:20:35 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63SGKYbn2773321
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 28 Apr 2026 12:20:34 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63SGKWDW2773304;
+	Tue, 28 Apr 2026 12:20:32 -0400
+Date: Tue, 28 Apr 2026 12:20:32 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
+        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
+        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
+        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
+ device encryption
+Message-ID: <afDeUNNWEIlxl5HC@redhat.com>
+References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
+ <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
+ <ae65vfakVKg2aGcp@redhat.com>
+ <af84cfb7-b673-404a-a7f9-6efd9d23a08f@oss.qualcomm.com>
+ <f92f318b-5c99-4880-906c-136aa180d58c@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] md-7.1-20260428
-To: Yu Kuai <yukuai@fnnas.com>
-Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
- Song Liu <song@kernel.org>, Li Nan <linan122@huawei.com>,
- Xiao Ni <xiao@kernel.org>, Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
- Benjamin Marzinski <bmarzins@redhat.com>,
- Junrui Luo <moonafterrain@outlook.com>, Keith Busch <kbusch@kernel.org>
-References: <20260428143340.1088943-1-yukuai@fnnas.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260428143340.1088943-1-yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f92f318b-5c99-4880-906c-136aa180d58c@oss.qualcomm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 4/28/26 8:33 AM, Yu Kuai wrote:
-> Hi Jens,
+On Tue, Apr 28, 2026 at 06:43:08PM +0800, Linlin Zhang wrote:
+> Correct the response to Benjamin's comments.
 > 
-> Please consider pulling the following changes into your block-7.1
-> branch.
+> On 4/27/2026 8:20 PM, Linlin Zhang wrote:
+> > 
+> > 
+> > On 4/27/2026 9:19 AM, Benjamin Marzinski wrote:
+> >> On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
+> >>> From: Eric Biggers <ebiggers@google.com>
+> >>> +
+> >>> +static int inlinecrypt_map(struct dm_target *ti, struct bio *bio)
+> >>> +{
+> >>> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> >>> +	sector_t sector_in_target;
+> >>> +	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = {};
+> >>> +
+> >>> +	bio_set_dev(bio, ctx->dev->bdev);
+> >>> +
+> >>> +	/*
+> >>> +	 * If the bio is a device-level request which doesn't target a specific
+> >>> +	 * sector, there's nothing more to do.
+> >>> +	 */
+> >>> +	if (bio_sectors(bio) == 0)
+> >>> +		return DM_MAPIO_REMAPPED;
+> >>> +
+> >>> +	/*
+> >>> +	 * The bio should never have an encryption context already, since
+> >>> +	 * dm-inlinecrypt doesn't pass through any inline encryption
+> >>> +	 * capabilities to the layer above it.
+> >>> +	 */
+> >>> +	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
+> >>> +		return DM_MAPIO_KILL;
+> >>> +
+> >>> +	/* Map the bio's sector to the underlying device. (512-byte sectors) */
+> >>> +	sector_in_target = dm_target_offset(ti, bio->bi_iter.bi_sector);
+> >>> +	bio->bi_iter.bi_sector = ctx->start + sector_in_target;
+> >>> +	/*
+> >>> +	 * If the bio doesn't have any data (e.g. if it's a DISCARD request),
+> >>> +	 * there's nothing more to do.
+> >>> +	 */
+> >>> +	if (!bio_has_data(bio))
+> >>> +		return DM_MAPIO_REMAPPED;
+> >>> +
+> >>> +	/* Calculate the DUN and enforce data-unit (crypto sector) alignment. */
+> >>> +	dun[0] = ctx->iv_offset + sector_in_target; /* 512-byte sectors */
+> >>> +	if (dun[0] & ((ctx->sector_size >> SECTOR_SHIFT) - 1))
+> >>> +		return DM_MAPIO_KILL;
+> >>
+> >> If ctx->iv_offset is not a multiple of ctx->sector_size, this will
+> >> always fail. ctx->iv_offset should probably get validated in
+> >> inlinecrypt_ctr()
+> > 
+> > ACK
+> > 
+> > Yes, this assumes iv_offset is aligned to sector_size when large crypto
+> > sectors are used. That’s a requirement of dm-inlinecrypt semantics, and
+> > adding an explicit check in inlinecrypt_ctr() would make this fail earlier
+> > and more clearly.
 > 
-> This pull request contains:
+> Sorry, the last response is wrong. No need to add check in inlinecrypt_ctr().
 > 
-> Bug Fixes:
-> - Fix a raid5 UAF on IO across the reshape position.
-> - Avoid failing RAID1/RAID10 devices for invalid IO errors.
-> - Fix RAID10 divide-by-zero when far_copies is zero.
-> - Restore bitmap grow through sysfs.
+> iv_offset is the starting offset for IVs that are generated as if the target were
+> preceded by iv_offset 512-byte sectors.
 > 
-> Cleanups:
-> - Use mddev_is_dm() instead of open-coding gendisk checks.
-> - Use ATTRIBUTE_GROUPS() for md default sysfs attributes.
-> - Replace open-coded wait loops with wait_event helpers.
-> 
-> Others:
-> - Add Xiao Ni as md/raid reviewer.
+> I think this concern is based on an implicit assumption that
+> sector_in_target is always data-unit (crypto sector) aligned. In this
+> target, however, sector_in_target is derived from dm_target_offset() and
+> is in 512-byte sectors, so it is not guaranteed to be a multiple of
+> (sector_size >> SECTOR_SHIFT).
 
-Two notes:
+sector_in_target should be guaranteed to be sector_size aligned.
+inlinecrypt_io_hints() sets the device logical block size to at least
+ctx->sector_size, and validate_hardware_logical_block_alignment() makes
+sure that the target starts on a logical block boundary. The block
+layer enforces IO to be aligned with the logical block size, so
+an IO that starts 7 sectors into a device with a 4096 ctx->sector_size
+should be impossible. 
 
-1) Why are you rebasing the tree right before sending it? There
-   should be zero need to do that, please don't.
-
-2) Please switch to https://patch.msgid.link/ for you Link tags,
-   if they are just links to the patch submission. That makes it
-   clear this is the case, just the patch. You can use lore for
-   actual bug reports etc.
-
-Pulled, but please change the above two things going forward.
-
--- 
-Jens Axboe
+-Ben
 
