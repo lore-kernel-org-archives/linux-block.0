@@ -1,144 +1,186 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BDC303A0A
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 14:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777472793; cv=pass; b=ieO3lLeM6FLnQGA+DXh+5jcqP5diOQ4wf7XeUR94s6RhYhay1d05I861RXKqSE7xvp/8/72Qrxw69iEiamqkiqHX9xQ+yaMTGozh8fz3RupllcTb64E7ZbLyHrjcRM21gPJsF8OFkQm3MoNfPRvLnqpvi3ixFucY9CVJ89b9+Yw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777472793; c=relaxed/simple;
-	bh=7xI9AQ6tZUuFKwMUeQZHIpwamqGIWKJrJNxNM4JnsE0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Bq62Y07e8bMcK9IV7KyqEKwq/6vuhx9QbE6yUtl0foWkRcOqRoIKAqSbe4IQxvK8Wd2SWKqtmS8xojJlmAD/8MUeOHyVWGhqOuKmbs3vZRkqFAgzegHqNu0t5THf0ERR9fhk95OmLjyzN56kIDq12GzGPjyYFe94V89LTFt7a+I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=I05XuEn5; arc=pass smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0529B37DE8A
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 15:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777476316; cv=none; b=mtVF+3/FI+LZ+a0c0Tcp3sy2ujJJDPT2JyXWXbU3x4P5HtysEj1ehfqCVuItRvZtJCCZcE7J1rLr755yuMa19DF55RdcbnC82fQvEHn78Cbnp0GxVA7aNO+b5R4fGJa47zGNwqg//QbJkSQ8Jfn+TgHWZx+3eqB/qUY4qWCWg6I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777476316; c=relaxed/simple;
+	bh=JvxfV5QjKQbwm7+BOekQVOayYxapWdUNFPLNqt75HHE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h+r05xF0HYhv37ipsh6Wd8qPKSCM/vVPPjLhZuaaML8CLLMkRuHTApSih3/9rNncY8C6pKgYABQsdnJfuxJEbGtMEEW56+YKIgvvNv3mEhvU+pnBvZsxurrcxA17WFHEokehPp42ZEdQIfKR+f1KJ8AT7amsWlVN+TD2S/+K/u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PiGnFF8H; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="I05XuEn5"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-38be5e86918so142221701fa.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 07:26:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777472789; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NK6ohptz/VKyEKBvPgwbJ+1RdNj/hYIKV6W6GlSIbVhC+26GOctLZl/8sJu5kxZ8q4
-         KPoam0LBnFklAjavN0/dbKV6NP9DdJR0aadmM58TlhHCeOlSt4kisuzKktZZVr48mrNm
-         RJXLFNgTC4adkFLMWEZGj/owB24x2AtbNdSvgZxQTA1NsIavxA/2MDps09ONkWLzHWzx
-         GYOcDt9p5Y/ocNb9Nb/DJ92emtvIHj7xA8TRAEVNVGnyKY9HE1vGaa4hLFVjdfL/ZZIz
-         tLWM6J6ueKixkbQYQ5s3UWO0KdnvtxE26a3ZcSXdSbf9WJv4XWwotBVX6fWIU2/XvPvN
-         WVPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=7xI9AQ6tZUuFKwMUeQZHIpwamqGIWKJrJNxNM4JnsE0=;
-        fh=5sBAdvXtvf6UAjszU/YRgoWsujL+bzv5KF8WpPgZPF0=;
-        b=EqNCVrc3avGTeGd9DZoKSlPyWTcKSGXpa98rZu82eTn7b1NM7RGAQ5VKtw6fDkUThi
-         19rQE4EyZy+R5+kPwDlMmBYyzqMGra2XEIz+1enYEV9Okp7FFUhfojTWHXzvgD9BPhB9
-         4KGy7byHbReEMMAowNDXRxsJVmda0QPiVWm65RqeieZA9op54iBt4D+SY4jdzma2Pzt0
-         QV6qO3sDAwvpX9QGYvPByPLHyuCpyPhy3tI1oA5Ln7l7XcbJcVL9yTIAdc5UGp6doQII
-         yhn/tdWqO9niNtmJ34M/iWhxH3rkRh8eOSxepHRMbrQqxs2AbZFE85Llht+k46im4XXG
-         iNBQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1777472789; x=1778077589; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7xI9AQ6tZUuFKwMUeQZHIpwamqGIWKJrJNxNM4JnsE0=;
-        b=I05XuEn5yDlVti1D7ti7dpl4MN3sx8bVC1MVe84z5NovGAPJfnbHrvfjRaN5bo4kfA
-         phrvLK10EfXR/zCSPPhr/0ifZXMj3Bh8CP/icnbZsckpRYWoMaOzPZ/WwmlFs1/Dqk7l
-         SU3BDtSWuGvYoz1HEY+n8A1Rds22SfjApMzC9IsnNML1MXL7X2f7L+zTsT+H/9cXpqZx
-         1T2vzzSFeoKF5nBEY3NqDZ+WOn73nxvk4VK+PTGFVyr4cJo2iLc9kZm5gYvcOBs0Qa35
-         VrgW2YzvcvERfFBsDw9eKM0MhCGV/QaEVZnYxlQ/GEH59J1jMEhzRkJHpIaWGNkSTHwy
-         EFhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777472789; x=1778077589;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7xI9AQ6tZUuFKwMUeQZHIpwamqGIWKJrJNxNM4JnsE0=;
-        b=lins0bFwgPKNBOBd35XVP2CMXEcMakLilEimoyHA6XxCEIj48LT2wxUyeasJop6XXO
-         /BnsoV4rtasGpCLxEsaRVDtSdvd6DQxu/aEoxAWvb4f2ZaoX8gquKNW6HtutnW5hW1rm
-         fknIBUy7PMmdlH+XVu3bEc9EwaLH7wYdFPt4I6zeuQqAhHr1LLcAD00xXA9Sw1b2sgUG
-         mSk0tns1H+AkiS9dTdjTJQK4TYLcCv3+a2FO/NX+qL4cb6cnialJsb/XeiGgnx46Jebf
-         AnxxnLtoNYcDaKpUeuUbzQfNZ3G+jXSMwLETmJ64SmIjxIdXZmXNGA8KV86ln438rbYj
-         Ux7A==
-X-Forwarded-Encrypted: i=1; AFNElJ9Dpla48uZhGI8s2tJnCTiCg9rdJ9fVJjxJiC2Stm1gO/T6gco0myidViS1F6GRxrhmGgfFHHs+aPDuWw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeKghVrUbBvimBkBQnHcBsSh0R9NKCLxpOwtc6JNj+uorh9rO/
-	0Ekj87c1U0bDQ6QIBmqqBwH6HjNnhX+tKDf0FqCpY/lfxiP5hkZ8782atP+5qNIJwD/zj1IOmJg
-	2L40o8ko11eYCEWHm+ovlZEnPS4D89f9Jukh4qnDqBg==
-X-Gm-Gg: AeBDievczSsaM781UdUvvAhAGfEgMTeI+Ma0YTmOqjmsFNm3DAFQG0FfNKHHRreDvk3
-	ZHNgGfqrLubxCoD8STkFx7dVuDUkkcbMCwnGHvW6DbmNfsRXmujNE9GiEn/3NgjW6/cZjtOS5Ar
-	33pCqPwK+yBpDk94cY+JlW7qahGYu+jJILaLsvx9V08wXfkAigOzhzGNbIqhZUuYIJgN6Gxkxlu
-	P6VURwTmWkYcSGlSwWUdDvmId1o4cLMILyZbX3BOLWIn4jGR2mlbjYY6LkQMqJfVVNJvMFhZbh4
-	j1W1wc7S65huAap/s8bflV3pNsqkiR5un6FMgzOM2+mmVh/EK90m0oggiqc5TS9uxqxnnGAzN1n
-	es54=
-X-Received: by 2002:a05:651c:23d2:10b0:38a:902:dcd with SMTP id
- 38308e7fff4ca-3924bcdeb13mr12504311fa.20.1777472789037; Wed, 29 Apr 2026
- 07:26:29 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiGnFF8H"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777476314;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EMT0J2vcJAfTCz/tlata9hzsUiHyRA7lCZ4HpBR0qWg=;
+	b=PiGnFF8HYtxWIt/aGFH/WrQCzr1IaLLwIN9DV+mjzDbo5nxexScD3GRqvS1uYC10U9NXX/
+	jOuIhc77RsMc5FqHNC9teHdYGL80+yBx89O2XKfRO9wp8mZQrGBLvREJsKAMg+zbK5BZMI
+	RfTRyd9vR3Lz/eUrodCJv/75ULidPao=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-584-MwTeSaaBP3KyBOulTq63rQ-1; Wed,
+ 29 Apr 2026 11:25:09 -0400
+X-MC-Unique: MwTeSaaBP3KyBOulTq63rQ-1
+X-Mimecast-MFC-AGG-ID: MwTeSaaBP3KyBOulTq63rQ_1777476307
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AEE2B1800350;
+	Wed, 29 Apr 2026 15:25:06 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F110B300019F;
+	Wed, 29 Apr 2026 15:25:05 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63TFP4Zs2813142
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 29 Apr 2026 11:25:04 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63TFP24c2813132;
+	Wed, 29 Apr 2026 11:25:02 -0400
+Date: Wed, 29 Apr 2026 11:25:01 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
+        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
+        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
+        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
+ device encryption
+Message-ID: <afIizQA9kVR_u_2j@redhat.com>
+References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
+ <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
+ <ae7yzw-5wz9cqZt8@redhat.com>
+ <ae_vacHQ75AgZbm_@redhat.com>
+ <6390db35-7f8e-4d00-9c1f-43d676007910@oss.qualcomm.com>
+ <afDh8XRWW_JgaUP3@redhat.com>
+ <7ab5cd97-30b7-42ca-80ce-6d9cd8c45b73@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
- <7aca0686-b255-4ece-b766-ebfc90df7340@acm.org> <CAJpMwyha9Tuzn1nEDvfPbdaPFa6WbVBO91QoPEKJC+DB7V4PBw@mail.gmail.com>
-In-Reply-To: <CAJpMwyha9Tuzn1nEDvfPbdaPFa6WbVBO91QoPEKJC+DB7V4PBw@mail.gmail.com>
-From: Haris Iqbal <haris.iqbal@ionos.com>
-Date: Wed, 29 Apr 2026 16:26:14 +0200
-X-Gm-Features: AVHnY4Iwf5MmMYkExI68LxCrn43SXMOiFXgqjdVHXqxda9PoZwxmIJwNjUWSrxY
-Message-ID: <CAJpMwyiPYNKDn74NA_cKovFUZ7-gUnKgayQ0jf-h907rLZqDZw@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] A block level, active-active replication solution
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
-	Jia Li <jia.li@ionos.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7ab5cd97-30b7-42ca-80ce-6d9cd8c45b73@oss.qualcomm.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Feb 19, 2026 at 11:43=E2=80=AFAM Haris Iqbal <haris.iqbal@ionos.com=
-> wrote:
->
-> On Fri, Feb 13, 2026 at 6:32=E2=80=AFPM Bart Van Assche <bvanassche@acm.o=
-rg> wrote:
-> >
-> > On 2/3/26 7:09 AM, Haris Iqbal wrote:
-> > > We would like to present the idea and internal workings of the
-> > > solution, and also discuss design and some benchmarking results
-> > > (comparison with RAID1 over RNBD/NVMeOF devices, or DRBD) during
-> > > LSF/MM/BPF. We also want to get feedback, and potentially get more
-> > > people involved in the project.
+On Wed, Apr 29, 2026 at 08:34:00PM +0800, Linlin Zhang wrote:
+> 
+> 
+> On 4/29/2026 12:36 AM, Benjamin Marzinski wrote:
+> > On Tue, Apr 28, 2026 at 05:20:07PM +0800, Linlin Zhang wrote:
+> >>
+> >>
+> >> On 4/28/2026 7:21 AM, Benjamin Marzinski wrote:
+> >>> On Mon, Apr 27, 2026 at 01:23:27AM -0400, Benjamin Marzinski wrote:
+> >>>> On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
+> >>>>> From: Eric Biggers <ebiggers@google.com>
+> >>>>> +	/*
+> >>>>> +	 * Since we've added an encryption context to the bio and
+> >>>>> +	 * blk-crypto-fallback may be needed to process it, it's necessary to
+> >>>>> +	 * use the fallback-aware bio submission code rather than
+> >>>>> +	 * unconditionally returning DM_MAPIO_REMAPPED.
+> >>>>> +	 *
+> >>>>> +	 * To get the correct accounting for a dm target in the case where
+> >>>>> +	 * __blk_crypto_submit_bio() doesn't take ownership of the bio (returns
+> >>>>> +	 * true), call __blk_crypto_submit_bio() directly and return
+> >>>>> +	 * DM_MAPIO_REMAPPED in that case, rather than relying on
+> >>>>> +	 * blk_crypto_submit_bio() which calls submit_bio() in that case.
+> >>>>> +	 */
+> >>>>> +	if (__blk_crypto_submit_bio(bio))
+> >>>>
+> >>>> This will still double account for fallback writes (which call
+> >>>> submit_bio() on the encrypted bios, and return DM_MAPIO_SUBMITTED here). 
+> >>>
+> >>> Just to clarify, I'm talking about the vmstats accounting. The IO
+> >>> originally gets accounted by submit_bio() when the bio is submitted to
+> >>> the dm device. For actual inline encryption and fallback reads, dm will
+> >>> submit the bio to the underlying device using submit_bio_noacct() to
+> >>> avoid double-counting the IO.
+> >>>
+> >>> For fallback writes, __blk_crypto_submit_bio() will submit the encrypted
+> >>> bios to the underlying device with submit_bio(). This adds the IO
+> >>> sectors again, even though it's the same IO, only encrypted now.
+> >>
+> >>
+> >> Right, thanks for calling this out.
+> >>
+> >> For fallback writes, the IO is still double-counted. Given that this only
+> >> affects IO accounting in the blk-crypto fallback write slow-path and not
+> >> correctness, I think this is an acceptable tradeoff, and we can leave a
+> >> TODO to revisit the accounting once a better solution exists.
+> >>
+> >> Add the bellow to the annotate.
+> >>
+> >>   /*
+> >>    * TODO: blk-crypto fallback write slow-path currently double-accounts
+> >>    * IO in vmstat, as encrypted bios are submitted via submit_bio().
+> >>    * This does not affect data correctness. Consider fixing this if
+> >>    * a cleaner accounting model for derived bios is introduced.
+> >>    */
+> >>
+> >> Do you agree?
+> > 
+> > You could add an extra argument, for instance "bool need_acct", to
+> > __blk_crypto_submit_bio(), and plumb it through to
+> > __blk_crypto_fallback_encrypt_bio(), where it could be used to choose
+> > between calling submit_bio() and and submit_bio_noacct().
+> > 
+> > We could even add a flag to cloned bios for stacked devices, that could
+> > be checked in submit_bio(), so we didn't need to have
+> > submit_bio_noacct(). But this is a pretty niche case with other
+> > solutions, so I'm not sure if it warrants adding more checks to
+> > submit_bio().
+> > 
+> > I do agree that people probably aren't using dm-inlinecrypt for devices
+> > where they don't actually have inline encryption capabilities, so it's
+> > not a major issue. What to you think, Mikulas?
+> 
+> Thanks for the suggestions.
+> 
+> Adding a bool need_acct parameter to __blk_crypto_submit_bio() would require
+> updating all existing callers, which feels rather intrusive given that the
+> accounting issue only affects the blk‑crypto fallback write slow‑path. I’m a
+> bit concerned that this would broaden the scope of the change more than
+> necessary for the problem at hand.
 
-Hello,
+I get your concern, and I'd like a second opinion on how much we should
+care about this, but it doesn't look like there are many other callers
+that would be effected here. The only existing caller of
+__blk_crypto_submit_bio() is blk_crypto_submit_bio(), which would just
+call it with "need_acct=true". Looking at the code path below
+__blk_crypto_submit_bio() that would need to change for submitting the
+bios:
 
-As mentioned earlier, we have open sourced the RMR+BRMR code and the
-documentation is also public.
+__blk_crypto_submit_bio() is the only caller of
+blk_crypto_fallback_bio_prep()
 
-https://github.com/ionos-cloud/RMR
-https://ionos-cloud.github.io/rmr.io/
+blk_crypto_fallback_bio_prep() is the only caller of
+blk_crypto_fallback_encrypt_bio().
 
-> >
-> > Please prepare for the question why the choice has been made to
-> > implement this functionality as a new kernel module instead of
-> > integrating this functionality in the DRBD kernel driver.
->
-> Hi Bart,
->
->
-> In short, it was mostly because of 2 reasons.
-> 1) We wanted to keep the "single-hop replication and syncing" offering
-> in a generic transport module (RMR), so that it can be used re-used by
-> other modules in the future.
-> 2) We think that DRBD=E2=80=99s core abstractions (per=E2=80=91node peer =
-replication,
-> single lower device) are orthogonal to =E2=80=9Cactive-active replication=
-=E2=80=9D
-> model.
->
-> We can discuss this further during the summit.
-> I assume when you said to "prepare for the question", you meant the same?
->
-> >
-> > Thanks,
-> >
-> > Bart.
+blk_crypto_fallback_encrypt_bio() is the only caller of
+__blk_crypto_fallback_encrypt_bio(), which is the function that would
+need to choose between submit_bio() and submit_bio_noacct().
+
+Doing this would change the crypto API (by necessity, since we're adding
+a new argument to __blk_crypto_submit_bio() for stacking devices to
+use), and it is adds a extra argument to a number of functions, just to
+handle this corner case. But it is still a relatively contained change.
+
+-Ben 
+
