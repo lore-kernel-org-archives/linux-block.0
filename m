@@ -1,159 +1,196 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5AB38F95E
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 09:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB55037997E;
+	Wed, 29 Apr 2026 09:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777455137; cv=none; b=TahDFs5YkW2eBljnV8lEy5lonSfe9WozN76HBCkmKH693KBFs6KpWMYev6kqKLJGnT+9GNPKrz8jiQ7M0C+UZnELJBbHWApwXnnJo/RQNS6/30IPLQtdTYpdxC3j4DQ6Eww9DxIMhTkK4u7LlUPHw+QAHPFS50D2YcrnBwSg8rw=
+	t=1777455781; cv=none; b=i9qfWsepFyDiULl5gCHvQ+fpD5BXIfCAedCJTfbXWelq8NQWcNuUS1RmBv1I/BFMzp185YFbuS+cDoVAqoFXl/hx1r1WrCa23D3SN23MMKACLuVgsGAoPOS5TDnuN/u9HHtKTOMKqS4Nj+hDue8i2kZsQSKLMbxpsKj6HDAva5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777455137; c=relaxed/simple;
-	bh=5q81zyT9bNFdWJs9YZZFd/1yiVmz3SfrynLds2/FimI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GOVumV0qO6Z0yloSpYdbJN3ovZaxXxeAQR/RetTTEcy7lqUVx0utWGygUrYAvOD+xwvYtXxK0jTObJssZEuvG4jpGiahO/uzG5wf32zjQvPSBp4qeHYNO1Q+ZnLlwWW9zTGSpG3Bxy+tJG8JtzfbKQXsCUFkQKWRCXWK6GZE/cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QrFnsG+j; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=VK0pNfsU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1777455781; c=relaxed/simple;
+	bh=wRK4S5rK3UhrlR/h65Xao3844xgB7UOt5Ukh2PdCmUE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EsBKBuTnkxjQSeZxVSV8g2HNr5qOpUB/XgfVu+4xktVPFFujdNPB9PVnrpdd2gDwiKI7iG5bupBVFk4b9fzvhKcU2jj8bQg45DDSNHk+59ZGmqfjFqXmiDh+lKXrWg7ZcHZIpWm61kmohA5OJgpaxzKeIuDdO3rNftkzFx6Y7bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ah13YQAu; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QrFnsG+j";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="VK0pNfsU"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63T8qcUe870234
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 09:32:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Dpp2pOYs+zgwLnYd8Zpm3wMJtqBgJtWLRZMos+6qw+M=; b=QrFnsG+jG6rGzo9W
-	lO0/0zNIpKPh5RzaU880EfRtJvcH9VKGHTso9BTsUoTdKhUk1V+siOywCL8LjgFi
-	tsaJ6EiG+/j7Kabmwf9GqvEIuGlyf5V7pT7hOuM4P70FxKSiOaD/tOSHyLtQrefW
-	NahBP2Wbc+FIakFEpEPpbyRRGGIXWu6Xi6wR4VZSz7O9gK0wRWBZh+f+km76aphq
-	fOOYVZTZ4aExY24etzO0XVpDZqW4GUA9FcGEePBWxgcP3ccKN4YTkAEUhMCMSj6J
-	LQanDekJryOGgpc0YHp2feY03k7QMgHdrEByr//wIDqm2f8yuyI9eHD1g6WhHYpm
-	GeEgXQ==
-Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com [209.85.221.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4du0u1u7uc-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 09:32:14 +0000 (GMT)
-Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-56f7d6e7a31so661648e0c.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 02:32:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1777455134; x=1778059934; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dpp2pOYs+zgwLnYd8Zpm3wMJtqBgJtWLRZMos+6qw+M=;
-        b=VK0pNfsUNUqEa4lJ9L2erBXv4206Il+blXl2uWvUQw8lnUzT+eGJKmdhX3BbxU5QBW
-         5RhQMXFYTj6dJ+95kXBjOx+x44MGIeYvwXQuZdPHn8IML7J2FjREp8Z875QWiv9rajOv
-         apGnMyu4i45kqcRi9S94WV9l1V0z9hVVQhhecbzdalNpUjaIqY5ZAtvDr7/IOZjHcbtk
-         Nrfrpx473jxWjV1rPAM6+t4EwNELb+0DOa2/Im5Iwh3HHxjz1/Tt23r+5FNuSL18KS+b
-         UR0QZ3rZiXRs6Pnn6ZyhD+e2e372mVMTkoSlQqkmTzwaK2C39X/Vf8gFdH+fLilePojj
-         aUgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777455134; x=1778059934;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dpp2pOYs+zgwLnYd8Zpm3wMJtqBgJtWLRZMos+6qw+M=;
-        b=SIgLux0nq4BoaDqQz/WVOXcMbQqYLBjfWQmtJ6nTgn1aI6o/F4mbL8fMi3ops7/ngq
-         c86ZRLd+Or/g4zOEKZVeTh0VyEoQ5xNoK9YzcIjQQY2z0/dxCAUPqPlz2d3v1eQirZJ2
-         mEndj6YUZHh22AsvpD0NIsgd9MBVn1Ackae1ZHcfiF0/opbi3sHNekhOZhrSMxRRdIPz
-         xwNy8SrXIyPfaW/4AzaJ8d5LnOo0Cj8d931MQvDvyG41oVUoDSI8K4wdCgAkQJ2+sx2U
-         qATHo7JFK7jbDOaVn6aOz3uLl/qOk2G3dW1I7v838NrlDGhvE91giTWBVs8Yuhb+5/U8
-         LP0Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8L1Z5EPUKwSalTOJJAYiFD700gcSgfr3LWAPq+a0rd5+Ma/jM/MbUvpZVns43cihUptrDpnEpAlBrPfw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzymrXHlPJuLHZNu6/zPHPyG/XP+hG3SXfELQR3RkqRttsHBpqW
-	R5kjjx87I57nTqwbkq1n0YcEuFyiMOogp0SCghLNuO4UF6LKTC7JLV7luKPa6qbkCQvhc4l1fY2
-	jWUFr+JKwjDqQfvtfWfzDKFe06E0SZJc3Go/vb4zymUP/OE35vL0wy+ZGDSzKQYdvYQ==
-X-Gm-Gg: AeBDiev3/9ljSHqKuK5l1cHXw5sZw0WA1RapT6sKwMYa/MlapE1c6rUn6/gWm9D5gRe
-	Sn6CDXy2x3JyHuMBfXxu6e73LBgj74s9Y0/YcgWIEGnrAfvLB+kuVcR1aLREkpN0gt/k5gwL+AM
-	p9qaTDJ0TWT3gzr3pt8fRfJxnC41j36oyanB3+0V1SXIXufTabB+uDLPiA0mbmDU+A6mzSy3e3R
-	9rwjvMxI53atTXZnbcIt2/NwYqELtQHCMjgBNin1OUHZH//L9grhwU8fNsJRFhPqqBJd9CippsL
-	oZFE8rej1SkE2yHkuDvkXZtST49I5qMCu94mh6H+pESsHdK5K9BDS5IdOkYqzNIeiVn/QgYWUoM
-	P1etb8YFOaYgvIYX6XmXN94Y2CXF9z4kjbNPsuKHTBc+/vWERHle72OpAlbovTaM8DJ90kGRmWA
-	p8NP9JyUUWB+NSdA==
-X-Received: by 2002:ac5:ccd9:0:b0:56a:9e65:3e30 with SMTP id 71dfb90a1353d-573a2df9fd3mr1309852e0c.3.1777455133958;
-        Wed, 29 Apr 2026 02:32:13 -0700 (PDT)
-X-Received: by 2002:ac5:ccd9:0:b0:56a:9e65:3e30 with SMTP id 71dfb90a1353d-573a2df9fd3mr1309824e0c.3.1777455133542;
-        Wed, 29 Apr 2026 02:32:13 -0700 (PDT)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bb980a6f2e6sm67596966b.8.2026.04.29.02.32.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2026 02:32:12 -0700 (PDT)
-Message-ID: <2390c346-0112-45b2-8d10-d29ca3cc8f88@oss.qualcomm.com>
-Date: Wed, 29 Apr 2026 11:32:07 +0200
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ah13YQAu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=7Z
+	6hxnV1VSIKM9efhddwewPqmECMf0l0a3PvYABrFNk=; b=ah13YQAuyioBTv6jA4
+	UuXXh2S68IiDmv+yD038r/Fs1mAwpmRoEk/dAz5e3+uJVIsrqyF1tqSg8RP9oqJ7
+	Hh4IZC+VhkWi45AOpcZnqOj2BT2M3bSFjgqyv0xTivooicJJJIxeE5+IwUXO9rJF
+	/nQXoXn4czdc9h9UFfqKkAytw=
+Received: from vbox.. (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wCXTaFe0vFp59QzCQ--.984S2;
+	Wed, 29 Apr 2026 17:41:50 +0800 (CST)
+From: Li kunyu <likunyu10@163.com>
+To: axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Li kunyu <likunyu10@163.com>
+Subject: [PATCH] block/blk-iolatency: Add the processing flow of the chained bio in the QoS and define the related types to solve the problem of incorrect inflight processing in the QoS. The usage of the done_split_bio abstract function in the blk-iolatency project.
+Date: Wed, 29 Apr 2026 17:41:48 +0800
+Message-ID: <20260429094148.2394-1-likunyu10@163.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] arm64: dts: qcom: arduino-imola: Get Bluetooth BD
- address from NVMEM
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
-        Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jeff Johnson
- <jjohnson@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, daniel@makrotopia.org
-References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
- <20260428-block-as-nvmem-v1-9-6ad23e75190a@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260428-block-as-nvmem-v1-9-6ad23e75190a@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: LYa7qXiOCGMxnErlI3irsvUVJY9i5RbD
-X-Proofpoint-ORIG-GUID: LYa7qXiOCGMxnErlI3irsvUVJY9i5RbD
-X-Authority-Analysis: v=2.4 cv=aPPAb79m c=1 sm=1 tr=0 ts=69f1d01e cx=c_pps
- a=wuOIiItHwq1biOnFUQQHKA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
- a=EUspDBNiAAAA:8 a=vtxEUVkT7waMBiOsAPUA:9 a=QEXdDO2ut3YA:10
- a=XD7yVLdPMpWraOa8Un9W:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDA5NSBTYWx0ZWRfX8zBzn7FuXSOh
- RdPC2wy0WkrdnRiK6oo4Je87MxR12BYXi6+iOJ4EAo4J9BbCG24hMOtSuCmdzEZSFyRB7e4ASU9
- lUOssetXp5g9k4bNPwq7VnymLVT9VhKOc/O8/uRfN9XCIXQ9CYsXss42iFGBcXswKFiNZfAQBrA
- XzUgC+fnP96gYVNdSyRPiHDQEXYa0MszqVCSf0kVV+2EjSFMrkToFkkiaroQzR56o6fbAfFGwHv
- 1my2IcR7jrYG5jumXqP8E/1pa6CxJ3hxWGToqDsW6nfKdKKModg1MhFDgfODm90BS7tpW/84yjg
- p2Do6zexELITsmWW9EvFvQcgxhmUXASn8iLHAdNrVSz1zWV67sv8tBNgXawhMHUH6beC0nGBceo
- Wq/IAHOvGeZTeoMJxX7O/iPs+QccuUIbzGMYxaMrtXc0ILZkGDr/dwaSNFDMyyzF+ZCJrH2TSBS
- 7sXkh4rJwGSUCAd3r2Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1011 priorityscore=1501 adultscore=0 impostorscore=0
- lowpriorityscore=0 phishscore=0 bulkscore=0 malwarescore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604290095
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wCXTaFe0vFp59QzCQ--.984S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXFWUWw4kAr15KF1ktr13Jwb_yoWruF4fpa
+	10gwnIkrZrKF4kWa93GwsrCw4SkanYgryUC3yfA34Syrn2gr12vF18ZF10yryFyrWrCrW7
+	Jrn8tF45Gr45G37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piYhF7UUUUU=
+X-CM-SenderInfo: poln30d1xriqqrwthudrp/xtbC5B+iR2nx0l-zAAAA34
 
-On 4/28/26 4:23 PM, Loic Poulain wrote:
-> On Arduino Uno-Q, the Bluetooth Device address is stored in the eMMC
-> boot1 partition. Point to the appropriate NVMEM cell to retrieve it.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
+Signed-off-by: Li kunyu <likunyu10@163.com>
+---
+ block/bio.c               |  2 ++
+ block/blk-iolatency.c     | 34 ++++++++++++++++++++++++++++++++++
+ block/blk-merge.c         |  7 ++++++-
+ block/blk-rq-qos.h        | 11 +++++++++++
+ include/linux/blk_types.h |  2 ++
+ 5 files changed, 55 insertions(+), 1 deletion(-)
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+diff --git a/block/bio.c b/block/bio.c
+index b8972dba68a0..7740701afc7f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1733,6 +1733,8 @@ static inline bool bio_remaining_done(struct bio *bio)
+ 		return true;
+ 	}
+ 
++	rq_qos_done_split_bio(bio);
++
+ 	return false;
+ }
+ 
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 53e8dd2dfa8a..ba5870bf14c5 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -632,6 +632,39 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	}
+ }
+ 
++static void blkcg_iolatency_done_split_bio(struct rq_qos *rqos, struct bio *bio)
++{
++	struct blkcg_gq *blkg;
++	struct rq_wait *rqw;
++	struct iolatency_grp *iolat;
++	int inflight = 0;
++
++	blkg = bio->bi_blkg;
++	if (!blkg || !bio_flagged(bio, BIO_QOS_CHAIN_CHILD))
++		return;
++
++	iolat = blkg_to_lat(bio->bi_blkg);
++	if (!iolat)
++		return;
++
++	if (!iolat->blkiolat->enabled)
++		return;
++
++	while (blkg && blkg->parent) {
++		iolat = blkg_to_lat(blkg);
++		if (!iolat) {
++			blkg = blkg->parent;
++			continue;
++		}
++		rqw = &iolat->rq_wait;
++
++		inflight = atomic_dec_return(&rqw->inflight);
++		WARN_ON_ONCE(inflight < 0);
++
++		blkg = blkg->parent;
++	}
++}
++
+ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ {
+ 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
+@@ -645,6 +678,7 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ static const struct rq_qos_ops blkcg_iolatency_ops = {
+ 	.throttle = blkcg_iolatency_throttle,
+ 	.done_bio = blkcg_iolatency_done_bio,
++	.done_split_bio = blkcg_iolatency_done_split_bio,
+ 	.exit = blkcg_iolatency_exit,
+ };
+ 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index fcf09325b22e..c236f9b34044 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -151,8 +151,13 @@ static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
+ 	if (split_sectors) {
+ 		bio = bio_submit_split_bioset(bio, split_sectors,
+ 				&bio->bi_bdev->bd_disk->bio_split);
+-		if (bio)
++		if (bio) {
+ 			bio->bi_opf |= REQ_NOMERGE;
++			/* Fix the issue where the inflight statistics
++			 * of the chained bio in the QoS are incorrect.
++			 */
++			bio_set_flag(split, BIO_QOS_CHAIN_CHILD);
++		}
+ 	}
+ 
+ 	return bio;
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index a747a504fe42..496a27b9d412 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -45,6 +45,7 @@ struct rq_qos_ops {
+ 	void (*cleanup)(struct rq_qos *, struct bio *);
+ 	void (*queue_depth_changed)(struct rq_qos *);
+ 	void (*exit)(struct rq_qos *);
++	void (*done_split_bio)(struct rq_qos *, struct bio *);
+ 	const struct blk_mq_debugfs_attr *debugfs_attrs;
+ };
+ 
+@@ -108,6 +109,7 @@ void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
+ void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
+ void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
+ void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
++void __rq_qos_done_split_bio(struct rq_qos *rqos, struct bio *bio);
+ void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
+ 
+ static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
+@@ -157,6 +159,15 @@ static inline void rq_qos_done_bio(struct bio *bio)
+ 		__rq_qos_done_bio(q->rq_qos, bio);
+ }
+ 
++static inline void rq_qos_done_split_bio(struct bio *bio)
++{
++	if (bio->bi_bdev && bio_flagged(bio, BIO_QOS_CHAIN_CHILD)) {
++		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
++		if (q->rq_qos)
++			__rq_qos_done_split_bio(q->rq_qos, bio);
++	}
++}
++
+ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
+ {
+ 	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos) {
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 8808ee76e73c..63fee89ecc14 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -322,6 +322,8 @@ enum {
+ 	BIO_REMAPPED,
+ 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
+ 	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
++	BIO_QOS_CHAIN_CHILD,    /* chained bio child, used for segmenting out
++				* the bio */
+ 	BIO_FLAG_LAST
+ };
+ 
+-- 
+2.47.3
 
-Konrad
