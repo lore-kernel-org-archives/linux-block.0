@@ -1,90 +1,195 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4413AD509
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 08:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC4539D6CB;
+	Wed, 29 Apr 2026 09:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777452808; cv=none; b=mCLj+TmZtqKYf7bdTgi4mT4CwlPCpu5qkxafE2GD4oTiAFifXgV7askZ5HbRWFb42EVTgEVpgBKqOyq8Dt7ieJGVoX3LPlaNZkZC3QIoyU+X3gdL9qmB4WyhFQueA+Uksc+xJjJtlA6p8yRTuB4lfLGKzvFT0WRQVji1UBHvpug=
+	t=1777454996; cv=none; b=p324aZTqXXiv8UnNKndjFw09Az4PoGTgSYpa8OWoy8WfZ2h2vHwnpQuOipWE+NwJlmUneqFh2wEWOgh/V8jrUSmjH1Vw9zCXZrnBmVbC9B2cpaRPTfW9qAIIeYZdqjGj3V/49eaXq8VC1fPU3NAepKe1cppyTSggvqfYk1j38K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777452808; c=relaxed/simple;
-	bh=OJw0cqLkYrPfWmxwpz5gJ+Hg/xhQpokAFPoJSwnJrOs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k//H4dniKn9HclyDlh7S4lUtMOCbUjbYC41nt1ONt3HUKuWLP0zaGQeYzAezVU/kZyo/rdfFzGk3qllJTXZwINJgqKMRrHGWpjquBzBvDAWyuWnGWxrd9gixPjYbFgsr0VHKMlqYOvr2hV8mL4I4B+9jMnI2UHsIZgHRDgKHxyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y3UWQnzr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777454996; c=relaxed/simple;
+	bh=0Zmd18qN7JJI+IpSRH03oGWiU+BXz+Xj+vOx98ygG/I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Erm7sgKbF3gcnJKCKIjnKUCQ0YUL7YAQsn1HqzDhKQhcacBZEr1Zr0TDywhn1z46Ah+LvMc6D5o864OrDN78ikm4FLLtjKJyztahKdiM5BkwaWSaJSL90nzKyb4zB0Qdik0q96mPxlRe16K7gnYQYGKGjjR2g0sXXBFWEqMv9ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=euKyt4sk; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y3UWQnzr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC85C2BCFA
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 08:53:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777452808;
-	bh=OJw0cqLkYrPfWmxwpz5gJ+Hg/xhQpokAFPoJSwnJrOs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Y3UWQnzrugN9g7H9n39KSSumKtrAVIdasAppLHzAlH98NZkxwIQz2dEqFdm+0df1W
-	 nb+rlwCt7e+lTtWWFXouOLexr04e7b7VqoYMY+vrlNjtRYIQMy5/ihOgrMObbCxrUy
-	 vzs/cqUMvxmgr6U87O9FjjAwe3huAVPGxywkpcRpDyslgiwKHty6inVTVwN5MT1YoS
-	 slP/fC9hAONh4xPfd/JmQgv+0BiiJvf43VIUHyOXKpTf4Nd94qgRkCxESRMmu3v40h
-	 yKOBB/8fwhJvYz385/Y41mkLaA8qOpejbv3ED0KmtWvFIsAV0JtNNBsnZy2JWSLz5B
-	 64hwJtq4rBNzw==
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5a3d42263e4so12226896e87.2
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 01:53:28 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8r3l2czHnUI/VhD0PpnTAMAisccydOqjMyX5GuXi2z1YYnq4+VkuvkyFdIfet3xlMHqQNtiMu1CiQlRg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeRKTV9hdltHjXFVmyLNG0kfVTkxCG91wA8gSM3kpypJc8g6dX
-	tcDqprx7t9/jKIQnZhRr3HDzeNPMTzuKNxjZXEOISkSKilhccB+krwGcc7Ukt9ma4s+VlnhcYEj
-	P8JbZMsOphFoCVh8y7PlB7cHZLOHkgdWCcmleePq7hQ==
-X-Received: by 2002:a05:6512:2256:b0:5a4:2cf:601e with SMTP id
- 2adb3069b0e04-5a749cf3d3amr1183325e87.12.1777452806809; Wed, 29 Apr 2026
- 01:53:26 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="euKyt4sk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=d0
+	6XGB/QmP1/mCNgT8clWghT3hJ7WdhN+FWTJjprH7k=; b=euKyt4skgGM60iZIRK
+	i2Ix9Oybg5lRr+sg2iQrE/wGk/fLCu1SHtvFkDtHS5uNHlfSlxsuNYEQnUerlATu
+	TGfOlqpCrlxBr9P304BRw+BKY1YhorEqGCaSeeaL8mqi7qCUKQnv6ZQkS6lCAP1H
+	BrHz8shj/a4TjTz7DJzq4NfYI=
+Received: from vbox.. (unknown [])
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wB35hFyz_FpKYoBCQ--.58768S2;
+	Wed, 29 Apr 2026 17:29:23 +0800 (CST)
+From: Li kunyu <likunyu10@163.com>
+To: axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Li kunyu <likunyu10@163.com>
+Subject: [PATCH] block/blk-iolatency: Add the processing flow of the chained bio in the QoS and define the related types to solve the problem of incorrect inflight processing in the QoS. The usage of the done_split_bio abstract function in the blk-iolatency project.
+Date: Wed, 29 Apr 2026 17:29:20 +0800
+Message-ID: <20260429092920.2124-1-likunyu10@163.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com> <20260428-block-as-nvmem-v1-7-6ad23e75190a@oss.qualcomm.com>
-In-Reply-To: <20260428-block-as-nvmem-v1-7-6ad23e75190a@oss.qualcomm.com>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Wed, 29 Apr 2026 10:53:13 +0200
-X-Gmail-Original-Message-ID: <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com>
-X-Gm-Features: AVHnY4K2fPfnriRCC1GlEFUQD6V4mQElLKoEhFKcWJOmHGXZy_EUPGrUvrMD7WI
-Message-ID: <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com>
-Subject: Re: [PATCH 7/9] Bluetooth: hci_sync: Add NVMEM-backed BD address retrieval
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
-	Rocky Liao <quic_rjliao@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wB35hFyz_FpKYoBCQ--.58768S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXFWUCw4UCw4rCF47Jr17Awb_yoWruF47pa
+	10gwnIkrWDKF4kWa97GwsrCw4SkanYgryUC3yfA34Syrn2gr12vF18ZF10yryFyrWrCrW7
+	Jrn8tF45Gr45G37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pi89NxUUUUU=
+X-CM-SenderInfo: poln30d1xriqqrwthudrp/xtbDABPmi2nxz3MPEgAA3H
 
-On Tue, Apr 28, 2026 at 4:23=E2=80=AFPM Loic Poulain
-<loic.poulain@oss.qualcomm.com> wrote:
->
-> Some devices store the Bluetooth BD address in non-volatile
-> memory, which can be accessed through the NVMEM framework.
-> Similar to Ethernet or WiFi MAC addresses, add support for
-> reading the BD address from a 'local-bd-address' NVMEM cell.
->
-> As with the device-tree provided BD address, add a quirk to
-> indicate whether a device or platform should attempt to read
-> the address from NVMEM when no valid in-chip address is present.
-> Also add a quirk to indicate if the address is stored in
-> big-endian byte order.
->
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> ---
+Signed-off-by: Li kunyu <likunyu10@163.com>
+---
+ block/bio.c               |  2 ++
+ block/blk-iolatency.c     | 34 ++++++++++++++++++++++++++++++++++
+ block/blk-merge.c         |  6 +++++-
+ block/blk-rq-qos.h        | 11 +++++++++++
+ include/linux/blk_types.h |  2 ++
+ 5 files changed, 54 insertions(+), 1 deletion(-)
 
-Is there any reason why we can't extend the existing
-of_get_mac_address() with another property name and use it here? It
-already has support for mac addresses from nvmem.
+diff --git a/block/bio.c b/block/bio.c
+index b8972dba68a0..7740701afc7f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1733,6 +1733,8 @@ static inline bool bio_remaining_done(struct bio *bio)
+ 		return true;
+ 	}
+ 
++	rq_qos_done_split_bio(bio);
++
+ 	return false;
+ }
+ 
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 53e8dd2dfa8a..ba5870bf14c5 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -632,6 +632,39 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	}
+ }
+ 
++static void blkcg_iolatency_done_split_bio(struct rq_qos *rqos, struct bio *bio)
++{
++	struct blkcg_gq *blkg;
++	struct rq_wait *rqw;
++	struct iolatency_grp *iolat;
++	int inflight = 0;
++
++	blkg = bio->bi_blkg;
++	if (!blkg || !bio_flagged(bio, BIO_QOS_CHAIN_CHILD))
++		return;
++
++	iolat = blkg_to_lat(bio->bi_blkg);
++	if (!iolat)
++		return;
++
++	if (!iolat->blkiolat->enabled)
++		return;
++
++	while (blkg && blkg->parent) {
++		iolat = blkg_to_lat(blkg);
++		if (!iolat) {
++			blkg = blkg->parent;
++			continue;
++		}
++		rqw = &iolat->rq_wait;
++
++		inflight = atomic_dec_return(&rqw->inflight);
++		WARN_ON_ONCE(inflight < 0);
++
++		blkg = blkg->parent;
++	}
++}
++
+ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ {
+ 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
+@@ -645,6 +678,7 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ static const struct rq_qos_ops blkcg_iolatency_ops = {
+ 	.throttle = blkcg_iolatency_throttle,
+ 	.done_bio = blkcg_iolatency_done_bio,
++	.done_split_bio = blkcg_iolatency_done_split_bio,
+ 	.exit = blkcg_iolatency_exit,
+ };
+ 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index fcf09325b22e..26373b9c02d3 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -151,8 +151,12 @@ static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
+ 	if (split_sectors) {
+ 		bio = bio_submit_split_bioset(bio, split_sectors,
+ 				&bio->bi_bdev->bd_disk->bio_split);
+-		if (bio)
++		if (bio) {
+ 			bio->bi_opf |= REQ_NOMERGE;
++			/* Fix the issue where the inflight statistics
++			 * of the chained bio in the QoS are incorrect.
++			 */
++			bio_set_flag(split, BIO_QOS_CHAIN_CHILD);
+ 	}
+ 
+ 	return bio;
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index a747a504fe42..496a27b9d412 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -45,6 +45,7 @@ struct rq_qos_ops {
+ 	void (*cleanup)(struct rq_qos *, struct bio *);
+ 	void (*queue_depth_changed)(struct rq_qos *);
+ 	void (*exit)(struct rq_qos *);
++	void (*done_split_bio)(struct rq_qos *, struct bio *);
+ 	const struct blk_mq_debugfs_attr *debugfs_attrs;
+ };
+ 
+@@ -108,6 +109,7 @@ void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
+ void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
+ void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
+ void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
++void __rq_qos_done_split_bio(struct rq_qos *rqos, struct bio *bio);
+ void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
+ 
+ static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
+@@ -157,6 +159,15 @@ static inline void rq_qos_done_bio(struct bio *bio)
+ 		__rq_qos_done_bio(q->rq_qos, bio);
+ }
+ 
++static inline void rq_qos_done_split_bio(struct bio *bio)
++{
++	if (bio->bi_bdev && bio_flagged(bio, BIO_QOS_CHAIN_CHILD)) {
++		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
++		if (q->rq_qos)
++			__rq_qos_done_split_bio(q->rq_qos, bio);
++	}
++}
++
+ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
+ {
+ 	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos) {
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 8808ee76e73c..63fee89ecc14 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -322,6 +322,8 @@ enum {
+ 	BIO_REMAPPED,
+ 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
+ 	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
++	BIO_QOS_CHAIN_CHILD,    /* chained bio child, used for segmenting out
++				* the bio */
+ 	BIO_FLAG_LAST
+ };
+ 
+-- 
+2.47.3
 
-Bart
