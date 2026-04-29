@@ -1,395 +1,204 @@
-Received: from arkamax.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907B33A5E69;
-	Wed, 29 Apr 2026 16:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777478891; cv=none; b=A3jXbt+xqBO7cPKOH06PmPq1lS6WmOeMBzYTYW6ZiLpfsk8aAqvaC3HcNimldOn+pq5vfa8a+h9oVwuYBaaBk9/KElJc5XHfBQaAKB+Qz0h3kE/DypWoWfVXy1C12HcByQwVTAB859i0j8pmmpO9LcXNhUR1tO5F+lhGj85C164=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777478891; c=relaxed/simple;
-	bh=2OxDRuVuRYUIezquhVk6qf5m05LQJvebSzdYBe3fKkI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=nZkjf4RIvlCOQ6GtwMWgu6VLkq2nSZatDaRU9bSrY3pc3I2ywjsINE6o27KThHJd9oiT5+3rfhrHigNhDLmC1KNuijyo3BgLEtWoQj+W0yLIbiBcUsLASVX/TvyKJtR/9U4tsh+YhFfiWJI60f3LA1vows69ZPZoqEKn8qGXNVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=arkamax.eu; spf=pass smtp.mailfrom=arkamax.eu; arc=none smtp.client-ip=128.116.240.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=arkamax.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arkamax.eu
-Received: from localhost (128-116-240-228.dyn.eolo.it [128.116.240.228])
-	by arkamax.eu (OpenSMTPD) with ESMTPSA id 8ebc5e10 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 29 Apr 2026 18:07:48 +0200 (CEST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A9B40B6E0
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 16:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.168.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777479757; cv=pass; b=fSQLqhWY4wX6GUB6dMhyzGsrNIprnwtQhW7tMlXdYAqO1mWpf79nWoHAMSndU5w61hTkpB4kE3xwLweD9E4MrLuAAtHXe1aWnBfu98sTDsQnSzzz7peo8t388BcH4vE6ZfJBjCwKDPBCCzGeTC0sh4+wNrvrN6daRCl/WFVoCn0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777479757; c=relaxed/simple;
+	bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gV3129qFrlEYZJhmPOeLVAQaHDX4cDuGW1Mz6P8ffjOTWeIQ/c+gxy9Wep9u3lFcPU4B17Jc2As/OwL/JRAdE5omhjbdCWC+hWIS8GcWTfu7TgIJsn9JHRD1JzO+nETK9uKIn9STC0xK7ogVNYa34YfLZGe1nQT3GZyDvCNcV7M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jzRi40++; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=GkK2GDLC; arc=pass smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jzRi40++";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="GkK2GDLC"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63TFgPCU901799
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 16:22:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=; b=jzRi40++qm9IKV3W
+	DFhl2OnAx5ljK0yTl5sdGb4NA1HEADBLS++TGqlMn+WPdwX2/6sEnm3lmv9ZYp99
+	LlEcReCx/bYzwF9NLAtO7bcrJFlciMJRn4aPd4eD+Stm98eR/lZ9R/efJuSpDVl6
+	p4AC2qFIxVW4C9vjed4kHsoulcpLPjlt7B+SFd8FKtUQRBzBx/9/HZp7wa0xKWjF
+	8rM2KO4apJFk/+YVNR4yaMCdO560y5Z1GaPSB3DeLIl+du/7wdBMFdHNxChQbTN3
+	j6zhYqIDgiwDKkVDo/UJGD/sin4FGYQlmLRq69LZ29Ly82bOVP73uBopj5ec+ouI
+	5qGwVQ==
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dubq9jk4v-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 16:22:29 +0000 (GMT)
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7dcd603855aso1696006a34.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 09:22:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777479749; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SM0mCAUNA1b0ulJ9IfjS+l4BfVdATWbeoisuDte5K2lf4y5A65lXDQF0yqinvLYomR
+         knOrC0KeQ6k2E+pBzGA31aOMZytDaSK/oLoO2XWOkAINALa+MLtn5nEUQSw38wEInGuA
+         9DMnsRHgGC7WguEaixzpst8qfEArEbSKFqA2FO9vShSLYqkLZxmUgkihrMREwfArp0o0
+         Z7EsaUPNekuSIZPxYBEBOeoe7AT6P3dlOKNAhEGK1KP1H/TLpgHmSaNxgaDF9XbjMW0O
+         rugIjNJod5tGGR/3ggEh6Pp79MB+extIO3e4Ln9JoNcxzZSgcnykqaQ4rgQfV2xvBI7k
+         o8fg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
+        fh=Qd4CgvRE3ec7h87FtWPbMm4Hy9ao73CAX/i+U5o8emo=;
+        b=ZbC+xJZ4I1k3CWBlZT7xVog4tZp/enlZrzXG7+nSNhoA807JKJbvIPEUFsonkLczyY
+         hRZqWwwrnLdziDax0v/s1kp87m92pzzDm8/B2cAnj+tHzXI3ogqT2TqDcbc5bHD+pO94
+         +EacDoeW82s45d8OxMDSeu1Pm+jzSpe/Gv+jztcWrpTuvj0+osSdWFxZLjTd6ZewsZ5f
+         7ppwUvKhrMR/QZJK9OOzNgQNA/6TduqTdxmLVuOGnr2YXEf3XXDe+H5z6r62IyLBQCRC
+         g3f/EPcXiJ0JOomH3BoHXeziVN66Xy2QHjtdwazWpF+ttvUCwpQxND3WCZ1boMhoK7nJ
+         mpnA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1777479749; x=1778084549; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
+        b=GkK2GDLCkQqfYx6JvKVq9FxU+hMrvsfGpUfPRavqDCLTUpLBKUdKe5rLsqys6FDmtP
+         hIOvvEfK9Q6faBvDu4cyfg+UhizleVr7xWuPGM+/O/Smc7rzLbfFpORp6rQ6R9u9TB42
+         YPliTBBJ/jTM060xEkWFeIHanPsz3QjsND1QRwNRc75XReEhwvQYDq/sOJ5sAZqqa09m
+         mGS5XsOIV6arpJMMcEf7lnuj1cFn5E1nVJlL9a//ZJIk7eITAA7hTvndy26W2QBSoky3
+         Dia8pdzWoCz5Ns+Xld2S5VTzXxMwdwCZB56H5G8oStRP0rifd4r3PNpyuomi6/FBTwRr
+         emew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777479749; x=1778084549;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zeHlRNAL/iq8k8oB+OXu5Y2acD+IRikshmtnJE9EZ2k=;
+        b=HzK6svNNWP2rbwIY9R0rY+juNKz0cauxlU/bQJoOYYI+D8aAGudUnQOgz5Z1QfEPqe
+         t3bUk9qgxzeVjqxrhIdp8/nMfBkh8FWzzFq7eP0iM5QKnYdcREEzf80nUdwJqdaf4N2L
+         qkq7U5+OlD2FaxWpXO6WDOFNFvsUO6NqxQMWZaVTrCdMjUYCwWiMCUlz69UGm3e75li8
+         QbUtxy2IpyHpCaYkcT8zgkPex8ieQesUg+asb6kZib4rcPoZCAvtMdRKCB/nPjiWKDck
+         VKtX5J+Qq9y+EMDnShmD9FIPA92+OVPi96BNh3DV+fAAYEu+xGL0PwFafpfi30Sf0sPR
+         Rhig==
+X-Forwarded-Encrypted: i=1; AFNElJ9lOcVdBAxSVTrrsKMHx4ODESVicLMya0sPlvsRfQlnE6Ji2AReZDwydEeBFqOFqsjhfXmnUBe9+kxahA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4rKnw0SB8G9DN0cfD/1uk0j63V3N+AUTeTCu9eNwUNipyMaAg
+	WpAPlOMQxHuM5U37tGDfXSnEUlu4UJYHMwqo4bZmXzgfY8Z8dcBxz3qtIH0FIP+0auOyGhACNKM
+	1jSpjlWLocBHSXHJsxRj8jpVqpWolr+ttXsvyyz6w1bInEUT3tZZI4C3x3oykqeam256NICBTFv
+	iqigjJIGYKzN1Km1pR/5nWH8uNnkaOJfGq4Xind0eg
+X-Gm-Gg: AeBDievpc7QLobGH1Bqjd1Hb55SyeM4C+29AuTx9ODxNEU/iFkwfUuhtBsmp/C4hgt+
+	3cqRsyPY97IrRnyY9GgaJa5E6bwXyg8f02sNcEFOpFD5xrESy9LEYK/Z0YM1v1et5lWuWClGNOx
+	/UyCsOMQj6MOqYNW0s3EmmBR52WQCnlt/RhE143GStABJjcmTNDZQM2yYufsVF+l50hVVDFFAmj
+	6RC1g0i/AK5aXCJ2X+aa/RAd/1D7gm/GVtfX+OawZZRvrIr3Q==
+X-Received: by 2002:a05:6820:1014:b0:696:6e28:8c19 with SMTP id 006d021491bc7-6966e288f89mr732609eaf.20.1777479748802;
+        Wed, 29 Apr 2026 09:22:28 -0700 (PDT)
+X-Received: by 2002:a05:6820:1014:b0:696:6e28:8c19 with SMTP id
+ 006d021491bc7-6966e288f89mr732600eaf.20.1777479748427; Wed, 29 Apr 2026
+ 09:22:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
+ <20260428-block-as-nvmem-v1-7-6ad23e75190a@oss.qualcomm.com>
+ <CAMRc=Me9G9vd06a39vi_UrXCTkUtJQRogm2MqgnwLS_r3Thyzg@mail.gmail.com> <e0adaf64-10d7-4e28-8403-769e3070ec30@lunn.ch>
+In-Reply-To: <e0adaf64-10d7-4e28-8403-769e3070ec30@lunn.ch>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Wed, 29 Apr 2026 18:22:16 +0200
+X-Gm-Features: AVHnY4IKbhM_HKhU56A0ru1z2waWryyeh9i-sfRAmlk4QJVuWsNhvXilz3QVxic
+Message-ID: <CAFEp6-26sVj21JVECREORdq+UeFTB22MoqAm6Pd2fTosCQau9Q@mail.gmail.com>
+Subject: Re: [PATCH 7/9] Bluetooth: hci_sync: Add NVMEM-backed BD address retrieval
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, Ulf Hansson <ulfh@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, daniel@makrotopia.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 29 Apr 2026 18:07:47 +0200
-Message-Id: <DI5RO76D5IWR.19K0ES58HUIVS@arkamax.eu>
-From: "Maurizio Lombardi" <mlombard@arkamax.eu>
-To: "Pavel Begunkov" <asml.silence@gmail.com>, "Jens Axboe"
- <axboe@kernel.dk>, "Keith Busch" <kbusch@kernel.org>, "Christoph Hellwig"
- <hch@lst.de>, "Sagi Grimberg" <sagi@grimberg.me>, "Alexander Viro"
- <viro@zeniv.linux.org.uk>, "Christian Brauner" <brauner@kernel.org>,
- "Andrew Morton" <akpm@linux-foundation.org>, "Sumit Semwal"
- <sumit.semwal@linaro.org>, =?utf-8?q?Christian_K=C3=B6nig?=
- <christian.koenig@amd.com>, <linux-block@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
- <linux-fsdevel@vger.kernel.org>, <io-uring@vger.kernel.org>,
- <linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
- <linaro-mm-sig@lists.linaro.org>
-Cc: "Nitesh Shetty" <nj.shetty@samsung.com>, "Kanchan Joshi"
- <joshi.k@samsung.com>, "Anuj Gupta" <anuj20.g@samsung.com>, "Tushar Gohad"
- <tushar.gohad@intel.com>, "William Power" <william.power@intel.com>, "Phil
- Cayton" <phil.cayton@intel.com>, "Jason Gunthorpe" <jgg@nvidia.com>
-Subject: Re: [PATCH v3 07/10] nvme-pci: implement dma_token backed requests
-X-Mailer: aerc 0.21.0
-References: <cover.1777475843.git.asml.silence@gmail.com>
- <5cecb1157ab784f9f303a91449fdf11b03aa6002.1777475843.git.asml.silence@gmail.com>
-In-Reply-To: <5cecb1157ab784f9f303a91449fdf11b03aa6002.1777475843.git.asml.silence@gmail.com>
+X-Proofpoint-GUID: WK-oAQsnJbG62lABpBfhNp0md5-tzpFO
+X-Proofpoint-ORIG-GUID: WK-oAQsnJbG62lABpBfhNp0md5-tzpFO
+X-Authority-Analysis: v=2.4 cv=Wak8rUhX c=1 sm=1 tr=0 ts=69f23045 cx=c_pps
+ a=7uPEO8VhqeOX8vTJ3z8K6Q==:117 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=yOCtJkima9RkubShWh1s:22 a=EUspDBNiAAAA:8 a=J1Chn9sQg74BwZjCRdUA:9
+ a=QEXdDO2ut3YA:10 a=EXS-LbY8YePsIyqnH6vw:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDE2NSBTYWx0ZWRfX6yM/lbjpGz69
+ L4Og0yiA5dmpwRGbUXjxzOymukH3SyfDGcirSUXoVdTtV4tNQfR7hU6NjgcDhQPJGrnp0QbtaD8
+ xwFcFMATm41ZUm2g2mGaHeGiDMoOf47YFlmrfD2OmX2ZLe/KubekYLCqoykdBmwZRKgDzHgr46y
+ nLxWcIg4poZf2j2Sh8eFp+Gyf2zsRLtZ3TBHOrDv1o3l0FR/GLAIo+FPuqBedpw3GXjbHu2GEEu
+ f95Zq/velUKi6EvxsOkMYfUdN/Tgl2+lfPZpqwjn2B+68hgiKMceq3PDT3EICQsBXWxk947Udb9
+ dzlpedfIOeEUrCWq6ITrBUOa8Dsw/lu7Rv+IBilsjjIyJ9KIMwpFhUmtF6YVPj8moZ9VmGUB44G
+ x7PcjiW/JL6+ZdfHTHHP0Zn9l35CFSFl73RM9yJwPPOmpuOw6rbkVaVehMxoHUQUVPvAJviY+sF
+ +tYunFYAe6RmEDx0nrA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-29_01,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 spamscore=0 clxscore=1015
+ bulkscore=0 impostorscore=0 adultscore=0 phishscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604290165
 
-On Wed Apr 29, 2026 at 5:25 PM CEST, Pavel Begunkov wrote:
-> Enable BIO_DMABUF_MAP backed requests. It creates a prp list for the
-> dmabuf when it's mapped, which is then used to initialise requests.
+Hi Bartosz, Andrew,
+
+On Wed, Apr 29, 2026 at 3:15=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> Suggested-by: Keith Busch <kbusch@kernel.org>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  drivers/nvme/host/pci.c | 282 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 282 insertions(+)
+> On Wed, Apr 29, 2026 at 10:53:13AM +0200, Bartosz Golaszewski wrote:
+> > On Tue, Apr 28, 2026 at 4:23=E2=80=AFPM Loic Poulain
+> > <loic.poulain@oss.qualcomm.com> wrote:
+> > >
+> > > Some devices store the Bluetooth BD address in non-volatile
+> > > memory, which can be accessed through the NVMEM framework.
+> > > Similar to Ethernet or WiFi MAC addresses, add support for
+> > > reading the BD address from a 'local-bd-address' NVMEM cell.
+> > >
+> > > As with the device-tree provided BD address, add a quirk to
+> > > indicate whether a device or platform should attempt to read
+> > > the address from NVMEM when no valid in-chip address is present.
+> > > Also add a quirk to indicate if the address is stored in
+> > > big-endian byte order.
+> > >
+> > > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > > ---
+> >
+> > Is there any reason why we can't extend the existing
+> > of_get_mac_address() with another property name and use it here? It
+> > already has support for mac addresses from nvmem.
 >
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index db5fc9bf6627..d2629853a972 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -27,6 +27,8 @@
->  #include <linux/io-64-nonatomic-lo-hi.h>
->  #include <linux/io-64-nonatomic-hi-lo.h>
->  #include <linux/sed-opal.h>
-> +#include <linux/io_dmabuf_token.h>
-> +#include <linux/dma-resv.h>
-> =20
->  #include "trace.h"
->  #include "nvme.h"
-> @@ -393,6 +395,17 @@ struct nvme_queue {
->  	struct completion delete_done;
->  };
-> =20
-> +struct nvme_dmabuf_token {
-> +	struct dma_buf_attachment *attach;
-> +};
-> +
-> +struct nvme_dmabuf_map {
-> +	struct io_dmabuf_map base;
-> +	dma_addr_t *dma_list;
-> +	struct sg_table *sgt;
-> +	unsigned nr_entries;
-> +};
-> +
->  /* bits for iod->flags */
->  enum nvme_iod_flags {
->  	/* this command has been aborted by the timeout handler */
-> @@ -854,6 +867,134 @@ static void nvme_free_descriptors(struct request *r=
-eq)
->  	}
->  }
-> =20
-> +static void nvme_dmabuf_map_sync(struct nvme_dev *nvme_dev, struct reque=
-st *req,
-> +				 bool for_cpu)
-> +{
-> +	int length =3D blk_rq_payload_bytes(req);
-> +	struct device *dev =3D nvme_dev->dev;
-> +	enum dma_data_direction dma_dir;
-> +	struct bio *bio =3D req->bio;
-> +	struct nvme_dmabuf_map *map;
-> +	dma_addr_t *dma_list;
-> +	int offset, map_idx;
-> +
-> +	dma_dir =3D rq_data_dir(req) =3D=3D READ ? DMA_FROM_DEVICE : DMA_TO_DEV=
-ICE;
-> +	map =3D container_of(bio->dmabuf_map, struct nvme_dmabuf_map, base);
-> +	dma_list =3D map->dma_list;
-> +
-> +	offset =3D bio->bi_iter.bi_bvec_done;
-> +	map_idx =3D offset / NVME_CTRL_PAGE_SIZE;
-> +	length +=3D offset & (NVME_CTRL_PAGE_SIZE - 1);
-> +
-> +	while (length > 0) {
-> +		u64 dma_addr =3D dma_list[map_idx++];
-> +
-> +		if (for_cpu)
-> +			__dma_sync_single_for_cpu(dev, dma_addr,
-> +						  NVME_CTRL_PAGE_SIZE, dma_dir);
-> +		else
-> +			__dma_sync_single_for_device(dev, dma_addr,
-> +						     NVME_CTRL_PAGE_SIZE,
-> +						     dma_dir);
-> +		length -=3D NVME_CTRL_PAGE_SIZE;
-> +	}
-> +}
-> +
-> +static void nvme_rq_clean_dmabuf_map(struct nvme_dev *dev,
-> +				      struct request *req)
-> +{
-> +	struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
-> +
-> +	nvme_dmabuf_map_sync(dev, req, true);
-> +
-> +	if (!(iod->flags & IOD_SINGLE_SEGMENT))
-> +		nvme_free_descriptors(req);
-> +}
-> +
-> +static blk_status_t nvme_rq_setup_dmabuf_map(struct request *req,
-> +					     struct nvme_queue *nvmeq)
-> +{
-> +	struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
-> +	int length =3D blk_rq_payload_bytes(req);
-> +	u64 dma_addr, prp1_dma, prp2_dma;
-> +	struct bio *bio =3D req->bio;
-> +	struct nvme_dmabuf_map *map;
-> +	dma_addr_t *dma_list;
-> +	dma_addr_t prp_dma;
-> +	__le64 *prp_list;
-> +	int i, map_idx;
-> +	int offset;
-> +
-> +	nvme_dmabuf_map_sync(nvmeq->dev, req, false);
-> +
-> +	map =3D container_of(bio->dmabuf_map, struct nvme_dmabuf_map, base);
-> +	dma_list =3D map->dma_list;
-> +
-> +	offset =3D bio->bi_iter.bi_bvec_done;
-> +	map_idx =3D offset / NVME_CTRL_PAGE_SIZE;
-> +	offset &=3D (NVME_CTRL_PAGE_SIZE - 1);
-> +	prp1_dma =3D dma_list[map_idx++] + offset;
-> +
-> +	length -=3D (NVME_CTRL_PAGE_SIZE - offset);
-> +	if (length <=3D 0) {
-> +		prp2_dma =3D 0;
-> +		goto done;
-> +	}
-> +
-> +	if (length <=3D NVME_CTRL_PAGE_SIZE) {
-> +		prp2_dma =3D dma_list[map_idx];
-> +		goto done;
-> +	}
-> +
-> +	if (DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE) <=3D
-> +	    NVME_SMALL_POOL_SIZE / sizeof(__le64))
-> +		iod->flags |=3D IOD_SMALL_DESCRIPTOR;
-> +
-> +	prp_list =3D dma_pool_alloc(nvme_dma_pool(nvmeq, iod), GFP_ATOMIC,
-> +			&prp_dma);
-> +	if (!prp_list)
-> +		return BLK_STS_RESOURCE;
-> +
-> +	iod->descriptors[iod->nr_descriptors++] =3D prp_list;
-> +	prp2_dma =3D prp_dma;
-> +	i =3D 0;
-> +	for (;;) {
-> +		if (i =3D=3D NVME_CTRL_PAGE_SIZE >> 3) {
-> +			__le64 *old_prp_list =3D prp_list;
-> +
-> +			prp_list =3D dma_pool_alloc(nvmeq->descriptor_pools.large,
-> +					GFP_ATOMIC, &prp_dma);
-> +			if (!prp_list)
-> +				goto free_prps;
-> +			iod->descriptors[iod->nr_descriptors++] =3D prp_list;
-> +			prp_list[0] =3D old_prp_list[i - 1];
-> +			old_prp_list[i - 1] =3D cpu_to_le64(prp_dma);
-> +			i =3D 1;
-> +		}
-> +
-> +		dma_addr =3D dma_list[map_idx++];
-> +		prp_list[i++] =3D cpu_to_le64(dma_addr);
-> +
-> +		length -=3D NVME_CTRL_PAGE_SIZE;
-> +		if (length <=3D 0)
-> +			break;
-> +	}
-> +done:
-> +	iod->cmd.common.dptr.prp1 =3D cpu_to_le64(prp1_dma);
-> +	iod->cmd.common.dptr.prp2 =3D cpu_to_le64(prp2_dma);
-> +	return BLK_STS_OK;
-> +free_prps:
-> +	nvme_free_descriptors(req);
-> +	return BLK_STS_RESOURCE;
-> +}
-> +
-> +static inline bool nvme_rq_is_dmabuf_attached(struct request *req)
-> +{
-> +	if (!IS_ENABLED(CONFIG_DMABUF_TOKEN))
-> +		return false;
-> +	return req->bio && bio_flagged(req->bio, BIO_DMABUF_MAP);
-> +}
-> +
->  static void nvme_free_prps(struct request *req, unsigned int attrs)
->  {
->  	struct nvme_iod *iod =3D blk_mq_rq_to_pdu(req);
-> @@ -932,6 +1073,11 @@ static void nvme_unmap_data(struct request *req)
->  	struct device *dma_dev =3D nvmeq->dev->dev;
->  	unsigned int attrs =3D 0;
-> =20
-> +	if (nvme_rq_is_dmabuf_attached(req)) {
-> +		nvme_rq_clean_dmabuf_map(nvmeq->dev, req);
-> +		return;
-> +	}
-> +
->  	if (iod->flags & IOD_SINGLE_SEGMENT) {
->  		static_assert(offsetof(union nvme_data_ptr, prp1) =3D=3D
->  				offsetof(union nvme_data_ptr, sgl.addr));
-> @@ -1222,6 +1368,9 @@ static blk_status_t nvme_map_data(struct request *r=
-eq)
->  	struct blk_dma_iter iter;
->  	blk_status_t ret;
-> =20
-> +	if (nvme_rq_is_dmabuf_attached(req))
-> +		return nvme_rq_setup_dmabuf_map(req, nvmeq);
-> +
->  	/*
->  	 * Try to skip the DMA iterator for single segment requests, as that
->  	 * significantly improves performances for small I/O sizes.
-> @@ -2238,6 +2387,134 @@ static int nvme_create_queue(struct nvme_queue *n=
-vmeq, int qid, bool polled)
->  	return result;
->  }
-> =20
-> +#ifdef CONFIG_DMABUF_TOKEN
-> +static void nvme_dmabuf_invalidate_mappings(struct dma_buf_attachment *a=
-ttach)
-> +{
-> +	struct io_dmabuf_token *token =3D attach->importer_priv;
-> +
-> +	io_dmabuf_token_invalidate_mappings(token);
-> +}
-> +
-> +const struct dma_buf_attach_ops nvme_dmabuf_importer_ops =3D {
-> +	.invalidate_mappings	=3D nvme_dmabuf_invalidate_mappings,
-> +	.allow_peer2peer	=3D true,
-> +};
-> +
-> +static struct io_dmabuf_map *nvme_dmabuf_token_map(struct io_dmabuf_toke=
-n *token)
-> +{
-> +	struct nvme_dmabuf_token *data =3D token->dev_priv;
-> +	struct dma_buf_attachment *attach =3D data->attach;
-> +	dma_addr_t *dma_list =3D NULL;
-> +	unsigned long tmp, i =3D 0;
-> +	struct nvme_dmabuf_map *map;
-> +	struct scatterlist *sg;
-> +	struct sg_table *sgt;
-> +	unsigned nr_entries;
-> +	int ret;
-> +
-> +	dma_resv_assert_held(token->dmabuf->resv);
-> +
-> +	map =3D kmalloc(sizeof(*map), GFP_KERNEL);
-> +	if (!map)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	nr_entries =3D token->dmabuf->size / NVME_CTRL_PAGE_SIZE;
-> +	dma_list =3D kmalloc_array(nr_entries, sizeof(dma_list[0]), GFP_KERNEL)=
-;
-> +	if (!dma_list) {
-> +		ret =3D -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	sgt =3D dma_buf_map_attachment(attach, token->dir);
-> +	if (IS_ERR(sgt)) {
-> +		ret =3D PTR_ERR(sgt);
-> +		sgt =3D NULL;
-> +		goto err;
-> +	}
-> +
-> +	for_each_sgtable_dma_sg(sgt, sg, tmp) {
-> +		dma_addr_t dma_addr =3D sg_dma_address(sg);
-> +		unsigned long sg_len =3D sg_dma_len(sg);
-> +
-> +		if (sg_len % NVME_CTRL_PAGE_SIZE) {
-> +			ret =3D -EINVAL;
-> +			goto err;
-> +		}
-> +
-> +		while (sg_len) {
-> +			dma_list[i++] =3D dma_addr;
-> +			dma_addr +=3D NVME_CTRL_PAGE_SIZE;
-> +			sg_len -=3D NVME_CTRL_PAGE_SIZE;
-> +		}
-> +	}
-> +
-> +	ret =3D io_dmabuf_init_map(token, &map->base);
-> +	if (ret)
-> +		goto err;
-> +	map->nr_entries =3D nr_entries;
-> +	map->dma_list =3D dma_list;
-> +	map->sgt =3D sgt;
-> +	return &map->base;
-> +err:
-> +	if (sgt)
-> +		dma_buf_unmap_attachment(attach, sgt, token->dir);
-> +	kfree(map);
-> +	kfree(dma_list);
-> +	return ERR_PTR(ret);
-> +}
-> +
-> +static void nvme_dmabuf_token_unmap(struct io_dmabuf_token *token,
-> +				 struct io_dmabuf_map *map_base)
-> +{
-> +	struct nvme_dmabuf_token *data =3D token->dev_priv;
-> +	struct nvme_dmabuf_map *map =3D container_of(map_base,
-> +						struct nvme_dmabuf_map, base);
-> +
-> +	dma_resv_assert_held(token->dmabuf->resv);
-> +
-> +	dma_buf_unmap_attachment(data->attach, map->sgt, token->dir);
-> +	kfree(map->dma_list);
-> +}
-> +
-> +static void nvme_dmabuf_token_release(struct io_dmabuf_token *token)
-> +{
-> +	struct nvme_dmabuf_token *data =3D token->dev_priv;
-> +
-> +	dma_buf_detach(token->dmabuf, data->attach);
-> +	kfree(data);
-> +}
-> +
-> +const struct io_dmabuf_token_dev_ops nvme_dma_token_ops =3D {
-> +	.map		=3D nvme_dmabuf_token_map,
-> +	.unmap		=3D nvme_dmabuf_token_unmap,
-> +	.release	=3D nvme_dmabuf_token_release,
-> +};
-> +
-> +static int nvme_create_dmabuf_token(struct request_queue *q,
-> +				 struct io_dmabuf_token *token)
-> +{
-> +	struct nvme_dmabuf_token *data;
-> +	struct dma_buf_attachment *attach;
-> +	struct nvme_ns *ns =3D q->queuedata;
-> +	struct nvme_dev *dev =3D to_nvme_dev(ns->ctrl);
-> +	struct dma_buf *dmabuf =3D token->dmabuf;
-> +
-> +	data =3D kzalloc(sizeof(data), GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
+> Does it even need to be a different property name? Is a bluetooth MAC
+> address somehow different to an Ethernet MAC address? Isn't it just a
+> EUI-48, independent of it being Ethernet, Bluetooth, wifi, fddi, token
+> ring, homing pigeon?
 
-Shouldn't this be kzalloc(sizeof(*data)...) ?
+In terms of naming, I followed the pattern of the existing DT
+properties: for Ethernet/WiFi there is mac-address property, and for
+Bluetooth a local-bd-address property. So it seems reasonable to reuse
+the same naming for the NVMEM labelling. Also One thing to keep in
+mind is that Bluetooth has historically handled addresses in
+little-endian format, while Ethernet MAC addresses are typically
+stored in big-endian format (as far as I know).
 
-Also, checkpatch generates a warning because kzalloc_obj() should be
-preferred for this kind of memory allocations over kzalloc().
+That said, a more generic EUI-48 identifier could also make sense if
+we want to go in that direction, with expected property/nvmem-cell
+name(s) as parameters?
 
-> +
-> +	token->dev_priv =3D data;
-> +	token->dev_ops =3D &nvme_dma_token_ops;
-> +
-> +	attach =3D dma_buf_dynamic_attach(dmabuf, dev->dev,
-> +					&nvme_dmabuf_importer_ops, token);
-> +	if (IS_ERR(attach))
-> +		return PTR_ERR(attach);
-
-Supposing dma_buf_dynamic_attach() returns an error, won't the 'data'
-pointer be leaked?
-
-Maurizio
+Regards,
+Loic
