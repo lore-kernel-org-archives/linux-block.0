@@ -1,195 +1,160 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC4539D6CB;
-	Wed, 29 Apr 2026 09:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1745038D6B1
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 09:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777454996; cv=none; b=p324aZTqXXiv8UnNKndjFw09Az4PoGTgSYpa8OWoy8WfZ2h2vHwnpQuOipWE+NwJlmUneqFh2wEWOgh/V8jrUSmjH1Vw9zCXZrnBmVbC9B2cpaRPTfW9qAIIeYZdqjGj3V/49eaXq8VC1fPU3NAepKe1cppyTSggvqfYk1j38K8=
+	t=1777455053; cv=none; b=rPN0rmODlyUFHd9l6RYH+GbnoVdEFLiPZAg0KVkEvpHXGuATQ4SERQcL/BnVHCjLaxhYjdEHDRNBN7XPjxhdVpAYc9la9i8tykvXE24fGaXNUffXLWiAAoCe7QlChg9OgIWz5EddqLpsfdkqmu2FsIZcc3qAd/RmXMqjsgm45Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777454996; c=relaxed/simple;
-	bh=0Zmd18qN7JJI+IpSRH03oGWiU+BXz+Xj+vOx98ygG/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Erm7sgKbF3gcnJKCKIjnKUCQ0YUL7YAQsn1HqzDhKQhcacBZEr1Zr0TDywhn1z46Ah+LvMc6D5o864OrDN78ikm4FLLtjKJyztahKdiM5BkwaWSaJSL90nzKyb4zB0Qdik0q96mPxlRe16K7gnYQYGKGjjR2g0sXXBFWEqMv9ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=euKyt4sk; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1777455053; c=relaxed/simple;
+	bh=wC9jrPQBmpCZbW2mnXn6p/4PAelbyjfeh2Yka1RlPpM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lNYUBR5ClchULSp3sdLNCYOn5KsJOHMn5uQ1enj0on5Npw9zwu8PhoqjZMjM0O3ujIXgc0kw5OWGWRxBHZ1J+DDOyZIR6nfx2w6YcZ7Hw6M/22IHuh09uIbGMZ+jWpmYEGWyXIJAKbby9y3obfY0czYnnQnqozIpB3W+z2UAOYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=W9VWA6S3; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=V4Wf0eoQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="euKyt4sk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=d0
-	6XGB/QmP1/mCNgT8clWghT3hJ7WdhN+FWTJjprH7k=; b=euKyt4skgGM60iZIRK
-	i2Ix9Oybg5lRr+sg2iQrE/wGk/fLCu1SHtvFkDtHS5uNHlfSlxsuNYEQnUerlATu
-	TGfOlqpCrlxBr9P304BRw+BKY1YhorEqGCaSeeaL8mqi7qCUKQnv6ZQkS6lCAP1H
-	BrHz8shj/a4TjTz7DJzq4NfYI=
-Received: from vbox.. (unknown [])
-	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wB35hFyz_FpKYoBCQ--.58768S2;
-	Wed, 29 Apr 2026 17:29:23 +0800 (CST)
-From: Li kunyu <likunyu10@163.com>
-To: axboe@kernel.dk,
-	tj@kernel.org,
-	josef@toxicpanda.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Li kunyu <likunyu10@163.com>
-Subject: [PATCH] block/blk-iolatency: Add the processing flow of the chained bio in the QoS and define the related types to solve the problem of incorrect inflight processing in the QoS. The usage of the done_split_bio abstract function in the blk-iolatency project.
-Date: Wed, 29 Apr 2026 17:29:20 +0800
-Message-ID: <20260429092920.2124-1-likunyu10@163.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="W9VWA6S3";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="V4Wf0eoQ"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63T8ppuX2094110
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 09:30:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	gTbNCeRSUqu4zDmkAqRY6ARTuww7wMu5rx1tnXDAf20=; b=W9VWA6S3iqRyvA7f
+	IQsLcQMaUAo6MrX9KGt2ltCHppKvhII5yVDzVpDzHK2kuP0AaZslI8qh0v3tmdex
+	IHtPapbJQePeiqdCjlTAhAHyEtwfT+4h6Zf8mY9rL59hDCZTT0mB7QUXD6jK/LEX
+	YPlvGlHt/g2oCFgtmk6x9RRZqHkzt+idAJZfRqmiEEqUOF9drtciI0/PpY5w+sH2
+	wGojjqWxaAsCUJXiE3JP1jCqQkACKt3T6EDFIM1KBOrrB9G53FbimPaNVhoSbKrh
+	h3vOEeWBL3aHeQUyDP5coXfAtAd1BplIgxkVknbEbhHroHuyOjpgWPgJcKcqpcyx
+	cjXoQg==
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com [209.85.221.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dudh3rksk-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 09:30:49 +0000 (GMT)
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-56f71af9dddso903391e0c.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 02:30:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1777455048; x=1778059848; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gTbNCeRSUqu4zDmkAqRY6ARTuww7wMu5rx1tnXDAf20=;
+        b=V4Wf0eoQAMEva3tDdlrX9/Zl9AZ1bYSngQg/oYmbri4DFawPnSwKNq3piwSd9kYUpE
+         wJMOp9YezrpOeC69LdgSX/znAt2WaolwaiJKh1MceLb025yYmwEvSmSta/Jcq35nK+WP
+         wBjGkelpYxRvdJkqEWpA+vLyGKMxCRc06xoyTg6Erw8FT1e+87RjsjHtDXshS6VNG2Kt
+         Vfw6sTmLtrIWtP/Jrl+IbgfcTIJU+GcNoDXYWEx8Bj3C7x33mRyb6OzLQHgUhwZUN3ui
+         dNa9CIjrWBJ9N0vDukQG8M/ieGF6fxPlbBSG3TD1Wc1A6l9DWi40S3VcUuWjfYoECdMb
+         W28g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777455048; x=1778059848;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gTbNCeRSUqu4zDmkAqRY6ARTuww7wMu5rx1tnXDAf20=;
+        b=U0Z7ZLrJBaDAssJhNVPfcx9D1/VbPgL1oN6uCvxoC/RgHhXEQNtKhHcD7hH8J3qwfO
+         qi8hMlwiSJzcCom2cn9HBmNcUO26slbstOS6ID+u8R+EIZ31TNh9J0WzN/QF445bh8M9
+         diNv+OiRrYZ5W864L7dnjs+AvmUbzQYqeUcgefAzF8ub0zv8wx7DIU4ipjZ0qxsZcUJ8
+         2orn+14qHzrX0IOAgRJW2itvuDCFiP6xnzphuOGFG2eKh0vEmoPgi9WUc8fomx8YyItw
+         tyYUWkzADQKTHAXtAG0WWyrITgueSpr+u3SPancHQ3GX1rIM68h99h/hRJzY3U3zY9L+
+         LLfA==
+X-Forwarded-Encrypted: i=1; AFNElJ9REaCDyVCY5/ZJ4RKToubYWv6CiX+OSF/EV8UGnh3KbCd6I5kaT4YHd/aGtO49AkHerR73HJ6w7/cUBw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEW3jtOlNm4WsO3OX6l+VjAD4jjoYhqI2Ix0fhWNL3qotDRiFt
+	0R63PGk+eHcSmcp5s8TuRWq39tNHlOMghyE2bUu8hgWeRuLNaJGqk2KL5fKwjrptPgCNOg7gjBp
+	l2EvCvzaD3FZ0kWSn/pfOSBiR02SZ5WDJT6MLR2/tK5SZhwNlYG2MX7kRZRvW3S6L/Q==
+X-Gm-Gg: AeBDievhBFdjxA0KharT4EX/Db08r78oKt88OjCCe4w39kJmO+uKK4oFoIXIvEC8EjF
+	VUxzk2YppMNnl9oIRWlzMCrSG+Vl8vnipjXDht/BaTAoD8sMn45cMBzLDGmZnyh6bzoHSj0PXiS
+	DBT6bO05n1LZD+Us2ogAau9mxWn/qBsEvgm6JgsA9MGaZbxqxQJp5J2kwmSD0H773QtcKU9Z0Hr
+	tAMiiCLi1fNYuzT/m/Tkx97PshPOtd8Nh6xzgowsdzMkePjsz4hWvMeEoCrP1q3BXIZ+zEMKpa2
+	gyl+FfZ8f9FpfDwmMD6keimPmruaHQv2gUC/D/S63ipgEHZ90WVBFNGUc48c7LvC9s1PiP44lME
+	gJhh1MBoDhHMHUVSTH6+eWKdsAbNs6WxWeE7gbIX7qNwdgCzwFrdWfzUAERYoE8FLxXPVaLyO+a
+	4JSgcEbfwHfz6rkA==
+X-Received: by 2002:ac5:c894:0:b0:56f:6edd:77ae with SMTP id 71dfb90a1353d-573a293d531mr1234260e0c.0.1777455048468;
+        Wed, 29 Apr 2026 02:30:48 -0700 (PDT)
+X-Received: by 2002:ac5:c894:0:b0:56f:6edd:77ae with SMTP id 71dfb90a1353d-573a293d531mr1234254e0c.0.1777455048034;
+        Wed, 29 Apr 2026 02:30:48 -0700 (PDT)
+Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bb985e1b108sm65753866b.50.2026.04.29.02.30.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Apr 2026 02:30:47 -0700 (PDT)
+Message-ID: <aadfa862-a99e-4214-b19f-6854672dc8d4@oss.qualcomm.com>
+Date: Wed, 29 Apr 2026 11:30:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wB35hFyz_FpKYoBCQ--.58768S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxXFWUCw4UCw4rCF47Jr17Awb_yoWruF47pa
-	10gwnIkrWDKF4kWa97GwsrCw4SkanYgryUC3yfA34Syrn2gr12vF18ZF10yryFyrWrCrW7
-	Jrn8tF45Gr45G37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pi89NxUUUUU=
-X-CM-SenderInfo: poln30d1xriqqrwthudrp/xtbDABPmi2nxz3MPEgAA3H
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/9] arm64: dts: qcom: arduino-imola: Get WiFi MAC from
+ NVMEM
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
+        Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson
+ <jjohnson@kernel.org>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, daniel@makrotopia.org
+References: <20260428-block-as-nvmem-v1-0-6ad23e75190a@oss.qualcomm.com>
+ <20260428-block-as-nvmem-v1-5-6ad23e75190a@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20260428-block-as-nvmem-v1-5-6ad23e75190a@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: 3HaevAIEZMd9Zjf-LcybJodPMY-rSO3b
+X-Authority-Analysis: v=2.4 cv=A4dc+aWG c=1 sm=1 tr=0 ts=69f1cfc9 cx=c_pps
+ a=JIY1xp/sjQ9K5JH4t62bdg==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
+ a=EUspDBNiAAAA:8 a=vtxEUVkT7waMBiOsAPUA:9 a=QEXdDO2ut3YA:10
+ a=tNoRWFLymzeba-QzToBc:22
+X-Proofpoint-ORIG-GUID: 3HaevAIEZMd9Zjf-LcybJodPMY-rSO3b
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI5MDA5NSBTYWx0ZWRfXwuPANqwXqINi
+ ZTR5RlIIrUZSoAvY+R+iY3Vf2e68EXqdycPFXtnbDl3X6cZ/VBmVz7fXROjhYn7BPTGehUGYAVr
+ 4hb22qLsqkP0Qhr0ZKNbJyvhKCAO6cF5GLbYTEkNO+TZqtUlH9VXto9/rpwwAzZMXoVHToPvg+G
+ Zd3JZYtlKovRWBmHO3056N55cacXtUxwHlHRYZMwqOSbaYAEGFcwu2YRpFk9l9FwgQMYuMt+zT/
+ /Ynr5unTh4W/mSf3j5jGrsBhgH6/Ik4c8Cr7mVEo1SBaLYR62LwMIvOsspZB3Rzu/TmD3ufGpfI
+ bVqbzDdPRlNTqXRPN/cqAMraMWXPOByddmv39AqJLXy0xLz4TzKekXXvYKo4P5eJbJ8YJo/mRme
+ +f0T7zAmibgSROuCdv/XM38mYAy2r7ZvuwcxCQlgHGWzRtfPOCe1MhhNI7cQM4DNBZT44ntDofN
+ EPxtOiBlNEA9e/UGi0g==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-28_05,2026-04-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 spamscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 bulkscore=0 impostorscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604290095
 
-Signed-off-by: Li kunyu <likunyu10@163.com>
----
- block/bio.c               |  2 ++
- block/blk-iolatency.c     | 34 ++++++++++++++++++++++++++++++++++
- block/blk-merge.c         |  6 +++++-
- block/blk-rq-qos.h        | 11 +++++++++++
- include/linux/blk_types.h |  2 ++
- 5 files changed, 54 insertions(+), 1 deletion(-)
+On 4/28/26 4:23 PM, Loic Poulain wrote:
+> On Arduino Uno-Q, the WiFi MAC address is stored in the eMMC
+> boot1 partition. Point to the appropriate NVMEM cell to
+> retrieve it.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
 
-diff --git a/block/bio.c b/block/bio.c
-index b8972dba68a0..7740701afc7f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1733,6 +1733,8 @@ static inline bool bio_remaining_done(struct bio *bio)
- 		return true;
- 	}
- 
-+	rq_qos_done_split_bio(bio);
-+
- 	return false;
- }
- 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 53e8dd2dfa8a..ba5870bf14c5 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -632,6 +632,39 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 	}
- }
- 
-+static void blkcg_iolatency_done_split_bio(struct rq_qos *rqos, struct bio *bio)
-+{
-+	struct blkcg_gq *blkg;
-+	struct rq_wait *rqw;
-+	struct iolatency_grp *iolat;
-+	int inflight = 0;
-+
-+	blkg = bio->bi_blkg;
-+	if (!blkg || !bio_flagged(bio, BIO_QOS_CHAIN_CHILD))
-+		return;
-+
-+	iolat = blkg_to_lat(bio->bi_blkg);
-+	if (!iolat)
-+		return;
-+
-+	if (!iolat->blkiolat->enabled)
-+		return;
-+
-+	while (blkg && blkg->parent) {
-+		iolat = blkg_to_lat(blkg);
-+		if (!iolat) {
-+			blkg = blkg->parent;
-+			continue;
-+		}
-+		rqw = &iolat->rq_wait;
-+
-+		inflight = atomic_dec_return(&rqw->inflight);
-+		WARN_ON_ONCE(inflight < 0);
-+
-+		blkg = blkg->parent;
-+	}
-+}
-+
- static void blkcg_iolatency_exit(struct rq_qos *rqos)
- {
- 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
-@@ -645,6 +678,7 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
- static const struct rq_qos_ops blkcg_iolatency_ops = {
- 	.throttle = blkcg_iolatency_throttle,
- 	.done_bio = blkcg_iolatency_done_bio,
-+	.done_split_bio = blkcg_iolatency_done_split_bio,
- 	.exit = blkcg_iolatency_exit,
- };
- 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index fcf09325b22e..26373b9c02d3 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -151,8 +151,12 @@ static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
- 	if (split_sectors) {
- 		bio = bio_submit_split_bioset(bio, split_sectors,
- 				&bio->bi_bdev->bd_disk->bio_split);
--		if (bio)
-+		if (bio) {
- 			bio->bi_opf |= REQ_NOMERGE;
-+			/* Fix the issue where the inflight statistics
-+			 * of the chained bio in the QoS are incorrect.
-+			 */
-+			bio_set_flag(split, BIO_QOS_CHAIN_CHILD);
- 	}
- 
- 	return bio;
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index a747a504fe42..496a27b9d412 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -45,6 +45,7 @@ struct rq_qos_ops {
- 	void (*cleanup)(struct rq_qos *, struct bio *);
- 	void (*queue_depth_changed)(struct rq_qos *);
- 	void (*exit)(struct rq_qos *);
-+	void (*done_split_bio)(struct rq_qos *, struct bio *);
- 	const struct blk_mq_debugfs_attr *debugfs_attrs;
- };
- 
-@@ -108,6 +109,7 @@ void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
- void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
- void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
- void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
-+void __rq_qos_done_split_bio(struct rq_qos *rqos, struct bio *bio);
- void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
- 
- static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
-@@ -157,6 +159,15 @@ static inline void rq_qos_done_bio(struct bio *bio)
- 		__rq_qos_done_bio(q->rq_qos, bio);
- }
- 
-+static inline void rq_qos_done_split_bio(struct bio *bio)
-+{
-+	if (bio->bi_bdev && bio_flagged(bio, BIO_QOS_CHAIN_CHILD)) {
-+		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-+		if (q->rq_qos)
-+			__rq_qos_done_split_bio(q->rq_qos, bio);
-+	}
-+}
-+
- static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- {
- 	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos) {
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 8808ee76e73c..63fee89ecc14 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -322,6 +322,8 @@ enum {
- 	BIO_REMAPPED,
- 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
- 	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
-+	BIO_QOS_CHAIN_CHILD,    /* chained bio child, used for segmenting out
-+				* the bio */
- 	BIO_FLAG_LAST
- };
- 
--- 
-2.47.3
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
+Konrad
