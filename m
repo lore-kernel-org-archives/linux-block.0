@@ -1,186 +1,183 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0529B37DE8A
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 15:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C8437E30A
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 15:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777476316; cv=none; b=mtVF+3/FI+LZ+a0c0Tcp3sy2ujJJDPT2JyXWXbU3x4P5HtysEj1ehfqCVuItRvZtJCCZcE7J1rLr755yuMa19DF55RdcbnC82fQvEHn78Cbnp0GxVA7aNO+b5R4fGJa47zGNwqg//QbJkSQ8Jfn+TgHWZx+3eqB/qUY4qWCWg6I=
+	t=1777476384; cv=none; b=oqRfTOAHj8I8rpgidQpv5AEgWFX7N3fPq1vKEb/gNS2NtrlUz8H+YIsg+RidvT5Sd7etAYmTguW9PV9rNphS0AcspkHEpENxM9nlqugmiX2M3X4B9S/4HO3doBaRR2o4Kbx1jgm0OMy2b2/AHaaRY18karMnSnU/k7ZYodyNoYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777476316; c=relaxed/simple;
-	bh=JvxfV5QjKQbwm7+BOekQVOayYxapWdUNFPLNqt75HHE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h+r05xF0HYhv37ipsh6Wd8qPKSCM/vVPPjLhZuaaML8CLLMkRuHTApSih3/9rNncY8C6pKgYABQsdnJfuxJEbGtMEEW56+YKIgvvNv3mEhvU+pnBvZsxurrcxA17WFHEokehPp42ZEdQIfKR+f1KJ8AT7amsWlVN+TD2S/+K/u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PiGnFF8H; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1777476384; c=relaxed/simple;
+	bh=hELMxdIqirWfZE9lS3jphk/Hs00RokLAMWOkF4lalT0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qP51ntkOfh2qYQi3UOU2bPflTfWbWlX0thiYseOidIAWInnjMtpV3Bn8x8HaFbk71sYk5613eJAkx3X0VJPQiT96hUJQwpbKN/mHvgNpG2WPlRLc4lNXazWGKSZY6eU9H3oIbYcVuuNlvUhU1zRsC5g3v6zCcftmpv3DYsJgNm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XWB8xc98; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiGnFF8H"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777476314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EMT0J2vcJAfTCz/tlata9hzsUiHyRA7lCZ4HpBR0qWg=;
-	b=PiGnFF8HYtxWIt/aGFH/WrQCzr1IaLLwIN9DV+mjzDbo5nxexScD3GRqvS1uYC10U9NXX/
-	jOuIhc77RsMc5FqHNC9teHdYGL80+yBx89O2XKfRO9wp8mZQrGBLvREJsKAMg+zbK5BZMI
-	RfTRyd9vR3Lz/eUrodCJv/75ULidPao=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-584-MwTeSaaBP3KyBOulTq63rQ-1; Wed,
- 29 Apr 2026 11:25:09 -0400
-X-MC-Unique: MwTeSaaBP3KyBOulTq63rQ-1
-X-Mimecast-MFC-AGG-ID: MwTeSaaBP3KyBOulTq63rQ_1777476307
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AEE2B1800350;
-	Wed, 29 Apr 2026 15:25:06 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F110B300019F;
-	Wed, 29 Apr 2026 15:25:05 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63TFP4Zs2813142
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 29 Apr 2026 11:25:04 -0400
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63TFP24c2813132;
-	Wed, 29 Apr 2026 11:25:02 -0400
-Date: Wed, 29 Apr 2026 11:25:01 -0400
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
-        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
-        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
-        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
- device encryption
-Message-ID: <afIizQA9kVR_u_2j@redhat.com>
-References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
- <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
- <ae7yzw-5wz9cqZt8@redhat.com>
- <ae_vacHQ75AgZbm_@redhat.com>
- <6390db35-7f8e-4d00-9c1f-43d676007910@oss.qualcomm.com>
- <afDh8XRWW_JgaUP3@redhat.com>
- <7ab5cd97-30b7-42ca-80ce-6d9cd8c45b73@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XWB8xc98"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488b0046078so114871905e9.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 08:26:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777476378; x=1778081178; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G9kqbgnidQC23bEvrBAVDYa4e7L0vOouqvUY0ysfe8Y=;
+        b=XWB8xc98up29GzY7kFjywBjNyG9lgycOlMLs1dHgrQ32RQEWjh6cxO4yMt8G/UntSC
+         4kksswLeJ03wupTCWEvdS7ZG2if40crUlus2GT8pR5xWNiEWI/uiK7N0mIrzbrNFKnOL
+         PySlG5myV9tLCrrkUmRq49nU7xHF8nIgRKHwlG1Qw6DzKvYg+kl+vYewodjHeZ/fQUEU
+         HY93XBkBemETwZXXuPpu1nm9a0NV/vd06xGE571ZmDtPeca3KlAnQ65PZTTkTqnPOBbw
+         REGD+nzd0M52LFRdTDuoc0l8KZasOYu1p3bNIERwFJvAJXQABZDlS0H/3MO75ARW9ztW
+         V5ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777476378; x=1778081178;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G9kqbgnidQC23bEvrBAVDYa4e7L0vOouqvUY0ysfe8Y=;
+        b=jdise/tO2TUza/SyysIq3ftMKx9j7awDmvxc7XpIpTC4pA+WdNyJ6MIUDjvW9wb4G3
+         K1K19JC7T/5WHRCrUMe+DosBa4IVxckHVrmlPNR9Xtfptqhz0f5AzOkkReIHPT7akmYi
+         4AzRxjyPVTuO17SvBUJwYx+TDPlgxPMrDrmQfsBYucFJetTTlgd8Cx8RvEE45zonSqpH
+         LSj3qvnLL+4W/lHuIlyzdMtI2BdgEBdEGx1N9B8l6XPImVwOQVV9JhFiFcRuvVW9KZmQ
+         dtlLmrBjiPeCcNbMmi6+XQb6zZ3sqqFTExCOmavwXGT/KUUnHqllgOzEVcXdyrpi7sM2
+         H54g==
+X-Forwarded-Encrypted: i=1; AFNElJ9wUA7vrZBw2wdRVQsM5jlgXfq71OEsFC2j0pELtVOGYhbnknMme8jhPudaBfwfoHW4EkIYOu/TCFcjYw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5OV+VaXR4LjnVrZUenMDH9Jafz3RG0mAg4ebM4oSdEAKDDBci
+	ZqwEdUvMLGkeXyI6Upji73U4Vce/wcfWj1LiL0IrjXJvZAWffk0r0kp7
+X-Gm-Gg: AeBDieuAkPHTTfLjjXYAKQJ9COnWaoF3agnOpnz0kGd9f4fc5RfZF2+Ad7BLq9EBgB1
+	+24Ir8qJyuXI3WT45z9l2DMaxmRy6WgpVCCAin6ZPdNLpTJp93kgvF8UR8nqER/sOudKZfhxDcg
+	JUhiUQ0DWIQOM4t+mXa1Sx3ELrr3NElkQQPQ2yPTh80I+q2mEbLKWm/6VXExNdrr0WY6kTJ/pYh
+	ogHRoE6uKSxyzNhdQft7+sKMAOgsplmTTBJkfBlbDDrx9YLuDImXAZDNo4pyNH1d3FQcfUqKbOd
+	H6GKD5i3XD+R6Ae8wgUXYsBPfZrFs7sHP8BpceuxFmo9LZbelMo81G+Ulrm0gDfOzCuk8kDGDtB
+	qqeqFjqNlrOgE+ySRoNbx8sv+HhhW5FMPIyQiXpC30upopk7BOYbq4L5RvzJ+h1/oxRKy5Tuae9
+	YhodN9TOp44QjOhEjgQG/RBcdCwVezT1GcGS809trphswAFa70LWYBkFX/7TaqbkoKPR0SsLHAi
+	NDBgV37qhghVZPipPXy3JNnXb5d/VBV3ssn5g45iTHJ
+X-Received: by 2002:a05:600c:4f92:b0:489:1ff1:74df with SMTP id 5b1f17b1804b1-48a77ae5430mr125646225e9.1.1777476377153;
+        Wed, 29 Apr 2026 08:26:17 -0700 (PDT)
+Received: from 127.0.0.1localhost ([82.132.184.31])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-447b76e5c22sm6382951f8f.28.2026.04.29.08.26.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 08:26:16 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org
+Cc: asml.silence@gmail.com,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Tushar Gohad <tushar.gohad@intel.com>,
+	William Power <william.power@intel.com>,
+	Phil Cayton <phil.cayton@intel.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: [PATCH v3 00/10] Add dmabuf read/write via io_uring
+Date: Wed, 29 Apr 2026 16:25:46 +0100
+Message-ID: <cover.1777475843.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <7ab5cd97-30b7-42ca-80ce-6d9cd8c45b73@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Apr 29, 2026 at 08:34:00PM +0800, Linlin Zhang wrote:
-> 
-> 
-> On 4/29/2026 12:36 AM, Benjamin Marzinski wrote:
-> > On Tue, Apr 28, 2026 at 05:20:07PM +0800, Linlin Zhang wrote:
-> >>
-> >>
-> >> On 4/28/2026 7:21 AM, Benjamin Marzinski wrote:
-> >>> On Mon, Apr 27, 2026 at 01:23:27AM -0400, Benjamin Marzinski wrote:
-> >>>> On Fri, Apr 10, 2026 at 06:40:30AM -0700, Linlin Zhang wrote:
-> >>>>> From: Eric Biggers <ebiggers@google.com>
-> >>>>> +	/*
-> >>>>> +	 * Since we've added an encryption context to the bio and
-> >>>>> +	 * blk-crypto-fallback may be needed to process it, it's necessary to
-> >>>>> +	 * use the fallback-aware bio submission code rather than
-> >>>>> +	 * unconditionally returning DM_MAPIO_REMAPPED.
-> >>>>> +	 *
-> >>>>> +	 * To get the correct accounting for a dm target in the case where
-> >>>>> +	 * __blk_crypto_submit_bio() doesn't take ownership of the bio (returns
-> >>>>> +	 * true), call __blk_crypto_submit_bio() directly and return
-> >>>>> +	 * DM_MAPIO_REMAPPED in that case, rather than relying on
-> >>>>> +	 * blk_crypto_submit_bio() which calls submit_bio() in that case.
-> >>>>> +	 */
-> >>>>> +	if (__blk_crypto_submit_bio(bio))
-> >>>>
-> >>>> This will still double account for fallback writes (which call
-> >>>> submit_bio() on the encrypted bios, and return DM_MAPIO_SUBMITTED here). 
-> >>>
-> >>> Just to clarify, I'm talking about the vmstats accounting. The IO
-> >>> originally gets accounted by submit_bio() when the bio is submitted to
-> >>> the dm device. For actual inline encryption and fallback reads, dm will
-> >>> submit the bio to the underlying device using submit_bio_noacct() to
-> >>> avoid double-counting the IO.
-> >>>
-> >>> For fallback writes, __blk_crypto_submit_bio() will submit the encrypted
-> >>> bios to the underlying device with submit_bio(). This adds the IO
-> >>> sectors again, even though it's the same IO, only encrypted now.
-> >>
-> >>
-> >> Right, thanks for calling this out.
-> >>
-> >> For fallback writes, the IO is still double-counted. Given that this only
-> >> affects IO accounting in the blk-crypto fallback write slow-path and not
-> >> correctness, I think this is an acceptable tradeoff, and we can leave a
-> >> TODO to revisit the accounting once a better solution exists.
-> >>
-> >> Add the bellow to the annotate.
-> >>
-> >>   /*
-> >>    * TODO: blk-crypto fallback write slow-path currently double-accounts
-> >>    * IO in vmstat, as encrypted bios are submitted via submit_bio().
-> >>    * This does not affect data correctness. Consider fixing this if
-> >>    * a cleaner accounting model for derived bios is introduced.
-> >>    */
-> >>
-> >> Do you agree?
-> > 
-> > You could add an extra argument, for instance "bool need_acct", to
-> > __blk_crypto_submit_bio(), and plumb it through to
-> > __blk_crypto_fallback_encrypt_bio(), where it could be used to choose
-> > between calling submit_bio() and and submit_bio_noacct().
-> > 
-> > We could even add a flag to cloned bios for stacked devices, that could
-> > be checked in submit_bio(), so we didn't need to have
-> > submit_bio_noacct(). But this is a pretty niche case with other
-> > solutions, so I'm not sure if it warrants adding more checks to
-> > submit_bio().
-> > 
-> > I do agree that people probably aren't using dm-inlinecrypt for devices
-> > where they don't actually have inline encryption capabilities, so it's
-> > not a major issue. What to you think, Mikulas?
-> 
-> Thanks for the suggestions.
-> 
-> Adding a bool need_acct parameter to __blk_crypto_submit_bio() would require
-> updating all existing callers, which feels rather intrusive given that the
-> accounting issue only affects the blk‑crypto fallback write slow‑path. I’m a
-> bit concerned that this would broaden the scope of the change more than
-> necessary for the problem at hand.
+The patch set allows to register a dmabuf to an io_uring instance for
+a specified file and use it with io_uring read / write requests. The
+infrastructure is not tied to io_uring and there could be more users
+in the future. A similar idea was attempted some years ago by Keith [1],
+from where I borrowed a good number of changes, and later was brough up
+by Tushar and Vishal from Intel.
 
-I get your concern, and I'd like a second opinion on how much we should
-care about this, but it doesn't look like there are many other callers
-that would be effected here. The only existing caller of
-__blk_crypto_submit_bio() is blk_crypto_submit_bio(), which would just
-call it with "need_acct=true". Looking at the code path below
-__blk_crypto_submit_bio() that would need to change for submitting the
-bios:
+It's an opt-in feature for files, and they need to implement a new
+file operation to use it. Only NVMe block devices are supported in this
+series. The user API is built on top of io_uring's "registered buffers",
+where a dmabuf is registered in a special way, but after it can be used
+as any other "registered buffer" with IORING_OP_{READ,WRITE}_FIXED
+requests. It's created via a new file operation and the resulted map is
+then passed through the I/O stack in a new iterator type. There is some
+additional infrastructure to bind it all, which also counts requests
+using a dmabuf map and managing lifetimes, which is used to implement
+map invalidation.
 
-__blk_crypto_submit_bio() is the only caller of
-blk_crypto_fallback_bio_prep()
+It was tested for GPU <-> NVMe transfers. Also, as it maintains a
+long-term dma mapping, it helps with the IOMMU cost. The numbers
+below are for udmabuf reads previously run by Anuj for different
+IOMMU modes:
 
-blk_crypto_fallback_bio_prep() is the only caller of
-blk_crypto_fallback_encrypt_bio().
+- STRICT: before = 570 KIOPS, after = 5.01 MIOPS
+- LAZY: before = 1.93 MIOPS, after = 5.01 MIOPS
+- PASSTHROUGH: before = 5.01 MIOPS, after = 5.01 MIOPS
 
-blk_crypto_fallback_encrypt_bio() is the only caller of
-__blk_crypto_fallback_encrypt_bio(), which is the function that would
-need to choose between submit_bio() and submit_bio_noacct().
+There are some liburing tests that can serve as an example:
+git: https://github.com/isilence/liburing.git rw-dmabuf-tests-v3
+url: https://github.com/isilence/liburing/tree/rw-dmabuf-tests-v3
 
-Doing this would change the crypto API (by necessity, since we're adding
-a new argument to __blk_crypto_submit_bio() for stacking devices to
-use), and it is adds a extra argument to a number of functions, just to
-handle this corner case. But it is still a relatively contained change.
+[1] https://lore.kernel.org/io-uring/20220805162444.3985535-1-kbusch@fb.com/
 
--Ben 
+v3: - Rework io_uring registration
+    - Move token/map infrastructure code out of blk-mq
+    - Simplify callbacks: remove a separate blk-mq table, which was
+      mostly just forwarding calls (to nvme).
+    - Don't skip dma sync depending on request direction
+    - Fix a couple of hangs
+    - Rename s/dma/dmabuf/
+    - Other small changes
+
+v2: - Don't pass raw dma addresses, wrap it into a driver specific object
+    - Split into two objects: token and map
+    - Implement move_notify
+
+Pavel Begunkov (10):
+  file: add callback for creating long-term dmabuf maps
+  iov_iter: add iterator type for dmabuf maps
+  block: move bvec init into __bio_clone
+  block: introduce dma map backed bio type
+  lib: add dmabuf token infrastructure
+  block: forward create_dmabuf_token to drivers
+  nvme-pci: implement dma_token backed requests
+  io_uring/rsrc: introduce buf registration structure
+  io_uring/rsrc: extend buffer update
+  io_uring/rsrc: add dmabuf backed registered buffers
+
+ block/bio.c                     |  28 +++-
+ block/blk-merge.c               |  14 ++
+ block/blk.h                     |   3 +-
+ block/fops.c                    |  16 ++
+ drivers/nvme/host/pci.c         | 282 ++++++++++++++++++++++++++++++++
+ include/linux/bio.h             |  19 ++-
+ include/linux/blk-mq.h          |   9 +
+ include/linux/blk_types.h       |   8 +-
+ include/linux/fs.h              |   2 +
+ include/linux/io_dmabuf_token.h |  92 +++++++++++
+ include/linux/io_uring_types.h  |   5 +
+ include/linux/uio.h             |  11 ++
+ include/uapi/linux/io_uring.h   |  31 +++-
+ io_uring/io_uring.c             |   3 +-
+ io_uring/rsrc.c                 | 266 +++++++++++++++++++++++++-----
+ io_uring/rsrc.h                 |  30 +++-
+ io_uring/rw.c                   |   4 +-
+ lib/Kconfig                     |   4 +
+ lib/Makefile                    |   2 +
+ lib/io_dmabuf_token.c           | 272 ++++++++++++++++++++++++++++++
+ lib/iov_iter.c                  |  29 +++-
+ 21 files changed, 1071 insertions(+), 59 deletions(-)
+ create mode 100644 include/linux/io_dmabuf_token.h
+ create mode 100644 lib/io_dmabuf_token.c
+
+-- 
+2.53.0
 
