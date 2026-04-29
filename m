@@ -1,109 +1,124 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C4237B415
-	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 15:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF6B36E48B
+	for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 15:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777476611; cv=none; b=jqXmKM7qJV/EnWo38I+BWHToW/pn5olkwJ9+QdfkHHDORlCq+b6cvevlVF31LYH0X/lPXMuWKbVX/UoxuA89jsmmk7ZcFKyRa+CuZF/rwaB583sB6NWSfxxnAYPhT+WhnDxKdgwU/lv94ivmDsbVdm0csSG+/7UAE1st/JcAC6k=
+	t=1777478335; cv=none; b=dTeJRq2sp0wlqidAvtZ8Kse2tiG4JLCv1edmVoC31d4A6PFeROzIprCpxtJDQjulpdIpN0HDHew1dRXzqWeax8dP6ngtkA67knONKWIHW7Tjdb0QQsh783tFUjMvPzq724BHoDmJC2vr8idnQl9v0IsoAv44Ur1ntyaCJkeR0S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777476611; c=relaxed/simple;
-	bh=rzuxUcixg/aGo1wsLI7mfQXDoDsrq+gCA/2UqCKDcbI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YUXinA0Jbdsd1q4r/80L47YX5aNhHox7ilm6/B8JNJ8Iyrlze5LvDMyhaO92pxenhhxXSXEobhh3NZQbwNRbpBf3H2nhWWMAXW+jPTni6WFvBmasD+MyLfDOk459KzFuG82RLdeUqxslewfe6dGlaECVOtCMArwuk66FiRxk9Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qMkRCmAG; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777478335; c=relaxed/simple;
+	bh=bL1oI2T+/QcAyav4PbOZOKZIhEYDZCWxS6CoNwLPGbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bjkS81galjfjr0hkb+Yix9riN9hdC1pD3dSVzVNqU0jVQMpAbBXX0kU+PH5oPK2TFoKeMsGQ63asSoo9zMWGKaBumuYEy2ELcTbqUJyLZLyVIK6qEW+QIElItljmo12JCQA2P1mnp52r+DlYjbmtdjmzM8ZDnlE3oowsRayI5A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JS+8CJX6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qMkRCmAG"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43cff5dafc3so9976302f8f.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 08:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777476608; x=1778081408; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FOLuNiA/kfZwdLV9E2p8TNPc5d6B3zFK/DDHPjJ4Ciw=;
-        b=qMkRCmAGPF/CQdcPyMvL7/b3NrrRRQjb9rPJFbEO+e47eRTPnAFflJ7b7/PXCP3za1
-         3ecR+Hipy0pr2biy0kmthF9f41ammpPrxLG4BQqO5tHigxmxrKm3zPWOFdhUVbOwpl+G
-         dDvxE4hDeh7HYZdShxmepG+bcgdeMrvNTKjgP4hW4567eU776FPkTErKOZTp2J/+JrFG
-         jVTk2AjOa4qDaPOr34pI7R7g2xRo/jz7rj0pmtPYD8ZGilkaOFPgMqghJJlgE09MsMLy
-         gmb8sXsShLrMJEFyD2OUoNV8ga1ftTKs0EPkyc4QBg7KjbnrHqqABWouhVnp7eKEkqjx
-         QwoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777476608; x=1778081408;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FOLuNiA/kfZwdLV9E2p8TNPc5d6B3zFK/DDHPjJ4Ciw=;
-        b=S5Gk8E028qSPhAXXoCEeiSNyU8siU8eGudMUbAiDqZLxYLQD8FE3o4M4jh2I7O7jPv
-         udPzCab4UYI9EGrSmyiJuiLBGPC70TSP/vnh8CtDl5jsoL9SnOqPYCVI5mylG+z75lpg
-         6pOBHPk3FJU9WxEwqoVcdKgAJikxepn/OUsPtO4NHJEf5UJYU2LO7snJ1kXAU5jahK2R
-         eXUjVIECVKxZ4liaio5ixlnrQgTA/xHt1DtFQl7iUJlFgkoO3uzRgcnG4yTq/4Zmiv4G
-         CqYDkq6P6dfPiGBNvCt3Axkg9ZyiKSmcxBwVpEXZyJ3ozGReM/M1wa823KRBd+1F0YK/
-         ZcUw==
-X-Forwarded-Encrypted: i=1; AFNElJ/NSfqbgiBlX9r0HT10Yvisy8INgy6jsjoz2I6i4EDtinK5jAVJazmq5I+2+COqiW//0i4r6PHEhla+aQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgS7vXcQucEZlNlZVNs0I/lN4n4U+xh3H/hSMgalojO6NzCjhd
-	Mz5ZBqcaG5NhKgKsz7xYnqXDhmMl2TL+zwFE0YZc6MfJqHrOzXENrdE5
-X-Gm-Gg: AeBDievYZD2fNZOeoSKaDcopa7rqYcq384lX90A8nCExJDXPGL/HR2xv+Wdc7YX4kn/
-	Y81MdWI9ToRSz6lZCKGT5iL4gjiOlgC/B96WgR333MoEITQv2m9088PmLOHJfNmEPkSlUhIAwye
-	18T6SFbZIZAKYukuVoUtaTbtrCfkJ6W4wMQbtUubkXVth6Z2X6v0N9LJ+1w1o57VJCpvk85a8uq
-	zXaKEcpqLNv8rLAy1HGXeaUJNaTT/uDKI+W41FSCncckudfU0fO00HPlqZPKXNZ4uEcHtB6mJvA
-	zdVaAwVnvmk+W1+U8GP5pn4+Oi2CtwwAD4lFI7wRtdRjevhfuoxgFQiXX4Rv23LhnhXZzOnMxQW
-	Ci6VFavMCkjAlFboGSW9yaXqSZw3VCPwm55hMVImtseDagE+AeYTyYoVAk0p9vbOJ7VCD2Ibyof
-	62EuzGai7aCoevDY014D58V6367HBbB2gx3gpySzDTVwectwUPYQ+OzjXVHm4J19I4Max9/oIVY
-	erud2zigaRKpY1uy5nO/032ffoiK2GhicY2EKzsKA==
-X-Received: by 2002:a05:6000:4313:b0:43d:d037:d59c with SMTP id ffacd0b85a97d-4478eb81cf7mr7566713f8f.16.1777476607642;
-        Wed, 29 Apr 2026 08:30:07 -0700 (PDT)
-Received: from [10.228.209.141] ([82.132.184.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-447b3d481fdsm6740381f8f.8.2026.04.29.08.30.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2026 08:30:07 -0700 (PDT)
-Message-ID: <46bf2c04-72ab-48a2-a8e1-9f4423eb17a6@gmail.com>
-Date: Wed, 29 Apr 2026 16:29:51 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JS+8CJX6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777478333;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xnhFIL+kHv1nOvxllV0EK3JEL4JKFydqeH0J7oPCUog=;
+	b=JS+8CJX60d6rJA7TRUPRcBE+BImLIUAMgbNsjJjI9+Vgsy06In5ZnYvl1P/CkiwW8QkX9F
+	URvZu4jH8wxHPPweBgqk92Sslf5nYlktmhdw9TMwkarCFIlkunu1jl/yIia8kaQWVCv/mN
+	T3KLt6L4rRDONqgfymIbMU0X47KVPaY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-82-dg8-1hSYMSe39iZfNUPhnQ-1; Wed,
+ 29 Apr 2026 11:58:49 -0400
+X-MC-Unique: dg8-1hSYMSe39iZfNUPhnQ-1
+X-Mimecast-MFC-AGG-ID: dg8-1hSYMSe39iZfNUPhnQ_1777478326
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EE17E19560BB;
+	Wed, 29 Apr 2026 15:58:45 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (bmarzins-01.fast.eng.rdu2.dc.redhat.com [10.6.23.12])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 44E4F180034F;
+	Wed, 29 Apr 2026 15:58:45 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 63TFwh352814008
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 29 Apr 2026 11:58:44 -0400
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 63TFwhfH2814007;
+	Wed, 29 Apr 2026 11:58:43 -0400
+Date: Wed, 29 Apr 2026 11:58:43 -0400
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: linux-block@vger.kernel.org, ebiggers@kernel.org, mpatocka@redhat.com,
+        gmazyland@gmail.com, linux-kernel@vger.kernel.org,
+        adrianvovk@gmail.com, dm-devel@lists.linux.dev,
+        quic_mdalam@quicinc.com, israelr@nvidia.com, hch@infradead.org,
+        axboe@kernel.dk
+Subject: Re: [PATCH v2 2/3] dm-inlinecrypt: add target for inline block
+ device encryption
+Message-ID: <afIqszyKboCEmHDa@redhat.com>
+References: <20260410134031.2880675-1-linlin.zhang@oss.qualcomm.com>
+ <20260410134031.2880675-3-linlin.zhang@oss.qualcomm.com>
+ <ae7yzw-5wz9cqZt8@redhat.com>
+ <ae_vacHQ75AgZbm_@redhat.com>
+ <6390db35-7f8e-4d00-9c1f-43d676007910@oss.qualcomm.com>
+ <afDh8XRWW_JgaUP3@redhat.com>
+ <7ab5cd97-30b7-42ca-80ce-6d9cd8c45b73@oss.qualcomm.com>
+ <afIizQA9kVR_u_2j@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/10] nvme-pci: implement dma_token backed requests
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Cc: Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi
- <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>,
- Tushar Gohad <tushar.gohad@intel.com>,
- William Power <william.power@intel.com>, Phil Cayton
- <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
-References: <cover.1777475843.git.asml.silence@gmail.com>
- <5cecb1157ab784f9f303a91449fdf11b03aa6002.1777475843.git.asml.silence@gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <5cecb1157ab784f9f303a91449fdf11b03aa6002.1777475843.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afIizQA9kVR_u_2j@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 4/29/26 16:25, Pavel Begunkov wrote:
-> Enable BIO_DMABUF_MAP backed requests. It creates a prp list for the
-> dmabuf when it's mapped, which is then used to initialise requests.
+On Wed, Apr 29, 2026 at 11:25:04AM -0400, Benjamin Marzinski wrote:
+> On Wed, Apr 29, 2026 at 08:34:00PM +0800, Linlin Zhang wrote:
+[...]
+> > 
+> > Thanks for the suggestions.
+> > 
+> > Adding a bool need_acct parameter to __blk_crypto_submit_bio() would require
+> > updating all existing callers, which feels rather intrusive given that the
+> > accounting issue only affects the blk‑crypto fallback write slow‑path. I’m a
+> > bit concerned that this would broaden the scope of the change more than
+> > necessary for the problem at hand.
+> 
+> I get your concern, and I'd like a second opinion on how much we should
+> care about this, but it doesn't look like there are many other callers
+> that would be effected here. The only existing caller of
+> __blk_crypto_submit_bio() is blk_crypto_submit_bio(), which would just
+> call it with "need_acct=true". Looking at the code path below
+> __blk_crypto_submit_bio() that would need to change for submitting the
+> bios:
+> 
+> __blk_crypto_submit_bio() is the only caller of
+> blk_crypto_fallback_bio_prep()
+> 
+> blk_crypto_fallback_bio_prep() is the only caller of
+> blk_crypto_fallback_encrypt_bio().
+> 
+> blk_crypto_fallback_encrypt_bio() is the only caller of
+> __blk_crypto_fallback_encrypt_bio(), which is the function that would
+> need to choose between submit_bio() and submit_bio_noacct().
+> 
+> Doing this would change the crypto API (by necessity, since we're adding
+> a new argument to __blk_crypto_submit_bio() for stacking devices to
+> use), and it is adds a extra argument to a number of functions, just to
+> handle this corner case. But it is still a relatively contained change.
 
-I left nvme request / map setup as it was in Keith's work for the most
-part (apart from rebases, adapting it, etc.). It appears I have some
-use for prp lists, and I know Kanchan, Nitesh and Anuj already have some
-patches adding sgl support and some other optimisations. Hopefully, I
-addressed most all feedback from v2.
+Having discussed this a bit, I'm fine with leaving this as a TODO for
+now. If anyone wants to chime in with an opinion on how acceptable it
+would be to add a new bio flag for skipping accounting, that would be
+great.
 
--- 
-Pavel Begunkov
+-Ben 
 
