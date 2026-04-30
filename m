@@ -1,35 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f68.google.com (mail-pj1-f68.google.com [209.85.216.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2F6344DBD;
-	Thu, 30 Apr 2026 03:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3952475D0
+	for <linux-block@vger.kernel.org>; Thu, 30 Apr 2026 04:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777519546; cv=none; b=ipkCa7dVbTX8kjEc/d1Nhw7m56VODeCR1S4NkFAFDp3htkU65m0E5IqGtPkBs1u95Dlc0GtAcQqHHVi/iMwrLyURnKsBXAhJxd6VhPGRaHkRSeGTbSImiB7uLNiePWTnBY7el8WLXkJg5TFRe7n0NoiPUYspeczSn2u28YQrGVg=
+	t=1777523313; cv=none; b=VNrrYAN/Urxx8cOj3OfpKLl9bYYIqoYUWud33Ubi3l/e8ob3tb4CgCQtRKsNbrvowusuTH4VAYOdyUwpr08AY/ehuFU2JpH4R9Y94kwJZZvir9DqNE8cYes6jzunBRdNsJfAnmxac2Vq6FLZdb9aPO4I8gU/x7HOChG5OmvCq/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777519546; c=relaxed/simple;
-	bh=Ut5G69bc29PiPzWoT/741NVv5Kk/lOmdOdb5wKBmZHY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oMJPoul8PNqJN8qxyXzoDt53j74wHJg6kb+2ZS0hgqpWdjZGNbOH1It4TJf2ivzRj3tb7vyNx2vyMDZNuY+0yONyH7UOzjDDXVpxGQ9PrY2dHQEyawfmOkUyKSBWQa1B3GsGLAZ5UOKFYciaQK/rWsrPoxF1IimFm8pwH1T2tAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V5dcZx5w; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777523313; c=relaxed/simple;
+	bh=T5+gGKdSpuZhUfkSn7rO4bf4xdJPJqZzx0aVM2H2T7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BOyguhAI41Fcgh9lwbVgtmHj+WAAfU+ptYff0gfcUjPSHVsKZypmymEX0ZiNSUzaikPOKy8azn8qhvDLgSaox3siHDIcADVJz0J/uQRoCmI+/1WRbSuMoHrj/QFWer3vuVVflR/WU9K//e1Cw0f65dJFh4YF2b2XsGUOxUmWqfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QZey0UJ9; arc=none smtp.client-ip=209.85.216.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V5dcZx5w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FEFFC2BCB9;
-	Thu, 30 Apr 2026 03:25:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777519545;
-	bh=Ut5G69bc29PiPzWoT/741NVv5Kk/lOmdOdb5wKBmZHY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V5dcZx5w6ZsNbkLQRDMzB2RWL/aoneaFsqWWBCOjQU9YtIWRYDD+T+yLL0c1uuBhY
-	 qEq09wxP51HP2ucG5VcbFYEWu1xwrI3mLVWalChYNFLQKJVV2/uPNO5bNsVTmGtBYW
-	 y+MFexZXsUKBzIR9VcaG11CGAPdXCh5mrQ4ITyVmu2dzJeTpqYPZZKRQaFN8mTUumj
-	 qe1015WQ5bGNHETaFFAMkfQbXS+479tE5rufj5GTm7FfEY/F/wwiBzlApZyMLXQ7Xj
-	 eN4jVc9crSFreUj8YqywmtdyQ9MC4GHMaLaL9pIVAuwmWk3hGgC+ZxtKtJbApg/ERF
-	 YZVQLUUCYw1Pw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id DA1FF3809A07;
-	Thu, 30 Apr 2026 03:25:01 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZey0UJ9"
+Received: by mail-pj1-f68.google.com with SMTP id 98e67ed59e1d1-3614826eca4so432218a91.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Apr 2026 21:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777523312; x=1778128112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uAr+aUBEOsJn73lAMWt8blqY6wZFQ8Uqh4fIytefAh8=;
+        b=QZey0UJ99YK5IsBbTszKJ6+3E3KYEZqExKwFODhj4DXp0hAaJSgEMBXdckS5yV5Jpd
+         sT5j0yzhmy3MUimQNO3L8UvyJ08KWG73e2RQJ6AHybvwL5xsdn1I9z7ReGU1bDpEhjFr
+         Nb7hjN9y2wU1zqJkMptuEDHHuokUS7BNkYd0Nl+zM3GEB1amhZYVpTwDBxB9wiNnhb3R
+         T3sjqQVJ9We3J/XzaPbvT4bH4jUXSiFywRKZg1FP5LNWivPCjqgwDrDEKQbe94n1h0cs
+         Tvg9o4RiO6Vq+Tpdm5gCf3b9AczjcEFAvmNT5eLns8sjOD3uGku35hF4lFBD8e1uP2qM
+         khzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777523312; x=1778128112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uAr+aUBEOsJn73lAMWt8blqY6wZFQ8Uqh4fIytefAh8=;
+        b=dbYttWPEBBzE3VaJ/Tf9jDDkFrvmCURF1IDTtRHekN/bA0OS6S+vDjh7XaGNr4cV2u
+         /WQKdx5kVnNY2Hd++nUVQh8f/XxtckHTG7XflrgalZ0GLtUrzpMJkpc/qRB96EiItNOD
+         hktWx753XmYAKv5yLz243V4zvHv/9cpIhHIjubIbcoewdRaU2uvYcY3Wzbvn+mOTYX+n
+         WvCw16hA+Tur9sIRgHDAPBvxaiGdpCq2n8G+fGepcxIR1seZ7TQILrbX63Yn2TOEowg7
+         Ew9iI78HsxHNaixxy3YORex5OwdH5r4wnXsdd5WZfgLoU7f5ZwLk6kxwnovTyxmj8nEo
+         7QDQ==
+X-Gm-Message-State: AOJu0Yxpa5w5+Ydbax9HQ9pswwT7dsGsA5hK/4ZAqbYuE0oLEnfhq7X6
+	AqlbjhGVRFHS4f/2n2tYRUrg8O2Wer7uaLx1hEdtXwjvJwtX9RTR7lpe3W6LmB0ST/KI/d3HGqU
+	=
+X-Gm-Gg: AeBDieso5ZXXbV53Qn/Gll4zmcTRhHJ9WvY5N3eyn/uEu2/8Vlgbs4V2c6cliWWKam8
+	rNBd2CKQyh8Sfg60XpCIFsR6Qcy2YZGCUKgCtIqqgBX9MqPVk1lWKUWW3nIsI+wsIgsEirqEr4c
+	gdAp6dBaZqae2RXu5XpeBIBvCrjq/u0MbMTfqmRP4OnskZByY0T7YBoNy/NBCDHIG4AaS15yr3z
+	v4JyOBkQg74P5Lt9C16f6Y05anwcfEnvmDOnZe3/Al1k1arlFvWn7tTrzUgHQxADjK/hryEGs4e
+	E5ZR2OQtB1ckDvf2E7VXygsOYYcHP+wqtoDACPHO805kyaX8rp8SWthnTvR8vsDSRyvRShOJtty
+	1kTUafJVciz+KTKkKuQLZ6UQHkIk0b2PGSHOLDC8Q/LoXy/4YXW8iCCGtytl2HXt5KwxiOkmvxB
+	088VdThVT1SQEMjq5zMK2bE46cNrz2GP0NdaK05aoqYA6QH0/M7fbkdH8Y
+X-Received: by 2002:a17:90b:224b:b0:364:6f27:43ea with SMTP id 98e67ed59e1d1-364c329dbb7mr1374939a91.21.1777523311979;
+        Wed, 29 Apr 2026 21:28:31 -0700 (PDT)
+Received: from LAPTOP-1HUHJV8R.localdomain ([2408:8642:893:d2da:950b:8595:5fb6:24f3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364bd5d745csm691118a91.4.2026.04.29.21.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2026 21:28:31 -0700 (PDT)
+From: l1za0.sec@gmail.com
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: blk-mq: fix UAF in blk_mq_tagset_busy_iter
+Date: Thu, 30 Apr 2026 12:28:21 +0800
+Message-ID: <20260430042821.29120-1-l1za0.sec@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,119 +71,93 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 00/33] rust: bump minimum Rust and `bindgen` versions
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <177751950055.2274119.12088060080551439561.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Apr 2026 03:25:00 +0000
-References: <20260405235309.418950-1-ojeda@kernel.org>
-In-Reply-To: <20260405235309.418950-1-ojeda@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: linux-riscv@lists.infradead.org, nathan@kernel.org, nsc@kernel.org,
- dakr@kernel.org, a.hindborg@kernel.org, catalin.marinas@arm.com,
- will@kernel.org, pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- acourbot@nvidia.com, airlied@gmail.com, simona@ffwll.ch,
- brendan.higgins@linux.dev, david@davidgow.net, gregkh@linuxfoundation.org,
- arve@android.com, tkjos@android.com, christian@brauner.io,
- cmllamas@google.com, aliceryhl@google.com, corbet@lwn.net, boqun@kernel.org,
- gary@garyguo.net, bjorn3_gh@protonmail.com, lossin@kernel.org,
- tmgross@umich.edu, rust-for-linux@vger.kernel.org,
- linux-kbuild@vger.kernel.org, lorenzo.stoakes@oracle.com, vbabka@kernel.org,
- Liam.Howlett@oracle.com, urezki@gmail.com, linux-block@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alex@ghiti.fr,
- nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- raemoar63@gmail.com, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, nick.desaulniers+lkml@gmail.com,
- morbo@google.com, justinstitt@google.com, llvm@lists.linux.dev,
- linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
- linux-doc@vger.kernel.org
 
-Hello:
+From: Haocheng Yu <l1za0.sec@gmail.com>
 
-This series was applied to riscv/linux.git (fixes)
-by Miguel Ojeda <ojeda@kernel.org>:
+A KASAN: slab-use-after-free Read in blk_mq_tagset_busy_iter is
+reported by a modified Syzkaller-based kernel fuzzing tool we
+developed.
 
-On Mon,  6 Apr 2026 01:52:36 +0200 you wrote:
-> As proposed in the past in e.g. LPC 2025 and the Maintainers Summit [1],
-> we are going to follow Debian Stable's Rust versions as our minimum
-> supported version.
-> 
-> Debian Trixie was released with a Rust 1.85.0 toolchain [2], which it
-> still uses to this day [3] (i.e. no update to Rust 1.85.1).
-> 
-> [...]
+This problem is caused by a race condition between
+block/blk-mq-tag.c/blk_mq_tagset_busy_iter() and
+block/blk-mq.c/blk_mq_realloc_tag_set_tags(). In
+blk_mq_realloc_tag_set_tags(), set->tags is first freed, and then
+new_tags is assigned to set->tags. However, this process is not
+protected by synchronization. Therefore, if another process reads
+tagset->tags in blk_mq_tagset_busy_iter() between these two steps,
+it will cause a use-after-free read problem.
 
-Here is the summary with links:
-  - [v2,01/33] rust: kbuild: remove `--remap-path-prefix` workarounds
-    https://git.kernel.org/riscv/c/c8cbe2fc22e4
-  - [v2,02/33] rust: kbuild: remove "`try` keyword" workaround for `bindgen` < 0.59.2
-    https://git.kernel.org/riscv/c/518b9ad2fab3
-  - [v2,03/33] rust: kbuild: remove unneeded old `allow`s for generated layout tests
-    https://git.kernel.org/riscv/c/92cc022f044f
-  - [v2,04/33] gpu: nova-core: bindings: remove unneeded `cfg_attr`
-    https://git.kernel.org/riscv/c/341c51ee3293
-  - [v2,05/33] rust: bump Rust minimum supported version to 1.85.0 (Debian Trixie)
-    https://git.kernel.org/riscv/c/f32fb9c58a5b
-  - [v2,06/33] rust: bump Clippy's MSRV and clean `incompatible_msrv` allows
-    https://git.kernel.org/riscv/c/b6cfba436623
-  - [v2,07/33] rust: allow globally `clippy::incompatible_msrv`
-    https://git.kernel.org/riscv/c/7ed188605e1d
-  - [v2,08/33] rust: simplify `RUSTC_VERSION` Kconfig conditions
-    https://git.kernel.org/riscv/c/b28711ac98e8
-  - [v2,09/33] rust: remove `RUSTC_HAS_SLICE_AS_FLATTENED` and simplify code
-    https://git.kernel.org/riscv/c/9b398d056543
-  - [v2,10/33] rust: remove `RUSTC_HAS_COERCE_POINTEE` and simplify code
-    https://git.kernel.org/riscv/c/4ab22c543f18
-  - [v2,11/33] rust: kbuild: remove skipping of `-Wrustdoc::unescaped_backticks`
-    https://git.kernel.org/riscv/c/0f6e1e0705f0
-  - [v2,12/33] rust: kbuild: remove `feature(...)`s that are now stable
-    https://git.kernel.org/riscv/c/d1aa40daa777
-  - [v2,13/33] rust: transmute: simplify code with Rust 1.80.0 `split_at_*checked()`
-    https://git.kernel.org/riscv/c/f309a6edda53
-  - [v2,14/33] rust: alloc: simplify with `NonNull::add()` now that it is stable
-    https://git.kernel.org/riscv/c/161dd7b51e96
-  - [v2,15/33] rust: macros: simplify code using `feature(extract_if)`
-    https://git.kernel.org/riscv/c/42ec980024f0
-  - [v2,16/33] rust: block: update `const_refs_to_static` MSRV TODO comment
-    https://git.kernel.org/riscv/c/961b72d45ae4
-  - [v2,17/33] rust: bump `bindgen` minimum supported version to 0.71.1 (Debian Trixie)
-    https://git.kernel.org/riscv/c/c3a00a3f31ff
-  - [v2,18/33] rust: rust_is_available: remove warning for `bindgen` 0.66.[01]
-    https://git.kernel.org/riscv/c/41cfbb4295cf
-  - [v2,19/33] rust: rust_is_available: remove warning for `bindgen` < 0.69.5 && libclang >= 19.1
-    https://git.kernel.org/riscv/c/ae64324ad5c1
-  - [v2,20/33] rust: kbuild: update `bindgen --rust-target` version and replace comment
-    https://git.kernel.org/riscv/c/276ed30c558e
-  - [v2,21/33] rust: kbuild: remove "dummy parameter" workaround for `bindgen` < 0.71.1
-    https://git.kernel.org/riscv/c/93553d9922b0
-  - [v2,22/33] docs: rust: quick-start: openSUSE provides `rust-src` package nowadays
-    https://git.kernel.org/riscv/c/53c9647c0a48
-  - [v2,23/33] docs: rust: quick-start: update Ubuntu versioned packages
-    https://git.kernel.org/riscv/c/982e1aa6de73
-  - [v2,24/33] docs: rust: quick-start: update minimum Ubuntu version
-    https://git.kernel.org/riscv/c/6767147cb941
-  - [v2,25/33] docs: rust: quick-start: add Ubuntu 26.04 LTS and remove subsection title
-    https://git.kernel.org/riscv/c/780f847e1419
-  - [v2,26/33] docs: rust: quick-start: remove Gentoo "testing" note
-    https://git.kernel.org/riscv/c/99c672426aed
-  - [v2,27/33] docs: rust: quick-start: remove Nix "unstable channel" note
-    https://git.kernel.org/riscv/c/b69a14650009
-  - [v2,28/33] docs: rust: quick-start: remove GDB/Binutils mention
-    https://git.kernel.org/riscv/c/a4392ed1c8b9
-  - [v2,29/33] docs: rust: general-information: simplify Kconfig example
-    https://git.kernel.org/riscv/c/9375ea727d7e
-  - [v2,30/33] docs: rust: general-information: use real example
-    https://git.kernel.org/riscv/c/86c5d1c6740c
-  - [v2,31/33] rust: declare cfi_encoding for lru_status
-    https://git.kernel.org/riscv/c/9e5946de3a38
-  - [v2,32/33] rust: kbuild: support global per-version flags
-    https://git.kernel.org/riscv/c/b2aa1535ecdd
-  - [v2,33/33] rust: kbuild: allow `clippy::precedence` for Rust < 1.86.0
-    https://git.kernel.org/riscv/c/2e2f8b5a0656
+To fix this vulnerability, first save the old set->tags. After
+updating set->tags to new_tags, wait for the reading side to exit
+before releasing it. This avoids the problem of tagset->tags being
+directly released while blk_mq_tagset_busy_iter() is still iterating.
 
-You are awesome, thank you!
+Signed-off-by: Haocheng Yu <l1za0.sec@gmail.com>
+---
+The full reproducer is attached here:
+
+# {Threaded:true Repeat:true RepeatTimes:0 Procs:8 Slowdown:1 Sandbox:none SandboxArg:0 Leak:false NetInjection:true NetDevices:true NetReset:true Cgroups:true BinfmtMisc:true CloseFDs:true KCSAN:false DevlinkPCI:false NicVF:false USB:true VhciInjection:true Wifi:true IEEE802154:true Sysctl:true Swap:true UseTmpDir:true HandleSegv:true Trace:false CallComments:true LegacyOptions:{Collide:false Fault:false FaultCall:0 FaultNth:0}}
+r0 = syz_open_dev$ndb(&(0x7f0000000000), 0x0, 0xc0400)
+r1 = syz_open_dev$ndb(&(0x7f0000000000), 0x0, 0x80040)
+ioctl$NBD_SET_FLAGS(r1, 0xab0a, 0x9ad)
+socketpair$nbd(0x1, 0x1, 0x0, &(0x7f0000000080)={<r2=>0xffffffffffffffff})
+r3 = syz_open_dev$dri(&(0x7f0000000100), 0xfffffffffffffffc, 0xc8503)
+r4 = syz_open_dev$ndb(&(0x7f0000000000), 0x0, 0xc0400)
+socketpair$nbd(0x1, 0x1, 0x0, &(0x7f0000000080)={<r5=>0xffffffffffffffff})
+ioctl$NBD_SET_SOCK(r4, 0xab00, r5)
+r6 = syz_open_dev$ndb(&(0x7f0000000240), 0x0, 0x12100)
+ioctl$NBD_DO_IT(r6, 0xab03)
+close_range(r3, 0xffffffffffffffff, 0x0)
+ioctl$NBD_SET_SIZE_BLOCKS(0xffffffffffffffff, 0xab07, 0x1)
+ioctl$NBD_SET_SOCK(r0, 0xab00, r2)
+r7 = syz_open_dev$loop(&(0x7f0000000040), 0x1, 0x200)
+ioctl$BLKPG(r7, 0x1269, &(0x7f00000001c0)={0x1, 0x0, 0x98, &(0x7f00000000c0)={0x5, 0x2, 0x10}})
+close(0x5)
+r8 = syz_open_dev$ndb(&(0x7f0000000000), 0x0, 0x100)
+r9 = syz_open_dev$ndb(&(0x7f0000000000), 0x0, 0xc0400)
+socketpair$nbd(0x1, 0x1, 0x0, &(0x7f0000000080)={<r10=>0xffffffffffffffff})
+ioctl$NBD_SET_SOCK(r9, 0xab00, r10)
+close(0x5)
+r11 = syz_open_dev$ndb(&(0x7f0000000000), 0x0, 0x100)
+ioctl$NBD_DO_IT(r11, 0xab03)
+r12 = syz_open_dev$ndb(&(0x7f0000000040), 0x0, 0x0)
+ioctl$NBD_CLEAR_SOCK(r12, 0xab04)
+ioctl$NBD_DO_IT(r8, 0xab03)
+socket$inet6_tcp(0xa, 0x1, 0x0)
+syz_open_dev$ndb(&(0x7f0000000000), 0x0, 0xc0400)
+
+
+
+
+ block/blk-mq.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d626d32f6e57..4357625a512d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4738,6 +4738,7 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
+ 				       int new_nr_hw_queues)
+ {
+ 	struct blk_mq_tags **new_tags;
++	struct blk_mq_tags **old_tags;
+ 	int i;
+ 
+ 	if (set->nr_hw_queues >= new_nr_hw_queues)
+@@ -4751,8 +4752,10 @@ static int blk_mq_realloc_tag_set_tags(struct blk_mq_tag_set *set,
+ 	if (set->tags)
+ 		memcpy(new_tags, set->tags, set->nr_hw_queues *
+ 		       sizeof(*set->tags));
+-	kfree(set->tags);
++	old_tags = set->tags;
+ 	set->tags = new_tags;
++	synchronize_srcu(&set->tags_srcu);
++	kfree(old_tags);
+ 
+ 	for (i = set->nr_hw_queues; i < new_nr_hw_queues; i++) {
+ 		if (!__blk_mq_alloc_map_and_rqs(set, i)) {
+
+base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.51.0
 
