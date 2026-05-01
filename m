@@ -1,113 +1,103 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D314539E17A
-	for <linux-block@vger.kernel.org>; Fri,  1 May 2026 11:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C51D32ED5C
+	for <linux-block@vger.kernel.org>; Fri,  1 May 2026 11:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777634618; cv=none; b=QyaJfyoGeti8wWDS2ucps+a9HDVFoB1LjOPTP6yIgn4tFU9XC8/JPjDBI6epTYvifx+IT+3w4IMd9jj3vqIqcIE+JAe9w0SVjt3UdqtbpKSug/128e1HIZFJnH9rhgpbJZMdm1G7RNXtoe3ac31wkrV1AXx3W+U4s3QX25++6fc=
+	t=1777635074; cv=none; b=hnpBUvwiQyJX06nASWYvPxQhuFK2wG38/PtfA4cStdq2sCpjUdkByvUlaoH9Ssy/H9rTRskbWmBjy/uH0OECpLMc1rIod6sTHjavb1KPbGeO8gF6OvK5eV0+7nrygi6gCupAtj7JEiJnEQqN7Kzp9SoC+2bUE8a5AyMdsVoKGrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777634618; c=relaxed/simple;
-	bh=WMySMhSY1HbZtrRGZKBa7H8/7kI9ofQUKDZwuaJwjnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kL9YYXhYhE/Afyc/HKB/QhOEhdDz7jPLuihGNL4hK6pygPkqJoZKv4YsV3Sky7fWQIe+cruCDFK5mhOVu+WCdoBxSPA8IHsc4eYRO4Z241f2N3W2Z0sERAD6nDZVxk8CTRmmuCTO3bB7tA8Alg+vbZ4ys4Kka1WLn0icjgKkZws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7sEYLEA; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777635074; c=relaxed/simple;
+	bh=EnAwRtIlwBUDMWB22npAHi5k4xLWsYG4FrVUlP76SHY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Ws16kqOxOgw5RegGgfi75IDRstCfm0EqCaSzM8uuJyC/MxtysPgk3rUVAiMGVWZNUL/k+cmx+Kw+QS0NgeKa0Qo6w9GnnRC06wFXaP53CVR3Qbc5SF6zXx8xJqVeQvuV1FMfXrmcawlZzS0TMy8dDySDx4CF4HLavrdXIivV9H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=nWi5dsr+; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7sEYLEA"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-488ff90d6c7so18267275e9.2
-        for <linux-block@vger.kernel.org>; Fri, 01 May 2026 04:23:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="nWi5dsr+"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-42321c8b8f5so1547608fac.1
+        for <linux-block@vger.kernel.org>; Fri, 01 May 2026 04:31:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777634615; x=1778239415; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ctKDfUxcBJv5xHYKM/TY8s/R9Ax+DgkJmDB04pWI6HA=;
-        b=g7sEYLEAfmLw6XPZbQvyUL71aHhlX66+L74YEpA3u593ahyx5g4QK4IsagUx51D/nh
-         tTWuDViV4PEc99b6lcCFA2CZ2bnn47Iw2MaRlnwobE/MyPav3wD9qOwzDDX/DlrUS8Xz
-         TfKmy3RsG61pCCvkbC/zjt9ICYMtHJJGRnrRlCD9GstPJzCDBcroT+B7dwu1KZXuc7SM
-         rN2hVREISmnIAMN2c9FcwLnTlGFuhho9tCA7xDADXr8i67ca3a+SG1hMOCzG2Wu+lH6U
-         ZKGEnXPktWYsTBn3NDPD/jFgrH97xZfHqXsDw5tOexD/DAT6qgUVRVLG2O0VOtUJNQua
-         J2HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777634615; x=1778239415;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1777635071; x=1778239871; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ctKDfUxcBJv5xHYKM/TY8s/R9Ax+DgkJmDB04pWI6HA=;
-        b=nEJhUyf5tD6jzBcwY1d0R8n+IlVuclvXRjqMbhLFPNvoL2hUPRg/9KLSZmKh2ZeA8q
-         y43vy3KVmq3Rj99BH6HIva5HdJrSVXxNPZ9wTbQfEV4Hma1Ea+i5hdOJMqkPlXA18KVX
-         JuyBOhD7L2LtB8OAAbH0eDC80DgCERfRjIpomgM5lNcAIzk8Hf7hNh3Kdpv7vPHx7Dag
-         YwSuqOZl4LiidIlUIb+peH61tsCP8KC2U7wbP96bYgCQuHAUFr5M5h7c+tvn48+o7vI7
-         CgUgMBmMjlee/f3HMXU9fp9g3X4WWKqHygoWGRxOJZPh89RdjApCjvuHCuOmFlqy2myT
-         DSbA==
-X-Forwarded-Encrypted: i=1; AFNElJ8KtwNJYgNGdWdzkqlDdggGNjEW6X5UQx3g+9p+YR4fb6iLdDebdINFyxuKw+nA/rFm0uRmCXOShbNHTA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeX/J1zHFVKV6CsmFour8TzKW9i4eOYw32+py07LZdPdlcgDY6
-	04ec1oyNtDn5+uNuUyd5n3C3HaVVDan++vT7psyZJCPqXHjXzeObi5Lm
-X-Gm-Gg: AeBDiesL1vWeN5v+Q3DqzMcu36uRNooQepoSw2fRRjPuIdqsj1upOrM9lN5JrFU5e2t
-	FTxgMeE2YHhTZ0O2DnYEb4G+3Ei9pB8MKNH3wv2kpUQqXO9Cpv7Z1kQRle6BCj2ptrb2fDbOC73
-	+IwJuOLTT4jtVbXUQvBTgIz8cJ9ZXzlX3pdTHcclsyQpfh3mGeZP/fsZ2vACbYoRQvNXuMQbPRn
-	w8MNlavzC79kWAbv58LGwKXBdJmCaX1kOnqJNuRpSwXp4fwZKeDPDHdUHET+NMn85jv36aLS4fy
-	5c+hXuksxOFZa2LIVixN1GwXceZJaNQ9FkfvaQ2hnXz6xnIu5pgybkv8H2BEOG7LMFKxPCLuz5w
-	QQPZYulms3DpB1kiVinsQt/uemVwaHWdLy4IqR1wAFRWo6gl4GfZyLpX79TgQ6nAG0C1uc2JTco
-	5jA2EEmmqI0e3B2hx6GimrS3IBwUc0+OluzE+uJPymdcQssKSez92fC7/ivCH/AdTsgiUBuJN+Y
-	vs5PLX1D95gUbICOxc=
-X-Received: by 2002:a05:600c:4645:b0:48a:8cb6:88b9 with SMTP id 5b1f17b1804b1-48a8cb68911mr32091255e9.22.1777634615182;
-        Fri, 01 May 2026 04:23:35 -0700 (PDT)
-Received: from fedora (185-147-214-8.mad.as62651.net. [185.147.214.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8feef7d5sm11320215e9.27.2026.05.01.04.23.30
+        bh=KxPR8SrPdmEzJCIGf7lc2mEVw5dkavMakfuxT21ny8k=;
+        b=nWi5dsr+MhWgWoE8fYE9mJGUdkTcS4F8GJWOmFPM8n/jfv0tSjPgDfpcCyahUO4i0p
+         +oZDqmiprsk33K2BrAvGv7Dcs6us033lSwQfKHzt4CCV1Mi3T02TbUXkT2etg0P95QuM
+         iSJkhjA5UHFFmYje0UDweX0fiKZTgyaA5oxXp8XM6LEJMZcgWapAVKPvyktDf83K1ZFj
+         ezjoRbGAVXrSZiSRb0gkVGMK1bepduUDihxG6Ne8+IhWCkqoka/PnLO7SvbAcplFiQvl
+         9U3eyAtBvYT4HsQMDtnijDRU8VfJ5dMlxHsUN8XRty7pjUJ+4IUgA8VO9gbMJ+nI1X78
+         wivA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777635071; x=1778239871;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KxPR8SrPdmEzJCIGf7lc2mEVw5dkavMakfuxT21ny8k=;
+        b=Oa4F3MHNDLZiFD5y4+18jc1S7+C3jrznHL5ChRupXJxigXx72bbr5zQ+0bPwg0sjT1
+         oBgE7JY5CTFcMlBZMlQX27WbZCXQu2wslu/bx8evBM9sgRFbgcA2uPexwN7Xsq1Cix/Z
+         j0fBcre3eJYue+nwr1XcIqcTIyCMLdwpVmlNFeXR1uWEO4LXQly00UsvMqzpylR7E4sy
+         yJ9/u9wJeR3saDDw957H7ZY8fQiXIJC2qQsshsC6n4a/qtByFxVhaQvyOK0atOibN1iO
+         qgJESYKaPMgeNwlPhcR91aiwzagSQfiXJYUE17idXNf8a+/9SiT7FYi1fpguyMIWXRmz
+         sYeg==
+X-Gm-Message-State: AOJu0Yw7wrjMoUFUvsxvg3ZGGiX/YzItDDMdi9HMIsh73dh1Fwbkn0S+
+	pwfyITdTwymEeBT8eEe6Ovg5+sY2Ch7XopA2VVBUTVH89bIlpMjE7/YkuTL767gkdv0=
+X-Gm-Gg: AeBDiesQkGJTnKvu+38dkQN1QZ5e/YiGPvNGls5RwYZ/Yz6//Gsg3Wvof9DkdLnSYfo
+	V/zB1vDoI6egTscG6crjhTkJcN6s1RFJJ2Rx8tUBSHxkFx3dcA95t6dI+/FkGmL+uKJatEhNLFr
+	nfTIEm3oRYb284I0xb5hEH2Z0gjyIwGK2pAg+8VYZj/w9uD971hgtpdxrCADBbV5xNkjOrpIFec
+	u8EQ2lFFb21HjV5TFL7Fpb8dlmk/teH55mARUpyuxY035FQCKRBQx3QHAiy4JdGvj8E65ZjMDOZ
+	jAiObAVljFIkVNFrvT0AfNjY17LDNi8ZTTFM+CRMJOjWhY3n5LoA/B+JA9zqDvcPwLNMpww4HNn
+	r+asT1nHYutcgYYzY+r1bsNeyS9KHrGeZjXwygVYk10/DQbn1ju5MvBB5BvwzdR8hyGJREKPXKI
+	kZYBwjc7vvJF1hUxbR2v76MmKfBAo0/ix8maIGM+7AcMUBXDddm7YcJ7JO3V5mRsRWgT37MHknY
+	UY1MGIF0gSSaco=
+X-Received: by 2002:a05:6870:70a7:b0:42b:d272:9506 with SMTP id 586e51a60fabf-43438a53b2fmr2933580fac.7.1777635071373;
+        Fri, 01 May 2026 04:31:11 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43454cbc3c7sm2515077fac.12.2026.05.01.04.31.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 04:23:34 -0700 (PDT)
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH] ublk: don't issue uring_cmd from fallback task work
-Date: Fri,  1 May 2026 19:23:12 +0800
-Message-ID: <20260501112312.947327-1-tom.leiming@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Fri, 01 May 2026 04:31:10 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Uday Shankar <ushankar@purestorage.com>
+In-Reply-To: <20260501112312.947327-1-tom.leiming@gmail.com>
+References: <20260501112312.947327-1-tom.leiming@gmail.com>
+Subject: Re: [PATCH] ublk: don't issue uring_cmd from fallback task work
+Message-Id: <177763506987.181772.6728415392389170664.b4-ty@b4>
+Date: Fri, 01 May 2026 05:31:09 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-From: Jens Axboe <axboe@kernel.dk>
 
-When ublk_ch_uring_cmd_cb() runs as fallback task work (e.g., because
-the submitting task is exiting), the command should not be issued as
-current is a kworker, not the daemon task. This can cause io->task
-to capture the wrong task in __ublk_fetch(), leading to a task
-mismatch warning in ublk_uring_cmd_cancel_fn().
+On Fri, 01 May 2026 19:23:12 +0800, Ming Lei wrote:
+> When ublk_ch_uring_cmd_cb() runs as fallback task work (e.g., because
+> the submitting task is exiting), the command should not be issued as
+> current is a kworker, not the daemon task. This can cause io->task
+> to capture the wrong task in __ublk_fetch(), leading to a task
+> mismatch warning in ublk_uring_cmd_cancel_fn().
+> 
+> Check tw.cancel and return -ECANCELED instead of issuing the command
+> from fallback context.
+> 
+> [...]
 
-Check tw.cancel and return -ECANCELED instead of issuing the command
-from fallback context.
+Applied, thanks!
 
-Fixes: 3421c7f68bba ("ublk: make sure io cmd handled in submitter task context")
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
- drivers/block/ublk_drv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+[1/1] ublk: don't issue uring_cmd from fallback task work
+      commit: 845db023a8aeba8b14315a846dcfba31ee727fb1
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 8e5f3738c203..d10460d29e4a 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -3496,8 +3496,10 @@ static void ublk_ch_uring_cmd_cb(struct io_tw_req tw_req, io_tw_token_t tw)
- {
- 	unsigned int issue_flags = IO_URING_CMD_TASK_WORK_ISSUE_FLAGS;
- 	struct io_uring_cmd *cmd = io_uring_cmd_from_tw(tw_req);
--	int ret = ublk_ch_uring_cmd_local(cmd, issue_flags);
-+	int ret = -ECANCELED;
- 
-+	if (!tw.cancel)
-+		ret = ublk_ch_uring_cmd_local(cmd, issue_flags);
- 	if (ret != -EIOCBQUEUED)
- 		io_uring_cmd_done(cmd, ret, issue_flags);
- }
+Best regards,
 -- 
-2.53.0
+Jens Axboe
+
+
 
