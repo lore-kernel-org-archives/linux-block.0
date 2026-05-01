@@ -1,63 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EE935DA78
-	for <linux-block@vger.kernel.org>; Fri,  1 May 2026 18:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AAA3D16EC
+	for <linux-block@vger.kernel.org>; Fri,  1 May 2026 19:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777661020; cv=none; b=Yatp5PqXo3nAOWT2wrQQ/xCuONTMVXfvNWwtZYWeIaCSrRA5jc70PGwlacNd4S60p2dqhCwp8UOcIysA8wiCDi/E6+fi5hCl/MBLN84gC7KFZtayTz7l6iNaxbs5wBxF7brHD4fLBIpcsz1blkkN6DIgrN4BUzZhygR7WxppeEA=
+	t=1777664859; cv=none; b=jBkx0MeCMRPGLgeN5LFDgdzUPADXNlc8nuuIPfb3stfCAZXWzA2WtxQHgbW7SRLIQ26pXKbUgA2gpj84CPysBF0L8NlcNCdu1U/+1F5zW1fRHxMiCs+owrFCCnEjr7R2+7BjLybtUy8aJFCxykNI9R1F2KCqSHUPmCWd3SqP17U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777661020; c=relaxed/simple;
-	bh=vTwO8EIAyQEoQe0ERynzB01EuYPlAH4cPjDt95QKl0o=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=E/Uxf8Pbv4ASc3jssAEu59HZyWti+nE9vuxRIhBFa/9a7I6qXKAnwu4DOQHBi/NBGchGgCYq/2VY9BftCRvGo3CokrtGqypTK/HYJxWMTu3N08l3CY0ucsjHUc/Og/MkypsTbybhitTqxQt2OH3Hblz3xIGy1LCI+Gjxp3ykGFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TD4p/Tje; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777664859; c=relaxed/simple;
+	bh=tTQxO1HFYqK2qYnCcDIbyhe18U+8nD8zRgYvECcGKNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CM4L7de0XzO2uZjbGq0ohGNFn09cjwuD5WqXy4nlqtBc/d0lg0fcZIYZ8OcNdw37JMKvU+2/CBFMjPMS77ZhqKffejZLOUfeirOwez6U8lUW4OxJZ/apZDs2k2Q41Z5JLSRGQXOo4KZWnPptazrrnHepv02ycCiPZjdKoHWtASY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=uRAZUPir; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TD4p/Tje"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6972CC2BCB4;
-	Fri,  1 May 2026 18:43:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777661020;
-	bh=vTwO8EIAyQEoQe0ERynzB01EuYPlAH4cPjDt95QKl0o=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=TD4p/TjeW5YBw5BHVq6To7Ng9F7GoVyS/C9XL6yTkgyPnM5aPTnU5RrWAOKgqQomf
-	 E61fa6GzLIuZVLQF/VxRjvaBLqI9cTgjoN8wsA7U9nNbjjxgEe7GHc8E7anb2zY9BS
-	 lmsohaLA1ef0GNmSFv7zBLbYPwi9y3svdjonY+pr2v/m4MMK/9jCN3O8oQK/YUg9oQ
-	 +Wuurrc9I3I1pw0ZfPWwsBQ+kVCRfIgRYh+pXhjNYoKQFLJjGNyvkh/8TcXD2aXFI6
-	 NjfN+1dCULt+fqOoT21E8xfZC9Eg0WVZDXtdWlUzFNWdip2Y7fGoHaGeB3tsZ3eWct
-	 uzdEvMe4Dq9RA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02BEA380CEE6;
-	Fri,  1 May 2026 18:42:55 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 7.1-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <8549b9c4-487f-4d3e-8b23-8e83297d11be@kernel.dk>
-References: <8549b9c4-487f-4d3e-8b23-8e83297d11be@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <8549b9c4-487f-4d3e-8b23-8e83297d11be@kernel.dk>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.1-20260430
-X-PR-Tracked-Commit-Id: 7e36e03d192a5547757bd8f9d9052a60f64e6d17
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 6fe0be6dc7faf984599b1e356ead1c49b64ed3ca
-Message-Id: <177766097356.3581397.10603012647537877410.pr-tracker-bot@kernel.org>
-Date: Fri, 01 May 2026 18:42:53 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uRAZUPir"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=GJ+oYQjemozvwpJlGqadgjG7lpeLN4I9Uzkg/dcZqmg=; b=uRAZUPire5BuHvjS4AaJDx39To
+	DvXtIvSGEk3YT/ZoeHwMdzWRvjcnishSVw6/wHiQjTUBbNwR84SGUlr9RaX9CqAw8jhtzTZ/lpZat
+	6h6iAz6FMOeP0D0P4RS0pmCASYgHTPNKQngMO5Y7LvK80FY05PGru28d8MZAqPpmFldWcmOHcL2+J
+	HotuX2+V5sx2fPFS5xjpiAYtsIg6Q7Vbc0c+c4QUNY0cjlYGjjKgsxYKGZ4UAeZjV91PcESi9G3nI
+	lybRmozIG7wlZSJl7oE6+0Yy48dckuwhjcGLhg/ezwreOQsVyV+lP9g40YKqQJdS/XvX/9BgVNJQC
+	BmowYGkg==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1wItpn-00000009Fkj-1HYP;
+	Fri, 01 May 2026 19:47:35 +0000
+Date: Fri, 1 May 2026 20:47:35 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Haris Iqbal <haris.iqbal@ionos.com>
+Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+	Jia Li <jia.li@ionos.com>
+Subject: Re: [Lsf-pc] [LSF/MM/BPF TOPIC] A block level, active-active
+ replication solution
+Message-ID: <afUDV3ue45-shCNU@casper.infradead.org>
+References: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
 
-The pull request you sent on Thu, 30 Apr 2026 19:49:46 -0600:
+On Tue, Feb 03, 2026 at 04:09:59PM +0100, Haris Iqbal via Lsf-pc wrote:
+> We are working on a pair of kernel modules which would offer a new
+> replication solution in the Linux kernel. It would be a block level,
+> active-active replication solution for RDMA transport.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.1-20260430
+Why is active-active a good idea?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/6fe0be6dc7faf984599b1e356ead1c49b64ed3ca
+With an active-passive solution, network traffic is directed to the
+active node.  Over time at some point we get close to saturating the
+link and performance drops.  At that point, human intervention will
+occur and the network link will be upgraded.
 
-Thank you!
+With an active-active solution, traffic goes to each node.  At smoe point
+each link will be about 75% utilised and we won't see any performance
+problems.  But then a node goes down and all of a sudden the remaining
+node is being hit with 150% of the link capacity.  There's no gradual
+degradation here; the whole solution just goes down.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Of course it doesn't have to be network capacity either; it could be CPU,
+RAM or any other resource needed to service the requests.
+
+Active-active is fragile and I would never recommend such a solution.
+I won't be in your session, but I thought it worth raising this point.
