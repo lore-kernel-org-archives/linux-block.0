@@ -1,460 +1,249 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEEA35966;
-	Sat,  2 May 2026 00:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777681201; cv=none; b=tfQpChWIDhen8vVnX74IwOdHZVTfi/EbQ3OtXIxW4XvOlkuVvAGkIWszAJ60dzhmtaw67uo9+PEXARu1yfRkgmv3cuLPBQyUzkrAsD9gbDrz2Ac2IwltSh4cS99lacHJGovook+NreLPbsiMt2OrW9pdkc3la69Ph2wvrtnOdb8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777681201; c=relaxed/simple;
-	bh=DnJ+AUeWDrpxVFt3u5FS73OmVGN5OykFZeheU5M8iI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d5RosYfNMbIGDUUsC6oNka894LTJqcLwOmFukVttvb6l3tVFX3W9Rs7c6Ef7gZBu0i7tm5PbEZL7WKExBg1DhlVBs3ZBEsugs4zl8Kl3NQvDP8bcCcomUCsGAQyfc250Df8CotX1UGeon2wcjrZrlByeCy0E5u8i4OJgz+jY0as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BcDHiN3o; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E6C292918
+	for <linux-block@vger.kernel.org>; Sat,  2 May 2026 07:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777706488; cv=pass; b=KzPzCqs2wbj0NiGbgSc/mF2KKsKEhEC4hJNrXiiWEIqlBV2y/oF8vUm4gMhSMTtBpHnFzJWXPkuCeE73wBKuW4plwdj1G+d03E8VLzbGwFjzPGYz1Aaq3I5sCQ+LnoBPlj1DI9N05F3q4/pPJIeTbfGZHSzf7YBlBpTlOf0czdU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777706488; c=relaxed/simple;
+	bh=7F84FqSVgdll/J3gfhxZgla2DXC4zz+PTtMk5XWN3dI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P1YeL4ymp1YKA6DoucMkUDYJGClB9vqjs/+bapNGiXku2aLFf5v56RS7GT5Wfa2HaqQxru3HshSnJmbHoYNG5tfNkkdn5GoDEm382AEnU/cu16WrbQrZL5od8uzeaDSNaVDXSgiOHi0IoWH+0PcKxU27bf3pBOi/XxzcKQ6j+CY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qNv6+itG; arc=pass smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BcDHiN3o"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777681198; x=1809217198;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DnJ+AUeWDrpxVFt3u5FS73OmVGN5OykFZeheU5M8iI4=;
-  b=BcDHiN3o100xGW0IfSVa+1/CNzNCO3g3us7asLtbk6DUBq2JGXJcZO4H
-   hsGhgb+ZWKezuL9gxo+9DI9pS4zYzwxJDf28SyrimtXru+MN4VcYeWPQ6
-   fM2Fo3voYqURMu7kSllIEOfJeXmGlW0TQnOBlo+dRwuz8TfCzj1EO8tPj
-   zff+gCyEzIVtCSbgnZAKTq7tU/TAapVkO+NRva83ngfs7qCytmdPCkatr
-   jw4hjt4bfGze8zFlY72gGs5Y7/waO2BhnCHL6f8fPq23v+ajoh5sbBhep
-   2zcBPpQtgWM3O5Tu2/IurBUfI97gIwEVa+bR13u4Y+qvsywY27M4DdN2i
-   g==;
-X-CSE-ConnectionGUID: LQqkk1mVRoedd9v4CtdEeA==
-X-CSE-MsgGUID: kufUWuGGT8ibw2pd9LQ6Ow==
-X-IronPort-AV: E=McAfee;i="6800,10657,11773"; a="82493980"
-X-IronPort-AV: E=Sophos;i="6.23,210,1770624000"; 
-   d="scan'208";a="82493980"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2026 17:19:58 -0700
-X-CSE-ConnectionGUID: 71vDT+awT6mzwbvNCQ5nVg==
-X-CSE-MsgGUID: rwN+HL4RTleSYBG5+lLa2A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,210,1770624000"; 
-   d="scan'208";a="258606626"
-Received: from igk-lkp-server01.igk.intel.com (HELO bdf09bfdbd5f) ([10.211.93.152])
-  by fmviesa001.fm.intel.com with ESMTP; 01 May 2026 17:19:56 -0700
-Received: from kbuild by bdf09bfdbd5f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wIy5J-0000000059F-23CW;
-	Sat, 02 May 2026 00:19:53 +0000
-Date: Sat, 2 May 2026 02:19:00 +0200
-From: kernel test robot <lkp@intel.com>
-To: Li kunyu <likunyu10@163.com>, axboe@kernel.dk, tj@kernel.org,
-	josef@toxicpanda.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Li kunyu <likunyu10@163.com>
-Subject: Re: [PATCH] block/blk-iolatency: Add the processing flow of the
- chained bio in the QoS and define the related types to solve the problem of
- incorrect inflight processing in the QoS. The usage of the done_split_bio
- abstract function in the blk-iolatency project.
-Message-ID: <202605020222.x7HELUvP-lkp@intel.com>
-References: <20260429092920.2124-1-likunyu10@163.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qNv6+itG"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488ff90d6c7so25534755e9.2
+        for <linux-block@vger.kernel.org>; Sat, 02 May 2026 00:21:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777706485; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Q7jV+kXYlh+men0qJETMNKe+35YGhBcFk4zW2NiNEjkRxv7+u/k00yoc8KuNQf/Wt/
+         5oC3Vduiy9UMPkR9hT8Ev1k5ACyh3LrhjUA2/ngxVXTey+gakcy1MLZtUWTNditL1AU5
+         ZwUxVNdJxRQWP/1GsQMBMBRRhhja9I0vHcRuIxTeoqXdGRfaNGIvDtei1EZ6I0R9xOkJ
+         maKgXJqrrDO2u/99RmfF6tKea40+2fw+3+gz3+Eeq/AMVkvKfckfX8LGRmmCVuv/ThPv
+         HFJEHtMYVX6jtKgLP1TW1GvPup8LIAUNQ5x4b217c7EE/biIj6svdg6Da3zXwN1YbhkS
+         /K/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ZpCDGLyqdlQwW4lsWNusxnqIO2tGN0lN9JL64dsGkB0=;
+        fh=Pi21Voy3/Se/btEh/FvA/eJP1EzLdYDTkoKnxoEh+V8=;
+        b=Xk6z9rR1dUEjpb98wcDuPLi3FJvLNM8+Ikp2NOKuXdVM5Qa+P8YTOhJ5DKyNJFCp9r
+         TLUKj3mtiH29qrpC0bo0f7+zIkvqIaZ8dDnj88QfcDMekn1D7LIwCWxtbdwWdcc13aFN
+         Odsiji+ydHzoe8gW/0uRn8tP0SC5JC9/e4x7+HKxGpYMthKtdXhDtZesI4BWYHx6cBDf
+         pdZeeXd4l8b+RmB5wwYlIZef14G6v0u2/bzLsAuHdq1nYImW5IABYUvbX4hs0EBhhcz9
+         C5By6AUTVf44ESGw+AYtxRuuAJqsBBV8CPcN92Y52/aSJGJm7jlImHY6zeyC6YAfk+2k
+         v5dQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777706485; x=1778311285; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZpCDGLyqdlQwW4lsWNusxnqIO2tGN0lN9JL64dsGkB0=;
+        b=qNv6+itGlTMeZopw/05Z6ZHI/ovpThMyMJdaffEsvc//w91TgrcSnV/K81f86Hx+X+
+         2QSNV++LE6qO5yo44PPwfJe9gSuOXE+CGhRTsric69hIXp6kNBcq96qsIRFuf4di2YB3
+         4IJizM7V6ChDCwf8G7w+GOxeLEOe9MAKNwAcOLtdMbkqQeSPPiETQHCFGoEePIeL6zyU
+         HzKQ40Uj4Q6oqVxgf1gcGutltn30247Fbujheq6fm4NV+WPbaO7zr+JqT7CxciCep2lv
+         8lWYlq7pT3UCCtnS7PhHHUuU81M354owE8WGO2mIJUrHAbaNXIOudjANF/GaDgBk/cbb
+         QO8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777706485; x=1778311285;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZpCDGLyqdlQwW4lsWNusxnqIO2tGN0lN9JL64dsGkB0=;
+        b=c2qFDuJPoveYOXlhwVid2DwEShWTjZtywJA8huOwXhDTVgysAuq6BFjPz+a2D77mhZ
+         g6Yn30d5gRgHdlroz0vSP65+zodEoCywq2NdF87iDfu6RhpI/eErrFgQojiNWqJISQ3f
+         gWD1c6t5Xk2ozN5wSBxjSmQrfYLbNlqvvh5hSt1sELXm0VLJjJzw8wdp526JFc/1uPFK
+         7AUi/1I7JTt+8Me/t7WiRUiZ6VU/PHIOQFCwGRBAEyWEgGXxHKAQFXO+4aEO5vejBXgw
+         sEIVP4ZCh3Ln0H0OcYKbu0vrMouH0t4tIpd268fOQ1euLjopqr5TgHfZ+fzs8CZpy0N9
+         sRTg==
+X-Forwarded-Encrypted: i=1; AFNElJ/h/X2crIWsmPGWf4ikFQesioMrSjdS5VV3Jbr7j/jPOBkWi9H9p7JBdQEDhUaq4Newe7FbmgCIjTU1vA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCLD+nYI7woAu2lCpczVsziwRzHkp5gmSaAhyR+bb3fZkOyrt3
+	ihqs5/G8T2lEbVjdrXNvt7o2tb6o65pq67Uxji+CZg8nNP55oqKSzYgAlr8PGlBHUAeOsdZSQwl
+	hdoZQSohF88wQCI3/a6uvWS57S4neKPxNfIy4Qs4=
+X-Gm-Gg: AeBDievFMtqnKMeSviPCrf7rgpGOXhY5mNusgaJjrbWfwHbqk6QdmbTFa/lq+8VQHuL
+	SjB1hmOEw1PpeeHpHp64s9Z7dOGDSkQdu4E4HWx3jNksx1t7zFvL1je9aH5jVx0/gc67xj8sQMT
+	LDBK7kfUN79LygJEDyNjN6QJBdci1PKWL8vfYj/bG+HiVifjwoKLYIS+fZQO+HiYFvyg1s7heCB
+	UeNvIpS1oY6XlLQJRk97mIU1wRzQdbzt3/pcKlUBION9FSxouJ6MPb/nPVW/E9tfp9WP374BQSV
+	A+Ts7bVFhInWJur7ZlRWqccr7bEuAlrLOBvv1snBlbUqa8P07rF3VbLw5oQzh1Vm4g==
+X-Received: by 2002:a05:600c:4f47:b0:488:b8bc:6a32 with SMTP id
+ 5b1f17b1804b1-48a988be27dmr31882145e9.23.1777706485082; Sat, 02 May 2026
+ 00:21:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260429092920.2124-1-likunyu10@163.com>
+References: <20260421121616.3298845-1-haowenchao@xiaomi.com>
+ <CAOptpSPs-1UrEa8AHg19e590=SiV6bpnex7gCbif8=aY7BtpuA@mail.gmail.com>
+ <CAO9r8zOjugCwWqHP3zxXPmjp8TwpoROCjCqTZ_uxOBQwVqCWqA@mail.gmail.com> <CAOptpSMQyyb+q-VJdJ0RzNkjaer1CTePM5WkwEj_7cAO4aUToQ@mail.gmail.com>
+In-Reply-To: <CAOptpSMQyyb+q-VJdJ0RzNkjaer1CTePM5WkwEj_7cAO4aUToQ@mail.gmail.com>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Sat, 2 May 2026 08:21:11 +0100
+X-Gm-Features: AVHnY4JJPCx4iVzK4vXW7jpHkva-oYoA8F0sH-mKu9sI_gFhCrlz3UorVnkOfjY
+Message-ID: <CAKEwX=PrfrNys4ao7-d11J7r4pv5VmE8gTU_7iUHaHAKNaFuBQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/4] mm/zsmalloc: reduce zs_free() latency on swap
+ release path
+To: Wenchao Hao <haowenchao22@gmail.com>
+Cc: Yosry Ahmed <yosry@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	Barry Song <baohua@kernel.org>, Xueyuan Chen <xueyuan.chen21@gmail.com>, 
+	Wenchao Hao <haowenchao@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Li,
+On Tue, Apr 28, 2026 at 2:51=E2=80=AFPM Wenchao Hao <haowenchao22@gmail.com=
+> wrote:
+>
+> On Tue, Apr 28, 2026 at 2:17=E2=80=AFAM Yosry Ahmed <yosry@kernel.org> wr=
+ote:
+> >
+> > On Sat, Apr 25, 2026 at 9:13=E2=80=AFPM Wenchao Hao <haowenchao22@gmail=
+.com> wrote:
+> > >
+> > > On Tue, Apr 21, 2026 at 8:16=E2=80=AFPM Wenchao Hao <haowenchao22@gma=
+il.com> wrote:
+> > > >
+> > > > Swap freeing can be expensive when unmapping a VMA containing
+> > > > many swap entries. This has been reported to significantly
+> > > > delay memory reclamation during Android's low-memory killing,
+> > > > especially when multiple processes are terminated to free
+> > > > memory, with slot_free() accounting for more than 80% of
+> > > > the total cost of freeing swap entries.
+> > > >
+> > > > Two earlier attempts by Lei and Zhiguo added a new thread in the mm=
+ core
+> > > > to asynchronously collect and free swap entries [1][2], but the
+> > > > design itself is fairly complex.
+> > > >
+> > > Hi Nhat, Kairui, Barry, Xueyuan,
+> > >
+> > > Thanks for the review. I agree with the direction and have some ideas=
+ for
+> > > an alternative approach.
+> > >
+> > > My approach: first eliminate pool->lock from zs_free() itself, then d=
+efer
+> > > free to per-cpu buffers with a lockless handoff, and finally reduce
+> > > class->lock overhead during drain by exploiting natural class localit=
+y.
+> > > Achieving both per-cpu and per-class is difficult, so the class->lock
+> > > optimization is a compromise =E2=80=94 but one that works well in pra=
+ctice.
+> > >
+> > > 1. Encode class_idx in obj to eliminate pool->lock
+> > >
+> > > OBJ_INDEX_BITS is over-provisioned on 64-bit. For example on arm64
+> > > (chain_size=3D8): OBJ_INDEX_BITS=3D24 but only 10 bits are actually n=
+eeded
+> > > for obj_idx, leaving 14 spare bits.
+> > > We can split OBJ_INDEX into class_idx + obj_idx:
+> > >
+> > >     obj: [PFN | class_idx (OBJ_CLASS_BITS) | obj_idx (OBJ_IDX_BITS)]
+> > >
+> > > OBJ_CLASS_BITS is computed dynamically as `ilog2(ZS_SIZE_CLASSES - 1)=
+ + 1`
+> > > (8 bits for 4K pages, 9 for 64K).
+> > > Since class_idx is invariant across migration (only PFN changes), zs_=
+free()
+> > > can extract class_idx locklessly, then acquire class->lock and re-rea=
+d obj for a
+> > > stable PFN. No pool->lock needed.
+> >
+> > How much of the benefit do we get with just these locking improvements
+> > without having to defer any of the freeing work?
+> >
+>
+> Hi Yosry,
+>
+> Thanks for the review. Great question =E2=80=94 we tested exactly this.
+>
+> With only the class_idx-in-obj encoding (eliminating pool->lock from
+> zs_free, no deferred freeing), we measured on two platforms.
+>
+> Test: each process independently mmap 256MB, write data, madvise
+> MADV_PAGEOUT to swap out via zram (lzo-rle), then concurrent munmap.
+>
+> Raspberry Pi 4B (4-core ARM64 Cortex-A72):
+>
+>   mode        Base       ClassIdx-only   Speedup
+>   single      59.0ms     56.0ms          1.05x
+>   multi 2p    94.6ms     66.7ms          1.42x
+>   multi 4p    202.9ms    110.6ms         1.83x
+>
+> x86 physical machine (4-core Intel i7-12700, 2 rounds averaged):
+>
+>   mode        Base       ClassIdx-only   Speedup
+>   single      11.7ms     9.8ms           1.19x
+>   multi 2p    24.1ms     17.2ms          1.40x
+>   multi 4p    63.0ms     45.3ms          1.39x
 
-kernel test robot noticed the following build errors:
+Oh man, you are eliminating pool lock here right? This would help my
+other patch series a lot too :)
 
-[auto build test ERROR on axboe/for-next]
-[also build test ERROR on next-20260430]
-[cannot apply to linus/master v6.16-rc1]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+https://lore.kernel.org/all/CAKEwX=3DM5YpR0cQrryX_y4pm_BuxyUWZ_8MbhWodwbf1F=
+e=3Dgzew@mail.gmail.com/
+https://lore.kernel.org/all/CAKEwX=3DPkFiP+u+ThrzjTKBi+usQf2uuhTZcfB2BNNA8R=
+boOFDQ@mail.gmail.com/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Li-kunyu/block-blk-iolatency-Add-the-processing-flow-of-the-chained-bio-in-the-QoS-and-define-the-related-types-to-solve-the-prob/20260501-153918
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
-patch link:    https://lore.kernel.org/r/20260429092920.2124-1-likunyu10%40163.com
-patch subject: [PATCH] block/blk-iolatency: Add the processing flow of the chained bio in the QoS and define the related types to solve the problem of incorrect inflight processing in the QoS. The usage of the done_split_bio abstract function in the blk-iolatency project.
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260502/202605020222.x7HELUvP-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260502/202605020222.x7HELUvP-lkp@intel.com/reproduce)
+Well, the deferred freeing would completely move that contention out
+of the way lol. But this would benefit all users, regardless of
+whether we're deferring the free step or not (for instance, this will
+reduce contention between page fault and compaction, IIUC?) I feel
+like you'll get some good numbers testing in a system with compaction
+and THP enabled, with lots of swap activities. Which is... a lot of
+server setup :)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605020222.x7HELUvP-lkp@intel.com/
+If the deferred freeing is too controversial, this smells like
+something that should be upstreamed independently.
 
-All errors (new ones prefixed by >>):
+>
+> Single-process shows modest improvement. With multiple processes,
+> each read_lock/read_unlock atomically modifies the shared rwlock
+> reader count, and the cost of these atomic operations increases
+> with more CPUs accessing the same cacheline concurrently.
+> Eliminating pool->lock removes this overhead entirely.
+>
+> This only works on 64-bit systems where OBJ_INDEX_BITS has enough
+> spare bits to fit class_idx. 32-bit systems don't have the room.
+> I'm still working on the compile-time gating to properly enable
+> this based on architecture and page size configuration.
 
-   block/blk-merge.c: In function 'bio_submit_split':
->> block/blk-merge.c:159:38: error: 'split' undeclared (first use in this function); did you mean 'sg_split'?
-     159 |                         bio_set_flag(split, BIO_QOS_CHAIN_CHILD);
-         |                                      ^~~~~
-         |                                      sg_split
-   block/blk-merge.c:159:38: note: each undeclared identifier is reported only once for each function it appears in
->> block/blk-merge.c:165:20: error: invalid storage class for function '__bio_split_discard'
-     165 | static struct bio *__bio_split_discard(struct bio *bio,
-         |                    ^~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:214:28: error: invalid storage class for function 'blk_boundary_sectors'
-     214 | static inline unsigned int blk_boundary_sectors(const struct queue_limits *lim,
-         |                            ^~~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:235:24: error: invalid storage class for function 'get_max_io_size'
-     235 | static inline unsigned get_max_io_size(struct bio *bio,
-         |                        ^~~~~~~~~~~~~~~
->> block/blk-merge.c:288:13: error: invalid storage class for function 'bvec_split_segs'
-     288 | static bool bvec_split_segs(const struct queue_limits *lim,
-         |             ^~~~~~~~~~~~~~~
->> block/blk-merge.c:314:21: error: invalid storage class for function 'bio_split_alignment'
-     314 | static unsigned int bio_split_alignment(struct bio *bio,
-         |                     ^~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:322:28: error: invalid storage class for function 'bvec_seg_gap'
-     322 | static inline unsigned int bvec_seg_gap(struct bio_vec *bvprv,
-         |                            ^~~~~~~~~~~~
-   In file included from include/linux/linkage.h:7,
-                    from include/linux/kernel.h:18,
-                    from block/blk-merge.c:5:
->> block/blk-merge.c:425:19: error: non-static declaration of 'bio_split_io_at' follows static declaration
-     425 | EXPORT_SYMBOL_GPL(bio_split_io_at);
-         |                   ^~~~~~~~~~~~~~~
-   include/linux/export.h:76:28: note: in definition of macro '__EXPORT_SYMBOL'
-      76 |         extern typeof(sym) sym;                                 \
-         |                            ^~~
-   include/linux/export.h:90:41: note: in expansion of macro '_EXPORT_SYMBOL'
-      90 | #define EXPORT_SYMBOL_GPL(sym)          _EXPORT_SYMBOL(sym, "GPL")
-         |                                         ^~~~~~~~~~~~~~
-   block/blk-merge.c:425:1: note: in expansion of macro 'EXPORT_SYMBOL_GPL'
-     425 | EXPORT_SYMBOL_GPL(bio_split_io_at);
-         | ^~~~~~~~~~~~~~~~~
-   block/blk-merge.c:341:5: note: previous definition of 'bio_split_io_at' with type 'int(struct bio *, const struct queue_limits *, unsigned int *, unsigned int,  unsigned int)'
-     341 | int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
-         |     ^~~~~~~~~~~~~~~
->> block/blk-merge.c:491:15: error: non-static declaration of 'bio_split_to_limits' follows static declaration
-     491 | EXPORT_SYMBOL(bio_split_to_limits);
-         |               ^~~~~~~~~~~~~~~~~~~
-   include/linux/export.h:76:28: note: in definition of macro '__EXPORT_SYMBOL'
-      76 |         extern typeof(sym) sym;                                 \
-         |                            ^~~
-   include/linux/export.h:89:41: note: in expansion of macro '_EXPORT_SYMBOL'
-      89 | #define EXPORT_SYMBOL(sym)              _EXPORT_SYMBOL(sym, "")
-         |                                         ^~~~~~~~~~~~~~
-   block/blk-merge.c:491:1: note: in expansion of macro 'EXPORT_SYMBOL'
-     491 | EXPORT_SYMBOL(bio_split_to_limits);
-         | ^~~~~~~~~~~~~
-   block/blk-merge.c:485:13: note: previous definition of 'bio_split_to_limits' with type 'struct bio *(struct bio *)'
-     485 | struct bio *bio_split_to_limits(struct bio *bio)
-         |             ^~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:526:28: error: invalid storage class for function 'blk_rq_get_max_sectors'
-     526 | static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
-         |                            ^~~~~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:548:19: error: invalid storage class for function 'll_new_hw_segment'
-     548 | static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
-         |                   ^~~~~~~~~~~~~~~~~
->> block/blk-merge.c:597:12: error: invalid storage class for function 'll_front_merge_fn'
-     597 | static int ll_front_merge_fn(struct request *req, struct bio *bio,
-         |            ^~~~~~~~~~~~~~~~~
->> block/blk-merge.c:616:13: error: invalid storage class for function 'req_attempt_discard_merge'
-     616 | static bool req_attempt_discard_merge(struct request_queue *q, struct request *req,
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:634:12: error: invalid storage class for function 'll_merge_requests_fn'
-     634 | static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
-         |            ^~~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:677:13: error: invalid storage class for function 'blk_rq_set_mixed_merge'
-     677 | static void blk_rq_set_mixed_merge(struct request *rq)
-         |             ^~~~~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:698:25: error: invalid storage class for function 'bio_failfast'
-     698 | static inline blk_opf_t bio_failfast(const struct bio *bio)
-         |                         ^~~~~~~~~~~~
->> block/blk-merge.c:711:20: error: invalid storage class for function 'blk_update_mixed_merge'
-     711 | static inline void blk_update_mixed_merge(struct request *req,
-         |                    ^~~~~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:725:13: error: invalid storage class for function 'blk_account_io_merge_request'
-     725 | static void blk_account_io_merge_request(struct request *req)
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> block/blk-merge.c:736:23: error: invalid storage class for function 'blk_try_req_merge'
-     736 | static enum elv_merge blk_try_req_merge(struct request *req,
-         |                       ^~~~~~~~~~~~~~~~~
->> block/blk-merge.c:747:13: error: invalid storage class for function 'blk_atomic_write_mergeable_rq_bio'
-     747 | static bool blk_atomic_write_mergeable_rq_bio(struct request *rq,
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:753:13: error: invalid storage class for function 'blk_atomic_write_mergeable_rqs'
-     753 | static bool blk_atomic_write_mergeable_rqs(struct request *rq,
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:781:24: error: invalid storage class for function 'attempt_merge'
-     781 | static struct request *attempt_merge(struct request_queue *q,
-         |                        ^~~~~~~~~~~~~
-   block/blk-merge.c:869:24: error: invalid storage class for function 'attempt_back_merge'
-     869 | static struct request *attempt_back_merge(struct request_queue *q,
-         |                        ^~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:880:24: error: invalid storage class for function 'attempt_front_merge'
-     880 | static struct request *attempt_front_merge(struct request_queue *q,
-         |                        ^~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:939:13: error: invalid storage class for function 'blk_account_io_merge_bio'
-     939 | static void blk_account_io_merge_bio(struct request *req)
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:979:30: error: invalid storage class for function 'bio_attempt_front_merge'
-     979 | static enum bio_merge_status bio_attempt_front_merge(struct request *req,
-         |                              ^~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:1017:30: error: invalid storage class for function 'bio_attempt_discard_merge'
-    1017 | static enum bio_merge_status bio_attempt_discard_merge(struct request_queue *q,
-         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:1042:30: error: invalid storage class for function 'blk_attempt_bio_merge'
-    1042 | static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
-         |                              ^~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:1143:19: error: non-static declaration of 'blk_bio_list_merge' follows static declaration
-    1143 | EXPORT_SYMBOL_GPL(blk_bio_list_merge);
-         |                   ^~~~~~~~~~~~~~~~~~
-   include/linux/export.h:76:28: note: in definition of macro '__EXPORT_SYMBOL'
-      76 |         extern typeof(sym) sym;                                 \
-         |                            ^~~
-   include/linux/export.h:90:41: note: in expansion of macro '_EXPORT_SYMBOL'
-      90 | #define EXPORT_SYMBOL_GPL(sym)          _EXPORT_SYMBOL(sym, "GPL")
-         |                                         ^~~~~~~~~~~~~~
-   block/blk-merge.c:1143:1: note: in expansion of macro 'EXPORT_SYMBOL_GPL'
-    1143 | EXPORT_SYMBOL_GPL(blk_bio_list_merge);
-         | ^~~~~~~~~~~~~~~~~
-   block/blk-merge.c:1120:6: note: previous definition of 'blk_bio_list_merge' with type 'bool(struct request_queue *, struct list_head *, struct bio *, unsigned int)' {aka '_Bool(struct request_queue *, struct list_head *, struct bio *, unsigned int)'}
-    1120 | bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
-         |      ^~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:1175:19: error: non-static declaration of 'blk_mq_sched_try_merge' follows static declaration
-    1175 | EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
-         |                   ^~~~~~~~~~~~~~~~~~~~~~
-   include/linux/export.h:76:28: note: in definition of macro '__EXPORT_SYMBOL'
-      76 |         extern typeof(sym) sym;                                 \
-         |                            ^~~
-   include/linux/export.h:90:41: note: in expansion of macro '_EXPORT_SYMBOL'
-      90 | #define EXPORT_SYMBOL_GPL(sym)          _EXPORT_SYMBOL(sym, "GPL")
-         |                                         ^~~~~~~~~~~~~~
-   block/blk-merge.c:1175:1: note: in expansion of macro 'EXPORT_SYMBOL_GPL'
-    1175 | EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
-         | ^~~~~~~~~~~~~~~~~
-   block/blk-merge.c:1145:6: note: previous definition of 'blk_mq_sched_try_merge' with type 'bool(struct request_queue *, struct bio *, unsigned int,  struct request **)' {aka '_Bool(struct request_queue *, struct bio *, unsigned int,  struct request **)'}
-    1145 | bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-         |      ^~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:1175:1: error: expected declaration or statement at end of input
-    1175 | EXPORT_SYMBOL_GPL(blk_mq_sched_try_merge);
-         | ^~~~~~~~~~~~~~~~~
-   block/blk-merge.c: At top level:
-   block/blk-merge.c:1089:6: warning: 'blk_attempt_plug_merge' defined but not used [-Wunused-function]
-    1089 | bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
-         |      ^~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:896:6: warning: 'blk_attempt_req_merge' defined but not used [-Wunused-function]
-     896 | bool blk_attempt_req_merge(struct request_queue *q, struct request *rq,
-         |      ^~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:493:14: warning: 'blk_recalc_rq_segments' defined but not used [-Wunused-function]
-     493 | unsigned int blk_recalc_rq_segments(struct request *rq)
-         |              ^~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:454:13: warning: 'bio_split_write_zeroes' defined but not used [-Wunused-function]
-     454 | struct bio *bio_split_write_zeroes(struct bio *bio,
-         |             ^~~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:442:13: warning: 'bio_split_zone_append' defined but not used [-Wunused-function]
-     442 | struct bio *bio_split_zone_append(struct bio *bio,
-         |             ^~~~~~~~~~~~~~~~~~~~~
-   block/blk-merge.c:427:13: warning: 'bio_split_rw' defined but not used [-Wunused-function]
-     427 | struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
-         |             ^~~~~~~~~~~~
-   block/blk-merge.c:201:13: warning: 'bio_split_discard' defined but not used [-Wunused-function]
-     201 | struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
-         |             ^~~~~~~~~~~~~~~~~
+/*
+* The pool->lock protects the race with zpage's migration
+* so it's safe to get the page from handle.
+*/
+read_lock(&pool->lock);
+obj =3D handle_to_obj(handle);
+obj_to_zpdesc(obj, &f_zpdesc);
+zspage =3D get_zspage(f_zpdesc);
+class =3D zspage_class(pool, zspage);
+spin_lock(&class->lock);
+read_unlock(&pool->lock);
 
+It's basically just this blob right?
 
-vim +159 block/blk-merge.c
+>
+> > As others have pointed out, I don't want to just defer expensive work
+> > without understanding why it's expensive and running into limitations
+> > about why it cannot be improved without deferring.
+>
+> For the deferred freeing part: the class_idx-in-obj optimization
+> addresses the multi-process scenario where concurrent atomic
+> operations on pool->lock become expensive, but does not help
+> single-process munmap. Deferred freeing moves the entire zs_free
+> cost (including class->lock and zspage freeing) off the munmap
+> hot path, which benefits even single-process workloads. The two
+> optimizations are complementary.
 
-   142	
-   143	static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
-   144	{
-   145		if (unlikely(split_sectors < 0)) {
-   146			bio->bi_status = errno_to_blk_status(split_sectors);
-   147			bio_endio(bio);
-   148			return NULL;
-   149		}
-   150	
-   151		if (split_sectors) {
-   152			bio = bio_submit_split_bioset(bio, split_sectors,
-   153					&bio->bi_bdev->bd_disk->bio_split);
-   154			if (bio) {
-   155				bio->bi_opf |= REQ_NOMERGE;
-   156				/* Fix the issue where the inflight statistics
-   157				 * of the chained bio in the QoS are incorrect.
-   158				 */
- > 159				bio_set_flag(split, BIO_QOS_CHAIN_CHILD);
-   160		}
-   161	
-   162		return bio;
-   163	}
-   164	
- > 165	static struct bio *__bio_split_discard(struct bio *bio,
-   166			const struct queue_limits *lim, unsigned *nsegs,
-   167			unsigned int max_sectors)
-   168	{
-   169		unsigned int max_discard_sectors, granularity;
-   170		sector_t tmp;
-   171		unsigned split_sectors;
-   172	
-   173		*nsegs = 1;
-   174	
-   175		granularity = max(lim->discard_granularity >> 9, 1U);
-   176	
-   177		max_discard_sectors = min(max_sectors, bio_allowed_max_sectors(lim));
-   178		max_discard_sectors -= max_discard_sectors % granularity;
-   179		if (unlikely(!max_discard_sectors))
-   180			return bio;
-   181	
-   182		if (bio_sectors(bio) <= max_discard_sectors)
-   183			return bio;
-   184	
-   185		split_sectors = max_discard_sectors;
-   186	
-   187		/*
-   188		 * If the next starting sector would be misaligned, stop the discard at
-   189		 * the previous aligned sector.
-   190		 */
-   191		tmp = bio->bi_iter.bi_sector + split_sectors -
-   192			((lim->discard_alignment >> 9) % granularity);
-   193		tmp = sector_div(tmp, granularity);
-   194	
-   195		if (split_sectors > tmp)
-   196			split_sectors -= tmp;
-   197	
-   198		return bio_submit_split(bio, split_sectors);
-   199	}
-   200	
-   201	struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
-   202			unsigned *nsegs)
-   203	{
-   204		unsigned int max_sectors;
-   205	
-   206		if (bio_op(bio) == REQ_OP_SECURE_ERASE)
-   207			max_sectors = lim->max_secure_erase_sectors;
-   208		else
-   209			max_sectors = lim->max_discard_sectors;
-   210	
-   211		return __bio_split_discard(bio, lim, nsegs, max_sectors);
-   212	}
-   213	
- > 214	static inline unsigned int blk_boundary_sectors(const struct queue_limits *lim,
-   215							bool is_atomic)
-   216	{
-   217		/*
-   218		 * chunk_sectors must be a multiple of atomic_write_boundary_sectors if
-   219		 * both non-zero.
-   220		 */
-   221		if (is_atomic && lim->atomic_write_boundary_sectors)
-   222			return lim->atomic_write_boundary_sectors;
-   223	
-   224		return lim->chunk_sectors;
-   225	}
-   226	
-   227	/*
-   228	 * Return the maximum number of sectors from the start of a bio that may be
-   229	 * submitted as a single request to a block device. If enough sectors remain,
-   230	 * align the end to the physical block size. Otherwise align the end to the
-   231	 * logical block size. This approach minimizes the number of non-aligned
-   232	 * requests that are submitted to a block device if the start of a bio is not
-   233	 * aligned to a physical block boundary.
-   234	 */
- > 235	static inline unsigned get_max_io_size(struct bio *bio,
-   236					       const struct queue_limits *lim)
-   237	{
-   238		unsigned pbs = lim->physical_block_size >> SECTOR_SHIFT;
-   239		unsigned lbs = lim->logical_block_size >> SECTOR_SHIFT;
-   240		bool is_atomic = bio->bi_opf & REQ_ATOMIC;
-   241		unsigned boundary_sectors = blk_boundary_sectors(lim, is_atomic);
-   242		unsigned max_sectors, start, end;
-   243	
-   244		/*
-   245		 * We ignore lim->max_sectors for atomic writes because it may less
-   246		 * than the actual bio size, which we cannot tolerate.
-   247		 */
-   248		if (bio_op(bio) == REQ_OP_WRITE_ZEROES)
-   249			max_sectors = lim->max_write_zeroes_sectors;
-   250		else if (is_atomic)
-   251			max_sectors = lim->atomic_write_max_sectors;
-   252		else
-   253			max_sectors = lim->max_sectors;
-   254	
-   255		if (boundary_sectors) {
-   256			max_sectors = min(max_sectors,
-   257				blk_boundary_sectors_left(bio->bi_iter.bi_sector,
-   258						      boundary_sectors));
-   259		}
-   260	
-   261		start = bio->bi_iter.bi_sector & (pbs - 1);
-   262		end = (start + max_sectors) & ~(pbs - 1);
-   263		if (end > start)
-   264			return end - start;
-   265		return max_sectors & ~(lbs - 1);
-   266	}
-   267	
-   268	/**
-   269	 * bvec_split_segs - verify whether or not a bvec should be split in the middle
-   270	 * @lim:      [in] queue limits to split based on
-   271	 * @bv:       [in] bvec to examine
-   272	 * @nsegs:    [in,out] Number of segments in the bio being built. Incremented
-   273	 *            by the number of segments from @bv that may be appended to that
-   274	 *            bio without exceeding @max_segs
-   275	 * @bytes:    [in,out] Number of bytes in the bio being built. Incremented
-   276	 *            by the number of bytes from @bv that may be appended to that
-   277	 *            bio without exceeding @max_bytes
-   278	 * @max_segs: [in] upper bound for *@nsegs
-   279	 * @max_bytes: [in] upper bound for *@bytes
-   280	 *
-   281	 * When splitting a bio, it can happen that a bvec is encountered that is too
-   282	 * big to fit in a single segment and hence that it has to be split in the
-   283	 * middle. This function verifies whether or not that should happen. The value
-   284	 * %true is returned if and only if appending the entire @bv to a bio with
-   285	 * *@nsegs segments and *@sectors sectors would make that bio unacceptable for
-   286	 * the block driver.
-   287	 */
- > 288	static bool bvec_split_segs(const struct queue_limits *lim,
-   289			const struct bio_vec *bv, unsigned *nsegs, unsigned *bytes,
-   290			unsigned max_segs, unsigned max_bytes)
-   291	{
-   292		unsigned max_len = max_bytes - *bytes;
-   293		unsigned len = min(bv->bv_len, max_len);
-   294		unsigned total_len = 0;
-   295		unsigned seg_size = 0;
-   296	
-   297		while (len && *nsegs < max_segs) {
-   298			seg_size = get_max_segment_size(lim, bvec_phys(bv) + total_len, len);
-   299	
-   300			(*nsegs)++;
-   301			total_len += seg_size;
-   302			len -= seg_size;
-   303	
-   304			if ((bv->bv_offset + total_len) & lim->virt_boundary_mask)
-   305				break;
-   306		}
-   307	
-   308		*bytes += total_len;
-   309	
-   310		/* tell the caller to split the bvec if it is too big to fit */
-   311		return len > 0 || bv->bv_len > max_len;
-   312	}
-   313	
- > 314	static unsigned int bio_split_alignment(struct bio *bio,
-   315			const struct queue_limits *lim)
-   316	{
-   317		if (op_is_write(bio_op(bio)) && lim->zone_write_granularity)
-   318			return lim->zone_write_granularity;
-   319		return lim->logical_block_size;
-   320	}
-   321	
- > 322	static inline unsigned int bvec_seg_gap(struct bio_vec *bvprv,
-   323						struct bio_vec *bv)
-   324	{
-   325		return bv->bv_offset | (bvprv->bv_offset + bvprv->bv_len);
-   326	}
-   327	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
++1 :)
