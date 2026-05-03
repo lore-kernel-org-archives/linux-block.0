@@ -1,32 +1,30 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5F539524B
-	for <linux-block@vger.kernel.org>; Sun,  3 May 2026 03:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9890239890A
+	for <linux-block@vger.kernel.org>; Sun,  3 May 2026 03:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777780627; cv=none; b=j7vcPPW/+8IT7Gay6XuuXlXZ+EJy2Z0eMQXxuviXQucn4YMoATNLWQmoT0i9MjaFkPscRdpHilikkpU9AuETgIUDTV5T5rL4ZKX/EZRdnKBo5W00Y9I6wHS01ji8wQuDIJEDOZHQS42dNz9opuDMnMJ7mqJsl+s/PwbU0+SoFWw=
+	t=1777780630; cv=none; b=XyLvrA8byKop3CVXIuURCDFgez5HZ0LL5KL2XK6/TXVdp2kCdf0/AIL3QIT1ewUNIsHv9OS65wpox0YbIlMYAEKNS9eARL5naTcFq8cGtI/ZJ1jayJJmlGgRgB8Vv1Htldr/KpFffAw0CS+Qq8Ov3hIbx3y4KVfM2Quel0OBa7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777780627; c=relaxed/simple;
-	bh=6G4wKlX0zo1jHPqX7RH9W8wPuQmHfTUtMAViJ7TEYLg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GaxMkrp1Bbmfxrn5yWjBgnUFaBU8VQUDIzA9cLvSmxptHV0+WdrZEnYp1w+GAbUe2CXbZqaEuJbLHMVqOlOfyGbV0hT6PnL761uavH7xYLzaTtEJmET/c4UacCWkH17tJejZNNHF90oIc4Vef50sfwEGrAYa0TBx2k7xKUPLCZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=duXzc8O7; arc=none smtp.client-ip=91.218.175.189
+	s=arc-20240116; t=1777780630; c=relaxed/simple;
+	bh=hAE6HCqRG8x2SlEJpkqJka2MHr8n993wVwxNdtqP7vQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fiWMpb1kjx6z+CNReeeuARpUXSGdiqDZ+AFqhAmTGW+qDmbAiQ7FuKBZ0WU76wby34VOWF12EegEvIm5dD0dBOSe7ykRfcHWaGKxF+eZA8ui3mAyTGepsHlYtL4P2IwraOXMLzxHVIlfBlc513PIzAYOfb6+2SpAggf2SwN55ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TiitcpSf; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="duXzc8O7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TiitcpSf"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777780623;
+	t=1777780616;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QDbfqpo/kWoDEd8LDUkjAyHgL8/MvRl9aZnHCn01hLw=;
-	b=duXzc8O7x2poXRdeV0qKBWwaBHQEumGyZ8rve9ETVOWt7Qd4e8U9Ffc0DEE7ASz4Jgdccq
-	VGBXDDKEM+JAoaqVSjNMwRwaxRH5l4padCwaIgDa50OvgF1jEVqosAAXRBw4V5as0OV4E8
-	EqaWuwkvf96ian4JWrLtXMSGR8c5qzk=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qrpZPxwTHWgxoPwD/KyFHZZa8ge1uutA4flbtd9qwuk=;
+	b=TiitcpSfUxBNu8lDHPowCSao5yr+71nw5UMqB3Pvqyg67vs/XUT26w4wKvEXdBHxQs4u32
+	LxMaCTzEF3qQLtl7DVb8uu6MQzbQjbUtRQvUPlQBisTv/WuCu2mzjCv1bVM8QuBqcVICGp
+	onjb7wf9sVnK4ysyBrZX3qdkNdg4KPA=
 From: Kaitao cheng <kaitao.cheng@linux.dev>
 To: axboe@kernel.dk,
 	ast@kernel.org,
@@ -42,12 +40,10 @@ To: axboe@kernel.dk,
 Cc: bpf@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [RFC v2 1/3] bpf: Add KF_SPIN_LOCK flag for kfuncs under bpf_spin_lock
-Date: Sun,  3 May 2026 11:56:21 +0800
-Message-ID: <20260503035623.28771-2-kaitao.cheng@linux.dev>
-In-Reply-To: <20260503035623.28771-1-kaitao.cheng@linux.dev>
-References: <20260503035623.28771-1-kaitao.cheng@linux.dev>
+	Kaitao cheng <kaitao.cheng@linux.dev>
+Subject: [RFC v2 0/3] block: Introduce a BPF-based I/O scheduler
+Date: Sun,  3 May 2026 11:56:20 +0800
+Message-ID: <20260503035623.28771-1-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,70 +53,82 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Kaitao Cheng <chengkaitao@kylinos.cn>
+I have been working on adding a new BPF-based I/O scheduler. It has both
+kernel and user-space parts. In kernel space, using per-ctx, I implemented
+a simple elevator that exposes a set of BPF hooks. The goal is to move the
+policy side of I/O scheduling out of the kernel and into user space, which
+should greatly increase flexibility and applicability. To verify that the
+whole stack works end to end, I wrote a simple BPF example program. I am
+calling this feature the UFQ (User-programmable Flexible Queueing) I/O
+scheduler.
 
-Introduce the KF_SPIN_LOCK kfunc metadata flag in BTF so kfuncs may be
-explicitly marked as safe to call while holding bpf_spin_lock.
+This patch depends on new BPF functionality that I have already posted to
+the BPF community but that is not yet in mainline. Details are in the
+thread:
 
-Allow kfuncs defined in kernel modules to be marked with KF_SPIN_LOCK.
+https://lore.kernel.org/bpf/20260427165906.84420-1-kaitao.cheng@linux.dev/
 
-Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
----
- include/linux/btf.h   |  1 +
- kernel/bpf/verifier.c | 20 +++++++++++++++-----
- 2 files changed, 16 insertions(+), 5 deletions(-)
+To try it, you need to apply the patches from that series first.
 
-diff --git a/include/linux/btf.h b/include/linux/btf.h
-index c82d0d689059..08d8a023ffe6 100644
---- a/include/linux/btf.h
-+++ b/include/linux/btf.h
-@@ -79,6 +79,7 @@
- #define KF_ARENA_ARG1   (1 << 14) /* kfunc takes an arena pointer as its first argument */
- #define KF_ARENA_ARG2   (1 << 15) /* kfunc takes an arena pointer as its second argument */
- #define KF_IMPLICIT_ARGS (1 << 16) /* kfunc has implicit arguments supplied by the verifier */
-+#define KF_SPIN_LOCK    (1 << 17) /* kfunc is allowed inside bpf_spin_lock-ed region */
- 
- /*
-  * Tag marking a kernel function as a kfunc. This is meant to minimize the
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 4d78d834c609..cffba6a714f3 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -11403,11 +11403,21 @@ static bool is_bpf_stream_kfunc(u32 btf_id)
- 	       btf_id == special_kfunc_list[KF_bpf_stream_print_stack];
- }
- 
--static bool kfunc_spin_allowed(u32 btf_id)
-+static bool kfunc_spin_allowed(struct bpf_verifier_env *env, s32 func_id, s16 offset)
- {
--	return is_bpf_graph_api_kfunc(btf_id) || is_bpf_iter_num_api_kfunc(btf_id) ||
--	       is_bpf_res_spin_lock_kfunc(btf_id) || is_bpf_arena_kfunc(btf_id) ||
--	       is_bpf_stream_kfunc(btf_id);
-+	struct bpf_kfunc_meta kfunc;
-+	int err;
-+
-+	if (is_bpf_graph_api_kfunc(func_id) || is_bpf_iter_num_api_kfunc(func_id) ||
-+	    is_bpf_res_spin_lock_kfunc(func_id) || is_bpf_arena_kfunc(func_id) ||
-+	    is_bpf_stream_kfunc(func_id))
-+		return true;
-+
-+	err = fetch_kfunc_meta(env, func_id, offset, &kfunc);
-+	if (err || !kfunc.flags)
-+		return false;
-+
-+	return *kfunc.flags & KF_SPIN_LOCK;
- }
- 
- static bool is_sync_callback_calling_kfunc(u32 btf_id)
-@@ -17025,7 +17035,7 @@ static int do_check_insn(struct bpf_verifier_env *env, bool *do_print_state)
- 				     insn->imm != BPF_FUNC_spin_unlock &&
- 				     insn->imm != BPF_FUNC_kptr_xchg) ||
- 				    (insn->src_reg == BPF_PSEUDO_KFUNC_CALL &&
--				     (insn->off != 0 || !kfunc_spin_allowed(insn->imm)))) {
-+				     !kfunc_spin_allowed(env, insn->imm, insn->off))) {
- 					verbose(env,
- 						"function calls are not allowed while holding a lock\n");
- 					return -EINVAL;
+I am looking for community feedback on whether this direction and the
+implementation approach make sense, and what else we should
+consider.
+
+todo:
+1. More thorough testing
+2. Split the code into multiple sub-patches
+3. Identify concrete use cases
+
+Changes in v2:
+- Remove bpf_request_put (Alexei Starovoitov)
+- Update the UFQ README (Miguel Ojeda)
+- Add bio merge support
+- Fix synchronization issues during UFQ scheduler transitions
+
+Link to v1:
+https://lore.kernel.org/bpf/20260327114741.91500-1-pilgrimtao@gmail.com/
+
+Kaitao Cheng (3):
+  bpf: Add KF_SPIN_LOCK flag for kfuncs under bpf_spin_lock
+  block: Introduce the UFQ I/O scheduler
+  tools/ufq_iosched: add BPF example scheduler and build scaffolding
+
+ block/Kconfig.iosched                         |   8 +
+ block/Makefile                                |   1 +
+ block/blk-merge.c                             |  28 +-
+ block/blk-mq.c                                |   8 +-
+ block/blk-mq.h                                |   2 +-
+ block/blk.h                                   |   5 +
+ block/ufq-bpfops.c                            | 241 +++++++
+ block/ufq-iosched.c                           | 640 ++++++++++++++++++
+ block/ufq-iosched.h                           |  64 ++
+ block/ufq-kfunc.c                             | 131 ++++
+ include/linux/btf.h                           |   1 +
+ kernel/bpf/verifier.c                         |  20 +-
+ tools/ufq_iosched/.gitignore                  |   2 +
+ tools/ufq_iosched/Makefile                    | 262 +++++++
+ tools/ufq_iosched/README.md                   | 145 ++++
+ .../include/bpf-compat/gnu/stubs.h            |  12 +
+ tools/ufq_iosched/include/ufq/common.bpf.h    |  75 ++
+ tools/ufq_iosched/include/ufq/common.h        |  90 +++
+ tools/ufq_iosched/include/ufq/simple_stat.h   |  23 +
+ tools/ufq_iosched/ufq_simple.bpf.c            | 604 +++++++++++++++++
+ tools/ufq_iosched/ufq_simple.c                | 120 ++++
+ 21 files changed, 2464 insertions(+), 18 deletions(-)
+ create mode 100644 block/ufq-bpfops.c
+ create mode 100644 block/ufq-iosched.c
+ create mode 100644 block/ufq-iosched.h
+ create mode 100644 block/ufq-kfunc.c
+ create mode 100644 tools/ufq_iosched/.gitignore
+ create mode 100644 tools/ufq_iosched/Makefile
+ create mode 100644 tools/ufq_iosched/README.md
+ create mode 100644 tools/ufq_iosched/include/bpf-compat/gnu/stubs.h
+ create mode 100644 tools/ufq_iosched/include/ufq/common.bpf.h
+ create mode 100644 tools/ufq_iosched/include/ufq/common.h
+ create mode 100644 tools/ufq_iosched/include/ufq/simple_stat.h
+ create mode 100644 tools/ufq_iosched/ufq_simple.bpf.c
+ create mode 100644 tools/ufq_iosched/ufq_simple.c
+
 -- 
 2.50.1 (Apple Git-155)
 
