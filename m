@@ -1,135 +1,123 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E712BE639
-	for <linux-block@vger.kernel.org>; Sun,  3 May 2026 05:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777785245; cv=pass; b=IsN8gfLH8lkwxojQre9gLKmhqln5f1bLsak2rqiS55fZ5F2BUXO9+SD6S6cPT/UZTtTKprSBzSaKjBDOQzE44c/YkPPo9E+tuXU98aBZmJJ+toEWGARFAueS7S81H1x2Xshgqkoe1hgjeJabytEQjhSd4HZHlxvAV8vNkNg08vw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777785245; c=relaxed/simple;
-	bh=Bgg6tRIruHZPLNbPdn4Lx9Egym+DaQ0OL37BLC4LLNg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T0WSXRV51397ahJUszyPgKMypR/iXtRX9Bz4i3dybx1UFML3286WiMM++Y7LAqRJxOToTB5p6GYUEeRLKusukVT7ln/StUmCnjZaUN9bsvUZsMOJWpxiR42c8B9lfHPRtPoRPt3y5eHUymzNgMbNLmF23vkokECiafRD900pvQg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n56N02sv; arc=pass smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7FA224FA;
+	Sun,  3 May 2026 05:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777787566; cv=none; b=YKi4ewSaWOHXg92pzmApSIRYSQ7anvcgT/dvewnXG0bYBGWq10uFr6jOJWdAB73Rb6lkURRNkRokicAhNwarq73vSttZMaay9PVLgzoR8CKWyHY2oGIbZJQCYFAscK8wAeNh7e0XEXZFxLsCei9z0EdVP6WgLv1+qd7fkUeRlwo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777787566; c=relaxed/simple;
+	bh=7+p+o/rhroUxkfbMGB72LwqTiS71a3jhkJJB4mE6sl8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PqtJdo9Z0xeGtZj9SFLQtTP/psfkevIiST0MmFTH2iZLMX63O01LQlOisxsuxMJH+0l63MX8V79ssbEFUnbTTqqfURYj7dTiDb85FQZopiWIHn6cMF6gscxiF+57taK6UNij75UpvPwx3084QPXWhTwhSt/JSOZO6Crb72qX6sM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Hf3RyffZ; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n56N02sv"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79ab5fd969aso33042087b3.0
-        for <linux-block@vger.kernel.org>; Sat, 02 May 2026 22:14:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777785242; cv=none;
-        d=google.com; s=arc-20240605;
-        b=crNGlAAJ146eSuKORPxuRobpC2rPYoYPrhWY4bHw/nroU2ymI4UnbfUdB3Y8oNX/8R
-         8U5Rfo1rPP8Oh80YStJpo7njSM2QRwPd5j2Lh40xHa/p3KvMFF4pDh5TL7cQy1o97NzU
-         VHj6/c9KjAUqJYZokI1Mui3OnT40y086zJ0yKC1RoltGZfylzmogrNrlBK7xMYBAiBfV
-         I2LcGKVJTP6sPkamBs5gJYflm8Ec9JCrnXEL7r7R5AmObtQxklXNI1TzS9UORaCrBCjj
-         mrxLAOI4r7Hb4guwWvi0ixj8yvYOP+AYm6by+ssqjeckhtpQM16cxqsNpnN0pBZiFHDg
-         LAHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zdcGJAM8jBlmLda8jFwuK8SYIvIOeidaOnoqCWXbNc8=;
-        fh=TmmmctC9SqUPSW9kGDwXHtd2SkwnRbZxBQabsLDy5MA=;
-        b=KlzNc4bYFe3BjvQbX/osgfcMRF1aQYDN24jiJqU+BcEMnjoUkych2KE5wnx8FMpZM8
-         1p1Tu0x17JqsPf/E7sk+stpzyKBmZ/c/e1N8+GmtKF9nkQIJ9XC/N0loHkIXO6XvQSEB
-         QE0J10dW2ysEKx5ZBGN7Mpoq1G3XIk2Y7RynwzJ+UNr538bmN3jefQjfpM5CoF0KmgKK
-         7oETvUvYwDrT+XYDH0YwcJasHHHV4Zvry5TsDNTjsre7Xxmw54/HA1ahAotYbLtqqV0Q
-         gldCtWuPJz08sOAAZKtzymZa16hQtQXUuGEAAkgx6Z+e5+JgGs8GyZM8j9Ey0j84KPxg
-         YnGQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777785242; x=1778390042; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zdcGJAM8jBlmLda8jFwuK8SYIvIOeidaOnoqCWXbNc8=;
-        b=n56N02svaLVEkuXKSURdyLtwh1ajI7G22Ud1EveZ3FsN+ADYXaGntY1aUlS0EBg2Ul
-         aP+/3MWvgA0xksIkv4JcE1QMbOciHc65gYlD0fE0+9F5kHGxWhznefbI1wh5ky/mrr6g
-         Gl+uO50aIXhIupcw8Fe9h/AYdEHL3whB3lX2mXlT2/fsLqmr4jA3QgsD/tp219ftMAC3
-         WrIUCkmKtsvw/1Ba1gPvS9jIXRROiiN6qYhGjFTY+l3mbArz+toXHGCxFjV8STaLsIIn
-         iDSUrYUsMAioBAkHOyJNl2tzoK83ffW1QmYJhtPYngTWRisF21SJChFSHQYNRPvQrcNE
-         rgbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777785242; x=1778390042;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zdcGJAM8jBlmLda8jFwuK8SYIvIOeidaOnoqCWXbNc8=;
-        b=FeGSYuiwqCe4qzcu4Z2j1VGyVoXCV3fCmLOgGTYmbml7+0W01Bvf2vqfjtqOJhO22+
-         w6Nyy1Q1tW+p62CjcOI6L+deWTXV3iamwZc1Jp3fIWwoWgmHWlB5as6PDA+fagnMQ70/
-         py2dZKDE2z1V8GDJ0++t4dpdyQ2zW+6r7RmV8KPpHiH01tBFvGaU+eM9nzG99CQJb7MQ
-         F0kyHJmuKnx7BOrPpGCCsWNmMSzz7HMcLYypsY8CDcJ/st7Zf9tM9zztTJTaUI67b+vQ
-         0usx1Xfoo5b8GvHpAIRQNAENKU3iTcK6j6YvK6a2cNSceE5qfV1Qc3U4by3CAkv+l1k3
-         5wJQ==
-X-Gm-Message-State: AOJu0YysX3z3pBZSm2JcjIjitzzRhJnNCijKe8MuTSEWizPykBumt8WR
-	EJc7SxzcEZxZvtbhz33OqQy18R3zirvTHuR/gydctt7CwDtdV6NPMLeRzUpf/OGfFVE/dKb8FYO
-	AjoD91xYZU+4KBe7o/hjFaMjDimgS1hQ=
-X-Gm-Gg: AeBDieur3DyrKjBhNIVbSRjgGV3p1vUhyQc52EqVSSXrEcqnSYp6C9Zx1mvs7f5qiSA
-	0SCm9lVRmu9MQd26i4PlwluLP2Q2bu8hmob+7jdtIEJA4o/uH9BloEEkKXoF0+mCh1q8xiYbb1X
-	DW+RQwJW2iqsKrzjmL2Ivn0rv6BBwuqITn6/RRGCXYuUsSU2FU64uAdi8DG9H80DGPOs/IVwMvy
-	WMzMRfGJPlte3WDPqSvK+6oPFNcNQMcsiLLsiSIcdKYVbCtUXMKSuFfBclFSsfsc8cpAZNEvdoc
-	9GExLcL3+/Q0OAHo0wYCj4KUgxgQLUMNKCtikk8yNtvpB0mCFoufNMNynNShIkH5XuAR7ldUCW4
-	tvEf56zUEd8ttXtXwnw==
-X-Received: by 2002:a05:690c:6d82:b0:7bd:8952:132e with SMTP id
- 00721157ae682-7bd89521822mr5806557b3.3.1777785241772; Sat, 02 May 2026
- 22:14:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Hf3RyffZ"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4g7YpN4zkrzlgtd0;
+	Sun,  3 May 2026 05:52:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1777787559; x=1780379560; bh=IqE7MhhCDqKc7Zlp8tPSoJsT
+	xXLU1qnMtGH8VV918nQ=; b=Hf3RyffZj4OMurpfFZS6e5HjSD37mNGa8GmGxJTA
+	6bBYsWQmsTsS9Dinv2hjonrLICsZbr2SmME7rsoHsEOYQ08qtZxJEzIY7+2SOVw1
+	6F9T3WinSY/uJ66yYbkUlJcRK1AFKyMPqleNuxGe4HDg/EeRRg+8LqdI4EybBLpv
+	+6Tz6vlnnTws/VHabiq8nTaPUXOgd2w9KDpgf2tz/u1vG7Rd9BVRZTuppyRCpa6W
+	hpPQbK+CoU4s19W4iqDiSSY2z69CWIUjlpA78ewtc2nP5P0/UDP1qHR9xj8V1Pxs
+	Q06LIUF5emyqeNpvkKU855UI2xXB/kkWOVSBT95EDEz61g==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id p_tQR2x9mnrb; Sun,  3 May 2026 05:52:39 +0000 (UTC)
+Received: from [10.211.8.206] (unknown [213.147.98.98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4g7YpC03JZzlgr44;
+	Sun,  3 May 2026 05:52:34 +0000 (UTC)
+Message-ID: <b568c125-d827-42f3-97ab-521a8648d917@acm.org>
+Date: Sun, 3 May 2026 07:52:32 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260322051838.1137822-1-kartikey406@gmail.com>
-In-Reply-To: <20260322051838.1137822-1-kartikey406@gmail.com>
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-Date: Sun, 3 May 2026 10:43:50 +0530
-X-Gm-Features: AVHnY4Ly-1cUEeK9MYq7ONu9W8AXSkGhiqNuKIo0E-YsZ8okhaz5G4KdNlAZAqs
-Message-ID: <CADhLXY6uKPhLHTYysPLnK+sy=ZEq-7hGN2rwbzaoHdHj7LfmGA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] blktrace: reject buf_size smaller than blk_io_trace
-To: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, 
-	syzbot+ed8bc247f231c1a48e21@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Deepanshu Kartikey <kartikey406@gmail.com>, axboe@kernel.dk,
+ rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org,
+ syzbot+ed8bc247f231c1a48e21@syzkaller.appspotmail.com
+References: <20260322051838.1137822-1-kartikey406@gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260322051838.1137822-1-kartikey406@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 22, 2026 at 10:48=E2=80=AFAM Deepanshu Kartikey
-<kartikey406@gmail.com> wrote:
->
-> blk_trace_setup() accepts any non-zero buf_size.
-> If buf_size < sizeof(struct blk_io_trace), relay_reserve()
-> always returns NULL and all trace events are silently dropped.
->
-> Reject such values early with -EINVAL.
->
-> Reported-by: syzbot+ed8bc247f231c1a48e21@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Ded8bc247f231c1a48e21
-> Signed-off-by: Deepanshu Kartikey <Kartikey406@gmail.com>
-> ---
->  kernel/trace/blktrace.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
+On 3/22/26 6:18 AM, Deepanshu Kartikey wrote:
+> Closes: https://syzkaller.appspot.com/bug?extid=ed8bc247f231c1a48e21
+> [ ... ] 
 > diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
 > index 8cd2520b4c99..6cc7d83ed1c2 100644
 > --- a/kernel/trace/blktrace.c
 > +++ b/kernel/trace/blktrace.c
-> @@ -773,7 +773,7 @@ int blk_trace_setup(struct request_queue *q, char *na=
-me, dev_t dev,
->         if (ret)
->                 return -EFAULT;
->
-> -       if (!buts.buf_size || !buts.buf_nr)
-> +       if (buts.buf_size < sizeof(struct blk_io_trace) || !buts.buf_nr)
->                 return -EINVAL;
->
->         buts2 =3D (struct blk_user_trace_setup2) {
-> --
-> 2.43.0
->
+> @@ -773,7 +773,7 @@ int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+>   	if (ret)
+>   		return -EFAULT;
+>   
+> -	if (!buts.buf_size || !buts.buf_nr)
+> +	if (buts.buf_size < sizeof(struct blk_io_trace) || !buts.buf_nr)
+>   		return -EINVAL;
+>   
+>   	buts2 = (struct blk_user_trace_setup2) {
 
-Gentle ping on this patch . Let me know the status of this patch
+Why sizeof(struct blk_io_trace) instead of sizeof(struct blk_io_trace2)?
+Even sizeof(struct blk_io_trace2) is too small if any additional data is
+included.
 
-Thanks
+Additionally, how can this patch fix the issue mentioned in the linked 
+syzbot report? Is the syzbot link correct? From the syzbot report:
+
+Oops: general protection fault, probably for non-canonical address 
+0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+RIP: 0010:bvec_set_page include/linux/bvec.h:44 [inline]
+RIP: 0010:__bio_add_page block/bio.c:992 [inline]
+RIP: 0010:bio_add_page+0x462/0x6e0 block/bio.c:1048
+Call Trace:
+  <TASK>
+  bio_add_folio+0x64/0x90 block/bio.c:1084
+  io_submit_add_bh fs/ext4/page-io.c:465 [inline]
+  ext4_bio_write_folio+0x1446/0x1ea0 fs/ext4/page-io.c:603
+  mpage_map_and_submit_buffers fs/ext4/inode.c:2326 [inline]
+  mpage_map_and_submit_extent fs/ext4/inode.c:2516 [inline]
+  ext4_do_writepages+0x207e/0x46e0 fs/ext4/inode.c:2928
+  ext4_writepages+0x241/0x3b0 fs/ext4/inode.c:3022
+  do_writepages+0x32e/0x550 mm/page-writeback.c:2554
+  __writeback_single_inode+0x133/0x11a0 fs/fs-writeback.c:1750
+  writeback_sb_inodes+0x992/0x1a20 fs/fs-writeback.c:2042
+  __writeback_inodes_wb+0x111/0x240 fs/fs-writeback.c:2118
+  wb_writeback+0x46a/0xb70 fs/fs-writeback.c:2229
+  wb_check_start_all fs/fs-writeback.c:2355 [inline]
+  wb_do_writeback fs/fs-writeback.c:2381 [inline]
+  wb_workfn+0x95b/0xf50 fs/fs-writeback.c:2414
+  process_one_work+0x9ab/0x1780 kernel/workqueue.c:3288
+  process_scheduled_works kernel/workqueue.c:3379 [inline]
+  worker_thread+0xba8/0x11e0 kernel/workqueue.c:3465
+  kthread+0x388/0x470 kernel/kthread.c:436
+  ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+  </TASK>
+
+Thanks,
+
+Bart.
