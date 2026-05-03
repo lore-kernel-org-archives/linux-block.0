@@ -1,94 +1,122 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B473113D891;
-	Sun,  3 May 2026 11:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B2D221277
+	for <linux-block@vger.kernel.org>; Sun,  3 May 2026 15:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777806540; cv=none; b=pUom7l6bT0a1c+aTNSoZfwE2eQDOv4+FdnZOlzp4resdoiBV+k3ZTh6fVoOKulWFByIboxkq/VCzecRZfmIBUdu9J8vYRoMtlLj9OvMDzkzJKSo8WFrAWJ7ymxtSslAwlDE8e8kcxIX/7gOzW/BKAXUzK1Bv4iDyBBO+7kaNEcc=
+	t=1777820522; cv=none; b=qr9fxWcevbRs3cFikN1ZiXTepp9IPYDJD6b40SlNXYpx08wFsgZ9utz5Zmd88CIl28U9a+Bq2IrHuN83meMHf/d8KOacDoIZ08BNQAb2ybFNIiFNEzrHcIhUb82KiU3FKtWOCxUaTmqZFTxVx2ohSqDhelgNDBV/30iywK5awzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777806540; c=relaxed/simple;
-	bh=T4liqSNyfhqqx4IuluvXA4Y0fx5sInlzola2gG/iXx4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tmiA7s37iSxo8T0CRWIwHEf0rXR0XR7SC0MuQmpvmAU+69UvkpImqSAp66LcJkEMPYHSC0UXDEAaKmeeXI67q9UcPW8/jWpozzxdSfo/q2s3Lo0X7JpH9cmWZAu6PlHmxJl+5gUeat2fj6uZeCvXN+CU+ysLJQNWH5K89jh2ISc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=vMscr7YM; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1777820522; c=relaxed/simple;
+	bh=mxiuTSM74D+CaLeXfgdYtfifPRbcHdaHlRBKwbBo1qQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZTBMeODHqI8q0uHyF29KuBNdmwfqOi30UeLJggItbCF56jhW3chBY2Z7KMU50DjDpYBu9Tcl/7O7Fd7bqjxSyPrLwcAL9VzHEfHTNVkqt63LiQGkUMvk2+0/ZNLM0eKYCl5oh5iOTn+85/DXQ/BPhce7nrRG7RmnHUufOVF/XGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ezzCAw2O; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="vMscr7YM"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4g7hqG0pV6zlgtd0;
-	Sun,  3 May 2026 11:08:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1777806534; x=1780398535; bh=Gc3vf0oTsrBP5r4gguorIwCT
-	NwM99bsgKjg74B49dKc=; b=vMscr7YMZQMMxHyKUuyPtHXwXeE4W67BPxtVSGKh
-	3x5NaUjXRBuFHOoGOW3/WdoHzEmZH+lYOUJWPw5eQrftpAKv0wMGvj2/3DakU058
-	89ilyeW88VQB4rJ2qCxNDTzm9hn8m+pJQ4HDEItvlBjGZLQ+T1mcC+qzDt5E7nRZ
-	yKSVZhESjvdx/hK2ZAS3KDOjapBjYnBgcNIVBRpBb40z//OoCH4J+eKwb/8LpdtG
-	daOJOiYwRP1bxC5PZ6Euin3vGGujP5QPpRUB2G5NhiouccIOQGxmVUNhOUWv00fz
-	MsILaObFONIDPfMm6tTFoT9Pc2qNy/Meu7yIrWgdMH9phA==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id IYmczv1KkU_P; Sun,  3 May 2026 11:08:54 +0000 (UTC)
-Received: from [10.211.8.206] (unknown [213.147.98.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4g7hq63fFXzlgr41;
-	Sun,  3 May 2026 11:08:49 +0000 (UTC)
-Message-ID: <8abcd4ec-3e62-49d8-8657-f1a1ca925fba@acm.org>
-Date: Sun, 3 May 2026 13:08:47 +0200
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ezzCAw2O"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2ba180a022dso22545ad.1
+        for <linux-block@vger.kernel.org>; Sun, 03 May 2026 08:02:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777820520; x=1778425320; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fnGRoHJD9DIK5jxS2cgW0aYU1wp8JHRLjsfyg7b6pV0=;
+        b=ezzCAw2OfpHY9PBHeNatHTb21QbIJoSO7qETLbtH7vL4gjJT9wuFEq8UqmpWSznkQ8
+         m0Y4fUj5DX+NCz8zqj7g6V1/0CI9v9cmlQf7L/0eGa7vWO/dv/y8ViLJ+ddBVJZsHpuB
+         wRVgCUjXOj6I0iZj356emwZQ6tJkzm/5LEG6iUFc6AUIqCpEHpUDQ+k4TfH/LiwK5fZv
+         RaXs8E08Ljt0DhCAz139jbKQnDLU5Kf/bHjyxEV+jnWBKnUODfBgGGVoOQkEY5Umh7vq
+         /CpmA33/cbvt3/ITUs2XtcKXZTaKxZjXi9MPGzp55xLsJBsTiGRFuubZ63iwjZ40tfUM
+         6DIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777820520; x=1778425320;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fnGRoHJD9DIK5jxS2cgW0aYU1wp8JHRLjsfyg7b6pV0=;
+        b=Ow76dszp35aTYXCBeI7iBicH3pxCuU9dygl1fzcf+Zhzqyazn3mEQjyPr7fB3mBs+b
+         mONOQLjiGOIEONZkdko3ZF0HD3rw3YWMUxlxMIA4cAiqmuMqLodA8xu6LdabaB5qgRiW
+         WcOp4G88uimhWTnuXFYcMkULFeiD9d1HLn2nc+xAcqBqGNa9+9POtYq6BBwQezQj8TVE
+         MqdX4LURjdsgdv23yPDIaqjz7DWH9mkG8kYlDaiACntWPf0gnrfjZEtpPgSufAuAKI9u
+         oUJ9MF+BjdXA6bXWl8SYwo68qFyhvM4vbjqRUHYwbwkEswkW729Q0OCd3M4CajuShgFY
+         AxHQ==
+X-Forwarded-Encrypted: i=1; AFNElJ900oP0ydKN5Ij2xtmL/mhaq5MNyC1rN/TVWaYkOAQR1m+3NNNubXPcrcOjLytvGRFzw7YY/f2iHw0enA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw1iGa4qknAEyjDe7ZE6+Zo4G/gEZvECoiQNjItOf/M++IBQkZ
+	0uek7QNa6VzJtywXEqtQ0HNdByG7b6hAKdqbCo5dwHwn/D9IoJuXfzlQ/SXJNphfYd+40F84y1k
+	yDetlRw==
+X-Gm-Gg: AeBDiet737K13keAXqyMWNI+oXWm9sz2V31SVr8tn+Ya2mBcNhXwHLuFgz/DraaZD8z
+	tyOlyOCey7KyOLBFbka/5MuvcpWsLhWkw/W+y90539HL6Tb5B4lHagZpzZXmsfimmtMZEBx+6J2
+	23nejXpfNF9VNziFnm5lGm0j8PTeH7yFHdjdWGadhZOLY8fDR4hLwhaS4E4c6APJsTGAnXN4HVP
+	rFEfwE9/Zz+TcNdp4AZKeQzuUCFwuyY0p2BS2upDCmah8upmBfWwka2bXceBz3f2tmgv7NZBNEq
+	ESEPGg1zoVmSzNm+hpr83gfkzWlHXrKNMUj/7TbDHIWZw6BMBuyvrrao6Q4D/mnvrmqSCee1TgE
+	MIOsd3H4l0UQEJ0nNTf5oAbXmCP73TQ1mrI2kckA4G3rqrOGZfxeeYdu0QczAQhuypY9dzz9R9r
+	ybMFA9Awo89y7ZUrqsCMhiGccvGcStB8N7bD1aLA9ovk+E6oEWyFm7VMeicFK4QRo7zYS6Vtmoc
+	5W9O/EIfp6mxsg1sdSa7pTwYkD7C5Xto1d92/5nHNa6d25cqR82RaNS7b/6Qpx6zy7Cd2/84n2e
+	6g==
+X-Received: by 2002:a17:903:3c2e:b0:294:ecba:c8e with SMTP id d9443c01a7336-2b9f5801b67mr2523835ad.3.1777820519037;
+        Sun, 03 May 2026 08:01:59 -0700 (PDT)
+Received: from google.com (112.174.16.34.bc.googleusercontent.com. [34.16.174.112])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364f488df2fsm3665907a91.6.2026.05.03.08.01.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 May 2026 08:01:58 -0700 (PDT)
+Date: Sun, 3 May 2026 15:01:53 +0000
+From: Carlos Llamas <cmllamas@google.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>, kernel-team@android.com,
+	linux-kernel@vger.kernel.org,
+	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: restore mempool reserves for non-block
+Message-ID: <afdjYQ1szt_ovq_k@google.com>
+References: <20260503001734.858296-1-cmllamas@google.com>
+ <d8a4d967-ca1b-421c-a452-d440df9535f2@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] blktrace: reject buf_size smaller than blk_io_trace2
-To: Deepanshu Kartikey <kartikey406@gmail.com>, axboe@kernel.dk,
- rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-References: <20260503085519.138360-1-kartikey406@gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260503085519.138360-1-kartikey406@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d8a4d967-ca1b-421c-a452-d440df9535f2@acm.org>
 
-On 5/3/26 10:55 AM, Deepanshu Kartikey wrote:
-> blk_trace_setup() accepts any non-zero buf_size from
-> userspace and passes it directly to relay_open(). If
-> buf_size is smaller than sizeof(struct blk_io_trace2),
-> relay_reserve() always returns NULL and all trace
-> events are silently dropped.
+On Sun, May 03, 2026 at 06:26:48AM +0200, Bart Van Assche wrote:
+> On 5/3/26 2:17 AM, Carlos Llamas wrote:
+> > Fixes: b520c4eef83d ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
+> 
+> Hi Carlos,
+> 
+> Please help with verifying whether this patch series is sufficient:
+> Christoph Hellwig, fix /dev/sg allocation failures register, April 15.
+> This patch series can be found by searching for "b520c4eef83d" on
+> lore.kernel.org.
 
-That's the intended behavior, isn't it?
+Hey Bart,
 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 8cd2520b4c99..20f941495151 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -773,7 +773,7 @@ int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
->   	if (ret)
->   		return -EFAULT;
->   
-> -	if (!buts.buf_size || !buts.buf_nr)
-> +	if (buts.buf_size < sizeof(struct blk_io_trace2) || !buts.buf_nr)
->   		return -EINVAL;
->   
->   	buts2 = (struct blk_user_trace_setup2) {
+I did look for fixes but I totally missed commit 7b03c93d2beb ("scsi:
+sg: Don't use GFP_ATOMIC in sg_start_req()") from mkp tree. Sorry, this
+patch definitely fixes the issue I'm facing. Thanks!
 
-We may be better off not changing this code because there may be users 
-who rely on the current behavior and who will report this change in
-behavior as a regression.
+I actually started with this same approach as there was no apparent
+reason for using GFP_ATOMIC in sg_start_req(), there is even another
+might-sleep call with scsi_alloc_request() a few lines above.
 
-Thanks,
+However, it seemed odd to me that after removing the check added by
+Christoph the mempool allocation would succeed. So there was something
+else besides a failed slab request that made it work. That is how I
+eventually found out about the mempool reserves.
 
-Bart.
+My (very limited) understanding is that mempool_alloc() attempts to
+allocate in the following order: (1) from the slab cache, (2) mempool
+reserves and finally (3) sleep and wait. In this scenario, we now that
+(1) has failed and (3) is not an option because of no-block flags.
+However, mempool reserves are still a valid option.
+
+Anyway, I just wanted to point that out in case the check needs to be
+revisited. I'll cherry-pick the fix from Martin's tree for now.
+
+Cheers!
+--
+Carlos Llamas
