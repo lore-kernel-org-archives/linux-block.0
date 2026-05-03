@@ -1,405 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A79382384;
-	Sun,  3 May 2026 04:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777783505; cv=none; b=Z62IKuA5MocSRRwqYbVTCvXeRp8smuqzjIKHjg4Uu/GQ16CSsv1eZEd/ezctBVQ5Z13neYdr1p2/ewAGzk3yYivLZjMh1YEvfrBJ0FnsMYVsej5/ByuLU1aryMBej1x4tKQoywtwF5Smy5VWuN7xTODzsvKAnHhiaD2zckLYt0I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777783505; c=relaxed/simple;
-	bh=8QD4Lwzvt8FNmmvFD0AeqMXq1xD7kBgIea+D6GZrNeU=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=jPAAZ6wX1RjY6fz7Qajyv/UCt0+UTjhBrhhlzyB6UGOK9UpJTXCuimldrZwCxlIg1oOVrUEvvxGzT9e9/dsX4LqnqQvvSfpMeZqLflsULTtZTS5C7mNZvt9vwdjLp7nD8X8bQiA/pgo2asf5ha+OZNUBTtZpwsPVMELgB6VlbOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tl7gFzts; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E712BE639
+	for <linux-block@vger.kernel.org>; Sun,  3 May 2026 05:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777785245; cv=pass; b=IsN8gfLH8lkwxojQre9gLKmhqln5f1bLsak2rqiS55fZ5F2BUXO9+SD6S6cPT/UZTtTKprSBzSaKjBDOQzE44c/YkPPo9E+tuXU98aBZmJJ+toEWGARFAueS7S81H1x2Xshgqkoe1hgjeJabytEQjhSd4HZHlxvAV8vNkNg08vw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777785245; c=relaxed/simple;
+	bh=Bgg6tRIruHZPLNbPdn4Lx9Egym+DaQ0OL37BLC4LLNg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T0WSXRV51397ahJUszyPgKMypR/iXtRX9Bz4i3dybx1UFML3286WiMM++Y7LAqRJxOToTB5p6GYUEeRLKusukVT7ln/StUmCnjZaUN9bsvUZsMOJWpxiR42c8B9lfHPRtPoRPt3y5eHUymzNgMbNLmF23vkokECiafRD900pvQg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n56N02sv; arc=pass smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tl7gFzts"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0274C2BCC4;
-	Sun,  3 May 2026 04:45:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777783505;
-	bh=8QD4Lwzvt8FNmmvFD0AeqMXq1xD7kBgIea+D6GZrNeU=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=tl7gFztst0qwOA+2BcsacRXN4ukmsrv/nQTeHYu2Whpifa2uAHzSJcogJdhQ5A4TG
-	 6SbS6JusbHvi2pASSGYEycYgtpclXDRJn31h/DYiQvgEwHB8aAlcTqN/N08RBz9iRa
-	 8H/yvGZmPe/d87d/2c1sBCtsj4f147DZobzi6Anjz1mkL3o+AQJsQA6d1iHdgBkwNS
-	 59PJP+G/GxLg+rbNeTxGphThUCh/Cm7xYy7zhW2pOEV4tolgGb1gGHprIMREhqjall
-	 98tDRmIH5ja137H6H4AbADWL4Vz1CXHmqFFy1kj6aCc/Q0GU80im+nvV9E9jjCWQiZ
-	 TZSxM2S4mMTYg==
-Content-Type: multipart/mixed; boundary="===============3913617580182485502=="
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n56N02sv"
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79ab5fd969aso33042087b3.0
+        for <linux-block@vger.kernel.org>; Sat, 02 May 2026 22:14:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777785242; cv=none;
+        d=google.com; s=arc-20240605;
+        b=crNGlAAJ146eSuKORPxuRobpC2rPYoYPrhWY4bHw/nroU2ymI4UnbfUdB3Y8oNX/8R
+         8U5Rfo1rPP8Oh80YStJpo7njSM2QRwPd5j2Lh40xHa/p3KvMFF4pDh5TL7cQy1o97NzU
+         VHj6/c9KjAUqJYZokI1Mui3OnT40y086zJ0yKC1RoltGZfylzmogrNrlBK7xMYBAiBfV
+         I2LcGKVJTP6sPkamBs5gJYflm8Ec9JCrnXEL7r7R5AmObtQxklXNI1TzS9UORaCrBCjj
+         mrxLAOI4r7Hb4guwWvi0ixj8yvYOP+AYm6by+ssqjeckhtpQM16cxqsNpnN0pBZiFHDg
+         LAHw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zdcGJAM8jBlmLda8jFwuK8SYIvIOeidaOnoqCWXbNc8=;
+        fh=TmmmctC9SqUPSW9kGDwXHtd2SkwnRbZxBQabsLDy5MA=;
+        b=KlzNc4bYFe3BjvQbX/osgfcMRF1aQYDN24jiJqU+BcEMnjoUkych2KE5wnx8FMpZM8
+         1p1Tu0x17JqsPf/E7sk+stpzyKBmZ/c/e1N8+GmtKF9nkQIJ9XC/N0loHkIXO6XvQSEB
+         QE0J10dW2ysEKx5ZBGN7Mpoq1G3XIk2Y7RynwzJ+UNr538bmN3jefQjfpM5CoF0KmgKK
+         7oETvUvYwDrT+XYDH0YwcJasHHHV4Zvry5TsDNTjsre7Xxmw54/HA1ahAotYbLtqqV0Q
+         gldCtWuPJz08sOAAZKtzymZa16hQtQXUuGEAAkgx6Z+e5+JgGs8GyZM8j9Ey0j84KPxg
+         YnGQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777785242; x=1778390042; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zdcGJAM8jBlmLda8jFwuK8SYIvIOeidaOnoqCWXbNc8=;
+        b=n56N02svaLVEkuXKSURdyLtwh1ajI7G22Ud1EveZ3FsN+ADYXaGntY1aUlS0EBg2Ul
+         aP+/3MWvgA0xksIkv4JcE1QMbOciHc65gYlD0fE0+9F5kHGxWhznefbI1wh5ky/mrr6g
+         Gl+uO50aIXhIupcw8Fe9h/AYdEHL3whB3lX2mXlT2/fsLqmr4jA3QgsD/tp219ftMAC3
+         WrIUCkmKtsvw/1Ba1gPvS9jIXRROiiN6qYhGjFTY+l3mbArz+toXHGCxFjV8STaLsIIn
+         iDSUrYUsMAioBAkHOyJNl2tzoK83ffW1QmYJhtPYngTWRisF21SJChFSHQYNRPvQrcNE
+         rgbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777785242; x=1778390042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zdcGJAM8jBlmLda8jFwuK8SYIvIOeidaOnoqCWXbNc8=;
+        b=FeGSYuiwqCe4qzcu4Z2j1VGyVoXCV3fCmLOgGTYmbml7+0W01Bvf2vqfjtqOJhO22+
+         w6Nyy1Q1tW+p62CjcOI6L+deWTXV3iamwZc1Jp3fIWwoWgmHWlB5as6PDA+fagnMQ70/
+         py2dZKDE2z1V8GDJ0++t4dpdyQ2zW+6r7RmV8KPpHiH01tBFvGaU+eM9nzG99CQJb7MQ
+         F0kyHJmuKnx7BOrPpGCCsWNmMSzz7HMcLYypsY8CDcJ/st7Zf9tM9zztTJTaUI67b+vQ
+         0usx1Xfoo5b8GvHpAIRQNAENKU3iTcK6j6YvK6a2cNSceE5qfV1Qc3U4by3CAkv+l1k3
+         5wJQ==
+X-Gm-Message-State: AOJu0YysX3z3pBZSm2JcjIjitzzRhJnNCijKe8MuTSEWizPykBumt8WR
+	EJc7SxzcEZxZvtbhz33OqQy18R3zirvTHuR/gydctt7CwDtdV6NPMLeRzUpf/OGfFVE/dKb8FYO
+	AjoD91xYZU+4KBe7o/hjFaMjDimgS1hQ=
+X-Gm-Gg: AeBDieur3DyrKjBhNIVbSRjgGV3p1vUhyQc52EqVSSXrEcqnSYp6C9Zx1mvs7f5qiSA
+	0SCm9lVRmu9MQd26i4PlwluLP2Q2bu8hmob+7jdtIEJA4o/uH9BloEEkKXoF0+mCh1q8xiYbb1X
+	DW+RQwJW2iqsKrzjmL2Ivn0rv6BBwuqITn6/RRGCXYuUsSU2FU64uAdi8DG9H80DGPOs/IVwMvy
+	WMzMRfGJPlte3WDPqSvK+6oPFNcNQMcsiLLsiSIcdKYVbCtUXMKSuFfBclFSsfsc8cpAZNEvdoc
+	9GExLcL3+/Q0OAHo0wYCj4KUgxgQLUMNKCtikk8yNtvpB0mCFoufNMNynNShIkH5XuAR7ldUCW4
+	tvEf56zUEd8ttXtXwnw==
+X-Received: by 2002:a05:690c:6d82:b0:7bd:8952:132e with SMTP id
+ 00721157ae682-7bd89521822mr5806557b3.3.1777785241772; Sat, 02 May 2026
+ 22:14:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <66924eebcf2a5bac23e4050d6a82a7ed75e89b935b9411d25789cfa575815577@mail.kernel.org>
-In-Reply-To: <20260503035623.28771-3-kaitao.cheng@linux.dev>
-References: <20260503035623.28771-3-kaitao.cheng@linux.dev>
-Subject: Re: [RFC v2 2/3] block: Introduce the UFQ I/O scheduler
-From: bot+bpf-ci@kernel.org
-To: kaitao.cheng@linux.dev,axboe@kernel.dk,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,memxor@gmail.com,song@kernel.org,yonghong.song@linux.dev,jolsa@kernel.org,john.fastabend@gmail.com
-Cc: bpf@vger.kernel.org,linux-block@vger.kernel.org,linux-kernel@vger.kernel.org,chengkaitao@kylinos.cn,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Sun,  3 May 2026 04:45:02 +0000 (UTC)
+References: <20260322051838.1137822-1-kartikey406@gmail.com>
+In-Reply-To: <20260322051838.1137822-1-kartikey406@gmail.com>
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+Date: Sun, 3 May 2026 10:43:50 +0530
+X-Gm-Features: AVHnY4Ly-1cUEeK9MYq7ONu9W8AXSkGhiqNuKIo0E-YsZ8okhaz5G4KdNlAZAqs
+Message-ID: <CADhLXY6uKPhLHTYysPLnK+sy=ZEq-7hGN2rwbzaoHdHj7LfmGA@mail.gmail.com>
+Subject: Re: [PATCH] blktrace: reject buf_size smaller than blk_io_trace
+To: axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, 
+	syzbot+ed8bc247f231c1a48e21@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============3913617580182485502==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-> diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
-> --- a/block/Kconfig.iosched
-> +++ b/block/Kconfig.iosched
-> @@ -44,4 +44,12 @@
->  	Enable some debugging help. Currently it exports additional stat
->  	files in a cgroup which can be useful for debugging.
+On Sun, Mar 22, 2026 at 10:48=E2=80=AFAM Deepanshu Kartikey
+<kartikey406@gmail.com> wrote:
 >
-> +config IOSCHED_UFQ
-> +	tristate "UFQ I/O scheduler"
-> +	default y
-> +	help
-> +	The UFQ I/O scheduler is a programmable I/O scheduler. When
-> +	enabled, an out-of-kernel I/O scheduler based on eBPF can be
-> +	designed to interact with it, leveraging its customizable
-> +	hooks to redefine I/O scheduling policies.
->  endmenu
-> diff --git a/block/Makefile b/block/Makefile
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -24,6 +24,7 @@
->  obj-$(CONFIG_MQ_IOSCHED_KYBER)	+= kyber-iosched.o
->  bfq-y				:= bfq-iosched.o bfq-wf2q.o bfq-cgroup.o
->  obj-$(CONFIG_IOSCHED_BFQ)	+= bfq.o
-> +obj-$(CONFIG_IOSCHED_UFQ)	+= ufq-iosched.o ufq-bpfops.o ufq-kfunc.o
+> blk_trace_setup() accepts any non-zero buf_size.
+> If buf_size < sizeof(struct blk_io_trace), relay_reserve()
+> always returns NULL and all trace events are silently dropped.
 >
->  obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o \
->  				   bio-integrity-fs.o
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -774,8 +774,8 @@
->   * For non-mq, this has to be called with the request spinlock acquired.
->   * For mq with scheduling, the appropriate queue wide lock should be held.
->   */
-> -static struct request *attempt_merge(struct request_queue *q,
-> -				     struct request *req, struct request *next)
-> +static struct request *attempt_merge(struct request_queue *q, struct request *req,
-> +				     struct request *next, bool nohash)
->  {
->  	if (!rq_mergeable(req) || !rq_mergeable(next))
->  		return NULL;
-> @@ -842,7 +842,7 @@
+> Reject such values early with -EINVAL.
 >
->  	req->__data_len += blk_rq_bytes(next);
+> Reported-by: syzbot+ed8bc247f231c1a48e21@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Ded8bc247f231c1a48e21
+> Signed-off-by: Deepanshu Kartikey <Kartikey406@gmail.com>
+> ---
+>  kernel/trace/blktrace.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> -	if (!blk_discard_mergable(req))
-> +	if (!nohash && !blk_discard_mergable(req))
->  		elv_merge_requests(q, req, next);
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 8cd2520b4c99..6cc7d83ed1c2 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -773,7 +773,7 @@ int blk_trace_setup(struct request_queue *q, char *na=
+me, dev_t dev,
+>         if (ret)
+>                 return -EFAULT;
 >
->  	blk_crypto_rq_put_keyslot(next);
-> @@ -879,11 +879,17 @@
->  	struct request *prev = elv_former_request(q, rq);
+> -       if (!buts.buf_size || !buts.buf_nr)
+> +       if (buts.buf_size < sizeof(struct blk_io_trace) || !buts.buf_nr)
+>                 return -EINVAL;
 >
->  	if (prev)
-> -		return attempt_merge(q, prev, rq);
-> +		return attempt_merge(q, prev, rq, false);
+>         buts2 =3D (struct blk_user_trace_setup2) {
+> --
+> 2.43.0
 >
->  	return NULL;
->  }
->
-> +struct request *bpf_attempt_merge(struct request_queue *q, struct request *rq,
-> +				  struct request *next)
-> +{
-> +	return attempt_merge(q, rq, next, true);
-> +}
 
-CONFIG_IOSCHED_UFQ is a tristate option so the UFQ modules can be built
-with CONFIG_IOSCHED_UFQ=m. However bpf_attempt_merge has no EXPORT_SYMBOL
-or EXPORT_SYMBOL_GPL declaration. When built as a module,
-ufq-iosched.ko calls this function in ufq_try_insert_merge and
-ufq-kfunc.ko calls it in bpf_request_try_merge, causing a linker failure
-("undefined reference to bpf_attempt_merge"). Should EXPORT_SYMBOL_GPL be
-added here, or should CONFIG_IOSCHED_UFQ be changed to a bool?
+Gentle ping on this patch . Let me know the status of this patch
 
->
->  /*
->   * Try to merge 'next' into 'rq'. Return true if the merge happened, false
-> @@ -1035,11 +1041,11 @@
->  	return BIO_MERGE_FAILED;
->  }
->
-> -static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
-> -						   struct request *rq,
-> -						   struct bio *bio,
-> -						   unsigned int nr_segs,
-> -						   bool sched_allow_merge)
-> +enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
-> +					    struct request *rq,
-> +					    struct bio *bio,
-> +					    unsigned int nr_segs,
-> +					    bool sched_allow_merge)
->  {
->  	if (!blk_rq_merge_ok(rq, bio))
->  		return BIO_MERGE_NONE;
-
-blk_attempt_bio_merge is changed from static to externally linked and is
-called from ufq-iosched.c (ufq_bio_merge) and ufq-kfunc.c
-(bpf_request_bio_try_merge). Since CONFIG_IOSCHED_UFQ is tristate, these
-callers can be built as modules, but blk_attempt_bio_merge has no
-EXPORT_SYMBOL or EXPORT_SYMBOL_GPL. When CONFIG_IOSCHED_UFQ=m, the
-modules will fail to link with "undefined reference to
-blk_attempt_bio_merge". Should EXPORT_SYMBOL_GPL be added, or should
-CONFIG_IOSCHED_UFQ be restricted to bool?
-
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -796,7 +796,7 @@
->  	}
->  }
->
-> -static void __blk_mq_free_request(struct request *rq)
-> +void __blk_mq_free_request(struct request *rq)
->  {
->  	struct request_queue *q = rq->q;
->  	struct blk_mq_ctx *ctx = rq->mq_ctx;
-
-__blk_mq_free_request is changed from static to externally linked and is
-called from ufq-iosched.c (ufq_dispatch_request, ufq_try_insert_merge)
-and ufq-kfunc.c (bpf_request_release). CONFIG_IOSCHED_UFQ is tristate so
-these callers can be modules, but __blk_mq_free_request has no
-EXPORT_SYMBOL declaration. With CONFIG_IOSCHED_UFQ=m the modules will
-fail to link ("undefined reference to __blk_mq_free_request"). Should
-EXPORT_SYMBOL_GPL be added here, or should CONFIG_IOSCHED_UFQ be
-restricted to bool?
-
-[ ... ]
-
-> diff --git a/block/ufq-bpfops.c b/block/ufq-bpfops.c
-> --- /dev/null
-> +++ b/block/ufq-bpfops.c
-> @@ -0,0 +1,241 @@
-
-[ ... ]
-
-> +static int bpf_ufq_enable(void *ops)
-> +{
-> +	ufq_ops = *(struct ufq_iosched_ops *)ops;
-> +	atomic_set(&ufq_bpfops_enabled, 1);
-> +	return 0;
-> +}
-> +
-> +static void bpf_ufq_disable(struct ufq_iosched_ops *ops)
-> +{
-> +	atomic_set(&ufq_bpfops_enabled, 0);
-> +	wait_event(ufq_bpfops_wq, !atomic_read(&ufq_bpfops_users));
-> +	memset(&ufq_ops, 0, sizeof(ufq_ops));
-> +}
-
-Is a memory barrier needed between atomic_set(&ufq_bpfops_enabled, 0) and
-the first atomic_read(&ufq_bpfops_users)?
-
-Looking at ufq_bpfops_tryget:
-
-  atomic_inc(&ufq_bpfops_users);
-  smp_mb__after_atomic();
-  if (unlikely(!atomic_read(&ufq_bpfops_enabled))) {
-      if (atomic_dec_and_test(&ufq_bpfops_users))
-          wake_up_all(&ufq_bpfops_wq);
-      return NULL;
-  }
-  return &ufq_ops;
-
-The inc/mb/read sequence on the reader side pairs with a store/mb/read
-on the disable side. But bpf_ufq_disable only has:
-
-  atomic_set(&ufq_bpfops_enabled, 0);
-  wait_event(..., !atomic_read(&ufq_bpfops_users));
-
-The wait_event macro expands to an immediate condition check before
-acquiring the wait queue lock. Without a barrier between the store to
-enabled and the first load of users, Store-Load reordering can allow the
-disable path to observe users == 0 while a concurrent reader observes
-enabled == 1 and returns &ufq_ops. This creates a window where the
-disable path proceeds to memset(&ufq_ops, 0, ...) while a reader is
-returning the pointer to a caller who will immediately dereference it,
-resulting in a NULL function pointer dereference.
-
-Should smp_mb__after_atomic() be added after the atomic_set in
-bpf_ufq_disable?
-
-> +static bool bpf_ufq_is_valid_access(int off, int size,
-> +				    enum bpf_access_type type,
-> +				    const struct bpf_prog *prog,
-> +				    struct bpf_insn_access_aux *info)
-> +{
-> +	if (type != BPF_READ)
-> +		return false;
-> +	if (off < 0 || off >= sizeof(__u64) * MAX_BPF_FUNC_ARGS)
-> +		return false;
-> +	if (off % size != 0)
-> +		return false;
-> +
-> +	/*
-> +	 * btf_ctx_access() treats pointers that are not "pointer to struct"
-> +	 * as scalars (no reg_type), so loading pointers like merge_req()'s
-> +	 * int *type or merge_bio()'s bool *merged from ctx leaves a SCALAR
-> +	 * and stores through them fail verification. Model both as writable
-> +	 * buffers.
-> +	 */
-> +	if (size == sizeof(__u64) && prog->aux->attach_func_name &&
-> +	    ((!strcmp(prog->aux->attach_func_name, "merge_req") && off == 16) ||
-> +	     (!strcmp(prog->aux->attach_func_name, "merge_bio") && off == 24))) {
-> +		if (!btf_ctx_access(off, size, type, prog, info))
-> +			return false;
-> +		info->reg_type = PTR_TO_BUF;
-> +		return true;
-> +	}
-
-The merge_req and merge_bio ctx offsets at 16 and 24 are overridden to
-PTR_TO_BUF so BPF programs can store through the int *type and bool
-*merged pointers. However info->reg_type is set without populating any
-size or range field (such as info->mem_size or a MEM_FIXED_SIZE marker).
-
-The verifier's check_buffer_access only enforces off >= 0 and rejects
-variable offsets; it does not clamp the access to any declared buffer
-size. This allows a BPF program to compute ptr + K for large K and write
-beyond the stack object.
-
-The kernel callers pass real stack variables:
-
-  ufq_try_insert_merge: &merge_type (4-byte int)
-  ufq_bio_merge: &ret (1-byte bool)
-
-A BPF program could issue *(type + 1024) = 0 which would be accepted by
-the verifier (constant offset, non-negative, PTR_TO_BUF) but write to
-stack memory beyond the local variable, corrupting saved registers or
-frame pointers.
-
-Other subsystems mark such buffers with PTR_TO_MEM | MEM_FIXED_SIZE and
-set info->mem_size, or use kfuncs with explicit size arguments. Should a
-declared size be added here, or should these be redesigned as kfunc
-parameters?
-
-[ ... ]
-
-> diff --git a/block/ufq-iosched.c b/block/ufq-iosched.c
-> --- /dev/null
-> +++ b/block/ufq-iosched.c
-> @@ -0,0 +1,640 @@
-
-[ ... ]
-
-> +static int ufq_init_sched(struct request_queue *q, struct elevator_queue *eq)
-> +{
-> +	const struct ufq_iosched_ops *ops;
-> +	struct ufq_data *ufq;
-> +
-> +	ufq = kzalloc_node(sizeof(*ufq), GFP_KERNEL, q->node);
-> +	if (!ufq)
-> +		return -ENOMEM;
-> +
-> +	eq->elevator_data = ufq;
-> +	ufq->q = q;
-> +	INIT_LIST_HEAD(&ufq->active_node);
-> +
-> +	blk_queue_flag_set(QUEUE_FLAG_SQ_SCHED, q);
-> +	q->elevator = eq;
-> +
-> +	q->async_depth = q->nr_requests;
-> +	ufq->async_depth = q->nr_requests;
-> +
-> +	ops = ufq_bpfops_tryget();
-> +	if (ops) {
-> +		if (ops->init_sched)
-> +			ops->init_sched(q);
-> +		ufq_bpfops_put();
-> +	}
-
-The ops->init_sched(q) call here discards the return value. The
-ufq_iosched_ops struct defines init_sched with signature 'int
-(*init_sched)(struct request_queue *q)', intending it to signal errors.
-
-If a BPF init_sched returns an error (for example -ENOMEM from a failed
-per-queue allocation), ufq_init_sched continues, returns 0, and registers
-the queue on ufq_active_queues with the BPF program in an inconsistent
-state. The BPF program believes initialization failed while the kernel
-believes the queue is active. Later ops->insert_req / ops->dispatch_req
-calls will run against uninitialized BPF state.
-
-Other block elevators (blk-mq-sched.c, blk_mq_init_sched) check the
-return value and roll back on error (teardown tags, free structures,
-clear q->elevator). Should the return value be checked here and the error
-propagated?
-
-[ ... ]
-
-> diff --git a/block/ufq-kfunc.c b/block/ufq-kfunc.c
-> --- /dev/null
-> +++ b/block/ufq-kfunc.c
-> @@ -0,0 +1,131 @@
-
-[ ... ]
-
-> +__bpf_kfunc struct request *bpf_request_try_merge(struct request *rq, struct request *next)
-> +{
-> +	struct blk_mq_ctx *ctx;
-> +	struct ufq_data *ufq;
-> +	struct request *free;
-> +
-> +	if (!rq || !next || !rq->q || rq->q != next->q)
-> +		return NULL;
-> +
-> +	ufq = rq->q->elevator->elevator_data;
-> +	if (!ufq)
-> +		return NULL;
-> +
-> +	if (rq->mq_ctx != next->mq_ctx || rq->mq_hctx != next->mq_hctx)
-> +		return NULL;
-> +
-> +	ctx = rq->mq_ctx;
-> +	if (!ctx)
-> +		return NULL;
-> +
-> +	spin_lock(&ctx->lock);
-> +	free = bpf_attempt_merge(rq->q, rq, next);
-> +	if (free) {
-> +		if (rq->q->last_merge == free)
-> +			rq->q->last_merge = NULL;
-> +		list_del_init(&free->queuelist);
-> +		atomic_dec(&ufq->rqs_count);
-> +	}
-> +	spin_unlock(&ctx->lock);
-> +
-> +	return free;
-> +}
-
-[ ... ]
-
-> +BTF_KFUNCS_START(ufq_kfunc_set_ops)
-> +BTF_ID_FLAGS(func, bpf_request_acquire, KF_ACQUIRE | KF_RET_NULL)
-> +BTF_ID_FLAGS(func, bpf_request_release, KF_RELEASE)
-> +BTF_ID_FLAGS(func, bpf_request_bio_try_merge, KF_SPIN_LOCK)
-> +BTF_ID_FLAGS(func, bpf_request_try_merge, KF_SPIN_LOCK)
-> +BTF_KFUNCS_END(ufq_kfunc_set_ops)
-
-bpf_request_try_merge returns 'struct request *' and has multiple NULL
-return paths (!rq, !next, !ufq, mq_ctx/mq_hctx mismatch, !ctx, merge
-failure). The kfunc is annotated with KF_SPIN_LOCK but lacks KF_RET_NULL.
-
-Without KF_RET_NULL the verifier treats the return value as a non-NULL
-pointer and allows BPF programs to dereference it unconditionally. When
-the kfunc returns NULL at runtime, the BPF program dereferences NULL and
-causes a kernel crash.
-
-bpf_request_acquire is correctly annotated with 'KF_ACQUIRE |
-KF_RET_NULL'. Should bpf_request_try_merge also have KF_RET_NULL (or
-'KF_SPIN_LOCK | KF_ACQUIRE | KF_RET_NULL')?
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/25269522212
---===============3913617580182485502==--
+Thanks
