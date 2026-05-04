@@ -1,80 +1,71 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7E218DB1F
-	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 03:26:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC631E7C23
+	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 03:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777865163; cv=none; b=fXx/uMsEWMvVFlqbMzoipa9y6fSQ7JqdYFWxN8CwIePmn8OQ1isGZ6Y8/Va9k0RkPZntqF1YZJ56bScXVDS6KIdD6DDYXeCJpn7Yn6vL1q1neWexmaNfuIgdHZm29LjJ2KNVRV1cd1VEftN4T+n4lpn7XZ1mvEj2A62gbJV1NSE=
+	t=1777865354; cv=none; b=cvp9I6nvSjDYV0ajUyOuc9NU8YzoRjJEY6pDFKq+KoDyKcutzPYfpMhJoaKh5YfOLKxlnKOHsRAFTdB7kMw42szYdKevuHGGYUYywBjDAG+WESnk5Sa2Nsbw02Wr0W7gfdBUbmrdPkk8DWRncWQiYDiatqjJFNO99lwcyBuHJ8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777865163; c=relaxed/simple;
-	bh=lgP9nc8xg9Hh45JT0BP15Lj2a1lG76uxk3hmVagthBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kh1vDE0NhaWd2hdLCZUpRXeZVz/+2fYe8oQjxjJXH3Uh9LGnUbMD9xmDVT/T51fgWTEaCbiMek5hLTYb6vpD5cSVXm5+cFH/dne0LecRpBvi6ql1i0BPBhldFYqdwUtiQiOnLPf7nPlv6+hIhcqfVrcwM74ftHFY74KmUbWMINI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dH9rAMT5; arc=none smtp.client-ip=209.85.215.180
+	s=arc-20240116; t=1777865354; c=relaxed/simple;
+	bh=e3c1aJi9cdRikhG1TAYQtDgXPR7Exc/+fRN0Oa3H2c0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UrHzYW7s8ohoq1+1DMtC+61c44JqUb9up3hsqK2qoZ7eM6kNA125+S/aXmkdtbn4hTCpMa+r9av2FlztFZSPtHmOYpljhZTClRiTfF5ruQ+/8WPUr5ZNxLbTlEAdvCgrbSp/scAq7V3fROUiybFb33ijdzUBQdnE5Gc3zTzgp8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AnKtApdR; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dH9rAMT5"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c70e3eb3af1so105623a12.2
-        for <linux-block@vger.kernel.org>; Sun, 03 May 2026 20:26:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnKtApdR"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82f8b60e54dso2733544b3a.2
+        for <linux-block@vger.kernel.org>; Sun, 03 May 2026 20:29:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777865161; x=1778469961; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1777865352; x=1778470152; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sHXTY9sLnF1K25ZmkWpIUiO8YMQuEQwzanxq/iB+EKM=;
-        b=dH9rAMT5jvlx9Mn25Ar6ztuF/W2gRAIoOf8LbbDWJRuMXJkHF0KbDUaZbUMmsENnLa
-         +QsKdtXpNoKAquRpq+Tp+wxWoOZRxFAX47VEAoZKtVM+TANvGKEbH604izdq3Q5qblEr
-         YR8ImQQYhqh8lUSmcXBWM9A/aUAv1mGZ7b6rybOgFGv3bqvfJVLwEIbA0TdRNnk4/h8o
-         djjY8AI88hVYtT6M6NdsfIRwwYr8bu1vVz1KbA9yjj3eSPocspU8lw7gsN0Nf0veWGV2
-         TlTBUd5I4DPLmfnrTqctNXbN3cn5YsaFcXWR4GPI/pYF0SpsPPMyxDX3AzQ/DH2MScV+
-         Jueg==
+        bh=Z41zW/n/iQloyMt7R2rXQjfcS9X6TQ9nrqVkTfnUhDQ=;
+        b=AnKtApdRcEFYzL25TQaksEwTl+ktUsR3Q8opMNnMxpWgKDEBeN/tVCd57yBod6exy0
+         PddBrNumcLG7xjaWQ6BlrOepHty1HWJa1CeAb8k8yNJXc664RuZXg/rpYEbZyd1bKdzQ
+         BzD+Fqzrh8+ftchnNKLrlR3WSKIzA3f5xzeNYivWum/E7NV7jYPyQL2jc2L9daPuIXw4
+         6QL5w/2oairtZ2IbDL1AWUt56pmShgHzr+InSZhVDA95UbjYSknySTSA55K0mLnceJvm
+         RG5CQniPsSQJyiLZs6sV8Cynt3d3s33aL/CZ6S1KJ+oNUVEry0v3voVfoSW3B92bkbOm
+         efRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777865161; x=1778469961;
+        d=1e100.net; s=20251104; t=1777865352; x=1778470152;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sHXTY9sLnF1K25ZmkWpIUiO8YMQuEQwzanxq/iB+EKM=;
-        b=Unw8VvTQp9n3c4gWS05aLvZS1+souLUCogG1ulbHlivyIJRYNM+EDIAp8Oj1qTwvZ1
-         BHodqqWN+9Mw9IikeXDfdy+oD3znPs0KNchbygynBFr1A7QhU+X8gk7KAq7CBwdi+5/t
-         H7F58wdw3OJxykvvTlC0UDMvr9TQGU4IX1wqRKowU5lbWkL3FS97z1Z6My16Gnk1ZvlR
-         Rgj/wZQxcUhRu+PglnAZGQAaf99YmeFc07lwAHQ7QWcnoXSXXnpc0jyo+Oa4F2RkWdOu
-         Kr0l8kvDRMbalishyKp7dNrqYHrSr9lVFhYEtFFIRCtHg8hPs3g33EXHTpAOTP0xNrKl
-         h22w==
-X-Forwarded-Encrypted: i=1; AFNElJ/tLuskEMohBem1HW3N0d0S3LRA7lFHURii/Cf6n7BDBt6n9eMWKj7duU6lxSlNxzwUOdfYPaySyORvwQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyej61lTDMN+edQrEWlNudGbfrHvfjIXHGta9FeIHvzetDuKrDI
-	jRzvy5HMuXanBNhvm7F7m2RLaxJrCdVbZcnyo5y4iDtnYUis2OcZ6lBi
-X-Gm-Gg: AeBDietXW59UkYk9PLThJdGh5dtHMm7cE2YzRFCh0D30YFLmSBuDDywuZNK/prNPVl6
-	4zgKdW1KykNqTeO3sqgxBGx6RTIz/Lb9FZjtLecQC0TpeDhsrMMx/NPVCgSyxWqzmOz8W0E3hua
-	kd6COOH8TgTJlL4VDiTSgcWm8In7RtecGQtVLfrDXvgN+Sg7pgAiAA3U8jITeC3Fl+LAIeFh3zg
-	lLcZ+H6UE9em0gwl4F650/gs59r0tY+Z1sTDkoKDkHQZ7mYo3yueX2mWQmDlWl9Ij2IKNhh6WY+
-	gnC5RNJflu1Mfos5jmMpBbIzzp3U1I+047gc77BPEKg+pGoa1XQLVpOvX3TlLfIBYTrkfyKdrob
-	xYxwhr2xeGQIEeLbQA7wXAjIINg9lnRbTCovA7WUJpiCpTyGg+N7ivFJzfat4BBMedSBcDejBO7
-	wX/F4UW4Tn2GDXUFN1Um1aA+e8L94WYEGptlm0hd0bvg==
-X-Received: by 2002:a05:6a00:1490:b0:835:45bf:965a with SMTP id d2e1a72fcca58-83545bf98a7mr2082260b3a.7.1777865161249;
-        Sun, 03 May 2026 20:26:01 -0700 (PDT)
-Received: from b330-MS-7D46.. ([122.192.219.205])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515acfbb5sm10165651b3a.34.2026.05.03.20.25.57
+        bh=Z41zW/n/iQloyMt7R2rXQjfcS9X6TQ9nrqVkTfnUhDQ=;
+        b=qHmdqQSaRG3dSwL4x6oalMskzUa9p+z29Dx1yVVDPBGXFsx4U8wIJrvccC5QAzDva+
+         iXiYEHXy7u+XMy+LbQ3VvJnFQR0Fp20j7t6qZHMgDWAouv+0lvC8ZJKtGrFrt1NEb802
+         rrD9987ikTUhxjvQtdoVwjlRnceIIzxLDFD928wT92sfi7ltpiHxH0pDnONpdwRUwPmf
+         27FN1bap7Rb5QuSOrtB/iOR4VJozpiHiISGV7upvo5RFLAQvP7JpGsVKOflwvjWMlSW9
+         3D0MTdXCpdDLL41+jTQjD0nH5NKxs+INv5SiT8PzBO/Ozokuj66/FsHvcbFODIylpNue
+         yGfg==
+X-Gm-Message-State: AOJu0YyBLj+2hqcXg/I8ylE9MFuVQ/GX3C0MCNBhjbDoOCi4jiVzx5q1
+	ojQJWyPCkyS064QkzcmXekKPz2fmtQTnNIhFxq6GULzVwCuYVL1bwPUs
+X-Gm-Gg: AeBDietP7D9Z+Q5CSeZSvO1NUYO5k4iO0/ZPIRzT7UJbjKKEnTemeM3Cmkn+am2ybUw
+	ArgnLO3T+hAhGEG5iLBDGqEUeDirVmgMAic4Dbel475IRSTZAOhuq08f9u/a1bWfi+9NmRd0M5R
+	hBG9GQ6CCqqvZBjnCTQmRFr7Yfe0SgO/pUAasQjgLSdZwH6A8LIXy2melj22Jp8ITH4qhtp1Bq4
+	VEAXhwC1CrDeOGQSqRioUO0Yg4ionJIecSoWC5ifEnLTcG4i05BQMv9mneSdJKYqHJzhn5Wm8QZ
+	IrP420rLUfyZsMcvdzTXsRgBL4KtdAFjiZ5AJd/3EsP/aM1b3XTYQNv4Xbxi0njk6qxkTWtpAcl
+	Y5qZjWCdKcSnSqIUwiRGYFWx03iSsEATIdO6cHM5OW1JjpfAqL0n2KBRwsrA6q3fIM+4l+XqwwG
+	PvMwFHAalp1o7tJ/VWDqkqZVigWss7
+X-Received: by 2002:a05:6a00:4286:b0:837:7e7d:3d2 with SMTP id d2e1a72fcca58-8377e7d086bmr2405512b3a.31.1777865352437;
+        Sun, 03 May 2026 20:29:12 -0700 (PDT)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83515ad0183sm11128941b3a.31.2026.05.03.20.29.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 May 2026 20:26:00 -0700 (PDT)
-From: Ziyu Zhang <ziyuzhang201@gmail.com>
-To: philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com
-Cc: axboe@kernel.dk,
-	drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
+        Sun, 03 May 2026 20:29:12 -0700 (PDT)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: efremov@linux.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	baijiaju1990@gmail.com,
-	r33s3n6@gmail.com,
-	gality369@gmail.com,
-	zhenghaoran154@gmail.com,
-	hanguidong02@gmail.com,
-	zzzccc427@gmail.com,
-	Ziyu Zhang <ziyuzhang201@gmail.com>
-Subject: [PATCH] drbd: serialize UUID snapshot in drbd_md_write()
-Date: Mon,  4 May 2026 11:25:50 +0800
-Message-ID: <20260504032550.706749-1-ziyuzhang201@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Cen Zhang <zzzccc427@gmail.com>
+Subject: [PATCH] floppy: select FDC before arming timeout work
+Date: Mon,  4 May 2026 11:28:53 +0800
+Message-Id: <20260504032853.316099-1-zzzccc427@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,51 +74,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-drbd_md_write() copies device->ldev->md.uuid[] into the on-disk
-metadata block without holding uuid_lock.
+floppy_shutdown() uses current_fdc to choose which controller state
+to mark for reset when fd_timeout expires. lock_fdc() currently arms
+that timeout before set_fdc() has selected the drive/FDC and updated
+current_drive/current_fdc.
 
-The write-side helpers drbd_uuid_new_current() and drbd_uuid_set_bm()
-update md.uuid[] under uuid_lock, and some updates span multiple UUID
-slots as one logical state transition. An unlocked drbd_md_write() can
-therefore observe and persist a mixed UUID tuple assembled from two
-different states.
+drive_params[drive].timeout is user configurable, so the timeout
+can be immediate. Even with a non-zero timeout, a delayed caller can
+leave the timeout work running while set_fdc() is still testing
+fdc_state[fdc].rawcmd and updating the adjacent reset bitfield. The
+timeout can then use stale selected-controller state or race the reset
+bitfield update.
 
-This is problematic because the serialized UUID tuple is written to
-stable storage and later consumed by reconnect and resync decision
-logic, meaning an inconsistent on-disk snapshot can represent a state that
-never existed atomically in memory.
+Move the timeout arm after set_fdc() in lock_fdc(), and keep the
+same ordering for the direct floppy_queue_rq() path. This ensures
+fd_timeout cannot run until the selected-controller state describes
+the operation being timed.
 
-Protect the UUID copy with uuid_lock so drbd_md_write() serializes one
-coherent snapshot.
-
-Fixes: b411b3637fa7 ("The DRBD driver")
-Signed-off-by: Ziyu Zhang <ziyuzhang201@gmail.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
- drivers/block/drbd/drbd_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/block/floppy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index a9e49b212..6f835dd05 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -3004,13 +3004,17 @@ void drbd_md_write(struct drbd_device *device, void *b)
- {
- 	struct meta_data_on_disk *buffer = b;
- 	sector_t sector;
-+	unsigned long flags;
- 	int i;
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 92e446a64371..f9b924a2f276 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -894,8 +894,8 @@ static int lock_fdc(int drive)
  
- 	memset(buffer, 0, sizeof(*buffer));
+ 	command_status = FD_COMMAND_NONE;
  
- 	buffer->la_size_sect = cpu_to_be64(get_capacity(device->vdisk));
-+	/* Serialize the UUID tuple as one coherent snapshot. */
-+	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
- 	for (i = UI_CURRENT; i < UI_SIZE; i++)
- 		buffer->uuid[i] = cpu_to_be64(device->ldev->md.uuid[i]);
-+	spin_unlock_irqrestore(&device->ldev->md.uuid_lock, flags);
- 	buffer->flags = cpu_to_be32(device->ldev->md.flags);
- 	buffer->magic = cpu_to_be32(DRBD_MD_MAGIC_84_UNCLEAN);
+-	reschedule_timeout(drive, "lock fdc");
+ 	set_fdc(drive);
++	reschedule_timeout(drive, "lock fdc");
+ 	return 0;
+ }
  
+@@ -2874,8 +2874,8 @@ static blk_status_t floppy_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	spin_unlock_irq(&floppy_lock);
+ 
+ 	command_status = FD_COMMAND_NONE;
+-	__reschedule_timeout(MAXTIMEOUT, "fd_request");
+ 	set_fdc(0);
++	__reschedule_timeout(MAXTIMEOUT, "fd_request");
+ 	process_fd_request();
+ 	is_alive(__func__, "");
+ 	return BLK_STS_OK;
 -- 
 2.43.0
 
