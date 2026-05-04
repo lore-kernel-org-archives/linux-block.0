@@ -1,197 +1,143 @@
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011005.outbound.protection.outlook.com [40.107.208.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92D22BEC27;
-	Mon,  4 May 2026 07:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED3A2DEA9B
+	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 08:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777878858; cv=fail; b=Ucl42y/wu+TQN/ka9UzeXSMGo9nW8Te7H/e8zUEHlz8ul8hDHsNl43q4TeHtl1ODp13nVwUYMyFFt1NZvnFoM2fw1NR8U0sOxM2BPZY98Z9Z1FNox+14e4qUWTLvtbbO2ERotYPun677kyXGC8jCkxlEk/PMen03FB6x7fPTu9E=
+	t=1777883104; cv=pass; b=ixqbs65wjM7PWFKPalvW2Q1GK6+kQZ/M9IQOup+4uV71C4A0zp+TDwXHnufWnoY+1RQxBD97nz9keYzXWqHeO5lPWnin3IRxz2IkR73+Tu0Z/3rkwvKrk301rsp4j/cQjFU8bSuvoI7FtXL1H86Lv8uot/pB1JwawKhhHvTbZis=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777878858; c=relaxed/simple;
-	bh=NgXU1M5PncPzsomB/XcjGdC0ZLGNvx7d3snwYW0GNrw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SZo2nPhVCemETd7taYodEdzvwome6mGuDhSW7pMgN7pVXEzIMVMoUL85xglJmgqNjzKv/HEkXXIbgbb6gftdcfgisgY5yvqNcdwompdOreLzX9mbWYXjiY9beR1D/kd4/vUvms8OcW4v4ibR/OwGnRXRZ7uSdX+/ixa/LM0XNbQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XZjDas2O; arc=fail smtp.client-ip=40.107.208.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1777883104; c=relaxed/simple;
+	bh=50B2Z+s4Yf1eJw7c+SSWBLTa9fp6lCfkiafN8LV4ncI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fc13qF+P+oHP4sQEe0iW7fLa7UCh+Lu1q09OZ0jhFQ89NsJ32lJ78gofripLkH0XbdbuZRk4x4L1wofoNNZwZprYprrskB/VguTbSNKch0Z8x2xzioXs1p3Rl9FzP2oc5O2O1UxWUiPEiNdMjwQ78ikAY8+6XUYscvF0R+9nJLc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=ZwFKW6Xv; arc=pass smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XZjDas2O"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gq10awCoJJKWUeWc0PE5Ip6Ml365LQ++qnr00yQsnBisU2/RPCUfyrZzToMpRjFmwTS2JfFzq7H5NDgovSVz9KUT8AfI4ky1pR+o6iSjjjMx3mjL5j+ZULRDcHQgKUSJUmVuhkkPcd7fTc5x4d7HolkJfpmWdZ6d7OPyoR/BCQyK/1+pOBjAU+qS/QXQdqMjX/rtdPppY9YERtmZe5WQvKQF2hdluCSit34qyZfU6MNTGHUheUwbIEwighMllJj9PtzHjavDGz8tojiHzM4EExHMF+dgmIgpoYYwa+7hHOYa9w+zfwN7lFqSc0XXs2gcbAzrqalyGmg79uWQMpSzBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LNbYfKTDh8lupKfUI5nB6tm8EchhiVPSTMZ6+Xt9Ad0=;
- b=cdxDma+p9Ref/w1byHoWwxoYH+pA9Et1nXiXdrzoMk6vL8WJ4s8ViQUtZDXEbyoE41pq9jBYQiwncckOl+ibZGpnVR2bJm0efgsTKf8sATUe9HpAfY46b9001u3K8hFP/1r1PbEkIn/AIoMioyCW3pzkdmrJtESEMPShXT/L/UgbwMdjxGZUOPIvXZiQqHeW5cZJMLoI/6wejmEtUWBUIgjvd5RxDOzhX22r3TVEbvPO4H6SyllrmhQaozezLwZ2egT8YawGhVCUyCXdPY2zJUlj8zEn1baYhjh1Mnj5CqzyBJUhiaFF+FxDF0KCHjxX9uCUSuWmKSW7Aunjscd+bg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LNbYfKTDh8lupKfUI5nB6tm8EchhiVPSTMZ6+Xt9Ad0=;
- b=XZjDas2OOov17NjE+Vb4hDNp3tO/LS5Aj4QW/Fwwr3rI99iW5uectTpPMQ31q3EgGYnn0utZd5ZUuvlB0udmWuXtDE96DhL3XSd0R/LynX+7M6E+iHJocfS2JeBAegEc1J2MuBp45OtaKavg+Kt0XZlbfgAm8jwT+JwGoSCAvzA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by PH8PR12MB7375.namprd12.prod.outlook.com (2603:10b6:510:215::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Mon, 4 May
- 2026 07:14:13 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.20.9870.023; Mon, 4 May 2026
- 07:14:13 +0000
-Message-ID: <4c9c9840-944d-4736-a55a-74f5c05b528c@amd.com>
-Date: Mon, 4 May 2026 09:14:04 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/10] file: add callback for creating long-term dmabuf
- maps
-To: Pavel Begunkov <asml.silence@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org
-Cc: Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi
- <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>,
- Tushar Gohad <tushar.gohad@intel.com>,
- William Power <william.power@intel.com>, Phil Cayton
- <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
-References: <cover.1777475843.git.asml.silence@gmail.com>
- <ae941457cf6cacb9d4c16b6ec904da9ef7fed97f.1777475843.git.asml.silence@gmail.com>
- <f0dd8f89-835e-4331-b593-4405ec59f4fe@amd.com>
- <6cce2f4d-7400-4618-82ce-cbd5004c92a4@gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <6cce2f4d-7400-4618-82ce-cbd5004c92a4@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0060.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cc::20) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="ZwFKW6Xv"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-39380e79936so15062721fa.2
+        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 01:25:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777883101; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hOGf5zbOjiwEjbFy16I+UbDfImu0UWL+Yf/O95hSsKn+DcEtNi44+H4pCl6Oa3MCQY
+         9wPAUOKpFU8LPtYRKksWlcBvKJ/a0eW09PkFiFyj9p1rIu+YG72NXoIcdf/aaQRwe/Bl
+         jtipVcxKicSJQEl38vrupqtknVq8cnuapziQfrBtYhmXACmcXllxp/lkd8KkztHDti/E
+         TyqfnfuDLOsq/Cs9ynjNtD6um73ijWvfL4e+fdFp1i+hIxMAIniiFVOek/dr0KB92dRN
+         g1EGTdyLk+/aoDbOkX4aKy5sb87IfXNNTAjvXUrrpymq5R34bqDlvdYZ2L3F+2ci5IMr
+         DIEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=d5tzrJoeJBcUI9Ju9dlr6+HpOppz4fCD51OB2ckkMu8=;
+        fh=BoyZaCEGuHcMzUHH3foywDsTCicMwk79fTZR14tlhzU=;
+        b=X7Oez8ZV4Gjaqh+kX0lS2IPPsWoXeqdJv9HXJzNuMvh7peiEt3JRxrZayhweO/TWVs
+         Zpjlnn2Oy2bF03k2fSGI2sSl8o2x8DYVcix07d4jOvS39g5QiPFKiNB4gOp5eHszRmi4
+         HYw3KukFJSQ0KaCmaBV9Hy1EfJ0S76g21PTIDTn+vO6jBEmQSgNdBXKpj750AC760Iw+
+         91EUtBA8UdSIkir2iRqqlJn65zGnJmJtUbwkp1mziahZX5xZeMcssm5uv+U0bjxpFFPY
+         BrcQ1KLX1+HrFuppVJ52Asa5SZUEJw/8Z3H2VoHkljaZXQ9pmy9oeaRFm2rvXfKBZFSX
+         Fjbg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1777883101; x=1778487901; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d5tzrJoeJBcUI9Ju9dlr6+HpOppz4fCD51OB2ckkMu8=;
+        b=ZwFKW6XvS6Uq9fpij5X6vzhc2PinkIq9qL7lhJLX2l3SftxWxj3l9XPJGP7By2vMnU
+         nU0PHFpQui8CdfLEJ1T3/Qj56bAqagshckC7+KOuYqAgvU1GKiK2FmNzymh6dq+n2d8v
+         4s5bhY1O4ikA60srtKMW8J9esobN+7D5e2YEyLlSjl63xIGJnna6xhLYJtjJZ9ezMx8l
+         mPweK/H45K/BO47JFAUjI9heXfnu/cC7dawQ7OUXo5IiEORqmGZsGGT9DvDtt+eUQONz
+         lFpgIJolzzwGr61r11AmAI+bm7w97xDenuchK9CaJO1RJafoE6l65i/9HexyRIn1Vnzd
+         SwRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777883101; x=1778487901;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=d5tzrJoeJBcUI9Ju9dlr6+HpOppz4fCD51OB2ckkMu8=;
+        b=jvCqbj73g8hdWGJk/gViWpLiqwvMoKlZnSc2xQA660wXwyejpelko1NUYn4HS7O03Q
+         J8WCFLrYMBIb/KZw7voMZ+dJs3ojA+gyqmGSnzO8W32vjHnH5eRv9N/y2lCLQQaHRFCF
+         06+GuagJ9VGIrvbvWtGrUpQnX88c3sCamO5Ca124khzxvsimCemyAHO64GvrR8a/77fD
+         7fhiqGYyn8SkJ5L9rhz6fUCBXsRXZWdZoYB2ER9PWwXWIbyR89nxFHdvy9tZ7rlxh1eS
+         X9WasRvCRL977xjSDkYpqKmThJ/sTNhkqMnM/P47B899o7UXYb9NqWURrZg+jrkLm2MZ
+         zsBA==
+X-Forwarded-Encrypted: i=1; AFNElJ9ltd04VsMxMnX6GLlN4jRA1Ko+djnfwSdsPkyP3eE6A6wZB9OS3ms6cTHOr95Ggp6Fw61AO8GsEBdAHQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ4qlm+EwIZx454ac5gOMpUTYccP2hIPz8QlfZwhCOPy/oENSm
+	oDDTX65q2XlHgp+g34Dd+N0bLDk7i68Bt+qscmHnWHnO/bmj1jtHe+vPimf5SFqGMLBnCqQRz2C
+	ijCWnndRT9Ry+EhB4Gyen+2xUYeMITM3MZUON+GcfxQ==
+X-Gm-Gg: AeBDietdAg0tq5oOZy7HaqusyfEG2EG2uYEsSRCWFaY79Dtz/OphiGZ2x/9zmGvsLCE
+	YtzAFwyktgyicnrYKyN2a2JC9oKTbtT+hIxd5OdSVNAQzuaq3oc2CF3NL6WL21jefhUXrIyMlOJ
+	MNtuOEu/GYmasjDFgSECZDegLczM91yVFF70QG8iQsXQyRtrET4B4A8bTTT1Va/MrpkO+RTjAKP
+	BG7Oki5ijMprmYxkdtZ9U4RWc3xCZFzx5p/29kilV291zc/KaxtA4DBXe73yn0+kW8kpWOk1f5I
+	mghBmsQBCtb5PHK0y4WnSE0SWTbWgxz1OX0x6WwTmNoQJrq2F+DVUt6rWVlQzOI1DSYLkGRoGSk
+	v6sdV1KO9fvSZNg==
+X-Received: by 2002:a2e:b8d0:0:b0:38e:49e6:a376 with SMTP id
+ 38308e7fff4ca-393785ab20bmr25114161fa.22.1777883100524; Mon, 04 May 2026
+ 01:25:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|PH8PR12MB7375:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6ca7ef87-0d2d-4c0a-88b1-08dea9acbe65
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|18002099003|921020|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	2r9jki0x8EOX/9SyWv65hye/iYyg2KP34dx3y5KvqmRMEStLAOPDrJzhJKeMdSVKF1xdzu0Rw1LXoEOJ39LDHpxEBfVXot9D88Ig/b1V+sRECoI3kSL1WShfWTeI6++YvB4LEgpomagrNITjY6S+wW3bZKD2eOmdQ8ZZzgoLOAQSQjUFPvJF0Y/cdzoIkyQ8Ec09nKZqfOtdAgo/1QbroHc3Xgf+iPa5PG5oxCTTfyYG1WPvpWHKivHMCd2BExKlsCxvducIYEpY2YGksuBWemnigytY7QdUsTwHy6AgxcDzEXF4RgMcCgm7/amBCYuP+icjFr0PNYyLFaieR+W6XXFAuGLQlQLcdwxd4t7HVn6KF6bbPaLB7h+9CZU51XtLfpr86+H5UPxZej75UdaRKwMq+BE+lwo36uAulKwR3TAPPhNiQoVOgw3poSEKjKhAd0eIGtOd76eBI4CPyPRAJW68P/hXE0hNOqlhrCIi73kebNfcFiCg4EuY1C7LnbRRgOfUv5wsHiDuzH8/55coDs6nx7hyOmmXZaKBrn3X9oZQFjUkogQxdUHuukWco/eEIOzTsPxageMt+zHIc21shI2SZ+SMCCOd5aXu/nq+z3w3jKF29LsbdeUkiAY5273/3fyy7ViIdfdLTRbqTkeYCrsCQHmD2xZ66mcGIk/cYkT/0+JAbnc5nR45rH3z2M79Z1Xi+jEqaiSVy2J1B95awYr+WfXjs64fWKm7//AjwFw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(18002099003)(921020)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eWs4QXBYbm53VTErcE1OODQxTWlEZmhzaWZiZDJUcnNnajl3UXhhcW1iRGk2?=
- =?utf-8?B?cjVLVWkvMlNZRHJvWm5VNzVpZzlyMHNkYi9DSTBwb1pWQngwRFFFM2ZZc3JS?=
- =?utf-8?B?UTJoUHdmQm5EM2kzWDRaU0tGNzhFVC9Rb3Eyb1F1cW81MjFCWE9yR1JMeFoz?=
- =?utf-8?B?S2Rqbk9DWGJuNXFzRGE3V2RyRi95ODlZeGRHUVoreHM1N0NLTmJCTHNmNnEz?=
- =?utf-8?B?cW9qdDZraEdKSFUzZVlQd1hObWxCSzJBQVJjZFBpdk9rTlhxWjZNM3lpblBP?=
- =?utf-8?B?TDNrRktwblpoU1Z4T3RrcGhWK1ROaWRMYm9ucUdiQXBMWnBLU2R1d2hlRllw?=
- =?utf-8?B?WW1HWUZNekVDUVF4WnFYOUw5L1dKMlVBc2ZWeG1jdXhDQUZHSCtneWFoUGw2?=
- =?utf-8?B?RWdQLzdQVGxJS0ptS3RLYlBrMHNEb3hBekl6MHkraUZ4L0p5Q1hnM0Fqcmll?=
- =?utf-8?B?dEJ5U1Q3alF1bUF1UVVDaWtiUmhNRHEvNVdRQ0tsTFVnaXdaaFEvSTN2WGZO?=
- =?utf-8?B?NThQMmFlazlkNlZ1eEFpcEc2Y3YrWkxoOTFnQVBZTFBYTjZjZi96S2s1d0Fy?=
- =?utf-8?B?NDNvaURjTWcrelVjSHdvOUswOTcvNk4xNDE1TEwrdTZHcHh0Z21lckkwY2Rw?=
- =?utf-8?B?eW5weFlmVzc1WVQ5NVE3NlhJOWl3M1ErMVNQUzNreUhnakgxLytKTHZDZEVj?=
- =?utf-8?B?aFE0NFdxZnBibGNyYjNLSUdhZWlGR2t1ek1WVGRzSG9MRmMrZk00MlgrT0tI?=
- =?utf-8?B?V3RteU8xQzlWU2h3THFkdFpHMHEzV3BpSE5hY0VjYVQyMkU1MjY4UW4rWUk3?=
- =?utf-8?B?NjRncURsZWdUVVJ0VlBiTFc2SzhTVitMV2VmbDllU1ZZWWU5aHg2a3VFOSsr?=
- =?utf-8?B?cVc5SXQ2SFVMdjBwQ0hpeFc1T2xsYlJKVDZ3TGFyc1kyaXFwVXp2NXV2MTJQ?=
- =?utf-8?B?YWkrWmszcVpDelpEWEFhTDRDb2RBQlVaT0lxWTVnQjJmZ1M2eWdkcTZIRm9J?=
- =?utf-8?B?ZXVyTGxMOXIwdFgxMmhVY2g3a2UvNFBOcmxqUFZiY25QaHoveDRmdGtlQ29p?=
- =?utf-8?B?UXFJK2k0ZXFRUk95L0dNeW5JSlBKVHFDa3FSSVR0VzF4VmVXNlhwTjZLRnZK?=
- =?utf-8?B?QTZSRWFTZTlqRHFLcUFiOTFlTjl5eWlrK3l6VUZHdnloL3hKZGo3UFlmNmZr?=
- =?utf-8?B?eFdOUFBhVDFGY3hNbGp1ZHpERExvWXVpQlhoVDIzL0dQSjFKdng2a29NdkZz?=
- =?utf-8?B?QWVScVVrMk03Y1BWSzlPc2tGbndwSkRGc09jQXZ6ei94Um4raFc4NlpoRkkw?=
- =?utf-8?B?dmh3SXYrVEZGMk9MbFUrY3dEUUF5cS9pTU9mdHYwTUV3M1hkYnZkeEYvNW9Q?=
- =?utf-8?B?WkFXY0tPL3pscm9oK3hvTnNPaFlwQnZnNlhYQTM2ejZxbEpWbEpleW5ibVNQ?=
- =?utf-8?B?V2JnUnF2bGk5YjB3QXhhZTBmLzBTaUtiSFEwMkZNZFlQRjJZQ3hWTVNoWWZW?=
- =?utf-8?B?RllwZFQ4ekczMDRiNGpVRlJMRE1aWFRaZTJ5ZlN4K0RtdHEraTk2cVJEN2J1?=
- =?utf-8?B?VGVCTGg3d1prNzhSaWNYVk0xQmpjaDgrd1VCZWtXcE5OQTFZdk9EdG45SUhD?=
- =?utf-8?B?NFl3aVJPOGNSTkoybUUyUDVkNGpta0d6V0kwQUdJaVNsWjk0VVBlWFVHeGpJ?=
- =?utf-8?B?M0dHRWNMZ0FGNEpxSmg0KzUwM1JEZyt3MmRVU1dhQW1xSk5ZWTlJN3ZSbFdk?=
- =?utf-8?B?KzRzSWFTMElGMDNYUW1CdlRHUHNXNmtxTnArdmhLS3NyajByQVhzazVWWmta?=
- =?utf-8?B?eW5JbXNac0VRamNobWZCMUpGWVFOYW93UUhXYnFoUXdYWmxscXF5SlVCUS9s?=
- =?utf-8?B?U0d4NjRVWWJPc2FIbkFLUUpraDdGdjZjQXU5SUk5YXBKWmoyYlJlUjRDekU5?=
- =?utf-8?B?RGhQNE9MRXZzSFA0SlRMUWtYZW5UTnZJb3RuSXM5VW02T2pndWRjWWp2bWNV?=
- =?utf-8?B?V3JTSUR1alNhUTdQK0RUY25kZjVKdnJRM2EybVJ1WlJDWEJuaXhOUnNFOE5n?=
- =?utf-8?B?SFBlcEgzZWZyS0NKbTVxVDdPcUswdEdNbXZKS20yMGRHZlV5NS90YVNOQ1Ba?=
- =?utf-8?B?UzJJT2dDYm1XdlVhcUg1S21VMEdTT1NHcXpMcitvZ1h1eHE3T0hIaVNDcXdh?=
- =?utf-8?B?aGgyVTNMVUFCRFFDUHB5aHlUYzRiTFQ0L1pFTHo4cTNoUmdHWXI0UmxlVmZU?=
- =?utf-8?B?SnJEb21ucVVOUHBuTW9iejM3R01oRTFLc2gzd3ZsV2pSbW51RVdjSDN5Zi9t?=
- =?utf-8?Q?lRCiD467FpyX1dqcfx?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ca7ef87-0d2d-4c0a-88b1-08dea9acbe65
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2026 07:14:12.9675
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: atoJyTpYzmKoD0wWHoKmRA5jtrN7JUjk5umOY7ZM0839xrt752Z9O+2B30jxhv5W
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7375
+References: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
+ <afUDV3ue45-shCNU@casper.infradead.org> <afXi9crQyOnqJ4-1@kbusch-mbp>
+In-Reply-To: <afXi9crQyOnqJ4-1@kbusch-mbp>
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Mon, 4 May 2026 10:24:48 +0200
+X-Gm-Features: AVHnY4IFBQNkCdL70YZBETegG4GJzr0i17Pz-ADdOtn2SGkpbvKiXl0-WqsHR5k
+Message-ID: <CAJpMwyj0SRLE6+y2aYQ3493f5Qcox-hOfUTKjJQUxhBZ7rLJSw@mail.gmail.com>
+Subject: Re: [Lsf-pc] [LSF/MM/BPF TOPIC] A block level, active-active
+ replication solution
+To: Keith Busch <kbusch@kernel.org>, Matthew Wilcox <willy@infradead.org>
+Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
+	Jia Li <jia.li@ionos.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/30/26 20:33, Pavel Begunkov wrote:
-> On 4/30/26 07:03, Christian König wrote:
->> On 4/29/26 17:25, Pavel Begunkov wrote:
->>> Introduce a new file callback that allows creating long-term dma
->>> mapping. All necessary information together with a dmabuf will be passed
->>> in the second argument of type struct io_dmabuf_token, which will be
->>> defined in following patches.
->>
->> Well first of all the naming is probably not the best. Maybe rather call that dma-buf attachment or context or mappping.
-> 
-> "Mapping" or "attachment" would be confusing as maps are created lazily
-> together with struct io_dmabuf_map. I can name it create_dmabuf_ctx(),
-> but I decided to use "token" not to collide with dmabuf terminology.
-> e.g. I wouldn't be surprised to see some dmabuf ctx in the dmabuf
-> implementation code. Maybe "*io_ctx" would be better.
+On Sat, May 2, 2026 at 1:41=E2=80=AFPM Keith Busch <kbusch@kernel.org> wrot=
+e:
+>
+> On Fri, May 01, 2026 at 08:47:35PM +0100, Matthew Wilcox wrote:
+> > On Tue, Feb 03, 2026 at 04:09:59PM +0100, Haris Iqbal via Lsf-pc wrote:
+> > > We are working on a pair of kernel modules which would offer a new
+> > > replication solution in the Linux kernel. It would be a block level,
+> > > active-active replication solution for RDMA transport.
+> >
+> > Why is active-active a good idea?
+> >
+> > With an active-passive solution, network traffic is directed to the
+> > active node.  Over time at some point we get close to saturating the
+> > link and performance drops.  At that point, human intervention will
+> > occur and the network link will be upgraded.
+> >
+> > With an active-active solution, traffic goes to each node.  At smoe poi=
+nt
+> > each link will be about 75% utilised and we won't see any performance
+> > problems.  But then a node goes down and all of a sudden the remaining
+> > node is being hit with 150% of the link capacity.  There's no gradual
+> > degradation here; the whole solution just goes down.
 
-Context or ctx sounds fine to me. IIRC we don't have a context in the DMA-buf subsystem yet.
+One can always flow-control the traffic so that each node in the
+active-active setup serves enough such that the sum of both can be
+served by one node too in case of failure.
+By restricting the traffic (as in active-passive) during the happy
+case (no node failure), which would actually be the major chunk of the
+lifetime of such setups, one is under-utilizing the available link and
+intentionally accepting lower performance.
 
-But we do have the terminology context in other subsystems and components which build on top of DMA-buf similar to this patch set here. So I think that is a pretty good match.
+Another point is that, for an active-active setup, when one node dies,
+for the other surviving node only the reads are doubled, which would
+mean roughly 40% increase (if we consider a 30/70 write/read split).
 
-> 
->> Then the patch should probably define the full interface and not just add the callback here and then the structure in a follow up patch.
-> 
-> I strongly prefer splitting patches so that they touch one tree at
-> a time whenever possible.
+>
+> Maybe I'm out of touch with reality, but I could swear active-passive
+> setups are often configured such that the passive node for one resource
+> is the active node for another. That would also suffer the same link
+> capacity issues you're describing.
 
-Exactly that is what you should *not* do and is the background reason why I ask.
-
-Making changes in a core header like include/linux/fs.h to add a new interface and then only later on explaining how that interface works is usually a pretty clear no-go for upstreaming.
-
-Each patch should make one consistent change and upstream maintainers sometimes even require that you give an user for the interface in the same patch.
-
-> tbh, I don't see much of a problem it being
-> not defined as it's just forwarded in first patches, but I can shuffle
-> it around in the series so that definitions come first.
-
-That is not really a good idea either.
-
-As far as I can see a good organization of the patches would look something like this:
-
-1. The API between higher level and filesystem. Including all the functions, structures, enums etc.. necessary to give everybody reviewing it a solid picture of the general idea.
-
-2. The higher level/frontend/uAPI. Again including all the stuff necessary to get a solid picture.
-
-3. Eventually the glue code between #1 and #2. Depends on if you need it or not to understand those patches individually.
-
-4. The backend implementation, which enables the new feature for a specific fs and/or storage device.
-
-5. Updating Documentation/filesystems/api-summary.rst and eventually adding a new file to explain how the DMA-buf interaction with the fs layer works.
-
-Regards,
-Christian.
+AFAIK, what you are describing is a more of a clustered raid setup,
+where multiple clients write to different defined and protected
+sections of the disk.
