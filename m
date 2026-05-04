@@ -1,128 +1,178 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C76B3DE43C
-	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 15:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777908617; cv=none; b=b8zcTy/fBwbA/QAeE0RbgYHdC6V2rz8RAMEt6uKloKZW6MS7+tFimfaqQAJaTvGD1byNOAVVP12yPWvSnXSKXWPsk3HpebuAjyQcyy/eAWiRv1S7INNkq8nuoDY7TrIK7od8ZGWQJdiDCwlUSfdN6Me3E4/nzS4hHo4kiWNATZ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777908617; c=relaxed/simple;
-	bh=6QwUQCcZs6tvnhRhV82Gt4iwhALrIcfYYBRUBpS70Xk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rl6p0gUqxibx7tIPeS8hmm9jEaSyNbFvNxfSF7VLbEXtP6nmghkOueZyxNW/rxIbaQoYamqp/rTOuvH3LN7wjJeBKTsbrR4Rd6fwPtwjo/wvDm7vrhXxO+lskNES1rC5CghiSzJ8tZc2gAFMebsjS0TOX9LD7Nllew6wzwaM9T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRCydiHt; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108853E4C95
+	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 17:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777916469; cv=pass; b=kOaD9KuKR6NUj7VGKEWKd4Dh0VZ+6KQBeG4wEqiOEvoroZadVILY2sJp1kME4UBOwdhmSTbUD/z5xTDaLpm7xTxJiAVP4BNztRH8CxT8FksPxwY2gHmXGIbY3tGY9nrKlnskPyGCX/nuIIyBaL0+hPhCNde1Q8EHxPQJ/mlqgUA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777916469; c=relaxed/simple;
+	bh=0clKQYIOKoni7veBGH6WUx86f/jHz3tzgYwL1kSYCr8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nwE/AFO+RYst+QlJjihzCEbRCKxpi0glTy6G++MrMYAMTr2/Vk+M4lEEobVW8EYR3jnaS4HepI/mQt4spj5O6G/pZhfOE2Z5SfDvbVzd6Z8QeBm/YE25qjSOTbaMhlgp+3KZw1h83opPXmc8P54AFAT+fMUC2OcRwFqinGzrLGo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WL0kh5NY; arc=pass smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRCydiHt"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso33781995e9.3
-        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 08:30:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WL0kh5NY"
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7dbbf1e1058so676164a34.0
+        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 10:41:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777916467; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HvO+0EZnYFg/HtErDpQVNj6CO7dSuy9dBC5BJ469Y5COyGHovu4ZTETXVOnn8eES1k
+         YrmgMu0PilHvWabpQGnn4dVWKw9frnOBmPy6BdVM+SNxhH6OGEfPdBxOGy8XtgYl1JFW
+         hp/STEgVja3de3SkEx1R2bTAPIR5AESpy+tWOix1ZHpMkXhbsfvNkHkaZHn9boZXXxMw
+         e/YBvMxY50IH//GvECueXtW02vMi2DTFX7xrzHXzbCdtM6rycGM1BTlnoa1DdXw0rvER
+         aXrPT2ILoGMTFwf0uLxFUn+Dkr9n0E6618klt0ZSTCJwSr34S9rEQEpgd7zduIILXlbo
+         /Jbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vEu05cN6cisrNYgG7dGV7tiqc8ttSV8rFmY4ZAaFzaI=;
+        fh=vu+NOfMmkqTL7zAejC5rcxVE2rbwBvDUFq6gCkIC5tg=;
+        b=b5QXxktErqyhb5tmjq0tVNAtJZHy7CzGLDn4qrqOWRMNM2IniwmPncaateF0SDokVq
+         4aUq/D6Tg5MaEZLCqo/BuydkZaNMco3HX68gdldw4YCTDBkHUUmQxrDn8BHHGX11vULY
+         jgZZGeWO4ZUXx2ClDDqtoTofv3JgtNwGuHMsvxwOR+BSDNjphi9InTaBr86hWCZmo62N
+         Qt0pO+OpAv+rkEaggYDLPRyZzitljpZhjQSwIoCeR+FZVmPMJQQxDI4MELf0GxIcwpmP
+         MvC7M4/n6yzn+of28CdaYQNV6c128fzK1KIiv2jwJRrZsmKp/VAciJiwmRu6D9HoFeVb
+         8w0A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777908615; x=1778513415; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JTReAJBRtrEN050pOinCvG1qLugpFlFxRiDBF5vEgm4=;
-        b=KRCydiHtndzdGf5TkyPWPK008OR44tmdTzRSw2JTkci3b8zxWdo6LUsffiYnvHOIHZ
-         byvbAFU+RxD4lCtq0X+S2IM4H0QbB6OZMCBxc7pin9y6EX+SuPXA5gMhhWyeXfpWAAV2
-         Ks2/rvJXblg6QPna/4dBmIaDduBtVsMUv7M+b8K74EgNRC5F6jdMSS0X6eDO4NIB2O8E
-         FByWC3qNVSk5GNL8bwbGWbQyiohl2FuRsikc2DbQXJqAFZMniHDWsJjhrCZRbrQpJSz+
-         eFYbBUm/AxpKp0NDVg0mO4O7XcgZ22nVwUnW81OZx2sRwS1e6QUjjoB+WkcRsrYrQtxs
-         dBJw==
+        d=purestorage.com; s=google2022; t=1777916467; x=1778521267; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vEu05cN6cisrNYgG7dGV7tiqc8ttSV8rFmY4ZAaFzaI=;
+        b=WL0kh5NY5dqBV2lB/KZoafDGsiUG8KEkp3RTESiUjWmcyM4YflIHpTHzl0lT6MBh1Y
+         /9oU2oqBSThDL9HpXlBHVlPlaLnog6MeNBD9ZrC04OMZNWamDwiLcNrUpz0jTzE/124G
+         JnXi8fGUuIo1rzO2YY+Smb/LbGwNq3BuG3+N2E7fVCfdumLcWhLDfguKqGyWexm8A/PE
+         gbKhNP98wycK+hSKIURimeKBd1uetWv1+/s5y8y/i+hbJsnlj7beRvMWGnDHkuWoFzYd
+         fSDK8bV9y1YrQSQRUx1NC1bCksQQjB/dokWCDqzGttyJ7uECYg/TuLmu3LjeiyOkDG0s
+         V6gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777908615; x=1778513415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JTReAJBRtrEN050pOinCvG1qLugpFlFxRiDBF5vEgm4=;
-        b=rCzCZ9S+scUl+v1Mqh8RFmMfBkR6QduhqimE/XFZNFZdvLgw/qbpFMSIr5JTuwouVT
-         1eQKty4oSjMK39eEo8RNFSSN3zHpPGNrWDKY4qp+izdxy6WXQHBW/WgfsRkS7I+rpaBv
-         qPr3aylAV1Z87I/kCjtLtbnmICgCm6I6Vg/bGt1wEa/sZMUW/hw8+mVtvWoXv8y/6ARd
-         6A8jd012/ZsSAEG5Ec8p3RcFeutL4fq9jOEO/bltuoZq+IXsdKLDFU+R9Zk++9anyYYE
-         jKHCgS0+WfPtUeO5bdJLBJmQJ4h/YTHT5JEsfiDypG+he798Nod/7VfjDW4vl6IMCtOR
-         Uo6Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/Q7oDNa1zA6JiuR0kva2MxEpNAuyYXd1D3FxnOLq22pzwh/kJMi9WV4QjPaopsSnehRbUg7HXNMYP+/g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyklBHdEMzeee45dThEIwbX3vMeUox9+ou2uOkrQLjaNjQOs0xp
-	8OQUwMJitcqPK2KHm8CYPPuISpcS4qqL51k0CC7SjR+rA5GE9tD6aD+zYPeuT5UiLYk=
-X-Gm-Gg: AeBDievOdeeZaib3mop+1LiQGdxwAbQx907ZalPbdhNhGLzDlUd/nt0+vgDTgNKhOpP
-	ZmDofBm6/NCmr8/eH3l7CR9p+Oea6wCoV7rIoW6Azv/VdXJB2b8w7Xcv/sav8FAdj2A5ry/mNA1
-	Ge6xGb+wla5TtuoPk9hArEpRjJEg2LElhYcaYarYK1/YttAsr5pNFT4KuxcEDXoyF1SpkrZzvEJ
-	nKMMOAoDupxvASouj56Cz8lnNAjXqRLgRl8DsdgmLd2dHctALP7nDo+DYEPJ9yWvHGqiXIvgWpb
-	SdpNe2Gnk4vKhAxr7D9Y9oikWdT0Ij+s56rCMJ9IFqYaqYdEnXcfgzODWLbHcHW1C168FpNsisn
-	BIB7rohaVg2eLFjzXUsCKF9VAfJn4WnK4rQfKYLknBnLX6CeYIyej3RF5JzVAVVZKipnaiBwa4Z
-	ar7oXJ4+rqmBapK7bO26qdZ83Q87kkHK/UsjJ3Y/yGH/u4ShNmeKfYhHSHUBaE8Oo9jq/ESs9Li
-	Eq8bKDqTm8ivBPGtk4Abfvd
-X-Received: by 2002:a05:600c:4f91:b0:489:1ba8:5be9 with SMTP id 5b1f17b1804b1-48a98676b26mr157938505e9.29.1777908614504;
-        Mon, 04 May 2026 08:30:14 -0700 (PDT)
-Received: from fedora (185-147-212-251.par.as62651.net. [185.147.212.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a8ea7cfd2sm25250825f8f.2.2026.05.04.08.30.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 08:30:13 -0700 (PDT)
-Date: Mon, 4 May 2026 23:29:55 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
-Message-ID: <afi7c-VUJWOLlC1m@fedora>
-References: <cover.1777475843.git.asml.silence@gmail.com>
+        d=1e100.net; s=20251104; t=1777916467; x=1778521267;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vEu05cN6cisrNYgG7dGV7tiqc8ttSV8rFmY4ZAaFzaI=;
+        b=TPl3RUUoXAZE9cYOj2YPSl5gFUwXbfRUkMwXVGIww0IRtTSMjCqNXQ3ShwY0xBjDTL
+         l4YrlkrwAgc28sbRasT4zrHCY1UvvQLyYmcvtj2rtLN7atRj+3E+5rtMBqednC4bTVWI
+         uOcrFwP25dcBy+XAAIQ5WMmzuD5WmOSAyac08zBJ0aD+RhwaMYUlnQ6SAPOBQRVef9Uu
+         DmygPPgM/5t0gSDZ04ZqcCe1Asa6o9sHgkfwQMjVPXwUgyDD7SD6hNYgh2MDV3RZ8NIF
+         Dmy+xa30V/Z2epTy5vk3MTIyH6OVX4NMlDloRNy4I3O3WkQVMi12HfblQHiKRmCDHjou
+         jOzg==
+X-Gm-Message-State: AOJu0YxF0/9AfTR7MKDp9o/S8YdIcg6Wbbg1dYoDhv7ST9WqCqqOnuyA
+	EY9GD1aUD4dmWJmPLQ/6eSV15Gi6rkxvsgTsaxwpbF+BjtOOm033Q27Nbk+b6ObKUy3Z9dAa2YU
+	h741dTlmmFWKxgYGFk6q7DaKDwClWhxlTAeIsOx/+cCeO8g4XLLovh5ze3Q==
+X-Gm-Gg: AeBDieuMy6zGz7xtw/OicdRGlD1hc14AtzcecoevL+l8jMb8fZcqOBaY+b1khKDg00Y
+	JofffytIM95fPHHhRXzCFCyS2jjeAKM9rphVbxIMs0ObHpoC/IEwhT/yJRDxTed/17qxubn8oD6
+	+yixV7conPRncEqEn+MolgaUcIKCL68F0+ZkZT8VHlnDMcPjlOA91niC99c66bDrCFuBhDBy0DA
+	UxZHwi4a9N6V9ixi1nXbxpGq5t3Lcr1z9LsSUgNMYzvBLzkJ1glAAvYGxFiPPjh/J+pJGCVsjL7
+	2lvO4PkIoNSy9DCBTRs=
+X-Received: by 2002:a05:6830:34a6:b0:7de:4260:944d with SMTP id
+ 46e09a7af769-7dee1471792mr5001640a34.7.1777916466725; Mon, 04 May 2026
+ 10:41:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1777475843.git.asml.silence@gmail.com>
+References: <14e454d3-8f27-459a-a515-8a2b70ac109d@kernel.dk>
+In-Reply-To: <14e454d3-8f27-459a-a515-8a2b70ac109d@kernel.dk>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 4 May 2026 10:40:55 -0700
+X-Gm-Features: AVHnY4Iqsc1E6yII4LWr_weLRlKOUxOp8AhbPr3KelwtHdPfz6AV3pwsd-7ZRRM
+Message-ID: <CADUfDZqw6P1a5Q55cEgAPbULxJatEXNL6UXyn=ftS_dqBBqq9A@mail.gmail.com>
+Subject: Re: [PATCH] block: only read from sqe on initial invocation of blkdev_uring_cmd()
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 29, 2026 at 04:25:46PM +0100, Pavel Begunkov wrote:
-> The patch set allows to register a dmabuf to an io_uring instance for
-> a specified file and use it with io_uring read / write requests. The
-> infrastructure is not tied to io_uring and there could be more users
-> in the future. A similar idea was attempted some years ago by Keith [1],
-> from where I borrowed a good number of changes, and later was brough up
-> by Tushar and Vishal from Intel.
-> 
-> It's an opt-in feature for files, and they need to implement a new
-> file operation to use it. Only NVMe block devices are supported in this
-> series. The user API is built on top of io_uring's "registered buffers",
-> where a dmabuf is registered in a special way, but after it can be used
-> as any other "registered buffer" with IORING_OP_{READ,WRITE}_FIXED
-> requests. It's created via a new file operation and the resulted map is
-> then passed through the I/O stack in a new iterator type. There is some
-> additional infrastructure to bind it all, which also counts requests
-> using a dmabuf map and managing lifetimes, which is used to implement
-> map invalidation.
-> 
-> It was tested for GPU <-> NVMe transfers. Also, as it maintains a
-> long-term dma mapping, it helps with the IOMMU cost. The numbers
-> below are for udmabuf reads previously run by Anuj for different
-> IOMMU modes:
+On Mon, May 4, 2026 at 7:39=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> This passthrough helper currently only supports discards. Part of that
+> command is the start and length, which is read from the SQE. It does
+> so on every invocation, where it really should just make it stable
+> on the first invocation. This avoids needing to copy the SQE upfront,
+> as we only really need those two 8b values stored in our per-req
+> payload.
+>
+> Cc: stable@vger.kernel.org # 6.17+
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>
+> ---
+>
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index fc3be0549aa7..6aa02575e08d 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -857,6 +857,8 @@ long compat_blkdev_ioctl(struct file *file, unsigned =
+cmd, unsigned long arg)
+>  #endif
+>
+>  struct blk_iou_cmd {
+> +       u64 start;
+> +       u64 len;
+>         int res;
+>         bool nowait;
+>  };
+> @@ -946,23 +948,27 @@ int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsi=
+gned int issue_flags)
+>  {
+>         struct block_device *bdev =3D I_BDEV(cmd->file->f_mapping->host);
+>         struct blk_iou_cmd *bic =3D io_uring_cmd_to_pdu(cmd, struct blk_i=
+ou_cmd);
+> -       const struct io_uring_sqe *sqe =3D cmd->sqe;
+>         u32 cmd_op =3D cmd->cmd_op;
+> -       uint64_t start, len;
+>
+> -       if (unlikely(sqe->ioprio || sqe->__pad1 || sqe->len ||
+> -                    sqe->rw_flags || sqe->file_index))
+> -               return -EINVAL;
+> +       /* Read what we need from the SQE on the first issue */
+> +       if (issue_flags & IO_URING_F_INLINE) {
 
-Plain registered buffer is long-live too, which raises question: does this
-framework need to take it into account from beginning?
+I don't think IO_URING_F_INLINE is guaranteed to be set on the first
+issue? For example, a subsequent command in a linked chain, or one
+that sets REQ_F_FORCE_ASYNC or REQ_F_IO_DRAIN will be issued
+asynchronously originally. Could you check !(issue_flags &
+IORING_URING_CMD_REISSUE) instead?
 
-BTW, inspired by this approach, I adds similar feature to ublk via UBLK_IO_F_SHMEM_ZC
-which can maintain long-term vfio dma mapping over registered user-place aligned buffer.
+Best,
+Caleb
 
-
-
-Thanks, 
-Ming
+> +               const struct io_uring_sqe *sqe =3D cmd->sqe;
+> +
+> +               if (unlikely(sqe->ioprio || sqe->__pad1 || sqe->len ||
+> +                            sqe->rw_flags || sqe->file_index))
+> +                       return -EINVAL;
+> +
+> +               bic->start =3D READ_ONCE(sqe->addr);
+> +               bic->len =3D READ_ONCE(sqe->addr3);
+> +       }
+>
+>         bic->res =3D 0;
+>         bic->nowait =3D issue_flags & IO_URING_F_NONBLOCK;
+>
+> -       start =3D READ_ONCE(sqe->addr);
+> -       len =3D READ_ONCE(sqe->addr3);
+> -
+>         switch (cmd_op) {
+>         case BLOCK_URING_CMD_DISCARD:
+> -               return blkdev_cmd_discard(cmd, bdev, start, len, bic->now=
+ait);
+> +               return blkdev_cmd_discard(cmd, bdev, bic->start, bic->len=
+,
+> +                                         bic->nowait);
+>         }
+>         return -EINVAL;
+>  }
+>
+> --
+> Jens Axboe
+>
+>
