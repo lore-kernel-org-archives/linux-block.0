@@ -1,123 +1,144 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613593D3319
-	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 12:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8C43603DD
+	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 14:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777897989; cv=none; b=dWDej1xHXbRgQLpECu4FMnmbwGk1RtdRYa0ftELIuKUG0ZJRZ/vSU93Rhq8sYUzn3eBJMc+RTIr9xGMX6fwTnwy45VfaDTGTbfSRv0XgMcic2K5TnCYHNiMt5sT8iEgTkK/fPNldDDf410qgTk+vLkhsDSUUFF5tuUayVXDx2nY=
+	t=1777905486; cv=none; b=pjybjj5//+BsBwyQ5PxTMfy8L+7DvfLyRtSNq4wVpJIBSmhkMhOZMPPl0w21EkCn/+MSt2HOb4vXDKYYpFzn6mnld4hox3VTNBlWBJ9f61mGwYUkFN38Z05M/OUb4PGdQFp6/Dz+yViekH+oFsdLTGdrmmV9ttTCF0aa+2Zd9Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777897989; c=relaxed/simple;
-	bh=yBqzeljeCYAWMfvKpILNF3nSvYdFoDwPi6LXBX0tD48=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jVJlwagW2uGTrfZ95npdHqogJf8k4CmVvBHj4KnvmGmRoKwUB9vUU8WQ2zLXqlcQQj1gWbUccnCPdEjvit/tDQk5OlHIVkuUaUgEOtVoKEzhfBKcjt4XTNBYA3wVWdaKGdC4ZQKIdpEflpg5dR/xcf3UKtjOWGuzqXzUJgkecPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DKQwjQRb; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com
+	s=arc-20240116; t=1777905486; c=relaxed/simple;
+	bh=PUZEoNkKWf9JGLPAlCtTEqIbiatzBUd52e5P6IUZBLY=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=sGHWiT+tzZwQNgkGHwUQok24pS6ZwHYHHgpVfn6Jjt7JNIOTh5EXUH0W/BLDSvWZ7TvfIcwjkDEFaGNteEoEPTpssan5kmOVcWVayxkW0gASZzDEebJG/SeEZvrsxOgLh7nT19GWf5Z58GcSWqqIjIeeGG1vaulRoePCDyyLQWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=RobG8h9+; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DKQwjQRb"
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-835423c69ffso550364b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 05:33:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="RobG8h9+"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso33283335e9.3
+        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 07:38:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777897988; x=1778502788; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=e8/CDtnGvalUzgGFzgyiRHcKrsHnUrOiavCD5LiN7Ac=;
-        b=DKQwjQRbrBKyaP29/7VWl0cRhivrxZq/Z+93tXrAr0iamjMNRA2P1BvvSVer56ErC1
-         +yPIhyPzP96lA0Ojv1biVLaNXBziRBJ+YWNg83uqocBgi25ZYOPo07I1IDPDAVj6da/5
-         Rpej3IomOvrf5iJz8tTqODt4ejklGo0zj051JoAai0POboLQXRnnY4ohUt6l0ZU9d4kv
-         Wh2Fxd1BC6Atx0mhsZO5uK83pEIUZRSuZKOEJuNRkEJLf69bbevv9ibRxRwWBQYw5hQl
-         YugcfCiS4CBSdB5HBu8BSnMywUQzbNW1hdsQigNyOIcVnhWm4u74KVWn0vma163GYDEF
-         rN9w==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1777905482; x=1778510282; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rm0hrublys8E1weVlmrNPjJ8bLK11GDL1xb4Hh3ZltM=;
+        b=RobG8h9+hacs6D5nhipX2oafECXCC8cD9JjbUZp0VMb5KlT6ccWuhgq38qHUfVuzFS
+         ttAdvoS9+a9KMNOPBwSUfqT0pDnv18GlW8nTHnxExIrTXMlO8ugKysPOqX1Izu3/HjuP
+         RtX9dd9Gpm9y7gk8WIsecJZN5caLOOtcUNDQtiBaCZflhSHw3BBliW9oQuI6yZ1snDDn
+         TBvU7F2OZKFOd/o6+yinwruz6tFE+b02a8h8YSnFxzE4jLEUD4zxx7LJ3TQQYGMRzUBB
+         EBjFaI+Z68fp3VRt+fZM+AMeIlAm0Clj43MRMWlopaXe23MfG9WQJQPdQtgcKTx6ew7z
+         UhKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777897988; x=1778502788;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20251104; t=1777905482; x=1778510282;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=e8/CDtnGvalUzgGFzgyiRHcKrsHnUrOiavCD5LiN7Ac=;
-        b=nAy7SOHdiCfrlsxZrLKIVbNmF+cGXIBfc/Ccn0PAK6BxsVDyeuDIJV1cDgKGLc4osV
-         u8F2eSmH2+xp34KlsRzDPXsc8iezxNx8+hBHkwYfk8a+DF0t5eEdR7uWWd/VLc55CL9b
-         GOnPh2A6kw6j7F9kUUpA1RqklS0P/wI/vE/jG7VEi25tevfB4y9vnfry75EjHwdvLkHu
-         TRrIDRGuIn3Bm9ESBy7at4K+GnrDAQF+WMW0xdMA/FTgeJDV7YJlKPY1PP/HVzd+/Qa/
-         hmF0KBw76pM7Y06MyASKwUVlk5Q/QleXA2R0rSM9WFNb76MpeeMTB88etuw81PKGgHBl
-         HR8A==
-X-Forwarded-Encrypted: i=1; AFNElJ94W7u6mhbm1E3B5xJpM7TblHyHWgLRJSVMwhCZoSG5hRHoCz/gqjwpDE7XQodfoaGS8iESde4yqnUGwQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/VbDDS9tG09hxUyILqNtrEgc6CsF90/kChcpDLU7Brrkve9dK
-	KQ245oxCVma0kgkCC20ulq+MNHnjeZwULsAsQB79+BgGxbluOQdjVYOmm7GABdN3xljR7MMzud+
-	bos8EFrx06l9puxMlHrv5
-X-Received: from pfblu21.prod.google.com ([2002:a05:6a00:7495:b0:82f:86c3:55ba])
- (user=richardycc job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:8ccb:b0:835:3c9f:1a15 with SMTP id d2e1a72fcca58-8353c9f1f13mr4332851b3a.25.1777897987531;
- Mon, 04 May 2026 05:33:07 -0700 (PDT)
-Date: Mon,  4 May 2026 12:32:30 +0000
+        bh=rm0hrublys8E1weVlmrNPjJ8bLK11GDL1xb4Hh3ZltM=;
+        b=spxzcJYngQEBgBuMQKY/JZQmihZmrwL0sg3YxiJA4OR9AJAeQkau7v7XCPPMjPl1jq
+         3NwX5Y3sALdBWXMLsEqBsQl8rIlsUBsQIVfEGrVCifft/ci+YACCSQcfj1jBijh6qfZI
+         RJDWgBcbwDxkPAVsZlpnR75Y9Op9/AdGuqWMB3FcRXev+70FDKrV3mX6RUX+OJioZr/v
+         jVY03EJjdnd6QaqSYRWnJxLUOZ3/xDoKC0CicModQCOGGlnMimqoDO8iu+jdBI+83uH4
+         HcPKu/nci02CtAB7zoTavOEHVuIPx20QYbMV9k6FijsEvonS6J5+lKbGZ92S2tEy04vK
+         e/lw==
+X-Gm-Message-State: AOJu0YzavX+cGuXxYqziYlMWlmZJcgtGyfLPmf8L+Hlpg7tUPmmdnvbL
+	auljQ1zqRBWrcjqKzz3s1+1w/yH+R3/Q0zGNoqFZg6GdBgdnS6xzNnV9sPFUnNUm1sVP9fo7Lno
+	M4XbO7G8=
+X-Gm-Gg: AeBDiev+/whhT4nS69H5gOxCK+wFUdKtrH39ssxvhsUuxn6I94mywSEn7eKwtZnd/sb
+	eLz9YRclQZtOLLswZ35I8qad5GiwLkLpk24TnRegnfKQNbN85Tyh1srjBZFreXLSRBtEcNlukOc
+	igvhExagwRhAm0JJJXX5OdJmFXCgek76bJLEN3JCUQ+Hb720DzjJMjpcsVtZYlfEMJ7gts9ETTK
+	R8qeaGZ44pobfKtwOJlE+8Dwc3i9l0sxIw0sUtQwW5iUjBvSEzFlb/FfiqM62Sm+h0HxpjPPNLN
+	mYsSKCPycjv8dwyAAbwqeTL5yfiqSPXBOT4y73EZQxexHQuHCxhY9oaemccLK9biNCNKleKfSBy
+	U1aTie8MAgA6jFeirsYpJVT8Yj7IXBlhLJOF6AZu4911ipxaBRFxqY4T6bZX3p4hUcy4bU3ANwH
+	P/eCcsVtedlRUoT5S6z7xX4zT54Zqm/KkRTQVcSi9uOXowo0HchPYRZWmTE4VXbYig8NozFktis
+	apQ1lxczcm0CUH2PBkP
+X-Received: by 2002:a05:600d:8453:b0:48a:5339:ef0e with SMTP id 5b1f17b1804b1-48a9852f5e7mr130533505e9.3.1777905482236;
+        Mon, 04 May 2026 07:38:02 -0700 (PDT)
+Received: from [10.211.9.173] ([213.147.98.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a8fed8b8dsm113373115e9.4.2026.05.04.07.38.01
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 May 2026 07:38:01 -0700 (PDT)
+Message-ID: <14e454d3-8f27-459a-a515-8a2b70ac109d@kernel.dk>
+Date: Mon, 4 May 2026 08:37:59 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
-Message-ID: <20260504123230.3833765-1-richardycc@google.com>
-Subject: [PATCH] zram: fix use-after-free in zram_writeback_endio
-From: Richard Chang <richardycc@google.com>
-To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>
-Cc: bgeffon@google.com, liumartin@google.com, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org, 
-	Richard Chang <richardycc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: only read from sqe on initial invocation of
+ blkdev_uring_cmd()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-A crash was observed in zram_writeback_endio due to a NULL pointer
-dereference in wake_up. The root cause is a race condition between the
-bio completion handler (zram_writeback_endio) and the writeback task.
+This passthrough helper currently only supports discards. Part of that
+command is the start and length, which is read from the SQE. It does
+so on every invocation, where it really should just make it stable
+on the first invocation. This avoids needing to copy the SQE upfront,
+as we only really need those two 8b values stored in our per-req
+payload.
 
-In zram_writeback_endio, wake_up() is called on &wb_ctl->done_wait after
-releasing wb_ctl->done_lock. This creates a race window where the
-writeback task can see num_inflight become 0, return, and free wb_ctl
-before zram_writeback_endio calls wake_up().
+Cc: stable@vger.kernel.org # 6.17+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-CPU 0 (zram_writeback_endio)       CPU 1 (zram_complete_done_reqs)
-============================       ============================
-spin_lock(&wb_ctl->done_lock);
-list_add(&req->entry, &wb_ctl->done_reqs);
-spin_unlock(&wb_ctl->done_lock);
-                                   while (&wb_ctl->num_inflight) > 0)
-                                   spin_lock(&wb_ctl->done_lock);
-                                   list_del(&req->entry);
-                                   spin_unlock(&wb_ctl->done_lock);
-				   // num_inflight becomes 0
-                                   atomic_dec(&wb_ctl->num_inflight);
-                                   returns to writeback_store();
-				   // frees wb_ctl
-                                   release_wb_ctl(wb_ctl);
-
-// UAF crash!
-wake_up(&wb_ctl->done_wait);
-
-Fix this by moving wake_up() inside the done_lock critical section.
-This ensures that zram_complete_done_reqs cannot consume the request
-and decrement num_inflight until zram_writeback_endio has finished
-calling wake_up() and released the lock.
-
-Fixes: f405066a1f0d ("zram: introduce writeback bio batching")
-Signed-off-by: Richard Chang <richardycc@google.com>
 ---
- drivers/block/zram/zram_drv.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index aebc710f0d6a..a457fdf564f8 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -966,9 +966,8 @@ static void zram_writeback_endio(struct bio *bio)
+diff --git a/block/ioctl.c b/block/ioctl.c
+index fc3be0549aa7..6aa02575e08d 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -857,6 +857,8 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ #endif
  
- 	spin_lock_irqsave(&wb_ctl->done_lock, flags);
- 	list_add(&req->entry, &wb_ctl->done_reqs);
--	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
+ struct blk_iou_cmd {
++	u64 start;
++	u64 len;
+ 	int res;
+ 	bool nowait;
+ };
+@@ -946,23 +948,27 @@ int blkdev_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ {
+ 	struct block_device *bdev = I_BDEV(cmd->file->f_mapping->host);
+ 	struct blk_iou_cmd *bic = io_uring_cmd_to_pdu(cmd, struct blk_iou_cmd);
+-	const struct io_uring_sqe *sqe = cmd->sqe;
+ 	u32 cmd_op = cmd->cmd_op;
+-	uint64_t start, len;
+ 
+-	if (unlikely(sqe->ioprio || sqe->__pad1 || sqe->len ||
+-		     sqe->rw_flags || sqe->file_index))
+-		return -EINVAL;
++	/* Read what we need from the SQE on the first issue */
++	if (issue_flags & IO_URING_F_INLINE) {
++		const struct io_uring_sqe *sqe = cmd->sqe;
++
++		if (unlikely(sqe->ioprio || sqe->__pad1 || sqe->len ||
++			     sqe->rw_flags || sqe->file_index))
++			return -EINVAL;
++
++		bic->start = READ_ONCE(sqe->addr);
++		bic->len = READ_ONCE(sqe->addr3);
++	}
+ 
+ 	bic->res = 0;
+ 	bic->nowait = issue_flags & IO_URING_F_NONBLOCK;
+ 
+-	start = READ_ONCE(sqe->addr);
+-	len = READ_ONCE(sqe->addr3);
 -
- 	wake_up(&wb_ctl->done_wait);
-+	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
+ 	switch (cmd_op) {
+ 	case BLOCK_URING_CMD_DISCARD:
+-		return blkdev_cmd_discard(cmd, bdev, start, len, bic->nowait);
++		return blkdev_cmd_discard(cmd, bdev, bic->start, bic->len,
++					  bic->nowait);
+ 	}
+ 	return -EINVAL;
  }
- 
- static void zram_submit_wb_request(struct zram *zram,
+
 -- 
-2.54.0.545.g6539524ca2-goog
+Jens Axboe
 
