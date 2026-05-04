@@ -1,125 +1,123 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F1C3A383A
-	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 10:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613593D3319
+	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 12:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777890487; cv=none; b=jhtwtUMkWTNaiVG8zF3tUHXJ/O9MRyZ0h1YJ1HTQf0EFzYHP/a11KCQrrMtL1kr7mhmpoXQTbOQhIGtqhPGPdxES5pd+UE051u70KLNu1eGYrmhDgrlx13lcYdGLVIo1LAIKeSjnZLe/kmAUty864iBmq/GzF6pZvg76Xv6LFU0=
+	t=1777897989; cv=none; b=dWDej1xHXbRgQLpECu4FMnmbwGk1RtdRYa0ftELIuKUG0ZJRZ/vSU93Rhq8sYUzn3eBJMc+RTIr9xGMX6fwTnwy45VfaDTGTbfSRv0XgMcic2K5TnCYHNiMt5sT8iEgTkK/fPNldDDf410qgTk+vLkhsDSUUFF5tuUayVXDx2nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777890487; c=relaxed/simple;
-	bh=5xdOX+5arWSGEvcko0QhRQZxIy5sg/8ZA7krb4Kpmuo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UpEmSCHJL58+V7joZsdVkkCVkhsDeosZwHWXpfY2/34JeQS91+gMBonQrCFyT8uXdV3QXPOxsNT5cCJniONdU02EuuwBuj/73nGhWcrRzHptm6rzjhgbUA1KZDPDiWuzTAvKUjenW18q5DycaIIJMpwEGcY1263Vn1qGtq0VbL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82fbdd60b64so2781862b3a.3
-        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 03:28:05 -0700 (PDT)
+	s=arc-20240116; t=1777897989; c=relaxed/simple;
+	bh=yBqzeljeCYAWMfvKpILNF3nSvYdFoDwPi6LXBX0tD48=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jVJlwagW2uGTrfZ95npdHqogJf8k4CmVvBHj4KnvmGmRoKwUB9vUU8WQ2zLXqlcQQj1gWbUccnCPdEjvit/tDQk5OlHIVkuUaUgEOtVoKEzhfBKcjt4XTNBYA3wVWdaKGdC4ZQKIdpEflpg5dR/xcf3UKtjOWGuzqXzUJgkecPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DKQwjQRb; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DKQwjQRb"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-835423c69ffso550364b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 05:33:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1777897988; x=1778502788; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=e8/CDtnGvalUzgGFzgyiRHcKrsHnUrOiavCD5LiN7Ac=;
+        b=DKQwjQRbrBKyaP29/7VWl0cRhivrxZq/Z+93tXrAr0iamjMNRA2P1BvvSVer56ErC1
+         +yPIhyPzP96lA0Ojv1biVLaNXBziRBJ+YWNg83uqocBgi25ZYOPo07I1IDPDAVj6da/5
+         Rpej3IomOvrf5iJz8tTqODt4ejklGo0zj051JoAai0POboLQXRnnY4ohUt6l0ZU9d4kv
+         Wh2Fxd1BC6Atx0mhsZO5uK83pEIUZRSuZKOEJuNRkEJLf69bbevv9ibRxRwWBQYw5hQl
+         YugcfCiS4CBSdB5HBu8BSnMywUQzbNW1hdsQigNyOIcVnhWm4u74KVWn0vma163GYDEF
+         rN9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777890485; x=1778495285;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=36PFWv+dxWmp+SudS0+HKGu6RNXmbG2x8E/T6lDWSiQ=;
-        b=kjTyPptljZ5NIOFwdjvp7GivusPZzT5BbanJZVZ25lYkRFFxepcJIi0T/gPKTkmmpA
-         mpwMzYG0XfB4vMND2ZBYBihnrC68w1xs0bLtCyVs407QrlXlkImHMq4pHrF20OtbMJf/
-         CP3AOQw9Qj/dwzPbJ5mhjZtbYa2EB5oObUC5gR/HI0HvnKCZRV7iCtxXCuaVbXX0IXHa
-         R7+RhVUNVLX6nFtlLBC9Qh/YJ5jnCKYHdOFSFyy57629X2WxrqeO3aS2YEOfCYw2GdV9
-         ayHkIR5GaQhGO02CiHULwPXB8CCneb6o7ubK8ODwU8GQ0M5uimKUCwlc5kszq2O9hYyU
-         ig4A==
-X-Gm-Message-State: AOJu0YyivDTusDnQWe5gKyRQFWOD7MN56Xyf5nD/kIwH3SYC6B/Oeakh
-	AzAMQzvQV1W7a3U8zYny5nx+rzaeCYfKSgyqZ4VsjlkKQQj2+XKa8a5w
-X-Gm-Gg: AeBDiesGDEm/xKCIEydlzJqnvHdVfiAZe68YgEgtSjiz7IJlxoPO8aWIilFi4KfvVBB
-	xxAsQDI8HfqiWUpJPO6jMiawNscyQfda6xqjPk/vFGu1EEWNUD3dkxj8/ZayZKGdC2m7AoJFZBC
-	s8gnlSq6XuWw4ZALX/FcN8dTtztnf/QrDg6YM6EowfGvWF1l3qMb0f3Z2LH8z0CX35wlSmfrL1F
-	V0pbAIjWlFfboIgFMGMXjRtbIe4OlUDEhpAamsR92lDM2R5iv/U75ne8sxcxJpqWPVE7Qugp7oo
-	HJT62juDDTudKZUGUZukwyAld6Hk43vlxnvccaW1CQga2nqLaGqLykdRrjcfcOuypNF6OATi5ZR
-	3CPpLuUMXK3KFBXJtwfLQfq/Kdlg7oshkxfIoOWjXMh8AQ25Gx6yPsrT0M8x43s+zH2tx0XqIMZ
-	9do164GfYKpW1C40sJMyD+jrydOoSBMfcBr0quhR78yNlXs6Smp8u/yySsPsyfk7DBOeMo
-X-Received: by 2002:a05:6a00:aa8c:b0:82f:623f:e5b3 with SMTP id d2e1a72fcca58-8352d2b58d9mr9304507b3a.34.1777890484980;
-        Mon, 04 May 2026 03:28:04 -0700 (PDT)
-Received: from [10.68.32.41] (bba-86-97-226-202.alshamil.net.ae. [86.97.226.202])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-835158a26d3sm11222616b3a.19.2026.05.04.03.28.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2026 03:28:04 -0700 (PDT)
-Message-ID: <05c7b472-6335-49f8-8c2c-73737b300f1f@linux.com>
-Date: Mon, 4 May 2026 14:27:52 +0400
+        d=1e100.net; s=20251104; t=1777897988; x=1778502788;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e8/CDtnGvalUzgGFzgyiRHcKrsHnUrOiavCD5LiN7Ac=;
+        b=nAy7SOHdiCfrlsxZrLKIVbNmF+cGXIBfc/Ccn0PAK6BxsVDyeuDIJV1cDgKGLc4osV
+         u8F2eSmH2+xp34KlsRzDPXsc8iezxNx8+hBHkwYfk8a+DF0t5eEdR7uWWd/VLc55CL9b
+         GOnPh2A6kw6j7F9kUUpA1RqklS0P/wI/vE/jG7VEi25tevfB4y9vnfry75EjHwdvLkHu
+         TRrIDRGuIn3Bm9ESBy7at4K+GnrDAQF+WMW0xdMA/FTgeJDV7YJlKPY1PP/HVzd+/Qa/
+         hmF0KBw76pM7Y06MyASKwUVlk5Q/QleXA2R0rSM9WFNb76MpeeMTB88etuw81PKGgHBl
+         HR8A==
+X-Forwarded-Encrypted: i=1; AFNElJ94W7u6mhbm1E3B5xJpM7TblHyHWgLRJSVMwhCZoSG5hRHoCz/gqjwpDE7XQodfoaGS8iESde4yqnUGwQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/VbDDS9tG09hxUyILqNtrEgc6CsF90/kChcpDLU7Brrkve9dK
+	KQ245oxCVma0kgkCC20ulq+MNHnjeZwULsAsQB79+BgGxbluOQdjVYOmm7GABdN3xljR7MMzud+
+	bos8EFrx06l9puxMlHrv5
+X-Received: from pfblu21.prod.google.com ([2002:a05:6a00:7495:b0:82f:86c3:55ba])
+ (user=richardycc job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:8ccb:b0:835:3c9f:1a15 with SMTP id d2e1a72fcca58-8353c9f1f13mr4332851b3a.25.1777897987531;
+ Mon, 04 May 2026 05:33:07 -0700 (PDT)
+Date: Mon,  4 May 2026 12:32:30 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH] floppy: select FDC before arming timeout work
-To: Cen Zhang <zzzccc427@gmail.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- baijiaju1990@gmail.com
-References: <20260504032853.316099-1-zzzccc427@gmail.com>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <20260504032853.316099-1-zzzccc427@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.545.g6539524ca2-goog
+Message-ID: <20260504123230.3833765-1-richardycc@google.com>
+Subject: [PATCH] zram: fix use-after-free in zram_writeback_endio
+From: Richard Chang <richardycc@google.com>
+To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>
+Cc: bgeffon@google.com, liumartin@google.com, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, 
+	Richard Chang <richardycc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi, 
+A crash was observed in zram_writeback_endio due to a NULL pointer
+dereference in wake_up. The root cause is a race condition between the
+bio completion handler (zram_writeback_endio) and the writeback task.
 
-thank you for the patch.
+In zram_writeback_endio, wake_up() is called on &wb_ctl->done_wait after
+releasing wb_ctl->done_lock. This creates a race window where the
+writeback task can see num_inflight become 0, return, and free wb_ctl
+before zram_writeback_endio calls wake_up().
 
-On 04/05/2026 07:28, Cen Zhang wrote:
-> floppy_shutdown() uses current_fdc to choose which controller state
-> to mark for reset when fd_timeout expires. lock_fdc() currently arms
-> that timeout before set_fdc() has selected the drive/FDC and updated
-> current_drive/current_fdc.
-> 
-> drive_params[drive].timeout is user configurable, so the timeout
-> can be immediate. Even with a non-zero timeout, a delayed caller can
-> leave the timeout work running while set_fdc() is still testing
-> fdc_state[fdc].rawcmd and updating the adjacent reset bitfield. The
-> timeout can then use stale selected-controller state or race the reset
-> bitfield update.
-> 
-> Move the timeout arm after set_fdc() in lock_fdc(), and keep the
-> same ordering for the direct floppy_queue_rq() path. This ensures
-> fd_timeout cannot run until the selected-controller state describes
-> the operation being timed.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+CPU 0 (zram_writeback_endio)       CPU 1 (zram_complete_done_reqs)
+============================       ============================
+spin_lock(&wb_ctl->done_lock);
+list_add(&req->entry, &wb_ctl->done_reqs);
+spin_unlock(&wb_ctl->done_lock);
+                                   while (&wb_ctl->num_inflight) > 0)
+                                   spin_lock(&wb_ctl->done_lock);
+                                   list_del(&req->entry);
+                                   spin_unlock(&wb_ctl->done_lock);
+				   // num_inflight becomes 0
+                                   atomic_dec(&wb_ctl->num_inflight);
+                                   returns to writeback_store();
+				   // frees wb_ctl
+                                   release_wb_ctl(wb_ctl);
 
-Reviewed-by: Denis Efremov (Oracle) <efremov@linux.com>
+// UAF crash!
+wake_up(&wb_ctl->done_wait);
 
-> ---
->  drivers/block/floppy.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index 92e446a64371..f9b924a2f276 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -894,8 +894,8 @@ static int lock_fdc(int drive)
->  
->  	command_status = FD_COMMAND_NONE;
->  
-> -	reschedule_timeout(drive, "lock fdc");
->  	set_fdc(drive);
-> +	reschedule_timeout(drive, "lock fdc");
->  	return 0;
->  }
->  
-> @@ -2874,8 +2874,8 @@ static blk_status_t floppy_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	spin_unlock_irq(&floppy_lock);
->  
->  	command_status = FD_COMMAND_NONE;
-> -	__reschedule_timeout(MAXTIMEOUT, "fd_request");
->  	set_fdc(0);
-> +	__reschedule_timeout(MAXTIMEOUT, "fd_request");
->  	process_fd_request();
->  	is_alive(__func__, "");
->  	return BLK_STS_OK;
+Fix this by moving wake_up() inside the done_lock critical section.
+This ensures that zram_complete_done_reqs cannot consume the request
+and decrement num_inflight until zram_writeback_endio has finished
+calling wake_up() and released the lock.
 
-Thanks,
-Denis
+Fixes: f405066a1f0d ("zram: introduce writeback bio batching")
+Signed-off-by: Richard Chang <richardycc@google.com>
+---
+ drivers/block/zram/zram_drv.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index aebc710f0d6a..a457fdf564f8 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -966,9 +966,8 @@ static void zram_writeback_endio(struct bio *bio)
+ 
+ 	spin_lock_irqsave(&wb_ctl->done_lock, flags);
+ 	list_add(&req->entry, &wb_ctl->done_reqs);
+-	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
+-
+ 	wake_up(&wb_ctl->done_wait);
++	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
+ }
+ 
+ static void zram_submit_wb_request(struct zram *zram,
+-- 
+2.54.0.545.g6539524ca2-goog
+
