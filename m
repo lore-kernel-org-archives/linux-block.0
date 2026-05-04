@@ -1,33 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4366168BD;
-	Mon,  4 May 2026 04:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145051F09A8;
+	Mon,  4 May 2026 04:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777869861; cv=none; b=HOPZdEhlTz7xAHs/T/HYeGqXlQVub1Zvt41pBNTdmQuPHsu2d7AMKeiPZssoI/KG/twXMLVg0/Auw4Fs98H3O7HXBB+xXcr+zNlUYIjZ+mEJtnjs2WqZYZMPcBTG9YCDkL0JddS5IBaFuFbrfRyX1dN5hFuxydmUsk1xWw0Kn5M=
+	t=1777870729; cv=none; b=IjsCi6f0ahT7AJNQm7FFKKnW2ExDunQ/oILZ/MB+GMM03N3UIztNQXb1Ma7imMTNRHJv650siV+xPtWEO6L7APf7p3DfO4DxsMnphaLFkwSAuEI2CSgLQ9COR6V223N/wlXkqnSCyx0jn/aqRxEsOkJp5a35RNyB/lfM5N1nH+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777869861; c=relaxed/simple;
-	bh=WgdMtm8snSXiXjZbw4RKtd8xmEOVgpkx/K7f4EFgSIo=;
+	s=arc-20240116; t=1777870729; c=relaxed/simple;
+	bh=HDD2JjMSCwaAzH5cmnutTQ9kbbQjd8Obu8MwU/ju5G0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gvt432EHOEabJ2Rg8/sTKBM6Y0Sikmh51y0hESBwbOfhrThkKgwPU15Ff79MbReEwWEL2WypO2AYDYPkOD63oq8QG6m6dOpmSaxGAzSR9msLzY0+ni8ojwODZWrcwtxMLUA2ALhY+QfKxL713WGTj3IeXtXghiYBbYxkAmaF4Bo=
+	 Content-Type:Content-Disposition:In-Reply-To; b=H6f7eViIbyz3pPpIWwkDcl+wuySIBpBvqFsqbQWdTJfuKLkYNcY7E8r4FA5x1vYBUZDd1cl8mXMb0nazObU2hfxFOBzu9BlF3wzWwC1edCJDSYGSASXeEu5UrA6cVEK4n8HrrBNB50HBjVCgX9bRBeSe1cioI34+rT1Xzjk7uRM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id DDCE168AFE; Mon,  4 May 2026 06:44:15 +0200 (CEST)
-Date: Mon, 4 May 2026 06:44:15 +0200
+	id 75EAB68AFE; Mon,  4 May 2026 06:58:44 +0200 (CEST)
+Date: Mon, 4 May 2026 06:58:44 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Carlos Llamas <cmllamas@google.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>, kernel-team@android.com,
-	linux-kernel@vger.kernel.org,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: restore mempool reserves for non-block
-Message-ID: <20260504044415.GA9077@lst.de>
-References: <20260503001734.858296-1-cmllamas@google.com> <d8a4d967-ca1b-421c-a452-d440df9535f2@acm.org> <afdjYQ1szt_ovq_k@google.com>
+To: "Pankaj Raghav (Samsung)" <pankaj.raghav@linux.dev>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: pass a minsize argument to
+ bio_iov_iter_bounce
+Message-ID: <20260504045844.GA9353@lst.de>
+References: <20260430132019.312405-1-hch@lst.de> <20260430132019.312405-2-hch@lst.de> <jgzzl7e6qzea5ohma2tdma2rndlaj4ouohsiwohpz22w3aiqvp@czndpvnggd3q>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,28 +35,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <afdjYQ1szt_ovq_k@google.com>
+In-Reply-To: <jgzzl7e6qzea5ohma2tdma2rndlaj4ouohsiwohpz22w3aiqvp@czndpvnggd3q>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, May 03, 2026 at 03:01:53PM +0000, Carlos Llamas wrote:
-> On Sun, May 03, 2026 at 06:26:48AM +0200, Bart Van Assche wrote:
-> > On 5/3/26 2:17 AM, Carlos Llamas wrote:
-> > > Fixes: b520c4eef83d ("block: split bio_alloc_bioset more clearly into a fast and slowpath")
-> > 
-> > Hi Carlos,
-> > 
-> > Please help with verifying whether this patch series is sufficient:
-> > Christoph Hellwig, fix /dev/sg allocation failures register, April 15.
-> > This patch series can be found by searching for "b520c4eef83d" on
-> > lore.kernel.org.
+On Fri, May 01, 2026 at 02:46:51PM +0200, Pankaj Raghav (Samsung) wrote:
+> On Thu, Apr 30, 2026 at 03:20:04PM +0200, Christoph Hellwig wrote:
+> > When bouncing for block size > PAGE_SIZE file systems, the bio needs to
+> > be big enough to fit an entire block.
 > 
-> Hey Bart,
-> 
-> I did look for fixes but I totally missed commit 7b03c93d2beb ("scsi:
-> sg: Don't use GFP_ATOMIC in sg_start_req()") from mkp tree. Sorry, this
-> patch definitely fixes the issue I'm facing. Thanks!
+> We set the alignment to fs_block_size when IOMAP_DIO_FSBLOCK_ALIGNED is
+> set. And we always set IOMAP_DIO_FSBLOCK_ALIGNED in btrfs for dio 
+> reads/writes. IIUC, it was added to support bs > PS block sizes in btrfs.
+> But in XFS, we set it only for CoW inodes (xfs_is_always_cow_inode is true).
 
-Also b5129bda5bbc ("block: only restrict bio allocation gfp mask asked
-to block") in the block tree.  Both of these should fix the issue
-you're seeing, and both are good on their own.
+Yes, I ran into this with zoned XFS on large block size.
+
+> 
+> The commit message seems to indicate this is needed for all filesystems
+> that support bs > PS configurations. Am I missing something here?
+
+No, the commit message could be a bit more exact.
 
