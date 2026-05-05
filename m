@@ -1,197 +1,125 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1B13ED118
-	for <linux-block@vger.kernel.org>; Tue,  5 May 2026 07:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2663093DF
+	for <linux-block@vger.kernel.org>; Tue,  5 May 2026 09:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777967271; cv=none; b=h8+0JkjZ5L9bLDCZ90L6lbwg5wd4Nj0Bb4AXfzjkSrg8bqwEQuCQGLYaJpjrSabu+pwrGU4aVhM3t7O7FvKWdiUjRO0uN85phPilpfgxQ4Wrj65uNy9Sk6AMUUfj97V3m7YieKLuVBDe24kXMlO+jxazSTOm1+3zUZe1CqMHdbw=
+	t=1777972803; cv=none; b=pzH7h0F7O2Wj5eRwbTstptKg7heU9KzJPpXerfUBq3NFjXOQqEkOUA55Ikgl31OGtIc47evskh3WwqXRLdac5IMbVDygXGW0uOlQSAzndXsRt4qLJB+3EoPqVnuUxkt9Mjjl9skWQEpDdrkckDVIdyp+LsAM1L7DjekeiMaSvFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777967271; c=relaxed/simple;
-	bh=m3VnSMM2QtOWFjvotg7TV3q/DN1mgtB9oq+ih2Z0h1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZUB0HYEyP1MxpC3rYychgJXVXsmS4TduiR2ZkdPhGRKsuRLX1/r852sfyn+i7iEfspLsEf00yAfhUo72WO61nOlgwGZwCMvj7Vh1DYMQk6lZacSAsNU6y9v3yprbVpCrPSbR81aqFyxXB06PbdEeC4tmxWNNKEOyHWMOQaerCOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=LswpkPtP; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	s=arc-20240116; t=1777972803; c=relaxed/simple;
+	bh=w735SAosskY0lneyTF/N6eHJ+JYB4aKQ6FyORfKtj3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MNNqGClaU2gOe8lnbYWslTc7CiEZkpm8NMAa1f0X8/MdhdmIaD2WmzPkJPHpYGViplUREIXMLNOkT4cqzhDF0WpA05nxynwcrFQCAbbamF4ZznbvcFjJQ+72rW1vcRGrmMEybmFHVGjBq0eCk8NeytLReogMzlBhYvtNInnfTok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=xSDtT0Q1; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="LswpkPtP"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48a3e9862f0so32640055e9.1
-        for <linux-block@vger.kernel.org>; Tue, 05 May 2026 00:47:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="xSDtT0Q1"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48a3e9862f0so33434245e9.1
+        for <linux-block@vger.kernel.org>; Tue, 05 May 2026 02:20:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1777967268; x=1778572068; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=63kUHHgmHe5aHRdq16aqP1LCZFlEN5uhqVLiLtPxsH8=;
-        b=LswpkPtPymN7j1kirDXXa5h/c7LOiytYYE3VujZvRrkmcbOr7QB+70QvH1avjDf3Gu
-         RrGm5VQ1Taq0eAiScG2Z/argb2LfewL7rXLPeY8/okN4YSRqQNXnufwANarjVM98swNu
-         wvmAhhyG2ujeDE1FT6nCeixdNYdofiEq5VmrRn6rSJCcksvQ123nISDXwyThjIbpCo0I
-         NQLQXpVk5eKAenHUpBXQ/FMNS+lvCuBakGBFij4EYLRE7ugp1CQJbSYlccdoFEkDN9yE
-         G1zFvM9H10rsMtQyTCkkhnm3vpYX03RX4o1SD088/pFkfYgJqbS8PleyS6eC+wLqdiGX
-         bhmw==
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1777972800; x=1778577600; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=g/XskZrJZlyhcSv2Bh7vKAobPna7NRs2qWovNRghzDM=;
+        b=xSDtT0Q1Pc29VaJGJod+NR/F+8qbRpfWHyaQN8rW5wyS71nET/MU7mJXvKxZDZtMxt
+         sRiGyNdU7Xt2LKHHKXCs0KdgDjNMcQ0My2ikzKnPvYTou4JWZDszzTGWDce/VSIwVJ0M
+         CAykduzdMUCNA0h2pQ1fkJq7PNKWf+Jr2gYjBFkcODcdXk2JG6TZaxw9OfKnZIfgIw3i
+         vY0kX8MG7AeNC41O+fds00GugEEb5yRV5iifmrI8YQ+e0dvkhefNzqrUh40YezFp3HMQ
+         /RIDeebfQ34u7OOsvioPY0rXxiXkf5NuzDhfZJj5zzABOgP53GeGwri5G+1hg7puUxwD
+         KGtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777967268; x=1778572068;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=63kUHHgmHe5aHRdq16aqP1LCZFlEN5uhqVLiLtPxsH8=;
-        b=hD2LPFp+TMvBrQpX37vX6EFbgueVI9EjCbShG54A0xtKoKcDFljaYqRhgylVfHDdDp
-         Cr4tR163SP/g+bh/nS8mwCTM/AbBN+/ofvd0Rdde9RCwGetNMz/9W0hkyenXrmu0bPCo
-         085aZVnMFCABV5U7wdQFIxcHC+CMi2n04Ojz0gUtbJSmZ1NEbsBjWEV7meV5MY0JpS+N
-         3UZEiYqmDBxlThx0MO4uFOFb6qjJ55Z1gby93AsUf3As4afhSDSwT/O7JCk1mmCR/8CQ
-         QDs1kqC/4g+Bv2NF3cdlGUwDH0yS73inL9tbT+jUWu10r38cAfoGMTpCZPmfiJELNNwF
-         Ejdg==
-X-Gm-Message-State: AOJu0YxQTrADyiUisGCPolXmz/DNl8w6MG0GQPMMGPTKPfHt42mLcxsr
-	JF+mKZsborDQQ0BfUGFDtNDpk2UqTCnU7KUSPjuEmK5UxSk9BrcPNndC9wnihu+LbkCnogsToiU
-	8vI5vS7Cb1Q==
-X-Gm-Gg: AeBDievVdF+IzoediCH6aQ33ffIhwiAIYQLr20NaKfQrH5sePeRwOa8VlDEDCymNDu+
-	gS4b8cBs4hidNzgLz4uLgOP2L4EYYyLM6emLVsD8mxEwuLsq4G1f3wkfFMHEKUGNLfJ1M3GqtuI
-	kw7i5b/Q7+WonEjG7Ig4ZOruWpY52dJJJDpFkWgYNw/h1XYi1PdLVLzeizoMw6gpBJTeRfcJd+3
-	Y+AYK13KhZhuYKkybGiV7EBOLgEA4Ub+3N8gzwdn9/tqpUhisjwIJFkiy2Ob86fSbUnI6LkehWm
-	mHcTi+luvFhPrzDFw+txvhcjPu3zl0n0DBgcxDQLloixy50b6TV9gQv4ZL7HG0Tfqh3D6Kattpa
-	IFTNbAKMFfijlpOVKkmeTwSXBq9FAuo50Z9dO41iYaJogXE2jjbQ6eIGZ3RK00tSK/EAThONh2z
-	gEAUOiGKRHAIp7PbpXXmAqxByg+W7HgEx4AgUnPsVA4PeSBL0bVe7U3bacouXx1KH9WxWu7oetg
-	qD5TcVfpt5ZA8kictHuVLw3ksbvvH8Kzpeu+venRnZ+Vg==
-X-Received: by 2002:a05:600c:19d4:b0:485:3c2e:60d5 with SMTP id 5b1f17b1804b1-48d1422baefmr39849435e9.2.1777967267641;
-        Tue, 05 May 2026 00:47:47 -0700 (PDT)
-Received: from lb03189.fkb.profitbricks.net ([213.147.98.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48d186d97c4sm10617125e9.35.2026.05.05.00.47.45
+        d=1e100.net; s=20251104; t=1777972800; x=1778577600;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g/XskZrJZlyhcSv2Bh7vKAobPna7NRs2qWovNRghzDM=;
+        b=fAgqMWgrRy0V8V+0BvGN9l6nAMnydyUVVVnLjuKxvhNRxoNbAUrXtm1x+CQUSkNCSU
+         wBLbTcyKeBc4Ea1QBGgtxhNrOPwmrcoecgCMSvA8Ppp6nYqx1kCMIaJh+q1JHtoGH7ao
+         HN6vq2fz4agBARRFLISltaLrP4QYL9pJ2qQCoN6b/CClORW5sxaAl+vNOf4q5WtQRJ9Q
+         V4MwMS7o0IWRmTfmDbPBVqmRxe0oZZWcpZMb7frFZEfsTI1LN+e0RcaOplJG2EvpaL/x
+         7pgFXEcOSIcN8KI2jY/EZvA4m9Lrz1gii0f8okTN5AWi/STmO0zWtx6Es9K4ZZ43lYeR
+         Nv1A==
+X-Forwarded-Encrypted: i=1; AFNElJ9ujtMaKTjG7DswMwTCZsn1Rz0JG6d55qNm4jleBO745fWmHQ5Q/dygSkA8Ms20EBVA2d6XFCeazwTyfA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0jof5DiZL6h1rMc1zxWziC1dqzUzMJsZVubdCq47pC9jNLSAd
+	CfzEFuW3huN3PV9LbHzzdX7pgLsyBlR46PXNG88gQ6oTOtp5nmZQml/uoUMgkZUm8IA=
+X-Gm-Gg: AeBDievR1SU2ZrdwxA3NkXq+V5SIV/PBQiDwoLJjOPjDR/qifrN9pMjMuOxi5G4b/1Q
+	jIkZb78y7W99ZTY5fSl1bzzjBL1oXzij2ZIyweBo3ysPzGvxLD3D9FQdjeXIIXfhXDEZzbC9oil
+	dUFs3IM0FdUjv4UvI3vdRLz0mcqprOUBuT8w6vUou/9XYraZZcNSxLZHeaRiZXXyGWWfNpGpyci
+	1MfC4FDtmvYpjUou04GQvDcuEdnRlYno0O73/AR8gzoXTzge/BzKie6Wjmraz3SsUcIgdSIdg3m
+	sZpOIw++ahPaowtB/crUJHbJuI3niea3qIZFKoMImwtxpGDoIcA4sWUOB6LJuQSSi/l7CGcmIY9
+	he90tBamyhX4AxaTzkRi8bkD+4A7c2fIM+A717vowdbK8CuNEd4PyyZPTX2uFxdsRmG32DD0WKp
+	yMAoRgSK+p7AHB4r+aY4z2QVDs0sv5UvL6yRbUK4cc0COq8KXZXkYSmfZoNzNEr5J6masOrLifd
+	0C8opSoUw==
+X-Received: by 2002:a05:600c:3152:b0:489:1d7a:4537 with SMTP id 5b1f17b1804b1-48d1422bafamr46477035e9.3.1777972799979;
+        Tue, 05 May 2026 02:19:59 -0700 (PDT)
+Received: from ryzen9 (192-164-131-220.hdsl.highway.telekom.at. [192.164.131.220])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48d184e09eesm12562715e9.29.2026.05.05.02.19.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 00:47:47 -0700 (PDT)
-From: Md Haris Iqbal <haris.iqbal@ionos.com>
-To: linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	axboe@kernel.dk,
-	bvanassche@acm.org,
-	hch@lst.de,
-	jgg@ziepe.ca,
-	leon@kernel.org,
-	jinpu.wang@ionos.com,
-	Md Haris Iqbal <haris.iqbal@ionos.com>,
+        Tue, 05 May 2026 02:19:59 -0700 (PDT)
+Date: Tue, 5 May 2026 11:19:57 +0200
+From: Philipp Reisner <philipp.reisner@linbit.com>
+To: Haris Iqbal <haris.iqbal@ionos.com>
+Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
 	Jia Li <jia.li@ionos.com>
-Subject: [PATCH 13/13] block/brmr: include client and server modules into kernel compilation
-Date: Tue,  5 May 2026 09:46:25 +0200
-Message-ID: <20260505074644.195453-14-haris.iqbal@ionos.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260505074644.195453-1-haris.iqbal@ionos.com>
-References: <20260505074644.195453-1-haris.iqbal@ionos.com>
+Subject: Re: [LSF/MM/BPF TOPIC] A block level, active-active replication
+ solution
+Message-ID: <afm2PewS5Gi5QU61@ryzen9>
+References: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
 
-Add the per-directory Kconfig and Makefile, and wire them into the
-parent drivers/block Kconfig and Makefile so BRMR can be enabled in
-a kernel build.
+Am Tue, Feb 03, 2026 at 04:09:59PM +0100 schrieb Haris Iqbal:
+> Hi Haris,
+> 
+> We are working on a pair of kernel modules which would offer a new
+> replication solution in the Linux kernel. It would be a block level,
+> active-active replication solution for RDMA transport.
+> 
+> The existing block level replication solution in the Linux kernel is
+> DRBD, which is an active-passive solution. The data replication in
+> DRBD happens through 2 network hops.
+>
+>
+> An active-active solution which one can build is by exporting block
+> devices, either through NVMeOF or RNBD/RTRS, over the network, and
+> then creating a raid1 device over it. It would provide a single hop
+> replication solution, but the synchronization during a degraded state
+> goes through 2 hops.
+> 
+> The proposed solution would provide an active-active single hop
+> replication, and a single hop synchronization (directly between
+> storage nodes) in case of a degraded state.
+[...]
 
-Three Kconfig symbols are introduced:
 
-  CONFIG_BLK_DEV_BRMR		(silent, selected by either side)
-  CONFIG_BLK_DEV_BRMR_CLIENT	(depends on INFINIBAND_RMR_CLIENT)
-  CONFIG_BLK_DEV_BRMR_SERVER	(depends on INFINIBAND_RMR_SERVER)
+I stumbled across this post because of the newer replies.
 
-The Makefile builds two modules: brmr-client.ko and brmr-server.ko.
-The server side acts as a consumer of the RMR server-side IO store
-interface (struct rmr_srv_store_ops) to back an RMR pool with a
-local block device.
+I want to point out that we have significantly developed DRBD over the
+last 15 Years as an out-of-tree module. In the past months, we began
+the process of getting all those improvements back into Linux
+upstream.
 
-Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
-Signed-off-by: Jia Li <jia.li@ionos.com>
----
- drivers/block/Kconfig       |  2 ++
- drivers/block/Makefile      |  1 +
- drivers/block/brmr/Kconfig  | 28 ++++++++++++++++++++++++++++
- drivers/block/brmr/Makefile | 16 ++++++++++++++++
- 4 files changed, 47 insertions(+)
- create mode 100644 drivers/block/brmr/Kconfig
- create mode 100644 drivers/block/brmr/Makefile
+With that, DRBD9 became multi-node. It does the “active-active single
+hop replication” as it is. The networking part is now abstracted into
+transport modules. We have one for TCP, one for load balancing across
+multiple TCP connections, and one for RDMA.
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index 858320b6ebb7..65167fcb1357 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -353,6 +353,8 @@ config BLKDEV_UBLK_LEGACY_OPCODES
- 
- source "drivers/block/rnbd/Kconfig"
- 
-+source "drivers/block/brmr/Kconfig"
-+
- config BLK_DEV_ZONED_LOOP
- 	tristate "Zoned loopback device support"
- 	depends on BLK_DEV_ZONED
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index 2d8096eb8cdf..4793c9b0b383 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -33,6 +33,7 @@ obj-$(CONFIG_BLK_DEV_PCIESSD_MTIP32XX)	+= mtip32xx/
- 
- obj-$(CONFIG_ZRAM) += zram/
- obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
-+obj-$(CONFIG_BLK_DEV_BRMR)	+= brmr/
- 
- obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
- obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull/
-diff --git a/drivers/block/brmr/Kconfig b/drivers/block/brmr/Kconfig
-new file mode 100644
-index 000000000000..a38d59d2c1d4
---- /dev/null
-+++ b/drivers/block/brmr/Kconfig
-@@ -0,0 +1,28 @@
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+
-+config BLK_DEV_BRMR
-+	bool
-+
-+config BLK_DEV_BRMR_CLIENT
-+	tristate "Block device over RMR (BRMR) client"
-+	depends on INFINIBAND_RMR_CLIENT
-+	select BLK_DEV_BRMR
-+	help
-+	  BRMR client is a block device driver that sits on top of the
-+	  RMR ULP and exposes a standard Linux block device (/dev/brmrX)
-+	  backed by an RMR pool.  Together with RMR it provides a
-+	  single-hop replication and resynchronization solution for
-+	  RDMA-connected storage clusters.
-+
-+	  If unsure, say N.
-+
-+config BLK_DEV_BRMR_SERVER
-+	tristate "Block device over RMR (BRMR) server"
-+	depends on INFINIBAND_RMR_SERVER
-+	select BLK_DEV_BRMR
-+	help
-+	  BRMR server exports a local block device as the backing store
-+	  for an RMR pool, so that BRMR clients can map it remotely
-+	  over RDMA.
-+
-+	  If unsure, say N.
-diff --git a/drivers/block/brmr/Makefile b/drivers/block/brmr/Makefile
-new file mode 100644
-index 000000000000..894ba2720557
---- /dev/null
-+++ b/drivers/block/brmr/Makefile
-@@ -0,0 +1,16 @@
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+
-+ccflags-y := -I$(srctree)/drivers/infiniband/ulp/rtrs \
-+	     -I$(srctree)/drivers/infiniband/ulp/rmr \
-+	     -I$(srctree)/drivers/block/brmr
-+
-+brmr-client-y := brmr-clt.o \
-+		 brmr-clt-sysfs.o \
-+		 brmr-clt-reque.o \
-+		 brmr-clt-stats.o
-+
-+brmr-server-y := brmr-srv-sysfs.o \
-+		 brmr-srv.o
-+
-+obj-$(CONFIG_BLK_DEV_BRMR_CLIENT) += brmr-client.o
-+obj-$(CONFIG_BLK_DEV_BRMR_SERVER) += brmr-server.o
--- 
-2.43.0
+What you are doing here, in DRBD lingo, is a diskless primary
+connected to multiple storage nodes.
 
+Find everything here https://github.com/LINBIT.
+The latest edition of what we bring to the upstreaming discussion:
+https://github.com/LINBIT/linux-drbd/tree/drbd-next
+
+Philipp
