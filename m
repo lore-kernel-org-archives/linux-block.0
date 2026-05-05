@@ -1,114 +1,191 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CWXP265CU010.outbound.protection.outlook.com (mail-ukwestazon11022087.outbound.protection.outlook.com [52.101.101.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D91248C8A6;
-	Tue,  5 May 2026 16:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777999080; cv=none; b=Y7hko3Z7Q6ZxmbXFxckofwAWQqrEbUHb3W8uRlRUURP1r2o1LOV28Y/Dofc59q+v1r0uOc1Z+xaLb6wr64bfbVh7CYzhc09Nia7PZ2+AamCagDyHVLbXXHQFZVmdP+hs20g/vMpN9O/Q4yPS4YfrJp2BhxF18BEB+wactSKqPt8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777999080; c=relaxed/simple;
-	bh=OR+cXX3O3Pn5AnhBdDXDFvoMA55eZX7aqCQYJmBcSwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pwL8SQdQewAkSQJ8w9uIezLkr88c+9H/yAOsk01p6IjkFvxpd8NKBfheKGn3p6m2i8hjTOOrbNG9vd07+cT/zttf9gvOamxGiGsylPiaUcWS/J1zecbj4BdC7lZ3/02Yf5AjA7G0sQKMmrNyKgwZFVkvSzXd8CW6RGwZsCYEacY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PT5kkN6R; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PT5kkN6R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C33B5C2BCB4;
-	Tue,  5 May 2026 16:37:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777999080;
-	bh=OR+cXX3O3Pn5AnhBdDXDFvoMA55eZX7aqCQYJmBcSwY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PT5kkN6Rg7Zr+umAFS68riH9fPZUlYimaVd9+UCV993sVtUPjG+zgOMNOoYZYxPZ8
-	 XKU3by1C9G1rulwOyQGw4c8h4sVfkr26Nzkx9wHCFLiQULmbqOqNVEL9nZMnHE9iQE
-	 0Skc4Rss8oYhJUIiPKqbXtdcKYEf8XJjHmM3t8bFtgKkkGawOTHA1SeY+Nml47OeNb
-	 pBPnJHtDzmrnPbvfCUO/Z4/c7dK5+syJJN959XwjlGLAK0Uft2aowz6oEh390QzQkC
-	 5dhxZJTU1qRsxSb0wE6fW+wrztq85AXi5R3hT+YAoi+VC3sC7fJlmCoomP0y8JnFcS
-	 iVtuXeABi/OMA==
-Date: Tue, 5 May 2026 09:37:58 -0700
-From: Minchan Kim <minchan@kernel.org>
-To: Richard Chang <richardycc@google.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>, bgeffon@google.com,
-	liumartin@google.com, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] zram: fix use-after-free in zram_writeback_endio
-Message-ID: <afoc5qLvK2PDQKb-@google.com>
-References: <20260504123230.3833765-1-richardycc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011A04A33F0;
+	Tue,  5 May 2026 18:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.101.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778006552; cv=fail; b=F2PcdXRPE20io0wyOD6evgF0oOy9sxsQ2HMxQ/TtLbG4cB/MwmcPfzZPE9WgKK2JE33ZVGlvVPtm8Oaepv0XCx21ARJ7S6mpWmfu+16Rp/Q17I+L6AgT8KiQgonmWNHf5W9eajJgBw6obU63Y7SiNLQxPU6vyt2iVCzG4rAb/Xs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778006552; c=relaxed/simple;
+	bh=ycTtMOPtbODDsV2VDyGEWbIGS3YniwwYVA6hMo6/GH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=sFe1NS9Jwa0m73cBMmJHF7VGhObv7Ox+5MluVE/9nLYfKPwSkN2JyW3jpuRJlMLPwnkz92zp07QIuPribPA0LNgbtbgeKJm8vlZnHr/5xAxjB2HOShXnYRUO+2cdT58jyCn+z4VSGFs85kFCtOfxiHUPCwJyXFF4JK52gV93BIY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.101.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AC+pMnJpcpR9wOnNr7p3SA8+g4dKvEsyCEUERNEJ9+zBXMjhgDQSzF+MKnFxJMjJoh1hDEEdcV7UdpMFxKngJYK8/pEesv8QaVxrRPhVAmP/whAECL7WRJs0emBy9f1UJsxLSPVw4TXu1+ZefJ4R5HsPPUkRWqMMpQNQPyTH4fg1ubtXU/uh7+xRScsYYCUS/p+oi9E7QhiYgjbOq7aHVug5pJkI/jAbQOieHDVf8hACUMjvJqixuAkhaumdAef5FUWYpiaZweKHzQlr6qDlcD4fO+iClqsDwYmPKMLJuBkojbiA3v/DVgF/MY9u/9wpDEkmKKwS5aSGz0aY5nW/Dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lhOkxrjJVAkeKIK3dAvPWKkQjHjXGsoVlbiHamENfuY=;
+ b=ad3yWO/I8/wgsWVl5jGT2YPD/BTnRHynO8/E5L9DBlnL2m1WctzOUeM2nGiF2noNekxwD8Ti2WaUVudnlv7zFhgPWw/uNDusxAzYkllPd0GToEuoiBmrh6bjbyQC0HFkMXpePMDuDboQRImn46/uN0iqVtMfFWX2+I/eFr8mqcgcEpA1VxgANyqR2PZUnpoXC0QaPOLEVahodOJibDV6cIMgSwEMqmbI819Hm25yg2P7MQHDRm3NX1dT6UlUscOxpjae5Ov19VXWxnZJvMJnmcq7I2tY5vUIhS1VB8dlo6J+b/uoRXK9ggUJ/cHZm/cM915hWkZaoZknYxqDhCe9Ww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
+ by CW1P123MB8568.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:27c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.25; Tue, 5 May
+ 2026 18:42:27 +0000
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9846.025; Tue, 5 May 2026
+ 18:42:26 +0000
+Date: Tue, 5 May 2026 14:42:19 -0400
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, 
+	mst@redhat.com
+Cc: aacraid@microsemi.com, James.Bottomley@hansenpartnership.com, 
+	martin.petersen@oracle.com, liyihang9@h-partners.com, kashyap.desai@broadcom.com, 
+	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com, 
+	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com, sreekanth.reddy@broadcom.com, 
+	suganath-prabu.subramani@broadcom.com, ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com, 
+	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com, 
+	bigeasy@linutronix.de, yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org, 
+	longman@redhat.com, chenridong@huawei.com, hare@suse.de, kch@nvidia.com, 
+	ming.lei@redhat.com, tom.leiming@gmail.com, steve@abita.co, sean@ashe.io, 
+	chjohnst@gmail.com, neelx@suse.com, mproche@gmail.com, nick.lange@gmail.com, 
+	marco.crivellari@suse.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, 
+	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com, 
+	MPT-FusionLinux.pdl@broadcom.com
+Subject: Re: [PATCH v12 01/13] scsi: aacraid: use block layer helpers to
+ calculate num of queues
+Message-ID: <ipymclgw2laol6aqwabsbwqhvnt57d56hvbyr5qh5k77rfxos7@46xma5rhedm3>
+References: <20260422185215.100929-1-atomlin@atomlin.com>
+ <20260422185215.100929-2-atomlin@atomlin.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lulx5av7ree2nb5v"
+Content-Disposition: inline
+In-Reply-To: <20260422185215.100929-2-atomlin@atomlin.com>
+X-ClientProxiedBy: BL1P221CA0031.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:208:5b5::10) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|CW1P123MB8568:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b76340e-65e5-4abc-01aa-08deaad60d10
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|56012099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	AGBl6n23A18w78qhcDF3FAlbpTG3ttcm1mBqWMHS42mIOCD9SOKOihYfYDOCuRFSDofnDkxY1HUHpRB5RoIlqDJyCQNIh7ammCgxg73Sp8QOqS7oBK9MGBWm0/yaFej/YVovNuDe6qEmaW1G/cJ5/xwlvXbPNtSEC442kRSc4b/bJdi2TPz5Gqt5SlQDsG3OQCOaJgZ11A6qhAIpnq3ybO0Z5MUtju5jbY9tCGirR24RL5qRH7pwmFOQvi3nF1ABVVRochPULTpiKX1LbJfJEcq2ZHGfbkIRFZAtrY4G9beKTV/234ZlXDDR0Z9M3MpIl8q6X2R2X0vE7+pwD2AkNreEvfr2aUfwPsRbEDYPhKIYS9hvcxAHOlRncDni0L18g82WXlLgfAlv0FpCjD5xwqzHzj4H4mjPS6RTZqE2YTTtVk8GmBDSAe029KnF3iwsXiXLlw1HCnVaSr3a0ZXdp0saO/3aLe6o7fQNwN6Fac/cZWKiv2m39EQ9vz7/7sNCNz4TWFzexm4d0jXc5ajRBGnwnv9tSGo9I2/l3h5/1PVdVZ8pblDiHI4bG8YV1mSSe0IAVhjCth04Pb/pB4PgoPvBugsJ4t5VU1T/vi4BGvtm0eUFWhuceoWvMVVrPjh/01bT02z4soAP8dL+NEzoMm+jEXR/gj321z4E2UL4ONLtyKEchzzPPbHOLxvAUQPb
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?b0JyR0pKRFdOMVZNSjNaWGNBNDFyaldRckN1UFFuUHJXd2psa212STJjdVhq?=
+ =?utf-8?B?TmNsMFdrakt5dElMazNlcnFzdC9GVStQbmZmN0hCK3VRVk01blR4MndPc0R4?=
+ =?utf-8?B?cDJ4U1RsUVI4U0RadVMzMi9hVFdubzRibU5xcWlOaHRPcGF3cVNYQkp0eUhO?=
+ =?utf-8?B?T0pobitUZjd0dGxhR1ppcWYzY0VOemd2S3FYVyt6RElGemo0VVV1UWtnajRL?=
+ =?utf-8?B?OTk0SEhnNlEwSkF1Mi81eXFjZWh6SDlubkZQRkZuZFY4Ykx1SmdLdlNySXZv?=
+ =?utf-8?B?eCtUMXdhU01INUtwSm5zODJtZkxyZU90SjV0b29FVDFJTnBhbEUzaTZ3eTJF?=
+ =?utf-8?B?WkJBYktEaDVkaTZRcVZUTWwzQ1A2YXp4a3dnV3NlK1RJQkR6ckRERnl4WGJl?=
+ =?utf-8?B?bVpFN0NwU1RRZFJKR1FxRUNPWDNQR2ltb1drdittc280NDRVVXdOUm9QQ0hX?=
+ =?utf-8?B?MGlleVhkaVJVdXAzVmpXa05jQWdyRkdhb3JHZzFlNEFPVXYvNUhjU2Fsazd2?=
+ =?utf-8?B?RmsyUExyQ3hMVjRhVEQvN3FwaG9DSmFlcWhRU2pHTzFETUtwWUdDRWNlT3JY?=
+ =?utf-8?B?N1cyMU5NM3dQM2FaYU9wWEhFK2FyTmV0cEdGR01uWWdwMU9vYVY4QU9iY2ZP?=
+ =?utf-8?B?SGg0RVVQNGNLa01NdFVrajE4bE45Qmt4Z1FvQVpMYkVsbExQbnFRQy9DYUNv?=
+ =?utf-8?B?aERBc3I4QU1tMXdIWU81QWVuOEhlOHBVWG9CcGZrbWIrNFhzSmQrU3N5Q0VK?=
+ =?utf-8?B?T3BscFVLdVRvdnBFaFU3ZmxmYXVkYlYrbDBFSE50eHE1NjNMcFhneDVOVlBP?=
+ =?utf-8?B?ZE1JdS9neFp1VTR1VWh6NDVPZmFkTSs4SjhNWXBVM2lYekFqSVpodE1mbURr?=
+ =?utf-8?B?UXZpY2tkeUludVYyTkRoWHpCbzdacThFR0xBMTFXcVptcFIrMTh4c2xJd2k4?=
+ =?utf-8?B?YTNvTTBOZkRTdDZNVmt1Vm9PamNqUjVZcGNscUUrM3pnbnYzS29GcG42aHVw?=
+ =?utf-8?B?ZlV3YjFJN2NrVTI3RkNZWUZpWTNqMGMyYXZMM2ZCL2l4NUxsSHJIZ1dZcEY3?=
+ =?utf-8?B?S05PMlA2VFlxYmI0TGNFWmk3UUdDdm9HNW9LV0tTZlY3RllHN2h4bFNiSysw?=
+ =?utf-8?B?N1FJMkFuNXEzbDJXMmdQSlBLUncxUklWVFhPYmRwU0FZL2N2Z01LU1M1UzBO?=
+ =?utf-8?B?UzZ6blVHMVpXTFpOdXdLRW1FQ3VFWnlGeWRWdDlXTFlhdmdiRk1XN05EQU5s?=
+ =?utf-8?B?ZEpxWGtQeVdxK1FSNWJKcU0rM0wxMCt5TjZ2SnUvQ2dPNm10d3pYcjJzVmw1?=
+ =?utf-8?B?aEYyVzB4bVNNbWpaeVFTQUVwNHVrNWZlam8wcXEyNFNKU214cS9xNUNvS1k5?=
+ =?utf-8?B?NVE0RjJzbHQrTms0OGw4VjZaL09jR2xjUlJvTW1vOXZNVWNFc0U3RmQ2aU94?=
+ =?utf-8?B?N0lQSmZyWXgrTVFnaVlYbmhESTExZjhmU1JOaUJYT0RsQ2JoZzVtWWpnVis2?=
+ =?utf-8?B?amFSenc1MFA1aUZLVjhtOEE1R0FKZEhkYTFhQzJoZDIwaXZFWmVwaGsvc0dX?=
+ =?utf-8?B?cy83MDlhS2UwTnJ4WEZpYmxqY1dIa01RTUtmek81enlQOTdpRjNSVXZ1ZHI3?=
+ =?utf-8?B?RWFRQzJjbUVJN2hpZXhmZ3VFakt1dURjUXpVQjFTVnhBajBSWnRsYk0wSThq?=
+ =?utf-8?B?Y1NWeHFwaURDMTVtSkIyQzZ4RS9IbzJNRXY3cWxXSG1acnIrc3cra1lvVFN2?=
+ =?utf-8?B?aGFnMnpwTjVhVGJrUG9HK2FmeWdUVnhmNFFwaTZKNmtGTDI5OXJtRVJVWHd5?=
+ =?utf-8?B?RFByYW8rd0pPR0w0MjJXSUFlVHJiRkcvdXZDbUhlQXNOREt2RjBwcU0vRy9B?=
+ =?utf-8?B?VlVZTXFsS2pXWmQ2Q0prMUlHVzBDeHFLb3E1SklVRWZCWGJJMDg0eUwxV0dN?=
+ =?utf-8?B?UVpPekRYVy80QVhkREJGMmlxZ2xuUVZwa0VvWXFVdTBlbDBMaGtKOXdlVXlv?=
+ =?utf-8?B?dHFOLzgyVGV2Uytwa25QclloSlE3MGwza25TWnhudDIxNFVGeUdVS0I2L0Vh?=
+ =?utf-8?B?M3VGM3lRdHRRR0F1ajl3cHNINzJZOWR5OGVDYkZYWFpvb2I1ZXZIcVpuSE1k?=
+ =?utf-8?B?MlJhcnVRSUc0L3g4aVNOTmlOdTUxVGozSVA0QThKLzJPVk9tdlVtMzFOYWFH?=
+ =?utf-8?B?STRZWGJQTGJwZEJscVlpN2ZGK08yRHZ2VEhWbWJFNzNFT2ZyNHhhNEN4VndI?=
+ =?utf-8?B?SlcvL1dQVmVsWUhralE1SUcxTEhNQ0dJZUx1eW9rOEdCUGJIMzNGV2NvYjFH?=
+ =?utf-8?B?SkV0eGxhdHRuMlg2a1lnL1dIOWFPTWJTWmVSRkMwM04zNW5vVGgxQT09?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b76340e-65e5-4abc-01aa-08deaad60d10
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2026 18:42:25.6991
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gx5JfUI3huAHynU/48gplf9ifcsXRZXgFgF7yDs3n+e1Jx/BJWEUC9xKZumWAo5e0JBX6LRtLE2FaQh/aZ5Afg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CW1P123MB8568
+
+--lulx5av7ree2nb5v
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260504123230.3833765-1-richardycc@google.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v12 01/13] scsi: aacraid: use block layer helpers to
+ calculate num of queues
+MIME-Version: 1.0
 
-On Mon, May 04, 2026 at 12:32:30PM +0000, Richard Chang wrote:
-> A crash was observed in zram_writeback_endio due to a NULL pointer
-> dereference in wake_up. The root cause is a race condition between the
-> bio completion handler (zram_writeback_endio) and the writeback task.
-> 
-> In zram_writeback_endio, wake_up() is called on &wb_ctl->done_wait after
-> releasing wb_ctl->done_lock. This creates a race window where the
-> writeback task can see num_inflight become 0, return, and free wb_ctl
-> before zram_writeback_endio calls wake_up().
-> 
-> CPU 0 (zram_writeback_endio)       CPU 1 (zram_complete_done_reqs)
-> ============================       ============================
-> spin_lock(&wb_ctl->done_lock);
-> list_add(&req->entry, &wb_ctl->done_reqs);
-> spin_unlock(&wb_ctl->done_lock);
->                                    while (&wb_ctl->num_inflight) > 0)
->                                    spin_lock(&wb_ctl->done_lock);
->                                    list_del(&req->entry);
->                                    spin_unlock(&wb_ctl->done_lock);
-> 				   // num_inflight becomes 0
->                                    atomic_dec(&wb_ctl->num_inflight);
->                                    returns to writeback_store();
-> 				   // frees wb_ctl
->                                    release_wb_ctl(wb_ctl);
-> 
-> // UAF crash!
-> wake_up(&wb_ctl->done_wait);
-> 
-> Fix this by moving wake_up() inside the done_lock critical section.
-> This ensures that zram_complete_done_reqs cannot consume the request
-> and decrement num_inflight until zram_writeback_endio has finished
-> calling wake_up() and released the lock.
-> 
-> Fixes: f405066a1f0d ("zram: introduce writeback bio batching")
-> Signed-off-by: Richard Chang <richardycc@google.com>
-> ---
->  drivers/block/zram/zram_drv.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index aebc710f0d6a..a457fdf564f8 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -966,9 +966,8 @@ static void zram_writeback_endio(struct bio *bio)
->  
->  	spin_lock_irqsave(&wb_ctl->done_lock, flags);
->  	list_add(&req->entry, &wb_ctl->done_reqs);
-> -	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
-> -
->  	wake_up(&wb_ctl->done_wait);
-> +	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
->  }
->  
+On Wed, Apr 22, 2026 at 02:52:03PM -0400, Aaron Tomlin wrote:
+> From: Daniel Wagner <wagi@kernel.org>
+>=20
+> The calculation of the upper limit for queues does not depend solely on
+> the number of online CPUs; for example, the isolcpus kernel
+> command-line option must also be considered.
+>=20
+> To account for this, the block layer provides a helper function to
+> retrieve the maximum number of queues. Use it to set an appropriate
+> upper queue number limit.
+>=20
+> Fixes: 94970cfb5f10 ("scsi: use block layer helpers to calculate num of q=
+ueues")
 
-I agree this will fix the issue, but using a lock to extend the lifetime of
-an object to avoid a UAF is not a good pattern. Object lifetime shared between
-process and interrupt contexts should be managed explicitly using refcount.
+Commit 94970cfb5f10 was a refactoring patch but it did not modify or break
+aacraid. I believe we should drop the "Fixes:" tag and use the following:
 
-Furthermore, keeping wake_up() outside the critical section minimizes
-interrupt-disabled latency and avoids nesting spinlocks
-(done_lock -> done_wait.lock), reducing the risk of future lockdep
-issues, just in case.
+    This brings aacraid in line with the API migration initiated for other
+    SCSI drivers in commit 94970cfb5f10 ("scsi: use block layer helpers to
+    calculate num of queues")
 
-It definitely will add more overhead for the submission/completion paths to deal
-with the refcount, but I think we should go that way at the cost of runtime.
+--=20
+Aaron Tomlin
+
+--lulx5av7ree2nb5v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeQaE6/qKljiNHm6b4t6WWBnMd9YFAmn6OgYACgkQ4t6WWBnM
+d9ablA/8DPA5XZOuwm2+ZxczNPy+0djdx/Ba6I48QLmXUtByVVHoCJS3b+E5HaZj
+HbktiIrn4LY1LOVs9hHpRNJCLliRhv2DBqSSodCs9LAXt0UKTd/0SJQTnAUMCW+T
+wusVO2jDaWADwIaxwKCHoP730sb2Vv4139/tVV10LJc2otreKSNcjs6HFa/8AxIA
+ZSgGUjjpaPYCt72i32HClY8TWdzml1+63fMrnAjOv1ROwUF++dvtSoZ0p4Cu6Stj
+RKbFm+SzIiMkRBFWunOaswa1vOKS5RUuIa5/T8nrR5E87n8wG9Nns734znAfHIVZ
+9HEVGSUrDEdqA26/GadpXr9tcDtaMTgKCMIhSbRcDp2BXlC1xJsnioQQFertZTs5
+wtYfF6k4/he/WvsYNCJQhnMohLdU9o434t5D8TB11w5zefG1/uUPnP0nSz2772XA
+Y0jVnVMB95myLeUUdkG1ao+Y8Ynt0jQ3/phexPxNUKe/+dQE44abnVxNJoBYWXeq
+PqF87EJNW2jNyNU+3ULTy8EuKQxj1XVY2s1nV8V8UXvGfCCrzXOsiKO5wuHn8M1I
+NKGoeIdCpbPUIWx23swq9jDq34XMh5D5uvqgNcM6tSnZlhPplLbA1zgEhDG3moWk
+61Q/9Thx7ahuWgMcZy+dpbMDRLD+kZQQGmw+DrsNCVsFM71FDes=
+=CeOH
+-----END PGP SIGNATURE-----
+
+--lulx5av7ree2nb5v--
