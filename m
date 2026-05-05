@@ -1,64 +1,64 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE713EC2DE
-	for <linux-block@vger.kernel.org>; Tue,  5 May 2026 07:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86883E95BF
+	for <linux-block@vger.kernel.org>; Tue,  5 May 2026 07:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777967254; cv=none; b=szqz/BYAivLJO4rBOIJimBWhUbIRUiZMrQTKFhc0LfIhLUYzraF2yxddZHgyeCEvFZKMXFpO05CXu1hVIYi30uUuqkui2diMnB+PU3moVGDDB3eUFjLqm5UfuH2zsU7nBKrdCXX1NPaH9LvYwvYPU6F27jxymFN9LyUNnbNF92M=
+	t=1777967260; cv=none; b=UpCQu4lUwMMGR5hnBNLRi3dWMkosjqAot0cTgu758ezXYbTb2+ShB5RGPLeVF5m0e/MoDD1Ctn8UpmJD++wmN16bxLqB0nAIokrQQxTBVShGW75LXuuRH8pq68wNQI5G+ppSktyheqpF+3k/4BB7DOgtzGk9sFz8ExnEPFGn48g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777967254; c=relaxed/simple;
-	bh=0yJT8QFEvfCqLmq2f2LuMOvO9+6CZ5GobjBrCm5dhG8=;
+	s=arc-20240116; t=1777967260; c=relaxed/simple;
+	bh=geA4MryeU2UclNAxcHEVRqgPgmO+wktIdv8kuvyvZf4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M4yF/7OlJflImIRzeDbmKOIVpAjw6Mkp7oeNneXyvJFIo1glUvxBPUiAWx2oVef7vYymIsnK+bFqg+QHyt2k7pn1P97aUA88nfPtQIEfYR8erOt7lJz563JFx5cdkxCg+GbqULJvOIFqSibj98+I3dklb4fTP8gkfIvI/51Pp0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=beVmaoqF; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version:Content-Type; b=PavQ1GGe8aK/mr/H7FpZcuMBFZDcCqmsiTBsyiRxsxQcZfguJdXX8rOEm5rYJgHcThc7XV4GFnuq4756pRh/H5fRz0XBCu9vpHAmTQ+pRBpS4NL8x1tjYZSitfwasMxct4iuRC9wwqk6ptT0U+ohJWn0Uj97USKUO2oskTmW9Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=dBIomGZu; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="beVmaoqF"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4890d945eb4so32881785e9.0
-        for <linux-block@vger.kernel.org>; Tue, 05 May 2026 00:47:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="dBIomGZu"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-48896199cbaso43508835e9.1
+        for <linux-block@vger.kernel.org>; Tue, 05 May 2026 00:47:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1777967242; x=1778572042; darn=vger.kernel.org;
+        d=ionos.com; s=google; t=1777967254; x=1778572054; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lp/g/mQJCIE0U+NQtOyu/324OU34Lnzvt4+XyTSQOTw=;
-        b=beVmaoqFy9WvL5zBWwm5mz6BIpZINLIjHwlDRUkNoha+sZoZ4CF0JiYLooFSK/+lyY
-         n6NYB9ubAa5aRfrCePx5fxwNlTYK5cunaRBk82303P8g3ZqhFZ9Xltn9OZDSRJmjD1Ne
-         lciCYo6iWl6VTdUfVZk6TaceppOnDK2TRdnhJiNnMT6uUG4XB5ZLdfFGj50GjbxaBrdR
-         mWU4x7+ri4Go5YhOeyNeGUc5WYeJ3w/sO0tAl8567iDnF1tIh4rXGVDy+NUDjO0TopXT
-         1ed/eifa9r2YoNTSHLESX+ijv/b2oPFS03gI7dP0priphtlogPu6CiOno4EnsGUI8R+i
-         clLg==
+        bh=PwGkBFHbFu/y+mgG9Lk/Gp6pcxDdG1DP37LAi3aazyM=;
+        b=dBIomGZucrvWW6gQJ8qLmySlrzwzniprnKa09dq9Pp+WGv8FES9uq77gbIAIAhcs7R
+         gRJPHKE/yPK1yS+C30drtYxVY6tflxBhZZtw6Nt5FDo2H/04sFMSDm2BSCx3LPobjThw
+         6j682m4JOL2otnT02bEq/KQn3DyTd9m+SMxvAO1bP00pkNnyMLup7TjZ3GEp5Mvb38Bv
+         ccK+Yzc54a4cpslcGN9GmhUm7vCkbzOJEYUfmvCYmokrirQyqycEHz6kq+4++TVdtrUA
+         Ml++SdHAlIUDtA937tL+Ac5/n1CoasmJKInOjYBDmqpQZzNLesNhIhzgV72H/uyAXFn8
+         97/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777967242; x=1778572042;
+        d=1e100.net; s=20251104; t=1777967254; x=1778572054;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Lp/g/mQJCIE0U+NQtOyu/324OU34Lnzvt4+XyTSQOTw=;
-        b=n4nenku9XdagrncXheONcIAVvWIUwJ7uNYAL6aPCNHaKf8lUGqv+/WEZetEgADoE/U
-         XjKfJTysM59sJDDaOS+QKYT80REfode6/CO5koSiz9IgUYPkquCuUTPvSF0LoEUE9m59
-         sUgbUvWbRg89mjRe8Z/r2g+eEk8F6apWWxpBJLxF1b9Yzpg2GLfRg1Qb6FWid0dtmu8W
-         +tLunDghVEsiq05IOQv1ZHe26n4ll4IdN+WAlv1K7wrzhL5JDDRXcffJSlxMj3n6GlVY
-         GprpcWpwyaY1WOz0IPZSzov+Q8ckRMAFQSpCr6MbUo3soUTivI9Twd1qY/KPJsEARWE/
-         qpCw==
-X-Gm-Message-State: AOJu0YzfF4zzhkPvUWwdvARWSV/jrPF/ctj6tG5u0OtMvKs+/9/psVfU
-	Vm2SlxHuJ48CyRQjrIycgH359U0Q1Lqlz9L9k9iMjdwH5gq3pzk10iCuhZIJ1gCEs+t8bz9Ui6u
-	/c4d73Pulr/NL
-X-Gm-Gg: AeBDievykV44vc+XaKx4wVWoJ1U70Hf593/4cGQ6dUwz2/3HXcNksZAYXXqO3QCRcHx
-	zkZCdivxJ0TNBdVi9KUcrYrBYphyRif/5K/7qVrPmGKU7Z95+dnoKTnBiYzeUSAh/GyLDLzjgC2
-	0CKWQRHmL1d10LgQxCxnglDlWZCBFpfRdXc7iviXRugF56w1pmZ3zU1gPLMfHeqouOA18tPUrbV
-	Wzl76iBWw+vNhhOoYMzxBRcJx5ubc5blO+sRGK+lqf5FTFfvz3FJPpzXGvleP8gqPTu+yxVfi2g
-	aRpTlksOj/TjOUYee9GQE30IHi0aVfnV7C7gyzIgV1YGQJN0i+Nl6gQ4Q+XRs9x8Nx8powZHJd4
-	peBu69OdyggoaTAef7vCtlcED0r4esSA+T37GRN0MxwlIIM/gLEVpJHPpPKHoxOy5aHHKwhEAG/
-	F+a+66lnPrOHlPYWavsQ3coRWmJFD15CKhMYJ2/PvXlIxVxv/0blPybUDbav90gP6Bj9TCi3XhN
-	8bYD7280CUilqT9JWbcF9ZHq9ItgrDwB70Xq/3jgoEewi5oly576k8N
-X-Received: by 2002:a05:600c:8b17:b0:48a:53cb:8604 with SMTP id 5b1f17b1804b1-48d1426cdecmr38920505e9.14.1777967240579;
-        Tue, 05 May 2026 00:47:20 -0700 (PDT)
+        bh=PwGkBFHbFu/y+mgG9Lk/Gp6pcxDdG1DP37LAi3aazyM=;
+        b=SajmOkhBVN9OZGJZigwx/hag4YIUTmGtVPCK/7JpuJHrC69LLWWhnTPNus7HGKcHvB
+         BlDv3xRSphoflC/iKOx50VKdqrOn7OOVc+wPCtzUleQmFSDFSdeWglqQggObW6Cq5Fq4
+         5SgRDJZYryOAhmPJjf6txVEgZ1B+RHPY9fSTNfg4zhoEMeOmALKh2e3UlRBDKm+osxOA
+         luIdf0cA/sRpEiQTnptwwou+SyG17jlF7qzzaMJ81q1hDsiL/+Q8duTemi7mjBcfOpIx
+         d4w0lmce5TYWvDoQrsA4rOJSmIxrfb+0qT8sPl5dQ5knNCDIZ6QgtBrYMNjYQxIIOAxW
+         hvrw==
+X-Gm-Message-State: AOJu0Yz/2UBI9lRtcaVl1QXKQVebQKeNqNIsRBKWGysL7hcYCEfK6g/i
+	O+qcUSzJH45fz8KnVQgjdiFWELdahMHFS5rVTPZ8tfUtQfmZJ9sF2EemNoOKs41SAq/k1bAYvSS
+	o9b6VWMkXsg==
+X-Gm-Gg: AeBDiev8nI4Ciz7PnoNnOF7fFOlOX9N0GlUJGMJ0OrgcrbdIQrOCcVzn91jCcw0pFdw
+	sqIf/cDRPFEg2vPCYQMIhp4g/F5qTkMNijvTH02Vy1T7uBrhvGg8o0AaDhfbEiuEUoflLJxBuAp
+	48V7eZFlkYQh+JajBeNhm7g/SkG40QKfu+COePUk5ili99TrL2Is721o8etTEntZkyE8+QO/V/E
+	aarpwliVwPOsqyVkHRyeWBXssqqM3YBPnwpPy6hQv6Qg16rifI1upnI9wPCwY+LQqslubldzKNX
+	HV/wbymZ4mNPQYuwXIE8Gi43W2XsQOv8AC18kK9RVaeQCgexEuWB3RjAj11p1kMt1/afUDBG95C
+	JhV9TbpXkcr31/thROnskTlQ34D/cPLSRdpVxMVZXaf5YDdswDsuGlxFre34UYgwRx3qAZ2+Dpr
+	HyagYDt5Iy2QbJgg49Bitc+3R2twC+cnZK7OOEya2RqsHP6yhgV4bBYyZJzN/Pa8CrLd2Qy+iqX
+	RRIXsbKtrFrQHOoGFPoAW7kU9Klj76PlQcGf3a/5mg/Sw==
+X-Received: by 2002:a05:600c:4f82:b0:488:e7e4:8425 with SMTP id 5b1f17b1804b1-48d18ce446bmr26865835e9.23.1777967253764;
+        Tue, 05 May 2026 00:47:33 -0700 (PDT)
 Received: from lb03189.fkb.profitbricks.net ([213.147.98.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48d186d97c4sm10617125e9.35.2026.05.05.00.47.17
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48d186d97c4sm10617125e9.35.2026.05.05.00.47.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 00:47:20 -0700 (PDT)
+        Tue, 05 May 2026 00:47:33 -0700 (PDT)
 From: Md Haris Iqbal <haris.iqbal@ionos.com>
 To: linux-block@vger.kernel.org,
 	linux-rdma@vger.kernel.org
@@ -71,9 +71,9 @@ Cc: linux-kernel@vger.kernel.org,
 	jinpu.wang@ionos.com,
 	Md Haris Iqbal <haris.iqbal@ionos.com>,
 	Jia Li <jia.li@ionos.com>
-Subject: [PATCH 05/13] RDMA/rmr: server: main functionality
-Date: Tue,  5 May 2026 09:46:17 +0200
-Message-ID: <20260505074644.195453-6-haris.iqbal@ionos.com>
+Subject: [PATCH 09/13] block/brmr: client: main functionality
+Date: Tue,  5 May 2026 09:46:21 +0200
+Message-ID: <20260505074644.195453-10-haris.iqbal@ionos.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260505074644.195453-1-haris.iqbal@ionos.com>
 References: <20260505074644.195453-1-haris.iqbal@ionos.com>
@@ -86,22 +86,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add the RMR server implementation:
+Add the BRMR client implementation:
 
-  rmr-srv.c	server core: session handling, pool registration via
-		rmr_srv_register(), incoming command and IO message
-		processing, sync thread coordination and the
-		rmr_srv_query()/rmr_srv_unregister() entry points used
-		by upper-layer stores.
-  rmr-srv-md.c	server-side metadata persistence: serialising the
-		pool metadata (member ID, map version, mapped size,
-		store state) and the dirty maps to the underlying
-		store, plus the periodic md_sync delayed work.
-
-The server interacts with an upper-layer store via the
-struct rmr_srv_store_ops interface defined in rmr-srv.h, allowing
-different store implementations (block device, file, ...) to plug
-in without modifying RMR itself.
+  brmr-clt.c		client core: gendisk and tag-set creation per
+			pool, blk-mq queue_rq() submitting block IOs to
+			the underlying RMR pool, queue limit setup
+			(chunk size, write-zeroes, discard, write-cache
+			and FUA features) and device tear-down.
+  brmr-clt-reque.c	per-CPU requeue queues used to retry IOs
+			temporarily blocked on RMR resource exhaustion.
+  brmr-clt-stats.c	per-pool statistics counters (request size
+			distribution, BLK_STS_RESOURCE returns).
 
 These files are not compiled until the modules are wired into the
 build in a later patch in this series.
@@ -109,21 +104,23 @@ build in a later patch in this series.
 Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
 Signed-off-by: Jia Li <jia.li@ionos.com>
 ---
- drivers/infiniband/ulp/rmr/rmr-srv-md.c |  764 ++++++
- drivers/infiniband/ulp/rmr/rmr-srv.c    | 3306 +++++++++++++++++++++++
- 2 files changed, 4070 insertions(+)
- create mode 100644 drivers/infiniband/ulp/rmr/rmr-srv-md.c
- create mode 100644 drivers/infiniband/ulp/rmr/rmr-srv.c
+ drivers/block/brmr/brmr-clt-reque.c |  228 +++++
+ drivers/block/brmr/brmr-clt-stats.c |  332 ++++++++
+ drivers/block/brmr/brmr-clt.c       | 1222 +++++++++++++++++++++++++++
+ 3 files changed, 1782 insertions(+)
+ create mode 100644 drivers/block/brmr/brmr-clt-reque.c
+ create mode 100644 drivers/block/brmr/brmr-clt-stats.c
+ create mode 100644 drivers/block/brmr/brmr-clt.c
 
-diff --git a/drivers/infiniband/ulp/rmr/rmr-srv-md.c b/drivers/infiniband/ulp/rmr/rmr-srv-md.c
+diff --git a/drivers/block/brmr/brmr-clt-reque.c b/drivers/block/brmr/brmr-clt-reque.c
 new file mode 100644
-index 000000000000..9dab71a810b8
+index 000000000000..252661486a0a
 --- /dev/null
-+++ b/drivers/infiniband/ulp/rmr/rmr-srv-md.c
-@@ -0,0 +1,764 @@
++++ b/drivers/block/brmr/brmr-clt-reque.c
+@@ -0,0 +1,228 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * Reliable multicast over RTRS (RMR) — server metadata subsystem
++ * Block device over RMR (BRMR)
 + *
 + * Copyright (c) 2026 IONOS SE
 + */
@@ -133,4070 +130,1788 @@ index 000000000000..9dab71a810b8
 +
 +#include <linux/module.h>
 +#include <linux/blkdev.h>
-+
-+#include "rmr-srv.h"
-+#include "rmr-req.h"
-+#include "rmr-clt.h"
-+
-+/**
-+ * process_md_io() - Process medata IO message
-+ *
-+ * @pool:	the pool where requests go through
-+ * @rtrs_op:	rtrs IO context
-+ * @offset:	offset in bytes relative to rmr metadata.
-+ * @len:	length of the buffer in bytes
-+ * @flags:	indicates metadata IO options
-+ * @buf:	pointer to metadata buffer
-+ *
-+ * Return:
-+ *	0 on success
-+ *
-+ * Description:
-+ *	All metadata IOs go through this function to submit requests to block device. The offset it
-+ *	passes on is relative to bytes shifting on rmr medata which is composed of a header
-+ *	structure for pool metadata, bitmap and last_io array.
-+ */
-+int process_md_io(struct rmr_pool *pool, struct rtrs_srv_op *rtrs_op, u32 offset, u32 len,
-+			 unsigned long flags, void *buf)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_srv_req *req;
-+	int err = 0;
-+
-+	srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	if (!percpu_ref_tryget_live(&pool->ids_inflight_ref)) {
-+		err = -EIO;
-+		goto no_put;
-+	}
-+
-+	req = rmr_srv_md_req_create(srv_pool, rtrs_op, buf, offset, len, flags, rmr_srv_endreq);
-+	if (IS_ERR(req)) {
-+		pr_err("Failed to create rmr_req %pe\n", req);
-+		err = PTR_ERR(req);
-+		goto put_pool;
-+	}
-+
-+	rmr_md_req_submit(req);
-+	return 0;
-+
-+put_pool:
-+	percpu_ref_put(&pool->ids_inflight_ref);
-+no_put:
-+	return err;
-+}
-+
-+int rmr_srv_read_md(struct rmr_pool *pool, struct rtrs_srv_op *rtrs_op, u32 offset, u32 len,
-+		    struct rmr_pool_md *pool_md_page)
-+{
-+	/* pool_md is pre-allocated */
-+	return process_md_io(pool, rtrs_op, offset, len, RMR_OP_MD_READ, pool_md_page);
-+}
-+
-+static int rmr_srv_load_last_io(struct rmr_srv_pool *srv_pool)
-+{
-+	void *buf;
-+	u64 offset, len;
-+	struct rmr_pool *pool = srv_pool->pool;
-+	struct rmr_pool_md *pool_md = &pool->pool_md;
-+	int err = 0;
-+
-+	if (!pool_md->queue_depth) {
-+		pr_err("%s: pool %s has zero queue_depth\n",
-+		       __func__, pool->poolname);
-+		return -EINVAL;
-+	}
-+	offset = RMR_LAST_IO_OFFSET;
-+	len = rmr_last_io_len(pool_md->queue_depth);
-+
-+	if (!srv_pool->last_io_idx) {
-+		srv_pool->last_io_idx = kcalloc(pool_md->queue_depth,
-+						sizeof(*srv_pool->last_io_idx), GFP_KERNEL);
-+		if (!srv_pool->last_io_idx)
-+			return -ENOMEM;
-+	}
-+
-+	buf = kzalloc(len, GFP_KERNEL);
-+	if (!buf) {
-+		err = -ENOMEM;
-+		return err;
-+	}
-+
-+	err = rmr_srv_read_md(pool, NULL, offset, len, buf);
-+	if (err) {
-+		pr_err("%s: failed to read last_io buffer of len %lld at offset %lld\n",
-+		       __func__, len, offset);
-+		goto free_buf;
-+	}
-+	memcpy(srv_pool->last_io_idx, (rmr_id_t *)buf, len);
-+
-+free_buf:
-+	kfree(buf);
-+	return err;
-+}
-+
-+/**
-+ * rmr_srv_md_maps_sync - Sync dirty maps to persistent storage
-+ *
-+ * Description:
-+ *	Writes maps in two passes to the map-related regions of the on-disk layout:
-+ *
-+ *	Pass 1 — hdr_region (single PAGE_SIZE write at RMR_MD_SIZE + last_io_len):
-+ *	  Fills one rmr_map_cbuf_hdr slot per map_idx in [0:maps_cnt].
-+ *	  The buffer is kzalloc'd, so slots beyond maps_cnt are zero.
-+ *	  The entire PAGE_SIZE region is issued as a single I/O.
-+ *
-+ *	Pass 2 — maps_region (slp pages at computed offsets after hdr_region):
-+ *	  Each map's data offset = map_region_offset + map_idx * per_map_size.
-+ *	  pool->maps[0:maps_cnt] is always dense (no NULL gaps).
-+ */
-+void rmr_srv_md_maps_sync(struct rmr_pool *pool)
-+{
-+	struct rmr_map_cbuf_hdr *map_cbuf_hdr;
-+	struct rmr_dirty_id_map *map = NULL;
-+	u32 hdr_region_offset = rmr_bitmap_offset(pool->pool_md.queue_depth);
-+	u32 map_region_offset = hdr_region_offset + RMR_MAP_BUF_HDR_SIZE;
-+	u64 per_map_size = 0;
-+	int err, lock_idx;
-+	void *buf;
-+	u8 map_idx;
-+
-+	buf = kzalloc(RMR_MAP_BUF_HDR_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return;
-+
-+	lock_idx = srcu_read_lock(&pool->map_srcu);
-+
-+	/* Fill the header region: one slot per active map */
-+	for (map_idx = 0; map_idx < pool->maps_cnt; map_idx++) {
-+		map = rcu_dereference(pool->maps[map_idx]);
-+		if (WARN_ON(!map))
-+			goto unlock;
-+
-+		map_cbuf_hdr = buf + map_idx * sizeof(struct rmr_map_cbuf_hdr);
-+		map_cbuf_hdr->version = RMR_MAP_FORMAT_VER;
-+		map_cbuf_hdr->member_id = map->member_id;
-+		map_cbuf_hdr->no_of_chunks = map->no_of_chunks;
-+		map_cbuf_hdr->no_of_flp = map->no_of_flp;
-+		map_cbuf_hdr->no_of_slp_in_last_flp = map->no_of_slp_in_last_flp;
-+		map_cbuf_hdr->no_of_chunk_in_last_slp = map->no_of_chunk_in_last_slp;
-+		map_cbuf_hdr->total_slp = map->total_slp;
-+		per_map_size = map->total_slp * PAGE_SIZE;
-+	}
-+
-+	/* Write the entire header region as a single PAGE_SIZE I/O */
-+	err = process_md_io(pool, NULL, hdr_region_offset,
-+			PAGE_SIZE, RMR_OP_MD_WRITE, buf);
-+	if (err) {
-+		pr_warn("%s: failed to write header region at 0x%x: %d\n",
-+			__func__, hdr_region_offset, err);
-+		goto unlock;
-+	}
-+
-+	if (WARN_ON(!per_map_size))
-+		goto unlock;
-+
-+	/* Write each map's slp pages */
-+	for (map_idx = 0; map_idx < pool->maps_cnt; map_idx++) {
-+		u32 map_data_offset;
-+		el_flp *flp_ptr;
-+		u64 no_of_slps;
-+		void *slp;
-+		int i, j;
-+
-+		map = rcu_dereference(pool->maps[map_idx]);
-+		if (WARN_ON(!map))
-+			break;
-+
-+		map_data_offset = map_region_offset + map_idx * per_map_size;
-+
-+		for (i = 0; i < map->no_of_flp; i++) {
-+			flp_ptr = (el_flp *)map->dirty_bitmap[i];
-+
-+			if (i == (map->no_of_flp - 1))
-+				no_of_slps = map->no_of_slp_in_last_flp;
-+			else
-+				no_of_slps = NO_OF_SLP_PER_FLP;
-+
-+			for (j = 0; j < no_of_slps; j++, flp_ptr++) {
-+				slp = (void *)(*flp_ptr);
-+
-+				err = process_md_io(pool, NULL, map_data_offset,
-+						PAGE_SIZE, RMR_OP_MD_WRITE, slp);
-+				if (err)
-+					pr_warn("%s: failed to write map slp at 0x%x: %d\n",
-+						__func__, map_data_offset, err);
-+				map_data_offset += PAGE_SIZE;
-+			}
-+		}
-+	}
-+
-+unlock:
-+	srcu_read_unlock(&pool->map_srcu, lock_idx);
-+	kfree(buf);
-+}
-+
-+/**
-+ * rmr_srv_refresh_md_maps - Restore maps from map buffers on disk
-+ *
-+ * Description:
-+ *	Reads back the maps written by rmr_srv_md_maps_sync(). Reads the hdr_region
-+ *	in a single I/O to obtain the per-map headers, then loads each present
-+ *	map's slp pages from maps_region:
-+ *	  data offset = map_region_offset + map_idx * per_map_size
-+ *	Header slots 0..N-1 are active; remaining are zero (member_id == 0).
-+ */
-+static int rmr_srv_refresh_md_maps(struct rmr_srv_pool *srv_pool)
-+{
-+	struct rmr_pool *pool = srv_pool->pool;
-+	struct rmr_map_cbuf_hdr *map_cbuf_hdr;
-+	struct rmr_dirty_id_map *map = NULL;
-+	u32 hdr_region_offset = rmr_bitmap_offset(pool->pool_md.queue_depth);
-+	u32 map_region_offset = hdr_region_offset + RMR_MAP_BUF_HDR_SIZE;
-+	int err = 0, lock_idx;
-+	void *buf;
-+	u8 map_idx, valid_nr = 0;
-+	bool unpack;
-+
-+	buf = kzalloc(RMR_MAP_BUF_HDR_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	/* Read the entire header region in a single PAGE_SIZE I/O */
-+	err = rmr_srv_read_md(pool, NULL, hdr_region_offset, RMR_MAP_BUF_HDR_SIZE, buf);
-+	if (err) {
-+		pr_err("%s: failed to read header region at offset %u\n",
-+				__func__, hdr_region_offset);
-+		kfree(buf);
-+		return err;
-+	}
-+
-+	lock_idx = srcu_read_lock(&pool->map_srcu);
-+	for (map_idx = 0; map_idx < RMR_POOL_MAX_SESS; map_idx++) {
-+		u64 per_map_size;
-+		u32 map_data_offset;
-+		el_flp *flp_ptr;
-+		u64 no_of_slps;
-+		void *slp;
-+		int i, j;
-+
-+		map_cbuf_hdr = buf + map_idx * sizeof(struct rmr_map_cbuf_hdr);
-+		pr_debug("%s: %llu %u %llu %llu %llu %llu %llu\n", __func__,
-+			map_cbuf_hdr->version,
-+			map_cbuf_hdr->member_id,
-+			map_cbuf_hdr->no_of_chunks,
-+			map_cbuf_hdr->no_of_flp,
-+			map_cbuf_hdr->no_of_slp_in_last_flp,
-+			map_cbuf_hdr->no_of_chunk_in_last_slp,
-+			map_cbuf_hdr->total_slp);
-+
-+		/* Empty slot: no more active maps beyond this point */
-+		if (!map_cbuf_hdr->member_id)
-+			break;
-+		valid_nr++;
-+
-+		per_map_size = map_cbuf_hdr->total_slp * PAGE_SIZE;
-+		map_data_offset = map_region_offset + map_idx * per_map_size;
-+
-+		unpack = false;
-+		/*
-+		 * The dirty map should be updated only when the one on disk is more updated.
-+		 * Such cases are as follows.
-+		 * 1) The dirty map does not exist in the pool. The map will be simply restored to
-+		 * the last version we have.
-+		 * 2) The dirty map of the pool is just created. If it has been updated, the one on
-+		 * disk is outdated.
-+		 */
-+		map = rmr_pool_find_map(pool, map_cbuf_hdr->member_id);
-+		if (!map) {
-+			map = rmr_map_create(pool, map_cbuf_hdr->member_id);
-+			if (IS_ERR(map)) {
-+				err = PTR_ERR(map);
-+				pr_err("%s: pool %s, member_id %d failed to create map\n",
-+				       __func__, pool->poolname, map_cbuf_hdr->member_id);
-+				goto unlock;
-+			}
-+			unpack = true;
-+		} else if (rmr_map_empty(map)) {
-+			unpack = true;
-+		}
-+
-+		if (map->no_of_chunks != map_cbuf_hdr->no_of_chunks ||
-+				map->no_of_flp != map_cbuf_hdr->no_of_flp ||
-+				map->no_of_slp_in_last_flp != map_cbuf_hdr->no_of_slp_in_last_flp ||
-+				map->no_of_chunk_in_last_slp != map_cbuf_hdr->no_of_chunk_in_last_slp ||
-+				map->total_slp != map_cbuf_hdr->total_slp) {
-+			pr_err("%s: Sanity check failed\n", __func__);
-+			goto unlock;
-+		}
-+
-+		xa_store(&pool->stg_members, map_cbuf_hdr->member_id, XA_TRUE, GFP_KERNEL);
-+
-+		if (!unpack)
-+			continue;
-+
-+		for (i = 0; i < map->no_of_flp; i++) {
-+			flp_ptr = (el_flp *)map->dirty_bitmap[i];
-+
-+			if (i == (map->no_of_flp - 1))
-+				no_of_slps = map->no_of_slp_in_last_flp;
-+			else
-+				no_of_slps = NO_OF_SLP_PER_FLP;
-+
-+			for (j = 0; j < no_of_slps; j++, flp_ptr++) {
-+				slp = (void *)(*flp_ptr);
-+
-+				err = rmr_srv_read_md(pool, NULL, map_data_offset,
-+						PAGE_SIZE, slp);
-+				if (err) {
-+					pr_err("%s: failed to read bitmap at offset %u\n",
-+						__func__, map_data_offset);
-+					goto unlock;
-+				}
-+				map_data_offset += PAGE_SIZE;
-+			}
-+		}
-+	}
-+
-+unlock:
-+	if (!valid_nr)
-+		pr_err("%s: no valid map found in metadata\n", __func__);
-+
-+	/*
-+	 * TODO: We need better error handling logic here.
-+	 * Lets suppose after successfully reading few pages for a map, we fail to read next page.
-+	 * We then error out and fail the register, but leave the partially updated map in the pool.
-+	 * Later when another register is called, and we come here to read the maps, we will
-+	 * see a non-empty map, and skip reading the map from disk.
-+	 */
-+	srcu_read_unlock(&pool->map_srcu, lock_idx);
-+	kfree(buf);
-+	return err;
-+}
-+
-+/**
-+ * rmr_srv_md_update() - update the metadata of the server pool
-+ *
-+ * Description:
-+ *	Read current in-memory pool states that changes to the srv_md of this pool.
-+ */
-+static int rmr_srv_md_update(struct rmr_srv_pool *srv_pool)
-+{
-+	struct rmr_pool *pool;
-+	struct rmr_srv_md *my_srv_md;
-+	int md_i;
-+
-+	pool = srv_pool->pool;
-+	md_i = rmr_pool_find_md(&pool->pool_md, srv_pool->member_id, true);
-+	if (md_i < 0) {
-+		pr_warn("No space for new member %d.\n", srv_pool->member_id);
-+		return -EINVAL;
-+	}
-+	my_srv_md = &pool->pool_md.srv_md[md_i];
-+	my_srv_md->member_id = srv_pool->member_id;
-+	my_srv_md->store_state = atomic_read(&srv_pool->store_state);
-+	my_srv_md->map_ver = srv_pool->pool->map_ver;
-+	my_srv_md->srv_pool_state = atomic_read(&srv_pool->state);
-+	pr_debug("Set srv_md[%d] it with the member_id %d.\n", md_i, srv_pool->member_id);
-+	return 0;
-+}
-+
-+/**
-+ * rmr_srv_flush_pool_md() - Write pool_md region to disk immediately
-+ *
-+ * @srv_pool:	Server pool whose pool_md is to be flushed
-+ *
-+ * Description:
-+ *	Persist pool_md without waiting for the delayed work.
-+ */
-+void rmr_srv_flush_pool_md(struct rmr_srv_pool *srv_pool)
-+{
-+	struct rmr_pool *pool = srv_pool->pool;
-+	void *buf;
-+	int err;
-+
-+	if (!atomic_read(&srv_pool->store_state) || !pool->mapped_size)
-+		return;
-+
-+	err = rmr_srv_md_update(srv_pool);
-+	if (err) {
-+		pr_warn("%s: failed to update pool_md before flush: 0x%x\n", __func__, err);
-+		return;
-+	}
-+
-+	buf = kzalloc(RMR_MD_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return;
-+
-+	memcpy(buf, &pool->pool_md, sizeof(struct rmr_pool_md));
-+	err = process_md_io(pool, NULL, 0, RMR_MD_SIZE, RMR_OP_MD_WRITE, buf);
-+	if (err)
-+		pr_warn("%s: failed to flush pool_md: 0x%x at offset 0 len %lu\n",
-+			__func__, err, RMR_MD_SIZE);
-+	kfree(buf);
-+}
-+
-+/**
-+ * rmr_srv_flush_last_io() - Write last_io region to disk
-+ *
-+ * @srv_pool:	Server pool whose last_io is to be flushed
-+ */
-+static void rmr_srv_flush_last_io(struct rmr_srv_pool *srv_pool)
-+{
-+	struct rmr_pool *pool = srv_pool->pool;
-+	u64 last_io_len = rmr_last_io_len(pool->pool_md.queue_depth);
-+	void *buf;
-+	int err;
-+
-+	if (!last_io_len || !srv_pool->last_io)
-+		return;
-+
-+	buf = kzalloc(last_io_len, GFP_KERNEL);
-+	if (!buf)
-+		return;
-+
-+	memcpy(srv_pool->last_io_idx, srv_pool->last_io, last_io_len);
-+	memcpy(buf, srv_pool->last_io_idx, last_io_len);
-+
-+	err = process_md_io(pool, NULL, RMR_MD_SIZE, last_io_len,
-+			    RMR_OP_MD_WRITE, buf);
-+	if (err)
-+		pr_warn("%s: failed to flush last_io: 0x%x at offset %lu len %llu\n",
-+			__func__, err, RMR_MD_SIZE, last_io_len);
-+	kfree(buf);
-+}
-+
-+/**
-+ * rmr_srv_md_load_buf() - Load the server metadata from buffer to the server pool.
-+ *
-+ * Description:
-+ *	This function loads the server-side metadata from buffer to the pool. The buffer must be
-+ *	in the format of rmr pool metadata structure, which may contain updated srv_md of
-+ *	multiple servers.
-+ */
-+static int rmr_srv_md_load_buf(struct rmr_pool *pool, void *buf)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_srv_md *srv_md_buf;
-+	u8 member_id = 0;
-+	int err = 0, index, i;
-+	bool ret = false;
-+
-+	buf += (RMR_CLT_MD_SIZE - sizeof(struct rmr_srv_md));
-+	for (i = 0; i < RMR_POOL_MAX_SESS; i++) {
-+		buf += sizeof(struct rmr_srv_md);
-+		srv_md_buf = (struct rmr_srv_md *)buf;
-+		member_id = srv_md_buf->member_id;
-+		/* skip updating the srv_md of this server pool */
-+		if (!member_id || member_id == srv_pool->member_id)
-+			continue;
-+
-+		index = rmr_pool_find_md(&pool->pool_md, member_id, true);
-+		if (index < 0) {
-+			pr_debug("%s: No space in the pool_md for new member %d\n",
-+				 __func__, member_id);
-+			err = -EINVAL;
-+			continue;
-+		}
-+
-+		pr_debug("Load srv_md[%d] with member_id %d\n", index, member_id);
-+		memcpy(&pool->pool_md.srv_md[index], srv_md_buf, sizeof(struct rmr_srv_md));
-+		ret = true;
-+	}
-+
-+	if (!ret) {
-+		pr_debug("No server metadata found in the buffer\n");
-+		err = -EINVAL;
-+	}
-+
-+	return err;
-+}
-+
-+/**
-+ * rmr_srv_md_process_buf() - Load the metadata from buffer to the server pool.
-+ *
-+ * Description:
-+ *	This node loads the metadata from buffer to the server pool.
-+ */
-+int rmr_srv_md_process_buf(struct rmr_pool *pool, void *buf, bool sync)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_pool_md *buf_pool_md, *dest_md = &pool->pool_md;
-+	int err = 0;
-+
-+	srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	buf_pool_md = (struct rmr_pool_md *)buf;
-+	if (!sync) {
-+		/* Copy only the client-side header. */
-+		memcpy(dest_md, buf_pool_md, RMR_CLT_MD_SIZE);
-+	} else {
-+		err = rmr_srv_md_load_buf(pool, buf);
-+		if (err)
-+			pr_err("Failed to load md buf to pool %s\n", pool->poolname);
-+	}
-+
-+	return err;
-+}
-+
-+int rmr_srv_send_md_update(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_pool *sync_pool = srv_pool->clt;
-+	struct rmr_msg_pool_cmd msg = {};
-+	int err = 0, buflen;
-+	void *buf;
-+
-+	/* Only normal-state server pools should send metadata updates. */
-+	if (atomic_read(&srv_pool->state) != RMR_SRV_POOL_STATE_NORMAL)
-+		return -EINVAL;
-+
-+	/* For a stg node A, is A->B alive? */
-+	if (!sync_pool) {
-+		pr_debug("pool %s has no sync pool assigned. Cannot send md update commands.\n",
-+			 pool->poolname);
-+		return -ENXIO;
-+	}
-+
-+	buf = kzalloc(RMR_MD_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+	buflen = RMR_MD_SIZE;
-+
-+	rmr_clt_init_cmd(sync_pool, &msg);
-+	msg.cmd_type = RMR_CMD_MD_SEND;
-+	/* This node sends messages to start md_update. */
-+	msg.md_send_cmd.leader_id = srv_pool->member_id;
-+	msg.md_send_cmd.src_mapped_size = pool->mapped_size;
-+
-+	err = rmr_clt_send_cmd_with_data_all(sync_pool, &msg, buf, buflen);
-+	if (err < 0) {
-+		pr_debug("pool %s sends all sess RMR_CMD_MD_SEND failed\n", pool->poolname);
-+		goto free_buf;
-+	}
-+
-+	/*
-+	 * keep the original slice of buffer if the corresponding send req failed.
-+	 *
-+	 * TODO:
-+	 * We need to use the err received from rmr_clt_send_cmd_with_data_all in this function,
-+	 * and match the sessions we are skipping.
-+	 *
-+	 * In general, the sessions_skipped == (RMR_POOL_MAX_SESS - (number_of_legs - 1 - err).
-+	 * If the above number does not match, then we abandon the buffers, and try again.
-+	 */
-+	err = rmr_srv_md_load_buf(pool, buf);
-+	if (err) {
-+		pr_debug("Failed to load md buf to pool %s\n", pool->poolname);
-+		goto free_buf;
-+	}
-+
-+free_buf:
-+	kfree(buf);
-+	return err;
-+}
-+
-+/**
-+ * rmr_srv_refresh_md() - Refresh the metadata of the rmr pool.
-+ *
-+ * @srv_pool: Server pool whose metadata to be find
-+ *
-+ * Description:
-+ *	Read the metadata of the rmr pool from the backing store.
-+ *
-+ * Return:
-+ *	True when reading the metadata succeeds in two cases. The first case is a successful read
-+ *	but no metadata found. The second case is it found metadata which contains the srv_md.
-+ *	False otherwise.
-+ */
-+int rmr_srv_refresh_md(struct rmr_srv_pool *srv_pool)
-+{
-+	struct rmr_pool_md *pool_md_page;
-+	struct rmr_pool *pool = srv_pool->pool;
-+	int index, ret;
-+	u64 md_ver;
-+
-+	pool_md_page = kzalloc(RMR_MD_SIZE, GFP_KERNEL);
-+	if (!pool_md_page)
-+		return -ENOMEM;
-+
-+	if (rmr_srv_read_md(pool, NULL, 0, RMR_MD_SIZE, pool_md_page)) {
-+		pr_err("%s: failed reading md of rmr\n", __func__);
-+		goto free_md;
-+	}
-+
-+	pr_info("%s: Read md of pool %s from store with magic 0x%llx\n",
-+		__func__, pool_md_page->poolname, pool_md_page->magic);
-+
-+	if (pool_md_page->magic != RMR_POOL_MD_MAGIC) {
-+		pr_info("%s: No valid md found on the store for pool %s\n",
-+			__func__, pool->poolname);
-+		ret = -EINVAL;
-+		goto free_md;
-+	}
-+
-+	/*
-+	 * TODO: Should we sanity check other params also?
-+	 */
-+	if (pool_md_page->chunk_size != pool->chunk_size) {
-+		pr_err("%s: chunk size mismatched. pool chunk size %u, md chunk size %u\n",
-+		       __func__, pool->chunk_size, pool_md_page->chunk_size);
-+		goto free_md;
-+	}
-+
-+	/* Import the metadata to the states of the pool. */
-+	index = rmr_pool_find_md(pool_md_page, srv_pool->member_id, false);
-+	if (index < 0) {
-+		pr_info("%s: No md found for member_id %d\n", __func__, srv_pool->member_id);
-+		ret = index;
-+		goto free_md;
-+	}
-+
-+	if (pool_md_page->srv_md[index].mapped_size != pool->mapped_size) {
-+		pr_err("%s: Mapped size mismatched. The srv pool %llu, md %llu\n",
-+		       __func__, pool->mapped_size, pool_md_page->mapped_size);
-+		ret = -EINVAL;
-+		goto free_md;
-+	}
-+
-+	md_ver = pool_md_page->srv_md[index].map_ver;
-+	if (md_ver < pool->map_ver)
-+		pr_err("The current map ver is %lld but the map ver on md is %lld.\n",
-+		       pool->map_ver, md_ver);
-+	else
-+		pool->map_ver = md_ver;
-+
-+	pool->pool_md = *pool_md_page;
-+
-+	ret = rmr_srv_load_last_io(srv_pool);
-+	if (ret) {
-+		pr_err("%s: failed to load last_io array to memory with err 0x%x\n",
-+		       __func__, ret);
-+		goto zero_md;
-+	}
-+
-+	pr_info("%s: no_of_chunks %lld\n", __func__, pool->no_of_chunks);
-+	ret = rmr_srv_refresh_md_maps(srv_pool);
-+	if (ret) {
-+		pr_err("%s: failed to load dirty bitmap to memory with err %pe\n",
-+		       __func__, ERR_PTR(ret));
-+		goto free_last_io;
-+	}
-+	goto free_md;
-+
-+free_last_io:
-+	kfree(srv_pool->last_io_idx);
-+	srv_pool->last_io_idx = NULL;
-+zero_md:
-+	memset(&pool->pool_md, 0, sizeof(pool->pool_md));
-+free_md:
-+	kfree(pool_md_page);
-+	return ret;
-+}
-+
-+/**
-+ * rmr_srv_mark_maps_dirty() - Set MD_DIRTY_MAPS and schedule delayed sync
-+ *
-+ * @srv_pool:	Server pool with changed maps
-+ */
-+void rmr_srv_mark_maps_dirty(struct rmr_srv_pool *srv_pool)
-+{
-+	set_bit(MD_DIRTY_MAPS, &srv_pool->md_dirty);
-+	mod_delayed_work(srv_pool->md_sync_wq, &srv_pool->md_sync_dwork,
-+			 msecs_to_jiffies(RMR_SRV_MD_SYNC_INTERVAL_MS));
-+}
-+
-+/**
-+ * rmr_srv_md_sync - sync dirty metadata regions of pool
-+ *
-+ * Description:
-+ *	Dirty-driven consumer: only flushes regions whose dirty bit is set.
-+ *	Producers set bits and schedule this work via mod_delayed_work().
-+ *	Does NOT re-queue itself — the next dirty event will schedule it.
-+ */
-+void rmr_srv_md_sync(struct work_struct *work)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_pool *pool;
-+	bool ret, did_work = false;
-+
-+	srv_pool = container_of(to_delayed_work(work), struct rmr_srv_pool, md_sync_dwork);
-+	if (!srv_pool->pool)
-+		return;
-+
-+	/*
-+	 * It could happen that access the pool while the pool is not there. Use reference counting
-+	 * for server pool to avoid the issue.
-+	 */
-+	ret = rmr_get_srv_pool(srv_pool);
-+	if (!ret) {
-+		pr_err("%s: pool is not there\n", __func__);
-+		return;
-+	}
-+
-+	pool = srv_pool->pool;
-+
-+	/*
-+	 * Update srv_md snapshot and notify peers whenever any region is dirty.
-+	 */
-+	if (!rmr_srv_md_update(srv_pool) && rmr_srv_send_md_update(pool))
-+		pr_debug("failed to send md update\n");
-+
-+	/*
-+	 * The io store is ready after the store is registered and the pool metadata is
-+	 * updated, if any.
-+	 */
-+	if (!atomic_read(&srv_pool->store_state) || !pool->mapped_size)
-+		goto put_pool;
-+
-+	/*
-+	 * On-disk layout of rmr pool metadata:
-+	 *
-+	 *   0           RMR_MD_SIZE   +last_io_len    +PAGE_SIZE
-+	 *   +-----------+-------------+---------------+--------------------+
-+	 *   | pool_md   | last_io     | hdr_region    | maps_region ...    |
-+	 *   +-----------+-------------+---------------+--------------------+
-+	 *   <-RMR_MD_SIZE><-last_io_len><--PAGE_SIZE--><-per_map slp pages->
-+	 *
-+	 * pool->maps[0:maps_cnt] is always dense (no NULL gaps).
-+	 *
-+	 * This I/O covers pool_md + last_io. hdr_region and maps_region are
-+	 * written separately by rmr_srv_md_maps_sync().
-+	 */
-+	if (test_and_clear_bit(MD_DIRTY_POOL, &srv_pool->md_dirty)) {
-+		rmr_srv_flush_pool_md(srv_pool);
-+		did_work = true;
-+	}
-+
-+	if (test_and_clear_bit(MD_DIRTY_LAST_IO, &srv_pool->md_dirty)) {
-+		rmr_srv_flush_last_io(srv_pool);
-+		did_work = true;
-+	}
-+
-+	if (test_and_clear_bit(MD_DIRTY_MAPS, &srv_pool->md_dirty)) {
-+		rmr_srv_md_maps_sync(pool);
-+		did_work = true;
-+	}
-+
-+	if (did_work)
-+		pr_debug("%s: flushed dirty regions for server pool %u of %s\n",
-+			 __func__, srv_pool->member_id, pool->poolname);
-+
-+put_pool:
-+	rmr_put_srv_pool(srv_pool);
-+	/* Do NOT re-queue. Producers schedule us via mod_delayed_work. */
-+}
-diff --git a/drivers/infiniband/ulp/rmr/rmr-srv.c b/drivers/infiniband/ulp/rmr/rmr-srv.c
-new file mode 100644
-index 000000000000..66af29b90c53
---- /dev/null
-+++ b/drivers/infiniband/ulp/rmr/rmr-srv.c
-@@ -0,0 +1,3306 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Reliable multicast over RTRS (RMR)
-+ *
-+ * Copyright (c) 2026 IONOS SE
-+ */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/blkdev.h>
-+
-+#include "rmr-srv.h"
-+#include "rmr-req.h"
-+#include "rmr-clt.h"
++#include <linux/blk-mq.h>
++#include <linux/slab.h>
++#include <linux/wait.h>
++#include <linux/sched.h>
++
++#include "brmr-clt.h"
++#include "rmr.h"
++#include "rmr-pool.h"
 +
 +MODULE_AUTHOR("The RMR and BRMR developers");
-+MODULE_VERSION(RMR_VER_STRING);
-+MODULE_DESCRIPTION("RMR Server");
++MODULE_VERSION(BRMR_VER_STRING);
++MODULE_DESCRIPTION("BRMR Block Device using RMR cluster");
 +MODULE_LICENSE("GPL");
 +
-+static struct rtrs_srv_ctx *rtrs_ctx;
-+struct kmem_cache *rmr_req_cachep;
-+
-+static LIST_HEAD(g_sess_list);
-+static DEFINE_MUTEX(g_sess_lock);
-+
-+#define MIN_CHUNK_SIZE (128 << 10)
-+#define MAX_CHUNK_SIZE (1024 << 10)
-+#define DEFAULT_CHUNK_SIZE MIN_CHUNK_SIZE
-+
-+static int __read_mostly chunk_size = DEFAULT_CHUNK_SIZE;
-+
-+module_param_named(chunk_size, chunk_size, uint, 0444);
-+MODULE_PARM_DESC(chunk_size,
-+		 "Unit size which is tracked for being dirty. (default: "
-+		 /* cppcheck-suppress unknownMacro */
-+		 __stringify(DEFAULT_CHUNK_SIZE) "KB)");
-+
-+static int __read_mostly sync_queue_depth = DEFAULT_SYNC_QUEUE_DEPTH;
-+
-+module_param_named(sync_queue_depth, sync_queue_depth, uint, 0644);
-+MODULE_PARM_DESC(sync_queue_depth,
-+		 "Max in-flight sync requests per pool (default: "
-+		 __stringify(DEFAULT_SYNC_QUEUE_DEPTH) ")");
-+
-+bool rmr_get_srv_pool(struct rmr_srv_pool *srv_pool)
++static inline void brmr_requeue(struct brmr_queue *q)
 +{
-+	pr_debug("pool %s, before inc refcount %d\n",
-+		 srv_pool->pool->poolname, refcount_read(&srv_pool->refcount));
-+	return refcount_inc_not_zero(&srv_pool->refcount);
++	if (WARN_ON(!q->hctx))
++		return;
++
++	/* We can come here from interrupt, thus async=true */
++	blk_mq_run_hw_queue(q->hctx, true);
 +}
 +
-+static struct rmr_srv_pool *rmr_find_and_get_srv_pool(u32 group_id)
++/**
++ * requeue implementation as used by ibnbd
++ */
++
++void brmr_init_cpu_qlists(struct brmr_cpu_qlist __percpu *cpu_queues)
 +{
-+	struct rmr_pool *pool;
-+	struct rmr_srv_pool *srv_pool;
++	unsigned int cpu;
++	struct brmr_cpu_qlist *cpu_q;
 +
-+	mutex_lock(&pool_mutex);
-+	pool = rmr_find_pool_by_group_id(group_id);
-+	if (!pool) {
-+		mutex_unlock(&pool_mutex);
-+		return ERR_PTR(-ENOENT);
++	for_each_possible_cpu(cpu) {
++		cpu_q = per_cpu_ptr(cpu_queues, cpu);
++
++		cpu_q->cpu = cpu;
++		INIT_LIST_HEAD(&cpu_q->requeue_list);
++		spin_lock_init(&cpu_q->requeue_lock);
 +	}
-+
-+	srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	if (!rmr_get_srv_pool(srv_pool)) {
-+		mutex_unlock(&pool_mutex);
-+		return ERR_PTR(-EINVAL);
-+	}
-+	mutex_unlock(&pool_mutex);
-+
-+	return srv_pool;
 +}
 +
-+void rmr_put_srv_pool(struct rmr_srv_pool *srv_pool)
++/**
++ * brmr_get_cpu_qlist() - finds a list with HW queues to be requeued
++ *
++ * Description:
++ *     Each CPU has a list of HW queues, which needs to be requeed.  If a list
++ *     is not empty - it is marked with a bit.  This function finds first
++ *     set bit in a bitmap and returns corresponding CPU list.
++ */
++static struct brmr_cpu_qlist *
++brmr_get_cpu_qlist(struct brmr_clt_pool *pool, int cpu)
 +{
-+	struct rmr_pool *pool = srv_pool->pool;
++	int bit;
 +
++	/* First half */
++	bit = find_next_bit(pool->cpu_queues_bm, nr_cpu_ids, cpu);
++	if (bit < nr_cpu_ids) {
++		return per_cpu_ptr(pool->cpu_queues, bit);
++	} else if (cpu != 0) {
++		/* Second half */
++		bit = find_next_bit(pool->cpu_queues_bm, cpu, 0);
++		if (bit < cpu)
++			return per_cpu_ptr(pool->cpu_queues, bit);
++	}
++
++	return NULL;
++}
++
++static inline int nxt_cpu(int cpu)
++{
++	return (cpu + 1) % nr_cpu_ids;
++}
++
++/**
++ * brmr_requeue_if_needed() - requeue if CPU queue is marked as non empty
++ *
++ * Description:
++ *     Each CPU has it's own list of HW queues, which should be requeued.
++ *     Function finds such list with HW queues, takes a list lock, picks up
++ *     the first HW queue out of the list and requeues it.
++ *
++ * Return:
++ *     True if the queue was requeued, false otherwise.
++ *
++ * Context:
++ *     Does not matter.
++ */
++static inline bool brmr_requeue_if_needed(struct brmr_clt_pool *pool)
++{
++	struct brmr_queue *q = NULL;
++	struct brmr_cpu_qlist *cpu_q;
++	unsigned long flags;
++	int *cpup;
++
++	/*
++	 * To keep fairness and not to let other queues starve we always
++	 * try to wake up someone else in round-robin manner.  That of course
++	 * increases latency but queues always have a chance to be executed.
++	 */
++	cpup = get_cpu_ptr(pool->cpu_rr);
++	for (cpu_q = brmr_get_cpu_qlist(pool, nxt_cpu(*cpup)); cpu_q;
++	     cpu_q = brmr_get_cpu_qlist(pool, nxt_cpu(cpu_q->cpu))) {
++		if (!spin_trylock_irqsave(&cpu_q->requeue_lock, flags))
++			continue;
++		if (likely(test_bit(cpu_q->cpu, pool->cpu_queues_bm))) {
++			q = list_first_entry_or_null(&cpu_q->requeue_list,
++						     typeof(*q), requeue_list);
++			if (WARN_ON(!q))
++				goto clear_bit;
++			list_del_init(&q->requeue_list);
++			clear_bit_unlock(0, &q->in_list);
++
++			if (list_empty(&cpu_q->requeue_list)) {
++				/* Clear bit if nothing is left */
++clear_bit:
++				clear_bit(cpu_q->cpu, pool->cpu_queues_bm);
++			}
++		}
++		spin_unlock_irqrestore(&cpu_q->requeue_lock, flags);
++
++		if (q)
++			break;
++	}
++
++	/**
++	 * Saves the CPU that is going to be requeued on the per-cpu var. Just
++	 * incrementing it doesn't work because brmr_get_cpu_qlist() will
++	 * always return the first CPU with something on the queue list when the
++	 * value stored on the var is greater than the last CPU with something
++	 * on the list.
++	 */
++	if (cpu_q)
++		*cpup = cpu_q->cpu;
++	put_cpu_var(pool->cpu_rr);
++
++	if (q)
++		brmr_requeue(q);
++
++	return !!q;
++}
++
++/**
++ * brmr_requeue_requests() - requeue all queues left in the list if
++ *     brmr_clt_pool is idling (there are no requests in-flight).
++ *
++ * Description:
++ *     This function tries to rerun all stopped queues if there are no
++ *     requests in-flight anymore.  This function tries to solve an obvious
++ *     problem, when number of tags < than number of queues (hctx), which
++ *     are stopped and put to sleep.  If last tag, which has been just put,
++ *     does not wake up all left queues (hctxs), IO requests hang forever.
++ *
++ *     That can happen when all number of tags, say N, have been exhausted
++ *     from one CPU, and we have many block devices per session, say M.
++ *     Each block device has it's own queue (hctx) for each CPU, so eventually
++ *     we can put that number of queues (hctxs) to sleep: M x nr_cpu_ids.
++ *     If number of tags N < M x nr_cpu_ids finally we will get an IO hang.
++ *
++ *     To avoid this hang last caller of brmr_put_iu() (last caller is the
++ *     one who observes pool->busy == 0) must wake up all remaining queues.
++ *
++ * Context:
++ *     Called from msg_io_conf which in turn is a completion handler
++ *     that is called from interupt.
++ */
++void brmr_requeue_requests(struct brmr_clt_pool *pool)
++{
++	bool requeued;
++
++	do {
++		requeued = brmr_requeue_if_needed(pool);
++	} while (atomic_read(&pool->busy) == 0 && requeued);
++}
++
++bool brmr_add_to_requeue(struct brmr_clt_pool *pool, struct brmr_queue *q)
++{
++	struct brmr_cpu_qlist *cpu_q;
++	unsigned long flags;
++	bool added = true;
++	bool need_set;
++
++	cpu_q = get_cpu_ptr(pool->cpu_queues);
++	spin_lock_irqsave(&cpu_q->requeue_lock, flags);
++
++	if (likely(!test_and_set_bit_lock(0, &q->in_list))) {
++		if (WARN_ON(!list_empty(&q->requeue_list)))
++			goto unlock;
++
++		need_set = !test_bit(cpu_q->cpu, pool->cpu_queues_bm);
++		if (need_set) {
++			set_bit(cpu_q->cpu, pool->cpu_queues_bm);
++			/* Paired with brmr_put_iu(). Set a bit first
++			 * and then observe the busy counter.
++			 */
++			smp_mb__before_atomic();
++		}
++		if (likely(atomic_read(&pool->busy))) {
++			list_add_tail(&q->requeue_list, &cpu_q->requeue_list);
++		} else {
++			/* Very unlikely, but possible: busy counter was
++			 * observed as zero.  Drop all bits and return
++			 * false to restart the queue by ourselves.
++			 */
++			if (need_set)
++				clear_bit(cpu_q->cpu, pool->cpu_queues_bm);
++			clear_bit_unlock(0, &q->in_list);
++			added = false;
++		}
++	}
++unlock:
++	spin_unlock_irqrestore(&cpu_q->requeue_lock, flags);
++	put_cpu_ptr(pool->cpu_queues);
++
++	return added;
++}
++
+diff --git a/drivers/block/brmr/brmr-clt-stats.c b/drivers/block/brmr/brmr-clt-stats.c
+new file mode 100644
+index 000000000000..de080fde779c
+--- /dev/null
++++ b/drivers/block/brmr/brmr-clt-stats.c
+@@ -0,0 +1,332 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Block device over RMR (BRMR)
++ *
++ * Copyright (c) 2026 IONOS SE
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++//#include <linux/module.h>
++//#include <linux/blkdev.h>
++//#include <linux/hdreg.h>
++
++#include "brmr-clt.h"
++#include "rmr.h"
++#include "rmr-pool.h"
++
++
++int brmr_clt_init_stats(struct brmr_clt_stats *stats)
++{
++	stats->pcpu_stats = alloc_percpu(typeof(*stats->pcpu_stats));
++	if (unlikely(!stats->pcpu_stats))
++		return -ENOMEM;
++
++	return 0;
++}
++
++void brmr_clt_free_stats(struct brmr_clt_stats *stats)
++{
++	free_percpu(stats->pcpu_stats);
++}
++
++int brmr_clt_reset_submitted_req(struct brmr_clt_stats *stats, bool enable)
++{
++	struct brmr_stats_pcpu *s;
++	int cpu;
++
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->submitted_requests, 0,
++		       sizeof(s->submitted_requests));
++	}
++
++	return 0;
++}
++
++int brmr_clt_reset_req_sizes(struct brmr_clt_stats *stats, bool enable)
++{
++	struct brmr_stats_pcpu *s;
++	int cpu;
++
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->request_sizes, 0,
++		       sizeof(s->request_sizes));
++	}
++
++	return 0;
++}
++
++static void brmr_update_submitted_requests(struct brmr_stats_pcpu *s,
++					   size_t size, int split, int d)
++{
++	s->submitted_requests.dir[d].total_sectors += (size >> SECTOR_SHIFT);
++	if (split)
++		s->submitted_requests.dir[d].cnt_split++;
++	else
++		s->submitted_requests.dir[d].cnt_whole++;
++}
++
++#define MAX_LEN (128*1024)
++#define NUM_CLASSES 16
++#define CLASSIFY_SHIFT (ilog2(MAX_LEN)-ilog2(NUM_CLASSES))
++
++/**
++   classifies length linearly in 16 classes:
++
++   input length in bytes
++   
++   <    0x2000 (8K)
++   >=   0x2000 (8K)
++   >=   0x4000 (16K)
++   >=   0x6000 (24K)
++   >=   0x8000 (32K)
++   >=   0xa000 (40K)
++   >=   0xc000 (48K)
++   >=   0xe000 (56K)
++   >=  0x10000 (64K)
++   >=  0x12000 (72K)
++   >=  0x14000 (80K)
++   >=  0x16000 (88K)
++   >=  0x18000 (96K)
++   >=  0x1a000 (104K)
++   >=  0x1c000 (112K)
++   >=  0x1e000 (120K)
++
++   Maximum value is 128K-1.
++   However everything larger is classified as class 15 as well.
++*/
++static inline int classify(long length)
++{
++	return length < MAX_LEN ? (length >> CLASSIFY_SHIFT) : NUM_CLASSES-1;
++}
++
++static void brmr_update_request_sizes(struct brmr_stats_pcpu *s,
++				      size_t size, int split, int d)
++{
++	int size_class = classify(size);
++	switch (split) {
++	case 0:
++		s->request_sizes.dir[d].cnt_whole[size_class]++;
++		break;
++	case 1:
++		s->request_sizes.dir[d].cnt_left[size_class]++;
++		break;
++	case 2:
++		s->request_sizes.dir[d].cnt_right[size_class]++;
++		break;
++	default:
++		WARN_ONCE(true,"unexpected value for split");
++	}
++}
++
++void brmr_update_stats(struct brmr_clt_stats *stats, size_t size, int split, int d)
++{
++	struct brmr_stats_pcpu *s;
++
++	s = this_cpu_ptr(stats->pcpu_stats);
++
++	brmr_update_submitted_requests(s, size, split, d);
++	brmr_update_request_sizes(s, size, split, d);
++}
++
++ssize_t brmr_clt_stats_rq_to_str(struct brmr_clt_stats *stats, char *page, size_t len)
++{
++	struct brmr_stats_rq sum;
++	struct brmr_stats_rq *r;
++	int cpu; int d;
++
++	memset(&sum, 0, sizeof(sum));
++
++	for_each_possible_cpu(cpu) {
++		r = &per_cpu_ptr(stats->pcpu_stats, cpu)->submitted_requests;
++
++		for (d=READ; d<=WRITE; d++) {
++			sum.dir[d].cnt_whole      += r->dir[d].cnt_whole;
++			sum.dir[d].cnt_split      += r->dir[d].cnt_split;
++			sum.dir[d].total_sectors  += r->dir[d].total_sectors;
++		}
++	}
++
++	return scnprintf(page, len, "%llu %llu %llu %llu %llu %llu\n",
++			 sum.dir[READ].cnt_whole, sum.dir[READ].cnt_split,
++			 sum.dir[READ].total_sectors,
++			 sum.dir[WRITE].cnt_whole, sum.dir[WRITE].cnt_split,
++			 sum.dir[WRITE].total_sectors);
++}
++
++ssize_t brmr_clt_stats_sizes_to_str(struct brmr_clt_stats *stats, char *page, size_t len)
++{
++	struct brmr_stats_sizes *sum;
++	struct brmr_stats_sizes *per_cpu;
++	int cpu; int d; int i; int cnt = 0;
++
++	sum = kzalloc(sizeof(*sum), GFP_KERNEL);
++	if (unlikely(!sum))
++		return -ENOMEM;
++
++	for (i = 0; i < STATS_SIZES_NUM; i++) {
++		for_each_possible_cpu(cpu) {
++			per_cpu = &per_cpu_ptr(stats->pcpu_stats, cpu)
++				->request_sizes;
++
++			for (d=READ; d<=WRITE; d++) {
++				sum->dir[d].cnt_whole[i]
++					+= per_cpu->dir[d].cnt_whole[i];
++				sum->dir[d].cnt_left[i]
++					+= per_cpu->dir[d].cnt_left[i];
++				sum->dir[d].cnt_right[i]
++					+= per_cpu->dir[d].cnt_right[i];
++			}
++		}
++	}
++
++	cnt += scnprintf(page + cnt, len - cnt,
++		"         READ        "
++		"        whole                left               right               "
++		"\n");
++	if (len - cnt <= 0)
++		goto free_return;
++
++	cnt += scnprintf(page + cnt, len - cnt,
++			 "<=   8 Kbytes: %19llu %19llu %19llu\n",
++			 sum->dir[READ].cnt_whole[0],
++			 sum->dir[READ].cnt_left[0],
++			 sum->dir[READ].cnt_right[0]);
++
++	for (i = 1; i < STATS_SIZES_NUM; i++) {
++
++		cnt += scnprintf(page + cnt, len - cnt,
++				 ">  %3d Kbytes: %19llu %19llu %19llu\n",
++				 (i)<<3,
++				 sum->dir[READ].cnt_whole[i],
++				 sum->dir[READ].cnt_left[i],
++				 sum->dir[READ].cnt_right[i]);
++
++		if (len - cnt <= 0)
++			goto free_return;
++	}
++
++	cnt += scnprintf(page + cnt, len - cnt,
++		"\n        WRITE        "
++		"        whole                left               right               "
++		"\n");
++	if (len - cnt <= 0)
++		goto free_return;
++
++	cnt += scnprintf(page + cnt, len - cnt,
++			 "<=   8 Kbytes: %19llu %19llu %19llu\n",
++			 sum->dir[WRITE].cnt_whole[0],
++			 sum->dir[WRITE].cnt_left[0],
++			 sum->dir[WRITE].cnt_right[0]);
++
++	for (i = 1; i < STATS_SIZES_NUM; i++) {
++
++		cnt += scnprintf(page + cnt, len - cnt,
++				 ">  %3d Kbytes: %19llu %19llu %19llu\n",
++				 (i)<<3,
++				 sum->dir[WRITE].cnt_whole[i],
++				 sum->dir[WRITE].cnt_left[i],
++				 sum->dir[WRITE].cnt_right[i]);
++
++		if (len - cnt <= 0)
++			goto free_return;
++	}
++
++free_return:
++	kfree(sum);
++
++	return cnt;
++}
++
++int brmr_clt_reset_sts_resource(struct brmr_clt_stats *stats, bool enable)
++{
++	struct brmr_stats_pcpu *s;
++	int cpu;
++
++	if (unlikely(!enable))
++		return -EINVAL;
++
++	for_each_possible_cpu(cpu) {
++		s = per_cpu_ptr(stats->pcpu_stats, cpu);
++		memset(&s->sts_resource, 0,
++		       sizeof(s->sts_resource));
++	}
++
++	return 0;
++}
++
++void brmr_clt_update_sts_resource(struct brmr_clt_stats *stats, int which)
++{
++	struct brmr_stats_pcpu *s;
++
++	s = this_cpu_ptr(stats->pcpu_stats);
++	switch (which) {
++	case 0:
++		s->sts_resource.get_iu++;
++		break;
++	case 1:
++		s->sts_resource.get_iu2++;
++		break;
++	case 2:
++		s->sts_resource.clt_request1++;
++		break;
++	case 3:
++		s->sts_resource.clt_request++;
++		break;
++	default:
++		WARN_ONCE(true,"unexpected value for which");
++	}
++}
++
++ssize_t brmr_stats_sts_resource_to_str(
++	struct brmr_clt_stats *stats, char *page, size_t len)
++{
++	struct brmr_stats_sts_resource sum;
++	struct brmr_stats_sts_resource *r;
++	int cpu;
++
++	memset(&sum, 0, sizeof(sum));
++
++	for_each_possible_cpu(cpu) {
++		r = &per_cpu_ptr(stats->pcpu_stats, cpu)->sts_resource;
++
++		sum.get_iu       += r->get_iu;
++		sum.get_iu2      += r->get_iu2;
++		sum.clt_request1 += r->clt_request1;
++		sum.clt_request  += r->clt_request;
++	}
++
++	return scnprintf(page, len, "%llu %llu %llu %llu\n",
++			 sum.get_iu, sum.get_iu2,
++			 sum.clt_request1, sum.clt_request);
++}
++
++ssize_t brmr_stats_sts_resource_per_cpu_to_str(
++	struct brmr_clt_stats *stats, char *page, size_t len)
++{
++	struct brmr_stats_sts_resource *r;
++	int cpu; int cnt = 0;
++
++	for_each_possible_cpu(cpu) {
++		r = &per_cpu_ptr(stats->pcpu_stats, cpu)->sts_resource;
++
++		cnt += scnprintf(page+cnt, len, "%d %llu %llu %llu %llu\n",
++				 cpu, r->get_iu, r->get_iu2,
++				 r->clt_request1, r->clt_request);
++		if (len - cnt <= 0)
++			goto return_cnt;
++	}
++
++return_cnt:
++	return cnt;
++}
++
+diff --git a/drivers/block/brmr/brmr-clt.c b/drivers/block/brmr/brmr-clt.c
+new file mode 100644
+index 000000000000..6f3d2dd2a9d9
+--- /dev/null
++++ b/drivers/block/brmr/brmr-clt.c
+@@ -0,0 +1,1222 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Block device over RMR (BRMR)
++ *
++ * Copyright (c) 2026 IONOS SE
++ */
++
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++#include <linux/module.h>
++#include <linux/blkdev.h>
++#include <linux/hdreg.h>
++#include <linux/uio.h>
++
++#include "brmr-clt.h"
++
++MODULE_AUTHOR("The RMR and BRMR developers");
++MODULE_VERSION(BRMR_VER_STRING);
++MODULE_DESCRIPTION("BRMR Block Device using RMR cluster");
++MODULE_LICENSE("GPL");
++
++/*
++ * Maximum number of partitions an instance can have.
++ * 6 bits = 64 minors = 63 partitions (one minor is used for the device itself)
++ */
++#define BRMR_PART_BITS		6
++
++static DEFINE_IDA(index_ida);
++static DEFINE_MUTEX(ida_lock);
++static DEFINE_MUTEX(brmr_device_lock);
++static LIST_HEAD(brmr_device_list);
++static int brmr_major;
++
++static int BRMR_DELAY_10ms   = 10;
++
++static int index_to_minor(int index)
++{
++	return index << BRMR_PART_BITS;
++}
++
++static int minor_to_index(int minor)
++{
++	return minor >> BRMR_PART_BITS;
++}
++
++static inline const char *rq_op_to_str(struct request *rq)
++{
++	switch (req_op(rq)) {
++	case REQ_OP_READ:
++		return "READ";
++	case REQ_OP_WRITE:
++		return "WRITE";
++	case REQ_OP_DISCARD:
++		return "DISCARD";
++	case REQ_OP_WRITE_ZEROES:
++		return "WRITE_ZEROES";
++	case REQ_OP_FLUSH:
++		return "FLUSH";
++	default:
++		return "UNKNOWN";
++	}
++	return "";
++}
++
++
++/* copy from blk.h */
++static inline bool biovec_phys_mergeable(struct request_queue *q,
++                struct bio_vec *vec1, struct bio_vec *vec2)
++{
++	unsigned long mask = queue_segment_boundary(q);
++	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
++	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
++
++	if (addr1 + vec1->bv_len != addr2)
++		return false;
++	// Comment out xen related code
++	/*
++	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
++		return false;
++	*/
++	if ((addr1 | mask) != ((addr2 + vec2->bv_len - 1) | mask))
++		return false;
++	return true;
++}
++
++/* copy from blk_merge.c */
++static inline unsigned get_max_segment_size(const struct request_queue *q,
++                                            struct page *start_page,
++                                            unsigned long offset)
++{
++	unsigned long mask = queue_segment_boundary(q);
++
++	offset = mask & (page_to_phys(start_page) + offset);
++
++	/*
++	 * overflow may be triggered in case of zero page physical address
++	 * on 32bit arch, use queue's max segment size when that happens.
++	 */
++	return min_not_zero(mask - offset + 1,
++				(unsigned long)queue_max_segment_size(q));
++}
++
++static inline struct scatterlist *blk_next_sg(struct scatterlist **sg,
++                struct scatterlist *sglist)
++{
++        if (!*sg)
++                return sglist;
++
++        /*
++         * If the driver previously mapped a shorter list, we could see a
++         * termination bit prematurely unless it fully inits the sg table
++         * on each mapping. We KNOW that there must be more entries here
++         * or the driver would be buggy, so force clear the termination bit
++         * to avoid doing a full sg_init_table() in drivers for each command.
++         */
++        sg_unmark_end(*sg);
++        return sg_next(*sg);
++}
++
++/* only try to merge bvecs into one sg if they are from two bios */
++static inline bool
++__blk_segment_map_sg_merge(struct request_queue *q, struct bio_vec *bvec,
++                           struct bio_vec *bvprv, struct scatterlist **sg)
++{
++
++	int nbytes = bvec->bv_len;
++
++	if (!*sg)
++		return false;
++
++	if ((*sg)->length + nbytes > queue_max_segment_size(q))
++		return false;
++
++	if (!biovec_phys_mergeable(q, bvprv, bvec))
++		return false;
++
++	(*sg)->length += nbytes;
++
++	return true;
++}
++
++/*
++ * brmr_clt_get_iu() - Get an RMR I/O unit (iu)
++ *
++ * Description:
++ *	It gets an RMR I/O unit using rmr_clt_get_iu() and increments
++ *	the pool busy counter. It invokes rmr_clt_get_iu() with NO_WAIT
++ *	as brmr can requeue an I/O request.
++ *
++ *	Ref. brmr_add_to_requeue()
++ */
++static inline struct rmr_iu *brmr_clt_get_iu(struct brmr_clt_pool *pool, enum rmr_io_flags flag)
++{
++	struct rmr_iu *iu = rmr_clt_get_iu(pool->rmr, flag, NO_WAIT);
++	if (IS_ERR_OR_NULL(iu))
++		return iu;
++
++	atomic_inc(&pool->busy);
++
++	return iu;
++}
++
++/*
++ * brmr_clt_put_iu() - Put the RMR I/O unit (iu)
++ *
++ * Description:
++ *	It puts the RMR I/O unit using rmr_clt_put_iu() and decrements
++ *	the pool busy counter. It uses memory barrier to reflect the
++ *	busy counter.
++ *
++ *	Ref. brmr_add_to_requeue() and brmr_requeue_requests()
++ */
++static inline void brmr_clt_put_iu(struct brmr_clt_pool *pool, struct rmr_iu *iu)
++{
++	rmr_clt_put_iu(pool->rmr, iu);
++
++	atomic_dec(&pool->busy);
++	/*
++	 * Paired with brmr_add_to_requeue(). Decrement first
++	 * and then check queue bits.
++	 */
++	smp_mb__after_atomic();
++	brmr_requeue_requests(pool);
++}
++
++static void brmr_softirq_done_fn(struct request *rq)
++{
++	struct brmr_clt_iu *iu = blk_mq_rq_to_pdu(rq);
++	struct brmr_clt_dev *dev = iu->dev;
++
++	if (blk_rq_nr_phys_segments(rq))
++		sg_free_table_chained(&iu->sgt, BRMR_INLINE_SG_CNT);
++
++	brmr_clt_put_iu(dev->pool, iu->rmr_iu);
++	blk_mq_end_request(rq, iu->status);
++}
++
++static void brmr_request_conf(void *priv, int errno)
++{
++	struct brmr_clt_iu *iu = (struct brmr_clt_iu *)priv;
++	struct brmr_clt_dev *dev = iu->dev;
++	struct request *rq = iu->rq;
++
++	iu->status = (errno && errno != -ENOENT) ? BLK_STS_IOERR : BLK_STS_OK;
++
++	blk_mq_complete_request(rq);
++
++	if (errno == -ENOENT)
++		pr_debug("%s request for %s IGNORED err: %d\n",
++			 rq_op_to_str(rq), dev->gd->disk_name, errno);
++	else if (errno)
++		pr_err_ratelimited("%s request for %s failed with err: %d\n",
++				rq_op_to_str(rq), dev->gd->disk_name, errno);
++}
++
++static blk_status_t brmr_queue_rq(struct blk_mq_hw_ctx *hctx,
++				  const struct blk_mq_queue_data *bd)
++{
++	struct brmr_clt_dev *dev = bd->rq->q->disk->private_data;
++	struct brmr_clt_pool *pool = dev->pool;
++	struct brmr_clt_iu *iu = blk_mq_rq_to_pdu(bd->rq);
++	struct request *rq = bd->rq;
++	struct rmr_iu *rmr_iu;
++	unsigned int sg_cnt = 0;
++	size_t offset; size_t length;
++	enum rmr_io_flags flag;
++	unsigned short prio, seg;
++	int data_dir, err;
++	blk_status_t ret = BLK_STS_IOERR;
++
++	if (unlikely(dev->dev_state != DEV_STATE_READY))
++		return ret;
++
++	iu->rq = rq;
++	iu->dev = dev;
++
++	offset = blk_rq_pos(rq) << SECTOR_SHIFT;
++	length = blk_rq_bytes(rq);
++	flag = rq_to_rmr_flags(rq);
++	prio = req_get_ioprio(rq);
++	data_dir = rq_data_dir(rq);
++
++	rmr_iu = brmr_clt_get_iu(pool, flag);
++	if (unlikely(rmr_iu == NULL)) {
++		pr_debug("Got no tag to send a request to rmr_clt\n");
++
++		/* Increment statistic counter for it */
++		brmr_clt_update_sts_resource(&dev->stats, 0);
++
++		if (!brmr_add_to_requeue(pool, hctx->driver_data))
++			/*
++			 * TODO unlikely
++			 * Restarting queue with some delay is a stupid way
++			 * of handling resource contentions
++			 */
++			blk_mq_delay_run_hw_queue(hctx, BRMR_DELAY_10ms);
++
++		return BLK_STS_RESOURCE;
++	}
++	if (IS_ERR(rmr_iu)) {
++		pr_err("Error %pe when reserving resources for io in pool %s\n",
++		       rmr_iu, pool->rmr->poolname);
++		return BLK_STS_IOERR;
++	}
++	iu->rmr_iu = rmr_iu;
++
++	iu->sgt.sgl = iu->sgl;
++	seg = blk_rq_nr_phys_segments(rq);
++	if (seg) {
++		err = sg_alloc_table_chained(&iu->sgt, seg, iu->sgt.sgl, BRMR_INLINE_SG_CNT);
++		if (err) {
++			pr_err("sg_alloc_table_chained failed, ret=%x\n", err);
++			blk_mq_delay_run_hw_queue(hctx, BRMR_DELAY_10ms);
++			brmr_clt_put_iu(pool, rmr_iu);
++			return BLK_STS_RESOURCE;
++		}
++	}
++
++	/* We only support discards with single segment and write_zeroes request with no segment. */
++	/* See queue limits. */
++	if ((req_op(rq) != REQ_OP_DISCARD) && (req_op(rq) != REQ_OP_WRITE_ZEROES))
++		sg_cnt = blk_rq_map_sg(rq, iu->sgt.sgl);
++
++	blk_mq_start_request(rq);
++	brmr_update_stats(&dev->stats, length, 0, data_dir);
++
++	pr_debug("brmr %s request with flag %x offset %lu length %lu sg_cnt: %d\n",
++		 rq_op_to_str(rq), flag, offset, length, sg_cnt);
++
++	err = rmr_clt_request(pool->rmr, rmr_iu, offset, length, flag, prio,
++			      iu, brmr_request_conf, iu->sgt.sgl, sg_cnt);
++	if (likely(err == 0))
++		return BLK_STS_OK;
++
++	pr_err_ratelimited("sending %s request for %s failed with err: %d\n",
++			   rq_op_to_str(rq), dev->gd->disk_name, err);
++
++	if (unlikely(err == -EAGAIN || err == -ENOMEM)) {
++		pr_debug("Got resource error %d when sending a request to rmr_clt\n", err);
++
++		brmr_clt_update_sts_resource(&dev->stats, 3);
++		blk_mq_delay_run_hw_queue(hctx, BRMR_DELAY_10ms);
++
++		ret = BLK_STS_RESOURCE;
++	} else {
++		ret = BLK_STS_IOERR;
++	}
++
++	if (seg)
++		sg_free_table_chained(&iu->sgt, BRMR_INLINE_SG_CNT);
++
++	brmr_clt_put_iu(pool, rmr_iu);
++	return ret;
++}
++
++static struct blk_mq_ops brmr_mq_ops = {
++	.queue_rq	= brmr_queue_rq,
++	.complete	= brmr_softirq_done_fn,
++};
++
++static struct brmr_clt_pool *brmr_clt_create_pool(const char *poolname)
++{
++	struct brmr_clt_pool *pool;
++	int err;
++	struct rmr_attrs attrs;
++
++	pool = kzalloc(sizeof(*pool), GFP_KERNEL);
++	if (!pool)
++		return ERR_PTR(-ENOMEM);
++
++	pool->rmr = rmr_clt_open(pool, NULL, poolname);
++	if (IS_ERR_OR_NULL(pool->rmr)) {
++		err = PTR_ERR(pool->rmr);
++		goto free_pool;
++	}
++	err = rmr_clt_query(pool->rmr, &attrs);
++	if (unlikely(err))
++		goto close_rmr;
++
++	pool->queue_depth = attrs.queue_depth;
++	pool->max_io_size = attrs.max_io_size;
++	pool->chunk_size = attrs.chunk_size;
++	pool->max_segments = attrs.max_segments;
++
++	snprintf(pool->poolname, sizeof(pool->poolname), "%s", poolname);
++
++	/*
++	 * When opening a new pool, allocate mq tags for that pool - they are
++	 * going to be shared among all devices opened in that pool
++	 */
++	pool->tag_set.ops		= &brmr_mq_ops;
++	pool->tag_set.queue_depth	= pool->queue_depth;
++	pool->tag_set.numa_node		= NUMA_NO_NODE;
++	pool->tag_set.flags		= BLK_MQ_F_TAG_QUEUE_SHARED;
++	pool->tag_set.cmd_size		= sizeof(struct brmr_clt_iu) + BRMR_RDMA_SGL_SIZE;
++	pool->tag_set.nr_hw_queues	= num_online_cpus();
++
++	err = blk_mq_alloc_tag_set(&pool->tag_set);
++	if (unlikely(err))
++		goto close_rmr;
++
++	refcount_set(&pool->refcount, 1);
++
++	atomic_set(&pool->busy, 0);
++	bitmap_zero(pool->cpu_queues_bm, NR_CPUS);
++	pool->cpu_rr = alloc_percpu(int);
++	if (unlikely(!pool->cpu_rr)) {
++		pr_err("Failed to alloc percpu var (cpu_rr)\n");
++		err = -ENOMEM;
++		goto free_tag_set;
++	}
++	pool->cpu_queues = alloc_percpu(struct brmr_cpu_qlist);
++	if (unlikely(!pool->cpu_queues)) {
++		pr_err("Failed to alloc percpu var (cpu_queues)\n");
++		err = -ENOMEM;
++		goto free_cpu_rr;
++	}
++	brmr_init_cpu_qlists(pool->cpu_queues);
++	return pool;
++free_cpu_rr:
++	free_percpu(pool->cpu_rr);
++free_tag_set:
++	blk_mq_free_tag_set(&pool->tag_set);
++close_rmr:
++	rmr_clt_close(pool->rmr);
++free_pool:
++	kfree(pool);
++
++	return ERR_PTR(err);
++}
++
++static void brmr_clt_free_pool(struct brmr_clt_pool *pool)
++{
++	free_percpu(pool->cpu_queues);
++	pool->cpu_queues = NULL;
++	free_percpu(pool->cpu_rr);
++	pool->cpu_rr = NULL;
++	blk_mq_free_tag_set(&pool->tag_set);
++	rmr_clt_close(pool->rmr);
++	kfree(pool);
++}
++
++static void brmr_clt_put_pool(struct brmr_clt_pool *pool)
++{
++	if (refcount_dec_and_test(&pool->refcount))
++		brmr_clt_free_pool(pool);
++	else
++		rmr_clt_put_pool(pool->rmr);
++}
++
++static inline bool brmr_clt_get_dev(struct brmr_clt_dev *dev)
++{
++	return refcount_inc_not_zero(&dev->refcount);
++}
++
++void brmr_clt_put_dev(struct brmr_clt_dev *dev)
++{
 +	might_sleep();
 +
-+	pr_debug("pool %s, before dec refcnt %d\n",
-+		 (pool ? pool->poolname : "(empty)"), refcount_read(&srv_pool->refcount));
-+	if (refcount_dec_and_test(&srv_pool->refcount)) {
-+		mutex_destroy(&srv_pool->srv_pool_lock);
++	if (refcount_dec_and_test(&dev->refcount)) {
 +
-+		if (srv_pool->clt)
-+			rmr_clt_close(srv_pool->clt);
++		mutex_lock(&ida_lock);
++		ida_free(&index_ida, dev->idx);
++		mutex_unlock(&ida_lock);
 +
-+		kfree(srv_pool->last_io);
-+		srv_pool->last_io = NULL;
-+		kfree(srv_pool->last_io_idx);
-+		srv_pool->last_io_idx = NULL;
++		kfree(dev->hw_queues);
 +
-+		if (pool) {
-+			pr_info("srv: destroy pool %s\n", pool->poolname);
-+			free_pool(pool);
++		brmr_clt_put_pool(dev->pool);
++
++		if (!list_empty(&dev->list)) {
++			mutex_lock(&brmr_device_lock);
++			list_del(&dev->list);
++			mutex_unlock(&brmr_device_lock);
 +		}
-+
-+		cancel_delayed_work_sync(&srv_pool->md_sync_dwork);
-+		destroy_workqueue(srv_pool->md_sync_wq);
-+
-+		cancel_delayed_work_sync(&srv_pool->clean_dwork);
-+		destroy_workqueue(srv_pool->clean_wq);
-+
-+		kfree(srv_pool);
++		kfree(dev);
 +	}
 +}
 +
-+static const char *rmr_get_srv_pool_state_name(enum rmr_srv_pool_state state)
++static int brmr_open(struct gendisk *disk, blk_mode_t mode)
 +{
-+	switch (state) {
-+	case RMR_SRV_POOL_STATE_EMPTY: return "RMR_SRV_POOL_STATE_EMPTY";
-+	case RMR_SRV_POOL_STATE_REGISTERED: return "RMR_SRV_POOL_STATE_REGISTERED";
-+	case RMR_SRV_POOL_STATE_CREATED: return "RMR_SRV_POOL_STATE_CREATED";
-+	case RMR_SRV_POOL_STATE_NORMAL: return "RMR_SRV_POOL_STATE_NORMAL";
-+	case RMR_SRV_POOL_STATE_NO_IO: return "RMR_SRV_POOL_STATE_NO_IO";
++	struct brmr_clt_dev *dev = disk->private_data;
 +
-+	default: return "Unknown state";
-+	}
++	if (READ_ONCE(dev->dev_state) != DEV_STATE_READY)
++		return -EIO;
++
++	if (!brmr_clt_get_dev(dev))
++		return -EIO;
++
++	return 0;
++}
++
++static void brmr_release(struct gendisk *gen)
++{
++	struct brmr_clt_dev *dev = gen->private_data;
++
++	brmr_clt_put_dev(dev);
++}
++
++#if 0
++static int brmr_getgeo(struct block_device *block_device,
++		       struct hd_geometry *geo)
++{
++	struct brmr_clt_dev *dev = block_device->bd_disk->private_data;
++
++	geo->cylinders	= (dev->size_sect & ~0x3f) >> 6;	/* size/64 */
++	geo->heads	= 4;
++	geo->sectors	= 16;
++	geo->start	= 0;
++
++	return 0;
++}
++#endif
++
++static const struct block_device_operations brmr_ops = {
++	.owner		= THIS_MODULE,
++	.open		= brmr_open,
++	.release	= brmr_release,
++	/*.getgeo		= brmr_getgeo,*/
++};
++
++/**
++ * brmr_clt_init_cmd() - Initialize message command
++ *
++ * @msg:	command message where to init
++ */
++static void brmr_clt_init_cmd(struct brmr_msg_cmd *msg)
++{
++	memset(msg, 0, sizeof(*msg));
++
++	msg->hdr.type = cpu_to_le16(BRMR_MSG_CMD);
++	msg->hdr.__padding = 0;
++	msg->ver = BRMR_PROTO_VER_MAJOR;
 +}
 +
 +/**
-+ * rmr_srv_change_pool_state() - Change srv pool state
++ * brmr_cmd_conf() - Confirmation function for brmr command message
 + *
-+ * @srv_pool:	Server pool whose state is to be changed
-+ * @new_state:	State to which the transition is to be made
-+ *
-+ * Return:
-+ *	old state on succes
-+ *	negative error code on failure
++ * @priv:	priv pointer to brmr command private data
++ * @errno:	error number passed from RMR.
++ *		See description of errno in RMR function.
 + *
 + * Description:
-+ *	This function controls the state transitions for rmr-srv pool state.
-+ *	Every state transition is controlled by this except to NORMAL.
-+ *	Function rmr_srv_set_pool_state_normal handles transition to state NORMAL.
-+ *	"always-invalid" state transitions are checked and prevented here
-+ *	Case dependent valid/invalid state transition, should be handled by caller
++ *	Command response for a map new command can fail on multiple levels.
++ *	If RMR fails to send the message to any or one of the nodes, that would reflect on the
++ *	errno. If the command fails on BRMR level, that would reflect on the rsp struct.
++ *	The error number will be used differently by different commands accordingly.
 + */
-+static inline int rmr_srv_change_pool_state(struct rmr_srv_pool *srv_pool,
-+					    enum rmr_srv_pool_state new_state)
++static void brmr_clt_cmd_conf(void *priv, int errno)
 +{
-+	enum rmr_srv_pool_state old_state = atomic_read(&srv_pool->state);
-+	int cmp_state;
++	struct brmr_cmd_priv *cmd_priv = (struct brmr_cmd_priv *)priv;
 +
-+	WARN_ON(new_state == RMR_SRV_POOL_STATE_NORMAL);
-+
-+	if (old_state == new_state)
-+		return old_state;
-+
-+	pr_info("%s: Old state %s, Requested state %s\n",
-+		__func__, rmr_get_srv_pool_state_name(old_state),
-+		rmr_get_srv_pool_state_name(new_state));
-+
-+	switch (new_state) {
-+	case RMR_SRV_POOL_STATE_NO_IO:
-+		/*
-+		 * NO_IO can be reached from REGISTERED, CREATED, or NORMAL.
-+		 * EMPTY -> NO_IO is illegal: a pool with no store cannot have
-+		 * active sessions that fail.
-+		 */
-+		if (WARN_ON(old_state == RMR_SRV_POOL_STATE_EMPTY))
-+			goto err;
-+		atomic_set(&srv_pool->state, RMR_SRV_POOL_STATE_NO_IO);
++	switch (cmd_priv->cmd_type) {
++	case BRMR_CMD_MAP:
++		pr_info("%s: BRMR_CMD_MAP err=%d\n", __func__, errno);
++		cmd_priv->errno = errno;
 +		break;
-+	case RMR_SRV_POOL_STATE_EMPTY:
-+		/*
-+		 * EMPTY is reached from REGISTERED (store unregistered, no
-+		 * sessions) or from NO_IO (last session left, no store). A
-+		 * direct jump from CREATED or NORMAL is illegal — those states
-+		 * must pass through NO_IO first.
-+		 */
-+		if (WARN_ON(old_state == RMR_SRV_POOL_STATE_CREATED ||
-+			    old_state == RMR_SRV_POOL_STATE_NORMAL))
-+			goto err;
-+		atomic_set(&srv_pool->state, RMR_SRV_POOL_STATE_EMPTY);
++	case BRMR_CMD_REMAP:
++		pr_info("%s: BRMR_CMD_REMAP err=%d\n", __func__, errno);
 +		break;
-+	case RMR_SRV_POOL_STATE_REGISTERED:
++	case BRMR_CMD_UNMAP:
++		pr_info("%s: BRMR_CMD_UNMAP err=%d\n", __func__, errno);
 +		/*
-+		 * REGISTERED is entered from EMPTY (store just registered, no
-+		 * sessions) or from NO_IO (last session left, store still
-+		 * present). A direct jump from CREATED or NORMAL is illegal —
-+		 * those states must pass through NO_IO first.
++		 * No processing needed here.
 +		 */
-+		if (WARN_ON(old_state == RMR_SRV_POOL_STATE_CREATED ||
-+			    old_state == RMR_SRV_POOL_STATE_NORMAL))
-+			goto err;
-+		atomic_set(&srv_pool->state, RMR_SRV_POOL_STATE_REGISTERED);
++		break;
++	case BRMR_CMD_GET_PARAMS:
++		pr_info("%s: BRMR_CMD_GET_PARAMS err=%d\n", __func__, errno);
++		if (errno)
++			cmd_priv->errno = errno;
++		break;
 +
-+		break;
-+	case RMR_SRV_POOL_STATE_CREATED:
-+		/*
-+		 * CREATED is entered only from REGISTERED, when the first
-+		 * non-sync create-mode join arrives. Any other predecessor
-+		 * is illegal.
-+		 */
-+		cmp_state = RMR_SRV_POOL_STATE_REGISTERED;
-+		if (atomic_try_cmpxchg(&srv_pool->state, &cmp_state, RMR_SRV_POOL_STATE_CREATED))
-+			goto out;
-+		WARN_ON(1);
-+		goto err;
 +	default:
-+		pr_err("%s: Unknown state %d\n", __func__, new_state);
-+		goto err;
++		pr_err("%s: Unknown command type %d err=%d\n", __func__, cmd_priv->cmd_type, errno);
 +	}
 +
-+out:
-+	rmr_srv_mark_pool_md_dirty(srv_pool);
-+	return old_state;
-+
-+err:
-+	pr_err("%s: Failed. Old state %s, Requested state %s\n",
-+	       __func__, rmr_get_srv_pool_state_name(old_state),
-+	       rmr_get_srv_pool_state_name(new_state));
-+	return -EINVAL;
++	complete(&cmd_priv->complete_done);
 +}
 +
 +/**
-+ * rmr_srv_set_pool_state_normal() - Change srv pool state to NORMAL
++ * brmr_clt_send_msg_cmd() - Sends command message to rmr pool
 + *
-+ * @srv_pool:	Server pool whose state is to be changed to NORMAL
-+ *
-+ * Return:
-+ *	old state on succes
-+ *	negative error code on failure
-+ *
-+ * Description:
-+ *	This function controls the state transitions for rmr-srv pool state to NORMAL
-+ *	"always-invalid" state transitions are checked and prevented here
-+ *	Case dependent valid/invalid state transition, should be handled by caller
-+ */
-+static int rmr_srv_set_pool_state_normal(struct rmr_srv_pool *srv_pool)
-+{
-+	int old_state;
-+
-+	mutex_lock(&srv_pool->srv_pool_lock);
-+	old_state = atomic_read(&srv_pool->state);
-+
-+	pr_info("%s: Old state %s\n", __func__,
-+		rmr_get_srv_pool_state_name(old_state));
-+
-+	if (old_state == RMR_SRV_POOL_STATE_NORMAL)
-+		goto out;
-+
-+	/*
-+	 * CREATED -> NORMAL: normal enable on a newly created pool.
-+	 * NO_IO -> NORMAL: map update completed, pool can serve IOs again.
-+	 * Any other predecessor is illegal.
-+	 */
-+	if (WARN_ON(old_state != RMR_SRV_POOL_STATE_CREATED &&
-+		    old_state != RMR_SRV_POOL_STATE_NO_IO)) {
-+		old_state = -EINVAL;
-+		goto out;
-+	}
-+
-+	atomic_set(&srv_pool->state, RMR_SRV_POOL_STATE_NORMAL);
-+	rmr_srv_mark_pool_md_dirty(srv_pool);
-+	pr_info("%s: Server pool state changed to NORMAL\n", __func__);
-+
-+out:
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+
-+	return old_state;
-+}
-+
-+/**
-+ * rmr_srv_clear_map() - clear the  dirty map if other pool member completely synced it
-+ *
-+ * @pool:	rmr pool that holds the maps to clean
-+ * @member_id:	pool member id for which map is reported as clean
-+ *
-+ * Description:
-+ *	If other pool member responded that he finished syncing his data, then we can
-+ *	clear his map replicated to this nodes, in case of some clear commands were
-+ *	lost or failed.
++ * @dev:		pointer to brmr device
++ * @msg:		msg struct to be sent
++ * @rsp_buf:		response buffer where the response of the storage side is stored
++ * @rsp_buf_len:	length of the response buffer
 + *
 + * Return:
-+ *	no
++ *	Negative if failed to sent command
++ *	As handled by each command in brmr_clt_cmd_conf, if succeeded to send command
 + *
 + * Context:
-+ *	This function can wait on spin_lock if the deleted entry should be inserted back
-+ *
-+ * Locks:
-+ *	no
++ *	Would block until response is received
 + */
-+static void rmr_srv_clear_map(struct rmr_pool *pool, u8 member_id)
++static int brmr_clt_send_msg_cmd(struct brmr_clt_dev *dev, struct brmr_msg_cmd *msg, void *rsp_buf,
++			     size_t rsp_buf_len)
 +{
-+	// TODO: this looks like rmr_pool_map_remove_entries, can we do something about this?
-+	// I was not able to merge them, but it would be nice.
-+	struct rmr_dirty_id_map *map = NULL;
-+	rmr_id_t id;
-+	int i, lock_idx;
-+
-+	pr_debug("pool %s clear map entries for member_id=%u\n",
-+		 pool->poolname, member_id);
-+
-+	lock_idx = srcu_read_lock(&pool->map_srcu);
-+	map = rmr_pool_find_map(pool, member_id);
-+	if (!map) {
-+		pr_err("for pool %s cannot find map for member id %u\n", pool->poolname, member_id);
-+		goto unlock;
-+	}
-+
-+	/* if the map state changed since we send our CHECK_MAP command, it means that
-+	 * some entries were added and the map is not clean and we should not wipe it.
-+	 * rsp of CHECK_MAP cmd can be outdated a little so we do not trust it then.
-+	 */
-+	if (atomic_read(&map->check_state) != RMR_MAP_STATE_CHECKING)
-+		pr_debug("map for member_id=%u cannot be cleared now, state changed\n",
-+			 map->member_id);
-+
-+	for (i = 0; i < map->no_of_chunks; i++) {
-+		id.a = 1;
-+		id.b = i;
-+
-+		rmr_map_unset_dirty(map, id, MAP_NO_FILTER);
-+
-+		/* If the state changed since the last check then it is possible that after
-+		 * clear_bit of RMR_MAP_STATE_CHECK_CLEAR in the rmr_req_check_map we called
-+		 * rmr_map_insert. There we check that entry is already in the map and leave
-+		 * the function. But the following erease here would delete it. So we return
-+		 * erased entry back to the table if the state of checking changed.
-+		 */
-+		if (atomic_read(&map->check_state) != RMR_MAP_STATE_CHECKING) {
-+			pr_debug("map for member_id=%u cannot be cleared now, state changed\n",
-+				 map->member_id);
-+
-+			rmr_map_set_dirty(map, id, 0);
-+			goto unlock;
-+		}
-+	}
-+	pr_debug("clear map entries for member_id=%u is done\n", member_id);
-+unlock:
-+	srcu_read_unlock(&pool->map_srcu, lock_idx);
-+	rmr_srv_mark_maps_dirty((struct rmr_srv_pool *)pool->priv);
-+}
-+
-+/**
-+ * rmr_srv_check_map_clear() - periodic work that checks if the other node finished sync
-+ *
-+ * @work:	delayed work structure to start and repeat the work
-+ *
-+ * Description:
-+ *	Check the dirty maps of all of the other pool members. If any of the maps is dirty
-+ *	then send check command and if the pool member responds that it has cleared his map,
-+ *	then we should clear it locally. When checking is done reschedule itself again.
-+ *
-+ * Return:
-+ *	no
-+ *
-+ * Context:
-+ *	runs in the process context.
-+ *
-+ * Locks:
-+ *	no
-+ */
-+static void rmr_srv_check_map_clear(struct work_struct *work)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_pool *pool;
-+	int i, lock_idx;
-+
-+	srv_pool = container_of(to_delayed_work(work), struct rmr_srv_pool, clean_dwork);
-+
-+	if (!srv_pool->pool) {
-+		pr_debug("no rmr pool assigend to srv_pool yet.\n");
-+		goto out;
-+	}
-+
-+	pool = srv_pool->pool;
-+	pr_debug("check map for srv pool %s started...\n", pool->poolname);
-+
-+	if (atomic_read(&srv_pool->state) != RMR_SRV_POOL_STATE_NORMAL) {
-+		pr_debug("srv pool %s is not in normal state, skip map clear check",
-+			 pool->poolname);
-+		goto out;
-+	}
-+
-+	if (!srv_pool->clt) {
-+		pr_debug("srv pool %s does not have sync pool assigned, skip map clear check\n",
-+			 pool->poolname);
-+		goto out;
-+	}
-+
-+	lock_idx = srcu_read_lock(&pool->map_srcu);
-+	for (i = 0; i < pool->maps_cnt; i++) {
-+		struct rmr_dirty_id_map *map;
-+		u8 member_id;
-+		int ret;
-+
-+		map = rcu_dereference(pool->maps[i]);
-+		if (WARN_ON(!map))
-+			break;
-+
-+		member_id = map->member_id;
-+		if (member_id == srv_pool->member_id) {
-+			pr_debug("srv pool %s skip checking map with id %u, since it is me.\n",
-+				 pool->poolname, member_id);
-+			continue;
-+		}
-+
-+		if (rmr_map_empty(map)) {
-+			pr_debug("srv pool %s map for member_id=%u is empty, no need to check\n",
-+				 pool->poolname, map->member_id);
-+			continue;
-+		}
-+
-+		atomic_set(&map->check_state, RMR_MAP_STATE_CHECKING);
-+
-+		ret = rmr_clt_pool_member_synced(srv_pool->clt, member_id);
-+		if (ret < 0) {
-+			pr_debug("pool %s failed to check if member_id=%u synced, ret %d\n",
-+				 pool->poolname, member_id, ret);
-+			atomic_set(&map->check_state, RMR_MAP_STATE_NO_CHECK);
-+			continue;
-+		}
-+
-+		pr_debug("pool %s check if pool member %u synced, reported %u\n\n",
-+			 pool->poolname, member_id, ret);
-+		if (ret)
-+			rmr_srv_clear_map(pool, member_id);
-+
-+		atomic_set(&map->check_state, RMR_MAP_STATE_NO_CHECK);
-+	}
-+	srcu_read_unlock(&pool->map_srcu, lock_idx);
-+
-+	pr_debug("check map for pool %s done. schedule next one.\n", pool->poolname);
-+
-+out:
-+	queue_delayed_work(srv_pool->clean_wq, &srv_pool->clean_dwork,
-+			   msecs_to_jiffies(RMR_SRV_CHECK_MAPS_INTERVAL_MS));
-+}
-+
-+struct rmr_srv_pool *rmr_create_srv_pool(char *poolname, u32 member_id)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	srv_pool = kzalloc(sizeof(struct rmr_srv_pool), GFP_KERNEL);
-+	if (unlikely(!srv_pool))
-+		return ERR_PTR(-ENOMEM);
-+
-+	atomic_set(&srv_pool->state, RMR_SRV_POOL_STATE_EMPTY);
-+	srv_pool->maintenance_mode = false;
-+	refcount_set(&srv_pool->refcount, 1);
-+	mutex_init(&srv_pool->srv_pool_lock);
-+
-+	atomic_set(&srv_pool->store_state, false);
-+
-+	srv_pool->member_id = member_id;
-+	srv_pool->max_sync_io_size = U32_MAX;
-+
-+	/* Sync thread */
-+	srv_pool->th_tsk = NULL;
-+	atomic_set(&srv_pool->thread_state, SYNC_THREAD_STOPPED);
-+	atomic_set(&srv_pool->in_flight_sync_reqs, 0);
-+
-+	/* clean outdated entries from the map work */
-+	srv_pool->clean_wq = alloc_workqueue("%s_clean_wq", 0, 0, poolname);
-+	if (!srv_pool->clean_wq) {
-+		kfree(srv_pool);
-+		pr_err("failed to create wq pool %s\n", poolname);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+	INIT_DELAYED_WORK(&srv_pool->clean_dwork, rmr_srv_check_map_clear);
-+	queue_delayed_work(srv_pool->clean_wq, &srv_pool->clean_dwork,
-+			   msecs_to_jiffies(RMR_SRV_CHECK_MAPS_INTERVAL_MS));
-+
-+	/* sync metadata of the rmr pool */
-+	srv_pool->md_sync_wq = alloc_workqueue("%s_md_sync_wq", 0, 0, poolname);
-+	if (!srv_pool->md_sync_wq) {
-+		kfree(srv_pool);
-+		pr_err("failed to create md_sync_wq pool %s\n", poolname);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	INIT_DELAYED_WORK(&srv_pool->md_sync_dwork, rmr_srv_md_sync);
-+	/* No initial queue — first dirty event will schedule the work. */
-+	return srv_pool;
-+}
-+
-+void rmr_srv_pool_update_params(struct rmr_pool *pool)
-+{
-+	pr_info("%s: Setting chunk_size for pool %s to %d",
-+		__func__, pool->poolname, chunk_size);
-+	pool->chunk_size = chunk_size;
-+	pool->chunk_size_shift = ilog2(chunk_size);
-+}
-+
-+static struct rmr_pool *rmr_srv_sess_get_pool(struct rmr_srv_sess *srv_sess, u32 group_id)
-+{
-+	struct rmr_pool *pool;
-+	struct rmr_srv_pool *srv_pool;
-+	bool ret;
-+
-+	rcu_read_lock();
-+	pool = xa_load(&srv_sess->pools, group_id);
-+	if (!pool) {
-+		pool = ERR_PTR(-ENXIO);
-+		goto out;
-+	}
-+
-+	srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	ret = rmr_get_srv_pool(srv_pool);
-+	if (!ret)
-+		pool = ERR_PTR(-ENXIO);
-+
-+out:
-+	rcu_read_unlock();
-+	return pool;
-+}
-+
-+static void rmr_srv_sess_put_pool(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	rmr_put_srv_pool(srv_pool);
-+}
-+
-+/**
-+ * rmr_srv_endreq() - Function called when an rmr server request finishes processing
-+ *
-+ * @req:	Pointer to the request ending
-+ * @err:	Error value. Would be 0 for a successful request
-+ */
-+void rmr_srv_endreq(struct rmr_srv_req *req, int err)
-+{
-+	struct rmr_srv_pool *srv_pool = req->srv_pool;
-+	struct rmr_pool *pool = srv_pool->pool;
-+	struct rtrs_srv_op *rtrs_op = req->rtrs_op;
-+	struct rmr_dirty_id_map *map;
-+	int i;
-+
-+	if (req->flags == RMR_OP_MD_WRITE || req->flags == RMR_OP_MD_READ) {
-+		if (unlikely(err))
-+			pr_err("Failed to complete the md req %x\n", req->flags);
-+		goto put_ref;
-+	} else if (unlikely(err) && !req->sync) {
-+		struct rmr_srv_pool *srv_pool = req->srv_pool;
-+
-+		rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+	} else if (rmr_op(req->flags) == RMR_OP_WRITE) {
-+		srv_pool->last_io[req->mem_id].a = req->id.a;
-+		srv_pool->last_io[req->mem_id].b = req->id.b;
-+
-+		if (!test_and_set_bit(MD_DIRTY_LAST_IO, &srv_pool->md_dirty)) {
-+			mod_delayed_work(srv_pool->md_sync_wq,
-+					 &srv_pool->md_sync_dwork,
-+					 msecs_to_jiffies(RMR_SRV_MD_SYNC_INTERVAL_MS));
-+		}
-+
-+		for (i = 0; i < req->failed_cnt; i++) {
-+			int err;
-+
-+			map = rmr_pool_find_map(srv_pool->pool, req->failed_srv_id[i]);
-+			if (!map) {
-+				pr_err("Cannot find map for srv_id %u\n", req->failed_srv_id[i]);
-+				err = -EINVAL;
-+				goto out;
-+			}
-+
-+			atomic_set(&map->check_state, RMR_MAP_STATE_NO_CHECK);
-+			rmr_map_set_dirty(map, req->id, 0);
-+
-+			if (req->map_ver > srv_pool->pool->map_ver)
-+				srv_pool->pool->map_ver = req->map_ver;
-+		}
-+		if (req->failed_cnt) {
-+			rmr_srv_mark_pool_md_dirty(srv_pool);
-+			rmr_srv_mark_maps_dirty(srv_pool);
-+		}
-+	}
-+
-+out:
-+	/* The requests created by rmr-srv don't use rtrs_op. */
-+	rtrs_srv_resp_rdma(rtrs_op, err);
-+	rmr_srv_sess_put_pool(req->srv_pool->pool);
-+put_ref:
-+	percpu_ref_put(&pool->ids_inflight_ref);
-+}
-+
-+static void rmr_srv_stop_sync_and_unset_store(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	atomic_set(&srv_pool->store_state, false);
-+
-+	if (atomic_read(&srv_pool->thread_state) != SYNC_THREAD_STOPPED) {
-+		atomic_set(&srv_pool->thread_state, SYNC_THREAD_REQ_STOP);
-+		wake_up_process(srv_pool->th_tsk);
-+
-+		while (atomic_read(&srv_pool->thread_state) != SYNC_THREAD_STOPPED) {
-+			set_current_state(TASK_INTERRUPTIBLE);
-+			schedule_timeout(msecs_to_jiffies(1000));
-+		}
-+	}
-+}
-+
-+static void rmr_srv_delete_store_member(struct rmr_pool *pool, unsigned long id)
-+{
-+	rmr_pool_remove_map(pool, id);
-+	xa_erase(&pool->stg_members, id);
-+	rmr_srv_mark_maps_dirty((struct rmr_srv_pool *)pool->priv);
-+}
-+
-+/**
-+ * rmr_srv_add_store_member() - Register a storage member and create its dirty map
-+ *
-+ * @pool:	The pool to which the member belongs.
-+ * @id:		Member ID of the storage node to add.
-+ *
-+ * Records @id in pool->stg_members and allocates a dirty map for it.
-+ * On failure the stg_members entry is removed before returning.
-+ *
-+ * Return:
-+ *	0 on success, negative error code on failure.
-+ */
-+static int rmr_srv_add_store_member(struct rmr_pool *pool, unsigned long id)
-+{
-+	struct rmr_dirty_id_map *map;
++	struct brmr_cmd_priv cmd_priv;
++	struct kvec vec;
 +	int ret;
 +
-+	map = rmr_pool_find_map(pool, id);
-+	if (map) {
-+		pr_err("%s: pool %s, member_id %lu map already exists\n",
-+		       __func__, pool->poolname, id);
-+		return -EEXIST;
++	vec = (struct kvec) {
++		.iov_base = msg,
++		.iov_len  = sizeof(*msg)
++	};
++
++	cmd_priv.dev = dev;
++	cmd_priv.cmd_type = msg->cmd_type;
++	cmd_priv.rsp_buf = rsp_buf;
++	cmd_priv.rsp_buf_len = rsp_buf_len;
++	cmd_priv.errno = 0;
++	init_completion(&cmd_priv.complete_done);
++
++	ret = rmr_clt_cmd_with_rsp(dev->pool->rmr, brmr_clt_cmd_conf, &cmd_priv, &vec, 1, rsp_buf,
++				   rsp_buf_len, sizeof(struct brmr_msg_cmd_rsp));
++
++	if (!ret) {
++		wait_for_completion(&cmd_priv.complete_done);
++		ret = cmd_priv.errno;
 +	}
 +
-+	ret = xa_err(xa_store(&pool->stg_members, id, XA_TRUE, GFP_KERNEL));
-+	if (ret) {
-+		pr_err("%s: Failed to add storage member %lu: %d\n",
-+		       __func__, id, ret);
-+		return ret;
++	return ret;
++}
++
++static struct brmr_clt_dev *brmr_alloc_and_init_dev(struct brmr_clt_pool *pool,
++						u64 size)
++{
++	struct brmr_clt_dev *dev;
++	struct brmr_queue *q;
++	struct blk_mq_hw_ctx *hctx;
++	int ret;
++	unsigned long i;
++
++	/*
++	 * alloc device structure
++	 */
++	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
++	if (!dev) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	INIT_LIST_HEAD(&dev->list);
++	dev->size_sect = size;
++	dev->pool = pool;
++	dev->dev_state = DEV_STATE_INIT;
++	dev->map_incomplete = false;
++	refcount_set(&dev->refcount, 1);
++
++	/*
++	 * Alloc a "queue" per cpu
++	 */
++	dev->hw_queues = kcalloc(nr_cpu_ids,
++				 sizeof(*dev->hw_queues), GFP_KERNEL);
++	if (unlikely(!dev->hw_queues)) {
++		ret = -ENOMEM;
++		goto free_dev;
 +	}
 +
 +	/*
-+	 * Create the map of the newly added member.
++	 * Get an id to be used in /dev/brmr<idx>
 +	 */
-+	map = rmr_map_create(pool, id);
-+	if (IS_ERR(map)) {
-+		ret = PTR_ERR(map);
-+		pr_err("%s: pool %s, member_id %lu failed to create map on err %d: %pe\n",
-+		       __func__, pool->poolname, id, ret, map);
-+		goto rem_store;
++	mutex_lock(&ida_lock);
++	ret = ida_alloc_range(&index_ida, 0, minor_to_index(1 << MINORBITS) - 1,
++			      GFP_KERNEL);
++	mutex_unlock(&ida_lock);
++	if (ret < 0) {
++		pr_err("%s: ida_alloc_range() failed for pool %s, err: %d\n",
++		       __func__, pool->poolname, ret);
++		goto free_queues;
 +	}
++	dev->idx = ret;
++
++	/*
++	 * Init mq queue
++	 */
++	dev->gd = blk_mq_alloc_disk(&pool->tag_set, NULL, dev);
++	if (IS_ERR(dev->gd)) {
++		ret = PTR_ERR(dev->gd);
++		pr_err("Failed to initialize mq: %pe\n", dev->queue);
++		goto remove_ida;
++	}
++	dev->queue = dev->gd->queue;
++
++	/*
++	 * Assign hardware contexts to our queues
++	 */
++	queue_for_each_hw_ctx(dev->queue, hctx, i) {
++		q = &dev->hw_queues[i];
++		INIT_LIST_HEAD(&q->requeue_list);
++		q->hctx = hctx;
++		hctx->driver_data = q;
++	}
++
++	return dev;
++
++remove_ida:
++	mutex_lock(&ida_lock);
++	ida_free(&index_ida, dev->idx);
++	mutex_unlock(&ida_lock);
++free_queues:
++	kfree(dev->hw_queues);
++free_dev:
++	kfree(dev);
++out:
++	return ERR_PTR(ret);
++}
++
++static int brmr_set_dev_params(struct brmr_clt_dev *dev)
++{
++	struct brmr_clt_pool *pool = dev->pool;
++	u32 chunk_size = brmr_pool_chunk_size(pool);
++	struct queue_limits lim;
++	int ret;
++
++	/* Aligns requests with the chunks in rmr client */
++	if (!is_power_of_2(chunk_size >> SECTOR_SHIFT)) {
++		pr_err("%u not a power of 2!\n", chunk_size);
++		return -EINVAL;
++	}
++
++	/*
++	 * Set request queue parameters via queue_limits API
++	 */
++	lim = queue_limits_start_update(dev->queue);
++	lim.logical_block_size = dev->logical_block_size;
++	lim.physical_block_size = dev->physical_block_size;
++	lim.max_segments = dev->max_segments;
++	lim.max_hw_sectors = dev->max_hw_sectors;
++	lim.max_write_zeroes_sectors = dev->max_write_zeroes_sectors;
++	lim.io_opt = brmr_pool_chunk_size(pool);
++	lim.chunk_sectors = chunk_size >> SECTOR_SHIFT;
++
++	/* however we don't support discards to */
++	/* discontiguous segments in one request */
++	lim.max_discard_segments = 1;
++	lim.max_hw_discard_sectors = dev->max_discard_sectors;
++	if (dev->secure_discard)
++		lim.max_secure_erase_sectors = dev->max_discard_sectors;
++
++	lim.discard_granularity = dev->discard_granularity;
++	lim.discard_alignment = dev->discard_alignment;
++
++	/* needed for ibtrs_map_sg_fr to work */
++	lim.virt_boundary_mask = SZ_4K - 1;
++
++	/* non-rotational device */
++	lim.features &= ~BLK_FEAT_ROTATIONAL;
++
++	if (dev->wc)
++		lim.features |= BLK_FEAT_WRITE_CACHE;
++	if (dev->fua)
++		lim.features |= BLK_FEAT_FUA;
++
++	ret = queue_limits_commit_update(dev->queue, &lim);
++	if (ret)
++		goto err;
++
++	blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, dev->queue);
++	blk_queue_flag_set(QUEUE_FLAG_SAME_FORCE, dev->queue);
++
++	ret = brmr_clt_init_stats(&dev->stats);
++	if (unlikely(ret))
++		goto err;
++
++	dev->gd->major = brmr_major;
++	dev->gd->minors = 1 << BRMR_PART_BITS;
++	dev->gd->first_minor = index_to_minor(dev->idx);
++	dev->gd->fops = &brmr_ops;
++	dev->gd->queue = dev->queue;
++	dev->gd->private_data = dev;
++	snprintf(dev->gd->disk_name, sizeof(dev->gd->disk_name),
++		 "brmr%d", dev->idx);
++	set_capacity(dev->gd, dev->size_sect);
++
 +	return 0;
 +
-+rem_store:
-+	xa_erase(&pool->stg_members, id);
++err:
 +	return ret;
 +}
 +
 +/**
-+ * rmr_srv_handle_other_member_add() - Handle a POOL_INFO ADD message for a different member
++ * brmr_get_remote_dev_params() - Gets device params from storage nodes
 + *
-+ * @srv_pool:		The server pool receiving the notification.
-+ * @pool_info_cmd:	The received POOL_INFO command carrying member_id, mode, and dirty.
-+ *
-+ * For %RMR_POOL_INFO_MODE_ASSEMBLE, verifies that the member and its dirty map
-+ * already exist (the node is rejoining a pool it was previously part of).
-+ * For %RMR_POOL_INFO_MODE_CREATE, adds the member via rmr_srv_add_store_member()
-+ * and optionally marks its map fully dirty if the client reported outstanding data.
-+ *
-+ * Return:
-+ *	0 on success, negative error code on failure.
-+ */
-+static int rmr_srv_handle_other_member_add(struct rmr_srv_pool *srv_pool,
-+					   const struct rmr_msg_pool_info_cmd *pool_info_cmd)
-+{
-+	struct rmr_pool *pool = srv_pool->pool;
-+	struct rmr_dirty_id_map *map;
-+	int ret;
-+
-+	if (pool_info_cmd->mode == RMR_POOL_INFO_MODE_ASSEMBLE) {
-+		pr_info("%s: Member %u got add of member %u with mode assemble\n",
-+			__func__, srv_pool->member_id, pool_info_cmd->member_id);
-+
-+		/*
-+		 * For assemble, member info should already exist.
-+		 */
-+		if (xa_load(&pool->stg_members, pool_info_cmd->member_id) != XA_TRUE) {
-+			pr_err("%s: pool %s, member_id %u not present\n",
-+			       __func__, pool->poolname, pool_info_cmd->member_id);
-+			return -ENOENT;
-+		}
-+
-+		map = rmr_pool_find_map(pool, pool_info_cmd->member_id);
-+		if (!map) {
-+			pr_err("%s: pool %s, member_id %u, map not present\n",
-+			       __func__, pool->poolname, pool_info_cmd->member_id);
-+			return -ENOENT;
-+		}
-+	} else if (pool_info_cmd->mode == RMR_POOL_INFO_MODE_CREATE &&
-+		    pool_info_cmd->member_id != srv_pool->member_id) {
-+		pr_info("%s: Member %u got add of member %u with mode create\n",
-+			__func__, srv_pool->member_id, pool_info_cmd->member_id);
-+
-+		ret = rmr_srv_add_store_member(pool, pool_info_cmd->member_id);
-+		if (ret) {
-+			pr_err("%s: rmr_srv_add_store_member failed %d\n", __func__, ret);
-+			return ret;
-+		}
-+
-+		if (pool_info_cmd->dirty) {
-+			map = rmr_pool_find_map(pool, pool_info_cmd->member_id);
-+			if (WARN_ON(!map)) {
-+				xa_erase(&pool->stg_members, pool_info_cmd->member_id);
-+				return -EINVAL;
-+			}
-+			rmr_map_set_dirty_all(map, MAP_NO_FILTER);
-+		}
-+		rmr_srv_mark_maps_dirty((struct rmr_srv_pool *)pool->priv);
-+	} else {
-+		pr_err("%s: pool %s, member_id %u, unexpected mode %u for ADD operation\n",
-+		       __func__, pool->poolname, pool_info_cmd->member_id,
-+		       pool_info_cmd->mode);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+int rmr_srv_query(struct rmr_pool *pool, u64 mapped_size, struct rmr_attrs *attr)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_dirty_id_map *map;
-+	size_t queue_depth;
-+
-+	if (pool) {
-+		srv_pool = (struct rmr_srv_pool *)pool->priv;
-+		queue_depth = srv_pool->queue_depth;
-+	} else {
-+		/*
-+		 * If pool is NULL, we are being called to estimate the md size
-+		 * before the pool is created. Use max queue depth in that case.
-+		 */
-+		queue_depth = RMR_SRV_MAX_QDEPTH;
-+	}
-+
-+	/*
-+	 * Dummy map structure, so that we can reuse the update map param function.
-+	 */
-+	map = (struct rmr_dirty_id_map *)get_zeroed_page(GFP_KERNEL);
-+	if (!map) {
-+		pr_err("%s: Cannot allocate map\n", __func__);
-+		return -ENOMEM;
-+	}
-+
-+	map->no_of_chunks = (mapped_size >> (ilog2(chunk_size) - 9));
-+	rmr_map_update_page_params(map);
-+
-+	attr->rmr_md_size = (map->total_slp * PAGE_SIZE * RMR_POOL_MAX_SESS) + RMR_MD_SIZE;
-+	attr->rmr_md_size += (queue_depth * sizeof(*srv_pool->last_io_idx));
-+
-+	attr->rmr_md_size = attr->rmr_md_size / SECTOR_SIZE;
-+
-+	free_page((unsigned long)map);
-+	return 0;
-+}
-+EXPORT_SYMBOL(rmr_srv_query);
-+
-+/**
-+ * rmr_srv_set_map() - Create the dirty map for this server's member in the pool
-+ *
-+ * @pool:	The pool for which the map is to be created.
-+ * @mode:	Registration mode; if %RMR_SRV_DISK_REPLACE, any existing map for
-+ *		this member is removed before creating the new one.
++ * @dev:		pointer to brmr device
 + *
 + * Description:
-+ *	Invoked after the mapped size of the pool has been validated.  Updates
-+ *	pool metadata with the mapped size, recalculates the chunk count, and
-+ *	calls rmr_srv_add_store_member() to register this node's map.
++ *	Does the following (sanity) checks
++ *	1) For an unmapped device, param get should succeed on all legs
++ *	2) There should not be a mixture of mapped and unmapped devices
++ *
++ *	In addition to above, it also does the following work
++ *	1) For a mapped device, read from a single leg is enough for success
++ *	2) For an unmapped device, it does validation checks for params for every leg
 + *
 + * Return:
-+ *	0 on success, negative error code on failure.
++ *	Negative in case of failure
++ *	0 for success, and a non-mapped device is found
++ *	1 for success, and a mapped device is found
++ *
++ * Context:
++ *	Would block until response is received
 + */
-+static int rmr_srv_set_map(struct rmr_pool *pool, enum rmr_srv_register_disk_mode mode)
++static int brmr_get_remote_dev_params(struct brmr_clt_dev *dev)
 +{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	int ret, md_i;
++	struct brmr_clt_pool *pool = dev->pool;
++	struct brmr_msg_cmd msg;
++	struct brmr_msg_cmd_rsp *brmr_cmd_rsp;
++	void *rsp_buf;
++	size_t rsp_buf_len;
++	int err = 0, i;
++	bool partial_fail = false, mapped = false;
 +
-+	pr_info("%s: Mapped size of the pool %s is set to %lld\n",
-+		__func__, pool->poolname, pool->mapped_size);
++	brmr_clt_init_cmd(&msg);
++	msg.cmd_type = BRMR_CMD_GET_PARAMS;
 +
-+	/* Update mapped_size in the pool metadata. */
-+	md_i = rmr_pool_find_md(&pool->pool_md, srv_pool->member_id, true);
-+	if (md_i < 0) {
-+		pr_err("No space for new member %d.\n", srv_pool->member_id);
++	rsp_buf_len = sizeof(struct brmr_msg_cmd_rsp) * RMR_POOL_MAX_SESS;
++	rsp_buf = kzalloc(rsp_buf_len, GFP_KERNEL);
++	if (!rsp_buf)
 +		return -ENOMEM;
++
++	err = brmr_clt_send_msg_cmd(dev, &msg, rsp_buf, rsp_buf_len);
++	if (err < 0) {
++		pr_err("%s: brmr_clt_send_msg_cmd failed with errno %d\n", __func__, err);
++		goto free_data;
++	} else if (err) {
++		/*
++		 * We cannot directly fail here, since we do not know if this is a map for a
++		 * newly created device, or for one which has gone through mapping before.
++		 *
++		 * For the former, any failure should end in the whole map process failing.
++		 * For the latter, a single read from a device with mapped state set should
++		 * be enough for us to go ahead and map.
++		 */
++		partial_fail = true;
 +	}
-+	pool->pool_md.srv_md[md_i].mapped_size = pool->mapped_size;
 +
 +	/*
-+	 * The existing map is irrelevant if user asked for store REPLACE.
++	 * Lets do the sanity check first, because combining it with param checks makes the
++	 * entire loop harder to read
 +	 */
-+	if (mode == RMR_SRV_DISK_REPLACE)
-+		rmr_pool_remove_map(pool, srv_pool->member_id);
++	for (i = 0; i < RMR_POOL_MAX_SESS; i++) {
++		struct brmr_cmd_get_params_rsp *get_params_rsp;
 +
-+	ret = rmr_srv_add_store_member(pool, srv_pool->member_id);
-+	if (ret) {
-+		pr_err("%s: rmr_srv_add_store_member failed %d\n", __func__, ret);
++		brmr_cmd_rsp = ((struct brmr_msg_cmd_rsp *)rsp_buf) + i;
++
++		/*
++		 * We do not need to worry about not seeing MAGIC.
++		 * This would happen for a non-working sessions, OR
++		 * for extra sessions in the end for which there are no legs in RMR (Don't care)
++		 *
++		 * For non-working sessions, we will be notified by RMR through the return value
++		 */
++		if (brmr_cmd_rsp->magic != BRMR_CMD_RSP_MAGIC)
++			continue;
++
++		/*
++		 * This is error returned by rmr-store.
++		 */
++		if (brmr_cmd_rsp->status)
++			partial_fail = true;
++
++		get_params_rsp = &brmr_cmd_rsp->get_params_rsp;
++
++		/*
++		 * If we find a mapped device, we save that info.
++		 */
++		if (get_params_rsp->mapped)
++			mapped = true;
++	}
++
++	/*
++	 * If there is no device mapped, it means that this is the first map after device creation
++	 * In such a case, we need all sessions to be up and running.
++	 */
++	if (mapped == false && partial_fail) {
++		pr_err("%s: Mapping first time, but got failure for some sessions\n", __func__);
++		err = -EINVAL;
++		goto free_data;
++	}
++
++	for (i = 0; i < RMR_POOL_MAX_SESS; i++) {
++		struct brmr_cmd_get_params_rsp *get_params_rsp;
++		struct brmr_blk_dev_params *rsp_dev_params;
++
++		brmr_cmd_rsp = ((struct brmr_msg_cmd_rsp *)rsp_buf) + i;
++
++		/*
++		 * We are tracking partial failures through the above loop, so
++		 * ignore it here.
++		 */
++		if (brmr_cmd_rsp->magic != BRMR_CMD_RSP_MAGIC ||
++		    brmr_cmd_rsp->status)
++			continue;
++
++		get_params_rsp = &brmr_cmd_rsp->get_params_rsp;
++
++		/*
++		 * We cheat a little, and do this sanity check here.
++		 *
++		 * If even a single device was mapped, and we have sessions with non-mapped
++		 * devices, it will be wrong to go forward with brmr map.
++		 */
++		if (mapped && !get_params_rsp->mapped) {
++			/*
++			 * This can only happen if a node went down and up.
++			 * And instead of re-adding a MAPPED device, a create was called
++			 * We cannot allow map this way, since this means discard could
++			 * have been skipped.
++			 */
++			pr_err("%s: Mixed combination of mapped+unmapped metadata found\n",
++			       __func__);
++			err = -EINVAL;
++			goto free_data;
++		}
++
++		/*
++		 * The device size_sect, which is the size provided by the user in the map
++		 * command, should be same as the mapped_size of every storage node's backend
++		 * device, which was provided during create_store.
++		 */
++		if (dev->size_sect != le64_to_cpu(get_params_rsp->mapped_size)) {
++			pr_err("%s: Mismatched mapped_size: (Provide) %llu != %llu (Remote)\n",
++			       __func__, dev->size_sect, le64_to_cpu(get_params_rsp->mapped_size));
++			err = -EINVAL;
++			goto free_data;
++		}
++
++		rsp_dev_params = &get_params_rsp->dev_params;
++
++		dev->max_write_zeroes_sectors = min_not_zero(
++						dev->max_write_zeroes_sectors,
++						le32_to_cpu(
++						rsp_dev_params->max_write_zeroes_sectors));
++		dev->max_discard_sectors = min_not_zero(brmr_pool_chunk_size(pool) >> SECTOR_SHIFT,
++						le32_to_cpu(rsp_dev_params->max_discard_sectors));
++		dev->physical_block_size = max_t(u16, dev->physical_block_size,
++						 le16_to_cpu(rsp_dev_params->physical_block_size));
++		dev->logical_block_size = max_t(u16, dev->logical_block_size,
++						le16_to_cpu(rsp_dev_params->logical_block_size));
++
++		dev->discard_granularity = dev->logical_block_size;
++		dev->discard_alignment = dev->logical_block_size;
++
++		/* secure_discard is actually true or false, but since we used
++		 * __le16 to transfer this value in msg, min_t should work fine here
++		 */
++		dev->secure_discard = min_t(u16, dev->secure_discard,
++					    le16_to_cpu(rsp_dev_params->secure_discard));
++
++		dev->cache_policy = rsp_dev_params->cache_policy;
++		dev->wc = !!(rsp_dev_params->cache_policy & BRMR_WRITEBACK);
++		dev->fua = !!(rsp_dev_params->cache_policy & BRMR_FUA);
++	}
++
++	/* max segments and max_hw_sectors we get from rtrs sessions values
++	 * stored in pool like in RNBD, not from bdev of the store side.
++	 */
++	dev->max_segments = pool->max_segments;
++	dev->max_hw_sectors = pool->max_io_size / SECTOR_SIZE;
++
++	/*
++	 * Return whether its a new map or an old one
++	 */
++	err = mapped;
++
++free_data:
++	kfree(rsp_buf);
++
++	return err;
++}
++
++/**
++ * brmr_clt_send_map_cmd() - Sends map command for a brmr device
++ *
++ * @dev:	pointer to brmr device
++ *
++ * Return:
++ *	Negative error value in case of failure
++ *	0 on success
++ *
++ * Context:
++ *	Would block until response is received
++ */
++static int brmr_clt_send_map_cmd(struct brmr_clt_dev *dev)
++{
++	struct brmr_clt_pool *pool = dev->pool;
++	struct brmr_msg_cmd msg;
++	struct brmr_blk_dev_params *dev_params = &(msg.map_new_cmd.dev_params);
++	void *rsp_buf;
++	size_t rsp_buf_len;
++	int err = 0;
++
++	brmr_clt_init_cmd(&msg);
++	msg.cmd_type = BRMR_CMD_MAP;
++
++	rsp_buf_len = sizeof(struct brmr_msg_cmd_rsp) * RMR_POOL_MAX_SESS;
++	rsp_buf = kzalloc(rsp_buf_len, GFP_KERNEL);
++	if (!rsp_buf)
++		return -ENOMEM;
++
++	msg.map_new_cmd.version = BRMR_CURRENT_HEADER_VERSION;
++	msg.map_new_cmd.mapped_size = dev->size_sect;
++
++	dev_params->max_hw_sectors = cpu_to_le32(dev->max_hw_sectors);
++	dev_params->max_write_zeroes_sectors = cpu_to_le32(dev->max_write_zeroes_sectors);
++	dev_params->max_discard_sectors = cpu_to_le32(dev->max_discard_sectors);
++	dev_params->discard_granularity = cpu_to_le32(dev->discard_granularity);
++	dev_params->discard_alignment = cpu_to_le32(dev->discard_alignment);
++	dev_params->physical_block_size = cpu_to_le16(dev->physical_block_size);
++	dev_params->logical_block_size = cpu_to_le16(dev->logical_block_size);
++	dev_params->max_segments = cpu_to_le16(dev->max_segments);
++	dev_params->secure_discard = cpu_to_le16(dev->secure_discard);
++	dev_params->cache_policy = dev->cache_policy;
++
++	err = brmr_clt_send_msg_cmd(dev, &msg, rsp_buf, rsp_buf_len);
++	if (err)
++		pr_err("Failed to send cmd msg BRMR_CMD_MAP in pool %s, err=%d\n",
++		       pool->poolname, err);
++
++	kfree(rsp_buf);
++	return err;
++}
++
++/*
++ * brmr_clt_send_unmap_cmd() - Send an unmap command to the server pool
++ *
++ * Sending may fail (e.g. no sessions connected). The failure is logged but
++ * not propagated — callers always continue with local cleanup regardless.
++ */
++static void brmr_clt_send_unmap_cmd(struct brmr_clt_dev *dev)
++{
++	struct brmr_msg_cmd msg;
++	void *rsp_buf;
++	size_t rsp_buf_len;
++	int ret;
++
++	brmr_clt_init_cmd(&msg);
++	msg.cmd_type = BRMR_CMD_UNMAP;
++
++	rsp_buf_len = sizeof(struct brmr_msg_cmd_rsp) * RMR_POOL_MAX_SESS;
++	rsp_buf = kzalloc(rsp_buf_len, GFP_KERNEL);
++	if (!rsp_buf) {
++		pr_err("Failed to alloc rsp_buf for unmap in pool %s\n",
++		       dev->pool->poolname);
++		return;
++	}
++
++	/*
++	 * Sending messages could fail. For example, there are no client pool sessions
++	 * connected to this pool. Unmap_dev still progresses and cleans up the device
++	 * states on the client side.
++	 */
++	ret = brmr_clt_send_msg_cmd(dev, &msg, rsp_buf, rsp_buf_len);
++	if (ret)
++		pr_err("Error %d when unmap device in pool %s\n",
++		       ret, dev->pool->poolname);
++
++	kfree(rsp_buf);
++}
++
++/**
++ * brmr_clt_map_device() - Maps brmr device through an rmr pool
++ *
++ * @id:	Id for the device
++ * @poolname:	rmr poolname which is to be used for mapping
++ * @size:	Size of the disk
++ *
++ * Description:
++ *	Opens rmr pool with pool name "poolname"
++ *	Allocated brmr device and initializes it
++ *	Maps brmr device using the rmr pool only if its not already mapped
++ *
++ * Return:
++ *	Pointer to allocated and mapped brmr device on success
++ *	Error pointer on failure
++ */
++struct brmr_clt_dev *brmr_clt_map_device(const char *poolname, u64 size)
++{
++	struct brmr_clt_pool *pool = NULL;
++	struct brmr_clt_dev *dev;
++	int ret, mapped;
++
++	/* Create brmr pool */
++	pool = brmr_clt_create_pool(poolname);
++	if (IS_ERR(pool)) {
++		ret = PTR_ERR(pool);
 +		goto err_out;
 +	}
 +
-+	return ret;
++	/* Alloc device */
++	dev = brmr_alloc_and_init_dev(pool, size);
++	if (IS_ERR(dev)) {
++		pr_err("Error %pe allocating brmr device in pool %s\n",
++			dev, pool->poolname);
++		brmr_clt_put_pool(pool);
++		ret = PTR_ERR(dev);
++		goto err_out;
++	}
 +
++	mapped = brmr_get_remote_dev_params(dev);
++	if (mapped < 0) {
++		pr_err("Failed to get remote devs block params in pool %s, err=%d\n",
++		       pool->poolname, mapped);
++		ret = mapped;
++		goto dest_dev;
++	}
++
++	/* Set device params */
++	ret = brmr_set_dev_params(dev);
++	if (unlikely(ret)) {
++		pr_err("Error %d brmr_set_dev_params in pool %s\n",
++		       ret, pool->poolname);
++		goto dest_dev;
++	}
++
++	/*
++	 * We send map command only if its a new map.
++	 * This must happen before add_disk() so the server is ready to serve
++	 * I/O by the time the kernel probes the partition table.
++	 */
++	if (!mapped) {
++		pr_info("%s: Sending map command through pool %s\n", __func__, pool->poolname);
++		ret = brmr_clt_send_map_cmd(dev);
++		if (ret) {
++			pr_err("Failed to send map cmd to pool %s, err=%d\n",
++			       pool->poolname, ret);
++			goto put_disk;
++		}
++	}
++
++	dev->dev_state = DEV_STATE_READY;
++
++	/*
++	 * Add gendisk
++	 */
++	ret = add_disk(dev->gd);
++	if (ret) {
++		pr_err("%s: add_disk failed with err %d\n", __func__, ret);
++		goto unmap_dev;
++	}
++
++	mutex_lock(&brmr_device_lock);
++	list_add(&dev->list, &brmr_device_list);
++	mutex_unlock(&brmr_device_lock);
++
++	return dev;
++
++unmap_dev:
++	dev->dev_state = DEV_STATE_INIT;
++	if (!mapped)
++		brmr_clt_send_unmap_cmd(dev);
++put_disk:
++	put_disk(dev->gd);
++	brmr_clt_free_stats(&dev->stats);
++dest_dev:
++	brmr_clt_put_dev(dev);
 +err_out:
-+	pool->pool_md.srv_md[md_i].mapped_size = 0;
-+	return ret;
++	return ERR_PTR(ret);
++}
++
++static void destroy_gen_disk(struct brmr_clt_dev *dev)
++{
++	unsigned int memflags;
++
++	del_gendisk(dev->gd);
++	/*
++	 * Before marking queue as dying (blk_cleanup_queue() does that)
++	 * we have to be sure that everything in-flight has gone.
++	 * Blink with freeze/unfreeze.
++	 */
++	memflags = blk_mq_freeze_queue(dev->queue);
++	blk_mq_unfreeze_queue(dev->queue, memflags);
++	put_disk(dev->gd);
 +}
 +
 +/**
-+ * rmr_srv_register() - Register a backend store with an RMR server pool
++ * brmr_clt_close_device() - Closes a brmr device
 + *
-+ * @poolname:	Name of the pool to which the store is to be registered.
-+ * @ops:	Store operations pointer.
-+ * @priv:	Private data for the store.
-+ * @mapped_size:	Size of the storage device in sectors.
-+ * @mode:	Registration mode: %RMR_SRV_DISK_CREATE for a new store,
-+ *		%RMR_SRV_DISK_REPLACE to replace an existing one, or
-+ *		%RMR_SRV_DISK_ADD to rejoin an existing pool.
-+ *
-+ * Description:
-+ *	An RMR server pool requires a backend store to service I/Os.
-+ *	This function registers that store, sets up the pool's dirty map for
-+ *	this member, and records the marked_create flag for validation when
-+ *	the first client joins.
-+ *
-+ * Return:
-+ *	Pointer to the rmr_pool on success, NULL on error.
-+ */
-+static bool rmr_srv_pool_has_non_sync_sess(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool_sess *pool_sess;
-+
-+	list_for_each_entry(pool_sess, &pool->sess_list, pool_entry) {
-+		if (!pool_sess->sync)
-+			return true;
-+	}
-+	return false;
-+}
-+
-+struct rmr_pool *rmr_srv_register(char *poolname, struct rmr_srv_store_ops *ops, void *priv,
-+				  u64 mapped_size, enum rmr_srv_register_disk_mode mode)
-+{
-+	struct rmr_pool *pool;
-+	struct rmr_srv_io_store *io_store;
-+	struct rmr_srv_pool *srv_pool;
-+	u32 group_id = rmr_pool_hash(poolname);
-+	enum rmr_srv_pool_state state;
-+	int ret;
-+
-+	srv_pool = rmr_find_and_get_srv_pool(group_id);
-+	if (IS_ERR(srv_pool)) {
-+		pr_err("pool %s does not exists: %pe\n", poolname, srv_pool);
-+		return NULL;
-+	}
-+	pool = srv_pool->pool;
-+
-+	mutex_lock(&srv_pool->srv_pool_lock);
-+	if (mode == RMR_SRV_DISK_CREATE &&
-+	    (rmr_srv_pool_has_non_sync_sess(pool) ||
-+	     rmr_pool_find_map(pool, srv_pool->member_id))) {
-+		pr_err("%s: Cannot register (create) new backend for %s; Sessions/Map exists\n",
-+		       __func__, poolname);
-+		ret = -EEXIST;
-+		goto put_err;
-+	}
-+
-+	if (mode == RMR_SRV_DISK_REPLACE &&
-+	    (!rmr_srv_pool_has_non_sync_sess(pool))) {
-+		pr_err("%s: Cannot register (replace) new backend for %s; No non-sync session\n",
-+		       __func__, poolname);
-+		ret = -EINVAL;
-+		goto put_err;
-+	}
-+
-+	if (srv_pool->io_store) {
-+		pr_err("Srv pool %s already has store registered\n", poolname);
-+		goto put_err;
-+	}
-+
-+	if (pool->mapped_size && pool->mapped_size != mapped_size) {
-+		pr_err("Pool %s already has mapped size %lld, cannot register store with %lld\n",
-+		       poolname, pool->mapped_size, mapped_size);
-+		ret = -EINVAL;
-+		goto put_err;
-+	}
-+
-+	io_store = kzalloc(sizeof(*io_store), GFP_KERNEL);
-+	if (!io_store) {
-+		pr_err("Failed to allocate io_store for %s\n", poolname);
-+		goto put_err;
-+	}
-+
-+	pool->mapped_size = mapped_size;
-+	io_store->ops = ops;
-+	io_store->priv = priv;
-+	srv_pool->io_store = io_store;
-+
-+	/* The pool updates its number of tracking chunks with the mapped size just provided. */
-+	rmr_pool_update_no_of_chunk(pool);
-+
-+	if (mode == RMR_SRV_DISK_CREATE || mode == RMR_SRV_DISK_REPLACE) {
-+		ret = rmr_srv_set_map(pool, mode);
-+		if (ret) {
-+			pr_err("%s: failed to set maps in rmr pool %s, err %d\n",
-+			       __func__, poolname, ret);
-+			goto free_io_store;
-+		}
-+	} else if (mode == RMR_SRV_DISK_ADD) {
-+		/*
-+		 * Read the pool metadata stored on this device before md_sync writes
-+		 * new metadata to the store.
-+		 */
-+		ret = rmr_srv_refresh_md(srv_pool);
-+		if (ret) {
-+			pr_err("%s: cannot refresh md of the pool\n", __func__);
-+			goto free_io_store;
-+		}
-+	} else {
-+		pr_err("%s: Wrong register disk mode %d\n", __func__, mode);
-+		ret = -EINVAL;
-+		goto free_io_store;
-+	}
-+
-+	srv_pool->marked_create = (mode == RMR_SRV_DISK_CREATE);
-+	atomic_set(&srv_pool->store_state, true);
-+	rmr_srv_mark_pool_md_dirty(srv_pool);
-+	state = atomic_read(&srv_pool->state);
-+	if (state != RMR_SRV_POOL_STATE_NORMAL &&
-+	    state != RMR_SRV_POOL_STATE_NO_IO)
-+		rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_REGISTERED);
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+
-+	__module_get(THIS_MODULE);
-+	pr_info("Registered store with pool %s\n", poolname);
-+
-+	return srv_pool->pool;
-+
-+free_io_store:
-+	kfree(io_store);
-+	srv_pool->io_store = NULL;
-+put_err:
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+	rmr_put_srv_pool(srv_pool);
-+	return NULL;
-+}
-+EXPORT_SYMBOL(rmr_srv_register);
-+
-+static void rmr_srv_delete_md(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_dirty_id_map *map = NULL;
-+	int err, lock_idx;
-+	u32 map_region_offset = rmr_bitmap_offset(pool->pool_md.queue_depth) + RMR_MAP_BUF_HDR_SIZE;
-+	u64 per_map_size = 0;
-+	u64 len;
-+	u8 map_idx;
-+	void *buf;
-+
-+	/*
-+	 * It could happen to access the pool while the pool is not there. Use reference counting
-+	 * for server pool to avoid the issue.
-+	 */
-+	err = rmr_get_srv_pool(srv_pool);
-+	if (!err) {
-+		pr_err("%s: pool is not there\n", __func__);
-+		return;
-+	}
-+
-+	len = rmr_bitmap_offset(pool->pool_md.queue_depth) + PAGE_SIZE;
-+	buf = kzalloc(len, GFP_KERNEL);
-+	if (!buf)
-+		goto put_pool;
-+
-+	/*
-+	 * On-disk layout of rmr pool metadata:
-+	 *
-+	 *   0           RMR_MD_SIZE   +last_io_len    +PAGE_SIZE
-+	 *   +-----------+-------------+---------------+--------------------+
-+	 *   | pool_md   | last_io     | hdr_region    | maps_region ...    |
-+	 *   +-----------+-------------+---------------+--------------------+
-+	 *   <-RMR_MD_SIZE><-last_io_len><--PAGE_SIZE--> maps_cnt * per_map
-+	 */
-+	err = process_md_io(pool, NULL, 0, len, RMR_OP_MD_WRITE, buf);
-+	if (err)
-+		pr_warn("%s: failed to process md write io with err 0x%x.\n", __func__, err);
-+
-+	/*
-+	 * Zero the bitmap on disk using O(1) offset formula.
-+	 */
-+	lock_idx = srcu_read_lock(&pool->map_srcu);
-+	for (map_idx = 0; map_idx < pool->maps_cnt; map_idx++) {
-+		u32 map_data_offset;
-+		el_flp *flp_ptr;
-+		u64 no_of_slps;
-+		int i, j;
-+
-+		map = rcu_dereference(pool->maps[map_idx]);
-+		if (WARN_ON(!map))
-+			break;
-+
-+		per_map_size = map->total_slp * PAGE_SIZE;
-+		map_data_offset = map_region_offset + map_idx * per_map_size;
-+
-+		for (i = 0; i < map->no_of_flp; i++) {
-+			flp_ptr = (el_flp *)map->dirty_bitmap[i];
-+
-+			if (i == (map->no_of_flp - 1))
-+				no_of_slps = map->no_of_slp_in_last_flp;
-+			else
-+				no_of_slps = NO_OF_SLP_PER_FLP;
-+
-+			for (j = 0; j < no_of_slps; j++, flp_ptr++) {
-+				err = process_md_io(pool, NULL, map_data_offset,
-+						    PAGE_SIZE, RMR_OP_MD_WRITE, buf);
-+				if (err)
-+					pr_warn("%s: bitmap write failed at 0x%x, err 0x%x.\n",
-+						__func__, map_data_offset, err);
-+				map_data_offset += PAGE_SIZE;
-+			}
-+		}
-+	}
-+	srcu_read_unlock(&pool->map_srcu, lock_idx);
-+
-+	rmr_srv_delete_store_member(pool, srv_pool->member_id);
-+
-+	free_page((unsigned long)buf);
-+put_pool:
-+	rmr_put_srv_pool(srv_pool);
-+}
-+
-+/**
-+ * rmr_srv_unregister() - Unregister the backend store from rmr server pool
-+ *
-+ * @poolname:	Name of the pool from which the store is to be unregistered
-+ * @delete:	If true, delete all the metadata associated with this pool
-+ *
-+ * Description:
-+ *	rmr server pool needs a backend store which serves the IOs
-+ *	This function is used to unregister a backend store from rmr server pool.
-+ *
-+ * Return:
-+ *	None
-+ */
-+void rmr_srv_unregister(char *poolname, bool delete)
-+{
-+	struct rmr_pool *pool;
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_srv_io_store	*io_store;
-+
-+	mutex_lock(&pool_mutex);
-+	pool = rmr_find_pool(poolname);
-+	mutex_unlock(&pool_mutex);
-+
-+	if (!pool) {
-+		pr_err("%s, Pool %s does not exists\n", __func__, poolname);
-+		return;
-+	}
-+
-+	srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	mutex_lock(&srv_pool->srv_pool_lock);
-+
-+	if (!srv_pool->io_store) {
-+		pr_err("Srv pool %s not registered\n", poolname);
-+		mutex_unlock(&srv_pool->srv_pool_lock);
-+		return;
-+	}
-+
-+	if (srv_pool->marked_delete) {
-+		if (!delete) {
-+			pr_err("%s: Storage server marked for delete, but delete mode not set\n",
-+			       __func__);
-+			pr_err("%s: Continuing with only removal", __func__);
-+		}
-+	} else if (!srv_pool->marked_create && delete) {
-+		pr_err("%s: Storage server not marked for delete, abandoning delete.\n", __func__);
-+		delete = false;
-+	}
-+
-+	io_store = srv_pool->io_store;
-+
-+	rmr_srv_stop_sync_and_unset_store(pool);
-+
-+	percpu_ref_kill_and_confirm(&pool->ids_inflight_ref, rmr_pool_confirm_inflight_ref);
-+	wait_for_completion(&pool->complete_done);
-+	wait_for_completion(&pool->confirm_done);
-+
-+	/*
-+	 * Re-init so metadata IO can go in if needed
-+	 */
-+	reinit_completion(&pool->complete_done);
-+	reinit_completion(&pool->confirm_done);
-+	percpu_ref_reinit(&pool->ids_inflight_ref);
-+
-+	if (delete)
-+		rmr_srv_delete_md(pool);
-+
-+	kfree(srv_pool->io_store);
-+	srv_pool->io_store = NULL;
-+
-+	mutex_lock(&pool->sess_lock);
-+	if (!rmr_srv_pool_has_non_sync_sess(pool))
-+		rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_EMPTY);
-+	mutex_unlock(&pool->sess_lock);
-+
-+	srv_pool->marked_delete = false;
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+
-+	pool->mapped_size = 0;
-+
-+	rmr_put_srv_pool(srv_pool);
-+
-+	pr_info("Unregistered store with pool %s\n", poolname);
-+
-+	module_put(THIS_MODULE);
-+}
-+EXPORT_SYMBOL(rmr_srv_unregister);
-+
-+/**
-+ * rmr_srv_pool_cmd_with_rsp() - Sends a user command to all sessions of the internal (sync) clt
-+ *
-+ * @pool:	rmr pool to which the command is for
-+ * @conf:	confirmation function to be called after completion
-+ * @priv:	pointer to priv data, to be returned to user while calling conf function
-+ * @usr_vec:	kvec containing user data (mostly command messages?)
-+ * @nr:		number of kvecs
-+ * @buf:	buf where the response from the user server is to be directed
-+ * @buf_len:	length of the buffer
-+ * @size:	size of the buf to be sent to a single session
-+ *
-+ * Description:
-+ *	This function provides an interface for the user to send commands to storage nodes connected
-+ *	through the internal network of this rmr pool.
-+ *	It redirects the command through the rmr-client pool in this storage node, which then sends
-+ *	the command to all the storage nodes it is connected to.
-+ *	The command is sent as a read, so that the response from the user srv side can be received
-+ *	The buffer sent by the user is meant to receive the response from the user server side.
-+ *	The size of the buffer is set during rmr_clt_open.
-+ *
-+ * Return:
-+ *	0 on success
-+ *	negative errno in case of error
-+ *
-+ * Context:
-+ *	Inflight commands will block map update, until the inflights are completed.
-+ */
-+int rmr_srv_pool_cmd_with_rsp(struct rmr_pool *pool, rmr_conf_fn *conf, void *priv,
-+			     const struct kvec *usr_vec, size_t nr, void *buf, int buf_len,
-+			     size_t size)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	if (!srv_pool->clt) {
-+		pr_warn("srv pool %s does not have sync pool assigned.\n",
-+			pool->poolname);
-+		return -EAGAIN;
-+	}
-+
-+	return rmr_clt_cmd_with_rsp(srv_pool->clt, conf, priv, usr_vec, nr, buf, buf_len, size);
-+}
-+EXPORT_SYMBOL(rmr_srv_pool_cmd_with_rsp);
-+
-+static int rmr_srv_send_discard_all(struct rmr_pool *pool, u8 member_id)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_pool *sync_pool = srv_pool->clt;
-+	struct rmr_msg_pool_cmd msg = {};
-+	int err;
-+
-+	/*
-+	 * If the member_id is not this server's member_id, it means this server is the receiving
-+	 * node of the discard request.
-+	 */
-+	if (srv_pool->member_id != member_id)
-+		return 0;
-+
-+	pr_info("%s: Send discards across storage nodes for pool %s\n",
-+		__func__, pool->poolname);
-+
-+	rmr_clt_init_cmd(sync_pool, &msg);
-+	msg.cmd_type = RMR_CMD_SEND_DISCARD;
-+	msg.send_discard_cmd.member_id = member_id;
-+
-+	err = rmr_clt_pool_send_all(sync_pool, &msg);
-+	if (err) {
-+		pr_err("Failed to send discard cmd for pool %s: %d\n",
-+		       pool->poolname, err);
-+	}
-+	return err;
-+}
-+
-+/**
-+ * rmr_srv_discard_id() - discard the data chunks of length from offset on disk
-+ *
-+ * @pool:	source pool.
-+ * @offset	offset in bytes.
-+ * @length:	length in bytes
-+ * @member_id:	member id of the storage node to discard the data from. If 0, then the node is
-+ *		this server pool.
-+ * @sync:	indicates whether to send sync requests to other connected nodes.
-+ *
-+ * Return:
-+ *	0 on success, err code otherwise
-+ *
-+ * Description:
-+ *	This function discards the data chunks on the server with member_id. It will mark the
-+ *	data chunks as dirty and set the discard_entries flag of the corresponding srv_md true.
-+ *	Then it notifies all the connected nodes it has discarded data.
-+ */
-+int rmr_srv_discard_id(struct rmr_pool *pool, u64 offset, u64 length, u8 member_id, bool sync)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_dirty_id_map *map;
-+	rmr_id_t id;
-+	int md_i, err;
-+
-+	if (!member_id)
-+		member_id = srv_pool->member_id;
-+
-+	map = rmr_pool_find_map(pool, member_id);
-+	if (!map) {
-+		pr_err("for srv pool %s cannot find map for member_id %u\n",
-+		       pool->poolname, member_id);
-+		return -EINVAL;
-+	}
-+
-+	md_i = rmr_pool_find_md(&pool->pool_md, member_id, false);
-+	if (md_i < 0) {
-+		pr_err("%s: for srv pool %s cannot find md for member_id %u\n",
-+		       __func__, pool->poolname, member_id);
-+		return -EINVAL;
-+	}
-+
-+	/*
-+	 * If this node has received a response of the discard request from a normal server,
-+	 * the node will continue to mark all the data chunks as dirty.
-+	 */
-+	if (member_id == srv_pool->member_id && sync) {
-+		if (!srv_pool->clt) {
-+			pr_err("pool %s has no sync pool assigned. Cannot send discards.\n",
-+			       pool->poolname);
-+			return -ENXIO;
-+		}
-+
-+		/*
-+		 * This node tries to send discards to all its connected nodes. The other node
-+		 * that has received the discards will start a new round. In the end, all normal
-+		 * nodes that are connected to this node should receive the discards.
-+		 */
-+		err = rmr_srv_send_discard_all(pool, member_id);
-+		if (err) {
-+			pr_err("%s: no server receives discards for pool %s: %d\n",
-+			       __func__, pool->poolname, err);
-+			return err;
-+		}
-+	}
-+
-+	/*
-+	 * Set the discard_entries flag of the corresponding srv_md true. Be careful that setting
-+	 * the wrong srv_md will lead to loops of discards.
-+	 */
-+	pool->pool_md.srv_md[md_i].discard_entries = true;
-+	rmr_srv_mark_pool_md_dirty(srv_pool);
-+
-+	if (length) {
-+		rmr_map_calc_chunk(pool, offset, length, &id);
-+		rmr_map_set_dirty(map, id, MAP_ENTRY_UNSYNCED);
-+	} else {
-+		/* discard all data chunks */
-+		rmr_map_set_dirty_all(map, MAP_ENTRY_UNSYNCED);
-+		pr_info("%s: Discard all data chunks for member_id %u in srv_pool %s: %u\n",
-+			__func__, member_id, pool->poolname, srv_pool->member_id);
-+	}
-+
-+	rmr_map_clear_filter_all(map, MAP_ENTRY_UNSYNCED);
-+	rmr_srv_mark_maps_dirty(srv_pool);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(rmr_srv_discard_id);
-+
-+void rmr_srv_replace_store(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	RMR_STORE_SET_REPLACE(pool->map_ver);
-+	rmr_srv_flush_pool_md(srv_pool);
-+}
-+EXPORT_SYMBOL(rmr_srv_replace_store);
-+
-+/**
-+ * rmr_srv_pool_check_store() - Check whether IO is allowed for a pool or not
-+ *
-+ * @pool:	pool to check
-+ *
-+ * Return:
-+ *	1 if IO is allowed, 0 therwise
-+ *
-+ * Description:
-+ *	For a rmr-srv pool, the store registered provides a way to check whether it can process
-+ *	IOs or not.
-+ */
-+static int rmr_srv_pool_check_store(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_srv_io_store *store = srv_pool->io_store;
-+	void *store_priv;
-+
-+	if (!store) {
-+		pr_debug("for srv pool %s no store assigned\n", pool->poolname);
-+		return false;
-+	}
-+
-+	if (!store->ops) {
-+		pr_err("for pool %s store has no ops assigned\n", pool->poolname);
-+		return false;
-+	}
-+	store_priv = store->priv;
-+
-+	return store->ops->io_allowed(store_priv);
-+}
-+
-+/**
-+ * process_msg_io() - Process IO message
-+ *
-+ * @srv_sess:	rmr srv session over which the message was received
-+ * @rtrs_op:	rtrs IO context
-+ * @data:	pointer to data buf
-+ * @datalen:	len of data buf
-+ * @usr:	pointer to user buf
-+ * @usrlen:	len of user buf
-+ *
-+ * Return:
-+ *	0 on success
-+ *	negative error code otherwise
-+ *
-+ * Description:
-+ *	Perform some basic checks.
-+ *	Create an IO request and start its state machine.
-+ */
-+static int process_msg_io(struct rmr_srv_sess *srv_sess,
-+			  struct rtrs_srv_op *rtrs_op, void *data,
-+			  u32 datalen, const void *usr, size_t usrlen)
-+{
-+	const struct rmr_msg_io *msg = usr;
-+	struct rmr_pool *pool;
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_srv_req *req;
-+	int err = 0;
-+	u32 group_id = le32_to_cpu(msg->hdr.group_id);
-+
-+	pool = rmr_srv_sess_get_pool(srv_sess, group_id);
-+	if (IS_ERR(pool)) {
-+		pr_err_ratelimited("Got I/O request on session %s for unknown pool group id %d: %pe\n",
-+				   srv_sess->sessname, group_id, pool);
-+		return PTR_ERR(pool);
-+	}
-+
-+	srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	/*
-+	 * No new references will come in after we have killed the percpu_ref.
-+	 * Percpu_ref_tryget_live() returns false when @confirm_kill in
-+	 * percpu_ref_kill_and_confirm() is done.
-+	 */
-+	if (!percpu_ref_tryget_live(&pool->ids_inflight_ref)) {
-+		err = -EIO;
-+		goto no_put;
-+	}
-+
-+	if (!atomic_read(&srv_pool->store_state) ||
-+	    atomic_read(&srv_pool->state) != RMR_SRV_POOL_STATE_NORMAL) {
-+		pr_err_ratelimited("server pool %s is not up for IO (state = %s)\n",
-+				   pool->poolname,
-+				   rmr_get_srv_pool_state_name(atomic_read(&srv_pool->state)));
-+		err = -EIO;
-+		goto put_pool;
-+	}
-+
-+	/*
-+	 * The IOs coming from internal sync sessions are always READ.
-+	 */
-+	if (msg->sync && rmr_op(le32_to_cpu(msg->flags)) != RMR_OP_READ) {
-+		pr_err_ratelimited("process_msg_io: pool %s write IO from internal connection.\n",
-+				   pool->poolname);
-+		err = -EIO;
-+		goto put_pool;
-+	}
-+
-+	/*
-+	 * For non internal IOs, make sure the underlying store is ready for IO
-+	 */
-+	if (!msg->sync && !rmr_srv_pool_check_store(pool)) {
-+		pr_err("process_msg_io: pool %s IO not allowed\n", pool->poolname);
-+		err = -EIO;
-+		goto put_pool;
-+	}
-+
-+	req = rmr_srv_req_create(msg, srv_pool, rtrs_op, data, datalen, rmr_srv_endreq);
-+	if (IS_ERR(req)) {
-+		pr_err("Failed to create rmr_req %pe\n", req);
-+
-+		//TODO: do we have to rtrs_srv_resp_rdma here ?
-+		err = PTR_ERR(req);
-+		goto put_pool;
-+	}
-+
-+	rmr_req_submit(req);
-+	return 0;
-+
-+put_pool:
-+	percpu_ref_put(&pool->ids_inflight_ref);
-+
-+no_put:
-+	rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+	rmr_srv_sess_put_pool(pool);
-+	return err;
-+}
-+
-+int rmr_srv_get_sync_permit(struct rmr_srv_pool *srv_pool)
-+{
-+	atomic_inc(&srv_pool->in_flight_sync_reqs);
-+
-+	while (atomic_read(&srv_pool->in_flight_sync_reqs) >= sync_queue_depth) {
-+		/* Permit overslow; sleep */
-+		set_current_state(TASK_INTERRUPTIBLE);
-+		schedule();
-+
-+		if (atomic_read(&srv_pool->thread_state) != SYNC_THREAD_RUNNING) {
-+			atomic_dec(&srv_pool->in_flight_sync_reqs);
-+
-+			return -EINTR;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+void rmr_srv_put_sync_permit(struct rmr_srv_pool *srv_pool)
-+{
-+	atomic_dec(&srv_pool->in_flight_sync_reqs);
-+
-+	wake_up_process(srv_pool->th_tsk);
-+}
-+
-+static int rmr_srv_sync_map(void *arg)
-+{
-+	struct rmr_srv_pool *srv_pool = arg;
-+	struct rmr_pool *pool = srv_pool->pool;
-+	struct rmr_dirty_id_map *map;
-+	rmr_id_t rmr_id;
-+	struct rmr_map_entry *entry;
-+	int err = 0;
-+	u64 i;
-+
-+	pr_info("Sync thread starting!\n");
-+
-+	map = rmr_pool_find_map(pool, srv_pool->member_id);
-+	if (!map) {
-+		/*
-+		 * We do not need to error out here.
-+		 * Since no session has ever been added to this pool,
-+		 * it technically means this pool is in sync state.
-+		 */
-+		pr_info("No map found for pool %s\n", pool->poolname);
-+		goto out;
-+	}
-+
-+	rmr_id.a = 1;
-+	for (i = 0; i < map->no_of_chunks; i++) {
-+		if (atomic_read(&srv_pool->thread_state) == SYNC_THREAD_REQ_STOP) {
-+			pr_info("Request to stop sync thread\n");
-+			err = -EINTR;
-+			goto err;
-+		}
-+
-+		if (!atomic_read(&srv_pool->store_state) ||
-+		    atomic_read(&srv_pool->state) != RMR_SRV_POOL_STATE_NORMAL) {
-+			atomic_set(&srv_pool->thread_state, SYNC_THREAD_WAIT);
-+			pr_err("Pool not in desired state\n");
-+			/* Unsure what error to return here */
-+			err = -EINVAL;
-+			goto err;
-+		}
-+
-+		rmr_id.b = i;
-+		entry = rmr_map_get_dirty_entry(map, rmr_id);
-+		if (entry) {
-+			if (atomic_cmpxchg(&entry->sync_cnt, -1, 0) != -1) {
-+				/* someone has already started sync for this id */
-+				continue;
-+			}
-+
-+			err = rmr_srv_sync_chunk_id(srv_pool, entry, rmr_id, true);
-+			if (err) {
-+				/* this is to undo the previous cmpxchg if the error in
-+				 * rmr_srv_sync_chunk_id happened before any requests were created
-+				 */
-+				atomic_cmpxchg(&entry->sync_cnt, 0, -1);
-+				pr_err("Failed to sync chunk (%llu, %llu)\n", rmr_id.a, rmr_id.b);
-+				goto err;
-+			}
-+		}
-+	}
-+
-+	/*
-+	 * Finished syncing chunks,
-+	 * Now change the thread state to wait,
-+	 * to wait for the in flight syncs
-+	 */
-+	atomic_set(&srv_pool->thread_state, SYNC_THREAD_WAIT);
-+
-+err:
-+	while (atomic_read(&srv_pool->in_flight_sync_reqs) != 0) {
-+		/*
-+		 * Wait for all permits to get freed.
-+		 * Since the completion path needs this thread to
-+		 * be up and running
-+		 */
-+		set_current_state(TASK_INTERRUPTIBLE);
-+		schedule();
-+		//TODO: should it be timeout?
-+	}
-+
-+out:
-+	atomic_set(&srv_pool->thread_state, SYNC_THREAD_STOPPED);
-+
-+	pr_info("Sync thread exiting with err %d\n", err);
-+	return err;
-+}
-+
-+int rmr_srv_sync_thread_start(struct rmr_srv_pool *srv_pool)
-+{
-+	atomic_set(&srv_pool->in_flight_sync_reqs, 0);
-+	srv_pool->th_tsk = kthread_run(rmr_srv_sync_map, srv_pool,
-+				       "rmr_srv_sync_thread");
-+	if (IS_ERR(srv_pool->th_tsk)) {
-+		atomic_set(&srv_pool->thread_state, SYNC_THREAD_STOPPED);
-+		return -ENOMEM;
-+	}
-+
-+	atomic_set(&srv_pool->thread_state, SYNC_THREAD_RUNNING);
-+	return 0;
-+}
-+
-+int rmr_srv_sync_thread_stop(struct rmr_srv_pool *srv_pool)
-+{
-+	if (atomic_read(&srv_pool->thread_state) == SYNC_THREAD_RUNNING) {
-+		atomic_set(&srv_pool->thread_state, SYNC_THREAD_REQ_STOP);
-+		wake_up_process(srv_pool->th_tsk);
-+	}
-+
-+	return 0;
-+}
-+
-+void rmr_srv_sync_req_failed(struct rmr_srv_pool *srv_pool)
-+{
-+	/*
-+	 * TODO: Investigate the necessity to change server state
-+	 * to RMR_SRV_POOL_STATE_NO_IO for sync_req failure.
-+	 */
-+	// rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+	rmr_srv_sync_thread_stop(srv_pool);
-+}
-+
-+static void rmr_srv_read_map_buf(struct rmr_pool *pool, void *buf, size_t buflen,
-+				 const struct rmr_msg_map_buf_cmd *map_buf_cmd)
-+{
-+	int size;
-+	u8 map_idx = map_buf_cmd->map_idx;
-+	u64 slp_idx = map_buf_cmd->slp_idx;
-+
-+	size = rmr_pool_maps_to_buf(pool, &map_idx, &slp_idx, buf, buflen, MAP_NO_FILTER);
-+	if (size == 0) {
-+		// No more dirty map to write
-+		struct rmr_map_buf_hdr *map_buf_hdr = (struct rmr_map_buf_hdr *)buf;
-+
-+		map_buf_hdr->version = RMR_MAP_FORMAT_VER;
-+		map_buf_hdr->member_id = 0;
-+	}
-+}
-+
-+static void rmr_srv_update_md_buf(struct rmr_srv_pool *srv_pool, void *buf, size_t buflen)
-+{
-+	struct rmr_pool *pool = srv_pool->pool;
-+	struct rmr_pool_md *pool_md = &pool->pool_md;
-+	struct rmr_pool_md *buf_md = (struct rmr_pool_md *)buf;
-+	u8 member_id = srv_pool->member_id;
-+	int idx, buf_idx;
-+
-+	/* Zero out the buffer in case data is corrupted somehow. */
-+	memset(buf, 0, buflen);
-+	idx = rmr_pool_find_md(pool_md, member_id, false);
-+	if (idx < 0) {
-+		pr_err("The server pool hasn't updated srv_md yet %d\n", member_id);
-+		return;
-+	}
-+
-+	buf_idx = rmr_pool_find_md(buf_md, member_id, true);
-+	if (buf_idx < 0) {
-+		pr_err("The buffer has no space for the member_id %d\n", member_id);
-+		return;
-+	}
-+
-+	memcpy(&buf_md->srv_md[buf_idx], &pool_md->srv_md[idx], sizeof(struct rmr_srv_md));
-+}
-+
-+static int rmr_srv_save_last_io_to_map(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_dirty_id_map *map;
-+	int i, j, lock_idx;
-+
-+	map = rmr_pool_find_map(pool, srv_pool->member_id);
-+	if (!map) {
-+		pr_err("no map found for member_id %u\n", srv_pool->member_id);
-+		return -EINVAL;
-+	}
-+
-+	for (i = 0; i < srv_pool->queue_depth; i++) {
-+		rmr_id_t *id;
-+		struct rmr_dirty_id_map *mp;
-+
-+		id = &srv_pool->last_io[i];
-+
-+		if (id->a == U64_MAX && id->b == U64_MAX)
-+			continue;
-+
-+		if (rmr_map_check_dirty(map, *id)) {
-+			/*
-+			 * We already have this id added to our map, and which says
-+			 * that its dirty for us. This means that last_io info about
-+			 * this id is outdated.
-+			 * We honor the info in the map, and skip this entry
-+			 */
-+			continue;
-+		}
-+
-+		lock_idx = srcu_read_lock(&pool->map_srcu);
-+		for (j = 0; j < pool->maps_cnt; j++) {
-+			mp = rcu_dereference(pool->maps[j]);
-+			if (WARN_ON(!mp) || mp->member_id == srv_pool->member_id)
-+				continue;
-+
-+			rmr_map_set_dirty(mp, *id, 0);
-+
-+			// Clean the entry since it has been used up
-+			id->a = U64_MAX;
-+			id->b = U64_MAX;
-+		}
-+		srcu_read_unlock(&pool->map_srcu, lock_idx);
-+	}
-+
-+	rmr_srv_mark_maps_dirty(srv_pool);
-+	return 0;
-+}
-+
-+/**
-+ * process_msg_user_cmd() - Process user command
-+ *
-+ * @pool:	rmr pool
-+ * @cmd_msg:	pointer to command message. The user data is right after this struct.
-+ * @data:	data buffer to be passed down the user
-+ * @datalen:	length of the user buffer
-+ *
-+ * Description:
-+ *	Pass down the user command to the user server side.
-+ *	The user command data is kept right after the pool command (see arranging of kvec)
++ * @dev:		pointer to brmr device to close
++ * @sysfs_self:	pointer to sysfs attribute
 + *
 + * Return:
 + *	0 in case of success
-+ *	negative is case of failure
-+ *
-+ * Context:
-+ *	The call goes to the user server side. Care must be taken not to block.
++ *	negative in case of failure
 + */
-+static int process_msg_user_cmd(struct rmr_srv_pool *srv_pool,
-+				const struct rmr_msg_pool_cmd *cmd_msg, void *data, int datalen)
++int brmr_clt_close_device(struct brmr_clt_dev *dev,
++		      const struct attribute *sysfs_self)
 +{
-+	struct rmr_srv_io_store *store = srv_pool->io_store;
-+	size_t usr_len = cmd_msg->user_cmd.usr_len;
-+	int ret;
++	dev->dev_state = DEV_STATE_CLOSING;
++	destroy_gen_disk(dev);
++	brmr_clt_send_unmap_cmd(dev);
++	sysfs_remove_link(&dev->kobj, BRMR_LINK_NAME);
 +
-+	pr_debug("%s: cmd_len=%zu usr_len=%zu\n", __func__, sizeof(*cmd_msg), usr_len);
++	if (sysfs_self)
++		brmr_clt_destroy_dev_sysfs_files(dev, sysfs_self);
 +
-+	if (!store) {
-+		pr_err("%s: No store registered\n", __func__);
-+		return -EAGAIN;
-+	}
-+
-+	ret = store->ops->submit_cmd(store->priv, cmd_msg + 1, usr_len, data, datalen);
-+
-+	return ret;
-+}
-+
-+static void do_sess_leave_srv_sess(struct rmr_srv_pool_sess *pool_sess)
-+{
-+	struct rmr_srv_sess *srv_sess = pool_sess->srv_sess;
-+
-+	mutex_lock(&srv_sess->lock);
-+	list_del(&pool_sess->srv_sess_entry);
-+	mutex_unlock(&srv_sess->lock);
-+}
-+
-+static void sess_leave_pool(struct rmr_pool *pool,
-+			    struct rmr_srv_pool_sess *pool_sess)
-+{
-+	struct rmr_srv_sess *srv_sess = pool_sess->srv_sess;
-+
-+	pr_info("pool sesss %s leaves pool %s\n",
-+		pool_sess->sessname, pool->poolname);
-+
-+	mutex_lock(&pool->sess_lock);
-+	list_del(&pool_sess->pool_entry);
-+	xa_erase(&srv_sess->pools, pool->group_id);
-+	mutex_unlock(&pool->sess_lock);
-+
-+	rmr_srv_sysfs_del_sess(pool_sess);
-+
-+	pool_sess->srv_pool = NULL;
-+}
-+
-+static void rmr_srv_free_pool_sess(struct rmr_srv_pool_sess *pool_sess)
-+{
-+	kfree(pool_sess);
-+}
-+
-+static void destroy_sess(struct rmr_srv_sess *srv_sess)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	struct rmr_srv_pool_sess *pool_sess, *tmp;
-+
-+	// why do they do this in rnbd srv ?
-+	// if (list_empty(&srv_sess->pool_sess_list))
-+	// 	goto out;
-+
-+	mutex_lock(&srv_sess->lock);
-+	list_for_each_entry_safe (pool_sess, tmp, &srv_sess->pool_sess_list, srv_sess_entry) {
-+		list_del(&pool_sess->srv_sess_entry);
-+		srv_pool = pool_sess->srv_pool;
-+
-+		// A network disconnect event
-+		if (!pool_sess->sync)
-+			rmr_srv_change_pool_state(pool_sess->srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+
-+		sess_leave_pool(srv_pool->pool, pool_sess);
-+		rmr_put_srv_pool(srv_pool);
-+		rmr_srv_free_pool_sess(pool_sess);
-+	}
-+	mutex_unlock(&srv_sess->lock);
-+
-+	xa_destroy(&srv_sess->pools);
-+	might_sleep();
-+
-+	mutex_lock(&g_sess_lock);
-+	list_del(&srv_sess->g_list_entry);
-+	mutex_unlock(&g_sess_lock);
-+
-+	mutex_destroy(&srv_sess->lock);
-+	kfree(srv_sess);
-+}
-+
-+void rmr_srv_destroy_pool(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool_sess *pool_sess, *tmp;
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	if (!pool) {
-+		pr_err("%s: pool is empty\n", __func__);
-+		return;
-+	}
-+
-+	list_for_each_entry_safe (pool_sess, tmp, &pool->sess_list, pool_entry) {
-+		WARN_ON(!pool_sess->srv_pool);
-+
-+		do_sess_leave_srv_sess(pool_sess);
-+		sess_leave_pool(srv_pool->pool, pool_sess);
-+		rmr_put_srv_pool(srv_pool);
-+		rmr_srv_free_pool_sess(pool_sess);
-+	}
-+}
-+
-+int rmr_srv_remove_clt_pool(struct rmr_srv_pool *srv_pool)
-+{
-+	struct rmr_pool *clt;
-+
-+	clt = srv_pool->clt;
-+	if (!clt) {
-+		pr_info("Srv pool %s has no internal clt pool assigned\n",
-+			srv_pool->pool->poolname);
-+		return -EINVAL;
-+	}
-+
-+	pr_info("from pool %s remove sync (internal) pool %s\n",
-+		srv_pool->pool->poolname, clt->poolname);
-+	srv_pool->clt = NULL;
-+
-+	rmr_clt_close(clt);
-+
-+	pr_info("pool %s removed\n", clt->poolname);
++	brmr_clt_free_stats(&dev->stats);
++	brmr_clt_put_dev(dev);
 +
 +	return 0;
 +}
 +
-+static int create_srv_sess(struct rtrs_srv_sess *rtrs)
++struct brmr_clt_dev *find_and_get_device(const char *name)
 +{
-+	struct rmr_srv_sess *srv_sess;
-+	char sessname[NAME_MAX];
-+	int err;
++	struct brmr_clt_dev *dev;
 +
-+	err = rtrs_srv_get_path_name(rtrs, sessname, sizeof(sessname));
-+	if (unlikely(err)) {
-+		pr_err("rtrs_srv_get_sess_name(%s): %d\n", sessname, err);
-+		return err;
-+	}
-+	srv_sess = kzalloc(sizeof(*srv_sess), GFP_KERNEL);
-+	if (!srv_sess)
-+		return -ENOMEM;
++	mutex_lock(&brmr_device_lock);
++	list_for_each_entry(dev, &brmr_device_list, list) {
++		if (strncasecmp(dev->pool->poolname, name, NAME_MAX))
++			continue;
 +
-+	mutex_init(&srv_sess->lock);
-+	srv_sess->rtrs = rtrs;
-+	strscpy(srv_sess->sessname, sessname, NAME_MAX);
-+	xa_init_flags(&srv_sess->pools, XA_FLAGS_ALLOC);
-+	INIT_LIST_HEAD(&srv_sess->pool_sess_list);
-+	mutex_init(&srv_sess->lock);
-+
-+	mutex_lock(&g_sess_lock);
-+	list_add(&srv_sess->g_list_entry, &g_sess_list);
-+	mutex_unlock(&g_sess_lock);
-+
-+	rtrs_srv_set_sess_priv(rtrs, srv_sess);
-+
-+	return 0;
-+}
-+
-+static int rmr_srv_link_ev(struct rtrs_srv_sess *rtrs,
-+			   enum rtrs_srv_link_ev ev, void *priv)
-+{
-+	struct rmr_srv_sess *srv_sess = priv;
-+
-+	switch (ev) {
-+	case RTRS_SRV_LINK_EV_CONNECTED:
-+		return create_srv_sess(rtrs);
-+
-+	case RTRS_SRV_LINK_EV_DISCONNECTED:
-+		if (WARN_ON(!srv_sess))
-+			return -EINVAL;
-+
-+		destroy_sess(srv_sess);
-+		return 0;
-+
-+	default:
-+		pr_warn("Received unknown rtrs session event %d from session %s\n",
-+			ev, srv_sess->sessname);
-+		return -EINVAL;
-+	}
-+}
-+
-+static struct rmr_srv_pool_sess *__find_sess_in_pool(struct rmr_pool *pool,
-+						     const char *sessname)
-+{
-+	struct rmr_srv_pool_sess *pool_sess;
-+
-+	list_for_each_entry (pool_sess, &pool->sess_list, pool_entry) {
-+		if (!strcmp(pool_sess->sessname, sessname)) {
-+			return pool_sess;
++		if (brmr_clt_get_dev(dev)) {
++			mutex_unlock(&brmr_device_lock);
++			return dev;
 +		}
 +	}
++	mutex_unlock(&brmr_device_lock);
 +
 +	return NULL;
 +}
 +
-+static int sess_join_pool(struct rmr_pool *pool, struct rmr_srv_pool_sess *pool_sess)
-+{
-+	struct rmr_srv_pool_sess *find;
-+	struct rmr_srv_sess *srv_sess = pool_sess->srv_sess;
-+	int ret = 0;
-+
-+	mutex_lock(&pool->sess_lock);
-+	find = __find_sess_in_pool(pool, pool_sess->sessname);
-+	if (find) {
-+		ret = -EEXIST;
-+		goto unlock;
-+	}
-+
-+	ret = xa_err(xa_store(&srv_sess->pools, pool->group_id, pool, GFP_KERNEL));
-+	if (ret) {
-+		pr_err("can not add pool %s err %d\n", pool->poolname, ret);
-+		goto unlock;
-+	}
-+	pr_info("%s: Added pool %s to rmr_srv_sess %s\n",
-+		__func__, pool->poolname, srv_sess->sessname);
-+
-+	ret = rmr_srv_sysfs_add_sess(pool, pool_sess);
-+	if (ret) {
-+		pr_err("failed to create sysfs for pool sess %s in pool %s\n",
-+		       pool_sess->sessname, pool->poolname);
-+
-+		xa_erase(&srv_sess->pools, pool->group_id);
-+		goto unlock;
-+	}
-+	list_add(&pool_sess->pool_entry, &pool->sess_list);
-+
-+unlock:
-+	mutex_unlock(&pool->sess_lock);
-+
-+	return ret;
-+}
-+
-+static void do_sess_leave_pool(struct rmr_pool *pool, struct rmr_srv_pool_sess *pool_sess)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	do_sess_leave_srv_sess(pool_sess);
-+	sess_leave_pool(pool, pool_sess);
-+	rmr_put_srv_pool(srv_pool);
-+	rmr_srv_free_pool_sess(pool_sess);
-+}
-+
-+/**
-+ * process_msg_pool_info() - Process a POOL_INFO membership change notification
-+ *
-+ * @pool:		Pool which received the command.
-+ * @pool_info_cmd:	The received POOL_INFO command carrying member_id,
-+ *			operation, mode, and dirty flag.
-+ *
-+ * Dispatches on (operation, mode) pairs notified by the client:
-+ *  - ADD + CREATE:    a new storage node is joining; add it via
-+ *		       rmr_srv_handle_other_member_add().
-+ *  - ADD + ASSEMBLE:  an existing node is reassembling; verify its map and
-+ *		       stg_members entry already exist.
-+ *  - REMOVE + DELETE: a storage node is permanently leaving; remove its map
-+ *		       and stg_members entry via rmr_srv_delete_store_member().
-+ *  - REMOVE + DISASSEMBLE: temporary leave; no map changes needed (TODO).
-+ *
-+ * Return:
-+ *	0 on success, negative error code on failure.
-+ */
-+static int process_msg_pool_info(struct rmr_pool *pool,
-+				 const struct rmr_msg_pool_info_cmd *pool_info_cmd)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	int ret = 0;
-+
-+	pr_info("%s: Server pool %s with member_id %u, received pool_info message\n",
-+		__func__, pool->poolname, srv_pool->member_id);
-+
-+	if (pool_info_cmd->operation == RMR_POOL_INFO_OP_ADD) {
-+		ret = rmr_srv_handle_other_member_add(srv_pool, pool_info_cmd);
-+		if (ret) {
-+			pr_err("%s: Failed to create maps for other pools: %d\n",
-+			       __func__, ret);
-+			return ret;
-+		}
-+	} else if (pool_info_cmd->operation == RMR_POOL_INFO_OP_REMOVE) {
-+		if (pool_info_cmd->mode == RMR_POOL_INFO_MODE_DELETE) {
-+			pr_info("%s: Member %u got remove of member %u with mode delete\n",
-+				__func__, srv_pool->member_id, pool_info_cmd->member_id);
-+			rmr_srv_delete_store_member(pool, pool_info_cmd->member_id);
-+		} else if (pool_info_cmd->mode == RMR_POOL_INFO_MODE_DISASSEMBLE) {
-+			pr_info("%s: Member %u got remove of member %u with mode disassemble, "
-+				"preserving dirty map\n",
-+				__func__, srv_pool->member_id, pool_info_cmd->member_id);
-+			/*
-+			 * Do NOT remove the dirty map or stg_members entry for the
-+			 * disassembled member.  IOs arriving after this point will
-+			 * continue to accumulate dirty entries for that member via
-+			 * the piggyback mechanism, so it can resync on reassembly.
-+			 */
-+		}
-+	}
-+	rmr_srv_flush_pool_md(srv_pool);
-+
-+	return ret;
-+}
-+
-+static struct rmr_srv_pool_sess *alloc_pool_sess(struct rmr_srv_pool *srv_pool,
-+						 struct rmr_srv_sess *srv_sess)
-+{
-+	struct rmr_srv_pool_sess *pool_sess;
-+
-+	pool_sess = kzalloc_node(sizeof(*pool_sess), GFP_KERNEL, NUMA_NO_NODE);
-+	if (unlikely(!pool_sess)) {
-+		pr_err("Failed to allocate session for srv pool %s\n", srv_pool->pool->poolname);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	strscpy(pool_sess->sessname, srv_sess->sessname, NAME_MAX);
-+	INIT_LIST_HEAD(&pool_sess->pool_entry);
-+	INIT_LIST_HEAD(&pool_sess->srv_sess_entry);
-+	pool_sess->srv_sess = srv_sess;
-+	pool_sess->srv_pool = srv_pool;
-+
-+	return pool_sess;
-+}
-+
-+/**
-+ * rmr_srv_process_join_create() - Handle the CREATE case of a join_pool message
-+ *
-+ * @pool:		The pool being created.
-+ * @join_pool_cmd:	The received join_pool command carrying dirty flag and
-+ *			per-member info for any pre-existing pool members.
-+ *
-+ * If the client reports that this server's existing data is dirty, marks own
-+ * map fully dirty.  Then iterates the per-member list in the message and adds
-+ * each member via rmr_srv_add_store_member(), marking its map dirty if the
-+ * client flagged it.  On failure, all members added so far are cleaned up.
-+ *
-+ * Return:
-+ *	0 on success, negative error code on failure.
-+ */
-+static int rmr_srv_process_join_create(struct rmr_pool *pool,
-+				       const struct rmr_msg_join_pool_cmd *join_pool_cmd)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_dirty_id_map *map;
-+	int i, ret;
-+	u8 member_id;
-+
-+	/*
-+	 * Mark our maps dirty if client asked us to.
-+	 */
-+	if (join_pool_cmd->dirty) {
-+		map = rmr_pool_find_map(pool, srv_pool->member_id);
-+		if (!map) {
-+			pr_err("%s: No map found for %u\n",
-+			       __func__, srv_pool->member_id);
-+			return -EINVAL;
-+		}
-+		rmr_map_set_dirty_all(map, MAP_NO_FILTER);
-+	}
-+
-+	/*
-+	 * Add other storage members in case its a create message.
-+	 */
-+	for (i = 0; i < join_pool_cmd->mem_info.no_of_stor; i++) {
-+		member_id = join_pool_cmd->mem_info.p_mem_info[i].member_id;
-+
-+		ret = rmr_srv_add_store_member(pool, member_id);
-+		if (ret) {
-+			pr_err("%s: rmr_srv_add_store_member failed %d\n", __func__, ret);
-+			goto cleanup;
-+		}
-+
-+		if (join_pool_cmd->mem_info.p_mem_info[i].c_dirty) {
-+			map = rmr_pool_find_map(pool, member_id);
-+			if (WARN_ON(!map)) {
-+				xa_erase(&pool->stg_members, member_id);
-+				ret = -EINVAL;
-+				goto cleanup;
-+			}
-+			rmr_map_set_dirty_all(map, MAP_NO_FILTER);
-+		}
-+	}
-+
-+	return 0;
-+
-+cleanup:
-+	while (i--)
-+		rmr_srv_delete_store_member(pool,
-+					    join_pool_cmd->mem_info.p_mem_info[i].member_id);
-+	return ret;
-+}
-+
-+static void rmr_srv_process_leave_delete(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	void *entry;
-+	unsigned long id;
-+
-+	/*
-+	 * When we are leaving a pool (not disassembly), we have to,
-+	 * 1) Delete dirty entries from all the maps of other storage nodes, since we do not
-+	 * need them anymore
-+	 * 2) Delete all the maps of other storage nodes.
-+	 *
-+	 * Map for this storage node is created/deleted during register/unregister.
-+	 */
-+	xa_for_each(&pool->stg_members, id, entry) {
-+		if (id == srv_pool->member_id)
-+			continue;
-+
-+		rmr_srv_delete_store_member(pool, id);
-+	}
-+}
-+
-+static int process_msg_join_pool(struct rmr_pool *pool, struct rmr_srv_sess *srv_sess,
-+				 struct rtrs_srv_sess *rtrs, bool sync,
-+				 const struct rmr_msg_join_pool_cmd *join_pool_cmd)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_srv_pool_sess *pool_sess;
-+	int ret = 0, i;
-+	bool alloced_last_io = false;
-+
-+	pr_info("Client %s requests to join pool %s (state=%d)\n",
-+		srv_sess->sessname, pool->poolname, atomic_read(&srv_pool->state));
-+
-+	mutex_lock(&srv_sess->lock);
-+
-+	/*
-+	 * Here we only do chunk size check,
-+	 * to make sure different storage nodes do not use different chunk sizes.
-+	 */
-+	if (join_pool_cmd->chunk_size && pool->chunk_size != join_pool_cmd->chunk_size) {
-+		pr_err("pool %s has chunksize %u != msg chunksize %u\n",
-+		       pool->poolname, pool->chunk_size, join_pool_cmd->chunk_size);
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	mutex_lock(&srv_pool->srv_pool_lock);
-+	if (atomic_read(&srv_pool->state) == RMR_SRV_POOL_STATE_EMPTY) {
-+		pr_err("%s: pool %s has no store registered; join rejected\n",
-+		       __func__, pool->poolname);
-+		ret = -EINVAL;
-+		goto unlock_srv_pool_lock;
-+	}
-+
-+	if (!sync) {
-+		if (join_pool_cmd->create) {
-+			if (srv_pool->last_io || srv_pool->last_io_idx) {
-+				pr_err("%s: pool %s already has last_io buffer allocated\n",
-+				       __func__, pool->poolname);
-+				ret = -EEXIST;
-+				goto unlock_srv_pool_lock;
-+			}
-+
-+			if (!srv_pool->marked_create) {
-+				pr_err("%s: pool %s not in create state\n",
-+				       __func__, pool->poolname);
-+				ret = -EINVAL;
-+				goto unlock_srv_pool_lock;
-+			}
-+		} else if (srv_pool->marked_create) {
-+			pr_err("%s: pool %s should not be in create state\n",
-+			       __func__, pool->poolname);
-+			ret = -EINVAL;
-+			goto unlock_srv_pool_lock;
-+		}
-+	}
-+
-+	pool_sess = alloc_pool_sess(srv_pool, srv_sess);
-+	if (IS_ERR(pool_sess)) {
-+		pr_err("failed to allc pool_sees for pool %s sev_sess %s: %pe\n",
-+		       pool->poolname, srv_sess->sessname, pool_sess);
-+		ret = PTR_ERR(pool_sess);
-+		goto unlock_srv_pool_lock;
-+	}
-+	srv_pool->queue_depth = join_pool_cmd->queue_depth;
-+
-+	ret = sess_join_pool(pool, pool_sess);
-+	if (ret) {
-+		pr_err("Failed to join pool\n");
-+		goto free_sess;
-+	}
-+	pool_sess->sync = sync;
-+
-+	if (!pool_sess->sync && !srv_pool->last_io) {
-+		/* Joining for the first time */
-+		srv_pool->last_io = kcalloc(srv_pool->queue_depth, sizeof(*srv_pool->last_io),
-+					    GFP_KERNEL);
-+		if (!srv_pool->last_io) {
-+			pr_err("Memory allocation failed for srv_pool->last_io\n");
-+			ret = -ENOMEM;
-+			goto sess_leave;
-+		}
-+		alloced_last_io = true;
-+
-+		/* The previous last_io buffer exists. */
-+		if (srv_pool->last_io_idx) {
-+			memcpy(srv_pool->last_io, srv_pool->last_io_idx,
-+			       rmr_last_io_len(srv_pool->queue_depth));
-+		} else {
-+			for (i = 0; i < srv_pool->queue_depth; i++) {
-+				srv_pool->last_io[i].a = U64_MAX;
-+				srv_pool->last_io[i].b = U64_MAX;
-+			}
-+
-+			srv_pool->last_io_idx = kcalloc(srv_pool->queue_depth,
-+						    sizeof(*srv_pool->last_io_idx), GFP_KERNEL);
-+			if (!srv_pool->last_io_idx) {
-+				ret = -ENOMEM;
-+				goto free_last_io;
-+			}
-+		}
-+		pr_info("Allocated %ld B last_io buffer for pool %s\n",
-+			srv_pool->queue_depth * sizeof(*srv_pool->last_io), pool->poolname);
-+	}
-+
-+	/*
-+	 * Join/Rejoin messages from sync sessions do not affect our state.
-+	 *
-+	 * For non-sync sessions, if our state is NO_IO, pserver can either send a,
-+	 * - rejoin message in case our state NO_IO due to network/IO issue
-+	 * - join message in case pserver crashed
-+	 * hence, no state transition is needed.
-+	 */
-+	if (!pool_sess->sync) {
-+		if (join_pool_cmd->create) {
-+			/*
-+			 * First-time pool creation: set up member info and maps,
-+			 * then move to CREATED awaiting enable_pool(1).
-+			 */
-+			ret = rmr_srv_process_join_create(pool, join_pool_cmd);
-+			if (ret) {
-+				pr_err("%s: rmr_srv_process_join_create failed %d\n",
-+				       __func__, ret);
-+				goto free_last_io;
-+			}
-+
-+			/*
-+			 * In the CREATE path pool_md has only magic set; all other
-+			 * header fields are normally populated later by
-+			 * RMR_CMD_SEND_MD_BUF.  Initialise them now so that
-+			 * queue_depth (and the bitmap/last_io offsets derived from
-+			 * it) are correct before the first on-demand map flush fires.
-+			 */
-+			pool->pool_md.queue_depth = join_pool_cmd->queue_depth;
-+			pool->pool_md.chunk_size  = pool->chunk_size;
-+			pool->pool_md.mapped_size = pool->mapped_size;
-+			pool->pool_md.group_id    = pool->group_id;
-+			strscpy(pool->pool_md.poolname, pool->poolname,
-+				sizeof(pool->pool_md.poolname));
-+			rmr_srv_mark_pool_md_dirty(srv_pool);
-+			rmr_srv_mark_maps_dirty((struct rmr_srv_pool *)pool->priv);
-+
-+			ret = rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_CREATED);
-+			if (ret < 0)
-+				goto leave_delete;
-+
-+			srv_pool->marked_create = false;
-+		} else if (atomic_read(&srv_pool->state) != RMR_SRV_POOL_STATE_NO_IO) {
-+			/*
-+			 * Assemble or rejoin: a map update is needed before IOs
-+			 * can resume, so move to NO_IO. If we are already in
-+			 * NO_IO (e.g. pserver reconnecting after a network event
-+			 * that already drove us there), no transition is needed.
-+			 */
-+			ret = rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+			if (ret < 0)
-+				goto leave_delete;
-+		}
-+	}
-+
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+
-+	rmr_get_srv_pool(srv_pool);
-+	list_add_tail(&pool_sess->srv_sess_entry, &srv_sess->pool_sess_list);
-+
-+	mutex_unlock(&srv_sess->lock);
-+
-+	return 0;
-+
-+leave_delete:
-+	if (!pool_sess->sync && join_pool_cmd->create)
-+		rmr_srv_process_leave_delete(pool);
-+free_last_io:
-+	if (alloced_last_io) {
-+		kfree(srv_pool->last_io);
-+		srv_pool->last_io = NULL;
-+
-+		kfree(srv_pool->last_io_idx);
-+		srv_pool->last_io_idx = NULL;
-+	}
-+sess_leave:
-+	sess_leave_pool(pool, pool_sess);
-+free_sess:
-+	rmr_srv_free_pool_sess(pool_sess);
-+unlock_srv_pool_lock:
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+unlock:
-+	mutex_unlock(&srv_sess->lock);
-+	return ret;
-+}
-+
-+void rmr_srv_stop_sync_and_go_offline(struct rmr_pool *pool)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+	rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+
-+	if (atomic_read(&srv_pool->thread_state) != SYNC_THREAD_STOPPED) {
-+		atomic_set(&srv_pool->thread_state, SYNC_THREAD_REQ_STOP);
-+		wake_up_process(srv_pool->th_tsk);
-+
-+		while (atomic_read(&srv_pool->thread_state) != SYNC_THREAD_STOPPED) {
-+			set_current_state(TASK_INTERRUPTIBLE);
-+			schedule_timeout(msecs_to_jiffies(1000));
-+		}
-+	}
-+}
-+
-+static int process_msg_leave_pool(struct rmr_pool *pool, struct rmr_srv_sess *sess, bool sync,
-+				  const struct rmr_msg_leave_pool_cmd *leave_pool_cmd)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_srv_pool_sess *pool_sess;
-+	u64 last_io_len;
-+	int ret = 0;
-+	void *buf;
-+
-+	pr_info("Session %s requests to leave pool %d\n", sess->sessname,
-+		leave_pool_cmd->member_id);
-+
-+	if (srv_pool->member_id != leave_pool_cmd->member_id) {
-+		pr_err("%s: For sess %s, Srv pool member_id %d, Message member_id %d\n",
-+		       __func__, sess->sessname, srv_pool->member_id, leave_pool_cmd->member_id);
-+		return -ENOENT;
-+	}
-+
-+	mutex_lock(&pool->sess_lock);
-+	pool_sess = __find_sess_in_pool(pool, sess->sessname);
-+	if (!pool_sess) {
-+		mutex_unlock(&pool->sess_lock);
-+		pr_err("Session %s is not in pool %s\n", sess->sessname,
-+		       pool->poolname);
-+		return -ENOENT;
-+	}
-+	mutex_unlock(&pool->sess_lock);
-+
-+	do_sess_leave_pool(pool, pool_sess);
-+
-+	mutex_lock(&srv_pool->srv_pool_lock);
-+	srv_pool->marked_delete = leave_pool_cmd->delete;
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+
-+	if (!sync) {
-+		/*
-+		 * Stop the sync thread if its running, and go offline.
-+		 */
-+		rmr_srv_stop_sync_and_go_offline(pool);
-+
-+		if (leave_pool_cmd->delete) {
-+			rmr_srv_process_leave_delete(pool);
-+		} else {
-+			/*
-+			 * Disassemble: flush the dirty map to disk first so that
-+			 * the on-disk map reflects all dirty entries accumulated
-+			 * up to this point.  On reassembly the map is read back
-+			 * and used to drive resync of any members that missed IOs.
-+			 */
-+			rmr_srv_md_maps_sync(pool);
-+
-+			/*
-+			 * Clear last_io and persist it to disk so that it is not
-+			 * used after reassembly.  Note: maps are always flushed
-+			 * above regardless of whether last_io is valid; the two
-+			 * operations are independent.
-+			 */
-+			last_io_len = rmr_last_io_len(pool->pool_md.queue_depth);
-+
-+			if (!srv_pool->last_io || !last_io_len)
-+				goto change_state;
-+
-+			memset(srv_pool->last_io, 0, last_io_len);
-+			if (srv_pool->last_io_idx)
-+				memset(srv_pool->last_io_idx, 0, last_io_len);
-+
-+			buf = kzalloc(last_io_len, GFP_KERNEL);
-+			if (!buf)
-+				goto change_state;
-+
-+			ret = process_md_io(pool, NULL,
-+					    RMR_LAST_IO_OFFSET,
-+					    last_io_len,
-+					    RMR_OP_MD_WRITE, buf);
-+			if (ret) {
-+				pr_err("%s: For pool %s process_md_io failed\n",
-+				       __func__, pool->poolname);
-+			}
-+			kfree(buf);
-+		}
-+
-+change_state:
-+		/*
-+		 * All sessions have left. Transition back to REGISTERED if the
-+		 * backend store is still present, or to EMPTY if it is not.
-+		 */
-+		mutex_lock(&srv_pool->srv_pool_lock);
-+		if (srv_pool->io_store)
-+			rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_REGISTERED);
-+		else
-+			rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_EMPTY);
-+		mutex_unlock(&srv_pool->srv_pool_lock);
-+	}
-+
-+	return 0;
-+}
-+
-+static int process_msg_map_clear(struct rmr_srv_sess *srv_sess,
-+				 const void *usr)
-+{
-+	const struct rmr_msg_io *msg = usr;
-+	struct rmr_pool *pool;
-+	rmr_id_t id;
-+	unsigned long key;
-+	struct rmr_map_entry *entry;
-+	struct rmr_dirty_id_map *map;
-+	u8 member_id;
-+	int err = 0;
-+	u32 group_id = le32_to_cpu(msg->hdr.group_id);
-+
-+	id.a = le64_to_cpu(msg->id_a);
-+	id.b = le64_to_cpu(msg->id_b);
-+	key = rmr_id_to_key(id);
-+	member_id = msg->member_id;
-+
-+	pr_debug("received map clear msg, id (%llu, %llu), member_id %u\n",
-+		 id.a, id.b, member_id);
-+
-+	pool = rmr_srv_sess_get_pool(srv_sess, group_id);
-+	if (IS_ERR(pool)) {
-+		pr_err_ratelimited("Got I/O request on session %s for unknown pool: %pe\n",
-+				   srv_sess->sessname, pool);
-+		return PTR_ERR(pool);
-+	}
-+
-+	map = rmr_pool_find_map(pool, member_id);
-+	if (!map) {
-+		pr_err("no map found for member_id %u\n", member_id);
-+		err = -EINVAL;
-+		goto put_pool;
-+		//TODO: handle this , probably initialize map, or just throw err?
-+	}
-+
-+	entry = rmr_map_unset_dirty(map, id, MAP_NO_FILTER);
-+	if (entry) {
-+		/* We do not need any rcu protection here since it is deleted by the other
-+		 * rmr server. And sync can only be done for entries that are
-+		 * dirty for this particaular server.
-+		 */
-+		kmem_cache_free(rmr_map_entry_cachep, entry);
-+	}
-+	rmr_srv_mark_maps_dirty((struct rmr_srv_pool *)pool->priv);
-+
-+put_pool:
-+	rmr_srv_sess_put_pool(pool);
-+	return err;
-+}
-+
-+static int process_msg_map_add(struct rmr_srv_sess *srv_sess,
-+			       const void *usr)
-+{
-+	const struct rmr_msg_io *msg = usr;
-+	struct rmr_pool *pool;
-+	int i, ret = 0;
-+	struct rmr_dirty_id_map *map;
-+	u32 group_id = le32_to_cpu(msg->hdr.group_id);
-+
-+	pr_debug("received map add member_id %u, id (%llu %llu)\n",
-+		 msg->member_id, msg->id_a, msg->id_b);
-+
-+	pool = rmr_srv_sess_get_pool(srv_sess, group_id);
-+	if (IS_ERR(pool)) {
-+		pr_err_ratelimited("Got I/O request on session %s for unknown pool: %pe\n",
-+				   srv_sess->sessname, pool);
-+		return PTR_ERR(pool);
-+	}
-+
-+	for (i = 0; i < msg->failed_cnt; i++) {
-+		u64 msg_map_ver = le64_to_cpu(msg->map_ver);
-+		rmr_id_t id;
-+
-+		map = rmr_pool_find_map(pool, msg->failed_id[i]);
-+		if (!map) {
-+			pr_err("no map found for member_id %u\n", msg->failed_id[i]);
-+			ret = -EINVAL;
-+			goto put_pool;
-+		}
-+
-+		atomic_set(&map->check_state, RMR_MAP_STATE_NO_CHECK);
-+		id.a = le64_to_cpu(msg->id_a);
-+		id.b = le64_to_cpu(msg->id_b);
-+		rmr_map_set_dirty(map, id, 0);
-+
-+		if (msg_map_ver > pool->map_ver)
-+			pool->map_ver = msg_map_ver;
-+	}
-+	if (msg->failed_cnt) {
-+		rmr_srv_mark_pool_md_dirty((struct rmr_srv_pool *)pool->priv);
-+		rmr_srv_mark_maps_dirty((struct rmr_srv_pool *)pool->priv);
-+	}
-+
-+put_pool:
-+	rmr_srv_sess_put_pool(pool);
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmr_srv_set_pool_mm() - Set the rmr srv pool to maintenance mode
-+ *
-+ * @srv_pool:	The rmr srv pool to set in maintenance mode
-+ *
-+ * Description:
-+ *	While in maintenance mode, we do not serve IOs either, so we set state to NO_IO
-+ *
-+ * Return:
-+ *	0 on success
-+ *	Error value on failure
-+ */
-+static int rmr_srv_set_pool_mm(struct rmr_srv_pool *srv_pool)
-+{
-+	srv_pool->maintenance_mode = true;
-+
-+	return rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+}
-+
-+/**
-+ * rmr_srv_unset_pool_mm() - Clear the rmr srv pool maintenance mode
-+ *
-+ * @srv_pool:	The rmr srv pool to clear maintenance mode of
-+ *
-+ * Description:
-+ *	While in maintenance mode, we do not serve IOs either, so we set state to NO_IO
-+ *
-+ * Return:
-+ *	0 on success
-+ *	Error value on failure
-+ */
-+static int rmr_srv_unset_pool_mm(struct rmr_srv_pool *srv_pool)
-+{
-+	srv_pool->maintenance_mode = false;
-+	rmr_srv_flush_pool_md(srv_pool);
-+
-+	return 0;
-+}
-+
-+static int process_msg_enable_pool(struct rmr_pool *pool, struct rmr_srv_sess *sess, bool sync,
-+				   const struct rmr_msg_enable_pool_cmd *enable_pool_cmd)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	enum rmr_srv_pool_state old_state = atomic_read(&srv_pool->state);
-+	int ret = 0;
-+
-+	/*
-+	 * Enable/Disable messages from sync sessions do not affect us.
-+	 */
-+	if (sync) {
-+		pr_info("%s: From sync sess %s, for pool %s\n", __func__, sess->sessname,
-+			pool->poolname);
-+		return 0;
-+	}
-+
-+	pr_info("Client %s requests to set enable=%d pool %s current state %s\n",
-+		sess->sessname, enable_pool_cmd->enable, pool->poolname,
-+		rmr_get_srv_pool_state_name(old_state));
-+
-+	/*
-+	 * Enable when not in maintenance mode, can be handled simply
-+	 */
-+	if (enable_pool_cmd->enable && !srv_pool->maintenance_mode) {
-+		/*
-+		 * CREATED -> NORMAL: initial enable after create-mode join.
-+		 * NO_IO -> NORMAL: was_last_authoritative recovery (pserver
-+		 * enables this node directly without a map update because its
-+		 * dirty map is already authoritative).
-+		 */
-+		if (old_state != RMR_SRV_POOL_STATE_CREATED &&
-+		    old_state != RMR_SRV_POOL_STATE_NO_IO) {
-+			pr_err("%s: pool %s cannot be enabled in state %s\n",
-+			       __func__, pool->poolname,
-+			       rmr_get_srv_pool_state_name(old_state));
-+			return -EINVAL;
-+		}
-+
-+		ret = rmr_srv_set_pool_state_normal(srv_pool);
-+		if (ret < 0)
-+			goto out_err;
-+
-+		return 0;
-+	}
-+
-+	/*
-+	 * Any other case involves considering maintenance mode settings
-+	 */
-+	if (!enable_pool_cmd->enable) {
-+		if (old_state != RMR_SRV_POOL_STATE_NORMAL &&
-+		    old_state != RMR_SRV_POOL_STATE_NO_IO) {
-+			pr_err("%s: pool %s can only disable from NORMAL or NO_IO state (current: %s)\n",
-+			       __func__, pool->poolname,
-+			       rmr_get_srv_pool_state_name(old_state));
-+			return -EINVAL;
-+		}
-+		ret = rmr_srv_set_pool_mm(srv_pool);
-+	} else {
-+		ret = rmr_srv_unset_pool_mm(srv_pool);
-+	}
-+
-+	if (ret < 0)
-+		goto out_err;
-+
-+	return 0;
-+
-+out_err:
-+	/*
-+	 * Put srv pool state to old one
-+	 */
-+	atomic_set(&srv_pool->state, old_state);
-+	return ret;
-+}
-+
-+/**
-+ * process_msg_map_ready() - Process RMR_CMD_MAP_READY command
-+ *
-+ * @pool:		Pool which received the command
-+ * @sync:		Whether the command was sent from an internal (sync) rmr-client or not
-+ *
-+ * Return:
-+ *	0 on success
-+ *	Negative errno on failure
-+ *
-+ * Description:
-+ *	A RMR_CMD_MAP_READY command is the first command that is sent to a storage node which will
-+ *	receive a map from another storage node as part of a map update.
-+ *
-+ *	It checks whether this storage node is ready and in an expected state to receive a map.
-+ */
-+static int process_msg_map_ready(struct rmr_pool *pool, bool sync)
-+{
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_dirty_id_map *map;
-+	int i, err = 0, pool_state;
-+
-+	mutex_lock(&srv_pool->srv_pool_lock);
-+	pool_state = atomic_read(&srv_pool->state);
-+
-+	/* A map update from another storage node is not allowed. */
-+	if (sync) {
-+		pr_err("%s: (sync) Cannot receive map from other storage nodes\n", __func__);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * A map update from pserver should start only when in,
-+	 * NO_IO - after a network/IO error
-+	 * CREATED - For extend (This is not nice.
-+	 *			 Extend should inform the storage node that it is being
-+	 *			 used for an extend leg for an already existing node, and
-+	 *			 the state should be set accordingly. So that we can allow
-+	 *			 this only when in NO_IO state.)
-+	 */
-+	if (pool_state != RMR_SRV_POOL_STATE_NO_IO && pool_state != RMR_SRV_POOL_STATE_CREATED) {
-+		pr_err("(non-sync) pool state not correct %d", pool_state);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * We seem to be in process of another map update.
-+	 */
-+	if (srv_pool->map_update_state != MAP_UPDATE_STATE_DISABLED) {
-+		pr_err("rmr_srv_send_map Map update already in progress\n");
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * If pserver is instructing us to receive a map, then the map we
-+	 * hold is meaningless.
-+	 */
-+	mutex_lock(&pool->maps_lock);
-+	for (i = 0; i < RMR_POOL_MAX_SESS; i++) {
-+		map = rcu_dereference_protected(pool->maps[i],
-+						lockdep_is_held(&pool->maps_lock));
-+		if (!map)
-+			continue;
-+
-+		rmr_map_unset_dirty_all(map);
-+	}
-+	mutex_unlock(&pool->maps_lock);
-+	rmr_srv_mark_maps_dirty(srv_pool);
-+
-+	srv_pool->map_update_state = MAP_UPDATE_STATE_READY;
-+
-+	pr_info("%s: process_msg_cmd: moved to MAP_UPDATE_STATE_READY\n", __func__);
-+
-+out:
-+	mutex_unlock(&srv_pool->srv_pool_lock);
-+	return err;
-+}
-+
-+/**
-+ * process_msg_cmd_handler() - Processes rmr command message
-+ *
-+ * @work:	scheduled work structure
-+ *
-+ * Description:
-+ *	The command messages being processed here, can be broadly divided into 2 categories.
-+ *	Ones which are able to use the rsp buffer to send back status.
-+ *	Ones which cannot use the rsp buffer to send back status. These ones use the rsp buffer
-+ *	for other purposes; like sending map data, or read user rsp buffer.
-+ *
-+ * Context:
-+ *	Execution time depends on the command. It may take a long time for commands which sends
-+ *	data (map).
-+ */
-+static void process_msg_cmd_handler(struct work_struct *work)
-+{
-+	struct rmr_cmd_work_info *work_info = container_of(work, struct rmr_cmd_work_info, cmd_work);
-+	struct rmr_pool *pool = work_info->pool;
-+	struct rmr_srv_pool *srv_pool = (struct rmr_srv_pool *)pool->priv;
-+	struct rmr_srv_sess *sess = work_info->sess;
-+	struct rtrs_srv_sess *rtrs = work_info->rtrs;
-+	const struct rmr_msg_pool_cmd *cmd_msg = work_info->cmd_msg;
-+	struct rmr_dirty_id_map *map;
-+	u8 sync, flags;
-+	u64 src_mapped_size;
-+	int md_i, err = 0;
-+
-+	/*
-+	 * The switch cases below are used by either map sending node,
-+	 * or the node which is to receive the map, but not both.
-+	 */
-+	switch (cmd_msg->cmd_type) {
-+	case RMR_CMD_REJOIN_POOL:
-+		/*
-+		 * For now, we do not have any difference between joinand
-+		 * rejoin on the storage server side
-+		 */
-+	case RMR_CMD_JOIN_POOL:
-+		/*
-+		 * Server node, received a request for a new session
-+		 */
-+		err = process_msg_join_pool(pool, sess, rtrs, cmd_msg->sync,
-+					    &cmd_msg->join_pool_cmd);
-+		if (err) {
-+			pr_err("process_msg_join_pool failed with err %d\n", err);
-+			goto out;
-+		}
-+		work_info->rsp->join_pool_cmd_rsp.chunk_size = pool->chunk_size;
-+
-+		if (pool->mapped_size) {
-+			work_info->rsp->join_pool_cmd_rsp.mapped_size = pool->mapped_size;
-+			pr_info("srv pool %s sets mapped size %llu\n",
-+			       pool->poolname, pool->mapped_size);
-+		} else
-+			work_info->rsp->join_pool_cmd_rsp.mapped_size = 0;
-+
-+		break;
-+	case RMR_CMD_POOL_INFO:
-+		/*
-+		 * Server node, received pool info command
-+		 */
-+		err = process_msg_pool_info(pool, &cmd_msg->pool_info_cmd);
-+		if (err) {
-+			pr_err("process_msg_pool_info failed with err %d\n", err);
-+			goto out;
-+		}
-+
-+		break;
-+	case RMR_CMD_LEAVE_POOL:
-+		err = process_msg_leave_pool(pool, sess, cmd_msg->sync, &cmd_msg->leave_pool_cmd);
-+		if (err) {
-+			pr_err("process_msg_leave_pool failed with err %d\n", err);
-+			goto out;
-+		}
-+
-+		break;
-+	case RMR_CMD_ENABLE_POOL:
-+		err = process_msg_enable_pool(pool, sess, cmd_msg->sync, &cmd_msg->enable_pool_cmd);
-+		if (err) {
-+			pr_err("process_msg_enable_pool failed with err %d\n", err);
-+			goto out;
-+		}
-+
-+		break;
-+	case RMR_CMD_MAP_READY:
-+		/*
-+		 * Map receiving node.
-+		 * Getting ready to receive dirty map
-+		 */
-+		pr_info("%s: RMR_CMD_MAP_READY\n", __func__);
-+
-+		err = process_msg_map_ready(pool, cmd_msg->sync);
-+		if (err) {
-+			pr_err("process_msg_map_ready failed with err %d\n", err);
-+			goto out;
-+		}
-+
-+		break;
-+	case RMR_CMD_MAP_SEND:
-+		/*
-+		 * Map sending node.
-+		 * Send map to the node with member_id == map_send_cmd->receiver_member_id
-+		 */
-+		pr_info("%s: RMR_CMD_MAP_SEND\n", __func__);
-+
-+		err = rmr_clt_send_map(pool, srv_pool->clt, &cmd_msg->map_send_cmd, MAP_NO_FILTER);
-+		if (err) {
-+			pr_err("rmr_clt_send_map failed with err %d\n", err);
-+			goto out;
-+		}
-+
-+		break;
-+	case RMR_CMD_SEND_MAP_BUF:
-+		/*
-+		 * Map receiving node.
-+		 * Received the map from another node. Save it.
-+		 */
-+		pr_info("%s: RMR_CMD_SEND_MAP_BUF\n", __func__);
-+
-+		if (srv_pool->map_update_state != MAP_UPDATE_STATE_READY) {
-+			pr_err("rmr_srv_send_map Node not ready to receive map\n");
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		err = rmr_pool_save_map(pool, work_info->data, work_info->datalen,
-+					false);
-+		if (err) {
-+			if (!cmd_msg->sync)
-+				rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+
-+			pr_err("rmr_pool_save_map failed\n");
-+			goto out;
-+		}
-+		break;
-+	case RMR_CMD_MAP_BUF_DONE:
-+		/*
-+		 * Map receiving node.
-+		 * A confirmation that all map updates have been sent.
-+		 */
-+		pr_info("%s: RMR_CMD_MAP_BUF_DONE\n", __func__);
-+
-+		if (srv_pool->map_update_state != MAP_UPDATE_STATE_READY) {
-+			pr_err("rmr_srv_send_map Node state not correct\n");
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (cmd_msg->map_buf_done_cmd.map_version < pool->map_ver) {
-+			pr_err("Map version received (%llu) is older than ours (%llu)\n",
-+			       cmd_msg->map_buf_done_cmd.map_version, pool->map_ver);
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		pool->map_ver = cmd_msg->map_buf_done_cmd.map_version;
-+		rmr_srv_mark_pool_md_dirty(srv_pool);
-+
-+		srv_pool->map_update_state = MAP_UPDATE_STATE_DONE;
-+
-+		break;
-+	case RMR_CMD_MAP_DONE:
-+		/*
-+		 * Map receiving node.
-+		 * A confirmation from the client, that map update was done successfully or not.
-+		 */
-+		pr_info("%s: RMR_CMD_MAP_DONE\n", __func__);
-+
-+		if (srv_pool->map_update_state != MAP_UPDATE_STATE_DONE) {
-+			pr_err("rmr_srv_send_map Map not updated succesfully\n");
-+			err = -EINVAL;
-+		}
-+
-+		/*
-+		 * On a successful map update, we go to NORMAL state.
-+		 *
-+		 * map_done_cmd.enable says whether this map update should make us go to
-+		 * NORMAL state or not. This is controlled by the pserver.
-+		 */
-+		if (cmd_msg->map_done_cmd.enable) {
-+			if (rmr_srv_set_pool_state_normal(srv_pool) < 0)
-+				err = -EINVAL;
-+		}
-+
-+		srv_pool->map_update_state = MAP_UPDATE_STATE_DISABLED;
-+		break;
-+	case RMR_CMD_MAP_DISABLE:
-+		/*
-+		 * Something went wrong on the client side; we need to reset everything.
-+		 */
-+		pr_info("%s: RMR_CMD_MAP_DISABLE\n", __func__);
-+
-+		if (!cmd_msg->sync)
-+			rmr_srv_change_pool_state(srv_pool, RMR_SRV_POOL_STATE_NO_IO);
-+
-+		srv_pool->map_update_state = MAP_UPDATE_STATE_DISABLED;
-+		break;
-+	case RMR_CMD_READ_MAP_BUF:
-+		/*
-+		 * Pserver wants to read our dirty map. So send it.
-+		 */
-+		pr_info("%s: RMR_CMD_READ_MAP_BUF\n", __func__);
-+
-+		rmr_srv_read_map_buf(pool, work_info->data, work_info->datalen,
-+				     &cmd_msg->map_buf_cmd);
-+
-+		goto out_no_rsp;
-+	case RMR_CMD_MAP_CHECK:
-+		pr_debug("%s: RMR_CMD_MAP_CHECK\n", __func__);
-+
-+		if (atomic_read(&srv_pool->state) != RMR_SRV_POOL_STATE_NORMAL) {
-+			pr_debug("srv pool %s is not in normal state, cannot do map check\n",
-+				pool->poolname);
-+			work_info->rsp->value = false;
-+			break;
-+		}
-+		map = rmr_pool_find_map(pool, srv_pool->member_id);
-+		if (!map) {
-+			pr_err("pool %s no map found for member_id %u\n",
-+			       pool->poolname, srv_pool->member_id);
-+			err = -EINVAL;
-+			goto out;
-+		}
-+		work_info->rsp->value = rmr_map_empty(map);
-+		pr_debug("pool %s member_id %d rsp with map_empty=%llu\n",
-+			 pool->poolname, srv_pool->member_id,
-+			 work_info->rsp->value);
-+
-+		break;
-+
-+	case RMR_CMD_LAST_IO_TO_MAP:
-+		/*
-+		 * Use the last_io list, and add those IOs as dirty IDs to the map
-+		 * for every other storage server other than this one.
-+		 */
-+		pr_info("%s: RMR_CMD_LAST_IO_TO_MAP\n", __func__);
-+		err = rmr_srv_save_last_io_to_map(pool);
-+		if (err) {
-+			pr_err("rmr_srv_save_last_io_to_map failed\n");
-+			goto out;
-+		}
-+
-+		break;
-+
-+	case RMR_CMD_MAP_TEST:
-+		/*
-+		 * Received the map test from another node.
-+		 * Check that we have everything that other node has.
-+		 */
-+		pr_info("%s: RMR_CMD_MAP_TEST\n", __func__);
-+
-+		err = rmr_pool_save_map(pool, work_info->data, work_info->datalen, true);
-+		if (err) {
-+			pr_err("rmr_srv_save_map failed, test_only, err %d\n", err);
-+		}
-+		goto out_no_rsp;
-+	case RMR_CMD_MD_SEND:
-+		/*
-+		 * Received the message to copy metadata of server pool to the sender.
-+		 */
-+		src_mapped_size = cmd_msg->md_send_cmd.src_mapped_size;
-+		pr_debug("stg %u: receives md_update message from pool %u\n",
-+			 srv_pool->member_id, cmd_msg->md_send_cmd.leader_id);
-+
-+		/* Check the pool mapped_sizes are consistent or not */
-+		if (pool->mapped_size && src_mapped_size && pool->mapped_size != src_mapped_size) {
-+			pr_err_ratelimited("This %s mapped_size %llu != src %d mapped_size %llu\n",
-+			       pool->poolname, pool->mapped_size, cmd_msg->md_send_cmd.leader_id,
-+			       src_mapped_size);
-+			goto out;
-+		}
-+
-+		if (cmd_msg->md_send_cmd.read_full_md) {
-+			if (work_info->datalen < sizeof(struct rmr_pool_md)) {
-+				pr_err("%s: buffer too small for full pool_md (%zu < %zu)\n",
-+				       __func__, work_info->datalen,
-+				       sizeof(struct rmr_pool_md));
-+				err = -EINVAL;
-+				goto out;
-+			}
-+			memcpy(work_info->data, &pool->pool_md, sizeof(struct rmr_pool_md));
-+		} else {
-+			/* If updating buf incurs error, it simply waits for next md_update. */
-+			rmr_srv_update_md_buf(srv_pool, work_info->data, work_info->datalen);
-+		}
-+
-+		break;
-+	case RMR_CMD_SEND_MD_BUF:
-+		/*
-+		 * Received the client pool metadata. Save it.
-+		 */
-+		sync = cmd_msg->send_md_buf_cmd.sync;
-+		flags = cmd_msg->send_md_buf_cmd.flags;
-+		if (flags == RMR_OP_MD_WRITE) {
-+			err = rmr_srv_md_process_buf(pool, work_info->data, sync);
-+			if (err) {
-+				pr_err("rmr_srv_write_md failed\n");
-+				goto out;
-+			}
-+
-+			if (atomic_read(&srv_pool->store_state)) {
-+				/* write back to disk */
-+				err = process_md_io(pool, NULL, 0, work_info->datalen, flags,
-+						    &pool->pool_md);
-+				if (err) {
-+					pr_err("Failed to process md io\n");
-+					goto out;
-+				}
-+			}
-+		}
-+
-+		if (!sync && flags == RMR_OP_MD_READ)
-+			memcpy(work_info->data, &pool->pool_md, sizeof(struct rmr_pool_md));
-+
-+		break;
-+	case RMR_CMD_SEND_DISCARD:
-+		/* Received the message to handle discards. */
-+		pr_info("%s: RMR_CMD_SEND_DISCARD for srv %u\n",
-+			__func__, cmd_msg->send_discard_cmd.member_id);
-+		if (!cmd_msg->sync) {
-+			err = rmr_pool_md_check_discard(pool, cmd_msg->send_discard_cmd.member_id);
-+			if (err > 0) {
-+				/* This node has received discards. */
-+				err = 0;
-+				pr_info("pool %s member_id %d has received discards\n",
-+					pool->poolname, srv_pool->member_id);
-+				goto out;
-+			}
-+		}
-+
-+		/*
-+		 * For sync requests, even if the server that is not in normal state has received
-+		 * the discard request, its dirty map is still outdated. However, non-sync
-+		 * requests can overlook this check and proceed discarding directly.
-+		 */
-+		if (cmd_msg->sync && atomic_read(&srv_pool->state) != RMR_SRV_POOL_STATE_NORMAL){
-+			pr_err("srv pool %s not in normal state for sync discard request\n",
-+				pool->poolname);
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		err = rmr_srv_discard_id(pool, 0, 0, cmd_msg->send_discard_cmd.member_id,
-+				cmd_msg->sync);
-+		if (err)
-+			pr_err("Failed to discard id\n");
-+
-+		break;
-+	case RMR_CMD_STORE_CHECK:
-+		pr_debug("%s: RMR_CMD_STORE_CHECK\n", __func__);
-+
-+		work_info->rsp->value = rmr_srv_pool_check_store(pool);
-+		pr_debug("pool %s member_id %d rsp with value=%llu\n",
-+			 pool->poolname, srv_pool->member_id,
-+			 work_info->rsp->value);
-+
-+		break;
-+	case RMR_CMD_MAP_GET_VER:
-+		pr_debug("%s: RMR_CMD_MAP_GET_VER\n", __func__);
-+
-+		work_info->rsp->value = pool->map_ver;
-+		pr_debug("pool %s member_id %d rsp with value=%llu\n",
-+			 pool->poolname, srv_pool->member_id,
-+			 work_info->rsp->value);
-+
-+		break;
-+	case RMR_CMD_MAP_SET_VER:
-+		pr_debug("%s: RMR_CMD_MAP_SET_VER\n", __func__);
-+
-+		pool->map_ver = work_info->cmd_msg->set_map_ver_cmd.map_ver;
-+		rmr_srv_mark_pool_md_dirty(srv_pool);
-+		break;
-+	case RMR_CMD_DISCARD_CLEAR_FLAG:
-+		pr_info("%s: RMR_CMD_DISCARD_CLEAR_FLAG\n", __func__);
-+
-+		md_i = rmr_pool_find_md(&pool->pool_md, cmd_msg->send_discard_cmd.member_id, false);
-+		if (md_i < 0) {
-+			pr_info("Didn't find md for member_id %u\n",
-+				cmd_msg->send_discard_cmd.member_id);
-+			goto out;
-+		}
-+
-+		pool->pool_md.srv_md[md_i].discard_entries = false;
-+		rmr_srv_flush_pool_md(srv_pool);
-+		break;
-+	case RMR_CMD_USER:
-+		pr_debug("%s: RMR_CMD_USER\n", __func__);
-+
-+		err = process_msg_user_cmd(srv_pool, cmd_msg, work_info->data, work_info->datalen);
-+		if (err) {
-+			pr_err("process_msg_user_cmd failed with err %d\n", err);
-+			goto out_no_rsp;
-+		}
-+
-+		goto out_no_rsp;
-+	default:
-+		pr_warn("%s: switch default type: %d\n", __func__, cmd_msg->cmd_type);
-+
-+		err = -EINVAL;
-+	}
-+
-+out:
-+	work_info->rsp->err = err;
-+	work_info->rsp->member_id = srv_pool->member_id;
-+	work_info->rsp->cmd_type = cmd_msg->cmd_type;
-+
-+out_no_rsp:
-+	// Should we return err in rdma_resp ?
-+	pr_debug("send rtrs completion from msg_cmd_handler, err:%d\n", err);
-+	rtrs_srv_resp_rdma(work_info->rtrs_op, err);
-+
-+	rmr_put_srv_pool(srv_pool);
-+	kfree(work_info);
-+}
-+
-+static int schedule_process_msg_cmd(struct rmr_srv_sess *srv_sess,
-+				    struct rtrs_srv_op *rtrs_op,
-+				    void *data, size_t datalen,
-+				    const void *msg, size_t len)
-+{
-+	struct rmr_srv_pool *srv_pool;
-+	const struct rmr_msg_pool_cmd *cmd_msg = msg;
-+	const char *poolname = cmd_msg->pool_name;
-+	struct rmr_cmd_work_info *work_info;
-+	u32 group_id = le32_to_cpu(cmd_msg->hdr.group_id);
-+
-+	pr_debug("pool %s received cmd %d\n",
-+		 poolname, cmd_msg->cmd_type);
-+
-+	srv_pool = rmr_find_and_get_srv_pool(group_id);
-+	if (IS_ERR(srv_pool)) {
-+		pr_err("Cmd %s: pool %s does not exists: %pe\n",
-+                        rmr_get_cmd_name(cmd_msg->cmd_type), poolname, srv_pool);
-+		return PTR_ERR(srv_pool);
-+	}
-+
-+	pr_debug("process_msg_cmd: pool %s found\n", poolname);
-+
-+	work_info = kzalloc(sizeof(struct rmr_cmd_work_info), GFP_KERNEL);
-+	if (!work_info) {
-+		pr_err("failed to allocate work info to send map\n");
-+		rmr_put_srv_pool(srv_pool);
-+		return -ENOMEM;
-+	}
-+	work_info->pool = srv_pool->pool;
-+	work_info->sess = srv_sess;
-+	work_info->rtrs = srv_sess->rtrs;
-+	work_info->rtrs_op = rtrs_op;
-+	work_info->cmd_msg = cmd_msg;
-+	work_info->rsp = data;
-+	work_info->data = data;
-+	work_info->datalen = datalen;
-+
-+	INIT_WORK(&work_info->cmd_work, process_msg_cmd_handler);
-+	schedule_work(&work_info->cmd_work);
-+
-+	return 0;
-+}
-+
-+static int rmr_srv_rdma_ev(void *priv, struct rtrs_srv_op *id,
-+			   void *data, size_t datalen,
-+			   const void *usr, size_t usrlen)
-+{
-+	struct rmr_srv_sess *srv_sess = priv;
-+	const struct rmr_msg_hdr *hdr = usr;
-+	int ret = 0;
-+	u16 type;
-+
-+	if (unlikely(WARN_ON(!srv_sess)))
-+		return -ENODEV;
-+
-+	type = le16_to_cpu(hdr->type);
-+
-+	switch (type) {
-+	case RMR_MSG_IO:
-+		return process_msg_io(srv_sess, id, data, datalen,
-+				      usr, usrlen);
-+	case RMR_MSG_MAP_CLEAR:
-+		ret = process_msg_map_clear(srv_sess, usr);
-+		break;
-+	case RMR_MSG_MAP_ADD:
-+		ret = process_msg_map_add(srv_sess, usr);
-+		break;
-+	case RMR_MSG_CMD:
-+		return schedule_process_msg_cmd(srv_sess, id, data, datalen,
-+						usr, usrlen);
-+	default:
-+		pr_warn("Received unexpected message type %d from session %s\n",
-+			type, srv_sess->sessname);
-+		return -EINVAL;
-+	}
-+
-+	rtrs_srv_resp_rdma(id, ret);
-+
-+	return 0;
-+}
-+
-+/**
-+ * rmr_srv_check_params() - Check the parameters of the storage node
-+ *
-+ * @srv_pool:	The rmr srv pool to check parameters for
-+ *
-+ * Description:
-+ *	Checks the device params with other connected server nodes.
-+ *
-+ * Return:
-+ *	0 on success.
-+ *	-Negative error code on failure.
-+ */
-+int rmr_srv_check_params(struct rmr_srv_pool *srv_pool)
-+{
-+	void *dev;
-+	int err;
-+
-+	/* If the store has not been added to this server pool, ignore device param checks. */
-+	if (!srv_pool->io_store)
-+		return 0;
-+
-+	dev = srv_pool->io_store->priv;
-+	err = srv_pool->io_store->ops->get_params(dev);
-+	if (err) {
-+		pr_err("%s: store get_params failed for pool %s, err %d\n",
-+		       __func__, srv_pool->pool->poolname, err);
-+		return err;
-+	}
-+	return 0;
-+}
-+EXPORT_SYMBOL(rmr_srv_check_params);
-+
-+static struct rtrs_srv_ops rtrs_ops;
-+static int __init rmr_srv_init_module(void)
++static int __init brmr_client_init(void)
 +{
 +	int err;
 +
-+	if (!is_power_of_2(chunk_size) ||
-+	    chunk_size < MIN_CHUNK_SIZE || chunk_size > MAX_CHUNK_SIZE) {
-+		pr_err("Loading module %s failed. Invalid chunk_size %u\n",
-+			KBUILD_MODNAME, chunk_size);
-+		pr_err("Chunk size should be a power of 2, and between (min %u - max %u)\n",
-+			MIN_CHUNK_SIZE, MAX_CHUNK_SIZE);
-+		return -EINVAL;
-+	}
++	pr_info("Loading module %s, version %s\n",
++		KBUILD_MODNAME, BRMR_VER_STRING);
 +
-+	pr_info("Loading module %s, version %s, proto %s, chunk_size %u\n",
-+		KBUILD_MODNAME, RMR_VER_STRING, RMR_PROTO_VER_STRING, chunk_size);
-+
-+	rtrs_ops = (struct rtrs_srv_ops){
-+		.rdma_ev = rmr_srv_rdma_ev,
-+		.link_ev = rmr_srv_link_ev,
-+	};
-+
-+	rmr_req_cachep = kmem_cache_create("rmr_req_cachep", sizeof(struct rmr_srv_req),
-+					   0, 0, NULL);
-+	if (!rmr_req_cachep) {
-+		pr_err("can not allocagte cachep for rmr_req\n");
-+		err = -ENOMEM;
++	brmr_major = register_blkdev(brmr_major, "brmr");
++	if (brmr_major <= 0) {
++		pr_err("Failed to load module,"
++		       " block device registration failed\n");
++		err = -EBUSY;
 +		goto out;
 +	}
-+	rmr_map_entry_cachep = kmem_cache_create("rmr_map_entry_cachep",
-+						 sizeof(struct rmr_map_entry),
-+						 0, 0, NULL);
-+	if (!rmr_map_entry_cachep) {
-+		pr_err("can not allocagte cachep for rmr_map_entry\n");
-+		err = -ENOMEM;
-+		goto req_destroy;
-+	}
 +
-+	BUILD_BUG_ON(PAGE_SIZE / sizeof(struct rmr_map_cbuf_hdr) < RMR_POOL_MAX_SESS);
-+
-+	rtrs_ctx = rtrs_srv_open(&rtrs_ops, RTRS_PORT);
-+	if (IS_ERR(rtrs_ctx)) {
-+		err = PTR_ERR(rtrs_ctx);
-+		pr_err("rtrs_srv_open(), err: %pe\n", rtrs_ctx);
-+		goto map_destroy;
-+	}
-+
-+	err = rmr_srv_create_sysfs_files();
-+	if (err) {
-+		pr_err("rmr_srv_create_sysfs_files(), err: %d\n", err);
-+		goto srv_close;
-+	}
-+
-+	return 0;
-+
-+srv_close:
-+	rtrs_srv_close(rtrs_ctx);
-+map_destroy:
-+	kmem_cache_destroy(rmr_map_entry_cachep);
-+req_destroy:
-+	kmem_cache_destroy(rmr_req_cachep);
++	err = brmr_clt_create_sysfs_files();
 +out:
 +	return err;
 +}
 +
-+static void __exit rmr_srv_cleanup_module(void)
++static void __exit brmr_client_exit(void)
 +{
-+	struct rmr_pool *pool, *tmp;
-+	struct rmr_srv_pool *srv_pool;
++	struct brmr_clt_dev *dev, *tmp;
 +
 +	pr_info("Unloading module\n");
-+	kmem_cache_destroy(rmr_req_cachep);
 +
-+	rtrs_srv_close(rtrs_ctx);
++	brmr_clt_destroy_sysfs_files();
++	unregister_blkdev(brmr_major, "brmr");
 +
-+	list_for_each_entry_safe (pool, tmp, &pool_list, entry) {
-+		srv_pool = (struct rmr_srv_pool *)pool->priv;
-+
-+		WARN_ON(!list_empty(&pool->sess_list));
-+		rmr_srv_destroy_pool(pool);
-+		rmr_srv_destroy_pool_sysfs_files(pool, NULL);
-+		rmr_put_srv_pool(srv_pool);
++	list_for_each_entry_safe(dev, tmp, &brmr_device_list, list) {
++		brmr_clt_close_device(dev, NULL);
 +	}
 +
-+	rmr_srv_destroy_sysfs_files();
-+	pr_info("Module unloaded\n");
++	ida_destroy(&index_ida);
++
++	pr_info("Module %s unloaded\n", KBUILD_MODNAME);
 +}
 +
-+module_init(rmr_srv_init_module);
-+module_exit(rmr_srv_cleanup_module);
++module_init(brmr_client_init);
++module_exit(brmr_client_exit);
 -- 
 2.43.0
 
