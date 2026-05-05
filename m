@@ -1,64 +1,64 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8FC3EF66B
-	for <linux-block@vger.kernel.org>; Tue,  5 May 2026 07:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B7A3C73F6
+	for <linux-block@vger.kernel.org>; Tue,  5 May 2026 07:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777967261; cv=none; b=b46CNQi/cG4pqf+kar3C2m8OhlhohLWG2v6z9yZjqEIeERnbVmBVIriVq2fBNRx18ClNLgL7TRaoH6ZGtrRzi6UJmqy4/WEd/zb7B7hTKnpJvWJEMPiCyz1lu4qydSiEoayqfzC71D8veq5TjWSOmnNJcQzRvjDInIkjI18IQwg=
+	t=1777967270; cv=none; b=W2jZZ6U9tkPkvqmW/efZwBC7O5HPoKib2TAyAlY1tnVJrEVYuF1DLVnRhcARtHMOp/k3KA9OvoIrSby1u+25iHZAHtVUkvHC4JtrYNXYcyIlugxIC5thQvheVAAwbLWwoQIIwuF+qL3AN7JYfkV/W4iaC2PCZy4Xd/4KWlEn/oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777967261; c=relaxed/simple;
-	bh=rq0+Z93obv5Grwn3XTm3Uy3Bjfophr5ZveAClvQUGtw=;
+	s=arc-20240116; t=1777967270; c=relaxed/simple;
+	bh=bNPMjRK/9zc5WmfGqTDIbzwmoE4hgIMJpwf3II1ievY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pmmAubKKNmhmzHUps1CTdHbbJfVbm0EXAEj57GEMNHkkbhdreWiEiySQgIwq2y3Q8/PwFivahZl/ZHjCG7GFdwnpT+5CaL1wM75ePWLOmHplaBlVTJu2gTZ/KSDbPMdNQWE6mkCvo9cn3hsUiGw/3hRJbb6t8tqy1rf6sN++ClI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=iaouXt76; arc=none smtp.client-ip=209.85.128.50
+	 MIME-Version; b=Qh8DMHOPTOsff7bM2r2oA7q9vOAD9yNhsoNGpXgUIq8C6IvQ2gve3gC70J72LS5J8E3WJIXYwJ4EtyQQZm9PsimqOq9xscjKqxqd9pHCCzTfygrbMD0SGI3hwXdAFcF2UZPI0GE0uGxFEaFX9oxBF5QSDNLSCo7QDz8hl6a8WN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=WbIFrHc4; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="iaouXt76"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so55350135e9.2
-        for <linux-block@vger.kernel.org>; Tue, 05 May 2026 00:47:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="WbIFrHc4"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4852b81c73aso36605445e9.3
+        for <linux-block@vger.kernel.org>; Tue, 05 May 2026 00:47:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1777967257; x=1778572057; darn=vger.kernel.org;
+        d=ionos.com; s=google; t=1777967266; x=1778572066; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HpmOvPSjAFgS0P/3F7aPn9za6o6h9Wu4IxiKRKRNKUY=;
-        b=iaouXt766ZjYdl0TkOOT5T4G3s394wOzusH3PVVrH2yE60AdktCjFLLN3VLLhGkHe/
-         FRFJ4YNnworfjcOmfXNNU7is6dNOPwHbRoe+caulK77Cfh1zzgkc8FgO1bvWCL+p1rsf
-         xogMfmVo76z+Yq6dQxpY2G78letwol8WLLmBEmR7UERrKAzkfDtjrF7LjFKPgIHGOBTr
-         qsM7HS6y8sopBCEe+++ppSdrcU6JWzjRTcJmqJbKyqZeZBqJ17aE5zmEvjlQlL6WptpY
-         xaZhTnFTN64Vm9ZbEq9/Y4SRUb5E/CfE+yQdoon6zCiy7U+Ii8chPXZ0308XA7gLixbO
-         P/eA==
+        bh=BwY0oJ9mAmiBb5l+7tRNvn9yezGrGkzpmxT/seGzEBM=;
+        b=WbIFrHc4wse9dTxevUn4s/4Kt8MbMSpcCgKeIuCP1Bp5be/lAN1pcai8m8OkaZ9Njb
+         JRzYLamsc4QZAYcDnR/0iHrVbXC79iU5KIGY5F6N6Hxo2Eo+gYL1ZiUEJqSFR2hKEjzU
+         jPWC9giBEn7BIOQcDcZe3T7++TjOQ6ZMVSGfMQ8Lq+SZIQth8HdPxkBYXOhEYUcOCjuO
+         KrsPdbeneVu5n10+/3DVpdhnVn36yIcwW3ol765VI1+Upr829v+ab06HvEZ5nn4zNL/t
+         z71M/yNwU/mKy362hZi5si4J01ywgibGQUzoWtt4Rri3/8sh/3/kgNZ5xRfCFrXW+LNw
+         2XGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777967257; x=1778572057;
+        d=1e100.net; s=20251104; t=1777967266; x=1778572066;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=HpmOvPSjAFgS0P/3F7aPn9za6o6h9Wu4IxiKRKRNKUY=;
-        b=BGbKOFOWDOGtgg7nc6rIg4VaLFGZFFDLDSDQcI4F5lpXuRXWNIojHWlR5FLpkzL+8Z
-         0ZESd4peDIdR2BI009QJsJcpdSKR+ODRYQKjmgk6fstPjj3iW3vq63vBjfKWrD+7WqQ5
-         Wnlcrc0zJ/0HhsZXmEU88hkPSu+SViXukRLC/KT9YthGtbaxy6NCWtEIGfkxqECXsSGx
-         Qj1RlkJyIhZBBtegW0mDVFkfL0sZvjRdJwQUl+n0CeXfnXljv8CMF9dZMauJZgAlSRpI
-         qNZMbKXBjzsaauxmhN4PJeKoyhT8NZVi9sg7FWvGa+9oUjD0WWnan8p+TGTvYTarBYRp
-         ax8g==
-X-Gm-Message-State: AOJu0YxeWo4TMb+1l26saMB5c27jCloRa1aMG0krTfMEHQIn7KjzHa13
-	rX8fk0JPcCW+ETaEwBGipvAD+0U8zEMMptuA1U6OpvRW2HF+FBHDEIS+1snzfhzH4u8pNGAxZ6E
-	IxgKnFEz0mw==
-X-Gm-Gg: AeBDietsmA4p5BALX3B/js9FLX4K3J2Rzv8/OQMM7qfEDrD5sn2BdaVzlSzxK3iqTDo
-	6hvlt5wtkkzS7Dihu0bVYUf3OHUfLd0BFWVpjFJaNg3ulHN2zEtxVbOk4U0nazMtK+L0qTPDdb9
-	/tJnDdlUrb6pqhhI7xFjr74nHdn8DOTbswZv5Km4WX+cofuyZksXfIy3rCQ3w0pHE1uocCHfmgJ
-	KAvDKzunuSZ/F7ntgqV/O67tHkp4p+FaJ4Br5208tEFYvDNYL39G9g9xYmQUrWbBWvJwDe+mjQH
-	rELIP7JG8FdPJcH7JYdNMT/8cnN3CY3TyR/icsbRvn9/xbzerDyjAFkjPdkPd4S7BFBG8uoBoxu
-	7JjrNBVZmKf9BEkPUvW2gmB/e3VDP90PF/dLR1X16iwuIFutGlY5jwVICKcUjZhBQHsPZVImwZm
-	7C449zFx5gr+VpEhDo9MzHlfCxBomboIic3ZgfhYA7kX6yAa/oyhbriiARrJjrcXByW5NBp0acv
-	pf5TAJcLqUc7rTIRvxMDklHPKMAsFOW0P6+Ni0+hZljUsvdSEk68RK/
-X-Received: by 2002:a05:600c:a118:b0:48a:7676:30bc with SMTP id 5b1f17b1804b1-48a9865e188mr159801435e9.14.1777967257408;
-        Tue, 05 May 2026 00:47:37 -0700 (PDT)
+        bh=BwY0oJ9mAmiBb5l+7tRNvn9yezGrGkzpmxT/seGzEBM=;
+        b=YD0mild3ADYDkFNKpkamhEn+hwCw0BtoJawPkEBfGJbw8CmOwUDWVa4iRf1DQs91AG
+         YguNCpbX0chepn4xhI/yW+nEqxtKfwxKINtL7NhYpfTu4IbmkWJp3kf1QyO+qKuGXRVK
+         aniic3/aNz3od04qyB/N9vKqKfVdyNChoQwnKfKqSGoHPfPsZSXMlEMoLz5Tr4zKhsG9
+         4nmsl1GefDJBeLzERP4vT2zUeMBDTDFmFbp/kQJ5BoC0236Kkb3JU4DCXgBI+Oa//Smd
+         pfK8A8WwrF3hTU7puicj07YO4tb9BVgLzkLQC48qMmbrcwiCtNIBd5PQe5VjBDsQHJnh
+         ZmWA==
+X-Gm-Message-State: AOJu0Yx1CDf+T6dyuuHFOpVfTA7ve3ZImhA3rCn+TCvqCjHvkJkanEgc
+	D70Omm3JDWhk736WqgZYrR2ESqmVmn7Rm1DlVXxzMr3TR3E+gQGlRuOxGgXSyINmvIePbl1W0AA
+	cRMFXlNhTwA==
+X-Gm-Gg: AeBDiev5eC62l+QwjjHbTUvm9bgwr5qkqaytdc9cvPyQWBCjEThrFd6nt8US462d6bD
+	p3ufBY1eg9SDG607GNWybahrWNPVZfmwQ8K374V2aBfAxW/pPtbwkV+8xXUimfAJOwZMQnzhavd
+	V0ZPAYnXh/xftG1IbIq7ZFwDzxxgnFmFrrObA6BWZfqnsXfSHCXHwiYN0zS9PfuQnbhNZ5GRmqH
+	3IhpmbYmZzcjovJLRnNah3qdKkRC1frYpPiRF3Y8Nm+YTexHPufbucH9jGKl4MjwnnPYhOptEcx
+	pO9uBjTyrnr7Fzs9Pl5Lzrg8e68vD4wZ5aEcF6u1HWNsH7eochEUiBA3MkLT6G0W8s/7oMcCS9L
+	JSwcr/+FX89FHNUl/P9Ud+afKakqcEXP2JdcwQsQaIUlEGv6P9h3eu9Zos+qi/vF+C9dKSfSBhi
+	Cd6/HnsqjoqIxoYPdcfgH5NC58TCpkXcYdhhFRXCFtj+2JnuYVAG9ztBXppAXfx25jZJhF5Ah08
+	+Tw+hSLj7Fx+dLYuyUtsweBPY3VyxW1lTJUucPXSXl6FQ==
+X-Received: by 2002:a05:600c:a30a:b0:489:149a:f9e6 with SMTP id 5b1f17b1804b1-48d18cef14dmr19006305e9.28.1777967265550;
+        Tue, 05 May 2026 00:47:45 -0700 (PDT)
 Received: from lb03189.fkb.profitbricks.net ([213.147.98.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48d186d97c4sm10617125e9.35.2026.05.05.00.47.34
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48d186d97c4sm10617125e9.35.2026.05.05.00.47.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2026 00:47:37 -0700 (PDT)
+        Tue, 05 May 2026 00:47:44 -0700 (PDT)
 From: Md Haris Iqbal <haris.iqbal@ionos.com>
 To: linux-block@vger.kernel.org,
 	linux-rdma@vger.kernel.org
@@ -71,9 +71,9 @@ Cc: linux-kernel@vger.kernel.org,
 	jinpu.wang@ionos.com,
 	Md Haris Iqbal <haris.iqbal@ionos.com>,
 	Jia Li <jia.li@ionos.com>
-Subject: [PATCH 10/13] block/brmr: client: sysfs interface functions
-Date: Tue,  5 May 2026 09:46:22 +0200
-Message-ID: <20260505074644.195453-11-haris.iqbal@ionos.com>
+Subject: [PATCH 12/13] block/brmr: server: sysfs interface functions
+Date: Tue,  5 May 2026 09:46:24 +0200
+Message-ID: <20260505074644.195453-13-haris.iqbal@ionos.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260505074644.195453-1-haris.iqbal@ionos.com>
 References: <20260505074644.195453-1-haris.iqbal@ionos.com>
@@ -85,11 +85,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the BRMR client sysfs interface used to map and unmap remote
-devices.  Writes to /sys/devices/virtual/brmr-client/ctl/map_device
-trigger creation of a /dev/brmrN gendisk backed by the named RMR
-pool; per-device attribute groups expose the device state and
-statistics, and accept unmap requests.
+Add the BRMR server sysfs interface used to register and unregister
+backing block devices.  Writes to
+/sys/devices/virtual/brmr-server/ctl/map_device open the named
+block device, validate or initialise its on-disk metadata, and
+register it with RMR as the IO store for the named pool.
 
 This file is not compiled until the modules are wired into the
 build in a later patch in this series.
@@ -97,75 +97,90 @@ build in a later patch in this series.
 Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
 Signed-off-by: Jia Li <jia.li@ionos.com>
 ---
- drivers/block/brmr/brmr-clt-sysfs.c | 463 ++++++++++++++++++++++++++++
- 1 file changed, 463 insertions(+)
- create mode 100644 drivers/block/brmr/brmr-clt-sysfs.c
+ drivers/block/brmr/brmr-srv-sysfs.c | 707 ++++++++++++++++++++++++++++
+ 1 file changed, 707 insertions(+)
+ create mode 100644 drivers/block/brmr/brmr-srv-sysfs.c
 
-diff --git a/drivers/block/brmr/brmr-clt-sysfs.c b/drivers/block/brmr/brmr-clt-sysfs.c
+diff --git a/drivers/block/brmr/brmr-srv-sysfs.c b/drivers/block/brmr/brmr-srv-sysfs.c
 new file mode 100644
-index 000000000000..7d2435acac6a
+index 000000000000..7e413eb258bb
 --- /dev/null
-+++ b/drivers/block/brmr/brmr-clt-sysfs.c
-@@ -0,0 +1,463 @@
++++ b/drivers/block/brmr/brmr-srv-sysfs.c
+@@ -0,0 +1,707 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Block device over RMR (BRMR)
 + *
 + * Copyright (c) 2026 IONOS SE
 + */
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
-+
++#include <linux/kernel.h>
 +#include <linux/types.h>
 +#include <linux/ctype.h>
 +#include <linux/parser.h>
 +#include <linux/module.h>
++#include <linux/fs.h>
 +#include <linux/uaccess.h>
 +#include <linux/device.h>
++#include <linux/slab.h>
 +
-+#include "brmr-clt.h"
++#include "brmr-srv.h"
++#include "rmr-srv.h"
 +
-+static struct device *brmr_dev;
-+static struct class *brmr_dev_class;
-+static struct kobject *brmr_devs_kobj;
++#undef pr_fmt
++#define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
++
++static struct class *rmr_str_class;
++static struct device *rmr_ctl_dev;
++static struct device *rmr_strs_dev;
 +
 +enum {
-+	BRMR_OPT_ERR		= 0,
-+	BRMR_OPT_POOL		= 1 << 1,
-+	BRMR_OPT_SIZE		= 1 << 2,
++	BRMR_SRV_STR_OPT_ERR = 0,
++	BRMR_SRV_STR_OPT_DEVICE = 1 << 0,
++	BRMR_SRV_STR_OPT_POOL = 1 << 2,
++	BRMR_SRV_STR_OPT_MAPPED_SIZE = 1 << 3,
++	BRMR_SRV_STR_OPT_MODE = 1 << 4,
 +};
 +
-+static int brmr_clt_create_dev_sysfs_files(struct brmr_clt_dev *dev);
-+static int brmr_add_dev_symlink(struct brmr_clt_dev *dev);
-+
-+static unsigned int brmr_opt_mandatory[] = {
-+	BRMR_OPT_POOL,
++static const unsigned int rmr_str_opt_mandatory[] = {
++	BRMR_SRV_STR_OPT_POOL,
++	BRMR_SRV_STR_OPT_DEVICE,
++	BRMR_SRV_STR_OPT_MAPPED_SIZE,
 +};
 +
-+static const match_table_t brmr_opt_tokens = {
-+	{	BRMR_OPT_POOL,		"pool=%s"	},
-+	{	BRMR_OPT_SIZE,		"size=%s"	},
-+	{	BRMR_OPT_ERR,		NULL		},
++static const match_table_t rmr_str_opt_tokens = {
++	{ BRMR_SRV_STR_OPT_POOL, "pool=%s" },
++	{ BRMR_SRV_STR_OPT_DEVICE, "device=%s" },
++	{ BRMR_SRV_STR_OPT_MAPPED_SIZE, "mapped_size=%s" },
++	{ BRMR_SRV_STR_OPT_MODE, "mode=%s" },
++	{ BRMR_SRV_STR_OPT_ERR, NULL },
 +};
 +
-+/* remove new line from string */
-+static void strip(char *s)
++struct brmr_srv_str_options {
++	char *pool;
++	char *device;
++	unsigned long mapped_size;
++};
++
++static void brmr_srv_remove_store(struct brmr_srv_blk_dev *dev, struct kobj_attribute *attr,
++				  bool delete)
 +{
-+	char *p = s;
++	mutex_lock(&store_mutex);
 +
-+	while (*s != '\0') {
-+		if (*s != '\n')
-+			*p++ = *s++;
-+		else
-+			++s;
-+	}
-+	*p = '\0';
++	blk_str_destroy_sysfs_files(dev, &attr->attr);
++
++	brmr_srv_blk_close(dev, delete);
++
++	pr_info("put blkdev %s\n", dev->bdev->bd_disk->disk_name);
++	bdev_fput(dev->bdev_file);
++
++	pr_info("%s store %s, store name %s.\n", (delete ? "Delete" : "Remove"),
++		dev->name, dev->poolname);
++	brmr_srv_blk_destroy(dev);
++	mutex_unlock(&store_mutex);
 +}
 +
-+static int brmr_clt_parse_options(const char *buf,
-+			      char *pool,
-+			      unsigned long *size)
++static int brmr_srv_parse_add_opts(const char *buf, struct brmr_srv_str_options *opt,
++				   unsigned int *replace)
 +{
 +	char *options, *sep_opt;
 +	char *p;
@@ -180,66 +195,107 @@ index 000000000000..7d2435acac6a
 +		return -ENOMEM;
 +
 +	sep_opt = strstrip(options);
-+	strip(sep_opt);
 +	while ((p = strsep(&sep_opt, " ")) != NULL) {
 +		if (!*p)
 +			continue;
 +
-+		token = match_token(p, brmr_opt_tokens, args);
++		token = match_token(p, rmr_str_opt_tokens, args);
 +		opt_mask |= token;
 +
 +		switch (token) {
-+		case BRMR_OPT_POOL:
++		case BRMR_SRV_STR_OPT_POOL:
 +			p = match_strdup(args);
 +			if (!p) {
 +				ret = -ENOMEM;
 +				goto out;
 +			}
 +			if (strlen(p) > NAME_MAX) {
-+				pr_err("poolname too long\n");
++				pr_err("add_store: pool name is too long\n");
 +				ret = -EINVAL;
 +				kfree(p);
 +				goto out;
 +			}
-+			strscpy(pool, p, NAME_MAX);
++			strscpy(opt->pool, p, NAME_MAX);
 +			kfree(p);
 +			break;
 +
-+		case BRMR_OPT_SIZE:
++		case BRMR_SRV_STR_OPT_DEVICE:
++			p = match_strdup(args);
++			if (!p) {
++				ret = -ENOMEM;
++				goto out;
++			}
++			if (strlen(p) > NAME_MAX) {
++				pr_err("add_store: device name is too long\n");
++				ret = -EINVAL;
++				kfree(p);
++				goto out;
++			}
++			strscpy(opt->device, p, NAME_MAX);
++			kfree(p);
++			break;
++
++		case BRMR_SRV_STR_OPT_MAPPED_SIZE:
 +			p = match_strdup(args);
 +			if (!p) {
 +				ret = -ENOMEM;
 +				goto out;
 +			}
 +
-+			/*
-+			 * The conventional semantics are that if the number begins with 0x, it will
-+			 * be parsed as hexadecimal; if it begins with 0, it will be parsed as
-+			 * octal; otherwise, it will be parsed as decimal.
-+			 */
-+			ret = kstrtoul(p, 0, size);
++			ret = kstrtoul(p, 0, &opt->mapped_size);
 +			if (ret) {
-+				pr_err("size '%s' isn't an integer: %d\n", p, ret);
++				pr_err("mapped_size isn't an integer: %d\n", ret);
++				kfree(p);
++				goto out;
++			}
++
++			if (opt->mapped_size == 0) {
++				pr_err("mapped_size cannot be 0\n");
++				ret = -EINVAL;
++				kfree(p);
++				goto out;
++			}
++
++			kfree(p);
++			break;
++
++		case BRMR_SRV_STR_OPT_MODE:
++			if (!replace) {
++				pr_err("%s: mode option not supported here\n", __func__);
++				ret = -EINVAL;
++				goto out;
++			}
++
++			p = match_strdup(args);
++			if (!p) {
++				ret = -ENOMEM;
++				goto out;
++			}
++
++			if (!strcmp(p, "replace")) {
++				*replace = true;
++			} else {
++				pr_err("%s: Unknown mode '%s'\n", __func__, p);
++				ret = -EINVAL;
 +				kfree(p);
 +				goto out;
 +			}
 +			kfree(p);
 +			break;
 +
-+
 +		default:
-+			pr_err("unknown parameter or missing value"
-+			       " '%s'\n", p);
++			pr_err("add_store: Unknown parameter or missing value '%s'\n",
++			       p);
 +			ret = -EINVAL;
 +			goto out;
 +		}
 +	}
 +
-+	for (i = 0; i < ARRAY_SIZE(brmr_opt_mandatory); i++) {
-+		if ((opt_mask & brmr_opt_mandatory[i])) {
++	for (i = 0; i < ARRAY_SIZE(rmr_str_opt_mandatory); i++) {
++		if ((opt_mask & rmr_str_opt_mandatory[i])) {
 +			ret = 0;
 +		} else {
-+			pr_err("parameters missing\n");
++			pr_err("add_store: Parameters missing\n");
 +			ret = -EINVAL;
 +			break;
 +		}
@@ -250,69 +306,463 @@ index 000000000000..7d2435acac6a
 +	return ret;
 +}
 +
-+static ssize_t brmr_map_device_show(struct kobject *kobj,
-+				    struct kobj_attribute *attr,
-+				    char *page)
++static ssize_t blk_str_dev_size_show(struct kobject *kobj,
++				     struct kobj_attribute *attr, char *page)
 +{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo \""
-+			 "pool=<name of the RMR pool> "
-+			 "size=<size of the volume in sectors>\" > %s\n",
-+			 attr->attr.name);
++	struct brmr_srv_blk_dev *dev;
++
++	dev = container_of(kobj, struct brmr_srv_blk_dev, kobj);
++
++	return sysfs_emit(page, "%llu\n", dev->dev_size);
 +}
 +
-+static ssize_t brmr_map_device_store(struct kobject *kobj,
-+				     struct kobj_attribute *attr,
-+				     const char *buf, size_t count)
++static struct kobj_attribute blk_str_dev_size_attr =
++	__ATTR(dev_size, 0644, blk_str_dev_size_show, NULL);
++
++static ssize_t blk_str_mapped_size_show(struct kobject *kobj,
++					struct kobj_attribute *attr, char *page)
 +{
-+	struct brmr_clt_dev *dev;
-+	char pool[NAME_MAX];
-+	unsigned long size = 0;
-+	int ret;
++	struct brmr_srv_blk_dev *dev;
 +
-+	ret = brmr_clt_parse_options(buf, pool, &size);
-+	if (ret)
-+		goto err;
++	dev = container_of(kobj, struct brmr_srv_blk_dev, kobj);
 +
-+	dev = find_and_get_device(pool);
-+	if (dev) {
-+		pr_err("Device exists and opened as %s\n",
-+		       dev->gd->disk_name);
-+		brmr_clt_put_dev(dev);
-+		ret = -EEXIST;
-+		goto err;
++	return sysfs_emit(page, "%llu\n", dev->mapped_size);
++}
++
++static struct kobj_attribute blk_str_mapped_size_attr =
++	__ATTR(mapped_size, 0644, blk_str_mapped_size_show, NULL);
++
++static ssize_t blk_str_bdev_name_show(struct kobject *kobj,
++				      struct kobj_attribute *attr, char *page)
++{
++	struct brmr_srv_blk_dev *dev;
++
++	dev = container_of(kobj, struct brmr_srv_blk_dev, kobj);
++
++	return sysfs_emit(page, "%s\n", dev->name);
++}
++
++static struct kobj_attribute blk_str_bdev_name_attr =
++	__ATTR(bdev_name, 0644, blk_str_bdev_name_show, NULL);
++
++static ssize_t blk_str_remove_store_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 to remove the store\n");
++}
++
++static ssize_t blk_str_remove_store_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct brmr_srv_blk_dev *dev;
++
++	dev = container_of(kobj, struct brmr_srv_blk_dev, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		pr_err("%s, %s unknown value: '%s'\n",
++		       dev->name, attr->attr.name, buf);
++		return -EINVAL;
 +	}
 +
-+	dev = brmr_clt_map_device(pool, size);
-+	if (IS_ERR(dev)) {
-+		pr_err("Error mapping device to pool %s\n", pool);
-+		ret = PTR_ERR(dev);
-+		goto err;
-+	}
-+	ret = brmr_clt_create_dev_sysfs_files(dev);
-+	if (ret)
-+		goto close_device;
-+
-+	ret = brmr_add_dev_symlink(dev);
-+	if (ret)
-+		goto destroy_sysfs;
++	brmr_srv_remove_store(dev, attr, false);
 +
 +	return count;
++}
 +
-+destroy_sysfs:
-+	sysfs_remove_link(&dev->kobj, BRMR_LINK_NAME);
-+	brmr_clt_destroy_dev_sysfs_files(dev, NULL);
-+close_device:
-+	brmr_clt_close_device(dev, NULL);
-+err:
++static struct kobj_attribute blk_str_remove_store_attr =
++	__ATTR(remove_store, 0644,
++	       blk_str_remove_store_show, blk_str_remove_store_store);
++
++static ssize_t blk_str_delete_store_show(struct kobject *kobj,
++					 struct kobj_attribute *attr,
++					 char *page)
++{
++	return scnprintf(page, PAGE_SIZE, "Usage: echo 1 to delete the store\n");
++}
++
++static ssize_t blk_str_delete_store_store(struct kobject *kobj,
++					  struct kobj_attribute *attr,
++					  const char *buf, size_t count)
++{
++	struct brmr_srv_blk_dev *dev;
++
++	dev = container_of(kobj, struct brmr_srv_blk_dev, kobj);
++	if (!sysfs_streq(buf, "1")) {
++		pr_err("%s, %s unknown value: '%s'\n",
++		       dev->name, attr->attr.name, buf);
++		return -EINVAL;
++	}
++
++	brmr_srv_remove_store(dev, attr, true);
++
++	return count;
++}
++
++static struct kobj_attribute blk_str_delete_store_attr =
++	__ATTR(delete_store, 0644,
++	       blk_str_delete_store_show, blk_str_delete_store_store);
++
++static ssize_t state_show(struct kobject *kobj,
++			  struct kobj_attribute *attr, char *page)
++{
++	struct brmr_srv_blk_dev *dev;
++	size_t count = 0;
++
++	dev = container_of(kobj, struct brmr_srv_blk_dev, kobj);
++
++	if (test_bit(BRMR_SRV_STORE_OPEN, &dev->state))
++		count += sysfs_emit_at(page, count, "open\n");
++	else
++		count += sysfs_emit_at(page, count, "closed\n");
++
++	if (test_bit(BRMR_SRV_STORE_MAPPED, &dev->state))
++		count += sysfs_emit_at(page, count, "mapped\n");
++	else
++		count += sysfs_emit_at(page, count, "unmapped\n");
++
++	return count;
++}
++
++static struct kobj_attribute blk_str_state_attr =
++	__ATTR_RO(state);
++
++static struct attribute *blk_str_map_attrs[] = {
++	&blk_str_dev_size_attr.attr,
++	&blk_str_mapped_size_attr.attr,
++	&blk_str_bdev_name_attr.attr,
++	&blk_str_remove_store_attr.attr,
++	&blk_str_delete_store_attr.attr,
++	&blk_str_state_attr.attr,
++	NULL,
++};
++ATTRIBUTE_GROUPS(blk_str_map);
++
++static struct kobj_type blk_str_device_ktype = {
++	.sysfs_ops = &kobj_sysfs_ops,
++	.default_groups = blk_str_map_groups,
++};
++
++static int blk_str_create_sysfs_files(struct brmr_srv_blk_dev *dev)
++{
++	int ret;
++
++	ret = kobject_init_and_add(&dev->kobj, &blk_str_device_ktype,
++				   &rmr_strs_dev->kobj,
++				   "%s", dev->poolname);
++	if (ret)
++		pr_err("Failed to create sysfs dir for store %s, name %s, err=%d\n",
++		       dev->name, dev->poolname, ret);
++
 +	return ret;
 +}
 +
-+static struct kobj_attribute brmr_map_device_attr =
-+	__ATTR(map_device, 0644,
-+	       brmr_map_device_show, brmr_map_device_store);
++void blk_str_destroy_sysfs_files(struct brmr_srv_blk_dev *dev,
++				 const struct attribute *sysfs_self)
++{
++	if (sysfs_self)
++		sysfs_remove_file_self(&dev->kobj, sysfs_self);
++
++	kobject_del(&dev->kobj);
++	kobject_put(&dev->kobj);
++}
++
++/**
++ * brmr_srv_blk_dev_exit() - Destroy and put the blkdev
++ *
++ * @dev:	RMR block device structure to be used.
++ *
++ * Description:
++ *	This function gives up the blkdev reference, and destroys the rmr block device
++ */
++static void brmr_srv_blk_dev_exit(struct brmr_srv_blk_dev *dev)
++{
++	pr_info("%s: put blkdev %s\n", __func__, dev->name);
++	bdev_fput(dev->bdev_file);
++
++	brmr_srv_blk_destroy(dev);
++}
++
++/**
++ * brmr_srv_blk_dev_init() - Create and initialize a brmr server store block device
++ *
++ * @pool_name:	Name to be given to the created rmr block device
++ * @dev_name:	path to the block device
++ * @mapped_size:mapped size of the block device
++ *
++ * Description:
++ *	This function checks whether the rmr pool is available to be registered.
++ *	It then creates the block device, and initializes it.
++ *
++ * Return:
++ *	Pointer to the created rmr block device on success
++ *	Error pointer on error
++ */
++static struct brmr_srv_blk_dev *brmr_srv_blk_dev_init(char *pool_name, char *dev_name,
++						      u64 mapped_size)
++{
++	struct file *bdev_file;
++	struct brmr_srv_blk_dev *dev;
++
++	dev = brmr_srv_blk_create(dev_name, pool_name);
++	if (IS_ERR(dev)) {
++		pr_err("failed to alloc store for device %s: %pe\n", pool_name, dev);
++		return dev;
++	}
++
++	bdev_file = bdev_file_open_by_path(dev_name, DEFAULT_BLK_OPEN_FLAGS,
++					   dev, NULL);
++	if (IS_ERR(bdev_file)) {
++		pr_err("%s: bdev_file_open_by_path for device %s failed with err (%pe)\n",
++		       __func__, dev_name, bdev_file);
++		brmr_srv_blk_destroy(dev);
++		return ERR_CAST(bdev_file);
++	}
++
++	dev->bdev_file = bdev_file;
++	dev->bdev = file_bdev(bdev_file);
++	dev->dev_size = get_capacity(dev->bdev->bd_disk);
++	strscpy(dev->name, dev->bdev->bd_disk->disk_name, sizeof(dev->name));
++
++	if (mapped_size < BLK_STR_MIN_MAPPED_SIZE) {
++		pr_err("%s: Given mapped size %llu less than minimum default(%lu) for dev %s\n",
++		       __func__, mapped_size, BLK_STR_MIN_MAPPED_SIZE, dev->name);
++		brmr_srv_blk_dev_exit(dev);
++		return ERR_PTR(-ENOSPC);
++	}
++
++	if (mapped_size + BLK_STR_MD_SIZE_SECTORS > dev->dev_size) {
++		pr_err("can not map %llu, only %llu available %s\n",
++		       mapped_size, dev->dev_size - BLK_STR_MD_SIZE_SECTORS, dev->name);
++		brmr_srv_blk_dev_exit(dev);
++		return ERR_PTR(-ENOSPC);
++	}
++
++	dev->mapped_size = mapped_size;
++
++	pr_info("%s: succeeded\n", __func__);
++
++	return dev;
++}
++
++static ssize_t brmr_srv_create_store_store(struct kobject *kobj,
++				       struct kobj_attribute *attr,
++				       const char *buf, size_t count)
++{
++	struct brmr_srv_str_options opt;
++	char dev_name[NAME_MAX];
++	char pool_name[NAME_MAX];
++	struct brmr_srv_blk_dev *dev;
++	struct brmr_srv_blk_dev_meta *md_page;
++	int md_state, err;
++
++	opt.pool = pool_name;
++	opt.device = dev_name;
++	opt.mapped_size = 0;
++
++	if (brmr_srv_parse_add_opts(buf, &opt, NULL))
++		goto out;
++
++	md_page = kzalloc(PAGE_SIZE, GFP_KERNEL);
++	if (!md_page) {
++		pr_err("%s: Failed to allocate page to read md\n", __func__);
++		goto out;
++	}
++
++	mutex_lock(&store_mutex);
++
++	dev = brmr_srv_blk_dev_init(pool_name, dev_name, opt.mapped_size);
++	if (IS_ERR(dev)) {
++		pr_err("%s: brmr_srv_blk_dev_init failed: %pe\n", __func__, dev);
++		goto mut_unlock;
++	}
++
++	md_state = brmr_srv_read_and_check_md(dev, md_page);
++	if (md_state != -1) {
++		/*
++		 * read and check md failed. It could be read error or that md exists
++		 */
++		pr_err("%s: md read and check failed: %d\n", __func__, md_state);
++		goto dev_exit;
++	}
++
++	err = brmr_srv_blk_open(dev, dev_name, true, false);
++	if (err) {
++		pr_err("failed to open %s, err %d\n", dev_name, err);
++		goto dev_exit;
++	}
++
++	err = blk_str_create_sysfs_files(dev);
++	if (err) {
++		pr_err("failed to create sysfs files\n");
++		goto dev_close;
++	}
++
++	mutex_unlock(&store_mutex);
++	pr_info("Created new blk store for %s, with disk %s\n", pool_name, dev_name);
++
++	kfree(md_page);
++	return count;
++
++dev_close:
++	brmr_srv_blk_close(dev, true);
++dev_exit:
++	brmr_srv_blk_dev_exit(dev);
++mut_unlock:
++	mutex_unlock(&store_mutex);
++	kfree(md_page);
++out:
++	return -EINVAL;
++}
++
++static ssize_t brmr_srv_create_store_show(struct kobject *kobj,
++				      struct kobj_attribute *attr,
++				      char *page)
++{
++	return scnprintf(page, PAGE_SIZE,
++			 "Usage: echo \"pool=<name of the rmr pool> device=<full path of block device> mapped_size=<size of given block device to be mapped>\" > %s\n\n",
++			 attr->attr.name);
++}
++
++static struct kobj_attribute brmr_srv_create_store_attr =
++	__ATTR(create_store, 0644,
++	       brmr_srv_create_store_show, brmr_srv_create_store_store);
++
++static ssize_t brmr_srv_add_store_store(struct kobject *kobj, struct kobj_attribute *attr,
++				       const char *buf, size_t count)
++{
++	struct brmr_srv_blk_dev *dev;
++	char dev_name[NAME_MAX];
++	char pool_name[NAME_MAX];
++	struct brmr_srv_str_options opt;
++	struct brmr_srv_blk_dev_meta *md_page;
++	int md_state, ret;
++	unsigned int replace = false;
++
++	opt.pool = pool_name;
++	opt.device = dev_name;
++	opt.mapped_size = 0;
++
++	if (brmr_srv_parse_add_opts(buf, &opt, &replace))
++		goto out;
++
++	/*
++	 * Disable replace mode for now.
++	 * Most of the code for replace mode to work is present, but there are some
++	 * edge cases which needs work, and a info exchange between storage nodes which
++	 * needs to be added.
++	 */
++	if (replace) {
++		pr_err("%s: Replace mode not supported yet\n", __func__);
++		goto out;
++	}
++
++	md_page = kzalloc(PAGE_SIZE, GFP_KERNEL);
++	if (!md_page) {
++		pr_err("Failed to allocate page to read md\n");
++		goto out;
++	}
++
++	mutex_lock(&store_mutex);
++
++	dev = brmr_srv_blk_dev_init(pool_name, dev_name, opt.mapped_size);
++	if (IS_ERR(dev)) {
++		pr_err("brmr_srv_blk_dev_init failed: %pe\n", dev);
++		goto mut_unlock;
++	}
++
++	md_state = brmr_srv_read_and_check_md(dev, md_page);
++	if (md_state == -1) {
++		/*
++		 * md doesn't exists. This means the disk is an empty one.
++		 * We have to replace, so check the mode first
++		 */
++		if (!replace) {
++			pr_err("%s: Incorrect mode %d. md doesn't exists\n", __func__, replace);
++			goto dev_exit;
++		}
++
++		/*
++		 * we have to do the following,
++		 *
++		 * 1) Check params like mapped size from at least one other storage node
++		 * 2) Do discard
++		 */
++		pr_info("%s: No md found. Replacing disk %s for pool %s, size %llu\n",
++			__func__, dev_name, pool_name, dev->mapped_size);
++	} else if (md_state == 0) {
++		/*
++		 * md exists.
++		 * We are restoring an earlier used device.
++		 */
++		if (replace) {
++			pr_err("%s: Incorrect mode %d. md exists\n", __func__, replace);
++			goto dev_exit;
++		}
++
++		/*
++		 * Validate the metadata stored with the data provided.
++		 */
++		ret = brmr_srv_blk_validate_md(dev, md_page);
++		if (ret) {
++			pr_err("Local metadata validation failed\n");
++			goto dev_exit;
++		}
++
++		memcpy(&dev->dev_params, &md_page->dev_params, sizeof(struct rmr_blk_dev_params));
++		dev->state = md_page->state;
++
++		pr_info("%s: md found. Re-adding disk %s for pool %s, size %llu\n",
++			__func__, dev_name, pool_name, dev->mapped_size);
++	} else {
++		pr_err("%s: md cannot be read for block device %s, Err = %d\n",
++		       __func__, dev->name, md_state);
++		goto dev_exit;
++	}
++
++	if (brmr_srv_blk_open(dev, dev_name, false /* create */, replace)) {
++		pr_err("failed to open %s\n", dev_name);
++		goto dev_exit;
++	}
++
++	ret = blk_str_create_sysfs_files(dev);
++	if (ret) {
++		pr_err("failed to create sysfs files\n");
++		goto dev_close;
++	}
++
++	mutex_unlock(&store_mutex);
++
++	kfree(md_page);
++	return count;
++
++dev_close:
++	brmr_srv_blk_close(dev, replace);
++dev_exit:
++	brmr_srv_blk_dev_exit(dev);
++mut_unlock:
++	mutex_unlock(&store_mutex);
++	kfree(md_page);
++out:
++	return -EINVAL;
++}
++
++static ssize_t brmr_srv_add_store_show(struct kobject *kobj,
++				      struct kobj_attribute *attr,
++				      char *page)
++{
++	return scnprintf(page, PAGE_SIZE,
++			 "Usage: echo \"pool=<name of the rmr pool> device=<full path of block device> mapped_size=<size of given block device to be mapped>\" > %s\n\n",
++			 attr->attr.name);
++}
++
++static struct kobj_attribute brmr_srv_add_store_attr =
++	__ATTR(add_store, 0644,
++	       brmr_srv_add_store_show, brmr_srv_add_store_store);
 +
 +static struct attribute *default_attrs[] = {
-+	&brmr_map_device_attr.attr,
++	&brmr_srv_create_store_attr.attr,
++	&brmr_srv_add_store_attr.attr,
 +	NULL,
 +};
 +
@@ -320,255 +770,49 @@ index 000000000000..7d2435acac6a
 +	.attrs = default_attrs,
 +};
 +
-+static ssize_t brmr_unmap_device_show(struct kobject *kobj,
-+				      struct kobj_attribute *attr, char *page)
-+{
-+	return scnprintf(page, PAGE_SIZE, "Usage: echo <normal|force> > %s\n",
-+			 attr->attr.name);
-+}
-+
-+static ssize_t brmr_unmap_device_store(struct kobject *kobj,
-+				       struct kobj_attribute *attr,
-+				       const char *buf, size_t count)
-+{
-+	struct brmr_clt_dev *dev;
-+	int err;
-+
-+	dev = container_of(kobj, struct brmr_clt_dev, kobj);
-+
-+	if (!sysfs_streq(buf, "1")) {
-+		pr_err("%s: unknown value: '%s'\n", attr->attr.name, buf);
-+		return -EINVAL;
-+	}
-+
-+	pr_info("Closing device %s.\n", dev->gd->disk_name);
-+
-+	/*
-+	 * We take explicit module reference only for one reason: do not
-+	 * race with lockless ibnbd_destroy_sessions().
-+	 */
-+	if (!try_module_get(THIS_MODULE)) {
-+		return -ENODEV;
-+	}
-+	err = brmr_clt_close_device(dev, &attr->attr);
-+	if (unlikely(err)) {
-+		if (unlikely(err != -EALREADY))
-+			pr_err("unmap_device %s: %d\n",
-+			       dev->gd->disk_name, err);
-+		goto module_put;
-+	}
-+
-+	/*
-+	 * Here device can be vanished!
-+	 */
-+	err = count;
-+
-+module_put:
-+	module_put(THIS_MODULE);
-+
-+	return err;
-+}
-+
-+static struct kobj_attribute brmr_unmap_device_attr =
-+	__ATTR(unmap_device, 0644,
-+	       brmr_unmap_device_show, brmr_unmap_device_store);
-+
-+static ssize_t brmr_clt_device_state_show(struct kobject *kobj,
-+				   struct kobj_attribute *attr,
-+				   char *page)
-+{
-+	struct brmr_clt_dev *dev;
-+	int cnt;
-+
-+	dev = container_of(kobj, struct brmr_clt_dev, kobj);
-+
-+	switch (dev->dev_state) {
-+	case DEV_STATE_INIT:
-+		cnt = sysfs_emit(page, "init\n");
-+		break;
-+	case DEV_STATE_READY:
-+		cnt = sysfs_emit(page, "ready\n");
-+		break;
-+	case DEV_STATE_DISCONNECTED:
-+		cnt = sysfs_emit(page, "disconnected\n");
-+		break;
-+	case DEV_STATE_CLOSING:
-+		cnt = sysfs_emit(page, "closing\n");
-+		break;
-+	default:
-+		cnt = sysfs_emit(page, "unknown\n");
-+		break;
-+	}
-+
-+	if (dev->map_incomplete)
-+		cnt += sysfs_emit_at(page, cnt, "degraded\n");
-+
-+	return cnt;
-+}
-+
-+static struct kobj_attribute brmr_clt_device_state =
-+	__ATTR(state, 0444, brmr_clt_device_state_show, NULL);
-+
-+static struct attribute *brmr_clt_dev_attrs[] = {
-+	&brmr_unmap_device_attr.attr,
-+	&brmr_clt_device_state.attr,
-+	NULL,
-+};
-+ATTRIBUTE_GROUPS(brmr_clt_dev);
-+
-+static struct kobj_type brmr_clt_device_ktype = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+	.default_groups  = brmr_clt_dev_groups,
-+};
-+
-+static struct kobj_type brmr_clt_stats_ktype = {
-+	.sysfs_ops      = &kobj_sysfs_ops,
-+};
-+
-+static int brmr_clt_create_stats_files(struct kobject *kobj,
-+				   struct kobject *kobj_stats);
-+
-+static int brmr_clt_create_dev_sysfs_files(struct brmr_clt_dev *dev)
-+{
-+	int ret;
-+
-+	ret = kobject_init_and_add(&dev->kobj, &brmr_clt_device_ktype,
-+				   brmr_devs_kobj,
-+				   "%s", dev->gd->disk_name);
-+	if (ret)
-+		pr_err("Failed to create sysfs dir for device '%s': %d\n",
-+		       dev->gd->disk_name, ret);
-+
-+	ret = brmr_clt_create_stats_files(&dev->kobj, &dev->kobj_stats);
-+	if (unlikely(ret)) {
-+		pr_err("Failed to create sysfs stats files "
-+		       "for device '%s': %d\n", dev->gd->disk_name, ret);
-+		kobject_del(&dev->kobj);
-+		kobject_put(&dev->kobj);
-+	}
-+	return ret;
-+}
-+
-+static int brmr_add_dev_symlink(struct brmr_clt_dev *dev)
-+{
-+	struct kobject *gd_kobj = &disk_to_dev(dev->gd)->kobj;
-+	int ret;
-+
-+	ret = sysfs_create_link(&dev->kobj, gd_kobj, BRMR_LINK_NAME);
-+	if (ret) {
-+		pr_err("Creating symlink for %s failed, err: %d\n",
-+		       dev->gd->disk_name, ret);
-+	}
-+
-+	return ret;
-+}
-+
-+void brmr_clt_destroy_dev_sysfs_files(struct brmr_clt_dev *dev,
-+				     const struct attribute *sysfs_self)
-+{
-+	if (dev->kobj.state_in_sysfs) {
-+
-+		kobject_del(&dev->kobj_stats);
-+		kobject_put(&dev->kobj_stats);
-+		if (sysfs_self)
-+			sysfs_remove_file_self(&dev->kobj, sysfs_self);
-+		kobject_del(&dev->kobj);
-+		kobject_put(&dev->kobj);
-+	}
-+}
-+
-+int brmr_clt_create_sysfs_files(void)
++int brmr_srv_create_sysfs_files(void)
 +{
 +	int err;
++	dev_t devt = MKDEV(0, 0);
 +
-+	brmr_dev_class = class_create("brmr-client");
-+	if (IS_ERR(brmr_dev_class))
-+		return PTR_ERR(brmr_dev_class);
++	rmr_str_class = class_create("brmr-server");
++	if (IS_ERR(rmr_str_class))
++		return PTR_ERR(rmr_str_class);
 +
-+	brmr_dev = device_create(brmr_dev_class, NULL,
-+				 MKDEV(0, 0), NULL, "ctl");
-+	if (IS_ERR(brmr_dev)) {
-+		err = PTR_ERR(brmr_dev);
++	rmr_ctl_dev = device_create(rmr_str_class, NULL, devt, NULL, "ctl");
++	if (IS_ERR(rmr_ctl_dev)) {
++		err = PTR_ERR(rmr_ctl_dev);
 +		goto cls_destroy;
 +	}
-+	brmr_devs_kobj = kobject_create_and_add("devices", &brmr_dev->kobj);
-+	if (unlikely(!brmr_devs_kobj)) {
-+		err = -ENOMEM;
-+		goto dev_destroy;
++
++	rmr_strs_dev = device_create(rmr_str_class, NULL, devt, NULL, "stores");
++	if (IS_ERR(rmr_strs_dev)) {
++		err = PTR_ERR(rmr_strs_dev);
++		goto ctl_destroy;
 +	}
-+	err = sysfs_create_group(&brmr_dev->kobj, &default_attr_group);
++
++	err = sysfs_create_group(&rmr_ctl_dev->kobj, &default_attr_group);
 +	if (unlikely(err))
-+		goto put_devs_kobj;
++		goto strs_destroy;
 +
 +	return 0;
 +
-+put_devs_kobj:
-+	kobject_del(brmr_devs_kobj);
-+	kobject_put(brmr_devs_kobj);
-+dev_destroy:
-+	device_unregister(brmr_dev);
++strs_destroy:
++	device_unregister(rmr_strs_dev);
++ctl_destroy:
++	device_unregister(rmr_ctl_dev);
 +cls_destroy:
-+	class_destroy(brmr_dev_class);
++	class_destroy(rmr_str_class);
 +
 +	return err;
 +}
 +
-+void brmr_clt_destroy_sysfs_files(void)
++void brmr_srv_destroy_sysfs_files(void)
 +{
-+	sysfs_remove_group(&brmr_dev->kobj, &default_attr_group);
-+	kobject_del(brmr_devs_kobj);
-+	kobject_put(brmr_devs_kobj);
-+	device_unregister(brmr_dev);
-+	class_destroy(brmr_dev_class);
-+}
-+
-+STAT_ATTR(struct brmr_clt_dev, requests,
-+	  brmr_clt_stats_rq_to_str, brmr_clt_reset_submitted_req);
-+STAT_ATTR(struct brmr_clt_dev, request_sizes,
-+	  brmr_clt_stats_sizes_to_str, brmr_clt_reset_req_sizes);
-+STAT_ATTR(struct brmr_clt_dev, sts_resource,
-+	  brmr_stats_sts_resource_to_str, brmr_clt_reset_sts_resource);
-+STAT_ATTR(struct brmr_clt_dev, sts_resource_per_cpu,
-+	  brmr_stats_sts_resource_per_cpu_to_str, brmr_clt_reset_sts_resource);
-+
-+static struct attribute *brmr_stats_attrs[] = {
-+	&requests_attr.attr,
-+	&request_sizes_attr.attr,
-+	&sts_resource_attr.attr,
-+	&sts_resource_per_cpu_attr.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group brmr_stats_attr_group = {
-+	.attrs = brmr_stats_attrs,
-+};
-+
-+static int brmr_clt_create_stats_files(struct kobject *kobj,
-+				   struct kobject *kobj_stats)
-+{
-+	int ret;
-+
-+	ret = kobject_init_and_add(kobj_stats, &brmr_clt_stats_ktype, kobj, "stats");
-+	if (ret) {
-+		pr_err("Failed to init and add stats kobject, err: %d\n",
-+		       ret);
-+		return ret;
-+	}
-+
-+	ret = sysfs_create_group(kobj_stats, &brmr_stats_attr_group);
-+	if (ret) {
-+		pr_err("failed to create stats sysfs group, err: %d\n",
-+		       ret);
-+		goto put_stats_obj;
-+	}
-+
-+	return 0;
-+
-+put_stats_obj:
-+	kobject_del(kobj_stats);
-+	kobject_put(kobj_stats);
-+
-+	return ret;
++	sysfs_remove_group(&rmr_ctl_dev->kobj, &default_attr_group);
++	device_unregister(rmr_strs_dev);
++	device_unregister(rmr_ctl_dev);
++	class_destroy(rmr_str_class);
 +}
 -- 
 2.43.0
