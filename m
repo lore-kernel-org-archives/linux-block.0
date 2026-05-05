@@ -1,200 +1,89 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7100B3E4C8C
-	for <linux-block@vger.kernel.org>; Mon,  4 May 2026 17:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777917364; cv=pass; b=jXVAEA2ovyetO33+XDlo4sXS7CcFFr4F1igrHJlC4ZaG4JZ4EFaAp3fzn0638IZJyyU7gYeuJCa4lHaYyaGGBvgefcbi0Rno8uPmsLCB+4RxHqBonKqfp8TJhjb4dYY1VqXnloioAq5FBijpRY0boxCx1b74VmZbSw2h75GVv9E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777917364; c=relaxed/simple;
-	bh=bmNymKc+WlzZEEC+pNTT+/WQ3FaUTTrwyjCxZ/xSL2Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ih6Geqeyjfsg5BL9HY/zPGNlKWqgy2JNVzd/9Yp78OwoV8G3la6vzjMV/s1D/Y0ADCcUWL3uQ5IE/Cfb/VBEZErm3yBc5smI/JtY72Cfzvv8y7Lu4rkiUZvMKWOm/heBKwx7KALTnVPY+xLre515gFdMA4TVoWKD4b8hV/BycoU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=a4Vut8WE; arc=pass smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DF01C84D7;
+	Tue,  5 May 2026 01:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777942952; cv=none; b=VD0HbGjq8Y9udYxjELABQp0jYL16YjOtnTfB2ndsY9jdNB9wbyAWT3dgPcsa3uodKKna73nIvD+UYuf40CPsOftTqI3DCQuVQi9pkDQ1GHVIAh7U7OSzuzQ9tAD52uG0oE+w4uISMVD+8z5ra5J8XqPqBCBi+6+5P0Go6LY2VXQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777942952; c=relaxed/simple;
+	bh=iEGXDzlDY4dzJ0j/v5KnsVQUb0689gZIcFlZ1AFxiGU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j9QMoI2aaxoQQ5wUfr3L2bVMvqdxerY56ZmoSGU0m1QNxp3cUUGpTpqFR4bGPnq3O5PSRuUuYNqPpixY9EjG5SHsAbA6h7YUW55YLd4IheRNrady4n9oVmBwI5oPpKT5fT/pFflvzDDL/OafVaqrMUdgL7hdb6bHM+kw4mJTUsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grFstXbC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="a4Vut8WE"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7dbb4fdc04eso604153a34.2
-        for <linux-block@vger.kernel.org>; Mon, 04 May 2026 10:55:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777917356; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MlYdoWi4qX7c2hBQqUHjKzvqIgVAP2BB1H44w0I6yFo6GK6uSAvvTyjR4pwJ/qEI3w
-         U6ga4SUnnZdRFN6gm+Vyh4VbpGKe1FE5MkHYx0fNTbnI9dAa5e8U/ycUF1hu54WZ910u
-         gagC+eySxaFbTJGEOhThoxMx+9k1AkQwZwXfZMCGpdEQmqeg4EvmHCLof09NFWX3wqxn
-         sJOj/hhIQ0EMuaPAmvuTJNe4J8tTYtmuxP5A1iOWdeLrSK+cn/4pjuT+KfFQCR+uKPtg
-         EnvOblxyzyGyPFPQW4fvV5juw4QSLcEmbTHxcV6XEgvf8xfkl+I9Y57YrlLUigzJMs7O
-         Eu1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=bmNymKc+WlzZEEC+pNTT+/WQ3FaUTTrwyjCxZ/xSL2Q=;
-        fh=xC8+Dtv+7soUaE7NSEVpoyOgKOoMxSYr0DAAM7rvjGw=;
-        b=G19jQKb1c7+llAnHt3n1pv1INE1gSNNGyj5sOlCcei7G19Q+q9TrxslwvvHSUPKZm2
-         qUwbSBuJuHJ0nwTyO2KvfqEYJJdIndt+sO6D4SvyrCYjUkQCgUbqjzQbHOJrvpfJWtdE
-         REW5fNRsQ65Le9lztJ+39oFMdIoT2Xvo32vguviUF+uzfyInHuDBik/Lbo3A3AeGmJEq
-         QR3QfZb1r1QNmliGzYfzTCUOCu9nkfq1KuJTjL+skPn2tDH7FqBJ4ES2jGeFcXAAzw+/
-         VW078tbQ+jur3hoIPUr/ODkRxg8RngbU+Li91xd6pup4pqUwunVTzPrNNhO4U5EShH+x
-         Z7aw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1777917356; x=1778522156; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bmNymKc+WlzZEEC+pNTT+/WQ3FaUTTrwyjCxZ/xSL2Q=;
-        b=a4Vut8WE8RLH/3YO/k+1r4rZ4hy+1lwjhwX/Eccnz9XYIuqQuU8hFplBUfTby9Tn+L
-         K+q0X6majklIy0Lj/11mbBhb5gAFsvJXcT9Gr8LZBKknjdg9B8L14a3lTz3PmqAqAtpA
-         xi4IU1oyGgoxWjB9tda1Y7IMocs/9UHFYQB6CY23de+3SeJAVLHN443FQTOuMX3WmVna
-         4HPDlBzKCC7F+09ngUFu8alDAZP7lH2aU8uVdWb+TaryoPV7CiL5OlWomNZxqKy3y6Vt
-         PES5n0mV3owYSGgYrUX7g19/75Pb0115ZtvyrvY3ev8G3wGANjA6fRT1wuqYLi0XHDL9
-         r+Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777917356; x=1778522156;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bmNymKc+WlzZEEC+pNTT+/WQ3FaUTTrwyjCxZ/xSL2Q=;
-        b=p/aWYmhXWtupUR0zpos1Ccgy+K37QpcUJ+LX0AMbr8Jeej+VJ5NBnUktf5AZ1BFTLI
-         5AjQuTDRt0IGvH1wDawJ4u7Ca1226izXlB69GaLIVEOKEN5ET6gI/V5y1ASc0LsDbZhA
-         ihukcbaRNRf+7w/s22Kkd14tzAZg7JPwIJc4JIHEwgMg+s0CuWMw3R2c3CHKXMhN6SKz
-         NHZ+YbQ22hXqayfwIeF2dg2tXXeuawQ6H85GSHG7mUp5AKSZaZmnBODi7KnvD/UrBhJy
-         ffQGKS/hY5k2/LUfl9oLjJxSBD5EuBOg33tifX1gZ7AlpnDYnR1q+Vj2y+avRgGPJ6Sf
-         f3Ag==
-X-Forwarded-Encrypted: i=1; AFNElJ+pu55E+VHsOy0htUsP8Oxny1ufKeemiNHr7lObkQu1L/xuythMpZfiYRsR26g31GAKiYzWb2trBzQ2Aw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaH/dQ9Fv9mjKmNqPvo3r9EGu9T84aDaWSneoYMzTpKVfC3n/q
-	xDHgLjij/4GXVbtvjE1oUaPoE3SBpot13b+drg3GGnbXoMSPVLji01Ia7/GNiA8UwaYR+ZZypZQ
-	oAAzDa8gYIWeFgLS1m5ABE5mTtv91aDpsfAHB3db/Yg==
-X-Gm-Gg: AeBDietLz7nnozIJ7wgH2H/ucd+QRr0wb6Ke5SKXkIVMIztx0oWye1eoEFpO4+6ceb1
-	1fbqHvKs9mhCulC6YJAD00jioOjeUQpvxqKZCY1l+8oeO/XciseF4ddzamQQdKqgChUv/Yhk3FH
-	F9Z+e2olvwmmfPz7vM7uSDFM+KzcTEmfunGCxzvzF0VrL2xXQdZYhKDy3/1CJFeSh7/h0aUduWl
-	BT2S7Q5m2io1c03oFqbL8szuAiZx8irjI7WfG/GsKsfuwz2JfP8201PfPNwEZ/N2PXs0plcOhcI
-	DW/fB786yT/VG6V843U=
-X-Received: by 2002:a05:6830:314a:b0:7dc:cba1:8306 with SMTP id
- 46e09a7af769-7dee11cbc2amr4169091a34.2.1777917356159; Mon, 04 May 2026
- 10:55:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grFstXbC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24D92C2BCB8;
+	Tue,  5 May 2026 01:02:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777942951;
+	bh=iEGXDzlDY4dzJ0j/v5KnsVQUb0689gZIcFlZ1AFxiGU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=grFstXbCwhBGyTVmgTIhFOCAjCfAhphC5VCNADmCIDQLgEcq08XtGBvBiS6tiUn+A
+	 Gl6jmAupztL64e0HtHVgcHVzUmRgEo+WC05tClgvtjeqTMMyRq9JaShOrodJgN6G9K
+	 Yvfb3lFbYi7Nbw574MZqybscKJoAJmUkt0NEGGRhCME+7fmXfyU8Kp4npai6CFMrtI
+	 ceUzWbQQPEpf+J/Y4pNnZI3N420ZHjOb7FOxhvQm5VCvvk+VJTixVlzblvmW17chZl
+	 YYEuRz7ZyhOKyjhZOHfGaynn68YG0w3tyfsUB6QIzIjPiHGwcsPd+Xexw11Tq/4bbc
+	 Sm7e8vdatShbA==
+Date: Mon, 4 May 2026 18:02:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Christoph =?UTF-8?B?QsO2aG13YWxkZXI=?=
+ <christoph.boehmwalder@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
+ linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>,
+ Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/4] tools: ynl-gen-c: optionally emit structs and
+ helpers
+Message-ID: <20260504180230.34ec1561@kernel.org>
+In-Reply-To: <afhgQgySpoxXFCn1@localhost.localdomain>
+References: <20260407173356.873887-1-christoph.boehmwalder@linbit.com>
+	<20260407173356.873887-3-christoph.boehmwalder@linbit.com>
+	<20260412125502.3f8ff576@kernel.org>
+	<adzVUdf74CVk2DwJ@localhost.localdomain>
+	<20260413104939.5ef4d9dc@kernel.org>
+	<ad4ox7ibZoiW-tje@localhost.localdomain>
+	<20260414083548.02f76970@kernel.org>
+	<afhgQgySpoxXFCn1@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260417015732.2692434-1-csander@purestorage.com>
- <yq18qams3re.fsf@ca-mkp.ca.oracle.com> <CADUfDZrwzUTi2TOj6M-+FtBK6u5evMsWSBqRDwJsLb8yLbOGvw@mail.gmail.com>
- <yq15x5lqfdx.fsf@ca-mkp.ca.oracle.com> <CADUfDZqkT4g3T6uE=hxt9J6JDMXbJt49rM7_Vgs3EBPdFeuuLw@mail.gmail.com>
-In-Reply-To: <CADUfDZqkT4g3T6uE=hxt9J6JDMXbJt49rM7_Vgs3EBPdFeuuLw@mail.gmail.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 4 May 2026 10:55:44 -0700
-X-Gm-Features: AVHnY4KNYsVR2kYl7eJ0Hwf9__aBJ8ZzUEN24LJvPWcKnRGqgghNGjpf2B_6MDk
-Message-ID: <CADUfDZq+BZ4Xn19TXH53NndDwDwMKm3xS8wSMnMtRsF7dWSyGg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/6] block: fix integrity offset/length conversions
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	Chaitanya Kulkarni <kch@nvidia.com>, Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org, 
-	target-devel@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 23, 2026 at 11:02=E2=80=AFAM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
->
-> On Mon, Apr 20, 2026 at 7:09=E2=80=AFPM Martin K. Petersen
-> <martin.petersen@oracle.com> wrote:
+On Mon, 4 May 2026 11:05:55 +0200 Christoph B=C3=B6hmwalder wrote:
+> On Tue, Apr 14, 2026 at 08:35:48AM -0700, Jakub Kicinski wrote:
+> >On Tue, 14 Apr 2026 14:08:58 +0200 Christoph B=C3=B6hmwalder wrote: =20
+> >> But we still need to support the current family via a compat path, and
+> >> I would much rather have two YNL-based families than one genl_magic and
+> >> one YNL-based. Carrying both sounds like a nightmare.
+> >>
+> >> So the spec proposed in this series would never actually be used to
+> >> generate a userspace client, if that's what you're asking. We would
+> >> continue to use the current libgenl-based approach, with some userspace
+> >> compat shims to make it work with YNL. Then, when "drbd2" comes along,
+> >> we could "do things properly". =20
 > >
-> >
-> > Hi Caleb!
-> >
-> > > NVM Command Set specification 1.1 section 5.3.3 requires the referenc=
-e
-> > > tag to increment by 1 per logical block, so that seems to determine
-> > > the increment unit:
-> >
-> > SCSI allows PI to be interleaved at intervals smaller than the logical
-> > block size. This was done for PI compatibility in mixed environments
-> > with both 512[en] and 4Kn disks. Interleaving allows 8 bytes of PI per
-> > 512 bytes of data on devices using 4 KB logical blocks. That is the
-> > reason why we use the term "integrity interval" instead of assuming
-> > logical block size.
->
-> Thanks for the explanation, I'm not too familiar with SCSI. I meant to
-> refer to integrity intervals in my explanation if they differ from the
-> logical block size.
->
-> >
-> > > The ref tag used for a particular block needs to be consistent. And
-> > > since reftag(block N) can be computed as the reftag(M) + N - M if
-> > > block N is accessed as part of an I/O that begins at block M, the
-> > > function must be of the form reftag(block N) =3D N + c for some const=
-ant
-> > > c. Thus, the ref tag seed needs to be computed in units of logical
-> > > blocks (integrity intervals); no other unit (e.g. 512-byte sectors)
-> > > works.
-> >
-> > Whoever attaches the PI decides on the seed value. In the case of the
-> > block layer it made sense to use block layer sector number since that
-> > value is inevitably going to be the same for a future read.
->
-> I'm not following "going to be the same for a future read". The block
-> can be read back by an I/O with a different starting
-> offset/sector/seed, as my example illustrates. When the integrity
-> interval size differs from the sector size (512 bytes), mixing the two
-> units results in a different ref tag seed for the block depending on
-> the starting offset of the I/O.
->
-> >
-> > Note that with MD, DM, and partitioning in the mix, the sector number
-> > seen by whoever submits the I/O is going to be different from the LBAs
-> > on the target devices which eventually receive the I/O. Nobody says
-> > there is a computable constant offset. Think scattered LVM extent
-> > allocations. Or RAID stripes placed at mismatched LBA offsets.
->
-> The constant offset relationship still needs to hold over any
-> contiguous range of a backing block device that can be accessed by a
-> single I/O. For example, with partitions, it's not possible for a
-> single I/O to cross a partition boundary, so each partition can have a
-> different constant offset between the ref tags and absolute integrity
-> interval numbers. With RAID, each shard can have a different constant
-> offset. etc.
->
-> >
-> > > To see the issue with the current approach, consider an example
-> > > accessing LBA 1 on a device with a 4 KB block size. If the block is
-> > > written as part of a write that begins at LBA 0, its ref tag in the
-> > > generated PI will be 1 (sector 0 + 1 integrity interval). If it's
-> > > later read by a read starting at LBA 1, its expected ref tag will be =
-8
-> > > (sector 8 + 0 integrity intervals), and the auto-integrity code will
-> > > fail the read due to a reftag mismatch.
-> >
-> > Something is broken, then. Because the ref tag in the received PI shoul=
-d
-> > have been remapped to start at 8 in that case.
->
-> Ah, I missed the remapping piece. Thanks for pointing that out. I
-> guess I was testing with a ublk device that doesn't advertise
-> BLK_INTEGRITY_REF_TAG. Since commit 203247c5cb97 ("blk-integrity:
-> support arbitrary buffer alignment"), the ref tag is unconditionally
-> set in the PI from the (sector) seed, but the remapping is conditional
-> on BLK_INTEGRITY_REF_TAG. That explains why I was seeing ref tags in
-> the PI that didn't match the integrity interval numbers.
->
-> So seems like patch 1 ("block: use integrity interval instead of
-> sector as seed") doesn't need a Fixes tag. Still, I'm confused why the
-> auto-integrity code bothers setting the seed to the sector number in
-> the first place if it's going to be remapped later. Why not just leave
-> the seed zeroed?
+> >Let's jump to the drbd2 work. =20
+>=20
+> We have a bit of a chicken-egg situation there.
+>=20
+> The drbd2 work depends on the DRBD 9 upstreaming series, since the drbd2
+> netlink family will use the new DRBD 9 semantics.
+> However, the DRBD 9 series depends on the current DRBD module already
+> using YNL (or rather, *not* using genl_magic anymore).
+>=20
+> Our plan is to convert the current family to YNL in-place first, then
+> incrementally add the new modern drbd2 family with DRBD 9 semantics in
+> another series.
+>=20
+> How would you prefer to handle the YNL switch? If it makes it easier for
+> you, just committing the YNL-generated code without the generator is
+> fine for me. The old family is effectively frozen, so that would work.
 
-Martin,
-I would appreciate a response here. Would you be okay with patch 1 if
-the Fixes tags were dropped? Do you think we can get rid of the ref
-tag seed initialization entirely if the ref tags get remapped later
-anyways? Even if patch 1 is not required for correctness, patch 2 is a
-fix for a separate issue introduced in the 7.1 merge window and has
-reviews from Christoph and Anuj. I would prefer not to hold up that
-fix over this ref tag seed discussion.
-
-Best,
-Caleb
+That could work. Please float a series and CC netdev, we'll review.
