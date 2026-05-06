@@ -1,66 +1,48 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F59936D51D
-	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 07:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEA4371045;
+	Wed,  6 May 2026 07:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778051373; cv=none; b=fYIUHIWab+f99or5S5N5Nj4YRg1a82Lyhm7jR3HAmuX+lQNDBX3ka/rZLh8J7uP3wxdFz+9+/R0Yir+PYsaGbCRvHmv++VEpQjgXpvxgJSz9lILkLK6j5OzTojnleDxpCdbnW4zG38wXEg160yphPnxqsJQS0be4Yjl8VlP31WE=
+	t=1778051696; cv=none; b=K/Ad8utuRmkxaB6P5dSN0qatWFoD6Xl9I+p5e3iU3Wh2NsBGCGktD0iMSf0mll00/CjO/B/MNy0BPkydJNmmRDen93fjZlF1lNpHOp+i4rTqdYrFJt7npO90XQM5rZ/peXkB/VCptY/h5IvUSZa+Ci+1Jn4EfTJU3br8hhVT9iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778051373; c=relaxed/simple;
-	bh=vvariKpSLXBVCVyZYR/OEUF/P0GtuR2yTqRCxKpPd0M=;
+	s=arc-20240116; t=1778051696; c=relaxed/simple;
+	bh=oiLfJnBpP8paIDRaqOxibrdvXg0OP6R68Uq8hSs/4bA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IUR1dXeXu4XzyYebq2Rfi7cCFjvnK/HIvczr0c5nb5BKwaBJGj3lkrOJRvFPBX3SM1THl/kBWx3BmXt1e1Scztex+jNcBkVsXQmDyPy8GoYIVVaYIGAT7x9ZndBGK9ClSBar/Y6/0FYduVjUJDfzF8fBikRpwhDA6OUyIkc0hpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=NRU2rSQs; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=kGFIZSfLGUQMA4pU3sg7NzoG1Txq/JjI6sgn9XkmuItNZIs8autfLsR/iGM6LeYaq0wZMQBQYgQVA5b8h3ij+ZMOvYUY6nDjBMOEXpXtMOvD9YQX30HMVJ16KMWk9Beuqyir3CP3y2HOLG5AVy3XK2MaMsO5r2T8BTEWpRGfFPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=HgLT9vei; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="NRU2rSQs"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43d76dd4ee8so4847929f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 00:09:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778051369; x=1778656169; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=i/NNK31KWxsQZ1iecY4atieFZgPU2Vu2GTBkZCQW8vg=;
-        b=NRU2rSQsD6eSP3AK8j6YyfJxjzeWmZEzDH9Q1Lz8vCqEy0feLZa47W7kdwc+ymPoq6
-         KLnQ7tPK3eunSTtICKk+LoBtWCDoZdGF2FKf5KluduAXWzc8i7FFE/NK0gp+HR2Ijxc7
-         WHlOYKLU4L8gG6sSMee4hj8pe+GSGf4kHpvQnc9PiEpW4aSGhEGFFwLQ+obYR8xbk/rT
-         5BKsX4fi1t9500Q3tDbsK4I9CtXYPmUclWc3WzSCZdpH0lMhnF34nLH+zlcyfBvezwid
-         TTXFKjA3nk23KrIhNZ2Anonuf/KhFB1m1d0CLr2N9oL5IPmadyLeTvXEifvXaTz+r5kV
-         fG1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778051369; x=1778656169;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i/NNK31KWxsQZ1iecY4atieFZgPU2Vu2GTBkZCQW8vg=;
-        b=b7vKVT4RmzUkPJoU40OL4VsYvrw4i0rFwiZUrMZD/iv/Q8Bpt+Ak66v0ORTqOmlngk
-         287Z7AJwQ4bd27bdo5paX4U63RqTA3SwnN0+/6EVS2ilS9RscPzlmhYZFMtjzMfoA8pg
-         xhp2Ub5cO4N74zKz2FQlgb1Y+aSU723rv8dCus9kUWLbGHQX/+qnArVkpsjDPexgOxKX
-         9tjOn+I6jaCU5wxamFnsD+w8CxroHviUFGCAbRkFKqIX38ohYlS0y10VZDQQUdI9jEEs
-         1cki6U/edJpnoIayrHpJbDLK2PhqsHcsKRkmExWkziyFoSG3yYgY/JiTVtFO1eGNARPw
-         706A==
-X-Gm-Message-State: AOJu0YzM/b5+wflKtnG/uex54RrFPUlg/ajPgrW9PF+tdVlTmPQ0asi2
-	voVbgF2NgtooDS7WISe1Mm4sl9DLdmSGTMl7xyVlvemL8Q+FXEb25ao+iMbwQ7lln+M=
-X-Gm-Gg: AeBDiesFsbubsOoS9U6Z86Q+NqGnJqw/5fWUyGRDnOQ7j49I7NLj8W9/SJWVXDLeFYT
-	yzxdaanBY8P/VWoPIQNo6fZAexeqFTylM+rb/G+GMvpXuVyLDu5hEcxc/sYuCLCwE/lrMzWbnsI
-	fcMAsBXhAIdp2O6W03eYPrYOriuQBvkveHmds6Yn7MyAWFnRVufQCSXpFNeiv4zm2OsNm+GVx/l
-	I7E9A6znYkNqMvhad5TXOK33PGbK1qkh7SC+XdtwyWaS1PM20uSDHbXr70zlOYZH72PIlXPz88y
-	XlR5TClGAi3lpDO2xNT18WfyjI1Q5pXUCKcwr5qTolhIkegm2JVOhHfHZ8pTqT5fHJy/OA+NWAm
-	Lk/xZ0Cuzqz86McSUJXOkPJTsKCeHps7vaH/DZnZgA7p1tt4cyI4p/aaq+m3PiR1J+4CkVy0HUJ
-	In+GWW2CK002w15rlgmPKJWbCw2cq63d6QkHuUzFhr/c48IXyYzPwruXcObzhrOBlBOCCt6dYQL
-	pQyt6Iq1Bxi9Pd8CbdK3Q26sQNuEk0=
-X-Received: by 2002:a5d:5d03:0:b0:43d:68dc:9ca6 with SMTP id ffacd0b85a97d-4515b5254b6mr3720321f8f.18.1778051369468;
-        Wed, 06 May 2026 00:09:29 -0700 (PDT)
-Received: from [10.211.9.173] ([213.147.98.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45055f249bbsm9065327f8f.36.2026.05.06.00.09.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2026 00:09:28 -0700 (PDT)
-Message-ID: <db3d516f-6ad2-469a-9bd8-1a9b61eb12a0@kernel.dk>
-Date: Wed, 6 May 2026 01:09:27 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="HgLT9vei"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4g9RTn4zBpz1XM5kD;
+	Wed,  6 May 2026 07:14:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1778051684; x=1780643685; bh=E9gVIx7qpK9ZWf+0jQrzOUzj
+	URf3+hUPA7+/vACoBmA=; b=HgLT9veiAkbzOzuB9xaTi+wF/qAUYZVWH1qviWk1
+	it4/eIZZvzmaZnmuEJXJZAdWg9MTDlXIKzNT3ZTV9TPZTg/EpLdDIZPl1riUX0wP
+	ti8Ly/6I3S0t/AKcnMQ29X7YA7vwHWWO4/wnaz4nDa+AdxCNaI6LF15n4zUuXbTa
+	2/LQd4BNWotU/XYIw7IjObOTzdAF16Hy+nWHuYFDUO7Z+8BTTiITPZO8wVnjcEM3
+	P030oxwGHPADRNYq/WLKasEh8C/Y5XOo6JaXiirh+lFShCIjW6YNvM1rk7r6rlIv
+	WUHP8fUAcoeomwAW8suAorpznJGFHEYWlsKsDYOa/VSRKg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 6E-AuBj1atIm; Wed,  6 May 2026 07:14:44 +0000 (UTC)
+Received: from [10.211.9.52] (unknown [213.147.98.98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4g9RTT14LRz1XM5jn;
+	Wed,  6 May 2026 07:14:36 +0000 (UTC)
+Message-ID: <50187fa5-03a9-4ca3-bcaf-a36ed75bda2c@acm.org>
+Date: Wed, 6 May 2026 09:14:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,53 +50,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: bic maybe null pointer dereference
-To: yanlonglong <yanlonglong@kylinos.cn>, yukuai@fnnas.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260506055655.32276-1-yanlonglong@kylinos.cn>
+Subject: Re: [PATCH v6 1/1] block/blk-mq: use atomic_t for quiesce_depth to
+ avoid lock contention on RT
+To: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>,
+ axboe@kernel.dk, linux-block@vger.kernel.org
+Cc: bigeasy@linutronix.de, clrkwllms@kernel.org, rostedt@goodmis.org,
+ ming.lei@redhat.com, muchun.song@linux.dev, mkhalfella@purestorage.com,
+ chris.friesen@windriver.com, linux-kernel@vger.kernel.org,
+ linux-rt-devel@lists.linux.dev, linux-rt-users@vger.kernel.org,
+ stable@vger.kernel.org, ionut_n2001@yahoo.com, sunlightlinux@gmail.com
+References: <cover.1778048987.git.ionut.nechita@windriver.com>
+ <406f424c0a718bf492d40c206983e355e600945a.1778048987.git.ionut.nechita@windriver.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260506055655.32276-1-yanlonglong@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <406f424c0a718bf492d40c206983e355e600945a.1778048987.git.ionut.nechita@windriver.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/5/26 11:56 PM, yanlonglong wrote:
-> Signed-off-by: yanlonglong <yanlonglong@kylinos.cn>
-
-Your subject line is incomplete, and your commit message is even more
-incomplete.
-
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 141c602d5e85..27ef736085b1 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -3035,9 +3035,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
->  {
->  	struct bfq_io_cq *bic = bfqq->bic;
-> -	unsigned int a_idx = bfqq->actuator_idx;
-> -	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
+On 5/6/26 8:56 AM, Ionut Nechita (Wind River) wrote:
+>   void blk_mq_quiesce_queue_nowait(struct request_queue *q)
+>   {
+> -	unsigned long flags;
 > -
->  	/*
->  	 * If !bfqq->bic, the queue is already shared or its requests
->  	 * have already been redirected to a shared queue; both idle window
-> @@ -3046,6 +3043,9 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
->  	if (!bic)
->  		return;
->  
-> +	unsigned int a_idx = bfqq->actuator_idx;
-> +	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
-> +
->  	bfqq_data->saved_last_serv_time_ns = bfqq->last_serv_time_ns;
->  	bfqq_data->saved_inject_limit =	bfqq->inject_limit;
->  	bfqq_data->saved_decrease_time_jif = bfqq->decrease_time_jif;
+> -	spin_lock_irqsave(&q->queue_lock, flags);
+> -	if (!q->quiesce_depth++)
+> -		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
+> -	spin_unlock_irqrestore(&q->queue_lock, flags);
+> +	atomic_inc(&q->quiesce_depth);
+> +	/*
+> +	 * Pairs with smp_rmb() in blk_mq_run_hw_queue(): make the
+> +	 * incremented quiesce_depth observable to readers re-checking
+> +	 * the quiesce state, so they don't dispatch on a quiesced queue.
+> +	 */
+> +	smp_mb__after_atomic();
+>   }
 
-Ehm no, variable declarations go at the top.
+No, this is not sufficient to guarantee that blk_mq_run_hw_queue() sees
+the latest value of q->quiesce_depth. If you want to achieve that I
+think the only option is to protect the atomic_inc() above with
+hctx->queue->queue_lock.
 
-Please try again, correcting the title/subject and ACTUALLY write a
-commit message. See:
+> @@ -2362,17 +2365,15 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+>   
+>   	need_run = blk_mq_hw_queue_need_run(hctx);
+>   	if (!need_run) {
+> -		unsigned long flags;
+> -
+>   		/*
+> -		 * Synchronize with blk_mq_unquiesce_queue(), because we check
+> -		 * if hw queue is quiesced locklessly above, we need the use
+> -		 * ->queue_lock to make sure we see the up-to-date status to
+> -		 * not miss rerunning the hw queue.
+> +		 * Re-check the quiesce state after a read barrier. Pairs with
+> +		 * smp_mb__after_atomic() in blk_mq_quiesce_queue_nowait() and
+> +		 * blk_mq_unquiesce_queue() so we don't miss rerunning the hw
+> +		 * queue when a concurrent unquiesce has just dropped the
+> +		 * quiesce_depth to zero.
+>   		 */
+> -		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
+> +		smp_rmb();
+>   		need_run = blk_mq_hw_queue_need_run(hctx);
+> -		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
 
-Documentation/process/submitting-patches.rst
+If the atomic_inc() in blk_mq_quiesce_queue_nowait() is protected by
+hctx->queue->queue_lock then the above code doesn't have to be modified.
 
--- 
-Jens Axboe
+Thanks,
+
+Bart.
