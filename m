@@ -1,66 +1,67 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AAF32C8B
-	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 10:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEB73E274E
+	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 10:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778064120; cv=none; b=GszBJc2UIgm/xA3Yub+5tOrzNPT+YLnjj4ZSurccaM+b3gQSd/MNsXDSXVYYxi8q5rCI6M/IOhKPE6wjrN510Y+vNGaXYSOcDMwPF0fqBRkQc/S7OIDDKDjW/P2iH/ltRbdb/iA4PbAQ5IX74N0Fy5u7CqTiW8GeZmAhVV2lV2w=
+	t=1778064202; cv=none; b=KLTDcz3/PcQBfLXHt7M6gXGmd3h5ZpJyjgifH4NosuyHgoIbeJxNHzrL3UV/bqX1Z5mBhsUA2Mzv5MLBnLlr/EViKefIstpRADjVS3msfFyZNQeAc1CLJGh0aJC7GOSnlFGUjJPvCC9QBNW6mzFvuHixGAxC1X1o1+JxsROmUnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778064120; c=relaxed/simple;
-	bh=DsY/SFW24sC0wmI81ASDC6V+e+HKYw5jdUmk01QezMk=;
+	s=arc-20240116; t=1778064202; c=relaxed/simple;
+	bh=hOmu4Us7ulxPNOky/M6H+xw8sGA21hVukVAm9GB4TKs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r9jDSbEaOf0uWTrP0KThBybLRyYSMIAdkA2Oeo2BSLjVISR05PHwJStCpVFuORHrl42JF2CNvvuNjaQkb1PE6BUgTDY23M7bGG+uCFLSAis9+hlakuZcg0zyOzM4eHCrTfXBt8u6xR7SEJZ7xLLYQFToxIoe3A9cIJJLx8FWeF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=ElyqBId2; arc=none smtp.client-ip=209.85.221.46
+	 In-Reply-To:Content-Type; b=FFCv+2tEnUzIUu/u0XqvITkEqfRRmC9PlO4igHhut7mrm9w7P1C/PyaIcJMmse8XHTk6GUXhiVQLD5FHYS8b03POwWFnsUFTyvtoRn93WUiHQX5QhshbJ9IGo/yc+9KUryClpkNGMM6eBA2N4uLgo/ng8Xa/EnwL2D0KjTIAsnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=vF/akcv1; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="ElyqBId2"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43d75312379so492017f8f.1
-        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 03:41:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="vF/akcv1"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43d7e23defbso3560078f8f.0
+        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 03:43:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778064117; x=1778668917; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778064199; x=1778668999; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gcF8GD17NRlKZjIVYFwP6ujBkxC9SfM3ir1MBqAtF6E=;
-        b=ElyqBId2NgbgVecq4foesAPMYH/MeTUG76BFt1ZVC7GsWuypifll1/KvwWLvvtGeKU
-         dA6PSX4FLcddVI88d1iI1FXdx//bSAxRlYnp5Agjd16C3GU2sabWuAkSjo6QYcg96Hl+
-         B7k8YukO17wdAKSCt0x9cHGl1cVGtbivvidIRk1JXS1LH+iLoAhPmerQLiq6R+8CtuAJ
-         t/oGtBeuipz4vawVLEulX8rO6RTiyLh7sTrYz/wFPzMaPeqb+cKLbVhjbROqus80cxm9
-         aW9UqMleqslPel2CCdUUA2PITMyGs2kHYs/auCvzOSGNCrPCQm/HtPQbwHKwixsGjuB7
-         t2og==
+        bh=kNKW8exgBK0FS2c2WGoBUqZnBzWtTWrHpZ5cK2HpsJk=;
+        b=vF/akcv1ketwUgFKjTNCFpPLz+pHVzSOI4J1MXUmKIUOeDDs3xWi+5BCDHNBY36xA7
+         9pH4D5dydSpDjxVZ7GJHzEFsRlis7esrsK/MtsPtocdNSNyllZpepPToGtFj0Om6Fp3E
+         Gb8+WmdMHIjPI1uLfVhLm3cbxqWOa3dXQetxACnDxHhl83lq6ITpmOWblGWX+WhY+O1O
+         HFeYrxQFS6YKa7nzAr9HOH0jU0CvdpCK+M8EeiToGA5DwpJXLyrVtKew0wFeb1vOJ8jz
+         sjAbb/o6leU5bnAn2N1JE8E+txAu/4CkzqWlBDXYrXBvl3XNykuhqzOGy0NvBpbsxgj1
+         Kgag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778064117; x=1778668917;
+        d=1e100.net; s=20251104; t=1778064199; x=1778668999;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gcF8GD17NRlKZjIVYFwP6ujBkxC9SfM3ir1MBqAtF6E=;
-        b=Ih5v0QDarOop177eeaaL/eetwgU+d39ThoSYKqlJNjCSoa5e0N7GOPkJPFuWPzsgCU
-         i+PGDVpMBAhsJ6CMGhBN3eVd2o50OxAGZTQVq65ZaHOBxPKC78HJ7WgFv3pLV047Styv
-         PV0vqX2bMURKSpLlqVJzWu0YA2PFl82a19OMGn84wCCGlE60QRf6TgJ8YEGClTKhMQwz
-         ms+pOimDNulD1FUAxMg2gV/52/9LXcPf/h4JXACccQMb8wu7d+54L38yGrnYfWv26PeI
-         L7GVaV+2Z9z7FR13oW07RuuUjjDwi/HQhlGDKKhdnm+VlBOBy/3nVlAdAQFGPN+evqXK
-         6OsA==
-X-Gm-Message-State: AOJu0YwPqGga9LW3vU7srJIPAQrtHIDbFoVFEFsU8543noU+MuMoJPvU
-	TZpxLXqTW/0E1grgqc/pMGSewN2fXd+o1/5XoMGMA7EPXT4dLFDRjiDH1QVqsptec1E=
-X-Gm-Gg: AeBDiet+OQ0qYd7ONH8Nq2UwFoXayUgBIF8k64LW2/VdGNfyL97AU/b+Sp7e/pRMaI/
-	VRoJU7KM94ZdC7lybOJ3QsBFPxPr+iWUjQyGyttDT02EMjjgcgryE/XfSGOJa7+/Qb2TYUKYtUl
-	kJMXly8Nt024H72mjQJi1r/CDTqDqnrduf6d2bs2djWqCcdU4Smr4NOvBOF1RYUAtzjqkUOtdjZ
-	3ZvPazK7zvREqt2gBDiliTxgGldjQeoAO5GCOwyIcOeGYmp6aKDaMzLxODQPywiq1VhJ7GmYGHn
-	dn1Q09BKzL2Ks8AbslrzTdU9A2LnHZeC0BYznEaCM+8j+qti8e7PhhASfOtbeatXx//7lddtadM
-	BvDxfPyw9VZTEPjSysDnXFMIGBYweQlI9eRF/rKc4+tQBvvkQskcfN39tlhnpUgCN+HnFYZKoCC
-	s7AcYRE+YYfrPrXnD+H1hwxO7qWpKsgoHhHKitboLOcKwy+mHnFi7FqBXDJF1XjfuQjbQfz7HxS
-	IewEO3pxz42HQz7DuwX2MEe7Crzejg=
-X-Received: by 2002:a05:6000:1842:b0:44c:53dc:8cb2 with SMTP id ffacd0b85a97d-4516594c3f1mr4347575f8f.14.1778064116826;
-        Wed, 06 May 2026 03:41:56 -0700 (PDT)
+        bh=kNKW8exgBK0FS2c2WGoBUqZnBzWtTWrHpZ5cK2HpsJk=;
+        b=gN1wop4KHPeSaDl/QGyX3N3qZH/qFamugTO0/eySCLM7GqstQsS7UXMz2lqkaKxsNO
+         nq21Q+OpHFdOnQgPGk/edLaK0psEOdfNZXaHwJ4w+in9DkFYGAaPHXZrPEAoGUUrQZcy
+         KP6BFa/DBoDcbPYgjwm5x/7435nmqAQq6SYpwIwsvwvRHj1TTJCGXR393sKuJ7va7s3t
+         ALb5cperwa+tgystsgD1tUowmpcWdeNWiEsRAKEt+0VqXU5u9y5yYiMyZo1Hrk9hkOqi
+         r1kCi+eH6tfbd25QH+nzzHb4TiuknQXDQR5cFiJ3gZDSkHsEUHkazYF682Pa8NxnmioT
+         HYcQ==
+X-Gm-Message-State: AOJu0YxmyDt5UOaSWFex7jiB4aiXIpDI6dzurnF5cbyVC9zbgmUL+MLi
+	b9ZZfzYu1u7nlQs5sL2V9q+BOhatGG9KgI79FHtgKBtJ/JOkNyCIwvg+qMyUoXXTae2Rtddcz7V
+	XMpZxfrs=
+X-Gm-Gg: AeBDievEI7ya/qAlAtpHHQrvqxRAhikr0lPUrGsUz9vtOb113/llPRnenM3e3XGXojy
+	gnpKyYtnT6YNkJSYKCZ79AgOiq7e0Dq10vNLrQZyjnJkcATLRCZKOcDgY8Or1waBZ0alWXf/9JT
+	7H1c1sSwM58WhIAE4VfHufQGATdOAi0jtSGf/3yhS/uP5UXxcwF+qAq8R5fv6zMEmaM89w3I+Lo
+	uOlkrZC/19N3xOj6HrNT1O5Wm/MGs+4mkFYkuqES+iJ9wjpid2wJRanUcEQF23ZNz7MSDTKW6UP
+	ygFnZ13lVeLKgSF53VT2LVwRo2sNN7YiGUyuaSdJCayZ3dLwS35DbhbZghrDSN5KV0xb1/e2u7N
+	LrO6tZYbAuz6+FjQ5rNWyXAEGReWvZQUWEP50XgkK0duyIHJTTVeLQzVj78/lkGx1iv9E4n5+Qz
+	aZJJU6cvUv+Ya7nNSW5vQEWz0TW2eXpNiVXLsgaeqjQBcgUywT0c7FA64cplLz0Bv5qXQccuuAU
+	QJZR8Z4HUJr4wR1qf6EtLXFuhAP374=
+X-Received: by 2002:a05:6000:26ca:b0:43d:68ad:3b7f with SMTP id ffacd0b85a97d-4515ce1ca0emr4794680f8f.21.1778064198973;
+        Wed, 06 May 2026 03:43:18 -0700 (PDT)
 Received: from [10.211.9.173] ([213.147.98.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-450524833e1sm11670232f8f.2.2026.05.06.03.41.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-450524834eesm11178915f8f.4.2026.05.06.03.43.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2026 03:41:56 -0700 (PDT)
-Message-ID: <9face7b3-d4de-474f-8948-d8efde02bfc8@kernel.dk>
-Date: Wed, 6 May 2026 04:41:55 -0600
+        Wed, 06 May 2026 03:43:18 -0700 (PDT)
+Message-ID: <be3d5412-ec7c-4abf-b890-22c0b7295cc3@kernel.dk>
+Date: Wed, 6 May 2026 04:43:17 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,48 +69,39 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: add NULL checks for bic in bfq_bfqq_save_state
- function
-To: yanlonglong <yanlonglong@kylinos.cn>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yukuai@fnnas.com
-References: <db3d516f-6ad2-469a-9bd8-1a9b61eb12a0@kernel.dk>
- <20260506090409.49648-1-yanlonglong@kylinos.cn>
+Subject: Re: [PATCH v2] block: only read from sqe on initial invocation of
+ blkdev_uring_cmd()
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <64e053e4-24aa-434d-9b35-794d3b292628@kernel.dk>
+ <CADUfDZq11PnyH5Vh8VjUzsV9Mxq6=0poGw--umMxccfwXiz54g@mail.gmail.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260506090409.49648-1-yanlonglong@kylinos.cn>
+In-Reply-To: <CADUfDZq11PnyH5Vh8VjUzsV9Mxq6=0poGw--umMxccfwXiz54g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 5/6/26 3:04 AM, yanlonglong wrote:
-> When the `bic` variable is null, referencing `bfqq_data` through `bic` will
-> cause the program to crash. Therefore, the null check for `bic` should be
-> moved to the beginning of the function to prevent referencing a null pointer.
+On 5/5/26 9:32 AM, Caleb Sander Mateos wrote:
+> On Tue, May 5, 2026 at 12:38?AM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> This passthrough helper currently only supports discards. Part of that
+>> command is the start and length, which is read from the SQE. It does
+>> so on every invocation, where it really should just make it stable
+>> on the first invocation. This avoids needing to copy the SQE upfront,
+>> as we only really need those two 8b values stored in our per-req
+>> payload.
+> 
+> Maybe I'm missing something, but how does this avoid the SQE copy?
+> Won't io_uring_cmd_sqe_copy() still copy the SQE if the command issue
+> is delayed by links/drain/forced async or if the initial issue returns
+> EAGAIN? The code change looks fine to me, but I'm not sure I
+> understand the motivation.
 
-Cap at 72 char line length... And title should start with "block, bfq: ".
-And should be "add NULL check", singular, see below.
-
-> Fixed:fd571df0ac5b289af8?"block, bfq: turn bfqq_data into an array in bfq_io_cq"?
-
-This tag is wrong, should be a shortened sha and the format is also
-wrong (Fixed vs Fixes).
-
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 141c602d5e85..e952e4ea2dd4 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -3035,9 +3035,8 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
->  {
->  	struct bfq_io_cq *bic = bfqq->bic;
-> -	unsigned int a_idx = bfqq->actuator_idx;
-> -	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
-> -
-> +	unsigned int a_idx = 0;
-> +	struct bfq_iocq_bfqq_data *bfqq_data = NULL;
-
-You're killing the empty line between variables and the comment. And why
-is a_idx being moved? This is !bic being NULL, presumably?
+Because the alternative would be to copy it upfront and then using ->sqe
+would always be fine. But we can just ensure start/len are stable. The
+patch is about the latter, not adding any further copy avoidance. Yes if
+you use async or it's a link or drained, prep will always copy it.
+That's fine.
 
 -- 
 Jens Axboe
