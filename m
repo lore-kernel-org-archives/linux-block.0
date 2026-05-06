@@ -1,438 +1,215 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3DE22AE65
-	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 13:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778075506; cv=none; b=qqjS+GzgJ5W6v2do7Gd3Z0iWjWqQEwiUHsPXgIZjxe8OOByauLQNHzMqbEPuYB0kQ/cq8LoxGFzx+a8kAe8To0TJxM8Y3DGvyTwc6RkBql8G43W8u+vYfYHZnsbOkM+a/ejr8mqlk2BxKFx/jLAkHfregusdIAhNWe0i4kbxBX4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778075506; c=relaxed/simple;
-	bh=LWjVTnJKRNj7G/2V9+mHhYoW1hPBBC7V7osckVb59wM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OXQ7iwiZX7uFQcxm+qcmFyCJaPzXPG1GU2HgJP+AA9SityUXBCiwne/l6jgCLJ28JtukM8rsc7ia4E5YuBw3/ed9hQupZIvUJ+ElNAeo2+KxJaDARiqAK2S8f2Ng6OOhJskw3iNB4lJADhto5tiDHCOfLj7xsaTefddbB150UvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zh6cZmmA; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4441F4611C6
+	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 13:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778075727; cv=pass; b=iKY9Zb2tmzCpxSUf2VxkzpsKvdgzp/nH5DMAvRyqLpJGCBSYBopkHNysY/Di9bK0e/W4EUf08DsLIsa8A7EVBGGkf2KKYbbC3bPdCDjGnEXzbD/Kn8xaIg3Y8TDgLkxdylYfoPLebcvDtkDmWa7g5BbUWaT+Q0ryq5jgObI9FOM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778075727; c=relaxed/simple;
+	bh=2KP3Gj9aAfmR1sfpaUt/E/mXu4yFOIappvpZCpTNm+0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LcVRifFBHjFX+A5pBXkPvkY29owm+6qxPqMcLcxu0GjWB5e76l2YOBPyHhHGXZzY5uTXZrZNpXjeAFokL6kNeEcnTGfBcFDTfD750+U3oAqDl8bMMD6QTaBMFLDatV7dhXScImZTbm7aDkx8hSdT8fb0kKfSlX8vKYFeQD6E6xI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxV7LGu1; arc=pass smtp.client-ip=209.85.128.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zh6cZmmA"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2ad21f437eeso7761295ad.0
-        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 06:51:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxV7LGu1"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7bd5dde63dbso66576157b3.3
+        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 06:55:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778075725; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Mzv8Gvz7io03SXQEEe5dlisHcdBQzPhBYI3gD23AS6Mg8ivBiDMLG5WCUZi8vprZ+Y
+         hF5KnevMJ7+6ZPVAeW51ACVHaRgXYHRpXvHUcvtQr5IcV3GISVnt7PfqCyl7oMT5BIh+
+         ezhyfSrxHV/+dTLzZY+kXch/B+bfygXs/REEbVF5r7b+LlqivsA1Xh5yv+mkcpYBsOZb
+         J7iLHv7Ge7xt8qwjJbELeB6hNHn7gTBRWvt1i0Q1fwmvhnUCpxlFpoAUhilxWGRtk6eE
+         0ZQtuvZr0FnC9rrslCWJlKRA1T399qJR7cU/Z4ODN3xYtU4eZL3uQmc8AkIIzaz2BfsS
+         VeWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=aNRy0S6L3YSzMl7VPrdeXJU725FCyYdB61hcQ1UpLhI=;
+        fh=ghioexF/rKMvoNMd/Mjc/MwsmP6jgMEDWcy3lKX3aG4=;
+        b=U9JCc2Kto8dRtat2/iBJ4wVrdXezOJ/YdgVqawEvoJxSG2KUo4nW6sRsiJu0ymJ23U
+         df9+V9nl3OTlToqp9lKdPWLz6M+SGCc6Htv1SioMcQKek2IyfSxogLup85B2c0KCPtIi
+         SKgpUjfcPG6xTKTvlkHjsi/9pnWQQYf3SrQp9E/JSbEsfLCbwtWFFZy6thlU5nHJbtar
+         xbeHArOXyGKt9xWrUhnnfzZMOm8GFlJo+7wXHKO4dKeqmHAQQYyapLEuFCzZEV4Hbn4w
+         bRpipHNI1s6VHVKIAjpMD3TKVOFORunlNPY8N/X92bB9dIgClkI0v2T34WeyhfTKp/63
+         y5RQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778075503; x=1778680303; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1778075725; x=1778680525; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ezuaXNEegTO67jS4OHIKFoL/ovNqxQxNcS5nsfNqawM=;
-        b=Zh6cZmmAvS5XBNIeiulwryrmV7gt+ffs6d7PXDJfU6hVI0TW2ipcDrjn6Pi40Om41J
-         xyPeUP5No7CUj1sjlGDhGdsb3A9Zn+j6ssAkt2FdPOILemb9aKCJyPWEKvue4gJZLgG0
-         jEh7ihmQQ8VKyDqoBrBu67Nj7ZFbU+zYKpJsaL3cp1W30qeO+iSiYy1c1DNuExB3SSUa
-         f9RwIa+i/L2YDxWpgUelNpoouFuTxi98rHJmPjJX4JyA9n9k8bq6RkrLuZnF3DhnQCGp
-         NULSvgxpvuJfmbpE+2DFRQo5IjEVyOkax5MWxtX4B1FOBaKex4zS+a834oZmf/4amipv
-         bFdA==
+        bh=aNRy0S6L3YSzMl7VPrdeXJU725FCyYdB61hcQ1UpLhI=;
+        b=bxV7LGu1fI7cQSnMW5vL8lZW9TeJrT6Qde6oM7aSYLppHdfIxsnntwwnh6bbAyNYGi
+         Vtl2nXxJlAwtmqYWRt8bMl9OOCS4mWoKPHUKs48/Qar74xMZU0DQraEwqpHOQYmcg4cG
+         17m7H6aOuaCCdrdXsYmf4NnaUa9o9iJKSuHq6TlnHZvgWHuhYq9XOY1zbqJZOtwTKwbn
+         zkEwyXhfQzKfbrcWhC0ZH4FceGtZLE50diiCZtXIIcG3VaKNWz8ArWi2mwdowwj4OJKa
+         NW5AyhH48l00gZgP+0BbSpExrAaOOhezYZSMWBP4p3E8XfZoivip2+37Qxooj/eTYxQ+
+         5Mbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778075503; x=1778680303;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1778075725; x=1778680525;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ezuaXNEegTO67jS4OHIKFoL/ovNqxQxNcS5nsfNqawM=;
-        b=aQDcpdK8xQQ+otuPhMdG8hgyZnlqX1EPwIqJIUF/faWX7MaV39Kiror7RVb59fPXkt
-         KVTljK17RwddsXj+GeRRvpwogJ3TDp2stv1gVqAX33YRPjgsjRJnZ0F+n0bUASBQ9Dng
-         5Ae9zhnn6ymFKlR4KPCh17haZAcwQ9ULUGKHMzCKx1Gf2dJEBahmEbB0fWTzlpeP5JPW
-         AJTgtL9SpCRbx6tsS74MZtz6eetiApFxDZ507ciZw09PrbdBlScN3pdB4MqUrtl9Aozp
-         IAExTTIvYqPet7MfVo8qgZLYbAqSiRutQC4MOt0KyqdJaWaJ1os3TA58t3woVPfkJ+om
-         q59A==
-X-Gm-Message-State: AOJu0Yy0fLdr1IWiI/xtOj/+q8Fgt1qfzamKdyw7rv6TUxSLCUbBrxM5
-	I4CT+CffuJ4jFgX69QXXL/3e42DEZ1Vkr5KX7mhWeDkTEYWvbtpH997r
-X-Gm-Gg: AeBDieuayzz9blqAVlNfYS/cC2ANZ3Bp0n+2QL8uzkslRPoErbUvjEwV8xz+qIT7hHq
-	GJfJVvGlC+AFP8MwUClMCOvxmwMCjo9ddcMbR+CIDzTGTONq+JOaJfH+4MxxWMPQABayK4UWO4c
-	7QPpVl/JXq8fiaSWg7ttpxH8VreIouXx/YsnEFNaCV2HFQH+okbh+fC4c/bX3Y5JgvDMV8SB9Jv
-	OZFK2gw7bObNBPH4OnOl7mYdLOcjgIJKXsiZe3xjBkrDqSF53kgjwvnlXjGafZBjNPk7QDpQhv5
-	QsCrwoH1jhhL21pZyh2/1UQrmMorAKK0KoYSqM74ahtzVK2+IXmBSxTr4IIfgjWW1yoGCsH0W7H
-	LEoKYLLEyKT2sjBPC5Npj+N2sXSCJNrSiUr6G9qLLrzBmJickEILoavXIn3Igrhpsbhsz3iDYsE
-	Z/DL/uBAvgT7nwl8NpLQxSQw==
-X-Received: by 2002:a17:903:3dce:b0:2b0:4fb3:c771 with SMTP id d9443c01a7336-2ba4d68d5dcmr52292415ad.6.1778075502374;
-        Wed, 06 May 2026 06:51:42 -0700 (PDT)
-Received: from n37-098-250.byted.org ([240e:83:200::738])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ba7bf330a0sm26970375ad.31.2026.05.06.06.51.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 06:51:41 -0700 (PDT)
-From: Diangang Li <diangangli@gmail.com>
-To: axboe@kernel.dk,
-	viro@zeniv.linux.org.uk,
-	brauner@kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	changfengnan@bytedance.com,
-	Diangang Li <lidiangang@bytedance.com>
-Subject: [RFC v1 1/1] buffer_head: fail fast on repeated reads after I/O errors
-Date: Wed,  6 May 2026 21:50:47 +0800
-Message-Id: <20260506135047.2670453-2-diangangli@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260506135047.2670453-1-diangangli@gmail.com>
-References: <20260506135047.2670453-1-diangangli@gmail.com>
+        bh=aNRy0S6L3YSzMl7VPrdeXJU725FCyYdB61hcQ1UpLhI=;
+        b=iR9T60GDxxtVfRIdHxMWw50CCQbz3Epny2U8iIpXnI5+p1aDx3icR3RThd/So4Bsgx
+         VwF0fqj1qrNu8xcN+khfBPBFYMEj6X2yEhCi/u0RVv+R7kla5reQb6kQ+UtkCM6hQNSm
+         K3JebX/0osQezN4HMZKaOhevedLSOyh8FKTGnhgwCcBY1kasj2pTQN13HlFyLWAOgoFF
+         K0xqwdDJUT/ZQ8S2c9iJKarD5DZrf5kjyCCuW3VbtDaqx0KlU+GuZ0Hso436OMe2bLjX
+         4blS9rjeOLw5rSRV22pDUDRsBGa8JlkzC/mnG6enFnociJoFhuhgUangLNPSmdqfznyW
+         KsXQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+g0a3MVfOvNiM+6XKQ23JDXLb0LqF+bbWhkH6PknwrvVWn9ZWFcXJaN3bGx/StQvaquRYxs0iYyvSk2g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyobvJeMGVJfWl3PRIRACI5COd2xkOTmD6X9UrRPZ3EeO8nKYxm
+	PhizWfXldl7OLV6K5s1Ohvi+iiYm5hSUFDZDS4RTktk5fVNEnfceSLl9kLqQ7de2qhAgAZRg1Dn
+	7tljxC3VKEIHanDO9wWPmJ7i4s72NyE8=
+X-Gm-Gg: AeBDievdJjR4KAZfhKyxt1KLc0Y0EVHJhtd82tnLKQTypgU+lt1KWPUjWZZOYycv8ox
+	vK9eOXzCe/ml/PclK1L7pUaPGdEdkowogkBfLGVZLcEnkbUfgPB39soveX6NT1QNSNHS58LMnuI
+	XOTA85G/r3B42jX9Xi3WQWlzEvnGMx1FsXY9aFSc/17uxKR/2pDCMbkq8msfqtRWi2NBIlZDPsn
+	jjZ2F+g4K0+NsbDPZdLV6HO8fr0ICUJyU64D78svMUz31K6hlJLZ8UsLmN3bqjGOmFp5tRELA+A
+	WLz4kW+I0mcu4aRYtaj+PG+hqtgyPg==
+X-Received: by 2002:a05:690c:f06:b0:7bd:9ce7:164c with SMTP id
+ 00721157ae682-7bdf5ef293amr42572997b3.43.1778075725139; Wed, 06 May 2026
+ 06:55:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260421121616.3298845-1-haowenchao@xiaomi.com>
+ <CAOptpSPs-1UrEa8AHg19e590=SiV6bpnex7gCbif8=aY7BtpuA@mail.gmail.com>
+ <CAO9r8zOjugCwWqHP3zxXPmjp8TwpoROCjCqTZ_uxOBQwVqCWqA@mail.gmail.com>
+ <CAOptpSMQyyb+q-VJdJ0RzNkjaer1CTePM5WkwEj_7cAO4aUToQ@mail.gmail.com> <CAKEwX=PrfrNys4ao7-d11J7r4pv5VmE8gTU_7iUHaHAKNaFuBQ@mail.gmail.com>
+In-Reply-To: <CAKEwX=PrfrNys4ao7-d11J7r4pv5VmE8gTU_7iUHaHAKNaFuBQ@mail.gmail.com>
+From: Wenchao Hao <haowenchao22@gmail.com>
+Date: Wed, 6 May 2026 21:55:14 +0800
+X-Gm-Features: AVHnY4LF3aWQo3HGLZrYMNvLGHmAQYHlyMw97GRdhJ_YEuxrndl8XeHVPrQ1D64
+Message-ID: <CAOptpSOnRCHo35KK5x3S0f5y9+7+dxfznpjNRH072jZvhYHwww@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/4] mm/zsmalloc: reduce zs_free() latency on swap
+ release path
+To: Nhat Pham <nphamcs@gmail.com>
+Cc: Yosry Ahmed <yosry@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	Barry Song <baohua@kernel.org>, Xueyuan Chen <xueyuan.chen21@gmail.com>, 
+	Wenchao Hao <haowenchao@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Diangang Li <lidiangang@bytedance.com>
+On Sat, May 2, 2026 at 3:21=E2=80=AFPM Nhat Pham <nphamcs@gmail.com> wrote:
+>
+> > With only the class_idx-in-obj encoding (eliminating pool->lock from
+> > zs_free, no deferred freeing), we measured on two platforms.
+> >
+> > Test: each process independently mmap 256MB, write data, madvise
+> > MADV_PAGEOUT to swap out via zram (lzo-rle), then concurrent munmap.
+> >
+> > Raspberry Pi 4B (4-core ARM64 Cortex-A72):
+> >
+> >   mode        Base       ClassIdx-only   Speedup
+> >   single      59.0ms     56.0ms          1.05x
+> >   multi 2p    94.6ms     66.7ms          1.42x
+> >   multi 4p    202.9ms    110.6ms         1.83x
+> >
+> > x86 physical machine (4-core Intel i7-12700, 2 rounds averaged):
+> >
+> >   mode        Base       ClassIdx-only   Speedup
+> >   single      11.7ms     9.8ms           1.19x
+> >   multi 2p    24.1ms     17.2ms          1.40x
+> >   multi 4p    63.0ms     45.3ms          1.39x
+>
+> Oh man, you are eliminating pool lock here right? This would help my
+> other patch series a lot too :)
+>
+> https://lore.kernel.org/all/CAKEwX=3DM5YpR0cQrryX_y4pm_BuxyUWZ_8MbhWodwbf=
+1Fe=3Dgzew@mail.gmail.com/
+> https://lore.kernel.org/all/CAKEwX=3DPkFiP+u+ThrzjTKBi+usQf2uuhTZcfB2BNNA=
+8RboOFDQ@mail.gmail.com/
+>
 
-A failed buffer_head read leaves the buffer !Uptodate. If multiple
-threads hit that same buffer_head, they serialize on BH_Lock and each
-one re-submits the same read after the previous owner drops the lock.
-If the device is slow to return the error, this can turn one bad block
-into long stalls and repeated slow I/O.
+Yes, exactly. With class_idx encoded in the obj value,
+zs_free() can determine the correct size_class without
+any pool-level lock. The lockless read gives a valid
+class_idx because it's invariant across migration (only
+PFN changes), and we re-read obj under class->lock to
+get a stable PFN.
 
-Trying to remember bad LBAs in block or drivers would need a generic
-per-device table with lookup, eviction, and lifetime rules. For buffer_head
-users, keep the failure state with the cached buffer_head instead.
+> Well, the deferred freeing would completely move that contention out
+> of the way lol. But this would benefit all users, regardless of
+> whether we're deferring the free step or not (for instance, this will
+> reduce contention between page fault and compaction, IIUC?) I feel
+> like you'll get some good numbers testing in a system with compaction
+> and THP enabled, with lots of swap activities. Which is... a lot of
+> server setup :)
+>
+> If the deferred freeing is too controversial, this smells like
+> something that should be upstreamed independently.
+>
 
-Track non-readahead read I/O errors in buffer_head with a dedicated bit
-and a failure timestamp. Update this state from the bio completion path.
-Add an optional per-bdev retry window: within the window, non-readahead
-submit_bh() reads complete immediately with failure for a buffer_head
-that recently saw a non-readahead read error. A successful read or
-rewrite clears the state.
+Agreed. We're planning to split the series so that the
+class_idx encoding + pool->lock elimination can be
+reviewed and merged independently of the deferred free
+framework. It's a pure win with no behavioral change
+=E2=80=94 just less lock contention.
 
-The timestamp is recorded on the first error only, so repeated failures do
-not extend the window. Once the window expires, the next read is submitted
-normally and can discover that the device or media has recovered.
+> >
+> > Single-process shows modest improvement. With multiple processes,
+> > each read_lock/read_unlock atomically modifies the shared rwlock
+> > reader count, and the cost of these atomic operations increases
+> > with more CPUs accessing the same cacheline concurrently.
+> > Eliminating pool->lock removes this overhead entirely.
+> >
+> > This only works on 64-bit systems where OBJ_INDEX_BITS has enough
+> > spare bits to fit class_idx. 32-bit systems don't have the room.
+> > I'm still working on the compile-time gating to properly enable
+> > this based on architecture and page size configuration.
+>
+> /*
+> * The pool->lock protects the race with zpage's migration
+> * so it's safe to get the page from handle.
+> */
+> read_lock(&pool->lock);
+> obj =3D handle_to_obj(handle);
+> obj_to_zpdesc(obj, &f_zpdesc);
+> zspage =3D get_zspage(f_zpdesc);
+> class =3D zspage_class(pool, zspage);
+> spin_lock(&class->lock);
+> read_unlock(&pool->lock);
+>
+> It's basically just this blob right?
+>
 
-Configure per block device via sysfs:
+Yes, that's the blob being replaced. On the
+ZS_OBJ_CLASS_IDX path (64-bit systems), it becomes:
 
-  /sys/block/<disk>/read_err_retry_sec
-  /sys/block/<disk>/<part>/read_err_retry_sec
+    obj =3D handle_to_obj(handle);
+    class =3D pool->size_class[obj_to_class_idx(obj)];
+    spin_lock(&class->lock);
+    obj =3D handle_to_obj(handle); /* re-read for stable PFN */
 
-Default is 0, preserving existing behavior. Disk and partition values are
-independent, and values larger than MAX_JIFFY_OFFSET / HZ are rejected to
-avoid jiffies overflow.
+No pool->lock at all. We've also added compile-time
+gating (#if BITS_PER_LONG >=3D 64) since 32-bit systems
+lack the spare bits in OBJ_INDEX to fit class_idx. On
+32-bit, it falls back to the original pool->lock path.
 
-Link: https://lore.kernel.org/linux-ext4/20260325093349.630193-1-diangangli@gmail.com/
-Signed-off-by: Diangang Li <lidiangang@bytedance.com>
----
- Documentation/ABI/stable/sysfs-block | 26 +++++++++++
- block/genhd.c                        | 24 ++++++++++
- block/partitions/core.c              | 24 ++++++++++
- fs/buffer.c                          | 65 ++++++++++++++++++++++++++++
- include/linux/blk_types.h            |  3 ++
- include/linux/buffer_head.h          | 10 +++++
- 6 files changed, 152 insertions(+)
-
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index 900b3fc4c72d0..b850f96fa048e 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -185,6 +185,32 @@ Description:
- 		unsigned integer, but only "0" and "1" are valid values.
- 
- 
-+What:		/sys/block/<disk>/read_err_retry_sec
-+What:		/sys/block/<disk>/<partition>/read_err_retry_sec
-+Date:		May 2026
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		(RW) Configure the fail-fast window, in seconds, for repeated
-+		buffer_head reads after read I/O errors.
-+
-+		The default value is 0, which disables the fail-fast behavior and
-+		preserves the existing retry behavior. When this value is non-zero,
-+		a buffer_head that has recently seen a non-readahead read I/O error
-+		can fail another read immediately within the configured window,
-+		instead of submitting another bio for the same buffer_head.
-+
-+		This only applies to buffer_head reads submitted through submit_bh().
-+		It is not a generic block layer read retry policy, and it does not
-+		affect direct I/O or non-buffer_head bio submissions.
-+
-+		Disk and partition attributes are independent. Setting the disk
-+		attribute does not change the value for existing or future
-+		partition block devices.
-+
-+		The maximum accepted value is MAX_JIFFY_OFFSET / HZ. Larger values
-+		are rejected with -ERANGE.
-+
-+
- What:		/sys/block/<disk>/<partition>/alignment_offset
- Date:		April 2009
- Contact:	Martin K. Petersen <martin.petersen@oracle.com>
-diff --git a/block/genhd.c b/block/genhd.c
-index 7d6854fd28e95..302dce67d685c 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1159,6 +1159,28 @@ static ssize_t partscan_show(struct device *dev,
- 	return sysfs_emit(buf, "%u\n", disk_has_partscan(dev_to_disk(dev)));
- }
- 
-+static ssize_t read_err_retry_sec_show(struct device *dev,
-+				       struct device_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lu\n",
-+			  READ_ONCE(dev_to_bdev(dev)->bd_read_err_retry_sec));
-+}
-+
-+static ssize_t read_err_retry_sec_store(struct device *dev,
-+					struct device_attribute *attr,
-+					const char *buf, size_t count)
-+{
-+	unsigned long sec;
-+
-+	if (kstrtoul(buf, 0, &sec))
-+		return -EINVAL;
-+	if (sec > MAX_JIFFY_OFFSET / HZ)
-+		return -ERANGE;
-+
-+	WRITE_ONCE(dev_to_bdev(dev)->bd_read_err_retry_sec, sec);
-+	return count;
-+}
-+
- static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
- static DEVICE_ATTR(ext_range, 0444, disk_ext_range_show, NULL);
- static DEVICE_ATTR(removable, 0444, disk_removable_show, NULL);
-@@ -1173,6 +1195,7 @@ static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
- static DEVICE_ATTR(badblocks, 0644, disk_badblocks_show, disk_badblocks_store);
- static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
- static DEVICE_ATTR(partscan, 0444, partscan_show, NULL);
-+static DEVICE_ATTR_RW(read_err_retry_sec);
- 
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- ssize_t part_fail_show(struct device *dev,
-@@ -1224,6 +1247,7 @@ static struct attribute *disk_attrs[] = {
- 	&dev_attr_events_poll_msecs.attr,
- 	&dev_attr_diskseq.attr,
- 	&dev_attr_partscan.attr,
-+	&dev_attr_read_err_retry_sec.attr,
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	&dev_attr_fail.attr,
- #endif
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 5d5332ce586b6..62b4c2f70709f 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -205,6 +205,28 @@ static ssize_t part_discard_alignment_show(struct device *dev,
- 	return sysfs_emit(buf, "%u\n", bdev_discard_alignment(dev_to_bdev(dev)));
- }
- 
-+static ssize_t read_err_retry_sec_show(struct device *dev,
-+				       struct device_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lu\n",
-+			  READ_ONCE(dev_to_bdev(dev)->bd_read_err_retry_sec));
-+}
-+
-+static ssize_t read_err_retry_sec_store(struct device *dev,
-+					struct device_attribute *attr,
-+					const char *buf, size_t count)
-+{
-+	unsigned long sec;
-+
-+	if (kstrtoul(buf, 0, &sec))
-+		return -EINVAL;
-+	if (sec > MAX_JIFFY_OFFSET / HZ)
-+		return -ERANGE;
-+
-+	WRITE_ONCE(dev_to_bdev(dev)->bd_read_err_retry_sec, sec);
-+	return count;
-+}
-+
- static DEVICE_ATTR(partition, 0444, part_partition_show, NULL);
- static DEVICE_ATTR(start, 0444, part_start_show, NULL);
- static DEVICE_ATTR(size, 0444, part_size_show, NULL);
-@@ -213,6 +235,7 @@ static DEVICE_ATTR(alignment_offset, 0444, part_alignment_offset_show, NULL);
- static DEVICE_ATTR(discard_alignment, 0444, part_discard_alignment_show, NULL);
- static DEVICE_ATTR(stat, 0444, part_stat_show, NULL);
- static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
-+static DEVICE_ATTR_RW(read_err_retry_sec);
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- static struct device_attribute dev_attr_fail =
- 	__ATTR(make-it-fail, 0644, part_fail_show, part_fail_store);
-@@ -227,6 +250,7 @@ static struct attribute *part_attrs[] = {
- 	&dev_attr_discard_alignment.attr,
- 	&dev_attr_stat.attr,
- 	&dev_attr_inflight.attr,
-+	&dev_attr_read_err_retry_sec.attr,
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	&dev_attr_fail.attr,
- #endif
-diff --git a/fs/buffer.c b/fs/buffer.c
-index b0b3792b1496e..2a28ab6a51f0e 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -920,6 +920,7 @@ static sector_t folio_init_buffers(struct folio *folio,
- 			bh->b_private = NULL;
- 			bh->b_bdev = bdev;
- 			bh->b_blocknr = block;
-+			clear_buffer_read_io_error_state(bh);
- 			if (uptodate)
- 				set_buffer_uptodate(bh);
- 			if (block < end_block)
-@@ -1503,6 +1504,7 @@ static void discard_buffer(struct buffer_head * bh)
- 	lock_buffer(bh);
- 	clear_buffer_dirty(bh);
- 	bh->b_bdev = NULL;
-+	clear_buffer_read_io_error_state(bh);
- 	b_state = READ_ONCE(bh->b_state);
- 	do {
- 	} while (!try_cmpxchg_relaxed(&bh->b_state, &b_state,
-@@ -1997,6 +1999,7 @@ iomap_to_bh(struct inode *inode, sector_t block, struct buffer_head *bh,
- 		bh->b_blocknr = (iomap->addr + offset - iomap->offset) >>
- 				inode->i_blkbits;
- 		set_buffer_mapped(bh);
-+		clear_buffer_read_io_error_state(bh);
- 		return 0;
- 	default:
- 		WARN_ON_ONCE(1);
-@@ -2663,6 +2666,33 @@ sector_t generic_block_bmap(struct address_space *mapping, sector_t block,
- }
- EXPORT_SYMBOL(generic_block_bmap);
- 
-+static void bh_update_io_error_state(struct buffer_head *bh, const struct bio *bio)
-+{
-+	const enum req_op op = bio_op(bio);
-+
-+	if (op != REQ_OP_READ && op != REQ_OP_WRITE)
-+		return;
-+
-+	/*
-+	 * Track non-readahead read failures (timestamped) so submit_bh() can
-+	 * fail repeated reads fast. A successful read or rewrite clears the
-+	 * state.
-+	 */
-+	if (!bio->bi_status) {
-+		clear_buffer_read_io_error(bh);
-+		bh->b_err_timestamp = 0;
-+		return;
-+	}
-+
-+	/* Record the first failure; don't extend the window on repeats. */
-+	if (op != REQ_OP_READ || (bio->bi_opf & REQ_RAHEAD) ||
-+	    buffer_read_io_error(bh))
-+		return;
-+
-+	set_buffer_read_io_error(bh);
-+	bh->b_err_timestamp = jiffies;
-+}
-+
- static void end_bio_bh_io_sync(struct bio *bio)
- {
- 	struct buffer_head *bh = bio->bi_private;
-@@ -2670,10 +2700,37 @@ static void end_bio_bh_io_sync(struct bio *bio)
- 	if (unlikely(bio_flagged(bio, BIO_QUIET)))
- 		set_bit(BH_Quiet, &bh->b_state);
- 
-+	bh_update_io_error_state(bh, bio);
-+
- 	bh->b_end_io(bh, !bio->bi_status);
- 	bio_put(bio);
- }
- 
-+static bool bh_failfast_read(struct buffer_head *bh)
-+{
-+	unsigned long retry_sec = READ_ONCE(bh->b_bdev->bd_read_err_retry_sec);
-+
-+	if (!retry_sec || !buffer_read_io_error(bh))
-+		return false;
-+
-+	/* No timestamp: treat as stale state and re-arm on the next failure. */
-+	if (!bh->b_err_timestamp) {
-+		clear_buffer_read_io_error(bh);
-+		return false;
-+	}
-+
-+	if (time_before(jiffies,
-+			bh->b_err_timestamp + secs_to_jiffies(retry_sec))) {
-+		test_set_buffer_req(bh);
-+		bh->b_end_io(bh, 0);
-+		return true;
-+	}
-+
-+	clear_buffer_read_io_error(bh);
-+	bh->b_err_timestamp = 0;
-+	return false;
-+}
-+
- static void buffer_set_crypto_ctx(struct bio *bio, const struct buffer_head *bh,
- 				  gfp_t gfp_mask)
- {
-@@ -2702,6 +2759,14 @@ static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
- 	BUG_ON(buffer_delay(bh));
- 	BUG_ON(buffer_unwritten(bh));
- 
-+	/*
-+	 * Fail fast for repeated non-readahead buffer_head reads after a recent
-+	 * I/O error. This avoids serializing many callers on BH_Lock while
-+	 * re-submitting the same failing read.
-+	 */
-+	if (op == REQ_OP_READ && !(opf & REQ_RAHEAD) && bh_failfast_read(bh))
-+		return;
-+
- 	/*
- 	 * Only clear out a write error when rewriting
- 	 */
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 8808ee76e73c0..9437c471ee7d7 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -69,6 +69,9 @@ struct block_device {
- 	atomic_t		bd_fsfreeze_count; /* number of freeze requests */
- 	struct mutex		bd_fsfreeze_mutex; /* serialize freeze/thaw */
- 
-+	/* Seconds; 0 disables read fail-fast window for submit_bh(READ). */
-+	unsigned long		bd_read_err_retry_sec;
-+
- 	struct partition_meta_info *bd_meta_info;
- 	int			bd_writers;
- #ifdef CONFIG_SECURITY
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index e4939e33b4b51..3ab36429f8f38 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -29,6 +29,7 @@ enum bh_state_bits {
- 	BH_Delay,	/* Buffer is not yet allocated on disk */
- 	BH_Boundary,	/* Block is followed by a discontiguity */
- 	BH_Write_EIO,	/* I/O error on write */
-+	BH_Read_EIO,	/* I/O error on read */
- 	BH_Unwritten,	/* Buffer is allocated on disk but not written */
- 	BH_Quiet,	/* Buffer Error Prinks to be quiet */
- 	BH_Meta,	/* Buffer contains metadata */
-@@ -79,6 +80,7 @@ struct buffer_head {
- 	spinlock_t b_uptodate_lock;	/* Used by the first bh in a page, to
- 					 * serialise IO completion of other
- 					 * buffers in the page */
-+	unsigned long b_err_timestamp;	/* timestamp of last I/O error */
- };
- 
- /*
-@@ -132,11 +134,18 @@ BUFFER_FNS(Async_Write, async_write)
- BUFFER_FNS(Delay, delay)
- BUFFER_FNS(Boundary, boundary)
- BUFFER_FNS(Write_EIO, write_io_error)
-+BUFFER_FNS(Read_EIO, read_io_error)
- BUFFER_FNS(Unwritten, unwritten)
- BUFFER_FNS(Meta, meta)
- BUFFER_FNS(Prio, prio)
- BUFFER_FNS(Defer_Completion, defer_completion)
- 
-+static inline void clear_buffer_read_io_error_state(struct buffer_head *bh)
-+{
-+	clear_buffer_read_io_error(bh);
-+	bh->b_err_timestamp = 0;
-+}
-+
- static __always_inline void set_buffer_uptodate(struct buffer_head *bh)
- {
- 	/*
-@@ -411,6 +420,7 @@ map_bh(struct buffer_head *bh, struct super_block *sb, sector_t block)
- 	bh->b_bdev = sb->s_bdev;
- 	bh->b_blocknr = block;
- 	bh->b_size = sb->s_blocksize;
-+	clear_buffer_read_io_error_state(bh);
- }
- 
- static inline void wait_on_buffer(struct buffer_head *bh)
--- 
-2.39.5
+> >
+> > > As others have pointed out, I don't want to just defer expensive work
+> > > without understanding why it's expensive and running into limitations
+> > > about why it cannot be improved without deferring.
+> >
+> > For the deferred freeing part: the class_idx-in-obj optimization
+> > addresses the multi-process scenario where concurrent atomic
+> > operations on pool->lock become expensive, but does not help
+> > single-process munmap. Deferred freeing moves the entire zs_free
+> > cost (including class->lock and zspage freeing) off the munmap
+> > hot path, which benefits even single-process workloads. The two
+> > optimizations are complementary.
+>
+> +1 :)
