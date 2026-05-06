@@ -1,153 +1,107 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA763E274C
-	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 09:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2BF328243;
+	Wed,  6 May 2026 09:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778058151; cv=none; b=Sepd5gn/Y00NJCTP7Yy073usvAfh/qtG5n0rQOjBcLiZktXN+FNtozDuqJ4DEl0FBkhw+nSaVypraFo7eZrjWaGoEfgfK9t5e1MwEiB/r4QBP1Ds74Jqy5jXYtdMWBImG3w3ZX9nDwA2LhuxIB8su99ck45TyfXFkslXXI/2uwQ=
+	t=1778058290; cv=none; b=eFnp1XJkjS+pCWJmzy0yfr7F0gHy1moNt23uytOnZ5tVJL+O80BSBfRzF7iG0Xtuw+JpWq4mZV60NrOjZl6XBNDZUNfkmLWJqsMwu4bZoJ5O934sdhqTCo3WmhbHz8uMRBiz8SSr3w23J+HboZTpMVVfB2B5HhEkaFbLBQpaKVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778058151; c=relaxed/simple;
-	bh=nLSZKCR0woXtN6W5cyzs5oEHO2Ts0XPwdeXwd60CnUg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZV2aHYLiCjFT31FYB57wfuoyx/le5os2r0I/zRnGJtqAU2h+PqNaATH67KdZd0XQp7QdK4+aNAwK6RYPKThTmO77URSeLwuWH9WD6mhatfVw1DGLI8BkQr6WEv1zxzepVuBsLQ9dCUKhcZ77DWz7AwmMq5hBpqeihOcsU3ZWzek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGAPdKzL; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGAPdKzL"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso54603665e9.2
-        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 02:02:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778058143; x=1778662943; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mmaZWXsqMxYY1SXzoardDG6u5dyIRaJ/iULJJHwbN+E=;
-        b=KGAPdKzLk3vJJ86/+9JWb0pewVd+eSoidY3lk7EZPts94uHo4N/VRkoM9t57Na8hZU
-         ohCDqtJlErkxUgfhc1xF31gaTTxEEV9aQTpYdnIYJw5UqkLIvfOYXMVeC0yFRnX/MHe4
-         HmgeTl6uAbvaO7lSltkxovg9zHAEVQVtWdlJLq+MyigLOHJOPN3xooUX/QlPsg9aezCX
-         fcFIH2ULFXdTlkzGp+Ry1SgKQ1i2euO26Gf6Maw6yBVWA69E1LILuSHMu5h7drw4GBsF
-         YHnLv0r1kzhMzpzHNEVk53axTY4nfGL7MMB052P2FX+fuI9Xsu9HaT6ntUkADcXIzcaX
-         fiPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778058143; x=1778662943;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mmaZWXsqMxYY1SXzoardDG6u5dyIRaJ/iULJJHwbN+E=;
-        b=CCfFr4rdet3IF510LuWwQ6EenavwE/xcoel2a4WDY6313MGfisAYDzKLWBuzhHpnli
-         YpUcUNUv83OKJSP489D6rdZ1yMdwIzPxSaYpT5uSIABb7wk9pRRb0C7BAnPDcuSU/odl
-         WxxAT+EkfQ83PqkKUuSBDLD7MQ3eyCZtVaYABSY+/gUB7R11Gb45ChR6i5nDmTufgrR0
-         SMFgFTSIV5ds4sQ2+nY3su5jmivXxu4Ejc4dnX88i0d6E/0L3clxl/IZKqpPlTAuvK2q
-         uX0IbvzHCq9guKpeyGn2l9WKQ7fVRR/8NL8/wW7cb7Wn9yUTPHnSIInrtzms0cTJO6Dm
-         lIRg==
-X-Forwarded-Encrypted: i=1; AFNElJ+hpznhWFy3YmoU5K9pzRCSBmjsMzg0IWG7GYvwwMqZZ7B6YcGQ9MD6inPGjEJx1C7+BJRUUk+UgYwLHw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2dRqpxsiPggLqpSNv4N0jXoUVN0Svqcku5g1xEQFKQ7Hblgv/
-	a8WU6c/ewA1RmBIeML4pD7mmxoT3UkeJeYjntHPRpZx5LWSj3lbRd/i+
-X-Gm-Gg: AeBDietLoufhrYarM+yi/o+/jwrBzBzTprVfERvoRAoMRHdgE70qPNqI7oOkMcjCwTl
-	baz9GlrLvdx2+Qfn76s2dOfAQjz26SYPinCs6qnyJJbsn/NVjNsxGtXSgpNdcP4XCgxC7g/gazJ
-	xrM1wj0E/DnVG84LGz/IrrFfUeEkLiJCApw5j+gwmKAdckDA6VAwLADi/gmVdu5HnloiRlP1eMY
-	fDSh9v/vENbcKAgCjCJaeEW94S5Z94alwG1zzs98RhCYfkWFZz+raVgHZ/XvdufNr920VueApqH
-	+Fghy3godfbqVE2Rtk18/iT4OfL9nlRDkqFYmoeHYEaMGfBa8ubQPkNSOolQ+AJOleGJoXfjXDs
-	O5m8ZBmsINUD/BHcM+zmZKG+CAql7WwZml2QkuLDtcHfjOHMxRp03a/4RfXPRvx7R99AqlOESZY
-	Mpb16Xu/wIgAnODCELLYMJJE1q5fnGci4JpyMTpbzUf/w+hPczTLxxPAVY0YvbRIzDP5pKz2NUS
-	ix82Q/CMBfsbrJNVE8JF9NZueHXfXqiGX0y/ACmXQ==
-X-Received: by 2002:a05:600c:2e0c:b0:489:1c2d:211e with SMTP id 5b1f17b1804b1-48e51e0c833mr25734095e9.5.1778058142476;
-        Wed, 06 May 2026 02:02:22 -0700 (PDT)
-Received: from [10.109.92.22] ([86.33.71.194])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e52f5c1cfsm21365215e9.0.2026.05.06.02.02.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2026 02:02:21 -0700 (PDT)
-Message-ID: <6873d617-c904-45f3-bad9-e1ae39cfecd2@gmail.com>
-Date: Wed, 6 May 2026 10:02:11 +0100
+	s=arc-20240116; t=1778058290; c=relaxed/simple;
+	bh=gIPiLyzvkCimISkjxiTv8tC+1/5WUILhKNCmRBva46I=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lDWvPMqSJCOBySFLFg8LujWezIgCjIF1bqUthEe6r/ijrgtsWf73rI220klIoSVqSvBFHnw7iR1IrGboKQkIVWRVNK/ZKl4YkrOyVF2SuVPTms5aHjJGWPYpfpqwWBPZkIhRgMA6SwytRzIBsAsxMAcoOQE/wdl+lcthbtgXjNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 9d7af5c2492a11f1aa26b74ffac11d73-20260506
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_TXT
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED, SN_EXISTED
+	SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:dabb9f43-839c-4592-8144-23fafb84ff51,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.3.12,REQID:dabb9f43-839c-4592-8144-23fafb84ff51,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:e7bac3a,CLOUDID:995d4eb785a2556e923e7b6c198be648,BulkI
+	D:260506170441HOP1KWDG,BulkQuantity:0,Recheck:0,SF:10|66|78|81|82|101|102|
+	127|850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk
+	:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,
+	BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 9d7af5c2492a11f1aa26b74ffac11d73-20260506
+X-User: yanlonglong@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
+	(envelope-from <yanlonglong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 822434755; Wed, 06 May 2026 17:04:40 +0800
+From: yanlonglong <yanlonglong@kylinos.cn>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yanlonglong@kylinos.cn,
+	yukuai@fnnas.com
+Subject: [PATCH v2] block: add NULL checks for bic in bfq_bfqq_save_state function
+Date: Wed,  6 May 2026 17:04:09 +0800
+Message-Id: <20260506090409.49648-1-yanlonglong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <db3d516f-6ad2-469a-9bd8-1a9b61eb12a0@kernel.dk>
+References: <db3d516f-6ad2-469a-9bd8-1a9b61eb12a0@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
- William Power <william.power@intel.com>, Phil Cayton
- <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
-References: <cover.1777475843.git.asml.silence@gmail.com>
- <afi7c-VUJWOLlC1m@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <afi7c-VUJWOLlC1m@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hey Ming,
+When the `bic` variable is null, referencing `bfqq_data` through `bic` will
+cause the program to crash. Therefore, the null check for `bic` should be
+moved to the beginning of the function to prevent referencing a null pointer.
 
-On 5/4/26 16:29, Ming Lei wrote:
-> On Wed, Apr 29, 2026 at 04:25:46PM +0100, Pavel Begunkov wrote:
->> The patch set allows to register a dmabuf to an io_uring instance for
->> a specified file and use it with io_uring read / write requests. The
->> infrastructure is not tied to io_uring and there could be more users
->> in the future. A similar idea was attempted some years ago by Keith [1],
->> from where I borrowed a good number of changes, and later was brough up
->> by Tushar and Vishal from Intel.
->>
->> It's an opt-in feature for files, and they need to implement a new
->> file operation to use it. Only NVMe block devices are supported in this
->> series. The user API is built on top of io_uring's "registered buffers",
->> where a dmabuf is registered in a special way, but after it can be used
->> as any other "registered buffer" with IORING_OP_{READ,WRITE}_FIXED
->> requests. It's created via a new file operation and the resulted map is
->> then passed through the I/O stack in a new iterator type. There is some
->> additional infrastructure to bind it all, which also counts requests
->> using a dmabuf map and managing lifetimes, which is used to implement
->> map invalidation.
->>
->> It was tested for GPU <-> NVMe transfers. Also, as it maintains a
->> long-term dma mapping, it helps with the IOMMU cost. The numbers
->> below are for udmabuf reads previously run by Anuj for different
->> IOMMU modes:
-> 
-> Plain registered buffer is long-live too, which raises question: does this
-> framework need to take it into account from beginning?
+Fixed:fd571df0ac5b289af8（"block, bfq: turn bfqq_data into an array in bfq_io_cq"）
+Signed-off-by: yanlonglong <yanlonglong@kylinos.cn>
+---
+ block/bfq-iosched.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Not sure I follow, mind expanding on what should be accounted?
-Are you suggesting that we might want to use normal registered
-buffers in a similar way? I.e. giving the driver an ability to
-pre-register them?
-
-> BTW, inspired by this approach, I adds similar feature to ublk via UBLK_IO_F_SHMEM_ZC
-> which can maintain long-term vfio dma mapping over registered user-place aligned buffer.
-
-Interesting, just too a glance, and it looks like what David Wei
-was thinking to add to fuse, but IIUC he gave up exactly because the
-client will need to cooperate and that could be troublesome.
-
-Should we try to push everything under the same interface instead of
-keeping a ublk specific one? Again to the point that it requires
-a cooperative client, but if it's something more generic, the user
-might just try to use it as a general optimisation. In the same way
-it'll be helpful to fuse, and as a bonus you wouldn't need tree look
-ups (but mandates clients using registered buffers as a downside).
-
-It'd need to shaped to somehow work better with host memory as I
-assume you want to be able to map it into server in common case.
-Switch case'ing if it's a udmabuf is not the greatest approach,
-but maybe we can figure out something else.
-  
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 141c602d5e85..e952e4ea2dd4 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3035,9 +3035,8 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ {
+ 	struct bfq_io_cq *bic = bfqq->bic;
+-	unsigned int a_idx = bfqq->actuator_idx;
+-	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
+-
++	unsigned int a_idx = 0;
++	struct bfq_iocq_bfqq_data *bfqq_data = NULL;
+ 	/*
+ 	 * If !bfqq->bic, the queue is already shared or its requests
+ 	 * have already been redirected to a shared queue; both idle window
+@@ -3046,6 +3045,9 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ 	if (!bic)
+ 		return;
+ 
++	a_idx = bfqq->actuator_idx;
++	bfqq_data = &bic->bfqq_data[a_idx];
++
+ 	bfqq_data->saved_last_serv_time_ns = bfqq->last_serv_time_ns;
+ 	bfqq_data->saved_inject_limit =	bfqq->inject_limit;
+ 	bfqq_data->saved_decrease_time_jif = bfqq->decrease_time_jif;
 -- 
-Pavel Begunkov
+2.43.0
 
