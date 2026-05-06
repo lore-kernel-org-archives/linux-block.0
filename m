@@ -1,215 +1,207 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4441F4611C6
-	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 13:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778075727; cv=pass; b=iKY9Zb2tmzCpxSUf2VxkzpsKvdgzp/nH5DMAvRyqLpJGCBSYBopkHNysY/Di9bK0e/W4EUf08DsLIsa8A7EVBGGkf2KKYbbC3bPdCDjGnEXzbD/Kn8xaIg3Y8TDgLkxdylYfoPLebcvDtkDmWa7g5BbUWaT+Q0ryq5jgObI9FOM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778075727; c=relaxed/simple;
-	bh=2KP3Gj9aAfmR1sfpaUt/E/mXu4yFOIappvpZCpTNm+0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LcVRifFBHjFX+A5pBXkPvkY29owm+6qxPqMcLcxu0GjWB5e76l2YOBPyHhHGXZzY5uTXZrZNpXjeAFokL6kNeEcnTGfBcFDTfD750+U3oAqDl8bMMD6QTaBMFLDatV7dhXScImZTbm7aDkx8hSdT8fb0kKfSlX8vKYFeQD6E6xI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxV7LGu1; arc=pass smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9B03F7861
+	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 14:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778076952; cv=none; b=E5JDY3V3qiRWMTpItz5Lv6chBZk+6bczjQIBJFf8VInNl5+JxmsX5a3BclDMtr33xdkbmcGyHX7s0vmME8XZsSSlUzTVVXaXB41dz4BC6faOsNJ9YofCg185dZvGe+fOTQOW0BY+5791ZNLTRFrI8t3OJgTJPulcZz66gAg7uxE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778076952; c=relaxed/simple;
+	bh=zZcagGFZAjrjlPTdskd9mqi0QrGre7yqU1eShhuplxw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Exk8VdJQNfcGC326XnLy4o5RAn83LwzDUGfnUo0w9OhpLMOqxzKTYlwhA/BZ4As3Buh3JUPoJ3Y565g1oxogvWj1Mx2tPoH0nlL0Lm8uMYLgDoL3Fvwact7xeH2mnKi8xbRyWKFwrSKx3QZldeH/Sov0rU+bwcvI4zhSuoHwA3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BJ9XhKk0; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxV7LGu1"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7bd5dde63dbso66576157b3.3
-        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 06:55:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778075725; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Mzv8Gvz7io03SXQEEe5dlisHcdBQzPhBYI3gD23AS6Mg8ivBiDMLG5WCUZi8vprZ+Y
-         hF5KnevMJ7+6ZPVAeW51ACVHaRgXYHRpXvHUcvtQr5IcV3GISVnt7PfqCyl7oMT5BIh+
-         ezhyfSrxHV/+dTLzZY+kXch/B+bfygXs/REEbVF5r7b+LlqivsA1Xh5yv+mkcpYBsOZb
-         J7iLHv7Ge7xt8qwjJbELeB6hNHn7gTBRWvt1i0Q1fwmvhnUCpxlFpoAUhilxWGRtk6eE
-         0ZQtuvZr0FnC9rrslCWJlKRA1T399qJR7cU/Z4ODN3xYtU4eZL3uQmc8AkIIzaz2BfsS
-         VeWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=aNRy0S6L3YSzMl7VPrdeXJU725FCyYdB61hcQ1UpLhI=;
-        fh=ghioexF/rKMvoNMd/Mjc/MwsmP6jgMEDWcy3lKX3aG4=;
-        b=U9JCc2Kto8dRtat2/iBJ4wVrdXezOJ/YdgVqawEvoJxSG2KUo4nW6sRsiJu0ymJ23U
-         df9+V9nl3OTlToqp9lKdPWLz6M+SGCc6Htv1SioMcQKek2IyfSxogLup85B2c0KCPtIi
-         SKgpUjfcPG6xTKTvlkHjsi/9pnWQQYf3SrQp9E/JSbEsfLCbwtWFFZy6thlU5nHJbtar
-         xbeHArOXyGKt9xWrUhnnfzZMOm8GFlJo+7wXHKO4dKeqmHAQQYyapLEuFCzZEV4Hbn4w
-         bRpipHNI1s6VHVKIAjpMD3TKVOFORunlNPY8N/X92bB9dIgClkI0v2T34WeyhfTKp/63
-         y5RQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJ9XhKk0"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4832c8f9d87so11153825e9.3
+        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 07:15:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778075725; x=1778680525; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aNRy0S6L3YSzMl7VPrdeXJU725FCyYdB61hcQ1UpLhI=;
-        b=bxV7LGu1fI7cQSnMW5vL8lZW9TeJrT6Qde6oM7aSYLppHdfIxsnntwwnh6bbAyNYGi
-         Vtl2nXxJlAwtmqYWRt8bMl9OOCS4mWoKPHUKs48/Qar74xMZU0DQraEwqpHOQYmcg4cG
-         17m7H6aOuaCCdrdXsYmf4NnaUa9o9iJKSuHq6TlnHZvgWHuhYq9XOY1zbqJZOtwTKwbn
-         zkEwyXhfQzKfbrcWhC0ZH4FceGtZLE50diiCZtXIIcG3VaKNWz8ArWi2mwdowwj4OJKa
-         NW5AyhH48l00gZgP+0BbSpExrAaOOhezYZSMWBP4p3E8XfZoivip2+37Qxooj/eTYxQ+
-         5Mbg==
+        d=gmail.com; s=20251104; t=1778076949; x=1778681749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Io/N+hHnLMI/zVIF68lkuWkyC9l4bvcPQWSmOV0m6oQ=;
+        b=BJ9XhKk0MrbDVLaIWxMT5d6zEFaVIIJWRlMtlXLgjDCsfaIL7Z8IJNXOxW5Z4ixUDa
+         oF8it0AxhKV9+BapijXl4FQXvUb1AjQCz4aGwdIcJfbbYd+xmxOR7ACUq0nPR/T8RIrC
+         Y6p6CA6k/j0YV8MzD1jdKNuS4u/D0gVtWsvYkOFhlX5+bEhRpdmLw0I7K/dVMHz02Yn2
+         6vlis2G9tkVNhGRhWqP4minQrJKfhb+LHGSEzUHOVpbEiADOpLEwGtcBKIaaFvcOZeiS
+         +HKCx0aMP38thLUd7G4q/5pt536KRrUXhVHktVAMWaKu7I8KG88AYNoKhnwyQ+e6vod3
+         LOXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778075725; x=1778680525;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aNRy0S6L3YSzMl7VPrdeXJU725FCyYdB61hcQ1UpLhI=;
-        b=iR9T60GDxxtVfRIdHxMWw50CCQbz3Epny2U8iIpXnI5+p1aDx3icR3RThd/So4Bsgx
-         VwF0fqj1qrNu8xcN+khfBPBFYMEj6X2yEhCi/u0RVv+R7kla5reQb6kQ+UtkCM6hQNSm
-         K3JebX/0osQezN4HMZKaOhevedLSOyh8FKTGnhgwCcBY1kasj2pTQN13HlFyLWAOgoFF
-         K0xqwdDJUT/ZQ8S2c9iJKarD5DZrf5kjyCCuW3VbtDaqx0KlU+GuZ0Hso436OMe2bLjX
-         4blS9rjeOLw5rSRV22pDUDRsBGa8JlkzC/mnG6enFnociJoFhuhgUangLNPSmdqfznyW
-         KsXQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+g0a3MVfOvNiM+6XKQ23JDXLb0LqF+bbWhkH6PknwrvVWn9ZWFcXJaN3bGx/StQvaquRYxs0iYyvSk2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyobvJeMGVJfWl3PRIRACI5COd2xkOTmD6X9UrRPZ3EeO8nKYxm
-	PhizWfXldl7OLV6K5s1Ohvi+iiYm5hSUFDZDS4RTktk5fVNEnfceSLl9kLqQ7de2qhAgAZRg1Dn
-	7tljxC3VKEIHanDO9wWPmJ7i4s72NyE8=
-X-Gm-Gg: AeBDievdJjR4KAZfhKyxt1KLc0Y0EVHJhtd82tnLKQTypgU+lt1KWPUjWZZOYycv8ox
-	vK9eOXzCe/ml/PclK1L7pUaPGdEdkowogkBfLGVZLcEnkbUfgPB39soveX6NT1QNSNHS58LMnuI
-	XOTA85G/r3B42jX9Xi3WQWlzEvnGMx1FsXY9aFSc/17uxKR/2pDCMbkq8msfqtRWi2NBIlZDPsn
-	jjZ2F+g4K0+NsbDPZdLV6HO8fr0ICUJyU64D78svMUz31K6hlJLZ8UsLmN3bqjGOmFp5tRELA+A
-	WLz4kW+I0mcu4aRYtaj+PG+hqtgyPg==
-X-Received: by 2002:a05:690c:f06:b0:7bd:9ce7:164c with SMTP id
- 00721157ae682-7bdf5ef293amr42572997b3.43.1778075725139; Wed, 06 May 2026
- 06:55:25 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778076949; x=1778681749;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Io/N+hHnLMI/zVIF68lkuWkyC9l4bvcPQWSmOV0m6oQ=;
+        b=m5VeteGeEmOL6T8RLGFgCnX0supnr/rfhmnZXDybjIsBrm86VttYOMC5mUlMYiTixb
+         zmLRdX2VVsqN/2Nun4iVginkppIKU5kPPO48AfaoRzT7gKoCbdMqga2rf+ny8oDsvLPx
+         SwcvknLJF3ZJLYAH51DgyFO4f2o+U4I9I8oZYv9mKEmWOjjT2l/2DCjCGVFlwdbvsapi
+         zPPwubHVmpfWw5R0VGVo2d/DDQzGXsDQlB89Ww8Nt1NU3IAwn9nQHmbdYA2BQy6968rt
+         Za5k4cPiPH08zgCuyMJQfwEcFsKMVGGMYUeiuav2e84RmEx4WeH4Q/5NMULkh08SC2uL
+         pTIQ==
+X-Forwarded-Encrypted: i=1; AFNElJ++3aLda5Ww0G4P+ZKh0ZXdFzhLt/ec4PzKladqGWH8hJmetRsF1iptBQBfp4P3RpR997mf0QSn1WiTTg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQVfsHpBiYunZDSul//16njlkZmb7ZPEWcUEiZBLiTcwZwEh2N
+	iNbh9/fY211zxSMos1EgNvs8IskCbJ1KUQOmQo8GfYOD5lvuq3fytYM=
+X-Gm-Gg: AeBDievqE7KvdhguxBKCHA4nOhaPHYgz7DZmx+ylZYwgexD3EI+h/fEEqpyYSLXUpnX
+	jQ4Ug/Rtebx2KddIqKzaZAygR8ONKBoATULkW74Ks+NpwuaXLhOc5jUhDk0GIOo5PLxVOduOK1o
+	74Lp4xRrRPzTYDPOaAjtjGiZ2AM0JRm4GgxYfOY3jQkc2F0ZSqeotaBl0HaFYqTIilvVWaRYkTj
+	9vnaxtwHvfzK3ndiMr1lRtG9YD0F1Pfl0izWGgGJi/rvnr8UBhhtMDPvdL/fMcPS9LhPaVc8mcq
+	VmCTWXEPQ0bsp/cjgPJsohtn58BB5jea1Che/OoKNDefRz2ya3RzPQkwXfiKE5GLzHb1KlcqONx
+	ARkN7zVjhZnW8+juZd+OV+YvH2p1SvsLr1DCdUP4S55lKesS17rIvUHXdjvbD6/zRpSB3X6cjyF
+	R3/ytDWQhyNoWaKwP/QtmIlZl5Cd8mhBxmfVmozof9pdMcVJ93fipOXBd4RFEcUHtPofBVIv7X
+X-Received: by 2002:a05:600c:1f95:b0:486:fc61:541d with SMTP id 5b1f17b1804b1-48e51e124b9mr32527385e9.2.1778076948868;
+        Wed, 06 May 2026 07:15:48 -0700 (PDT)
+Received: from localhost (8.red-80-39-165.dynamicip.rima-tde.net. [80.39.165.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4505558e213sm13671647f8f.25.2026.05.06.07.15.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 May 2026 07:15:47 -0700 (PDT)
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+To: 
+Cc: Xose Vazquez Perez <xose.vazquez@gmail.com>,
+	Aviv Coro <aviv.coro@ibm.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Brian Bunker <brian@purestorage.com>,
+	Caleb Sander <csander@purestorage.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Chris Leech <cleech@redhat.com>,
+	Christophe Varoqui <christophe.varoqui@opensvc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Clayton Skaggs <claytons@netapp.com>,
+	Constantine Gavrilov <cgavrilov@infinidat.com>,
+	Daniel Wagner <wagi@kernel.org>,
+	=?UTF-8?q?David=20Santamar=C3=ADa=20Rogado?= <howl.nsp@gmail.com>,
+	"Dmitry V. Levin" <ldv@strace.io>,
+	"Ewan D. Milne" <emilne@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	James Smart <jsmart2021@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	John Meneghini <jmeneghi@redhat.com>,
+	Jyoti Rani <jrani@purestorage.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Li Xiaokeng <lixiaokeng@huawei.com>,
+	Marco Patalano <mpatalan@redhat.com>,
+	Martin Belanger <martin.belanger@dell.com>,
+	Martin George <Martin.George@netapp.com>,
+	Martin Wilck <mwilck@suse.com>,
+	Matthias Rudolph <Matthias.Rudolph@hitachivantara.com>,
+	Maurizio Lombardi <mlombard@arkamax.eu>,
+	NetApp RDAC team <ng-eseries-upstream-maintainers@netapp.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Randy Jennings <randyj@purestorage.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Simon Schricker <sschricker@suse.de>,
+	Steven Schremmer <Steve.Schremmer@netapp.com>,
+	Thomas Song <tsong@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Vasuki Manikarnike <vasuki.manikarnike@hpe.com>,
+	Wayne Berthiaume <Wayne.Berthiaume@dell.com>,
+	Zou Ming <zouming.zouming@huawei.com>,
+	BLOCK-ML <linux-block@vger.kernel.org>,
+	DM_DEVEL-ML <dm-devel@lists.linux.dev>,
+	NVME-ML <linux-nvme@lists.infradead.org>,
+	SCSI-ML <linux-scsi@vger.kernel.org>
+Subject: [PATCH RFC] nvme-multipath: optimize path selection in queue-depth policy
+Date: Wed,  6 May 2026 16:15:41 +0200
+Message-ID: <20260506141544.125089-1-xose.vazquez@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421121616.3298845-1-haowenchao@xiaomi.com>
- <CAOptpSPs-1UrEa8AHg19e590=SiV6bpnex7gCbif8=aY7BtpuA@mail.gmail.com>
- <CAO9r8zOjugCwWqHP3zxXPmjp8TwpoROCjCqTZ_uxOBQwVqCWqA@mail.gmail.com>
- <CAOptpSMQyyb+q-VJdJ0RzNkjaer1CTePM5WkwEj_7cAO4aUToQ@mail.gmail.com> <CAKEwX=PrfrNys4ao7-d11J7r4pv5VmE8gTU_7iUHaHAKNaFuBQ@mail.gmail.com>
-In-Reply-To: <CAKEwX=PrfrNys4ao7-d11J7r4pv5VmE8gTU_7iUHaHAKNaFuBQ@mail.gmail.com>
-From: Wenchao Hao <haowenchao22@gmail.com>
-Date: Wed, 6 May 2026 21:55:14 +0800
-X-Gm-Features: AVHnY4LF3aWQo3HGLZrYMNvLGHmAQYHlyMw97GRdhJ_YEuxrndl8XeHVPrQ1D64
-Message-ID: <CAOptpSOnRCHo35KK5x3S0f5y9+7+dxfznpjNRH072jZvhYHwww@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 0/4] mm/zsmalloc: reduce zs_free() latency on swap
- release path
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: Yosry Ahmed <yosry@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	Barry Song <baohua@kernel.org>, Xueyuan Chen <xueyuan.chen21@gmail.com>, 
-	Wenchao Hao <haowenchao@xiaomi.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Patchwork-Bot: notify
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, May 2, 2026 at 3:21=E2=80=AFPM Nhat Pham <nphamcs@gmail.com> wrote:
->
-> > With only the class_idx-in-obj encoding (eliminating pool->lock from
-> > zs_free, no deferred freeing), we measured on two platforms.
-> >
-> > Test: each process independently mmap 256MB, write data, madvise
-> > MADV_PAGEOUT to swap out via zram (lzo-rle), then concurrent munmap.
-> >
-> > Raspberry Pi 4B (4-core ARM64 Cortex-A72):
-> >
-> >   mode        Base       ClassIdx-only   Speedup
-> >   single      59.0ms     56.0ms          1.05x
-> >   multi 2p    94.6ms     66.7ms          1.42x
-> >   multi 4p    202.9ms    110.6ms         1.83x
-> >
-> > x86 physical machine (4-core Intel i7-12700, 2 rounds averaged):
-> >
-> >   mode        Base       ClassIdx-only   Speedup
-> >   single      11.7ms     9.8ms           1.19x
-> >   multi 2p    24.1ms     17.2ms          1.40x
-> >   multi 4p    63.0ms     45.3ms          1.39x
->
-> Oh man, you are eliminating pool lock here right? This would help my
-> other patch series a lot too :)
->
-> https://lore.kernel.org/all/CAKEwX=3DM5YpR0cQrryX_y4pm_BuxyUWZ_8MbhWodwbf=
-1Fe=3Dgzew@mail.gmail.com/
-> https://lore.kernel.org/all/CAKEwX=3DPkFiP+u+ThrzjTKBi+usQf2uuhTZcfB2BNNA=
-8RboOFDQ@mail.gmail.com/
->
+Move the zero-depth check inside the optimized path case to enable early
+exit. It avoids redundant condition checks for non-optimized paths, and
+eliminates the per-iteration check at the end of the loop, improving the
+performance.
 
-Yes, exactly. With class_idx encoded in the obj value,
-zs_free() can determine the correct size_class without
-any pool-level lock. The lockless read gives a valid
-class_idx because it's invariant across migration (only
-PFN changes), and we re-read obj under class->lock to
-get a stable PFN.
+Cc: Aviv Coro <aviv.coro@ibm.com>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Cc: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: Brian Bunker <brian@purestorage.com>
+Cc: Caleb Sander <csander@purestorage.com>
+Cc: Chaitanya Kulkarni <kch@nvidia.com>
+Cc: Chris Leech <cleech@redhat.com>
+Cc: Christophe Varoqui <christophe.varoqui@opensvc.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Clayton Skaggs <claytons@netapp.com>
+Cc: Constantine Gavrilov <cgavrilov@infinidat.com>
+Cc: Daniel Wagner <wagi@kernel.org>
+Cc: David Santamaría Rogado <howl.nsp@gmail.com>
+Cc: Dmitry V. Levin <ldv@strace.io>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Ewan Milne <emilne@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: James Smart <jsmart2021@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: John Meneghini <jmeneghi@redhat.com>
+Cc: Jyoti Rani <jrani@purestorage.com>
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Li Xiaokeng <lixiaokeng@huawei.com>
+Cc: Marco Patalano <mpatalan@redhat.com>
+Cc: Martin Belanger <martin.belanger@dell.com>
+Cc: Martin George <Martin.George@netapp.com>
+Cc: Martin Wilck <mwilck@suse.com>
+Cc: Matthias Rudolph <Matthias.Rudolph@hitachivantara.com>
+Cc: Maurizio Lombardi <mlombard@arkamax.eu>
+Cc: NetApp RDAC team <ng-eseries-upstream-maintainers@netapp.com>
+Cc: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Randy Jennings <randyj@purestorage.com>
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Cc: Simon Schricker <sschricker@suse.de>
+Cc: Steven Schremmer <Steve.Schremmer@netapp.com>
+Cc: Thomas Song <tsong@purestorage.com>
+Cc: Uday Shankar <ushankar@purestorage.com>
+Cc: Vasuki Manikarnike <vasuki.manikarnike@hpe.com>
+Cc: Wayne Berthiaume <Wayne.Berthiaume@dell.com>
+Cc: Zou Ming <zouming.zouming@huawei.com>
+Cc: BLOCK-ML <linux-block@vger.kernel.org>
+Cc: DM_DEVEL-ML <dm-devel@lists.linux.dev>
+Cc: NVME-ML <linux-nvme@lists.infradead.org>
+Cc: SCSI-ML <linux-scsi@vger.kernel.org>
+Signed-off-by: Xose Vazquez Perez <xose.vazquez@gmail.com>
+---
+Status: Compile-tested only. UNTESTED on real hardware.
 
-> Well, the deferred freeing would completely move that contention out
-> of the way lol. But this would benefit all users, regardless of
-> whether we're deferring the free step or not (for instance, this will
-> reduce contention between page fault and compaction, IIUC?) I feel
-> like you'll get some good numbers testing in a system with compaction
-> and THP enabled, with lots of swap activities. Which is... a lot of
-> server setup :)
->
-> If the deferred freeing is too controversial, this smells like
-> something that should be upstreamed independently.
->
+[I do not have access to this kind of hardware]
 
-Agreed. We're planning to split the series so that the
-class_idx encoding + pool->lock elimination can be
-reviewed and merged independently of the deferred free
-framework. It's a pure win with no behavioral change
-=E2=80=94 just less lock contention.
+Feedback and testing are highly welcome.
+---
+ drivers/nvme/host/multipath.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-> >
-> > Single-process shows modest improvement. With multiple processes,
-> > each read_lock/read_unlock atomically modifies the shared rwlock
-> > reader count, and the cost of these atomic operations increases
-> > with more CPUs accessing the same cacheline concurrently.
-> > Eliminating pool->lock removes this overhead entirely.
-> >
-> > This only works on 64-bit systems where OBJ_INDEX_BITS has enough
-> > spare bits to fit class_idx. 32-bit systems don't have the room.
-> > I'm still working on the compile-time gating to properly enable
-> > this based on architecture and page size configuration.
->
-> /*
-> * The pool->lock protects the race with zpage's migration
-> * so it's safe to get the page from handle.
-> */
-> read_lock(&pool->lock);
-> obj =3D handle_to_obj(handle);
-> obj_to_zpdesc(obj, &f_zpdesc);
-> zspage =3D get_zspage(f_zpdesc);
-> class =3D zspage_class(pool, zspage);
-> spin_lock(&class->lock);
-> read_unlock(&pool->lock);
->
-> It's basically just this blob right?
->
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index 263161cb8ac0..7d212f6e865d 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -409,6 +409,8 @@ static struct nvme_ns *nvme_queue_depth_path(struct nvme_ns_head *head)
+ 				min_depth_opt = depth;
+ 				best_opt = ns;
+ 			}
++			if (min_depth_opt == 0)
++				goto out;
+ 			break;
+ 		case NVME_ANA_NONOPTIMIZED:
+ 			if (depth < min_depth_nonopt) {
+@@ -419,11 +421,8 @@ static struct nvme_ns *nvme_queue_depth_path(struct nvme_ns_head *head)
+ 		default:
+ 			break;
+ 		}
+-
+-		if (min_depth_opt == 0)
+-			return best_opt;
+ 	}
+-
++out:
+ 	return best_opt ? best_opt : best_nonopt;
+ }
+ 
+-- 
+2.54.0
 
-Yes, that's the blob being replaced. On the
-ZS_OBJ_CLASS_IDX path (64-bit systems), it becomes:
-
-    obj =3D handle_to_obj(handle);
-    class =3D pool->size_class[obj_to_class_idx(obj)];
-    spin_lock(&class->lock);
-    obj =3D handle_to_obj(handle); /* re-read for stable PFN */
-
-No pool->lock at all. We've also added compile-time
-gating (#if BITS_PER_LONG >=3D 64) since 32-bit systems
-lack the spare bits in OBJ_INDEX to fit class_idx. On
-32-bit, it falls back to the original pool->lock path.
-
-> >
-> > > As others have pointed out, I don't want to just defer expensive work
-> > > without understanding why it's expensive and running into limitations
-> > > about why it cannot be improved without deferring.
-> >
-> > For the deferred freeing part: the class_idx-in-obj optimization
-> > addresses the multi-process scenario where concurrent atomic
-> > operations on pool->lock become expensive, but does not help
-> > single-process munmap. Deferred freeing moves the entire zs_free
-> > cost (including class->lock and zspage freeing) off the munmap
-> > hot path, which benefits even single-process workloads. The two
-> > optimizations are complementary.
->
-> +1 :)
