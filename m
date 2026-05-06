@@ -1,40 +1,59 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEEE23183C;
-	Wed,  6 May 2026 02:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7742EAD15;
+	Wed,  6 May 2026 05:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778035401; cv=none; b=NHg35f+n+OIQRJuI+ONlN9UzhJDOf1SCuXDceC6YHLMoD3QDlO9SZXjNXx4b4x+JbMSlD/cY7PIKzvSrh/tTSgMvY+NZjkei3E8MhS+BixuDE5fg+uojtRm5tG8AKlJEyqZObxSGN8iplVHbRI+7TvGv+1MY+T7dY8ri1m/epxQ=
+	t=1778047093; cv=none; b=ASRJo8sDpcroeBvG3HwrELfRzAXxaBbB0NQYrtvOXj/EW5revhv//BEltE83IUcuqwbhJ5QF+UQLMEOs33Hi6C/hPgdR8D/HnlWvNbTvOlk8Gr61njJA4Zy/ogfHVEoMep2zkthBCuxfkjps8D7K1qukccaIUV8izTlMXZXEwMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778035401; c=relaxed/simple;
-	bh=46eDNhYic0uPwK8kBO8/u+opbZOLflAr6f3eGbQCxWo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y+n4+yiu5ZIY6gJa7PJgp5dNlUOb+WntOCKUIJ3cJtivpCO20cUm38KmmqasGnvnBTqzXYksG+x3EUuJ4ElDlNYnfe/jTfUSTuF2t/JgV8RqqrJ9X1/ZO6b0M8GcEVXCTIwS/cUJI3WTin1N2oPcQpRzMEZU25NKXuF4pzcSysc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JAVsjsLp; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JAVsjsLp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Pg
-	npo6Lf/GSuVTnxYWFDVr0mLMZHod6X84KLTgEMTIw=; b=JAVsjsLp98Qiq0GmWY
-	Nlly81Wng9MZPDnWFjtMw17op5+EFmlM0Qeo0DoQQv6lEDMvJ3ZC+1NWzvf0TluI
-	wQt2ZjBFRcExVD2WLIGmKl/XpWAJ2SOuNfXfdwK2f3zrh+VPhlfeiAOX+dfSh4hr
-	d8Cb8LQZbQqv/HJIhINgx3aqs=
-Received: from vbox.. (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDnT7+pqvppHIiCDg--.11596S2;
-	Wed, 06 May 2026 10:42:50 +0800 (CST)
-From: Li kunyu <likunyu10@163.com>
-To: axboe@kernel.dk,
-	tj@kernel.org,
-	josef@toxicpanda.com
+	s=arc-20240116; t=1778047093; c=relaxed/simple;
+	bh=SJUbqtZNZz2pBYu/cIwv77mVnQorYqUdiS2mm9Im2hY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CQm1RSxAAAmBcWKPuRacwwo4iqOahOJtMl9RB5iAJNpPQ8cDtyK+CheCPB/+TjHFgqi7drVixQHrz3hkd+xJca2sphln1x9XNjqbPOOwZBRHc7xytHEDUQkuU/rkdHK3KDx+VpD16tlzNAUVuOme7DLPBKhQjjR8N9kPZup13Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 855d1bd8491011f1aa26b74ffac11d73-20260506
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED, SN_EXISTED
+	SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:0ce67127-95b3-4c80-9b09-030f2e2b656b,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-20
+X-CID-INFO: VERSION:1.3.12,REQID:0ce67127-95b3-4c80-9b09-030f2e2b656b,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-20
+X-CID-META: VersionHash:e7bac3a,CLOUDID:3308ae2ac72b6d80ec9ead5bd9e668d7,BulkI
+	D:260506135756MUKKROK6,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
+	|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS
+	:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,A
+	RC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 855d1bd8491011f1aa26b74ffac11d73-20260506
+X-User: yanlonglong@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
+	(envelope-from <yanlonglong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 226104818; Wed, 06 May 2026 13:57:53 +0800
+From: yanlonglong <yanlonglong@kylinos.cn>
+To: yukuai@fnnas.com,
+	axboe@kernel.dk
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Li kunyu <likunyu10@163.com>
-Subject: [PATCH v2] block/blk-iolatency: Add the processing flow of the chained bio in the QoS and define the related types to solve the problem of incorrect inflight processing in the QoS. The usage of the done_split_bio abstract function in the blk-iolatency project.
-Date: Wed,  6 May 2026 10:42:44 +0800
-Message-ID: <20260506024244.2741-1-likunyu10@163.com>
-X-Mailer: git-send-email 2.47.3
+	yanlonglong <yanlonglong@kylinos.cn>
+Subject: [PATCH] block: bic maybe null pointer dereference
+Date: Wed,  6 May 2026 13:56:55 +0800
+Message-Id: <20260506055655.32276-1-yanlonglong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,157 +61,36 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnT7+pqvppHIiCDg--.11596S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxXFWUWw4kAr15KF1ktr13Jwb_yoWrtr4Upa
-	10gwnIkrZrKF4kWa93GwsrCw4SkanYgryUC3yfA34Syrn2gr12vF18ZF1vyryFyrWfCrW7
-	Jrn8tF45Gr45C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piYFAdUUUUU=
-X-CM-SenderInfo: poln30d1xriqqrwthudrp/xtbC-wrtkmn6qqrDagAA3w
 
-Signed-off-by: Li kunyu <likunyu10@163.com>
+Signed-off-by: yanlonglong <yanlonglong@kylinos.cn>
 ---
-v2: Fix the use of 'split' in the 'bio_set_flag' function to 'bio'
+ block/bfq-iosched.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
- block/bio.c               |  2 ++
- block/blk-iolatency.c     | 34 ++++++++++++++++++++++++++++++++++
- block/blk-merge.c         |  7 ++++++-
- block/blk-rq-qos.h        | 11 +++++++++++
- include/linux/blk_types.h |  2 ++
- 5 files changed, 55 insertions(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index b8972dba68a0..7740701afc7f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1733,6 +1733,8 @@ static inline bool bio_remaining_done(struct bio *bio)
- 		return true;
- 	}
- 
-+	rq_qos_done_split_bio(bio);
-+
- 	return false;
- }
- 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 53e8dd2dfa8a..ba5870bf14c5 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -632,6 +632,39 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 	}
- }
- 
-+static void blkcg_iolatency_done_split_bio(struct rq_qos *rqos, struct bio *bio)
-+{
-+	struct blkcg_gq *blkg;
-+	struct rq_wait *rqw;
-+	struct iolatency_grp *iolat;
-+	int inflight = 0;
-+
-+	blkg = bio->bi_blkg;
-+	if (!blkg || !bio_flagged(bio, BIO_QOS_CHAIN_CHILD))
-+		return;
-+
-+	iolat = blkg_to_lat(bio->bi_blkg);
-+	if (!iolat)
-+		return;
-+
-+	if (!iolat->blkiolat->enabled)
-+		return;
-+
-+	while (blkg && blkg->parent) {
-+		iolat = blkg_to_lat(blkg);
-+		if (!iolat) {
-+			blkg = blkg->parent;
-+			continue;
-+		}
-+		rqw = &iolat->rq_wait;
-+
-+		inflight = atomic_dec_return(&rqw->inflight);
-+		WARN_ON_ONCE(inflight < 0);
-+
-+		blkg = blkg->parent;
-+	}
-+}
-+
- static void blkcg_iolatency_exit(struct rq_qos *rqos)
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 141c602d5e85..27ef736085b1 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -3035,9 +3035,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
  {
- 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
-@@ -645,6 +678,7 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
- static const struct rq_qos_ops blkcg_iolatency_ops = {
- 	.throttle = blkcg_iolatency_throttle,
- 	.done_bio = blkcg_iolatency_done_bio,
-+	.done_split_bio = blkcg_iolatency_done_split_bio,
- 	.exit = blkcg_iolatency_exit,
- };
+ 	struct bfq_io_cq *bic = bfqq->bic;
+-	unsigned int a_idx = bfqq->actuator_idx;
+-	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
+-
+ 	/*
+ 	 * If !bfqq->bic, the queue is already shared or its requests
+ 	 * have already been redirected to a shared queue; both idle window
+@@ -3046,6 +3043,9 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ 	if (!bic)
+ 		return;
  
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index fcf09325b22e..84373e3e1bbe 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -151,8 +151,13 @@ static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
- 	if (split_sectors) {
- 		bio = bio_submit_split_bioset(bio, split_sectors,
- 				&bio->bi_bdev->bd_disk->bio_split);
--		if (bio)
-+		if (bio) {
- 			bio->bi_opf |= REQ_NOMERGE;
-+			/* Fix the issue where the inflight statistics
-+			 * of the chained bio in the QoS are incorrect.
-+			 */
-+			bio_set_flag(bio, BIO_QOS_CHAIN_CHILD);
-+		}
- 	}
- 
- 	return bio;
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index a747a504fe42..496a27b9d412 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -45,6 +45,7 @@ struct rq_qos_ops {
- 	void (*cleanup)(struct rq_qos *, struct bio *);
- 	void (*queue_depth_changed)(struct rq_qos *);
- 	void (*exit)(struct rq_qos *);
-+	void (*done_split_bio)(struct rq_qos *, struct bio *);
- 	const struct blk_mq_debugfs_attr *debugfs_attrs;
- };
- 
-@@ -108,6 +109,7 @@ void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
- void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
- void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio);
- void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
-+void __rq_qos_done_split_bio(struct rq_qos *rqos, struct bio *bio);
- void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
- 
- static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
-@@ -157,6 +159,15 @@ static inline void rq_qos_done_bio(struct bio *bio)
- 		__rq_qos_done_bio(q->rq_qos, bio);
- }
- 
-+static inline void rq_qos_done_split_bio(struct bio *bio)
-+{
-+	if (bio->bi_bdev && bio_flagged(bio, BIO_QOS_CHAIN_CHILD)) {
-+		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-+		if (q->rq_qos)
-+			__rq_qos_done_split_bio(q->rq_qos, bio);
-+	}
-+}
++	unsigned int a_idx = bfqq->actuator_idx;
++	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
 +
- static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- {
- 	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos) {
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 8808ee76e73c..63fee89ecc14 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -322,6 +322,8 @@ enum {
- 	BIO_REMAPPED,
- 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
- 	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
-+	BIO_QOS_CHAIN_CHILD,    /* chained bio child, used for segmenting out
-+				* the bio */
- 	BIO_FLAG_LAST
- };
- 
+ 	bfqq_data->saved_last_serv_time_ns = bfqq->last_serv_time_ns;
+ 	bfqq_data->saved_inject_limit =	bfqq->inject_limit;
+ 	bfqq_data->saved_decrease_time_jif = bfqq->decrease_time_jif;
 -- 
-2.47.3
+2.43.0
 
