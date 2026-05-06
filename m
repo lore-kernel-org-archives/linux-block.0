@@ -1,147 +1,153 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF1F3E3166
-	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 08:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA763E274C
+	for <linux-block@vger.kernel.org>; Wed,  6 May 2026 09:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778055777; cv=none; b=jxloO5rlJS/jI6ZXOe5LdIDmZUlQfMpnmwtgosC50J/qD6QiSlcdh27QBicxtodn285naj+EiXSWKaDArddHmrQPmPkmGRDg/3u2lEl7l3jneT9tbS35d9V+WeJ9GcjKOqI8MqC54UWnVjwxCW3h8SV+gYfY7bA4U2xFU61dkGU=
+	t=1778058151; cv=none; b=Sepd5gn/Y00NJCTP7Yy073usvAfh/qtG5n0rQOjBcLiZktXN+FNtozDuqJ4DEl0FBkhw+nSaVypraFo7eZrjWaGoEfgfK9t5e1MwEiB/r4QBP1Ds74Jqy5jXYtdMWBImG3w3ZX9nDwA2LhuxIB8su99ck45TyfXFkslXXI/2uwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778055777; c=relaxed/simple;
-	bh=hmf510Ov3EeF70DCYYiFhHmFrdUpMkk7KLJ9vm8LokI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fk/6i628zcAa8ZSSLdxX0YdMO7wW0PVHeY3y7rSIe+neLw2LrET4NgwwNZ32QWS7qeDvJia5t8WcH33JdCDK3B0VOhAEM2QxIVTG2p7nTSlbNMaR5fgo1OKMpj06dwCJJmzF8KXfi640XpdpDQWY7m1z0+U7tw0htCWYrId6ps0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lGBHuQ6i; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1778058151; c=relaxed/simple;
+	bh=nLSZKCR0woXtN6W5cyzs5oEHO2Ts0XPwdeXwd60CnUg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZV2aHYLiCjFT31FYB57wfuoyx/le5os2r0I/zRnGJtqAU2h+PqNaATH67KdZd0XQp7QdK4+aNAwK6RYPKThTmO77URSeLwuWH9WD6mhatfVw1DGLI8BkQr6WEv1zxzepVuBsLQ9dCUKhcZ77DWz7AwmMq5hBpqeihOcsU3ZWzek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGAPdKzL; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lGBHuQ6i"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-488af9fdaa7so31681535e9.1
-        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 01:22:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGAPdKzL"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488a9033b2cso54603665e9.2
+        for <linux-block@vger.kernel.org>; Wed, 06 May 2026 02:02:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778055774; x=1778660574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cJPWrd8dw3wtAv09ZbzzyDIXa8XSYzZ3K19Z6D/HyDQ=;
-        b=lGBHuQ6iDQ+2d8JGHJlDZP9BLt7HakjfojgO/XkyICqIgJ3KMMslXt9JQiZf7aaspV
-         GICX14NjQHPg7g0fT49l9aI86JfjjSiVZTf9ocfxYIS7nKc7p6BSS3soSRW7HTzm9se9
-         afJOWqGTgzsDdtWULDDq5lhPeV0qm0dwL7SICcjVIonkRCnSMlsdROeTAMlJnpaArBaH
-         gEJgV1dX90F640B19h4gZsz/Zi/SBMz0LIDuP+XCYfZr3NOFdwsB24OYbCuuRyypyRqb
-         9hlpOxRNkONON3CpvIPFjiiOHMkWMY2PqX1vpX/UyYmYU/L8Dvm+RC9BCsuDQN9+CkZz
-         HEWg==
+        d=gmail.com; s=20251104; t=1778058143; x=1778662943; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mmaZWXsqMxYY1SXzoardDG6u5dyIRaJ/iULJJHwbN+E=;
+        b=KGAPdKzLk3vJJ86/+9JWb0pewVd+eSoidY3lk7EZPts94uHo4N/VRkoM9t57Na8hZU
+         ohCDqtJlErkxUgfhc1xF31gaTTxEEV9aQTpYdnIYJw5UqkLIvfOYXMVeC0yFRnX/MHe4
+         HmgeTl6uAbvaO7lSltkxovg9zHAEVQVtWdlJLq+MyigLOHJOPN3xooUX/QlPsg9aezCX
+         fcFIH2ULFXdTlkzGp+Ry1SgKQ1i2euO26Gf6Maw6yBVWA69E1LILuSHMu5h7drw4GBsF
+         YHnLv0r1kzhMzpzHNEVk53axTY4nfGL7MMB052P2FX+fuI9Xsu9HaT6ntUkADcXIzcaX
+         fiPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778055774; x=1778660574;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cJPWrd8dw3wtAv09ZbzzyDIXa8XSYzZ3K19Z6D/HyDQ=;
-        b=UzRc7MUEsfBVfMVyO+zfvrqGRc23t7wHAnZv6rBteWrv5ppsDQ54bEKuZmGqWiWB5x
-         o28vT7MOtFvgRwJD5szQrcEmQaOC/grUSz7eXwkhQWR0yPligSFOG4ibkAN4UFnTITB+
-         xrkLMBfHLQ2ndH6K8ZBpuqsYXkoumtqSkNWf7nZY40NwIm7Q3ob3t246tQS44slfP4Nm
-         b3KLzk3/DXX+X3cTjd97gs+vhkM6YTWRc597PA3RV8cMu0Lv+ESduDHcyC5KTOJNSOw+
-         uLrAED1qychQIitiN4vkNj+Zg8BciFFgCxLd6zgpx+rrfc/eWf1YLqztgEAeIEzfYSQP
-         gchA==
-X-Forwarded-Encrypted: i=1; AFNElJ/3DtR2lTMahOhVkB0lheT1qoVBUb2buZDPzAUWFPU2HIwbYQQ8b2L+W4G76SvA05PBiTrrUmK3A8M/zQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9igp1WsYh7bH3mJrHDuCL3sdeKPRMZwCLOk/9SqjhyG58letc
-	PtYtkUDRAjh2pf0OMPMYvQPwJyfO5hDghGenIc7GmlhGTVRccVlrtpiax8OUbQ==
-X-Gm-Gg: AeBDieuF0q1j9mu97aLgTKT1X3imeScG+wi8mfgH13GjjunlFBlrysPlh2eXwQNuE7f
-	RQERgvlC3f1AMxIpbSZMG5ymP/7yPvVPkNWq++cJYG9qQKD7haz1geFzqcW16XKoJvF8gH5i+CL
-	+35CZW7fjcuFJxFlAdxZdtUKNwmA+QDcgObw2+o3LI41nbmIGqcIHMx9ywSen6vdPnxlbF3/vI7
-	kSmqe6D4R7ag5q94ZXA6FcYwsH508BSittVz3iSR1wxFDkk6HM1Jwz3gEZrF01R33KaIr9GVsxw
-	yCPNwdOKu5U4y1ePPlp1yxAtX3RctxLf+3BhHaAXPJV4Xlubyx7bx1cOhaeBsMh/oPfgFzDzSXl
-	g3BHRsQSPpfV/g8eZrGgdAdX6HU4jNtlghoqcSGCW5XuMILPbrdAxheW1xyToKIKESUB3lpGVgo
-	2nC6L1qxlApd5w/zY29bgo1d2fEV9kAE93tj97IO9Wshzzig+uh5OwoCoUu9r4hcc7UTpX5Bag2
-	zl94DxNhJOObQeAl0N7Gw5b
-X-Received: by 2002:a05:600c:4e0c:b0:48a:55d8:7882 with SMTP id 5b1f17b1804b1-48e51e16e58mr45385535e9.9.1778055774175;
-        Wed, 06 May 2026 01:22:54 -0700 (PDT)
-Received: from fedora (185-147-212-251.par.as62651.net. [185.147.212.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e538a547bsm33428665e9.5.2026.05.06.01.22.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2026 01:22:53 -0700 (PDT)
-From: Ming Lei <tom.leiming@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Ming Lei <tom.leiming@gmail.com>
-Subject: [PATCH v2] ublk: validate physical_bs_shift, io_min_shift and io_opt_shift
-Date: Wed,  6 May 2026 16:22:38 +0800
-Message-ID: <20260506082238.22363-1-tom.leiming@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1778058143; x=1778662943;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mmaZWXsqMxYY1SXzoardDG6u5dyIRaJ/iULJJHwbN+E=;
+        b=CCfFr4rdet3IF510LuWwQ6EenavwE/xcoel2a4WDY6313MGfisAYDzKLWBuzhHpnli
+         YpUcUNUv83OKJSP489D6rdZ1yMdwIzPxSaYpT5uSIABb7wk9pRRb0C7BAnPDcuSU/odl
+         WxxAT+EkfQ83PqkKUuSBDLD7MQ3eyCZtVaYABSY+/gUB7R11Gb45ChR6i5nDmTufgrR0
+         SMFgFTSIV5ds4sQ2+nY3su5jmivXxu4Ejc4dnX88i0d6E/0L3clxl/IZKqpPlTAuvK2q
+         uX0IbvzHCq9guKpeyGn2l9WKQ7fVRR/8NL8/wW7cb7Wn9yUTPHnSIInrtzms0cTJO6Dm
+         lIRg==
+X-Forwarded-Encrypted: i=1; AFNElJ+hpznhWFy3YmoU5K9pzRCSBmjsMzg0IWG7GYvwwMqZZ7B6YcGQ9MD6inPGjEJx1C7+BJRUUk+UgYwLHw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2dRqpxsiPggLqpSNv4N0jXoUVN0Svqcku5g1xEQFKQ7Hblgv/
+	a8WU6c/ewA1RmBIeML4pD7mmxoT3UkeJeYjntHPRpZx5LWSj3lbRd/i+
+X-Gm-Gg: AeBDietLoufhrYarM+yi/o+/jwrBzBzTprVfERvoRAoMRHdgE70qPNqI7oOkMcjCwTl
+	baz9GlrLvdx2+Qfn76s2dOfAQjz26SYPinCs6qnyJJbsn/NVjNsxGtXSgpNdcP4XCgxC7g/gazJ
+	xrM1wj0E/DnVG84LGz/IrrFfUeEkLiJCApw5j+gwmKAdckDA6VAwLADi/gmVdu5HnloiRlP1eMY
+	fDSh9v/vENbcKAgCjCJaeEW94S5Z94alwG1zzs98RhCYfkWFZz+raVgHZ/XvdufNr920VueApqH
+	+Fghy3godfbqVE2Rtk18/iT4OfL9nlRDkqFYmoeHYEaMGfBa8ubQPkNSOolQ+AJOleGJoXfjXDs
+	O5m8ZBmsINUD/BHcM+zmZKG+CAql7WwZml2QkuLDtcHfjOHMxRp03a/4RfXPRvx7R99AqlOESZY
+	Mpb16Xu/wIgAnODCELLYMJJE1q5fnGci4JpyMTpbzUf/w+hPczTLxxPAVY0YvbRIzDP5pKz2NUS
+	ix82Q/CMBfsbrJNVE8JF9NZueHXfXqiGX0y/ACmXQ==
+X-Received: by 2002:a05:600c:2e0c:b0:489:1c2d:211e with SMTP id 5b1f17b1804b1-48e51e0c833mr25734095e9.5.1778058142476;
+        Wed, 06 May 2026 02:02:22 -0700 (PDT)
+Received: from [10.109.92.22] ([86.33.71.194])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e52f5c1cfsm21365215e9.0.2026.05.06.02.02.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 May 2026 02:02:21 -0700 (PDT)
+Message-ID: <6873d617-c904-45f3-bad9-e1ae39cfecd2@gmail.com>
+Date: Wed, 6 May 2026 10:02:11 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+References: <cover.1777475843.git.asml.silence@gmail.com>
+ <afi7c-VUJWOLlC1m@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <afi7c-VUJWOLlC1m@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-ublk_validate_params() checks logical_bs_shift is within
-[9, PAGE_SHIFT] but has no upper bound for physical_bs_shift,
-io_min_shift, or io_opt_shift. A malicious userspace can set any
-of these to a large value (e.g., 44), causing undefined behavior
-from `1 << shift` in ublk_ctrl_start_dev() since the result is
-stored in 32-bit unsigned int.
+Hey Ming,
 
-Cap all three at ilog2(SZ_256M) (28). 256M is big enough to cover
-all practical block sizes, and originates from the maximum physical
-block size possible in NVMe (lba_size * (1 + npwg), where npwg is
-16-bit).
+On 5/4/26 16:29, Ming Lei wrote:
+> On Wed, Apr 29, 2026 at 04:25:46PM +0100, Pavel Begunkov wrote:
+>> The patch set allows to register a dmabuf to an io_uring instance for
+>> a specified file and use it with io_uring read / write requests. The
+>> infrastructure is not tied to io_uring and there could be more users
+>> in the future. A similar idea was attempted some years ago by Keith [1],
+>> from where I borrowed a good number of changes, and later was brough up
+>> by Tushar and Vishal from Intel.
+>>
+>> It's an opt-in feature for files, and they need to implement a new
+>> file operation to use it. Only NVMe block devices are supported in this
+>> series. The user API is built on top of io_uring's "registered buffers",
+>> where a dmabuf is registered in a special way, but after it can be used
+>> as any other "registered buffer" with IORING_OP_{READ,WRITE}_FIXED
+>> requests. It's created via a new file operation and the resulted map is
+>> then passed through the I/O stack in a new iterator type. There is some
+>> additional infrastructure to bind it all, which also counts requests
+>> using a dmabuf map and managing lifetimes, which is used to implement
+>> map invalidation.
+>>
+>> It was tested for GPU <-> NVMe transfers. Also, as it maintains a
+>> long-term dma mapping, it helps with the IOMMU cost. The numbers
+>> below are for udmabuf reads previously run by Anuj for different
+>> IOMMU modes:
+> 
+> Plain registered buffer is long-live too, which raises question: does this
+> framework need to take it into account from beginning?
 
-Also zero out ub->params with memset() when copy_from_user() fails
-or ublk_validate_params() returns error, so that no stale or partial
-params survive for a subsequent START_DEV to consume.
+Not sure I follow, mind expanding on what should be accounted?
+Are you suggesting that we might want to use normal registered
+buffers in a similar way? I.e. giving the driver an ability to
+pre-register them?
 
-Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
-Signed-off-by: Ming Lei <tom.leiming@gmail.com>
----
-V2:
-	- zero out ub->params in case of partial copy or validation failure
+> BTW, inspired by this approach, I adds similar feature to ublk via UBLK_IO_F_SHMEM_ZC
+> which can maintain long-term vfio dma mapping over registered user-place aligned buffer.
 
- drivers/block/ublk_drv.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+Interesting, just too a glance, and it looks like what David Wei
+was thinking to add to fuse, but IIUC he gave up exactly because the
+client will need to cooperate and that could be troublesome.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index d10460d29e4a..57ec900f0ce0 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -900,6 +900,20 @@ static int ublk_validate_params(const struct ublk_device *ub)
- 		if (p->logical_bs_shift > PAGE_SHIFT || p->logical_bs_shift < 9)
- 			return -EINVAL;
- 
-+		/*
-+		 * 256M is a reasonable upper bound for physical block size,
-+		 * io_min and io_opt; it aligns with the maximum physical
-+		 * block size possible in NVMe.
-+		 */
-+		if (p->physical_bs_shift > ilog2(SZ_256M))
-+			return -EINVAL;
-+
-+		if (p->io_min_shift > ilog2(SZ_256M))
-+			return -EINVAL;
-+
-+		if (p->io_opt_shift > ilog2(SZ_256M))
-+			return -EINVAL;
-+
- 		if (p->logical_bs_shift > p->physical_bs_shift)
- 			return -EINVAL;
- 
-@@ -4992,13 +5006,15 @@ static int ublk_ctrl_set_params(struct ublk_device *ub,
- 		 */
- 		ret = -EACCES;
- 	} else if (copy_from_user(&ub->params, argp, ph.len)) {
-+		/* zero out partial copy so no stale params survive */
-+		memset(&ub->params, 0, sizeof(ub->params));
- 		ret = -EFAULT;
- 	} else {
- 		/* clear all we don't support yet */
- 		ub->params.types &= UBLK_PARAM_TYPE_ALL;
- 		ret = ublk_validate_params(ub);
- 		if (ret)
--			ub->params.types = 0;
-+			memset(&ub->params, 0, sizeof(ub->params));
- 	}
- 	mutex_unlock(&ub->mutex);
- 
+Should we try to push everything under the same interface instead of
+keeping a ublk specific one? Again to the point that it requires
+a cooperative client, but if it's something more generic, the user
+might just try to use it as a general optimisation. In the same way
+it'll be helpful to fuse, and as a bonus you wouldn't need tree look
+ups (but mandates clients using registered buffers as a downside).
+
+It'd need to shaped to somehow work better with host memory as I
+assume you want to be able to map it into server in common case.
+Switch case'ing if it's a udmabuf is not the greatest approach,
+but maybe we can figure out something else.
+  
 -- 
-2.53.0
+Pavel Begunkov
 
