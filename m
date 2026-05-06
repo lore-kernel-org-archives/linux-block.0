@@ -1,107 +1,88 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2BF328243;
-	Wed,  6 May 2026 09:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1F73E958C;
+	Wed,  6 May 2026 09:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778058290; cv=none; b=eFnp1XJkjS+pCWJmzy0yfr7F0gHy1moNt23uytOnZ5tVJL+O80BSBfRzF7iG0Xtuw+JpWq4mZV60NrOjZl6XBNDZUNfkmLWJqsMwu4bZoJ5O934sdhqTCo3WmhbHz8uMRBiz8SSr3w23J+HboZTpMVVfB2B5HhEkaFbLBQpaKVs=
+	t=1778060638; cv=none; b=tyGDijMWwA550zydFghFpQHPsZrnYSNc+hi8uitYssm3F6ZIY/VwAT31N+gbvjaB1UUQpG+KD37LGjBhL5bNz19G92i9SME5G3d+FFYIi+QkZoql/iSxIwDwj8us4uFtCHysZLvlDa4jeWxkyR67XcXecdiSNLtX+SEqdX0J1FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778058290; c=relaxed/simple;
-	bh=gIPiLyzvkCimISkjxiTv8tC+1/5WUILhKNCmRBva46I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lDWvPMqSJCOBySFLFg8LujWezIgCjIF1bqUthEe6r/ijrgtsWf73rI220klIoSVqSvBFHnw7iR1IrGboKQkIVWRVNK/ZKl4YkrOyVF2SuVPTms5aHjJGWPYpfpqwWBPZkIhRgMA6SwytRzIBsAsxMAcoOQE/wdl+lcthbtgXjNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 9d7af5c2492a11f1aa26b74ffac11d73-20260506
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_TXT
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
-	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED, SN_EXISTED
-	SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF, GTI_FG_BS
-	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:dabb9f43-839c-4592-8144-23fafb84ff51,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.3.12,REQID:dabb9f43-839c-4592-8144-23fafb84ff51,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:e7bac3a,CLOUDID:995d4eb785a2556e923e7b6c198be648,BulkI
-	D:260506170441HOP1KWDG,BulkQuantity:0,Recheck:0,SF:10|66|78|81|82|101|102|
-	127|850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk
-	:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,
-	BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 9d7af5c2492a11f1aa26b74ffac11d73-20260506
-X-User: yanlonglong@kylinos.cn
-Received: from localhost.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
-	(envelope-from <yanlonglong@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 822434755; Wed, 06 May 2026 17:04:40 +0800
-From: yanlonglong <yanlonglong@kylinos.cn>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yanlonglong@kylinos.cn,
-	yukuai@fnnas.com
-Subject: [PATCH v2] block: add NULL checks for bic in bfq_bfqq_save_state function
-Date: Wed,  6 May 2026 17:04:09 +0800
-Message-Id: <20260506090409.49648-1-yanlonglong@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <db3d516f-6ad2-469a-9bd8-1a9b61eb12a0@kernel.dk>
-References: <db3d516f-6ad2-469a-9bd8-1a9b61eb12a0@kernel.dk>
+	s=arc-20240116; t=1778060638; c=relaxed/simple;
+	bh=RIN7YXqXvgh2MdA7eJYTnfvp7/z4cdn5ni4CU/qLi/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CMYEc80sDxH7GPrtnu0T9vaOpD/wRiMZRLyznLs8BlbouwHMb/Vt3Wu6uTUb827kbrBajd+URqC4PIWNjbxsT59lLZTvaQO6X+dG1Raho8SEuQO9XK0q+TLLs1viY1pb0zy6YLiZ/oOJW0dv1NxDAHt9mzn6/gKUipL2FlFQ1cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=BlLTgGQd; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="BlLTgGQd"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4g9Vnf6lPYzlgd7G;
+	Wed,  6 May 2026 09:43:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1778060623; x=1780652624; bh=1LBEh0gXi9dp9n7zJVBhVS8a
+	OkHdRkSIbKvK+ex01T4=; b=BlLTgGQd2ohpnnhQ9iA1uf7NcFP7Jifk3isld384
+	nDJE3QwFmzEqzNXiPdO6/R+wdB3XTDiG/zckrvWhCdLWu02frLNZbFCnVdeZ9f4y
+	EqdSsOT7082FgqqRDm34ViE4vXatdvPEU21cjPLVp292UWrCS07/k64/i+M07Rxf
+	DI7v6Y5eArBMR5AgHRWvIPaJskfu93pubyvGfvunwPhX+dDiKsUPukFRo65Nv2+g
+	45yRTWhFpvNGsyL7gguVW0KVqhTtzJai9yeUnXjjzWXw6GehiZ3JvDmllds5Q8LP
+	FbevXaAJ78mnW8as8ioevCAQWt0+lq/PO/XCFDR8aAXx5g==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Swzqo4UsmoAs; Wed,  6 May 2026 09:43:43 +0000 (UTC)
+Received: from [10.211.9.52] (unknown [213.147.98.98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4g9VnM6bfczlfwHS;
+	Wed,  6 May 2026 09:43:34 +0000 (UTC)
+Message-ID: <713ba2ae-e322-4e56-b0b8-89766f7f65c1@acm.org>
+Date: Wed, 6 May 2026 11:43:32 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/1] block/blk-mq: use atomic_t for quiesce_depth to
+ avoid lock contention on RT
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>,
+ axboe@kernel.dk, linux-block@vger.kernel.org, clrkwllms@kernel.org,
+ rostedt@goodmis.org, ming.lei@redhat.com, muchun.song@linux.dev,
+ mkhalfella@purestorage.com, chris.friesen@windriver.com,
+ linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+ linux-rt-users@vger.kernel.org, stable@vger.kernel.org,
+ ionut_n2001@yahoo.com, sunlightlinux@gmail.com
+References: <cover.1778048987.git.ionut.nechita@windriver.com>
+ <406f424c0a718bf492d40c206983e355e600945a.1778048987.git.ionut.nechita@windriver.com>
+ <50187fa5-03a9-4ca3-bcaf-a36ed75bda2c@acm.org>
+ <20260506074758.8zEg1ZBh@linutronix.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260506074758.8zEg1ZBh@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When the `bic` variable is null, referencing `bfqq_data` through `bic` will
-cause the program to crash. Therefore, the null check for `bic` should be
-moved to the beginning of the function to prevent referencing a null pointer.
+On 5/6/26 9:47 AM, Sebastian Andrzej Siewior wrote:
+> On 2026-05-06 09:14:33 [+0200], Bart Van Assche wrote:
+>> If the atomic_inc() in blk_mq_quiesce_queue_nowait() is protected by
+>> hctx->queue->queue_lock then the above code doesn't have to be modified.
+> 
+> But wouldn't the atomic_inc + barrier avoid the need to have the lock?
+> Isn't this a normal pattern? If the lock is kept, we could use
+> non-atomic ops here then. But this avoids having the lock.
 
-Fixed:fd571df0ac5b289af8（"block, bfq: turn bfqq_data into an array in bfq_io_cq"）
-Signed-off-by: yanlonglong <yanlonglong@kylinos.cn>
----
- block/bfq-iosched.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+I strongly prefer a spinlock + non-atomic variables rather than using an
+atomic variable and barriers because algorithms that use a spinlock are
+easier to verify.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 141c602d5e85..e952e4ea2dd4 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3035,9 +3035,8 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- {
- 	struct bfq_io_cq *bic = bfqq->bic;
--	unsigned int a_idx = bfqq->actuator_idx;
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
--
-+	unsigned int a_idx = 0;
-+	struct bfq_iocq_bfqq_data *bfqq_data = NULL;
- 	/*
- 	 * If !bfqq->bic, the queue is already shared or its requests
- 	 * have already been redirected to a shared queue; both idle window
-@@ -3046,6 +3045,9 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- 	if (!bic)
- 		return;
- 
-+	a_idx = bfqq->actuator_idx;
-+	bfqq_data = &bic->bfqq_data[a_idx];
-+
- 	bfqq_data->saved_last_serv_time_ns = bfqq->last_serv_time_ns;
- 	bfqq_data->saved_inject_limit =	bfqq->inject_limit;
- 	bfqq_data->saved_decrease_time_jif = bfqq->decrease_time_jif;
--- 
-2.43.0
+Thanks,
 
+Bart.
