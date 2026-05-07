@@ -1,50 +1,46 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4457175A9F;
-	Thu,  7 May 2026 01:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0461B78F3;
+	Thu,  7 May 2026 05:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778117346; cv=none; b=iucRF9fatGLzDjS+L9HznRA0ECOUwKQSJPrJHcHtpYsFJDAiJ8eD5ZlUQYuo2DVoZTeL8DjXeMD35+jB8Rtlqv0IBxW6LA0vDn1bZK34cZOZrO4Y0FWm7S9o1V2KXi8FynTsDUWFAN2euhbL9Gm6ZH29ZI2eNxN+PE26UDdDfTY=
+	t=1778130125; cv=none; b=kL3lzdje3CJJZv0q0oy/fE7u680SfcggH4n98RIFMODVmDmSFfPTsr6tGzRgjVLZqC+XR+oIzu0jScBLgA2KiPXRjvkFEH9+1njbUJFJvuSbOZh5fcGqWlz+JWKIbskDnTGiE+d5OHXTTUAIsX0fYk4RiZypCzk+Etb8cWVj5AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778117346; c=relaxed/simple;
-	bh=zGVDwaGzTTtM4iqEj8gFUZDGWOtL0unAkHTZL2LRrYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=owd2uuw0mZgxng20CCJAxX0aWY7PG4CcJ8Wzm8ro3S8IAqpB2MYc5rqiMbLRolMyFV6kgNzhEXCT3ppzTKYp0F4BTS1V3NlMPnE9gd/iXzpcMElg3n+skjmgqN/3AdDhc7gGIoudSsNO0FbkcgNmt9qJVNTUYbcSk2haCkKhZnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 1cf262e849b411f1aa26b74ffac11d73-20260507
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:4e8e331c-712b-466b-9665-40438af11549,IP:0,U
-	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:25
-X-CID-META: VersionHash:e7bac3a,CLOUDID:3afcfde5172380540cc4f2207bc67a04,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:81|82|102|850|898,TC:nil,Content:0|15|50
-	,EDM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
-	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 1cf262e849b411f1aa26b74ffac11d73-20260507
-X-User: yanlonglong@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <yanlonglong@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 535383488; Thu, 07 May 2026 09:28:55 +0800
-From: yanlonglong <yanlonglong@kylinos.cn>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yanlonglong@kylinos.cn,
-	yukuai@fnnas.com
-Subject: [PATCH v3] block: add NULL checks for bic in bfq_bfqq_save_state function
-Date: Thu,  7 May 2026 09:28:26 +0800
-Message-ID: <20260507012826.1535-1-yanlonglong@kylinos.cn>
-X-Mailer: git-send-email 2.47.1.windows.2
-In-Reply-To: <9face7b3-d4de-474f-8948-d8efde02bfc8@kernel.dk>
-References: <9face7b3-d4de-474f-8948-d8efde02bfc8@kernel.dk>
+	s=arc-20240116; t=1778130125; c=relaxed/simple;
+	bh=yxroJRjEGUbyRj5kI6X/DS8yQTTEQHsAthXLoWFrpug=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m3rlDzkW+BJdGZrIihzxvswESVBlAc9brgTsJtwuu3nPF9Q+UHAmyQ4CpcVzpK1SX8NsHKXnYSE5ht+/R+0uedhZ3w5x2T+8C1rNJBRHJ9GYfmjMkbwDslYxPlc535InjFe4e1H2QW84u7VBXVJQXxleTy5ekwnFmHkqsy7z4cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nRauK8iA; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nRauK8iA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=CKFAjES2gFiXuKnMxHCHtVrZ0QNMmLLhxSZDfzYnhko=; b=nRauK8iAwUlrJyE5zK65kFWuUx
+	StKrPXXvPesiloHhpI/99MprzszQGcr+ZffwKUFNnkhtMjgoDnvi/3HEubc1xHTulBh2Ikrm06aDY
+	5p/K5J7F3N77WX3nYBiSJDUE/uKb8zzKQcx0S2sHWDo9mVDYgtH7PACUnLQO8BqGID2BCdDXotVd1
+	Qg2/EyIyAd0dgZ0znT/Sy4YBhxLSeVABsD0nsEGMrBMAyNnQbbAct/aqVl9iJWPimXWTnwDA0QYXx
+	tm6FFeqr/tYiZFpHUI3iG65JkVmerLJxJFpjAWc5ahcnPxfEkP1R205BoMAG+/OUCpEm0apbDrbz+
+	K4lIGSEw==;
+Received: from 2a02-8389-2341-5b80-decc-1a96-daaa-a2cc.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:decc:1a96:daaa:a2cc] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wKqs3-00000002lxa-03e3;
+	Thu, 07 May 2026 05:01:59 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Pankaj Raghav <pankaj.raghav@linux.dev>,
+	linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: fix block layer bounce buffering for block size > PAGE_SIZE v2
+Date: Thu,  7 May 2026 07:01:46 +0200
+Message-ID: <20260507050153.1298375-1-hch@lst.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,38 +48,18 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-When the `bic` variable is null, referencing `bfqq_data` through `bic` will
-cause the program to crash. Therefore, the null check for `bic` should be
-moved to the beginning of the function to prevent referencing a null pointer.
+Hi all,
 
-Fixes:fd571df0ac5b("block, bfq: turn bfqq_data into an array in bfq_io_cq")
-Signed-off-by: yanlonglong <yanlonglong@kylinos.cn>
----
- block/bfq-iosched.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+this series has two fixes that make the new block layer bounce
+buffering code work for the block size > PAGE_SIZE case.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 141c602d5e85..c8cf8764d48d 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -3036,7 +3036,7 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- {
- 	struct bfq_io_cq *bic = bfqq->bic;
- 	unsigned int a_idx = bfqq->actuator_idx;
--	struct bfq_iocq_bfqq_data *bfqq_data = &bic->bfqq_data[a_idx];
-+	struct bfq_iocq_bfqq_data *bfqq_data = NULL;
- 
- 	/*
- 	 * If !bfqq->bic, the queue is already shared or its requests
-@@ -3046,6 +3046,7 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
- 	if (!bic)
- 		return;
- 
-+	bfqq_data = &bic->bfqq_data[a_idx];
- 	bfqq_data->saved_last_serv_time_ns = bfqq->last_serv_time_ns;
- 	bfqq_data->saved_inject_limit =	bfqq->inject_limit;
- 	bfqq_data->saved_decrease_time_jif = bfqq->decrease_time_jif;
--- 
-2.43.0
+Changes since v1:
+ - update a commit log to better describe the applicability
 
+Diffstat:
+ block/bio.c          |   27 +++++++++++++++------------
+ fs/iomap/direct-io.c |    2 +-
+ include/linux/bio.h  |    3 ++-
+ 3 files changed, 18 insertions(+), 14 deletions(-)
