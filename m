@@ -1,106 +1,89 @@
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FC2370D63
-	for <linux-block@vger.kernel.org>; Thu,  7 May 2026 07:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C0631A7EA
+	for <linux-block@vger.kernel.org>; Thu,  7 May 2026 08:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778140285; cv=none; b=RcZC/52Ok5DUONZiAoITCYD81fu3tREryY78W/mNvZbfSXGNxMh9IwxWPYts0lV+NmKeDNoTf+mfwlndTeBpJPVzIQu8aC4Yf2l6nMAJOaO8GfOGzGWbEU1sQWDm5StQRKxmfs/SkyDnslJ1zBUkVn408cqDP7lR9I/J5fHXBb8=
+	t=1778141160; cv=none; b=A0NbBsqr7k+j8MwJ8cingdVZ8AsaPhenqyP+OveIs2sbHayxdQcapJYGVh/I4nblMGXIHd77LCfHLqFeqqfgCrZqC/qBnokvW4/4GPdKwMrdtaEUosQEcMqnc6RuPnNchTYu+iGKwuSP/yRaI+vqvTv8YQqaqqoNkxF/t10AuJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778140285; c=relaxed/simple;
-	bh=hXQbl8Cit4+T7yJRt5JdQu9NH39mDdQbqe+q74GCoO4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IX4iuwOkaybjVDceIX7JSNONtIDnmGuvpePKrwqfrdtEa/SyFnH7UsOY456XKUObR+7f89gwRj7kmYDIow2cBLPDLS6AALUOoVqEfTjSjJy05U/QllBOLlh3tWfWISuWx38mRR+9gMZV5z6kCkBqVh7Irb5H379YjAx7ZYw8y0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=KZ6I+6+l; arc=none smtp.client-ip=74.125.82.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1778141160; c=relaxed/simple;
+	bh=mzo5hInL1GMeoZKQdJ0QsbZ5h1dsaidU5BwUTNW4xDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q/SoeJSW/iuPrf6uOf20qqXIsJ3FcC2qYZs6I+tcDhZvN5m7N2PbnGHeel/OSW6FafyBfyY7pj2ZvMvNA2C/KcRlQaQNLWqQmBJAZvS1adeAdCbYYb0awPEBTcrc4e4fcNjT2kNKxELEBtjWsLZvtG+gUGBMwK09JyolcHpn0PI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tU1l5guO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="KZ6I+6+l"
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-2ee990e8597so929655eec.1
-        for <linux-block@vger.kernel.org>; Thu, 07 May 2026 00:51:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778140281; x=1778745081; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I5O+SMVnZI3YBFvbhgSVs7bzkx3ZYwEGUQfzptmHoXU=;
-        b=KZ6I+6+lwczseyjNIJZl4pBnDm0jGr/gk/aThc5B0UbdSKkCg4jGX+fi9cTHPUWAtu
-         SEbDm7iFVXAYEJiKTYZzogHLbb6Q2+VviNncsj/ajX4svIBx6BMXX5mhNMjBwdV+egUG
-         HiKDKtsRgsvHiBcVs5ULSQZJZ17mx/xqCEW/CWQyQPtBWm3srajLdrf84VXJ/fHblgO5
-         FNjh9tmUVd1C/IMC21YNTU7GSW2d6ozwFIBSB5+bARGWBCA56gt2E7qTPD9aZlsWev0L
-         mop2cbc0ex/mMYvw33aUH3wWDi3ly4mn0M6W94DSrG29xsnTwZP9mwybPBlLc7B81UBk
-         P0eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778140281; x=1778745081;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I5O+SMVnZI3YBFvbhgSVs7bzkx3ZYwEGUQfzptmHoXU=;
-        b=p17o3YhUNg5ZYUYMacCkw6hZ9CKzLAr/9Uiti8dRvyLvorlpcTdbloDEZ/iv7cCBw8
-         t/Q1Uva13OiQDl8jsoTabCYY7Rf9ubHBgocbmIYkDm50NTBerVZPhVqnUp6FIK4wfszI
-         ++87MpCs51YAEsQsUtJTw6egVY1CB30TkTD5DeevFEtu5gtd7P48tbeKnqXiZDcL8h3G
-         PMLyEJ9s+u5ItuDW30yX5TxP7Zz/gw/2LIH6NTMIACZPvTyQ3w9+rWnYFzRSsphoSAx1
-         B/loSdmSd4sycN3lQeGYLSAKkgh6EPevE9f1Zrzt0RT46uKkEZ1RUIPKIMild9K/cURc
-         0oZQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+YV49+8r71Tapo9xr0cxaAbx5S3Xu7XJcZ9DjFo1QenKHHjnMH3AHNJdzsZrkH7XJw5j2yn6pG6YG0PA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz19ODvk++I7Tqkw/9iRi7pyNnGO5HrUF452FIVh9r6xmNx+Lm5
-	YjzNRXk+z4yZGTiXdmS0lkesyxUvWFi3QdG/EUplg2iUggstfV4vPlXbZDsK3x3TE6k=
-X-Gm-Gg: AeBDieuX7auVTh/2XV1+Ka2iDE6vZp9My4Zvt/6tKSFUqrS2bcSZoNuuv4160N0hZrG
-	EByX6ELpKjbHhCOGMramqmXA7dnohId3tpqGmf8KpDHf8ZUdbRQlzQvRjOIFvYpKCmkobnOtuPh
-	FpM5FsGEAYA9BuJ2/R4DvhHeWL9N8DOwJLjwXuca1YuOgrTO2AMpZfwJ58cGV5oQT50h6J8Aa2J
-	5ga6xyZDjGwwNQ+PN5Gs5ejdCsPoKkSsmsafkPQcNv8SpXkmaZoiJPnfFikiEdxib1rssaiTIhl
-	bLNuywG7jgmYMXm7qij62ZmEEQbl0PtFzAxSDPrOdLR248h+px2olpYqhaubxbdFXgNZOgZO6q0
-	vTjZWjENlf0CApKbmz5AeGKc9CM2d54NoUkXLGDwq7gMd8iI54KNuk2zn/oZvMULUfxKKrRCOit
-	0ByKQJmgJW5NSpIFLTeoD4TNMMu+A00blZzXAzZNIUhtEP3sOVfZCMijITHBhSDPYn0lpJUoxnT
-	GKQtCZt/qVshl+I20bnXfu48cN4bPZp01miuLEhq3AzaFETTKB2ziJKCNZwZrmS82MN/MUDKq3A
-	DIOPgNPJ
-X-Received: by 2002:a05:693c:2c01:b0:2c5:b23e:48a6 with SMTP id 5a478bee46e88-2f54b265a7dmr3572827eec.23.1778140281108;
-        Thu, 07 May 2026 00:51:21 -0700 (PDT)
-Received: from ?IPV6:2600:380:4661:8001:1a06:add6:6891:16e? ([2600:380:4661:8001:1a06:add6:6891:16e])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f56f88f89csm6750124eec.15.2026.05.07.00.51.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2026 00:51:20 -0700 (PDT)
-Message-ID: <3f01f3b5-f57e-4e04-8a70-ac0722f243be@kernel.dk>
-Date: Thu, 7 May 2026 01:51:15 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tU1l5guO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A13C2BCB8;
+	Thu,  7 May 2026 08:05:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778141159;
+	bh=mzo5hInL1GMeoZKQdJ0QsbZ5h1dsaidU5BwUTNW4xDg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tU1l5guOHozYQTJukgPDSQ2QDuPnBbrysovPftNfBsDpo/0ZS2J8/95Gw6hEXpVkP
+	 sPzJe9aRk58BMYJ70OgzvJ8CpJ/PekGv56QPmgacBnB0zJskLWqHp0s2Mqjgy9tbNK
+	 noAOrhRq49e30wkMxd4GPpYPYe0X2iViwktIYg4q/uPrxd9UPpYhXzbQi5hbeHBeNN
+	 6zAtmIFNWo3VxSGAH5rtAs6fFxjdIYmkJiAxtRTNSw46qVoyeoiJkHR0ZKsBP3pPZg
+	 H9cOkn4EP1gpr1P3opvgaLaec3GAxYdSmPqctmTdhOQLy2EVMqkvw/2NQqZ9PmYiE6
+	 QhR6YNIQ15HAg==
+Date: Thu, 7 May 2026 10:05:54 +0200
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Chao Shi <coshi036@gmail.com>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, sagi@grimberg.me, axboe@kernel.dk,
+	Sungwoo Kim <iam@sung-woo.kim>, Dave Tian <daveti@purdue.edu>,
+	Weidong Zhu <weizhu@fiu.edu>
+Subject: Re: [PATCH RFC 2/2] nvme: set integrity metadata size for EXT_LBAS
+ non-PI namespace
+Message-ID: <afxH4g52fRXOyBsP@kbusch-mbp>
+References: <20260427003457.1264511-1-coshi036@gmail.com>
+ <20260427003457.1264511-2-coshi036@gmail.com>
+ <20260507054944.GB19796@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] block: bio-integrity: Fix null-ptr-deref in
- bio_integrity_map_user()
-To: Sungwoo Kim <iam@sung-woo.kim>, Keith Busch <kbusch@kernel.org>
-Cc: Chao Shi <cshi008@fiu.edu>, Weidong Zhu <weizhu@fiu.edu>,
- Dave Tian <daveti@purdue.edu>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260427040926.987166-3-iam@sung-woo.kim>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260427040926.987166-3-iam@sung-woo.kim>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260507054944.GB19796@lst.de>
 
-> diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-> index e54c6e06e1cb..766cc2d1d51c 100644
-> --- a/block/bio-integrity.c
-> +++ b/block/bio-integrity.c
-> @@ -403,6 +403,23 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
->  	if (unlikely(ret < 0))
->  		goto free_bvec;
->  
-> +	/* Handle partial pinning. This can happen when pin_user_pages_fast()
-> +	 * returns fewer pages than requested
-> +	 */
+On Thu, May 07, 2026 at 07:49:44AM +0200, Christoph Hellwig wrote:
+> On Sun, Apr 26, 2026 at 08:34:57PM -0400, Chao Shi wrote:
+> > +		/*
+> > +		 * For PCIe EXT_LBAS non-PI namespaces the block layer sets
+> > +		 * capacity to 0 (we return false) to prevent block I/O, but a
+> > +		 * cached-rq bio may bypass bio_queue_enter freeze serialisation
+> > +		 * and reach nvme_setup_rw() with head->ms != 0 and no
+> > +		 * REQ_INTEGRITY set.  Populate bi->metadata_size so that
+> > +		 * bio_integrity_action() returns non-zero and bio_integrity_prep()
+> > +		 * sets REQ_INTEGRITY on any such bio, preventing the WARN_ON_ONCE
+> > +		 * at nvme_setup_rw() (addressed by patch 1/2).
+> 
+> This sounds like the Bug Keith is trying to fix in the block layer
+> ("blk-mq: check for stale cached request in blk_mq_submit_bio") ?
 
-Please follow the multi-line comment style used in the code around you.
+Both issues are dealing with cached request corner cases, but they're
+not really related. My bug fix is specifically when those requests are
+freed, while this one is just racing with them.
 
-> +	if (user_backed_iter(iter) && unlikely(ret != bytes)) {
-> +		if (0 < ret) {
+For this patch's issue, how is the host being triggered to rescan? If
+you're sending a "Format NVM" command, the driver would have frozen the
+queues first, which would have waited for any cached requests to flush
+out and prevent new ones from being allocated until after the format has
+been updated in the driver.
 
-And never do this, it's so much worse to read than if (ret > 0)
+It's possible to format the namespace from a different controller the
+host doesn't know about, so we've always had a race where the actual
+format is different than what the host knows about. The rescan would
+have to be triggered some other way in that case (either through AEN or
+manual sysfs/ioctl trigger).
 
--- 
-Jens Axboe
+We always ensure the queue is frozen when we update the queue limits in
+this path too, so the driver and block layer should always be in sync
+even if it's not in sync with the device. That in itself can be pretty
+nasty, but we'd need a new NVMe TP to define a way to fix that. But
+specifically on the driver warning here, I'm not sure how it is getting
+triggered due to the existing freeze semantics around the queue limits
+update.
