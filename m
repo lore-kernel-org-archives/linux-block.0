@@ -1,71 +1,88 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E0A3C060C
-	for <linux-block@vger.kernel.org>; Thu,  7 May 2026 09:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7828C3AD51F
+	for <linux-block@vger.kernel.org>; Thu,  7 May 2026 09:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778146843; cv=none; b=eox4cxTpSbzXkfoQ44rjDOuSBm5cYG03Oo4ywnUEs+k2TvgCTRPMzFRskUTYM3ONYSfvVf6NLR/6A6C8gSmGK6NBKjpQ8KF7YTuMoTxYWVjkmdgYkGP7xXxnWHhAm+RDGNLkq19PO/RLwYQ1Z76U0AHjPRZorG9WJLIa7Ssqy+M=
+	t=1778147462; cv=none; b=FmmY/IelRm0PpPjAp5tPTIQRidSAlNpK88LnuZMrVJJGBjhpfLo15UObZjuVCA+MRhHry65/9DaB9F2ByBh7FvIJDni14+gawT5Vrb5LgI8hkg1CexMKCObftxKR1+tyLNOg/lnYrSjQSgZuCZvvrfv00PZWSin74QXyWUuw2Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778146843; c=relaxed/simple;
-	bh=64GYkBNAtE+BDFwDFkPtNvIvvoMh/YbkLtBo5cM1LEs=;
+	s=arc-20240116; t=1778147462; c=relaxed/simple;
+	bh=SGEcwnAvvWnARcPzNzohe5P5P1OF2zid+5BmrvKQSbU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mxfo2jGSrOfDhUOfHO55L84/jnAFC8iU7b9oBcrhlzE1tRlETiHizuJLBt7JtVTwgYoTGcjgxv46uvNeoA5YxJhU9YfynelwSl4jV1vOENC9CvfbNse8pEbnOU6HIAg4o9kryTzAkAvFUBcplGqHaMAiUEba9g9Lr9THhIxH324=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nLL0DtLX; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZZ6OfwqVDPzTjWMWgC5qrFKasXDSMQBitZw3JChf6GWULbJ1sp4dzPI9Xni0rjRRugJvpXUCkHf97hxsW4FrwQEy6k2zIwsB1CFH41w8TYFD4hv726vd6Rer1HG45rCWcyqp2RQQSY/C3oexxuWd4IiEgSIk+Bugf+OSFtw7tKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qb6d1Z+s; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nLL0DtLX"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2b9ec9443c2so10412615ad.1
-        for <linux-block@vger.kernel.org>; Thu, 07 May 2026 02:40:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qb6d1Z+s"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43d77f6092eso419517f8f.2
+        for <linux-block@vger.kernel.org>; Thu, 07 May 2026 02:51:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1778146841; x=1778751641; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778147459; x=1778752259; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6GHLHxbWZMeODD7NZR/2u5e4BofCNB2jQY/FhKfcUTY=;
-        b=nLL0DtLXXmO8zJyC1JE+QIM3Fv9sIfvg9Hh/3vc6A/bJAqpJ2gvpGt09V0N58esQCx
-         H0LPqKOPX5sBhCUqrWz86QtMh2+T5OaI4wZWF+63yxA/7yS6kS/cOUZlECQBPAJatzpH
-         Q+hu8wmDID+jsXkq/GjWToiArpdYLKN6kBa0E=
+        bh=EcZwFh2QZ44n0xgSUmMbcy6iZL2QmvBbYa+KTyDF4zs=;
+        b=Qb6d1Z+sFmZAoweE/gz8UcIKxryKUEkHsLlzEG0V++nPg75LSmnULTfGYSa9yVm5sF
+         rHal6jM18HSYeMMBitU23Ys9nmVQqDxtvZJLLrBaIcT9E0bCVdjBZ/sXJG25qSqdSQvc
+         mWHHK46kKDfvDtvrtveG6YgnLwknIkrmDLhr+qJxboC26WKWD3+q5QJAtBCL0mJfg8MK
+         KHQqqHIvUc3OUtmqij4iPvzScUg1METxrzed/zAReXH0ek1hGi6/eU3ZfZxUhiKHVwpW
+         RdEWeOo4qH32eZeywVzwJZZgsFxfQG4Ya+5W20Y3bLGDho8geWYg3UfaJZp9PWvsYzYx
+         tlsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778146841; x=1778751641;
+        d=1e100.net; s=20251104; t=1778147459; x=1778752259;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6GHLHxbWZMeODD7NZR/2u5e4BofCNB2jQY/FhKfcUTY=;
-        b=dJWmRGKIav0gvYJoPXYLfopbhviqgPMbPgTMxOJwU0oLxk+8Gybs03LToolmEBG4R4
-         yOczgdR85mXAYzMWbelmwsMhq4T8nZl+k/D1A51vTj8yLE5hkOLd/ABmtZph1YavhdYU
-         ZLa6uhFLZ2XaeXsBMZM8tnPlbSfP+nJW6hcj/Y9OUsJQ8Ip7fvK6SjPRI7k1lH6+eOi+
-         ytNqnBg5k6EeizswSx3bczqIF0795EK9Lld9XiNsYHiCsoELHMBwvHbntSbPASCR/v3t
-         oWcjh5YQu4SdED4NbJd0E00f/qcKKrJmMxXs61nwM0QGHqxKwvoVpW72TgEdu1IFl+xl
-         lNzQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9SuoRoicQYXAZLdvDiDVAJhH+Exc9w5U26jh+ybGua5Q5S3ULlQuaJRgGWgsIjG9geDC6OUP6MMpfrIQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0or2geOnXbz4+iE+N1tuIKPO3Ei9gvb0RMyqkvImnQN5urSQt
-	OvTKuS8njPJUreRTuiLU2YHPb8F1a+iSqD9lXhNkuf/Tca6ZEHgxSV1XzKprx7sCeA==
-X-Gm-Gg: AeBDies9Pu6o/vUbwEMCP+dZECCl70a3yb90F/reReeWAICMCWaLGKoXcx5MRmvxq0S
-	2fKh3MC0prQtV4iB+hOaW1d008X4vyNY2RgBp0URkd2KBEtFzT5ANcrtCQKGfySADB50AbPM0us
-	jOSnmOxO/EdvSMh8dwRe28m0idYYpDrfqasT8jln1R/fUag7OWP09VB2svIDw2wLuNZMm21H3Iq
-	vsso0xwuM6YIwzmuDXTEOvW7Y0hfUKQd5Y/lpj/Q4IuzffJPbn8vdQnUXCrVG7874dwnMrf7H+D
-	8WEoLzuKBUrz3m8cPbRYbhjQvOmz5WHesJHHtFgjANClYZY384UNNfJJkn6bfTARz0Lmc3euNlr
-	O7syK8vSK3Er7mLchvZbGNL/OZZ9rgj4Lc/eUMJkGQDLjwkcK+k9loTAyT3mHeT44Nz7SuMMk3O
-	vpiM1KBvTLQ8IVGxZPjaBNNb8m2LHrTxVB0p3ka/AoBvrO+bdifW6maarjB8H5wnxMDlme0fPK3
-	w==
-X-Received: by 2002:a17:903:28c:b0:2b4:64cf:e8f8 with SMTP id d9443c01a7336-2babc859054mr19200625ad.2.1778146841053;
-        Thu, 07 May 2026 02:40:41 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:7ba2:1dc2:ed3e:1484])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2babaac3576sm20701395ad.4.2026.05.07.02.40.39
+        bh=EcZwFh2QZ44n0xgSUmMbcy6iZL2QmvBbYa+KTyDF4zs=;
+        b=lEUon9grrqVGnCElRkgs88NAc2Deln1uy5neINLiXstalXg+3E9R0pIiF1R85Ic9Za
+         XvS9u5NXzmQwja/e7T9k7jRXIXXxXucG20j6mD97I4aSb+DYIdN2zxm/k15I7oKQ9W5r
+         Gxp16jxW/1vOkVPht9eS2AsArIdcxDfipSrhQRpCnrZz+UmEVj8SCg4z/w2dR8snx9fa
+         ucbREB3RLXH6Pl41+SLKZdxz9flvVcfo+590MyQo/+NL0ihEze7rkmeFXw6aBpo7/T3/
+         dY7VnDVnVWJ6hu8/yVcqcgMBQopdG3S2U2+OzBk67RYC9acPgzhOx0wGpquc27lB4e+o
+         twhw==
+X-Forwarded-Encrypted: i=1; AFNElJ9N46HBfeu6s2TENvuo041N2fS89JkARrshLFYa9+DUaWDGnNr4EulRpsM71vYJtRnz/lPCnrdW6Re1aw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwV5Lq+QMw+7gJbxvic/3+G6qaKo/JHFfZ7hC4ONZrG+ATZL8Cy
+	pzz+BShUn1jcSz7vbB11aWF5LlOGpUw9nQ6FebA5VVEMkKSJtXqxhUlJ
+X-Gm-Gg: AeBDievP0ArveIGGs56Rt+mxQYNbgkyPfDUxna4cet38fVW7XCtOLnG1zvZ4ED/mWZm
+	xanHgiEuud2jiLblmtb3nP80bfnQxnh6D43V5ge950LgP62CVgG69jfaaotzfDeOtWBtUvFrtXU
+	yLeG48GhvMSUC6hSBEDoooLrE8Pk4RJ3mSo72oSk6ioPutIuiRxUYxQkchlk+LUnTYpAnSgDfBy
+	jBVySpATgv0yaHc3IkD7TEmjcfINXi6hXNL4UZJpyLURFI+rxEeJLGsIfGsvMs+zPFsScCVuvcm
+	RAyqSlqIvnX/v0NEhFSzh+LvGTlxEFEnrh1iwHOdFKdEs3q0b4AJdrH2C3Z9fyy0kNZzpnknc+e
+	EpxnUFL6R8bGAe70fvloF0D7srcjxQ/ZxWKbZszdqVQOsKx7plCpSEWfZIzjnd7zGfyEoUeIkRV
+	hnbrEmwECGeLuAKrrB997asgkG1ttJ8Re4S45MHwlZfxWSu0WCr6SwcVulPQFe/g==
+X-Received: by 2002:a05:6000:2207:b0:43d:7dc2:b655 with SMTP id ffacd0b85a97d-4515ad767c3mr12533550f8f.15.1778147458336;
+        Thu, 07 May 2026 02:50:58 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45052a48c04sm19976392f8f.15.2026.05.07.02.50.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 02:40:40 -0700 (PDT)
-Date: Thu, 7 May 2026 18:40:37 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Minchan Kim <minchan@kernel.org>
-Cc: Richard Chang <richardycc@google.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
-	Andrew Morton <akpm@linux-foundation.org>, bgeffon@google.com, liumartin@google.com, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] zram: fix use-after-free in zram_writeback_endio
-Message-ID: <afw2919RiZje9xzq@google.com>
-References: <20260504123230.3833765-1-richardycc@google.com>
- <afoc5qLvK2PDQKb-@google.com>
+        Thu, 07 May 2026 02:50:57 -0700 (PDT)
+Date: Thu, 7 May 2026 17:50:43 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Tushar Gohad <tushar.gohad@intel.com>,
+	William Power <william.power@intel.com>,
+	Phil Cayton <phil.cayton@intel.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
+Message-ID: <afxgc4hizusnAA26@fedora>
+References: <cover.1777475843.git.asml.silence@gmail.com>
+ <afi7c-VUJWOLlC1m@fedora>
+ <6873d617-c904-45f3-bad9-e1ae39cfecd2@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,115 +91,79 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <afoc5qLvK2PDQKb-@google.com>
+In-Reply-To: <6873d617-c904-45f3-bad9-e1ae39cfecd2@gmail.com>
 
-On (26/05/05 09:37), Minchan Kim wrote:
-> > @@ -966,9 +966,8 @@ static void zram_writeback_endio(struct bio *bio)
-> >
-> >  	spin_lock_irqsave(&wb_ctl->done_lock, flags);
-> >  	list_add(&req->entry, &wb_ctl->done_reqs);
-> > -	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
-> > -
-> >  	wake_up(&wb_ctl->done_wait);
-> > +	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
-> >  }
-> >
->
-> I agree this will fix the issue, but using a lock to extend the lifetime of
-> an object to avoid a UAF is not a good pattern. Object lifetime shared between
-> process and interrupt contexts should be managed explicitly using refcount.
+On Wed, May 06, 2026 at 10:02:11AM +0100, Pavel Begunkov wrote:
+> Hey Ming,
+> 
+> On 5/4/26 16:29, Ming Lei wrote:
+> > On Wed, Apr 29, 2026 at 04:25:46PM +0100, Pavel Begunkov wrote:
+> > > The patch set allows to register a dmabuf to an io_uring instance for
+> > > a specified file and use it with io_uring read / write requests. The
+> > > infrastructure is not tied to io_uring and there could be more users
+> > > in the future. A similar idea was attempted some years ago by Keith [1],
+> > > from where I borrowed a good number of changes, and later was brough up
+> > > by Tushar and Vishal from Intel.
+> > > 
+> > > It's an opt-in feature for files, and they need to implement a new
+> > > file operation to use it. Only NVMe block devices are supported in this
+> > > series. The user API is built on top of io_uring's "registered buffers",
+> > > where a dmabuf is registered in a special way, but after it can be used
+> > > as any other "registered buffer" with IORING_OP_{READ,WRITE}_FIXED
+> > > requests. It's created via a new file operation and the resulted map is
+> > > then passed through the I/O stack in a new iterator type. There is some
+> > > additional infrastructure to bind it all, which also counts requests
+> > > using a dmabuf map and managing lifetimes, which is used to implement
+> > > map invalidation.
+> > > 
+> > > It was tested for GPU <-> NVMe transfers. Also, as it maintains a
+> > > long-term dma mapping, it helps with the IOMMU cost. The numbers
+> > > below are for udmabuf reads previously run by Anuj for different
+> > > IOMMU modes:
+> > 
+> > Plain registered buffer is long-live too, which raises question: does this
+> > framework need to take it into account from beginning?
+> 
+> Not sure I follow, mind expanding on what should be accounted?
+> Are you suggesting that we might want to use normal registered
+> buffers in a similar way? I.e. giving the driver an ability to
+> pre-register them?
 
-->num_inflight is a ref-counter, basically.  The problem is that
-completion is a two-step process, only one part of each is synchronized
-with the writeback context.  I honestly don't want to have two ref-counts:
-one for requests pending zram completion and one for active endio contexts.
-Maybe we can repurpose num_inflight instead.
+Yeah, normal registered buffer is long-live too, which is exactly
+what the driver cares for the long-term dma mapping motivation.
 
-> Furthermore, keeping wake_up() outside the critical section minimizes
-> interrupt-disabled latency
+> 
+> > BTW, inspired by this approach, I adds similar feature to ublk via UBLK_IO_F_SHMEM_ZC
+> > which can maintain long-term vfio dma mapping over registered user-place aligned buffer.
+> 
+> Interesting, just too a glance, and it looks like what David Wei
+> was thinking to add to fuse, but IIUC he gave up exactly because the
+> client will need to cooperate and that could be troublesome.
 
-So I considered that, but isn't endio already called from IRQ context?
-Just asking.  We wakeup only one waiter (writeback task), so it's not
-that bad CPU-cycles wise.  Do you think it's really a concern?
+Here the cooperation is minimized, maybe one shmem/hugetlb path, or memfd,
+and it is one optimization and opt-in, and fallback to normal path
+if application doesn't cooperate.
 
-wake_up() under spin-lock solves the problem of a unsynchronized
-two-stages endio process.
+> 
+> Should we try to push everything under the same interface instead of
+> keeping a ublk specific one? Again to the point that it requires
 
-> and avoids nesting spinlocks (done_lock -> done_wait.lock), reducing
-> the risk of future lockdep issues, just in case.
+If generic interface can be figured out, it shouldn't be a big deal for
+ublk to switch to it, and the usage is simple actually.
 
-I considered lockdep as well but ruled it out as impossible scenario,
-nesting here is strictly uni-directional, we never call into zram from
-the scheduler.  Just saying.
+So far, ublk supports both FS and nvme block device.
 
-> It definitely will add more overhead for the submission/completion paths to deal
-> with the refcount, but I think we should go that way at the cost of runtime.
+And cooperation can't be avoided for this usage no matter if generic or
+driver specific implementation is taken, for both fuse & ublk.
 
-Dunno, something like below maybe?
+> a cooperative client, but if it's something more generic, the user
+> might just try to use it as a general optimisation. In the same way
+> it'll be helpful to fuse, and as a bonus you wouldn't need tree look
+> ups (but mandates clients using registered buffers as a downside).
 
----
- drivers/block/zram/zram_drv.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+Yeah, but tree lookup is fast enough in case of huge page for typical
+application, and it is simple in concept.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index ce2e1c79fc75..27fe50d666d7 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -967,7 +967,7 @@ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
- static void zram_writeback_endio(struct bio *bio)
- {
- 	struct zram_wb_req *req = container_of(bio, struct zram_wb_req, bio);
--	struct zram_wb_ctl *wb_ctl = bio->bi_private;
-+	struct zram_wb_ctl *wb_ctl = READ_ONCE(bio->bi_private);
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&wb_ctl->done_lock, flags);
-@@ -975,6 +975,7 @@ static void zram_writeback_endio(struct bio *bio)
- 	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
- 
- 	wake_up(&wb_ctl->done_wait);
-+	atomic_dec(&wb_ctl->num_inflight);
- }
- 
- static void zram_submit_wb_request(struct zram *zram,
-@@ -998,7 +999,7 @@ static int zram_complete_done_reqs(struct zram *zram,
- 	unsigned long flags;
- 	int ret = 0, err;
- 
--	while (atomic_read(&wb_ctl->num_inflight) > 0) {
-+	for (;;) {
- 		spin_lock_irqsave(&wb_ctl->done_lock, flags);
- 		req = list_first_entry_or_null(&wb_ctl->done_reqs,
- 					       struct zram_wb_req, entry);
-@@ -1006,7 +1007,6 @@ static int zram_complete_done_reqs(struct zram *zram,
- 			list_del(&req->entry);
- 		spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
- 
--		/* ->num_inflight > 0 doesn't mean we have done requests */
- 		if (!req)
- 			break;
- 
-@@ -1014,7 +1014,6 @@ static int zram_complete_done_reqs(struct zram *zram,
- 		if (err)
- 			ret = err;
- 
--		atomic_dec(&wb_ctl->num_inflight);
- 		release_pp_slot(zram, req->pps);
- 		req->pps = NULL;
- 
-@@ -1129,8 +1128,11 @@ static int zram_writeback_slots(struct zram *zram,
- 	if (req)
- 		release_wb_req(req);
- 
--	while (atomic_read(&wb_ctl->num_inflight) > 0) {
--		wait_event(wb_ctl->done_wait, !list_empty(&wb_ctl->done_reqs));
-+	while (atomic_read(&wb_ctl->num_inflight) ||
-+	       !list_empty(&wb_ctl->done_reqs)) {
-+		wait_event_timeout(wb_ctl->done_wait,
-+				   !list_empty(&wb_ctl->done_reqs),
-+				   HZ);
- 		err = zram_complete_done_reqs(zram, wb_ctl);
- 		if (err)
- 			ret = err;
--- 
-2.54.0.563.g4f69b47b94-goog
+
+Thanks,
+Ming
