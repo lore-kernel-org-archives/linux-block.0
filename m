@@ -1,126 +1,202 @@
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149952E7BD3
-	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 19:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7183E4C61
+	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 20:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778268197; cv=none; b=asmsWZIxNMkgQqSUqXzMAoxmb9iNwnG9LgTyIi7ASVIsPY9DmeSSFyT513Gg3MOiaYK2XD6PfIzO7yRvt0EHMRRb51+RDmkPseK1MQ1MGWRs7/jd5pID36/e5B4kxOmp7vsBYhRt9ZyN4iGO2fhqjDpSTHEQoyboKOp3vUxjP3E=
+	t=1778271189; cv=none; b=efFFAVDeAS6zhyOpoOtHgVBxqe75cBOL/1RDTsDT4KLjUTu0BvDE/XzaIRDV+i6tS349t4yWQ9/z5mglV+yQGFhQQZnuBG2cgadK+Kh7JuRvm9qxOtGP8bZBQwVDYOPbSKasD/mhIEZ3KDpZlsxh4wcV571CeKb6QK9N7OfB5qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778268197; c=relaxed/simple;
-	bh=9lu+svmkR4kYQtHFym6oy8j1i/LpOnyqspkAYn0ixqU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=PFIZio2HV/bTKWXu6VrppVDI/kgW78YsTXCllLN9HhEXCTQHZbWBccz+87rsdO5hBjuWWl/D9BiMD61/Wh2dgZ6KKFUUd1CpIS0fgft7g/PQQc1sMzXn9gQZkTQna3RGLzuKFeAw/ydvUtMmigO0bsx7qqmneneu5P4Qlfyf9u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=JkkLA8kQ; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1778271189; c=relaxed/simple;
+	bh=ctngZu+aSAHhDu3PSjz9OJb24VmabpcYprQlPT4iRQM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y5dYgGhK+56lauokJiUaCtxRfbjJog1KiSVjEtmctSJyCUAZGyC3uF86jdZIPgAOhJEWEAjzqmUQAzU8QWrvo5mHTil+TOuLwsRNvk8QkaCRnD1KSqmSKx6v690Zp6nLKmvTGv+n4xJsPBScgOxvzc4xcYoPZIWajSE1s90eFBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDOUuD6l; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="JkkLA8kQ"
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7de4be15125so1901460a34.0
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2026 12:23:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778268195; x=1778872995; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aMMawRsNeOF2V9xnaQzJI1Y2OQV/JVr1ilC+c34eaTc=;
-        b=JkkLA8kQ7QBPnin6InOqgoO7iTn1YhfpOnESJQIoh5NBX8O0Oe1BKD1xCuerOdXH5k
-         ogyv6gIDd1V9Wcn1KDppxmqmlqnexixQcn0HX37K5ilh+9nnwXESLKrKC1UPAQAgqTZ3
-         DgPXatveVXUPQcL3CkDq+tsHpLNgjQvr/8YDxtlqCU7eU5YkcQYutadjXS1cJditZB6y
-         YJjBzjIA1tnXh+ALKuiKotgsjZbd7LPm9sFPUq/EBVQl2NyZFYH8OQ+K6XeMeyluAIJZ
-         DkQDqJoTYRWAEN9AKnmt5b1lUioo1ZLShhXWR0DIvfrou7KsioE0xDMb6oT6xygPKi02
-         Zb1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778268195; x=1778872995;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aMMawRsNeOF2V9xnaQzJI1Y2OQV/JVr1ilC+c34eaTc=;
-        b=Vav/bxXBV253CK+7fNcCoW010SRiY3ggPuiInWdQo4GNJEKiQWEEr/k278QfkE9pcN
-         zqlcNIwcnEemXKStsTRoHvWS2a6m4cqEup0DQE+GDIdZMvTrPIZgGbM9mvzG7SFiu0h1
-         tIOBwm88r8m5HWdPjb8jYxVGrDfBuaneztVnkcHh2qU2nL0C9wTjZPqsS4LSHkZy4Ve8
-         oHTF6y07BEJBNk+q2/3J3vq3bVTEdTuPhQVtEVAR19FyBGH3II16Ls1Q9ZRwS8V/yb/V
-         zKdZOmyOE05UTCOuvEHQHfayfS5ugGTTIlTL8s6z7c/1XsYk7UVWHyrn04aRiL8CUGCs
-         RShg==
-X-Gm-Message-State: AOJu0YxfzNgH8qD4KumHwUkIu3bYlINmodXn9mYB/WoyGqmWJ4DQ3N6f
-	4Ot/TE/4e/NgkNbBDLcfJIFY7vTpTRxueOGkWuuCZPC4SCplNnHknl+Oxw2Z+FPcnx9a6uL/Mpk
-	9kVGa
-X-Gm-Gg: AeBDietOgXXI2NL03qyhMyUKVhm+Nn3i1T+MWLVG9cY3JwbNWomr2IT3tXj9842h5Ul
-	X2tcIQllk/EzRzBs0H6NSXyZGpYJkqevpJLCJ/3dFqGXbDUfmmlDwzu+sqzq5kipyDUMFrMVXZl
-	uBD+7CSUfZp7010rgWdYar/efVXgCcATpIMhwJWOL5JmObej2gPLmKm3RnzCCM/4yCBXOnEWcTR
-	qmITcU2j4uzkjflpXH24LxH3MWe+SsD0zlmCQsbsXXrp5DKftj0tFxmMkBPu3tDtxCClEj9PyZs
-	TEveZsvprNikvjAWayBqN27Fg6kJa1L/uXFRkUa2EAz8vL4VjsLIICB9pugKPjq15TEHrGXE2OK
-	ejQFGd0kVmI6EBRLOnqtA4on58WAkmMfoNoPX4EgV8W49qmW7uKxxS2LvmShSw8b1QLhBusy21/
-	sgff0kbePcmFMkZO01zXZ6+05wZ0puv7OuQyfX09vlIoDczNHxeNFq0sxBXf9azhX2ZwZf1rLSh
-	k7OAwUp
-X-Received: by 2002:a05:6830:67c6:b0:7dd:e032:3cdb with SMTP id 46e09a7af769-7e1df0d2a88mr9689962a34.18.1778268194962;
-        Fri, 08 May 2026 12:23:14 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e367a18481sm1693159a34.0.2026.05.08.12.23.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 May 2026 12:23:13 -0700 (PDT)
-Message-ID: <36745ebc-0658-48b4-9878-982d5644642a@kernel.dk>
-Date: Fri, 8 May 2026 13:23:12 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDOUuD6l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF99AC2BCF5
+	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 20:13:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778271188;
+	bh=ctngZu+aSAHhDu3PSjz9OJb24VmabpcYprQlPT4iRQM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=IDOUuD6l08tpao6KddG0HnQQ+2CBWwKcCOhbwnk+AgSNvoGV4nBoZ6PvKcVM70CX/
+	 yxgNyGNVflIbUau5zlPW7EGSsuRJuJENJ1NATtQy6ujr6z4o4nkfJvPBSHXgDv03JY
+	 FVjYXI8/kOENaRqs03a6EnuVWVkvgSdP+Yy6BayVznnAO3n14rmOLjJBytFtLDRJ6/
+	 SJ3KxIUybj3B8wjNtwAuB3WytZ2XmiImYYkmfyz8o5PCcN9jSSqR5z6OxjDcTnn5Be
+	 4tBkYRr/VTDFbZiy+wei2TtJYMJBaMm4ql6iT+UVHDVSH2jMmocrEUkqIOOUODYbSv
+	 NTAyfiC/8BWGg==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-bc64ad08bf9so381594166b.0
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2026 13:13:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+FwoV3lUfL6tzXqOHGjnWcNec6mwuRLqSgnz9zE6uO7d8z+uRSeIv/gFaHL5q7+lvN9YFnG2O37ZhfwA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdP9RnNP2GdIYsMNMdS5IN+DH6v22vIPeROCj3iSJDH91m38XW
+	u76VNVpk19P9VI1fzHl8n/qlRDtkNgUyfFjvYWb1rlOjetPq6r6aaFHWvgcAQNrWHZ8poPNgLP1
+	l5R/IOu5DUwzxT/swSxgwvF+EzGZcYyA=
+X-Received: by 2002:a17:907:1c2a:b0:ba4:a7a3:d03f with SMTP id
+ a640c23a62f3a-bc56dd1a4a5mr752154166b.27.1778271187725; Fri, 08 May 2026
+ 13:13:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 7.1-rc3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260508060724.3810904-1-haowenchao@xiaomi.com>
+In-Reply-To: <20260508060724.3810904-1-haowenchao@xiaomi.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Fri, 8 May 2026 13:12:56 -0700
+X-Gmail-Original-Message-ID: <CAO9r8zO3GrMLDV57aRaiwRvZhwcduihKhc3rBpFGkbZKoq_iSw@mail.gmail.com>
+X-Gm-Features: AVHnY4J5AOuTir0jOtNhvbYTTtEs__nYFSDyU1jMgmuDCshQa-U3e6S9kx4Bids
+Message-ID: <CAO9r8zO3GrMLDV57aRaiwRvZhwcduihKhc3rBpFGkbZKoq_iSw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 0/4] mm/zsmalloc: per-cpu deferred free to
+ accelerate swap entry release
+To: Wenchao Hao <haowenchao22@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Barry Song <21cnbao@gmail.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
+	Johannes Weiner <hannes@cmpxchg.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	Minchan Kim <minchan@kernel.org>, Nhat Pham <nphamcs@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Wenchao Hao <haowenchao@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Linus,
+()
 
-A few fixes for block that should go into the current kernel release.
-These are mostly ublk related, in detail:
+On Thu, May 7, 2026 at 11:08=E2=80=AFPM Wenchao Hao <haowenchao22@gmail.com=
+> wrote:
+>
+> Swap freeing can be expensive when unmapping a VMA containing many swap
+> entries. This has been reported to significantly delay memory reclamation
+> during Android's low-memory killing, especially when multiple processes
+> are terminated to free memory, with slot_free() accounting for more than
+> 80% of the total cost of freeing swap entries.
+>
+> Two earlier attempts by Lei and Zhiguo added a new thread in the mm core
+> to asynchronously collect and free swap entries [1][2], but the design
+> itself is fairly complex.
+>
+> When anon folios and swap entries are mixed within a process, reclaiming
+> anon folios from killed processes helps return memory to the system as
+> quickly as possible, so that newly launched applications can satisfy
+> their memory demands. It is not ideal for swap freeing to block anon
+> folio freeing. On the other hand, swap freeing can still return memory
+> to the system, although at a slower rate due to memory compression.
+>
+> This series introduces a callback-based deferred free framework in
+> zsmalloc. Callers (zram, zswap) register push/drain callbacks to
+> define what gets buffered and how it gets drained. The entire free
+> path including caller-side bookkeeping (slot_free, zswap_entry_free)
+> is deferred to a background worker.
 
-- Fix for ublk not doing an actual issue from the task_work fallback
-  path. Any request hitting that should be canceled automatically.
+How much of the speedup comes from avoiding the per-class lock,
+free_zspage(), other work in zswap, etc.
 
-- Fix for uring_cmd prep side handling, for the block side uring_cmd
-  discard handling.
+I ask because I think the design here is still fairly complex. I don't
+like how zswap and zram are registering callbacks into zsmalloc to do
+their own freeing work, and they fill the buffers on behalf of
+zsmalloc which seems like a layering violation.
 
-- Fix for missing validation of the io and physical block size shifts.
+I wonder how much of the speedup we get by just deferring
+free_zspage()? That part can be done much more simply by just putting
+the pages on a per-class list and having an async worker or a kthread
+consume them and batch-free them. If the rest of zs_free() is also
+expensive, we can do the deferred freeing on that level although it
+would be more complicated as we need to have a fixed size buffer to
+store them and handle running out of space.
 
-- Fix for a use-after-free in ublk's cancel command handling.
+A breakdown of where the slowdown is coming from would be helpful to
+understand what to focus on.
 
-Please pull!
-
-
-The following changes since commit 7e36e03d192a5547757bd8f9d9052a60f64e6d17:
-
-  Merge tag 'md-7.1-20260428' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-7.1 (2026-04-28 08:36:26 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.1-20260508
-
-for you to fetch changes up to f7700a4415afb3ac1767a556094e4ef8bd440e41:
-
-  ublk: fix use-after-free in ublk_cancel_cmd() (2026-05-08 06:44:42 -0600)
-
-----------------------------------------------------------------
-block-7.1-20260508
-
-----------------------------------------------------------------
-Jens Axboe (2):
-      ublk: don't issue uring_cmd from fallback task work
-      block: only read from sqe on initial invocation of blkdev_uring_cmd()
-
-Ming Lei (2):
-      ublk: validate physical_bs_shift, io_min_shift and io_opt_shift
-      ublk: fix use-after-free in ublk_cancel_cmd()
-
- block/ioctl.c            | 24 +++++++++++++++---------
- drivers/block/ublk_drv.c | 42 +++++++++++++++++++++++++++++++++++-------
- 2 files changed, 50 insertions(+), 16 deletions(-)
-
--- 
-Jens Axboe
-
+>
+> Implementation:
+>   - Each CPU owns a single-page buffer. The hot path writes a value
+>     via the push callback with preemption disabled (no locks).
+>   - When the buffer fills, it is swapped with a fresh page from a
+>     pre-allocated page pool. The full page is queued to a WQ_UNBOUND
+>     worker for drain.
+>   - The drain callback performs the actual expensive work (zs_free,
+>     slot_free, zswap_entry_free, etc.) in batch, off the hot path.
+>   - If no free page is available, the caller falls back to synchronous
+>     processing.
+>
+> The speedup comes from moving expensive swap slot freeing off the
+> munmap hot path into a background worker, so that intact anonymous
+> folios are released back to the system without blocking. The worker
+> drains at a slower rate since compressed objects are small and freeing
+> a single handle may not release an entire page until the zspage is
+> fully empty.
+>
+> Performance results (Raspberry Pi 4B, ARM64, 8GB RAM):
+>
+> Test 1: munmap latency for 256MB swap-filled VMA (zram backend)
+>
+>   mode        Base       Patched     Speedup
+>   single      61.82ms    8.62ms      7.17x
+>   multi 2p    94.75ms    54.11ms     1.75x
+>   multi 3p    154.64ms   104.83ms    1.48x
+>
+> Test 2: munmap latency for different sizes (zram, single process)
+>
+>   Size       Base         Patched     Speedup
+>   64MB       14.11ms      2.18ms      6.47x
+>   128MB      29.45ms      4.48ms      6.57x
+>   192MB      43.85ms      6.62ms      6.62x
+>   256MB      57.01ms      9.08ms      6.28x
+>   512MB      115.13ms     55.58ms     2.07x
+>   1024MB     229.66ms     153.28ms    1.50x
+>
+> Test 3: munmap latency for 256MB swap-filled VMA (zswap backend)
+>
+>   mode        Base       Patched     Speedup
+>   single      152.14ms   51.26ms     2.97x
+>   multi 2p    186.56ms   105.42ms    1.77x
+>   multi 3p    205.83ms   153.32ms    1.34x
+>
+> Test 4: munmap latency for different sizes (zswap, single process)
+>
+>   Size       Base         Patched     Speedup
+>   64MB       37.83ms      13.26ms     2.85x
+>   128MB      75.11ms      26.73ms     2.81x
+>   256MB      150.78ms     52.97ms     2.85x
+>   512MB      303.04ms     130.38ms    2.32x
+>   1024MB     599.95ms     287.10ms    2.09x
+>
+> [1] https://lore.kernel.org/all/20240805153639.1057-1-justinjiang@vivo.co=
+m/
+> [2] https://lore.kernel.org/all/20250909065349.574894-1-liulei.rjpt@vivo.=
+com/
+> [3] https://lore.kernel.org/linux-mm/20260412060450.15813-1-baohua@kernel=
+.org/
+>
+> Changes since v2:
+> - Use per-cpu single-page buffers instead of a global list; the hot
+>   path only writes into the local CPU's buffer with preemption disabled
+> - Add a page pool for buffer rotation: when the current buffer is full,
+>   swap it with a free page from the pool and queue the full page for
+>   drain
+> - Introduce push/drain callback ops so that zram and zswap can each
+>   define their own element size and drain logic (zram stores u32 slot
+>   indices, zswap stores unsigned long handles)
+> - Drop the lock optimization patches it will be submitted separately
+>   as part of a dedicated zsmalloc lock contention series
+> - Link to v2: https://lore.kernel.org/all/20260421121616.3298845-1-haowen=
+chao@xiaomi.com/
+>
+> Barry Song (1):
+>   zram: use zsmalloc deferred free callback for async slot free
+>
+> Wenchao Hao (3):
+>   mm/zsmalloc: introduce deferred free framework with callback ops
+>   mm/zswap: use zsmalloc deferred free callback for async invalidate
+>   zram: batch clear flags in slot_free with single write
+>
+>  drivers/block/zram/zram_drv.c |  44 ++++++-
+>  drivers/block/zram/zram_drv.h |   6 +
+>  include/linux/zsmalloc.h      |  16 +++
+>  mm/zsmalloc.c                 | 208 +++++++++++++++++++++++++++++++++-
+>  mm/zswap.c                    |  38 ++++++-
+>  5 files changed, 306 insertions(+), 6 deletions(-)
+>
+> --
+> 2.34.1
+>
