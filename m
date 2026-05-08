@@ -1,63 +1,63 @@
 Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5599A351C06
-	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 06:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB18F352C4F
+	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 06:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778220528; cv=none; b=KsO6t00OuUGwTjf2UU0Ue0f6QhCqNfIDHknX7eAHA7fXpI5ADIXYGcBg23ArWTpOFZ17cw65uQuKELfEIDLsPwdZuS6eSwLKYCgB4V+ikHA1VNaeRMjLL3OSpDcJKsARAFzdlozYwPtj86+Q2likKYA9e5HJJJyiLj+/NWj5BzU=
+	t=1778220533; cv=none; b=PPz83UPWU64GIPMf1P6VNCDkMDOtPlOVgOsXGG/VyCRmXBI70hj5x82MjEHvZ1UDniwI8BXyOs97eZULk2rsGyVLLHNgV3gYFgmGspGJAH37byZEstei0SXGC30U5A6t0hQdEmVyMbiqgBYB3UyrcBoclR6NhZk961MQhOD3Zx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778220528; c=relaxed/simple;
-	bh=FyN27PCxe7idHEb0M9IbW6EmU5wzpxP1oM6GSGDaxlE=;
+	s=arc-20240116; t=1778220533; c=relaxed/simple;
+	bh=QFVoHteQkcIT+51G9kCmVEfuqfNqbnC+Yohfl+w3FDc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HhUqkRv/s3oTocBnkfmKmrWlmfU8R2nOcWBm79pWjP266FPKH6vJcddCfWzVCA2tRF91nEeHEqYXt+J+d6hxKwb2Yz5i8RahBCzu6HECj0yhmXbqvdZZhYpA/6buLsusRI0ejEPhR0eNh/3kQ1zN4hfc+5w/3SUhyLsBPMpyx8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uq8LMJCy; arc=none smtp.client-ip=209.85.216.47
+	 MIME-Version; b=dQbkgQYzYZhg7B2zd+wqq+Z7cSCUYWQBpTbfxA3qipESzayt3Us1rI03P5H8yEdhCG9wQ7+gfXG60X4Jh+w2f8G0C+Rnp63oqCtsrY2odxYPVePTm1efTrOyJUYHXQS8KyKayrJbyn83WoBEEu4yIrxMtBPZuGZpdOUQm1skwbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iSuHa/Sn; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uq8LMJCy"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3650453fb28so1007547a91.2
-        for <linux-block@vger.kernel.org>; Thu, 07 May 2026 23:08:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iSuHa/Sn"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-365d712bbd2so974862a91.2
+        for <linux-block@vger.kernel.org>; Thu, 07 May 2026 23:08:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778220520; x=1778825320; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778220524; x=1778825324; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r2lOcE/NP78qCrPw4J8Q2tX1lxKRSjJyhRJEj/5K+f4=;
-        b=Uq8LMJCyhNVwF6uiTHJWYg5x3MdhlHE2y3y26N52ZLn2c83Syil7b6CpO8ueQZnDsZ
-         0IKI/qZ8QRT7zm6j+KyXiw7cATrWv2qYwvaCjgYcwAdQEnDZ/OwXYObtapWFWJHGVppD
-         TuXRq+hWfRUdsWLtclU3EoFiZMehvHRWDQX7HEyGpdZVRldLDMS00PjUEywXxloA/HJx
-         PppzounWEzqdysqUzz/57FEtcX/n49YTVL1ODvOS+orzzrmBRLhSc4GADoVzTqtamLwe
-         aOynqz4YTqqb1QaWuZ4Vn1SZiOl4sWocN/atToRNLcrEGzR7KRCORyemFc+miR0VGKS8
-         bZwQ==
+        bh=+yZbCZTgQWjeOZMMSiccr5Z+zvHQMRYXTy9f6X1ybwU=;
+        b=iSuHa/Sn5HvUlCHS4qwIZhc5EaB7lLK+3AMg+jnT25+mGURBpPsjDhqF0C72wXJdeW
+         KDzwpTpYQkDwsgvxaOAsQebSzvUG1TZKehIvqNXMBodRp58J1ALIO4DwVF8ADIv4jNOI
+         P0VFj5FyjmwLNRWL0BP4mcglV9wpYQtBYhJCp/7QPIt/hd/+EJvXqijy4UZoQnzL8lk1
+         kqU1Zg1lFEpLwfix2lnay2+XjKeD1cfEqUVSuHXdZmWb76EC6afsKYv2Px1bZokSUBeD
+         SJ+h32F1WSotPh6vZ8Z1tml3jxTbL15Hsece+hVS2i2vPsxgJH6UveP2AngELq1/YYAj
+         mnPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778220520; x=1778825320;
+        d=1e100.net; s=20251104; t=1778220524; x=1778825324;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=r2lOcE/NP78qCrPw4J8Q2tX1lxKRSjJyhRJEj/5K+f4=;
-        b=B7WoYf6q1VlH1wIr35XokIBFPztRAJ2Gxy5eY8E1sio8WN5Je59eb0Q8t2985RB4nR
-         zFOn+pXjl0jWWppKvPgjnTAf36IFI6m0ARd5Nu8E2XN2yHOxBSnUXk1U9CajGiU3u/2g
-         M1jsGngv4rM9PVqKaF4D1nc4cE2Z885exceOF2X4l0KK17WqbbEprqX3NZ1fpfj5XChD
-         pOkFG5kf1FJGFmlhvnYf4X3T65zDOc8kdp2pzn+KzmWtUVgosfFXRyy8fKcUAA4FFwYc
-         kQCUb3ZGRmH740yqBaBXuLjHVo8T3w0Dn/Dnmr1qe9aYoXO3eqEFoAKq60z2inZu/IDQ
-         4G1A==
-X-Forwarded-Encrypted: i=1; AFNElJ/df4+kPwSyvo40ZRTZ2uR7VCH2mWIZDljOeZocMC4EBy1j/2bRXA72wIct6+SloSOoz4N9VXAGhklaXA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFk90VRtA5XqU3ZcQ1blfu2zncZiSATyQxNBlYAKv5DOHziwRf
-	0Q6qZzPncQgdarPn9Vw9lxoxQApo4hiJy3cqwYKUxxn3k0VfxtdctPy+
-X-Gm-Gg: Acq92OEA2JB/cbNJWE0oB9DSMnjjKfncAJVIO+262xRg3QLMRvpJqGMIT3yL1DkJ9uG
-	N711CHR6gZ3Iymi9xhgSJ41GY6cHANiEEfCYq+Lg/7UAigQu2pmVqH6E5kFYP51ZvzV8xvLwbM6
-	5n5wl/WU92gtw9ad8Df4Sw002ITz7F37Cw7xmuTu0LDtJaFPXSzWW3YizyHIiq/YeLgqp8c9Cav
-	cJ4+FShiDSeJH8c1tTjR13kEvYri14bBnNuxarFWRaaqdsirGAbx2WPSKN4cwYvTR539Xyag2d6
-	cjo/pspzrDXp+5TppDLiJ3VpG0TiAeVK3VMGStbkIB/pTwRcPCV0QHZpoLf38Hsl9g3k/eNl3mi
-	hcKF+q0CnluCzLZ6KuuCko7Bp88y3vBN4DE5YpoZeToX5m/Xy3d9ubDS0QXNnfQ95X/7ZXVMDEG
-	ako8lsl77bJGlfO76WKCwixWMrd2JIHgoMmZWdcA==
-X-Received: by 2002:a17:90b:1c8b:b0:364:534b:a898 with SMTP id 98e67ed59e1d1-365abad59c2mr10570996a91.8.1778220519914;
-        Thu, 07 May 2026 23:08:39 -0700 (PDT)
+        bh=+yZbCZTgQWjeOZMMSiccr5Z+zvHQMRYXTy9f6X1ybwU=;
+        b=kB73tik0bRFCGXwrqpkgdH9zMIR3yQ+FMDhiosIxZ3hLygW6yfyWKmzfzTfsCYeuiV
+         BfbkE+xmpHC0C6eQrbpDJs3tS64RPY7dIalTyWXhRPgatIzO7e2FJ8zmGtUQ+U9IZRYP
+         PHcJPLLzoYb3YUNHmVOAYXoPde+uEAfubnY4YtgxzsGo1nz6SqpODAoSatiivDvkNrcA
+         RTAOa5oWTAVYfxmmtcQLEsRvW6kp5LE4u4I4Lsk9tA44/lgaPVXDzQIzSvz+5Ls7iML6
+         J4TTdHd3+JR2KZTq3LHlUxd38uDLc7VtLkkJSJa9hnO+EPpFo95P5/bUL1s6EWH4hc0T
+         fmiA==
+X-Forwarded-Encrypted: i=1; AFNElJ92kwkh9PD03WD5nh6k1/wPC/Uck4ksvUx0jadXaaDDJK0HAX3o0z7IF3oO0GsWZe6fPoXD3kBTtEnQlw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWonVRnpiatA7Lu76C5KmtNfdYMJ7ydpzIqbFW0KqlMJKWJZq2
+	KppmOV96ZQUyuucoG4qOxvxFSG01RFXLZVq1azK2tPxsJ+ysc3fWP1o0
+X-Gm-Gg: Acq92OHDyz7sGppmyR2iXLYHqHXXfHby3YH8mDuBsf/fLUN+jCTUpwQZwR8/AVKe0ce
+	coGS20ytPyEM+Q8f5e1e917IajXsSvSemFiKsoNH44zEAAyPPmu/Nr2bRokIsiI8MlJ9bVR1mhS
+	uZOlPhVfLkUb6uyOL25jrUkkMMovNWtB+ogDrV47lEdrYkWb+tKU8twgXzY2FSOv9bKkSXdXx83
+	03KsuN+/ui+bsFYxfFgnzRLDWnLGAmZmxeJLYRAf9cVcSIToi9gSkUdrbJMGN/M1UOHjTLz3NG/
+	5ThPZ6+HuHRKLN0eoE4Z6EZiWdhDmKlTdx5gux72jiqb1UBLCgnEerFuvue8OaqGoiPInlM4ZpE
+	uyUJBECQ+kGQkXm6WdZckJigkK931PLj3dI8JujI5lK3uSCVzrppp5313tDhw3OLUjFajEVv+H2
+	ImQuqZKeVy5V2BIOL+zIgv4sfstwJNu7ygD+Vt7vLac8L2EL+h
+X-Received: by 2002:a17:90b:3d0b:b0:35b:952c:43b9 with SMTP id 98e67ed59e1d1-365abcf0698mr11808706a91.10.1778220524197;
+        Thu, 07 May 2026 23:08:44 -0700 (PDT)
 Received: from ubuntu22.mioffice.cn ([43.224.245.232])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36645bb9c02sm673651a91.1.2026.05.07.23.08.36
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36645bb9c02sm673651a91.1.2026.05.07.23.08.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 23:08:39 -0700 (PDT)
+        Thu, 07 May 2026 23:08:43 -0700 (PDT)
 From: Wenchao Hao <haowenchao22@gmail.com>
 X-Google-Original-From: Wenchao Hao <haowenchao@xiaomi.com>
 To: Andrew Morton <akpm@linux-foundation.org>,
@@ -73,10 +73,11 @@ To: Andrew Morton <akpm@linux-foundation.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Yosry Ahmed <yosry@kernel.org>
 Cc: Wenchao Hao <haowenchao22@gmail.com>,
+	Barry Song <baohua@kernel.org>,
 	Wenchao Hao <haowenchao@xiaomi.com>
-Subject: [RFC PATCH v3 2/4] mm/zswap: use zsmalloc deferred free callback for async invalidate
-Date: Fri,  8 May 2026 14:07:22 +0800
-Message-Id: <20260508060724.3810904-3-haowenchao@xiaomi.com>
+Subject: [RFC PATCH v3 3/4] zram: use zsmalloc deferred free callback for async slot free
+Date: Fri,  8 May 2026 14:07:23 +0800
+Message-Id: <20260508060724.3810904-4-haowenchao@xiaomi.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260508060724.3810904-1-haowenchao@xiaomi.com>
 References: <20260508060724.3810904-1-haowenchao@xiaomi.com>
@@ -88,89 +89,93 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Register zswap_deferred_ops to defer the entire zswap_entry_free()
-to the WQ_UNBOUND worker. The invalidate hot path only stores the
-entry pointer into the per-cpu buffer (512 entries/page).
+From: Barry Song <baohua@kernel.org>
 
-The drain callback performs the full entry teardown: lru_del, zs_free,
-memcg uncharge, cache_free, and stats update. On deferred failure,
-fallback to synchronous zswap_entry_free().
+Register zram_deferred_ops with zs_pool_enable_deferred_free() to
+defer slot freeing to a WQ_UNBOUND worker. The notify hot path only
+stores a u32 slot index into the per-cpu buffer (1024 entries/page).
 
+The drain callback does slot_lock + slot_free + slot_unlock for each
+index. On deferred failure (no free page), fallback to synchronous
+slot_lock + slot_free + slot_unlock.
+
+Signed-off-by: Barry Song <baohua@kernel.org>
 Signed-off-by: Wenchao Hao <haowenchao@xiaomi.com>
 ---
- mm/zswap.c | 38 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 37 insertions(+), 1 deletion(-)
+ drivers/block/zram/zram_drv.c | 39 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/mm/zswap.c b/mm/zswap.c
-index 4b5149173b0e..3f23ddbe525c 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -270,6 +270,8 @@ static void acomp_ctx_free(struct crypto_acomp_ctx *acomp_ctx)
- 	acomp_ctx->buffer = NULL;
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index aebc710f0d6a..0d07f0901e55 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -56,6 +56,7 @@ static size_t huge_class_size;
+ static const struct block_device_operations zram_devops;
+ 
+ static void slot_free(struct zram *zram, u32 index);
++static const struct zs_deferred_ops zram_deferred_ops;
+ #define slot_dep_map(zram, index) (&(zram)->table[(index)].dep_map)
+ 
+ static void slot_lock_init(struct zram *zram, u32 index)
+@@ -1994,6 +1995,8 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ 	if (!huge_class_size)
+ 		huge_class_size = zs_huge_class_size(zram->mem_pool);
+ 
++	zs_pool_enable_deferred_free(zram->mem_pool, &zram_deferred_ops, zram);
++
+ 	for (index = 0; index < num_pages; index++)
+ 		slot_lock_init(zram, index);
+ 
+@@ -2784,6 +2787,39 @@ static void zram_submit_bio(struct bio *bio)
+ 	}
  }
  
-+static const struct zs_deferred_ops zswap_deferred_ops;
-+
- static struct zswap_pool *zswap_pool_create(char *compressor)
- {
- 	struct zswap_pool *pool;
-@@ -289,6 +291,8 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
- 	if (!pool->zs_pool)
- 		goto error;
- 
-+	zs_pool_enable_deferred_free(pool->zs_pool, &zswap_deferred_ops, pool);
-+
- 	strscpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
- 
- 	/* Many things rely on the zero-initialization. */
-@@ -777,6 +781,36 @@ static void zswap_entry_free(struct zswap_entry *entry)
- 	atomic_long_dec(&zswap_stored_pages);
- }
- 
-+static enum zs_push_ret zswap_deferred_push(void *buf,
++static enum zs_push_ret zram_deferred_push(void *buf,
 +		unsigned int count, unsigned long value)
 +{
-+	unsigned long *entries = buf;
++	u32 *indices = buf;
 +
-+	if (count >= PAGE_SIZE / sizeof(unsigned long))
++	if (count >= PAGE_SIZE / sizeof(u32))
 +		return ZS_PUSH_FULL;
-+	entries[count] = value;
-+	if (count + 1 >= PAGE_SIZE / sizeof(unsigned long))
++	indices[count] = (u32)value;
++	if (count + 1 >= PAGE_SIZE / sizeof(u32))
 +		return ZS_PUSH_FULL_QUEUED;
 +	return ZS_PUSH_OK;
 +}
 +
-+static void zswap_deferred_drain(void *private, void *buf, unsigned int count)
++static void zram_deferred_drain(void *private, void *buf, unsigned int count)
 +{
-+	unsigned long *entries = buf;
++	struct zram *zram = private;
++	u32 *indices = buf;
 +	unsigned int i;
 +
 +	for (i = 0; i < count; i++) {
-+		struct zswap_entry *entry = (struct zswap_entry *)entries[i];
++		u32 index = indices[i];
 +
-+		zswap_entry_free(entry);
++		slot_lock(zram, index);
++		slot_free(zram, index);
++		slot_unlock(zram, index);
 +	}
 +}
 +
-+static const struct zs_deferred_ops zswap_deferred_ops = {
-+	.push = zswap_deferred_push,
-+	.drain = zswap_deferred_drain,
++static const struct zs_deferred_ops zram_deferred_ops = {
++	.push = zram_deferred_push,
++	.drain = zram_deferred_drain,
 +};
 +
- /*********************************
- * compressed storage functions
- **********************************/
-@@ -1647,7 +1681,9 @@ void zswap_invalidate(swp_entry_t swp)
- 		return;
+ static void zram_slot_free_notify(struct block_device *bdev,
+ 				unsigned long index)
+ {
+@@ -2792,6 +2828,9 @@ static void zram_slot_free_notify(struct block_device *bdev,
+ 	zram = bdev->bd_disk->private_data;
  
- 	entry = xa_erase(tree, offset);
--	if (entry)
-+	if (!entry)
+ 	atomic64_inc(&zram->stats.notify_free);
++	if (zs_free_deferred(zram->mem_pool, (unsigned long)index))
 +		return;
-+	if (!zs_free_deferred(entry->pool->zs_pool, (unsigned long)entry))
- 		zswap_entry_free(entry);
- }
- 
++
+ 	if (!slot_trylock(zram, index)) {
+ 		atomic64_inc(&zram->stats.miss_free);
+ 		return;
 -- 
 2.34.1
 
