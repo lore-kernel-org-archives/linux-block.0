@@ -1,89 +1,167 @@
-Received: from forward501b.mail.yandex.net (forward501b.mail.yandex.net [178.154.239.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CCC37BE7C;
-	Fri,  8 May 2026 08:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7461B2F8EA9
+	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 08:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778229016; cv=none; b=qlB4A2nzIq6nugt43cTElKc82oy0vg7R44ewVGsuVWp1qPIWz2QJbzD2GYlNHm3gJ6oVUIyFTvg7ekQdjfTzu8NndjgpI4mJDBc363sxPOFGhyCOoshzIVkbgQp+irnygTuMmtpcfLJEa/otCiz9pR+mlgx3ZmgeflTOszlflXA=
+	t=1778230247; cv=none; b=p6FkMlMDUfVXzoTPkrrY2i3BNg7ST1taqyY+lZb+7a/kYvNQAsurOAyw5fpQ8ilPYEM3ZM0WkYUCucEodNXYDU5T1Ub22+vZ3vawinKm2p2IS8kr3zbjl/9dFHY882Z5FkC0Cna7C2XFzXOv8eoMG+vh0zI97p0cBhlKOp5xcfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778229016; c=relaxed/simple;
-	bh=Pj7koE15BSopNI/Y7CoJNrAoiXs+cwYfL04SAD+c63U=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uvkXa/NAG17ItXMbZ/FDdbau1WdiOjUrgO+wGUXvzs7/1KydufgxNpjkZh/XsdbYzuv5bs89UiUZ8U3tuerpuARykNWL1texv1/tbafqqGtY0mQoRBOuYG3Yv1j/X9ZROB7l3ETdEgF1gCaCEtKVn5732lMw327Ds5X2qnlWdJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=ULVIXZTW; arc=none smtp.client-ip=178.154.239.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1778230247; c=relaxed/simple;
+	bh=PE9EIJRDSFXQ0GiM9MkcUIHGlokeliwyI9Q259F+kK8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WFLcpTqS6UDh3HxMRMotQK+WvDrDBBnvSF5vNDq3/U47XwNke4ms5dDWeTpQOItFw72BJpfjotWTDDD1RWZRVFNaZYSzpcKcStTG8A8qKJxWmoGupQI8CYmJaHKVnCaUnyMKCUyuThdRz2qAX5iDUR4xBnmGoIIxgoI/TTu8isM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=udnuTRBg; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="ULVIXZTW"
-Received: from mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net [IPv6:2a02:6b8:c11:2281:0:640:870e:0])
-	by forward501b.mail.yandex.net (Yandex) with ESMTPS id 7C1CD81903;
-	Fri, 08 May 2026 11:30:08 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net (smtp) with ESMTPSA id 5UBgwfJTOOs0-sRushEvi;
-	Fri, 08 May 2026 11:30:07 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1778229008; bh=tEAT9HIAm4EzezM9pdAwS0iT+gBH1o2zWvbDl7ShVSQ=;
-	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
-	b=ULVIXZTWrb1CgiHb3Fog39Ptx9bp7lZ6icuGIWx1Ue6dsRcBQ8bbBSLoR/Zt83N9S
-	 /BpVZ8R8K3/wkVXEptQv5AJkiXLtMrVArc64yGrm+nytoQSvz9rHcgjx3jM8Tq7uns
-	 j9Fxrw9htmGuLSNpCM27OPC+ACJt/LZ6Rl25Tuwg=
-Authentication-Results: mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <5bd98789901e6bcd2b41d646209deb6e48ffb711.camel@yandex.ru>
-Subject: Re: [PATCH 6.12] block: fix memory leak in in bio_map_user_iov()
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
-  Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Christoph
- Hellwig <hch@lst.de>, 	lvc-project@linuxtesting.org, netdev@vger.kernel.org
-Date: Fri, 08 May 2026 11:30:05 +0300
-In-Reply-To: <20260507212200-2614841ccc112a082cab6938-pchelkin@ispras>
-References: <20260505094529.406783-1-dmantipov@yandex.ru>
-	 <20260507212200-2614841ccc112a082cab6938-pchelkin@ispras>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="udnuTRBg"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c82346bdb00so2061890a12.0
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2026 01:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1778230246; x=1778835046; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EGFRFy1WoEV55J2RPFTdCgdsXVvquGiPRRD2auMcPnE=;
+        b=udnuTRBgY1HGwUN7XImYPIp+07hQXRSp3peLAC6uoGsMu4fkc7RYukO5PcH8PE3KUI
+         hG83jUQ8wro1UBJhtzRKZyC0WYkJr1vK7DZbXTuNGOTcMiRIrOID6LciLvU7H0q6tIwN
+         LmEY9UCRdE39p/F1EKRx6QCC9xBHF2KKCVJXvFm8f6Wm/a0p91oSgmlt7aE2mq6zQVgK
+         kmmgoo2J49jxG4jlMm6+PfhUcHpMoAt+CnDzrYV+MFJ7W2MTzUplKNX3/RC1P4nIPTsb
+         gduhqmumiQmF6u2t3pJzeDXAjXdzVTXEenxb1yzf2sqBs7c06djYbKHx2L6Fai++YC3c
+         KFmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778230246; x=1778835046;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EGFRFy1WoEV55J2RPFTdCgdsXVvquGiPRRD2auMcPnE=;
+        b=qDKqmRHnMSod+g2Z503wMX2X2hUYBguVgeJW6st1TZUBNjfJrO2olXTDf8ZxDIk8HQ
+         +VMx+vLbxGkg71jCEl3OITDs2MudBJV+3Gpj4jRE79BMoI/6I7cryfjPWdB42ZkGbXi7
+         wytROaIwwBU66CGXoFpUb542dKcgRO6u944vnlrOEgvkEgOWGWwj60E0Qfr/zgxPLJQD
+         5e0Lwe3kypfXblOreU2mfwyUvV9GmPPFbHxLH4YW6va3N4p/sJUkZwdcL3E+0WDYrbEB
+         S2jfOiHbdE3Vazn3CROTt1ZZRVfGl5AWDIDxDTLTPrTTvGzqmGRnl5gm+o5feERGcUxw
+         39DQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+VKdA8JRdgOmAwuvEQgPEg1sEEZfv1dpqcBJ2dstrrx+oahdzdnBgtNR0a1DtMDBQkyaW4MDoYxKelbg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyaku6XYKz/WaQz2uK1dm1zzF4nKvrd0e+mfTx++eggfNEqrcFl
+	PxdZLH9ixrvnMyXrYmxmCF4RzVqAph+/Av2pOWbl30j/xgQUvdE3PEHvPCebzyf+u+DIZbmC1tq
+	doWTnAhYmeXdValVb/NzP
+X-Received: from pgww20.prod.google.com ([2002:a05:6a02:2c94:b0:c76:5ef4:ec3])
+ (user=richardycc job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a21:6d91:b0:3a8:236a:7df2 with SMTP id adf61e73a8af0-3aa5abc86a4mr12929465637.44.1778230245628;
+ Fri, 08 May 2026 01:50:45 -0700 (PDT)
+Date: Fri,  8 May 2026 08:49:33 +0000
+In-Reply-To: <af1BNwmyHK6aU_uT@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <af1BNwmyHK6aU_uT@google.com>
+X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
+Message-ID: <20260508084933.3730661-1-richardycc@google.com>
+Subject: [PATCH v2] zram: fix use-after-free in zram_writeback_endio
+From: Richard Chang <richardycc@google.com>
+To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>
+Cc: bgeffon@google.com, liumartin@google.com, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-mm@kvack.org, 
+	Richard Chang <richardycc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2026-05-07 at 21:52 +0300, Fedor Pchelkin wrote:
+A crash was observed in zram_writeback_endio due to a NULL pointer
+dereference in wake_up. The root cause is a race condition between the
+bio completion handler (zram_writeback_endio) and the writeback task.
 
-> In some form the issue is present in current upstream as well.=C2=A0 For
-> example, there is another callsite of iov_iter_extract_pages() in
-> block/bio-integrity.c where the same pattern still persists.=C2=A0
+In zram_writeback_endio, wake_up() is called on &wb_ctl->done_wait after
+releasing wb_ctl->done_lock. This creates a race window where the
+writeback task can see num_inflight become 0, return, and free wb_ctl
+before zram_writeback_endio calls wake_up().
 
-Good point, and skb_splice_from_iter() looks suspicious as well:
+CPU 0 (zram_writeback_endio)     CPU 1 (writeback_store)
+============================     ============================
+                                 zram_writeback_slots
+                                   zram_submit_wb_request
+                                   zram_submit_wb_request
+                                   wait_event(wb_ctl->done_wait)
+spin_lock(&wb_ctl->done_lock);
+list_add(&req->entry, &wb_ctl->done_reqs);
+spin_unlock(&wb_ctl->done_lock);
+wake_up(&wb_ctl->done_wait);
+                                   zram_complete_done_reqs
+spin_lock(&wb_ctl->done_lock);
+list_add(&req->entry, &wb_ctl->done_reqs);
+spin_unlock(&wb_ctl->done_lock);
+                                   while (num_inflight) > 0)
+                                     spin_lock(&wb_ctl->done_lock);
+                                     list_del(&req->entry);
+                                     spin_unlock(&wb_ctl->done_lock);
+                                     // num_inflight becomes 0
+                                     atomic_dec(num_inflight);
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 7dad68e3b518..bf053372acb2 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -7343,12 +7343,16 @@ ssize_t skb_splice_from_iter(struct sk_buff *skb, s=
-truct iov_iter *iter,
-=20
-                len =3D iov_iter_extract_pages(iter, &ppages, maxsize, nr, =
-0, &off);
-                if (len <=3D 0) {
-+                       /* Possible memory leak - ppages should be vfree()'=
-d
-+                          if reallocated (ppages !=3D pages)? */
-                        ret =3D len ?: -EIO;
-                        break;
-                }
-=20
-                i =3D 0;
-                do {
-+                       /* This looks wrong if reallocated - ppages[i++]
-+                          should be used instead? */
-                        struct page *page =3D pages[i++];
-                        size_t part =3D min_t(size_t, PAGE_SIZE - off, len)=
-;
+                                 // Leave zram_writeback_slots
+                                 // Free wb_ctl
+                                 release_wb_ctl(wb_ctl);
+// UAF crash!
+wake_up(&wb_ctl->done_wait);
 
-This issue likely crosses the boundaries of block subsystem so netdev
-people are encouraged to look as well.
+This patch fixes this race by using RCU. By protecting wb_ctl with
+rcu_read_lock() in zram_writeback_endio and using kfree_rcu() to free
+it, we ensure that wb_ctl remains valid during the execution of
+zram_writeback_endio.
 
-Dmitry
+Fixes: f405066a1f0d ("zram: introduce writeback bio batching")
+Suggested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Suggested-by: Minchan Kim <minchan@kernel.org>
+Signed-off-by: Richard Chang <richardycc@google.com>
+---
+V1 -> V2: use RCU to manage the wb_ctl lifetime
+
+ drivers/block/zram/zram_drv.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index aebc710f0d6a..07111455eecf 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -33,6 +33,7 @@
+ #include <linux/cpuhotplug.h>
+ #include <linux/part_stat.h>
+ #include <linux/kernel_read_file.h>
++#include <linux/rcupdate.h>
+ 
+ #include "zram_drv.h"
+ 
+@@ -504,6 +505,7 @@ struct zram_wb_ctl {
+ 	wait_queue_head_t done_wait;
+ 	spinlock_t done_lock;
+ 	atomic_t num_inflight;
++	struct rcu_head rcu;
+ };
+ 
+ struct zram_wb_req {
+@@ -847,7 +849,7 @@ static void release_wb_ctl(struct zram_wb_ctl *wb_ctl)
+ 		release_wb_req(req);
+ 	}
+ 
+-	kfree(wb_ctl);
++	kfree_rcu(wb_ctl, rcu);
+ }
+ 
+ static struct zram_wb_ctl *init_wb_ctl(struct zram *zram)
+@@ -964,11 +966,13 @@ static void zram_writeback_endio(struct bio *bio)
+ 	struct zram_wb_ctl *wb_ctl = bio->bi_private;
+ 	unsigned long flags;
+ 
++	rcu_read_lock();
+ 	spin_lock_irqsave(&wb_ctl->done_lock, flags);
+ 	list_add(&req->entry, &wb_ctl->done_reqs);
+ 	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
+ 
+ 	wake_up(&wb_ctl->done_wait);
++	rcu_read_unlock();
+ }
+ 
+ static void zram_submit_wb_request(struct zram *zram,
+-- 
+2.54.0.563.g4f69b47b94-goog
+
