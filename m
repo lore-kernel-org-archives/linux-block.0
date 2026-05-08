@@ -1,183 +1,198 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A89918EFD1
-	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 02:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063103502A9
+	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 06:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778208009; cv=none; b=kdGJ9nnDBtP3/AmoD/b3McL06xE+ZEz67xj+HbJ+isKWQUNrN0d36r114Oq+0Sk3ODl3d3hNzst9QGz3keNtNBkZmdEC9qwpaerT5kvRzXV3xBPGuK7AKfpiRxJ6F8ej3paKKwsAX/AgGbBklV1tkISrQPDf9O8o/oXS86H70Kk=
+	t=1778220519; cv=none; b=jK7HG8dtVYlX6hVKhSvS1E4U6CYIqaaL9Tb4w/Eyo3H2LZaEV33N+fdUFalWZbfp+AFfGnDl+hLDcxROD5ImNOPPxdRKuE9r/fojos67IB+3nsgOBY8wpChhxAngEGcl3tmioafTWIFXccKORtIUbYmw7Yj4glcHEZ2xzlx7Flg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778208009; c=relaxed/simple;
-	bh=cRRUJ15AsoPYdI6y/ghArfrGQ2ztB9tme1uXn13cHSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=edSrbGnTmAy1zgvcqHMKiU4apG3nz07PxPkVydpz9wf8cEywaW8NfPnBlb0X/ifLrMgQIjajwMXbff4cHrpYnqwBE5RPlfaPdazMmm/QRkM8l934qyKV1msfes9sCNbBkCe1ycfA62gX3qZeInkE0slkSzzYZ07wzNRPLuMRdAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=heoVFtad; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1778220519; c=relaxed/simple;
+	bh=F44cshLe0rQV26karhspwn59+OgT6EOxogJitR4bH2E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=muiNVUSe4zJChB4MNfw7nORUp1iBsMxyTPvTYN3fgw1K2mmalRjvYx0D0GD68au+1CLpQE6mxlI01WArjvJ2qtbmGGldQphZWXZnklVoS5TS3cqbjS7XfvzbsNQBPNRl4QO1oBOzwBIAdoaPSYS1HN95OD9nJbGuWwpfqlpXrr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fSvaqiFF; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="heoVFtad"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-838d0b7c950so981629b3a.3
-        for <linux-block@vger.kernel.org>; Thu, 07 May 2026 19:40:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSvaqiFF"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3660daea6a5so796595a91.1
+        for <linux-block@vger.kernel.org>; Thu, 07 May 2026 23:08:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1778208007; x=1778812807; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lgIxBzyqVLhoNqsOJWVNuFvzEo5Cnm2Tdi9qM5pIjSw=;
-        b=heoVFtad6tqmZlC2Vom8OVWpm3MTStjeCVaZgUUCK38Muf9EnyTYrRb1Z/hcOCyahb
-         WdAygYmzkx1XXKKjIxTddpqtj8DQP5TX+JiPIyK+rnveC2c2WdL1n4OT9yxBdqCOG19G
-         5nXMaWyr0L+2AKtn4NxBILeARmR2zZxFcZfj8=
+        d=gmail.com; s=20251104; t=1778220512; x=1778825312; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NO9fgxc/4uI9ijrHR/+VJ2Jv5ttegtV3BGSa2bNu9og=;
+        b=fSvaqiFFKrdCN56DZDOtgtiUouDZZcJqbCa93UJYYSSo/S5QoZaPwyKgbKayPZnMoI
+         022KfCCxy0E4gS1nkAJIZN6VRdFIPjC2CwKUoLgtW9ubQcZdeBSsFc2RJRgSKt+8yAFQ
+         1M5dW5a/cmS3iH/jRCBg7uFe6xJY9+eGS59ghlSMSkK7OnSLqePpCJ0l3NMl3pF8a/4P
+         BHrC6rYxsO+vBaYp4DmOP9GukfgcOd/tCw2ERy2Cevfj/lNvxxzfMtyeXz1a809Y0XXg
+         dnprq3YnzPE8Enq3g3dxmWmcVtGIXaoniI4HUB7TCp5EXn4weUHtO2IZkxRqyN6pCCQQ
+         8vFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778208007; x=1778812807;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lgIxBzyqVLhoNqsOJWVNuFvzEo5Cnm2Tdi9qM5pIjSw=;
-        b=OJHhfyLK4x4ecB+cPPxuJyk6h/ysMAtogTMKe3QkvLDNbr3TRZswSaSk02C/CeD9v+
-         G2cqo2vQmS/a4+YAVZ8FNuD5Gj2cy3slEZUyd0SISZFvMdEgOO7sN3BRUU04NPaR3Djs
-         6z3Flgbsi+dyeqbRKUUVQ8Nj//6BGMgmqWUN9DQz4C4MfVpQSRFGX6ILsLE14Aw/DWGt
-         qZdA7GsJPV2g85AA6NGIc6GmyS+pJ13x+tE/PPVkWYW9w5LTMKYS3tEFpLDwQZUN5QpX
-         SbXl9z8GOpp/COnqSh/SBxV3CzgH2CBlrXG1skPQX2K7PTTOVthfuJkVCcLR7sfuZV23
-         4sdQ==
-X-Forwarded-Encrypted: i=1; AFNElJ91jWsgHM585HqMLfJINh2cqp9QsW9MU3hx3qQyUjWuN1uxk5TUSSegnXhes0GBGX7+RAdn+X4TYrHskA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYo/VA/tZMqSoqPjMOXFlZaEcM3EOh8HBP8nRLBZEl9QjNmEWv
-	PTeOE2MsGgk5slYyPHkoyy1DuI/RgR8zTezJIrB2mj9w6Y3yMKvjVtAhVLRkbiYR1w==
-X-Gm-Gg: AeBDiesbRn8uK/43xK+vJaCWYbwgcLG78ENrgIZ/3PZYnXJZ6SZ2WJ5ULqPoaLvGRWA
-	7j3y0mXtHVvQE42rKfPdDXX/yWJ80ojHWI6ORZn/vI6lSdppw/ac62V2nhXkdV6uRVvlJKR6klq
-	MJPLZwBt78ggIH+EefjsJkbcuCi9HTt0vWspwUp6eR5/KD2w0XbMKZ1RrfXvOpIcFDXnT7PzkmF
-	p/nYxbBHM/1xq6h07K7bKrI9MUvOKcNrAge4rvBBHNoa9Cb3BVqZvl3EOgPOYO6rs3radQfx9oh
-	o4dgMOVrsiAgWd/2jqzvIOREt3pXVneNCTU29wlP272TFvmrpzvaHSRvpM5q+dGDRYMDkZWkVZG
-	coUwluKMTEGuKJFi/6D+PL0DNTrlabSI5xQLP3uBMdLcheyX8xSa455nBtgm/TCTmwqWY3ITPf6
-	Z29sW0H3Mcl+uZW+YHrn9cAU6e7GIJo7FyFZNL2oaNacj+ywHfz2/tiKjX864fzkw=
-X-Received: by 2002:a05:6a00:8e09:b0:82f:6e9:d1c3 with SMTP id d2e1a72fcca58-83a5d873ebemr10437527b3a.29.1778208007495;
-        Thu, 07 May 2026 19:40:07 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:7ba2:1dc2:ed3e:1484])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8396563f111sm10182262b3a.4.2026.05.07.19.40.05
+        d=1e100.net; s=20251104; t=1778220512; x=1778825312;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NO9fgxc/4uI9ijrHR/+VJ2Jv5ttegtV3BGSa2bNu9og=;
+        b=OrRnbSpOsW09wsPtSRjB+XghkioT2FVtPdX95eXiUB9sCRoiUrgZjiXoD4D5S+WKN3
+         Un3KNKTYh+B1PQTgGV2G0g+AULl6BEfOTqoHBYjPjOKRNbboxK7IsgTimG8bfOYvbLOU
+         MZyqmMx8eXxjAwxuY6mHDJnmZLm2zSkJGtCktgwTSdYDxvyMqlpCrYgLylWAgMXWB9i1
+         YsFxUunZ77TTWSNnWlIAuEtc/fpcprh8efFvyLzIrVM30skWec8Mh6DOTkzeMhU/3tgL
+         Z5Q5RfKgL/ZX/tt+QNfIADzJyPbtEQ79S3fQp+nHYpC0jnksint4Qub2Jli6F0zkJ11o
+         HWxg==
+X-Forwarded-Encrypted: i=1; AFNElJ8LQvs+wMgvCvxC037X05MsfTMxbBwa+RcUCHvMtB/s3F0G/uBg/c2+nJWlgSylVhrD/Gwvqa+vZMVy7g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQzMJSHyeaymNpGduuQSo6rwqSUPqtMQwe9c0Dnwkhezzvs18y
+	w5U+/U7GKY3qJObseEULx6QLfwT58IqwufL6bRV2tLdd38PcbeNQ6LLy
+X-Gm-Gg: Acq92OFt40VRJyICkf8zUwlB5NrdsUFEdddlqO9MbHWfNNJpqD4WEIOEjIxZLYV5obN
+	i/+EvZE4WDhEzx2L+v06/T1VRt0NWvba7b4YTpCMk6i2ULQ9xDVWiOa+FHl3rDvGve4L8mQ9/dv
+	YLYJeYVUePUn6q3OCcwVs/XnFCNB7LcDJlXV4dWuXSmnoKUIm+JUd+OvUb1Foi8lc5g6lxqcPvf
+	CpNHFcNWV6S2nRhxFqvZOL5ysZjbEkfnEDln4+doecG26PHQqvb4tMXMQOKIKhfNytFTLXKGuK8
+	r7BtmDJsyc+aZJmCi7TibdiWXozGCVmsKdsnsgTG9Yw9xtr0+5oWuWO0WIH+x+o9woQl2YQvOiF
+	j6NBkba1ZKcBFLVWEOlPEDHOlv4ZvMeHCIbcYwKvz5WI9e7tIfTUAE5zB3t8gu+Gl1i7p74WOhk
+	PcT4+TT85cwHloFQxVRYmQLdF5Ss1OZlcxyPgqyPL2vUO5ZwvV
+X-Received: by 2002:a17:90b:4d90:b0:365:b93a:1ebc with SMTP id 98e67ed59e1d1-365b93a1fe0mr9875584a91.3.1778220511629;
+        Thu, 07 May 2026 23:08:31 -0700 (PDT)
+Received: from ubuntu22.mioffice.cn ([43.224.245.232])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36645bb9c02sm673651a91.1.2026.05.07.23.08.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2026 19:40:07 -0700 (PDT)
-Date: Fri, 8 May 2026 11:40:03 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Minchan Kim <minchan@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Richard Chang <richardycc@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Andrew Morton <akpm@linux-foundation.org>, bgeffon@google.com, liumartin@google.com, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH] zram: fix use-after-free in zram_writeback_endio
-Message-ID: <af1BNwmyHK6aU_uT@google.com>
-References: <20260504123230.3833765-1-richardycc@google.com>
- <afoc5qLvK2PDQKb-@google.com>
- <afw2919RiZje9xzq@google.com>
- <af0YtJOLGvO-LJow@google.com>
+        Thu, 07 May 2026 23:08:31 -0700 (PDT)
+From: Wenchao Hao <haowenchao22@gmail.com>
+X-Google-Original-From: Wenchao Hao <haowenchao@xiaomi.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Barry Song <21cnbao@gmail.com>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	Minchan Kim <minchan@kernel.org>,
+	Nhat Pham <nphamcs@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Yosry Ahmed <yosry@kernel.org>
+Cc: Wenchao Hao <haowenchao22@gmail.com>,
+	Wenchao Hao <haowenchao@xiaomi.com>
+Subject: [RFC PATCH v3 0/4] mm/zsmalloc: per-cpu deferred free to accelerate swap entry release
+Date: Fri,  8 May 2026 14:07:20 +0800
+Message-Id: <20260508060724.3810904-1-haowenchao@xiaomi.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af0YtJOLGvO-LJow@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On (26/05/07 15:56), Minchan Kim wrote:
-> > -	while (atomic_read(&wb_ctl->num_inflight) > 0) {
-> > -		wait_event(wb_ctl->done_wait, !list_empty(&wb_ctl->done_reqs));
-> > +	while (atomic_read(&wb_ctl->num_inflight) ||
-> > +	       !list_empty(&wb_ctl->done_reqs)) {
-> > +		wait_event_timeout(wb_ctl->done_wait,
-> > +				   !list_empty(&wb_ctl->done_reqs),
-> > +				   HZ);
-> >  		err = zram_complete_done_reqs(zram, wb_ctl);
-> >  		if (err)
-> >  			ret = err;
-> 
-> I understand why you used a timeout here, but I still don't think it's a good
-> idea since the user could wait for up to a second unnecessarily during the
-> race.
+Swap freeing can be expensive when unmapping a VMA containing many swap
+entries. This has been reported to significantly delay memory reclamation
+during Android's low-memory killing, especially when multiple processes
+are terminated to free memory, with slot_free() accounting for more than
+80% of the total cost of freeing swap entries.
 
-Well, sure, it doesn't have to be a full HZ, we only need to wait
-for propagation of atomic_dec() from another CPU.  That's very fast,
-orders of magniter faster than a full second.  Just saying.
+Two earlier attempts by Lei and Zhiguo added a new thread in the mm core
+to asynchronously collect and free swap entries [1][2], but the design
+itself is fairly complex.
 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index a324ede6206d..28ab4a24e77f 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -33,6 +33,7 @@
->  #include <linux/cpuhotplug.h>
->  #include <linux/part_stat.h>
->  #include <linux/kernel_read_file.h>
-> +#include <linux/kref.h>
->  
->  #include "zram_drv.h"
->  
-> @@ -504,6 +505,7 @@ struct zram_wb_ctl {
->  	wait_queue_head_t done_wait;
->  	spinlock_t done_lock;
->  	atomic_t num_inflight;
-> +	struct kref kref;
->  };
+When anon folios and swap entries are mixed within a process, reclaiming
+anon folios from killed processes helps return memory to the system as
+quickly as possible, so that newly launched applications can satisfy
+their memory demands. It is not ideal for swap freeing to block anon
+folio freeing. On the other hand, swap freeing can still return memory
+to the system, although at a slower rate due to memory compression.
 
-Yeah okay, it overlaps with ->num_inflight, but we can live with that.
-Maybe can get rod of ->num_inflight in future patches.
+This series introduces a callback-based deferred free framework in
+zsmalloc. Callers (zram, zswap) register push/drain callbacks to
+define what gets buffered and how it gets drained. The entire free
+path including caller-side bookkeeping (slot_free, zswap_entry_free)
+is deferred to a background worker.
 
-[..]
-> @@ -864,6 +875,7 @@ static struct zram_wb_ctl *init_wb_ctl(struct zram *zram)
->  	atomic_set(&wb_ctl->num_inflight, 0);
->  	init_waitqueue_head(&wb_ctl->done_wait);
->  	spin_lock_init(&wb_ctl->done_lock);
-> +	kref_init(&wb_ctl->kref);
->  
->  	for (i = 0; i < zram->wb_batch_size; i++) {
->  		struct zram_wb_req *req;
-> @@ -985,6 +997,7 @@ static void zram_writeback_endio(struct bio *bio)
->  	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
->  
->  	wake_up(&wb_ctl->done_wait);
-> +	kref_put(&wb_ctl->kref, release_wb_ctl_kref);
->  }
-> 
->  
->  static void zram_submit_wb_request(struct zram *zram,
-> @@ -996,6 +1009,7 @@ static void zram_submit_wb_request(struct zram *zram,
->  	 * so that we don't over-submit.
->  	 */
->  	zram_account_writeback_submit(zram);
-> +	kref_get(&wb_ctl->kref);
->  	atomic_inc(&wb_ctl->num_inflight);
->  	req->bio.bi_private = wb_ctl;
->  	submit_bio(&req->bio);
-> @@ -1276,8 +1290,8 @@ static ssize_t writeback_store(struct device *dev,
->  
->  	wb_ctl = init_wb_ctl(zram);
->  	if (!wb_ctl) {
-> -		ret = -ENOMEM;
-> -		goto out;
-> +		release_pp_ctl(zram, pp_ctl);
-> +		return -ENOMEM;
->  	}
->  
->  	args = skip_spaces(buf);
+Implementation:
+  - Each CPU owns a single-page buffer. The hot path writes a value
+    via the push callback with preemption disabled (no locks).
+  - When the buffer fills, it is swapped with a fresh page from a
+    pre-allocated page pool. The full page is queued to a WQ_UNBOUND
+    worker for drain.
+  - The drain callback performs the actual expensive work (zs_free,
+    slot_free, zswap_entry_free, etc.) in batch, off the hot path.
+  - If no free page is available, the caller falls back to synchronous
+    processing.
 
-So I think we also need to do kref_put(&wb_ctl->kref, release_wb_ctl_kref)
-at the end of writeback_store(), because otherwise it just kfree()
-wb_ctl and we have the same race condition:
+The speedup comes from moving expensive swap slot freeing off the
+munmap hot path into a background worker, so that intact anonymous
+folios are released back to the system without blocking. The worker
+drains at a slower rate since compressed objects are small and freeing
+a single handle may not release an entire page until the zspage is
+fully empty.
 
-@@ -1330,7 +1340,7 @@ static ssize_t writeback_store(struct device *dev,
- 
- out:
- 	release_pp_ctl(zram, pp_ctl);
--	release_wb_ctl(wb_ctl);
-+	kref_put(&wb_ctl->kref, release_wb_ctl_kref);
- 
- 	return ret;
- }
+Performance results (Raspberry Pi 4B, ARM64, 8GB RAM):
 
-And indirect release in init_wb_ctl() as well:
+Test 1: munmap latency for 256MB swap-filled VMA (zram backend)
 
-@@ -895,7 +903,7 @@ static struct zram_wb_ctl *init_wb_ctl(struct zram *zram)
- 	return wb_ctl;
- 
- release_wb_ctl:
--	release_wb_ctl(wb_ctl);
-+	kref_put(&wb_ctl->kref, release_wb_ctl_kref);
- 	return NULL;
- }
+  mode        Base       Patched     Speedup
+  single      61.82ms    8.62ms      7.17x
+  multi 2p    94.75ms    54.11ms     1.75x
+  multi 3p    154.64ms   104.83ms    1.48x
+
+Test 2: munmap latency for different sizes (zram, single process)
+
+  Size       Base         Patched     Speedup
+  64MB       14.11ms      2.18ms      6.47x
+  128MB      29.45ms      4.48ms      6.57x
+  192MB      43.85ms      6.62ms      6.62x
+  256MB      57.01ms      9.08ms      6.28x
+  512MB      115.13ms     55.58ms     2.07x
+  1024MB     229.66ms     153.28ms    1.50x
+
+Test 3: munmap latency for 256MB swap-filled VMA (zswap backend)
+
+  mode        Base       Patched     Speedup
+  single      152.14ms   51.26ms     2.97x
+  multi 2p    186.56ms   105.42ms    1.77x
+  multi 3p    205.83ms   153.32ms    1.34x
+
+Test 4: munmap latency for different sizes (zswap, single process)
+
+  Size       Base         Patched     Speedup
+  64MB       37.83ms      13.26ms     2.85x
+  128MB      75.11ms      26.73ms     2.81x
+  256MB      150.78ms     52.97ms     2.85x
+  512MB      303.04ms     130.38ms    2.32x
+  1024MB     599.95ms     287.10ms    2.09x
+
+[1] https://lore.kernel.org/all/20240805153639.1057-1-justinjiang@vivo.com/
+[2] https://lore.kernel.org/all/20250909065349.574894-1-liulei.rjpt@vivo.com/
+[3] https://lore.kernel.org/linux-mm/20260412060450.15813-1-baohua@kernel.org/
+
+Changes since v2:
+- Use per-cpu single-page buffers instead of a global list; the hot
+  path only writes into the local CPU's buffer with preemption disabled
+- Add a page pool for buffer rotation: when the current buffer is full,
+  swap it with a free page from the pool and queue the full page for
+  drain
+- Introduce push/drain callback ops so that zram and zswap can each
+  define their own element size and drain logic (zram stores u32 slot
+  indices, zswap stores unsigned long handles)
+- Drop the lock optimization patches it will be submitted separately
+  as part of a dedicated zsmalloc lock contention series
+- Link to v2: https://lore.kernel.org/all/20260421121616.3298845-1-haowenchao@xiaomi.com/
+
+Barry Song (1):
+  zram: use zsmalloc deferred free callback for async slot free
+
+Wenchao Hao (3):
+  mm/zsmalloc: introduce deferred free framework with callback ops
+  mm/zswap: use zsmalloc deferred free callback for async invalidate
+  zram: batch clear flags in slot_free with single write
+
+ drivers/block/zram/zram_drv.c |  44 ++++++-
+ drivers/block/zram/zram_drv.h |   6 +
+ include/linux/zsmalloc.h      |  16 +++
+ mm/zsmalloc.c                 | 208 +++++++++++++++++++++++++++++++++-
+ mm/zswap.c                    |  38 ++++++-
+ 5 files changed, 306 insertions(+), 6 deletions(-)
+
+--
+2.34.1
+
