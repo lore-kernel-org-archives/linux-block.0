@@ -1,167 +1,165 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward102d.mail.yandex.net (forward102d.mail.yandex.net [178.154.239.213])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7461B2F8EA9
-	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 08:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE7937187B;
+	Fri,  8 May 2026 11:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.213
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778230247; cv=none; b=p6FkMlMDUfVXzoTPkrrY2i3BNg7ST1taqyY+lZb+7a/kYvNQAsurOAyw5fpQ8ilPYEM3ZM0WkYUCucEodNXYDU5T1Ub22+vZ3vawinKm2p2IS8kr3zbjl/9dFHY882Z5FkC0Cna7C2XFzXOv8eoMG+vh0zI97p0cBhlKOp5xcfM=
+	t=1778238927; cv=none; b=gZaZesjo/aLS9z9u8ZGhmbniSldkfB6zWfmzu4vXmKtpdTiwj/XK4IJxBGIg4GaKzAARsJftEKYnyN1Rm2eg0sAzXq7AR1HU31MgBKVIHog6m1ioJxy4MW2FTcb7eOwLwWl+r7jO30bEdRrB1spYGeTV36UsI+hyvo0U+1lorRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778230247; c=relaxed/simple;
-	bh=PE9EIJRDSFXQ0GiM9MkcUIHGlokeliwyI9Q259F+kK8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WFLcpTqS6UDh3HxMRMotQK+WvDrDBBnvSF5vNDq3/U47XwNke4ms5dDWeTpQOItFw72BJpfjotWTDDD1RWZRVFNaZYSzpcKcStTG8A8qKJxWmoGupQI8CYmJaHKVnCaUnyMKCUyuThdRz2qAX5iDUR4xBnmGoIIxgoI/TTu8isM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=udnuTRBg; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--richardycc.bounces.google.com
+	s=arc-20240116; t=1778238927; c=relaxed/simple;
+	bh=233mq/faJh6is6meW777b5v9jeXzszz2Xt3EdCCMPeg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qPstQvWLG/3KoZhbrq521QiiWV5mNLoSJWLUcHmR0ej37rI0SFeShy+IMeuvubNygM7wIahdpOreVg9Uynzme0iRKEHlKN79qJtFC0c9/0NdKISBNciut87MzdLNu2/1BCf80EXBfybvTt7JGGXNpFC9WmY1gb9RDTbx0O18tn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=sPUWgfAB; arc=none smtp.client-ip=178.154.239.213
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="udnuTRBg"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c82346bdb00so2061890a12.0
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2026 01:50:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778230246; x=1778835046; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGFRFy1WoEV55J2RPFTdCgdsXVvquGiPRRD2auMcPnE=;
-        b=udnuTRBgY1HGwUN7XImYPIp+07hQXRSp3peLAC6uoGsMu4fkc7RYukO5PcH8PE3KUI
-         hG83jUQ8wro1UBJhtzRKZyC0WYkJr1vK7DZbXTuNGOTcMiRIrOID6LciLvU7H0q6tIwN
-         LmEY9UCRdE39p/F1EKRx6QCC9xBHF2KKCVJXvFm8f6Wm/a0p91oSgmlt7aE2mq6zQVgK
-         kmmgoo2J49jxG4jlMm6+PfhUcHpMoAt+CnDzrYV+MFJ7W2MTzUplKNX3/RC1P4nIPTsb
-         gduhqmumiQmF6u2t3pJzeDXAjXdzVTXEenxb1yzf2sqBs7c06djYbKHx2L6Fai++YC3c
-         KFmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778230246; x=1778835046;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGFRFy1WoEV55J2RPFTdCgdsXVvquGiPRRD2auMcPnE=;
-        b=qDKqmRHnMSod+g2Z503wMX2X2hUYBguVgeJW6st1TZUBNjfJrO2olXTDf8ZxDIk8HQ
-         +VMx+vLbxGkg71jCEl3OITDs2MudBJV+3Gpj4jRE79BMoI/6I7cryfjPWdB42ZkGbXi7
-         wytROaIwwBU66CGXoFpUb542dKcgRO6u944vnlrOEgvkEgOWGWwj60E0Qfr/zgxPLJQD
-         5e0Lwe3kypfXblOreU2mfwyUvV9GmPPFbHxLH4YW6va3N4p/sJUkZwdcL3E+0WDYrbEB
-         S2jfOiHbdE3Vazn3CROTt1ZZRVfGl5AWDIDxDTLTPrTTvGzqmGRnl5gm+o5feERGcUxw
-         39DQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+VKdA8JRdgOmAwuvEQgPEg1sEEZfv1dpqcBJ2dstrrx+oahdzdnBgtNR0a1DtMDBQkyaW4MDoYxKelbg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyaku6XYKz/WaQz2uK1dm1zzF4nKvrd0e+mfTx++eggfNEqrcFl
-	PxdZLH9ixrvnMyXrYmxmCF4RzVqAph+/Av2pOWbl30j/xgQUvdE3PEHvPCebzyf+u+DIZbmC1tq
-	doWTnAhYmeXdValVb/NzP
-X-Received: from pgww20.prod.google.com ([2002:a05:6a02:2c94:b0:c76:5ef4:ec3])
- (user=richardycc job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:6d91:b0:3a8:236a:7df2 with SMTP id adf61e73a8af0-3aa5abc86a4mr12929465637.44.1778230245628;
- Fri, 08 May 2026 01:50:45 -0700 (PDT)
-Date: Fri,  8 May 2026 08:49:33 +0000
-In-Reply-To: <af1BNwmyHK6aU_uT@google.com>
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="sPUWgfAB"
+Received: from mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:7ba3:0:640:5ad4:0])
+	by forward102d.mail.yandex.net (Yandex) with ESMTPS id 2A883C01D3;
+	Fri, 08 May 2026 14:15:15 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net (smtp) with ESMTPSA id DFESAFMS7Os0-YZiOMHrK;
+	Fri, 08 May 2026 14:15:14 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1778238914; bh=hdEv90OrIa5Or68EvQ9jPENOtjFFvSTt1FJMESWp1pE=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=sPUWgfABlGj4F+i0tV7eMT2VXirgVwBD/nO7cSxleRbYEKidjlxS5nePA+69oSdBE
+	 Bq9/7507YaSmLgRd6I7zuUnsiAhwuBirbkIuJuNj5bk7H1wF7lDA/9Hm8qIzdF6G2A
+	 tLGuIxCInDjGsTxMVkjpk9syZcRr/kzlE2k4PbH8=
+Authentication-Results: mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	Fedor Pchelkin <pchelkin@ispras.ru>
+Subject: [PATCH] lib: free pagelist on error in iov_iter_extract_pages()
+Date: Fri,  8 May 2026 14:13:29 +0300
+Message-ID: <20260508111329.329943-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <af1BNwmyHK6aU_uT@google.com>
-X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
-Message-ID: <20260508084933.3730661-1-richardycc@google.com>
-Subject: [PATCH v2] zram: fix use-after-free in zram_writeback_endio
-From: Richard Chang <richardycc@google.com>
-To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>
-Cc: bgeffon@google.com, liumartin@google.com, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org, 
-	Richard Chang <richardycc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-A crash was observed in zram_writeback_endio due to a NULL pointer
-dereference in wake_up. The root cause is a race condition between the
-bio completion handler (zram_writeback_endio) and the writeback task.
+Since 'iov_iter_extract_pages()' may allocate new pagelist if the passed
+one isn't large enough, the worst-case scenario may be:
 
-In zram_writeback_endio, wake_up() is called on &wb_ctl->done_wait after
-releasing wb_ctl->done_lock. This creates a race window where the
-writeback task can see num_inflight become 0, return, and free wb_ctl
-before zram_writeback_endio calls wake_up().
+...
+struct page *stack_pages[SMALL];
+struct page **pages = stack_pages;
+...
+if (iov_iter_extract_pages(i..., &pages, ...) <= 0) {
+        /* Even in case of error, new pagelist may be allocated */
+        if (pages != stack_pages)
+                kvfree(pages);                                  [1]
+        /* The rest of error handling and return */
+}
+/* Regular flow */
+...
+if (pages != stack_pages)
+        kvfree(pages);
+...
+return 0;
 
-CPU 0 (zram_writeback_endio)     CPU 1 (writeback_store)
-============================     ============================
-                                 zram_writeback_slots
-                                   zram_submit_wb_request
-                                   zram_submit_wb_request
-                                   wait_event(wb_ctl->done_wait)
-spin_lock(&wb_ctl->done_lock);
-list_add(&req->entry, &wb_ctl->done_reqs);
-spin_unlock(&wb_ctl->done_lock);
-wake_up(&wb_ctl->done_wait);
-                                   zram_complete_done_reqs
-spin_lock(&wb_ctl->done_lock);
-list_add(&req->entry, &wb_ctl->done_reqs);
-spin_unlock(&wb_ctl->done_lock);
-                                   while (num_inflight) > 0)
-                                     spin_lock(&wb_ctl->done_lock);
-                                     list_del(&req->entry);
-                                     spin_unlock(&wb_ctl->done_lock);
-                                     // num_inflight becomes 0
-                                     atomic_dec(num_inflight);
+If you're unlucky so SMALL amount of pages wasn't enough and new
+pagelist was allocated, missing [1] causes the memory leak similar
+to one I've recently observed and fixed for 6.12 in [2]. So adjust
+'iov_iter_extract_pages()' to make such a cleanup itself rather than
+rely on caller's handling on error paths, thus making [1] not needed.
 
-                                 // Leave zram_writeback_slots
-                                 // Free wb_ctl
-                                 release_wb_ctl(wb_ctl);
-// UAF crash!
-wake_up(&wb_ctl->done_wait);
+[2] https://lore.kernel.org/stable/20260505094529.406783-1-dmantipov@yandex.ru/T/#u
 
-This patch fixes this race by using RCU. By protecting wb_ctl with
-rcu_read_lock() in zram_writeback_endio and using kfree_rcu() to free
-it, we ensure that wb_ctl remains valid during the execution of
-zram_writeback_endio.
-
-Fixes: f405066a1f0d ("zram: introduce writeback bio batching")
-Suggested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Suggested-by: Minchan Kim <minchan@kernel.org>
-Signed-off-by: Richard Chang <richardycc@google.com>
+Suggested-by: Fedor Pchelkin <pchelkin@ispras.ru>
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
-V1 -> V2: use RCU to manage the wb_ctl lifetime
+ lib/iov_iter.c | 54 ++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 33 insertions(+), 21 deletions(-)
 
- drivers/block/zram/zram_drv.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index aebc710f0d6a..07111455eecf 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -33,6 +33,7 @@
- #include <linux/cpuhotplug.h>
- #include <linux/part_stat.h>
- #include <linux/kernel_read_file.h>
-+#include <linux/rcupdate.h>
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 243662af1af7..46dd11913df0 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1807,7 +1807,8 @@ static ssize_t iov_iter_extract_user_pages(struct iov_iter *i,
+  *  (*) Use with ITER_DISCARD is not supported as that has no content.
+  *
+  * On success, the function sets *@pages to the new pagelist, if allocated, and
+- * sets *offset0 to the offset into the first page.
++ * sets *offset0 to the offset into the first page. On error, new pagelist
++ * is freed if was allocated, and *@pages sets back to its original value.
+  *
+  * It may also return -ENOMEM and -EFAULT.
+  */
+@@ -1818,31 +1819,42 @@ ssize_t iov_iter_extract_pages(struct iov_iter *i,
+ 			       iov_iter_extraction_t extraction_flags,
+ 			       size_t *offset0)
+ {
++	struct page **oldpages = *pages;
++	int ret;
++
+ 	maxsize = min_t(size_t, min_t(size_t, maxsize, i->count), MAX_RW_COUNT);
+ 	if (!maxsize)
+ 		return 0;
  
- #include "zram_drv.h"
- 
-@@ -504,6 +505,7 @@ struct zram_wb_ctl {
- 	wait_queue_head_t done_wait;
- 	spinlock_t done_lock;
- 	atomic_t num_inflight;
-+	struct rcu_head rcu;
- };
- 
- struct zram_wb_req {
-@@ -847,7 +849,7 @@ static void release_wb_ctl(struct zram_wb_ctl *wb_ctl)
- 		release_wb_req(req);
- 	}
- 
--	kfree(wb_ctl);
-+	kfree_rcu(wb_ctl, rcu);
+ 	if (likely(user_backed_iter(i)))
+-		return iov_iter_extract_user_pages(i, pages, maxsize,
+-						   maxpages, extraction_flags,
+-						   offset0);
+-	if (iov_iter_is_kvec(i))
+-		return iov_iter_extract_kvec_pages(i, pages, maxsize,
+-						   maxpages, extraction_flags,
+-						   offset0);
+-	if (iov_iter_is_bvec(i))
+-		return iov_iter_extract_bvec_pages(i, pages, maxsize,
+-						   maxpages, extraction_flags,
+-						   offset0);
+-	if (iov_iter_is_folioq(i))
+-		return iov_iter_extract_folioq_pages(i, pages, maxsize,
+-						     maxpages, extraction_flags,
+-						     offset0);
+-	if (iov_iter_is_xarray(i))
+-		return iov_iter_extract_xarray_pages(i, pages, maxsize,
+-						     maxpages, extraction_flags,
+-						     offset0);
+-	return -EFAULT;
++		ret = iov_iter_extract_user_pages(i, pages, maxsize,
++						  maxpages, extraction_flags,
++						  offset0);
++	else if (iov_iter_is_kvec(i))
++		ret = iov_iter_extract_kvec_pages(i, pages, maxsize,
++						  maxpages, extraction_flags,
++						  offset0);
++	else if (iov_iter_is_bvec(i))
++		ret = iov_iter_extract_bvec_pages(i, pages, maxsize,
++						  maxpages, extraction_flags,
++						  offset0);
++	else if (iov_iter_is_folioq(i))
++		ret = iov_iter_extract_folioq_pages(i, pages, maxsize,
++						    maxpages, extraction_flags,
++						    offset0);
++	else if (iov_iter_is_xarray(i))
++		ret = iov_iter_extract_xarray_pages(i, pages, maxsize,
++						    maxpages, extraction_flags,
++						    offset0);
++	else
++		ret = -EFAULT;
++
++	if (unlikely(ret) && *pages && *pages != oldpages) {
++		kvfree(*pages);
++		*pages = oldpages;
++	}
++
++	return ret;
  }
+ EXPORT_SYMBOL_GPL(iov_iter_extract_pages);
  
- static struct zram_wb_ctl *init_wb_ctl(struct zram *zram)
-@@ -964,11 +966,13 @@ static void zram_writeback_endio(struct bio *bio)
- 	struct zram_wb_ctl *wb_ctl = bio->bi_private;
- 	unsigned long flags;
- 
-+	rcu_read_lock();
- 	spin_lock_irqsave(&wb_ctl->done_lock, flags);
- 	list_add(&req->entry, &wb_ctl->done_reqs);
- 	spin_unlock_irqrestore(&wb_ctl->done_lock, flags);
- 
- 	wake_up(&wb_ctl->done_wait);
-+	rcu_read_unlock();
- }
- 
- static void zram_submit_wb_request(struct zram *zram,
 -- 
-2.54.0.563.g4f69b47b94-goog
+2.54.0
 
