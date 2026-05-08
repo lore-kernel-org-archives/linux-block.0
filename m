@@ -1,98 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499E934EEEE;
-	Fri,  8 May 2026 21:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48633313E1D;
+	Fri,  8 May 2026 21:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778274979; cv=none; b=DTfOFX8ADh48VaUsJ8B3vPGiOiWyiU1iFO/mPBqxygXTn9x31UPQxUg/1ofybQBKc/KB/SmxQ9Fwe5wLcAYaKsbCrhO4PQMtPCFokkVLZBL9MLDbt8ARhqdqqIR/UNz72VGUa9dvQQLEDTl8ZTTbPiWncIxLPuscSUkClmggIE4=
+	t=1778276904; cv=none; b=Lh4CtUi/XbW/1BRb15YwpoDXZzxjJwv4l5nct3GrDQt5RMxJBgRL8dHuuw5zhdU0o10LLMK/vKpGwxQMsRxpROcxE2Qfi2OA5TlBQ8cQJgY6ejqG34srtnno1Ly97obJzHxk9wfHNt3qv5Wghs1NvHoNm630zw2j7/fhaLGjNMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778274979; c=relaxed/simple;
-	bh=70OCw1Vkjgg3oNBk6/UUtqGZOBPrd8//tlolMQrk7CE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eHxaOnxnO94AIo5vkPs9cwDZ8ZcxZrOV4miqHq9xYEAMhqBWGx3uA8Yb4j709ybDbxrbOq3w7R1O3FtFriTXKxYZHdKEWcdNiqDLDL1W39Y6O3WdXUuuFaQIRtun0OsIidINQziboak++Gd+FzWI1s4N8H1zMNLI9BfbmvwV0sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2+CJhfO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778276904; c=relaxed/simple;
+	bh=sDrByXkNM/hfNAgnMiBhFUzfsx2eIayFCqoEwBNZBUg=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=S4ecUl5PpN/6zAaDh2Oqb//IGtg5atHtJK7vlPqObKnJ0lx1Jp/U4z5DR8wUeyp8m9jpazIAIglATxYQhFia4CtvTOFz7sBQCuv+HMs/xmFrH34OMOvKierk+GdtF9imsoYGpGUnD2NjRog1SOlsLdytBo4kdumKLxKfIP/D/Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=b2hsc13r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2+CJhfO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4497C2BCB0;
-	Fri,  8 May 2026 21:16:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778274979;
-	bh=70OCw1Vkjgg3oNBk6/UUtqGZOBPrd8//tlolMQrk7CE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p2+CJhfOLKI7D+tdcb1zgUcXi9bmIgau9NrEK0i7p1R9a7M/qnKGiFtPbptErwuKQ
-	 SiRwHsj464rZtXXmfoKEsOaA5sqTQq0yG6psHPuitAJZdU5TzMHs2aeyTNWrRKd0Op
-	 oO+M2nt7jDQHkqYigcdQg1arrICvBGFeqCsD7/1ZA1nNayE5cNCnmN4LD3WrqQ+Hzu
-	 KeiIyftDpyLXrZIATq2flJEWY6hksi3VYORgpP0JvhN0viJv1xuI6OiPOi621JWYbu
-	 x7ppUHM/oHfzoyxDfTJ01fz6JhHBAhTUo5EBdBTDb8sTzuMyrUo7uD4++yE8O8W+il
-	 zUVsEvgZbeKtQ==
-Date: Fri, 8 May 2026 14:16:17 -0700
-From: Minchan Kim <minchan@kernel.org>
-To: Richard Chang <richardycc@google.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>, bgeffon@google.com,
-	liumartin@google.com, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v2] zram: fix use-after-free in zram_writeback_endio
-Message-ID: <af5SoTVsm2vVhoml@google.com>
-References: <af1BNwmyHK6aU_uT@google.com>
- <20260508084933.3730661-1-richardycc@google.com>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="b2hsc13r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E0EC2BCB0;
+	Fri,  8 May 2026 21:48:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1778276904;
+	bh=sDrByXkNM/hfNAgnMiBhFUzfsx2eIayFCqoEwBNZBUg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b2hsc13r3jGPAriQu8pal0P53uwSmh90Ma0aR4PVQivKbZczxKXBv17HVJglTVF4l
+	 E9AR2YRmhwKOB9F4hLq8Zh8Xn3uzwcuTKhG0RL8r2f8M2fSgtMsQ26pIoEFk7AAass
+	 ov7Vnh4t499uT2SUPODznNucbivx5JrHMQuozOrE=
+Date: Fri, 8 May 2026 14:48:23 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ lvc-project@linuxtesting.org, Fedor Pchelkin <pchelkin@ispras.ru>
+Subject: Re: [PATCH] lib: free pagelist on error in iov_iter_extract_pages()
+Message-Id: <20260508144823.0213964cb15e7ef8fbdcd7c5@linux-foundation.org>
+In-Reply-To: <20260508111329.329943-1-dmantipov@yandex.ru>
+References: <20260508111329.329943-1-dmantipov@yandex.ru>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260508084933.3730661-1-richardycc@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 08, 2026 at 08:49:33AM +0000, Richard Chang wrote:
-> A crash was observed in zram_writeback_endio due to a NULL pointer
-> dereference in wake_up. The root cause is a race condition between the
-> bio completion handler (zram_writeback_endio) and the writeback task.
+On Fri,  8 May 2026 14:13:29 +0300 Dmitry Antipov <dmantipov@yandex.ru> wrote:
+
+> Since 'iov_iter_extract_pages()' may allocate new pagelist if the passed
+> one isn't large enough, the worst-case scenario may be:
 > 
-> In zram_writeback_endio, wake_up() is called on &wb_ctl->done_wait after
-> releasing wb_ctl->done_lock. This creates a race window where the
-> writeback task can see num_inflight become 0, return, and free wb_ctl
-> before zram_writeback_endio calls wake_up().
+> ...
+> struct page *stack_pages[SMALL];
+> struct page **pages = stack_pages;
+> ...
+> if (iov_iter_extract_pages(i..., &pages, ...) <= 0) {
+>         /* Even in case of error, new pagelist may be allocated */
+>         if (pages != stack_pages)
+>                 kvfree(pages);                                  [1]
+>         /* The rest of error handling and return */
+> }
+> /* Regular flow */
+> ...
+> if (pages != stack_pages)
+>         kvfree(pages);
+> ...
+> return 0;
 > 
-> CPU 0 (zram_writeback_endio)     CPU 1 (writeback_store)
-> ============================     ============================
->                                  zram_writeback_slots
->                                    zram_submit_wb_request
->                                    zram_submit_wb_request
->                                    wait_event(wb_ctl->done_wait)
-> spin_lock(&wb_ctl->done_lock);
-> list_add(&req->entry, &wb_ctl->done_reqs);
-> spin_unlock(&wb_ctl->done_lock);
-> wake_up(&wb_ctl->done_wait);
->                                    zram_complete_done_reqs
-> spin_lock(&wb_ctl->done_lock);
-> list_add(&req->entry, &wb_ctl->done_reqs);
-> spin_unlock(&wb_ctl->done_lock);
->                                    while (num_inflight) > 0)
->                                      spin_lock(&wb_ctl->done_lock);
->                                      list_del(&req->entry);
->                                      spin_unlock(&wb_ctl->done_lock);
->                                      // num_inflight becomes 0
->                                      atomic_dec(num_inflight);
-> 
->                                  // Leave zram_writeback_slots
->                                  // Free wb_ctl
->                                  release_wb_ctl(wb_ctl);
-> // UAF crash!
-> wake_up(&wb_ctl->done_wait);
-> 
-> This patch fixes this race by using RCU. By protecting wb_ctl with
-> rcu_read_lock() in zram_writeback_endio and using kfree_rcu() to free
-> it, we ensure that wb_ctl remains valid during the execution of
-> zram_writeback_endio.
-> 
-> Fixes: f405066a1f0d ("zram: introduce writeback bio batching")
-> Suggested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Suggested-by: Minchan Kim <minchan@kernel.org>
-> Signed-off-by: Richard Chang <richardycc@google.com>
-Acked-by: Minchan Kim <minchan@kernel.org>
+> If you're unlucky so SMALL amount of pages wasn't enough and new
+> pagelist was allocated, missing [1] causes the memory leak similar
+> to one I've recently observed and fixed for 6.12 in [2]. So adjust
+> 'iov_iter_extract_pages()' to make such a cleanup itself rather than
+> rely on caller's handling on error paths, thus making [1] not needed.
+
+AI review said things:
+	https://sashiko.dev/#/patchset/20260508111329.329943-1-dmantipov@yandex.ru
 
