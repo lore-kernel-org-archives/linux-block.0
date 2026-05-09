@@ -1,126 +1,95 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from va-1-114.ptr.blmpb.com (va-1-114.ptr.blmpb.com [209.127.230.114])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768932853F3
-	for <linux-block@vger.kernel.org>; Sat,  9 May 2026 02:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3999286D7D
+	for <linux-block@vger.kernel.org>; Sat,  9 May 2026 04:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.114
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778293108; cv=none; b=sDK0oJzyeaObKJsRIpwoll4OugkBJ/KdnYcuoXQ6tmvlAvIsLHHM3dkNOhZMkvwOIOhOSMRMWkXT/lNMjWa0i5zkuduOo0eWGuZgi8t2kAGoVnCaVyKp9S4BvgG+tIHRNKaxVX5Up5snqhkhipv/+6/EOeGWGtQNtgbPShkl7hk=
+	t=1778300624; cv=none; b=KBtej2lzznu6X9FykdovEu9Pxz6gOq+YMz5SA6WAVlJIogBVdfLjGHNdZgsfExs5fWH0wiPAq+wScyUuAXH2JGuMlyrGonykpGn5BKza+K6tfNjTANEJHI6VjL5aL/c4/MeicAD0BpSgHlgRe7WaKhhL3cAxcyCjMlxoPd8SPhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778293108; c=relaxed/simple;
-	bh=dX1DT7/XIapuCyUNps6vGdble1ta01efA5iYuPMeyf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YPG4B1HawjNs9LRJlLcQikasdN0mzww/YkLldWWhL3fp2gFXB3KS2CoMs09cc7O461iXPzMvwTRyTP589J0Ro5OYiVRxaU6h9r1VuY1u/om73CGcQt3WPM5qPWmlLxuAgFTEihD9D9jA6XB4uxZ189+wzVjs2PokptyLRq5iIbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=k8euHPay; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1778300624; c=relaxed/simple;
+	bh=sXVUgUiexe6pW0yV/m2bxYF4BP+fyNnZvw0G86FXGfI=;
+	h=Content-Type:To:From:Message-Id:Subject:Cc:Date:Mime-Version; b=FJw4FRpE1Q8aemuB9Z+n8k5B96g6ASDpzVYDq3dibPolYRaDyHK1iN43179at8MdzRB6OOcE8K+yNrMYFKFGQ/p1l9C/Jfr04PXhaeqboUknphGgSQqDCf0HgaZoj9q3hSUmBzONwIk+BcQAgT0eoiRtN5igpvQiz6rjvL1PSH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=L/Jgi5+b; arc=none smtp.client-ip=209.127.230.114
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="k8euHPay"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c8026aa4d53so1745864a12.3
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2026 19:18:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1778293107; x=1778897907; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PTwvstf0xm7AuzRsUone+BxfsctoSovje/yCegOz74I=;
-        b=k8euHPayA1LlrPGmTLQ2THB5qf95hT+3cWWncKM5TOeS79yyM+WYcS8N01HGAcKo97
-         b7s8Ko5fYWIdxc6SMoPd/00AT3V1rSBMQ85WeRe4kRpMUkiWQ/CD5spqB3ll/3KaW6o/
-         vP2/dVXowbnWJpGNZ1c30V3Nd32ek3J1T56Gg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778293107; x=1778897907;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PTwvstf0xm7AuzRsUone+BxfsctoSovje/yCegOz74I=;
-        b=HKk/TiWEKNXRjuup/28JDVEBKBCfTJjfAg0vCW6aHQ+Oe/JBldMwq3p1NsNY4DLZ4D
-         ICIyaxY870cafDsZ7UI+bKUt2TRsWWvbRWr6BichWMx/ApYSVSEbe34qwtrqHcaL1bbE
-         /SeN8g/EGhflpkDTR2he4S2yy5XM+3JZmZx0P+stfM6m82LPeCNACzTYn4ACNzFf67Rz
-         ijVMxHNGOgpCu8nouzYK6eVXkVgYp7O4dieQpYdWZu2VJ54Bh1Mc74h382q/8aQR9gMn
-         AHnmumrQIA5SsefyTc9WfsQSCSsrFV7iz5rrsT8v3FO64g/pS7bhvl914kvTyqQouD4/
-         G9Dg==
-X-Forwarded-Encrypted: i=1; AFNElJ/iiLBQgOLVFlCfGsXNsopyPUZwI1876EeaS/NklphXGV4kjFCUQ2Unef3b51htJuMlK43jjy409quk+w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXw6Ro6VnIW+t3nJ65wclhm/+pvGqdxLc/KF/rNC9cTpI+6b0u
-	ttSUwAIC8MKxrKltM7xc0c+xY29MouD66N2+/rUuHcpRWxG7g1NUwozg1rqdoV4rh9sEAqdQMTJ
-	yoRY=
-X-Gm-Gg: AeBDieuhPjEr2pi6TIOPjU3gjg4JU/JQeBKXQ/Pn+EgqGWVowwSsMOzSyRqHJ7EZmaQ
-	wgfAanSYYnFK7rk2UnCole5Zi2BiOqsdlnaLIWPKIWVoCK0Y3Z/0pluadwmpTaUKNOXqoY/VWXp
-	4NhmyD+aJ0EMavrFyrrCCXzf5LT9ETPGFGen7VR6N1lmXZ2YhVf/N5W3gY9n5xCKwiSPM5gmSqy
-	hDOyG0o3KvExyYpkXiF/QqjN+dylg0Nc/OjPMtG6/jcH5wJDiITDMAcQTFBu1FHBafJdMTI29TT
-	hr0YjwqHL0Ksb5NHuf8W8Q9HEzDxv0SmUrZHmpLbZeaPV2hnp4OvT8HZZRPGSFPCtZD36o5xQ0c
-	y/TYnNJI6cm0HBwlvWUsFfU9bZTpaTLA5jxm6UIjuGKE5kWEjlTaRvHNXsKSujDQGKdJxeld0Sm
-	hTHUcs7yWhKWLA6la3/POND2wBGcmRb20g6myyJAO+GOGzHO8AgCBkMGSk6Rvj7oA=
-X-Received: by 2002:a05:6a20:4322:b0:3a3:1164:c7a6 with SMTP id adf61e73a8af0-3aa5a8fba0bmr16369167637.14.1778293106865;
-        Fri, 08 May 2026 19:18:26 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:96eb:c157:3755:4e22])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c8267689d76sm3059171a12.11.2026.05.08.19.18.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 19:18:26 -0700 (PDT)
-Date: Sat, 9 May 2026 11:18:22 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Richard Chang <richardycc@google.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
-	Andrew Morton <akpm@linux-foundation.org>, bgeffon@google.com, liumartin@google.com, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v2] zram: fix use-after-free in zram_writeback_endio
-Message-ID: <af6ZT9oR7GGmMFSC@google.com>
-References: <af1BNwmyHK6aU_uT@google.com>
- <20260508084933.3730661-1-richardycc@google.com>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="L/Jgi5+b"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1778300611; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=GV7P7vEAFPZuslqOmWnT2zTRNsZaE/E9s732MHBL+jQ=;
+ b=L/Jgi5+bSeOqh529AAi3HY2zCg1DokWA8JPVyrQLGed5HoXxh+YSZ8B2Z4gOJJIVxWCFJ0
+ m9bd5QSxEopvyZ1BTSimiRDss19HLpJSRGL2nTYdaTCf/ln+pGDwS7E8stT6sGX9Lhme20
+ bO4LUTwYop77NIkRswa3X0TVDk9wVxUkgxRQ06E3MNJj73viEymIZXlJwoMVS24r77m1lC
+ wlQQCDa8IGO6V+u7eCHg1YXm13avUQtAfCy6bB4ocoDViMSbJdu+D7dIkQ3TWZfdXFNJMM
+ G2kJmaRsHOOyQM9mPzUfcgQObvuqjTrruiyFhHJuh+h5i5jbCakoaICmMyi67g==
+X-Lms-Return-Path: <lba+269feb6c1+6aef85+vger.kernel.org+yinxin.x@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+To: <axboe@kernel.dk>, <dhowells@redhat.com>
+From: "Xin Yin" <yinxin.x@bytedance.com>
+Message-Id: <20260509040119.1116544-1-yinxin.x@bytedance.com>
+X-Mailer: git-send-email 2.20.1
+Subject: [PATCH] block: fix pages array leak in bio_map_user_iov error path
+Cc: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	"Xin Yin" <yinxin.x@bytedance.com>, <stable@vger.kernel.org>
+Date: Sat,  9 May 2026 12:01:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260508084933.3730661-1-richardycc@google.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Original-From: Xin Yin <yinxin.x@bytedance.com>
 
-On (26/05/08 08:49), Richard Chang wrote:
-> A crash was observed in zram_writeback_endio due to a NULL pointer
-> dereference in wake_up. The root cause is a race condition between the
-> bio completion handler (zram_writeback_endio) and the writeback task.
-> 
-> In zram_writeback_endio, wake_up() is called on &wb_ctl->done_wait after
-> releasing wb_ctl->done_lock. This creates a race window where the
-> writeback task can see num_inflight become 0, return, and free wb_ctl
-> before zram_writeback_endio calls wake_up().
-> 
-> CPU 0 (zram_writeback_endio)     CPU 1 (writeback_store)
-> ============================     ============================
->                                  zram_writeback_slots
->                                    zram_submit_wb_request
->                                    zram_submit_wb_request
->                                    wait_event(wb_ctl->done_wait)
-> spin_lock(&wb_ctl->done_lock);
-> list_add(&req->entry, &wb_ctl->done_reqs);
-> spin_unlock(&wb_ctl->done_lock);
-> wake_up(&wb_ctl->done_wait);
->                                    zram_complete_done_reqs
-> spin_lock(&wb_ctl->done_lock);
-> list_add(&req->entry, &wb_ctl->done_reqs);
-> spin_unlock(&wb_ctl->done_lock);
->                                    while (num_inflight) > 0)
->                                      spin_lock(&wb_ctl->done_lock);
->                                      list_del(&req->entry);
->                                      spin_unlock(&wb_ctl->done_lock);
->                                      // num_inflight becomes 0
->                                      atomic_dec(num_inflight);
-> 
->                                  // Leave zram_writeback_slots
->                                  // Free wb_ctl
->                                  release_wb_ctl(wb_ctl);
-> // UAF crash!
-> wake_up(&wb_ctl->done_wait);
-> 
-> This patch fixes this race by using RCU. By protecting wb_ctl with
-> rcu_read_lock() in zram_writeback_endio and using kfree_rcu() to free
-> it, we ensure that wb_ctl remains valid during the execution of
-> zram_writeback_endio.
-> 
-> Fixes: f405066a1f0d ("zram: introduce writeback bio batching")
-> Suggested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Suggested-by: Minchan Kim <minchan@kernel.org>
-> Signed-off-by: Richard Chang <richardycc@google.com>
+In bio_map_user_iov(), when iov_iter_extract_pages() is called with pages
+set to NULL (because nr_vecs > UIO_FASTIOV), want_pages_array() internally
+allocates a pages array via kvmalloc_array(). If iov_iter_extract_pages()
+subsequently returns bytes <= 0 (e.g., due to pin_user_pages_fast()
+failure), the code jumps to out_unmap without freeing the dynamically
+allocated pages array, causing a memory leak detectable by kmemleak.
 
-Acked-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+This can be triggered from userspace by issuing an SG_IO v4 ioctl on a
+bsg device with a large din_xfer_len and an invalid din_xferp (mapped
+PROT_NONE), which causes pin_user_pages_fast() to fail after the pages
+array has already been allocated by want_pages_array().
+
+The kmemleak backtrace looks like:
+
+  unreferenced object 0xffff... (size 2048):
+    backtrace (crc 0):
+      kvmalloc_node+0x...
+      want_pages_array+0x...
+      iov_iter_extract_pages+0x...
+      bio_map_user_iov+0x...
+      blk_rq_map_user_iov+0x...
+      blk_rq_map_user+0x...
+      bsg_transport_sg_io_fn+0x...
+
+Fix this by freeing the dynamically allocated pages array (when it
+differs from the on-stack stack_pages) before jumping to the error path.
+
+Fixes: 403b6fb8dac1 ("block: convert bio_map_user_iov to use iov_iter_extract_pages")
+Cc: stable@vger.kernel.org # 6.5+
+Signed-off-by: Xin Yin <yinxin.x@bytedance.com>
+---
+ block/blk-map.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 0aadbaf7a9ddd..5b9f14caad4f9 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -304,6 +304,8 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 		bytes = iov_iter_extract_pages(iter, &pages, LONG_MAX,
+ 					       nr_vecs, extraction_flags, &offs);
+ 		if (unlikely(bytes <= 0)) {
++			if (pages != stack_pages)
++				kvfree(pages);
+ 			ret = bytes ? bytes : -EFAULT;
+ 			goto out_unmap;
+ 		}
+-- 
+2.20.1
