@@ -1,281 +1,182 @@
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE49390CA1
-	for <linux-block@vger.kernel.org>; Sat,  9 May 2026 08:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A8539A05C
+	for <linux-block@vger.kernel.org>; Sat,  9 May 2026 09:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778316490; cv=pass; b=JCqtq17xcVWLiugdlJuj5c35ouXuyrbrApkx+wFa5eMUy7xqPqFxMgIAFRykL7sHhxqEVzFJT15vPF//RDCuru1XcNP0Sz6JBHpn2QWkWjJu8z0WSJ6FP6Xj4qKQlc5UZ81jce+k5KCROozsRrnPVKoNywKPSoNL2mRFUm3o5UU=
+	t=1778317718; cv=pass; b=QXdaZYDeXfUGHiqZ5EeGBqGJY+w3hJCUtSzst2kPv3XXg95fMquOsHUxDOW9wRcIRF9hqhb5/RBNOA7A4H6W8yrTZqlccdq6FUQCtsrH3qr7oWYSgqNhT+JryYEBOLKTa4ms/KDgmDgns7Zmq1DvX+nVqu9bMvEkwRXCsocZgRc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778316490; c=relaxed/simple;
-	bh=oaRxlLbcznN5M2wsy1OHTi3r75GilxYQYWMZXLK9K9o=;
+	s=arc-20240116; t=1778317718; c=relaxed/simple;
+	bh=HpJECKPCWn98B7gbdA38eNjL28bkoBw6bgxwkA1qVRE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NYllFGy3JguZvT1UXLQ/jZl8J6/ym71T47nDFW3pu7Dfr8KSjcBzkiRJC/FN1gEF10haZ6EbF4pj+wCSpTPefzMsM2tmD7lSBTRjA/7O1gCUavsfvDm34KyfTkJWwqadzVOjD1dJLGdHYT88DkMjmlrZPj5yP89Uws9QSPOP6SA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qn3ioq+W; arc=pass smtp.client-ip=74.125.224.50
+	 To:Cc:Content-Type; b=YAWCmH8eh7E+cEA7ht0DPOOuclR7Xwdo0Naqji3LJL+BvN6w1aGdHxrlhafDyWOvrM7pGhaOTXK/xTav6a3foW/KyWyzxMcV9AOc6ktc3W8w2ZbfQDOtJX8qLy+lTy8tzAyZT2cQdZICKbNkh1IeDAWKOwNRWoanYI7hM8sc8dE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jAQ5Hv0i; arc=pass smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qn3ioq+W"
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-65c7a459105so3195918d50.0
-        for <linux-block@vger.kernel.org>; Sat, 09 May 2026 01:48:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778316488; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jAQ5Hv0i"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7bd5c582c47so26474777b3.2
+        for <linux-block@vger.kernel.org>; Sat, 09 May 2026 02:08:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778317716; cv=none;
         d=google.com; s=arc-20240605;
-        b=KdRPRspEZfyACqlMXCLAwi/m+b9csgWlEafuUNsU8DCskifcp0030OTkNiu540FRx5
-         V6x3pO5ZM3P9os2EBUOll9IMb6Wbfzmhp9xWM5QtPchswH/XgXS18vLgEtHUIqEJ9FNW
-         ZD6DcrCfj76P/mqiuCfPLgE+kRUnK6Hhfgyw8Kh68qU1/PbCJb53aZEQcCUwW7BesRrr
-         ncbS5S9BU7B8S1mbNNiusgHpVfrr58DF7gL9e6GGJWb/fOfSBwcMmOIdoIFfMH+seEi7
-         aRiGcSkpietzu+1bWnTwW6Idue8F2JRR035o7g+lSPDzZObzgY5t78wqbTLdt/4nnC4x
-         qN+A==
+        b=XKInXZVTgwInwuwYLDA3QIDDGFIMAejeAMM2pJPqegeDRviJ7qcG7girto6Eg8/RH9
+         eyVEJG/psYiX4Lxhz38FEiVC9OxJsbhAUNKUdl4mWnSbwcns3F9IEHqBAgrrGMEEYzVh
+         EcByoIgxS/x5kkykg6KU3K0VDTvJOmUnB0v31sjjo8rH6Go2pT+2GoKfNgqW9uGxl0Uy
+         RK4Kqma+fsGDvBnyBatJVXt1v58YTqvSEKQefLfNCvSIR+QM4gktz8/+ZoaH4IZA88Ok
+         izd3piFCGZ2e90urwruH7SY9Vzu3tExI6o40n430s0KTr4P/NxcKKqw/ukdlMBGkgN/V
+         Qf/g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=K3qF25jvgZAKkMW+NjZ+nl1TbSQf0Fcc08uA3kp981w=;
-        fh=uAHjg2eG1HXvaqC97EKIY3sgsWfE/E+9azqUuWKLO/o=;
-        b=aXJVIPnEW4lEJYZ45QfmJV+Ekn0MqfN1+WIJMkg8/IFKyGPU8QIYEYhlcLvbYeW9rZ
-         H0HFAk5JnOrHefEWVndcN6QPFcW/lXN6Xpgk6dn95gZ30A79ZeBFnPo1mO3y0LB/4lN+
-         RZQkiKCMlxdg2RZvGqSWQOjfk1XUKcf3e8F62VEoffd8bo/KLHCiVE8UZKixctkstvdJ
-         uLgXqLXKej9/H03KTllURKXoNWdJFnkffMGUX8FUVefxJvH7Vd3OYLXy+dXrmSG/AmJI
-         Rs/8PmNGvmwf0MPp88slWTC7T449+dtL9bja2X69Ie05lcvudfy1ZqQB9uo5SxrRNzSX
-         9v/Q==;
+        bh=tVdwEh33FhmGvU050t774z8AFpJQif4TcQfckUPV3TY=;
+        fh=Pu2n1NYnazqwDDBEFy4OfGIzjDA6zrQhLn4YBS1AqGA=;
+        b=GtDE3wSvQkDa8rmKlj0zKxitDyZIKUsFokmNpExuWrU6YX48tN3xD97YORsx1QlPhv
+         aQ4QgDJZyyzJ1rJGz7ba41ixQQWsT3j3T745osNr/5TIpGZNI7J34zunxe+I5ZpGQRSn
+         KZTqDoL5lJeyUF91pIyU+9tSYlwdLTxan+wQ8FL5anY9+8aJ3y5ujP/qFqVsW3vgLrac
+         6udsdh+qEoHUmOLqNBtXaxqrXYt49IlVIKAypurfrORn6kIz266B57AjUpG2uhcipwDc
+         zKxOcFZbzqOmQQdxQxMKlLeAoc3zNxTLu2Bs3v3VT8ymCj5hNZsOyLu+har+bsnvFCUc
+         flFQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778316488; x=1778921288; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778317716; x=1778922516; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K3qF25jvgZAKkMW+NjZ+nl1TbSQf0Fcc08uA3kp981w=;
-        b=Qn3ioq+WLshG6u7CDGhAVushOL03Wo2RgsXSW0HSA0P46+gj0XxmBXs9DATehANjnn
-         uIvmqdhUJaLTI4fIkLRC33JrGojDAKx4LOS4DPUJ9FmQcPODHmi9QsqdxF7ijfDHloLO
-         uoQxghOLRLCV9HWDfS/asStmcj3iv/04opdi5QJVE12OReDLSfpRyaEuCC7+ZHeZXhqA
-         40Zzi74FjCJv8K39moV09IahkOknAS3GCLCLB/gBCwmYvRRIKA6wQ1DupSua1JjouQSx
-         rvY5hx0USRq/dCMAOGnPPcSHNK/6NNy5Rorb2iiFzFRDH+Yk2bQ3fRuHDyNqma6GryZD
-         sfbA==
+        bh=tVdwEh33FhmGvU050t774z8AFpJQif4TcQfckUPV3TY=;
+        b=jAQ5Hv0i1w35/Leog188TvYMiDZZdAsizBFXKrIiS5oFnHmhsEexw6M6NtGPwBnfgz
+         ewxrSCKOpmGTsovzKnY5p9mYLd1PbjZyFI5nG0Beo9E0xlwg8OC75FRHsJgxOpLdpoCT
+         TTHHmtcG4SkXxMhNxt2ema+HwNLKsuDJmAO9iB5vy2d2J/5Y0P+WOMFgMR4VRbD7eM5p
+         /NZko2O1QZgQPRrKEEGrTaJe/+g50RnK2Qz2qlj7O/ctbJwA3/PSdB6/myNJUQwQhbiu
+         0d4ofh5L0Svwa9yK23mLPeLnQ0rHK2EV+86BTMpEYFuvIPPZez1jmvvKXb9zKXTeKpHn
+         Y1qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778316488; x=1778921288;
+        d=1e100.net; s=20251104; t=1778317716; x=1778922516;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=K3qF25jvgZAKkMW+NjZ+nl1TbSQf0Fcc08uA3kp981w=;
-        b=fhRHkKvOXvcRPa5o1CfSTjwYJcJSjmt4I9Y7bkky7WcByrSqxiMSzVa7BO4Z2Y7FWO
-         QCzXMdEyWcm7dZnHe5VFZ1J9MzNRpKrKxZqyeJrhOkHTqOOF8HhMl+LQXweWbj7K/PgR
-         ycnndvkQHB2fUNOux0aXJQDbHN99Fs/i8ic4yDQQj66ZpbvH0hcJyl15CLZXJUSxZcB0
-         bCAmzQQH30Q0I0wgM6hrfrOF1Fzd7WWACehRCH89LMt2gtRXxtLUulcMTpirbnvsOaSw
-         WSh67agj7+rWEeikhHlkjhA6h8aCUyNfRmPj1J2BzqV7CODQsiR9RRA4sp1IEf4r6SYe
-         TtEg==
-X-Forwarded-Encrypted: i=1; AFNElJ8Qp3ERU5wL1WeU+hgjXC6To3vwh92/+s5uMY3f8mXLouE3GYLOHrDD06QPEQD+yyspBXDnb5gMh1lqhA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO3NjJ9Tp16aZ1EvAUEdAN8R7KFFoGZ2UGwzovMliXk16SeLHC
-	wbds4Eaip04CHY/0Hymz/WptXonjVrNZnAnWY4zPborF315lZ+MLgEdCdx7Qwy1XftSMiLkODNO
-	mGvVOg764LtbjoL67+KDcb/M2g+LFneg=
-X-Gm-Gg: Acq92OG4/bYw184uvyTeqry/2O17fap3wn82BuE247MNqczSIo7HhMW5OmaoySlcvTj
-	49hr3PRHI0kZjoM7LM8DwaPFWvVeOG9v2nN8mF91TdWMrNZlQix0irnRTgvJAPYyFcvHLlj40mh
-	cRZNsA777/ppxTlnjunU9QVJLJeGms2o8bgCW+nSeKdwbqMOOl3tQWN443gXDca0+dYqev3UXB9
-	OadczdA9E+B7rTjttjTKoHwlItmjzOKJWl3OXyW9VREWgvikh0QIu8yvak/lExb96xjSbwOir0W
-	sdRk6Zou
-X-Received: by 2002:a53:ac8b:0:b0:651:c41c:80ce with SMTP id
- 956f58d0204a3-65d7e782ee0mr9032266d50.16.1778316488245; Sat, 09 May 2026
- 01:48:08 -0700 (PDT)
+        bh=tVdwEh33FhmGvU050t774z8AFpJQif4TcQfckUPV3TY=;
+        b=lLgcTaOcdL92PG+2yAkLdSgp+lygkmOuI86qsPTjRbw45yA3k2qm0OUq4RI87J7Ld1
+         BqFiBKk/pc2IOPtR1QKDv9vpAxlMauIWxSwwwRWfz+33I3BJ1PFGRjZmbR3xM9AUbhxC
+         7qweJDNy89RUeexOVqODBCR1JV/EsWung7laXV1nS23xyhnwp3U4H19uJSpf5LueP0pt
+         633DiV4bn3v59xewML4VIM2xBsvutJFVRDESMvTpDNWGAqKu8fvRhUAw4HxgPT+OUxef
+         bVzwy6ujmtBQoQSOqLXDPpmZy+jdLAOVnEvk2O1POSNu/5H8RZp/Ji3Qfy4iGYI+zzFO
+         rtdg==
+X-Forwarded-Encrypted: i=1; AFNElJ862m0z3kx1UuOri3T9lYgybgAAIYaukGasgnEq0w42vNr+/nNRgYUhk9ajRVMVvkQz8Op5HY3RgAfv9Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVSKmPLtPfnYG2mjtvthlR1v0FJh7VeoomvFmi1P4N9UY5pnEI
+	mUanLHW3vj9Hu/Wry7MdF+C7UV6mqCYL2SALq3MUV6h/SKVjFs2MBcqeuE0075BTRmcRWQH5lHO
+	AXJqqI6UTDbD8ojo/vAlMKoUFKRcW0Wc=
+X-Gm-Gg: Acq92OFOTYYvw61rNuEUa7566xS5g7TNwSpte62AF7d5bTeKlX0cW2Jd9qap78N5WVY
+	TKUFkGIU3P6joWtqlo1STxiPatifqhqz5Yzytq0HceT9GjghoS4qFmeYsmatY1WbtbyCyBbccen
+	d402/AsMYDv7H910PNix8HEodFgcsTpak4BCK2302ngwL+3rxudJOfWkdYJDJQytWpMRqjBUZd7
+	zeADOKAXcHNk+FSlYB6wK1riWCFpmmO9qb9BzAwonE2FYZ4Bp/db8R8usTTo24PinE/JDGZlaEn
+	4d+JYEWn
+X-Received: by 2002:a05:690c:d94:b0:7bf:107b:f859 with SMTP id
+ 00721157ae682-7bf107c07f3mr101380657b3.16.1778317715853; Sat, 09 May 2026
+ 02:08:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260508060724.3810904-1-haowenchao@xiaomi.com>
- <20260508060724.3810904-2-haowenchao@xiaomi.com> <CAKEwX=MzLKTF2uQRaJU8UK5B9UeW-Sh-LE_8fdmo7y-MPPbwyg@mail.gmail.com>
-In-Reply-To: <CAKEwX=MzLKTF2uQRaJU8UK5B9UeW-Sh-LE_8fdmo7y-MPPbwyg@mail.gmail.com>
+References: <20260421121616.3298845-1-haowenchao@xiaomi.com>
+ <CAOptpSPs-1UrEa8AHg19e590=SiV6bpnex7gCbif8=aY7BtpuA@mail.gmail.com>
+ <CAO9r8zOjugCwWqHP3zxXPmjp8TwpoROCjCqTZ_uxOBQwVqCWqA@mail.gmail.com>
+ <CAOptpSMQyyb+q-VJdJ0RzNkjaer1CTePM5WkwEj_7cAO4aUToQ@mail.gmail.com>
+ <CAKEwX=PrfrNys4ao7-d11J7r4pv5VmE8gTU_7iUHaHAKNaFuBQ@mail.gmail.com>
+ <CAOptpSOnRCHo35KK5x3S0f5y9+7+dxfznpjNRH072jZvhYHwww@mail.gmail.com> <CAKEwX=PgsM4Z0URJcF5VSXX_jdy-cAs2JxDCCR1a8CGwV4tCAg@mail.gmail.com>
+In-Reply-To: <CAKEwX=PgsM4Z0URJcF5VSXX_jdy-cAs2JxDCCR1a8CGwV4tCAg@mail.gmail.com>
 From: Wenchao Hao <haowenchao22@gmail.com>
-Date: Sat, 9 May 2026 16:47:56 +0800
-X-Gm-Features: AVHnY4It_UXh4NngbQgPwWNgoNxLei8GvwX1tCgHjP3tCsKGiSXiBnVS9MeknAQ
-Message-ID: <CAOptpSMaAEDMfGOufrWkJY5VchFBx+ON=Uc1j19JP5vw_wJdEA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 1/4] mm/zsmalloc: introduce deferred free framework
- with callback ops
+Date: Sat, 9 May 2026 17:08:24 +0800
+X-Gm-Features: AVHnY4IXrMEe_-uQNRtiTfBHiBqbclVoh00lPISlO6-0pAUXbq9BaSPyawX3d1U
+Message-ID: <CAOptpSMdFwQUxT7bP7s1GWyXvzUQrg3ROtGp3w_zYy2rSkDYRQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/4] mm/zsmalloc: reduce zs_free() latency on swap
+ release path
 To: Nhat Pham <nphamcs@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Barry Song <21cnbao@gmail.com>, 
+Cc: Yosry Ahmed <yosry@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
 	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
-	Johannes Weiner <hannes@cmpxchg.org>, linux-block@vger.kernel.org, 
+	Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-block@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Yosry Ahmed <yosry@kernel.org>, Wenchao Hao <haowenchao@xiaomi.com>
+	Barry Song <baohua@kernel.org>, Xueyuan Chen <xueyuan.chen21@gmail.com>, 
+	Wenchao Hao <haowenchao@xiaomi.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 9, 2026 at 8:29=E2=80=AFAM Nhat Pham <nphamcs@gmail.com> wrote:
+On Sat, May 9, 2026 at 7:33=E2=80=AFAM Nhat Pham <nphamcs@gmail.com> wrote:
 >
-> On Thu, May 7, 2026 at 11:08=E2=80=AFPM Wenchao Hao <haowenchao22@gmail.c=
-om> wrote:
+> On Wed, May 6, 2026 at 6:55=E2=80=AFAM Wenchao Hao <haowenchao22@gmail.co=
+m> wrote:
 > >
-> > Add a per-cpu deferred free mechanism to zsmalloc with a callback
-> > interface that lets callers (zram, zswap) customize push and drain
-> > behavior.
+> > On Sat, May 2, 2026 at 3:21=E2=80=AFPM Nhat Pham <nphamcs@gmail.com> wr=
+ote:
+> > >
+> > >
+> > > Oh man, you are eliminating pool lock here right? This would help my
+> > > other patch series a lot too :)
+> > >
+> > > https://lore.kernel.org/all/CAKEwX=3DM5YpR0cQrryX_y4pm_BuxyUWZ_8MbhWo=
+dwbf1Fe=3Dgzew@mail.gmail.com/
+> > > https://lore.kernel.org/all/CAKEwX=3DPkFiP+u+ThrzjTKBi+usQf2uuhTZcfB2=
+BNNA8RboOFDQ@mail.gmail.com/
+> > >
 > >
-> > Each CPU owns a single-page buffer. The hot path (zs_free_deferred)
-> > writes a value into the current CPU's buffer via the push callback
-> > with preemption disabled =E2=80=94 no locks, no atomics. When the buffe=
-r
-> > fills, it is swapped with a fresh page from a pre-allocated page
-> > pool and the full page is queued to a WQ_UNBOUND worker for drain.
+> > Yes, exactly. With class_idx encoded in the obj value,
+> > zs_free() can determine the correct size_class without
+> > any pool-level lock. The lockless read gives a valid
+> > class_idx because it's invariant across migration (only
+> > PFN changes), and we re-read obj under class->lock to
+> > get a stable PFN.
 > >
-> > The drain worker invokes the drain callback which performs the actual
-> > expensive work (zs_free, slot_free, etc.) in batch, away from the
-> > original hot path.
+> > >
+> > > /*
+> > > * The pool->lock protects the race with zpage's migration
+> > > * so it's safe to get the page from handle.
+> > > */
+> > > read_lock(&pool->lock);
+> > > obj =3D handle_to_obj(handle);
+> > > obj_to_zpdesc(obj, &f_zpdesc);
+> > > zspage =3D get_zspage(f_zpdesc);
+> > > class =3D zspage_class(pool, zspage);
+> > > spin_lock(&class->lock);
+> > > read_unlock(&pool->lock);
+> > >
+> > > It's basically just this blob right?
+> > >
 > >
-> > Page pool management:
-> >   - Pool is pre-allocated at enable time (ZS_DEFERRED_POOL_SIZE pages)
-> >   - Full buffers are drained and returned to the pool
-> >   - If no free page is available when buffer is full, the push falls
-> >     back to synchronous processing by the caller
+> > Yes, that's the blob being replaced. On the
+> > ZS_OBJ_CLASS_IDX path (64-bit systems), it becomes:
 > >
-> > Signed-off-by: Wenchao Hao <haowenchao@xiaomi.com>
-> > ---
-> > +#define ZS_DEFERRED_POOL_SIZE  (256 * 1024 / PAGE_SIZE)
+> >     obj =3D handle_to_obj(handle);
+> >     class =3D pool->size_class[obj_to_class_idx(obj)];
+> >     spin_lock(&class->lock);
+> >     obj =3D handle_to_obj(handle); /* re-read for stable PFN */
+> >
+> > No pool->lock at all. We've also added compile-time
+> > gating (#if BITS_PER_LONG >=3D 64) since 32-bit systems
+> > lack the spare bits in OBJ_INDEX to fit class_idx. On
+> > 32-bit, it falls back to the original pool->lock path.
+> >
 >
-> Seems oddly specific? :) And this doesn't quite scale with number of
-> CPUs, or memory size?
->
+> BTW, I've tested your idea with a hacky prototype, when I was playing
+> with my vswap series. It absolutely improves free time in the usemem
+> benchmark :) Idea is very promising - I won't scoop your work of
+> course, just letting you know that at least in my use case, it works
+> :) Look forward to seeing it submitted soon!!!
 
-256K holds the deferred metadata for ~128MB zswap or ~256MB zram
-entries, which matches what a killed process typically has swapped
-out. Pages sitting in the pool are memory that can't be used
-elsewhere, so I didn't want it to grow with RAM/CPU. Happy to
-parameterize it if you'd prefer.
+Thanks, Nhat, that's great to hear.
 
-> > +
-> > +struct zs_deferred_percpu {
-> > +       unsigned int count;
-> > +       void *buf;
-> > +};
-> > +
-> >  struct zs_pool {
-> >         const char *name;
-> >
-> > @@ -217,6 +224,18 @@ struct zs_pool {
-> >         /* protect zspage migration/compaction */
-> >         rwlock_t lock;
-> >         atomic_t compaction_in_progress;
-> > +
-> > +       /* per-cpu deferred free */
-> > +       const struct zs_deferred_ops *deferred_ops;
-> > +       void *deferred_private;
-> > +       struct zs_deferred_percpu __percpu *deferred;
-> > +       struct work_struct deferred_work;
-> > +       struct workqueue_struct *deferred_wq;
-> > +       struct list_head deferred_pool;
-> > +       unsigned int deferred_pool_count;
-> > +       spinlock_t deferred_pool_lock;
-> > +       struct list_head deferred_drain_list;
-> > +       spinlock_t deferred_drain_lock;
-> >  };
-> >
-> >  static inline void zpdesc_set_first(struct zpdesc *zpdesc)
-> > @@ -1416,6 +1435,171 @@ void zs_free(struct zs_pool *pool, unsigned lon=
-g handle)
-> >  }
-> >  EXPORT_SYMBOL_GPL(zs_free);
-> >
-> > +static struct page *deferred_pool_get(struct zs_pool *pool)
-> > +{
-> > +       struct page *page =3D NULL;
-> > +
-> > +       spin_lock(&pool->deferred_pool_lock);
-> > +       if (!list_empty(&pool->deferred_pool)) {
-> > +               page =3D list_first_entry(&pool->deferred_pool, struct =
-page, lru);
-> > +               list_del(&page->lru);
-> > +               pool->deferred_pool_count--;
-> > +       }
-> > +       spin_unlock(&pool->deferred_pool_lock);
-> > +       return page;
-> > +}
-> > +
-> > +static void deferred_pool_put(struct zfs_pool *pool, struct page *page=
-)
-> > +{
-> > +       spin_lock(&pool->deferred_pool_lock);
-> > +       list_add_tail(&page->lru, &pool->deferred_pool);
-> > +       pool->deferred_pool_count++;
-> > +       spin_unlock(&pool->deferred_pool_lock);
-> > +}
-> > +
-> > +static void zs_deferred_work_fn(struct work_struct *work)
-> > +{
-> > +       struct zs_pool *pool =3D container_of(work, struct zs_pool, def=
-erred_work);
-> > +       struct page *page;
-> > +
-> > +       while (true) {
-> > +               unsigned int count;
-> > +
-> > +               spin_lock(&pool->deferred_drain_lock);
-> > +               if (list_empty(&pool->deferred_drain_list)) {
-> > +                       spin_unlock(&pool->deferred_drain_lock);
-> > +                       break;
-> > +               }
-> > +               page =3D list_first_entry(&pool->deferred_drain_list,
-> > +                                       struct page, lru);
-> > +               list_del(&page->lru);
-> > +               count =3D page_private(page);
-> > +               spin_unlock(&pool->deferred_drain_lock);
-> > +
-> > +               pool->deferred_ops->drain(pool->deferred_private,
-> > +                                         page_address(page), count);
-> > +               deferred_pool_put(pool, page);
-> > +               cond_resched();
-> > +       }
-> > +}
-> > +
-> > +bool zs_free_deferred(struct zs_pool *pool, unsigned long value)
-> > +{
-> > +       struct zs_deferred_percpu *def;
-> > +       struct page *new_page, *full_page;
-> > +       enum zs_push_ret ret;
-> > +
-> > +       if (!pool->deferred)
-> > +               return false;
-> > +
-> > +       def =3D get_cpu_ptr(pool->deferred);
-> > +
-> > +       ret =3D pool->deferred_ops->push(def->buf, def->count, value);
-> > +       if (ret =3D=3D ZS_PUSH_OK) {
-> > +               def->count++;
-> > +               put_cpu_ptr(pool->deferred);
-> > +               return true;
-> > +       }
-> > +
-> > +       if (ret =3D=3D ZS_PUSH_FULL_QUEUED)
-> > +               def->count++;
-> > +
-> > +       new_page =3D deferred_pool_get(pool);
-> > +       if (new_page) {
-> > +               full_page =3D virt_to_page(def->buf);
-> > +               set_page_private(full_page, def->count);
-> > +               def->buf =3D page_address(new_page);
-> > +               def->count =3D 0;
-> > +
-> > +               if (ret =3D=3D ZS_PUSH_FULL) {
-> > +                       pool->deferred_ops->push(def->buf, 0, value);
-> > +                       def->count =3D 1;
-> > +               }
-> > +               put_cpu_ptr(pool->deferred);
-> > +
-> > +               spin_lock(&pool->deferred_drain_lock);
-> > +               list_add_tail(&full_page->lru, &pool->deferred_drain_li=
-st);
-> > +               spin_unlock(&pool->deferred_drain_lock);
-> > +               queue_work(pool->deferred_wq, &pool->deferred_work);
-> > +               return true;
-> > +       }
-> > +       put_cpu_ptr(pool->deferred);
-> > +
-> > +       /* ret=3D=3D2: value already queued, will be drained eventually=
- */
-> > +       if (ret =3D=3D 2)
->
-> =3D=3D 2? :)
->
+I've split this part out and posted it as its own series:
 
-Will replace with ZS_PUSH_FULL_QUEUED, if v4 still has
-this logic.
+  https://lore.kernel.org/linux-mm/20260508061910.3882831-1-haowenchao@xiao=
+mi.com
+
+Review there would be very welcome.
+
+Also, could you share the details of your usemem setup? I'd like
+to reproduce it locally on the same baseline.
 
 Thanks,
 Wenchao
