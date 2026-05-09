@@ -1,212 +1,203 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBF03630B7
-	for <linux-block@vger.kernel.org>; Fri,  8 May 2026 23:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2364E38D
+	for <linux-block@vger.kernel.org>; Sat,  9 May 2026 00:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778283185; cv=pass; b=XvEbz+QzxAhdr2KCaiOpYyXq872DTfYsyGRo5GiCKzmdLVp6D/wuRYys1jEaRWGwHlh0wUOLU9NIBa994u6f0+Movonn5RRA8k1D8ZhFDYAMuvJWfUINwEAafLpqsLUkO9LC4vci1x8TLPmTcM0mX6XZEbrcKeXCOEETEFriUu4=
+	t=1778285296; cv=pass; b=Ldt7rOc9Ey/QfX5K8i+hXW6mrEOyxjxhcaNziQOvORjS+VljvMuJr5O4QMI1ZC88tp6vfKg2xZegCZ9W+Pakyeo17GluQwptjSAaPewuk42YbYdKFBBPFoHxh9q5eaJSTxXAmI3VnAYj9z8eioT1QzoZIdUbJBrvYzxwlxg1+1c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778283185; c=relaxed/simple;
-	bh=RBipzRmN0XYvIxuSGuKckHsMVzpx80+O83M8kOJtC0g=;
+	s=arc-20240116; t=1778285296; c=relaxed/simple;
+	bh=mMU8ttRmfI7xOgz+LXLEUc+3WoqyF9JN0ux8LRvIpRo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CpsRyvz2vDdKQcF19t5UdKydm4tGp8efibpNwmqnUpKqwjO4xnvmnPds7V7KOuzSD6b0BELNOPRLhggWJXWvoc8AGBK1uQCqPkryj+2yPW+ZARN8EHUMwzBpMkgs2JQJkA+DboP77bb9qsj5DsKeB62fTEVGfhOb9FMa6jLLsNs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SVKBkRfm; arc=pass smtp.client-ip=209.85.221.47
+	 To:Cc:Content-Type; b=SkwbXkMzwotqtuozq5TFPKVnzs8EUm4LKwJilzErg6i9AwW4pB46ma3vcrCZkw5LzC592lCMQroIzr8AXG9g4WWK+GBbB5iVdHaZKi6Rd52KUmYW+uXX5r6mBkqjpP4RWA27RKYMzBr9QYWdTawgGLPb73KlutMX2hz8gg300co=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUaANKz1; arc=pass smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVKBkRfm"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43fe608cb92so1545179f8f.2
-        for <linux-block@vger.kernel.org>; Fri, 08 May 2026 16:33:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778283182; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUaANKz1"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-44ce78ab5feso2178059f8f.0
+        for <linux-block@vger.kernel.org>; Fri, 08 May 2026 17:08:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778285293; cv=none;
         d=google.com; s=arc-20240605;
-        b=FFod0M+BUvToi8VBLl8015DtaHBLC//ysCjM6UBw7s0NBPXTQ30HKCy0jwYxxIXQbH
-         g5uIKV8c9UdNJNftBsVXYxUlT2jckoMSuZPPg0osetauvPNqRBZzZeBCINW0o6TONeKP
-         09ipjIFc0G7BAdw5lCSIR9t2781Q4fRVHr1ZROUHu/kD9q6xAv2USwrJ8bwHaA45IPH+
-         OKvsROc9ta1Qu65EJU+Yak7lIpOZIfPEbGDBAz6whNkny3snzpC2ld7/A3MuR85NWdzI
-         fPXbmK4fsaNVQYdqVZRVtfkToofm3TpG5r16nNeFQlpjRUeqfqcm2UoFX5XzvPzkgMHq
-         V0qA==
+        b=ZwwvF2gCHl/P3Wgd9n68rRJ38PbDlVQIDhR2V0SB3Inqx4Vti9pgT4oxJrSqH8m9oY
+         3mrg6U8ijwxWplVTbRNcuxRvvE8FU3POtufKZp/Hq82UxbpMeL95qzJavsjQdQ7OvdyF
+         OcEGZCRlHp1egL8iu7QyoVvrkD/YDfQkgxAVpdSeSEN3a3BzS58kzz3Q5hKt3/mZnWiS
+         Fkm2NeKPEhY1HBQPb0tnWcubiLgn3ab20j/UtueuED+v328PxVoC7lQBrhvrvfKn5JKC
+         6tjaJfXdVC8kA1fe8zBLXSvgDYHH5uLjmgRNYs8D/bItVrnXKRbonSxy/C2lgp1epPku
+         j/IA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=oSOi2hfsCtv/FfIwJYFm2BLHlgEKmdNqcetZh+pI3Hw=;
-        fh=TBbPS0C/1OR1l9zrrUQUXCplrh6NKHcefI7BlLrCsLA=;
-        b=gT7MMHLxTmae6NyT/s4Yung9OL+AU45oxohS95QqcYmGuXMwqW2J9BTyay+v+EWafe
-         /O6U3FvhnGV2vqQ4v6hI9iOjacaVMOcrcdHX4ShpY0i/aHLp08Ir+YwKXHOQBWkEBzHJ
-         UJ9qDobPUAgRALy3yCIO7vADZfLf6I8Mpftz84VH/J+e7IfptoK2D+qCu0J7pS0LXcx+
-         6UiS5yLynF8vLUOjZjbt0YRD3PkX3YxaZTG+O2qEps8gYW3T7LxnQRhYRK0zDvnj91u2
-         /VY4+krqQ1zsrm26sfQWZROZwqbJHwTFmcIZ24HGu330yD5lOIevS5xrdFbaq90SKoAf
-         8NKg==;
+        bh=2hAe5AS8Ymjlp2Wl032hmQa+iD3KTwFf8efNYcRmY7E=;
+        fh=qqyrq2CnqdeQLwLZXD/8P02988wOe9yJw/Vbvq7MllA=;
+        b=VEgCyV4vc+8hwxg/EIK+TchlWwsfVPxhAASrJe9LjwSiqEzuJegJNg2f8/oosHLtcA
+         cemG30Sdj5/n7bLsMTooeOTfr0dzjfunXQTzpDZhxSkdBolQUBliBrJtJ2MSEpYbZdVM
+         RlJYKn3+r3OSS5cYLM4SFndp5CydexzZKwxoB9MPkWrUxHTvTAEQ8of37kEHlfzobawM
+         R2PkE2LCmOsq7dlLHmpgTMN/swcjVB5q9p6CchRTXQPDr4MPih0u15UDHCD5sDpd7bD1
+         CSsLsbfTmuZKgbf91c0+7Wnxx1JJo61HRN6oDb53fBYZKHjiLpAS6rFdxgWbsTsjPwqH
+         npcw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778283182; x=1778887982; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778285293; x=1778890093; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oSOi2hfsCtv/FfIwJYFm2BLHlgEKmdNqcetZh+pI3Hw=;
-        b=SVKBkRfmMYs1OpbsrnqjlyY1nLLr+m3J4jVMRoLSiqC/5DmlTXSXYJh3n9s/P9nSxr
-         RFZEoWhCq3U6AnvTMzakimLaJPKOcQtNwyXMjy6lvCaGDAHEAh0ZTPLyIzI90SH/xu2E
-         J4f72ysYRVGjjAaOvTYKYQ/ubz1ULcQ8+Vm6/8cMiujggh85RYl7s4Dl5Mf7OVpBCY/8
-         CiplV7gSY4LGojaoq21yAsKlI+p2pRKYOPeG5GrWkoIecaPCJqstub0xZzjo4jheMGOx
-         duFzdXAUwqakDHBQfvvMF6U6vkMCF+VFor8QjWm9vaMu+dpgTUmTVBx9A3Px0WayNebO
-         rjng==
+        bh=2hAe5AS8Ymjlp2Wl032hmQa+iD3KTwFf8efNYcRmY7E=;
+        b=FUaANKz1/7xjdK4Ht1tjxLjoqRiTPLTNJE2JUVFW4Ta6ooTZufkcSRllIrFeHU0cLe
+         iJiq5hAN8G9/mJQbUyiEB13E35RD033w/UW7ApJqlMJCZLkvdvvDjZsezS9ihP2X1/ZO
+         sWePXdVtAQCS45GzcZ22EIqZQkB6edpnd7TYkTiq8a4YEaJ0GEEAgllvGD9DWSOX1uMN
+         lIAdU6frQbNonnmZ7Jh/L6HGV0TxjGN/f4URtkPbDYN3cU/u5km2Oyk73sjJT7CmQ512
+         9GlbJXXTl6kqkHQC5Q6eU+UJi8SUHU94ZrNRT89PXcw7/QN13FS5ZIxt0dGoTY8JAS5J
+         2pdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778283182; x=1778887982;
+        d=1e100.net; s=20251104; t=1778285293; x=1778890093;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=oSOi2hfsCtv/FfIwJYFm2BLHlgEKmdNqcetZh+pI3Hw=;
-        b=CF2DwtxRWDqmlSj7UsLnLB8s3rWPfY7L00jWqi/xztrQTmSVE3LC3jH4YEgs4OgxfA
-         f1HAv+xcYXq2FYzkl+NgU3Py7GZnFohbZcp5T5mmyQwiPmIFGuqjPQ4k6fNjv3fuKOdW
-         iOgqKzu1Awtxm4F9gTJ4W7e9JVkgz/f64/m7t0CfcKtwa2JGuHD6i+wf78fPAPdN/toz
-         ATOhSl4oy5ehRooRJwnT5HTJR0sL4+IQWfDi4vXC2TJ5CXmVGcDkSn8552VXs1npMI8f
-         HocaNFkkHmsZ4QWss8uEwyn9o6M9xQOYCbTXHKD9U5f6AXBt+cd2gz8/rcWvWHI8jSiH
-         CW9A==
-X-Forwarded-Encrypted: i=1; AFNElJ/eGWJ5NPSJO/jHdLhqYP0EXjokxL1tMu7LoU1EvOovEuugZksaVAAuN8OZgEPjdQxhKeGsI4/ko0KYIQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyXSrTqm8sEEz7/5fClQDGIukHmTnuNHQ5Wk1cvkjXDmqbI7W0
-	1W5gUoLsyOqY2faxGDLIzkY01hOrXGI4Ci5Nwgi/7A+yXBeqXd/waEudHGLXBslVnFXrN8/R7g4
-	IcKndJNcZuZU0jTDHwAxbHH5Ws7zno6w=
-X-Gm-Gg: Acq92OEy31Fus5pvPgflVD88JQm5sVhJ42F1Fxloh77wxMLyJYR35nxc5ZnGEwW2JwN
-	Sw1+N1VNibZh5t2K16hzYhiMiEgcOGk7yAIwdgk/rOs/hH9eeUabuF39HXvo2ZVxd6U5F1AWDUh
-	qLL/sxgWMz0Y/MT4Bil9YmtxZzSRe9tNR1+mW8mQfct7DkGXK61cv2DpQigOxY3lcM3UIqPiE0a
-	He/2V16Xcx8O+NsJ+BpEZTymcUn1vSWxBK2GXYOBcoFnUr92I8hdnlvz7dWrFkNF4oZ9egBbWtr
-	ocugJO4IPmsLJ2xZugi//D02ValNr444cgTafkkTb9YYCEMe
-X-Received: by 2002:a5d:588c:0:b0:451:bbe4:b48e with SMTP id
- ffacd0b85a97d-45460e406fdmr7146433f8f.5.1778283182084; Fri, 08 May 2026
- 16:33:02 -0700 (PDT)
+        bh=2hAe5AS8Ymjlp2Wl032hmQa+iD3KTwFf8efNYcRmY7E=;
+        b=cW1lPWTQVKFcsIfTKuEpWR/2VpEmv77hQ6F5KcABw6TgAzh5GSu7zWRN/2rTUL6vga
+         YjJJti5xlGiclE6Ns6jqCZCdYmo/xauEyeY38GpVZe7psWJXKJlVN8jY9k5IFwr43dEP
+         qHAGN20toA4s3sfgFE1GcbKYIOr3BN08VSkM/55UGMUKdDTxQUEEI+Fcum/YDdLTGIQl
+         iDbrKRKN3fmAclbfw6tjN6V2iDXaQmfm4XHSMgwXXF341kxedBrni4zCuRqtbQodHPMU
+         zVJYb+VlEbB37nDx5JAKcjE4caNBfwJvmB2Ku3S9ZBr1DTRTyFmBhsADQYODBxPlhzyN
+         YHhg==
+X-Forwarded-Encrypted: i=1; AFNElJ9OQQ+kJrefpzuJuhn/ExDQX7EvFTjej0sW0s4g2uADN0UMYVXE+n+WV8Bw7Gi6o2ZeIhLUzkSMm0UrWA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgwICziSC2vOph5mSjIJlgSjWC2UalRYsNjSwDR/t2hgsNFoGo
+	LWtp2k4YFFhUcrU2a0CQy4DpoagXRNiVZp1KeH77cHainjAwypmJhgj8v4LKP/6HHz0GilEDJB6
+	aKU63VbqKmXIfSythF0zAjhB5Dco0Aow=
+X-Gm-Gg: Acq92OGbzBeZYjFt087mYWaSJ++yB18ixMhyBDrP3YE8yVpBDDFMg+QpiUeIxDehyAy
+	2FJupzqIl/xwDS4c/OqzSjtLQJc2zHmRSdrVNnTKhkbignuicDXtfBfIiF7E5Jj0sve7epye5SK
+	vNHstNGAQE9+mPmZE6GxqmkjbuKSsGP1hQKhLNC/+Fb1AKhvi/BX/yHhAEH7a0iRBVsGnRHVdlV
+	7CLjsgnyfxQ5SeTAIxSnJe23blH8VYTWvcUp5w4gmQGlClwNUp6TBg9ZI2/8BYjJPpGg+HC2yQI
+	qH5zCmy6VeWPijrtvp41XFzIt/bypV11TmXd/w==
+X-Received: by 2002:a05:6000:220c:b0:43d:77f4:7145 with SMTP id
+ ffacd0b85a97d-4515bae9147mr23715114f8f.19.1778285293382; Fri, 08 May 2026
+ 17:08:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260421121616.3298845-1-haowenchao@xiaomi.com>
- <CAOptpSPs-1UrEa8AHg19e590=SiV6bpnex7gCbif8=aY7BtpuA@mail.gmail.com>
- <CAO9r8zOjugCwWqHP3zxXPmjp8TwpoROCjCqTZ_uxOBQwVqCWqA@mail.gmail.com>
- <CAOptpSMQyyb+q-VJdJ0RzNkjaer1CTePM5WkwEj_7cAO4aUToQ@mail.gmail.com>
- <CAKEwX=PrfrNys4ao7-d11J7r4pv5VmE8gTU_7iUHaHAKNaFuBQ@mail.gmail.com> <CAOptpSOnRCHo35KK5x3S0f5y9+7+dxfznpjNRH072jZvhYHwww@mail.gmail.com>
-In-Reply-To: <CAOptpSOnRCHo35KK5x3S0f5y9+7+dxfznpjNRH072jZvhYHwww@mail.gmail.com>
+References: <20260508060724.3810904-1-haowenchao@xiaomi.com>
+In-Reply-To: <20260508060724.3810904-1-haowenchao@xiaomi.com>
 From: Nhat Pham <nphamcs@gmail.com>
-Date: Fri, 8 May 2026 16:32:50 -0700
-X-Gm-Features: AVHnY4LVPgaokRSD-yNzmbW3fcr5U2WsfiVX3TD22zLlG4u5QMOCyYiPo_GSa7U
-Message-ID: <CAKEwX=PgsM4Z0URJcF5VSXX_jdy-cAs2JxDCCR1a8CGwV4tCAg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 0/4] mm/zsmalloc: reduce zs_free() latency on swap
- release path
+Date: Fri, 8 May 2026 17:08:01 -0700
+X-Gm-Features: AVHnY4KbA6937UtLfw7u1pC6wkI6O7XsgN0-eZFsAMS6V-1aa9ouZXB-HiwqhPA
+Message-ID: <CAKEwX=Ood7Q4zv0zc+GCCGtWu2GLVdtod=4VC9151r87AZXpWA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 0/4] mm/zsmalloc: per-cpu deferred free to
+ accelerate swap entry release
 To: Wenchao Hao <haowenchao22@gmail.com>
-Cc: Yosry Ahmed <yosry@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+Cc: Andrew Morton <akpm@linux-foundation.org>, Barry Song <21cnbao@gmail.com>, 
 	Chengming Zhou <chengming.zhou@linux.dev>, Jens Axboe <axboe@kernel.dk>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-block@vger.kernel.org, 
+	Johannes Weiner <hannes@cmpxchg.org>, linux-block@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	Barry Song <baohua@kernel.org>, Xueyuan Chen <xueyuan.chen21@gmail.com>, 
-	Wenchao Hao <haowenchao@xiaomi.com>
+	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Yosry Ahmed <yosry@kernel.org>, Wenchao Hao <haowenchao@xiaomi.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 6, 2026 at 6:55=E2=80=AFAM Wenchao Hao <haowenchao22@gmail.com>=
- wrote:
+On Thu, May 7, 2026 at 11:08=E2=80=AFPM Wenchao Hao <haowenchao22@gmail.com=
+> wrote:
 >
-> On Sat, May 2, 2026 at 3:21=E2=80=AFPM Nhat Pham <nphamcs@gmail.com> wrot=
-e:
-> >
-> > > With only the class_idx-in-obj encoding (eliminating pool->lock from
-> > > zs_free, no deferred freeing), we measured on two platforms.
-> > >
-> > > Test: each process independently mmap 256MB, write data, madvise
-> > > MADV_PAGEOUT to swap out via zram (lzo-rle), then concurrent munmap.
-> > >
-> > > Raspberry Pi 4B (4-core ARM64 Cortex-A72):
-> > >
-> > >   mode        Base       ClassIdx-only   Speedup
-> > >   single      59.0ms     56.0ms          1.05x
-> > >   multi 2p    94.6ms     66.7ms          1.42x
-> > >   multi 4p    202.9ms    110.6ms         1.83x
-> > >
-> > > x86 physical machine (4-core Intel i7-12700, 2 rounds averaged):
-> > >
-> > >   mode        Base       ClassIdx-only   Speedup
-> > >   single      11.7ms     9.8ms           1.19x
-> > >   multi 2p    24.1ms     17.2ms          1.40x
-> > >   multi 4p    63.0ms     45.3ms          1.39x
-> >
-> > Oh man, you are eliminating pool lock here right? This would help my
-> > other patch series a lot too :)
-> >
-> > https://lore.kernel.org/all/CAKEwX=3DM5YpR0cQrryX_y4pm_BuxyUWZ_8MbhWodw=
-bf1Fe=3Dgzew@mail.gmail.com/
-> > https://lore.kernel.org/all/CAKEwX=3DPkFiP+u+ThrzjTKBi+usQf2uuhTZcfB2BN=
-NA8RboOFDQ@mail.gmail.com/
-> >
+> Swap freeing can be expensive when unmapping a VMA containing many swap
+> entries. This has been reported to significantly delay memory reclamation
+> during Android's low-memory killing, especially when multiple processes
+> are terminated to free memory, with slot_free() accounting for more than
+> 80% of the total cost of freeing swap entries.
 >
-> Yes, exactly. With class_idx encoded in the obj value,
-> zs_free() can determine the correct size_class without
-> any pool-level lock. The lockless read gives a valid
-> class_idx because it's invariant across migration (only
-> PFN changes), and we re-read obj under class->lock to
-> get a stable PFN.
+> Two earlier attempts by Lei and Zhiguo added a new thread in the mm core
+> to asynchronously collect and free swap entries [1][2], but the design
+> itself is fairly complex.
 >
-> > Well, the deferred freeing would completely move that contention out
-> > of the way lol. But this would benefit all users, regardless of
-> > whether we're deferring the free step or not (for instance, this will
-> > reduce contention between page fault and compaction, IIUC?) I feel
-> > like you'll get some good numbers testing in a system with compaction
-> > and THP enabled, with lots of swap activities. Which is... a lot of
-> > server setup :)
-> >
-> > If the deferred freeing is too controversial, this smells like
-> > something that should be upstreamed independently.
-> >
+> When anon folios and swap entries are mixed within a process, reclaiming
+> anon folios from killed processes helps return memory to the system as
+> quickly as possible, so that newly launched applications can satisfy
+> their memory demands. It is not ideal for swap freeing to block anon
+> folio freeing. On the other hand, swap freeing can still return memory
+> to the system, although at a slower rate due to memory compression.
 >
-> Agreed. We're planning to split the series so that the
-> class_idx encoding + pool->lock elimination can be
-> reviewed and merged independently of the deferred free
-> framework. It's a pure win with no behavioral change
-> =E2=80=94 just less lock contention.
+> This series introduces a callback-based deferred free framework in
+> zsmalloc. Callers (zram, zswap) register push/drain callbacks to
+> define what gets buffered and how it gets drained. The entire free
+> path including caller-side bookkeeping (slot_free, zswap_entry_free)
+> is deferred to a background worker.
 >
-> > >
-> > > Single-process shows modest improvement. With multiple processes,
-> > > each read_lock/read_unlock atomically modifies the shared rwlock
-> > > reader count, and the cost of these atomic operations increases
-> > > with more CPUs accessing the same cacheline concurrently.
-> > > Eliminating pool->lock removes this overhead entirely.
-> > >
-> > > This only works on 64-bit systems where OBJ_INDEX_BITS has enough
-> > > spare bits to fit class_idx. 32-bit systems don't have the room.
-> > > I'm still working on the compile-time gating to properly enable
-> > > this based on architecture and page size configuration.
-> >
-> > /*
-> > * The pool->lock protects the race with zpage's migration
-> > * so it's safe to get the page from handle.
-> > */
-> > read_lock(&pool->lock);
-> > obj =3D handle_to_obj(handle);
-> > obj_to_zpdesc(obj, &f_zpdesc);
-> > zspage =3D get_zspage(f_zpdesc);
-> > class =3D zspage_class(pool, zspage);
-> > spin_lock(&class->lock);
-> > read_unlock(&pool->lock);
-> >
-> > It's basically just this blob right?
-> >
+> Implementation:
+>   - Each CPU owns a single-page buffer. The hot path writes a value
+>     via the push callback with preemption disabled (no locks).
+>   - When the buffer fills, it is swapped with a fresh page from a
+>     pre-allocated page pool. The full page is queued to a WQ_UNBOUND
+>     worker for drain.
+>   - The drain callback performs the actual expensive work (zs_free,
+>     slot_free, zswap_entry_free, etc.) in batch, off the hot path.
+>   - If no free page is available, the caller falls back to synchronous
+>     processing.
 >
-> Yes, that's the blob being replaced. On the
-> ZS_OBJ_CLASS_IDX path (64-bit systems), it becomes:
+> The speedup comes from moving expensive swap slot freeing off the
+> munmap hot path into a background worker, so that intact anonymous
+> folios are released back to the system without blocking. The worker
+> drains at a slower rate since compressed objects are small and freeing
+> a single handle may not release an entire page until the zspage is
+> fully empty.
 >
->     obj =3D handle_to_obj(handle);
->     class =3D pool->size_class[obj_to_class_idx(obj)];
->     spin_lock(&class->lock);
->     obj =3D handle_to_obj(handle); /* re-read for stable PFN */
+> Performance results (Raspberry Pi 4B, ARM64, 8GB RAM):
 >
-> No pool->lock at all. We've also added compile-time
-> gating (#if BITS_PER_LONG >=3D 64) since 32-bit systems
-> lack the spare bits in OBJ_INDEX to fit class_idx. On
-> 32-bit, it falls back to the original pool->lock path.
+> Test 1: munmap latency for 256MB swap-filled VMA (zram backend)
+>
+>   mode        Base       Patched     Speedup
+>   single      61.82ms    8.62ms      7.17x
+>   multi 2p    94.75ms    54.11ms     1.75x
+>   multi 3p    154.64ms   104.83ms    1.48x
+>
+> Test 2: munmap latency for different sizes (zram, single process)
+>
+>   Size       Base         Patched     Speedup
+>   64MB       14.11ms      2.18ms      6.47x
+>   128MB      29.45ms      4.48ms      6.57x
+>   192MB      43.85ms      6.62ms      6.62x
+>   256MB      57.01ms      9.08ms      6.28x
+>   512MB      115.13ms     55.58ms     2.07x
+>   1024MB     229.66ms     153.28ms    1.50x
+>
+> Test 3: munmap latency for 256MB swap-filled VMA (zswap backend)
+>
+>   mode        Base       Patched     Speedup
+>   single      152.14ms   51.26ms     2.97x
+>   multi 2p    186.56ms   105.42ms    1.77x
+>   multi 3p    205.83ms   153.32ms    1.34x
+>
+> Test 4: munmap latency for different sizes (zswap, single process)
+>
+>   Size       Base         Patched     Speedup
+>   64MB       37.83ms      13.26ms     2.85x
+>   128MB      75.11ms      26.73ms     2.81x
+>   256MB      150.78ms     52.97ms     2.85x
+>   512MB      303.04ms     130.38ms    2.32x
+>   1024MB     599.95ms     287.10ms    2.09x
 >
 
-BTW, I've tested your idea with a hacky prototype, when I was playing
-with my vswap series. It absolutely improves free time in the usemem
-benchmark :) Idea is very promising - I won't scoop your work of
-course, just letting you know that at least in my use case, it works
-:) Look forward to seeing it submitted soon!!!
+Hmmm, why are we batching at the zswap/zsmalloc level like this? I
+agree with Yosry that this seems like somewhat of an unnecessary
+layering violation. For example, do we observe a lot more performance
+wins by doing this instead of just simply:
+
+static void zswap_entry_free(swp_entry_t swp, bool deferred)
+{
+    ...
+    if (!deferred || !zs_deferred_free(entry->pool->zs_pool , entry->handle=
+))
+        zs_free(entry->pool->zs_pool , entry->handle);
+}
+
+(basically what you had in the last version).
+
+One weird effect of doing deferred zswap entry freeing like what you
+are proposing here, is that the zswap LRU will be littered with stale
+zswap entries. Seems like you removed them from the zswap xarray, but
+they're still linked into the zswap LRU? At writeback time, that will
+throw off the statistics used in the heuristics, and will make
+writeback go through a bunch of stale entries, wasting more cycles :)
+Seems a bit inelegant, no?
