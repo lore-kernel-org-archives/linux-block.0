@@ -1,102 +1,139 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACC73EDAA7
-	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 13:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AB73FD152
+	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 15:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778507085; cv=none; b=s7soA9Lfg5OMgScP8GCuJ5pU4BI1tT+ux5btqt/OScSUqW+w/dLgUVPJ6BthoQoWhJk8FfiTqtFHA836Is/7rkwL7GC7f36ond0P10B2VqciIbH2klY3DMaH6xGR6yqxGYVVaYU+U/08Pbjvjyiw6tyEwN23D0sujpo4flqZVYM=
+	t=1778514118; cv=none; b=OOKiagJ5h5iZkiuiwNcfIvx8DkUhr8Kj/HTyM9Au+fM5Bu3TkyBcKdaVmbGUc82/lS/LepO7X8/BcM+W+TEfgHjp/5TjAeIjrXRtDas7ySWRfOkXvROqD7Pm3NoU1+XOAyFFFpyXM856gZNvL8Dn8n3eGdp5fsPWG1F6mEPzRsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778507085; c=relaxed/simple;
-	bh=HhoCeclU6mcEX5HqCwLQNyLrmPvKY4GVFSFC4NjCjlA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=LCVSwvIaxdSuXv0AJ1/0qVdpLePLJY6CBqiNwaNTXQfDtmnmFtWi21DqWUZggRFwEalXqVMkxAVsnONHXW/HESMDriSBPBsJpg5kbsUdVcLaSOz7Zjk3z5rzwxeUPHJWh/KJTaUEq7LceL8vbApwUbglCLanKiGgfXNux5EipVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=QLN/Oc4W; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1778514118; c=relaxed/simple;
+	bh=kVG0WDPsto5l7ZUTqiWn5Cqkt7EpnbeAgtsdgTQEtD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BKK0QrfBG6GQNOSu49vdF8a2UppF7TobaJdIYTrnwlRCmMSSvJGY1/H4H0lAdALPOnjzL1yYIXNsLaHF8X1yQT4cVvD05yOyUyZ2DA4Zo8HET5ZgFaz31MacmdaEU5waWlaakYB6NR8RCWFN+eeUE2FnysioJ9NdIw1FfTE57+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=TgswUlui; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="QLN/Oc4W"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-47c6f914617so2174141b6e.1
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2026 06:44:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778507083; x=1779111883; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dw8OyP3p59+OyJU1z+w4fzPTY3puC6FrPvvMcxdCwUI=;
-        b=QLN/Oc4WZ97tJJOv/u6ML+JvCQucXAGfG8rUBNhs/34OqjnQJaB26gE6bwvJnhnDYx
-         YFfgYIKWnvFkFGl3//TdsdhtZYuLMdGok3qJc34DlGzJSjl2y1vsWVzt6ZOZleKHGE1I
-         jy+4XDvi3ggXi/e4jZ1lmlSfOqCBLg/fXL5kIMjMDRA3yLIfPxhPE2ktd+1f/gVFXMbT
-         57qeDy2JFFosIKkecdNoXGtkDoiM7Aw0MAWKQKPJJCwPr7QIRimKoz48AyJiuHEAEztu
-         7BE2zJ4IHKpJjXt7DNNWQ+X7IZ7UPSf3o9rkhgSgkuKqBZyMHUALbkbdkbK/AjEdWAv+
-         TDLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778507083; x=1779111883;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dw8OyP3p59+OyJU1z+w4fzPTY3puC6FrPvvMcxdCwUI=;
-        b=Prud5HEsuHZ2R1aTDTh+mTzCI2LEZmrde7DMm+H7pdE5auKCup+ILc1Z/p4fh68Btn
-         97H+uSlg7rCZAE7ZxbJUVwnPic+36QWENmTo7bZ8GtOlGvisTQs3tMOmYd4BaZWlXqhj
-         TpwvxAcUD7bzzyC3wGUQrIlYtelYASMjJg44JYmAxN/mCrN3KhfsVqLUHqGj5FAIU8g5
-         B67uNWnwgxAy9ti7G2dd1SEeaxYN/CarM1sKJw7vD9WupAOkOibIJv81Hs/1pnHnBz8/
-         75qr2XBesIooFjR5jPTudyaumwg+k8sFXgeV0oUiAKq2xbsZiRwBoSUwwgH4o3Iejt6R
-         7ovQ==
-X-Gm-Message-State: AOJu0YwHOrchVt70m/BeH+rdHJVPVLB7n4ZayOZpT3MRJPNjw2Pdqau6
-	QDhxDFbDxYtDA/ea+6ZB5AJ8raoq+ohnHYqKalpg0HOAdaFn4GCdPNPjVSFQHGrTFvk=
-X-Gm-Gg: Acq92OGgJCtGP67THRJWPafA9SfA2yg5G5t93UoCw69dBh1nZ2BWj+SoOWgfQXN8MHs
-	KDcPCw6IxW2tE7/vIVzBd6B8jc5pDHOsGbEq1HK/WE904181D9cdzUtQP7YheFlQWUMtneauwyr
-	k5xQ9CfT7KsCMLFoNUUbePIgZtEe6/SrBkKkd9LK3/qOUXj1EOdlNBg1XfJdj549YdNplUxjRjP
-	8voI3iVvQXiZlY8hFsegZp5ve++OKqcDWgNgAlHUIfFCNRMRY9ovdKSNdXSp2Hk7vJNVy+cMBcZ
-	dd455c2l0IZOlHK3Zhvdx6MO40+1GFF03jzIJPGvBAVX/OO1FdAoKv1reh+vKEQNXyjytU+XI4X
-	s3Uq+BCj22TV4qvrsYgRb5v+EgvJLze2F5QqO7UzD/Pe0/FS+ASolnuQz0dQg5wkiKbpSyAHrIe
-	eC7f3L5rGu/nY97nUvZ5CgrmqNYCSW033edh+wKVpeYMyPVPLIomEEUayOZ4euKw8jn5x4j8TCA
-	ogjMJcgg8Gh4OM=
-X-Received: by 2002:a05:6820:8c2:b0:699:b16b:936b with SMTP id 006d021491bc7-69b36ad3868mr5064676eaf.11.1778507083059;
-        Mon, 11 May 2026 06:44:43 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-435571099a4sm9503962fac.7.2026.05.11.06.44.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 06:44:42 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>
-In-Reply-To: <20260510144843.769031-1-tom.leiming@gmail.com>
-References: <20260510144843.769031-1-tom.leiming@gmail.com>
-Subject: Re: [PATCH] ublk: reject max_sectors smaller than PAGE_SECTORS in
- parameter validation
-Message-Id: <177850708188.123140.14621938925915660284.b4-ty@b4>
-Date: Mon, 11 May 2026 07:44:41 -0600
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="TgswUlui"
+Received: from macsyma.thunk.org (pool-173-48-82-102.bstnma.fios.verizon.net [173.48.82.102])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 64BFfkGf012506
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 May 2026 11:41:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1778514108; bh=rkkf7GYy99no7sSxomt4p8c6EexRWWpSm7wuNfMKLIE=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=TgswUluicpDMnqN+xplQQqegb2mx2o+JcJ/m+Wz2zMrx/K4ByctL+Bm0mCKarKsYI
+	 1hkV5v7rgK736DEuA9/SddYTryhkVcbXSD9j5vAksGmH2MbVtbz3OaFA/CtnIhc5kq
+	 CFOdmyniVX7z7910dyC2b33IYF/izWyMo+fp7mCKR8XiWk1yviYACuZxDYnwYs7Inn
+	 t8yaYw3agbTcvgaR853qEF/OIxdD9MKiQBUYwj0WSKX3d9y7yfOClRSqioKQHkFg7N
+	 0qkmx2H59GK+QagkMQX6Ocvyd6wl5wT6TscGsY6HHPMEB7SHZnZqiLlkBgI2B61qzK
+	 74kRLtbiYhAlA==
+Received: by macsyma.thunk.org (Postfix, from userid 15806)
+	id 48DF86708EBF; Mon, 11 May 2026 11:40:46 -0400 (EDT)
+Date: Mon, 11 May 2026 11:40:46 -0400
+From: "Theodore Tso" <tytso@mit.edu>
+To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: xfstests-bld kernel config and automated tsting (Was: blktests:
+ status, expansion plan for the storage stack test framework)
+Message-ID: <20260511154046.GA21199@macsyma-wired.lan>
+References: <31a2a4c2-8c33-429a-a2b1-e1f3a0e90d72@nvidia.com>
+ <agHGnYHo4HEKhYJb@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <agHGnYHo4HEKhYJb@shinmob>
 
-
-On Sun, 10 May 2026 22:48:43 +0800, Ming Lei wrote:
-> blk_validate_limits() requires max_hw_sectors >= PAGE_SECTORS and fires
-> a WARN_ON_ONCE if this invariant is violated. ublk_validate_params()
-> only checked the upper bound of max_sectors against max_io_buf_bytes,
-> allowing userspace to pass small values (including zero) that trigger
-> the warning when blk_mq_alloc_disk() is called from
-> ublk_ctrl_start_dev().
+On Mon, May 11, 2026 at 09:27:38PM +0900, Shin'ichiro Kawasaki wrote:
 > 
-> [...]
+> - For easier config:
+>   - Ted has the config generation tool.
+>   -> I'm interested in it, and would like to take a look.
 
-Applied, thanks!
+The config generation tool is part of my xfstests-bld test appliance:
 
-[1/1] ublk: reject max_sectors smaller than PAGE_SECTORS in parameter validation
-      commit: 1860c2f85922917d8a46f16a6f4bd2298ffa0fb5
+     https://github.com/tytso/xfstests-bld
 
-Best regards,
--- 
-Jens Axboe
+I have blktests support integrated into gce-xfstests.  After setting
+gce-xfstests per:
 
+https://github.com/tytso/xfstests-bld/blob/master/Documentation/gce-xfstests.md
+
+Using it is basically as simple as:
+
+cd /usr/src/linux
+install-kconfig --blktests
+kbuild
+gce-xfstests --blktests
+
+The install-kconfig and kbuild scripts can be found in the
+kernel-build directory in the xfstests-bld repo:
+
+https://github.com/tytso/xfstests-bld/tree/master/kernel-build
+
+Note: In addition to --blktests, install-kconfig supports other options,
+including --lockdep, --kasan, --ubsan, --arch arm64, --kcsan, etc.
+
+
+Unfortunately, blktests is currently not supported in kvm-xfstests
+(aka qemu-xfstests, since it also works on MacOS's HVF).  It should be
+possible, but currently kvm-xfstests doesn't suport modules, and
+blktests is pretty fundamentally tied to modules.  With gce-xfstests,
+we upload a kernel.deb install it in the system under test.  With
+kvm-xfstests, we directly boot the kernel directly out of the build
+tree, which is much faster (5 seconds from "kvm-xfstests shell" to
+shell prompt)--- but doesn't support modules.
+
+
+Projects to improve blktests in my test appliance:
+
+   1. Add support for modules in kvm-xfstests and then enable blktests for
+      kvm-xfstests.
+   2. Add support for some kind of machine readable test results file
+      (e.g., junit XML or  kTAP)
+
+The reason why (2) is so interesting is that it allows for a
+convenient report generation which summarizes the test run, e.g:
+
+ext4/4k: 615 tests, 1 failures, 74 skipped, 4701 seconds
+  Flaky: generic/234: 20% (1/5)
+ext4/1k: 609 tests, 78 skipped, 5586 seconds
+ext4/ext3: 607 tests, 159 skipped, 5044 seconds
+ext4/encrypt: 590 tests, 191 skipped, 2768 seconds
+ext4/nojournal: 607 tests, 1 failures, 158 skipped, 4111 seconds
+  Flaky: generic/234: 20% (1/5)
+ext4/ext3conv: 612 tests, 2 failures, 76 skipped, 5212 seconds
+  Flaky: generic/234: 20% (1/5)   generic/409: 20% (1/5)
+     
+(Note: ext4/4k, ext4/1k, etc. are different file system test
+scenarios, which run on a different VM)
+
+The other reason why (2) is handy is that it enables using automated
+bisection searches, e.g.:
+
+   gce-xfstests ltm --repo linux-stable-gc -c ext4/4k generic/234 \
+       --bisect-good v7.0.5 --bisect-bad linux-7.0.y
+
+So if we had a machine-readable results file, ala xfstests's "check -R
+xunit-quiet", I could add automated bisection for blktests failures to
+gce-xfstests.
+
+Cheers,
+
+					- Ted
+
+P.S.  For more information about my test-appliance system, see:
+
+https://thunk.org/gce-xfstests
+https://github.com/tytso/xfstests-bld/blob/master/Documentation/kvm-quickstart.md
+https://github.com/tytso/xfstests-bld/blob/master/Documentation/gce-xfstests.md
 
 
