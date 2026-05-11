@@ -1,156 +1,145 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE0C3D301E;
-	Mon, 11 May 2026 15:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D185426ECF
+	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 16:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778515096; cv=none; b=q0mwdX99geQIzt6bJpw4eQN6RKJng67pEpb+KLDeBF5VCihKo2W5TLU/AgpK2FogYnLxn16KPlCiTnZ4kCrTr9E1xXPCXfvqL2q44grC0JglrDUJodEZROwJqTTCKTyCbHfYbowmtPfc8QHTGr/Uzo7vBzK7s/bA0I38BBsa32Q=
+	t=1778517077; cv=none; b=jXDIsown/enVjXs9U8NJUDMShAC6AqBqsTojrwb1evi88ZYc1P6ui1V4ePkw+oHjEL4N+FMegRgRRsX5lqbZrjg0CB8qY29NmlRIlk/cSrNasJRTfo13g7+2rgp/9X+TFlv2GAG0IuzbxE3K6q8uR0xS6wBgInRtPP9EmH2rKXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778515096; c=relaxed/simple;
-	bh=IOa2rk96FIJ7USIoXgWoPEPEpqlURjMbbFryJ4vbLH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=OKvTX+P+XrUl52Vc+hidVYGkBO4mu3OV9tOzFVPvBHwCaOMqGwhipEaFo16SJxmvaXi9UGTFRf+Jm9Yh5L3O7wabYs2D7MEnEkgetj+rmQkE0Psprg7DcYNvnT8kGnGPD/hvPs+uYTLkuYjVFShxZQssdRXDgtKZM3R7pa5k4iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=CKtoVvKg; arc=none smtp.client-ip=199.89.1.16
+	s=arc-20240116; t=1778517077; c=relaxed/simple;
+	bh=2R5gR/hie3mD3L/dsPaAEchXIuIO+bVWOLaX/i9UClY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tko5OHFTOTKzuTIYi9+5hSz4VVsi6QnG0HboK/eQJlQ/qCpx2zj89ZpWBewLXISXkw17We75QGV5y7ETgfTT/d5tuwKZJom8pTKrRZcCsHqDtVuLqMcSzHRxTWlhSfp+13cXfRtzxWbCZ/AOOzHtNylszhc7mjDlfpqDK/jfxw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=kSvJ+NlS; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="CKtoVvKg"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="kSvJ+NlS"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gDksL6ZNbzlffvb;
-	Mon, 11 May 2026 15:58:14 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gDlbR4sbmzlfgQH;
+	Mon, 11 May 2026 16:31:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1778515090; x=1781107091; bh=hNaKD1fQ5uJxjCybxNlROYmb
-	x5C050NUO18KAErj+vY=; b=CKtoVvKg3wdAdXsbWhnVTMYx7yfUXjWvOazftsR3
-	/98UGMBcuDQzBNM48f/WSHlUW5dyhMumQqu7d6PdOuZHMHwukoGfAm5Lf+0wKGEr
-	VPHg7d0+QO3yBRoRn4ZtNn992Oew+I/KoFL41edsyrcamNj5Yu1UVA2/id9lO46B
-	eEYUTXnw5u3diI+4TiaEhsLyEOtsLxBDF3C4pXCi9srKo+g2dRJFBgCuaPVgzow4
-	/CXexbL3mgpoGJ5gTOGfElB3+QWrzqiB6clEagOzRcY0x/zA16GmtIbc7zZjPMpr
-	4rc1P7553XnxzGc9tBr1/3UmuTU6+psZxoZZycxmDmu7pA==
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1778517071; x=1781109072; bh=Keeec/pdoEDXg+cyqYs1HnIHMv2Tlygg3up
+	U7kH/988=; b=kSvJ+NlSdn8p33zxbfjDMh9estNgKc6fdmcI3Ur+MQIZyZbpocC
+	Gao3hIpaHvtS7nb9/dbSwisFqFxi/na2ZNqGTcSiXXsaNJ4tZvUxlhdo2SCDzX3N
+	IB7HXfZ80XBGRM1YojsSJh2YXjnzBquF+Grr/wO1ByWQXrynSdSHI11ruY+8Sj9I
+	JU1RVlAUn513W6zPdWQv+MlIJ002jXpp6mDjvayaeIXu7375a2GN+xAe7XY/md5k
+	Z1yww3ssOsiEdirFdmxJv5MfT6bMymQsdj70hapIH1UtK8LCa/PuyUbk4mT7n6MT
+	Sz3nZvyEAukaQ3IXlA4veiZEYI30VkCQHnw==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id BuYqrM0zrkxa; Mon, 11 May 2026 15:58:10 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
+ id IW7kvMor3g2M; Mon, 11 May 2026 16:31:11 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gDksD6N9SzlfpM6;
-	Mon, 11 May 2026 15:58:08 +0000 (UTC)
-Message-ID: <c0047a38-3d02-4ce5-88b0-2b7d0b9b69fa@acm.org>
-Date: Mon, 11 May 2026 08:58:07 -0700
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gDlbK6gJzzlfdvj;
+	Mon, 11 May 2026 16:31:09 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Marco Elver <elver@google.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v4 00/12] Enable lock context analysis
+Date: Mon, 11 May 2026 09:30:42 -0700
+Message-ID: <20260511163100.1887263-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loop: Fix NULL pointer dereference by synchronizing
- lo_release and loop_queue_rq
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
- Damien Le Moal <dlemoal@kernel.org>
-References: <69e2ca14.a00a0220.1bd0ca.0031.GAE@google.com>
- <e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp>
- <e33b4060-69d9-4d02-a330-2fbd19249237@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <e33b4060-69d9-4d02-a330-2fbd19249237@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 5/11/26 4:43 AM, Tetsuo Handa wrote:
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 0000913f7efc..9be47ce97dab 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -93,6 +93,7 @@ struct loop_cmd {
->   static DEFINE_IDR(loop_index_idr);
->   static DEFINE_MUTEX(loop_ctl_mutex);
->   static DEFINE_MUTEX(loop_validate_mutex);
-> +DEFINE_SRCU(loop_io_srcu);
->   
->   /**
->    * loop_global_lock_killable() - take locks for safe loop_validate_file() test
-> @@ -1747,8 +1748,19 @@ static void lo_release(struct gendisk *disk)
->   	need_clear = (lo->lo_state == Lo_rundown);
->   	mutex_unlock(&lo->lo_mutex);
->   
-> -	if (need_clear)
-> +	if (need_clear) {
-> +		/*
-> +		 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
-> +		 * wait for already started loop_queue_rq() to complete.
-> +		 */
-> +		synchronize_srcu(&loop_io_srcu);
-> +		/*
-> +		 * Now that no more works are scheduled by loop_queue_rq(),
-> +		 * wait for already scheduled works to complete.
-> +		 */
-> +		drain_workqueue(lo->workqueue);
->   		__loop_clr_fd(lo);
-> +	}
->   }
+Hi Jens,
 
-There is already a mechanism in the block layer to wait for pending
-.queue_rq() calls to complete. Please take a look at
-blk_mq_quiesce_queue().
+During the most recent merge window the following patch series has been m=
+erged:
+[PATCH v5 00/36] Compiler-Based Context- and Locking-Analysis
+(https://lore.kernel.org/lkml/20251219154418.3592607-1-elver@google.com/)=
+. That
+patch series drops support for verifying lock context annotations with sp=
+arse
+and introduces support for verifying lock context annotations with Clang.=
+ The
+support in Clang for lock context annotation and verification is better t=
+han
+that in sparse. As an example, __cond_acquires() and __guarded_by() are
+supported by Clang but not by sparse. Hence this patch series that enable=
+s lock
+context analysis for the block layer core.
 
->   static void lo_free_disk(struct gendisk *disk)
-> @@ -1854,11 +1866,15 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
->   	struct request *rq = bd->rq;
->   	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
->   	struct loop_device *lo = rq->q->queuedata;
-> +	int idx;
->   
->   	blk_mq_start_request(rq);
->   
-> -	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
-> +	idx = srcu_read_lock(&loop_io_srcu);
-> +	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound) {
-> +		srcu_read_unlock(&loop_io_srcu, idx);
->   		return BLK_STS_IOERR;
-> +	}
->   
->   	switch (req_op(rq)) {
->   	case REQ_OP_FLUSH:
-> @@ -1888,6 +1904,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
->   #endif
->   	loop_queue_work(lo, cmd);
->   
-> +	srcu_read_unlock(&loop_io_srcu, idx);
->   	return BLK_STS_OK;
->   }
-
-Why SRCU instead of RCU? The loop driver doesn't set BLK_MQ_F_BLOCKING
-and hence must not sleep inside loop_queue_rq(). Additionally, the block
-layer already holds an RCU lock around all loop_queue_rq() calls. From
-block/blk-mq.h:
-
-/* run the code block in @dispatch_ops with rcu/srcu read lock held */
-#define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
-do {								\
-	if ((q)->tag_set->flags & BLK_MQ_F_BLOCKING) {		\
-		struct blk_mq_tag_set *__tag_set = (q)->tag_set; \
-		int srcu_idx;					\
-								\
-		might_sleep_if(check_sleep);			\
-		srcu_idx = srcu_read_lock(__tag_set->srcu);	\
-		(dispatch_ops);					\
-		srcu_read_unlock(__tag_set->srcu, srcu_idx);	\
-	} else {						\
-		rcu_read_lock();				\
-		(dispatch_ops);					\
-		rcu_read_unlock();				\
-	}							\
-} while (0)
+Please consider this patch series for the next merge window.
 
 Thanks,
 
 Bart.
+
+Changes compared to v3:
+ - Replaced the "block/bdev: Annotate the blk_holder_ops callback invocat=
+ions"
+   patch with a patch that adds __releases() annotations to the function
+   pointers in struct blk_holder_ops.
+ - Dropped the blk-zoned patch since a better patch from Christoph has
+   been merged.
+
+Changes compared to v2:
+ - Retained the block layer core patches and left out the block driver pa=
+tches.
+ - Inlined blkg_conf_open_bdev_frozen() and blkg_conf_close_bdev_frozen()=
+.
+ - In blkg_conf_open_bdev(), added a return statement if the
+   WARN_ON_ONCE() statement triggers.
+ - Replaced the "block/ioctl: Add lock context annotations" patch with a
+   __release() annotation.
+ - Replaced the blk-zoned patch with a patch from Christoph.
+
+Changes compared to v1:
+ - Rebased this patch series on top of Jens' for-next branch.
+ - Included two patches that split blkg_conf_prep() and blkg_conf_exit().
+ - Modified how patches are split. Split the block layer core patch into
+   multiple patches and moved the CONTEXT_ANALYSIS :=3D y assignments int=
+o the
+   block driver patches.
+ - Made the new source code comments easier to comprehend.
+ - Introduced macros in the mq-deadline and Kyber I/O schedulers to make =
+the
+   __acquires() expressions easier to read.
+ - Removed the changes from this series that are not block layer changes.
+
+Bart Van Assche (12):
+  block: Annotate the queue limits functions
+  block/bdev: Annotate the blk_holder_ops callback functions
+  block/cgroup: Split blkg_conf_prep()
+  block/cgroup: Split blkg_conf_exit()
+  block/cgroup: Improve lock context annotations
+  block/cgroup: Inline blkg_conf_{open,close}_bdev_frozen()
+  block/crypto: Annotate the crypto functions
+  block/blk-iocost: Add lock context annotations
+  block/blk-mq-debugfs: Improve lock context annotations
+  block/kyber: Make the lock context annotations compatible with Clang
+  block/mq-deadline: Make the lock context annotations compatible with
+    Clang
+  block: Enable lock context analysis
+
+ block/Makefile             |  2 +
+ block/bfq-cgroup.c         | 11 ++++-
+ block/blk-cgroup.c         | 98 ++++++++++----------------------------
+ block/blk-cgroup.h         | 13 +++--
+ block/blk-crypto-profile.c |  2 +
+ block/blk-iocost.c         | 96 +++++++++++++++++++++++--------------
+ block/blk-iolatency.c      | 19 ++++----
+ block/blk-mq-debugfs.c     | 12 ++---
+ block/blk-throttle.c       | 34 +++++++------
+ block/blk.h                |  4 ++
+ block/kyber-iosched.c      |  7 ++-
+ block/mq-deadline.c        | 12 +++--
+ include/linux/blkdev.h     | 21 +++++---
+ 13 files changed, 173 insertions(+), 158 deletions(-)
+
