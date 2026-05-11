@@ -1,98 +1,196 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5310B377560
-	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 11:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5927A314D2D;
+	Mon, 11 May 2026 11:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778499006; cv=none; b=pEhpNH4uk509er3BQmNJozh4gd1N9nHIoHIQyU2cEgG5Xa1AbJaabf0QHoKEaWPW6GMUp8vsLIDIaDBM3+CT4zABigRxdW9Pn3bytfIJBiazRphT5PC1MnUVETluf4R26sMPsBE4jNfY8BfYr1qeeMAhu/v68UorF3mzNA+JcLE=
+	t=1778499845; cv=none; b=AkQc6j+wEHqlAFi+WJqipsg7OykKikfQspJxJWtwJPAxeZ79JG7j0+lhBLOrjsEV+XyBA5BknXBeHe849PtioDcKCbvu7KBHgfgpjRBh2XhX98xqL/rvT6jZzq0jNMYyxBb0y/toFNKK06wqyTL1/o+zDZZGVyVPSbuNahgQ9Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778499006; c=relaxed/simple;
-	bh=IqeusD7M1GeDYISR0gEebUtKpnVGG12mdh36BE5ONCI=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GTTXtaGuVhPo5tox22S7oSOAfYG4lOGWv+xJ/zPfkF0uJ7dtZM01wZCnzgKFenUUeCaOOQiWBXgjlafSFhAigV+ulH4SeH+HBIT2Ip5BB1iB5EC5b3kVwzNGP9SSQDTrQNR8DyVD1lp2LH8wNR8902NqgwBI0tsqKvYsKOUt9So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQCdmNsA; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQCdmNsA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17A0AC4AF14
-	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 11:30:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778499006;
-	bh=IqeusD7M1GeDYISR0gEebUtKpnVGG12mdh36BE5ONCI=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=UQCdmNsA2HNRZi618Ti6Qgj7Eu2mu+CjUBP6v8fQlfk0MiE639MxL8eWXPHwelqmg
-	 9s8fwULbVpjE1SEqsNZ+1yE4RTDr+DPLjtlChVqZoRyMcRrjgnHr0K95KzeidjVFwo
-	 w/faNuiTciWBxTuAz3FiBcOsfbXOa9oYRzb5QLzhlV8ek504pFwt6ksLN6OJCC/N2J
-	 CAq+9d9Zv2jkQFfX5RXz5/NCue3ECTlzZLKbdQ2PqxWLhsk5fKPSz+SBFR918eIGyN
-	 CjsRmLQ+Kwaipq2MHQ7oPADPMBGKHgSAhkHEimGMc+1kpphIuC4IkzsVT5zFB+2voP
-	 kjP61TSkHblcA==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-38e7b0903cdso39693351fa.3
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2026 04:30:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8vcWXcJUNG40uFhOcMrg5DN9VFGnn37u/5LG9Qo4Aq+9+HMuwl3lkGvtke+B/ehPwuz8/PS+Ju8WZx7g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP81Z5ZEhbRpt9mCEcRea2nXp3YyYzrITluLOyk7ZTH4cJ1c59
-	NNenPB580R5EhjqIMAbq8YAGlY+4ZvIntw243uble1p+MSkW7hXCdjub7IXvrsd+kozo0bu+J+K
-	J40a3RHE4dKSLQlu200SB3aiXP/HFMeLj3solOQ0dxg==
-X-Received: by 2002:a05:651c:897:b0:394:5b8:485a with SMTP id
- 38308e7fff4ca-39405b84da4mr33981821fa.14.1778499004642; Mon, 11 May 2026
- 04:30:04 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 May 2026 04:30:02 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 May 2026 04:30:02 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260507-block-as-nvmem-v2-8-bf17edd5134e@oss.qualcomm.com>
+	s=arc-20240116; t=1778499845; c=relaxed/simple;
+	bh=gCzv8v1uAfyIzE+5M43AB+N7kVCSNtujZB9qgESEOyE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=O11bwuVZEuzZWewDudNCVEHDxBGi+ET1dDGxY01m72UCNzuWzgq61gPaJI8h1GRZW9Vslib1mHgefBfDL5gA+GzQ7xZP0M0mnxAUoxCKlp+SDSYmM0ScNnNxo/uQISNRhtLnM0mVg3fvZbXDdKSSqPU1/QhlE4fjpJ0epHtGR2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64BBhMFX097501;
+	Mon, 11 May 2026 20:43:22 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64BBhLPM097493
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 11 May 2026 20:43:22 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <e33b4060-69d9-4d02-a330-2fbd19249237@I-love.SAKURA.ne.jp>
+Date: Mon, 11 May 2026 20:43:18 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260507-block-as-nvmem-v2-0-bf17edd5134e@oss.qualcomm.com> <20260507-block-as-nvmem-v2-8-bf17edd5134e@oss.qualcomm.com>
-Date: Mon, 11 May 2026 04:30:02 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MfM7cTRA7fMG_ej2v1e=6aQDMz3t9TxvwXeJ0mR1VY2dw@mail.gmail.com>
-X-Gm-Features: AVHnY4J57m614VXHB1gG4Q2Qt_nwp6rzOp-nMalUaxmsHemzFoQ6bUJPlO5KxfQ
-Message-ID: <CAMRc=MfM7cTRA7fMG_ej2v1e=6aQDMz3t9TxvwXeJ0mR1VY2dw@mail.gmail.com>
-Subject: Re: [PATCH v2 8/8] arm64: dts: qcom: arduino-imola: Describe NVMEM
- layout for WiFi/BT addresses
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, daniel@makrotopia.org, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Ulf Hansson <ulfh@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
-	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Saravana Kannan <saravanak@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] loop: Fix NULL pointer dereference by synchronizing
+ lo_release and loop_queue_rq
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <dlemoal@kernel.org>
+References: <69e2ca14.a00a0220.1bd0ca.0031.GAE@google.com>
+ <e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav402.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On Thu, 7 May 2026 17:24:43 +0200, Loic Poulain
-<loic.poulain@oss.qualcomm.com> said:
-> On Arduino Uno-Q, the eMMC boot1 partition is factory provisioned
-> with device-specific information such as the WiFi MAC address
-> and the Bluetooth BD address. This partition can serve as an
-> alternative to additional non-volatile memory, such as a
-> dedicated EEPROM.
->
-> The eMMC boot partitions are typically good candidates, as they
-> are relatively small, read-only by default (and can be enforced
-> as hardware read-only), and are not affected by board reflashing
-> procedures, which generally target the eMMC user or GP partitions.
->
-> Describe the corresponding nvmem-layout for the WiFi and Bluetooth
-> addresses, and point the WiFi and Bluetooth nodes to the appropriate
-> NVMEM cells to retrieve them.
->
-> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> ---
+Summary:
+This patch addresses a NULL pointer dereference in lo_rw_aio() by
+introducing SRCU-based synchronization and explicit workqueue draining
+during device release. This race appears to have been exacerbated or
+introduced by recent changes in the block layer's request completion and
+freezing logic.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Problem Description:
+A NULL pointer dereference was reported by syzbot. The crash occurs when
+lo_rw_aio() access lo->lo_backing_file which has already been cleared by
+__loop_clr_fd().
+
+The investigation suggests a gap between loop_queue_rq() and the driver's
+internal workqueue. Even when the block layer attempts to freeze the queue,
+requests that have already passed the loop_queue_rq() state check but have
+not yet been queued to lo->workqueue can "leak" and execute after
+lo_release() has proceeded to teardown the device.
+
+Suspicious Commits and Behavioral Changes:
+We suspect this race became visible due to behavioral changes in how the
+block layer handles request completion and synchronization, specifically:
+
+1. Commit 65565ca5f99b ("block: unify the synchronous bi_end_io
+   callbacks"): This unified completion path might have altered the timing
+   or the visibility of in-flight requests during a queue freeze, allowing
+   lo_release() to proceed before the loop driver's internal asynchronous
+   work has been fully accounted for.
+
+2. Changes in blk_mq_freeze_queue(): In older kernels, the freeze mechanism
+   might have more effectively covered the window between queue_rq and the
+   driver's execution of that request. The current behavior seems to allow
+   __loop_clr_fd() to run while loop_queue_rq() is still in the middle of
+   scheduling work.
+
+Stability and Backporting:
+Because the underlying cause is tied to recent block layer refactoring,
+this patch should not be backported to older stable kernels without careful
+verification, as it may be unnecessary or lead to performance regressions
+due to the added SRCU overhead.
+
+Solution:
+The patch closes the race window using SRCU:
+
+* loop_queue_rq: Wrapped in srcu_read_lock() to ensure that once a request
+  passes the Lo_bound check, the corresponding queue_work() must complete
+  before the teardown path can finish its synchronization.
+
+* lo_release: Calls synchronize_srcu() followed by drain_workqueue(). This
+  sequence ensures:
+  * No new work can be scheduled (lo_state change).
+  * All ongoing scheduling calls have finished (synchronize_srcu).
+  * All scheduled work has finished executing (drain_workqueue).
+  * Finally, it is safe to clear lo_backing_file.
+
+Trace Evidence:
+Console logs with debug printk() patch confirm that __loop_clr_fd() has
+cleared the file for loop3 between multiple lo_rw_aio() requests.
+
+  [  122.956248][ T6148] loop3: detected capacity change from 0 to 32768
+  [  122.958217][ T6142] lo_rw_aio(loop3) starting read with raw_refcnt=0x0, refcnt=1
+  (...snipped...)
+  [  123.234786][   T44] lo_rw_aio(loop3) starting read with raw_refcnt=0x0, refcnt=1
+  [  123.254716][ T6148] __loop_clr_fd(loop3) clearing lo_backing_file with raw_refcnt=0x0, refcnt=1
+  [  123.265134][  T180] lo_rw_aio(loop3) starting write with NULL file (already cleared?)
+  [  123.265221][  T180] Oops: general protection fault, probably for non-canonical address 0xdffffc0000000014: 0000 [#1] SMP KASAN PTI
+  [  123.265238][  T180] KASAN: null-ptr-deref in range [0x00000000000000a0-0x00000000000000a7]
+  [  123.265255][  T180] CPU: 0 UID: 0 PID: 180 Comm: kworker/u8:7 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+  [  123.265276][  T180] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
+  [  123.265287][  T180] Workqueue: loop3 loop_workfn
+  [  123.265320][  T180] RIP: 0010:lo_rw_aio+0xd1d/0x1170
+
+Reported-by: syzbot+cd8a9a308e879a4e2c28@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28
+Analyzed-by: AI Mode in Google Search (no mail address)
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+Since this race condition is difficult to reproduce, we can't do bisection.
+I hope you can figure out what has changed in the block layer for this merge window.
+You might want to revert instead of modifying the loop driver.
+
+ drivers/block/loop.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0000913f7efc..9be47ce97dab 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -93,6 +93,7 @@ struct loop_cmd {
+ static DEFINE_IDR(loop_index_idr);
+ static DEFINE_MUTEX(loop_ctl_mutex);
+ static DEFINE_MUTEX(loop_validate_mutex);
++DEFINE_SRCU(loop_io_srcu);
+ 
+ /**
+  * loop_global_lock_killable() - take locks for safe loop_validate_file() test
+@@ -1747,8 +1748,19 @@ static void lo_release(struct gendisk *disk)
+ 	need_clear = (lo->lo_state == Lo_rundown);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	if (need_clear)
++	if (need_clear) {
++		/*
++		 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
++		 * wait for already started loop_queue_rq() to complete.
++		 */
++		synchronize_srcu(&loop_io_srcu);
++		/*
++		 * Now that no more works are scheduled by loop_queue_rq(),
++		 * wait for already scheduled works to complete.
++		 */
++		drain_workqueue(lo->workqueue);
+ 		__loop_clr_fd(lo);
++	}
+ }
+ 
+ static void lo_free_disk(struct gendisk *disk)
+@@ -1854,11 +1866,15 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct request *rq = bd->rq;
+ 	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 	struct loop_device *lo = rq->q->queuedata;
++	int idx;
+ 
+ 	blk_mq_start_request(rq);
+ 
+-	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
++	idx = srcu_read_lock(&loop_io_srcu);
++	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound) {
++		srcu_read_unlock(&loop_io_srcu, idx);
+ 		return BLK_STS_IOERR;
++	}
+ 
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_FLUSH:
+@@ -1888,6 +1904,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ #endif
+ 	loop_queue_work(lo, cmd);
+ 
++	srcu_read_unlock(&loop_io_srcu, idx);
+ 	return BLK_STS_OK;
+ }
+ 
+-- 
+2.54.0
+
+
