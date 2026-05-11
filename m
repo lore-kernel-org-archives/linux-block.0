@@ -1,131 +1,147 @@
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65DB47AF5D
-	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 18:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778523343; cv=pass; b=Rd3OUIe1VI5LxPURnkWY3VO8gU9Uh4m2Tru7q0dUOZqdvaMGjQwAYWi+C+KFjtSfXx9YUeunPxerU8P0Ywnc92TO4Wj5t3JWAKSWh9Hj3kEEE3PruxhD+iELzY5d4k7+V8Y9i316MjbXvd7Fnie86sggXYFCE6Prbz/GKLvrZ2Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778523343; c=relaxed/simple;
-	bh=Gq2oFI7fb9cvE5Ox5L24XethX2AXJ0og/l+ryUAg5Xw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fWJSxuJhrc6R2GSs6wXY0ehjjo1tbSe8pHVuUU1o8sePTX+eKoRUUdGBUIrDFWPWvfYdabk8Ol/TQEKVIYZQhrxOf1EfhSXrmEO3j2xmOPF8TzOJWhXG3OjhorkpiDo51kQC8Z5h8U+QuWD0ax/1wU7QsdSSbETq8XQhjOXLdM8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ri/N4RpS; arc=pass smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD775388E55
+	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 21:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778534648; cv=none; b=tJe1+J9xxnB6CD8DdMwxHoFHF2yjNZpMhZqAdBI/OO+9CmIhGNkv8t37S8y8YayRVydtY3SqXTMefjGthLiagdHr2cf3eBoAACP/1Vo4usmF0ICttDEDe53rM3ykgJxUlnD4+eCxu9LL4s1ccNuou15iso7+QZ8bn36YTkDm1Ik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778534648; c=relaxed/simple;
+	bh=3thlf8owW1YrKqHXFc7okAlkd2LemVmenzlnMg4WkV4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kBU7smmzddtZkb1e+UjqdI69eBNJF4Lr9rRA5GlZpx4Un+VzuGw+7NHdJptnkJlUAJLzQHGCOPmkj9o+0Q3HPYgVwealPZhlv3DDCgujdSVVS+BmvjrBp8CZlueX7atNAGZ/E5OqWjznERMxmKRQFooCIVpQ5D8HVBamsuZnZUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=YYqRkzKo; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ri/N4RpS"
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-132d1b2519eso2319442c88.0
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2026 11:15:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778523341; cv=none;
-        d=google.com; s=arc-20240605;
-        b=M1fuQIcBUiPcg6kv/2Y3puzg85CRx5Vnf01bUryQTUsCg1wSNRSTddh3pP2kBhqHiu
-         qMuzvQGXqEbhZm6aaX7SPKLJrM+Uc/B2zFOKCaFa5nKOPBMDw8dWVw6y36eVMxtls5dL
-         lXOmfjJoJAMXW+fwhYtWelErPD4oX4ISwidJoyxeSDOOhrXhnNZqqXrn6zmzsz+1ABAl
-         fC4LiFJmVJdqhU/pfFEsXdEXg9PyYOtKq0cjRFBiGBHVnMKgo21WR0Yjm+6ThE3dkh3f
-         QPQcXPK6kn0tqM6PKZpBbbBOeBveSkzj8aSsTbU6170V87IloW99ZjkjuKBmWZMS+Lg3
-         9Y8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Gq2oFI7fb9cvE5Ox5L24XethX2AXJ0og/l+ryUAg5Xw=;
-        fh=ViS+U0XSm9VrJ40hsLN7BGhztb1Ozd2wap2dS7FknJ4=;
-        b=Na5C1nhWHBFvIoXzlG+PHoM6tQ/B68sggt3rDfSgshIZd1NCZDsGmhjlBOcIfQ+hkP
-         RJg4QShX4vcCXxphetjQGoqr9eyBOiZVBExK9qZ3Y+Arz404Wyo1E4eNxr5HQG+ABTGu
-         V2oe9gpBSWSlYWjLgW8JE45D9dnfzjit31ZKiNFTXaOM4bER8+omDbp53lpBscKiCNL2
-         QEV5tqbOzWFv1phwk+UrYvR+gpcNzQoQ037FvNYsD5Rqy1anJLMJSIgKnGw+8xTY2VP/
-         c2ppCZ6ylcOpnlE8sQtGRFpdvPw2s7yNPxqcoT567xcSXpz32xaxVDzQ9CWi2NPmSlQn
-         a4vA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="YYqRkzKo"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4891f6b6388so1478105e9.0
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2026 14:24:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1778523341; x=1779128141; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gq2oFI7fb9cvE5Ox5L24XethX2AXJ0og/l+ryUAg5Xw=;
-        b=Ri/N4RpSfFZ6LsHcPouESUv9MOkoBI4Vfi7jDvfzJwhpUpXAM0hL4iAsQ0Qj4gmkj8
-         e6solSLImnMAD+P8x2fE9bmRgIYpBwFFp06p0/yOWbTqbyIEHcJJ6usz6dReeGbQT42r
-         suH3/0/NPL+nfhPLbr5R0zp9egXx6oulOLA35GbRi2J2XTGdoOtGRgS9C13q4vLAGhV/
-         bZ83SxAIn/f6/3t1x+RYD5FuxbqyklSgN0N3bsobMM08eM6q87H2SCPl7wBNdHKg+4F0
-         PcWXVPy/Gxsz6xWlfiPZHQrnJUg7XOADxsAaLWIeDGz57TQAffloixqkjkDOBDkYXJZ6
-         UBYQ==
+        d=purestorage.com; s=google2022; t=1778534644; x=1779139444; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LrtoJAjNIEskZcGprZzXovRMS9udKv5uVIH5xK3Q3Q0=;
+        b=YYqRkzKoiEois+vPgnWZHBHuiWAonUXfEjSAds26MXI6s7+XfnEKnFgv/AtLdIMA/I
+         8qZ/CbvLvqKPDeIDCaq4thYx5ee3fQaso/OHsocs8R6gzPtEGqMo5OU5jYeuGsYEC3pN
+         kz8vQzoFFk9QgPJnAg3DhztVBPkQNWzMhn2UWia22ik7Hq/zgBdOMoUmaaKHKHB+iJ4Q
+         XU0tcLTydkZLxPWq4IS1Cht71g1a/TCMKeVLTRr1C5l4iGvwUL6qdvbZs/bhCWit81fY
+         kXvpDBzIQ4/vZ+YirA1ztj/yvMrSAp3T3AVfsD//Sv1uq+ikl2BnQK/eOzjk0aaGkkBc
+         Z9DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778523341; x=1779128141;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1778534644; x=1779139444;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Gq2oFI7fb9cvE5Ox5L24XethX2AXJ0og/l+ryUAg5Xw=;
-        b=tWgnXEMUG38Lx99kGuV7nEHZm7TuKPRE104oGdQftwTh6KREeHD+YkqC6Fr2Dc/pM1
-         mDiFmwc5evrwf1hC9svjWfktLqegYgzPaszk8nWb4LvpBCjpCAriZsjXWv+71aCh/Et2
-         t1Dd6saO8L8hgR9fqfN3ZkN2BpaQdhSSj6P+g6YuXFH45Vg7feX7aESL7B5InXyPRQrq
-         hSJkUJnwMChgHBrRliJ6NKEjy52MxFSD1o15hbX+j77a+xvHYJXV/UkGmHS+nSu2c5L+
-         ZqWAfFJhkIIKGM0RhNHp0Y822HKd/UA91ubmNfedDDgCccNkNK+nSnx187brgtQ+OL2H
-         kG7A==
-X-Forwarded-Encrypted: i=1; AFNElJ/lZY6y2g7nSc4hqzIYtE9kl+ZZdvCOcb6SFbMr8RmEW86jCqWikS4RWgx8SUdaDKBV474B+YENkO/gDg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSLNaU1AuTqlli9O1J42QKd1IK/mlEhOd13F5LkYvwpqhOh37f
-	tWh7vBLCZKUd/AMeVbGP1WSy5aj78ou10+wIZ/JeAxv4dfYq7ROe5gnYcAbKrCTnD7tUUTzMZNc
-	pS9G1U4J6f84QM+0XDAdFKnQj2ruKZxOumwMJPu7g
-X-Gm-Gg: Acq92OHtln3q3CX5JU0dI1Wxuvos7vAwDoyLOzjJKuTbYC9Q97KkrTm0eyOW8CjPEff
-	TJsKQWgHoM0F7kuBKdC77YlmmQ/0Cahf2j/h/NlnRfm7CHc4XO0lgHbTC2miwtFzO1vIdLihyta
-	XFuKOHPemYNbB068MMLh5cZ83Sq1j/CR/929dtdPvar6kp9orddgv/7U9lZmDoQvh7JoE2o2fjI
-	m6WC6xVEmCxpsnuAj841p68QmDRN7ZHYgHQWxfPzYx6EbuBsCAj9vIvI7FJUF1wgAhVE/2HkkvW
-	/o+4rP+PLNXhH+o+dGnpf2c1Dyk7MMauHvlQeQ3AIfyVWnT7yw==
-X-Received: by 2002:a05:7022:2511:b0:12a:b39a:339f with SMTP id
- a92af1059eb24-1319cd2660fmr12214055c88.21.1778523340163; Mon, 11 May 2026
- 11:15:40 -0700 (PDT)
+        bh=LrtoJAjNIEskZcGprZzXovRMS9udKv5uVIH5xK3Q3Q0=;
+        b=e177jVR7tSFa4Rxgnt5YEmeXYFk5AVuMojYJ1rvXgGOMI42cnkRwjL5R3jZHfpZ/MI
+         HjJweR7lNGN05jt7198WPNRYx2dpbFS0y36s34pC7/96xkgj+7h6qng5hPM9ES3Ydx+9
+         WPnwfOWdrU6A6CQZfngHYt43VELfxIhk85TAVVqmx2jnoLWtuIpOAstZEfY6o6IvJJwZ
+         5mH5SNT397d2PPf2uyuc//TZsNXNNJvalqtn8oqb6zTZ/iIvGZnKBkAKah019J52pNON
+         Fdig6K8ZaqfSOTr2ByiS8rZCq+LRZkmzMwqn/iI7PDv6PpcXqRoyUXg8l0pt2NSkQxz5
+         i59g==
+X-Forwarded-Encrypted: i=1; AFNElJ+z1zWcVTqcn5VkL16A2wI5vw0PcMKNUZO2iTAxtPUqFM7otPRwfeg8IWj9xv6+PIBgZ2dV/5eA/6dH8w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywau+at5P6NA1Cd9BytF9ylZSlu1xQqPRjdFKAlTiHlZvEw4gsI
+	8ED/ABnLCy0CGwUbnKcqQqVPcnSGG9dT4MNp7jUfw7kBkWlwKgy5iP2ZU+CghLHvbPs=
+X-Gm-Gg: Acq92OHZoPSt1oN0VaRdwgfPn7ftFoh4r3qIqri6PAAy6iRLFhXhFUqwNOerh93l9ua
+	evmjOnJrYWdWhCUJsFAC9EGAqpSd4uu3FevpzOScFEPhzh8Enw2fdFDZivmr6/m2rx5HlH2zvp5
+	8X20ueTorpzgWYT2BFMwXDG4CCUKcSm+K8cQmOnrUd2f+EHG6X3Hma3Hq7FTzTiwFzTsHm4XYAv
+	3y+cW9gvdbgI+vtPWKCkMbUo3BkgYrzYjEkZS4MdPsZpfgd9E0ljF20vaupGL903u+/hTZ3isjh
+	u4rTQTk3E6SRqvq9tLbK9qXAa8f1qUm5CkI3/d3mIrNhOoHqcWmSF1aBtAZ/MsAFmgpNTf84lql
+	5qBd3GtV5gWZ/FH1lVLGWx4SeD1YCRdePCFZqgiVKmqek/AgHwaS0A1En3jHC9SVlMDPIkac0cS
+	A8mQU9SLsAsg+/+vdVZYVkhYJxqd/EyD5TbzKCtdKtfQDXEfxz
+X-Received: by 2002:a05:600c:3595:b0:48a:5664:f44a with SMTP id 5b1f17b1804b1-48e5325018dmr229880365e9.2.1778534644261;
+        Mon, 11 May 2026 14:24:04 -0700 (PDT)
+Received: from dev-cachen.dev.purestorage.com ([208.88.159.129])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-48e702e042dsm219069155e9.5.2026.05.11.14.24.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 14:24:03 -0700 (PDT)
+From: Casey Chen <cachen@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	Casey Chen <cachen@purestorage.com>
+Subject: [PATCH] block: recompute nr_integrity_segments in blk_insert_cloned_request
+Date: Mon, 11 May 2026 15:22:30 -0600
+Message-ID: <20260511212230.27511-1-cachen@purestorage.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260402183950.3626956-1-bvanassche@acm.org> <20260402183950.3626956-3-bvanassche@acm.org>
- <20260409064221.GA8378@lst.de> <CANpmjNMUv5n2VrWGPBOzGg7-r6gf3hH6ZoJYtRsrntY8+_=fQg@mail.gmail.com>
- <2e09806a-d5fe-4581-8024-906be7dca4de@acm.org> <CANpmjNPJPz7qruFw8S=4qoF32snPW-RYrd_BZK6skR_y86CUZg@mail.gmail.com>
- <08078df0-d3e6-4860-b22b-937035d45857@acm.org> <CANpmjNONpHgSzavkbqdbM2N0oCtt2_2+UqBCMWjMaWEcWrCy4w@mail.gmail.com>
- <2a2c46fb-c934-4ecc-b3cb-4e4114a6d6bf@acm.org> <CANpmjNPzuCUKRPFXZ8ckiCE01kc85xzOiMB05Y9OC9J4Lwi61w@mail.gmail.com>
- <CANpmjNM6nERjfhNBE=D93E+HMaQtJWyi9s2qHmLWrmtBFt05vg@mail.gmail.com> <0b5bcac4-f58d-4cb0-9d58-fef74238edb8@acm.org>
-In-Reply-To: <0b5bcac4-f58d-4cb0-9d58-fef74238edb8@acm.org>
-From: Marco Elver <elver@google.com>
-Date: Mon, 11 May 2026 20:15:02 +0200
-X-Gm-Features: AVHnY4LV4Jvva6FrTXljUA-Ri8JDZJ0bhywCKET3zioGRo852eRBjSeQuKq3HEE
-Message-ID: <CANpmjNPduiwLHUtT=woSoVj07-CJjbTyCpsznt-Hmg6SaV+T6w@mail.gmail.com>
-Subject: Re: [PATCH v3 02/12] block/bdev: Annotate the blk_holder_ops callback invocations
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Damien Le Moal <dlemoal@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 11 May 2026 at 18:37, Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 5/10/26 11:00 PM, Marco Elver wrote:
-> > Clang 23 will have function pointer support:
-> > https://github.com/llvm/llvm-project/commit/d1e84bb9ad3b6a844cd902cf70e2764cb8126979
->
-> Thanks Marco for having implemented function pointer support in Clang!
->
-> As you may already have noticed a new version of this patch series has
-> been posted that relies on this feature.
+blk_insert_cloned_request() already recomputes nr_phys_segments
+against the bottom queue, because "the queue settings related to
+segment counting may differ from the original queue." The exact same
+reasoning applies to integrity segments: a stacked driver's underlying
+queue can have tighter virt_boundary_mask, seg_boundary_mask, or
+max_segment_size than the top queue, in which case
+blk_rq_count_integrity_sg() against the bottom queue produces a
+different count than the cached rq->nr_integrity_segments inherited
+from the source request by blk_rq_prep_clone().
 
-Nice.
+When the cached count is lower than the bottom queue's actual count,
+blk_rq_map_integrity_sg() trips
 
-> Combining -Wthread-safety with
-> annotating function pointers with older versions of Clang results in a
-> build error. Should a test be added to the kernel build such that
-> config WARN_CONTEXT_ANALYSIS can only be enabled if Clang supports
-> annotating function pointers?
+	BUG_ON(segments > rq->nr_integrity_segments);
 
-Ultimately, we'll be bumping the min. version:
-https://lore.kernel.org/all/acqELlVC6vEeEF-W@elver.google.com/
+on dispatch. The same families of stacked setups that motivated the
+existing nr_phys_segments recompute -- dm-multipath fanning out to
+nvme-rdma in particular -- can produce this.
 
-Not sure when Peter wanted to pull that in - I believe we wanted to
-wait until distros have a reasonably up-to-date Clang 23-dev version
-in their repos.
+Mirror the nr_phys_segments handling: when the request carries
+integrity, recompute nr_integrity_segments against the bottom queue
+and reject the request if it exceeds the bottom queue's
+max_integrity_segments. blk_rq_count_integrity_sg() and
+queue_max_integrity_segments() are both already available via
+<linux/blk-integrity.h>, which blk-mq.c includes.
 
-For the time being, you could do this in the subsystems that need it:
+This closes a latent gap in the stacking contract and brings the
+integrity-segment accounting in line with the existing
+phys-segment accounting.
 
-CONTEXT_ANALYSIS := $(call clang-min-version, 230000)
+Fixes: 76c313f658d2 ("blk-integrity: improved sg segment mapping")
+Signed-off-by: Casey Chen <cachen@purestorage.com>
+---
+ block/blk-mq.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-... untested though, so please check it works.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4c5c16cce4f8..d0c37daf568f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3307,6 +3307,25 @@ blk_status_t blk_insert_cloned_request(struct request *rq)
+ 		return BLK_STS_IOERR;
+ 	}
+ 
++	/*
++	 * Integrity segment counting depends on the same queue limits
++	 * (virt_boundary_mask, seg_boundary_mask, max_segment_size) that
++	 * vary across stacked queues, so recompute against the bottom
++	 * queue just like nr_phys_segments above.
++	 */
++	if (blk_integrity_rq(rq) && rq->bio) {
++		unsigned short max_int_segs = queue_max_integrity_segments(q);
++
++		rq->nr_integrity_segments =
++			blk_rq_count_integrity_sg(rq->q, rq->bio);
++		if (rq->nr_integrity_segments > max_int_segs) {
++			printk(KERN_ERR "%s: over max integrity segments limit. (%u > %u)\n",
++				__func__, rq->nr_integrity_segments,
++				max_int_segs);
++			return BLK_STS_IOERR;
++		}
++	}
++
+ 	if (q->disk && should_fail_request(q->disk->part0, blk_rq_bytes(rq)))
+ 		return BLK_STS_IOERR;
+ 
+-- 
+2.50.1
+
