@@ -1,73 +1,75 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD775388E55
-	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 21:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E920637E30D
+	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 21:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778534648; cv=none; b=tJe1+J9xxnB6CD8DdMwxHoFHF2yjNZpMhZqAdBI/OO+9CmIhGNkv8t37S8y8YayRVydtY3SqXTMefjGthLiagdHr2cf3eBoAACP/1Vo4usmF0ICttDEDe53rM3ykgJxUlnD4+eCxu9LL4s1ccNuou15iso7+QZ8bn36YTkDm1Ik=
+	t=1778536318; cv=none; b=ko54mOZrDgEgE+pqUkHUAxlSVxdBAx9yaT6B0hMrODntq6rHdahFreNTkaiAI9tL6LPlLCrsHDzQk0OYqJZt2ONYY53Prze4sIKj7a0X029O+2cevB1+IV7ZPWX6HVMdC92DQjwU/qEgXwdOZ8wXCmQq60413taoRqUk2yvZItA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778534648; c=relaxed/simple;
-	bh=3thlf8owW1YrKqHXFc7okAlkd2LemVmenzlnMg4WkV4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kBU7smmzddtZkb1e+UjqdI69eBNJF4Lr9rRA5GlZpx4Un+VzuGw+7NHdJptnkJlUAJLzQHGCOPmkj9o+0Q3HPYgVwealPZhlv3DDCgujdSVVS+BmvjrBp8CZlueX7atNAGZ/E5OqWjznERMxmKRQFooCIVpQ5D8HVBamsuZnZUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=YYqRkzKo; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1778536318; c=relaxed/simple;
+	bh=H884xHAasWhJMrJEAQrb8OdVWipJmcLKpX0XCXbKWAQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WPkvw+Gy3+Gb9/QZ+VHp+Ss42REVzUXb2ZOGEeY/aP3e3H6n1567YQkXJgi+yKZ4Ty8pheyezYGZyusgJKHsc855Qb+Szykyj+7UCUaiW3p3SFbOREGAMHeH1ia2siRqobtI67uFNCfMU3VF1BkS0s3YOSAMQOJ2fhwzrWIZ+5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c836qKmL; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="YYqRkzKo"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4891f6b6388so1478105e9.0
-        for <linux-block@vger.kernel.org>; Mon, 11 May 2026 14:24:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c836qKmL"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-48e8132c6d0so13785465e9.1
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2026 14:51:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1778534644; x=1779139444; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778536315; x=1779141115; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LrtoJAjNIEskZcGprZzXovRMS9udKv5uVIH5xK3Q3Q0=;
-        b=YYqRkzKoiEois+vPgnWZHBHuiWAonUXfEjSAds26MXI6s7+XfnEKnFgv/AtLdIMA/I
-         8qZ/CbvLvqKPDeIDCaq4thYx5ee3fQaso/OHsocs8R6gzPtEGqMo5OU5jYeuGsYEC3pN
-         kz8vQzoFFk9QgPJnAg3DhztVBPkQNWzMhn2UWia22ik7Hq/zgBdOMoUmaaKHKHB+iJ4Q
-         XU0tcLTydkZLxPWq4IS1Cht71g1a/TCMKeVLTRr1C5l4iGvwUL6qdvbZs/bhCWit81fY
-         kXvpDBzIQ4/vZ+YirA1ztj/yvMrSAp3T3AVfsD//Sv1uq+ikl2BnQK/eOzjk0aaGkkBc
-         Z9DA==
+        bh=FNrh6D5SHjoaH2WyyedqLt7IdCIpYru9M1cGpz/UP08=;
+        b=c836qKmLSZ/guB0D49Qeaumcb1R5sbopcwh1yebzG/iFPdQFvS8IUFF9CrtLFepw1e
+         I/swRcQXoIfI4ueEIvxINExBoWcll8KtMmnSw3cnDpADTuNgUNcKR8oHXjq3ma5eYGei
+         yI/hwRn3Y7npFSnBZS6LEKaRMuTiuGlc2pNyPstCB5mQYf6rO1c/uyf8GesY0BSm3TLt
+         nIwkUyngYiU1OK7KbTsDttwpOmS6nyXMjtkaGoet/vGMogLsORiuNoKCNBMMZIqD+iVi
+         YmmZGABXtAjp6KUftXYJpSKQ23D6knZYaVgAEidCLsbELtEuvnxk+DqGi6OT2yT0YvH6
+         GTIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778534644; x=1779139444;
+        d=1e100.net; s=20251104; t=1778536315; x=1779141115;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LrtoJAjNIEskZcGprZzXovRMS9udKv5uVIH5xK3Q3Q0=;
-        b=e177jVR7tSFa4Rxgnt5YEmeXYFk5AVuMojYJ1rvXgGOMI42cnkRwjL5R3jZHfpZ/MI
-         HjJweR7lNGN05jt7198WPNRYx2dpbFS0y36s34pC7/96xkgj+7h6qng5hPM9ES3Ydx+9
-         WPnwfOWdrU6A6CQZfngHYt43VELfxIhk85TAVVqmx2jnoLWtuIpOAstZEfY6o6IvJJwZ
-         5mH5SNT397d2PPf2uyuc//TZsNXNNJvalqtn8oqb6zTZ/iIvGZnKBkAKah019J52pNON
-         Fdig6K8ZaqfSOTr2ByiS8rZCq+LRZkmzMwqn/iI7PDv6PpcXqRoyUXg8l0pt2NSkQxz5
-         i59g==
-X-Forwarded-Encrypted: i=1; AFNElJ+z1zWcVTqcn5VkL16A2wI5vw0PcMKNUZO2iTAxtPUqFM7otPRwfeg8IWj9xv6+PIBgZ2dV/5eA/6dH8w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywau+at5P6NA1Cd9BytF9ylZSlu1xQqPRjdFKAlTiHlZvEw4gsI
-	8ED/ABnLCy0CGwUbnKcqQqVPcnSGG9dT4MNp7jUfw7kBkWlwKgy5iP2ZU+CghLHvbPs=
-X-Gm-Gg: Acq92OHZoPSt1oN0VaRdwgfPn7ftFoh4r3qIqri6PAAy6iRLFhXhFUqwNOerh93l9ua
-	evmjOnJrYWdWhCUJsFAC9EGAqpSd4uu3FevpzOScFEPhzh8Enw2fdFDZivmr6/m2rx5HlH2zvp5
-	8X20ueTorpzgWYT2BFMwXDG4CCUKcSm+K8cQmOnrUd2f+EHG6X3Hma3Hq7FTzTiwFzTsHm4XYAv
-	3y+cW9gvdbgI+vtPWKCkMbUo3BkgYrzYjEkZS4MdPsZpfgd9E0ljF20vaupGL903u+/hTZ3isjh
-	u4rTQTk3E6SRqvq9tLbK9qXAa8f1qUm5CkI3/d3mIrNhOoHqcWmSF1aBtAZ/MsAFmgpNTf84lql
-	5qBd3GtV5gWZ/FH1lVLGWx4SeD1YCRdePCFZqgiVKmqek/AgHwaS0A1En3jHC9SVlMDPIkac0cS
-	A8mQU9SLsAsg+/+vdVZYVkhYJxqd/EyD5TbzKCtdKtfQDXEfxz
-X-Received: by 2002:a05:600c:3595:b0:48a:5664:f44a with SMTP id 5b1f17b1804b1-48e5325018dmr229880365e9.2.1778534644261;
-        Mon, 11 May 2026 14:24:04 -0700 (PDT)
-Received: from dev-cachen.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-48e702e042dsm219069155e9.5.2026.05.11.14.24.02
+        bh=FNrh6D5SHjoaH2WyyedqLt7IdCIpYru9M1cGpz/UP08=;
+        b=O5mx76HkDbDjS47ch93cF1ASkMyM3FKynDhCUyzBviZ8RtQIAUE+1MRP6BDiTB5G+d
+         q322Uy4D9Xrunk4u8c6fhsZkyrp2sd4mio2NGmbbW0wGLI99LtXcgzh0UnTISULU9qp5
+         tT9uMYcshAFzUwpD89pWM7MWwK4emAUl2m3enAjPbeSPqS3iNHK7cwBGNEcTK/nAPgwv
+         2Uq40RKU7ZuZEHPygUgTaS2ncbm8UrwIIec80X5H9rVJ+rPGaelRBvXkvLVj/GNLwasF
+         uNJ3KiVkXQZh8kI3DAuN6WyOnAQHtSHerEU9CMP/KYcfoHIIvCi/Yg8g3Gsw2Wvu65dF
+         F+Aw==
+X-Forwarded-Encrypted: i=1; AFNElJ8QJAkYMIKcVht7XKip0+qSQ0IjyaQJPn4vuToOtWb6H5+Xp5msPTIYlfJZ2HRr305yfHKY5IVyRXc4Ew==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCb7ex69r3uI7I2l+eYXIkQqfgszKbgulFgGuNI3bSpQDFenjY
+	L76bqDIvo0aHUVrGW80ZaFFb62ii3irAtaI7C5GQxlpkk0VvJ8BDfh6TozImR8dFcWbEtg==
+X-Gm-Gg: Acq92OEYv/0gjGEhgiugBCiBhcdOUH8ir1iQ2AE2u4DpMylAuiiOFmP3I9d2GzvvFeK
+	9hc6sy1Ui6BQGzzueWgG9VU2qZzv1NPEZgD/zZOG6mIrkvwuYqeBUPHgbXnVzTp7qDWedj5gv3R
+	o8DtvxCOLfnfc6133G7HzHynHEmcXIV79DdSasZPxpx+NZnRwsIYtKx2F3fIWluZUnvzGvZuPk3
+	05YxnEAmm9SHgxCHzOZW93ILqhBxpHjILpL2AKPiuHB4IL6Lbq+BL8s0d2IGYoR7HNbIfw1WoU/
+	4bGi4Nqzdg4JuYvYsaQnDceZd5W5WZBxui3kMaN0IBGeBSKIJAjDVLQEL2tpzu4QSHipqyQknch
+	cSMa/pxRCUh/Z/ZrN+N7YNVUaWJv5iw8DCg11Wi5hVxWOpk0zTMur0QyFK0FyOQIbgYiESbp5EI
+	s1A5RnlijhgwI968fPw7cE28iKfUNskIGJqMh11Nkn54gP54rwne87XNyi+ot61zrS6m+630pQ/
+	1WqNHXkfJE=
+X-Received: by 2002:a05:600c:15d1:b0:48d:112c:f582 with SMTP id 5b1f17b1804b1-48e51e1e415mr254346135e9.11.1778536315089;
+        Mon, 11 May 2026 14:51:55 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48e8f42a845sm2918695e9.20.2026.05.11.14.51.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 May 2026 14:24:03 -0700 (PDT)
-From: Casey Chen <cachen@purestorage.com>
+        Mon, 11 May 2026 14:51:54 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
+Cc: Christoph Hellwig <hch@lst.de>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
 	linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	Casey Chen <cachen@purestorage.com>
-Subject: [PATCH] block: recompute nr_integrity_segments in blk_insert_cloned_request
-Date: Mon, 11 May 2026 15:22:30 -0600
-Message-ID: <20260511212230.27511-1-cachen@purestorage.com>
-X-Mailer: git-send-email 2.50.1
+	linux-kernel@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>
+Subject: [PATCH] block: don't overwrite bip_vcnt in bio_integrity_copy_user()
+Date: Mon, 11 May 2026 22:51:51 +0100
+Message-ID: <20260511215151.346228-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,72 +78,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-blk_insert_cloned_request() already recomputes nr_phys_segments
-against the bottom queue, because "the queue settings related to
-segment counting may differ from the original queue." The exact same
-reasoning applies to integrity segments: a stacked driver's underlying
-queue can have tighter virt_boundary_mask, seg_boundary_mask, or
-max_segment_size than the top queue, in which case
-blk_rq_count_integrity_sg() against the bottom queue produces a
-different count than the cached rq->nr_integrity_segments inherited
-from the source request by blk_rq_prep_clone().
+bio_integrity_add_page() already sets bip_vcnt to 1 for the bounce
+segment. Overwriting it with nr_vecs breaks bip_vcnt <= bip_max_vcnt
+on WRITE (bip_max_vcnt is 1), so the gap-merge checks in block/blk.h
+read past the bip_vec[] flex array. On READ the read is in bounds
+but lands on a saved user bvec instead of the bounce.
 
-When the cached count is lower than the bottom queue's actual count,
-blk_rq_map_integrity_sg() trips
+The line was added for split propagation, but bio_integrity_clone()
+doesn't copy bip_vcnt and BIP_CLONE_FLAGS excludes BIP_COPY_USER.
 
-	BUG_ON(segments > rq->nr_integrity_segments);
-
-on dispatch. The same families of stacked setups that motivated the
-existing nr_phys_segments recompute -- dm-multipath fanning out to
-nvme-rdma in particular -- can produce this.
-
-Mirror the nr_phys_segments handling: when the request carries
-integrity, recompute nr_integrity_segments against the bottom queue
-and reject the request if it exceeds the bottom queue's
-max_integrity_segments. blk_rq_count_integrity_sg() and
-queue_max_integrity_segments() are both already available via
-<linux/blk-integrity.h>, which blk-mq.c includes.
-
-This closes a latent gap in the stacking contract and brings the
-integrity-segment accounting in line with the existing
-phys-segment accounting.
-
-Fixes: 76c313f658d2 ("blk-integrity: improved sg segment mapping")
-Signed-off-by: Casey Chen <cachen@purestorage.com>
+Fixes: 3991657ae707 ("block: set bip_vcnt correctly")
+Signed-off-by: David Carlier <devnexen@gmail.com>
 ---
- block/blk-mq.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ block/bio-integrity.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4c5c16cce4f8..d0c37daf568f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3307,6 +3307,25 @@ blk_status_t blk_insert_cloned_request(struct request *rq)
- 		return BLK_STS_IOERR;
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index e79eaf047794..869746412949 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -308,7 +308,6 @@ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec,
  	}
  
-+	/*
-+	 * Integrity segment counting depends on the same queue limits
-+	 * (virt_boundary_mask, seg_boundary_mask, max_segment_size) that
-+	 * vary across stacked queues, so recompute against the bottom
-+	 * queue just like nr_phys_segments above.
-+	 */
-+	if (blk_integrity_rq(rq) && rq->bio) {
-+		unsigned short max_int_segs = queue_max_integrity_segments(q);
-+
-+		rq->nr_integrity_segments =
-+			blk_rq_count_integrity_sg(rq->q, rq->bio);
-+		if (rq->nr_integrity_segments > max_int_segs) {
-+			printk(KERN_ERR "%s: over max integrity segments limit. (%u > %u)\n",
-+				__func__, rq->nr_integrity_segments,
-+				max_int_segs);
-+			return BLK_STS_IOERR;
-+		}
-+	}
-+
- 	if (q->disk && should_fail_request(q->disk->part0, blk_rq_bytes(rq)))
- 		return BLK_STS_IOERR;
- 
+ 	bip->bip_flags |= BIP_COPY_USER;
+-	bip->bip_vcnt = nr_vecs;
+ 	return 0;
+ free_bip:
+ 	bio_integrity_free(bio);
 -- 
-2.50.1
+2.53.0
 
