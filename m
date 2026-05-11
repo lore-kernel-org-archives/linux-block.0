@@ -1,55 +1,55 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF41843C05B
-	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 16:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7377644E053
+	for <linux-block@vger.kernel.org>; Mon, 11 May 2026 16:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778517078; cv=none; b=SRmCTu/xxRPnBOpndIVLw85pPgjTsD7kJmyS+usi8H5+t8wBTK07R/8qoqZhFa+fMtc5kBnT+1qDliX51Qir8tnEAbfQYNacNR8dYim0vbeEkk0hosVyT0qKwmF/dacMlcB3L2VUOvq39c3ExfpAuLYvGdg6qNG2Hmb8kargl8s=
+	t=1778517080; cv=none; b=B/Pty358EF2WDbP2alirueXtvdr1QWKBJqgHGQpakx5wWbeDhIVzP5euW2cEy1PCIVAhdaJYBj9mfqQMCNqfBdphappbBN/QXDrBgTGbCVv0VGB7c/j3ih+AIjgcIdBI8//+BvKReHHHqANmDfgkydDDvzkrEEeAAxrwipgjx8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778517078; c=relaxed/simple;
-	bh=uM5EdW/OlUVkUg4gC7tqT9lI0hRifXJIrBwBq2Umt6Q=;
+	s=arc-20240116; t=1778517080; c=relaxed/simple;
+	bh=EijhLDoL/36s8VoBWMLRxGSfZsNmUmHyqR8S9RIYawY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TgzKTLPWmQsiOVQs5A/BNDS/JflOs+Xi9Qgmy3e3zzhr7ZyXPlilejvlpjIb4EXb/zEetUBmo2XIMDqNP9ug+vlKxdA5REUd/Rg5VDgXZhiOxqWYcp7huVCcqIDQJYPnb4RmTJklQcpeWCNMIbvclXyr17dmpRdSY9vqkGmBuqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=xCicKAFv; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=Eh/J5pURSasqIsL4jujsmR6Qcle35D0G2TcnmmaoNAKu4gJQTjB1w7+fbuvQb1SjL4/PMbGBiDMevYqAQLhLaqBpBLQqjs3DtXQEnU8yo2IMId7YgHrUV12G1S2GzQyCyRnwH+aIgCBqlKVrEk0F756wnbQKrXuoqizAUKAXlAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=sqEVLxx/; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="xCicKAFv"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="sqEVLxx/"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gDlbS2Rdhzlfl8H;
-	Mon, 11 May 2026 16:31:16 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gDlbW0Y6TzlfddR;
+	Mon, 11 May 2026 16:31:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1778517072; x=1781109073; bh=SC881
-	DCneUnD8o49nD6S9IfchQhY8TFUSl0lxWzq8aI=; b=xCicKAFvbQBDXNEQq5HPD
-	wBPO2PrtT3xL33qZ3LAoFioGmNqY1eNHi8kXxlGZQYBWYV44rX6KKixqqpo6dF/M
-	qgI0KY77FcOFIpkYZiRydl6iGASHyJvkthHdHxAToQtFiFkdZ5UQXYprKokVYk5J
-	c5TBjLpXBOtsIxfZIqc/dcZwIPG4SKkGHFUXH/VL+dHXxIL2KPTUYXavVpVvU3K+
-	1/y215NXCWrMYp1xbN+ToKqr/RH8gBUiGN7jThXy/tnxWF4tzC0mI1r+DdxdbrG2
-	6JLVaXqED8SRFP/uioNE+U3rjRgJzSM79svWbifnchY84SEkysDYz8cf2K1SGLRJ
-	Q==
+	:received:received; s=mr01; t=1778517075; x=1781109076; bh=TswD3
+	QCL5sUBKmBeKuGaCQal6ah7SLen+FK0CMkfQTo=; b=sqEVLxx/qqgyDB+RftI5m
+	0j5lJg2NKgxm3R//Uk1sDwokk9BL4o/p8bq5kSxK5L9pjUMeYBLejALfrZXo29XJ
+	rsHZNEFfPtX/lg4g9YOvCJ1fob98itF4OFuH+jSNMuDiFwDNMAn75NtlOk18yWi7
+	747ygKVt9arhLyjVBcuRFo+qo6sJrhTf4eddz0+FEfjhdChDn63XgmORUvawFpos
+	4kR6Z3SLHSJHvJWvJ31hsKfiFWx3bGTs+ovUIwkprHGccsZ4uelmgUsIivQryt/p
+	pth8QzczJpqM0wD4W7cIuRmTxtdNF8LZMmZX48BxypiTFNMhoarHeOpZ2DK8Cy4t
+	g==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ck_OwzOdlpn1; Mon, 11 May 2026 16:31:12 +0000 (UTC)
+ id ri2QXI8uZdFr; Mon, 11 May 2026 16:31:15 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gDlbM4zr2zlfgRw;
-	Mon, 11 May 2026 16:31:11 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gDlbP2BppzlfwJB;
+	Mon, 11 May 2026 16:31:13 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Marco Elver <elver@google.com>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v4 01/12] block: Annotate the queue limits functions
-Date: Mon, 11 May 2026 09:30:43 -0700
-Message-ID: <20260511163100.1887263-2-bvanassche@acm.org>
+Subject: [PATCH v4 02/12] block/bdev: Annotate the blk_holder_ops callback functions
+Date: Mon, 11 May 2026 09:30:44 -0700
+Message-ID: <20260511163100.1887263-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.54.0.563.g4f69b47b94-goog
 In-Reply-To: <20260511163100.1887263-1-bvanassche@acm.org>
 References: <20260511163100.1887263-1-bvanassche@acm.org>
@@ -61,47 +61,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Let the thread-safety checker verify whether every start of a queue
-limits update is followed by a call to a function that finishes a queue
-limits update.
+The four callback functions in blk_holder_ops all release the
+bd_holder_lock. Annotate these functions accordingly.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/linux/blkdev.h | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ include/linux/blkdev.h | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 890128cdea1c..8651af4fe9d7 100644
+index 8651af4fe9d7..d0c181da2da0 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -1093,15 +1093,17 @@ static inline unsigned int blk_boundary_sectors_l=
-eft(sector_t offset,
-  */
- static inline struct queue_limits
- queue_limits_start_update(struct request_queue *q)
-+	__acquires(&q->limits_lock)
- {
- 	mutex_lock(&q->limits_lock);
- 	return q->limits;
- }
- int queue_limits_commit_update_frozen(struct request_queue *q,
--		struct queue_limits *lim);
-+		struct queue_limits *lim) __releases(&q->limits_lock);
- int queue_limits_commit_update(struct request_queue *q,
--		struct queue_limits *lim);
--int queue_limits_set(struct request_queue *q, struct queue_limits *lim);
-+		struct queue_limits *lim) __releases(&q->limits_lock);
-+int queue_limits_set(struct request_queue *q, struct queue_limits *lim)
-+	__must_not_hold(&q->limits_lock);
- int blk_validate_limits(struct queue_limits *lim);
+@@ -1747,22 +1747,26 @@ void blkdev_show(struct seq_file *seqf, off_t off=
+set);
+ #endif
 =20
- /**
-@@ -1113,6 +1115,7 @@ int blk_validate_limits(struct queue_limits *lim);
-  * starting update.
-  */
- static inline void queue_limits_cancel_update(struct request_queue *q)
-+	__releases(&q->limits_lock)
- {
- 	mutex_unlock(&q->limits_lock);
- }
+ struct blk_holder_ops {
+-	void (*mark_dead)(struct block_device *bdev, bool surprise);
++	void (*mark_dead)(struct block_device *bdev, bool surprise)
++		__releases(&bdev->bd_holder_lock);
+=20
+ 	/*
+ 	 * Sync the file system mounted on the block device.
+ 	 */
+-	void (*sync)(struct block_device *bdev);
++	void (*sync)(struct block_device *bdev)
++		__releases(&bdev->bd_holder_lock);
+=20
+ 	/*
+ 	 * Freeze the file system mounted on the block device.
+ 	 */
+-	int (*freeze)(struct block_device *bdev);
++	int (*freeze)(struct block_device *bdev)
++		__releases(&bdev->bd_holder_lock);
+=20
+ 	/*
+ 	 * Thaw the file system mounted on the block device.
+ 	 */
+-	int (*thaw)(struct block_device *bdev);
++	int (*thaw)(struct block_device *bdev)
++		__releases(&bdev->bd_holder_lock);
+ };
+=20
+ /*
