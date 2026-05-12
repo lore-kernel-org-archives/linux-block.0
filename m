@@ -1,54 +1,56 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09B83C585A;
-	Tue, 12 May 2026 16:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D130E3D5C05;
+	Tue, 12 May 2026 17:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778604796; cv=none; b=pXhbhkkBFzhGVAeTK5IHCMcO2q9wmYCLR+D9WqsA9COBX9Zr83agoPTJFdJxxOJgN0efSyjR8Y7bwlK5xBNKKEsYI+obfh1cMK/5G6CgqFNph4oR3BmMt6/0xroRwCpZqNnZ6PmkQUnoce0vG63iQT+RZZG+Nojw5zSz3NN+HuU=
+	t=1778605325; cv=none; b=Wq9Q4kDZmK5kwZQqxCAaLYa3G4FxKUfTQSHsKm4hROgv12VDfwegJHQb7WykVhnOUyMnMrgrbBb99Fr8PnD6Gbc/Vhc7lFxFk3rqpk17cJBXY12NZOkTzhTT/qO3Zb0O8w0aly0IgyIU779BLts2Av1skhpQuunGeNI07n7Zp4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778604796; c=relaxed/simple;
-	bh=H51awmjchn3ktm1kEw3yzsvYYjYeUcUygf/vtUrpzGI=;
+	s=arc-20240116; t=1778605325; c=relaxed/simple;
+	bh=3w1awZ3eeZyi0jyriVIT/nzrxciCz6a3fg6BE8QtIlg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jn1mh+KY9O5ONxMCWwh0RhpFY31cWXaGIL1orb1DURkq9c3GwoQhGqet9p9G910kXYaBIZH1BTKTgotT1P2I7K7kpjOYxmu73QJdcbVayb2PRL3PwUtdX9zY9EXglznC9NXX/GQEzafJsIAz861+o5f2KFATpGMDXIjIrpRoc70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NH3uMjJ5; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=G5uslSr+tSmuo0d6F51f0tPRdKogqVtXMZCSxCTsHwtfQSsgHC6M+pEYzL1LWEUos7mAmBEaEySZK6tmXHFvLq89RMDAQTqX1J8GUpudprL9qVCJhdtKNfQvQa+2I6EMqs0VjoxOyS3d7fb3HZqE8Q3hRZeE0ACmwl059ef00rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TjMYk2vR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NH3uMjJ5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=cp8Ov3Km4p0cgJ79n5HhDt4ZPrXGNqNCqzbE5ZqPAk0=; b=NH3uMjJ5Z0O7U3S6diofk/1sOJ
-	etdgyE5oFamij5asCZ5NNOFE/i4fNgIxKEGX0vxJdgUlOs3UNRMRHg0+fEfgzSYqM8MJ2ACX1bRT0
-	xshoKVxgOQ+hNywQ4RkniJCXox3/U8Q+dicE5Fx9u08HAz/9HYuSCFvqo8nEERrjoab1yHvA8MzhJ
-	I2/KAqWQoRvdUlSGYpalCUTfIpd7WfjRDDF+CNVfJDXtgmlKXya6UlpsYDk+IO5CbmS7QqyFE+LXg
-	zl2MXY1osN9tD7XDa5Un+xSVePqcx9IHHH3GqNVm8iCqPGPz1vINfH+DVcEqvCPjP63TWHE8a/Zoo
-	W2afC0Og==;
-Received: from 2001-1c00-8d85-4b00-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:4b00:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wMqLz-0000000FPDC-3we8;
-	Tue, 12 May 2026 16:53:08 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 2E2D4302F8E; Tue, 12 May 2026 18:53:07 +0200 (CEST)
-Date: Tue, 12 May 2026 18:53:06 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Michael Wu <michael@allwinnertech.com>,
-	Xiaosen He <xiaosen.he@oss.qualcomm.com>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>
-Subject: Re: [PATCH] sched: flush plug in schedule_preempt_disabled() to
- prevent deadlock
-Message-ID: <20260512165306.GB2677887@noisy.programming.kicks-ass.net>
-References: <20260512085939.1107372-1-tom.leiming@gmail.com>
- <20260512120431.GC1889694@noisy.programming.kicks-ass.net>
- <20260512124021.GA2214256@noisy.programming.kicks-ass.net>
- <agNLCof3zO5-QAo9@fedora>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TjMYk2vR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F11FC2BCC7;
+	Tue, 12 May 2026 17:02:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778605325;
+	bh=3w1awZ3eeZyi0jyriVIT/nzrxciCz6a3fg6BE8QtIlg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TjMYk2vRoty2a4xDF+mPNkwg088Su/Dx1Sz86vsQ2QZG6kbz61WB0pPzkcCZAxjYq
+	 kJY3nMshWUg7KGRx6BsutKaT+vu8mwemfJijbJapF//T7rUIbic7QUSCSMCINj9Vnm
+	 utITe5nMhhEVSeINgpaCBTozVPfIZ/os3th5Ms0aJgOfThlG42fWDsASqq13Ot1T5b
+	 Wg1VYUEw8U21QanLlWxGkEH80h/yjschij/vN+NnHNHX+S7Sb+2OzYIZUb7Q97/fHl
+	 QCDzO30QikF4V6NHzRaXJaxzSG3Ei3fZ/Pa/6QN0mk9zIzYYmmkf0fXA4YRksP43ne
+	 w2Gji8z2LDbZA==
+Date: Tue, 12 May 2026 10:02:04 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
+	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 08/12] swap,iomap: simplify iomap_swapfile_iter
+Message-ID: <20260512170204.GI9555@frogsfrogsfrogs>
+References: <20260512053625.2950900-1-hch@lst.de>
+ <20260512053625.2950900-9-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,65 +59,209 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <agNLCof3zO5-QAo9@fedora>
+In-Reply-To: <20260512053625.2950900-9-hch@lst.de>
 
-On Tue, May 12, 2026 at 11:45:14PM +0800, Ming Lei wrote:
-> On Tue, May 12, 2026 at 02:40:21PM +0200, Peter Zijlstra wrote:
-> > On Tue, May 12, 2026 at 02:04:32PM +0200, Peter Zijlstra wrote:
-> > > On Tue, May 12, 2026 at 04:59:39PM +0800, Ming Lei wrote:
-> > > > On preemptible kernels, a deadlock can occur when a task with plugged IO
-> > > > calls schedule_preempt_disabled():
-> > > > 
-> > > >   schedule_preempt_disabled()
-> > > >     sched_preempt_enable_no_resched()  // preemption now enabled
-> > > >     schedule()                         // <-- preemption can happen here
-> > > >       sched_submit_work()
-> > > >         blk_flush_plug()
-> > > > 
-> > > > After sched_preempt_enable_no_resched() re-enables preemption, the task
-> > > > can be preempted (e.g., by a higher-priority RT task) before reaching
-> > > > blk_flush_plug() in sched_submit_work(). Since the task's state is
-> > > > already TASK_UNINTERRUPTIBLE (set by the mutex/rwsem slowpath caller),
-> > > > requests in current->plug remain unflushed for an unbounded time.
-> > > > 
-> > > > If another task depends on those plugged requests to make progress (e.g.,
-> > > > to release a lock the sleeping task needs), a deadlock results:
-> > > > 
-> > > >   - Task A (writeback worker): holds plugged IO, preempted before
-> > > >     flushing, stuck on run queue behind higher-priority work
-> > > >   - Task B: waiting for IO completion from Task A's plug, holds a lock
-> > > >     that Task A needs to be woken up
-> > > > 
-> > > > Both reported deadlocks involve mutex/rwsem slowpaths, which are the
-> > > > primary callers of schedule_preempt_disabled() with non-running task
-> > > > state.
-> > > > 
-> > > > Fix by flushing the plug in schedule_preempt_disabled() while
-> > > > preemption is still disabled. This ensures the plug is empty before the
-> > > > preemption window opens.
-> > > 
-> > > How is this different from any path calling schedule()? That would be
-> > > subject to exactly the same issue.
-> > > 
-> > > The patch cannot be correct.
-> > 
-> > Also, is there a reason io_schedule_prepare() has a blk_flush_plug()
-> > call?
+On Tue, May 12, 2026 at 07:35:24AM +0200, Christoph Hellwig wrote:
+> add_swap_extent already coalesces multiple extents, no need to duplicate
+> that in the caller.
 > 
-> It is added in Tejun's "[PATCHSET RFC] sched, jbd2: mark sleeps on journal->j_checkpoint_mutex as iowait":
-> 
-> https://lore.kernel.org/all/1477673892-28940-1-git-send-email-tj@kernel.org/#t
-> 
-> which fixes iowait accounting for ext4, meantime adds the model
-> "io_schedule_prepare() + schedule() + io_schedule_finish()", which actually
-> can avoid this kind issue easily because io_schedule_prepare() is called
-> in task running state.
-> 
-> For this f2fs issue, maybe it can be addressed by adding rwsem io variant
-> just like mutex_lock_io(), meantime iowait accounting is covered too.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-So personally I detest all of iowait, its an abomination. And I don't
-see how having an iowait specific version avoids any problem.
+/me wishes he'd either noticed that add_swap_extent already had the
+coalescing code or had documented why he implemented his own.
 
-You can get preempted at any point before between getting the io started
-and blocking.
+OH.  Now I remember why -- it's to handle contiguous mixed mappings
+better.
+
+Let's say that you have a 1k fsblock filesystem and 4k base pages.  You
+fallocate an 8G swap file and then mkswap it.  The first mapping is a 1k
+written mapping at offset 0 for the swap header, followed by an 8388607k
+unwritten mapping at offset 3k.
+
+The PAGE_SIZE rounding code in iomap_swapfile_add_extent will round the
+end of that first mapping down to zero and ignore it.  The second
+mapping will be treated as if it were a 8388604k mapping starting at
+offset 4096.  Now the page counts are wrong and the swapon fails.
+
+A more generic solution to this would be to change add_swap_extent to
+take sector_t addr and length values and use them to construct a bitmap
+representing contiguous physical space on the bdev, accounting of course
+for PAGE_SIZE alignment.  Except for the swap header page, every other
+contiguously set page-aligned region in the bitmap gets added to the
+swap extent map.
+
+You could then maximize the number of pages participating in swap even
+for files with layouts that are truly egregiously bad.  But I elected
+not to go there because the common case is fallocate getting contiguous
+space.
+
+But still, I'm not sure we want to drop the iomap accumulator in
+fs/iomap/swapfile.c.
+
+--D
+
+> ---
+>  fs/iomap/swapfile.c | 104 +++++++++++++-------------------------------
+>  1 file changed, 31 insertions(+), 73 deletions(-)
+> 
+> diff --git a/fs/iomap/swapfile.c b/fs/iomap/swapfile.c
+> index cf354fdfb7c3..a4e0ca462cc4 100644
+> --- a/fs/iomap/swapfile.c
+> +++ b/fs/iomap/swapfile.c
+> @@ -6,57 +6,32 @@
+>  #include <linux/iomap.h>
+>  #include <linux/swap.h>
+>  
+> -/* Swapfile activation */
+> -
+> -struct iomap_swapfile_info {
+> -	struct iomap iomap;		/* accumulated iomap */
+> -	struct swap_info_struct *sis;
+> -	unsigned long nr_pages;		/* number of pages collected */
+> -	struct file *file;
+> -};
+> -
+> -/*
+> - * Collect physical extents for this swap file.  Physical extents reported to
+> - * the swap code must be trimmed to align to a page boundary.  The logical
+> - * offset within the file is irrelevant since the swapfile code maps logical
+> - * page numbers of the swap device to the physical page-aligned extents.
+> - */
+> -static int iomap_swapfile_add_extent(struct iomap_swapfile_info *isi)
+> -{
+> -	struct iomap *iomap = &isi->iomap;
+> -	uint64_t first_ppage;
+> -	uint64_t next_ppage;
+> -
+> -	/*
+> -	 * Round the start up and the end down so that the physical
+> -	 * extent aligns to a page boundary.
+> -	 */
+> -	first_ppage = ALIGN(iomap->addr, PAGE_SIZE) >> PAGE_SHIFT;
+> -	next_ppage = ALIGN_DOWN(iomap->addr + iomap->length, PAGE_SIZE) >>
+> -			PAGE_SHIFT;
+> -	return add_swap_extent(isi->sis, next_ppage - first_ppage, first_ppage);
+> -}
+> -
+> -static int iomap_swapfile_fail(struct iomap_swapfile_info *isi, const char *str)
+> +static int iomap_swapfile_fail(struct file *file, const char *str)
+>  {
+>  	char *buf, *p = ERR_PTR(-ENOMEM);
+>  
+>  	buf = kmalloc(PATH_MAX, GFP_KERNEL);
+>  	if (buf)
+> -		p = file_path(isi->file, buf, PATH_MAX);
+> +		p = file_path(file, buf, PATH_MAX);
+>  	pr_err("swapon: file %s %s\n", IS_ERR(p) ? "<unknown>" : p, str);
+>  	kfree(buf);
+>  	return -EINVAL;
+>  }
+>  
+>  /*
+> - * Accumulate iomaps for this swap file.  We have to accumulate iomaps because
+> - * swap only cares about contiguous page-aligned physical extents and makes no
+> - * distinction between written and unwritten extents.
+> + * Report physical extents for this swap file.  Physical extents reported to the
+> + * swap code must be trimmed to align to a page boundary.  The logical offset
+> + * within the file is irrelevant since the swapfile code maps logical page
+> + * numbers of the swap device to the physical page-aligned extents.
+>   */
+> -static int iomap_swapfile_iter(struct iomap_iter *iter,
+> -		struct iomap *iomap, struct iomap_swapfile_info *isi)
+> +static int iomap_swapfile_iter(struct iomap_iter *iter, struct file *file,
+> +		struct swap_info_struct *sis)
+>  {
+> +	struct iomap *iomap = &iter->iomap;
+> +	uint64_t first_ppage;
+> +	uint64_t next_ppage;
+> +	int error;
+> +
+>  	switch (iomap->type) {
+>  	case IOMAP_MAPPED:
+>  	case IOMAP_UNWRITTEN:
+> @@ -64,35 +39,31 @@ static int iomap_swapfile_iter(struct iomap_iter *iter,
+>  		break;
+>  	case IOMAP_INLINE:
+>  		/* No inline data. */
+> -		return iomap_swapfile_fail(isi, "is inline");
+> +		return iomap_swapfile_fail(file, "is inline");
+>  	default:
+> -		return iomap_swapfile_fail(isi, "has unallocated extents");
+> +		return iomap_swapfile_fail(file, "has unallocated extents");
+>  	}
+>  
+>  	/* No uncommitted metadata or shared blocks. */
+>  	if (iomap->flags & IOMAP_F_DIRTY)
+> -		return iomap_swapfile_fail(isi, "is not committed");
+> +		return iomap_swapfile_fail(file, "is not committed");
+>  	if (iomap->flags & IOMAP_F_SHARED)
+> -		return iomap_swapfile_fail(isi, "has shared extents");
+> +		return iomap_swapfile_fail(file, "has shared extents");
+>  
+>  	/* Only one bdev per swap file. */
+> -	if (iomap->bdev != isi->sis->bdev)
+> -		return iomap_swapfile_fail(isi, "outside the main device");
+> -
+> -	if (isi->iomap.length == 0) {
+> -		/* No accumulated extent, so just store it. */
+> -		memcpy(&isi->iomap, iomap, sizeof(isi->iomap));
+> -	} else if (isi->iomap.addr + isi->iomap.length == iomap->addr) {
+> -		/* Append this to the accumulated extent. */
+> -		isi->iomap.length += iomap->length;
+> -	} else {
+> -		/* Otherwise, add the retained iomap and store this one. */
+> -		int error = iomap_swapfile_add_extent(isi);
+> -		if (error)
+> -			return error;
+> -		memcpy(&isi->iomap, iomap, sizeof(isi->iomap));
+> -	}
+> +	if (iomap->bdev != sis->bdev)
+> +		return iomap_swapfile_fail(file, "outside the main device");
+>  
+> +	/*
+> +	 * Round the start up and the end down so that the physical extent
+> +	 * aligns to a page boundary.
+> +	 */
+> +	first_ppage = ALIGN(iomap->addr, PAGE_SIZE) >> PAGE_SHIFT;
+> +	next_ppage = ALIGN_DOWN(iomap->addr + iomap->length, PAGE_SIZE) >>
+> +			PAGE_SHIFT;
+> +	error = add_swap_extent(sis, next_ppage - first_ppage, first_ppage);
+> +	if (error)
+> +		return error;
+>  	return iomap_iter_advance_full(iter);
+>  }
+>  
+> @@ -110,10 +81,6 @@ int iomap_swap_activate(struct file *file, struct swap_info_struct *sis,
+>  		.len	= ALIGN_DOWN(i_size_read(inode), PAGE_SIZE),
+>  		.flags	= IOMAP_REPORT,
+>  	};
+> -	struct iomap_swapfile_info isi = {
+> -		.sis = sis,
+> -		.file = file,
+> -	};
+>  	int ret;
+>  
+>  	/*
+> @@ -125,16 +92,7 @@ int iomap_swap_activate(struct file *file, struct swap_info_struct *sis,
+>  		return ret;
+>  
+>  	while ((ret = iomap_iter(&iter, ops)) > 0)
+> -		iter.status = iomap_swapfile_iter(&iter, &iter.iomap, &isi);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	if (isi.iomap.length) {
+> -		ret = iomap_swapfile_add_extent(&isi);
+> -		if (ret)
+> -			return ret;
+> -	}
+> -
+> -	return 0;
+> +		iter.status = iomap_swapfile_iter(&iter, file, sis);
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL_GPL(iomap_swap_activate);
+> -- 
+> 2.53.0
+> 
+> 
