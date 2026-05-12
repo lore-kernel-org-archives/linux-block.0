@@ -1,148 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56148946A;
-	Tue, 12 May 2026 00:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8C713AD05
+	for <linux-block@vger.kernel.org>; Tue, 12 May 2026 05:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778544080; cv=none; b=sau16jzARjSHu6mAIxaFYvd6YqinwIFlcC9dmlCbNVtk+4V2OFGMcHFfDXFO8V9RPBwzZiEhDgbAa13eVfXO7vP1v2waBzvwcUr5B44QN+4GxvVUpp817Wz6Ho14ilzXi1/ics1nI9XTBQowFTrMtJa5+9zqUT32SQ+/f0EKfx4=
+	t=1778562646; cv=none; b=ncQRKDczKiEEA21M2W2ebWiBxNVKkKs2+8WySB9YdvGY3/Kxp8I4aRzyHGzHzlwtSGFcWn0AlyRn+kVAJ2iSphj6V/4FG+Cg8kRuoywvmLKZVGm2vRmyRFHlR+OEC4/K4ksBdYxC8erheGW2JAnyhbD1cv6lBFdTtqISPi0/br8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778544080; c=relaxed/simple;
-	bh=lxS+xrMxyMqeQ2Uc3VsxxruNoLpj5OEXbZ+YMCjKNdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YUktbyDxr7MR+NkPwxiYIBdYtZvMSLIo9beTb1tL+AsYCosEuKBZhmRALA/X3Db/hG9FVtJkpDykFa9l7XFvCwBbDxza0PXs7WWOqIBUKwuYnEmrDHfdMNKi5lMT/KfdJhSIP8WBgXPSRxVUvfeFG9VvHvPJri7TXwN2bdl24rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHJl1G85; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHJl1G85"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF3AC2BCB0;
-	Tue, 12 May 2026 00:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778544080;
-	bh=lxS+xrMxyMqeQ2Uc3VsxxruNoLpj5OEXbZ+YMCjKNdg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vHJl1G85/YJp5rqU3eQ4CU0FVvAvkuV1YWkG4jjOTEOanLn5pIPBLwEpUs8CsgtUg
-	 nIsF5pdFsR0rdb+kx7eJ1xkDQloOOBGvV7U8JbgygkvTRJm6QmzsVmHAx+NmTOZoR3
-	 u8NGZ4tROdEfW7GeWhMay/j7WY+wuTFs4852SbPl2P4O5FBpSHXdF6IEYoH0dEXF/i
-	 i+korJYaMRt2NPLp01pjGAuN4FMJfVA4gGLfXLwBj6wBunqCSpBT/YnNoUEz+O6vAk
-	 SrKxyfJI3T/rbhi+dhmRa4pkREhnLbxhG5yIBPvmxw5+T/r9snPjrijoilAkkrb7/T
-	 uanPaFCXTm+Jg==
-Date: Tue, 12 May 2026 00:01:18 +0000
-From: Yosry Ahmed <yosry@kernel.org>
-To: Wenchao Hao <haowenchao22@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Barry Song <21cnbao@gmail.com>, Chengming Zhou <chengming.zhou@linux.dev>, 
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	Minchan Kim <minchan@kernel.org>, Nhat Pham <nphamcs@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Wenchao Hao <haowenchao@xiaomi.com>
-Subject: Re: [RFC PATCH v3 0/4] mm/zsmalloc: per-cpu deferred free to
- accelerate swap entry release
-Message-ID: <agJslV2eNj9FLFqI@google.com>
-References: <20260508060724.3810904-1-haowenchao@xiaomi.com>
- <CAO9r8zO3GrMLDV57aRaiwRvZhwcduihKhc3rBpFGkbZKoq_iSw@mail.gmail.com>
- <CAOptpSPY3YL5VFJW9KKP99Yb17+_rdXKsKj93FdEn3_Zb350ow@mail.gmail.com>
+	s=arc-20240116; t=1778562646; c=relaxed/simple;
+	bh=dcEmVjoKdHpiPTjQ1tFHqV8QJTHDEZBuy1AIrj3Rq3Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bp812H77r7egkXG0oy3fAbUKXd6Sirer+z5scftexJJaCM/cgIKbcIot3o05kE4hv2Em1MH20K10s0QOJN5174CDgDAfe8EQ4fC9kYcYpA4UOgYNAXyf5xuMOcGGFtn2DaZN0cik8dKxSeONqyMprE/b6DtRYT4REMrMwm8XH24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-6587cee8b57so5425793d50.2
+        for <linux-block@vger.kernel.org>; Mon, 11 May 2026 22:10:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778562644; x=1779167444;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i+6QzfD1TPj/UYCxT/pRvXekIh5WoFE0MUpGbazQu3A=;
+        b=qTdGMAaEWnySqgvynNlq+shLJ1vaqap8bh5vdGG//6oG+KnnKgyHk4v3XEQE+cwo5L
+         86smxKgDValA7bD7AZQ1Gos0FaNFm0HYX32O/yx/LIt+Ck8Id1/Rnyj15gJkiBimi/uO
+         Yi7yQecqLul2YMPhFS8v0vR8tkFdTkILwcVloVIY2GJvXt8L9W2OOu++P7N2ADmNSemF
+         L8wJ0pRBlz1XZldmBbUca9MlTlTNVKe1W1wYVCPDsfM8wu8ceoI0iohrrIFOybagJjOW
+         n8fSzFLp077Lg/EGNyu2sxOUq4TMgz/ltcTkg7yZsHrP4dU/zEkhtkH4MwDerk2ujQ6w
+         vf5A==
+X-Forwarded-Encrypted: i=1; AFNElJ9RbGc2lp/r+kU7lrXy+b0ju2dIcLo+//Enja72WkDMdkmr9BQubuFpMK/5tNuSI4ptHNb/rEFN3IDhwQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yza0ANw1nJHV7VOYx8+AsLcE6WJxmcOEEsr/OA+Hczs41zDSDPr
+	MC7NYW4tytrewSJlpfwOzXIXJVCxYFenOIWZLQTZkSPD1Tc7S6X4fCG4
+X-Gm-Gg: Acq92OHIpFtdmJu1aRNzfSLbueoAeTolpuM0KcXSn000ESuYKt2Mp+h32DQ3HfQ6nDk
+	9WHrMgbvmB1u28J6AKFHnEms1yg9NA2j7rfSPA6mBF+WZTEHwkvOfqB5hDddi2jeBbla520g7J1
+	hm5AlIpBUnlFWSwpp8d2c0sTmeXNtaZ4SyyH7Ugdx3TvB7gFTrOzEs2cmVAZgQA6inMUalfOGdm
+	3q5+fMfhGJJun1XHw9GuCJZoE4qK0MLt+7Y6kyt7Wn1JtNRhmyEvrsPPflO1v1QfnCJCV6IZ6fZ
+	dt8J4yuD4hgCgky9+eMQ+8NDSVyXde+O3wfQibej5/x2dHaAyl5WsD++BRJCBq/8nhzAvAIUxjz
+	NbLI8m9+rOIlJDqjsp0yWcC0ne+ttZhyR6nXCTbNJBGmL9P9Nt+7Zh7div6MfrGd88MCdVS5Jy5
+	4hsQpn/y1vGQ==
+X-Received: by 2002:a05:690e:4087:b0:65c:65ae:be23 with SMTP id 956f58d0204a3-65de128085fmr1332746d50.45.1778562644054;
+        Mon, 11 May 2026 22:10:44 -0700 (PDT)
+Received: from tofu.. ([128.210.0.165])
+        by smtp.googlemail.com with ESMTPSA id 00721157ae682-7bd6685bfd4sm159239347b3.33.2026.05.11.22.10.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2026 22:10:42 -0700 (PDT)
+From: Sungwoo Kim <iam@sung-woo.kim>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Chao Shi <cshi008@fiu.edu>,
+	Weidong Zhu <weizhu@fiu.edu>,
+	Dave Tian <daveti@purdue.edu>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5] block: bio-integrity: Fix null-ptr-deref in bio_integrity_map_user()
+Date: Tue, 12 May 2026 01:09:29 -0400
+Message-ID: <20260512050929.541397-2-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOptpSPY3YL5VFJW9KKP99Yb17+_rdXKsKj93FdEn3_Zb350ow@mail.gmail.com>
 
-On Sat, May 09, 2026 at 04:32:04PM +0800, Wenchao Hao wrote:
-> On Sat, May 9, 2026 at 4:13 AM Yosry Ahmed <yosry@kernel.org> wrote:
-> >
-> > On Thu, May 7, 2026 at 11:08 PM Wenchao Hao <haowenchao22@gmail.com> wrote:
-> > >
-> > > Swap freeing can be expensive when unmapping a VMA containing many swap
-> > > entries. This has been reported to significantly delay memory reclamation
-> > > during Android's low-memory killing, especially when multiple processes
-> > > are terminated to free memory, with slot_free() accounting for more than
-> > > 80% of the total cost of freeing swap entries.
-> > >
-> > > This series introduces a callback-based deferred free framework in
-> > > zsmalloc. Callers (zram, zswap) register push/drain callbacks to
-> > > define what gets buffered and how it gets drained. The entire free
-> > > path including caller-side bookkeeping (slot_free, zswap_entry_free)
-> > > is deferred to a background worker.
-> >
-> > How much of the speedup comes from avoiding the per-class lock,
-> > free_zspage(), other work in zswap, etc.
-> 
-> This series doesn't avoid the per-class lock. The pool->lock part
-> has been split out and posted as a separate series, so this series
-> focuses purely on the defer scheme:
-> 
-> https://lore.kernel.org/linux-mm/20260508061910.3882831-1-haowenchao@xiaomi.com/
-> 
-> >
-> > I ask because I think the design here is still fairly complex. I don't
-> > like how zswap and zram are registering callbacks into zsmalloc to do
-> > their own freeing work, and they fill the buffers on behalf of
-> > zsmalloc which seems like a layering violation.
-> 
-> The callback design was motivated by code reuse -- deferring only
-> zs_free() inside zsmalloc gave less speedup, and the machinery
-> needed to defer caller-side bookkeeping turns out to be the same
-> on both sides (per-cpu page buffer, drain worker, fallback). So I
-> folded the common parts into zsmalloc.
-> 
-> I agree it's not clean from a layering standpoint, and I'm happy to
-> revisit if the reuse isn't worth the cost.
-> 
-> >
-> > I wonder how much of the speedup we get by just deferring
-> > free_zspage()?
-> 
-> Below is the perf breakdown, sampled only during munmap() of a
-> 256MB zram-filled VMA on a Raspberry Pi 4B.
-> 
-> Base kernel:
-> 
->   # Samples: 491  of event 'cycles'
->   # Event count (approx.): 214056923
->   #
->   # Children      Self  Symbol
->   # ........  ........  ..........................................
->       99.55%     0.41%  [k] __zap_vma_range
->       97.27%     2.91%  [k] swap_put_entries_cluster
->       94.37%     1.65%  [k] __swap_cluster_free_entries
->       88.99%     8.91%  [k] zram_slot_free_notify
->       79.87%    10.78%  [k] slot_free
->       56.27%     5.99%  [k] zs_free
->       47.61%     4.35%  [k] free_zspage
+pin_user_pages_fast() can partially succeed and return the number of
+pages that were actually pinned. However, the bio_integrity_map_user()
+does not handle this partial pinning. This leads to a general protection
+fault since bvec_from_pages() dereferences an unpinned page address,
+which is 0.
 
-Seems like most of the zsmalloc overhead comres from free_zspage(),
-right? I think we significantly simplify things if we only defer that
-part. Instead of having a page pool and buffers were we stores the
-handles for async free, we can just remove the zspage from from the
-fullness list and put it on a deferred freeing list.
+To fix this, add a check to verify that all requested memory is pinned.
+If partial pinning occurs, unpin the memory and return -EFAULT.
 
-We can probably even explore not doing per-CPU and just use a single
-global worker with a single lockless list (llist), then the worker can
-just do llist_del_all() to atomically empty the list and process it
-locally. If that turns out to be expensive we can do per-CPU lists.
+Reproducer in blktest: https://github.com/linux-blktests/blktests/pull/244
+Tested by Shin'ichiro:
+https://lore.kernel.org/linux-block/20260427040926.987166-3-iam@sung-woo.kim/T/#me17b14f2b2de12cf012b04d297e24cae667a6bd9
 
-WDYT? I think this can simplify things significantly.
+Kernel Oops:
 
->       36.85%     4.96%  [k] __free_zspage
->       19.27%     0.21%  [k] __folio_put
->       12.64%     2.91%  [k] __free_frozen_pages
->        9.50%     6.40%  [k] kmem_cache_free
->        8.28%     8.28%  [k] _raw_spin_unlock_irqrestore
->        6.83%     1.85%  [k] dec_zone_page_state
->        5.18%     5.18%  [k] _raw_spin_unlock
->        5.18%     5.18%  [k] folio_unlock
->        4.98%     4.98%  [k] mod_zone_state
->        4.12%     4.12%  [k] _raw_spin_lock
->        3.30%     3.30%  [k] __swap_cgroup_id_xchg
-> 
-> Perf of the zsmalloc-only variant (same 256MB zram workload):
-> 
-> My first attempt for this RFC was exactly that -- defer only the
-> handle free inside zsmalloc, keep zram/zswap caller-side bookkeeping
-> synchronous. (I would post this version after this thread)
-[..]
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+CPU: 0 UID: 0 PID: 1061 Comm: nvme-passthroug Not tainted 7.0.0-11783-g90957f9314e8-dirty #16 PREEMPT(lazy)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org 04/01/2014
+RIP: 0010:bio_integrity_map_user.cold+0x1b0/0x9d6
+
+Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
+Acked-by: Chao Shi <cshi008@fiu.edu>
+Acked-by: Weidong Zhu <weizhu@fiu.edu>
+Acked-by: Dave Tian <daveti@purdue.edu>
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+V4: https://lore.kernel.org/linux-block/20260427040926.987166-3-iam@sung-woo.kim/T/#ma69d880eb4dba82bc55cad882d42f2b674c473b6
+
+V4->V5
+- Fixed a coding style issue, addressing a Jens's comments.
+
+Thank you Shin'ichiro for testing V4. It'd be great if you could test V5 as
+well. V5 is the same as V4 except for the coding style fix, thus I don't
+expect any functional change.
+
+ block/bio-integrity.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index e54c6e06e1cb..856a5f16155e 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -403,6 +403,24 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ 	if (unlikely(ret < 0))
+ 		goto free_bvec;
+ 
++	/*
++	 * Handle partial pinning. This can happen when pin_user_pages_fast()
++	 * returns fewer pages than requested.
++	 */
++	if (user_backed_iter(iter) && unlikely(ret != bytes)) {
++		if (ret > 0) {
++			int npinned = DIV_ROUND_UP(offset + ret, PAGE_SIZE);
++			int i;
++
++			for (i = 0; i < npinned; i++)
++				unpin_user_page(pages[i]);
++		}
++		if (pages != stack_pages)
++			kvfree(pages);
++		ret = -EFAULT;
++		goto free_bvec;
++	}
++
+ 	nr_bvecs = bvec_from_pages(bvec, pages, nr_vecs, bytes, offset,
+ 				   &is_p2p);
+ 	if (pages != stack_pages)
+-- 
+2.47.3
+
