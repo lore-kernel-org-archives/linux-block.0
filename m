@@ -1,67 +1,67 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7667E4ADD92
-	for <linux-block@vger.kernel.org>; Tue, 12 May 2026 09:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4494A3402
+	for <linux-block@vger.kernel.org>; Tue, 12 May 2026 09:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778578233; cv=none; b=LkpJLFPJxyx0rvo8p2yL0lgEp+faWnXkV/G8y79AaNmEjk25g7isDIIdyTxUQwzcEUQ+/3GKdI4b0sAplfJdUMTrJsmY+XK4mamzaWUp1/IzIubHLZI2aR1/f4WxLlkmm1oGr+vEJoQnIs4gJ3YJkins3yixyIfsUJkekUUwQkE=
+	t=1778578241; cv=none; b=VJM4W/4KW8mC9wiiKUsPFVLRX0yEAgTmXi/qROyhQ5idcwyJxUC5D8ovGJWX7AlnbOF1F6ED7BMfOSl9J2kjtukidw6/BNeCjODuJ/HAl54Be89YetiRFYpKj+CEjht5AvQUW9vbQaDwYIsFje8HMgzzpThRFMNzicw3cTcwvdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778578233; c=relaxed/simple;
-	bh=9ZVEYWiJ8mfJhHSDmdYoWsnzgviWs338ieiJcp1NW8I=;
+	s=arc-20240116; t=1778578241; c=relaxed/simple;
+	bh=AmxHQti+Cn5C3pCrdSnBlqV6BaHV+iBm0oydG8MleKw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u/rz5zkX8do9ewyp8cGJxwKIPRjgDtUwNy/6cBBOs5NrKhYev7oz/mr+7g+Y0S5pMJiLP0NVdI96pRwIT+fO8GlZ7j1mtc7BSHuQYVJyGdEiZnuBrmH2N5XWR77OzOhYSx1K7w/k37Hobnm5hHI0JG+WQk2drzhfQytEnNPyxPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h2CAUCIc; arc=none smtp.client-ip=209.85.218.46
+	 In-Reply-To:Content-Type; b=K+oBMdgL953teDw9ggAoir6fPDh9We10M9+y3N+spHlOv8PxpwPmdc/nxdzxplcYsWf9sYYWlY8QGzQ/uGEXjF9bARf2GLkZNp6IWToe+BkipGNofSYH+VSFiqX0jF8ShZkppAqILLj757yNxB4lVdB8bx8mR/5S5a03lUnX8tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WHcEIjXa; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h2CAUCIc"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-bd2d8bb1068so57266266b.1
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2026 02:30:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WHcEIjXa"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-bd0209f25c1so286543666b.2
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2026 02:30:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778578231; x=1779183031; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778578238; x=1779183038; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=VGZAkcM+ym8AsbVGOAJ6+xeqYSrWcyKvdgdcKQ4eIYE=;
-        b=h2CAUCIcRb1DusSV3M0DsVMKaSnFMzQWB6BN488Z0jBqWbmUCtiTejmJ++7kPmu9az
-         GBKb0ygNhV2hiSnqxDsOYc4Z4bZoFQNS0sIGhGkJOhwnEXt056MHvrdx/cJoM0ub2HUN
-         NOvpioQrJODvqUNhlzDTfCE7DGx/rnVg27HjOsNWBMVHOWkKkLp3exAhuEciaqbO6r9F
-         qRqgLy8MESUqxlcORPoWtDDbcIV9/tbZe41qBYHOUhIsPqYoAtcBornYvNJbQBmrrmQa
-         gyfnctFEo/U/XYK9lRLVL/m9QMQM7poAmGO/UeuMf4Zlfs09jO9HRptcF0fqlDrExe9g
-         iAmA==
+        bh=1i6gK0r7rGWa5W/9WTpQ/H0vww/+AQmB17cNctDGbjU=;
+        b=WHcEIjXadNkPFUtxZjibbIycxST9iPZAoiAmYMM+LukrN41+AEMZMMUijkA9iID3PE
+         xg4pwXQf1Jf28htElNpnJC22niTXyfKF2ymcgg/R2KWT8wuJf7+q2BzapkmyoHtiZ9yp
+         ZeXZ3dQBvv9XhLemLk6KoEUkaMeUy6581GgCbmz5Bl7y6+kbR3Wnh6/jD6M/cDn9kMfZ
+         8AT9zIXP9OC7N3eldFmoe4xsIW/dvKGuw497uGm9lfr9q33CRajDdp+P2QckaO8WZZWu
+         SK3l7wPIIMsdE2Ht4/8hyulcplC4t6peIu+13WnT+be/vVykhbBCd5Kgo5tQ7Kxl6IsG
+         JtHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778578231; x=1779183031;
+        d=1e100.net; s=20251104; t=1778578238; x=1779183038;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VGZAkcM+ym8AsbVGOAJ6+xeqYSrWcyKvdgdcKQ4eIYE=;
-        b=F9609rW9QyWJqXpRxthnp5uAj5j+JEtLdkbx9L0k6YOBnrUAkpYfjltFCnNyraGjcU
-         xV17J7yQ45mHSZTQQqK1k2JK2os5NaxWKjG2ZlqYzf0LeW51pyLgH+/Bt1ndDs1uJ5xF
-         l1Bwor+nUnhlfv+c1LA05Xs+XR4Ut3l918eMp+l1q72HTbSSkffpwkmvnVLbsmRgGarR
-         YjM5icJR+Ml3/lKAh/PJuiqvvpNAro5HB5YXccYPwm69WD87yulV+zuMf57x+2OJ+f2Y
-         6sALCoTykYfaYClcQEsqQ6fSmL7qkseI9Xp5wEU71u12wxm6EXPRrMN2f6m1BUtgGG3G
-         Xk9g==
-X-Forwarded-Encrypted: i=1; AFNElJ8MPmpAqZPdIaML4OAXGxlxSvnP8U4OavOMjW6/7xjt0m04mYqClBjLpRAgE8je3j29D5xahKkA0RKzbQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaJa4dATH8xjvkTCXoR3QnqGcGR4W9G+2YLyzY+nzgxeqm3QrT
-	8niGk3aTRqmwSHu8XnJ1CqEoXBHtQVIqnZsICYhlj5P+nc5FQXc3lCQj
-X-Gm-Gg: Acq92OGx0+ohpDl0BYcBvmHnlRwXOur+Ck/SEAT3MSbXrpENIfvPMo53WaOJQUUDvo8
-	fKCfBq2R2HMwJBeSJiKUpb1Stl28bugtL5wmLLxNwbpfAiaZVFt5dDfVko9Aqm9CUQhKPX4gpZ7
-	Ikvmn43Wp7FRFTbnPguqLpFeGYRQMhXOk40fJkYYIoOm88imaZdt9SAp+a3xZeIWx9lZvxvpBXv
-	sPypJ00DGIPL6YddWnV9lOY/yZYlDL/1auZr1h+5zwmSeaDbpdW4LU8CMPemUN8w9qFy5wgF+b8
-	VTXbb+ZSo839j+SRyZy4RF1ynrZCgbki7cWkDToiCktBbs+1hbWx9WboUpBnL4w2l04eIIGs3fZ
-	j2PhAMd1UO8zFmXtjv0IQCvGOopbKINc4M2FwY9pOx7YW8Esfq4ypj2A2+7oHZOqP6xBluYQzsS
-	V4XAO65VHcten8/ar+yXXYjp0TVjuQrBNO/cDDnD9DPS2jMelNuRQPrO0F4QornkdZSIVn/TQYF
-	85thVjhpT1XoL3p7QpM9gtVWqnx90764h9gY7F5w1LrkHQXYA==
-X-Received: by 2002:a17:906:99c3:b0:bc4:f3ef:e43c with SMTP id a640c23a62f3a-bcaad52246cmr973369766b.45.1778578230560;
-        Tue, 12 May 2026 02:30:30 -0700 (PDT)
+        bh=1i6gK0r7rGWa5W/9WTpQ/H0vww/+AQmB17cNctDGbjU=;
+        b=kWuOP/3aPw49DKqlp6O5e6f+9YIvx23Kbn+9fVOtuZNChKWzlXDd4LMUsxqPFqlZJ7
+         eSTxBABsXOewFG+RhhqSBNL2QSVLqBcgGUUAfjWlh4Mr+FhyWgKAFbKlJllLzFFyn73A
+         lwENzDxkiU2wlyql6aZD5Ysnc0v46swSbdVYy+SM1pO2fvB/ksr1itKaEZQHqgSiH1Lg
+         rTXkgiLYLmYP8r42GlCr7eKpKS4FGg0/Lh3PLQtQiJagXZA84ti6dlqeod71jo5Cd++x
+         UCdvGzeilmhh7MdI5oxl4T0WyGS6UyBi/9eWpIH81WFppjYU2n8mY8JaE1U7ySdWzZfm
+         1nnw==
+X-Forwarded-Encrypted: i=1; AFNElJ9zQKTuCy1Fvy0D6Zy07CtV7RtT1xYGzZhJH4zAvpilCrTfFOvBq7SjCu1LvHTyoIY7tuuRx6i6d2eY4A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6BQfVQgWwFKMJnLLbe5X6p4Q2lwUPDM9HKDpBdaVr55MCPlyW
+	Jz7YCpQYrBVdViFCeXRzM1fgqVF/UGrirXFrwjPCobgh1s1tah8Nv0y2
+X-Gm-Gg: Acq92OHJxBrvnQ15xpDIOYVeOfzZi0WFDvloQjHM+EwxpQlFQ61U8gP7j5jD/uI1fYP
+	RLqgU0STMEYjx4MkQA4x9TonytrwDPKqz3I/YwRsHZ70/8R12Fk7dykPFbI5amAWwSGqspE7ZMT
+	fmKErkaujwIyJY1y29H9N09Ap85sRrjtvBHr9uDjfpb/Xkr+mPVW7a3b3578/+q5HLReI6ENRC9
+	BWtMv+2r0dIA+scs+ILClOb0eoSd/ZIhzEM0ZZSMKEAe0bZIS/EjkOXaCOlanC3GbxJAMtzrUWl
+	FMBjpjSxEp0KEOS8i+36sLYtOn2KtrGPtD2jeojwm1khmv2RHNyxIWAq+BLb/1Lnfyuky0adFVv
+	mE6JOTlR02AVtFHIZZgmS0gTL8erUv5V/+Q72r2PAu0fXtDwjmzSi9tqlkXjBgEBQPGcq/xKOmy
+	2yqGGy4DlIp6cXdhNh6Rqh8WWbgJzoyIDVIdHj77kU3Y3XOKtMEke5igKBwZKDN+u98fDVU3b/1
+	NpnsP8kDhHbYjK/+oQAY361mTWFHQYiMLoT8VFQYeyF7THbbg==
+X-Received: by 2002:a17:907:97d0:b0:bc2:1dab:3ea0 with SMTP id a640c23a62f3a-bd28de036d4mr114881866b.8.1778578237873;
+        Tue, 12 May 2026 02:30:37 -0700 (PDT)
 Received: from ?IPV6:2620:10d:c096:325::372? ([2620:10d:c092:600::1:8c90])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bcfb7b17d1fsm303492866b.41.2026.05.12.02.30.29
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bcfb7b17d1fsm303492866b.41.2026.05.12.02.30.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 02:30:30 -0700 (PDT)
-Message-ID: <a4748a29-8aa1-44c1-a1e4-b82f4f191d4a@gmail.com>
-Date: Tue, 12 May 2026 10:30:27 +0100
+        Tue, 12 May 2026 02:30:37 -0700 (PDT)
+Message-ID: <24cc68b2-c432-4623-92eb-b56b76850c35@gmail.com>
+Date: Tue, 12 May 2026 10:30:34 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,9 +70,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
-To: Christoph Hellwig <hch@lst.de>
+To: Ming Lei <tom.leiming@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
  Christian Brauner <brauner@kernel.org>,
  Andrew Morton <akpm@linux-foundation.org>,
  Sumit Semwal <sumit.semwal@linaro.org>,
@@ -86,26 +87,44 @@ Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
  William Power <william.power@intel.com>, Phil Cayton
  <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
 References: <cover.1777475843.git.asml.silence@gmail.com>
- <20260512070045.GA32030@lst.de>
+ <afi7c-VUJWOLlC1m@fedora> <6873d617-c904-45f3-bad9-e1ae39cfecd2@gmail.com>
+ <afxgc4hizusnAA26@fedora>
 Content-Language: en-US
 From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260512070045.GA32030@lst.de>
+In-Reply-To: <afxgc4hizusnAA26@fedora>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/12/26 08:00, Christoph Hellwig wrote:
-> What tree is this against?  I can't apply it against the usual
-> candidates, even accounting for the time lag in getting to it.
+On 5/7/26 10:50, Ming Lei wrote:
+...
+>>> BTW, inspired by this approach, I adds similar feature to ublk via UBLK_IO_F_SHMEM_ZC
+>>> which can maintain long-term vfio dma mapping over registered user-place aligned buffer.
+>>
+>> Interesting, just too a glance, and it looks like what David Wei
+>> was thinking to add to fuse, but IIUC he gave up exactly because the
+>> client will need to cooperate and that could be troublesome.
+> 
+> Here the cooperation is minimized, maybe one shmem/hugetlb path, or memfd,
+> and it is one optimization and opt-in, and fallback to normal path
+> if application doesn't cooperate.
 
-It should've been a Jens' for-next
+My point is that with widely enough adopted interface the user will be
+able to opportunistically use it without knowledge about the file, i.e.
+not knowing whether it's ublk or something else. But as you mentioned
+below, it'd be cooperative interface in either case.
+>> Should we try to push everything under the same interface instead of
+>> keeping a ublk specific one? Again to the point that it requires
+> 
+> If generic interface can be figured out, it shouldn't be a big deal for
+> ublk to switch to it, and the usage is simple actually.
 
-> Can you provide a git tree?
+Sure, you'd just need to maintain both as there is a mismatch between
+interfaces.
 
-git: https://github.com/isilence/linux.git rw-dmabuf-v4
-url: https://github.com/isilence/linux/tree/rw-dmabuf-v4
-
-It's a wip branch, for now it's just v3 + 2 fixes.
-
+> So far, ublk supports both FS and nvme block device.
+> 
+> And cooperation can't be avoided for this usage no matter if generic or
+> driver specific implementation is taken, for both fuse & ublk.
 -- 
 Pavel Begunkov
 
