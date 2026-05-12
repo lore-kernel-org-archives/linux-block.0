@@ -1,147 +1,111 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B4F20ED
-	for <linux-block@vger.kernel.org>; Tue, 12 May 2026 19:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778613675; cv=pass; b=uTulmthmWkdcgJwtqqfs6mmA8wB5B2tPPfD24KsJZiXTmAs/5Al/3SOTTuWfL+i/07OrcGkCqYuafH6IAzGu0ezgxKOtoBHBUMlZ6HLvrvz0E2kQ1Yt0FGcyIOjea5zM5gg/EZK4rPKFzLr7bNQFZ5gmCWkO2+6VDxl0XqW3uI4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778613675; c=relaxed/simple;
-	bh=nll91ULm6w2aHk9Z18ZnaI6Kevm+cuOw6+VQhhfKLeA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WpfF6AQynnfKolePJm5ISZOUMTaH0IV7rfasAzRDBfxXrj6HRS0JmXX1m8OjKSEfMx8tqeiUZN+GvYjfM0Si0kzpSvhY5Yil9fiQWnOhAoHUdDVNHUa5VrWgvEt69UZC6sdGfmPk2jMig3sNJ/X3IksEbuDlfGF4i78lBjFKhv8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=W4HnrVJK; arc=pass smtp.client-ip=209.85.161.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B79325B0B0
+	for <linux-block@vger.kernel.org>; Tue, 12 May 2026 19:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778614137; cv=none; b=h7WXS9J4+y6+3TrurmeRZy7+UpqjP3C34pHpk2J+2WHXOpwvLu7NPOxnZT7ixcoVPBMWJshdoAyk0hmJnmD23YItlJAe3b6fITfbMnVxxf77MCzCpkqlEgExnJeEYGg/gcGeOpJoe84GWsbgpUqjSxKAbDpLGPWQ68VXBJwd0dc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778614137; c=relaxed/simple;
+	bh=5NBDeyx3AzjMfkzZylUmP/Rv69iLbu6wiY0g3mpQPUc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YdpFiLIRc4KVFyv1i7IVOfBtzZYsOcjRzVY0jQ3iRY16/77SBIwrnghiD/1/8Yz8dQgJax44pKPsQcvviF48BEhFv6D3OgsZc1hluZL8wdSSIAZubQ5g1wHzZoGq2OQMv9JB/uquMVccI7BEYXcgk5K5l/E6uyGzFj2VALApqCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=fvo6/z3H; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="W4HnrVJK"
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-69491071fc6so418809eaf.2
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2026 12:21:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1778613673; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ISmQhEgkfhEcFosnn7VyMAD3IcWuvB7ZGl0cNro5kl3iWrClSpGSiJBVZuuDpf4q2A
-         Ppy74BZmJdSstkxV/sprFDqC6yjUZB+ekNNYp72mHWU/exgZ6ovXettAy5GpJwkqtXSq
-         0+IAchQhzqxoDuxu8y2o73MTsoDadPwDhmE3aydfudaGzqFYEFGcDmRRLp7W17WrAWkw
-         HXEs9nmLzl38tHPRxNgC91hPhUVdGeqKqhP0eFYZJrWnZF2COt0Ic1qQY6EqasRh8sM8
-         w5u71yxhHfZv4Bwjw/jDJjn7ymd9redxlSYKgcAVXhCAhdWnAZ0TJoXzdZ97UY7ERX+T
-         XOAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=nO3qnWfhbRxzX+PzpSpdWAjHeYnC8LurbOKJOZKk+Lg=;
-        fh=7U+fd9HPELE/UyCQ/Ax98vyT4PEUmwuCHESd7fvfdFw=;
-        b=MONlB2LPEJojphnmW+ko0p8QKJlFyGiT1xOeud1C+ldbvHwpBEfhdGguNVXdO8Tffz
-         uoHM2FcAwKNWU1nM7XzSZvzCSkVkn1LKDA7S+N3S7FZ1bxam9IizV007QYWyDlar8ATe
-         L28VcNuSn/gTWgbtM7kXfUGAw4t71UlvjUVVj+jKEYGz8dMDLBS9s3s8+eL4sKJ6/wnb
-         fsenZsUo56lwqTkbT6Gi3ixKdOrZhvoA/HsM6+3H6d1xgFw8C9FetHkU0k2T5y2j8l7K
-         2zsuD824KR+ljtF5WFN1SsqWOrb6SisWoLCCZgdjrGxsXjQIpxgxuXw4GGv0xYTu2jun
-         +npg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1778613673; x=1779218473; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nO3qnWfhbRxzX+PzpSpdWAjHeYnC8LurbOKJOZKk+Lg=;
-        b=W4HnrVJKCyu4I17/DkGo2/lcuHGcx2K4xJeeHUcDkBp71WiAhIhH6SlSJNNLhMcYNs
-         JhZZZLajy9pexHsnycEMKlPTtAiCO8qQo40AVelIpf12hbBTLGZtjgr59jdicq6pL3MG
-         gkthr01U20Lwve6ZM0mKyEgXxdO9Sp72XLlhss54KRfpFFbMBQ4r4E0E1AwB95g3docw
-         zaLn0hXN6Hktfbj/RVg2NP/U26KdZlQk2rcYKus2RbdMkir2X3LLK1T1iNOofFpwlcg3
-         Xo46vGFXAeibumYie/Rvq/nD9GbwGNcQWh9r8gS7RcgGSkuZSI3Pwt6kTCLukU1bZcbo
-         okZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778613673; x=1779218473;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nO3qnWfhbRxzX+PzpSpdWAjHeYnC8LurbOKJOZKk+Lg=;
-        b=OwTF9QUYNU6mxoiWUghwjtmP4Ty7IosWu1kqfEGoEVWMmlqodgWGi9Dyi0Mjg+iUt4
-         x28uWQUWe1IvB/ONODdVtFkO2W8vWb2AubC/SnhVStiIvR6xftnIPrNH5qh5xvrHZilB
-         tA32dn5bWlUvZhm5PQjkuK3xBCWGa/snMnmvSfNJ/Ozik7jkdTFTwPi2agCcyPaT+poZ
-         qzmlvTS8IaF/8rquoDIXswusjRg1F9AmoF4cXcQJYZyx8kQkcaaED21BY/pzC4+Z75Hk
-         rzoc19ZsMwWDCcjnzx3pfVKumP+Oxrze9yPMNMmYacVcdQcfEOjRR5yx6YPXqpYQ7NT7
-         djrQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+Fh+sNbIgGSgQw9hB8ak+Db0ilk4akKMcStAJ6r2Mf+TyKlB9w5OAua/Vg9viF02hNLLQXUzrfIE0fqw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4lM98gPVev+Q6HuRWumkiAohgIijBK4kC0zDc1OBe7JHUHpZ5
-	jTQqExU6QzFP8M3JZEwDtE2etwkG13hxRF67hxjf0ceb+NXHOxlwNR9UA1RJNEa2gDDym4sjxzE
-	TkP+ZzdxuTuN0pSNV/o05TgNyQNe6b58PAo7DY+vzDwXNa7Z/1PqO3vQtOQ==
-X-Gm-Gg: Acq92OHDRkn66Q/5bvPjFVkRKWBtTUXOPcFIu5S9vDibrnmCu4r9zUSa1zJXzQrpghV
-	ghUgSDB/aEnfD5kQKVR6pCme47f2uiFgox942Q8swvJtCmpWLyS7hyMTLfy3io0AOXb4fhGmt2R
-	x1E8c0NhaJd6mjrLqBeaCvFW1Ad8yzKXGaZfD9Ti+fAx9zIEt6m+ACj1/C9OnUfuzbiHwuJgEU3
-	9M9THaIAVX8W/OUYyy8/bPl0WlY64RFmNhzUGgnjByorpR/vRNrlS+f4qUVvRwmerVLI/PKWqnA
-	xN5xY5ABp+KWfsUGTKA=
-X-Received: by 2002:a05:6820:55d2:10b0:694:8ed2:9bbf with SMTP id
- 006d021491bc7-69b78d98e1fmr26675eaf.2.1778613673210; Tue, 12 May 2026
- 12:21:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="fvo6/z3H"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gFRTz54Ctz1XM5kD;
+	Tue, 12 May 2026 19:28:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1778614132; x=1781206133; bh=mp6BA131EzzVN0wIrKuaoaXT
+	gkb2LEeDiNgtO6cxED8=; b=fvo6/z3HR7PeJ1o/NF38gZANaZIS7HjslXPNlZLB
+	sHOfJgg8smWsDAMHn+9zXUNUOu7sly8ZU6OLE7+3e2Py8yX7lwsZUF4Jy7lDncxL
+	LuR0FJVNly/12xp8uzoeq4Rlzqo4wfLoM5pCrLvC55fawHz41xchiRAMhcVrDuCd
+	WPp8cZCw6pESoUFai7w/x8MbaoP5qJnrbyNEIGhpHksgoZHYpIoc8S23j2ElT2xj
+	k2h/3WHDCetdMQ78qlzHk4zG5NpU5BkWeEUOZjtAinW0eCHQplRB0ORNQdT1euZv
+	wiz3yPyELupBd5K/nQIp1crEtNFcffzDnOAf431ggcPDnw==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id f10nOklHl644; Tue, 12 May 2026 19:28:52 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gFRTv3GRBz1XM5jn;
+	Tue, 12 May 2026 19:28:50 +0000 (UTC)
+Message-ID: <56a1f905-2348-483b-a79e-5b3ebbd3482d@acm.org>
+Date: Tue, 12 May 2026 12:28:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260512170525.357573-1-dmantipov@yandex.ru> <CADUfDZqnV5BRwZq3c3Atu8w3gOm87AbmtexL=MenWcSbTVOgvw@mail.gmail.com>
- <26c1f22358ca894945dbfb8b7b6376a8a59229c7.camel@yandex.ru>
-In-Reply-To: <26c1f22358ca894945dbfb8b7b6376a8a59229c7.camel@yandex.ru>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 12 May 2026 12:20:59 -0700
-X-Gm-Features: AVHnY4KR8wr161beKIFztTVzYdNB9ClF9w_gJXdqgle_01-EMcDGH2azbqJmguw
-Message-ID: <CADUfDZrmXfHFV3k=m0+0Jmpd3dtx=pmsEefwkAunQt1JbQnG0g@mail.gmail.com>
-Subject: Re: [PATCH v2] lib: free pagelist on error in iov_iter_extract_pages()
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	Chao Shi <cshi008@fiu.edu>, Weidong Zhu <weizhu@fiu.edu>, Dave Tian <daveti@purdue.edu>, 
-	Sungwoo Kim <iam@sung-woo.kim>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/12] block/bdev: Annotate the blk_holder_ops callback
+ functions
+To: Marco Elver <elver@google.com>, Peter Zijlstra <peterz@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+References: <20260511163100.1887263-1-bvanassche@acm.org>
+ <20260511163100.1887263-3-bvanassche@acm.org>
+ <CANpmjNNMDY=gB23ejdDYZg5yYduup_iXE1FAWC-fghr2od7Hwg@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CANpmjNNMDY=gB23ejdDYZg5yYduup_iXE1FAWC-fghr2od7Hwg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 12, 2026 at 11:45=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.r=
-u> wrote:
->
-> On Tue, 2026-05-12 at 10:46 -0700, Caleb Sander Mateos wrote:
->
-> > The mismatch between ret <=3D 0 here and ret < 0 in
-> > bio_integrity_map_user() would result in a use-after-free in the ret
-> > =3D=3D 0 case, no? I guess this should be fixed by the "block:
-> > bio-integrity: Fix null-ptr-deref in bio_integrity_map_user()" patch
-> > that landed today.
->
-> Not sure about null-ptr-deref but IIUC this patch fixes memory leak
-> at [2] but not at [1]:
+On 5/11/26 3:19 PM, Marco Elver wrote:
+> On Mon, 11 May 2026 at 18:31, Bart Van Assche <bvanassche@acm.org> wrote:
+>>
+>> The four callback functions in blk_holder_ops all release the
+>> bd_holder_lock. Annotate these functions accordingly.
+>>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> 
+> Because of this change we'll need clang 23, or you add:
+> 
+> CONTEXT_ANALYSIS := $(call clang-min-version, 230000)
+> 
+> .. although anything else that includes blkdev.h that has
+> CONTEXT_ANALYSIS := y, but is compiled with clang 22 will break.
+> 
+> Would have been good to wait for clang 23 to be released (August this
+> year) - although if we consider the next merge window + final release
+> of Linux 7.2, it might get reasonably close to August.
 
-Yes, and I think your patch would fix the leak of pages in the ret < 0
-case. With both patches, ret =3D=3D 0 would result in calls to
-kvfree(pages) from both iov_iter_extract_pages() and
-bio_integrity_map_user(), but the value of pages in
-bio_integrity_map_user() should stay as NULL, so the second call
-should be a no-op.
+Hi Marco,
 
->
->         ret =3D iov_iter_extract_pages(iter, &pages, bytes, nr_vecs,
->                                         extraction_flags, &offset);
->         if (unlikely(ret < 0))
->                 goto free_bvec;                                 [1]
->
->         /*
->          * Handle partial pinning. This can happen when pin_user_pages_fa=
-st()
->          * returns fewer pages than requested.
->          */
->         if (user_backed_iter(iter) && unlikely(ret !=3D bytes)) {
->                 if (ret > 0) {
->                         int npinned =3D DIV_ROUND_UP(offset + ret, PAGE_S=
-IZE);
->                         int i;
->
->                         for (i =3D 0; i < npinned; i++)
->                                 unpin_user_page(pages[i]);
->                 }
->                 if (pages !=3D stack_pages)
->                         kvfree(pages);                          [2]
->                 ret =3D -EFAULT;
->                 goto free_bvec;
->         }
->
-> Dmitry
+How about detecting whether or not Clang supports context annotations
+for function pointers, e.g. as follows?
+
+diff --git a/init/Kconfig b/init/Kconfig
+index 2937c4d308ae..61e592205179 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -32,6 +32,9 @@ config CLANG_VERSION
+  	default $(cc-version) if CC_IS_CLANG
+  	default 0
+
++config CC_CONTEXT_ANNOTATIONS_ON_FUNCTION_POINTERS
++	def_bool $(success, echo 'struct __attribute__((capability("m"))) m { 
+}; struct a { void (*fp)(struct m* m) 
+__attribute__((release_capability(m))); };' | $(CC) -x c - -c -Wall 
+-Wextra -Werror -o /dev/null)
++
+  config AS_IS_GNU
+  	def_bool $(success,test "$(as-name)" = GNU)
+
+
+Thanks,
+
+Bart.
