@@ -1,109 +1,167 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174F7388882;
-	Tue, 12 May 2026 12:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA39F3B1003
+	for <linux-block@vger.kernel.org>; Tue, 12 May 2026 14:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778589641; cv=none; b=Z4B+1bx41BLOdHIk0VJYinJmAXOV80MhuwgPsmK6UAKEOURNv03wN2itmWaiHEUdvBQ8EgAy4kreNk/boGZcGgOrUTgtL4wGUMeUInpZ0SUKy5dLKdQOTvN4TiPqUy2/yt6QIhKO1a7xUHa7JoXw2yZgibYz70pa2z7nOdAWMxs=
+	t=1778595607; cv=none; b=gsdXgw7JcoixuL6k6W4VTjnD/O5jVjqPHkjwAsmWMe24bthPXxW/0+2xDpDsUktPQFGutoewCVvgHzbfVj9N8T0lArshR8bksokzyJ4DbkKFExiBJQK+c8TK9Hhfw5iRuLko4NxutIjjIHMbu0p4+dMI3UVBmVqa6u/xM1crR8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778589641; c=relaxed/simple;
-	bh=/aPJ2FydTuDDFHfqQVZJ+O0BFa6yGd9S7P2jzRkEpY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=roMTr3FrMq2rjwRthhD5W2qafU8fyrZ6W2lpfggzeKn77MgZkTvAA73/u9nYHLa2G3WnQib4lHRy9pcth8fi8ZgAkhYn3XYGA485My67wWiEfcBXsiafKtnB42WCkPxhvad1KeYWcb4LWqVlANO9SGcz8Sj7jY4mzhPrROWdFKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UkiPQoMT; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1778595607; c=relaxed/simple;
+	bh=vqr1rgjf6u/HCJT7JLU1CD3nThlktkS40ND0tlqkrMM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bkEN0DruN1TEbhhhHHtdHrzpgK2niC4U6feX1bhBz6MKwqPntvkvlpxtREeHKUp6PM0FFTsLjOWDPUZX6sbV9aaeKQV8rcQ/XD1cdwrka5AE1yi7Hd+ww09cayToTD0/2X4wAvDlqmHZEQkyoYC9H8pumNh4lzFKMSZCA0l9hic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t81N7W/N; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1ZnWSPCT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=MetrSyzq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sOo4epfI; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UkiPQoMT"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=sx/aTUJMAwlAnMQA5EsetnGYrgOYuy3tvG0DXI0Vbvk=; b=UkiPQoMTiH8AXS40Q3WvXcUaRw
-	RTG2OFWFJceysjCLH0VO8Nm2BcaMzdp4v9ZrC0I2XfmPmOPsA2ZNC7cqi3de9WHxKapMwEOerVxcK
-	b+pnbjPULxj8TAtRXD4NtB2Q2Ai9f42vn3dxRcyO4sKo4+KaAWxg8Vod7YbKFt4Ev2tNFnq73czAp
-	lnBMKOpkbf0um3Fzf1vt7VxDWIO1uxlQeR+6UOIDIz7VnqZ0Kmxx5j0D4SZtVgOYGGL3S38GG/20s
-	5Y6ZERDtS/nje0VLh9k85+bPXKO+109KaA6/kiac7gWDiwX2T6A4JCwnWJUcyRcty2di3HjzQWJDo
-	QQf7t7AQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wMmPO-00000009k1N-3WLe;
-	Tue, 12 May 2026 12:40:22 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 2E75B30075A; Tue, 12 May 2026 14:40:21 +0200 (CEST)
-Date: Tue, 12 May 2026 14:40:21 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Michael Wu <michael@allwinnertech.com>,
-	Xiaosen He <xiaosen.he@oss.qualcomm.com>
-Subject: Re: [PATCH] sched: flush plug in schedule_preempt_disabled() to
- prevent deadlock
-Message-ID: <20260512124021.GA2214256@noisy.programming.kicks-ass.net>
-References: <20260512085939.1107372-1-tom.leiming@gmail.com>
- <20260512120431.GC1889694@noisy.programming.kicks-ass.net>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t81N7W/N";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1ZnWSPCT";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="MetrSyzq";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sOo4epfI"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B75F775BB5;
+	Tue, 12 May 2026 14:20:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1778595603; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3EP1faBGLN+no503thLo6n9CBiSdMnrRO0eLXY2Tv7I=;
+	b=t81N7W/Nv8v0rvD1jUc+ze0GLTAUr0+ebiCY8NRvyVD072ReKjkvloxx4U7OkdRoEQ0zGK
+	Uc1ZQoWjOazikndFHR4w84zAYGpdIYqD2+eV4s+n1TqFD38nflnVI+RTZcChEX0At55gfC
+	drLcL8V43UizQAqY91hs8iAHs+42vQE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1778595603;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3EP1faBGLN+no503thLo6n9CBiSdMnrRO0eLXY2Tv7I=;
+	b=1ZnWSPCTE0ulbttJ5D5p1MT6QIrRfxF+4EzTeliV+7nqcWGcE93xfXPHMDBdnKLG6O+ysa
+	OgeIRotsLjQzS7Dg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=MetrSyzq;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=sOo4epfI
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1778595602; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3EP1faBGLN+no503thLo6n9CBiSdMnrRO0eLXY2Tv7I=;
+	b=MetrSyzqzRmF15ALI99x0FOfYG+LVv5NSyeKSsp1fmVsUQXBlW9EZpI6M5rWr2BlMe4NqM
+	XV3Ubxo8H+0dPDEzfCCeuasu2JDdIi1kXn46oumn1eRCuL0kaUEk9mAwHLd+iD0XHpWU4m
+	91I+1jdBGn8ji5W9GYx7LHTsH8Lt3Jg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1778595602;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3EP1faBGLN+no503thLo6n9CBiSdMnrRO0eLXY2Tv7I=;
+	b=sOo4epfI7bN0V03WcMMc0+0wvwYdvLRapy8n5DXXujoyRA6nGGMcyk1otyobCC0j3AD1f2
+	gYwqBRX7+8vmctCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A3313593A9;
+	Tue, 12 May 2026 14:20:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id cFX6JBE3A2rMCgAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 12 May 2026 14:20:01 +0000
+Message-ID: <816ac704-4f46-4f00-8e84-aed892d93187@suse.de>
+Date: Tue, 12 May 2026 16:19:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260512120431.GC1889694@noisy.programming.kicks-ass.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/12] swap: remove the maxpages variable in sys_swapon
+To: Christoph Hellwig <hch@lst.de>, Andrew Morton
+ <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
+ Kairui Song <kasong@tencent.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+ "Darrick J . Wong" <djwong@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ Namjae Jeon <linkinjeon@kernel.org>, Hyunchul Lee <hyc.lee@gmail.com>,
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+ Carlos Maiolino <cem@kernel.org>, Damien Le Moal <dlemoal@kernel.org>,
+ Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+ linux-cifs@vger.kernel.org
+References: <20260512053625.2950900-1-hch@lst.de>
+ <20260512053625.2950900-2-hch@lst.de>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260512053625.2950900-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email,suse.de:mid];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,kernel.dk,suse.com,mit.edu,gmail.com,samba.org,manguebit.org,wdc.com,vger.kernel.org,kvack.org,lists.sourceforge.net];
+	DKIM_TRACE(0.00)[suse.de:+];
+	TO_DN_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	R_RATELIMIT(0.00)[to_ip_from(RLps6cgtzy16baoy877g4cecjn)];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email,suse.de:mid]
+X-Rspamd-Queue-Id: B75F775BB5
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
 
-On Tue, May 12, 2026 at 02:04:32PM +0200, Peter Zijlstra wrote:
-> On Tue, May 12, 2026 at 04:59:39PM +0800, Ming Lei wrote:
-> > On preemptible kernels, a deadlock can occur when a task with plugged IO
-> > calls schedule_preempt_disabled():
-> > 
-> >   schedule_preempt_disabled()
-> >     sched_preempt_enable_no_resched()  // preemption now enabled
-> >     schedule()                         // <-- preemption can happen here
-> >       sched_submit_work()
-> >         blk_flush_plug()
-> > 
-> > After sched_preempt_enable_no_resched() re-enables preemption, the task
-> > can be preempted (e.g., by a higher-priority RT task) before reaching
-> > blk_flush_plug() in sched_submit_work(). Since the task's state is
-> > already TASK_UNINTERRUPTIBLE (set by the mutex/rwsem slowpath caller),
-> > requests in current->plug remain unflushed for an unbounded time.
-> > 
-> > If another task depends on those plugged requests to make progress (e.g.,
-> > to release a lock the sleeping task needs), a deadlock results:
-> > 
-> >   - Task A (writeback worker): holds plugged IO, preempted before
-> >     flushing, stuck on run queue behind higher-priority work
-> >   - Task B: waiting for IO completion from Task A's plug, holds a lock
-> >     that Task A needs to be woken up
-> > 
-> > Both reported deadlocks involve mutex/rwsem slowpaths, which are the
-> > primary callers of schedule_preempt_disabled() with non-running task
-> > state.
-> > 
-> > Fix by flushing the plug in schedule_preempt_disabled() while
-> > preemption is still disabled. This ensures the plug is empty before the
-> > preemption window opens.
+On 5/12/26 07:35, Christoph Hellwig wrote:
+> Always use si->max which is updated setup_swap_extents instead of copying
+> into and out of maxpages.
 > 
-> How is this different from any path calling schedule()? That would be
-> subject to exactly the same issue.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   mm/swapfile.c | 27 +++++++++++----------------
+>   1 file changed, 11 insertions(+), 16 deletions(-)
 > 
-> The patch cannot be correct.
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
-Also, is there a reason io_schedule_prepare() has a blk_flush_plug()
-call?
+Cheers,
 
-io_schedule()
-  token = io_schedule_prepare()
-    blk_flush_plug(current->plug, true);
-  schedule()
-    if (!task_is_running(tsk))
-      sched_submit_work()
-        blk_flush_plug(tsk->plug, true);
-
-Why isn't the one in sched_submit_work() sufficient? This thing either
-needs a comment justifying its existence, or get removed.
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
