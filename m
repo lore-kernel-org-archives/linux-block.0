@@ -1,106 +1,93 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB11A360EC3;
-	Tue, 12 May 2026 11:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB91D2F12DA;
+	Tue, 12 May 2026 12:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778586485; cv=none; b=qr1rOflS8gJ7ujFZ+sK1E9Op7FBbMC7Nff+wZ2aB6i4EFF74LUDyYxF8kOCdqwVzRIFuseyd24pb6ILwD1EkaT+ZM7J00qubdD0alLckH2C5Y1aNVwt0z7XmZKdeygKW+TvdaNQDOksj/1Lk5BHD64Z2CEwg5u1oAGBKBrJgRuM=
+	t=1778587483; cv=none; b=rs2vLb4LLTlRyBNBuVrIOXLC9jqRGQtgLHeD8Hyt1Jp8ypxPtZxBCz8xkGFP5kF++M0/DiP53VXE0tyaOlXNNfqQ87TxNyy82/jiW01pKimWp1/pALU60QOmnOFrZFymXDMrHGh03+KjB5yMOrMng027yAkGNccbXAmiKi0qXgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778586485; c=relaxed/simple;
-	bh=xW0IXLghbN2fcgVFjinBuP6pTZHAYH4U0nAUGnGBIlc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=eshBKX+0AiuIIFFI7j8zOqleoEIRHB4tqhoew+boxZUok/OLPmEL5PIBXkbV4Re+bf5MeCML2c5WwB2af1jMsG3eKYgaH77t4ygnYnpFna4IxLSZ99+syNcDM/Ep8KsvwsVAAVPrkHtF+F6wY9za+6xN1gGHC4qMn+zogP53f+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64CBkqIY090642;
-	Tue, 12 May 2026 20:46:52 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64CBkq4o090638
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 12 May 2026 20:46:52 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <af2205e3-205e-4743-a767-8593c2c4747a@I-love.SAKURA.ne.jp>
-Date: Tue, 12 May 2026 20:46:51 +0900
+	s=arc-20240116; t=1778587483; c=relaxed/simple;
+	bh=4V43S6Dj0iZy2lMXEaOFqXdpJsj1QL0+DKe1V9xS89w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eeeT1A79TS/H9CfJnmY+mJnLedPDaL1F2EasxIteYKKVC6o7J/8iZwQMLS9Nj2TdWpEniIPw14DxS2JbpLvTYw20UctujgIAqJmpiUGKm4DG43vtpD0lEp4kXFnicIs8ZLe+4jaguXEqB4JQeyXk6GLhm6qzjcRYRqRifiCBrB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YNZ7oVyI; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YNZ7oVyI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=BzSQcLPIQ3AfygSkxes+P0fY0tOS1ixZrgeVnP+FvGI=; b=YNZ7oVyINV9lrqvCEAEOYgyx4U
+	fdy8FxZX4ma6ZaGCDZSrikaF12tlPZCNoYlVV6I7nzmXZMOEl0kN5nmNeDMcTTqUg8FmzzLMpR+vJ
+	6lW/Dy0vEJy16K3DAE+AzR+2GbvBVK/AKMcO0v1nFM+eQsLZ+LmlAW2T62cJC2xdJsxCEKetx42NH
+	1efgE+Lpy2iWBR6q2YNzdsR3L/1Pcisq5TtmXkZFE3K/WLrlmwNnWcW60hjJSMuuBkjrRQ9iVwqLh
+	Xg6Oq6vVIgwOUF/KC9p9ThqROB2tKt8IqIBa0Po6IC6YzAGuDMx4QLzXjQy58ohZJMe6A94kecn5n
+	leS5Y5Iw==;
+Received: from 2001-1c00-8d85-4b00-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:4b00:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wMlqj-00000009hpL-34LK;
+	Tue, 12 May 2026 12:04:34 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id F2C6830075A; Tue, 12 May 2026 14:04:31 +0200 (CEST)
+Date: Tue, 12 May 2026 14:04:31 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Michael Wu <michael@allwinnertech.com>,
+	Xiaosen He <xiaosen.he@oss.qualcomm.com>
+Subject: Re: [PATCH] sched: flush plug in schedule_preempt_disabled() to
+ prevent deadlock
+Message-ID: <20260512120431.GC1889694@noisy.programming.kicks-ass.net>
+References: <20260512085939.1107372-1-tom.leiming@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loop: Fix NULL pointer dereference by synchronizing
- lo_release and loop_queue_rq
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <69e2ca14.a00a0220.1bd0ca.0031.GAE@google.com>
- <e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp>
- <e33b4060-69d9-4d02-a330-2fbd19249237@I-love.SAKURA.ne.jp>
- <c0047a38-3d02-4ce5-88b0-2b7d0b9b69fa@acm.org>
- <f720dd8b-4aa3-48e4-a1bb-c0b43eb70f19@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-In-Reply-To: <f720dd8b-4aa3-48e4-a1bb-c0b43eb70f19@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260512085939.1107372-1-tom.leiming@gmail.com>
 
-Commit 99ebc509eef5 ("mm: memcontrol: fix rcu unbalance in get_non_dying_memcg_end()") fixed
-RCU imbalance bug, and it seems that so far only trees without that commit is reproducing RCU
-imbalance bug.
-
-But since this NULL pointer dereference bug was reproduced in linux-next-20260508 which already
-includes that commit, I suspect that some change in the block layer broke protection by RCU
-synchronization or flushing of lo->workqueue.
-
-Can you check that there was no commit that might break protection by RCU synchronization or
-flushing of lo->workqueue?
-
-On 2026/05/12 2:43, Tetsuo Handa wrote:
-> Thank you for responding.
+On Tue, May 12, 2026 at 04:59:39PM +0800, Ming Lei wrote:
+> On preemptible kernels, a deadlock can occur when a task with plugged IO
+> calls schedule_preempt_disabled():
 > 
-> Given it is protected by RCU, this might be yet another manifestation of
-> "is trying to release lock (rcu_read_lock) at:" + "but there are no more locks to release!"-type of
-> hidden RCU imbalance bugs recently introduced? Andrew, was any progress made for RCU imbalance bugs?
+>   schedule_preempt_disabled()
+>     sched_preempt_enable_no_resched()  // preemption now enabled
+>     schedule()                         // <-- preemption can happen here
+>       sched_submit_work()
+>         blk_flush_plug()
 > 
-> On 2026/04/21 20:05, Tetsuo Handa wrote:
->> Since this problem started after the merge window opened, the culprit commit
->> might be in between commit a028739a4330 ("Merge tag 'block-7.0-20260305' of
->> git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux") and
->> commit 7fe6ac157b7e ("Merge tag 'for-7.1/block-20260411' of
->> git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux").
->> Also, syzbot was not testing changes in linux-next since next-20260403,
->> and found this problem in next-20260413.
+> After sched_preempt_enable_no_resched() re-enables preemption, the task
+> can be preempted (e.g., by a higher-priority RT task) before reaching
+> blk_flush_plug() in sched_submit_work(). Since the task's state is
+> already TASK_UNINTERRUPTIBLE (set by the mutex/rwsem slowpath caller),
+> requests in current->plug remain unflushed for an unbounded time.
 > 
-> On 2026/05/12 0:58, Bart Van Assche wrote:
->> Why SRCU instead of RCU? The loop driver doesn't set BLK_MQ_F_BLOCKING
->> and hence must not sleep inside loop_queue_rq(). Additionally, the block
->> layer already holds an RCU lock around all loop_queue_rq() calls. From
->> block/blk-mq.h:
->>
->> /* run the code block in @dispatch_ops with rcu/srcu read lock held */
->> #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)    \
->> do {                                \
->>     if ((q)->tag_set->flags & BLK_MQ_F_BLOCKING) {        \
->>         struct blk_mq_tag_set *__tag_set = (q)->tag_set; \
->>         int srcu_idx;                    \
->>                                 \
->>         might_sleep_if(check_sleep);            \
->>         srcu_idx = srcu_read_lock(__tag_set->srcu);    \
->>         (dispatch_ops);                    \
->>         srcu_read_unlock(__tag_set->srcu, srcu_idx);    \
->>     } else {                        \
->>         rcu_read_lock();                \
->>         (dispatch_ops);                    \
->>         rcu_read_unlock();                \
->>     }                            \
->> } while (0)
+> If another task depends on those plugged requests to make progress (e.g.,
+> to release a lock the sleeping task needs), a deadlock results:
+> 
+>   - Task A (writeback worker): holds plugged IO, preempted before
+>     flushing, stuck on run queue behind higher-priority work
+>   - Task B: waiting for IO completion from Task A's plug, holds a lock
+>     that Task A needs to be woken up
+> 
+> Both reported deadlocks involve mutex/rwsem slowpaths, which are the
+> primary callers of schedule_preempt_disabled() with non-running task
+> state.
+> 
+> Fix by flushing the plug in schedule_preempt_disabled() while
+> preemption is still disabled. This ensures the plug is empty before the
+> preemption window opens.
 
+How is this different from any path calling schedule()? That would be
+subject to exactly the same issue.
+
+The patch cannot be correct.
