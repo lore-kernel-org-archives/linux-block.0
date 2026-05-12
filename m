@@ -1,134 +1,93 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward502a.mail.yandex.net (forward502a.mail.yandex.net [178.154.239.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A6B368D55
-	for <linux-block@vger.kernel.org>; Tue, 12 May 2026 08:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA76492188;
+	Tue, 12 May 2026 08:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.82
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778573240; cv=none; b=YYxIvmEDRV1owaOqFKyPU4Xb5YnUNWd+uwShrNmFhJEdlu517aOzIyWybE2kI+TXRHmhxJwD8PYyTOAT/WkwYWvPeIQ/0tykgiz6NQCt0Lz4fx3HLFP2gRk3ObdKntSOWn6eCWI5TXs2YKymdrlkv51vuKyt5n15Rh5rlEdn+v8=
+	t=1778573585; cv=none; b=qy00gWX/M/P6/r0pfBpXMmRRDLrH6kAFMHwpXEouTz+7RG2OdDu8AsPp1R3EvVNaIRY0lO5Mux9OWA6YTwPYunK5HSP+/8psZar6OczfwJwHpDyYE57lSSn96cRxD6wAbh5utQ8YfPHyCPE/YNm456wRWF0emqqG2Ar/lJ/nNRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778573240; c=relaxed/simple;
-	bh=jAgQG7EAsC36kPwVxZzWPi1dqHCRuBg4xd0zcyE/2EQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IQK8ZxW2SS7DZaBz0JMKCMCeFBTNiCWz6GZw9Pp36tFj8ITQ9Kdam4bfgI7OPQWaYmgki08IWkwdABANPjx7ESPK8XmnsI6Dzn2GuioE3CvMvbYiFOvVZsdKcButWao8oYOPNAVRHk7v3ST32/XmvF8P1BtiOI6kA7qHCV6CVqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DHtIGK8N; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778573585; c=relaxed/simple;
+	bh=BYL3Nj8xAQDf01o29bt+3vC0EBC0fEQa91HekCGI85g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gwKjDFjuubiI6SETCNEdvK2k+yMnTjPNKJGFIEDlgNAsUkrvYZ3pyu6bS3kDWlP8i5Y4zBjlIGyQc8FXL4DlPdMjdp+lBN8EINcOPgbctk2hEkCrvezEQDEeguuRaltwKA5VLFXKQbeJQ8SCMbfpsUkX/+t2yMO1RdAXbyLuopU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=TRsvU4Mo; arc=none smtp.client-ip=178.154.239.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DHtIGK8N"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-479d593a0c3so4453432b6e.0
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2026 01:07:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778573237; x=1779178037; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xdojfavMRM36mRqPBUNav0nKv8uWwk4QyGdy/Q3s4jo=;
-        b=DHtIGK8N99liEslDW+UlteRa+ixhktYXmjJJlC5j1K3GQu5HN/9fOSKhbUb7ej9e5z
-         GGXD9rBrVoBdarAMnWT3yLwWvlSI5yLAFFwU7qJW+yU7N6mIuCF+r4G/5G3WtFVWJsYm
-         2mTrOvFPFvErglJlYSANjrDjWJ12Am6Buz58yVP/Y3H0smbsy6zICqkrnSUoluHzvFJr
-         tN0rUkQj2i5z+s9v4AF3N8phcATfp0kp4JiHBgYfmeHvXn58nnNuWNIxChApszpj0Igl
-         j4C0kIfWMofBEkzqxZQq0+m1LcQGSRFSKtJuXuB9lGi/MCNx6GnLkJyhbwVLRUR/Nfd9
-         6/vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778573237; x=1779178037;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xdojfavMRM36mRqPBUNav0nKv8uWwk4QyGdy/Q3s4jo=;
-        b=c33xLzuMD6SasKhNEndScRdPScZ/+Yssc1J64n0Ladf/iBBgorJ5A/idOb/XisEWbu
-         ImAIzNXxpGLFwgGt943AkNykJD42x1Fa8Tf577FlYIlV6XWnHY3gNdkHimXO8scrLICF
-         sllmbYQdX7gGjM3cdEY7XCcj/SbqBa6totWS+ImNQHfIov56gMSUcHFcTbMLHjWKC+IW
-         iRo7dss+uQIfQY3pDKESsehYwNuTTilYso4r1EhdwdyjBTTyFxWY/0inufoz5SAqQVXp
-         nq34nRv3hPIXD7Fb66ndktbgv3GF4t7Izn5/ji3NBRIPqkJRlshsbdrHJOCMRORyR+t5
-         5nKA==
-X-Forwarded-Encrypted: i=1; AFNElJ8f/+0jqcA0suL0Ctd49AKUMoiv25d470PGPG0U6QW+0qDwJUL8W0I0fenAWj+XjpM8n90q+kUfMPIsog==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGuPc/Ua9CDOi6X66VKLK+GFHiK4P9aRLGk1/ak6g7LcjMmkW/
-	cBi6ROq+hYqPt2tATS4eGtduItMmynyOGg3L0OUKPvjLPEWRoLaOcpYG
-X-Gm-Gg: Acq92OHi/Y/0QvStLl/Xlq0f7q5LmcEqyc2ItWjaLNfYEqyRsCx5oN5UPXcyJJEpeVX
-	hgKBlMcUoep0bJs8bLweiTTd8ZilhH3xHsoqDgOfnIteCe1KqXPk0V/fx3B9gosrTHF2xPkYH22
-	3oU5EXojYF6Y9eTLXdlTofdP8qQLvfFgut62qsb1C+lqiAJLIPmoBw5BOn3WneFlE4t6FMKd1FZ
-	ktH/d3PCZwDhi0gqAXEMgU6onCVHUtZuLBIckf4YS7mKO6VEj8c54qQBwWVtcsl8whDJBBatjUQ
-	XuchmD6wcTjBComvqT6zJVWMPEkA3O66M8mtvjsYPBVjKezxwaZ+7O57ZTxP2LzcSVKV3eg04gM
-	6OXacHdQ+vAxji61SnNFHCnTzVTQnlJ1HLXakgUON5wGsuqvCf4Bv8yrzvOblhYF1Frckmck8+o
-	BVk2KK6b5QSWIIGaAlY6+o3PBs7CrVG5ualfcmKYr/8GPolLYPSIkWsVEFoA0IwF5bwP2aq6gc2
-	OF6rtmLHrkHo85NpLkKnBFKXr1KWdA=
-X-Received: by 2002:a05:6808:c171:b0:47c:be57:7fb0 with SMTP id 5614622812f47-48293c21669mr2066853b6e.9.1778573237226;
-        Tue, 12 May 2026 01:07:17 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4824f8f1964sm6030932b6e.7.2026.05.12.01.07.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 01:07:16 -0700 (PDT)
-Date: Tue, 12 May 2026 16:07:11 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Xiaosen <xiaosen.he@oss.qualcomm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Wu <michael@allwinnertech.com>
-Subject: Re: [PATCH] sched: disable preemption around blk_flush_plug in
- sched_submit_work
-Message-ID: <agLfr9kPHJUrZUex@fedora>
-References: <20260423125528.2917171-1-tom.leiming@gmail.com>
- <5660795d-87de-46f5-add4-7729a02225ef@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="TRsvU4Mo"
+Received: from mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0f:39a:0:640:15c4:0])
+	by forward502a.mail.yandex.net (Yandex) with ESMTPS id 478E3812EB;
+	Tue, 12 May 2026 11:12:52 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net (smtp) with ESMTPSA id nCFf6A3RB8c0-y9E09JTj;
+	Tue, 12 May 2026 11:12:50 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1778573570; bh=XJ+oUBWpEaY2qbP7rSYzkjlbVvJJPvJAXa5sPFYRbb8=;
+	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
+	b=TRsvU4Moi2MaABcBaJZ3fhICfiiBkukj4QR/JCg/AQreukxgDbXkU/IgvQ9m9v76y
+	 y9CtJR7W7Q58cECXULCaC/kt63ZotVL1Fd4Ff+8NFTiIHQBSzQ+GUQ3v1xTTNGAcT5
+	 mlnYxqIlAezPQnH8Za+1LVvNU/tg9QOo39NTaYV4=
+Authentication-Results: mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <89db3b52508cfb345317feec8fe066849abccc14.camel@yandex.ru>
+Subject: Re: [PATCH] lib: free pagelist on error in iov_iter_extract_pages()
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
+  Christoph Hellwig	 <hch@lst.de>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, 	lvc-project@linuxtesting.org, Fedor
+ Pchelkin <pchelkin@ispras.ru>
+Date: Tue, 12 May 2026 11:12:49 +0300
+In-Reply-To: <CADUfDZpC5WOBY4_xvAy6ORtgQsxwFYj3Px81RdN7NKQZBFdJSQ@mail.gmail.com>
+References: <20260508111329.329943-1-dmantipov@yandex.ru>
+	 <CADUfDZpC5WOBY4_xvAy6ORtgQsxwFYj3Px81RdN7NKQZBFdJSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5660795d-87de-46f5-add4-7729a02225ef@oss.qualcomm.com>
 
-On Tue, May 12, 2026 at 01:56:55PM +0800, Xiaosen wrote:
-> There is another deadlock caused by preemption during calling
-> blk_flush_plug() in sched_submit_work().
-> blk_mq_dispatch_list
->   percpu_ref_get(&this_hctx->queue->q_usage_counter)
->     percpu_ref_get_many(ref, 1);
->           rcu_read_lock()
->             __rcu_read_lock()
->             rcu_lock_acquire
->                   lock_acquire
->                     preempt_schedule_irq  --> writeback worker got
-> preempted here and be scheduled out in D state
-> 
-> 1. task kworker/u32:6 had dirty pages from f2fs node inode submitted to
-> block layer and the corresponding request was added to plug list of the
-> current task.
-> 2. task snpe-net-run acquired gc_lock waiting for the request that
-> contained page from node inode to be completed.
-> 3. task kworker/u32:6 needed to acquire gc_lock to perform foreground
-> GC, since the gc_lock had already been acquired by task snpe-net-run, so
-> it called blk_flush_plug() in sched_submit_work() before sleeping to
-> avoid deadlocks, but task kworker/u32:6 got preempted in RCU critical
-> section before running hw queue to issue plugged requests. so the
-> plugged requests were pending in local request list. task kworker/u32:6
-> was scheduled out waiting to be woken up by the release of gc_lock.
-> 4. so, there is a deadlock to cause RCU STALL.
-> 
-> I think task kworker/u32:6 should not be scheduled out before returning
-> from blk_flush_plug(), and I think this patch should be able to fix such
-> deadlocks.
+On Fri, 2026-05-08 at 11:33 -0700, Caleb Sander Mateos wrote:
 
-This patch isn't enough, because the current task could be preempted
-anytime before calling into blk_flush_plug(), even before schedule().
+> Indeed, it looks like *all* callers of iov_iter_extract_pages()
+> pass a non-NULL struct page **.
 
-One quick way is to fix schedule_preempt_disabled(), I will prepare one
-formal patch later.
+This is not true for 6.12.x at least (where this issue was initially discov=
+ered)
+where bio_map_user_iov() do the following:
+...
+	while (iov_iter_count(iter)) {
+		struct page *stack_pages[UIO_FASTIOV];
+		struct page **pages =3D stack_pages;
+		ssize_t bytes;
+		size_t offs;
+		int npages;
 
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index b8871449d3c6..18ef6ed71b4f 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -7336,6 +7336,7 @@ asmlinkage __visible void __sched schedule_user(void)
-  */
- void __sched schedule_preempt_disabled(void)
- {
-+       blk_flush_plug(current->plug, true);
-        sched_preempt_enable_no_resched();
-        schedule();
-        preempt_disable();
+		if (nr_vecs > ARRAY_SIZE(stack_pages))
+                        /* Stack pages aren't enough, so set 'pages' to NUL=
+L
+                           and force allocation by want_pages_array(). */
+			pages =3D NULL;
 
+		bytes =3D iov_iter_extract_pages(iter, &pages, LONG_MAX,
+					       nr_vecs, extraction_flags, &offs);
+		if (unlikely(bytes <=3D 0)) {
+                        /* If 'pages' was allocated (and so pages !=3D stac=
+k_pages), memory leak here */
+			ret =3D bytes ? bytes : -EFAULT;
+			goto out_unmap;
+		}
 
-Thanks,
-Ming
+For 6.12.x and may be other stables, the simplest possible fix is
+https://lore.kernel.org/stable/20260505094529.406783-1-dmantipov@yandex.ru/=
+T/#u.
+
+For upstream, it may be better to tweak iov_iter_extract_pages() itself, bu=
+t
+it may be required to adjust all of the callers.
+
+Dmitry
