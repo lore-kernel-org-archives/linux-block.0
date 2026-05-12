@@ -1,58 +1,180 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A54368D6A;
-	Tue, 12 May 2026 07:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A4E357D08;
+	Tue, 12 May 2026 07:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778569269; cv=none; b=PlRh8I5IBjpZ5qm/AFH/3ZWSvAjrDzNtemshjwee9cu08LTN4OMsXC/94SoNZ5xp4dEWCGUSFVCYJ2aGcOlz5bAoAzh8ciK1Yol70ym0t8oGEAak/sAQH0JvK0XHHtqOVXakwVnotTF2Bi582Vpoi5MKlz7B71S8PICtxcVcriQ=
+	t=1778569722; cv=none; b=ZacpkcsJD/F3dELlzrPe8rrb0XbUq3+VehYSBxgHLHxyPrLhm8h1DVTFkKx4vTJ8TGUa6nM1zYNwJzXKMkGrFhIEGUkST6kktVBFLtzSdZkJCpfiblZP+JzP5Z6vKBQ9H5GYmuAl2JNs7UU5DzMhdnmiimNZ3/iJ+eK/VuDjRZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778569269; c=relaxed/simple;
-	bh=KkcmQuuEBxWL+hwMwZ61+Q42L9xzkCI2bIb55AkoXNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CfaD3CFxX58g86jS7Jr5PT47EtR9G586ffH3yghcs6At5cWDnfh6to7sBRnf+VKsdBtwTgcFT1RCqvlvM4590JMzYYzc0QEFPG/bEwo/hAaQMfgj46QJMC9vwcos6/APXBmpxyPllQmX7L9PGkD3UXD1o/f602XjwoH9HKUyAXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id EBBE468C4E; Tue, 12 May 2026 09:00:47 +0200 (CEST)
-Date: Tue, 12 May 2026 09:00:46 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 00/10] Add dmabuf read/write via io_uring
-Message-ID: <20260512070045.GA32030@lst.de>
-References: <cover.1777475843.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1778569722; c=relaxed/simple;
+	bh=5R+EGY533uqCmLzbRat4246szQJrvxiGXh+zrcNZP8Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qZ/tT+5p2sM4JWHzRLZkPhbZC1yih/gvOJK9nyvA5tVfDW6cvm+Jgvfoy7SevddRJlhhJzGd+WDLpw+TPbpvVvg7LIvcRew3rbikdnLLn5s37GpyGC+PB8Ta6Tmi3H4MAhlusbVHNfD8Jj4bXbiubTFZoOdhU6+BBoIf4vizWlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZVW7Qui; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZVW7Qui"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E6A5C2BCFD;
+	Tue, 12 May 2026 07:08:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778569721;
+	bh=5R+EGY533uqCmLzbRat4246szQJrvxiGXh+zrcNZP8Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AZVW7Qui1CP12PCsES+DAfGefhgG6ZsGG+IPd29OfkaPW+1CkthidE8AZJwY75U0C
+	 4rNrhnRBljNrhbvZDbEiEgSRDdXMcjdraEcCwuiJdxsOXLKnGqhSVmrr/6hhPR2x9L
+	 5vwiYRzb+7Elk2tmObpq81hcArgCm9ZegwZDJEAkv9M9iicfMeRn5NaRYpNZWqfPOE
+	 2HWszZ/4Gxf/5HGNX9W/seayQBqvEPgMe4Hs7m6wvAkzGhJbO9TvFDGMPWP3Yn5FY9
+	 SZ27OhjGJ/CoGsGG5mf9JCFTzQ3uplWm0vr4OAI+NqYEiilCS2Y4tpjuYjp3Qie9BH
+	 /RQBnxU6ladzQ==
+Message-ID: <03dddf72-8755-4ebf-ba79-456377f0f25d@kernel.org>
+Date: Tue, 12 May 2026 16:08:35 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1777475843.git.asml.silence@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/12] swap: remove the maxpages variable in sys_swapon
+To: Christoph Hellwig <hch@lst.de>, Andrew Morton
+ <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
+ Kairui Song <kasong@tencent.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+ "Darrick J . Wong" <djwong@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ David Sterba <dsterba@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+ Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ Namjae Jeon <linkinjeon@kernel.org>, Hyunchul Lee <hyc.lee@gmail.com>,
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+ Carlos Maiolino <cem@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>,
+ linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-mm@kvack.org, linux-block@vger.kernel.org,
+ linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+ linux-cifs@vger.kernel.org
+References: <20260512053625.2950900-1-hch@lst.de>
+ <20260512053625.2950900-2-hch@lst.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260512053625.2950900-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-What tree is this against?  I can't apply it against the usual
-candidates, even accounting for the time lag in getting to it.
+On 5/12/26 14:35, Christoph Hellwig wrote:
+> Always use si->max which is updated setup_swap_extents instead of copying
+> into and out of maxpages.
 
-Can you provide a git tree?
+Checking mm/swapfile.c, I see s->max being set only in swapon(). Is this a typo
+or am I misunderstanding this sentence ?
 
+Looks good otherwise, but it would be nice to rename ->max to ->maxpages to make
+it clear what this is counting.
+
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  mm/swapfile.c | 27 +++++++++++----------------
+>  1 file changed, 11 insertions(+), 16 deletions(-)
+> 
+> diff --git a/mm/swapfile.c b/mm/swapfile.c
+> index 9174f1eeffb0..f7ebd97e28a3 100644
+> --- a/mm/swapfile.c
+> +++ b/mm/swapfile.c
+> @@ -3350,10 +3350,9 @@ static unsigned long read_swap_header(struct swap_info_struct *si,
+>  }
+>  
+>  static int setup_swap_clusters_info(struct swap_info_struct *si,
+> -				    union swap_header *swap_header,
+> -				    unsigned long maxpages)
+> +				    union swap_header *swap_header)
+>  {
+> -	unsigned long nr_clusters = DIV_ROUND_UP(maxpages, SWAPFILE_CLUSTER);
+> +	unsigned long nr_clusters = DIV_ROUND_UP(si->max, SWAPFILE_CLUSTER);
+>  	struct swap_cluster_info *cluster_info;
+>  	int err = -ENOMEM;
+>  	unsigned long i;
+> @@ -3395,7 +3394,7 @@ static int setup_swap_clusters_info(struct swap_info_struct *si,
+>  		if (err)
+>  			goto err;
+>  	}
+> -	for (i = maxpages; i < round_up(maxpages, SWAPFILE_CLUSTER); i++) {
+> +	for (i = si->max; i < round_up(si->max, SWAPFILE_CLUSTER); i++) {
+>  		err = swap_cluster_setup_bad_slot(si, cluster_info, i, true);
+>  		if (err)
+>  			goto err;
+> @@ -3425,7 +3424,7 @@ static int setup_swap_clusters_info(struct swap_info_struct *si,
+>  	si->cluster_info = cluster_info;
+>  	return 0;
+>  err:
+> -	free_swap_cluster_info(cluster_info, maxpages);
+> +	free_swap_cluster_info(cluster_info, si->max);
+>  	return err;
+>  }
+>  
+> @@ -3440,7 +3439,6 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+>  	union swap_header *swap_header;
+>  	int nr_extents;
+>  	sector_t span;
+> -	unsigned long maxpages;
+>  	struct folio *folio = NULL;
+>  	struct inode *inode = NULL;
+>  	bool inced_nr_rotate_swap = false;
+> @@ -3512,14 +3510,13 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+>  	}
+>  	swap_header = kmap_local_folio(folio, 0);
+>  
+> -	maxpages = read_swap_header(si, swap_header, inode);
+> -	if (unlikely(!maxpages)) {
+> +	si->max = read_swap_header(si, swap_header, inode);
+> +	if (unlikely(!si->max)) {
+>  		error = -EINVAL;
+>  		goto bad_swap_unlock_inode;
+>  	}
+>  
+> -	si->max = maxpages;
+> -	si->pages = maxpages - 1;
+> +	si->pages = si->max - 1;
+>  	nr_extents = setup_swap_extents(si, swap_file, &span);
+>  	if (nr_extents < 0) {
+>  		error = nr_extents;
+> @@ -3531,14 +3528,12 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+>  		goto bad_swap_unlock_inode;
+>  	}
+>  
+> -	maxpages = si->max;
+> -
+>  	/* Set up the swap cluster info */
+> -	error = setup_swap_clusters_info(si, swap_header, maxpages);
+> +	error = setup_swap_clusters_info(si, swap_header);
+>  	if (error)
+>  		goto bad_swap_unlock_inode;
+>  
+> -	error = swap_cgroup_swapon(si->type, maxpages);
+> +	error = swap_cgroup_swapon(si->type, si->max);
+>  	if (error)
+>  		goto bad_swap_unlock_inode;
+>  
+> @@ -3546,7 +3541,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+>  	 * Use kvmalloc_array instead of bitmap_zalloc as the allocation order might
+>  	 * be above MAX_PAGE_ORDER incase of a large swap file.
+>  	 */
+> -	si->zeromap = kvmalloc_array(BITS_TO_LONGS(maxpages), sizeof(long),
+> +	si->zeromap = kvmalloc_array(BITS_TO_LONGS(si->max), sizeof(long),
+>  				     GFP_KERNEL | __GFP_ZERO);
+>  	if (!si->zeromap) {
+>  		error = -ENOMEM;
+> @@ -3597,7 +3592,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+>  		}
+>  	}
+>  
+> -	error = zswap_swapon(si->type, maxpages);
+> +	error = zswap_swapon(si->type, si->max);
+>  	if (error)
+>  		goto bad_swap_unlock_inode;
+>  
+
+
+-- 
+Damien Le Moal
+Western Digital Research
