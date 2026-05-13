@@ -1,166 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85B914AD20;
-	Wed, 13 May 2026 14:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFA438655A;
+	Wed, 13 May 2026 14:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778683198; cv=none; b=HVbBYF+p+UljFw4WdBuShMvSIdeKeL0xA/dhTZVwfqPIcyw3oMUm2l3wn7T7anoS3YZPK8/K2xVhKFzQVKZhh7ZiSqokeDMzjoiVjvX+PSMlWLHSwqYEgYCEM3IR5x5mQvh6MR/SU+RiruApTvSfHMNrhKUCXzfnTCjzvqxfBOE=
+	t=1778684361; cv=none; b=iTK1QhfmhcdYbhmyQoPdM4VrW7HzWoI3PtTB101iNjpQXqUEouYHpZk1olqfT4B6LFqCTRT5yRrHRnekBCrOC5b8ONsdLjVCul4tZP9p1DGGaA2oL6sHF3Tyd3Jo/xSZBrkajesE/xWKD5KrbKXeOJJj9bq5NgrI/WxMgGf0Cjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778683198; c=relaxed/simple;
-	bh=/Itz8rUC6zWsgXF2WM8FdHvpSMrY909xTLPghnPN7SA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Ol7nKg6VrR22XDmNARoRYEylXjJc2Pux1JPrpy7XbR7DXjVbpxw5rHTUg85pOAcz3pJ8ZHL8YGs2NlTVk7qGMat6J3k82Ti2liYmd9NbMd33TIZEjfoE2WR1VfY7Z3YcKBXEsJOuLBPQOirHAT5TkY3wWZxSA9ZnnZpoSVPHZVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rMrudIA4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778684361; c=relaxed/simple;
+	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZhMrupf3fZ6ls6FVHJp880rovHBrIpAxXmr8lnULIEhJPSrZiYAzG1/w8BjXXkWF/YlY651QuhNX2j5B0SV0hm4xGTDZ21uo84LwcqRDo7Umyj2OVhM7le6YNRunOLF4FBm+8lkkdyqRsJLIWqZH3UgwwtbbnGAmzRD9RgyiUzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIhYEKx5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rMrudIA4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4A89C19425;
-	Wed, 13 May 2026 14:39:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIhYEKx5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D47CC2BCB3;
+	Wed, 13 May 2026 14:59:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778683198;
-	bh=/Itz8rUC6zWsgXF2WM8FdHvpSMrY909xTLPghnPN7SA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=rMrudIA41DVasAItRo1t0lWrba2r4J7Hda1pWsT9mVfLFXSrBqMZLxy0KF6t8vdF0
-	 9t1YZPczBczwCkC0ODNzcxz/IuPmRFdjR6TSTJJCbv9UhGPOAsMiK3v+5TEYU0d+4y
-	 SvvLO/9DPowr2wx7AO7rloL2+frWgVzi3w3ici+TKLravaEAXeDJKKR212XzsERXYP
-	 Zajpe1RjRDrv9f0/wFJO7OHKa2kgMW6OCp92ECsPyAozOkXHOf6UcmZpJiP435oCXS
-	 4GEzy8Ap0c+DXtCJ6uA3f5H+VYocGbFeKR9jn2if+4ZsJW3tH0Q8E+tYYhkYkZ/BZ1
-	 8kuAPvFPqB3Zw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, Miguel
- Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6?=
- =?utf-8?Q?rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor Gross
- <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Breno Leitao
- <leitao@debian.org>, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH] configfs: rust: add an API for adding default groups
- from C
-In-Reply-To: <aZLXSPk2uO-R0e6b@google.com>
-References: <20260215-configfs-c-default-groups-v1-1-e967daef6c36@kernel.org>
- <aZLXSPk2uO-R0e6b@google.com>
-Date: Wed, 13 May 2026 16:39:47 +0200
-Message-ID: <87se7v4bm4.fsf@t14s.mail-host-address-is-not-set>
+	s=k20201202; t=1778684360;
+	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iIhYEKx51XcVXCXizSytP4ZvhZtiBJmIPf+6O8Mktq3AJeEzUzkfq9zJFMxWWOQN/
+	 aoWFZ5To1myUEqEdw7VallkySu/iGPAldgKZg0gl6xnLSnuloIhSu3lBTLqysfs1I0
+	 Skg4f9BktAuE18yvvQRJ70VrpwY5SAV36hi26w0P9GMsQkbf7JD+SNU9HxSde3AnHu
+	 bo3a4ZV9/09phwV+AioQvcuqmfuB2eTSN/4uxVBmpiaTeWdd95EFcAzHk3DTbz/8je
+	 v+mVMmUJ6OM8tMNlaOTQXwFxTd7uJskcOql+wcSZWQ2REyC0QM0b5EqoBwpRfC7ETk
+	 FtuJsAzYKU1jA==
+Date: Wed, 13 May 2026 07:59:19 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
+	Kairui Song <kasong@tencent.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
+	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 08/12] swap,iomap: simplify iomap_swapfile_iter
+Message-ID: <20260513145919.GP9555@frogsfrogsfrogs>
+References: <20260512053625.2950900-1-hch@lst.de>
+ <20260512053625.2950900-9-hch@lst.de>
+ <20260512170204.GI9555@frogsfrogsfrogs>
+ <20260513065608.GA2250@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260513065608.GA2250@lst.de>
 
-Alice Ryhl <aliceryhl@google.com> writes:
+On Wed, May 13, 2026 at 08:56:08AM +0200, Christoph Hellwig wrote:
+> On Tue, May 12, 2026 at 10:02:04AM -0700, Darrick J. Wong wrote:
+> > OH.  Now I remember why -- it's to handle contiguous mixed mappings
+> > better.
+> > 
+> > Let's say that you have a 1k fsblock filesystem and 4k base pages.  You
+> > fallocate an 8G swap file and then mkswap it.  The first mapping is a 1k
+> > written mapping at offset 0 for the swap header, followed by an 8388607k
+> > unwritten mapping at offset 3k.
+> > 
+> > The PAGE_SIZE rounding code in iomap_swapfile_add_extent will round the
+> > end of that first mapping down to zero and ignore it.  The second
+> > mapping will be treated as if it were a 8388604k mapping starting at
+> > offset 4096.  Now the page counts are wrong and the swapon fails.
+> 
+> Do we care about this use case?  I guess you did as you implemented
+> his, but still?
 
-> On Sun, Feb 15, 2026 at 09:33:47PM +0100, Andreas Hindborg wrote:
->> Some C subsystems provide a feature to add configfs default groups to the
->> configfs hierarchy of other drivers or subsystems. Rust abstractions for
->> these subsystems will want a way to add these default groups via the
->> configfs Rust API. So add infrastructure to make this possible.
->> 
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> ---
->>  drivers/block/rnull/configfs.rs |  1 +
->>  rust/helpers/configfs.c         | 16 ++++++++++++++++
->>  rust/helpers/helpers.c          |  1 +
->>  rust/kernel/configfs.rs         | 33 ++++++++++++++++++++++++++++++++-
->>  samples/rust/rust_configfs.rs   |  8 +++++++-
->>  5 files changed, 57 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
->> index 6713a6d92391d..ea38b27a9011c 100644
->> --- a/drivers/block/rnull/configfs.rs
->> +++ b/drivers/block/rnull/configfs.rs
->> @@ -78,6 +78,7 @@ fn make_group(
->>                      name: name.try_into()?,
->>                  }),
->>              }),
->> +            core::iter::empty(),
->>          ))
->>      }
->>  }
->> diff --git a/rust/helpers/configfs.c b/rust/helpers/configfs.c
->> new file mode 100644
->> index 0000000000000..7cec8ffcb093d
->> --- /dev/null
->> +++ b/rust/helpers/configfs.c
->> @@ -0,0 +1,16 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +#include <linux/configfs.h>
->> +
->> +__rust_helper void
->> +rust_helper_configfs_add_default_group(struct config_group *new_group,
->> +				       struct config_group *group)
->> +{
->> +	configfs_add_default_group(new_group, group);
->> +}
->> +
->> +__rust_helper void
->> +__rust_helper_configfs_remove_default_groups(struct config_group *group)
->
-> Only the annotation has the two __ prefix, not the symbol name.
+We do, because mkswap -F uses fallocate nowadays:
 
-Hmm, odd that the bindings generate correct anyway.
+$ mkswap -s 4194304 -F a
+Setting up swapspace version 1, size = 4 MiB (4190208 bytes)
+no label, UUID=bc9746bf-e200-4944-927c-80d83872f1cb
+$ filefrag -v a
+Filesystem type is: 58465342
+File size of a is 4194304 (1024 blocks of 4096 bytes)
+ ext:     logical_offset:        physical_offset: length:   expected: flags:
+   0:        0..       0:  411383552.. 411383552:      1:            
+   1:        1..    1023:  411383553.. 411384575:   1023:             last,unwritten,eof
+a: 1 extent found
 
->
->> +#[pinned_drop]
->> +impl<Data> PinnedDrop for Group<Data> {
->> +    fn drop(self: Pin<&mut Self>) {
->> +        // SAFETY: We have exclusive access to `self` and we know the default groups are alive
->> +        // because we reference them through `self.default_groups`.
->> +        unsafe { bindings::configfs_remove_default_groups(self.group.get()) };
->
-> Why isn't this here already?
+> > A more generic solution to this would be to change add_swap_extent to
+> > take sector_t addr and length values and use them to construct a bitmap
+> > representing contiguous physical space on the bdev, accounting of course
+> > for PAGE_SIZE alignment.  Except for the swap header page, every other
+> > contiguously set page-aligned region in the bitmap gets added to the
+> > swap extent map.
+> 
+> You don't even need a bitmap, just do basically the same checks as
+> the iomap code when moving to a new swap extent after moving to use
+> the sector_t.  And it really should anyway, as the current abuse of
+> sector_t to store a disk offset in PAGE_SIZE units is pretty gross.
 
-What do you mean. The drop of default groups is not there already,
-because it was not previously possible to add default groups. So there
-would be nothing to drop.
+Oh, I meant this to handle the particularly gross case where the fsblock
+size is smaller than a base page, but there are a very large number of
+file mappings that point to a physically contiguous extent but are not
+in logical order:
 
->
->> +    }
->>  }
->>  
->>  impl<Data> Group<Data> {
->> @@ -259,7 +269,13 @@ pub fn new(
->>          name: CString,
->>          item_type: &'static ItemType<Group<Data>, Data>,
->>          data: impl PinInit<Data, Error>,
->> +        default_groups: impl IntoIterator<Item = Arc<dyn CDefaultGroup>>,
->
-> Honestly, I'd just take a KVec here.
+{.offset=0, .length=1k, .addr=7},
+{.offset=1, .length=1k, .addr=6},
+{.offset=2, .length=1k, .addr=5},
+{.offset=3, .length=1k, .addr=4},
+{.offset=4, .length=1k, .addr=3},
+{.offset=5, .length=1k, .addr=2},
+{.offset=6, .length=1k, .addr=1},
+{.offset=7, .length=1k, .addr=0},
 
-I was trying to be fancy. Is it not more flexible to take an iterator?
-What are the pros/cons?
+That's two pages of swapfile, but with the current layout accumulation
+code we "cannot" find either.
 
->
->>      ) -> impl PinInit<Self, Error> {
->> +        let mut dg = KVec::new();
->> +        for group in default_groups {
->> +            dg.push(group, GFP_KERNEL).unwrap();
->> +        }
->> +
->>          try_pin_init!(Self {
->>              group <- pin_init::init_zeroed().chain(|v: &mut Opaque<bindings::config_group>| {
->>                  let place = v.get();
->> @@ -268,13 +284,28 @@ pub fn new(
->>                  unsafe {
->>                      bindings::config_group_init_type_name(place, name.cast(), item_type.as_ptr())
->>                  };
->> +
->> +                for default_group in &dg {
->> +                    // SAFETY: We keep the default groups alive until `Self` is dropped.
->> +                    unsafe { bindings::configfs_add_default_group(default_group.group_ptr(), place) }
->> +                }
->
-> Do these not need to be removed in drop?
-
-Yes, I added the drop logic above. It is the hunk you asked why is it not
-already here?
-
-
-Best regards,
-Andreas Hindborg
-
-
-
+--D
