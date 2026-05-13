@@ -1,145 +1,219 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AB8368D4E
-	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 08:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E17355F54;
+	Wed, 13 May 2026 08:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778659728; cv=none; b=oTCJCdM7xxsQ593hABERIxD7Kl7lPwj3v2hH6Z5YVGpK0Z0MTcODXDeFPXqWiM6M98ADu46rDugXueH/tsbpVYkSc5/vxBi4h6+L8DllESaKqxFItO7paW8WZKbIogWRcvt9vctizI3kYcTEQqxQCLJEYzoX257jYjS+AT1R2zE=
+	t=1778659850; cv=none; b=On+JVCdqJazH7XMSp9moNOONnIyslAXdyb1KeWV/KpV7oJTgKtka34YzcQMOnMCxSwlVOpU2Jg1r9u6WChkBe/9RGzwGfJvZmr6oc49r4yMs6I4Fz+vMh7x5pJHmTfYg0Yx8HJ+k3PYimd0jbIOO+Q1WstMjbGOOtYqUClGNaN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778659728; c=relaxed/simple;
-	bh=4btVtrjwZj+qvTMRZdaxsK35m7G7BWtAvytYXi/zXOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/QubUZkoySvgUII4viQ6t57gkOY3xt+gg5TM1NzHxbvmUp4LgmFCAEPeDpNq49mC+xlxyEd/CgRHMJsyJRp4Idx5BaRozhqQVFNupV76QYMZRNBTdqlU62qinSSFM6u84yqk4eV2BbUxX56Rz1lqCrCjEApBZQ/DEdUlbvsjzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lsWSX6j6; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778659850; c=relaxed/simple;
+	bh=n748Yn/XBJYLt419HNlwshkRzmHb4ouIN3m4LOeFl5I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C4h5pWTaF2xJNzff0lo3govJlNXCS6AhruMbW8RMw9AHKzodPV9de37FXEEuxj/CuTnyKIxWI/IsDFevLSbIIyQYxrFxmkMkIuNc29txsqb3EZT9uIirP1EF7qO61RgGIvCJlTGKIzwVs65aLemAi9rT4U6dgVJXJMvsxMhxVvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=eQ5j4hnO; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lsWSX6j6"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-40423dbe98bso3263116fac.2
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2026 01:08:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778659726; x=1779264526; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WLWC9LhEn5jAtEa1iuRPCWA08PAJdtUr0z7GULsP2M4=;
-        b=lsWSX6j62SG7jYBAv+iuol8lXaCzjZ8dXvVrvBPPfl/zyBfD59HEAhL+idCvm2Sx68
-         PQhdFCwruWnYHDRjyfnH7+G5PkS8nPUHdWAUfUIqpw2/vIcIUYtAnYiZMHgWt5WCaWUF
-         Yma1fdRL6L0+vRS9k9ZsYYzbEDFfarlF02o7XrhQ7TXvf5PWDNs+XAzsMztiU/dRal+0
-         PwSFhKDrCMNCO+YIqxC/DbpW8Ch1zQhJ/Fe8fuEOrCcomX7WgVBbsAjk4UdVjDDbVqqk
-         l3o+Cw8Gf0cV5vGZUbOfeSP0LN5W2B4zMd476o/983tYb8IKm/LflFGQKYp3k+oqPX/P
-         YpXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778659726; x=1779264526;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WLWC9LhEn5jAtEa1iuRPCWA08PAJdtUr0z7GULsP2M4=;
-        b=qxyMy2Q7jxph5as2ayYWdJSqVy9Xr/2pe+mFW+EmKZFj0jZS5sRLcFHiNQRzBKrqAU
-         LFLpMLmna5vu+zPN2Bjl2M9rbmjOumwC96m9BbrhT6rm3ZrR8YeCHKSjbmTJptQ8xTzU
-         0r6ti3OisL4UBKN1CroTh6S2Hwje8GdIzY55hhWhQZ88O49Fm3VnCLm5eLzAhKKZL46G
-         M/ZQv2qf5GbFuXKyKhZAy724blRD+q3jMaCmdUNostkvMdFM9VUDbHDAX3oK0qCOHp0b
-         op6KDnEukhNHhtLxTNfVLOuAUpIQdEJXNlU4aI4VLmAOIuvSEfAahYG6Hf1aU9i4+oid
-         WZbg==
-X-Forwarded-Encrypted: i=1; AFNElJ9t89gKQ8buTUXCpurfXVBxxDBUGdYV7SGVsWew8/WlNtZjd8nZD4oYfVjLVJowveHuJsLqGXIfO1RB2Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzel73SHKIROwS/pYeyVgqPPTRSXdWvkBYGnw5HUr6P7IjB4MUu
-	nULqOmNubKQ8cn/Bk5hpr2kRaQ+VeXqUAcyaFVA3o4u0lEcVCITt0X9Y
-X-Gm-Gg: Acq92OFpTqc4unMMfMt2C/IGea7flWgQAfla3de2F2/UrXIVdSk9DiYS03wXZ4OVI5B
-	3c3un3ejoWPXaq9NGjo90bZVNg+/avhn1BGwux+ayXJYNjG8m6SLJxHr5QxG45KGtTlIB542qpq
-	byhp93E8h4QNjCeb0qor3M8W63+ZbKf/jd+3wHhs9e264x2oLNWJqizfdYp0VChUqRTxL4u+tEI
-	UKMqXGqELR+wcizprE99q2QxyIanB9eRtxVt4U6xH8srGpfhHGGXPoTT2lCbW5PnW9zYXP0I15W
-	JE0at/hayjJM8XwDXbIFUE2+L9JCBkAM7mqK1VbLkNXoTh5/nrNl3apAdGu6JjyMPdBXt1pSaiw
-	PHfrq299IlzFnty05MSBqn+OjC297EKkY6+3aTkkMJvIovhl+7/Y5DfaeFSFqS8qtOClwzKe+kY
-	lvzIVPLHDgSiSwkT3HgiP/uBD7H7DJCLmfk1n8FILRvIUke0qtPHMqct6UC3Fc5vBT64Vegujmc
-	/fgLUAcWrWMszKfQt1RNw5TnP4kju0=
-X-Received: by 2002:a05:6870:c101:b0:42f:af81:276d with SMTP id 586e51a60fabf-439ce4ceca8mr1236116fac.36.1778659725904;
-        Wed, 13 May 2026 01:08:45 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4355710cfccsm15347800fac.8.2026.05.13.01.08.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 01:08:45 -0700 (PDT)
-Date: Wed, 13 May 2026 16:08:35 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Michael Wu <michael@allwinnertech.com>,
-	Xiaosen He <xiaosen.he@oss.qualcomm.com>,
-	Thomas Gleixner <tglx@kernel.org>
-Subject: Re: [PATCH] sched: flush plug in schedule_preempt_disabled() to
- prevent deadlock
-Message-ID: <agQxg-pBzF8rp1Ii@fedora>
-References: <20260512085939.1107372-1-tom.leiming@gmail.com>
- <20260512120431.GC1889694@noisy.programming.kicks-ass.net>
- <20260512124021.GA2214256@noisy.programming.kicks-ass.net>
- <agNLCof3zO5-QAo9@fedora>
- <agNgdIMacaG-41vj@slm.duckdns.org>
- <agPcx_vuO3ZYbAy1@fedora>
- <20260513073039.GG1889694@noisy.programming.kicks-ass.net>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="eQ5j4hnO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=0Y
+	20XQbZKCV32rGsXa4Y/6qWFrp6iiB+NtKwVZ08QDc=; b=eQ5j4hnOp6ip1cWenZ
+	WdeDTkez2r7Hotk8Slm86IAkX1HRafjrnRU6VHyKs7iAiXxPZp96C+4IlViNIU40
+	imYRt8e8mmJrU4YFy+rZ7oYZ6XYo+y/DHT50Xp7huOSmjjljj9AE2te3yAgQZS/M
+	KKrO7JlORzwox3xsdZfoERe9c=
+Received: from pek-lpg-core5.wrs.com (unknown [])
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wBH9tvhMQRqwvdJBA--.46014S2;
+	Wed, 13 May 2026 16:10:10 +0800 (CST)
+From: Robert Garcia <rob_garcia@163.com>
+To: stable@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Breno Leitao <leitao@debian.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Robert Garcia <rob_garcia@163.com>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 5.15.y] blk-cgroup: Fix NULL deref caused by blkg_policy_data being installed before init
+Date: Wed, 13 May 2026 16:10:09 +0800
+Message-Id: <20260513081009.2293360-1-rob_garcia@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260513073039.GG1889694@noisy.programming.kicks-ass.net>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBH9tvhMQRqwvdJBA--.46014S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3Jr1fXF48tryDuw47AFyxXwb_yoWxJrW5pF
+	43Kry5CrW0qr4xWF4jgF15uryYgan5A3WUArWfurn5AF1UKrn7Z3WDAFWUZryfAF43WF4a
+	qr4Ut3yxKwn0kaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pETmhUUUUUU=
+X-CM-SenderInfo: 5uresw5dufxti6rwjhhfrp/xtbDAgIgi2oEMeIpcwAA3M
 
-On Wed, May 13, 2026 at 09:30:39AM +0200, Peter Zijlstra wrote:
-> On Wed, May 13, 2026 at 10:07:03AM +0800, Ming Lei wrote:
-> > On Tue, May 12, 2026 at 07:16:36AM -1000, Tejun Heo wrote:
-> > > Hello, Ming.
-> > > 
-> > > On Tue, May 12, 2026 at 11:45:14PM +0800, Ming Lei wrote:
-> > > > On Tue, May 12, 2026 at 02:40:21PM +0200, Peter Zijlstra wrote:
-> > > > > On Tue, May 12, 2026 at 02:04:32PM +0200, Peter Zijlstra wrote:
-> > > > > > On Tue, May 12, 2026 at 04:59:39PM +0800, Ming Lei wrote:
-> > > > > > > On preemptible kernels, a deadlock can occur when a task with plugged IO
-> > > > > > > calls schedule_preempt_disabled():
-> > > > > > > 
-> > > > > > >   schedule_preempt_disabled()
-> > > > > > >     sched_preempt_enable_no_resched()  // preemption now enabled
-> > > > > > >     schedule()                         // <-- preemption can happen here
-> > > > > > >       sched_submit_work()
-> > > > > > >         blk_flush_plug()
-> > > > > > > 
-> > > > > > > After sched_preempt_enable_no_resched() re-enables preemption, the task
-> > > > > > > can be preempted (e.g., by a higher-priority RT task) before reaching
-> > > > > > > blk_flush_plug() in sched_submit_work(). Since the task's state is
-> > > > > > > already TASK_UNINTERRUPTIBLE (set by the mutex/rwsem slowpath caller),
-> > > > > > > requests in current->plug remain unflushed for an unbounded time.
-> > > > > > > 
-> > > > > > > If another task depends on those plugged requests to make progress (e.g.,
-> > > > > > > to release a lock the sleeping task needs), a deadlock results:
-> > > > > > > 
-> > > > > > >   - Task A (writeback worker): holds plugged IO, preempted before
-> > > > > > >     flushing, stuck on run queue behind higher-priority work
-> > > > > > >   - Task B: waiting for IO completion from Task A's plug, holds a lock
-> > > > > > >     that Task A needs to be woken up
-> > > 
-> > > My memory is hazy around io_schedule but the above reads really weird to me.
-> > > A task, regardless of its current state stays on the runqueue when
-> > > preempted, so the condition is temporary. As soon as the preempted task can
-> > > get CPU, it should unwind the situation. That's not a deadlock. Is the
-> > > problem that there can be preemption-induced delay in flushing the plugs?
-> > 
-> > IMO, preempting a `!TASK_RUNNING` task can be thought as effective sleep,
-> 
-> No it cannot be. Preemption ignores task state.
+From: Tejun Heo <tj@kernel.org>
 
-Yeah, I get similar conclusion too with AI's assistance.
+[ Upstream commit ec14a87ee1999b19d8b7ed0fa95fea80644624ae ]
 
-But both two reports show that the preempted task aren't switched back for
-long enough time, can you share any idea for Michael & Xiaosen to investigate
-further from scheduler side?
+blk-iocost sometimes causes the following crash:
 
-https://lore.kernel.org/linux-block/20260417082744.30124-1-michael@allwinnertech.com/
+  BUG: kernel NULL pointer dereference, address: 00000000000000e0
+  ...
+  RIP: 0010:_raw_spin_lock+0x17/0x30
+  Code: be 01 02 00 00 e8 79 38 39 ff 31 d2 89 d0 5d c3 0f 1f 00 0f 1f 44 00 00 55 48 89 e5 65 ff 05 48 d0 34 7e b9 01 00 00 00 31 c0 <f0> 0f b1 0f 75 02 5d c3 89 c6 e8 ea 04 00 00 5d c3 0f 1f 84 00 00
+  RSP: 0018:ffffc900023b3d40 EFLAGS: 00010046
+  RAX: 0000000000000000 RBX: 00000000000000e0 RCX: 0000000000000001
+  RDX: ffffc900023b3d20 RSI: ffffc900023b3cf0 RDI: 00000000000000e0
+  RBP: ffffc900023b3d40 R08: ffffc900023b3c10 R09: 0000000000000003
+  R10: 0000000000000064 R11: 000000000000000a R12: ffff888102337000
+  R13: fffffffffffffff2 R14: ffff88810af408c8 R15: ffff8881070c3600
+  FS:  00007faaaf364fc0(0000) GS:ffff88842fdc0000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 00000000000000e0 CR3: 00000001097b1000 CR4: 0000000000350ea0
+  Call Trace:
+   <TASK>
+   ioc_weight_write+0x13d/0x410
+   cgroup_file_write+0x7a/0x130
+   kernfs_fop_write_iter+0xf5/0x170
+   vfs_write+0x298/0x370
+   ksys_write+0x5f/0xb0
+   __x64_sys_write+0x1b/0x20
+   do_syscall_64+0x3d/0x80
+   entry_SYSCALL_64_after_hwframe+0x46/0xb0
 
-https://lore.kernel.org/linux-block/5660795d-87de-46f5-add4-7729a02225ef@oss.qualcomm.com/
+This happens because iocg->ioc is NULL. The field is initialized by
+ioc_pd_init() and never cleared. The NULL deref is caused by
+blkcg_activate_policy() installing blkg_policy_data before initializing it.
 
+blkcg_activate_policy() was doing the following:
 
-Thanks,
-Ming
+1. Allocate pd's for all existing blkg's and install them in blkg->pd[].
+2. Initialize all pd's.
+3. Online all pd's.
+
+blkcg_activate_policy() only grabs the queue_lock and may release and
+re-acquire the lock as allocation may need to sleep. ioc_weight_write()
+grabs blkcg->lock and iterates all its blkg's. The two can race and if
+ioc_weight_write() runs during #1 or between #1 and #2, it can encounter a
+pd which is not initialized yet, leading to crash.
+
+The crash can be reproduced with the following script:
+
+  #!/bin/bash
+
+  echo +io > /sys/fs/cgroup/cgroup.subtree_control
+  systemd-run --unit touch-sda --scope dd if=/dev/sda of=/dev/null bs=1M count=1 iflag=direct
+  echo 100 > /sys/fs/cgroup/system.slice/io.weight
+  bash -c "echo '8:0 enable=1' > /sys/fs/cgroup/io.cost.qos" &
+  sleep .2
+  echo 100 > /sys/fs/cgroup/system.slice/io.weight
+
+with the following patch applied:
+
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index fc49be622e05..38d671d5e10c 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1553,6 +1553,12 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+> 		pd->online = false;
+> 	}
+>
+> +       if (system_state == SYSTEM_RUNNING) {
+> +               spin_unlock_irq(&q->queue_lock);
+> +               ssleep(1);
+> +               spin_lock_irq(&q->queue_lock);
+> +       }
+> +
+> 	/* all allocated, init in the same order */
+> 	if (pol->pd_init_fn)
+> 		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
+
+I don't see a reason why all pd's should be allocated, initialized and
+onlined together. The only ordering requirement is that parent blkgs to be
+initialized and onlined before children, which is guaranteed from the
+walking order. Let's fix the bug by allocating, initializing and onlining pd
+for each blkg and holding blkcg->lock over initialization and onlining. This
+ensures that an installed blkg is always fully initialized and onlined
+removing the the race window.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Reported-by: Breno Leitao <leitao@debian.org>
+Fixes: 9d179b865449 ("blkcg: Fix multiple bugs in blkcg_activate_policy()")
+Link: https://lore.kernel.org/r/ZN0p5_W-Q9mAHBVY@slm.duckdns.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Robert Garcia <rob_garcia@163.com>
+---
+ block/blk-cgroup.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 61fdff5406b5..1179c4bee705 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1337,7 +1337,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ retry:
+ 	spin_lock_irq(&q->queue_lock);
+ 
+-	/* blkg_list is pushed at the head, reverse walk to allocate parents first */
++	/* blkg_list is pushed at the head, reverse walk to initialize parents first */
+ 	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
+ 		struct blkg_policy_data *pd;
+ 
+@@ -1375,21 +1375,20 @@ int blkcg_activate_policy(struct request_queue *q,
+ 				goto enomem;
+ 		}
+ 
+-		blkg->pd[pol->plid] = pd;
++		spin_lock(&blkg->blkcg->lock);
++
+ 		pd->blkg = blkg;
+ 		pd->plid = pol->plid;
+-		pd->online = false;
+-	}
++		blkg->pd[pol->plid] = pd;
+ 
+-	/* all allocated, init in the same order */
+-	if (pol->pd_init_fn)
+-		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
+-			pol->pd_init_fn(blkg->pd[pol->plid]);
++		if (pol->pd_init_fn)
++			pol->pd_init_fn(pd);
+ 
+-	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
+ 		if (pol->pd_online_fn)
+-			pol->pd_online_fn(blkg->pd[pol->plid]);
+-		blkg->pd[pol->plid]->online = true;
++			pol->pd_online_fn(pd);
++		pd->online = true;
++
++		spin_unlock(&blkg->blkcg->lock);
+ 	}
+ 
+ 	__set_bit(pol->plid, q->blkcg_pols);
+@@ -1406,14 +1405,19 @@ int blkcg_activate_policy(struct request_queue *q,
+ 	return ret;
+ 
+ enomem:
+-	/* alloc failed, nothing's initialized yet, free everything */
++	/* alloc failed, take down everything */
+ 	spin_lock_irq(&q->queue_lock);
+ 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
+ 		struct blkcg *blkcg = blkg->blkcg;
++		struct blkg_policy_data *pd;
+ 
+ 		spin_lock(&blkcg->lock);
+-		if (blkg->pd[pol->plid]) {
+-			pol->pd_free_fn(blkg->pd[pol->plid]);
++		pd = blkg->pd[pol->plid];
++		if (pd) {
++			if (pd->online && pol->pd_offline_fn)
++				pol->pd_offline_fn(pd);
++			pd->online = false;
++			pol->pd_free_fn(pd);
+ 			blkg->pd[pol->plid] = NULL;
+ 		}
+ 		spin_unlock(&blkcg->lock);
+-- 
+2.34.1
+
