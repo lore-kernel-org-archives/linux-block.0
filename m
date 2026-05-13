@@ -1,26 +1,26 @@
-Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021076.outbound.protection.outlook.com [52.101.95.76])
+Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022079.outbound.protection.outlook.com [52.101.96.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0104B2BEC2E;
-	Wed, 13 May 2026 00:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7742D3739;
+	Wed, 13 May 2026 00:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.79
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778633723; cv=fail; b=hYA+Y1lHYFu7DMibKU4qL5KDYpo/m0bVC18EK3rE+y0IBOsMlnMsnC++oe6KtiA+6WlAA6LxPxkZEFPET1WD5E6TRVWG/Ehmpk3BxEDZP1ACFzNFYYkHjzVvF0NRyccv8jE0r4mmWfQXIuXP8c/tKLsiyUWriPwpwa2scS//4HU=
+	t=1778633727; cv=fail; b=KZuzFNgbaIBb2yIRbIUjXDH6eyNeMYYG6r249VnEwLyIlWaxbter8+lcUwc+0gjkwSD5aHdLwV5V8FYJEQoLwewml6t7VUziDwybWzaTzPK4W8XgERb6ao0F+B3viIjaQMSiEZSdwDgwbtRp1Ku5DPZ7EJRvJROdQzRFnDsermo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778633723; c=relaxed/simple;
-	bh=H1RSijiFZwChg42ZDOQha8MtLlUmmuZbVL920hVLQGg=;
+	s=arc-20240116; t=1778633727; c=relaxed/simple;
+	bh=PzBDfA3d7+ASQriMDUWfRKFP0iPi3stFY2fk68+KFoA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mc7fkuPQE3jg8oyfERwqmeXNi/i8KvIVhrZFaBb1pikvt0XMAfRsfCyEINzeYxtAsj8TIYfGz1P6fnppg2NWwviNMnsCRlxwIUFvY+L8Ct32TL5qmlJVwvFGO8w7XMwKXCTexR6eEEPSQw9nATTXsVgWD39DmfehPSZuxLFeyB4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.95.76
+	 Content-Type:MIME-Version; b=bLO+p8FbwBaU1MPhV5T3TADqGfYiZVUBtSHMxRFvaiIL/CppuYWdir705ymyrtIgJYMORMlfcNaRIsokNU9vX29QjO0xiosOCQPizDg4TFFnZ2meF8hvpb31khn7LL2vJ2LFZZaAE81ISh4G1lybsf+Hu0N9AGFzYlMSh7XNLPA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.96.79
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wjhCVWDcWdd0VtSkUKejwpqpn+ZsyO63BH7oa8ctV4zzOZ9h/+yijwTJJ1u92engcois+FO+p/Ox5C5dMVh/8RgGlB6D3ip3l5zUqijfHdTOBv0rgQ6JFxHngoFz43B9r07ykfIO71Sv84a2zDELVEysMh+IWXdReInvi7ZoCUYa1YK0uDuj7KaaheEOoXvRjPPeXhC2ZvAyIp4C2JFwGWsil3P4mV1930O9WygB6XpWBa0wd/geUDiaSrAhQLlPhX0jeMGvQ56aBp/YRiU50tXtudesM/QJEV7zY0RC2+af48woMIadl6n6jG2esWzuoE3ZA8wo8EE4b8CZ4oUMsA==
+ b=osGl0+DVSkTD5HmpTeH0A9NPFkR4FzbYIn/y5MA5pbNC3gmbtLePK6kcOeX2t7GenRKet04Cx0CvqyF4LULBlTTwu6E59Er4FigvWvOTQtruk5iwG9mM2P2ZZ4vremHY0jzxrlBZ/1IHHvG7HO2ZuldlGd46plCOIsjTTNQqPbEpPSFjmZIdDWgWHUMlT3BERIORURxZ86cIB/qzKeS6PTqAcx7U1SjtjhIP4qYYX9qmsl3sBqN7R5gNO4Xow+8aLKhLiaMjTiW1f+IiXKYCDOrHTVodufJO94rayRZFh+Lmm7j9a342WWH7kUQUngGE9RpgdO80Bnw9Zn2OvZkGcw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mNamlmCMt57K1U2lDW4kZvmBXMIcKl5Ky/MTc/Rmaw4=;
- b=ToBEf9JTaGtTfFfYRkvB0B3O+hNuPNEReoKYmVtF1EKLBvfWES7LlEIOwW2WoxCqsSNp6x19UxwcPU8znJh1Q2YeNcmUMFhXePGuk+arvR6tun8eWLzDY4biTxeqfjOmWp9yN4GzLk7EY8QJy37k0k5Ph0esrQM6zR3zeeAWDmkzqduSVRDlmew+Zw34218Paxm2gNoaw+GWaQgvowHp+4kCXk/QV8NZKP1hZWs/1CM9OdeyCMH8EGBwWDYP1qEoenruWZ0fO9OM2KB6O7ziL4pZ8sqxRuia3fMjEJZbd3o8HxJEKG6PTy7ZznEkmw9xVp2IvDJ2BF3itmPzqAEzwQ==
+ bh=bIszH2br9ZJYos5PXfUA4/flxCXriDxW07qzDbLS268=;
+ b=a2XaTwVCFOaX7gVmqU+Z5u01qyxOuOhJB17uhFPGx4Xbw4UAfmbpwY/tvMUdyUxEm+VHYV/h1tvnv0HZcHuosJv+wXDe18H0nsuCi8m4goasfPnVD7RhsSyWrLuYJr+omCffR5j+a4ZR9MBeLHbSEc7yUj8KU37jhauCA1KWBbdknDF+nR3ZWC2Hp3JCLHyfADEcFEwvql8xcH7r/37hVb/TrNvlX/klqsHOX1+K+5rfytVJZ7Ma73zRdbaKl6mqH5RUmNpmeYRhOcBIkPkjp4cG/9iUewAzKpNQdvrBpJahu5hfALOSrbGEyjCM+J0jUNTuLGp5/ceorV6IBbqMkg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
  dkim=pass header.d=atomlin.com; arc=none
@@ -30,11 +30,11 @@ Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
  by CWLP123MB4226.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:bb::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.17; Wed, 13 May
- 2026 00:55:20 +0000
+ 2026 00:55:24 +0000
 Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9846.025; Wed, 13 May 2026
- 00:55:20 +0000
+ 00:55:24 +0000
 From: Aaron Tomlin <atomlin@atomlin.com>
 To: axboe@kernel.dk,
 	kbusch@kernel.org,
@@ -83,16 +83,16 @@ Cc: atomlin@atomlin.com,
 	rishil1999@outlook.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v13 2/8] lib/group_cpus: remove dead !SMP code
-Date: Tue, 12 May 2026 20:55:03 -0400
-Message-ID: <20260513005509.135966-3-atomlin@atomlin.com>
+Subject: [PATCH v13 3/8] lib/group_cpus: Add group_mask_cpus_evenly()
+Date: Tue, 12 May 2026 20:55:04 -0400
+Message-ID: <20260513005509.135966-4-atomlin@atomlin.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260513005509.135966-1-atomlin@atomlin.com>
 References: <20260513005509.135966-1-atomlin@atomlin.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BN9PR03CA0580.namprd03.prod.outlook.com
- (2603:10b6:408:10d::15) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-ClientProxiedBy: BN1PR14CA0019.namprd14.prod.outlook.com
+ (2603:10b6:408:e3::24) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -102,121 +102,214 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|CWLP123MB4226:EE_
-X-MS-Office365-Filtering-Correlation-Id: dc40397e-d952-40c6-512a-08deb08a4e6b
+X-MS-Office365-Filtering-Correlation-Id: 582558e0-25f0-45c2-8e08-08deb08a509e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|376014|366016|7416014|56012099003|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	ESlcqxoCSffWINM5I6AYiV07z8uMO9c8MHQBFRdOUTb53pWbVNXceSR5vruIIub8Du8ZgmZgMkGbhUFPwu6uxrOKd/F8ioV1oRG6+l6mojj9O0XB+HpbS5AcPBqSlACDAm0N2pdBwcgd7xKtM9ope0x+iTcHUgcAAKCGbyTwBu9C9zgQQ2jq/+AkGrM7IZj98mD7Em26bzi1Wyh/YOkm9RyVNB5Iv7oCXdT4jAJf9X15JARagtzTjXy0JJND3A79iUCpoEPFzzt78deQvzqMWY1PbYfPTH9ZnFalvDfUvygTeBseHhcOLCEjbP5OTGdk/TSAcfs8nxj1V12rRwHa2U9VXA5gL8/BWDccvWEhO1rUUATsh+PnMUmRlSKtpSbSU0S0PodSerfJO/0rA1m2w97I2amOYek3aQFENUw9DJXeJWc+TYDW2KSTLJjN3ennXUpiU14Wka9a8s9YquQdO2gM+ddXlELSTg1oE3ZFqA67Ys9OGPg9M7XpwXYGsSxP8Wz+6RFC5z7qyuTbWmVLAgZ0HpLPssJjja35nE2i76sK/SixTT2eOxz3zFmlhUIznNGyxtQsHlOeLCDPn2jjd8jrlQmNNCx7kSTbEOp8SWXawSyeUwDyaxTqi9VeMA7VX1AtyPoFSl9fdyOkq355F4KUWEeeEgz6JxTSjIUp7g6xMI+HHCSNuL4r0NVZfUp8
+	PLKx0DcsdUA8PTfN5nRhhGd0PGHRS5J9jPmgauI0YcKmwW+BaUaOMPYB/FeBcDKuubi2jVSkh/kFRGwJLgYGH1SiqxpQ2dsEzktL5M2wWGsyXW+Gi5+b+XYqDiv1MVQy/0Dpkrr08GvDihOfvHLyTU/UwRiMeBjCG/kb24Jvw83FuQ1FAnL5/Kp7ULjTVRPnKh8k0v83qqb5XEaWMxIm2kSMOW6wWciq65Y1i6lLKv5JDKdYTwyYvNRhRzw9RifSheowi2AZibG90c77/aNwwM7az6OOL4uEboOPnUUHdWVQM0bEhICFjSuyhUwOxVyOGouSFTA8Ge09RMbMs5dULAmoYLIfkFggpDOzgVvicw76s8LOodEDQxUneZT649ldRHNVDMUL9c2KZfLMnT3VUlNlxl4FlUOHFIPC8NQG2moTSkdP4u7xwSPGCWVZx8F07Is7Tcdeug7QQZUqH8Wliqa5ToBwXiTZ8ALwbQJlumYhm8yhFhRvD/j7IxC9iqwTaksTQe0AepKIUTYIqRYvMtgICTe/RQ8mtBNmCh9cgT+2EXco0iSCLc6afoTvcPjIhKH5oUrgtuYzaFhM5fwz/4wnp01+pMxZTy+dqRK7pRNdfNnOqJ0xBKpahc16PlsPKl7AzJN/oTfVK1+GnJKBF4Y59DgBoZHxRGxryzIVApS7aPfJscijlu8FHrDDbPBf
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YW68+7J2jGzpj5xjX1Se5bFBZaHrKfTrK7TEMajuy1MEZS7qt9DfPaZjJ6ni?=
- =?us-ascii?Q?C3//TcVqQJEzJlz+dRHX786ssKdysOwtZmn6j2eI7SMoCEIgNkF6Jwi/fUK8?=
- =?us-ascii?Q?7qK4kHmUBjYDEy/1OgHBjSmvjf/OfXxl4hRlRxl8upXqlz5er1fJMJ4hzGFE?=
- =?us-ascii?Q?o2sufJImqTS3uTB+GFQPT2qiHZqCMRmUhk1gY/R2FBjH5pRXjAXeXsSbW9wI?=
- =?us-ascii?Q?hmlwh81KHSNzfSMYRRTSdyE6XxVPw2Q02fdnMT5Y2B+CkwjRZAOnS8LsL6yM?=
- =?us-ascii?Q?K7G51kpakadeBjsWrfVLKr8wRTJDQDFzYmmgH++jlkvxXjaG3sTCtMPCMsc2?=
- =?us-ascii?Q?iKa4/u6sY6+MaTrTCi9kNKXqM95jXeV53s0WK5a1sVgasF9ZIsRvwURO3Jok?=
- =?us-ascii?Q?mHxgBI909o2c5MDV2WUxb05Wr39DKGcq+ZQMKdDWB97pU/+hP0ilSoTWRP6E?=
- =?us-ascii?Q?nmtSdXaxRfnSni+JOOZnz8I53Fc2KfpO+/1ZGnMjytQHMb0PDjj6WY7BIyIr?=
- =?us-ascii?Q?ek9Xb8kqvcvLT7zNpyacLAZtRXRfldO3FRfb6+8bFt9IPKmsRTbrDVLWpKXV?=
- =?us-ascii?Q?WuFavhOSNFTirQAdJHZxbKXLjEUojgus19LL8+n3TIOXH8dLccXzd70FGevd?=
- =?us-ascii?Q?myu85nh+5Im5MCDHjlS2ODW6ejQWFPD4QOUJajyBz1sWQ3wH5jablxGQcDii?=
- =?us-ascii?Q?SVoBoh44AIwUKRCODszaCmMps+kvhFNeyKHq3FzwDZMrsWL/M3eJ6Q86ziTU?=
- =?us-ascii?Q?AK6e5N/tlzFQzihFFeDHJ56mJOEXzHJqbHHcXxTNlf0i0Mau4l4Ni1kuXBip?=
- =?us-ascii?Q?1UUilglCAqpwzP0xWgCGixGNMJy3rDz1XpsnDp+HPbvuoJZtKgrCJQ73oeGG?=
- =?us-ascii?Q?8vhC7K0we0BQGPE79nT3n9Q3rnh6+n9jVTIhtKgHVcVeEDoUn5LOQZKmEwwz?=
- =?us-ascii?Q?sIlooZ3lOHrWv/ev15ug6TbX+L1bTaloAB01kwfhk6dsW4YhblpAVVWpVxIb?=
- =?us-ascii?Q?eIi507nzkhXU8pH9v68uLky+ELt+/2oXUjHHdsL1sYFtGasldk2ldAPICEE+?=
- =?us-ascii?Q?HzOGCkJHUNbB/Vw1CUdL2eTE/edGIiBvvXuoc3Fn9SV8pokhY2a4zU0c/FrZ?=
- =?us-ascii?Q?AL0fJN4/5Bi+XwsTSlNYyfS/+VcgyU1yF4dBZBAc0kzP1MF9N6tMqjbsc0OS?=
- =?us-ascii?Q?uPjwqMTroSQb60JeSYRm8Uxwm4p67Ap9GcRAeLdjmpV64b2104SJ9sX+Vh6M?=
- =?us-ascii?Q?oIn8c0NCgfXzLVgEgP+0gglxkiAB1rA4ZxHLPWt5MZJ5rWTgEQAgyCP8aLdD?=
- =?us-ascii?Q?q5yXCRPU55kw/ZDoGkiWGCcJrBAkbPcP5sFCLlj48x6s9nBV9/Vrc7foqB1S?=
- =?us-ascii?Q?1mz/MQ2igBP6SIy2HOXZeZUwtmOR3hqJ7+IxaLujAeW2SwA+D8Ygeb/I+2av?=
- =?us-ascii?Q?SNVyqIdqJai4J9A6MUrNNs6SdC6+Jk7JNfCmci0f1y0BzMA85S/W16Ly7r5U?=
- =?us-ascii?Q?QZpl+rKK9gDgMccQACzICbZcKxnZ9asVtmzm8e6hTbl7pLZc/cp7z6kpfVSH?=
- =?us-ascii?Q?SxcrBIlO0z8lBOuOobcVryl2QHm3fAcURZsCM/Mna32eOQxX1AnEAQ9yZMJw?=
- =?us-ascii?Q?Xt2obP9Bf3RyJoEqrkgqq/VFsKi+ZJv0LzRfDj1L4wgpXvc634WARzfSiQGP?=
- =?us-ascii?Q?cr8T9HCts7w1BKsSYfO0rsw/tZW8A9D7auZx93BUYfDEl15r6WOxriw8OnpA?=
- =?us-ascii?Q?FWCeVbNjAw=3D=3D?=
+	=?us-ascii?Q?VnyICuWMhCPl9GD+CECCAV1Yk09XXSrxrxEKlgdONseGDbiQx0LUPUFVrFbj?=
+ =?us-ascii?Q?WXPlXaXr5VM8CEf61FpqB0wtLY3d8PERwYuYEhX3YdX/uyrzXQpivu3nu4PG?=
+ =?us-ascii?Q?n8aQj9Fms1w/TgYzJoubnJCkmeZCZ3ksZsZta2LBGeBgORCwt/nMZyEzZRpy?=
+ =?us-ascii?Q?/wwVyoXQ0VVlFxTkX8e9JzHa0RkExPP7RT0KGEp8MapCCfNI1AGH+N9oqV+U?=
+ =?us-ascii?Q?SVNRxgSm2CO0rg0HFY87tc4/b8O9ELwKP9aKB6lfqA++YHGMz+ucHtciYvS8?=
+ =?us-ascii?Q?67ujbxYQAJCM3cTClRsAhOCefUpyr7SQO21HhjoZ+gEwIjgZ+BN3QPmYOvu8?=
+ =?us-ascii?Q?3mH0ugIg6sRA0yh7pZaxMzFolHs9RJRetVED6CqBQVQb22ztGODz3dlZxyoe?=
+ =?us-ascii?Q?TqGl3ECJamjzPoHR0ecaYi74USPVft+Kk5o+IlzdTJ/Z9tFpfLfvGPhkAyNO?=
+ =?us-ascii?Q?n1PS82j0gLtxnR2yv5ZAgwmAiTtlC0R+ytrYbZv2V7VfdNb3gGOb67IpjHgN?=
+ =?us-ascii?Q?UEIrofuRY3NK4RU/FnJDPpz2YgJo9cFPc2sRIIaTzGmPHI8yll6xXbxK36VR?=
+ =?us-ascii?Q?/xm8iqh1j0yuMEMA/+Y3ZdbNPRu2ZFUXGHVurJFyZMWLvL0T1SeTQNrM/chF?=
+ =?us-ascii?Q?txcWxmtBrIeQ+OhUdqa1eJDWr6bvDGLV5xjPDV5W9kF5jEuAoZOX3D/oV9eL?=
+ =?us-ascii?Q?fxisdeBG5sJZHQhKpq7oAF85v13e9CPnMQFstnBLH6KayxJxYFRkJYeiDu00?=
+ =?us-ascii?Q?ZwLDactjo3zJ7xtjpLm700a47+12HpEsZps6ijJlvPcqHmtdylMNSoSlageN?=
+ =?us-ascii?Q?GeKx8hhtr8lsRwCZA4BEnLvpRUFQEo/8RxYYf2U2bMY3LnsHMf6GcO0ZVb9g?=
+ =?us-ascii?Q?ZAsED/9stD3QEopttsGhLsHiIwxTY2GyCX1XnbCxTykCv88DUBo2jt6VY8k2?=
+ =?us-ascii?Q?Wv+IRxrpn9ESIHyp8O0EwrcJoFxer+sXlegilq6LPusYaas8Ki2wwYNHIP9h?=
+ =?us-ascii?Q?ean8lD4Zlii5p8HNDotaaWuvmbhAoJQNZJaxc6pBsm2MuXD7wKnF1GMxJScb?=
+ =?us-ascii?Q?ApUcoLvtvOau8lreJebNKlVwfiejXTwhKxco+z5PsG6tKCOPjzPezBisfTkb?=
+ =?us-ascii?Q?ABTH5tLLOyJ5g24jh7jxmKBY8Rm+GHpqM6nVcLMf4iD7zJ8MKpT5ppdrDikJ?=
+ =?us-ascii?Q?gAng2ZfaD4EI4bpQCdLKH5CgvvH3rD3L3l/kKuTgdxzlW2K1Jhnqf/jWRn8w?=
+ =?us-ascii?Q?dMquYpZ77lTSt/UqCGgehGAeYdiVSzM0NtJzfmUOly1x4D95lAD+EDqOGP7t?=
+ =?us-ascii?Q?4W8c4MEc8lmchRWXaBAUpqiO3Jl0eOOitOljPjxwgOFNpWKF2CQ3PCZgcJjJ?=
+ =?us-ascii?Q?QOM2OhfKOkPHUPAotJHmTD895Ci5XTPho4vXylQ1vT8xAqOF5mKp44ZF8sq1?=
+ =?us-ascii?Q?rF1keB9LhTtavVjX8dWwpOiBk22zb9/1GWX5eCHBwFxQA0SCAEsvIqG85GmN?=
+ =?us-ascii?Q?M5t7aNNQ4zsM69jhpsPCnOAWRZUl5Z0/pji82Ju/53WtA/IsLJnYJdjT1sev?=
+ =?us-ascii?Q?ibeix1WMIHgfwGvwmh98lxkZPUolgTzes//n7Gt0PBzf53+8IBV0S87Ba+wt?=
+ =?us-ascii?Q?Hh+UqLmAHJ41CmXVfTJuCNjMkKbOWse6Ss3tggG6fA1e6PjaGMBSRaA4k/LH?=
+ =?us-ascii?Q?mW1Khhr+AREUa8F+K62dDGzMznyMXwEpJMPX71uB6OBB/cTK4faMywuebN/J?=
+ =?us-ascii?Q?BUZAaO8big=3D=3D?=
 X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc40397e-d952-40c6-512a-08deb08a4e6b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 582558e0-25f0-45c2-8e08-08deb08a509e
 X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 00:55:20.2653
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2026 00:55:23.9749
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0IdM6SAcXJidDMaujV0Il2jjIhKmSt/69+UP1A+wkmaOTpTgT0ytSb0Uz7NEb3JDi777H0KiVN1GhTCWn9KYxg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: yhlsqfDNEAC7L4Jg/UGrqfnqOJOJhol4ewC3bpBmLJjwZOuT94cRm7TaU2N8VcwrEl0XrSQNLwGi06DI5YJSrg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP123MB4226
 
 From: Daniel Wagner <wagi@kernel.org>
 
-The core scheduler recently transitioned to compiling SMP data
-structures unconditionally to reduce code complexity - see commit
-cac5cefbade9 ("sched/smp: Make SMP unconditional").
+This commit introduces group_mask_cpus_evenly(), which allows callers to
+distribute a specific CPU mask evenly across groups. It serves as a bounded
+version of group_cpus_evenly().
 
-In alignment with this philosophy of reducing dual-path maintenance,
-this patch removes the #ifdef CONFIG_SMP guards and the dedicated !SMP
-fallback logic here.
-
-While the !SMP path provided a slightly simpler execution flow for
-uniprocessor kernels (avoiding SMP-specific overhead), maintaining these
-separate code paths adds unnecessary complexity and testing burden.
-Removing these guards simplifies the codebase by standardizing entirely
-on the SMP logic, which safely resolves to single-CPU operations on UP
-configurations.
+While group_cpus_evenly() operates on the global cpu_possible_mask,
+group_mask_cpus_evenly() confines the distribution strictly within the
+boundaries of the caller-provided mask. It preserves the kernel's native
+two-stage spreading logic-first prioritising CPUs that are physically
+present (cpu_present_mask) to prevent I/O starvation, and then distributing
+any remaining vectors to non-present CPUs to maintain hotplug safety.
 
 Signed-off-by: Daniel Wagner <wagi@kernel.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
-[atomlin: Updated commit message to clarify !SMP removal context]
+[atomlin:
+    - Added check for numgrps == 0
+    - Updated commit message to resolve typo
+    - Removed unused <linux/sched/isolation.h>
+    - Fix TOCTOU race by caching the provided mask
+    - Implemented two-stage grouping logic to prioritise physically
+      present CPUs, mirroring group_cpus_evenly()]
 Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
 ---
- lib/group_cpus.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+ include/linux/group_cpus.h |   3 ++
+ lib/group_cpus.c           | 106 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 109 insertions(+)
 
+diff --git a/include/linux/group_cpus.h b/include/linux/group_cpus.h
+index 9d4e5ab6c314..defab4123a82 100644
+--- a/include/linux/group_cpus.h
++++ b/include/linux/group_cpus.h
+@@ -10,5 +10,8 @@
+ #include <linux/cpu.h>
+ 
+ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks);
++struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
++				       const struct cpumask *mask,
++				       unsigned int *nummasks);
+ 
+ #endif
 diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index e6e18d7a49bb..b8d54398f88a 100644
+index b8d54398f88a..2552ccea743e 100644
 --- a/lib/group_cpus.c
 +++ b/lib/group_cpus.c
-@@ -9,8 +9,6 @@
- #include <linux/sort.h>
- #include <linux/group_cpus.h>
- 
--#ifdef CONFIG_SMP
--
- static void grp_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
- 				unsigned int cpus_per_grp)
- {
-@@ -564,22 +562,4 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
- 	*nummasks = min(nr_present + nr_others, numgrps);
+@@ -563,3 +563,109 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
  	return masks;
  }
--#else /* CONFIG_SMP */
--struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
--{
--	struct cpumask *masks;
--
--	if (numgrps == 0)
--		return NULL;
--
--	masks = kzalloc_objs(*masks, numgrps);
--	if (!masks)
--		return NULL;
--
--	/* assign all CPUs(cpu 0) to the 1st group only */
--	cpumask_copy(&masks[0], cpu_possible_mask);
--	*nummasks = 1;
--	return masks;
--}
--#endif /* CONFIG_SMP */
  EXPORT_SYMBOL_GPL(group_cpus_evenly);
++
++/**
++ * group_mask_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
++ * @numgrps: number of cpumasks to create
++ * @mask: CPUs to consider for the grouping
++ * @nummasks: number of initialized cpumasks
++ *
++ * Return: cpumask array if successful, NULL otherwise. Only the CPUs
++ * marked in the mask will be considered for the grouping. And each
++ * element includes CPUs assigned to this group. nummasks contains the
++ * number of initialized masks which can be less than numgrps.
++ *
++ * Try to put close CPUs from viewpoint of CPU and NUMA locality into
++ * the same group.
++ *
++ * We guarantee in the resulting grouping that all CPUs specified in the
++ * provided mask are covered, and no same CPU is assigned to multiple
++ * groups.
++ */
++struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
++				       const struct cpumask *mask,
++				       unsigned int *nummasks)
++{
++	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
++	cpumask_var_t *node_to_cpumask;
++	cpumask_var_t nmsk, local_mask, npresmsk;
++	int ret = -ENOMEM;
++	struct cpumask *masks = NULL;
++
++	if (numgrps == 0)
++		return NULL;
++
++	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
++		return NULL;
++
++	if (!zalloc_cpumask_var(&local_mask, GFP_KERNEL))
++		goto fail_nmsk;
++
++	if (!zalloc_cpumask_var(&npresmsk, GFP_KERNEL))
++		goto fail_local_mask;
++
++	node_to_cpumask = alloc_node_to_cpumask();
++	if (!node_to_cpumask)
++		goto fail_npresmsk;
++
++	masks = kzalloc_objs(*masks, numgrps);
++	if (!masks)
++		goto fail_node_to_cpumask;
++
++	build_node_to_cpumask(node_to_cpumask);
++
++	/*
++	 * Create a stable snapshot of the mask. The grouping algorithm
++	 * requires the CPU count to remain constant across its multiple
++	 * passes. This prevents allocation failures if the caller passes a
++	 * dynamic mask (e.g., cpu_online_mask) that changes concurrently.
++	 */
++	cpumask_copy(local_mask, data_race(mask));
++
++	/*
++	 * Grouping present CPUs first. We intersect the provided mask with
++	 * cpu_present_mask to ensure that we prioritise physically
++	 * available CPUs for the initial distribution.
++	 */
++	cpumask_and(npresmsk, local_mask, data_race(cpu_present_mask));
++	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
++				  npresmsk, nmsk, masks);
++	if (ret < 0)
++		goto fail_node_to_cpumask;
++	nr_present = ret;
++
++	/*
++	 * Allocate non-present CPUs starting from the next group to be
++	 * handled. If the grouping of present CPUs already exhausted the
++	 * group space, assign the non-present CPUs to the already
++	 * allocated out groups.
++	 */
++	if (nr_present >= numgrps)
++		curgrp = 0;
++	else
++		curgrp = nr_present;
++	cpumask_andnot(npresmsk, local_mask, npresmsk);
++	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
++				  npresmsk, nmsk, masks);
++	if (ret >= 0)
++		nr_others = ret;
++
++fail_node_to_cpumask:
++	free_node_to_cpumask(node_to_cpumask);
++
++fail_npresmsk:
++	free_cpumask_var(npresmsk);
++
++fail_local_mask:
++	free_cpumask_var(local_mask);
++
++fail_nmsk:
++	free_cpumask_var(nmsk);
++	if (ret < 0) {
++		kfree(masks);
++		return NULL;
++	}
++	*nummasks = min(nr_present + nr_others, numgrps);
++	return masks;
++}
++EXPORT_SYMBOL_GPL(group_mask_cpus_evenly);
 -- 
 2.51.0
 
