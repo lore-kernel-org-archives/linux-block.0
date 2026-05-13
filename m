@@ -1,131 +1,129 @@
-Received: from mail-qt1-f226.google.com (mail-qt1-f226.google.com [209.85.160.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6CD3B0AE1
-	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 21:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252A63CC7F5
+	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 22:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778707143; cv=none; b=sJJqULKoNx42Mtk/EaclVPh/ieoRro+pr7pqPm7ok3R+r9ooPYB5K7soms0DqGKRhIDV3woKY4iM0zC+1qyGWGtieAHctU3HY2OY4u3Cj9seEF7WZgPUvD6xCPmOHTQQB1jtq6CFqxtNEJLjFWdEnG5WRuoaN6FE+POVTq3oAPA=
+	t=1778710455; cv=none; b=BD15l5b959Hs+wvXg2560yXxVwchix5MM31FGVHyDs/gtd44oen4Lkt6fWwV5dxSf3nGh0hE0piFA9DfLBZ//tFJiG88xf0dvugc+xPQm0Cbbm37FPXr7jdBcwv41Woh2dEiXW1o2Ep7LiiZsGsFsOCBZT5i6zQL+extXWRjxa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778707143; c=relaxed/simple;
-	bh=kGs2WnbC6y0yqjyWpEWDsbi6xUYHXc/nXh53NKQFFBA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rpigpmeZJLMdS/hr6Dha0eS5ii5qXohNoMpGtHlANbqNsYdawf/7GgVhH+iTuCB534yCl1jGY+ScsKnLW8vYNV+GMCDLXetSdl0GO56t9rTTwA+dvDH64PurEl39fikgxtQMeYGcCxJdc6x+GzclkPaQVRIW5gGMS59HOuohM6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=YuoSDRPd; arc=none smtp.client-ip=209.85.160.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1778710455; c=relaxed/simple;
+	bh=yyEH/U+g3fVcijk25ZndnGTGa52zozAJ+u2EftffBcc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F5jfaLSX3M+xEr3oEXtK/cLdbBvhKtD8bVdXZe3Mm6uRhcXaSomM0gZ8E2t/VKzJfRIxCJipTZ/N3PlQ3U0KqWI+lFQAVHx+thDsvHmrtVUEeEhzPVFnPrj+70/wNu0UVxhTJE/AhVxAJvUbIbNtScfGQ0MGtiRlwsCPUPypNes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Mbit0xHr; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="YuoSDRPd"
-Received: by mail-qt1-f226.google.com with SMTP id d75a77b69052e-50e5e241feaso11169381cf.2
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2026 14:19:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1778707140; x=1779311940; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f3GgPB/qY/ZnxxAx67/XgeDITrY4cObzikz91xtmMpg=;
-        b=YuoSDRPdYvGeqKWBWyipO0rriA1+FBwq0SUqsrX/w9zc+3K7dT7goIvwJ4BvKcd5Rz
-         LrOvEkFeANs+RcFafvKKx9xpiJNon1jJrkCB6GV8eVGA5sxrF22WpJSsqbTA5opT4CD4
-         l0hH+Ku/e0eF/hf9xE8nke/JXtzfWHRbyGMWN5zpRy0baWJsLcAc6z4y8kts2iO+CNpM
-         iPUfRnNkkoAX4MPC6BX8m8eafLpMl9sOkZkxETeKuPKzx7THqI8OJ1Lv3p9nTbSZAn9s
-         ElJ6+/AVgOb8TmmvlS8IPeHjYSkrCvUB/OWU1F2lQ1FFRU1OTDzrc681h9TLqE+7WASN
-         oEMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778707140; x=1779311940;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=f3GgPB/qY/ZnxxAx67/XgeDITrY4cObzikz91xtmMpg=;
-        b=oztwh9NKsJ9pnWjh95jU5qrTuG+OYxLy715/09o48NK3ICwugUOH2hyhTqie5mLzj0
-         y3BfdJSHkK7UJ7zpxseShZ6Rp2QR9NwnS0TZmmZfZA1ldkX/bK4zuAwYp2qDfugCrT+o
-         u/mK6lHrgKFw2EDGVk9QbJD3vhtBKomMrwak6Mg6OYLfTRXMhc0DUEV9Der9VAMA5pjS
-         YNe+L2uPlbZWxLc3ssaZSsEEPtudG6xl2o0Cy3/lf+GOxl5rvQOh1sJwSp/1FxrIa/Yj
-         GH/v00Ja8vjjU82OGxXRhY2tQ2UIwxLByrqEASkJ5AFsYwl2ozFoqX19eskjPGFrH5pE
-         gCtQ==
-X-Gm-Message-State: AOJu0Yxkw8pjoiaNHGBH1UC0a+/OQAHSa7U/xbrvhjaXCC0088I4uQen
-	ewf1caFDM4BWw6fh97t+6vIAZlnCG6nborn4OjGvlYZKCswfOdW8BzHg5GpmPBhyqDeAwYC10ig
-	jHQ8nbU9QJ1qrffa36cu5bngbFpU2uivgkEF5QOIlzaH2BaCQNVYe
-X-Gm-Gg: Acq92OF1c6+nLcoK2S6qvyuh+yAlhOUVahOocjAWqIM1d9e/Ha1Odv67DtuM0UWdle9
-	2ggxIWkLdAaQxL0b6XBFtkTClmzu09uhaH7DSNrrEzcoSXdTUC0k8yixe1qCeIbomBEYHO4bMdb
-	rivLOxBNSuvxRCbHVusmmDxoPQYAn3pGW3DHGNDyPpvWSV9Ptm3byV1HfFwsSgFBC92nlqHXI2N
-	qZXIdH5D8iMquLk5ou1DtBUS60e77G9l1H/N7Ap+LUnf2hfqpSzKm8LoaVCPuNhVP3iYrO8cPLW
-	i4gkxhP1VPUZ36ooJJysgrujoKOY5WTRLMnh35AtLOpCH016MgUSmIBgVy4l6zL2sy2G8uYwXN1
-	NjKBREoRV+o1uTXJVBet1DpjEBGnBdlgOwEaFnL4=
-X-Received: by 2002:ac8:5a4f:0:b0:50b:3489:5495 with SMTP id d75a77b69052e-5162f6d5c6bmr46107531cf.8.1778707139566;
-        Wed, 13 May 2026 14:18:59 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-51645861bb5sm3171cf.29.2026.05.13.14.18.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 14:18:59 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.46.22])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id EDE32340C58;
-	Wed, 13 May 2026 15:18:58 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id E8D62E41188; Wed, 13 May 2026 15:18:58 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <tom.leiming@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 7.2 1/2] blk-mq: introduce blk_rq_has_data()
-Date: Wed, 13 May 2026 15:18:45 -0600
-Message-ID: <20260513211846.1956810-2-csander@purestorage.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260513211846.1956810-1-csander@purestorage.com>
-References: <20260513211846.1956810-1-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Mbit0xHr"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gG7640sL5z1XM6JX;
+	Wed, 13 May 2026 22:14:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1778710439; x=1781302440; bh=91Wdd0jWJhPhn0Rw/F1nwHjW
+	yxYaHuPlJw3w4bQOzLQ=; b=Mbit0xHrOBDdchcd3gSH6SzsXj/WSQ3lk63gIgKa
+	OMH3bPj2FqXgY8MkUneYifmlRb878Y5U8ADYmiCI3kS7WFaExZjTqk8nDy1mCae3
+	etqCOruvaGL5rxnHxQlINOyR4x14AzSfbjlZhIEGqwizK0NdiSew16i9jYavbzpO
+	2Pwn1UV1MBQD6ljX9J/Mf2EG5UyaVjIJZrqJY0p+ciNr/o/ZntfvpoJY8DpgWKoK
+	+GMW6D+MjWwo4mC0BPZqvD3lCNmo5vPozysK/kBzswKTXn//SfTiZRYiLY9kFmxE
+	WAlQcU1aOJvsDRo1wxBrKMYrfnzow+Fcw//hCS3D1e/TSg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id kQO87Gw9rWrc; Wed, 13 May 2026 22:13:59 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gG75y3wzfz1XM6JP;
+	Wed, 13 May 2026 22:13:58 +0000 (UTC)
+Message-ID: <e6dbe36b-7bd3-4848-91e1-9c84d421e1ee@acm.org>
+Date: Wed, 13 May 2026 15:13:57 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/12] block/bdev: Annotate the blk_holder_ops callback
+ functions
+To: Nathan Chancellor <nathan@kernel.org>, Marco Elver <elver@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20260511163100.1887263-1-bvanassche@acm.org>
+ <20260511163100.1887263-3-bvanassche@acm.org>
+ <CANpmjNNMDY=gB23ejdDYZg5yYduup_iXE1FAWC-fghr2od7Hwg@mail.gmail.com>
+ <56a1f905-2348-483b-a79e-5b3ebbd3482d@acm.org>
+ <CANpmjNM_rCMzbz88SSmmQU2h0+OvjoyN=VapkBc4OEwF=fRcvA@mail.gmail.com>
+ <20260513133614.GA703152@ax162>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260513133614.GA703152@ax162>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add blk_rq_has_data(), an analogue of bio_has_data() for struct request.
-This skips one dereference relative to bio_has_data(rq->bio).
+On 5/13/26 6:36 AM, Nathan Chancellor wrote:
+> While doing a dynamic check is more expensive than a version check, I
+> would not worry much about that overhead if the check is worthwhile or
+> valuable. In this case, I tend to agree with you that it would just be
+> better to bump the minimum version of Clang required for context
+> analysis because of the improvements (other than the function pointer
+> support) that you have landed in main since release/22.x. While I am
+> always sad to see support for older compilers dropped, I don't think
+> clang-22 is widespread enough for that to really matter. On the other
+> hand, I do worry that if we do not have a wide enough window of
+> supported compilers for developers / maintainers to use, we won't be
+> able to uncover potential problems to address in the compiler (I feel
+> like getting __counted_by deployed was particular painful for this
+> reason), if that makes sense.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+It seems to me that increasing the required Clang version is the least
+controversial approach. If nobody objects I will start testing the patch
+below.
+
+Thanks,
+
+Bart.
+
+Subject: [PATCH] lib/Kconfig.debug: Require Clang 23 for context analysis
+
+Context annotations for function pointers will be supported by Clang 23
+but are not supported by Clang 22. Bump the minimum required Clang
+version in preparation of annotating the blk_holder_ops function pointer
+members.
+
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- include/linux/blk-mq.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+  lib/Kconfig.debug | 4 ++--
+  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 18a2388ba581..4349aefdbc87 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -1102,10 +1102,11 @@ struct req_iterator {
- 		 bio_iter_last(bvec, _iter.iter))
- 
- /*
-  * blk_rq_pos()			: the current sector
-  * blk_rq_bytes()		: bytes left in the entire request
-+ * blk_rq_has_data()		: whether the request carries data
-  * blk_rq_cur_bytes()		: bytes left in the current segment
-  * blk_rq_sectors()		: sectors left in the entire request
-  * blk_rq_cur_sectors()		: sectors left in the current segment
-  * blk_rq_stats_sectors()	: sectors of the entire request used for stats
-  */
-@@ -1117,10 +1118,18 @@ static inline sector_t blk_rq_pos(const struct request *rq)
- static inline unsigned int blk_rq_bytes(const struct request *rq)
- {
- 	return rq->__data_len;
- }
- 
-+static inline bool blk_rq_has_data(const struct request *rq)
-+{
-+	return blk_rq_bytes(rq) &&
-+	       req_op(rq) != REQ_OP_DISCARD &&
-+	       req_op(rq) != REQ_OP_SECURE_ERASE &&
-+	       req_op(rq) != REQ_OP_WRITE_ZEROES;
-+}
-+
- static inline int blk_rq_cur_bytes(const struct request *rq)
- {
- 	if (!rq->bio)
- 		return 0;
- 	if (!bio_has_data(rq->bio))	/* dataless requests such as discard */
--- 
-2.54.0
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 8ff5adcfe1e0..5b5d1d183618 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -630,7 +630,7 @@ config DEBUG_FORCE_WEAK_PER_CPU
+
+  config WARN_CONTEXT_ANALYSIS
+  	bool "Compiler context-analysis warnings"
+-	depends on CC_IS_CLANG && CLANG_VERSION >= 220100
++	depends on CC_IS_CLANG && CLANG_VERSION >= 230000
+  	# Branch profiling re-defines "if", which messes with the compiler's
+  	# ability to analyze __cond_acquires(..), resulting in false positives.
+  	depends on !TRACE_BRANCH_PROFILING
+@@ -641,7 +641,7 @@ config WARN_CONTEXT_ANALYSIS
+  	  and releasing user-definable "context locks".
+
+  	  Clang's name of the feature is "Thread Safety Analysis". Requires
+-	  Clang 22.1.0 or later.
++	  Clang 23.0 or later.
+
+  	  Produces warnings by default. Select CONFIG_WERROR if you wish to
+  	  turn these warnings into errors.
+
+
 
