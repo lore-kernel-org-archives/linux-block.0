@@ -1,106 +1,73 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B302BD58A
-	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 13:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7612D3725;
+	Wed, 13 May 2026 14:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778680569; cv=none; b=ArKA040lEkL9R6JODSkUtjtqlQnAOC1Tw+YEbWfaEMC6FrubdQL+v03fAQiRlMerrZDzA+zE+PZcfwB2KeOeSfm6LLvyEEDvZ3dV65tXiKauKtfObj6TBzMcs+uN/UF/z4Xt/v6UED+AVhz4ijL3x2jC7wnnUp6mlU187e0+WNM=
+	t=1778681028; cv=none; b=ZjMhHEFnfs2C2p4Wu2eo+rJyoRdfz3681e/AKtIl2s4gJfhvJS+8x2uy4FlWCmq6beH8vOleHKufAySkjekBBdtRsf/FlmftjnbC1f2blJ9IZ++57YHMGp2z0Y/I2DzYp9On6RsyffWQl3lpQmvt+6sOwVUk+ynmjxTxiRrWOn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778680569; c=relaxed/simple;
-	bh=XhltUBaAJNijJMB60BcpKe5hSXdb7Bm8XFFXjh3PJl8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jzrE04C8VVddnZTBpxxS0OtSpW66TOmzIPv5GuT4d+1MRK+8XxBNIW8lYdvCpI+TUHTwgcsGrJ5W25VHCg344IpocZ3/bKzLp/Zg8dI/51WxyoKctj/IXI7lGqCo25566LO1iJzswLli+ZemxqEBzP7LxzZ/1xRH8O2vO/pUHxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=AS6v8Wzv; arc=none smtp.client-ip=209.85.160.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1778681028; c=relaxed/simple;
+	bh=+DlhqxbsUxs8TSFy328TyjZOji9gRCtPaLK2MQ9YrE0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=oTaPN23S40goZkUr3BwP0onqQRqGwuevUe3KQXzaob+Z6fxt1B5PGiR7zFzlT2XDIMTO4HJO3mgbjPC5qYYHNj6mPMnvQn9kd/V1Ro5/ChGrWFFGv32PV69elWvyeA5UNFi4PVebkHVBQIKvC3xnGNDt3OKrNw26WN264deq96U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JWcMztLE; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="AS6v8Wzv"
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-439a7e828b1so1322918fac.1
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2026 06:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1778680567; x=1779285367; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lUsiQzFbsCDbLVSzZ+u0+8y253XZk7g1w4U0y/oBNa0=;
-        b=AS6v8Wzv125bsFiyFayDR8uIRlSwZgYCtOT444tYlj3bDMCLDdURNB+jQiH4p3BBHD
-         x7MnUTRm/3xvi2BkierMJrjcxkkF15yk/BMfy3pd4af1oxlCknt3bbQOCpHkg+rZnLGS
-         mu7l67jSf9ly6ODA+L9DE3y8/6xVUiB/7DmiZ9X+maL4lP8mOzaaHB7ZVGARAIkyImBC
-         04RqbiLd7DBOTh+eXgkE0wfwjr8QLjT176v7SKSj/YTLwxnbiU+kj7NH32sN0bSD2obs
-         tKwTuFd/hkb9LNqNJ1QaAoXTqNIX3YLbANht1j58joBNAKHtWQzhfEwykf3g25WDSns7
-         vRrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778680567; x=1779285367;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lUsiQzFbsCDbLVSzZ+u0+8y253XZk7g1w4U0y/oBNa0=;
-        b=ZfWJWD/qD4druWPWHM33qb5/z4QJEORTW4gUIWmSfTCK6p60YwUZHufHMdsqENMF5L
-         S8u3GvxOHmOxQIuF/VQAafrij+9ebBSzwhXH+UWnAu1m/hwWGRIbJqMNfBujYc5alxSP
-         8sO8FI9jThGW0OvJbYlglLFAoOB6HDEZwx5qTHYgpeOc7Fl4DudOP38fzreAu8OMIN9+
-         U4XDvRC8nssYOc3nnybd8n5RqnOg3emV6zJ5XXyOpPIY9gzV25crBjMrvOJQ1UQWYbbh
-         P7wZZhQZte2VQOGGD07zF1ylKtjiKDjJcJ1VUJrDbaAgDbkFJLfSCYcDJKddia9V1G1T
-         rzfg==
-X-Gm-Message-State: AOJu0YxJzl/7G8hkIMXgYUUfcbPSUYCzg42QMbxWo3Qpu49ISaJmHetv
-	4B7bfgpvaf53EbNHSfG9UYGzsD8l06M41pRosLsn6lbaM93zZrblANQGydqbqrZdEV7otMZS99K
-	mGw/c
-X-Gm-Gg: Acq92OHFSopxIgOk6KRcLObDQ9DL8FR1guYthC3muDHQsn947+k1T88FRWBR4wbDdaw
-	k2PQLqp0h9JL1+jUK8nCVuxssVpGVfsFYeyvUNLeEY2OWfQ6QyXZZUNAzcS6h113GTHzYd5oKxr
-	uNfNKlTmocAzcoUVu9cozzQFA5QLWTJsSJYbFWhb8dizmTI8kziHXUFLL5mKw6FYRLCN6JwpmJN
-	6i828Fa2kME8aE13gzEINucv2jbACjb5wfy4jFhO/XJL4rs0hGSxvofF7fvncvnq7TsXUQExiCP
-	DsK4yhk5jMi0E4N4w3oymCzDJvwVxXSFvH2Qk/DJxrj5nuopWBlVdGVVc+dIBTEHoXbMjVtgXq/
-	2zU7lFt6sSPmtfNZc1M1JwE3w0r9KUmqVfX7fm86FdG2hvMNXTHKGmDpzCHrWUlHv3JOIR4cWIr
-	tjilzH1EAGU/8Xba0K5jT99ogp555rDNtZemlEJV/SsaB0Q+6iFy9yev/k1fP+1CSD02EvsLr+C
-	pTE
-X-Received: by 2002:a05:6870:d609:b0:3e8:9b72:5cda with SMTP id 586e51a60fabf-4399b5dbfb6mr4411331fac.11.1778680567021;
-        Wed, 13 May 2026 06:56:07 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-439c0954a81sm2962187fac.18.2026.05.13.06.56.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2026 06:56:06 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <tom.leiming@gmail.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>
-In-Reply-To: <20260513101941.1373998-1-tom.leiming@gmail.com>
-References: <20260513101941.1373998-1-tom.leiming@gmail.com>
-Subject: Re: [PATCH V2] selftests: ublk: cap nthreads to kernel's actual
- nr_hw_queues
-Message-Id: <177868056593.400295.12640470219021357080.b4-ty@b4>
-Date: Wed, 13 May 2026 07:56:05 -0600
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JWcMztLE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=/l
+	wiOPTnvlBpog3cv49D12gfGRsm5qJ0BLZQamnSSg0=; b=JWcMztLEhA7kS0JHqg
+	EmpAqZK9WQoqCxXZzTk5weZVCoW5P+6gMt9FWbXLePTUj99/RmkKih2od4xB9KkN
+	mMIcTzWJKPsUHJUCMa6ZdpHsRESXVyZfJOgRyWkT3SCfLP+WuD+23QBggiJUOYhm
+	e1kSjxxpLh3U6zFEF4St6CCIc=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp5 (Coremail) with SMTP id QCgvCgDXniBxhARqrEiHDg--.29S2;
+	Wed, 13 May 2026 22:02:27 +0800 (CST)
+From: wang wei <a929244872@163.com>
+To: richardycc@google.com
+Cc: akpm@linux-foundation.org,
+	axboe@kernel.dk,
+	bgeffon@google.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	liumartin@google.com,
+	minchan@kernel.org,
+	senozhatsky@chromium.org,
+	stable@vger.kernel.org,
+	wang wei <a929244872@163.com>
+Subject: [PATCH] Re:[PATCH v3] zram: fix use-after-free in zram_writeback_endio
+Date: Wed, 13 May 2026 22:02:18 +0800
+Message-Id: <20260513140218.7425-1-a929244872@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260512074918.2606208-1-richardycc@google.com>
+References: <20260512074918.2606208-1-richardycc@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:QCgvCgDXniBxhARqrEiHDg--.29S2
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjTRPrcfUUUUU
+X-CM-SenderInfo: jdzsmjiuuylji6rwjhhfrp/xtbC6hTZgGoEhHRf4wAA3F
 
+>@@ -847,7 +849,7 @@ static void release_wb_ctl(struct zram_wb_ctl *wb_ctl)
+> 		release_wb_req(req);
+> 	}
+>
+>-	kfree(wb_ctl);
+>+	kfree_rcu(wb_ctl, rcu);
+> }
 
-On Wed, 13 May 2026 18:19:40 +0800, Ming Lei wrote:
-> dev->nthreads is derived from the user-requested queue count before the
-> ADD command, but the kernel may reduce nr_hw_queues (capped to
-> nr_cpu_ids). When the VM has fewer CPUs than requested queues, the
-> daemon creates more handler threads than there are kernel queues.
-> 
-> In non-batch mode, the extra threads access uninitialized queues
-> (q_depth=0), submit zero io_uring SQEs, and block forever in
-> io_cqring_wait. In batch mode, the extra threads cause similar hangs
-> during device removal.
-> 
-> [...]
+Do we need to add a 'rcu_assign_pointer(wb_ctl, NULL);' before 'kfree_rcu(wb_ctl, rcu)'?
 
-Applied, thanks!
+Signed-off-by: wang wei <a929244872@163.com>
 
-[1/1] selftests: ublk: cap nthreads to kernel's actual nr_hw_queues
-      commit: 87d0740b7c4cc847be1b6f307ab6d8547cb1a726
-
-Best regards,
 -- 
-Jens Axboe
-
-
+2.25.1
 
