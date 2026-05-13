@@ -1,135 +1,133 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097DD423151
-	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 12:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6DD331202
+	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 13:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778676716; cv=none; b=Y0fAR+zUI9TsRhg2a7UkXGw8lckldq1+mCTSz669YS+3FAtPFrtPemyo5xmKldlYU8JfsuThAEtWpF+mM836Of6F1TvDsiyax5541IzLerwh21Xbkny7KRBEQf+tGccybBDahCXSTjAKZ5oOb4Po4j9203GaWGlUY+3fERvpM1E=
+	t=1778678955; cv=none; b=dpSsGkMBTdcvxIM8Wpcu613Db9mB8T6rwnBfBg6h0MhNhgPqgcI4kDEk2sEMTwwxt32JKlTzO+7T+3uqv4ar2fNoLDw5G1ngp68oadKnE0bpGuq2gcu8peIP9r1XTl2l3mEuKBSUvFV3kQodpx35YwnB/pVXTaDdrPABVzcR4lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778676716; c=relaxed/simple;
-	bh=q1ZzCv3qy931Od931muGLANVwooKhx0f1Vn6rfQqN0s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qhzw8vHlTnODhZkKFLBmYvshhpwZfE46VQt9KIcZzCj0Ip8PNXvupFQq6F4yI6cmp27Fwn48YZzTMOeJu7fPy1EigG48N4w1Ulm9OGRjHzSMPIj12FNejs61JoUIA/nlgbRaVthFdtiuNTOMx6wkTwTNeD1I6QOiOHoOQAJL/24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+	s=arc-20240116; t=1778678955; c=relaxed/simple;
+	bh=qvrzIgPI09xnL+lPNRKw47FDVzkn2xkt2K7Rwhlyrpg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jg+/1CRqoJQpJpQoa02ewDQBzc/pPa28JAQmCgOoACSPo7rQm4dCB2rGnfoJWhK/GDbAsAK/KUt7nFBOMuCM0RtkiR/UQrN8FIco61dw1LjdT/70kPy3prVdNNpXrKh3WzxHl9Xo5C0gSNenCY43QvTnxUyun5DxP+/uV5UtLjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a107B9Ew; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7c58e6eb3edso18297527b3.2
-        for <linux-block@vger.kernel.org>; Wed, 13 May 2026 05:51:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778676713; x=1779281513;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a107B9Ew"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-441209fb77eso4152105f8f.1
+        for <linux-block@vger.kernel.org>; Wed, 13 May 2026 06:29:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778678952; x=1779283752; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fmqp9pIMfFQVUOf0gODDSHc+R5Yka09MdAc/3G4zwFg=;
-        b=YrNEWs+4fDHdSfF1jQO4Gu82m2UC/B2XfNwi57vyGDqBx6BwQdCsjM5PQm6LX1ES9f
-         2ZBURMMSQllT6EjC+ApkitUgHZxSa+8HltjjEU1kVslCTp7N6LztFhHK6ZqMnfXqA4Xf
-         A4v1S6MtOnBW7Mc0LV5R3vCNXA3ZLMXSfRdHCEqJCBFD/tQmIrqq7pOouKoc72qSmFaq
-         lMSkSE4uUYDFFYaz3rPMIGeUw4k6xRdHIruPQ3Rpbk/ipjasR/+WlWJTxej9sf7NbAUE
-         lDE79RhicUkpe0H/xWwdQMvKlc4JCtBdTJ5yKbdhUE8RrD2ISDlqKav7UIYyJAJNLAmA
-         lgrg==
-X-Gm-Message-State: AOJu0YwXsa7pmcTlSutrQGeBwQJdmXDpBb3LZgLHfhLSWSgnTM5R+BBM
-	+BtUNBRAkr8+T+22wNfhoY2bdCbbM/cnQukevUGqZkuOzD5YEAGMSdAA
-X-Gm-Gg: Acq92OGFATTMdPrlsA8HUZCiu6W7YAjhesa1Mj/HAo0UXweggjWpcW/qWDvXS/jZ684
-	WraeA/zsRBCZU21woL/a/USmb39sg5G/QevKLrGzktKXww2c0PnltIaqcvjFhNzu2BN8ViB6C6q
-	qeh831U0/PkSOowu8XXditVfKfia1lDRLCthvwBgshpGwPs4gpX3+d2psdmfZ/6GYGRh1gZzlg1
-	pgsBlpC3w829IfvzXKj5YgCTPEwvslswWbrwZ2yqDBTv58iJb6ndEHbttWcXywhLMtYXz0Iw/i4
-	47Wod05yOO4jOO32WfBmwVFSya4SABchGSWXTJ2dzdetUJPg310xG1Is8jlL9z/73/ujUBMOwhz
-	nmwL6Y+K7LfbrhOSQdsbuf0Qjb+pEFKBrfewLUAEKp/W2h5EaZ5pvExEBblmZIZ/2iVlr8TA2JH
-	pi/2/EpP/u4L/Q2JpbBY8tug1xFQHfRx8r92doVcEVSQd+sQMHO6WxJSZO/Bl28Ck=
-X-Received: by 2002:a05:690c:7407:b0:7bd:5cc4:1962 with SMTP id 00721157ae682-7c6dd0af4e6mr22242187b3.48.1778676712899;
-        Wed, 13 May 2026 05:51:52 -0700 (PDT)
-Received: from [10.68.32.41] (bba-217-164-201-253.alshamil.net.ae. [217.164.201.253])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd6686fbcdsm177353557b3.40.2026.05.13.05.51.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 May 2026 05:51:52 -0700 (PDT)
-Message-ID: <d9d586f3-c50c-4386-87ca-0d911c94d27c@linux.com>
-Date: Wed, 13 May 2026 16:51:47 +0400
+        bh=+cq+23+E96HQoAhwgeeSJr3+OJ8IJX5BGImZhad/wV8=;
+        b=a107B9Ew/L+JG9kf+Z1nV/fx/+/Yb5mbJ9IZSmqcqG5NRhHtSigWVxLyt5e4tVheRP
+         fVjtYzbSvKxWG/9swUAl2JC7bOL4zt7vyjCnIC8OuK2OMjbgJBd7ZXSOd9A2k/U6ZdZx
+         IjexhbZVncU3yj8qsWTZZXbphJKEGru0GTV9TW0VSNxNUEF9TejQU1LxeC23owu6b8iT
+         ERboyV8DTmKJyNrtYYu2ZtgNGMFqTuCpA+7JxZMpzt9wq45ITtvGgvRTJ8s7Z9NXHaiv
+         Dc2JWteKzwRsB8GUKRASoBUvNyZQ288ROHW0dQRuuliK8uDWf25EzvdXbuywp4OcMKw3
+         hDpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778678952; x=1779283752;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+cq+23+E96HQoAhwgeeSJr3+OJ8IJX5BGImZhad/wV8=;
+        b=rkCksOkdut1n8QIfkpdvHl/8y/qyMquVdtsUpLV8GXfLIzdY8GgPQU7QgaEKEql9G0
+         FG+5E4qHcee9Ju9WLx4+8XlHuQHlWsYhKJQD1UrJHu5P72Rkh/QRZLX4ZhRkgdU9VtBZ
+         /Z54UXs1JXulRt5DC2MSVBIVAF43l84rwySF2NMxDBFqoI0aAH85o+aDAaKAc6Piwarr
+         xjNiCpsqXIX0Pe7ZM53d4VHqj63TMUydJlJmsUw/Ec7cwg5gzcEDVigLyJcjB3nTc2OP
+         4l4jtFAjExvZ/AYh9N82ewXIgR0A2s332y0Mg7HnZAEAOhduYKY2DSMHtzvif9i0hc0+
+         SUHA==
+X-Forwarded-Encrypted: i=1; AFNElJ/lCcbMZ6ZMSg3l5bn0K4OEjPjsc0wQGXVYojqfZSml41IFv0p9P2Ply0ma+5krr8WOKN4eoPyvwQsYBg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP4Bp1z0hEu91n0HUNCyH/Bc7OS1WgW1bVKIK5gtJkROo07A0N
+	fdX8VLWqCwzZnpVowWrC02qOWvHdoYJRlzYIH7xVsqIfnAKwWc9qBrYA
+X-Gm-Gg: Acq92OGDcNk0yHarCXUoaCS1tlnoTFPX310smiBz3/L/hUqHKDrbBL4XmozqQFnl2lN
+	HVW6qkxqfiYPB94SMcmnpmcXGIc5hn/owbc1BN8eDOtSOfYfDijCQD2NC53dQiQZViXyN5Xjkho
+	31bzBlNsz3YER4CYhCdo+Tqxq6F/DQCzRRMSZAuXeyLCqGArHAQv/nDOw6Xg8WFh7nIbPqTvzY5
+	oT34Gx/ghLOlfd19vRknSI6DXj7xn1yiE2h6PHezbR6YN347eEnGzgHFm9si1219jFv1K+lFkqT
+	2ETI6EQ+s45E48Fxb6sPGzdF2yyxaxs/aeSLyPWEgyismb+GohErL5A8JOK6LVMTi2qFD06UkP4
+	1Y+uH120nA+YgDT98qXMynLjBlv4Q3+BGuHkMgxL0//WlqK0Ggnv02mJQFtUPUjRTfyxPXEjbMe
+	RlPOIm2u5PFPQ4CnFVvA/RlepQASFMyNBLH3BH/7DF2iJpFqD/LyIL+a0EQc1q
+X-Received: by 2002:a5d:591c:0:b0:446:708e:1e8d with SMTP id ffacd0b85a97d-45ac4504a13mr9930360f8f.30.1778678951817;
+        Wed, 13 May 2026 06:29:11 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4549120ec0asm40068578f8f.17.2026.05.13.06.29.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 06:29:11 -0700 (PDT)
+Date: Wed, 13 May 2026 14:29:09 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Christoph
+ Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Andrew
+ Morton <akpm@linux-foundation.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, Nitesh
+ Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>, Anuj
+ Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v3 02/10] iov_iter: add iterator type for dmabuf maps
+Message-ID: <20260513142909.03ae6c2b@pumpkin>
+In-Reply-To: <20260513110557.705bdeed@pumpkin>
+References: <cover.1777475843.git.asml.silence@gmail.com>
+	<20a233d2f35274817aa643cc0fe113707eb47e72.1777475843.git.asml.silence@gmail.com>
+	<20260513110557.705bdeed@pumpkin>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH] floppy: force media-change checks when clearing events
-To: Cen Zhang <zzzccc427@gmail.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- baijiaju1990@gmail.com
-References: <20260506010248.3275696-1-zzzccc427@gmail.com>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <20260506010248.3275696-1-zzzccc427@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hello,
+On Wed, 13 May 2026 11:05:57 +0100
+David Laight <david.laight.linux@gmail.com> wrote:
 
-On 06/05/2026 05:02, Cen Zhang wrote:
-> floppy_open() tries to make blocking read/write opens perform a fresh
-> media-change check by clearing drive_state[drive].last_checked before
-> calling disk_check_media_change().  That timestamp is also updated by
-> disk_change() when another FDC operation observes that the disk-change
-> line is clear.
+...
+> > @@ -575,7 +575,8 @@ void iov_iter_advance(struct iov_iter *i, size_t size)
+> >  {
+> >  	if (unlikely(i->count < size))
+> >  		size = i->count;
+> > -	if (likely(iter_is_ubuf(i)) || unlikely(iov_iter_is_xarray(i))) {
+> > +	if (likely(iter_is_ubuf(i)) || unlikely(iov_iter_is_xarray(i)) ||
+> > +	    unlikely(iov_iter_is_dmabuf_map(i))) {  
 > 
-> The worker path that calls disk_change() is not serialized by the
-> floppy_mutex/open_lock pair held by floppy_open().  A worker can therefore
-> store a recent jiffies value after floppy_open() stores zero and before the
-> synchronous disk_check_media_change() call reaches floppy_check_events().
-> The checkfreq throttle can then treat the media-change state as fresh and
-> skip the hardware poll that the open path explicitly tried to force.
-
-Thanks for the report and patch. The race you describe is real. However,
-the proposed fix introduces a regression on the close path that I don't
-think we can take as-is.
-
 > 
-> Use the block layer's clearing mask instead of a racy timestamp sentinel.
-> When DISK_EVENT_MEDIA_CHANGE is being synchronously cleared, bypass the
-> checkfreq throttle and poll the drive.  Periodic event checks still use
-> last_checked to avoid unnecessary polling, and floppy_open() no longer
-> needs to write last_checked itself.
+> Doesn't the extra check add more code to all the non-ubuf cases?
+> This could be fixed by either making iter_type a bitmask (with one bit set)
+> or writing an iter_is_one_of(i, ITER_xxx, ITER_yyy) define that uses
+> '(1 << i->iter_type) & ((1 << ITER_xxx) | ...)'
 
-bdev_release() unconditionally calls disk_flush_events(disk, DISK_EVENT_MEDIA_CHANGE);
-on every final fput() of a block device. disk_flush_events() is not a no-op.
-I'm afraid that after this patch every close of /dev/fd0 (or any floppy partition)
-forces a synchronous FDC poll.
+This seems to DTRT:
 
-> 
-> Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
-> ---
->  drivers/block/floppy.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index 92e446a643712..7217db0b907b3 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -4051,7 +4051,6 @@ static int floppy_open(struct gendisk *disk, blk_mode_t mode)
->  		fdc_state[FDC(drive)].rawcmd = 2;
->  	if (!(mode & BLK_OPEN_NDELAY)) {
->  		if (mode & (BLK_OPEN_READ | BLK_OPEN_WRITE)) {
-> -			drive_state[drive].last_checked = 0;
->  			clear_bit(FD_OPEN_SHOULD_FAIL_BIT,
->  				  &drive_state[drive].flags);
->  			if (disk_check_media_change(disk))
-> @@ -4092,7 +4091,9 @@ static unsigned int floppy_check_events(struct gendisk *disk,
->  	    test_bit(FD_VERIFY_BIT, &drive_state[drive].flags))
->  		return DISK_EVENT_MEDIA_CHANGE;
->  
-> -	if (time_after(jiffies, drive_state[drive].last_checked + drive_params[drive].checkfreq)) {
-> +	if ((clearing & DISK_EVENT_MEDIA_CHANGE) ||
-> +	    time_after(jiffies, drive_state[drive].last_checked +
-> +			       drive_params[drive].checkfreq)) {
->  		if (lock_fdc(drive))
->  			return 0;
->  		poll_drive(false, 0);
+#define _ITER_IS_ONE_OF(iter, t1, t2, t3, t4, t5, t6, t7, t8, ...) \
+    ((1u << (iter)->iter_type) & ((1u << ITER_##t1) | (1u << ITER_##t2) | \
+        (1u << ITER_##t3) | (1u << ITER_##t4) | (1u << ITER_##t5) | \
+        (1u << ITER_##t6) | (1u << ITER_##t7) | (1u << ITER_##t8)))
+#define ITER_IS_ONE_OF(iter, t, ...) \
+    _ITER_IS_ONE_OF(iter, t, ## __VA_ARGS__, t, t, t, t, t, t, t)
 
-For v2 I think we should avoid using the block-layer clearing mask as a force-poll
-signal. We can make floppy_open() do the forced open-time poll directly under
-lock_fdc(), then let disk_check_media_change() observe the resulting state.
-This code pattern is already lives in FDPOLLDRVSTAT/FDFMTBEG handling branches.
+int foo(void *);
+int f(struct iov_iter *i)
+{
+    return ITER_IS_ONE_OF(i, UBUF, KVEC) ? foo(i) : 0;
+}
 
-Denis 
+See https://godbolt.org/z/sMz93zah1
+
+Pasting ITER_ on the front ensures the values are constants of the right type.
+OTOH it makes it harder to search for uses of each type.
+You could paste _ITER_ on the front, elsewhere define _ITER_ITER_UVEC
+to be ITER_UVEC (etc), and require the caller use the full name.
+
+-- David
