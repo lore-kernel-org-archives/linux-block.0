@@ -1,126 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward502b.mail.yandex.net (forward502b.mail.yandex.net [178.154.239.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFA438655A;
-	Wed, 13 May 2026 14:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFFE494A19
+	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 15:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778684361; cv=none; b=iTK1QhfmhcdYbhmyQoPdM4VrW7HzWoI3PtTB101iNjpQXqUEouYHpZk1olqfT4B6LFqCTRT5yRrHRnekBCrOC5b8ONsdLjVCul4tZP9p1DGGaA2oL6sHF3Tyd3Jo/xSZBrkajesE/xWKD5KrbKXeOJJj9bq5NgrI/WxMgGf0Cjo=
+	t=1778687030; cv=none; b=QME8JUbc0XiY1vIeNLCCV66SLtbTYnyWXKzSD7XkLlYBv49tHzoQDpz6BYXrX4bylnlj3dLaP+intZ2BHpTdHdh2cAYvE53cBcltNE68+AhPudtlzOZrKoXJxjg43NkTAB43VfavvBJ5SqOptfBUxDfGQtz7z/VDnAcALH7v2Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778684361; c=relaxed/simple;
-	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZhMrupf3fZ6ls6FVHJp880rovHBrIpAxXmr8lnULIEhJPSrZiYAzG1/w8BjXXkWF/YlY651QuhNX2j5B0SV0hm4xGTDZ21uo84LwcqRDo7Umyj2OVhM7le6YNRunOLF4FBm+8lkkdyqRsJLIWqZH3UgwwtbbnGAmzRD9RgyiUzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIhYEKx5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778687030; c=relaxed/simple;
+	bh=//OyCPFODt9WWRcc3+70UONwCSivWbTtAeKxTLmZs1A=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tbFqHMsg2tANc/8V0onHv+illqe5KSrCUh5+MTTYxtib3heRC/PxYXVCKlf5Fauvnv974KQ37XV5eMN1hs5bcwaJW8/PXhhCwT5m/5jPgDFOmoqnI3lBIz8iHwDz7PLa9u3LpEAIxm+a470YvH51Svdl3SmbXESgD46LLWbTx28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=N8sTDJ6G; arc=none smtp.client-ip=178.154.239.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIhYEKx5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D47CC2BCB3;
-	Wed, 13 May 2026 14:59:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778684360;
-	bh=zbNHyyDRYAeGo6U86F5ea4LHa32zJh59lyteWOe4KGw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iIhYEKx51XcVXCXizSytP4ZvhZtiBJmIPf+6O8Mktq3AJeEzUzkfq9zJFMxWWOQN/
-	 aoWFZ5To1myUEqEdw7VallkySu/iGPAldgKZg0gl6xnLSnuloIhSu3lBTLqysfs1I0
-	 Skg4f9BktAuE18yvvQRJ70VrpwY5SAV36hi26w0P9GMsQkbf7JD+SNU9HxSde3AnHu
-	 bo3a4ZV9/09phwV+AioQvcuqmfuB2eTSN/4uxVBmpiaTeWdd95EFcAzHk3DTbz/8je
-	 v+mVMmUJ6OM8tMNlaOTQXwFxTd7uJskcOql+wcSZWQ2REyC0QM0b5EqoBwpRfC7ETk
-	 FtuJsAzYKU1jA==
-Date: Wed, 13 May 2026 07:59:19 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>,
-	Kairui Song <kasong@tencent.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 08/12] swap,iomap: simplify iomap_swapfile_iter
-Message-ID: <20260513145919.GP9555@frogsfrogsfrogs>
-References: <20260512053625.2950900-1-hch@lst.de>
- <20260512053625.2950900-9-hch@lst.de>
- <20260512170204.GI9555@frogsfrogsfrogs>
- <20260513065608.GA2250@lst.de>
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="N8sTDJ6G"
+Received: from mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:5f11:0:640:6821:0])
+	by forward502b.mail.yandex.net (Yandex) with ESMTPS id C767E82CC7;
+	Wed, 13 May 2026 18:43:36 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net (smtp) with ESMTPSA id XhNiH43RTuQ0-2eNjmJCd;
+	Wed, 13 May 2026 18:43:35 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1778687015; bh=//OyCPFODt9WWRcc3+70UONwCSivWbTtAeKxTLmZs1A=;
+	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
+	b=N8sTDJ6GPpMu/Mm4X0oEC1ZGp1DNUuq56+SoYX9t1aXPi/9jeJwJlt1/9nNf5c5hn
+	 gooIqXv1Y5c5F0wz60MZvA3CulxPfwMbnN7+zcYhZFCno+gGKd/aZucxsnVe0Zz9u6
+	 oASF3hQH7bjnJOwU6945TwUXh4U9j/26C5LTxpU8=
+Authentication-Results: mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <f2d980020f2735d3acd25e660bdc4918b6745782.camel@yandex.ru>
+Subject: Re: [PATCH] block: bio-integrity: fix memory leak in
+ bio_integrity_map_user()
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Weidong Zhu <weizhu@fiu.edu>, Chao Shi	
+ <cshi008@fiu.edu>, Sungwoo Kim <iam@sung-woo.kim>, Dave Tian
+ <daveti@purdue.edu>,  Keith Busch <kbusch@kernel.org>, Christoph Hellwig
+ <hch@lst.de>, linux-block@vger.kernel.org, 	lvc-project@linuxtesting.org
+Date: Wed, 13 May 2026 18:43:33 +0300
+In-Reply-To: <CADUfDZo972nK0iE79ogjob5_VN2-i-7L5XypDbdW0bupNfTo+g@mail.gmail.com>
+References: <20260513070515.528861-1-dmantipov@yandex.ru>
+	 <CADUfDZo972nK0iE79ogjob5_VN2-i-7L5XypDbdW0bupNfTo+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260513065608.GA2250@lst.de>
 
-On Wed, May 13, 2026 at 08:56:08AM +0200, Christoph Hellwig wrote:
-> On Tue, May 12, 2026 at 10:02:04AM -0700, Darrick J. Wong wrote:
-> > OH.  Now I remember why -- it's to handle contiguous mixed mappings
-> > better.
-> > 
-> > Let's say that you have a 1k fsblock filesystem and 4k base pages.  You
-> > fallocate an 8G swap file and then mkswap it.  The first mapping is a 1k
-> > written mapping at offset 0 for the swap header, followed by an 8388607k
-> > unwritten mapping at offset 3k.
-> > 
-> > The PAGE_SIZE rounding code in iomap_swapfile_add_extent will round the
-> > end of that first mapping down to zero and ignore it.  The second
-> > mapping will be treated as if it were a 8388604k mapping starting at
-> > offset 4096.  Now the page counts are wrong and the swapon fails.
-> 
-> Do we care about this use case?  I guess you did as you implemented
-> his, but still?
+On Wed, 2026-05-13 at 07:32 -0700, Caleb Sander Mateos wrote:
 
-We do, because mkswap -F uses fallocate nowadays:
+> I preferred your previous patch changing iov_iter_extract_pages() to
+> free the page array on error.
 
-$ mkswap -s 4194304 -F a
-Setting up swapspace version 1, size = 4 MiB (4190208 bytes)
-no label, UUID=bc9746bf-e200-4944-927c-80d83872f1cb
-$ filefrag -v a
-Filesystem type is: 58465342
-File size of a is 4194304 (1024 blocks of 4096 bytes)
- ext:     logical_offset:        physical_offset: length:   expected: flags:
-   0:        0..       0:  411383552.. 411383552:      1:            
-   1:        1..    1023:  411383553.. 411384575:   1023:             last,unwritten,eof
-a: 1 extent found
+Me too.
 
-> > A more generic solution to this would be to change add_swap_extent to
-> > take sector_t addr and length values and use them to construct a bitmap
-> > representing contiguous physical space on the bdev, accounting of course
-> > for PAGE_SIZE alignment.  Except for the swap header page, every other
-> > contiguously set page-aligned region in the bitmap gets added to the
-> > swap extent map.
-> 
-> You don't even need a bitmap, just do basically the same checks as
-> the iomap code when moving to a new swap extent after moving to use
-> the sector_t.  And it really should anyway, as the current abuse of
-> sector_t to store a disk offset in PAGE_SIZE units is pretty gross.
+> Even though bio_integrity_map_user() is the only current caller that
+> requests iov_iter_extract_pages() allocate a page array, others could
+> be added in the future and forget to do this freeing.
 
-Oh, I meant this to handle the particularly gross case where the fsblock
-size is smaller than a base page, but there are a very large number of
-file mappings that point to a physically contiguous extent but are not
-in logical order:
+It was in the past. Again, the whole thing was started from 6.12, see
+https://lore.kernel.org/stable/20260505094529.406783-1-dmantipov@yandex.ru
+(the commit message is somewhat messy BTW), and I'm definitely interested
+in supporting that longterm too.
 
-{.offset=0, .length=1k, .addr=7},
-{.offset=1, .length=1k, .addr=6},
-{.offset=2, .length=1k, .addr=5},
-{.offset=3, .length=1k, .addr=4},
-{.offset=4, .length=1k, .addr=3},
-{.offset=5, .length=1k, .addr=2},
-{.offset=6, .length=1k, .addr=1},
-{.offset=7, .length=1k, .addr=0},
+> Is there a reason you decided to modify bio_integrity_map_user() instead?
 
-That's two pages of swapfile, but with the current layout accumulation
-code we "cannot" find either.
+Sure. Such an ad-hoc quick fixes are much more likely to be integrated
+within a reasonable time and effort from the maintainer. OTOH better wait f=
+or
+Jens' answer before doing anything else.
 
---D
+Dmitry
