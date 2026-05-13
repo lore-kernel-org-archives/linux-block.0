@@ -1,107 +1,124 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward201b.mail.yandex.net (forward201b.mail.yandex.net [178.154.239.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC6E39FCD0
-	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 06:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A17A18E025
+	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 07:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778655405; cv=none; b=ZGF+0XyvtYxqH9TyDiSh5y3CflsbwctJ3E1a3kNczToqD7s/MllegnYOGqVonAj+9aGEOXvkxBmU8AWJk1qbcKqKoQqUb0qU/PfOQD+vHKJH1BH7e7AEEx7WNnIkBsoSY3QirKjVXfR6USCAWxbeR3Yd9UJ+avZTWZbJybh+gz8=
+	t=1778655939; cv=none; b=H2aknq0PcdqOmef9WTUgAGhmTeICO/ahvSkItlth4PqaRV7Nn2351u609f70qvZouEt8rq5Pp8NXA1fgoiudf21HlcSfYvhUhMlStTr1IhZjc4h4Am+yOTiTQxYz0mIlcbOMpgfrb5ATaa5RPNVZcSf+jSSKiUvjNcvnJjZGSsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778655405; c=relaxed/simple;
-	bh=yhT0EdIn34OudW5j/r+UeOcpI1T1LAByDG3DZD/bLMs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VVr3SlViSP0q7OKLWcj/39mDHNOwTYHHC3aPACBTzbUFHDfee9mwuY8jy05yN6R4kgmkSr7oUnOAEfP3O2qYx4idpkMiJFrKVIf9DVKGLJkNKYg1e42qJpa9TB8+FiMau9dvzOHZNRREfHpNc3r3yHIWchhrZXRttwCZhH5Elcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=vIW8aOVU; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1778655939; c=relaxed/simple;
+	bh=shODB+zfPSlL/9axeKYgINsS80yow8aTFBcBKvIUdNg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C55lLCRgvsfSFrxWTWTIwOR3n5dMCr/W9Pp4om19eDHiwCkxk/ctKuxyjBGScc3qW23KO7Lw11y0eJ+3x1Q+r1olRsJX/dcJU90AlhhKwkt/7IUcPHWG/GzoQWMS1wcxslHcMt94l1wGAB0foc9UYriEx3hShu26igOrJeTbsGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=IeKcbsGe; arc=none smtp.client-ip=178.154.239.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="vIW8aOVU"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-444826c16ffso5454516f8f.1
-        for <linux-block@vger.kernel.org>; Tue, 12 May 2026 23:56:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1778655402; x=1779260202; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ICO8dJZapJhTfhwfOJGvuSMwHyEwmud9Z8lFAXKdCLI=;
-        b=vIW8aOVU8p3Q7LbIDA1bwtd8F4dpTWh2ApyY66PW5s4itvBfOViIJzt9JMnkqU59wR
-         Vl1CJ1R7xpN8N4KFvGPjmsqH7soymYTTbWKvw99AsuHv74Zt5mKBu92dHpgJ3yreM+HP
-         n8cviuLHUMaa3bTEzqokO1clN4Sjx0uUvFEXdbqXPeFrYPs0j+32vvvj21G6K5R/DJiL
-         FLzZRl1GwoLTpqcGHvwkUY78vonSXOzaKrzmcGfqWweEOJF+LhlZzIx8msfC6igtSZ4t
-         NEAVAZODyaExPB85Ot8txRRAAR7iLoND/SAVlKcwPs3dSibfLBm827iW+IesBda4bQgV
-         QpdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778655402; x=1779260202;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ICO8dJZapJhTfhwfOJGvuSMwHyEwmud9Z8lFAXKdCLI=;
-        b=cD4vsMThOAO59TItWraGbq4TwludrxFFx/M5UU8vA1lV8y2mMHTLxh32ugh5N8hxhl
-         DBvEF0TnGDbeLiDwKkE9m7ma+EXeEa6XUJZTND76lEjL3Fr2Kkb2tILfM+AcoM1MrySx
-         +TZN2Y7IIYiMmBwgOFTYdImtNFfjRYL29CRBN+7D+zWoiPQg3x+PVIdUtmW+uaSRBjph
-         dgjLgU+eYfLSxmvYXh6ruHBG2sjFyEOQMUESaaOb7TKnAlCfiPzeZWaE6/kb7VEAd36Z
-         ZUJUvZnbtfoLF5xMnrwnd9cPHUMjceX+xGsOD6TG2obbjVImKo/t6W8A8y4xol3wDjyL
-         0qdw==
-X-Forwarded-Encrypted: i=1; AFNElJ/lDOMi/BdL7hEO+8X1W6lXtzPuiJEw6yPKPMic1GdOXaDCAdL4nlx/R+ouT6Ap5a6OaY6IBBOBidNZSg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHPayyo+AtHpO9mCDnQGjZmycvFsuXPSoMu/Lcl+1KhB9RBGuu
-	M15eoTg6a5XRMqrPZ1ojNLZQk6qxZTjg+N68KOGkyvUsforegl8m90vJccMfeBJKhzvdwClZSzC
-	Y6BBI
-X-Gm-Gg: Acq92OHCzbSTC6Dh5LFFyT1j+q0dfn73FmalnHIH/e7mv2oU54246EyUHlE+K6EHKCQ
-	yg6QWx1haP58whKz/uUWyw919zxL0Xg6XJbnCKzknRzpNgZwZsK/ZrYU5lnphmlImKXtWWmUEYR
-	U2kF2rQprb4QAon/GZ00wciV4l6+ZKp1QeS+KhaQ8sBzEeeB9JCB+dW/huuu5atfSMH6DFIwLHp
-	PiwT33rHJoAb6Skizt0kE4dntxOxl43QL4wY+T6tK43gVlb9j9dT/O04Mb+HBPgmPyJh0oMkNIC
-	b4FPXuV0oPAEBekPWFotKBh/7ZJ93BUeN41sgvx2UDszXQlv9SeG2ssNUnGhaYtxklVByYmv9ra
-	wNtbYPuqvePtsOioHrhfHawZywnnFetwTE+E6oRX1GtJ/eS0d87YWrdVjEB1wGmABxDp9dTI6cB
-	N9TJD/3ADL8g8wrv/UHB9RQaFtPYv//+vSndPJ/xkWPtjyKU4bZ/bX95QIDK2nVj6+q6zmeaRVz
-	GMCOMWrVHsbWA/HMrCjHt/1/7NcHA==
-X-Received: by 2002:a05:6000:268a:b0:43f:e934:50ac with SMTP id ffacd0b85a97d-45c5859efc6mr2894173f8f.7.1778655402253;
-        Tue, 12 May 2026 23:56:42 -0700 (PDT)
-Received: from localhost.localdomain (178.115.63.61.wireless.dyn.drei.com. [178.115.63.61])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4549130549bsm39386799f8f.18.2026.05.12.23.56.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 23:56:41 -0700 (PDT)
-From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="IeKcbsGe"
+Received: from forward101b.mail.yandex.net (forward101b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d101])
+	by forward201b.mail.yandex.net (Yandex) with ESMTPS id 50971C5E1B
+	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 10:05:31 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-57.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-57.sas.yp-c.yandex.net [IPv6:2a02:6b8:c1e:478a:0:640:bc50:0])
+	by forward101b.mail.yandex.net (Yandex) with ESMTPS id AF5A3C00F9;
+	Wed, 13 May 2026 10:05:22 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-57.sas.yp-c.yandex.net (smtp) with ESMTPSA id K5FfqbCSWqM0-lEjRhdjr;
+	Wed, 13 May 2026 10:05:21 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1778655921; bh=7lrwf2pfZ9QJ0zIageGlT0y9KS0M3GnO4JbDoqXkYtM=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=IeKcbsGebtDoLNlZaS88anIxIutyc2pAZhUIfShDQfsxaNH9ojx4kezJHl98TYAqB
+	 JSh1WEjoLWC4SJJHPREZnk4Lidd+WGKwzPRLT/bAmHbKN+0eRY3cwENKyDZCPwzR2N
+	 ByPklhE4QXquPmb1towG0niZSiKzQF/3a8g494gU=
+Authentication-Results: mail-nwsmtp-smtp-production-main-57.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars@linbit.com>,
-	drbd-dev@lists.linux.dev,
+Cc: Weidong Zhu <weizhu@fiu.edu>,
+	Chao Shi <cshi008@fiu.edu>,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Dave Tian <daveti@purdue.edu>,
+	Keith Busch <kbusch@kernel.org>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Christoph Hellwig <hch@lst.de>,
 	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Subject: [PATCH] MAINTAINERS: use new drbd-dev mailing list
-Date: Wed, 13 May 2026 08:55:57 +0200
-Message-ID: <20260513065557.36042-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.53.0
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] block: bio-integrity: fix memory leak in bio_integrity_map_user()
+Date: Wed, 13 May 2026 10:05:15 +0300
+Message-ID: <20260513070515.528861-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-We are migrating from our own infrastructure to lists.linux.dev, so
-change the drbd-dev address to point to the new domain.
+Since 'iov_iter_extract_pages()' may allocate new array of pages
+even when it returns non-zero error value, matching cleanup with
+'vfree()' should be performed on all return paths afterwards. So
+adjust 'bio_integrity_map_user()' to ensure that both 'pages' and
+'bvec' arrays are always freed on return.
 
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Fixes: 8582792cf23b ("block: bio-integrity: Fix null-ptr-deref in bio_integrity_map_user()")
+Fixes: 492c5d455969 ("block: bio-integrity: directly map user buffers")
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bio-integrity.c | 21 ++++++---------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4abb3345bc4e..b8db0c038c55 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7773,7 +7773,7 @@ DRBD DRIVER
- M:	Philipp Reisner <philipp.reisner@linbit.com>
- M:	Lars Ellenberg <lars.ellenberg@linbit.com>
- M:	Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
--L:	drbd-dev@lists.linbit.com
-+L:	drbd-dev@lists.linux.dev
- S:	Supported
- W:	http://www.drbd.org
- T:	git git://git.linbit.com/linux-drbd.git
-
-base-commit: 36446de0c30c62b9d89502fd36c4904996d86ecd
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index e796de1a749e..53fb04adb09b 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -400,7 +400,7 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ 	ret = iov_iter_extract_pages(iter, &pages, bytes, nr_vecs,
+ 					extraction_flags, &offset);
+ 	if (unlikely(ret < 0))
+-		goto free_bvec;
++		goto out_free;
+ 
+ 	/*
+ 	 * Handle partial pinning. This can happen when pin_user_pages_fast()
+@@ -414,16 +414,12 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ 			for (i = 0; i < npinned; i++)
+ 				unpin_user_page(pages[i]);
+ 		}
+-		if (pages != stack_pages)
+-			kvfree(pages);
+ 		ret = -EFAULT;
+-		goto free_bvec;
++		goto out_free;
+ 	}
+ 
+ 	nr_bvecs = bvec_from_pages(bvec, pages, nr_vecs, bytes, offset,
+ 				   &is_p2p);
+-	if (pages != stack_pages)
+-		kvfree(pages);
+ 	if (nr_bvecs > queue_max_integrity_segments(q))
+ 		copy = true;
+ 	if (is_p2p)
+@@ -434,15 +430,10 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ 	else
+ 		ret = bio_integrity_init_user(bio, bvec, nr_bvecs, bytes);
+ 	if (ret)
+-		goto release_pages;
+-	if (bvec != stack_vec)
+-		kfree(bvec);
+-
+-	return 0;
+-
+-release_pages:
+-	bio_integrity_unpin_bvec(bvec, nr_bvecs);
+-free_bvec:
++		bio_integrity_unpin_bvec(bvec, nr_bvecs);
++out_free:
++	if (pages != stack_pages)
++		kvfree(pages);
+ 	if (bvec != stack_vec)
+ 		kfree(bvec);
+ 	return ret;
 -- 
-2.53.0
+2.54.0
 
