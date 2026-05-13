@@ -1,84 +1,107 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC4B3D5643;
-	Wed, 13 May 2026 06:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC6E39FCD0
+	for <linux-block@vger.kernel.org>; Wed, 13 May 2026 06:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778655380; cv=none; b=K2ZJM9Fm7XUvpFwzEPMq9TYVpCsbfbCSoKvpYCb72XWHWr8iv1Gj0bzr/tIIxRt6JqtUiJqp3hzVkmapEKU7M7AG6lfxWkQDBWj2LkmiZ1sB0Sd2YswI6cgeClEUr3btMjUTEes6IAbsIPGqu7tEHc1+7EEJEkUbREBs263QKlk=
+	t=1778655405; cv=none; b=ZGF+0XyvtYxqH9TyDiSh5y3CflsbwctJ3E1a3kNczToqD7s/MllegnYOGqVonAj+9aGEOXvkxBmU8AWJk1qbcKqKoQqUb0qU/PfOQD+vHKJH1BH7e7AEEx7WNnIkBsoSY3QirKjVXfR6USCAWxbeR3Yd9UJ+avZTWZbJybh+gz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778655380; c=relaxed/simple;
-	bh=P5caj/MRFse/CJvpKQWbUktTehkszC/Sgk5XdsZppJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JR0t3yQWUn/VTFKmG5V9VbdRk0ITuX43SNWH2kCNj1lz6unC9gr+olpbghacdvt+wgIkxWHuQkiQrohPtd3+oF+fPZAPlMXQkuoEsmwrLGPLcQZh51bXj07VttyWV8m+LCSQtlEClgjqxMOiZs7ZbsD4K4L4by39jyHiZNEnXP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 82B0768B05; Wed, 13 May 2026 08:56:08 +0200 (CEST)
-Date: Wed, 13 May 2026 08:56:08 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 08/12] swap,iomap: simplify iomap_swapfile_iter
-Message-ID: <20260513065608.GA2250@lst.de>
-References: <20260512053625.2950900-1-hch@lst.de> <20260512053625.2950900-9-hch@lst.de> <20260512170204.GI9555@frogsfrogsfrogs>
+	s=arc-20240116; t=1778655405; c=relaxed/simple;
+	bh=yhT0EdIn34OudW5j/r+UeOcpI1T1LAByDG3DZD/bLMs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VVr3SlViSP0q7OKLWcj/39mDHNOwTYHHC3aPACBTzbUFHDfee9mwuY8jy05yN6R4kgmkSr7oUnOAEfP3O2qYx4idpkMiJFrKVIf9DVKGLJkNKYg1e42qJpa9TB8+FiMau9dvzOHZNRREfHpNc3r3yHIWchhrZXRttwCZhH5Elcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=vIW8aOVU; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="vIW8aOVU"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-444826c16ffso5454516f8f.1
+        for <linux-block@vger.kernel.org>; Tue, 12 May 2026 23:56:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1778655402; x=1779260202; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ICO8dJZapJhTfhwfOJGvuSMwHyEwmud9Z8lFAXKdCLI=;
+        b=vIW8aOVU8p3Q7LbIDA1bwtd8F4dpTWh2ApyY66PW5s4itvBfOViIJzt9JMnkqU59wR
+         Vl1CJ1R7xpN8N4KFvGPjmsqH7soymYTTbWKvw99AsuHv74Zt5mKBu92dHpgJ3yreM+HP
+         n8cviuLHUMaa3bTEzqokO1clN4Sjx0uUvFEXdbqXPeFrYPs0j+32vvvj21G6K5R/DJiL
+         FLzZRl1GwoLTpqcGHvwkUY78vonSXOzaKrzmcGfqWweEOJF+LhlZzIx8msfC6igtSZ4t
+         NEAVAZODyaExPB85Ot8txRRAAR7iLoND/SAVlKcwPs3dSibfLBm827iW+IesBda4bQgV
+         QpdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778655402; x=1779260202;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ICO8dJZapJhTfhwfOJGvuSMwHyEwmud9Z8lFAXKdCLI=;
+        b=cD4vsMThOAO59TItWraGbq4TwludrxFFx/M5UU8vA1lV8y2mMHTLxh32ugh5N8hxhl
+         DBvEF0TnGDbeLiDwKkE9m7ma+EXeEa6XUJZTND76lEjL3Fr2Kkb2tILfM+AcoM1MrySx
+         +TZN2Y7IIYiMmBwgOFTYdImtNFfjRYL29CRBN+7D+zWoiPQg3x+PVIdUtmW+uaSRBjph
+         dgjLgU+eYfLSxmvYXh6ruHBG2sjFyEOQMUESaaOb7TKnAlCfiPzeZWaE6/kb7VEAd36Z
+         ZUJUvZnbtfoLF5xMnrwnd9cPHUMjceX+xGsOD6TG2obbjVImKo/t6W8A8y4xol3wDjyL
+         0qdw==
+X-Forwarded-Encrypted: i=1; AFNElJ/lDOMi/BdL7hEO+8X1W6lXtzPuiJEw6yPKPMic1GdOXaDCAdL4nlx/R+ouT6Ap5a6OaY6IBBOBidNZSg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHPayyo+AtHpO9mCDnQGjZmycvFsuXPSoMu/Lcl+1KhB9RBGuu
+	M15eoTg6a5XRMqrPZ1ojNLZQk6qxZTjg+N68KOGkyvUsforegl8m90vJccMfeBJKhzvdwClZSzC
+	Y6BBI
+X-Gm-Gg: Acq92OHCzbSTC6Dh5LFFyT1j+q0dfn73FmalnHIH/e7mv2oU54246EyUHlE+K6EHKCQ
+	yg6QWx1haP58whKz/uUWyw919zxL0Xg6XJbnCKzknRzpNgZwZsK/ZrYU5lnphmlImKXtWWmUEYR
+	U2kF2rQprb4QAon/GZ00wciV4l6+ZKp1QeS+KhaQ8sBzEeeB9JCB+dW/huuu5atfSMH6DFIwLHp
+	PiwT33rHJoAb6Skizt0kE4dntxOxl43QL4wY+T6tK43gVlb9j9dT/O04Mb+HBPgmPyJh0oMkNIC
+	b4FPXuV0oPAEBekPWFotKBh/7ZJ93BUeN41sgvx2UDszXQlv9SeG2ssNUnGhaYtxklVByYmv9ra
+	wNtbYPuqvePtsOioHrhfHawZywnnFetwTE+E6oRX1GtJ/eS0d87YWrdVjEB1wGmABxDp9dTI6cB
+	N9TJD/3ADL8g8wrv/UHB9RQaFtPYv//+vSndPJ/xkWPtjyKU4bZ/bX95QIDK2nVj6+q6zmeaRVz
+	GMCOMWrVHsbWA/HMrCjHt/1/7NcHA==
+X-Received: by 2002:a05:6000:268a:b0:43f:e934:50ac with SMTP id ffacd0b85a97d-45c5859efc6mr2894173f8f.7.1778655402253;
+        Tue, 12 May 2026 23:56:42 -0700 (PDT)
+Received: from localhost.localdomain (178.115.63.61.wireless.dyn.drei.com. [178.115.63.61])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4549130549bsm39386799f8f.18.2026.05.12.23.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 23:56:41 -0700 (PDT)
+From: =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars@linbit.com>,
+	drbd-dev@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Subject: [PATCH] MAINTAINERS: use new drbd-dev mailing list
+Date: Wed, 13 May 2026 08:55:57 +0200
+Message-ID: <20260513065557.36042-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260512170204.GI9555@frogsfrogsfrogs>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 12, 2026 at 10:02:04AM -0700, Darrick J. Wong wrote:
-> OH.  Now I remember why -- it's to handle contiguous mixed mappings
-> better.
-> 
-> Let's say that you have a 1k fsblock filesystem and 4k base pages.  You
-> fallocate an 8G swap file and then mkswap it.  The first mapping is a 1k
-> written mapping at offset 0 for the swap header, followed by an 8388607k
-> unwritten mapping at offset 3k.
-> 
-> The PAGE_SIZE rounding code in iomap_swapfile_add_extent will round the
-> end of that first mapping down to zero and ignore it.  The second
-> mapping will be treated as if it were a 8388604k mapping starting at
-> offset 4096.  Now the page counts are wrong and the swapon fails.
+We are migrating from our own infrastructure to lists.linux.dev, so
+change the drbd-dev address to point to the new domain.
 
-Do we care about this use case?  I guess you did as you implemented
-his, but still?
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+---
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> A more generic solution to this would be to change add_swap_extent to
-> take sector_t addr and length values and use them to construct a bitmap
-> representing contiguous physical space on the bdev, accounting of course
-> for PAGE_SIZE alignment.  Except for the swap header page, every other
-> contiguously set page-aligned region in the bitmap gets added to the
-> swap extent map.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4abb3345bc4e..b8db0c038c55 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7773,7 +7773,7 @@ DRBD DRIVER
+ M:	Philipp Reisner <philipp.reisner@linbit.com>
+ M:	Lars Ellenberg <lars.ellenberg@linbit.com>
+ M:	Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+-L:	drbd-dev@lists.linbit.com
++L:	drbd-dev@lists.linux.dev
+ S:	Supported
+ W:	http://www.drbd.org
+ T:	git git://git.linbit.com/linux-drbd.git
 
-You don't even need a bitmap, just do basically the same checks as
-the iomap code when moving to a new swap extent after moving to use
-the sector_t.  And it really should anyway, as the current abuse of
-sector_t to store a disk offset in PAGE_SIZE units is pretty gross.
+base-commit: 36446de0c30c62b9d89502fd36c4904996d86ecd
+-- 
+2.53.0
 
