@@ -1,211 +1,415 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C8B26A1CF
-	for <linux-block@vger.kernel.org>; Thu, 14 May 2026 18:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DCD3CF694
+	for <linux-block@vger.kernel.org>; Thu, 14 May 2026 21:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778783460; cv=none; b=F+cN8MGhUsCLCByQI4wD2xTb7+csOn8SusO9swVmyydSb5DaouB/w6/3Fe3fMqgoPjViWyg6CnD91aEm5tKxeX6C2ygaCUb4Ek25i8kd5TRUrrUNYeo5rgTbqIhjugsXowtUYc/nwJlShNbzbxUEOUGGeV3w2rmgSkqpG1IM0hQ=
+	t=1778795528; cv=none; b=VKv2Ypm+KROw7L77hl/g50teFQWhjplMTPwD0FQTbm4Zr2OBD52hqzlAqlrJH5ag/3+6jb/BDkXw8yAxt3jEtkJlmUD/vnOJPmOaJfRi5UpnZq46o0KZbVOC+AojnDmLftm2oc5ViG6yCKx4Xkbd9Z3+WY9y1Sl9Vtm96wTqbLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778783460; c=relaxed/simple;
-	bh=sBXDLpHn+FDmACYj8iVCL8mnydrKrBAMrYu3fP5qGe8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EKFKws7uJo8/YF56bT5O8o6BTuJ25PieyAa5yXjjxI0NpXFcicxNd0nWlJTNP2mvqrSsSIqC37qgP3s2JrhhhIQ1ACTn1eSy5epC6meddtm1+OPVAa1wELUCXIAhz68WpBw6KqnyXpyrPVSlBqFeHeBUomvkbPay8hhE2bMoDuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=aEiW1vgo; arc=none smtp.client-ip=148.163.135.74
+	s=arc-20240116; t=1778795528; c=relaxed/simple;
+	bh=oc6U7NpIca6DPcliabejSR7QvsWIVWFdwf+uh6U3Rsg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=BbWFPgdG3oT8tjRC/traO7zaUYjzgiSScukbuiWvUx2VOCcENRdX9kvz21fdmCeEXQ8xMr/BUe8IbdayABGHFZxLM4yzo0mWWNrxbqBvZaz6IZNS3wz65UNRFcvOidqN9DFNGHts4Y4Ugpux32FRBmc6gSOduJdxUzNkrWzBIXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=amptX5dC; arc=none smtp.client-ip=148.163.139.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="aEiW1vgo"
-Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64EHupXm1891145
-	for <linux-block@vger.kernel.org>; Thu, 14 May 2026 14:30:52 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="amptX5dC"
+Received: from pps.filterd (m0167074.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64ELgpxh610222
+	for <linux-block@vger.kernel.org>; Thu, 14 May 2026 17:51:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=dqki
-	LvRS0biC8wDTf7mWRqTHG4xr6lw6pw3nx+LivZU=; b=aEiW1vgogj7n5YcW6NHF
-	YbDTonW54xw3FqAAekPPADUwCORx5bTzh7grpXCPPXfwnH6gVmeTcev+Dnh0bG44
-	Il1GBqAswROlkVnubEUDPgMfEWWkWMpwoTuXyoaWapqNM4RLXTGrhbIRlnATX3Oz
-	RhYkbCg+r8A3AD6O0954cUbQwfKwGI774KaY1uZ2jMw+pFfk2tbhcisGBL2Ez+5e
-	gTCP3AyeSdrj5oaw3jxqG/tI7y1jI07auVhmJqvKafZ0nm67VdKe2Caet6gdgAyn
-	DfuVt3CESQv1iyvQHkMmz1MwNC6RvKQMkvR5PeKvn323GXRBuH58ptK/j1ZnBdfC
-	XA==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4e5bbav053-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=ot8e
+	9s9wEWPY8e0IKULsGPR22o/8zTD5eyv3hI7CBS8=; b=amptX5dCAhpcnMGmuHLT
+	GYOn8Vyq1JSUuTaRKvpBtp4cP8ObZJDxT/CCcaLdO9j67TZKns3IqaI0gwDxMfri
+	sZ71s+48zMDhznNI5m8HKE7ePWk5fVxvvLhKPxt12xJjWv2nss7XbWFa1XgLyRi9
+	0AR6y6+jHz3Wg9TYx6OVohvAKySgnHEfrYfXp/EjQT+S3qyxvM+il3WnRtGDbqTR
+	09uaHzbDh9rC22KUjg/cc46V0pl8mR8vESanql4dUBrPmKGzKGzbzU9nqubUXNNS
+	Cz6BtlC8kk8av73Apy9e4SkRvFAgB+t3i9HIV8Ns3CfPiJApjoJggTBJSr0ZVtxD
+	kQ==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4e5m219m32-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 14 May 2026 14:30:51 -0400 (EDT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-50d812c898cso199392511cf.1
-        for <linux-block@vger.kernel.org>; Thu, 14 May 2026 11:30:51 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Thu, 14 May 2026 17:51:50 -0400 (EDT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-90d175ae52bso930815585a.0
+        for <linux-block@vger.kernel.org>; Thu, 14 May 2026 14:51:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778783451; x=1779388251;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dqkiLvRS0biC8wDTf7mWRqTHG4xr6lw6pw3nx+LivZU=;
-        b=hLKL12WaDHnoKA0F0hX394r8tK/Ws6LxVkkIXBe1BQ1YtTVGyLS0UDWiiI1B5/+vBr
-         jFJLUucl1QqFoWC+5HV0zD2Abw/fsuUhDwBZO80d8HuVD6FTNr7F0Z0Uv2C/OGCDhEH9
-         HCmnlItS1Yi/RyKeXw8e+Cz5AYmaWb21Cr/8oI00g66htpqleN2POgkhRsf70ty36mGc
-         7hswWRDkCFK6aZ5ZiFKCK+36kjKQNb4vGBXYleiw4z97lKDOR9jUDUhNm6mP3BlUKHPw
-         UaRmRwarQFOJk5AF+YeqtBqAy+FpSyjAl0N/vsjn2ibbI9Kg9Zc3ZNKKryuZlnGEAhlR
-         atxw==
-X-Forwarded-Encrypted: i=1; AFNElJ+2Jn3M1GCqmf5MU1s0GCNw/PVLX75ikRZhWeNlbOHmUt/ZTclK+t7xrcsFFdf360Q3kmTkDBZxT2DbkA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4HXCiT+2UM5VZx/r2O3ff302ln8nm71Zo8Xi5zhBWljyGEbR5
-	SOSxmOcqabg31zK5LUVxLd1oQUbW0mTOt9MOZOMMUCL7mtROv4RJohmG0+S6B6YEFdaYGmtNNGC
-	+lIKbkBn6QWCNwbSma1RYmYa55cUmCoKLNnhnPZrVerCP14Rx1Y31fgVQXTAX
-X-Gm-Gg: Acq92OEoFDtW1a++eUXPiZiA/V8T1AJYZVQQpjvnFo6ilu8f/rfleiLblJ/6jgWq3IB
-	soi2IpTnW+/yM82qvQC3QSEDZrcJ5BxC4DAyJ9gZawIRXfGnyHSIvzpJSUI8DGXECKc1iWFLm6l
-	4Nl930RvDShVmrZ8ChyxtHfmrrEz3G08e7gHwmYzykQl+Gb9ON6l18EylehxCDwuNJrHF1V4QDU
-	0DpD2l499TR3rGcdtS81EDE3n4VnDPNAZOjRX1ymZ3+whPuwyKeSy3XNv8MOltUsRL6KT3UoDzt
-	n4Kr2Z6C0RY7DhbgGVn43iGbfVkpZia+Wkyr/0Xv9VQ9oyGmmRiml8dJht5y49hm8LKN4mIkuSY
-	Aybr5idst+0AX5kfC7xyjB4HtTJkC6sY2tTdJrndmzc35hV8=
-X-Received: by 2002:a05:622a:5910:b0:50f:c26d:f309 with SMTP id d75a77b69052e-5165a007037mr6567431cf.9.1778783450603;
-        Thu, 14 May 2026 11:30:50 -0700 (PDT)
-X-Received: by 2002:a05:622a:5910:b0:50f:c26d:f309 with SMTP id d75a77b69052e-5165a007037mr6566801cf.9.1778783450039;
-        Thu, 14 May 2026 11:30:50 -0700 (PDT)
-Received: from [10.206.44.99] ([129.236.229.175])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516514e0b91sm12008351cf.15.2026.05.14.11.30.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2026 11:30:49 -0700 (PDT)
-Message-ID: <18dd3936-9ca7-4c34-976a-a0fa09dde238@columbia.edu>
-Date: Thu, 14 May 2026 14:30:48 -0400
+        d=1e100.net; s=20251104; t=1778795510; x=1779400310;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ot8e9s9wEWPY8e0IKULsGPR22o/8zTD5eyv3hI7CBS8=;
+        b=rL4tyn07tzMNdSyvXLq9bGYi/HTLvnRi9Ah4h48SW0gtGwb4Zm/HMuMzyi+LdS5XzS
+         CgD2isX7gCkAeh+FG10U7mqmHslFdn499JaQ2FPHiEdQnOJewlRvV5vEEhnICaAFiQUC
+         F0aaUN1WtOZF2afXiZmpe48BcTwta5JbxR/RRb07ck5Uyu0CGfk703rZ0a5mnbTC8Pg2
+         y44z3SFbATguSJD4xZg9R+F0wxAoigsHAS6+0pdqG+W98ue9gobqdIeZ//8qswgd+4vY
+         Y9ejRH/7Y2pJPcVtB/q9SZQFhHEfA8jGrzySqMm5eDDAwUHb1/TFQCq7PPJksrLbFlIm
+         auZA==
+X-Forwarded-Encrypted: i=1; AFNElJ+q4aa9NrSNV8vV5BylTnUIeyp1JX7mINwsnFVZ178oSTlPtq39hctxzPo3ygy2fIRE+0t8qD0JOMk9/Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfRFbilBqunhJDGI3+ntVgfW/uHg3QRDfqxVcGzoDZPJdMTVvi
+	gLtmyySKjwLL7ScaMA/gKR8bK5TyMmEneYz/XHOBuODvFV7MM8vvav+OASrqXoo2Cd2YmV7hLfI
+	4PjjAX+bK0E4E+bImibiUb4A17LzZRIEdUgEzjDjsWd4CNnQBynF9OIyGRR/d
+X-Gm-Gg: Acq92OEAGTp930vHLtqoUd9VWQ1URei5Z2Pw1JpeWEIL9DU1r26AI19UwoGPwN1EY4q
+	vRqiec+9mUaWOQQlBfrb2zO4EL0BKA6pdkrkvbafdvyH/YJcl3ESyWUPlsyOz5TmEJli/R5sL33
+	9tjFIct5n+rBOPiG/xM/Sn1kn84kXLhZfFUdNEBFpe6ObwXfVn1S+zQaUrl/LdRJ2+YpKgUtdzW
+	r9zTI9otcV5LHAkMGbs1y8Yizjv4rO4ANlMvYive2ZbE4YWY9cggMniZ95BRJvmGojGscjBacGn
+	Fk0UQmpds8bWgqSjuHQ/m/tE4Kqjx1pU2iniysFd8yJeCP03u9JL5h/peb0eCOd9DDmwEp6dwEf
+	rt3eKiZtpVcMI9ZhrIxf55JKRrcVwcAAc163V9Wnwmrk=
+X-Received: by 2002:a05:620a:7112:b0:8f0:7516:da99 with SMTP id af79cd13be357-911ce90bc41mr243015685a.60.1778795510071;
+        Thu, 14 May 2026 14:51:50 -0700 (PDT)
+X-Received: by 2002:a05:620a:7112:b0:8f0:7516:da99 with SMTP id af79cd13be357-911ce90bc41mr243010885a.60.1778795509581;
+        Thu, 14 May 2026 14:51:49 -0700 (PDT)
+Received: from [127.0.1.1] ([129.236.229.175])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-910ba18132fsm354966085a.6.2026.05.14.14.51.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2026 14:51:49 -0700 (PDT)
+From: Tal Zussman <tz2294@columbia.edu>
+Date: Thu, 14 May 2026 17:51:14 -0400
+Subject: [PATCH v6 1/4] block: add task-context bio completion
+ infrastructure
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/8] iomap: use bio_complete_in_task for buffered read
- errors
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260514-blk-dontcache-v6-1-782e2fa7477b@columbia.edu>
+References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
+In-Reply-To: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
+To: Jens Axboe <axboe@kernel.dk>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong"
- <djwong@kernel.org>,
-        Carlos Maiolino <cem@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Carlos Maiolino <cem@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@infradead.org>
 Cc: Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-        Gao Xiang <hsiangkao@linux.alibaba.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-References: <20260409160243.1008358-1-hch@lst.de>
- <20260409160243.1008358-7-hch@lst.de>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <20260409160243.1008358-7-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: eKQZkrF7A1Auqz08NK2TmXoyjfUxU67q
-X-Proofpoint-ORIG-GUID: eKQZkrF7A1Auqz08NK2TmXoyjfUxU67q
-X-Authority-Analysis: v=2.4 cv=N7kZ0W9B c=1 sm=1 tr=0 ts=6a0614db cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=nkegbr1AwBRna+m8FBH0UQ==:17
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>,
+        Tal Zussman <tz2294@columbia.edu>
+X-Mailer: b4 0.14.3-dev-d7477
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1778795507; l=9111;
+ i=tz2294@columbia.edu; s=20250528; h=from:subject:message-id;
+ bh=oc6U7NpIca6DPcliabejSR7QvsWIVWFdwf+uh6U3Rsg=;
+ b=at5gcGpC3+Y/wzEruMkgdaBcuT4Jo3oZWqaJdg6p+Uy1AWNOkr00RFSEU5rxarBI4k5fCGW3W
+ OHd6hHEUgR8AKdSok87SSLXOCUi+S4svySklPkFKz3mCi8gj+YE2QgR
+X-Developer-Key: i=tz2294@columbia.edu; a=ed25519;
+ pk=BIj5KdACscEOyAC0oIkeZqLB3L94fzBnDccEooxeM5Y=
+X-Proofpoint-GUID: ZIN3CiZtxHm1R0k7llH0sif_7EAxoUDH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE0MDIxNiBTYWx0ZWRfX9utWN3DWAp+j
+ wnnMuGxdp0ocPRNabQS9s9QgW3BftqoYfqmRWNzR7UbzX6RN+vtnzTCVhPKjb7euGzNwPl7lfcW
+ enHYpZRo0pYv0JERETfurQCdXA2iKwticKGms6Fr3LvEi128QeYJASBlvPKBBV/iS6Rlh4FdA9C
+ EK08+eGQ83zYjtiMB2H4tIO0NX/XkukuvMX6orSSRkRlofkic6D1unWQXapDDb5mvtOYm1bPhPn
+ G8byAX1Mn52p8cLlpYQWs8JFkFM6rF5ttNqP4CpehOG2jLvrFTH22WGPWfvjCEVp1LpWgMkbB1r
+ TQSG3+9b1HNHOVFgzGyq0aKUvNjC86uY7sSC//lxgWtbncGkyeu1Z6Th8I5HjsVGfsnugKTztRT
+ haQXK72LBVKXs8e9MmstwBhRQb6jkZcEMJWCmb4pKQpyz70hPVRrGwUoqDbKxavFaqSo+b/3QgF
+ JPDwyzlwMkm9k4WdrXw==
+X-Authority-Analysis: v=2.4 cv=VLjtWdPX c=1 sm=1 tr=0 ts=6a0643f6 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=nkegbr1AwBRna+m8FBH0UQ==:17
  a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=svvvyxlR1OQQkelhaPoB:22
- a=f7q37D0tNRou1Q5H7aAA:9 a=QEXdDO2ut3YA:10 a=kacYvNCVWA4VmyqE58fU:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE0MDE4NSBTYWx0ZWRfX2x0LyUQV+21n
- QdKhgSUvU2lr76x9ZTN0cJvFZ9HCX+RjILk/5fush+HgsChjzct5LjlkUQhOZgCKO/Z1Qk66/kH
- IQSelcdrfXkRUvZmV1qLMaX6gJRq10QwMQTanK69IzXc8H5iXKuCwyo1QZ2YE9391S3IkBGXivk
- DcYnSLMwpVdYJaPwZBlX7hA1UDX5LN09h33UUtlE+eCfn5IzVEcMlT/tzBqINDQ/hZSCpsNlqi3
- /5V9vKz1YBkXIXOy52/imogvqmnClqZQKVQ/w74pJ48csedsPHCQyEohoG9nuk6HEBwplgTEweQ
- CTFkK269jqI2EroKSDZTn9CDLKPZvJhV7BtYvG7Fzyo7eZAE3bBtPmqsD+ijcb0f2Mh6uPVFwx4
- VW94Wjy/n52GTrYAdw/QkvmtYakL/nmb9sHpr647PNkM5HQA35e3sO62YOrZbGWn+/pNbz/RNzz
- mz47g1q/QNgQqJPb7Gg==
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=azVShVRs0zEubeQ0wG0L:22
+ a=VwQbUJbxAAAA:8 a=JfrnYn6hAAAA:8 a=OwvvbMMXozzxZtH9MBEA:9 a=QEXdDO2ut3YA:10
+ a=IoWCM6iH3mJn3m4BftBB:22 a=1CNFftbPRP8L7MoqJWF3:22
+X-Proofpoint-ORIG-GUID: ZIN3CiZtxHm1R0k7llH0sif_7EAxoUDH
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11786
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=10 suspectscore=0 priorityscore=1501
- lowpriorityscore=10 spamscore=0 phishscore=0 adultscore=0 bulkscore=10
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605050000
- definitions=main-2605140185
+ priorityscore=1501 impostorscore=10 lowpriorityscore=10 adultscore=0
+ phishscore=0 suspectscore=0 spamscore=0 malwarescore=0 clxscore=1015
+ bulkscore=10 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
+ definitions=main-2605140216
 
-On 4/9/26 12:02 PM, Christoph Hellwig wrote:
-> Replace out own hand-crafted complete in task context scheme with the
-> generic block code.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   fs/iomap/bio.c | 44 +-------------------------------------------
->   1 file changed, 1 insertion(+), 43 deletions(-)
-> 
-> diff --git a/fs/iomap/bio.c b/fs/iomap/bio.c
-> index 4504f4633f17..5b9b91198ec8 100644
-> --- a/fs/iomap/bio.c
-> +++ b/fs/iomap/bio.c
-> @@ -9,9 +9,6 @@
->   #include "internal.h"
->   #include "trace.h"
->   
-> -static DEFINE_SPINLOCK(failed_read_lock);
-> -static struct bio_list failed_read_list = BIO_EMPTY_LIST;
-> -
->   static u32 __iomap_read_end_io(struct bio *bio, int error)
->   {
->   	struct folio_iter fi;
-> @@ -27,49 +24,10 @@ static u32 __iomap_read_end_io(struct bio *bio, int error)
->   	return folio_count;
->   }
->   
-> -static void
-> -iomap_fail_reads(
-> -	struct work_struct	*work)
-> -{
-> -	struct bio		*bio;
-> -	struct bio_list		tmp = BIO_EMPTY_LIST;
-> -	unsigned long		flags;
-> -
-> -	spin_lock_irqsave(&failed_read_lock, flags);
-> -	bio_list_merge_init(&tmp, &failed_read_list);
-> -	spin_unlock_irqrestore(&failed_read_lock, flags);
-> -
-> -	while ((bio = bio_list_pop(&tmp)) != NULL) {
-> -		__iomap_read_end_io(bio, blk_status_to_errno(bio->bi_status));
-> -		cond_resched();
-> -	}
-> -}
-> -
-> -static DECLARE_WORK(failed_read_work, iomap_fail_reads);
-> -
-> -static void iomap_fail_buffered_read(struct bio *bio)
-> -{
-> -	unsigned long flags;
-> -
-> -	/*
-> -	 * Bounce I/O errors to a workqueue to avoid nested i_lock acquisitions
-> -	 * in the fserror code.  The caller no longer owns the bio reference
-> -	 * after the spinlock drops.
-> -	 */
-> -	spin_lock_irqsave(&failed_read_lock, flags);
-> -	if (bio_list_empty(&failed_read_list))
-> -		WARN_ON_ONCE(!schedule_work(&failed_read_work));
-> -	bio_list_add(&failed_read_list, bio);
-> -	spin_unlock_irqrestore(&failed_read_lock, flags);
-> -}
-> -
->   static void iomap_read_end_io(struct bio *bio)
->   {
-> -	if (bio->bi_status) {
-> -		iomap_fail_buffered_read(bio);
-> +	if (bio->bi_status && bio_complete_in_task(bio))
->   		return;
-> -	}
-> -
->   	__iomap_read_end_io(bio, 0);
+Some bio completion handlers need to run from preemptible task context,
+but bio_endio() may be called from IRQ context (e.g., buffer_head
+writeback). Callers need a way to ensure their callback eventually runs
+from a sleepable context. Add infrastructure for that, in two forms:
 
-I think this should be something like:
+  1. BIO_COMPLETE_IN_TASK, a bio flag the submitter sets when it knows
+     in advance that its callback needs task context (e.g., dropbehind
+     writeback). bio_endio() sees the flag and offloads completion to a
+     worker automatically.
 
-	__iomap_read_end_io(bio, blk_status_to_errno(bio->bi_status));
+  2. bio_complete_in_task(), a helper that completion callbacks can
+     invoke from within bi_end_io() when the deferral decision is
+     dynamic (e.g., fserror reporting).
 
-Otherwise the error is never propagated when iomap_read_end_io() is later
-called from task context. Maybe worth rearranging slightly to avoid the
-blk_status_to_errno() call for non-error I/Os?
+Both share a per-CPU batch list drained by a delayed work item on a
+WQ_PERCPU workqueue. Producers push the bio onto the local CPU's batch
+and schedule the work item, which then dispatches each bio's bi_end_io()
+from task context. The delayed work item uses a 1-jiffie delay to allow
+batches of completions to accumulate before processing.
 
-I was planning on carrying this and 7/8 in the next version of my series
-so that the procedural version has users, but I'll send without for now.
+Both methods are gated on bio_in_atomic(), which returns true in any
+context where a sleeping bi_end_io() is unsafe, including
+non-preemptible task context. This logic is copied from commit
+c99fab6e80b7 ("erofs: fix atomic context detection when
+!CONFIG_DEBUG_LOCK_ALLOC").
 
->   }
->   
-> -- 
-> 2.47.3
-> 
+Two CPU hotplug callbacks are used to drain remaining bios from the
+departing CPU's batch, while maintaining the per-CPU behavior. The
+CPUHP_AP_ONLINE_DYN callback disables the per-CPU delayed work while the
+CPU is still online, preventing it from running on an unbound worker
+later. CPUHP_BP_PREPARE_DYN then drains any bios added between disabling
+the work item and CPU offline.
+
+Link: https://lore.kernel.org/all/20260409160243.1008358-1-hch@lst.de/
+Suggested-by: Matthew Wilcox <willy@infradead.org>
+Suggested-by: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Tal Zussman <tz2294@columbia.edu>
+---
+ block/bio.c               | 147 +++++++++++++++++++++++++++++++++++++++++++++-
+ include/linux/bio.h       |  32 ++++++++++
+ include/linux/blk_types.h |   1 +
+ 3 files changed, 179 insertions(+), 1 deletion(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index b8972dba68a0..6864ee737400 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -19,6 +19,7 @@
+ #include <linux/blk-crypto.h>
+ #include <linux/xarray.h>
+ #include <linux/kmemleak.h>
++#include <linux/local_lock.h>
+ 
+ #include <trace/events/block.h>
+ #include "blk.h"
+@@ -1717,6 +1718,79 @@ void bio_check_pages_dirty(struct bio *bio)
+ }
+ EXPORT_SYMBOL_GPL(bio_check_pages_dirty);
+ 
++/*
++ * Infrastructure for deferring bio completions to task-context via a per-CPU
++ * workqueue. Triggered either by the BIO_COMPLETE_IN_TASK bio flag (static
++ * decision at submit time) or by calling bio_complete_in_task() from
++ * bi_end_io() (dynamic decision at completion time).
++ */
++
++struct bio_complete_batch {
++	local_lock_t lock;
++	struct bio_list list;
++	struct delayed_work work;
++	int cpu;
++};
++
++static DEFINE_PER_CPU(struct bio_complete_batch, bio_complete_batch) = {
++	.lock = INIT_LOCAL_LOCK(lock),
++};
++static struct workqueue_struct *bio_complete_wq;
++
++static void bio_complete_work_fn(struct work_struct *w)
++{
++	struct delayed_work *dw = to_delayed_work(w);
++	struct bio_complete_batch *batch =
++		container_of(dw, struct bio_complete_batch, work);
++
++	while (1) {
++		struct bio_list list;
++		struct bio *bio;
++
++		local_lock_irq(&bio_complete_batch.lock);
++		list = batch->list;
++		bio_list_init(&batch->list);
++		local_unlock_irq(&bio_complete_batch.lock);
++
++		if (bio_list_empty(&list))
++			break;
++
++		while ((bio = bio_list_pop(&list)))
++			bio->bi_end_io(bio);
++
++		if (need_resched()) {
++			bool is_empty;
++
++			local_lock_irq(&bio_complete_batch.lock);
++			is_empty = bio_list_empty(&batch->list);
++			local_unlock_irq(&bio_complete_batch.lock);
++			if (!is_empty)
++				mod_delayed_work_on(batch->cpu,
++						    bio_complete_wq,
++						    &batch->work, 0);
++			break;
++		}
++	}
++}
++
++void __bio_complete_in_task(struct bio *bio)
++{
++	struct bio_complete_batch *batch;
++	unsigned long flags;
++	bool was_empty;
++
++	local_lock_irqsave(&bio_complete_batch.lock, flags);
++	batch = this_cpu_ptr(&bio_complete_batch);
++	was_empty = bio_list_empty(&batch->list);
++	bio_list_add(&batch->list, bio);
++	local_unlock_irqrestore(&bio_complete_batch.lock, flags);
++
++	if (was_empty)
++		mod_delayed_work_on(batch->cpu, bio_complete_wq,
++				    &batch->work, 1);
++}
++EXPORT_SYMBOL_GPL(__bio_complete_in_task);
++
+ static inline bool bio_remaining_done(struct bio *bio)
+ {
+ 	/*
+@@ -1791,7 +1865,9 @@ void bio_endio(struct bio *bio)
+ 	}
+ #endif
+ 
+-	if (bio->bi_end_io)
++	if (bio_flagged(bio, BIO_COMPLETE_IN_TASK) && bio_in_atomic())
++		__bio_complete_in_task(bio);
++	else if (bio->bi_end_io)
+ 		bio->bi_end_io(bio);
+ }
+ EXPORT_SYMBOL(bio_endio);
+@@ -1977,6 +2053,51 @@ int bioset_init(struct bio_set *bs,
+ }
+ EXPORT_SYMBOL(bioset_init);
+ 
++static int bio_complete_batch_cpu_online(unsigned int cpu)
++{
++	enable_delayed_work(&per_cpu(bio_complete_batch, cpu).work);
++	return 0;
++}
++
++/*
++ * Disable this CPU's delayed work so that it cannot run on an unbound worker
++ * after the CPU is offlined.
++ */
++static int bio_complete_batch_cpu_down_prep(unsigned int cpu)
++{
++	disable_delayed_work_sync(&per_cpu(bio_complete_batch, cpu).work);
++	return 0;
++}
++
++/*
++ * Drain a dead CPU's deferred bio completions. The CPU is dead and the worker
++ * is canceled so no locking is needed.
++ */
++static int bio_complete_batch_cpu_dead(unsigned int cpu)
++{
++	struct bio_complete_batch *batch =
++		per_cpu_ptr(&bio_complete_batch, cpu);
++	struct bio *bio;
++
++	while ((bio = bio_list_pop(&batch->list)))
++		bio->bi_end_io(bio);
++
++	return 0;
++}
++
++static void __init bio_complete_batch_init(int cpu)
++{
++	struct bio_complete_batch *batch =
++		per_cpu_ptr(&bio_complete_batch, cpu);
++
++	bio_list_init(&batch->list);
++	INIT_DELAYED_WORK(&batch->work, bio_complete_work_fn);
++	batch->cpu = cpu;
++
++	if (!cpu_online(cpu))
++		disable_delayed_work_sync(&batch->work);
++}
++
+ static int __init init_bio(void)
+ {
+ 	int i;
+@@ -1991,6 +2112,30 @@ static int __init init_bio(void)
+ 				SLAB_HWCACHE_ALIGN | SLAB_PANIC, NULL);
+ 	}
+ 
++	for_each_possible_cpu(i)
++		bio_complete_batch_init(i);
++
++	bio_complete_wq = alloc_workqueue("bio_complete",
++					   WQ_MEM_RECLAIM | WQ_PERCPU, 0);
++	if (!bio_complete_wq)
++		panic("bio: can't allocate bio_complete workqueue\n");
++
++	/*
++	 * bio task-context completion draining on hot-unplugged CPUs:
++	 *
++	 *   1. Stop the per-CPU delayed work while the CPU is still online, so
++	 *      that it cannot run on an unbound worker later.
++	 *   2. Drain leftover bios added between worker disabling and CPU
++	 *      offlining.
++	 */
++	cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
++				  "block/bio:complete:online",
++				  bio_complete_batch_cpu_online,
++				  bio_complete_batch_cpu_down_prep);
++	cpuhp_setup_state_nocalls(CPUHP_BP_PREPARE_DYN,
++				  "block/bio:complete:dead",
++				  NULL, bio_complete_batch_cpu_dead);
++
+ 	cpuhp_setup_state_multi(CPUHP_BIO_DEAD, "block/bio:dead", NULL,
+ 					bio_cpu_dead);
+ 
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 97d747320b35..c0214d6c28d6 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -369,6 +369,38 @@ static inline struct bio *bio_alloc(struct block_device *bdev,
+ 
+ void submit_bio(struct bio *bio);
+ 
++/**
++ * bio_in_atomic - check if the current context is unsafe for bio completion
++ *
++ * Return: %true in atomic contexts (e.g. hard/soft IRQ, preempt-disabled);
++ * %false when a bio can be safely completed in the current context.
++ */
++static inline bool bio_in_atomic(void)
++{
++	if (IS_ENABLED(CONFIG_PREEMPTION) && rcu_preempt_depth())
++		return true;
++	if (!IS_ENABLED(CONFIG_PREEMPT_COUNT))
++		return true;
++	return !preemptible();
++}
++
++void __bio_complete_in_task(struct bio *bio);
++
++/**
++ * bio_complete_in_task - ensure a bio is completed in preemptible task context
++ * @bio: bio to complete
++ *
++ * If called from non-task context, offload the bio completion to a worker
++ * thread and return %true. Else return %false and do nothing.
++ */
++static inline bool bio_complete_in_task(struct bio *bio)
++{
++	if (!bio_in_atomic())
++		return false;
++	__bio_complete_in_task(bio);
++	return true;
++}
++
+ extern void bio_endio(struct bio *);
+ 
+ static inline void bio_io_error(struct bio *bio)
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 8808ee76e73c..d49d97a050d0 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -322,6 +322,7 @@ enum {
+ 	BIO_REMAPPED,
+ 	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
+ 	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
++	BIO_COMPLETE_IN_TASK, /* complete bi_end_io() in task context */
+ 	BIO_FLAG_LAST
+ };
+ 
+
+-- 
+2.39.5
 
