@@ -1,41 +1,41 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD513DA7C9
-	for <linux-block@vger.kernel.org>; Fri, 15 May 2026 04:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0943D9DB4
+	for <linux-block@vger.kernel.org>; Fri, 15 May 2026 04:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778820965; cv=none; b=HtVRSyl/FRyRLlqjO+U19TamrlNJvbWzLlZg2ERksww4S6Bsjkp0rYWTvenzM+Id0Ww29vPrl3vCT/2EJXB/iEuCEnzJ9X4ndUwZBrp4jE++EQz9qKCoxPDWORTj4itpUM5vBWsrQCaK7bWRHzavklR3zMHBALxgQzt+iQA9P8U=
+	t=1778820967; cv=none; b=JWHco1krLDGTDk4GHZ/FWJdLzfrakbjXnLN/KABumnN02ouhTIeyjSY2NNiC8aBnQFd4XPIw4nE83cKr3kYbtxbz6cAf0Dz/PNpWd3XwQxjtMOjIxvsP9f+p/Sl/tEG0JCG8Tq/l/X5jeOfuxcPwFEpSCNOP16BUbYByRyZv3HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778820965; c=relaxed/simple;
-	bh=g9Ii8RYKuBYw8kVB+iTRyrtBh/GPycuHAc2i5h/Wkl4=;
+	s=arc-20240116; t=1778820967; c=relaxed/simple;
+	bh=7q/62FJ5oFt1SqQsjwgUbQi1jfK5lCAbYFcs5wl9D5U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wfx8kK9zjfy6m9fLWTjA28sXXhUTn4mYYn1O+kPrcRrYz42J8LrRqSWihTOQEa6JeOjrqpTpgp0AGRl8jR92UqQs8/4vEbXHo6Rt/+2RiE97AZdRHLcMyJCoe6FXFWJSMKNZjsXmH9l3DoQxgAnHxJRAuKCxAObY9awosdwWHYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=v0sulI7o; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=iSaF+dVsuhagJSKrNBtkr5pmj7aV+OfQack7FaAtBx7xzyzimlCtm6o6/DqZjYf4PvJnbMLOfr+ZUd2GRT1PvNdnt5UklfmEeh2ICv0tG95miaFOT9BcM57yz8G462PIMUUA2ynUQKRe3UGijyU0IfzEUVgfNljQPuEEHj3eOpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=w1eRCzWp; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="v0sulI7o"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="w1eRCzWp"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=dl/k1uI9hHpBDe8yq8mlXPEwoMHr2lCTam0mC5Gh1jg=; b=v0sulI7oi4AVmVuuVJsnHsSpeQ
-	MYlimNJOPSwhVhEhougxvegLqrYPJKDWVDiWSg2exh3iNgOXrnuIu1IXOfWIlPfq6ZALDWxY6lddN
-	kCmeIPEQnt8OBxULM8wnDHcDubZITzYBQLd98HZ4jrh8/Ex5S3Z0heFAKSNFW0Qs/lfiUMxr9X7JO
-	E4cdtd7vvvOGTDuzLAcDZmzC9gTlBdabwuIrYkKRbVglYlapnOg+VUikmvsJSjQS3PFDQkoWCib6f
-	/aTPuxT0nqXC1Xrm7TR6lvsDmYCq0rsZfY4mm9iMMFyComcVDj31Z+zIIiVe0Z7T2ubq1kgNwDtV+
-	LgCQiXWw==;
+	bh=4qnU9Ms874Q6tLOw6V4MEWp8NTXDbMBaJPAqU2S4rXA=; b=w1eRCzWpR3Swdt+5JJMy+S/jXV
+	dkPS2tITmg80xTFS2iNRJew+qtu/aXCtTtU1IqsycaKOly179KW8wZgzeJtvtrZjsVT7Vham42/Ls
+	HEelFLsRbYpkRZIZ/L1d28WcannCqIj6DvrNaoEoWw6wl4oUdhAcWaaP7qipyVrImFlNgyGLfiK5X
+	/afmAcIDLdwYBNB19bqmnL5eCyIbrO1Gv0pLFPoxRjxa8BxVHp14I+T/9GPWvrLH5rEGXLuZ+N3ur
+	csgI672CfPlCjEH81vKCGVuZmJQBXPbSSh4oDR8QcaUmLOFdBzaTVUSU4RoGX/iwMy65pmippdoof
+	qff3Oqsg==;
 Received: from 2a02-8389-2341-5b80-decc-1a96-daaa-a2cc.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:decc:1a96:daaa:a2cc] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wNkag-00000007Lwu-2gFm;
-	Fri, 15 May 2026 04:56:02 +0000
+	id 1wNkaj-00000007LxV-18il;
+	Fri, 15 May 2026 04:56:05 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 4/5] block: unexport blk_status_to_str
-Date: Fri, 15 May 2026 06:55:33 +0200
-Message-ID: <20260515045547.3790129-5-hch@lst.de>
+Subject: [PATCH 5/5] block: unexport bio_{set,check}_pages_dirty
+Date: Fri, 15 May 2026 06:55:34 +0200
+Message-ID: <20260515045547.3790129-6-hch@lst.de>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260515045547.3790129-1-hch@lst.de>
 References: <20260515045547.3790129-1-hch@lst.de>
@@ -48,53 +48,33 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Only used in core block code, so unexport and move the prototype to
-blk.h.
+Only used in built-in code.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c       | 1 -
- block/blk.h            | 2 ++
- include/linux/blkdev.h | 1 -
- 3 files changed, 2 insertions(+), 2 deletions(-)
+ block/bio.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d7de87e86994..22af5dec112b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -197,7 +197,6 @@ const char *blk_status_to_str(blk_status_t status)
- 		return "<null>";
- 	return blk_errors[idx].name;
+diff --git a/block/bio.c b/block/bio.c
+index 57d5a87b3e2f..2d880d1255fe 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1650,7 +1650,6 @@ void bio_set_pages_dirty(struct bio *bio)
+ 		folio_unlock(fi.folio);
+ 	}
  }
--EXPORT_SYMBOL_GPL(blk_status_to_str);
+-EXPORT_SYMBOL_GPL(bio_set_pages_dirty);
  
- /**
-  * blk_sync_queue - cancel any pending callbacks on a queue
-diff --git a/block/blk.h b/block/blk.h
-index b998a7761faf..bf1a80493ff1 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -49,6 +49,8 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- 					      gfp_t flags);
- void blk_free_flush_queue(struct blk_flush_queue *q);
+ /*
+  * bio_check_pages_dirty() will check that all the BIO's pages are still dirty.
+@@ -1709,7 +1708,6 @@ void bio_check_pages_dirty(struct bio *bio)
+ 	spin_unlock_irqrestore(&bio_dirty_lock, flags);
+ 	schedule_work(&bio_dirty_work);
+ }
+-EXPORT_SYMBOL_GPL(bio_check_pages_dirty);
  
-+const char *blk_status_to_str(blk_status_t status);
-+
- bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
- bool blk_queue_start_drain(struct request_queue *q);
- bool __blk_freeze_queue_start(struct request_queue *q,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 890128cdea1c..17270a28c66d 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1040,7 +1040,6 @@ extern const char *blk_op_str(enum req_op op);
- 
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
--const char *blk_status_to_str(blk_status_t status);
- 
- /* only poll the hardware once, don't continue until a completion was found */
- #define BLK_POLL_ONESHOT		(1 << 0)
+ static inline bool bio_remaining_done(struct bio *bio)
+ {
 -- 
 2.53.0
 
