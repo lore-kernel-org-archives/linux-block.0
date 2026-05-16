@@ -1,60 +1,60 @@
 Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CEE3D6691
-	for <linux-block@vger.kernel.org>; Sat, 16 May 2026 12:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4576B3D6CC6
+	for <linux-block@vger.kernel.org>; Sat, 16 May 2026 12:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778933334; cv=none; b=agJwk2p/SP7VKAxGpzGI8vU4nLjAB3UUdcxt/MK30ldmTcn03KF+7DLiHYT3wSlh5dJLM/8McCMWwsLpWT66nAdJ+ZDdad8HSfNbUlIKSxeTArTMSOVVz1ucBjJKyv86vBorLR4rGGH1+qRkvvk6zOc+tlULsrnKOBKY8coXv9M=
+	t=1778933334; cv=none; b=D0CUR4fVvjASuNp0j3tYQrjZnnnDOxHpKgKRPZ+in/egeIjLAXdx2Tsry90qXRMfgutG0MD47i77Qwl5CPqOf51y50InSu1HVCommLwqlhwWzixIsw6CA0YBuUGbcyNPjp0Bewhi+DUntVGyiAf2k+0xjZnx6dmTQFG560P6kFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1778933334; c=relaxed/simple;
-	bh=MBvNMa93C+K5gfKb76R2nR0N55+okXWDE1G4PhAM1kg=;
+	bh=LdEW2zjydpQdvEn4yoz2obAdUuVvOYgKJu4/poDKRTg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p1cFWFtv/v5Hc8akDoogcz4ffuaa3FmovjMCko0fjVdVtZBJI9Iv2hnHuwr94baK31qm13AZvZyaBuqnosAtfyuhR7v9bN3b6n7qicEUhTMxm9a+sKZLeoJco5ohyE3mG6BH0lXaPsh0t33cLYGX2KRbSFTBTKlAN+mUp2RyJ34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Amxy5uQl; arc=none smtp.client-ip=216.71.154.45
+	 MIME-Version; b=IGO/XxpzrVr9676lKnZ/ZjpOAWUNZRhNMVYwY6gl8qiDxmOZCieucyoS/j6wMSFd/TkIrzp+tw4jLoKnqE+Na2qFvtavXVnhglqSon1rOJNSux5EisC8/v1mpqF7Z0GsvzvdrioCnQoAwceAwujBuge555Tei+uiV61Dqm3fkSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=DVMMUYfc; arc=none smtp.client-ip=216.71.154.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Amxy5uQl"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DVMMUYfc"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1778933332; x=1810469332;
+  t=1778933333; x=1810469333;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MBvNMa93C+K5gfKb76R2nR0N55+okXWDE1G4PhAM1kg=;
-  b=Amxy5uQlhvQ1+fZVdB1J5jRc4hs946IrsrILFG2IZKQihEW1U3u5BtoB
-   Relwp4R0a8BeEgeGGLl6UG0Vj4qkQ4VtWLeRl0gApqBMlFWR9S08rWnE3
-   vrJHXl4Mi/4jbLDZb+ciSjYErjFzcs/w+odmjOPpE0puOQTzbfKeLJo5I
-   qwD+GVORaLBxNzO31FiZ5yQ4bLGf/N5y+UH0xJO/uSEyCpFDL1nDhfXB8
-   J0GQVR9eaF+hNyNYxmYEr4Nb7pFEHbDTjPVT3JqkJoJR9fHuBZr7m+s7T
-   4C3J/XjNIvgVZeal+TvpND+OVDGL7up+sfd2H2O4uQTPyfC6lNOl4CuT8
-   w==;
-X-CSE-ConnectionGUID: 5WBXdiFyQO+qYcMkvVFK1A==
-X-CSE-MsgGUID: Em6FA24HStuu2R3wy5gsXg==
+  bh=LdEW2zjydpQdvEn4yoz2obAdUuVvOYgKJu4/poDKRTg=;
+  b=DVMMUYfcrsPEeW2N3cfL8+vNdE6v0ISHNJ811uozDMCkS0yVBhX5jwrp
+   hScRxZhpJxdrtp/jRV7yukMJ1uf1pyCgyR2nlh1oseDggQ9GxQGfPTXFj
+   EzzTgNfR6w1jcbm4Kc1/9fNM+QM2JvqpYSZ4ebYm+zER6EKfg2i/pePAM
+   7nqu0HtzsTwSFIvLWS21xrYjyjx51pIQXkQPG8O+lhavZQkuTyWYgSP17
+   JoOY9JSjQudkmzVdM6hjCPTW+E/5g3TiXpo5xZ1fviwJ4W4Yd9hbqs4sz
+   K1HY55fz4c3lZxfZEAPHvovxEF/+lI/V7K0rfZLclrOKY1SJjb5Z05a2z
+   g==;
+X-CSE-ConnectionGUID: UKyNiJcQTamALck18dQ3JA==
+X-CSE-MsgGUID: y8U7gxYdTFu01N2BZ4jRZQ==
 X-IronPort-AV: E=Sophos;i="6.23,238,1770566400"; 
-   d="scan'208";a="145562576"
+   d="scan'208";a="145562577"
 Received: from unknown (HELO uls-op-esad2-o.wdc.com) ([199.255.45.15])
   by ob1.hgst.iphmx.com with ESMTP; 16 May 2026 20:07:43 +0800
-X-CSE-ConnectionGUID: ZfphAotmRSC8rOI14SSOdg==
-X-CSE-MsgGUID: 5y2v2h0zSDKR8hd0lzu/cQ==
-IronPort-SDR: 6a085e04_kFgk6cKTFjQwWMA84Frc3nmyeAYaUU6vLn4giWZehuzBQGJ
- awLn9yJXmi+vgqXzgROIVbEslco14X1Xsx5cQKg==
+X-CSE-ConnectionGUID: I348Og49QHGGYEbxFLewrw==
+X-CSE-MsgGUID: Slh43elkTCCSZyQvic7QgA==
+IronPort-SDR: 6a085e06_44jSGQ9JYeCNlFHBBFylajDCh23h/yvyeD05u8GCE2yWK5W
+ uvPnFlAuevqzN6QfhMnp7Q/ul9G5yctdczkXxCg==
 Received: from uls-op-esai2-o.wdc.com ([10.248.3.38])
-  by uls-op-esad2-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 May 2026 05:07:31 -0700
-X-CSE-ConnectionGUID: L1VkjcwFS7GLbZt8u5Bxww==
-X-CSE-MsgGUID: w2BBOh++RZOsS4jheLX8xw==
+  by uls-op-esad2-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 May 2026 05:07:33 -0700
+X-CSE-ConnectionGUID: AykGN6zPRlqZnMENCkbanA==
+X-CSE-MsgGUID: Z/KT1E2LR9Oe7pC6jz+lZA==
 WDCIronportException: Internal
 Received: from wdap-zejtyqwo0v.ad.shared (HELO shinmob.wdc.com) ([10.224.105.206])
-  by uls-op-esai2-o.wdc.com with ESMTP; 16 May 2026 05:07:31 -0700
+  by uls-op-esai2-o.wdc.com with ESMTP; 16 May 2026 05:07:33 -0700
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org
 Cc: Daniel Wagner <wagi@kernel.org>,
 	John Meneghini <jmeneghi@redhat.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v2 1/3] check: add --cmd-trace option
-Date: Sat, 16 May 2026 21:07:27 +0900
-Message-ID: <20260516120729.113659-2-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 2/3] common/rc: add _set_attr() function to trace attribute writes
+Date: Sat, 16 May 2026 21:07:28 +0900
+Message-ID: <20260516120729.113659-3-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260516120729.113659-1-shinichiro.kawasaki@wdc.com>
 References: <20260516120729.113659-1-shinichiro.kawasaki@wdc.com>
@@ -66,70 +66,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Test cases that use helper functions can be difficult to understand due
-to deep nesting. To make test execution easier to follow, add a new
---cmd-trace (or -t) option to record the commands executed during test
-runs.
+Many test cases write to sysfs/configfs/debugfs attributes, and these
+writes are important for understanding test behavior. However, bash's
+xtrace feature does not record the target attribute file in commands
+like `echo X > Y`; it only records `echo X`.
 
-The trace is implemented using bash's xtrace feature. Enable xtrace with
-`set -x` before each test case and redirect the trace output to a
-`.cmdtrace` file in the result directory.
+To capture the write target, introduce `_set_attr()`, which writes its
+first argument to the file specified by its second argument. This allows
+xtrace to record the complete operation (e.g., `_set_attr X Y` instead
+of just `echo X`).
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- check | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ common/rc | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/check b/check
-index c166fae..a68049b 100755
---- a/check
-+++ b/check
-@@ -458,7 +458,17 @@ _call_test() {
- 
- 		TIMEFORMAT="%Rs"
- 		pushd . >/dev/null || return
-+		if ((CMD_TRACE)); then
-+			exec 8>"${seqres}.cmdtrace"
-+			export BASH_XTRACEFD=8
-+			set -x
-+		fi
- 		{ time "$test_func" >"${seqres}.out" 2>&1; } 2>"${seqres}.runtime"
-+		if ((CMD_TRACE)); then
-+			set +x
-+			unset BASH_XTRACEFD
-+			exec 8>&-
-+		fi
- 		TEST_RUN["exit_status"]=$?
- 		popd >/dev/null || return
- 		TEST_RUN["runtime"]="$(cat "${seqres}.runtime")"
-@@ -1157,7 +1167,7 @@ Miscellaneous:
- 
- _check_dependencies
- 
--if ! TEMP=$(getopt -o 'do:q::x:c:h' --long 'device-only,quick::,exclude:,output:,config:,help' -n "$0" -- "$@"); then
-+if ! TEMP=$(getopt -o 'do:q::x:c:th' --long 'device-only,quick::,exclude:,output:,config:,cmd-trace,help' -n "$0" -- "$@"); then
- 	exit 1
- fi
- 
-@@ -1165,6 +1175,7 @@ eval set -- "$TEMP"
- unset TEMP
- 
- LOADED_CONFIG=0
-+CMD_TRACE=0
- OPTION_EXCLUDE=()
- while true; do
- 	case "$1" in
-@@ -1192,6 +1203,10 @@ while true; do
- 			LOADED_CONFIG=1
- 			shift 2
- 			;;
-+		'-t'|'--cmd-trace')
-+			CMD_TRACE=1
-+			shift
-+			;;
- 		'-h'|'--help')
- 			usage out
- 			;;
+diff --git a/common/rc b/common/rc
+index d2c1d74..7dd5898 100644
+--- a/common/rc
++++ b/common/rc
+@@ -780,3 +780,10 @@ _min() {
+ 	done
+ 	echo "$ret"
+ }
++
++# Write a value to a sysfs/debugfs/configfs attribute. This wrapper is used to
++# trace sysfs/debugfs/configfs attribute writes when the --cmd-trace option is
++# enabled.
++_set_attr() {
++	echo -n "$1" > "$2"
++}
 -- 
 2.54.0
 
