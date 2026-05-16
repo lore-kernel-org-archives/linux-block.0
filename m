@@ -1,211 +1,264 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.162])
+Received: from mout-y-111.mailbox.org (mout-y-111.mailbox.org [91.198.250.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9C52D63F8;
-	Sat, 16 May 2026 05:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.162
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818E618DB1A;
+	Sat, 16 May 2026 07:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778908225; cv=none; b=OSLi6VlpTS9IIC5AVwvKpaGxQadSrKXc6ULbaWe9TvKBFBW2qQ1pSPWDUVbbbyDrHdLndBE8ZEydYMgAEFCULihbyJlAF800adV3D9NRZ6s76VnWohpbIYyOUvMtKoPaXtWePi6GoZ8Vmhs9NV3HiWnDmRgaPe5rJ12S3r87oaI=
+	t=1778915400; cv=none; b=e+xn140VjBcCFfLHG4yNVYS6pPPluxEI1XRVNqztSLhVjPOEiL5QLBP7Ow/LfaeLUpuVeOA167vrQSiS+nlhJuT4Vfg6F4566PJl7BZ5MG2ciiWODUNJqWI2jpBQVims2TU5fgxAfLuELl6Jwa39TGCGpqEf7CLLZiqc65tqZNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778908225; c=relaxed/simple;
-	bh=D8BHF2e7ol40Q7czWVQrbVmOuHc1mEAiLQSWLpEkrvI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ry8AQ3/K5cff0d9p6kMg4BtwxjmL89h87Xnldf/hfMEXT/Df7QHcLA2q0I6gbx0Vj6ivkiMqoctFr2vnmBS+x7T1oDMCPTWNx2zjCyx8TQp4sWtp4XlOB5i310lswErNLazxZgTfChVZJkLwiZgXJrJCXsDTmIa+nMISLgT75I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=A7nUkgN2; arc=none smtp.client-ip=188.68.63.162
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1778915400; c=relaxed/simple;
+	bh=lV+w0Ac36wFq4l4XxOkdZ/XAMtSjX2uErz74FJbKIPY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=TD/D0A8P6Mvb17isoTnRg/0KGXZ3iYp9DXhaJ/kjJhpLuKKL3j1dT/zwxeCwwUHQLX2JcMm0UWKDUwQx281fW06nAsvQqI7eVmkpGWBHqZ/a79A4XynTZ8zW56lrbZV1GmHRXwub3ooz4t9BPXSSi7kw0iFvYJbdfgKVgYplFqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=oyMB6gsV; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=o9uuHquk; arc=none smtp.client-ip=91.198.250.236
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="A7nUkgN2"
-Received: from mors-relay-8201.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4gHXFL3RKYz3vx0;
-	Sat, 16 May 2026 07:10:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1778908214;
-	bh=D8BHF2e7ol40Q7czWVQrbVmOuHc1mEAiLQSWLpEkrvI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=A7nUkgN2eGOvhU4WXMKHGEa6P2r5vE1nEWor7QJtO9m1csBo5P0lDFTNDIJROzKJS
-	 rvg9NRoSrDwnD8E2bzLRBSLyLAtBOVZyGgrb5JcqSwa4gz7rsKpwfWGZ8P9k9MNLpt
-	 b142NZB7PmuaPW82o5nd5n+woeNwLOkTzhX3aGdrUM1cS8WaDeFDSsgWiZI0S8z8f1
-	 BLmoJ+/qwzenmPic+AovSbBTqzPHJXMF4U9KFfU62J0poS8DZQujsK4XHGJ6cvYexo
-	 rWdz0BvKL9gmYvGg87gAWiLf7YemXIyQksDlJ75SEtCer4k6IB/hGZ/SgN5YvL3laR
-	 /v4Gfh5BOVDvw==
-Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4gHXDX2j94z3vxf;
-	Sat, 16 May 2026 07:09:32 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
-X-Spam-Flag: NO
-X-Spam-Score: -2.901
-X-Spam-Level: 
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="oyMB6gsV";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="o9uuHquk"
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4gHXDW1dMDz8tYK;
-	Sat, 16 May 2026 07:09:31 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id 485EA6038A;
-	Sat, 16 May 2026 07:09:30 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <c3e576c8-f548-4ee4-87de-cb9151f8a061@leemhuis.info>
-Date: Sat, 16 May 2026 07:09:29 +0200
+	by mout-y-111.mailbox.org (Postfix) with ESMTPS id 4gHZvR0sf8z9yVt;
+	Sat, 16 May 2026 09:09:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1778915395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bCTRR472fL00L0PSNs+VkKzuj6RmTK8wIoiHmuNbRls=;
+	b=oyMB6gsVSD0ghwtNlOgdOxR8dM0Of2tddz2PEWv3N8MIoaEjSebnHERYYcq3/gnchTcMW7
+	T1oChKRRnHRPLdCXaKdleZKIGLRUo3GkaJTeq1MKKEil+Nt1CX4q3YXWgMl0DkERVKbEt2
+	jRQNb5Cg9VsxFS+my5b4Ig/Nnb2kZtbAouXZTANHYJnkuyBeJauoN/+9Iw7ziENHkcSBB5
+	pDv4sGl7MWL7BZZ5qS9w3Usqwb7h1YkpR+Ze3Zs7UuacZsDSuPAlq68SWfGwHnG1sNDKO8
+	kRIeKLD+Y5/OmOtLYevI4oxcOquYxHNl3Q+d18UM1iwuPkvQasRo11cQnINejw==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=o9uuHquk;
+	spf=pass (outgoing_mbo_mout: domain of a0yami@mailbox.org designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=a0yami@mailbox.org
+From: Qing Ming <a0yami@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1778915393;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bCTRR472fL00L0PSNs+VkKzuj6RmTK8wIoiHmuNbRls=;
+	b=o9uuHqukR5PEQQJ2wmOSoCVU49Sf+2P0LanFGDJ1Vs4UlaAct3i8mlyULrcgLtxUz8Sccg
+	f0gFs8TK3rxPTv5xa9eRo1V6u2Pj5LfAReUtz96izGOfWkrQsNRxF1iObIB0CkCf6bT0i6
+	oRvkCOs7WSHRIZhjlEIG1ttQOE6po/yis1KP5wlg/yaHkrcfyOgW08A03yfC5JxyAN3tWL
+	0LwBsasx8OA6hfCsqD2r3t0KURdbvUChc/4JAJJzSdACQ7Gz6tIZpXCBUHgvm7a+yNnLf9
+	c3ALg4HSYfGARle732btOo3bC46xx1Wwj4P3Nx6spKWf1oetBdqh91OoQo6oNg==
+To: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Yosry Ahmed <yosry@kernel.org>
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	bpf@vger.kernel.org,
+	Qing Ming <a0yami@mailbox.org>
+Subject: [PATCH v2] cgroup/rstat: validate cpu before css_rstat_cpu() access
+Date: Sat, 16 May 2026 15:08:49 +0800
+Message-ID: <20260516070849.106141-1-a0yami@mailbox.org>
+In-Reply-To: <20260515122952.59209-1-a0yami@mailbox.org>
+References: <20260515122952.59209-1-a0yami@mailbox.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] block: virtio-blk + LVM raid1 spurious sector-0 read
- failures on libaio/threads submit since 5ff3f74e145a ("block: simplify direct
- io validity check")
-To: Vjaceslavs Klimovs <vklimovs@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Cc: Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-kernel@vger.kernel.org, regressions@lists.linux.dev
-References: 
- <CAC_j7i1R7oy+nRhxEjCTba=DUgn02w9X+p94DCu0aHv5+5tKnQ@mail.gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: 
- <CAC_j7i1R7oy+nRhxEjCTba=DUgn02w9X+p94DCu0aHv5+5tKnQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: 
- <177890817076.3831586.10386450463854607080@mxe9fb.netcup.net>
-X-Rspamd-Server: rspamd-worker-8404
-X-Rspamd-Queue-Id: 485EA6038A
-X-NC-CID: tAMvYmqH/meHEIlGdngnv5viqO4OlrXp0oO+3t/3OO+A03Yzhjs=
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: cqjtyprk1mgmjgi3m5anood8wjajaezk
+X-MBO-RS-ID: 2e6ac942611f7cd341e
+X-Rspamd-Queue-Id: 4gHZvR0sf8z9yVt
 
-On 5/15/26 18:52, Vjaceslavs Klimovs wrote:
-> Summary
-> -------
-> On v6.18, starting a libvirt/QEMU guest with virtio-blk backed by an
-> LVM "--type raid1" LV (drivers/md/dm-raid.c stacked on
-> drivers/md/raid1.c) makes md/raid1 register read failures at LV
-> sector 0 within seconds of "virsh start" and mark rimage_0 Faulty
-> once max_corrected_read_errors (default 20) is exceeded. Reads
-> succeed via the redirect path so guests boot, but every guest disk
-> ends up degraded on every VM start. Same workload on legacy
-> "--type mirror" (drivers/md/dm-raid1.c) crashes the host: a
-> zero-length READ reaches the NVMe controller, is rejected with
-> "Invalid Field in Command", and the dm-mirror recovery path oopses.
+css_rstat_updated() is exposed as a BPF kfunc and accepts a
+caller-provided cpu argument. The function uses cpu for per-cpu rstat
+lookups without checking whether it refers to a valid possible CPU.
 
-That sounds somewhat like
-https://lore.kernel.org/all/2982107.4sosBPzcNG@electra/
+A BPF iter/cgroup program with CAP_BPF and CAP_PERFMON can pass an
+invalid cpu value. On an unfixed UBSCAN_BOUNDS test kernel, cpu ==
+0x7fffffff triggers:
 
-Have you tried latest 7.1-rc? It contains a fix for the problem
-mentioned in said thread: f7b24c7b41f23b ("md/raid1,raid10: don't fail
-devices for invalid IO errors") [v7.1-rc2]
+  UBSAN: array-index-out-of-bounds in kernel/cgroup/rstat.c:31:9
+  index 2147483647 is out of range for type 'long unsigned int [64]'
+  Call Trace:
+    css_rstat_updated
+    bpf_iter_run_prog
+    cgroup_iter_seq_show
+    bpf_seq_read
 
-Ciao, Thorsten
+Add cpu validation to the BPF-facing css_rstat_updated() kfunc and
+move the common implementation to __css_rstat_updated() for in-kernel
+callers.
 
-> Symptom on dm-raid raid1 (post --type raid1)
-> --------------------------------------------
-> Per LV, at virsh start, in host dmesg:
-> 
->   kernel: raid1_end_read_request: 95 callbacks suppressed
->   kernel: raid1_read_request: 95 callbacks suppressed
->   kernel: md/raid1:mdX: dm-58: rescheduling sector 0
->   kernel: md/raid1:mdX: redirecting sector 0 to other mirror: dm-58
->   kernel: md/raid1:mdX: dm-58: rescheduling sector 0
->   kernel: md/raid1:mdX: redirecting sector 0 to other mirror: dm-58
->   [... 10 rescheduling/redirecting pairs ...]
->   kernel: md/raid1:mdX: dm-58: Raid device exceeded read_error
-> threshold [cur 21:max 20]
->   kernel: md/raid1:mdX: dm-58: Failing raid device
->   kernel: md/raid1:mdX: Disk failure on dm-58, disabling device.
->   kernel: md/raid1:mdX: Operation continuing on 1 devices.
-> 
->   dmeventd: WARNING: Device #0 of raid1 array, vg0-iris_boot, has failed.
->   dmeventd: WARNING: Waiting for resynchronization to finish before
-> initiating repair on RAID device vg0-iris_boot.
->   dmeventd: Use 'lvconvert --repair vg0/iris_boot' to replace failed device.
-> 
-> Subsequent "lvs -a":
-> 
->   WARNING: RaidLV vg0/iris_boot needs to be refreshed!
->   See character 'r' at position 9 in the RaidLV's attributes and its SubLV(s).
-> 
-> dmesg | grep nvme is EMPTY on this path. The NVMe driver is not
-> involved in producing the error; the failure originates between the
-> virtio-blk bio submission and raid1_end_read_request().
-> 
-> Symptom on legacy dm-mirror (pre-conversion --type mirror)
-> ----------------------------------------------------------
-> Same workload on drivers/md/dm-raid1.c reaches the NVMe controller
-> as a zero-length READ and panics the host through dm-mirror's
-> recovery path:
-> 
->   kernel: operation not supported error, dev nvme1n1, sector 935446535
-> op 0x0:(READ) flags 0x0 phys_seg 0 prio class 2
->   kernel: nvme1n1: I/O Cmd(0x2) @ LBA 935446535, 0 blocks, I/O Error
-> (sct 0x0 / sc 0x2)
->   [... 10+ identical bursts at same timestamp ...]
->   dmeventd: Primary mirror device 252:58 read failed.
->   dmeventd: vg0-iris_boot is now in-sync.
->   [kernel oops in dm_mirror recovery path, full trace lost to console flash]
-> 
-> The "phys_seg 0", "0 blocks", "sct 0x0/sc 0x2" trio (NVMe Generic,
-> Invalid Field in Command, NVMe spec 4.1.1.2) is unambiguous: a bio
-> with bi_iter.bi_size == 0 and bi_vcnt == 0 left the block layer and
-> hit the controller. dm-raid raid1 hides this by retrying on the
-> surviving leg, but the upstream-of-md trigger is identical.
-> 
-> Bisect
-> ------
-> git bisect, v6.12..v6.18, 16 deterministic GOOD/BAD steps, no skips,
-> ~104 minutes:
-> 
->   5ff3f74e145adc79b49668adb8de276446acf6be is the first bad commit
->   block: simplify direct io validity check
-> 
->   --- a/block/fops.c
->   +++ b/block/fops.c
->   @@ -38,8 +38,8 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
->    static bool blkdev_dio_invalid(struct block_device *bdev, struct kiocb *iocb,
->                                   struct iov_iter *iter)
->    {
->   -        return iocb->ki_pos & (bdev_logical_block_size(bdev) - 1) ||
->   -                !bdev_iter_is_aligned(bdev, iter);
->   +        return (iocb->ki_pos | iov_iter_count(iter)) &
->   +                        (bdev_logical_block_size(bdev) - 1);
->    }
-> 
-> The dropped bdev_iter_is_aligned() used to walk the iov_iter and
-> reject per-segment misaligned/degenerate vectors at the blkdev fops
-> entry point. The replacement only validates ki_pos and total length
-> against the logical block size. Cases that now pass that no longer
-> get rejected:
-> 
->   - iter with iov_iter_count(iter) == 0  (degenerate; total length is
->     "sector-aligned" since 0 % 512 == 0)
->   - iter where total length is sector-aligned but a segment isn't
-> 
-> The commit message justifies the removal with "The block layer
-> checks all the segments for validity later". This is true for the
-> io_uring submit path (which enters __blkdev_direct_IO directly and
-> does its own validation) but not for the libaio aio_read/write_iter
-> or the worker-pool sync read/write_iter paths that enter via
-> blkdev_{read,write}_iter() -> blkdev_dio_invalid(). For those paths,
-> the segment check has no replacement.
-> 
-> Reproducing
-> ----------------------------------------------------------
-> 
-> The trigger requires QEMU virtio-blk's specific submission shape AND
-> a non-io_uring submit. Userspace libaio alone, userspace
-> preadv-in-a-thread alone, and QEMU's raw-driver open probes (which
-> qemu-img info exercises identically) are all insufficient. The
-> combination that hits the bug is "guest-driven I/O through
-> virtio-blk-pci with cache.direct=on and aio in {native, threads}".
-> 
-> #regzbot introduced: 5ff3f74e145adc79b49668adb8de276446acf6be
-> 
-> Thanks,
-> Vjaceslavs Klimovs
-> 
+Fixes: a319185be9f5 ("cgroup: bpf: enable bpf programs to integrate with rstat")
+Signed-off-by: Qing Ming <a0yami@mailbox.org>
+---
+v2:
+- Split css_rstat_updated() into a BPF-visible wrapper and an internal
+  __css_rstat_updated() helper.
+- Switch internal callers to __css_rstat_updated().
+
+ block/blk-cgroup.c     |  2 +-
+ include/linux/cgroup.h |  1 +
+ kernel/cgroup/rstat.c  | 30 ++++++++++++++++++++----------
+ mm/memcontrol.c        |  6 +++---
+ 4 files changed, 25 insertions(+), 14 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 554c87bb4a86..bc63bd220865 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -2241,7 +2241,7 @@ void blk_cgroup_bio_start(struct bio *bio)
+ 	}
+ 
+ 	u64_stats_update_end_irqrestore(&bis->sync, flags);
+-	css_rstat_updated(&blkcg->css, cpu);
++	__css_rstat_updated(&blkcg->css, cpu);
+ 	put_cpu();
+ }
+ 
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index f6d037a30fd8..c5648fcf74e2 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -777,6 +777,7 @@ static inline void cgroup_path_from_kernfs_id(u64 id, char *buf, size_t buflen)
+ /*
+  * cgroup scalable recursive statistics.
+  */
++void __css_rstat_updated(struct cgroup_subsys_state *css, int cpu);
+ void css_rstat_updated(struct cgroup_subsys_state *css, int cpu);
+ void css_rstat_flush(struct cgroup_subsys_state *css);
+ 
+diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+index 150e5871e66f..ed60ba119c68 100644
+--- a/kernel/cgroup/rstat.c
++++ b/kernel/cgroup/rstat.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ #include "cgroup-internal.h"
+ 
++#include <linux/cpumask.h>
+ #include <linux/sched/cputime.h>
+ 
+ #include <linux/bpf.h>
+@@ -53,7 +54,7 @@ static inline struct llist_head *ss_lhead_cpu(struct cgroup_subsys *ss, int cpu)
+ }
+ 
+ /**
+- * css_rstat_updated - keep track of updated rstat_cpu
++ * __css_rstat_updated - keep track of updated rstat_cpu
+  * @css: target cgroup subsystem state
+  * @cpu: cpu on which rstat_cpu was updated
+  *
+@@ -63,20 +64,17 @@ static inline struct llist_head *ss_lhead_cpu(struct cgroup_subsys *ss, int cpu)
+  *
+  * NOTE: if the user needs the guarantee that the updater either add itself in
+  * the lockless list or the concurrent flusher flushes its updated stats, a
+- * memory barrier is needed before the call to css_rstat_updated() i.e. a
++ * memory barrier is needed before the call to __css_rstat_updated() i.e. a
+  * barrier after updating the per-cpu stats and before calling
+- * css_rstat_updated().
++ * __css_rstat_updated().
+  */
+-__bpf_kfunc void css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
++void __css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
+ {
+ 	struct llist_head *lhead;
+ 	struct css_rstat_cpu *rstatc;
+ 	struct llist_node *self;
+ 
+-	/*
+-	 * Since bpf programs can call this function, prevent access to
+-	 * uninitialized rstat pointers.
+-	 */
++	/* Prevent access to uninitialized rstat pointers. */
+ 	if (!css_uses_rstat(css))
+ 		return;
+ 
+@@ -125,6 +123,18 @@ __bpf_kfunc void css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
+ 	llist_add(&rstatc->lnode, lhead);
+ }
+ 
++/*
++ * BPF-facing wrapper for __css_rstat_updated(). Validate the caller-provided
++ * CPU before passing it to the internal rstat updater.
++ */
++__bpf_kfunc void css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
++{
++	if (unlikely(cpu < 0 || cpu >= nr_cpu_ids || !cpu_possible(cpu)))
++		return;
++
++	__css_rstat_updated(css, cpu);
++}
++
+ static void __css_process_update_tree(struct cgroup_subsys_state *css, int cpu)
+ {
+ 	/* put @css and all ancestors on the corresponding updated lists */
+@@ -170,7 +180,7 @@ static void css_process_update_tree(struct cgroup_subsys *ss, int cpu)
+ 		 * flusher flush the stats updated by the updater who have
+ 		 * observed that they are already on the list. The
+ 		 * corresponding barrier pair for this one should be before
+-		 * css_rstat_updated() by the user.
++		 * __css_rstat_updated() by the user.
+ 		 *
+ 		 * For now, there aren't any such user, so not adding the
+ 		 * barrier here but if such a use-case arise, please add
+@@ -614,7 +624,7 @@ static void cgroup_base_stat_cputime_account_end(struct cgroup *cgrp,
+ 						 unsigned long flags)
+ {
+ 	u64_stats_update_end_irqrestore(&rstatbc->bsync, flags);
+-	css_rstat_updated(&cgrp->self, smp_processor_id());
++	__css_rstat_updated(&cgrp->self, smp_processor_id());
+ 	put_cpu_ptr(rstatbc);
+ }
+ 
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index c03d4787d466..749c128b4fad 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -679,7 +679,7 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, long val,
+ 	if (!val)
+ 		return;
+ 
+-	css_rstat_updated(&memcg->css, cpu);
++	__css_rstat_updated(&memcg->css, cpu);
+ 	statc_pcpu = memcg->vmstats_percpu;
+ 	for (; statc_pcpu; statc_pcpu = statc->parent_pcpu) {
+ 		statc = this_cpu_ptr(statc_pcpu);
+@@ -2796,7 +2796,7 @@ static inline void account_slab_nmi_safe(struct mem_cgroup *memcg,
+ 		struct mem_cgroup_per_node *pn = memcg->nodeinfo[pgdat->node_id];
+ 
+ 		/* preemption is disabled in_nmi(). */
+-		css_rstat_updated(&memcg->css, smp_processor_id());
++		__css_rstat_updated(&memcg->css, smp_processor_id());
+ 		if (idx == NR_SLAB_RECLAIMABLE_B)
+ 			atomic_add(nr, &pn->slab_reclaimable);
+ 		else
+@@ -3019,7 +3019,7 @@ static inline void account_kmem_nmi_safe(struct mem_cgroup *memcg, int val)
+ 		mod_memcg_state(memcg, MEMCG_KMEM, val);
+ 	} else {
+ 		/* preemption is disabled in_nmi(). */
+-		css_rstat_updated(&memcg->css, smp_processor_id());
++		__css_rstat_updated(&memcg->css, smp_processor_id());
+ 		atomic_add(val, &memcg->kmem_stat);
+ 	}
+ }
+-- 
+2.53.0
 
