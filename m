@@ -1,160 +1,80 @@
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D0873463
-	for <linux-block@vger.kernel.org>; Sun, 17 May 2026 05:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696ED3BB661
+	for <linux-block@vger.kernel.org>; Sun, 17 May 2026 17:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778996211; cv=none; b=gUz5vIrRlqi6Q5wLfPfPiIMvU8ST+H29EkSyAfMv1/4qUBFrC+VIZ1DASQjNOMa46YBr1YtghBZp+7ZPOzK1hUGsfcRU+odhYKVmQnkHtyuZ66y7I81Tn73YXIJJSAfpYPE3Q+JFs7T7NzisWKqVlEs7rdjSTCA9kBaCs8NH3UM=
+	t=1779038787; cv=none; b=aWSP3hhuriQyWVOr02RF+FCd7dUMptNHEEMhIF2uMghnw32RaW7cBKnN4ji54CtH/jE/5N1P0s8XD49oxyvF2JFzy46dymbYQErKtXQQDQbE6cUkHlY7dm9Lm8+l2DE3duLl9/c2O7Q9aOsOZI28v0dRrT6b4YmUvPYkp9AA/AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778996211; c=relaxed/simple;
-	bh=afjwGEe2oEassWdXpr0gGPe/aGW7hgJc7rpQoXMPtS4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p+UP9BgH9bIu1S1k/t7v6/HLrwUJGBVcEhkztWCMCC+z6bE98NEihuiswqHke/9BhSY6KoSAVdwa6vqig587haC5WwbuJbTV5PsjMnz7Zo6UpuTo3odNbwKGyy16VUM5hg9wCGG+wKSbC94JZQvRE/GDZ6jlMU9wltuRg4ilKJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dAqlmN+X; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779038787; c=relaxed/simple;
+	bh=eJsfiUZLw3wmJYdoGds/9LxKqXLvl/zHbkZXEefuyqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PpyhT78g9xS9Yd5Jd4/X4JOs/9iRNxvoUAHWKFMeS8cjW3Bm4DPOjh+4rdBiEf8eLv6YPF58xXdXXCvvCS/LiGO4bgETFw6DcYMQciFy6KEZgFKCGs8Nn4k3pLFKxME5L/T/awJkEpbO77nESD5KqGWh8DhGqJ0WP+WX2ETmwNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fQj6T2Tw; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dAqlmN+X"
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-95d3492fb1eso776939241.3
-        for <linux-block@vger.kernel.org>; Sat, 16 May 2026 22:36:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778996209; x=1779601009; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0E7jjUk3MC5+CVl+LevXCEF8IwXtzIWnXoqor7xZUmU=;
-        b=dAqlmN+XkNvqY/ThgJGau9bnj9nK4hdjSyprmyXgwhVd/rjHdLjpKH5Dkvrzt4Fssi
-         8EvpDE9j/GstX2bluPQV0KNo+kd3Wp7jFK3gEJ4gabrxNL/pwXvJLqHrbGE2CPz30vfg
-         oKotwxwKXcK4trzD/hUJl4QZod6hyZ7ZTARA9XzJKVXpRNIL7ise9YMwmxVwkaJl36GQ
-         5+lO+sb6vn1Iv6dSxsxFQqCzBRuGVOp3EpGpMGO1LtkPMwsvcnQenwqdTaoNHkNQNCO6
-         +hlkC9W5WQvQJFmQMMKyFJsNhzE/VdwFDticD71fnEKHAEACyLIWI7Z7oprcbLVg8o/e
-         jyiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778996209; x=1779601009;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0E7jjUk3MC5+CVl+LevXCEF8IwXtzIWnXoqor7xZUmU=;
-        b=s4VsqLcnNGcxRD+gpgTojve/xRAZGdqf5IxrVXbX46F7L4S8hLV6WPezEpLdAsYHzG
-         CjBaWMJ7z32/gBV9csX84Eidn1kAyj2X0OaXEpd2DF9IqvtTEDT+nsdp2FPB2X7RCLRd
-         GXZRapy8vBc00jOGMdXrUiAWJprY6ydLKzlBBETIoQnO5bL2EK0uBcXt8XCOal0MJy+N
-         YglyP9L55gsjmKjbz8U+eumOafbz6yf60A+kDjuWKPEErlvK7SJfRxVvLkngdcFadVir
-         BAc2CztSn9ZbvlQ//8DNt3qFMpFD1z+/S4M1OLM0NN/L65oJed7jC6NoEPuauDU/3uQP
-         QcdQ==
-X-Gm-Message-State: AOJu0YzCNB/QjcW6dSeJ3aofTRtNJwkRfn6oKsQJsIjH5sbLu9rpPj/G
-	vjQjATB2pm9Nl82xSg2peI9TuStDu6jQk74O6AxC266sBSp7UIsK9439
-X-Gm-Gg: Acq92OGX1h5jBoAAtzZLLMX2kDRlaPCaX7J9LWCC3MHHiGcX3eE9U82LO8PswXbz+5j
-	3+MwvtxC+MPbZDkqHgaGxl4+GYYlwNfQcQiDoS+p2ISHjgoXnasbR66xAQeXcgfCi5rOxBcx2kj
-	xAMk8tAn0fAqn0+b37ELo9VyCnnfsUDPRWETWpendlj1/vbnsMA6hgOY8cKAJvlSA56oZjV79l/
-	kXmiaMPJGcev0I/JF5/ZxO8SJidiNdaKqhszxYRvEIM5TkGJ2Ge/YnPEYzO5ns3HpwXiNMV4e/s
-	IZ9uPzIV7tXzZoU5j+gmC6LMwoHwHHjzWOfoyzGyn8Shroh0RLgPL8Es7iMSMkBDUFD6K/Hco0G
-	Ua+W56lqOyg53ChB4pUN9XXna/2FsQBpkraLLCCGHWf89zNtE9k/ipcbp/CpHUnMKRQ/10HunSS
-	zImvMzDJsPzoR09Eb10y1AWMGywWT47QsCkJnZUIuNTA==
-X-Received: by 2002:a05:6102:3053:b0:633:7d88:c77d with SMTP id ada2fe7eead31-63a3fe9f462mr5371583137.29.1778996209295;
-        Sat, 16 May 2026 22:36:49 -0700 (PDT)
-Received: from syssplab.cs.fiu.edu (nat1.cs.fiu.edu. [131.94.134.89])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-95fc2c99f63sm3347932241.1.2026.05.16.22.36.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 May 2026 22:36:48 -0700 (PDT)
-From: Chao Shi <coshi036@gmail.com>
-To: linux-nvme@lists.infradead.org
-Cc: linux-block@vger.kernel.org,
-	hch@lst.de,
-	kbusch@kernel.org,
-	sagi@grimberg.me,
-	axboe@kernel.dk,
-	iam@sung-woo.kim,
-	daveti@purdue.edu,
-	weizhu@fiu.edu,
-	Chao Shi <coshi036@gmail.com>
-Subject: [PATCH v2] nvme: don't WARN on I/O to a namespace revalidated to unusable metadata
-Date: Sun, 17 May 2026 01:36:35 -0400
-Message-ID: <20260517053635.2282446-1-coshi036@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fQj6T2Tw"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779038782;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=76A0oZKKwfcdbs5aKjR8EbOiZitG9AezNjNS+0A/s0s=;
+	b=fQj6T2TwMKYJU357KmZwNUZ9lZ6u9U4axvvwAgyKUDkRhlPmMkmz51+GD55aYMzQq3I58l
+	eOhSl3ZsGuUVhxgDNcYW1Gib7IMaopqtmFgXSIYCLxdvkr/pnnDLMt4cQcArSrHtcVcRBE
+	4Fji3JBwwO8xk/ZOK8ri5SSCdmz6wP8=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND] n64cart: use strscpy in n64cart_probe
+Date: Sun, 17 May 2026 19:26:17 +0200
+Message-ID: <20260517172617.3954-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1160; i=thorsten.blum@linux.dev; h=from:subject; bh=eJsfiUZLw3wmJYdoGds/9LxKqXLvl/zHbkZXEefuyqk=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmcvyxjduj/7+yQebn74XLzd/NXbj7tUqag6VdicWyes fQrVaZ/HaUsDGJcDLJiiiwPZv2Y4VtaU7nJJGInzBxWJpAhDFycAjCRpQ8ZGVbuEubryD2y5vtM laiTiw3Kfz0+5Dpt+8mtNSkMlh82LZ3D8If3UVNEeaGpkf7xdMUIua88ii5n3ncekc6bEe+U5sq UwAcA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-nvme_setup_rw() fires WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)) for a
-namespace with head->ms != 0 but no PI and no REQ_INTEGRITY.  This
-occurs when Identify Namespace reports flbas META_EXT, lbaf[].ms != 0
-and dps == 0: on PCIe nvme_configure_metadata() sets EXT_LBAS without
-METADATA_SUPPORTED, nvme_init_integrity() registers no profile, and
-capacity is forced to 0.  It is the host-unaware geometry change Keith
-described -- an out-of-band format on a shared namespace, or a
-non-compliant device seen on rescan -- not the host's own Format NVM,
-which freezes first.
+strcpy() has been deprecated [1] because it performs no bounds checking
+on the destination buffer, which can lead to buffer overflows. While the
+current code works correctly, replace strcpy() with the safer strscpy()
+to follow secure coding best practices.
 
-The freeze in nvme_update_ns_info_block() is not defeated; the WARN
-just does not depend on q->limits.  It depends on ns->head->ms (read
-live at dispatch, set inside the freeze window) and on REQ_INTEGRITY,
-never set for this geometry.  capacity == 0 only gates submission
-(bio_check_eod()), not dispatch: a writeback bio that passed
-bio_check_eod() under the old capacity sits on the task plug holding
-no q_usage_counter reference and is flushed by blk_finish_plug() after
-the update committed head->ms != 0 (dmesg confirms: the capacity-change
-line prints before the WARN).
+[1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy
 
-The I/O is already rejected correctly (BLK_STS_NOTSUPP, capacity 0).
-The assertion fires on a device-reachable, already-handled condition
--- a panic under panic_on_warn -- and its premise does not hold:
-metadata without PI or a registrable profile is a legitimate, unusable
-state.  Add that explicit case and emit one dev_warn_once() instead.
-Fully fencing already-submitted bios over a revalidation is larger,
-TP-level work and is out of scope here.
-
-Tested: built on linux-kcov-debug (6.19.0+, KASAN); boot-tested under
-FEMU, 4x dd + 500 rescans, no splat; reject path verified by code
-inspection.
-
-Found by FuzzNvme (Syzkaller with FEMU fuzzing framework).
-
-Link: https://lore.kernel.org/linux-nvme/20260427003457.1264511-1-coshi036@gmail.com/
-Acked-by: Sungwoo Kim <iam@sung-woo.kim>
-Acked-by: Dave Tian <daveti@purdue.edu>
-Acked-by: Weidong Zhu <weizhu@fiu.edu>
-Signed-off-by: Chao Shi <coshi036@gmail.com>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
-v2: drop 2/2 (faking an integrity profile); supersede 1/2 with an
-    explicit unusable-metadata case + one dev_warn_once() instead of
-    downgrading the WARN; rewrite the log with the requested mechanism.
-RFC v1: https://lore.kernel.org/linux-nvme/20260427003457.1264511-1-coshi036@gmail.com/
+ drivers/block/n64cart.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
- drivers/nvme/host/core.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index d1711ef59fb8..32ccb56c4aaf 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1039,8 +1039,23 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 		 * namespace capacity to zero to prevent any I/O.
- 		 */
- 		if (!blk_integrity_rq(req)) {
--			if (WARN_ON_ONCE(!nvme_ns_has_pi(ns->head)))
-+			/*
-+			 * A namespace with metadata but neither PI nor a block
-+			 * layer integrity profile is unusable: nvme_init_integrity()
-+			 * registers no profile, blk_get_integrity() is NULL, no bio
-+			 * ever gets REQ_INTEGRITY, and the capacity is forced to 0.
-+			 * A bio that passed bio_check_eod() under the old capacity
-+			 * and was batched on a plug before the namespace revalidated
-+			 * can still be dispatched here afterwards.  Reject it; this
-+			 * is the expected terminal handling of I/O to a namespace
-+			 * that revalidated to an unusable geometry, not a bug.
-+			 */
-+			if (!nvme_ns_has_pi(ns->head)) {
-+				dev_warn_once(ns->ctrl->device,
-+					"%s: I/O to namespace with metadata but no usable integrity profile (ms=%u), rejecting\n",
-+					ns->disk->disk_name, ns->head->ms);
- 				return BLK_STS_NOTSUPP;
-+			}
- 			control |= NVME_RW_PRINFO_PRACT;
- 			nvme_set_ref_tag(ns, cmnd, req);
- 		}
--- 
-2.43.0
-
+diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
+index b9fdeff31caf..328da73b6f2c 100644
+--- a/drivers/block/n64cart.c
++++ b/drivers/block/n64cart.c
+@@ -12,6 +12,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/platform_device.h>
++#include <linux/string.h>
+ 
+ enum {
+ 	PI_DRAM_REG = 0,
+@@ -145,7 +146,7 @@ static int __init n64cart_probe(struct platform_device *pdev)
+ 	disk->flags = GENHD_FL_NO_PART;
+ 	disk->fops = &n64cart_fops;
+ 	disk->private_data = &pdev->dev;
+-	strcpy(disk->disk_name, "n64cart");
++	strscpy(disk->disk_name, "n64cart");
+ 
+ 	set_capacity(disk, size >> SECTOR_SHIFT);
+ 	set_disk_ro(disk, 1);
