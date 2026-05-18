@@ -1,82 +1,125 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDFE15C14F;
-	Mon, 18 May 2026 06:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31263246F4;
+	Mon, 18 May 2026 06:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779086035; cv=none; b=rgIIXUqyd60jJ2s72lO7YLwd9ce0mSBYuVBu2ZS/DhNlBQw+L1O81tuRVe0N1/HwEZ5RX9xG7kasGeYNUdkw1feWbc7FVpktAtyid2JHGPXmS2i38gwP0z/Qq7sPQ9PMmCKoEbnoSNKyYJ4SVHPepEY5RNcGl5QVSTdeBfsEyGw=
+	t=1779086899; cv=none; b=XMattViULaifyQ7e/1EOan+Z2A3s02dKKWyqQIuZMiLtKMI3ePrLVIxQJE1qDUb40zOO+uJm6unIFGwUodhcr/WYBnN3iZrFvhQHBgFPUFEiDYsq4etSuGivaFMj19xg54VyyZYzW66MI+A/T1TzMTE69u/zQlC4gpYJdXH4yp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779086035; c=relaxed/simple;
-	bh=j3QTDC8yDwPPtroAwXq3qr87mPdpW0/E6Oo2g7devGU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XpF+2xC+fQAf6b66m3CdXaH26m2vJzKGUz6fK3S7DB4o0PZLdqZYgwiiPxc2IvQyqKC7ou9Qf1HVJIkI0CEFtR2E+gNu7vogBE5g8Nyu2yji1+2i4AN2Bxw/AK3LLoV1qkJrPtAJpyP4XaeSVcfUUChxlYmD4b9QUWhMaGSDmCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qC42MBdi; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+	s=arc-20240116; t=1779086899; c=relaxed/simple;
+	bh=kqZg1RRtDe2nEefgCSyIfrLurXbbJ6IaMqIK6ptMdl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S1OePbRqV/vyw0oVX1nkIS2/aqME/5PgmRFFn+kjv5f4496ESyhWiIBqrXyB5wFL9A+o8wqZt6ZO4QkOD1/yXTAyodsEgJ3qsBBw+pfeXybj2B4WWPyVVMgrc1iidoKI2QEOx1nCToLVBLVYkgHe9ah589amheUmpm+3iW8S3FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=q2RkAlOA; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qC42MBdi"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q2RkAlOA"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=ZXdlojor4eZreSZvQ2niU3VpTmSTWNa557g2Qmob984=; b=qC42MBdi/sl9Vti0QiPKRYGs60
-	KV05/8Lar1aBCkKsHkPlrVbQHUkjL57R0W8q3Y6Pi4ck0aYbUwHtXlv+p+bLS9gLOkEvhnjeD4RYa
-	KgYh6SIOHo2ahBUZgPcQTPAeOnqCpd+y6gZa6jlJfNEMFvfHRtVLisPK49kvFVP+uFsyicNwVmQHQ
-	F/pbavy9FCuYTLHGASIHYczvBude7sPzp/iDZV+PQkWz3otyepjTQC+mv1K7hBaIshUmvQCPJP6yD
-	IJvQrLTuBexzbW07Hg4SnsR98zIHfFWlOdqp8oCHgIYYwyI6ldmMxRUgR0MR/mkdPRjU3u+Pk27+F
-	3apjxxFA==;
-Received: from [2001:4bb8:2ee:fcf2:e6ad:a575:3e60:e254] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wOrXy-0000000ERIM-0iur;
-	Mon, 18 May 2026 06:33:50 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] block: don't set BIO_QUIET for BLK_STS_AGAIN
-Date: Mon, 18 May 2026 08:33:30 +0200
-Message-ID: <20260518063336.507369-3-hch@lst.de>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260518063336.507369-1-hch@lst.de>
-References: <20260518063336.507369-1-hch@lst.de>
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=6QlzVHg/VJtWXf7fgwcVOARPx/LzCTC/cqL++r1Bxj8=; b=q2RkAlOADHQeGt9L5UyoaQwDJv
+	ZQx/5j3Ebjw42T3EHsqG3owxB9wcEbB6IeR46UrKNkyNjZsJ1ZPyFfRO99Pq7rdIzRjIjhqY/AgwG
+	2RHy4eLnSxmxfBP9PCyupAOmUgtVUy3QUiQtC/yw7TfXbpnHSGpOOZPBhw1I725qA/78wDtJfQ+2a
+	BDLG4hAxsYX6LGB0fomexQDlVkaQxBk+84Xm98/78ClzG3v52AxBwd7LxXEu4md71daVbRlAAol2n
+	WCbwu+jFGYMvJT3GJfVulk+JhK4cHftGW81kWWZoQaC3ARwxhPgGhxEnqlhKyuyAo74oYYnHtAcie
+	0CQTAqvw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wOrlq-0000000ETRO-04oH;
+	Mon, 18 May 2026 06:48:10 +0000
+Date: Sun, 17 May 2026 23:48:09 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	Christoph Hellwig <hch@infradead.org>,
+	Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
+Subject: Re: [PATCH v6 1/4] block: add task-context bio completion
+ infrastructure
+Message-ID: <agq2KRd8RkP1TAf5@infradead.org>
+References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
+ <20260514-blk-dontcache-v6-1-782e2fa7477b@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260514-blk-dontcache-v6-1-782e2fa7477b@columbia.edu>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Commit abb30460bda2 ("block: mark bio_wouldblock_error() bio with
-BIO_QUIET") added this to suppress buffer_head warnings, but neither
-when this commit was added nor now any buffer_head using code actually
-ever sets REQ_NOWAIT which can lead to BLK_STS_AGAIN.
+On Thu, May 14, 2026 at 05:51:14PM -0400, Tal Zussman wrote:
+> Some bio completion handlers need to run from preemptible task context,
+> but bio_endio() may be called from IRQ context (e.g., buffer_head
+> writeback). Callers need a way to ensure their callback eventually runs
+> from a sleepable context. Add infrastructure for that, in two forms:
+> 
+>   1. BIO_COMPLETE_IN_TASK, a bio flag the submitter sets when it knows
+>      in advance that its callback needs task context (e.g., dropbehind
+>      writeback). bio_endio() sees the flag and offloads completion to a
+>      worker automatically.
+> 
+>   2. bio_complete_in_task(), a helper that completion callbacks can
+>      invoke from within bi_end_io() when the deferral decision is
+>      dynamic (e.g., fserror reporting).
 
-Remove the special handling for now.  If we ever plan to use REQ_NOWAIT
-for buffer_head based I/O we're better off handling BLK_STS_AGAIN in
-the completion handler as it actually needs to retry the I/O as well.
+Note that method 2 is unused as of this series.  I do plan to add users
+ASAP, and at one or two could even land through the block layer in this
+merge window.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/bio.h | 1 -
- 1 file changed, 1 deletion(-)
+> Both share a per-CPU batch list drained by a delayed work item on a
+> WQ_PERCPU workqueue. Producers push the bio onto the local CPU's batch
+> and schedule the work item, which then dispatches each bio's bi_end_io()
+> from task context. The delayed work item uses a 1-jiffie delay to allow
+> batches of completions to accumulate before processing.
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 85463981d0f5..7597ae4dc52b 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -379,7 +379,6 @@ static inline void bio_io_error(struct bio *bio)
- 
- static inline void bio_wouldblock_error(struct bio *bio)
- {
--	bio_set_flag(bio, BIO_QUIET);
- 	bio->bi_status = BLK_STS_AGAIN;
- 	bio_endio(bio);
- }
--- 
-2.53.0
+But this 1-jiffie delay also means we unconditionally increase
+completion latency, which feels like a bad idea.  Do you have any
+measurements that show where it does benefit?  Note that queing work
+already often has very measurable latency on it's own.  This also
+directly contradics the erofs experience that even went to a RT
+thread to reduce the latency.
 
+> Both methods are gated on bio_in_atomic(), which returns true in any
+> context where a sleeping bi_end_io() is unsafe, including
+> non-preemptible task context. This logic is copied from commit
+> c99fab6e80b7 ("erofs: fix atomic context detection when
+> !CONFIG_DEBUG_LOCK_ALLOC").
+
+Let's not copy it, but have a prep patch that moves the erofs logic
+into the block layer under the new bio_in_atomic name.
+
+> +		while ((bio = bio_list_pop(&list)))
+> +			bio->bi_end_io(bio);
+> +
+> +		if (need_resched()) {
+> +			bool is_empty;
+> +
+> +			local_lock_irq(&bio_complete_batch.lock);
+> +			is_empty = bio_list_empty(&batch->list);
+> +			local_unlock_irq(&bio_complete_batch.lock);
+> +			if (!is_empty)
+> +				mod_delayed_work_on(batch->cpu,
+> +						    bio_complete_wq,
+> +						    &batch->work, 0);
+> +			break;
+> +		}
+> +	}
+
+Ån all mainstream architetures we now default to lazy preempt, which
+should remove the need for need_resched() calls.  Do you have evidence
+that we actually need this handling on recent kernels?
+
+Otherwise this looks good to me.
