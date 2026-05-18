@@ -1,45 +1,88 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9943F0760;
-	Mon, 18 May 2026 12:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE07D44D01F
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 13:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779109039; cv=none; b=O6NPtjD2vExW0CvHisLhu/KX/ujOIjJ3hI+kgFTgel8xcJU7qed+fFs+9wIGZ5+GX3nCQvzJSbUkB0kPTSV+Pv0dfjXvvFnZNmuQj50IRo80iAxrY/YfH7nMvxP9Q4nTKZvCuXyb13mZWPIMsjC+7wfy94rxlgZ+R9l2VQ1r3PU=
+	t=1779109417; cv=none; b=RVmeaPpA54RpNDYEsn589PhsvffG6SjHjElwNNgGr4BEMcick27kr6eSxMoD4Rd8cAZkeBacsuzKNdo4lomv9yfh/ZoyLjYO68qJaCtYstI9ZcWLt+q5907dAJ7MNeq1gXenunsYZIPvsMsBhK/CU+RP2Qj9hsrDQQ/YMUFCVtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779109039; c=relaxed/simple;
-	bh=LsOiIUcaczQe/qsyYHUA46UAMy24CVa7oQJnUgawucE=;
+	s=arc-20240116; t=1779109417; c=relaxed/simple;
+	bh=yE4CHMQIUtF6+r+hvFjz6O1zIkW6RzcsEEtlrbhHGPI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=My7Pq1JSTC2QzzifbtooUJJII4o47x/czesRy7xl8iddEFQs7diku1ys7MOnJnGDQOfuDjSzTtALVUsnS71h+qrNViBYtbJArimwx9WgaS7IjIiI7qBhzPE7qqQs4nzWNSGpCqtW+huSsAf6ksITHSMPwCWWLiHzEt83PbNLGAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id E839E68D05; Mon, 18 May 2026 14:57:13 +0200 (CEST)
-Date: Mon, 18 May 2026 14:57:13 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 04/10] block: introduce dma map backed bio type
-Message-ID: <20260518125713.GC5754@lst.de>
-References: <cover.1777475843.git.asml.silence@gmail.com> <646ecd6fde8d9e146cb051efb514deb27ce3883e.1777475843.git.asml.silence@gmail.com> <20260513081929.GD5477@lst.de> <24833f76-2289-4859-86d1-9215b11a1258@gmail.com> <df697a76-c700-4908-ac08-a47ad07e0796@amd.com> <4561c621-817c-46be-8ff0-0b557f6c819d@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H28+c1za+68vQdSghAchyxNec1TO8gvJWgT1rD25jYEjZ9wOm/SodVN/PnWFhepKqNkJRRzCuzgw98WOXZRtfMst6x5uCP4Zm1Yj/tVX4MaEZCusnNl0aIYsK0dNuVuYm1m1O6FD9XmefrEGYq5skCRjmYS9qoAooqDKxK8VK3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=JTdHUir1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=6oU8YxnV; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=JTdHUir1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=6oU8YxnV; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="JTdHUir1";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6oU8YxnV";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="JTdHUir1";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6oU8YxnV"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 2B267672D4;
+	Mon, 18 May 2026 13:03:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1779109414; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vEzAx8oAOdGhbrtapAhwTP0oz+pKIk8gOMfPuvDdiaY=;
+	b=JTdHUir1xyt6R4h3O0+WypUzNUGu1BmendR5vnYg+6n12vKECO/2V0Lw7MPbT/qW/Skz1S
+	w/3mZxuSjVCWYzP/l14hMYA/XoK7GtKM+SW4ehem0ad4Sr+K1CR6Q1xDS9poki60RgfPF+
+	j/uaKMXJ/h5rcnN+HHo2KjgQ/IHptTg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1779109414;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vEzAx8oAOdGhbrtapAhwTP0oz+pKIk8gOMfPuvDdiaY=;
+	b=6oU8YxnVLWluicvjHtdSkG3CQ22jmQA9u5tfve2/ZLuOnGo2vEhKlpJgPHsJWu09+iEVww
+	xzVy8NRUadZstUCw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=JTdHUir1;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=6oU8YxnV
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1779109414; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vEzAx8oAOdGhbrtapAhwTP0oz+pKIk8gOMfPuvDdiaY=;
+	b=JTdHUir1xyt6R4h3O0+WypUzNUGu1BmendR5vnYg+6n12vKECO/2V0Lw7MPbT/qW/Skz1S
+	w/3mZxuSjVCWYzP/l14hMYA/XoK7GtKM+SW4ehem0ad4Sr+K1CR6Q1xDS9poki60RgfPF+
+	j/uaKMXJ/h5rcnN+HHo2KjgQ/IHptTg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1779109414;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vEzAx8oAOdGhbrtapAhwTP0oz+pKIk8gOMfPuvDdiaY=;
+	b=6oU8YxnVLWluicvjHtdSkG3CQ22jmQA9u5tfve2/ZLuOnGo2vEhKlpJgPHsJWu09+iEVww
+	xzVy8NRUadZstUCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 21B54593A8;
+	Mon, 18 May 2026 13:03:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id rsQuCCYOC2pLNgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 18 May 2026 13:03:34 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 37701A0A90; Mon, 18 May 2026 15:03:29 +0200 (CEST)
+Date: Mon, 18 May 2026 15:03:29 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>, 
+	Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: don't set BIO_QUIET for BLK_STS_AGAIN
+Message-ID: <sw5zffcmk66gcihpt55gxnr4lvmp3qbxhm6l6uo6y2qpmxp77x@wtnwreneuu3i>
+References: <20260518063336.507369-1-hch@lst.de>
+ <20260518063336.507369-3-hch@lst.de>
+ <4j3y4zm2vsbyxlpmyktz4g3sbfwucw64h7p5t3hos3bvtinax4@j5dj3aeahnwa>
+ <20260518125109.GA5286@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,35 +91,78 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4561c621-817c-46be-8ff0-0b557f6c819d@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20260518125109.GA5286@lst.de>
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Queue-Id: 2B267672D4
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.01
 
-On Mon, May 18, 2026 at 01:40:18PM +0100, Pavel Begunkov wrote:
->> When that is really a performance critical path then you can use the likely() and unlikely() macros to give the compiler the hint which one to prefer.
->
-> That might be more penalising than placing them in the right order,
-> and it might be fine as it's new and all that, but it's not a clear
-> cut as it's definitely not created to be a slow path.
+On Mon 18-05-26 14:51:09, Christoph Hellwig wrote:
+> On Mon, May 18, 2026 at 02:34:49PM +0200, Jan Kara wrote:
+> > > Commit abb30460bda2 ("block: mark bio_wouldblock_error() bio with
+> > > BIO_QUIET") added this to suppress buffer_head warnings, but neither
+> > > when this commit was added nor now any buffer_head using code actually
+> > > ever sets REQ_NOWAIT which can lead to BLK_STS_AGAIN.
+> > > 
+> > > Remove the special handling for now.  If we ever plan to use REQ_NOWAIT
+> > > for buffer_head based I/O we're better off handling BLK_STS_AGAIN in
+> > > the completion handler as it actually needs to retry the I/O as well.
+> > > 
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > 
+> > So I agree about the bh argument but bio_wouldblock_error() is not specific
+> > to bh path in any way, is it? So do we expect all bi_end_io handlers to
+> > check for BLK_STS_AGAIN and avoid complaining to logs in case of that? Not
+> > that all of them would be currently checking for BIO_QUIET either so I'm
+> > mostly trying to figure out what's the expected handling.
+> 
+> File system would need special handling for BLK_STS_AGAIN were we to wire
+> it up again (in upstream we have the dead direct-io code removed in
+> patch 1, and an incorrect use in iomap polled I/O I sent a separate patch
+> for), because simply bubbling it up as -EAGAIN will generally do the
+> wrong thing.  We ran into file system corruption last time we did it due
+> to non-idempotency of writes and general locking issues with just
+> retrying at a higher level.
+> 
+> Thus the rough consensus was that If we want to support fs-issued
+> REQ_NOWAIT I/O we'd first need to add infrastructure to retry them from
+> a blocking context at the bio-level, preferably in the block layer
+> itself.
 
-Yes.  Whatever the caller is using at a given time is the fast path here,
-and dynamic branch prediction in modern cpus handles this really well.
+OK, fair. Thanks for explanation. So this flagging with quiet is indeed
+pointless. Feel free to add:
 
-> TBH, not sure
-> why we're bike shedding such things, is it somewhere in the code
-> style?
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-It makes reading the code annoying, so it better have a good reason.
-Now for a single conditional it's not much of an issue, but these
-things tend to pile up and then start to get really annoying.
-Always write your code the most straight forward way unless you
-have a good reason not to.
-
-
->> What could be useful is to have the true path for the more common and the false path for the less common case for documentation purposes, but in that case I would expected some code comments as well.
-> What kind of comment are you thinking about? A "this is not a likely
-> path" type of comment before each mention of the flag is usually not
-> very useful.
-
-Indeed.  It's also not true here.  If the workload uses dmabufs, the
-path obviously is very likely.
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
