@@ -1,42 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82742FFDD5
-	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 22:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691882FC037;
+	Mon, 18 May 2026 23:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779144118; cv=none; b=bd3zHvfpfoyPLLi+/tFn7Y9ppdjAOMYvjn0QyUQ2uFz/oKJMBythqRYYyUh2mNpJ4VoisQvABL/RT5DPOJPW+wtNIEwM2p5Yje+jn/BHd0sUdsDppiMa9745ePG2rQ+dF9RONwZqvb6HVDbUacLz6AheX00bKsCvW8zFk1rZS90=
+	t=1779145683; cv=none; b=MHgLkceGpcOIbp+Ol5E2uYpLd+aZZBp3Gk56FdmHtvXue0o1KqLlDe4J+uMecbAaOaA/hJ6Sxe6ox/UB4Z1PJt9lhYUpH822lrllNubsuHn/jAFwzVJ5aMYfSduql3zszfoV7nlUG85EL1go+QCboJPg/HHCeFckRrwxsAWvToY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779144118; c=relaxed/simple;
-	bh=/m9Na+4BY6gmj3jriRMHq3pbKkdV5/qYlv0Jn+T/IOQ=;
+	s=arc-20240116; t=1779145683; c=relaxed/simple;
+	bh=4q2GOm1N4IpIGCfMcBHRTAsYMJPr9WGSOlAlYUvlfq8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cq7EdSOH1yhS582rdzxO7Ts9B4S7y1hg+o2i4G89yplUJObCZ6Lz68FZ1aBPPzb2xd4m0XZ4x4N24hzJxk/eUBWltlbYtw7tJgfUW5C1sHt5yBr8OaCMX2VyIk01ZFq7IgjdtUcT8Xgyge3HV45PrexhtCfxtltGMH13LNvmSyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3SDih/1; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZwjIBcIIywZR3XFGx9zq04Aacw/3iso2vtOrqoe/qF0BQ/t2cz0DHx6+myFOsI8T3lkgsiaupjmW9+E8YObhds3zH1pdOMh+L7BEkJ3iyLHqwBlmGh/LrGVaKO8bwau+coiz7o3CAactM8+tlejxY0aQ2GWKNieKZxaX3+n4ggQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xjxliwVI; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P3SDih/1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D752C2BCB7;
-	Mon, 18 May 2026 22:41:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779144117;
-	bh=/m9Na+4BY6gmj3jriRMHq3pbKkdV5/qYlv0Jn+T/IOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P3SDih/1oJoL53BNzkIbzPha1oyZ50G9QNgJt5uLSnjNqpLa+oc5/40TUyDynToQ0
-	 LnwVHg3OowFqBo5OrA5u2I/AfEVMw7ttgD2Eh7rKb3dpj59CzG6LSEKTb1lIytyVoe
-	 ghL6Uxk5zfZwJINHHOvgTcXRsWe3PcDpIi/03deOXiZnnse6BkhPcvUMDsGZzUjnmn
-	 cn9ofFhst63H2h9tzSAHpFESIlcP3jtooe3tAZtDKzETLRwjnN2uFM6h2gqT8qFVOQ
-	 /Df6G/DttIjIqJhemOd1LngHslzU4MoTwdoaPZkvu4RbBlCRQQg2nvEkTuWXWdopF7
-	 D1K9YL6xFEKrA==
-Date: Mon, 18 May 2026 16:41:55 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Chao S <coshi036@gmail.com>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, hch@lst.de,
-	sagi@grimberg.me, axboe@kernel.dk, Sungwoo Kim <iam@sung-woo.kim>,
-	Dave Tian <daveti@purdue.edu>, Weidong Zhu <weizhu@fiu.edu>
-Subject: Re: [PATCH RFC 1/2] nvme: downgrade WARN in nvme_setup_rw to pr_debug
-Message-ID: <aguVs9t5Pvz_y8CI@kbusch-mbp>
-References: <20260427003457.1264511-1-coshi036@gmail.com>
- <afzWCpJSqvjnTgpF@kbusch-mbp>
- <CACd_6n29MeACfWpqK5jaSPOVK+q5yop+eeuO_Wk0M0E5Wr7ujw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xjxliwVI"
+Date: Mon, 18 May 2026 16:07:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779145670;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=43OgO2OF5H7R43ZRhOnt2E+DP2ym+ONP1Bx6PELiuxQ=;
+	b=xjxliwVIsTVqpRoDu9W+fAcJvEIbnG0t9OxUSP3cg6HlVZskMXA6QNBB3X+o63maJnj+9H
+	vQQpAkHZJLWuVQeW3/Q+dnNPwK0iZCHLtZh5RB6IjW9L7VqDpSoR1Z3e5L3ctzgQX44gzj
+	TpYT2Lwyz6vbUVd12Ys23u5fpg93vfw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Tejun Heo <tj@kernel.org>
+Cc: Qing Ming <a0yami@mailbox.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, Hao Luo <haoluo@google.com>, 
+	Yosry Ahmed <yosry@kernel.org>, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v2] cgroup/rstat: validate cpu before css_rstat_cpu()
+ access
+Message-ID: <agubZePrBmStHxhH@linux.dev>
+References: <20260515122952.59209-1-a0yami@mailbox.org>
+ <20260516070849.106141-1-a0yami@mailbox.org>
+ <64f59b64664f769661a8b8cd587c85f8@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,28 +50,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACd_6n29MeACfWpqK5jaSPOVK+q5yop+eeuO_Wk0M0E5Wr7ujw@mail.gmail.com>
+In-Reply-To: <64f59b64664f769661a8b8cd587c85f8@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, May 16, 2026 at 11:53:54PM -0400, Chao S wrote:
-> Not the freeze.  The WARN does not depend on q->limits, but on
-> ns->head->ms (read live at dispatch, set inside the freeze window) and
-> on REQ_INTEGRITY, never set for EXT_LBAS-non-PI.  capacity==0 only
-> gates submission (bio_check_eod()), not dispatch: a writeback bio that
-> passed bio_check_eod() under the old capacity sits on the task plug
-> holding no q_usage_counter ref, so it does not block the freeze;
-> blk_finish_plug() flushes it after the update committed head->ms != 0
-> (dmesg: the capacity-change line prints before the WARN).
+On Mon, May 18, 2026 at 09:36:36AM -1000, Tejun Heo wrote:
+> Hello,
+> 
+> > Qing Ming (1):
+> >   cgroup/rstat: validate cpu before css_rstat_cpu() access
+> 
+> Applied to cgroup/for-7.1-fixes.
+> 
+> In hindsight, we should have added a separate kfunc wrapper from the
+> start instead of tagging css_rstat_updated() with __bpf_kfunc directly,
+> which would have avoided the rename. Oh well, it is what it is.
 
-I'm also not what you mean about the task plug here. The plug list holds
-requests, which hold queue references. The plug does not hold bios. If
-you're not using a preallocated cached request, then the bio just gets
-stuck on "bio_queue_enter" until the freeze completes with the new
-limits, though it does proceed with potentially outdated assumtions.
-
-So I think the problem is that the early checks are done outside the
-queue entered context, and some of the following code depends on those
-checks being valid.
-
-My suggestion in the other reply isn't quite right for a couple reasons
-(partition handling and issues with nvme multipath path failure), so
-don't bother trying that.
+Is it frown upon to change the kfunc signature or remove __bpf_kfunc from a
+function? I am assuming we can but better not to, correct?
