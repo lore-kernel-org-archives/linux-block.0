@@ -1,67 +1,67 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AE53E3DAA
-	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 09:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E6A3E0754
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 09:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779095591; cv=none; b=Qd8kAA7KWYMx2bKoW3874jOZJy0y1nVyp7TZMLryzn8Qs9TpSZlj7o1QRtLupre4bT6IkukmVs6eEDWlFESsLb8s9GNy3z44Re/B1+sOtLGcYbOG5A20OjPxODBNLcLDkz5bFSaN8+GL2wcBu5cpS/0+ixh857ajMYv9rfHqDQw=
+	t=1779096284; cv=none; b=VISd0jgN2KxM0cuKJ4/e6YfB46+19IukX9He8+A2uN980x+VhdHmh/iJq0VQLMKVjiwrmrqoGCFdtNWyigaQjuUIe2kER8xaaHp1clgpjybNYwns9WQIpKqyPfug2c5IzIW1IVRO2LXlWzpbRALsLWrEiI4mc0wUjEU5hDB4SbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779095591; c=relaxed/simple;
-	bh=/W8E/uJT+njUZo+KbiayviEW8GF8DDjlc2Y8J9q3llA=;
+	s=arc-20240116; t=1779096284; c=relaxed/simple;
+	bh=aFahUNzTuRd9lUxR1CTcAQQJqOKmfE/dGIcc0XxoVMU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KD/G3OIr7IOKt30vml9zyKhMt1ncGbAyYkFxtBCevaWjRaKkYXpuT6IbmaSK0BZrFEx2cQztKTNNifeV9/vORz66t5YJPfkzS3ud833JBo4vEP8NeIIZUzYqbCxrNvFDUQjis2MXUev5SuvDTs9n2g6NmGUAsjqUsA2+9oWeJcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kJ3LMwfL; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=LcbGQpvp7Uei2RcRgFeDuUr2WXStsNdifZ6HUZDdZ2iyAjH+vNGBvSbsMb0Cc2eJz8c6zj6FSTRt6vm/Po+wy4T4p1HsQ6/tcxVnt/MY/T5tzKfBcPADmk2f5CY6+Y4TFsKmOWHN+XKhvVGjrAvCmWGbeypFd2ZRfJOZU5oqFcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AlgdSvCf; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJ3LMwfL"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-488b0046078so17753265e9.1
-        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 02:13:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlgdSvCf"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43fe62837baso1049143f8f.3
+        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 02:24:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779095589; x=1779700389; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779096281; x=1779701081; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xG/69Jp5I3ufceWw4+S4Fo/It8aPbBbD9UGvG/3mKFY=;
-        b=kJ3LMwfLwL6XVhhLsb1SGnpdIPkgtdx7c5aCOor9MszrVAOgWkZm3xdjWk+SpwPfO5
-         M/f7UB8N7uLp1FYlYsum4j7R/boSI6kOkz0g547XeuJZEqnLF2xmz+oQKkBskRA11eoT
-         0i7v6bXvmtOlabA2zcuSEFMODHUEvUQs0r/uENdTaKIeidz04Ye5OAkkPdPUaTdgNW4e
-         9+JbALJQwZ4woVn+OsXerhiZ8NxPOChI2tTDcQt7KzLAV4Hd6Gj7NYdS+Ey6XU0bR5rQ
-         0aXZ+PR/hgj/TxCFJKgGKhd0HjllXlzojeNw/N3haemcGtEo8vQNQmyp/Dc6DFv7rDqv
-         4Geg==
+        bh=8ZnntFD93TY8/+xleaPVExk6NAT6He9j34KXY+n97WI=;
+        b=AlgdSvCf0TRu9rJVleCHIzTcmD0GE+h3APf3VOfOZ1cbKpW6GubpjmhF4EwezjT5Vt
+         TFs148AA7KCfRr+bwmWp3MR9SeVp2uvP+/gyUY5RvFBzbx2+gE7bTh09tdzJtCLELo0Q
+         uYfcJCy9co8Wmd78W0TW+VrsKOeFaP4DATPE+fE0duTTx8VKUBBegBIstHdXyVNG/jLe
+         gR6QTjNp8CNjx8WObfme7ar4nvVxXSf7b8cPeyguI2sxfZRylKWUUlIDpwrd025MhsLo
+         CWCZpDS2CHpDJZUhf6x3MUl5XT6+wbbN2PUag9gYzY4dNJatC6vz777RWxanc9PlAtOi
+         IozQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779095589; x=1779700389;
+        d=1e100.net; s=20251104; t=1779096281; x=1779701081;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xG/69Jp5I3ufceWw4+S4Fo/It8aPbBbD9UGvG/3mKFY=;
-        b=Le+AXXgYeMxoHfuJCOY1YECKIckw9pnm/BWqQdQFJSePXJD9aGIoxmvzX6sqzVcBpz
-         KjZ8Ss1dSEW6nsBwwSXBfhLxkFC1i5g0bAvtIkGOnJIaR3Q2+vCvZYCMfr2hzwXkRN7x
-         tLaFxRdO+/QVXJ/sXDR1m8DHBrjNlSAHOexm+slkslJyJwTmrpQjCTPjfpiBcymT8L+m
-         4R//oOrcYYnnH83jtEjdLRs/ilpiCxchJmsbMtlOsHk4SvPS8c63Ns5PVZHu2JojmKGP
-         +qAwdM7WPrtg1fsUtwVpnBAEM+8icGkB7B2IbRdl30YfgikieuEbtxv+kizthiNzJALy
-         JL9Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+WWMxp8nmO5OAtPU+7CgF4lswGEvEVycJXTUyyMeGHmaEnUI1+Dlu8SE/XntwQa6hgxsOe81JfWdY6Yw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI4At3YONunc58Pwrr/W86QZvGwx8HUSUdoxCSpUXhmud52+xk
-	nc+axgm2DE0gXzt5Bdc779GYwWwz15yLmB4Zl6NU43kl1Vj08Lx5sL/L
-X-Gm-Gg: Acq92OEYvUybbLauo2GTWgneKRc3LdsbwYVlMnmxcHeYqmZRnbTZP+sseMROfNk5qYM
-	hymyAiqxleCQ1klzZAAQq/oZjUKwW7B/S5x5JvEb5luf68Kv8rN+yZv/JenkJRACRR2zXJ7YkBr
-	Gnpg3EDveJg92+l+4qhSRSmHH/qj9YTjhxppoc7XyXBh9ubtC5mlD4T7RvN9hU4tfoXwEw4GBkZ
-	DpmVN3sE/D89MPIahhoSf2w9+dMkmGmzABlnQYKGsaiMKFdgHO3lv3WqEIWsfBWjbVBOPY39uBa
-	a2YvxwFzxvnABaMGoCAWIofQ8gCgKsO/6noxW857lRAsF/erZF+IGjqIqE/UoZW70FcekiAnXB7
-	O4ogxjjwg5DbUl5DiHODTEKHtmpIFldL/9WA6ViWuhlUsr+R+6aU5Ml/lXHg5ikbcyU+ymIfskG
-	R/8Vb3srhYGXY99z6W8pWBWGCIf8Y2mJMwjkcs/h+MQ2t8r2rAJ1KmIN+7d6dqQFoKYr0j/okwU
-	jOdEBAYXcJ49F4ek//VVV2d9Ss+xA99SkKLAc4HulvPTJ3SDVnYFW+lRtc=
-X-Received: by 2002:a05:600c:1d0d:b0:489:1ff1:74df with SMTP id 5b1f17b1804b1-48fe5fcdf50mr205316035e9.1.1779095588623;
-        Mon, 18 May 2026 02:13:08 -0700 (PDT)
+        bh=8ZnntFD93TY8/+xleaPVExk6NAT6He9j34KXY+n97WI=;
+        b=mX3CAm3tKAcpui0VY7yC57MfJhFqRY5zJiVVjLJtwzYNhKoXkO+BjA0jqnxUuNCA/k
+         1Hwg6ZbOl1AVX0ITNxPTxNXgWWs0AQXs2fJ+YAhDGvvfSbWwKqbj8ZYmxGrevP2YNDLv
+         kF3D0f182dE5EimCmxrxSGEpXpLkjj3hyEbFQ3t12ISfa16XkWfBnxSXJEdDCzkOhRJG
+         0uFFyzHmVLDfOVwcRHMXLIYAfOjb780twbQ4tN/YIWmL/nT1VcLike0sfDIwUm6CiqGv
+         GqUoLd3IemOE5px++4EJx3UIMebkHtHGE++hmzKiZpai1ay1NnJbw8mvsE9ndH+TgQug
+         wLVg==
+X-Forwarded-Encrypted: i=1; AFNElJ+ShRrCG9MYsVopU18aGxWAlNUlKTlBPugASsorhovy9x4OsLZq6nGXxJ0qsyngY9Kr7C3WZXtTeccEPA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqeWVjsJDuTbbEvnyRPynuReQHbvQNWtorNl2Iu0x+AeeKInHW
+	A0ZCgVYFeUtOw9DmLvhzhNmrVcWI2KHzQBkkVv8ZQ6JKOxjSsAHLtMk2
+X-Gm-Gg: Acq92OFjzKTrj36pNkSyX2kFuvH6uxH4Tq1oSFdTmRsBfWIOJi5KSWq6EKrqKi+v68p
+	HMIrg2djd3lypC2eVj9mYQzrSVgD4GRyU+St/dJgZwpa/LrpLFX78Qja7PRtd5lWAeS5CuNfOAC
+	yuiWhx7YOsKpIkJlUUrlXXBlcpg9o5oPsv/307sbhqGmUvWKRp7evSYjJbrVAbUIDf4GUYpbNxI
+	PmzUnnVrNmeyGtKJ9l5uRf6SbymoSvziLptK6UJcb6eJQgd99OqlCnZHOvanGmEBDqyQMHIcq1v
+	wL5+U0lnilZvprwDdLVdZUvw0fpIehoxfXLEbOzQyNN0vlZlHcGh0n25rUChSRQviFHWFGmPpvc
+	3ciW2OSAKQPjehsU+1w4DLhr6EnD4+neLYFxwhrTdo0NRYtLoRdMDJ3ZmN10ZGzg81MewKHFkkJ
+	Q27e/R11OwTHeIRQBpnF6RViQGEFaVl3VrJSSadBmTIiFcYZhni8oqbu4J2qjKziAqWqlkL7Tyc
+	tZUiYW+kjNELCwGJKoN7Y7eSHOT1P6fwmJij/ZdJqkhhV4n3TU5DgyrR0Y=
+X-Received: by 2002:a05:6000:288c:b0:43b:962b:5314 with SMTP id ffacd0b85a97d-45e5c372a9cmr22814328f8f.19.1779096280750;
+        Mon, 18 May 2026 02:24:40 -0700 (PDT)
 Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:6e9b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da0fe13a7sm36837416f8f.29.2026.05.18.02.13.04
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45e6a135f0csm17325957f8f.27.2026.05.18.02.24.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 02:13:07 -0700 (PDT)
-Message-ID: <88576019-44fc-4614-9e89-a17478dbf340@gmail.com>
-Date: Mon, 18 May 2026 10:13:03 +0100
+        Mon, 18 May 2026 02:24:40 -0700 (PDT)
+Message-ID: <4b2f74e9-3225-47f6-85fe-911720030e35@gmail.com>
+Date: Mon, 18 May 2026 10:24:35 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,10 +69,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 06/10] block: forward create_dmabuf_token to drivers
-To: Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 02/10] iov_iter: add iterator type for dmabuf maps
+To: David Laight <david.laight.linux@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
  Christian Brauner <brauner@kernel.org>,
  Andrew Morton <akpm@linux-foundation.org>,
  Sumit Semwal <sumit.semwal@linaro.org>,
@@ -86,25 +87,50 @@ Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
  William Power <william.power@intel.com>, Phil Cayton
  <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
 References: <cover.1777475843.git.asml.silence@gmail.com>
- <559756c5e22dcfa183080a979de039910d1b896d.1777475843.git.asml.silence@gmail.com>
- <20260513082553.GB6461@lst.de>
+ <20a233d2f35274817aa643cc0fe113707eb47e72.1777475843.git.asml.silence@gmail.com>
+ <20260513110557.705bdeed@pumpkin> <20260513142909.03ae6c2b@pumpkin>
 Content-Language: en-US
 From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260513082553.GB6461@lst.de>
+In-Reply-To: <20260513142909.03ae6c2b@pumpkin>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/13/26 09:25, Christoph Hellwig wrote:
-> On Wed, Apr 29, 2026 at 04:25:52PM +0100, Pavel Begunkov wrote:
->> Add a trivial implementation of the create_dmabuf_token call for
->> block devices that forwards the call to a new blk-mq callback if it's
->> available.
+On 5/13/26 14:29, David Laight wrote:
+> On Wed, 13 May 2026 11:05:57 +0100
+> David Laight <david.laight.linux@gmail.com> wrote:
 > 
-> This should go into block_device_operations as there is nothing blk-mq
-> specific about this.  I.e. even if this patchset doesn't handle stacking
-> drivers yet, it should be easy enough to add them in the future.
+> ...
+>>> @@ -575,7 +575,8 @@ void iov_iter_advance(struct iov_iter *i, size_t size)
+>>>   {
+>>>   	if (unlikely(i->count < size))
+>>>   		size = i->count;
+>>> -	if (likely(iter_is_ubuf(i)) || unlikely(iov_iter_is_xarray(i))) {
+>>> +	if (likely(iter_is_ubuf(i)) || unlikely(iov_iter_is_xarray(i)) ||
+>>> +	    unlikely(iov_iter_is_dmabuf_map(i))) {
+>>
+>>
+>> Doesn't the extra check add more code to all the non-ubuf cases?
+>> This could be fixed by either making iter_type a bitmask (with one bit set)
 
-Ok
+Not going to do that. It was specifically converted from bitmask
+before, and the check optimisations like this were voiced back than.
+
+>> or writing an iter_is_one_of(i, ITER_xxx, ITER_yyy) define that uses
+>> '(1 << i->iter_type) & ((1 << ITER_xxx) | ...)'
+> 
+> This seems to DTRT:
+> 
+> #define _ITER_IS_ONE_OF(iter, t1, t2, t3, t4, t5, t6, t7, t8, ...) \
+>      ((1u << (iter)->iter_type) & ((1u << ITER_##t1) | (1u << ITER_##t2) | \
+>          (1u << ITER_##t3) | (1u << ITER_##t4) | (1u << ITER_##t5) | \
+>          (1u << ITER_##t6) | (1u << ITER_##t7) | (1u << ITER_##t8)))
+> #define ITER_IS_ONE_OF(iter, t, ...) \
+>      _ITER_IS_ONE_OF(iter, t, ## __VA_ARGS__, t, t, t, t, t, t, t)
+
+We definitely don't want that, using them directly would've been
+much cleaner.
+
+if (get_type_mask(i) & (TYPE1 | TYPE2)) ...
 
 -- 
 Pavel Begunkov
