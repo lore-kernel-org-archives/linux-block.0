@@ -1,66 +1,67 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E983EBF3B
-	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 10:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FFA3EEADD
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 10:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779100209; cv=none; b=qKfmJC6Cv8dDcJDdqeEQxrYk+8IcFVjiwi92aEKd5UgtjsfgHOPzPaVmfNQB9YZpx9IyKClgcQBm8C4Er1UC9Rje4EplI/ueP+P27mepgHb5wp+LoW8zhbTeQsWghEwUxvia7C0GkqJdatWZxH3aWCMM3ZdGMnAAbWXaUfZNck0=
+	t=1779100267; cv=none; b=ORYy8S++/HPw3RJTZY3sdpW1ELDf446+M/GNMp7O3ZBdTD3QCa3LHJ/KpuTlqyEy5z/HG439Oh0qjxtNOnrwa1EdS/NQNJ2Z7eTJlyFiI04HUrcNJpOlf3D8aF3KtUYhLwMr6S55NNd99Pdl1G+siatseUYf8q9VZ/aSpSkWjnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779100209; c=relaxed/simple;
-	bh=FbvAJUBaJSoNOddpm6KcOlO9qRGB7h6zbd7g73ujdLc=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=EzIe46M6tflUfhx3/bS6IL/rDVZ+AvO+RB+4bX6yFMSEkgithA9fQA8pP6pYC7ANU3fKLspyZQQLx4WwsP5aRIYcXOnyi3JLlvnwJFIvcyE5duzdxRWSKLUAYdub6mNE650fCJRxPCfOe7SqWI9yUpJh30nFzQ4AUymDEyx1QOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AJQ4iM0Y; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1779100267; c=relaxed/simple;
+	bh=uNvks5nLVhab845gPs8D4jnOry1W6hE6xPWWd9nU+CA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BotaLIzypSi4PcrauoH0PELKUNz20XOEXkJqtHbEe6JNPFMN9iUPSgR8UEZhv6/lgpVYA51YNxJTxkQMJkrimyYR9tB8uwRLz1XWXklkz/zZdlmp1DHt6UGFMdSh0F/pcWnvHNmiBzkTp/0Fj7FqUD7Fe5WmspxihPRs7z73WGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SFtHjJDu; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJQ4iM0Y"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4526a8170ceso831290f8f.2
-        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 03:29:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFtHjJDu"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-67da63ae541so4664217a12.0
+        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 03:31:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779100196; x=1779704996; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yBM/MqSlhfscJgewJTDJnR/WZOfF3ZaH9qUvK+mYr0I=;
-        b=AJQ4iM0Y3atulw0PqPF8op4PRnWpRVYOty/GNjhKqmtpas6RAxpBy+PRn9KMn1Wno2
-         qjZPw+EhhE0hOFeMi5Jmm2umUnXHc9uHE6Sc4jCIy8Ms4gDmWbAja3yDgp1f0sakvIzo
-         mND0MAlV95AGumFfzHSvL6fn/HmzZMpLelmMNL/OqSMvfJdhoE33lGksAXwRGKhpz9y3
-         MUxmm5rukKAQCGvtg3KEsHI7vG7ayeRK0NXm2lTRYxEUjs5WhyITg3Gsh7qemErQcLpo
-         H/MeM/3buitXkpHJfEHCNh+4Lx9a+L/jbz0S914lIrMYWChf5levhxDB0NWAD/C8QyT9
-         dHrA==
+        d=gmail.com; s=20251104; t=1779100257; x=1779705057; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hx27Zr2PfQkgYP6DocpvbcVC/5/Kjswu2b3jiJPzVQY=;
+        b=SFtHjJDu5+thx67ZQgSBSlnzrWP8St/IsgqvFJBv+8gm1ZrL2dyXiR9tOuiCjTHlxK
+         leC3X5LwO9ivz6GpTCXdCkORR5nUXpH3H7zydiX32uINNdws6VGv3HNPz767MpzZyFLv
+         CwtfM3jnULTNL8ABAm8hoRo8Gid93oQikbr8Xq08xamILO2ehZBd0oG56QxnAvJixFAt
+         w6azypF0dMLXHB6c7c0334C/m+OJ2yS/GGsT+E/iEqTBoTUUM1K96VkKyWLbFWOKggQK
+         i0EgO1KZSz8N0Ht7I8I199PJpHmud6anBnAwiAxTKU6aQqsnKb7fdI6vF+DEf3UPLiaQ
+         +FvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779100196; x=1779704996;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yBM/MqSlhfscJgewJTDJnR/WZOfF3ZaH9qUvK+mYr0I=;
-        b=YKqvxYHiQ7+PD243kpuD3R5XHJprNN5t0RH8n/WkPN2sxx1e2TC/4EahpgieBXYX8J
-         /JcbaGTN7E/tx9cHdf8YGiqGl9ateNhjmJXkaGjzP09RcKIXiRVLqPOSrVcUBsmUjhk2
-         0m7IR404npXvjJ/ey/80OjilHbYT2MHH1ip/yRBz28zvkTygAQlSoMnkx0QBRytcYL2u
-         adJWVXmMEKIIl96/DPJ/nyJpSyQvp4R+PUP5b8FwivX6qAprthaBmDVoL0WiXYEdLF3O
-         UJW1nxeqbZLtKwAocwC7GMoNCoqYsmoNF0g5xJLuCMchGZbrSVFQV41tb7F2uvjH8cbF
-         XPNg==
-X-Forwarded-Encrypted: i=1; AFNElJ9UBy0ltadoCXpLQuX4IULrILhOHPg6Iw1wStAaQXfWuseJaRcEpuQYuV7usnPrwdIiMz36ZV6hIHhATg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNTSEX8Ba0Z9vWi39vn5FhkVQoEo5STkOY+qYTszUS0ApX2wMN
-	MD0/os/rL6lIpHnNv6MPeauUzg+GB261fLd5UHjMGcDMw+1AX4Ik+esM
-X-Gm-Gg: Acq92OHVz3qcpBowFsapr96RBIDGlp0f1ERl6G3Tbae0xRhvBY6hGqaCwJgOb9ygpqp
-	acXxWohZVtvr4W4Ibfx2nr3XISi0yf/SPXK9NipkWVCzSG+oe85NRNZYKGejQBmbwhTL3zzQApf
-	moRAhk2mXZJ9p7GKjP9VMDxlFPeGBtuRFbIZyJ7Z7ih7oqysbzPg40Gd4ogq97VVru4fSArRSTD
-	rp/lKFid+NJnLb2lOXa84+K+/VLsALRItp4Gj08i9dohLHXq3GHgCTOx/ZMWurWdHPyeNVpd8vG
-	hqm8EVU+F/nQNLppVWBk6Us1+L4Y+Va8WcFGgCBrXGJaQGXM0yCN5JtJxSoBpFWaJPft/V434n/
-	yCzTxiDtDTc9c9NREjApeftpZf5v3REgkk/2pnjlGoZWIgLQcolTeucvJ618NHSVMs6ZMH3s79R
-	M3M7CwFdW7yQ+DYYgUCQKDH0U9sELtltznnlP6oe/owhUkFscSWcnsyVN9WC4XiiBaEHi2MCFqm
-	8aTaZdupbSFjXKktMp96ABHH5aNnNt/WrgQL4Ne9zyCN8UgjKqMM6whXBU=
-X-Received: by 2002:a5d:5885:0:b0:43c:f7e5:817b with SMTP id ffacd0b85a97d-45e5c5cc2b5mr22613508f8f.19.1779100196106;
-        Mon, 18 May 2026 03:29:56 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779100257; x=1779705057;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hx27Zr2PfQkgYP6DocpvbcVC/5/Kjswu2b3jiJPzVQY=;
+        b=aZfszWCiX/nNbznu0RvzL7iu5sjw4elw6dzHUgsAaZ+JgYDKiIa4Xszf+UgWsQ6Nvw
+         NL9DfK9b5JSitPzoaySPeqXTY/MGyfDIJNTq+empU8DhSozM6Qx+P7xu11izOWQPa+Yh
+         VG/+3lN23I7CONSPhaGtCJw4/RrVgMt5wze0BZo34kNkNHMWfvit1glh3smJhIoxReUT
+         7US/yamr+S5PwQjaS/aeOgl/9tW/N0hg8Jqzl+PuLv2TId5NM1T33ZFm6ApmLkyhGD+Y
+         JehXaf1bD3TfDlaNuKKDkexScgCOhLVJn7Aw1+s+xYMMV26NmOl8K/3TrkS+VYlwxtfE
+         VIVQ==
+X-Forwarded-Encrypted: i=1; AFNElJ880o2DBvkuR18dzcgzvk0e3Q3SMFrvFYzJ2nDK6bEVCAFMjn/wvUaeEMSapOq4j1SN8P1nmzHlrW5mvg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZgkIu7SiwQfPPrUVqodGDkfUhYITjuDhGKo/mUzcWiKeryTRw
+	XohLMYL5/xUtjqZmGbzXJ032x3WsTS1uJA0swW+ey3pUqPvo3oMLnqxV
+X-Gm-Gg: Acq92OFxGDFuREUbtoV7jMM3Ph7yjjlxAnpDyCQbPcoKInjT+UwGjPr7S+GHmDqvu4F
+	CZfSvWj+EDgwrQfRNRFYNUbMBJW0Rj0k/lpfqYEwYCDwBjlklLYo/vUin/E0HAI6dWaif7UaxwP
+	939XSaLW42zNr8hDD43R9N6fzKdGaqJMm2yTBw9I5Qhc3y7BtGvILX25u/EmKiz5dNBxLAl60bv
+	xX1CoaHH562XvM0kHpdQxjWWavgj9COkX2f1kA/azuemb1zDSp1CYstKzb/ebc7fWpgy2s4Xm52
+	mRGKgwfevnKlohaM9DGO+PCykc/InOo1hB3mcMOszRP8RRQ45OaA+KOQLMXKEAXEDgPZGkdXZFG
+	oN7qw7irlF2KLeAMimcPh5eyvuVFqTHCETI9LWWyd1Kcgc6kyWoUORTQ4BUvj0kXX3ohGtAu6Gs
+	bE1oenIxp53oGM3mvCw3F+1EE5V0lk31tkl7rxoevom5xD5OcJGIvhz5SuBOwaKbSZTIH7jsmJs
+	SZBtCL2pJyC/o0gLS0W74yUxCa3zpwUr0kcjSVjBhajVOSEHykViVcvaWM=
+X-Received: by 2002:a17:907:1c0d:b0:bd2:bd3:1ef8 with SMTP id a640c23a62f3a-bd517a99797mr714341866b.35.1779100257041;
+        Mon, 18 May 2026 03:30:57 -0700 (PDT)
 Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:ec20])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a6454sm36537426f8f.34.2026.05.18.03.29.54
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4e4d54dsm542055466b.47.2026.05.18.03.30.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 03:29:55 -0700 (PDT)
-Message-ID: <24833f76-2289-4859-86d1-9215b11a1258@gmail.com>
-Date: Mon, 18 May 2026 11:29:54 +0100
+        Mon, 18 May 2026 03:30:56 -0700 (PDT)
+Message-ID: <574f42cf-0d72-437a-8eba-fd970011e206@gmail.com>
+Date: Mon, 18 May 2026 11:30:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,9 +69,9 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: [PATCH v3 04/10] block: introduce dma map backed bio type
-To: Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 07/10] nvme-pci: implement dma_token backed requests
+To: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>,
+ Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
  Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
  Christian Brauner <brauner@kernel.org>,
@@ -82,146 +83,34 @@ Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
  io-uring@vger.kernel.org, linux-media@vger.kernel.org,
  dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
  Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
- William Power <william.power@intel.com>, Phil Cayton
- <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+ Jason Gunthorpe <jgg@nvidia.com>
 References: <cover.1777475843.git.asml.silence@gmail.com>
- <646ecd6fde8d9e146cb051efb514deb27ce3883e.1777475843.git.asml.silence@gmail.com>
- <20260513081929.GD5477@lst.de>
+ <5cecb1157ab784f9f303a91449fdf11b03aa6002.1777475843.git.asml.silence@gmail.com>
+ <20260513083817.GC6461@lst.de>
+ <CGME20260518092930epcas5p30d3b49f26efa5969ddcdb15351a886f3@epcas5p3.samsung.com>
+ <50ed7240-d8d3-4816-bcc9-ce8adbbbf841@gmail.com>
+ <f9e04625-50c6-4fa9-8b12-76496e29f10c@samsung.com>
 Content-Language: en-US
-In-Reply-To: <20260513081929.GD5477@lst.de>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <f9e04625-50c6-4fa9-8b12-76496e29f10c@samsung.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/13/26 09:19, Christoph Hellwig wrote:
->> +	if (!bio_flagged(bio_src, BIO_DMABUF_MAP)) {
->> +		bio->bi_io_vec = bio_src->bi_io_vec;
->> +	} else {
->> +		bio->dmabuf_map = bio_src->dmabuf_map;
->> +		bio_set_flag(bio, BIO_DMABUF_MAP);
->> +	}
+On 5/18/26 11:18, Anuj Gupta/Anuj Gupta wrote:
+> On 5/18/2026 2:59 PM, Pavel Begunkov wrote:
+>>> FYI, I really want SGL support before this get merged, but ignoring that
+>>> for now:
+>>
+>> I was hoping to let Samsung guys to send a follow up they already have,
+>> but I'll ask them to have about taking it into this patch set.
 > 
-> This is backwards, please avoid pointless negations:
-
-I can flip it, but compilers tend to prefer the true branch. E.g. this
-
-if (cond) A; else B;
-C;
-
-can get compiled into:
-
-jmpcc cond B
-A: ...
-C:
-return;
-B: ...
-jmp C;
-  
-
+> I had done patches on top of v3 adding SGL support and PRP list reuse
+> optimization for the dmabuf path.
+> Branch: https://github.com/SamsungDS/linux/commits/rw-dmabuf-v3-nvme-opt/
 > 
-> 	if (bio_flagged(bio_src, BIO_DMABUF_MAP)) {
-> 		bio->dmabuf_map = bio_src->dmabuf_map;
-> 		bio_set_flag(bio, BIO_DMABUF_MAP);
-> 	} else {
-> 		bio->bi_io_vec = bio_src->bi_io_vec;
-> 	}
-> 
->> +	if (bio_flagged(bio, BIO_DMABUF_MAP)) {
->> +		nsegs = 1;
->> +
->> +		if ((bio->bi_iter.bi_bvec_done & lim->dma_alignment) ||
->> +		    (bio->bi_iter.bi_size & len_align_mask))
->> +			return -EINVAL;
->> +		if (bio->bi_iter.bi_size > max_bytes) {
->> +			bytes = max_bytes;
->> +			goto split;
->> +		}
-> 
-> Please add a comment explaining why nsegs is always 1 here.
+> Also pasting the SGL patch here for quick reference:
 
-
-
-> 
->> @@ -424,7 +424,8 @@ static inline struct bio *__bio_split_to_limits(struct bio *bio,
->>   	switch (bio_op(bio)) {
->>   	case REQ_OP_READ:
->>   	case REQ_OP_WRITE:
->> -		if (bio_may_need_split(bio, lim))
->> +		if (bio_may_need_split(bio, lim) ||
->> +		    bio_flagged(bio, BIO_DMABUF_MAP))
->>   			return bio_split_rw(bio, lim, nr_segs);
-> 
-> The BIO_DMABUF_MAP check should go into bio_may_need_split.
-
-Ok
->> +static inline void bio_advance_iter_dmabuf_map(struct bvec_iter *iter,
->> +					       unsigned int bytes)
->> +{
->> +	iter->bi_bvec_done += bytes;
->> +	iter->bi_size -= bytes;
->> +}
->> +
->>   static inline void bio_advance_iter(const struct bio *bio,
->>   				    struct bvec_iter *iter, unsigned int bytes)
->>   {
->>   	iter->bi_sector += bytes >> 9;
->>   
->> -	if (bio_no_advance_iter(bio))
->> +	if (bio_no_advance_iter(bio)) {
->>   		iter->bi_size -= bytes;
->> -	else
->> +	} else if (bio_flagged(bio, BIO_DMABUF_MAP)) {
->> +		bio_advance_iter_dmabuf_map(iter, bytes);
-> 
-> This is a bit of a mess.  You're using bi_bvec_done for something that
-> is not bvec_done, which makes the naming very confusing.  That is even
-> more confusing than the existing usage, which isn't great.  Also we
-> add yet another conditional to heavily inlined code.  I'd suggest
-> the following:
-> 
->   - add a prep patch to rename bi_bvec_done to bi_offset, as even for
->     the existing usage it is the offset into the current bio_vec as
->     much as it is the count of byes done, as those must be the same
->     and it is used both ways
->   - add a prep patch to also increase bi_offset for bio_no_advance_iter.
->     It is not actually use there, but incrementing it is harmless and
->     this will avoid a new special case
->   - please also documet this new usage in the commet in struct bvec_iter.
->   - then just add the dma buf mapping to the bio_no_advance_iter condition
-
-I'll take a look
-
->   - figure out what to do about dm_bio_rewind_iter, which pokes into these
->     things that really should be block layer internal
-
-Need to check what that is, but doesn't implement the interface and
-is not supposed to ever see the dmabuf iterator.
-
->>   }
->> @@ -391,7 +403,7 @@ static inline void bio_wouldblock_error(struct bio *bio)
->>    */
->>   static inline int bio_iov_vecs_to_alloc(struct iov_iter *iter, int max_segs)
->>   {
->> -	if (iov_iter_is_bvec(iter))
->> +	if (iov_iter_is_bvec(iter) || iov_iter_is_dmabuf_map(iter))
->>   		return 0;
->>   	return iov_iter_npages(iter, max_segs);
->>   }
-> 
-> Please update the comment for this helper.
-> 
->> @@ -322,6 +327,7 @@ enum {
->>   	BIO_REMAPPED,
->>   	BIO_ZONE_WRITE_PLUGGING, /* bio handled through zone write plugging */
->>   	BIO_EMULATES_ZONE_APPEND, /* bio emulates a zone append operation */
->> +	BIO_DMABUF_MAP, /* Using premmaped dma buffers */
-> 
-> Shouldn't this be a REQ_ flag as we should never mix and match bios with
-> and without this flag in a single request?
-
-Do you mean adding both and propagating it from bio to req? submit_bio()
-takes a bio, so we still need to set it there before it reaches blk-mq.
-And there might be bio-based drivers using it in the future.
+Thanks Anuj!
 
 -- 
 Pavel Begunkov
