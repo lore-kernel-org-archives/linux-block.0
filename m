@@ -1,130 +1,108 @@
-Received: from va-1-115.ptr.blmpb.com (va-1-115.ptr.blmpb.com [209.127.230.115])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437363D0926
-	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 08:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0573E51D2
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 09:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779093137; cv=none; b=nkaedG4ku8maOfTP/2d2YK1g1JgL3e2GuEFtxxXg1+28lSHGgK+A/jARBSzj+UjsOkLvY5gpbS4nKey7zISMaDTQ9Li/VxV1xJdXxiCn4V+qNQUhzUjQhV7ZugoDwSr1Y+uhUkK9/nLUOpLavfHbBpRhgnIVT94Ru63S+JVa+nQ=
+	t=1779095429; cv=none; b=aCkKO7oNj4OJ+QJb+V9i2rWRWt4I9GRTQ8vR63Z6OgUEHyILOJdRpLSvOnjfqC5LFwAuc9kZOVqBNBTx+Sxvugj1zhPhLyjiNmQMLCY3XBS+zT662edzvfG+6CdgEkZ+pvkxZs2Rvl+TKqVUtDgog61/SBSS2TzTqrNlF7qlmg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779093137; c=relaxed/simple;
-	bh=Caoz15xueDbeL9nAkqBm7PpGrwSJjsT7uulOTHKxrcc=;
-	h=Subject:Mime-Version:References:In-Reply-To:Content-Type:Date:To:
-	 Cc:From:Message-Id; b=YLeYE2ft58u12NMgEuK2VcUY6Eb1kbnLqWJ6voFNxcQ+hFCZdwg60iFdaiedxPoN0+bQhL0TDb0LZNlCKLfFI8l2xkO2U+p6edTweYwim/C01dq0L39Y0jpa6vCiFpdBkPyO69fxiXdFgnjUCxJl9mmN4liNQv2xm5ngPgSaNPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QBhzScvu; arc=none smtp.client-ip=209.127.230.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1779095429; c=relaxed/simple;
+	bh=JDf5tfG8fpD06t7iMggta6QbZxhroHbPF6Ww351Aud0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=T3mqj2z4GxwSbU7sikPNq2RymayOwpYNhvSmWLKQftsCh4/AaGtBV49nLChbU31G1iBZrt2poN4BrAeQAoBUNRHGZF5yakuduaa7M/hZv6RYp22a+iwXNjAMUZ3RfbxugwnApz4Ax+EVuA2/LsvoDmCxf59aqtTPl0YkDrpqFJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TJPAkrMm; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QBhzScvu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=2212171451; d=bytedance.com; t=1779093123; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=Caoz15xueDbeL9nAkqBm7PpGrwSJjsT7uulOTHKxrcc=;
- b=QBhzScvubHMFL38iIlrDy6dEqTcmSGzYZon1eZb1FoZ6l7d8Anwf0eXoR9sLNjiajs4tIh
- QJKNTZUZEh4q1Jhnqg+8JYXepSqri2E0sC1jxNV+fVw42JpSGmt6nYk8bYkwH1Yg1rN0cq
- UdS7Mu2Wzr0Cli5b4XwZ/UMPOGRV24ES4nssJBb6qaiG3pVTrTBAhZ0qknKsPvf6DOfKug
- 7v4gw38u2jl9tG9GFufbzTjipdqiLI47h45dimHz8cU+88q5/3AUHXwa6XsZ9a0KZc1U+g
- Zzg1WN3Fan5CNKhvFux6Aykgz6gIRUaVPLARglxit4aTpnH+wEw3LyI1yUXzuQ==
-Subject: Re: [PATCH] block: fix pages array leak in bio_map_user_iov error path
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TJPAkrMm"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-67bc8609a9bso4350065a12.0
+        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 02:10:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779095426; x=1779700226; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NK6QaM0AvluQNq8GVPqTX/wBbD7FgigoEBmBlLT11LA=;
+        b=TJPAkrMmxASGuDLSpftlKK9PV2MtAwT6+7Zl98Vv1r8yDlfkDFF/T+xJ88LhrcItVy
+         ogY/zfhZ2Xnl5jlrZIb6sM4Mz3XxcicP7OiNGHUStVms8Gwjd5P8+TT6NAfBi73t5hZg
+         0RQzv0FBgIFWDCSXCa+GlKsUl4aracaro5yu0WDXS0VvvSedi6zLP0ZXeFy0w52LN7k8
+         XipxwpaOI/gdIFepZD0M2KQT9zlG3SAeoBBPX89ZVnTj0/aWa+P3LiXCRjYEu+4pc9c9
+         vZ0R9gPdyLql3qAx7QemfDa+q25ncNE+TNIhhkPPbjwsPksLMjMxFooK9aFjxvyUC/I+
+         Ombg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779095426; x=1779700226;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NK6QaM0AvluQNq8GVPqTX/wBbD7FgigoEBmBlLT11LA=;
+        b=e20Etwo6kR5m/Tlf7NyuflhUiTPBmRc5P75JUSAuwZ8OM07aWiA2zekDllq+iYXcTE
+         mSd+2l7GmpfBuyJ8UVIeSQ/fLqozYU9MT0hWLYQwkLXCRLY93BmAZoJIWXiMDTUZYtig
+         ZGUtJMTmFPMnkOhDRyG/OHagR/TARQzlkE3nhciFT/2qKiU7au+IlXzBrr1C15TDAHHW
+         uU5UOTvqnGJrJj4hNPayRDlm4DI9H8wYPdSm5AfuSjyA1Pbv5wJuYs88qBArAKaTQmN3
+         tSQNLr8NHhli5LUnCYhaGXlbMkGFB2f8q0B+7pdluZZD00nNwS3udh6BEqX7ZnjpWnyQ
+         rxBA==
+X-Forwarded-Encrypted: i=1; AFNElJ9+WK7cWRukAwQbcqwB64BGeyKbLuosJqV423+vdGe8+lMzIDDmEM94fFmdTROVXbQcV+9EC+zGb1ubiw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRH4k6+y5VHIUJUzNwQYG/rSlwpfwhWHlQYZafSHbdXCVjIUsv
+	P4rSDzuRUCTowh2G/jSU1qMIersLsu8AQxWUUw+E3oxjfNauf/SvTfb0
+X-Gm-Gg: Acq92OFsquGAZvk1ZzXNvR0h5hjWGDJZDhF5AQl+6Kio8GUIXjqtcgLZqo61mPwGkEo
+	PdPeuXiGcBtygCxXUR9AIPi+0pwiOwGgEunDYu9aZRDbAE4w31XSkSY50XKyj8tVA91wmWwY1UC
+	dwoCgP6jflH/HRz07tk9qeOvfO6eRB1eN2NIIMJgZ5V0BdkIhS2vdlJpkJMPct+HWe+HFcqYdTm
+	igZ1hq4HrRtWTqrxI/YrwoSCQz9vtliKQP2bBKeMb1VvkioAF0oflasg4hMGOj5y1yRtHGDjcPK
+	eYQgZLVrx1GLsjCEFp0RloP2eZVOGR6Rzly5TgBSaKEiCkmZ5g3lHfJaFGVMTKNo7t0+UlV/sa8
+	vmz1REB3PY2SSZk7Rk92gJam3rrWrxi1tp0GcSS6qZP94T43CFIjM/L1q4YIwqLxnZrVHsRx8tG
+	pOGQmqoWIZ94SU6PQnJOzsB/JsLex1h8OO06sdCHJldiOZYxUtXnpz8C6E6T1Q1X6qKJIe0mIXJ
+	iFUTnny6oONRT2q+FjUtqalRmeBSR4xWeVbLnclU5PYVQ+vM1tDeQG0h+r3IRATecp1Pg==
+X-Received: by 2002:a05:6402:4150:b0:67e:153e:51cb with SMTP id 4fb4d7f45d1cf-683bcd9e33amr6611396a12.16.1779095426574;
+        Mon, 18 May 2026 02:10:26 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:6e9b])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68310b4069dsm4929655a12.1.2026.05.18.02.10.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 May 2026 02:10:25 -0700 (PDT)
+Message-ID: <d14967a9-979d-428e-8190-6a756da1c130@gmail.com>
+Date: Mon, 18 May 2026 10:10:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260509040119.1116544-1-yinxin.x@bytedance.com>
-In-Reply-To: <20260509040119.1116544-1-yinxin.x@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 May 2026 16:31:57 +0800
-To: "Jens Axboe" <axboe@kernel.dk>, "dhowells" <dhowells@redhat.com>
-Cc: "linux-block" <linux-block@vger.kernel.org>, 
-	"linux-kernel" <linux-kernel@vger.kernel.org>, 
-	"stable" <stable@vger.kernel.org>
-From: =?utf-8?q?=E5=B0=B9=E6=AC=A3?= <yinxin.x@bytedance.com>
-X-Lms-Return-Path: <lba+16a0ace81+6fb701+vger.kernel.org+yinxin.x@bytedance.com>
-Message-Id: <b0a5d388d0b2cb320744535d7f9d8f59e469aa88.58c4717d.1c34.424e.88d9.43d76ef83dce@bytedance.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Pavel Begunkov <asml.silence@gmail.com>
+Subject: Re: [PATCH v3 03/10] block: move bvec init into __bio_clone
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ Nitesh Shetty <nj.shetty@samsung.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+References: <cover.1777475843.git.asml.silence@gmail.com>
+ <43a91f54d61d3329316e40c69ace781b4d35fe0b.1777475843.git.asml.silence@gmail.com>
+ <20260513081238.GC5477@lst.de>
+Content-Language: en-US
+In-Reply-To: <20260513081238.GC5477@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 5/13/26 09:12, Christoph Hellwig wrote:
+> On Wed, Apr 29, 2026 at 04:25:49PM +0100, Pavel Begunkov wrote:
+>> To quote Cristoph: "Historically __bio_clone itself does not clone the
 
-> From: "Xin Yin"<yinxin.x@bytedance.com>
-> Date:=C2=A0 Sat, May 9, 2026, 12:23
-> Subject:=C2=A0 [PATCH] block: fix pages array leak in bio_map_user_iov er=
-ror path
-> To: <axboe@kernel.dk>, <dhowells@redhat.com>
-> Cc: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Xin Y=
-in"<yinxin.x@bytedance.com>, <stable@vger.kernel.org>
-> In bio_map_user_iov(), when iov_iter_extract_pages() is called with pages
-> set to NULL (because nr_vecs > UIO_FASTIOV), want_pages_array() internall=
-y
-> allocates a pages array via kvmalloc_array(). If iov_iter_extract_pages()
-> subsequently returns bytes <=3D 0 (e.g., due to pin_user_pages_fast()
-> failure), the code jumps to out_unmap without freeing the dynamically
-> allocated pages array, causing a memory leak detectable by kmemleak.
->=C2=A0
-> This can be triggered from userspace by issuing an SG_IO v4 ioctl on a
-> bsg device with a large din_xfer_len and an invalid din_xferp (mapped
-> PROT_NONE), which causes pin_user_pages_fast() to fail after the pages
-> array has already been allocated by want_pages_array().
->=C2=A0
-> The kmemleak backtrace looks like:
->=C2=A0
-> =C2=A0 unreferenced object 0xffff... (size 2048):
-> =C2=A0 =C2=A0 backtrace (crc 0):
-> =C2=A0 =C2=A0 =C2=A0 kvmalloc_node+0x...
-> =C2=A0 =C2=A0 =C2=A0 want_pages_array+0x...
-> =C2=A0 =C2=A0 =C2=A0 iov_iter_extract_pages+0x...
-> =C2=A0 =C2=A0 =C2=A0 bio_map_user_iov+0x...
-> =C2=A0 =C2=A0 =C2=A0 blk_rq_map_user_iov+0x...
-> =C2=A0 =C2=A0 =C2=A0 blk_rq_map_user+0x...
-> =C2=A0 =C2=A0 =C2=A0 bsg_transport_sg_io_fn+0x...
->=C2=A0
-> Fix this by freeing the dynamically allocated pages array (when it
-> differs from the on-stack stack_pages) before jumping to the error path.
->=C2=A0
-> Fixes: 403b6fb8dac1 ("block: convert bio_map_user_iov to use iov_iter_ext=
-ract_pages")
-> Cc: stable@vger.kernel.org # 6.5+
-> Signed-off-by: Xin Yin <yinxin.x@bytedance.com>
-> ---
-> =C2=A0block/blk-map.c | 2 ++
-> =C2=A01 file changed, 2 insertions(+)
->=C2=A0
-> diff --git a/block/blk-map.c b/block/blk-map.c
-> index 0aadbaf7a9ddd..5b9f14caad4f9 100644
-> --- a/block/blk-map.c
-> +++ b/block/blk-map.c
-> @@ -304,6 +304,8 @@ static int bio_map_user_iov(struct request *rq, struc=
-t iov_iter *iter,
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bytes =3D i=
-ov_iter_extract_pages(iter, &pages, LONG_MAX,
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 nr_vecs, extraction_flags, &offs);
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikel=
-y(bytes <=3D 0)) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0if (pages !=3D stack_pages)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0kvfree(pages);
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0ret =3D bytes ? bytes : -EFAULT;
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0goto out_unmap;
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> --=C2=A0
-> 2.20.1
->
-Hi Jens
+Sorry for late replies
 
-Gentle ping on this patch.
+> It's Christoph.
 
-This patch fixes a memory leak in bio_map_user_iov() that only affects
-stable kernels (6.5+) carrying commit 403b6fb8dac1. Mainline resolved
-this through a later refactoring that removed the affected code path
-entirely, so there is no upstream commit to backport.
+Oops, typo, sorry for that
 
-Could this be picked up for 6.6.y?
+-- 
+Pavel Begunkov
 
-Thanks,
-Xin Yin
