@@ -1,67 +1,68 @@
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6519548166D
-	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 13:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77653481238
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 13:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779111112; cv=none; b=fjOS2vTS8DHM9el7QipQ6C/4HC364pZq4lfkyZIAoW5Ln5Z4jbDiEKqzl71OMKByHIzI54HaHKqGYPEkJEdo/zNdn3D/OowXCqImfoCMMFdG5in8HsEIkP1O11xHZMxWPTAgMSvyjqyjpFpBALrS1uzwWW4Saxjv85588Jp3Qac=
+	t=1779112800; cv=none; b=kGs3K6VobfBacLsHmYOFCSanyFpUp2AQGflQsh8iSBUkDhrn+BGnEYnF3YBEeXUCm4l5VbmmQWMh7cAeCLTjo/Icxbo07hodJudx/LT+5Qpu8kLiZqrxNPsiK9dMdqsvvh1B2RxYlGacMaHhcWVb6fXn9jWQBNT5oaluXx7h3JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779111112; c=relaxed/simple;
-	bh=zZMMxqnny3cHOAYYaD4CNuMlxW/kWQlIMc0SJFkrcrI=;
+	s=arc-20240116; t=1779112800; c=relaxed/simple;
+	bh=MXTgLfPj/f1h325rq7FWLxCdh3CeoPcDyvJ5aI3aWzQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oq9xmi1YeS7IbUuWy686b4qXxRRD0rsdtgu8LHNPUHPevKypFoWMLGcaLWzTa4cx2UKQOBhlZKB7p6+ry19V6lB2qTLiDPN1aklV+/FErYjLtumQHsBryWL+dz3+UyJ3bYIaAQ0VGdS+JCVI3wgH92P8qBv6exqyY3Q2SL8cwTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=PEd+Cxwo; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=n/BoOFEXdBnv7qVQ+iczN2UgYLihbzdPSIqpQ1WlJaQdRTLm5ntYsRg0FnkdFHqy6tMHeCmbRE+B48GQxonVzwbrC7ttkb6o//r6n3DcoNAVbfbTswzo4V/fCMBYZJINhbbEOgIzZzvvSNWPW6sFGv47YhX8rjZpcxxepJZ6OKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOOc+c5J; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="PEd+Cxwo"
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-40423dbe98bso977202fac.2
-        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 06:31:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOOc+c5J"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-67b32c695efso7118976a12.1
+        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 06:59:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779111109; x=1779715909; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779112797; x=1779717597; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IqJ8roRy607EAYQ6vvcN1sGfcnFbnV79s0MYTtuprjg=;
-        b=PEd+CxwojKFnxSYAYdk0NFy5VCq1fBhSN3f2T8LTe1ePEqiz1At25mPS50VltoJ0bP
-         lcTwa1E4qQAF1DqeYdA630K8nPRBnrCXJT8qWjPZpTnpjGJdaR1EKdUWwW5um5p+y7pb
-         U2B/cHoQ1+LVsGoFOu8eXMlzVt88fozYbiNmxFfOs59Q/cpoDWutmQSVvbo3MI13Cuef
-         3zTbtWsT1cSePDTzXTpwfvPhcFxszbENRQxXkbfLf0aENS5hx5fnGwgqNXh/fxzmDlYg
-         3oYQQaloxWWs01ZggqI1uQjAvmFVykFtwYFtTzd289YGWpt5fv1pXT8ztK6ZSFOP+ney
-         1jKA==
+        bh=+WT00WHtAu4WqCgP+skKdKZ8K4Rq+JbbmW7SvyUtdIs=;
+        b=OOOc+c5JDZpSmhka23oYEOg+ROkjXJVULMzl2HVHv64Ntjq7Dh8Yd7RWeENxZo9ps5
+         KZUQpoIuFMqYgZJmDwjQxwB9VWa7YEtiEWSD1JL3PWwpiwM+iGAcC9vmq8YL+1ZFZcnk
+         Pw7BriH8opyUYq0yCxYVdVr4gRcncSEPsnVSvWEQTvF3Gm3bMk1b44T8BMKI9eX9k7Wh
+         kk2zXj+9okLSUDZ1fQx0DR9R826qiAdQVWZvZbkPFV6XY3r/jAiok7Jt+DEyvjUZCL3C
+         JI8b1ADQtCWzvtZQ+TMmSzNjjvGM5O4y9DKH7WJ0ngBwdJT37RxaXUC/saca5NI91v7m
+         2kkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779111109; x=1779715909;
+        d=1e100.net; s=20251104; t=1779112797; x=1779717597;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IqJ8roRy607EAYQ6vvcN1sGfcnFbnV79s0MYTtuprjg=;
-        b=NfXihAduoqQYr0JrOzFrOuRewK8lbJ+G5QmQwo1SgcLaJUQ1mWERJUqZEaJLu6qkgv
-         bTN2jch0PyECC3AOSi+S+KU3eiDXIIUfr/2zqqUfnEk7P9DlEZk7Nxpe0w28Xl/IvAhB
-         jWzQTS0tF5iABlBCJzqMJeu1ZnTFbkc0ngIAcgYRovBrRtV0vRpCp5EAE8SuYFFEYkJa
-         qbJwPLD3d7rNQKn+/9urvttMPln7S/reESTc32A06+YWcfHLMzp1VT7Bg4x4ZUVKTFz2
-         /z1ClMuzQ4yP128iKAZYQvzURInszpfOshRTOaR4HqVYZ2/hOsWWcgft+SCntN5HZnwj
-         9V0A==
-X-Forwarded-Encrypted: i=1; AFNElJ/VaEWZmV9O/CEEFC6BFYKbWTI5ewHGnfUJjyX09/RNKAzkUWFTWaXTZ1yUUu0zSO8g1tGLPosMwTLKPw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWPfiGPLUAPeljrdLxdSTloWqiTKq36DCsR1tExpS1CS1l1sq1
-	1pUbA+tMPC0oExGXfq7GYITZYadC7q8u3FevUaAsoqOx77KinGNqM6VeVcFs5qEPFa8=
-X-Gm-Gg: Acq92OGiZL9vRxWOkWSAeIbv7DMdQZTBuRvmQ4qVx5/dMsxOMaLowkpbGsaAukCafO6
-	HnirPIG06Zw1bgJR36en+VmyEWlyESzDHPNattvoK+Zh/3YptyEif4PZwu1xF2PH+f4hw+skCGG
-	tLCmaUkF6AlXc67wolR7Xxa+3GeMBHdZC5cPK1SUBmCcRj/tj15ByP5XzTEC52+8l8zTy2sdnp1
-	WSUMc7t1Q9o56e2FLJUtUfVeaEPqvxlp6lg1GVkzdgMtVcuCFc2vURitPObeH22fS78wC+0VTgl
-	rY2wtrAQVFGDaiLDLXBN2exeMONLyDvCMlghgY89ltD3onfMBgQzl6iCl/0OdGGNP/bJwIq+4rR
-	6gYkDTT7ECBEZKjUyXqDqWCVz0+ibS/sD937p66XOuCq77dzwFr7L0riqnzxN7yLYwS5qJgb5uK
-	EqeXXgEDEjJ3Fmrr6tuOueUHsj/tjuBmqwGGEpp3k2t80EKeH9DxhSUTfyPEkB9auUfgX4pJPsx
-	JORtjyJtx4gmMikmIc=
-X-Received: by 2002:a05:6870:4e8c:b0:42c:b844:a8a4 with SMTP id 586e51a60fabf-43a2da1c5f3mr8755914fac.15.1779111108749;
-        Mon, 18 May 2026 06:31:48 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43a946f3b20sm3944430fac.0.2026.05.18.06.31.46
+        bh=+WT00WHtAu4WqCgP+skKdKZ8K4Rq+JbbmW7SvyUtdIs=;
+        b=SAZDiDO41jAigp1WS9wuSZtJQpW4VxEnUbBltKHQ7WYGOotgmzpokpy4G/krELaBgP
+         kTpXLR6GNVMB4gda7sHsecTXvwMptWKmapxsOcWZDuorTgnufGyRGtUess7jXeAc/Ybm
+         jyzT7/F4SIMPgLyc2Ogqsqz7gbsbp+vJPD0iJ7BqWDNN+/scQy44C+5EsODhj+5XDo82
+         BNbTiHEYFGY4EliWH5xDTSetwU6P3FsImcK+W+2CAfsWRewaDvDAcQa+PVK3kdEzqNa7
+         aMjIGjW32pKMXLTrRb70QWuJuDpOebkvuk2S+izX4bXuMkfGdrHWUBmd0NfYxaSCEWJ1
+         ForQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+UR4e0QjmyFBWxoc2NAUF0wiqVqndvwIpzUHOOWBSMgUu/R6AlTIfojKyZoC4YtYdKY+Fh8MYFAswoOQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL1xPmo8TWfXyDJ1ExBVHKsgusBWKG0p915X0xAFK0+TmqXVrE
+	v7ZbcifVxNQogo3P8SUp/AFGuWyysOZl8gVh1rk9ipYU7L8e7fjVgh0B
+X-Gm-Gg: Acq92OE8kEWNCF4R6WO9Wz3ZVoGp0njct7K0dprJCCo/hftVg8EmzPiPBUCTul6Y5kr
+	BK5POM5E/oHigsoJAzQiLCxOF/iAVF4tLn4eDS0yhPVJq9dLZfZZ5nppPACLmbT0QLuQgRh2pCs
+	R7mkIYgq7Uv0FlIjc+AuqUDP5I2VSAeZD/n9wYNW/rzFH5Z/ZEXLfUpBNjcPuLGuiGaJL7fnUly
+	JZL2cMpzF9rF0wWxNKQOznbG30167ICF3vFgKfrAIRM0P1xLRGOXdiSXOaH5FIY97SyAtBo8qm7
+	3ByEO3gnOtpg5ROknG+3CvXLhsx97tJ4iBoRIjg0q54fM4Anmlrp/0ZbWTkYhs0J+9g3VgxlKlT
+	bc+ZktmA8pSSX3EBxZz27vQ3JuwyTm3yg3CSacUYRXqdXK+BdEE16yRw5gxgpPIjXHfKbTsQpxZ
+	Q25jzplwIK4gtU7cwIl7sXhyKtKlCXAX320Rj9GcvQjKL0uc3ASf7HC2uw7eFNICc6RDYBXncJ7
+	CO1M+9a8Ag8NUUT0fiP1O3TZkUSafKRToiWOqmx4p+DLWlNJ/Vnyq/6LlK8AKOibYNGUB1sdLiX
+	Pz9h4MGYGZ7v
+X-Received: by 2002:a17:907:3f1d:b0:bc1:7da0:21 with SMTP id a640c23a62f3a-bd4f34bd0e3mr858876966b.23.1779112796524;
+        Mon, 18 May 2026 06:59:56 -0700 (PDT)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4dea94bsm565057266b.33.2026.05.18.06.59.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 06:31:47 -0700 (PDT)
-Message-ID: <189ddfd7-f579-4c86-bcfc-334cf574bdfc@kernel.dk>
-Date: Mon, 18 May 2026 07:31:45 -0600
+        Mon, 18 May 2026 06:59:55 -0700 (PDT)
+Message-ID: <166da921-77bd-422e-85af-ef67d6fccc42@gmail.com>
+Date: Mon, 18 May 2026 14:59:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,52 +70,60 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 0/2] blk-mq: introduce tag starvation observability
-To: Aaron Tomlin <atomlin@atomlin.com>, rostedt@goodmis.org,
- mhiramat@kernel.org, mathieu.desnoyers@efficios.com
-Cc: bvanassche@acm.org, johannes.thumshirn@wdc.com, kch@nvidia.com,
- dlemoal@kernel.org, ritesh.list@gmail.com, loberman@redhat.com,
- neelx@suse.com, sean@ashe.io, mproche@gmail.com, chjohnst@gmail.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-References: <20260517213614.350367-1-atomlin@atomlin.com>
+Subject: Re: [PATCH v3 04/10] block: introduce dma map backed bio type
+To: Christoph Hellwig <hch@lst.de>
+Cc: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, Nitesh Shetty <nj.shetty@samsung.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, Anuj Gupta <anuj20.g@samsung.com>,
+ Tushar Gohad <tushar.gohad@intel.com>,
+ William Power <william.power@intel.com>, Phil Cayton
+ <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
+References: <cover.1777475843.git.asml.silence@gmail.com>
+ <646ecd6fde8d9e146cb051efb514deb27ce3883e.1777475843.git.asml.silence@gmail.com>
+ <20260513081929.GD5477@lst.de>
+ <24833f76-2289-4859-86d1-9215b11a1258@gmail.com>
+ <df697a76-c700-4908-ac08-a47ad07e0796@amd.com>
+ <4561c621-817c-46be-8ff0-0b557f6c819d@gmail.com>
+ <20260518125713.GC5754@lst.de>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260517213614.350367-1-atomlin@atomlin.com>
-Content-Type: text/plain; charset=UTF-8
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260518125713.GC5754@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/17/26 3:36 PM, Aaron Tomlin wrote:
-> Hi Jens, Steve, Masami,
+On 5/18/26 13:57, Christoph Hellwig wrote:
+> On Mon, May 18, 2026 at 01:40:18PM +0100, Pavel Begunkov wrote:
+>>> When that is really a performance critical path then you can use the likely() and unlikely() macros to give the compiler the hint which one to prefer.
+>>
+>> That might be more penalising than placing them in the right order,
+>> and it might be fine as it's new and all that, but it's not a clear
+>> cut as it's definitely not created to be a slow path.
 > 
-> In high-performance storage environments, particularly when utilising RAID
-> controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED), severe latency
-> spikes can occur when fast devices are starved of available tags.
-> Currently, diagnosing this specific queue contention requires deploying
-> dynamic kprobes or inferring sleep states, which lacks a simple,
-> out-of-the-box diagnostic path.
+> Yes.  Whatever the caller is using at a given time is the fast path here,
+> and dynamic branch prediction in modern cpus handles this really well.
 > 
-> This short series introduces dedicated, low-overhead observability for tag
-> exhaustion events in the block layer:
+>> TBH, not sure
+>> why we're bike shedding such things, is it somewhere in the code
+>> style?
 > 
->   - Patch 1 introduces the "block_rq_tag_wait" tracepoint in the tag
->     allocation slow-path to capture precise, event-based starvation.
-> 
->   - Patch 2 complements this by exposing "wait_on_hw_tag" and
->     "wait_on_sched_tag" per-CPU counters via debugfs for quick,
->     point-in-time cumulative polling.
-> 
-> Together, these provide storage engineers with zero-configuration
-> mechanisms to definitively identify shared-tag bottlenecks.
+> It makes reading the code annoying, so it better have a good reason.
+> Now for a single conditional it's not much of an issue, but these
+> things tend to pile up and then start to get really annoying.
+> Always write your code the most straight forward way unless you
+> have a good reason not to.
 
-Why not just issue the trace points? Then there's close to zero
-overhead, rather than needing to need added counters for this, and the
-kernel to keep track. If you just issue the get/put tag kind of traces,
-then userspace can keep track. That's what blktrace has done for decades
-for things like inflight/queue depth accounting.
-
-IOW, seems to me, this could be done with basically zero kernel
-additions outside of perhaps a trace point or two.
+For me, having the most common case first is more natural and
+readable, but I'm going to flip it just to avoid spending more
+time here.
 
 -- 
-Jens Axboe
+Pavel Begunkov
+
