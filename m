@@ -1,47 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827D737E2F9;
-	Mon, 18 May 2026 05:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB37A3DA7FC
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 05:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779082214; cv=none; b=J3QfAGgtXvqqnmQEkObDs3mekYUx7QEW6Uf9sUqyYqP3IIqXgbdQGLC7IbDJNbKWTW/lLY6o5uqg4qcAMysJeu4c9cywdan+8NeASGh5YeN75aWA94l3Ocnr8g8/dv0LoSrzbfO8WxYxebD2jDgKe6yUXfOl2/xQNSomvKBTla8=
+	t=1779083832; cv=none; b=RJyV6aRYJc2Aopv/n8wgQn6IZGDEFcynqHj90/zohHn91z/x/8o0sv63t7m0bYytXb7Pwq/dpOsUQFLopGQm31CiyWd6HRli7lPtOSLN657pZyXKRjp6baGD3Am4ywl1J506ct24T4GD9Nrj9OKuIV76kpcVdvL0s+Pr4IFc38E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779082214; c=relaxed/simple;
-	bh=GoAXwkLK2fB7oLnuO4UOL0mHLu6beDp8Zw9xvLDZuPg=;
+	s=arc-20240116; t=1779083832; c=relaxed/simple;
+	bh=omRRaWaVODUqN4DRarvnaOcSgQaqjontElTq09tgS0s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZBt5CqcnovJnFvP9iXlb0T+cKPMZInOm0q9CMmPdjiyztt8/FuOjI6ccD9qeVfngRPlsKrQDs66omBPLDwkS9XbloKwmML7tuLjlvtEdpYzyPoE6ZtjUQZHDRVxBqeK3WTIRcexuPptSXvgFRi9Wysw4ewH7JCjET/f2oTxQ72U=
+	 Content-Type:Content-Disposition:In-Reply-To; b=KxNrV2m78ZV0BUcH/U2yecxFy9obO4WNjToit3WswPjZo5BMkDztt5NWHpEDigXCiPrdBtHVqX4gBNAsohuYZiy6qSqSgGo8n6ymjpXMCYjcnk5bRyoFmL7TjKTvAxlC5glwO02jBrh1dESg12a90ThGc0r0SDWDNmbdifnI/pw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1EAAF68C4E; Mon, 18 May 2026 07:29:55 +0200 (CEST)
-Date: Mon, 18 May 2026 07:29:54 +0200
+	id 7F9E268C4E; Mon, 18 May 2026 07:56:59 +0200 (CEST)
+Date: Mon, 18 May 2026 07:56:59 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: Chris Li <chrisl@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Kairui Song <kasong@tencent.com>,
-	Christian Brauner <brauner@kernel.org>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, David Sterba <dsterba@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Hyunchul Lee <hyc.lee@gmail.com>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org
-Subject: Re: improve the swap_activate interface
-Message-ID: <20260518052954.GA9758@lst.de>
-References: <20260512053625.2950900-1-hch@lst.de> <CACePvbUj0-fAd-gjRjxFXYz22hGQaT9upFL85KUqD=W=SWX+0Q@mail.gmail.com>
+To: Chao S <coshi036@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, kbusch@kernel.org, sagi@grimberg.me,
+	axboe@kernel.dk, Sungwoo Kim <iam@sung-woo.kim>,
+	Dave Tian <daveti@purdue.edu>, Weidong Zhu <weizhu@fiu.edu>
+Subject: Re: [PATCH RFC 1/2] nvme: downgrade WARN in nvme_setup_rw to
+ pr_debug
+Message-ID: <20260518055659.GC10368@lst.de>
+References: <20260427003457.1264511-1-coshi036@gmail.com> <20260507054809.GA19796@lst.de> <CACd_6n3s+Y+xdsuQVja=t1RUEdro2yQRyJyjpqFcd9_pF98OzA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,16 +35,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACePvbUj0-fAd-gjRjxFXYz22hGQaT9upFL85KUqD=W=SWX+0Q@mail.gmail.com>
+In-Reply-To: <CACd_6n3s+Y+xdsuQVja=t1RUEdro2yQRyJyjpqFcd9_pF98OzA@mail.gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, May 15, 2026 at 02:40:09PM -0700, Chris Li wrote:
-> BTW, I just tried it, this series conflicts with Kairui's swap table
-> phase IV series. Might need to coordinate the merge order with Kairui.
+On Sat, May 16, 2026 at 11:54:49PM -0400, Chao S wrote:
+> On Thu, May 07, 2026 at 07:48:09AM +0200, Christoph Hellwig wrote:
+> > What is "semantic mutation of Identify Namespace responses" [...]
+> 
+> The emulated controller returns a mutated Identify Namespace on
+> rescan (flbas META_EXT, lbaf.ms != 0, dps == 0) -- the host-unaware
 
-Yes.  I think the swap table should be a priority.  Next would be
-swap_ops (see my take on that from Friday) and then this series.  The
-iomap-fuse work from Darrick seems to be a bit stalled on the fuse side,
-so I hope he can wait a bit on this as well.  Especially as swapfile
-support might not be the highest priority feature for that.
+What does "mutated" mean here?
 
