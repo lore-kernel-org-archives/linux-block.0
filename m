@@ -1,67 +1,67 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E6A3E0754
-	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 09:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306A23E51E7
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 09:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779096284; cv=none; b=VISd0jgN2KxM0cuKJ4/e6YfB46+19IukX9He8+A2uN980x+VhdHmh/iJq0VQLMKVjiwrmrqoGCFdtNWyigaQjuUIe2kER8xaaHp1clgpjybNYwns9WQIpKqyPfug2c5IzIW1IVRO2LXlWzpbRALsLWrEiI4mc0wUjEU5hDB4SbU=
+	t=1779096566; cv=none; b=leKNAiDKczemSN+tDH6c7HHB8VgWWZVFyj8BYG484FgicywOcShrx4m3TBgESkTbNRckSHbpQACfvxHgZ6DUQ/nmZAgC/ClQ/zNOa0HjxhDuGw+gbW5ZTJcjsdjCCS8MeP5D/xejzfxU/ByMT8OKTNiARNe7RiTxhAxViXjc5KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779096284; c=relaxed/simple;
-	bh=aFahUNzTuRd9lUxR1CTcAQQJqOKmfE/dGIcc0XxoVMU=;
+	s=arc-20240116; t=1779096566; c=relaxed/simple;
+	bh=r0/J3kQR5yeiimzsreh80xsM6C9KNUlXaQl9kU29TUs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LcbGQpvp7Uei2RcRgFeDuUr2WXStsNdifZ6HUZDdZ2iyAjH+vNGBvSbsMb0Cc2eJz8c6zj6FSTRt6vm/Po+wy4T4p1HsQ6/tcxVnt/MY/T5tzKfBcPADmk2f5CY6+Y4TFsKmOWHN+XKhvVGjrAvCmWGbeypFd2ZRfJOZU5oqFcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AlgdSvCf; arc=none smtp.client-ip=209.85.221.54
+	 In-Reply-To:Content-Type; b=nJuiQhBUYktIesJLl9/GDmx3+s9caz2vLoT6aXvHDrq+A3VI6NV/c6b+0CdE32qP72tCr1r/UUMj0Hwpi5Vkb88ayNxNMpMc5KHKq6ogb1S1zToLupQGG1lfe3o4UzgwImXCbynlZLzoUrNl2YxqtH5wB7XbhJs2d9UTeSabw2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B6sihm9e; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlgdSvCf"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43fe62837baso1049143f8f.3
-        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 02:24:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6sihm9e"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-48a7fe4f40bso25534515e9.0
+        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 02:29:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779096281; x=1779701081; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779096563; x=1779701363; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8ZnntFD93TY8/+xleaPVExk6NAT6He9j34KXY+n97WI=;
-        b=AlgdSvCf0TRu9rJVleCHIzTcmD0GE+h3APf3VOfOZ1cbKpW6GubpjmhF4EwezjT5Vt
-         TFs148AA7KCfRr+bwmWp3MR9SeVp2uvP+/gyUY5RvFBzbx2+gE7bTh09tdzJtCLELo0Q
-         uYfcJCy9co8Wmd78W0TW+VrsKOeFaP4DATPE+fE0duTTx8VKUBBegBIstHdXyVNG/jLe
-         gR6QTjNp8CNjx8WObfme7ar4nvVxXSf7b8cPeyguI2sxfZRylKWUUlIDpwrd025MhsLo
-         CWCZpDS2CHpDJZUhf6x3MUl5XT6+wbbN2PUag9gYzY4dNJatC6vz777RWxanc9PlAtOi
-         IozQ==
+        bh=CDwQwZfzQ+v4zAM7BuOooX+kRgbnUOKOzvArP/cGiqU=;
+        b=B6sihm9e1ft7GQekyoXBNogAiSuG3QW34W93kkgKsnnNNCDv5J6PKfz6fFTivh/Gss
+         0aeFH+dUmUOPPFDfzXy+bVNg8/JbM8bVScJP8cGlfl6x6NdamFBBcJNpcrzmbTnSBFQP
+         xLI9pHzOFEB+/TAjplJRJusm7Il+vpUm9nUJLFPj2xfh1LlIzWrqsltuOIr2zo56HwCq
+         t9Gr2zAI2FqfHBmRgBbouS+cBThIAKbF3/6s37Ifde0OdwJ76X2qqp/elc7yo+1FUyO/
+         5lCFkIBDoLApQ4ZPiUA5LuXTZHogsG91YKqTcgJs8DHnSw/kXU9BQMdHeSsyU+OQoV7g
+         6vEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779096281; x=1779701081;
+        d=1e100.net; s=20251104; t=1779096563; x=1779701363;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8ZnntFD93TY8/+xleaPVExk6NAT6He9j34KXY+n97WI=;
-        b=mX3CAm3tKAcpui0VY7yC57MfJhFqRY5zJiVVjLJtwzYNhKoXkO+BjA0jqnxUuNCA/k
-         1Hwg6ZbOl1AVX0ITNxPTxNXgWWs0AQXs2fJ+YAhDGvvfSbWwKqbj8ZYmxGrevP2YNDLv
-         kF3D0f182dE5EimCmxrxSGEpXpLkjj3hyEbFQ3t12ISfa16XkWfBnxSXJEdDCzkOhRJG
-         0uFFyzHmVLDfOVwcRHMXLIYAfOjb780twbQ4tN/YIWmL/nT1VcLike0sfDIwUm6CiqGv
-         GqUoLd3IemOE5px++4EJx3UIMebkHtHGE++hmzKiZpai1ay1NnJbw8mvsE9ndH+TgQug
-         wLVg==
-X-Forwarded-Encrypted: i=1; AFNElJ+ShRrCG9MYsVopU18aGxWAlNUlKTlBPugASsorhovy9x4OsLZq6nGXxJ0qsyngY9Kr7C3WZXtTeccEPA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqeWVjsJDuTbbEvnyRPynuReQHbvQNWtorNl2Iu0x+AeeKInHW
-	A0ZCgVYFeUtOw9DmLvhzhNmrVcWI2KHzQBkkVv8ZQ6JKOxjSsAHLtMk2
-X-Gm-Gg: Acq92OFjzKTrj36pNkSyX2kFuvH6uxH4Tq1oSFdTmRsBfWIOJi5KSWq6EKrqKi+v68p
-	HMIrg2djd3lypC2eVj9mYQzrSVgD4GRyU+St/dJgZwpa/LrpLFX78Qja7PRtd5lWAeS5CuNfOAC
-	yuiWhx7YOsKpIkJlUUrlXXBlcpg9o5oPsv/307sbhqGmUvWKRp7evSYjJbrVAbUIDf4GUYpbNxI
-	PmzUnnVrNmeyGtKJ9l5uRf6SbymoSvziLptK6UJcb6eJQgd99OqlCnZHOvanGmEBDqyQMHIcq1v
-	wL5+U0lnilZvprwDdLVdZUvw0fpIehoxfXLEbOzQyNN0vlZlHcGh0n25rUChSRQviFHWFGmPpvc
-	3ciW2OSAKQPjehsU+1w4DLhr6EnD4+neLYFxwhrTdo0NRYtLoRdMDJ3ZmN10ZGzg81MewKHFkkJ
-	Q27e/R11OwTHeIRQBpnF6RViQGEFaVl3VrJSSadBmTIiFcYZhni8oqbu4J2qjKziAqWqlkL7Tyc
-	tZUiYW+kjNELCwGJKoN7Y7eSHOT1P6fwmJij/ZdJqkhhV4n3TU5DgyrR0Y=
-X-Received: by 2002:a05:6000:288c:b0:43b:962b:5314 with SMTP id ffacd0b85a97d-45e5c372a9cmr22814328f8f.19.1779096280750;
-        Mon, 18 May 2026 02:24:40 -0700 (PDT)
+        bh=CDwQwZfzQ+v4zAM7BuOooX+kRgbnUOKOzvArP/cGiqU=;
+        b=RbiHDzDQlKkAtBTV6RvVYhg3Q4FA3qAVg8OrwZffedyu8SCwsT2+23RpQ4lQUdfKAO
+         8id+dTAv53Z3SoTzI3JTlhhuTHQOD/oR1ob9pREWzOi6YorEcWtk+xSWTEYhgqKiM3OQ
+         P8XFP58LsaRTgCxeZqX48IMqv0qDsDFI+7Ea/UjblD1ySy13TGMFmKnEISLXTwm6hN9r
+         lZc21Rn1Eex+YMqum4EpuNQ4CemP0H/EycD79Frul0Q15Uo6YEWhSGWfphBZ/hXm30Fj
+         WnRZ0tq88lpa//2JcJshWEOxO5YWoIxGrp1iGSmBZy4icjYVxUiU4BURk8HrXQaFQf5m
+         pxAA==
+X-Forwarded-Encrypted: i=1; AFNElJ/Cnk0vDPUVV5xrSYykioEzYcydMJXOmrjD6JB7qTsRns6CSDM7hWp/CrInoBtAfWA7Kusap5lLPjILwg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBNS2ng8kvMCng8zQTEEhjcrI0PQJy5jeDaztE7pzW+a6f/RIz
+	+AW+J7T5Y03deHLcwcG5hVYmRNYdXgA1lnePu0mdblEaX3iDMml7OZ2M
+X-Gm-Gg: Acq92OEXUjvtubxouqR3vtisfDMCErExhtLhSub1BnljfXEMD80pEfVGke57x8QJd6Q
+	Rbj/nu9ko9lJTyWF9WLC7MheFQnAWesn2jC4W9T/i4kpefGKrcSvLeFNrT6KD9EPbBkkwbutP8l
+	tF3TVlqUkjo1HgIaRX6YdS1a4Np2DDXJ7oYx3JF5qSEH4AO1P1S+QxDKLygjtYzYff5ZFLpdTVS
+	0urRSsnCvwl6lBmjXJx3oRr+vgJC1HR9MbeL9k+1lx4XFn9cvff8AzC2ToTlcUpYIR4fSBcxTGk
+	DoUlwKod9vwo+wfkOyYQ5rcjjVYL/b894yvywgAd4w7LHLR49iSo0PJMv+S9Dk+pLgBFz3SIHd6
+	+s6dDKcbgO9zbLw19W320lAsCU2K+o1dcuxDa9Y2luMx0lyBQzYlcI1CIQ5pphzDETCQQ6UtGiz
+	vSrUhG+G0vjbXLtDEw2J3+GKsfs135ncr3pjJvyA+DY6YKF0I8q/a/7mm0jfltKdd6l7T3NiFqy
+	x32BpCtNBkfigXyfn3uSTxBTUeSig+Q+elukSG5sbMCW0JsdwviqMe3b3fJ5ArkoAb1tQ==
+X-Received: by 2002:a05:600c:34cc:b0:48e:635a:18d7 with SMTP id 5b1f17b1804b1-48fe59b047bmr240818345e9.0.1779096563202;
+        Mon, 18 May 2026 02:29:23 -0700 (PDT)
 Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:6e9b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45e6a135f0csm17325957f8f.27.2026.05.18.02.24.36
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe582e3sm88451385e9.15.2026.05.18.02.29.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2026 02:24:40 -0700 (PDT)
-Message-ID: <4b2f74e9-3225-47f6-85fe-911720030e35@gmail.com>
-Date: Mon, 18 May 2026 10:24:35 +0100
+        Mon, 18 May 2026 02:29:22 -0700 (PDT)
+Message-ID: <50ed7240-d8d3-4816-bcc9-ce8adbbbf841@gmail.com>
+Date: Mon, 18 May 2026 10:29:18 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,11 +69,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/10] iov_iter: add iterator type for dmabuf maps
-To: David Laight <david.laight.linux@gmail.com>
+Subject: Re: [PATCH v3 07/10] nvme-pci: implement dma_token backed requests
+To: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
+ Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
  Christian Brauner <brauner@kernel.org>,
  Andrew Morton <akpm@linux-foundation.org>,
  Sumit Semwal <sumit.semwal@linaro.org>,
@@ -87,50 +86,163 @@ Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
  William Power <william.power@intel.com>, Phil Cayton
  <phil.cayton@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
 References: <cover.1777475843.git.asml.silence@gmail.com>
- <20a233d2f35274817aa643cc0fe113707eb47e72.1777475843.git.asml.silence@gmail.com>
- <20260513110557.705bdeed@pumpkin> <20260513142909.03ae6c2b@pumpkin>
+ <5cecb1157ab784f9f303a91449fdf11b03aa6002.1777475843.git.asml.silence@gmail.com>
+ <20260513083817.GC6461@lst.de>
 Content-Language: en-US
 From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260513142909.03ae6c2b@pumpkin>
+In-Reply-To: <20260513083817.GC6461@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/13/26 14:29, David Laight wrote:
-> On Wed, 13 May 2026 11:05:57 +0100
-> David Laight <david.laight.linux@gmail.com> wrote:
+On 5/13/26 09:38, Christoph Hellwig wrote:
+> FYI, I really want SGL support before this get merged, but ignoring that
+> for now:
+
+I was hoping to let Samsung guys to send a follow up they already have,
+but I'll ask them to have about taking it into this patch set.
+
+>> +struct nvme_dmabuf_map {
+>> +	struct io_dmabuf_map base;
+>> +	dma_addr_t *dma_list;
+>> +	struct sg_table *sgt;
+>> +	unsigned nr_entries;
 > 
-> ...
->>> @@ -575,7 +575,8 @@ void iov_iter_advance(struct iov_iter *i, size_t size)
->>>   {
->>>   	if (unlikely(i->count < size))
->>>   		size = i->count;
->>> -	if (likely(iter_is_ubuf(i)) || unlikely(iov_iter_is_xarray(i))) {
->>> +	if (likely(iter_is_ubuf(i)) || unlikely(iov_iter_is_xarray(i)) ||
->>> +	    unlikely(iov_iter_is_dmabuf_map(i))) {
->>
->>
->> Doesn't the extra check add more code to all the non-ubuf cases?
->> This could be fixed by either making iter_type a bitmask (with one bit set)
+> I'd make dma_list a variable-sized array at the end of the struture to avoid
+> an extra allocation and pointer derefernece.
 
-Not going to do that. It was specifically converted from bitmask
-before, and the check optimisations like this were voiced back than.
+Ok
 
->> or writing an iter_is_one_of(i, ITER_xxx, ITER_yyy) define that uses
->> '(1 << i->iter_type) & ((1 << ITER_xxx) | ...)'
+>> +static void nvme_dmabuf_map_sync(struct nvme_dev *nvme_dev, struct request *req,
+>> +				 bool for_cpu)
+>> +{
+>> +	int length = blk_rq_payload_bytes(req);
+>> +	struct device *dev = nvme_dev->dev;
+>> +	enum dma_data_direction dma_dir;
+>> +	struct bio *bio = req->bio;
+>> +	struct nvme_dmabuf_map *map;
+>> +	dma_addr_t *dma_list;
+>> +	int offset, map_idx;
+>> +
+>> +	dma_dir = rq_data_dir(req) == READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+>> +	map = container_of(bio->dmabuf_map, struct nvme_dmabuf_map, base);
+>> +	dma_list = map->dma_list;
+>> +
+>> +	offset = bio->bi_iter.bi_bvec_done;
+>> +	map_idx = offset / NVME_CTRL_PAGE_SIZE;
+>> +	length += offset & (NVME_CTRL_PAGE_SIZE - 1);
 > 
-> This seems to DTRT:
+> Please initialize the variable at declaration time and use or add proper
+> helpers to simplify this:
+
+> static inline struct nvme_dmabuf_map *
+> to_nvme_dmabuf_map(struct io_dmabuf_map *map)
+> {
+> 	return container_of(map, struct nvme_dmabuf_map, base);
+> }
 > 
-> #define _ITER_IS_ONE_OF(iter, t1, t2, t3, t4, t5, t6, t7, t8, ...) \
->      ((1u << (iter)->iter_type) & ((1u << ITER_##t1) | (1u << ITER_##t2) | \
->          (1u << ITER_##t3) | (1u << ITER_##t4) | (1u << ITER_##t5) | \
->          (1u << ITER_##t6) | (1u << ITER_##t7) | (1u << ITER_##t8)))
-> #define ITER_IS_ONE_OF(iter, t, ...) \
->      _ITER_IS_ONE_OF(iter, t, ## __VA_ARGS__, t, t, t, t, t, t, t)
+> ....
+> 
+> 	enum dma_data_direction dma_dir = rq_dma_dir(req);
+> 	struct device *dev = nvme_dev->dev;
+> 	struct bio *bio = req->bio;
+> 	struct nvme_dmabuf_map *map = to_nvme_dmabuf_map(bio->bi_dmabuf_map);
+> 	dma_addr_t *dma_list = map->dma_list;
+> 	int offset = bio->bi_iter.bi_bvec_done;
+> 	int mmap_idx = offset / NVME_CTRL_PAGE_SIZE;
+> 	int length = blk_rq_payload_bytes(req) +
+> 		offset & (NVME_CTRL_PAGE_SIZE - 1);
+> 
+> Also a lot of these ints sound like they should be unsigned.
 
-We definitely don't want that, using them directly would've been
-much cleaner.
+Ok
 
-if (get_type_mask(i) & (TYPE1 | TYPE2)) ...
+>> +
+>> +	while (length > 0) {
+>> +		u64 dma_addr = dma_list[map_idx++];
+>> +
+>> +		if (for_cpu)
+>> +			__dma_sync_single_for_cpu(dev, dma_addr,
+>> +						  NVME_CTRL_PAGE_SIZE, dma_dir);
+>> +		else
+>> +			__dma_sync_single_for_device(dev, dma_addr,
+>> +						     NVME_CTRL_PAGE_SIZE,
+>> +						     dma_dir);
+>> +		length -= NVME_CTRL_PAGE_SIZE;
+>> +	}
+>> +}
+> 
+> Nothing should be using these __dma_sync helpers that are internal
+> details. Using them means you call into sync code that should be skipped
+> on most common server class systems.
+
+Yeah, the kernel test robot already flagged it as well
+
+> Also the for_cpu argument is a bit ugly.  I'd rather have separate
+> routines as in the core dma-mapping code, even if that means a little bit
+> of code duplication.
+> 
+>> +static blk_status_t nvme_rq_setup_dmabuf_map(struct request *req,
+>> +					     struct nvme_queue *nvmeq)
+>> +{
+>> +	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+>> +	int length = blk_rq_payload_bytes(req);
+>> +	u64 dma_addr, prp1_dma, prp2_dma;
+>> +	struct bio *bio = req->bio;
+>> +	struct nvme_dmabuf_map *map;
+>> +	dma_addr_t *dma_list;
+>> +	dma_addr_t prp_dma;
+>> +	__le64 *prp_list;
+>> +	int i, map_idx;
+>> +	int offset;
+>> +
+>> +	nvme_dmabuf_map_sync(nvmeq->dev, req, false);
+>> +
+>> +	map = container_of(bio->dmabuf_map, struct nvme_dmabuf_map, base);
+>> +	dma_list = map->dma_list;
+>> +
+>> +	offset = bio->bi_iter.bi_bvec_done;
+>> +	map_idx = offset / NVME_CTRL_PAGE_SIZE;
+>> +	offset &= (NVME_CTRL_PAGE_SIZE - 1);
+>> +	prp1_dma = dma_list[map_idx++] + offset;
+> 
+> Same comments as for the sync helper above.
+> 
+>> +	length -= (NVME_CTRL_PAGE_SIZE - offset);
+>> +	if (length <= 0) {
+>> +		prp2_dma = 0;
+>> +		goto done;
+>> +	}
+>> +
+>> +	if (length <= NVME_CTRL_PAGE_SIZE) {
+>> +		prp2_dma = dma_list[map_idx];
+>> +		goto done;
+>> +	}
+>> +
+>> +	if (DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE) <=
+>> +	    NVME_SMALL_POOL_SIZE / sizeof(__le64))
+>> +		iod->flags |= IOD_SMALL_DESCRIPTOR;
+>> +
+>> +	prp_list = dma_pool_alloc(nvme_dma_pool(nvmeq, iod), GFP_ATOMIC,
+>> +			&prp_dma);
+>> +	if (!prp_list)
+>> +		return BLK_STS_RESOURCE;
+>> +
+>> +	iod->descriptors[iod->nr_descriptors++] = prp_list;
+>> +	prp2_dma = prp_dma;
+> 
+> And I really hate how this duplicates all the nasty PRP building logic,
+> although right now I don't have a good answer to that.
+> 
+>> +static inline bool nvme_rq_is_dmabuf_attached(struct request *req)
+>> +{
+>> +	if (!IS_ENABLED(CONFIG_DMABUF_TOKEN))
+>> +		return false;
+>> +	return req->bio && bio_flagged(req->bio, BIO_DMABUF_MAP);
+>> +}
+> 
+> This is something that should go into the block layer.
+
+I'll move it
 
 -- 
 Pavel Begunkov
