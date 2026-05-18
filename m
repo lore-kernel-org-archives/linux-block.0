@@ -1,67 +1,74 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5F1381AFA;
-	Mon, 18 May 2026 19:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3D91DB13A;
+	Mon, 18 May 2026 19:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779132199; cv=none; b=IXNYGfrgJDvtGreN3Gmccb0KZjcQHRxyk6/ZiwXM/8kKml2G1FumIB4C/WASL3+oPQJ8987tYi2vE7PIcsM7Teg5WkiaHWjeP04J8Awc2b26WpKnoG3nFBm9gg8hrgFyHfwvDwpcs+5vijotJ8pONNYxVQ4xXIv9ldNz4rDtlks=
+	t=1779132998; cv=none; b=gXww8pimhU4u57iSdZCtJMp+yHILEPlxtj61B+8kKFEvfOdaIYDyY4Vt7buKWCWDRb7l9q81lbpm1r18yg6aOYIJ3Z9dNnE7M8W43lB0JXhfgurE061X4f0fc9Xy/fs+IqUxCKo+YFBHfkuzRTJEtNjxtw0nG0BpK7PCi+IIR+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779132199; c=relaxed/simple;
-	bh=YH4nu/12Er9fpJ5EGzk3UetLfoGZNCOH+QXK+VHEjAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R1qCFusEK/4XlkYj18//N0MleQm2eBVgibExTBa7Umzlxtaj610OGuIcnzie6nfEUU2DfcPjD/ig73tYj3GutNpoQY8UzldfslbbFttAGjOX1UcYVORK4lEYJthoxf3ZzHX6pE3Jdn/xG3V1dajH2HzDINAluOudDImDS0ZEZMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/Cm/JV4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779132998; c=relaxed/simple;
+	bh=Wi4BvHbnLogHwDnFAOY65k7rUtfMvJIPCaPQGLK8bGM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References; b=qfHNUpXLhMsFltuTAOjvBsFlBTq3V5qOqao2fYmOPdXcKkI528hfdN4GiMogGZbUyM/8rws44/DaEm9VN+BIbmsoEATFqXgxal5X5daP3dCOktelAORQgwfi06hhyVNiFl3X5jVqPeAZ0XUsf8j2W7xsNlgfddENf7I8OVFUErY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHUbWISf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/Cm/JV4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05A3CC2BCB7;
-	Mon, 18 May 2026 19:23:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHUbWISf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D39DC2BCC9;
+	Mon, 18 May 2026 19:36:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779132199;
-	bh=YH4nu/12Er9fpJ5EGzk3UetLfoGZNCOH+QXK+VHEjAY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F/Cm/JV4svOkZT2PAuIcH1Uf/NhGI3JV6zXPuOUXFXpkqtWktw6076FFWVntMxaeJ
-	 zsLbjp3MidWODCbo0PAW+yun3KiOFTX3hOssgL14d5RTnziesPNbV78tYy4+uu2nbz
-	 QI1mZOLz487wG3uwJ7iYKl41JQF0bE+a6iiVV7MS8KELABw+WatMEAe2eYgf96rRW4
-	 iM8/xEwDtjcM+VA14HGvb74a58gnqvWUP00cuSUEwKpRnP87ocbq9DRuO9sfFJvkT2
-	 AzJE06Q7ux0VZzlVGC4I3OdX6JvStUN1ch+KodDouQdj+XfKUfKAlmmdQoECMj/dyu
-	 VRAG5dOoOIxuQ==
-Date: Mon, 18 May 2026 13:23:17 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: "Achkinazi, Igor" <Igor.Achkinazi@dell.com>
-Cc: "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] nvme-multipath: set BIO_REMAPPED on bios remapped to
- per-path namespace disks
-Message-ID: <agtnJb5a5uIqH-65@kbusch-mbp>
-References: <MW5PR19MB548483D1FAE4F322E4C97352FD032@MW5PR19MB5484.namprd19.prod.outlook.com>
+	s=k20201202; t=1779132997;
+	bh=Wi4BvHbnLogHwDnFAOY65k7rUtfMvJIPCaPQGLK8bGM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nHUbWISfDDPMmeTskxlUgDj20zlZf5ueVVBgVCkkys/td237mdFYzqbo+3e2bKrP7
+	 +I6JaY27VuRSK6VaJc0oAH6tC29ivAtndPbkgjI9eV967MvzipLcFuj5JLNgXhh+mW
+	 CZ9C1ihR87awMWUbC6RDLrjiDLt5NPSmseTMxVMXVSTL7K32VAn/RxvxamnBkoqy17
+	 a7XZvINC1MAYhvNAVPTkjob5f58PPVKUsCR+hZxb628znZfT5lp1eAXkpEt657oTLn
+	 gkhWX7RSTVep0I5Ayg9VVCl2sTYfMQeM69J2pVwjQPO24a8jxhS+YAw96uwf09snN5
+	 AwY37XiJh6aKA==
+Date: Mon, 18 May 2026 09:36:36 -1000
+Message-ID: <64f59b64664f769661a8b8cd587c85f8@kernel.org>
+From: Tejun Heo <tj@kernel.org>
+To: Qing Ming <a0yami@mailbox.org>
+Cc: Josef Bacik <josef@toxicpanda.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Koutný <mkoutny@suse.com>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Yosry Ahmed <yosry@kernel.org>,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH v2] cgroup/rstat: validate cpu before
+ css_rstat_cpu() access
+In-Reply-To: <20260516070849.106141-1-a0yami@mailbox.org>
+References: <20260515122952.59209-1-a0yami@mailbox.org>
+ <20260516070849.106141-1-a0yami@mailbox.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MW5PR19MB548483D1FAE4F322E4C97352FD032@MW5PR19MB5484.namprd19.prod.outlook.com>
 
-On Mon, May 18, 2026 at 02:52:56PM +0000, Achkinazi, Igor wrote:
-> @@ -511,6 +511,13 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
->         ns = nvme_find_path(head);
->         if (likely(ns)) {
->                 bio_set_dev(bio, ns->disk->part0);
-> +               /*
-> +                * Mark the bio as remapped to the per-path namespace disk so
-> +                * that bio_check_eod() is skipped on resubmission (e.g. from
-> +                * bio splitting in blk_mq_submit_bio).  The EOD check already
-> +                * passed on the multipath head disk.
-> +                */
-> +               bio_set_flag(bio, BIO_REMAPPED);
+Hello,
 
-Any reason nvme multipath can't call submit_bio_noacct_nocheck()
-directly instead? If it's safe to skip the eod check here, then it
-looks safe to skip everything else too.
+> Qing Ming (1):
+>   cgroup/rstat: validate cpu before css_rstat_cpu() access
+
+Applied to cgroup/for-7.1-fixes.
+
+In hindsight, we should have added a separate kfunc wrapper from the
+start instead of tagging css_rstat_updated() with __bpf_kfunc directly,
+which would have avoided the rename. Oh well, it is what it is.
+
+Thanks.
+
+--
+tejun
