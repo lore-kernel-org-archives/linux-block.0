@@ -1,72 +1,69 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DBD352C4E
-	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 17:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4F539023C
+	for <linux-block@vger.kernel.org>; Mon, 18 May 2026 19:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779124290; cv=none; b=ppxJCQEYFgksZkPQa1xpBYclBMmFT45LYoyqQAW2AUKtG1l2ndUB2U68opcUVhb8630ymfSa5GJpjKO8qBiUP3UP8fyUkSxpXsfCHqAEjg13YkGx/0wRbiXMjgephxE+L8bs9rOdzjBooELP04Bw2ipwythTDjQXkucbUuMmtbg=
+	t=1779131948; cv=none; b=MmG75r5TAGon7+q8PbIh3dnvN5qmUJQ9BFNcstdlUVO10ezV3s6k0VF007tfWeOnoWkrirzfJFtI2wUtAZOxAHtM1RFRApeb+PTAAtx1fC/DGeNzPg6yaE4PfycKE40X6FE0rZB/HTCsitBnTwwmry4FFVOBhPD0X44mDmeNvz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779124290; c=relaxed/simple;
-	bh=oRTJkVWF4HeuSUN2WfzzdMQeErRdHBj39qDSjGUtqf0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=borXqf2o7F0Si2Rqk/21ND1WdnPKNTPuN8sJQAONbjYdanAb8knY8cI73KXjiUlKPOT4YohuGFMZjsFv8PUbNqNptqecR2yGnk5E6sdXJ03TM9OQyDq2dAqQEckoMgypVhqauav1V0/Geo1kGrsJswpC6leZZ0ElfoYQoHYu0KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=YURHATHC; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1779131948; c=relaxed/simple;
+	bh=YFhY9Oja0xAhwcMRPAQXvqvD2wPgo6bs4N5pZzlzYnM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMWKkKeqgEVVpEEOUTTZNKB1CoNu2iVcQNmg74T1/zF7MaPFN5dSVtuBPYCcKAlpPHUMXps8AiO+trPY2QK76NPUTUyXbCyAOAORJNyBmZ7IKsxvHEdtRgJ6DQksxmBBUieB6b8bz+z6HWldlyhjnquBOozFfxe/dcgqmefUWrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S80F7c+m; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="YURHATHC"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gK48c44Whz1XM6JS;
-	Mon, 18 May 2026 17:11:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1779124286; x=1781716287; bh=oRTJkVWF4HeuSUN2WfzzdMQe
-	ErRdHBj39qDSjGUtqf0=; b=YURHATHCnGLzPfg4VFv2/hBpoJ0uJyDIm8XB0tiQ
-	mwvHQucOgky6IZe3PzPjrdXZkJRaEWFOTYPD4VrOFFpFBrzCVc6iCfon73vgj1TV
-	yldjwf3aRvmIekstIBIMPKnJDX0qubi6sWpDb4off1Dz1Tz3SwauTtRap9G8kb5J
-	1j2WPbSH64jedUEMaL0ZQpCK3Bmq1xC33mIQxv+g51xQnqZwsNoyTeiqaBUcDuVH
-	hNPG+PiWwExJ7s73F2qYT4+q41RWCH0/xBB3oGiuAcL9i0ISvCYGUV83I80KWJY3
-	hg3XEXpueh81aKH5ao4piJfb5eCf9Xtj3X/1tKDuFIOmYg==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id aPP3SOTTIP_a; Mon, 18 May 2026 17:11:26 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gK48X3mRHz1XM5jn;
-	Mon, 18 May 2026 17:11:24 +0000 (UTC)
-Message-ID: <b4a8ae4a-1d24-4bce-b53c-17729d070f0b@acm.org>
-Date: Mon, 18 May 2026 10:11:21 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S80F7c+m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F08D7C2BCB7;
+	Mon, 18 May 2026 19:19:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779131948;
+	bh=YFhY9Oja0xAhwcMRPAQXvqvD2wPgo6bs4N5pZzlzYnM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S80F7c+mti1+IVcR9v3yZYou2ZJvA0m+0kKFqoVk8SDHhFz/elHqlNuUsiuwy6DlG
+	 F4x9ocvUIaxR8lHaGHZnN1/bVH3D9EjIhiuo8K95LlDJh4afT1GNgSKR7LkghVEo7F
+	 gkudFyrL0XcFKDfmVVOY7uiGUMQridM7p8gswxczGozH9wFPw2DOm9OuDa+xyth37q
+	 gO5BscQHsgRO5y2dbNPasEjnWT3FWbi5FTnsQIeoJrEOZzzXhja/HKEno8LjpZha64
+	 lhQsYbK2mMyrnyATgq3gS7W4v1tQi69lhcNnViK6e7PMYQBQ3tlyxbMmUz/w7V1gnK
+	 FUy9hehynJ2qw==
+Date: Mon, 18 May 2026 09:19:07 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Tao Cui <cuitao@kylinos.cn>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH] blk-cgroup-rwstat: add missing DISCARD counter in
+ blkg_rwstat_total()
+Message-ID: <agtmKyx4GqRQrftf@slm.duckdns.org>
+References: <20260516044752.446995-1-cuitao@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2 0/3] introduce command trace feature
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: Daniel Wagner <wagi@kernel.org>, John Meneghini <jmeneghi@redhat.com>
-References: <20260516120729.113659-1-shinichiro.kawasaki@wdc.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260516120729.113659-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260516044752.446995-1-cuitao@kylinos.cn>
 
-On 5/16/26 5:07 AM, Shin'ichiro Kawasaki wrote:
-> Some blktests test cases have deep nesting, making their behavior
-> difficult to understand. For example, the nvme test group has many
-> helper functions that set sysfs attribute values and call nvme-cli
-> commands. Understanding these behaviors is essential for debugging test
-> case failures.
-For the series:
+On Sat, May 16, 2026 at 12:47:52PM +0800, Tao Cui wrote:
+> Since commit 636620b66d5d ("blkcg: Track DISCARD statistics and output
+> them in cgroup io.stat"), blkg_rwstat_add() routes discard IOs into
+> BLKG_RWSTAT_DISCARD, but blkg_rwstat_total() still only sums READ and
+> WRITE.  This makes the total inconsistent with the per-type counters
+> whenever discard IOs are present.
+> 
+> On mixed read/write/discard workloads, the total undercounts the
+> actual IO activity.  If only discard requests are queued, the total
+> returns 0 outright.  In BFQ this causes avg_queue_size to be
+> underestimated and the group to be incorrectly marked empty.
+> 
+> The affected BFQ code paths are all gated by CONFIG_BFQ_CGROUP_DEBUG
+> and used only for statistics display (bfq.sectors, bfq.avg_queue_size,
+> bfq.empty_time).  No scheduling decisions depend on these values.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+I don't think including discard in total io amount is an improvement. This
+will throw off a lot of people.
+
+Thanks.
+
+-- 
+tejun
