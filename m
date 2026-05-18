@@ -1,129 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C30302753
-	for <linux-block@vger.kernel.org>; Sun, 17 May 2026 22:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCB01FECBA;
+	Mon, 18 May 2026 01:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779057751; cv=none; b=meAY3s7PPZBJFk9N9YFNCTXKS8fgpIgKtCj97dkot5G1x1L4viZ8wPOkphBk37M+Wk7FFii6s/a0WNjkeN3k3lhLuQW0YuqD7m6u5k+EmSTK373bnqoKShjqViLmqcQ3Kdo31A9fOZgW7P3ogSs+c1Ws4ui8fLcRPbhmR+MYjDE=
+	t=1779066876; cv=none; b=sPvijy9EuSfk5Kwzv00bMBKKrwdrihJlICgji6IWSWRfmJhmp4+jnU41yBUcgLmfVYZ+5jub0DELcjyiiYyXTthTKkBlEllBhw2RJJBRYq0VVPiKLUbleE5w++EK7OB6q+G7zLYChzt6Ljljp+Tp4Otz5c8knqIAJDBi/tJLl+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779057751; c=relaxed/simple;
-	bh=3iOivSf6w1GmUE9wsNkmfi5xiRA8ejFL0Xb42zY2nfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aGgxS0COpbpoRlTjyyMzsfEPpvysTd7qEk93n08gnqoZTdEMvayOnXL1cGXVROTXJ71gr3yST39JM2ImK+bGb4gPqvo2Te6xO68j0/P7k7awJcgW+lp+dVWlFnzw+oiY6eqQsYtkXPLcjNbiEo7Kso29pH8jU6lt0542w1VGRRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N4nLtLw4; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N4nLtLw4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA689C2BCB0;
-	Sun, 17 May 2026 22:42:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1779057751;
-	bh=3iOivSf6w1GmUE9wsNkmfi5xiRA8ejFL0Xb42zY2nfQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N4nLtLw4vQcxwBuVpycw5KkOxK3AfSqdDYXBV3gvBhoYxboHzaMxd2uxB8Umy6eK6
-	 whLwQeUwdfLLgkdMdxAHstiRIiFoS7Cz5QYLgRf8vlhvuv9hp5zfX95SJKADvW0DDZ
-	 YTN+JTbPaQLZuVQk9buQYZDRB7lDtMP13HINGzXOg2WVFcDk28jreKA6OJgGg5/qyQ
-	 s4lKeT7ghd9GkdVYzETj2lFPqzzIX9kl03auDN4EhuC7fp0XL9Nl+96l4m4fpNWXKg
-	 9eCeO6C0xpX+o8YNkl33S7mG3jEMrAaYcgLYhTBOYwa6ozrYcrodLfr/2I0TUvKN76
-	 0U89uJNgQ6+hQ==
-Date: Sun, 17 May 2026 16:42:29 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Chao S <coshi036@gmail.com>
-Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, hch@lst.de,
-	sagi@grimberg.me, axboe@kernel.dk, Sungwoo Kim <iam@sung-woo.kim>,
-	Dave Tian <daveti@purdue.edu>, Weidong Zhu <weizhu@fiu.edu>
-Subject: Re: [PATCH RFC 1/2] nvme: downgrade WARN in nvme_setup_rw to pr_debug
-Message-ID: <agpEVUYhyqBxBypz@kbusch-mbp>
-References: <20260427003457.1264511-1-coshi036@gmail.com>
- <afzWCpJSqvjnTgpF@kbusch-mbp>
- <CACd_6n29MeACfWpqK5jaSPOVK+q5yop+eeuO_Wk0M0E5Wr7ujw@mail.gmail.com>
- <ago7kyBnaWKU7l3E@kbusch-mbp>
+	s=arc-20240116; t=1779066876; c=relaxed/simple;
+	bh=k+8nZs+E882US7hblQn4br6HhSehbAQcgwObve8Uggk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dbAwJbLAGJWihB0rOI0silB90Au3A/o2439kQOC9OG1Kx60xYgvh9WvtXM+RnstbqX95Yd0Z26Do+UUk1saluNJhyU4xfnUH0m5mNjXLIBWLstJhhCoXbESjeMJv9RQcavGySIFafjwpYXGRh6NvIjL4l8YHcuSxPw+50P4qx3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gJfv60rC0zKHMtq;
+	Mon, 18 May 2026 09:13:22 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 6647F40574;
+	Mon, 18 May 2026 09:14:23 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.85.155])
+	by APP4 (Coremail) with SMTP id gCh0CgCXX1vtZwpq_HnICg--.8878S4;
+	Mon, 18 May 2026 09:14:23 +0800 (CST)
+From: Zizhi Wo <wozizhi@huaweicloud.com>
+To: axboe@kernel.dk,
+	tj@kernel.org,
+	josef@toxicpanda.com,
+	yukuai@fnnas.com,
+	linux-block@vger.kernel.org
+Cc: cgroups@vger.kernel.org,
+	yangerkun@huawei.com,
+	chengzhihao1@huawei.com,
+	wozizhi@huaweicloud.com
+Subject: [PATCH] blk-cgroup: defer blkcg css_put until blkg is unlinked from queue
+Date: Mon, 18 May 2026 09:09:32 +0800
+Message-ID: <20260518010932.633707-1-wozizhi@huaweicloud.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ago7kyBnaWKU7l3E@kbusch-mbp>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCXX1vtZwpq_HnICg--.8878S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxWw1kZF4kXF1fKr15Jw4xWFg_yoW5Ar18pF
+	ZxGrWSy3srKryIvan8WF17X34F9a1rKF15GrZ5Gw4Ykr45Zrn2qF1UArWkXFWY9FZ7Ar4Y
+	yrW0qrZrtF4UCwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
+	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
+	6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: pzr2x6tkl6x35dzhxuhorxvhhfrp/
 
-On Sun, May 17, 2026 at 04:05:07PM -0600, Keith Busch wrote:
-> On Sat, May 16, 2026 at 11:53:54PM -0400, Chao S wrote:
-> > On Thu, May 07, 2026 at 07:12:26PM +0100, Keith Busch wrote:
-> > > [...] how that was defeated [...]
-> > 
-> > Hi Keith,
-> > 
-> > Not the freeze.  The WARN does not depend on q->limits, but on
-> > ns->head->ms (read live at dispatch, set inside the freeze window) and
-> > on REQ_INTEGRITY, never set for EXT_LBAS-non-PI.  capacity==0 only
-> > gates submission (bio_check_eod()), not dispatch: a writeback bio that
-> > passed bio_check_eod() under the old capacity sits on the task plug
-> > holding no q_usage_counter ref, so it does not block the freeze;
-> > blk_finish_plug() flushes it after the update committed head->ms != 0
-> > (dmesg: the capacity-change line prints before the WARN).
-> > 
-> > So it is reachable -- the host-unaware geometry change you described,
-> > unrelated to your block fix.  The deeper fencing gap is the separate
-> > TP-level issue; v2 does not attempt it, it only stops a
-> > device-reachable, already-safely-rejected dispatch from being a WARN
-> > (a panic under panic_on_warn).
-> 
-> I think tHe WARN is serving it's intendeded purpose: the block layer
-> shouldn't have submitted this request. You can't do generic read/write
-> with extended metadatate as the DMA is going to corrupt memory with
-> respect to what the block layer expects.
-> 
-> This driver is depending on the capacity constraint to prevent this
-> scenario, so I think The "end-of-device" check needs to happen within
-> the entered queue context. If there's a scenario that escapes that
-> check, then I think that's what needs fixing, not the driver.
+From: Zizhi Wo <wozizhi@huawei.com>
 
-Does this fix it? I don't necessarily like having yet another check in
-the hotpath, but should be exactly the check that drivers expected to be
-done, so should be cache hot in the normal case.
+[BUG]
+Our fuzz testing triggered a blkcg use-after-free issue:
 
+  BUG: KASAN: slab-use-after-free in _raw_spin_lock+0x75/0xe0
+  Call Trace:
+  ...
+  blkcg_deactivate_policy+0x244/0x4d0
+  ioc_rqos_exit+0x44/0xe0
+  rq_qos_exit+0xba/0x120
+  __del_gendisk+0x50b/0x800
+  del_gendisk+0xff/0x190
+  ...
+
+[CAUSE]
+process1						process2
+cgroup_rmdir
+...
+  css_killed_work_fn
+    offline_css
+    ...
+      blkcg_destroy_blkgs
+      ...
+        __blkg_release
+	  css_put(&blkg->blkcg->css)
+          blkg_free
+	    INIT_WORK(xxx, blkg_free_workfn)
+	    schedule_work
+    css_put
+    ...
+      blkcg_css_free
+        kfree(blkcg)--------blkcg has been freed!!!
+====================================schedule_work
+              blkg_free_workfn
+							__del_gendisk
+							  rq_qos_exit
+							    ioc_rqos_exit
+							      blkcg_deactivate_policy
+							        mutex_lock(&q->blkcg_mutex)
+								spin_lock_irq(&q->queue_lock)
+							        list_for_each_entry(blkg, xxx)
+								  blkcg = blkg->blkcg
+								  spin_lock(&blkcg->lock)-------UAF!!!
+	        mutex_lock(&q->blkcg_mutex)
+	        spin_lock_irq(&q->queue_lock)
+	        /* Only then is the blkg removed from the list */
+	        list_del_init(&blkg->q_node)
+
+As a result, a blkg can still be reachable through q->blkg_list while
+its ->blkcg has already been freed.
+
+[Fix]
+Fix this by deferring the blkcg css_put() until after the blkg has been
+unlinked from q->blkg_list in blkg_free_workfn(). This ensures that the
+blkcg outlives every blkg still reachable through q->blkg_list, so any
+iterator holding q->queue_lock is guaranteed to observe a valid
+blkg->blkcg.
+
+Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()")
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
 ---
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 17450058ea6d8..4b5fb32a7d6f8 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -553,7 +553,7 @@ ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
-  * This may well happen - the kernel calls bread() without checking the size of
-  * the device, e.g., when mounting a file system.
-  */
--static inline int bio_check_eod(struct bio *bio)
-+int bio_check_eod(struct bio *bio)
- {
- 	sector_t maxsector = bdev_nr_sectors(bio->bi_bdev);
- 	unsigned int nr_sectors = bio_sectors(bio);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4c5c16cce4f8f..b75117ec5c988 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3186,6 +3186,11 @@ void blk_mq_submit_bio(struct bio *bio)
- 		goto queue_exit;
- 	}
+ block/blk-cgroup.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 554c87bb4a86..7b7677d022d0 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -132,10 +132,15 @@ static void blkg_free_workfn(struct work_struct *work)
+ 	if (blkg->parent)
+ 		blkg_put(blkg->parent);
+ 	spin_lock_irq(&q->queue_lock);
+ 	list_del_init(&blkg->q_node);
+ 	spin_unlock_irq(&q->queue_lock);
++	/*
++	 * Release blkcg css ref only after blkg is removed from q->blkg_list,
++	 * so concurrent iterators won't see a blkg with a freed blkcg.
++	 */
++	css_put(&blkg->blkcg->css);
+ 	mutex_unlock(&q->blkcg_mutex);
  
-+	if (unlikely(bio_check_eod(bio))) {
-+		bio_io_error(bio);
-+		goto queue_exit;
-+	}
-+
- 	if ((bio->bi_opf & REQ_POLLED) && !blk_mq_can_poll(q)) {
- 		bio->bi_status = BLK_STS_NOTSUPP;
- 		bio_endio(bio);
-diff --git a/block/blk.h b/block/blk.h
-index b998a7761faf3..84515bb75485d 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -54,6 +54,7 @@ bool blk_queue_start_drain(struct request_queue *q);
- bool __blk_freeze_queue_start(struct request_queue *q,
- 			      struct task_struct *owner);
- int __bio_queue_enter(struct request_queue *q, struct bio *bio);
-+int bio_check_eod(struct bio *bio);
- void submit_bio_noacct_nocheck(struct bio *bio, bool split);
- int bio_submit_or_kill(struct bio *bio, unsigned int flags);
+ 	blk_put_queue(q);
+ 	free_percpu(blkg->iostat_cpu);
+ 	percpu_ref_exit(&blkg->refcnt);
+@@ -177,12 +182,10 @@ static void __blkg_release(struct rcu_head *rcu)
+ 	 * blkg_stat_lock is for serializing blkg stat update
+ 	 */
+ 	for_each_possible_cpu(cpu)
+ 		__blkcg_rstat_flush(blkcg, cpu);
  
+-	/* release the blkcg and parent blkg refs this blkg has been holding */
+-	css_put(&blkg->blkcg->css);
+ 	blkg_free(blkg);
+ }
+ 
+ /*
+  * A group is RCU protected, but having an rcu lock does not mean that one
 -- 
+2.52.0
+
