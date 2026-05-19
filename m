@@ -1,238 +1,204 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CWXP265CU008.outbound.protection.outlook.com (mail-ukwestazon11020139.outbound.protection.outlook.com [52.101.195.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3E32749CF
-	for <linux-block@vger.kernel.org>; Tue, 19 May 2026 01:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779153898; cv=none; b=eymR6EHPPwkOhSBhCPIajA5uj/NwocRhhL2phqJO1JLUR37VWL8WA9WjF3l5CGmnJ7Yl7IGmydcGpfg7fouX8SkBtkLlLADa0rKiGtucaMWNDpoi1KwYueTpPfJJW5v0v5S/9nYKSJ3baAEG5EjBPFgfm2Bv9GrvKj0K5X2QF4Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779153898; c=relaxed/simple;
-	bh=VzMjhjnFJWz9dLD0rxOTzWJky+s5SLINInPF47To/v8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K2R80su2nwr9MptXRbL0qS6qWjlYbk68Xr9lTT7uZaecV5MFiE6Xd0OcJP5lH+9bj8hRTL5MwBNbnad8XZ3BU5CiQ0w349+vNAjCmLDQ3A9EaWMF7LLdDJ82iY7FtaVbcXXDhVQBOUfpP1+VEBd6CWcV3Ei9oC2PgFWrwcC+kro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G7tA224f; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G7tA224f"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-408778a8ec4so1906714fac.0
-        for <linux-block@vger.kernel.org>; Mon, 18 May 2026 18:24:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779153896; x=1779758696; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cq9cVpikNjuZFrIF8dtmXI9wmUwkCwAk9zI9DbaCQ0k=;
-        b=G7tA224fP6p2n/SU36vihRoFWrY+JyllnMplwtmD8WPkhYfzB/0oB7/ukbaZ3aq+si
-         U3Wt9W5H5XSpRbg2iZX+psrhhV5d+ZXxu1z1vwiCaRhMEKhuoav1tpR0AIpLHQedeNey
-         YAJlyKT/geAcpnvg0C6EeZyJ5khn3eL38VmNm43cutdFWlj36YkSXCrzVazZozavq3S2
-         E3ZpLM8AugWdks/pCNcsezFuWRvXIwQ6YJWUvhA4yoeAdkrrCc7167lj1NkfgxnbC4fu
-         zppCPit/cz6pQtco9zEoNviWt9NnHAkMI05Hk1+cfiDrpj0D2MPjfVNnamrZ5BB8j3wp
-         AEwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779153896; x=1779758696;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cq9cVpikNjuZFrIF8dtmXI9wmUwkCwAk9zI9DbaCQ0k=;
-        b=XNpdWNm+kHe6hFt4c+d/v4hoPOOH+tKPx8DY1jN4ru1GhtLDVs8797vVR1sdYFvtxf
-         8fyMh3J/uRNLpYSZtW5KbfeDPVLOUAI2iFeowuA3tFz28r9EvCnEhENRynmVhXbsIrrz
-         lHhLf3UGtwh/1+hWuOtuoCHvBjAkaQkmRwW0Etx7w9/fBxADfpNfCRGKCS7iN7G6OQmb
-         nwB0qOuJ9N1VDV+fuQPcNQRAkce2XJhoEISV1sPnbZAZIUWTF+1MnQn68wWy0gW40nYb
-         K7Bnv7pQYknSrWJoKk+KC7Ew0B6cy1R4+34jBpl9/F+PsKExgkP+VA7vfDmwjzidXvZ/
-         kTcg==
-X-Forwarded-Encrypted: i=1; AFNElJ9K2Hkrhj86pLLL4ULRt/q35nUwGLNhoKqzjGs3YL8QYRyYA7pbBsPL4MQ0ds9wl1vaTYcSog5SxMUS8w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YztztreIDlb5GzWuRARaZfYC54W/OpH8iotHmYFSOSi83OIzJaD
-	ntaysxq0umPoqARg8+nRW/ywNMr9I4YqDaVTZV0uNL1IpmQ0BDmuTRgH
-X-Gm-Gg: Acq92OG1U5pVhk5ZY2nz7Cl56J4hwepsYu4imeT1Pats4hxJwQsFhTKq7g+CSMvEkEy
-	Wc4bbXJBaTJwdmqfnjT9x0nXU68rAesW06NSA2aL2HO7zRjD2+RNapDCCo0fFApbO6jZ+ESk4S3
-	HtTmlruOkR2f6UJIZBOZwPq2iN51431/QkQDp5g+qhJcNqfC2iYL1wm43EB3h67cyIWB4/BhbNs
-	e4q8VSDLbclB6IOtZxZkV6jiKcW+YNkkJUiyTtp8WCKs31ioRfwibxrRRuMALws4bh1CjwEuC15
-	EjFHdRLeOnlFn9uuGOUAC0/aUiegiKWZ7GA7ozywrH5+si+mQ4dsgOjvo+JU2PM2LaoXIJY89LB
-	y3LXhjjYS6kyTSLwYl9fu9M81dE6VosjtqwKjeRGOddQpXEPmZJGzlhOAj6d1TfMQE78AW0OV42
-	ZL41lSU00r0062auylkbspKJYqKkr7ES5ep1+fW5SCQ/xqmcfNsZC/rbrulOjnwGDVEme6UKvao
-	a6y6fxy81rbDugVuNc/
-X-Received: by 2002:a05:6820:4b15:b0:69b:34db:20cc with SMTP id 006d021491bc7-69c9bdbdddamr10588018eaf.43.1779153896149;
-        Mon, 18 May 2026 18:24:56 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43a957b5cf4sm5852128fac.17.2026.05.18.18.24.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 18:24:55 -0700 (PDT)
-Date: Tue, 19 May 2026 09:24:50 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2] blk-mq: check for stale cached request in
- blk_mq_submit_bio
-Message-ID: <agu74lMg10kxPXrl@fedora>
-References: <20260501174120.403960-1-kbusch@meta.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9218F312825;
+	Tue, 19 May 2026 02:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.195.139
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779159027; cv=fail; b=icCbsqLJoBaG0DJ11Ee5KaTc/gkqkxIjdhHfXYuWAId8t8XegX1z1sR4C4O6wLQNd7+Ofk3nRR4Cv15bG+IILhg+2p1jNtGiBvFiKhHhfEnCUjU7ZRC2hEYgBY0ElrHkj/qiURfqX86c0Fc205ttdXBJ1BpSP8dcikjjMeaZDS4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779159027; c=relaxed/simple;
+	bh=8gzyF2UcB7D2H4w37hXTFVcFhc57ygfH8DXZc0Fpngg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=QZPqRVuOQvhHKOB+Hxq9qGdzNCBdiDQNHYQ4VrY61v2PidfAlunIQNwlEO4BMukLEC8ttxywoc93LTu3a9h1kYlMZHpoK9wIu7pYHkuztQCZCsvMeMZ2csVPRuqjtTYZX6ZRyuhu4oQqRheNscUr+HzJwvvPTVyRlTbi5R8gidc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.195.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dOnASJ28H/s/JVZ6C+0o/WCsG39NO/cBg+OUrq59GehSo9LVydDAe95Ba86t+CV7oi87QuKMiKCIt41XVeeaXmlfSr8QE23HewOJRYGGJ0lHtXpgHTbAj80pYAGsmKFv5juHkPlzGxeie5xsCAnBmGU125vbft9jbQ3Z8G6rgQSN+AAQVV0x98kbqyfcKw2sWOU6jgyChCVd4IlgYRgygmK92IosxL1CTYFV1jiUQiqPYS6vBE60/tNDgRG3TRAuIGUrjq+YHa75v+jBo+dFTAb5xbu9RdEsYFBBjLtXpx/e+5WQkgCgYXRngpFrWlMLWlXpyJwE9D5cjwJ5u+ju4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8gzyF2UcB7D2H4w37hXTFVcFhc57ygfH8DXZc0Fpngg=;
+ b=GYNgDB72gUdz6b1qS2m4qgnox2AKxbZ9KPjGt6D7qrUUvrbPjZP2Un24Pnm3vHCRugK97CWO2y9CNjtrKVhNB8EBOs8iKCu1FseVLF/HSnzORp0xkiga7AIHfy649Qt7ItSe0w+gqFeJehMjKTCL3U+LP9TuYgs/YfPusNMkwcmSblaydrnt2nMhimnWtJlzRNR1JntVQO+LXBG73TCwtpwNqet2Wqt94y3hEfd1q9Ow9XbwFpuljEzeeBX9QSmQ2sor3m4QW+osAm20E3d60thj94nF286LqXOlxetvKeQMm5uJeCgGWn/KVAOM+CoYD/rVZrsrl3CnLjYlAt9nQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
+ by CWLP123MB6857.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:1ed::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.24; Tue, 19 May
+ 2026 02:50:21 +0000
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9846.025; Tue, 19 May 2026
+ 02:50:17 +0000
+Date: Mon, 18 May 2026 22:50:13 -0400
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: Daniel Wagner <dwagner@suse.de>
+Cc: Daniel Wagner <wagi@monom.org>, axboe@kernel.dk, kbusch@kernel.org, 
+	hch@lst.de, sagi@grimberg.me, mst@redhat.com, aacraid@microsemi.com, 
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com, liyihang9@h-partners.com, 
+	kashyap.desai@broadcom.com, sumit.saxena@broadcom.com, 
+	shivasharan.srikanteshwara@broadcom.com, chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com, 
+	sreekanth.reddy@broadcom.com, suganath-prabu.subramani@broadcom.com, ranjan.kumar@broadcom.com, 
+	jinpu.wang@cloud.ionos.com, tglx@kernel.org, mingo@redhat.com, peterz@infradead.org, 
+	juri.lelli@redhat.com, vincent.guittot@linaro.org, akpm@linux-foundation.org, 
+	maz@kernel.org, ruanjinjie@huawei.com, bigeasy@linutronix.de, 
+	yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org, longman@redhat.com, 
+	chenridong@huawei.com, hare@suse.de, kch@nvidia.com, ming.lei@redhat.com, 
+	tom.leiming@gmail.com, steve@abita.co, sean@ashe.io, chjohnst@gmail.com, neelx@suse.com, 
+	mproche@gmail.com, nick.lange@gmail.com, marco.crivellari@suse.com, 
+	rishil1999@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v13 5/8] blk-mq: use hk cpus only when isolcpus=io_queue
+ is enabled
+Message-ID: <jts6gcq2pjywiwnhojp3hwrl26z26igsyqfl5a7dst5fkmwseu@haf5dmjrtpsr>
+References: <20260513005509.135966-1-atomlin@atomlin.com>
+ <20260513005509.135966-6-atomlin@atomlin.com>
+ <3af2cd18-1221-4ff6-aa7f-6dab74460eab@nitrogen.local>
+ <bovevvg2n77nzdrvjkayca2piibjl4noykv24wthex7em4u5lo@beqyhu2xertk>
+ <70b4cbf0-9137-41de-881b-ff2a60f084ec@flourine.local>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ubccp6puy3dx7d2v"
+Content-Disposition: inline
+In-Reply-To: <70b4cbf0-9137-41de-881b-ff2a60f084ec@flourine.local>
+X-ClientProxiedBy: BN9PR03CA0732.namprd03.prod.outlook.com
+ (2603:10b6:408:110::17) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|CWLP123MB6857:EE_
+X-MS-Office365-Filtering-Correlation-Id: 93a69756-b8f3-429c-0071-08deb5515c0a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|22082099003|18002099003|56012099003|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	/VhbNAmkIGbFaeRIWQm3TVteczt6cHADM8X3lzfsAIcOkhaarXwjXqdNhZ+w1flbV4zxtWRzGw1DkXlA5jKb+ZyB3x2dllJwFeLdFX2QqnycCXkhDHFj0jZWyLLz2nQ/8m4apT9KgScCUwWeSXOdsWVKxmWcMCdbLP718zf64YXAOTDKBGY2/JZ7+se8Fl+rRPvtkUDdJBDx2DvbWQzlRrd7+xadQHNtLSeQ+oEdVvQOVmYWP+t35O+iUflFM/re3nDiKD32M9GjVg5SBw7ZZcJjHVfgLhVNQ4iqKRPrgLCkEKwNMv2YWHorc23EBH+oF08pmoA0ASG6jVYfyxYKprg386WQNPvsEsXdVKTk3cmOtwqvkzSBi+BMA6Po966z82LrB2JUyOpLw9gl4p/LlKShQ9IKjuhiftUB4Y/VcfbWZK1xl2YLNXmRdIdXCu5aBPXDcugqD8XEfFdg7Nsll2YNLdsDqVA+Fd4pl4d0JSZjsRp0PdyMyFq9HT1ooZb5vgxb7DOM0BZ0LUmUPADyOxCkoLduvTX31sUkPJR/iZBUZ6OX+bDYM63D+EQRnG+ealPFOxrL1TUBlEbx17xSfg7KfYkA91bOAGlIvO08mFCrIuCZ+AKueRoK5LoDzz3fMgEovXDlMXyGqI3rSqcAMY+zYihUHf6bC7ebU0aMwBd8D8kk23PY7C9qdSrtI1lz
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(22082099003)(18002099003)(56012099003)(4143699003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OURkWVVzK3Z0TnBMb1lIbUF4cTM4aXNacEw2eWpxTlVXSUdzMW92WFMrTVBH?=
+ =?utf-8?B?SXo2K1d2RjA3TEppUkNtNmtaUTFMYmU2bkh5NGRwb0ozOUNmMTk4Z0RxWnI0?=
+ =?utf-8?B?WWx1M3Zqak0zWk8rTExWbThMU1FvODFVOUhmMEZJYS90Q2hKQzJzZWJuQXZp?=
+ =?utf-8?B?bTBhNFJGN3JJcXZVWkhvcE0zL1VPdmVhQjRuMGlNL1U5UnA1U1MyNjFsTUV5?=
+ =?utf-8?B?M0xUQUdWSzB2T25hYWhWa0dRMXk1WVJUU29IbmJkTzVCeDBoeFBtVTlsQ2k3?=
+ =?utf-8?B?em5QQ0FXWnI5cVFld09iR0dRK2tDMlRBK3JTR25uZ3JuK25ndzdYZFp5OEZS?=
+ =?utf-8?B?ZDEwdnJYNXcrMTkrZUY0L1ZlU1ZYU0JwSUVLL29mbEdxenBtUzA5R2tqYWlv?=
+ =?utf-8?B?ZS9CQ0pSOXVQc01FdHBENUlUc0VQMXREa041UkdMMlJXeEN1TFpMQzBtRkpo?=
+ =?utf-8?B?YWJOWm5Xa0dPMTBlQy9RQXZEWUZVay8rSXgzaUtaNitCTGpSdHRWeDF1c1NK?=
+ =?utf-8?B?V0d3QVBVRmRqTDd6UjFac1dWb0xIZFY2aEl0ZlljREhGODNaTTF5WDYzNUxS?=
+ =?utf-8?B?ak5nNjJnaWdNcGw4NVZHZ085ZldDNlpnNW5VdnJOaVRzRy96WlhpRWZDZE40?=
+ =?utf-8?B?L0xnNDRITDFxaUJiY2tyTW9Oa3JhMnU2clhjYjMxMm95MkFJc2F0STVBQVBr?=
+ =?utf-8?B?ODNjSnl6Vmh6emlpOEt0emdpcngrc0g0Zk1QcG5EcUhaNTYzZFMwN0tFRDBs?=
+ =?utf-8?B?ZkVCYkdmdEVObkxXYVFKSWQyVXRTcGFlcVMxSlA5NUNzNWVUMTd3VFVVSkpx?=
+ =?utf-8?B?TmJhS0VsM01HSy9zT0h3WS9VNVpsTDM0UnRYSXNzanhuYmt5TUNNTndiam0r?=
+ =?utf-8?B?YWhhOXc5YlFmYm1oRWowQUlGRGVraFE3VlNDaGVndU4yY3Z3OWVNZS9IdFl2?=
+ =?utf-8?B?dmNieEwyaEU5TisxSlV0L0ZVZ012VHA1UGhKc2NsUmhEYnQ3cFhJTnZ3dmJX?=
+ =?utf-8?B?TEJQOUxncERhSi9LSE9aM0dDN0NKaFgvd2srUmRiZ1VYVDA0K3NMaEFGNXB2?=
+ =?utf-8?B?eVE5NzBMYjlhU3UrMDJKVW1McE81b1BJbmRjL3BUOUNUVGVGb2hKQXhZMVpY?=
+ =?utf-8?B?SXRubjdPdkxQVFJlM3d0QmI2b2tSdHJhMFh5YmhhMEx5NDdHMjBkRUc3aTdy?=
+ =?utf-8?B?K05jeDQrazM4dG83MW43M2pWdnpUZk5DalorY2ZiNHgyaW5YK2p1S1hwWGx1?=
+ =?utf-8?B?V0FNekVTTno0UGxiK2R6UktZQUd2UG41OUUzUjFUNFMwMFIvY3BMaDNjYnVs?=
+ =?utf-8?B?TnNpOGFrMmNvTTNGN0p6WVlDZjNNYUdaT0IvTkRHaitpNkJRVXlRZ2xxRWpv?=
+ =?utf-8?B?YVpxSmx6L3hZRmE1R2daKzcxVUM3NlFaRVF6Uzk4aXMycU5LYXhqY01YVzIy?=
+ =?utf-8?B?WGF0Vnl2RDNVdGc5TUQ3K1E1WVNLTzJtNnlQeTh4ZEZGTjFRWGhRaTlkK2JS?=
+ =?utf-8?B?a3VOQ3NOa24vdUNyOGN2cTh6Z2F3U3ZNYTlvcndRMFJJbEhFR1VRVDRKNC9i?=
+ =?utf-8?B?c0czVjdnaXNnU2dYQTZ1VG1salhaM05CcmlvRHk2WjJjQkNuK0ZHaXM5azgw?=
+ =?utf-8?B?Vmt6T2VyV2ZrYTdjZVNNajJYUDczakFzYnArYkZWdHFGdFVwQWZwS0E1SUk4?=
+ =?utf-8?B?WEp4Sm9UbVRjd1o3TTlKZmhDOStmb1gwMFNBVzJmR01mOVNyTHkrVzNveHhV?=
+ =?utf-8?B?eFRnWFE1WUpob1J1enl0OHphalNCVkg1Z1U0SW1sbDdVdi8zSVVKN3Z0UFJj?=
+ =?utf-8?B?eTRRQk9MNmtmRnpXdmNmdU5xRGxtUUcvTllqT0lSQVhaV0p4WVlLdStYOWI4?=
+ =?utf-8?B?U3RTTzBzU0E1V0h6RW54WXU4bTlEUmpYb3pkL21JbEY3WjZ5aDNLOGcwcm5O?=
+ =?utf-8?B?ZVlLUC9vKzNLOUw1MExCTXViblFmSDE4MFJqMHdraDM0WnlUOFBPTXVuaHc5?=
+ =?utf-8?B?c0FkL0RXS0FCQTdLVmZOdlVsa1p0THhkRk0xeFBZMEUyZlNYbjJvdks4WWhD?=
+ =?utf-8?B?MEs3MWp1VjN0bWNCaFBZdzN0TThaQXNldlYzTHNoTkhpRmgzekw0bHU2Tkl2?=
+ =?utf-8?B?WDV1WEZRL0Jsb3hKMTd6MDBRN0t6R05pNlFMMTRHVm9WeW9FR2ducU5PYW4z?=
+ =?utf-8?B?L3lUQWxudDNkdUlVaXZGNFI3TnJZN0FwbzlxZ3QzK0ZXWUl1d0dwbGk2dVZz?=
+ =?utf-8?B?RWxYR3dkbDM3NEtnWFpKME5mWXVPbzlsSFFZdHB3TnM4ZlZvUlA2cjFXRjQ1?=
+ =?utf-8?B?UmVVVnFsQ21aanBQcXJyKzJ2Mzk0ZkwwUG0rS0s0QW5FMXZXZExLdz09?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93a69756-b8f3-429c-0071-08deb5515c0a
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 02:50:17.7794
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uFHFnbHhsgiMAh/3GfARKe2Ugsno8hXruTGeDJSGvtJBKUFs9+jM+rfp+o3s9wn2s8RlH5mfX8cbK5KOTUfcFw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP123MB6857
+
+--ubccp6puy3dx7d2v
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260501174120.403960-1-kbusch@meta.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v13 5/8] blk-mq: use hk cpus only when isolcpus=io_queue
+ is enabled
+MIME-Version: 1.0
 
-On Fri, May 01, 2026 at 10:41:19AM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> When submitting a bio to blk-mq, if the task should sleep after peeking
-> a cached request, but before it pops it, the plug flushes and calls
-> blk_mq_free_plug_rqs, freeing the cached_rqs. This creates a
-> use-after-free bug. Fix this by ensuring the cached_rqs still contains
-> our peeked request, and retry the bio submission without it if the
-> request had been freed.
+On Thu, May 14, 2026 at 12:42:57PM +0200, Daniel Wagner wrote:
+> On Wed, May 13, 2026 at 07:30:44PM -0400, Aaron Tomlin wrote:
+> > > I think this should also check if the CPU is online. The fallback sho=
+uld
+> > > ensure the system will boot.
+> >=20
+> > While I completely agree with the goal of ensuring a safe boot, I suspe=
+ct
+> > that we actually must iterate over for_each_possible_cpu(cpu) here to
+> > prevent map boundary violations during CPU hotplug events.
+>=20
+> I have to check this version of the patch what is happening in detail.
+> Originally the idea was that the fallback should only be taken if it's
+> not possible to create a valid mapping due to $reason. In this case the
+> system should still boot and issue a warning. This is also what the
+> comments says in the function, pick one online CPU and map all hctx to
+> it. Don't bother to be smart.
 
-Yeah, it is one real bug.
+Hi Daniel,
 
-> 
-> The code had already warned of this possibility, and specifically popped
-> the request before other known blocking calls, but it didn't handle a
-> blocking GFP_NOIO alloc. Under memory pressure, allocating the split bio
-> or the integrity payload are two such cases that can block. The blk-mq
-> submit_bio function continues using the peeked request that was already
-> freed and re-initialized, so the driver receives that request with a
-> NULL'ed mq_hctx, and inevitably panics.
-> 
-> Relevant kernel messages if you should encounter this condition, where
-> the "WARNING" is the harbinger of the panic about to happen:
-> 
-> ------------[ cut here ]------------
->  WARNING: CPU: 4 PID: 80820 at block/blk-mq.c:3071 blk_mq_submit_bio+0x2cf/0x5b0
-> ...
->  BUG: kernel NULL pointer dereference, address: 0000000000000100
->  #PF: supervisor read access in kernel mode
->  #PF: error_code(0x0000) - not-present page
->  PGD 6b367b067 P4D 6b367b067 PUD 6bb5eb067 PMD 0
->  Oops: Oops: 0000 [#1] SMP
-> ...
->  Call Trace:
->   <TASK>
->   blk_mq_dispatch_queue_requests+0x46/0x120
->   blk_mq_flush_plug_list+0x38/0x130
->   blk_add_rq_to_plug+0xa2/0x160
->   blk_mq_submit_bio+0x3ab/0x5b0
->   __submit_bio+0x3a/0x260
->   submit_bio_noacct_nocheck+0xc6/0x2b0
->   btrfs_submit_bbio+0x14d/0x520
->   ? btrfs_get_extent+0x43f/0x640
->   submit_extent_folio+0x31f/0x340
->   btrfs_do_readpage+0x2d7/0xac0
->   btrfs_readahead+0x142/0x200
->   ? clear_state_bit+0x520/0x520
->   read_pages+0x57/0x200
->   ? folio_alloc_noprof+0x10c/0x310
->   page_cache_ra_unbounded+0x28c/0x480
->   ? asm_sysvec_call_function+0x16/0x20
->   ? blk_cgroup_congested+0xa/0x50
->   ? page_cache_sync_ra+0x41/0x2d0
->   filemap_get_pages+0x347/0xd50
->   filemap_read+0xd3/0x500
->   ? 0xffffffff81000000
->   __io_read+0x111/0x440
->   io_read+0x23/0x90
->   __io_issue_sqe+0x40/0x120
->   io_issue_sqe+0x3f/0x3a0
->   io_submit_sqes+0x2bd/0x790
->   __se_sys_io_uring_enter+0x100/0xc10
->   ? eventfd_read+0x100/0x1f0
->   ? futex_wake+0x1b9/0x260
->   ? syscall_trace_enter+0x34/0x1d0
->   do_syscall_64+0x6a/0x250
->   entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> 
-> Fixes: b0077e269f6c1 ("blk-mq: make sure active queue usage is held for bio_integrity_prep()")
-> Fixes: 7b4f36cd22a65 ("block: ensure we hold a queue reference when using queue limits")
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
-> v1->v2:
-> 
->   Warn if the cached_rqs is not NULL when the peeked request isn't the
->   top. This should never happen, but such a bug would be difficult to
->   figure out was happening without the warning. The previous warn was
->   essential to figure out the bug this patch is addressing.
-> 
->   If the peeked request was freed, rerun the entire bio setup. The first
->   version potentially performed operations outside the queue usage
->   counter protection, so may have resulted in an invalid bio if it was
->   racing against a driver updating queue limites. This retry also
->   required clearing the integrity allocation if it was done since
->   updated limits may make any previous setup invalid.
-> 
->  block/blk-mq.c | 29 +++++++++++++++++++++--------
->  1 file changed, 21 insertions(+), 8 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 4c5c16cce4f8f..73ef3e4be5123 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3096,22 +3096,27 @@ static struct request *blk_mq_peek_cached_request(struct blk_plug *plug,
->  	return rq;
->  }
->  
-> -static void blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
-> +static bool blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
->  		struct bio *bio)
->  {
-> -	if (rq_list_pop(&plug->cached_rqs) != rq)
-> -		WARN_ON_ONCE(1);
-> -
->  	/*
-> -	 * If any qos ->throttle() end up blocking, we will have flushed the
-> -	 * plug and hence killed the cached_rq list as well. Pop this entry
-> -	 * before we throttle.
-> +	 * We will have flushed the plug and hence killed the cached_rq list as
-> +	 * well if anything had scheduled. Pop this entry before we throttle if
-> +	 * the entry is still valid.
->  	 */
-> +	struct request *popped = rq_list_pop(&plug->cached_rqs);
-> +
-> +	if (popped != rq) {
-> +		WARN_ON_ONCE(popped);
-> +		return false;
-> +	}
-> +
->  	rq_qos_throttle(rq->q, bio);
->  
->  	blk_mq_rq_time_init(rq, blk_time_get_ns());
->  	rq->cmd_flags = bio->bi_opf;
->  	INIT_LIST_HEAD(&rq->queuelist);
-> +	return true;
->  }
->  
->  static bool bio_unaligned(const struct bio *bio, struct request_queue *q)
-> @@ -3154,6 +3159,7 @@ void blk_mq_submit_bio(struct bio *bio)
->  	 */
->  	rq = blk_mq_peek_cached_request(plug, q, bio->bi_opf);
->  
-> +retry:
->  	/*
->  	 * A BIO that was released from a zone write plug has already been
->  	 * through the preparation in this function, already holds a reference
-> @@ -3211,7 +3217,14 @@ void blk_mq_submit_bio(struct bio *bio)
->  
->  new_request:
->  	if (rq) {
-> -		blk_mq_use_cached_rq(rq, plug, bio);
-> +		if (!blk_mq_use_cached_rq(rq, plug, bio)) {
-> +			struct bio_integrity_payload *bip = bio_integrity(bio);
-> +
-> +			if (bip && (bip->bip_flags & BIP_BLOCK_INTEGRITY))
-> +				bio_integrity_free(bio);
-> +			rq = NULL;
-> +			goto retry;
-> +		}
+Understood.
 
-This way still looks fragile, given rq isn't guaranteed to be live.
+Previously, heavy isolation could starve a device of its minvec
+requirement, forcing the block layer into this fallback.
 
-Just wondering why not pop it from plug->cached_rqs from beginning, and
-move it back in case of `queue_exit:`?
+The next iteration of this series has been updated to ensure a minimum
+vector safety net. To prevent fatal -ENOSPC device probe aborts on heavily
+isolated systems (i.e., where the housekeeping CPU count might be lower
+than a device's structural minimum), the final vector calculation is
+safeguarded to never drop below minvec. Queues will safely share the
+available housekeeping CPUs instead of failing the probe.
 
+Kind regards,
+--=20
+Aaron Tomlin
 
+--ubccp6puy3dx7d2v
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
-Ming
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEeQaE6/qKljiNHm6b4t6WWBnMd9YFAmoLz+AACgkQ4t6WWBnM
+d9YMSw//S/dmR0MU/9vU8Z0bFpZ9MKUJ/YpICl6TS3j3Sk9HiswHEQ3cXBewTa8r
+ca5LXxxwYRtQsceM0/ebVcA027UAoYPjX6pyrlcG5pWGOHgCyN+qWtPB7sGEOSbo
+7vdcCxYwAyfSU5hSofw60PAML0kCDTnmtXLzUcNY+qlhy5iMkoANzK60RZv1eb6N
+2bdp2HIE/hpbUdGRPtCv4JICrGKoCd+NtsidWPTHiaaMeupxR57I1eRvp8pIxttp
+HFm3TpMFeH2dQIrLAryGvD8HW/SMVKRrETQ6mJCdJCyYRdjHWctM1mlYAMG2luSU
+DuzKuNfVZzFACnTSIoCcL1YVTjZLMVHvn23BCD3GExtkhGv81BmYlZTC97lD+2Ec
+N3FX9OjOtZbxXmq3MKq2AeFB8Eq2s5vYDjf1Sg7cbnIWiS8rU36l1U87WzyZAl4p
+xzV0j96MQMDGFzDY5Knj6oaNbZ0WbxKB0XC2bdhQi9KIhd/DsWTrrgvuIScfcHzS
+vtbiPGuiKaAM3NL0ZUxt9l3ODZFYR3Euf9n9C99RT+ry29ioMI0/bRpNtcrDdpnI
+ByE8vXi1lCjce4+vqfon3ifQ/Nu6HfRmKPNGjdI7Y2kF5lNgmEs5v5M/L+VXyIL/
+5+SNJBo2tpKDdFyyjRso541nDCQDa9tmiRhbmZfbCbwqOA36jPU=
+=wLfc
+-----END PGP SIGNATURE-----
+
+--ubccp6puy3dx7d2v--
