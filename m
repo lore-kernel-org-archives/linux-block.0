@@ -1,123 +1,163 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EFF27281E
-	for <linux-block@vger.kernel.org>; Tue, 19 May 2026 17:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779211451; cv=none; b=CdQfMcL2ZRtvilDPOMl/6PJsKEaMobi92ykg1Tx7mlGouJbyqBpLMixRvbLzmRZ1MrTVWi5Ppb7/IzMeugBfI0kSHbLO80TGCgiVM9KC+TuNwVBHFNnlrN9w+s9TcXL1gvgqn8i10Q4DPR5o0i4FkTm6TT2clPtEqIVuf7cAQLE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779211451; c=relaxed/simple;
-	bh=xHs0yFkztIznLwb33EEnA0Kjl3n1+393w46rYwPRLvc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OfSTVKbL0WmE0z4NGr05c1+E3uqKbMWiILeMLzsd14qKYdhM6i/zklecgI4JDYTWKeZqrFzdlwncWu9c+blDqnwTeB0kZn8b3h2n1emjgw9igLTv9cRvLWSc77koueZX/d05z/w4TsrXF974yYXUt+MHwa9Zhmuo6Owdhbk0gR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=de+0quj5; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602B93DB334
+	for <linux-block@vger.kernel.org>; Tue, 19 May 2026 17:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779211829; cv=pass; b=oZmYQI3DE/4WGB5sxll0oT3t/hzGM34xD30iceAnnyMF2NMN3JK/+T2WnQ4RY5go0VgCBouE+wqHzJITESyEpeDKd2OCx9WtpK+6dLhhTFg4cjooKYkTya/OfisssA2L2yUhHUyJTJcuQUFMX0O6qsBnqNUy7V106l03xHJaTGE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779211829; c=relaxed/simple;
+	bh=7gkvuiDElaYKKD7N6WpKQ7gsyRhM7wHYaXNapde9ApA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AvdzqLe/N6SaKUVtbUsxr8yVy2rMH9/MZUGknMMsB0eWXZYBnoWqnCh434Vapc67T2IE5rg+XHKPZhuHISv/jqEDmB7jQpBybZuPp8dyh9IemLtVkGFAqhdKLGQD19BovVNMin/8IUDK/W0hkyj6CRdIVs++hSDQHRggk7qvxqg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=THKKGU1Q; arc=pass smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="de+0quj5"
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64J4VXVX182059
-	for <linux-block@vger.kernel.org>; Tue, 19 May 2026 10:24:06 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=zy1ofmOP6PSRwOaZNgivE8Y4y6QkgY6sla0k7S7E7Cg=; b=de+0quj5V62B
-	kOO1nbP2jsBQY055/rN1A9xHIDKh4RxevoK+crjDDdK/rw0QjVr14bH7YehoNaMX
-	V/FrCs1p1PkxADqJLBLzGFworXaJH5ZbCm4yllzxoZ53xuyrGYjoUF5DOfVRvPJ3
-	My6o0W0U4MnyE2hvkRlQ1PZ5FWusyx5SUZQgtKeu2todQk3I2epgRTUmrsbqP+tg
-	w7hN5wj2jvJXJtDvF6bL4HguMQPBoEIQYu5EEo2SUB0fQu6lnTGNcmSdxabo2i4j
-	jki8AR37KivD8pRRfTc9b14kIU2+1DSXOSIX4UtEvwYxRci6cUK03j9eN3xJRsOT
-	hb+uSs0uOQ==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4e6p3bskgw-12
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 19 May 2026 10:24:06 -0700 (PDT)
-Received: from twshared23877.03.snb2.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.37; Tue, 19 May 2026 17:23:56 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 637E31A75978D; Tue, 19 May 2026 10:23:32 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
-CC: <axboe@kernel.dk>, <hch@lst.de>, <tom.leiming@gmail.com>,
-        <coshi036@gmail.com>, <Igor.Achkinazi@dell.com>, <dlemoal@kernel.org>,
-        Keith
- Busch <kbusch@kernel.org>
-Subject: [PATCH RFC 2/5] block: fix invalid zone append status
-Date: Tue, 19 May 2026 10:23:23 -0700
-Message-ID: <20260519172326.3462354-3-kbusch@meta.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260519172326.3462354-1-kbusch@meta.com>
-References: <20260519172326.3462354-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="THKKGU1Q"
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-69489e55b15so145120eaf.3
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2026 10:30:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779211826; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ClioobjWNZ8BAoK8pe6uVoa5saVQiWQ6SfhU+9h9hUTtWXbqKgYcY/ekr/koNH/z2u
+         88Skbxn10tM/58LofFuoCobKDtAHvjfyVZoXx+y9s8820AldnM7rmWiqTBZjBFXJWQZQ
+         0m7KbLb4mnXPQWePWyULjC7rB2Lb6Zv9MK6/YsFiedHYEpYjnQoyuILFYezXanYdstMf
+         a6rzk7Z5pG01G1b/5OgzYeF1hguPn+fR/YPU2pAbb9KsOylyul+l1zSlVqj7bMfNBO8m
+         IGJzUhZa0hQ53P3qz0C2RnTnD63U69laqYpWVx0TaqY8AZAYpNDxHyk4bl8X+7Lszkdi
+         ZJYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BO3tk1HUsrHMlVLjdJPUmFor8Zm4KHh+N/ip+lC/DLk=;
+        fh=W2WDN24dtoI9Bp3xqL9QGn0TFtf243F1MfDZnhNAW/8=;
+        b=OEZ5GyWcc901/IYc+vj0FJklvcqMepglLPgf9PsEh3ktWpBjhxRfWIZKEZ3P1mJJNl
+         pQR9SjAYkiBrJ/mD7ocu3VKW9oqlnSo19PJQkKrC5KTKYdJSWFvnoXMC53UwUNagFaf4
+         WuOdgrCbSPTNsEIjw/KqFKcIAn1zP+wSsDYV2Xk8zGSZztVHmCCnHhuX8zvI1MnRzXUy
+         hej7Up+iG7O0M89XfvISM5zzxSdu0JrpldJ04NVIxPkZj+jjW3zh6Wzdu8mZcA+oV1xA
+         FT1XX/tJAglF5TgtdxnA58HZkB9qsx4+Cq3C7J+3jBbFZO/PqKUHspZd9EILUJDkP7DV
+         8EQA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1779211826; x=1779816626; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BO3tk1HUsrHMlVLjdJPUmFor8Zm4KHh+N/ip+lC/DLk=;
+        b=THKKGU1QkdPnzxwBu02UFYH+vh3Cpx0mQNKHa3/JV6FF8DsWHC88fkvA8WezpVNHG6
+         aPZmP5aPmwOsutYGnL5QAOXwLrZMIY7NPzIAGii2WpST5Z0dLTD2xjJcwnbkgRkSxuq2
+         Zfl7pnWY0/mKI6GtxGu+OjATibXdX1elYd+g7fzi+OrvGc+UvrcL5F6Lplv5X9kJobIY
+         tDrIhrC/cyqrNzLcFuqigdeel5EqAb94E89o2dZlpXu82Ra/yga5SkpGT6w72hBJZwqg
+         5yIPaHdDg+ncvox5SkZ8lHaMyu7lVpWgxaBNqey0PhHxGU5wMKvZfKQknbJamEAamPxW
+         w45Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779211826; x=1779816626;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BO3tk1HUsrHMlVLjdJPUmFor8Zm4KHh+N/ip+lC/DLk=;
+        b=OV5Y/IQhhyOB64ltuE4rhGAepWQD9/mQw7eGZy9Q01ce/Bfc4dgkrB8vgXhcP6zhlp
+         k0imyEx9s9W7G8Io1mv81dJhIymVTwyN4eb8CBTOL+9WxgV0lR5p6Lr3v0/BrtrN2KF1
+         JumzLvom7cGEBdAGeCFeqD6UIGAuRY2+IgeTD4nGFlYn/YZ/MZvcp7TsBSRR9iLG6zK7
+         OueUGX/uTn4lqQ0+sudDIasn5801mtwpu+4qgvS53dYeHhLgQ8RW+GVGL9lRPCN1IeW3
+         1PNZDiDpnh6knJiuRXNdvqlMisUCTE4MD0O44snG7ah5CDuKmEXea0V2PTBAKZgeMwKO
+         sLaA==
+X-Forwarded-Encrypted: i=1; AFNElJ/Lf3CyEyrJmSkZfAkwxdbJ6VeL560Y5sLkiRg/zxrHqXXbd8+IksF8Rc74pBZw8Efhziis1ypa5gh1lA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1M7bvRcgJQWvRO/9my7jgx6+gc3Xv1oRhBRd3RiVlbt+gk6nI
+	js9+KorTnFiUtmWrgETBTdiPICwEdZtZsZdmcEakaaPf74vttNqZ6P8QLYioubOFE447dWznC9W
+	RpsyU/nWMNkz2JpAkooQZ9F0Pqjsrkn/oKXMMY7WulbMvTgHtshVJii4=
+X-Gm-Gg: Acq92OGXZmCfKaJlbX/BNLVuW5sUVOGVIB5F30crZUnYZYqbn9qIjizLVqgC5c4OUw0
+	9QnkSnGdtWCDt98hZHS3NQ6FxkK52ncAFRWSF2pZxaqIfqDVlxnmD2P2X8eLBMbOFFdqVQ9IWjH
+	q7+12CWH8JejI68cg3BSDf10S79LruF4IFNtXIxBomRJy4zh0inp/BBGaYXbHO85Ei8BACQFQGf
+	NAF/5nPXa0Otx7YGo08vi0kq8AF4i8NfLmEIKGX30iOJdoT7dOav6EQQOmqTERq2oxDRx+Th9Kn
+	W8H7YCUK/xxMbxu62UMUXyf2pbpT
+X-Received: by 2002:a05:6808:180b:b0:479:f928:44dd with SMTP id
+ 5614622812f47-482e55aa13fmr7127510b6e.1.1779211826010; Tue, 19 May 2026
+ 10:30:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260513182924.1753582-1-csander@purestorage.com>
+In-Reply-To: <20260513182924.1753582-1-csander@purestorage.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 19 May 2026 10:30:15 -0700
+X-Gm-Features: AVHnY4IdielbYchZmLgL1L_n9WgVYxRpcXUHu8srIr6nbv0PX5Kc5MQ0-lP0oXo
+Message-ID: <CADUfDZqnHaNCT7Y9GqmAKZn+2oXVEfXCa3dPL4JYLtue7c0GOg@mail.gmail.com>
+Subject: Re: [PATCH v4] bio-integrity-fs: pass data iter to bio_integrity_verify()
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE5MDE3NCBTYWx0ZWRfX3pdhfRypMWEb
- V8EOYtCNsg1BntvnRyjCTvNkLeecud/HtTHcXZ9GrqXLQLpJVv5Ma3IyKews14VGKMvr1mwUlpf
- hhEW0If0u+iZC7cIZOVlsrNoOFnPwayBnYmPsqcj7J1lUBEqO5bFjWsMf4macsIvQpwrDJpAQha
- kKiOjjviR8spx7/E0NG3DdVceYo4WlIGQ72VozMOKVFmqtPmZ3RGHF2+9wB+61/yVeGs/VwJcAP
- z3577oewFl/kyRmZSFTB/qtXhD5t1/40cKn6d3FvMV50t5XjleJDAjTtuKDL5jAAkw1ZcbfDext
- iiqRKPJNB8Kg/0ZSPSeq/rJQiLORcVIEZWvQwpY/XOZSUIhGJ5hDVuTmoXYaA1cm5y6SUiY36WG
- gxrTewR9WdE/SlE3mBRMbH3NpQAXFblvBWPozmb5HSpqyvERX0rU4qbKp1P1KS5bf9IJosGNAwi
- mxIPC57L12FnC9kKWMw==
-X-Proofpoint-GUID: IoWKTUCIuQgqP9AfB-tKkmIxoR-sL5Cr
-X-Authority-Analysis: v=2.4 cv=K6cS2SWI c=1 sm=1 tr=0 ts=6a0c9cb6 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=JnKecZnUtZousrUlYMGU:22 a=VwQbUJbxAAAA:8 a=xkUBQ34vpCiLUNs1zEsA:9
-X-Proofpoint-ORIG-GUID: IoWKTUCIuQgqP9AfB-tKkmIxoR-sL5Cr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-19_05,2026-05-18_01,2025-10-01_01
 
-From: Keith Busch <kbusch@kernel.org>
+Hi Jens,
+Gentle ping on this fix for 7.1.
 
-A bio submitted to a zone block device that breaks the limits is invalid
-rather than an IO error. Fix up the return code to report it that way,
-as the previously used IOERR is considered a path failure.
+Thanks,
+Caleb
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 22af5dec112b5..92a802dc8042c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -604,7 +604,7 @@ static inline blk_status_t blk_check_zone_append(stru=
-ct request_queue *q,
-=20
- 	/* The bio sector must point to the start of a sequential zone */
- 	if (!bdev_is_zone_start(bio->bi_bdev, bio->bi_iter.bi_sector))
--		return BLK_STS_IOERR;
-+		return BLK_STS_INVAL;
-=20
- 	/*
- 	 * Not allowed to cross zone boundaries. Otherwise, the BIO will be
-@@ -612,11 +612,11 @@ static inline blk_status_t blk_check_zone_append(st=
-ruct request_queue *q,
- 	 * different zones.
- 	 */
- 	if (nr_sectors > q->limits.chunk_sectors)
--		return BLK_STS_IOERR;
-+		return BLK_STS_INVAL;
-=20
- 	/* Make sure the BIO is small enough and will not get split */
- 	if (nr_sectors > q->limits.max_zone_append_sectors)
--		return BLK_STS_IOERR;
-+		return BLK_STS_INVAL;
-=20
- 	bio->bi_opf |=3D REQ_NOMERGE;
-=20
---=20
-2.53.0-Meta
-
+On Wed, May 13, 2026 at 11:29=E2=80=AFAM Caleb Sander Mateos
+<csander@purestorage.com> wrote:
+>
+> bio_integrity_verify() expects the passed struct bvec_iter to be an
+> iterator over bio data, not integrity. So construct a separate data
+> bvec_iter without the bio_integrity_bytes() conversion and pass it to
+> bio_integrity_verify() instead of bip_iter.
+>
+> Fixes: 0bde8a12b554 ("block: add fs_bio_integrity helpers")
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+> v4: split from series changing ref tag seed units
+> v3: https://lore.kernel.org/linux-block/20260417015732.2692434-3-csander@=
+purestorage.com/
+>
+>  block/bio-integrity-fs.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/bio-integrity-fs.c b/block/bio-integrity-fs.c
+> index acb1e5f270d2..0daa42d9ead7 100644
+> --- a/block/bio-integrity-fs.c
+> +++ b/block/bio-integrity-fs.c
+> @@ -53,21 +53,25 @@ EXPORT_SYMBOL_GPL(fs_bio_integrity_generate);
+>
+>  int fs_bio_integrity_verify(struct bio *bio, sector_t sector, unsigned i=
+nt size)
+>  {
+>         struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_d=
+isk);
+>         struct bio_integrity_payload *bip =3D bio_integrity(bio);
+> +       struct bvec_iter data_iter =3D {
+> +               .bi_sector      =3D sector,
+> +               .bi_size        =3D size,
+> +       };
+>
+>         /*
+>          * Reinitialize bip->bip_iter.
+>          *
+>          * This is for use in the submitter after the driver is done with=
+ the
+>          * bio.  Requires the submitter to remember the sector and the si=
+ze.
+>          */
+>         memset(&bip->bip_iter, 0, sizeof(bip->bip_iter));
+>         bip->bip_iter.bi_sector =3D sector;
+>         bip->bip_iter.bi_size =3D bio_integrity_bytes(bi, size >> SECTOR_=
+SHIFT);
+> -       return blk_status_to_errno(bio_integrity_verify(bio, &bip->bip_it=
+er));
+> +       return blk_status_to_errno(bio_integrity_verify(bio, &data_iter))=
+;
+>  }
+>
+>  static int __init fs_bio_integrity_init(void)
+>  {
+>         fs_bio_integrity_cache =3D kmem_cache_create("fs_bio_integrity",
+> --
+> 2.54.0
+>
