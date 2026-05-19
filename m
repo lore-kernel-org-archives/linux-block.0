@@ -1,88 +1,164 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AFF3F6C4C;
-	Tue, 19 May 2026 09:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E5A1DE8BB;
+	Tue, 19 May 2026 09:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779182744; cv=none; b=ut2kc4GW8VOgd44LPP9EW5liCc/C6cW7vAda3hSQfVeh5txrOlpTwdqmSCkn/KTZSJWfE/J7litSdWXZwI4/QBe1NaWTQdIMNvtWIga3KMgHw5pvs4Z+BZKV1LYi9ki2MOra689Imtl+8lc/Wo9qVVuPNMSTTAAwjRbT6l8C854=
+	t=1779182873; cv=none; b=N98BC4JPsVMIE8qtIYK4nDdCqtFGN8VKwxS0wJLiXc8BX1XrtBd/dV38e19fQOisuuJrwZ4H8lF/kCZTsicEwqF2R005pVz673BZdKqSOXbtJNlZ8HQ8IahHJKjap++68UrI59ExFeQY4rcEfySi1uqECeYk68F0lqRmzZQesFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779182744; c=relaxed/simple;
-	bh=CtNNvNnb1Z3Z+dqNXItF+xz1Kd7BrttIjpxzy76M0jY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a7q9mgeJAlVB++nTbdSplJXvx0YF8cTH7PSChwp4jNRFEQ1xAVd3TG+sO95/r++NLGpGQGXmES14VqAp7DMmoHiYu0lxILCBlJJ6OJKFM0OIk/+cPQ+XhxDUWXUTFtI1e0gY25I9HszOrYQe6/JZXMJrJHfHOXYF0cD9xQc7Q6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 4A1F868C4E; Tue, 19 May 2026 11:25:38 +0200 (CEST)
-Date: Tue, 19 May 2026 11:25:38 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 05/10] lib: add dmabuf token infrastructure
-Message-ID: <20260519092538.GA19935@lst.de>
-References: <cover.1777475843.git.asml.silence@gmail.com> <c61e6d928f86f4cb253ae350272e6039faefd3a6.1777475843.git.asml.silence@gmail.com> <20260513082431.GA6461@lst.de> <ebf41920-5852-428f-b98a-e0f44c8f3315@gmail.com> <20260518125326.GA5754@lst.de> <ea47051e-697f-4017-a514-be6ef7c110e9@gmail.com> <20260519065653.GB8173@lst.de> <9933142a-4ce2-4219-9574-73da30edd74e@gmail.com>
+	s=arc-20240116; t=1779182873; c=relaxed/simple;
+	bh=aEQnsPukQSqa6lUUXnAh1X3y62rqxIaRosLtp0QUu64=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JCpNrTXm1OVQykP7vEvy0BxydLZ0OffSD5sHjppwXTLN7PyiPSLho0jNKhJncyvHc8IxPIlsUOTGxVE56Hv5GAKbdRPhnxpBSlt2BHdflRySF2i9F2xSZHnMIdxkhnvr+Dv1HSOxDHI2IEPzBP31pxAQd0MUL+JiO/VIqQ41gBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64J9RF2i061321;
+	Tue, 19 May 2026 18:27:15 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64J9RFKM061316
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 19 May 2026 18:27:15 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <d43125ff-cc66-49b7-b16d-1b2650c68c23@I-love.SAKURA.ne.jp>
+Date: Tue, 19 May 2026 18:27:11 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9933142a-4ce2-4219-9574-73da30edd74e@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] loop: Fix NULL pointer dereference by synchronizing
+ lo_release and loop_queue_rq
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+References: <69e2ca14.a00a0220.1bd0ca.0031.GAE@google.com>
+ <e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp>
+ <e33b4060-69d9-4d02-a330-2fbd19249237@I-love.SAKURA.ne.jp>
+ <c0047a38-3d02-4ce5-88b0-2b7d0b9b69fa@acm.org>
+ <f720dd8b-4aa3-48e4-a1bb-c0b43eb70f19@I-love.SAKURA.ne.jp>
+ <af2205e3-205e-4743-a767-8593c2c4747a@I-love.SAKURA.ne.jp>
+ <9b2032d6-3f36-4d2b-8128-985c08a4fa37@I-love.SAKURA.ne.jp>
+ <20260518174013.4b72dd50a5bcb89daaed1f62@linux-foundation.org>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260518174013.4b72dd50a5bcb89daaed1f62@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav201.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On Tue, May 19, 2026 at 08:55:32AM +0100, Pavel Begunkov wrote:
-> On 5/19/26 07:56, Christoph Hellwig wrote:
->> On Mon, May 18, 2026 at 03:23:53PM +0100, Pavel Begunkov wrote:
->>> To be fair, it's not that dma-buf specific. This lib/ code only
->>> does some resv locking, fence waiting and queuing fences,
->>
->> But all the dma resv/fence stuff is pretty tied into the dma-buf
->> ecosystem.  I don't think it would really apply to something not
->> doing DMA at all.
->
-> The point is that those can be separated to reuse the rest.
+On 2026/05/19 9:40, Andrew Morton wrote:
+> AI review asked a couple of questions:
+> 	https://sashiko.dev/#/patchset/9b2032d6-3f36-4d2b-8128-985c08a4fa37@I-love.SAKURA.ne.jp
 
-Are you actually doing this right now?  If so please share what you
-have, otherwise let's keep the dma-buf bits together and move things
-if new abstractions emerge.
+To: gemini/gemini-3.1-pro-preview
 
->> But none of that really sits in the current lib/ code anyway?
->
-> It's about naming. E.g. passing a DMABUF_ITER that doesn't have a
-> dma-buf would be confusing, and then it'll need renaming at all
-> layers to support the use case.
+Thank you for your valuable feedback. Your point about asynchronous I/O completing after drain_workqueue()
+and potentially causing a UAF at file_inode() from kiocb_end_write() from lo_rw_aio_do_completion() is correct.
+The drain_workqueue() alone does not wait for in-flight AIOs that have already returned -EIOCBQUEUED. However,
+I'm not convinced that use of blk_mq_freeze_queue() inside __loop_clr_fd() where disk->open_mutex was already
+held by bdev_release() is absolutely deadlock-free.
 
-Again, if you concretely are doing this right now, find a good
-name and place based on those abstractions.  If not let's ignore
-it and move it if needed.
+1. VFS and Block Layer Lock Contention:
+   __loop_clr_fd() is exclusively invoked from the lo_release() path during the final close of the device.
+   At this stage, the block layer is holding disk->open_mutex. If we call blk_mq_freeze_queue() here, it will
+   synchronously wait for all in-flight AIOs to complete. However, the completion paths of those in-flight AIOs
+   (or subsequent metadata processing in the underlying filesystem) may attempt to acquire resources or execute
+   code paths that depend on the very same device state or open/close status. This creates a circular dependency,
+   leading to an unrecoverable hang.
 
->> drivers/dma-buf is a pretty natural place for it, I could not thing
->
-> _If_ there is no dma mappings, drivers/dma-buf would definitely
-> be an awkward spot.
+2. Memory Reclaim Deadlock:
+   blk_mq_freeze_queue() blocks until the queue's usage counter drops to zero. If an in-flight AIO requires memory
+   allocation for metadata updates upon completion, and the system is under heavy memory pressure, it can trigger
+   direct memory reclaim. If the reclaim path attempts to sync other buffers or interact with the frozen loop
+   device/queue, a circular deadlock occurs.
 
-Yes.  But that's not the case right now.  And from looking at the
-handwaiving for ublk/fuse probably not anytime soon, but maybe I'm
-mistaken on the latter.
+Therefore, I would like to choose SRCU-based synchronization instead of blk_mq_freeze_queue().
+
+* Locking: We call srcu_read_lock(&loop_io_srcu) only for asynchronous paths (cmd->use_aio) immediately
+  before submitting the I/O to the underlying filesystem in lo_rw_aio().
+
+* Unlocking: The reader lock is released via srcu_read_unlock() at the very end of the AIO completion handler
+  (lo_rw_aio_do_completion()).
+
+* Synchronization: We place synchronize_srcu(&loop_io_srcu) immediately after drain_workqueue() in __loop_clr_fd().
+
+I think that this guarantees that __loop_clr_fd() safely blocks until all pending AIO callbacks are 100% completed,
+fully eliminating the UAF risk and ensuring the safety of the subsequent mapping_set_gfp_mask() and fput(), while
+remaining entirely deadlock-free.
+
+What do you think about this approach?
+
+ drivers/block/loop.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0000913f7efc..7c3961f3cbc9 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -80,6 +80,7 @@ struct loop_cmd {
+ 	struct list_head list_entry;
+ 	bool use_aio; /* use AIO interface to handle I/O */
+ 	atomic_t ref; /* only for aio */
++	int srcu_idx;
+ 	long ret;
+ 	struct kiocb iocb;
+ 	struct bio_vec *bvec;
+@@ -93,6 +94,7 @@ struct loop_cmd {
+ static DEFINE_IDR(loop_index_idr);
+ static DEFINE_MUTEX(loop_ctl_mutex);
+ static DEFINE_MUTEX(loop_validate_mutex);
++DEFINE_SRCU(loop_io_srcu);
+ 
+ /**
+  * loop_global_lock_killable() - take locks for safe loop_validate_file() test
+@@ -327,6 +329,8 @@ static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+ 		kiocb_end_write(&cmd->iocb);
+ 	if (likely(!blk_should_fake_timeout(rq->q)))
+ 		blk_mq_complete_request(rq);
++	if (cmd->use_aio)
++		srcu_read_unlock(&loop_io_srcu, cmd->srcu_idx);
+ }
+ 
+ static void lo_rw_aio_complete(struct kiocb *iocb, long ret)
+@@ -392,6 +396,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	if (cmd->use_aio) {
+ 		cmd->iocb.ki_complete = lo_rw_aio_complete;
+ 		cmd->iocb.ki_flags = IOCB_DIRECT;
++		cmd->srcu_idx = srcu_read_lock(&loop_io_srcu);
+ 	} else {
+ 		cmd->iocb.ki_complete = NULL;
+ 		cmd->iocb.ki_flags = 0;
+@@ -1118,6 +1123,22 @@ static void __loop_clr_fd(struct loop_device *lo)
+ 	struct file *filp;
+ 	gfp_t gfp = lo->old_gfp_mask;
+ 
++	/*
++	 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
++	 * wait for already started loop_queue_rq() to complete.
++	 */
++	synchronize_rcu();
++	/*
++	 * Now that no more works are scheduled by loop_queue_rq(),
++	 * wait for already scheduled works to complete.
++	 */
++	drain_workqueue(lo->workqueue);
++	/*
++	 * Now that no more AIO requests are scheduled by lo_rw_aio(),
++	 * wait for already started AIO to complete.
++	 */
++	synchronize_srcu(&loop_io_srcu);
++
+ 	spin_lock_irq(&lo->lo_lock);
+ 	filp = lo->lo_backing_file;
+ 	lo->lo_backing_file = NULL;
 
