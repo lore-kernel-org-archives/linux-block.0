@@ -1,93 +1,111 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB98E2F7F06;
-	Tue, 19 May 2026 06:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C839E2459C5;
+	Tue, 19 May 2026 07:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779173823; cv=none; b=bFrjlxhf2xOXIxgLvcKRoZ3gAjdVgPh0kig5ZSqCDsXG3E7LR1jdrxLNjuKTQuwKpLFRTtVhF8r0DgqwY00PfalZTGbqYeEp3o1344E+obRH9kceP+NAJNplbszFrWV1oCN+EXPo04rqlmEX46QoVii15Ioye27bdhOPi1LX4Jk=
+	t=1779177050; cv=none; b=AdncQa6olcO2fCIfQ4a9gD3eswP23eaRFKYOcH34rs9w9i76yYYk7nLpnwdYO/5mVAZGs/F562DZpx+PIxJtzfVznaSQ4oHj7F5bI8CoHPMtuoyayUefxQiPQUaUi+uHvUt2JqF1/7jJ370d+xyz4R5lB2AixvIFl+hJ3XhHuT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779173823; c=relaxed/simple;
-	bh=DrWqQzOlBT7PBXEQ74exqA8NUZJPGXS5sd2MPD5AnkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hKrEQG56hFfwbHiwzyMNPcGRr6V5ATm8vzv/VGgQXOap2/finuRwria42SolTUr1ah87I/PmjA4qFHYeMQF14pxtuUwKwlcX/SKUoW81mZBcLYvN0Np5MRfmfoN/h771YfEWlBDdt/okG0XuEHe9tEsg1d9f63n3hYcs6wu5+OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id F393168AFE; Tue, 19 May 2026 08:56:53 +0200 (CEST)
-Date: Tue, 19 May 2026 08:56:53 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Tushar Gohad <tushar.gohad@intel.com>,
-	William Power <william.power@intel.com>,
-	Phil Cayton <phil.cayton@intel.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 05/10] lib: add dmabuf token infrastructure
-Message-ID: <20260519065653.GB8173@lst.de>
-References: <cover.1777475843.git.asml.silence@gmail.com> <c61e6d928f86f4cb253ae350272e6039faefd3a6.1777475843.git.asml.silence@gmail.com> <20260513082431.GA6461@lst.de> <ebf41920-5852-428f-b98a-e0f44c8f3315@gmail.com> <20260518125326.GA5754@lst.de> <ea47051e-697f-4017-a514-be6ef7c110e9@gmail.com>
+	s=arc-20240116; t=1779177050; c=relaxed/simple;
+	bh=ZVSoKWNwE/fLrAe2TbSPmVg6n/BxsyChM0yaAKsjfSY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Av9gxFxdacGZT1nxSGkAsoCWPA4wRXf1JOm5OSeDysyP68Uaqte01S+aaM6eioIqCgelradZR7hUkc3dcvK8j+8IvbPLCvz6xCYBicJyf4qN+HQ9OHdxp9mYCBH2axgaC57+7UEcajpzg71zyREkVv1k2vuhB1CzI/24KVVxa0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 6fdce3e6535711f1aa26b74ffac11d73-20260519
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:360fb4f9-0ad2-4757-8f04-d62136ed362a,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:e7bac3a,CLOUDID:2c59e22560394ab4418eebe409e8ad69,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|865|898,TC:nil,Content:0|15|50,E
+	DM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA
+	:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 6fdce3e6535711f1aa26b74ffac11d73-20260519
+Received: from localhost [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <pengyu@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1430405130; Tue, 19 May 2026 15:50:42 +0800
+From: Yu Peng <pengyu@kylinos.cn>
+To: Jens Axboe <axboe@kernel.dk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Yu Peng <pengyu@kylinos.cn>
+Subject: [PATCH] tracing/blktrace: Use sysfs_emit() for sysfs show callbacks
+Date: Tue, 19 May 2026 15:50:12 +0800
+Message-Id: <20260519075012.3859119-1-pengyu@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ea47051e-697f-4017-a514-be6ef7c110e9@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 18, 2026 at 03:23:53PM +0100, Pavel Begunkov wrote:
-> To be fair, it's not that dma-buf specific. This lib/ code only
-> does some resv locking, fence waiting and queuing fences,
+Use sysfs_emit() and sysfs_emit_at() instead of sprintf() when
+formatting blktrace sysfs show output.
 
-But all the dma resv/fence stuff is pretty tied into the dma-buf
-ecosystem.  I don't think it would really apply to something not
-doing DMA at all.
+No functional change intended.
 
-> otherwise
-> all the attaching is done by the driver behind callbacks. Switching
-> it to some memfd could be pretty simple. But The main thing it'd
-> need to share is iterator handling like forwarding in the block
-> layer, and it should be fine as it's already passed as a completely
-> opaque object with no knowledge about pages / dma / etc. for the
-> middle layers.
+Signed-off-by: Yu Peng <pengyu@kylinos.cn>
+---
+ kernel/trace/blktrace.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-But none of that really sits in the current lib/ code anyway?
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 8cd2520b4c99e..1eda8158883ca 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -2025,11 +2025,11 @@ static ssize_t blk_trace_mask2str(char *buf, int mask)
+ 
+ 	for (i = 0; i < ARRAY_SIZE(mask_maps); i++) {
+ 		if (mask & mask_maps[i].mask) {
+-			p += sprintf(p, "%s%s",
++			p += sysfs_emit_at(buf, p - buf, "%s%s",
+ 				    (p == buf) ? "" : ",", mask_maps[i].str);
+ 		}
+ 	}
+-	*p++ = '\n';
++	p += sysfs_emit_at(buf, p - buf, "\n");
+ 
+ 	return p - buf;
+ }
+@@ -2048,20 +2048,20 @@ static ssize_t sysfs_blk_trace_attr_show(struct device *dev,
+ 	bt = rcu_dereference_protected(q->blk_trace,
+ 				       lockdep_is_held(&q->debugfs_mutex));
+ 	if (attr == &dev_attr_enable) {
+-		ret = sprintf(buf, "%u\n", !!bt);
++		ret = sysfs_emit(buf, "%u\n", !!bt);
+ 		goto out_unlock_bdev;
+ 	}
+ 
+ 	if (bt == NULL)
+-		ret = sprintf(buf, "disabled\n");
++		ret = sysfs_emit(buf, "disabled\n");
+ 	else if (attr == &dev_attr_act_mask)
+ 		ret = blk_trace_mask2str(buf, bt->act_mask);
+ 	else if (attr == &dev_attr_pid)
+-		ret = sprintf(buf, "%u\n", bt->pid);
++		ret = sysfs_emit(buf, "%u\n", bt->pid);
+ 	else if (attr == &dev_attr_start_lba)
+-		ret = sprintf(buf, "%llu\n", bt->start_lba);
++		ret = sysfs_emit(buf, "%llu\n", bt->start_lba);
+ 	else if (attr == &dev_attr_end_lba)
+-		ret = sprintf(buf, "%llu\n", bt->end_lba);
++		ret = sysfs_emit(buf, "%llu\n", bt->end_lba);
+ 
+ out_unlock_bdev:
+ 	blk_debugfs_unlock_nomemrestore(q);
+-- 
+2.43.0
 
->> lib/ is most certainly the wrong place for something that absolutely
->> is not library functionality but directly interacts with a few
->> subsystems.
->
-> It only interacts with dma-buf, and even for dma-buf attachments
-> are created by the driver. Block, nvme, io_uring are users, either
-> using the helpers or implementing callbacks.
->
-> Ok. Let's assume for the argument's sake it's not dma-buf
-> specific, if not lib/, where would you put it? I was also
-> assuming that dma-buf being under drivers/ is rather a relic
-> of the past rather than the desired location, hmm?
-
-drivers/dma-buf is a pretty natural place for it, I could not thing
-where else you'd place dma-buffers.  I'm not sure how hmm has anything
-to do with it.
-
->
->
-> -- 
-> Pavel Begunkov
----end quoted text---
