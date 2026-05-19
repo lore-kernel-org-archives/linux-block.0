@@ -1,35 +1,45 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7FB3A543E;
-	Tue, 19 May 2026 06:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB98E2F7F06;
+	Tue, 19 May 2026 06:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779173590; cv=none; b=eqFZ7crDpAFY4ImZBn71rY1IV7w9J3CR2N+16K02HixYTpl+6AARSYoXiAkdVwAFxF6xV9Hf26zOPXc+QGcZvCZwLphqLF9Lw9CGDXTiTI78zKvmyD51AXm++eOuhGe3+sBY6URNffJ7wU1irmRuca6MH3GpTVKzBK6zWSKqaQk=
+	t=1779173823; cv=none; b=bFrjlxhf2xOXIxgLvcKRoZ3gAjdVgPh0kig5ZSqCDsXG3E7LR1jdrxLNjuKTQuwKpLFRTtVhF8r0DgqwY00PfalZTGbqYeEp3o1344E+obRH9kceP+NAJNplbszFrWV1oCN+EXPo04rqlmEX46QoVii15Ioye27bdhOPi1LX4Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779173590; c=relaxed/simple;
-	bh=iBMnfOpZMlMikubAUJOkcEpNqP5FwUUy48scPBDbKJs=;
+	s=arc-20240116; t=1779173823; c=relaxed/simple;
+	bh=DrWqQzOlBT7PBXEQ74exqA8NUZJPGXS5sd2MPD5AnkE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OPyo1h4W5hV9lIKwwCT/cztUjz8YtWXAHiemnPgbQC/r2bPpc4XwosJ5rhYaxG4AiS5fIJ2IqqQyIXyS/mESYN5Z741Bip4OWkYsjvp2aEnpkCWZBBiLWXIFbCcbdK6D08Wa6fedBrjmxidE4N1ZYOipJm/2PkQfNpHcXV8GjGw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=hKrEQG56hFfwbHiwzyMNPcGRr6V5ATm8vzv/VGgQXOap2/finuRwria42SolTUr1ah87I/PmjA4qFHYeMQF14pxtuUwKwlcX/SKUoW81mZBcLYvN0Np5MRfmfoN/h771YfEWlBDdt/okG0XuEHe9tEsg1d9f63n3hYcs6wu5+OQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id EE7C668CFE; Tue, 19 May 2026 08:53:03 +0200 (CEST)
-Date: Tue, 19 May 2026 08:53:03 +0200
-From: "hch@lst.de" <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: "Achkinazi, Igor" <Igor.Achkinazi@dell.com>, "hch@lst.de" <hch@lst.de>,
-	"sagi@grimberg.me" <sagi@grimberg.me>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] nvme-multipath: set BIO_REMAPPED on bios remapped to
- per-path namespace disks
-Message-ID: <20260519065303.GA7918@lst.de>
-References: <MW5PR19MB548483D1FAE4F322E4C97352FD032@MW5PR19MB5484.namprd19.prod.outlook.com> <agtnJb5a5uIqH-65@kbusch-mbp>
+	id F393168AFE; Tue, 19 May 2026 08:56:53 +0200 (CEST)
+Date: Tue, 19 May 2026 08:56:53 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Tushar Gohad <tushar.gohad@intel.com>,
+	William Power <william.power@intel.com>,
+	Phil Cayton <phil.cayton@intel.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v3 05/10] lib: add dmabuf token infrastructure
+Message-ID: <20260519065653.GB8173@lst.de>
+References: <cover.1777475843.git.asml.silence@gmail.com> <c61e6d928f86f4cb253ae350272e6039faefd3a6.1777475843.git.asml.silence@gmail.com> <20260513082431.GA6461@lst.de> <ebf41920-5852-428f-b98a-e0f44c8f3315@gmail.com> <20260518125326.GA5754@lst.de> <ea47051e-697f-4017-a514-be6ef7c110e9@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,31 +48,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <agtnJb5a5uIqH-65@kbusch-mbp>
+In-Reply-To: <ea47051e-697f-4017-a514-be6ef7c110e9@gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, May 18, 2026 at 01:23:17PM -0600, Keith Busch wrote:
-> On Mon, May 18, 2026 at 02:52:56PM +0000, Achkinazi, Igor wrote:
-> > @@ -511,6 +511,13 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
-> >         ns = nvme_find_path(head);
-> >         if (likely(ns)) {
-> >                 bio_set_dev(bio, ns->disk->part0);
-> > +               /*
-> > +                * Mark the bio as remapped to the per-path namespace disk so
-> > +                * that bio_check_eod() is skipped on resubmission (e.g. from
-> > +                * bio splitting in blk_mq_submit_bio).  The EOD check already
-> > +                * passed on the multipath head disk.
-> > +                */
-> > +               bio_set_flag(bio, BIO_REMAPPED);
-> 
-> Any reason nvme multipath can't call submit_bio_noacct_nocheck()
-> directly instead? If it's safe to skip the eod check here, then it
-> looks safe to skip everything else too.
+On Mon, May 18, 2026 at 03:23:53PM +0100, Pavel Begunkov wrote:
+> To be fair, it's not that dma-buf specific. This lib/ code only
+> does some resv locking, fence waiting and queuing fences,
 
-We really shouldn't expose that, and it doesn't quite to the
-right checks here.
+But all the dma resv/fence stuff is pretty tied into the dma-buf
+ecosystem.  I don't think it would really apply to something not
+doing DMA at all.
 
-But I think the proper fix is to stop using bio_set_dev entirely.
-We do not want to associate the bio with a new blkg as those are
-basically not going to exist for the underlying devices.  I'm also
-not sure we want to allow another round of BPF throttling either.
+> otherwise
+> all the attaching is done by the driver behind callbacks. Switching
+> it to some memfd could be pretty simple. But The main thing it'd
+> need to share is iterator handling like forwarding in the block
+> layer, and it should be fine as it's already passed as a completely
+> opaque object with no knowledge about pages / dma / etc. for the
+> middle layers.
+
+But none of that really sits in the current lib/ code anyway?
+
+>> lib/ is most certainly the wrong place for something that absolutely
+>> is not library functionality but directly interacts with a few
+>> subsystems.
+>
+> It only interacts with dma-buf, and even for dma-buf attachments
+> are created by the driver. Block, nvme, io_uring are users, either
+> using the helpers or implementing callbacks.
+>
+> Ok. Let's assume for the argument's sake it's not dma-buf
+> specific, if not lib/, where would you put it? I was also
+> assuming that dma-buf being under drivers/ is rather a relic
+> of the past rather than the desired location, hmm?
+
+drivers/dma-buf is a pretty natural place for it, I could not thing
+where else you'd place dma-buffers.  I'm not sure how hmm has anything
+to do with it.
+
+>
+>
+> -- 
+> Pavel Begunkov
+---end quoted text---
