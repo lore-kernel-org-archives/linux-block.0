@@ -1,140 +1,111 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FD939936D
-	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 08:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620A73AF64B
+	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 09:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779267300; cv=none; b=J7i/m3qd3RNL9i1UQ2t1yp1ByQODfsqdPurjgEUxkSPUk3fFI6NyKEjs7ek2AhfIw4a4iBlsOAf+Mco8iek+eV5d5mjOGKqXg3hu/Kq6pVI19gc8Lj3R9S1H/HpStLPIlggVRhQ45uRzlqivqSvDmpFdLIYNUC0yyNVyuPu8XuM=
+	t=1779268362; cv=none; b=Q171AOsXLi2t5Dmmu2iLCCqxfqK4K6g2z/PtLaBeN1jzcC9cRm9eP1Qap543cEMoMXMEggB5RYHts5hvE6878qvxWMSKdlCodzhHgAjevms5n+UxJpeI+s+Ibi51KzSaJxAPiC2K/NamO0DManHXHmQqREYoJ2mPUuejSwfVMGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779267300; c=relaxed/simple;
-	bh=xHyTDYMIueRzo/SEG/1vuBgSGwFfMVv9GNL3h7aYAqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YTxLPO/JPfmdvMTA0gotcKbAuR7nT1iJna3NxuxNogr3DDB2hRnDo89eganIWLsQmzNa5M0EELwM5jnompHSNd+TPr+t9Cj8ZiSZq7J/xrClSH2lcFxp95J1c2+7aYPjzp4KqW9OWhcndWFD9fKXLqDy8GOZClS4+rvPwvjpiIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QM5k2aVo; arc=none smtp.client-ip=209.85.167.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QM5k2aVo"
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-47cbd444fd0so3019148b6e.2
-        for <linux-block@vger.kernel.org>; Wed, 20 May 2026 01:54:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779267298; x=1779872098; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ND+IuduqwCQ7jAcLo0l8S+CJjohmBHkLkrbOeAIupY=;
-        b=QM5k2aVoJ9AVr3xNIz0/m8WdWDB8xQtcoYnfHwv3vzVwZf/D37RGScZmVwVnF92mRq
-         ILMKP/dZvGlkw94ApQQlTSLqmzYFyKug4eo5kbgNDpevBZmPeMGvWSOcYlIbAR9xChX3
-         doxZ3nTU6pKgxIEnfp9DM0t9ALtwyMkllQhkN630PwZeutdiUiaZMXRyVDkwAyoFde0I
-         OhQnRX0zM/we6ivJwVZ2jtv8TqcSar5MU1hSvZeM5lvEFrTrLZ8yD6NR/TXoKVCPSraJ
-         smLIcoSYGe1Y99bAyhJjtpjgTHhx0NoiyEQ8yRN9mKxUn+KTYIV8WwusUo8ocRBtq3lb
-         aPDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779267298; x=1779872098;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5ND+IuduqwCQ7jAcLo0l8S+CJjohmBHkLkrbOeAIupY=;
-        b=fSe01mIdApfE+i77SZXfiYYFXuTEGcNljZy8G57nXG+zP2hZN8DrNQ7j7P84tTagfz
-         QMeIuH2IrK08YAAGHYLCtvgvyM0XBmkINTWoYAoN7bEITH532SmiHwv2J3+2MAI4CWIM
-         Rszrr35FtrB4YyGvtOLIFKwpwmp7N/0x3D3ZrGKqxRQZAyoVW8fr9++vOvwQ1BenL0Z5
-         /IeRXDdepdR3RSPuJJPcWLpHrXVlSzSPOZExgMUh1MTFMPypP9ydC5UF+N7YjAaNbmzK
-         SESKLZ3m5VIMW0yytB9BeO+pbTGdo8l91bWl+z8lSV31NOeQvoxEM6606zZmRAmhRIwK
-         BIaQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+wtj4cdmMmunUDvzgFJj6Zlq3jkVzpB8z+ht1uNkRxw6KOIg7lyqRNcS+uK0zdHNqD3ftsvVzo7DdHsg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuTGBzS+poPmWKXnPlI/NllQ0PO8ZM3zD1Uhsi277FsPbf2OTa
-	QDZ6dU4MgoVYG0DbnEWRZVDffMqAC7Y4bReDQgZK8065p2JqUr/Srrlc
-X-Gm-Gg: Acq92OH7ikH04hbPZ0hA4jD+lC/cyEMHpZkYwUBQ7XpWs3elNmg537jsX5haK8+QhI0
-	Slel+TImKbTYn5t6IUHV+GPwiKYqERU4MMxDY4wYgmecJEyra0+IhS8906DpCLcXmKuhg1mX24B
-	sHgUXAmhxwQsV/EFa2lJaQurC92IXY1D1QdixQ0ixnlmLp6PScj/2D6hPIOsvlxpHkCRdF3wH55
-	mjMDFtjwE5/DbUlGPZ2ZwiFFDIM0mNtQYY3yKp0ZT+bUFeOnR6YLmBiQk7fikWgoA4sMMjel6Mt
-	Lvx57BzLB7kUoHtVJCt8huVla35iRy7vIRw/onAMJeguWEeFyJd6sSmUhdE8CZVRMTu7V8wRlSI
-	p3w9ZTLiY282TL9O3m6mzVMcYwdpsvTnPE5m80/ktLsahMZLUrarNfeYiNErj5FoAhblJKjz/31
-	UkddaB3FxHCsX5/bIL3yqFJRxCmBeN6nm6Kswj+9yE1wveC9DfuaE0bJ9EOqnyE0Vnu3Q4GzAo+
-	1eFBGIyUQ+9Khm+9c/QfOIHhNsd4KA=
-X-Received: by 2002:a05:6808:1b20:b0:46a:746c:2d53 with SMTP id 5614622812f47-482e55c6965mr15535056b6e.2.1779267298073;
-        Wed, 20 May 2026 01:54:58 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e55b7c6b38sm11987730a34.2.2026.05.20.01.54.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 01:54:57 -0700 (PDT)
-Date: Wed, 20 May 2026 16:54:51 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2] loop: Fix NULL pointer dereference by synchronizing
- lo_release and loop_queue_rq
-Message-ID: <ag1223nAa0wZ8ALC@fedora>
-References: <c0047a38-3d02-4ce5-88b0-2b7d0b9b69fa@acm.org>
- <f720dd8b-4aa3-48e4-a1bb-c0b43eb70f19@I-love.SAKURA.ne.jp>
- <af2205e3-205e-4743-a767-8593c2c4747a@I-love.SAKURA.ne.jp>
- <9b2032d6-3f36-4d2b-8128-985c08a4fa37@I-love.SAKURA.ne.jp>
- <20260518174013.4b72dd50a5bcb89daaed1f62@linux-foundation.org>
- <d43125ff-cc66-49b7-b16d-1b2650c68c23@I-love.SAKURA.ne.jp>
- <ag0lS_CbKO9R5CV8@fedora>
- <94076bc9-2c09-4bb6-8468-b6b8af419cb9@I-love.SAKURA.ne.jp>
- <ag1nfIFcykmQHbkk@fedora>
- <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp>
+	s=arc-20240116; t=1779268362; c=relaxed/simple;
+	bh=MvpCBtKPSZ6w0M1+uH7kbxa8AV9lizCgS1zkpaGPh30=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BEGF2eMaPIqRlo83p+rAvikr8QUVsBdULODnKoE1+0qokO4FBrHU8c5DNIrk0mWOiA7i16o+1dXZEKG4rvXZN9QJuSDRwSc61NY+lioZflWlbRp72P+Mj7u5J22jdXqzDNnMegxKnDPUGkQY2ePpZ7vf4O2EfPV2e+aCzgAk6ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 0acb3978542c11f1aa26b74ffac11d73-20260520
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CTE_8B, HR_CTT_MISS
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_LANG
+	HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN
+	HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_TRUSTED
+	SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED, SA_UNFAMILIAR, SN_UNTRUSTED
+	SN_UNFAMILIAR, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD
+	CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
+	ABX_MISS_RDNS
+X-CID-CACHE: Type:Local,Time:202605201706+08,HitQuantity:2
+X-CID-UNFAMILIAR: 1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:07200570-9d2d-4351-8746-85dec8651cf5,IP:10,
+	URL:0,TC:0,Content:0,EDM:-25,RT:0,SF:-50,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:-65
+X-CID-INFO: VERSION:1.3.12,REQID:07200570-9d2d-4351-8746-85dec8651cf5,IP:10,UR
+	L:0,TC:0,Content:0,EDM:-25,RT:0,SF:-50,FILE:0,BULK:0,RULE:NOTI_GNA5D1EA,AC
+	TION:release,TS:-65
+X-CID-META: VersionHash:e7bac3a,CLOUDID:920c002179874b6c021f6793f994dcc1,BulkI
+	D:260520170624KO738B3G,BulkQuantity:0,Recheck:0,SF:13|16|19|66|78|102|127|
+	307|308|316|324|332|342|344|347|350|351|850|865|898|10047|15047|20030|2500
+	0|26021,TC:nil,Content:0|15|50,EDM:2,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,
+	QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+	,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_USA,TF_CID_SPAM_FSD,TF_CID_SPAM_RUA,TF_CID_SPAM_SUA,
+	TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 0acb3978542c11f1aa26b74ffac11d73-20260520
+X-User: sangyao@kylinos.cn
+Received: from localhost.localdomain [(183.242.174.22)] by mailgw.kylinos.cn
+	(envelope-from <sangyao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1108699617; Wed, 20 May 2026 17:12:36 +0800
+From: Yao Sang <sangyao@kylinos.cn>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Yao Sang <sangyao@kylinos.cn>
+Subject: [PATCH] block: stack zoned resource limits
+Date: Wed, 20 May 2026 17:12:37 +0800
+Message-Id: <20260520091237.392802-1-sangyao@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 20, 2026 at 05:20:01PM +0900, Tetsuo Handa wrote:
-> On 2026/05/20 16:49, Ming Lei wrote:
-> > On Wed, May 20, 2026 at 03:36:12PM +0900, Tetsuo Handa wrote:
-> >> On 2026/05/20 12:06, Ming Lei wrote:
-> >>> The IO after close(loop) should be from writeback. rcu/sruc isn't necessary,
-> >>
-> >> Gemini's comment is that drain_workqueue() is not sufficient for waiting for
-> >> do_req_filebacked(REQ_OP_WRITE) requests with cmd->use_aio == true case to complete.
-> > 
-> > Anything cleared in __loop_clr_fd() is not used by lo_rw_aio_complete() & lo_complete_rq().
-> 
-> "struct inode *inode = file_inode(iocb->ki_filp);" in kiocb_end_write() from
-> lo_rw_aio_do_completion() can dereference "struct file *" with refcount == 0 (UAF)
-> because fput() in __loop_clr_fd() can be the last reference to that file.
+This was found while debugging a zoned NVMe multipath setup, where the
+namespace head reported 0/0 for max_open_zones and max_active_zones
+while the live path still reported finite limits.
 
-OK, you are right.
+blk_stack_limits() already combines several zoned queue limits, but it
+leaves max_open_zones and max_active_zones unchanged. Since 0 means "no
+limit" for both values, stacked zoned devices can preserve bogus 0/0
+limits even when the underlying queue advertises finite values.
 
-It can be handled by adding sync_blockdev(lo->lo_device) in __loop_clr_fd()
-because IO can be from writeback only when loop disk is closed.
+Stack max_open_zones and max_active_zones with min_not_zero(), and
+clear them when the resulting queue is not zoned.
 
-Please feel free to test the following change:
+Signed-off-by: Yao Sang <sangyao@kylinos.cn>
+---
+ block/blk-settings.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0000913f7efc..bbd15974a082 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1118,6 +1118,8 @@ static void __loop_clr_fd(struct loop_device *lo)
-        struct file *filp;
-        gfp_t gfp = lo->old_gfp_mask;
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 78c83817b9d3..88b6c3703101 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -814,6 +814,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 
+ 	t->max_hw_zone_append_sectors = min(t->max_hw_zone_append_sectors,
+ 					b->max_hw_zone_append_sectors);
++	t->max_open_zones = min_not_zero(t->max_open_zones,
++				       b->max_open_zones);
++	t->max_active_zones = min_not_zero(t->max_active_zones,
++					 b->max_active_zones);
+ 
+ 	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
+ 					    b->seg_boundary_mask);
+@@ -921,6 +925,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 	t->zone_write_granularity = max(t->zone_write_granularity,
+ 					b->zone_write_granularity);
+ 	if (!(t->features & BLK_FEAT_ZONED)) {
++		t->max_open_zones = 0;
++		t->max_active_zones = 0;
+ 		t->zone_write_granularity = 0;
+ 		t->max_zone_append_sectors = 0;
+ 	}
+-- 
+2.25.1
 
-+       sync_blockdev(lo->lo_device);
-+
-        spin_lock_irq(&lo->lo_lock);
-        filp = lo->lo_backing_file;
-        lo->lo_backing_file = NULL;
-
-> > 
-> > So why isn't drain_workqueue() enough for cmd->use_aio?
-> 
-> In addition to possible UAF above, the assumption at
-> https://elixir.bootlin.com/linux/v7.1-rc4/source/drivers/block/loop.c#L1134
-> is currently broken due to this race problem.
-
-That shouldn't be one issue otherwise bio based driver can't work with updating
-limits.
-
-
-Thanks, 
-Ming
