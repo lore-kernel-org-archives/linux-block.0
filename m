@@ -1,206 +1,140 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F405C3AEF2D
-	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 08:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FD939936D
+	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 08:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779266955; cv=none; b=U82VBIKnXhgrEvAjjdsK0cSe++Lu3DpXiWShKo6YbsrcaVtqBcGOpJ8HkdRXiDAQn0OQ+gJzEN4Wj5Wjg3djPWlaUs1m1rppPB+8OBatiblHwEet3d2hQUQr4gQMBDIcghKrE6mCTfiCnaaxEzEUS9RJ2bmF3aRNElvm7JX6+8s=
+	t=1779267300; cv=none; b=J7i/m3qd3RNL9i1UQ2t1yp1ByQODfsqdPurjgEUxkSPUk3fFI6NyKEjs7ek2AhfIw4a4iBlsOAf+Mco8iek+eV5d5mjOGKqXg3hu/Kq6pVI19gc8Lj3R9S1H/HpStLPIlggVRhQ45uRzlqivqSvDmpFdLIYNUC0yyNVyuPu8XuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779266955; c=relaxed/simple;
-	bh=pj/EJozPL745SHnll9mOA+g5Utfwv5+0NQepHAA3WNk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H3E8TFYk3FTGKllC0iGaZ9sRWd8I8Nm4XNPkJxfkfHbaj57QDWpCc7/5H1A6783r5AM317v+1tMdlOmehh+GAnuvXLfZRKw/vHJdGkEmInaQ29E1EocKBpppe1L3Rg8Tiuga5GKMGtHepxReC6O8Ft8RuYh+NXg5iMNStQqECRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WYrcPpHl; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1779267300; c=relaxed/simple;
+	bh=xHyTDYMIueRzo/SEG/1vuBgSGwFfMVv9GNL3h7aYAqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YTxLPO/JPfmdvMTA0gotcKbAuR7nT1iJna3NxuxNogr3DDB2hRnDo89eganIWLsQmzNa5M0EELwM5jnompHSNd+TPr+t9Cj8ZiSZq7J/xrClSH2lcFxp95J1c2+7aYPjzp4KqW9OWhcndWFD9fKXLqDy8GOZClS4+rvPwvjpiIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QM5k2aVo; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WYrcPpHl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=dCFjzfWQme50XrjyE/ls2JJmF87OLq5pdBrGMEd0vlA=; b=WYrcPpHlRwF3IUzP4qModLkkob
-	r2jDuKWK3410/G/LtwG/WtP/yH/hBRjYgaoKzZ62seg5vwBDHkt0U/5l/gVczADVkiJLnQlnRuaSd
-	SEPvcaDvEbMV4kb9pylOYZdfAY69ynNE+q6xhYnYumIyV13PQQf1ioQPAo9hZnCSmMf5IllDzB0E0
-	+/jNS3WM/CGIOt4Y7etSbm3wYURNLy1C9VucF0K3r4esfN5d8Hv8ABIHRSvKv+IgzfWn5juKPsUxF
-	JnSV/8c/xwzzkUPxlIj8KfQvkLQb+7vu9+nE+eHLM+rfRH7fbiaJ6B0agdygWxqsFmYXrXsSumWFH
-	N1n2pD1g==;
-Received: from [2001:4bb8:2ee:ba61:eae3:c2ec:f16a:563d] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wPcc3-000000041Ks-0SyQ;
-	Wed, 20 May 2026 08:49:11 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: kbusch@kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH] blk-mq: always take a queue reference in blk_mq_submit_bio
-Date: Wed, 20 May 2026 10:49:05 +0200
-Message-ID: <20260520084905.1092158-1-hch@lst.de>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QM5k2aVo"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-47cbd444fd0so3019148b6e.2
+        for <linux-block@vger.kernel.org>; Wed, 20 May 2026 01:54:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779267298; x=1779872098; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ND+IuduqwCQ7jAcLo0l8S+CJjohmBHkLkrbOeAIupY=;
+        b=QM5k2aVoJ9AVr3xNIz0/m8WdWDB8xQtcoYnfHwv3vzVwZf/D37RGScZmVwVnF92mRq
+         ILMKP/dZvGlkw94ApQQlTSLqmzYFyKug4eo5kbgNDpevBZmPeMGvWSOcYlIbAR9xChX3
+         doxZ3nTU6pKgxIEnfp9DM0t9ALtwyMkllQhkN630PwZeutdiUiaZMXRyVDkwAyoFde0I
+         OhQnRX0zM/we6ivJwVZ2jtv8TqcSar5MU1hSvZeM5lvEFrTrLZ8yD6NR/TXoKVCPSraJ
+         smLIcoSYGe1Y99bAyhJjtpjgTHhx0NoiyEQ8yRN9mKxUn+KTYIV8WwusUo8ocRBtq3lb
+         aPDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779267298; x=1779872098;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5ND+IuduqwCQ7jAcLo0l8S+CJjohmBHkLkrbOeAIupY=;
+        b=fSe01mIdApfE+i77SZXfiYYFXuTEGcNljZy8G57nXG+zP2hZN8DrNQ7j7P84tTagfz
+         QMeIuH2IrK08YAAGHYLCtvgvyM0XBmkINTWoYAoN7bEITH532SmiHwv2J3+2MAI4CWIM
+         Rszrr35FtrB4YyGvtOLIFKwpwmp7N/0x3D3ZrGKqxRQZAyoVW8fr9++vOvwQ1BenL0Z5
+         /IeRXDdepdR3RSPuJJPcWLpHrXVlSzSPOZExgMUh1MTFMPypP9ydC5UF+N7YjAaNbmzK
+         SESKLZ3m5VIMW0yytB9BeO+pbTGdo8l91bWl+z8lSV31NOeQvoxEM6606zZmRAmhRIwK
+         BIaQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+wtj4cdmMmunUDvzgFJj6Zlq3jkVzpB8z+ht1uNkRxw6KOIg7lyqRNcS+uK0zdHNqD3ftsvVzo7DdHsg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuTGBzS+poPmWKXnPlI/NllQ0PO8ZM3zD1Uhsi277FsPbf2OTa
+	QDZ6dU4MgoVYG0DbnEWRZVDffMqAC7Y4bReDQgZK8065p2JqUr/Srrlc
+X-Gm-Gg: Acq92OH7ikH04hbPZ0hA4jD+lC/cyEMHpZkYwUBQ7XpWs3elNmg537jsX5haK8+QhI0
+	Slel+TImKbTYn5t6IUHV+GPwiKYqERU4MMxDY4wYgmecJEyra0+IhS8906DpCLcXmKuhg1mX24B
+	sHgUXAmhxwQsV/EFa2lJaQurC92IXY1D1QdixQ0ixnlmLp6PScj/2D6hPIOsvlxpHkCRdF3wH55
+	mjMDFtjwE5/DbUlGPZ2ZwiFFDIM0mNtQYY3yKp0ZT+bUFeOnR6YLmBiQk7fikWgoA4sMMjel6Mt
+	Lvx57BzLB7kUoHtVJCt8huVla35iRy7vIRw/onAMJeguWEeFyJd6sSmUhdE8CZVRMTu7V8wRlSI
+	p3w9ZTLiY282TL9O3m6mzVMcYwdpsvTnPE5m80/ktLsahMZLUrarNfeYiNErj5FoAhblJKjz/31
+	UkddaB3FxHCsX5/bIL3yqFJRxCmBeN6nm6Kswj+9yE1wveC9DfuaE0bJ9EOqnyE0Vnu3Q4GzAo+
+	1eFBGIyUQ+9Khm+9c/QfOIHhNsd4KA=
+X-Received: by 2002:a05:6808:1b20:b0:46a:746c:2d53 with SMTP id 5614622812f47-482e55c6965mr15535056b6e.2.1779267298073;
+        Wed, 20 May 2026 01:54:58 -0700 (PDT)
+Received: from fedora ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e55b7c6b38sm11987730a34.2.2026.05.20.01.54.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2026 01:54:57 -0700 (PDT)
+Date: Wed, 20 May 2026 16:54:51 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2] loop: Fix NULL pointer dereference by synchronizing
+ lo_release and loop_queue_rq
+Message-ID: <ag1223nAa0wZ8ALC@fedora>
+References: <c0047a38-3d02-4ce5-88b0-2b7d0b9b69fa@acm.org>
+ <f720dd8b-4aa3-48e4-a1bb-c0b43eb70f19@I-love.SAKURA.ne.jp>
+ <af2205e3-205e-4743-a767-8593c2c4747a@I-love.SAKURA.ne.jp>
+ <9b2032d6-3f36-4d2b-8128-985c08a4fa37@I-love.SAKURA.ne.jp>
+ <20260518174013.4b72dd50a5bcb89daaed1f62@linux-foundation.org>
+ <d43125ff-cc66-49b7-b16d-1b2650c68c23@I-love.SAKURA.ne.jp>
+ <ag0lS_CbKO9R5CV8@fedora>
+ <94076bc9-2c09-4bb6-8468-b6b8af419cb9@I-love.SAKURA.ne.jp>
+ <ag1nfIFcykmQHbkk@fedora>
+ <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp>
 
-When submitting a bio to blk-mq, if the task should sleep after peeking
-a cached request, but before it pops it, the plug flushes and calls
-blk_mq_free_plug_rqs, freeing the cached_rqs. This creates a
-use-after-free bug.
+On Wed, May 20, 2026 at 05:20:01PM +0900, Tetsuo Handa wrote:
+> On 2026/05/20 16:49, Ming Lei wrote:
+> > On Wed, May 20, 2026 at 03:36:12PM +0900, Tetsuo Handa wrote:
+> >> On 2026/05/20 12:06, Ming Lei wrote:
+> >>> The IO after close(loop) should be from writeback. rcu/sruc isn't necessary,
+> >>
+> >> Gemini's comment is that drain_workqueue() is not sufficient for waiting for
+> >> do_req_filebacked(REQ_OP_WRITE) requests with cmd->use_aio == true case to complete.
+> > 
+> > Anything cleared in __loop_clr_fd() is not used by lo_rw_aio_complete() & lo_complete_rq().
+> 
+> "struct inode *inode = file_inode(iocb->ki_filp);" in kiocb_end_write() from
+> lo_rw_aio_do_completion() can dereference "struct file *" with refcount == 0 (UAF)
+> because fput() in __loop_clr_fd() can be the last reference to that file.
 
-Fix this by alway grabbing a queue usage reference in blk_mq_submit_bio.
-While past commit claims that this is slow, we're better safe than
-fast as a first priority.
+OK, you are right.
 
-The code had already warned of this possibility, and specifically popped
-the request before other known blocking calls, but it didn't handle a
-blocking GFP_NOIO alloc. Under memory pressure, allocating the split bio
-or the integrity payload are two such cases that can block. The blk-mq
-submit_bio function continues using the peeked request that was already
-freed and re-initialized, so the driver receives that request with a
-NULL'ed mq_hctx, and inevitably panics.
+It can be handled by adding sync_blockdev(lo->lo_device) in __loop_clr_fd()
+because IO can be from writeback only when loop disk is closed.
 
-Large parts of the commit message are stolen from an earlier attempt
-to fix this issue by Keith Busch <kbusch@kernel.org>.
+Please feel free to test the following change:
 
-Fixes: b0077e269f6c1 ("blk-mq: make sure active queue usage is held for bio_integrity_prep()")
-Fixes: 7b4f36cd22a65 ("block: ensure we hold a queue reference when using queue limits")
-Reported-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 65 +++++++++++++++++++-------------------------------
- 1 file changed, 24 insertions(+), 41 deletions(-)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0000913f7efc..bbd15974a082 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1118,6 +1118,8 @@ static void __loop_clr_fd(struct loop_device *lo)
+        struct file *filp;
+        gfp_t gfp = lo->old_gfp_mask;
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d0c37daf568f..a9af1a9faedc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3075,43 +3075,42 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- }
- 
- /*
-- * Check if there is a suitable cached request and return it.
-+ * Check if there is a suitable cached request and use it if possible.
-  */
--static struct request *blk_mq_peek_cached_request(struct blk_plug *plug,
--		struct request_queue *q, blk_opf_t opf)
-+static struct request *blk_mq_pop_cached_request(struct blk_plug *plug,
-+		struct request_queue *q, struct bio *bio)
- {
--	enum hctx_type type = blk_mq_get_hctx_type(opf);
-+	enum hctx_type type = blk_mq_get_hctx_type(bio->bi_opf);
- 	struct request *rq;
- 
- 	if (!plug)
- 		return NULL;
++       sync_blockdev(lo->lo_device);
 +
-+	/*
-+	 * Note: we must not sleep between the peek of the cached_rqs list here
-+	 * and the pop below.
-+	 */
- 	rq = rq_list_peek(&plug->cached_rqs);
- 	if (!rq || rq->q != q)
- 		return NULL;
- 	if (type != rq->mq_hctx->type &&
- 	    (type != HCTX_TYPE_READ || rq->mq_hctx->type != HCTX_TYPE_DEFAULT))
- 		return NULL;
--	if (op_is_flush(rq->cmd_flags) != op_is_flush(opf))
-+	if (op_is_flush(rq->cmd_flags) != op_is_flush(bio->bi_opf))
- 		return NULL;
--	return rq;
--}
--
--static void blk_mq_use_cached_rq(struct request *rq, struct blk_plug *plug,
--		struct bio *bio)
--{
- 	if (rq_list_pop(&plug->cached_rqs) != rq)
- 		WARN_ON_ONCE(1);
- 
--	/*
--	 * If any qos ->throttle() end up blocking, we will have flushed the
--	 * plug and hence killed the cached_rq list as well. Pop this entry
--	 * before we throttle.
--	 */
- 	rq_qos_throttle(rq->q, bio);
--
- 	blk_mq_rq_time_init(rq, blk_time_get_ns());
- 	rq->cmd_flags = bio->bi_opf;
- 	INIT_LIST_HEAD(&rq->queuelist);
-+
-+	/*
-+	 * Drop the extra queue reference from the cached request.
-+	 */
-+	blk_queue_exit(q);
-+	return rq;
- }
- 
- static bool bio_unaligned(const struct bio *bio, struct request_queue *q)
-@@ -3149,11 +3148,6 @@ void blk_mq_submit_bio(struct bio *bio)
- 	struct request *rq;
- 	blk_status_t ret;
- 
--	/*
--	 * If the plug has a cached request for this queue, try to use it.
--	 */
--	rq = blk_mq_peek_cached_request(plug, q, bio->bi_opf);
--
- 	/*
- 	 * A BIO that was released from a zone write plug has already been
- 	 * through the preparation in this function, already holds a reference
-@@ -3162,19 +3156,11 @@ void blk_mq_submit_bio(struct bio *bio)
- 	 */
- 	if (bio_zone_write_plugging(bio)) {
- 		nr_segs = bio->__bi_nr_segments;
--		if (rq)
--			blk_queue_exit(q);
- 		goto new_request;
- 	}
- 
--	/*
--	 * The cached request already holds a q_usage_counter reference and we
--	 * don't have to acquire a new one if we use it.
--	 */
--	if (!rq) {
--		if (unlikely(bio_queue_enter(bio)))
--			return;
--	}
-+	if (unlikely(bio_queue_enter(bio)))
-+		return;
- 
- 	/*
- 	 * Device reconfiguration may change logical block size or reduce the
-@@ -3210,9 +3196,11 @@ void blk_mq_submit_bio(struct bio *bio)
- 	}
- 
- new_request:
--	if (rq) {
--		blk_mq_use_cached_rq(rq, plug, bio);
--	} else {
-+	/*
-+	 * If the plug has a cached request for this queue, try to use it.
-+	 */
-+	rq = blk_mq_pop_cached_request(plug, q, bio);
-+	if (!rq) {
- 		rq = blk_mq_get_new_requests(q, plug, bio);
- 		if (unlikely(!rq)) {
- 			if (bio->bi_opf & REQ_NOWAIT)
-@@ -3257,12 +3245,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	return;
- 
- queue_exit:
--	/*
--	 * Don't drop the queue reference if we were trying to use a cached
--	 * request and thus didn't acquire one.
--	 */
--	if (!rq)
--		blk_queue_exit(q);
-+	blk_queue_exit(q);
- }
- 
- #ifdef CONFIG_BLK_MQ_STACKING
--- 
-2.53.0
+        spin_lock_irq(&lo->lo_lock);
+        filp = lo->lo_backing_file;
+        lo->lo_backing_file = NULL;
 
+> > 
+> > So why isn't drain_workqueue() enough for cmd->use_aio?
+> 
+> In addition to possible UAF above, the assumption at
+> https://elixir.bootlin.com/linux/v7.1-rc4/source/drivers/block/loop.c#L1134
+> is currently broken due to this race problem.
+
+That shouldn't be one issue otherwise bio based driver can't work with updating
+limits.
+
+
+Thanks, 
+Ming
