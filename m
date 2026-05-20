@@ -1,222 +1,203 @@
-Received: from mail-244107.protonmail.ch (mail-244107.protonmail.ch [109.224.244.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654852FFFA5
-	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 02:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE1032B9A8
+	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 03:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779245993; cv=none; b=QARgq30uEE93nIrmz+FZHcwdZWKD0WZTq2Ge3MOKdMlxn0mSylrqId4kJkX6d4e58Qyf3Q1IBiX84+oK758U8hVx8tkdnCVsFUs48jpBCPG6EQAoG/4jJ7r6Cq70gsohUKnh718ljp30rwuuhyGmm2gK+bNLzPDWy7gNWRso52I=
+	t=1779246419; cv=none; b=lvn8OUVSm3vUsLeCgW2LFfvF8w398mF/P4Ix+6vVkCqvTa1dxiOdgkHsys4J686LgvvBUIT9Z10qb/KxrCUbA1Biw2JSIjEgiMm26st7lXDgxlRdfS4G4i1xCxQKEazdPHOehV7nhFcCs1YTHWuZO+je2p/BLRd8Py4vUBv/pMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779245993; c=relaxed/simple;
-	bh=ndq7djO5Vz9L5XMUHKZft0Mlsh4PvKioYaIJspTeF8U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R4oNv1qgXIt20Qdh74WqQymOzBlQqA1zBn6u576iFluObzHMGW/T/Q3pjagorxl+DFUeYaU7o8EWgob/nIPMgrCslb1LKURoXEPRS9qveF7f1eCBkJ2S+Ob9AkThV538Ura1mLJZT2osTnIGIhdw7Q+j3+wvcg7gO/IEUgz5Brc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=onurozkan.dev; spf=pass smtp.mailfrom=onurozkan.dev; dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b=awDWTzVG; arc=none smtp.client-ip=109.224.244.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=onurozkan.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onurozkan.dev
+	s=arc-20240116; t=1779246419; c=relaxed/simple;
+	bh=09n8hah+N4ZBTDdK9+URDQ5v1kM6v5jDI7553ZxU6P0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GKJY4uiuQm/YdcmmtQe4JqvM7zeL936a72DlgMCKSlxVMmAatYqqed05fuZs01wNcDEce5rolTRWWoM5tYmwRiQ7AASmfx7/6O3bTHjndfqvp1sUfFMAv4mt0dTv5hF6BJR8OS/4NaOwe+3SGc/oI2cRKJNBhe21DV/2U3UAHCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LAfbCiCm; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b="awDWTzVG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onurozkan.dev;
-	s=protonmail; t=1779245984; x=1779505184;
-	bh=5D0Ta5NjIvVby0FlgcU2krulv3FIHt6oByCRoo/rrzc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:From:To:
-	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=awDWTzVGhJzx1jt5myiYzTG/0BiTXxHhEp1SapLeNsuyy/a/pqTj6djhrJU0JuGSZ
-	 bnjJidREl315D/Ktkqcwz4EnkHp1XypL17mJzUqjFKiaEMYisSB/Zd9/clDg1sx6vA
-	 j+TBajWWzaRHJL2kVkuJYz2K9LOLmnHhEJ9hSVPFw38E6ye4wg4YOQREWb7v6q/u5v
-	 jbxuV090DibIu1sMJTuE2Hsovrr0zkiqiqinSIs5dZaWUKVETloqpucUObzKqAyZlO
-	 YWC8cMXgPkEcs8rDthpdKoU9j7SDxrrEumbdVFcArG64qLnel9CV7as0icQlFfqBr7
-	 OGDYGag2yAevQ==
-X-Pm-Submission-Id: 4gKx8t0H96z2Scq8
-From: =?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
-To: Alvin Sun <alvin.sun@linux.dev>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	rust-for-linux@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
-Subject: Re: [PATCH v2 5/5] rust: block: mq: remove redundant imports and format
-Date: Wed, 20 May 2026 05:59:39 +0300
-Message-ID: <20260520025941.35532-1-work@onurozkan.dev>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <20260520-miscdev-use-format-v2-5-64dc48fc1345@linux.dev>
-References: <20260520-miscdev-use-format-v2-0-64dc48fc1345@linux.dev> <20260520-miscdev-use-format-v2-5-64dc48fc1345@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LAfbCiCm"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7dcd17e19b6so2399973a34.1
+        for <linux-block@vger.kernel.org>; Tue, 19 May 2026 20:06:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779246417; x=1779851217; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iCJ1DD7tVweiKbLtyjjzWQ55vZMs9gLi6ogTzUVf/4k=;
+        b=LAfbCiCmrDkF9DdbIlR9GMt9BOaUFVHalVzl7r5Kqmcs7fgL5BCOQTR1/QJSqZQAJS
+         tOuFtYtInOX+ZIO1yox2CPq4xEGbNIi6aUkkhyNw53sj1XivBXc6ab6N3BNCov3/FlDk
+         WQ9tspmBQUd6R/WP+5XOaku/8oebq880s1K9CphpNBe6XROrYEUTWIIgW+kv1H6EpLqA
+         Y0DOR1Lo2eCQiTqnM4DU8T+RPF+PheW7W7QbE5HoM4xsAOs4hkJ3AupOobkkmnCY+NgW
+         8V2xk02DOiXSl2W0etrxgGLxNnwsW00ytBdWp5+9I5O+Lsjj2ofpfSVgG3FA8DrDdR9n
+         +r3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779246417; x=1779851217;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iCJ1DD7tVweiKbLtyjjzWQ55vZMs9gLi6ogTzUVf/4k=;
+        b=Teeow1Wz27f5h3+CK5epDqS0+PCMa76Wl16txFE39GgyO5+gbZVZ+dylAN2DIIp+oE
+         scC5pQnQC9ZXIJs06RvoCYgtpo/YbYrMzkP9Umx/uN+5WmMrUXZqVMeTJbvq9TcVJ3tg
+         E5SERzkVYrogQHMQolhC0JebxXQI/Jr6hXQSxV/MnUN7VTzjp4NUErEk/u/9u+RV5mtg
+         Se4j8ADfr8MLEYkVFsU2i7b5xiqI9DC/3YuIKG46/RLPfjyu3nmNyM1toIvy07ob1ZcZ
+         ubUIzAuk1cfv92+PVpgP/dM13tqLRNKJCVrZqkfhlORTrKFi8btDRttnCVVNdcRiSdIY
+         TDag==
+X-Forwarded-Encrypted: i=1; AFNElJ8YiLaeAgpMzQKODzjkJEDQaykUPEKznlJiGXS+DbN/idiv+j27PhiFDsa+1gP0cBCYswekapF4U5JJiw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy377JHSl9PuWyfN2/phOFkWWtbrM61F//OQ0FPU+iThml5SBLe
+	nqsgVqqHRiFLyMANg7OHgV+4r5GN0+ZNz9jGINpVo8qdQG15s4fATOeN
+X-Gm-Gg: Acq92OFVir3N6ZFsXSz2Cs5qPprg+RfY2ajeH+UMuoOoiG3tL5RKQuEWCGV/BMDlgEj
+	AaqjsyvwxHrlvf7hZYAb1nl2MaZpHHmyEvDhL7Fbf9BSuc7Rg0ccFriUissKEGO2fxPZDYOZsTA
+	DoKZVVtaKRn0XgvFg5qLYEHH/kFVaYStzSpPCkbfEHZvb7LgIAQSl0d0b0QRMv7frVP/fqJBkH2
+	50ezmo7074RnX9HCQZkpfZaH+YYe1muzoVznLvz68aXc4WUJRdRcF1eNpfN30DrMWUHiaEPbJy2
+	MfMHyQZHPHKOL5G12it54ROejqTA7XmJy+mo4+zJtHDbbCh0P3Vq4/A8Uig93DNykmSO/1dtzFZ
+	WCh8OjvGgaG7IO+iZWZ5J9HQTgPBJfSwbVWQ1DW/YEFzK81qfbsZPtObqvUm9P9RfTT1RxlWBlw
+	lHQGX/1ILgp1CmifDqflcJPnnnd202hBr8ZbFZ7SU3l/SFOMTOCiP0qVk7APyfSkrcgQutJH4Rj
+	/cEC8E9PALDJmzMAwpV
+X-Received: by 2002:a05:6830:82d3:b0:7dc:dd58:50b8 with SMTP id 46e09a7af769-7e4f2b89890mr14360672a34.13.1779246416970;
+        Tue, 19 May 2026 20:06:56 -0700 (PDT)
+Received: from fedora ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e55b7cd6c0sm12351755a34.4.2026.05.19.20.06.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2026 20:06:56 -0700 (PDT)
+Date: Wed, 20 May 2026 11:06:51 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2] loop: Fix NULL pointer dereference by synchronizing
+ lo_release and loop_queue_rq
+Message-ID: <ag0lS_CbKO9R5CV8@fedora>
+References: <69e2ca14.a00a0220.1bd0ca.0031.GAE@google.com>
+ <e1d824ba-9ac7-4fde-a791-32eeadcd4258@I-love.SAKURA.ne.jp>
+ <e33b4060-69d9-4d02-a330-2fbd19249237@I-love.SAKURA.ne.jp>
+ <c0047a38-3d02-4ce5-88b0-2b7d0b9b69fa@acm.org>
+ <f720dd8b-4aa3-48e4-a1bb-c0b43eb70f19@I-love.SAKURA.ne.jp>
+ <af2205e3-205e-4743-a767-8593c2c4747a@I-love.SAKURA.ne.jp>
+ <9b2032d6-3f36-4d2b-8128-985c08a4fa37@I-love.SAKURA.ne.jp>
+ <20260518174013.4b72dd50a5bcb89daaed1f62@linux-foundation.org>
+ <d43125ff-cc66-49b7-b16d-1b2650c68c23@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d43125ff-cc66-49b7-b16d-1b2650c68c23@I-love.SAKURA.ne.jp>
 
-On Wed, 20 May 2026 10:40:12 +0800=0D
-Alvin Sun <alvin.sun@linux.dev> wrote:=0D
-=0D
-> Drop `Result`, `Pin`, `pin_data`, `pinned_drop`, `PinInit`, and=0D
-> `try_pin_init` imports already provided by `kernel::prelude`.=0D
-> =0D
-> Simplify `error` imports and flatten parameters formatting.=0D
-> =0D
-> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>=0D
-=0D
-Reviewed-by: Onur =C3=96zkan <work@onurozkan.dev>=0D
-=0D
-> ---=0D
->  rust/kernel/block/mq/gen_disk.rs   |  7 +++----=0D
->  rust/kernel/block/mq/operations.rs |  5 +----=0D
->  rust/kernel/block/mq/request.rs    |  2 +-=0D
->  rust/kernel/block/mq/tag_set.rs    | 22 ++++------------------=0D
->  4 files changed, 9 insertions(+), 27 deletions(-)=0D
-> =0D
-> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_=
-disk.rs=0D
-> index 6f599f654f37f..a2c45bde75a7c 100644=0D
-> --- a/rust/kernel/block/mq/gen_disk.rs=0D
-> +++ b/rust/kernel/block/mq/gen_disk.rs=0D
-> @@ -12,9 +12,8 @@=0D
->          TagSet, //=0D
->      },=0D
->      error::{=0D
-> -        self,=0D
->          from_err_ptr,=0D
-> -        Result, //=0D
-> +        to_result, //=0D
->      },=0D
->      fmt::{=0D
->          self,=0D
-> @@ -67,7 +66,7 @@ pub fn rotational(mut self, rotational: bool) -> Self {=
-=0D
->      /// and that it is a power of two.=0D
->      pub fn validate_block_size(size: u32) -> Result {=0D
->          if !(512..=3Dbindings::PAGE_SIZE as u32).contains(&size) || !siz=
-e.is_power_of_two() {=0D
-> -            Err(error::code::EINVAL)=0D
-> +            Err(EINVAL)=0D
->          } else {=0D
->              Ok(())=0D
->          }=0D
-> @@ -177,7 +176,7 @@ pub fn build<T: Operations>(=0D
->          // operation, so we will not race.=0D
->          unsafe { bindings::set_capacity(gendisk, self.capacity_sectors) =
-};=0D
->  =0D
-> -        crate::error::to_result(=0D
-> +        to_result(=0D
->              // SAFETY: `gendisk` points to a valid and initialized insta=
-nce of=0D
->              // `struct gendisk`.=0D
->              unsafe {=0D
-> diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/op=
-erations.rs=0D
-> index 187b0b7791db9..0343069b373c7 100644=0D
-> --- a/rust/kernel/block/mq/operations.rs=0D
-> +++ b/rust/kernel/block/mq/operations.rs=0D
-> @@ -10,10 +10,7 @@=0D
->          request::RequestDataWrapper,=0D
->          Request, //=0D
->      },=0D
-> -    error::{=0D
-> -        from_result,=0D
-> -        Result, //=0D
-> -    },=0D
-> +    error::from_result,=0D
->      prelude::*,=0D
->      sync::{=0D
->          aref::ARef,=0D
-> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/reque=
-st.rs=0D
-> index 4e0579660e906..d10fb7627c870 100644=0D
-> --- a/rust/kernel/block/mq/request.rs=0D
-> +++ b/rust/kernel/block/mq/request.rs=0D
-> @@ -7,7 +7,7 @@=0D
->  use crate::{=0D
->      bindings,=0D
->      block::mq::Operations,=0D
-> -    error::Result,=0D
-> +    prelude::*,=0D
->      sync::{=0D
->          aref::{=0D
->              ARef,=0D
-> diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_s=
-et.rs=0D
-> index c1fd3e047af50..df3f90bfbb817 100644=0D
-> --- a/rust/kernel/block/mq/tag_set.rs=0D
-> +++ b/rust/kernel/block/mq/tag_set.rs=0D
-> @@ -4,8 +4,6 @@=0D
->  //!=0D
->  //! C header: [`include/linux/blk-mq.h`](srctree/include/linux/blk-mq.h)=
-=0D
->  =0D
-> -use core::pin::Pin;=0D
-> -=0D
->  use crate::{=0D
->      bindings,=0D
->      block::mq::{=0D
-> @@ -13,22 +11,14 @@=0D
->          request::RequestDataWrapper,=0D
->          Operations, //=0D
->      },=0D
-> -    error::{=0D
-> -        self,=0D
-> -        Result, //=0D
-> -    },=0D
-> -    prelude::try_pin_init,=0D
-> +    error::to_result,=0D
-> +    prelude::*,=0D
->      types::Opaque, //=0D
->  };=0D
->  use core::{=0D
->      convert::TryInto,=0D
->      marker::PhantomData, //=0D
->  };=0D
-> -use pin_init::{=0D
-> -    pin_data,=0D
-> -    pinned_drop,=0D
-> -    PinInit, //=0D
-> -};=0D
->  =0D
->  /// A wrapper for the C `struct blk_mq_tag_set`.=0D
->  ///=0D
-> @@ -47,11 +37,7 @@ pub struct TagSet<T: Operations> {=0D
->  =0D
->  impl<T: Operations> TagSet<T> {=0D
->      /// Try to create a new tag set=0D
-> -    pub fn new(=0D
-> -        nr_hw_queues: u32,=0D
-> -        num_tags: u32,=0D
-> -        num_maps: u32,=0D
-> -    ) -> impl PinInit<Self, error::Error> {=0D
-> +    pub fn new(nr_hw_queues: u32, num_tags: u32, num_maps: u32) -> impl =
-PinInit<Self, Error> {=0D
->          let tag_set: bindings::blk_mq_tag_set =3D pin_init::zeroed();=0D
->          let tag_set: Result<_> =3D core::mem::size_of::<RequestDataWrapp=
-er>()=0D
->              .try_into()=0D
-> @@ -77,7 +63,7 @@ pub fn new(=0D
->                  // SAFETY: we do not move out of `tag_set`.=0D
->                  let tag_set: &mut Opaque<_> =3D unsafe { Pin::get_unchec=
-ked_mut(tag_set) };=0D
->                  // SAFETY: `tag_set` is a reference to an initialized `b=
-lk_mq_tag_set`.=0D
-> -                error::to_result( unsafe { bindings::blk_mq_alloc_tag_se=
-t(tag_set.get())})=0D
-> +                to_result( unsafe { bindings::blk_mq_alloc_tag_set(tag_s=
-et.get())})=0D
->              }),=0D
->              _p: PhantomData,=0D
->          })=0D
-> =0D
-> -- =0D
-> 2.43.0=0D
-> =0D
-> =0D
+On Tue, May 19, 2026 at 06:27:11PM +0900, Tetsuo Handa wrote:
+> On 2026/05/19 9:40, Andrew Morton wrote:
+> > AI review asked a couple of questions:
+> > 	https://sashiko.dev/#/patchset/9b2032d6-3f36-4d2b-8128-985c08a4fa37@I-love.SAKURA.ne.jp
+> 
+> To: gemini/gemini-3.1-pro-preview
+> 
+> Thank you for your valuable feedback. Your point about asynchronous I/O completing after drain_workqueue()
+> and potentially causing a UAF at file_inode() from kiocb_end_write() from lo_rw_aio_do_completion() is correct.
+> The drain_workqueue() alone does not wait for in-flight AIOs that have already returned -EIOCBQUEUED. However,
+> I'm not convinced that use of blk_mq_freeze_queue() inside __loop_clr_fd() where disk->open_mutex was already
+> held by bdev_release() is absolutely deadlock-free.
+> 
+> 1. VFS and Block Layer Lock Contention:
+>    __loop_clr_fd() is exclusively invoked from the lo_release() path during the final close of the device.
+>    At this stage, the block layer is holding disk->open_mutex. If we call blk_mq_freeze_queue() here, it will
+>    synchronously wait for all in-flight AIOs to complete. However, the completion paths of those in-flight AIOs
+>    (or subsequent metadata processing in the underlying filesystem) may attempt to acquire resources or execute
+>    code paths that depend on the very same device state or open/close status. This creates a circular dependency,
+>    leading to an unrecoverable hang.
+> 
+> 2. Memory Reclaim Deadlock:
+>    blk_mq_freeze_queue() blocks until the queue's usage counter drops to zero. If an in-flight AIO requires memory
+>    allocation for metadata updates upon completion, and the system is under heavy memory pressure, it can trigger
+>    direct memory reclaim. If the reclaim path attempts to sync other buffers or interact with the frozen loop
+>    device/queue, a circular deadlock occurs.
+> 
+> Therefore, I would like to choose SRCU-based synchronization instead of blk_mq_freeze_queue().
+> 
+> * Locking: We call srcu_read_lock(&loop_io_srcu) only for asynchronous paths (cmd->use_aio) immediately
+>   before submitting the I/O to the underlying filesystem in lo_rw_aio().
+> 
+> * Unlocking: The reader lock is released via srcu_read_unlock() at the very end of the AIO completion handler
+>   (lo_rw_aio_do_completion()).
+> 
+> * Synchronization: We place synchronize_srcu(&loop_io_srcu) immediately after drain_workqueue() in __loop_clr_fd().
+> 
+> I think that this guarantees that __loop_clr_fd() safely blocks until all pending AIO callbacks are 100% completed,
+> fully eliminating the UAF risk and ensuring the safety of the subsequent mapping_set_gfp_mask() and fput(), while
+> remaining entirely deadlock-free.
+> 
+> What do you think about this approach?
+> 
+>  drivers/block/loop.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 0000913f7efc..7c3961f3cbc9 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -80,6 +80,7 @@ struct loop_cmd {
+>  	struct list_head list_entry;
+>  	bool use_aio; /* use AIO interface to handle I/O */
+>  	atomic_t ref; /* only for aio */
+> +	int srcu_idx;
+>  	long ret;
+>  	struct kiocb iocb;
+>  	struct bio_vec *bvec;
+> @@ -93,6 +94,7 @@ struct loop_cmd {
+>  static DEFINE_IDR(loop_index_idr);
+>  static DEFINE_MUTEX(loop_ctl_mutex);
+>  static DEFINE_MUTEX(loop_validate_mutex);
+> +DEFINE_SRCU(loop_io_srcu);
+>  
+>  /**
+>   * loop_global_lock_killable() - take locks for safe loop_validate_file() test
+> @@ -327,6 +329,8 @@ static void lo_rw_aio_do_completion(struct loop_cmd *cmd)
+>  		kiocb_end_write(&cmd->iocb);
+>  	if (likely(!blk_should_fake_timeout(rq->q)))
+>  		blk_mq_complete_request(rq);
+> +	if (cmd->use_aio)
+> +		srcu_read_unlock(&loop_io_srcu, cmd->srcu_idx);
+>  }
+>  
+>  static void lo_rw_aio_complete(struct kiocb *iocb, long ret)
+> @@ -392,6 +396,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  	if (cmd->use_aio) {
+>  		cmd->iocb.ki_complete = lo_rw_aio_complete;
+>  		cmd->iocb.ki_flags = IOCB_DIRECT;
+> +		cmd->srcu_idx = srcu_read_lock(&loop_io_srcu);
+>  	} else {
+>  		cmd->iocb.ki_complete = NULL;
+>  		cmd->iocb.ki_flags = 0;
+> @@ -1118,6 +1123,22 @@ static void __loop_clr_fd(struct loop_device *lo)
+>  	struct file *filp;
+>  	gfp_t gfp = lo->old_gfp_mask;
+>  
+> +	/*
+> +	 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
+> +	 * wait for already started loop_queue_rq() to complete.
+> +	 */
+> +	synchronize_rcu();
+> +	/*
+> +	 * Now that no more works are scheduled by loop_queue_rq(),
+> +	 * wait for already scheduled works to complete.
+> +	 */
+> +	drain_workqueue(lo->workqueue);
+> +	/*
+> +	 * Now that no more AIO requests are scheduled by lo_rw_aio(),
+> +	 * wait for already started AIO to complete.
+> +	 */
+> +	synchronize_srcu(&loop_io_srcu);
+
+The IO after close(loop) should be from writeback. rcu/sruc isn't necessary,
+please see the patch posted in another thread:
+
+https://lore.kernel.org/linux-block/agxJdUf1b0JSDAux@fedora/
+
+in which the check on lo->lo_state is moved to loop_handle_cmd(), meantime
+drain_workqueue() is added for draining in-flight workers.
+
+Thanks,
+Ming
