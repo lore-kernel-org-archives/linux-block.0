@@ -1,26 +1,26 @@
 Received: from CWXP265CU010.outbound.protection.outlook.com (mail-ukwestazon11022104.outbound.protection.outlook.com [52.101.101.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3374939F160;
-	Wed, 20 May 2026 21:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4644A39FCAD;
+	Wed, 20 May 2026 21:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.101.104
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779313850; cv=fail; b=PLm2+/1cdsJvmZ7CzVJXdXNE7O2p7u3VkbpIv5NC6Egdn3GRNodFNvDMsmLDpAb2N/H/4lpKEXHzkiYU8EZ+xPU+Vo0QXpAdN1t+agJySz1HILkhB1XY5TFZIJtRHsUWGx1sdUXU2wyFJGIzWEoE2IrKZ7+FCzV9bN0UsingcZo=
+	t=1779313851; cv=fail; b=IUE2LLL8izKAlFHqE+XcXIWKOH9/yWZjmXues2dQkTM/Y0TtdaH5NFJOq/76BhgYALZ6wmlc/G0kYCeR3GOKJPzQUXH7ktAAdowaqJ0TO8udksDlj1t+oMt3l6n52m5BjQvhmxciUQRxRy9DJF6ed0MmOH6mvSiujjgbtzLYX4U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779313850; c=relaxed/simple;
-	bh=hXNp73LStpJu0P5docvAKs7XTN8rNNa3FfSzIYZk/8A=;
+	s=arc-20240116; t=1779313851; c=relaxed/simple;
+	bh=e+GLj/od8aW6hP+C4zeK/EV8wQghaKWNz13PZblqiTE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Nqt8LL+zPaBexl1XlOb6t1Ftf7dlJIjugVhc9KaRFo2ZcUN919o2qlOiSun6BlsO86vnIYTK8/nE1nm6vSvZTj+FxOuaHm90FUfzU31mrUGS5GqKLcVVDCJCbUu4CUn2+Jxg8GgOWTpN6NJjyQi15in2PhIOfcRTXXE5Gi4vVe8=
+	 Content-Type:MIME-Version; b=rx2kpCr/9gzXBfUl/A7yrFhVVJ4FfnxFYoVtZjGjDW9gYOQ1GKzFCSbTO7FA27AzeDuS4vpr9ztsfYiMY9rKfbRiKs1xfDSQIqIP1i5LkgUACCUB+h3Q4RcMo0FuNhIaPTcAdiliEAIe+8l+9e0CrH1gw3SdKt10LDcwCuWqCRU=
 ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.101.104
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BjQPOw9u/qe7Ro8eJtet9QWNScgJh9p2UvN6Risl7iEcTAV7y5sydhmowPzWi5+WA5UA/tpgzYpE96WR9wXgXsAZUdqSzZFBXTYczhmMGoQUuQHXA4n1slX/6oXGIgjs3bvsGofgDv6DCKwtEJQol7i0FT80sBEQ1+Nqw7u+j9oT8tKOMcWF+gg+U1Dei+/0yZUAZ7xtEog83GuA1LYvmid+t3yQPEM+xfCh6u0iEc6gZnVsb6KNMmL8eDAVsmG9N4duhfhNdcgzZQfgmllyZ9MjivI9jDBcTfeq00G9v0mFAZQWYkcn3z+LNPr/OhJ66MmlBH5uTIWLQmoeeLIQOQ==
+ b=bqE2OWgJc62FVA4OfYpvH7YJLAhO6+qmgcEsZd1NE7hTaIRwYj86LOkPx/G9LHdGuN/4Vz65aZ4kbo6Pma4OHDgFPQBcU3YXT9hEAOHgP6inBj20FaRJQ8sZBMewLqgWv9wZ0bFJW/F4asq0QRk1Uh1raqeUFpD8Pf2TrguABuM6B/lfAAoEfAcF/YfrfMpLQCGB0tYdFyn00Rw+IHyQzTg3Ib6vfkw6Hp7zHw4+NNoLyX3FcBqd1vXCDUQcK2BPmhR9RW0jFBPViUEc1q9yjz+L3rxvCBrNfxPjQC40y8DGhZ2QQkf8v6dfySu31w0R5qNT/WFpe2onKh9xHayoXA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iaOB4wVhhGa3ZpNrecnHrqVOFjn11m/h4x2rBCwlxZQ=;
- b=Ufz//vFBfcrBmXSYHn7oDYTS/HH1nusc3cGfcTLynC+y1TlbOqkbcqeZek+D3fvE6OOUnkRD+tBQ+Z/JejaURv6c0wkp3MNTY9zyDXyBkPuVgw1kP0WJlnFeYcl40XFwoQ6kyvBJXtK6//K3zedD4Am90fFPPA6VySX95TCT1gLtMYoO0ZK1tYJnILWnE69jeb7Psnb8IyaMXHbWB8V0ycAmGLgj5TzSeM9o/ZansFPtg5sldUrX8WuQGnIaoar4wOvm+16NdcrvUqhZ2TnNacZ8BCoaQNo2RMHtsGzz1tOjV6JdEReWEqm7gzEyElansDMIMwfg3Qh7qpE4lnOjJw==
+ bh=yxmsVF9BcruDQVuzOgTuQiNP4A1fOg7rMbhpo0DxUE0=;
+ b=VWfNIFOdq7PlkvYqtknWQo8PPFu9mxbPtFqAf4ORVa9JMFQ61AZvIG181KP5xYK3iSfk1WgadDyIoeCKHhGLSWCyCi9C11qQArp/SNNGpqqB3EqLyobfqFNwrddsO6rHZVNDR1yEtpvqInkAXUNryRrm8+Z0Z3UrJ2vJNN5Sz1a4TI00czkwmvCpIIxuC1tgFjygtMTaWmI9RAC9LL3AD39CnJY4XuFPHDpWpG8v/JA7mQP9Q6tM1LT1ue/uRcsMtSbEGr9GcLfnIJ67VGtHe6TngfStvkHAbcbgR16UZI8OeTj0ub8e6b3Hz50HDCVlRM6/q0QvjXSveAmE6hanTQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
  dkim=pass header.d=atomlin.com; arc=none
@@ -30,11 +30,11 @@ Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
  by LO4P123MB6626.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:278::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.16; Wed, 20 May
- 2026 21:50:45 +0000
+ 2026 21:50:48 +0000
 Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9846.025; Wed, 20 May 2026
- 21:50:45 +0000
+ 21:50:48 +0000
 From: Aaron Tomlin <atomlin@atomlin.com>
 To: axboe@kernel.dk,
 	kbusch@kernel.org,
@@ -83,16 +83,16 @@ Cc: atomlin@atomlin.com,
 	rishil1999@outlook.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v14 3/8] lib/group_cpus: Add group_mask_cpus_evenly()
-Date: Wed, 20 May 2026 17:50:25 -0400
-Message-ID: <20260520215030.496803-4-atomlin@atomlin.com>
+Subject: [PATCH v14 4/8] isolation: Introduce io_queue isolcpus type
+Date: Wed, 20 May 2026 17:50:26 -0400
+Message-ID: <20260520215030.496803-5-atomlin@atomlin.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260520215030.496803-1-atomlin@atomlin.com>
 References: <20260520215030.496803-1-atomlin@atomlin.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BL1P221CA0039.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:5b5::17) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-ClientProxiedBy: BL1P221CA0031.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:208:5b5::10) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -102,215 +102,116 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|LO4P123MB6626:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9fdf1b15-4d2f-41f4-6a27-08deb6b9d865
+X-MS-Office365-Filtering-Correlation-Id: 0c99ee8f-bfeb-4714-f2c2-08deb6b9da75
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|6133799003|22082099003|56012099003|18002099003;
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|6133799003|22082099003|56012099003|18002099003|3023799007;
 X-Microsoft-Antispam-Message-Info:
-	A4J6J5F6LKmNlmwcy7gb5OsCjcVwKLfbF9PwRKW0b+AYSOqAan7PweJzJwpjoAXVoXC322Iz0VmDU5QyoRxf+N/USqbxFs8SYvhZdTas6bJ3WhxHH+uldAhUcTx0N2DcCr3PXKm2yKuDOnJppqAs9uDEsve8B7Vmscq2qk4JfmUCI7TWi5zcIScVNh5WFGiV8EcvfLg24QyUBWMjQbuD0ZcNfOr1F7jJ51q8YBzZzU1Ma6Mh5PzxDMZJXJyy6jBghA66ePHiCfi/qhai8cVn7UwqFNAyOW1qCMcMdKsAfgdKwqCbr9y+pVIW4cTO097fO6X8o6ii07/89IuLsgQD+7zPxolthY+Yzb/DnV/XT4u1TwkJaI8D0S6WI4kDY0c8v4zv2R5wj8ZAn+EAu9J2sOyYz/SqY0+UFljKu/vK+Qvz5ch2IW0UVyqVDYArvDOsrkUmT/+GB0ktc4DsyuwOvKayY9LKKyNjwSnUjYAZ6igXEuPaI75ku8y/0m5+IOaFMVfVV3wris4ndwufkVQlT1HBFRHP3HyLzl2avY/r38z1a7ayflKV3Pc5kd9mA8RXSovt50XuwnMEYhMT8fQtbQMAZebq5auC+YDzr9BMZgF7uZR7e4PRtOj/wkVwkKGrYxaxzzUZkAsJiF52JZiGb7xR0+B5uoaRyleCIqQZoyTR2/KukQG9JcpTdhrvORPQ
+	dXQMFN0WIqMHTeNd2cgtGpWvMGlk/L5udpROuRnz7pboDuwNsl+lNP0g3DKVd9CwHId0e73+MXfQfrbsdLk0CwS6JTzyded8CNBXcJx9G4hvbOch5k4r/BBTl5XiEfJyhi5l+ruqnR/IkxWW7QgBuSSTivHaHa0COfB8rXpEK/E6EvL57dMIqNgamjMCeEmqaHHkUyQ4cafa73RBrBIwZwbm5V5Hzp3BYZPzCDSGoKkD+xZMlS6BYg8PYnPuVhg+Ux5g4lZa+b9oAe7slunBA1lUo7ZGXbjZVCg+uyUkOoEJTkSSmQsILgXU0SpKSyMYDe6VOOJu1kC/zlQpOZduuFs02sZCQbzbmvpTlWK36RBJEE99uFXgA6WYMx2wLRU+V/LCNGXdVGn2HtrzJHHR5BjyGg1L6LDWD3O+HA1B4/3gOsGrOSI10c6WJG4qmj/f8rCHV7BJST6qooDqU/J8iS/poAkp8Cj58BAC++RP1vg6e0aMcCWDD4xvgbWgkZYwMXoT5zuHtORmrc8OalyDNozMFLeHSQvdLdQ8KgQD3g/3LUiwuw+/mVGkJpPnyEu0N3G5SpavDf30jyAGTdxeO2SujjDOfGmRgNmqPTloPLHDgbYVer9szEI8lwnOE5tWhF7SGLgaedl+hoE8ZH4v+USmlOgWZYn70wJq/f8majD6ncpfSs4AN2PcFGlo+Je1
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(6133799003)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(6133799003)(22082099003)(56012099003)(18002099003)(3023799007);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?oOZbhPhSEqLybdf0FqXIXS0JXPfBjAHGSyjoN2sZ5EdJVQe6JBxIsgrhvrk7?=
- =?us-ascii?Q?Pkz1LP6u56XCNPYoPX1q2UpsHTr+jRsiKtXdntUhC6z9REtC2mLzXVptoSCX?=
- =?us-ascii?Q?i1IMnGQTQqHrcokOviF0qGV7VPtXkdH0iw6LgMO86DCS+EUix0HyhBBM3Y5V?=
- =?us-ascii?Q?0czwzdPgI2Z3wryJtVpiV9ukELKAs5DvUMMe6GI8dTc7PFAKJdyj3mCc6jGE?=
- =?us-ascii?Q?jVamWpsXioqB6EVUeTtlBk6E0obYXRl19u/XvCgNx4cKiDRgHMw8Z2jqAlgI?=
- =?us-ascii?Q?w62ZP8qVT2kgfiliUHNyIh5R2ZfTzL1ropyfdFDpcK7rv48oazbmYaeeBfII?=
- =?us-ascii?Q?V/gMhMU/pZybbUZML4qVH47bOqBB5O/fjmB9V3RNOf10ZH36vmeK+9WM0Cx6?=
- =?us-ascii?Q?d9c9aVAR2tlv1mQdA4gQgNFwZSx3jlZaTweslmndQPaG35oo3/+TLQcXlPRF?=
- =?us-ascii?Q?dklPtBqsUHStHw7znwUYGCZvfK6WuZuESCEBq28kSFq/MyEruF/OaCmvxsdP?=
- =?us-ascii?Q?aNHG9snzpU1FHpWgfYmMerrgyC0lIMfuhplzl9Omlq+PgOJNRir+70MVzDna?=
- =?us-ascii?Q?RbO7NO3uCfjqhcBT8i3rts8TWgcI2xPGUDW0RdTdiwf5NEWI4tKAymD3kLlN?=
- =?us-ascii?Q?lcqAkR4OHnwldcDGmgBkqPb/0pfR2Zt1CW0kY9MKNJSqebzKCBqN1iUpG9WV?=
- =?us-ascii?Q?tphB7B12VUwI6RlHCkyGnNyZTbnx/doyWCy18YqcQvg7M5vKSHdNxAEPSeFp?=
- =?us-ascii?Q?3wbSVVeDJm3OG6AZQ4VOhN+HrvAnW8WNi47ZMt9/KwzQSQC6Jop+3FhbB7fP?=
- =?us-ascii?Q?e9fp3iStOCKY2XWKlN5RRSSB2UENrDN6f8kkPKSuNBdF8dbQzFPXjCx0V6nR?=
- =?us-ascii?Q?GJe9UZRYW6rJTzim641/CCsdM0sGBZYEbcSOPgZYfadAemOLZ2t0dz5LTU83?=
- =?us-ascii?Q?OWFfsxKYhyDW0qCJyvZ9PsshSKI580oc/tp/3inLunlnOTw1XxCYOShnaTO0?=
- =?us-ascii?Q?GXO+GjUGglxAVuc5VVwUsBCciQw/juO+CF+Q+zmdlFFt+2Knf0RWxlxghBpR?=
- =?us-ascii?Q?ioQyFMaCV8gB8lR49BXizjUDPFmpgtjI/Ndgr87o3YoLUyvp/3wmmFU7aE1u?=
- =?us-ascii?Q?dQzzhGIaBi7LIioWgonA/ukdPctvHkbYIgc9tZEVHqJBewJ6j0wiYWQzPHN7?=
- =?us-ascii?Q?OjzsDcGVkt2HS72OisP3qri4mk/jmpJN+f1m5SBdL0W2LI21ggCuNuZQwNag?=
- =?us-ascii?Q?BVclqxZsrIFM1wRbIjVqtHsL3pkkrIYb4yRPfq7pJRUyUcz1KU8P4MQLXjh6?=
- =?us-ascii?Q?qMFisXXgQveis5Kn4yzg9Q/X3L9Z0QHhVtLyRtihBm0IGCwTV4orVqV1HufT?=
- =?us-ascii?Q?l4ZrxFjnOxLWYX+TeKgO+m6Hn0301IBhV2xhXnfOxkPY7Up1ct7lVY3KFpVJ?=
- =?us-ascii?Q?nKaTxTepkaWXcNT/7NokNqzBYAP+90r9ZTM+ixsZQPFqfHS/SaSYV+hH3vZt?=
- =?us-ascii?Q?twhx7jeCbMwriMeCWADQoCHXVCzqhnyjI7/E6GAZMAYk9dNXBnXecy7saUrx?=
- =?us-ascii?Q?Y4wFzo2pfZw8lH7ZW89ndwUKypuXHHSfgRCWvbmB9lvmg/UaUe4xrrAHXhje?=
- =?us-ascii?Q?V2lyCgIBOWdC3pyfmRrh+tmnqrQnpXALd/ZLfspYtaQGQcSXIgPKPPICLDuD?=
- =?us-ascii?Q?Fkhg032o6uwUN5BPfitKDE1pwAprtwZv4tuY/M2fVyqIi/TM7cgYFl9Tn0z5?=
- =?us-ascii?Q?5DiQCg+C1w=3D=3D?=
+	=?us-ascii?Q?00ilHV6GQPZNVF2p+jllT+fK5DOKOuPM2E4gsevLycQ8T9WRR4BqE5j2u54y?=
+ =?us-ascii?Q?pZRPVKNlLldbFRMRS+5FR6Y7cX9YpkexCuWX1cAQ00r7H40w2/cCGjVk16e1?=
+ =?us-ascii?Q?FD1HoiC6OiqWEbOKr20RTC0Upsaqxs3wb2L5DovtIXBzwHxN6qKDuE81KPnj?=
+ =?us-ascii?Q?kEgAgvZ9Qd5dyfb13ymHtpsOV4nh+jchhr62k0fxzgCWat6mTj4GrhMOtqnG?=
+ =?us-ascii?Q?oQ8tTqbMrrY65hYe4vf3FuBYIayq+hfhedy4boFL7L/NNmEqhz0301Gkiz8T?=
+ =?us-ascii?Q?ddX530uCzLYJcJh7KuvSDsXsjt28vVre4EEhOemvAYzkizrX5zbtfQIRR7VY?=
+ =?us-ascii?Q?TkTexpBnjE8HIFMRbOR9GNCcOZGAw9YJ0rxulNzyK/Yx5bVYBgTSb3hakNRl?=
+ =?us-ascii?Q?ViM3wRHuYajc70FfkcElADEph2P7kQo6gNrCkb4tUT5Gr3GgFc9pqTFn9Rmf?=
+ =?us-ascii?Q?YL7nugeVWJyD6GnE4VkV5naXfTz2ChzbpqI4w2ymAfgKTHfX5TXY1S7y4BII?=
+ =?us-ascii?Q?py5S2XOWOIeFFx5RPbSrHzcHkn+wvTTPd1EPAaP8l/4b1GeT2eCcSXuL6VYi?=
+ =?us-ascii?Q?pLDqwwubs2goOsR1SPNI0b4yJgppxusyI/kd4Y4SU70/NFWuY7WVVZSYbp8N?=
+ =?us-ascii?Q?6yX+4snO4rWAaNp/f7mxwFxNfaFG5jYWUCG2oLr7vaguTkCmTXxkWp8WvHVQ?=
+ =?us-ascii?Q?2dplLZkJEMUnw8kd55ZSoMzqHaLX4wDLO2GEyZSf82uzsckhtfFrCxvb/zHZ?=
+ =?us-ascii?Q?i43Rwucs/CQN3KX0KyH1NA0rW85jpgQRFL111sV+K3GgUiEJAPW8rtzY6u8n?=
+ =?us-ascii?Q?ovOaSaYhlZCekZzyP+dy18nRrJqM6t3HX04v0f4uNFFK+0GQtoVdj7r7RD8E?=
+ =?us-ascii?Q?OHn7DrBrTXrgSfueuxBmV2XI0VyFiA8wdFgg8zHtjfjcw0VuAemaGlunjo35?=
+ =?us-ascii?Q?CpCoYABW5R4PDx4/Zq5+5IsSN/Qq0ODnk3jGVh0Z6TugLSOeF2c3oioC9mIg?=
+ =?us-ascii?Q?i65EdQLMNKyMBTOnUkFISIDzGTaojrnLHBtZwpramPBgP1GgoLr/mOc2q29V?=
+ =?us-ascii?Q?IGGgX59DZyuXVT4jeMWng7/mMpCBBUqJBPE0GZTGE7Y/v+W04+BpYwiD2wxz?=
+ =?us-ascii?Q?QfmgAQ5p4309uqCEfHLj+bRfzzs1IIk7dKbd8PKkTY5O2vdWS745+DssAbrb?=
+ =?us-ascii?Q?pi7O5rSTaeGD5/8lXkUjG0rki6zGguSyEKMsRK1uKCr4rJVoSQuHfufV7124?=
+ =?us-ascii?Q?U2YPSTUxP1CQL/BRt7Cd+fG4NkWrQ+6HNU3jmz93WA4N+xUxQLNKNgeycAUu?=
+ =?us-ascii?Q?tSbT4goefqgMsZxZljP+AA09/UBPiYSikshW9w43Nn5vJ9lbaIsRhezDwNTe?=
+ =?us-ascii?Q?nzc0/UpNEabIFGPwLdJiiAnGjQR/P2qUNsPnvmIo5qmjOGaKaAXkgeeDhdOS?=
+ =?us-ascii?Q?QoGiqa0vNYkYd3igMhBy5SmcH5JrHCQbuHOjmg2lSHv93JroCWeL3QpLC+u+?=
+ =?us-ascii?Q?+j5cGnTGXJjRIGe6BvMR+JrQzP6gAJbRHryy//qfcdvxWtycLA9/c9e2V5kP?=
+ =?us-ascii?Q?J++SE9No/3tSxo+Y8nQLj/RWpu0n5cnKLSgTS7IMxfNzslFuOULpUFrBZ3vV?=
+ =?us-ascii?Q?TOfJLpvYLvMxe8M/9nxpOe7Yyt3UoDqYo+1LMP4BuC+5kKs7KIMhY7HYf3Na?=
+ =?us-ascii?Q?7O/X2iTnnhMCeM62W44oSeYcqVt+G+U/7H4ykdlK5xspq2NQEdRP00S28bOp?=
+ =?us-ascii?Q?nkg1Pv+Kqw=3D=3D?=
 X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9fdf1b15-4d2f-41f4-6a27-08deb6b9d865
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c99ee8f-bfeb-4714-f2c2-08deb6b9da75
 X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 21:50:45.1236
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 21:50:48.6696
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IeTC7gOo2GEm7W/R9HWJHeDs0jMKk3WR13qRZTxCEo8kQ/e1pRBd2QQ8ErdtWob6YJhaCJ86WCJ7MMq3fbSL3g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: R9l9yBp8as99dfoPg5JPQJ6cKCdu4mrqC+abQLIR+IS1V7Rbv3Tmgt72pdi2eqxg+VxuXt2kdct5Rh0bXOr2XA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P123MB6626
 
 From: Daniel Wagner <wagi@kernel.org>
 
-This commit introduces group_mask_cpus_evenly(), which allows callers to
-distribute a specific CPU mask evenly across groups. It serves as a bounded
-version of group_cpus_evenly().
+Multiqueue drivers spread I/O queues across all CPUs for optimal
+performance. However, these drivers are not aware of CPU isolation
+requirements and will distribute queues without considering the isolcpus
+configuration.
 
-While group_cpus_evenly() operates on the global cpu_possible_mask,
-group_mask_cpus_evenly() confines the distribution strictly within the
-boundaries of the caller-provided mask. It preserves the kernel's native
-two-stage spreading logic-first prioritising CPUs that are physically
-present (cpu_present_mask) to prevent I/O starvation, and then distributing
-any remaining vectors to non-present CPUs to maintain hotplug safety.
+Introduce a new isolcpus mask that allows users to define which CPUs
+should have I/O queues assigned. This is similar to managed_irq, but
+intended for drivers that do not use the managed IRQ infrastructure
 
 Signed-off-by: Daniel Wagner <wagi@kernel.org>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
-[atomlin:
-    - Added check for numgrps == 0
-    - Updated commit message to resolve typo
-    - Removed unused <linux/sched/isolation.h>
-    - Fix TOCTOU race by caching the provided mask
-    - Removed ineffective data_race() annotations around cpumask pointers
-    - Implemented two-stage grouping logic to prioritise physically
-      present CPUs, mirroring group_cpus_evenly()]
 Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
 ---
- include/linux/group_cpus.h |   3 ++
- lib/group_cpus.c           | 106 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 109 insertions(+)
+ include/linux/sched/isolation.h | 1 +
+ kernel/sched/isolation.c        | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/include/linux/group_cpus.h b/include/linux/group_cpus.h
-index 9d4e5ab6c314..defab4123a82 100644
---- a/include/linux/group_cpus.h
-+++ b/include/linux/group_cpus.h
-@@ -10,5 +10,8 @@
- #include <linux/cpu.h>
+diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+index cf0fd03dd7a2..30cb9a44365e 100644
+--- a/include/linux/sched/isolation.h
++++ b/include/linux/sched/isolation.h
+@@ -18,6 +18,7 @@ enum hk_type {
+ 	HK_TYPE_MANAGED_IRQ,
+ 	/* Inverse of boot-time nohz_full= or isolcpus=nohz arguments */
+ 	HK_TYPE_KERNEL_NOISE,
++	HK_TYPE_IO_QUEUE,
+ 	HK_TYPE_MAX,
  
- struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks);
-+struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
-+				       const struct cpumask *mask,
-+				       unsigned int *nummasks);
+ 	/*
+diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+index ef152d401fe2..3406e3024fd4 100644
+--- a/kernel/sched/isolation.c
++++ b/kernel/sched/isolation.c
+@@ -16,6 +16,7 @@ enum hk_flags {
+ 	HK_FLAG_DOMAIN		= BIT(HK_TYPE_DOMAIN),
+ 	HK_FLAG_MANAGED_IRQ	= BIT(HK_TYPE_MANAGED_IRQ),
+ 	HK_FLAG_KERNEL_NOISE	= BIT(HK_TYPE_KERNEL_NOISE),
++	HK_FLAG_IO_QUEUE	= BIT(HK_TYPE_IO_QUEUE),
+ };
  
- #endif
-diff --git a/lib/group_cpus.c b/lib/group_cpus.c
-index b8d54398f88a..8503ab712e42 100644
---- a/lib/group_cpus.c
-+++ b/lib/group_cpus.c
-@@ -563,3 +563,109 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
- 	return masks;
- }
- EXPORT_SYMBOL_GPL(group_cpus_evenly);
+ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
+@@ -340,6 +341,12 @@ static int __init housekeeping_isolcpus_setup(char *str)
+ 			continue;
+ 		}
+ 
++		if (!strncmp(str, "io_queue,", 9)) {
++			str += 9;
++			flags |= HK_FLAG_IO_QUEUE;
++			continue;
++		}
 +
-+/**
-+ * group_mask_cpus_evenly - Group all CPUs evenly per NUMA/CPU locality
-+ * @numgrps: number of cpumasks to create
-+ * @mask: CPUs to consider for the grouping
-+ * @nummasks: number of initialized cpumasks
-+ *
-+ * Return: cpumask array if successful, NULL otherwise. Only the CPUs
-+ * marked in the mask will be considered for the grouping. And each
-+ * element includes CPUs assigned to this group. nummasks contains the
-+ * number of initialized masks which can be less than numgrps.
-+ *
-+ * Try to put close CPUs from viewpoint of CPU and NUMA locality into
-+ * the same group.
-+ *
-+ * We guarantee in the resulting grouping that all CPUs specified in the
-+ * provided mask are covered, and no same CPU is assigned to multiple
-+ * groups.
-+ */
-+struct cpumask *group_mask_cpus_evenly(unsigned int numgrps,
-+				       const struct cpumask *mask,
-+				       unsigned int *nummasks)
-+{
-+	unsigned int curgrp = 0, nr_present = 0, nr_others = 0;
-+	cpumask_var_t *node_to_cpumask;
-+	cpumask_var_t nmsk, local_mask, npresmsk;
-+	int ret = -ENOMEM;
-+	struct cpumask *masks = NULL;
-+
-+	if (numgrps == 0)
-+		return NULL;
-+
-+	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
-+		return NULL;
-+
-+	if (!zalloc_cpumask_var(&local_mask, GFP_KERNEL))
-+		goto fail_nmsk;
-+
-+	if (!zalloc_cpumask_var(&npresmsk, GFP_KERNEL))
-+		goto fail_local_mask;
-+
-+	node_to_cpumask = alloc_node_to_cpumask();
-+	if (!node_to_cpumask)
-+		goto fail_npresmsk;
-+
-+	masks = kzalloc_objs(*masks, numgrps);
-+	if (!masks)
-+		goto fail_node_to_cpumask;
-+
-+	build_node_to_cpumask(node_to_cpumask);
-+
-+	/*
-+	 * Create a stable snapshot of the mask. The grouping algorithm
-+	 * requires the CPU count to remain constant across its multiple
-+	 * passes. This prevents allocation failures if the caller passes a
-+	 * dynamic mask (e.g., cpu_online_mask) that changes concurrently.
-+	 */
-+	cpumask_copy(local_mask, mask);
-+
-+	/*
-+	 * Grouping present CPUs first. We intersect the provided mask with
-+	 * cpu_present_mask to ensure that we prioritise physically
-+	 * available CPUs for the initial distribution.
-+	 */
-+	cpumask_and(npresmsk, local_mask, cpu_present_mask);
-+	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
-+				  npresmsk, nmsk, masks);
-+	if (ret < 0)
-+		goto fail_node_to_cpumask;
-+	nr_present = ret;
-+
-+	/*
-+	 * Allocate non-present CPUs starting from the next group to be
-+	 * handled. If the grouping of present CPUs already exhausted the
-+	 * group space, assign the non-present CPUs to the already
-+	 * allocated out groups.
-+	 */
-+	if (nr_present >= numgrps)
-+		curgrp = 0;
-+	else
-+		curgrp = nr_present;
-+	cpumask_andnot(npresmsk, local_mask, npresmsk);
-+	ret = __group_cpus_evenly(curgrp, numgrps, node_to_cpumask,
-+				  npresmsk, nmsk, masks);
-+	if (ret >= 0)
-+		nr_others = ret;
-+
-+fail_node_to_cpumask:
-+	free_node_to_cpumask(node_to_cpumask);
-+
-+fail_npresmsk:
-+	free_cpumask_var(npresmsk);
-+
-+fail_local_mask:
-+	free_cpumask_var(local_mask);
-+
-+fail_nmsk:
-+	free_cpumask_var(nmsk);
-+	if (ret < 0) {
-+		kfree(masks);
-+		return NULL;
-+	}
-+	*nummasks = min(nr_present + nr_others, numgrps);
-+	return masks;
-+}
-+EXPORT_SYMBOL_GPL(group_mask_cpus_evenly);
+ 		/*
+ 		 * Skip unknown sub-parameter and validate that it is not
+ 		 * containing an invalid character.
 -- 
 2.51.0
 
