@@ -1,26 +1,26 @@
 Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021073.outbound.protection.outlook.com [52.101.95.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71EEE39EF0B;
-	Wed, 20 May 2026 21:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C633A0E85;
+	Wed, 20 May 2026 21:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779313842; cv=fail; b=jHwRxjI0RnEctr1WmZPYufJ1gRt+PVnvtQWXJGn/uEiJtsJi0rpiEnv9gM+m+9NIdVbhNKixSOmXENrHsUSkuYaaPkRC8Pley7T635mwD/2d6eZm8dUIeJSz3xkXfv4R3z1x40uWXmqkaDCeuvxvBkVOH5cZTeuqpQAvI2//Ftw=
+	t=1779313844; cv=fail; b=cgwsTzQK55qEWJZyZiKXQk0FMDvXt2R9jrltr63v80WJYn6KIOcqjdIKXutSsVHklVhlAmFkOk3NTdbjl9nBaD4Vwt8PEIolUZgIlw6PCwbYahlaYOm3dBCNpNRUcCsmusXtpZ6WPN+cPwq5Rh5xSjDCz8/K7dtce2RP01utRWk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779313842; c=relaxed/simple;
-	bh=jENbK+vrYb6YqS1GYa8XzDXhjvifp1BwR+fmi1nKfLQ=;
+	s=arc-20240116; t=1779313844; c=relaxed/simple;
+	bh=H1RSijiFZwChg42ZDOQha8MtLlUmmuZbVL920hVLQGg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=L5Y06MtHJwrf4FCoWANfAsO6N8mEXLGhq+175c4BpO7HrSO+LbcZoUOfbH4spqfpQXDChyzy6BaO6jl6ANdUD1S0cgq0D+f67Z8cZ8TrG5vMnhMUu4xNMaDRR1tHjDFPZpVEHjazYHqyxoH9Hl2hWT0LiTQe6nCJWljBTQSf6wk=
+	 Content-Type:MIME-Version; b=uUifJPWnz4unxr3ymH7NTpVX6zOkDuxMH03WlChYFRpq78zdOcWyO4dUbFMNS7aemLdy5DqvnpQHwYGTyTH/WEAIJdOB3PB/yNt8xsfrQn6flQ97AyHhU7iZ4097ep70ZGDed/mZ/kvyyvzqUfOKwIOqs5R2udqedtSQS5cqO0g=
 ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.95.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A3NGKMl4xpxOPrdH4rPuyOoB8TluWDv4MEhVpktHqK3xa+UhPgc8dp8ro+gOcGABOQlLOOaFcP4SnTqIuKgedhgqT51on0BftjirziAiWLeJ6LGLDfwQ9oKlNpCCg73Ktl/e/xWfBgCh0G7U+vmeQSTcEKcgSNe46FYF5xfrIOPULJHcjuNUWatRHqKCudtPgFXzHIhSBar4EDdThd9/+TzIe1XRcKUDJWK5d1vFM7LtJCHvZyXBFhBK102W85Q9uLZzSZDrH3TAzkf1DCfeCobndJ+XYvEgW4/Ypp2W2RzghJZASiDDNGUuoVOfJtFDf1FJm0MuRm4vqgNoGR9aLA==
+ b=aoBOrAD49EDvgLVQkb8poCwevyFCv3+AI1LQ0FRkpy6zeuFXvrNMpvg6mgiTv/FzzxecLS1TomPxc4ZLYVCl2DKjvu2Sd+yiEylyaDHOk8TzGN5YJ0Hy/Ihko+y1Iy2ODoxTtHB4tXvnA1GacapWhl5UuY6RLJcmxoMaWbFnKji9mKtDogXR46iKKXxnz3RS409RZ7JNpM+A3qqBQKWjjy4CcVohOhfNW1tOsSflntiM2tILUzAE5a/w5vdIb62vVsH3286US1LxA5ZuIFNHI8Ot6J0OdRrw2MtvRpwdrH0erHS83PVrK5aJXQ4MsIx/ew1jqk31kV8CQCNiCKXMFw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K43Wuedv+u4rD85xwRtYGV1orY+Mw4iD6rZzvgYkw9E=;
- b=BjwDAI6pV12PpGjaOs1RjsxBx2b7qTibDJT0bEWzC1Qi5wPE/6Iam5QO/20HZz07P5tvttnC6EmlkmugY1SN8RfhxSPqsxFImdat7bnXKxgP5j8I/ESqhZ96Q6g6MBJs979F4+wu5tmphGmJ+1XjwNqfnVAdnz/GYeHJpYVS5au5sdgb/+NW6AafDpvDMRuCAEKmxD9GwNsL340DQIWbgi7ozWP+/1GZoczQQj+u4VwXO6s2DiaxItw0ly4QL5H9Cb6fdFn0mCPqH9cEnBNM0nNzWsKb62/eSuYMIbD8WnzyCgYZ65L0d87zc0XS/ufzv8BTT8GTNI4dL6X6FOSIbw==
+ bh=mNamlmCMt57K1U2lDW4kZvmBXMIcKl5Ky/MTc/Rmaw4=;
+ b=bEezhEz1lZUT5v4TKlbrkbpzMHk5tsm+7KZF2D9Nt63XwmmzQSmNixf7X1d/G0WfLfb//rg2hFtY3RkA8yZ+0e8Y3/7/7tQsqw+Sk2YXSTZVTFMkrKtk7xXXq18n1OpIIu09nce54iUIClPHUhnYIeCZhNi9z89anC8ue3Ro+WEBCDcYojUn3qw4NYsL8osXpmKaWNcfbOW9ubhNvHapnZyQEW7PsC7cW7bVl4PBkVZsXvB5X4C32NnfPb63+ey8AzZWLCc8qPjAXeNVVKXMR8gHjAvMxMGmHD1dOXHOWo9qhvjn6rg8sxHMJL/ToUc5Wzx9Isps7sCGX9EgTEXjcg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
  dkim=pass header.d=atomlin.com; arc=none
@@ -30,11 +30,11 @@ Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
  by LO4P123MB6626.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:278::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.16; Wed, 20 May
- 2026 21:50:38 +0000
+ 2026 21:50:41 +0000
 Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  ([fe80::de8e:2e4f:6c6:f3bf%2]) with mapi id 15.20.9846.025; Wed, 20 May 2026
- 21:50:38 +0000
+ 21:50:41 +0000
 From: Aaron Tomlin <atomlin@atomlin.com>
 To: axboe@kernel.dk,
 	kbusch@kernel.org,
@@ -83,16 +83,16 @@ Cc: atomlin@atomlin.com,
 	rishil1999@outlook.com,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v14 1/8] scsi: aacraid: use block layer helpers to calculate num of queues
-Date: Wed, 20 May 2026 17:50:23 -0400
-Message-ID: <20260520215030.496803-2-atomlin@atomlin.com>
+Subject: [PATCH v14 2/8] lib/group_cpus: remove dead !SMP code
+Date: Wed, 20 May 2026 17:50:24 -0400
+Message-ID: <20260520215030.496803-3-atomlin@atomlin.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260520215030.496803-1-atomlin@atomlin.com>
 References: <20260520215030.496803-1-atomlin@atomlin.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BL1PR13CA0062.namprd13.prod.outlook.com
- (2603:10b6:208:2b8::7) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-ClientProxiedBy: MN0PR05CA0022.namprd05.prod.outlook.com
+ (2603:10b6:208:52c::22) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
  (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -102,96 +102,121 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|LO4P123MB6626:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d4ae548-178e-405b-ac53-08deb6b9d42e
+X-MS-Office365-Filtering-Correlation-Id: 92fc7957-9136-4d27-31f6-08deb6b9d66f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|22082099003|56012099003|18002099003;
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|6133799003|22082099003|56012099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	uIgzQjNi5zWyIOZK7++kBXyjcAtkQbCpm14TyqXmaZgQ/AxwTg6IcGFKy/gBiOABAUWPkSWic31VJ13D75++LqE/H984XKHZDXAeRjtjDFFw07JB8hfDEdZ3O4AjAbeUJwaET+3uT+oLTtBHXJosB7e1C1aXiTkhcZdu/VvnvBgG50pzrVJYJvDJoRD5cwwjohLkMDPC1J4Pqune9lRqN4ygQDbcJ403V2PL9RliwheJDaDBzSTj1U3QCRJsb9SW307dHvD+L6cpQWzre0xhbQb8fP3OrqpwgLFO+THqndXGBajl7ygSrE+dtVXBZj/WuT57kADxsUIOvKi92UPUunZUMU6KsAGmIcETJGdoTM/uWxdDyyDaQFdY1KhQWyIvNPIjltUz8xK3awsqF4m3DTv3Kur29gR2UTj/uECLCeI4obWDgTG8KE4F3ND9FuSWD4Qg4X4rW2E5XGHQi045SkyI6Hedo2uyaZF9U4QNSjyeOMeFuTTDhIbGsesz+H/ecRYk2mYeSrw7baVXtjSDQdMttMIlx0tPUAT9zuG+LSqYpAgBRaKuzGyoF12lb4YSDZHrZB2Ob/ytg571SD9j/4EJeR0nOwuaJ4z3KUtKDB05q/3yZRyuzO19HlREMN5+bIM/i3CHKojL6zE2k5N3zmSjIhxosGlWPd48whTtf8NKQP0r8EB48arO6/SOIIJv
+	Ygqn3vxwSt4e9mZRd+yzGhGiU1DAGgiEFvWbjc3ZJNuzMd1gzcHgPj/e4nPmdJjGxU591yUcBONx1cEKLcZQg01heZQOuqSs6WtP9uUGgJV68/zc/60b78CPYdnrh1nCZSOrxGVsdKXpM7qk3jRx/M8P4+HQpmg+3rY3Tq1tRvCgqKBNYtvKVWKSi2tdOf1elZkvaR7hlssXUpBUk8ATVdocZLNGVqlD6/j8t/jKSbRPt1dvGBI4ScI4pcOLF+8yejcBTy8Bu6mtUuDFWJEEOPV5duNQ2xE/hRTE/gerToB/Bp/e2WB5hBlYUJJ+/KY8DJRalI+virTcI3FJOCaVT+jnVGTw94BHCN8mctaNXI5RSsOTjz52RR1AvCrPht7z4XxmvqbbQCoql5cEmoxbn0H4SA66XRrh5xeqrw8xIkNCWI/QNPcnrXfnhWct2mQAs7SiP0lQNzBY01i0udesbcFL8WQ7Z6uS3e78NwH+JEiMVaOVdwSqeTZ739fetNGVUlDHuAm580rSc62mLLYbMG6rJgslhbkqwizGFJHSJJtUKCHr6m3S+tm+5xfXgxAWaHjpU0Wk7jY+5RgyAPYbC5AIzz5XipiaFpd2Pynj12fPgh+mdBUMYFTH5h9SPraMFXxjzgLmEetXaHB1KhTkBr5TIj+tTYcrGuPdf25T2VqGwfTnrBhcLBogvH1sAOt2
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(6133799003)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7faHtdYfKNhu6jjC4dIOkxDGRUry4szKKx6uy2N1I11rw8nECEMS2ERCHWVw?=
- =?us-ascii?Q?5OuMoHiSfg0IiY4XACEsEwWRBuQF2Cm6F50ibfgRtepOSI9nSINoZqrDH9fh?=
- =?us-ascii?Q?rnKaknILdroGHS+S2q5ftBENeJRgX+tL1ffRU9Qcy7objUssKufrHIb9YpWe?=
- =?us-ascii?Q?0gwhcfFIpDlNk3ov6Mufu56ie+vyR07v/xtfBvwXTcxl4V3oKrF20/+i/YpA?=
- =?us-ascii?Q?iyfItvoJ4goBCqy2+uTkw2643zwsWmgXB7IWrQLdu6clLu/wjbzV0OCnFDPK?=
- =?us-ascii?Q?ckhdMoYIJcauxfffQydPZCNsh8CDX8kcERKDs6PNRxsc441WmL39URFegwRQ?=
- =?us-ascii?Q?6KWML5DCAFg3VLok8HEhGb2HMGpJUlOmX1RTrjZFL2Aq7PyB4f8FYVwjUone?=
- =?us-ascii?Q?MTKLu9hV2E1VnFyQ5ucEEFLXTKbm/Y20czg1PRNe29ZIjkiay3G0N9BjXlwm?=
- =?us-ascii?Q?5wcemCBQcMTWRCjdzV0hfk0CEILETukWov3RDlewSh/bdhKKy3X8JED9kGtZ?=
- =?us-ascii?Q?ExF0zGllXEmu6R627lfBtAWC2wP+t0BngKmyr/Z8pB4nNaJC5FNKPsWd18jR?=
- =?us-ascii?Q?oML8ewElp9w94XEg73vX44vY3sY9u7G/GqHXjfhxA04aychJSe1dj+t2kfS/?=
- =?us-ascii?Q?44hXZibPvBn7KygFPj/PV5BU9zIjcQ8OtvT18wAHtsEPI1z/EOt3kOx0NiZ7?=
- =?us-ascii?Q?i353q4Kdwub9gihxj+ewEMJ5tXXKAkDlcGYJdzG4COCw9ePrrwdmjJ4VAc9B?=
- =?us-ascii?Q?0Dkgpa7q0RAaqfKzpx4ruPkuxM1cs/XzdmRvQWlKLjkUZS0aA664R9doYWOE?=
- =?us-ascii?Q?4JitvUEF5hqNOijlhmGsjfiwd0UdXotTJLUPMayhTDP4/RSTns8EfOpMkerS?=
- =?us-ascii?Q?zxifN1v/3MJpulElxLDZBrS9QE4IXZmA9MjIGuGXl8rXa5MWqPm1zyx2xXr7?=
- =?us-ascii?Q?EHW02Po2lnhM1wp67zjsMm5anr6JpzCHvwWcEh5NhvsMvlI780+bcak8qo2D?=
- =?us-ascii?Q?TayAmALUXTVR6tfQB877ckQk5ihZVXWUe56AxyRCfWjUVwaNNNldHk2YcrPz?=
- =?us-ascii?Q?9UL192EiXHUwtV2aU9RCnLRojrs1k072WgqHO2JuIss8+W3wdWWPtxcqThZO?=
- =?us-ascii?Q?VavS2FTpLCZjIRidhLZVM0bqfkRpUDWVEiUVUn0Y+/0M0ofsbxcW8BkqGCRr?=
- =?us-ascii?Q?+UD8B3IWaoKr16hDTZkNlHaMpqFjGwzOdooMPXzWveni0iYxE3HW6lRTz3vN?=
- =?us-ascii?Q?P9DQ2TSJymKRpSLuXtmMqxPyNXYeLru0Qjl+mYqFnAwk0CJe8cj7NX+Rqti4?=
- =?us-ascii?Q?sMTXJyF+gbutVbSD6CyxfJyoAby3v/AkKmRVWqwCT4Ats5sgE3Nn3/dK0xHE?=
- =?us-ascii?Q?RBT7nrLsyd84BdW0w1VqcHSUdRuELP3BRDW8UHeFqPVQnoNiZNNaAuoImON1?=
- =?us-ascii?Q?UfxuwjmH05xW/XxmI0UfLao0Z6QL3iKc8xBz2O6Bv6nYj5cZtZeAelbgQm9f?=
- =?us-ascii?Q?q41YXhkBkurOi3821ucReMFP9Wh4HgiSh+81JuYBhcq8UT3TYwvaF7WwWmi7?=
- =?us-ascii?Q?zLbGGZcft8rbjhgGX/twI4/gzepkiwhh2yMmWXO01D7mtOcr+21r/vNoyPWm?=
- =?us-ascii?Q?ieuouBrFBTG48+pQPpwFT6uB0yIoRpha3kKXXL6pOUEnVhoXfVcEkWPzfnaP?=
- =?us-ascii?Q?Yregd6Bs+3uWPtex0K/02hjwuvlsIwSxvB9M8zJzCM40zt0SAqryqTiRUqdj?=
- =?us-ascii?Q?pB/cdS6qog=3D=3D?=
+	=?us-ascii?Q?yaBjRBPEIDGCeXq8OQSwz5tLM14iwaTb51IdLDXHPqFRRTJo28nlch26uXHu?=
+ =?us-ascii?Q?AZM9WqMxiGB1rwCHPHPcHOBut4sG3WrGK/1f/Y+6aWtd8CiesV8zs9GisJwu?=
+ =?us-ascii?Q?iYXKvNA66wa9Vbo8unWR425zpROecJ1O2XQJVi3Y7FB0h16NRF8Pdl4DM3Ih?=
+ =?us-ascii?Q?afksEoQMInncV1oOhBQIkZo6ZXdKSLuvwqzVotFALgQXdWL8gfhCvd1fqku1?=
+ =?us-ascii?Q?2kYNMcjHVaGFno8JxEtO95AxG6kBtyjG47sYDF3PecxKekYvOOmQj/FCnoQE?=
+ =?us-ascii?Q?p38+RJNu6ISRXitPZYuWfKyksyzs1rGnQ7HNZwwx6I5M0OL3KM4odbUS1n9u?=
+ =?us-ascii?Q?qYYQDcnNsEnK35nRiyZdMhsXRZz97QjrZCZI0nZqVHhOw1Aycp8F6RM7kRxH?=
+ =?us-ascii?Q?BwXoPnu5jCgA2uOTq1/wAIjc0tO4RXltERE3EWnyqY6ZZ2nUqFmlUaKy3Fec?=
+ =?us-ascii?Q?ge9QFo9tivSO1iTot1sZxyOrTcFuFZmj7mKCgSwa8RTmn332g270aAccxvMG?=
+ =?us-ascii?Q?hHA0ySjNLVJUHBelitL9sZ0OdffvnHgGdZdExzqjwPtucLekXGumzt7trVvK?=
+ =?us-ascii?Q?aaU1po2MUY3rUi8h/aGB1pO2HkIRPgKTfhFVn1hh4N5LjIp8UfXM1BRvLfa4?=
+ =?us-ascii?Q?tBhkQJe/1mRtEjA3ST8Hpp1Xq4K9xxaKm0/rzmsviFsif2CEsgtmhhHWFKlg?=
+ =?us-ascii?Q?L8ry6TofrLbIgCISW/8uCLY2aGefvI+BFrRi62t5EtJ95wmI+UKWhnffg8I+?=
+ =?us-ascii?Q?ZrNGGBA86vq1uY3JM6xhNd3D9n9aalvBkN3cm9/VlOco2gr88/tHEaVrW83i?=
+ =?us-ascii?Q?+B5wrGXQyUo5TGC/vJXPJ7Cswl2J19pLQD+wB7a4kcjFK1oYabBL+yF9jTs+?=
+ =?us-ascii?Q?MguNgweQAwClWVPODK8W8JvEgTjPvcrY1DLqOSzo0Ar4CPdfHr0brm9Vz+m7?=
+ =?us-ascii?Q?+0AGL10R+Uoz4QNOMsLLleA0kWf3MfPSLQJ0rEB1zVx7eQqfY8AwcTY9kOkA?=
+ =?us-ascii?Q?It0KdSioKNyeJs2rVp7+gqisUmvwI1UHxLm2NlJJrr+laEu6U6EfYsKWNBfc?=
+ =?us-ascii?Q?qD1qJ/OaUIXDmhRTQ01xXe8RONNdNn+ZNEHtPDWEdmohJuoek4Y0B8Lb6C8n?=
+ =?us-ascii?Q?d69v4INlOuYENQmjds9tG7UbFdGnnVE21Uuj8GOfoZsv7R10guDAT8Iahl7Q?=
+ =?us-ascii?Q?vCgcHFSmUEUmtQOvTJ7U7tHrXxLxmDnooXS79Og4vLWqJr5vfpBub//kypJ9?=
+ =?us-ascii?Q?HHuISgZI+dtQdb6hsj7lWjRV6RCb5ApLkDnbEeXf4j0sXowXnmnd21WTjRfw?=
+ =?us-ascii?Q?im/z4HjN9QrmUkVUMZcBhlrfzrBfBgSP9MILc09Wdi5TSh6/Hk0sBBdF3dmB?=
+ =?us-ascii?Q?gchJZllu/xUKweYJRCydNIE75Svj7zpVCSpIKZZHswkpECjofbWiPOMTGSPE?=
+ =?us-ascii?Q?AscjHUFOtZgxIzkLKdXfF7XOk4i2GAK2JjMgsrRxQ/S3VgliXVvgw8b4n8/p?=
+ =?us-ascii?Q?wDH/ypMq6AchIVLKa70I2LHNWLaKA34F2t8IEGJq15G4Vp1YUoAf6BPLIdhq?=
+ =?us-ascii?Q?de+zIX4wGLXKINvJCCUVOmmqxJ8LA4dWgw+p+/D6zlZeZ6aZlVPc65DmUivZ?=
+ =?us-ascii?Q?dOEmm2r0Q3ELGU9m68HHULvQzbzGp7ryCz0Wv1/vHx0tzHGdDwxRtcCKOfqL?=
+ =?us-ascii?Q?y0MI5Cf/IdNow02WcBRrDy3EwwgP8LSFvGSopA77kEXCzc+QOvNVs+Otx+og?=
+ =?us-ascii?Q?OxkyaaPsBQ=3D=3D?=
 X-OriginatorOrg: atomlin.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d4ae548-178e-405b-ac53-08deb6b9d42e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92fc7957-9136-4d27-31f6-08deb6b9d66f
 X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 21:50:37.9849
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2026 21:50:41.8176
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ejf6yx07UJ8OQVSjd2O9ovlGsGI9MGEYfj1GLYvUyeR2thIshtqkyLZ8Qyat16fsXyzIMShxH48cqe6wFx//Nw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: aN1XvS5bI8h+aoMwYbBaRodVA+THGjJHhhAcgRfmf4tJq0GnmnyCGRtP+aidNpT/dt8f4OzP/2M7B0yMvO+9dQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P123MB6626
 
 From: Daniel Wagner <wagi@kernel.org>
 
-The calculation of the upper limit for queues does not depend solely on
-the number of online CPUs; for example, the isolcpus kernel
-command-line option must also be considered.
+The core scheduler recently transitioned to compiling SMP data
+structures unconditionally to reduce code complexity - see commit
+cac5cefbade9 ("sched/smp: Make SMP unconditional").
 
-To account for this, the block layer provides a helper function to
-retrieve the maximum number of queues. Use it to set an appropriate
-upper queue number limit.
+In alignment with this philosophy of reducing dual-path maintenance,
+this patch removes the #ifdef CONFIG_SMP guards and the dedicated !SMP
+fallback logic here.
 
-This patch brings aacraid in line with the API migration initiated for
-other SCSI drivers in commit 94970cfb5f10 ("scsi: use block layer
-helpers to calculate num of queues").
+While the !SMP path provided a slightly simpler execution flow for
+uniprocessor kernels (avoiding SMP-specific overhead), maintaining these
+separate code paths adds unnecessary complexity and testing burden.
+Removing these guards simplifies the codebase by standardizing entirely
+on the SMP logic, which safely resolves to single-CPU operations on UP
+configurations.
 
 Signed-off-by: Daniel Wagner <wagi@kernel.org>
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
-[atomlin: Drop "Fixes:" tag; indicate alignment with other SCSI drivers]
+[atomlin: Updated commit message to clarify !SMP removal context]
 Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
 ---
- drivers/scsi/aacraid/comminit.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ lib/group_cpus.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
 
-diff --git a/drivers/scsi/aacraid/comminit.c b/drivers/scsi/aacraid/comminit.c
-index 9bd3f5b868bc..ec165b57182d 100644
---- a/drivers/scsi/aacraid/comminit.c
-+++ b/drivers/scsi/aacraid/comminit.c
-@@ -469,8 +469,7 @@ void aac_define_int_mode(struct aac_dev *dev)
- 	}
+diff --git a/lib/group_cpus.c b/lib/group_cpus.c
+index e6e18d7a49bb..b8d54398f88a 100644
+--- a/lib/group_cpus.c
++++ b/lib/group_cpus.c
+@@ -9,8 +9,6 @@
+ #include <linux/sort.h>
+ #include <linux/group_cpus.h>
  
- 	/* Don't bother allocating more MSI-X vectors than cpus */
--	msi_count = min(dev->max_msix,
--		(unsigned int)num_online_cpus());
-+	msi_count = blk_mq_num_online_queues(dev->max_msix);
- 
- 	dev->max_msix = msi_count;
- 
+-#ifdef CONFIG_SMP
+-
+ static void grp_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
+ 				unsigned int cpus_per_grp)
+ {
+@@ -564,22 +562,4 @@ struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
+ 	*nummasks = min(nr_present + nr_others, numgrps);
+ 	return masks;
+ }
+-#else /* CONFIG_SMP */
+-struct cpumask *group_cpus_evenly(unsigned int numgrps, unsigned int *nummasks)
+-{
+-	struct cpumask *masks;
+-
+-	if (numgrps == 0)
+-		return NULL;
+-
+-	masks = kzalloc_objs(*masks, numgrps);
+-	if (!masks)
+-		return NULL;
+-
+-	/* assign all CPUs(cpu 0) to the 1st group only */
+-	cpumask_copy(&masks[0], cpu_possible_mask);
+-	*nummasks = 1;
+-	return masks;
+-}
+-#endif /* CONFIG_SMP */
+ EXPORT_SYMBOL_GPL(group_cpus_evenly);
 -- 
 2.51.0
 
