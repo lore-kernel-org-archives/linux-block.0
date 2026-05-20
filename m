@@ -1,61 +1,37 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620A73AF64B
-	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 09:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAC62853E9
+	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 09:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779268362; cv=none; b=Q171AOsXLi2t5Dmmu2iLCCqxfqK4K6g2z/PtLaBeN1jzcC9cRm9eP1Qap543cEMoMXMEggB5RYHts5hvE6878qvxWMSKdlCodzhHgAjevms5n+UxJpeI+s+Ibi51KzSaJxAPiC2K/NamO0DManHXHmQqREYoJ2mPUuejSwfVMGE=
+	t=1779270647; cv=none; b=QxG2/VRVf5nbyxX4a78v0f2+w6EDvKUHVp8u6LVnZAKtPDWCmA1LwohZ3PcKCpTsOynKZ68bHB2IOsXGBDESQBDw1/RQr6bSsR94vhI5Ecc/XnUsYFdB8c1gieqOuEehVBOjKXTJ7o3cjEpa9T3gs0H8yRAaoKtI5DWsYVgQNRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779268362; c=relaxed/simple;
-	bh=MvpCBtKPSZ6w0M1+uH7kbxa8AV9lizCgS1zkpaGPh30=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BEGF2eMaPIqRlo83p+rAvikr8QUVsBdULODnKoE1+0qokO4FBrHU8c5DNIrk0mWOiA7i16o+1dXZEKG4rvXZN9QJuSDRwSc61NY+lioZflWlbRp72P+Mj7u5J22jdXqzDNnMegxKnDPUGkQY2ePpZ7vf4O2EfPV2e+aCzgAk6ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 0acb3978542c11f1aa26b74ffac11d73-20260520
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CTE_8B, HR_CTT_MISS
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_LANG
-	HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN
-	HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_TRUSTED
-	SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED, SA_UNFAMILIAR, SN_UNTRUSTED
-	SN_UNFAMILIAR, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD
-	CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
-	ABX_MISS_RDNS
-X-CID-CACHE: Type:Local,Time:202605201706+08,HitQuantity:2
-X-CID-UNFAMILIAR: 1
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:07200570-9d2d-4351-8746-85dec8651cf5,IP:10,
-	URL:0,TC:0,Content:0,EDM:-25,RT:0,SF:-50,FILE:0,BULK:0,RULE:Release_Ham,AC
-	TION:release,TS:-65
-X-CID-INFO: VERSION:1.3.12,REQID:07200570-9d2d-4351-8746-85dec8651cf5,IP:10,UR
-	L:0,TC:0,Content:0,EDM:-25,RT:0,SF:-50,FILE:0,BULK:0,RULE:NOTI_GNA5D1EA,AC
-	TION:release,TS:-65
-X-CID-META: VersionHash:e7bac3a,CLOUDID:920c002179874b6c021f6793f994dcc1,BulkI
-	D:260520170624KO738B3G,BulkQuantity:0,Recheck:0,SF:13|16|19|66|78|102|127|
-	307|308|316|324|332|342|344|347|350|351|850|865|898|10047|15047|20030|2500
-	0|26021,TC:nil,Content:0|15|50,EDM:2,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,
-	QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-	,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_USA,TF_CID_SPAM_FSD,TF_CID_SPAM_RUA,TF_CID_SPAM_SUA,
-	TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 0acb3978542c11f1aa26b74ffac11d73-20260520
-X-User: sangyao@kylinos.cn
-Received: from localhost.localdomain [(183.242.174.22)] by mailgw.kylinos.cn
-	(envelope-from <sangyao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1108699617; Wed, 20 May 2026 17:12:36 +0800
-From: Yao Sang <sangyao@kylinos.cn>
+	s=arc-20240116; t=1779270647; c=relaxed/simple;
+	bh=U174URSm8M/UyfNglJScb+jhxWK1f7fMxVBiMtBmJkg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=l4wDZq3jp43Gg/K36bZWNVG+UIuF2SLzVivDsM3yy3D/pIVyiBLZf2oyTxj99dCRO6WySoDy0vL3Bz+sy7Wot41UkEu3zUlm8ROTI9UeFHIU+puqRgyz1aWPeA+xcJ3S6rB8pB1bNdvq8CXeneE4aCVXt1lKMl2NnWOSAcnJ0Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Ba/o0H/W; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Ba/o0H/W"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=al
+	3oiTreKLnkrLRi7GKnjlMtyBbUW0K/r4U+fcd/3b8=; b=Ba/o0H/WENxaTFbQbK
+	VKwpCxU/tgWVile8KJownh3TPCVUwB8p+yud3OF883C3XgDCRiv5wxEppMDThkZz
+	rcAMIPiLTIpYE7IdsgF7gzTHzwTwaTtzKk/T+bTkDxE5uHVOhXUnbfDnOoWvZu0d
+	bz/X791JbAJ+8pjPTqh8AXdOM=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wD330bigw1qyXqlCg--.57867S2;
+	Wed, 20 May 2026 17:50:28 +0800 (CST)
+From: dayou5941@163.com
 To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Yao Sang <sangyao@kylinos.cn>
-Subject: [PATCH] block: stack zoned resource limits
-Date: Wed, 20 May 2026 17:12:37 +0800
-Message-Id: <20260520091237.392802-1-sangyao@kylinos.cn>
+Cc: yukuai@fnnas.com,
+	axboe@kernel.dk,
+	liyouhong@kylinos.cn
+Subject: [PATCH] block, bfq: skip dispatch when selected queue has no next_rq
+Date: Wed, 20 May 2026 17:50:24 +0800
+Message-Id: <20260520095024.685338-1-dayou5941@163.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -64,48 +40,37 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD330bigw1qyXqlCg--.57867S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKFWxKry3Ww4ktryfGr4UArb_yoW3KFb_Cw
+	1DC39akFWUArn8uF4fKF1UJr1jyFyaga18GryrGr1DX34jqa13Aa9rKFya9Fs8Ja97CFy3
+	tws0qwnxtr45ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xR3noUUUUUUU==
+X-CM-SenderInfo: 5gd103ivzuiqqrwthudrp/xtbC3QT3pmoNg+TftgAA3h
 
-This was found while debugging a zoned NVMe multipath setup, where the
-namespace head reported 0/0 for max_open_zones and max_active_zones
-while the live path still reported finite limits.
+From: liyouhong <liyouhong@kylinos.cn>
 
-blk_stack_limits() already combines several zoned queue limits, but it
-leaves max_open_zones and max_active_zones unchanged. Since 0 means "no
-limit" for both values, stacked zoned devices can preserve bogus 0/0
-limits even when the underlying queue advertises finite values.
+bfq_dispatch_rq_from_bfqq() dispatches bfqq->next_rq directly. Add a
+guard in __bfq_dispatch_request() so that dispatch is skipped if the
+selected queue unexpectedly has no next request.
 
-Stack max_open_zones and max_active_zones with min_not_zero(), and
-clear them when the resulting queue is not zoned.
+This keeps behavior unchanged in normal paths while avoiding entering
+the dispatch helper with a missing next_rq.
 
-Signed-off-by: Yao Sang <sangyao@kylinos.cn>
----
- block/blk-settings.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Signed-off-by: liyouhong <liyouhong@kylinos.cn>
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 78c83817b9d3..88b6c3703101 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -814,6 +814,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 141c602d5e85..c3d9d02064b7 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5226,7 +5226,7 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 		goto exit;
  
- 	t->max_hw_zone_append_sectors = min(t->max_hw_zone_append_sectors,
- 					b->max_hw_zone_append_sectors);
-+	t->max_open_zones = min_not_zero(t->max_open_zones,
-+				       b->max_open_zones);
-+	t->max_active_zones = min_not_zero(t->max_active_zones,
-+					 b->max_active_zones);
+ 	bfqq = bfq_select_queue(bfqd);
+-	if (!bfqq)
++	if (!bfqq || !bfqq->next_rq)
+ 		goto exit;
  
- 	t->seg_boundary_mask = min_not_zero(t->seg_boundary_mask,
- 					    b->seg_boundary_mask);
-@@ -921,6 +925,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 	t->zone_write_granularity = max(t->zone_write_granularity,
- 					b->zone_write_granularity);
- 	if (!(t->features & BLK_FEAT_ZONED)) {
-+		t->max_open_zones = 0;
-+		t->max_active_zones = 0;
- 		t->zone_write_granularity = 0;
- 		t->max_zone_append_sectors = 0;
- 	}
+ 	rq = bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
 -- 
 2.25.1
 
