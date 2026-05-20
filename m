@@ -1,203 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-43171.protonmail.ch (mail-43171.protonmail.ch [185.70.43.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0F530C37C;
-	Wed, 20 May 2026 02:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D9D17B50A
+	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 02:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779244813; cv=none; b=Q/oQhC2cpofyLs2wSVEZzRwLHi89NMUokvRFpKGeimJrpiJ7oVL0CcfnyV+i9zTtgG3VipfWrX5J0ylheCFF7pjgQAH1meZ/H1Elg+GEhcp2oC4N2otVT5Ngarg1gRXsD5im4FA3B1AtSlVCC66xigOK1Qj4aX4sHhNTzejbSdY=
+	t=1779245883; cv=none; b=lrTU8OWdUvowBEZV0UHqcqDp9h2MjJ7iBHonX95pD1938ipyUTRqOrd1L8Hjsl0yPYIr/hAscC3Mpd1RDBnV8WnK+shuH/sV98Nli5/fE2p0B8+ztjJKm2yZ1ZtVRUGQcZaem052wgsLk8aiHQnfgnLhpQNkoWUfjKmVf0TDt6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779244813; c=relaxed/simple;
-	bh=VQ6SfO+yEalvsJozTTACmmQGrJq83YqYX2ySQ0d/Qu0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kdbRLBDhxn3glOPSHbb4WWDlnhXwNFw5TNDdZ+0QmrPOn5pNKQQKGZGu/sdkcjH+e1LaGBNclO1qxLR9H5VtUsUKtvcq++AOxUFTiPNkkPBWmmnDXXOHRBLruC0l4fHEMRPa9zWZ1Ulez7yU0ptbxDsgnccnNqRZxm7UThwLCq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nFk/zKsv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1779245883; c=relaxed/simple;
+	bh=JYmwJ10Q/X6BIP7TZU0p2oXEr64Lfl2uYD7b5gohn/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FgOltyNGmt8S+Zi6xCkO16JmIwrBz7KqntxfGQohHOBhtswzEAtEa6avMyoPBVbDLgRLZVLi/GMimlbs/DiqMt1VSIBJ7hT6CA6LMypm+4Cog4XBEp/9fIl8lLToIjb6A3OT7mx5oEU6Yo+R11b/ZKvGlaTS+WGzaxl+988++ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=onurozkan.dev; spf=pass smtp.mailfrom=onurozkan.dev; dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b=Ews0QMxd; arc=none smtp.client-ip=185.70.43.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=onurozkan.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onurozkan.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nFk/zKsv"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 17E24C4AF09;
-	Wed, 20 May 2026 02:40:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1779244813; bh=VQ6SfO+yEalvsJozTTACmmQGrJq83YqYX2ySQ0d/Qu0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=nFk/zKsvMMnaMVGanNj+EAKH2QoYJj716zusOCpQaUt+tYWUFZ3aXAzDZNe73gtOt
-	 JWG01cKel909QRRujcazqgVVq29tJ1mHnIykGQhxNdqEEIwjd5vf1hlzHvVcghwLrZ
-	 Es9VUPWGWxmLxmODRML642adkxULxEvZF3qm+zBg=
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D997CD5BAF;
-	Wed, 20 May 2026 02:40:13 +0000 (UTC)
-From: Alvin Sun <alvin.sun@linux.dev>
-Date: Wed, 20 May 2026 10:40:12 +0800
-Subject: [PATCH v2 5/5] rust: block: mq: remove redundant imports and
- format
+	dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b="Ews0QMxd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onurozkan.dev;
+	s=protonmail; t=1779245877; x=1779505077;
+	bh=HMq9Kjag9CHf0MPnSr5IKPbFSpP3OZPnDYq4FIJoKX8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:From:To:
+	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=Ews0QMxd+ay79QhpTiAIHgopATwYQ4PW1TYqREmx9pBZlEm0TrbqQgopjYSqT0oxI
+	 FolwGQ6ooWNaGFW8v+695Mau0ScF0RzcxH4aFXO6yY7nkrg3vqnIDKQ0hivEck0o05
+	 HH0rX3ZdqtWRXJcoB4535oBpf6qJj5jLU2tTcF28wONUtH9XuGsSaqc3ISZAA7zZjw
+	 EAyAKo/JkUGUFcCXFekytmeETzGR99euKU/NFz4/YLUsHHYdP7D+IQhDK24hlHxrgW
+	 Oi1HPc+WeXwrtiHtF+WiO6MeagmJ5OUuqu4F0WmVRBbYo0ELMU1Mmyevs61YLVHq7w
+	 IBp4S0OOOiqDw==
+X-Pm-Submission-Id: 4gKx6q2f0rz1DFG3
+From: =?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
+To: Alvin Sun <alvin.sun@linux.dev>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	rust-for-linux@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
+Subject: Re: [PATCH v2 1/5] rust: miscdevice: use vertical import style
+Date: Wed, 20 May 2026 05:57:51 +0300
+Message-ID: <20260520025754.32911-1-work@onurozkan.dev>
+X-Mailer: git-send-email 2.51.2
+In-Reply-To: <20260520-miscdev-use-format-v2-1-64dc48fc1345@linux.dev>
+References: <20260520-miscdev-use-format-v2-0-64dc48fc1345@linux.dev> <20260520-miscdev-use-format-v2-1-64dc48fc1345@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260520-miscdev-use-format-v2-5-64dc48fc1345@linux.dev>
-References: <20260520-miscdev-use-format-v2-0-64dc48fc1345@linux.dev>
-In-Reply-To: <20260520-miscdev-use-format-v2-0-64dc48fc1345@linux.dev>
-To: Arnd Bergmann <arnd@arndb.de>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
- Danilo Krummrich <dakr@kernel.org>
-Cc: rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org, 
- Alvin Sun <alvin.sun@linux.dev>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779244810; l=4389;
- i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=VQ6SfO+yEalvsJozTTACmmQGrJq83YqYX2ySQ0d/Qu0=;
- b=WRfLGPOL/DVrS8+DRP30zCJWVbE2Uy0pEboRR5fzDRRDC72tTz7hNau3hIfotmTRLyddhwQvu
- OPVaIXkouRRC4qBuVV/glYg/MmhM6qB6LKqQCcTFOT/3OY16iJ44IgE
-X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
- pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
-X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
- auth_id=684
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Drop `Result`, `Pin`, `pin_data`, `pinned_drop`, `PinInit`, and
-`try_pin_init` imports already provided by `kernel::prelude`.
-
-Simplify `error` imports and flatten parameters formatting.
-
-Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
----
- rust/kernel/block/mq/gen_disk.rs   |  7 +++----
- rust/kernel/block/mq/operations.rs |  5 +----
- rust/kernel/block/mq/request.rs    |  2 +-
- rust/kernel/block/mq/tag_set.rs    | 22 ++++------------------
- 4 files changed, 9 insertions(+), 27 deletions(-)
-
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 6f599f654f37f..a2c45bde75a7c 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -12,9 +12,8 @@
-         TagSet, //
-     },
-     error::{
--        self,
-         from_err_ptr,
--        Result, //
-+        to_result, //
-     },
-     fmt::{
-         self,
-@@ -67,7 +66,7 @@ pub fn rotational(mut self, rotational: bool) -> Self {
-     /// and that it is a power of two.
-     pub fn validate_block_size(size: u32) -> Result {
-         if !(512..=bindings::PAGE_SIZE as u32).contains(&size) || !size.is_power_of_two() {
--            Err(error::code::EINVAL)
-+            Err(EINVAL)
-         } else {
-             Ok(())
-         }
-@@ -177,7 +176,7 @@ pub fn build<T: Operations>(
-         // operation, so we will not race.
-         unsafe { bindings::set_capacity(gendisk, self.capacity_sectors) };
- 
--        crate::error::to_result(
-+        to_result(
-             // SAFETY: `gendisk` points to a valid and initialized instance of
-             // `struct gendisk`.
-             unsafe {
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 187b0b7791db9..0343069b373c7 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -10,10 +10,7 @@
-         request::RequestDataWrapper,
-         Request, //
-     },
--    error::{
--        from_result,
--        Result, //
--    },
-+    error::from_result,
-     prelude::*,
-     sync::{
-         aref::ARef,
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index 4e0579660e906..d10fb7627c870 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -7,7 +7,7 @@
- use crate::{
-     bindings,
-     block::mq::Operations,
--    error::Result,
-+    prelude::*,
-     sync::{
-         aref::{
-             ARef,
-diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
-index c1fd3e047af50..df3f90bfbb817 100644
---- a/rust/kernel/block/mq/tag_set.rs
-+++ b/rust/kernel/block/mq/tag_set.rs
-@@ -4,8 +4,6 @@
- //!
- //! C header: [`include/linux/blk-mq.h`](srctree/include/linux/blk-mq.h)
- 
--use core::pin::Pin;
--
- use crate::{
-     bindings,
-     block::mq::{
-@@ -13,22 +11,14 @@
-         request::RequestDataWrapper,
-         Operations, //
-     },
--    error::{
--        self,
--        Result, //
--    },
--    prelude::try_pin_init,
-+    error::to_result,
-+    prelude::*,
-     types::Opaque, //
- };
- use core::{
-     convert::TryInto,
-     marker::PhantomData, //
- };
--use pin_init::{
--    pin_data,
--    pinned_drop,
--    PinInit, //
--};
- 
- /// A wrapper for the C `struct blk_mq_tag_set`.
- ///
-@@ -47,11 +37,7 @@ pub struct TagSet<T: Operations> {
- 
- impl<T: Operations> TagSet<T> {
-     /// Try to create a new tag set
--    pub fn new(
--        nr_hw_queues: u32,
--        num_tags: u32,
--        num_maps: u32,
--    ) -> impl PinInit<Self, error::Error> {
-+    pub fn new(nr_hw_queues: u32, num_tags: u32, num_maps: u32) -> impl PinInit<Self, Error> {
-         let tag_set: bindings::blk_mq_tag_set = pin_init::zeroed();
-         let tag_set: Result<_> = core::mem::size_of::<RequestDataWrapper>()
-             .try_into()
-@@ -77,7 +63,7 @@ pub fn new(
-                 // SAFETY: we do not move out of `tag_set`.
-                 let tag_set: &mut Opaque<_> = unsafe { Pin::get_unchecked_mut(tag_set) };
-                 // SAFETY: `tag_set` is a reference to an initialized `blk_mq_tag_set`.
--                error::to_result( unsafe { bindings::blk_mq_alloc_tag_set(tag_set.get())})
-+                to_result( unsafe { bindings::blk_mq_alloc_tag_set(tag_set.get())})
-             }),
-             _p: PhantomData,
-         })
-
--- 
-2.43.0
-
-
+On Wed, 20 May 2026 10:40:08 +0800=0D
+Alvin Sun <alvin.sun@linux.dev> wrote:=0D
+=0D
+> Convert `use` imports to vertical layout for better readability and=0D
+> maintainability.=0D
+> =0D
+> Signed-off-by: Alvin Sun <alvin.sun@linux.dev>=0D
+=0D
+Reviewed-by: Onur =C3=96zkan <work@onurozkan.dev>=0D
+=0D
+> ---=0D
+>  rust/kernel/miscdevice.rs | 34 ++++++++++++++++++++++++++++------=0D
+>  1 file changed, 28 insertions(+), 6 deletions(-)=0D
+> =0D
+> diff --git a/rust/kernel/miscdevice.rs b/rust/kernel/miscdevice.rs=0D
+> index c3c2052c92069..05a6b6b9770f2 100644=0D
+> --- a/rust/kernel/miscdevice.rs=0D
+> +++ b/rust/kernel/miscdevice.rs=0D
+> @@ -11,16 +11,38 @@=0D
+>  use crate::{=0D
+>      bindings,=0D
+>      device::Device,=0D
+> -    error::{to_result, Error, Result, VTABLE_DEFAULT_ERROR},=0D
+> -    ffi::{c_int, c_long, c_uint, c_ulong},=0D
+> -    fs::{File, Kiocb},=0D
+> -    iov::{IovIterDest, IovIterSource},=0D
+> +    error::{=0D
+> +        to_result,=0D
+> +        Error,=0D
+> +        Result,=0D
+> +        VTABLE_DEFAULT_ERROR, //=0D
+> +    },=0D
+> +    ffi::{=0D
+> +        c_int,=0D
+> +        c_long,=0D
+> +        c_uint,=0D
+> +        c_ulong, //=0D
+> +    },=0D
+> +    fs::{=0D
+> +        File,=0D
+> +        Kiocb, //=0D
+> +    },=0D
+> +    iov::{=0D
+> +        IovIterDest,=0D
+> +        IovIterSource, //=0D
+> +    },=0D
+>      mm::virt::VmaNew,=0D
+>      prelude::*,=0D
+>      seq_file::SeqFile,=0D
+> -    types::{ForeignOwnable, Opaque},=0D
+> +    types::{=0D
+> +        ForeignOwnable,=0D
+> +        Opaque, //=0D
+> +    },=0D
+> +};=0D
+> +use core::{=0D
+> +    marker::PhantomData,=0D
+> +    pin::Pin, //=0D
+>  };=0D
+> -use core::{marker::PhantomData, pin::Pin};=0D
+>  =0D
+>  /// Options for creating a misc device.=0D
+>  #[derive(Copy, Clone)]=0D
+> =0D
+> -- =0D
+> 2.43.0=0D
+> =0D
+> =0D
