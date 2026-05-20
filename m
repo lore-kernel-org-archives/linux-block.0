@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939B536827E
-	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 06:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5C834DCC8
+	for <linux-block@vger.kernel.org>; Wed, 20 May 2026 07:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779260313; cv=none; b=RCbWjH7EhWI0rAHWRq2ibtqNoGW3w+lXQjaIVklgcAlDau9630EDR7ah6h2Ywu3uMs6TukPuKcpvJPevwwtDiihLIXRpFBslJdT0LaL2q55Vg/rM6jv5qM4YfL2otrhlAmz1gneeWRqN7JhLwZTEoZL7Dm6ZHXsI5j2VnpKerf0=
+	t=1779261768; cv=none; b=KEfp6MYTh+uoV1o/CE0Nyi96GWhxWhmdbLNUlDRxXia9YvjqR+TCJ8nXXjKMu283qAIBLoqM8azQJYlV5WlkZTLKPIsCDGKsLbBqldeFtce365xoND4AIpvZFSEkBbAVK61hfqbzBt00XNEY/NsRIYsU6Z5MTYGr0XA162Fnglk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779260313; c=relaxed/simple;
-	bh=O2tnikSTVyKUTj7P39fhhIt5eWPWx2Du6lsz8h95pTQ=;
+	s=arc-20240116; t=1779261768; c=relaxed/simple;
+	bh=OEzlS1jd5QMmP53SZ5T4g08EAu977qlP6bBWWrvK7dU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UL0Cr6ryiKBPeJ7lUanHwjpLKUsY028GUOiVHGcdXZ/u75bC08zTfv44Ptv8zq9dYPmeDjT6Bv933RLsqHdE7wE6DxOwGLh3Q7w/xzWmRLty+Joy/FGTi3E0U3zhf29yZPKL5TiF+wRqUpmikQMAfiym7+A8v2nkDojRJlyReY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqaLa8/P; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=SCuTfMe51hGdI0fib+crN5iMaS/SVAr6DtkpYoKmpHghnu/NsfDFm34Z3Blz3CxpJVvG3WYLA5MoIyChWP+SOa8SyZ7CSgAIZEj44ECMX6UVLjY83ytMrZ8jDWfQQNgb+URmiBqPWD2Rj6fdSkQFQC/7ccD6eFyC3pAeaR6fdWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CD+gw0k4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqaLa8/P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C46B1F000E9;
-	Wed, 20 May 2026 06:58:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CD+gw0k4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD90B1F00893;
+	Wed, 20 May 2026 07:22:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779260310;
-	bh=RUk03tD02nWAPVWUDiXz6OebsNBD2Kwac2rrRjCZDfs=;
+	s=k20260515; t=1779261766;
+	bh=iTGTHmjgP5M+bWV7oIfWCuPYiD48ND/hiGO4ejfqww4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=DqaLa8/PbJqWvIfX3g1QZ6m7s0vV6P/N1MMIxxyrqr2lOMrev6U0V6VK95xAFoOBz
-	 vhX2nXB09bPUm1JLnlRtsU4qkz95Gi6qoVtmlkzXt9yTo1mhunZoZEUw34scmTtXdR
-	 55z7JNqZoYpfZy00Oc+7U1kIBE5cUwrv60zH+aOWrj7NstXhh+ZBjxtpv4Y8+T1eYv
-	 xYG22ekc35s/Lz6N2UUk2b+citri2O6waxzjPOr9AMi9PeO/SbuFIlN4OByocOHtDF
-	 8z9Os9R4vVzFdiZcw+CsJI3hRLR8fMlgoKXqUxHBH3IREO1BSACFv4NK3FkKpPfiNU
-	 MGz8g6GnZ0oqw==
-Message-ID: <493f4c2d-8926-47d3-8865-e4ab4b8873ed@kernel.org>
-Date: Wed, 20 May 2026 08:58:26 +0200
+	b=CD+gw0k4sBVGEj9UXGl0hcM6RvTigNbVgQyLxLsAyWofDgJU3J9vIFyYAGe/1XY27
+	 S9Hb7stujoA2zIroOnvqh2NDpdaZ+5xhHMQbta6YpdvCEZ0V1AETyy9EkCFF/1c9hc
+	 8frC58RlI0ODxB7xHhOmQ+IYxt6/hbPvv5Qb1JrycJgTlWpaY3G3iN1gPaFFm5qAyK
+	 os45CkLzRhH6qNoN6uPTLybpcWd7bcAI2mIEu0sEze6lX5q8qyj2oitRolcGo3P8sI
+	 oTnx+06xfEnQ4GNqJA70k4eRgHOQlvAhV2Kw4DLnb4MX65+z4TcnnmOG6clF1AgD6z
+	 x4fXggdpqvd/A==
+Message-ID: <03564da7-661e-40ea-9a11-8b96972f1048@kernel.org>
+Date: Wed, 20 May 2026 09:22:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,35 +35,79 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 2/5] block: fix invalid zone append status
+Subject: Re: [PATCH RFC 3/5] block: validate bio bounds in the queue entered
+ context
 To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
  linux-nvme@lists.infradead.org
 Cc: axboe@kernel.dk, hch@lst.de, tom.leiming@gmail.com, coshi036@gmail.com,
  Igor.Achkinazi@dell.com, Keith Busch <kbusch@kernel.org>
 References: <20260519172326.3462354-1-kbusch@meta.com>
- <20260519172326.3462354-3-kbusch@meta.com>
+ <20260519172326.3462354-4-kbusch@meta.com>
 Content-Language: en-US
 From: Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <20260519172326.3462354-3-kbusch@meta.com>
+In-Reply-To: <20260519172326.3462354-4-kbusch@meta.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2026/05/19 19:23, Keith Busch wrote:
 > From: Keith Busch <kbusch@kernel.org>
 > 
-> A bio submitted to a zone block device that breaks the limits is invalid
-> rather than an IO error. Fix up the return code to report it that way,
-> as the previously used IOERR is considered a path failure.
+> bio_check_eod() in submit_bio_noacct() validates that a bio does not
+> extend beyond the partition's available sectors. This check runs before
+> bio_queue_enter(), so it is not serialized against queue limit updates.
+> A driver that freezes the queue, updates limits, changes the capacity,
+> and unfreezes can race with a bio that passed the early check under the
+> old capacity.
+> 
+> Remove bio_check_eod() and replace it with a bounds check in
+> __bio_split_to_limits(), which runs after the queue usage reference has
+> been acquired. The check uses partition-aware arithmetic to validate
+> both partition bounds and disk capacity in a single comparison that
+> works correctly on the post-remap sector values.
 > 
 > Signed-off-by: Keith Busch <kbusch@kernel.org>
 
-Looks good.
+[...]
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> @@ -423,6 +423,17 @@ static inline bool bio_may_need_split(struct bio *bio,
+>  static inline struct bio *__bio_split_to_limits(struct bio *bio,
+>  		const struct queue_limits *lim, unsigned int *nr_segs)
+>  {
+> +	if (unlikely(bio_end_sector(bio) > bdev_nr_sectors(bio->bi_bdev) +
+> +					   bio->bi_bdev->bd_start_sect)) {
+> +		pr_info_ratelimited("%s: attempt to access beyond end of device\n"
+> +				    "%pg: rw=%d, sector=%llu, nr_sectors = %u limit=%llu\n",
+> +				    current->comm, bio->bi_bdev, bio->bi_opf,
+> +				    bio->bi_iter.bi_sector, bio_sectors(bio),
+> +				    bdev_nr_sectors(bio->bi_bdev) +
+> +					bio->bi_bdev->bd_start_sect);
 
-Same comment as the previous patch. This could go in regardless of the other
-fixes I think.
+Should this be a pr_err_ratelimited() ?
+
+Also, putting this check here means that we are going to redo the check for all
+the fragment of the large BIO being split, no ? It would be nice to be able to
+do this check only once when the large BIO is submitted.
+
+Moving this check to a helper and calling this new helper higher in the
+submission path could avoid that. But I am not 100% sure if a higher placed call
+can be a problem.
+> +		goto ioerr;
+> +	}
+> +
+>  	switch (bio_op(bio)) {
+>  	case REQ_OP_READ:
+>  	case REQ_OP_WRITE:
+> @@ -442,6 +453,9 @@ static inline struct bio *__bio_split_to_limits(struct bio *bio,
+>  		*nr_segs = 0;
+>  		return bio;
+>  	}
+> +ioerr:
+> +	bio_io_error(bio);
+> +	return NULL;
+>  }
+>  
+>  /**
 
 
 -- 
