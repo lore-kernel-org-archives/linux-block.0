@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A208D386C13;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4962392C2E;
 	Thu, 21 May 2026 06:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779346633; cv=none; b=X33RPQpqSzVS1/v3bTquejo/ljcMw3RX2p/wlW5t81PhMbcR+YTfpMIrBiFfJFATijUL9lfbt++iGmKxUXz/K8XVRZ8G41F/8J4tjJA5QN1EDVvZ4rOme78Rc4iuUHSb3VK0Csd8p4bzcy0oih8GYQKR9MnUL4bptUdhWO0yWl4=
+	t=1779346633; cv=none; b=iD1EL43NDets8guZIEyh+x18vFhz+KmX7imiAtjO8dHMM7xN999xoQzdD4l/c27YO2ahrY0qFx5hJtV9zwsEuWDWPxjgXoKwx1hJctZcEdpqJeWZSxfZV9Tp6KaQzS9bjjuuURRu7iO+/aFv4jvIkIUP5XePFSWTytpRTuk3urk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779346633; c=relaxed/simple;
-	bh=m1EAr4ayyi4PZbyexLDSnvqug8qI7CL7WNOpMU9eF+A=;
+	bh=ZAphU0EjCdGw+0Fm9VnI2fX2eOGjP3AWC7Pmb+1TUMI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GD+3EbZL8c9ztPMd6rwDzoOcL+IJb9UuAEVJtTJkDz6wrFI5LLNOvUea1LPgg0TghBmgajOeZkoSaDLZyHxUhHgacHWX8HQE1n4r+3P5ZMo8HXEIekFJaSzJqxeygbyjjTmY2kLRlZWtjOT5IFHSBGd2NReEAwsaYQ7MQTHksDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YCfU4Elt; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=K30GaQ4hjqPysGozISJu1Q3MU3GQ2hY+3/0+yg20le5JnyXH+8+KaVVoQajukn/J2+xyeoXGeoz7QwnLpXtcrRwGNDoSoAR3bgxa2fPBHB7ADreFehamu95gdDV/xyzuRqldmvVkzr++hc6qEfIsLSfgkZedyFECpCSQYoJ0HMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NXqYLSXd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YCfU4Elt"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55BBEC2BCB9;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NXqYLSXd"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C054C4AF0E;
 	Thu, 21 May 2026 06:57:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1779346633; bh=m1EAr4ayyi4PZbyexLDSnvqug8qI7CL7WNOpMU9eF+A=;
+	t=1779346633; bh=ZAphU0EjCdGw+0Fm9VnI2fX2eOGjP3AWC7Pmb+1TUMI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=YCfU4EltUvfqUCDL8fbQ4IOVXjV6OB9aQo1hX9J0Ok3E/CGTlygSx4MPEZ9elAI8G
-	 oIp025a/8yATSONu/zVMc7K+FyIcYerv7szSrR4YDLWqTGBqrgy5Xj1Z6ZX11Cv/pz
-	 p2XMXrw44W2I+EHV81clQbIL4BzENlrmRkqc6zjs=
+	b=NXqYLSXd8LSUpY8UhE3Gs5s+yi3uJyiX6jBf3FggrUCTmyJXcK2BTKHGEGqNMvX1l
+	 WXRd0XbY5kBeJ5vewpXc1YX/1SmGCYksipxrLMJanfjVSmSW8SjEJQqnDB/1/ZXR7L
+	 lmlaQ70GXaHiuyr25NXdyjN/jEL1i3x0u0dd+73Y=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 414C2CD343F;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D94CD5BAE;
 	Thu, 21 May 2026 06:57:13 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Thu, 21 May 2026 14:57:07 +0800
-Subject: [PATCH v3 1/7] rust: miscdevice: use vertical import style
+Date: Thu, 21 May 2026 14:57:10 +0800
+Subject: [PATCH v3 4/7] rust: block: mq: use vertical import style
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,7 +36,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260521-miscdev-use-format-v3-1-56240ca70d0c@linux.dev>
+Message-Id: <20260521-miscdev-use-format-v3-4-56240ca70d0c@linux.dev>
 References: <20260521-miscdev-use-format-v3-0-56240ca70d0c@linux.dev>
 In-Reply-To: <20260521-miscdev-use-format-v3-0-56240ca70d0c@linux.dev>
 To: Arnd Bergmann <arnd@arndb.de>, 
@@ -54,11 +54,11 @@ Cc: rust-for-linux@vger.kernel.org, linux-block@vger.kernel.org,
  Alvin Sun <alvin.sun@linux.dev>, 
  =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779346631; l=1454;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779346631; l=3793;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=m1EAr4ayyi4PZbyexLDSnvqug8qI7CL7WNOpMU9eF+A=;
- b=8T1vx1s1VmH35F1FrgNNRC6xE9XlmnV7pJAOkySzqQ2GoLAZ37pb3nRmBzuA26PUPfYJlTJCp
- Re7cVT6TddCAgHDS2FQK2dj/2OHnIREGXSsbh3u+/0l0S3Y9HXXxPpd
+ bh=ZAphU0EjCdGw+0Fm9VnI2fX2eOGjP3AWC7Pmb+1TUMI=;
+ b=XSeo0tBnhXizXV7Nk+WflXtQgvWea8sorO+0ReAfL0gGMun5IB2Md7vSYxQfsT/0rlxp4YKyX
+ pgMXn9NQKZ+BBHu3okQ8VkCi6FfSsbAYw4P/3SYdReboHUVS+zcAWIN
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
@@ -70,58 +70,142 @@ maintainability.
 Reviewed-by: Onur Özkan <work@onurozkan.dev>
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- rust/kernel/miscdevice.rs | 34 ++++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+ rust/kernel/block/mq/gen_disk.rs   | 21 +++++++++++++++++----
+ rust/kernel/block/mq/operations.rs | 17 +++++++++++++----
+ rust/kernel/block/mq/request.rs    | 14 ++++++++++----
+ rust/kernel/block/mq/tag_set.rs    | 24 +++++++++++++++++++-----
+ 4 files changed, 59 insertions(+), 17 deletions(-)
 
-diff --git a/rust/kernel/miscdevice.rs b/rust/kernel/miscdevice.rs
-index c3c2052c92069..05a6b6b9770f2 100644
---- a/rust/kernel/miscdevice.rs
-+++ b/rust/kernel/miscdevice.rs
-@@ -11,16 +11,38 @@
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index 912cb805caf51..aac8ece10ae7c 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -7,14 +7,27 @@
+ 
  use crate::{
      bindings,
-     device::Device,
--    error::{to_result, Error, Result, VTABLE_DEFAULT_ERROR},
--    ffi::{c_int, c_long, c_uint, c_ulong},
--    fs::{File, Kiocb},
--    iov::{IovIterDest, IovIterSource},
+-    block::mq::{Operations, TagSet},
+-    error::{self, from_err_ptr, Result},
+-    fmt::{self, Write},
++    block::mq::{
++        Operations,
++        TagSet, //
++    },
 +    error::{
-+        to_result,
-+        Error,
-+        Result,
-+        VTABLE_DEFAULT_ERROR, //
++        self,
++        from_err_ptr,
++        Result, //
 +    },
-+    ffi::{
-+        c_int,
-+        c_long,
-+        c_uint,
-+        c_ulong, //
++    fmt::{
++        self,
++        Write, //
 +    },
-+    fs::{
-+        File,
-+        Kiocb, //
-+    },
-+    iov::{
-+        IovIterDest,
-+        IovIterSource, //
-+    },
-     mm::virt::VmaNew,
      prelude::*,
-     seq_file::SeqFile,
--    types::{ForeignOwnable, Opaque},
+     static_lock_class,
+     str::NullTerminatedFormatter,
+     sync::Arc,
+-    types::{ForeignOwnable, ScopeGuard},
 +    types::{
 +        ForeignOwnable,
-+        Opaque, //
++        ScopeGuard, //
++    }, //
+ };
+ 
+ /// A builder for [`GenDisk`].
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index 8ad46129a52c4..187b0b7791db9 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -6,11 +6,20 @@
+ 
+ use crate::{
+     bindings,
+-    block::mq::{request::RequestDataWrapper, Request},
+-    error::{from_result, Result},
++    block::mq::{
++        request::RequestDataWrapper,
++        Request, //
 +    },
++    error::{
++        from_result,
++        Result, //
++    },
+     prelude::*,
+-    sync::{aref::ARef, Refcount},
+-    types::ForeignOwnable,
++    sync::{
++        aref::ARef,
++        Refcount, //
++    },
++    types::ForeignOwnable, //
+ };
+ use core::marker::PhantomData;
+ 
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index ce3e30c81cb5e..66254d02bba65 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -9,13 +9,19 @@
+     block::mq::Operations,
+     error::Result,
+     sync::{
+-        aref::{ARef, AlwaysRefCounted},
++        aref::{
++            ARef,
++            AlwaysRefCounted, //
++        },
+         atomic::Relaxed,
+-        Refcount,
++        Refcount, //
+     },
+-    types::Opaque,
++    types::Opaque, //
 +};
 +use core::{
 +    marker::PhantomData,
-+    pin::Pin, //
++    ptr::NonNull, //
  };
--use core::{marker::PhantomData, pin::Pin};
+-use core::{marker::PhantomData, ptr::NonNull};
  
- /// Options for creating a misc device.
- #[derive(Copy, Clone)]
+ /// A wrapper around a blk-mq [`struct request`]. This represents an IO request.
+ ///
+diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
+index dae9df408a862..c1fd3e047af50 100644
+--- a/rust/kernel/block/mq/tag_set.rs
++++ b/rust/kernel/block/mq/tag_set.rs
+@@ -8,13 +8,27 @@
+ 
+ use crate::{
+     bindings,
+-    block::mq::{operations::OperationsVTable, request::RequestDataWrapper, Operations},
+-    error::{self, Result},
++    block::mq::{
++        operations::OperationsVTable,
++        request::RequestDataWrapper,
++        Operations, //
++    },
++    error::{
++        self,
++        Result, //
++    },
+     prelude::try_pin_init,
+-    types::Opaque,
++    types::Opaque, //
++};
++use core::{
++    convert::TryInto,
++    marker::PhantomData, //
++};
++use pin_init::{
++    pin_data,
++    pinned_drop,
++    PinInit, //
+ };
+-use core::{convert::TryInto, marker::PhantomData};
+-use pin_init::{pin_data, pinned_drop, PinInit};
+ 
+ /// A wrapper for the C `struct blk_mq_tag_set`.
+ ///
 
 -- 
 2.43.0
