@@ -1,119 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9335E39D6E8;
-	Thu, 21 May 2026 07:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123601D432D;
+	Thu, 21 May 2026 07:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779349978; cv=none; b=fYRsL4uttJoiLnG8l2VvZPds5EhDNRLoi/OamfCTY2554GpPe6ul//gfm+Dmk2qzkoBkWiyJi+8h+/qZNP/01IlCuQJpRgecnccVrNO8YxQ39PBgAzYsJzfoR/ic6p+5xwuc1kzlTui/Vaydh812i3wj2KPanKRfA77qfPGiCJU=
+	t=1779350059; cv=none; b=ZrPgaUZNaqBKvR3otnWcV1t+go09rt4KBh4r3aIKZg+EuHBD7n8d73+A+1I5vJP4mCCCLs4P9ZRgbR1OAYcznI6WKyNj8sE0Bnpc9P5Mr/7mahFBrxqQzPLySKLv7N+/tVWlOgWQASntvSQ9pcM+9q2XUB1RMZYJJTVKTPAAkRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779349978; c=relaxed/simple;
-	bh=IhDcgM1opHQeEW8Lhx3ILcfCCuQubakT0ILbtE8LP9Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HRl9OuQuy+fcprx6ioJ87lZsqrQn3dDjl+46NreiIzx+FtONlj8qOWhDk+pY9XRggfr1rp/rckv5ZapK7wxzpxKRxP7mE9cmHBzWIiybB0mjsJg3adgjPNcld1PtK0XPGBWv45ZHHUa8gS8MquMXTY1A6MrAYbEpdYaWc//FLic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FWlSCKvu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FWlSCKvu"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D5E8AC2BCB7;
-	Thu, 21 May 2026 07:52:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1779349977; bh=IhDcgM1opHQeEW8Lhx3ILcfCCuQubakT0ILbtE8LP9Q=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FWlSCKvuJDPYLkC44Cysam4hJdbuocMZqt0GTqvStv4m70h6C+/l2VxwuRc99cOm7
-	 VHC8kj2kO3xDN/ZulFll8h49EDtg+6b+uyq6HwoQEso3Ns7w4/kvQs94iQbncwDjV5
-	 1TRWsfVD3awlJNY6A4M4bWvwOinxzxe5dIk+8ATY=
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8D5CD4F3C;
-	Thu, 21 May 2026 07:52:57 +0000 (UTC)
-From: Alvin Sun <alvin.sun@linux.dev>
-Date: Thu, 21 May 2026 15:52:58 +0800
-Subject: [PATCH v2 6/7] rust: configfs: use `LocalModule` for `THIS_MODULE`
+	s=arc-20240116; t=1779350059; c=relaxed/simple;
+	bh=8dFQhSrPgLGdp5wbPpNKxYeHpPZO/Mfa2Yg7BD37zgA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eJ/uOg6XQAR52BTxPBUWuMIyN/SucEOYygWJXNNGgmRZdGrSItMLpEPE7N8HLFkUXGtMbo2j4eXpW+qTyoFQuW0m326cBYm/TzUMasna9qpC7cNFB2BmOpxz9SL+c1E1I9XB7VgtIXSw4+s/9JgNcAqRu9Sw/unvdFc5t+8BOhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 40cec12054ea11f1aa26b74ffac11d73-20260521
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:532e35bd-e6a2-46ea-817b-1b2810f5a423,IP:20,
+	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:15
+X-CID-INFO: VERSION:1.3.12,REQID:532e35bd-e6a2-46ea-817b-1b2810f5a423,IP:20,UR
+	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:15
+X-CID-META: VersionHash:e7bac3a,CLOUDID:e590074133f47be07a94fc1eb35f04e2,BulkI
+	D:260520203343UF2G41NA,BulkQuantity:9,Recheck:0,SF:17|19|64|66|78|80|81|82
+	|83|102|127|841|865|898,TC:nil,Content:0|15|52,EDM:-3,IP:-2,URL:0,File:nil
+	,RT:nil,Bulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,D
+	KP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 40cec12054ea11f1aa26b74ffac11d73-20260521
+X-User: cuitao@kylinos.cn
+Received: from [192.168.108.130] [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <cuitao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
+	with ESMTP id 740294230; Thu, 21 May 2026 15:54:11 +0800
+Message-ID: <f981747e-2abb-47b4-9707-a846e450c662@kylinos.cn>
+Date: Thu, 21 May 2026 15:54:06 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260521-fix-fops-owner-v2-6-fd99079c5a04@linux.dev>
-References: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
-In-Reply-To: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
-To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
- Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
- Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
- Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, 
- Simona Vetter <simona@ffwll.ch>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
- David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, 
- Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>
-Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org, 
- driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org, 
- nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org, 
- kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
- Alvin Sun <alvin.sun@linux.dev>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779349975; l=1996;
- i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=IhDcgM1opHQeEW8Lhx3ILcfCCuQubakT0ILbtE8LP9Q=;
- b=xu7fCCb/X5SIsHPhPGu9B415jM0ngv4cFvYDJedOxZLgAglNfbavmx+H5SJ/7zGEINxd+Txdg
- uO3ilrLZMqRDD0SOxi9FUK+DUTpUcvFD0DSJIdqnk3/NIwKv7PrqhdA
-X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
- pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
-X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
- auth_id=684
-
-Replace the `THIS_MODULE` static reference in the `configfs_attrs!`
-macro with `<LocalModule as ModuleMetadata>::THIS_MODULE`, consistent
-with the move of `THIS_MODULE` into the `ModuleMetadata` trait.
-
-Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
----
- rust/kernel/configfs.rs | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
-index 2339c6467325d..cc60297f11551 100644
---- a/rust/kernel/configfs.rs
-+++ b/rust/kernel/configfs.rs
-@@ -875,7 +875,7 @@ fn as_ptr(&self) -> *const bindings::config_item_type {
- ///                 configfs::Subsystem<Configuration>,
- ///                 Configuration
- ///                 >::new_with_child_ctor::<N,Child>(
--///             &THIS_MODULE,
-+///             &<LocalModule as ::kernel::ModuleMetadata>::THIS_MODULE,
- ///             &CONFIGURATION_ATTRS
- ///         );
- ///
-@@ -1021,7 +1021,8 @@ macro_rules! configfs_attrs {
- 
-                     static [< $data:upper _TPE >] : $crate::configfs::ItemType<$container, $data>  =
-                         $crate::configfs::ItemType::<$container, $data>::new::<N>(
--                            &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                            &<LocalModule as ::kernel::ModuleMetadata>::THIS_MODULE,
-+                            &[<$ data:upper _ATTRS >]
-                         );
-                 )?
- 
-@@ -1030,7 +1031,8 @@ macro_rules! configfs_attrs {
-                         $crate::configfs::ItemType<$container, $data>  =
-                             $crate::configfs::ItemType::<$container, $data>::
-                             new_with_child_ctor::<N, $child>(
--                                &THIS_MODULE, &[<$ data:upper _ATTRS >]
-+                                &<LocalModule as ::kernel::ModuleMetadata>::THIS_MODULE,
-+                                &[<$ data:upper _ATTRS >]
-                             );
-                 )?
- 
-
--- 
-2.43.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-throttle: schedule parent dispatch in tg_flush_bios()
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: axboe@kernel.dk, cgroups@vger.kernel.org, josef@toxicpanda.com,
+ linux-block@vger.kernel.org, tj@kernel.org
+References: <ag2owaQQoigp_fSV@shinmob>
+ <20260520142022.1799724-1-cuitao@kylinos.cn> <ag5DjOCrzfD7D_Ln@shinmob>
+ <31179261-64e0-4950-b112-32627d48e734@kylinos.cn> <ag6OXDuTc3JubfqV@shinmob>
+From: Tao Cui <cuitao@kylinos.cn>
+In-Reply-To: <ag6OXDuTc3JubfqV@shinmob>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
+Hello,
+
+I was able to reproduce the failure and have identified the root cause.
+
+在 2026/5/21 12:54, Shin'ichiro Kawasaki 写道:
+>> If the issue persists after running with LC_ALL=C ./check throtl/004, I'll investigate further.
+> 
+> It still fails with LC_ALL=C.
+> 
+> # LC_ALL=C ./check throtl/004
+> throtl/004 (nullb) (delete disk while IO is throttled)       [passed]
+>     runtime  1.250s  ...  1.211s
+> throtl/004 (sdebug) (delete disk while IO is throttled)      [failed]
+>     runtime  2.518s  ...  2.271s
+>     --- tests/throtl/004.out    2026-03-20 14:25:50.478000000 +0900
+>     +++ /home/shin/Blktests/blktests/results/nodev_sdebug/throtl/004.out.bad    2026-05-21 13:46:36.676000000 +0900
+>     @@ -1,3 +1,2 @@
+>      Running throtl/004
+>     -Input/output error
+>      Test complete
+> 
+
+What the patch intends to fix
+
+tg_flush_bios() schedules pending_timer on the child tg's own service_queue.
+For leaf cgroups, the child's pending_tree is empty, so the timer fires but
+dispatches nothing. The throttled bio remains stuck in the parent's
+pending_tree, but the parent's timer is never rescheduled. This causes tg
+residual in the parent's rb tree and uncontrolled dispatch latency (~500ms
+before the fix vs ~30ms after, in my testing).
+
+Why throtl/004 fails for scsi_debug
+
+The patch changes the dispatch timing: bios are now dispatched immediately
+through the parent instead of waiting for the parent timer to fire naturally.
+
+I looked at the SCSI device deletion flow (please correct me if I'm wrong):
+
+__scsi_remove_device()
+  -> scsi_device_set_state(SDEV_CANCEL)        // step 1
+  -> device_del() -> sd_remove() -> del_gendisk() -> __del_gendisk()
+       -> __blk_mark_disk_dead()               // sets GD_DEAD
+       -> blk_throtl_cancel_bios()             // schedules dispatch
+  -> scsi_device_set_state(SDEV_DEL)           // step 2
+  -> blk_mq_destroy_queue()
+
+Without the patch: 
+  bios remain in the parent's pending_tree and are
+  dispatched only after the SCSI device has transitioned to SDEV_DEL (step 2).
+  scsi_device_state_check(SDEV_DEL) returns BLK_STS_IOERR (EIO).
+
+With the patch: 
+  bios are dispatched immediately and reach the SCSI layer
+  while the device is still in SDEV_CANCEL (between steps 1 and 2).
+  scsi_device_state_check(SDEV_CANCEL) falls into the default case, which
+  returns BLK_STS_OFFLINE (ENODEV).
+
+The FULL output confirms this:
+
+# nullb (passes)
+dd: error writing '/dev/dev_nullb': Input/output error
+
+# sdebug (fails)
+dd: error writing '/dev/sda': No such device
+
+Possible fix directions
+- Revert and redesign: 
+  revert and fix the original latency/residual issue differently.
+- Fix SCSI layer: 
+  make scsi_device_state_check() return BLK_STS_IOERR for SDEV_CANCEL 
+  to match SDEV_DEL behavior. This requires SCSI maintainer approval.
+- Fix blk-throttle cancel path: 
+  have blk_throtl_cancel_bios() directly complete bios via bio_io_error() 
+  instead of going through the SCSI submission path. This requires distinguishing 
+  device deletion (fail with EIO) from cgroup removal (dispatch normally since the device is still alive).
+
+I prefer the third approach. The semantics of blk_throtl_cancel_bios are precisely "cancel the bios", 
+and completing them directly with -EIO is more logical than detouring through the SCSI layer. 
+We could either add a parameter to tg_flush_bios() or introduce a new dedicated function to handle the device removal scenario.
+
+Does anyone have other ideas?
+
+Thanks,
+Tao
