@@ -1,193 +1,113 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C174381AEB
-	for <linux-block@vger.kernel.org>; Thu, 21 May 2026 19:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A959F3C3BF4
+	for <linux-block@vger.kernel.org>; Thu, 21 May 2026 19:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779390206; cv=none; b=sIMaviJg3peJPBZ3qqX5XWQkiIyRcuQyW998rtuYCCMyeLv991mvQJhzjSggwxGZLaYDPFHjjy9tuVJJFtV8PWiVbxZVNFrGQjNK+vTyfLjVB3lCe8KpXADldztWqOqrLHK1ToWLHJ21t8318mCr+6DJ8HHdLRKR/zzhyk96O2M=
+	t=1779390348; cv=none; b=l1xW2QEREVqJaTs9LJJBs3a9qQ4XIE/Tc0Om3Y9KMDrHU848sUWmKcPlmg2mE446ny3WTHnSVaeVUMkfbys7EsfrB/I4T8Chx8Rk6bwJwlLSSoVKmDSX0pim+cGim7iQh4Jy5OzSsfNykPufUf4odVuKkqiQR4aNFl4vjxJX7yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779390206; c=relaxed/simple;
-	bh=PnVfwKwv/MGdRzz/FQltWdHGBFuU6uggaADJT3ft6AM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nLFLWZVJ5D+D6XQaf3ZCuTkLbj8NuMXd5VSRBBlxmUpkLAVgzGq+DjRz0Sm63Q3+R7mfzn4GbU5DZzCkqxYMrAPYdeVI0pmPDDcmsKp5K7vrQVeatPEMUx7yZAzWcv94h6b/jetbeRuv8iqQEMxh+D30oIggeI3d7PN2YQCy1sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=sIgHWitn; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1779390348; c=relaxed/simple;
+	bh=EsDQ+bjGGGBE7U1va5RDEvpoMq2T3HTdiZvqDkpAs6o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pqGn6jxNPj/n7Ea8DoShuCFceW8S7L9I6N2N8rbduTiDgL2d8OHHvJb+UPedcmLVwDGcJT6RJmMQFHpnI+4gvS3iAs9GindNI4haOGcPsUCPJmTl3CFkm++0X6n+yokNCVTK/I29GTPguTtajpBGbrrkGSGTcjRzjrkAwmfO5Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=DsT2tf64; arc=none smtp.client-ip=209.85.167.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="sIgHWitn"
-Received: from pps.filterd (m0528008.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64LIHLUP1694316
-	for <linux-block@vger.kernel.org>; Thu, 21 May 2026 12:03:18 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=CYQ6WRYb+QwWs/E9pe
-	Ns/aMyVCpvaKQKTVzaiKSLHus=; b=sIgHWitniQ5SisFlPgiDArwwoz4F4TUCIK
-	/qPl+CXZw2KUOOJWwxk90RCJv8hg0wCu5O2HWtJ3IRA9XzO614wOM5JHox4083ZT
-	GoVwa+z4vwkim7FGKM3a7rWCJkA5E0GJ0oaGniToQbBsRsnTruL6XNQk5YoTCF/P
-	t/cIAiIuMFyui38yPeDEwKGPAkdJ/AbxK+KTBeVd5ABQg8CyWqSfjiRWNZQyTUHu
-	/DMISK7bKXaJLqiMRy4BU/+RuHcasmJWTdIwGd5Eqm4FwpveGN97ISbRPjigt9B+
-	7NDDayKwt11/iKn5IvM4cXZKaQsn+zaLfyZJqo0ztQ3fcF8NKq6g==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ea76pg9qx-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 21 May 2026 12:03:17 -0700 (PDT)
-Received: from twshared13583.32.frc3.facebook.com (2620:10d:c0a8:1b::8e35) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.37; Thu, 21 May 2026 19:03:14 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 2EC151B2ABA8B; Thu, 21 May 2026 12:02:55 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>
-CC: <tom.leiming@gmail.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3] blk-mq: pop cached request if it is usable
-Date: Thu, 21 May 2026 12:02:53 -0700
-Message-ID: <20260521190253.242065-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="DsT2tf64"
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-484cf882ce5so4488595b6e.1
+        for <linux-block@vger.kernel.org>; Thu, 21 May 2026 12:05:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779390341; x=1779995141; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GKZWfxUS+4Tb1YFOg6z2FhYi+KBYNtAoDv3dZXK4Wf8=;
+        b=DsT2tf64FL9Lz4Fu4KHIagfEeEmca2BKUrbT04t7Gw33V87CF7V/iw5YGN2ZAFu2c2
+         ddERfZauIkT7t39rbtdxZHoPUMbEpT38OKtWgljTeyZ6YNrVL0k+l7AX94j2Hyne+6vd
+         0wwdHrzBeZozUObtXsWAIM6Hu5e8bFxnH46VGz++flqeVahWNeUBMYGk6XYLNeq+JZMg
+         LpefKS0xw5rLXtpFj0zQ9rTaGnyB0OmczMVBsW9DunMeYg1KDBM7KLjfO1V1qdSj6tF8
+         3a4ttHd22C9ZXv2X1XZrKCGvhM7aOZFrEYEZwzAx4dvv58/V3beELixD8gBx7WXkVhJq
+         wzVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779390341; x=1779995141;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GKZWfxUS+4Tb1YFOg6z2FhYi+KBYNtAoDv3dZXK4Wf8=;
+        b=IfpvEQpWq/y2FAH/K2PMbBwpetJ7aNj6eHYzYVYcl9kPuP6wpvfjrIaCEOHHNxyQMI
+         +hrz8d5sKr3dPw/5cdaYNzE+lZlklwyDZoYhJ2F7XL6+P/Vtw94KYnfK5fLT3ZY2BSb1
+         2Gl2TzYHD3FgLfJfIT2Nb+9532P/KuNeDYLMce3Gbau6cVEAfHlk3zdpbHOyxR9qBXOp
+         C5AG7L+Am4UVsYaKsCEs6YC9A4MIGpSaByguti0Plx8+S3zo7n6RYZCNF7+QO2jh5gR7
+         bfj671cUhVVuvY8JhtxLg332IUZgPv5B2RkCQaqHi7ulT+O9+gpd7NS0OGfQLjFgHk/o
+         b3Sg==
+X-Forwarded-Encrypted: i=1; AFNElJ8/i988T9GRzykv81dzbuowKKaz1JvYxzqa2LPFKCLD3LufpfWswIxMG4d0wdFGE2fBOhe3VQ2mc8g/8w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG0T9yj7EyOJw6R90JdqDiXaoSK4Rs0fJbaM8eIf8NZIY5z1cK
+	iuIhFF4AvG205R5w77mFxVAivNxFd4pCZT6fBbW/JLpa4SlC4elclD1AGmjq6pyyhIs=
+X-Gm-Gg: Acq92OFwwpI4ryNSpuggHqdI59Sz5KuL2+Y2EtnI1H7vQNeeC58ulJZ5zGN5STEPuLc
+	KInGrUhTpwCn/fsaXLyJzb3REe8jRmrTQ5bq5cj6PzV1VHoyI0Tp/dW/+TiuJgCGOsbiI4i7fvH
+	GTTCGLKIU8phYtg4SV4S1bPS6b72wfz3uMfDN5VYc17vXnIvB90wwAWtmmYIQJwbg5VmThB4haw
+	yMFDLeQVouAW8vhIUVp+8HWiyKTLXKyl7HjaJvjTc/V4YbxnISrzuD3I++yO7gCXLm51Bu+de4r
+	5wJa5t/A4KObLtBNu+3jp69UgBN3E2K63FFm8jhXCq7bopvUlVs4A6XNGh/9O3uNkcqsRjxGtBN
+	5Y89ikQl/ivmgmdCjTAq6jd6/FlSNGMDjPGtoVv0jqln6A1aWYgkZJUcKKXk9KOYmgwPRYslQ0U
+	1i15WBLpCfYTFqyC1egY5jT2CGz2SMMnCzrhOU4EWXJQB8GekbOSUKy+ZpkV9tcC6tZGDfayae6
+	+zHYdeI
+X-Received: by 2002:a05:6808:191a:b0:47b:d914:48c3 with SMTP id 5614622812f47-48549cfca30mr189968b6e.10.1779390341515;
+        Thu, 21 May 2026 12:05:41 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-485431be4bdsm725820b6e.18.2026.05.21.12.05.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 May 2026 12:05:40 -0700 (PDT)
+Message-ID: <2bc4ae80-a010-489c-b85d-3f75b2319100@kernel.dk>
+Date: Thu, 21 May 2026 13:05:39 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=ROKD2Yi+ c=1 sm=1 tr=0 ts=6a0f56f6 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=_1IyUuN4QrATX339ibzo:22 a=VwQbUJbxAAAA:8 a=o6C09Vw2lQhHS83W158A:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDE5MSBTYWx0ZWRfX9ubH/USAWPIP
- BSD1OavfiX5VwwFtcXUStqG6vMefGm8r8O9vB+smpjLK+rBs935SR2stzwHW3yW4YQMYjEe8Exg
- rDf45iKp0D/8U1wddzdlUalmwqBKrq42GZM8fZ0Dev24iSa0GEXPzrNt5Byva+XmZyT8G88spEt
- 8MKSXQ8oQ3q9G9XRe+1/WoTrVpocTWaIUfhtXlX0nt4IG6fnUSrGyLeX2QqljqthCdXDGDHJanS
- my9j1DeCI4g8Qb65An8crAvmVUzK0xCsbHj/XC/yfFYbTFGBhNAZAuUcsSCvi8w4pHgyyYkFQ7z
- MSx7TvDWgjn/nu5VRkresDMCwmntHFTJqaIqOS1VmAhWXWH2Cb21VPYtWAtIZ26QaXvgKqlU9+4
- J1ffG0lFxDEIAF/LswavZVy6JLFqhhvLKFQkOtzF8bUMrngnVZuIbe2T9Ad5UjBHFRkALkCB1qG
- BnnH6dWt759nw23xR7w==
-X-Proofpoint-GUID: jR0fbsXBk6N9_GNLKq_cs8_nKbK9dFpK
-X-Proofpoint-ORIG-GUID: jR0fbsXBk6N9_GNLKq_cs8_nKbK9dFpK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-21_04,2026-05-18_01,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3] blk-mq: pop cached request if it is usable
+To: Keith Busch <kbusch@meta.com>, hch@lst.de, linux-block@vger.kernel.org
+Cc: tom.leiming@gmail.com, Keith Busch <kbusch@kernel.org>
+References: <20260521190253.242065-1-kbusch@meta.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260521190253.242065-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+On 5/21/26 1:02 PM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> When submitting a bio to blk-mq, if the task should sleep after peeking
+> a cached request, but before it pops it, the plug flushes and calls
+> blk_mq_free_plug_rqs, freeing the cached_rqs. This creates a
+> use-after-free bug. Fix this by popping the cached request before any
+> possible blocking calls if it is suitable for use.
+> 
+> Popping this request first holds a queue reference, so avoid any
+> serialization races with queue freezes and can safely proceed with
+> dispatching that request to the driver. This potentially increases a
+> timing window from when a driver wants to freeze its queue to when
+> requests stop being dispatched. That scenario is off the fast path
+> though, and drivers need to appropriately handle requests during a
+> freeze request anyway.
+> 
+> The downside is the popped element needs to be individually freed when
+> we performed a bio plug merge. The cached request would have had to be
+> freed later anyway, but this patch does it inline with building the plug
+> list instead of after flushing it.
 
-When submitting a bio to blk-mq, if the task should sleep after peeking
-a cached request, but before it pops it, the plug flushes and calls
-blk_mq_free_plug_rqs, freeing the cached_rqs. This creates a
-use-after-free bug. Fix this by popping the cached request before any
-possible blocking calls if it is suitable for use.
+Keith and I had a side-bar about this earlier today, and yes this is so
+much better imho than both v2 or Christoph's sledge hammer.
 
-Popping this request first holds a queue reference, so avoid any
-serialization races with queue freezes and can safely proceed with
-dispatching that request to the driver. This potentially increases a
-timing window from when a driver wants to freeze its queue to when
-requests stop being dispatched. That scenario is off the fast path
-though, and drivers need to appropriately handle requests during a
-freeze request anyway.
+I've already tested this one too, and as expected, it's not regressing
+performance. It's also saner in that there's no gap between peek and pop
+anymore, so no risk of further blocking screwing with the list on
+unplug.
 
-The downside is the popped element needs to be individually freed when
-we performed a bio plug merge. The cached request would have had to be
-freed later anyway, but this patch does it inline with building the plug
-list instead of after flushing it.
-
-Fixes: b0077e269f6c1 ("blk-mq: make sure active queue usage is held for b=
-io_integrity_prep()")
-Fixes: 7b4f36cd22a65 ("block: ensure we hold a queue reference when using=
- queue limits")
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
-v2->v3:
-
-  This pops the cached requests first. It's simpler this way and I don't
-  see any strong reason against it.
-
- block/blk-mq.c | 34 +++++++++-------------------------
- 1 file changed, 9 insertions(+), 25 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d0c37daf568f2..28c2d931e75ea 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3077,7 +3077,7 @@ static struct request *blk_mq_get_new_requests(stru=
-ct request_queue *q,
- /*
-  * Check if there is a suitable cached request and return it.
-  */
--static struct request *blk_mq_peek_cached_request(struct blk_plug *plug,
-+static struct request *blk_mq_get_cached_request(struct blk_plug *plug,
- 		struct request_queue *q, blk_opf_t opf)
- {
- 	enum hctx_type type =3D blk_mq_get_hctx_type(opf);
-@@ -3093,27 +3093,10 @@ static struct request *blk_mq_peek_cached_request=
-(struct blk_plug *plug,
- 		return NULL;
- 	if (op_is_flush(rq->cmd_flags) !=3D op_is_flush(opf))
- 		return NULL;
-+	rq_list_pop(&plug->cached_rqs);
- 	return rq;
- }
-=20
--static void blk_mq_use_cached_rq(struct request *rq, struct blk_plug *pl=
-ug,
--		struct bio *bio)
--{
--	if (rq_list_pop(&plug->cached_rqs) !=3D rq)
--		WARN_ON_ONCE(1);
--
--	/*
--	 * If any qos ->throttle() end up blocking, we will have flushed the
--	 * plug and hence killed the cached_rq list as well. Pop this entry
--	 * before we throttle.
--	 */
--	rq_qos_throttle(rq->q, bio);
--
--	blk_mq_rq_time_init(rq, blk_time_get_ns());
--	rq->cmd_flags =3D bio->bi_opf;
--	INIT_LIST_HEAD(&rq->queuelist);
--}
--
- static bool bio_unaligned(const struct bio *bio, struct request_queue *q=
-)
- {
- 	unsigned int bs_mask =3D queue_logical_block_size(q) - 1;
-@@ -3152,7 +3135,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	/*
- 	 * If the plug has a cached request for this queue, try to use it.
- 	 */
--	rq =3D blk_mq_peek_cached_request(plug, q, bio->bi_opf);
-+	rq =3D blk_mq_get_cached_request(plug, q, bio->bi_opf);
-=20
- 	/*
- 	 * A BIO that was released from a zone write plug has already been
-@@ -3211,7 +3194,10 @@ void blk_mq_submit_bio(struct bio *bio)
-=20
- new_request:
- 	if (rq) {
--		blk_mq_use_cached_rq(rq, plug, bio);
-+		rq_qos_throttle(rq->q, bio);
-+		blk_mq_rq_time_init(rq, blk_time_get_ns());
-+		rq->cmd_flags =3D bio->bi_opf;
-+		INIT_LIST_HEAD(&rq->queuelist);
- 	} else {
- 		rq =3D blk_mq_get_new_requests(q, plug, bio);
- 		if (unlikely(!rq)) {
-@@ -3257,12 +3243,10 @@ void blk_mq_submit_bio(struct bio *bio)
- 	return;
-=20
- queue_exit:
--	/*
--	 * Don't drop the queue reference if we were trying to use a cached
--	 * request and thus didn't acquire one.
--	 */
- 	if (!rq)
- 		blk_queue_exit(q);
-+	else
-+		blk_mq_free_request(rq);
- }
-=20
- #ifdef CONFIG_BLK_MQ_STACKING
---=20
-2.53.0-Meta
-
+-- 
+Jens Axboe
