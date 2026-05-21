@@ -1,34 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3500F3570C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35339397B02;
 	Thu, 21 May 2026 07:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779349978; cv=none; b=d+unlt/Yy8LtxQogRl7s2fG4wVe22HS4LtYgsdNXEkUaLghUwhvay+ivxYeY8ohSqNU7bmZAbZsgt+cGZ4cCWLSNxt/SpKNMHidwlruoUMvqzEv6ozinU8q1cYkoS/f/VQ7mKCJ0yHdOgu1NYA+mfqxnGKQ6MOj8WGkaNM0QnRw=
+	t=1779349978; cv=none; b=Mt8K93m0YqV3KOsNuAOVWjgxrOqI5AuWxLkFSCsZ4iURqbmHYucCWtA/K0VUVlECgor5vMnY/o5TV7QgkRXy6xyB5Zsr3NRb6v02dxM4EeOyxhGe0152iGJXiuHkEjmy+OcnKxwQOyGXHofN8bYal4DNt9DTXRk9qn/3VAXjJyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779349978; c=relaxed/simple;
-	bh=igfKdO1neJGj7Xg6xYLkNhUmyQWCWGYNm1ghjHlm9Ts=;
+	bh=o0NVwirES5UBqa+dDLOUFzSJEpbDhFbK8hdfhxeciEw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Px8Sgq7euab1YOwlXhomLlPUAWGu7sZs/D2Y5R33bWLknY4ThIVdI7vYYaDl2S/2TNMoG3OxKl9yF9CItn02k+7YKYp59qwgszp860/yUJl2/mF8i3quuikS+q44D/YofCAHWVnRNzEaOIZONk+LAl0N+s7JNbVsEynsEn4uVFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Lko8sLPw; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=Aa7rDYQvkiGoN2jO/eAlQn77OvGzxPsTr/cINyZscmHc2AJ0sXEsd4BowzE+bIH5N4Wekh1GHW5jxisGhPJIc35wCDuXO0eYU5QVn2cQiOo1ov8SfteXgSzoLszXxkaxs0kh/p5ZDxRbIUux9//bo3dQJovjWVni6PT8RqzAar4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xCZwE6GO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Lko8sLPw"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9281CC2BCF5;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xCZwE6GO"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8185FC4AF0C;
 	Thu, 21 May 2026 07:52:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
-	t=1779349977; bh=igfKdO1neJGj7Xg6xYLkNhUmyQWCWGYNm1ghjHlm9Ts=;
+	t=1779349977; bh=o0NVwirES5UBqa+dDLOUFzSJEpbDhFbK8hdfhxeciEw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Lko8sLPwkDsoRcgsQrusAof3Keyg2dX6AZDvrMnjoFhmHUNJwIsSRnO4rR9W464rf
-	 +32O+5QWwK6iBG023IMHvPftROEIjLtG4RCWfnxWTB/D8ana6ACfhAOhb6h6DZg2Q6
-	 lbz3QRKVPw5A2LH/vpbfBVwjkEzTfMqlWtQUsdkw=
+	b=xCZwE6GOX4iuDiy20/IGmM8QsxM+3ra6PCO0q6H2M+A0gS5+2S85pCJjY1k9+ZnV7
+	 Jj7lrHwDlUpSmegwXIC7fgfyM0QafFIRYu/zy8pSMXdxgVGqHLmsyTXoDzldJiQ8HL
+	 KSMiyBOczT6rTyVbqMNClEvkIn7GvqU48/ROO/HE=
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F8FCD5BAE;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED62CD4F3C;
 	Thu, 21 May 2026 07:52:57 +0000 (UTC)
 From: Alvin Sun <alvin.sun@linux.dev>
-Date: Thu, 21 May 2026 15:52:55 +0800
-Subject: [PATCH v2 3/7] rust: doctest: add LocalModule fallback for
- #[vtable] ThisModule
+Date: Thu, 21 May 2026 15:52:54 +0800
+Subject: [PATCH v2 2/7] rust: macros: auto-insert ThisModule in #[vtable]
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +36,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260521-fix-fops-owner-v2-3-fd99079c5a04@linux.dev>
+Message-Id: <20260521-fix-fops-owner-v2-2-fd99079c5a04@linux.dev>
 References: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
 In-Reply-To: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
 To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
@@ -61,52 +60,119 @@ Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org,
  kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
  Alvin Sun <alvin.sun@linux.dev>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779349975; l=1155;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779349975; l=4177;
  i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
- bh=igfKdO1neJGj7Xg6xYLkNhUmyQWCWGYNm1ghjHlm9Ts=;
- b=Ubb5+DjFaDZl1QG6msYhLYQXO3XoE/obxTPEmhDpWHhkqkskJ/AaP5OP7ETnNf7BNSiQQMVSo
- NiYU21Tty1pCcwjGht3L1od+nJVFQw6SQkngoRE4uCVCx9Xw4fmnGrD
+ bh=o0NVwirES5UBqa+dDLOUFzSJEpbDhFbK8hdfhxeciEw=;
+ b=Q6DTbV7+PYfAMn/D2wleruFS9xF8ZeX0LkKJ4lQ3KJ9pAlD1ePSSYkJDIUEFG7J7bjgi4m6yG
+ SlPaIh4AX5MA9Gos3sDeR7pI9c3YzSVg0Y89M2pSvYmn9amiF6SQMDP
 X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
  pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
 X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
  auth_id=684
 
-Add a `LocalModule` struct with a null-pointer `ModuleMetadata` impl
-in the doctest harness, so that `crate::LocalModule` (auto-inserted
-by `#[vtable]`) resolves correctly when there is no `module!` macro.
+Auto-add `type ThisModule: ::kernel::ModuleMetadata;` as a required
+associated type on the trait side if not already defined, and
+auto-insert `type ThisModule = crate::LocalModule;` on the impl side
+if not explicitly provided, eliminating the need to manually declare
+and implement `ThisModule` in every vtable trait and impl.
 
 Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- scripts/rustdoc_test_gen.rs | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ rust/macros/lib.rs    |  6 ++++++
+ rust/macros/vtable.rs | 38 +++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/rustdoc_test_gen.rs b/scripts/rustdoc_test_gen.rs
-index ee76e96b41eea..198af4e446c8c 100644
---- a/scripts/rustdoc_test_gen.rs
-+++ b/scripts/rustdoc_test_gen.rs
-@@ -239,6 +239,22 @@ macro_rules! assert_eq {{
+diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
+index 2cfd59e0f9e7c..d35e45ea745c0 100644
+--- a/rust/macros/lib.rs
++++ b/rust/macros/lib.rs
+@@ -176,6 +176,12 @@ pub fn module(input: TokenStream) -> TokenStream {
+ ///
+ /// This macro should not be used when all functions are required.
+ ///
++/// Additionally, this macro automatically handles the `ThisModule`
++/// associated type: on the trait side, `type ThisModule: ModuleMetadata;`
++/// is added as a required associated type if not already defined; on the
++/// impl side, `type ThisModule = LocalModule;` is automatically inserted
++/// if not explicitly defined.
++///
+ /// # Examples
+ ///
+ /// ```
+diff --git a/rust/macros/vtable.rs b/rust/macros/vtable.rs
+index c6510b0c4ea1d..d3d0e9cbd7172 100644
+--- a/rust/macros/vtable.rs
++++ b/rust/macros/vtable.rs
+@@ -23,6 +23,7 @@
  
- const __LOG_PREFIX: &[u8] = b"rust_doctests_kernel\0";
+ fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
+     let mut gen_items = Vec::new();
++    let mut has_this_module = false;
  
-+/// Dummy module type for doctest context.
-+struct LocalModule;
+     gen_items.push(parse_quote! {
+          /// A marker to prevent implementors from forgetting to use [`#[vtable]`](vtable)
+@@ -30,6 +31,28 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
+          const USE_VTABLE_ATTR: ();
+     });
+ 
++    // Detect existing type ThisModule so we don't add a duplicate.
++    for i in &item.items {
++        if let TraitItem::Type(type_item) = i {
++            if type_item.ident == "ThisModule" {
++                has_this_module = true;
++            }
++        }
++    }
 +
-+use kernel::{{
-+    str::CStr,
-+    ModuleMetadata,
-+    ThisModule, //
-+}};
-+use core::ptr::null_mut;
++    // Add `type ThisModule: ModuleMetadata` as a required associated type if
++    // the trait does not already define it. No default is used because
++    // `associated_type_defaults` is unstable (issue #29661).
++    if !has_this_module {
++        gen_items.push(parse_quote! {
++            /// The module implementing this vtable trait.
++            ///
++            /// Automatically set to `crate::LocalModule` by the `#[vtable]`
++            /// impl macro.
++            type ThisModule: ::kernel::ModuleMetadata;
++        });
++    }
 +
-+impl ModuleMetadata for LocalModule {{
-+    const NAME: &'static CStr = c"rust_doctests_kernel";
-+    // SAFETY: `try_module_get`/`module_put` handle null module pointers gracefully.
-+    const THIS_MODULE: ThisModule = unsafe {{ ThisModule::from_ptr(null_mut()) }};
-+}}
+     for item in &item.items {
+         if let TraitItem::Fn(fn_item) = item {
+             let name = &fn_item.sig.ident;
+@@ -58,18 +81,31 @@ fn handle_trait(mut item: ItemTrait) -> Result<ItemTrait> {
+ fn handle_impl(mut item: ItemImpl) -> Result<ItemImpl> {
+     let mut gen_items = Vec::new();
+     let mut defined_consts = HashSet::new();
++    let mut defined_types = HashSet::new();
+ 
+-    // Iterate over all user-defined constants to gather any possible explicit overrides.
++    // Iterate over all user-defined constants and types to gather any possible explicit overrides.
+     for item in &item.items {
+         if let ImplItem::Const(const_item) = item {
+             defined_consts.insert(const_item.ident.clone());
+         }
++        if let ImplItem::Type(type_item) = item {
++            defined_types.insert(type_item.ident.clone());
++        }
+     }
+ 
+     gen_items.push(parse_quote! {
+         const USE_VTABLE_ATTR: () = ();
+     });
+ 
++    // Auto-insert `type ThisModule = crate::LocalModule` if not explicitly defined.
++    // `crate::LocalModule` resolves to the real module type (via `module!`) or a
++    // dummy fallback in non-module contexts (e.g., doctests).
++    if !defined_types.contains(&parse_quote!(ThisModule)) {
++        gen_items.push(parse_quote! {
++            type ThisModule = crate::LocalModule;
++        });
++    }
 +
- {rust_tests}
- "#
-     )
+     for item in &item.items {
+         if let ImplItem::Fn(fn_item) = item {
+             let name = &fn_item.sig.ident;
 
 -- 
 2.43.0
