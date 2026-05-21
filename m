@@ -1,44 +1,44 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123601D432D;
-	Thu, 21 May 2026 07:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C776B175A8F;
+	Thu, 21 May 2026 09:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779350059; cv=none; b=ZrPgaUZNaqBKvR3otnWcV1t+go09rt4KBh4r3aIKZg+EuHBD7n8d73+A+1I5vJP4mCCCLs4P9ZRgbR1OAYcznI6WKyNj8sE0Bnpc9P5Mr/7mahFBrxqQzPLySKLv7N+/tVWlOgWQASntvSQ9pcM+9q2XUB1RMZYJJTVKTPAAkRw=
+	t=1779354304; cv=none; b=ehA79CfaUiWK6nqWRrN6bml8AbWTihLe0JJApZqvUVnsEwSbjtgFQVgwuWYpT7dISRoUaEbXJTuq32DKKZTBR/ohhYHRVtNQlhNTqVfYV5w0YnEMKYpgz7HPvWtu/w/DVfMe6vtEbyJ0xpH8jU9mXQvgALvvAYPj1a/KjeYNdMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779350059; c=relaxed/simple;
-	bh=8dFQhSrPgLGdp5wbPpNKxYeHpPZO/Mfa2Yg7BD37zgA=;
+	s=arc-20240116; t=1779354304; c=relaxed/simple;
+	bh=qCwCAijqdvdP9Oi+hkkTLPF71BM6kp8lP+BjhPBtVg0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eJ/uOg6XQAR52BTxPBUWuMIyN/SucEOYygWJXNNGgmRZdGrSItMLpEPE7N8HLFkUXGtMbo2j4eXpW+qTyoFQuW0m326cBYm/TzUMasna9qpC7cNFB2BmOpxz9SL+c1E1I9XB7VgtIXSw4+s/9JgNcAqRu9Sw/unvdFc5t+8BOhw=
+	 In-Reply-To:Content-Type; b=olSehylGEcsDjwnZEqv9Ran0h7xguWihOsYGF0tji5GY0ckX7CgQXnyuW85M6UqqN/3PENfqYNuSpDj0ZMeDGPZ2sNrI28vWg257PYBdk9X8zg7yHUj2vMrVH+Lu78eXPp1qrXVAsO+3HNHBn7H6buVcjZt7GGFsIezolnAjJ8Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 40cec12054ea11f1aa26b74ffac11d73-20260521
+X-UUID: 21c3cb4054f411f1aa26b74ffac11d73-20260521
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:532e35bd-e6a2-46ea-817b-1b2810f5a423,IP:20,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:15
-X-CID-INFO: VERSION:1.3.12,REQID:532e35bd-e6a2-46ea-817b-1b2810f5a423,IP:20,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:15
-X-CID-META: VersionHash:e7bac3a,CLOUDID:e590074133f47be07a94fc1eb35f04e2,BulkI
-	D:260520203343UF2G41NA,BulkQuantity:9,Recheck:0,SF:17|19|64|66|78|80|81|82
-	|83|102|127|841|865|898,TC:nil,Content:0|15|52,EDM:-3,IP:-2,URL:0,File:nil
-	,RT:nil,Bulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,D
-	KP:0,BRR:0,BRE:0,ARC:0
+X-CID-O-INFO: VERSION:1.3.12,REQID:1e747207-1168-4520-8ae7-854bf1909505,IP:10,
+	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-15
+X-CID-INFO: VERSION:1.3.12,REQID:1e747207-1168-4520-8ae7-854bf1909505,IP:10,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-15
+X-CID-META: VersionHash:e7bac3a,CLOUDID:08995bd8fb7bc2b15f05408dc435ee31,BulkI
+	D:260520203343UF2G41NA,BulkQuantity:11,Recheck:0,SF:17|19|66|78|81|82|83|1
+	02|127|865|898,TC:nil,Content:0|15|52,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,B
+	ulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
+	0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_OBB
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 40cec12054ea11f1aa26b74ffac11d73-20260521
+X-UUID: 21c3cb4054f411f1aa26b74ffac11d73-20260521
 X-User: cuitao@kylinos.cn
 Received: from [192.168.108.130] [(223.70.159.239)] by mailgw.kylinos.cn
 	(envelope-from <cuitao@kylinos.cn>)
 	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 740294230; Thu, 21 May 2026 15:54:11 +0800
-Message-ID: <f981747e-2abb-47b4-9707-a846e450c662@kylinos.cn>
-Date: Thu, 21 May 2026 15:54:06 +0800
+	with ESMTP id 803809240; Thu, 21 May 2026 17:04:54 +0800
+Message-ID: <5d59c249-5e8d-482d-bb83-11f6ed6e0e8c@kylinos.cn>
+Date: Thu, 21 May 2026 17:04:49 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,88 +58,50 @@ In-Reply-To: <ag6OXDuTc3JubfqV@shinmob>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+Hello，
 
-Hello,
+Following up on my analysis, I did some further investigation into
+why I couldn't reproduce the failure locally.
 
-I was able to reproduce the failure and have identified the root cause.
+The root cause is a timing-sensitive race between the dispatch and
+SCSI state transition. Whether the race manifests depends on kernel
+build configs that affect execution speed.
 
 在 2026/5/21 12:54, Shin'ichiro Kawasaki 写道:
+
 >> If the issue persists after running with LC_ALL=C ./check throtl/004, I'll investigate further.
 > 
-> It still fails with LC_ALL=C.
-> 
-> # LC_ALL=C ./check throtl/004
-> throtl/004 (nullb) (delete disk while IO is throttled)       [passed]
->     runtime  1.250s  ...  1.211s
-> throtl/004 (sdebug) (delete disk while IO is throttled)      [failed]
->     runtime  2.518s  ...  2.271s
->     --- tests/throtl/004.out    2026-03-20 14:25:50.478000000 +0900
->     +++ /home/shin/Blktests/blktests/results/nodev_sdebug/throtl/004.out.bad    2026-05-21 13:46:36.676000000 +0900
->     @@ -1,3 +1,2 @@
->      Running throtl/004
->     -Input/output error
->      Test complete
-> 
+I found the following key differences between my config and the
+Fedora debug config:
 
-What the patch intends to fix
+  Config                    Mine    Fedora
+  CONFIG_PREEMPT            n       y
+  CONFIG_KASAN              n       y
+  CONFIG_PROVE_LOCKING      n       y
+  CONFIG_DEBUG_PREEMPT      n       y
+  CONFIG_DEBUG_SPINLOCK     n       y
+  CONFIG_LOCKDEP            n       y
+  CONFIG_DEBUG_KMEMLEAK     n       y
 
-tg_flush_bios() schedules pending_timer on the child tg's own service_queue.
-For leaf cgroups, the child's pending_tree is empty, so the timer fires but
-dispatches nothing. The throttled bio remains stuck in the parent's
-pending_tree, but the parent's timer is never rescheduled. This causes tg
-residual in the parent's rb tree and uncontrolled dispatch latency (~500ms
-before the fix vs ~30ms after, in my testing).
+KASAN and lock debugging slow down the __del_gendisk() path
+significantly. This gives dispatch_work enough time to run and
+submit bios while the device is still in SDEV_CANCEL, triggering
+the BLK_STS_OFFLINE (ENODEV) response.
 
-Why throtl/004 fails for scsi_debug
+After disabling the first four options (CONFIG_PREEMPT, CONFIG_KASAN,
+CONFIG_PROVE_LOCKING, CONFIG_DEBUG_PREEMPT) on the Fedora config,
+the test passes:
 
-The patch changes the dispatch timing: bios are now dispatched immediately
-through the parent instead of waiting for the parent timer to fire naturally.
+throtl/004 (nullb) (delete disk while IO is throttled)       [passed]
+    runtime  0.763s
+throtl/004 (sdebug) (delete disk while IO is throttled)      [passed]
+    runtime  0.923s
 
-I looked at the SCSI device deletion flow (please correct me if I'm wrong):
-
-__scsi_remove_device()
-  -> scsi_device_set_state(SDEV_CANCEL)        // step 1
-  -> device_del() -> sd_remove() -> del_gendisk() -> __del_gendisk()
-       -> __blk_mark_disk_dead()               // sets GD_DEAD
-       -> blk_throtl_cancel_bios()             // schedules dispatch
-  -> scsi_device_set_state(SDEV_DEL)           // step 2
-  -> blk_mq_destroy_queue()
-
-Without the patch: 
-  bios remain in the parent's pending_tree and are
-  dispatched only after the SCSI device has transitioned to SDEV_DEL (step 2).
-  scsi_device_state_check(SDEV_DEL) returns BLK_STS_IOERR (EIO).
-
-With the patch: 
-  bios are dispatched immediately and reach the SCSI layer
-  while the device is still in SDEV_CANCEL (between steps 1 and 2).
-  scsi_device_state_check(SDEV_CANCEL) falls into the default case, which
-  returns BLK_STS_OFFLINE (ENODEV).
-
-The FULL output confirms this:
-
-# nullb (passes)
-dd: error writing '/dev/dev_nullb': Input/output error
-
-# sdebug (fails)
-dd: error writing '/dev/sda': No such device
-
-Possible fix directions
-- Revert and redesign: 
-  revert and fix the original latency/residual issue differently.
-- Fix SCSI layer: 
-  make scsi_device_state_check() return BLK_STS_IOERR for SDEV_CANCEL 
-  to match SDEV_DEL behavior. This requires SCSI maintainer approval.
-- Fix blk-throttle cancel path: 
-  have blk_throtl_cancel_bios() directly complete bios via bio_io_error() 
-  instead of going through the SCSI submission path. This requires distinguishing 
-  device deletion (fail with EIO) from cgroup removal (dispatch normally since the device is still alive).
-
-I prefer the third approach. The semantics of blk_throtl_cancel_bios are precisely "cancel the bios", 
-and completing them directly with -EIO is more logical than detouring through the SCSI layer. 
-We could either add a parameter to tg_flush_bios() or introduce a new dedicated function to handle the device removal scenario.
-
-Does anyone have other ideas?
+This confirms the race is timing-sensitive and depends on the
+kernel build config. The fix with bio_io_error() is still the
+right approach -- it completes bios directly at the throttle
+layer, avoiding the SCSI state check entirely.
 
 Thanks,
 Tao
+
