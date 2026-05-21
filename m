@@ -1,107 +1,92 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-3-27.ptr.tlmpb.com (sg-3-27.ptr.tlmpb.com [101.45.255.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C776B175A8F;
-	Thu, 21 May 2026 09:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1043134B1B0
+	for <linux-block@vger.kernel.org>; Thu, 21 May 2026 09:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.45.255.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779354304; cv=none; b=ehA79CfaUiWK6nqWRrN6bml8AbWTihLe0JJApZqvUVnsEwSbjtgFQVgwuWYpT7dISRoUaEbXJTuq32DKKZTBR/ohhYHRVtNQlhNTqVfYV5w0YnEMKYpgz7HPvWtu/w/DVfMe6vtEbyJ0xpH8jU9mXQvgALvvAYPj1a/KjeYNdMU=
+	t=1779355707; cv=none; b=ORcDpPm2sXI4aZ0uQulojgXj+PWfJ+j4A2w/kF9w3tOk5sjqScJU3SJGR/NAQReJ5q3Nk0P47/NkLlCI+gOdziEnVLf4L5030cAJDGoHOAT5+xH5sgIRegXRHYC9vHqENLyuKsvLuE1pJkQ+kC4u2Btb0F0vMbwns8mIUcHhaQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779354304; c=relaxed/simple;
-	bh=qCwCAijqdvdP9Oi+hkkTLPF71BM6kp8lP+BjhPBtVg0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=olSehylGEcsDjwnZEqv9Ran0h7xguWihOsYGF0tji5GY0ckX7CgQXnyuW85M6UqqN/3PENfqYNuSpDj0ZMeDGPZ2sNrI28vWg257PYBdk9X8zg7yHUj2vMrVH+Lu78eXPp1qrXVAsO+3HNHBn7H6buVcjZt7GGFsIezolnAjJ8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 21c3cb4054f411f1aa26b74ffac11d73-20260521
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:1e747207-1168-4520-8ae7-854bf1909505,IP:10,
-	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-15
-X-CID-INFO: VERSION:1.3.12,REQID:1e747207-1168-4520-8ae7-854bf1909505,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-15
-X-CID-META: VersionHash:e7bac3a,CLOUDID:08995bd8fb7bc2b15f05408dc435ee31,BulkI
-	D:260520203343UF2G41NA,BulkQuantity:11,Recheck:0,SF:17|19|66|78|81|82|83|1
-	02|127|865|898,TC:nil,Content:0|15|52,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,B
-	ulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
-	0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_OBB
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 21c3cb4054f411f1aa26b74ffac11d73-20260521
-X-User: cuitao@kylinos.cn
-Received: from [192.168.108.130] [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <cuitao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 803809240; Thu, 21 May 2026 17:04:54 +0800
-Message-ID: <5d59c249-5e8d-482d-bb83-11f6ed6e0e8c@kylinos.cn>
-Date: Thu, 21 May 2026 17:04:49 +0800
+	s=arc-20240116; t=1779355707; c=relaxed/simple;
+	bh=TCuBdQxIaXMb5Kz93JXxvVM0Iz93kDNFn+gcxV2K+yE=;
+	h=From:Content-Type:Subject:Message-Id:In-Reply-To:To:Cc:Date:
+	 Mime-Version:References; b=unw2hPcJ7EJESK0RM+c8qOoOxezYAh8d7jF14zXRXkYA05J7Xi6xE3fCdj0YKmWmoILVPAqOQKZdNa4hCIqPppvvSKX2ijwBu2AcZrnyz19Br66ONrkCCDz8AG4H8yA/wCmfZDnl9+2/Q/qiSCDm72wR99tQq92Vhb9F3HfHVdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=DBlRL4lg; arc=none smtp.client-ip=101.45.255.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="DBlRL4lg"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1779355654;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=TdQD3dL9aPkcA57ZfHSNhc602yaNoCAEDzOYq2YRLOI=;
+ b=DBlRL4lgCE7pdOW5fs+Hsl6Nzna/PF+1punKUrDc+HM1GC/tY4HEDc0G2WSI8Z1jzeiU3v
+ VdwoH3ZTB+mlQGSanYIKBggrTZ9/aNtCMBqpVo+XcbKlW+jOzqh+runm37oGAvJEbFPf1a
+ 9zRgPtOl0iDBli+J7AUJWjkTq96mJnP7VSxpPGLLNKpHXVdZpEA7Xk5UMd8tcmPjv4G2vx
+ 2r7IklxTJ6ql80DkXFwmMmGWmHsPsJCyD2kZbID5zf0usR0ReBENBwztoH1PvXJmbPhU/s
+ z32TsZSEIVVPRdmc6TDOONo0zMlg3mRUtBAW+3lKL7suTRHvbZYIGnSHSG2AnA==
+From: "Yu Kuai" <yukuai@fnnas.com>
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [PATCH] block, bfq: skip dispatch when selected queue has no next_rq
+Message-Id: <f0c0ed75-0858-4464-b22f-d64a6e3048cd@fygo.io>
+Received: from [192.168.1.104] ([39.182.0.188]) by smtp.feishu.cn with ESMTPS; Thu, 21 May 2026 17:27:30 +0800
+In-Reply-To: <20260520095024.685338-1-dayou5941@163.com>
+To: <dayou5941@163.com>, <linux-block@vger.kernel.org>
+Cc: <axboe@kernel.dk>, <liyouhong@kylinos.cn>, <yukuai@fygo.io>
+Date: Thu, 21 May 2026 17:27:28 +0800
+X-Lms-Return-Path: <lba+26a0ed004+d6d62b+vger.kernel.org+yukuai@fnnas.com>
+Reply-To: yukuai@fygo.io
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-throttle: schedule parent dispatch in tg_flush_bios()
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: axboe@kernel.dk, cgroups@vger.kernel.org, josef@toxicpanda.com,
- linux-block@vger.kernel.org, tj@kernel.org
-References: <ag2owaQQoigp_fSV@shinmob>
- <20260520142022.1799724-1-cuitao@kylinos.cn> <ag5DjOCrzfD7D_Ln@shinmob>
- <31179261-64e0-4950-b112-32627d48e734@kylinos.cn> <ag6OXDuTc3JubfqV@shinmob>
-From: Tao Cui <cuitao@kylinos.cn>
-In-Reply-To: <ag6OXDuTc3JubfqV@shinmob>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Original-From: Yu Kuai <yukuai@fygo.io>
+References: <20260520095024.685338-1-dayou5941@163.com>
 
-Hello，
+Hi,
 
-Following up on my analysis, I did some further investigation into
-why I couldn't reproduce the failure locally.
+=E5=9C=A8 2026/5/20 17:50, dayou5941@163.com =E5=86=99=E9=81=93:
+> From: liyouhong <liyouhong@kylinos.cn>
+>
+> bfq_dispatch_rq_from_bfqq() dispatches bfqq->next_rq directly. Add a
+> guard in __bfq_dispatch_request() so that dispatch is skipped if the
+> selected queue unexpectedly has no next request.
+>
+> This keeps behavior unchanged in normal paths while avoiding entering
+> the dispatch helper with a missing next_rq.
 
-The root cause is a timing-sensitive race between the dispatch and
-SCSI state transition. Whether the race manifests depends on kernel
-build configs that affect execution speed.
+Can you explan in which case bfqq can be returned from bfq_select_queue
+with next_rq set to NULL? I didn't find it with a quick review.
 
-在 2026/5/21 12:54, Shin'ichiro Kawasaki 写道:
+Take a look at bfq_dispatch_rq_from_bfqq(), bfqq->next_rq will be dereferen=
+ced
+unconditionally, which should lead to kernel crash before this patch if
+next_rq can be NULL.
 
->> If the issue persists after running with LC_ALL=C ./check throtl/004, I'll investigate further.
-> 
-I found the following key differences between my config and the
-Fedora debug config:
+>
+> Signed-off-by: liyouhong <liyouhong@kylinos.cn>
+>
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 141c602d5e85..c3d9d02064b7 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5226,7 +5226,7 @@ static struct request *__bfq_dispatch_request(struc=
+t blk_mq_hw_ctx *hctx)
+>   		goto exit;
+>  =20
+>   	bfqq =3D bfq_select_queue(bfqd);
+> -	if (!bfqq)
+> +	if (!bfqq || !bfqq->next_rq)
+>   		goto exit;
+>  =20
+>   	rq =3D bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
 
-  Config                    Mine    Fedora
-  CONFIG_PREEMPT            n       y
-  CONFIG_KASAN              n       y
-  CONFIG_PROVE_LOCKING      n       y
-  CONFIG_DEBUG_PREEMPT      n       y
-  CONFIG_DEBUG_SPINLOCK     n       y
-  CONFIG_LOCKDEP            n       y
-  CONFIG_DEBUG_KMEMLEAK     n       y
-
-KASAN and lock debugging slow down the __del_gendisk() path
-significantly. This gives dispatch_work enough time to run and
-submit bios while the device is still in SDEV_CANCEL, triggering
-the BLK_STS_OFFLINE (ENODEV) response.
-
-After disabling the first four options (CONFIG_PREEMPT, CONFIG_KASAN,
-CONFIG_PROVE_LOCKING, CONFIG_DEBUG_PREEMPT) on the Fedora config,
-the test passes:
-
-throtl/004 (nullb) (delete disk while IO is throttled)       [passed]
-    runtime  0.763s
-throtl/004 (sdebug) (delete disk while IO is throttled)      [passed]
-    runtime  0.923s
-
-This confirms the race is timing-sensitive and depends on the
-kernel build config. The fix with bio_io_error() is still the
-right approach -- it completes bios directly at the throttle
-layer, avoiding the SCSI state check entirely.
-
-Thanks,
-Tao
-
+--=20
+Thansk,
+Kuai
