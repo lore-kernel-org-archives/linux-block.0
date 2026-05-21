@@ -1,111 +1,164 @@
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F35E397B02;
-	Thu, 21 May 2026 07:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DBA397B1C;
+	Thu, 21 May 2026 07:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779348861; cv=none; b=EtS7zSjjyrTKVuUM0oQkJ43trVvUDFBV6FbFvNsAB5bgt48Dg5Hxwri+3UduTFw09qo40eom1h8u38OWvXmSyFNrKtwW/wca3cw6ILk8zNBbKiyp2mLKGWkoYMtO+pX6ZtigUEsOjKCvCXoIS1F2a9p0pJlgoAUTJbh+rB6TTOQ=
+	t=1779349978; cv=none; b=QI/CgUQjNJQEzMhtNUld79MuVd1t9QwBc6T/QoYTOjt6QlhX42H8UiQJhbC2b048q4OTZ0tc+naCKb1rdaiyfvs4v+BTpqW1OSYWhHlNhuiCMiIvoZhDlMhjUXFTRrndlA0+tAJqaCOsLWA07sQyDeJttnYev4y5+YoXow7e7fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779348861; c=relaxed/simple;
-	bh=OmnMaX9ik+XuaAJfZZpEW4OaX30cmy0+4VMgXEukpr8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=umh5tAo5i3GUmjiW55biqcNioknlwXHYw46cGXRU06tKgGURejqRmXGVIH7Lj98blWqhJ55Z/67YHkwrPCIZ0su3/YxdHVDOaS8O19smtk4gLQRWAaTayYTAScG5eZg/k3YGph8B6I4Hd7ZnF5Pm+BfXi2pALOuDXK6uF4ZjayM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=xIJT839r; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+	s=arc-20240116; t=1779349978; c=relaxed/simple;
+	bh=g5lNOWZdFZ078Eg8FihJThI93jDxzsjGBAigjw8fo38=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=gdeTBoBFWKN+wagATxPZjwLGzFdIi6wt36WopyhGBx2r2hewUOXxTp3f1FLcNhOaLtolPk1xN/cBvY1sDXirOy8KSH08s9p+Yrt86uhuSl0iNqMo1+WIuXZfpu6D+Y+KNIO1CO8k0i2P3e+49JhCxSdS8PoozV/9mKVjPzGqfzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xhTIw633; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="xIJT839r"
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1779348537;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pgNeb9y7oioHQCP03azgKcyZm+rXC/BLtQGfBx3gEJs=;
-	b=xIJT839rjwpMDJ9ntjlxhaYBhsAhDZzKnLBjRzKyQ28PcibudhQlwdF59sXgaNXxGA7HtV
-	GmqWrDiv6M06jo+W2egxMt4Sw0MGhupIwv+MV0cjVVDWv6AtMRWP3y0Hxlp9wb1nTkCPw8
-	+yeRAgbKZgZNIqmtBKinmvQlGPadw80=
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: [PATCH] block: Avoid mounting the bdev pseudo-filesystem in userspace
-Date: Thu, 21 May 2026 10:28:56 +0300
-Message-ID: <20260521072857.5078-1-arefev@swemel.ru>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xhTIw633"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A06FC2BCB9;
+	Thu, 21 May 2026 07:52:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux.dev; s=korg;
+	t=1779349977; bh=g5lNOWZdFZ078Eg8FihJThI93jDxzsjGBAigjw8fo38=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=xhTIw633sN19LCBdjB1HTf9dSgzdyM88djd03g3BpnZHdUyCCkbcKfy36L1S7zUB3
+	 hwfBhn5IG72NrMEjIvZwX/q0t4z3l9jlJ/GykCpm20eLuBbUblip4QWbimYlbDI7JB
+	 b+IP+0hfTs0YUy63TXNSrCWCoc6HEQ7tal7tCB6o=
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F92CD4F5E;
+	Thu, 21 May 2026 07:52:57 +0000 (UTC)
+From: Alvin Sun <alvin.sun@linux.dev>
+Date: Thu, 21 May 2026 15:52:53 +0800
+Subject: [PATCH v2 1/7] rust: module: add `THIS_MODULE` const to
+ `ModuleMetadata` trait
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260521-fix-fops-owner-v2-1-fd99079c5a04@linux.dev>
+References: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
+In-Reply-To: <20260521-fix-fops-owner-v2-0-fd99079c5a04@linux.dev>
+To: Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+ Petr Pavlu <petr.pavlu@suse.com>, Daniel Gomez <da.gomez@kernel.org>, 
+ Sami Tolvanen <samitolvanen@google.com>, Aaron Tomlin <atomlin@atomlin.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>, 
+ Breno Leitao <leitao@debian.org>, Jens Axboe <axboe@kernel.dk>
+Cc: rust-for-linux@vger.kernel.org, linux-modules@vger.kernel.org, 
+ driver-core@lists.linux.dev, dri-devel@lists.freedesktop.org, 
+ nova-gpu@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, linux-block@vger.kernel.org, 
+ Alvin Sun <alvin.sun@linux.dev>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779349975; l=3841;
+ i=alvin.sun@linux.dev; s=20260317; h=from:subject:message-id;
+ bh=g5lNOWZdFZ078Eg8FihJThI93jDxzsjGBAigjw8fo38=;
+ b=FhGtAlbF3396Z+dQAsyxXzU2I9Oz+YJMiNSCAigLuceECR4JjS9R0/Tvaps4sBC+ytD60pqQZ
+ Arr+EzySJNWBLxRc55m2GilIMFF4U2MTiMxCo80BR4hrhjbfpnj+i/w
+X-Developer-Key: i=alvin.sun@linux.dev; a=ed25519;
+ pk=CHcwQp8GSoj25V/L1ZWNSQjWp9eSIb0s9LKr0Nm3WuE=
+X-Endpoint-Received: by B4 Relay for alvin.sun@linux.dev/20260317 with
+ auth_id=684
 
-The bdev pseudo-filesystem is an internal kernel filesystem with which
-userspace should not interfere. Unregister it so that userspace cannot
-even attempt to mount it.
+Add a `THIS_MODULE` const to the `ModuleMetadata` trait so that
+modules can provide their `ThisModule` pointer usable in const
+contexts such as static file_operations.
 
-This fixes a bug [1] that occurs when attempting to access files,
-because the system call move_mount() uses pointers declared in the
-inode_operations structure, which for the bdev pseudo-filesystem
-are always equal to 0. `inode->i_op = &empty_iops;`
+Move the `THIS_MODULE` static from the `module!` macro into the
+`ModuleMetadata` impl, and update `__init` to use
+`LocalModule::THIS_MODULE` instead.
 
-[1]
-
- BUG: kernel NULL pointer dereference, address: 0000000000000000
- #PF: supervisor instruction fetch in kernel mode
- #PF: error_code(0x0010) - not-present page
- PGD 23380067 P4D 23380067 PUD 23381067 PMD 0 
- Oops: 0010 [#1] PREEMPT SMP KASAN NOPTI
- CPU: 2 PID: 17125 Comm: syz-executor.0 Not tainted 6.1.155-syzkaller-00350-g84221fde2681 #0
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
- RIP: 0010:0x0
-
- Call Trace:
- <TASK>
- lookup_open.isra.0+0x700/0x1180 fs/namei.c:3460
- open_last_lookups fs/namei.c:3550 [inline]
- path_openat+0x953/0x2700 fs/namei.c:3780
- do_filp_open+0x1c5/0x410 fs/namei.c:3810
- do_sys_openat2+0x171/0x4d0 fs/open.c:1318
- do_sys_open fs/open.c:1334 [inline]
- __do_sys_openat fs/open.c:1350 [inline]
- __se_sys_openat fs/open.c:1345 [inline]
- __x64_sys_openat+0x13c/0x1f0 fs/open.c:1345
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x35/0x80 arch/x86/entry/common.c:81
- entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Link: https://lore.kernel.org/all/20131010004732.GJ13318@ZenIV.linux.org.uk/T/#
-Cc: stable@vger.kernel.org
-Signed-off-by: Denis Arefev <arefev@swemel.ru>
+Signed-off-by: Alvin Sun <alvin.sun@linux.dev>
 ---
- block/bdev.c | 5 -----
- 1 file changed, 5 deletions(-)
+ rust/kernel/lib.rs    |  3 +++
+ rust/macros/module.rs | 34 +++++++++++++++++-----------------
+ 2 files changed, 20 insertions(+), 17 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index bb0ffa3bb4df..107ac9eaac7f 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -446,15 +446,10 @@ EXPORT_SYMBOL_GPL(blockdev_superblock);
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index b72b2fbe046d6..f0cf0705d9697 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -184,6 +184,9 @@ fn init(module: &'static ThisModule) -> impl pin_init::PinInit<Self, error::Erro
+ pub trait ModuleMetadata {
+     /// The name of the module as specified in the `module!` macro.
+     const NAME: &'static crate::str::CStr;
++
++    /// The module's `THIS_MODULE` pointer.
++    const THIS_MODULE: ThisModule;
+ }
  
- void __init bdev_cache_init(void)
- {
--	int err;
+ /// Equivalent to `THIS_MODULE` in the C API.
+diff --git a/rust/macros/module.rs b/rust/macros/module.rs
+index 06c18e2075083..b6d7b3299fbf9 100644
+--- a/rust/macros/module.rs
++++ b/rust/macros/module.rs
+@@ -497,28 +497,28 @@ pub(crate) fn module(info: ModuleInfo) -> Result<TokenStream> {
+         /// Used by the printing macros, e.g. [`info!`].
+         const __LOG_PREFIX: &[u8] = #name_cstr.to_bytes_with_nul();
+ 
+-        // SAFETY: `__this_module` is constructed by the kernel at load time and will not be
+-        // freed until the module is unloaded.
+-        #[cfg(MODULE)]
+-        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+-            extern "C" {
+-                static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
+-            };
 -
- 	bdev_cachep = kmem_cache_create("bdev_cache", sizeof(struct bdev_inode),
- 			0, (SLAB_HWCACHE_ALIGN|SLAB_RECLAIM_ACCOUNT|
- 				SLAB_ACCOUNT|SLAB_PANIC),
- 			init_once);
--	err = register_filesystem(&bd_type);
--	if (err)
--		panic("Cannot register bdev pseudo-fs");
- 	blockdev_mnt = kern_mount(&bd_type);
- 	if (IS_ERR(blockdev_mnt))
- 		panic("Cannot create bdev pseudo-fs");
+-            ::kernel::ThisModule::from_ptr(__this_module.get())
+-        };
+-
+-        #[cfg(not(MODULE))]
+-        static THIS_MODULE: ::kernel::ThisModule = unsafe {
+-            ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
+-        };
+-
+         /// The `LocalModule` type is the type of the module created by `module!`,
+         /// `module_pci_driver!`, `module_platform_driver!`, etc.
+         type LocalModule = #type_;
+ 
+         impl ::kernel::ModuleMetadata for #type_ {
+             const NAME: &'static ::kernel::str::CStr = #name_cstr;
++
++            #[cfg(MODULE)]
++            const THIS_MODULE: ::kernel::ThisModule = {
++                extern "C" {
++                    static __this_module: ::kernel::types::Opaque<::kernel::bindings::module>;
++                }
++
++                // SAFETY: `__this_module` is constructed by the kernel at load time
++                // and lives until the module is unloaded.
++                unsafe { ::kernel::ThisModule::from_ptr(__this_module.get()) }
++            };
++
++            #[cfg(not(MODULE))]
++            const THIS_MODULE: ::kernel::ThisModule = unsafe {
++                ::kernel::ThisModule::from_ptr(::core::ptr::null_mut())
++            };
+         }
+ 
+         // Double nested modules, since then nobody can access the public items inside.
+@@ -616,7 +616,7 @@ pub extern "C" fn #ident_exit() {
+                 /// This function must only be called once.
+                 unsafe fn __init() -> ::kernel::ffi::c_int {
+                     let initer = <super::super::LocalModule as ::kernel::InPlaceModule>::init(
+-                        &super::super::THIS_MODULE
++                        &<super::super::LocalModule as ::kernel::ModuleMetadata>::THIS_MODULE
+                     );
+                     // SAFETY: No data race, since `__MOD` can only be accessed by this module
+                     // and there only `__init` and `__exit` access it. These functions are only
+
 -- 
 2.43.0
+
 
