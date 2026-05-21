@@ -1,92 +1,75 @@
-Received: from sg-3-27.ptr.tlmpb.com (sg-3-27.ptr.tlmpb.com [101.45.255.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1043134B1B0
-	for <linux-block@vger.kernel.org>; Thu, 21 May 2026 09:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.45.255.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D38C35E95F
+	for <linux-block@vger.kernel.org>; Thu, 21 May 2026 09:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779355707; cv=none; b=ORcDpPm2sXI4aZ0uQulojgXj+PWfJ+j4A2w/kF9w3tOk5sjqScJU3SJGR/NAQReJ5q3Nk0P47/NkLlCI+gOdziEnVLf4L5030cAJDGoHOAT5+xH5sgIRegXRHYC9vHqENLyuKsvLuE1pJkQ+kC4u2Btb0F0vMbwns8mIUcHhaQU=
+	t=1779356655; cv=none; b=WtI5HL/m4t7weaqpNz7+hhjFmop3/p36/jwO+JAxX/3YwpZhlQaJBmJ6RmQkz3GR73NV+c1qcwxRATVg/XudRq6djH4vboS8Ql+EvaqYexvoA685ZlO1R+XP+GVSbJRIybkRaXEgMEl4V/yAsSJcVN+0VjofYjMpNAAGd7wotd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779355707; c=relaxed/simple;
-	bh=TCuBdQxIaXMb5Kz93JXxvVM0Iz93kDNFn+gcxV2K+yE=;
-	h=From:Content-Type:Subject:Message-Id:In-Reply-To:To:Cc:Date:
-	 Mime-Version:References; b=unw2hPcJ7EJESK0RM+c8qOoOxezYAh8d7jF14zXRXkYA05J7Xi6xE3fCdj0YKmWmoILVPAqOQKZdNa4hCIqPppvvSKX2ijwBu2AcZrnyz19Br66ONrkCCDz8AG4H8yA/wCmfZDnl9+2/Q/qiSCDm72wR99tQq92Vhb9F3HfHVdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=DBlRL4lg; arc=none smtp.client-ip=101.45.255.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1779356655; c=relaxed/simple;
+	bh=9HEUyvv9OsJhJY9co8XKFJooiMT5u9qY5HI6gln70Ts=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=gLBRHXaw3WJovLJWg8+p1zPu1WQQGBZ2yWaDolfLRqoZMXSlfAZoMmI9vRRRxN6VaAZMT0DHg4p2eqIGBs0nlblO+VIOImUllNya2MeM070F48HYjJbA75Wn5gflc0tiixE3OoddsGyBncmmksYZw5j9J+MKJ0PJ5VvTatCiBTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ay5hS3ch; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="DBlRL4lg"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1779355654;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=TdQD3dL9aPkcA57ZfHSNhc602yaNoCAEDzOYq2YRLOI=;
- b=DBlRL4lgCE7pdOW5fs+Hsl6Nzna/PF+1punKUrDc+HM1GC/tY4HEDc0G2WSI8Z1jzeiU3v
- VdwoH3ZTB+mlQGSanYIKBggrTZ9/aNtCMBqpVo+XcbKlW+jOzqh+runm37oGAvJEbFPf1a
- 9zRgPtOl0iDBli+J7AUJWjkTq96mJnP7VSxpPGLLNKpHXVdZpEA7Xk5UMd8tcmPjv4G2vx
- 2r7IklxTJ6ql80DkXFwmMmGWmHsPsJCyD2kZbID5zf0usR0ReBENBwztoH1PvXJmbPhU/s
- z32TsZSEIVVPRdmc6TDOONo0zMlg3mRUtBAW+3lKL7suTRHvbZYIGnSHSG2AnA==
-From: "Yu Kuai" <yukuai@fnnas.com>
-User-Agent: Mozilla Thunderbird
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [PATCH] block, bfq: skip dispatch when selected queue has no next_rq
-Message-Id: <f0c0ed75-0858-4464-b22f-d64a6e3048cd@fygo.io>
-Received: from [192.168.1.104] ([39.182.0.188]) by smtp.feishu.cn with ESMTPS; Thu, 21 May 2026 17:27:30 +0800
-In-Reply-To: <20260520095024.685338-1-dayou5941@163.com>
-To: <dayou5941@163.com>, <linux-block@vger.kernel.org>
-Cc: <axboe@kernel.dk>, <liyouhong@kylinos.cn>, <yukuai@fygo.io>
-Date: Thu, 21 May 2026 17:27:28 +0800
-X-Lms-Return-Path: <lba+26a0ed004+d6d62b+vger.kernel.org+yukuai@fnnas.com>
-Reply-To: yukuai@fygo.io
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ay5hS3ch"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=9HEUyvv9OsJhJY9co8XKFJooiMT5u9qY5HI6gln70Ts=; b=a
+	y5hS3chzo7khOOxxb1OZ3txu/wru4EEiZkDSTMmKAE9DBdBp41I/WLuPGyQ22Mkj
+	IGzSRfinY5lfK736Ut8vhIGqkra/17BUu3TXGRv0VbdbMZApZCXno+w+9m7b+XKR
+	zdgUofzm1GwFGVal6k1893D4CqExmrLnryIaMtaGuw=
+Received: from dayou5941$163.com ( [116.128.244.169] ) by
+ ajax-webmail-wmsvr-40-143 (Coremail) ; Thu, 21 May 2026 17:43:50 +0800
+ (CST)
+Date: Thu, 21 May 2026 17:43:50 +0800 (CST)
+From: =?GBK?B?wO7T07roIA==?= <dayou5941@163.com>
+To: yukuai@fygo.io
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk, liyouhong@kylinos.cn
+Subject: Re:Re: [PATCH] block, bfq: skip dispatch when selected queue has no
+ next_rq
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20260403(27802f6d) Copyright (c) 2002-2026 www.mailtech.cn 163com
+In-Reply-To: <f0c0ed75-0858-4464-b22f-d64a6e3048cd@fygo.io>
+References: <20260520095024.685338-1-dayou5941@163.com>
+ <f0c0ed75-0858-4464-b22f-d64a6e3048cd@fygo.io>
+X-NTES-SC: AL_Qu2cC/+euU4o5iibYekcmEsSg+02Wsq5u/si1YVec+4GuyvKwB8BcnlRBErK3uKjDiGutCWRdCdExuV8ZYJncNnS6UMCmVt4rWdUskgq4A==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Yu Kuai <yukuai@fygo.io>
-References: <20260520095024.685338-1-dayou5941@163.com>
+MIME-Version: 1.0
+Message-ID: <3446c150.87ac.19e49eb7f3f.Coremail.dayou5941@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:jygvCgDXf0jX0w5qeAOpAA--.1265W
+X-CM-SenderInfo: 5gd103ivzuiqqrwthudrp/xtbC+hdI9moO09dV1QAA3z
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-Hi,
-
-=E5=9C=A8 2026/5/20 17:50, dayou5941@163.com =E5=86=99=E9=81=93:
-> From: liyouhong <liyouhong@kylinos.cn>
->
-> bfq_dispatch_rq_from_bfqq() dispatches bfqq->next_rq directly. Add a
-> guard in __bfq_dispatch_request() so that dispatch is skipped if the
-> selected queue unexpectedly has no next request.
->
-> This keeps behavior unchanged in normal paths while avoiding entering
-> the dispatch helper with a missing next_rq.
-
-Can you explan in which case bfqq can be returned from bfq_select_queue
-with next_rq set to NULL? I didn't find it with a quick review.
-
-Take a look at bfq_dispatch_rq_from_bfqq(), bfqq->next_rq will be dereferen=
-ced
-unconditionally, which should lead to kernel crash before this patch if
-next_rq can be NULL.
-
->
-> Signed-off-by: liyouhong <liyouhong@kylinos.cn>
->
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 141c602d5e85..c3d9d02064b7 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -5226,7 +5226,7 @@ static struct request *__bfq_dispatch_request(struc=
-t blk_mq_hw_ctx *hctx)
->   		goto exit;
->  =20
->   	bfqq =3D bfq_select_queue(bfqd);
-> -	if (!bfqq)
-> +	if (!bfqq || !bfqq->next_rq)
->   		goto exit;
->  =20
->   	rq =3D bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
-
---=20
-Thansk,
-Kuai
+CgoKCgoKCgoKCgoKCgoKCgpBdCAyMDI2LTA1LTIxIDE3OjI3OjI4LCAiWXUgS3VhaSIgPHl1a3Vh
+aUBmbm5hcy5jb20+IHdyb3RlOgo+SGksCj4KPtTaIDIwMjYvNS8yMCAxNzo1MCwgZGF5b3U1OTQx
+QDE2My5jb20g0LS1wDoKPj4gRnJvbTogbGl5b3Vob25nIDxsaXlvdWhvbmdAa3lsaW5vcy5jbj4K
+Pj4KPj4gYmZxX2Rpc3BhdGNoX3JxX2Zyb21fYmZxcSgpIGRpc3BhdGNoZXMgYmZxcS0+bmV4dF9y
+cSBkaXJlY3RseS4gQWRkIGEKPj4gZ3VhcmQgaW4gX19iZnFfZGlzcGF0Y2hfcmVxdWVzdCgpIHNv
+IHRoYXQgZGlzcGF0Y2ggaXMgc2tpcHBlZCBpZiB0aGUKPj4gc2VsZWN0ZWQgcXVldWUgdW5leHBl
+Y3RlZGx5IGhhcyBubyBuZXh0IHJlcXVlc3QuCj4+Cj4+IFRoaXMga2VlcHMgYmVoYXZpb3IgdW5j
+aGFuZ2VkIGluIG5vcm1hbCBwYXRocyB3aGlsZSBhdm9pZGluZyBlbnRlcmluZwo+PiB0aGUgZGlz
+cGF0Y2ggaGVscGVyIHdpdGggYSBtaXNzaW5nIG5leHRfcnEuCj4KPkNhbiB5b3UgZXhwbGFuIGlu
+IHdoaWNoIGNhc2UgYmZxcSBjYW4gYmUgcmV0dXJuZWQgZnJvbSBiZnFfc2VsZWN0X3F1ZXVlCj53
+aXRoIG5leHRfcnEgc2V0IHRvIE5VTEw/IEkgZGlkbid0IGZpbmQgaXQgd2l0aCBhIHF1aWNrIHJl
+dmlldy4KPgo+VGFrZSBhIGxvb2sgYXQgYmZxX2Rpc3BhdGNoX3JxX2Zyb21fYmZxcSgpLCBiZnFx
+LT5uZXh0X3JxIHdpbGwgYmUgZGVyZWZlcmVuY2VkCj51bmNvbmRpdGlvbmFsbHksIHdoaWNoIHNo
+b3VsZCBsZWFkIHRvIGtlcm5lbCBjcmFzaCBiZWZvcmUgdGhpcyBwYXRjaCBpZgo+bmV4dF9ycSBj
+YW4gYmUgTlVMTC4KCj4KClRoYW5rcyBmb3IgdGhlIGNsYXJpZmljYXRpb24uCgpJIGFncmVlIHRo
+ZXJlIGlzIG5vIGRlbW9uc3RyYXRlZCBwYXRoIGZvciBgbmV4dF9ycSA9PSBOVUxMYCBoZXJlLCBz
+byBJJ2xsIGRyb3AKdGhpcyBwYXRjaC4KCk9uZSBmb2xsb3ctdXAgcXVlc3Rpb246IGlmIGBuZXh0
+X3JxYCBpcyBndWFyYW50ZWVkIG5vbi1OVUxMIGFmdGVyCmBiZnFfc2VsZWN0X3F1ZXVlKClgLCB3
+b3VsZCB5b3UgY29uc2lkZXIgdGhlIGBpZiAocnEpYCBjaGVjayBhZnRlcgpgYmZxX2Rpc3BhdGNo
+X3JxX2Zyb21fYmZxcSgpYCByZWR1bmRhbnQgZm9yIHRoYXQgcGF0aD8KClRoYW5rcywKbGl5b3Vo
+b25nCg==
