@@ -1,98 +1,104 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC02D407575
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 14:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3AF41C2F2
+	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 14:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779458415; cv=none; b=rrlR74v9HcVpEfzcr5UJdkgI97FWyknBk95L7RQBl3A01OWPc1yb1I+o/5zLu5j9qHw4zAWpilbifTxzmhSo1R5FM6pu8yDwf+I/Bn/G4EDLspTnsHG6UjAg4k9OaQ7QJRogATz8j4DCYApudyDchGTZm8GmRFsz7cQzv2U4klg=
+	t=1779458770; cv=none; b=cd24xaKsiNmMHftG74BVFiAbUF0IDlSHel7LJZgl3YLsWOics37TbaFtMjbe+lAJBH9l4BiZlAwFiyHHhBIJuAgiqoOv6FRC9SLWXD1coIrYRsUHvcgFH16yEeEOS5Zx178pIXOWT6HbtKVCBWenzAPA4GDeAcVSNVJzQ0tVeAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779458415; c=relaxed/simple;
-	bh=SVSeh0WtbiLfmNIaz76M4SuD93elHicyms9C1xrpiVQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l8akHmkY8lp2MbsSv/lzXpF7YEgS87yjdk30o+6u7rP0XP7qZILVj82AQwetYpAg2g8PkVo6329Ji9Yw84/3zAoq3Sk3QEIeDmN0wqrruCUKZPnjiC7zBhGMxO8a8NpfpAW+fJWq9EeqrdSEnOWqxs5OxQ31THgOOmLJ268mZic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=ispeognI; arc=none smtp.client-ip=209.85.160.53
+	s=arc-20240116; t=1779458770; c=relaxed/simple;
+	bh=RKf4SJP//pUgs2fFYiO7wQADQ7h3MuKCkA4umIzoOV8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=SjYvaQVDA+CLlLVCRmdz772Be/hNAOtXOGzoZJH5gCVFvG0cIoq41FkODzJU7ERGY7PaRRHAablEB1WAcPHhmcKO85hOf3H7KksffjZVFa5XU+inMVeBGhTjxqBHyryh2dKltIEgroeK3QbATqKnUg5+DxOlLIGVHqaPVhBT5G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=N6Fuim3M; arc=none smtp.client-ip=209.85.160.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="ispeognI"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-43b7987a9d1so197522fac.1
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 07:00:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="N6Fuim3M"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-408778a8ec4so4509127fac.0
+        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 07:06:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779458409; x=1780063209; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Duo5QNbnu48RMs5TWYd9pNItgsjRBgd5VchjQlpi0vQ=;
-        b=ispeognIpQBoqeVvfvDxcvqzYFAxk/i/tnBXGiTSf1689AbY8usl7xFnqjOK6WbIWX
-         VKgkLBFYHcjizZZ46pILFkY3617jbQ6N/hv1nSZR+uJlAa34FuqDUlI6MhWUS6I0hf/i
-         QmPT3X93nH4vq2Heemv4LtmxHKp82fCdN97TBZHd2eEtFWRdm7UqNhsGsUrCeHF0FwSO
-         89x5OmgJFfUpdffwUiOQBFE/2wHozwhyLY5oCEZGpsWf8YHvm4hqwowTHlpuXz6w94Vf
-         1oEGb9BaQx2N9QYl+Lr8e3IeLlgHK+KxHu5Ifmr6lvXOSxdWgCwk+AP5KfCvGkogtp/n
-         RIBA==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779458765; x=1780063565; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IsAhZciPltskpB+CH+Xn7+a5Hugw+ATxejWcisf+UfI=;
+        b=N6Fuim3M7WpKq1ac4h8aGvtDGr5SwUULxeyOmAsYwk2QawUm2HdKo7UqjW2Y5lUoSb
+         uNo0NRqXCZo+7LbVJW1NfzmVVOmaL7E1FRiT5tyiiDRqlHPR85PCeRp/XwzSbgLIwMpc
+         IgciMG23yzxRX6zPR1DvG2+jyOTzzU2+KYAHxZuHvcG7eIRzGTf2IKVnb4tT+uI1r830
+         yIFqVVto63eNsVby4KatHlDNDanX7hSVqzRDpDoNjAsmTdQFf1ENLysrwBFtd+8s3d1C
+         E23/COzs/cpLGXABAiYAbDNOh9e+6rsQMRfMTfvyomGtiThuXTkSYrYxUY0mA/iSRg3P
+         xO/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779458409; x=1780063209;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Duo5QNbnu48RMs5TWYd9pNItgsjRBgd5VchjQlpi0vQ=;
-        b=c1+vb3Yf/wajh2eqSoQ60c1ohJ68yDm0jDVK3ST8926NIPSAHrBjawh50wiuO1uEsz
-         qb5SlOU997CbLyb6j+gVL0hDCsoVnC2IMui910/2KDp8tlYA/fJy94YXYvgtlY7i4MTc
-         yIqeHD9w6grXJnXcCjAKPtROYyt9FkgL38XGPihBgclUij6T3cvjqHcph2c99FIJt/yO
-         nYtqWJsX5YgOxZygDd4847K6Si4gjL0lsB/bzZEjQIG/lrIE0t1uCYce7jFrgbtE0nU4
-         Of6c9NHJfPOzQkphk+fgBQ0whbNvvbaFqznaW5PmSkZs1BzIUcJ4NoKiw9j/R3OTY7BF
-         ql6g==
-X-Forwarded-Encrypted: i=1; AFNElJ8eaGr7Yjo3ukB+J7sMybX1NmQXXZgRLKr9LLEpPCWDRoPHcbjcu9H7pIe956Yc+kUo/65nvRTBr1EfbQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRbg7OW6FQ4JKXmCjlkfw5PAJzCHKXHXZPCXxWJ4J4BguUCUd2
-	lT3IzpOBz1jASpYVfQEyLu5PKIXYRpvPTgy4TGrX1sbZLIgJsnkLEtYyQR2tX7Q2TQQ=
-X-Gm-Gg: Acq92OF5L1acs6mXwmnX/m0Ykd1x6F5yVQ5h7sWnpxkt5EyhUcxBMkofknwEPRubyS8
-	vNKE75RfsAOzWWexamN0gKPVn/Zr8ZD8UxeiEnSxra8bWgXN4QlGZ4D868FgNnGX+46MDelnvVf
-	PEbJKttJoRTHgulxVKlGWQ2HNMGzl1XmMQt5QJccdFThl4UA5atBKVc96vP+5intRqUwIXFH9rv
-	DuE6HzMDRcXjOWgJUNLtn25pb+pHoDvUm+ORR16ACpfB21jkMYzyG16rj9klDfm+ZTfHfkRyi85
-	b8pmDuALrgLoTgkoU9KA+mnITVZpDdIN4OXB/iLqHb7ViI8L4oPvfRGgo7JbK6HnoIqnSdAoVci
-	4NyGzXXYaQe1vUIR6wEPvNSuqVTGibRNKCLiVWYfR4fvVgyJVUbdXJLYab3NUeFm+OUYcaclMYq
-	l8mFyuV57U/ZGgKGl3JmHFEK91VyqNARQJ3XK0pDcIBcDuhpqjWa1J7EG07h+xwKeJoPQExOOFj
-	DgiZy5me0+VSSQtwlo=
-X-Received: by 2002:a05:6870:31b0:b0:417:2b13:f2cd with SMTP id 586e51a60fabf-43b5ac7afbbmr2158095fac.10.1779458408591;
-        Fri, 22 May 2026 07:00:08 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b639fd705sm1924724fac.15.2026.05.22.07.00.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 May 2026 07:00:07 -0700 (PDT)
-Message-ID: <669e0818-4a21-406c-82ab-71c55c1a993a@kernel.dk>
-Date: Fri, 22 May 2026 08:00:06 -0600
+        d=1e100.net; s=20251104; t=1779458765; x=1780063565;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IsAhZciPltskpB+CH+Xn7+a5Hugw+ATxejWcisf+UfI=;
+        b=H3hCL/dEmcdlU4OMkOEB5HYWvLtD0cxDjHwtbFtwbX4w0j5en8Bs7FVkikykll8oA7
+         UYyB9m+kYYiE/2rQx8+ONMBC/KOxzUY9jir/bv9LVvdkJU6XculdYeFtwbP2fpNBKgAy
+         WNmGtM7CyObsbdEmRoRaqd/2m4UqZKNTtY85uJl3q4HTFQJj9EWMcip7YxJschJzkx1S
+         HT4Cz8d/s39lMrATLfRueZ/wA8sXwknp1ReNjWHqmnXUpSN2ySnoGUMzhbuwc7QT4zRw
+         I+euZPsudrXQ4pH8jR/TiqjOXhrjXKhl7cE5ww+Ot9mNogvZ74xCIpq7ECvv/FjWi/SK
+         fajQ==
+X-Gm-Message-State: AOJu0Yy6vv63xHK/gijURWMWjuU6VBoWHZSJKSCr62EpzjDvDhuuXVhE
+	W67CocAl4XBfu0bg2vlokT2PAY0FUNXoJI+gifY67fsI8V0abRQP9U1aVOqZoBUKpIw+nW3QwOx
+	w43Kp
+X-Gm-Gg: Acq92OGneIBEHGAg/LPNq7la7He0lfK4gWdjR7Q3uuQlTM1HzFcFssoIco9O+SD8sCs
+	3phQt4a/CAFT9Wg3eRkK9oYmrzwIHEIvJ5SUMzkpuy99toQwY2RPgfFcjM1gI6BUMpb6onobcXZ
+	XhLFF5uuiuGKuKiHSeHoOqWa4zu2ntVON/P6QatFzKccspSl37CXtTmfjCF5Bh1T1ePuD0jm1v/
+	rBSagOcJLrSUpM5gE3Yi9WEKqfLTHXEEQ4uwx0JMEMk0OoRFysDW31mhz9MXLIdM10NhcdWnvXR
+	/96ixVnfkMbc6CT9NBL0LXuE685luR6Uu+HCBfiD8sFPDEilxJ1hH1ueWDqzr/vF+bDMcHn7fre
+	dO2+KHQGsMHWkRQXy98bIGZT+l/oP7m5sG4b9syZNmLhMudc/JgmS5+hUvA0fJYG/Zm3BugPLyt
+	ICeVBBKxtveS+gVo6OzxHdLzW8wgUC5a7MJtOrk53ZtWkBOFl9JI619t/L4zO3wyCSSf0alFRCo
+	fc=
+X-Received: by 2002:a05:6808:1719:b0:482:c65c:457e with SMTP id 5614622812f47-4854a0ead12mr2075770b6e.11.1779458764983;
+        Fri, 22 May 2026 07:06:04 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4855476ab77sm554972b6e.17.2026.05.22.07.06.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 May 2026 07:06:04 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20260522115622.588535-1-dlemoal@kernel.org>
+References: <20260522115622.588535-1-dlemoal@kernel.org>
+Subject: Re: [PATCH] block: avoid use-after-free in
+ disk_free_zone_resources()
+Message-Id: <177945876373.102352.8012707488920137128.b4-ty@b4>
+Date: Fri, 22 May 2026 08:06:03 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] block: propagate in_flight to whole disk on partition
- I/O
-To: Tang Yizhou <yizhou.tang@shopee.com>, hch@lst.de
-Cc: yukuai@fnnas.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Leon Hwang <leon.huangfu@shopee.com>
-References: <20260522131409.261259-1-yizhou.tang@shopee.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260522131409.261259-1-yizhou.tang@shopee.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On 5/22/26 7:14 AM, Tang Yizhou wrote:
-> Fixes: e016b78201a2 ("block: return just one value from part_in_flight")
+
+On Fri, 22 May 2026 20:56:22 +0900, Damien Le Moal wrote:
+> The function disk_update_zone_resources() may call
+> disk_free_zone_resources() in case of error, and following this,
+> blk_revalidate_disk_zones() will again calls disk_free_zone_resources() if
+> disk_update_zone_resources() failed. If a zone worker thread is being used
+> (which is the default for a rotational media zoned device),
+> disk_free_zone_resources() will try to stop the zone worker thread twice
+> because disk->zone_wplugs_worker is not reset to NULL when the worker
+> thread is stopped the first time.
 > 
-> v2: Update commit message.
-> v3: Take Christoph's advice and factor the common code into two helpers.
-> 
-> Suggested-by: Leon Hwang <leon.huangfu@shopee.com>
-> Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
-> ---
+> [...]
 
-Changelog goes _below_ this line, we don't want it in the git commit
-message. And Fixes goes with the other tags.
+Applied, thanks!
 
+[1/1] block: avoid use-after-free in disk_free_zone_resources()
+      commit: f6982769910ecddabdb5b8b9afdab0bb8b6668ac
+
+Best regards,
 -- 
 Jens Axboe
+
+
+
