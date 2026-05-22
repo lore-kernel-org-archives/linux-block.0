@@ -1,96 +1,266 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E86838B131
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 06:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779432904; cv=none; b=FwDbNDTfDeyPevnEVEIqL9KwjXxISMfxNnof5mm4bEMzPWV5aV6mmUZR892/pFJejIybdE+feFLJceyS79Pgmotp0ybB/+ez02i6xbyvUi18gY4TAAwQTaHSXXmT3mhg/SVvuKX53Zs5KDZZyM0pgTZm581/W/SRa0eiwf916sQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779432904; c=relaxed/simple;
-	bh=J3+5OL5EhLqcxq/nt7CPYWw8xRqdSV4nBMp25MrOrT8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cOTjyngdnLhZXJINTxKsB1dqY4+rRYlbjox1ZRyOLZgItxrkiY05fs6/hlw7yps8Q3F5QY/m+M6MPbxdJmuyTWsovOKHHHRGogh/ugZJGz/R99N0Cgo+YGfNZImaYqm1Hjm5qJbAIqWa5R+mJ+9GJGXQMarLOD++xMlDAWayYyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64M6swjV086528;
-	Fri, 22 May 2026 15:54:58 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64M6swhR086525
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 22 May 2026 15:54:58 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <7ef76131-d077-4cfc-80ab-69720a214a5c@I-love.SAKURA.ne.jp>
-Date: Fri, 22 May 2026 15:54:54 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D37F363C45
+	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 07:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779433261; cv=pass; b=TtsOnaqzhUV6rGnkOtPNDgF1wLzxo7NSPYlTJwpqXXVD9FVEuJ54hs/oRWsM9pQ7POmb+BeLZ3MeXFqmuhcQyc7bixydEcC3s7BnDIsk1OqtbVVNdSIj4r5b30+sImCeJ65uehKJGgtMxgEHv/U13RqfH+sNPdT8VdTf1ov0u94=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779433261; c=relaxed/simple;
+	bh=RPLULZwyGFBcnLzO3/6uBXaB8JE/6zjrHV/JLXWUDl0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NehmH6QCAgXtUU0Se0d/r1A9IQDZ1/n52kvlsciQwYzZStl9XTUVQMwwkTZZ4pEYSi+PcSxk4rJDhrEgAJToYFVS7uAiCweJLtdCzT4+yUsbOJPLrOmNlDObRs2YAg0RAOirMSXzWWMCPFX+Lq3OYIQdYFMiJaSvaCco3+dtauA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=HLzHPZrA; arc=pass smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="HLzHPZrA"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-488a8ca4aadso68020275e9.3
+        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 00:00:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779433258; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SwS/OMhl9WgO9ZStY5k4o19mNuYuxS0vCJfSfIxPTKkeIcBpxnql58tYdhcK40j0I3
+         8LelSf9p2Ejg/CixX8G/Adqi07k1hXdlS1TKK9YgvIA6jzuW7U6gC81F/N+c5b/cMbFx
+         khmH91oDMIZzYyTrZP330lgwFAJBMFx3DLZ5Twuz7Cet3+tmVODpUVxusIiKLk2Xs7Rt
+         wtlzq8/9a9Ke7blJGfISMwBVo2PFq+L2/zfxzebBGzCFEEycYOdxwApa5didi1ZZ8o4j
+         5kRRWQHzxi6rlAFtarWu+Qeva4zkr9xWrG3E+sg1F8A8GUd+ywI0LnVkMQ//sk8nffoz
+         el2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=DgrJhf9pCLWRyhDeCL2ag+63OL5JMEGKJLqO1vcQ/ro=;
+        fh=UPU3Kf9+2mHG0rkuf+78g8rGdzGgu0NbunL6LbKVc/I=;
+        b=ErLSnpvAbs5vRCO6e6EijxWwEuEDsXYB9Et5TqbbM468Y/1lUaE1t3s6t3l9BPqpvg
+         CQboZXIJ9CA453AwCn4RpNnyckBcl1wZbs1qAKmk037AuVCvoSIB9e4agKYodcZ6WwLB
+         Q27Jd70cnBoK4NaG0bWlvh69FN8ZI9d1ISXOh4JyLHeN16eACyMUS90xFndp+e6UXZbd
+         8C8VEwrUjZBRIL+gOZsvNQWRegvri8AuVvgZfZu8sw7iy/Oi5Wip8GqYa7BQX/q4vMkJ
+         1p8KuX2JVHESaDoAIlhu4xWupRzCBBkpnZ98jDHbaYt1TEChQKASgILqLXuiT56SFvuz
+         oI0w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1779433258; x=1780038058; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DgrJhf9pCLWRyhDeCL2ag+63OL5JMEGKJLqO1vcQ/ro=;
+        b=HLzHPZrA6n4uD7WqH3WLxWPD+3X9IiQxUW7HukJBPo7Mvwsojo4BP6KnY7uSUKLIWi
+         opGFMqwn4+HijbCbKmiy4klL/LZdhnJVTVcybWHMz+fREl7R7fdrp7+wZ72QwznzPmx6
+         jMZQMvZADyTeH4OzWGXbDbb/d4BWzVjOsHJApUlZtKXEETqJ4WWFNjczpfjgKm/GyRUv
+         HN0xRFVD7oDKuUdiPVdHJjJ8pc7XT0lIGCs1bEThAlru00LEmt5w7X7A0jH9DZNVc0ga
+         yax1LGmHjLJyGD24nv3bH/tJqhIfAC6dA41VqwTSPTPFP3sW0NN5McELKrCbW2VoYPe8
+         v5jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779433258; x=1780038058;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DgrJhf9pCLWRyhDeCL2ag+63OL5JMEGKJLqO1vcQ/ro=;
+        b=pBbnzQqBFPmdyw3JqDZuF8340IJcrHHvQ/8ImvK2nOdg4nmjjEbFkMFXNYhWqXBem4
+         a01G7hTlNpCck5gDTd2rPOVXdfgGmnqbSGZlKF/H/wsntQOT+llsIL/2ZYYZCIvlcoDL
+         d7BogEmANWx1jmDRt8rSpHm+C9pYd4tGVgeQK8sNrTSxb0QAvZYMv+M6o/iJ9CzMYwzs
+         9Pev0ObRxHXqb3F0oESmWysuRzCAucBy3qGvS9SAcChciVB8UkkUh9lctYWjaLasU3NU
+         fjtXMzPSIg3djfZhE71MQdSqMwhOUN4AcFwlM9Nt6lRBtcRK6974HlxVFwpzq+L6gDPt
+         z80A==
+X-Gm-Message-State: AOJu0Yzo21TKbGpoSvae1vfCBVYn2HJkaCHxjzhldsU6IXUdkFuj07HV
+	h1CAVP4WF67Ubglp4FpNM1MsDLdcgBnW2NzrdcDOwLH2heaZnpz01hcp5gfGeZLI4cv1rfyh4vt
+	x4aL8Y9VpYOa9dpTm0biMVcBclIYRZzhPfey5U6p8Uw==
+X-Gm-Gg: Acq92OEeHPiuCB2SY71NV8BbYzixMBRiI5u2kVLASS7dADF6KRuk2rFDYShoY2AAVQE
+	AKJqXiys050uUPVDmqnwhjx4b8DbAT67i05mmZC4NwVvW8Nb/IoAi7WtxAx2+R2CG5uHXYju9L5
+	wSEuQ6lCFTEAUJyIgsUt/j/9s/apI61MNw+8Vzot5wez9kSsd65DSULQkaVO7n+617umAeM7fk2
+	bhSZ9L82qMZcrf6iehMFs/3xOOkreXY2wkFMQZaqFW0T8feMSgeSyD+39ROHoMn9FyOD7rXAxG9
+	DbNaHQA6QDDsFHB4IBlge2Woptqg0B7vrHLhiaybpQg1ZDX7vXTQcK4RzMmrVCdUxd5rR0zZX/3
+	6a2aHdUMkMoaZufc=
+X-Received: by 2002:a05:600c:1c0b:b0:488:b187:3c with SMTP id
+ 5b1f17b1804b1-490426aa7acmr30260965e9.14.1779433257800; Fri, 22 May 2026
+ 00:00:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loop: add sync_blockdev() in __loop_clr_fd() to prevent
- UAF
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        syzbot+cd8a9a308e879a4e2c28@syzkaller.appspotmail.com,
-        syzbot+bc273027d5643e48e5b3@syzkaller.appspotmail.com,
-        Hongling Zeng <zenghongling@kylinos.cn>,
-        Bart Van Assche
- <bvanassche@acm.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <20260522025451.845068-1-tom.leiming@gmail.com>
- <e4deece5-d866-4a44-9097-eaa1e2727c0b@I-love.SAKURA.ne.jp>
- <ag_RZc908B64hTFG@fedora>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <ag_RZc908B64hTFG@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav402.rs.sakura.ne.jp
+References: <20260513085340.3673127-1-neelx@suse.com>
+In-Reply-To: <20260513085340.3673127-1-neelx@suse.com>
+From: Daniel Vacek <neelx@suse.com>
+Date: Fri, 22 May 2026 09:00:46 +0200
+X-Gm-Features: AVHnY4KaCg2TnL5N7-_bJO4bF9ZVXcF6atGf4TwugcWam8oNLxjSD5HXNcr7eME
+Message-ID: <CAPjX3FdHJpZUVk2dfA+Ov5K6vOSsOJMUaxCU4G8y1qg6baMXYw@mail.gmail.com>
+Subject: Re: [PATCH v7 00/43] btrfs: add fscrypt support
+To: Eric Biggers <ebiggers@kernel.org>, David Sterba <dsterba@suse.com>
+Cc: linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2026/05/22 12:45, Ming Lei wrote:
-> On Fri, May 22, 2026 at 12:28:34PM +0900, Tetsuo Handa wrote:
->> On 2026/05/22 11:54, Ming Lei wrote:
->>> Fix this by adding sync_blockdev() in __loop_clr_fd() to flush all
->>> pending writeback I/O before clearing lo->lo_backing_file. Since the
->>> loop disk is already closed at this point, no new I/O can be submitted
->>> — only writeback remains.
->>
->> Why can you assume that synchronize_rcu() + drain_workqueue(lo->workqueue)
->> is unnecessary? Since we don't know exact commit which is causing this
->> problem, we don't know what has changed.
-> 
-> When sync_blockdev() returns, there can't be any inflight IO:
-> 
-> - no one can open this loop disk
-> - no dirty page cache any more
-> 
-> So why do you want to add rcu/drain_workqueue?
+On Wed, 13 May 2026 at 10:54, Daniel Vacek <neelx@suse.com> wrote:
+>
+> Hello,
+>
+> These are the remaining parts from former series [1] from Omar, Sweet Tea
+> and Josef.  Some bits of it were split into the separate set [2] before.
+>
+> Notably, at this stage encryption is not supported with RAID5/6 setup
+> and send is also disabled for now.
+>
+> For straight git access you can find this series as the `fscrypt-v7` tag
+> e85358ef9fba here:
+>
+> [0] https://github.com/dvacek/linux-btrfs/tree/fscrypt-v7
+>
+> Changes since v6 [3]
+>  * Rebased onto linux v7.1-rc3.
+>  * Adapted to the v7.0 fscrypt API changes, mostly following commit
+>    bb8e2019ad613 ("blk-crypto: handle the fallback above the block layer")
+>  * Addressed all the review feedback, thanks to Eric Biggers, Chris Mason
+>    (and his LLM review prompts) and Neal Gompa.
+>  * Adapted to the v7.1 fscrypt API cleanups, using byte offsets as function
+>    arguments instead of logical block numbers for newly introduced functions.
+>    This should match https://lore.kernel.org/linux-fscrypt/20260218061531.3318130-1-hch@lst.de/
+>    As a result btrfs_set_bio_crypt_ctx_from_extent() and btrfs_mergeable_encrypted_bio()
+>    helpers were no longer needed and they got removed.
 
-The fact that __loop_clr_fd() is called before lo_rw_aio() completes suggests that
-some works queued before __loop_clr_fd() is called have not been completed.
+Hi Eric,
 
-I don't know what sync_blockdev() guarantees, but even if sync_blockdev() can guarantee
-both "loop_queue_rq() is no longer running" and "all pending AIO requests issued by
-lo_rw_aio() have been completed", I think that sync_blockdev() cannot determine whether
-lo->lo_device has pending work or not.
+This is just a gentle ping.
+I was wondering if you had a chance to look at this version?
+I believe all your previous feedback has been addressed and this
+version is solid.
+Please, let me know your thoughts.
 
-Therefore, I guess that at least drain_workqueue() is needed before sync_blockdev().
-If sync_blockdev() cannot guarantee "loop_queue_rq() is no longer running",
-I guess that both synchronize_rcu() + drain_workqueue() are needed before sync_blockdev().
+Regards,
+Daniel
 
-(And I don't know whether sync_blockdev() is appropriate because we don't know what change
-made this problem visible. We didn't hit this problem until Linux 7.0.)
-
-> 
-> Fixes: 1fe0b1acb14d ("loop: only freeze the queue in __loop_clr_fd when needed")
-
-The Fixes: for these reports should be the commit which made this problem visible.
-Or, this patch will be needlessly backported to stable kernels.
-
+> There are a few changes since v5 [1]:
+>  * Rebased to btrfs/for-next branch.  Couple things changed in the last
+>    years.  A few patches were dropped as the code cleaned up or refactored.
+>    More details in the patches themselves.
+>  * As suggested by Qu and Dave, the on-disk format of storing the extent
+>    encryption context was re-designed.  Now, a new tree item with dedicated
+>    key is inserted instead of extending the file extent item.  As a result
+>    a special care needs to be taken when removing the encrypted extents
+>    to also remove the related encryption context item.
+>  * Fixed bugs found during testing.
+>
+> Have a nice day,
+> Daniel
+>
+> [1] v5 https://lore.kernel.org/linux-btrfs/cover.1706116485.git.josef@toxicpanda.com/
+> [2]    https://lore.kernel.org/linux-btrfs/20251112193611.2536093-1-neelx@suse.com/
+> [3] v6 https://lore.kernel.org/linux-btrfs/20260206182336.1397715-1-neelx@suse.com/
+>
+> Josef Bacik (33):
+>   fscrypt: add per-extent encryption support
+>   fscrypt: allow inline encryption for extent based encryption
+>   fscrypt: add a __fscrypt_file_open helper
+>   fscrypt: conditionally don't wipe mk secret until the last active user
+>     is done
+>   blk-crypto: add a process bio callback
+>   fscrypt: add a process_bio hook to fscrypt_operations
+>   fscrypt: add documentation about extent encryption
+>   btrfs: add infrastructure for safe em freeing
+>   btrfs: select encryption dependencies if FS_ENCRYPTION
+>   btrfs: add fscrypt_info and encryption_type to ordered_extent
+>   btrfs: plumb through setting the fscrypt_info for ordered extents
+>   btrfs: populate the ordered_extent with the fscrypt context
+>   btrfs: keep track of fscrypt info and orig_start for dio reads
+>   btrfs: add extent encryption context tree item type
+>   btrfs: pass through fscrypt_extent_info to the file extent helpers
+>   btrfs: implement the fscrypt extent encryption hooks
+>   btrfs: setup fscrypt_extent_info for new extents
+>   btrfs: populate ordered_extent with the orig offset
+>   btrfs: set the bio fscrypt context when applicable
+>   btrfs: add a bio argument to btrfs_csum_one_bio
+>   btrfs: limit encrypted writes to 256 segments
+>   btrfs: implement process_bio cb for fscrypt
+>   btrfs: implement read repair for encryption
+>   btrfs: add test_dummy_encryption support
+>   btrfs: make btrfs_ref_to_path handle encrypted filenames
+>   btrfs: deal with encrypted symlinks in send
+>   btrfs: decrypt file names for send
+>   btrfs: load the inode context before sending writes
+>   btrfs: set the appropriate free space settings in reconfigure
+>   btrfs: support encryption with log replay
+>   btrfs: disable auto defrag on encrypted files
+>   btrfs: disable encryption on RAID5/6
+>   btrfs: disable send if we have encryption enabled
+>
+> Omar Sandoval (6):
+>   fscrypt: expose fscrypt_nokey_name
+>   btrfs: start using fscrypt hooks
+>   btrfs: add inode encryption contexts
+>   btrfs: add new FEATURE_INCOMPAT_ENCRYPT flag
+>   btrfs: adapt readdir for encrypted and nokey names
+>   btrfs: implement fscrypt ioctls
+>
+> Sweet Tea Dorminy (4):
+>   btrfs: handle nokey names
+>   btrfs: add get_devices hook for fscrypt
+>   btrfs: set file extent encryption excplicitly
+>   btrfs: add fscrypt_info and encryption_type to extent_map
+>
+>  Documentation/filesystems/fscrypt.rst |  41 +++
+>  block/blk-crypto-fallback.c           |  41 +++
+>  block/blk-crypto-internal.h           |   8 +
+>  block/blk-crypto-profile.c            |   2 +
+>  block/blk-crypto.c                    |   6 +-
+>  fs/btrfs/Kconfig                      |   4 +
+>  fs/btrfs/Makefile                     |   1 +
+>  fs/btrfs/accessors.h                  |   2 +
+>  fs/btrfs/backref.c                    |  43 ++-
+>  fs/btrfs/bio.c                        | 155 +++++++++-
+>  fs/btrfs/bio.h                        |  14 +-
+>  fs/btrfs/btrfs_inode.h                |   7 +-
+>  fs/btrfs/compression.c                |   6 +
+>  fs/btrfs/ctree.h                      |   3 +
+>  fs/btrfs/defrag.c                     |  14 +
+>  fs/btrfs/delayed-inode.c              |  25 +-
+>  fs/btrfs/delayed-inode.h              |   5 +-
+>  fs/btrfs/dir-item.c                   | 110 ++++++-
+>  fs/btrfs/dir-item.h                   |  10 +-
+>  fs/btrfs/direct-io.c                  |  28 +-
+>  fs/btrfs/disk-io.c                    |   3 +-
+>  fs/btrfs/extent_io.c                  | 115 ++++++-
+>  fs/btrfs/extent_io.h                  |   3 +
+>  fs/btrfs/extent_map.c                 | 102 ++++++-
+>  fs/btrfs/extent_map.h                 |  26 ++
+>  fs/btrfs/file-item.c                  |  28 +-
+>  fs/btrfs/file-item.h                  |   2 +-
+>  fs/btrfs/file.c                       |  79 +++++
+>  fs/btrfs/fs.h                         |   6 +-
+>  fs/btrfs/fscrypt.c                    | 413 ++++++++++++++++++++++++++
+>  fs/btrfs/fscrypt.h                    |  86 ++++++
+>  fs/btrfs/inode.c                      | 404 +++++++++++++++++++------
+>  fs/btrfs/ioctl.c                      |  41 ++-
+>  fs/btrfs/ordered-data.c               |  35 ++-
+>  fs/btrfs/ordered-data.h               |  14 +
+>  fs/btrfs/reflink.c                    |  43 ++-
+>  fs/btrfs/root-tree.c                  |   9 +-
+>  fs/btrfs/root-tree.h                  |   2 +-
+>  fs/btrfs/send.c                       | 134 ++++++++-
+>  fs/btrfs/super.c                      |  99 +++++-
+>  fs/btrfs/super.h                      |   3 +-
+>  fs/btrfs/sysfs.c                      |   6 +
+>  fs/btrfs/tree-checker.c               |  64 +++-
+>  fs/btrfs/tree-log.c                   |  34 ++-
+>  fs/btrfs/volumes.c                    |   5 +
+>  fs/crypto/crypto.c                    |  10 +-
+>  fs/crypto/fname.c                     |  36 ---
+>  fs/crypto/fscrypt_private.h           |  51 +++-
+>  fs/crypto/hooks.c                     |  38 ++-
+>  fs/crypto/inline_crypt.c              |  91 +++++-
+>  fs/crypto/keyring.c                   |  18 +-
+>  fs/crypto/keysetup.c                  | 164 ++++++++++
+>  fs/crypto/policy.c                    |  47 +++
+>  include/linux/blk-crypto.h            |  15 +-
+>  include/linux/fscrypt.h               | 127 ++++++++
+>  include/uapi/linux/btrfs.h            |   1 +
+>  include/uapi/linux/btrfs_tree.h       |  26 +-
+>  57 files changed, 2665 insertions(+), 240 deletions(-)
+>  create mode 100644 fs/btrfs/fscrypt.c
+>  create mode 100644 fs/btrfs/fscrypt.h
+>
+> --
+> 2.53.0
+>
