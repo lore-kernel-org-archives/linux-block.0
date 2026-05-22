@@ -1,224 +1,98 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1A8370AF3
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 13:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779455659; cv=none; b=PKarSEDPgrpqzSYgnAFIJiLYjXq2ylGtsUvcd5hi3RAFK3NQBjpHekBlD0TmAzCKgv9uedRzdviHcqdc9xU6OlflyiQ9tc9SwAwXyHRxi81UAEMoiIJmV114+2z5ZjubEC4Nx8RwTf7P9hc/U4EWHTm2V+ImSj1oTE+wS3Ucqso=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779455659; c=relaxed/simple;
-	bh=YSAciv9TDQClx2IMLcHJIqG7XiH7Ty8bOhwekIMEN50=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e7QnViiFZGMhHIrnDEPECZlTL/4eOougZpnRz474ZRUItYrWDhybHwW5hPz8LVVGQFwfybUS0dxvMsIAFcWM2iiD90mmdgGjXW2comHGUU76nvMUXyeD6DoVW7Uxyh3IAWIzMU6VOXgATbsyNBuXGofga8BA6jjAmHqA4B6kinI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=TtyiNMVu; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48AE1EB5F8
+	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 13:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779455711; cv=pass; b=uQfmP1kE6P07xjc3BxD5MKsPorTiqh+qzeSDyM9gllGq+zC75r+f8I+6G7bNJqRiyfD5HJosEGlDjkgmMuvx5OE1CceGhSgBoeqS4/bsdPiwruEMq/AJiSx0bF8Dhn0G4RETcko3VJV7ovqQ0gZLQAOLRznF+/w0ukqKX63i+A0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779455711; c=relaxed/simple;
+	bh=Y/TGuNutVYXpBAEqRrrQnqHgQDmm6YU5GAa+3jsTu70=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q8a+5TeJL9TAoA4kE63IQfTuoMQqVDxU1vDv+Yf1xwiaNz40L3gIj/5BFTYpQhrMbguGtX8yFuo42unZFPo6xFCWmjD5+NtgWHOQtea5YQbnP4H/Ppxuwc28a5PvzmaX3iPkt+/qjhp2dVMKV9PJWiekb0kDgXAO+uaIPZhVJ5M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=LLKpiZuM; arc=pass smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="TtyiNMVu"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-83d5bbef760so3082602b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 06:14:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="LLKpiZuM"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5a884815606so8317687e87.0
+        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 06:15:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779455708; cv=none;
+        d=google.com; s=arc-20240605;
+        b=MAHputFduG0e/8q8gCZ6D8a2tqOiwT+hk/RHckZQ6SUjBN/q/8yxSLsTkl9XXK0r6d
+         iPUMP0Ot8Wvnitr/a4kwEREYzlt99T7N2LDL9ZBwwk8cLlJyyQBlD6uTKa12tHgSp4tT
+         Tup4TwGqC4tIrVtqgtYTAwcJmGIZX1w4oI0T+m45jyhfm4MmX3HO3/LSpEA4YIGvDDKf
+         K1VHcE7wvgJLdJiI7hZDMampoK15vc0s3k2EcSYC8YfwEtYHOaKJWvoCISKT1en0CYJF
+         mrKF0AIh7pMyofLXy1yfIcDKtxBBfcPHeh1v1oHqVqgWgBA8kxmxvK4opEw8k5016o5f
+         5zTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Y/TGuNutVYXpBAEqRrrQnqHgQDmm6YU5GAa+3jsTu70=;
+        fh=4UuI8/ButfpsdKML8OFacNjNh0JnNP4trMkTVnwYbvk=;
+        b=IELdYlJqAIeMsA2rPIRDVPk1agqHOpnyT6OVXfzXrfJScnyfUStisS56lEWlrSioxk
+         ys5PlOJjyHgoUYn0agtKqtwu/hTxdBkN/cdbwnS7Hjp3VKCl1NuvOTLqbahut1fJ8f1u
+         mpC9B3bhbyBB5dU6DZHg1CUa/KT0k6WLVl1o3t7EEc5e3xc/OC2eOYNiXX/uIhUMFLWX
+         FUAAw9u+6d2Y+FrHyYvZfGGewr5RPRkhDa6xlen2NJBd9DDxoHMpux6fdnhKWMJconh6
+         8yabpFEXMhPiICBy7ToxUT+NeXaXnYXFlRMP1HBD8b5LmmgRfnkyfqTBrMi1UzKvj+09
+         5VcA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1779455657; x=1780060457; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5auOG1877ywlMK3+iSMdUow3qmNazPx9wYUImkm+Qrw=;
-        b=TtyiNMVu/Ilxh82WFB/zXNZQOtoZdhSumNqHMKeNlHdkeC/qThEgAkjX3zi2zCqPH3
-         2eqwG3f3hedF4rmtpLCgIVkwZAyZp29Hi05NeI6ugGdNqkXiAr6ATIUVvRIYLXj+2YDm
-         MklY0lDt0PP321F8gRuli58Znfb3YS31+rbgwgmucN5IsGIjEar5HAdv6KPx6fEzrbZZ
-         HUwHymLaxyKK3/fy5Bo6+m4pJJZU4Dc72yv/f1UTo23VlBzdebqXUUuJmJLXlwZOyECy
-         mSlJ0PdJ+/HgcVfEtgoVswzZB3rBLazJT2beGkx3YkG0WwgVmIjdQoODhh01rjWwh6a8
-         1UZQ==
+        d=shopee.com; s=shopee.com; t=1779455708; x=1780060508; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y/TGuNutVYXpBAEqRrrQnqHgQDmm6YU5GAa+3jsTu70=;
+        b=LLKpiZuM30NHJevfyWrM++xREguuEkcccobyrCcFBbCah1pYRDPn2tEOqEfNd7VrOq
+         l/pSxsiIqo8fUTnHDng0aCYIn2SwFzZv/IUkkpS0TdKF719SludNZTjNJaUuQprZBIi/
+         hAmxUScZ9gbgCGpHk/XQxateYGGhNl5uO0uez3qAZCmBXoNMMwsHvLbTVGc+7E2z/HV8
+         iXLFcFr6YdU9CO4Z9PhxQ7daaeq6hlx2m9GsKh5s0tRb1ifCi3nCG16i8XUK1hyV19ZD
+         +8vFKuvHoF90FSfiyC2PN2iwUiWrYr9aDt9IyV2SrMzotkVLYg0C4adOO04nDCzzNnpU
+         CQow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779455657; x=1780060457;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1779455708; x=1780060508;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5auOG1877ywlMK3+iSMdUow3qmNazPx9wYUImkm+Qrw=;
-        b=ECw9/NLAcGDDKmOxLQFKVuA515thKB2WmW7WB3MtUEdIfBCDw/sYyec1a3M3+iyZvw
-         k79rvPG93Fkfu07zaPmqmZyMuM8YaSUnFrEovQ1P9PZiW6owUiTPKddnYu+2TEhEtsxK
-         gmYrP8Jzo1CnuAD/kB+vW2nwUnyYP/LcSf+PjwZXo21o/rsaafUG0TTeuefzTREjTs2m
-         PDhE8P0XEl1wgGEoePtGX9Zby8EYwDzKz+wAjdRvGSCfQhPaqhtjJuqbwQGfcizTnCO9
-         oKTPzTb+Wy5kpPmkXO3rYysNI0gBff6aLM/9tEgJH3i/LLjY/vBEFsVs6uQwA5S1JY7Z
-         oNiQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/FgPOVWyxrvBjVKGB24Xbr/bsgZPgARobZqt2ixV7bcgfGoqlJC2PhwbQJip0uqgiWkZWxUCCl4Ihwig==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU6xc7b58d5klq2AWPbcwg/zyT25bYuwio08Fux9IcGB55P3S6
-	I+Uu9e3pLnM2Vc0ltkemod2hia0feAam30+yhCpKtPuwaoUMam798br/ufUz4Az+pak=
-X-Gm-Gg: Acq92OHSwH/pirpsxUbQrNCOaIEKawm+BVo+Hx1i+ic8kRkPbr5IBg1+gStkqtdwqiC
-	+f1xRGjnAMZaUEn5gOGnSPsqbyxsubTv743NNPF9fbU3uI+D7WWTEpdzHmyAPRqN6tEYcuxpVLV
-	8rdosDvNyCs3eAfrl+x8AhhC8kDWNjuu+MxW3fRnFrfzkkFWx1o2Yw30k+uZMNHEcqJDxrdLH5Z
-	aQnPzNQAV0D5n6ROMJ301SE7UsdqL/B6mLkoYBaX96KxWGku21H2gX3AErZDJfJ6rM21EB96sf1
-	SNHw3ympYzfM3gpj/GLUi2YOQlACwF2jr61d0nZbVeWZkYxs2/QxbITs1vOPPh5redEVdk6jmjR
-	MD8I02dDqsjKGRNtQirQlZsttuLG7srlHDx/CsnjVs38MqBHkUJY8YIR6LYpx6fufMMDwroSP6L
-	QsWXy4FhD8plyJ6UxlpUk=
-X-Received: by 2002:a05:6a00:e8b:b0:835:cc47:6fe8 with SMTP id d2e1a72fcca58-8415f3bcffamr3913828b3a.46.1779455656963;
-        Fri, 22 May 2026 06:14:16 -0700 (PDT)
-Received: from localhost.localdomain ([147.136.157.0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84165009852sm2030340b3a.59.2026.05.22.06.14.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 May 2026 06:14:16 -0700 (PDT)
-From: Tang Yizhou <yizhou.tang@shopee.com>
-X-Google-Original-From: Tang Yizhou
-To: axboe@kernel.dk,
-	hch@lst.de
-Cc: yukuai@fnnas.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tang Yizhou <yizhou.tang@shopee.com>,
-	Leon Hwang <leon.huangfu@shopee.com>
-Subject: [PATCH v3] block: propagate in_flight to whole disk on partition I/O
-Date: Fri, 22 May 2026 21:14:09 +0800
-Message-ID: <20260522131409.261259-1-yizhou.tang@shopee.com>
-X-Mailer: git-send-email 2.43.0
+        bh=Y/TGuNutVYXpBAEqRrrQnqHgQDmm6YU5GAa+3jsTu70=;
+        b=aB6lg5dw5ZTP31LH4JIaTjfbfQxM4bnDi38AVKlSXKC9yMeRNa7sWmqfTjKkD2vmj4
+         G14Yk656nYSSXqxz7oMe3XnlZ2qLSyrx7HgKcXaicJdiX2rRD1vUf80BYOOrca5c8ee/
+         7SAZc8mwfrdRVEG97uF3Y+1etKb2G0YT8JfXfEDbkcOov1IeSgaJSGSqa+rmOvpo9CeM
+         Wp+p05RmF/hM4KlonsQr8eN+rPFL0NdorQgcbf0C2GwvzA1jLUJOzWDBuKl5MuY9l7O8
+         wNnSYOAc55QKblvUiGOC0FBf9Xxn77RV5d8NJBhhWmFxV4c89ZLzzqL1HTvdLP71UkYc
+         s+OQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/1rtxfL+34QFYvCtf1yx2XokRwkQHUXLOalO2P4tUc/d6nYvYK91991kn2zvGrYbR7UcoP3m1NoKZz7w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPIlr3OdtiuFIhegvtzz9M5ZBotaGrN03gxVYppUNfPkgs8ij8
+	bernzi3k/gN7AhoWvws1YZ7djg1Q5R51BlZp6WsMdzwWCyGnoMSrqKmz+sjid1zrK0O1PmJcyb3
+	FmLzRu534RV1ZAHNWxXjlHWPj1exJvxOr6JUZyM9W+Q==
+X-Gm-Gg: Acq92OH2HDryEDugfrNAAfcJh7RcfitDuHq5qfn6SfbSFnjmGJnz09oCwYY1HvH1z16
+	Wvup3lq6hNnQeLnnY1+TM7GZZcqVMqQpNs8CeTF472bHCivi7Z8AyZVsQb6jsLsO/9BuCR0im/S
+	Av0zATkFzUPr4SlEbbqV8++bOB084ALMZ+HPyju4Vy7zd5c8qzaTcRTWGi+MrEa19Lp6ZH0+CTI
+	aOesxkfO6DxvWt9+6iBYw7IgKM+5SZa300bQzBzOMycrhsOjf89ybwG51qQmcfKcoBNBF1S1jOZ
+	5a2CPIhBijxw3AjI
+X-Received: by 2002:ac2:44cf:0:b0:5aa:b6b:a3f1 with SMTP id
+ 2adb3069b0e04-5aa323d97f8mr702123e87.45.1779455708099; Fri, 22 May 2026
+ 06:15:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
+References: <20260522123437.214058-1-yizhou.tang@shopee.com> <20260522130157.GA25237@lst.de>
+In-Reply-To: <20260522130157.GA25237@lst.de>
 From: Tang Yizhou <yizhou.tang@shopee.com>
+Date: Fri, 22 May 2026 21:14:56 +0800
+X-Gm-Features: AVHnY4K853kRvr_VL_AS1H0bWBCqNuo485idzKFybGVtIov8w7-0f7b5vzDCvrE
+Message-ID: <CACuPKxk=oLxYhyR3ZCVLK1fWqT1AkgQJb5AF8CR-LtSV=K3z-Q@mail.gmail.com>
+Subject: Re: [PATCH v2] block: propagate in_flight to whole disk on partition I/O
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, yukuai@fnnas.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Leon Hwang <leon.huangfu@shopee.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Now when I/O is submitted to a partition, the per-CPU in_flight[]
-counter is incremented only on the partition's block_device, not on the
-underlying whole disk. This leads to a problem which can be shown by a
-fio test:
+Sorry I sent this before reading your email. Please refer to patch v3.
 
-lsblk
-  NAME     MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
-  mydev    252:1    0   20G  0 disk
-  └─mydev1 259:0    0   10G  0 part
-
-iostat -xp 1
-  Device       r/s        rkB/s      ... aqu-sz   %util
-  mydev    128153.00  512612.00      ...  13.22   72.20
-  mydev1   128154.00  512616.00      ...  13.22  100.00
-
-%util is different between mydev and mydev1, which is unexpected.
-
-This is the cumulative effect of a series of patches. The root cause is
-commit e016b78201a2 ("block: return just one value from part_in_flight"),
-which deleted the branch in part_in_flight() that aggregated the whole-disk
-in_flight count on top of the partition's. Then the second commit is
-commit 10ec5e86f9b8 ("block: merge part_{inc,dev}_in_flight into their
-only callers"), which folded the whole-disk in_flight accounting into
-generic_start_io_acct() and generic_end_io_acct(). Those two helpers
-were then removed by commit e722fff238bb ("block: remove
-generic_{start,end}_io_acct"), and from that point on the whole disk's
-in_flight is no longer accounted at all.
-
-In update_io_ticks(), if calling bdev_count_inflight() finds that the
-inflight value of the whole device is 0, the accumulation of io_ticks will
-be skipped, causing the reported util% value to be underestimated.
-
-Fix it by restoring the whole-disk in_flight accounting.
-
-Fixes: e016b78201a2 ("block: return just one value from part_in_flight")
-
-v2: Update commit message.
-v3: Take Christoph's advice and factor the common code into two helpers.
-
-Suggested-by: Leon Hwang <leon.huangfu@shopee.com>
-Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
----
- block/blk-core.c |  4 ++--
- block/blk-mq.c   |  5 ++---
- block/blk.h      | 22 ++++++++++++++++++++++
- 3 files changed, 26 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 17450058ea6d..81b322b8a385 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1042,7 +1042,7 @@ unsigned long bdev_start_io_acct(struct block_device *bdev, enum req_op op,
- {
- 	part_stat_lock();
- 	update_io_ticks(bdev, start_time, false);
--	part_stat_local_inc(bdev, in_flight[op_is_write(op)]);
-+	bdev_inc_in_flight(bdev, op);
- 	part_stat_unlock();
- 
- 	return start_time;
-@@ -1073,7 +1073,7 @@ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
- 	part_stat_inc(bdev, ios[sgrp]);
- 	part_stat_add(bdev, sectors[sgrp], sectors);
- 	part_stat_add(bdev, nsecs[sgrp], jiffies_to_nsecs(duration));
--	part_stat_local_dec(bdev, in_flight[op_is_write(op)]);
-+	bdev_inc_in_flight(bdev, op);
- 	part_stat_unlock();
- }
- EXPORT_SYMBOL(bdev_end_io_acct);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d0c37daf568f..6bdfe642bd93 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1082,8 +1082,7 @@ static inline void blk_account_io_done(struct request *req, u64 now)
- 		update_io_ticks(req->part, jiffies, true);
- 		part_stat_inc(req->part, ios[sgrp]);
- 		part_stat_add(req->part, nsecs[sgrp], now - req->start_time_ns);
--		part_stat_local_dec(req->part,
--				    in_flight[op_is_write(req_op(req))]);
-+		bdev_dec_in_flight(req->part, req_op(req));
- 		part_stat_unlock();
- 	}
- }
-@@ -1143,7 +1142,7 @@ static inline void blk_account_io_start(struct request *req)
- 
- 	part_stat_lock();
- 	update_io_ticks(req->part, jiffies, false);
--	part_stat_local_inc(req->part, in_flight[op_is_write(req_op(req))]);
-+	bdev_inc_in_flight(req->part, req_op(req));
- 	part_stat_unlock();
- }
- 
-diff --git a/block/blk.h b/block/blk.h
-index b998a7761faf..05099aab6863 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/bio-integrity.h>
- #include <linux/blk-crypto.h>
-+#include <linux/part_stat.h>
- #include <linux/lockdep.h>
- #include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
- #include <linux/sched/sysctl.h>
-@@ -11,6 +12,7 @@
- #include <xen/xen.h>
- #include "blk-crypto-internal.h"
- 
-+
- struct elv_change_ctx;
- 
- /*
-@@ -485,6 +487,26 @@ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
- 		q->last_merge = NULL;
- }
- 
-+static inline void bdev_inc_in_flight(struct block_device *bdev,
-+				      enum req_op op)
-+{
-+	bool rw = op_is_write(op);
-+
-+	part_stat_local_inc(bdev, in_flight[rw]);
-+	if (bdev_is_partition(bdev))
-+		part_stat_local_inc(bdev_whole(bdev), in_flight[rw]);
-+}
-+
-+static inline void bdev_dec_in_flight(struct block_device *bdev,
-+				      enum req_op op)
-+{
-+	bool rw = op_is_write(op);
-+
-+	part_stat_local_dec(bdev, in_flight[rw]);
-+	if (bdev_is_partition(bdev))
-+		part_stat_local_dec(bdev_whole(bdev), in_flight[rw]);
-+}
-+
- /*
-  * Internal io_context interface
-  */
--- 
-2.43.0
-
+Best regards,
+Yi
