@@ -1,74 +1,74 @@
 Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D191B3655DB
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 23:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C9938F931
+	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 23:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779491692; cv=none; b=BQDkh0paz+gpQJ7cVdl0yqgUNlgtTNn/1DwOdUB5PmoLPEwmo64ZWV+b0Hd4Cht5zgFjEUNsCTBiq9QDIL7sj+ulH0A3IYJ3bPe2zUFjMUwhuL5jRBmeTQa3uK4ojWOi5WCw9kK+Y1sNoRAIGXaWOWQ8gUCnL8NeyNr0QPTJjGU=
+	t=1779491840; cv=none; b=b3BDxKzFv5yRMr0KfJauFTsdpgHpmhYDBy4BFbhYoaLNj1xuo7NS0DEAqCXSCjtqrj4PDOxkg6+oSYh53DUVNDfN39DZvDNyYUC1HumjlB++LCGF1xDJpqiFmRLm/qM3bgCJzU6fJmONryOnrM5FiS7Vi8gRUWDqp7/s+1xR/JQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779491692; c=relaxed/simple;
-	bh=gV53TwSs0drt5X5gnSBlHKrw6+HA0vOx7vN5OP4e850=;
+	s=arc-20240116; t=1779491840; c=relaxed/simple;
+	bh=4g38+1lKxMMFXNGYi+/tGlmbD39J/6oFSR8yf9ZHHoU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ayMNrrl/x49QSzg2M7amUtBQKl7oIg1hky0siwCmCRLJiSjo1aK+26Gexu5Vf6DKC7TXRLr5PX6fR2D2RIi+QsiI9hRFzwdLLyP7NzxuU1Z1kPOmbfSH/eFwPIJkLcl2n6zozm4Wn4xe24BapyI66NOp4AGWlenSbmheII5H9ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=G2A9IOS3; arc=none smtp.client-ip=148.163.135.74
+	 In-Reply-To:Content-Type; b=FWkrPyngq2W6BYPL9cicg7F9Y7cJaerr4OPPz9IRgW3FUeUhh3w69INlqCUazu6nlp/YB5XDX2iecHqd+HaWsd5tyxZG1WGm0Kp3TTTw4yadXnH0bzprgaZSZaUCcuGjOKEuTK0dfgup4+hOutA7JGZaefvypX6FsFCI98GPFVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=QCzNXMoc; arc=none smtp.client-ip=148.163.135.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="G2A9IOS3"
-Received: from pps.filterd (m0167072.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64MMS4gH310347
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 19:14:50 -0400
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="QCzNXMoc"
+Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64MMSaZL2789975
+	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 19:17:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=SCJZ
-	IS3EJwvEDcATBWIFn6gHp7ruxYI8VCEk1vbgm7Y=; b=G2A9IOS3JesynR/UdOCn
-	/ut7BaIFp+bYt3cWcBDa1+1qX107hdOZAXsxXWg9TXcFIIQbTqVvqIeRJL3bUjRB
-	UDu7592o6g/OwynE+EnnlBOTkWS2ZjX9GmRuW1agJFz/DlTmacfQAt/E5dOs6kpg
-	XYQYlsbSRI5JZ9+o7MhW637PGbZF9haOkuwD+34B9dN4iOrRO418PwB5gjKphlWD
-	4hY51YdLNL2I/qkxN9JZKz9Pq7doj2Mn4gI9amxgvsz+E5/mYktzg2FkrFBroOJp
-	8rjK6HV2y0PoqI+nzlXQ/e7TXg02cUei9ufFo3UQVCp84CjljxoEdHozHaD8/A2K
-	ew==
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4earpgbkd4-1
+	:message-id:mime-version:references:subject:to; s=pps01; bh=XolI
+	xwfsVJBVBpTPhnOybhIeNs+9oP88EwbFpg7C0dI=; b=QCzNXMocAxNFTmwB5r82
+	Iqr6KeBeNApgLe1JbrJXqMTH7Hv0Jt/WD3PXKZ/QXCCaHxNZnn7Cil8P0gyKLaZv
+	DWa07xsv7CrqPRbXnIU40NAL0kpe5neyU5MB0D0nSvHNPjBZq1at98019jHZbOE3
+	9g6gkdgK+gyYrvYu1WCQVHRC1VK7MVRiBOCNXxobfa1CXAaZYTlihRJo2JKZpq8E
+	AI1jZOOmEZE6eGOhYGuOC2N/WUrRf67sQd7RyFsswLHPrLlCbfd44HeFHwp6RxpT
+	j8T6/BvDioIehEh0yVkyfu3Y4ybyW3Q/KGibGcM/+R8a2gbWyj/1VhE1uhi2jsxH
+	Mg==
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4eatyqae41-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 19:14:49 -0400 (EDT)
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-914b5249bf6so345238785a.3
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 16:14:49 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 19:17:18 -0400 (EDT)
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-516da5a1db4so26207151cf.0
+        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 16:17:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779491689; x=1780096489;
+        d=1e100.net; s=20251104; t=1779491837; x=1780096637;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=SCJZIS3EJwvEDcATBWIFn6gHp7ruxYI8VCEk1vbgm7Y=;
-        b=Ey/BuOkjNrNHNlOx3Vy0lK4UQlZwGxPwDlEukKJLBYDFUQcPvjj2ZGWRdj8ZrZv1zv
-         fYXlcK7qUyDto7ipocL3CdeH9SN4xnMwdxtMERMMZYwqpvHLg0heGmsVcMMFK1BfpZA+
-         QfHFpH/hxWmEMFyLtSpDLXmlMYoYZw76y9tHRo74QYcEY1dqyoyyEEkZNTkhTbchoizZ
-         Mav4dZTSWW1vxi5Z9rw7D7tkr6jok7BuOJoGz/aI9XcXSVZXSevlwPX5o5Lsu7rqhh5Y
-         jWPLj+O7nUGhntZIwI8SbtyXTKuu3TAJvp1qTMoVbWdslHUvDPfU7VRy0T4clGlBbAHP
-         HA5g==
-X-Forwarded-Encrypted: i=1; AFNElJ/d1ZNEyjzdKTObJfztcuKzRMzkUo11WdpUsvnwY+5v/OMEM7pk2YGVMHv/fOQfUfeM23lvYZoq9PQacw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAnhVIiMVyAOcA86s9vo+/8VPIaF8a4WUAIp8QI/ncxq/OH2p6
-	omZ7QiDhQMZuEkl77RN6Q/T7lVgeSbv6yvqewyV5MRae+wvUtIpVPX50JeetYBYIsmhGYacDPQa
-	PThfYH0FK005QtUJzBQDwerlqYVaM5vDYjf3krOZlba8RFAaUjlaM42ITHbAO
-X-Gm-Gg: Acq92OEZXTtuUyHBR/iE/wdjX0DVg6z4gN8b2kxqa/J+xKs/oPbrW/fygRswyR1bgRq
-	1Itkv/Us+YDKwfX2YpTvgGyMMmmdlgpn3HSSdKHYfr84AyswLf5xd8auENSPh3jbawHkIh8AUoL
-	ysiF0zbTJvzmoDCzQj4HCWBekqVZ8PcOznEJpAup+CTPpt+ERWd2GiJWwGn4Ho/CloKKCBvQi7W
-	3BEyYY7XbavPvQMNeGNBEYzXOAf7iF+fawfXjJI3MfmYxHxHG/Kv94qAuHRNul3mT42jkuEBTIe
-	w/DUFx9gERWJE6iibf8dSYmVMJKhbz0+4h8KgEekip+uUPVrQiVk3bj2bsBTUmX163ANA/9xRJ2
-	tCbFUBWt11CHcdGuGlB4goDwn1Et9/77b7dGJWNmJaG21JAy/rrx/rSh2G6Cm46K+uRkvuZkuoQ
-	Y=
-X-Received: by 2002:a05:620a:2909:b0:8f2:c47b:962e with SMTP id af79cd13be357-914b49f5399mr897288185a.49.1779491688912;
-        Fri, 22 May 2026 16:14:48 -0700 (PDT)
-X-Received: by 2002:a05:620a:2909:b0:8f2:c47b:962e with SMTP id af79cd13be357-914b49f5399mr897283585a.49.1779491688439;
-        Fri, 22 May 2026 16:14:48 -0700 (PDT)
+        bh=XolIxwfsVJBVBpTPhnOybhIeNs+9oP88EwbFpg7C0dI=;
+        b=fOBgiSAk1x8EINCUsWEHy+P/sMG9PocJvV62VxQfHTdCmcok48pvRX3cOBDsFs7XHN
+         MAI9GedWW9c18bRS/1URvZGkxuREbF/mmykg/NWiYqSk7l5uNXsshZdtd0ZZipqBXl5K
+         0JYYVuOZV/WvCO8mO1MwJ9koqBR8ZAzAIlgbG4DGC7M2RfDskKTJGvfjsgG2ZnngfmxV
+         EeG8Hnxm1s8BN4lxeE0+QZwaThRdR//yygX+sJaVYV518B24rRwjhp6PpBqGBsBEuEz0
+         M5x9IqXeyRvxTpJEyjqT4Ij9DxDY677nDOQod3cC+BymHxwC+NsEyDlxnvqtfteHQBdq
+         TAPw==
+X-Forwarded-Encrypted: i=1; AFNElJ8z/XwDiygsO7fyQgZAZLhk4fYy9P3FwkpxDnxPI4Y1nmfmXK1NpZkcu+AJOyGdqw7bHpSqPf7Zu5BnSA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAVOaWPpySpfX4NlceNZinxlozDrshpKRdoemn7xNWr2qaMFJF
+	ZRT++spaE5I/nVPqVqromZisNymd2CTtw/dM81nWHFdMddj/YJeZx6B7xpuPiz2LqnU4aNnvLV/
+	bEW7ZGH4qN2epAqa5h3WF1QNJ7l2hK2GfOT6HLOcw960yH7o84gzqeKCkkvBd
+X-Gm-Gg: Acq92OG1KPNMthriESEjOhWzzA8O7ypZfpHZ/D6TayOli0J8ElsxNthUXPJ8sN+r93q
+	JcUH0XWNJxTxbT9Oamcm3fdTPJrUKeJDKQ+gyJob42HEDRWKGvXQNeWvEryxc1SvZlwXkdG7H+0
+	ga+UriMt7TWfzGJjTWkb1kcuc1kXC1geUY6muUnisgWtKZyxEk/+id9JgVpBMCkw4SWUUxBQGud
+	YlIrMNBZepZJLpl8nTw2DLMCIilX7r1HXuwywkTX3Fa2oN41+jwqCBpCx9DvpJzQ322MYF+Iuq5
+	emxsBBF2G3gZ9RDo1R1eyJDr+miX8SiGZSOONMg8upMcvETyQ1ahhIlSgcSxAKVeSjiAmkhyVY4
+	nYNor3l+WG8s33RVk0v4JIf+V5BBuRQmeuipCkj9vF/l+vHbazrKGCCgxrVulqGqUdjZzfVW4Ts
+	c=
+X-Received: by 2002:ac8:58cd:0:b0:516:d8c6:3e64 with SMTP id d75a77b69052e-516d8c6436fmr59502341cf.53.1779491837053;
+        Fri, 22 May 2026 16:17:17 -0700 (PDT)
+X-Received: by 2002:ac8:58cd:0:b0:516:d8c6:3e64 with SMTP id d75a77b69052e-516d8c6436fmr59501831cf.53.1779491836515;
+        Fri, 22 May 2026 16:17:16 -0700 (PDT)
 Received: from [10.207.65.224] (nat-128-59-177-214.net.columbia.edu. [128.59.177.214])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-914bb9f4689sm249676485a.38.2026.05.22.16.14.47
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516d8b0065asm25972531cf.2.2026.05.22.16.17.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 May 2026 16:14:47 -0700 (PDT)
-Message-ID: <d98a35c1-882b-4752-a2c7-378872fc97a3@columbia.edu>
-Date: Fri, 22 May 2026 19:14:46 -0400
+        Fri, 22 May 2026 16:17:16 -0700 (PDT)
+Message-ID: <f8d509c7-c0c0-4196-9a82-a6f8ae24ffc2@columbia.edu>
+Date: Fri, 22 May 2026 19:17:15 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,7 +76,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/4] buffer: add dropbehind writeback support
+Subject: Re: [PATCH v6 4/4] block: enable RWF_DONTCACHE for block devices
 To: Jens Axboe <axboe@kernel.dk>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Christian Brauner <brauner@kernel.org>,
@@ -90,47 +90,52 @@ Cc: Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
         linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
 References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
- <20260514-blk-dontcache-v6-3-782e2fa7477b@columbia.edu>
+ <20260514-blk-dontcache-v6-4-782e2fa7477b@columbia.edu>
 Content-Language: en-US
 From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <20260514-blk-dontcache-v6-3-782e2fa7477b@columbia.edu>
+In-Reply-To: <20260514-blk-dontcache-v6-4-782e2fa7477b@columbia.edu>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDIzMiBTYWx0ZWRfX6K+aNva4TnLC
- PYYgY+AaCTo0jmA6BiaotmBw4yE4JtkUdBT/36HySMarWu+KBLgx6shtF4XmxeytI8pbJPtTKPF
- lz2BK5GHrOg+wVLo7TAVAm7uhI4ansAL9i18+tqZbQPI+lomLTN8CK0bbkfbzPz+jvv2wWSFzGe
- MdT+aCNNEz0W3ai0n+Gf+xqpF+Ix9sMFG/xOL0HzizaT8dVfnZAS5SmHgF/7GgbYYUgpgQ/eEFH
- OeudU4FIAf+snE/gLgXy6X6Uw75J8FFmrEpfvwqNnbDbtw1ywSKTriJ6eM3mEBMZ4QkT7eRUlvC
- sO4nDQkDYsGBrRDj0pNyr8eyL/eHht2WI7mjHw96S6jxBKiQAosJbEQy8kfnsZ4VtdbpsxWP3Ee
- OJ6htBoxTGeSQAHJJ028ojMEEwKTj11u5UFBHJ/89tZYjanZdOTWDZ4eIpAgTCImOrFklUmkAqp
- KO3Y/UJUP+8avfndAyg==
-X-Proofpoint-ORIG-GUID: HIUI474qiPcGknFNZFX1BGhcFqiU-1c7
-X-Proofpoint-GUID: HIUI474qiPcGknFNZFX1BGhcFqiU-1c7
-X-Authority-Analysis: v=2.4 cv=K4kS2SWI c=1 sm=1 tr=0 ts=6a10e36a cx=c_pps
- a=50t2pK5VMbmlHzFWWp8p/g==:117 a=n4JpGxNP30DHW88kdRRHAg==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDIzMiBTYWx0ZWRfX7MWJKwZlWJjk
+ MOaexB7yy0+c0jmBUxBL1SK8BhCrX+Ncv8Km99HJybPgV5K+vHCMsm5+K6zss8WrAJIT2C74A/Z
+ yPTfSGvtHSftcVthv5VutuRX9qX5PQ+lTjjdVYpKV+K1euQGegU0zpTdMyCGft1Gz4pyqltbTms
+ vZkuWCrPfp8gqKI1aZX+7yBNZSJm7Rt+eClyr9Fw9VT6u26JvkK+OrGo3ZwEnlgDAR7rMaAZyD5
+ yimTcZh9XyiasmcMab1LtBQaaG6u67MKjvZakza4gN7azmBurBmLOcep/xtt4snRRmPM0aaLlcS
+ kD9f0uUSl7vnym+r7bxdhfg9KULUQfJT/oeIJS0RU5St7HY7JtBebAcmtyUoTylCAWyWYkBadfq
+ Nx7LhHjQ+dws83ngp4L8Ohm8bkR4XA+jB53wvNqjhFRvlDvYTVJo5g/zX560QFCmaWbYCQfUjGg
+ HMm5WypXFq2NuRJDuCA==
+X-Proofpoint-GUID: Lg9pUkkvrMZWxKc5U39idHlJw380v5fX
+X-Proofpoint-ORIG-GUID: Lg9pUkkvrMZWxKc5U39idHlJw380v5fX
+X-Authority-Analysis: v=2.4 cv=QYJWeMbv c=1 sm=1 tr=0 ts=6a10e3fe cx=c_pps
+ a=WeENfcodrlLV9YRTxbY/uA==:117 a=n4JpGxNP30DHW88kdRRHAg==:17
  a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=SsB-OO3BMngHh3ZO9fOt:22
- a=c92rfblmAAAA:8 a=lIN9f26y6YkxF9qERjMA:9 a=QEXdDO2ut3YA:10
- a=IoWCM6iH3mJn3m4BftBB:22 a=GvGzcOZaWPEFPQC_NcjD:22
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=svvvyxlR1OQQkelhaPoB:22
+ a=c92rfblmAAAA:8 a=7QGR7LCADlPcIrvLOjwA:9 a=QEXdDO2ut3YA:10
+ a=kacYvNCVWA4VmyqE58fU:22 a=GvGzcOZaWPEFPQC_NcjD:22
 X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11794
  signatures=596817
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 phishscore=0 bulkscore=10 malwarescore=0
- priorityscore=1501 impostorscore=10 lowpriorityscore=10 adultscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
+ priorityscore=1501 malwarescore=0 bulkscore=10 phishscore=0
+ lowpriorityscore=10 clxscore=1015 suspectscore=0 spamscore=0 adultscore=0
+ impostorscore=10 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
  definitions=main-2605220232
 
 On 5/14/26 5:51 PM, Tal Zussman wrote:
-> Add block_write_begin_iocb() which threads the kiocb through to
-> __filemap_get_folio() so that buffer_head-based I/O can use DONTCACHE
-> behavior. When the iocb has IOCB_DONTCACHE set, FGP_DONTCACHE is
-> passed to mark the folio for dropbehind. The existing
-> block_write_begin() is preserved as a wrapper that passes a NULL iocb.
+> Block device buffered reads and writes already pass through
+> filemap_read() and iomap_file_buffered_write() respectively, both of
+> which handle IOCB_DONTCACHE. Enable RWF_DONTCACHE for block device files
+> by setting FOP_DONTCACHE in def_blk_fops.
 > 
-> Set BIO_COMPLETE_IN_TASK in submit_bh_wbc() when the folio has
-> dropbehind set, so that buffer_head writeback completions get deferred
-> to task context.
+> For CONFIG_BUFFER_HEAD=y paths, use block_write_begin_iocb() in
+> blkdev_write_begin() to thread the kiocb through so that buffer_head
+> writeback gets dropbehind support.
+> 
+> CONFIG_BUFFER_HEAD=n paths are handled by the previously added iomap
+> BIO_COMPLETE_IN_TASK support.
+> 
+> This support is useful for databases that operate on raw block devices,
+> among other userspace applications.
 > 
 > Signed-off-by: Tal Zussman <tz2294@columbia.edu>
 
@@ -138,95 +143,49 @@ Responding to Sashiko review inline:
 
 Link: https://sashiko.dev/#/patchset/20260514-blk-dontcache-v6-0-782e2fa7477b%40columbia.edu
 
+Q: "Could this code path be unreachable during block device writes?
+Block device buffered writes use blkdev_write_iter(), which unconditionally
+delegates to blkdev_buffered_write() and subsequently
+iomap_file_buffered_write(). The iomap infrastructure bypasses the legacy
+address_space_operations .write_begin method.
+During a write, iomap_write_begin() handles buffer head allocation internally
+by calling __block_write_begin_int() directly. This naturally inherits the
+FGP_DONTCACHE flag passed down from the kiocb via iomap_get_folio().
+If the VFS write paths were actually calling .write_begin for block devices, a
+CONFIG_BUFFER_HEAD=n kernel would crash with a NULL pointer dereference since
+def_blk_aops does not define .write_begin or .write_end in that configuration."
+
+A: So this actually seems legit... doesn't look like anything actually calls 
+blkdev_write_begin() or blkdev_write_end(), unless I'm missing something.
+block_write_begin_iocb() usage seems necessary for bh-based filesystems, but
+block devices seem to use iomap for writes unconditionally.
+
 > ---
->  fs/buffer.c                 | 19 +++++++++++++++++--
->  include/linux/buffer_head.h |  3 +++
->  2 files changed, 20 insertions(+), 2 deletions(-)
+>  block/fops.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/fs/buffer.c b/fs/buffer.c
-> index b0b3792b1496..d0abaf44d782 100644
-> --- a/fs/buffer.c
-> +++ b/fs/buffer.c
-> @@ -2138,14 +2138,19 @@ EXPORT_SYMBOL(block_commit_write);
->   *
->   * The filesystem needs to handle block truncation upon failure.
->   */
-> -int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
-> +int block_write_begin_iocb(const struct kiocb *iocb,
-> +		struct address_space *mapping, loff_t pos, unsigned len,
->  		struct folio **foliop, get_block_t *get_block)
+> diff --git a/block/fops.c b/block/fops.c
+> index bb6642b45937..31b073181d87 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -504,7 +504,8 @@ static int blkdev_write_begin(const struct kiocb *iocb,
+>  			      unsigned len, struct folio **foliop,
+>  			      void **fsdata)
 >  {
->  	pgoff_t index = pos >> PAGE_SHIFT;
-> +	fgf_t fgp_flags = FGP_WRITEBEGIN;
->  	struct folio *folio;
->  	int status;
->  
-> -	folio = __filemap_get_folio(mapping, index, FGP_WRITEBEGIN,
-> +	if (iocb && iocb->ki_flags & IOCB_DONTCACHE)
-> +		fgp_flags |= FGP_DONTCACHE;
-> +
-> +	folio = __filemap_get_folio(mapping, index, fgp_flags,
->  			mapping_gfp_mask(mapping));
->  	if (IS_ERR(folio))
->  		return PTR_ERR(folio);
-> @@ -2160,6 +2165,13 @@ int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
->  	*foliop = folio;
->  	return status;
+> -	return block_write_begin(mapping, pos, len, foliop, blkdev_get_block);
+> +	return block_write_begin_iocb(iocb, mapping, pos, len, foliop,
+> +				     blkdev_get_block);
 >  }
-
-Q: "Is an EXPORT_SYMBOL() or EXPORT_SYMBOL_GPL() needed for
-block_write_begin_iocb()?
-Since the legacy wrapper block_write_begin() remains exported, it appears
-filesystems compiled as loadable modules (like ext4 or fat) will encounter
-linker errors if they attempt to transition to the new API."
-
-A: Can be added once filesystems want to use it.
-
-> +
-> +int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
-> +		struct folio **foliop, get_block_t *get_block)
-> +{
-> +	return block_write_begin_iocb(NULL, mapping, pos, len, foliop,
-> +				      get_block);
-> +}
->  EXPORT_SYMBOL(block_write_begin);
 >  
->  int block_write_end(loff_t pos, unsigned len, unsigned copied,
-> @@ -2715,6 +2727,9 @@ static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
+>  static int blkdev_write_end(const struct kiocb *iocb,
+> @@ -966,7 +967,7 @@ const struct file_operations def_blk_fops = {
+>  	.splice_write	= iter_file_splice_write,
+>  	.fallocate	= blkdev_fallocate,
+>  	.uring_cmd	= blkdev_uring_cmd,
+> -	.fop_flags	= FOP_BUFFER_RASYNC,
+> +	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
+>  };
 >  
->  	bio = bio_alloc(bh->b_bdev, 1, opf, GFP_NOIO);
->  
-> +	if (folio_test_dropbehind(bh->b_folio))
-> +		bio_set_flag(bio, BIO_COMPLETE_IN_TASK);
-> +
-
-Q: "Does this add unnecessary workqueue overhead for read operations?
-While task-context deferral is required for asynchronous writeback completions
-to allow folio_end_writeback() to sleep and invalidate the folio, read
-dropbehind invalidation is handled synchronously in the reader's task context
-via filemap_end_dropbehind_read().
-Could this be gated by an op == REQ_OP_WRITE or op_is_write(opf) check so
-that read bio completions aren't forced into a workqueue?"
-
-A: Seems worth adding a op_is_write(opf) check to avoid deferring read
-dropbehind completions.
-
->  	if (IS_ENABLED(CONFIG_FS_ENCRYPTION))
->  		buffer_set_crypto_ctx(bio, bh, GFP_NOIO);
->  
-> diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-> index e4939e33b4b5..4ce50882d621 100644
-> --- a/include/linux/buffer_head.h
-> +++ b/include/linux/buffer_head.h
-> @@ -260,6 +260,9 @@ int block_read_full_folio(struct folio *, get_block_t *);
->  bool block_is_partially_uptodate(struct folio *, size_t from, size_t count);
->  int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
->  		struct folio **foliop, get_block_t *get_block);
-> +int block_write_begin_iocb(const struct kiocb *iocb,
-> +		struct address_space *mapping, loff_t pos, unsigned len,
-> +		struct folio **foliop, get_block_t *get_block);
->  int __block_write_begin(struct folio *folio, loff_t pos, unsigned len,
->  		get_block_t *get_block);
->  int block_write_end(loff_t pos, unsigned len, unsigned copied, struct folio *);
+>  static __init int blkdev_init(void)
 > 
 
