@@ -1,179 +1,63 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3ABB372050;
-	Fri, 22 May 2026 18:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D290357CED
+	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 19:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779474088; cv=none; b=EimKlslqLX4crQtWQfNGLJCgz+FX3xP3+b92l+Gfzy2shx1IxxfFG9rkyn5FulAUKfoYLT+a6Goym1w+k95pPL//Jpxrlp+9biW4HweSSbfr54RVQZE+0gXUpm+qELw7Dk4zTKsZGIavpEbglF3/Uc07hZ3bdIbcSj+b1eJT5/M=
+	t=1779478748; cv=none; b=EaRfixuRdd17uoSZhXF/LIk5ZctJc6RInfqYWO+SwTdK/YV5vr65DvB4TEGgknEJfLLz0K92T5l21nmMjZu9maeAgUIaqleyiGVioxI92riVEDIdBdnhSADu8K8ZG5oPVqwAUQKsKMoXN5nfP28OrdaMMyjMmYHm56EeFEgz74Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779474088; c=relaxed/simple;
-	bh=7d3Ti/hdlleLXjr3sAr8veTvIAhSjpJDPwOsLjEprog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SWxTps1G9+Ph+ZhXq3xBq0zIQTnw7wPRKfWIsjJ4Z1t/anXk99XGxTIPoOo/ZQ1R+yi2Fy+gKI6GpptaJ4HMAcYG/7pRAH2aiOZhs8rv4CCHGjGcfk1UQ/9FBp9G2xNh+LM62pLlSAofb6fqlZWwoCnaYsFkvR/xapxpme6Htb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=edYPf9Rr; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1779478748; c=relaxed/simple;
+	bh=1TEK7xpb0lCTBautsJOrszInMvJw94L/RlIoBE28Nfk=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Vgf1amnY8W8w0N5VdAYE8fYNOOsYgaLQivIKSx+Ed0N3uzP/ciGOHYBr/hoNt4ToZex5lv5u0BJxzRI09CWvMT6z5eDuQgwVM4mXCqyhebn7EjD7mysMleSK4AOcZMst4Dbehv7z7g0a0adrcTVycYh1DHqpurzX+AzRVKR4Q7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6k1sUUr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="edYPf9Rr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=zKLvy/XVT2bpLk4en4fS6J9Rd5aUoTUJe2g27vvq3tQ=; b=edYPf9RrqDquidBWf3LrLjCWr8
-	ohWh080hKEcac6vExpyKG6U5XH6P+E+dZdSgULWxD6I72OJhYutOSlbKYpTTFdLOR5mcLYHcY0IDU
-	GNhkRn/4TYmnPQ1tKqvbP2Y4zrJrKYYyPxiA1RQ3umXuH/GiWVePTUZ9gqi79KgnEEdK4KyjN4pi7
-	IifQXHjtqCfaWBQlFD+w2KDacSCmWUkpptnUzdCtQTIKxdT4aAeYbBwRl/6b+YTCKdjbuSUj26nAG
-	fvkUYyPbSvmOppII2AVGbp6zwYaJ5jteoiqs7qpS9un1v4oBxS9mmFOtOYSb3V769RRasMtXbdScu
-	1m/BTF6w==;
-Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wQUUu-0000000ARbe-2m3r;
-	Fri, 22 May 2026 18:21:24 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6k1sUUr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D78F1F00ADF;
+	Fri, 22 May 2026 19:39:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779478747;
+	bh=oGULZSxs3p43O8fR4vUyK9vRChagfeFCaH86HtkWWpA=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=R6k1sUUrUXuL656TNGaML9DZ9P+d5ZJybWO5GYncmsTArhSdxoLVvxocF09IP5VHq
+	 jUeB0raeWJLyyLUe5UOajPI/KsKwa4ze+sVjO2/Fv6QLdiVpLqQqDSow7Iz21Gm+tw
+	 s2AM8M0czToPrEMNBHNY5h+0E3K8y+CG2AV+9UeSqeM1hs1s9ZYOT3fhtUMWZw4MN/
+	 2RncZR271SvJ0ZB6Kr6Co/yb2ltnmKrlaGq4kdCQ9LaUqBU9rErpNReaTQUIBPRh06
+	 dWqRZIIDheNUzoxyUfr1IDVTLX6ZPc6v8ZyHiDcnOBXpe0BmPppQi+PGYbyA6M25Ky
+	 2GuT8h0QseAJw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 56CC13930FBA;
+	Fri, 22 May 2026 19:39:17 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 7.1-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <a050fd86-b9dc-4a39-a274-57bbe1931d42@kernel.dk>
+References: <a050fd86-b9dc-4a39-a274-57bbe1931d42@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <a050fd86-b9dc-4a39-a274-57bbe1931d42@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.1-20260522
+X-PR-Tracked-Commit-Id: f6982769910ecddabdb5b8b9afdab0bb8b6668ac
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3997e3bb1d30a426c0599918ebaac51698fcc959
+Message-Id: <177947875609.1341212.3122950451972178862.pr-tracker-bot@kernel.org>
+Date: Fri, 22 May 2026 19:39:16 +0000
 To: Jens Axboe <axboe@kernel.dk>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	linux-mm@kvack.org,
-	Leon Romanovsky <leon@kernel.org>
-Subject: [PATCH] block: Add bvec_folio()
-Date: Fri, 22 May 2026 19:21:20 +0100
-Message-ID: <20260522182122.2489391-1-willy@infradead.org>
-X-Mailer: git-send-email 2.54.0
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-This is a simple helper which replaces page_folio(bvec->bv_page).
-Minor improvement in readability, but the real motivation is to reduce
-the number of references to bvec->bv_page so that it can be changed
-with less work.
+The pull request you sent on Fri, 22 May 2026 09:53:29 -0600:
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-Cc: Leon Romanovsky <leon@kernel.org>
----
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-7.1-20260522
 
-Hi Jens,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3997e3bb1d30a426c0599918ebaac51698fcc959
 
-I have a pile of other patches which depend on this one, but they're
-spread all over the kernel and don't really have anything in common
-with each other.  Getting this in the next merge window will let me send
-those patches next cycle.
+Thank you!
 
- block/bio.c          |  6 +++---
- include/linux/bio.h  |  2 +-
- include/linux/bvec.h | 13 +++++++++++++
- io_uring/rsrc.c      |  2 +-
- mm/page_io.c         |  4 ++--
- 5 files changed, 20 insertions(+), 7 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 5f10900b3f42..85aab3140909 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1300,7 +1300,7 @@ static void bio_free_folios(struct bio *bio)
- 	int i;
- 
- 	bio_for_each_bvec_all(bv, bio, i) {
--		struct folio *folio = page_folio(bv->bv_page);
-+		struct folio *folio = bvec_folio(bv);
- 
- 		if (!is_zero_folio(folio))
- 			folio_put(folio);
-@@ -1409,7 +1409,7 @@ int bio_iov_iter_bounce(struct bio *bio, struct iov_iter *iter, size_t maxlen,
- 
- static void bvec_unpin(struct bio_vec *bv, bool mark_dirty)
- {
--	struct folio *folio = page_folio(bv->bv_page);
-+	struct folio *folio = bvec_folio(bv);
- 	size_t nr_pages = (bv->bv_offset + bv->bv_len - 1) / PAGE_SIZE -
- 			bv->bv_offset / PAGE_SIZE + 1;
- 
-@@ -1443,7 +1443,7 @@ static void bio_iov_iter_unbounce_read(struct bio *bio, bool is_error,
- 			bvec_unpin(&bio->bi_io_vec[1 + i], mark_dirty);
- 	}
- 
--	folio_put(page_folio(bio->bi_io_vec[0].bv_page));
-+	folio_put(bvec_folio(&bio->bi_io_vec[0]));
- }
- 
- /**
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index dc17780d6c1e..6613ab4519bd 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -283,7 +283,7 @@ static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
- 		return;
- 	}
- 
--	fi->folio = page_folio(bvec->bv_page);
-+	fi->folio = bvec_folio(bvec);
- 	fi->offset = bvec->bv_offset +
- 			PAGE_SIZE * folio_page_idx(fi->folio, bvec->bv_page);
- 	fi->_seg_count = bvec->bv_len;
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index d36dd476feda..32846079b853 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -74,6 +74,19 @@ static inline void bvec_set_virt(struct bio_vec *bv, void *vaddr,
- 	bvec_set_page(bv, virt_to_page(vaddr), len, offset_in_page(vaddr));
- }
- 
-+/**
-+ * bvec_folio - Return the first folio referenced by this bvec
-+ * @bv: bvec to access
-+ *
-+ * bvecs can span multiple folios.  Unless you know that this
-+ * bvec does not, you may be better off using something like
-+ * bio_for_each_folio_all() which iterates over all folios.
-+ */
-+static inline struct folio *bvec_folio(const struct bio_vec *bv)
-+{
-+	return page_folio(bv->bv_page);
-+}
-+
- struct bvec_iter {
- 	/*
- 	 * Current device address in 512 byte sectors. Only updated by the bio
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index 650303626be6..5d792f70ec1e 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -102,7 +102,7 @@ static void io_release_ubuf(void *priv)
- 	unsigned int i;
- 
- 	for (i = 0; i < imu->nr_bvecs; i++) {
--		struct folio *folio = page_folio(imu->bvec[i].bv_page);
-+		struct folio *folio = bvec_folio(&imu->bvec[i]);
- 
- 		unpin_user_folio(folio, 1);
- 	}
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 70cea9e24d2f..a59b73f8bdd9 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -490,7 +490,7 @@ static void sio_read_complete(struct kiocb *iocb, long ret)
- 
- 	if (ret == sio->len) {
- 		for (p = 0; p < sio->pages; p++) {
--			struct folio *folio = page_folio(sio->bvec[p].bv_page);
-+			struct folio *folio = bvec_folio(&sio->bvec[p]);
- 
- 			count_mthp_stat(folio_order(folio), MTHP_STAT_SWPIN);
- 			count_memcg_folio_events(folio, PSWPIN, folio_nr_pages(folio));
-@@ -500,7 +500,7 @@ static void sio_read_complete(struct kiocb *iocb, long ret)
- 		count_vm_events(PSWPIN, sio->len >> PAGE_SHIFT);
- 	} else {
- 		for (p = 0; p < sio->pages; p++) {
--			struct folio *folio = page_folio(sio->bvec[p].bv_page);
-+			struct folio *folio = bvec_folio(&sio->bvec[p]);
- 
- 			folio_unlock(folio);
- 		}
 -- 
-2.47.3
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
