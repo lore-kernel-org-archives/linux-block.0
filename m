@@ -1,73 +1,199 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF5E3438AD
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 09:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553512F0C7E;
+	Fri, 22 May 2026 09:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779440629; cv=none; b=tSJuXYHswzAstLkSHheCkigm9duV7tkleVono+nScTv3dBzI5PJBMmmMceV2Eyw0ldqhihuJmm3ATsEuuQJ5HYuiI4rLpLqSs3tv/h5lg1Tl2Hdmmh6oYxBIoRO0wKXN35683fxZcOWknlRpxJaqkBv+u4MB2Wz9DflKkk5YWmI=
+	t=1779441352; cv=none; b=LMW2c5XJRrhvmtmzd4Y+Fz3DLO+6U+kIOcULLi0gqWdW9olzJ7Iobvs2i4a1ScfIVf+ETX8o6DGcESbLuaGUZsHE6DZ4N8Bt2jgJwKw2mrTdS74Glc+mP+nu/Cdg42cJhxFM+js1W/9SxEhJpyWRyX+VcWd1E52FDA8+7wjgZjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779440629; c=relaxed/simple;
-	bh=rE5qbF74J/MKMn97iKB1KyH0B8m/7B7nsIog11qhmng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mwx2ODZG7fksGBd1sDu/x4Y92T47x67VzvxcqslRfjVwDHfEeCG2XR+YSy8q4lAuxsrJxw5JkUZWJ7CXhO6UqbMUwDWGrtydRta/1Qjil3R852tW/pzsODAon5ivRMCsXy0HcsWVqWiJ1+Gh4cHrcuIo5tGif9qU0cJ/m5kF1Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id C591568AFE; Fri, 22 May 2026 11:03:41 +0200 (CEST)
-Date: Fri, 22 May 2026 11:03:40 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-	tom.leiming@gmail.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3] blk-mq: pop cached request if it is usable
-Message-ID: <20260522090340.GA7331@lst.de>
-References: <20260521190253.242065-1-kbusch@meta.com>
+	s=arc-20240116; t=1779441352; c=relaxed/simple;
+	bh=oBYHzTU1lkSpFLiOM57OLlBnNVrEaNVBbd5dBdlf2WU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jbf4YYJc8zlk19y7ioleqb1FkV+tzae9CJtycUG9pc+x26yyzJn5N+XuXJeJ86W29TIwgEjIjOwi2oKDjJEHJrRgsNOD+BwEnrANDQY7NepI0tbot38OuJLX9d+9JZwf7CRtEyU6hV2YZodwjaJsyHm5KWZruHAx/HOEZ8Y+Eno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: cfadd1b855be11f1aa26b74ffac11d73-20260522
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_C_CI, GTI_FG_IT, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
+	ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:92af8e96-0972-472c-9c22-53e277bb93bf,IP:10,
+	URL:0,TC:0,Content:0,EDM:-20,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-10
+X-CID-INFO: VERSION:1.3.12,REQID:92af8e96-0972-472c-9c22-53e277bb93bf,IP:10,UR
+	L:0,TC:0,Content:0,EDM:-20,RT:0,SF:0,FILE:0,BULK:0,RULE:EDM_GE969F26,ACTIO
+	N:release,TS:-10
+X-CID-META: VersionHash:e7bac3a,CLOUDID:086bd40506295a46c59a6d8ea38ce2ea,BulkI
+	D:260522171546EOHFZZSX,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|102|127|
+	865|898,TC:nil,Content:0|15|50,EDM:1,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:n
+	il,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BR
+	E:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_AEC,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,
+	TF_CID_SPAM_ULS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: cfadd1b855be11f1aa26b74ffac11d73-20260522
+X-User: cuitao@kylinos.cn
+Received: from ctao-book.. [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <cuitao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 170641192; Fri, 22 May 2026 17:15:44 +0800
+From: Tao Cui <cuitao@kylinos.cn>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	cgroups@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	Tao Cui <cuitao@kylinos.cn>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v2] blk-throttle: schedule parent dispatch in tg_flush_bios()
+Date: Fri, 22 May 2026 17:15:30 +0800
+Message-ID: <20260522091530.1901437-1-cuitao@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260521190253.242065-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-> +static struct request *blk_mq_get_cached_request(struct blk_plug *plug,
->  		struct request_queue *q, blk_opf_t opf)
->  {
->  	enum hctx_type type = blk_mq_get_hctx_type(opf);
-> @@ -3093,27 +3093,10 @@ static struct request *blk_mq_peek_cached_request(struct blk_plug *plug,
->  		return NULL;
->  	if (op_is_flush(rq->cmd_flags) != op_is_flush(opf))
->  		return NULL;
-> +	rq_list_pop(&plug->cached_rqs);
->  	return rq;
->  }
+tg_flush_bios() schedules pending_timer on the child tg's own
+service_queue, which causes throtl_pending_timer_fn() to dispatch from
+the child's pending_tree.  For leaf cgroups this tree is empty, so the
+timer fires and exits without dispatching the throttled bio.
 
-Please add a comment about not sleeping between the peek and pop as
-in my earlier patch here.
+The throttled bio sits in the parent's pending_tree with disptime set
+to jiffies (THROTL_TG_CANCELING zeroes all dispatch times), but the
+parent's timer is never explicitly rescheduled.  The bio only gets
+dispatched when the parent timer eventually fires at its previously
+scheduled expiry.
 
-> @@ -3257,12 +3243,10 @@ void blk_mq_submit_bio(struct bio *bio)
->  	return;
->  
->  queue_exit:
-> -	/*
-> -	 * Don't drop the queue reference if we were trying to use a cached
-> -	 * request and thus didn't acquire one.
-> -	 */
->  	if (!rq)
->  		blk_queue_exit(q);
-> +	else
-> +		blk_mq_free_request(rq);
->  }
+Fix by calling throtl_schedule_next_dispatch(sq->parent_sq, true)
+instead, matching what tg_set_limit() already does.  This forces the
+parent's dispatch cycle to run immediately and flush all canceling
+bios without waiting for a stale timer.
 
-I think keeping a comment here would be nice, a would be avoid
-the inversion of the condition for a trivial if/else.
+For the device deletion path (blk_throtl_cancel_bios), directly
+complete throttled bios with EIO via bio_io_error() instead of
+dispatching them through the timer -> work -> submission chain.
+This avoids a race with the SCSI state machine where bios can reach
+the SCSI layer while the device is in SDEV_CANCEL state, causing
+ENODEV instead of the expected EIO.
 
-But on a higher level, I really think you should add it back to the
-batch list here, otherwise we're doing lots of roundtrips through
-blk_mq_free_request for trivially mergable sequential I/O.
+Reported-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Link: https://lore.kernel.org/all/ag2owaQQoigp_fSV@shinmob/
+Signed-off-by: Tao Cui <cuitao@kylinos.cn>
+
+---
+Changes in v2:
+- Rewrite blk_throtl_cancel_bios() to directly complete throttled
+  bios with EIO via bio_io_error() instead of dispatching them
+  through the timer -> work -> submission chain.  This avoids a
+  race with the SCSI state machine during device deletion where
+  bios can reach the SCSI layer while the device is in SDEV_CANCEL
+  state, causing ENODEV instead of the expected EIO.
+- Add Reported-by and Link tags from Shin'ichiro Kawasaki's report.
+
+v1:
+  https://lore.kernel.org/all/20260520062420.1762788-1-cuitao@kylinos.cn/
+---
+ block/blk-throttle.c | 51 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 49 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index cabf91f0d0dc..88986dde1e18 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1649,7 +1649,7 @@ static void tg_flush_bios(struct throtl_grp *tg)
+ 	 */
+ 	tg_update_disptime(tg);
+ 
+-	throtl_schedule_pending_timer(sq, jiffies + 1);
++	throtl_schedule_next_dispatch(sq->parent_sq, true);
+ }
+ 
+ static void throtl_pd_offline(struct blkg_policy_data *pd)
+@@ -1668,11 +1668,52 @@ struct blkcg_policy blkcg_policy_throtl = {
+ 	.pd_free_fn		= throtl_pd_free,
+ };
+ 
++static void tg_cancel_writeback_bios(struct throtl_grp *tg,
++				      struct bio_list *cancel_bios)
++{
++	struct throtl_service_queue *sq = &tg->service_queue;
++	struct throtl_data *td = sq_to_td(sq);
++	int rw;
++
++	if (tg->flags & THROTL_TG_CANCELING)
++		return;
++	tg->flags |= THROTL_TG_CANCELING;
++
++	for (rw = READ; rw <= WRITE; rw++) {
++		struct throtl_qnode *qn, *tmp;
++		unsigned int nr_bios = 0;
++
++		list_for_each_entry_safe(qn, tmp, &sq->queued[rw], node) {
++			struct bio *bio;
++
++			while ((bio = bio_list_pop(&qn->bios_iops))) {
++				sq->nr_queued_iops[rw]--;
++				bio_list_add(&cancel_bios[rw], bio);
++				nr_bios++;
++			}
++			while ((bio = bio_list_pop(&qn->bios_bps))) {
++				sq->nr_queued_bps[rw]--;
++				bio_list_add(&cancel_bios[rw], bio);
++				nr_bios++;
++			}
++
++			list_del_init(&qn->node);
++			blkg_put(tg_to_blkg(qn->tg));
++		}
++
++		td->nr_queued[rw] -= nr_bios;
++	}
++
++	throtl_dequeue_tg(tg);
++}
++
+ void blk_throtl_cancel_bios(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	struct cgroup_subsys_state *pos_css;
+ 	struct blkcg_gq *blkg;
++	struct bio_list cancel_bios[2] = { };
++	int rw;
+ 
+ 	if (!blk_throtl_activated(q))
+ 		return;
+@@ -1693,10 +1734,16 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+ 		 * Cancel bios here to ensure no bios are inflight after
+ 		 * del_gendisk.
+ 		 */
+-		tg_flush_bios(blkg_to_tg(blkg));
++		tg_cancel_writeback_bios(blkg_to_tg(blkg), cancel_bios);
+ 	}
+ 	rcu_read_unlock();
+ 	spin_unlock_irq(&q->queue_lock);
++
++	for (rw = READ; rw <= WRITE; rw++) {
++		struct bio *bio;
++		while ((bio = bio_list_pop(&cancel_bios[rw])))
++			bio_io_error(bio);
++	}
+ }
+ 
+ static bool tg_within_limit(struct throtl_grp *tg, struct bio *bio, bool rw)
+-- 
+2.43.0
 
