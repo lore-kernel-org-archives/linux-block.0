@@ -1,194 +1,312 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E225F399361;
-	Sat, 23 May 2026 12:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCD3223DEA
+	for <linux-block@vger.kernel.org>; Sat, 23 May 2026 12:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779539612; cv=none; b=Ltp3L6yeDsT8DqAoOpzTvnS4fy9MKT2pFdwHMBXxx7CAZkNIlubZEZ66I9J9ZpnUAY6ypK9dmgyAOcytkLhltiGK8I9uiS+yZStHelfQe2uJhUSa6OKhinYRx+auzuf2Cftb9FnnrrmpFI0H2G2t7kXj6UC6JAUrgY9d8qKWyKs=
+	t=1779540766; cv=none; b=nnIcagA6LNmwtAL/Rmxts6mP0Y6AaQ0Z33exKG+Fbx3a9v3TrAhm7Dq8yY69+JH8tTu5pSaCB4+KW9rS+erRRx0Y+MQe4vCs4FkS5h1X1TWxtzJRLEvYw0qItN8QFn+G5Zdlt25MykFJbsSPxxtR5PiMCLYWQZf+GNWR88h25J4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779539612; c=relaxed/simple;
-	bh=56rtl5yWcqt/qvv0kT1QPxahxvD5Oep41kV/zQgRNLw=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=BCBnco9lLzAqCsjkIiC7wbyZX3Q4mfMVkxvqxXpgQrvRmhg0qZ2NOzxerEygdnY3GXO7fNot+h+qFF5Zv6rOwU5dgvnhtgOxNS5qC3rE0c3uzLlScf/RF8st/cbv4uHbApJRTsxyjhIodZV3tQouEDxHluvJ7QMRurRVFIfuMPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jW3+XESk; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779540766; c=relaxed/simple;
+	bh=6+fWAZt+4ivYTzLpmo8IvPTUCuA4JscxLqeYDtrKYs4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MZZzApvnSrM1lXznA0nhY9xlL+qDXaa/u7TCtsqi2sI0pIGjf4EZMbzD5pibxOainkRiksXEPR9SgbqzcsGFNb3BKfeI9LPlvo6GtObAJNyPc5VKOnW7ptuSNpIb3mFwaJXuZwxIy0eggWini+G2/fvsmvXJNcvvNufijbWiK+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=j3gOBikg; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jW3+XESk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D033D1F000E9;
-	Sat, 23 May 2026 12:32:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779539609;
-	bh=feRzGMWHkALLA8SyrU6RJ1+Ne9lKt9MuXcA+HfB5g6s=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To;
-	b=jW3+XESk7IvEcBU+bpy8yPJAU/0IVwlShO9v6KZOWX/ll0bKB5YUpHGA74CScGkib
-	 h61p7Ii11ojyLl4zWD9zC9jbGza8+08D0KF1Xyx9eBM6rLRsPBrMoOJWaYv4k5Vx5f
-	 b+ou7eQ1gREOxWOzgW+VN7myFXCmEhBFTQ9Sdu659LX8/GPVkRUMTXMWimv/FjEczf
-	 bG24n4N8iuPU4UnGW4T49bADfkhY2K1I2wXkGRyHTK9qH1ARUHqANTaWPkqp1iRNQ2
-	 wp7jB+4PxO00QxNwhLHhUxRt7tl3Y/eymRjs0Aul1vvTeTOYwlxBhdLtHlabRl0oG/
-	 MVc5rNjQJ3rsg==
-Message-ID: <6b2a816f-eb3b-4e0c-a024-ee2e3743eb04@kernel.org>
-Date: Sat, 23 May 2026 21:32:41 +0900
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="j3gOBikg"
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 24B17240105
+	for <linux-block@vger.kernel.org>; Sat, 23 May 2026 14:52:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net; s=2017;
+	t=1779540757; bh=bxiCjbyE4L9dPupS9cBbu4nnbIMmzEr7N/QwhywpPUo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:From;
+	b=j3gOBikgfn1xTd/Gd2B+JyqhIyaLtMxcxXdZX3m9eLRzQ1vmLG/sQ2WOzYbxt+OPZ
+	 0W3blV4pxc1wVtCgfZSjDG54sl27t3gA80+tuXxyJ7moJCzoVmjgSApuLW5Ji4lG9i
+	 l4LZ5AIUIJmiODfR+WIAw9GRIxXdCd2rF/dsklQuP8H0trjRBYUjfcyd2/1+2gRyTR
+	 HQOg+JgGmG3x/otZzozN/kbh7DQxC5md5txTL9dtXZiq8KlOXLB89O8cC4GXsBm1sf
+	 ERoqvMz8i/ZQosK4gKjcCaj6DkgX6TtWjYS+jXTZcvhP4h3nyFqk+ossLfxPYJ2lcp
+	 IacfcRFiAnelQ==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4gN29W11Cqz6tvq;
+	Sat, 23 May 2026 14:52:31 +0200 (CEST)
+From: Mateusz Nowicki <mateusz.nowicki@posteo.net>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Sung-woo Kim <iam@sung-woo.kim>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Ulf Hansson <ulfh@kernel.org>,
+	Richard Weinberger <richard@nod.at>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Sven Peter <sven@kernel.org>,
+	Janne Grunau <j@jannau.net>,
+	Neal Gompa <neal@gompa.dev>,
+	Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Justin Tee <justin.tee@broadcom.com>,
+	Naresh Gottumukkala <nareshgottumukkala83@gmail.com>,
+	Paul Ely <paul.ely@broadcom.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Thomas Fourier <fourier.thomas@gmail.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Luke Wang <ziniu.wang_1@nxp.com>,
+	Kees Cook <kees@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	nbd@other.debian.org,
+	dm-devel@lists.linux.dev,
+	linux-mmc@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org
+Subject: [PATCH v1] block: switch numa_node to int in blk_mq_hw_ctx and init_request
+Date: Sat, 23 May 2026 12:52:35 +0000
+Message-ID: <20260523125210.272274-1-mateusz.nowicki@posteo.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Harry Yoo <harry@kernel.org>
-Subject: DEPT (the dependency tracker) as AI review prompt? (was: DEPT v18)
-To: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org
-Cc: kernel_team@skhynix.com, torvalds@linux-foundation.org,
- damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
- adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com,
- peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
- rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
- daniel.vetter@ffwll.ch, duyuyang@gmail.com, johannes.berg@intel.com,
- tj@kernel.org, tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
- amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
- linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
- minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
- sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
- penberg@kernel.org, rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
- linux-block@vger.kernel.org, josef@toxicpanda.com,
- linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
- dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
- dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
- melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
- chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
- max.byungchul.park@gmail.com, boqun.feng@gmail.com, longman@redhat.com,
- yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
- netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com,
- corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
- hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
- gustavo@padovan.org, christian.koenig@amd.com, andi.shyti@kernel.org,
- arnd@arndb.de, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- rppt@kernel.org, surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com,
- da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org,
- frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
- josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com,
- jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com,
- neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
- trondmy@kernel.org, anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
- clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
- kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, broonie@kernel.org,
- kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
- ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
- baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
- joel.granados@kernel.org, richard.weiyang@gmail.com,
- geert+renesas@glider.be, tim.c.chen@linux.intel.com, linux@treblig.org,
- alexander.shishkin@linux.intel.com, lillian@star-ark.net,
- chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
- link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
- brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
- mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
- linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-modules@vger.kernel.org, rcu@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev,
- 2407018371@qq.com, dakr@kernel.org, miguel.ojeda.sandonis@gmail.com,
- neilb@ownmail.net, bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
- dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
- tmgross@umich.edu, rust-for-linux@vger.kernel.org, Chris Mason
- <clm@meta.com>, Roman Gushchin <roman.gushchin@linux.dev>,
- Josef Bacik <josef@toxicpanda.com>
-References: <20251205071855.72743-1-byungchul@sk.com>
-Content-Language: en-US
-In-Reply-To: <20251205071855.72743-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Can we start DEPT as an AI review prompt, by documenting DEPT's 
-dependency tracking model and false positive elimination rules as a 
-carefully crafted prompt?
+numa_node in blk_mq_hw_ctx and the matching argument of
+blk_mq_ops::init_request can be NUMA_NO_NODE (-1).  Declared as
+unsigned int, NUMA_NO_NODE becomes UINT_MAX and walks off
+nvme_dev::descriptor_pools[] on CONFIG_NUMA=n [1].
 
-While DEPT can identify deadlock issues beyond lockdep's capabilities, 
-it is hard to enable in automated testing; without fine-grained 
-annotations it can produce a high rate of false positives, and verifying 
-them requires significant human effort.
+Switch the field and the callback prototype to int and update all
+in-tree init_request implementations.  No functional change:
+cpu_to_node(), kmalloc_node() and blk_alloc_flush_queue() already
+take int.
 
-The open source AI Review Prompt has locking.md file [1] that teaches 
-the AI how to review locks and detect misuse.
+Link: https://lore.kernel.org/linux-nvme/20260522150628.399288-1-mateusz.nowicki@posteo.net/ [1]
+Link: https://lore.kernel.org/linux-nvme/20260309062840.2937858-2-iam@sung-woo.kim/
+Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
+Suggested-by: Sung-woo Kim <iam@sung-woo.kim>
+Signed-off-by: Mateusz Nowicki <mateusz.nowicki@posteo.net>
+---
+ block/bsg-lib.c                   | 2 +-
+ drivers/block/mtip32xx/mtip32xx.c | 2 +-
+ drivers/block/nbd.c               | 2 +-
+ drivers/md/dm-rq.c                | 2 +-
+ drivers/mmc/core/queue.c          | 2 +-
+ drivers/mtd/ubi/block.c           | 2 +-
+ drivers/nvme/host/apple.c         | 2 +-
+ drivers/nvme/host/fc.c            | 2 +-
+ drivers/nvme/host/pci.c           | 2 +-
+ drivers/nvme/host/rdma.c          | 2 +-
+ drivers/nvme/host/tcp.c           | 2 +-
+ drivers/nvme/target/loop.c        | 2 +-
+ drivers/scsi/scsi_lib.c           | 2 +-
+ include/linux/blk-mq.h            | 4 ++--
+ 14 files changed, 15 insertions(+), 15 deletions(-)
 
-If we can write a review prompt for DEPT in a similar manner and have 
-the AI do the deadlock detection and false positive elimination, I think 
-we could identify those problems more effectively with much less human 
-effort.
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index fdb4b290ca68..895db30a7033 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -299,7 +299,7 @@ static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ /* called right after the request is allocated for the request_queue */
+ static int bsg_init_rq(struct blk_mq_tag_set *set, struct request *req,
+-		       unsigned int hctx_idx, unsigned int numa_node)
++		       unsigned int hctx_idx, int numa_node)
+ {
+ 	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+ 
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 567192e371a8..8aedba9b5690 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3340,7 +3340,7 @@ static void mtip_free_cmd(struct blk_mq_tag_set *set, struct request *rq,
+ }
+ 
+ static int mtip_init_cmd(struct blk_mq_tag_set *set, struct request *rq,
+-			 unsigned int hctx_idx, unsigned int numa_node)
++			 unsigned int hctx_idx, int numa_node)
+ {
+ 	struct driver_data *dd = set->driver_data;
+ 	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index fe63f3c55d0d..e2fe9e3308fc 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1888,7 +1888,7 @@ static void nbd_dbg_close(void)
+ #endif
+ 
+ static int nbd_init_request(struct blk_mq_tag_set *set, struct request *rq,
+-			    unsigned int hctx_idx, unsigned int numa_node)
++			    unsigned int hctx_idx, int numa_node)
+ {
+ 	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 	cmd->nbd = set->driver_data;
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 9703b3ae364e..9a386254d836 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -462,7 +462,7 @@ static void dm_start_request(struct mapped_device *md, struct request *orig)
+ }
+ 
+ static int dm_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
+-			      unsigned int hctx_idx, unsigned int numa_node)
++			      unsigned int hctx_idx, int numa_node)
+ {
+ 	struct mapped_device *md = set->driver_data;
+ 	struct dm_rq_target_io *tio = blk_mq_rq_to_pdu(rq);
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 39fcb662c43f..cfa268925c26 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -208,7 +208,7 @@ static unsigned short mmc_get_max_segments(struct mmc_host *host)
+ }
+ 
+ static int mmc_mq_init_request(struct blk_mq_tag_set *set, struct request *req,
+-			       unsigned int hctx_idx, unsigned int numa_node)
++			       unsigned int hctx_idx, int numa_node)
+ {
+ 	struct mmc_queue_req *mq_rq = req_to_mmc_queue_req(req);
+ 	struct mmc_queue *mq = set->driver_data;
+diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
+index 8880a783c3bc..29c0d6941a81 100644
+--- a/drivers/mtd/ubi/block.c
++++ b/drivers/mtd/ubi/block.c
+@@ -312,7 +312,7 @@ static blk_status_t ubiblock_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ static int ubiblock_init_request(struct blk_mq_tag_set *set,
+ 		struct request *req, unsigned int hctx_idx,
+-		unsigned int numa_node)
++		int numa_node)
+ {
+ 	struct ubiblock_pdu *pdu = blk_mq_rq_to_pdu(req);
+ 
+diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
+index c692fc73babf..97586307ac1a 100644
+--- a/drivers/nvme/host/apple.c
++++ b/drivers/nvme/host/apple.c
+@@ -819,7 +819,7 @@ static int apple_nvme_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
+ 
+ static int apple_nvme_init_request(struct blk_mq_tag_set *set,
+ 				   struct request *req, unsigned int hctx_idx,
+-				   unsigned int numa_node)
++				   int numa_node)
+ {
+ 	struct apple_nvme_queue *q = set->driver_data;
+ 	struct apple_nvme *anv = queue_to_apple_nvme(q);
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index e4f4528fe2a2..1907da499ad2 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -2109,7 +2109,7 @@ __nvme_fc_init_request(struct nvme_fc_ctrl *ctrl,
+ 
+ static int
+ nvme_fc_init_request(struct blk_mq_tag_set *set, struct request *rq,
+-		unsigned int hctx_idx, unsigned int numa_node)
++		unsigned int hctx_idx, int numa_node)
+ {
+ 	struct nvme_fc_ctrl *ctrl = to_fc_ctrl(set->driver_data);
+ 	struct nvme_fcp_op_w_sgl *op = blk_mq_rq_to_pdu(rq);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 139a10cd687f..afd407df640f 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -660,7 +660,7 @@ static int nvme_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
+ 
+ static int nvme_pci_init_request(struct blk_mq_tag_set *set,
+ 		struct request *req, unsigned int hctx_idx,
+-		unsigned int numa_node)
++		int numa_node)
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index f77c960f7632..08459c65c3d5 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -292,7 +292,7 @@ static void nvme_rdma_exit_request(struct blk_mq_tag_set *set,
+ 
+ static int nvme_rdma_init_request(struct blk_mq_tag_set *set,
+ 		struct request *rq, unsigned int hctx_idx,
+-		unsigned int numa_node)
++		int numa_node)
+ {
+ 	struct nvme_rdma_ctrl *ctrl = to_rdma_ctrl(set->driver_data);
+ 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 15d36d6a728e..36b3ec50a9fd 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -548,7 +548,7 @@ static void nvme_tcp_exit_request(struct blk_mq_tag_set *set,
+ 
+ static int nvme_tcp_init_request(struct blk_mq_tag_set *set,
+ 		struct request *rq, unsigned int hctx_idx,
+-		unsigned int numa_node)
++		int numa_node)
+ {
+ 	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(set->driver_data);
+ 	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
+diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
+index d98d0cdc5d6f..ae00bcef2251 100644
+--- a/drivers/nvme/target/loop.c
++++ b/drivers/nvme/target/loop.c
+@@ -202,7 +202,7 @@ static int nvme_loop_init_iod(struct nvme_loop_ctrl *ctrl,
+ 
+ static int nvme_loop_init_request(struct blk_mq_tag_set *set,
+ 		struct request *req, unsigned int hctx_idx,
+-		unsigned int numa_node)
++		int numa_node)
+ {
+ 	struct nvme_loop_ctrl *ctrl = to_loop_ctrl(set->driver_data);
+ 	struct nvme_loop_iod *iod = blk_mq_rq_to_pdu(req);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 6e8c7a42603e..67f789bd02e7 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1950,7 +1950,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ }
+ 
+ static int scsi_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
+-				unsigned int hctx_idx, unsigned int numa_node)
++				unsigned int hctx_idx, int numa_node)
+ {
+ 	struct Scsi_Host *shost = set->driver_data;
+ 	struct scsi_cmnd *cmd = blk_mq_rq_to_pdu(rq);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 18a2388ba581..2e7f90048171 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -428,7 +428,7 @@ struct blk_mq_hw_ctx {
+ 	struct blk_mq_tags	*sched_tags;
+ 
+ 	/** @numa_node: NUMA node the storage adapter has been connected to. */
+-	unsigned int		numa_node;
++	int			numa_node;
+ 	/** @queue_num: Index of this hardware queue. */
+ 	unsigned int		queue_num;
+ 
+@@ -653,7 +653,7 @@ struct blk_mq_ops {
+ 	 * flush request.
+ 	 */
+ 	int (*init_request)(struct blk_mq_tag_set *set, struct request *,
+-			    unsigned int, unsigned int);
++			    unsigned int, int);
+ 	/**
+ 	 * @exit_request: Ditto for exit/teardown.
+ 	 */
 
-[1] 
-https://github.com/masoncl/review-prompts/blob/main/kernel/subsystem/locking.md
-
+base-commit: 45255ea1ca096b11b1303c9b54502a28f3a31dd1
 -- 
-Cheers,
-Harry / Hyeonggon
-
-On 12/5/25 4:18 PM, Byungchul Park wrote:
-> I'm happy to see that DEPT reported real problems in practice:
-> 
->     https://lore.kernel.org/lkml/6383cde5-cf4b-facf-6e07-1378a485657d@I-love.SAKURA.ne.jp/
->     https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byungchul.park@lge.com/
->     https://lore.kernel.org/all/b6e00e77-4a8c-4e05-ab79-266bf05fcc2d@igalia.com/
-> 
-> I’ve added documentation describing DEPT — this should help you
-> understand what DEPT is and how it works.  You can use DEPT simply by
-> enabling CONFIG_DEPT and checking dmesg at runtime.
-> ---
-> 
-> Hi Linus and folks,
-> 
-> I’ve been developing a tool to detect deadlock possibilities by tracking
-> waits/events — rather than lock acquisition order — to cover all the
-> synchronization mechanisms.  To summarize the design rationale, starting
-> from the problem statement, through analysis, to the solution:
-> 
->     CURRENT STATUS
->     --------------
->     Lockdep tracks lock acquisition order to identify deadlock conditions.
->     Additionally, it tracks IRQ state changes — via {en,dis}able — to
->     detect cases where locks are acquired unintentionally during
->     interrupt handling.
->     
->     PROBLEM
->     -------
->     Waits and their associated events that are never reachable can
->     eventually lead to deadlocks.  However, since Lockdep focuses solely
->     on lock acquisition order, it has inherent limitations when handling
->     waits and events.
->     
->     Moreover, by tracking only lock acquisition order, Lockdep cannot
->     properly handle read locks or cross-event scenarios — such as
->     wait_for_completion() and complete() — making it increasingly
->     inadequate as a general-purpose deadlock detection tool.
->     
->     SOLUTION
->     --------
->     Once again, waits and their associated events that are never
->     reachable can eventually lead to deadlocks.  The new solution, DEPT,
->     focuses directly on waits and events.  DEPT monitors waits and events,
->     and reports them when any become unreachable.
-> 
-> DEPT provides:
-> 
->     * Correct handling of read locks.
->     * Support for general waits and events.
->     * Continuous operation, even after multiple reports.
->     * Simple, intuitive annotation APIs.
-> 
-> There are still false positives, and some are already being worked on
-> for suppression.  Especially splitting the folio class into several
-> appropriate classes e.g. block device mapping class and regular file
-> mapping class, is currently under active development by me and Yeoreum
-> Yun.
->> Anyway, these efforts will need to continue for a while, as we’ve seen
-> with lockdep over two decades.  DEPT is tagged as EXPERIMENTAL in
-> Kconfig — meaning it’s not yet suitable for use as an automation tool.
-> 
-> However, for those who are interested in using DEPT to analyze complex
-> synchronization patterns and extract dependency insights, DEPT would be
-> a great tool for the purpose.
+2.53.0
 
