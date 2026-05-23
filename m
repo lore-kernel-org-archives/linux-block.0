@@ -1,119 +1,257 @@
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A4825B0AA
-	for <linux-block@vger.kernel.org>; Sat, 23 May 2026 13:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8082F3168FB
+	for <linux-block@vger.kernel.org>; Sat, 23 May 2026 14:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779544585; cv=none; b=RHvsBEuKsTMq7pEhTRbdCT/R4xziQIMFVCUb678DDxELp0kbOJAWA4FnnpLMSx9D7cyjrQwJMEHe1PBlF4idjOWpBR9yv25xvjVYSRsOkvAnK4KTH5CyO6UehKWCQJjjIK4ujZx9yv3c1DFi0YW5hSl12RmzC5zxtK3gADFyVkI=
+	t=1779545262; cv=none; b=f8faKNDMk9NwZYhfad/SYWlELSXZ8hq+UcuQ5ppVu7OxN95BxBlPJMYxy5e+0GrX5bM9gRnNH2Wcex0WLwxZPJz3j/zCaBnZd2I0SFQ40T1ZYl9r1sFWINSQyvqG3ci9uw6VV421eMduqiXqAjJ9gEM+prbYwQMjurspRdLKF0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779544585; c=relaxed/simple;
-	bh=IQrjNrvQ/MIKMylnDMD+1/kJcvZ5OH6hPD8Hp7/iOIY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YrzEd3J1ntOlwNv5eQi3+UYw7/sJGdYSH8MQVZOWeBGieIqe+Z+uv00RMHtpwT1ok1FAuPW1tdZzKRXrktKPlFAu9rm5a2shgr5QUtnr3Y/BqtTvDKE8noup8dImiBZ/lG8wGwVubpIUErf+4VfZuCkq+kNVUO1y894K9UuTnF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=u8dBGuBW; arc=none smtp.client-ip=209.85.161.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="u8dBGuBW"
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-69d8e55e76fso823947eaf.2
-        for <linux-block@vger.kernel.org>; Sat, 23 May 2026 06:56:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779544583; x=1780149383; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dmyc9diXCNhqzK4Rcicl3F8fH3GjZpu9eBl3t98hlwg=;
-        b=u8dBGuBWSxbU0bDEna7ctJkp1J9RCKUFMrSdSamrLmO+vej8aqesgKHjjrkUW4xBJJ
-         sUmX1E6YZiM69yb50RtHa7amabVkpFsTaQHLHJ+PL4HUxhTspaq9wQ2LfT7jfq0ol8Ge
-         XhoSMpt/hLXzc1F5MQhnUTkT33J+1YWlGuPdIlYsG/5XhHoHYV7dBoYd4oYe3MO6Lt3z
-         Lo8GYYbtACT9GJCr7byke2VimLAzZ6hTYasVgn2hysq2vaiI4OXnt+5J9d2s3V5DtHTr
-         rs5byzOSF/dum3r8Xe+OwbO18RJ5Bfj1FQUgtQxkysAZimR4wtK5Aa5XGG4/Bt53YiI1
-         WezQ==
+	s=arc-20240116; t=1779545262; c=relaxed/simple;
+	bh=QLj/GX5k7eFyGfeZf3Wtm2oB8X6vtQ/bwHDCPYzJK1A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jKlvzA7aehedVERVC5RShhyl6wM38SxpA+F3USne3UTt/Xt1c2+mFXHeOfWpuR1rd87RH3CXIOgX4Sqzbk+F+lsPzmAUSvhLryOUjQl4dM52Nh5XgTlA0hritX+gEuMzCvAGLAs0cNySn0h7HVIK2VWibPKKwAOsA8e7Z/pIoQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-bcd99d6eb32so128271166b.3
+        for <linux-block@vger.kernel.org>; Sat, 23 May 2026 07:07:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779544583; x=1780149383;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dmyc9diXCNhqzK4Rcicl3F8fH3GjZpu9eBl3t98hlwg=;
-        b=KH/NHD95+FXLnXjlDJb4Afm08cyRCe7b3SclNToqUjRuMrNfKFp0g02rpjzcGMHLp3
-         GBDgG1g79oD+OsNnFMmwg8PE/kv9jEYFYrtyI8+7GzXEfykzQb+gqd/sCI2VH26WhXnP
-         E0DnnAf+6mobl/vvTHbkt11hHgYDPX78P/Q7toKVaP/OIPpkNwyJ36X9hgGaJ8IaBOsv
-         wx0pZdRprxHfypwpKWUfQ+zju1MSe6PC8Q+sToaBxC50iQMojCVLPGShbx4IDut82tge
-         3z8ur3b2zWEk2BOK6ctYE9gLYM/w44VGoMpRz0c1uwYhd1EuSXAl24v2v+h1b01cdR6V
-         curA==
-X-Forwarded-Encrypted: i=1; AFNElJ9x6q2XeKJfMuQBPvzeDRK7VD73QAgCplPh7aJFmRxrGnD7TGBsdlSIMCgt857XNqJoP5M0z6nkseiObg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLVaAZF9rhwIKMdf5SWpijNKMcLW1Prk1xK3brrQzHlBvEbs0e
-	yTT2Q0UeXa/XZw+RMbEKfm2bWjt+h7jmd1/eapgj9IIykvjFp2w/hfTV/F6PdCJQCLI=
-X-Gm-Gg: Acq92OGMnJTNCcIGN76RDYkctiYmnYvFAuGufz/u82f3H2RTqcAJsCOvny7pAIo4QGq
-	jSGcydk1f/9A1Dc64X3r/sPQ3Wg+6Q1s2VPuBcz9KP3nghcqLSH0jNEGOWph9gP4tpT3GfmRdsf
-	ug3cnPg8vjLYwJPypA1pRQ6aESg/ParCWMqR1M//KVCYf8LNRh6gQq+CQ0roJBuz5OeVBbeJnLE
-	RiEb3Of3y2JGH9kWSU9uVyOnHc76eaOJISOYowL4l6FL8GxDeQEp95jHnMBfBzRj/JwoWLRsGyC
-	f9Q0n2ibThkf0mCWQcql3gO5dFiIR1X67wNd9XSyypOAs8X21J1/FLPH+hzcxkI5rNN632NsN5G
-	qST1GELj2jmiE3VHQpmDDla9spLnYP813+t02vdAJEShzJofBMGi7MU/rt/Kqfvy0dkND480dUb
-	5mghOWYfQ2jKPC28xM4Bxt9fp99UZ1lSIjeX0A/YKFOIX4TFJ/pXRGMLJvrSAo2Pvdg3bszI2Be
-	6PdSB05e6FqWRRqFAK/
-X-Received: by 2002:a05:6820:7185:b0:69d:8c39:4159 with SMTP id 006d021491bc7-69d8c3943bbmr2132831eaf.47.1779544583030;
-        Sat, 23 May 2026 06:56:23 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69d83aafca2sm2491066eaf.15.2026.05.23.06.56.21
+        d=1e100.net; s=20251104; t=1779545259; x=1780150059;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WuWEfTQYjsCVqVvHObEiNmRNaaJS3/KGoVEjCdjn4Xk=;
+        b=NQ6YwfcTorBj/9gVCocK2DosVn6EW0TrVc/0OflcZOoB9SbWrxG2Utv3d9IfXwRDEI
+         MjuZ+UZ22J311IovrO9dhUI1qzxUBEFBMGIsxTb5DgORfPKxkDgZoQHECLOrJfV9J71z
+         e3B3xvLw+U+n3jwHxAQgxjqgND1WgRNWaN2b3lDjhGVXVbwuOthDBeFSTX3oMu+vN2iU
+         7tPhJRnhfHPLnUgOHUFMyTwCa2AkaaQG7LLqDEC5hNnPxhiv//XewXuyVYCDLDLlR8de
+         pL6DzbNT20ic5+VPhpXQ48jCDVSTabk2V4cjIYB9xCPxKKiJhKqj7ZDG6i+1AVHafqRk
+         0Ffw==
+X-Forwarded-Encrypted: i=1; AFNElJ+by5Us0FW6+CSiAtpdnSjQ1y/seTAxANlbdmjHZrmfm/MZp6XdMzgxaMLgN/Hrcx2ltMvv6K+a4pYQcA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4vI/XFbHccyp3vK81ZlsNe/G7Lwnma//oiG04xwAdJVFBYUQ5
+	R3Y/6mLisNyMvmgxIxNBXnoKO9lbN0gmjk/8BXHONRBbA2FfguZkbzQ8FJcro59EvYY=
+X-Gm-Gg: Acq92OEZbmWtdGFdgXKsyTYF/ELXPmxUBopLfzam9xHA2HadHQzMjVXsKUiAOL5mriw
+	LZqI6nX8SHSwxVdiL9MnYdTXqrCKS0Xuo3qI2RdpUCHVcS7p3D+xlrfiWpOGooeZp9p4dVltb1w
+	SvoBUmUTCp9y6lGVot77qSJW7/vkc3w+82mwDKshoFCi80+WloABzVIhM069GkcyeO0iLI7zRHQ
+	6OjQrQix4pWTwTIHGvZQL2ZFPbbTya127T3g+aERbUc7xalZg8YN93XAQ2XFY84/EAbE0CfeqYW
+	//2b9LndUqRzOR3WXsxiPWE8/3DXN8SMjt6UwST3iT+g1OeElxgHkuti16dA8PpV0EVCXa1iwqQ
+	LwE3z4xaAfCzFYB+bIQifPN0iXO8AxkMgPU+B1kqSsNSskXNLUG049fB7F8YANI8dLrkh7puwSp
+	7GwjBnU46ZRYCyH8yg9M7uYXZLentjRM2kGaeCdu339nI4bhkvZv1p6u8oZlKfG5O+dnx/skKrA
+	yaPOuz3KnM1NPLXIgQlo0+ZEr8AtttPWLr+3EEwL3LGg5GvnS6E/hOMKChcpo1oIV1Y0BWT700=
+X-Received: by 2002:a17:906:f5aa:b0:bc3:6177:ed1b with SMTP id a640c23a62f3a-bdd2aada0edmr203467066b.4.1779545258637;
+        Sat, 23 May 2026 07:07:38 -0700 (PDT)
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com. [209.85.128.42])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bddc264dd45sm189066966b.1.2026.05.23.07.07.38
+        for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 23 May 2026 06:56:22 -0700 (PDT)
-Message-ID: <95233011-744b-4383-84c6-8ace373fa275@kernel.dk>
-Date: Sat, 23 May 2026 07:56:20 -0600
+        Sat, 23 May 2026 07:07:38 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48fde653997so7250985e9.2
+        for <linux-block@vger.kernel.org>; Sat, 23 May 2026 07:07:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+2e883w03iPuvUUbFKvl7SvWMo3p4NGHwzI7eh8uN8g7bEDonNnluUwwXwNaYVdWrSgat0TgQ2qgOT5Q==@vger.kernel.org
+X-Received: by 2002:a05:600c:8484:b0:48a:56d4:7274 with SMTP id
+ 5b1f17b1804b1-490428ce814mr56748215e9.3.1779544847387; Sat, 23 May 2026
+ 07:00:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3] blk-mq: pop cached request if it is usable
-To: Keith Busch <kbusch@kernel.org>, Ming Lei <tom.leiming@gmail.com>
-Cc: Keith Busch <kbusch@meta.com>, hch@lst.de, linux-block@vger.kernel.org
-References: <20260521190253.242065-1-kbusch@meta.com>
- <ag-WUymW2vwVyMJB@fedora> <ag-1EoopSdp0JZR5@kbusch-mbp>
- <ag_XoloTHEgt3Y8s@fedora> <ahDT-JZZGyyTXyii@kbusch-mbp>
- <ahDe25f1Dw0YBsOL@kbusch-mbp>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ahDe25f1Dw0YBsOL@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251205071855.72743-1-byungchul@sk.com> <6b2a816f-eb3b-4e0c-a024-ee2e3743eb04@kernel.org>
+In-Reply-To: <6b2a816f-eb3b-4e0c-a024-ee2e3743eb04@kernel.org>
+From: Yunseong Kim <ysk@kzalloc.com>
+Date: Sat, 23 May 2026 16:00:36 +0200
+X-Gmail-Original-Message-ID: <CA+7O06GxeDLR9RcKDN2i-Rgc4kgzz6BfF4b0XAH4tFx=A723Nw@mail.gmail.com>
+X-Gm-Features: AVHnY4Jzdbo-RS-M3p-EbMJdQhZ_EyUwot0ge9SpoXayUSqjrmRfCiJZJ7yo4J8
+Message-ID: <CA+7O06GxeDLR9RcKDN2i-Rgc4kgzz6BfF4b0XAH4tFx=A723Nw@mail.gmail.com>
+Subject: Re: DEPT (the dependency tracker) as AI review prompt? (was: DEPT v18)
+To: Harry Yoo <harry@kernel.org>
+Cc: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org, kernel_team@skhynix.com, 
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com, 
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca, 
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org, 
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org, 
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch, 
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu, 
+	willy@infradead.org, david@fromorbit.com, amir73il@gmail.com, 
+	gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org, 
+	akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org, 
+	hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com, 
+	dennis@kernel.org, cl@linux.com, penberg@kernel.org, rientjes@google.com, 
+	vbabka@suse.cz, ngupta@vflare.org, linux-block@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org, 
+	dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org, 
+	dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com, 
+	melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com, 
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com, 
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com, longman@redhat.com, 
+	yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com, 
+	netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com, 
+	corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org, 
+	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org, gustavo@padovan.org, 
+	christian.koenig@amd.com, andi.shyti@kernel.org, arnd@arndb.de, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, rppt@kernel.org, 
+	surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com, 
+	da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org, 
+	frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com, 
+	josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com, 
+	jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com, 
+	mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com, neil@brown.name, 
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org, 
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de, clrkwllms@kernel.org, 
+	mark.rutland@arm.com, ada.coupriediaz@arm.com, kristina.martsenko@arm.com, 
+	wangkefeng.wang@huawei.com, broonie@kernel.org, kevin.brodsky@arm.com, 
+	dwmw@amazon.co.uk, shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com, 
+	yuzhao@google.com, baolin.wang@linux.alibaba.com, usamaarif642@gmail.com, 
+	joel.granados@kernel.org, richard.weiyang@gmail.com, geert+renesas@glider.be, 
+	tim.c.chen@linux.intel.com, linux@treblig.org, 
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net, 
+	chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com, 
+	link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org, brauner@kernel.org, 
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com, 
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org, 
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org, 
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org, 
+	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net, bagasdotme@gmail.com, 
+	wsa+renesas@sang-engineering.com, dave.hansen@intel.com, geert@linux-m68k.org, 
+	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
+	bjorn3_gh@protonmail.com, lossin@kernel.org, a.hindborg@kernel.org, 
+	aliceryhl@google.com, tmgross@umich.edu, rust-for-linux@vger.kernel.org, 
+	Chris Mason <clm@meta.com>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Josef Bacik <josef@toxicpanda.com>, Yunseong Kim <yunseong.kim@est.tech>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/22/26 4:55 PM, Keith Busch wrote:
-> On Fri, May 22, 2026 at 04:08:56PM -0600, Keith Busch wrote:
->> On Fri, May 22, 2026 at 12:12:18PM +0800, Ming Lei wrote:
->>> On Thu, May 21, 2026 at 07:44:50PM -0600, Keith Busch wrote:
->>>> On Fri, May 22, 2026 at 07:33:39AM +0800, Ming Lei wrote:
->>>>>
->>>>> BTW, as mentioned in v2, the request may be added back in case of merge,
->>>>> but seems not a big deal given blk_mq_free_plug_rqs() doesn't free requests
->>>>> in batch.
->>>>
->>>> We could introduce a special goto label for the merge case to push it
->>>
->>> It can be done simply by replacing the added `blk_mq_free_request` with moving
->>> it back to plug list.
->>
->> What I'm worried about is hitting a blocking allocation, then the
->> cached_rqs list is freed, leaving the current request from it the only
->> one still holding a queue reference. I think we ought to re-enter the
->> queue in that case.
-> 
-> Hmm, I may be mistaken here. The block allocation doesn't call
-> blk_finish_plug(), so the current plug is left intact; the other
-> queue_exit goto's are either from non-blocking contexts or a
-> successful merge that holds queue references in other ways. I guess
-> there is no queue_exit goto where unconditionally pushing back might
-> be a problem. So yeah, sorry, maybe restoring it to the cached_rqs is
-> a worthy optimization to make.
+Hi Harry,
 
-Yeah should be fine, we also discussed this one the other day. Want to
-send a patch for that? Just mark it as fixing the previous even if it
-isn't a bug fix in the strictest sense of the word, but then we ensure
-that if one is backported, the other one will be too.
+On Sat, May 23, 2026 at 2:33=E2=80=AFPM Harry Yoo <harry@kernel.org> wrote:
+>
+> Can we start DEPT as an AI review prompt, by documenting DEPT's
+> dependency tracking model and false positive elimination rules as a
+> carefully crafted prompt?
+>
+> While DEPT can identify deadlock issues beyond lockdep's capabilities,
+> it is hard to enable in automated testing; without fine-grained
+> annotations it can produce a high rate of false positives, and verifying
+> them requires significant human effort.
+>
+> The open source AI Review Prompt has locking.md file [1] that teaches
+> the AI how to review locks and detect misuse.
+>
+> If we can write a review prompt for DEPT in a similar manner and have
+> the AI do the deadlock detection and false positive elimination, I think
+> we could identify those problems more effectively with much less human
+> effort.
+>
+> [1]
+> https://github.com/masoncl/review-prompts/blob/main/kernel/subsystem/lock=
+ing.md
+>
+> --
+> Cheers,
+> Harry / Hyeonggon
 
--- 
-Jens Axboe
+I think this is an excellent idea, Harry.
+
+I've previously experimented with running DEPT alongside syzkaller fuzzing,
+and many hung tasks missed by lockdep are caught by DEPT, but the resulting
+high volume of reports makes it easy for issues to get lost in the massive
+log output. Sorting through that output manually is a huge bottleneck, so
+leveraging a well-crafted AI prompt to triage the warnings and filter out
+the false positives would be incredibly valuable.
+
+Leveraging an AI prompt to triage these warnings would be incredibly valuab=
+le.
+I'd be happy to help translate DEPT's tracking model into specific rules fo=
+r
+reducing false positives and establishing solid filtering patterns.
+
+> On 12/5/25 4:18 PM, Byungchul Park wrote:
+> > I'm happy to see that DEPT reported real problems in practice:
+> >
+> >     https://lore.kernel.org/lkml/6383cde5-cf4b-facf-6e07-1378a485657d@I=
+-love.SAKURA.ne.jp/
+> >     https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byun=
+gchul.park@lge.com/
+> >     https://lore.kernel.org/all/b6e00e77-4a8c-4e05-ab79-266bf05fcc2d@ig=
+alia.com/
+> >
+> > I=E2=80=99ve added documentation describing DEPT =E2=80=94 this should =
+help you
+> > understand what DEPT is and how it works.  You can use DEPT simply by
+> > enabling CONFIG_DEPT and checking dmesg at runtime.
+> > ---
+> >
+> > Hi Linus and folks,
+> >
+> > I=E2=80=99ve been developing a tool to detect deadlock possibilities by=
+ tracking
+> > waits/events =E2=80=94 rather than lock acquisition order =E2=80=94 to =
+cover all the
+> > synchronization mechanisms.  To summarize the design rationale, startin=
+g
+> > from the problem statement, through analysis, to the solution:
+> >
+> >     CURRENT STATUS
+> >     --------------
+> >     Lockdep tracks lock acquisition order to identify deadlock conditio=
+ns.
+> >     Additionally, it tracks IRQ state changes =E2=80=94 via {en,dis}abl=
+e =E2=80=94 to
+> >     detect cases where locks are acquired unintentionally during
+> >     interrupt handling.
+> >
+> >     PROBLEM
+> >     -------
+> >     Waits and their associated events that are never reachable can
+> >     eventually lead to deadlocks.  However, since Lockdep focuses solel=
+y
+> >     on lock acquisition order, it has inherent limitations when handlin=
+g
+> >     waits and events.
+> >
+> >     Moreover, by tracking only lock acquisition order, Lockdep cannot
+> >     properly handle read locks or cross-event scenarios =E2=80=94 such =
+as
+> >     wait_for_completion() and complete() =E2=80=94 making it increasing=
+ly
+> >     inadequate as a general-purpose deadlock detection tool.
+> >
+> >     SOLUTION
+> >     --------
+> >     Once again, waits and their associated events that are never
+> >     reachable can eventually lead to deadlocks.  The new solution, DEPT=
+,
+> >     focuses directly on waits and events.  DEPT monitors waits and even=
+ts,
+> >     and reports them when any become unreachable.
+> >
+> > DEPT provides:
+> >
+> >     * Correct handling of read locks.
+> >     * Support for general waits and events.
+> >     * Continuous operation, even after multiple reports.
+> >     * Simple, intuitive annotation APIs.
+> >
+> > There are still false positives, and some are already being worked on
+> > for suppression.  Especially splitting the folio class into several
+> > appropriate classes e.g. block device mapping class and regular file
+> > mapping class, is currently under active development by me and Yeoreum
+> > Yun.
+> >> Anyway, these efforts will need to continue for a while, as we=E2=80=
+=99ve seen
+> > with lockdep over two decades.  DEPT is tagged as EXPERIMENTAL in
+> > Kconfig =E2=80=94 meaning it=E2=80=99s not yet suitable for use as an a=
+utomation tool.
+> >
+> > However, for those who are interested in using DEPT to analyze complex
+> > synchronization patterns and extract dependency insights, DEPT would be
+> > a great tool for the purpose.
+
+Best regards,
+Yunseong
