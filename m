@@ -1,74 +1,33 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C9938F931
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 23:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E225F399361;
+	Sat, 23 May 2026 12:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779491840; cv=none; b=b3BDxKzFv5yRMr0KfJauFTsdpgHpmhYDBy4BFbhYoaLNj1xuo7NS0DEAqCXSCjtqrj4PDOxkg6+oSYh53DUVNDfN39DZvDNyYUC1HumjlB++LCGF1xDJpqiFmRLm/qM3bgCJzU6fJmONryOnrM5FiS7Vi8gRUWDqp7/s+1xR/JQ=
+	t=1779539612; cv=none; b=Ltp3L6yeDsT8DqAoOpzTvnS4fy9MKT2pFdwHMBXxx7CAZkNIlubZEZ66I9J9ZpnUAY6ypK9dmgyAOcytkLhltiGK8I9uiS+yZStHelfQe2uJhUSa6OKhinYRx+auzuf2Cftb9FnnrrmpFI0H2G2t7kXj6UC6JAUrgY9d8qKWyKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779491840; c=relaxed/simple;
-	bh=4g38+1lKxMMFXNGYi+/tGlmbD39J/6oFSR8yf9ZHHoU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FWkrPyngq2W6BYPL9cicg7F9Y7cJaerr4OPPz9IRgW3FUeUhh3w69INlqCUazu6nlp/YB5XDX2iecHqd+HaWsd5tyxZG1WGm0Kp3TTTw4yadXnH0bzprgaZSZaUCcuGjOKEuTK0dfgup4+hOutA7JGZaefvypX6FsFCI98GPFVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=QCzNXMoc; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1779539612; c=relaxed/simple;
+	bh=56rtl5yWcqt/qvv0kT1QPxahxvD5Oep41kV/zQgRNLw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=BCBnco9lLzAqCsjkIiC7wbyZX3Q4mfMVkxvqxXpgQrvRmhg0qZ2NOzxerEygdnY3GXO7fNot+h+qFF5Zv6rOwU5dgvnhtgOxNS5qC3rE0c3uzLlScf/RF8st/cbv4uHbApJRTsxyjhIodZV3tQouEDxHluvJ7QMRurRVFIfuMPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jW3+XESk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="QCzNXMoc"
-Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64MMSaZL2789975
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 19:17:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=XolI
-	xwfsVJBVBpTPhnOybhIeNs+9oP88EwbFpg7C0dI=; b=QCzNXMocAxNFTmwB5r82
-	Iqr6KeBeNApgLe1JbrJXqMTH7Hv0Jt/WD3PXKZ/QXCCaHxNZnn7Cil8P0gyKLaZv
-	DWa07xsv7CrqPRbXnIU40NAL0kpe5neyU5MB0D0nSvHNPjBZq1at98019jHZbOE3
-	9g6gkdgK+gyYrvYu1WCQVHRC1VK7MVRiBOCNXxobfa1CXAaZYTlihRJo2JKZpq8E
-	AI1jZOOmEZE6eGOhYGuOC2N/WUrRf67sQd7RyFsswLHPrLlCbfd44HeFHwp6RxpT
-	j8T6/BvDioIehEh0yVkyfu3Y4ybyW3Q/KGibGcM/+R8a2gbWyj/1VhE1uhi2jsxH
-	Mg==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4eatyqae41-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 22 May 2026 19:17:18 -0400 (EDT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-516da5a1db4so26207151cf.0
-        for <linux-block@vger.kernel.org>; Fri, 22 May 2026 16:17:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779491837; x=1780096637;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XolIxwfsVJBVBpTPhnOybhIeNs+9oP88EwbFpg7C0dI=;
-        b=fOBgiSAk1x8EINCUsWEHy+P/sMG9PocJvV62VxQfHTdCmcok48pvRX3cOBDsFs7XHN
-         MAI9GedWW9c18bRS/1URvZGkxuREbF/mmykg/NWiYqSk7l5uNXsshZdtd0ZZipqBXl5K
-         0JYYVuOZV/WvCO8mO1MwJ9koqBR8ZAzAIlgbG4DGC7M2RfDskKTJGvfjsgG2ZnngfmxV
-         EeG8Hnxm1s8BN4lxeE0+QZwaThRdR//yygX+sJaVYV518B24rRwjhp6PpBqGBsBEuEz0
-         M5x9IqXeyRvxTpJEyjqT4Ij9DxDY677nDOQod3cC+BymHxwC+NsEyDlxnvqtfteHQBdq
-         TAPw==
-X-Forwarded-Encrypted: i=1; AFNElJ8z/XwDiygsO7fyQgZAZLhk4fYy9P3FwkpxDnxPI4Y1nmfmXK1NpZkcu+AJOyGdqw7bHpSqPf7Zu5BnSA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAVOaWPpySpfX4NlceNZinxlozDrshpKRdoemn7xNWr2qaMFJF
-	ZRT++spaE5I/nVPqVqromZisNymd2CTtw/dM81nWHFdMddj/YJeZx6B7xpuPiz2LqnU4aNnvLV/
-	bEW7ZGH4qN2epAqa5h3WF1QNJ7l2hK2GfOT6HLOcw960yH7o84gzqeKCkkvBd
-X-Gm-Gg: Acq92OG1KPNMthriESEjOhWzzA8O7ypZfpHZ/D6TayOli0J8ElsxNthUXPJ8sN+r93q
-	JcUH0XWNJxTxbT9Oamcm3fdTPJrUKeJDKQ+gyJob42HEDRWKGvXQNeWvEryxc1SvZlwXkdG7H+0
-	ga+UriMt7TWfzGJjTWkb1kcuc1kXC1geUY6muUnisgWtKZyxEk/+id9JgVpBMCkw4SWUUxBQGud
-	YlIrMNBZepZJLpl8nTw2DLMCIilX7r1HXuwywkTX3Fa2oN41+jwqCBpCx9DvpJzQ322MYF+Iuq5
-	emxsBBF2G3gZ9RDo1R1eyJDr+miX8SiGZSOONMg8upMcvETyQ1ahhIlSgcSxAKVeSjiAmkhyVY4
-	nYNor3l+WG8s33RVk0v4JIf+V5BBuRQmeuipCkj9vF/l+vHbazrKGCCgxrVulqGqUdjZzfVW4Ts
-	c=
-X-Received: by 2002:ac8:58cd:0:b0:516:d8c6:3e64 with SMTP id d75a77b69052e-516d8c6436fmr59502341cf.53.1779491837053;
-        Fri, 22 May 2026 16:17:17 -0700 (PDT)
-X-Received: by 2002:ac8:58cd:0:b0:516:d8c6:3e64 with SMTP id d75a77b69052e-516d8c6436fmr59501831cf.53.1779491836515;
-        Fri, 22 May 2026 16:17:16 -0700 (PDT)
-Received: from [10.207.65.224] (nat-128-59-177-214.net.columbia.edu. [128.59.177.214])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-516d8b0065asm25972531cf.2.2026.05.22.16.17.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 May 2026 16:17:16 -0700 (PDT)
-Message-ID: <f8d509c7-c0c0-4196-9a82-a6f8ae24ffc2@columbia.edu>
-Date: Fri, 22 May 2026 19:17:15 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jW3+XESk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D033D1F000E9;
+	Sat, 23 May 2026 12:32:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779539609;
+	bh=feRzGMWHkALLA8SyrU6RJ1+Ne9lKt9MuXcA+HfB5g6s=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To;
+	b=jW3+XESk7IvEcBU+bpy8yPJAU/0IVwlShO9v6KZOWX/ll0bKB5YUpHGA74CScGkib
+	 h61p7Ii11ojyLl4zWD9zC9jbGza8+08D0KF1Xyx9eBM6rLRsPBrMoOJWaYv4k5Vx5f
+	 b+ou7eQ1gREOxWOzgW+VN7myFXCmEhBFTQ9Sdu659LX8/GPVkRUMTXMWimv/FjEczf
+	 bG24n4N8iuPU4UnGW4T49bADfkhY2K1I2wXkGRyHTK9qH1ARUHqANTaWPkqp1iRNQ2
+	 wp7jB+4PxO00QxNwhLHhUxRt7tl3Y/eymRjs0Aul1vvTeTOYwlxBhdLtHlabRl0oG/
+	 MVc5rNjQJ3rsg==
+Message-ID: <6b2a816f-eb3b-4e0c-a024-ee2e3743eb04@kernel.org>
+Date: Sat, 23 May 2026 21:32:41 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,116 +35,160 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 4/4] block: enable RWF_DONTCACHE for block devices
-To: Jens Axboe <axboe@kernel.dk>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong"
- <djwong@kernel.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@infradead.org>
-Cc: Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
-References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
- <20260514-blk-dontcache-v6-4-782e2fa7477b@columbia.edu>
+From: Harry Yoo <harry@kernel.org>
+Subject: DEPT (the dependency tracker) as AI review prompt? (was: DEPT v18)
+To: Byungchul Park <byungchul@sk.com>, linux-kernel@vger.kernel.org
+Cc: kernel_team@skhynix.com, torvalds@linux-foundation.org,
+ damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+ adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, mingo@redhat.com,
+ peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+ rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
+ daniel.vetter@ffwll.ch, duyuyang@gmail.com, johannes.berg@intel.com,
+ tj@kernel.org, tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+ amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+ linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+ minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+ sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+ penberg@kernel.org, rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+ linux-block@vger.kernel.org, josef@toxicpanda.com,
+ linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
+ dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+ dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+ melissa.srw@gmail.com, hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+ chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+ max.byungchul.park@gmail.com, boqun.feng@gmail.com, longman@redhat.com,
+ yunseong.kim@ericsson.com, ysk@kzalloc.com, yeoreum.yun@arm.com,
+ netdev@vger.kernel.org, matthew.brost@intel.com, her0gyugyu@gmail.com,
+ corbet@lwn.net, catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
+ hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
+ gustavo@padovan.org, christian.koenig@amd.com, andi.shyti@kernel.org,
+ arnd@arndb.de, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+ rppt@kernel.org, surenb@google.com, mcgrof@kernel.org, petr.pavlu@suse.com,
+ da.gomez@kernel.org, samitolvanen@google.com, paulmck@kernel.org,
+ frederic@kernel.org, neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
+ josh@joshtriplett.org, urezki@gmail.com, mathieu.desnoyers@efficios.com,
+ jiangshanlai@gmail.com, qiang.zhang@linux.dev, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, chuck.lever@oracle.com,
+ neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
+ trondmy@kernel.org, anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+ clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+ kristina.martsenko@arm.com, wangkefeng.wang@huawei.com, broonie@kernel.org,
+ kevin.brodsky@arm.com, dwmw@amazon.co.uk, shakeel.butt@linux.dev,
+ ast@kernel.org, ziy@nvidia.com, yuzhao@google.com,
+ baolin.wang@linux.alibaba.com, usamaarif642@gmail.com,
+ joel.granados@kernel.org, richard.weiyang@gmail.com,
+ geert+renesas@glider.be, tim.c.chen@linux.intel.com, linux@treblig.org,
+ alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+ chenhuacai@kernel.org, francesco@valla.it, guoweikang.kernel@gmail.com,
+ link@vivo.com, jpoimboe@kernel.org, masahiroy@kernel.org,
+ brauner@kernel.org, thomas.weissschuh@linutronix.de, oleg@redhat.com,
+ mjguzik@gmail.com, andrii@kernel.org, wangfushuai@baidu.com,
+ linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ linux-i2c@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-modules@vger.kernel.org, rcu@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+ 2407018371@qq.com, dakr@kernel.org, miguel.ojeda.sandonis@gmail.com,
+ neilb@ownmail.net, bagasdotme@gmail.com, wsa+renesas@sang-engineering.com,
+ dave.hansen@intel.com, geert@linux-m68k.org, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
+ tmgross@umich.edu, rust-for-linux@vger.kernel.org, Chris Mason
+ <clm@meta.com>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Josef Bacik <josef@toxicpanda.com>
+References: <20251205071855.72743-1-byungchul@sk.com>
 Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <20260514-blk-dontcache-v6-4-782e2fa7477b@columbia.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIyMDIzMiBTYWx0ZWRfX7MWJKwZlWJjk
- MOaexB7yy0+c0jmBUxBL1SK8BhCrX+Ncv8Km99HJybPgV5K+vHCMsm5+K6zss8WrAJIT2C74A/Z
- yPTfSGvtHSftcVthv5VutuRX9qX5PQ+lTjjdVYpKV+K1euQGegU0zpTdMyCGft1Gz4pyqltbTms
- vZkuWCrPfp8gqKI1aZX+7yBNZSJm7Rt+eClyr9Fw9VT6u26JvkK+OrGo3ZwEnlgDAR7rMaAZyD5
- yimTcZh9XyiasmcMab1LtBQaaG6u67MKjvZakza4gN7azmBurBmLOcep/xtt4snRRmPM0aaLlcS
- kD9f0uUSl7vnym+r7bxdhfg9KULUQfJT/oeIJS0RU5St7HY7JtBebAcmtyUoTylCAWyWYkBadfq
- Nx7LhHjQ+dws83ngp4L8Ohm8bkR4XA+jB53wvNqjhFRvlDvYTVJo5g/zX560QFCmaWbYCQfUjGg
- HMm5WypXFq2NuRJDuCA==
-X-Proofpoint-GUID: Lg9pUkkvrMZWxKc5U39idHlJw380v5fX
-X-Proofpoint-ORIG-GUID: Lg9pUkkvrMZWxKc5U39idHlJw380v5fX
-X-Authority-Analysis: v=2.4 cv=QYJWeMbv c=1 sm=1 tr=0 ts=6a10e3fe cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=n4JpGxNP30DHW88kdRRHAg==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=x7bEGLp0ZPQA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=svvvyxlR1OQQkelhaPoB:22
- a=c92rfblmAAAA:8 a=7QGR7LCADlPcIrvLOjwA:9 a=QEXdDO2ut3YA:10
- a=kacYvNCVWA4VmyqE58fU:22 a=GvGzcOZaWPEFPQC_NcjD:22
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11794
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 bulkscore=10 phishscore=0
- lowpriorityscore=10 clxscore=1015 suspectscore=0 spamscore=0 adultscore=0
- impostorscore=10 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605220232
+In-Reply-To: <20251205071855.72743-1-byungchul@sk.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 5/14/26 5:51 PM, Tal Zussman wrote:
-> Block device buffered reads and writes already pass through
-> filemap_read() and iomap_file_buffered_write() respectively, both of
-> which handle IOCB_DONTCACHE. Enable RWF_DONTCACHE for block device files
-> by setting FOP_DONTCACHE in def_blk_fops.
+Can we start DEPT as an AI review prompt, by documenting DEPT's 
+dependency tracking model and false positive elimination rules as a 
+carefully crafted prompt?
+
+While DEPT can identify deadlock issues beyond lockdep's capabilities, 
+it is hard to enable in automated testing; without fine-grained 
+annotations it can produce a high rate of false positives, and verifying 
+them requires significant human effort.
+
+The open source AI Review Prompt has locking.md file [1] that teaches 
+the AI how to review locks and detect misuse.
+
+If we can write a review prompt for DEPT in a similar manner and have 
+the AI do the deadlock detection and false positive elimination, I think 
+we could identify those problems more effectively with much less human 
+effort.
+
+[1] 
+https://github.com/masoncl/review-prompts/blob/main/kernel/subsystem/locking.md
+
+-- 
+Cheers,
+Harry / Hyeonggon
+
+On 12/5/25 4:18 PM, Byungchul Park wrote:
+> I'm happy to see that DEPT reported real problems in practice:
 > 
-> For CONFIG_BUFFER_HEAD=y paths, use block_write_begin_iocb() in
-> blkdev_write_begin() to thread the kiocb through so that buffer_head
-> writeback gets dropbehind support.
+>     https://lore.kernel.org/lkml/6383cde5-cf4b-facf-6e07-1378a485657d@I-love.SAKURA.ne.jp/
+>     https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byungchul.park@lge.com/
+>     https://lore.kernel.org/all/b6e00e77-4a8c-4e05-ab79-266bf05fcc2d@igalia.com/
 > 
-> CONFIG_BUFFER_HEAD=n paths are handled by the previously added iomap
-> BIO_COMPLETE_IN_TASK support.
-> 
-> This support is useful for databases that operate on raw block devices,
-> among other userspace applications.
-> 
-> Signed-off-by: Tal Zussman <tz2294@columbia.edu>
-
-Responding to Sashiko review inline:
-
-Link: https://sashiko.dev/#/patchset/20260514-blk-dontcache-v6-0-782e2fa7477b%40columbia.edu
-
-Q: "Could this code path be unreachable during block device writes?
-Block device buffered writes use blkdev_write_iter(), which unconditionally
-delegates to blkdev_buffered_write() and subsequently
-iomap_file_buffered_write(). The iomap infrastructure bypasses the legacy
-address_space_operations .write_begin method.
-During a write, iomap_write_begin() handles buffer head allocation internally
-by calling __block_write_begin_int() directly. This naturally inherits the
-FGP_DONTCACHE flag passed down from the kiocb via iomap_get_folio().
-If the VFS write paths were actually calling .write_begin for block devices, a
-CONFIG_BUFFER_HEAD=n kernel would crash with a NULL pointer dereference since
-def_blk_aops does not define .write_begin or .write_end in that configuration."
-
-A: So this actually seems legit... doesn't look like anything actually calls 
-blkdev_write_begin() or blkdev_write_end(), unless I'm missing something.
-block_write_begin_iocb() usage seems necessary for bh-based filesystems, but
-block devices seem to use iomap for writes unconditionally.
-
+> I’ve added documentation describing DEPT — this should help you
+> understand what DEPT is and how it works.  You can use DEPT simply by
+> enabling CONFIG_DEPT and checking dmesg at runtime.
 > ---
->  block/fops.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/block/fops.c b/block/fops.c
-> index bb6642b45937..31b073181d87 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -504,7 +504,8 @@ static int blkdev_write_begin(const struct kiocb *iocb,
->  			      unsigned len, struct folio **foliop,
->  			      void **fsdata)
->  {
-> -	return block_write_begin(mapping, pos, len, foliop, blkdev_get_block);
-> +	return block_write_begin_iocb(iocb, mapping, pos, len, foliop,
-> +				     blkdev_get_block);
->  }
->  
->  static int blkdev_write_end(const struct kiocb *iocb,
-> @@ -966,7 +967,7 @@ const struct file_operations def_blk_fops = {
->  	.splice_write	= iter_file_splice_write,
->  	.fallocate	= blkdev_fallocate,
->  	.uring_cmd	= blkdev_uring_cmd,
-> -	.fop_flags	= FOP_BUFFER_RASYNC,
-> +	.fop_flags	= FOP_BUFFER_RASYNC | FOP_DONTCACHE,
->  };
->  
->  static __init int blkdev_init(void)
+> Hi Linus and folks,
 > 
+> I’ve been developing a tool to detect deadlock possibilities by tracking
+> waits/events — rather than lock acquisition order — to cover all the
+> synchronization mechanisms.  To summarize the design rationale, starting
+> from the problem statement, through analysis, to the solution:
+> 
+>     CURRENT STATUS
+>     --------------
+>     Lockdep tracks lock acquisition order to identify deadlock conditions.
+>     Additionally, it tracks IRQ state changes — via {en,dis}able — to
+>     detect cases where locks are acquired unintentionally during
+>     interrupt handling.
+>     
+>     PROBLEM
+>     -------
+>     Waits and their associated events that are never reachable can
+>     eventually lead to deadlocks.  However, since Lockdep focuses solely
+>     on lock acquisition order, it has inherent limitations when handling
+>     waits and events.
+>     
+>     Moreover, by tracking only lock acquisition order, Lockdep cannot
+>     properly handle read locks or cross-event scenarios — such as
+>     wait_for_completion() and complete() — making it increasingly
+>     inadequate as a general-purpose deadlock detection tool.
+>     
+>     SOLUTION
+>     --------
+>     Once again, waits and their associated events that are never
+>     reachable can eventually lead to deadlocks.  The new solution, DEPT,
+>     focuses directly on waits and events.  DEPT monitors waits and events,
+>     and reports them when any become unreachable.
+> 
+> DEPT provides:
+> 
+>     * Correct handling of read locks.
+>     * Support for general waits and events.
+>     * Continuous operation, even after multiple reports.
+>     * Simple, intuitive annotation APIs.
+> 
+> There are still false positives, and some are already being worked on
+> for suppression.  Especially splitting the folio class into several
+> appropriate classes e.g. block device mapping class and regular file
+> mapping class, is currently under active development by me and Yeoreum
+> Yun.
+>> Anyway, these efforts will need to continue for a while, as we’ve seen
+> with lockdep over two decades.  DEPT is tagged as EXPERIMENTAL in
+> Kconfig — meaning it’s not yet suitable for use as an automation tool.
+> 
+> However, for those who are interested in using DEPT to analyze complex
+> synchronization patterns and extract dependency insights, DEPT would be
+> a great tool for the purpose.
 
