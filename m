@@ -1,50 +1,50 @@
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19FF375AB8
-	for <linux-block@vger.kernel.org>; Sun, 24 May 2026 23:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5393009F2
+	for <linux-block@vger.kernel.org>; Sun, 24 May 2026 23:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779665369; cv=none; b=jpr2D/qGPpjRuL7RgEBOCvbHKKDaD98BSckV+TK/JfQtDt+K1rTRlRcVm1WsVZwwWmnBKHkG2bRHvXg+7xfqa+FYCT9cSfe70DpRXQnUX/D1rJ0bvN+aoGRhJVfrOcuTlwDTGHxMC0BQerU1nqQsGdv+UXE8Lrk2ShKUwq5JFU0=
+	t=1779666692; cv=none; b=aHgPyfp6eBEuu0JpCuq0fo34X0NCCK3kcVQESsn2vjigPtVlG+I0V+zBUklNV/H8T7mJ3bwzitrk6yGU5RLt5I7WW5wJHZfsfAJ8tVRqNiLx5R6vGoZBUzU7GH1XTTC4maeQcuB+eyaMP3/uI4VOqHHYtyr71YGmNv0RrwVe1mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779665369; c=relaxed/simple;
-	bh=wNYm0t1P14qJ5QVb1LqTO4zTqcWynHS/2BTUps+kPy8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ijm2A/0EpY0e0YSjVbI5lfSlUkccP4gn26TpVKhSyEfMRbuvcndyqkw7OJvH4Fb692qBFD9jFevIXMFlblWF0o/hD/E3CjuU/ivhxRJyZytEVmdPqWZyywNsGZk9TEH+qAcCQZx0EPJfHIeyWdkd5NalJiO8o+nUn3DFyFt9SB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+	s=arc-20240116; t=1779666692; c=relaxed/simple;
+	bh=oODVC9qGwahCxOLuKU16MWFSd39wR696YNUcn8mh1l0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=b9amulosjzFcTCa98kto4kilvOJPNxLKc/KDRRzw6uBafiN2KdLlnCCc0aGdX3YwNHo2kV7rKqHhdSbXzB2yQJpPyFMIhfx7qfB01LbujxT0Uj+DfsQfYV09DHDbyxpEq1z/isafe32d3orXo57cdQGCJtlKVoc1or+o082nmTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-69d77a8f5caso2938119eaf.3
-        for <linux-block@vger.kernel.org>; Sun, 24 May 2026 16:29:27 -0700 (PDT)
+Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-69d77a8f5caso2943025eaf.3
+        for <linux-block@vger.kernel.org>; Sun, 24 May 2026 16:51:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779665367; x=1780270167;
+        d=1e100.net; s=20251104; t=1779666689; x=1780271489;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1tVT08qMKwM4LEWiR7dp2rhaqpG7vbi83pDn6j2sArM=;
-        b=lEWz+wA/QTiqgi2rPYvhHsQgyj2a4VTeMwDu+ODmAEfPFxM48zg/XwO6KScSh8zruo
-         Ei4Z4S8oeaI8DpkSvLJqyssJ5z+Un/rUiIrsnZ/yOfvJw3etWwZrgJss5p/TUEQnYqTM
-         XssBxLbF37CihChapievCHvD+gym1ftMV9iBJTJTDmiNkEwlma5l7jWs+rUwka/fJVBJ
-         Mtics1Sj+2E+YaorShVYGsFfqSDcCQuzq3RDMdGQs0ceW9cWrXUrgV3/iaZOBDlcmXJb
-         +BfEmS81paT5eFUKbYK4m7UnI3QGKjCYww/7EH6t2ZK000q5nrm3L5fF962XrZ9rytPb
-         i4Dg==
-X-Forwarded-Encrypted: i=1; AFNElJ9cI2O9o16y1bxMw8xS4G1vudA0PCbEuGHqAAlYkRXZCQ0jt+f4e2w7gxiDw3MuG78BW16PCQsU8TzKnQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzlTKbEXwhfsbZ/ELeo+4fCqaHTjLoqOq4r3hgtTXszNPatSj6
-	kDo1RAaKTNAyMfcGrRzjbnQ0pfnv/TxFXHhDLLsVtUW2WcawkuXCJxOf3W1JnlrqKmwylA3/vCo
-	Z5ZFYvXqXrsfUGa2WGoVPFEPj1RikoRxzB+TtbZtTZjItLDnl4mUhv9ZTPrg=
+        bh=0Z2DJ9klW2KnGrYNzjxmTbrVz0K6vzimOEKz85PWPRA=;
+        b=HvqsvK1Zm4pcaRhKK8Fpd1kwXsTjFDcEI69ippNVFF3VnDUewEpluvNCp1zgT1H0iu
+         hNF6M3u/CuNYLE8fx1SO6ibui+C3MNz4NlbVMlZQSKvQ5i4CnoMtKudyLbhzubRXM6B7
+         59Fwqs7pEpSyra6baKx7pjscL4okL9JyrDrJTDbBxk7t8DX/4Ceo+OqcDjhMXbNTP48Y
+         wmfof+GJCYarJyeAGuQmnZAG1YbkXBcbxY1AtyS6liQUG8P3Heq6nv+VcVMXEa6+ogwS
+         M92GnMyZy8fv1lPfjRV3zSX5VJiF/GE6H33RngFES6dGiddLlTRHEbxKpLsNNM6yGogx
+         KLIg==
+X-Forwarded-Encrypted: i=1; AFNElJ+BzgSs/NtU5CYp2CZDItSS3RKJwy/1aanlOvesHnR1IhAg9zHBI6Hp6puojNNF/xi7+4pIos14AcfhMA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzipOHK9vlvODz3yIyB+w+20SqSnATqbFaf7mfm6fxlOQGZ0P75
+	+qfOX+OzpxPellLtEeqrWkfFrPtHNNtp+1OsLce5YYAsTx2PWKh6LqMd0kU8wYV0apCvYNJH6TE
+	h9kfNXfpcKyY5ecXICgrVv/jR3ZTHqiLy2br953GcqCH2TEQqqDyCmHjBdRg=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1c9f:b0:69d:9547:c961 with SMTP id
- 006d021491bc7-69d9547d11fmr4043550eaf.22.1779665366889; Sun, 24 May 2026
- 16:29:26 -0700 (PDT)
-Date: Sun, 24 May 2026 16:29:26 -0700
+X-Received: by 2002:a05:6820:821:b0:69d:b4fb:f319 with SMTP id
+ 006d021491bc7-69db4fbf40emr1036894eaf.7.1779666689306; Sun, 24 May 2026
+ 16:51:29 -0700 (PDT)
+Date: Sun, 24 May 2026 16:51:29 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1389d6.a70a0220.74ee.0000.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in bdev_open
-From: syzbot <syzbot+0f427123ae84b3ba6dc7@syzkaller.appspotmail.com>
+Message-ID: <6a138f01.050a0220.378d86.0000.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in add_disk_fwnode
+From: syzbot <syzbot+4feabfc9641267769c97@syzkaller.appspotmail.com>
 To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
@@ -55,9 +55,9 @@ syzbot found the following issue on:
 
 HEAD commit:    c1ecb239fa34 Add linux-next specific files for 20260522
 git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=14e5db06580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15526d96580000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=e0299bf0261ddd5
-dashboard link: https://syzkaller.appspot.com/bug?extid=0f427123ae84b3ba6dc7
+dashboard link: https://syzkaller.appspot.com/bug?extid=4feabfc9641267769c97
 compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
 Unfortunately, I don't have any reproducer for this issue yet.
@@ -68,14 +68,14 @@ vmlinux: https://storage.googleapis.com/syzbot-assets/517b638d908a/vmlinux-c1ecb
 kernel image: https://storage.googleapis.com/syzbot-assets/dd5e3b587fce/bzImage-c1ecb239.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0f427123ae84b3ba6dc7@syzkaller.appspotmail.com
+Reported-by: syzbot+4feabfc9641267769c97@syzkaller.appspotmail.com
 
 ======================================================
 WARNING: possible circular locking dependency detected
 syzkaller #0 Tainted: G             L     
 ------------------------------------------------------
-syz.0.336/7301 is trying to acquire lock:
-ffff88801b3974c8 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0xe0/0xcc0 block/bdev.c:953
+syz.0.2446/19404 is trying to acquire lock:
+ffff88806b47a410 (&set->update_nr_hwq_lock){++++}-{4:4}, at: add_disk_fwnode+0xe7/0x480 block/genhd.c:596
 
 but task is already holding lock:
 ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev block/genhd.c:881 [inline]
@@ -86,7 +86,7 @@ which lock already depends on the new lock.
 
 the existing dependency chain (in reverse order) is:
 
--> #6 (major_names_lock){+.+.}-{4:4}:
+-> #7 (major_names_lock){+.+.}-{4:4}:
        __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
        mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
        blk_probe_dev block/genhd.c:881 [inline]
@@ -110,7 +110,7 @@ the existing dependency chain (in reverse order) is:
        do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
        entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
--> #5 (system_transition_mutex){+.+.}-{4:4}:
+-> #6 (system_transition_mutex){+.+.}-{4:4}:
        __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
        mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
        lock_system_sleep+0x49/0x70 kernel/power/main.c:71
@@ -129,24 +129,19 @@ the existing dependency chain (in reverse order) is:
        do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
        entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
--> #4 (&of->mutex){+.+.}-{4:4}:
+-> #5 (&of->mutex){+.+.}-{4:4}:
        __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
        mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
        kernfs_seq_start+0x5c/0x420 fs/kernfs/file.c:172
        seq_read_iter+0x3f8/0xe20 fs/seq_file.c:226
-       copy_splice_read+0x605/0xab0 fs/splice.c:362
-       do_splice_read fs/splice.c:980 [inline]
-       splice_direct_to_actor+0x483/0xc80 fs/splice.c:1084
-       do_splice_direct_actor fs/splice.c:1202 [inline]
-       do_splice_direct+0x19b/0x2a0 fs/splice.c:1228
-       do_sendfile+0x547/0x7e0 fs/read_write.c:1372
-       __do_sys_sendfile64 fs/read_write.c:1433 [inline]
-       __se_sys_sendfile64+0x144/0x1a0 fs/read_write.c:1419
+       new_sync_read fs/read_write.c:493 [inline]
+       vfs_read+0x58b/0xa80 fs/read_write.c:574
+       ksys_read+0x156/0x270 fs/read_write.c:717
        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
        do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
        entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
--> #3 (&p->lock){+.+.}-{4:4}:
+-> #4 (&p->lock){+.+.}-{4:4}:
        __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
        mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
        seq_read_iter+0xb8/0xe20 fs/seq_file.c:183
@@ -161,7 +156,7 @@ the existing dependency chain (in reverse order) is:
        ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
--> #2 ((work_completion)(&worker->work)){+.+.}-{0:0}:
+-> #3 ((work_completion)(&lo->rootcg_work)){+.+.}-{0:0}:
        process_one_work+0x8d7/0x1630 kernel/workqueue.c:3294
        process_scheduled_works kernel/workqueue.c:3401 [inline]
        worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
@@ -169,7 +164,7 @@ the existing dependency chain (in reverse order) is:
        ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
--> #1 ((wq_completion)loop1){+.+.}-{0:0}:
+-> #2 ((wq_completion)loop1){+.+.}-{0:0}:
        touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:4033
        __flush_workqueue+0x14b/0x14f0 kernel/workqueue.c:4075
        drain_workqueue+0xd3/0x390 kernel/workqueue.c:4239
@@ -186,32 +181,45 @@ the existing dependency chain (in reverse order) is:
        do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
        entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
--> #0 (&disk->open_mutex){+.+.}-{4:4}:
+-> #1 (&disk->open_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
+       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
+       __del_gendisk+0x127/0x980 block/genhd.c:710
+       del_gendisk+0xe7/0x160 block/genhd.c:823
+       loop_remove+0x42/0xc0 drivers/block/loop.c:2136
+       loop_control_remove drivers/block/loop.c:2195 [inline]
+       loop_control_ioctl+0x4ba/0x5b0 drivers/block/loop.c:2237
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl+0xff/0x170 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (&set->update_nr_hwq_lock){++++}-{4:4}:
        check_prev_add kernel/locking/lockdep.c:3167 [inline]
        check_prevs_add kernel/locking/lockdep.c:3286 [inline]
        validate_chain kernel/locking/lockdep.c:3910 [inline]
        __lock_acquire+0x15a5/0x2d10 kernel/locking/lockdep.c:5239
        lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5870
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       bdev_open+0xe0/0xcc0 block/bdev.c:953
-       bdev_file_open_by_dev+0x1be/0x240 block/bdev.c:1067
-       disk_scan_partitions+0x1c1/0x2c0 block/genhd.c:387
-       add_disk_final block/genhd.c:416 [inline]
-       add_disk_fwnode+0x321/0x480 block/genhd.c:610
+       down_read+0x97/0x200 kernel/locking/rwsem.c:1568
+       add_disk_fwnode+0xe7/0x480 block/genhd.c:596
        add_disk include/linux/blkdev.h:794 [inline]
-       brd_alloc+0x5c9/0x7d0 drivers/block/brd.c:340
+       loop_add+0x86e/0xb50 drivers/block/loop.c:2108
        blk_probe_dev block/genhd.c:884 [inline]
        blk_request_module+0x27d/0x2a0 block/genhd.c:-1
        blkdev_get_no_open+0x3f/0xe0 block/bdev.c:833
-       bdev_file_open_by_dev+0xa0/0x240 block/bdev.c:1054
-       swsusp_check+0x56/0x490 kernel/power/swap.c:1571
-       software_resume+0x51/0x4c0 kernel/power/hibernate.c:1023
-       resume_store+0x333/0x4f0 kernel/power/hibernate.c:1307
-       kernfs_fop_write_iter+0x3b0/0x540 fs/kernfs/file.c:352
-       new_sync_write fs/read_write.c:595 [inline]
-       vfs_write+0x629/0xba0 fs/read_write.c:688
-       ksys_write+0x156/0x270 fs/read_write.c:740
+       blkdev_open+0x1f5/0x620 block/fops.c:688
+       do_dentry_open+0x83d/0x13e0 fs/open.c:947
+       vfs_open+0x3b/0x350 fs/open.c:1052
+       do_open fs/namei.c:4688 [inline]
+       path_openat+0x2eea/0x3960 fs/namei.c:4847
+       do_file_open+0x23e/0x4a0 fs/namei.c:4876
+       do_sys_openat2+0x115/0x200 fs/open.c:1368
+       do_sys_open fs/open.c:1374 [inline]
+       __do_sys_creat fs/open.c:1452 [inline]
+       __se_sys_creat fs/open.c:1446 [inline]
+       __x64_sys_creat+0x8f/0xc0 fs/open.c:1446
        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
        do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
        entry_SYSCALL_64_after_hwframe+0x77/0x7f
@@ -219,7 +227,7 @@ the existing dependency chain (in reverse order) is:
 other info that might help us debug this:
 
 Chain exists of:
-  &disk->open_mutex --> system_transition_mutex --> major_names_lock
+  &set->update_nr_hwq_lock --> system_transition_mutex --> major_names_lock
 
  Possible unsafe locking scenario:
 
@@ -228,23 +236,16 @@ Chain exists of:
   lock(major_names_lock);
                                lock(system_transition_mutex);
                                lock(major_names_lock);
-  lock(&disk->open_mutex);
+  rlock(&set->update_nr_hwq_lock);
 
  *** DEADLOCK ***
 
-6 locks held by syz.0.336/7301:
- #0: ffff888011240528 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x252/0x320 fs/file.c:1260
- #1: ffff888035564480 (sb_writers#7){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2733 [inline]
- #1: ffff888035564480 (sb_writers#7){.+.+}-{0:0}, at: vfs_write+0x22d/0xba0 fs/read_write.c:684
- #2: ffff88801efe3078 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x1df/0x540 fs/kernfs/file.c:343
- #3: ffff88801eec5c38 (kn->active#59){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:80 [inline]
- #3: ffff88801eec5c38 (kn->active#59){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x232/0x540 fs/kernfs/file.c:344
- #4: ffffffff8de756d8 (system_transition_mutex){+.+.}-{4:4}, at: software_resume+0x47/0x4c0 kernel/power/hibernate.c:1022
- #5: ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev block/genhd.c:881 [inline]
- #5: ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_request_module+0x35/0x2a0 block/genhd.c:897
+1 lock held by syz.0.2446/19404:
+ #0: ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev block/genhd.c:881 [inline]
+ #0: ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_request_module+0x35/0x2a0 block/genhd.c:897
 
 stack backtrace:
-CPU: 1 UID: 0 PID: 7301 Comm: syz.0.336 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
+CPU: 0 UID: 0 PID: 19404 Comm: syz.0.2446 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
 Tainted: [L]=SOFTLOCKUP
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
 Call Trace:
@@ -257,40 +258,37 @@ Call Trace:
  validate_chain kernel/locking/lockdep.c:3910 [inline]
  __lock_acquire+0x15a5/0x2d10 kernel/locking/lockdep.c:5239
  lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5870
- __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
- mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
- bdev_open+0xe0/0xcc0 block/bdev.c:953
- bdev_file_open_by_dev+0x1be/0x240 block/bdev.c:1067
- disk_scan_partitions+0x1c1/0x2c0 block/genhd.c:387
- add_disk_final block/genhd.c:416 [inline]
- add_disk_fwnode+0x321/0x480 block/genhd.c:610
+ down_read+0x97/0x200 kernel/locking/rwsem.c:1568
+ add_disk_fwnode+0xe7/0x480 block/genhd.c:596
  add_disk include/linux/blkdev.h:794 [inline]
- brd_alloc+0x5c9/0x7d0 drivers/block/brd.c:340
+ loop_add+0x86e/0xb50 drivers/block/loop.c:2108
  blk_probe_dev block/genhd.c:884 [inline]
  blk_request_module+0x27d/0x2a0 block/genhd.c:-1
  blkdev_get_no_open+0x3f/0xe0 block/bdev.c:833
- bdev_file_open_by_dev+0xa0/0x240 block/bdev.c:1054
- swsusp_check+0x56/0x490 kernel/power/swap.c:1571
- software_resume+0x51/0x4c0 kernel/power/hibernate.c:1023
- resume_store+0x333/0x4f0 kernel/power/hibernate.c:1307
- kernfs_fop_write_iter+0x3b0/0x540 fs/kernfs/file.c:352
- new_sync_write fs/read_write.c:595 [inline]
- vfs_write+0x629/0xba0 fs/read_write.c:688
- ksys_write+0x156/0x270 fs/read_write.c:740
+ blkdev_open+0x1f5/0x620 block/fops.c:688
+ do_dentry_open+0x83d/0x13e0 fs/open.c:947
+ vfs_open+0x3b/0x350 fs/open.c:1052
+ do_open fs/namei.c:4688 [inline]
+ path_openat+0x2eea/0x3960 fs/namei.c:4847
+ do_file_open+0x23e/0x4a0 fs/namei.c:4876
+ do_sys_openat2+0x115/0x200 fs/open.c:1368
+ do_sys_open fs/open.c:1374 [inline]
+ __do_sys_creat fs/open.c:1452 [inline]
+ __se_sys_creat fs/open.c:1446 [inline]
+ __x64_sys_creat+0x8f/0xc0 fs/open.c:1446
  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
  do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f157962ce59
+RIP: 0033:0x7f1094cfce59
 Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f157783c028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f15798a6180 RCX: 00007f157962ce59
-RDX: 0000000000000024 RSI: 0000200000000040 RDI: 000000000000000d
-RBP: 00007f15796c2d6f R08: 0000000000000000 R09: 0000000000000000
+RSP: 002b:00007f1092f56028 EFLAGS: 00000246 ORIG_RAX: 0000000000000055
+RAX: ffffffffffffffda RBX: 00007f1094f75fa0 RCX: 00007f1094cfce59
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00002000000000c0
+RBP: 00007f1094d92d6f R08: 0000000000000000 R09: 0000000000000000
 R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f15798a6218 R14: 00007f15798a6180 R15: 00007fffa4f29e08
+R13: 00007f1094f76038 R14: 00007f1094f75fa0 R15: 00007fff22949298
  </TASK>
 block device autoloading is deprecated and will be removed.
-PM: Image not found (code -22)
 
 
 ---
