@@ -1,257 +1,123 @@
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060AC8462
-	for <linux-block@vger.kernel.org>; Sun, 24 May 2026 13:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4C723507C;
+	Sun, 24 May 2026 15:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779629785; cv=none; b=rgpvlK+wnhzTKFFOE2Ce9HblCk2Vqq0cpY2NHlVgUWGaFegOF/XjJoSMZOpHgqqdLruy0GUymKnoHby4nG4pu/A9GMzddMJ5Glitw3PlWJFIXUmTMO9TOf0ggeHM7mogISvxYpH87Vd7994nbka/NUHP2mmbV1kItQ8BqlXdKh8=
+	t=1779636441; cv=none; b=fX6G4WNpA/CuxKSFhZWEh4OLtAThJ0mUkuiWYCnGNCa329gmBPuUiSSrdWfPNqZnR/AUxdHj2qokIGPgsqJGQieScI1/MVTxly05Vv9jt3hLiTYS64V4NEZiLk/duivc+SrFubmaxpj3Kle/0e4ghqYDmNtwrVp4IkAmqJEjBMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779629785; c=relaxed/simple;
-	bh=RUF88D4oxokI6ytz04k5oknLm9XIlC+0WgbXkUL8igU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tVgT1jUMyqcTYb0KAb0sJ0Xc+sW43meQtiVmDfVzD6JDRQ/dB9gMRf4Q6RO4l6NLJFNkZwQlazUf976fZO4OP2euLtcOSb4Nzv7U8je298SUYYYHtJK1AZ7Evhp1Dv9KxPbmCbR6/iiEPSgZyzAqMnGUU7v2s4VKrlTcGtj9LcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-69d92a86e3bso1677297eaf.1
-        for <linux-block@vger.kernel.org>; Sun, 24 May 2026 06:36:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779629782; x=1780234582;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YZoo+gfHiL9v2AlEyKRRsGzRo7Lz5LerxSDL2g5j4AU=;
-        b=Yme2FYjjVgj3UNS04wVkkZU8UqTi3/6BxijQhhEI9z/7o8WfoMKkkc9RvypeAFR1OI
-         YAAumESXfxuvqIMVAUMiz9H0o9MqMhzA6nKBSVIHM5miaaaD0tYwDOLa/kSXRKCYkDGo
-         georijqcoOWJlEMLakYwb6Ztc9LqjV87kT8u1+YhzrHkOL6HMJDJ4QqxUD87+wv/LQc9
-         yJd8WB83+O4m9OAKsJx4+QfTaXu6ffor/+xUY04tQUE2wUGWi//+hAmmpiUhBdoj0ljI
-         2dszzyLFDFVPHap6cqN1Cs0d1pg8EDqM0YlL4xJNsErd9kCQ9yMvhDn5r6Vg2h4HrZu5
-         9dBg==
-X-Forwarded-Encrypted: i=1; AFNElJ+HhB9FOJG98/9gOhXHdJDnnwJFNBXRLZdkC9iBKr3gJPsj4ELm3GuLUuXtog1jQGtOeaPvzTdOuDYbiQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvVkxlVqoNxY9TngSSTuPP9sedW50ihRTEUqVKzCVX2/Y2Gex5
-	953qhUMb0n951L8zGrki9tg0v0zzXjbfrYtFUaihibmpJdAIPc0MWav9F59fzNT98btwVewhrvQ
-	VHWZ9tNCGv3WQLARM4UgvJtNy6NqcizvBgjIOHnfRGUg48a1vjvsw0xF/ZUQ=
+	s=arc-20240116; t=1779636441; c=relaxed/simple;
+	bh=PgxWFhb9QEUrpPNpDxbag+moJuBrreIDwu+ugweCmDE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qSckKvcydMtWtkLRNl4s3ZbCvsy54ny+1lunZdb1SfNUfxebpv+eUbzwR3IX3YYlzXdenho9wHpnXquKoglSNTFRnc0i804cWRE/csWJIE5Zp1Y78pqeqWen5m9Wfhife078pD6g64en2UrHYYevcVRPsfIaRBupvk0Yr8pYMKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
+	by app2 (Coremail) with SMTP id zQmowABX9Au0GBNq7t8MAA--.29302S3;
+	Sun, 24 May 2026 23:26:52 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Cc: ojeda@kernel.org,
+	boqun@kernel.org,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	lossin@kernel.org,
+	a.hindborg@kernel.org,
+	aliceryhl@google.com,
+	tmgross@umich.edu,
+	dakr@kernel.org,
+	daniel.almeida@collabora.com,
+	axboe@kernel.dk,
+	sunke@kylinos.cn,
+	tamird@kernel.org,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	royenheart@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH 1/1] rust: block: fix GenDiskBuilder failure cleanup
+Date: Sun, 24 May 2026 23:26:28 +0800
+Message-ID: <b6411cc055080c984a67bfad72fd683aa84b8e13.1779596478.git.royenheart@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1779596478.git.royenheart@gmail.com>
+References: <cover.1779596478.git.royenheart@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:8186:b0:696:25d4:1e62 with SMTP id
- 006d021491bc7-69d7ead4e83mr5563720eaf.2.1779629781709; Sun, 24 May 2026
- 06:36:21 -0700 (PDT)
-Date: Sun, 24 May 2026 06:36:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a12fed5.050a0220.3c3a9.000b.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in bdev_release (2)
-From: syzbot <syzbot+2f62807dc3239b8f584e@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQmowABX9Au0GBNq7t8MAA--.29302S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw17ZFW8tw47XF43XrW5KFg_yoW8uF4rpF
+	ZxWrs0yrWvgFn7ta1UA3y7ury8Gw1kW3y8Ca98J3y29r1akrs7Xr9Yqr43XryvyFsrCFZa
+	qF4j9rWa9r1rAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQERCWoStM4DXgAAsH
 
-Hello,
+From: Haoze Xie <royenheart@gmail.com>
 
-syzbot found the following issue on:
+If GenDiskBuilder::build() fails after __blk_mq_alloc_disk(), the
+allocated gendisk is left behind until the caller drops the last
+tagset reference.
 
-HEAD commit:    c1ecb239fa34 Add linux-next specific files for 20260522
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=153a947e580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=77a9211ff284de54
-dashboard link: https://syzkaller.appspot.com/bug?extid=2f62807dc3239b8f584e
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+Handle the failure path by releasing the temporary gendisk first,
+then converting the foreign queue data back, so probe failures clean
+up both resources before returning an error.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4cb88c910144/disk-c1ecb239.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4a9bc938cf88/vmlinux-c1ecb239.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/684f1e33f264/bzImage-c1ecb239.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2f62807dc3239b8f584e@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L     
-------------------------------------------------------
-udevd/5769 is trying to acquire lock:
-ffff88805ecd4938 ((wq_completion)loop4){+.+.}-{0:0}, at: touch_wq_lockdep_map+0xb5/0x180 kernel/workqueue.c:4033
-
-but task is already holding lock:
-ffff88802674c4c8 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_release+0x1af/0x660 block/bdev.c:1136
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #5 (&disk->open_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       bdev_open+0xe0/0xcc0 block/bdev.c:953
-       bdev_file_open_by_dev+0x1be/0x240 block/bdev.c:1067
-       swsusp_check+0x56/0x490 kernel/power/swap.c:1571
-       software_resume+0x51/0x4c0 kernel/power/hibernate.c:1023
-       resume_store+0x333/0x4f0 kernel/power/hibernate.c:1307
-       kernfs_fop_write_iter+0x3b0/0x540 fs/kernfs/file.c:352
-       new_sync_write fs/read_write.c:595 [inline]
-       vfs_write+0x629/0xba0 fs/read_write.c:688
-       ksys_write+0x156/0x270 fs/read_write.c:740
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (system_transition_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       lock_system_sleep+0x49/0x70 kernel/power/main.c:71
-       resume_store+0x2ff/0x4f0 kernel/power/hibernate.c:1300
-       kernfs_fop_write_iter+0x3b0/0x540 fs/kernfs/file.c:352
-       new_sync_write fs/read_write.c:595 [inline]
-       vfs_write+0x629/0xba0 fs/read_write.c:688
-       ksys_write+0x156/0x270 fs/read_write.c:740
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #3 (&of->mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       kernfs_seq_start+0x5c/0x420 fs/kernfs/file.c:172
-       traverse+0x164/0x580 fs/seq_file.c:107
-       seq_read_iter+0xd09/0xe20 fs/seq_file.c:196
-       lo_rw_aio+0xc80/0xf00 include/linux/percpu-rwsem.h:-1
-       do_req_filebacked drivers/block/loop.c:435 [inline]
-       loop_handle_cmd drivers/block/loop.c:1941 [inline]
-       loop_process_work+0x92a/0x11b0 drivers/block/loop.c:1976
-       process_one_work+0x98b/0x1630 kernel/workqueue.c:3318
-       process_scheduled_works kernel/workqueue.c:3401 [inline]
-       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
-       kthread+0x388/0x470 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #2 (&p->lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       seq_read_iter+0xb8/0xe20 fs/seq_file.c:183
-       lo_rw_aio+0xc80/0xf00 include/linux/percpu-rwsem.h:-1
-       do_req_filebacked drivers/block/loop.c:435 [inline]
-       loop_handle_cmd drivers/block/loop.c:1941 [inline]
-       loop_process_work+0x92a/0x11b0 drivers/block/loop.c:1976
-       process_one_work+0x98b/0x1630 kernel/workqueue.c:3318
-       process_scheduled_works kernel/workqueue.c:3401 [inline]
-       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
-       kthread+0x388/0x470 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #1 ((work_completion)(&worker->work)){+.+.}-{0:0}:
-       process_one_work+0x8d7/0x1630 kernel/workqueue.c:3294
-       process_scheduled_works kernel/workqueue.c:3401 [inline]
-       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
-       kthread+0x388/0x470 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #0 ((wq_completion)loop4){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3167 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3286 [inline]
-       validate_chain kernel/locking/lockdep.c:3910 [inline]
-       __lock_acquire+0x15a5/0x2d10 kernel/locking/lockdep.c:5239
-       lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5870
-       touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:4033
-       __flush_workqueue+0x14b/0x14f0 kernel/workqueue.c:4075
-       drain_workqueue+0xd3/0x390 kernel/workqueue.c:4239
-       __loop_clr_fd drivers/block/loop.c:1130 [inline]
-       lo_release+0x287/0x8f0 drivers/block/loop.c:1767
-       bdev_release+0x541/0x660 block/bdev.c:-1
-       blkdev_release+0x15/0x20 block/fops.c:705
-       __fput+0x461/0xa70 fs/file_table.c:510
-       fput_close_sync+0x11f/0x240 fs/file_table.c:615
-       __do_sys_close fs/open.c:1511 [inline]
-       __se_sys_close fs/open.c:1496 [inline]
-       __x64_sys_close+0x7e/0x110 fs/open.c:1496
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  (wq_completion)loop4 --> system_transition_mutex --> &disk->open_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&disk->open_mutex);
-                               lock(system_transition_mutex);
-                               lock(&disk->open_mutex);
-  lock((wq_completion)loop4);
-
- *** DEADLOCK ***
-
-1 lock held by udevd/5769:
- #0: ffff88802674c4c8 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_release+0x1af/0x660 block/bdev.c:1136
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5769 Comm: udevd Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2045
- check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2177
- check_prev_add kernel/locking/lockdep.c:3167 [inline]
- check_prevs_add kernel/locking/lockdep.c:3286 [inline]
- validate_chain kernel/locking/lockdep.c:3910 [inline]
- __lock_acquire+0x15a5/0x2d10 kernel/locking/lockdep.c:5239
- lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5870
- touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:4033
- __flush_workqueue+0x14b/0x14f0 kernel/workqueue.c:4075
- drain_workqueue+0xd3/0x390 kernel/workqueue.c:4239
- __loop_clr_fd drivers/block/loop.c:1130 [inline]
- lo_release+0x287/0x8f0 drivers/block/loop.c:1767
- bdev_release+0x541/0x660 block/bdev.c:-1
- blkdev_release+0x15/0x20 block/fops.c:705
- __fput+0x461/0xa70 fs/file_table.c:510
- fput_close_sync+0x11f/0x240 fs/file_table.c:615
- __do_sys_close fs/open.c:1511 [inline]
- __se_sys_close fs/open.c:1496 [inline]
- __x64_sys_close+0x7e/0x110 fs/open.c:1496
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f836530a407
-Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-RSP: 002b:00007ffd5e8529c0 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 00007f836521c880 RCX: 00007f836530a407
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000008
-RBP: 00007f836521c6e8 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000002
-R13: 000055c60f674190 R14: 0000000000000008 R15: 000055c60f683f10
- </TASK>
-
-
+Fixes: 3253aba3408aa ("rust: block: introduce `kernel::block::mq` module")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Haoze Xie <royenheart@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ rust/kernel/block/mq/gen_disk.rs | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index 912cb805caf5..100c7b937a7e 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -149,6 +149,17 @@ pub fn build<T: Operations>(
+ 
+         // SAFETY: `gendisk` is a valid pointer as we initialized it above
+         unsafe { (*gendisk).fops = &TABLE };
++        let cleanup_failure = ScopeGuard::new_with_data((gendisk, data), |(gendisk, data)| {
++            // SAFETY: `gendisk` came from `__blk_mq_alloc_disk()` above and
++            // has not been added to the VFS on this cleanup path.
++            unsafe { bindings::put_disk(gendisk) };
++            // SAFETY: `data` came from `into_foreign()` above and has not been
++            // converted back on this cleanup path.
++            drop(unsafe { T::QueueData::from_foreign(data) });
++        });
++        // The failure guard now owns both pieces of cleanup; the early guard
++        // must not run on this path anymore.
++        recover_data.dismiss();
+ 
+         let mut writer = NullTerminatedFormatter::new(
+             // SAFETY: `gendisk` points to a valid and initialized instance. We
+@@ -172,7 +183,7 @@ pub fn build<T: Operations>(
+             },
+         )?;
+ 
+-        recover_data.dismiss();
++        cleanup_failure.dismiss();
+ 
+         // INVARIANT: `gendisk` was initialized above.
+         // INVARIANT: `gendisk` was added to the VFS via `device_add_disk` above.
+-- 
+2.47.3
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
