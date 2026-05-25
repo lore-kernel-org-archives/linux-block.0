@@ -1,119 +1,136 @@
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458E7318ED9
-	for <linux-block@vger.kernel.org>; Mon, 25 May 2026 17:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779731524; cv=pass; b=Mjc6ZiQgi4QwV1ja2cM9KQ67RqMFtgXxkZHIv92ogYxKmlfn3rdfJ2yawnRV0eFJ19EUvIzRp1RoKMd1Zg3yww9+lwRkMEkH8zsSkq9sNjZDOF4TfMzJ475MnYLlMa36Ab0TdO/GlH6u/IZoSPhacIqDb3kSfUnd3sRY2ePauzc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779731524; c=relaxed/simple;
-	bh=kr6z8jUXJs76+Hb66TPj5wAIPCr19WpDG6Lp2ByKQGw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RFE7UXwRgwOJ8U4JAGCMC1jzyEo7ur82adGlY99SAc7t/GV62ouJB38xfbsDM3NKvKAYPv6C+KySj4EQSvfolYTAxvpCzgx/5fINWeg+clxz1XKSTqqalyx776hkaqnkLF/T80/Hydq0X3GospQtLMWK+C1Qn3htSrDV7bu2pJM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OppDLcB6; arc=pass smtp.client-ip=74.125.82.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EF432573F
+	for <linux-block@vger.kernel.org>; Mon, 25 May 2026 18:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779732391; cv=none; b=BzimA9MNDyf8atF6GQR01tDv3EnNljrK9Bp2R8Rrtb6n1WM1eWH6Q+EuPI4mBlKR0S4tBwhn9LWosEGsluNi79C/+0j77EiSf7JkxRiTsclXDWnwOMUlvOZ02j/Ug1h5wpFTvUCYneTRccMBpHNmnv/7O+wOYzDPBWlKNxEtGPk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779732391; c=relaxed/simple;
+	bh=1pp+Hr16Pf3N7l0d/q2W+xea9I/gy+MmginnCOpfNrk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tWYumdVVUFrZYG+5XrnGDTpNn/VYaTYZhnPmEq6/SEWsYOgwCeQBiLSL2cjrztfAvJBQHYAqIlmsoc68GvD/SdHswaQlKKmpHHkfV9NGF7qbCMGmQrdAnybn8npyTOPr/cCeNqbscsggjK9AE2XZOGjNO3iFjnUtHXJiXT9jXXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=LDGGlSvn; arc=none smtp.client-ip=148.163.135.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OppDLcB6"
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2bda3b4318dso965820eec.1
-        for <linux-block@vger.kernel.org>; Mon, 25 May 2026 10:52:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779731522; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DOKMN92dn+i8bpdbF7Be287d/scGPiaEcNA3rsTGA/fMR1VZGGsNOTXANiG534U7kR
-         /XJGBoo8pjzu/XBAvDkof7Wp3pQo9YysITrPA0eaqo2iNSEq0GjVClFKqQh6KRU5jiH5
-         Ma7Aqv79XVF717/GnKXtKkP/EP86frQ4kAmXqD9ckw4Un9bIYKwJuVe2cvr3FibSV+Qh
-         Im76e2JsBSFyM1a3DkBBN9XjILXVGEaounWFXMxLpzKmhXtdbn+HYp47w2S98Uhv072P
-         e6Oub+DfLDskYFKtnTqWyZWr0tsGxZ6Pn2nA5nABK2QyZh1kvZgzGkPkBGiRIidirLPn
-         j3Ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=kr6z8jUXJs76+Hb66TPj5wAIPCr19WpDG6Lp2ByKQGw=;
-        fh=OHnksx0i0ax3UMqEXmAbCJ9JzuBW7l2A5G/jGi383ZU=;
-        b=cfP70UhKHRd64ln4FXMDvE4x1onY5hVCyCbxjgKT+Rxm3QYZjrjnzdjD6RvDBcb1j+
-         KaZYjNSXZuDf2xBmLKs2Ycp6kFnkvGIOvbsM+1KubkW1HOvTaMgpLd0V0XaW5BAW8EKq
-         A9azKFWYBK1ldifx0QhkcVlYh/72fvsmFcPdlFSc3wYlItmM+a91EKxa5Fktadqe4TM8
-         FcsJOyiCvkI5RjhLXEkUastRQ6NTlPFFFzyqHcv63ivAHtS6WvPBosYZU2l11QWOZtEf
-         VhQyTdsNok5Dzc/GXGwTDJfxolcFZ+2UYXJBE2MKFEM7saqFaxZxyPkKb4rNCprT5uMI
-         SRAA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779731522; x=1780336322; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kr6z8jUXJs76+Hb66TPj5wAIPCr19WpDG6Lp2ByKQGw=;
-        b=OppDLcB6u+4hVFF0nRgLbobmYXoTLVQJl+Z8xPBBHmHFhvYb8RJRiF9YS8rMNI5nCc
-         7Y8Mv0RdAOhQbay8yY1egS3iRvlzguBb1ZAA5/XLhVgteYSK+JiGxyk3//MN4458SRo9
-         RnPLdCXmz6BGOrsL8jz/xmx2khl/zkRtjFrmwzlRIX1cARxKH1ICKY/RTZN9zD9UCIY4
-         M0RsNpnlmJzXox6znyWLgimAjUEKTjik8ZAFNZ9+ZZRRE1MRZ555L/2pLG3E12eCKfoW
-         DO1NfH6+ROopBpWoGmUixJGU0ztsptJdzJY2XF17VDZnzj9mul7XxWDgSEvcG3nfxPpi
-         nZ9g==
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="LDGGlSvn"
+Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
+	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64PHe2Lx2624220
+	for <linux-block@vger.kernel.org>; Mon, 25 May 2026 14:06:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps01; bh=5dou
+	ZQvAFCZqdwJptJlzHlLbYqFrEBFAQblRV8bjPPI=; b=LDGGlSvnVwPgOU4r5HIX
+	Vm5NLt1fPlF7jAwQrDVvRFtcUNaPLFY0z4vFHzF8KvXEAANZI70k+v0RcNbZ0hB0
+	6g4puXZgHGEPugavputida2cXCM/mE4ZHs2PDRKSB62pgVTfHyArD0xbxdNakbXS
+	KE/vTIjo9ruSIpd0EQJg/cY3nDA/83pNowZVYvqOrrSEwU5duvcgQ3009GAqfAfN
+	dkEvk9SYCVk8mUvDfbJBStXJyg4S1/qMbbPEZudpe9MYTh+YK5MJleWd2E/NlDwV
+	NgB4/9N3hqj83Dv+gYm9ZpQhehAs2aspWH660TK8R8F/Q7S72bwrWAZWjmePpXZ5
+	qg==
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com [209.85.219.70])
+	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4ecu1b8446-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 25 May 2026 14:06:23 -0400 (EDT)
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-8bc5ab12bb5so56466076d6.3
+        for <linux-block@vger.kernel.org>; Mon, 25 May 2026 11:06:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779731522; x=1780336322;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kr6z8jUXJs76+Hb66TPj5wAIPCr19WpDG6Lp2ByKQGw=;
-        b=ZbaPnHcMeB8hkhPg8gOEnp7Cer0HGzq9j1E3f3eFgF4ZFYsmciKI6gIeptVcBAB+gF
-         zJhNbX+c9sFQVSk/9ewDHqXojfjMLwdZmI6QcAw0p7py1UiwtlltxfR3LjtF7lp+ic+N
-         V7PjU0SCYiniWnwJqKEIg/Nln2M/XtHd9ZRTSrC7Crm+/xRK3enlgoLP00wEG4mil3lj
-         JTYXcLE4y5fX56n27l/aYbKEhRERepweQUJyxhxvMs8HWoO/khoTRUDJLVnZukIb2HEC
-         17svn3b71JCzUdku5gMh0ieFRBW5RIhrZpKXUE7zYXdF86woCtrWj1rzFnBV4zSWhF2Y
-         POBw==
-X-Forwarded-Encrypted: i=1; AFNElJ8uxBaAnFJTA9jH8gQNOTRtp5/3fJJQcGryCtVCetV4PI5j0jvDa+r+4UaTHc0BsdKaLuGx4VrA96dbrg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQRf9yRAkWNtK4B2L1ZS77gRltgCbCpoiDDJyvh8fgrF++/ZX0
-	vllq14sBw5VcpRGLVHHVhxKkrNuk+KuiapQSdaHNsKgNczYrvCuSDYtKqhd50KQcPei9hFLsn+P
-	/LSrSH7yqzcMDdG4sFvg0c2/mSdXdeIo=
-X-Gm-Gg: Acq92OHT5RgfrPAbmTe16TuC5Uf2kI+aR++GkuOv+8beZZUiJXEGfq/gAHI+ATw29/M
-	KN/xew38zJ17o4AhY/V3E0ywI7t2HF/zYnOdAaCt+PI1/akbz8saPe0Gdv6bMfFovFq5zb3HhQP
-	QMo3WmX9orOcjSLAzkwhtj4PAUvIQM+ur6qTD4cjXWaa90/KK23iKWffggglHOMpmvp2FJ2yLMT
-	xpvTxmrO8oYSJawME73RlKoAHKOAr8AwWd8RIC4n9cdS0uA0t2A2KXsAoFZn6bbyoJzD8L1wO2u
-	94IOkj7G1dykHNyWosqkmnCXygGOEDvoJu4boMZpkx7ohv7t7jEMeIt9+FhACsvf/40UIUhMBYD
-	mikl6+hXe6C2DGcR0bxmadxo=
-X-Received: by 2002:a05:7300:df44:b0:2e6:b55a:76c9 with SMTP id
- 5a478bee46e88-30448cf0ceamr2954662eec.0.1779731522166; Mon, 25 May 2026
- 10:52:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779732382; x=1780337182;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5douZQvAFCZqdwJptJlzHlLbYqFrEBFAQblRV8bjPPI=;
+        b=BLuVplhfGePYcweT15ntEYibUHkAOIscSUbQSMvNgJOQ5TVaMCJD0mTXBhi0s5SOOS
+         9HaEGj7gEa9fRWSXh76J7tDW26KNRnB93EU2WtZiQ/RUjiHRjCae8XRpXKbZej88Jf53
+         I1YBX+cVyzPbpf1fyeKfk+qTXRtDHcIfOzLvAaB5q0CwX7UknldKm5G3scGki4CxQJtZ
+         JgyNpqfn+YP4JS4wP8yQHZ4/ThqFMCy6nqqtuONNu25v8v946/n2dA6VrF6jw9wtSxvw
+         gNs3cUfLR7UFZsN1On5pvdyADP/+GrznbIqg4mwKPuuIqSfQLepTUXXLDInBcyAl8SOj
+         r9TQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/KOzOR+VrDIdHnCcqOYEUrfWKNglCmCdFhp5twgJR+6pR0o+bJ16j6P+c+DyZZzDo3iAeTbE/D1XGLSw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7hYp9XMQRy66DuPzDAgDbza/uajvl4L9uuDA/6OAqCrdvhR29
+	GIiTPsdXScPv5Ab5RkQvnNi+Lx5HO0fH6ZCddVfJbsNZT4LF7Xdl34Wo79fBzLaybChahnoMfin
+	c6YvSzbqAbHTttmn/IfwRccc9mUtsSg4YjqG6izWdA9Tn8y/sP5wwT2wC4myT
+X-Gm-Gg: Acq92OFl9wFhRFV/9cUIN97an/xU6jlADjs3QVp46bCCjliYOKRcZPqgubPgFBCt3Co
+	KTMnSZib20MbR+1nQJjF/pqJUsIZEKnFbMxx0DAuLRo6a3wHFxGir0GGvNE8+qLLCHYgX+pA7q5
+	TRahR88TSaXSYF+5o5yU1XzUBa38eP1emBBqjKLGzV15wi0RcgchCa2DqQObYn9NGFvcKI99J66
+	aOOufvTprfxyimvXKEJ+jnJGiWjafq1MgpfkZxDaQWSIUToU7ahQLHZwjSkzh3RwLDSzkaLhYfS
+	JHTXj49yZOt14euqxrIXHnyo2xXxPYHNQalwA2u3n8g8jeiTsCTlBM1RbzJGEqJTTXss4/N/PNO
+	0XlSb81keTLkUk2uRkpCArzQBeUHleEs41T7FAr2a6Y0cokZ4Vgcgmv1r9N0qxg+qWGmocrE=
+X-Received: by 2002:a05:6214:5a03:b0:8b1:f8fe:507b with SMTP id 6a1803df08f44-8cc7b540e74mr240941596d6.19.1779732382464;
+        Mon, 25 May 2026 11:06:22 -0700 (PDT)
+X-Received: by 2002:a05:6214:5a03:b0:8b1:f8fe:507b with SMTP id 6a1803df08f44-8cc7b540e74mr240941006d6.19.1779732381967;
+        Mon, 25 May 2026 11:06:21 -0700 (PDT)
+Received: from [192.168.1.62] (dyn-160-39-33-242.dyn.columbia.edu. [160.39.33.242])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8cc812e657csm127335106d6.24.2026.05.25.11.06.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 May 2026 11:06:21 -0700 (PDT)
+Message-ID: <dcba754e-1c29-402a-980c-f9fe3e57a0a1@columbia.edu>
+Date: Mon, 25 May 2026 14:06:19 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260521-miscdev-use-format-v3-0-56240ca70d0c@linux.dev>
-In-Reply-To: <20260521-miscdev-use-format-v3-0-56240ca70d0c@linux.dev>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 25 May 2026 19:51:49 +0200
-X-Gm-Features: AVHnY4Lj-A7r4aYA8iAqKIKO_8AgbVe3NWs2TYf--zAM-mIaOF-qUbEBAdoXyqQ
-Message-ID: <CANiq72k3cjgHiimYqGfuQjPy+A3oOUEoMxUJCS-FgBm25D4MLA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/7] rust: use vertical import style and remove
- redundant imports
-To: Alvin Sun <alvin.sun@linux.dev>
-Cc: Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
-	Rae Moar <raemoar63@gmail.com>, rust-for-linux@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 4/4] block: enable RWF_DONTCACHE for block devices
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Christian Brauner <brauner@kernel.org>,
+        "Darrick J. Wong"
+ <djwong@kernel.org>,
+        Carlos Maiolino <cem@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
+References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
+ <20260514-blk-dontcache-v6-4-782e2fa7477b@columbia.edu>
+ <f8d509c7-c0c0-4196-9a82-a6f8ae24ffc2@columbia.edu>
+ <ahPejprWrEjsh7aC@infradead.org>
+Content-Language: en-US
+From: Tal Zussman <tz2294@columbia.edu>
+In-Reply-To: <ahPejprWrEjsh7aC@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: Pv-sqkVOkI4Dk3AQ630ZDYfxhTpmHq_L
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI1MDE4MSBTYWx0ZWRfX3bQFvAM07CQb
+ 2cDP8UcG4y2J5UGhVNlReVZQTWBhzEoCXRcaw2u/AryXrQSjA5VR1dNfThMpxQ/ZUKrhcm8njYI
+ 59epinXThVGGdb3R/lfXsg+mll0a6v7i6Q5SEwrhurYivXhYq7431Ev7dc206zEWjghlZeRdUwJ
+ ZGe8q3HTAfRa2/P3Oqkil6PKOcMnRJq4o11EUH1cm12ktGN3gO2dcfWipV6aIgQXz6WNiUJKACE
+ VTAZjO+Rq0oLJTRvBYlt/se646gf6ExSyhEmNWNzCYr1ZvOPrADvxj0OQg9H37wlXoMDa0weq/v
+ DI8eRisw71K1fz9Yot37iNJT1tuO0b/iA7+26kEJx+NeeQ59O8zuT993LNlULqTZcceiQ8cg61H
+ BPPdbuk+qKv0nJc2fr1EApGTArJr1Ua4ZC/RXgQsE0veJLjmWb9Q+YpI90BUvGX7Y/u6MaBX1VG
+ i2RgiGtou6kVr1wRffA==
+X-Authority-Analysis: v=2.4 cv=GfcnWwXL c=1 sm=1 tr=0 ts=6a148f9f cx=c_pps
+ a=oc9J++0uMp73DTRD5QyR2A==:117 a=GaPK54s0Se3oFqK5NkZy0g==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=x7bEGLp0ZPQA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=svvvyxlR1OQQkelhaPoB:22
+ a=V2gEwdiY8GOwGPefXFgA:9 a=QEXdDO2ut3YA:10 a=iYH6xdkBrDN1Jqds4HTS:22
+X-Proofpoint-GUID: Pv-sqkVOkI4Dk3AQ630ZDYfxhTpmHq_L
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11797
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 malwarescore=0 priorityscore=1501 phishscore=0
+ lowpriorityscore=10 suspectscore=0 bulkscore=10 spamscore=0 adultscore=0
+ impostorscore=10 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
+ definitions=main-2605250181
 
-On Thu, May 21, 2026 at 8:57=E2=80=AFAM Alvin Sun <alvin.sun@linux.dev> wro=
-te:
->
-> Adopt the vertical import style and drop redundant imports already
-> re-exported via `kernel::prelude`.
+On 5/25/26 1:30 AM, Christoph Hellwig wrote:
+> On Fri, May 22, 2026 at 07:17:15PM -0400, Tal Zussman wrote:
+>> A: So this actually seems legit... doesn't look like anything actually calls 
+>> blkdev_write_begin() or blkdev_write_end(), unless I'm missing something.
+>> block_write_begin_iocb() usage seems necessary for bh-based filesystems, but
+>> block devices seem to use iomap for writes unconditionally.
+> 
+> Yes.  Maybe send a separate patch to remove these now unused methods?
+> Or I could do that since I forgot to remove them when I should have.
+> 
 
-I can take this if block and misc Ack. The changes are straightforward anyw=
-ay.
-
-Thanks!
-
-Cheers,
-Miguel
+I'll send a patch. I'll also drop the block_write_begin_iocb() change from this
+series, as it becomes unused.
