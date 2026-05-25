@@ -1,313 +1,350 @@
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021141.outbound.protection.outlook.com [52.101.95.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5393009F2
-	for <linux-block@vger.kernel.org>; Sun, 24 May 2026 23:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779666692; cv=none; b=aHgPyfp6eBEuu0JpCuq0fo34X0NCCK3kcVQESsn2vjigPtVlG+I0V+zBUklNV/H8T7mJ3bwzitrk6yGU5RLt5I7WW5wJHZfsfAJ8tVRqNiLx5R6vGoZBUzU7GH1XTTC4maeQcuB+eyaMP3/uI4VOqHHYtyr71YGmNv0RrwVe1mc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779666692; c=relaxed/simple;
-	bh=oODVC9qGwahCxOLuKU16MWFSd39wR696YNUcn8mh1l0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=b9amulosjzFcTCa98kto4kilvOJPNxLKc/KDRRzw6uBafiN2KdLlnCCc0aGdX3YwNHo2kV7rKqHhdSbXzB2yQJpPyFMIhfx7qfB01LbujxT0Uj+DfsQfYV09DHDbyxpEq1z/isafe32d3orXo57cdQGCJtlKVoc1or+o082nmTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-69d77a8f5caso2943025eaf.3
-        for <linux-block@vger.kernel.org>; Sun, 24 May 2026 16:51:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779666689; x=1780271489;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0Z2DJ9klW2KnGrYNzjxmTbrVz0K6vzimOEKz85PWPRA=;
-        b=HvqsvK1Zm4pcaRhKK8Fpd1kwXsTjFDcEI69ippNVFF3VnDUewEpluvNCp1zgT1H0iu
-         hNF6M3u/CuNYLE8fx1SO6ibui+C3MNz4NlbVMlZQSKvQ5i4CnoMtKudyLbhzubRXM6B7
-         59Fwqs7pEpSyra6baKx7pjscL4okL9JyrDrJTDbBxk7t8DX/4Ceo+OqcDjhMXbNTP48Y
-         wmfof+GJCYarJyeAGuQmnZAG1YbkXBcbxY1AtyS6liQUG8P3Heq6nv+VcVMXEa6+ogwS
-         M92GnMyZy8fv1lPfjRV3zSX5VJiF/GE6H33RngFES6dGiddLlTRHEbxKpLsNNM6yGogx
-         KLIg==
-X-Forwarded-Encrypted: i=1; AFNElJ+BzgSs/NtU5CYp2CZDItSS3RKJwy/1aanlOvesHnR1IhAg9zHBI6Hp6puojNNF/xi7+4pIos14AcfhMA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzipOHK9vlvODz3yIyB+w+20SqSnATqbFaf7mfm6fxlOQGZ0P75
-	+qfOX+OzpxPellLtEeqrWkfFrPtHNNtp+1OsLce5YYAsTx2PWKh6LqMd0kU8wYV0apCvYNJH6TE
-	h9kfNXfpcKyY5ecXICgrVv/jR3ZTHqiLy2br953GcqCH2TEQqqDyCmHjBdRg=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2031DDC1B;
+	Mon, 25 May 2026 00:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.141
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779670295; cv=fail; b=Ag91KDkT0vkVShYXuT/t+wFjgjYbZWPndDMdoqPcCqQIOMtle0ViVoSF6mDKVVvIy9g8WB57scCLCJ7hutYZxg7Awmnvd7SzbLhvYm3KccbqtCYtV5QBDkXFoTd+rUb6gTG0v0bTlIeMVGaFtb3ig0NRrRGZC4pP4b97gfqJhPk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779670295; c=relaxed/simple;
+	bh=p8F8XnV6bW+ho/aE1p4KEj5ma1rQsKBi61nXJ/FNnDs=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=E7150VmDWoDvdIVqx/pew7Wro6D8sXW8oEZlA/dcNz6v0lFOQAQ1BwoRgLAUYoDI99jyHtHypxWm0JYAmykL6IInzZC1B0oOGlXlSXBgjpMoK6L921tZzrd5nGTyc9c0xKIf+rtOx+nUZDIwfgW7fT8rq//qNU2PICr62mIV1Zs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=52.101.95.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M1hDZ2hA1gderBdLxr+oP1M48NsxBqexxM3lYH1a5dafORRRscZWmhVrmVjTnDVYt+1Bzxc9fdgb9sOKDQhfyY4637RCN5lSopWMo3zRgZr4hh0svKVF/tEmdBANXfdjy/SAWvjoIukTwHUREMYa9rUkF5zsvfSy52rkvusZTCZ3kvpW1fmRkyGKh3FEqEytgTPZ8wBpannqgJiaBCCKh82pUmsdU8OT0culphcBqMMlQlDcq2RF8fzM0O0fQReGDIBwRwDHHekaRUqOvhjPAwv6NiWChb7W5/ouUQ0mQt6n8fR/8JdhjvCinAqCUaznz4wINubU7dGiPcvnB3PKiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ey0WmP/p1ZhGosx9WAgT6iKJcyBlXGtLxVhp+NVV638=;
+ b=mp2thNow5vk8g9f2jc7UbZNCi6d1sz0Ux1LvuD2UZiZQe31Wlb8m6/LaaLO81DjtCkOflwb3TBCOXUOpxh3Ce8f6BLZMHsoD5uFxlErSntl/s6OWF+rfqQxLTGXCVtMVfbszDgdkG4sGLPWOYslhav4RRnAEeSu7a6jFUyxpR1JW+mDnuwXy9rCKFUlKs/xubnq5l/Y6p7xt12Ceu8FLXdog7XqGMGow278pbLh79MDDvh/+HL25/Mzz0c5+0fgrO+H1N8YbczTqwbR3H4iMYcoa5L1YD/TlztFKoHQLd2PTsegbTh9vI349PQbfY8JmOEsTK+pzNVNGGntOXcFjhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:183::5)
+ by LO7P123MB8467.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:45f::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.19; Mon, 25 May
+ 2026 00:51:29 +0000
+Received: from CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230]) by CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::cec4:77ab:262e:d230%4]) with mapi id 15.21.0048.016; Mon, 25 May 2026
+ 00:51:28 +0000
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: axboe@kernel.dk,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com
+Cc: bvanassche@acm.org,
+	johannes.thumshirn@wdc.com,
+	kch@nvidia.com,
+	dlemoal@kernel.org,
+	ritesh.list@gmail.com,
+	john.g.garry@oracle.com,
+	loberman@redhat.com,
+	neelx@suse.com,
+	sean@ashe.io,
+	mproche@gmail.com,
+	chjohnst@gmail.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: [PATCH v9] blk-mq: add tracepoint block_rq_tag_wait
+Date: Sun, 24 May 2026 20:51:23 -0400
+Message-ID: <20260525005123.722277-1-atomlin@atomlin.com>
+X-Mailer: git-send-email 2.51.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BN9P223CA0019.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:408:10b::24) To CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:183::5)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:821:b0:69d:b4fb:f319 with SMTP id
- 006d021491bc7-69db4fbf40emr1036894eaf.7.1779666689306; Sun, 24 May 2026
- 16:51:29 -0700 (PDT)
-Date: Sun, 24 May 2026 16:51:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a138f01.050a0220.378d86.0000.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in add_disk_fwnode
-From: syzbot <syzbot+4feabfc9641267769c97@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB6607:EE_|LO7P123MB8467:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c4130ff-5942-4511-fedf-08deb9f7c10a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|56012099003|18002099003|6133799003|5023799004;
+X-Microsoft-Antispam-Message-Info:
+	Go8RPoNFSP5BNfYH74vuOJ90Xw4MDNZyk2LT5aIZZjpciE83j0LWIVnyP4XkTEkYdiZ9hKZBvYndgZqhQUzmbjGupJbA7nvSfpPud875qAXE8HVDB7OJ3Wkxt7bPQpjCi88WQFBY/j8lC16vZ36onoVwDU+/hkRaoGxkvvpnTmn+UBgzygxvhUZTX/Fx+EXWGIHDH5KCnq9250exb7vqlnaOoDc7OxUDJQWtAMPrrid3LFhtel0klnRHGrrmwSIbz4AA6/mlxtSc3dddNdXNjJucIpK92AE1vT17GXO1sfGZPsSby94+QUo3fbs597X18XeF5xYnvxB7YqmnhP5SrtFp0esyzidsjNPojJUrULdUkLLVEoZBDOGwptEIXJSRhApg6USGTfirmxWVhHEAzs1IL79iVz5MVduNSYRXfmn/4dGkuDZYp7uaE0ZXS0gOBY1yWLI7YPwAu3Qi2mSa5SP22UcBPVwdXv2RjZtSX36i0cxOAjYBOKplGX1Fg+qVS60ONaJMFO+igotKKjo2FSRaiRcVAeXlzxWEK9/LR7dAOtd9U2gv1ikY1M71Bj+2Q2F+YdOYysU4zTNLYSz9M+jH1eDo3WEZJub9fA9Yd1onYwQ/R07DT3t/ixGeigwi2SgUBgpbMn3opS7Nrm7jLDBCW4X51aiKlRK2f9FnyBGGQ78iVePHPuyX6KecdcUZIXrcXne0Iz5hX0eIbdnbxA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(56012099003)(18002099003)(6133799003)(5023799004);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?AK2bIpUqV2meNvKxyYNxxsNWNLnGSx9ZSO23hjpfSiXddRHaROE5Sgm2Atv1?=
+ =?us-ascii?Q?GOEKWBKNxWLXeqC2dBg0nAdyIyc+2Z62NVGw5BgRt/vQi238UBQWSGWHVRZX?=
+ =?us-ascii?Q?SD3Jno0FKQL9c5t2uyFz8WJtAj+q3xBV3Y7mIGpu9tbLxprkoNRqQSqEYJKl?=
+ =?us-ascii?Q?FtU7N0OfYbPUqwv/wXuOZx2F3yMPv1ddrBrR2HboytHCJCvKKSxQq6iGL5No?=
+ =?us-ascii?Q?4pFLnlT0RhuSqQHdMK4s5FCuOhiy6Kw48neynDb5mH+Lq9vDQySY91ddKmp1?=
+ =?us-ascii?Q?1uAuJ1T9DGd8xbFii9m5ZQn1H4EawoVzBQPepWDIYLmK6SMEpHm1XpouDfLn?=
+ =?us-ascii?Q?MoIC8YIZVjDtdRfydfBMiZ1K5ShaWeSiMRwG5mZ5JProU4197NhTHljXxYko?=
+ =?us-ascii?Q?ooTHymTskXxBFb0cqqvSPdbZL8ad/c1NVbRekpWTAgGa4ooFd/LhCh/YzfFt?=
+ =?us-ascii?Q?4y8v9VsRIM2wLn34OFuj/f81jDNL5o7CnG4mYgc4EA2u8X1AJVXUTBS6k5OU?=
+ =?us-ascii?Q?P4URZQDJmugkmEU5jH/eGn2qNMPGo5UCTZEcnKJEW1EbcQkP3hByD1RjX3f4?=
+ =?us-ascii?Q?SmqDXZD+EYKqs1TOY2C6e3Q/AT7CKDo4ZKjliCHvPxY1o8n8BTzVAcdiCm+E?=
+ =?us-ascii?Q?ILyFghlKj5a5A4BDzpCB16pOqLD9cSynrLKvwsV5LYJ30JdLgEHR4lK7VlSg?=
+ =?us-ascii?Q?ltEea4EktYq8w7LJLDH5HYVcQxc0FKy7k+WpJtC7g/bzyFIjHRYtMbs/I+K0?=
+ =?us-ascii?Q?5Ylo8a2LPJNv+UBfTpluYoLcDSUZGx/f/gIQYiBa9LvnxK53GmkgMzImbRPt?=
+ =?us-ascii?Q?3gXAl++XSbkDVLhNbtYeW7MB06oyTD5XqRPOsq/oSvkLu9372Tlr110x3M/e?=
+ =?us-ascii?Q?a1yXGS8BJe5RWUFHSXkgFnzv3lfOlClNkf6ORcGBxroyj7vr6McCBam5dHY2?=
+ =?us-ascii?Q?9lwOpZvsU4bmqL57urZ4tT/szyJpvb4HtKOiNDOHqvaX+TPgOQHeqfEv2PoX?=
+ =?us-ascii?Q?/wyxaippCa/+TwAHK/r/EHJ6N9QbRaeBl+6L82/WwmOqBivj52q8gNlMYRsi?=
+ =?us-ascii?Q?Ep/l9ahofJ3VAJE4VVRrhe5Te80IH5gs6FxOtGkO2jQY1H1ABnq/w3u7aVYH?=
+ =?us-ascii?Q?WzlUJX/E5zV3N9cU70lyJhxBZOtLweJeIi3TnSlOsjLWRViTlnFj1G0L28fC?=
+ =?us-ascii?Q?Vbu+p6kEaXE6lnygwxp5ZSBd61RJmVh+cs/AFIbdXea9DCLFjn8d3U53Qdf6?=
+ =?us-ascii?Q?8GOONydpdGC+3DcppSSZR1uKZmwc4RSqk+RmQBehktW0IBo7wRJSoomdlQtf?=
+ =?us-ascii?Q?eodrVV7syRk8YwwXTLgHg9XlbQVdttYTFAtM5kBs8etWBo5f63Zbi8t9XTj3?=
+ =?us-ascii?Q?mJlAZ6t6m/vf2o1Lxzx1l8M/zn+DGKRBeTZFj7ZvfLRM9oVDhePwWJHt7V12?=
+ =?us-ascii?Q?Pl2cHA81WxU/kzi3lXWEfTtVcB3DCpeyb4IqsyfgVOVQnpc39NPueliAVdCe?=
+ =?us-ascii?Q?Ou1TFLdgnYhcdyVWnAhYNrZrj8yOCIchXLuw9neVUMV74JfdjElshZvKQ5ww?=
+ =?us-ascii?Q?xCdlCQOl5s9gx2OPclHW5TqxiSMRz6yCPhsBJ1l/kk4V5uGC0IdK97bpAiqt?=
+ =?us-ascii?Q?H1h7eN8IV4rtHTiiTcdaxY0cktzFQF6cvrnsjvDj7Pcrh3RSMdofYPUcWN/o?=
+ =?us-ascii?Q?XUvFujBIV9MFiViIobvFbEgRnnDUDHKxl1ps1Igm2WIHIPIwhZozRBjfMEND?=
+ =?us-ascii?Q?0Wf0Mcffrg=3D=3D?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c4130ff-5942-4511-fedf-08deb9f7c10a
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB6607.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2026 00:51:28.1497
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wMd4KUYiDQIFSptT6fBGSWc5o/vxCEF7SFmGFRTDdG+p2PrqqsX4tgKJkTQuYdi9Qy3SQffaVnSV48omCJZ5yA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO7P123MB8467
 
-Hello,
+In high-performance storage environments, particularly when utilising
+RAID controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED), severe
+latency spikes can occur when fast devices (SSDs) are starved of hardware
+tags when sharing the same blk_mq_tag_set.
 
-syzbot found the following issue on:
+Currently, diagnosing this specific hardware queue contention is
+difficult. When a CPU thread exhausts the tag pool, blk_mq_get_tag()
+forces the current thread to block uninterruptible via io_schedule().
+While this can be inferred via sched:sched_switch or dynamically
+traced by attaching a kprobe to blk_mq_mark_tag_wait(), there is no
+dedicated, out-of-the-box observability for this event.
 
-HEAD commit:    c1ecb239fa34 Add linux-next specific files for 20260522
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15526d96580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e0299bf0261ddd5
-dashboard link: https://syzkaller.appspot.com/bug?extid=4feabfc9641267769c97
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+This patch introduces the block_rq_tag_wait tracepoint in the tag
+allocation slow-path. It triggers immediately before the task state
+is altered to TASK_UNINTERRUPTIBLE (ensuring safety for PREEMPT_RT
+locks). It exposes the exact hardware context (hctx) that is starved,
+the specific pool experiencing starvation (driver, software scheduler,
+or reserved), and the exact pool depth.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+This provides storage engineers with a zero-configuration, low-overhead
+mechanism to definitively identify shared-tag bottlenecks. For example,
+userspace can trivially replicate tag starvation counters using bpftrace:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b8845b668755/disk-c1ecb239.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/517b638d908a/vmlinux-c1ecb239.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/dd5e3b587fce/bzImage-c1ecb239.xz
+    # bpftrace -e 'tracepoint:block:block_rq_tag_wait { @tag_waits[cpu] = count(); }'
+    Attaching 1 probe...
+    ^C
+    @tag_waits[4]: 12
+    @tag_waits[12]: 87
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4feabfc9641267769c97@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Tainted: G             L     
-------------------------------------------------------
-syz.0.2446/19404 is trying to acquire lock:
-ffff88806b47a410 (&set->update_nr_hwq_lock){++++}-{4:4}, at: add_disk_fwnode+0xe7/0x480 block/genhd.c:596
-
-but task is already holding lock:
-ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev block/genhd.c:881 [inline]
-ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_request_module+0x35/0x2a0 block/genhd.c:897
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #7 (major_names_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       blk_probe_dev block/genhd.c:881 [inline]
-       blk_request_module+0x35/0x2a0 block/genhd.c:897
-       blkdev_get_no_open+0x3f/0xe0 block/bdev.c:833
-       bdev_file_open_by_dev+0xa0/0x240 block/bdev.c:1054
-       swsusp_check+0x56/0x490 kernel/power/swap.c:1571
-       software_resume+0x51/0x4c0 kernel/power/hibernate.c:1023
-       resume_store+0x333/0x4f0 kernel/power/hibernate.c:1307
-       kernfs_fop_write_iter+0x3b0/0x540 fs/kernfs/file.c:352
-       iter_file_splice_write+0x9a6/0x10f0 fs/splice.c:736
-       do_splice_from fs/splice.c:936 [inline]
-       direct_splice_actor+0x104/0x160 fs/splice.c:1159
-       splice_direct_to_actor+0x545/0xc80 fs/splice.c:1103
-       do_splice_direct_actor fs/splice.c:1202 [inline]
-       do_splice_direct+0x19b/0x2a0 fs/splice.c:1228
-       do_sendfile+0x547/0x7e0 fs/read_write.c:1372
-       __do_sys_sendfile64 fs/read_write.c:1433 [inline]
-       __se_sys_sendfile64+0x144/0x1a0 fs/read_write.c:1419
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #6 (system_transition_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       lock_system_sleep+0x49/0x70 kernel/power/main.c:71
-       resume_store+0x2ff/0x4f0 kernel/power/hibernate.c:1300
-       kernfs_fop_write_iter+0x3b0/0x540 fs/kernfs/file.c:352
-       iter_file_splice_write+0x9a6/0x10f0 fs/splice.c:736
-       do_splice_from fs/splice.c:936 [inline]
-       direct_splice_actor+0x104/0x160 fs/splice.c:1159
-       splice_direct_to_actor+0x545/0xc80 fs/splice.c:1103
-       do_splice_direct_actor fs/splice.c:1202 [inline]
-       do_splice_direct+0x19b/0x2a0 fs/splice.c:1228
-       do_sendfile+0x547/0x7e0 fs/read_write.c:1372
-       __do_sys_sendfile64 fs/read_write.c:1433 [inline]
-       __se_sys_sendfile64+0x144/0x1a0 fs/read_write.c:1419
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #5 (&of->mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       kernfs_seq_start+0x5c/0x420 fs/kernfs/file.c:172
-       seq_read_iter+0x3f8/0xe20 fs/seq_file.c:226
-       new_sync_read fs/read_write.c:493 [inline]
-       vfs_read+0x58b/0xa80 fs/read_write.c:574
-       ksys_read+0x156/0x270 fs/read_write.c:717
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (&p->lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       seq_read_iter+0xb8/0xe20 fs/seq_file.c:183
-       lo_rw_aio+0xc80/0xf00 include/linux/percpu-rwsem.h:-1
-       do_req_filebacked drivers/block/loop.c:435 [inline]
-       loop_handle_cmd drivers/block/loop.c:1941 [inline]
-       loop_process_work+0x92a/0x11b0 drivers/block/loop.c:1976
-       process_one_work+0x98b/0x1630 kernel/workqueue.c:3318
-       process_scheduled_works kernel/workqueue.c:3401 [inline]
-       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
-       kthread+0x388/0x470 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #3 ((work_completion)(&lo->rootcg_work)){+.+.}-{0:0}:
-       process_one_work+0x8d7/0x1630 kernel/workqueue.c:3294
-       process_scheduled_works kernel/workqueue.c:3401 [inline]
-       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
-       kthread+0x388/0x470 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #2 ((wq_completion)loop1){+.+.}-{0:0}:
-       touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:4033
-       __flush_workqueue+0x14b/0x14f0 kernel/workqueue.c:4075
-       drain_workqueue+0xd3/0x390 kernel/workqueue.c:4239
-       __loop_clr_fd drivers/block/loop.c:1130 [inline]
-       lo_release+0x287/0x8f0 drivers/block/loop.c:1767
-       bdev_release+0x541/0x660 block/bdev.c:-1
-       blkdev_release+0x15/0x20 block/fops.c:705
-       __fput+0x461/0xa70 fs/file_table.c:510
-       fput_close_sync+0x11f/0x240 fs/file_table.c:615
-       __do_sys_close fs/open.c:1511 [inline]
-       __se_sys_close fs/open.c:1496 [inline]
-       __x64_sys_close+0x7e/0x110 fs/open.c:1496
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&disk->open_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
-       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
-       __del_gendisk+0x127/0x980 block/genhd.c:710
-       del_gendisk+0xe7/0x160 block/genhd.c:823
-       loop_remove+0x42/0xc0 drivers/block/loop.c:2136
-       loop_control_remove drivers/block/loop.c:2195 [inline]
-       loop_control_ioctl+0x4ba/0x5b0 drivers/block/loop.c:2237
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:597 [inline]
-       __se_sys_ioctl+0xff/0x170 fs/ioctl.c:583
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&set->update_nr_hwq_lock){++++}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3167 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3286 [inline]
-       validate_chain kernel/locking/lockdep.c:3910 [inline]
-       __lock_acquire+0x15a5/0x2d10 kernel/locking/lockdep.c:5239
-       lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5870
-       down_read+0x97/0x200 kernel/locking/rwsem.c:1568
-       add_disk_fwnode+0xe7/0x480 block/genhd.c:596
-       add_disk include/linux/blkdev.h:794 [inline]
-       loop_add+0x86e/0xb50 drivers/block/loop.c:2108
-       blk_probe_dev block/genhd.c:884 [inline]
-       blk_request_module+0x27d/0x2a0 block/genhd.c:-1
-       blkdev_get_no_open+0x3f/0xe0 block/bdev.c:833
-       blkdev_open+0x1f5/0x620 block/fops.c:688
-       do_dentry_open+0x83d/0x13e0 fs/open.c:947
-       vfs_open+0x3b/0x350 fs/open.c:1052
-       do_open fs/namei.c:4688 [inline]
-       path_openat+0x2eea/0x3960 fs/namei.c:4847
-       do_file_open+0x23e/0x4a0 fs/namei.c:4876
-       do_sys_openat2+0x115/0x200 fs/open.c:1368
-       do_sys_open fs/open.c:1374 [inline]
-       __do_sys_creat fs/open.c:1452 [inline]
-       __se_sys_creat fs/open.c:1446 [inline]
-       __x64_sys_creat+0x8f/0xc0 fs/open.c:1446
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &set->update_nr_hwq_lock --> system_transition_mutex --> major_names_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(major_names_lock);
-                               lock(system_transition_mutex);
-                               lock(major_names_lock);
-  rlock(&set->update_nr_hwq_lock);
-
- *** DEADLOCK ***
-
-1 lock held by syz.0.2446/19404:
- #0: ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_probe_dev block/genhd.c:881 [inline]
- #0: ffffffff8e74bdd8 (major_names_lock){+.+.}-{4:4}, at: blk_request_module+0x35/0x2a0 block/genhd.c:897
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 19404 Comm: syz.0.2446 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2045
- check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2177
- check_prev_add kernel/locking/lockdep.c:3167 [inline]
- check_prevs_add kernel/locking/lockdep.c:3286 [inline]
- validate_chain kernel/locking/lockdep.c:3910 [inline]
- __lock_acquire+0x15a5/0x2d10 kernel/locking/lockdep.c:5239
- lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5870
- down_read+0x97/0x200 kernel/locking/rwsem.c:1568
- add_disk_fwnode+0xe7/0x480 block/genhd.c:596
- add_disk include/linux/blkdev.h:794 [inline]
- loop_add+0x86e/0xb50 drivers/block/loop.c:2108
- blk_probe_dev block/genhd.c:884 [inline]
- blk_request_module+0x27d/0x2a0 block/genhd.c:-1
- blkdev_get_no_open+0x3f/0xe0 block/bdev.c:833
- blkdev_open+0x1f5/0x620 block/fops.c:688
- do_dentry_open+0x83d/0x13e0 fs/open.c:947
- vfs_open+0x3b/0x350 fs/open.c:1052
- do_open fs/namei.c:4688 [inline]
- path_openat+0x2eea/0x3960 fs/namei.c:4847
- do_file_open+0x23e/0x4a0 fs/namei.c:4876
- do_sys_openat2+0x115/0x200 fs/open.c:1368
- do_sys_open fs/open.c:1374 [inline]
- __do_sys_creat fs/open.c:1452 [inline]
- __se_sys_creat fs/open.c:1446 [inline]
- __x64_sys_creat+0x8f/0xc0 fs/open.c:1446
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1094cfce59
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1092f56028 EFLAGS: 00000246 ORIG_RAX: 0000000000000055
-RAX: ffffffffffffffda RBX: 00007f1094f75fa0 RCX: 00007f1094cfce59
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00002000000000c0
-RBP: 00007f1094d92d6f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f1094f76038 R14: 00007f1094f75fa0 R15: 00007fff22949298
- </TASK>
-block device autoloading is deprecated and will be removed.
-
-
+Signed-off-by: Aaron Tomlin <atomlin@atomlin.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Hi Johannes, Damien, Chaitanya, Laurence,
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+I have dropped the earlier "Reviewed-by:" and "Tested-by:" tags because
+of functional logic changes in the tracepoint assignment block. A fresh
+review would be highly appreciated. Thank you.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Changes since v8 [1]:
+ - Fixed the standard pool depth calculation in TP_fast_assign to
+   accurately report the unreserved capacity by mathematically
+   subtracting nr_reserved_tags from nr_tags
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ - Removed "Reviewed-by:" and "Tested-by:" tags due to the functional
+   logic updates in the tracepoint assignment block
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Changes since v7 [2]:
+ - Added an is_reserved boolean to the trace record to explicitly expose
+   reserved pool starvation to userspace
 
-If you want to undo deduplication, reply with:
-#syz undup
+ - Fixed TP_fast_assign to report the correct nr_reserved_tags depth
+   when I/O schedulers utilise the reserved pool
+
+Changes since v6 [3]:
+ - Dropped Patch 2. Observability is now driven entirely by the tracepoint,
+   with the commit message updated to demonstrate how userspace (e.g.,
+   bpftrace) can safely replicate counting out-of-band (Jens Axboe)
+
+ - Moved tracepoint call above sbitmap_prepare_to_wait(). This prevents
+   inadvertently resetting the task state under PREEMPT_RT locks
+
+ - Updated the tracepoint signature and TP_fast_assign block to evaluate
+   the allocation flags. If the submitting context is starved of a reserved
+   tag (BLK_MQ_REQ_RESERVED), the tracepoint now accurately reports the
+   severely constrained nr_reserved_tags depth instead of the total nr_tags
+   depth.
+
+Changes since v5 [4]:
+ - Replaced this_cpu_inc() with raw_cpu_inc() within
+   blk_mq_debugfs_inc_wait_tags(). This resolves a preemption warning
+   triggered under CONFIG_DEBUG_PREEMPT=y, as the routine is invoked from a
+   preemptible context immediately prior to io_schedule(). This adjustment
+   deliberately prioritises the reduction of execution overhead over
+   absolute statistical precision for this diagnostic interface.
+
+Changes since v4 [5]:
+ - Prevented a NULL pointer dereference in the tracepoint fast-assign for
+   disk-less request queues by safely checking q->disk before resolving the
+   dev_t
+
+ - Fixed a Use-After-Free (UAF) and permanent memory leak by decoupling
+   the per-CPU counter allocation from the volatile debugfs lifecycle and
+   tying it directly to the core hctx lifecycle (i.e., blk_mq_init_hctx()
+   and blk_mq_exit_hctx())
+
+ - Fixed a potential compiler double-fetch bug by wrapping the per-CPU
+   pointer evaluations with READ_ONCE() in blk_mq_debugfs_inc_wait_tags()
+
+ - Passed the appropriate gfp_t flags down to the allocation routines to
+   maintain the strict GFP_NOIO context
+
+ - Updated kernel-doc descriptions to clarify that the NULL pointer
+   checks guard against memory allocation failures under pressure, rather
+   than initialisation race conditions
+
+Changes since v3 [6]:
+ - Transitioned tracking architecture from shared atomic_t variables to
+   dynamically allocated per-CPU counters to resolve cache line bouncing
+   (Bart Van Assche)
+
+Changes since v2 [7]:
+ - Added "Reviewed-by:" and "Tested-by:" tags for patch 1
+
+ - Evaluate is_sched_tag directly within TP_fast_assign (Steven Rostedt)
+
+ - Introduced atomic counters via debugfs
+
+Changes since v1 [8]:
+ - Improved the description of the trace point (Damien Le Moal)
+
+ - Removed the redundant "active requests" (Laurence Oberman)
+
+ - Introduced pool-specific starvation tracking
+
+[1]: https://lore.kernel.org/lkml/20260524014204.622699-1-atomlin@atomlin.com/
+[2]: https://lore.kernel.org/lkml/20260523200942.587199-1-atomlin@atomlin.com/
+[3]: https://lore.kernel.org/lkml/20260517213614.350367-1-atomlin@atomlin.com/
+[4]: https://lore.kernel.org/lkml/20260427020142.358912-1-atomlin@atomlin.com/
+[5]: https://lore.kernel.org/lkml/20260419023036.1419514-1-atomlin@atomlin.com/
+[6]: https://lore.kernel.org/lkml/20260319221956.332770-1-atomlin@atomlin.com/
+[7]: https://lore.kernel.org/lkml/20260319015300.287653-1-atomlin@atomlin.com/
+[8]: https://lore.kernel.org/lkml/20260317182835.258183-1-atomlin@atomlin.com/
+---
+ block/blk-mq-tag.c           |  6 ++++
+ include/trace/events/block.h | 59 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 33946cdb5716..35deee5bbc73 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -13,6 +13,7 @@
+ #include <linux/kmemleak.h>
+ 
+ #include <linux/delay.h>
++#include <trace/events/block.h>
+ #include "blk.h"
+ #include "blk-mq.h"
+ #include "blk-mq-sched.h"
+@@ -181,6 +182,11 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 		if (tag != BLK_MQ_NO_TAG)
+ 			break;
+ 
++		/* Log the starvation event before altering task state */
++		trace_block_rq_tag_wait(data->q, data->hctx,
++					data->rq_flags & RQF_SCHED_TAGS,
++					data->flags);
++
+ 		sbitmap_prepare_to_wait(bt, ws, &wait, TASK_UNINTERRUPTIBLE);
+ 
+ 		tag = __blk_mq_get_tag(data, bt);
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 6aa79e2d799c..9c97a16850b9 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -226,6 +226,65 @@ DECLARE_EVENT_CLASS(block_rq,
+ 		  IOPRIO_PRIO_LEVEL(__entry->ioprio), __entry->comm)
+ );
+ 
++/**
++ * block_rq_tag_wait - triggered when a request is starved of a tag
++ * @q: request queue of the target device
++ * @hctx: hardware context of the request experiencing starvation
++ * @is_sched_tag: indicates whether the starved pool is the software scheduler
++ * @alloc_flags: allocation flags dictating the specific tag pool
++ *
++ * Called immediately before the submitting context is forced to block due
++ * to the exhaustion of available tags (i.e., physical hardware driver
++ * tags, software scheduler tags, or reserved tags). This trace point
++ * indicates that the context will be placed into an uninterruptible state
++ * via sbitmap_prepare_to_wait(). If a tag is not acquired in the final
++ * lockless retry, the context will yield the CPU via io_schedule() until
++ * an active request completes and relinquishes its assigned tag.
++ */
++TRACE_EVENT(block_rq_tag_wait,
++
++	TP_PROTO(struct request_queue *q, struct blk_mq_hw_ctx *hctx,
++		 bool is_sched_tag, unsigned int alloc_flags),
++
++	TP_ARGS(q, hctx, is_sched_tag, alloc_flags),
++
++	TP_STRUCT__entry(
++		__field( dev_t,		dev			)
++		__field( u32,		hctx_id			)
++		__field( u32,		nr_tags			)
++		__field( bool,		is_sched_tag		)
++		__field( bool,		is_reserved		)
++	),
++
++	TP_fast_assign(
++		__entry->dev		= q->disk ? disk_devt(q->disk) : 0;
++		__entry->hctx_id	= hctx->queue_num;
++		__entry->is_sched_tag	= is_sched_tag;
++		__entry->is_reserved	= alloc_flags & BLK_MQ_REQ_RESERVED;
++
++		if (__entry->is_reserved) {
++			__entry->nr_tags = is_sched_tag ?
++					   hctx->sched_tags->nr_reserved_tags :
++					   hctx->tags->nr_reserved_tags;
++		} else {
++			if (is_sched_tag)
++				__entry->nr_tags = hctx->sched_tags->nr_tags -
++						   hctx->sched_tags->nr_reserved_tags;
++			else
++				__entry->nr_tags = hctx->tags->nr_tags -
++						   hctx->tags->nr_reserved_tags;
++		}
++
++	),
++
++	TP_printk("%d,%d hctx=%u starved on %s%s tags (depth=%u)",
++		  MAJOR(__entry->dev), MINOR(__entry->dev),
++		  __entry->hctx_id,
++		  __entry->is_sched_tag ? "scheduler" : "hardware",
++		  __entry->is_reserved ? " reserved" : "",
++		  __entry->nr_tags)
++);
++
+ /**
+  * block_rq_insert - insert block operation request into queue
+  * @rq: block IO operation request
+
+base-commit: 6779b50faa562e6cca1aa6a4649a4d764c6c7e28
+-- 
+2.51.0
+
