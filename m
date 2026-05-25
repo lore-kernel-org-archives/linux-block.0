@@ -1,126 +1,70 @@
-Received: from va-2-37.ptr.blmpb.com (va-2-37.ptr.blmpb.com [209.127.231.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E1133EB06
-	for <linux-block@vger.kernel.org>; Mon, 25 May 2026 05:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D52342524;
+	Mon, 25 May 2026 05:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779686942; cv=none; b=JU4WMjW4Evu3MyPUcV0ZkhCc3jPu8rJm+/5bub3nCEmWpE+tS1f2+tRIryrbsNZjE91gNPv1nu3D/cmRwvJ/Zo6vZIm8yguYBjW9fBj0hmv8m3H2eTUHOcoMCq1vOZi+xFd+LMe9MIllYoFhN66z9d72bUQnbnKc2jH8QtdLrl0=
+	t=1779687062; cv=none; b=BkbDCM2gzbKPFbRwlo5LYEXXMUz+G02I9g5FQ0GNfaTkmt41v1tlBTNuK+Z65IbEzlO8FMxEy2QPempfDPvrDZN3/sjoXrG5DSZTSl7T7WRoNe/wyX8KOaeNm9cucAVCHypQ0yotgS04l2f7i/IwsmHkAq5bf4tNZ5gtnFKw3L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779686942; c=relaxed/simple;
-	bh=FTVmaFbWNt5LXOmEyJMYYK/RvxJHDa9jF+bxv56vfjs=;
-	h=From:In-Reply-To:References:Cc:Subject:Message-Id:To:Content-Type:
-	 Date:Mime-Version; b=MFwRwh+/vcOQ32TFt1Ky+YuLBHIxnmZPbSv6X8/nA22lvcTbjYrLo3RjiBXdEwcKVmZz2KV/yPn3rOVxqrvnT7iWDGcDTiH0eITo1u2IeR74HChsHs9+wzqW73VC8RBrSn+vmHQKAiPnZa6R2s+WkPAM4Hi7SKAaug4Zjff8Uzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=YaKOZXOm; arc=none smtp.client-ip=209.127.231.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1779687062; c=relaxed/simple;
+	bh=mneTr/PT7L8IGptiANNpugHuM64luBmMlC8aVKGJ8E0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZfMTg4Dzjsk2DSNGMn+8NdAsYLZSN6JoD1bgkOT1o15TD8JsHW0RQEKXHkOGCQM2TT30jdsariUrzvsD+oLThDSlf6TqwLm+7UNO/E5rPAgIMRrZ4gghftyOCm29kspRxYoavQupCITPo53zOrEu6tSJgfJmPZUAIwv9bgyDghY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=g4ON/0Fn; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="YaKOZXOm"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g4ON/0Fn"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1779686929;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=FTVmaFbWNt5LXOmEyJMYYK/RvxJHDa9jF+bxv56vfjs=;
- b=YaKOZXOmdfavatC22fEZRNajXytyWolPy23aEy8/t2vhcW6d39MA1Sd198mhw9uzgJhjjy
- 8mmWole5SS3SLfUfKFXH1bFYZ/cj2v+K+6uHutBV4zpDAQ48mWmYkkfzjo4rgAOkaiADRE
- a/qWiYn/rNTah5wQxlIXTB18a5XjiSEk36EGQMGAbj+bsQgVg0/OS9PUdzhWpIrffuJSmZ
- 518mzq1+yr3+EV1vrut1EJQj1G1tEjnWV1rDgu33HwVccsTpba5Dpuaf+BLV3E4TJJcWvA
- x03jLy+uY1MUNJ16StL/kOhcUwAAn2r9yFFq4A72pGX5zB4gN0U181sFhSq6Tg==
-User-Agent: Mozilla Thunderbird
-Content-Transfer-Encoding: base64
-From: "Yu Kuai" <yukuai@fygo.io>
-In-Reply-To: <1cb74987-34e2-422f-93cf-9174fe913538@kernel.dk>
-X-Original-From: Yu Kuai <yukuai@fygo.io>
-References: <338169f719c77e4afe58f42e9760349e@linux.ibm.com> <1cb74987-34e2-422f-93cf-9174fe913538@kernel.dk>
-Content-Language: en-US
-Reply-To: yukuai@fygo.io
-Cc: <tom.leiming@gmail.com>, <jmoyer@redhat.com>, 
-	"Gjoyce" <gjoyce@linux.ibm.com>, <wenxiong@us.ibm.com>, <yukuai@fygo.io>
-Subject: Re: Observing higher CPU utilization during random IO fio testing
-Message-Id: <043e357f-5b37-4e05-9433-271504fc1d30@fygo.io>
-To: "Jens Axboe" <axboe@kernel.dk>, "Wen Xiong" <wenxiong@linux.ibm.com>, 
-	<linux-block@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Received: from [192.168.1.104] ([39.182.0.188]) by smtp.larksuite.com with ESMTPS; Mon, 25 May 2026 05:28:48 +0000
-X-Lms-Return-Path: <lba+26a13de10+a9b20b+vger.kernel.org+yukuai@fygo.io>
-Date: Mon, 25 May 2026 13:28:45 +0800
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=2U0I91EEn9zktr/NrB5JNMRj3jME1frv7H4DRKlkkao=; b=g4ON/0Fn2ZnumYYz2ZJB1T88cU
+	rNHpVEomEVsJ1cxLFOKfkJusvgNbjI14ra30px6ASSOkgnAncCdx1EA8wpz5/7p/1AsnKtwKqlV6I
+	9e9gIYLIifhVrQPuTGuIw0WSjFlSiqE27GCrGUkXo0zNRG6mnAv2cvSVoOM2ADeuTQ/A0CpP0E+GK
+	cWVO9QKrA3z/8kpOdxQB+eBHDBYZlzyiRaukyYZP7CfTKl0/yONePwuuCWVo0ttW42wxXQGikkP2T
+	dIKdMDBG+1ZRyYKO7UEM2j/7KJsUjYLGzL2eXOduhNg10pRUUA+L75zygat6xSUFHxJlExZTn/1b/
+	V/+d1fLA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wRNtu-0000000GKEh-46lr;
+	Mon, 25 May 2026 05:30:54 +0000
+Date: Sun, 24 May 2026 22:30:54 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Tal Zussman <tz2294@columbia.edu>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	Christoph Hellwig <hch@infradead.org>,
+	Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
+Subject: Re: [PATCH v6 4/4] block: enable RWF_DONTCACHE for block devices
+Message-ID: <ahPejprWrEjsh7aC@infradead.org>
+References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
+ <20260514-blk-dontcache-v6-4-782e2fa7477b@columbia.edu>
+ <f8d509c7-c0c0-4196-9a82-a6f8ae24ffc2@columbia.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f8d509c7-c0c0-4196-9a82-a6f8ae24ffc2@columbia.edu>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-SGksDQoNCuWcqCAyMDI2LzUvMjIgNTo1MiwgSmVucyBBeGJvZSDlhpnpgZM6DQo+IE9uIDUvMjEv
-MjYgMTo0NCBQTSwgV2VuIFhpb25nIHdyb3RlOg0KPj4gSGkgQWxsLA0KPj4NCj4+IE91ciBwZXJm
-b3JtYW5jZSB0ZWFtIG9ic2VydmVkIHRoZSBoaWdoZXIgQ1BVIHV0aWxpemF0aW9uIGluIFJIRUwx
-MCBjb21wYXJlZCB0byBSSEVMOS44LCBvYnNlcnZlZCB0aGUgc2ltaWxhciBpc3N1ZSBpbiB1cHN0
-cmVhbSBrZXJuZWwodjcuMS1yYzQpIGFzIHdlbGwgd2hlbiBydW5uaW5nIEZJTyByYW5kb20gSU8g
-dGVzdHMuDQo+Pg0KPj4gU3lzdGVtIGNvbmZpZ3VyYXRpb246DQo+PiA0NyBkZWRpY2F0ZSBjb3Jl
-cw0KPj4gMTIwIEdCIG1lbW9yeQ0KPj4gUENJZTQgMi1Qb3J0IDY0R2IgRkMgQWRhcHRlcg0KPj4g
-Rmxhc2hTeXN0ZW06IEZTOTUwMCwgMTIgTFVOcy9GQyBwb3J0LCAxMDBHIGVhY2ggTFVOLg0KPj4N
-Cj4+IFJhbmRvbSBJTyB0ZXN0cyBhcmUgbW9yZSBDUFUgaW50ZW5zaXZlIHRoYW4gc2VxdWVudGlh
-bCBJTyB0ZXN0cyBkdWUgdG8gc2V2ZXJhbCBmYWN0b3JzOiBtb3JlIGNvbnRleHQgc3dpdGNoaW5n
-LCBJbnRlcnJ1cHQgSGFuZGxpbmcswqAgY2FjaGUgSW5lZmZpY2llbmN5IGV0Yy4gV2UgZm91bmQg
-b3V0IHRoZSBmb2xsb3dpbmcgcGF0Y2ggd2hpY2ggY2F1c2VkIHRoZSBoaWdoZXIgQ1BVIHV0aWxp
-emF0aW9uIGluIHJoZWwxMCBhbmQgbmV3ZXIgbGludXgga2VybmVsOg0KPj4NCj4+IGNvbW1pdCAw
-NjA0MDZjNjFjN2NiNGJiZDgyYTAyZDE3OWRlY2NhOWM5YmIzNDQzIChIRUFEKQ0KPj4gQXV0aG9y
-OiBZdSBLdWFpIDx5dWt1YWkzQGh1YXdlaS5jb20+DQo+PiBEYXRlOsKgwqAgVGh1IE1heSA5IDIw
-OjM4OjI1IDIwMjQgKzA4MDANCj4+DQo+PiBibG9jazogYWRkIHBsdWcgd2hpbGUgc3VibWl0dGlu
-ZyBJTw0KPj4NCj4+IFNvIHRoYXQgaWYgY2FsbGVyIGRpZG4ndCB1c2UgcGx1ZywgZm9yIGV4YW1w
-bGUsIF9fYmxrZGV2X2RpcmVjdF9JT19zaW1wbGUoKQ0KPj4gYW5kIF9fYmxrZGV2X2RpcmVjdF9J
-T19hc3luYygpLCBibG9jayBsYXllciBjYW4gc3RpbGwgYmVuZWZpdCBmcm9tIGNhY2hpbmcNCj4+
-IG5zZWMgdGltZSBpbiB0aGUgcGx1Zy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBZdSBLdWFpIDx5
-dWt1YWkzQGh1YXdlaS5jb20+DQo+PiBMaW5rOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9yLzIw
-MjQwNTA5MTIzODI1LjMyMjUyMDctMS15dWt1YWkxQGh1YXdlaWNsb3VkLmNvbQ0KPj4gU2lnbmVk
-LW9mZi1ieTogSmVucyBBeGJvZSA8YXhib2VAa2VybmVsLmRrPg0KPj4NCj4+IFdlIHJldmVydGVk
-IGFib3ZlIHBhdGNoIGluIHJoZWwxMCBrZXJuZWwgYW5kIHVwc3RyZWFtIDcuMS1yYzQsIHNhdyBs
-b3dlciBDUFUgdXRpbGl6YXRpb24gd2hlbiBkb2luZyB0aGUgc2FtZSBGSU8gdGVzdC4NCj4+DQo+
-PiBUaGUgcGF0Y2ggYWRkcyBwbHVnZ2luZyBpbiBfX3N1Ym1pdF9iaW8oKSBpbiBibG9jayBsYXll
-ciwgbWF5YmUgY2F1c2UgcGVyZm9ybWFuY2UgZGVncmFkYXRpb246DQo+PiAtIFJhbmRvbSBJTyB0
-ZXN0cyBoYXZlIGxlc3MgbWVyZ2luZywgZmx1c2ggb3ZlcmhlYWQuDQo+PiAtIE1vcmUgSU8gc2No
-ZWR1bGVyIGludGVyYWN0aW9uLCBmb3JjZXMgcmVxdWVzdHMgdGhyb3VnaCBzY2hlZHVsZXIgaW5z
-dGVhZCBvZiBkaXJlY3QgZGlzcGF0Y2goZGlyZWN0IGRpc3BhdGNoIHRvIGhhcmR3YXJlIHF1ZXVl
-KQ0KDQpJIGRvbid0IHVuZGVyc3RhbmQgdGhpcyBwb2ludC4gQ2FuIHlvdSBleHBsYWluIG1vcmU/
-IEkgdGhpbmsgcGx1ZyBzaG91bGQgbm90IG1hdHRlciBpZiByZXF1ZXN0IGdvIHRocm91Z2ggc2No
-ZWR1bGVyIG9yIG5vdC4NCg0KPj4gLSBQb29yIGNhY2hlIGxvY2FsaXR5IGR1cmluZyBwbHVnIG9w
-ZXJhdGlvbg0KPj4NCj4+IEJlbG93IGFyZSBzb21lIHBlcmZvcm1hbmNlIGRhdGEgdGhhdCBvdXIg
-cGVyZm9ybWFuY2UgdGVhbSBjb2xsZWN0ZWQ6DQo+Pg0KPj4gUkhFTDkuOCBjb21wYXJpc29uIFJI
-RUwxMC4wDQo+PiBJb3R5cGXCoMKgwqDCoCBxZMKgwqDCoMKgwqDCoMKgIG5qwqDCoMKgwqDCoMKg
-wqDCoCBybWl4wqDCoMKgwqDCoCBtcHN0YXQgYnVzeSBkZWx0YcKgwqDCoCBscGFyc3RhdCBkZWx0
-YQ0KPj4gUmFuZHJ3wqDCoMKgwqAgMcKgwqDCoMKgwqDCoMKgwqAgMjDCoMKgwqDCoMKgwqDCoMKg
-IDEwMMKgwqDCoMKgwqDCoCAxMzUlwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMTA5
-JQ0KPj4gUmFuZHJ3wqDCoMKgwqAgMcKgwqDCoMKgwqDCoMKgwqAgNDDCoMKgwqDCoMKgwqDCoMKg
-IDEwMMKgwqDCoMKgwqDCoCA3MiXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDgx
-JQ0KPj4gUmFuZHJ3wqDCoMKgwqAgMcKgwqDCoMKgwqDCoMKgwqAgMjDCoMKgwqDCoMKgwqDCoMKg
-IDcwwqDCoMKgwqDCoMKgwqAgMjc4JcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDE3
-NCUNCj4+IFJhbmRyd8KgwqDCoMKgIDHCoMKgwqDCoMKgwqDCoMKgIDQwwqDCoMKgwqDCoMKgwqDC
-oCA3MMKgwqDCoMKgwqDCoMKgIDI3MiXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAx
-OTElDQo+PiBSYW5kcnfCoMKgwqDCoCAxwqDCoMKgwqDCoMKgwqDCoCAyMMKgwqDCoMKgwqDCoMKg
-wqAgMMKgwqDCoMKgwqDCoMKgwqAgOTMlwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCAzMCUNCj4+IFJhbmRyd8KgwqDCoMKgIDHCoMKgwqDCoMKgwqDCoMKgIDQwwqDCoMKgwqDCoMKg
-wqDCoCAwwqDCoMKgwqDCoMKgwqDCoCAxMDQlwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgMzYlDQo+Pg0KPj4gUkhFTCA5LjggY29tcGFyaXNvbiBSSEVMMTAgd2l0aCByZXZlcnRpbmcg
-YWJvdmUgcGx1Z2dpbmcgcGF0Y2ggaW4gYmxvY2sgbGF5ZXIuaA0KPj4gSW90eXBlwqDCoMKgwqAg
-cWTCoMKgwqDCoMKgwqDCoCBuasKgwqDCoMKgwqDCoMKgwqAgcm1peMKgwqDCoMKgwqDCoCBtcHN0
-YXQgYnVzeSBkZWx0YcKgwqDCoCBscGFyc3RhdCBkZWx0YWINCj4+IFJhbmRyd8KgwqDCoMKgIDHC
-oMKgwqDCoMKgwqDCoMKgIDIwwqDCoMKgwqDCoMKgwqDCoCAxMDDCoMKgwqDCoMKgwqDCoCAtMTIl
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMjAlDQo+PiBSYW5kcnfCoMKgwqDCoCAx
-wqDCoMKgwqDCoMKgwqDCoCA0MMKgwqDCoMKgwqDCoMKgwqAgMTAwwqDCoMKgwqDCoMKgwqAgLTQy
-JcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC00JQ0KPj4gUmFuZHJ3wqDCoMKgwqAg
-McKgwqDCoMKgwqDCoMKgwqAgMjDCoMKgwqDCoMKgwqDCoMKgIDcwwqDCoMKgwqDCoMKgwqDCoCA3
-MCXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDcxJQ0KPj4gUmFuZHJ3wqDCoMKg
-wqAgMcKgwqDCoMKgwqDCoMKgwqAgNDDCoMKgwqDCoMKgwqDCoMKgIDcwwqDCoMKgwqDCoMKgwqDC
-oCAlNTHCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDYwJQ0KPj4gUmFuZHJ3wqDC
-oMKgwqAgMcKgwqDCoMKgwqDCoMKgwqAgMjDCoMKgwqDCoMKgwqDCoMKgIDDCoMKgwqDCoMKgwqDC
-oMKgwqAgLTE0JcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC00MyUNCj4+IFJhbmRy
-d8KgwqDCoMKgIDHCoMKgwqDCoMKgwqDCoMKgIDQwwqDCoMKgwqDCoMKgwqDCoCAwwqDCoMKgwqDC
-oMKgwqDCoMKgIC0zMyXCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAtNTElDQo+Pg0K
-Pj4gQ2FuIGEgYmxvY2sgbGF5ZXIgZXhwZXJ0IGhlbHAgdXMgcmVzb2x2ZSB0aGlzIGhpZ2ggQ1BV
-IHV0aWxpemF0aW9uIHBlcmZvcm1hbmNlIGlzc3VlPw0KDQpBbmQgSSBhc3N1bWUgeW91J3JlIHRl
-c3RpbmcgcmF3IGRpc2ssIGJlY2F1c2UgZmlsZXN5c3RlbXMgc2hvdWxkIGFsd2F5cyBlbmFibGUg
-cGx1Zy4NCg0KPj4gTGV0IHVzIGtub3cgaWYgeW91IG5lZWQgbW9yZSBwZXJmb3JtYW5jZSBkYXRh
-IG9yIG90aGVyIHBlcmYgZGF0YS4NCg0KWWVzLCBwZXJmIGRhdGEgd2lsbCBiZSBoZWxwZnVsLiBB
-bmQgcGxlYXNlIHNob3cgeW91ciB0ZXN0IGluIGRldGFpbHMgYW5kIEknbGwNCmNoZWNrIGlmIEkg
-Y2FuIHJlcHJvZHVjZSBpdC4NCg0KPiBMZXQncyBDQyBZdSBLdWFpIHdobyB3cm90ZSB0aGF0IGNv
-bW1pdCwgdGhhdCBtaWdodCBoZWxwLg0KPg0KLS0gDQpUaGFuc2ssDQpLdWFp
+On Fri, May 22, 2026 at 07:17:15PM -0400, Tal Zussman wrote:
+> A: So this actually seems legit... doesn't look like anything actually calls 
+> blkdev_write_begin() or blkdev_write_end(), unless I'm missing something.
+> block_write_begin_iocb() usage seems necessary for bh-based filesystems, but
+> block devices seem to use iomap for writes unconditionally.
+
+Yes.  Maybe send a separate patch to remove these now unused methods?
+Or I could do that since I forgot to remove them when I should have.
+
