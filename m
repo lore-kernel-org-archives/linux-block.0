@@ -1,111 +1,239 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B11242D72
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 01:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE80265623
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 02:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779759856; cv=none; b=hTLR9kn6YsMG3ILxdmYicx8S1UyQ0eD34WGTWaQafaQsC+REKRiQDprLx7ZAFXGI8hd9p6GEgeTUrePWhZaJuCff/QjbECNDXjvk6a9fKw3d7xOBkfw7kRHGwzKeJ6GpWfHbR38ZDLW385NuSTDld25JA7BvQuXrRkBLgE1X7O4=
+	t=1779761763; cv=none; b=Qe2agT3Fz3juaqX9+eSqYDiTXwBVzkt8WtfXAVzemT/oVJOV4I9lEeb5fjlgUl026OPfo9bnkOlfhzr0oU+G6JnYSLK2U98W2ViyzsYKS9tKwFRBHfie6XTuyljYvXp3hXHBy6NHi5V8w78I3P8fahmzCaGRfrm8o04MpqToqOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779759856; c=relaxed/simple;
-	bh=bXGkjaGQLPPRhGoaBmy14wkmNOAIJLXs1pBYxWUTz3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y+VyvMgH6uzy3hNNvj8SfMC4dWjaa40ZFNd//iHkp4g2bzmsQy8kix0f4lxhzqNaVZKCryy+k6fLRvy8KRf0MnHNWEGvKJNVzbt6NPz6mb7AjPm0nle1+PBFwX6DGUoW2zT3gkd8XXYJaEVewmRjwN063PBYmApA7so5feK5eBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mj6x0uut; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779761763; c=relaxed/simple;
+	bh=7Lz7zct0T+drazH0wRYYmjTYORRDWotElxY6m2xO7jg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ktg3VQASHOh8J7ydw3oLifvuDfRNP0/2o8gtFO5PqFmljvLCNAunprlZ8Gy7G36/DpRW505N+HLvEbU+ulQ+pjefxkCe4RwTt8L8mlwEvGqu2YGwtRvgRT9S5xs1RfK+epNeqX1R3UzByvT/oVqyCtuNZye34fJm2F37hVR3av0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=egqTZPRm; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mj6x0uut"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-914bd98faafso252530285a.0
-        for <linux-block@vger.kernel.org>; Mon, 25 May 2026 18:44:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="egqTZPRm"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-83d5bbef760so4133445b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 25 May 2026 19:16:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779759854; x=1780364654; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/laSw8wGKqpG7xDWFNSVZINyUhQN2Xmwzo1IdWSZlZE=;
-        b=mj6x0uutxWAoGY2OMYCMZJTR68JHYn28I4CvRNIOLedgDGXsYKtPdBKwhaxKrFBsAe
-         cB99gBqDu0WUxLwGcgp4uVIP0Oh0O/Syt/I8OusJ69q85mHUdOKgz+U78ZomAEOCv0LU
-         58neEV3pZ3QqO1hAVSpbgHKUtbHRNh7d7cmaUi2JXqTzTaCsoCpxmFyjGjAXIamzn/II
-         X8x5WW2NStOgH8pjA5MYYaLAWjtOBFQVifbbjVr5tRuoLkoKonDt/2dBvgdMKxIRFb7D
-         PT9kURPN5PZT6SJiG15TmTR+laDz1pjkmYyn3OfgfE7n+KyWw2M/Iht5V0wmYmgiS5fn
-         cy8w==
+        d=shopee.com; s=shopee.com; t=1779761761; x=1780366561; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kchS3QdWpyeEDApYkMFv3kCi0sAF0UzPuKNZ9sqfNKo=;
+        b=egqTZPRmVfKGxtIZo3hjDVzT1ayoJwH0BHqDq4JTZMwtZA5xLojg7rSudIBWDKXMHw
+         C7h64/F2WLC6CYmNfygtm50UAsxqENdYcKDtJtuiYwmntHC70/RtA3plsolgmuYBTaUu
+         X1WOItYaCSBlPu4+7Z3EzzqkMQHFDMrZSp4R/BCIee1XFVz3cPqy02kzuM/G3oRFGdCA
+         bXdgbhDpOzJKu5Y/Wai4yLvxdx+eYBEFddMltxD2OcTmzBQTrb7qhGd6iahKI3mwxzF7
+         N+TCkjhMXvYOv3v7Gud/gRvVA46JwqOUMf8WckyHnFv5pXuZtehowEPYY/dPXgO1IFRI
+         WsbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779759854; x=1780364654;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/laSw8wGKqpG7xDWFNSVZINyUhQN2Xmwzo1IdWSZlZE=;
-        b=SiepFypOPw+1UoF/VGoaXDRQdoMSrw4DfhIDTwD09GeSFgJ/EMQcPwtfl49N8/Qdw9
-         5ceYApmGIoDk/20EhZHeEWchEc1Og34t+S3K6Xgb7O/5ud9krHCkcU+96HLuFLlQ+aTb
-         Pz57rdmjKb8AZ/5w6lCT7t4rAbbZvrm0BYDaPCcWC597YMDG9P7sYG+M2+4W6a7aUYzy
-         0OH1NRvsvGU7ZHWGFXuvgXbFEXmkUxX5Z64MV53amMRg5nilj3xNxsBnqBDbhIfYz05d
-         Q2B/o00y8K4slTw1Xmh92jp0glFtIT9b2k9F6TPkk4vCSTSEbSm4F+Ye14yLZyXiDKEj
-         2AeQ==
-X-Gm-Message-State: AOJu0YyO88303ImNfY+iBzD6W+NHOJHL4vuvumFrgudXh93C38lnVi5J
-	97b19pXSB1hFHEm2x9Ih8tgiHn8bnUM1RX/opMxIbhGd8FQ25sty+dSvAKt5MXjl
-X-Gm-Gg: Acq92OHhya10OqC7WDb+XlpqUjckMQw/oTwhvKYP1pSIqiUao/qKn31udB2BMoEhy5z
-	b3ouKgR1/1hrWYMSMH8/SBpW9AepI5rr9ceITfKDtpkirkP/VlKLRSzeb4d86uBGktqOSYTESK7
-	rK6tMQK1DYAETr5EnKND+1reOwASyGiuGrTV5blF8ANhoKGCqkXoL4iLrE8Zzd/RBtS1F3jlhv2
-	5Q3MROg+/A1Zloy39BT+M6kPcn7PjkwXLwygpnC/g9D0dFl650Pzri2M3T25YBOF9cJ9G4lSPqz
-	MNz2pQR+XN9DcibI9vmzd18uIHxaSLYWAzemxmSyDpdZT9NBzG5TDZRjvbYMkuee3GXV+E4YGSA
-	HQhjNTFc5TOWaigUcmEG1ZMxHZTJsPfkxfxXAW6inGfzpWDcl/UEdYPtGi7Vn2f4PzjKcylVWJo
-	QQfuxLeMpba8SfKJeREjBngyau4Goij3J2mSU7zBPUfeyaLA7N9HeB+TQXFKw3DVG5YnW63WFff
-	i2SGyCX+secFtf/3YEm9w==
-X-Received: by 2002:a05:620a:4407:b0:8f8:e046:999e with SMTP id af79cd13be357-914b45c4865mr2309734285a.0.1779759853761;
-        Mon, 25 May 2026 18:44:13 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-914f880c526sm51476685a.39.2026.05.25.18.44.10
+        d=1e100.net; s=20251104; t=1779761761; x=1780366561;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kchS3QdWpyeEDApYkMFv3kCi0sAF0UzPuKNZ9sqfNKo=;
+        b=U7eduel6jCrY/bVArqoM0neN5N+DTP4Bvir7eBAgdVn4RYRmT3eLCYMXexv2YEQUGm
+         YeZbIPsTPYzv/D3dBnxCZ0x1F6rSg2PhkmyH8aHDkOyLL3t0hmegpusH/pgE1qaDTirW
+         xKZZnbUkSSZr7svdMqdBMeWaSVem17MN5QGVzF7auXsWjQR1JicT9Axndk2wLbP8qfep
+         XrJbpWawx8PbW/ot9Q2eBS6bJE54++YlNG1+3SditDicBr0mgGvz62kCfT4zizEAgIX8
+         97a1jhKDjASeqEs4PnlSbpEfrHkyl1o14A9zElLrSQUbQ6UUTUO/B9xXtkWoOl1L+7jX
+         ZoQQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+RVpEJNhp7CMaK7YnUw/wq56oHJ4X187SelBTRA0wzeTs2OOCIDfk/dDxssZOD41tItpGNiIwKzRxfFw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCXEwdYyvg17f+THbQRAPSz6lyel/COC4Hx7Nzxj5TH0ed83HC
+	J5+kq6klMvMTw9OwnLT4dtbkuUJZVzL4C8GFs1ZOqTUEVibpH98iI0MQos4oxixBHe6fnsJ+ltG
+	xQkma
+X-Gm-Gg: Acq92OGpm0Yz4oebRBkacdu1sIqqj5Vf6emUaWYbIEDy6ZBE9ECV7JKwTfcbwL/Z62W
+	RWWGRTQLQBZHcrIFgmI1phb6Ck+mcvOTXdYY4tsZQlUWsPii4OeEk5pqnW09f5k4T9SN/hcm4vT
+	SDCa27bRu9By+LZalmfR0hXjCGnOYxIyAMxYagKI8cHeWN0JqOsM4jsQhZphPwZuwA9FDMeNJ9C
+	XT2M2yYUbO4Tpq9hbLajx2iCagFr3FpVpQj3KePJ3xf4V3CnmDtazqQSurI3FLw6vv/LcFXKTbE
+	1gGon5qs91jmizenmGPmwO7fmPfsUHFccnZBA5R2abstRT536IzHKzMjsKwYCb4vRX0CDSltCl+
+	GDBvVr4/QC5s3mk1oN4MMC2z2ns2JIapCbq/iIPGsKQRl0+kO+zV7brS7bAAnV3EgO21EZ4QYKP
+	Wh2dNvyYfN
+X-Received: by 2002:a05:6a00:4fc1:b0:82c:9126:320c with SMTP id d2e1a72fcca58-8415f0e6355mr15934960b3a.3.1779761761207;
+        Mon, 25 May 2026 19:16:01 -0700 (PDT)
+Received: from localhost.localdomain ([147.136.157.0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84164e9e7cdsm11181027b3a.34.2026.05.25.19.15.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2026 18:44:13 -0700 (PDT)
-Date: Mon, 25 May 2026 20:44:07 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] blk-mq: reinsert cached request to the list
-Message-ID: <ahT656Dazfz5oc8r@fedora>
-References: <20260525160744.896047-1-kbusch@meta.com>
+        Mon, 25 May 2026 19:16:00 -0700 (PDT)
+From: Tang Yizhou <yizhou.tang@shopee.com>
+X-Google-Original-From: Tang Yizhou
+To: axboe@kernel.dk,
+	hch@lst.de,
+	kbusch@kernel.org
+Cc: yukuai@fnnas.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Tang Yizhou <yizhou.tang@shopee.com>,
+	Leon Hwang <leon.huangfu@shopee.com>
+Subject: [PATCH v7] block: propagate in_flight to whole disk on partition I/O
+Date: Tue, 26 May 2026 10:15:55 +0800
+Message-ID: <20260526021555.359500-1-yizhou.tang@shopee.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260525160744.896047-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 25, 2026 at 09:07:44AM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> A previous commit removed an optimization out of caution for a scenario
-> that turns out not to be real: all the "queue_exit" goto's are safe to
-> reinsert the request into the cached_rq's plug list as they are either
-> from a non-blocking path, or a successful merge that already holds the
-> queue reference. This optimization is most needed for small sequential
-> workloads that successfully merge into larger requests.
-> 
-> Fixes: dc278e9bf2b9 ("blk-mq: pop cached request if it is usable")
-> Suggested-by: Ming Lei <tom.leiming@gmail.com>
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  block/blk-mq.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 28c2d931e75ea..72c8ac805882c 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3246,7 +3246,7 @@ void blk_mq_submit_bio(struct bio *bio)
->  	if (!rq)
->  		blk_queue_exit(q);
->  	else
-> -		blk_mq_free_request(rq);
-> +		rq_list_push(&plug->cached_rqs, rq);
+From: Tang Yizhou <yizhou.tang@shopee.com>
 
-rq_list_add_head()?
+Now when I/O is submitted to a partition, the per-CPU in_flight[]
+counter is incremented only on the partition's block_device, not on the
+underlying whole disk. This leads to a problem which can be shown by a
+fio test:
 
+lsblk
+  NAME     MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+  mydev    252:1    0   20G  0 disk
+  └─mydev1 259:0    0   10G  0 part
 
-Thanks,
-Ming
+iostat -xp 1
+  Device       r/s        rkB/s      ... aqu-sz   %util
+  mydev    128153.00  512612.00      ...  13.22   72.20
+  mydev1   128154.00  512616.00      ...  13.22  100.00
+
+%util is different between mydev and mydev1, which is unexpected.
+
+This is the cumulative effect of a series of patches. The root cause is
+commit e016b78201a2 ("block: return just one value from part_in_flight"),
+which deleted the branch in part_in_flight() that aggregated the whole-disk
+in_flight count on top of the partition's. Then the second commit is
+commit 10ec5e86f9b8 ("block: merge part_{inc,dev}_in_flight into their
+only callers"), which folded the whole-disk in_flight accounting into
+generic_start_io_acct() and generic_end_io_acct(). Those two helpers
+were then removed by commit e722fff238bb ("block: remove
+generic_{start,end}_io_acct"), and from that point on the whole disk's
+in_flight is no longer accounted at all.
+
+In update_io_ticks(), if calling bdev_count_inflight() finds that the
+inflight value of the whole device is 0, the accumulation of io_ticks will
+be skipped, causing the reported util% value to be underestimated.
+
+Fix it by restoring the whole-disk in_flight accounting.
+
+Fixes: e016b78201a2 ("block: return just one value from part_in_flight")
+Suggested-by: Leon Hwang <leon.huangfu@shopee.com>
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+v2: Update commit message.
+v3: Take Christoph's advice and factor the common code into two helpers.
+v4: Remove my redundant new line in blk.h. Add Christoph's Reviewed-by
+tag.
+v5: Remove the changelog from the commit message.
+v6: Accept Keith's suggestion and fix the bug in bdev_end_io_acct().
+v7: Address the review feedback from Claude Opus 4.7 and update
+blk_account_io_merge_request().
+ block/blk-core.c  |  4 ++--
+ block/blk-merge.c |  3 +--
+ block/blk-mq.c    |  5 ++---
+ block/blk.h       | 21 +++++++++++++++++++++
+ 4 files changed, 26 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 17450058ea6d..cee4e4a37503 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1042,7 +1042,7 @@ unsigned long bdev_start_io_acct(struct block_device *bdev, enum req_op op,
+ {
+ 	part_stat_lock();
+ 	update_io_ticks(bdev, start_time, false);
+-	part_stat_local_inc(bdev, in_flight[op_is_write(op)]);
++	bdev_inc_in_flight(bdev, op);
+ 	part_stat_unlock();
+ 
+ 	return start_time;
+@@ -1073,7 +1073,7 @@ void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+ 	part_stat_inc(bdev, ios[sgrp]);
+ 	part_stat_add(bdev, sectors[sgrp], sectors);
+ 	part_stat_add(bdev, nsecs[sgrp], jiffies_to_nsecs(duration));
+-	part_stat_local_dec(bdev, in_flight[op_is_write(op)]);
++	bdev_dec_in_flight(bdev, op);
+ 	part_stat_unlock();
+ }
+ EXPORT_SYMBOL(bdev_end_io_acct);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index fcf09325b22e..62d68a72f569 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -723,8 +723,7 @@ static void blk_account_io_merge_request(struct request *req)
+ 	if (req->rq_flags & RQF_IO_STAT) {
+ 		part_stat_lock();
+ 		part_stat_inc(req->part, merges[op_stat_group(req_op(req))]);
+-		part_stat_local_dec(req->part,
+-				    in_flight[op_is_write(req_op(req))]);
++		bdev_dec_in_flight(req->part, req_op(req));
+ 		part_stat_unlock();
+ 	}
+ }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d0c37daf568f..6bdfe642bd93 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1082,8 +1082,7 @@ static inline void blk_account_io_done(struct request *req, u64 now)
+ 		update_io_ticks(req->part, jiffies, true);
+ 		part_stat_inc(req->part, ios[sgrp]);
+ 		part_stat_add(req->part, nsecs[sgrp], now - req->start_time_ns);
+-		part_stat_local_dec(req->part,
+-				    in_flight[op_is_write(req_op(req))]);
++		bdev_dec_in_flight(req->part, req_op(req));
+ 		part_stat_unlock();
+ 	}
+ }
+@@ -1143,7 +1142,7 @@ static inline void blk_account_io_start(struct request *req)
+ 
+ 	part_stat_lock();
+ 	update_io_ticks(req->part, jiffies, false);
+-	part_stat_local_inc(req->part, in_flight[op_is_write(req_op(req))]);
++	bdev_inc_in_flight(req->part, req_op(req));
+ 	part_stat_unlock();
+ }
+ 
+diff --git a/block/blk.h b/block/blk.h
+index b998a7761faf..11245a494c43 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -4,6 +4,7 @@
+ 
+ #include <linux/bio-integrity.h>
+ #include <linux/blk-crypto.h>
++#include <linux/part_stat.h>
+ #include <linux/lockdep.h>
+ #include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
+ #include <linux/sched/sysctl.h>
+@@ -485,6 +486,26 @@ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
+ 		q->last_merge = NULL;
+ }
+ 
++static inline void bdev_inc_in_flight(struct block_device *bdev,
++				      enum req_op op)
++{
++	bool rw = op_is_write(op);
++
++	part_stat_local_inc(bdev, in_flight[rw]);
++	if (bdev_is_partition(bdev))
++		part_stat_local_inc(bdev_whole(bdev), in_flight[rw]);
++}
++
++static inline void bdev_dec_in_flight(struct block_device *bdev,
++				      enum req_op op)
++{
++	bool rw = op_is_write(op);
++
++	part_stat_local_dec(bdev, in_flight[rw]);
++	if (bdev_is_partition(bdev))
++		part_stat_local_dec(bdev_whole(bdev), in_flight[rw]);
++}
++
+ /*
+  * Internal io_context interface
+  */
+-- 
+2.43.0
+
