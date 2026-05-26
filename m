@@ -1,169 +1,113 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEF221638D
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 15:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600C036EAAB
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 15:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779809308; cv=none; b=p4kQlZQacpMB4fGinLlgtwdL8VLAnIPAaecdbpIB0cakuNzcywITtHbeExW+u2pfhxkb7UhiCrf/SafL13DsySgEJqYlSw15Vk+sWF6JA8/Zy+2L5m1zNoiASHKp/+w3P69hYBCBFLj+aS0JFDhFbq9ogVDZhSVGAK78Vpt8XOw=
+	t=1779809759; cv=none; b=KmpPzi1Qgni5Ie9Jex7IBdThsNuQ35cB65Gm56yBd6fqT5KucycOBzZWndEBAG0+8SMD5QPw/58ByYo1osJcH8SpyF9cUy07JZmWSGw4W/35B4ZSdjjUjv1tRnNmELENryeLrq9z+53pcbdQtfB88qyMd4sV1m0qPMe+oTUuZJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779809308; c=relaxed/simple;
-	bh=xcCQ8gxaQLHAWukbfwN+urF3SG2cfYhZtL5JJPE0tXE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=Z4x/EQE2acJMRWDJJaDlN4ykC2GnHaS1Uvv6Qszya7B1rR/Ys8/NnmFxpF3jHRM9jWUAr3XIZbmUN9+Aib74suEMHJ1Qy1q+5eWA/ILpSz1osVyMDgK9dWFH5sMLmZmVX/pfi66BQ3FZWC1Nv9A2ISKsr5lBN19supUfcSePDZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QyXS9GMT; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1779809759; c=relaxed/simple;
+	bh=o6W5WfzbDTEvjVLEUyBfEwwMjRDYUWLLGWTHt/nhRpA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lnLmryy6IHno/2f0sL1bCaE7yyAgTkBUBdi4MTfEtCW/8hz8/rtb5jy9TDCdkMM9o0q4f1xs6K+jbs0jO3mM5Zc1akH5se+/j6vbZJZdNUeg402wmNVYLcFv0bleLjCDpNoYPio5Xy2ywF8zpX3fO3MGERL7KiMHGy9nBSoQZ9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=BJ1NX0wr; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QyXS9GMT"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64Q8j7pa2497908;
-	Tue, 26 May 2026 15:28:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=1olhyF
-	k3DQXag9mO6pHhpq3tJzVWf/cbDwuDM1WNMYw=; b=QyXS9GMTNaQON3icqRx1np
-	3pYTg5V3spQMDZ9kfbcvxEUKnWLQ8cHBSjXGa7OJzTwnJmdm7JnVmDQkT3CJSzBm
-	g2ZjOSSBWt9uZwEyreKqNPBLO/4ubAeB9Z/ZXqKJqQKSiHUWPGuscl5Wi857L1UW
-	sN56hWFtGmZTXDxY9a/ie8L0zAXGpeEe9ShAmqLP0h7GN3M39NidMfN4n+OgwcK3
-	gD8gHFt3u7/9ViMM0vGU0GSSXsPGQ8yqWPX0pk0P34ZCki9VvAAFuuTkDkIhsC0X
-	kFmfIIrGDs9McbTtLL1d1p71U6+Iffsj1jYjFzUPV/8N6aozjZ24Q8WwQkFUtkwA
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4eb4nq3xjx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 May 2026 15:28:16 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64QFOC3G018038;
-	Tue, 26 May 2026 15:28:15 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ebrsg9t7a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 May 2026 15:28:15 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64QFSDAX32637628
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 May 2026 15:28:14 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B036E58052;
-	Tue, 26 May 2026 15:28:13 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5111658056;
-	Tue, 26 May 2026 15:28:13 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 26 May 2026 15:28:13 +0000 (GMT)
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="BJ1NX0wr"
+Received: from pps.filterd (m0528008.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64QFW1wt1039899
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 08:35:54 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=j8Ecogw3YBGRuoyqJ6
+	aShqn8/KMBYM5J9SolyBPFzw8=; b=BJ1NX0wralxDKBqU5rbtlIO6DZrnWCg3h8
+	sTotQzegZXz+uma3XxteKO8DuyPrq2T3owfUJ4ZYsBXl/tlrIrC3FW507+wwEQ3e
+	vPHbHC8OQwFc9RYwhFJmbGzJw5Hn+NZ54G8wdus/oUYpgUjctIt4P95fqF1th9sv
+	qYKA2uQnM1jr3Jw+creFzyw3RRHM+TQaFLo+Yzqoq44XU23Dv7yLX1nYziFk2wFd
+	YArTTl3gqC9fc8pKpxOxOX5opJV9NlraA+CM2QoPuljZULgC87RzzCyJsMhyXY4A
+	X1r+EAjZdZioEexxkYM8Cv5ctqnzXB7LweOCWyoiWmUW+par0ddw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ec0uhtrkn-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 08:35:53 -0700 (PDT)
+Received: from twshared23436.02.snb2.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.37; Tue, 26 May 2026 15:35:51 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 8193F1CA8C213; Tue, 26 May 2026 08:35:43 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+CC: Keith Busch <kbusch@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCHv2] blk-mq: reinsert cached request to the list
+Date: Tue, 26 May 2026 08:35:31 -0700
+Message-ID: <20260526153531.2365935-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 26 May 2026 10:28:13 -0500
-From: Wen Xiong <wenxiong@linux.ibm.com>
-To: yukuai@fygo.io
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        tom.leiming@gmail.com, jmoyer@redhat.com,
-        Gjoyce <gjoyce@linux.ibm.com>, wenxiong@us.ibm.com
-Subject: Re: Observing higher CPU utilization during random IO fio testing
-In-Reply-To: <043e357f-5b37-4e05-9433-271504fc1d30@fygo.io>
-References: <338169f719c77e4afe58f42e9760349e@linux.ibm.com>
- <1cb74987-34e2-422f-93cf-9174fe913538@kernel.dk>
- <043e357f-5b37-4e05-9433-271504fc1d30@fygo.io>
-Message-ID: <4ce7323fc4b02cdabc96c8443d373091@linux.ibm.com>
-X-Sender: wenxiong@linux.ibm.com
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-GUID: LVr-jCd-xKC084MO8zQ-KAT51Iz7y2WP
-X-Proofpoint-ORIG-GUID: Y1aoA-GO9ZffEfyUmOdrSuMlEbb6foBv
-X-Authority-Analysis: v=2.4 cv=QIJYgALL c=1 sm=1 tr=0 ts=6a15bc10 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=lQJ2ouIgk1iEnd2pObUA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI2MDEzMCBTYWx0ZWRfX3ZHrNUYSKLmc
- mB6xu5Go26AKWweXCMGADZp0ICvSDs4Xo34bZTZgQ2Xgqqz72+u32n4txGWM3kZYySHzY3LrsdI
- qkjNmsoSfLGRY7iyvpHu29n055R62jSgYZCUNtBbbYuRTlTFAAxG1bDyLRnCVmrDR0SSc4k+A57
- 2x37NEZU4oWIYwIWFb0pzrJAIzlaQXZIngY+JJHckA5Q2F51uGFcAZJBGYGYUqv8WIKPdawrOC0
- opQgCz5KXGxHJGmRXbFl3jQNKhfxB08vz/cUpnfq9t54TGn3zwbHvv091ooFANQUj/ubwXM6UOx
- F4saz/uP986l3pQHl3Tk7VAfz1z2+5WfJp2PDLIAaXzVCNBOGZXvtZwc1OxFjC99ESOVOj7ZaFt
- b79WhH2My7Tu5TuAxPkvMqeXk3TIe04jyXYFkXmKJ4GMavcLflWnOQRYtL6g2uz1OeF6vdmQ7Sm
- jFlHsJ/JFCR8/riSLNA==
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=We88rUhX c=1 sm=1 tr=0 ts=6a15bdd9 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
+ a=_1IyUuN4QrATX339ibzo:22 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8
+ a=HvWbp9H3uqfuRpaB1fwA:9
+X-Proofpoint-ORIG-GUID: gw591YagmfIC9gRuJZ2FJ5uu3CJgl1pR
+X-Proofpoint-GUID: gw591YagmfIC9gRuJZ2FJ5uu3CJgl1pR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI2MDEzMyBTYWx0ZWRfX5BgtDKeGUiV/
+ SmHrtEswvFbwFpSLppONBlLaPi9mXs6bsUKoGGWuWc7AayhIC4LO1iEQEx/dP6zQwdUksB5zjMJ
+ 52HwQ9vioA+eQ6p0TjUL5rS0APXLRdcdFMSjBMzRJujT5xq98liVqC5czDS70hshvBeXsD5AQ8w
+ sDSEe+xYBeDjz1ud7f3yD+N/BZOv2V6jnrHVqj0qjKNaVfU4L/T++VnR1AMwnfEmfTyN7vsUFfp
+ Dq7FBwNeYoZ0j1LZiTbc/osJqNlOn7yE5HEXdlae+ekaX0D0PIpzcO8carzpTzDN7/jcwFCW3tQ
+ 4rKerC+p5PYgMtS3FuXq010RBv4D8DSfsOew+ygas6Em6b3pfiSf31HfdNlzlPdwJhDYUAaHV0h
+ aoX0AM/ocYWWlxN4g1gbCR7R4QI89MyKqWlm6zWRctb/VG0O0asaV2kvOvKlOq2hUrQn4IZhdJQ
+ 7mhtWoBIkUiP4w2HkDg==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-05-26_03,2026-05-26_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 priorityscore=1501 impostorscore=0 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 adultscore=0 spamscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
- definitions=main-2605260130
 
-On 2026-05-25 00:28, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2026/5/22 5:52, Jens Axboe 写道:
->>> - More IO scheduler interaction, forces requests through scheduler 
->>> instead of direct dispatch(direct dispatch to hardware queue)
-> I don't understand this point. Can you explain more? I think plug
-> should not matter if request go through scheduler or not.
+From: Keith Busch <kbusch@kernel.org>
 
-My understanding is:
-Random IO tests are more CPU intensive.
-Plug delays the dispatch IOs to hardware queue(quick way) directly.
-Plug submits multiple IO requests in a batch to defer submitting IO 
-until calling blk_flush_plug(dispatch to hardware queue) or task gets 
-scheduling.
-> 
+A previous commit removed an optimization out of caution for a scenario
+that turns out not to be real: all the "queue_exit" goto's are safe to
+reinsert the request into the cached_rq's plug list as they are either
+from a non-blocking path, or a successful merge that already holds the
+queue reference. This optimization is most needed for small sequential
+workloads that successfully merge into larger requests.
 
-> And I assume you're testing raw disk, because filesystems should
-> always enable plug.
-> 
-Yes. FIO random IO tests over raw disks.
+Fixes: dc278e9bf2b9 ("blk-mq: pop cached request if it is usable")
+Suggested-by: Ming Lei <tom.leiming@gmail.com>
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+v1->v2:
 
-> Yes, perf data will be helpful. And please show your test in details 
-> and I'll
-> check if I can reproduce it.
+  Actually use the correct rq_list function to return the rq to the
+  list.
 
-System config:
-47 dedicate cores
-120 GB memory
-PCIe4 2-Port 64Gb FC Adapter
-64Gb FC switch
-FlashSystem: FS9500, 12 LUNs/FC port
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Below is fio config for rwmixread=100:
-[global]
-randrepeat=0
-buffered=0
-direct=1
-norandommap=1
-group_reporting=1
-size=80g
-ioengine=libaio
-rw=randrw
-bs=4k
-iodepth=1
-rwmixread=100
-runtime=600
-ramp_time=5
-time_based=1
-numjobs=20
-
-[job1]
-filename=/dev/dm-2
-
-[job2]
-filename=/dev/dm-3
-...
-24 jobs in total.
-
-We collected some perf data. What kind of perf data you want? Let me 
-know.
-Thanks,
-Wendy
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 28c2d931e75ea..a24175441380e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3246,7 +3246,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	if (!rq)
+ 		blk_queue_exit(q);
+ 	else
+-		blk_mq_free_request(rq);
++		rq_list_add_head(&plug->cached_rqs, rq);
+ }
+=20
+ #ifdef CONFIG_BLK_MQ_STACKING
+--=20
+2.53.0-Meta
 
