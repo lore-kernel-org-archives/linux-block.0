@@ -1,109 +1,151 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDE738D3E4
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 15:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B293AB5DA
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 16:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779810853; cv=none; b=J7nUCVf6j+qzibwX3oWdypquqQTeR9AHVfT22cILsnQeFH7SSM4AkzXMY4d1RPsTfQqwXOrT27va4JPwfLnkTvXyTrB8oXXlJ/B+27zGGeyOPoOSHos+sWy/RKtZ4XVRk9GvkJGO2SmoJjF22y8FurZR022RTv9t96R0CHG4eVg=
+	t=1779811559; cv=none; b=q+aqY74zv/PFZ0RX/kNBjrMOGKKNRtbkuOdg02F+RRg24yY/0JVKQ+qPMhFfOFdQOkSNi32TUjJ8y8MhF4QRYMC1p6TmoI3BWb31LH/NImmAm5CeeCpplchHCwMxuMnUg9ZbRVuq8LmFagZP9pAzDBGA79W07MI9pN+GDmb6qNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779810853; c=relaxed/simple;
-	bh=UwvhFRGfIjAPST39fDZ3QztI5XPHQtdJDtntLCLDrkE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QEFtlQ0cVMxVeCxbYEqmvEt/wFFDn6kZFAKKQgVExzCWwXHIHE8aizBP5fwqAtTT6NaBHfqUXWoAWTATUIZ8JYxznSzmdWEAxOpBzXoasAW1Q94zo3i6EjC/CFfYE8psTSzeRKgGiXhynQpFUiCbaaYtSU5hbBuHZjwWYkH6XlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=O80pavbn; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1779811559; c=relaxed/simple;
+	bh=wtKitjtzmd/W3pYaBMBl0rpKGMTcllyt74BBNd8mKkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rc9mW0nMv3ocS8gpe8hkVpe9WM/iqEuYlGeAbgMmpLMaRQUkLjo4llCdP6NEpcQgLuJKMyTVD5YGhazQeswZGyMes+k/QMfgJyl08F3hsrYKtFcYDLS1aQjSul32kahaaaA812ebGyQ3oBZGi1zjgjSuzaE9mBUb8fHDzLtWWPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hSo0Ab3H; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/YR2m4Es; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eyzmpKwA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YJKsXh+E; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="O80pavbn"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7e603d0ee0aso2663804a34.2
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 08:54:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779810849; x=1780415649; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yZhEC9CknXyzU2320wcMqP/xC9qIrHuDUyaoAaM9rq4=;
-        b=O80pavbnUPBhRrpJYadrsY7B/ZWix1tbTItSJKNsYPeBptP3BMzAxBA82f2v1cQc0Q
-         EXxKUPRfrabOIuGgWcRU9UdMNdvuXgE+gUnbbo132y1FJzjsPyZtrdqykjkrSPxD73Pf
-         nvJCnOv7MaEaok3nmEbj5aa8QfP8mylRc/TlJ7USRHb5S/oAzjhaMixVYp0Qq0/F6t36
-         +MuFTBs2ORFSN92xNDsnMxb7KhTNMs7/njkzpumISkq80xFl6tBY+w6430fJswPt7nf2
-         v53n5lKRlFw05JviPXrE0v6lUjkbeq3v3sLcl1WIAbbZhXkW1PjBkjfEVQPRkUQn08jf
-         nvSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779810849; x=1780415649;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yZhEC9CknXyzU2320wcMqP/xC9qIrHuDUyaoAaM9rq4=;
-        b=HSh2wIoG2eKKOIYNztqgfKgmlEQQMoHbDarI2Tsa7NOXnrM8VJ/2Jhx4Glx7X7eqyy
-         6qUAUu+KNr0m6hwxgo2Oq6zjrF1jX5K7TdJi7dkjVG1trVmYmeYEGL/4SgKt4586FzHM
-         TSfc6DqVyYQw7A0VUYvt2ZCBoknoaS6SSUfDmTtVS5gbPnI6wa2q4MyUloDlSQ93Xs8A
-         mbUMXof2Vaxd84b1RGfDY5w4Pj5MvFTtQRpDf2k1vwY/AJp5gj+nVOuOGrNY+Yt7Nn/M
-         jtg8NgcyMRX91SQ44m0ZhPSQiTjZhKnxKqyunZazDq5BOSewCgEQiPeZJtGXzKj4to1d
-         zsMw==
-X-Gm-Message-State: AOJu0YylFaH0jf1F/LFIsjeGRxVmUBqXzOOc7fkW2CDBO34tSzN01ZvA
-	lMxxFmrTPZB6DQPDvOxOKkmdS2ybV724iPykPLJNwWDu6Gd2lSvN04VYfIT4Bd7M0JhCKkwF3ye
-	g5qgC
-X-Gm-Gg: Acq92OFq/dmzo4c0sPEQBeqQSmdjQMXYn3vU7Ko4FQiF+tdg13Qv4WPUMg/jkvIIv9d
-	lmlkFS8bDWTkRxGphTtXKUcos18gpouf8z3hNJTRPgxTc3oZvDwQ4uj1EEIZFG3h2qkTUt0lTJN
-	cGmwTT0h52cf+NTYbZgERYh8S7lkIZkt9DT5T0QuxsDLJYLTXieDYIEaI6WhVwvZy3Mv/YUT+6u
-	gFIYCs0EoWoP1YcVzxZyQ2Xa8PbJsHR3DY6Gprb0RyHu8j/Lhws0jtgM8krDAj7gpWg890l6JhO
-	1LmdRXw3n5mDuUcGOOWggjGt2VFYMFXP5pgzYtPLiag9VW/jI0UFWdkGSH1WLMOLcDLbkJSfftz
-	IeGqLyz5ln7K715pdLKkl60sy+/Kob/jSDCq8Eal9V4ooouUOhZfcGbNpE0AiACGRTb3KCMXNXs
-	PjVwV0wCVIUK17ng1dxoPLyIJYmHyc+ypqe9Rlnl8oN++BtHpcn/iDBHKLHwvuCBT7jLhkiHtz6
-	qmgZfBzarxNuHdVW7U=
-X-Received: by 2002:a05:6830:2404:b0:7e3:9d19:1e47 with SMTP id 46e09a7af769-7e5fef3460dmr11665134a34.25.1779810849588;
-        Tue, 26 May 2026 08:54:09 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e6060b2dffsm9560816a34.0.2026.05.26.08.54.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 May 2026 08:54:08 -0700 (PDT)
-Message-ID: <458c5c9c-8740-4079-8800-f30e074fafef@kernel.dk>
-Date: Tue, 26 May 2026 09:54:06 -0600
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hSo0Ab3H";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/YR2m4Es";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eyzmpKwA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YJKsXh+E"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 309566749F;
+	Tue, 26 May 2026 16:05:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779811556; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R6nl9BWi2tPkU3zI7N4oxXpL8czPQn+mAF/EXe4tDgo=;
+	b=hSo0Ab3H58LHEjWqMfgRMQzR6cx9naHEEYs8jTl28GXLDAAPTzJ+RgWpAB8Inz5HBnR6gh
+	yhOlyTHvGWgACYVPjbO4hnBLbrWDspjF4gmIOuHioth8VEJpf1Swn21QvvcBpK0RG1MgBN
+	iTpoJqRccZi3eiZWnd+MN4gxQMmeFAU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779811556;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R6nl9BWi2tPkU3zI7N4oxXpL8czPQn+mAF/EXe4tDgo=;
+	b=/YR2m4EsRcC34rZZxFOnqPWsXydVVfuq2X6V584zMoyMxort5b8tRs+a5CVOHm+1tLP13I
+	sX1jnhKlNM52juCw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779811555; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R6nl9BWi2tPkU3zI7N4oxXpL8czPQn+mAF/EXe4tDgo=;
+	b=eyzmpKwAsg1tBYx3NpxDbTIh+7fbPy6+/nKD7OBN/RWtCqNKPmnkDaoNkNAwmO9qOV7/gx
+	lkjXkLBPoEeSpmFr3kJV5I5BXPWtddqS3py6ry45xL3R9ioaP3oCMkqoIedL6p7QWOtY/V
+	DLEvZgsNl1dBCxb1JtTR47yZcLRYDOo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779811555;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R6nl9BWi2tPkU3zI7N4oxXpL8czPQn+mAF/EXe4tDgo=;
+	b=YJKsXh+E14xhq0ajVSE8Y0rdjhTZibZwh4Vremw+JwXk9vScyR7yRjuX86f1K3Mz9nV0qW
+	zoXY/TQgwxMIZjBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0E2405A2B8;
+	Tue, 26 May 2026 16:05:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id fiBwA+PEFWrgDwAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Tue, 26 May 2026 16:05:55 +0000
+Date: Tue, 26 May 2026 18:05:54 +0200
+From: Daniel Wagner <dwagner@suse.de>
+To: Aaron Tomlin <atomlin@atomlin.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, 
+	mst@redhat.com, aacraid@microsemi.com, James.Bottomley@hansenpartnership.com, 
+	martin.petersen@oracle.com, liyihang9@h-partners.com, kashyap.desai@broadcom.com, 
+	sumit.saxena@broadcom.com, shivasharan.srikanteshwara@broadcom.com, 
+	chandrakanth.patil@broadcom.com, sathya.prakash@broadcom.com, sreekanth.reddy@broadcom.com, 
+	suganath-prabu.subramani@broadcom.com, ranjan.kumar@broadcom.com, jinpu.wang@cloud.ionos.com, 
+	tglx@kernel.org, mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, akpm@linux-foundation.org, maz@kernel.org, ruanjinjie@huawei.com, 
+	bigeasy@linutronix.de, yphbchou0911@gmail.com, wagi@kernel.org, frederic@kernel.org, 
+	longman@redhat.com, chenridong@huawei.com, hare@suse.de, kch@nvidia.com, 
+	ming.lei@redhat.com, tom.leiming@gmail.com, steve@abita.co, sean@ashe.io, 
+	chjohnst@gmail.com, neelx@suse.com, mproche@gmail.com, nick.lange@gmail.com, 
+	marco.crivellari@suse.com, rishil1999@outlook.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v15 0/8] blk: honor isolcpus configuration
+Message-ID: <a276d7fa-8ab1-4cc2-a095-e7e4c060a4ad@flourine.local>
+References: <20260521232956.553287-1-atomlin@atomlin.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: rename need_dispatch to cautious_dispatch in
- blk-mq sched
-To: Guixin Liu <kanie@linux.alibaba.com>, Christoph Hellwig <hch@lst.de>,
- Keith Busch <kbusch@kernel.org>
-Cc: linux-block@vger.kernel.org, xlpang@linux.alibaba.com,
- oliver.yang@linux.alibaba.com
-References: <20260526131103.3105411-1-kanie@linux.alibaba.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260526131103.3105411-1-kanie@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260521232956.553287-1-atomlin@atomlin.com>
+X-Spam-Level: 
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com,outlook.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[47];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLkc91obuuiwe93nwph69c5cft)];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.dk,kernel.org,lst.de,grimberg.me,redhat.com,microsemi.com,hansenpartnership.com,oracle.com,h-partners.com,broadcom.com,cloud.ionos.com,infradead.org,linaro.org,linux-foundation.org,huawei.com,linutronix.de,gmail.com,suse.de,nvidia.com,abita.co,ashe.io,suse.com,outlook.com,vger.kernel.org];
+	TAGGED_RCPT(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
 
-On 5/26/26 7:11 AM, Guixin Liu wrote:
-> The local boolean in __blk_mq_sched_dispatch_requests() decides whether
-> to fall back to the per-ctx round-robin path (blk_mq_do_dispatch_ctx())
-> instead of the batch flush path (blk_mq_flush_busy_ctxs()).  The whole
-> function is about dispatching anyway, so the name "need_dispatch" is
-> not particularly informative and can mislead readers into thinking that
-> a false value means "skip dispatching".
+Hi Aaron,
+
+On Thu, May 21, 2026 at 07:29:48PM -0400, Aaron Tomlin wrote:
+> Please let me know your thoughts.
 > 
-> Rename it to "cautious_dispatch" to match the comment right above the
-> check ("dequeue request one by one from sw queue if queue is busy")
-> and to convey the actual intent: take the cautious, fair, one-at-a-time
-> path either when we just drained hctx->dispatch (so the device has
-> recently pushed back) or when the dispatch_busy EWMA still indicates
-> congestion.  The fast batch path is only taken when neither signal
-> suggests recent backpressure.
+> 
+> Changes since v14:
 
-If we're going to do churn like that, it should at least be an
-improvement. 'cautious_dispatch' tells the reader nothing about
-what kind of behavior this modifies. 'piecemeal_dispatch' would
-be much better, as it actually accurately describes what it
-does.
+You’re moving fast with these updates! It’s great energy, but it’s
+actually moving a bit faster than the review process can keep up with.
+I’ve heard from some folks in the CC that they waiting for a 'final'
+version.
 
--- 
-Jens Axboe
+Is this latest version ready for a full, deep-dive review, or are there
+still a few 'knacks' you’re looking to iron out first?
 
+Thanks,
+Daniel
