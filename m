@@ -1,129 +1,248 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A3130C630
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 18:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1433B776C
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 18:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779818563; cv=pass; b=CabptfQtE6gXj2ZdpoX+qIBUgXSPK0Wzf3yU3CE2M8DW8mQv3Enazoh5yLP3yT+9u3KA8WStvNn57e1xEFTeNjjBr/VK+qDtySceRTffFptsp6PU9m6sNpzkT8Ta4LFdYhDGYTkEkzwwWfri9RMQoGFiALTIJPdny18FlfCfq0w=
+	t=1779819007; cv=pass; b=VoTIy0WGiMf466kXgCWlt2yjVFXtSNtGi1LkLPPTtJu9XSua9p/b/2LPJdDev7YT5SuoTTon65Mp72Kzh7eCmIy5CPgOS2apl9mBG9Tonf3WYJbf3zZY/+rMZA83kBoqD1XHjgMQcuftwvmTMTKgqPSc5U9N1p7pjJN3tcMUY8c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779818563; c=relaxed/simple;
-	bh=ZaAtzlYyiZ9vDcx2mG+Vc/njgcOwf5fe+9JMdr02KY8=;
+	s=arc-20240116; t=1779819007; c=relaxed/simple;
+	bh=MrbwzFNqjMIOLhoJfecFvvakYx1xgE9jvaem2D7B/aw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fRV/AJ1iDuqAOngk1u5rl09DUrkhhNwfdtJ/s9Tj76Ek87RecruNm154qJQpeeGwt6DDQp6+tb84fzAPZesIu9Dkjrb9nGTyq5ahYDEYRoB7McbFNGIFv5V9tcHdzOkWTzsGlfB7y5Fx/gPzqtM4df9YwDvUGqDSTnqCOGyF63E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kV4oFDjT; arc=pass smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=bsDbfEsGh3CyZViolPoKVq1O26n8jC1E6CCULrfak9CHzY7bK9bSLEmKwhTNz8V4Y8h/MEnuTrSkE+HuxBxFo2UI3Mm6E/w45Z4nLCO/b4u0Dp0ONkrlLWfxgUDsaaXN+8UscYWYT/Kh6VWdNWIF/fdBkb7nI+l9W+dhVMcjTDU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FnADok/+; arc=pass smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kV4oFDjT"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-bdf8add254dso327104466b.1
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 11:02:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779818561; cv=none;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FnADok/+"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7e5f812619dso232551a34.1
+        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 11:10:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779819004; cv=none;
         d=google.com; s=arc-20240605;
-        b=g4rJM5fbkTTGXHbc1KTlum7PaNTMvbivzHS15eueBq0ofPuxTsuHz+RrwMo6ov2Lxy
-         LANzLvIRKWdnXiIgnbeMGfIASuBHt8aqMYEuegy6yQFibTmPF+o8qYLy5KeSxgm8uIKG
-         MlCJokiCXuzEKAwU9M7WUhp5dpKBG3Rm1jQg+Bo/0Tqbh8rUHvWWBbRQZimGIjtVn3MP
-         zRdxitq0WOAakki0RlDHPrTZ8S/c8Xj4gAIF/pWIAVk3PshgtOlAn0vvkermzNdsDgTU
-         9GpomBd0gHOn+Ig9BpGR85RsBlw3UxlVqXCVvx8IWv2oGlgrRK4dsDxlWdm3fa4OC0Ap
-         1S9A==
+        b=AlzHr6tLcEs0/5GID4f4O0hFMRV2u8X0HR1C6OA/FSWBU4MOHDYqWlaIMtLduMUWO8
+         oGQa3xJ2OP67txDW6LF2KGyjIiPLT8+2WPhEx3UvP+AwPl8B/LTPvpDlU+uB6yGKmpas
+         knAdWT3hmnwhRJdULpHFbmt3UyjcCqdkb0AHfcwx2+3eyi+xnJK93bXgDj7EwRbeZiYh
+         iV979VIlcbV+7Aefm5ppw9I8JMWKFtPDu5GgEcRsBjxecksNk5cwLcebOLl2s3jZs4zf
+         Pa8MLNOZaql8LCTmIBUe6JiRHb4WOpXjFeyEZ9YwVfiZ+215Tp11aG+GaQ9/UYAMPc90
+         Q8Kg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=u2yr/TnlLJ3QluCqFrvycdU+0iJIGme3P7fn2IgBvQk=;
-        fh=8Oa+OW7YNScrmdrJgjamjPAZ5Rj1nqcPlIVkLkrER+s=;
-        b=CLDCYp0IZ6PPe9pnF+Oxd8ZvPB3IPIbYk7nlRgAu3jFX6y35M6VC+iA/4rKUZv3Pn5
-         s6fJVG2Bx+sGc8WV6K+d+Td+uCXdNEjUgAT2UFvC3aDoUw3TwGDLBySi1Z39ZtMK6Fyv
-         e+gr3NCNXuSaPS1RpzW2kn/cFxIR6lShKAz3UzoNoH+6HnyNNtOp4UHsixWj2qN0TEAg
-         94cYA51Tpg/KF9XGEiVoY+VLnGDZ0YgjanHoiLVd3gEKLXVfOae5pH3/dO3FKe/EITTI
-         fSuzVaaqItKEja+l/Lrukc4GZRNeunH9S1qXGAv2KXiXOrYdYVnVjHTtMwV+w2bgFw2S
-         Zgnw==;
+        bh=BHxc1zDO61V3Z4wRHfTslCCcmY1zg5MFafEGkaMrBHY=;
+        fh=C7yAdiEYheUYFXjyxxrVkx39iaH2XL4I74VKQSV/e3w=;
+        b=CHn4onJErZEhQLtuhehsGjoCwbaUz00L7T1PUKVuIfYC9JOUbQkofD6PjZ+CQFXMEW
+         arZlqEi2xEu4FyVaqudfeq4QY4WGeCQo5kVYBX9x8AUK77azgDXyBE/3HSStV7zVKKbt
+         SMRdXPB/UcSVaOmqU0WWqry5eg+kiQT7UdTP4xJfMi1QJ6Jh257HHMiPVj/NPGkuIR/8
+         T7v/4uN4zsv3cHDxBTPrynvAopuLZtHD81pXQplHyhMVpdCX9TdNwTcOnJloLa+DCKqn
+         vnXtlYpp/zxUId/8LakgwelTOE2T48nfc3KKJCj4+fHKU6T+iegg/el+Dmh4zcIptWH3
+         bbOw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779818561; x=1780423361; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1779819004; x=1780423804; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u2yr/TnlLJ3QluCqFrvycdU+0iJIGme3P7fn2IgBvQk=;
-        b=kV4oFDjT0EVzaI+0XWiL0C5ymUcfpjWF5EMgNFzowPv7+6KABYSPbP1JnmCsXzjvrL
-         rwVJDUsksR6TbMqZfP7B2pLZHEKNJV6K5XngFKV3m19zGyXAfsv6m9xxj0g+VwWRdTEv
-         lPct0907Olvveusw95ihtx36NJ8JA8dczbyJUcnxLAqY4MX9YvN3TppRm1i1pPbwROV3
-         lh+mLKUh5DB+mtZt7DptakNvPIIik8M3ZXDvmA7gnmBdIEuyG2JYRO+1TjJT6FcPV5WV
-         nAyDgHG1Yx8JxMIIExzSFHQduDidVW88kH0ruKasnPS41dVxz5bkmJDsdvbR3n5cnPQn
-         xdjA==
+        bh=BHxc1zDO61V3Z4wRHfTslCCcmY1zg5MFafEGkaMrBHY=;
+        b=FnADok/+KA9RKNjrKtyqlTyBfJGhMZBZJEhzpN2S/QfTJ05ehAZL3hqreiO2sEBjCI
+         9D+K2L/T5qJI9AM2oGqF2ieicTSEIvQ8HhDhDvrMNCGewL2zZqhZB6fJKIRJYEqPMeLf
+         ErdqD6XoKhMtVsBK5jLaG+OuGh8N7W47gSSFyuzytukjxaO+euJ5QuUNAUtDXU4aYnaz
+         sWbrK/b9vreiXPRSZ4OrVUcRlwxqZpTY4VRdS/P26mt+Bps6o2ojWbV8zFpOfmuVsMJ1
+         IAf8i7h/VQJ+WRb2USHxbjCsWDPwefN8gm79ZZxaLbqVQlDao9C9w/L5adEk35bR9mOS
+         CqiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779818561; x=1780423361;
+        d=1e100.net; s=20251104; t=1779819004; x=1780423804;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=u2yr/TnlLJ3QluCqFrvycdU+0iJIGme3P7fn2IgBvQk=;
-        b=VFosVEqHIguTGEORVnNEQROPQiefRLMRRl7ECVlCD3tKQOk9tyZXTnFgQB55UcpP8i
-         tlpH9XjKqy/6AZ3etxcBg6CBrdHhEYEn86MtZSWt2kC1dAlqV7Nr3fb7aSwhtDfWD76Y
-         1bvpzA5Rg9sXpOl8SescabNZX5dGhd5DLqXYb+54gsEjyaumXq03vTMzlpdOr+fawuSB
-         Fk11kW0F4DL96c2Rc69rYcG5GcGWS009gjV0zVTvR2/tBGNhjyltIQVdD62oCVS2EWmN
-         kNDmitpy6BP4BAy4D2hhTMq6iQNDXEZDu/OwXCuxixoSPbxiG0z4F91z63hTr1On+hM0
-         25Mg==
-X-Forwarded-Encrypted: i=1; AFNElJ9oGaYvGRQBMjzN9HRmzIXvpDIbpcWVyxLr9f5V/IeLxCHP+Wq6ORjnoVo5wqAvP5l91YCbaIgrSR6rHA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDonT6hmI+f73OM2WyEWHFFw3L245VCPqXVjO8ldfPUkT+HFU2
-	hpxuM8Jn9zFaY31ueXURndNVBB+ywM+umVEMDEdEm/iGgnN/bzGkUWyMR0uuVenycimbsXS38KX
-	mjXbONAlDBGQHqgoQZnxW+tz/UvJyfrY=
-X-Gm-Gg: Acq92OEw+vhyNRs/CFx1FrdCT0mri1gNFngXmSY+6bUCCHobGKIzqDpJwNpnbU0qGAX
-	jYLL6WocFUe5kgQ+hqFDZH9BcL/FTj9l5AYp1pcp9pZc5tCODOFGG3WWNNVvsfIN+q9RBWUiQc7
-	ufrxaAu7fs5iDZF7N1DFTm0wyPaVH9aiuAKfh9xNDlCaucDRNgz9UqBgutX5+C0jSJ2uth9rHCu
-	8ipzQRloPfIw52L23pP12mn6JhvvEczjlt9/lNim079ckt0ACvH6hVQr/x5gsUMomYTrFEHWE7Z
-	YKuCLjVHDyjhAbzB6w==
-X-Received: by 2002:a17:907:9604:b0:ba8:2ebd:dfb6 with SMTP id
- a640c23a62f3a-bdd25de289cmr1192642566b.23.1779818560374; Tue, 26 May 2026
- 11:02:40 -0700 (PDT)
+        bh=BHxc1zDO61V3Z4wRHfTslCCcmY1zg5MFafEGkaMrBHY=;
+        b=dwBdMSnU88iMXy70pB3ibHx+lnFQbW384nLZruv4U8NxYcEVMfjBeORNuizSEbxydV
+         mbut4Hzz2bXe8zVHBbBg2VOVgeSJCN5PuPuPw8bPWKgFgG5juihM+3Cf2L0U5vQZn5CX
+         qbRd9HGiMPkEu/4+JJB+fUXcAflTHh/rpbYLe8ALTizAmVctuVuQ4e57SEOWlUtXi4iD
+         T6f4nClZk0CrzQvA8rH0CEQA+L5RI4VRsQo4yLJnNdIPcRnQepV8ax5CALhbfuSydfu2
+         4IgSdbn137o2dXeZy+l3cJ51dei46MQ0nSnCMnMpI/3LGHGP5dZ54TAQCwOeH571RMAH
+         tW6A==
+X-Forwarded-Encrypted: i=1; AFNElJ9Bg+d8/2e0clJso8rFzU0pYD9A/U3hv5Bfau0rVtwOeWaana97WPvDtG01jK6aY5wZPd/s9YLq3cJTbw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaHFBhVRFfWgbAr0HECf8anJKu3/DgI7O1adGNFaHK6+gm5pqx
+	3BAcRGwSl0k5b2PlUIpgRfP7DmYemI5Oxea1SJSovYtmF0FxlgVEwSADnZg37Kj7OA/H1GlGoXi
+	UK7qITVoFh34v9PfUwy2unTJ+iFEtHEjOc8i/eGWyrQ==
+X-Gm-Gg: Acq92OGsyLM9LT/gowDAd4LLPMHGC4LdAiUUx5FIxRe5VUqmadMZXE/sP6IUe2MQG6G
+	i0TI8RD9edB4c+rpY84nbXt89Ilmz41gNMjhVmJvM5Kl35X04n2b6uF8VzDuw4LDvrBhPTmCJTg
+	fB5v4lTMYqbn891mJdOiBEv9VWbOpNl4955+aVFSQM1dW+Yx8cGpIo6PuKxt0XbQCzM/rX4z/ig
+	TYQ5aUTdDpUj/eDYLYcaNI5n5Yl0OGTtQUWYNTQDy5frzj1XcWA8qe2Uk49kD2ZqsM6TPTNY/pX
+	TM3gYXI=
+X-Received: by 2002:a05:6830:a8f:b0:7d9:b2dc:334a with SMTP id
+ 46e09a7af769-7e5fee9eb96mr7175624a34.3.1779819003631; Tue, 26 May 2026
+ 11:10:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260522220025.1770388-1-coshi036@gmail.com> <177981343047.464267.10378401249582627288.b4-ty@b4>
-In-Reply-To: <177981343047.464267.10378401249582627288.b4-ty@b4>
-From: Chao S <coshi036@gmail.com>
-Date: Tue, 26 May 2026 14:02:24 -0400
-X-Gm-Features: AVHnY4KzuxEsBiiKJ_yFObio6pBm4s0WB0v6fgnampd9IL2XRtJQBNx6JQfoDhI
-Message-ID: <CACd_6n2x4Hgxus-0zkjavAEw-MxkP=5BhzvS4795oa3vh9OD5Q@mail.gmail.com>
-Subject: Re: [PATCH] block: skip sync_blockdev() on surprise removal in bdev_mark_dead()
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sungwoo Kim <iam@sung-woo.kim>, Dave Tian <daveti@purdue.edu>, Weidong Zhu <weizhu@fiu.edu>
+References: <20260526070042.1817997-1-hch@lst.de>
+In-Reply-To: <20260526070042.1817997-1-hch@lst.de>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 26 May 2026 11:09:51 -0700
+X-Gm-Features: AVHnY4IRLcYnCjR9E40iQgZ2bqE9n7WhAapD9iHGH21LcobRM_qbr3tc7AD_k1U
+Message-ID: <CADUfDZqWFWsLwuTwtXQg8zfYAumTqjVDsL3aH3cpKN599SUQww@mail.gmail.com>
+Subject: Re: [PATCH] bvec: make the bvec_iter helpers inline functions
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Thanks Jens! I appreciate your work!.
+On Tue, May 26, 2026 at 12:00=E2=80=AFAM Christoph Hellwig <hch@lst.de> wro=
+te:
+>
+> The macros are impossible to follow due to the lack of visual type
+> information and all the braces.  Replace them with inline helpers to
+> improve on that.  Because the calling conventions are a bit problematic
+> with a lot of passing structures by value, all the helpers are marked
+> as __always_inline so that they are force inlined.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Best,
-Chao
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-On Tue, May 26, 2026 at 12:37=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote=
-:
+> ---
+>  include/linux/bvec.h | 101 +++++++++++++++++++++++++++----------------
+>  1 file changed, 64 insertions(+), 37 deletions(-)
 >
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index d36dd476feda..f4c7ec282ac9 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -104,51 +104,78 @@ struct bvec_iter_all {
+>         unsigned        done;
+>  };
 >
-> On Fri, 22 May 2026 18:00:25 -0400, Chao Shi wrote:
-> > bdev_mark_dead()'s @surprise =3D=3D true means the device is already go=
-ne.
-> > The filesystem callback fs_bdev_mark_dead() honours this and skips
-> > sync_filesystem(), but the bare block device path (no ->mark_dead op)
-> > lost its !surprise guard when the holder ->mark_dead callback was wired
-> > up (see Fixes), and now calls sync_blockdev() unconditionally, which ca=
-n
-> > hang forever waiting on writeback that can no longer complete.
-> >
-> > [...]
+> -/*
+> - * various member access, note that bio_data should of course not be use=
+d
+> - * on highmem page vectors
+> - */
+> -#define __bvec_iter_bvec(bvec, iter)   (&(bvec)[(iter).bi_idx])
+> +static __always_inline const struct bio_vec *
+> +__bvec_iter_bvec(const struct bio_vec *bvecs, const struct bvec_iter ite=
+r)
+> +{
+> +       return bvecs + iter.bi_idx;
+> +}
 >
-> Applied, thanks!
+>  /* multi-page (mp_bvec) helpers */
+> -#define mp_bvec_iter_page(bvec, iter)                          \
+> -       (__bvec_iter_bvec((bvec), (iter))->bv_page)
+> +static __always_inline struct page *
+> +mp_bvec_iter_page(const struct bio_vec *bvecs, const struct bvec_iter it=
+er)
+> +{
+> +       return __bvec_iter_bvec(bvecs, iter)->bv_page;
+> +}
 >
-> [1/1] block: skip sync_blockdev() on surprise removal in bdev_mark_dead()
->       commit: 304f384f34af98a205086ce67331cad4fea6504d
+> -#define mp_bvec_iter_len(bvec, iter)                           \
+> -       min((iter).bi_size,                                     \
+> -           __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_don=
+e)
+> +static __always_inline unsigned int
+> +mp_bvec_iter_len(const struct bio_vec *bvecs, const struct bvec_iter ite=
+r)
+> +{
+> +       return min(__bvec_iter_bvec(bvecs, iter)->bv_len - iter.bi_bvec_d=
+one,
+> +                       iter.bi_size);
+> +}
 >
-> Best regards,
+> -#define mp_bvec_iter_offset(bvec, iter)                                \
+> -       (__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_don=
+e)
+> +static __always_inline unsigned int
+> +mp_bvec_iter_offset(const struct bio_vec *bvecs, const struct bvec_iter =
+iter)
+> +{
+> +       return __bvec_iter_bvec(bvecs, iter)->bv_offset + iter.bi_bvec_do=
+ne;
+> +}
+>
+> -#define mp_bvec_iter_page_idx(bvec, iter)                      \
+> -       (mp_bvec_iter_offset((bvec), (iter)) / PAGE_SIZE)
+> +static __always_inline unsigned int
+> +mp_bvec_iter_page_idx(const struct bio_vec *bvecs, const struct bvec_ite=
+r iter)
+> +{
+> +       return mp_bvec_iter_offset(bvecs, iter) / PAGE_SIZE;
+> +}
+>
+> -#define mp_bvec_iter_bvec(bvec, iter)                          \
+> -((struct bio_vec) {                                            \
+> -       .bv_page        =3D mp_bvec_iter_page((bvec), (iter)),    \
+> -       .bv_len         =3D mp_bvec_iter_len((bvec), (iter)),     \
+> -       .bv_offset      =3D mp_bvec_iter_offset((bvec), (iter)),  \
+> -})
+> +static __always_inline struct bio_vec
+> +mp_bvec_iter_bvec(const struct bio_vec *bvecs, const struct bvec_iter it=
+er)
+> +{
+> +       return (struct bio_vec) {
+> +               .bv_page        =3D mp_bvec_iter_page(bvecs, iter),
+> +               .bv_len         =3D mp_bvec_iter_len(bvecs, iter),
+> +               .bv_offset      =3D mp_bvec_iter_offset(bvecs, iter),
+> +       };
+> +}
+>
+>  /* For building single-page bvec in flight */
+> - #define bvec_iter_offset(bvec, iter)                          \
+> -       (mp_bvec_iter_offset((bvec), (iter)) % PAGE_SIZE)
+> -
+> -#define bvec_iter_len(bvec, iter)                              \
+> -       min_t(unsigned, mp_bvec_iter_len((bvec), (iter)),               \
+> -             PAGE_SIZE - bvec_iter_offset((bvec), (iter)))
+> -
+> -#define bvec_iter_page(bvec, iter)                             \
+> -       (mp_bvec_iter_page((bvec), (iter)) +                    \
+> -        mp_bvec_iter_page_idx((bvec), (iter)))
+> -
+> -#define bvec_iter_bvec(bvec, iter)                             \
+> -((struct bio_vec) {                                            \
+> -       .bv_page        =3D bvec_iter_page((bvec), (iter)),       \
+> -       .bv_len         =3D bvec_iter_len((bvec), (iter)),        \
+> -       .bv_offset      =3D bvec_iter_offset((bvec), (iter)),     \
+> -})
+> +static __always_inline unsigned int
+> +bvec_iter_offset(const struct bio_vec *bvecs, const struct bvec_iter ite=
+r)
+> +{
+> +       return mp_bvec_iter_offset(bvecs, iter) % PAGE_SIZE;
+> +}
+> +
+> +static __always_inline unsigned int
+> +bvec_iter_len(const struct bio_vec *bvecs, const struct bvec_iter iter)
+> +{
+> +       return min(mp_bvec_iter_len(bvecs, iter),
+> +                       PAGE_SIZE - bvec_iter_offset(bvecs, iter));
+> +}
+> +
+> +static __always_inline struct page *
+> +bvec_iter_page(const struct bio_vec *bvecs, const struct bvec_iter iter)
+> +{
+> +       return mp_bvec_iter_page(bvecs, iter) +
+> +               mp_bvec_iter_page_idx(bvecs, iter);
+> +}
+> +
+> +static __always_inline struct bio_vec
+> +bvec_iter_bvec(const struct bio_vec *bvecs, const struct bvec_iter iter)
+> +{
+> +       return (struct bio_vec) {
+> +               .bv_page        =3D bvec_iter_page(bvecs, iter),
+> +               .bv_len         =3D bvec_iter_len(bvecs, iter),
+> +               .bv_offset      =3D bvec_iter_offset(bvecs, iter),
+> +       };
+> +}
+>
+>  static inline bool bvec_iter_advance(const struct bio_vec *bv,
+>                 struct bvec_iter *iter, unsigned bytes)
 > --
-> Jens Axboe
->
+> 2.53.0
 >
 >
