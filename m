@@ -1,74 +1,77 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42B43C6A29
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 16:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FD03C6A56
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 16:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779813425; cv=none; b=H1pOLDdO6F78PwGtHJdfIFPquH/6f+9/yKfBoB6YRNHRbJ9WOoqzkur5f2efEL6tga0aDvguqKcVu8OCe9yuuTbZVDdffE/ZGm8z0lXjgiJ+5PWCOOe7YCaaYyrBQP7QwODUKTbIWbkV8nv1FnSaCT4vkLCUV3+GMxV3PV+GP9E=
+	t=1779813433; cv=none; b=E7IpzyTK9zbpNdIeGNzOLYFhj5ZC9/ZRrrjfGyu2bCQfWkt8PM8IvwCVGHFeaLwyJcdoGI4B16OFMBGRokDj6ZABJahCV/fzZhR1EiWeHJoTbq2W99iQovQzc0DURl4JNuZz49CFi5vK2tfQYZKfWEljSUDyTewKgHPVFPMjp3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779813425; c=relaxed/simple;
-	bh=/GO3LeLy3wKpnITAQTk1hnrHhz5bef2/BRgq4MASNl4=;
+	s=arc-20240116; t=1779813433; c=relaxed/simple;
+	bh=k7m3TShuDxcI1i40xO14T3m0hb0f1G2Z9ivDSnAllCY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=BJ0vPczWTrZDEShF1TAPh14K4/4AJfgRzBgb7kcDK5XmtdRAAbLXUt0FGcHdAedwt5ubLPTCh8Lub06Okwi+4aqkIAiwxOvpWntdkqoF+XB1lPEp2OJUKdYW5QIZFyWapeT8iWrNqmHhyj+ytDWUntLvnXoW8k81bHJydxsvX0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=jK8Fy/jy; arc=none smtp.client-ip=209.85.161.50
+	 MIME-Version:Content-Type; b=QbWbl8zl/kZcC5pq3JG6dPiNm8JSijBXxRaEbJZ9pjfmvBvKNmz46x9nKJGHIaznjih0FULwS2S909y9s2nVTDVaMq2bcSNGB3+mXdADrww2uIpJCfdV6cX/eBMKhdBYypVv9G4Dk9VRWWBFxbRhWB7k1wBhIAWl1R5TiZ78s18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=vU7TohBN; arc=none smtp.client-ip=209.85.160.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="jK8Fy/jy"
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-69d8e55e76fso2660885eaf.2
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 09:37:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="vU7TohBN"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-43b78b54dbdso2622051fac.1
+        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 09:37:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779813423; x=1780418223; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779813430; x=1780418230; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=b7pfyyoGQMu4WrjFiMzIODi4ZGH4tu1162Cj6NAkVLc=;
-        b=jK8Fy/jyUnzS49pxgSdZ8X9lpQrw/+/L8hdngVx/hvxZXPwqfPBOkAG6L55I8aHDIw
-         zKunQHdGSiZ0lPPEhzHf8brI8K00BXAFQPRd3uXwooU5b2+kPbBgLr+4uNS3oGHjQGhf
-         Rmvecgn2h77BGa0pBKVhzvDVWYTy142hub4VkMWgPD/FU3ErZsBP06tbEbC/hPwsqu92
-         3b7UKytUCO//2Yhxi/K7IW6gwugcSzl4kU3Xnj36j1Z+DxzG+SfNxyWsHs44hKc1BxPZ
-         YclRuOtWmH427dC7wniovX8R4AGz+/GbPecPQnZtyEPgDlwlG+70GlgWHZ+uVPYctGYW
-         xAOQ==
+        bh=vjWmpAZyQXAr6Dn33RGAFX5IxZ9Y2+mFnV5iI0sKiIg=;
+        b=vU7TohBN9O6hqZeKb6RBvP8/+iNdQXbm6QfeeslBvIFp/lJYsZjJ+03mfv8ZVKUzxM
+         wrzMfg26dXCjGJgpKUEuqyapjLUu3xZSBoMCGgOOebMgVSiLecC688XPU3YDRHU6q6EF
+         Uq2+oCBpuIRPlFBxWcpC+XEE/dhHm3jdvR6G+1j0CIGUlIWDXFoVCfNhliNxSNgH+lCI
+         kVuxcpN6BoO4l0xj/F0LIu01kd3UnjOuACjw23piNUBg11+oCU4Sn8c15KKfkw7+qseV
+         YixxVyx/qZ3MYg9DuaxUbmAhed3bI5QIbc50jCk/gLWu9LopVypm6kgLG5HvYXQEygWE
+         hCuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779813423; x=1780418223;
+        d=1e100.net; s=20251104; t=1779813430; x=1780418230;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=b7pfyyoGQMu4WrjFiMzIODi4ZGH4tu1162Cj6NAkVLc=;
-        b=N+Tm2YG7GOrJSQ8D7vonsU7/CUp2FduQklObv7lMpj1FeTEJPrHu7W+Q9UtlOsY2Jn
-         XxH776mX0h3hKhF7ShEml/uguxhWCmwFggyru+W5j77uy/OsA/i3QStFmPfrcoktsS4y
-         I4RPjQYqDV4OJjjp1iBaXOWJzjgQSVXzo3J748Hk10XN8nE8S7w1oe+IhgiIj8zBpOf8
-         e0dqIZsKa5xCM6/j8wLDhF4DZ1BA91Ay3gV+CbhnWE3zhBOHE3eZj5a0tPH75ITwRiap
-         LTBRUkiUzR54RFMALjPXqEgZsn9chaOKIHvfSc8qa+xYkbU173RKXBkcAgQhg/Z1U8A+
-         xiTA==
-X-Gm-Message-State: AOJu0YyBNscRRgTi+Jg+jIz7NRuGH41G1LJwdQgCdt9+bOEqVU9O4hpy
-	IXXR/efi3J288Fz2vUcSErTwTmFxVBr5INo26PIOJiOz02WwLpPXcbzvzpJwd4iMVo34chG/q3h
-	ZNrwA
-X-Gm-Gg: Acq92OGdQ8paMDfwS7pOTsZ7sBSuipLbFItwPIOD/bKQCnzTlbdjQ9H+L5I+BF0Netk
-	smlhwdYPwx8SVtZ+hnWuDPqL77xAVlh1BZf357vk0ktsR8M8l8d3rRqYrtzxPSC44Z6CBMtFuMb
-	kJZtjEzmZEknx6AtJLORWY2PtDenPF/P2wAGR5pQXz/FzrmhieRDT+ARV0Ln9LRhbKgDKe3PjiN
-	WOgsN/e0Bd8Drpn/VBtH/lQfjvfob/VKkqnWIzphGORChM0CGJGRnM0fuX/Mx5VmJd7M60mYAaG
-	qs4BNcXVXmJW6KJH3VBXWazEiQSlYF1bgwdUHD4hdhylXtPK08MisxJqfDdwaNETQcWN2j6Q5im
-	+IVGu8qkvP0qMlAYux6bNHoqyQUT06BpLFDGs3s2gMuA27vLGZDwGMP6xl4BdQ3AcOYmDxOBJdW
-	+6q6TxFND2SEZFbe6buZPFO0k/nQg/BRKOQl/hsntfph++ZNNjjBhsTflfMHCPgK6RdG2z++Hfr
-	iiRLCIw6Aox5w==
-X-Received: by 2002:a05:6820:215:b0:69d:9be6:860e with SMTP id 006d021491bc7-69d9be68ef9mr7011333eaf.43.1779813422691;
-        Tue, 26 May 2026 09:37:02 -0700 (PDT)
+        bh=vjWmpAZyQXAr6Dn33RGAFX5IxZ9Y2+mFnV5iI0sKiIg=;
+        b=ea5Fl9HihoYbM9xAJnyTR679KeA5oYy1EgAQl8kTfVLL2Sm55j+0Sh1+ENrY2SwCD+
+         l3yXeml/ZLqux565O8ANsWHmI+dCrht/oyV5s6dIzafT9zYKLpd1k8YxtsEaYl9B4Ep8
+         6yh/3VjU6ZcBqzyHw8ZV2IsWdmzXjCGOx9oEeK98kkG46Jj+KRXg2zOHq7RS9yOi3Lu0
+         A0gnLNQp9rjNxbf2jQtsWJsTbnBdLUFjOONFXRl1wcby7oz1vNXfMlSBgS3e5UVpGlWV
+         6LCIbqxfDm41H+WR60IJevSuN/Z00UTL1zGJ4gFzgShKaVMPve6IK6KfH//cSyvKXwKM
+         WDTg==
+X-Forwarded-Encrypted: i=1; AFNElJ9UzhBmoiNwdrMPE9y8vza/g+QLoyiF/8XHMpBJRqWD7KTe+SDbwfh8kh4hcIybFCclXH7LHI4UxkaEWQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQhm5DilybEKESB2sJF07hPEq3OVkA1jL8sUyKGRYN4oOmwK03
+	nl+pCJNeLFmb8Fl5FMGLoufWPdTaSKzoQhDxtbQUeGLAEaFMQdXGl2e64iZ3idY2Tsw=
+X-Gm-Gg: Acq92OEZR5S6IZ1e6pLuR3WGVyxPecNtM61MU8PibG4SM7ElJcwN21sHaqbw/lInzQX
+	V/ssM7dJeJLpcvoTDfMGr/iVPxU+T0V2tjlumVKyO9lb/6fqqfDCvwVzACxulWS1YLI8ZlVrogh
+	uxZgogS3MNsT/KPtLxJoKHUhXYjXHZ+LLmqnMHII+xbw7Ijag2gkoLfNce64B0w36esGWH/t/Ha
+	M7lzuVwSbG6/+m/vYlPPYLIKqL3SjGt8teTpBSQlGEcXz08MhtDWONBrEQFWxAu88izFSp3b1Wx
+	K1cnf3p4gjelGVXPIzUDny+wZpubjO7qOcJuSadmnBmw5gVwQuJDxQjV6AO4ZdTzKLLF8lXx+k3
+	yTTZKTSKMonNtekjZ3TIaCBx1av4Ose5a4auhwIImGWcAGm8tWp8rTOcXB6ocLVs1doDp44/hkE
+	mmoCmr+BFPntOCYmcg62T4rog2YuWoiivSCN7gGuPpk+5LDmBW/bEX5/cqmJHF+Gs0rZ7cIp2fL
+	nUKyJ20rrH2aA==
+X-Received: by 2002:a05:6870:4595:b0:42c:f89:7555 with SMTP id 586e51a60fabf-43b5aa4a3bemr12861346fac.11.1779813430300;
+        Tue, 26 May 2026 09:37:10 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b639fd7adsm13561265fac.14.2026.05.26.09.37.00
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b639fd7adsm13561265fac.14.2026.05.26.09.37.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 09:37:01 -0700 (PDT)
+        Tue, 26 May 2026 09:37:03 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org
-In-Reply-To: <20260526103722.2287587-1-vulab@iscas.ac.cn>
-References: <20260526103722.2287587-1-vulab@iscas.ac.cn>
-Subject: Re: [PATCH] block: blk-mq: fix ws_active refcount leak in
- blk_mq_mark_tag_wait()
-Message-Id: <177981342076.464267.17950379735757813338.b4-ty@b4>
-Date: Tue, 26 May 2026 10:37:00 -0600
+To: rostedt@goodmis.org, mhiramat@kernel.org, 
+ mathieu.desnoyers@efficios.com, Aaron Tomlin <atomlin@atomlin.com>
+Cc: bvanassche@acm.org, johannes.thumshirn@wdc.com, kch@nvidia.com, 
+ dlemoal@kernel.org, ritesh.list@gmail.com, john.g.garry@oracle.com, 
+ loberman@redhat.com, neelx@suse.com, sean@ashe.io, mproche@gmail.com, 
+ chjohnst@gmail.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+In-Reply-To: <20260525005123.722277-1-atomlin@atomlin.com>
+References: <20260525005123.722277-1-atomlin@atomlin.com>
+Subject: Re: [PATCH v9] blk-mq: add tracepoint block_rq_tag_wait
+Message-Id: <177981342289.464267.13862280829247173081.b4-ty@b4>
+Date: Tue, 26 May 2026 10:37:02 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,21 +83,25 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Tue, 26 May 2026 10:37:22 +0000, Wentao Liang wrote:
-> blk_mq_mark_tag_wait() calls sbitmap_queue_get() which increments
-> sbq->ws_active. On the error path where the waitqueue_active() check
-> fails and the function returns early, sbq->ws_active is not decremented,
-> leaking the reference.
+On Sun, 24 May 2026 20:51:23 -0400, Aaron Tomlin wrote:
+> In high-performance storage environments, particularly when utilising
+> RAID controllers with shared tag sets (BLK_MQ_F_TAG_HCTX_SHARED), severe
+> latency spikes can occur when fast devices (SSDs) are starved of hardware
+> tags when sharing the same blk_mq_tag_set.
 > 
-> Fix this by calling sbitmap_queue_clear() to properly release the
-> ws_active reference before returning on the error path.
+> Currently, diagnosing this specific hardware queue contention is
+> difficult. When a CPU thread exhausts the tag pool, blk_mq_get_tag()
+> forces the current thread to block uninterruptible via io_schedule().
+> While this can be inferred via sched:sched_switch or dynamically
+> traced by attaching a kprobe to blk_mq_mark_tag_wait(), there is no
+> dedicated, out-of-the-box observability for this event.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: blk-mq: fix ws_active refcount leak in blk_mq_mark_tag_wait()
-      commit: 94028f339610f5d39d101449dc27156aea03b3cb
+[1/1] blk-mq: add tracepoint block_rq_tag_wait
+      commit: 9ece10778f8931630f86e802f94dc71115de0c8c
 
 Best regards,
 -- 
