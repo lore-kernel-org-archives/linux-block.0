@@ -1,55 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9233FBEC7
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 14:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9712C3FF1B8;
+	Tue, 26 May 2026 14:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779804151; cv=none; b=qGH2a/XGPPIHFk1Cj3+BoD3kNGnJadaphzOk8/rJieZLjDaux3e9DgMofCm2piS8QyRvCGjudASsyw/vtgG60nc7q7DHrqdWPtVovCvYegeLGCihRSUJWir++tfgaxR8w5CT8xY4tB6M4nlQy2QuJI8sphCQsBnvx6risM5gI7Y=
+	t=1779805154; cv=none; b=TonA/WVd2ZiUGIVLWhp3gi1q5xBXfRPR8l+ZZTOhhUXyGTb1aDh8Ab9gdO5CEGo/eLrWSbAT96ki1lBV40dA2PGZ5v8uSVALdoG5nbBKGjFJnJ03wk5fWQphG2/2dPZ+/gTwTcmO9m7A3wuBCM9bwzacWpc0Mx6pLpWJCMA2qps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779804151; c=relaxed/simple;
-	bh=X0GxWYTGw4jTFtj0zn5H7JoqshmKIbNaRI+Lod8XIGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pb9ee7j5BTnx5PV5UZG1SSd7TS7ATpRxMROCrbUTzNpYkYJcfy5mZD6isOKn/xiVsS6pR+Yslybvjlpr12ZMyrh5NLuWn0h2xo6qmF7UM/evxsFwuadE1nfHBNOe+NWJG9ume6F9nXgJ9EI6P35K8JpqZMA/WR5HG2fDOx14KGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nO7n2yh9; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nO7n2yh9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7D281F000E9;
-	Tue, 26 May 2026 14:02:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779804150;
-	bh=Q0tOLb2ufYPC1G9O02nlHp6C846al/OH4FmQiF+dmAg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=nO7n2yh9lx6Xnjs+1IfqiWmOOy3W8QT6gOlNCbFmCznHsFo2TDZdkQUR80Mpxmu+a
-	 rxtlUgF/3V8/h8TM0RTQzGhnudPbWiqu/6FhKT8enQ+dsrCQm9EwnvGE/sOkm5+Jm9
-	 Wbw1Brop640DZHjnQo/saTculfPbdcqckLNn99oaBJqqSEUmWpqKgi0Miv2nwWhWDC
-	 bAkB21v9m0xL4JzNhQb26YxdDBpBpF05Hho0BW8xJXF2Rsw1BlVZs2RoxkLysyegzN
-	 biNi1YUWPvyvd0r+LNi8hrHv/cyCgqkl+3jZwJNnmoUP6wPGn3o47Mob3pvazXhhKt
-	 JDbz8IiuQGIfQ==
-Date: Tue, 26 May 2026 08:02:28 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	axboe@kernel.dk, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] blk-mq: reinsert cached request to the list
-Message-ID: <ahWn9JhsPhhTQkGL@kbusch-mbp>
-References: <20260525160744.896047-1-kbusch@meta.com>
- <ahT656Dazfz5oc8r@fedora>
+	s=arc-20240116; t=1779805154; c=relaxed/simple;
+	bh=LgrCO9oMw/z3/g27hCLEyNUrRjPB18SvS9w/FJ+lUXs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NCvCqJCHpHogIjG3Hf6EnBnc9PgAGhPRvySzay6XgfkF5yLvK88EeTY7yaMsw68R00L7ycxcMYI+BFk8laIWy94PweRc0pXljJs3Mp0SB045YL57Lfb7N+GcPipXQ4jOG11Oh1xtmJ2fteUNy2S2A45hXib/r0SeNI02YQLjuFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
+	by APP-05 (Coremail) with SMTP id zQCowADHNenQqxVq+O56EQ--.396S2;
+	Tue, 26 May 2026 22:18:56 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] block: blk-zoned: fix zwplug refcount leak on write error path
+Date: Tue, 26 May 2026 14:18:24 +0000
+Message-Id: <20260526141824.2293025-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ahT656Dazfz5oc8r@fedora>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowADHNenQqxVq+O56EQ--.396S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZryxCw4fKry7XF13Gw4fuFg_yoW8JFy7pr
+	WF934YkF9Yqr10qay0kF1UXF109wsrGrZ7KrWSywnxZw1rX34jqF1UZrs0gr1Fkr97uFWY
+	vFZxtFyDArs8CrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
+	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjO6pDUUUU
+	U==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgwTA2oVcMiv1AAAsm
 
-On Mon, May 25, 2026 at 08:44:07PM -0500, Ming Lei wrote:
-> On Mon, May 25, 2026 at 09:07:44AM -0700, Keith Busch wrote:
-> > +		rq_list_push(&plug->cached_rqs, rq);
-> 
-> rq_list_add_head()?
+blk_zone_wplug_handle_write() increments zwplug->ref via kref_get()
+when preparing to handle a zone write. On the error path where
+blk_zone_wplug_handle_write_noalloc() fails, the function returns
+without calling kref_put() on zwplug->ref, leaking the reference.
 
-Yes indeed. Serves me right for trying to squeeze this in over a
-holiday. Thanks.
+Add kref_put(&zwplug->ref, ...) on the error path to properly release
+the reference.
+
+Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+Cc: stable@vger.kernel.org
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ block/blk-zoned.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 42ef830054dc..24b899663a48 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1503,6 +1503,7 @@ static bool blk_zone_wplug_handle_write(struct bio *bio, unsigned int nr_segs)
+ 
+ 	if (!blk_zone_wplug_prepare_bio(zwplug, bio)) {
+ 		spin_unlock_irqrestore(&zwplug->lock, flags);
++		disk_put_zone_wplug(zwplug);
+ 		bio_io_error(bio);
+ 		return true;
+ 	}
+@@ -1511,6 +1512,7 @@ static bool blk_zone_wplug_handle_write(struct bio *bio, unsigned int nr_segs)
+ 	zwplug->flags |= BLK_ZONE_WPLUG_PLUGGED;
+ 
+ 	spin_unlock_irqrestore(&zwplug->lock, flags);
++	disk_put_zone_wplug(zwplug);
+ 
+ 	return false;
+ 
+-- 
+2.34.1
+
