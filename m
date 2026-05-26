@@ -1,128 +1,111 @@
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70C1277029
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 00:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B11242D72
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 01:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779756210; cv=none; b=J2mITgUwb0hUUo9c1LXf7X4sX8p2EbMDOGeao4pYFJwQ8ym63Nv1iE0E6an9qEI0ZhMydZ0yQ281X4F9hjunuTg8Rerf3f5NfSriRa2Dj+wQEaZGDaMKvBxCGwJLgVeHR9gQLbEuKM6MDb1LzNxps0lRoxkpn5AHaVF+TSKweWQ=
+	t=1779759856; cv=none; b=hTLR9kn6YsMG3ILxdmYicx8S1UyQ0eD34WGTWaQafaQsC+REKRiQDprLx7ZAFXGI8hd9p6GEgeTUrePWhZaJuCff/QjbECNDXjvk6a9fKw3d7xOBkfw7kRHGwzKeJ6GpWfHbR38ZDLW385NuSTDld25JA7BvQuXrRkBLgE1X7O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779756210; c=relaxed/simple;
-	bh=OeBdW8w+K/E4rAqV47MIXje5WFc1I6FcWdJRjvTURBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TYNap5cedtB7Bw9kOVg2odw6m7mmMAuAohzxbWvnE/l/9cwFLRO2w0F9uwKQ7DBVhWxaqql2YU6TtusLSs4dcpeUwA/zxhPsTlPr44RTYEcjMoagauPbBhLirtUnCGmTVhtnMX8jAzOdJh3czqpRITIkUaG7idY7xPRS+5qvWWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j+MeQm9a; arc=none smtp.client-ip=209.85.214.195
+	s=arc-20240116; t=1779759856; c=relaxed/simple;
+	bh=bXGkjaGQLPPRhGoaBmy14wkmNOAIJLXs1pBYxWUTz3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y+VyvMgH6uzy3hNNvj8SfMC4dWjaa40ZFNd//iHkp4g2bzmsQy8kix0f4lxhzqNaVZKCryy+k6fLRvy8KRf0MnHNWEGvKJNVzbt6NPz6mb7AjPm0nle1+PBFwX6DGUoW2zT3gkd8XXYJaEVewmRjwN063PBYmApA7so5feK5eBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mj6x0uut; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j+MeQm9a"
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2bd266f6fc0so49319505ad.2
-        for <linux-block@vger.kernel.org>; Mon, 25 May 2026 17:43:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mj6x0uut"
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-914bd98faafso252530285a.0
+        for <linux-block@vger.kernel.org>; Mon, 25 May 2026 18:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779756208; x=1780361008; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZSBKRaBI53J0bLo/1yi0NM1Rx2AWnXxdKiQgfUvj7w=;
-        b=j+MeQm9azVO4TPM2KU1U8hZ9OF+E2RSuCdDT7wJR+/h/GBKVaH2cYkqV7Ue8sIKNOQ
-         YpLvinZhHYPnjEmV57Ir+20L+0Ej4wdszdZZ3e9g0m4/taoDPEEPcdtiUlKZmdf1gn5E
-         sCUrPwX92VVw0xy1Ecbekfz4n9b/oGYRRGKgIXs1nyFK1RzeutofLIZJb3FO5fztbpo/
-         8zwymWq3BmcHRhxMg8gzrC33ZLmgA8q5HKTtBRcpFRbognjSytYMXx0+E/YAkQR9dyyd
-         ZlIuvt5by5pZ6Ubo4Q7gpUMmexDPFiSeqhvolvq25SuhZ05ArAbyAnSC+8LbpbOeJykH
-         1Jtg==
+        d=gmail.com; s=20251104; t=1779759854; x=1780364654; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/laSw8wGKqpG7xDWFNSVZINyUhQN2Xmwzo1IdWSZlZE=;
+        b=mj6x0uutxWAoGY2OMYCMZJTR68JHYn28I4CvRNIOLedgDGXsYKtPdBKwhaxKrFBsAe
+         cB99gBqDu0WUxLwGcgp4uVIP0Oh0O/Syt/I8OusJ69q85mHUdOKgz+U78ZomAEOCv0LU
+         58neEV3pZ3QqO1hAVSpbgHKUtbHRNh7d7cmaUi2JXqTzTaCsoCpxmFyjGjAXIamzn/II
+         X8x5WW2NStOgH8pjA5MYYaLAWjtOBFQVifbbjVr5tRuoLkoKonDt/2dBvgdMKxIRFb7D
+         PT9kURPN5PZT6SJiG15TmTR+laDz1pjkmYyn3OfgfE7n+KyWw2M/Iht5V0wmYmgiS5fn
+         cy8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779756208; x=1780361008;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IZSBKRaBI53J0bLo/1yi0NM1Rx2AWnXxdKiQgfUvj7w=;
-        b=TAfPoq1CDaObb/sTkPwUbXZhGlxFPtZkfvfkh48l03/CjG9Qp/iAlKzCehcI1xsnev
-         v7+2fxboalUzt2LbAzdlxaUbOmG+QdfeILZ7jpf8BIdAWbNveV39WCK956+yB0WiAFb2
-         ZvvakRoy6AGz/c96QtGuElEa7PhV+rPDSwZ6c583s42f7ex6kcFb3/zwxXOGRYz1h++u
-         svBUfXMwgQjQ/neM4R5toiDAElfUM0eEZV0oVNbYXSA/cqncwkvvKvQNoAJ4ZerMCJ87
-         ifLDh1unKOWuw7x3BleOnOSxcQF0H2k0RJxtHAZbpr1LoToBq2VgQ4ZMbg/zsyFLQo0/
-         L2lA==
-X-Forwarded-Encrypted: i=1; AFNElJ9jTGclIEp3/lTAVsBFnJNCwr5odDtM/u0uJLEZSJSTIq+eJP5mL4k2Z8jYZjfaJc+FR1YqV7EVo54Vpw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNx8n3TGnPJgAzQAznbT4M/vvmjjn50i1WLil5I+iGD/Q1HasM
-	YJYNbTKG0W7oUV+CdkFuWITT6Ar1sTHzg8Qt87D1bZV+rh+3HncWOyB0nGhjoz1b4SzPQA==
-X-Gm-Gg: Acq92OFY8wbNPl6n/xTF3XgWDX4gAjYw8TqETqJAyObo0ZZv8EPA3GtEX+/O4GCRsjb
-	IFOuD/GEAuxKtHNNLDxP9xHC1fBIoZw2JEZ3PwLiJb8wLFGYFVb75f+0Bg8uqRGGcANDvDage1l
-	bqyqS4rlUSCu2HwYRhwBXbLMT71c/GwnGrO2DXDpCycOz71QSO7j05LT3boycMl+JLZoJ0DBcUO
-	MVrafDXfdsjX8hV8MASDSluy3JZ3oE8lh5VfO8I1PqOKzSM25Fi4UcZJwTflVdm1bY66demT3Of
-	4ouVOfHfercWnr7Tn6C4dIibgk7S5AAldE8ylfWzDgu0BnO0a3GhbH98e7P7zDqMT4v9VvHZsnA
-	POGca06mwlKsx//AIpliB8dW2ZVuarAwhqA9PuX9MIpTHqTfIVX6CzssT6PGEmk5UzW1ZQ2hK7r
-	GwuJ70Uvg=
-X-Received: by 2002:a17:903:3850:b0:2ba:3e2f:6874 with SMTP id d9443c01a7336-2beb06994aemr181148545ad.26.1779756207944;
-        Mon, 25 May 2026 17:43:27 -0700 (PDT)
-Received: from [0.0.0.0] ([64.118.136.15])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56b9fabsm133811225ad.23.2026.05.25.17.43.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 May 2026 17:43:27 -0700 (PDT)
-Message-ID: <8b988694-789b-4a2d-9e7c-0206ac427860@gmail.com>
-Date: Tue, 26 May 2026 08:43:20 +0800
+        d=1e100.net; s=20251104; t=1779759854; x=1780364654;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/laSw8wGKqpG7xDWFNSVZINyUhQN2Xmwzo1IdWSZlZE=;
+        b=SiepFypOPw+1UoF/VGoaXDRQdoMSrw4DfhIDTwD09GeSFgJ/EMQcPwtfl49N8/Qdw9
+         5ceYApmGIoDk/20EhZHeEWchEc1Og34t+S3K6Xgb7O/5ud9krHCkcU+96HLuFLlQ+aTb
+         Pz57rdmjKb8AZ/5w6lCT7t4rAbbZvrm0BYDaPCcWC597YMDG9P7sYG+M2+4W6a7aUYzy
+         0OH1NRvsvGU7ZHWGFXuvgXbFEXmkUxX5Z64MV53amMRg5nilj3xNxsBnqBDbhIfYz05d
+         Q2B/o00y8K4slTw1Xmh92jp0glFtIT9b2k9F6TPkk4vCSTSEbSm4F+Ye14yLZyXiDKEj
+         2AeQ==
+X-Gm-Message-State: AOJu0YyO88303ImNfY+iBzD6W+NHOJHL4vuvumFrgudXh93C38lnVi5J
+	97b19pXSB1hFHEm2x9Ih8tgiHn8bnUM1RX/opMxIbhGd8FQ25sty+dSvAKt5MXjl
+X-Gm-Gg: Acq92OHhya10OqC7WDb+XlpqUjckMQw/oTwhvKYP1pSIqiUao/qKn31udB2BMoEhy5z
+	b3ouKgR1/1hrWYMSMH8/SBpW9AepI5rr9ceITfKDtpkirkP/VlKLRSzeb4d86uBGktqOSYTESK7
+	rK6tMQK1DYAETr5EnKND+1reOwASyGiuGrTV5blF8ANhoKGCqkXoL4iLrE8Zzd/RBtS1F3jlhv2
+	5Q3MROg+/A1Zloy39BT+M6kPcn7PjkwXLwygpnC/g9D0dFl650Pzri2M3T25YBOF9cJ9G4lSPqz
+	MNz2pQR+XN9DcibI9vmzd18uIHxaSLYWAzemxmSyDpdZT9NBzG5TDZRjvbYMkuee3GXV+E4YGSA
+	HQhjNTFc5TOWaigUcmEG1ZMxHZTJsPfkxfxXAW6inGfzpWDcl/UEdYPtGi7Vn2f4PzjKcylVWJo
+	QQfuxLeMpba8SfKJeREjBngyau4Goij3J2mSU7zBPUfeyaLA7N9HeB+TQXFKw3DVG5YnW63WFff
+	i2SGyCX+secFtf/3YEm9w==
+X-Received: by 2002:a05:620a:4407:b0:8f8:e046:999e with SMTP id af79cd13be357-914b45c4865mr2309734285a.0.1779759853761;
+        Mon, 25 May 2026 18:44:13 -0700 (PDT)
+Received: from fedora ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-914f880c526sm51476685a.39.2026.05.25.18.44.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 May 2026 18:44:13 -0700 (PDT)
+Date: Mon, 25 May 2026 20:44:07 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, axboe@kernel.dk,
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] blk-mq: reinsert cached request to the list
+Message-ID: <ahT656Dazfz5oc8r@fedora>
+References: <20260525160744.896047-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] rust: block: fix GenDiskBuilder failure cleanup
-To: Andreas Hindborg <a.hindborg@kernel.org>, Ren Wei <n05ec@lzu.edu.cn>,
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org
-Cc: ojeda@kernel.org, boqun@kernel.org, gary@garyguo.net,
- bjorn3_gh@protonmail.com, lossin@kernel.org, aliceryhl@google.com,
- tmgross@umich.edu, dakr@kernel.org, daniel.almeida@collabora.com,
- axboe@kernel.dk, sunke@kylinos.cn, tamird@kernel.org, yuantan098@gmail.com,
- bird@lzu.edu.cn
-References: <cover.1779596478.git.royenheart@gmail.com>
- <vDiE0u5yWwpR73QOOL97_K5xky-jGckDYtTjHAJH_7uGK6V1W8OKtcgrAIK2mC6I0Kfkd6lhbSYgjk2IRbvORw==@protonmail.internalid>
- <b6411cc055080c984a67bfad72fd683aa84b8e13.1779596478.git.royenheart@gmail.com>
- <87qzmz75d9.fsf@t14s.mail-host-address-is-not-set>
-From: Haoze Xie <royenheart@gmail.com>
-In-Reply-To: <87qzmz75d9.fsf@t14s.mail-host-address-is-not-set>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260525160744.896047-1-kbusch@meta.com>
 
-On 5/26/2026 1:42 AM, Andreas Hindborg wrote:
-> "Ren Wei" <n05ec@lzu.edu.cn> writes:
+On Mon, May 25, 2026 at 09:07:44AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
->> From: Haoze Xie <royenheart@gmail.com>
->>
->> If GenDiskBuilder::build() fails after __blk_mq_alloc_disk(), the
->> allocated gendisk is left behind until the caller drops the last
->> tagset reference.
->>
->> Handle the failure path by releasing the temporary gendisk first,
->> then converting the foreign queue data back, so probe failures clean
->> up both resources before returning an error.
->>
->> Fixes: 3253aba3408aa ("rust: block: introduce `kernel::block::mq` module")
->> Cc: stable@kernel.org
->> Reported-by: Yuan Tan <yuantan098@gmail.com>
->> Reported-by: Xin Liu <bird@lzu.edu.cn>
->> Signed-off-by: Haoze Xie <royenheart@gmail.com>
->> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> A previous commit removed an optimization out of caution for a scenario
+> that turns out not to be real: all the "queue_exit" goto's are safe to
+> reinsert the request into the cached_rq's plug list as they are either
+> from a non-blocking path, or a successful merge that already holds the
+> queue reference. This optimization is most needed for small sequential
+> workloads that successfully merge into larger requests.
 > 
-> Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+> Fixes: dc278e9bf2b9 ("blk-mq: pop cached request if it is usable")
+> Suggested-by: Ming Lei <tom.leiming@gmail.com>
+> Suggested-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  block/blk-mq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Thanks for reporting and fixing!
-> 
-> I see we also lack a `put_disk` in `GenDisk::drop` after `del_gendisk`.
-> Do you want to patch that as well?
-> 
-> Best regards,
-> Andreas Hindborg
-> 
-> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 28c2d931e75ea..72c8ac805882c 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3246,7 +3246,7 @@ void blk_mq_submit_bio(struct bio *bio)
+>  	if (!rq)
+>  		blk_queue_exit(q);
+>  	else
+> -		blk_mq_free_request(rq);
+> +		rq_list_push(&plug->cached_rqs, rq);
 
-Hi Andreas,
+rq_list_add_head()?
 
-Thanks for the review and for pointing this out.
 
-We will run some additional experiments around the `GenDisk::drop()`
-teardown path first. If it does turn out to be a real issue, we will
-send a follow-up patch.
-
-Best regards,
-Haoze
+Thanks,
+Ming
