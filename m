@@ -1,38 +1,33 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915F2355F4E;
-	Tue, 26 May 2026 08:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5763148C2;
+	Tue, 26 May 2026 10:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779785830; cv=none; b=hrmPxQm9U2ku4Hhu+Q+fTCl/h4nlGvOs//TbW/dtU2p3RiTga5HdHPDzp4Zb3FHc06+ly+F7+cxUDsDxzYMhlfhvUm6oDj0wvpDNVHaE3lcJlxvPzZem9l8OIIxKCN8WTlULgM0DrVUoqqs8bjifE612QtOznCeku6Nbrf/F7yk=
+	t=1779790917; cv=none; b=duvYliDw5bCZ0AzVkypx8RTLUwTJaiOvT4Zr18ggFUbdi7p8/4WSHncEGGneJrvou/H0lbpDVtBGgX2lu0Wp0YmuQBADtmoSP+zh5dxESeBosLFh7EMW+It3Bp23YY8negcBf1IYU0/DN9MN6XfO4dCsewsuM1H0lz1n7GNVdv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779785830; c=relaxed/simple;
-	bh=4xRmiCghoaumjlLjoTcpUj2bHImb/nKVfXIo3hgsY1M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C0+BsYlG2Afr+mAvYtgGRXe+Xzd6qpgWN4AOZQj6qpTFe6wM6BEvb74n5AoyJDHSiGNewdGbjdiSX8Hh9UsbG1lnmLmE9LKH4zE8gEIC2kfJSCMP0F8O1a9WRraQ2ovxhcU6dwDEgRoagpcTPQmiAHW1RCVRneR+biu1Rfae1zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Y6R0riIJ; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Y6R0riIJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=c8
-	poVyZ3dw/tWL2WhpOonhjWBenScgcZCXUDf3lSl9E=; b=Y6R0riIJ9fucK87rDc
-	fJXO2opgSY8kMA+uRaPbl49GGeb+bySspnge/8inB2bDr5B2RYZ7cj4z/7eP4cS5
-	dSRpQI6uIM62GtAiKc7LHoLhqOT53lNHbw6rQWQqxRN+KFpgl8vua0DidCIfL0uN
-	JdDHzn5X3NmFQVXqI3jVGR/+M=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgAH9vBQYBVqOZNlGQ--.57606S2;
-	Tue, 26 May 2026 16:56:50 +0800 (CST)
-From: luoqing <l1138897701@163.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
+	s=arc-20240116; t=1779790917; c=relaxed/simple;
+	bh=ybYrIRR85J9BXUQl4JzK/S4jab12sMaPx+vpv4wJt7I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hPIC2juBF1Tkg4McK/UUHqVh0ef9o3g+fgRR/vQLix26/p4wfXlKeU/LRmxOFOhjzqHhwj8oPV+HKTVjXO2I5HfibxRQ3AoxAlK11CB9Bh/78qH/HC5FqOQKwwVj57IeGgdMi/zp/QgeJHRrZp9OIVcHs5ignS1n3KuibI5DWZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
+	by APP-03 (Coremail) with SMTP id rQCowAAnC+I4dBVqIqVsEg--.1580S2;
+	Tue, 26 May 2026 18:21:44 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: Jens Axboe <axboe@kernel.dk>,
+	stable@vger.kernel.org
+Cc: Josh Law <objecting@objecting.org>,
+	Kees Cook <kees@kernel.org>,
+	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	l1138897701@163.com
-Subject: [PATCH 1/2] block: Use struct_size() helper in kmalloc()
-Date: Tue, 26 May 2026 16:56:48 +0800
-Message-Id: <20260526085648.1784798-1-l1138897701@163.com>
-X-Mailer: git-send-email 2.25.1
+	Wentao Liang <vulab@iscas.ac.cn>
+Subject: [PATCH] block: partitions: fix of_node refcount leak in of_partition()
+Date: Tue, 26 May 2026 10:21:24 +0000
+Message-Id: <20260526102124.2283846-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,38 +35,67 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgAH9vBQYBVqOZNlGQ--.57606S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZw18tw4DZFyUXw43XF4DCFg_yoW3uwc_Aw
-	1qvrn7Cr1kAF4fZrnFkFW8Jryv9w4DJr4Fgr9xtr9xWFyUJ3Z3Ca4UXr1fXF95CryfGrZx
-	Z3yDZr9IqFnrujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7VUUSfOUUUUUU==
-X-CM-SenderInfo: jorrjmiyzxliqr6rljoofrz/xtbC+RIMUGoVYFLchAAA3i
+X-CM-TRANSID:rQCowAAnC+I4dBVqIqVsEg--.1580S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zr1kWr18KF4DGFy3uF1DGFg_yoW8XFWUpr
+	sxC3y5Ar1UGry3C34ktF4xZw1Ykan7XrZ8tF17K340kF1DX3Z7tFWjv3y5Zws0qr95A3yU
+	ZF1jgrykX3W7Ar7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
+	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUejjgDUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwoTA2oVMA-iFAABsq
 
-From: luoqing <luoqing@kylinos.cn>
+of_partition() calls of_node_get() on the parent device node at the
+beginning of the function, storing the reference in 'partitions_np'.
+This reference is leaked in two paths:
 
-Make use of the struct_size() helper instead of an open-coded version,
-in order to avoid any potential type mistakes or integer overflows that,
-in the worst scenario, could lead to heap overflows.
+1. The compatibility check at the top of the function returns 0
+   without releasing partitions_np when the node exists but is not
+   "fixed-partitions" compatible.
 
-Signed-off-by: luoqing <luoqing@kylinos.cn>
+2. The function returns 1 at the end after successfully processing
+   all partitions without releasing partitions_np.
+
+Fix both leaks by adding of_node_put(partitions_np) on each path.
+
+Fixes: 2e3a191e89f9 ("block: add support for partition table defined in OF")
+Cc: stable@vger.kernel.org
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 ---
- block/bio.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/partitions/of.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index d80d5d26804e..397fc3bc0ede 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -657,8 +657,7 @@ struct bio *bio_kmalloc(unsigned short nr_vecs, gfp_t gfp_mask)
+diff --git a/block/partitions/of.c b/block/partitions/of.c
+index c22b60661098..53664ea06b65 100644
+--- a/block/partitions/of.c
++++ b/block/partitions/of.c
+@@ -74,8 +74,10 @@ int of_partition(struct parsed_partitions *state)
+ 	struct device_node *partitions_np = of_node_get(ddev->of_node);
  
- 	if (nr_vecs > BIO_MAX_INLINE_VECS)
- 		return NULL;
--	return kmalloc(sizeof(*bio) + nr_vecs * sizeof(struct bio_vec),
--			gfp_mask);
-+	return kmalloc(struct_size(bio, bio_vec, nr_vecs), gfp_mask);
+ 	if (!partitions_np ||
+-	    !of_device_is_compatible(partitions_np, "fixed-partitions"))
++	    !of_device_is_compatible(partitions_np, "fixed-partitions")) {
++		of_node_put(partitions_np);
+ 		return 0;
++	}
+ 
+ 	slot = 1;
+ 	/* Validate parition offset and size */
+@@ -104,5 +106,6 @@ int of_partition(struct parsed_partitions *state)
+ 
+ 	seq_buf_puts(&state->pp_buf, "\n");
+ 
++	of_node_put(partitions_np);
+ 	return 1;
  }
- EXPORT_SYMBOL(bio_kmalloc);
- 
 -- 
-2.25.1
+2.34.1
 
