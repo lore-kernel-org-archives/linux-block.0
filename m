@@ -1,119 +1,111 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C763B4E9D
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 21:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EF43C584B
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 21:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779832304; cv=none; b=DXci9L2JYuD4y7bcnNzVb+rsosB71rDvvUnct2B8Bq7JzrRZhtrZWg1DfVbrQ16rQS6nYqnFky5GxR7fXxu6Z/qslvHAxmZ/MNHNBoaS1FElMMJChqFl29kEfnV6oOenHqrKlD0l1HGtX32Aa5RMxDIW0L/CaRb+hoX4rRWmcaQ=
+	t=1779832357; cv=none; b=hjGoIc3LL8kL+i6zttsItxPZBxJZ54Ih7JLZsmHOV8ABlIpOHIey68Jrld+W46cyRBab0uwBeZl20AdANO/EomXpw/OHy+PB5qXf4zHzY3Mb/NmJiONbGHWq0vNF6Mb0A+SVb/JUK51olfavFAOzlWwoVM/8JoUNzpfwvUolVnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779832304; c=relaxed/simple;
-	bh=/JQM2OwPOrXvBPoLMhF6DhSJJg9UVNCh2Y3F7mDsZq0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bjk8ZHL4BZKI7pLttJGQ5xjxeD5oSV3/ChgHMCxV3V2a3V7WYfthQ12F+VvSpgAziNZJiqQwulv1L68HxJ7p3D9nYa0fpGX5/Ody5n4K6wHFVu+forrlxk9SUw3NyG05A3GZz1wpBN6jXcZehRwoezFzrzYcYTX9GBrnSO25uv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=ner3lzy2; arc=none smtp.client-ip=209.85.161.46
+	s=arc-20240116; t=1779832357; c=relaxed/simple;
+	bh=4NrTmsYwJJmQ5/ng8nsl+5S2O34t8HzC26mJd+ruPNg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=pSNexRtgS8Rtg/xq8gyt/lkF4Yqz3NaQBoRSueEzIzCucmTIvu8uUXH6/o5Uu7nREaDrb+B5MmZ+YmtoGuGNUCh7kxpEfCQvlRR7OP5RPQLO0UvTHrwbU8S8rAix6EJERnA6KI7QARaL3K61ru3lvvY9MTdfpOwmUZg+jtuHvpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=w9IdnVFl; arc=none smtp.client-ip=209.85.160.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="ner3lzy2"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-69d8b7aeeecso1388462eaf.1
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 14:51:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="w9IdnVFl"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-43acf1694daso6293238fac.3
+        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 14:52:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779832301; x=1780437101; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RA7cD0bS7vuj5BqYOqhUb3Pso3HctOE2AcDFDnLY8ug=;
-        b=ner3lzy2tdEv1Y/7W5mtK5dtfav0oSsR9OiUqlPJLcC0O+ywc4xMZQoNHax44doTKU
-         Zdlc26o5D44p6HTSABZc2rgkjd1RWgyYQ4LIgv+quzMV/NAtMg4daffhdr314hu0TJ2i
-         lNSWVpZsBWv8H+BbyY78yhYdAc0k8KdvQMLNYCeFgAcwL9o+8NwKekcl3m68UBWxERJg
-         u1jTbf6YjO2ViMIP8mzSgd0djfNI/y0ljXHug+j+ss/AvDqTjYVakEGm12KsmCWxHp+n
-         /BlxxIfeEQDgSOg0bByHMHRw71o1TuVyt9g7QuHkTOYEQpmzIdXxHHbyqDDHtlWeyn4c
-         MGBQ==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779832349; x=1780437149; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ygleTelCqI5oqapwk6Og8dhDrlXNgz7gDtcSwArrBbE=;
+        b=w9IdnVFlWMtWJOQvUeXQp8ZP69zopJWnlfVQz5qR5vF2OVlPyXk222oWHWzxPBEtVN
+         g02xQQr1PzMGpEcvaSAvW1fxbf5S/f7gUiMjEo3bfIStgyT73uFTtWeIuHvpvW0UovSm
+         4AdLAME3Wo1H3vFDOY6dTnapYdASLFN/MmSOX7wt0fH5ZB+gey7DpJjBotICiDcSWLUB
+         /UaoW5+GU9aNv1T02Ktml72uh28ET053FbcaH7IFQCjOW6fFRC47NSC9HlO3qrmNHmmg
+         Z367Q5NAT5vUmUhHwqvezl0tlvlmtmRJGh4bXtYk6ZEW1DgDFqU0KpaV1z1grEaKLmJu
+         4T1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779832301; x=1780437101;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RA7cD0bS7vuj5BqYOqhUb3Pso3HctOE2AcDFDnLY8ug=;
-        b=PrJTPmCM0tKY1Sz6wdEHeIJCefiUbvzZrmg6uVPEU2H6dxeJALY4MHaqKfbdClxITI
-         DxEHerchAgY4C6T8cJiVsvRajwUtkhYG0UQMr7htiexPkty4wsz7QY2mQ7XTsl43YQqe
-         Cpg1hs12Aan9dcldkwG3wTXDQ4fx1cosHzWjpJCZxONRCbXXNCXKAq0E+eZm5s98SO2v
-         TRhzJy5OxB8gjYqxwqmXWjnU4n9YUN6Jlqe995eviuK0zhMHPQ2qYBxwhMwdRYOOIoND
-         HdL6WEqT9Sdzqn1Jkhn40vuCrx0SoXD1n8IDUjH+U5h2slTa5jq1spsmk/0t9u0ZVQ6N
-         xUCA==
-X-Forwarded-Encrypted: i=1; AFNElJ8sbwevL3UME8nAaz5ILtmluCoPplvE97bZ1w8VWuu8G2wTIEQzGqgKNw+fx1TD+rwOrTPOto2048S52g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0QbxKUcnN/diYlVheln+ZJJEBdH3tSeN6mqxRQh3y9t2wR7VH
-	ZJDhRHvi55i05EnbiddW0HvIV/Jf2Mwtbg8OAASbe7znY+F7EAxXltkO++eV2LOGlBw=
-X-Gm-Gg: Acq92OEC5iW3ll2QP80vpB/O1jE0ILMvJ7gmh/3IdMtHh7wrgvtvvDc4Kbui9zQGpe6
-	+Of2Y4dIHp5gHxGsNAeS3scKTsWGCBFd90viieIT7/lYpaYLSYpLPVN0rWTRNx3E5HaOhyWez5o
-	xdoOC31EinkP86KQK3pzJ9N/xCjuCeWV3Ju0fNyu7Vp9JMHSM3KAtpnu1bMAAS89q52Fsfpx9nQ
-	OgTl2zg4tjgK/KKNfj0Xa6It+5I3AOClNbKpc8llxN3+kUBhgNFO9vBYO41gFAEKE4q+HWsw6zV
-	253bTFqRuCm2GKZ8PRDWTlNXGWTRIO8jT+TS9c3iGaX+EJEx2CAXgGu+inDTH12Wj+HuCOsn2XE
-	yA6/LU4yx+LqkbP36hv9L21ZNdSshCd8rPbA91diPADCF8dScdR7PFWJzRZQXjR/MJQ4xU3rPnB
-	4w2mFipSeMmbXoYpBI4wTU7XxGdvCqvuNAvE3qSNxlYj7HOXNUS4RMcFliZA/AhAF9iV0ajyQP4
-	CY8QKTE4kPk1ZMn0hE=
-X-Received: by 2002:a05:6820:1995:b0:69b:bf80:2db5 with SMTP id 006d021491bc7-69d7ecbfda4mr11748930eaf.52.1779832301111;
-        Tue, 26 May 2026 14:51:41 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69d83aa422fsm6396077eaf.14.2026.05.26.14.51.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 May 2026 14:51:40 -0700 (PDT)
-Message-ID: <b89e372e-3068-4c26-9552-13e6853ba000@kernel.dk>
-Date: Tue, 26 May 2026 15:51:39 -0600
+        d=1e100.net; s=20251104; t=1779832349; x=1780437149;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ygleTelCqI5oqapwk6Og8dhDrlXNgz7gDtcSwArrBbE=;
+        b=LdBUeF90BH2jJ1jymmgx8fw69mo0Hstrt22r56RuOiDWSbxrh6Mq1Q2N6v2n108UM5
+         Y8CNLv/uDd7973/uKreL7sx95CpMkow/BXWgJp2C99b0G+vKWUvNRp6GTh+JjGkkqYsd
+         ztgbHZKP5rYOtNjzJI6UlxxB7ExxelZKjEWlrDk/91OZmcdQAoxi8UkVwd+SPT+J9u6s
+         nA1zDAhuqlMOOufg7n1krcNAY7Zl3+HOtELJOnv6G2VplFp0Qgg6gUHGU0N1nyQOohVS
+         cLprZ+NhBhvEuA4nypJGxGd4XWuuHFzpif0ke+XFM/TKe96iuNNEc4LZ+QS4rXmy2HcM
+         QIrQ==
+X-Gm-Message-State: AOJu0Yw2Ox/6n6pWbtVK724O8gkaGii3d+8pf+7gBwWbqWsQ5EeSxqtG
+	0mImeBEs7mXK2d4fha+biAAtfRexgCWZYchZnsCkk95R1JbORvhI8PM6N12mJ7kWugo=
+X-Gm-Gg: Acq92OFn0HwzVPDcOClD1qmR2hukYpOvB0A0S2QC4R+hI+QbMEhN42tbtzZFOFnTc7a
+	iX7b1pMORlLgzDFgJq+bnFw34TzW5S8ZOXjZDiE9eSavb1tZvRfJwmShrDp226w1eF6FNWble5l
+	FXWsqn6BAGjiBpd4CnqrAGUw0cPQpJBv/IkaCiK77fwpb1ECHzcoJEJu7gDzZmsNXNg+pUsVdny
+	wSSJ81CTk4iaAGiBQ3iwMnMy/rC4X2LF/yEl1CFnZ8aT/w/gvRvwCAd//3y2eq5TpgdjArdwb0/
+	BJSOLPAmQvMKJLXFNcLgWBLN8KTc8P2SLfeX+lRkWGXJWzpg4ygh7O9fXZEjJTEaBqkAxu/HjX7
+	RE/iiFXKp5FaaDKmdeO0Oc+fx/gjSwskkkizsw+1PF+EPrcibJvgxp7d5MHFENmaS1AFN7UuSS3
+	7sE57MqUc60+vQ3Jjy36xFYZYVV+jVqWC4qceuyk87dQBlhptjJaVTo8uNFD8DuzdQ5mV7/VoIK
+	rNlKbLwKrOrZg==
+X-Received: by 2002:a05:6870:88a0:b0:42f:c1ea:f19d with SMTP id 586e51a60fabf-43b5aacfaefmr11826864fac.10.1779832349406;
+        Tue, 26 May 2026 14:52:29 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b639725a5sm14453746fac.10.2026.05.26.14.52.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 14:52:28 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: song@kernel.org, yukuai@fnnas.com, linan122@huawei.com, 
+ kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, 
+ Chaitanya Kulkarni <kch@nvidia.com>
+Cc: linux-block@vger.kernel.org, linux-raid@vger.kernel.org, 
+ linux-nvme@lists.infradead.org, kmodukuri@nvidia.com
+In-Reply-To: <20260513185153.95552-1-kch@nvidia.com>
+References: <20260513185153.95552-1-kch@nvidia.com>
+Subject: Re: [PATCH V4 0/3] md/nvme: Enable PCI P2PDMA support for RAID0
+ and NVMe Multipath
+Message-Id: <177983234828.663325.17778666619930426072.b4-ty@b4>
+Date: Tue, 26 May 2026 15:52:28 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 0/3] md/nvme: Enable PCI P2PDMA support for RAID0 and
- NVMe Multipath
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: "song@kernel.org" <song@kernel.org>, "yukuai@fnnas.com"
- <yukuai@fnnas.com>, Christoph Hellwig <hch@lst.de>,
- "linan122@huawei.com" <linan122@huawei.com>,
- "kbusch@kernel.org" <kbusch@kernel.org>, "sagi@grimberg.me"
- <sagi@grimberg.me>, "linux-block@vger.kernel.org"
- <linux-block@vger.kernel.org>,
- "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Kiran Modukuri <kmodukuri@nvidia.com>
-References: <20260513185153.95552-1-kch@nvidia.com>
- <20260515043535.GB3756@lst.de>
- <4ed83782-04cf-45b5-93a0-05a08e61b82e@nvidia.com>
- <053b99b2-c994-42ff-af63-6e63ab468557@nvidia.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <053b99b2-c994-42ff-af63-6e63ab468557@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On 5/26/26 11:09 AM, Chaitanya Kulkarni wrote:
-> Jens,
+
+On Wed, 13 May 2026 11:51:50 -0700, Chaitanya Kulkarni wrote:
+> This patch series extends PCI peer-to-peer DMA (P2PDMA) support to enable
+> direct data transfers between PCIe devices through RAID and NVMe multipath
+> block layers.
 > 
-> On 5/19/26 17:11, Chaitanya Kulkarni wrote:
->> Jens,
->>
->>
->> On 5/14/26 9:35 PM, Christoph Hellwig wrote:
->>> Still looks good to me as per the reviews.
->>>
->> If there no objection, can we merge this ?
->>
->> -Chaitanya
->>
->>
-> There is outstanding work I want to send out based on this one.
+> Current Linux kernel P2PDMA infrastructure supports direct peer-to-peer
+> transfers, but this support is not propagated through certain storage
+> stacks like MD RAID and NVMe multipath. This adds two patches for
+> MD RAID 0/1/10 and NVMe to propogate P2PDMA support through the
+> storage stack.
+> 
+> [...]
 
-Out standing, outstanding, or both? :-)
+Applied, thanks!
 
-> May I please request you to merge this patch series ?
+[1/3] block: clear BLK_FEAT_PCI_P2PDMA in blk_stack_limits() for non-supporting devices
+      commit: 7882834048f110931275357db60dccff906dc96a
+[2/3] md: propagate BLK_FEAT_PCI_P2PDMA from member devices to RAID device
+      commit: 02666132403aec8fc5de315002894f713ef17dbc
+[3/3] nvme-multipath: enable PCI P2PDMA for multipath devices
+      commit: fb0eeeed91f3236133383445fee5cc8f20330e6e
 
-Was waiting on the md parts to get reviewed, by I missed that Xiao Ni
-already did. I'll queue it up.
-
+Best regards,
 -- 
 Jens Axboe
+
+
+
