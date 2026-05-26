@@ -1,74 +1,74 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5843B0AD7
-	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 16:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42B43C6A29
+	for <linux-block@vger.kernel.org>; Tue, 26 May 2026 16:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779813423; cv=none; b=aiMldndVT8f2nX3lOrahetBtKIdsXR6G9CY0EVd2CgnFqjorjg9JqK6Oibxra/AVXazOoM+FPc/JBMeftd94da5saFwqJCvRVdmI/nZ9adfGU0DqBOCAT7AghDUQnuZ/0vJJfzVZhQMWxUH/4Ik+jU50UWPzaHRRIBsBdyZKeWE=
+	t=1779813425; cv=none; b=H1pOLDdO6F78PwGtHJdfIFPquH/6f+9/yKfBoB6YRNHRbJ9WOoqzkur5f2efEL6tga0aDvguqKcVu8OCe9yuuTbZVDdffE/ZGm8z0lXjgiJ+5PWCOOe7YCaaYyrBQP7QwODUKTbIWbkV8nv1FnSaCT4vkLCUV3+GMxV3PV+GP9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779813423; c=relaxed/simple;
-	bh=s+BHrTyK+bMHO5iiJGA5ie9MctNkpfULkFQmmfjBr/M=;
+	s=arc-20240116; t=1779813425; c=relaxed/simple;
+	bh=/GO3LeLy3wKpnITAQTk1hnrHhz5bef2/BRgq4MASNl4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=JyVOLW103oT/GMyCcfD7k5FS8cRSHMXbAA3ZpBMBivpyVuyH1GEVi8S3cZnzZMATDOvk1BfMW9BAzoq36EDzSnD0dYPFY8URlMjh1AJGbC2UH4Oa/A4EDLxLlhJP1tL3t9IEDQjRvNqc537uKnGp6pJGVJbamhw9tooM13g3LaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=dT2fjf3a; arc=none smtp.client-ip=209.85.160.43
+	 MIME-Version:Content-Type; b=BJ0vPczWTrZDEShF1TAPh14K4/4AJfgRzBgb7kcDK5XmtdRAAbLXUt0FGcHdAedwt5ubLPTCh8Lub06Okwi+4aqkIAiwxOvpWntdkqoF+XB1lPEp2OJUKdYW5QIZFyWapeT8iWrNqmHhyj+ytDWUntLvnXoW8k81bHJydxsvX0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=jK8Fy/jy; arc=none smtp.client-ip=209.85.161.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="dT2fjf3a"
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-43bf95c3f6fso1063550fac.0
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 09:37:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="jK8Fy/jy"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-69d8e55e76fso2660885eaf.2
+        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 09:37:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779813420; x=1780418220; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779813423; x=1780418223; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LGmZSJTM92Vl79lLjuAT/E/OXHWP+RudsX5qZkZ0lRg=;
-        b=dT2fjf3a2HjlDfoj3CIAkKoJEEQWpI27/8dXjkpy52+zQVitgzRUTRn/EK5E7hQsr1
-         2Jn67mBfpLn06Zbe2fjvN6aLdFI2MjpUOWShsve/zi8G7FfL0tgAtHZayKdWmch14pXg
-         FwWOtQitmG20dFyAjXZ8QG1H0o2+qCdbajdHuNREjOua9BCe/LgKu7lQj6tvem5QSwsZ
-         Ft6mIf3h45vUDPlCV59UdXW7J9mk4LX2xOsni7N0RuCuvQHLlwsGGn5PE7WgcUD0e3Cy
-         ZhESZV9aB57C5DpNYZi5UnTxo5Vok4OMRrVEzfz45tn+qsSRC9O971IPQtF/hYgmQlul
-         jGiQ==
+        bh=b7pfyyoGQMu4WrjFiMzIODi4ZGH4tu1162Cj6NAkVLc=;
+        b=jK8Fy/jyUnzS49pxgSdZ8X9lpQrw/+/L8hdngVx/hvxZXPwqfPBOkAG6L55I8aHDIw
+         zKunQHdGSiZ0lPPEhzHf8brI8K00BXAFQPRd3uXwooU5b2+kPbBgLr+4uNS3oGHjQGhf
+         Rmvecgn2h77BGa0pBKVhzvDVWYTy142hub4VkMWgPD/FU3ErZsBP06tbEbC/hPwsqu92
+         3b7UKytUCO//2Yhxi/K7IW6gwugcSzl4kU3Xnj36j1Z+DxzG+SfNxyWsHs44hKc1BxPZ
+         YclRuOtWmH427dC7wniovX8R4AGz+/GbPecPQnZtyEPgDlwlG+70GlgWHZ+uVPYctGYW
+         xAOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779813420; x=1780418220;
+        d=1e100.net; s=20251104; t=1779813423; x=1780418223;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LGmZSJTM92Vl79lLjuAT/E/OXHWP+RudsX5qZkZ0lRg=;
-        b=Nc0ltgYWhUd06aNQkal90GTynkg1x1I3RY1GoY76BDe5sT6ek0ud5gRtsAl0IL3XWg
-         Fp+V8zYZnODqdLwrBwOA+gE0KXoS78KEUW46ZihJq3tAPrhDlXqP+ilQRjewTBmdgYS2
-         hb6danwD4b1NnQpliHI5MnoX8onABXZWABn+VHTVVUjrTTFqaSzbske35UezYEn3mTYf
-         5PQ11WaoekbbCr5O0rzFmL7/HjPVZHJjjetsXVAB+EgYJYCvHqvCFZ7n2iDQa3vmHWSw
-         SGkHvkVdWjrQqOAQwBLHQyeqOAh8L8y5noh1c2SSVKGURlcgySBeGmuwoDXg1pDGVy06
-         5EqQ==
-X-Forwarded-Encrypted: i=1; AFNElJ95YM2E99lVXg7WDHycN0UtiQUlW6xqXQyYKD8qYhFhwsHSlyk1+7dGhtJ5A9Q5QjVnqFLCLUpHHXLEsQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7J71GJbszxkvIHEkMd43mVs6ukvznjy1FO8VmEeOywloNZ2kO
-	M/c630FTlk1t5zqs/jW7D6uFxcj3ATGDazfjhUMiA7x6QJM+E0Jc+ItWuK/9gg5572w=
-X-Gm-Gg: Acq92OHOgzUs+yHi8vajQE4dbXb1Pey4clMkVuUc1d/WFRdbm6XhnVqhtk9FAbsvkZ8
-	WkiJ5vwrumB4R/tzhryvhP0C8qBmA+GhV3a3u8ymEEMyWTkvgwTA2510JLUDKmOxuPPma9WaPKY
-	X5DU03NZMn8Mw4VlDReUrNatxmxyJ2rKO+gAv09WKJDRxK52dxuUFQV9056ptpYPBgzJRy9HhI0
-	meaU3O9qxwNf2rdGF3bE80y4tTNt6aynruVmTAvA7yxwLhE78zq9V6rmeQQ0m2axZ8om139mtGD
-	jVX4RQj1wtfRFYnzTJwwketMdrjjvKH5vfuJRV7lyhoUKH311csjfbSI87EIGNlGimh6+Vt6GET
-	ykjtV+AdXFA5lozdzawW+0eFbgM5Rchk8NqLUrluH8N7KiZQDJi7KzOkLqjUAE8EEIJNYN7wpz9
-	cVAeobEstIfGVaJ9ndrFZlGd02Zw4z5S3e9Db+SHY6MW6d/E0Zz1M1UCZpLrlVLTYKR/1onWUl3
-	xU=
-X-Received: by 2002:a05:6871:ea14:b0:439:b99e:4414 with SMTP id 586e51a60fabf-43b2f7fde1bmr11858804fac.6.1779813420627;
-        Tue, 26 May 2026 09:37:00 -0700 (PDT)
+        bh=b7pfyyoGQMu4WrjFiMzIODi4ZGH4tu1162Cj6NAkVLc=;
+        b=N+Tm2YG7GOrJSQ8D7vonsU7/CUp2FduQklObv7lMpj1FeTEJPrHu7W+Q9UtlOsY2Jn
+         XxH776mX0h3hKhF7ShEml/uguxhWCmwFggyru+W5j77uy/OsA/i3QStFmPfrcoktsS4y
+         I4RPjQYqDV4OJjjp1iBaXOWJzjgQSVXzo3J748Hk10XN8nE8S7w1oe+IhgiIj8zBpOf8
+         e0dqIZsKa5xCM6/j8wLDhF4DZ1BA91Ay3gV+CbhnWE3zhBOHE3eZj5a0tPH75ITwRiap
+         LTBRUkiUzR54RFMALjPXqEgZsn9chaOKIHvfSc8qa+xYkbU173RKXBkcAgQhg/Z1U8A+
+         xiTA==
+X-Gm-Message-State: AOJu0YyBNscRRgTi+Jg+jIz7NRuGH41G1LJwdQgCdt9+bOEqVU9O4hpy
+	IXXR/efi3J288Fz2vUcSErTwTmFxVBr5INo26PIOJiOz02WwLpPXcbzvzpJwd4iMVo34chG/q3h
+	ZNrwA
+X-Gm-Gg: Acq92OGdQ8paMDfwS7pOTsZ7sBSuipLbFItwPIOD/bKQCnzTlbdjQ9H+L5I+BF0Netk
+	smlhwdYPwx8SVtZ+hnWuDPqL77xAVlh1BZf357vk0ktsR8M8l8d3rRqYrtzxPSC44Z6CBMtFuMb
+	kJZtjEzmZEknx6AtJLORWY2PtDenPF/P2wAGR5pQXz/FzrmhieRDT+ARV0Ln9LRhbKgDKe3PjiN
+	WOgsN/e0Bd8Drpn/VBtH/lQfjvfob/VKkqnWIzphGORChM0CGJGRnM0fuX/Mx5VmJd7M60mYAaG
+	qs4BNcXVXmJW6KJH3VBXWazEiQSlYF1bgwdUHD4hdhylXtPK08MisxJqfDdwaNETQcWN2j6Q5im
+	+IVGu8qkvP0qMlAYux6bNHoqyQUT06BpLFDGs3s2gMuA27vLGZDwGMP6xl4BdQ3AcOYmDxOBJdW
+	+6q6TxFND2SEZFbe6buZPFO0k/nQg/BRKOQl/hsntfph++ZNNjjBhsTflfMHCPgK6RdG2z++Hfr
+	iiRLCIw6Aox5w==
+X-Received: by 2002:a05:6820:215:b0:69d:9be6:860e with SMTP id 006d021491bc7-69d9be68ef9mr7011333eaf.43.1779813422691;
+        Tue, 26 May 2026 09:37:02 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b639fd7adsm13561265fac.14.2026.05.26.09.36.59
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-43b639fd7adsm13561265fac.14.2026.05.26.09.37.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 09:36:59 -0700 (PDT)
+        Tue, 26 May 2026 09:37:01 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: stable@vger.kernel.org, Wentao Liang <vulab@iscas.ac.cn>
-Cc: Josh Law <objecting@objecting.org>, Kees Cook <kees@kernel.org>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260526102124.2283846-1-vulab@iscas.ac.cn>
-References: <20260526102124.2283846-1-vulab@iscas.ac.cn>
-Subject: Re: [PATCH] block: partitions: fix of_node refcount leak in
- of_partition()
-Message-Id: <177981341919.464267.12762011041724879743.b4-ty@b4>
-Date: Tue, 26 May 2026 10:36:59 -0600
+To: Wentao Liang <vulab@iscas.ac.cn>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+In-Reply-To: <20260526103722.2287587-1-vulab@iscas.ac.cn>
+References: <20260526103722.2287587-1-vulab@iscas.ac.cn>
+Subject: Re: [PATCH] block: blk-mq: fix ws_active refcount leak in
+ blk_mq_mark_tag_wait()
+Message-Id: <177981342076.464267.17950379735757813338.b4-ty@b4>
+Date: Tue, 26 May 2026 10:37:00 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,21 +80,21 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.15.2
 
 
-On Tue, 26 May 2026 10:21:24 +0000, Wentao Liang wrote:
-> of_partition() calls of_node_get() on the parent device node at the
-> beginning of the function, storing the reference in 'partitions_np'.
-> This reference is leaked in two paths:
+On Tue, 26 May 2026 10:37:22 +0000, Wentao Liang wrote:
+> blk_mq_mark_tag_wait() calls sbitmap_queue_get() which increments
+> sbq->ws_active. On the error path where the waitqueue_active() check
+> fails and the function returns early, sbq->ws_active is not decremented,
+> leaking the reference.
 > 
-> 1. The compatibility check at the top of the function returns 0
->    without releasing partitions_np when the node exists but is not
->    "fixed-partitions" compatible.
+> Fix this by calling sbitmap_queue_clear() to properly release the
+> ws_active reference before returning on the error path.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: partitions: fix of_node refcount leak in of_partition()
-      commit: 148cd4873115feb266c002d4d4618ea7f14342d9
+[1/1] block: blk-mq: fix ws_active refcount leak in blk_mq_mark_tag_wait()
+      commit: 94028f339610f5d39d101449dc27156aea03b3cb
 
 Best regards,
 -- 
