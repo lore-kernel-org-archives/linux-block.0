@@ -1,115 +1,131 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A24B372ED3
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 03:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A064337B3FD
+	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 03:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779850860; cv=none; b=B2aCyUFkJC05RIwjCa1EQRLdROeyhNu14I0NiXXkLsNAXd7hDn5hChdGKVRqjoQx0xtAlFh634pBmTvO4eRjYuU5J+mubX2dJcIxJgRc5jZJRMLXuV6IMBrfbawYN28c+IW6s1eFtWNKbgAaoDr97VgP5Pfg1CG0+zR98lxHEjQ=
+	t=1779852401; cv=none; b=GamUJskSQJgNnVg4QqzrAX4mh6vGqsF4DyDPXeLJy5I8RZbPIZ409wHosIAfwqFS3wFPBmkPt9WRSNi9PuC7R/74m6hREendvQAKWRWDv2PBX5KRkxzO1F/sSw8b48LQcWK7jWfhlZet3QbOwW4849VwkW1xKbKYw4qVUUePvQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779850860; c=relaxed/simple;
-	bh=l24Cx1MrKrvp4Q2cUKmT1CDQC1RwyjfAflDdCsjh3ng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VZV97ZQPifMUC6VDbHBKwg8mE8+srS79wQLXklb6mhh2t6z2YUwGpKyIxfB+1ZIYwjyVeEM9PiXaKUOuuXZvvuUBOQOBfPeUoUlIjH9bHThxGTVJbZqKeVq0eNysyBV+/odOdnTRAaN299eQZ3uLoO5tgSlsEzAEHP19x67AX98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=otPOjawa; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1779852401; c=relaxed/simple;
+	bh=7NqP8wTnbRIxVIzZFbQP+alLTQXvzELVOk1InVzXOvQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hu56/traVj1wNhNdwHf7QSzgvHMoEwRr1cUMXhV6tWWmTYLwVbvB2MzrbZVqNE9o9EhuakWi21SYh26aWFVH62VKDwn1v7KFL2OCGCfXV9qRaDbPh0OpqEPkhNmPasWFjVQfl2hLSITrpiQsnKQWpDNc7QyjmoOjlTmzCXPHYTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4qt36iV; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="otPOjawa"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8b7105dfb35so145627376d6.3
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 20:00:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4qt36iV"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2b941cd869cso72680645ad.1
+        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 20:26:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779850858; x=1780455658; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LW74ifQIEMw9K0LJrVq6jLhT79y6ZRMrtmCmy57465k=;
-        b=otPOjawas0BUAfr7T7mWO/WO2cE9MqQwXaLT1vnDh7uBqVDWlQ2LzgkXovUMs3I5xK
-         hI3emTeseBOhS4+I7/IBi8+P4GZ0RxFZKb/a5WvujLn5k6v/34AmyenTjzCeCdJbg32T
-         mlHQ0xigGqGFb8VGAkB6pHqB0l7XbFEqw+ETuaIqQHKYCvP6DXRofuaFs4/aeANIvPDH
-         de33rYv4z2KOJcLwuM6+TeylcJmBEaD5T08oFieNjlNn494zPrLIe8rGNP/N6tPOtPG5
-         2WE2mrnc6zEJy8CYtxH4udIJGEDa4kVLTsM7U9McNlfe95D/MytXxo5sO4VPh+4uVCiD
-         eLEQ==
+        d=gmail.com; s=20251104; t=1779852399; x=1780457199; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=H63J7/JvszdGRcjeN8wXnJUHZrHDcDH58PcyxoI9MIw=;
+        b=A4qt36iVvMAc/ws918KKQtswgZCew6tKtj08YXiOQLED15c9SiN/uusGM8CTylFeSl
+         g87yM963JeyP4zCslII8wGa1nRNJQA9ZRqEVpfimfSo3FXxRxlHIDFUHjcacTT/o+Toy
+         ldKOC/1y+/6H+1eyQ6u74xVICH4lE6tKCoXe7gzu3MmFTjzJQB8II2Vxx5AXVDqm/pPN
+         VXh1Y5R0yZomLWH14p/JQvm0YCqIVXyM3MBxe2kp1IJJtF1LUUJF0TjAZYKMHVCafxqr
+         F3rXvPHy6ozXbH3afC2tkil2ZH4wq5ECA+mRTkMh4TQBJqBIqq7ozwmASFue0Ygr3M+T
+         AZKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779850858; x=1780455658;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LW74ifQIEMw9K0LJrVq6jLhT79y6ZRMrtmCmy57465k=;
-        b=PyxuyLeWSNMY+GHVrlqmKAM3eQgpy9z3DSroSOy1f8HVgex0zdPYEZgdieF7PfrPFQ
-         l2vCJLDSoUhkFRxPh7Vkty9shjo3VCGrFi00LSVYMypiMpgrC3pBOx4EpacpqTXGJYK7
-         qbM3HgHIiSc5iEn39QIaCMpjhiem2wm4VIBnOaqibA6XYDfuIQBV+oLpAb4C4syujATp
-         TeyBtBqP5QfbDnrilyeTx9TpcHrILAqFCi6UoynG+p0yogfA5mRxKAWdJrwPmp2n9Xs9
-         IGcA5H/odda/ZSVBpndh1QGlyqCrP6VecCLHpHhSV3eynbfTpr3nHsCHbPA8iphWOs1t
-         kNOg==
-X-Forwarded-Encrypted: i=1; AFNElJ9OGKqqVd0/JqB5pc1b0tbigp+mcVkB2Dpzje2nmcUkNzuO1x4dPoCsUBGbi0DGgdIAj8XyM9MV8gPIow==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbZiFCRGs3hIzEfPmcDtilOo4QYqifl4bALaPTGKVzcTCeQNcC
-	21rCWoc5JM0Qn3EKqBXVYqoqMHkMPxcvKjZtIAe/2lAo+K3i9hgNygM4
-X-Gm-Gg: Acq92OGTINBNrObKx3zCufSCe9SaGqZEngPHvjALzF1p53gTwHlXTnaqU5l3VtuHU3w
-	EH49jyjlmN62MbNsc6rcKpkDiOoQE07tCZDpvoBNqLJT7ZQyGbrrrusotDDm9QWoUAR9RihzLIv
-	LvMr7HI6GTqfXKFGxrS+F+xYCFseX5kx22AF/6d912cbJEwall2FMIlX47hHjuaNLxZqGrBnBw/
-	bFf9XD3bACHI0m3LecsN4znO2zUHltcYTU2XvG6eEKd3FcST8pSxnARIUHXpomezY5Zt6hpOW7o
-	63qs5LJL5eLdcW8p0nVNTGgQpDL5VlZjjD1mNhfX8m+EkcIHLxtjP1TLyJ3He8fQQZmrAmMNpJZ
-	FbAtNA29FgA4XTg/I6qZIO18r2T6FzCFhDMhvonp3WLbRTmgUWQQFpnTpnwyQRyPFvDGHn//xUH
-	RwG7HQSEWqH6eH7BsrOnbr8J7tiQjhbKEpuTjM8fr25saKNYSukfB0RbibyfIOEs+L+i6Y3NRsk
-	GiJs1lzmOmqfhpMRE/9FQ==
-X-Received: by 2002:a05:6214:5093:b0:8a0:3bd8:5950 with SMTP id 6a1803df08f44-8cc7b5c0bb4mr338124896d6.23.1779850858174;
-        Tue, 26 May 2026 20:00:58 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8cc81302a98sm153788216d6.33.2026.05.26.20.00.52
+        d=1e100.net; s=20251104; t=1779852399; x=1780457199;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H63J7/JvszdGRcjeN8wXnJUHZrHDcDH58PcyxoI9MIw=;
+        b=DOjQ6eeWnMs0lK5l8T3emcp87b4A4IvSe7Oub7+MkRZJn4JCLjOY+oAiHkiBkxu5Yn
+         WYCZYo8G6NtjBFVP9V/21/bAHhBkcIhKR2Tma44k8x0e4j2BAQ4f/+2PIeUqFj0qKWTF
+         2F90Vnk6r8zbcQkg9ZS/DVxmIm2XqwFuFfVS+x8VX78t+Ly5BPfudh95rLrPCiT1MfXb
+         MyMLvG8fnqnLSs/OZjfucmVknMvnDFJb0Hw3zKlzDZqFnHvCV/ukJ9Et1bFCSr/QXwGh
+         vZz0DUjP8ikX2fTkL4IhIecoKE8PUCOKU3ALswb9VUCHSzqmizYYOcqcUwaMXc+Og+Fc
+         zE/g==
+X-Forwarded-Encrypted: i=1; AFNElJ/PIToDB0nfRbyMhvCw9w2Gd3bx8WKIzADCcalDLYfAXe4xDt81ygmbwC8tS/uLwe1Fb3ErBvO22RvWmA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3sNrio9z5nrCNNghJYsU1tWQ0i9fVqoxdrFdgSP8s7XSUP6Li
+	Ehw3XXy12BRV5P+4Zy7SnYNhIpt6hs8JgqX9GDXx9xY40OuU8ZfPKGOqn7MfR3OA
+X-Gm-Gg: Acq92OHsDOxHITTZJrhOWSZJ7HPNoS5PV51WQhiSMoNzVztpP+CAnsOiC3kok86f4tY
+	iRFSv5Fb3iWpYZf/idZz995Q67C3djfzRXQyfwowA9rx0vzfLwO3Y7fcI4oMWbInYuP/xYfRlRy
+	bzltKFPPgSfbSuMuKVBg5MhrZBqe/zQCMpjKE+L6eLtSTyt6QLheUMVQsLUfKy7txYarMEaGzHU
+	MUDFnPwn6uiJ3J79b5dsDsvgWr4mL9scIcbX5IPi8DmP7xKUJkWUgrrSKkHB4ZBLbKUgLh1DqNS
+	nv52NUZTM2tydcDXYSAJp9UBWVY0d4Mmz71fWGC7SUU5mPbrwNexCiYLxjbS8fFO364JtH0KvLi
+	ME8gEkiXT/ggL1obfr9MLXOavw/YR5R9x0ZHC583SYntdGvpbTajRJbyAHvPHKNLqjlpTmYoSks
+	r20cIYgPyMBLJ0BrZDBZ284PiRR02YjR56ThRSnhwM5NfF
+X-Received: by 2002:a17:903:2bcc:b0:2bc:b80f:677e with SMTP id d9443c01a7336-2beb069970bmr226864455ad.25.1779852398945;
+        Tue, 26 May 2026 20:26:38 -0700 (PDT)
+Received: from [127.0.0.1] ([116.80.91.208])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb58dba7bsm133826365ad.66.2026.05.26.20.26.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 20:00:57 -0700 (PDT)
-Date: Tue, 26 May 2026 22:00:49 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
-Message-ID: <ahZeYQ0cLE1i8TGs@fedora>
-References: <ag0lS_CbKO9R5CV8@fedora>
- <94076bc9-2c09-4bb6-8468-b6b8af419cb9@I-love.SAKURA.ne.jp>
- <ag1nfIFcykmQHbkk@fedora>
- <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp>
- <ag1223nAa0wZ8ALC@fedora>
- <fda8abc8-6aa2-463b-bf72-865f6b838034@I-love.SAKURA.ne.jp>
- <ahRocb0Vs_m6RF_O@fedora>
- <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp>
- <ahZGxoI6oHQ_vSrx@fedora>
- <d1b5a737-f0e3-4927-b762-430b37fbb2f9@I-love.SAKURA.ne.jp>
+        Tue, 26 May 2026 20:26:38 -0700 (PDT)
+From: Cunlong Li <shenxiaogll@gmail.com>
+Date: Wed, 27 May 2026 11:26:20 +0800
+Subject: [PATCH] zram: fix use-after-free in zram_bvec_write_partial()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d1b5a737-f0e3-4927-b762-430b37fbb2f9@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260527-zram-v1-1-ce1acb2bfaf9@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAFtkFmoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDUyMz3aqixFzdJANDEyPTJPNUs2QzJaDSgqLUtMwKsDHRsbW1ALPvOSp
+ WAAAA
+X-Change-ID: 20260526-zram-b01425b7e6c6
+To: Minchan Kim <minchan@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+ Christoph Hellwig <hch@lst.de>, stable@vger.kernel.org, 
+ Cunlong Li <shenxiaogll@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779852395; l=1573;
+ i=shenxiaogll@gmail.com; s=20260517; h=from:subject:message-id;
+ bh=7NqP8wTnbRIxVIzZFbQP+alLTQXvzELVOk1InVzXOvQ=;
+ b=rMIc9aoiEnh5ChwVz/WDhL34yOkVfP7nSmRV3FVvu4I0exZ1M9lMnRqSVW+ZJNXsgn1H9tPeZ
+ cerOcUqZw+JCmnJWc/vNNzhiTrqiUdUtfEtbzW1nN8rRT966vG6i9zb
+X-Developer-Key: i=shenxiaogll@gmail.com; a=ed25519;
+ pk=SKFifnqPdsvsjuhUiq+Y9vtCdhyZ/LrRcfYn8eRq6AE=
 
-On Wed, May 27, 2026 at 10:35:56AM +0900, Tetsuo Handa wrote:
-> On 2026/05/27 10:20, Ming Lei wrote:
-> >> Of course we should try to figure out the root cause first, but how can we do?
-> > 
-> > Definitely unexpected write IO(after umount & loop closed) from btrfs is more serious,
-> > which may cause data loss, so CC btrfs list and maintainer.
-> 
-> Why do you assume that the culprit is btrfs?
-> 
-> https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 indicated that
-> this similar race is also happening with jfs.
+zram_read_page() picks the sync or async backing device read path
+based on whether the parent bio is NULL.  zram_bvec_write_partial()
+passes its parent bio down, so for ZRAM_WB slots the read is
+dispatched asynchronously and zram_read_page() returns 0 while the
+bio is still in flight.  The caller then runs memcpy_from_bvec(),
+zram_write_page() and __free_page() on the buffer, leaving the
+async read to write into a freed page.
 
-I just didn't see the above report on jfs.
+zram_bvec_read_partial() was switched to NULL in commit 4e3c87b9421d
+("zram: fix synchronous reads") for the same reason; the
+write_partial counterpart was missed.
 
-It doesn't change anything, the same question still stands: unexpected write IO is issued
-or crosses umount & last closing of loop disk.
+Fixes: 4e3c87b9421d ("zram: fix synchronous reads")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: stable@vger.kernel.org
+Signed-off-by: Cunlong Li <shenxiaogll@gmail.com>
+---
+ drivers/block/zram/zram_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index aebc710f0d6a..b23a8bbb687c 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2333,7 +2333,7 @@ static int zram_bvec_write_partial(struct zram *zram, struct bio_vec *bvec,
+ 	if (!page)
+ 		return -ENOMEM;
+ 
+-	ret = zram_read_page(zram, page, index, bio);
++	ret = zram_read_page(zram, page, index, NULL);
+ 	if (!ret) {
+ 		memcpy_from_bvec(page_address(page) + offset, bvec);
+ 		ret = zram_write_page(zram, page, index);
 
+---
+base-commit: e8c2f9fdadee7cbc75134dc463c1e0d856d6e5c7
+change-id: 20260526-zram-b01425b7e6c6
 
-Thanks,
-Ming
+Best regards,
+-- 
+Cunlong Li <shenxiaogll@gmail.com>
+
