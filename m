@@ -1,137 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8ED539C63D
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 17:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EB43C583B;
+	Wed, 27 May 2026 18:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779903200; cv=none; b=VjI1pgIVjzprbGYH+ykUJWONExdQcDmj553jJ+lfGJPYqTqAdlty3KQi3kykWDGBhw13MX84AQNl3wbbhSE2FWJFkN3OqgXrhDcPQgltpvvM2MuCHN05LcYT9WKftjXD6EPZzNaP0fnfeck+SAqgrI5hxYAOsPlOj4IwYtfpDvo=
+	t=1779905176; cv=none; b=Uu+5hwwgD1kkSV1UYBLT80TS+pVeaOXXjI5sCfWzCX79GAXu1fupy88oW0H0aiCbTYnZH23p4PrzLDl3iNE5RNhbfaUasxv6526HgFrFPJzv1GUr9YO54CjFqL/ULNYKvFEiuMTGUz+FixXxn6OKaZPFKAGLNtln7ul0kchgrjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779903200; c=relaxed/simple;
-	bh=FxFhadcSC6cjPReQAORcacd1A09nh8WHMoTrbMH405w=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=NrYEWamu/W7q9PbzsTMNT3NAJQmsHgRN0T3m6hyEWwxUA8pjFTHdY2V8qgNzHWzFVFboiVnLU9x5QdPgPv4t62MqGn6GWLfAkkMwcWbbyu7twUw+ScMNZYVtkv5b3kUVgCPxJd46bK0t0U3yv2v8LfPXalhEzPErnWK+tNQMHEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZMpMaFaB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1779905176; c=relaxed/simple;
+	bh=4ynxLGq8Tq6N3l/4qPYz5DvdlYzFN3mdDCXp/vSoefc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PrEUdY/tqXIIF1Q7LblbNCUYQDDYSQYtcmrclMhOz6FmeFRUyv4ULnLvkuyAYfyW2LskS1pH+kDj5/egaAvaUUnKxaERwYkJ0V2hYpPNtrPWWYTT8lDGYjM5t2URAvP2+1rd3maQXUUL6ITGV1IK81NSPmadcVleaWR9p6/2mu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XkeYlKla; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMpMaFaB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1779903197;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9frPwY1OQPr9fMKeynViORyeJ9Wy9bgDD7DDIXjto1U=;
-	b=ZMpMaFaB3gIYDkefwt76wlyFGfbK27WaHOIRHrTZ4IjKBXH4UFWJItJAxKWEUlXJpyYyCH
-	fuM0jD/drx71eGSVbPUwlO0FW6zlliGcGxsd3XsD5ytaNwgj+lRJ24bdn9OWZapg+MB4dd
-	OxHIIsQiwJ1PW9mmX8Wkv1NKYX3CiSo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-369-sUi0JFExMxWotYbohv7wWA-1; Wed,
- 27 May 2026 13:33:11 -0400
-X-MC-Unique: sUi0JFExMxWotYbohv7wWA-1
-X-Mimecast-MFC-AGG-ID: sUi0JFExMxWotYbohv7wWA_1779903189
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A9E119560AA;
-	Wed, 27 May 2026 17:33:08 +0000 (UTC)
-Received: from [10.44.32.28] (unknown [10.44.32.28])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA79F1800465;
-	Wed, 27 May 2026 17:33:03 +0000 (UTC)
-Date: Wed, 27 May 2026 19:32:56 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Leonid Ravich <lravich@amazon.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-    "David S . Miller" <davem@davemloft.net>, 
-    Mike Snitzer <snitzer@kernel.org>, Alasdair Kergon <agk@redhat.com>, 
-    Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
-    Jens Axboe <axboe@kernel.dk>, Horia Geanta <horia.geanta@nxp.com>, 
-    Gilad Ben-Yossef <gilad@benyossef.com>, linux-crypto@vger.kernel.org, 
-    dm-devel@lists.linux.dev, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] dm crypt: batch all sectors of a bio per crypto
- request
-In-Reply-To: <20260527065021.19525-5-lravich@amazon.com>
-Message-ID: <d288173f-86fe-adda-99e7-6b5e975660f7@redhat.com>
-References: <20260527065021.19525-1-lravich@amazon.com> <20260527065021.19525-5-lravich@amazon.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XkeYlKla"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8E0F1F000E9;
+	Wed, 27 May 2026 18:06:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779905175;
+	bh=jqVJcUgPxUF+veB1WjKysV5XgWlSW8zAy9W8I7TfmWY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=XkeYlKlaOV4r9NQo+KZZMzid8GXX3wMD5sHbirRqLdS8jU+SLanW28ZcRbd+xhdn7
+	 wTibJDx9/45Sx8YCANjmzR0zh8XZIbbjAOpP42FozftfnAshIiQie89gKUw+SrsiFH
+	 jA5tUhc2uOcuqZC5Degja4N0s+rTbdoljYBXjirbpS9nFiNofiFU8vKXWpMLOaVnKQ
+	 YC2iQJ1z12tVr7OtuVObxrq9ANhhRF2mGBkmt5nuJDnN5UKo9INA0tdxWpcOv6wpUI
+	 N2Bo+ncYzaZNjPg5Fv1t9r+CFV/mDiv/VTrRKKTxRumYXyiiqPO3/K+STlX2crDRbY
+	 UkUz62cUpcAug==
+Message-ID: <b9f08e4e-d706-48fa-b11e-734bb4092b6c@kernel.org>
+Date: Thu, 28 May 2026 03:06:12 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: blk-zoned: fix zwplug refcount leak on write error
+ path
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Haris Iqbal <haris.iqbal@linux.dev>, Wentao Liang <vulab@iscas.ac.cn>,
+ Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260526141824.2293025-1-vulab@iscas.ac.cn>
+ <d8be2a57-c950-46c2-b9d8-120b6e53da91@linux.dev>
+ <90a1581d-9a3c-46db-bc7b-5fd1a9d9c0e1@kernel.org> <ahbZRsqHKKbg9PSB@shinmob>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ahbZRsqHKKbg9PSB@shinmob>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi
+On 2026/05/27 20:47, Shin'ichiro Kawasaki wrote:
+> On May 27, 2026 / 08:15, Damien Le Moal wrote:
+> [...]
+>> Wentao,
+>>
+>> You clearly did not test this at all because if you had, you would have seen
+>> all the warning splats that your patch triggers.
+> 
+> FYI, the blktests CI run for the patch caught failures at block/017, zbd/004,
+> zbd/009 and zbd/012.
 
-On Wed, 27 May 2026, Leonid Ravich wrote:
+Thanks Shin'ichiro. I did a simple manual test issuing an unaligned write with
+dd on a zloop device. That was enough to trigger warnings similar to what the CI
+reported.
 
-> +/*
-> + * Multi-data-unit variant of crypt_convert_block_skcipher.  Submits all
-> + * remaining sectors of the current bio in one skcipher request whose
-> + * data_unit_size is cc->sector_size.  The cipher walks the IV between
-> + * data units (see crypto_skcipher_set_data_unit_size()).
-> + *
-> + * Returns the same set of values as crypt_convert_block_skcipher:
-> + *   0 on synchronous success (full chunk processed),
-> + *   -EINPROGRESS / -EBUSY on asynchronous dispatch,
-> + *   -EAGAIN if the per-bio scatterlist allocation cannot be made.  The
-> + *           caller MUST disable multi-data-unit batching for the rest
-> + *           of this bio and re-enter the per-sector path, which uses
-> + *           only mempool reserves and is therefore safe even on the
-> + *           swap-out-to-dm-crypt path under total memory exhaustion.
-> + *   negative errno otherwise.
-> + *
-> + * On success the bio iterators have been advanced by the chunk size.
-> + *
-> + * Walks the bio with __bio_for_each_bvec so that multi-page folios
-> + * produce one scatterlist entry rather than N (one per PAGE_SIZE).
-> + */
-> +static int crypt_convert_block_skcipher_multi(struct crypt_config *cc,
-> +					      struct convert_context *ctx,
-> +					      struct skcipher_request *req,
-> +					      unsigned int *out_processed)
-> +{
-> +	const unsigned int sector_size = cc->sector_size;
-> +	const gfp_t gfp = GFP_NOIO | __GFP_NORETRY | __GFP_NOWARN;
-> +	unsigned int total_in = ctx->iter_in.bi_size;
-> +	unsigned int total_out = ctx->iter_out.bi_size;
-> +	unsigned int total = min(total_in, total_out);
-> +	unsigned int n_sectors;
-> +	unsigned int n_sg_in = 0, n_sg_out = 0;
-> +	struct dm_crypt_request *dmreq = dmreq_of_req(cc, req);
-> +	struct scatterlist *sg_in = NULL, *sg_out = NULL;
-> +	struct bvec_iter iter_in, iter_out;
-> +	struct bio_vec bv;
-> +	u8 *iv, *org_iv;
-> +	int r;
-> +
-> +	if (unlikely(total < sector_size))
-> +		return -EIO;
-> +	n_sectors = total / sector_size;
-> +	total = n_sectors * sector_size;
-
-Division is slow. There should be this:
-	n_sectors = total >> cc->sector_shift;
-
-
-> +     if (unlikely(total < sector_size))
-> +             return -EIO;
-
-The condition total < sector_size is true if total is small but it goes 
-through if total is bigger but unaligned. I think that it should be:
-
-	if (unlikely(total & (sector_size - 1)))
-		return -EIO;
-
-(then, we can drop the line "total = n_sectors * sector_size")
-
-ctx->iter_in.bi_size is supposed to be the same as ctx->iter_out.bi_size, 
-so do we really need total = min(total_in, total_out)? Should it instead 
-warn if they differ? (where the warning would indicate a bug in the code)
-
-Mikulas
-
+-- 
+Damien Le Moal
+Western Digital Research
