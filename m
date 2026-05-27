@@ -1,110 +1,155 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0F417A31E
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 03:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FDA2459DD
+	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 03:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779853543; cv=none; b=MzoN1a1knNeR9ro2JtiU46onpYp8/77R20CQfdl9jdxxGE6gjJOc/bYWB8Q/sxzjWZjDJ4vssHgbLsuTZTfJ9QjWJR35EKRAsvetfQcOsD1+syDL/1ue9k7X3e4MtKiuMLzlLlnVkSe4+ZTNzaxqj50TEV5XD/nYuQuBIxpP2eg=
+	t=1779853963; cv=none; b=WKixVnbocSdsY5hCrmxFludb+RHl7MoPkJO5s9TEywXovMKZmEYzEHzEQpBln0pCA/fS/h1Gph2Lb5UNY1M1PBtAgJCUxdkaV0NSF8efOqwH3Xd+yfDa2Cq2290fFNQ3+p6WR2RgbLA28axPtUsRAXWxj9Xtl0fYiiyYM9ixX18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779853543; c=relaxed/simple;
-	bh=RB6k6fJeesvAOl3RIkf0eAcn1RQtk89RN7lhQyACCTw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o5+lLCQ+iRt95NhCNVT3CPgFqwGN3ldHhB7qEijxemxOavxYAShgPxZRWRI9Xhd2C17F1fk81R2RGGDW6cYRBe+XkIgu2vUjC3oIgv9sRwKuQi/Xpguw0xiH+cRm9ARmts+rmoDE/5P1myUFSi4erO+TH+G0COtxdZpzqT4gXho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ayj1HHei; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1779853963; c=relaxed/simple;
+	bh=dJXb19Osa1h+praf5iKuqDSE/LsePmEMFxH6RkgLnKY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=lnmAsYE/VJlIJT0IDvbEwgvwbPxiRSsKifkOc4c5LWITgr+aTkSqwzRPcEvmBXl+5t/ZIBf7XHAMdRLQgBTVEEMlEHBYHi+KVDgvXUwBgWr4uCZP+9Cs6miZMJeqtdAdCxTgOXTztDpvtqKt4uC5jzOGU+d8wTUdYcwFuZKzBzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=AgM1hy8A; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ayj1HHei"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2bccb978bd9so69267005ad.0
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 20:45:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1779853541; x=1780458341; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DIzXofIA1kQTMtH8bue4R/Y/pLpr9GrF0sr5GiXdihw=;
-        b=ayj1HHeiFDESNa0nU4rAU236dEYHpGQ9unLqwSyokZNmPI2sOv/iMP9QAuyRfFEfCY
-         KI2RKZmWfb9qsHManq3LX4O+V49ZVg5x4QLvjFoDuar+BX/EI2w++ekpe8Zmhol9yGk2
-         pf5sBulDKqvqp8CENBNeaeHk97Q3Hht0JrJmY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779853541; x=1780458341;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DIzXofIA1kQTMtH8bue4R/Y/pLpr9GrF0sr5GiXdihw=;
-        b=g1/X+uhWsa+B5+jk0syQT8dB2/xDZCxg899iS2xM98E7NmliWjrHke8CWEdu8JgEhL
-         dqGfwq2FvnQc4jV16BXrZM8MW6YRp6WUeCF+GGoZ3gXoNhrhlWsZ6clWRD1piChLxQD+
-         FzbgdDsGVcrm3j+rr0bPtPwE348T2291II3H8vr7LRG9lyh9EDEkjQkjhcYR19CpLS/+
-         /VwjARd7rEyfDLFzEdWJymD/vziajThNW8UrWVFgVvQ1om/pv4rUh7h6C0mLNXKp8uau
-         jshjHPD7xu4+n6oVkLHqz9DiYCHJxc4oNC+A/EdfWAXJb2KJvPBh0C2GOp7ncIqB5CIV
-         RqfQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9PoNoythesDZbnWHsvAIMqHekQhQ3UpZMWRMGweJ0MV4soe0FaiTJJljVpsx1OktqxMHB75MuzDXpwEA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywo/In/3tMv2xNf/xR7KKzq3gIbVnWxUoo74c4foje6yzODLdIQ
-	rmt3biW4x3nxjjp2ZhoVPgwn0OsTE/PKazofZx8dIz0D3CIqV6JpPq5tQoH+rB4WCg==
-X-Gm-Gg: Acq92OGj/MJKblOBUnf0I5GlQYSRmQ92dI3lotqSp+Q066APznbmWJAgQtdRjgU33La
-	btzHXefwura4ZA0rn1Yu8oEwJQX/y8tK5nHT+/6c23Buor/PmA/dlTMYVKL3vsj2DWQrUUIPrhY
-	Z3A8HDkE/qZIZuOP6KjaSvXqTRr68qMj7dqrxeQoBwjC6M/9rg6rRgc5vuKaBCMxHiavVqrN1YX
-	bfOS1Wzi86gplvZYUcoYu3Rdig/ijbmCiVD1Zv7UBY9dbbz3TTxcT0RJPSZYZVwRfOyd3e5N5kB
-	fCflraSAzv8a0mStugJi4Vy72GXoCya3g/dUV/E4CTjdHEzD+d0BSpP1Nfv5qzBRJzqJBODR9US
-	gTfm6ME8VqkZRwYalcGLWiIE5f2iZm+ga3zWO6f8Kxjrgr7feJbMJJYvTs/IUBQH8q4LKt8ttYV
-	rghpsqggtiLsk4S6WkuoMyne9c1EFjEY5QAeR9gEHyef/XaJBIDSrgSL/g6hMz6IaJA+iZytWBw
-	Q==
-X-Received: by 2002:a17:902:d482:b0:2b2:ec33:cf15 with SMTP id d9443c01a7336-2bea20c02e2mr237439135ad.7.1779853541545;
-        Tue, 26 May 2026 20:45:41 -0700 (PDT)
-Received: from google.com ([2a00:79e0:2031:6:b55c:5b57:6435:9af4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb58b2ccbsm141659055ad.48.2026.05.26.20.45.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2026 20:45:40 -0700 (PDT)
-Date: Wed, 27 May 2026 12:45:37 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Cunlong Li <shenxiaogll@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	Christoph Hellwig <hch@lst.de>, stable@vger.kernel.org
-Subject: Re: [PATCH] zram: fix use-after-free in zram_bvec_write_partial()
-Message-ID: <ahZov_99kMxaTH2P@google.com>
-References: <20260527-zram-v1-1-ce1acb2bfaf9@gmail.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="AgM1hy8A"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=RB8V7hcKY/bxo8qZrnz1kBrq6dvXt64MiANiM1jN/qA=;
+	b=AgM1hy8AkkFrr7j7TZNENvgwImFMEhEgv5mp2KJPAojIU30hL4oyaDtM4+Fx+HfNGvXX5bZ4N
+	5349HlitP8quWKsCu0vUUqb7RiIk+x/rkyDbhhpFojiGSH+C/o/QgtEQ9m8PigfH7a5oW2iulK/
+	akXY3rPmSvGvQjb0A9SiMmg=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gQFqW2pb7znTWb;
+	Wed, 27 May 2026 11:44:39 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id A4A8940539;
+	Wed, 27 May 2026 11:52:36 +0800 (CST)
+Received: from [10.174.176.240] (10.174.176.240) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Wed, 27 May 2026 11:52:36 +0800
+Message-ID: <9bd7c679-b5b4-4274-95ba-f2e3da1a531e@huawei.com>
+Date: Wed, 27 May 2026 11:52:35 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260527-zram-v1-1-ce1acb2bfaf9@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Revert "nbd: freeze the queue while we're adding
+ connections"
+From: yangerkun <yangerkun@huawei.com>
+To: <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <nbd@other.debian.org>, yangerkun
+	<yangerkun@huawei.com>
+References: <20260526115253.746625-1-yangerkun@huawei.com>
+In-Reply-To: <20260526115253.746625-1-yangerkun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
 
-On (26/05/27 11:26), Cunlong Li wrote:
-> zram_read_page() picks the sync or async backing device read path
-> based on whether the parent bio is NULL.  zram_bvec_write_partial()
-> passes its parent bio down, so for ZRAM_WB slots the read is
-> dispatched asynchronously and zram_read_page() returns 0 while the
-> bio is still in flight.  The caller then runs memcpy_from_bvec(),
-> zram_write_page() and __free_page() on the buffer, leaving the
-> async read to write into a freed page.
+
+
+在 2026/5/26 19:52, Yang Erkun 写道:
+> This reverts commit b98e762e3d71e893b221f871825dc64694cfb258.
 > 
-> zram_bvec_read_partial() was switched to NULL in commit 4e3c87b9421d
-> ("zram: fix synchronous reads") for the same reason; the
-> write_partial counterpart was missed.
+> Commit b98e762e3d71 ("nbd: freeze the queue while we're adding
+> connections") added blk_mq_freeze_queue/blk_mq_unfreeze_queue in
+> nbd_add_socket() to protect krealloc(config->socks) from concurrent I/O
+> that could cause a Use-After-Free.
 > 
-> Fixes: 4e3c87b9421d ("zram: fix synchronous reads")
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Cunlong Li <shenxiaogll@gmail.com>
+> However, analysis shows that in all current code paths, concurrent I/O
+> cannot actually reach nbd_add_socket():
+> 
+> 1. nbd_genl_connect() path:
+>     nbd_add_socket() is called first, and nbd_start_device() -- which
+>     starts the queue and enables I/O -- is called only after all sockets
+>     have been added. So the freeze/unfreeze runs against an idle queue,
+>     marking then waiting on a percpu_ref that is already zero, and then
+>     resurrecting it -- a pure no-op that burns an RCU grace period per
+>     socket on multi-core systems.
+> 
+> 2. nbd_ioctl(NBD_SET_SOCK) path:
+>     The task_setup check enforces that only the thread which performed
+>     the first NBD_SET_SOCK can call NBD_SET_SOCK again. That thread is
+>     blocked in NBD_DO_IT's wait_event_interruptible, so it cannot issue
+>     another NBD_SET_SOCK concurrently with I/O. Other threads are
+>     rejected by the task_setup != current check.
+
+Apologies, but the analysis provided here is inadequate. A 
+use-after-free (UAF) can still occur in the following scenario:
+
+task A: ioctl NBD_SET_SOCK => task_setup = A
+task B: ioctl NBD_DO_IT    => nbd_start_device_ioctl, nbd can receive IO
+task A: ioctl NBD_SET_SOCK => task_setup == A, so racer can happend with
+concurrent IO!
+
+This patch is misleading, please disregard it. Sorry once again.
+
+> 
+> 3. nbd_genl_reconfigure() does not call nbd_add_socket() at all; it
+>     uses nbd_reconnect_socket() which replaces a dead socket in-place
+>     without reallocating config->socks.
+> 
+> Therefore the freeze/unfreeze provides no actual protection in any
+> reachable code path, while imposing the cost of blk_mq_freeze_queue
+> (percpu_ref_kill + RCU grace period wait + percpu_ref_resurrect) on
+> every socket addition during device setup[1].
+> 
+> Revert the change to eliminate the unnecessary overhead.
+> 
+> Link: https://lore.kernel.org/all/20260327091223.4147956-1-leo.lilong@huaweicloud.com/ [1]
+> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 > ---
->  drivers/block/zram/zram_drv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   drivers/block/nbd.c | 11 +----------
+>   1 file changed, 1 insertion(+), 10 deletions(-)
 > 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index aebc710f0d6a..b23a8bbb687c 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -2333,7 +2333,7 @@ static int zram_bvec_write_partial(struct zram *zram, struct bio_vec *bvec,
->  	if (!page)
->  		return -ENOMEM;
->  
-> -	ret = zram_read_page(zram, page, index, bio);
-> +	ret = zram_read_page(zram, page, index, NULL);
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index fe63f3c55d0d..9033d996c9a9 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1245,22 +1245,16 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+>   	struct socket *sock;
+>   	struct nbd_sock **socks;
+>   	struct nbd_sock *nsock;
+> -	unsigned int memflags;
+>   	int err;
+>   
+>   	/* Arg will be cast to int, check it to avoid overflow */
+>   	if (arg > INT_MAX)
+>   		return -EINVAL;
+> +
+>   	sock = nbd_get_socket(nbd, arg, &err);
+>   	if (!sock)
+>   		return err;
+>   
+> -	/*
+> -	 * We need to make sure we don't get any errant requests while we're
+> -	 * reallocating the ->socks array.
+> -	 */
+> -	memflags = blk_mq_freeze_queue(nbd->disk->queue);
+> -
+>   	if (!netlink && !nbd->task_setup &&
+>   	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
+>   		nbd->task_setup = current;
+> @@ -1300,12 +1294,9 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+>   	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
+>   	socks[config->num_connections++] = nsock;
+>   	atomic_inc(&config->live_connections);
+> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
+> -
+>   	return 0;
+>   
+>   put_socket:
+> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
+>   	sockfd_put(sock);
+>   	return err;
+>   }
 
-Sounds like zram_bvec_write_partial() doesn't need bio parameter then?
