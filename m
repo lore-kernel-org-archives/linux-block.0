@@ -1,114 +1,73 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAFC2472A6
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 06:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164881A5B9E;
+	Wed, 27 May 2026 06:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779862545; cv=none; b=KhjJJ8aEbsLSM/mNn7lbA1T0KoFzSmdEYqwYxBfClcGwt9e4MAx2AIlwo70l3YihNxrDHlE0TErMXrQ5+fHxXDaJNe7Bil3pEBfujj5muS50EhchJICFH/y+5j4R+HJeo9MkCHzlQfQ+tQtKDVXAh7fGWwxcYShbW2L+PVF9gKg=
+	t=1779862955; cv=none; b=PykIXNpYgzRmfJZTgoWkADKEWLiEX+UfTntueS0Nsqyzsfs1UoPRsDuDQ2y54DkrlLhHpMCur8+ir5NVj8TVzw8/KTwt2IW2JgahRWIyBNXlSeOYdpqzmTSfVtzWs99gvXaP0tHgbGALw2VUTjcQlt091cnQ/1AHUJnfTE8cybc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779862545; c=relaxed/simple;
-	bh=mgLZGOA0JXHJ91P7CePp8AAmpR2BAMBHXxABH0eCzoM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JVY8RlixoTTH42zKCJGTdwtXIjl+LCENJ1bDh5H9ZTyXoz7Y0x1WN/mIRxVKmSoUPSwrI3hGTZydAdNmzMqdsitGVsky/XN/Cw/DB3q3DWwnkpFan5of5rhMOQy6fk588i3PuidtGBKJkAtkpA+2QedN5E6jamfn1rhjSbgvBRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I3hDHzw6; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1779862955; c=relaxed/simple;
+	bh=D6qiNKtozgv1ru63gwq6prIRdKT/tXSlog/V7cAwdbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JHCTMdVkFaBrGACWzg6YXVTgeiCZhZUykCD/9aSRObEgVDrktcGNrmz3zAAXfoSiZgfH0SNn/Iob/vqCRQxWeoXRmfUS6GPW3RjxxNQnApyia87emQXVV95uWgt76s3zTrvO5FIGb7ADhSBVTW7ZNU8Md8giYXmTEFtpwQYDNWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RCtA/4X1; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I3hDHzw6"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64QL4dU3735816;
-	Wed, 27 May 2026 06:15:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=wQaBgm
-	+w2IN+RG3ZCaGq5IQks1UT8XqVIkBR1qHuMbU=; b=I3hDHzw6OV1tCexnJhZFY6
-	fXd+wKRT24kGiJFIBhZi9+X98KP/ZlGoqoCkxPQORZ5emLc58jqkQrt3tP/Wu+d/
-	C7vGu1S+ueKFWuvHLNnAGkwhECFg+vecHVg+670qsWeu/1r9ZBeQX9HY9q8YVcvz
-	hPR8S3AFo25H503YTC484luEmuQU3mfuC0qULI7xeWRV91BC9fmNplF3zV1jrgng
-	eAteseWhgDBJuURiHjn+Nb1pWETsTohMfpXRO5M9dQfcPKgktDBeHE/SMcOJgKHu
-	/NB/vLFVwK/UOVFQ8o7liNE2JTn0aTXyH4Z7jcmrLzkRgcHUzmVb1A+AegM7HsaA
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4eb4nc6nvx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 May 2026 06:15:35 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 64R69C0E030435;
-	Wed, 27 May 2026 06:15:34 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4edjrb1nbx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 May 2026 06:15:34 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 64R6FYmi4588034
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 27 May 2026 06:15:34 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 349BD58055;
-	Wed, 27 May 2026 06:15:34 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0E3E65803F;
-	Wed, 27 May 2026 06:15:32 +0000 (GMT)
-Received: from [9.123.7.57] (unknown [9.123.7.57])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 27 May 2026 06:15:31 +0000 (GMT)
-Message-ID: <2a604079-2fcf-493b-a514-9f351badbada@linux.ibm.com>
-Date: Wed, 27 May 2026 11:45:30 +0530
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RCtA/4X1"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=sIgn2pTb2lMuNpwxC9YljPb7qAqonpElKjgih7wuKeA=; b=RCtA/4X1G26+BLIr7I/PYFUdTY
+	8uwJSaRlcCbSxn5XSr8N3Lm5+OkQnR/gXCK2Y3Ci/F0aRBZJmf+XF/eobnpq3pSiRdqITeARtvojH
+	n1WpNWosatSSsRkpQ0+gSgqLNTKZIyRQ0jgsvvLCiQABS8wGJRm+BpILb4o2JYoPE07e3rHohQAMY
+	HJoHTan4Tyn8ET+0TQe9K7K+V9XbTPCaCrprD0U6vrgPJCpHsnk0WB69CWV+AuF6YzlC6/B5ib7v/
+	EfMuLlBdUbzrvw3rFuAm7EVsmJsqVDQfg6Te1WX7VlhRLIM+PPs4vqi4NeCGgjrl1UpSRMYGm2K8F
+	hquiZvTg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wS7ev-00000003OVG-3fl4;
+	Wed, 27 May 2026 06:22:29 +0000
+Date: Tue, 26 May 2026 23:22:29 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-mm@kvack.org,
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH] block: Add bvec_folio()
+Message-ID: <ahaNpbG15d6StT9d@infradead.org>
+References: <20260522182122.2489391-1-willy@infradead.org>
+ <ahPm4h2gKgyEEuvV@infradead.org>
+ <ahROtyLcr567wM8l@casper.infradead.org>
+ <ahVBCtsodsM2FHis@infradead.org>
+ <ahXcsrxUFfzoVCOr@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 2/2] nvme: add support multipath passthrough iostats
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Cc: axboe@kernel.dk, hch@lst.de, Keith Busch <kbusch@kernel.org>
-References: <20260526153921.2402015-1-kbusch@meta.com>
- <20260526153921.2402015-3-kbusch@meta.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20260526153921.2402015-3-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=VvYTxe2n c=1 sm=1 tr=0 ts=6a168c07 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=FLEIk54Q6ZzNztR9B-4A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 73zkKmA_qBLjSMqdDprZUPTbRwAbIBCn
-X-Proofpoint-GUID: 73zkKmA_qBLjSMqdDprZUPTbRwAbIBCn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI3MDA1NyBTYWx0ZWRfX80VLGnnV+qSb
- o3S5QTk8T1gZYwn06y35K+n6ZR+CVJ9Afwm4fj2ljKrxZLiLoLMAYianaVCxt453CxbQvYV65nz
- SU1K4UUE8l2iOxJzKka91HAZx1kKOpyJwNZEPPnr2ucXFqxQQteCGYnLXVbRna0NY9V8KPpZKu/
- VkjDNKkSn7+jvY0bb9/CecYz6KkLPkCeLQTLWlYgoeB5jFiPmwg5HdPeDoqxJwIaMqRcxHrfOyH
- PqZnbxgethetgkHtPDEMz03E0YJzdpe+650ATWbflf0endtPpCE1AfTSOABQk73EqoNLBvZdiM5
- Aqa56xqZ1zu5wjyZrNCXZyIzMe8EsNvmCh03lzs3VvMRC2dIduWz29X8vqJkJX13t7eO7fGxBRr
- +c/xjkCc0GRf8nxy3Wz42ciTWM0ZWuXncE3KFnACZu40Rqm+eoKx+0KHTX2zlPSiAmXs3bqSZ7v
- bRhPjXnqZZXhLHiBceA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-05-26_05,2026-05-26_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 priorityscore=1501 spamscore=0 adultscore=0
- lowpriorityscore=0 malwarescore=0 impostorscore=0 clxscore=1015 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605270057
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ahXcsrxUFfzoVCOr@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 5/26/26 9:09 PM, Keith Busch wrote:
-> From: Keith Busch<kbusch@kernel.org>
+On Tue, May 26, 2026 at 06:47:30PM +0100, Matthew Wilcox wrote:
+> How about:
 > 
-> Don't skip io accounting for passthrough commands if the user enabled
-> tracking these.
-> 
-> Signed-off-by: Keith Busch<kbusch@kernel.org>
-> ---
->   drivers/nvme/host/ioctl.c     | 4 ++++
->   drivers/nvme/host/multipath.c | 5 ++++-
->   2 files changed, 8 insertions(+), 1 deletion(-)
+> /**
+>  * bvec_folio - Return the first folio referenced by this bvec
+>  * @bv: bvec to access
+>  *
+>  * bvecs can contain non-folio memory, so this should only be called by
+>  * the creator of the bvec; drivers have no business looking at the owner
+>  * of the memory.  It may not even be the right interface for the caller
+>  * to use as bvecs can span multiple folios.  You may be better off using
+>  * something like bio_for_each_folio_all() which iterates over all folios.
+>  */
 
-Looks good to me.
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Sounds good, although I'd captialize the first word in the sentence.
+(Not that anyone should follow my spelling advice in general)
+
