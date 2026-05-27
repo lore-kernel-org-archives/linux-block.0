@@ -1,137 +1,150 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E95282F00
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 00:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779843233; cv=pass; b=aZ8Tp96flVVKD07Z7uhRISMlJDMDxTdu1v3b2AM93wxV+yEpwkTt3lJqFhRqKARHn+5eKyLsyvBZmuasRf0qBWcWmeJhhS5WMFex1Usrt9L65CJLXeVvRnwiJKMqlwqqVsLvRU8m049OJAU2wCcE8adRdF+1tC4EAahMgjneFE4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779843233; c=relaxed/simple;
-	bh=jEtZmW4iI6jIA3bRzN5kt8WozNPOZTcP4Cfigf1mbUA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u7e30qB9sQc/rYNd6TSsftPx4qPGp8lo9jKcfR3bTWe/r2zN5D63gnDO7MFw2DANpVd1gZYEgO3SMdGJjX0rcyxQ+PdrRWAu6YFC0dcF4GcgxZ5JDurw3mhWCoqWFxKKilSBfAv2d+Hl9+FtoTkxxyXR+KQtzYLEpiZ5sRAln+8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O7tM1C8y; arc=pass smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4831E8320
+	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 01:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779844817; cv=none; b=HkCyjyNC8WN7N5kJnVQJ7W3+yvi46D7M4VCOcJoUT6GsL5n57XapnxFoTD3AePAI3ReOaDQWqY6iP8kl94VB93THntJ0hMaXF+aTswhl/9TMZzB/shvlAXckqYcDSV2d2XxpBVF1unbIWIfamOvnWWO3rU3go9eBB8e7YrUkTf4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779844817; c=relaxed/simple;
+	bh=zZFnGIBULEQhg8FFEYFwPaffueN2j/MQSoOCifUrvdE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dZwXLbnrP/YZFDK2+Z9rgDq33d57Maa/1xqwQj+ya5FozDzOf8386rTUA027eeB3YvwOJ2iRNICOWnYkxvn3/OX9M9648SnYde6KQZX17QXXrIAmU88VP1UVssPuadcLjiVispr2HOhgIId/xY5nZxLoN+ZtmEXCRUXsNfkAenM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WLZ1PPS9; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7tM1C8y"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-4854d5cc708so3475521b6e.2
-        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 17:53:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779843231; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ZGzvmsEXkrDJGe+WfzgFf0qzyz9G4bxsflfk+l1rbNMglf+vKkivbgkzDzkP1g/ppH
-         VA3FquIhCIgPYLRTqJGALbAVu5hEhLsy4s9NopM3Hiw4iAF2uWADzqYvDWSOjb6aTpq7
-         YewZux0f4UMNtxcsQh0DpuV0EFwXLKvOXRqTOkbCLuTHkL+pz4Gh8AJKxPk7I5b1eIqr
-         N59709dGsUrhVmoysLYdTA4FELe2MlfANCCtmpcvug7BDrg02JI32mPEQNwoYGhna7GL
-         E8HHwETujlnMTDSXzNZhMcsm+YRJ729GD6Rh3tNJWmZxj5ARHogn+j/KrBlcHcbTA3dM
-         LxGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Euoe+8m92aVED3ZbjaeLfTLUepBkVK5+E3xInzeEleI=;
-        fh=/5bdictZxk31Dc7ysuy6D6fWhC1lon+ivvRzck7hXMI=;
-        b=e11TDA1ynsYgDenjAP3n2Phrh6xhqk42BFFKyxqZg81zvGDA79miZO0Q9foEDBJVYF
-         Iuf5d6DIuDyaLrc7W6oVqPUMPOlpBLWqPe/8HAS6dbNgNHPNFWfyDrHNfqsW+DnbnRgb
-         YuD5shB0GO25keAaPi1g1nr5YHGDSyBiEfaupOCzRLHN9CkU27MkFK8F7Le2O6Vfov11
-         4X0gqhMGvVOALp3WM8oon7Y4H71xhNKZnrDL/rkSD5+wPqRQ4EtKoDRV53f9EhjJkoes
-         VXAqCZVw53f8yhPs/e8/0nLXPrdgq96Gao3PJ8bIQgp+Yh1KSkCEPCK8N1Elq5Tera7q
-         GGhQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WLZ1PPS9"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-516e1525aa3so42580921cf.3
+        for <linux-block@vger.kernel.org>; Tue, 26 May 2026 18:20:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779843231; x=1780448031; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Euoe+8m92aVED3ZbjaeLfTLUepBkVK5+E3xInzeEleI=;
-        b=O7tM1C8y0BNd2YbRNorvnWxTci4+vJzFk8hn+hOrHZ/ToK8fSmiz/7YH4mrq1sxZzq
-         rxq5P4UV6TU0gfiKcQIPjDr8N+XK6gYeIRa6eSmICv+YJZbtjsUZmV3UpcVjv8YKp9VT
-         p8k+k82VSOi7fg5VRq6VSDVLlSWl8ki/BIC/u/wsPniLHuZxzjRJS6nbiSrS0Wb9bkTq
-         D4xC3r3A5wxpsW+imZsDduSFSJWFeIubMixJ30sbcDdkBnbm9AFaY3DxwPniQJUL6Gpm
-         LVd0a4Hg1WI12ibfH8JkdLSmLbToRsbPK0x/h9TtTS1/DwzIUciFf0Rua4A+zeG2OwRK
-         yhuw==
+        d=gmail.com; s=20251104; t=1779844815; x=1780449615; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mlmC4XR4gxPVFC+3IrEsRTTaSk3Dm8cvG0pTcfli6zg=;
+        b=WLZ1PPS9k9IZrVn25H8e/ZPMAKqINazlPctdkjlpPnSayPqfBE7WGPuIKzPx9d0bio
+         8W62l78jxUQCBctHFNX2b9ASP2/8TWSkMyhYYX/MwMs9t9TiAsl/u+IG0IXlQJf3DDhM
+         S5Q1u1yRuzeRCQop12INnlvBMnZh1f16IAOo4YgWJYbHHNi5iEi3JI3mlsVQ5Cx9M83p
+         v3IbJAoadO/1bDkWt2eCkPrpr5pO02zqOOL67wT5s9I3ouniIQlkhyrUs94N3ZiAaqUr
+         RgpGIMGHB6Ev/UQktUX+3jG8u67iELUNX8Ntb2YaX1CqZRVvLbjMFELXP8b40rO1zzCh
+         nXjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779843231; x=1780448031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Euoe+8m92aVED3ZbjaeLfTLUepBkVK5+E3xInzeEleI=;
-        b=cPUzVFaM+79XLVcp7tYhzpqyRrbtt5/yyMov2a/RT1btX0PKjSojQQNjl9nDL9Ljy8
-         WupTCerPCmjkTw8AZhlY13Dwhwzj4+HVoNRKNzXyJxqhNZPnlnDnB84sLQ3kkSEusUi3
-         XMgSVChYHpujBaAZHuEHweBu4rEJPYq6wD7lb6TBeFXQlPGAz7+bZyQbE7DYU1zskaB+
-         YYTzQUL2rS3WLqRsnBPPpbdEBfU/6dgkqkPjHhBFQ7Ay81+BeU8x3NrIqef36JTgfqCo
-         XhF4gHqo3tjZmX09yETj0edrfvJpKTA09/1UWSz4G4IIqDLo6ARfCFjz5MfT46/UCZg+
-         1zfQ==
-X-Gm-Message-State: AOJu0YyJlV4N54PRpN7VEBUkP/g2Rk0Kc218GkE4qDQsyfKD9BqzN+Ju
-	uYnefjoguYwyq34KbZjE/r3vVmw2JNvV20/G1xQ50YS8jPcsQ6kDL7wzrjwVb0pRRbQ4WQae06f
-	plqC+oCAGPnxA4l0u9oqzAxmssEdgMDk=
-X-Gm-Gg: Acq92OGC0XZ8Od+tQWLxtPc/Nt80s0pxp3W5OYRApMS/qerWAwRomYVcWeUKemfNtdN
-	QUWqhncXuVMRgI/AXo4cd1kwARV3LNJLVtfOieocbbRfGaftg1WTvQBJFmLwsi9ZnPPlniq5ae/
-	zZ49OIojRJNMSw8MskUi+l5tqylA9KaCPjWOGCL27LVte//Z/IthyYOtKHRrqsTn9Rby9hunO2W
-	YX9KoxyW/XaQrsg+8ihKtd1CnA0WumhDoI/5hGeBLgo8ZHO+Su0PqDhMjSdd+qEt11N+z6Ge6Vp
-	uqonJ/KQFuPCf8wEVJDrWPCTQgfIktTnRezx2xiVbPX1YYD+vui19RJf4HL7K5alq4gmGd0rGxe
-	i1KHXVXb7mOVO4CEhOA==
-X-Received: by 2002:a05:6808:190f:b0:484:bbd2:850f with SMTP id
- 5614622812f47-4854a3f9656mr11904040b6e.27.1779843230914; Tue, 26 May 2026
- 17:53:50 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1779844815; x=1780449615;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mlmC4XR4gxPVFC+3IrEsRTTaSk3Dm8cvG0pTcfli6zg=;
+        b=mofS7xNDua1cwsscLMhDhDbIlzjfMbxlel5O9IQdiVYVl5H0TrGm1wsJyhgd8amki1
+         8JSGBNXk4aHrIzy84t4nRtG4lGPVESRFbF3/otrCDSDUyVxs9cxZYhk/EWzkzP4Ak9cI
+         3mYsMXQB5ts4aUMRoDiMHE5J6gZV157VV3GmiFjavkLFHwmytQ3RbpVOqrOn37ZDOfpq
+         1nLUHoUT3vgBtO3B+7Ew4FpVWYCPbCHe2auL2D87LiMBy1E/LlbthPVt1Y+hMgnMScxi
+         hZ/SNZkwcOWEr2L5lQf4vil8hWnZx7fy6+hVjwKjt31P4mP+KXBHhj3Wb/y/4X1uScYR
+         q7xA==
+X-Forwarded-Encrypted: i=1; AFNElJ9fx3SmpU0FJ5lEp3q8CrYKyO80Iy6kyv/4BB94B2ACBFmzp0scm6C06krH2FB38UA7rWcAfrYFJy7h5w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGWaFj/JnsI6dfoG4TDvrvOgVkZYVESWyGiAxOQpZKYFl/4sAB
+	bmOtad9XPG7aZLDgBrFY70ElCXlThaQPgNtP+vpNb6CFKOsyLPEIoBzIk11nwF0j
+X-Gm-Gg: Acq92OGp14uV3q/P4IF+wUPBdpuQetzfrnquPLychEB/b47ekG+03/Of3Pxb9D9S3eg
+	VzjKnDFTxmAwAv601QqQHkipkBttSpqyrNDbEY/jRdVo/o0xW8MaWEs//dY6Hyo1+hzIzMRvpes
+	oabdwCAV9wFJYttKI1ZzmvduZTkK+vLGwFHbCerDpzj5WdkdoeX4t+uTNvtY6HetcE3k5NDX7ST
+	rLkxV3AaktY/0xFOFRcBySKF1DXcoqI1CgJsbNEIzTuZlt2VvKVlIxgp/AjR92hdi8iKl3NV4js
+	vFibkGk2AbqsEF7JDq8KpxEHoIR2zTJ+QwElueojB71nczv1c1KnXrKd2gzcvSPHxxTB0B5FCru
+	/gENmqweexUVbwRfZYcqlPf7cmN3PFjlLT1Cl0Zat8W4LUptqhODBmJIdxt5aX5B+Yn4TE5HOEE
+	NX9Ab9y91rTQE9dbkD/TQ0qleCivejPf2+UQVpQ+JY6xFAGx+161YzhkGG/QKPOfUx3GPKoOCPT
+	gIYRryRD21txFGx5MBxqVRLTipHpOlJiSGUNaLcBdE=
+X-Received: by 2002:ac8:7e93:0:b0:50d:66b6:1564 with SMTP id d75a77b69052e-516d42e4250mr296025671cf.14.1779844814473;
+        Tue, 26 May 2026 18:20:14 -0700 (PDT)
+Received: from fedora ([172.245.82.59])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-51706af1328sm35061051cf.20.2026.05.26.18.20.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 May 2026 18:20:14 -0700 (PDT)
+Date: Tue, 26 May 2026 20:20:06 -0500
+From: Ming Lei <tom.leiming@gmail.com>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>
+Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
+Message-ID: <ahZGxoI6oHQ_vSrx@fedora>
+References: <20260518174013.4b72dd50a5bcb89daaed1f62@linux-foundation.org>
+ <d43125ff-cc66-49b7-b16d-1b2650c68c23@I-love.SAKURA.ne.jp>
+ <ag0lS_CbKO9R5CV8@fedora>
+ <94076bc9-2c09-4bb6-8468-b6b8af419cb9@I-love.SAKURA.ne.jp>
+ <ag1nfIFcykmQHbkk@fedora>
+ <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp>
+ <ag1223nAa0wZ8ALC@fedora>
+ <fda8abc8-6aa2-463b-bf72-865f6b838034@I-love.SAKURA.ne.jp>
+ <ahRocb0Vs_m6RF_O@fedora>
+ <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260526153531.2365935-1-kbusch@meta.com>
-In-Reply-To: <20260526153531.2365935-1-kbusch@meta.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Tue, 26 May 2026 19:53:39 -0500
-X-Gm-Features: AVHnY4LBMVm4MDKwk7VD2JmizIpy3TnfwyqlZBtBUa4c9ZoAIdLdLp6YGHB8D64
-Message-ID: <CACVXFVNZsA4HzeHX9cbZU3=Y6ss1jATTFSK_6JO=aygxaZgu3Q@mail.gmail.com>
-Subject: Re: [PATCHv2] blk-mq: reinsert cached request to the list
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, 
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp>
 
-On Tue, May 26, 2026 at 10:35=E2=80=AFAM Keith Busch <kbusch@meta.com> wrot=
-e:
->
-> From: Keith Busch <kbusch@kernel.org>
->
-> A previous commit removed an optimization out of caution for a scenario
-> that turns out not to be real: all the "queue_exit" goto's are safe to
-> reinsert the request into the cached_rq's plug list as they are either
-> from a non-blocking path, or a successful merge that already holds the
-> queue reference. This optimization is most needed for small sequential
-> workloads that successfully merge into larger requests.
->
-> Fixes: dc278e9bf2b9 ("blk-mq: pop cached request if it is usable")
-> Suggested-by: Ming Lei <tom.leiming@gmail.com>
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
-> v1->v2:
->
->   Actually use the correct rq_list function to return the rq to the
->   list.
->
->  block/blk-mq.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 28c2d931e75ea..a24175441380e 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3246,7 +3246,7 @@ void blk_mq_submit_bio(struct bio *bio)
->         if (!rq)
->                 blk_queue_exit(q);
->         else
-> -               blk_mq_free_request(rq);
-> +               rq_list_add_head(&plug->cached_rqs, rq);
->  }
+On Tue, May 26, 2026 at 09:25:30AM +0900, Tetsuo Handa wrote:
+> On 2026/05/26 0:19, Ming Lei wrote:
+> > On Mon, May 25, 2026 at 12:40:19PM +0900, Tetsuo Handa wrote:
+> >> Some commit which was merged in the merge window for 7.1 broke the loop
+> >> driver; a race window where lo_release() clears the backing file via
+> >> __loop_clr_fd() despite some I/O requests are pending was introduced [1][2].
+> >>
+> >> The exact commit which changed the behavior is not known due to lack of
+> >> reproducer and timing dependent behavior, but it seems that we need to
+> >> solve this problem in the loop driver despite there was no change for the
+> >> loop driver during this merge window.
+> >>
+> >> To close this race, try to flush pending I/O requests. However, calling
+> >> drain_workqueue() from __loop_clr_fd() with disk->open_mutex held causes
+> >> lockdep warnings [3][4]. We need to flush pending I/O requests without
+> >> disk->open_mutex held.
+> > 
+> > No, please don't workaround before root cause.
+> > 
+> > No proof shows that the issue is in block layer or loop driver, the IO isn't
+> > expected, you need to figure out why btrfs still issues IO after this loop
+> > disk is closed by everyone and writeback is done.
+> > 
+> > https://syzkaller.appspot.com/x/log.txt?x=101e4702580000
+> > 
+> 
+> Of course we should try to figure out the root cause first, but how can we do?
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+Definitely unexpected write IO(after umount & loop closed) from btrfs is more serious,
+which may cause data loss, so CC btrfs list and maintainer.
+
+...
+ 
+> Possible approaches for finding the exact commit that is causing this problem:
+> 
+>   (a) Revert all changes in the block layer from linux.git and monitor for one week for whether this
+>       problem is still happening (because linux.git is more frequently hitting this problem than
+>       linux-next.git ).
+> 
+>   (b) Revert all changes in the block layer from linux-next.git and monitor for two weeks for
+>       whether this problem is still happening (less reliable than linux.git but a candidate).
+> 
+>   (c) Let sashiko review all changes between v7.0 and v7.1 that may cause this problem.
+>       (Human developers have no time to review. But is investigation with moving baseline commit
+>       possible for sashiko ?)
+> 
+>   (d) Any ideas?
+> 
+> P.S. Since the loop driver is a critical infrastructure for testing filesystems by syzbot,
+> I want this problem be addressed before 7.1 is released.
+
+syzbot is for finding real problem, here the real trouble is unexpected write IO from btrfs.
+
+So please do not try to paper over real bug by 'fixing' loop.
+
 
 Thanks,
-Ming Lei
+Ming
