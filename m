@@ -1,43 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C477B39150A
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 15:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB3837B016
+	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 15:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779895263; cv=none; b=IMvCCFepIXm/vlk2mCASki78cJzhnxWzTnNj2JN9+M1WdPRG5/HXB9e/bIFQyj1BF3TI1U/jGFsdx0cWi+wjQRjLBIQ5EHL/Avx7DwNum8XekscnxhMUNC8tDdRZCzNTi0sCSRZIXsUtKYxG1i9BCoW5O66ixt3W7YArpRrnWWo=
+	t=1779895681; cv=none; b=G8iisuO28dVjPoqdinh9qrB6gN5IYbC98wgBcM8ebaya1iY2aev4YA2dboggkh6NOlqtY2Ne45EPmmm+3Lr6kSdbgz3uPbeCPp1Vl5E+xTb6XHvMSfnZ5TdHtzi7joBHQeBdZAgW2+ciW/jggrMrMCk/20AcBFDob1Wcpysja6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779895263; c=relaxed/simple;
-	bh=G+9kNBEnQQiUQKQrn70RNh1jIXrgf6susxumBtOBe/4=;
+	s=arc-20240116; t=1779895681; c=relaxed/simple;
+	bh=yaF0/MGGRTEj1imgWupXLNVzXV1O7b9kuPu2JTQddOM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SGCWS05rNKd+IYyEd5lM0f7JuHLOb5JMU9+hh7LHvKhnyAwNXAjQE1ZX727b2ksnZIZnBOdDUMrG6nuwuZC+3kjWmca6P7bpPXWRN/C6r4m7sFYF6FXyMihV7pyVWCO8hhrv6x/iW9LX1C3VcWGHZqwfNqpO5AI5v1k9YhD3phE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q7ctsfOM; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=YT2T/BKm5zetgoD5hxJ7ntJ6ND5ZqMrL2VIB/jNVBFXy6x9CbwZbzZ+k+Pd+0Gk0356KVgDJRtHC5YCrk4qQ95KjzejlpjvMeLSi7qBMBYAI8tBsFSWycI9WLlc2xZEmsz6tb8HK4HV++nD23CV5VeNYaan+44wiRoUmcnAyHsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XuMntUYO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q7ctsfOM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1492F1F000E9;
-	Wed, 27 May 2026 15:21:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XuMntUYO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 096391F000E9;
+	Wed, 27 May 2026 15:27:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779895262;
-	bh=2kDOEHTAVXsJ8p+1XJC3siM1N1XJmdh0X1046Pwc3ZI=;
+	s=k20260515; t=1779895680;
+	bh=yaF0/MGGRTEj1imgWupXLNVzXV1O7b9kuPu2JTQddOM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Q7ctsfOMOJm7A45J6fWGrWpuJjRLzTlQW1CgUT32VVkgLo79uHsvZ8gC6wWVcYg1j
-	 kbRhxueEE3D1nVJLSnZAn4lVgAN0fsOvrbcnWUcMqAsp1XfWSaVxzFCxQAUV0LO1T6
-	 yyelRFRkg6ZKDu+8Y3jlY+S/z7yeo/QMUEkqj0AS07ERBLihDqf7b4fDo2iFACqsjI
-	 nswJ9s+nMkU14lPgKVtbxqjn+15eYqDVGjjmA7Eq1PT/J8+6fAK+p7S2+2Jo8ArdLW
-	 2IFMHq1cpw5lwLPswjLvba1i0qFsfuY4fxWxbm5Q3CpmNt7E9GkH7HE6vdo4ZurNr9
-	 lre4BGLZu/rAw==
-Date: Wed, 27 May 2026 09:21:00 -0600
+	b=XuMntUYOJqdjIOXcFtuHx8vTau+gWZocyoiW0rYiOGwTHrmtMqorzoeTzXCtLJKt4
+	 Q5b8HDkb/VTS0TGEUmoCjb6Ri9gzHZW7AEB5olg5Gf6w3kCET0wznB7mumvwod3HDB
+	 3uyyAJULQB0v4049swOYwSet+jNEcLzrBLkUiRt3K9b5AgR5cKku/x4zJLNwZ/As5F
+	 JHJTlVc/UqRZyLWDPrLlqTCqEZlKG+lrTKq5XGTvMkgXK+837z0BWOGvYqt8o7m6kE
+	 jAzX1jVb19wtffQr9VljnTaZCFoWU8FMFZlqfLMJV2f7IWLC/drR2nSEqHxOPZ6ewU
+	 A1e4lzZ4+sSUA==
+Date: Wed, 27 May 2026 09:27:58 -0600
 From: Keith Busch <kbusch@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 3/3] bvec: make the bvec_iter helpers inline functions
-Message-ID: <ahcL3GaCxRoPnPBT@kbusch-mbp>
-References: <20260527151043.2349900-1-hch@lst.de>
- <20260527151043.2349900-4-hch@lst.de>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: add a bio_endio_status helper
+Message-ID: <ahcNfoJ2yulW4L1l@kbusch-mbp>
+References: <20260527151247.2352145-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,15 +41,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260527151043.2349900-4-hch@lst.de>
+In-Reply-To: <20260527151247.2352145-1-hch@lst.de>
 
-On Wed, May 27, 2026 at 05:10:22PM +0200, Christoph Hellwig wrote:
-> The macros are impossible to follow due to the lack of visual type
-> information and all the braces.  Replace them with inline helpers to
-> improve on that.  Because the calling conventions are a bit problematic
-> with a lot of passing structures by value, all the helpers are marked
-> as __always_inline so that they are force inlined.
+On Wed, May 27, 2026 at 05:12:47PM +0200, Christoph Hellwig wrote:
+> Add a helper that sets bi_status and call bio_endio() as that is a very
+> common pattern and convert the core block code over to it.
 
-Looks good.
+Thanks, this looks good.
 
 Reviewed-by: Keith Busch <kbusch@kernel.org>
