@@ -1,150 +1,131 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DD43C9891
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 12:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779885863; cv=pass; b=m7ufXGtDGHimSp7oBak1wd4SZusolfDSGt84WxAI55auZWgJ0s13L/trPfP8a86atTBhfcri5ets7bpIcLel6dgkSIJZkuSNxQirf/x6YiC1xW0sE/164PbY4jCJX7key+tM/KvLCnXXJs1V9oKCKHXx07B30ZGW2SrQrrBDp/Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779885863; c=relaxed/simple;
-	bh=rKGbXXnRzWeaQEyHC0cf0kemgdpBvit5j2YSNFR8sD0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ebya5Fo8eW4seQPFWK3ZdsO/1mihz+uYmiHjLQcSwZ8Mlyl9cErjXT5yBYkMD93/yrzK9MzhPakLLdYEEL6IRQrkD19X0X1DKv6cAazkX9dP6ppoXXv0kS+cD8A2iB7SrBKcC9t2hOEbBQakAtIHT2rt511yHk01jS0sPIWVC5Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=Rq96XAjY; arc=pass smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061033E9C0F;
+	Wed, 27 May 2026 13:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779886807; cv=none; b=UNxGueAL2ozg5zLp7D/Pij1HGi2stuJccxyrCcLDFrGny0Y7lBAzgiZdaGcGTP+HcBPjDErzIVP+NgjH2wQlh9g7+F/GwxwrSsOwgdZfQ+VKKFbJRdIf/Bxt7l/J6o4AWwpkGiAzJMiyH9vzLmvpIL687OUyoUkMirfZnbb4jAg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779886807; c=relaxed/simple;
+	bh=EBaps+i7LpVAFfaa4b8PPUb3GdkIkGVY4AM8X9+iX4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ee5rcvS1pphvcD2se/pX8NpkVGnMe5j+6IZ3S1XyMnmLi9HDfQZMKX/UbCO1IzablVXPk99JKF9AM/vG3OojEH0GrQhaBUr6Z6cxl46AISZlTtoEx9tWJyveqkpT/aOjfOwDhTwmgxQy/5k5mrdwlbieam/OhCGeiLWKY7Ne0X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KRj0xV6x; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="Rq96XAjY"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-393800f638bso86379791fa.1
-        for <linux-block@vger.kernel.org>; Wed, 27 May 2026 05:44:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1779885859; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VTO0TfBYIZmiVT7D0Spf0Cq4tahqNx7mfYP3mEjLzBMB6EMge8/5plO6bzMc2AR9po
-         QPnGusKxbfCfi8ZLhGYLJNPf7jnukv674TFhYCis/TokNpNzWLtFh6mHdyNG2Ds6nQvb
-         1xLctR/UIYXLgzY8nFcIOe//F/YEzd1hor2syVR1fcBEKcxm+4Zkz6xnY0itn9UIwWCD
-         qqtTqj0Gpc9nEnf2EfidORj3+jndZIsBR/tJ8OuayOjkTdZOHbkov5SOcUkicigw2Uvp
-         Xe1USjjzFlFpJNKnYrFbY/RAINZ/69MAiLrVbm76rn4N18d/0MXspX9RhQ/JYJA2bF54
-         cNKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qYq2RP7F78uUAT5YOZEmhrXVmYdKWobwZFZG/FoawmM=;
-        fh=yLNc1XidA814+sXQvhZiz4kF9KdVgIGZ2k2PcwTCG54=;
-        b=FzPupDH323nlWeC/7vkAz/0uq/Q/NCdfoUwdlP+LJtC1NbnNAZXN+umsmmTHweiv1J
-         0po8xMM0V9fS6N18D3j4XWXQOqvLcz7VIE8+lWbdnReb3CFCiV3kATDdRBTXr4C1fsA1
-         DH46U8EqJ6eSQgU4HFu9dI26eaDO0LDjTvFYeuecCWwv5TkDPAbcE4UlXJY8JZJDvHGD
-         HZaGZkHXo6Ko3xvrkd/eaYKTR+AllPheRB7NdPP3lrBLJlQ1gQ2UiCbnLPJyAOfWJZlx
-         A2PYBpDRXqMIz4qlhCXQDRtu/cosD/3B/v+8q2u9wPe5A+WgYg/0QtBL2K1M2gedkseO
-         Igmg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1779885859; x=1780490659; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qYq2RP7F78uUAT5YOZEmhrXVmYdKWobwZFZG/FoawmM=;
-        b=Rq96XAjYJ0bCmfwqWVKdMxj8UkueOC8qrqieEVn2pQIDXzhAf/6B3fzbc1AEegOkec
-         eaPiO3DDX9n/c2rWRwdt9R8ge2/sfBYaIXSmLGHs9ncjEhnAEdniuSbzADTDk/0U7FBG
-         z+oKYrzdi7EAdYdKKq3JFw5/vykWSRkFvbhusqi52uertqJXqR56CiIfE5A3Aa4OPxdh
-         +ZDto/1W0cdBwES+bNcq1pmyh3Yz3/oKkPV5GfaGQwjaCaHU8VjXPz5OQUHq8wnEYpg6
-         20HqOSJPReM3fpSOxMrbdPs33YnScokzQPKDXeThnFnXRuxqJ3WuikgkqYdASmM3OFbe
-         i+5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779885859; x=1780490659;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qYq2RP7F78uUAT5YOZEmhrXVmYdKWobwZFZG/FoawmM=;
-        b=BGuRK/24gJjIunTsWZqa4fSvrQyFSlYYJQRCtomd4WyDqex/IG9XX5JnvzvDKVb2Bh
-         5BUS06hoVsTwoPQ+RyDgoUYTzDP+IGfacK4OH3vjmjo549yKqjsMntchfYzeH1uq6jdb
-         D4qI/YJWtSMddcy17AVRnshbKSS/v8SZIGXP0DTNKwTy3w5KJayQHTKjXc+j07R0Ca62
-         0phhJfEV0b6TUFqD/6OxpOG6XRiCRFIfjg2RiOrIKAm7miPUry3cfSHUphokJa5b0tNO
-         WDOCJ/vFh2uCNXDtdxd1x8XKUDGILS2QRUcqlLiHAm0skFL01DFq2PsvnzhTX611jmRT
-         0Ngg==
-X-Gm-Message-State: AOJu0Ywcxljy6MJ98JhxNcUKfIgE3P5lNAEt/E+b9xzlanQc4j/MqdPU
-	qicmu1bvRyroiv4o2WEPEHdc8zjF4U7AX7qbX01ommUF8cSWsaTp1Z01rYK5HgENv36fLIqzhfx
-	3V2IqIgOV0XQ5GoyDauBop++5bBbec+8qregAnE/oNoD6oGLv+pEvpvJusA==
-X-Gm-Gg: Acq92OGFk/3H6O36Zg9qOxWQsiOB8l5ro1FbJcq6nBUSlDYp2A++DOphHMD3LmiCwtE
-	GE2C9YKwFmFvG1+FTisZh2XAwZktsPEZYWzr6Gtfh0au3gvfPvXIcYFdKSJfpyGnhleWj6VyE8c
-	xudGV9nUDorNcQm1wbkI3vBY/PasoctsXFoMtKWGp4uK5s1F7DThYjROEfHvzpj2j9bdLKGrShu
-	zuRdF1WY6faH2Bina97WWyrOn5RdipA/YZAYbFtyUfSVDEnAizMCgm7krUuBHN7PNgz+Z+vDSOl
-	sMJvX7rVYU2jtAIDLqr2cn67AnbGJt/uPVrGZjgCTLbjKkmI1w5AOXrDcqd/JzKq2BIQfoJVjlY
-	3Gr5dvmWH8MCJRC/XFjbjAV7vg/n06gQkcg==
-X-Received: by 2002:a05:651c:32d4:b0:38e:97c5:fe20 with SMTP id
- 38308e7fff4ca-395d8d8d349mr56711231fa.23.1779885859193; Wed, 27 May 2026
- 05:44:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KRj0xV6x"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=XSOTEpS6jnOnkKRCoQQoSeSU8dByk24sxPymLSbbGcE=; b=KRj0xV6xgukBl9D4xsqK6bZu1w
+	dlb6+dENOCzrPokyPEyMx/A/gnulxCC8Nx++F+gqtsSfg9ClXRpm31kYxour0RKhesUZlRvTUFuRd
+	19M6/F7BZYFc/d/YQVXxi2aRol6wjk4whwR16kRtSjpvF/JEF8P62hjtbSKs9ZYaGGLhnDdLMw5mL
+	/0fgeUmYAN+QGS97ENVQi4jvijWsfdJq5nO4yD9dVYRbOLO39dr4iA5+ulp8Sq/8WtiFXraw/grNl
+	j061BWxTakH+C5qFKHLDH5NrEG+CE7bdtola8Vdwh9FhPMYYePVoT2Ta0OQURkR/NFiZZXlYWpP79
+	cs+2kb4A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wSDrd-000000048vG-0eXC;
+	Wed, 27 May 2026 13:00:01 +0000
+Date: Wed, 27 May 2026 06:00:01 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Tal Zussman <tz2294@columbia.edu>,
+	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
+Subject: Re: [PATCH v6 1/4] block: add task-context bio completion
+ infrastructure
+Message-ID: <ahbq0RdUyLIPiItB@infradead.org>
+References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
+ <20260514-blk-dontcache-v6-1-782e2fa7477b@columbia.edu>
+ <agq2KRd8RkP1TAf5@infradead.org>
+ <ea1fa305-3ba2-4cfd-b7cb-86875032a300@columbia.edu>
+ <ahPbaSEoNA755Nt3@infradead.org>
+ <f1b8eeb6-2397-4f48-a21a-a023eb0c80ab@columbia.edu>
+ <rkb5oei6cx2erbyininczz6ukbnquqheexhu7tznn5rslkkdn7@b4kpdyhdwdb6>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260505074644.195453-1-haris.iqbal@ionos.com> <20260512103424.GR15586@unreal>
-In-Reply-To: <20260512103424.GR15586@unreal>
-From: Haris Iqbal <haris.iqbal@ionos.com>
-Date: Wed, 27 May 2026 14:44:08 +0200
-X-Gm-Features: AVHnY4JbIzKW-7wrGTUabsud434YAg-68Z5-lM-9PCK-aByORojgnGaXhVpogZs
-Message-ID: <CAJpMwyg-6Qxskq2ktuhvf46yD5848J9BYLMPPfBLjg2Uzs=xnw@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF RFC PATCH 00/13]
-To: Leon Romanovsky <leon@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, axboe@kernel.dk, bvanassche@acm.org, hch@lst.de, 
-	jgg@ziepe.ca, jinpu.wang@ionos.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <rkb5oei6cx2erbyininczz6ukbnquqheexhu7tznn5rslkkdn7@b4kpdyhdwdb6>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, May 12, 2026 at 12:34=E2=80=AFPM Leon Romanovsky <leon@kernel.org> =
-wrote:
->
-> On Tue, May 05, 2026 at 09:46:12AM +0200, Md Haris Iqbal wrote:
-> > Following a conversation with Bart yesterday, I am sending the RMR+BRMR
-> > code through patch for easier review.
-> >
-> > The patches apply over the for-next branch of the block tree over commi=
-t
-> > 07dfa981ca3
-> >
-> > For context,
-> > RMR (Reliable Multicast over RTRS) is a kernel module that provides
-> > active-active block-level replication over RDMA. It guarantees delivery
-> > of IO to a group of storage nodes and handles resynchronization of data
-> > directly between storage nodes without involving the compute client.
-> >
-> > BRMR (Block device over RMR) sits on top of RMR and exposes a standard
-> > Linux block device (/dev/brmrX) backed by an RMR pool. Together, RMR an=
-d
-> > BRMR provide a single-hop replication and resynchronization solution fo=
-r
-> > RDMA-connected storage clusters.
-> >
-> > My session is on Wednesday, at 12 in the storage room (Istanbul).
->
-> To summarize the discussion:
->
-> 1. Move as much logic as possible into the block layer; RDMA should serve
->    strictly as a transport.
-> 2. Identify another in=E2=80=91kernel user of this functionality, and add=
- support for
->    it if required. At least accommodate potential users elsewhere in the
->    kernel.
+On Wed, May 27, 2026 at 11:42:28AM +0200, Jan Kara wrote:
+> > I ran some experiments with fio on both XFS and a raw block device. Five
+> > iterations each for 60s. Results below.
+> > 
+> > TLDR: Removing the delay doesn't significantly decrease user-visible
+> > latency or otherwise improve performance, but does significantly reduce
+> > throughput and increase context switches in some workloads (e.g. C).
+> > I think it makes sense to leave the delay as-is. Thoughts?
+> 
+> Thanks for the test! One question below:
 
-Thanks for the summary Leon.
+Thanks from me as well!
 
-The main logic which handles multicast/replication legs, missed I/O
-tracking, re-synchronization, etc are the core parts of RMR.
-If we move those to a separate module, there won't be much left in
-RMR. RMR already uses RTRS from the RDMA subsystem as transport.
+> 
+> > Results:
+> > 
+> > Workloads (all `uncached=1`):
+> >   A: rw=write     bs=128k iodepth=1   ioengine=pvsync2     # XFS
+> >   B: rw=write     bs=128k iodepth=128 ioengine=io_uring    # XFS
+> >   C: rw=randwrite bs=4k   iodepth=32  ioengine=io_uring    # XFS
+> >   D: rw=rw 50/50  bs=64k  iodepth=32  ioengine=io_uring    # XFS
+> >   E: rw=write     bs=128k iodepth=128 ioengine=io_uring    # raw /dev/nvmeXn1
+> >   F: rw=write     bs=128k iodepth=128 numjobs=4
+> >      + vm.dirty_bytes=64MB, vm.dirty_background_bytes=32MB # XFS
+> > 
+> > Mean ± stddev across 5 iterations:
+> > 
+> >     metric                     delay=1           delay=0     delta
+> >     --------------------------------------------------------------
+> > 
+> >   A seq 128k qd1
+> >     BW (MB/s)                4333 ± 27         4374 ± 34     +0.9%
+> >     p99   (us)              36.2 ± 0.8        35.8 ± 0.4     -1.1%
+> >     p999  (us)               3260 ± 75         3228 ± 29     -1.0%
+> >     ctx-switches          184 k ± 59 k     3.68 M ± 65 k    +1903%
+> >     cs / io                0.09 ± 0.03       1.86 ± 0.03    +1888%
+> >     avg bios/run            80.4 ± 0.6         1.1 ± 0.0    -98.7%
+> 
+> So 1 jiffie delay is (with default HZ=1000) 1ms. That means for this load
+> the completion latency should be at least 1000us but your results show p99
+> latency of 36. What am I missing?
 
-Having said that, I am not against moving RMR out of the RDMA layer.
-It can serve as a reliable replication service/library for any other
-user in the kernel to use.
-Which subsystem (block or something else) would be a better fit then,
-can be discussed.
+Yes, this looks a bit odd.  Unless there's multiple threads submitting
+and somehow the completions get batched this should complete one
+bio at a time and be the worst case for the delay scheme.
 
-PS: Would this be a good candidate for a session/discussion in the upcoming=
- LPC?
+> >   C rand 4k qd32
+> >     BW (MB/s)               66.2 ± 0.8        44.6 ± 7.4    -32.7%
+> >     p99   (us)              8002 ± 174      17990 ± 6800   +124.8%
+> >     p999  (us)             11390 ± 554     31890 ± 11076   +180.0%
+> >     ctx-switches         3.67 M ± 45 k    3.59 M ± 106 k     -2.2%
+> >     cs / io                3.78 ± 0.04       5.62 ± 0.83    +48.7%
+> >     avg bios/run            32.3 ± 1.0         3.1 ± 0.3    -90.5%
+> 
+> I'm somewhat surprised how larger is the completion latency is here without
+> the delay. Is that due to a contention on local lock between the IO completion
+> interrupt and the worker? Or why is the completion latency so big here when
+> the case B with more IOs in flight, less bios per run, still had significantly
+> lower latency in the delay=0 case?
 
->
-> Thanks
+Note that in the past we had major problems with workqueue scheduling
+latency.  At some point these got mitigated a lot, but if they are back
+for this workload that might be one reason.
+
