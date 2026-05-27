@@ -1,155 +1,153 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011056.outbound.protection.outlook.com [52.101.62.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FDA2459DD
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 03:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779853963; cv=none; b=WKixVnbocSdsY5hCrmxFludb+RHl7MoPkJO5s9TEywXovMKZmEYzEHzEQpBln0pCA/fS/h1Gph2Lb5UNY1M1PBtAgJCUxdkaV0NSF8efOqwH3Xd+yfDa2Cq2290fFNQ3+p6WR2RgbLA28axPtUsRAXWxj9Xtl0fYiiyYM9ixX18=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779853963; c=relaxed/simple;
-	bh=dJXb19Osa1h+praf5iKuqDSE/LsePmEMFxH6RkgLnKY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=lnmAsYE/VJlIJT0IDvbEwgvwbPxiRSsKifkOc4c5LWITgr+aTkSqwzRPcEvmBXl+5t/ZIBf7XHAMdRLQgBTVEEMlEHBYHi+KVDgvXUwBgWr4uCZP+9Cs6miZMJeqtdAdCxTgOXTztDpvtqKt4uC5jzOGU+d8wTUdYcwFuZKzBzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=AgM1hy8A; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA6D2153D8;
+	Wed, 27 May 2026 04:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779854602; cv=fail; b=po5Z/ne5gCQIKl0NGc6Y/BsrJq3GDKYw7aAS9u3KB6gJEVMReQhR5KZ2AU36omI++gc3Gs6G1VUOZGtMkAxSqd8nShXTNLXUK37U80qc8arT2QrBw1xFFqgs+pUCWbE2E7w/Jt5lv6RQl0S/ntsOomIoGjlze631jrEyPsCuHnw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779854602; c=relaxed/simple;
+	bh=5qIfBDR79j9IqyIN6ONG1Lzp12mhSDReKSvMWIZ7HDs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WCKsqeA8oH6KCSlEgkzC77d+ShhXVPvPZ9Woq55hDXrcuRpUu7tCBNvRKqfEp9xhLj+PvZMrNQ0MDjf5wvc4gQzBpaR1AdufpKRRw70YuqGpWACkHYpmmNOv3i+Qrz/ZXEyBMFGucW9PieVAlkxXTS1rp5alcnuuuARQanRt9AY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WRnZ1lzz; arc=fail smtp.client-ip=52.101.62.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="AgM1hy8A"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=RB8V7hcKY/bxo8qZrnz1kBrq6dvXt64MiANiM1jN/qA=;
-	b=AgM1hy8AkkFrr7j7TZNENvgwImFMEhEgv5mp2KJPAojIU30hL4oyaDtM4+Fx+HfNGvXX5bZ4N
-	5349HlitP8quWKsCu0vUUqb7RiIk+x/rkyDbhhpFojiGSH+C/o/QgtEQ9m8PigfH7a5oW2iulK/
-	akXY3rPmSvGvQjb0A9SiMmg=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gQFqW2pb7znTWb;
-	Wed, 27 May 2026 11:44:39 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id A4A8940539;
-	Wed, 27 May 2026 11:52:36 +0800 (CST)
-Received: from [10.174.176.240] (10.174.176.240) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 27 May 2026 11:52:36 +0800
-Message-ID: <9bd7c679-b5b4-4274-95ba-f2e3da1a531e@huawei.com>
-Date: Wed, 27 May 2026 11:52:35 +0800
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WRnZ1lzz"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YJAz3296qsznGvLNnNV+fJoCuP1i+hLMm9dkbbo3TAuJtOIH55naHt4TwENxO7ecU89LSBG/vUR6JcEn4+s8vGdz1vdw1DJOqqSNU4ok/sqCFpSFJN7T3iIu4BiCJZ3VlviKBNu9E9nJH1bJgc5fhbQKpUHJuSzRzk47jshhnMVTnz5DVXTLdk0RkE+xgwzIo6hKfDH0w0nCld7wsZiuTaVaL3RvNGV3lie74vFOwAn1iKz/3e6dPHy30pKXkyLrxNQAP96xxV+CESkto8gBjczCveqGWCQyfEqDY7KFVVN/vl/7QW8cRpVVdeZmZPuy86x/OX3V4W5tcFmOUh83OQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5qIfBDR79j9IqyIN6ONG1Lzp12mhSDReKSvMWIZ7HDs=;
+ b=K/UHbzn6l+jRDfDOSXUmP5NRXzbeRsrc5DZA+I7XfkDC9AwrxVS8P84k3Aexy7ALBRbrn0rpjjVzuAWkrffJJ/ugSo0x1DzgnW5SFfrIBD2bJyKeY5dySersrGE/AwpRFjUTjmkcwUMJVDSN0YhKurBp0o8puhP6jqQf1hwuumsnfugi5To6LNLh7T9OKKP+wvGcgP++tMqFMRheDG3XuuNwwJFcYPbBhqIZJP54li7CNB2QRDbXoIXMQqiYDfz4/C1P856IA9QhNzNnZ0cQqn1zqQGq1dig1iMMpUY9wT5UzIER1UAUjXz1W1KyjLxe5LTuD6DyDMw3LDU0EYt25A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5qIfBDR79j9IqyIN6ONG1Lzp12mhSDReKSvMWIZ7HDs=;
+ b=WRnZ1lzzjKvNPPSqzGocGyuLPdsxb9WWHAbWS2cgxuDwRIXc5TgHSetO06z++aMW1/wivKQYEpJye6OQtnYDH9rBs/ZexLq1dohIc0Z2ULnAWpotVgBg2Mouhku1VhHmBcUPVM0AbXpJD2wp+iI+gMrWnK9x9M2oWgY2aua6/GMD4abyPH5wFPk2ZZwmYWVonO082Z4IlYQLFaq5jn/rKzT6RALb4IqRgdgfAfgRGWU315uO6FFDFr2udEZX8scxSm6lsaao8c1HACedSyAAXj8Ud0OPFk3Pb6jG+DT9b2GPdamdVyy0/Wxge4KcJdwAHbSAE/lLjy3b/OZ+Gy1/Fw==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by MN0PR12MB5788.namprd12.prod.outlook.com (2603:10b6:208:377::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.17; Wed, 27 May
+ 2026 04:03:17 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::2109:679c:3b3e:b008]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::2109:679c:3b3e:b008%6]) with mapi id 15.21.0071.011; Wed, 27 May 2026
+ 04:03:17 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: "song@kernel.org" <song@kernel.org>, "yukuai@fnnas.com"
+	<yukuai@fnnas.com>, Christoph Hellwig <hch@lst.de>, "linan122@huawei.com"
+	<linan122@huawei.com>, "kbusch@kernel.org" <kbusch@kernel.org>,
+	"sagi@grimberg.me" <sagi@grimberg.me>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-raid@vger.kernel.org"
+	<linux-raid@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, Kiran Modukuri <kmodukuri@nvidia.com>
+Subject: Re: [PATCH V4 0/3] md/nvme: Enable PCI P2PDMA support for RAID0 and
+ NVMe Multipath
+Thread-Topic: [PATCH V4 0/3] md/nvme: Enable PCI P2PDMA support for RAID0 and
+ NVMe Multipath
+Thread-Index: AQHc4wmyko8dzHWtKkiOtDLGosU2ILYOgneAgAeR0oCACopXgIAATvWAgABn1oA=
+Date: Wed, 27 May 2026 04:03:17 +0000
+Message-ID: <feed7ba2-3512-47b7-896c-cd08c0609639@nvidia.com>
+References: <20260513185153.95552-1-kch@nvidia.com>
+ <20260515043535.GB3756@lst.de>
+ <4ed83782-04cf-45b5-93a0-05a08e61b82e@nvidia.com>
+ <053b99b2-c994-42ff-af63-6e63ab468557@nvidia.com>
+ <b89e372e-3068-4c26-9552-13e6853ba000@kernel.dk>
+In-Reply-To: <b89e372e-3068-4c26-9552-13e6853ba000@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|MN0PR12MB5788:EE_
+x-ms-office365-filtering-correlation-id: e87907bd-90b8-471c-41fd-08debba4e218
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|10070799003|18002099003|22082099003|11063799006|4143699003|56012099006|38070700021;
+x-microsoft-antispam-message-info:
+ BKXs6K0zyAQ8c3LGiC2uqw88K7e882KV5WsEIdItMYXJVL/oymS5bXIU1oxOG+wM7TBk4U98bKw+kAVfK0F223M9gMKMTIcDRvo7OFxS2c9yhcxMSM/tnioNACHf4zDUZVuHDjQuzTC6BKlxiB8sn6YdPGRx/C7YkM93rdYW9ecYwihnUx7tGvgQp1VQ0O9A/F1jy6TfcnpjFMUSXTLdRpmlmSL+Q0X7FxQeOUHXupjdrDs0XAhViHWwheArYWtAMNc2zu6AcaWvY+Ui+korS65uS8Y3STXjljgxLbZRAxy7zW0OTx8XDT5VRT7t6N+wSvdIg8CrT/Lvwte5YoM9MxqysLJkyvuAhClSZEjeAGv/QUsyerxs/MJntHRoohjU6DcGqtDfNMpnINh0uNdByua7NGhziWu98Ma/B42u6L56MGNo2YDqJIEyYLuc0dBBAKCt46SBALSu7jDJ5b1fDIcxctD30CCyPBIRKb94FjkRmOkaSQ6lLkLQbeOZu5iggSLBBbRLGQJDolOVsJA1oXqYBR+BQs93QSEI7gmO0IFOkv8y5Y7ZBlcHr1bYP4pTwa92ZEVx5ARSn6nh+5mR1G+3PMl3TZkqVSTcjinG7IQuqMK2y6LkaAHV4UgKCk2/ZFfBQUkBk87VR77XAcItPGBqQN5AlGO0o0fw8He0DAnLPRn9cLmu96OAlLKmH/4+80d3YtlFdlaY7O1ADk/Drb5zfLsRGNHBh43X3xBSc81OQVJ6YoKtKiEvPOlkYY1b
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(10070799003)(18002099003)(22082099003)(11063799006)(4143699003)(56012099006)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?R3pFeGpNTEJqZCtkWGc1WFlFZk51aHhwOWovSTIvTWs1Vmw1M2lzM1J5R3hR?=
+ =?utf-8?B?OFdwenplelBhMXRlNHhMVE11TkFueE55bDNCZ3NCZy9rUng4V3lpRkRsdEpO?=
+ =?utf-8?B?Z25lQlBpbWpRdGFFYnBKZGR6ZEdKbTY1K0dkZ28vZGFSVGN6dWxJVE9HM0Z1?=
+ =?utf-8?B?K3FNZEV1blk5UGRqQ3ZuTmh0bllJSTVVOFg3cjRFczVVNUpCbFp2T2ZZczBW?=
+ =?utf-8?B?UEExS3l6ME04VXhuTFdkSWVPSW5HbmFNck45Rk1leGwwdkFpdGd4dTNQcFpv?=
+ =?utf-8?B?eVVtU3IwLzFRNXI2ZEhxcFQxSDBVSy83bEpsdkQzRTNtdEsyMFNmY2hhSXhL?=
+ =?utf-8?B?K05tQTBKWlA0alNOL05lRE5XamcvTE8yVU1zSUdud21OVEhSRW5sa0srdDln?=
+ =?utf-8?B?QXhxZHFKNXozL3o1a1duem1LN3lGWTN4S05wMlNpck5pOW1MUjFQVE1SUHph?=
+ =?utf-8?B?NTQ0MkcrMHdSay9wMG40R2YxM3FPR2dCUm5HYjdRL0RJaWxDU0M1S1d5clp5?=
+ =?utf-8?B?TndCL2lLTStWUVRMNkp6TUtWQ05FK2xoa0Y4VlRhYi9JZUZOaXVJa3JLTVlH?=
+ =?utf-8?B?WDljbFlqK2RrTHVRb2Nnc3luZUhvOGlRZit6TjJ2VHdmL1F6RlgzWkhydmJh?=
+ =?utf-8?B?bEJ3K3N2YVhPU2hSbm1xNGR3K3g4ZENYL1hUZEJKelpOcEZLSVBqZG4yWERq?=
+ =?utf-8?B?bGtiazVaVUt0VG1kbFBYb0lTZ2RaOEF3L2tpVkNpdi9mMVdDY0w5a2t6T0I3?=
+ =?utf-8?B?cXZXYStKUlNYOWdvV0p4b3FrSmRmejlTR2RvM0gxK2ZOUVoyUjNXcTJLWDEv?=
+ =?utf-8?B?Umk2N2Zvc0N0SGxuTUJIUnpQeFB3MHExZm55OGx6Q3dWdDZZdXB3N3I3OHRN?=
+ =?utf-8?B?SVc3VllPVlB0Mk9kbVozak4rR1F1YTN6Q1JaYXFYd1RYUGpsYzZ1eDZzSkgw?=
+ =?utf-8?B?T2IxNDNtRE1JMDVlUTJKS1ZtVUExVnVMbHU5SSt1V2N5WXpGZ3FpSjlnOFZB?=
+ =?utf-8?B?M0IvcnN2Y3hnMXFBdThwU2FaUGpUQ1RHdUkvMlVNYTU3aUdvb3EyVDlxM3Vt?=
+ =?utf-8?B?bm12Rk5ucTZtUVJUK2dmd2llNlZQbVR4aFNsUGVEMnhMNjBDQjZWY2xxeGFz?=
+ =?utf-8?B?SUl5bFRqOTdZMXZZSkhHQnVaMS8xSGVBdGZCV29PZGxESDRmS25UUU1kVHEw?=
+ =?utf-8?B?RjdwMlJ0S3BXdEM1T3NWUHF4a0M3S2ZaN2Z4dW91WDRBRGF0c2docmtPcjI2?=
+ =?utf-8?B?eUVXOWdwUUVKb2t1R21TVXd2V1R3NXM1Ni8vdmhKaGNVb08xcDJoL1hUN21y?=
+ =?utf-8?B?anpRcGt6eE92M3hnL0tyaktrYlZGTjZBcWYwcXlwanBQVkQrRlFheVJ6MVNi?=
+ =?utf-8?B?cVZZOFJUd1pDRFJTMkUzOE5LV3ptdVlReVBUdW5DTVpXblZRZjBITk5DQ2RY?=
+ =?utf-8?B?NlQ3VVU5RFBsUHBlVWMrbC90WGc0TGN3N2Q2TWdKa2lNa2p4bGw0Mk1Id0hU?=
+ =?utf-8?B?UzQzdWdtT0xuQnp5TjVyWUJoaXgvNUVTbW1SZXhpNVlaNEtzeUVpdlVOWk1P?=
+ =?utf-8?B?WXowbFVpa2VTSTRxMktqdDF3NWQvYzJCdHZhaEUweEYrdEtZTkZOZzhORmtN?=
+ =?utf-8?B?YWFsM1BMbG9LSk5EWVhoR1h1WklOK1ZzS3p6S00rK1RQSzhDOXFENDNkSVdU?=
+ =?utf-8?B?ZFhFZ3JrcFg5TjBwV1F2ZWl6Zmp2U0UyQlhEVDVoUFo1WVRFbjY3d2pNNmZh?=
+ =?utf-8?B?Yml0NG9qNGpPUDBPOVdaVUp0ZGdVSVdZQ0F5Y1dDanFKMjdZWlNPbmJLNEQ4?=
+ =?utf-8?B?NnRwdFU5c2piZGNqcUVRWDFxb1lJNzd2THBZNnJJOGhJbldlSUFaK0FvZitw?=
+ =?utf-8?B?NndlSnN6TnFEZHNWTk5uQW9GL3l3aXlWQjFGbm93M1pVUWwyUnJuazFsZTZR?=
+ =?utf-8?B?bVhZVDBJLzhFaHNDVk1wNHppZEU3YzFVQ0U4YU9iNjBMWi9vQnpidHAxRDJm?=
+ =?utf-8?B?SnpWTlN6VXNnNEdocmdBM25ZQnV5clYzSmR4azlVdlJLWWg0MWlaWS82TFZj?=
+ =?utf-8?B?TmM2bGQvMW9qd1RQeG0vK2ZOaENySUphVTdnZkVnMDlRYjhhN25RUEt4YTgv?=
+ =?utf-8?B?N3hrMDRycjg1VVNBdzZaUkxqUWZ0NFByblJ2Qml6Z3M1UFpWUFRCQ2FJd0xo?=
+ =?utf-8?B?eVJtUEU2OWRCWlBtOFBZYStVbTdmeXVFaVJqbml6RXBhMTd5aTZWT0lvdkdj?=
+ =?utf-8?B?TTg4ZW5uYzBYeHp0MmcvM0NvUVU2UUpIQnMxeGtRMnF5UnpGaFZybDNVVTJM?=
+ =?utf-8?B?UWg1ZUFlc01JdUVZTkI3UnZZSUZ4dzB4bzMxVzNaNnhkWmZMcms2b0p0WUlh?=
+ =?utf-8?Q?9eqgPX8OAm5f4IOP8jzsc36GjxysyLmQdvbms60NWZfb1?=
+x-ms-exchange-antispam-messagedata-1: r6G6kCgiyvcEYw==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <22F82D498F47314E8AF954FB3C94CA43@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Revert "nbd: freeze the queue while we're adding
- connections"
-From: yangerkun <yangerkun@huawei.com>
-To: <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <nbd@other.debian.org>, yangerkun
-	<yangerkun@huawei.com>
-References: <20260526115253.746625-1-yangerkun@huawei.com>
-In-Reply-To: <20260526115253.746625-1-yangerkun@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e87907bd-90b8-471c-41fd-08debba4e218
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2026 04:03:17.5284
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: APoBDXJ4rY0Ba4m71i4wUcvj7f2qOitjGwaeKrI7rwM4qK5eHryPluhkrLSP94FkT7URnksfkuVft4A/xrYhkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5788
 
-
-
-在 2026/5/26 19:52, Yang Erkun 写道:
-> This reverts commit b98e762e3d71e893b221f871825dc64694cfb258.
-> 
-> Commit b98e762e3d71 ("nbd: freeze the queue while we're adding
-> connections") added blk_mq_freeze_queue/blk_mq_unfreeze_queue in
-> nbd_add_socket() to protect krealloc(config->socks) from concurrent I/O
-> that could cause a Use-After-Free.
-> 
-> However, analysis shows that in all current code paths, concurrent I/O
-> cannot actually reach nbd_add_socket():
-> 
-> 1. nbd_genl_connect() path:
->     nbd_add_socket() is called first, and nbd_start_device() -- which
->     starts the queue and enables I/O -- is called only after all sockets
->     have been added. So the freeze/unfreeze runs against an idle queue,
->     marking then waiting on a percpu_ref that is already zero, and then
->     resurrecting it -- a pure no-op that burns an RCU grace period per
->     socket on multi-core systems.
-> 
-> 2. nbd_ioctl(NBD_SET_SOCK) path:
->     The task_setup check enforces that only the thread which performed
->     the first NBD_SET_SOCK can call NBD_SET_SOCK again. That thread is
->     blocked in NBD_DO_IT's wait_event_interruptible, so it cannot issue
->     another NBD_SET_SOCK concurrently with I/O. Other threads are
->     rejected by the task_setup != current check.
-
-Apologies, but the analysis provided here is inadequate. A 
-use-after-free (UAF) can still occur in the following scenario:
-
-task A: ioctl NBD_SET_SOCK => task_setup = A
-task B: ioctl NBD_DO_IT    => nbd_start_device_ioctl, nbd can receive IO
-task A: ioctl NBD_SET_SOCK => task_setup == A, so racer can happend with
-concurrent IO!
-
-This patch is misleading, please disregard it. Sorry once again.
-
-> 
-> 3. nbd_genl_reconfigure() does not call nbd_add_socket() at all; it
->     uses nbd_reconnect_socket() which replaces a dead socket in-place
->     without reallocating config->socks.
-> 
-> Therefore the freeze/unfreeze provides no actual protection in any
-> reachable code path, while imposing the cost of blk_mq_freeze_queue
-> (percpu_ref_kill + RCU grace period wait + percpu_ref_resurrect) on
-> every socket addition during device setup[1].
-> 
-> Revert the change to eliminate the unnecessary overhead.
-> 
-> Link: https://lore.kernel.org/all/20260327091223.4147956-1-leo.lilong@huaweicloud.com/ [1]
-> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
-> ---
->   drivers/block/nbd.c | 11 +----------
->   1 file changed, 1 insertion(+), 10 deletions(-)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index fe63f3c55d0d..9033d996c9a9 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1245,22 +1245,16 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
->   	struct socket *sock;
->   	struct nbd_sock **socks;
->   	struct nbd_sock *nsock;
-> -	unsigned int memflags;
->   	int err;
->   
->   	/* Arg will be cast to int, check it to avoid overflow */
->   	if (arg > INT_MAX)
->   		return -EINVAL;
-> +
->   	sock = nbd_get_socket(nbd, arg, &err);
->   	if (!sock)
->   		return err;
->   
-> -	/*
-> -	 * We need to make sure we don't get any errant requests while we're
-> -	 * reallocating the ->socks array.
-> -	 */
-> -	memflags = blk_mq_freeze_queue(nbd->disk->queue);
-> -
->   	if (!netlink && !nbd->task_setup &&
->   	    !test_bit(NBD_RT_BOUND, &config->runtime_flags))
->   		nbd->task_setup = current;
-> @@ -1300,12 +1294,9 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
->   	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
->   	socks[config->num_connections++] = nsock;
->   	atomic_inc(&config->live_connections);
-> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
-> -
->   	return 0;
->   
->   put_socket:
-> -	blk_mq_unfreeze_queue(nbd->disk->queue, memflags);
->   	sockfd_put(sock);
->   	return err;
->   }
-
+T24gNS8yNi8yNiAxNDo1MSwgSmVucyBBeGJvZSB3cm90ZToNCj4+IFRoZXJlIGlzIG91dHN0YW5k
+aW5nIHdvcmsgSSB3YW50IHRvIHNlbmQgb3V0IGJhc2VkIG9uIHRoaXMgb25lLg0KPiBPdXQgc3Rh
+bmRpbmcsIG91dHN0YW5kaW5nLCBvciBib3RoPyDwn5mCDQoNCmp1c3QgZmV3IGZpeGVzIDopDQoN
+Cj4+IE1heSBJIHBsZWFzZSByZXF1ZXN0IHlvdSB0byBtZXJnZSB0aGlzIHBhdGNoIHNlcmllcyA/
+DQo+IFdhcyB3YWl0aW5nIG9uIHRoZSBtZCBwYXJ0cyB0byBnZXQgcmV2aWV3ZWQsIGJ5IEkgbWlz
+c2VkIHRoYXQgWGlhbyBOaQ0KPiBhbHJlYWR5IGRpZC4gSSdsbCBxdWV1ZSBpdCB1cC4NCj4NCj4g
+LS0gSmVucyBBeGJvZQ0KDQpUaGFua3MgYSBsb3QuDQoNCi1jaw0KDQoNCg==
