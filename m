@@ -1,48 +1,29 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164881A5B9E;
-	Wed, 27 May 2026 06:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285BD39A061
+	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 06:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779862955; cv=none; b=PykIXNpYgzRmfJZTgoWkADKEWLiEX+UfTntueS0Nsqyzsfs1UoPRsDuDQ2y54DkrlLhHpMCur8+ir5NVj8TVzw8/KTwt2IW2JgahRWIyBNXlSeOYdpqzmTSfVtzWs99gvXaP0tHgbGALw2VUTjcQlt091cnQ/1AHUJnfTE8cybc=
+	t=1779863960; cv=none; b=RMo7fITkgl8fQ4SeOsGgy6h2DusnehGEUBDNgdmWwDrlblCBOj6tEFeZn180iF4ROXneW8dRD9WeZhgZO4GmAbD3q2zEVE+1Rg9dThR3Zfw3kUfdg86tmQDbCPxT+k/65oDRiOKosMcXSYbvo47hKU2kWj5ghi2j8lZyPAERiKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779862955; c=relaxed/simple;
-	bh=D6qiNKtozgv1ru63gwq6prIRdKT/tXSlog/V7cAwdbY=;
+	s=arc-20240116; t=1779863960; c=relaxed/simple;
+	bh=pOPCft3nL9uWeg8fYQW0UiMoj2WtAxbf5BvQmmXwTis=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHCTMdVkFaBrGACWzg6YXVTgeiCZhZUykCD/9aSRObEgVDrktcGNrmz3zAAXfoSiZgfH0SNn/Iob/vqCRQxWeoXRmfUS6GPW3RjxxNQnApyia87emQXVV95uWgt76s3zTrvO5FIGb7ADhSBVTW7ZNU8Md8giYXmTEFtpwQYDNWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RCtA/4X1; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RCtA/4X1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=sIgn2pTb2lMuNpwxC9YljPb7qAqonpElKjgih7wuKeA=; b=RCtA/4X1G26+BLIr7I/PYFUdTY
-	8uwJSaRlcCbSxn5XSr8N3Lm5+OkQnR/gXCK2Y3Ci/F0aRBZJmf+XF/eobnpq3pSiRdqITeARtvojH
-	n1WpNWosatSSsRkpQ0+gSgqLNTKZIyRQ0jgsvvLCiQABS8wGJRm+BpILb4o2JYoPE07e3rHohQAMY
-	HJoHTan4Tyn8ET+0TQe9K7K+V9XbTPCaCrprD0U6vrgPJCpHsnk0WB69CWV+AuF6YzlC6/B5ib7v/
-	EfMuLlBdUbzrvw3rFuAm7EVsmJsqVDQfg6Te1WX7VlhRLIM+PPs4vqi4NeCGgjrl1UpSRMYGm2K8F
-	hquiZvTg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wS7ev-00000003OVG-3fl4;
-	Wed, 27 May 2026 06:22:29 +0000
-Date: Tue, 26 May 2026 23:22:29 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-mm@kvack.org,
-	Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH] block: Add bvec_folio()
-Message-ID: <ahaNpbG15d6StT9d@infradead.org>
-References: <20260522182122.2489391-1-willy@infradead.org>
- <ahPm4h2gKgyEEuvV@infradead.org>
- <ahROtyLcr567wM8l@casper.infradead.org>
- <ahVBCtsodsM2FHis@infradead.org>
- <ahXcsrxUFfzoVCOr@casper.infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k5dPrueIwoHA5u13kCET0k1X/XdIoQ+kBmnDkfNMqB5vcvXE5mWENUngD3Y5wURTCyF0OqoUG+jHZMKkXVPiPto+1t/blaes4Nqjk+x1RonuXT67Nmfd2STa4lKzdH5IJCt0uwSA08KXSNM3hLbpD89dqIXx26NMqZI43eRjDB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id E1DB568BEB; Wed, 27 May 2026 08:39:11 +0200 (CEST)
+Date: Wed, 27 May 2026 08:39:11 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] bvec: make the bvec_iter helpers inline functions
+Message-ID: <20260527063911.GB17042@lst.de>
+References: <20260526070042.1817997-1-hch@lst.de> <ahX50HKkPtN7rNEq@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,23 +32,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ahXcsrxUFfzoVCOr@casper.infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <ahX50HKkPtN7rNEq@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, May 26, 2026 at 06:47:30PM +0100, Matthew Wilcox wrote:
-> How about:
+On Tue, May 26, 2026 at 01:51:44PM -0600, Keith Busch wrote:
+> On Tue, May 26, 2026 at 09:00:27AM +0200, Christoph Hellwig wrote:
+> > -#define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
+> > +static __always_inline const struct bio_vec *
+> > +__bvec_iter_bvec(const struct bio_vec *bvecs, const struct bvec_iter iter)
+> > +{
+> > +	return bvecs + iter.bi_idx;
+> > +}
 > 
-> /**
->  * bvec_folio - Return the first folio referenced by this bvec
->  * @bv: bvec to access
->  *
->  * bvecs can contain non-folio memory, so this should only be called by
->  * the creator of the bvec; drivers have no business looking at the owner
->  * of the memory.  It may not even be the right interface for the caller
->  * to use as bvecs can span multiple folios.  You may be better off using
->  * something like bio_for_each_folio_all() which iterates over all folios.
->  */
+> There's a couple drivers, nvme-tcp and loop, that call this without the
+> const qualifier, so this will produce new warnings. The nvme-tcp one is
+> simpler to fix by just adding the 'const', where loop looks like it
+> needs a little more consideration to get there, but still doable.
 
-Sounds good, although I'd captialize the first word in the sentence.
-(Not that anyone should follow my spelling advice in general)
-
+Yeah.  I actually had this fixes but sent out just HEAD^..HEAD instead
+of including the cleanups from them, which basically copy the nicer
+code pattern from the zloop driver.
