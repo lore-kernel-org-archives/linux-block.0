@@ -1,42 +1,81 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B9A322B87
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 14:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBB92EC54A
+	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 14:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779891250; cv=none; b=dGIlRyfIzq/l4iJ75r6Mmc88ntLXb+K0eIelJS8ZhxGJW6wt5YyRAVzKue86SHzLbmyvgJj9B+e18k2Zm3n5BG5+LbA0MgIEShJNRTodU2eyP781EzW9N4HJbJfzKnGDbtRAlYQqrhZ3LQ7kEDo40XeOyZDwl4bCa9UshwEn/Q8=
+	t=1779891367; cv=none; b=L8F6FY2jo9c1CeG5/8VO0jeQOP6VZ3uUJT6GZwzjD2pJM+YH41tTeNOEPlURKckMdjX1jtGBFxNKKO/iOxxrAaKKpEYbCTZVwCKjDAmjbIEVVGqZ/vd87vwoIyAvZjO0heZujen0jNgoZqh7aQQzeUdzZOxKi/wl4ZG/K5RmN48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779891250; c=relaxed/simple;
-	bh=UsQ3TEkBS9VN9Rkl/5w6YSuKtFnkMCOfWFAwX/Q0Q0s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZvBL9pPN6IDdRNxq8/00qALfPmDNX+tGGrsPRdRRi5lVFnuu1YK+GVsdOItdreCgoDK1XF40Bjkx9uRdABjtQVLBqBk9wkFfTIrZ+FUwWXQzuFlUOkPr3uNwqBLyNnj+NevTmAJ5WztkSuWtDKHVr4lnK5qqzzmm6slu+bk/q+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=g5FAxy7o; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1779891367; c=relaxed/simple;
+	bh=rwIJZwdE0h/vGwpewVyInBfM50pssfa9h16XffX+lY0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=Lyb2wQZIX6h/mHTcNi7Au6CCLQSOpiOTmPVxWO/XSxIswvxN7tx+aSw7oNl6fjjJUjXMdonRB15u3AztZQho8lTMYFBEuMxCplz/xAWLVmYYRfk0jtUQjuCGTax4iZ4XFZcNK1M4/L+hKInKWIGMzuVlEjwQjTiI/5EzsflcXcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ln1fQQSF; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g5FAxy7o"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=G2njepDg6hOsCtFhivj4zpznE/vFa1BG/vKtDM1tUkc=; b=g5FAxy7ogEQfDJYOvInOeyXJiy
-	4fw1+SN0hxcCt3oJNtXIMy2BFruXHQdfoXlxkK0S2B/83tbgC6XZl10xDrZWlY0fgPUPo1P7VEnLZ
-	QyK5dMKpdFUbMzdrQFrdpek9nioseV+HYakGicHhY1bmXbRERFmYv4MO/VUm0x9qMf1s2GykuYw+5
-	pDVRvbIAXBoWhALqIrOTy0uyYyB8bp0n5w4RlOEd/VPglEcedzashj9hqAZf8kTu7UGnDNYjjK98n
-	I8fH3ogY15k5dIMtm4mJBa2DyFfD1LcoGszd3CppaUdOULLXhwBaWG13WyNju4VR2/NquN7ZjeNZJ
-	1ZfygQ+A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wSF1I-00000004Gr6-22bV;
-	Wed, 27 May 2026 14:14:04 +0000
-Date: Wed, 27 May 2026 07:14:04 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>
-Subject: Re: Should the "loop" driver reject using pseudo files as backing
- file?
-Message-ID: <ahb8LHhDSMaXGEwC@infradead.org>
-References: <d38e4600-3c32-491f-aa49-905f4fad1bfb@I-love.SAKURA.ne.jp>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ln1fQQSF"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2bea7176c72so50170385ad.0
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2026 07:16:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779891366; x=1780496166; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :mail-followup-to:references:in-reply-to:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GzVcryfU9QxZddocswZazrJnx5GUut5UQLQcVR/qt2o=;
+        b=ln1fQQSFl0ff4QyEjpwc2jwX4jb5xohSdkYyhO7cskouo+sV6UtJ4uNasSNa+o9Uvi
+         7/nGDdns10Pr00EBix2uEQMzAaGrickjx/OAiIgSIoQdaarZ1DvBBqihQcx0YSCR1SIa
+         tXDwQFxsq6Gz/jWOluXHX+QRkpJz74rJP90S5AAPx0pGHb8LcRdGkDP3xoazP/YXmdGE
+         +af1f4gGpfJEjLW9bmjG/+7MdQd+bHzhr2F5awNFQEML4IC3VuxqSIOUAqCjTbuwZIll
+         XIPiW1n7SkUpLb84DHoSR6V9PiZ4u3/9PNvFGDnuiPaQZIkictcCqhRaip0zwLCifiIF
+         fAPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779891366; x=1780496166;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :mail-followup-to:references:in-reply-to:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GzVcryfU9QxZddocswZazrJnx5GUut5UQLQcVR/qt2o=;
+        b=cz2PjtZmdtQr/hnoDl+K3OZJJwK4aBvwxw4f+ajWvdnkk2NSTolAyUDyIbq6T0RlYQ
+         EWgQk+ggMuha3Qt/lJP/L9iZKVK7xAzwUh8n+tWhVwkje3mEEC2Uab51HP93RxtUwUB2
+         R2k/9zTI9/4t5gXdFc34lrMPzHAkSPSNlfXQhkqj6psiD3zGFk1n8TB+PKstSOuzg8hR
+         sdnnSB0a6ZbGVJTpS2sEr//vSATWBRW7oBdaRge83D9tqXAsoxDpCMdcVb6ouIyCIdy0
+         isuaNHEEYsnd6+RMhsBST13aiPN/Bvf0w0tY7bzzSpp/DV2uzFpuJiavxF3hzR12foA9
+         HfBg==
+X-Forwarded-Encrypted: i=1; AFNElJ+yyIoHWeGTPbNKDo+jsUdbrcGokxamnRt/lKXI45+cRmhzr3VtyXIioHTAukvb3BOc3ADP1Kh5vGpuIA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP1Uup3ld/hypBUilxF+TdUG3uyu+9gf+GAM1R81ryxLQI2Fmw
+	SS9sWeoKV9C0CoFtvIfzg/AOTP9jm8rTJmHQnNuTLbt0Dk5e0vJkvwTE
+X-Gm-Gg: Acq92OHorzb6Sw5gwJ5HwSKVilx5IxR0Lr0tkYWzOu0bpOW/JhDA+jg9PMT5VCMQjgE
+	VlPltPSVEAGoIWioCSs9NvGm0qSmggmOmK8Kl/PBIOy7a5Q2y32+MGK61/aU6RCiy6yhIcD4j8o
+	fZkzpaHkp9Bm64YDBih0DLOCnWDv/WTU9VWIR3L1lWhJGuWxzKucV4adGcogwdnLquT4HuPGo/I
+	06xRt2a6tIVzoIm8UJ+sg1rmMm6+3VhbcY3EpGR0EIf/Nj9dCFUeTwEGPdJKGY4vcSoPIoApExI
+	y7Jv4exf3cj3cw39Z7xd0Ksda0O1B84gtvhZzLdDsPbmQJdhhQ5j3oevLfYOQD+rmF4QKbzY58O
+	gEs7WKYcKNKCY0Npcv5k9KM7EENcN2y/yTAsXpCx/80fARrsQdnwxeoHGm8xaWlws8qqi4FebgF
+	IFFpBkGzahyBg3k6YFY6/wotTBNGRbnDd86btc76tsDAx3AXQ=
+X-Received: by 2002:a17:902:d4d1:b0:2bd:a5f:1d04 with SMTP id d9443c01a7336-2beb05bf787mr246093385ad.9.1779891365968;
+        Wed, 27 May 2026 07:16:05 -0700 (PDT)
+Received: from localhost.localdomain ([116.80.91.208])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb58b3085sm154156885ad.53.2026.05.27.07.16.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 07:16:05 -0700 (PDT)
+From: Cunlong Li <shenxiaogll@gmail.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Minchan Kim <minchan@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] zram: fix UAF in zram_bvec_write_partial() and drop dead bio plumbing
+Date: Wed, 27 May 2026 22:15:59 +0800
+Message-Id: <ahb8nzeug80MJ8Pw@debian>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <ahabSU6QcGJ4T4ZP@google.com>
+References: <20260527-zram-v2-0-2fb84b054b5c@gmail.com> <ahabSU6QcGJ4T4ZP@google.com>
+Mail-Followup-To: Cunlong Li <shenxiaogll@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,23 +84,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d38e4600-3c32-491f-aa49-905f4fad1bfb@I-love.SAKURA.ne.jp>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 27, 2026 at 10:52:02AM +0900, Tetsuo Handa wrote:
-> I noticed that /dev/loopX accepts pseudo files, for currently
-> loop_validate_file() does
+On Wed, May 27, 2026 at 04:21:53PM +0900, Sergey Senozhatsky wrote:
+> On (26/05/27 12:49), Cunlong Li wrote:
+> > Patch 1 fixes a use-after-free in zram_bvec_write_partial() that
+> > happens on PAGE_SIZE > 4K configurations when a partial write hits a
+> > ZRAM_WB slot.
+> > 
+> > Patch 2 is a follow-up cleanup that drops the now-unused bio parameter
+> > from zram_bvec_write_partial() and zram_bvec_write(), no functional
+> > change.
 > 
-> 	if (!S_ISREG(inode->i_mode) && !S_ISBLK(inode->i_mode))
-> 		return -EINVAL;
-> 
-> and pseudo files are treated as S_ISREG().
-> 
-> Reading pseudo files via /dev/loopX causes bogus results (tries to
-> repeatedly read the entire content up to the size visible to "ls"
-> command). I think that allowing such usage will confuse userspace
-> programs.
+> Did you test it?
 
-You get what you pay for.  Many other in-kernel and userspace users
-will be just as confused by them.
+Compile-tested only so far; I haven't had a chance to run a
+PAGE_SIZE > 4K reproducer yet.
 
+Thanks for the review.
+
+> 
+> Looks reasonable (unless I'm missing something):
+> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
