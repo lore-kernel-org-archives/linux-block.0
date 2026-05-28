@@ -1,93 +1,86 @@
-Received: from smtp153-171.sina.com.cn (smtp153-171.sina.com.cn [61.135.153.171])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C1930566B
-	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 23:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8F52D94AB
+	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 23:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780009308; cv=none; b=H66SeEdzwTuH2SqHcg0tUVp377xqxelLuInqK2224cWQ8Nyx+bwx5dzhxIT7rytRMtV5PlI6hX4oVJ7GNbT8VieRPQOHK0IX9EMloCyp6e9npmgZTzSNbmRPZYgf+Qxf0kATitY1Nh8KIyn8gObtxVlbhFqWSIQcgNJYkD++U5w=
+	t=1780011036; cv=none; b=HHqOUVqUgwn/sTughvWj557Tf2/IxJolZbTMCDoswLIMpGUwb5i6OeF6Q25g7beRECI3gXkAoxPhIFchGtJ6HEUYL92QqGR3NEWBlt75EGppKTQn5YFd0NU8K/lUBlrNVTY8ZSO0femj2aVXYyYmRGi8VtP0txdS++E2xE0giak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780009308; c=relaxed/simple;
-	bh=1T8/I6TvjiS18ZZDLJG7k3gfStyk9dmBa1e4cJe4Qtk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oziePcXtoQDj/GgR+wJKUVX/3VLVnlUu+Njmd5ewUnjcMwhl9xokx9f+8RS50Gxn8v1NFYHAY4aHjFpr8KEZ7YmM1EUZ+QtfTgkkBLOB3LgAt0g6G3dhpABbbqIpxI4owxY6V5lJC5cp9WmXeBfBI4G5URaKTRXTK8TizT0JUa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=j3bh2zBo; arc=none smtp.client-ip=61.135.153.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1780011036; c=relaxed/simple;
+	bh=CPg5W6qmv3QeO/QThKytexmCzra9QCkoXU0qYXhgnRE=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=cEtO1d9XsXvPyorrJ+UrX5mIM9TxYnlkVYGtiOO34FKCUuUswKC5++EGh5CZtjkumZRBcTC937kmuiC8J1qsTc8QndHeN76FUoIeisZsTFhcqU+j5s/1gpuL3o+fGSoLsGvnDmMCOtL1+QIftrKUQ28MosePqxGe4S5N2AsQ4hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IJNiVaMy; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="j3bh2zBo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1780009302;
-	bh=ew4LKtHTQRw4JU9dPbT+Bkxy6WAebg2DDIpNh0S9wiE=;
-	h=From:Subject:Date:Message-ID;
-	b=j3bh2zBop3s2UXi2eDER1j43CzZ/29e4XHtwAYmjwhjKvZeEqIzphlqymomc01ngi
-	 4jCg+4P9hs922NMUn9M9R1voKlxQhs9xM7gjHV1NH7cUiIQa9IQYVEeSimv4lgKWrs
-	 A1bpd2LRG7Xu5pmTTQpQca0h5g+JtbXzAhTqfUxM=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.34) with ESMTP
-	id 6A18C92B0000506E; Thu, 29 May 2026 07:01:01 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 5580266291955
-X-SMAIL-UIID: 978DE95D27164842A9C09416F2C93710-20260529-070101-1
-From: Hillf Danton <hdanton@sina.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-btrfs@vger.kernel.org,
-	David Sterba <dsterba@suse.com>,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
-Date: Fri, 29 May 2026 07:00:47 +0800
-Message-ID: <20260528230050.1185-1-hdanton@sina.com>
-In-Reply-To: <20260528054334.1159-1-hdanton@sina.com>
-References: 
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IJNiVaMy"
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780011022;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D4wIN4SNHRitM0ngarezIhOM5acJEbDG3qSyZyguPCI=;
+	b=IJNiVaMyTnO0R8z438tXxUIihVO7hXAF28ZbM8NefFkZnYup68YW7NgHHE+Nyox05yyblt
+	wTiE2pvjqGpFvYiIgRb16TDhnQNAD6yZOA4HPZ5UdcsdlWOLOBsMWBNqRYfi3L5WkiZWy/
+	E2+R14LJHOe2EQ20LJ6nT+g2NW9i/cU=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
+Subject: Re: [PATCH v2 0/2] Add bvec_folio and its kernel-doc
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: William Kucharski <william.kucharski@linux.dev>
+In-Reply-To: <20260528175905.1102280-1-willy@infradead.org>
+Date: Thu, 28 May 2026 17:30:07 -0600
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ io-uring@vger.kernel.org,
+ linux-mm@kvack.org,
+ Leon Romanovsky <leon@kernel.org>,
+ Christoph Hellwig <hch@infradead.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FADCC457-872C-466E-82F8-F88DF03E54F0@linux.dev>
+References: <20260528175905.1102280-1-willy@infradead.org>
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 28 May 2026 13:43:31 +0800 Hillf Danton wrote:
->On Tue, 26 May 2026 22:00:49 -0500 Ming Lei wrote:
->>On Wed, May 27, 2026 at 10:35:56AM +0900, Tetsuo Handa wrote:
->>> On 2026/05/27 10:20, Ming Lei wrote:
->>> >> Of course we should try to figure out the root cause first, but how can we do?
->>> > 
->>> > Definitely unexpected write IO(after umount & loop closed) from btrfs is more serious,
->>> > which may cause data loss, so CC btrfs list and maintainer.
->>> 
->>> Why do you assume that the culprit is btrfs?
->>> 
->>> https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 indicated that
->>> this similar race is also happening with jfs.
->>
->> I just didn't see the above report on jfs.
->> 
->> It doesn't change anything, the same question still stands: unexpected write IO is issued
->> or crosses umount & last closing of loop disk.
->>
-> Given the loop workqueue that triggered the jfs warning, can you specify
-> the reason why the workqueue in question is NOT flushed while closing disk?
->
-Got it, the loop workqueue is NOT flushed to avoid deadlock, see d292dc80686a
-("loop: don't destroy lo->workqueue in __loop_clr_fd") for detail.
-And the deadlock can be reproduced by flushing the loop workqueue with
-disk->open_mutex held [1].
+For the series:
 
-[1] Subject: Re: [syzbot] possible deadlock in blkdev_put (3)
-https://lore.kernel.org/lkml/000000000000ea753505da2658d5@google.com/
+Reviewed-by: William Kucharski <william.kucharski@linux.dev>
+
+> On May 28, 2026, at 11:59, Matthew Wilcox (Oracle) =
+<willy@infradead.org> wrote:
+>=20
+> Add the convenience helper bvec_folio() to avoid references to =
+bv_page.
+> Convert a few of the obvious users.
+>=20
+> v2:
+> - Tweak the kernel-doc (Christoph)
+> - Add the bvec kerneldoc to the documentation build
+>=20
+> Matthew Wilcox (Oracle) (2):
+>  block: Add bvec_folio()
+>  block: Include bvec.h kernel-doc in the htmldocs
+>=20
+> Documentation/core-api/kernel-api.rst |  1 +
+> block/bio.c                           |  6 +++---
+> include/linux/bio.h                   |  2 +-
+> include/linux/bvec.h                  | 17 +++++++++++++++++
+> io_uring/rsrc.c                       |  2 +-
+> mm/page_io.c                          |  4 ++--
+> 6 files changed, 25 insertions(+), 7 deletions(-)
+>=20
+> --=20
+> 2.47.3
+>=20
+>=20
+
