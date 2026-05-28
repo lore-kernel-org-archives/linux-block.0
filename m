@@ -1,84 +1,133 @@
-Received: from r3-24.sinamail.sina.com.cn (r3-24.sinamail.sina.com.cn [202.108.3.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0B7327C18
-	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 05:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3ACA30C359
+	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 06:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779947181; cv=none; b=JoVj80RbLtGVH+IKNOCr+30laN6pHrCNh2jciIZ7sZSHk+0UBztvGRYK1ZWflCQq3iJ5OaHiSgq/WoeisN+wOI9nJyQt73+tI5iBid/r3gZWg4JNQNy6BZrasR9mEv1mJG9N1gbOhTkcwsbmtZ0CvYbNobJV/IrPXXcst31NsZc=
+	t=1779948329; cv=none; b=MsgPCWsSotzUfRD6M2OmbsXAvjkoEU32VX2I5++PVIGEWMRh6MwqICCXCVyA675zPSRTP8qwG913FwP+my0vfAV1qq3mGN4sEhb/2hdZOzM45gIMt8IQpqMXRusUs39HVBcc6rZF1BBlq8nref9XOf3ltsMtImlY47tPfya7wsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779947181; c=relaxed/simple;
-	bh=C7JHlHzPIIDbcrjvTTaZykxa0kwfZ19sATnFMjQgAWY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uom0RaDkfgY7Ao7GDdJ5msKmnShwX4jI71lBrd4QxUI7XnsCqC6abGqh7UIsNV4+K+WkFsVpxR20HnaRJfDtlWdbtt93e+bjY05oXC9SzMODlnDSuN6bDmhlOiM4hZx3cHMKhLaWlOFkSCwZg1JoUr851yEmzoxPr7vW0cHmSnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=t6e/k7CG; arc=none smtp.client-ip=202.108.3.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1779948329; c=relaxed/simple;
+	bh=XRwErSt+b32PSYKPP11QqaYL99X9G0opk99wxwC0/mw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U9eVDmhrj/chaNjjhlnh57zcP5eejqde3KAOo+1Y3XRqWqf6Sqwmspq6reTJ8QYmaCOiXO6FPhB7DGoLvGWSoLGOOyh2IFDL6O+Q+0HKF7HZb4POeImeApYt3E/aB46Hq3IpBWdCkLrHV0+sSDZ6hTkerVVDRhEtuZIM2FCn4vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LN8CKolZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yxy/CmDj; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LN8CKolZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yxy/CmDj; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="t6e/k7CG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1779947177;
-	bh=cx/MeDnSm8Ccc4831CYFK65RBNwl+E+0XHr2pEV7eW0=;
-	h=From:Subject:Date:Message-ID;
-	b=t6e/k7CGvo/YHLy+R/Wrii/cuu3Vs6bZtGav3iY8FaH89rk4/CvpYJrgmYkzEZDu7
-	 Bd9ohGe5FgURyhyoJSc2U/G08ns3LOYEU/cQvJB3ie7Bbu1hJ7GIvLYNdJ+RR0fZZZ
-	 3GmXlAaQ5rBteTZarNbKoJgj+ahL3XKDLMgilGpY=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.31) with ESMTP
-	id 6A17D60E000062C1; Thu, 28 May 2026 13:43:45 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 9341726816115
-X-SMAIL-UIID: 4C03AE2645D34C15B349F3C5E267BA13-20260528-134345-1
-From: Hillf Danton <hdanton@sina.com>
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-btrfs@vger.kernel.org,
-	David Sterba <dsterba@suse.com>,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
-Date: Thu, 28 May 2026 13:43:31 +0800
-Message-ID: <20260528054334.1159-1-hdanton@sina.com>
-In-Reply-To: <ahZeYQ0cLE1i8TGs@fedora>
-References: <ag0lS_CbKO9R5CV8@fedora> <94076bc9-2c09-4bb6-8468-b6b8af419cb9@I-love.SAKURA.ne.jp> <ag1nfIFcykmQHbkk@fedora> <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp> <ag1223nAa0wZ8ALC@fedora> <fda8abc8-6aa2-463b-bf72-865f6b838034@I-love.SAKURA.ne.jp> <ahRocb0Vs_m6RF_O@fedora> <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp> <ahZGxoI6oHQ_vSrx@fedora> <d1b5a737-f0e3-4927-b762-430b37fbb2f9@I-love.SAKURA.ne.jp>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LN8CKolZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yxy/CmDj";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LN8CKolZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yxy/CmDj"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D04976ACFA;
+	Thu, 28 May 2026 06:05:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779948325; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lhITeeO5SslKJeMFj7cqRnEI7SzOrQWeSpQaTW65MKQ=;
+	b=LN8CKolZFgVDD66FCKfL1O37mcn3U1VhNhynBqDza/lNhItK7gf50nV7dgDOpder6eHibF
+	B9jfnbr+h48XxRL4ewbHSbpTenI5J+/QTOF8GrQyRvbb/rB7phE16bsFRCu44zhhY/16Nf
+	N0awJcSx6gyAcfg1thyyS+Q0U7RTZ/A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779948325;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lhITeeO5SslKJeMFj7cqRnEI7SzOrQWeSpQaTW65MKQ=;
+	b=yxy/CmDjQ0EXZrFTPGgyeZkkM7XPbO/lq3YPsMYgCf5/CanQgpCDuQKWRL49LNM0BEaPFh
+	5Eh5SaQQibQefPBA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1779948325; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lhITeeO5SslKJeMFj7cqRnEI7SzOrQWeSpQaTW65MKQ=;
+	b=LN8CKolZFgVDD66FCKfL1O37mcn3U1VhNhynBqDza/lNhItK7gf50nV7dgDOpder6eHibF
+	B9jfnbr+h48XxRL4ewbHSbpTenI5J+/QTOF8GrQyRvbb/rB7phE16bsFRCu44zhhY/16Nf
+	N0awJcSx6gyAcfg1thyyS+Q0U7RTZ/A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1779948325;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lhITeeO5SslKJeMFj7cqRnEI7SzOrQWeSpQaTW65MKQ=;
+	b=yxy/CmDjQ0EXZrFTPGgyeZkkM7XPbO/lq3YPsMYgCf5/CanQgpCDuQKWRL49LNM0BEaPFh
+	5Eh5SaQQibQefPBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B087B5AC2C;
+	Thu, 28 May 2026 06:05:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id poR/KSXbF2pkeQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 28 May 2026 06:05:25 +0000
+Message-ID: <7436e7a2-b626-4d7c-9acf-5431c5fbfdce@suse.de>
+Date: Thu, 28 May 2026 08:05:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: mark biovec_init_pool static
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+References: <20260527150646.2349405-1-hch@lst.de>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260527150646.2349405-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.994];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
 
-On Tue, 26 May 2026 22:00:49 -0500 Ming Lei wrote:
->On Wed, May 27, 2026 at 10:35:56AM +0900, Tetsuo Handa wrote:
->> On 2026/05/27 10:20, Ming Lei wrote:
->> >> Of course we should try to figure out the root cause first, but how can we do?
->> > 
->> > Definitely unexpected write IO(after umount & loop closed) from btrfs is more serious,
->> > which may cause data loss, so CC btrfs list and maintainer.
->> 
->> Why do you assume that the culprit is btrfs?
->> 
->> https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 indicated that
->> this similar race is also happening with jfs.
->
-> I just didn't see the above report on jfs.
+On 5/27/26 17:06, Christoph Hellwig wrote:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/bio.c         | 2 +-
+>   include/linux/bio.h | 1 -
+>   2 files changed, 1 insertion(+), 2 deletions(-)
 > 
-> It doesn't change anything, the same question still stands: unexpected write IO is issued
-> or crosses umount & last closing of loop disk.
->
-Given the loop workqueue that triggered the jfs warning, can you specify
-the reason why the workqueue in question is NOT flushed while closing disk?
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
