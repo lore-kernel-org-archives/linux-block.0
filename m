@@ -1,96 +1,130 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C489D3BB4A
-	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 01:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F4181732
+	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 02:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779930074; cv=none; b=RKuRzBcoeQN3wTDo+LZmZLhyV+o/Odg9qE+VrjAKvQlRWqUXNn06XlwpOiCv9aB2QwHGh82HJfHd69+i9Kk8M1EVvj+Myg/JMHBsj7eO2UTXbytA8BTVM6S8RTM5vQOPJ5tr50RPrXdzTo8Tu6Q5LwUHkLy4QKnaEQiRvk0XG6w=
+	t=1779936535; cv=none; b=akWW2tRfjtCVpRFltU+3K5OxtZfCrSj/wH12x0mZrIyruiasJhnSqh15ynNHxnrUnj0rraScXnhtjG05V/dkh+ZK7cr1I6lwfzkTmNwWuzmo9OFCz/ji8JMCOVUHceV6YMf60yGxEtNuX0svoRFZBgdY6htnGGqtE+w5Kr6a528=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779930074; c=relaxed/simple;
-	bh=bS2/5+LYYJaPbbnd1pcag8Lap7p35E/28UnS0i/CVow=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fAcASLRNfZKFyjKBzMrnqlprrDoPDj76CWhrFvGr99AOKoLv+QpE/VQ9r8QQ7EavUluCPiOSYy+M2g3gsL3P4/O3scSdOi5LhIZDatJ2vo72Sp7CbRa4nGnqlI9y4TQlsB/pXMuzCnhKDwC4T4eBrnFyJg3/5BJPlpSefTlpNpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Dp2LTjlg; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1779936535; c=relaxed/simple;
+	bh=hEMiF3S5n7GD3rgFs1MSCMOijiI81jrIRmqCj3tGYEk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Sr7A7G4STaaT0V40UtzMHdCt/hpp4Jtapj5hKVkWXiNYFSlndHF8j+wlRib2QKD5hTu8TTfbczN6l44x0O/TPkWqqaov5tzFTJNY8bMQMf5Oa/kDbzHAea9r4fP8Xxy1tTl7RFEH3iEzphhCA4CGV5pqVzchqoyuQ/p8tKg6PsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCmtmwQs; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Dp2LTjlg"
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64RKkthx2812561
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 18:01:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=u6bDNB2VRw04jTLm2H
-	XVwn98cjhg5mUaN35N0g7+xas=; b=Dp2LTjlgi0TNq0k4S2pcL5TfaB2iPFgVXO
-	ftBNKMN1yB+l/1IKFDcJYeOfAR8KGikjhqWJdQ5baOWJHQFDSjZsZFuWRdo+g+zt
-	K7iYuUT+xJEbSGyfUtNXHwz6kSCWsT4O37xRbgkiqul3oUBfolsanq1pkvIhUXEU
-	a9mZf9pjsLMYqPs/+pvC5+j17AEJOOQX5L1r4aY9XRJBqrRvwfnDaj5wjM90ds7J
-	vyy2BeWfeGINo5TpEgea4YQU334umy0CDNzwxgf9Wlb22iy5FbcCY91xAM0FLa+m
-	lWo/BLvtUiBZxD5zY1IjdUZazG1Bz0d9kTAiT0w9hFbrsUyRsmfw==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ee7x898pj-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 27 May 2026 18:01:13 -0700 (PDT)
-Received: from twshared12601.02.snb2.facebook.com (2620:10d:c0a8:1c::11) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.41; Thu, 28 May 2026 01:01:11 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 0A07F1D39B573; Wed, 27 May 2026 18:00:58 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
-CC: <axboe@kernel.dk>, <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 0/2] block, nvme: enable passthrough iostats
-Date: Wed, 27 May 2026 18:00:39 -0700
-Message-ID: <20260528010041.1533124-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCmtmwQs"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-834f1075805so9330742b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 27 May 2026 19:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779936533; x=1780541333; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2mHoOLXw1ORyK+bjLW8SaA8gqA96ImAqk4cz+WkSseo=;
+        b=KCmtmwQsAUgddrCgHUpBzgPHK4YznK4z+jAhu6d537AN4xwK3dS//AGoAemrYIwYgi
+         55Rg2Aj/jwvrHDe+xz54mRUw/I20sxjohnDSt6QVK5FIlcS+pJYiHCSlkKsjsx4CWni/
+         0CcDIg7yddTqiEO013xrRyOUU94TusqN6wzlNrp6EkAgEO/cyzOK3Fb9B89c84FFcvJW
+         VMTrB6srX1eGh9M+o5MZWSIpygwRIzgiUxYIQoklFQCcy/dr44MjqogFYkTGxfEhEg5L
+         mgszAXCHFpsT2hQNkhNaIFQfTr1J9IpmPd88+mZ2LbcXWnehU3ps5gOIIsmO1/VvUPKz
+         cgFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779936533; x=1780541333;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2mHoOLXw1ORyK+bjLW8SaA8gqA96ImAqk4cz+WkSseo=;
+        b=icyPXditxS1FFsCQ1EZCvAcujLseeTPzeZwCwip+USisd2wB46jqRESwJjBiAda6gL
+         5B66eTeLkW/0XTmrQubwNZs7IzMz4tlYVgPipVggHlp1mZqVpUdAnB/VbaBCPj18pCJm
+         WmHfsJj/I+5Jr3PLzyMjEwnr/Is4XbFgazNQ7HrA6cv+jgpSpCGJAltLPJvX7j7TSdhB
+         OB4w+RU9qtbAYD6OLh/hzCKVp8w6JZuN0zb/lkQBUXmXSqe2U11Dg71xxIzuFBSxc2Ec
+         7YP8d02x14GsBMrG8W6n3G+Ost2qlpW2zRNYvNZZd9ArLxr8cdBKVk4pQAowXYYUN0dV
+         a+Xw==
+X-Forwarded-Encrypted: i=1; AFNElJ9Nx4wPL5DBuZ69LTayCl6OSAjxIzkp/bFXEtFuSL5NwQNmDt9+3gKGKq+FI9T2Axk5SHt0mL3cOq0wag==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yztgf1bDoeVFURKEkzMxtnwh3rP3U89P9rB7vSY9zs+ojtNlPxV
+	nXlIyIClcCCEv4fEYzjjKFbRO5FjS19SU9himN5t/HFw526FkCN0gp3h
+X-Gm-Gg: Acq92OHl4HMxA2zVsAIG8VZyj7lQUOgjsQq8cN1CR7mOFn9fj5UFh6ij/QlMWOzUvDz
+	Z/2qalFd7ru1fXHXNaRXq+CyF9V3TgT9Z2lNd1czSs+fCkqgml0C2B6Oawp61hAdU4y1k7Tm6R1
+	Cy8GwwJd4bBrLr5ylds2H+v/2MqcEx7/m7zw3YXyWscLpbOGeMOk04hOq3LIdwZRU/QR3C8XNUx
+	Qyzx9lj8q+a8YZxWF2HDj7GFwPozVq3y8X0G65eyok+pPiQGRg1ylkg6uWLrL6dQ90wXVX9Rgq1
+	W7/e/9SE0HIddeKo6/bgJ9x6pqZ/F+VfS4fUlD+0Ivk8aV5TrLezM+774HxuwFw7X27PK9OgDX5
+	Eb/fFje7op8GiZNGb8godMoU5f9N0gwNliIbvriuGg5/L+liY4a4hDAbHdlteHhbWRFhkwCMUmo
+	JmdXwIZKe9hbEWFPRyCzPKZiT2iXjImsuWrg==
+X-Received: by 2002:a05:6a00:91c1:b0:841:dc7e:6adc with SMTP id d2e1a72fcca58-841dc7e7888mr4287582b3a.19.1779936533561;
+        Wed, 27 May 2026 19:48:53 -0700 (PDT)
+Received: from [127.0.0.1] ([116.80.91.208])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-841f3cbcddbsm366877b3a.4.2026.05.27.19.48.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2026 19:48:53 -0700 (PDT)
+From: Cunlong Li <shenxiaogll@gmail.com>
+Subject: [PATCH v3 0/2] zram: fix UAF in zram_bvec_write_partial() and drop
+ dead bio plumbing
+Date: Thu, 28 May 2026 10:48:43 +0800
+Message-Id: <20260528-zram-v3-0-cab86eef8764@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=GshyPE1C c=1 sm=1 tr=0 ts=6a1793d9 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=NGcC8JguVDcA:10 a=VkNPw1HP01LnGYTKEx00:22 a=7x6HtfJdh03M6CCDgxCd:22
- a=PAz_-FQ8hEVmOPYdF0yf:22 a=VwQbUJbxAAAA:8 a=D1VwSchhwDu8_UvpV7sA:9
-X-Proofpoint-ORIG-GUID: 7ELE8K5IMYBA5tNhZGKzyfjx1lt8pJYd
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI4MDAwNyBTYWx0ZWRfX45s5X0HA3vbB
- fh7hmCLn0CfKQkqMU3vIR81QpM7ySgf8saq78DOi3Qq1eG/lAPH5Hafv82ZyiI1qELMHiTFf1P4
- AJh6Bw6y8kHvJj0iStinNyx6QoJgZYCVYmw41Nn9/awMB4TlnPWvBI/w7jhfYOVCU93KsqAyfXC
- T0JUonBhQwM1n0S2yzk6ACxnDs0t1BJ6kqmNO4x6vSh4uxIX0El6V7+q4+PtpZME8sPbTz2DKt0
- Ui+HgPMwcuAUIphd3eZxBiicTBtTqQurv4xArQr9KvUYr5Suo1Ho2ON/hOuW7R08ZAWhK4okEwD
- skMiK7kN2CRy/TUhfasxR7uKfruIgEgh2tjyGX8atcfNYN/rHb8vvHJO9bBpHFkWy6MKSwVqKv8
- v6PZiksy6jFXcdj7KCxIj5SpDZonATS0ZbxSpzEXMJaKTTDoxXYPkQWJtVl0/jPZfriZ2cyPuGH
- w0Z0LHPDFCcCf5Ou1cA==
-X-Proofpoint-GUID: 7ELE8K5IMYBA5tNhZGKzyfjx1lt8pJYd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-05-27_05,2026-05-26_03,2025-10-01_01
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAytF2oC/23MQQrCMBCF4auUrB1JxiZVV95DXGTipA1YK4kEt
+ fTuphXBhct/mPeNInEMnMS+GkXkHFIYriU2q0q4zl5bhnAuLVCikRoNvKLtgaSqUVPDxhlRXm+
+ RfXgszPFUugvpPsTnomY1X79A8wGyAgWOlXWE5K3fHdrehsvaDb2YgYz/RggS0NO2Jqlr0u53N
+ E3TG7bTpUPNAAAA
+X-Change-ID: 20260526-zram-b01425b7e6c6
+To: Minchan Kim <minchan@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Yisheng Xie <xieyisheng1@huawei.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+ Cunlong Li <shenxiaogll@gmail.com>, stable@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779936530; l=1246;
+ i=shenxiaogll@gmail.com; s=20260517; h=from:subject:message-id;
+ bh=hEMiF3S5n7GD3rgFs1MSCMOijiI81jrIRmqCj3tGYEk=;
+ b=b0BDviFETroiomMLL7jl4q+mx7Zxj3oBLg5d53SGnqIPES4wURls/SzkCaj/bSMVLu7RDu0Nh
+ FQNi/cpR0KuDbjHlHbFkwfXLikSkTIE9UCFOw+gYAtjyOvG21yJL0pA
+X-Developer-Key: i=shenxiaogll@gmail.com; a=ed25519;
+ pk=SKFifnqPdsvsjuhUiq+Y9vtCdhyZ/LrRcfYn8eRq6AE=
 
-From: Keith Busch <kbusch@kernel.org>
+Patch 1 fixes a use-after-free in zram_bvec_write_partial() that
+happens on PAGE_SIZE > 4K configurations when a partial write hits a
+ZRAM_WB slot.
 
-v2->v3:
+Patch 2 is a follow-up cleanup that drops the now-unused bio parameter
+from zram_bvec_write_partial() and zram_bvec_write(), no functional
+change.
 
-  Added kerneldoc for the exported API
+Patch 1 is tagged for stable; patch 2 is not.
 
-  Added code comment for the passthrough safety
+Signed-off-by: Cunlong Li <shenxiaogll@gmail.com>
+---
+Changes in v3:
+- Update Fixes: tag to 8e654f8fbff5 ("zram: read page from backing
+  device") per Christoph.
+- Link to v2: https://lore.kernel.org/r/20260527-zram-v2-0-2fb84b054b5c@gmail.com
 
-  Added reviews.
+Changes in v2:
+- Add patch 2: drop the now-unused bio parameter from
+  zram_bvec_write_partial() and zram_bvec_write(), per Sergey's
+  suggestion on v1.
+- Link to v1: https://lore.kernel.org/r/20260527-zram-v1-1-ce1acb2bfaf9@gmail.com
 
-Keith Busch (2):
-  block: export passthrough stats enabled
-  nvme: add support multipath passthrough iostats
+---
+Cunlong Li (2):
+      zram: fix use-after-free in zram_bvec_write_partial()
+      zram: drop unused bio parameter from write helpers
 
- block/blk-mq.c                | 32 +---------------------------
- drivers/nvme/host/ioctl.c     |  9 ++++++++
- drivers/nvme/host/multipath.c |  5 ++++-
- include/linux/blk-mq.h        | 40 +++++++++++++++++++++++++++++++++++
- 4 files changed, 54 insertions(+), 32 deletions(-)
+ drivers/block/zram/zram_drv.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+---
+base-commit: e8c2f9fdadee7cbc75134dc463c1e0d856d6e5c7
+change-id: 20260526-zram-b01425b7e6c6
 
---=20
-2.53.0-Meta
+Best regards,
+-- 
+Cunlong Li <shenxiaogll@gmail.com>
 
