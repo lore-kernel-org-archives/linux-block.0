@@ -1,46 +1,46 @@
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C0226C3BD
-	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 19:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477A926C3BD
+	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 19:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779997583; cv=none; b=nO3ydqR+KpKgKuZgEEfX+ch4Cv+377h0occpWrafgwu878buIxCrTv6TpZcUMERHW1/b1bNqFZ7WnGgkJHRA08vBsCQyQ2YBjXt9Zty+Wpus+QCEeK9JaQhuQfRuO96cCrvBktfiJ5PHqx/fRRpWUUB92TceEHtPCy9ksnezW9g=
+	t=1779997586; cv=none; b=SP12AAfOlYElMJXAS8N5f3TzfqyPFYAdvhUnh57kbhQ5EiRdgRqaAQLkPVngQvFfCqlLoq7M9jgZ9KWvK5Bir7ORkvAVATXbFTLhiIwIySUdFbfFf29G1g4M2EgmJmJ2xoSPr6qaL26lI3Jfe6f3zAgHfGRLYmQmPCzuLMtz5bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779997583; c=relaxed/simple;
-	bh=XaJi5LE0jKsvSKyAgJO4oZYzyfUOGlFglcauLZx7Wd0=;
+	s=arc-20240116; t=1779997586; c=relaxed/simple;
+	bh=0o1LMMH8YMsy85Ql0dNxopzzmC5h8Gtam/rys9I4VM0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MXUlnR2+77fZIk9mIx0YGz1iZEsjzeyAx6JRAPqRhwmVuCIs0NcGzn9Y1lrZVy1RSrdUEg68I8kU8HdFnsqmIwDN4Ev9qq1/awfwjqxl8MMkTG0/VVgdofogZzOZE8Rpk3Xkn+0iAfcmIhZEXWBMTggd27phPj3ayR8UFPDPtxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=lhG2qUFb; arc=none smtp.client-ip=199.89.1.14
+	 MIME-Version; b=NZm1uwfYqdtZN7TY9F562Cs801bMprknIcyRNOG9YWF4p61uqK+KCCDq0Tp8qzy5x8syeJkwciKQHhR0HEXgknT61VT9ZfxQQuCfvdsiGcwl40wwnuZ0YcRJQ20HR2erWkoKbl10LwPe+wPANmLpwmlYZwRY3DfSNCelTnYUISo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=w4rRhDB7; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="lhG2qUFb"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="w4rRhDB7"
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gRH6j5z0Xz1XM0kC;
-	Thu, 28 May 2026 19:46:21 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gRH6n0QyZz1XM0pZ;
+	Thu, 28 May 2026 19:46:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1779997575; x=1782589576; bh=jvpCo
-	j9sifG4EMQk16WARHRYK/ZaSZ0RFY7h39W9bGM=; b=lhG2qUFb/w/iqYr5N/v7c
-	4/eITkiUxt5b3gQBjKmyPtuYSzTm2de58XVvfnx/t9SiZ/2Uq/y/s/X9p4rKNkmz
-	X0LaAbpu1dBWm+N63/ml9cf+rtb80GZy3Y6DG/52lsgRWIKo+skaUcGITeu/ZN9d
-	AGGQK0z59FD5V5+f84YHOJXICRjT7CUDDT8hNeC8sv30QraHRuVNqhVO4OCI1uDU
-	QImb7/oV6VzarRZgwVVV3CYyPUTHGilKpKpqx5fDSwqcC2S1F2xeOfEKKfYzS5c5
-	OTLX20uZhg/BdkqU9HB0t5uyy6u0Stf/F/x+mgucCjj1wq5AM46arv6jSHe2/p7T
+	:received:received; s=mr01; t=1779997580; x=1782589581; bh=mtT64
+	RurcT7xOWF8ZzCwY2gGt1sRp3ckYG01jWWVmBA=; b=w4rRhDB7NT20qNank2ZOR
+	W4al/HcqAoz72pVFt/B1ES+p/ykxQQx8l4RziNGEpBpuats4Wq8wEkRudXBGLcQO
+	DZx+OKOm+DQEhP0ZgRW1iBxGy1OkPHL7UiskJbMrJseZr+LxzC3JkqnA/A8imZt0
+	LBnBaK7IQcGk3xJPH8Z+sfH1U7mTYsPYrbcF38neBgB3q+ld/8RyrA8hGuhvbETH
+	paS48gTkWuIobhB9BtZXnPnYFamwcetLLM1V6wC7KaWmtZYpqSG261tLOJ0WSCNV
+	fxDNlbcyM00d7lEWEf2T8U5fgMRctIuIIOg+xGYBxyy7vaa+74SspQg+HuEIj3vu
 	w==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ynyb_muzieTV; Thu, 28 May 2026 19:46:15 +0000 (UTC)
+ id cozQY3UYtoB4; Thu, 28 May 2026 19:46:20 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gRH6Y1BrQz1XM0pZ;
-	Thu, 28 May 2026 19:46:12 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gRH6f4jr5z1XM0pY;
+	Thu, 28 May 2026 19:46:18 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -48,11 +48,10 @@ Cc: linux-block@vger.kernel.org,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Yu Kuai <yukuai@fnnas.com>
-Subject: [PATCH v5 03/12] block/cgroup: Split blkg_conf_prep()
-Date: Thu, 28 May 2026 12:45:40 -0700
-Message-ID: <4e4b11711301f1522fec5fb59de12cbd48f5038f.1779997063.git.bvanassche@acm.org>
+	Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH v5 05/12] block/cgroup: Improve lock context annotations
+Date: Thu, 28 May 2026 12:45:42 -0700
+Message-ID: <a30486e2e9695614e4407d5ad8c75d637f5b31db.1779997063.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
 In-Reply-To: <cover.1779997063.git.bvanassche@acm.org>
 References: <cover.1779997063.git.bvanassche@acm.org>
@@ -64,116 +63,56 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Move the blkg_conf_open_bdev() call out of blkg_conf_prep() to make it
-possible to add lock context annotations to blkg_conf_prep(). Change an
-if-statement in blkg_conf_open_bdev() into a WARN_ON_ONCE() call. Export
-blkg_conf_open_bdev() because it is called by the BFQ I/O scheduler and
-the BFQ I/O scheduler may be built as a kernel module.
+Add lock context annotations where these are missing. Move the
+blkg_conf_prep() annotation into block/blk-cgroup.h to make it visible
+to all blkg_conf_prep() callers.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Tejun Heo <tj@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/bfq-cgroup.c |  4 ++++
- block/blk-cgroup.c | 18 ++++++++----------
- block/blk-iocost.c |  4 ++++
- 3 files changed, 16 insertions(+), 10 deletions(-)
+ block/blk-cgroup.c |  1 -
+ block/blk-cgroup.h | 15 ++++++++++-----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index ac83b0668764..38396df9dce7 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1051,6 +1051,10 @@ static ssize_t bfq_io_set_device_weight(struct ker=
-nfs_open_file *of,
-=20
- 	blkg_conf_init(&ctx, buf);
-=20
-+	ret =3D blkg_conf_open_bdev(&ctx);
-+	if (ret)
-+		goto out;
-+
- 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_bfq, &ctx);
- 	if (ret)
- 		goto out;
 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 554c87bb4a86..a8d95d51b866 100644
+index 38d7bcfcbbe8..86513c54c217 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -771,10 +771,7 @@ EXPORT_SYMBOL_GPL(blkg_conf_init);
-  * @ctx->input and get and store the matching bdev in @ctx->bdev. @ctx->=
-body is
-  * set to point past the device node prefix.
-  *
-- * This function may be called multiple times on @ctx and the extra call=
-s become
-- * NOOPs. blkg_conf_prep() implicitly calls this function. Use this func=
-tion
-- * explicitly if bdev access is needed without resolving the blkcg / pol=
-icy part
-- * of @ctx->input. Returns -errno on error.
-+ * Returns: -errno on error.
-  */
- int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- {
-@@ -783,8 +780,8 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- 	struct block_device *bdev;
- 	int key_len;
-=20
--	if (ctx->bdev)
--		return 0;
-+	if (WARN_ON_ONCE(ctx->bdev))
-+		return -EINVAL;
-=20
- 	if (sscanf(input, "%u:%u%n", &major, &minor, &key_len) !=3D 2)
- 		return -EINVAL;
-@@ -813,6 +810,8 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- 	ctx->bdev =3D bdev;
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(blkg_conf_open_bdev);
-+
- /*
-  * Similar to blkg_conf_open_bdev, but additionally freezes the queue,
-  * ensures the correct locking order between freeze queue and q->rq_qos_=
-mutex.
-@@ -857,7 +856,7 @@ unsigned long __must_check blkg_conf_open_bdev_frozen=
+@@ -862,7 +862,6 @@ unsigned long __must_check blkg_conf_open_bdev_frozen=
 (struct blkg_conf_ctx *ctx)
-  * following MAJ:MIN, @ctx->bdev points to the target block device and
-  * @ctx->blkg to the blkg being configured.
-  *
-- * blkg_conf_open_bdev() may be called on @ctx beforehand. On success, t=
-his
-+ * blkg_conf_open_bdev() must be called on @ctx beforehand. On success, =
-this
-  * function returns with queue lock held and must be followed by
-  * blkg_conf_exit().
   */
-@@ -870,9 +869,8 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct =
-blkcg_policy *pol,
- 	struct blkcg_gq *blkg;
- 	int ret;
+ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		   struct blkg_conf_ctx *ctx)
+-	__acquires(&bdev->bd_queue->queue_lock)
+ {
+ 	struct gendisk *disk;
+ 	struct request_queue *q;
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index ce90f5b60d52..f0a3af520c55 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -218,14 +218,19 @@ struct blkg_conf_ctx {
+ };
 =20
--	ret =3D blkg_conf_open_bdev(ctx);
--	if (ret)
--		return ret;
-+	if (WARN_ON_ONCE(!ctx->bdev))
-+		return -EINVAL;
+ void blkg_conf_init(struct blkg_conf_ctx *ctx, char *input);
+-int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx);
++int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
++	__cond_acquires(0, &ctx->bdev->bd_queue->rq_qos_mutex);
+ unsigned long blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx);
+ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+-		   struct blkg_conf_ctx *ctx);
+-void blkg_conf_unprep(struct blkg_conf_ctx *ctx);
+-void blkg_conf_close_bdev(struct blkg_conf_ctx *ctx);
++		   struct blkg_conf_ctx *ctx)
++	__cond_acquires(0, &ctx->bdev->bd_disk->queue->queue_lock);
++void blkg_conf_unprep(struct blkg_conf_ctx *ctx)
++	__releases(ctx->bdev->bd_disk->queue->queue_lock);
++void blkg_conf_close_bdev(struct blkg_conf_ctx *ctx)
++	__releases(&ctx->bdev->bd_queue->rq_qos_mutex);
+ void blkg_conf_close_bdev_frozen(struct blkg_conf_ctx *ctx,
+-				 unsigned long memflags);
++				 unsigned long memflags)
++	__releases(&ctx->bdev->bd_queue->rq_qos_mutex);
 =20
- 	disk =3D ctx->bdev->bd_disk;
- 	q =3D disk->queue;
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 0cca88a366dc..b34f820dedcc 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -3140,6 +3140,10 @@ static ssize_t ioc_weight_write(struct kernfs_open=
-_file *of, char *buf,
-=20
- 	blkg_conf_init(&ctx, buf);
-=20
-+	ret =3D blkg_conf_open_bdev(&ctx);
-+	if (ret)
-+		goto err;
-+
- 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_iocost, &ctx);
- 	if (ret)
- 		goto err;
+ /**
+  * bio_issue_as_root_blkg - see if this bio needs to be issued as root b=
+lkg
