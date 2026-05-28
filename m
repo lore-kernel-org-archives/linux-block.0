@@ -1,63 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B012A3E714C;
-	Thu, 28 May 2026 18:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6C92E6CB8
+	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 19:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779992355; cv=none; b=scM4UfNxAo2mvQzcnVPPzaCxuyh/8rYNOeX6sr6uJzqHOWpWn84AWY6XJLgo6szSDvinEJi9sABEBRtDHDpM97q09SjVVYU+aFfF0lfaxU2ROBNbfTaDUKUEGz0zgRAssBk2UAbOwN4+/gj/p3asHlJrnhegSPdlnvbMLSaVLRk=
+	t=1779997575; cv=none; b=dihuMhQsp6iLKeHyEokEixM3e8ZT6pqUOF1+Y+wZwmSCEqfZwuB2aMxvISbqMr7RIwxq/fzyl3RsT4Wn2c+4tWpihv1mYp8vbqwkyHri1hRqL5u69BBGpiLF2DcJltd7YVzZCJKsEMMJdmTHm6Dw6Yy007oFvPhVEqPUGZqBUsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779992355; c=relaxed/simple;
-	bh=CEBX/X6PBwrtNQVS34YvCyy1sX4BvyaNdVAE0S10LS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OYcS19vuOusII2OGMf0W/usKzh14/VFNGkXIK9mE1eNfpWzhqsS71GZ/K3rClZ810A18K+6bV1sLGZUgi4ck5MpNwZ90+72E5CQvZ6MsYXkdUNc1Wl0BePKlqtJYavtYa78Cj1/YN4yKSPcvcEw5mylbFuuLpKrOc9j3hVMcK+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHnvxN+X; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779997575; c=relaxed/simple;
+	bh=twRbIS1AtC3a2qgRmDu5qLa3ek5TdDi74kQYEv4sCM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iuyAPYXUKHo9uQedF8FVv6m6IRKtnM3mU3jyCEpVxK7YajUpShdOYzPUCRZ1E6kwUxyGy7KAsfhAfRI++e/PmONZ2BDOaWusFD8G+m4vu3I8Czj80Sw2SPwa5eWV9y0q18zd+J3zpAFqK9c9HCC8WGyvwSSNQDEUM4U3SHpSX3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=vofSK/rt; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHnvxN+X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 129971F000E9;
-	Thu, 28 May 2026 18:19:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779992354;
-	bh=9zfQVtS7zyt1UNfdGE5qkvygfJ2lT/N6CFtv5qKDbrk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=CHnvxN+XbVHln5GN22bEU2DwuYKOLZj5zBnsHY7uYUJYtgLStmeZBgZI5iwEAeoW1
-	 UAbb/TmzhPagoPnMxqDC+j24wYy4VtfZLogzWU+I02dzskNiBT8x+Qup1QHfOfxITg
-	 y1zvbhEtk8nC1CC6cShHaV9Tf5lTGv/kbLlo8IIIEv8n7OMr1Yih2MhyE7BBYZDQd7
-	 9Bx5yLx0o8OqL++j+d1zBEZe7Y32uxEfJbTBpLLTIQEm88e//aJVSY3/NzghQ8aQ04
-	 oN/m/MgPw6HKU9YTWqkjT/3xFKNI+GTJDRsWKBSh6kQoqXkdY6WEWD+Oj/swFOSZtQ
-	 KtSwbX2gFC35A==
-Date: Thu, 28 May 2026 12:19:12 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: "Achkinazi, Igor" <Igor.Achkinazi@dell.com>
-Cc: "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] nvme-multipath: set BIO_REMAPPED on bios remapped to
- per-path namespace disks
-Message-ID: <ahiHIEhsV2zuG5vH@kbusch-mbp>
-References: <MW5PR19MB548483D1FAE4F322E4C97352FD032@MW5PR19MB5484.namprd19.prod.outlook.com>
- <DS0PR19MB76963295FC34844B413479F9FD092@DS0PR19MB7696.namprd19.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="vofSK/rt"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gRH6Z0xbMz1XM0ph;
+	Thu, 28 May 2026 19:46:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1779997570; x=1782589571; bh=mR/Jx
+	ESC/83+Jki4KGF2JUFJBVHxtNbvVYrIThxxq+A=; b=vofSK/rtwF/UX13SBpCMM
+	M3KFqSG0AMkuUKJUkHMmLTc5SjbvUY3Pp2cQw/qPdAPGid8/KkhWPV5ptBHykLIx
+	65uNw7Ib3Zntmp6JGYYF6q5dijN5KExINziToa+xyEROwN0p6j9bqa3GH9XUPtu5
+	NNqdyrrIhZg0iomFIBoop/9Mv7nGaWl+p7+obJRe4eDoJUurgeJVf9TTtd+Dktei
+	XM/v8pPgZHwbUU4iwut+IzoNUp1K4JUHGe3lCAXBkEGM4RCHSYqFZ2jf38NZE/l7
+	T2qebw4cT2NijV0kkWNBRvcJuEHLz5zGP9Voqe5SaJY1LpP9JAVeogpotbHR5a4n
+	g==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id OQgp2GTyg33C; Thu, 28 May 2026 19:46:10 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gRH6T5SNNz1XM0p3;
+	Thu, 28 May 2026 19:46:09 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v5 01/12] block: Annotate the queue limits functions
+Date: Thu, 28 May 2026 12:45:38 -0700
+Message-ID: <ecdb2e97d3824a64292be86eacdf87684cc9af85.1779997063.git.bvanassche@acm.org>
+X-Mailer: git-send-email 2.54.0.823.g6e5bcc1fc9-goog
+In-Reply-To: <cover.1779997063.git.bvanassche@acm.org>
+References: <cover.1779997063.git.bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR19MB76963295FC34844B413479F9FD092@DS0PR19MB7696.namprd19.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 28, 2026 at 03:24:27PM +0000, Achkinazi, Igor wrote:
-> The SRCU read lock prevents synchronize_srcu() from completing, but
-> does not prevent set_capacity(0) from executing.  The bio fails the
-> EOD check before it reaches the NVMe driver, so nvme_failover_req()
-> never gets a chance to redirect it to another path of multipath.  IO errors
-> are reported to the application despite another path being available.
+Let the thread-safety checker verify whether every start of a queue
+limits update is followed by a call to a function that finishes a queue
+limits update.
 
-I double checked the sequences here, and yes, I think the
-synchronize_srcu's already in place ensure every caller sees the EOD
-error before it could fail the bio_queue_enter(), so this looks like it
-happens to be sufficient. I'm okay with it. 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ include/linux/blkdev.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 17270a28c66d..65efbd7fe1a3 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1092,15 +1092,17 @@ static inline unsigned int blk_boundary_sectors_l=
+eft(sector_t offset,
+  */
+ static inline struct queue_limits
+ queue_limits_start_update(struct request_queue *q)
++	__acquires(&q->limits_lock)
+ {
+ 	mutex_lock(&q->limits_lock);
+ 	return q->limits;
+ }
+ int queue_limits_commit_update_frozen(struct request_queue *q,
+-		struct queue_limits *lim);
++		struct queue_limits *lim) __releases(&q->limits_lock);
+ int queue_limits_commit_update(struct request_queue *q,
+-		struct queue_limits *lim);
+-int queue_limits_set(struct request_queue *q, struct queue_limits *lim);
++		struct queue_limits *lim) __releases(&q->limits_lock);
++int queue_limits_set(struct request_queue *q, struct queue_limits *lim)
++	__must_not_hold(&q->limits_lock);
+ int blk_validate_limits(struct queue_limits *lim);
+=20
+ /**
+@@ -1112,6 +1114,7 @@ int blk_validate_limits(struct queue_limits *lim);
+  * starting update.
+  */
+ static inline void queue_limits_cancel_update(struct request_queue *q)
++	__releases(&q->limits_lock)
+ {
+ 	mutex_unlock(&q->limits_lock);
+ }
