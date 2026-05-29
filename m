@@ -1,111 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FEE2C15A5;
-	Fri, 29 May 2026 06:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231FE35203F
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 06:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780034977; cv=none; b=vCxdcGwL5kaSo4K7R5uYq0QTsF2E0rFMr/4ipHuncZ2W0SCgq6Lt4qQ4DYmVfUTx/Mojhbf9/PRI1SVCY+lWiHm6S0+hqukyM6lvdDLjtd/LQS2H5nMB6EZXhQf6QEgfHDQnk1/OiCWLnA6kZp47DUwuoYqEdMzcjc7N1Zgpr5M=
+	t=1780035384; cv=none; b=NhkMa7npSqj/zv1tgi0MC5LkiZ3kT1eoVvADbbWRIa0JTdTsRgNQy35pVoZpl/2/8fwDmP8Jhf8+RU3jQBRS4Y8WPh5sCF9vXYFcj9smfAFOXH852Ru29jth8SPo66qDWw4C2nxhOYL1rUBVQlozFP79WnIXJI/3oNSS1ZuM5rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780034977; c=relaxed/simple;
-	bh=fIclOetvM1I0QIG02RKZl70AzDznTBk+NdsBhwsjIU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BglWB+QGXTFZ2I+Y6AZri01psKSkHuGpYYN0ehi+cXxp0RQjkG9T7CY63N7B5sA0ne9L15XnlXUGXV6/AlOehVEPmqtVpe3wGhDar7HLspwciLS2txBZMGcSPBs8YFU0Nniypdj5DS4w3zxEd8SGNExbVQKbnNpoykQdiPeElpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EM3A7L7m; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780035384; c=relaxed/simple;
+	bh=a/p6mC0VGmPi6Fagw1ram42LV4IrVQ5DjVDWjEDRfxM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UbpCYaXz0pbl1Wwfu0iKHhHBMhp3cziUss4MpZF1iIall+bbhL7EdhFCnzJwlVBSDKzaTNMEk6q6Tm84e06BGh7hd0RG4rVelpBd3V3kHn1oKsMe7Y3IGEuuDYpFrtJfHc7k3thvB/XRVhNQIwm8R/ziMzCmfUogtvGyz3Lgk7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Qfb4o4xO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=55Xr3bsa; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Qfb4o4xO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=55Xr3bsa; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EM3A7L7m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C42D1F00893;
-	Fri, 29 May 2026 06:09:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780034976;
-	bh=pTHyR6AqtgUjVBTYL19Bfd0hR3boodWmhm7OEYTZO9Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EM3A7L7maU36AQcQxDmHswhEWSHuphXFIGifJgvim1ghA5909A0uS61DkB473+/TZ
-	 BWpLZDweN8SsyQoCmXfs3JbslfPvvMGrv98963NViBZB74enXXoMYZWYrO+LxRl5Ex
-	 XY3b4E7R0mlolAyKkUE2XuIWUgswJfg1mu7CCaXoxGxGK9LbCZTJgeyQNzlV5Ez4v4
-	 jPJrohFmF7/bBm0QoN5Zr5Zyu0yUfZFJl9aKRbrSirChY67w9t2NLI3281AXGSb+N4
-	 iilNWkPy9Pw3k2Fhekznz1YytL43mGN58pTsXfJsiFMgNzCDNw2YMxNlDzCAtONW2D
-	 4GE4W72eqBTlQ==
-From: Miguel Ojeda <ojeda@kernel.org>
-To: gregkh@linuxfoundation.org
-Cc: achill@achill.org,
-	akpm@linux-foundation.org,
-	broonie@kernel.org,
-	conor@kernel.org,
-	f.fainelli@gmail.com,
-	hargar@microsoft.com,
-	jonathanh@nvidia.com,
-	linux-kernel@vger.kernel.org,
-	linux@roeck-us.net,
-	lkft-triage@lists.linaro.org,
-	patches@kernelci.org,
-	patches@lists.linux.dev,
-	pavel@nabladev.com,
-	rwarsow@gmx.de,
-	shuah@kernel.org,
-	sr@sladewatkins.com,
-	stable@vger.kernel.org,
-	sudipm.mukherjee@gmail.com,
-	torvalds@linux-foundation.org,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 6.12 000/272] 6.12.92-rc1 review
-Date: Fri, 29 May 2026 08:09:18 +0200
-Message-ID: <20260529060918.123155-1-ojeda@kernel.org>
-In-Reply-To: <20260528194629.379955525@linuxfoundation.org>
-References: <20260528194629.379955525@linuxfoundation.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Qfb4o4xO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="55Xr3bsa";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Qfb4o4xO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="55Xr3bsa"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 37B4267235;
+	Fri, 29 May 2026 06:16:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780035380; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2AoKt5jawG2SYWcB6lrzc86SNhTgrdb3Hl77qm/udGg=;
+	b=Qfb4o4xO+07ViaKys2o47r7MyhBBn7VCldgc9aQMA42RDxzWNTpNhgKGMNEgnYu8lXaIdo
+	YGegcOh6sqXcjlRR/2FPXVCtdmJyS50aFeGNBATUIr78i4YycGZMuUnTX8Cf4IkTAA7/e7
+	fcgvXf4f6pnlidprw+PAtvlYWhOAO2g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780035380;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2AoKt5jawG2SYWcB6lrzc86SNhTgrdb3Hl77qm/udGg=;
+	b=55Xr3bsauaj3J+QpR1BRYMOqu6SWpjBvG17MEHVnmQEd6/NwhnVm19X4Em4G9FdR9o2rGj
+	PNd6mlV+kKrMNqBA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780035380; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2AoKt5jawG2SYWcB6lrzc86SNhTgrdb3Hl77qm/udGg=;
+	b=Qfb4o4xO+07ViaKys2o47r7MyhBBn7VCldgc9aQMA42RDxzWNTpNhgKGMNEgnYu8lXaIdo
+	YGegcOh6sqXcjlRR/2FPXVCtdmJyS50aFeGNBATUIr78i4YycGZMuUnTX8Cf4IkTAA7/e7
+	fcgvXf4f6pnlidprw+PAtvlYWhOAO2g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780035380;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2AoKt5jawG2SYWcB6lrzc86SNhTgrdb3Hl77qm/udGg=;
+	b=55Xr3bsauaj3J+QpR1BRYMOqu6SWpjBvG17MEHVnmQEd6/NwhnVm19X4Em4G9FdR9o2rGj
+	PNd6mlV+kKrMNqBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F097D5B1C4;
+	Fri, 29 May 2026 06:16:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id gzPiODMvGWpfEwAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 29 May 2026 06:16:19 +0000
+Message-ID: <36673080-f216-4c85-a9f6-ad9395dbd56e@suse.de>
+Date: Fri, 29 May 2026 08:16:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] block: Add bvec_folio()
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-mm@kvack.org,
+ Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@infradead.org>
+References: <20260528175905.1102280-1-willy@infradead.org>
+ <20260528175905.1102280-2-willy@infradead.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260528175905.1102280-2-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.996];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid,infradead.org:email]
 
-On Thu, 28 May 2026 21:46:14 +0200 Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
->
-> This is the start of the stable review cycle for the 6.12.92 release.
-> There are 272 patches in this series, all will be posted as a response
-> to this one.  If anyone has any issues with these being applied, please
-> let me know.
->
-> Responses should be made by Sat, 30 May 2026 19:45:52 +0000.
-> Anything received after that time might be too late.
-
-Boot-tested under QEMU for Rust x86_64, arm64 and riscv64; built-tested
-for loongarch64:
-
-Tested-by: Miguel Ojeda <ojeda@kernel.org>
-
-I am seeing:
-
-    In file included from kernel/trace/blktrace.c:23:
-    In file included from kernel/trace/../../block/blk.h:5:
-    ./include/linux/bio-integrity.h:101:12: error: unused function 'bio_integrity_map_user' [-Werror,-Wunused-function]
-      101 | static int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
-          |            ^~~~~~~~~~~~~~~~~~~~~~
-
-This looks like it needs:
-
-  546d191427cf ("block: make bio_integrity_map_user() static inline")
-
-(and indeed in my run `CONFIG_BLK_DEV_INTEGRITY` is not set like the
-commit message says).
-
-Cc: Anuj Gupta <anuj20.g@samsung.com>
-Cc: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>
-
-Cc: Jens Axboe <axboe@kernel.dk>
-CC: linux-block@vger.kernel.org
-
-Thanks!
+On 5/28/26 19:59, Matthew Wilcox (Oracle) wrote:
+> This is a simple helper which replaces page_folio(bvec->bv_page).
+> Minor improvement in readability, but the real motivation is to reduce
+> the number of references to bvec->bv_page so that it can be changed
+> with less work.
+> 
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> ---
+>   block/bio.c          |  6 +++---
+>   include/linux/bio.h  |  2 +-
+>   include/linux/bvec.h | 15 +++++++++++++++
+>   io_uring/rsrc.c      |  2 +-
+>   mm/page_io.c         |  4 ++--
+>   5 files changed, 22 insertions(+), 7 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
 Cheers,
-Miguel
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
