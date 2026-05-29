@@ -1,255 +1,302 @@
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+Received: from mail3-165.sinamail.sina.com.cn (mail3-165.sinamail.sina.com.cn [202.108.3.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686E9329E79
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 20:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C4E3A63F2
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 22:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780087586; cv=none; b=nAU0Wnkd+5illKz4kFECTSURklzN83W/TPzEiu+Cpm3PosDCWF5aCfBiZstaBIIBF3f5zE94YmqKEwdddKH75YV1Kl1OoRcWmyGStE+XiReWS6kJ/VXrxeIfuudBIV+axdj+ZzO34xBbRUF4QdP1vvlondOqJp1OOt16e6O2ZNY=
+	t=1780092387; cv=none; b=dd20q1KPPoCriUV896PujCUvR21x2aRaoFJYxnXmKH3s4auLitL2svBiDSF5WPX2H7loJq8BZ0Lf+r//akcRFFcXx71QkXVDuHR7Yh8AQjfez5ImjGneNj1qZhUquX7L2NeakdbMajk6oVDkGMGCC/Tj/tggFZt7swqRJdsoG60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780087586; c=relaxed/simple;
-	bh=Dgt9gdgsSTGz25LNKdlg6p96v9ORYzbnwBkkNl+zH0w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rCkN95nQIA3qOrZw+4eQnUlJKPjRzTgrJwbPpaIs2iZdLJSPZgeYwKV40qWdg2Hg01Gx5vs7rRo4ba/DkuF4RFa5tPafNTjINOiyN/NKxl/C4rHvPBjN4STAnRM5YgLALJdksiEj6G8J7Z66W7//YV2G/m7+TcgN7c0SMQ/VqFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=fNdL0jd2; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	s=arc-20240116; t=1780092387; c=relaxed/simple;
+	bh=FrlNSD5ptoLwRoC92Nn/ePPH3Q6UgR3eP7lFPmRGkjc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VqK7aflC1tzz6hNBCURV9JpTkJXle89V4l3GsJ5ORvc3FsrvsjzX1YOzLnf/liWZ3BiTBWjukeuuxtb6vlyIcNT3f1JBdXEPzLWR4nIBFejYx5yslRvN6yXod2iR+scNIFf61lmswOft1Rt4q3jKxGjRP41TKV6CHCsCFqJdeXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=lF4ptmmp; arc=none smtp.client-ip=202.108.3.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="fNdL0jd2"
-Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64TKgG3Q3728100
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 16:46:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps01; bh=Tu3y
-	zxbzT574lf/x8+7GuddK+9mUu+iNaUikqjzhrDc=; b=fNdL0jd2jEZLLdEDzHwo
-	hg9oAn2A09Nc/UhTjZBmS2wSISfSJcrx7iHnycx2ggqMsmdYhM48Qp6dn8zJwdYB
-	985sLAgkwtmSCT8teAzwTA6OhaIFRxvl6MhKiUIHzXRQSYgRkuDKU0XNg2X2RpBr
-	0P7NHA2+A2rGk69mahYeBod1zrBCcJUIzU4maJzE4t8BG1N9Hc/8nKnhiSDo4Nh4
-	Ch5XzOjEOBE/jVetXJBtepua7x9ftMeGTiaGWhJ+DI1yELSJMypkbL8bJpLS0OQb
-	sCO7ehhxuKMpXZEyP0t++n/X9s8DuU67L6dejzRsJ12iZiflWRTJYEZgsZtHx+T6
-	gg==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4efhpf05q1-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 16:46:18 -0400 (EDT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-90fb4c8390aso1439376385a.3
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 13:46:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780087578; x=1780692378;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Tu3yzxbzT574lf/x8+7GuddK+9mUu+iNaUikqjzhrDc=;
-        b=QS/oyooq9kfpHYa4RtxsXpG5wQNDoy9ERO2xiK0FqQTe4bq4+8HIEsUv22f9lONy5f
-         ZzvMOe5v3CHxCCOnDqMD9uzm3tfYQJLwjd9beryb0Te41TLOtkAWuSlyx7rNRUnNDbuB
-         uuzFbJkgMXuRGjigP8HL2m3L+6fX4iUUSJ4aKV3F7X3/rm7cVH0ey2kubWGuzOTAg7G9
-         AJygq8EC2RrQ50c+7e0IYLgEDuqy8f6UtJmrXvBpEzwFM+obV1mMsfwawVnlUHeuhhkW
-         u7yorbPnDR8Qy4h3N2Sh0EazYtmdwlEtVbuZd3m+riw7sToIzIaxP3n0RPfoBl5pdyT6
-         A0Qg==
-X-Forwarded-Encrypted: i=1; AFNElJ9pjch8zRfYtt6pjffChYrt//xiCOtzrfqAYV/YNmye7VXPF8WLL/pudqBFGHXPlCraOD4dR+SajjcW9g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWOAiOFCjLVc79VmIsVNSup0kT0MYB6tgSwyIeDS58v239srp8
-	r5/mH0EpMfx9xerScFrzRwhZe0zvm8Y/lh4CctCojPe7+WiSuJLdjMFtpuzRIMHuxaq81ESzpMy
-	Ly9zZYUsawz8HwYOQ5BqCvt25Poa1c88Wcv4YixexyYOpjNkWd+we51GvZfnk
-X-Gm-Gg: Acq92OGqA1mtIzNRTMxWi35ZNGa6P7xkATDosIPkL1v1lX8tRmgzLw2gVcw8RWTBooq
-	IwzTYAZnOdwmNMfad8cazNLcITAiPvmQxfmuMwvDSUrIOlaRmzECTg6T3TynFdzk2jb+tu+74HO
-	3FjGJDb+JvoMPBKX5tPoDKSGHiY+ZP0gWmRX6XP/9c0w4Nu6D1bmtTcjqMvbWWUwPMIAeIakYNq
-	+mZHj6XwhCcikeyYo89vwAAq7c7CyKPo7W5m/zcIJRaEkwmwBgsIM7zd+YNMMF5kMo26qj5nTjr
-	T7Naap+C/DINynJE4oX/Ji8Ri9RYLX9KnAYP1xNpjmKhM7IG4pPaOHmvhMfQzBLtXZJfeFwNP+O
-	HB/BUh5B1CJ00ms8X3fR8+4rQvDYbazwyhe0CVhuyFT4gW4/3KUyuwiSctloL7U98PxYfR3FrVM
-	5tlDUcBCco3x+P8W42ztrDdhIZ1w==
-X-Received: by 2002:a05:620a:27cf:b0:914:b65f:6afe with SMTP id af79cd13be357-9153d93295cmr223977985a.1.1780087577724;
-        Fri, 29 May 2026 13:46:17 -0700 (PDT)
-X-Received: by 2002:a05:620a:27cf:b0:914:b65f:6afe with SMTP id af79cd13be357-9153d93295cmr223970285a.1.1780087577139;
-        Fri, 29 May 2026 13:46:17 -0700 (PDT)
-Received: from ?IPV6:2600:4040:974e:fe00:c8bb:325f:9d37:a5f? ([2600:4040:974e:fe00:c8bb:325f:9d37:a5f])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-915324a5502sm300290485a.21.2026.05.29.13.46.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2026 13:46:16 -0700 (PDT)
-Message-ID: <80cb53f3-e7e5-4f96-bacc-f9fb7661d976@columbia.edu>
-Date: Fri, 29 May 2026 16:46:15 -0400
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="lF4ptmmp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1780092384;
+	bh=tV9YFy/TIg8r8/7C2E2kcrSOZPl7xJdXK++V+f+9xIc=;
+	h=From:Subject:Date:Message-ID;
+	b=lF4ptmmpl2hSaR0pt1SzcUtYrZXCBYywEJEKV+Sx86sNmO9W7mNkhG8A8/xX9BIC6
+	 qyq/xtwwbl/pPhryeueGdgtZp2h57bcdKrjzkuNUw8sU1sbSI3QPa4a5soD5Xp9Wzf
+	 oSJIWCF5uFsFMcI5SSZXjNCl1vKedjeBGh5GGmZ8=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
+	by sina.com (10.54.253.33) with ESMTP
+	id 6A1A0DD200007033; Fri, 30 May 2026 06:06:11 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 9575776685448
+X-SMAIL-UIID: 45EF894C6A164D4D8498A92F92AF606C-20260530-060611-1
+From: Hillf Danton <hdanton@sina.com>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Ming Lei <tom.leiming@gmail.com>,
+	linux-block <linux-block@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-btrfs@vger.kernel.org,
+	David Sterba <dsterba@suse.com>,
+	linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	syzbot+78ad2c6a58c0a1faa5f5@syzkaller.appspotmail.com
+Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
+Date: Sat, 30 May 2026 06:05:59 +0800
+Message-ID: <20260529220600.1226-1-hdanton@sina.com>
+In-Reply-To: <20260529070411.1206-1-hdanton@sina.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/4] block: add task-context bio completion
- infrastructure
-To: Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>
-Cc: Jens Axboe <axboe@kernel.dk>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong"
- <djwong@kernel.org>,
-        Carlos Maiolino <cem@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>
-References: <20260514-blk-dontcache-v6-0-782e2fa7477b@columbia.edu>
- <20260514-blk-dontcache-v6-1-782e2fa7477b@columbia.edu>
- <agq2KRd8RkP1TAf5@infradead.org>
- <ea1fa305-3ba2-4cfd-b7cb-86875032a300@columbia.edu>
- <ahPbaSEoNA755Nt3@infradead.org>
- <f1b8eeb6-2397-4f48-a21a-a023eb0c80ab@columbia.edu>
- <rkb5oei6cx2erbyininczz6ukbnquqheexhu7tznn5rslkkdn7@b4kpdyhdwdb6>
- <ahbq0RdUyLIPiItB@infradead.org>
-Content-Language: en-US
-From: Tal Zussman <tz2294@columbia.edu>
-In-Reply-To: <ahbq0RdUyLIPiItB@infradead.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI5MDIwNiBTYWx0ZWRfX3ypBNQVZZyQh
- DYT3Uq+A73xLf05LamUGH6M9Lg3bFrfy+P+3emQ99xPmUrVNsLCDl2baoALKzPuA/bzUYbF4b7u
- GF///GXnyzVCBfFoRmfsv9ojQOan+McqrWYNcADxq7TBiP0y8MRYxVMoCt/NDKgnKJet27E4upK
- hyD7pSZFDJeMYGWNmPHENBf7vZHNHmVX7oEhp1KOIIsrAacZwuP3AQbb/722ewAnmVDXU6w+xUq
- +3Q/D9KXyZzV+bj4CYbUPjbUseoNqKOlPB1EC4H/prXN2Le4AedJfHaBLvRJnb5aGWrE56Ojavf
- 7cayPtup69LbN057YYEhXwkkDLR3/pvHGv+uk2ztK6ajqt6tdH+myrCB1/9LJJJDkpgOy6vC2X0
- wmMdYq5rIqA2QkLtXAcutIopkY7bENrVbCsxK4SbcAJJ3fUdTXVBU/KtRSsoFjSSjgnmfAlWJUz
- QKvpbH/mVS1TSRmqFOA==
-X-Proofpoint-ORIG-GUID: 1NZQMaJEB6c4-qUOmcwPsj4stH7dQjie
-X-Authority-Analysis: v=2.4 cv=L7UtheT8 c=1 sm=1 tr=0 ts=6a19fb1a cx=c_pps
- a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=NGcC8JguVDcA:10 a=x7bEGLp0ZPQA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Da8U98TiO7q1upZEImrf:22 a=svvvyxlR1OQQkelhaPoB:22 a=glsx1xNwX7j2ZVJJCoYA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22
-X-Proofpoint-GUID: 1NZQMaJEB6c4-qUOmcwPsj4stH7dQjie
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11801
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=10 adultscore=0 phishscore=0
- priorityscore=1501 bulkscore=10 spamscore=0 clxscore=1015 impostorscore=10
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2605210000
- definitions=main-2605290206
 
-On 5/27/26 9:00 AM, Christoph Hellwig wrote:
-> On Wed, May 27, 2026 at 11:42:28AM +0200, Jan Kara wrote:
->> > I ran some experiments with fio on both XFS and a raw block device. Five
->> > iterations each for 60s. Results below.
->> > 
->> > TLDR: Removing the delay doesn't significantly decrease user-visible
->> > latency or otherwise improve performance, but does significantly reduce
->> > throughput and increase context switches in some workloads (e.g. C).
->> > I think it makes sense to leave the delay as-is. Thoughts?
->> 
->> Thanks for the test! One question below:
-> 
-> Thanks from me as well!
-> 
->> 
->> > Results:
->> > 
->> > Workloads (all `uncached=1`):
->> >   A: rw=write     bs=128k iodepth=1   ioengine=pvsync2     # XFS
->> >   B: rw=write     bs=128k iodepth=128 ioengine=io_uring    # XFS
->> >   C: rw=randwrite bs=4k   iodepth=32  ioengine=io_uring    # XFS
->> >   D: rw=rw 50/50  bs=64k  iodepth=32  ioengine=io_uring    # XFS
->> >   E: rw=write     bs=128k iodepth=128 ioengine=io_uring    # raw /dev/nvmeXn1
->> >   F: rw=write     bs=128k iodepth=128 numjobs=4
->> >      + vm.dirty_bytes=64MB, vm.dirty_background_bytes=32MB # XFS
->> > 
->> > Mean ± stddev across 5 iterations:
->> > 
->> >     metric                     delay=1           delay=0     delta
->> >     --------------------------------------------------------------
->> > 
->> >   A seq 128k qd1
->> >     BW (MB/s)                4333 ± 27         4374 ± 34     +0.9%
->> >     p99   (us)              36.2 ± 0.8        35.8 ± 0.4     -1.1%
->> >     p999  (us)               3260 ± 75         3228 ± 29     -1.0%
->> >     ctx-switches          184 k ± 59 k     3.68 M ± 65 k    +1903%
->> >     cs / io                0.09 ± 0.03       1.86 ± 0.03    +1888%
->> >     avg bios/run            80.4 ± 0.6         1.1 ± 0.0    -98.7%
->> 
->> So 1 jiffie delay is (with default HZ=1000) 1ms. That means for this load
->> the completion latency should be at least 1000us but your results show p99
->> latency of 36. What am I missing?
-> 
-> Yes, this looks a bit odd.  Unless there's multiple threads submitting
-> and somehow the completions get batched this should complete one
-> bio at a time and be the worst case for the delay scheme.
+On Fri, 29 May 2026 15:04:10 +0800 Hillf Danton wrote:
+>On Fri, 29 May 2026 09:14:47 +0900 Tetsuo Handa wrote:
+>>On 2026/05/29 8:00, Hillf Danton wrote:
+>>>> Given the loop workqueue that triggered the jfs warning, can you specify
+>>>> the reason why the workqueue in question is NOT flushed while closing disk?
+>>>>
+>>> Got it, the loop workqueue is NOT flushed to avoid deadlock, see d292dc80686a
+>>> ("loop: don't destroy lo->workqueue in __loop_clr_fd") for detail.
+>>> And the deadlock can be reproduced by flushing the loop workqueue with
+>>> disk->open_mutex held [1].
+>>> 
+>>> [1] Subject: Re: [syzbot] possible deadlock in blkdev_put (3)
+>>> https://lore.kernel.org/lkml/000000000000ea753505da2658d5@google.com/
+>>
+>>We can avoid the following lockdep warnings (including [1] you mentioned)
+>>
+>>  https://syzkaller.appspot.com/bug?extid=2f62807dc3239b8f584e
+>>  https://syzkaller.appspot.com/bug?extid=c4e9d077bcc86bee08dc
+>>  https://syzkaller.appspot.com/bug?extid=0f427123ae84b3ba6dc7
+>>  https://syzkaller.appspot.com/bug?extid=4feabfc9641267769c97
+>>  https://syzkaller.appspot.com/bug?extid=fb0ff9bfe34ad282ebd4
+>>
+>>caused by "drain_workqueue() with disk->open_mutex held" if we assign
+>>caller-specific lockdep class to disk->open_mutex
+>>
+>>  https://sourceforge.net/p/tomoyo/tomoyo.git/ci/c2245c765ebeba9dcb924d9171d8d470a9ac41c8/
+>>
+>>.
+>>
+>>Also, we can avoid lockdep warning caused by "drain_workqueue() with disk->open_mutex held" +
+>>"holding system_transition_mutex" if we forbid binding to pseudo files as backing file
+>>in the loop driver
+>>
+>>  https://lkml.kernel.org/r/d38e4600-3c32-491f-aa49-905f4fad1bfb@I-love.SAKURA.ne.jp
+>>
+>>which we can reproduce with
+>>
+>>  echo 7:0 > /sys/power/resume
+>>  losetup /dev/loop0 /sys/power/resume
+>>  cat /dev/loop0 > /dev/null
+>>  losetup -d /dev/loop0
+>>
+>>.
+>>
+>> Therefore, I think we can address this problem by "drain_workqueue() with disk->open_mutex
+>> held" in the loop driver side.
+>>
+> Good news.
+>
+Bad news: Subject: [syzbot] [block?] possible deadlock in loop_process_work
+[3] https://lore.kernel.org/lkml/6a19f5f7.5099cdd9.8e407.0004.GAE@google.com/
 
-Sorry, I should've clarified - the latency here is the userspace-visible
-I/O completion latency (i.e. fio's clat value).
+syzbot found the following issue on:
 
-I ran again and traced to get the actual time from __bio_complete_in_task()
-to calling ->bi_end_io(). The results match the 1 jiffie delay now:
+HEAD commit:    c1ecb239fa34 Add linux-next specific files for 20260522
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=12fa6336580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=77a9211ff284de54
+dashboard link: https://syzkaller.appspot.com/bug?extid=78ad2c6a58c0a1faa5f5
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-  metric                  delay=1  delay=0
+Unfortunately, I don't have any reproducer for this issue yet.
 
-  A seq 128k qd1
-    fio clat p99             38us     36us
-    bio cb p50             1.23ms    2.5us
-    bio cb p99             4.13ms   1.44ms
-    bio cb p999            5.01ms   2.63ms
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4cb88c910144/disk-c1ecb239.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4a9bc938cf88/vmlinux-c1ecb239.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/684f1e33f264/bzImage-c1ecb239.xz
 
-  B seq 128k qd128
-    fio clat p99           8.74ms   8.85ms
-    bio cb p50             1.27ms    3.1us
-    bio cb p99             4.05ms   2.27ms
-    bio cb p999            4.91ms   2.77ms
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+78ad2c6a58c0a1faa5f5@syzkaller.appspotmail.com
 
-  C rand 4k qd32
-    fio clat p99           8.16ms   8.11ms
-    bio cb p50             1.09ms   97.7us
-    bio cb p99             3.73ms   2.06ms
-    bio cb p999           11.87ms   3.79ms
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Tainted: G             L
+------------------------------------------------------
+kworker/u8:15/1491 is trying to acquire lock:
+ffff88805e1a6480 (sb_writers#5){.+.+}-{0:0}, at: do_req_filebacked drivers/block/loop.c:433 [inline]
+ffff88805e1a6480 (sb_writers#5){.+.+}-{0:0}, at: loop_handle_cmd drivers/block/loop.c:1941 [inline]
+ffff88805e1a6480 (sb_writers#5){.+.+}-{0:0}, at: loop_process_work+0x637/0x11b0 drivers/block/loop.c:1976
 
-  D mixed 64k qd32
-    fio clat p99            981us   1.03ms
-    bio cb p50             1.14ms   39.5us
-    bio cb p99             2.83ms    275us
-    bio cb p999            3.06ms    595us
+but task is already holding lock:
+ffffc90006e27c40 ((work_completion)(&worker->work)){+.+.}-{0:0}, at: process_one_work+0x8be/0x1630 kernel/workqueue.c:3294
 
-  E raw 128k qd128
-    fio clat p99          26.97ms  27.34ms
-    bio cb p50             1.58ms   41.5us
-    bio cb p99             2.98ms    325us
-    bio cb p999            3.02ms    575us
+which lock already depends on the new lock.
 
-  F mem-pressure
-    fio clat p99          29.75ms  30.43ms
-    bio cb p50             1.32ms    2.5us
-    bio cb p99             3.73ms   2.48ms
-    bio cb p999            4.62ms   2.83ms
 
-Note that in the above, the C degradation didn't reproduce as much. The
-bandwidth does go down from 64.5 MB/s with delay=1 to 54.9 MB/s with delay=0,
-but it's a much smaller drop. I ran it several more times and ran into the
-degradation ~20% of the time. The lack of batching means the completion
-kworker fires for nearly every bio, leading to heavier preemption when a
-writer is placed on a CPU that receives many completion IRQs. The degradation
-seems to occur when the writers are migrated less often, leading to more
-preemption. But I haven't dug into why the scheduler chooses to migrate more
-in some runs vs. others. However, when pinning to 16 cores, the difference
-between delay=0 and delay=1 goes away.
+the existing dependency chain (in reverse order) is:
 
-C specifically also seems to get worse because we're doing random writes to a
-sparse file, so each bio goes through the IOMAP_IOEND_UNWRITTEN path and the
-completion path is heavier, leading to more CPU stealing from the writing
-threads compared to the other workloads.
+-> #7 ((work_completion)(&worker->work)){+.+.}-{0:0}:
+       process_one_work+0x8d7/0x1630 kernel/workqueue.c:3294
+       process_scheduled_works kernel/workqueue.c:3401 [inline]
+       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
+       kthread+0x388/0x470 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
->> >   C rand 4k qd32
->> >     BW (MB/s)               66.2 ± 0.8        44.6 ± 7.4    -32.7%
->> >     p99   (us)              8002 ± 174      17990 ± 6800   +124.8%
->> >     p999  (us)             11390 ± 554     31890 ± 11076   +180.0%
->> >     ctx-switches         3.67 M ± 45 k    3.59 M ± 106 k     -2.2%
->> >     cs / io                3.78 ± 0.04       5.62 ± 0.83    +48.7%
->> >     avg bios/run            32.3 ± 1.0         3.1 ± 0.3    -90.5%
->> 
->> I'm somewhat surprised how larger is the completion latency is here without
->> the delay. Is that due to a contention on local lock between the IO completion
->> interrupt and the worker? Or why is the completion latency so big here when
->> the case B with more IOs in flight, less bios per run, still had significantly
->> lower latency in the delay=0 case?
-> 
-> Note that in the past we had major problems with workqueue scheduling
-> latency.  At some point these got mitigated a lot, but if they are back
-> for this workload that might be one reason.
-> 
+-> #6 ((wq_completion)loop4){+.+.}-{0:0}:
+       touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:4033
+       __flush_workqueue+0x14b/0x14f0 kernel/workqueue.c:4075
+       drain_workqueue+0xd3/0x390 kernel/workqueue.c:4239
+       __loop_clr_fd drivers/block/loop.c:1130 [inline]
+       lo_release+0x287/0x8f0 drivers/block/loop.c:1767
+       bdev_release+0x541/0x660 block/bdev.c:-1
+       blkdev_release+0x15/0x20 block/fops.c:705
+       __fput+0x461/0xa70 fs/file_table.c:510
+       fput_close_sync+0x11f/0x240 fs/file_table.c:615
+       __do_sys_close fs/open.c:1511 [inline]
+       __se_sys_close fs/open.c:1496 [inline]
+       __x64_sys_close+0x7e/0x110 fs/open.c:1496
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+-> #5 (&disk->open_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
+       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
+       __del_gendisk+0x127/0x980 block/genhd.c:710
+       del_gendisk+0xe7/0x160 block/genhd.c:823
+       nbd_dev_remove drivers/block/nbd.c:268 [inline]
+       nbd_dev_remove_work+0x47/0xe0 drivers/block/nbd.c:284
+       process_one_work+0x98b/0x1630 kernel/workqueue.c:3318
+       process_scheduled_works kernel/workqueue.c:3401 [inline]
+       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
+       kthread+0x388/0x470 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #4 (&set->update_nr_hwq_lock){++++}-{4:4}:
+       down_read+0x97/0x200 kernel/locking/rwsem.c:1568
+       add_disk_fwnode+0xe7/0x480 block/genhd.c:596
+       add_disk include/linux/blkdev.h:794 [inline]
+       nbd_dev_add+0x72c/0xb50 drivers/block/nbd.c:1984
+       nbd_genl_connect+0x965/0x1c80 drivers/block/nbd.c:2125
+       genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1114
+       genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+       genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1209
+       netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2551
+       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+       netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+       netlink_unicast+0x780/0x920 net/netlink/af_netlink.c:1345
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
+       sock_sendmsg_nosec+0x112/0x150 net/socket.c:797
+       __sock_sendmsg net/socket.c:812 [inline]
+       ____sys_sendmsg+0x55c/0x870 net/socket.c:2716
+       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2770
+       __sys_sendmsg net/socket.c:2802 [inline]
+       __do_sys_sendmsg net/socket.c:2807 [inline]
+       __se_sys_sendmsg net/socket.c:2805 [inline]
+       __x64_sys_sendmsg+0x1c3/0x2a0 net/socket.c:2805
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #3 (genl_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
+       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
+       genl_lock net/netlink/genetlink.c:35 [inline]
+       genl_lock_all net/netlink/genetlink.c:48 [inline]
+       genl_register_family+0x7b9/0x17b0 net/netlink/genetlink.c:784
+       vdpa_init+0x39/0x70 drivers/vdpa/vdpa.c:1565
+       do_one_initcall+0x250/0x870 init/main.c:1347
+       do_initcall_level+0x104/0x190 init/main.c:1409
+       do_initcalls+0x59/0xa0 init/main.c:1425
+       kernel_init_freeable+0x2a6/0x3e0 init/main.c:1658
+       kernel_init+0x1d/0x1d0 init/main.c:1548
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #2 (cb_lock){++++}-{4:4}:
+       down_read+0x97/0x200 kernel/locking/rwsem.c:1568
+       genl_rcv+0x19/0x40 net/netlink/genetlink.c:1217
+       netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+       netlink_unicast+0x780/0x920 net/netlink/af_netlink.c:1345
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1895
+       sock_sendmsg_nosec+0x112/0x150 net/socket.c:797
+       __sock_sendmsg net/socket.c:812 [inline]
+       sock_sendmsg+0x1ca/0x2d0 net/socket.c:835
+       splice_to_socket+0xae5/0x11f0 fs/splice.c:884
+       do_splice_from fs/splice.c:936 [inline]
+       do_splice+0xef8/0x1940 fs/splice.c:1349
+       __do_splice fs/splice.c:1431 [inline]
+       __do_sys_splice fs/splice.c:1634 [inline]
+       __se_sys_splice+0x353/0x490 fs/splice.c:1616
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&pipe->mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/rtmutex_api.c:559 [inline]
+       mutex_lock_nested+0x5a/0x1d0 kernel/locking/rtmutex_api.c:578
+       iter_file_splice_write+0x1f3/0x10f0 fs/splice.c:682
+       do_splice_from fs/splice.c:936 [inline]
+       do_splice+0xef8/0x1940 fs/splice.c:1349
+       __do_splice fs/splice.c:1431 [inline]
+       __do_sys_splice fs/splice.c:1634 [inline]
+       __se_sys_splice+0x353/0x490 fs/splice.c:1616
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x15f/0x560 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (sb_writers#5){.+.+}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3167 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3286 [inline]
+       validate_chain kernel/locking/lockdep.c:3910 [inline]
+       __lock_acquire+0x15a5/0x2d10 kernel/locking/lockdep.c:5239
+       lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5870
+       percpu_down_read_internal include/linux/percpu-rwsem.h:53 [inline]
+       percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
+       __sb_start_write include/linux/fs/super.h:19 [inline]
+       sb_start_write include/linux/fs/super.h:125 [inline]
+       kiocb_start_write include/linux/fs.h:2767 [inline]
+       lo_rw_aio+0xb1b/0xf00 drivers/block/loop.c:401
+       do_req_filebacked drivers/block/loop.c:433 [inline]
+       loop_handle_cmd drivers/block/loop.c:1941 [inline]
+       loop_process_work+0x637/0x11b0 drivers/block/loop.c:1976
+       process_one_work+0x98b/0x1630 kernel/workqueue.c:3318
+       process_scheduled_works kernel/workqueue.c:3401 [inline]
+       worker_thread+0xb49/0x1140 kernel/workqueue.c:3482
+       kthread+0x388/0x470 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+other info that might help us debug this:
+
+Chain exists of:
+  sb_writers#5 --> (wq_completion)loop4 --> (work_completion)(&worker->work)
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock((work_completion)(&worker->work));
+                               lock((wq_completion)loop4);
+                               lock((work_completion)(&worker->work));
+  rlock(sb_writers#5);
+
+ *** DEADLOCK ***
