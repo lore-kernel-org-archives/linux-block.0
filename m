@@ -1,189 +1,294 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-106104.protonmail.ch (mail-106104.protonmail.ch [79.135.106.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2255136165E
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 14:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780066299; cv=pass; b=jHRNDMklUoPvL02yMrIe5sl4ZraASdoLNEF5/csTQggDsUdo2eoQu6ylWpf+xtO8Wng6NFrKIXKeOzN7AI7JB4mtjB+Nl5XHtA05g+y87D5H4rEA6fZA4m/mzIlAMy5j8DwOzFopfMOr1UjTgKNzHk6KwkbE3rySrkqJTGDm7D8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780066299; c=relaxed/simple;
-	bh=GHjSbL147+woEuEDHu1Sw2wgGVb8jF7lNaayhkWhvu8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FTaW4XgrWEqSLE3NvfKrf4NpTkRKgedUw19/kCHMb2OdEw3S28jQEmR4NMDLoUyv4sZkQhciDtCI8SZ5Bugze7n9h1r1Q5K14UhQtmLnRBbi3Nnw9+rBPrAtp6+sKtAeoOTGpu6o2cHwUeYtvgaLsCuJvmYj8dqeM4+tCPieip4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Hq6mQPnl; arc=pass smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F32402442
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 15:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.104
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780066971; cv=none; b=c6m29bXQ3l4lg3dN6T2DK4QUevASASTAHzVG/czQGOp6pXbWYe/gBjAF7uVGtbUvdbT0Umt90fhBEi4bNPEx2Ha41GI2oU4Dfairf1BrQwHbJPh8lUZd+er1wiy38eJ91X2mB5cl/VhvhHUaYxs9sN3CY2Mz2m8M9pSC2cEpynE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780066971; c=relaxed/simple;
+	bh=EMPtP9btgWlTLlI58OWh0bxipBCl6lhHJOHJiOaYjaU=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ar9pycx+6zUBEjIXVFlDjuOUNxvIQZGkOjNd5PON6+SDq8DzLdqTrO7WP7jiJk/gL4TK8NwP7HUfW12zzgZw9o3G8rgCswyaJI1bWdXW/GLFFyc90daZ7dih70gcKExxQW85drT7QGYdJdNJw+AU5BBfJx87Q2MPFGE8VuYAn/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ljXfoEAI; arc=none smtp.client-ip=79.135.106.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Hq6mQPnl"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-44e1ebb3122so8474665f8f.2
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 07:51:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780066293; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BEyCobCPbg5nB6TxLjrKVg4fIIMVahploBN2T9rsdHnh3th3ySd8U2Cat04jmAcEDM
-         s++SSB5aNNwHSegOvU3/QtjwAjb5Ztb0dQLjcN8E+Nv0vhtY4gHMy4CEF+nNp7wc+cPJ
-         p93jPmf5VdWvj/iFzCn+e10Q59b1Z679lVyKc+SImkCiGnZRZBebzie323jgZYKOgq5G
-         96q395bBlgicCndcAli++EKnjecBcNcBVcG2y5SbwNttl8IE4tN0FIK5lkG71+3piVvB
-         rMWUjuUAABTAys3jjUi2fxR2p12OPHEikkZciF9ssNqL/bBXZqIemd4Biz4o3al2igZv
-         t7yQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=+0Vmq3Hp4b/auYqZr8FjphzD6qcX8xEFQj0zpLYQha0=;
-        fh=d64xWfbCyS+gVzKow6qs1lk9FxqJj8tXiPlRoxcGMBU=;
-        b=UMZeHq8wRV+RJ3Sijl8ieQxBAmtm6EH/uWj9PN1m0+PK7iejPV1SkTjd83f7qMtdWD
-         f53wpcTmF4F+wBtNusxj9SQWPKvEWc6qDn5DMcURe5/DoTSwPeStBaTIkXI7GaGLnOAv
-         cph7lu7ju50Xz3BApkU9yn+cId6qoT26SupGJZvRbnjX/dkPeUaH/fCfp2tiMHeAMtu6
-         kO81Ug4taUmeQTkdVg6ydGg7TRxEtHzdhddJ0KqUfMhUFCuOSPLZaZsjZ17Ze8C2aGoK
-         w2dtBcnhyeM2ffpUohMSrQQ6E39atlNlYln1SYltJC1iFAHtF9MnD6JDp4v3q22yx5Mz
-         tySw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1780066293; x=1780671093; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+0Vmq3Hp4b/auYqZr8FjphzD6qcX8xEFQj0zpLYQha0=;
-        b=Hq6mQPnlSyc0ww1/EIIE+gJItltSyFDx2eBmY8rIhVP1wefUlmwTjNi9O+4EdZECi6
-         njHCjdKD0tFE4AIXEPzqLAe6FwabtbX/9ae14SZcv4PxrCWXcxMMI6NgIZU3K6KiW3p2
-         PqWOSk/157p6chHJLdXhN2mDGuuv/WiyBqgFUuQBt2k6/qVV5gTa8YXKautcR4G7Fhnz
-         eadxjqq/+cG+9CJLMwrWkp7B5ANtOBU8mHAMQSqfp0koNXgE0JgVsouq2IAg2J3J0/3Y
-         hyZmvwWRatZ2tRamSC+ERRMy5jst9vWOEgMsgPykj7FKTCwUk01zmk842WkyNc6eqIzh
-         OXYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780066293; x=1780671093;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+0Vmq3Hp4b/auYqZr8FjphzD6qcX8xEFQj0zpLYQha0=;
-        b=V6V8PHoOhoo4dVb0NhN2vqKrO55KBr1ZA8OzQzjHnd+V5mJfx9M1AxNBvJ6GW9cRCa
-         YM1vRDjxsn3xe/arkjvaGtMlnK8i082VF0lsu318Vn31Z2hl/gYnyOXJ4YjWzo+O62zJ
-         591f9QYZOGIntar14Z5+MEyLjAkUN9F92laCHwE1FVPbk4wowNbwKoJw3GXy5rhZpQZr
-         xz7NWQdj62X7qfDsXLw0WO12LX3BKV42qJUAtDz/ODZzazCZCOqV8NmeZKk1RU+Aou8R
-         5SE1xyQYiu8pDDWfvXfso9bvhwEnoosvzAEdgt6Ar6PKoP+PQFKGOASZ821qPMS2n/Sz
-         4rRw==
-X-Forwarded-Encrypted: i=1; AFNElJ+KpAA3yhw0OAYKvP6yGAWFgQfap6Qz/9h+tICs8Rrgz6aPAT/fLPYt2NY391X9VRLru2XJNVZkfbMIPg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkpXkzWCQk8gkgRV59yLNpCDoOZeu+Oea4zBB2XMUouveRhO80
-	9SBJ18C27bbF+fqK1oTW3h6ccdagsV7zsQFT6xZDRKzl3ogm/h6c5NDUosBp4yPXEtwD+PXCLFg
-	Lc3UOlgXbBaBM6nxykwOkRg2awPvBgO2R00WwCcBpQA==
-X-Gm-Gg: Acq92OEjm+gxyHMXuI2kbUuNDYmmAsCCRJF0ber2naPWNHnVs7nzqr54XtBpN8wTC57
-	/0EcrRg+FSjCbZb7llTiR/cAjn5QYADZiTFbXf5nk/bkk9EpxM5S4Mr93iPcf9DUH1iWV41DHey
-	s4McJJoSi+GiIoCMi6dSBNz7BdSRaq/Yo8ZO9RfEm11bMW8kmyEDbamUjeC8vAaUJ0VFm7kMO+/
-	w2sgMrZ46EnFz7BZxiZqvbGsL84po6HD7RM0DTZOblRDoaBOehun+TYrC/wxkYR8Q1gZXktjoph
-	2obxTUnaJumYpfkL+5KuF4mPvGCXiNgNk4YWl9luy/kA5DPcgEWyopJtBxkphb0jTSvb6wAQCiH
-	dlmGSX5b+y16mXUk=
-X-Received: by 2002:a05:6000:160a:b0:43c:fc5c:a9fe with SMTP id
- ffacd0b85a97d-45ef6b6d56bmr140170f8f.20.1780066293416; Fri, 29 May 2026
- 07:51:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ljXfoEAI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1780066958; x=1780326158;
+	bh=BQvNer+ofG/FReA2INIhPudwMOlb+NHoKchhtRUrawk=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ljXfoEAIqCLKO0BatgjjwGL5lLj2zETEiu4g+0Q03i9SGEEl+iVZNDNjI0w/9XHLW
+	 VO4N4oyBZQZvRtE4UO3MqLyflqzBRNwHgZRFeGsaN8RPcnXWv2lAsVRYTbv2KEYeUn
+	 kKagDZ0EApSnLr4sHV21gwy0osqVfKpRC8rTX+BOE/hAquNp9qyAJbmWVfY+g75bHL
+	 nrQ5EwqKT+nNezdEivsDR6fvuP73omDQwuFKa8qASDI5Zz29fsxEzR1HKLa6M5RMOD
+	 DrT+4f68LIbLJ7sf/sfNC7LtUGAb2yw9FlErw/3i8fxlrvlKIQ1D75TnfYGyXqQHQc
+	 BSgVA2MxZFKPQ==
+Date: Fri, 29 May 2026 06:52:13 +0000
+To: "security@kernel.org" <security@kernel.org>
+From: hexlabsecurity@proton.me
+Cc: "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>, "kbusch@kernel.org" <kbusch@kernel.org>, "kch@nvidia.com" <kch@nvidia.com>, "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: [REPORT] nvmet-rdma: integer overflow in inline-data SGL bounds check -> pre-auth kernel-memory read + remote crash (candidate patch inline)
+Message-ID: <LM21QIR-1-qJb7PViyJKCnGBnUzizeiNJVWQ3wb7ZwGezodjgKg3f-iobqOyequ-sT1jFCKJImfqNO_BKU3KO80xFITnaI5GTV_GxLUNDDc=@proton.me>
+Feedback-ID: 199661219:user:proton
+X-Pm-Message-ID: 8f4d61be0a109faf1f15bde7791fe49436b287f1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-18-neelx@suse.com>
- <ahAfvPa_yl6AKZoW@infradead.org> <CAPjX3FeoGzNOBnmY5ie34irNaAOZiFqV_Ccf7dXFrZJeUXh8PA@mail.gmail.com>
- <ahBJdSKMly8rv04F@infradead.org>
-In-Reply-To: <ahBJdSKMly8rv04F@infradead.org>
-From: Daniel Vacek <neelx@suse.com>
-Date: Fri, 29 May 2026 16:51:22 +0200
-X-Gm-Features: AVHnY4L6Sj4CIQpoE8qqeTQsjviSoplxU_u3u53SGv7fIGYWGuBerFgqAZXaq_Y
-Message-ID: <CAPjX3FddgRbmVOKPBTtyU16NqYg5OSzp3jAuVmetmu2uH14eRA@mail.gmail.com>
-Subject: Re: [PATCH v7 17/43] btrfs: add get_devices hook for fscrypt
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 22 May 2026 at 14:17, Christoph Hellwig <hch@infradead.org> wrote:
-> On Fri, May 22, 2026 at 02:00:28PM +0200, Daniel Vacek wrote:
-> > > How does this handled adding/removing devices at runtime?
-> >
-> > When called, this callback returns the list of bdevs opened by the
-> > given superblock. If devices are added or removed, this function
-> > returns a different list.
-> > In other words it always returns a valid list.
-> >
-> > This is called from `fscrypt_get_devices()`, which is called from
-> > `fscrypt_select_encryption_impl()` or
-> > `fscrypt_prepare_inline_crypt_key()` or
-> > `fscrypt_destroy_inline_crypt_key()`. All these functions walk the
-> > returned list and discard it immediately afterwards.
-> >
-> > Note that with btrfs at this point we're only using the inline crypto fallback.
-> > Is there any particular reason you asked this question?
->
-> Well, assume you have a single device fs, and then you add a device
-> later, you will not get the blk_crypto_config_supported call for this
-> device, and it will not be taken into account.
+Hello,
 
-This function is called from `fscrypt_prepare_new_inode()` from
-`btrfs_new_inode_prepare()` as well as from many other places.
-It looks quite OK to me and I can also confirm this with tracing.
-Using the following bpftrace script:
+I would like to report an integer-overflow vulnerability in the NVMe-oF
+RDMA target (drivers/nvme/target/rdma.c).  The inline-data SGL bounds
+check in nvmet_rdma_map_sgl_inline() is computed in u64 over two
+host-controlled values and wraps, which a remote fabric peer can use
+both to read kernel memory back over the fabric and to crash the target.
 
-```
-fr:fscrypt_get_devices {
-//      $num_devs = args.num_devs[0];
-        $num_devs = ((uint32 *)args.num_devs)[0];
-//      if ($num_devs < 2) { return; }
-        printf("%s()\t\t\t(%4d %13s[%d])\tnum_devs %d\n", func,
-                cpu, curtask->comm, curtask->pid, $num_devs);
-}
+=3D=3D Affected =3D=3D
 
-f:blk_crypto_config_supported {
-        printf("%s()\t\t(%4d %13s[%d])\tbdev %18p\n", func,
-                cpu, curtask->comm, curtask->pid, args.bdev);
-}
-```
+  drivers/nvme/target/rdma.c, nvmet_rdma_map_sgl_inline()
 
-... and mounting an encrypted FS, then adding an additional device, like this:
+  Verified present on the current mainline tree (commit 27fa82620cba,
+  ~v7.1-rc5), at the bounds check:
 
-```
-$ mount /dev/vdb /mnt/scratch; \
-echo -ne $TEST_RAW_KEY | xfs_io -c add_enckey /mnt/scratch; \
-touch /mnt/scratch/dir/foo; \
-btrfs device add /dev/vdc /mnt/scratch; \
-touch /mnt/scratch/dir/bar
-```
+    static u16 nvmet_rdma_map_sgl_inline(struct nvmet_rdma_rsp *rsp)
+    {
+        struct nvme_sgl_desc *sgl =3D &rsp->req.cmd->common.dptr.sgl;
+        u64 off =3D le64_to_cpu(sgl->addr);     /* host-controlled, 64-bit =
+*/
+        u32 len =3D le32_to_cpu(sgl->length);   /* host-controlled, 32-bit =
+*/
+        ...
+        if (off + len > rsp->queue->dev->inline_data_size) {   /* u64 wrap =
+*/
+            pr_err("invalid inline data offset!\n");
+            return NVME_SC_SGL_INVALID_OFFSET | NVME_STATUS_DNR;
+        }
+        ...
+        nvmet_rdma_use_inline_sg(rsp, len, off);
+    }
 
-I'm getting this:
+  "off + len" is evaluated in u64 and wraps modulo 2^64.  For example
+  addr =3D 0xfffffffffffffe00, length =3D 0x1000 makes the sum wrap to
+  0xe00, which is <=3D inline_data_size (default PAGE_SIZE), so the check
+  passes.  The current check form (against the per-port inline_data_size)
+  and the fixed-size inline_sg[NVMET_RDMA_MAX_INLINE_SGE] array with the
+  num_pages(len) loop were introduced together by commit 0d5ee2b2ab4f
+  ("nvmet-rdma: support max(16KB, PAGE_SIZE) inline data"), which is the
+  Fixes: I used.  Note: the single-page inline path that predates that
+  commit may have an analogous u64-overflow read in a different code
+  shape; I would appreciate the maintainers' judgement on whether the
+  stable backport scope should reach before that commit.
 
-```
-fscrypt_get_devices()            (   5         touch[26840])    num_devs 1
-blk_crypto_config_supported()    (   5         touch[26840])    bdev
-0xffff88a9c33fc880
-fscrypt_get_devices()            (   5         touch[26840])    num_devs 1
-fscrypt_get_devices()            (   5         touch[26844])    num_devs 2
-blk_crypto_config_supported()    (   5         touch[26844])    bdev
-0xffff88a9c3262b80
-blk_crypto_config_supported()    (   5         touch[26844])    bdev
-0xffff88a9c33fc880
-fscrypt_get_devices()            (   5         touch[26844])    num_devs 2
-```
+=3D=3D Two consequences of the bypass =3D=3D
 
-Here you can see the newly added device is being considered.
+  1. Kernel-memory read (information disclosure).
+     nvmet_rdma_use_inline_sg() does "sg->offset =3D off", truncating the
+     64-bit offset to scatterlist::offset (unsigned int).  The block
+     layer then accesses page_to_phys(inline_page) + (off & 0xffffffff),
+     so the target reads up to inline_data_size bytes of kernel memory
+     per write command and returns them to the host on read-back, or
+     faults the in-kernel copy if the offset lands on unmapped memory.
 
-Moreover btrfs only supports the fallback encryption due to the need
-to compute the checksums of encrypted data stored on the device.
+  2. Kernel-memory corruption -> remote crash (denial of service).
+     A large length makes "sg_count =3D num_pages(len)" in
+     nvmet_rdma_use_inline_sg() exceed NVMET_RDMA_MAX_INLINE_SGE (4), so
+     the loop writes scatterlist entries past the fixed-size inline_sg[]
+     array, corrupting the surrounding command object.
 
-> Now can btrfs even support hardware inline encryption?  The way the bio
-> processing is special cased I somehow doubt it.  But the concept of a
-> static device list just doesn't work for btrfs, so I think the fscrypt
-> side of this will need refactoring not to rely on it.  If we never
-> support hardware inline encryption on such dynamic file systems that
-> would be relative easy, if we need to support that case things might
-> get a lot more complicated.
+=3D=3D Reachability =3D=3D
 
-Yeah, this depends. If the device or fscrypt could return the checksum
-to the FS, btrfs could use the inline HW encryption. Note that the
-checksum must also be one that btrfs supports.
-Otherwise we need to get the encrypted data to compute the checksum
-ourselves. That is precisely why only fallback encryption is currently
-supported. And it's where the FS callback hook is used to compute the
-checksum.
+  The path is reached by any write command carrying an inline SGL, i.e.
+  after a Fabrics Connect.  On a subsystem configured with
+  attr_allow_any_host=3D1 it is reachable WITHOUT authentication by any
+  RDMA peer (RoCE/iWARP/IB) that can reach the target's listener.  With
+  DH-CHAP configured, or attr_allow_any_host=3D0 with an unknown host NQN,
+  a valid/known host NQN is required first.
 
---nX
+=3D=3D Empirical reproduction =3D=3D
+
+  Reproduced against a stock nvmet-rdma target over a soft-iWARP (siw)
+  fabric on a Linux 6.12.90 build with KASAN (KASAN_INLINE):
+
+  - Read: a single write command with addr =3D 0xfffffffffffffe00,
+    length =3D 0x1000 produced a KASAN out-of-bounds read and returned
+    ~4 KiB of kernel memory (including kernel .text) into the
+    attacker-readable namespace.
+
+  - Crash: a write command with addr =3D 0xffffffffffff0500,
+    length =3D 0x10000 (sum wraps to 0x500 <=3D inline_data_size, but
+    num_pages(0x10000) =3D 16 writes 16 scatterlist entries into the
+    4-entry inline_sg[], 12 past its end) deterministically corrupted
+    the command object and oopsed the target:
+
+      Oops: general protection fault [...] KASAN: null-ptr-deref
+      RIP: nvmet_rdma_post_recv+0x... [nvmet_rdma]
+        nvmet_rdma_post_recv <- nvmet_rdma_queue_response
+        <- __nvmet_req_complete <- nvmet_check_transfer_len
+        <- nvmet_rdma_handle_command <- ib_cq_poll_work
+
+    Every reconnect re-triggers it (persistent remote DoS).  The
+    nvmet_rdma_cmd objects are carved from one contiguous kcalloc'd
+    array, so the over-long entry write stays within that allocation and
+    KASAN flags the downstream dereference of the corrupted command in
+    nvmet_rdma_post_recv rather than the store itself.  The out-of-bounds
+    content is not attacker-controlled, so this is a crash/corruption
+    primitive, not a controlled write; I do not see a path to remote code
+    execution from this bug.
+
+  Severity estimate.  The two consequences arise from different inline-SGL
+  capsules (small vs large length) and are scored as separate single-capsul=
+e
+  outcomes, not one combined vector:
+
+    OOB read  (info-disclosure):  CVSS 7.5 HIGH
+        CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+    OOB write (corruption/DoS):   CVSS 8.2 HIGH
+        CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H
+
+  Headline 8.2 HIGH (both reachable pre-auth with attr_allow_any_host=3D1).
+  With attr_allow_any_host=3D0 a valid host NQN is required first (PR:L),
+  lowering these to 6.5 and 7.1.
+
+=3D=3D Suggested fix =3D=3D
+
+  Validate the offset with check_add_overflow() before comparing against
+  inline_data_size.  A passing check then guarantees
+  off + len <=3D inline_data_size <=3D NVMET_RDMA_MAX_INLINE_DATA_SIZE, whi=
+ch
+  bounds both the truncated scatterlist::offset and
+  num_pages(len) <=3D NVMET_RDMA_MAX_INLINE_SGE, closing the read and the
+  inline_sg[] overflow together.  Candidate patch inline below (applies
+  to current mainline).
+
+=3D=3D Embargo =3D=3D
+
+  I am happy to follow the standard process.  Proposing a 7-day embargo;
+  the fix is small and I can adjust as the maintainers prefer.  I have
+  not notified linux-distros and will hold that until a public patch
+  lands, per the usual guidance.
+
+I am an independent security researcher; please credit
+"Bryam Vargas <hexlabsecurity@proton.me>" (Reported-by already in the
+patch).  Affiliation: HEXLAB SAS (registration pending) -- Cali,
+Colombia.  Happy to provide the full reproduction harness on request.
+
+Thank you,
+Bryam Vargas
+
+----- candidate patch (inline, plain text) -----
+
+From 448c122c744430c1c2926d635855a3894370ee33 Mon Sep 17 00:00:00 2001
+From: Bryam Vargas <hexlabsecurity@proton.me>
+Date: Thu, 28 May 2026 21:23:52 -0500
+Subject: [PATCH] nvmet-rdma: fix integer overflow in inline data SGL bounds
+ check
+
+nvmet_rdma_map_sgl_inline() bounds-checks the inline data descriptor
+with both operands host-controlled and the sum evaluated in u64:
+
+=09u64 off =3D le64_to_cpu(sgl->addr);
+=09u32 len =3D le32_to_cpu(sgl->length);
+=09...
+=09if (off + len > rsp->queue->dev->inline_data_size)
+=09=09return NVME_SC_SGL_INVALID_OFFSET | NVME_STATUS_DNR;
+
+"off + len" therefore wraps modulo 2^64.  A descriptor with, for
+example, addr =3D 0xfffffffffffffe00 and length =3D 0x1000 makes the sum
+wrap to 0xe00, which passes the inline_data_size check.  An inline-SGL
+write command reaches this path after a Fabrics Connect; on a subsystem
+with attr_allow_any_host set it is reachable without authentication by
+any peer that can reach the target.
+
+Two distinct out-of-bounds accesses follow from the bypass:
+
+ - nvmet_rdma_use_inline_sg() stores the 64-bit offset into
+   scatterlist::offset, which is unsigned int, committing the truncated
+   attacker offset to the inline page.  The block layer then accesses
+   page_to_phys(inline_page) + (off & 0xffffffff), reading up to
+   inline_data_size bytes of kernel memory per command back to the host
+   (or faulting the target if the offset lands on unmapped memory).
+
+ - A large len makes sg_count =3D num_pages(len) in
+   nvmet_rdma_use_inline_sg() exceed NVMET_RDMA_MAX_INLINE_SGE, so the
+   loop writes scatterlist entries past the fixed-size inline_sg[]
+   array, corrupting the surrounding command object and oopsing the
+   target on the next use of that command.
+
+Validate the offset with check_add_overflow() before comparing against
+inline_data_size.  A passing check then guarantees
+off + len <=3D inline_data_size <=3D NVMET_RDMA_MAX_INLINE_DATA_SIZE, which
+bounds both the truncated scatterlist::offset and
+num_pages(len) <=3D NVMET_RDMA_MAX_INLINE_SGE, closing the out-of-bounds
+read and the inline_sg[] overflow together.
+
+Reported-by: Bryam Vargas <hexlabsecurity@proton.me>
+Fixes: 0d5ee2b2ab4f ("nvmet-rdma: support max(16KB, PAGE_SIZE) inline data"=
+)
+Cc: stable@vger.kernel.org
+Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+---
+Review context (not for the commit log):
+
+Reproducer -- unprivileged remote RDMA peer against a target with
+attr_allow_any_host=3D1, a single inline-SGL WRITE capsule:
+  * OOB read:  sgl->addr=3D0xfffffffffffffe00, sgl->length=3D0x1000
+               (off+len wraps to 0xe00 <=3D inline_data_size; sg->offset
+               truncates to 0xfffffe00) -> ~4 KiB of kernel memory is
+               read back from the namespace.
+  * OOB write: sgl->addr=3D0xffffffffffff0500, sgl->length=3D0x10000
+               (num_pages(0x10000)=3D16 overruns the 4-entry inline_sg[])
+               -> target memory corruption / crash.
+
+A/B-tested on a 6.12.90 KASAN lab kernel (same .config, only this hunk
+differs): pre-fix the OOB-read capsule trips "KASAN: use-after-free in
+copy_page_from_iter_atomic" via nvmet_file_execute_io; post-fix both
+capsules are rejected with "invalid inline data offset!"
+(NVME_SC_SGL_INVALID_OFFSET), benign inline writes still succeed, and no
+KASAN/oops fires. The fix decides identically in 32- and 64-bit builds
+(check_add_overflow operates on u64).
+
+ drivers/nvme/target/rdma.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index e6e2c3f9afdf..a5bbf9d41c3b 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -12,6 +12,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/nvme.h>
++#include <linux/overflow.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/wait.h>
+@@ -847,6 +848,7 @@ static u16 nvmet_rdma_map_sgl_inline(struct nvmet_rdma_=
+rsp *rsp)
+ =09struct nvme_sgl_desc *sgl =3D &rsp->req.cmd->common.dptr.sgl;
+ =09u64 off =3D le64_to_cpu(sgl->addr);
+ =09u32 len =3D le32_to_cpu(sgl->length);
++=09u64 bound;
+
+ =09if (!nvme_is_write(rsp->req.cmd)) {
+ =09=09rsp->req.error_loc =3D
+@@ -854,7 +856,8 @@ static u16 nvmet_rdma_map_sgl_inline(struct nvmet_rdma_=
+rsp *rsp)
+ =09=09return NVME_SC_INVALID_FIELD | NVME_STATUS_DNR;
+ =09}
+
+-=09if (off + len > rsp->queue->dev->inline_data_size) {
++=09if (check_add_overflow(off, (u64)len, &bound) ||
++=09    bound > rsp->queue->dev->inline_data_size) {
+ =09=09pr_err("invalid inline data offset!\n");
+ =09=09return NVME_SC_SGL_INVALID_OFFSET | NVME_STATUS_DNR;
+ =09}
+--=20
+2.43.0
