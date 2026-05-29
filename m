@@ -1,80 +1,80 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9261D3A1A2D
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 06:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83153AA4FE
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 06:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780036178; cv=none; b=MJetmQmFGagaLBrEc6DSKBfHlW9fIW7pyvAnrsK6FlOC4NCJrU8V4527BSMWMQWDp0vNrthI7kM6t130B288jGHZKuVWLVAX6Rz6wVK+JtPI//ntvDKK8YrTLMgL3QRWuoR+P0IeswOWlhXuDv9oVlkF1eAY1qQ2RUXqaUSOu4I=
+	t=1780036213; cv=none; b=G4wILE5JXhXn1tMXJA6ID0UKCni0I5JoOr+bqSXDhdteeB2TXVRLrC7iFX75qJZgfyrfOPyMzmFbhtLkEQ07S0hUBURtyLLmwve+xzF+mXN1+wK6qRUj4/NNa0pYraQDBth+UJ/hc49qxb9pJys1YS4UD/xtXwLgbMHwJfPMDG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780036178; c=relaxed/simple;
-	bh=umgZy62eOKAynVRBShNhAHJb93UY6nKG1pADQdn0FH4=;
+	s=arc-20240116; t=1780036213; c=relaxed/simple;
+	bh=hdE/m8DIEtAHw990i0xdQIr2DufPkNW2ZplClOcNCuA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ICJlHxKLy8SRKmScCHEr2gnBOAXLTS4cftkheTZFn1jnGNM9Alkv1uXRYLyc4m9C5VTGPT4SxcKUy0bILh04CbSQo2WJeTctzfCDKRpzmUt4GgbPEFkQHewPNvGRCYPZVbYeFiR6aOAFFfGFqLPnEixHjaqT42pmvQBO30uQZzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gX634q3d; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wPB5+ZY9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jGwgsv5e; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=egpf3xr8; arc=none smtp.client-ip=195.135.223.130
+	 In-Reply-To:Content-Type; b=LIB+BTh1VlwLHp2PW3K3OR+dRMKAn3A+SrI2VfznDaS203zImacD4hPs9h4571bzFSl1sswKJ9jH5hdWWK2K2Bo5Ir36JiRiJDiiw0hh7y27dqi1SKZ/dh8Kt1GjOz1bAK0foEFLbpStb+v8vodSc9NcSyDyagJ6KC4zlOSnlGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Aowk61kB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KXItagqw; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ONddicRU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=24hOsqjA; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gX634q3d";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wPB5+ZY9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jGwgsv5e";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="egpf3xr8"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Aowk61kB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KXItagqw";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ONddicRU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="24hOsqjA"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id F123C6A920;
-	Fri, 29 May 2026 06:29:35 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C0A8F66E2C;
+	Fri, 29 May 2026 06:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780036176; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1780036211; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Be9ntOBr3w25N2oG95un0gm6DVOoacNpMFFFoAcjZ/s=;
-	b=gX634q3du+eagQnU14ETYc+qJQ+9KliKqO1TL4mSabdUUokwvp/N/fcg1FWbVKyJdTaI3K
-	f08mXlG+fpEX8f0rLfuEK0wxwRqczNBriphVKYdmtWW57ecVFLWkZ7TIreHoaYuiOoUMJk
-	vrFhlcBv6cVmCN7JhI6U8ZA7Cbc7Fsw=
+	bh=gCz86hRZ95m8DicgAhQICwyNqpfCtI05P5sHR+bMXpQ=;
+	b=Aowk61kBny19bpH86C2kejViGhjsPuOl73PWSDG28D7oqUZKneWnnRXIgU9VAvzHlE43jo
+	H3lmOSmRe0PC/sDp/h4KvkJvM+R9ISaGXhuWvTSZneQ2Xreg2Ot+jESXqzwK838zCM4aN5
+	pu2cXr50sYOY5wiQ0QCC/n9Yb/mXm00=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780036176;
+	s=susede2_ed25519; t=1780036211;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Be9ntOBr3w25N2oG95un0gm6DVOoacNpMFFFoAcjZ/s=;
-	b=wPB5+ZY9surtXW3vyciAIcXUFEmE5EvsAsztIw//Cihqjw6121So8ArN3g5fYESeSjaVA5
-	XqOKtgszKZ9HpJCQ==
-Authentication-Results: smtp-out1.suse.de;
+	bh=gCz86hRZ95m8DicgAhQICwyNqpfCtI05P5sHR+bMXpQ=;
+	b=KXItagqw8RPQFE2lUcnQc9QPvvLjp4x6qpxnWXXyW8MD+WsX0WAWHWugEOzN/U1Gl41Rg6
+	ZR255P5QJqCq79AA==
+Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780036175; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1780036210; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Be9ntOBr3w25N2oG95un0gm6DVOoacNpMFFFoAcjZ/s=;
-	b=jGwgsv5eRSMXmjDMq7aj4awhqW696Y6Tc0EC5YIKHLDstE7REUNJYNvf+cy30DkbDkHFG0
-	1TIdZnW/FLwqJGUBgdbWi1MJ1hb9AkDS01zLQW1cZtuhzrUKuvPqtFjsfaga3hgl1JZSWb
-	S6vmky1DkU0rIOW07GaDtKAbubcIV9U=
+	bh=gCz86hRZ95m8DicgAhQICwyNqpfCtI05P5sHR+bMXpQ=;
+	b=ONddicRUDWu66ecVojfMAvlYKhsGLF3hbI1mcEZojL1uRX7KfGIw74PGP283UpmjIauzha
+	kkNCkuyCzDksI1wIM+IglQ5bvsZrAkAFxOAkJQTRRLNOvvBGWhOnREzrKX+rwikyfLQUTA
+	uJ3WDDQnRw95p7ssQAJMBpfMSFJz28E=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780036175;
+	s=susede2_ed25519; t=1780036210;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Be9ntOBr3w25N2oG95un0gm6DVOoacNpMFFFoAcjZ/s=;
-	b=egpf3xr8J5V0V61B6Cf6ODlGrRg4fp0RidAXVepyKj4S3Ry3ryh3tu9lmrjbhEkV2Rk2Fh
-	lW9LPYIrCylNHaDg==
+	bh=gCz86hRZ95m8DicgAhQICwyNqpfCtI05P5sHR+bMXpQ=;
+	b=24hOsqjAae4PgenY/tXrc8mZwv5QnYaAUbH1goxqTht8VcF9JzgA/DeM/NhCM1yiC4zLV/
+	8jCckslGKHYzA4Bg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C3F705B1D1;
-	Fri, 29 May 2026 06:29:35 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 908F35B1D2;
+	Fri, 29 May 2026 06:30:10 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id N5e8Lk8yGWrMHwAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 29 May 2026 06:29:35 +0000
-Message-ID: <14786a7f-e0e8-45e1-ac7e-ff5b1dc35e4b@suse.de>
-Date: Fri, 29 May 2026 08:29:35 +0200
+	id zH/uIXIyGWqbIAAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 29 May 2026 06:30:10 +0000
+Message-ID: <6f021cb2-b989-493b-b25f-64172119d914@suse.de>
+Date: Fri, 29 May 2026 08:30:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,24 +82,23 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 06/12] block/cgroup: Inline
- blkg_conf_{open,close}_bdev_frozen()
+Subject: Re: [PATCH v5 07/12] block/crypto: Annotate the crypto functions
 To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Damien Le Moal <dlemoal@kernel.org>, Tejun Heo <tj@kernel.org>,
- Josef Bacik <josef@toxicpanda.com>
+ Damien Le Moal <dlemoal@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>
 References: <cover.1779997063.git.bvanassche@acm.org>
- <f7be976e5a79afc88970ea16158d0a64bbf8f25e.1779997063.git.bvanassche@acm.org>
+ <91f2acf006f02c42d5d418f3074a6541e79e6fce.1779997063.git.bvanassche@acm.org>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <f7be976e5a79afc88970ea16158d0a64bbf8f25e.1779997063.git.bvanassche@acm.org>
+In-Reply-To: <91f2acf006f02c42d5d418f3074a6541e79e6fce.1779997063.git.bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Level: 
 X-Spam-Score: -4.30
 X-Spam-Flag: NO
 X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
+	BAYES_HAM(-3.00)[99.99%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	NEURAL_HAM_SHORT(-0.20)[-0.996];
 	MIME_GOOD(-0.10)[text/plain];
@@ -116,24 +115,18 @@ X-Spamd-Result: default: False [-4.30 / 50.00];
 	FROM_EQ_ENVFROM(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[acm.org:email,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo,acm.org:email,lst.de:email]
 
 On 5/28/26 21:45, Bart Van Assche wrote:
-> The blkg_conf_open_bdev_frozen() calling convention is not compatible
-> with lock context annotations. Inline both blkg_conf_open_bdev_frozen()
-> and blkg_conf_close_bdev_frozen() because these functions only have a
-> single caller. This patch prepares for enabling lock context analysis.
+> Add the lock context annotations required for Clang's thread-safety
+> analysis.
 > 
-> The type of 'memflags' has been changed from unsigned long into unsigned
-> int to match the type of current->flags. See also <linux/sched.h>.
-> 
-> Cc: Tejun Heo <tj@kernel.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Cc: Eric Biggers <ebiggers@kernel.org>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->   block/blk-cgroup.c | 46 ----------------------------------------------
->   block/blk-cgroup.h |  4 ----
->   block/blk-iocost.c | 29 +++++++++++++++++++++++------
->   3 files changed, 23 insertions(+), 56 deletions(-)
+>   block/blk-crypto-profile.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
 Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
