@@ -1,294 +1,373 @@
-Received: from mail-106104.protonmail.ch (mail-106104.protonmail.ch [79.135.106.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F32402442
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 15:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.104
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780066971; cv=none; b=c6m29bXQ3l4lg3dN6T2DK4QUevASASTAHzVG/czQGOp6pXbWYe/gBjAF7uVGtbUvdbT0Umt90fhBEi4bNPEx2Ha41GI2oU4Dfairf1BrQwHbJPh8lUZd+er1wiy38eJ91X2mB5cl/VhvhHUaYxs9sN3CY2Mz2m8M9pSC2cEpynE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780066971; c=relaxed/simple;
-	bh=EMPtP9btgWlTLlI58OWh0bxipBCl6lhHJOHJiOaYjaU=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ar9pycx+6zUBEjIXVFlDjuOUNxvIQZGkOjNd5PON6+SDq8DzLdqTrO7WP7jiJk/gL4TK8NwP7HUfW12zzgZw9o3G8rgCswyaJI1bWdXW/GLFFyc90daZ7dih70gcKExxQW85drT7QGYdJdNJw+AU5BBfJx87Q2MPFGE8VuYAn/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ljXfoEAI; arc=none smtp.client-ip=79.135.106.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47502DA757
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 15:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780069437; cv=pass; b=ORafmlEWvnymZB/FU54hKTI0y8XPzWng2l2uSMevDXWo5nmmCCaNzcXjAsQ6bTXVL351Bs8sbSLi5i8OOVnB5ZUEL0ikQYfW2bHRKpGTXufmBHW3H1YWKOT6H9kO8M/EKUWroxsGuhbIbfI92wrptSmgMzfcy3+tUC/Tf4UA2Dk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780069437; c=relaxed/simple;
+	bh=6BGZKHWpW1Dl8PoL8+e7WbTrHofucG0I+sMBcDZ/tfg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WDSaOK6Z6oPpLSHx9KFhUirOtjpFgATUGsYuyCZXCSR4kECMKTvdXRqJrPpj/t6o8ADPfslYO5xgbZNz6d5fnyZbp5dmmifk3+tMnvI1UQCJgSXadq+AJDSI8IysTexPdg0aVm9/webXVGQ7JvFwG9Dg4dWZC2Kg0RzBvFWYOUg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QLZZHhOm; arc=pass smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ljXfoEAI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1780066958; x=1780326158;
-	bh=BQvNer+ofG/FReA2INIhPudwMOlb+NHoKchhtRUrawk=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=ljXfoEAIqCLKO0BatgjjwGL5lLj2zETEiu4g+0Q03i9SGEEl+iVZNDNjI0w/9XHLW
-	 VO4N4oyBZQZvRtE4UO3MqLyflqzBRNwHgZRFeGsaN8RPcnXWv2lAsVRYTbv2KEYeUn
-	 kKagDZ0EApSnLr4sHV21gwy0osqVfKpRC8rTX+BOE/hAquNp9qyAJbmWVfY+g75bHL
-	 nrQ5EwqKT+nNezdEivsDR6fvuP73omDQwuFKa8qASDI5Zz29fsxEzR1HKLa6M5RMOD
-	 DrT+4f68LIbLJ7sf/sfNC7LtUGAb2yw9FlErw/3i8fxlrvlKIQ1D75TnfYGyXqQHQc
-	 BSgVA2MxZFKPQ==
-Date: Fri, 29 May 2026 06:52:13 +0000
-To: "security@kernel.org" <security@kernel.org>
-From: hexlabsecurity@proton.me
-Cc: "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>, "kbusch@kernel.org" <kbusch@kernel.org>, "kch@nvidia.com" <kch@nvidia.com>, "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: [REPORT] nvmet-rdma: integer overflow in inline-data SGL bounds check -> pre-auth kernel-memory read + remote crash (candidate patch inline)
-Message-ID: <LM21QIR-1-qJb7PViyJKCnGBnUzizeiNJVWQ3wb7ZwGezodjgKg3f-iobqOyequ-sT1jFCKJImfqNO_BKU3KO80xFITnaI5GTV_GxLUNDDc=@proton.me>
-Feedback-ID: 199661219:user:proton
-X-Pm-Message-ID: 8f4d61be0a109faf1f15bde7791fe49436b287f1
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QLZZHhOm"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4905e190c71so68298595e9.3
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 08:43:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780069433; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hiKqQrhYtgGgbGcDJGYs8sVl7OTOZQdHbXNBS5AX1lO62g89SOKVRtzqj/RQReG9/C
+         aoBcsb5dy7zXRcg/s5GiWn7fQdFNnfDCOP0/fHr4YF7vePZo6TYytS4r3QrFJCTr+Hsp
+         dj1aOmpt3LGfxZMZg4N4YbUE5bWuZ6e+JOb/Nq6iWgKZny0E1/7O9gZtY29iow+fIqcI
+         RcL6+OE1ie3zc4T5kz2S+M5ttw73fx7ntvRHUFor0aI3z2oObvR+7TUXULnvJks1pnCS
+         8P+sIPckag4pPMFbhH1BWXvWK+RCsU9CiLOWlWkZCnSCdFnWw0nxRuOJ6LLRzX9LEFaP
+         icjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Mjd/RFuQoN4x/HaSDJPAuZODD9TAFUVApiD1tH4zt9k=;
+        fh=qLDi7b2hgP8F1kSWP8QlBdelKBVimUWRMY1qTrm7dVg=;
+        b=NCCoWccjWn51ugLEsfZ3cHdfR93Mqs0tVSXCze+U8fwlWvYirmrQOWNQKJ1xgBact/
+         VZpdUibvetFAQXoYLZ03HTEf9acJycQKbEFa5JgXLbsTpgvF3T6ET7CDS23nmfuEJlqG
+         SvKT+eIFbmhqC0epcq84oupoGSBRApTv8SFXEyXeRbe904TC/8AV8whbe2amhkMSfJtV
+         jO1VlreEGBu3KyKl0DgWvcwFXayfREsh1DU7/LtvVSzBsJPAl3Qn1u5l789ow037qNH7
+         OpVxDyXHiZhZb3YMmtzcSxIFromJAjvDUTFpwmJGLQpaYomdeYy7nOlnHF4O6lXX5Caq
+         HJ8g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1780069433; x=1780674233; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mjd/RFuQoN4x/HaSDJPAuZODD9TAFUVApiD1tH4zt9k=;
+        b=QLZZHhOmpwlCP4LowYEmzfEe4SBEyZsMKXBANxNaaOJ+Hg0GJCAv/fifFswndd3Srv
+         shyKwxFL2E4QUxLY7faSYCNZhSonaTSBz5I7rKfay3+i672u/9lnnQroQV+o3jWCk9Tp
+         4htAYkHDdqipNHUbh/zpnktVLYeUIk2JR+VrViZbw0QnXcGO7tZOMH+WHF32/ocu+gW6
+         DNQrpK1eYLqV8pbDazR6qFxrgKNXy7wfIc9kuK6YhUucrNbdfOdVjyziEUSjnyo6TQa7
+         2JkdgkDAZDJ8osymbnbbBaSF953hBFeDhiEhzCASEL1kpYIczHC1IbKNZjdu1oUITylR
+         9eZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780069433; x=1780674233;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mjd/RFuQoN4x/HaSDJPAuZODD9TAFUVApiD1tH4zt9k=;
+        b=nyo9MIyzOb4xOivJi58eFaGS4jeSPPHYz9DFYdF/XGxGqZNYuArLu+OZzL8JtiG7ng
+         LCPwJtJgqINN4UkJnWqeMbfiKTWW/whApTPn2Uol+9l6fuis2waTyBtIL8Yeq+tJ13nO
+         bSMThUwfktiQWvLNMlrW4BCOR0lf4zqv+QDuM4A0xu7xciDsGDHI4X+6JxRDNnY1isA9
+         XOCWxT0FW8iUR7qeDXJYc7Gu0zC/wSwF3ASAi9bZqVcNn1hT1gMkQmmQd8hBIKlkMKEK
+         4eoFUVYzeCGFcXcgaNCxgz0WOPYEkNddIY7p2wzdFNxQGD+bm8mn/vKUrAFIRIGvm0QD
+         nRBw==
+X-Forwarded-Encrypted: i=1; AFNElJ+ef8atorQL6euvyrsAU5tJrPeIQp2CspeRpVjlRkpMKsMi5ackDowmqekAeE7bgFUBY1tHUBIZXGpDfg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwczOxeiB3oHRn0CfZc+L51kB48D1p63H94ABBjy2SXqKM9mHN
+	+5h+SOXpmxPb7qmhdjPY8Bx6FGcfuEH1jQfGTq0s1bZyHUKKthk6J3xieBHp1LbEnVCGbGPggiT
+	VjfD0jZjmbdFXkSSzarn+rqeAaeo+XbAxg8A81ibKqQ==
+X-Gm-Gg: Acq92OEcA6U0NgcZRul8VXjqJsQrgStbWdd4PJ/kpZXTSJQEFzAD2MV/GyDAko26B6w
+	Byb7VyOPigcC6VuM6z0DKgoCujhd+AKKObfaAG5mU85qrJg2XhTu3/jvaoGW/2YmSl1jnspc7KJ
+	kRlwiCXZjGbOfBBDC5z/uuXfMlBrRPiEUpkyvrf8zkCHdGdSZ3BhoFzwdU11WXiVE6js+NcHEWP
+	Cd8Fq6BEck0RoRQM0tgSpSSbOdr1M0w9l1Q2zHOngPwX7s8etirkdBTiUhKsb3tgVOIFiTmnwX8
+	ytDoJAT2YRhXsmFe9V6AhcQLe14uCf1GKKalhYBilwWNj0G9l1PHewAgHUVXBgzRNmhYwVY6mqR
+	u3l+PEbrtL3OFgMw=
+X-Received: by 2002:a05:600c:1d86:b0:48e:60a3:220a with SMTP id
+ 5b1f17b1804b1-490a28aa789mr4847005e9.0.1780069433114; Fri, 29 May 2026
+ 08:43:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20260513085340.3673127-1-neelx@suse.com> <20260513085340.3673127-33-neelx@suse.com>
+ <ahAfo4DzvH_ob1hv@infradead.org>
+In-Reply-To: <ahAfo4DzvH_ob1hv@infradead.org>
+From: Daniel Vacek <neelx@suse.com>
+Date: Fri, 29 May 2026 17:43:41 +0200
+X-Gm-Features: AVHnY4LNmQMXMJqOYo-u3g5g_FfS_GaIHTnMIQeq2jow0uPl_gbFF7i0-FQGaO8
+Message-ID: <CAPjX3Ff1qSLGNP3979KzLoAJCJcT_1se0WJsBHmDWuvhkOwQxg@mail.gmail.com>
+Subject: Re: [PATCH v7 32/43] btrfs: implement process_bio cb for fscrypt
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org, 
+	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+On Fri, 22 May 2026 at 11:19, Christoph Hellwig <hch@infradead.org> wrote:
+> On Wed, May 13, 2026 at 10:53:06AM +0200, Daniel Vacek wrote:
+> > From: Josef Bacik <josef@toxicpanda.com>
+> >
+> > We are going to be checksumming the encrypted data, so we have to
+> > implement the ->process_bio fscrypt callback.  This will provide us with
+> > the original bio and the encrypted bio to do work on.  For WRITE's this
+> > will happen after the encrypted bio has been encrypted.  For READ's this
+> > will happen after the read has completed and before the decryption step
+> > is done.
+> >
+> > For write's this is straightforward, we can just pass in the encrypted
+> > bio to btrfs_csum_one_bio and then the csums will be added to the bbio
+> > as normal.
+> >
+> > For read's this is relatively straightforward, but requires some care.
+> > We assume (because that's how it works currently) that the encrypted bio
+> > match the original bio, this is important because we save the iter of
+> > the bio before we submit.  If this changes in the future we'll need a
+> > hook to give us the bi_iter of the decryption bio before it's submitted.
+> > We check the csums before decryption.  If it doesn't match we simply
+> > error out and we let the normal path handle the repair work.
+> >
+> > Signed-off-by: Josef Bacik <josef@toxicpanda.com>
+> > Signed-off-by: Daniel Vacek <neelx@suse.com>
+> > ---
+> >
+> > v7 changes:
+> >  * Fixed array overflow stack corruption for bios > max blocksize (>64KiB)
+> >    as reported by Chris' AI review.
+> > v6 changes:
+> >  * Adapt to btrfs_data_csum_ok() changes for bs > ps.  Mostly follow
+> >    what was done in 052fd7a5cace ("btrfs: make read verification
+> >    handle bs > ps cases without large folios").
+> >  * Rename bbio::csum_done to csum_ok due to name collision.
+> >    With upstream, member name csum_done was used for async csums.
+> > v5: https://lore.kernel.org/linux-btrfs/ca32684b01ff8c252be515509137e0a4a0e5db7a.1706116485.git.josef@toxicpanda.com/
+> > ---
+> >  fs/btrfs/bio.c       | 44 +++++++++++++++++++++++++++++++++++++++++++-
+> >  fs/btrfs/bio.h       |  3 +++
+> >  fs/btrfs/file-item.c | 14 ++++++++++++--
+> >  fs/btrfs/fscrypt.c   | 29 +++++++++++++++++++++++++++++
+> >  4 files changed, 87 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
+> > index 3e2ee19aab50..729c5aff5c3d 100644
+> > --- a/fs/btrfs/bio.c
+> > +++ b/fs/btrfs/bio.c
+> > @@ -301,6 +301,40 @@ static struct btrfs_failed_bio *repair_one_sector(struct btrfs_bio *failed_bbio,
+> >       return fbio;
+> >  }
+> >
+> > +blk_status_t btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio, struct bio *enc_bio)
+> > +{
+> > +     struct btrfs_inode *inode = bbio->inode;
+> > +     struct btrfs_fs_info *fs_info = inode->root->fs_info;
+> > +     struct bvec_iter iter = bbio->saved_iter;
+> > +     struct btrfs_device *dev = bbio->bio.bi_private;
+> > +     const u32 blocksize = fs_info->sectorsize;
+> > +     const u32 step = min(blocksize, PAGE_SIZE);
+> > +     const u32 nr_steps = iter.bi_size / step;
+> > +     phys_addr_t paddrs[BTRFS_MAX_BLOCKSIZE / PAGE_SIZE];
+> > +     phys_addr_t paddr;
+> > +     unsigned int slot = 0;
+> > +     u32 offset = 0;
+> > +
+> > +     /*
+> > +      * We have to use a copy of iter in case there's an error,
+> > +      * btrfs_check_read_bio will handle submitting the repair bios.
+> > +      */
+> > +     btrfs_bio_for_each_block(paddr, enc_bio, &iter, step) {
+> > +             ASSERT(slot < nr_steps);
+> > +             paddrs[slot] = paddr;
+> > +             slot++;
+> > +             offset += step;
+> > +             if (IS_ALIGNED(offset, blocksize)) {
+> > +                     if (!btrfs_data_csum_ok(bbio, dev, offset - blocksize, paddrs))
+> > +                             return BLK_STS_IOERR;
+> > +                     slot = 0;
+> > +             }
+> > +     }
+> > +
+> > +     bbio->csum_ok = true;
+> > +     return BLK_STS_OK;
+> > +}
+> > +
+> >  static void btrfs_check_read_bio(struct btrfs_bio *bbio, struct btrfs_device *dev)
+> >  {
+> >       struct btrfs_inode *inode = bbio->inode;
+> > @@ -330,6 +364,10 @@ static void btrfs_check_read_bio(struct btrfs_bio *bbio, struct btrfs_device *de
+> >       /* Clear the I/O error. A failed repair will reset it. */
+> >       bbio->bio.bi_status = BLK_STS_OK;
+> >
+> > +     /* This was an encrypted bio and we've already done the csum check. */
+> > +     if (status == BLK_STS_OK && bbio->csum_ok)
+> > +             goto out;
+> > +
+> >       btrfs_bio_for_each_block(paddr, &bbio->bio, iter, step) {
+> >               paddrs[(offset / step) % nr_steps] = paddr;
+> >               offset += step;
+> > @@ -341,6 +379,7 @@ static void btrfs_check_read_bio(struct btrfs_bio *bbio, struct btrfs_device *de
+> >                                                        paddrs, fbio);
+> >               }
+> >       }
+> > +out:
+> >       if (bbio->csum != bbio->csum_inline)
+> >               kvfree(bbio->csum);
+> >
+> > @@ -859,10 +898,13 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
+> >               /*
+> >                * Csum items for reloc roots have already been cloned at this
+> >                * point, so they are handled as part of the no-checksum case.
+> > +              *
+> > +              * Encrypted inodes are csum'ed via the ->process_bio callback.
+> >                */
+> >               if (!(inode->flags & BTRFS_INODE_NODATASUM) &&
+> >                   !test_bit(BTRFS_FS_STATE_NO_DATA_CSUMS, &fs_info->fs_state) &&
+> > -                 !btrfs_is_data_reloc_root(inode->root) && !bbio->is_remap) {
+> > +                 !btrfs_is_data_reloc_root(inode->root) && !bbio->is_remap &&
+> > +                 !IS_ENCRYPTED(&inode->vfs_inode)) {
+> >                       if (should_async_write(bbio) &&
+> >                           btrfs_wq_submit_bio(bbio, bioc, &smap, mirror_num))
+> >                               goto done;
+> > diff --git a/fs/btrfs/bio.h b/fs/btrfs/bio.h
+> > index 43f7544029ac..456d32db9e9e 100644
+> > --- a/fs/btrfs/bio.h
+> > +++ b/fs/btrfs/bio.h
+> > @@ -43,6 +43,7 @@ struct btrfs_bio {
+> >               struct {
+> >                       u8 *csum;
+> >                       u8 csum_inline[BTRFS_BIO_INLINE_CSUM_SIZE];
+> > +                     bool csum_ok;
+> >                       struct bvec_iter saved_iter;
+> >               };
+> >
+> > @@ -130,5 +131,7 @@ void btrfs_submit_repair_write(struct btrfs_bio *bbio, int mirror_num, bool dev_
+> >  int btrfs_repair_io_failure(struct btrfs_fs_info *fs_info, u64 ino, u64 fileoff,
+> >                           u32 length, u64 logical, const phys_addr_t paddrs[],
+> >                           unsigned int step, int mirror_num);
+> > +blk_status_t btrfs_check_encrypted_read_bio(struct btrfs_bio *bbio,
+> > +                                         struct bio *enc_bio);
+> >
+> >  #endif
+> > diff --git a/fs/btrfs/file-item.c b/fs/btrfs/file-item.c
+> > index 986914078708..72d9d3243460 100644
+> > --- a/fs/btrfs/file-item.c
+> > +++ b/fs/btrfs/file-item.c
+> > @@ -338,6 +338,14 @@ static int search_csum_tree(struct btrfs_fs_info *fs_info,
+> >       return ret;
+> >  }
+> >
+> > +static inline bool inode_skip_csum(struct btrfs_inode *inode)
+> > +{
+> > +     struct btrfs_fs_info *fs_info = inode->root->fs_info;
+> > +
+> > +     return (inode->flags & BTRFS_INODE_NODATASUM) ||
+> > +             test_bit(BTRFS_FS_STATE_NO_DATA_CSUMS, &fs_info->fs_state);
+> > +}
+> > +
+> >  /*
+> >   * Lookup the checksum for the read bio in csum tree.
+> >   *
+> > @@ -357,8 +365,7 @@ int btrfs_lookup_bio_sums(struct btrfs_bio *bbio)
+> >       int ret = 0;
+> >       u32 bio_offset = 0;
+> >
+> > -     if ((inode->flags & BTRFS_INODE_NODATASUM) ||
+> > -         test_bit(BTRFS_FS_STATE_NO_DATA_CSUMS, &fs_info->fs_state))
+> > +     if (inode_skip_csum(inode))
+> >               return 0;
+> >
+> >       /*
+> > @@ -817,6 +824,9 @@ int btrfs_csum_one_bio(struct btrfs_bio *bbio, struct bio *bio, bool async)
+> >       struct btrfs_ordered_sum *sums;
+> >       unsigned nofs_flag;
+> >
+> > +     if (inode_skip_csum(inode))
+> > +             return 0;
+> > +
+> >       nofs_flag = memalloc_nofs_save();
+> >       sums = kvzalloc(btrfs_ordered_sum_size(fs_info, bio->bi_iter.bi_size),
+> >                      GFP_KERNEL);
+> > diff --git a/fs/btrfs/fscrypt.c b/fs/btrfs/fscrypt.c
+> > index 5d34a8b94da5..924ee3df7f32 100644
+> > --- a/fs/btrfs/fscrypt.c
+> > +++ b/fs/btrfs/fscrypt.c
+> > @@ -16,6 +16,7 @@
+> >  #include "transaction.h"
+> >  #include "volumes.h"
+> >  #include "xattr.h"
+> > +#include "file-item.h"
+> >
+> >  /*
+> >   * From a given location in a leaf, read a name into a qstr (usually a
+> > @@ -212,6 +213,33 @@ static struct block_device **btrfs_fscrypt_get_devices(struct super_block *sb,
+> >       return devs;
+> >  }
+> >
+> > +static blk_status_t btrfs_process_encrypted_bio(struct bio *orig_bio,
+> > +                                             struct bio *enc_bio)
+> > +{
+> > +     struct btrfs_bio *bbio;
+> > +
+> > +     /*
+> > +      * If our bio is from the normal fs_bio_set then we know this is a
+> > +      * mirror split and we can skip it, we'll get the real bio on the last
+> > +      * mirror and we can process that one.
+> > +      */
+> > +     if (orig_bio->bi_pool == &fs_bio_set)
+> > +             return BLK_STS_OK;
+> > +
+> > +     bbio = btrfs_bio(orig_bio);
+> > +
+> > +     if (bio_op(orig_bio) == REQ_OP_READ) {
+> > +             /*
+> > +              * We have ->saved_iter based on the orig_bio, so if the block
+> > +              * layer changes we need to notice this asap so we can update
+> > +              * our code to handle the new world order.
+> > +              */
+> > +             ASSERT(orig_bio == enc_bio);
+> > +             return btrfs_check_encrypted_read_bio(bbio, enc_bio);
+> > +     }
+> > +     return btrfs_csum_one_bio(bbio, enc_bio, false);
+>
+> Honestly, all this shows that the architecture of the I/O path in this
+> series is pretty broken.  It needs all this magic detection, and the
+> passing of arguments that mixes the bbio for state and the lower
+> encrypted bio without the btrfs context shows something doesn't work
+> well.
 
-I would like to report an integer-overflow vulnerability in the NVMe-oF
-RDMA target (drivers/nvme/target/rdma.c).  The inline-data SGL bounds
-check in nvmet_rdma_map_sgl_inline() is computed in u64 over two
-host-controlled values and wraps, which a remote fabric peer can use
-both to read kernel memory back over the fabric and to crash the target.
+Well, this is all limited within the scope of the filesystem. Since
+btrfs needs to compute the data checksum and the bounce bio (with the
+encrypted pages) is created by the lower fscrypt layer, how else could
+we accomplish this?
 
-=3D=3D Affected =3D=3D
+As the blk-crypto is inlined, without the callback the filesystem
+never sees the encrypted data at all and it won't be able to get
+checksums.
 
-  drivers/nvme/target/rdma.c, nvmet_rdma_map_sgl_inline()
+> So let's take a step back, if we think of the I/O pipeline, it should do
+> things in this order for writes:
+>
+>  - encrypt data
+>  - generate checksums
+>  - do mirroring/striping/parity
+>
+> and reverse for reads.
+>
+> All this suggest that the btrfs_bio needs to exist for the encrypted
+> data.
 
-  Verified present on the current mainline tree (commit 27fa82620cba,
-  ~v7.1-rc5), at the bounds check:
+My understanding was that fscrypt works differently. The bounce bio is
+created inline in the lower layer, agnostic to any filesystem.
 
-    static u16 nvmet_rdma_map_sgl_inline(struct nvmet_rdma_rsp *rsp)
-    {
-        struct nvme_sgl_desc *sgl =3D &rsp->req.cmd->common.dptr.sgl;
-        u64 off =3D le64_to_cpu(sgl->addr);     /* host-controlled, 64-bit =
-*/
-        u32 len =3D le32_to_cpu(sgl->length);   /* host-controlled, 32-bit =
-*/
-        ...
-        if (off + len > rsp->queue->dev->inline_data_size) {   /* u64 wrap =
-*/
-            pr_err("invalid inline data offset!\n");
-            return NVME_SC_SGL_INVALID_OFFSET | NVME_STATUS_DNR;
-        }
-        ...
-        nvmet_rdma_use_inline_sg(rsp, len, off);
-    }
+>  So I think you'll need to and refactor this, preferably with the
+> really annoying two-level callbacks that this really hard to follow (or
+> implement).  Your caller is in the file system, and it should be able to
+> call fscrypt as helpers instead of going two layers down using direct
+> calls and then two layers back up using indirect calls.  The recent
+> refactoring that moves the fscrypt fallback above the block layer
+> instead of calling it from the bottom should help a lot with that.
 
-  "off + len" is evaluated in u64 and wraps modulo 2^64.  For example
-  addr =3D 0xfffffffffffffe00, length =3D 0x1000 makes the sum wrap to
-  0xe00, which is <=3D inline_data_size (default PAGE_SIZE), so the check
-  passes.  The current check form (against the per-port inline_data_size)
-  and the fixed-size inline_sg[NVMET_RDMA_MAX_INLINE_SGE] array with the
-  num_pages(len) loop were introduced together by commit 0d5ee2b2ab4f
-  ("nvmet-rdma: support max(16KB, PAGE_SIZE) inline data"), which is the
-  Fixes: I used.  Note: the single-page inline path that predates that
-  commit may have an analogous u64-overflow read in a different code
-  shape; I would appreciate the maintainers' judgement on whether the
-  stable backport scope should reach before that commit.
+Yeah, I may look into that. What you're talking about is a pretty recent change.
+This is an old patch [1] from 2023 rebased without many changes since
+as there was not much feedback before. So it still follows the
+original (former) design.
 
-=3D=3D Two consequences of the bypass =3D=3D
+If fscrypt supported checksumming the encrypted data and returned the
+value back to the filesystem, no callbacks would be needed. Though to
+me that sounds more invasive than this callback.
 
-  1. Kernel-memory read (information disclosure).
-     nvmet_rdma_use_inline_sg() does "sg->offset =3D off", truncating the
-     64-bit offset to scatterlist::offset (unsigned int).  The block
-     layer then accesses page_to_phys(inline_page) + (off & 0xffffffff),
-     so the target reads up to inline_data_size bytes of kernel memory
-     per write command and returns them to the host on read-back, or
-     faults the in-kernel copy if the offset lands on unmapped memory.
+[1] https://lore.kernel.org/linux-btrfs/a26514814b4d2a54ff2317369365dc2bf1c280dc.1695750478.git.josef@toxicpanda.com/
 
-  2. Kernel-memory corruption -> remote crash (denial of service).
-     A large length makes "sg_count =3D num_pages(len)" in
-     nvmet_rdma_use_inline_sg() exceed NVMET_RDMA_MAX_INLINE_SGE (4), so
-     the loop writes scatterlist entries past the fixed-size inline_sg[]
-     array, corrupting the surrounding command object.
-
-=3D=3D Reachability =3D=3D
-
-  The path is reached by any write command carrying an inline SGL, i.e.
-  after a Fabrics Connect.  On a subsystem configured with
-  attr_allow_any_host=3D1 it is reachable WITHOUT authentication by any
-  RDMA peer (RoCE/iWARP/IB) that can reach the target's listener.  With
-  DH-CHAP configured, or attr_allow_any_host=3D0 with an unknown host NQN,
-  a valid/known host NQN is required first.
-
-=3D=3D Empirical reproduction =3D=3D
-
-  Reproduced against a stock nvmet-rdma target over a soft-iWARP (siw)
-  fabric on a Linux 6.12.90 build with KASAN (KASAN_INLINE):
-
-  - Read: a single write command with addr =3D 0xfffffffffffffe00,
-    length =3D 0x1000 produced a KASAN out-of-bounds read and returned
-    ~4 KiB of kernel memory (including kernel .text) into the
-    attacker-readable namespace.
-
-  - Crash: a write command with addr =3D 0xffffffffffff0500,
-    length =3D 0x10000 (sum wraps to 0x500 <=3D inline_data_size, but
-    num_pages(0x10000) =3D 16 writes 16 scatterlist entries into the
-    4-entry inline_sg[], 12 past its end) deterministically corrupted
-    the command object and oopsed the target:
-
-      Oops: general protection fault [...] KASAN: null-ptr-deref
-      RIP: nvmet_rdma_post_recv+0x... [nvmet_rdma]
-        nvmet_rdma_post_recv <- nvmet_rdma_queue_response
-        <- __nvmet_req_complete <- nvmet_check_transfer_len
-        <- nvmet_rdma_handle_command <- ib_cq_poll_work
-
-    Every reconnect re-triggers it (persistent remote DoS).  The
-    nvmet_rdma_cmd objects are carved from one contiguous kcalloc'd
-    array, so the over-long entry write stays within that allocation and
-    KASAN flags the downstream dereference of the corrupted command in
-    nvmet_rdma_post_recv rather than the store itself.  The out-of-bounds
-    content is not attacker-controlled, so this is a crash/corruption
-    primitive, not a controlled write; I do not see a path to remote code
-    execution from this bug.
-
-  Severity estimate.  The two consequences arise from different inline-SGL
-  capsules (small vs large length) and are scored as separate single-capsul=
-e
-  outcomes, not one combined vector:
-
-    OOB read  (info-disclosure):  CVSS 7.5 HIGH
-        CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
-    OOB write (corruption/DoS):   CVSS 8.2 HIGH
-        CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H
-
-  Headline 8.2 HIGH (both reachable pre-auth with attr_allow_any_host=3D1).
-  With attr_allow_any_host=3D0 a valid host NQN is required first (PR:L),
-  lowering these to 6.5 and 7.1.
-
-=3D=3D Suggested fix =3D=3D
-
-  Validate the offset with check_add_overflow() before comparing against
-  inline_data_size.  A passing check then guarantees
-  off + len <=3D inline_data_size <=3D NVMET_RDMA_MAX_INLINE_DATA_SIZE, whi=
-ch
-  bounds both the truncated scatterlist::offset and
-  num_pages(len) <=3D NVMET_RDMA_MAX_INLINE_SGE, closing the read and the
-  inline_sg[] overflow together.  Candidate patch inline below (applies
-  to current mainline).
-
-=3D=3D Embargo =3D=3D
-
-  I am happy to follow the standard process.  Proposing a 7-day embargo;
-  the fix is small and I can adjust as the maintainers prefer.  I have
-  not notified linux-distros and will hold that until a public patch
-  lands, per the usual guidance.
-
-I am an independent security researcher; please credit
-"Bryam Vargas <hexlabsecurity@proton.me>" (Reported-by already in the
-patch).  Affiliation: HEXLAB SAS (registration pending) -- Cali,
-Colombia.  Happy to provide the full reproduction harness on request.
-
-Thank you,
-Bryam Vargas
-
------ candidate patch (inline, plain text) -----
-
-From 448c122c744430c1c2926d635855a3894370ee33 Mon Sep 17 00:00:00 2001
-From: Bryam Vargas <hexlabsecurity@proton.me>
-Date: Thu, 28 May 2026 21:23:52 -0500
-Subject: [PATCH] nvmet-rdma: fix integer overflow in inline data SGL bounds
- check
-
-nvmet_rdma_map_sgl_inline() bounds-checks the inline data descriptor
-with both operands host-controlled and the sum evaluated in u64:
-
-=09u64 off =3D le64_to_cpu(sgl->addr);
-=09u32 len =3D le32_to_cpu(sgl->length);
-=09...
-=09if (off + len > rsp->queue->dev->inline_data_size)
-=09=09return NVME_SC_SGL_INVALID_OFFSET | NVME_STATUS_DNR;
-
-"off + len" therefore wraps modulo 2^64.  A descriptor with, for
-example, addr =3D 0xfffffffffffffe00 and length =3D 0x1000 makes the sum
-wrap to 0xe00, which passes the inline_data_size check.  An inline-SGL
-write command reaches this path after a Fabrics Connect; on a subsystem
-with attr_allow_any_host set it is reachable without authentication by
-any peer that can reach the target.
-
-Two distinct out-of-bounds accesses follow from the bypass:
-
- - nvmet_rdma_use_inline_sg() stores the 64-bit offset into
-   scatterlist::offset, which is unsigned int, committing the truncated
-   attacker offset to the inline page.  The block layer then accesses
-   page_to_phys(inline_page) + (off & 0xffffffff), reading up to
-   inline_data_size bytes of kernel memory per command back to the host
-   (or faulting the target if the offset lands on unmapped memory).
-
- - A large len makes sg_count =3D num_pages(len) in
-   nvmet_rdma_use_inline_sg() exceed NVMET_RDMA_MAX_INLINE_SGE, so the
-   loop writes scatterlist entries past the fixed-size inline_sg[]
-   array, corrupting the surrounding command object and oopsing the
-   target on the next use of that command.
-
-Validate the offset with check_add_overflow() before comparing against
-inline_data_size.  A passing check then guarantees
-off + len <=3D inline_data_size <=3D NVMET_RDMA_MAX_INLINE_DATA_SIZE, which
-bounds both the truncated scatterlist::offset and
-num_pages(len) <=3D NVMET_RDMA_MAX_INLINE_SGE, closing the out-of-bounds
-read and the inline_sg[] overflow together.
-
-Reported-by: Bryam Vargas <hexlabsecurity@proton.me>
-Fixes: 0d5ee2b2ab4f ("nvmet-rdma: support max(16KB, PAGE_SIZE) inline data"=
-)
-Cc: stable@vger.kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
----
-Review context (not for the commit log):
-
-Reproducer -- unprivileged remote RDMA peer against a target with
-attr_allow_any_host=3D1, a single inline-SGL WRITE capsule:
-  * OOB read:  sgl->addr=3D0xfffffffffffffe00, sgl->length=3D0x1000
-               (off+len wraps to 0xe00 <=3D inline_data_size; sg->offset
-               truncates to 0xfffffe00) -> ~4 KiB of kernel memory is
-               read back from the namespace.
-  * OOB write: sgl->addr=3D0xffffffffffff0500, sgl->length=3D0x10000
-               (num_pages(0x10000)=3D16 overruns the 4-entry inline_sg[])
-               -> target memory corruption / crash.
-
-A/B-tested on a 6.12.90 KASAN lab kernel (same .config, only this hunk
-differs): pre-fix the OOB-read capsule trips "KASAN: use-after-free in
-copy_page_from_iter_atomic" via nvmet_file_execute_io; post-fix both
-capsules are rejected with "invalid inline data offset!"
-(NVME_SC_SGL_INVALID_OFFSET), benign inline writes still succeed, and no
-KASAN/oops fires. The fix decides identically in 32- and 64-bit builds
-(check_add_overflow operates on u64).
-
- drivers/nvme/target/rdma.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index e6e2c3f9afdf..a5bbf9d41c3b 100644
---- a/drivers/nvme/target/rdma.c
-+++ b/drivers/nvme/target/rdma.c
-@@ -12,6 +12,7 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/nvme.h>
-+#include <linux/overflow.h>
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/wait.h>
-@@ -847,6 +848,7 @@ static u16 nvmet_rdma_map_sgl_inline(struct nvmet_rdma_=
-rsp *rsp)
- =09struct nvme_sgl_desc *sgl =3D &rsp->req.cmd->common.dptr.sgl;
- =09u64 off =3D le64_to_cpu(sgl->addr);
- =09u32 len =3D le32_to_cpu(sgl->length);
-+=09u64 bound;
-
- =09if (!nvme_is_write(rsp->req.cmd)) {
- =09=09rsp->req.error_loc =3D
-@@ -854,7 +856,8 @@ static u16 nvmet_rdma_map_sgl_inline(struct nvmet_rdma_=
-rsp *rsp)
- =09=09return NVME_SC_INVALID_FIELD | NVME_STATUS_DNR;
- =09}
-
--=09if (off + len > rsp->queue->dev->inline_data_size) {
-+=09if (check_add_overflow(off, (u64)len, &bound) ||
-+=09    bound > rsp->queue->dev->inline_data_size) {
- =09=09pr_err("invalid inline data offset!\n");
- =09=09return NVME_SC_SGL_INVALID_OFFSET | NVME_STATUS_DNR;
- =09}
---=20
-2.43.0
+--nX
