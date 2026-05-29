@@ -1,86 +1,112 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8F52D94AB
-	for <linux-block@vger.kernel.org>; Thu, 28 May 2026 23:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7AF1684BE
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 00:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780011036; cv=none; b=HHqOUVqUgwn/sTughvWj557Tf2/IxJolZbTMCDoswLIMpGUwb5i6OeF6Q25g7beRECI3gXkAoxPhIFchGtJ6HEUYL92QqGR3NEWBlt75EGppKTQn5YFd0NU8K/lUBlrNVTY8ZSO0femj2aVXYyYmRGi8VtP0txdS++E2xE0giak=
+	t=1780013697; cv=none; b=ksVSFKauHqmPvQe/c7Qagb+VJElWzUwjlxZSf+HUcmmHG1THLeS4+7xE2Iqltz4VS6i1XQz6lyjPEwufPk3/tQ8FrK3IV8PZsof9EQSp2fvX02L5W78ShKNxLxlkPh2FDnLJdDCLgZRpRJ1XEw0UoTyYrLP/6tenBFm2RDv7j+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780011036; c=relaxed/simple;
-	bh=CPg5W6qmv3QeO/QThKytexmCzra9QCkoXU0qYXhgnRE=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=cEtO1d9XsXvPyorrJ+UrX5mIM9TxYnlkVYGtiOO34FKCUuUswKC5++EGh5CZtjkumZRBcTC937kmuiC8J1qsTc8QndHeN76FUoIeisZsTFhcqU+j5s/1gpuL3o+fGSoLsGvnDmMCOtL1+QIftrKUQ28MosePqxGe4S5N2AsQ4hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IJNiVaMy; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IJNiVaMy"
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780011022;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D4wIN4SNHRitM0ngarezIhOM5acJEbDG3qSyZyguPCI=;
-	b=IJNiVaMyTnO0R8z438tXxUIihVO7hXAF28ZbM8NefFkZnYup68YW7NgHHE+Nyox05yyblt
-	wTiE2pvjqGpFvYiIgRb16TDhnQNAD6yZOA4HPZ5UdcsdlWOLOBsMWBNqRYfi3L5WkiZWy/
-	E2+R14LJHOe2EQ20LJ6nT+g2NW9i/cU=
+	s=arc-20240116; t=1780013697; c=relaxed/simple;
+	bh=EpvZhaOno4JjKFW3qDgv0sB8Dx++vx0nQZkD9rA/DHw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gGV6GWu9gpMiXOo/Q/OOZ+AVbvDKHSnEGrxDeXmtIWpZSYNxPyzLVZPv+RbfGP9IBexrGDaoHERolEn0uTtRiExY2cooRKsaLIv+2YGcu4fSniwi4uHaGNFtm0357iKxGBzsdB6CqYyet7/dZoKwgmqqV/VfeszlfrcS8VTB284=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64T0Eog6003575;
+	Fri, 29 May 2026 09:14:50 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64T0EoYT003569
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 29 May 2026 09:14:50 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <26717cb6-81b0-4d5d-a5db-669283f9bb9d@I-love.SAKURA.ne.jp>
+Date: Fri, 29 May 2026 09:14:47 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
-Subject: Re: [PATCH v2 0/2] Add bvec_folio and its kernel-doc
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: William Kucharski <william.kucharski@linux.dev>
-In-Reply-To: <20260528175905.1102280-1-willy@infradead.org>
-Date: Thu, 28 May 2026 17:30:07 -0600
-Cc: Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- io-uring@vger.kernel.org,
- linux-mm@kvack.org,
- Leon Romanovsky <leon@kernel.org>,
- Christoph Hellwig <hch@infradead.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FADCC457-872C-466E-82F8-F88DF03E54F0@linux.dev>
-References: <20260528175905.1102280-1-willy@infradead.org>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
+To: Hillf Danton <hdanton@sina.com>, Ming Lei <tom.leiming@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>
+References: <20260528230050.1185-1-hdanton@sina.com>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260528230050.1185-1-hdanton@sina.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav303.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-For the series:
+On 2026/05/29 8:00, Hillf Danton wrote:
+>> Given the loop workqueue that triggered the jfs warning, can you specify
+>> the reason why the workqueue in question is NOT flushed while closing disk?
+>>
+> Got it, the loop workqueue is NOT flushed to avoid deadlock, see d292dc80686a
+> ("loop: don't destroy lo->workqueue in __loop_clr_fd") for detail.
+> And the deadlock can be reproduced by flushing the loop workqueue with
+> disk->open_mutex held [1].
+> 
+> [1] Subject: Re: [syzbot] possible deadlock in blkdev_put (3)
+> https://lore.kernel.org/lkml/000000000000ea753505da2658d5@google.com/
 
-Reviewed-by: William Kucharski <william.kucharski@linux.dev>
+We can avoid the following lockdep warnings (including [1] you mentioned)
 
-> On May 28, 2026, at 11:59, Matthew Wilcox (Oracle) =
-<willy@infradead.org> wrote:
->=20
-> Add the convenience helper bvec_folio() to avoid references to =
-bv_page.
-> Convert a few of the obvious users.
->=20
-> v2:
-> - Tweak the kernel-doc (Christoph)
-> - Add the bvec kerneldoc to the documentation build
->=20
-> Matthew Wilcox (Oracle) (2):
->  block: Add bvec_folio()
->  block: Include bvec.h kernel-doc in the htmldocs
->=20
-> Documentation/core-api/kernel-api.rst |  1 +
-> block/bio.c                           |  6 +++---
-> include/linux/bio.h                   |  2 +-
-> include/linux/bvec.h                  | 17 +++++++++++++++++
-> io_uring/rsrc.c                       |  2 +-
-> mm/page_io.c                          |  4 ++--
-> 6 files changed, 25 insertions(+), 7 deletions(-)
->=20
-> --=20
-> 2.47.3
->=20
->=20
+  https://syzkaller.appspot.com/bug?extid=2f62807dc3239b8f584e
+  https://syzkaller.appspot.com/bug?extid=c4e9d077bcc86bee08dc
+  https://syzkaller.appspot.com/bug?extid=0f427123ae84b3ba6dc7
+  https://syzkaller.appspot.com/bug?extid=4feabfc9641267769c97
+  https://syzkaller.appspot.com/bug?extid=fb0ff9bfe34ad282ebd4
+
+caused by "drain_workqueue() with disk->open_mutex held" if we assign
+caller-specific lockdep class to disk->open_mutex
+
+  https://sourceforge.net/p/tomoyo/tomoyo.git/ci/c2245c765ebeba9dcb924d9171d8d470a9ac41c8/
+
+.
+
+Also, we can avoid lockdep warning caused by "drain_workqueue() with disk->open_mutex held" +
+"holding system_transition_mutex" if we forbid binding to pseudo files as backing file
+in the loop driver
+
+  https://lkml.kernel.org/r/d38e4600-3c32-491f-aa49-905f4fad1bfb@I-love.SAKURA.ne.jp
+
+which we can reproduce with
+
+  echo 7:0 > /sys/power/resume
+  losetup /dev/loop0 /sys/power/resume
+  cat /dev/loop0 > /dev/null
+  losetup -d /dev/loop0
+
+.
+
+Therefore, I think we can address this problem by "drain_workqueue() with disk->open_mutex
+held" in the loop driver side.
+
+
+
+However, the possibility that the last milli-second writeback request
+(which runs during unmount operation) from filesystem fails due to
+
+    if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
+        return BLK_STS_IOERR;
+
+check in loop_queue_rq() will remain. Therefore, addressing this problem
+within individual filesystem will be more strict solution. But guessing from
+the pace jfs fixes bugs, it would take long time before we stop seeing
+this problem...
 
