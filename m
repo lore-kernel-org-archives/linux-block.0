@@ -1,80 +1,80 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FA618C008
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 06:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D783AA18B
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 06:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780036464; cv=none; b=pDNYD0qBmY3HZX2kzd9eI8/gpZVnG0pbYKgMd8vEv4YXa7OfWLz+cuCnpr+vRxnmtneQyFs4eyu+pZdsDLi3YEqRD/fL0K6MnrmkJ6c6dp+8D/kaxBbeDG1bMubvJZyApcDeTu+H24rdNGHgN7QMHAdfqTfWArseARKE/qd7iOc=
+	t=1780036520; cv=none; b=ABAg/XXq5wCX2lcVLAH97OVApNP8FVPgU0+AW4Ps11Od9nQWEmtrF7OYg2LW7jnkUooz5PhMP1pthtKYVRZ0UL7nqMtK6+/W2Ia1D4tYjP5+zy+aGWo/YBxMOKiiSmJqfPeBLs7foCT+FVRpRZmVu2NjGh00aGExdLT31wVJJ1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780036464; c=relaxed/simple;
-	bh=sFxJJoG001FaaHORlx+NJKGqzDVTcrZakzqS6MqaA9A=;
+	s=arc-20240116; t=1780036520; c=relaxed/simple;
+	bh=01Fi5TNzSvMLRU2AnDlSa6Qn1N6AyDzIFdpCSe361F4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jLpZYtNxLSyUemM/MOpPo/BeTtt2Hvttt4qcBqK+CqQkGKQSi5fNHqKvIkCu1REUYsqQ7PubbG61u4Ncd6uDNq80T4UytTXHQjyywfcUDY/VDZoWX4cGCXVVW4BlSjJrT3j+EVwla5YeWmK3jjx23M6Hq86UVjWWmgJFNdp3PXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nP33aqgh; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9GvjVip6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QPSsibk6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LQttSQ2C; arc=none smtp.client-ip=195.135.223.130
+	 In-Reply-To:Content-Type; b=NYWZMyq8Q8eZr5enrN63Ssc7F587wB67dzfcMAOwil9jOWfGg20+l6Cc6LulY5VV+e3bp9myLsCllrzkzYbF2aDxkVQgeU80wLT+LAL5Ho2N4DdZR+X7VTY7kMTJfiHa6Moth86ICoxPcyo1kgN0a6Pw9E0KxZ0QN/ft/vXPawg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aAYh9koA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IHYJmPYQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=aAYh9koA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IHYJmPYQ; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nP33aqgh";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9GvjVip6";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QPSsibk6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LQttSQ2C"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aAYh9koA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IHYJmPYQ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="aAYh9koA";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IHYJmPYQ"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1746C6A9F2;
-	Fri, 29 May 2026 06:34:21 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 545BC66E2C;
+	Fri, 29 May 2026 06:35:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780036462; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1780036517; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vCC7hlWAohqLo5kk6M+93g1E2ZFC5amW9SV5gGREF8s=;
-	b=nP33aqghJuSy9Yx7rr0lvR48WuCaRqFh+8YEMx+Vy4VenVY38v+seTR0c2GbNv5yrJytEn
-	qWWfDprNiMMT9F8pS+sz5AcwBum7ASsed2rvb6mxqIlURPW/UxPPzwejz5SeU14jLP7q3r
-	1C7YsxxxeJ6AVYE5KiOEyabgBT99Mz0=
+	bh=szWT/bhFGQJ0kXI1YZ6fPqNhNPaDn9DVm7nrr39/tUQ=;
+	b=aAYh9koAaDEYQrh+kGcl9KBraw5IW7zZ45VMSrL1/+kG8FA6UVNH6LQy5QwMlBEkVOJdWc
+	FLhIEzRYVZ4z/68bjnkkP2fgGCuEYTpxYD1XbY88s9QnI3ZucKJjMN3FYJxCs5ju+i2+Ez
+	knPd9HeNYmOPNELMSk7w6Fmh2dXufMA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780036462;
+	s=susede2_ed25519; t=1780036517;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vCC7hlWAohqLo5kk6M+93g1E2ZFC5amW9SV5gGREF8s=;
-	b=9GvjVip6ju7iWz5iQAYR4W4VJSseb2sK+OF+Gg0sRqXQfReAvglIxYpdJCtrO8uoyrE0Qk
-	WH9AmzFxLhBItBBw==
-Authentication-Results: smtp-out1.suse.de;
+	bh=szWT/bhFGQJ0kXI1YZ6fPqNhNPaDn9DVm7nrr39/tUQ=;
+	b=IHYJmPYQikdbIiPGkJvwI7iK9d2hjKjOReWW7TH4M3X8YdUmd3E8QV8KuE3bs4ERk4lpck
+	OV3vg9E+V73XtyCQ==
+Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1780036461; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1780036517; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vCC7hlWAohqLo5kk6M+93g1E2ZFC5amW9SV5gGREF8s=;
-	b=QPSsibk6Dc64xQml5kZZKElQaMPjYgqmCUvl3h0RMQ8lTR2cNAZXN4GJkPFV8gW/XCwi7T
-	SzuO4ARNmTdRC/nf2HmfA286ZowR5G84v68AOGWj5fxf42Z4lzX4l/Qm0RLiKweLSC0I2i
-	oaYOIYzaj0QcrAsaDAW9YpGXiDUBmnw=
+	bh=szWT/bhFGQJ0kXI1YZ6fPqNhNPaDn9DVm7nrr39/tUQ=;
+	b=aAYh9koAaDEYQrh+kGcl9KBraw5IW7zZ45VMSrL1/+kG8FA6UVNH6LQy5QwMlBEkVOJdWc
+	FLhIEzRYVZ4z/68bjnkkP2fgGCuEYTpxYD1XbY88s9QnI3ZucKJjMN3FYJxCs5ju+i2+Ez
+	knPd9HeNYmOPNELMSk7w6Fmh2dXufMA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1780036461;
+	s=susede2_ed25519; t=1780036517;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vCC7hlWAohqLo5kk6M+93g1E2ZFC5amW9SV5gGREF8s=;
-	b=LQttSQ2CypoTAtQx6zKJercSC09jXsViIotwSIeT4txUWhOoWbUJw+0lfWTq8YDv4Ic+3U
-	6LKddw8n+FEkT2Aw==
+	bh=szWT/bhFGQJ0kXI1YZ6fPqNhNPaDn9DVm7nrr39/tUQ=;
+	b=IHYJmPYQikdbIiPGkJvwI7iK9d2hjKjOReWW7TH4M3X8YdUmd3E8QV8KuE3bs4ERk4lpck
+	OV3vg9E+V73XtyCQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DA8845B1D6;
-	Fri, 29 May 2026 06:34:20 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 22DF05B1D7;
+	Fri, 29 May 2026 06:35:17 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id A+C3M2wzGWq8JAAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 29 May 2026 06:34:20 +0000
-Message-ID: <0c32d98f-9a46-47df-a827-2bfdde5d6013@suse.de>
-Date: Fri, 29 May 2026 08:34:20 +0200
+	id cbqSBqUzGWqRJQAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 29 May 2026 06:35:17 +0000
+Message-ID: <bfa3d9eb-c786-4575-b1f6-8c3f30068917@suse.de>
+Date: Fri, 29 May 2026 08:35:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,21 +82,21 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/12] block/blk-mq-debugfs: Improve lock context
- annotations
+Subject: Re: [PATCH v5 10/12] block/kyber: Make the lock context annotations
+ compatible with Clang
 To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
  Damien Le Moal <dlemoal@kernel.org>, Nathan Chancellor <nathan@kernel.org>
 References: <cover.1779997063.git.bvanassche@acm.org>
- <b49bc91945356894b8ab1dc2de1aabad6db3ce16.1779997063.git.bvanassche@acm.org>
+ <5165d212359b6b2ac70f52917282b85ea6c75fdf.1779997063.git.bvanassche@acm.org>
 Content-Language: en-US
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <b49bc91945356894b8ab1dc2de1aabad6db3ce16.1779997063.git.bvanassche@acm.org>
+In-Reply-To: <5165d212359b6b2ac70f52917282b85ea6c75fdf.1779997063.git.bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
 X-Spam-Level: 
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 X-Spamd-Result: default: False [-4.30 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
@@ -110,25 +110,24 @@ X-Spamd-Result: default: False [-4.30 / 50.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_TLS_ALL(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_TWO(0.00)[2];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,acm.org:email,suse.de:email,suse.de:mid];
+	FROM_EQ_ENVFROM(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,acm.org:email,suse.de:email,suse.de:mid]
 
 On 5/28/26 21:45, Bart Van Assche wrote:
-> Make the existing lock context annotations compatible with Clang. Add
-> the lock context annotations that are missing.
+> While sparse ignores the __acquires() and __releases() arguments, Clang
+> verifies these. Make the arguments of __acquires() and __releases()
+> acceptable for Clang.
 > 
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->   block/blk-mq-debugfs.c | 12 ++++++------
->   block/blk.h            |  4 ++++
->   2 files changed, 10 insertions(+), 6 deletions(-)
+>   block/kyber-iosched.c | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
 > 
-Reviewed-by: Hannes Reiecke <hare@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 
 Cheers,
 
