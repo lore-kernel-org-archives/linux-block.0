@@ -1,143 +1,129 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D9C3B47D7;
-	Fri, 29 May 2026 08:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23993A9619
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 08:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780044592; cv=none; b=WgLLEouSoYB8wpaglyD5kjYaHXjn1wlt8FpD6E7EucZ7Z1ThsgTrC9MoW9R+yK3Sgl+/PCxIloXcenfBgZ3XGOY+XcSW5QdsDNW0+BjRzsQJz7QtH3q8MOjBQskgsvwTfA5HfXeHg6gcdzzZt90qlAd36gazsz7/f6FjK7fkxLk=
+	t=1780044824; cv=none; b=E45o+imyz3n1O8C/m4JMSm0tJn5zE7yxpNWk0cgvyf9xvV8DMDG8K1IdAMOrNk4n7UwLR3LqmwmwVe17em/v/exXknnvJGyfj8NdmTSS4ifSsjpKDgel1ccLlzr23vNDZPC+MpSmVEDtgibmJ+Iej9j5v+jsl9glOQ25BFvp7M8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780044592; c=relaxed/simple;
-	bh=gzi15Ba6ST4F/udZXZcOXKU4Z4iYEVoCn/tiURTKZEU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RcfnHD9WvjiMjn4RyGSCiYqcwCv+V6dVi7OcY10fTrUsjq7Mon6322SWjduI+IYVRRBk6se6mGHd/5RyVrYQK/86/+z9qQBxuKIk14MI908gUshMsHcXgo/TUSqVkc476QcZT3YttYaNslgMPXqbER5SyAh2hLOk7cP9tnqjVdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=PezPME7C; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hXpBCHC4; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1780044824; c=relaxed/simple;
+	bh=FyoHFrGRRI+aMqGck5x5ii339plHkAlI7euqWoBRry0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kCX4yufq+yloXSGRJncqAF7eGdAfbjjxkzsColHTzrDDmr8gB9/cexrIQkGwGFbGxUohMYY8jqx5dcNPzWiqbemJevFUvAga0pcB9T3nSlV97BgKWK5yjeuENvJXxbVMiYqKdXqvgGCq0YVC7Vv1vZo9y743yYtqxqjzOcaRIGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSVB7Sfe; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="PezPME7C";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hXpBCHC4"
-Date: Fri, 29 May 2026 10:49:39 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1780044582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RIQTzMrAiz60EQXjnvZkMfXRLxi3s6ETa0YnTZQN3V0=;
-	b=PezPME7Ck4DYD3pliNLx80vlw7cBwz4loyN4hp4vr99ld5QeCjXUaYDk4HPjJWNIaQnq4f
-	0LxxtzVOUWhqIHIH7twCdRAVZ4CLMCdeIYdJe5JdlFewz1xVNoOu78DAFqsfcYlkoIcDT9
-	O/XNOzNEuARiVjFPEv7yXpTcaMjFZqQ2LZYMPvDbih3OvYfdJi/vdTvDq7xh8iGIbQTDzW
-	yDWvl0x9xn7yNXjZ9k9dcBmv54e/1zv0kJh5cvQZSczWuVAf4haoNjwrQ1mjH9Y00UK3oQ
-	6HjviRT4QUJQa+RVtekFJTWsggcUGZeLOBhi2MTnepnzenOqovMnOrV4JCrYfQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1780044582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RIQTzMrAiz60EQXjnvZkMfXRLxi3s6ETa0YnTZQN3V0=;
-	b=hXpBCHC4cVaCxy8mohdL9CuJryevkV2GGrSOm/4C3/y0Ka2S2b4kEgKL/boonjNbSwUhFS
-	2C4ZWQ/P7coXDPBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Tal Zussman <tz2294@columbia.edu>, Jens Axboe <axboe@kernel.dk>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Dave Chinner <dgc@kernel.org>, Bart Van Assche <bvanassche@acm.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, Gao Xiang <xiang@kernel.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH v6 1/4] block: add task-context bio completion
- infrastructure
-Message-ID: <20260529084939.bWkYVTj4@linutronix.de>
-References: <ea6fc01f-5cb7-4a04-9f92-bbd2791fea51@columbia.edu>
- <ahPdDtu3vXfNpb__@infradead.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSVB7Sfe"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-490426d72f7so68305395e9.3
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 01:53:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780044818; x=1780649618; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2R3/HY+TZwDP536xdY5FCSiiUr5tHBZfz6LP9l2pe1g=;
+        b=aSVB7Sfe35R4QxQ1xTmw1BTV1sk/8MzCzJfMGmrQ6b/C6wOUMDRwMKhh3SkdNRqsGU
+         r4TX8OSfoa/BrYm/t3qCIn/jS76W/HTgjz9IlWs9jKxZFUCGv1xnq8SqREMBz5Q8ODsw
+         Rt5yI/H7jOBmnKiv1B8Ehlx5mz0+10LGPUVc/8+GOYIRXo0mxiZrcjd6RwxZTICy6mJb
+         iaviRjKcB5WO9xRgqYccuVZA4r3Tht1OFX7Z3TnN4zxdp1mSwZxCrbMHqURQQfwpRcJZ
+         6+Fb1YTQ1EZYw6SMMMbGgfOwjGdxPtCPpn9Ymjga7/Bw5KxVXQXfU+ichOtMhfsWJTWL
+         pXaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780044818; x=1780649618;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2R3/HY+TZwDP536xdY5FCSiiUr5tHBZfz6LP9l2pe1g=;
+        b=aVzRdV91J3bQ+Y7dp1mFSMy8sTfFq8gVwCCPTNg09Mo3rRVGU1tTdgCMrP+KNs/Bml
+         1444/ZN20ZwY7DUtHdfdu0IruoQX5smlaUQTJQVjcU2U3Bjh8NqRiB0wkWBT025/cDdS
+         qlO0J+OSV+R/+tZ45zN98cGMJlxhuhFOmxlrXfDcYe5WznHoDKFYqOeKWNwtmR/jAz7X
+         mqKIJee0W2mmnq8nZZQlI35J6zVZbHG39qzmyLqraaNh91dNn+pRDInK8oEZ3sKklXhd
+         /UIgJEDJjL2SI8dUftfHcbJrBQ/sNsgBmCph4zR9pguSlLI0LHWTpvHq4rkupDGavKeb
+         fxTA==
+X-Forwarded-Encrypted: i=1; AFNElJ81ymuWIdcRen/1VQ2j5Rdq0ovIVbIsMAqGxZpmml797G0TTozDguxeB17VrFbSzP8vjQEC899Y3NVhog==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx33AHmAzptl/+eVGuDl5dL8GsKJ7qrmwI56RFOjs884UqbVm++
+	lTtCtUTg3BotndiT0p7DzbfFsv9f7cLh95WPOuJhc4jDRVIPwo0l6e4i
+X-Gm-Gg: Acq92OFlcJZqLLFaXOey3bogWGsVR7oO+FXTAb+R9Va2b/MEMpOyA0Z8oiN6zbhBxkb
+	Lt5IxdXW4hdcLrRtgo/CxrZo8jh7IJg6vO4twEA9HRbyEVpJ43f8k7XkNMlga8RuD/oxnhCbUwU
+	urYtTKZnO2DXEWWi6nq6uYBuFCsbAXyh2L447jrqXeFYcyRN6tEpy4IMnZuZkAFft6GFk5CsAmv
+	AByxJ217zqZUXzmV3Kv4uVVWJH+3A/lvthFjXMjTXFP2a/S8ETMQ/l33wisYiR2twAQUbZe1qyB
+	wCFQ0p46Ifww6llvk0sJZK6ps42Z9nL5JIlSWN8+8FLCBDW6+3LCOoCHn06cxu67snytq1PBTF3
+	1YMZhSIqrw+O5IT8EfKiteWbyGccKUErh28q1dLGwSOHg83Lht144lyu2Q2gc3o8TPtvFhAowTA
+	TfPHpIeTa03ySPB3b2+zlPHU36M1KTCEEhVIci56F2XA==
+X-Received: by 2002:a05:600c:6a8b:b0:490:778:4fec with SMTP id 5b1f17b1804b1-4909c0d3a70mr21125185e9.33.1780044817504;
+        Fri, 29 May 2026 01:53:37 -0700 (PDT)
+Received: from x1.tail0e71db.ts.net ([46.140.7.198])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909dff2a80sm29453685e9.3.2026.05.29.01.53.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2026 01:53:36 -0700 (PDT)
+From: Ruslan Valiyev <linuxoid@gmail.com>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Keith Busch <kbusch@kernel.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel test robot <lkp@intel.com>,
+	"kernelci . org bot" <bot@kernelci.org>,
+	Ruslan Valiyev <linuxoid@gmail.com>
+Subject: [PATCH 6.12.y] block: make bio_integrity_map_user() static inline
+Date: Fri, 29 May 2026 10:53:34 +0200
+Message-ID: <20260529085334.937482-1-linuxoid@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ahPdDtu3vXfNpb__@infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On 2026-05-24 22:24:30 [-0700], Christoph Hellwig wrote:
-> > > +	local_lock_irqsave(&bio_complete_batch.lock, flags);
-> > 
-> > Q: "Is it safe to use local_lock_irqsave() here when called from an atomic
-> > context?
-> > On CONFIG_PREEMPT_RT kernels, local_lock_t maps to a per-CPU spinlock_t,
-> > which is a sleepable rt_mutex. Since __bio_complete_in_task() is specifically
-> > called when bio_in_atomic() is true (which includes hardware interrupts or
-> > execution under a raw_spinlock_t), attempting to acquire a sleepable lock
-> > here would trigger an "Invalid wait context" lockdep warning.
-> > Would a lockless list (llist) be more appropriate here to avoid sleeping
-> > in atomic contexts?"
-> > 
-> > A: This seems legit, but I'm not super familiar with PREEMPT_RT. I don't want
-> > to switch to raw_spinlock_t, as it seems like that would add unnecessary
-> > overhead on non-PREEMPT_RT kernels. I think switching to use local_irq_save()
-> > (as is done for the per-CPU bio allocation cache) should work.
-> 
-> Adding the PREEMPT_RT maintainers for this as it is above my pay grade.
+From: Jens Axboe <axboe@kernel.dk>
 
-The local_lock_irqsave() seems to come from __bio_complete_in_task()
-which sounds like preemptible context in general. So yes, using so is
-safe.
-It should be even save with interrupt handlers and so on since they are
-threaded in general.
-There is this new bio_in_atomic() this looks a bit odd to detect softirq
-context as calimed in the comment. Anyway, on PREEMPT_RT
-rcu_preempt_depth() will work as intended. The preemptible() shouldn't
-get false because softirq handling is not recorded in preempt-counter,
-interrupts are forced-threaded so you should never be in hardirq
-context and things like spin_lock_irq() don't disable interrupts. So
-unless you do local_irq_save(), preempt_disable() you should remain
-preemptible (even in softirq). This might or might not do what you want.
+If CONFIG_BLK_DEV_INTEGRITY isn't set, then the dummy helper must be
+static inline to avoid complaints about the function being unused.
 
-> > Q: "Does creating this workqueue with WQ_MEM_RECLAIM break the local_lock_irq()
-> > protection in bio_complete_work_fn()?
-> > When a workqueue has WQ_MEM_RECLAIM, it spawns a global rescuer thread that
-> > can execute per-CPU work items during worker pool congestion. This rescuer
-> > thread executes unbound, meaning it could run on CPU B while processing
-> > CPU A's work item.
-> > Since local_lock operates strictly on the currently executing CPU, the
-> > rescuer thread on CPU B would acquire CPU B's lock, while popping elements
-> > from CPU A's list (derived via container_of()).
-> > If an interrupt on CPU A concurrently calls __bio_complete_in_task(),
-> > it will acquire CPU A's lock and modify the same list without mutual
-> > exclusion, potentially causing list corruption."
-> > 
-> > A: The rescuer should run on the same CPU, not unbound, so this is not an
-> > issue.
-> 
-> This is another area where the PREEMPT_RT/scheduler folks might be able
-> to help.
+Fixes: fe8f4ca7107e ("block: modify bio_integrity_map_user to accept iov_iter as argument")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202411300229.y7h60mDg-lkp@intel.com/
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+(cherry picked from commit 546d191427cf5cf3215529744c2ea8558f0279db)
 
-Not sure what the question is. WQ_MEM_RECLAIM is one thing WQ_UNBOUND/
-WQ_PERCPU another.
+The same build break is now reported on stable-rc/linux-6.12.y by KernelCI.
 
-bio_complete_wq is WQ_MEM_RECLAIM | WQ_PERCPU. So it will run on the
-requested CPU. The container_of() and local_local() looks like it will
-access the same thing but having a WARN_ON() if they don't would be a
-blessing. Or just use this_cpu in the worker FN to avoid all this.
+Verified the upstream cherry-pick applies cleanly on top of 97928cc88900a
+(Linux 6.12.92-rc1) and that block/bdev.o + block/fops.o compile cleanly
+afterwards with i386_defconfig (which leaves CONFIG_BLK_DEV_INTEGRITY
+unset). Without the fix both files trip:
 
-The need_resched() check in bio_complete_work_fn() is bit odd. So if
-need_resched() is true then you want to leave (and you care !PREEMPT
-kernels). On PREEMPT_LAZY you could just continue as there would be
-preemption sooner or later.
-The bio_list_empty() check below is futile. If it is empty then you
-leave doing nothing (so you could just leave without the check).
-If there is an item, then the enqueue "thread" should have invoked
-mod_delayed_work_on(, 1) claiming the work. That means the
-mod_delayed_work_on(, 0) in this function should do nothing because the
-work is already claimed (so you could just leave skipping the extra
-work).
+  include/linux/bio-integrity.h:101:12: error: 'bio_integrity_map_user' defined but not used [-Werror=unused-function]
 
-Sebastian
+Reported-by: kernelci.org bot <bot@kernelci.org>
+Closes: https://lore.kernel.org/all/178000554419.7114.5687032601791586484@330cfa3079ca/
+Closes: https://lore.kernel.org/all/178000194591.7095.11275948264529325340@330cfa3079ca/
+Signed-off-by: Ruslan Valiyev <linuxoid@gmail.com>
+---
+ include/linux/bio-integrity.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
+index be91479b2c42d..53f6dbd2816e0 100644
+--- a/include/linux/bio-integrity.h
++++ b/include/linux/bio-integrity.h
+@@ -98,7 +98,7 @@ static inline void bioset_integrity_free(struct bio_set *bs)
+ {
+ }
+ 
+-static int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
++static inline int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+ {
+ 	return -EINVAL;
+ }
+
+base-commit: 97928cc88900a9fb07a4dddbd1db19eb0ce55c56
+-- 
+2.43.0
+
