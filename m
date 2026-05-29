@@ -1,129 +1,143 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23993A9619
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 08:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38C83C2774
+	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 10:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780044824; cv=none; b=E45o+imyz3n1O8C/m4JMSm0tJn5zE7yxpNWk0cgvyf9xvV8DMDG8K1IdAMOrNk4n7UwLR3LqmwmwVe17em/v/exXknnvJGyfj8NdmTSS4ifSsjpKDgel1ccLlzr23vNDZPC+MpSmVEDtgibmJ+Iej9j5v+jsl9glOQ25BFvp7M8=
+	t=1780052366; cv=none; b=Y0M+LekoMQ8z4Y/niM47ELsURqzkZcRSKjxMakAGOEHBUMJGOkdYZCmqIHjRLrf5C1XdGaO6oAJajpLFDwruuP3lQhE22EXQdvHdQUu4ikHzDiCpGKb6cgqmE70tQa6zfaCnrbEOGHCg7SKyYnQ8NJC5/Ani3jBcKbbidltsdVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780044824; c=relaxed/simple;
-	bh=FyoHFrGRRI+aMqGck5x5ii339plHkAlI7euqWoBRry0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kCX4yufq+yloXSGRJncqAF7eGdAfbjjxkzsColHTzrDDmr8gB9/cexrIQkGwGFbGxUohMYY8jqx5dcNPzWiqbemJevFUvAga0pcB9T3nSlV97BgKWK5yjeuENvJXxbVMiYqKdXqvgGCq0YVC7Vv1vZo9y743yYtqxqjzOcaRIGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSVB7Sfe; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780052366; c=relaxed/simple;
+	bh=OALE1Pc/rF8dgWSwkPtQJkCEVXfiJcU73/nCbwbqG6M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ATnUFZZMXDx5Mk2c+a+KdZDQv6LJX3nnykXTsMKh2ZUZMdnSfk1e5yk7pWIXlKhi47eGUfjZ0yj8MHJR7LvXofPZriLYGKNB7NxEKdulE4mYtXjfNCxZa5tdTzV/VXDjrwnrrFpHDQlaZOnNUM5vTCOyxyBW58KBRQdcu6Azssw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=fmoDnVBf; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSVB7Sfe"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-490426d72f7so68305395e9.3
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 01:53:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="fmoDnVBf"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-49068493267so38636525e9.1
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 03:59:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780044818; x=1780649618; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2R3/HY+TZwDP536xdY5FCSiiUr5tHBZfz6LP9l2pe1g=;
-        b=aSVB7Sfe35R4QxQ1xTmw1BTV1sk/8MzCzJfMGmrQ6b/C6wOUMDRwMKhh3SkdNRqsGU
-         r4TX8OSfoa/BrYm/t3qCIn/jS76W/HTgjz9IlWs9jKxZFUCGv1xnq8SqREMBz5Q8ODsw
-         Rt5yI/H7jOBmnKiv1B8Ehlx5mz0+10LGPUVc/8+GOYIRXo0mxiZrcjd6RwxZTICy6mJb
-         iaviRjKcB5WO9xRgqYccuVZA4r3Tht1OFX7Z3TnN4zxdp1mSwZxCrbMHqURQQfwpRcJZ
-         6+Fb1YTQ1EZYw6SMMMbGgfOwjGdxPtCPpn9Ymjga7/Bw5KxVXQXfU+ichOtMhfsWJTWL
-         pXaQ==
+        d=googlemail.com; s=20251104; t=1780052363; x=1780657163; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F21Dsc8xJ3JaBQAyJr3DbcWUQMZ4eqao7aBELV86M4c=;
+        b=fmoDnVBfKy1QnDiVAyyFZbMss3DphTuiFrppppmYcuQiGm8/fLRpy+eGRUQS5j4a/q
+         SjOzGEPIeW8hGM80k72OQnM982Rw8pMyA4HZ+HVJH94QP67dIYaXsWb9EBLKJMB+o24c
+         u+5f+YQmRrlPc8Bnvlt649rVSBfB3o4y9izPJeQ1m3znXBXA1QLvNvDs7ne2dZAJ4k5R
+         zcgDIiRadGGP51C6myPSqrBN76Iq9oqdbbxeIwjtOEyacbxYlhDCMcOdPSXHUnoS9q8o
+         bc494ETZcj8FuYeLqPqLd2jSvd0jafNl5CL7ydsx9nS4PosZHrvrtY4COOIKV63hu0Tp
+         CiVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780044818; x=1780649618;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2R3/HY+TZwDP536xdY5FCSiiUr5tHBZfz6LP9l2pe1g=;
-        b=aVzRdV91J3bQ+Y7dp1mFSMy8sTfFq8gVwCCPTNg09Mo3rRVGU1tTdgCMrP+KNs/Bml
-         1444/ZN20ZwY7DUtHdfdu0IruoQX5smlaUQTJQVjcU2U3Bjh8NqRiB0wkWBT025/cDdS
-         qlO0J+OSV+R/+tZ45zN98cGMJlxhuhFOmxlrXfDcYe5WznHoDKFYqOeKWNwtmR/jAz7X
-         mqKIJee0W2mmnq8nZZQlI35J6zVZbHG39qzmyLqraaNh91dNn+pRDInK8oEZ3sKklXhd
-         /UIgJEDJjL2SI8dUftfHcbJrBQ/sNsgBmCph4zR9pguSlLI0LHWTpvHq4rkupDGavKeb
-         fxTA==
-X-Forwarded-Encrypted: i=1; AFNElJ81ymuWIdcRen/1VQ2j5Rdq0ovIVbIsMAqGxZpmml797G0TTozDguxeB17VrFbSzP8vjQEC899Y3NVhog==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx33AHmAzptl/+eVGuDl5dL8GsKJ7qrmwI56RFOjs884UqbVm++
-	lTtCtUTg3BotndiT0p7DzbfFsv9f7cLh95WPOuJhc4jDRVIPwo0l6e4i
-X-Gm-Gg: Acq92OFlcJZqLLFaXOey3bogWGsVR7oO+FXTAb+R9Va2b/MEMpOyA0Z8oiN6zbhBxkb
-	Lt5IxdXW4hdcLrRtgo/CxrZo8jh7IJg6vO4twEA9HRbyEVpJ43f8k7XkNMlga8RuD/oxnhCbUwU
-	urYtTKZnO2DXEWWi6nq6uYBuFCsbAXyh2L447jrqXeFYcyRN6tEpy4IMnZuZkAFft6GFk5CsAmv
-	AByxJ217zqZUXzmV3Kv4uVVWJH+3A/lvthFjXMjTXFP2a/S8ETMQ/l33wisYiR2twAQUbZe1qyB
-	wCFQ0p46Ifww6llvk0sJZK6ps42Z9nL5JIlSWN8+8FLCBDW6+3LCOoCHn06cxu67snytq1PBTF3
-	1YMZhSIqrw+O5IT8EfKiteWbyGccKUErh28q1dLGwSOHg83Lht144lyu2Q2gc3o8TPtvFhAowTA
-	TfPHpIeTa03ySPB3b2+zlPHU36M1KTCEEhVIci56F2XA==
-X-Received: by 2002:a05:600c:6a8b:b0:490:778:4fec with SMTP id 5b1f17b1804b1-4909c0d3a70mr21125185e9.33.1780044817504;
-        Fri, 29 May 2026 01:53:37 -0700 (PDT)
-Received: from x1.tail0e71db.ts.net ([46.140.7.198])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909dff2a80sm29453685e9.3.2026.05.29.01.53.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2026 01:53:36 -0700 (PDT)
-From: Ruslan Valiyev <linuxoid@gmail.com>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sasha Levin <sashal@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Keith Busch <kbusch@kernel.org>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel test robot <lkp@intel.com>,
-	"kernelci . org bot" <bot@kernelci.org>,
-	Ruslan Valiyev <linuxoid@gmail.com>
-Subject: [PATCH 6.12.y] block: make bio_integrity_map_user() static inline
-Date: Fri, 29 May 2026 10:53:34 +0200
-Message-ID: <20260529085334.937482-1-linuxoid@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20251104; t=1780052363; x=1780657163;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F21Dsc8xJ3JaBQAyJr3DbcWUQMZ4eqao7aBELV86M4c=;
+        b=pBJYXesVg69UmY5uw/4r69QlUiAlP9wrVSmKlzYpuiPlDLkkZto1TwOf+6xHlWPz0E
+         TzrTsoZthW5pjPTMYmREAh9vMb4LSHSTQ33Syi99cOJj5C574uenO+qjxhnxdBmApd5D
+         U+kuwVmS+8EHbRH07qhIrzm34c4EeeVvDuOQWifQs4fxz6rA0x/ESEWMr6evkynMVc0O
+         0yQClx2SCXvWC4OAOfvNuK8Tn7GlsNDWIkg0hsPpg7XahUZI22eMZFgdRajjuTE9rSyw
+         1JGzUNnDHYaUvqpAD16d5sYhNU4UWjqydG18H+34SfQjf6hBvyF/iUXlVOcJbrAv6p4r
+         FBQQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+2/XOQzGiVOWd4e6mbmqxQL6/JUMqd1L8hum5PPnI9TnoJVtkODjRiCybG1V+v91dB8mxWySF05IxBSA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQKORdR1QwdvP+ByDKzXwO/FFV+fETI0H+2bQiTcR5m8VQe7Aa
+	hGatx+G+iUfeoKWYOxNlJPMMjVKcXkBuRfnD2SoFCY+t5tjIzub0woE=
+X-Gm-Gg: Acq92OEK5HaIuvrb9w/mbrt101bHUBzYn8B5kP/kzHeVMPFADoGnXdfUtSn4HwXK+39
+	8y4DyYg/LpyaDk1W3rh14y+whfx3Q3yxDLRv2Yuf9m+kxaorQAmk6hBMh9CkWHWIQ1FO39HvXh2
+	8IgbizRTFMxpdWqShu5wAwdX95nbMiri51Ev4QTI1dwVv4VRunZes/6EZvIblmZQySWU/YSL2IM
+	7n6jjSdlc8DsvQFh45CGTDLejpjUYhTvDpGamhQgU7W1+BQliX7h6hwspOar/th6gn3UGiI1j5Z
+	nsDvdjwvS8rv972UbMLptPHZd9Ch9KZEgYP6XyMLK3tk5JizEoLh82cqstIBbhCEQ6cek9jRJih
+	taZBl4os8L6TWxLmHm8aejectavdIu+9vnf3o+mdGG1XNLcOLd9J/CwieKqLszic7jfnfiaa6qT
+	a6AF3afidH1zjHvktzCRuNLzLh6lwwAVQEPbqxG1bZavATBHKSj2kz5FIh6+W8yzkqnPsaur1Ji
+	xzkKSinEp+IwA==
+X-Received: by 2002:a05:600c:a55:b0:490:3ff5:737f with SMTP id 5b1f17b1804b1-4909c0af305mr44771955e9.18.1780052362946;
+        Fri, 29 May 2026 03:59:22 -0700 (PDT)
+Received: from [192.168.1.3] (p5b2b4ac5.dip0.t-ipconnect.de. [91.43.74.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909c1263dfsm12436465e9.30.2026.05.29.03.59.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 May 2026 03:59:22 -0700 (PDT)
+Message-ID: <9b886b8c-f3cb-4497-a4d3-159cddb0dec1@googlemail.com>
+Date: Fri, 29 May 2026 12:59:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Betterbird (Windows)
+Subject: Re: [PATCH 6.12 000/272] 6.12.92-rc1 review
+Content-Language: de-DE
+To: Miguel Ojeda <ojeda@kernel.org>, gregkh@linuxfoundation.org
+Cc: achill@achill.org, akpm@linux-foundation.org, broonie@kernel.org,
+ conor@kernel.org, f.fainelli@gmail.com, hargar@microsoft.com,
+ jonathanh@nvidia.com, linux-kernel@vger.kernel.org, linux@roeck-us.net,
+ lkft-triage@lists.linaro.org, patches@kernelci.org, patches@lists.linux.dev,
+ pavel@nabladev.com, rwarsow@gmx.de, shuah@kernel.org, sr@sladewatkins.com,
+ stable@vger.kernel.org, sudipm.mukherjee@gmail.com,
+ torvalds@linux-foundation.org, Anuj Gupta <anuj20.g@samsung.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+References: <20260528194629.379955525@linuxfoundation.org>
+ <20260529060918.123155-1-ojeda@kernel.org>
+From: Peter Schneider <pschneider1968@googlemail.com>
+In-Reply-To: <20260529060918.123155-1-ojeda@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Jens Axboe <axboe@kernel.dk>
+Am 29.05.2026 um 08:09 schrieb Miguel Ojeda:
+> On Thu, 28 May 2026 21:46:14 +0200 Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
+>>
+>> This is the start of the stable review cycle for the 6.12.92 release.
+>> There are 272 patches in this series, all will be posted as a response
+>> to this one.  If anyone has any issues with these being applied, please
+>> let me know.
+>>
+>> Responses should be made by Sat, 30 May 2026 19:45:52 +0000.
+>> Anything received after that time might be too late.
+> 
+> Boot-tested under QEMU for Rust x86_64, arm64 and riscv64; built-tested
+> for loongarch64:
+> 
+> Tested-by: Miguel Ojeda <ojeda@kernel.org>
+> 
+> I am seeing:
+> 
+>      In file included from kernel/trace/blktrace.c:23:
+>      In file included from kernel/trace/../../block/blk.h:5:
+>      ./include/linux/bio-integrity.h:101:12: error: unused function 'bio_integrity_map_user' [-Werror,-Wunused-function]
+>        101 | static int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
+>            |            ^~~~~~~~~~~~~~~~~~~~~~
+> 
+> This looks like it needs:
+> 
+>    546d191427cf ("block: make bio_integrity_map_user() static inline")
+> 
+> (and indeed in my run `CONFIG_BLK_DEV_INTEGRITY` is not set like the
+> commit message says).
 
-If CONFIG_BLK_DEV_INTEGRITY isn't set, then the dummy helper must be
-static inline to avoid complaints about the function being unused.
 
-Fixes: fe8f4ca7107e ("block: modify bio_integrity_map_user to accept iov_iter as argument")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202411300229.y7h60mDg-lkp@intel.com/
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-(cherry picked from commit 546d191427cf5cf3215529744c2ea8558f0279db)
+I didn't see this error message on x86_64; I built with CONFIG_WERROR=y and CONFIG_BLK_DEV_INTEGRITY=y
 
-The same build break is now reported on stable-rc/linux-6.12.y by KernelCI.
 
-Verified the upstream cherry-pick applies cleanly on top of 97928cc88900a
-(Linux 6.12.92-rc1) and that block/bdev.o + block/fops.o compile cleanly
-afterwards with i386_defconfig (which leaves CONFIG_BLK_DEV_INTEGRITY
-unset). Without the fix both files trip:
+Builds, boots and works on my 2-socket Ivy Bridge Xeon E5-2697 v2 server. No dmesg oddities or regressions found.
 
-  include/linux/bio-integrity.h:101:12: error: 'bio_integrity_map_user' defined but not used [-Werror=unused-function]
+Tested-by: Peter Schneider <pschneider1968@googlemail.com>
 
-Reported-by: kernelci.org bot <bot@kernelci.org>
-Closes: https://lore.kernel.org/all/178000554419.7114.5687032601791586484@330cfa3079ca/
-Closes: https://lore.kernel.org/all/178000194591.7095.11275948264529325340@330cfa3079ca/
-Signed-off-by: Ruslan Valiyev <linuxoid@gmail.com>
----
- include/linux/bio-integrity.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
-index be91479b2c42d..53f6dbd2816e0 100644
---- a/include/linux/bio-integrity.h
-+++ b/include/linux/bio-integrity.h
-@@ -98,7 +98,7 @@ static inline void bioset_integrity_free(struct bio_set *bs)
- {
- }
- 
--static int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
-+static inline int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- {
- 	return -EINVAL;
- }
+Beste Grüße,
+Peter Schneider
 
-base-commit: 97928cc88900a9fb07a4dddbd1db19eb0ce55c56
 -- 
-2.43.0
+Climb the mountain not to plant your flag, but to embrace the challenge,
+enjoy the air and behold the view. Climb it so you can see the world,
+not so the world can see you.                    -- David McCullough Jr.
 
+OpenPGP:  0xA3828BD796CCE11A8CADE8866E3A92C92C3FF244
+Download: https://www.peters-netzplatz.de/download/pschneider1968_pub.asc
+https://keys.mailvelope.com/pks/lookup?op=get&search=pschneider1968@googlemail.com
+https://keys.mailvelope.com/pks/lookup?op=get&search=pschneider1968@gmail.com
