@@ -1,139 +1,113 @@
-Received: from smtp153-165.sina.com.cn (smtp153-165.sina.com.cn [61.135.153.165])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E528818B0F
-	for <linux-block@vger.kernel.org>; Fri, 29 May 2026 07:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CEE2DEA89;
+	Fri, 29 May 2026 08:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780038418; cv=none; b=YpRfiPGEU3MFtxSmFb0eVpB7+7vZre0W1F2PHKy4kFx4A5hPsKD7vSQD/xn8Ut05iAAwEuq0JIj8ucOcaATj+qbP0adgZ/k06FTmeSUoe3YKSIBwcC+mdByptzdHQZrFg5tGBz4EXu/SHUlhQ2mH2sG4KRIGCap5gOIY7lV43pI=
+	t=1780043260; cv=none; b=dh9C+uBA54BYd7m4OI1izJ9Ltece4mRSrH7N+bQiUo+yPNHzqWxI+502PVpJTwYIEFpgSPYyJfQyRKRD9wDJNIbGx9UUk7XQLTXnP+xEOdpZBLFYezsVNRQCnEMzX5hPNaaLst829LsycuOo+eB6FySw/gXvSieN8dyLCiMIF8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780038418; c=relaxed/simple;
-	bh=QJBPhTdn+jjhlbB5sPkQIha3ypdO5+Koy6MfhAQgOWg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GocIRPndRtTwExy6KKWIT+uZ87v1hwF/B94oe16XMqwzcIPqkJtqQji4ZyLHkf/oTKGNJha+DcFckXDLUphMLKMfVKoC63s67cnqZ/2+vyOlfJvon3gZQUAVWz9kI7fyw8r/jgKkpPjtrNDkTORbRgmCuw2rd2Asxk+/vTdT2Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=0RFxf7gv; arc=none smtp.client-ip=61.135.153.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1780043260; c=relaxed/simple;
+	bh=eZPDRrZAgAZYw9/zdoO76/s8Sls3KbvKcVi/azdKSxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pEGUFKIrF5DTfGWQ81xEpMqfchZivP0LadJfyKKs6UnLXDLg+A5sT6ewDPI4lvEXU7EVj0yBt2glZdTxEy9JxhCXaEqjRqPGwyiXLBhG4jsut8pno6/Yhy7+R5bP03r79l8okQoW34uLDFUrxMhc2YymTaa16SBMK7zAR6dlKHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=Q6Hu6kin; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="0RFxf7gv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1780038413;
-	bh=I/cvswV/b0UR4VjhlDE/PSQobnVxd2Hh74IJsbGpfyw=;
-	h=From:Subject:Date:Message-ID;
-	b=0RFxf7gv0dBvc3Lj6z6d2MVxZAkGno7SQh1vnbiXFUA1xkbci3RpQwX8yCEyi8zT8
-	 h7QoD/2zIXlsfBLumqWmCVDbCD+guv5ywSf58FTPl8OAwcpVbwZwhNRJX8oyqFiHY3
-	 VYXnbSR9tr1foDdnV9jE93fcZF4GnEl8Vp8byCuQ=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.32) with ESMTP
-	id 6A193A7500003A64; Fri, 29 May 2026 15:04:23 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 2904214456667
-X-SMAIL-UIID: 144996F36D3C4D3FBCBB600E4D7C0F5F-20260529-150423-1
-From: Hillf Danton <hdanton@sina.com>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-btrfs@vger.kernel.org,
-	David Sterba <dsterba@suse.com>,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
-Date: Fri, 29 May 2026 15:04:10 +0800
-Message-ID: <20260529070411.1206-1-hdanton@sina.com>
-In-Reply-To: <26717cb6-81b0-4d5d-a5db-669283f9bb9d@I-love.SAKURA.ne.jp>
-References: 
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="Q6Hu6kin"
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5A4A4115799;
+	Fri, 29 May 2026 10:27:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1780043250;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=Fu92N19MSffikCHEnPXV/E3bF4MY+txwWr/Oeyobw34=;
+	b=Q6Hu6kinkDiAJ72zL1foun0PD/4q8U0n2Gay/Iv1O24yVU17QsfzVtdk84sDz+j/0dUS/r
+	o40ErHYVDdVVBksPG0WPsMO4YTbDqyUyRtm+qKK8bRM1gS9hVb35HzzRvV7IFw8QYYB/7x
+	IIXoUodLwc0SPbkd8RX6rojZeULYYrQ0UaqbVzVgNEKzO2L4YVtLJ905jtzPLwi1KkR+01
+	Zj9qeRCMUZyXqn2LJzjqIbkgLHTR3Psw71klSrXSu3Yi9PLVaAu1n5LM6Zz2vHTQC+8qLC
+	9qdcemGmaUNsbL+v6MuRk9CScreFL1qP3Pi8bwHAm6jWStayQM066fFPM9Tm6g==
+Date: Fri, 29 May 2026 10:27:21 +0200
+From: Pavel Machek <pavel@nabladev.com>
+To: Miguel Ojeda <ojeda@kernel.org>
+Cc: gregkh@linuxfoundation.org, achill@achill.org,
+	akpm@linux-foundation.org, broonie@kernel.org, conor@kernel.org,
+	f.fainelli@gmail.com, hargar@microsoft.com, jonathanh@nvidia.com,
+	linux-kernel@vger.kernel.org, linux@roeck-us.net,
+	lkft-triage@lists.linaro.org, patches@kernelci.org,
+	patches@lists.linux.dev, pavel@nabladev.com, rwarsow@gmx.de,
+	shuah@kernel.org, sr@sladewatkins.com, stable@vger.kernel.org,
+	sudipm.mukherjee@gmail.com, torvalds@linux-foundation.org,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 6.12 000/272] 6.12.92-rc1 review
+Message-ID: <ahlN6TPTgMwBT9_d@duo.ucw.cz>
+References: <20260528194629.379955525@linuxfoundation.org>
+ <20260529060918.123155-1-ojeda@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="VCB5S51KOtzjewLJ"
+Content-Disposition: inline
+In-Reply-To: <20260529060918.123155-1-ojeda@kernel.org>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, 29 May 2026 09:14:47 +0900 Tetsuo Handa wrote:
->On 2026/05/29 8:00, Hillf Danton wrote:
->>> Given the loop workqueue that triggered the jfs warning, can you specify
->>> the reason why the workqueue in question is NOT flushed while closing disk?
->>>
->> Got it, the loop workqueue is NOT flushed to avoid deadlock, see d292dc80686a
->> ("loop: don't destroy lo->workqueue in __loop_clr_fd") for detail.
->> And the deadlock can be reproduced by flushing the loop workqueue with
->> disk->open_mutex held [1].
->> 
->> [1] Subject: Re: [syzbot] possible deadlock in blkdev_put (3)
->> https://lore.kernel.org/lkml/000000000000ea753505da2658d5@google.com/
->
->We can avoid the following lockdep warnings (including [1] you mentioned)
->
->  https://syzkaller.appspot.com/bug?extid=2f62807dc3239b8f584e
->  https://syzkaller.appspot.com/bug?extid=c4e9d077bcc86bee08dc
->  https://syzkaller.appspot.com/bug?extid=0f427123ae84b3ba6dc7
->  https://syzkaller.appspot.com/bug?extid=4feabfc9641267769c97
->  https://syzkaller.appspot.com/bug?extid=fb0ff9bfe34ad282ebd4
->
->caused by "drain_workqueue() with disk->open_mutex held" if we assign
->caller-specific lockdep class to disk->open_mutex
->
->  https://sourceforge.net/p/tomoyo/tomoyo.git/ci/c2245c765ebeba9dcb924d9171d8d470a9ac41c8/
->
->.
->
->Also, we can avoid lockdep warning caused by "drain_workqueue() with disk->open_mutex held" +
->"holding system_transition_mutex" if we forbid binding to pseudo files as backing file
->in the loop driver
->
->  https://lkml.kernel.org/r/d38e4600-3c32-491f-aa49-905f4fad1bfb@I-love.SAKURA.ne.jp
->
->which we can reproduce with
->
->  echo 7:0 > /sys/power/resume
->  losetup /dev/loop0 /sys/power/resume
->  cat /dev/loop0 > /dev/null
->  losetup -d /dev/loop0
->
->.
->
->Therefore, I think we can address this problem by "drain_workqueue() with disk->open_mutex
->held" in the loop driver side.
->
-Good news.
->
->
->However, the possibility that the last milli-second writeback request
->(which runs during unmount operation) from filesystem fails due to
->
->    if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
->        return BLK_STS_IOERR;
->
->check in loop_queue_rq() will remain.
 
-This conflicts with "There is no need to destroy the workqueue when
-clearing unbinding a loop device from a backing file." in d292dc80686a
+--VCB5S51KOtzjewLJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->Therefore, addressing this problem
->within individual filesystem will be more strict solution. But guessing from
+Hi!
 
-Conflicts with "Another thing is, if it's some btrfs bios on-the-fly after 
-close_ctree(), the most common symptom should be NULL pointer 
-dereference inside various btrfs endio functions." [2] once more.
+> > This is the start of the stable review cycle for the 6.12.92 release.
+> > There are 272 patches in this series, all will be posted as a response
+> > to this one.  If anyone has any issues with these being applied, please
+> > let me know.
+> >
+> > Responses should be made by Sat, 30 May 2026 19:45:52 +0000.
+> > Anything received after that time might be too late.
+>=20
+> Boot-tested under QEMU for Rust x86_64, arm64 and riscv64; built-tested
+> for loongarch64:
+>=20
+> Tested-by: Miguel Ojeda <ojeda@kernel.org>
+>=20
+> I am seeing:
+>=20
+>     In file included from kernel/trace/blktrace.c:23:
+>     In file included from kernel/trace/../../block/blk.h:5:
+>     ./include/linux/bio-integrity.h:101:12: error: unused function 'bio_i=
+ntegrity_map_user' [-Werror,-Wunused-function]
+>       101 | static int bio_integrity_map_user(struct bio *bio, struct iov=
+_iter *iter)
+>           |            ^~~~~~~~~~~~~~~~~~~~~~
+>=20
 
-And you need to pay the fs guys more than two cents I think for cooking
-a FIX.
+We see that, too:
 
-[2] Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
-https://lore.kernel.org/lkml/36571f8a-4df8-4152-b078-d82dbff4ad7e@suse.com/
+https://gitlab.com/cip-project/cip-testing/linux-stable-rc-ci/-/jobs/145923=
+68004
 
->the pace jfs fixes bugs, it would take long time before we stop seeing
->this problem...
+We don't see the problem on 6.6, 6.18 or 7.0-stable.
+
+Best regards,
+									Pavel
+
+--VCB5S51KOtzjewLJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCahlN6QAKCRAw5/Bqldv6
+8nWmAJ9tSP7O4fleRuae2Fh0Zjw9Ju2vZACgkFoGeiljJKAhNQxf2xUT4hhpQSk=
+=zhks
+-----END PGP SIGNATURE-----
+
+--VCB5S51KOtzjewLJ--
