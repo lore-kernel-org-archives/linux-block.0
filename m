@@ -1,124 +1,153 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3252F5A36
-	for <linux-block@vger.kernel.org>; Sat, 30 May 2026 01:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C8F261B71;
+	Sat, 30 May 2026 06:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780105451; cv=none; b=Vm3palgz4s66ZIucle2kqchnkA+hZmL3AcVEUayQN/YKpQRecnrXWx4vVuR8p+6YMPRcBJ/bC4gVx+6Za93Prb/UFFe4cwdJybsVadCOiCGldIzUUMZg+VzNWqkC4IvKlc2sP/IXdpHPHr+L5DfM/2Smy2zaqkyNJUYad2+pvLs=
+	t=1780121548; cv=none; b=jLVZDe55SBcsJ8EQcZ3oDM1pLbBR55hrObZl1eriU0kJLVpjbj1t9DM64hiYZfXvmf92ca6MV8cVzfFUQ+wgtoAjanF0Wajmbi/cZMGTLRlor6XOLa8qVgWKFmwLJvV+7zxtp54Ybgf6v9mNSwFaA9h9vDDkozRftuQ7um8uzy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780105451; c=relaxed/simple;
-	bh=RoQnkjSAGQlltUOHi6qTBWzLW/MPRpTjVtIir1Bku8o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IhzwobvNmar14FXrFiLxNFT4iI0x/9FVwNdRZyKT2n4DF/NLfjL9S0Sqod2iZXaL0bYCLR9+ZsbDmy6XYK0r4XauYsNEIKyzPPEg1eqRVfWoZHYIAo9LA3XZ4vZvR0pIbQHf5ZLapQCukxbEJlqpR6jbEn3rCEChcam66PBuAk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=DxvId/bX; arc=none smtp.client-ip=209.85.160.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="DxvId/bX"
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-40ef10ec84cso11932107fac.2
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 18:44:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1780105449; x=1780710249; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X+zTIztgsGKEhgjsVhvr5Rv5TrBYFcWsdOmt+WZ+x9w=;
-        b=DxvId/bX6y9ovt3FpOHoF/jE8a+2ZK+wO1h+JJstdq1pihW80TGRlPSKVszpS7/Efj
-         YeVhEK5WftrE6UJNCse0z0hN9zhj2hOcNgzoo94sO2+Ifq5Yd1XkVNUYxyfEpqbe2JtU
-         BICSZC2kiX0GAWnMOs7u+/dJk0Gkpgz79rHqg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780105449; x=1780710249;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X+zTIztgsGKEhgjsVhvr5Rv5TrBYFcWsdOmt+WZ+x9w=;
-        b=PRWOdC3V464t584F0aZInM7arxmYF+1VwcWrhX2qJorGuAdWKIQHln7rETRP/2Zl0s
-         +GmTc4LyxrtwTFl4IyHiGVxDhrvml9LwMRdlEWgVV86nPZ4OkeSrFW3QVOwyASxuD8U4
-         N9OXIZ1j/8cUVCceRQCadp6rrphCBLVBP40zRjR0quaqcivefIE7b9UBCMaDpNJbRARv
-         5Qm4R29T7HKziA/SdO0ceamKnNdS0JE7FPp9WxjRw5nX6n8grjyc5Y8mKnx4YZsSmQhF
-         LY/epANJDFueXHXlVbYBwpgUyq2UqmR0fw2ZrI4qua0dsJsDwTSbk2eAcGX76byK3DOf
-         BBxw==
-X-Forwarded-Encrypted: i=1; AFNElJ87cJtFzGdntKf9ZOhn/WbBKp4KD4M74ENHMfcyerHZHNRY56MLJOSeZps89NMMpQg9c/i7auFXTBeIZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf7lpcKq44Jf7womrBAo3M6cQPZrCjeSlffSLkYHm5ybip+ZaE
-	zvzd3iCKrwJAlubQKMyF57/yAldCS2f9aNF8KWGl+QfxDaozGQE28eEhITEgvCv1cA==
-X-Gm-Gg: Acq92OHiTfsxAeizWWGQUTY0T/HR5fjQs/33htVAE1P/lM/edOMPPl3BthUqPTB5Wwu
-	oS4Qb/2SJg4R9L0BdVS9rw0VYzj1MxwXWEm7S4e4V4BHdPlXeNMTVfegR5rNsQ/RaJ9Dte1NUTg
-	a/IS6NhOiraEt8ltZLoTAGZJvVCaKI4WsHaPONllXrcDFyQTfrvjvfiZdE1WsTaI8BdZLproZeO
-	32h8/GGUfIGuti1YHd3Weo3ztVr34qOTxey9rQtXtf7UJtGIiE0Xolstu8RggqTAWCrEGoQLeik
-	KlMFt6YaDAk2pc2o0ndkHQ3ekU4hW/xyk/f5BhFBAKLeli7sX6gS4LBgYbjFKdsxdvpDZZVfQV4
-	59l6BovmSOLYDgBOeiSALw7RC/li3FmFLvgXELP9I7Q96WKljHP6vOm4yJCsDRflTh40NjBrIZv
-	aBhFrS8Z2xDlM4yzOE/BNj17tassWy
-X-Received: by 2002:a05:6820:1996:b0:69d:795a:5e8b with SMTP id 006d021491bc7-69e105d4115mr948538eaf.60.1780105448859;
-        Fri, 29 May 2026 18:44:08 -0700 (PDT)
-Received: from [172.22.22.28] ([73.62.185.64])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-43c94078170sm2262599fac.14.2026.05.29.18.44.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2026 18:44:08 -0700 (PDT)
-Message-ID: <284d5062-460e-496c-b700-2275deb7f8bb@ieee.org>
-Date: Fri, 29 May 2026 20:44:06 -0500
+	s=arc-20240116; t=1780121548; c=relaxed/simple;
+	bh=7ouJQbjnkf4ajwlrMpoph4gL41YDuMTIoHaBSseSOHQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JBaagqpWJ9xoZPQrQDYdv1/SqgLDksi1rON4GJEvH5qjZl2PPtdQfrjW6Fi4TuXyXL2AOObdrBbzUM23hvc5jAUNSj2pg9Hdx0r+1ZI3+a+xW7J7kKvIKrnGuJDkUCA+NxmF0Z+9ltjtV+VjCkF11KVSH3OVmbycG2G93zCkiio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app3 (Coremail) with SMTP id ywmowAA3dv66fxpqXeQOAA--.28177S2;
+	Sat, 30 May 2026 14:12:10 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-block@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Cc: ojeda@kernel.org,
+	boqun@kernel.org,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	lossin@kernel.org,
+	a.hindborg@kernel.org,
+	aliceryhl@google.com,
+	tmgross@umich.edu,
+	dakr@kernel.org,
+	daniel.almeida@collabora.com,
+	axboe@kernel.dk,
+	tamird@kernel.org,
+	sunke@kylinos.cn,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	royenheart@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH rust-fixes v3 1/1] rust: block: fix GenDisk cleanup paths
+Date: Sat, 30 May 2026 14:11:54 +0800
+Message-ID: <b70aff9a920cc42110fe5cf454c3099561863519.1780063368.git.royenheart@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rbd: check snap_count against RBD_MAX_SNAP_COUNT
-To: Rosen Penev <rosenp@gmail.com>, linux-block@vger.kernel.org
-Cc: Ilya Dryomov <idryomov@gmail.com>,
- Dongsheng Yang <dongsheng.yang@linux.dev>, Jens Axboe <axboe@kernel.dk>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- "open list:RADOS BLOCK DEVICE (RBD)" <ceph-devel@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:CLANG/LLVM BUILD SUPPORT:Keyword:b(?i:clang|llvm)b"
- <llvm@lists.linux.dev>
-References: <20260530011255.52916-1-rosenp@gmail.com>
-Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20260530011255.52916-1-rosenp@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ywmowAA3dv66fxpqXeQOAA--.28177S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXFy5JF43ury8CrWDJryfCrg_yoWrGFW3pr
+	WrWws0krWkKFn7tF4UArW7Zry8Gw1kG34rJa98C34a9F98Jrn7XrsYgF43ZFWDJFs29rZa
+	qay09rW2gr1rAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
+	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
+	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
+	e7AKxVW8ZVWrXwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
+	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpOJnUUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsDCWoZTE8LOwABsB
 
-On 5/29/26 8:12 PM, Rosen Penev wrote:
-> snap_count is u32 but the comparison is against a SIZE_MAX-derived value
-> (~2^61 on 64-bit), which clang flags as always false with
-> -Wtautological-constant-out-of-range-compare.
-> 
-> The proper check here should be that snap_count does not go over
-> RBD_MAX_SNAP_COUNT.
-> 
-> Assisted-by: Opencode:Big-pickle
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+From: Haoze Xie <royenheart@gmail.com>
 
-Looks good to me.
+GenDiskBuilder::build() still has fallible work after
+__blk_mq_alloc_disk(), but its error path only recovers the
+foreign queue data. That leaks the temporary gendisk and
+request_queue until later teardown. If the caller moved the last
+Arc<TagSet<T>> into build(), the leaked queue can retain blk-mq
+state after the tag set is dropped.
 
-Reviewed-by: Alex Elder <elder@riscstar.com>
+Fix the pre-registration failure path by dropping the temporary
+gendisk reference with put_disk() before recovering queue_data,
+so disk_release() can tear down the owned queue.
 
-> ---
->   drivers/block/rbd.c | 7 ++-----
->   1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index 94709466ad19..25215c209484 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -6075,12 +6075,9 @@ static int rbd_dev_v2_snap_context(struct rbd_device *rbd_dev,
->   
->   	/*
->   	 * Make sure the reported number of snapshot ids wouldn't go
-> -	 * beyond the end of our buffer.  But before checking that,
-> -	 * make sure the computed size of the snapshot context we
-> -	 * allocate is representable in a size_t.
-> +	 * beyond the end of our buffer.
->   	 */
-> -	if (snap_count > (SIZE_MAX - sizeof (struct ceph_snap_context))
-> -				 / sizeof (u64)) {
-> +	if (snap_count > RBD_MAX_SNAP_COUNT) {
->   		ret = -EINVAL;
->   		goto out;
->   	}
+Also pair GenDisk::drop() with put_disk() after del_gendisk().
+Once a Rust GenDisk has been added with device_add_disk(),
+del_gendisk() only unregisters it; the final gendisk reference
+still has to be dropped to complete the release path.
+
+Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+Signed-off-by: Haoze Xie <royenheart@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+Changes in v3:
+  - Add the requested blank lines around cleanup blocks for readability.
+  - v2 Link: https://lore.kernel.org/r/e14c015e2e0bde04f84a9452330b94436e2d8e68.1779901336.git.royenheart@gmail.com
+Changes in v2:
+  - Add the missing put_disk() after del_gendisk() in GenDisk::drop(),
+    as suggested by Andreas Hindborg.
+  - Keep the GenDiskBuilder::build() failure cleanup fix and fold both
+    lifecycle fixes into one patch.
+  - v1 Link: https://lore.kernel.org/r/b6411cc055080c984a67bfad72fd683aa84b8e13.1779596478.git.royenheart@gmail.com
+
+ rust/kernel/block/mq/gen_disk.rs | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index 912cb805caf5..fc97dd873974 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -150,6 +150,19 @@ pub fn build<T: Operations>(
+         // SAFETY: `gendisk` is a valid pointer as we initialized it above
+         unsafe { (*gendisk).fops = &TABLE };
+ 
++        let cleanup_failure = ScopeGuard::new_with_data((gendisk, data), |(gendisk, data)| {
++            // SAFETY: `gendisk` came from `__blk_mq_alloc_disk()` above and
++            // has not been added to the VFS on this cleanup path.
++            unsafe { bindings::put_disk(gendisk) };
++            // SAFETY: `data` came from `into_foreign()` above and has not been
++            // converted back on this cleanup path.
++            drop(unsafe { T::QueueData::from_foreign(data) });
++        });
++
++        // The failure guard now owns both pieces of cleanup; the early guard
++        // must not run on this path anymore.
++        recover_data.dismiss();
++
+         let mut writer = NullTerminatedFormatter::new(
+             // SAFETY: `gendisk` points to a valid and initialized instance. We
+             // have exclusive access, since the disk is not added to the VFS
+@@ -172,7 +185,7 @@ pub fn build<T: Operations>(
+             },
+         )?;
+ 
+-        recover_data.dismiss();
++        cleanup_failure.dismiss();
+ 
+         // INVARIANT: `gendisk` was initialized above.
+         // INVARIANT: `gendisk` was added to the VFS via `device_add_disk` above.
+@@ -215,6 +228,11 @@ fn drop(&mut self) {
+         // to the VFS.
+         unsafe { bindings::del_gendisk(self.gendisk) };
+ 
++        // SAFETY: By type invariant, `self.gendisk` was added to the VFS, so
++        // `put_disk()` must follow `del_gendisk()` to drop the final gendisk
++        // reference and trigger the remaining release path.
++        unsafe { bindings::put_disk(self.gendisk) };
++
+         // SAFETY: `queue.queuedata` was created by `GenDiskBuilder::build` with
+         // a call to `ForeignOwnable::into_foreign` to create `queuedata`.
+         // `ForeignOwnable::from_foreign` is only called here.
+-- 
+2.47.3
 
