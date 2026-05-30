@@ -1,134 +1,117 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C232017A586
-	for <linux-block@vger.kernel.org>; Sat, 30 May 2026 01:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4C81E1E04
+	for <linux-block@vger.kernel.org>; Sat, 30 May 2026 01:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780103464; cv=none; b=uPGB5F5RGHinBOSsVUwfDngL3Vbf0ZXQFBsU8k2frwJMwlV/AejpnSxJ7mvuZoaeA86V3uXcOLQiUL2aHArOpku0q3ZeRPPPBweQM1vn1YTKgHpsS96oI8g6QQ4CuPdDv6+3Bbkl7IlIEU4xEFznlqr6wPlWdtBi/sFsn9HfI0o=
+	t=1780103595; cv=none; b=U7ybM+4fsfO/J4vDNu7y4YUV81J3TcF8y2NhCJivsnzPiFyC4ZImNwt1Clj3HADkVOwo8SW7JpZjv8mKbQ2+DcZqmqTy8l+vtKk8unVcSJdg17UTQ0oO3tZdlb655uCM00uTGiToWmhR/czIIlxgWd/BMjbkQKj/5t2WtDtzMV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780103464; c=relaxed/simple;
-	bh=huxSrCuG0FjFGfixqDEb+YHlO7aMFs7aDt5bE22YDhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aTNK77b3BsR4If4PtjQHADI8gnVLgyAQAugJQAqG/zn2RpJY0BLb3CKjzSi9NvDwOM2ezlsY//47yYMl2LRGCTVXyMclNbgZgEoYkBWACwfsxRTOpioJri9jLtbyzCjeBqxdKn8FKCl1TyvxL+1cwvPENPfnEGSBpBq/krdU+cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s6LZ2CYg; arc=none smtp.client-ip=209.85.160.173
+	s=arc-20240116; t=1780103595; c=relaxed/simple;
+	bh=3UnX09p/RsUwab1+mBzMfqmj167P9iLQdXjXopkWBnA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QvKOx7rb961VUHkJ9Xf6HDe/JeY+VpeBG/2kr3FRKY8XOWXG80ithFjgRbPkKiSjzXjpCcw23LhzrwnkUqO4K0UQGIkr9zpGd8Ayj+6TOycyJ4V5y6YxhCZU6dGha9voiDRfhGLiK3+Oc/y4ktxvuew+Se2U3PGKFFeEGpon3Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FPOkTn8y; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s6LZ2CYg"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-516cbde40f2so93205931cf.3
-        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 18:11:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FPOkTn8y"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-84226d0f1d2so246636b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 29 May 2026 18:13:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780103462; x=1780708262; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PwbrM6sSXb8vY5axfHVECFP+564P0VkFU81XzT6eU3g=;
-        b=s6LZ2CYgHYroKZQldbNezk/W6+Ve43rjtdr/ihA2vC8wv3h5ZZxSBt4YFI4JuXsAQd
-         ypGXmLuR+vHjk0NFu/YuoyJ8MeE5CIiQxmuzqAD+onu5miXdT4Kz2724yDpa5Cs5g8OA
-         DKjxAFJFnR7w3l8oPQxPrGuDgB14f+yPx4IB/YrC56GtandSp9WL0GD0Bqq8J1OI3L5k
-         CApV3sAYFYf0mN44jnEKR/WIPxniKB98bzHApc7NCFwHBE0sILG9iBA5UgQoLqBxrxwn
-         eRb+GXgjEfVCiTU42K2FtO/P6xfLJUlzqMJzcKnLgbGWGwfncHKcEZBzDzkUiu3+BB0H
-         r29w==
+        d=gmail.com; s=20251104; t=1780103594; x=1780708394; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rwoi+zIOmB8T48lEoYYS1b4s148mrV/1IF4tO/5dMRA=;
+        b=FPOkTn8yJwu4bPVA57zcs9Yzn91joNCncit+xAQ+c5ci0GXwwegZjtz59imDFM6fVK
+         Z8yqdEdubHX+xdlx2Ev9CpG2RrQAUmzYWqENSbrPtlmJf58SWqBSyILgz0vb1Kvy8wR1
+         a1e8icgMMh/l7GZbDCQrnFg32L0lyU+dHvWlVQB/76WpGSn5qsWpE3XZMTctpRIGaQuC
+         5GeFKBx12WWQdemtueEQiSC+5XvNfPWgf07J0Gp24Kgf87tR9ZDOQwMwP05jiF6lBYt0
+         qdar0+59TjX8R/evpm2CZzgdvY4oZOo0pEahjd8s4PnTjKFWZRavtNrNNfIl+t8fyNle
+         VV0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780103462; x=1780708262;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PwbrM6sSXb8vY5axfHVECFP+564P0VkFU81XzT6eU3g=;
-        b=kj74HKo9NyZrNAdC/tDy3CqB2ZZ2s8dNXgbGLHMKNgIHZPFrPa+D/RHicBOIbkRoGo
-         O2nd3+f8NOkPeLPZ8IVm0jd7fmSlBI9oT0fxbKM45i6+FKeh5zkuC9oyjTrz4L30UFFr
-         BgZCtggzVnrS8HjylpEJ3OXqxem0Vm+h4GIzGd703ZbC/dKWUuH9IOVAeVUWwwFpiuvN
-         F6/Bv4jCBQD0Uqjj8cEtkDztlSzSePauuX17cLo0DiODQBdLAnDrYLcDoxianAmQoua+
-         ri+mIHIoXBXfgrzSXqRNpah/x+40hIpZz2kyKZ1C8p/ZeD8ipfWRN1E1lYSWIhy8dM3k
-         E7Vg==
-X-Gm-Message-State: AOJu0YzRd4loUvKUTjRa8jG22//3W7Ih+UaCZnmnALwLfR7Qb3XjvrtM
-	193YClIMHabGHBlrCn0DjrgFJHzt0zif0lIBWyvRo4uSS7EvN97NhEcs
-X-Gm-Gg: Acq92OGz0sL/jjHgFWoE2CiLNfiBN3wOfXZuNHkXI52ITfOuFwsYMy9p35BXQfswfbL
-	vJUHJm58EVNJaX0YeTJgGEbk3EII7HTd5CTz1A8pJoDLfx03cknVxUDGmVb1eUsqWZHhq/c80Di
-	DPZ7MDp8pUAPEwDpy/NIAR1WzuwhzbwBSlnRGqoAy2TuZ1UnjOZvlu2hej7QGt7naofXBbSd2Uo
-	2h6vysL9CKJs3/i+MOXsyq+TLxgOkEq1ktU1LZlRBFwADrDtv9NFVZ0WEsRpOufNSwfjJ9SpC8R
-	YACeYGVYs6A1Or50OclxRHHH55mGQuGnup9E9b6WyKHrrbzSFWVivtSO7q+bd9Xzo+YguaeCHqd
-	k7M1/nsWtE30Zvq8cNvHIhMFS2bcfowD28jO/HDvZGjM4vZ0VDJZs4Pwie3EnjVsopi3wNRDWn7
-	Z5i0XV214evk2sq7//iFltNLUpXT8MwfvKrJ4seVjqnkCn+yMnxHvghgn73ZPLokzka0MVykB//
-	meWPUvsxkYfeSGUzpUXuX3CuEfOaqJg
-X-Received: by 2002:a05:622a:8309:b0:516:e7d0:73a2 with SMTP id d75a77b69052e-5173a70f246mr24523451cf.15.1780103461838;
-        Fri, 29 May 2026 18:11:01 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5172eb3619bsm36386881cf.14.2026.05.29.18.10.58
+        d=1e100.net; s=20251104; t=1780103594; x=1780708394;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rwoi+zIOmB8T48lEoYYS1b4s148mrV/1IF4tO/5dMRA=;
+        b=eX2G4WKDCMQBTtMRMScR2/uCP9uoC+IY9ozaT0INBXAilE54PG7FDyLk6ddaaCFjAz
+         JfmsZ9KK9Ba/QPqxGDQSjdsiDQbg2okUmBcebkdXVjtm0lmJlm87D87soDUmCzk/KEbO
+         d6SpUsjhCccofHkpgRsCu4omncsFlfrq6xnGiDLuGP0BmSVPPsMC21Seb+Z9HoftEcM4
+         k9v2ZZdxzlOi8FVGdZvOpLa1TjI3ZQ8JhRFXDUCoT6fSn9ZnsUqiA+lkgrePjdF1vKbE
+         klNR1VSgBhTL5tg+54oBl5O1dJottgkt5sWxY99v/Hrzc1uT4QMlGCdjoKjXdFmCmx9N
+         fz9Q==
+X-Gm-Message-State: AOJu0YzkG+SLBeqw5YBjUXaD9m9I92UAPie6HGsI2E6FDuG7w3np3CyT
+	D4D56aqtXQSxS5vyGY9cVGNUimUfXnkc7COqDVSpfMdWJhAY8XpsTbmB0SpZPr3v
+X-Gm-Gg: Acq92OHu1FMdY55KYVjyilOdtLzkDo7+Wo1qNPUDQNh1U2gQliX5kaInZU0dS8x4xnU
+	j7yZgEolICRy2kkmspVgkOY1BtIuIVlnnIZPgRTFiJJ56cU3DEzmCX90FDK/w/DBBrzdMZa1dVm
+	paq/eLGRxRjoKhgH90HP58ZZWo1QqvsvmPBr2JujCKr0mo4CRwOyyuupFLHX2pdxpGlFzG+bdhJ
+	hhsdaNp/gWka7ulDfpdIIfxT6Swf36k8WWGIi8JhLlXin39l9BqTOJLGIBPKIPiQQjOoNR98/aK
+	kYMXl988V/Usd9zJpL1LpG7it8evM+5YGjeydKJxr8OJ99VFg0yG2GHOqvqO6OnHpzrl+Ah7tmF
+	pFf3ORg2n5Kbi1O5VLEhArLFgmhkZUMIi8DK8JZY2f++bhLerepPq/jIsuCFbd34EPOOzSI8N8+
+	O8rqF4WPHtUR0YGtgv2wU5xnnkQlsgQXU8rZdP1GgX32DRpQ529Q4mLX91EGiWLBpqiA2JkGDWh
+	NXBHlgFKN5QZwSIHlCX4P2UcmudhQOJkiDGRE891AUe4Q==
+X-Received: by 2002:a05:6a00:9099:b0:82f:721f:10ea with SMTP id d2e1a72fcca58-8422578d9cbmr1736790b3a.18.1780103594025;
+        Fri, 29 May 2026 18:13:14 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84214cba602sm3230843b3a.40.2026.05.29.18.13.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2026 18:11:01 -0700 (PDT)
-Date: Fri, 29 May 2026 20:10:55 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: Wen Xiong <wenxiong@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, jmoyer@redhat.com,
-	Gjoyce <gjoyce@linux.ibm.com>, wenxiong@us.ibm.com
-Subject: Re: Observing higher CPU utilization during random IO fio testing
-Message-ID: <aho5HxLsWMEpbUg2@fedora>
-References: <338169f719c77e4afe58f42e9760349e@linux.ibm.com>
+        Fri, 29 May 2026 18:13:13 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: Ilya Dryomov <idryomov@gmail.com>,
+	Dongsheng Yang <dongsheng.yang@linux.dev>,
+	Jens Axboe <axboe@kernel.dk>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	ceph-devel@vger.kernel.org (open list:RADOS BLOCK DEVICE (RBD)),
+	linux-kernel@vger.kernel.org (open list),
+	llvm@lists.linux.dev (open list:CLANG/LLVM BUILD SUPPORT:Keyword:\b(?i:clang|llvm)\b)
+Subject: [PATCH] rbd: check snap_count against RBD_MAX_SNAP_COUNT
+Date: Fri, 29 May 2026 18:12:55 -0700
+Message-ID: <20260530011255.52916-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <338169f719c77e4afe58f42e9760349e@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 21, 2026 at 02:44:22PM -0500, Wen Xiong wrote:
-> Hi All,
-> 
-> Our performance team observed the higher CPU utilization in RHEL10 compared
-> to RHEL9.8, observed the similar issue in upstream kernel(v7.1-rc4) as well
-> when running FIO random IO tests.
-> 
-> System configuration:
-> 47 dedicate cores
-> 120 GB memory
-> PCIe4 2-Port 64Gb FC Adapter
-> FlashSystem: FS9500, 12 LUNs/FC port, 100G each LUN.
-> 
-> Random IO tests are more CPU intensive than sequential IO tests due to
-> several factors: more context switching, Interrupt Handling,  cache
-> Inefficiency etc. We found out the following patch which caused the higher
-> CPU utilization in rhel10 and newer linux kernel:
-> 
-> commit 060406c61c7cb4bbd82a02d179decca9c9bb3443 (HEAD)
-> Author: Yu Kuai <yukuai3@huawei.com>
-> Date:   Thu May 9 20:38:25 2024 +0800
-> 
-> block: add plug while submitting IO
-> 
-> So that if caller didn't use plug, for example, __blkdev_direct_IO_simple()
-> and __blkdev_direct_IO_async(), block layer can still benefit from caching
-> nsec time in the plug.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> Link:
-> https://lore.kernel.org/r/20240509123825.3225207-1-yukuai1@huaweicloud.com
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> We reverted above patch in rhel10 kernel and upstream 7.1-rc4, saw lower CPU
-> utilization when doing the same FIO test.
-> 
-> The patch adds plugging in __submit_bio() in block layer, maybe cause
-> performance degradation:
-> - Random IO tests have less merging, flush overhead.
-> - More IO scheduler interaction, forces requests through scheduler instead
-> of direct dispatch(direct dispatch to hardware queue)
-> - Poor cache locality during plug operation
+snap_count is u32 but the comparison is against a SIZE_MAX-derived value
+(~2^61 on 64-bit), which clang flags as always false with
+-Wtautological-constant-out-of-range-compare.
 
-Yes, it is expected to see regression on QD=1 workload.
+The proper check here should be that snap_count does not go over
+RBD_MAX_SNAP_COUNT.
 
-Adding inner plug for caching timestamp only is not good from plug function viewpoint,
-because only the outer code path(io_uring, libaio, ...) knows exact IO batch size
-and can decide if plug should be used.
+Assisted-by: Opencode:Big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/block/rbd.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Given 060406c61c7c ("block: add plug while submitting IO") doesn't provide
-any performance data, maybe it can be reverted.
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 94709466ad19..25215c209484 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -6075,12 +6075,9 @@ static int rbd_dev_v2_snap_context(struct rbd_device *rbd_dev,
+ 
+ 	/*
+ 	 * Make sure the reported number of snapshot ids wouldn't go
+-	 * beyond the end of our buffer.  But before checking that,
+-	 * make sure the computed size of the snapshot context we
+-	 * allocate is representable in a size_t.
++	 * beyond the end of our buffer.
+ 	 */
+-	if (snap_count > (SIZE_MAX - sizeof (struct ceph_snap_context))
+-				 / sizeof (u64)) {
++	if (snap_count > RBD_MAX_SNAP_COUNT) {
+ 		ret = -EINVAL;
+ 		goto out;
+ 	}
+-- 
+2.54.0
 
-I am wondering why not move the timestamp cache into 'task_struct' and get wider users?
-
-
-Thanks,
-Ming
