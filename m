@@ -1,276 +1,123 @@
-Received: from r3-22.sinamail.sina.com.cn (r3-22.sinamail.sina.com.cn [202.108.3.22])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E46D3783D5
-	for <linux-block@vger.kernel.org>; Sat, 30 May 2026 22:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3953546E8
+	for <linux-block@vger.kernel.org>; Sat, 30 May 2026 23:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780181503; cv=none; b=WwdW0Llrh0ObkdKAZ9DbbbNrxMIO+NaRJOb3YgEM09OtDhTRgp2CHKnahnQ7IW7iv+r30ge+VUDFY2D66QWx5CSAbGAyrgdw9Rd55/O6/cSJ3Q3CQ8jDpb2bn2+3miRuFwgragm02+XoRoGOqtSIQUYq5tJRXFtQYKG65FTH+14=
+	t=1780185458; cv=none; b=lkcK44aubqcyBDM5IqzjDo6CFUpt2XFJJ9Mewsou6sCWPHjV2XqCVBVPn8YV0ZM4bLUwXJ8v3dfFK4vK4c7r93aMLS0KzUO7YjozsyN515dlnjzKdUOYw82XXclBFtivIZdPmkPRGYEhfeMlTvm718vtm9N25e7FesXh1qo0bso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780181503; c=relaxed/simple;
-	bh=L2F2GESRF7c7j2F7oJSXsdNQh4FQ+xA/+Op/QHuoJp8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dnuA93NlIqUoEaeqKu/SuUrkwcecebGGQhFTOGK6LNGDo/RdLHQ6mUMi1IuDjKTBbUtyokKFI1ljbfOLr2GE/g4ob9DbTv+5I7TSdG8PNYmNcKIU+46d9xPBhQu/I9NTn+TTxmp1gCs9ETgB8kELPbGVPdz3DDNYe6880qf63v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=jNco05MX; arc=none smtp.client-ip=202.108.3.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="jNco05MX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1780181499;
-	bh=goOLpAjYkboC1fsjOAjhfQJMnz4HVLH5o4r+Xngqo5U=;
-	h=From:Subject:Date:Message-ID;
-	b=jNco05MXwDi6MaEUDxpDaPiXnAdImr2U6RCXDgTU2mFmaSpPOCiustbQp4mcP0DUM
-	 VkGivN0eC6Y0ybGk3+myBjtob1CiTEGaf6jd0oreNhc3pUZjF9QaPCaCosuRiEoPSp
-	 yJR5grDLvFQxM5unS9x4lfkaWZwi9SPwM+bXb8Uc=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.33) with ESMTP
-	id 6A1B69F0000028DD; Sat, 31 May 2026 06:51:30 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 472976685163
-X-SMAIL-UIID: DB8065293FEC4C689523CF6966499A3A-20260531-065130-1
-From: Hillf Danton <hdanton@sina.com>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Boqun Feng <boqun@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Qu Wenruo <wqu@suse.com>,
-	Hillf Danton <hdanton@sina.com>
-Subject: Re: [PATCH] block: assign caller-specific lockdep class to disk->open_mutex
-Date: Sun, 31 May 2026 06:50:42 +0800
-Message-ID: <20260530225120.1346-1-hdanton@sina.com>
-In-Reply-To: <147ed056-03d9-4214-b925-0f10fc00cf27@I-love.SAKURA.ne.jp>
-References: 
+	s=arc-20240116; t=1780185458; c=relaxed/simple;
+	bh=P+ARwgwPDAQi8TDWl1HgbllaUnzFrBzBr8U8EqvzhWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NbI8bdd/AGT6wOBVij0lWPbFg1qgc8mNNYHHYLu6Tn72ilMM8o+FOyHKocE9AMuBNgz3Mtg5jKNLamdvALs7Asq7nSG7vAwyiHtxIEm5LfK4cW8SnnyHVWAPoGMckonlDEq4tZt7TNmjgUHmtNvOeqrO3F2H0KxdAe0fARbFZhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 64UNvYTZ074013;
+	Sun, 31 May 2026 08:57:34 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 64UNvYqK074010
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 31 May 2026 08:57:34 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
+Date: Sun, 31 May 2026 08:57:33 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
+To: Hillf Danton <hdanton@sina.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <dlemoal@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>
+References: <20260529220600.1226-1-hdanton@sina.com>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20260529220600.1226-1-hdanton@sina.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav402.rs.sakura.ne.jp
 
-On Sat, 30 May 2026 22:45:55 +0900 Tetsuo Handa wrote:
-> The block core currently allocates a single monolithic lockdep key for
-> disk->open_mutex across all callers. This single key conflates locking
-> hierarchies between independent block streams. For example, if a stacked
-> driver like loop flushes its internal workqueues inside lo_release() while
-> holding its own open_mutex, lockdep views this as a potential ABBA deadlock
-> against the underlying storage stack, leading to numerous circular
-> dependency splats [2][3][4][5][6].
+On 2026/05/30 7:05, Hillf Danton wrote:
+>>> Therefore, I think we can address this problem by "drain_workqueue() with disk->open_mutex
+>>> held" in the loop driver side.
+>>>
+>> Good news.
+>>
+> Bad news: Subject: [syzbot] [block?] possible deadlock in loop_process_work
+> [3] https://lore.kernel.org/lkml/6a19f5f7.5099cdd9.8e407.0004.GAE@google.com/
 > 
-> To reduce false-positives structurally, this patch splits the global
-> monolithic lock class into distinct, per-caller during disk allocation;
-> by changing "lock_class_key" into a 2-element array:
->   - lkclass[0]: Used for the legacy "(bio completion)" map.
->   - lkclass[1]: Assigned to target caller's disk->open_mutex.
-> 
-I wonder how this works given e966eaeeb623 ("locking/lockdep: Remove the
-cross-release locking checks").
 
-> This patch was tested by adding drain_workqueue() to __loop_clr_fd() during
-> testing of a patch for [1], and actually helped stopping [2][4][6].
-> Even if our final solution for [1] does not call drain_workqueue() with
-> disk->open_mutex held, keeping locking chains simpler and shorter should
-> be a good change.
-> 
-> Link: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28 [1]
-> Link: https://syzkaller.appspot.com/bug?extid=2f62807dc3239b8f584e [2]
-> Link: https://syzkaller.appspot.com/bug?extid=c4e9d077bcc86bee08dc [3]
-> Link: https://syzkaller.appspot.com/bug?extid=0f427123ae84b3ba6dc7 [4]
-> Link: https://syzkaller.appspot.com/bug?extid=4feabfc9641267769c97 [5]
-> Link: https://syzkaller.appspot.com/bug?extid=fb0ff9bfe34ad282ebd4 [6]
-> Suggested-by: AI Mode in Google Search (no mail address)
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> ---
->  block/blk-mq.c         | 4 ++--
->  block/blk.h            | 2 +-
->  block/genhd.c          | 8 ++++----
->  drivers/scsi/sd.c      | 4 ++--
->  drivers/scsi/sr.c      | 4 ++--
->  include/linux/blk-mq.h | 8 ++++----
->  include/linux/blkdev.h | 6 +++---
->  7 files changed, 18 insertions(+), 18 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 28c2d931e75e..01a15ac40754 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4492,7 +4492,7 @@ EXPORT_SYMBOL(blk_mq_destroy_queue);
->  
->  struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set,
->  		struct queue_limits *lim, void *queuedata,
-> -		struct lock_class_key *lkclass)
-> +		struct lock_class_key lkclass[2])
->  {
->  	struct request_queue *q;
->  	struct gendisk *disk;
-> @@ -4513,7 +4513,7 @@ struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set,
->  EXPORT_SYMBOL(__blk_mq_alloc_disk);
->  
->  struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
-> -		struct lock_class_key *lkclass)
-> +		struct lock_class_key lkclass[2])
->  {
->  	struct gendisk *disk;
->  
-> diff --git a/block/blk.h b/block/blk.h
-> index b998a7761faf..1744748f9b68 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -614,7 +614,7 @@ void drop_partition(struct block_device *part);
->  void bdev_set_nr_sectors(struct block_device *bdev, sector_t sectors);
->  
->  struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
-> -		struct lock_class_key *lkclass);
-> +		struct lock_class_key lkclass[2]);
->  struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id);
->  
->  int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode);
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 7d6854fd28e9..303bd5e619e7 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -1444,7 +1444,7 @@ dev_t part_devt(struct gendisk *disk, u8 partno)
->  }
->  
->  struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
-> -		struct lock_class_key *lkclass)
-> +		struct lock_class_key lkclass[2])
->  {
->  	struct gendisk *disk;
->  
-> @@ -1467,7 +1467,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
->  		goto out_free_bdi;
->  
->  	disk->node_id = node_id;
-> -	mutex_init(&disk->open_mutex);
-> +	mutex_init_with_key(&disk->open_mutex, &lkclass[1]);
->  	xa_init(&disk->part_tbl);
->  	if (xa_insert(&disk->part_tbl, 0, disk->part0, GFP_KERNEL))
->  		goto out_destroy_part_tbl;
-> @@ -1482,7 +1482,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
->  	device_initialize(disk_to_dev(disk));
->  	inc_diskseq(disk);
->  	q->disk = disk;
-> -	lockdep_init_map(&disk->lockdep_map, "(bio completion)", lkclass, 0);
-> +	lockdep_init_map(&disk->lockdep_map, "(bio completion)", &lkclass[0], 0);
->  #ifdef CONFIG_BLOCK_HOLDER_DEPRECATED
->  	INIT_LIST_HEAD(&disk->slave_bdevs);
->  #endif
-> @@ -1506,7 +1506,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
->  }
->  
->  struct gendisk *__blk_alloc_disk(struct queue_limits *lim, int node,
-> -		struct lock_class_key *lkclass)
-> +		struct lock_class_key lkclass[2])
->  {
->  	struct queue_limits default_lim = { };
->  	struct request_queue *q;
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index 599e75f33334..d8a1bbd4f19e 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -112,7 +112,7 @@ static DEFINE_MUTEX(sd_mutex_lock);
->  static mempool_t *sd_page_pool;
->  static mempool_t *sd_large_page_pool;
->  static atomic_t sd_large_page_pool_users = ATOMIC_INIT(0);
-> -static struct lock_class_key sd_bio_compl_lkclass;
-> +static struct lock_class_key sd_bio_compl_lkclass[2];
->  
->  static const char *sd_cache_types[] = {
->  	"write through", "none", "write back",
-> @@ -4021,7 +4021,7 @@ static int sd_probe(struct scsi_device *sdp)
->  		goto out;
->  
->  	gd = blk_mq_alloc_disk_for_queue(sdp->request_queue,
-> -					 &sd_bio_compl_lkclass);
-> +					 sd_bio_compl_lkclass);
->  	if (!gd)
->  		goto out_free;
->  
-> diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-> index c36c54ecd354..421b8bd37db0 100644
-> --- a/drivers/scsi/sr.c
-> +++ b/drivers/scsi/sr.c
-> @@ -106,7 +106,7 @@ static struct scsi_driver sr_template = {
->  static unsigned long sr_index_bits[SR_DISKS / BITS_PER_LONG];
->  static DEFINE_SPINLOCK(sr_index_lock);
->  
-> -static struct lock_class_key sr_bio_compl_lkclass;
-> +static struct lock_class_key sr_bio_compl_lkclass[2];
->  
->  static int sr_open(struct cdrom_device_info *, int);
->  static void sr_release(struct cdrom_device_info *);
-> @@ -634,7 +634,7 @@ static int sr_probe(struct scsi_device *sdev)
->  		goto fail;
->  
->  	disk = blk_mq_alloc_disk_for_queue(sdev->request_queue,
-> -					   &sr_bio_compl_lkclass);
-> +					   sr_bio_compl_lkclass);
->  	if (!disk)
->  		goto fail_free;
->  	mutex_init(&cd->lock);
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 18a2388ba581..57d805c78827 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -726,15 +726,15 @@ enum {
->  
->  struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set,
->  		struct queue_limits *lim, void *queuedata,
-> -		struct lock_class_key *lkclass);
-> +		struct lock_class_key lkclass[2]);
->  #define blk_mq_alloc_disk(set, lim, queuedata)				\
->  ({									\
-> -	static struct lock_class_key __key;				\
-> +	static struct lock_class_key __key[2];				\
->  									\
-> -	__blk_mq_alloc_disk(set, lim, queuedata, &__key);		\
-> +	__blk_mq_alloc_disk(set, lim, queuedata, __key);		\
->  })
->  struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
-> -		struct lock_class_key *lkclass);
-> +		struct lock_class_key lkclass[2]);
->  struct request_queue *blk_mq_alloc_queue(struct blk_mq_tag_set *set,
->  		struct queue_limits *lim, void *queuedata);
->  int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 890128cdea1c..3cd2056cde28 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -974,7 +974,7 @@ int bdev_disk_changed(struct gendisk *disk, bool invalidate);
->  
->  void put_disk(struct gendisk *disk);
->  struct gendisk *__blk_alloc_disk(struct queue_limits *lim, int node,
-> -		struct lock_class_key *lkclass);
-> +		struct lock_class_key lkclass[2]);
->  
->  /**
->   * blk_alloc_disk - allocate a gendisk structure
-> @@ -990,9 +990,9 @@ struct gendisk *__blk_alloc_disk(struct queue_limits *lim, int node,
->   */
->  #define blk_alloc_disk(lim, node_id)					\
->  ({									\
-> -	static struct lock_class_key __key;				\
-> +	static struct lock_class_key __key[2];				\
->  									\
-> -	__blk_alloc_disk(lim, node_id, &__key);				\
-> +	__blk_alloc_disk(lim, node_id, __key);				\
->  })
->  
->  int __register_blkdev(unsigned int major, const char *name,
-> -- 
-> 2.47.3
-> 
-> 
+OK. I sent two patches
+
+  https://lkml.kernel.org/r/147ed056-03d9-4214-b925-0f10fc00cf27@I-love.SAKURA.ne.jp
+  https://lkml.kernel.org/r/148efba2-a0b6-47d7-ac76-b19d2f4b696c@I-love.SAKURA.ne.jp
+
+as a preparation for evaluating the possibility of calling drain_workqueue() from
+__loop_clr_fd(). But as far as syzbot has tested using linux-next tree
+
+  https://syzkaller.appspot.com/bug?extid=c4e9d077bcc86bee08dc
+  https://syzkaller.appspot.com/bug?extid=4feabfc9641267769c97
+
+seems to remain even if we applied above patches.
+
+Therefore, I think that we need to call drain_workqueue() from __loop_clr_fd()
+without holding disk->open_mutex (if we address this NULL pointer dereference
+problem by updating the loop driver).
+
+"[PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()" was an attempt to call
+drain_workqueue() from __loop_clr_fd() without holding disk->open_mutex, but Sashiko's
+review ( https://sashiko.dev/#/patchset/fda8abc8-6aa2-463b-bf72-865f6b838034%40I-love.SAKURA.ne.jp )
+mentioned that the "module_put(THIS_MODULE);" executed as the last step of __loop_clr_fd() has
+a race window of concurrently triggering module unload operation because module refcount of
+the loop driver can become 0 due to this module_put(THIS_MODULE) call. In other words,
+we cannot safely manage refcount of the loop module without a support by the caller of
+lo_release() (i.e. bdev_release()).
+
+  void bdev_release(struct file *bdev_file)
+  {
+  (...snipped...)
+  	if (bdev_is_partition(bdev))
+  		blkdev_put_part(bdev);
+  	else
+  		blkdev_put_whole(bdev);
+  	mutex_unlock(&disk->open_mutex); // <= Keeping holding disk->open_mutex until __loop_clr_fd() completes causes circular locking problem.
+  
+  	module_put(disk->fops->owner); // <= Calling after __loop_clr_fd() completed is required for managing module refcount safely.
+  put_no_open:
+  	blkdev_put_no_open(bdev);
+  }
+
+Therefore, I think that the only robust and safe approach is, although you won't be
+happy to see layering violation / tricky code, either
+
+  (a) allow __loop_clr_fd() to temporarily drop disk->open_mutex
+
+or
+
+  (b) add a new callback for the loop driver which is called between mutex_unlock(&disk->open_mutex) and module_put(disk->fops->owner)
+
+. Jens, what do you think?
+
+One might argue that this problem should be fixed on the filesystem side by
+ensuring all filesystems wait for I/O requests safely. However, from the
+perspective of defensive programming, the loop driver should be robust enough
+to handle incomplete I/O serialization from underlying layers to prevent GPF.
+Furthermore, without adding noisy debug printk() messages, it is extremely
+difficult to pinpoint which specific layer or filesystem failed to wait for
+the I/O requests.
+
