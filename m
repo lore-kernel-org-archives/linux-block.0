@@ -1,114 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FF830DEBE
-	for <linux-block@vger.kernel.org>; Sun, 31 May 2026 21:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663441A5BAE;
+	Sun, 31 May 2026 22:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780263496; cv=none; b=Y5ryAv1vvpPHbIhElN6lh3AX/YJG2Ozq4xSNKqBJGx/HK/DG7pIb0TDcD7zU5UszA4fQedE+YhaNgjDeTPygcRTWj8VUbcUhysueU3AbDv9EYu4b7Eaw/I0pxoSH3lTama8NOKDv7BKiVEEh/ijMcorXp4PH0TSKPODzWfQ/wRY=
+	t=1780267539; cv=none; b=Wd/m9CMFXXBFecDbVfLRB6PTyW+4qU83erZZugZK1MlEMWY/NxH5IsjaES2UHMwy5eGKVnoVw5mf9JCKYnL+SW/M8nMYwIw33RnK65FQVPAaO0MIx1M46UAJkzMq5u2+7ztzAKgiEOENsycCBgK6QgPrDCERhYe+ykIVBI8JV7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780263496; c=relaxed/simple;
-	bh=1dgxJgxepE0o2fv0Yk+5W+qdhqsbf6104R4lJWV5OpQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n7btnhzbu/VO7L74iPi0wzx7ymXVIqZsZB7hvjxvr/UF7Y7HlMUQg455vMUb3FnhiSljBacwCbPhOqGMv9D5kCR/lEsfF7UPFIrRPsEzd5XN1MJ1eK4x+wpEkKv9uqZo5wYhjqzauVljpX81v589Salwf3W5koMtf04gXC2XYn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ujsb38R3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780267539; c=relaxed/simple;
+	bh=YnfHJKF7mTuPs63VbskHBRD+n+a04W5hkmSNy8P7Fv0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=U4Jx5e+D189/iGKRSLFORR3aRpRTtXr4uX8WFlPDT2fv5A9+9VWmwhEGceXNWSQtn/sXqyKKuXtGg5ozzKtjYL4n0fTgiC2oLHeuYX06wkZUjdh3egQK8sxFVG7vUDAItS86b1BQnSEEavNpJ5gB8DbgR59zIMGkdrgAT6TKwO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+cUKk8W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ujsb38R3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B33C1F00893
-	for <linux-block@vger.kernel.org>; Sun, 31 May 2026 21:38:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780263495;
-	bh=3ChlNi3gY4pmClyTFzjJW4JTye0c8PTWwo1dt2DbBgA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Ujsb38R3V4L+gQguxzwB8Xb+Q2WVperpa4SQqvZHHDKn6GCqR51/eYLNiz7UoTaUE
-	 cb7cK6dY8Opj2E5hWjo66rJS1KuH3scYI8FLzLA0bANRhyLLwai95gckI3xhizj6Oh
-	 4KV9+I7Y00c8yeGbcxFjbcy9Rs2K/csucO0eD7aVmQrf2skHut/6Fpwb7QJp0pg5V6
-	 a+WT5HinCfwb4RQvZUsxtjLEBNMnCveigF5G0aUtSbdNsB87fXEhSccqdC6xf88cIC
-	 C8gqSQZ8eH7ZIFTyClyDxJI/9K7KM2xzfKX6730jJXzzGLKziWv2QgFFq7SXSH3hjt
-	 edhpaguCEJTpg==
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-91550d518c0so84037085a.0
-        for <linux-block@vger.kernel.org>; Sun, 31 May 2026 14:38:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ+lY8znRww/dKT/Ly/NkPjWBOdF+AXcFNJ+Px6aGaJd2MIgHwKteAy3Xuxynkg870DgWg+LkHGUaQDy6A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHVdhJJ9MelARPkqsPDVHm7cL/1oUMSIJ95O52SkANzyrkIoet
-	riTU6ID447+yGvdCUM0lHmA6uXx3QP/as+tVtIp+YR2ORIkt0YECczWBBtb4wB/nHLs/IbxwN7f
-	CCoccSw9+t3fWifeZT8ZS1SrE8jYnoOA=
-X-Received: by 2002:a05:620a:448d:b0:914:dbb1:1487 with SMTP id
- af79cd13be357-9153da3f0f6mr1264775885a.53.1780263494750; Sun, 31 May 2026
- 14:38:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+cUKk8W"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E72FFC2BCB4;
+	Sun, 31 May 2026 22:45:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1780267539;
+	bh=YnfHJKF7mTuPs63VbskHBRD+n+a04W5hkmSNy8P7Fv0=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=N+cUKk8WxUUBSCVi4kqdDJj0WMowIKfptYYQXuXou57WjQ2TkzNYFzeA6/LZHeG6R
+	 KDxesYkZSsy9Bsmser8wY+rbnSK8erLJCqIHLWj1TTEiXNmaWM5tANODaZrlNRjeJz
+	 19P/NbKz96MjpW4I0jZSTobOlptr9TVJE1XSszI26MRJ+I87BYqWImeD64CJ0vw7tx
+	 dgELcIo36rLXaTe0wFUVtCWslisOZKymakRiGwvrk/7WiTTYHa4dhXQek9PkceR51E
+	 /YN6zTWGXSp6ljKeA0hEjIgZKJQYnpzThTwk22AgCyb5r/DY865iRWpiZlWbe2FpXH
+	 xCYxzXcsE6NYw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8D9CD6E56;
+	Sun, 31 May 2026 22:45:38 +0000 (UTC)
+From: "Samin Y. Chowdhury via B4 Relay" <devnull+samin_c.outlook.com@kernel.org>
+Date: Sun, 31 May 2026 18:45:07 -0400
+Subject: [PATCH RFC] blk-integrity: fix slab-out-of-bounds in t10_pi_verify
+ on namespace revalidation
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260531-zram-fix-partial-io-config-check-on-akpm-v1-1-eb085d98faea@gmail.com>
-In-Reply-To: <20260531-zram-fix-partial-io-config-check-on-akpm-v1-1-eb085d98faea@gmail.com>
-From: Barry Song <baohua@kernel.org>
-Date: Mon, 1 Jun 2026 05:38:03 +0800
-X-Gmail-Original-Message-ID: <CAGsJ_4wB5XyUrPpg1O-pkySxo91RsHxaaUkR+Kt+heP4_OeeqA@mail.gmail.com>
-X-Gm-Features: AVHnY4L6_UdjcCk4-_UTU0q2GUVmZ6B69Ux11hFD72dT9usvr_K3TiSBY_9PUJM
-Message-ID: <CAGsJ_4wB5XyUrPpg1O-pkySxo91RsHxaaUkR+Kt+heP4_OeeqA@mail.gmail.com>
-Subject: Re: [PATCH] zram: fix partial I/O config check
-To: Jianyue Wu <wujianyue000@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jens Axboe <axboe@kernel.dk>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Baoquan He <baoquan.he@linux.dev>, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org, 
-	Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260531-blk-integrity-fix-v1-1-cc7084f42cf1@outlook.com>
+X-B4-Tracking: v=1; b=H4sIAPK5HGoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDU2ND3aScbN3MvJLU9KLMkkrdtMwK3VQLQwNLAwOLxDRTEyWgvoKiVKA
+ w2MxopSA3Z6VYiGBxaVJWanIJyDSl2loAKVhpn3oAAAA=
+X-Change-ID: 20260531-blk-integrity-fix-e8109008af54
+To: Jens Axboe <axboe@kernel.dk>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Keith Busch <kbusch@kernel.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Samin Y. Chowdhury" <samin_c@outlook.com>, Sungwoo Kim <iam@sung-woo.kim>, 
+ Dave Tian <daveti@purdue.edu>, Weidong Zhu <weizhu@fiu.edu>, 
+ Ruimin Sun <rsun@fiu.edu>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1780267537; l=3868;
+ i=samin_c@outlook.com; s=20260531; h=from:subject:message-id;
+ bh=FkeOPgXRBosTQ74NzcoJaEx11Qy3el90YLb0xvy/x8c=;
+ b=yybthjaFNIzhCYNjL8VcfvYMrqAqCK63+hEE1YJAArc0bD4S5Cf2ygKs2cTMdpTl4DBTUR0tO
+ aptvoVo4h3+BvWoMRnxVCcO4saBJRMlz92C+ZJ/gR8JgHp9Nsbpt5fY
+X-Developer-Key: i=samin_c@outlook.com; a=ed25519;
+ pk=bhYTQ8dsutJTQ/B9OCMAespkxDADq+Ik/7wRt0sTlPQ=
+X-Endpoint-Received: by B4 Relay for samin_c@outlook.com/20260531 with
+ auth_id=801
+X-Original-From: "Samin Y. Chowdhury" <samin_c@outlook.com>
+Reply-To: samin_c@outlook.com
 
-On Sun, May 31, 2026 at 8:35=E2=80=AFPM Jianyue Wu <wujianyue000@gmail.com>=
- wrote:
->
-> IS_ENABLED() expects a CONFIG_* symbol. Use the real Kconfig symbol so
-> this warning reflects whether synchronous partial I/O is built in.
->
-> Signed-off-by: Jianyue Wu <wujianyue000@gmail.com>
-> ---
-> zram: fix partial I/O config check
-> ---
->  drivers/block/zram/zram_drv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
-c
-> index 6e1330ce4bc1..72f89fd5572e 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1510,7 +1510,7 @@ static int read_from_bdev(struct zram *zram, struct=
- page *page, u32 index,
->  {
->         atomic64_inc(&zram->stats.bd_reads);
->         if (!parent) {
-> -               if (WARN_ON_ONCE(!IS_ENABLED(ZRAM_PARTIAL_IO)))
-> +               if (WARN_ON_ONCE(!IS_ENABLED(CONFIG_ZRAM_PARTIAL_IO)))
+From: "Samin Y. Chowdhury" <samin_c@outlook.com>
 
-However, I don't see ZRAM_PARTIAL_IO defined as a Kconfig option.
+Abort early with BLK_STS_PROTECTION if a namespace revalidation changed
+bi->metadata_size after bio_integrity_prep() sized the allocation.
 
-#if PAGE_SIZE !=3D 4096
-static inline bool is_partial_io(struct bio_vec *bvec)
-{
-        return bvec->bv_len !=3D PAGE_SIZE;
-}
-#define ZRAM_PARTIAL_IO         1
-#else
-static inline bool is_partial_io(struct bio_vec *bvec)
-{
-        return false;
-}
-#endif
+Found by FuzzNvme (Syzkaller with FEMU fuzzing framework).
+
+When a namespace is revalidated between bio_integrity_prep() and
+bio_integrity_verify_fn(), the integrity profile's metadata_size may
+change under the in-flight bio. bio_integrity_verify_fn() re-reads the
+live blk_integrity via blk_get_integrity(), so blk_integrity_iterate()
+uses the new metadata_size as the per-interval step size against a
+buffer sized for the old one, advancing iter->prot_buf past the end of
+the allocation.
+
+task 1:
+  bio_integrity_prep()
+    bio_integrity_alloc_buf()
+      len = bio_integrity_bytes(bi, bio_sectors(bio))   ...(1)
+      bip->bip_iter.bi_size = len
+
+task 2:
+  nvme_update_ns_info_block()
+    blk_mq_freeze_queue()
+    nvme_init_integrity()
+      bi->metadata_size = head->ms                      ...(2)
+    blk_mq_unfreeze_queue()
+
+task 3:
+  bio_integrity_verify_fn()
+    bio_integrity_verify()
+      blk_integrity_iterate()
+        bi = blk_get_integrity()                        ...(3)
+        iter->interval_remaining = 1 << bi->interval_exp
+        iter->prot_buf += bi->metadata_size per interval
+        /* step size from (3), buffer sized at (1): overrun */
+
+Fixes: 8098514bd5ca ("block: always allocate integrity buffer when required")
+Signed-off-by: Samin Y. Chowdhury <samin_c@outlook.com>
+Acked-by: Sungwoo Kim <iam@sung-woo.kim>
+Acked-by: Dave Tian <daveti@purdue.edu>
+Acked-by: Weidong Zhu <weizhu@fiu.edu>
+Acked-by: Ruimin Sun <rsun@fiu.edu>
+---
+When a namespace is revalidated between bio_integrity_prep() and
+bio_integrity_verify_fn(), the integrity profile's metadata_size may
+change under the in-flight bio. bio_integrity_verify_fn() re-reads the
+live blk_integrity via blk_get_integrity(), so blk_integrity_iterate()
+uses the new metadata_size as the per-interval step size against a
+buffer sized for the old one, advancing iter->prot_buf past the end of
+the allocation.
+
+task 1:
+  bio_integrity_prep()
+    bio_integrity_alloc_buf()
+      len = bio_integrity_bytes(bi, bio_sectors(bio))   ...(1)
+      bip->bip_iter.bi_size = len
+
+task 2:
+  nvme_update_ns_info_block()
+    blk_mq_freeze_queue()
+    nvme_init_integrity()
+      bi->metadata_size = head->ms                      ...(2)
+    blk_mq_unfreeze_queue()
+
+task 3:
+  bio_integrity_verify_fn()
+    bio_integrity_verify()
+      blk_integrity_iterate()
+        bi = blk_get_integrity()                        ...(3)
+        iter->interval_remaining = 1 << bi->interval_exp
+        iter->prot_buf += bi->metadata_size per interval
+        /* step size from (3), buffer sized at (1): overrun */
+---
+ block/bio-integrity-auto.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/block/bio-integrity-auto.c b/block/bio-integrity-auto.c
+index 353eed632fc..b404dbaa9f8 100644
+--- a/block/bio-integrity-auto.c
++++ b/block/bio-integrity-auto.c
+@@ -38,6 +38,18 @@ static void bio_integrity_verify_fn(struct work_struct *work)
+ 	struct bio_integrity_data *bid =
+ 		container_of(work, struct bio_integrity_data, work);
+ 	struct bio *bio = bid->bio;
++	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
++
++	if (bi) {
++		unsigned int required = bio_integrity_bytes(bi, bio_sectors(bio));
++
++		if (unlikely(required > bid->bip.bip_iter.bi_size)) {
++			bio->bi_status = BLK_STS_PROTECTION;
++			bio_integrity_finish(bid);
++			bio_endio(bio);
++			return;
++		}
++	}
+ 
+ 	bio->bi_status = bio_integrity_verify(bio, &bid->saved_bio_iter);
+ 	bio_integrity_finish(bid);
+
+---
+base-commit: 174914ea551314c52a61713b9c4bde9e42d48073
+change-id: 20260531-blk-integrity-fix-e8109008af54
+
+Best regards,
+--  
+Samin Y. Chowdhury <samin_c@outlook.com>
 
 
->                         return -EIO;
->                 return read_from_bdev_sync(zram, page, index, blk_idx);
->         }
->
-> ---
-> base-commit: 404fb4f38e8f38469dfff4df0205c9d18eeb1f57
-> change-id: 20260531-zram-fix-partial-io-config-check-on-akpm-c62b972416f8
->
-> Best regards,
-> --
-> Jianyue Wu <wujianyue000@gmail.com>
->
