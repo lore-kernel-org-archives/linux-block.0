@@ -1,71 +1,119 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03403E172F
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 17:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1807337C90A
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 18:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780333823; cv=none; b=CmywRadelyuteBHm4Ry7aOHFqWpk2vEhLYpvx9j0T08SIhtDIY5JtJyPnM6D6XypcMR3E3DDGH/LFSEox34XdbIKjifnM1lvK1kjRdbcit1c/sc5xg5VUwxQOWVw3DEzt0OgRuMyY6hrxWdxvf+wh5Ex4GiS1mDX1fiBSM2ZpKQ=
+	t=1780340128; cv=none; b=oH84pofxmU1dMZk/2iOfxt6hDE6EphUs3TOOr4eZwrN+qi3IB8b7GsHZD5P4gclFK3HmMhQq29YtXaePW0K8N5mpbX+8aRBhPPgpM1w2JAF4fRckupVngDqLesW25gMoKWkST1RGbrLkDT5MH+4vN81XsMC13l7gR2p8Kzl113I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780333823; c=relaxed/simple;
-	bh=b6egYJT4oZVxlemiFQImQn69udxJzInQv9n8wbEyHTU=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=eE+OlHBcPgeNiccrkc/7R88qx5BJKKl3jC9Z2Z8HkWs3+focFrTJ5oIp1elNdff6WWGs8ULurkIZCGcW5fe5ARTsWpPEQlWWkH9pLMQEsqLHLQBzCvHEmTWtJBf4aEJdlTrk+AYHzhbDD1AUFSPWJxLPcw2o4TfD9cHgcsss5Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VsRMuo1T; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1780340128; c=relaxed/simple;
+	bh=92Odugj+uqpqoYzi39SNfTycubqdCPubhM2crY0//Ec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kRTTOWJeK8KPrZMF2JGpd2U3fmyNLif9u0eLyk1GqzO8pq/0dxjPUcPwAo8sfGKkWfRjog8sTQPgONT6u0VFXI9KxEgW4FIQQk/GDoDpLwmk/sWKLraDWPh0g9ErYE/rsmQCRsIXpxm0XQBQToZAlUGhjLcgxYXNVitwczTHX5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=QV2T7QNL; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VsRMuo1T"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=wuwhtsZvxtY5jXpZxPPq8x6oexBxcLSzun5iMte6UC4=; b=VsRMuo1TXRsso3tGC20B7I5bar
-	jMyxtqAf6qUA/bNZVxS8Yg6Te4ld5t8rkP6VBTkdf51pUySHwOG7LOssV3Bv7mVJX2vW2SuBMjIF2
-	FDnvG2bjaskpH1SXWPVDVgKEc5SckpIShTFo7WW/WKtbAIYwmG6FC2cdUpKNYR3O5RxcceG8JXavr
-	/loluxgqrYXS+Ao/Y6pJ5FEYZyJ8mkxwPqhCTLpS1EoaPrGGnZzMJPWExd5nQyu6Oqe0BawEF4JZH
-	3Y/WSFR6Q0qFYVCXMnbniio52UZhB70FEIHIbhxtu9BPh5O5jrCP/wpXkfZLNEx1bleMmjYSXS/0P
-	y/LUJKsQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wU69a-00000000Se3-2HZZ;
-	Mon, 01 Jun 2026 17:10:18 +0000
-Date: Mon, 1 Jun 2026 18:10:18 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: bio_copy_from_iter
-Message-ID: <ah28-oyillEaOrm1@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="QV2T7QNL"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-69e2e3c773fso352920eaf.2
+        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 11:55:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780340125; x=1780944925; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=on/PdQMM/Rm6Fk0z4T5hTZtddcW3TdPodKG2MMd3qBY=;
+        b=QV2T7QNLc9vB/Oirl/z89JlU0PFtHyj9FJ9EgseLNPSjxtcNXloLZcSyZ0bN8Ktxaa
+         ZoOXXwRA/wR2Q6m8+zPzihH2PejLkVl+75QhId1IQLTFaeL/i7GwzfY0BHbaHs4Huq6H
+         IM40udvJAUZNNbIPal0HyuYvhbSmFuX/zngpTiY6CRYDyM9eItC5Ib8BR/Rwaj0NESJ6
+         1jtrv01wAfLzbv2yoiIpy35KOehNWUVMuItaH6JE0iZbOTv80FeaKVWjGVklbRUpxFXf
+         5AXKLPHIONNbUBB6IgdZ8z3CXDjWYW1KPxj5WmMVpi73VxwOIvLzMUbpdXYDCEMvxh8q
+         mWEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780340125; x=1780944925;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=on/PdQMM/Rm6Fk0z4T5hTZtddcW3TdPodKG2MMd3qBY=;
+        b=qwD1x+ES7vPvkaQUEPG+p/GGpg6sePGcE4WC0KlGTkbOxYUYZw2NoiUtV24fSxvF9C
+         /Hp0nLE6fcFsdNA9knXGMkk1xmWxiIXZ3jiYGPmOPnM4ywDpkO8c8YNuWmDj/Pq0O9EJ
+         qefzyErQd/oKcM2sO0nim9wl3EfC4LZcSlVWle7K/+EwbuZefi4v4Qrw81eJFiUJw7wR
+         YSq+pHc/vjlGNEqwb+JL+JZ6bVOGOZiHawXfueOblW1Tql3ILmPX4RO4flyxHVXairze
+         uXc7GsDWYZWh1MCmfdPDq9XPJ7TGpPCA1kR4WtxiumHiqpRCK/bznENVdDrpidXBCynG
+         71lQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9s0NSp9jgw0Fxu5LJIvrzG5hJIaLSH/nWV6Q0Hh7Ysv91hC+rM96ceeNB5Sbw2c+ooBNapUQFgGjCPNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZO1l7MW7tZO1qKFjdNdGiuA2CfnnIdqiLDOJ5ZaWavf3IBn7W
+	FbB/+VyL7WBYsKX/n8hocEL/uLKDsAd4wK5L4VI7P1eurDn5nB12RtcXmwaByPvqpoM=
+X-Gm-Gg: Acq92OGoweXlinVNnsFMsLwmh7RRG8BjdwCpT1UmO58V45J44wsOOMszcYPdTLudrEl
+	8DCbnnKAiF/9Ai7WYCHLANHHMqJuy5Q5QrM/xb/t3p/ugZDocpEChKrWg8E/TJkyGf0r3cHdvlR
+	rdcgZ76f4ysBApGjkoaYo9WM0PJh5bAsCoQLDJQNEobl5MaEn3s1rrcIF3aZonkRZVHh5RDPeHz
+	paPRlnbQK+gwMq2QjwYOUtH+OK5I1TlL8onkhUtR0DykIkyuVkt2jiKqMLsKL0BJE5RDz6bB0e8
+	BZcjg4JnzA/nXCZhgFXo0Qir1uykWj1j30S+r/GlsNZU0EcS3kYAPAtXcHmh1oK5g+uD5NU7E9L
+	kYGdiOX7A5G9ljOXCeWfeIzBZth2s0XiWfp090/EJKML1qgGAPmxYSisysRLIrBJ4rxhliaL36i
+	CTbLBTfLPvKH/A0xCgDoGXZ4okyepeg8C+8652ukr4lWXDB+BFoHGl0bGMVqsZcWnp7fJ34n7eP
+	BdSjkWTWhiuZ8ZNk7E=
+X-Received: by 2002:a4a:d191:0:b0:69e:2da0:c1e2 with SMTP id 006d021491bc7-69e2da0c366mr1336452eaf.26.1780340124939;
+        Mon, 01 Jun 2026 11:55:24 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e067de2b8sm6985070eaf.4.2026.06.01.11.55.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Jun 2026 11:55:24 -0700 (PDT)
+Message-ID: <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
+Date: Mon, 1 Jun 2026 12:55:23 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] md-7.2-20260531
+To: Yu Kuai <yukuai@fygo.io>
+Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+ Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
+ Benjamin Marzinski <bmarzins@redhat.com>, Chen Cheng <chencheng@fnnas.com>,
+ Christoph Hellwig <hch@lst.de>, Li Nan <magiclinan@didiglobal.com>,
+ Thorsten Blum <thorsten.blum@linux.dev>
+References: <20260531112618.160409-1-yukuai@fygo.io>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260531112618.160409-1-yukuai@fygo.io>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-I'd like to remove copy_page_to_iter() (and only have
-copy_folio_to_iter()).  That led me to looking at bio_copy_to_iter().
-At first glance, switching it to bio_for_each_folio_all() makes a lot of
-sense -- if there are large folios involved, then we can copy an entire
-folio at a time instead of a page.
+On 5/31/26 5:26 AM, Yu Kuai wrote:
+> Hi Jens,
+> 
+> Please consider pulling the following changes into your for-7.2/block
+> branch.
+> 
+> This pull request contains:
+> 
+> Bug Fixes:
+> - Only requeue dm-raid bios when dm is suspending. (Benjamin Marzinski)
+> - Reset raid10 read_slot when reusing r10bio for discard. (Chen Cheng)
+> - Fix raid1/raid10 deadlock in read error recovery path. (Abd-Alrhman Masalkhi)
+> - Fix raid1/raid10 error-path detection with md_cloned_bio(). (Abd-Alrhman Masalkhi)
+> - Fix raid1/raid10 bio accounting for split md cloned bios. (Abd-Alrhman Masalkhi)
+> - Fix raid1 nr_pending leak in REQ_ATOMIC bad-block path. (Abd-Alrhman Masalkhi)
+> 
+> Improvements:
+> - Skip redundant raid_disks updates when the value is unchanged. (Abd-Alrhman Masalkhi)
+> 
+> Cleanups:
+> - Update MAINTAINERS email addresses. (Yu Kuai, Li Nan)
+> - Clean up raid1 read error handling. (Christoph Hellwig)
+> - Move the exceed_read_errors condition out of fix_read_error(). (Christoph Hellwig)
+> - Use str_plural() in raid0 dump_zones(). (Thorsten Blum)
 
-But what I can't prove to my satisfaction is that every bio passed to
-bio_copy_to_iter() necessarily contains folios.  That's not currently
-necessary, but will become necessary in the future. [1].
+Pulled, thanks.
 
-But I started thinking about what we could/should do in the future
-when bvecs refer only to physical addresses and not pages.  What we'll
-have is a list of (phys, len) tuples and need to copy that to an iter.
-We don't have an API for that today.  Should we add:
+Side note - emails from you with the new email address all end up in
+spam. I just noticed some of them this morning. But I think you want to
+ensure that the DKIM etc part of your email is all kosher, gmail flags
+all of it.
 
-copy_phys_to_iter(phys_addr_t phys, size_t len, struct iov_iter *i);
-
-We arguably get even more benefit by doing this as we'd no longer break the
-bio up into pages or folios, but can keep the contiguous chunks.  Not that
-optimising bio_uncopy_user() is going to be a particularly big win,
-but this API might be useful in places that are more performance sensitive.
-
-[1] I believe all these bvecs are constructed using
-blk_rq_map_user_iov() which can end up calling bio_add_vmalloc(),
-and vmalloc pages will not be folios.
+-- 
+Jens Axboe
