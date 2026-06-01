@@ -1,142 +1,154 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C69537F756
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 22:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780352497; cv=pass; b=EbsBJQVErM/V3RCtPfSBtjMXYGc+yUEyLo1up3P4OOAeWPXqJdejfFjyEkPVh7SDI2AK+L4gp8agiBBv+I+dm8K4BDWj1I4z2fBV0E+X4fifTBCvsvlsqOsoX3d2c0om2q0C7hkwKFN0NF2QBaAYzeCYPgMR3LXbV2WNsFYk2gI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780352497; c=relaxed/simple;
-	bh=KxQkfsKZeivLewXMPpdfYXxGpNj8gOeUAOAB3xPYlpQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=muvlp8ZFdFd5WCuwDIlgCzNxhBiXpMR1Gfns4ScOVqJp/6YVs8jloIYZI45F7ekkPCmwJwvuYljO2mlAlJEZaUIyl3Ra7BoLPOd/isM4EzpCN7jVFD/yoGW2UPoUdoz6IgySIMl0Re0zhDHY6LCkYxK4Ldj4/pgZBJyF3pzAgZ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lMGGw//0; arc=pass smtp.client-ip=209.85.167.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E81237F010
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 22:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780352890; cv=none; b=W2jhxnYVNtq3rq1hsTr2Htxp6swBFvb1SYn8CIpUcgDiDArFDz4KimpqvZp4jkCq0PmBnCU4X9QspWC8OkE0K3ZDVOuj2RUS5GHucYf/RJAYRSj1NKLcCq5DUZVRWqEIyaE8IVRdsyxc3ZbN2XPQZtkLSP8mIxuPZAulnS12xNI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780352890; c=relaxed/simple;
+	bh=09QywNMFB9xJQgcS3lv2RJl/+8KF5z2gwtaAl6Sdmzo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MgODkL2vBv7pbGtQ+P1SfaliIH3lsb/s/H+cMs5X272SUNmpnNKMQVE9HrP0IqXFCafDjYfm6glMGo82eReuCF2otUTBnup5u+5Rui3TknkqnvhzGl0LFr2vcxfUP3nEen3mXN6/UeO5JLk+v1cUY5o8o9Wg52qDPrXxNQfd34I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Qq8uywH7; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lMGGw//0"
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-48611ab8fceso1415405b6e.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 15:21:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780352495; cv=none;
-        d=google.com; s=arc-20240605;
-        b=i3zn0uLbRAkCcLk7ljve7fl7DcbAsHFQrYpaCxbS9vhLjsDdtZxl9p03uWRHuFFx6D
-         8rO1HQQ9A2Iso/q2q+HamQFPsompr4AAOYtnWog7PbR+MV4B6P5CKWiZAVAtOsJqmmtX
-         yXss3f4uz+tle/QEaUC7+dzV5uG4KtDQRBmxWwWLfl4ft7Tb7YkBOI4YzISJlLE+YbgE
-         G5bsgXv5vRXqt4ikUCjpcLKOiqzihbafhmJvqW2IrLZcXAx2MujJcZ1jT4AFBgDtNd0I
-         LeNbBtIMK26wlkuTG0BV3bn0uAtYgDVfE6nZ+H9jtIIPrpB7/N2onlMq37i54xveWo4U
-         YYgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3BdnP/6TNVAsxcaayiKJjGNALyqAthWM795Wx9+Pzhc=;
-        fh=eQZ5Gq/kLzFa7ymh7+87rJphBbkIzj+MvD13e5pS4IQ=;
-        b=E/ipTo8/Chkn0VokgYJ+h8SoVY99sU1LrphPvC8Fk8rI0PxA8d3vD7i1qjdrl9kDro
-         KpzDGhZyylqkKt4Gdk0U81qVIvY/kCqNj0DcMah51Wceoji5JIcMEUPcbnWR9CA4WeCc
-         jVp08qx+XpPXR9xM1PtcBi4ldWdcURrwtVxDdKK2jPVifuAFaQEB+sBHsl+B7QXw2JOg
-         4WRky26ENKRED1jm8LUX0L41Ei7LTzHmmcwUR58u7pZSI+jCSiHGReXGbm8I/FCSZpFT
-         6Fhn9MMt4pDX+CYUekncUe427jxAVL2HOL/AEwv7yXntHovYqauYFXThinqo9T/7jV7/
-         AtoA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Qq8uywH7"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490a762db7aso13516715e9.0
+        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 15:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780352495; x=1780957295; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3BdnP/6TNVAsxcaayiKJjGNALyqAthWM795Wx9+Pzhc=;
-        b=lMGGw//0NCICB/jRxUBpuri3xsaGywnk/nVkrHk4mICtpDOk1R6KQDf8fKvg8uhK+L
-         TdpyovsXI2Zk8jMIn6gO/j3VbTfEeCyzjf8c8bDgkNAIYeGNgI9izH8YhQ5IX+TgdJL4
-         6lEjlopwhB0j3GyqGF8Z4eZFYsGJUkw6feH8/AsFdIApPH5NOMaBrN/Xry+iCcWEVTZL
-         j7jPa31bs8vS8Rs5pA4BcV+PnmbEWY0VJ1OUYnmZYDLPzhluvzybShvH7BAdFws+8mMQ
-         XzgBNoNvXN581Wx7KRh+n04Jdp4ph7G+WAkaSs6RVAZNapA2Nh23e67Q/sRNecZXzdi3
-         eABw==
+        d=suse.com; s=google; t=1780352888; x=1780957688; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=giYcafd3I2mpvPflYmwbLiEG2gQ+vD7xawf2mxGjHFw=;
+        b=Qq8uywH74vqrKhYC/8U636f2URWfcor0TFBdCnOcw8VTY6wahkKvu3avM1zyDUvK+C
+         Hh5G0RFIi7OusASlQLRcTKW19BvQ8HTYJRrgtZfUzHAnSCd02JVCfg7ec1R6bRBH3up6
+         nDmfKJ6pDYOZr2JjQtIKPcziFDG4HABu9V2UUyWlJRjoaIjDNTxFvoU41J69hbKpIHKg
+         z+qTQaI2uRRLTmcSQl7jAOElGRz9k/6YBJm2jzehOOifPEhfeMBsHIc4wEkRK7cMbcyb
+         DZXZBGfihxqwJmE6WG3WvyIRoBMzzONFwNy4FKMH5o0E/XXiXMgGboyNqHwJkRV2koCb
+         koEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780352495; x=1780957295;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3BdnP/6TNVAsxcaayiKJjGNALyqAthWM795Wx9+Pzhc=;
-        b=M3Cektw7NsT2AAz4W6w8IgH3t1JS0UzCKGz9kQ1Efs6NQHnSUcO63SNEnBHJXaiXo/
-         yt67Qn+XwShzvTgfpnvHH995lTfKiFTxjnxIazJOym8BBzeb7t0+bvCitrb5eogG0Nt8
-         hynCbq2kTaFiIzndoE3fddq7RwzRl3sF/eOvevkVBbhfAseUVry6Qm2fgF/+P4IIgKLO
-         3OI5vF4gbDNpqmiD3WYsBNi86ks/FqAok05XnrvmQZJnuHd0rMevE0Av11ET4pXab5aC
-         Mnybz9Cs87rlldV/3uK9c6lWDWgoxlZzs2M/wQ4WMsPVv85Nt7bjiPG3ZONWuSxKxPbA
-         01dQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9zervGarWtuQ5JAednEwbLxqQPmm1oLm1gxGYxm73RkEJUspRtygPNM+6pfMX6bsyhDwqPJ/UAt/xjUQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6ScExUPMUFPgTekU3WqiBstKuRAUbC+Wj32HeMRcdXw4rJ/4G
-	Z1Lfjb+9E9+2m7rhmh381ntCv4HTm4/pFxxlytGoo4qGc8Yst35Y+SOdK+CUy2hVqgA9kwNaSJ2
-	dulcdqrKVb9vOieY6OsesXbrfuzEZV/Z/J1bwNik=
-X-Gm-Gg: Acq92OErRMSbQlf0L+fWlImJXqxfpr6poQe2iu84CpqRik5ZVmZifB5z9j9MA/5hc+b
-	WOCHws+7Hh0mk6D5QnKCs2Mb2FSfK2KB5vSA18iAh9x+v4T9su1JdBvMGZGO1zzPQSZnMjISdwd
-	gINoiAx8xdQGqKO9xEZSDfEuSLRTjofREy0fpnONGJ9280R3iZiNBhgGR7SKk8AKQCYjSA2WQz9
-	FwAmzVWmJFC2kPQVqrWjMXJRG3emQ0S79chxbLGtcrD/tLr4oKWSfpHfckueOzwqd1Jlwntl0XO
-	heWfOGQmUcsS3n4bawWpbsI2oe21p6Q2WuRq2JP4U8+4dHT5Ty/GsR5xpH7dPDmi+BfZQlCUwir
-	rP7sEiHtL9j7LngUH5X/DSHmSdPJP
-X-Received: by 2002:a05:6808:22a5:b0:467:16e4:d263 with SMTP id
- 5614622812f47-485fb61b153mr7764505b6e.44.1780352495232; Mon, 01 Jun 2026
- 15:21:35 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1780352888; x=1780957688;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=giYcafd3I2mpvPflYmwbLiEG2gQ+vD7xawf2mxGjHFw=;
+        b=pmcV9d5iB+lk3FMdVWajaW5xmwW4CVPlA9pQmxxkch8WguvGYKZ6JEZTnzGkHasEC5
+         d0aijGNTLr9IQ81LmdM/j6MdxuyGbIAuIh13KEvhTD71+NCYKeZrSjT+arux/jGFkbUW
+         Jajk8ku9KuFM9TjFQ52mv0Y+9qujW3wlhYQiPRoDA0p18O6KBWrRbZ/Ff69rhKTTY83u
+         ay+IFznDuYEY+R4fnv5bGUf4slVeLrK00zML4AnXq1yFI4rYV9gWpE6MAwVy4BnRiwmU
+         EUoxJnRuolg/Yv7fOf92SYhrxTXrXA/pkH/gUWmXHWOjdadEwQ9F7JNzUeh3BvloyfYe
+         YctA==
+X-Forwarded-Encrypted: i=1; AFNElJ+uRPtPxAovuUYc+pfQkfo2a2Lm7VikJGMekJiGoPssdm1uJVFDIr2EvX9sIm6ZW2939u0k2kS9zjeXoQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx46w9UBtmTSGLnpL14qAbjFKYrHdz7nppNBRPSbUD0XdMTpZ+t
+	OaIEdoAQ3nNQD+M8zgDVzLB5j+3XMmMWE2AT1BxUfeCvf49DzE7TgT8qxuEEbz5EPIo=
+X-Gm-Gg: Acq92OGL/Dxye/6LZR9YRi6zTGTkT00mImygkV4iEMt1DZaTcL5CEXXi2Jtan0Mn2ta
+	OaFA7pVz+1hV+diY8fG7KZ9LNAfMnnAIRrKTnCmzWvIDG39boRFrxptzYLv5U2j1/n2AjVkxFUe
+	OVaSl4FTVFVjE3cYHEH6G8aeFaSpRdYOM4uR8G6bjyBg+wLbpRnOIYr8C/gkoIySsIPWAHeywS+
+	54sC40XQ2c42r148Kei0EBZeCXBGMFEPBoumJb9rMQerqbNawVnS7T5ZId0tF4whvhFuy/v/Ti8
+	gOJce7T+2o+alk0HpEUmFGQWEnU6lN3IfJdviL7VCXFRhDHoWpuHi3/HC88zrzSJSoW6zqDNsjX
+	v7MXvUwwLRBc17UD61TF8Wlm6r4yKYoO83ED9OSPETM45BW+gBs3jjFk0u4Vmo7W/EZUzCeGylX
+	OVBEkt4585J7fLVI04hM/41AmBKNiSj041lKhjq+u97hk9xGdo/Kz+QwXahwcXp8qACzNNkXMCR
+	GIuVYG6K8BCrnJySISp3iHcYiLZzR1TsLyIUZ94nRLEsqQBN0huGLYu7w==
+X-Received: by 2002:a05:600c:5395:b0:490:4b89:535d with SMTP id 5b1f17b1804b1-490a2904b29mr282295395e9.1.1780352887955;
+        Mon, 01 Jun 2026 15:28:07 -0700 (PDT)
+Received: from ?IPV6:2403:580d:fda1:0:2bb5:f164:6e6a:38d8? (2403-580d-fda1-0-2bb5-f164-6e6a-38d8.ip6.aussiebb.net. [2403:580d:fda1:0:2bb5:f164:6e6a:38d8])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36dd90415besm774673a91.0.2026.06.01.15.28.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Jun 2026 15:28:06 -0700 (PDT)
+Message-ID: <d5d2ae2c-5b9a-4c33-8dca-6f2f15a7877a@suse.com>
+Date: Tue, 2 Jun 2026 07:57:59 +0930
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260601185544.1180263-1-yun.zhou@windriver.com>
-In-Reply-To: <20260601185544.1180263-1-yun.zhou@windriver.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Mon, 1 Jun 2026 17:21:23 -0500
-X-Gm-Features: AVHnY4JYPYTP9X70Y4aNRm5ImCSMHZArXYheqmU083lTNLElu8QsxGddC8xS4sM
-Message-ID: <CACVXFVNCBKfj_WTR2P+=2bQ94ki-af-eQRAPjg+yQqDzPObn4A@mail.gmail.com>
-Subject: Re: [PATCH] ublk: fix null-ptr-deref in ublk_queue_cmd
-To: Yun Zhou <yun.zhou@windriver.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
+To: Brian Foster <bfoster@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+ Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Bart Van Assche <bvanassche@acm.org>,
+ linux-block <linux-block@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>, linux-btrfs@vger.kernel.org,
+ David Sterba <dsterba@suse.com>, linux-fsdevel@vger.kernel.org,
+ Christian Brauner <brauner@kernel.org>
+References: <ahRocb0Vs_m6RF_O@fedora>
+ <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp>
+ <ahZGxoI6oHQ_vSrx@fedora>
+ <d1b5a737-f0e3-4927-b762-430b37fbb2f9@I-love.SAKURA.ne.jp>
+ <ahZeYQ0cLE1i8TGs@fedora>
+ <fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp>
+ <ab5492b6-a053-4e3b-8c59-2e836ae85bc4@kernel.org>
+ <20260528083848.GA7694@lst.de>
+ <36571f8a-4df8-4152-b078-d82dbff4ad7e@suse.com>
+ <20260601144034.GA4918@lst.de> <ah2zdCQ0WA6ol2Gn@bfoster>
+Content-Language: en-US
+From: Qu Wenruo <wqu@suse.com>
+Autocrypt: addr=wqu@suse.com; keydata=
+ xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
+ 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
+ 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
+ 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
+ gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
+ AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
+ FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
+ Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
+ fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
+ 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
+ V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
+ rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
+ rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
+ Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
+ E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
+ vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
+ g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
+ AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
+ cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
+ qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
+ /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
+ o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
+ JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
+In-Reply-To: <ah2zdCQ0WA6ol2Gn@bfoster>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 1, 2026 at 1:55=E2=80=AFPM Yun Zhou <yun.zhou@windriver.com> wr=
-ote:
->
-> ublk_queue_cmd() dereferences ios[tag].cmd without NULL check. The cmd
-> pointer can be NULL when ublk_cancel_cmd() races with IO dispatch during
-> server teardown:
->
->   CPU0 (partition scan work)        CPU1 (io_uring cancel callback)
->   ublk_queue_rq()
->     ublk_prep_req() -> OK
->     check canceling -> false
->                                     ublk_start_cancel()
->                                       quiesce, set canceling, unquiesce
->                                     ublk_cancel_cmd()
->                                       io->cmd =3D NULL
->     ublk_queue_cmd()
->       cmd =3D ios[tag].cmd  -> NULL
->       ublk_get_uring_cmd_pdu(cmd) -> null-ptr-deref
->
-> The race window exists because ublk_cancel_cmd() can execute between the
-> canceling flag check and the cmd dereference in ublk_queue_cmd(). This
-> cannot be closed with simple synchronization since blk_mq_quiesce_queue
-> only waits for in-flight dispatches, not requests already past the
-> canceling check.
->
-> Fix by checking cmd for NULL before dereferencing. When NULL, abort the
-> request via __ublk_abort_rq() which handles both recovery (requeue) and
-> non-recovery (end with IOERR) cases.
->
-> Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver=
-")
-> Reported-by: syzbot+415b9ec753cd2a196087@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D415b9ec753cd2a196087
-> Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
-
-Hello Yun,
-
-It should have been addressed by the following commit:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/commit/?h=
-=3Dfor-7.2/block&id=3D1133b93fc7f63defaa2c07d5f49873c14bb74681
 
 
+在 2026/6/2 01:59, Brian Foster 写道:
+> On Mon, Jun 01, 2026 at 04:40:34PM +0200, Christoph Hellwig wrote:
+>> On Thu, May 28, 2026 at 07:46:24PM +0930, Qu Wenruo wrote:
+>>>> e.g. 9c7504aa72b6 ("xfs: track and serialize in-flight async buffers against
+>>>> unmount")
+>>> Considering the xfs fix is pretty old, it's before the fix hint thus no
+>>> such mention in fstests.
+>>>
+>>> Do you happen to know which test case is for that fix?
+>>> I'd like to adapt it for btrfs as a reproducer.
+>>
+>> No.  Adding Brian who authored that commit.
+>>
+> 
+> I haven't followed through the full thread here... But if you're just
+> looking for an existing test case associated with the commit above on
+> XFS, I did some quick digging and xfs/311 is the original reproducer for
+> that one.
+
+Thanks a lot! I'll use the same delayed umount to verify the behavior of 
+btrfs.
 
 Thanks,
-Ming Lei
+Qu
+
+> 
+> Brian
+> 
+
