@@ -1,187 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1A0388886
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 08:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93352C21C4
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 08:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780300961; cv=none; b=eC6FjNLvGF41VS7sajhNfyVNjkYrfHI5GZC+rHhLhO4Cjw/9gT+4wdAwWKLdnBoLyiRvcN+yms40iUZCRVhyhlA0a3shqriXZoDDtwxFOX8oHsaGGwRAVhy48Gge825koA3nj6oRk8mSiVytF0funGy8gMontVsVWCzqNQHEWIo=
+	t=1780300966; cv=none; b=EQ2xLqirY0SaTperNKy0+0fJamn4XAzfe8MjDy9IxfIWOAgisR73JZwSK7uTPnysWD5LC/QF2yR98W8PQBqkCgYEL8qu6wi1vjLAN9P8ZmqzlDgQSRxsaAF8cpnfu5ZP1nipbVKdVEjIWkOQfMTcN1vlJHwilpymAtYPueBIuzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780300961; c=relaxed/simple;
-	bh=UILHryDMQUhZWMdKb7w0dn4SUpBgOsIAlkYSKCtbll4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=moZnpUoZ+jR1ub8GrswUdI62zvv2Sn79fgHs584UKwMuy+7unlm39vgTCxob/mjEOf3uBVrz1jO71To7czNdIeJF2xFVmzeuO0v2+cPaqfcynPzvYtCZPsE9zTVvhp9h5GGuSs1uyvMFav4bBrXcTfBfcbaa2FvjjcJRKFX+avA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84A051F00893;
-	Mon,  1 Jun 2026 08:02:38 +0000 (UTC)
-From: Yu Kuai <yukuai@fygo.io>
-To: tj@kernel.org,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	yukuai@fygo.io
-Subject: [PATCH] blk-iolatency: fix child_lat lock irq state
-Date: Mon,  1 Jun 2026 16:02:35 +0800
-Message-ID: <20260601080235.980914-1-yukuai@fygo.io>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1780300966; c=relaxed/simple;
+	bh=AgD+BzwxhQRkx6OqAI3ZzibLKjyCAVWY50FPyoOIYh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HEVuRNCGzYjUOUz3BlLpECFwXMk/bliHqYUWEboQh+/iXzHtVh1TcfzZYWg5oL8eOhbIwqejOFLylidtRhF3080ZerIHOq0W9Y8WgCbikMSL9yJdt1oTAoN31yxANEIIMLv/X98hh100j03VSULDdkVEWOH0vM1lmow0mR/nv9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b=MVLCiPMP; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linbit-com.20251104.gappssmtp.com header.i=@linbit-com.20251104.gappssmtp.com header.b="MVLCiPMP"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-45ebafde87cso6377831f8f.3
+        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 01:02:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20251104.gappssmtp.com; s=20251104; t=1780300963; x=1780905763; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bhYB9HvL0n+VB2gN+GfbC+Zc+n1I631BCVDzgaKbOyU=;
+        b=MVLCiPMPl2tjg2FvGaB5x7Sqw5bty6enPN+Zi2q7WvxmCJEPlsrBamhwcwYrtEyrx/
+         OUlD/d5OAxhT2LA1+YqZyjN6vdQmYCMnvggGAyFLMkh7ZKqmPwbkVo7mTe0YM+ISe8Xc
+         TzjSPuX7KD+STfpDkUFjdLEqeoOzttntQ1OwT+XGxMAbpmN9yeFO89gaCtzw0W/03+IS
+         Bdk9/vswiPkjT+uYZSSuGZMtmEDvEejQ5oMLX+JUHFEfisgr68gHS5F/Va/jSk++fvk2
+         ZSfsscyiyOvc+Ty+NkYYS+CaTq1pJxWGF8qGcMb7zOySsMMtl7ROqdg0DNuoIuCoNEXo
+         GmdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780300963; x=1780905763;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bhYB9HvL0n+VB2gN+GfbC+Zc+n1I631BCVDzgaKbOyU=;
+        b=ltwSXkzH2hXtiZfVPDOr2/13UZn4FIozmg7Fho4KcxzXb8yTcLfdTlxiVfYulouOMJ
+         zGHex1IKUj2AR7AZpkP6NVOR4ROKZpE2tUMjDFbe/ORR2xfd5MUvYpgsgyfTiMdyvoWe
+         +I7/7xNUqLWru2S3NshqRohobFaIrxljMxG1hiSRa+DRwkRZvlE5+qjehdEcxq7/3WHN
+         AfIXMFIUTxbeYVG8rhwsAFGZ7gSYvINhDzd/kC9E8erIXRmswcQ+IWYlyLIaqCcsLc5s
+         obTW58qxsOTRFBdSMmsk2GLuyw/CJAlRtPJxdKxOxnQH8u8L8oSGt4H+0CYvGtc6HBbs
+         m0og==
+X-Forwarded-Encrypted: i=1; AFNElJ9tSTt/ILKbrEAcx86Ih19EoIqudBLf6CkmUUk1MJrT+8wgzdhS8DhudpRGBJ0CHJg9ej/D0Ov06AzUFg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgo2J5MI7YPtZyPantDs7FbPdvncvxvj809kZPDPdBYC/mrtAz
+	Y9U71ybbEwq3rySh87ko5Ir8091wYaUcQa0XwFDzFmQDTLgW92ueN/smUsa2Lbv6spc=
+X-Gm-Gg: Acq92OHJg7hAAEqK4KUjTS9KBNPWycjAeklYfFnhhwgtokxKSWkbTQsCFWMOXeE6eVq
+	xrG+C8o3uD9hnBOSJ/fJsBSGax2j2i/TVIYPSR9xr68wPY2f7jsLCac2pwU6guUrmp3Tx1rGq2g
+	JDGhkaHIjCLGl3jYk3yxQPh+BxeWpfHr0hPlYDG7iBoW9VOXoBiV2nnowdx6C44TF8AMCkXazRF
+	5B9dfp/ExKkfMmHRaXnpLaOxO+INflX1K6iZUJANqS7KfCiqW+FMXcjspWBgttsb72SGx3qy/Vz
+	l+pCcs9RsONOr5+O4cZjoHEOaLptE7tTI2s+jq66IgibQ1SFE/7Q6vuETw+AKy4wXn280mTcy8Q
+	+fBwQjcF3J5sswSR9LdVbgEViZbYTFaEM/TW+4Yk8VdZb58/H5fAb/wbmrK+Zs7FsCXeuzTF/VM
+	5ygIWG/4NltqF0gA9RAaVkjKNvnVFQothESbMiBks2t3E9424gu4fVWUltpsvA+MF+cNPrUD63S
+	2OzdA==
+X-Received: by 2002:a5d:5f4e:0:b0:460:42c:1133 with SMTP id ffacd0b85a97d-460042c121cmr10149587f8f.14.1780300962972;
+        Mon, 01 Jun 2026 01:02:42 -0700 (PDT)
+Received: from localhost (h082218129081.host.wavenet.at. [82.218.129.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45ef34b7d6bsm24631881f8f.10.2026.06.01.01.02.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 01:02:42 -0700 (PDT)
+Date: Mon, 1 Jun 2026 10:02:41 +0200
+From: Christoph =?utf-8?Q?B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>, 
+	Lars Ellenberg <lars@linbit.com>, drbd-dev@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: use new drbd-dev mailing list
+Message-ID: <ah07tGQ4Fz8CXy9D@localhost.localdomain>
+Mail-Followup-To: Jens Axboe <axboe@kernel.dk>, 
+	Philipp Reisner <philipp.reisner@linbit.com>, Lars Ellenberg <lars@linbit.com>, drbd-dev@lists.linux.dev, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260513065557.36042-1-christoph.boehmwalder@linbit.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260513065557.36042-1-christoph.boehmwalder@linbit.com>
 
-iolatency_clear_scaling() updates child_lat.lock with hardirqs enabled.
-The bio completion path can take the same lock from hardirq context.
+On Wed, May 13, 2026 at 08:55:57AM +0200, Christoph Böhmwalder wrote:
+>We are migrating from our own infrastructure to lists.linux.dev, so
+>change the drbd-dev address to point to the new domain.
+>
+>Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+>---
+> MAINTAINERS | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/MAINTAINERS b/MAINTAINERS
+>index 4abb3345bc4e..b8db0c038c55 100644
+>--- a/MAINTAINERS
+>+++ b/MAINTAINERS
+>@@ -7773,7 +7773,7 @@ DRBD DRIVER
+> M:	Philipp Reisner <philipp.reisner@linbit.com>
+> M:	Lars Ellenberg <lars.ellenberg@linbit.com>
+> M:	Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+>-L:	drbd-dev@lists.linbit.com
+>+L:	drbd-dev@lists.linux.dev
+> S:	Supported
+> W:	http://www.drbd.org
+> T:	git git://git.linbit.com/linux-drbd.git
+>
+>base-commit: 36446de0c30c62b9d89502fd36c4904996d86ecd
+>-- 
+>2.53.0
 
-This triggers lockdep after io.latency is configured and I/O completes.
-Full lockdep report:
+Ping. @Jens is there anything still missing before this can be applied?
 
-  WARNING: inconsistent lock state
-  7.1.0-rc2-g6a04b2279273 #1 Not tainted
-  --------------------------------
-  inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
-  swapper/0/0 [HC1[1]:SC0[0]:HE0:SE1] takes:
-  ffff88810c682d10 (&iolat->child_lat.lock){?.+.}-{3:3}, at: blkcg_iolatency_done_bio+0x6e7/0xb90
-  {HARDIRQ-ON-W} state was registered at:
-    lock_acquire+0xd4/0x290
-    _raw_spin_lock+0x3a/0x70
-    iolatency_set_limit+0x49b/0x590
-    cgroup_file_write+0x1c5/0x4b0
-    kernfs_fop_write_iter+0x1d7/0x280
-    vfs_write+0x580/0x630
-    ksys_write+0xec/0x190
-    do_syscall_64+0x156/0x490
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-  irq event stamp: 328476
-  hardirqs last  enabled at (328475): [<ffffffffa4dd93b1>] do_idle+0x261/0x400
-  hardirqs last disabled at (328476): [<ffffffffa68347f3>] common_interrupt+0x13/0x90
-  softirqs last  enabled at (328398): [<ffffffffa4d508ac>] __irq_exit_rcu+0x8c/0x150
-  softirqs last disabled at (328387): [<ffffffffa4d508ac>] __irq_exit_rcu+0x8c/0x150
-
-                            other info that might help us debug this:
-   Possible unsafe locking scenario:
-
-         CPU0
-         ----
-    lock(&iolat->child_lat.lock);
-    <Interrupt>
-      lock(&iolat->child_lat.lock);
-
-                             *** DEADLOCK ***
-
-  1 lock held by swapper/0/0:
-   #0: ffff888103365450 (&virtscsi_vq->vq_lock){-.-.}-{3:3}, at: virtscsi_vq_done+0x9f/0x130
-
-                            stack backtrace:
-  CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 7.1.0-rc2-g6a04b2279273 #1 PREEMPT  1c49bdb9e32f352d2b66a5ca23d36d656c610458
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-5.fc42 04/01/2014
-  Call Trace:
-   <IRQ>
-   dump_stack_lvl+0x54/0x70
-   print_usage_bug+0x26d/0x280
-   mark_lock_irq+0x3ef/0x400
-   ? save_trace+0x3d/0x2f0
-   ? __pfx_stack_trace_consume_entry+0x10/0x10
-   mark_lock+0x117/0x190
-   __lock_acquire+0x570/0x2850
-   ? stack_trace_save+0xa1/0xe0
-   ? __pfx_stack_trace_save+0x10/0x10
-   ? filter_irq_stacks+0x27/0x80
-   ? stack_depot_save_flags+0x32/0x7f0
-   lock_acquire+0xd4/0x290
-   ? blkcg_iolatency_done_bio+0x6e7/0xb90
-   ? kvm_sched_clock_read+0x11/0x20
-   ? local_clock_noinstr+0xc/0xc0
-   ? local_clock+0x15/0x30
-   ? lock_release+0x111/0x470
-   ? blkcg_iolatency_done_bio+0x6e7/0xb90
-   _raw_spin_lock_irqsave+0x4c/0x90
-   ? blkcg_iolatency_done_bio+0x6e7/0xb90
-   blkcg_iolatency_done_bio+0x6e7/0xb90
-   ? __pfx_blkcg_iolatency_done_bio+0x10/0x10
-   __rq_qos_done_bio+0x51/0x60
-   bio_endio+0x135/0x320
-   blk_update_request+0x1e6/0x570
-   scsi_end_request+0x4b/0x410
-   scsi_io_completion+0x83/0x170
-   ? __pfx_virtscsi_complete_cmd+0x10/0x10
-   virtscsi_vq_done+0xd7/0x130
-   ? lock_acquire+0xd4/0x290
-   ? __pfx_virtscsi_vq_done+0x10/0x10
-   ? local_clock_noinstr+0xc/0xc0
-   ? local_clock+0x15/0x30
-   vring_interrupt+0x13b/0x150
-   ? __pfx_vring_interrupt+0x10/0x10
-   __handle_irq_event_percpu+0x145/0x4b0
-   handle_irq_event+0x54/0xb0
-   handle_edge_irq+0x111/0x320
-   __common_interrupt+0x97/0xf0
-   common_interrupt+0x7e/0x90
-   </IRQ>
-   <TASK>
-   asm_common_interrupt+0x26/0x40
-  RIP: 0010:pv_native_safe_halt+0x13/0x20
-  Code: d3 a5 01 00 cc 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 2f 39 21 00 f3 0f 1e fa fb f4 <c3> cc cc cc cc cc 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90
-  RSP: 0018:ffffffffa7607e00 EFLAGS: 00000246
-  RAX: 000000000005031b RBX: ffffffffa4dd93b1 RCX: ffffffffa683884b
-  RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffffa4dd93b1
-  RBP: ffffffffa7607ed0 R08: ffff888117bf408b R09: 1ffff11022f7e811
-  R10: dffffc0000000000 R11: ffffed1022f7e812 R12: 0000000000000000
-  R13: 0000000000000000 R14: 0000000000000000 R15: ffffffffa7f6cff0
-   ? do_idle+0x261/0x400
-   ? ct_kernel_exit+0xcb/0x110
-   ? do_idle+0x261/0x400
-   default_idle+0x9/0x20
-   default_idle_call+0x73/0xb0
-   do_idle+0x261/0x400
-   ? __pfx_do_idle+0x10/0x10
-   ? local_clock_noinstr+0x30/0xc0
-   ? local_clock+0x15/0x30
-   cpu_startup_entry+0x36/0x40
-   rest_init+0x207/0x210
-   start_kernel+0x321/0x370
-   x86_64_start_reservations+0x24/0x30
-   x86_64_start_kernel+0x13a/0x140
-   common_startup_64+0x13e/0x147
-   </TASK>
-
-Fix it by using spin_lock_irqsave() in iolatency_clear_scaling().
-Use irqsave rather than spin_lock_irq() because the same helper is also
-called from pd_offline_fn paths where hardirqs can already be disabled
-by blkcg teardown/deactivation locks. spin_unlock_irq() would wrongly
-enable hardirqs in those paths.
-
-Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
-Signed-off-by: Yu Kuai <yukuai@fygo.io>
----
- block/blk-iolatency.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 53e8dd2dfa8a..9152dc86b08b 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -811,16 +811,18 @@ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
- 	if (blkg->parent) {
- 		struct iolatency_grp *iolat = blkg_to_lat(blkg->parent);
- 		struct child_latency_info *lat_info;
-+		unsigned long flags;
-+
- 		if (!iolat)
- 			return;
- 
- 		lat_info = &iolat->child_lat;
--		spin_lock(&lat_info->lock);
-+		spin_lock_irqsave(&lat_info->lock, flags);
- 		atomic_set(&lat_info->scale_cookie, DEFAULT_SCALE_COOKIE);
- 		lat_info->last_scale_event = 0;
- 		lat_info->scale_grp = NULL;
- 		lat_info->scale_lat = 0;
--		spin_unlock(&lat_info->lock);
-+		spin_unlock_irqrestore(&lat_info->lock, flags);
- 	}
- }
- 
--- 
-2.51.0
-
+Thanks,
+Christoph
