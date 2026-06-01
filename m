@@ -1,72 +1,40 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288F52D7DCE
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 16:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03403E172F
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 17:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780331392; cv=none; b=Ags99uQVmJzxpwdU2FvYvSO8yAGzcDVH8kT+KoqWjqRBTl7EJj5qVrrJt5CApmyxo8CpRgFPntS/TGduLF780tLN4ZAvODK3Lw5AWq24gXV2NaZlxZ5j8VJZ/xw6nO04AXXkvmAjUxh2ga83bLm7z00m5aHgtBKTBuFT6nDLBXc=
+	t=1780333823; cv=none; b=CmywRadelyuteBHm4Ry7aOHFqWpk2vEhLYpvx9j0T08SIhtDIY5JtJyPnM6D6XypcMR3E3DDGH/LFSEox34XdbIKjifnM1lvK1kjRdbcit1c/sc5xg5VUwxQOWVw3DEzt0OgRuMyY6hrxWdxvf+wh5Ex4GiS1mDX1fiBSM2ZpKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780331392; c=relaxed/simple;
-	bh=gYfCSgj3xaS2A+YYEac1pAqnPzQSSEZ5MXWL4piM4aE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lNToc/k1DmH1Y+6q9FilFaICRQwaWK9gj6fGyNuTjkc3uCiyF9phH1py3Xnx7PJNjcNk1mNOlk/KgTjK2VZObfW1Y6K5mkOz6I+nxX1qBorCZ5FlAjhFay9PxzHrFQZ6oi5MkZ7lXcc8qdBNzNOWBnEODTlduLcMxoQM36jRPtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WeBEhzp+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1780333823; c=relaxed/simple;
+	bh=b6egYJT4oZVxlemiFQImQn69udxJzInQv9n8wbEyHTU=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=eE+OlHBcPgeNiccrkc/7R88qx5BJKKl3jC9Z2Z8HkWs3+focFrTJ5oIp1elNdff6WWGs8ULurkIZCGcW5fe5ARTsWpPEQlWWkH9pLMQEsqLHLQBzCvHEmTWtJBf4aEJdlTrk+AYHzhbDD1AUFSPWJxLPcw2o4TfD9cHgcsss5Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VsRMuo1T; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WeBEhzp+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780331389;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FCDOSgEjx1fWi4LkC7ZBCwOBu8wF5UiqKv/5m50uf7w=;
-	b=WeBEhzp+0oUFBjdurs15z44lHz1aGigxVYB5nDGYXv1zTsjaEiyxlwe/k1Fvu2umN73fF4
-	oPlduZEtqe9rOnXydYkRcfuN2YcspqyumZLt7T1NhuSpdY5mDSwsneJaDGWYoK+e1E2ojg
-	zJzYBOKdWneJ+6pDypauCgA5tHM75m4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-18-nWJ4074FMJq1TUF3XnERQQ-1; Mon,
- 01 Jun 2026 12:29:48 -0400
-X-MC-Unique: nWJ4074FMJq1TUF3XnERQQ-1
-X-Mimecast-MFC-AGG-ID: nWJ4074FMJq1TUF3XnERQQ_1780331386
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6384A195609F;
-	Mon,  1 Jun 2026 16:29:45 +0000 (UTC)
-Received: from bfoster (unknown [10.22.80.88])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1AE5B1800347;
-	Mon,  1 Jun 2026 16:29:42 +0000 (UTC)
-Date: Mon, 1 Jun 2026 12:29:40 -0400
-From: Brian Foster <bfoster@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Qu Wenruo <wqu@suse.com>, Damien Le Moal <dlemoal@kernel.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bvanassche@acm.org>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
-Message-ID: <ah2zdCQ0WA6ol2Gn@bfoster>
-References: <ahRocb0Vs_m6RF_O@fedora>
- <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp>
- <ahZGxoI6oHQ_vSrx@fedora>
- <d1b5a737-f0e3-4927-b762-430b37fbb2f9@I-love.SAKURA.ne.jp>
- <ahZeYQ0cLE1i8TGs@fedora>
- <fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp>
- <ab5492b6-a053-4e3b-8c59-2e836ae85bc4@kernel.org>
- <20260528083848.GA7694@lst.de>
- <36571f8a-4df8-4152-b078-d82dbff4ad7e@suse.com>
- <20260601144034.GA4918@lst.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VsRMuo1T"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=wuwhtsZvxtY5jXpZxPPq8x6oexBxcLSzun5iMte6UC4=; b=VsRMuo1TXRsso3tGC20B7I5bar
+	jMyxtqAf6qUA/bNZVxS8Yg6Te4ld5t8rkP6VBTkdf51pUySHwOG7LOssV3Bv7mVJX2vW2SuBMjIF2
+	FDnvG2bjaskpH1SXWPVDVgKEc5SckpIShTFo7WW/WKtbAIYwmG6FC2cdUpKNYR3O5RxcceG8JXavr
+	/loluxgqrYXS+Ao/Y6pJ5FEYZyJ8mkxwPqhCTLpS1EoaPrGGnZzMJPWExd5nQyu6Oqe0BawEF4JZH
+	3Y/WSFR6Q0qFYVCXMnbniio52UZhB70FEIHIbhxtu9BPh5O5jrCP/wpXkfZLNEx1bleMmjYSXS/0P
+	y/LUJKsQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wU69a-00000000Se3-2HZZ;
+	Mon, 01 Jun 2026 17:10:18 +0000
+Date: Mon, 1 Jun 2026 18:10:18 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: bio_copy_from_iter
+Message-ID: <ah28-oyillEaOrm1@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,26 +43,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260601144034.GA4918@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, Jun 01, 2026 at 04:40:34PM +0200, Christoph Hellwig wrote:
-> On Thu, May 28, 2026 at 07:46:24PM +0930, Qu Wenruo wrote:
-> >> e.g. 9c7504aa72b6 ("xfs: track and serialize in-flight async buffers against
-> >> unmount")
-> > Considering the xfs fix is pretty old, it's before the fix hint thus no 
-> > such mention in fstests.
-> >
-> > Do you happen to know which test case is for that fix?
-> > I'd like to adapt it for btrfs as a reproducer.
-> 
-> No.  Adding Brian who authored that commit.
-> 
+I'd like to remove copy_page_to_iter() (and only have
+copy_folio_to_iter()).  That led me to looking at bio_copy_to_iter().
+At first glance, switching it to bio_for_each_folio_all() makes a lot of
+sense -- if there are large folios involved, then we can copy an entire
+folio at a time instead of a page.
 
-I haven't followed through the full thread here... But if you're just
-looking for an existing test case associated with the commit above on
-XFS, I did some quick digging and xfs/311 is the original reproducer for
-that one.
+But what I can't prove to my satisfaction is that every bio passed to
+bio_copy_to_iter() necessarily contains folios.  That's not currently
+necessary, but will become necessary in the future. [1].
 
-Brian
+But I started thinking about what we could/should do in the future
+when bvecs refer only to physical addresses and not pages.  What we'll
+have is a list of (phys, len) tuples and need to copy that to an iter.
+We don't have an API for that today.  Should we add:
 
+copy_phys_to_iter(phys_addr_t phys, size_t len, struct iov_iter *i);
+
+We arguably get even more benefit by doing this as we'd no longer break the
+bio up into pages or folios, but can keep the contiguous chunks.  Not that
+optimising bio_uncopy_user() is going to be a particularly big win,
+but this API might be useful in places that are more performance sensitive.
+
+[1] I believe all these bvecs are constructed using
+blk_rq_map_user_iov() which can end up calling bio_add_vmalloc(),
+and vmalloc pages will not be folios.
