@@ -1,156 +1,298 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7543DBD49
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 15:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780327785; cv=pass; b=q3vlY/r5nK4Z0PFavNuqRhMwRNSmRpHBVIKT0BSvAPsjdbWCjl9YJpJ1klnaT8DQ8xrTuEWntYigoDyL7Gy8P5HGD6T7vf0WrP7t6WmHiEXlInX5OTxF4gjraLWTFN/aFl6l5OeMZM0PIGqqYzRBbqdwXUeMvNzvPFbEZjzZtRU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780327785; c=relaxed/simple;
-	bh=oi0Ow0XDEAtBt8RurlGOIpfeSQVz3W7XDL/R+3Ddj+k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q2+xtrRmVeD5COPjGedv88R4qZJUwEtBegMOZL48zeJEp6Afid8j/7+in6yA7JAx3IegTHsYA5G84ihkwmwLAbNdjSo/fxRh69LD3dYfilXflh3cJNiIUcmjJm5p/OD0TS9Wox7yJQSTSqnpNaaEmttqeFxHT4WyHFJ3NZMyDAc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JmZLuySf; arc=pass smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60D82C11CF
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 16:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780330426; cv=none; b=FtNOL9G6bWMOvSUEOolNZuYn5whL7lFbya3wCXcArs9MZptE6KQMqb+4WdbirQg45IxFFsrL2ClDZhu/tcdSMMhDpyvRfE2szabDxfs1/2MrkzKwOtNx3obZXr/NyUHicQ/J37OiObWdwqrYyoZniwi+jHkrwCFXKxBVC29VjXo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780330426; c=relaxed/simple;
+	bh=E/TGQivgMHJimA4BSIx91AIeOI43MoqvNuXHOsohYIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pi9Ij/cnfe+kIjhvcIgI5NYmjqJrAiy3eoP0iFtc0O/pqKHXgop3aywZrmwQrrEWF4ebth35QgOWzhWwYDfxL6GiPIR1B7yAzLAgBd4saHZPMmaoEMCsws8vFFcZhelSFOIWD7q5/woMujGVq7fctP6Xm3Ycd55McDq+7L7XMCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=aVT8OoJF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=aHvqfMtb; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=aVT8OoJF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=aHvqfMtb; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmZLuySf"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-43b6f19b7d4so7431501fac.0
-        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 08:29:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780327778; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JUtnoDX3PVwV+9v89C0uhGKB//O+/iceFCB0eW+X4hznxGI98CnF6E2If21K4CekUT
-         4+gdmlDHFmKjlGSHHHXH1vrWkNbuGw3ZBe9GPfFqldvC6EGBmfWkXkFPKRZi+dlzMVpK
-         5a6ugsXCpWmdrrbMSj/2u3AL/e8hCtD9211hZMkYJvB/97pIdGCF9R6n7JDHE7CepTsO
-         dJPB+GYg7PzTAMMU6p0tsVsxCwihu5tUTa4HNMjlh6Y5b/MWZXZrIHmjdaLBGXQZ/hBp
-         FSsyYz5PA/GX0qmLZttHV5I9gSXW9DZHKmHGWGZeUiaVLYGFhOMdw36lfPtqT5En/RWR
-         aD+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=rUPzckO9AMpnkkxRCiU7u4+L0pp2JXYyq4zdqyU3+88=;
-        fh=FTOE5p5TZKIuxh5klEuSgzOxsC+WiItJby+1cgJ7DsQ=;
-        b=JgeTi2rtEx9ASws8HcRYramtgaBxoufFbpSuwyJBLC6nMPeZbiX9x+vW6cCplPiOL9
-         VIJZ7lpEMUrE9IhLTQzDzoDg+ilMR5PBP1XP5X9VvRoKGVYWQt/5kvnuapRKfxD/71cY
-         q1OL/wXUmve1jawHdbVXhS7ct37Uu4n3Hh3gp4IR8/kPHLmVQi9zILjuIuoE8kzursK/
-         635mO5s/8ztd4EZolMgYeI3ngjtKZ8nO3t6xLYpHj10cXhVAiulvPBh4ofbO2RoLJxsa
-         b1j4O4f66xDWcG8HR9w3jbC8F9OXPWtSeCz14XxBoNNH2/s0uqykk2vl8EEetCw5dLez
-         nG0A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780327778; x=1780932578; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rUPzckO9AMpnkkxRCiU7u4+L0pp2JXYyq4zdqyU3+88=;
-        b=JmZLuySf1jxWK5iDgOUg/KC5wpk4YcTA4iHLvu3SPSE6bQSgAc/uzq/xgRbv1H9GNx
-         jX29mDcnib861fKIHDOztT1C9J5hKrp56xQwMKnFZSG9MZ2K4BKW95lLf3VbLQlRAITb
-         6L6p248QXgPCy070KkpSC25fdw1D25He37dIruTaI9ei4g1N0p1vtyPZa/fem+Q+Cr4e
-         hexmIDrKKR1LzML5Axq6NWW7A0Q1OR2JYMMutEM0sjOrz4E9SuQSQXE0tNsTI7bH4k+t
-         asSyLZRtVrAP+Ad03YBGvDtgn3bphgeBTVK3+I5flNNT3KAejHZb1WkkA3k4Qn7fpefh
-         SZUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780327778; x=1780932578;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rUPzckO9AMpnkkxRCiU7u4+L0pp2JXYyq4zdqyU3+88=;
-        b=O0DDvh36nGZOooIuijs2x/JDjdGB9scBvzj5Y3DG7Bsq9l4X1DAAvVynOgPHUivIEj
-         awvcwWDcICrQK+xXU9qKFmcDAvSppERTD7+3pt9O7YrB5qH0aYmPXlvQ+Z4TBmj6+Kuh
-         5jem0wH5jusp1MrNvpGV0qprHjbikgoT8Sm0TrP5tGbmVz6lJONRfNk4CqAnfb4Cd6z7
-         WMY5obOKuvhnaZ4WEntmV6RXSbciUB1HyrjUqQ8Xiz3pCEzOMDjbcTN5RP0J990taFBa
-         L8eG82DVRKUGCTwZtx1uZCZGxynuFzhh6IkLATcOiRJkP9ymRa6egqVdP8DnE5H5SPBM
-         BkkQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/6jAGivBn3+w18271PpCsM8OWt2gNCy+usneJE1JDtP2RWvjWK8I6M7V/ynBJYGiegB/F5f43DaEcRmw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMJL5pc7vXU8G+iJIbb7Exx0ZH2vF33INsdw96uT8t/6CdDsVU
-	MSehH3/FKfv32pdoIBEHFtdodhn/+V8J7lZFR7U7u9CCjMefEjyyfd/ZPYcQ7sFaoTl7bYwdEda
-	zLoa9QtqVRknPPj+mVgoaugpb3doCUUE=
-X-Gm-Gg: Acq92OHSbwdDdIvTnh6GPxMWJlOCZMXWX8xSPpRV8FXpuEkp7PUuWs+Lv/2FdxSJh9d
-	dx0eYYpGL6iBBLtZ/CixVplmnkaUWM8D/2ZhqYrNKjYwhHEFqY/OUW4ZSjrjX+LR9Lc3htOQpQ9
-	Hm0zjhBl7jyQL4HkdQqdY/p9KrZl/RQlRJ+gL5S9rZRIa4HZMa1kvVGLBn9azIs11ak7X8MY605
-	6BPJtzPkMBYVlELvWYd8/pKNr3XQebFzRTbEMVCrgQqxeCmL3TcbFHKXccFCIlDgVV0zJ56mDOP
-	tdlLfdKYWgOGAInnCjb7SG7DLW3aUQ4MLORQ35WxF4Nw3FIYGTjSz4RySM+XrcQnHlpzO7kEoHX
-	c9HiRnpNLt83Kid78Dg==
-X-Received: by 2002:a05:6870:e393:b0:43b:4e42:9867 with SMTP id
- 586e51a60fabf-43ca40b19a2mr6888184fac.15.1780327778175; Mon, 01 Jun 2026
- 08:29:38 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="aVT8OoJF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="aHvqfMtb";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="aVT8OoJF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="aHvqfMtb"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 099A566EFF;
+	Mon,  1 Jun 2026 16:13:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1780330423; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jtc6oyZiF4kCKo40Q8Qd02iiK1OO9fKOz3hhpZNr2ug=;
+	b=aVT8OoJFEtrdmv56Ex2gMhb9OWmVzDY3x5p3wE0tm+mpXRPi2QyU2MwH/vENI0Tp6vROmx
+	WSsmGttZvY+VbH/XUadFCGkRRjtfaVmZGJ0yEnKBTm/hIclS8PtlQukGutaxxVblXQIx9u
+	HEBMaBwooSg2Os9MbGBpwQ8K1HyDV+Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1780330423;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jtc6oyZiF4kCKo40Q8Qd02iiK1OO9fKOz3hhpZNr2ug=;
+	b=aHvqfMtbIxSp0nm2BDX1gcueAk6Jlml8T+fMYwDIk9KFo14nZBbQNN650JtV6jIMWUzy/S
+	xvDg2o3JZIDo5xCQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1780330423; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jtc6oyZiF4kCKo40Q8Qd02iiK1OO9fKOz3hhpZNr2ug=;
+	b=aVT8OoJFEtrdmv56Ex2gMhb9OWmVzDY3x5p3wE0tm+mpXRPi2QyU2MwH/vENI0Tp6vROmx
+	WSsmGttZvY+VbH/XUadFCGkRRjtfaVmZGJ0yEnKBTm/hIclS8PtlQukGutaxxVblXQIx9u
+	HEBMaBwooSg2Os9MbGBpwQ8K1HyDV+Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1780330423;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jtc6oyZiF4kCKo40Q8Qd02iiK1OO9fKOz3hhpZNr2ug=;
+	b=aHvqfMtbIxSp0nm2BDX1gcueAk6Jlml8T+fMYwDIk9KFo14nZBbQNN650JtV6jIMWUzy/S
+	xvDg2o3JZIDo5xCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7FFB779A7;
+	Mon,  1 Jun 2026 16:13:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id JQ6kOLavHWoFbQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 01 Jun 2026 16:13:42 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 85F1CA0EC0; Mon, 01 Jun 2026 18:13:38 +0200 (CEST)
+Date: Mon, 1 Jun 2026 18:13:38 +0200
+From: Jan Kara <jack@suse.cz>
+To: Yu Kuai <yukuai@fygo.io>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, jack@suse.cz
+Subject: Re: [PATCH] block, bfq: release cgroup stats with bfq_group
+Message-ID: <gscrsynwbepdg6ogl2vivebdjodfvfmwq37sc3lsyry5yn7rrl@xjyhzloepooa>
+References: <20260601061502.899552-1-yukuai@fygo.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1ab8c579-eb76-4227-8a72-6ec819135219@I-love.SAKURA.ne.jp>
- <ag1223nAa0wZ8ALC@fedora> <fda8abc8-6aa2-463b-bf72-865f6b838034@I-love.SAKURA.ne.jp>
- <ahRocb0Vs_m6RF_O@fedora> <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp>
- <ahZGxoI6oHQ_vSrx@fedora> <d1b5a737-f0e3-4927-b762-430b37fbb2f9@I-love.SAKURA.ne.jp>
- <ahZeYQ0cLE1i8TGs@fedora> <fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp>
- <ab5492b6-a053-4e3b-8c59-2e836ae85bc4@kernel.org> <20260528083848.GA7694@lst.de>
- <36571f8a-4df8-4152-b078-d82dbff4ad7e@suse.com>
-In-Reply-To: <36571f8a-4df8-4152-b078-d82dbff4ad7e@suse.com>
-From: Ming Lei <tom.leiming@gmail.com>
-Date: Mon, 1 Jun 2026 10:29:25 -0500
-X-Gm-Features: AVHnY4Jo-naNphBnmCUZCCUNQGptd23v8VZulBU6wmiaiHgGY3TyxDIc_hpXI6A
-Message-ID: <CACVXFVOSm=VpYfxUEpYk4yC2N1uAoK=vbg_A=h51GXeeArzCpw@mail.gmail.com>
-Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
-To: Qu Wenruo <wqu@suse.com>
-Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>, 
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Jens Axboe <axboe@kernel.dk>, 
-	Bart Van Assche <bvanassche@acm.org>, linux-block <linux-block@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, linux-btrfs@vger.kernel.org, 
-	David Sterba <dsterba@suse.com>, linux-fsdevel@vger.kernel.org, 
-	Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260601061502.899552-1-yukuai@fygo.io>
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [3.70 / 50.00];
+	URIBL_BLACK(7.50)[fygo.io:email];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	URIBL_BLOCKED(0.00)[suse.cz:email,imap1.dmz-prg2.suse.org:helo,suse.com:email];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email,imap1.dmz-prg2.suse.org:helo,fygo.io:email]
+X-Spam-Level: ***
+X-Spam-Score: 3.70
 
-On Thu, May 28, 2026 at 5:16=E2=80=AFAM Qu Wenruo <wqu@suse.com> wrote:
->
->
->
-> =E5=9C=A8 2026/5/28 18:08, Christoph Hellwig =E5=86=99=E9=81=93:
-> > On Thu, May 28, 2026 at 03:11:05AM +0900, Damien Le Moal wrote:
-> >> It sounds like the VFS unmount call needs to have something that waits=
- for
-> >> sync() to complete. Though, it really feels very strange that an FS ca=
-n complete
-> >
-> > I don't think this is the VFS-controlled VFS file data writeback, which
-> > we wait on, but some kind of fs controlled metadata.  And yes, it looks
-> > like those file systems are buggy in that area.  We definitively had
-> > such bugs in XFS before and fixed them.
-> >
-> > e.g. 9c7504aa72b6 ("xfs: track and serialize in-flight async buffers ag=
-ainst
-> > unmount")
-> Considering the xfs fix is pretty old, it's before the fix hint thus no
-> such mention in fstests.
->
-> Do you happen to know which test case is for that fix?
-> I'd like to adapt it for btrfs as a reproducer.
->
-> This syzbot report doesn't provide a reproducer.
->
->
-> Another thing is, if it's some btrfs bios on-the-fly after
-> close_ctree(), the most common symptom should be NULL pointer
-> dereference inside various btrfs endio functions.
-> As all those end_bbio_*() functions are referring to either fs_info or
-> inode/eb, thus if the fs is unmounted before the bio finished, they
-> should all cause use-after-free.
->
-> The only exception is discard, which is using blkdev_issue_discard()
-> thus has no such reference to btrfs internal structure, but that's out
-> of my understanding.
+On Mon 01-06-26 14:15:02, Yu Kuai wrote:
+> BFQ cgroup stats contain percpu counters embedded in struct bfq_group,
+> but the old free path destroys them from bfq_pd_free(), which is tied
+> to blkg policy-data teardown.
+> 
+> That is not the same lifetime as struct bfq_group. BFQ pins bfq_group
+> while bfq_queue entities refer to it, so bfq_pd_free() can drop the
+> policy-data reference while other bfq_group references still exist. The
+> following blkcg change also defers policy-data release through RCU and
+> leaves BFQ to run the final bfqg_put() from an RCU callback. For that
+> conversion, stats teardown must belong to the last bfq_group put, not to
+> policy-data teardown.
+> 
+> Move stats teardown to bfqg_put() so the embedded counters are destroyed
+> exactly when the last bfq_group reference is released, before kfree(bfqg).
+> 
+> Without this preparatory change, the RCU-delayed policy-data free
+> conversion reproduced the following KASAN report:
+> 
+>   BUG: KASAN: slab-use-after-free in percpu_counter_destroy_many+0xf1/0x2e0
+>   Write of size 8 at addr ffff88811d9409e0 by task test_blkcg/535
+> 
+>   CPU: 0 UID: 0 PID: 535 Comm: test_blkcg Not tainted 7.1.0-rc2-g1e14adca0199 #1 PREEMPT  ea13f83d4b74a12510d20db4a7d9a0fe8275f05c
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-5.fc42 04/01/2014
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x54/0x70
+>    print_address_description+0x77/0x200
+>    ? percpu_counter_destroy_many+0xf1/0x2e0
+>    print_report+0x64/0x70
+>    kasan_report+0x118/0x150
+>    ? percpu_counter_destroy_many+0xf1/0x2e0
+>    percpu_counter_destroy_many+0xf1/0x2e0
+>    __mmdrop+0x1d8/0x350
+>    finish_task_switch+0x3f5/0x570
+>    __schedule+0xe8e/0x18a0
+>    schedule+0xfe/0x1c0
+>    schedule_timeout+0x7f/0x1d0
+>    __wait_for_common+0x26c/0x3f0
+>    wait_for_completion_state+0x21/0x40
+>    call_usermodehelper_exec+0x271/0x2c0
+>    __request_module+0x296/0x410
+>    elv_iosched_store+0x1bc/0x2c0
+>    queue_attr_store+0x152/0x1c0
+>    kernfs_fop_write_iter+0x1d7/0x280
+>    vfs_write+0x580/0x630
+>    ksys_write+0xec/0x190
+>    do_syscall_64+0x156/0x490
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+>   Allocated by task 535:
+>    kasan_save_track+0x3e/0x80
+>    __kasan_kmalloc+0x72/0x90
+>    bfq_pd_alloc+0x60/0x100 [bfq]
+>    blkg_create+0x3bb/0xbe0
+>    blkg_lookup_create+0x3a2/0x460
+>    blkg_conf_start+0x24a/0x2d0
+>    bfq_io_set_weight+0x17f/0x430 [bfq]
+>    cgroup_file_write+0x1c5/0x4b0
+>    kernfs_fop_write_iter+0x1d7/0x280
+>    vfs_write+0x580/0x630
+>    ksys_write+0xec/0x190
+>    do_syscall_64+0x156/0x490
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+>   Freed by task 0:
+>    kasan_save_track+0x3e/0x80
+>    kasan_save_free_info+0x46/0x50
+>    __kasan_slab_free+0x3a/0x60
+>    kfree+0x14e/0x4f0
+>    rcu_core+0x6f3/0xcd0
+>    handle_softirqs+0x1a0/0x550
+>    __irq_exit_rcu+0x8c/0x150
+>    irq_exit_rcu+0xe/0x20
+>    sysvec_apic_timer_interrupt+0x6e/0x80
+>    asm_sysvec_apic_timer_interrupt+0x1a/0x20
+> 
+>   Last potentially related work creation:
+>    kasan_save_stack+0x3e/0x60
+>    kasan_record_aux_stack+0x99/0xb0
+>    call_rcu+0x55/0x5c0
+>    blkg_free_workfn+0x130/0x220
+>    process_scheduled_works+0x655/0xb60
+>    worker_thread+0x446/0x600
+>    kthread+0x1f4/0x230
+>    ret_from_fork+0x259/0x420
+>    ret_from_fork_asm+0x1a/0x30
+> 
+> Signed-off-by: Yu Kuai <yukuai@fygo.io>
 
-syzbot log shows the null-ptr-deref  is on WRITE, instead of DISCARD.
+Makes sense. Feel free to add:
 
-https://syzkaller.appspot.com/bug?extid=3Dcd8a9a308e879a4e2c28
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Adding WARN_ON(!lo->lo_backing_file) in loop_queue_rq() might capture
-this bio submission context if this req isn't issued via wq.
+								Honza
 
-Thanks,
-Ming Lei
+> ---
+>  block/bfq-cgroup.c | 43 ++++++++++++++++++++++---------------------
+>  1 file changed, 22 insertions(+), 21 deletions(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index ac83b0668764..37ab70930c8d 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -300,6 +300,25 @@ static struct bfq_group *bfqg_parent(struct bfq_group *bfqg)
+>  	return pblkg ? blkg_to_bfqg(pblkg) : NULL;
+>  }
+>  
+> +static void bfqg_stats_exit(struct bfqg_stats *stats)
+> +{
+> +	blkg_rwstat_exit(&stats->bytes);
+> +	blkg_rwstat_exit(&stats->ios);
+> +#ifdef CONFIG_BFQ_CGROUP_DEBUG
+> +	blkg_rwstat_exit(&stats->merged);
+> +	blkg_rwstat_exit(&stats->service_time);
+> +	blkg_rwstat_exit(&stats->wait_time);
+> +	blkg_rwstat_exit(&stats->queued);
+> +	bfq_stat_exit(&stats->time);
+> +	bfq_stat_exit(&stats->avg_queue_size_sum);
+> +	bfq_stat_exit(&stats->avg_queue_size_samples);
+> +	bfq_stat_exit(&stats->dequeue);
+> +	bfq_stat_exit(&stats->group_wait_time);
+> +	bfq_stat_exit(&stats->idle_time);
+> +	bfq_stat_exit(&stats->empty_time);
+> +#endif
+> +}
+> +
+>  struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
+>  {
+>  	struct bfq_entity *group_entity = bfqq->entity.parent;
+> @@ -321,8 +340,10 @@ static void bfqg_get(struct bfq_group *bfqg)
+>  
+>  static void bfqg_put(struct bfq_group *bfqg)
+>  {
+> -	if (refcount_dec_and_test(&bfqg->ref))
+> +	if (refcount_dec_and_test(&bfqg->ref)) {
+> +		bfqg_stats_exit(&bfqg->stats);
+>  		kfree(bfqg);
+> +	}
+>  }
+>  
+>  static void bfqg_and_blkg_get(struct bfq_group *bfqg)
+> @@ -433,25 +454,6 @@ void bfq_init_entity(struct bfq_entity *entity, struct bfq_group *bfqg)
+>  	entity->sched_data = &bfqg->sched_data;
+>  }
+>  
+> -static void bfqg_stats_exit(struct bfqg_stats *stats)
+> -{
+> -	blkg_rwstat_exit(&stats->bytes);
+> -	blkg_rwstat_exit(&stats->ios);
+> -#ifdef CONFIG_BFQ_CGROUP_DEBUG
+> -	blkg_rwstat_exit(&stats->merged);
+> -	blkg_rwstat_exit(&stats->service_time);
+> -	blkg_rwstat_exit(&stats->wait_time);
+> -	blkg_rwstat_exit(&stats->queued);
+> -	bfq_stat_exit(&stats->time);
+> -	bfq_stat_exit(&stats->avg_queue_size_sum);
+> -	bfq_stat_exit(&stats->avg_queue_size_samples);
+> -	bfq_stat_exit(&stats->dequeue);
+> -	bfq_stat_exit(&stats->group_wait_time);
+> -	bfq_stat_exit(&stats->idle_time);
+> -	bfq_stat_exit(&stats->empty_time);
+> -#endif
+> -}
+> -
+>  static int bfqg_stats_init(struct bfqg_stats *stats, gfp_t gfp)
+>  {
+>  	if (blkg_rwstat_init(&stats->bytes, gfp) ||
+> @@ -552,7 +554,6 @@ static void bfq_pd_free(struct blkg_policy_data *pd)
+>  {
+>  	struct bfq_group *bfqg = pd_to_bfqg(pd);
+>  
+> -	bfqg_stats_exit(&bfqg->stats);
+>  	bfqg_put(bfqg);
+>  }
+>  
+> -- 
+> 2.51.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
