@@ -1,30 +1,31 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECC032B10A
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 07:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B272147E5
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 07:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780298918; cv=none; b=jLESdiPK1hpVOvl6IQYZ89tmniB6QmnIj/fXCMB2y4MdNozmeM3wXL3r4gYveiy/BSZJhv1A2VmJOg68gJoKDdThpDOiw1kQ6/q62VTo2NqtkSY2qjvAxQdzMi5cC8qfoAkSqeS3g5hxureAqMi+xR1AUXiQyxAlpTXoa08yRDw=
+	t=1780299039; cv=none; b=F2zJZea2kFYIdKspWcQJPxgkio0Q3mnEtcFpg83umBK0iaKKjYkLGwYMxkpB16pn4VXG7ODyvyeuSd0H2l72TGBYmuULB8p+l5AQGU4JLaxHE1F9FL50YY4JKhNIw8l0wd3t/XJyTyoKDmAg9+NbvYFxN4Z7Vm6tN08daDoUBwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780298918; c=relaxed/simple;
-	bh=nbH5gWiA3/J9KoLf2ikmlrdSqVcfC8nE0KhGdG6L1TU=;
+	s=arc-20240116; t=1780299039; c=relaxed/simple;
+	bh=sQDFIEpPCk9nv5tsvv0u1xHmqyf3Jd31JUz+qNtUQac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pJPmuCYPq4tGA1ImA1kHit1Kgxc7NKN6Bu385PmCJlJlm6vU1f2I+h8RnUjUTs6bbFwfpS6RcTB2QRf646VLnHW9Y/U11Mcogj/2Tt5MK/oQ4H54S2sKncGJevqyCAWOX0GCydC3q1HayNQHmDfVwH2lZNaM4+k4HlaceZgE3MI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=mtm8kBNyzvIz2sePOvAbaAxRQZxQLDi13K9Wm+tcAXKYpFILPJlSFuHxMkDW++aQOb1nXMNSBSuRZ7B3KXnPMoofviBcEd6KzXg8mxMkqpuQofKIZaAcw2prILiX3r3fq1s/pgfadhJhma6uJuuzjxAEqkLz3VsdnJA8i3GQLQ0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id A84DF68B05; Mon,  1 Jun 2026 09:28:34 +0200 (CEST)
-Date: Mon, 1 Jun 2026 09:28:34 +0200
+	id 938CC68BEB; Mon,  1 Jun 2026 09:30:33 +0200 (CEST)
+Date: Mon, 1 Jun 2026 09:30:32 +0200
 From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
 	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [PATCH v5 05/12] block/cgroup: Improve lock context annotations
-Message-ID: <20260601072834.GB7799@lst.de>
-References: <cover.1779997063.git.bvanassche@acm.org> <a30486e2e9695614e4407d5ad8c75d637f5b31db.1779997063.git.bvanassche@acm.org>
+Subject: Re: [PATCH v5 06/12] block/cgroup: Inline
+ blkg_conf_{open,close}_bdev_frozen()
+Message-ID: <20260601073032.GC7799@lst.de>
+References: <cover.1779997063.git.bvanassche@acm.org> <f7be976e5a79afc88970ea16158d0a64bbf8f25e.1779997063.git.bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,15 +34,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a30486e2e9695614e4407d5ad8c75d637f5b31db.1779997063.git.bvanassche@acm.org>
+In-Reply-To: <f7be976e5a79afc88970ea16158d0a64bbf8f25e.1779997063.git.bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, May 28, 2026 at 12:45:42PM -0700, Bart Van Assche wrote:
-> Add lock context annotations where these are missing. Move the
-> blkg_conf_prep() annotation into block/blk-cgroup.h to make it visible
-> to all blkg_conf_prep() callers.
+On Thu, May 28, 2026 at 12:45:43PM -0700, Bart Van Assche wrote:
+> The blkg_conf_open_bdev_frozen() calling convention is not compatible
+> with lock context annotations. Inline both blkg_conf_open_bdev_frozen()
 
-Looks good:
+Maybe say fold into the only caller here?  Inline to me implies turning
+it into an inline function.
+> +	q = ctx.bdev->bd_queue;
+> +	blkg_conf_close_bdev(&ctx);
+> +	blk_mq_unfreeze_queue(q, memflags);
+> +
+>  	return nbytes;
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+[...]
+
+> +	q = ctx.bdev->bd_queue;
+> +	blkg_conf_close_bdev(&ctx);
+> +	blk_mq_unfreeze_queue(q, memflags);
+>  	return ret;
+
+It looks like this could be easily shared into a single label
+if you check for a non-zero ret and return that and else nbytes.
+
+Otherwise this looks good.
 
