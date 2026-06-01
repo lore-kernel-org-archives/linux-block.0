@@ -1,113 +1,100 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D012D839C
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 16:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288F52D7DCE
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 16:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780330522; cv=none; b=XeHO1sVVNvf+JY6RzkK2zPeDYwUQE3RpdBKkgiqfrkAEt63Ybz6bXpOqPqVMHYrgVSzCSMF1m/KuhpYLOrlDJL2Lc37HMJzWkHuv1WMrTK7GR5rMDiYGqk0usnoErwMfsbW3OX7+c+gVQIqLqn+dcn6LTiUg+06vfr/qBGU/2Ho=
+	t=1780331392; cv=none; b=Ags99uQVmJzxpwdU2FvYvSO8yAGzcDVH8kT+KoqWjqRBTl7EJj5qVrrJt5CApmyxo8CpRgFPntS/TGduLF780tLN4ZAvODK3Lw5AWq24gXV2NaZlxZ5j8VJZ/xw6nO04AXXkvmAjUxh2ga83bLm7z00m5aHgtBKTBuFT6nDLBXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780330522; c=relaxed/simple;
-	bh=gGgts3vFhcvuNsY6Ezu3ekzCGMMCBZk5YhQuXrdHvKc=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Gv855T50//+9b0st01h4UAEaSmss7em21X1wYCQd8SqOFwvJ1sIi/JaF21bruL8ZTd5VVJ8KtngQEaWJ+v2KFXtIPutYQHkJXdmaqNE2pqbZN88vDV7dzyEyJ+1AO3j8oaCJlC7eIZZ8Xf6q0QahgvJJ6rFCDeB4V/t4hqyBmSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=abVp4bcQ; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1780331392; c=relaxed/simple;
+	bh=gYfCSgj3xaS2A+YYEac1pAqnPzQSSEZ5MXWL4piM4aE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNToc/k1DmH1Y+6q9FilFaICRQwaWK9gj6fGyNuTjkc3uCiyF9phH1py3Xnx7PJNjcNk1mNOlk/KgTjK2VZObfW1Y6K5mkOz6I+nxX1qBorCZ5FlAjhFay9PxzHrFQZ6oi5MkZ7lXcc8qdBNzNOWBnEODTlduLcMxoQM36jRPtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WeBEhzp+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="abVp4bcQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WeBEhzp+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780330519;
+	s=mimecast20190719; t=1780331389;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TTT+gEI5KEOq43SEOKUvHTrUsZAXYCqPmLn6rmfCg7c=;
-	b=abVp4bcQ3q0Io61Ko5VbDsb34SF5g7OF4FMrcS32vs2dbXNY7SXAsNxMgxGX4/k/dcBx2e
-	Vk5MwZCGVmce5OrPmFNqeQRBy0uIz0qYZ7aEz4QtVmJYfyHcfqLKOq4rNjUKHiW2AvsgIf
-	rrSE8E/A9ESlOHwHLF8TiSQYHCLvld4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=FCDOSgEjx1fWi4LkC7ZBCwOBu8wF5UiqKv/5m50uf7w=;
+	b=WeBEhzp+0oUFBjdurs15z44lHz1aGigxVYB5nDGYXv1zTsjaEiyxlwe/k1Fvu2umN73fF4
+	oPlduZEtqe9rOnXydYkRcfuN2YcspqyumZLt7T1NhuSpdY5mDSwsneJaDGWYoK+e1E2ojg
+	zJzYBOKdWneJ+6pDypauCgA5tHM75m4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-596-CD5e8A7LMVOcOyd1kCx4yA-1; Mon,
- 01 Jun 2026 12:15:16 -0400
-X-MC-Unique: CD5e8A7LMVOcOyd1kCx4yA-1
-X-Mimecast-MFC-AGG-ID: CD5e8A7LMVOcOyd1kCx4yA_1780330515
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-18-nWJ4074FMJq1TUF3XnERQQ-1; Mon,
+ 01 Jun 2026 12:29:48 -0400
+X-MC-Unique: nWJ4074FMJq1TUF3XnERQQ-1
+X-Mimecast-MFC-AGG-ID: nWJ4074FMJq1TUF3XnERQQ_1780331386
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5228018002DC;
-	Mon,  1 Jun 2026 16:15:14 +0000 (UTC)
-Received: from [10.44.49.105] (unknown [10.44.49.105])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3642C18004A3;
-	Mon,  1 Jun 2026 16:15:11 +0000 (UTC)
-Date: Mon, 1 Jun 2026 18:15:08 +0200 (CEST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Leonid Ravich <lravich@amazon.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>, Alasdair Kergon <agk@redhat.com>, 
-    Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
-    Jens Axboe <axboe@kernel.dk>, Horia Geanta <horia.geanta@nxp.com>, 
-    Gilad Ben-Yossef <gilad@benyossef.com>, linux-crypto@vger.kernel.org, 
-    dm-devel@lists.linux.dev, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] dm crypt: batch all sectors of a bio per crypto
- request
-In-Reply-To: <20260601085644.13026-5-lravich@amazon.com>
-Message-ID: <d3bb0caa-cd29-a68e-0676-0b9418751865@redhat.com>
-References: <20260601085644.13026-1-lravich@amazon.com> <20260601085644.13026-5-lravich@amazon.com>
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6384A195609F;
+	Mon,  1 Jun 2026 16:29:45 +0000 (UTC)
+Received: from bfoster (unknown [10.22.80.88])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1AE5B1800347;
+	Mon,  1 Jun 2026 16:29:42 +0000 (UTC)
+Date: Mon, 1 Jun 2026 12:29:40 -0400
+From: Brian Foster <bfoster@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Qu Wenruo <wqu@suse.com>, Damien Le Moal <dlemoal@kernel.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Bart Van Assche <bvanassche@acm.org>,
+	linux-block <linux-block@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
+	linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v3] loop: Fix NULL pointer dereference in lo_rw_aio()
+Message-ID: <ah2zdCQ0WA6ol2Gn@bfoster>
+References: <ahRocb0Vs_m6RF_O@fedora>
+ <1a9f53d4-6f48-4df8-a3d8-2b0e442a163a@I-love.SAKURA.ne.jp>
+ <ahZGxoI6oHQ_vSrx@fedora>
+ <d1b5a737-f0e3-4927-b762-430b37fbb2f9@I-love.SAKURA.ne.jp>
+ <ahZeYQ0cLE1i8TGs@fedora>
+ <fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp>
+ <ab5492b6-a053-4e3b-8c59-2e836ae85bc4@kernel.org>
+ <20260528083848.GA7694@lst.de>
+ <36571f8a-4df8-4152-b078-d82dbff4ad7e@suse.com>
+ <20260601144034.GA4918@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260601144034.GA4918@lst.de>
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
+On Mon, Jun 01, 2026 at 04:40:34PM +0200, Christoph Hellwig wrote:
+> On Thu, May 28, 2026 at 07:46:24PM +0930, Qu Wenruo wrote:
+> >> e.g. 9c7504aa72b6 ("xfs: track and serialize in-flight async buffers against
+> >> unmount")
+> > Considering the xfs fix is pretty old, it's before the fix hint thus no 
+> > such mention in fstests.
+> >
+> > Do you happen to know which test case is for that fix?
+> > I'd like to adapt it for btrfs as a reproducer.
+> 
+> No.  Adding Brian who authored that commit.
+> 
 
+I haven't followed through the full thread here... But if you're just
+looking for an existing test case associated with the commit above on
+XFS, I did some quick digging and xfs/311 is the original reproducer for
+that one.
 
-On Mon, 1 Jun 2026, Leonid Ravich wrote:
-
-> When the underlying skcipher driver advertises support for multiple
-> data units in a single request (CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT),
-> configure the cipher with cc->sector_size as data_unit_size and
-> submit one request per bio instead of one request per sector.  This
-> removes per-sector overhead in the crypto API hot path: request
-> allocation, callback dispatch, completion handling, and SG setup.
-> 
-> The optimisation is enabled automatically at table load when all
-> of the following hold:
-> 
->  - the cipher is non-aead (i.e. skcipher);
->  - tfms_count is 1 (interleaved per-sector keys would break batching);
->  - the IV mode is plain or plain64 (the only modes whose generator
->    produces a sequential 64-bit little-endian counter that the cipher
->    can extend by adding the data-unit index, matching the convention
->    documented in crypto_skcipher_set_data_unit_size());
->  - the iv_gen_ops->post() hook is unset (lmk and tcw use it; both are
->    already excluded by the IV-mode test, but the explicit check makes
->    the assumption durable against future IV modes);
->  - dm-integrity is not stacked (no integrity tag or integrity IV);
->  - the cipher driver advertises multi-data-unit support.
-> 
-> A new CRYPT_MULTI_DATA_UNIT cipher_flag, set once at construction
-> time, gates the multi-data-unit path.  The existing per-sector path
-> in crypt_convert_block_skcipher() is unchanged; the new
-> crypt_convert_block_skcipher_multi() is reached from a small dispatch
-> in crypt_convert() and shares the same backlog/-EBUSY/-EINPROGRESS
-> flow control with the per-sector path.
-> 
-> Heap-allocated scatterlists are stashed in dm_crypt_request and freed
-> in crypt_free_req_skcipher() to avoid races between the synchronous-
-> success free path and async-completion reuse from the request pool.
-> On -ENOMEM during scatterlist allocation, the bio is requeued via
-> BLK_STS_DEV_RESOURCE rather than failed, matching the behaviour of
-> the existing -ENOMEM path for crypto request allocation.
-> 
-> Verified end-to-end with a byte-equivalence test: encrypted output of
-> plain64 dm-crypt with the multi-data-unit path matches output of the
-> single-data-unit path bit-for-bit over a 256 MB device.
-> 
-> Signed-off-by: Leonid Ravich <lravich@amazon.com>
-
-Reviewed-by: Mikulas Patocka <mpatocka@redhat.com>
+Brian
 
