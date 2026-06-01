@@ -1,119 +1,170 @@
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1807337C90A
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 18:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D948936493C
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 18:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780340128; cv=none; b=oH84pofxmU1dMZk/2iOfxt6hDE6EphUs3TOOr4eZwrN+qi3IB8b7GsHZD5P4gclFK3HmMhQq29YtXaePW0K8N5mpbX+8aRBhPPgpM1w2JAF4fRckupVngDqLesW25gMoKWkST1RGbrLkDT5MH+4vN81XsMC13l7gR2p8Kzl113I=
+	t=1780340260; cv=none; b=l7WgSh4qUvEj2VU5nSrCiGhhQ6A7hT/4/9mhC9ZJRoH/gCWDzJP6fbFsLwWbZoqpTrzClSJ7hNNZgOBiGGuk56VU6lRY8A6/CBtRC089dxwVP01w4WgoPo54+57XQmymAimsJjh8GXAHkX9p7TwRW+eNFR0vozFXGYi9ipRS/zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780340128; c=relaxed/simple;
-	bh=92Odugj+uqpqoYzi39SNfTycubqdCPubhM2crY0//Ec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kRTTOWJeK8KPrZMF2JGpd2U3fmyNLif9u0eLyk1GqzO8pq/0dxjPUcPwAo8sfGKkWfRjog8sTQPgONT6u0VFXI9KxEgW4FIQQk/GDoDpLwmk/sWKLraDWPh0g9ErYE/rsmQCRsIXpxm0XQBQToZAlUGhjLcgxYXNVitwczTHX5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=QV2T7QNL; arc=none smtp.client-ip=209.85.161.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1780340260; c=relaxed/simple;
+	bh=89tOA/vg8ODxo9Bd1kZAVRxj1Qun7rG5iGCntXOsfwM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rN4py8/cQDadTovukdkZGO3F8UXS+Z3YGSsriHjGAus39WcDHfWqfGx/x0xa2zSQLq+apC6vj+t79GOg7D8/4CeLZjAGIFD5jSariUFgO03bvZoYVbsmWUH++85ZY3VMV2K/xuPIHLvdCK84s5ZDvV7NNcrVlEK2fm+K5s5gDMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lRv9FZWv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Orov3lwY; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lRv9FZWv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Orov3lwY; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="QV2T7QNL"
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-69e2e3c773fso352920eaf.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 11:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780340125; x=1780944925; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=on/PdQMM/Rm6Fk0z4T5hTZtddcW3TdPodKG2MMd3qBY=;
-        b=QV2T7QNLc9vB/Oirl/z89JlU0PFtHyj9FJ9EgseLNPSjxtcNXloLZcSyZ0bN8Ktxaa
-         ZoOXXwRA/wR2Q6m8+zPzihH2PejLkVl+75QhId1IQLTFaeL/i7GwzfY0BHbaHs4Huq6H
-         IM40udvJAUZNNbIPal0HyuYvhbSmFuX/zngpTiY6CRYDyM9eItC5Ib8BR/Rwaj0NESJ6
-         1jtrv01wAfLzbv2yoiIpy35KOehNWUVMuItaH6JE0iZbOTv80FeaKVWjGVklbRUpxFXf
-         5AXKLPHIONNbUBB6IgdZ8z3CXDjWYW1KPxj5WmMVpi73VxwOIvLzMUbpdXYDCEMvxh8q
-         mWEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780340125; x=1780944925;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=on/PdQMM/Rm6Fk0z4T5hTZtddcW3TdPodKG2MMd3qBY=;
-        b=qwD1x+ES7vPvkaQUEPG+p/GGpg6sePGcE4WC0KlGTkbOxYUYZw2NoiUtV24fSxvF9C
-         /Hp0nLE6fcFsdNA9knXGMkk1xmWxiIXZ3jiYGPmOPnM4ywDpkO8c8YNuWmDj/Pq0O9EJ
-         qefzyErQd/oKcM2sO0nim9wl3EfC4LZcSlVWle7K/+EwbuZefi4v4Qrw81eJFiUJw7wR
-         YSq+pHc/vjlGNEqwb+JL+JZ6bVOGOZiHawXfueOblW1Tql3ILmPX4RO4flyxHVXairze
-         uXc7GsDWYZWh1MCmfdPDq9XPJ7TGpPCA1kR4WtxiumHiqpRCK/bznENVdDrpidXBCynG
-         71lQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9s0NSp9jgw0Fxu5LJIvrzG5hJIaLSH/nWV6Q0Hh7Ysv91hC+rM96ceeNB5Sbw2c+ooBNapUQFgGjCPNA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZO1l7MW7tZO1qKFjdNdGiuA2CfnnIdqiLDOJ5ZaWavf3IBn7W
-	FbB/+VyL7WBYsKX/n8hocEL/uLKDsAd4wK5L4VI7P1eurDn5nB12RtcXmwaByPvqpoM=
-X-Gm-Gg: Acq92OGoweXlinVNnsFMsLwmh7RRG8BjdwCpT1UmO58V45J44wsOOMszcYPdTLudrEl
-	8DCbnnKAiF/9Ai7WYCHLANHHMqJuy5Q5QrM/xb/t3p/ugZDocpEChKrWg8E/TJkyGf0r3cHdvlR
-	rdcgZ76f4ysBApGjkoaYo9WM0PJh5bAsCoQLDJQNEobl5MaEn3s1rrcIF3aZonkRZVHh5RDPeHz
-	paPRlnbQK+gwMq2QjwYOUtH+OK5I1TlL8onkhUtR0DykIkyuVkt2jiKqMLsKL0BJE5RDz6bB0e8
-	BZcjg4JnzA/nXCZhgFXo0Qir1uykWj1j30S+r/GlsNZU0EcS3kYAPAtXcHmh1oK5g+uD5NU7E9L
-	kYGdiOX7A5G9ljOXCeWfeIzBZth2s0XiWfp090/EJKML1qgGAPmxYSisysRLIrBJ4rxhliaL36i
-	CTbLBTfLPvKH/A0xCgDoGXZ4okyepeg8C+8652ukr4lWXDB+BFoHGl0bGMVqsZcWnp7fJ34n7eP
-	BdSjkWTWhiuZ8ZNk7E=
-X-Received: by 2002:a4a:d191:0:b0:69e:2da0:c1e2 with SMTP id 006d021491bc7-69e2da0c366mr1336452eaf.26.1780340124939;
-        Mon, 01 Jun 2026 11:55:24 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e067de2b8sm6985070eaf.4.2026.06.01.11.55.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2026 11:55:24 -0700 (PDT)
-Message-ID: <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
-Date: Mon, 1 Jun 2026 12:55:23 -0600
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lRv9FZWv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Orov3lwY";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lRv9FZWv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Orov3lwY"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 23A346B645;
+	Mon,  1 Jun 2026 18:57:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1780340256;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
+	b=lRv9FZWvI94VUYOpxJMCy2kLL6Bu6+3EsNZUzAnvNuCKo1QUuQkOI3zKss9ofXNX+YfLe3
+	q9w0lHsP9TeeJn46LjTjLKEt38KlHUn7A7uVTNCLmx3d55vxFi3wMomNejbBeSOEYjhxGT
+	YMVAcWgJVLsKq3fmuW/i901rtAqBWc0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1780340256;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
+	b=Orov3lwYX6ld8pYiDK+atsNbPbR+/S5KpgtJ9aR09hUcycQjEor5HwTw3n2Xj68UjjUL2p
+	7ZW8RpYU3TeQjwCw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1780340256;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
+	b=lRv9FZWvI94VUYOpxJMCy2kLL6Bu6+3EsNZUzAnvNuCKo1QUuQkOI3zKss9ofXNX+YfLe3
+	q9w0lHsP9TeeJn46LjTjLKEt38KlHUn7A7uVTNCLmx3d55vxFi3wMomNejbBeSOEYjhxGT
+	YMVAcWgJVLsKq3fmuW/i901rtAqBWc0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1780340256;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
+	b=Orov3lwYX6ld8pYiDK+atsNbPbR+/S5KpgtJ9aR09hUcycQjEor5HwTw3n2Xj68UjjUL2p
+	7ZW8RpYU3TeQjwCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0E462779A7;
+	Mon,  1 Jun 2026 18:57:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 1jo9AyDWHWrlDgAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Mon, 01 Jun 2026 18:57:36 +0000
+Date: Mon, 1 Jun 2026 20:57:30 +0200
+From: David Sterba <dsterba@suse.cz>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Daniel Vacek <neelx@suse.com>, David Sterba <dsterba@suse.com>,
+	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v7 00/43] btrfs: add fscrypt support
+Message-ID: <20260601185730.GE880787@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20260513085340.3673127-1-neelx@suse.com>
+ <CAPjX3FdHJpZUVk2dfA+Ov5K6vOSsOJMUaxCU4G8y1qg6baMXYw@mail.gmail.com>
+ <20260531002812.GA2302@sol>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] md-7.2-20260531
-To: Yu Kuai <yukuai@fygo.io>
-Cc: linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
- Abd-Alrhman Masalkhi <abd.masalkhi@gmail.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, Chen Cheng <chencheng@fnnas.com>,
- Christoph Hellwig <hch@lst.de>, Li Nan <magiclinan@didiglobal.com>,
- Thorsten Blum <thorsten.blum@linux.dev>
-References: <20260531112618.160409-1-yukuai@fygo.io>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260531112618.160409-1-yukuai@fygo.io>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260531002812.GA2302@sol>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	HAS_REPLYTO(0.30)[dsterba@suse.cz];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,sashiko.dev:url];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
+X-Spam-Level: 
+X-Spam-Score: -4.00
 
-On 5/31/26 5:26 AM, Yu Kuai wrote:
-> Hi Jens,
-> 
-> Please consider pulling the following changes into your for-7.2/block
-> branch.
-> 
-> This pull request contains:
-> 
-> Bug Fixes:
-> - Only requeue dm-raid bios when dm is suspending. (Benjamin Marzinski)
-> - Reset raid10 read_slot when reusing r10bio for discard. (Chen Cheng)
-> - Fix raid1/raid10 deadlock in read error recovery path. (Abd-Alrhman Masalkhi)
-> - Fix raid1/raid10 error-path detection with md_cloned_bio(). (Abd-Alrhman Masalkhi)
-> - Fix raid1/raid10 bio accounting for split md cloned bios. (Abd-Alrhman Masalkhi)
-> - Fix raid1 nr_pending leak in REQ_ATOMIC bad-block path. (Abd-Alrhman Masalkhi)
-> 
-> Improvements:
-> - Skip redundant raid_disks updates when the value is unchanged. (Abd-Alrhman Masalkhi)
-> 
-> Cleanups:
-> - Update MAINTAINERS email addresses. (Yu Kuai, Li Nan)
-> - Clean up raid1 read error handling. (Christoph Hellwig)
-> - Move the exceed_read_errors condition out of fix_read_error(). (Christoph Hellwig)
-> - Use str_plural() in raid0 dump_zones(). (Thorsten Blum)
+On Sat, May 30, 2026 at 05:28:12PM -0700, Eric Biggers wrote:
+> On Fri, May 22, 2026 at 09:00:46AM +0200, Daniel Vacek wrote:
 
-Pulled, thanks.
+> It's been really hard to find time to review this huge patchset.  I've
+> started going through it and will try to leave comments next week.
 
-Side note - emails from you with the new email address all end up in
-spam. I just noticed some of them this morning. But I think you want to
-ensure that the DKIM etc part of your email is all kosher, gmail flags
-all of it.
+Thank you. The patchset is huge but we'd like your feedback namely on
+the crypto layer changes, i.e. the first 8 patches. As this is outside
+of btrfs code we can't fix it incrementally later on. The current size
+of btrfs-only can be slightly reduced but a lot of must stay so it's
+clear how the fscrypt API is used.
 
--- 
-Jens Axboe
+I'm not sure if it was mentioned before wrt how to get this merged. My
+preferred way is to get your Ack for the crypto changes and then we can
+add it to linux-next via our btrfs git.
+
+It's too late for 7.2 also because you've asked for some changes. So the
+target is 7.3, hopefully giving all of us enough time to have the
+mergeable version in ~7.2-rc3 timeframe.
+
+If you have other ideas how to proceed with the merge process, please
+let me know.
+
+> In the mean time it would be really helpful if you went through the
+> Sashiko reviews
+> (https://sashiko.dev/#/patchset/20260513085340.3673127-1-neelx%40suse.com)
+> and address the ones that make sense to.  It found 93 issues including
+> 16 critical ones, which is kind of a lot.  Some of them are the same
+> things I'm noticing already.  Same for the issue that Christoph noticed
+> where new devices can be added; Sashiko had already found that too.
+> 
+> If I'm going to have to use my limited human review time to point out
+> issues that were already found, that's not a great use of time.
+> 
+> I also don't see any information about how this was tested (and will
+> continue to be tested in the future).
+
+The testing is not straightforward as it needs 3 projects to
+synchronize, kernel, fstests and btrfs-progs. Testing may need to use
+custom git branches for all of them. For btrfs-progs the changes will ge
+it in soon. For fstests it can be a chicken-egg problem, as they don't
+accept tests for unmerged code. We've been using our fstests [1] with
+additional fixups (not upstreamable, related to CI workarounds). Though
+I'm not sure if Daniel has updated the branch with his most recent
+version.
+
+[1] https://github.com/btrfs/fstests branch staging
