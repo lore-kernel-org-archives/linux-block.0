@@ -1,204 +1,198 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79232352038;
-	Mon,  1 Jun 2026 06:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCDD382F31
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 07:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780294508; cv=none; b=iuxeUu8RIfT7m0CfukdauHuvplSg7DZjyue0546IoAVMhGv0EAKNR82K6T3mCWUDlpaw9I1oKMNYi9vJ/it570m9ux/S9lx4Cyslgcoctx8qsThP5uvMW/JjJZ94/IzWLVKrXbZC56zawrU/tv+tcApNJpuZI3aDGWj4KIjHHnw=
+	t=1780297568; cv=none; b=CBjjV/SQXiSshnSx7bk2uFpjHnPvpq31bFshrFMHrmXWSmoiwCj+3vlFkZIprRDBAICV9HBkj0Ag79cQ8NC5qhWVbQIyuH2w19qHx5TPOUYRL83glpuvCmVcj6Sg0gvKP7LzRy6UBvcotfyYy3aH8YoVIp+7LbxP3cMG5vd9t/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780294508; c=relaxed/simple;
-	bh=E3aFpFNnCDGr2Jp8lUAFmNesLZn3mKTThVVZck/Kohk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l3jruwnC0UgneuvgRYPiuJ/1vxBybd66/fli4KeMQt9nD0986MKAUvMgipplVnKc9jx+teevbqoRAST3BzsIg6QrHzlf6dUIQAfRiSO8XjQyF+aro7C0bcYycrrBQEc3K2oFU/Fa6kvAwR8x4pFlHdpauF5YriwyccW1XA5YAns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 572551F0089D;
-	Mon,  1 Jun 2026 06:15:04 +0000 (UTC)
-From: Yu Kuai <yukuai@fygo.io>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Cc: yukuai@fygo.io,
-	linux-kernel@vger.kernel.org,
-	jack@suse.cz
-Subject: [PATCH] block, bfq: release cgroup stats with bfq_group
-Date: Mon,  1 Jun 2026 14:15:02 +0800
-Message-ID: <20260601061502.899552-1-yukuai@fygo.io>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1780297568; c=relaxed/simple;
+	bh=/KXv5NUj94usQ0ZgycG2iLencI22+GtcIGoB/xGqHWE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qb/EHCzJRrNeycfb/pN+ZN8leqsHyk4+xoa4S2BsZz6JN9PdYp+BqmLK1o2qKL500pnRF4JTcmCrXGsfMGHe2C8yjuSZnIkrH0KPLtGFG3qiQynnCxGCvcBbb6nV+kIMpZkVhQ3xzC4zhbnd1x0T2aoAQcrYHv49407oItuA3o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LQOa8Rbz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Wyqd/6lW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LQOa8Rbz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Wyqd/6lW; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LQOa8Rbz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Wyqd/6lW";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LQOa8Rbz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Wyqd/6lW"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4ACB5680E7;
+	Mon,  1 Jun 2026 07:06:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780297565; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BLr13s06hU3qP4KBbqLKv5ZBYcMx0rBcU2SLhQd5AS8=;
+	b=LQOa8RbzikrUArXOBNmvQepTY8wJAFYirLAjL0USvvHt7mRXnbAk+Y0mOlIF252CtX+G1w
+	CbZqNQvJe9PGdjyRU6CHZZ9FVetskHJxHlEopHLOh1YrDtr4w8gaOaIS6jNzfCb4mnLrUl
+	d+QzfuoQ9+7Ual5gP4E0nBIF2KG02es=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780297565;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BLr13s06hU3qP4KBbqLKv5ZBYcMx0rBcU2SLhQd5AS8=;
+	b=Wyqd/6lWiDN6IRH/SOjJV838JvCTndplCc880iAs3InuDLdN1dEaRLCCC1WjcTcmM785Ht
+	d3PlTtJ6rpaVFeDg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=LQOa8Rbz;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="Wyqd/6lW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1780297565; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BLr13s06hU3qP4KBbqLKv5ZBYcMx0rBcU2SLhQd5AS8=;
+	b=LQOa8RbzikrUArXOBNmvQepTY8wJAFYirLAjL0USvvHt7mRXnbAk+Y0mOlIF252CtX+G1w
+	CbZqNQvJe9PGdjyRU6CHZZ9FVetskHJxHlEopHLOh1YrDtr4w8gaOaIS6jNzfCb4mnLrUl
+	d+QzfuoQ9+7Ual5gP4E0nBIF2KG02es=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1780297565;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BLr13s06hU3qP4KBbqLKv5ZBYcMx0rBcU2SLhQd5AS8=;
+	b=Wyqd/6lWiDN6IRH/SOjJV838JvCTndplCc880iAs3InuDLdN1dEaRLCCC1WjcTcmM785Ht
+	d3PlTtJ6rpaVFeDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F027A779A7;
+	Mon,  1 Jun 2026 07:06:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id cXqkOFwvHWqGPgAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 01 Jun 2026 07:06:04 +0000
+Message-ID: <b83d888f-f905-4744-bf40-f4b8879f5cdb@suse.de>
+Date: Mon, 1 Jun 2026 09:06:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] nvme-multipath: set BIO_REMAPPED on bios remapped to
+ per-path namespace disks
+To: "Achkinazi, Igor" <Igor.Achkinazi@dell.com>,
+ "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
+ "sagi@grimberg.me" <sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>
+References: <MW5PR19MB548483D1FAE4F322E4C97352FD032@MW5PR19MB5484.namprd19.prod.outlook.com>
+ <DS0PR19MB76963295FC34844B413479F9FD092@DS0PR19MB7696.namprd19.prod.outlook.com>
+ <b8d1fda2-a2da-4b35-9bd5-941834f26c32@suse.de>
+ <DS0PR19MB7696FD43E37F19A597121212FD172@DS0PR19MB7696.namprd19.prod.outlook.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <DS0PR19MB7696FD43E37F19A597121212FD172@DS0PR19MB7696.namprd19.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 4ACB5680E7
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	TO_DN_SOME(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
 
-BFQ cgroup stats contain percpu counters embedded in struct bfq_group,
-but the old free path destroys them from bfq_pd_free(), which is tied
-to blkg policy-data teardown.
+On 5/30/26 16:34, Achkinazi, Igor wrote:
+> Hannes Reinecke wrote:
+>> ... or you could introduce __bio_set_dev():
+>>
+>> diff --git a/include/linux/bio.h b/include/linux/bio.h
+>> index 97d747320b35..5a2709adeea7 100644
+>> --- a/include/linux/bio.h
+>> +++ b/include/linux/bio.h
+>> @@ -518,15 +518,20 @@ static inline void blkcg_punt_bio_submit(struct
+>> bio *bio)
+>>    }
+>>    #endif /* CONFIG_BLK_CGROUP */
+>>
+>> -static inline void bio_set_dev(struct bio *bio, struct block_device *bdev)
+>> +static inline void __bio_set_dev(struct bio *bio, struct block_device
+>> *bdev)
+>>    {
+>> -       bio_clear_flag(bio, BIO_REMAPPED);
+>>           if (bio->bi_bdev != bdev)
+>>                   bio_clear_flag(bio, BIO_BPS_THROTTLED);
+>>           bio->bi_bdev = bdev;
+>>           bio_associate_blkg(bio);
+>>    }
+>>
+>> +static inline void bio_set_dev(struct bio *bio, struct block_device *bdev)
+>> +{
+>> +       bio_clear_flag(bio, BIO_REMAPPED);
+>> +       __bio_set_dev(bio, bdev);
+>> +}
+>> +
+>>    /*
+>>     * BIO list management for use by remapping drivers (e.g. DM or MD)
+>> and loop.
+>>     *
+>>
+>> to avoid all this clear-and-set-flag dance.
+> 
+> 
+> Thanks Hannes. It is a cleaner approach and avoids the clear-and-set
+> dance. However it touches the block layer (bio.h) and would need
+> wider review and testing across all bio_set_dev callers.
+> 
+> I'd prefer to keep this patch as a minimal, nvme multipath fix that
+> Is easy to backport to stable kernels where this race is hitting us
+> today. The __bio_set_dev() approach (or Keith's patch that is
+> removing set_capacity(0) entirely) could follow as the proper
+> long-term solution.
+> 
+Errm. So you are saying: the real solution is too cumbersome,
+let someone else do it?
 
-That is not the same lifetime as struct bfq_group. BFQ pins bfq_group
-while bfq_queue entities refer to it, so bfq_pd_free() can drop the
-policy-data reference while other bfq_group references still exist. The
-following blkcg change also defers policy-data release through RCU and
-leaves BFQ to run the final bfqg_put() from an RCU callback. For that
-conversion, stats teardown must belong to the last bfq_group put, not to
-policy-data teardown.
+I'll happily give you my reviewed by for the proper solution, and help
+you to move the real solution forward.
+But pushing the can down the road ... no.
 
-Move stats teardown to bfqg_put() so the embedded counters are destroyed
-exactly when the last bfq_group reference is released, before kfree(bfqg).
+Cheers
 
-Without this preparatory change, the RCU-delayed policy-data free
-conversion reproduced the following KASAN report:
-
-  BUG: KASAN: slab-use-after-free in percpu_counter_destroy_many+0xf1/0x2e0
-  Write of size 8 at addr ffff88811d9409e0 by task test_blkcg/535
-
-  CPU: 0 UID: 0 PID: 535 Comm: test_blkcg Not tainted 7.1.0-rc2-g1e14adca0199 #1 PREEMPT  ea13f83d4b74a12510d20db4a7d9a0fe8275f05c
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-5.fc42 04/01/2014
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x54/0x70
-   print_address_description+0x77/0x200
-   ? percpu_counter_destroy_many+0xf1/0x2e0
-   print_report+0x64/0x70
-   kasan_report+0x118/0x150
-   ? percpu_counter_destroy_many+0xf1/0x2e0
-   percpu_counter_destroy_many+0xf1/0x2e0
-   __mmdrop+0x1d8/0x350
-   finish_task_switch+0x3f5/0x570
-   __schedule+0xe8e/0x18a0
-   schedule+0xfe/0x1c0
-   schedule_timeout+0x7f/0x1d0
-   __wait_for_common+0x26c/0x3f0
-   wait_for_completion_state+0x21/0x40
-   call_usermodehelper_exec+0x271/0x2c0
-   __request_module+0x296/0x410
-   elv_iosched_store+0x1bc/0x2c0
-   queue_attr_store+0x152/0x1c0
-   kernfs_fop_write_iter+0x1d7/0x280
-   vfs_write+0x580/0x630
-   ksys_write+0xec/0x190
-   do_syscall_64+0x156/0x490
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-  Allocated by task 535:
-   kasan_save_track+0x3e/0x80
-   __kasan_kmalloc+0x72/0x90
-   bfq_pd_alloc+0x60/0x100 [bfq]
-   blkg_create+0x3bb/0xbe0
-   blkg_lookup_create+0x3a2/0x460
-   blkg_conf_start+0x24a/0x2d0
-   bfq_io_set_weight+0x17f/0x430 [bfq]
-   cgroup_file_write+0x1c5/0x4b0
-   kernfs_fop_write_iter+0x1d7/0x280
-   vfs_write+0x580/0x630
-   ksys_write+0xec/0x190
-   do_syscall_64+0x156/0x490
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-  Freed by task 0:
-   kasan_save_track+0x3e/0x80
-   kasan_save_free_info+0x46/0x50
-   __kasan_slab_free+0x3a/0x60
-   kfree+0x14e/0x4f0
-   rcu_core+0x6f3/0xcd0
-   handle_softirqs+0x1a0/0x550
-   __irq_exit_rcu+0x8c/0x150
-   irq_exit_rcu+0xe/0x20
-   sysvec_apic_timer_interrupt+0x6e/0x80
-   asm_sysvec_apic_timer_interrupt+0x1a/0x20
-
-  Last potentially related work creation:
-   kasan_save_stack+0x3e/0x60
-   kasan_record_aux_stack+0x99/0xb0
-   call_rcu+0x55/0x5c0
-   blkg_free_workfn+0x130/0x220
-   process_scheduled_works+0x655/0xb60
-   worker_thread+0x446/0x600
-   kthread+0x1f4/0x230
-   ret_from_fork+0x259/0x420
-   ret_from_fork_asm+0x1a/0x30
-
-Signed-off-by: Yu Kuai <yukuai@fygo.io>
----
- block/bfq-cgroup.c | 43 ++++++++++++++++++++++---------------------
- 1 file changed, 22 insertions(+), 21 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index ac83b0668764..37ab70930c8d 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -300,6 +300,25 @@ static struct bfq_group *bfqg_parent(struct bfq_group *bfqg)
- 	return pblkg ? blkg_to_bfqg(pblkg) : NULL;
- }
- 
-+static void bfqg_stats_exit(struct bfqg_stats *stats)
-+{
-+	blkg_rwstat_exit(&stats->bytes);
-+	blkg_rwstat_exit(&stats->ios);
-+#ifdef CONFIG_BFQ_CGROUP_DEBUG
-+	blkg_rwstat_exit(&stats->merged);
-+	blkg_rwstat_exit(&stats->service_time);
-+	blkg_rwstat_exit(&stats->wait_time);
-+	blkg_rwstat_exit(&stats->queued);
-+	bfq_stat_exit(&stats->time);
-+	bfq_stat_exit(&stats->avg_queue_size_sum);
-+	bfq_stat_exit(&stats->avg_queue_size_samples);
-+	bfq_stat_exit(&stats->dequeue);
-+	bfq_stat_exit(&stats->group_wait_time);
-+	bfq_stat_exit(&stats->idle_time);
-+	bfq_stat_exit(&stats->empty_time);
-+#endif
-+}
-+
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
- {
- 	struct bfq_entity *group_entity = bfqq->entity.parent;
-@@ -321,8 +340,10 @@ static void bfqg_get(struct bfq_group *bfqg)
- 
- static void bfqg_put(struct bfq_group *bfqg)
- {
--	if (refcount_dec_and_test(&bfqg->ref))
-+	if (refcount_dec_and_test(&bfqg->ref)) {
-+		bfqg_stats_exit(&bfqg->stats);
- 		kfree(bfqg);
-+	}
- }
- 
- static void bfqg_and_blkg_get(struct bfq_group *bfqg)
-@@ -433,25 +454,6 @@ void bfq_init_entity(struct bfq_entity *entity, struct bfq_group *bfqg)
- 	entity->sched_data = &bfqg->sched_data;
- }
- 
--static void bfqg_stats_exit(struct bfqg_stats *stats)
--{
--	blkg_rwstat_exit(&stats->bytes);
--	blkg_rwstat_exit(&stats->ios);
--#ifdef CONFIG_BFQ_CGROUP_DEBUG
--	blkg_rwstat_exit(&stats->merged);
--	blkg_rwstat_exit(&stats->service_time);
--	blkg_rwstat_exit(&stats->wait_time);
--	blkg_rwstat_exit(&stats->queued);
--	bfq_stat_exit(&stats->time);
--	bfq_stat_exit(&stats->avg_queue_size_sum);
--	bfq_stat_exit(&stats->avg_queue_size_samples);
--	bfq_stat_exit(&stats->dequeue);
--	bfq_stat_exit(&stats->group_wait_time);
--	bfq_stat_exit(&stats->idle_time);
--	bfq_stat_exit(&stats->empty_time);
--#endif
--}
--
- static int bfqg_stats_init(struct bfqg_stats *stats, gfp_t gfp)
- {
- 	if (blkg_rwstat_init(&stats->bytes, gfp) ||
-@@ -552,7 +554,6 @@ static void bfq_pd_free(struct blkg_policy_data *pd)
- {
- 	struct bfq_group *bfqg = pd_to_bfqg(pd);
- 
--	bfqg_stats_exit(&bfqg->stats);
- 	bfqg_put(bfqg);
- }
- 
+Hannes
 -- 
-2.51.0
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
