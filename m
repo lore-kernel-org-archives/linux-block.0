@@ -1,105 +1,138 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F339937BE85
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 18:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3DB2F39CE;
+	Mon,  1 Jun 2026 19:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780340374; cv=none; b=SFvC/6QeG/rNGM0W0SiwpdgFny8PiJxaOy/oIkbZlVAV7ZoGqpC/Y6cY1TQEb2P06WpiAk7OuCH89LCrmigAxr//d8saMlso0dhLdiBdREdyugFDB1fXlrJbw57WdAid+teS/uMlBDvfAjcJC+zk+7hePqfjA2lDqwGBQm/WZDc=
+	t=1780340721; cv=none; b=h6nu8yw90IHwaMHT8EwezgVj3BdvTDVn0fzCBB8cTzpCbvYRS++bfRDvNsikTMUeUZwIx9DlOf/NkJ/nE60PxjOryTx63aSHEyTC1UqLx79AYlqtyesMR29mCAQNERks1Hd5rqcPo5BecgS9QrpdM3mEqDudeGjqpcIuZRbJk00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780340374; c=relaxed/simple;
-	bh=Oahdd1iyQAdZ95ufgwnXaEBMw30/SX3sNkls3ORHuvI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=gl5SCBiirCtxkZh7lfZUrHOpaRpIbNZY0j6RH6BbYB8jDPZ8tX2e0vaF2MCd+vST2JHPimnY8IYyLRgjvSLODoMtCpEyxn1h5REbnZy36kigbxClqFo2f/EuxwcJJD66QDXM9G1zuX1ia3ePPJ9nHiJLM7wz4zKFkBr6PrgtP9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=fB5hycku; arc=none smtp.client-ip=209.85.160.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1780340721; c=relaxed/simple;
+	bh=BgDWW1g7rNywB4H6AACTNNWqVGslzNiqnPqXuTucn7M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QCFYJiFN5d0fCl/qoYjj8n/HHIuRbNG8z0RvILjNSb1LJZ7CKD9CxNlunV2hukW1BgzpyHMwrjOQZX0jTb0wvUE8ndEYu6AKe1LV9zRUCyjL9Pnbw760H/shdnUO2UqH1WAYm7X3IHaU1HbaSfPvfj6d47a1oxdE+7cENzhnyGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=fail smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=qweCHwW6; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="fB5hycku"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-43d2c7b5a6aso89983fac.0
-        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 11:59:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780340372; x=1780945172; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LBiOs3FxTFG2gkTy6rTBpEb67IkQRWWZbBsLVd+5Kqs=;
-        b=fB5hyckunecC9TV/G25nJIbpsCq6skjo8dvHRn+XSzWiQl5ZfZnJHxjIGgwITG54t/
-         RQIw3tiptESpAbV8Cqp/t4ktw97oSkGTSZHeUaWcWBLZIKgYu0bfNjNai2zYbpFg7VSO
-         ZPJbAIKVdOmGp1gs8Kg+IdbpI6EqUrPlQYTA+RXjJOFmPwLipxdac/PvY6uSugyaOzUC
-         KHXIW/uQK0U0HAz1L9MCZtior3urI/jPy/HFON+nzYeZv+jW60Dsq8dplsmivpTq4NQs
-         QxbERlR2L3398UJkmvW1bB5xnnAUlsGmG/itir15SdU950cvECv6BRIbe1acjCM5xExd
-         RaMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780340372; x=1780945172;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LBiOs3FxTFG2gkTy6rTBpEb67IkQRWWZbBsLVd+5Kqs=;
-        b=F5vzLc1x2biW8cs04HC/XDuFJvwXblCqgaj1QnDMzQEv5T2c98MZRBU7v/zm5PEHs6
-         w04n1NuXyfe53O5N39D2W91qWG++6RgoBe6uTyLSWLd9iWnsOWEoW+98XAYDlyQlTXIw
-         ID5SI+3OCYmur3BxK9p+CdybqSKUXlvbUrIAMADSO2OOeNB53xdo6d6cEuoWoL7dtAcV
-         38Up5TPuHjTJIKHDCN9U1OkXcUNs+x2hFlWsm0GW+mnR5FKs1UDqRmY1Md/SqNzU6u6v
-         Bn89SpvORtJfLK3wK9ZkN1M4KSvm/deag2F57GQLLAavspVRhN/UtpZXiBCwgKHS4WVM
-         HDeQ==
-X-Gm-Message-State: AOJu0YyEa6AtjL2LFfmNm2VYPXtd0OjyIlnJ2uYwyksqsmyv/RCDR1QB
-	Yaq1AVmHns/XTMvQAZFFL6VeURJhKiYG9EfVibp0assz8GLSgR8/GguzG0soE4m7/N4=
-X-Gm-Gg: Acq92OGycTiACZw4y5S3btIapWn+xXBAE0QSMj4CZCzVfrYmAlJDHDMgmyD47JGWCSJ
-	v+Rh5+tlctIVKC6v0w2dDtTd24lw/rE+1WZnaFr+SamzUlslZK/teDjybqiAkhtnn+v8dqwcDGP
-	4hzUsWmpayApvOjw6m/nE/6RsYNLu9oisMu1Z78vOwCG3NM7ztFIdh0g3eSQNc/j9hA0UUnO2WO
-	A3BLZAnakhvg9zGiSC1Jj3IrQbat55t94l8PyQytM+jpZzEQ0SV1DQbb4qAO4UcBgZ/MznIKSmO
-	dpSnqOwJEODUuUC7MGklplvFJbiOALO3KSmnJl4kBCX44IS3BA8e8aLfGv2Hq4Oaxqpv2/sibiZ
-	gySYIvFbgkULT7AyVdMaCYLrBRyK3gEu6NVMpiOMbZxojOOqrZwzOZlr2X2H/U7jJNe+6AGpHS1
-	yJtpsLoTyfJ9xVB7X30KSnX1Ksj1QULu2QNZn9Kf1zf0tvsRdkrZfXbvqFaFgi5Tzm1w1xPYiTr
-	GYoGYW+L5rRGw06qV0Q+Q1p
-X-Received: by 2002:a05:6820:2219:b0:69e:2fa:a5d5 with SMTP id 006d021491bc7-69e105a424bmr7103390eaf.55.1780340371861;
-        Mon, 01 Jun 2026 11:59:31 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e067e911csm6386319eaf.5.2026.06.01.11.59.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 11:59:31 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Yu Kuai <yukuai@fygo.io>
-Cc: linux-kernel@vger.kernel.org, jack@suse.cz
-In-Reply-To: <20260601061502.899552-1-yukuai@fygo.io>
-References: <20260601061502.899552-1-yukuai@fygo.io>
-Subject: Re: [PATCH] block, bfq: release cgroup stats with bfq_group
-Message-Id: <178034037115.437649.11950865294578053638.b4-ty@b4>
-Date: Mon, 01 Jun 2026 12:59:31 -0600
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="qweCHwW6"
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 651HpCAU3980382;
+	Mon, 1 Jun 2026 11:55:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=PPS06212021; bh=vKsCj21f0
+	6MKhuieakW4HkJcvnqBsIueXfH2RskP7zQ=; b=qweCHwW6Sf/0c+DXISdTmPhHL
+	7J6qr2WY7W+gbMN/kdurEItbBVhFvaURehNh7pb5TQeoqK1ks0Tufn/BWKBCzxSl
+	Qb5AhJmZATu7+Ho6pVYByRTnaBCa5iXLPA/gW7PkRqQR7R7zbiB510iZ/AYIsVHi
+	Af12hGR6Jfwg9gu2VvxF2NQe2VEzDIK82NYKfBN7lMBlRm3liYBfsoWGNpsoFDBn
+	KqpEnl2O8DV5sg05brqq/0nj7+cK3f5p2g21+MA4rXktnbRP5ah+3Ge3w73dHahc
+	zKxqiPp7ZJ3+61kzMyAM5AsjRc15D6SlhWb6+hWQxp0kUyE0ayQ66VK9d2epw==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [128.224.246.36])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4efydeb73x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 01 Jun 2026 11:55:48 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Mon, 1 Jun 2026 11:55:46 -0700
+Received: from c38b02c5ee49.wrs.com (10.11.232.110) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Mon, 1 Jun 2026 11:55:45 -0700
+From: Yun Zhou <yun.zhou@windriver.com>
+To: <tom.leiming@gmail.com>, <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yun.zhou@windriver.com>
+Subject: [PATCH] ublk: fix null-ptr-deref in ublk_queue_cmd
+Date: Tue, 2 Jun 2026 02:55:43 +0800
+Message-ID: <20260601185544.1180263-1-yun.zhou@windriver.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjAxMDE4NiBTYWx0ZWRfX9S/ZkuiZtfi0
+ RNN8V1ABwUHGGkwj57T6lPcTjd/hf3aPchdGlx2gPBwD9JrATh27QjlHzgF2NERvRXS04X7WSQO
+ 7pdpyDgSr8aXKIOHXl5jrpq4QCLu6rXod0Fx7HCosPhWTn16z8fTTy8y8r3Dzf3F4jkUx/bioDV
+ fitoLLgOnghM1FKstE74Oo+TjbUbHMaGYPEOyZZWdx/GwAJB//sb/eSlU06BBO8nuuvhjrx33Rx
+ 75SXHdheG0+OwqfwXY2L8EAdbmzfweTn3TngRVXa+tFMWv9bNDyGWvQ8sZE9pQiKv5IYMqZ53W3
+ 5SLzVDmtN+dYbNREN2qMcoLWhW15Qq+l7fK80QrDofdDmhuT+daLYwjo0of3auYG+6OwpEGehy/
+ oDqRpUBGzcmfpvZgbS+qKm5a0AQd6AEp4fPaPyRlFKmrWT6x+DfwoHHggb46qG5enFcgRLdxo84
+ mJO6rPTQh7JTyah+/0Q==
+X-Proofpoint-GUID: TSUX0mV6r5MkXFqM7vozdV-KFP2b_MTm
+X-Authority-Analysis: v=2.4 cv=Iq0utr/g c=1 sm=1 tr=0 ts=6a1dd5b4 cx=c_pps
+ a=AbJuCvi4Y3V6hpbCNWx0WA==:117 a=AbJuCvi4Y3V6hpbCNWx0WA==:17
+ a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=bi6dqmuHe4P4UrxVR6um:22
+ a=iKiJcTA2PjBS6x5JeXcw:22 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8
+ a=nFqGxSASerJtwWmRO4wA:9 a=DcSpbTIhAlouE1Uv7lRv:22 a=cQPPKAXgyycSBL8etih5:22
+ a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-ORIG-GUID: TSUX0mV6r5MkXFqM7vozdV-KFP2b_MTm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-01_05,2026-05-28_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 adultscore=0 priorityscore=1501 clxscore=1011
+ malwarescore=0 impostorscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606010186
 
+ublk_queue_cmd() dereferences ios[tag].cmd without NULL check. The cmd
+pointer can be NULL when ublk_cancel_cmd() races with IO dispatch during
+server teardown:
 
-On Mon, 01 Jun 2026 14:15:02 +0800, Yu Kuai wrote:
-> BFQ cgroup stats contain percpu counters embedded in struct bfq_group,
-> but the old free path destroys them from bfq_pd_free(), which is tied
-> to blkg policy-data teardown.
-> 
-> That is not the same lifetime as struct bfq_group. BFQ pins bfq_group
-> while bfq_queue entities refer to it, so bfq_pd_free() can drop the
-> policy-data reference while other bfq_group references still exist. The
-> following blkcg change also defers policy-data release through RCU and
-> leaves BFQ to run the final bfqg_put() from an RCU callback. For that
-> conversion, stats teardown must belong to the last bfq_group put, not to
-> policy-data teardown.
-> 
-> [...]
+  CPU0 (partition scan work)        CPU1 (io_uring cancel callback)
+  ublk_queue_rq()
+    ublk_prep_req() -> OK
+    check canceling -> false
+                                    ublk_start_cancel()
+                                      quiesce, set canceling, unquiesce
+                                    ublk_cancel_cmd()
+                                      io->cmd = NULL
+    ublk_queue_cmd()
+      cmd = ios[tag].cmd  -> NULL
+      ublk_get_uring_cmd_pdu(cmd) -> null-ptr-deref
 
-Applied, thanks!
+The race window exists because ublk_cancel_cmd() can execute between the
+canceling flag check and the cmd dereference in ublk_queue_cmd(). This
+cannot be closed with simple synchronization since blk_mq_quiesce_queue
+only waits for in-flight dispatches, not requests already past the
+canceling check.
 
-[1/1] block, bfq: release cgroup stats with bfq_group
-      commit: 9e1183a465e4a912cce1e4b389d0d7394c127eb5
+Fix by checking cmd for NULL before dereferencing. When NULL, abort the
+request via __ublk_abort_rq() which handles both recovery (requeue) and
+non-recovery (end with IOERR) cases.
 
-Best regards,
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+Reported-by: syzbot+415b9ec753cd2a196087@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=415b9ec753cd2a196087
+Signed-off-by: Yun Zhou <yun.zhou@windriver.com>
+---
+ drivers/block/ublk_drv.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 6c041eaebdb9..656e0d4e92bb 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -2090,8 +2090,14 @@ static void ublk_batch_queue_cmd(struct ublk_queue *ubq, struct request *rq, boo
+ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+ {
+ 	struct io_uring_cmd *cmd = ubq->ios[rq->tag].cmd;
+-	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
++	struct ublk_uring_cmd_pdu *pdu;
++
++	if (unlikely(!cmd)) {
++		__ublk_abort_rq(ubq, rq);
++		return;
++	}
+ 
++	pdu = ublk_get_uring_cmd_pdu(cmd);
+ 	pdu->req = rq;
+ 	io_uring_cmd_complete_in_task(cmd, ublk_cmd_tw_cb);
+ }
 -- 
-Jens Axboe
-
-
+2.43.0
 
