@@ -1,105 +1,160 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A988175A80
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 01:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B7E273D6D;
+	Mon,  1 Jun 2026 06:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780278485; cv=none; b=LBuARmYuLcz1bhaxBUD36+PPHRIJHV7MRECRlGNY0SMw0U8wN2nQUEq7h96i/itt+5GjG63V3p/cGFq+A0AoaozZBqaf8UT3ZDShyEZv6SzNBnwnKw9t9IKaMvDG46R2t4K5XlHz5r2MaJtSXbcKg5ieKTTvXwY1u8TweYHhpzQ=
+	t=1780294397; cv=none; b=P4Au4vRrrVWqyoKShzkkExwUAJuClTF1XEfEI5hag7cOpP0MzLFjMH73dx27FAzOQYEKcvaHzc36IK8KmKt32ks9UU8qgjKoyJy8E1T7Ts3ltmh5eYAdQDSmmaaLliSZye/AxQebN/aFDncGqcTM4+tPSK0F0ha/oKuYEwEGIck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780278485; c=relaxed/simple;
-	bh=WrNoHxJvvM6s001dLSGWe3dC6PRLGMD61IUwbr5AKVE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=e5+InIvX5XoBjq5Q0TNiJYr9YRAsmc7b7ticeWW85XfColPTh+LeutZGr6R0fWhzGG5579RqGneNirtpnI/mnqOyE91iWo9abQTwmSYQf74Az9ccHLGiMD/nTMByqhBW82/ajXxZX6piPfxIJ+ec6ZgjWTuJzsTVdIMWP8q/YWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=MauDHxzy; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="MauDHxzy"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-48611ab8fceso662431b6e.1
-        for <linux-block@vger.kernel.org>; Sun, 31 May 2026 18:48:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780278483; x=1780883283; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yml48kmcFqsVjGuwhSwxdayEWSO5y1wDWTo47bTAUpE=;
-        b=MauDHxzyPtPgw7WstncirmS7iepruDC6HmNikCancFTfhf8j1kF41BiG1K6st/0LrN
-         vcEttuuz7oQpjygj/xHHirkdxnPlp5W6vR60weelHAf3ZW/T6pZdZ48o7bpBur6tVUvh
-         88JQLbOTspnO/kdW/wGIQe1AI0CZX61ysEJDKSMXYtZCI2e1HG5GpJTckhJujeVooC/Q
-         vItrN80EaV4OTwXSkSzz/d2LhDQzIZYvMTOPsB+ZF2Oq1MfD71A4CUMwzWOyPLCwhS/c
-         HCIiOtt33Dkt3JgvGsMu3iR+blWuU3VTAGv3vrFIWdvio3Q3d1O5VWvIjA3O/jqWwUqC
-         dCqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780278483; x=1780883283;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Yml48kmcFqsVjGuwhSwxdayEWSO5y1wDWTo47bTAUpE=;
-        b=kJOU7DoVPPPqpoSxs47dTyfEOrOG4XG/fV9jsGBuZZUahFz7qFgm65us56TLMK2Et5
-         0bOiMOX8s6Ui9uILxNc2Uc1jqKUaFV3LcJB/nrJo0INoCSlrmcsWjLGT8TOjgE6+fs4p
-         kb/QRhjCSnL722mgKbdL9sHn5mPHnPUwpk8jzrNZAJr5Tvog36Haxz20OuwJ33XNhY7m
-         eTOCo/hP7m7sf+8MTooEjPR/c43TB5HkRFr5MjX79El1YIqFKxo3EULHlOgGac2/1Vbd
-         Hy8X5bfr9IzeLVw+r8+Sb9XMcVPvsj+xFhg8g3tzCWyaNNFE13QCUHVo8uCJwwcL7SK+
-         1rWw==
-X-Gm-Message-State: AOJu0YwnA3FdJzc300VNVwtZQfNjwRc9ktRe97O+hJmrXwKwoxHd6zZj
-	NyEzxQXue+brEYS+ctLXYeqFs/JdYbCbz7NTBwlyit7wFK5jq34niMrneUwDhM2/HSw=
-X-Gm-Gg: Acq92OGikV7sdFBOiF715f21nMyoSTxSskkLdq17A/Z02wxynxa6+0KPBIk2R5An0vC
-	cUiFJUHrslZuZ0w/YuIn5J0OuCyqEm7iTcNl97Jv4b03W7Mv79OCZJdA+aRd1a36Zfko2wpbcQX
-	y7z/GWyS0yVcE6oWvuMu/OElfMmuBRGuNZq05f+lZMa95WgUJH0l7A+KWmz8HZapOW2stnjYdzb
-	3nHam7Tew9UTNKrCugQwUfROmerIKj4HQe5XTZdtaxH2bkR3c2RcWTItqeBTE1LXIpcpusUYprt
-	CkOjR8+QePj4H78C54OwZQdQzIcnpfTlgugp2LQ9b/J+H6PHf70Fag5B84rhIvRK31wkW2+y6o9
-	nIFcZEU5bkZGy311RWhE/Ehp6m4pG8hfYbp6+hbOT+0/w0BAGAdy/pXEXtnPdz2CE8CcoDPVsJU
-	aGxb9IIJfrXvuPAxgGS8kDoLb4e6PCzVLSUsLykWAzm10aO/SqUFvq8gE8eBjI5vq0r7I=
-X-Received: by 2002:a05:6808:1b1f:b0:479:d937:c4f4 with SMTP id 5614622812f47-485fb2ad84dmr5005420b6e.19.1780278483233;
-        Sun, 31 May 2026 18:48:03 -0700 (PDT)
-Received: from [127.0.0.1] ([99.196.133.55])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-48605f6a38esm3494847b6e.2.2026.05.31.18.47.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2026 18:48:02 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- Ren Wei <n05ec@lzu.edu.cn>
-Cc: ojeda@kernel.org, boqun@kernel.org, gary@garyguo.net, 
- bjorn3_gh@protonmail.com, lossin@kernel.org, a.hindborg@kernel.org, 
- aliceryhl@google.com, tmgross@umich.edu, dakr@kernel.org, 
- daniel.almeida@collabora.com, tamird@kernel.org, sunke@kylinos.cn, 
- yuantan098@gmail.com, bird@lzu.edu.cn, royenheart@gmail.com
-In-Reply-To: <b70aff9a920cc42110fe5cf454c3099561863519.1780063368.git.royenheart@gmail.com>
-References: <b70aff9a920cc42110fe5cf454c3099561863519.1780063368.git.royenheart@gmail.com>
-Subject: Re: [PATCH rust-fixes v3 1/1] rust: block: fix GenDisk cleanup
- paths
-Message-Id: <178027846532.370486.3544820081108249434.b4-ty@b4>
-Date: Sun, 31 May 2026 19:47:45 -0600
+	s=arc-20240116; t=1780294397; c=relaxed/simple;
+	bh=LKFx1duQIEQE9J6Tv0ZU9+lgwwPqRkDYeHdTDLwgO2I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lgUiOQGC7QrkePRyeBfGm607wlBHuhvt7WrfKnIKsgJufpyOkmOmc3HKqb5IuHt//6syMeqUq4llQYA3ldTMaPC60HFkxEywjKKDbfmSrw9zEmdNz5irTwNCNo4bdwU+RhKcxM2ekB0rbQBJvykTlGmZFD9mofhu1Joc2oXFvec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F6A71F00893;
+	Mon,  1 Jun 2026 06:13:14 +0000 (UTC)
+From: Yu Kuai <yukuai@fygo.io>
+To: tj@kernel.org,
+	josef@toxicpanda.com
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-iocost: use irq-safe locking in cgroup handlers
+Date: Mon,  1 Jun 2026 14:13:12 +0800
+Message-ID: <20260601061312.896801-1-yukuai@fygo.io>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
+Content-Transfer-Encoding: 8bit
 
+ioc_timer_fn() acquires ioc->lock from timer softirq context. The
+io.weight, io.cost.qos and io.cost.model cgroup handlers can take the
+same lock from process context, and the direct handler paths must not do
+so with interrupts enabled.
 
-On Sat, 30 May 2026 14:11:54 +0800, Ren Wei wrote:
-> GenDiskBuilder::build() still has fallible work after
-> __blk_mq_alloc_disk(), but its error path only recovers the
-> foreign queue data. That leaks the temporary gendisk and
-> request_queue until later teardown. If the caller moved the last
-> Arc<TagSet<T>> into build(), the leaked queue can retain blk-mq
-> state after the tag set is dropped.
-> 
-> [...]
+A blkcg policy configuration reproducer with lockdep reproduced the
+following report:
 
-Applied, thanks!
+  WARNING: inconsistent lock state
+  7.1.0-rc2-g1e14adca0199 #1 Not tainted
+  --------------------------------
+  inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+  swapper/2/0 [HC0[0]:SC1[1]:HE0:SE0] takes:
+  ffff88810f95d0f8 (&ioc->lock){+.?.}-{3:3}, at: ioc_timer_fn+0x3ff/0x3af0
+  {SOFTIRQ-ON-W} state was registered at:
+    lock_acquire+0xd4/0x290
+    _raw_spin_lock+0x3a/0x70
+    ioc_weight_write+0x35a/0x420
+    cgroup_file_write+0x1c5/0x4b0
+    kernfs_fop_write_iter+0x1d7/0x280
+    vfs_write+0x580/0x630
+    ksys_write+0xec/0x190
+    do_syscall_64+0x156/0x490
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-[1/1] rust: block: fix GenDisk cleanup paths
-      (no commit info)
+  Possible unsafe locking scenario:
 
-Best regards,
+        CPU0
+        ----
+    lock(&ioc->lock);
+    <Interrupt>
+      lock(&ioc->lock);
+
+     *** DEADLOCK ***
+
+  1 lock held by swapper/2/0:
+   #0: ffffc90000230d20 ((&ioc->timer)){+.-.}-{0:0}, at:
+       call_timer_fn+0xba/0x3a0
+  stack backtrace:
+  CPU: 2 UID: 0 PID: 0 Comm: swapper/2 Not tainted 7.1.0-rc2-g1e14adca0199 #1 PREEMPT  ea13f83d4b74a12510d20db4a7d9a0fe8275f05c
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-5.fc42 04/01/2014
+  Call Trace:
+   <IRQ>
+   dump_stack_lvl+0x54/0x70
+   print_usage_bug+0x26d/0x280
+   mark_lock_irq+0x3ef/0x400
+   mark_lock+0x117/0x190
+   __lock_acquire+0x592/0x2850
+   lock_acquire+0xd4/0x290
+   _raw_spin_lock_irq+0x49/0x80
+   ioc_timer_fn+0x3ff/0x3af0
+   call_timer_fn+0x120/0x3a0
+   __run_timer_base+0x3ad/0x490
+   run_timer_softirq+0x31/0x60
+   handle_softirqs+0x1a0/0x550
+   __irq_exit_rcu+0x8c/0x150
+   irq_exit_rcu+0xe/0x20
+   sysvec_apic_timer_interrupt+0x6e/0x80
+   </IRQ>
+
+Use spin_lock_irq() in the affected process-context handlers. The default
+io.weight update already holds blkcg->lock with spin_lock_irq(), so the
+nested ioc->lock acquisition there is already IRQ-safe and is left as a
+plain spin_lock().
+
+Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
+Signed-off-by: Yu Kuai <yukuai@fygo.io>
+---
+ block/blk-iocost.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 0cca88a366dc..493cba5523a8 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3155,11 +3155,11 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
+ 			goto einval;
+ 	}
+ 
+-	spin_lock(&iocg->ioc->lock);
++	spin_lock_irq(&iocg->ioc->lock);
+ 	iocg->cfg_weight = v * WEIGHT_ONE;
+ 	ioc_now(iocg->ioc, &now);
+ 	weight_updated(iocg, &now);
+-	spin_unlock(&iocg->ioc->lock);
++	spin_unlock_irq(&iocg->ioc->lock);
+ 
+ 	blkg_conf_exit(&ctx);
+ 	return nbytes;
+@@ -3180,7 +3180,7 @@ static u64 ioc_qos_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	if (!dname)
+ 		return 0;
+ 
+-	spin_lock(&ioc->lock);
++	spin_lock_irq(&ioc->lock);
+ 	seq_printf(sf, "%s enable=%d ctrl=%s rpct=%u.%02u rlat=%u wpct=%u.%02u wlat=%u min=%u.%02u max=%u.%02u\n",
+ 		   dname, ioc->enabled, ioc->user_qos_params ? "user" : "auto",
+ 		   ioc->params.qos[QOS_RPPM] / 10000,
+@@ -3193,7 +3193,7 @@ static u64 ioc_qos_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
+ 		   ioc->params.qos[QOS_MIN] % 10000 / 100,
+ 		   ioc->params.qos[QOS_MAX] / 10000,
+ 		   ioc->params.qos[QOS_MAX] % 10000 / 100);
+-	spin_unlock(&ioc->lock);
++	spin_unlock_irq(&ioc->lock);
+ 	return 0;
+ }
+ 
+@@ -3378,14 +3378,14 @@ static u64 ioc_cost_model_prfill(struct seq_file *sf,
+ 	if (!dname)
+ 		return 0;
+ 
+-	spin_lock(&ioc->lock);
++	spin_lock_irq(&ioc->lock);
+ 	seq_printf(sf, "%s ctrl=%s model=linear "
+ 		   "rbps=%llu rseqiops=%llu rrandiops=%llu "
+ 		   "wbps=%llu wseqiops=%llu wrandiops=%llu\n",
+ 		   dname, ioc->user_cost_model ? "user" : "auto",
+ 		   u[I_LCOEF_RBPS], u[I_LCOEF_RSEQIOPS], u[I_LCOEF_RRANDIOPS],
+ 		   u[I_LCOEF_WBPS], u[I_LCOEF_WSEQIOPS], u[I_LCOEF_WRANDIOPS]);
+-	spin_unlock(&ioc->lock);
++	spin_unlock_irq(&ioc->lock);
+ 	return 0;
+ }
+ 
 -- 
-Jens Axboe
-
-
+2.51.0
 
