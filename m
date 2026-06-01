@@ -1,170 +1,102 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D948936493C
-	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 18:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6273336493C
+	for <linux-block@vger.kernel.org>; Mon,  1 Jun 2026 18:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780340260; cv=none; b=l7WgSh4qUvEj2VU5nSrCiGhhQ6A7hT/4/9mhC9ZJRoH/gCWDzJP6fbFsLwWbZoqpTrzClSJ7hNNZgOBiGGuk56VU6lRY8A6/CBtRC089dxwVP01w4WgoPo54+57XQmymAimsJjh8GXAHkX9p7TwRW+eNFR0vozFXGYi9ipRS/zk=
+	t=1780340374; cv=none; b=eb/3ljTmQPhwe3lQS2R8Tta33mI4pSkVNVal4hXMXXM6N+iDEb22wU1m7qTfr4hpamPVmdHgb34Um4zklelUoFqCQn3NzSpUK2bmWUgKOr7SZuNmsfjJxWum2jDXRTW+EX4KJIW4zmGsaLfDt4lyXyo5c8VoA4bmqhUpq1xm60w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780340260; c=relaxed/simple;
-	bh=89tOA/vg8ODxo9Bd1kZAVRxj1Qun7rG5iGCntXOsfwM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rN4py8/cQDadTovukdkZGO3F8UXS+Z3YGSsriHjGAus39WcDHfWqfGx/x0xa2zSQLq+apC6vj+t79GOg7D8/4CeLZjAGIFD5jSariUFgO03bvZoYVbsmWUH++85ZY3VMV2K/xuPIHLvdCK84s5ZDvV7NNcrVlEK2fm+K5s5gDMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lRv9FZWv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Orov3lwY; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lRv9FZWv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Orov3lwY; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1780340374; c=relaxed/simple;
+	bh=OpEc4Y/PrpWkGa9Fmdvfq4BLLoaFNGFe1Wlnjyx3my0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Ao6pEx7cd5djoGq6zQXkkU1qeGZ6twY37JxjPsT9EAWjCkW3nk8H1EzMV2uUUKwlNOFmRgAfRGXhPOFxUfHWEiJ7BE8sPtLjwgsH4THNhlBZ9yDhnZtG+k6PRwdzJm78BrJ4NBFxri8+47JIHZ9UdfC0NXB2tu+xBScelZrjTZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=naSmWNjF; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lRv9FZWv";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Orov3lwY";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lRv9FZWv";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Orov3lwY"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 23A346B645;
-	Mon,  1 Jun 2026 18:57:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1780340256;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
-	b=lRv9FZWvI94VUYOpxJMCy2kLL6Bu6+3EsNZUzAnvNuCKo1QUuQkOI3zKss9ofXNX+YfLe3
-	q9w0lHsP9TeeJn46LjTjLKEt38KlHUn7A7uVTNCLmx3d55vxFi3wMomNejbBeSOEYjhxGT
-	YMVAcWgJVLsKq3fmuW/i901rtAqBWc0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1780340256;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
-	b=Orov3lwYX6ld8pYiDK+atsNbPbR+/S5KpgtJ9aR09hUcycQjEor5HwTw3n2Xj68UjjUL2p
-	7ZW8RpYU3TeQjwCw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1780340256;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
-	b=lRv9FZWvI94VUYOpxJMCy2kLL6Bu6+3EsNZUzAnvNuCKo1QUuQkOI3zKss9ofXNX+YfLe3
-	q9w0lHsP9TeeJn46LjTjLKEt38KlHUn7A7uVTNCLmx3d55vxFi3wMomNejbBeSOEYjhxGT
-	YMVAcWgJVLsKq3fmuW/i901rtAqBWc0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1780340256;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2BQBHJyYMWnTxoTg7lZFROZPbjpK0REybaOLyY1zGMo=;
-	b=Orov3lwYX6ld8pYiDK+atsNbPbR+/S5KpgtJ9aR09hUcycQjEor5HwTw3n2Xj68UjjUL2p
-	7ZW8RpYU3TeQjwCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0E462779A7;
-	Mon,  1 Jun 2026 18:57:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 1jo9AyDWHWrlDgAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Mon, 01 Jun 2026 18:57:36 +0000
-Date: Mon, 1 Jun 2026 20:57:30 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Daniel Vacek <neelx@suse.com>, David Sterba <dsterba@suse.com>,
-	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v7 00/43] btrfs: add fscrypt support
-Message-ID: <20260601185730.GE880787@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20260513085340.3673127-1-neelx@suse.com>
- <CAPjX3FdHJpZUVk2dfA+Ov5K6vOSsOJMUaxCU4G8y1qg6baMXYw@mail.gmail.com>
- <20260531002812.GA2302@sol>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="naSmWNjF"
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-69d8e55e76fso5834674eaf.2
+        for <linux-block@vger.kernel.org>; Mon, 01 Jun 2026 11:59:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780340371; x=1780945171; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=91eVT96xRY/faTwQKcQ63E6IVm1ZZTt7y9K01q2sZyw=;
+        b=naSmWNjFHf6v0Zx1ANvz6dFXZkc1riNgrMcwpFiipy/FlYbQwM/dlUbCLLIjFcCKwN
+         +hQtAn9m2bADbeEn1HdK+yrUHTEVUPKtTNnxPv1bCikKaB7QMRqWd/Y5ghnbSex2idVt
+         QUl0wJQMCc1qecIAc7Sl/O81QpY4WDVSyg2wh7UXe2tIa98+cPcTJ1oE/iQjk6tXDe2f
+         AGaqxYpkNluUgn7e9X63mPvnwhrNXBc8v/F9aPyuXi50Mn0BAhgnRIQ46XhVp6C02KgN
+         cQ7K9609Bb5vqtHfI6HVGlPEpe74TyZnXPsceICD7Wz1B8OpHFM4hRNY4c0020otZWsK
+         GEyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780340371; x=1780945171;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=91eVT96xRY/faTwQKcQ63E6IVm1ZZTt7y9K01q2sZyw=;
+        b=nrpwCyQZQbyFbJBFgnB39SDIPSH8iwiZJPoNDdTB2taH4O8Q0cV/gFxjxEXHxrATGD
+         IfhUghv8KvwjntQL/vcLEEo+x8TklVZgjk462V35k5VIQJkjcg1lRVGGBCE6mvXDoB6G
+         ZzTVPQAhhbIadOhm+VQnQVd1/RBVI7EwrZdLAYaMJOMdGgFwMR3AcX3wqxGtZeoINnil
+         777ZeVnYCQxakEsryfNgDwX6RIpjYz7EZ+stkfDWu/Qv4rfw8vFxo8qG+Sa2puOmiqYb
+         SnZt25KXJQFY+P0rQ/VoZ53XLdkgdXL4uqrhIpiCsbddprXUGYEnvuZZF6+rZQr8y+l9
+         yaOA==
+X-Gm-Message-State: AOJu0Ywyiupt069T5/AzzsjthOim8yRdxO9VZ8IYt+DSXIFR+lb6pekI
+	vEnl2HkTqh/X63AywitwsIV3GwY2J9X9g3nnwvLsD02fVGtKxxo4Yl/i4uazfXyqMPSUa0bXVms
+	wNgcH
+X-Gm-Gg: Acq92OHRrTkvZOSPz7A+FRKOlWIC/KCdE2+VQsxqhCv4b7RF5qke9a7Qd0JHisEYrot
+	ER60wXSBoBJXHmNHu8OXHjPCcBJS5Q4DaDzESlB6PdzUAp9dvar/45MsUCRgbWlqBzGJxcqExJg
+	Ve9n52AhxgiYfIeJgVnTsEGHQdfVJKtyCRuxL8a99aUhc6bsvyozQ9FwmILAjQc98d9I2Id5X13
+	3F+08qOQoZMGC2yaEeXSTyRd0fdVVH/ulipoyqsIw2GYKAKvLAVYvkQoaTcG2x8b3NufLijg4jA
+	WUikFvR9G+EG4V+TERKq34giQMcv7yppLEROYCScLJSFQ3l2v7eNaLAIMp4uNgouzgKJ4XanRoj
+	3KXOs8L3GLfYNCG9pNkgwGS8eC7qhpjHgvk1miPIZWg+s6+dxFC5UYxmtNpo1ojWllALPh9ZYut
+	Gck4XZ+0tK00WkFNHVltg6p1228oTGgCpxg8wt4nQFzTiGjPzrF/+ejQxq7sqiLFvcmAVDbUG9f
+	DSb2bXfEEZRug==
+X-Received: by 2002:a05:6820:4b8e:b0:67e:3f0d:4235 with SMTP id 006d021491bc7-69e10403fbamr6175521eaf.11.1780340371050;
+        Mon, 01 Jun 2026 11:59:31 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e067e911csm6386319eaf.5.2026.06.01.11.59.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 11:59:30 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: tj@kernel.org, josef@toxicpanda.com, Yu Kuai <yukuai@fygo.io>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260601061312.896801-1-yukuai@fygo.io>
+References: <20260601061312.896801-1-yukuai@fygo.io>
+Subject: Re: [PATCH] blk-iocost: use irq-safe locking in cgroup handlers
+Message-Id: <178034037025.437649.2280578282193529084.b4-ty@b4>
+Date: Mon, 01 Jun 2026 12:59:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260531002812.GA2302@sol>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,sashiko.dev:url];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
-X-Spam-Level: 
-X-Spam-Score: -4.00
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-On Sat, May 30, 2026 at 05:28:12PM -0700, Eric Biggers wrote:
-> On Fri, May 22, 2026 at 09:00:46AM +0200, Daniel Vacek wrote:
 
-> It's been really hard to find time to review this huge patchset.  I've
-> started going through it and will try to leave comments next week.
-
-Thank you. The patchset is huge but we'd like your feedback namely on
-the crypto layer changes, i.e. the first 8 patches. As this is outside
-of btrfs code we can't fix it incrementally later on. The current size
-of btrfs-only can be slightly reduced but a lot of must stay so it's
-clear how the fscrypt API is used.
-
-I'm not sure if it was mentioned before wrt how to get this merged. My
-preferred way is to get your Ack for the crypto changes and then we can
-add it to linux-next via our btrfs git.
-
-It's too late for 7.2 also because you've asked for some changes. So the
-target is 7.3, hopefully giving all of us enough time to have the
-mergeable version in ~7.2-rc3 timeframe.
-
-If you have other ideas how to proceed with the merge process, please
-let me know.
-
-> In the mean time it would be really helpful if you went through the
-> Sashiko reviews
-> (https://sashiko.dev/#/patchset/20260513085340.3673127-1-neelx%40suse.com)
-> and address the ones that make sense to.  It found 93 issues including
-> 16 critical ones, which is kind of a lot.  Some of them are the same
-> things I'm noticing already.  Same for the issue that Christoph noticed
-> where new devices can be added; Sashiko had already found that too.
+On Mon, 01 Jun 2026 14:13:12 +0800, Yu Kuai wrote:
+> ioc_timer_fn() acquires ioc->lock from timer softirq context. The
+> io.weight, io.cost.qos and io.cost.model cgroup handlers can take the
+> same lock from process context, and the direct handler paths must not do
+> so with interrupts enabled.
 > 
-> If I'm going to have to use my limited human review time to point out
-> issues that were already found, that's not a great use of time.
+> A blkcg policy configuration reproducer with lockdep reproduced the
+> following report:
 > 
-> I also don't see any information about how this was tested (and will
-> continue to be tested in the future).
+> [...]
 
-The testing is not straightforward as it needs 3 projects to
-synchronize, kernel, fstests and btrfs-progs. Testing may need to use
-custom git branches for all of them. For btrfs-progs the changes will ge
-it in soon. For fstests it can be a chicken-egg problem, as they don't
-accept tests for unmerged code. We've been using our fstests [1] with
-additional fixups (not upstreamable, related to CI workarounds). Though
-I'm not sure if Daniel has updated the branch with his most recent
-version.
+Applied, thanks!
 
-[1] https://github.com/btrfs/fstests branch staging
+[1/1] blk-iocost: use irq-safe locking in cgroup handlers
+      commit: 1059a743064b873aaaf34ebcff89110c7753fa32
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
