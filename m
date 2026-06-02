@@ -1,102 +1,142 @@
-Received: from va-2-29.ptr.blmpb.com (va-2-29.ptr.blmpb.com [209.127.231.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15B935F191
-	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 03:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07D027F19F;
+	Tue,  2 Jun 2026 03:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780369762; cv=none; b=BhBmlwfK/9IPGU/2gw1jYHaPmOHRXopTDFwsfaKJutEz63HfPTvXNSgG8vcqDJRf53a8qEbG6Lsp69Eh5YKAtdnd8wD7QoVPQ0tbnx6NsQSI3C+TTntv00trvrv6MAn5JnIauucpAJb5IfnhYQBCocsxmQVI19w93xIka+4wooo=
+	t=1780370056; cv=none; b=gbawptisuuha0rFQxEjf/IpO0bRSb5eh5WK9FG/zDlnsR3TxneyWb0vyswfz4IQVjkcj8fE3KTlhwy8iip/GRcfjPqWBwwENWP3NeeEG4MvGr1x2UMGr6x6tyVPbwhzk5ZUT8ZmFbofGAs7VoPL0fS6GVOhvsuh50lKHVWdn+po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780369762; c=relaxed/simple;
-	bh=u0F/UiPe/Ds/hTqT1T8FZnOyFdvOY8K67htgUqBwfQ0=;
-	h=To:Date:In-Reply-To:Cc:From:References:Subject:Message-Id:
-	 Mime-Version:Content-Type; b=GAFr5AbUXJJ+4btjvZVmGgDSLFbFSKzYqGwEdy3AAxBX6Mgeq//8E70iJ33kHNClGvV1YUdlFDiz+yxVQ3RHIDz717qZD6PinJQXkqwgMSDAJ0PRNvGKOa+XmzQLva5PCccHNkDzxmvykAtbVlscTIKLF0c7otQqvX7467toZOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=oRpCjy8W; arc=none smtp.client-ip=209.127.231.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1780370056; c=relaxed/simple;
+	bh=XcuyzpMeexEc4ntKhWKvLmZX5C6PsWn2FLGhM/EaxUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EirG8T/N/DOdAZSWcW37rjayWvYE41vYnCfcttn2AlEHHvdQ/D9HhLQ25luHlDYDIuvSnbylqU2dQtl/rMlzXwMMkyi+mSaSLwUZ+af/Bl4NaIq22PCnf6mcjZao+gSkQhmUYnx6mhnzTVJUYJXP5y9DKGwKTJx9/Ys5hZ3CixY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VDON9IYZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="oRpCjy8W"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1780369633;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=u0F/UiPe/Ds/hTqT1T8FZnOyFdvOY8K67htgUqBwfQ0=;
- b=oRpCjy8WrxunDH8l6wsgRRbS//U7DcyFZbjGRHGTkXTwJ5bBgNe72NvTLHj+DEZJLn3RVz
- xjQFAAQRltmkeaH6O1R5Y92t/PuUwajUhepVpz0Lm9mpl43ClhM2hho9BwN4qIxDCaq4hz
- 0mPXp7PGS886+VFGVhM68+/VXLWabewzf0HVADq1ofMlGDxHZQShmy6PXmSLy4rpJYLEV3
- hqv9jv8M/53sonmkWtnJEENq2w5Epupx0oqVVTxqyearVtsVAObcVOjvt8Ly1fPRzITROU
- ZhA3dx2Y0VGWdC5BLE0adciPBijezzWmttpLGqVDo2G7weTADB9Dd+wzXDxNVA==
-To: "Jens Axboe" <axboe@kernel.dk>
-Date: Tue, 2 Jun 2026 11:07:08 +0800
-Content-Language: en-US
-In-Reply-To: <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Mozilla Thunderbird
-Reply-To: yukuai@fygo.io
-Cc: <linux-raid@vger.kernel.org>, <linux-block@vger.kernel.org>, 
-	"Abd-Alrhman Masalkhi" <abd.masalkhi@gmail.com>, 
-	"Benjamin Marzinski" <bmarzins@redhat.com>, 
-	"Chen Cheng" <chencheng@fnnas.com>, "Christoph Hellwig" <hch@lst.de>, 
-	"Li Nan" <magiclinan@didiglobal.com>, 
-	"Thorsten Blum" <thorsten.blum@linux.dev>, <yukuai@fygo.io>
-From: "Yu Kuai" <yukuai@fnnas.com>
-References: <20260531112618.160409-1-yukuai@fygo.io> <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
-X-Original-From: Yu Kuai <yukuai@fygo.io>
-Subject: Re: [GIT PULL] md-7.2-20260531
-Message-Id: <07d9a72c-6443-4d48-ae7e-a2dd8237fb39@fygo.io>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDON9IYZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB591F00893;
+	Tue,  2 Jun 2026 03:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780370055;
+	bh=0GmIBwr2K9ISMsr5/bEd8rwWJ/NyaURH6TbEH9AUztU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VDON9IYZe/F0MBtlfVuhPmMoXI9/A8xu/PvpOuYpULWPGXlVILuG5VFbFJQ6DoQ2T
+	 u8GJ3vgn+AfA0yGElhBa9T2fq9xPcKVCNTPfHbsq8Io3/8cCi5/M3RhIicHB+aNSrD
+	 Qr5v0OmRUPkCRqBRINxoAs9EBolPIBBbAbc3smJuUTIJbAuLc88aIAPjurEy9LcaDp
+	 wXPBjnisCsTTuB/NoXYFM1ZcCjejSoMQ70OFRsGfudo1p6Yv+3HKsubWj4AcKiYW+Q
+	 OHESUoB/Teo4vXjBnSiS5XuMwXaVq06me3kUGPsv5k3VP4GUYl7PoINVUCIftj7lsT
+	 EKeNOQe3KGrow==
+Date: Mon, 1 Jun 2026 20:12:51 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Daniel Vacek <neelx@suse.com>
+Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Omar Sandoval <osandov@osandov.com>,
+	Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Subject: Re: [PATCH v7 10/43] btrfs: start using fscrypt hooks
+Message-ID: <20260602031251.GG2295@sol>
+References: <20260513085340.3673127-1-neelx@suse.com>
+ <20260513085340.3673127-11-neelx@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Received: from [192.168.1.104] ([39.182.0.134]) by smtp.feishu.cn with ESMTPS; Tue, 02 Jun 2026 11:07:10 +0800
-X-Lms-Return-Path: <lba+26a1e48df+f70d66+vger.kernel.org+yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260513085340.3673127-11-neelx@suse.com>
 
-Hi,
+On Wed, May 13, 2026 at 10:52:44AM +0200, Daniel Vacek wrote:
+> @@ -9041,20 +9063,28 @@ static int btrfs_symlink(struct mnt_idmap *idmap, struct inode *dir,
+>  	};
+>  	unsigned int trans_num_items;
+>  	int ret;
+> -	int name_len;
+>  	int datasize;
+>  	unsigned long ptr;
+>  	struct btrfs_file_extent_item *ei;
+>  	struct extent_buffer *leaf;
+> +	struct fscrypt_str disk_link;
+> +	size_t max_len;
+> +	u32 name_len = strlen(symname);
+> +
+> +	/*
+> +	 * BTRFS_MAX_INLINE_DATA_SIZE() isn't actually telling the truth, we actually
+> +	 * limit inline data extents to min(BTRFS_MAX_INLINE_DATA_SIZE(), sectorsize),
+> +	 * so adjust max_len given this wonderful bit of inconsistency.
+> +	 */
+> +	max_len = min_t(size_t, BTRFS_MAX_INLINE_DATA_SIZE(fs_info), fs_info->sectorsize);
+>  
+> -	name_len = strlen(symname);
+>  	/*
+> -	 * Symlinks utilize uncompressed inline extent data, which should not
+> -	 * reach block size.
+> +	 * fscrypt sets disk_link.len to be len + 1, including a NUL terminator,
+> +	 * but we don't store that '\0' character.
+>  	 */
+> -	if (name_len > BTRFS_MAX_INLINE_DATA_SIZE(fs_info) ||
+> -	    name_len >= fs_info->sectorsize)
+> -		return -ENAMETOOLONG;
+> +	ret = fscrypt_prepare_symlink(dir, symname, name_len, max_len + 1, &disk_link);
+> +	if (ret)
+> +		return ret;
 
-=E5=9C=A8 2026/6/2 2:55, Jens Axboe =E5=86=99=E9=81=93:
-> On 5/31/26 5:26 AM, Yu Kuai wrote:
->> Hi Jens,
->>
->> Please consider pulling the following changes into your for-7.2/block
->> branch.
->>
->> This pull request contains:
->>
->> Bug Fixes:
->> - Only requeue dm-raid bios when dm is suspending. (Benjamin Marzinski)
->> - Reset raid10 read_slot when reusing r10bio for discard. (Chen Cheng)
->> - Fix raid1/raid10 deadlock in read error recovery path. (Abd-Alrhman Ma=
-salkhi)
->> - Fix raid1/raid10 error-path detection with md_cloned_bio(). (Abd-Alrhm=
-an Masalkhi)
->> - Fix raid1/raid10 bio accounting for split md cloned bios. (Abd-Alrhman=
- Masalkhi)
->> - Fix raid1 nr_pending leak in REQ_ATOMIC bad-block path. (Abd-Alrhman M=
-asalkhi)
->>
->> Improvements:
->> - Skip redundant raid_disks updates when the value is unchanged. (Abd-Al=
-rhman Masalkhi)
->>
->> Cleanups:
->> - Update MAINTAINERS email addresses. (Yu Kuai, Li Nan)
->> - Clean up raid1 read error handling. (Christoph Hellwig)
->> - Move the exceed_read_errors condition out of fix_read_error(). (Christ=
-oph Hellwig)
->> - Use str_plural() in raid0 dump_zones(). (Thorsten Blum)
-> Pulled, thanks.
->
-> Side note - emails from you with the new email address all end up in
-> spam. I just noticed some of them this morning. But I think you want to
-> ensure that the DKIM etc part of your email is all kosher, gmail flags
-> all of it.
+This is off by one from the other filesystems.  Yes, the way the other
+filesystems do encrypted symlinks is weird, but this still doesn't fix
+it, since the unnecessary 'struct fscrypt_symlink_data' is still stored.
+If it's not being fixed completely, it should just be done the same way.
 
-Thanks a lot for the notice, we'll look into this.
+Did you do it this way because you're trying to squeeze out an extra
+byte, to allow 4094-byte symlink targets instead of 4093 as the other
+filesystems do?  Or did you do it this way because btrfs doesn't count a
+nul terminator when checking unencrypted symlinks against
+BTRFS_MAX_INLINE_DATA_SIZE(fs_info), and you needed to preserve that
+behavior?  But at the same time, btrfs *does* count the nul terminator
+when validating against 'fs_info->sectorsize', and this changes that
+behavior.  So it's not clear what was intended here.
 
->
---=20
-Thansk,
-Kuai
+> +	if (IS_ENCRYPTED(inode)) {
+> +		ret = fscrypt_encrypt_symlink(inode, symname, name_len, &disk_link);
+> +		if (ret) {
+> +			btrfs_abort_transaction(trans, ret);
+> +			btrfs_free_path(path);
+> +			discard_new_inode(inode);
+> +			inode = NULL;
+> +			goto out;
+> +		}
+> +	}
+
+fscrypt_encrypt_symlink() already has an IS_ENCRYPTED(inode) check
+built-in.
+
+> +static const char *btrfs_get_link(struct dentry *dentry, struct inode *inode,
+> +				  struct delayed_call *done)
+> +{
+> +	struct page *cpage;
+> +	const char *paddr;
+> +	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+> +
+> +	if (!IS_ENCRYPTED(inode))
+> +		return page_get_link(dentry, inode, done);
+> +
+> +	if (!dentry)
+> +		return ERR_PTR(-ECHILD);
+> +
+> +	cpage = read_mapping_page(inode->i_mapping, 0, NULL);
+> +	if (IS_ERR(cpage))
+> +		return ERR_CAST(cpage);
+> +
+> +	paddr = fscrypt_get_symlink(inode, page_address(cpage),
+> +				    BTRFS_MAX_INLINE_DATA_SIZE(fs_info), done);
+> +	put_page(cpage);
+
+This uses a different max_len from btrfs_symlink().
+
+Speaking of symlinks, btrfs is also missing a hookup to
+fscrypt_symlink_getattr().
+
+- Eric
