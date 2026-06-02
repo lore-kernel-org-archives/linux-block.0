@@ -1,102 +1,100 @@
-Received: from lf-2-58.ptr.blmpb.com (lf-2-58.ptr.blmpb.com [101.36.218.58])
+Received: from va-2-38.ptr.blmpb.com (va-2-38.ptr.blmpb.com [209.127.231.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F403036C592
-	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 03:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B2138911F
+	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 04:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780372404; cv=none; b=SnCcSmyIaxAdPxE2CcUveMaYieGCsX1Ggz1cO66UWTfA2GZxnT2BhmyUWXNUMmAqBppo4jRt/WMCvIw8JF3BYqoXDTjsPaxAJk5pBrjJPOmF2wgOwyVmwVPIhHQHo5+7rJbaiCGIH80/ZFWX4BJNsbhLakmA7lzW0WIBek218cE=
+	t=1780372841; cv=none; b=iWkg5U0sYv2B//0iZvLWRI3RFjZWfYGSkCAQ3fid8MXBpp9f2pMYtazs9XBEnHJQ1Z5ZvNWPs50kkDaetN3VGFLyek09flML+2VQIWNNz/P7efDFUqN983TAsbW7jPRnsIisw/UzBlsgdD8SLOygAiTnk8+9wxr2ob/7Ii3J7Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780372404; c=relaxed/simple;
-	bh=TYbTK+1pZKxSIOHaFVEQ0H0lKRBtMbTz3gFI+nBSXig=;
-	h=To:Mime-Version:From:Subject:Date:Cc:Message-Id:Content-Type:
-	 In-Reply-To:References; b=BHKaFXj8CGJHW++FGMJHXG2bXX4Gfbk+I53VGKWGFrpCUalzLDagzkggubP/KccwPjDR1hJnxT3roIBnDYzJb+86dGkqBuYAz+5fbyfMkS1dCYeUNFvcES2aXE5gsrORaoah+Qc5+vJpAmTAwFo8vV+nkQ+wfZ6pEktFwh8kjb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=CuXbA23L; arc=none smtp.client-ip=101.36.218.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
+	s=arc-20240116; t=1780372841; c=relaxed/simple;
+	bh=SIG3S39IrTTtIod87Ka6s3XFr3Q9GCblkqDAkNbpSgI=;
+	h=From:Date:Content-Type:To:References:Cc:Message-Id:In-Reply-To:
+	 Subject:Mime-Version; b=buVRm/4jihuiQnSUN5QZ7RaYdfJqVOIUEppyg2CyQNhmPu6rTDBynxOd9o0+uSIDlFFxBsg2/er+1sZHUF5x3yn+VgMd0xDxXVxZgl8AgItTFu4C8GC5cvxumgP2vpXc5wA7q+4jS1XbJw8XkJhMnh7qaR31gOxwqXE9Vom8M5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=eatWS/NK; arc=none smtp.client-ip=209.127.231.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="CuXbA23L"
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="eatWS/NK"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1780371667;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1780372828;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=TYbTK+1pZKxSIOHaFVEQ0H0lKRBtMbTz3gFI+nBSXig=;
- b=CuXbA23Lo711oK9Irg1+ckVhiECd+m9hb+/7l5ELnsCa2kJ5EK/OgE4pvIerp9HuGSkYHk
- Xf1VfyIP16se8NT2QjaRuI8W8FpKVJ9A5Jv+n5syScs68ML4mOgruF3ie5lW/Et3rjg+XB
- Zutuh/wnQzNEPNAzxG0aJXLbfXJRYqueXRFBqwTHVr9t3mFmZwjfv5rdg+kMpf5YwwNx2d
- KVuHf5hd/j7C1WzV2cczIO4Kah/QDl0tv72tfkPx0Fb3j8ukq9ltWSmQSiLtgRcPAGvJ+7
- Pr1yR+1Xwvm0e61YIeN+VMkgn25+bK5aDeG/YCoRZ8HvslZj0WkRudOFpPhOfQ==
-To: "Jens Axboe" <axboe@kernel.dk>
-Received: from smtpclient.apple ([120.245.64.106]) by smtp.larksuite.com with ESMTPS; Tue, 02 Jun 2026 03:41:06 +0000
+ bh=SIG3S39IrTTtIod87Ka6s3XFr3Q9GCblkqDAkNbpSgI=;
+ b=eatWS/NKeZI+hiCrILGw/lBm2d6dKkM2ICMzYGv/v4d/wH99Eo6AnsLNV9l+Gz9D3Ilwqo
+ +0whrE6C2cxyYl/T1NkN8ka3BMxfU0O8SaxWLqfHgUH36HN/fqvZIkdyfFhjSDtNOj5J/d
+ mWicTONagUiiMU1fC67eeB6vNeQ5gs0u6b9Lu7LZuYtZfJCqcHZHQtA2VMDYQWc5NiBJfO
+ NbbOnJeB2jDHDfpb39kXX0zsLcgstlmMsUPppbNYriPF9yKUhUGDYH3Wndb3oxG2dUjSZ0
+ rpDN4qTBGLJqgwx8BdNbf6DvZxwFhvYKoKXNwhSONloO70wPhAKF75t3P88YQA==
+User-Agent: Mozilla Thunderbird
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Tue, 2 Jun 2026 12:00:23 +0800
+Content-Type: text/plain; charset=UTF-8
+To: "Bart Van Assche" <bart.vanassche@gmail.com>, <tj@kernel.org>, 
+	<josef@toxicpanda.com>
+Content-Language: en-US
+References: <20260601061312.896801-1-yukuai@fygo.io> <8709b8e7-8328-47e8-950f-e5726bd70dbc@gmail.com>
+X-Original-From: Yu Kuai <yukuai@fygo.io>
+X-Lms-Return-Path: <lba+26a1e555a+1ad458+vger.kernel.org+yukuai@fnnas.com>
+Cc: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, <yukuai@fygo.io>
+Message-Id: <a9710059-8f38-4594-81a8-45eb7210a12c@fygo.io>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <8709b8e7-8328-47e8-950f-e5726bd70dbc@gmail.com>
+Received: from [192.168.1.104] ([39.182.0.134]) by smtp.feishu.cn with ESMTPS; Tue, 02 Jun 2026 12:00:25 +0800
+Reply-To: yukuai@fygo.io
+Subject: Re: [PATCH] blk-iocost: use irq-safe locking in cgroup handlers
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: "Coly Li" <colyli@fygo.io>
-Subject: Re: [GIT PULL] md-7.2-20260531
-Date: Tue, 2 Jun 2026 11:40:53 +0800
-X-Mailer: Apple Mail (2.3864.600.51.1.1)
-Cc: "Yu Kuai" <yukuai@fygo.io>, <linux-raid@vger.kernel.org>, 
-	<linux-block@vger.kernel.org>, 
-	"linux-bcache" <linux-bcache@vger.kernel.org>
-Message-Id: <74048F79-FAD4-4C63-A885-31467EA60530@fygo.io>
-Content-Type: text/plain; charset=UTF-8
-X-Original-From: Coly Li <colyli@fygo.io>
-X-Lms-Return-Path: <lba+26a1e50d2+0d729a+vger.kernel.org+colyli@fygo.io>
-In-Reply-To: <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
-References: <20260531112618.160409-1-yukuai@fygo.io> <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
 
-Hi Jens,
+Hi,
 
-> 2026=E5=B9=B46=E6=9C=882=E6=97=A5 02:55=EF=BC=8CJens Axboe <axboe@kernel.=
-dk> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On 5/31/26 5:26 AM, Yu Kuai wrote:
->> Hi Jens,
->>=20
->> Please consider pulling the following changes into your for-7.2/block
->> branch.
->>=20
->> This pull request contains:
->>=20
->> Bug Fixes:
->> - Only requeue dm-raid bios when dm is suspending. (Benjamin Marzinski)
->> - Reset raid10 read_slot when reusing r10bio for discard. (Chen Cheng)
->> - Fix raid1/raid10 deadlock in read error recovery path. (Abd-Alrhman Ma=
-salkhi)
->> - Fix raid1/raid10 error-path detection with md_cloned_bio(). (Abd-Alrhm=
-an Masalkhi)
->> - Fix raid1/raid10 bio accounting for split md cloned bios. (Abd-Alrhman=
- Masalkhi)
->> - Fix raid1 nr_pending leak in REQ_ATOMIC bad-block path. (Abd-Alrhman M=
-asalkhi)
->>=20
->> Improvements:
->> - Skip redundant raid_disks updates when the value is unchanged. (Abd-Al=
-rhman Masalkhi)
->>=20
->> Cleanups:
->> - Update MAINTAINERS email addresses. (Yu Kuai, Li Nan)
->> - Clean up raid1 read error handling. (Christoph Hellwig)
->> - Move the exceed_read_errors condition out of fix_read_error(). (Christ=
-oph Hellwig)
->> - Use str_plural() in raid0 dump_zones(). (Thorsten Blum)
->=20
-> Pulled, thanks.
->=20
-> Side note - emails from you with the new email address all end up in
-> spam. I just noticed some of them this morning. But I think you want to
-> ensure that the DKIM etc part of your email is all kosher, gmail flags
-> all of it.
+=E5=9C=A8 2026/6/2 5:50, Bart Van Assche =E5=86=99=E9=81=93:
+> On 5/31/26 11:13 PM, Yu Kuai wrote:
+>> @@ -3378,14 +3378,14 @@ static u64 ioc_cost_model_prfill(struct=20
+>> seq_file *sf,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!dname)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0 spin_lock(&ioc->lock);
+>> +=C2=A0=C2=A0=C2=A0 spin_lock_irq(&ioc->lock);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 seq_printf(sf, "%s ctrl=3D%s model=3Dline=
+ar "
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ "rbps=3D%llu rseqiops=3D%llu rrandiops=3D%llu "
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ "wbps=3D%llu wseqiops=3D%llu wrandiops=3D%llu\n",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ dname, ioc->user_cost_model ? "user" : "auto",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ u[I_LCOEF_RBPS], u[I_LCOEF_RSEQIOPS], u[I_LCOEF_RRANDIOPS],
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ u[I_LCOEF_WBPS], u[I_LCOEF_WSEQIOPS],=20
+>> u[I_LCOEF_WRANDIOPS]);
+>> -=C2=A0=C2=A0=C2=A0 spin_unlock(&ioc->lock);
+>> +=C2=A0=C2=A0=C2=A0 spin_unlock_irq(&ioc->lock);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>> =C2=A0 }
+>
+> This change is wrong. ioc_cost_model_prfill() only has one caller,
+> namely blkcg_print_blkgs(). blkcg_print_blkgs() calls the above function
+> with interrupts disabled. The spin_unlock_irq(&ioc->lock) at the end of
+> the above function enables interrupts while q->queue_lock is held. If an
+> interrupt happens on the same CPU core before q->queue_lock is unlocked,
+> and that interrupt tries to lock q->queue_lock, a deadlock will occur.
 
-Could you please check my patch to change my email address go fygo.io in yo=
-ur spam emails?
-I guess similar situation may also happen on my patch sent from fygo.io.
-And yes, we are looking into this DKIM issue now.
+Yes, this is correct. Sorry I just notice this is a sysfs api like other
+places and didn't notice the problem. So ioc_weight_write() is the only
+place that need the fix.
 
-Thanks.
+Jens, please let me not if you want me to send a v2 or a fix.
 
-Coly Li
+>
+> Bart.
+
+--=20
+Thansk,
+Kuai
