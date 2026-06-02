@@ -1,48 +1,46 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98053161A4;
-	Tue,  2 Jun 2026 02:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F14614B08A;
+	Tue,  2 Jun 2026 02:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780365889; cv=none; b=fV8f6drWFHPPONoZjTNuOunJYZcIbreHdPUivkEgmsePIcgQ7TvqYkUhOLlrdpXKRpYVjljBOUMh/yfG+EaPwQgtZIcZXFS1ZNiNkRx+48oos8Zz4h7arGoQyX5g/CEa4tS9S4varq29xkFFoIBBIAkOIdQ1mAxHvJCjOPT5Qow=
+	t=1780367238; cv=none; b=V00FjfnuELWl/2VG1RpFAniLdqA92zwTaP6LDK8lN11a8b8xFv/GzwhCkHNIQMIyT/avYuAagC41GEhjvuoVpIvZQxU2bkdHlHQDXaXz0HMxtExh+hJBCrO35KWlOAe+/YpI9GdCyLknXp8lv7J7AiV3SxyQPS1V4ptqpdfxL3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780365889; c=relaxed/simple;
-	bh=T4I31M0PLTEwTn8WEOdyD4QByeRGNlWXuxameENdrkQ=;
+	s=arc-20240116; t=1780367238; c=relaxed/simple;
+	bh=xh5UTebwoTaJowF/caom4XsBxJnvBYNsa8feunb0Nh0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FzgIbO5ohjmwMk3SiGb6DdI1iNzsW5CbtdfXcOWJv7+KIrIUB6TX7weBMu7+HjXD6jH94brs7BlnR41gt9+0Rxx82QwQ+CXKzPoT+Nr+LzHBl/+fumfOkHF1N4+9jjimvm0z0TDg+dGCvxR9cVBibQ88BpWDFXJK4lZOQy/OLvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=nIVkQ2OE; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	 Content-Type:Content-Disposition:In-Reply-To; b=XpqwU8ro+cf1OvgzuhocoUgkCJv2o66LrAU72PEJV5UWr0Qu6dc7AE51fUC/u6bruv7XY9HTO9vO7W/nwRwsSjNT+7ij4UShWLTN9/DQLC7IH3XMDmaxh4TG5Z0WLg1+sd/8EU8ODfbpjAEry7OOi3rlknvDkMnLXs+TklIdbos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBp6yDOS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="nIVkQ2OE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=LeFlYkjUmS3153POexTFVk/hRyqELYXfJyWxbUFn0ec=; b=nIVkQ2OEloPOV+48X+lLM1OUeC
-	fgoztAFUyllJbj5tHe22c8jd/NklR+nnAXs3sSHZ+vzPAfr9rGUBilcbmSvr+c4xrY4b/uhX0ehzi
-	w4VarDH2CI4RXNWdaKKEiG3uzB3x8VVpGmXAWeYE4sTlHmJxN6Hos8uaAueTO7LnItyC9LFywPsuQ
-	lfT09AyO703q63bRf214goZ6A/Loc7EWs8R9whGpDQahAQsSsHNopLlGNiOkXzQD7xtI9nAB+QNIB
-	vI7fuD3Lf3qN05DQaxIcRZehkpYGC4QMbcjG6f18qY0cwqlE/u3JQbflVSXC05ODuE5XTYIhCsnPF
-	DudVPeTA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.2 #2 (Red Hat Linux))
-	id 1wUEUm-00000005Q2B-2HVb;
-	Tue, 02 Jun 2026 02:04:44 +0000
-Date: Tue, 2 Jun 2026 03:04:44 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org, stable@vger.kernel.org,
-	Denis Arefev <arefev@swemel.ru>
-Subject: [PATCH] make new mount API honour SB_NOUSER (was Re: [PATCH] block:
- Avoid mounting the bdev pseudo-filesystem in userspace)
-Message-ID: <20260602020444.GP2636677@ZenIV>
-References: <20260521072857.5078-1-arefev@swemel.ru>
- <20260602011907.GM2636677@ZenIV>
- <20260602013526.GO2636677@ZenIV>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBp6yDOS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12FBF1F00893;
+	Tue,  2 Jun 2026 02:27:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780367237;
+	bh=rZGdAyljt+9D6Yth8VqYWsVrybBQ37b7qGSayvIDdss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=TBp6yDOSpgGe4fBRS1WlG+K1YrLrNf/BhtCuM1ASQKUbZxGwjR18GF4sijAdpUVlU
+	 lOulDcd/GQzR8qmvpb4iM23/W9O7kHkgMmRIkgoHJZi50l5OaEsYjPZKaw4gNBomKO
+	 3JhyTEvVeQBaMqiSEtj9P896Eew3UiNTHymSAETEua8MoNeiEq13M9b1TITfv6ytGO
+	 dnR6B9E9N61yr9Z6XZpJjXdBp2sMy0bjTQIqZWyJjOfJ72uxEO8gOQ0MUCbscFc6Yj
+	 by130FmHjNgftvLWQsaSLO9GsBiUud3HR7WtE4ismnE0o7V8ErgKWjL3AEz5c+rKmZ
+	 cAQQdWdZjOqCw==
+Date: Mon, 1 Jun 2026 19:25:53 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Sterba <dsterba@suse.cz>
+Cc: Daniel Vacek <neelx@suse.com>, David Sterba <dsterba@suse.com>,
+	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v7 00/43] btrfs: add fscrypt support
+Message-ID: <20260602022553.GA2295@sol>
+References: <20260513085340.3673127-1-neelx@suse.com>
+ <CAPjX3FdHJpZUVk2dfA+Ov5K6vOSsOJMUaxCU4G8y1qg6baMXYw@mail.gmail.com>
+ <20260531002812.GA2302@sol>
+ <20260601185730.GE880787@twin.jikos.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,28 +49,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260602013526.GO2636677@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <20260601185730.GE880787@twin.jikos.cz>
 
-one should *not* be allowed to mount one of those, new API or not.
+On Mon, Jun 01, 2026 at 08:57:30PM +0200, David Sterba wrote:
+> The testing is not straightforward as it needs 3 projects to
+> synchronize, kernel, fstests and btrfs-progs. Testing may need to use
+> custom git branches for all of them. For btrfs-progs the changes will ge
+> it in soon. For fstests it can be a chicken-egg problem, as they don't
+> accept tests for unmerged code. We've been using our fstests [1] with
+> additional fixups (not upstreamable, related to CI workarounds). Though
+> I'm not sure if Daniel has updated the branch with his most recent
+> version.
+> 
+> [1] https://github.com/btrfs/fstests branch staging
 
-Reported-by: Denis Arefev <arefev@swemel.ru>
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
----
-[[ I still want to see the rest of the reproducer - report smells like a missing
-d_can_lookup() somewhere, on top of fsmount(2) bug]]
-diff --git a/fs/namespace.c b/fs/namespace.c
-index fe919abd2f01..17777c837683 100644
---- a/fs/namespace.c
-+++ b/fs/namespace.c
-@@ -4499,6 +4499,10 @@ SYSCALL_DEFINE3(fsmount, int, fs_fd, unsigned int, flags,
- 	new_mnt = vfs_create_mount(fc);
- 	if (IS_ERR(new_mnt))
- 		return PTR_ERR(new_mnt);
-+	if (new_mnt->mnt_sb->s_flags & SB_NOUSER) {
-+		mntput(new_mnt);
-+		return -EINVAL;
-+	}
- 	new_mnt->mnt_flags = mnt_flags;
- 
- 	new_path.dentry = dget(fc->root);
+Where are the btrfs-progs changes, then?  I'd like to try this out, but
+there's no way to do it without the btrfs-progs changes.
+
+- Eric
