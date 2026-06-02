@@ -1,46 +1,46 @@
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF203F4DE2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290D13F4DD2
 	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 17:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780420126; cv=none; b=QlDeutjnGrrLK+Nv34RD2zlygrlC4CHv1tbbY3CGpEuTsCWDeV9rY8VPdEzM9BJ7tOKISQr9oaMEAhhuYpl5b6n5wNjOJxTYVvogyfNEu11hq1N7sCD7qrZHX2aa+bAtuLnHzyYXPbEuwUSm4ZvmEpXkK7w7MIUaz3cyHzJJdm0=
+	t=1780420126; cv=none; b=jGndO7GcNzGwF6eQWMFr/LenKp4uWupcMMQX9A7jeHHHl4/RUemB+KGSe+YjmUVikpfKn3ABpfoZaVCDJ7JCm1g6cUOWdRhB2kGLS0HJxbocny/3vZVUdxGVUzsWREg7l1QO8vJD2gNCdAIlrBJh3oa6E3JrA8AxTcopBEH0LjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1780420126; c=relaxed/simple;
-	bh=oONaFj2FqSQz65z2kW+SG1QoMGPZ0bLGF8/2DR2xRng=;
+	bh=+roXnkgKJ1IYOwbaPhUA93bAojm79XqzH/FhfNc9kyg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RLb/7cE35oKyNg2QR4wRqrPLJfNkEfBjSZbV5hveiNUqOfJ2qAMOQrFd2ArW8+8jER+wkOghLXG8OF0OXwd/+ZWprYmUcCShfvprffsMNU7Yr6rpmVdukoW2qF6iwffz7UkeJPCy2B2H6C6bXfTu1K4DxnVWcCwrpNhKh0+aRhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=IcUYsjjJ; arc=none smtp.client-ip=199.89.1.14
+	 MIME-Version; b=Nh7Dz+YKIZ1w1Y7D4NozfOWCl5KJpleQybNInn4himLAg+OixK1QTD2iAJJH3yGZ0CcJfYiLJtCyWG2JV+unSIch8LxpGzITUR5FqZfUNcWk/MUXlrtOujPnoEef+Z7VicfGxeKV7az6aKLE70rB69w2mgNMJ12S6BsPoxE+ctY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=zFbnGa1/; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="IcUYsjjJ"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="zFbnGa1/"
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gVHNX643Fz1XM0nw;
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gVHNX5TZQz1XM0p8;
 	Tue,  2 Jun 2026 17:08:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1780420116; x=1783012117; bh=7sxDz
-	r234ly4JMo61FQM3nkkOybUDS/BD/v33622zU4=; b=IcUYsjjJQtUd0mnugwfB7
-	27Of1Gv1N2v0jza3PPghxg0TrcNxBgkjqN17jvYxiBXTgvlhrc7jufdgFnyORJaf
-	wq8M2L/kWlNMfotmmYqQzMg8wultr6n2+CjgRY0rr5sTEUYQcF+N0hem2H47HWlo
-	vzB6f+kqTBilAx7PyBxB+BC0ZYga5qGzePdZNVMqxu4P6pJoebTI4Je6yZMFwbrp
-	MpjiwknbrejWEIxfprEudC+42UiXxQ6gAxlFp+fWcM/V3IKHHIh1JBnv5fMnoDo6
-	48CnoZE8FWoIzEKRtK778dWxV9RduPEjXSC/EuD2WYLF625sauwD1qgptNflu1tS
-	g==
+	:received:received; s=mr01; t=1780420101; x=1783012102; bh=TjV+l
+	qXdBnZ3TydABf4G9SbJfFg2e5Ivx3lD3q5IS0c=; b=zFbnGa1/uS5rBNmrde03l
+	XR3VAtP/SHGIKnazC0B99uEVVuazMs/hXwhdKiPVrl8/qrhjCOPDAA6V4n1lli97
+	Iw+N851POFX6f4tI0EI7IrBbIywgaguSE67zc4RyKU0snmtIoG3iTO/OBrjTdAd8
+	HISG5bmqWTD2zVj+/0akhWEam++AdG54h/2le1DhInZ3riHPjozv+v790WAcvQmz
+	Ka9heW1oWZy4Ax10X4hQPBroSrgR16OvKvAJhKPVd1yL4i9uzLEMKhZtLz3glOrL
+	Su4X1ALoYnx97tR0UIj4I9KES/NtO0rNqoCdTP0Jwylr6JTUp/+MW128tbW/Y2fr
+	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id cI14BulBs4hk; Tue,  2 Jun 2026 17:08:36 +0000 (UTC)
+ id ejAloGPXTvQU; Tue,  2 Jun 2026 17:08:21 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gVHNM097xz1XM0nn;
-	Tue,  2 Jun 2026 17:08:34 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gVHN32hlwz1XM0nw;
+	Tue,  2 Jun 2026 17:08:19 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -49,10 +49,12 @@ Cc: linux-block@vger.kernel.org,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v6 10/14] block/blk-iocost: Inline iocg_lock() and iocg_unlock()
-Date: Tue,  2 Jun 2026 10:07:39 -0700
-Message-ID: <e0e81fbd746bfb54c31cb84f8671a0c23dcdedb2.1780419600.git.bvanassche@acm.org>
+	Josef Bacik <josef@toxicpanda.com>,
+	Yu Kuai <yukuai@fygo.io>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH v6 04/14] block/cgroup: Split blkg_conf_exit()
+Date: Tue,  2 Jun 2026 10:07:33 -0700
+Message-ID: <793249e79f746daa30574714ac3ad1909a52df9c.1780419600.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
 In-Reply-To: <cover.1780419600.git.bvanassche@acm.org>
 References: <cover.1780419600.git.bvanassche@acm.org>
@@ -64,105 +66,544 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Both iocg_lock() and iocg_unlock() use conditional locking. Fold these
-functions into their callers such that unlocking becomes unconditional.
+Split blkg_conf_exit() into blkg_conf_unprep() and blkg_conf_close_bdev()
+because blkg_conf_exit() is not compatible with the Clang thread-safety
+annotations. Remove blkg_conf_exit(). Rename blkg_conf_exit_frozen() into
+blkg_conf_close_bdev_frozen(). Add thread-safety annotations to the new
+functions.
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@kernel.org>
 Cc: Tejun Heo <tj@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-iocost.c | 49 +++++++++++++++++++---------------------------
- 1 file changed, 20 insertions(+), 29 deletions(-)
+ block/bfq-cgroup.c    |  9 ++++--
+ block/blk-cgroup.c    | 57 ++++++++++++++++++------------------
+ block/blk-cgroup.h    |  6 ++--
+ block/blk-iocost.c    | 67 +++++++++++++++++++++----------------------
+ block/blk-iolatency.c | 19 ++++++------
+ block/blk-throttle.c  | 34 +++++++++++++---------
+ 6 files changed, 101 insertions(+), 91 deletions(-)
 
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index df7b5a646e96..0bd0332b3d78 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -1054,11 +1054,11 @@ static ssize_t bfq_io_set_device_weight(struct ke=
+rnfs_open_file *of,
+=20
+ 	ret =3D blkg_conf_open_bdev(&ctx);
+ 	if (ret)
+-		goto out;
++		return ret;
+=20
+ 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_bfq, &ctx);
+ 	if (ret)
+-		goto out;
++		goto close_bdev;
+=20
+ 	if (sscanf(ctx.body, "%llu", &v) =3D=3D 1) {
+ 		/* require "default" on dfl */
+@@ -1079,8 +1079,11 @@ static ssize_t bfq_io_set_device_weight(struct ker=
+nfs_open_file *of,
+ 		bfq_group_set_weight(bfqg, bfqg->entity.weight, v);
+ 		ret =3D 0;
+ 	}
++
+ out:
+-	blkg_conf_exit(&ctx);
++	blkg_conf_unprep(&ctx);
++close_bdev:
++	blkg_conf_close_bdev(&ctx);
+ 	return ret ?: nbytes;
+ }
+=20
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index a8d95d51b866..38d7bcfcbbe8 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -755,7 +755,7 @@ EXPORT_SYMBOL_GPL(__blkg_prfill_u64);
+  *
+  * Initialize @ctx which can be used to parse blkg config input string @=
+input.
+  * Once initialized, @ctx can be used with blkg_conf_open_bdev() and
+- * blkg_conf_prep(), and must be cleaned up with blkg_conf_exit().
++ * blkg_conf_prep().
+  */
+ void blkg_conf_init(struct blkg_conf_ctx *ctx, char *input)
+ {
+@@ -817,8 +817,8 @@ EXPORT_SYMBOL_GPL(blkg_conf_open_bdev);
+  * ensures the correct locking order between freeze queue and q->rq_qos_=
+mutex.
+  *
+  * This function returns negative error on failure. On success it return=
+s
+- * memflags which must be saved and later passed to blkg_conf_exit_froze=
+n
+- * for restoring the memalloc scope.
++ * memflags which must be saved and later passed to
++ * blkg_conf_close_bdev_frozen() for restoring the memalloc scope.
+  */
+ unsigned long __must_check blkg_conf_open_bdev_frozen(struct blkg_conf_c=
+tx *ctx)
+ {
+@@ -858,7 +858,7 @@ unsigned long __must_check blkg_conf_open_bdev_frozen=
+(struct blkg_conf_ctx *ctx)
+  *
+  * blkg_conf_open_bdev() must be called on @ctx beforehand. On success, =
+this
+  * function returns with queue lock held and must be followed by
+- * blkg_conf_exit().
++ * blkg_conf_close_bdev().
+  */
+ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		   struct blkg_conf_ctx *ctx)
+@@ -968,42 +968,41 @@ int blkg_conf_prep(struct blkcg *blkcg, const struc=
+t blkcg_policy *pol,
+ EXPORT_SYMBOL_GPL(blkg_conf_prep);
+=20
+ /**
+- * blkg_conf_exit - clean up per-blkg config update
++ * blkg_conf_unprep - counterpart of blkg_conf_prep()
+  * @ctx: blkg_conf_ctx initialized with blkg_conf_init()
+- *
+- * Clean up after per-blkg config update. This function must be called o=
+n all
+- * blkg_conf_ctx's initialized with blkg_conf_init().
+  */
+-void blkg_conf_exit(struct blkg_conf_ctx *ctx)
+-	__releases(&ctx->bdev->bd_queue->queue_lock)
+-	__releases(&ctx->bdev->bd_queue->rq_qos_mutex)
++void blkg_conf_unprep(struct blkg_conf_ctx *ctx)
+ {
+-	if (ctx->blkg) {
+-		spin_unlock_irq(&bdev_get_queue(ctx->bdev)->queue_lock);
+-		ctx->blkg =3D NULL;
+-	}
++	WARN_ON_ONCE(!ctx->blkg);
++	spin_unlock_irq(&ctx->bdev->bd_disk->queue->queue_lock);
++	ctx->blkg =3D NULL;
++}
++EXPORT_SYMBOL_GPL(blkg_conf_unprep);
+=20
+-	if (ctx->bdev) {
+-		mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
+-		blkdev_put_no_open(ctx->bdev);
+-		ctx->body =3D NULL;
+-		ctx->bdev =3D NULL;
+-	}
++/**
++ * blkg_conf_close_bdev - counterpart of blkg_conf_open_bdev()
++ * @ctx: blkg_conf_ctx initialized with blkg_conf_init()
++ */
++void blkg_conf_close_bdev(struct blkg_conf_ctx *ctx)
++{
++	mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
++	blkdev_put_no_open(ctx->bdev);
++	ctx->body =3D NULL;
++	ctx->bdev =3D NULL;
+ }
+-EXPORT_SYMBOL_GPL(blkg_conf_exit);
++EXPORT_SYMBOL_GPL(blkg_conf_close_bdev);
+=20
+ /*
+- * Similar to blkg_conf_exit, but also unfreezes the queue. Should be us=
+ed
++ * Similar to blkg_close_bdev, but also unfreezes the queue. Should be u=
+sed
+  * when blkg_conf_open_bdev_frozen is used to open the bdev.
+  */
+-void blkg_conf_exit_frozen(struct blkg_conf_ctx *ctx, unsigned long memf=
+lags)
++void blkg_conf_close_bdev_frozen(struct blkg_conf_ctx *ctx,
++				 unsigned long memflags)
+ {
+-	if (ctx->bdev) {
+-		struct request_queue *q =3D ctx->bdev->bd_queue;
++	struct request_queue *q =3D ctx->bdev->bd_queue;
+=20
+-		blkg_conf_exit(ctx);
+-		blk_mq_unfreeze_queue(q, memflags);
+-	}
++	blkg_conf_close_bdev(ctx);
++	blk_mq_unfreeze_queue(q, memflags);
+ }
+=20
+ static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat =
+*src)
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index 1cce3294634d..ce90f5b60d52 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -222,8 +222,10 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx);
+ unsigned long blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx);
+ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		   struct blkg_conf_ctx *ctx);
+-void blkg_conf_exit(struct blkg_conf_ctx *ctx);
+-void blkg_conf_exit_frozen(struct blkg_conf_ctx *ctx, unsigned long memf=
+lags);
++void blkg_conf_unprep(struct blkg_conf_ctx *ctx);
++void blkg_conf_close_bdev(struct blkg_conf_ctx *ctx);
++void blkg_conf_close_bdev_frozen(struct blkg_conf_ctx *ctx,
++				 unsigned long memflags);
+=20
+ /**
+  * bio_issue_as_root_blkg - see if this bio needs to be issued as root b=
+lkg
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 8f1468444e97..e58274bc83e0 100644
+index b34f820dedcc..3e4e28ecc21f 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -727,26 +727,6 @@ static void iocg_commit_bio(struct ioc_gq *iocg, str=
-uct bio *bio,
- 	put_cpu_ptr(gcs);
+@@ -3142,21 +3142,23 @@ static ssize_t ioc_weight_write(struct kernfs_ope=
+n_file *of, char *buf,
+=20
+ 	ret =3D blkg_conf_open_bdev(&ctx);
+ 	if (ret)
+-		goto err;
++		return ret;
+=20
+ 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_iocost, &ctx);
+ 	if (ret)
+-		goto err;
++		goto close_bdev;
+=20
+ 	iocg =3D blkg_to_iocg(ctx.blkg);
+=20
++	ret =3D -EINVAL;
++
+ 	if (!strncmp(ctx.body, "default", 7)) {
+ 		v =3D 0;
+ 	} else {
+ 		if (!sscanf(ctx.body, "%u", &v))
+-			goto einval;
++			goto unprep;
+ 		if (v < CGROUP_WEIGHT_MIN || v > CGROUP_WEIGHT_MAX)
+-			goto einval;
++			goto unprep;
+ 	}
+=20
+ 	spin_lock(&iocg->ioc->lock);
+@@ -3165,14 +3167,15 @@ static ssize_t ioc_weight_write(struct kernfs_ope=
+n_file *of, char *buf,
+ 	weight_updated(iocg, &now);
+ 	spin_unlock(&iocg->ioc->lock);
+=20
+-	blkg_conf_exit(&ctx);
+-	return nbytes;
++	ret =3D 0;
+=20
+-einval:
+-	ret =3D -EINVAL;
+-err:
+-	blkg_conf_exit(&ctx);
+-	return ret;
++unprep:
++	blkg_conf_unprep(&ctx);
++
++close_bdev:
++	blkg_conf_close_bdev(&ctx);
++
++	return ret ?: nbytes;
  }
 =20
--static void iocg_lock(struct ioc_gq *iocg, bool lock_ioc, unsigned long =
-*flags)
--{
--	if (lock_ioc) {
--		spin_lock_irqsave(&iocg->ioc->lock, *flags);
--		spin_lock(&iocg->waitq.lock);
--	} else {
--		spin_lock_irqsave(&iocg->waitq.lock, *flags);
+ static u64 ioc_qos_prfill(struct seq_file *sf, struct blkg_policy_data *=
+pd,
+@@ -3241,10 +3244,8 @@ static ssize_t ioc_qos_write(struct kernfs_open_fi=
+le *of, char *input,
+ 	blkg_conf_init(&ctx, input);
+=20
+ 	memflags =3D blkg_conf_open_bdev_frozen(&ctx);
+-	if (IS_ERR_VALUE(memflags)) {
+-		ret =3D memflags;
+-		goto err;
 -	}
--}
--
--static void iocg_unlock(struct ioc_gq *iocg, bool unlock_ioc, unsigned l=
-ong *flags)
--{
--	if (unlock_ioc) {
--		spin_unlock(&iocg->waitq.lock);
--		spin_unlock_irqrestore(&iocg->ioc->lock, *flags);
--	} else {
--		spin_unlock_irqrestore(&iocg->waitq.lock, *flags);
--	}
--}
--
- #define CREATE_TRACE_POINTS
- #include <trace/events/iocost.h>
++	if (IS_ERR_VALUE(memflags))
++		return memflags;
 =20
-@@ -1585,13 +1565,17 @@ static enum hrtimer_restart iocg_waitq_timer_fn(s=
-truct hrtimer *timer)
- 	struct ioc_gq *iocg =3D container_of(timer, struct ioc_gq, waitq_timer)=
-;
- 	bool pay_debt =3D READ_ONCE(iocg->abs_vdebt);
- 	struct ioc_now now;
--	unsigned long flags;
+ 	body =3D ctx.body;
+ 	disk =3D ctx.bdev->bd_disk;
+@@ -3361,14 +3362,14 @@ static ssize_t ioc_qos_write(struct kernfs_open_f=
+ile *of, char *input,
 =20
- 	ioc_now(iocg->ioc, &now);
+ 	blk_mq_unquiesce_queue(disk->queue);
 =20
--	iocg_lock(iocg, pay_debt, &flags);
--	iocg_kick_waitq(iocg, pay_debt, &now);
--	iocg_unlock(iocg, pay_debt, &flags);
-+	if (pay_debt) {
-+		guard(spinlock_irqsave)(&iocg->ioc->lock);
-+		guard(spinlock)(&iocg->waitq.lock);
-+		iocg_kick_waitq(iocg, pay_debt, &now);
-+	} else {
-+		guard(spinlock_irqsave)(&iocg->waitq.lock);
-+		iocg_kick_waitq(iocg, pay_debt, &now);
-+	}
-=20
- 	return HRTIMER_NORESTART;
+-	blkg_conf_exit_frozen(&ctx, memflags);
++	blkg_conf_close_bdev_frozen(&ctx, memflags);
+ 	return nbytes;
+ einval:
+ 	spin_unlock_irq(&ioc->lock);
+ 	blk_mq_unquiesce_queue(disk->queue);
+ 	ret =3D -EINVAL;
+ err:
+-	blkg_conf_exit_frozen(&ctx, memflags);
++	blkg_conf_close_bdev_frozen(&ctx, memflags);
+ 	return ret;
  }
-@@ -2706,7 +2690,6 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, =
-struct bio *bio)
- 	u64 abs_cost, cost, vtime;
- 	bool use_debt, ioc_locked;
- 	enum over_budget_action action;
--	unsigned long flags;
 =20
- 	/* bypass IOs if disabled, still initializing, or for root cgroup */
- 	if (!ioc->enabled || !iocg || !iocg->level)
-@@ -2745,10 +2728,18 @@ static void ioc_rqos_throttle(struct rq_qos *rqos=
-, struct bio *bio)
- 	use_debt =3D bio_issue_as_root_blkg(bio) || fatal_signal_pending(curren=
-t);
- 	ioc_locked =3D use_debt || READ_ONCE(iocg->abs_vdebt);
- retry_lock:
--	iocg_lock(iocg, ioc_locked, &flags);
--	action =3D iocg_handle_over_budget(rqos, iocg, bio, &now, &wait, use_de=
-bt,
--					 ioc_locked, abs_cost, cost);
--	iocg_unlock(iocg, ioc_locked, &flags);
-+	if (ioc_locked) {
-+		guard(spinlock_irqsave)(&iocg->ioc->lock);
-+		guard(spinlock)(&iocg->waitq.lock);
-+		action =3D iocg_handle_over_budget(rqos, iocg, bio, &now, &wait,
-+						 use_debt, ioc_locked, abs_cost,
-+						 cost);
-+	} else {
-+		guard(spinlock_irqsave)(&iocg->waitq.lock);
-+		action =3D iocg_handle_over_budget(rqos, iocg, bio, &now, &wait,
-+						 use_debt, ioc_locked, abs_cost,
-+						 cost);
-+	}
- 	switch (action) {
- 	case action_retry:
- 		ioc_locked =3D true;
+@@ -3434,20 +3435,20 @@ static ssize_t ioc_cost_model_write(struct kernfs=
+_open_file *of, char *input,
+=20
+ 	ret =3D blkg_conf_open_bdev(&ctx);
+ 	if (ret)
+-		goto err;
++		return ret;
+=20
+ 	body =3D ctx.body;
+ 	q =3D bdev_get_queue(ctx.bdev);
+ 	if (!queue_is_mq(q)) {
+ 		ret =3D -EOPNOTSUPP;
+-		goto err;
++		goto close_bdev;
+ 	}
+=20
+ 	ioc =3D q_to_ioc(q);
+ 	if (!ioc) {
+ 		ret =3D blk_iocost_init(ctx.bdev->bd_disk);
+ 		if (ret)
+-			goto err;
++			goto close_bdev;
+ 		ioc =3D q_to_ioc(q);
+ 	}
+=20
+@@ -3458,6 +3459,8 @@ static ssize_t ioc_cost_model_write(struct kernfs_o=
+pen_file *of, char *input,
+ 	memcpy(u, ioc->params.i_lcoefs, sizeof(u));
+ 	user =3D ioc->user_cost_model;
+=20
++	ret =3D -EINVAL;
++
+ 	while ((p =3D strsep(&body, " \t\n"))) {
+ 		substring_t args[MAX_OPT_ARGS];
+ 		char buf[32];
+@@ -3475,20 +3478,20 @@ static ssize_t ioc_cost_model_write(struct kernfs=
+_open_file *of, char *input,
+ 			else if (!strcmp(buf, "user"))
+ 				user =3D true;
+ 			else
+-				goto einval;
++				goto unlock;
+ 			continue;
+ 		case COST_MODEL:
+ 			match_strlcpy(buf, &args[0], sizeof(buf));
+ 			if (strcmp(buf, "linear"))
+-				goto einval;
++				goto unlock;
+ 			continue;
+ 		}
+=20
+ 		tok =3D match_token(p, i_lcoef_tokens, args);
+ 		if (tok =3D=3D NR_I_LCOEFS)
+-			goto einval;
++			goto unlock;
+ 		if (match_u64(&args[0], &v))
+-			goto einval;
++			goto unlock;
+ 		u[tok] =3D v;
+ 		user =3D true;
+ 	}
+@@ -3500,24 +3503,18 @@ static ssize_t ioc_cost_model_write(struct kernfs=
+_open_file *of, char *input,
+ 		ioc->user_cost_model =3D false;
+ 	}
+ 	ioc_refresh_params(ioc, true);
+-	spin_unlock_irq(&ioc->lock);
+=20
+-	blk_mq_unquiesce_queue(q);
+-	blk_mq_unfreeze_queue(q, memflags);
+-
+-	blkg_conf_exit(&ctx);
+-	return nbytes;
++	ret =3D 0;
+=20
+-einval:
++unlock:
+ 	spin_unlock_irq(&ioc->lock);
+=20
+ 	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q, memflags);
+=20
+-	ret =3D -EINVAL;
+-err:
+-	blkg_conf_exit(&ctx);
+-	return ret;
++close_bdev:
++	blkg_conf_close_bdev(&ctx);
++	return ret ?: nbytes;
+ }
+=20
+ static struct cftype ioc_files[] =3D {
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 53e8dd2dfa8a..1aaee6fb0f59 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -840,7 +840,7 @@ static ssize_t iolatency_set_limit(struct kernfs_open=
+_file *of, char *buf,
+=20
+ 	ret =3D blkg_conf_open_bdev(&ctx);
+ 	if (ret)
+-		goto out;
++		return ret;
+=20
+ 	/*
+ 	 * blk_iolatency_init() may fail after rq_qos_add() succeeds which can
+@@ -850,11 +850,11 @@ static ssize_t iolatency_set_limit(struct kernfs_op=
+en_file *of, char *buf,
+ 	if (!iolat_rq_qos(ctx.bdev->bd_queue))
+ 		ret =3D blk_iolatency_init(ctx.bdev->bd_disk);
+ 	if (ret)
+-		goto out;
++		goto close_bdev;
+=20
+ 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_iolatency, &ctx);
+ 	if (ret)
+-		goto out;
++		goto close_bdev;
+=20
+ 	iolat =3D blkg_to_lat(ctx.blkg);
+ 	p =3D ctx.body;
+@@ -865,7 +865,7 @@ static ssize_t iolatency_set_limit(struct kernfs_open=
+_file *of, char *buf,
+ 		char val[21];	/* 18446744073709551616 */
+=20
+ 		if (sscanf(tok, "%15[^=3D]=3D%20s", key, val) !=3D 2)
+-			goto out;
++			goto unprep;
+=20
+ 		if (!strcmp(key, "target")) {
+ 			u64 v;
+@@ -875,9 +875,9 @@ static ssize_t iolatency_set_limit(struct kernfs_open=
+_file *of, char *buf,
+ 			else if (sscanf(val, "%llu", &v) =3D=3D 1)
+ 				lat_val =3D v * NSEC_PER_USEC;
+ 			else
+-				goto out;
++				goto unprep;
+ 		} else {
+-			goto out;
++			goto unprep;
+ 		}
+ 	}
+=20
+@@ -889,8 +889,11 @@ static ssize_t iolatency_set_limit(struct kernfs_ope=
+n_file *of, char *buf,
+ 	if (oldval !=3D iolat->min_lat_nsec)
+ 		iolatency_clear_scaling(blkg);
+ 	ret =3D 0;
+-out:
+-	blkg_conf_exit(&ctx);
++
++unprep:
++	blkg_conf_unprep(&ctx);
++close_bdev:
++	blkg_conf_close_bdev(&ctx);
+ 	return ret ?: nbytes;
+ }
+=20
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 88986dde1e18..47052ba21d1b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1353,21 +1353,21 @@ static ssize_t tg_set_conf(struct kernfs_open_fil=
+e *of,
+=20
+ 	ret =3D blkg_conf_open_bdev(&ctx);
+ 	if (ret)
+-		goto out_finish;
++		return ret;
+=20
+ 	if (!blk_throtl_activated(ctx.bdev->bd_queue)) {
+ 		ret =3D blk_throtl_init(ctx.bdev->bd_disk);
+ 		if (ret)
+-			goto out_finish;
++			goto close_bdev;
+ 	}
+=20
+ 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_throtl, &ctx);
+ 	if (ret)
+-		goto out_finish;
++		goto close_bdev;
+=20
+ 	ret =3D -EINVAL;
+ 	if (sscanf(ctx.body, "%llu", &v) !=3D 1)
+-		goto out_finish;
++		goto unprep;
+ 	if (!v)
+ 		v =3D U64_MAX;
+=20
+@@ -1381,8 +1381,12 @@ static ssize_t tg_set_conf(struct kernfs_open_file=
+ *of,
+=20
+ 	tg_conf_updated(tg, false);
+ 	ret =3D 0;
+-out_finish:
+-	blkg_conf_exit(&ctx);
++
++unprep:
++	blkg_conf_unprep(&ctx);
++
++close_bdev:
++	blkg_conf_close_bdev(&ctx);
+ 	return ret ?: nbytes;
+ }
+=20
+@@ -1537,17 +1541,17 @@ static ssize_t tg_set_limit(struct kernfs_open_fi=
+le *of,
+=20
+ 	ret =3D blkg_conf_open_bdev(&ctx);
+ 	if (ret)
+-		goto out_finish;
++		return ret;
+=20
+ 	if (!blk_throtl_activated(ctx.bdev->bd_queue)) {
+ 		ret =3D blk_throtl_init(ctx.bdev->bd_disk);
+ 		if (ret)
+-			goto out_finish;
++			goto close_bdev;
+ 	}
+=20
+ 	ret =3D blkg_conf_prep(blkcg, &blkcg_policy_throtl, &ctx);
+ 	if (ret)
+-		goto out_finish;
++		goto close_bdev;
+=20
+ 	tg =3D blkg_to_tg(ctx.blkg);
+ 	tg_update_carryover(tg);
+@@ -1573,11 +1577,11 @@ static ssize_t tg_set_limit(struct kernfs_open_fi=
+le *of,
+ 		p =3D tok;
+ 		strsep(&p, "=3D");
+ 		if (!p || (sscanf(p, "%llu", &val) !=3D 1 && strcmp(p, "max")))
+-			goto out_finish;
++			goto unprep;
+=20
+ 		ret =3D -ERANGE;
+ 		if (!val)
+-			goto out_finish;
++			goto unprep;
+=20
+ 		ret =3D -EINVAL;
+ 		if (!strcmp(tok, "rbps"))
+@@ -1589,7 +1593,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file=
+ *of,
+ 		else if (!strcmp(tok, "wiops"))
+ 			v[3] =3D min_t(u64, val, UINT_MAX);
+ 		else
+-			goto out_finish;
++			goto unprep;
+ 	}
+=20
+ 	tg->bps[READ] =3D v[0];
+@@ -1599,8 +1603,10 @@ static ssize_t tg_set_limit(struct kernfs_open_fil=
+e *of,
+=20
+ 	tg_conf_updated(tg, false);
+ 	ret =3D 0;
+-out_finish:
+-	blkg_conf_exit(&ctx);
++unprep:
++	blkg_conf_unprep(&ctx);
++close_bdev:
++	blkg_conf_close_bdev(&ctx);
+ 	return ret ?: nbytes;
+ }
+=20
