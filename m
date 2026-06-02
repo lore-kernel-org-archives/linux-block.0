@@ -1,105 +1,179 @@
-Received: from va-2-40.ptr.blmpb.com (va-2-40.ptr.blmpb.com [209.127.231.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AB233E34E
-	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 15:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4256B387574
+	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 16:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780415796; cv=none; b=Y5V408ESLg5+yx1zUJrh+t2xI9Tfv2eNKPTDkKfpcXDKGwWKNIFkVqQb3y9Kzp93UTokOoyO8MbDBhRheR2NWJFgn9OVdFGHZZObIhRxbTMbaM2LR9iThQgXPKV1V4tft3Lxuff1nHqtcyA1gr0X/XtR+UgqmPCNcaOv39nQsIA=
+	t=1780416055; cv=none; b=Fsq8OWMCuHShrNJuWDmK8L/oH/+FzQN4gbL+KmnL2Plabd8LP/chCdJhu1pGbyv0PYYQhwJ/HjXyq+49KJsSC/jdDmnAcUMjWwHoJOc1xJ36CYJ5BLa8kvmtyK0eYeOtH2a/MRqdlFppGBZ30835WGLAbN1H45Yu+vuXCmxctVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780415796; c=relaxed/simple;
-	bh=xc5RFHh85VaFWMhTbWHtBv1oZ8P0ahLqFBCs5djBKRA=;
-	h=Cc:Mime-Version:References:To:In-Reply-To:Content-Type:From:
-	 Subject:Date:Message-Id; b=EanfWzebmV0EmNUxzywsR+bNy+54CPkRz4T21h5ezauK6d/WWj3VATjm/zlIo77wMwNQEKmBwIm/NzQT5/jM0JgvOPq7rmyADb9eu/T4sBx9VAUnIWvP+1zHj1M12GA+SdIWaU9L/CbE1JHIEpcG4nBZzdSZppM40J7kYH02Ysc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=GWp1IWrV; arc=none smtp.client-ip=209.127.231.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1780416055; c=relaxed/simple;
+	bh=3q1u+LhUGVjb/A0xjYF86CsDVh0HAUHEaqbdDsS3brM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pb9MKHMO1ZmvM8j4AbtgetCnCKTtYeQoaGO5exES+HCFkWu9UhrnMv0zeUbP58p+IqbST7kxyl+bM4w5sWzyralf0T6ocWAxL9TIv4Cr/wnpFS52c5cNZvOeftISEz5hv4BG4wX8UoICc0G+ztcbAM34+NT2lL9D7wgjuJxgYpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=H2v1eMrR; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="GWp1IWrV"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="H2v1eMrR"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1780415784;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=r2Pp9YXJ9ZTzLm94EO/ONd8UqABk1GQg0Yxcb67VDsI=;
- b=GWp1IWrVFL7KmMP/U3WFtL+TmFwliP4/MEUx+jkANILkm6B1pAImqJXZumjT5g3k06E108
- xdX7hJ6n2+9goY4NvkX5weGTPCIfY//Nu0camphJtsHTkTEpi7NbVdTeLGWOyoh50ZH8c0
- P3F+uQBqqNiUe0ObovTrXj+8GdIgOnHOha/uxUu1HJam7aKrGBGBsni28c6WTlHfhQr8jF
- BB4dGP8LirNTdSoSTEbdrIkG2Q2U60fL/8Tmpom1FQZ2mtH/few3A2tLDXF/XxpX9M26fn
- TxYBKJskhn1Vt+Cr0f2DjM7KVA/mfTFxfuD9ePpdr+EVoa9uSyYBM/t0FnPZMQ==
-Cc: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<yukuai@fygo.io>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=VvElFF068Ve7ZBeg/s+GYXAA/2OootEbAfLXW7NSBv4=; b=H2v1eMrR4o3a9ugvd7BrH/6Tw0
+	r3SU+To9h8oh+5o8YQTgBa/xfTMb+naqzquPhwWqqQ+yUHWCutZdKD13IoLAdVeGSGV2Br+BHSkh7
+	DaeIBed7+2oackQBAGW3aPABvIZ77cQ0rXiuqxYhWI7Nvkf9IyBrjGjmJ28klJjCLHKXsXm3NjwgM
+	h8D9klFrEkqboBdyvYkFn1tyZD1vfKpAMcl9V31O7oUm97BMDPfSZW5F6pSxFp5m8hZq6QF788sT5
+	54eqjYCTHGrzg6f8Qf2NVq4269GhUqXjRYswDyxKRavAP9GDp3AqesMArvIXm//iJWRMfs+67TuEV
+	dhB8xWOw==;
+Received: from 2a02-8389-2341-5b80-decc-1a96-daaa-a2cc.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:decc:1a96:daaa:a2cc] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wURXn-0000000DO2R-1baf;
+	Tue, 02 Jun 2026 16:00:43 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: vbabka@kernel.org,
+	harry@kernel.org,
+	akpm@linux-foundation.org
+Cc: hao.li@linux.dev,
+	cl@gentwo.org,
+	rientjes@google.com,
+	roman.gushchin@linux.dev,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [PATCH] mm: simplify the mempool_alloc_bulk API
+Date: Tue,  2 Jun 2026 18:00:38 +0200
+Message-ID: <20260602160038.3976341-1-hch@lst.de>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-References: <20260601061312.896801-1-yukuai@fygo.io> <8709b8e7-8328-47e8-950f-e5726bd70dbc@gmail.com> <ac87c25f-6708-4307-ad03-645f984dfb1c@kernel.dk>
-Reply-To: yukuai@fygo.io
-To: "Jens Axboe" <axboe@kernel.dk>, 
-	"Bart Van Assche" <bart.vanassche@gmail.com>, <tj@kernel.org>, 
-	<josef@toxicpanda.com>
-In-Reply-To: <ac87c25f-6708-4307-ad03-645f984dfb1c@kernel.dk>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Received: from [192.168.1.104] ([39.182.0.134]) by smtp.feishu.cn with ESMTPS; Tue, 02 Jun 2026 23:56:21 +0800
-X-Lms-Return-Path: <lba+26a1efd26+e445aa+vger.kernel.org+yukuai@fnnas.com>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH] blk-iocost: use irq-safe locking in cgroup handlers
-Date: Tue, 2 Jun 2026 23:56:19 +0800
-Message-Id: <2f20263e-c589-491d-9be8-c2e3d56a9229@fygo.io>
-X-Original-From: Yu Kuai <yukuai@fygo.io>
-User-Agent: Mozilla Thunderbird
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi,
+The mempool_alloc_bulk was modelled after the alloc_pages_bulk API,
+including some misunderstanding of it.
 
-=E5=9C=A8 2026/6/2 21:25, Jens Axboe =E5=86=99=E9=81=93:
-> On 6/1/26 3:50 PM, Bart Van Assche wrote:
->> On 5/31/26 11:13 PM, Yu Kuai wrote:
->>> @@ -3378,14 +3378,14 @@ static u64 ioc_cost_model_prfill(struct seq_fil=
-e *sf,
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!dname)
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>  =C2=A0 -=C2=A0=C2=A0=C2=A0 spin_lock(&ioc->lock);
->>> +=C2=A0=C2=A0=C2=A0 spin_lock_irq(&ioc->lock);
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 seq_printf(sf, "%s ctrl=3D%s model=3Dli=
-near "
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 "rbps=3D%llu rseqiops=3D%llu rrandiops=3D%llu "
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 "wbps=3D%llu wseqiops=3D%llu wrandiops=3D%llu\n",
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 dname, ioc->user_cost_model ? "user" : "auto",
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 u[I_LCOEF_RBPS], u[I_LCOEF_RSEQIOPS], u[I_LCOEF_RRANDIOPS],
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 u[I_LCOEF_WBPS], u[I_LCOEF_WSEQIOPS], u[I_LCOEF_WRANDIOPS]);
->>> -=C2=A0=C2=A0=C2=A0 spin_unlock(&ioc->lock);
->>> +=C2=A0=C2=A0=C2=A0 spin_unlock_irq(&ioc->lock);
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>  =C2=A0 }
->> This change is wrong. ioc_cost_model_prfill() only has one caller,
->> namely blkcg_print_blkgs(). blkcg_print_blkgs() calls the above function
->> with interrupts disabled. The spin_unlock_irq(&ioc->lock) at the end of
->> the above function enables interrupts while q->queue_lock is held. If an
->> interrupt happens on the same CPU core before q->queue_lock is unlocked,
->> and that interrupt tries to lock q->queue_lock, a deadlock will occur.
-> Agree, it's broken. Which makes me suspect of the traces shown. Yu,
-> can you please shed some light on this?
+Remove checking for NULL slots in the array, as alloc_pages_bulk and
+kmem_cache_alloc_bulk always fill the array from the beginning and thus
+we know the offset of the first failing allocation.  This removes support
+for working well with alloc_pages_bulk used to refill page arrays that
+might have an entry removed from in the middle, but that is only used by
+sunrpc and hopefully on it's way out.
 
-Looks like my reply is in your spam again :(
+Also remove the allocated parameter as it is redundant because the caller
+can simply specific and offset into the entries array.
 
-The trace is from ioc_weight_write(), which do have the problem. And
-while reviewing related code, I'm wrong to think ioc_cost_model_prfill()
-have the same problem and changed it as well.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-crypto-fallback.c |  9 +++++----
+ include/linux/mempool.h     |  2 +-
+ mm/mempool.c                | 27 ++++++++++-----------------
+ 3 files changed, 16 insertions(+), 22 deletions(-)
 
->
-> I've dropped it, thanks Bart.
+diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+index 61f595410832..ab6924fba280 100644
+--- a/block/blk-crypto-fallback.c
++++ b/block/blk-crypto-fallback.c
+@@ -199,8 +199,8 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
+ 	pages += nr_segs * (PAGE_PTRS_PER_BVEC - 1);
+ 
+ 	/*
+-	 * Try a bulk allocation first.  This could leave random pages in the
+-	 * array unallocated, but we'll fix that up later in mempool_alloc_bulk.
++	 * Try a bulk allocation first.  This might not fill all allocated
++	 * pages, but we'll fix that up later in mempool_alloc_bulk.
+ 	 *
+ 	 * Note: alloc_pages_bulk needs the array to be zeroed, as it assumes
+ 	 * any non-zero slot already contains a valid allocation.
+@@ -208,8 +208,9 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
+ 	memset(pages, 0, sizeof(struct page *) * nr_segs);
+ 	nr_allocated = alloc_pages_bulk(GFP_KERNEL, nr_segs, pages);
+ 	if (nr_allocated < nr_segs)
+-		mempool_alloc_bulk(blk_crypto_bounce_page_pool, (void **)pages,
+-				nr_segs, nr_allocated);
++		mempool_alloc_bulk(blk_crypto_bounce_page_pool,
++				(void **)pages + nr_allocated,
++				nr_segs - nr_allocated);
+ 	memalloc_noio_restore(memflags);
+ 	*pages_ret = pages;
+ 	return bio;
+diff --git a/include/linux/mempool.h b/include/linux/mempool.h
+index e8e440e04a06..a0fa6d43e0dc 100644
+--- a/include/linux/mempool.h
++++ b/include/linux/mempool.h
+@@ -66,7 +66,7 @@ void *mempool_alloc_noprof(struct mempool *pool, gfp_t gfp_mask) __malloc;
+ #define mempool_alloc(...)						\
+ 	alloc_hooks(mempool_alloc_noprof(__VA_ARGS__))
+ int mempool_alloc_bulk_noprof(struct mempool *pool, void **elem,
+-		unsigned int count, unsigned int allocated);
++		unsigned int count);
+ #define mempool_alloc_bulk(...)						\
+ 	alloc_hooks(mempool_alloc_bulk_noprof(__VA_ARGS__))
+ 
+diff --git a/mm/mempool.c b/mm/mempool.c
+index db23e0eef652..473a029fa31f 100644
+--- a/mm/mempool.c
++++ b/mm/mempool.c
+@@ -419,12 +419,8 @@ static unsigned int mempool_alloc_from_pool(struct mempool *pool, void **elems,
+ 	spin_lock_irqsave(&pool->lock, flags);
+ 	if (unlikely(pool->curr_nr < count - allocated))
+ 		goto fail;
+-	for (i = 0; i < count; i++) {
+-		if (!elems[i]) {
+-			elems[i] = remove_element(pool);
+-			allocated++;
+-		}
+-	}
++	while (allocated < count)
++		elems[allocated++] = remove_element(pool);
+ 	spin_unlock_irqrestore(&pool->lock, flags);
+ 
+ 	/* Paired with rmb in mempool_free(), read comment there. */
+@@ -479,22 +475,21 @@ static inline gfp_t mempool_adjust_gfp(gfp_t *gfp_mask)
+  * @pool:	pointer to the memory pool
+  * @elems:	partially or fully populated elements array
+  * @count:	number of entries in @elem that need to be allocated
+- * @allocated:	number of entries in @elem already allocated
+  *
+- * Allocate elements for each slot in @elem that is non-%NULL. This is done by
+- * first calling into the alloc_fn supplied at pool initialization time, and
+- * dipping into the reserved pool when alloc_fn fails to allocate an element.
++ * Allocate @count elements into @elems.  This is done by first calling into the
++ * alloc_fn supplied at pool initialization time, and dipping into the reserved
++ * pool when alloc_fn fails to allocate an element.
+  *
+  * On return all @count elements in @elems will be populated.
+  *
+  * Return: Always 0.  If it wasn't for %$#^$ alloc tags, it would return void.
+  */
+ int mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
+-		unsigned int count, unsigned int allocated)
++		unsigned int count)
+ {
+ 	gfp_t gfp_mask = GFP_KERNEL;
+ 	gfp_t gfp_temp = mempool_adjust_gfp(&gfp_mask);
+-	unsigned int i = 0;
++	unsigned int allocated = 0;
+ 
+ 	VM_WARN_ON_ONCE(count > pool->min_nr);
+ 	might_alloc(gfp_mask);
+@@ -514,11 +509,9 @@ int mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
+ 	 * Try to allocate the elements using the allocation callback first as
+ 	 * that might succeed even when the caller's bulk allocation did not.
+ 	 */
+-	for (i = 0; i < count; i++) {
+-		if (elems[i])
+-			continue;
+-		elems[i] = pool->alloc(gfp_temp, pool->pool_data);
+-		if (unlikely(!elems[i]))
++	while (allocated < count) {
++		elems[allocated] = pool->alloc(gfp_temp, pool->pool_data);
++		if (unlikely(!elems[allocated]))
+ 			goto use_pool;
+ 		allocated++;
+ 	}
+-- 
+2.53.0
 
-I'll send a v2, and only fix ioc_weight_write().
-
->
---=20
-Thansk,
-Kuai
