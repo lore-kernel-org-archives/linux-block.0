@@ -1,87 +1,96 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A238A3DCDAB
-	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 17:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8A33F8EA7
+	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 17:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780420131; cv=none; b=oW79E7O9KZKqiPtkqkbinsOdzUScSENyC2YBBgqOZjJeFmpal9mI2zMnNTVzC0pL1oftjvR31t0Xw01seWT9F2Xt9VM7cb84k9yjBDohv7a9jcEbQvD8txTgnzaJYZT/u1wtzOuzKsdKmXKIaRHvEQE7vvJEBH+XFgKfmCtCS8c=
+	t=1780420777; cv=none; b=WxJF1omdhbCViThiQ42cQvv1Xi7B5VAZa7PN/7mVqhdmbFMUGnylVMzlQKA09/3LniPad1f9YE1ppHis6PvlQTPN8zIMz+TgfYMbakMwnRsypAoPLTHQvxnxITVZdzqBb6ezfEI7gl1MyuV2xmzpaER4YoK/d4vk4+HX2P7eRHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780420131; c=relaxed/simple;
-	bh=PbjejrNawT6IZ42K2OrPYLND8imh1omKlH1OmqI+iRQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZPLYF1/D4urA1QIeLi1J3xD8REBPEcPunvumyu7dxGzWAcMzXlXlFj4aUg0VqsK1EkAUqUYvexrim9qcgWG11MrSglPw75nceplG6f87vycEp5TwD9jIbBxLtQl1fGZjCSVLlL4pqifj+RaAO3DjygxWDadveXkay9YblhFMxyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=V8IVjlVc; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1780420777; c=relaxed/simple;
+	bh=J6TbArqEieGYxXff7djq4W3pT9sWbdagtpgszPKUGs8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=t0i60b6Ids9eks4IemvluZ3cdTYP8JIa+kGuVw1MLidJOAa+DnfHzdtZIHqKAFQfcvbzOj1GnzgIXQfUj/d12LkZSsz3umg7AaALQDYXrD660V4fRAoXqvibwzLUTo+5J9VNv1iMm+yEbyuBFyknfWoTGiofNKo66btFGd3PdRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=jKA41w5G; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="V8IVjlVc"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gVHNd2Jdhz1XM0nn;
-	Tue,  2 Jun 2026 17:08:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1780420126; x=1783012127; bh=iLgo9
-	8zo1ytdUf3y8is2IG9mUanjcWnswmRCuBZWQgc=; b=V8IVjlVcnR2nxenoINcmh
-	T/Y0wffIZ+wBfzeD6nIK5leKl8lVbJl3kF+1wXXf2CA9nOsVtl9Lh8wfxHhAVILE
-	BnPJbPaynKLtllavA6WSwZNknSc6X/ZuA4I3h7AieIL1CR7OmzTRr3itIDOcs8RB
-	kKsx+5Ob2gzQR55cHwpZxVwXGY4Jhh/KnCwKBePln6QsKw0HdklOLdaVYPhZR5xx
-	m+qH1s15e7+e4Z61I3//4/+1LhfVkkLWZPpBBqkSbwv5cB+imUvkVe2ZLt5GsQtZ
-	kgHzRwWCjHlnrfY9MuMg+5qj1Ye37eFB2eZffJB1CkJYC3qJ3lOAT/WTOe1Ys886
-	g==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id sv2VGIFGO7YA; Tue,  2 Jun 2026 17:08:46 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gVHNX3Mdqz1XM0p5;
-	Tue,  2 Jun 2026 17:08:44 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Hannes Reinecke <hare@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v6 14/14] block: Enable lock context analysis
-Date: Tue,  2 Jun 2026 10:07:43 -0700
-Message-ID: <b946525dda6465965149a238eb3e7464f887e388.1780419600.git.bvanassche@acm.org>
-X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
-In-Reply-To: <cover.1780419600.git.bvanassche@acm.org>
-References: <cover.1780419600.git.bvanassche@acm.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="jKA41w5G"
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-43d2ff651f2so854499fac.2
+        for <linux-block@vger.kernel.org>; Tue, 02 Jun 2026 10:19:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780420773; x=1781025573; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w22XETF1XI3MhIWY2ZCBASwJWSIv4gb6nes3rZAHzmM=;
+        b=jKA41w5GyNIVtf/y9eduUriCRVjnblzPxbifUpqBLE/8kjHMsgI+Ifkyp702VRkIs1
+         DGlvFkIsu6WUyEEMtayij6n8pH1p1cl5bLmWTiPbyXLy26KQTPfY0N1oDVBjoylADaZ8
+         ImmYIdb2PTn6Dd21W/uB6iGp2YlWIJRoP3RbbuKQLBXGfjNu7cuyN7eS6C1aoBI+i1b0
+         HLw9XArH5an3XzIKDiZPhRRA/JMF6hkgDtL09yi7qOGV/Q26ufP2XosFqKdv9hF1vI15
+         RfBowArI55ncwBhqFJ/N8PTrG7ed8pPs6dFHrLgijmq6YoWoG4bGvRgh+yf9sB68uRAp
+         HPDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780420773; x=1781025573;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=w22XETF1XI3MhIWY2ZCBASwJWSIv4gb6nes3rZAHzmM=;
+        b=es0mSDI4dkCmh8bk5XN/L1xqmUoyNCZUlDWI63Dts4ABpa5LNfDQUQf4JgZhu/Ft4K
+         oTIaUpfwswNQVgeNf7kSDHVcyqmw7hXqADfR77emdVBzQfVnmJ57wVGn9JtxrAa/n/76
+         F0E1B5Jk/12V1QPPk0XHikAavGEZKjvef793karXj7Vu/jact+zeLRCZM3vS+FzSucsd
+         k9sxqlsWBDMDjXETE2nwBcWTuItLXA0LObLfU6oII2H36HQzPpPGd6RHc3+90MCL+S8o
+         WNfp1LBDTBDTxZ8NY+cifociMDQ8JBrsfAVIWOcdFREDgSGhh1I1DBeJup7j8V89+wEf
+         ALbw==
+X-Gm-Message-State: AOJu0YxfrJxZJQsqbkU1MCNPlFD/54aZhEZNZ95feW+wBAvOB7cm3XH+
+	OBSbeUU5TUd0CzLuuOl6h3O3wNWRsVtBPx5zmvb4n4Fsq3T8g0iRDzdezIY8eEQGNuk=
+X-Gm-Gg: Acq92OG9GahD8L+CPa5dqv+poZ6Y/YSXSKn8H6T5jZo9F1MAwZmzh/doJoUTcSLQJaR
+	tSBLTsH9RwFVxtXwGreAftgpfL8nS32ZDwmL9+u05UMJvf1xSw99EYWH7sMdxOciAJ6RnV56MFD
+	sBZrcJYqrDjCQhUe6YYI7jSXMB0eONuLcp5mDCiC0rs3QYi5z50l9Ld/onPmBCcOnC2zMu3NLQd
+	ptK7K1iiZXFwxh/IsWQkxfW0VZlR1wkjFy3s2/5+/O0gNTOozzO6XAen45MKSoQR73avixwhGVE
+	9ZRibtfhWALqpSzlcxV1K/xpCUkTPLQtUNCnOz+Yx9IkP83i6p4oNvvOE3WYiPfOYdx1mMiugv6
+	06LDR9NlGQ/mwBM+VsVM+2TmkUdgvdXNPdABA07UJOeDmOgz9eSZ3rLGsFxKdvz9UcVlGojHmD7
+	KRoZUrIjXtfD2/kQ4QeSeQ59Avf9g4nqUI7NVvLRQb4Q12sOoc8G0AMLru9rkfKVJtOLZsmxB3M
+	ipG6D9/ApVYcg==
+X-Received: by 2002:a05:6808:2225:b0:485:4441:721a with SMTP id 5614622812f47-486578a21e9mr333978b6e.36.1780420773498;
+        Tue, 02 Jun 2026 10:19:33 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4863f0c9848sm2378107b6e.14.2026.06.02.10.19.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2026 10:19:33 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Kees Cook <kees@kernel.org>, Josh Law <objecting@objecting.org>, 
+ Thorsten Blum <thorsten.blum@linux.dev>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260602160757.973736-3-thorsten.blum@linux.dev>
+References: <20260602160757.973736-3-thorsten.blum@linux.dev>
+Subject: Re: [PATCH] block/partitions/acorn: use min in
+ {riscix,linux}_partition
+Message-Id: <178042077264.560183.2736435889845625330.b4-ty@b4>
+Date: Tue, 02 Jun 2026 11:19:32 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15.2
 
-Now that all block/*.c files have been annotated, enable lock context
-analysis for all these source files.
 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+On Tue, 02 Jun 2026 18:07:57 +0200, Thorsten Blum wrote:
+> Use min() to replace the open-coded implementations and to simplify
+> riscix_partition() and linux_partition().
 
-diff --git a/block/Makefile b/block/Makefile
-index 7dce2e44276c..54130faacc21 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -3,6 +3,8 @@
- # Makefile for the kernel block layer
- #
-=20
-+CONTEXT_ANALYSIS :=3D y
-+
- obj-y		:=3D bdev.o fops.o bio.o elevator.o blk-core.o blk-sysfs.o \
- 			blk-flush.o blk-settings.o blk-ioc.o blk-map.o \
- 			blk-merge.o blk-timeout.o blk-lib.o blk-mq.o \
+Applied, thanks!
+
+[1/1] block/partitions/acorn: use min in {riscix,linux}_partition
+      commit: aa528cd12ca6e7fda15f855b6d2095fd34d167e0
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
