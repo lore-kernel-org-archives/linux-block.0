@@ -1,145 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from lf-2-58.ptr.blmpb.com (lf-2-58.ptr.blmpb.com [101.36.218.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652123672B1;
-	Tue,  2 Jun 2026 03:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F403036C592
+	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 03:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.36.218.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780370915; cv=none; b=dK2M/zib4yMIe9bXusuzHEaiuvBJ1kZrhCXCktjVYqd0oDd0KA29Bm2b3nd1JcOnBYO5TtibbNdtnjBT1TBl2LlE7qalJjQO8ffvWZfbSi/CktGg1Re3/uhIbpfmmA1mwlp10hfw+XKK9mQ+lN8740wmtMn4AL23JzsEkk8zkoU=
+	t=1780372404; cv=none; b=SnCcSmyIaxAdPxE2CcUveMaYieGCsX1Ggz1cO66UWTfA2GZxnT2BhmyUWXNUMmAqBppo4jRt/WMCvIw8JF3BYqoXDTjsPaxAJk5pBrjJPOmF2wgOwyVmwVPIhHQHo5+7rJbaiCGIH80/ZFWX4BJNsbhLakmA7lzW0WIBek218cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780370915; c=relaxed/simple;
-	bh=NKFuBn+dShcm/VIC4I0y884SQpNh6C38L1ZKw0P8kco=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ehzSmygM3aakiY6ESIOvnT9mGYj1XCDID8CsbC+tEnv6O3ugml0s/3fAgrGwRKH+g9oCpIo3FaQeVIkh4eiB/vIK8CITlTLtTcMsSVMphvNS0H7SwfDLk26SgjEvozgKD4Vl8zSEyh5Gp0TVDeQJJbItUEUQazt+EGKjalZEv0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSacz+0N; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780372404; c=relaxed/simple;
+	bh=TYbTK+1pZKxSIOHaFVEQ0H0lKRBtMbTz3gFI+nBSXig=;
+	h=To:Mime-Version:From:Subject:Date:Cc:Message-Id:Content-Type:
+	 In-Reply-To:References; b=BHKaFXj8CGJHW++FGMJHXG2bXX4Gfbk+I53VGKWGFrpCUalzLDagzkggubP/KccwPjDR1hJnxT3roIBnDYzJb+86dGkqBuYAz+5fbyfMkS1dCYeUNFvcES2aXE5gsrORaoah+Qc5+vJpAmTAwFo8vV+nkQ+wfZ6pEktFwh8kjb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io; spf=pass smtp.mailfrom=fygo.io; dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b=CuXbA23L; arc=none smtp.client-ip=101.36.218.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fygo.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fygo.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSacz+0N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D05B41F00898;
-	Tue,  2 Jun 2026 03:28:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780370914;
-	bh=QzmYCSnyFJkG6KCO3M7XHLzRbzo9hRl374pQDpED/oU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=BSacz+0NMKk2h6FKutbbCag/D4pi1wuxfW9zktdrVitLKHSSuejRbG/fRv1YVedP4
-	 Jo99eGCZPTiqicH+xNkoXxOKQNTwL3hu6laKu5B2wIeumOwHnUfEeISVnaurVENiVn
-	 cM4KVX46CM0lNr0TSpJKA363C45rMN+8llLllfJ6A6OyfMc5AFXmBkOSYhUTgVzlbC
-	 tE9raXJNXdNfCXGhUoZxBh2G6qzSzZZZ92T/t3+WIlcM6DfgiSPmEepWbPF3QOqhi3
-	 M3orsNoiNEnWz67WKFnhnGPwxvukd817PE5k4b7CzFmA+bsQyddqNjtrR+2SemNPc1
-	 DZFjWMxsq02aw==
-Date: Mon, 1 Jun 2026 20:27:10 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Daniel Vacek <neelx@suse.com>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Omar Sandoval <osandov@osandov.com>,
-	Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-Subject: Re: [PATCH v7 12/43] btrfs: add new FEATURE_INCOMPAT_ENCRYPT flag
-Message-ID: <20260602032710.GI2295@sol>
-References: <20260513085340.3673127-1-neelx@suse.com>
- <20260513085340.3673127-13-neelx@suse.com>
+	dkim=pass (2048-bit key) header.d=fygo-io.20200929.dkim.larksuite.com header.i=@fygo-io.20200929.dkim.larksuite.com header.b="CuXbA23L"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fygo-io.20200929.dkim.larksuite.com; t=1780371667;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=TYbTK+1pZKxSIOHaFVEQ0H0lKRBtMbTz3gFI+nBSXig=;
+ b=CuXbA23Lo711oK9Irg1+ckVhiECd+m9hb+/7l5ELnsCa2kJ5EK/OgE4pvIerp9HuGSkYHk
+ Xf1VfyIP16se8NT2QjaRuI8W8FpKVJ9A5Jv+n5syScs68ML4mOgruF3ie5lW/Et3rjg+XB
+ Zutuh/wnQzNEPNAzxG0aJXLbfXJRYqueXRFBqwTHVr9t3mFmZwjfv5rdg+kMpf5YwwNx2d
+ KVuHf5hd/j7C1WzV2cczIO4Kah/QDl0tv72tfkPx0Fb3j8ukq9ltWSmQSiLtgRcPAGvJ+7
+ Pr1yR+1Xwvm0e61YIeN+VMkgn25+bK5aDeG/YCoRZ8HvslZj0WkRudOFpPhOfQ==
+To: "Jens Axboe" <axboe@kernel.dk>
+Received: from smtpclient.apple ([120.245.64.106]) by smtp.larksuite.com with ESMTPS; Tue, 02 Jun 2026 03:41:06 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260513085340.3673127-13-neelx@suse.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+From: "Coly Li" <colyli@fygo.io>
+Subject: Re: [GIT PULL] md-7.2-20260531
+Date: Tue, 2 Jun 2026 11:40:53 +0800
+X-Mailer: Apple Mail (2.3864.600.51.1.1)
+Cc: "Yu Kuai" <yukuai@fygo.io>, <linux-raid@vger.kernel.org>, 
+	<linux-block@vger.kernel.org>, 
+	"linux-bcache" <linux-bcache@vger.kernel.org>
+Message-Id: <74048F79-FAD4-4C63-A885-31467EA60530@fygo.io>
+Content-Type: text/plain; charset=UTF-8
+X-Original-From: Coly Li <colyli@fygo.io>
+X-Lms-Return-Path: <lba+26a1e50d2+0d729a+vger.kernel.org+colyli@fygo.io>
+In-Reply-To: <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
+References: <20260531112618.160409-1-yukuai@fygo.io> <753dfdb4-7d68-4183-af3f-d51e92d4dd31@kernel.dk>
 
-On Wed, May 13, 2026 at 10:52:46AM +0200, Daniel Vacek wrote:
-> From: Omar Sandoval <osandov@osandov.com>
-> 
-> As encrypted files will be incompatible with older filesystem versions,
-> new filesystems should be created with an incompat flag for fscrypt,
-> which will gate access to the encryption ioctls.
-> 
-> Signed-off-by: Omar Sandoval <osandov@osandov.com>
-> Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
-> Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-> Signed-off-by: Daniel Vacek <neelx@suse.com>
-> ---
-> 
-> v5: https://lore.kernel.org/linux-btrfs/ccbea52046c1dadbbef926bfc878cc23af952729.1706116485.git.josef@toxicpanda.com/
->  * No changes since.
-> ---
->  fs/btrfs/fs.h              | 3 ++-
->  fs/btrfs/super.c           | 5 +++++
->  fs/btrfs/sysfs.c           | 6 ++++++
->  include/uapi/linux/btrfs.h | 1 +
->  4 files changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/btrfs/fs.h b/fs/btrfs/fs.h
-> index a4758d94b32e..dbdb73722c14 100644
-> --- a/fs/btrfs/fs.h
-> +++ b/fs/btrfs/fs.h
-> @@ -322,7 +322,8 @@ enum {
->  	(BTRFS_FEATURE_INCOMPAT_SUPP_STABLE |	\
->  	 BTRFS_FEATURE_INCOMPAT_RAID_STRIPE_TREE | \
->  	 BTRFS_FEATURE_INCOMPAT_EXTENT_TREE_V2 | \
-> -	 BTRFS_FEATURE_INCOMPAT_REMAP_TREE)
-> +	 BTRFS_FEATURE_INCOMPAT_REMAP_TREE |	\
-> +	 BTRFS_FEATURE_INCOMPAT_ENCRYPT)
->  
->  #else
->  
-> diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-> index efaa0788c1fc..84df97363611 100644
-> --- a/fs/btrfs/super.c
-> +++ b/fs/btrfs/super.c
-> @@ -2563,6 +2563,11 @@ static int __init btrfs_print_mod_info(void)
->  			", fsverity=yes"
->  #else
->  			", fsverity=no"
-> +#endif
-> +#ifdef CONFIG_FS_ENCRYPTION
-> +			", fscrypt=yes"
-> +#else
-> +			", fscrypt=no"
->  #endif
->  			;
->  
-> diff --git a/fs/btrfs/sysfs.c b/fs/btrfs/sysfs.c
-> index 0d14570c8bc2..3fe57843f902 100644
-> --- a/fs/btrfs/sysfs.c
-> +++ b/fs/btrfs/sysfs.c
-> @@ -305,6 +305,9 @@ BTRFS_FEAT_ATTR_INCOMPAT(remap_tree, REMAP_TREE);
->  #ifdef CONFIG_FS_VERITY
->  BTRFS_FEAT_ATTR_COMPAT_RO(verity, VERITY);
->  #endif
-> +#ifdef CONFIG_FS_ENCRYPTION
-> +BTRFS_FEAT_ATTR_INCOMPAT(encryption, ENCRYPT);
-> +#endif /* CONFIG_FS_ENCRYPTION */
->  
->  /*
->   * Features which depend on feature bits and may differ between each fs.
-> @@ -338,6 +341,9 @@ static struct attribute *btrfs_supported_feature_attrs[] = {
->  #ifdef CONFIG_FS_VERITY
->  	BTRFS_FEAT_ATTR_PTR(verity),
->  #endif
-> +#ifdef CONFIG_FS_ENCRYPTION
-> +	BTRFS_FEAT_ATTR_PTR(encryption),
-> +#endif /* CONFIG_FS_ENCRYPTION */
->  	NULL
->  };
->  
-> diff --git a/include/uapi/linux/btrfs.h b/include/uapi/linux/btrfs.h
-> index 9165154a274d..2f6a46e5f4ce 100644
-> --- a/include/uapi/linux/btrfs.h
-> +++ b/include/uapi/linux/btrfs.h
-> @@ -335,6 +335,7 @@ struct btrfs_ioctl_fs_info_args {
->  #define BTRFS_FEATURE_INCOMPAT_ZONED		(1ULL << 12)
->  #define BTRFS_FEATURE_INCOMPAT_EXTENT_TREE_V2	(1ULL << 13)
->  #define BTRFS_FEATURE_INCOMPAT_RAID_STRIPE_TREE	(1ULL << 14)
-> +#define BTRFS_FEATURE_INCOMPAT_ENCRYPT		(1ULL << 15)
->  #define BTRFS_FEATURE_INCOMPAT_SIMPLE_QUOTA	(1ULL << 16)
->  #define BTRFS_FEATURE_INCOMPAT_REMAP_TREE	(1ULL << 17)
+Hi Jens,
 
-There seems to be an inconsistency where btrfs's fscrypt support depends
-on CONFIG_BTRFS_EXPERIMENTAL, but the support is advertised in sysfs
-regardless.
+> 2026=E5=B9=B46=E6=9C=882=E6=97=A5 02:55=EF=BC=8CJens Axboe <axboe@kernel.=
+dk> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On 5/31/26 5:26 AM, Yu Kuai wrote:
+>> Hi Jens,
+>>=20
+>> Please consider pulling the following changes into your for-7.2/block
+>> branch.
+>>=20
+>> This pull request contains:
+>>=20
+>> Bug Fixes:
+>> - Only requeue dm-raid bios when dm is suspending. (Benjamin Marzinski)
+>> - Reset raid10 read_slot when reusing r10bio for discard. (Chen Cheng)
+>> - Fix raid1/raid10 deadlock in read error recovery path. (Abd-Alrhman Ma=
+salkhi)
+>> - Fix raid1/raid10 error-path detection with md_cloned_bio(). (Abd-Alrhm=
+an Masalkhi)
+>> - Fix raid1/raid10 bio accounting for split md cloned bios. (Abd-Alrhman=
+ Masalkhi)
+>> - Fix raid1 nr_pending leak in REQ_ATOMIC bad-block path. (Abd-Alrhman M=
+asalkhi)
+>>=20
+>> Improvements:
+>> - Skip redundant raid_disks updates when the value is unchanged. (Abd-Al=
+rhman Masalkhi)
+>>=20
+>> Cleanups:
+>> - Update MAINTAINERS email addresses. (Yu Kuai, Li Nan)
+>> - Clean up raid1 read error handling. (Christoph Hellwig)
+>> - Move the exceed_read_errors condition out of fix_read_error(). (Christ=
+oph Hellwig)
+>> - Use str_plural() in raid0 dump_zones(). (Thorsten Blum)
+>=20
+> Pulled, thanks.
+>=20
+> Side note - emails from you with the new email address all end up in
+> spam. I just noticed some of them this morning. But I think you want to
+> ensure that the DKIM etc part of your email is all kosher, gmail flags
+> all of it.
 
-- Eric
+Could you please check my patch to change my email address go fygo.io in yo=
+ur spam emails?
+I guess similar situation may also happen on my patch sent from fygo.io.
+And yes, we are looking into this DKIM issue now.
+
+Thanks.
+
+Coly Li
