@@ -1,29 +1,91 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5581C2DA76C
-	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 06:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C202E3C9EC2
+	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 09:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780380206; cv=none; b=C4+AxvqlUhHOk1cUqQAolvp5PnLmh1qpooZmDJpEHG1nwnm23HFDKoWoVKJQTkoUHHldogXunecl7cgV4LHZDIKAV9tfR4PdWHIvHcIP7/k3pjhDrrJFY0k08kXq04R0HOWQJiYN8cAQbPZ32JDV4ZPiKNBAc3QEiHKHR7SBQQE=
+	t=1780391483; cv=none; b=BVAq5Dmj6zdv77pYhplf7EuAYWAIPgd03HfpJeHmesIqAIzc8PZH1DT0itquOL4acqTQ91XN4G6z9mxnOnDk8ykVWWt9uYIEohFA3BW2qu5WTi2QXbTUa9+BhF+FcpNXOB1aWAuNVsgVtnFFhm+qKd5NAthCzcs2vT3f7i/cr/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780380206; c=relaxed/simple;
-	bh=/JRa57UzU9TMspp887d1swSAsmjE9w79TS18+HcV7u8=;
+	s=arc-20240116; t=1780391483; c=relaxed/simple;
+	bh=kmYFTKG2SUmlBpuou8py97T6+0Zpvl4KZ/RWdzmEoQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l326WB2ULjiNKDtkcv8N/iQOoui2q8HoXlP/xbrR91CPXN/W0pHMpp55F89omIg0WxxorxYmL2M3INcIuyHJZ9e/sSXWGjGxUjoViujPDcsDYbnTA0xZD38jR/VsTz00dRtST1sMQtJ38n4KDeSSD1aDacZhrUkLRKAWnV6MuMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 85DB368BFE; Tue,  2 Jun 2026 08:03:20 +0200 (CEST)
-Date: Tue, 2 Jun 2026 08:03:19 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: bio_copy_from_iter
-Message-ID: <20260602060319.GA325@lst.de>
-References: <ah28-oyillEaOrm1@casper.infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fpn1UA4jILPxw7kDYJAm7F9U3jhBq2bXNjwvyuxyhVEqOw5qfyJCgslzuuVmh9XMOyIinXLkh0ER4MDlR6tUAifvuXMmYxYbJYKcF8Ej2wxEX+6EDKcjiF/3ZgsQrrnZTE5Z7FyPe0dAfYa7HhV/Z4qD//Vk6m6Ru58j/xDzV6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v2tljnKH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=V9fvRhjx; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v2tljnKH; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=V9fvRhjx; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v2tljnKH";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="V9fvRhjx";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v2tljnKH";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="V9fvRhjx"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id BDCE767142;
+	Tue,  2 Jun 2026 09:11:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1780391479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=56S6nHTn6QLJXTKoYw39upu1bRnKRafvZtBNAP4v898=;
+	b=v2tljnKHaq6gUr0smMyvmzxgdYG5qci7SJKfPGApxkxVyc4K/hb5h2Jh6pnRTuKumrtNNn
+	tXnk/mEDCntbmNUhyq3tZUXQo6CGiUoNGGTpgqlG6GTSbax2Ipl3Q+zF/PveM5LonjdQHO
+	kU2leV/aFaPx0sSKexCnGsCz/+AGJxA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1780391479;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=56S6nHTn6QLJXTKoYw39upu1bRnKRafvZtBNAP4v898=;
+	b=V9fvRhjx34y6RXwCpaQ3DZxIA7UlXXXh7wOHYDPFPh6U5SdShBRKyXhjXvrwjuLcbcj5ct
+	Zthva0hqIDNO8eBQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=v2tljnKH;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=V9fvRhjx
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1780391479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=56S6nHTn6QLJXTKoYw39upu1bRnKRafvZtBNAP4v898=;
+	b=v2tljnKHaq6gUr0smMyvmzxgdYG5qci7SJKfPGApxkxVyc4K/hb5h2Jh6pnRTuKumrtNNn
+	tXnk/mEDCntbmNUhyq3tZUXQo6CGiUoNGGTpgqlG6GTSbax2Ipl3Q+zF/PveM5LonjdQHO
+	kU2leV/aFaPx0sSKexCnGsCz/+AGJxA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1780391479;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=56S6nHTn6QLJXTKoYw39upu1bRnKRafvZtBNAP4v898=;
+	b=V9fvRhjx34y6RXwCpaQ3DZxIA7UlXXXh7wOHYDPFPh6U5SdShBRKyXhjXvrwjuLcbcj5ct
+	Zthva0hqIDNO8eBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B3EBD779A7;
+	Tue,  2 Jun 2026 09:11:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id gdvnKzeeHmqGOwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 02 Jun 2026 09:11:19 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 4B26CA0EC1; Tue, 02 Jun 2026 11:11:11 +0200 (CEST)
+Date: Tue, 2 Jun 2026 11:11:11 +0200
+From: Jan Kara <jack@suse.cz>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lvc-project@linuxtesting.org, stable@vger.kernel.org, Denis Arefev <arefev@swemel.ru>
+Subject: Re: [PATCH] make new mount API honour SB_NOUSER (was Re: [PATCH]
+ block: Avoid mounting the bdev pseudo-filesystem in userspace)
+Message-ID: <eevyuiiqt5b4n7kws2lc24jk2njdllanojl76t5cftx6he6hba@y46tiknbebj4>
+References: <20260521072857.5078-1-arefev@swemel.ru>
+ <20260602011907.GM2636677@ZenIV>
+ <20260602013526.GO2636677@ZenIV>
+ <20260602020444.GP2636677@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,35 +94,69 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ah28-oyillEaOrm1@casper.infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20260602020444.GP2636677@ZenIV>
+X-Spam-Flag: NO
+X-Rspamd-Action: no action
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_COUNT_THREE(0.00)[3];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.com:email]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: BDCE767142
+X-Spam-Score: -4.01
 
-On Mon, Jun 01, 2026 at 06:10:18PM +0100, Matthew Wilcox wrote:
-> I'd like to remove copy_page_to_iter() (and only have
-> copy_folio_to_iter()).  That led me to looking at bio_copy_to_iter().
-> At first glance, switching it to bio_for_each_folio_all() makes a lot of
-> sense -- if there are large folios involved, then we can copy an entire
-> folio at a time instead of a page.
+On Tue 02-06-26 03:04:44, Al Viro wrote:
+> one should *not* be allowed to mount one of those, new API or not.
 > 
-> But what I can't prove to my satisfaction is that every bio passed to
-> bio_copy_to_iter() necessarily contains folios.  That's not currently
-> necessary, but will become necessary in the future. [1].
+> Reported-by: Denis Arefev <arefev@swemel.ru>
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-bio_copy_to_iter is only called from blk_rq_unmap_user, which is only
-used for bios created blk_rq_map_user_iov and only used when they had to
-be bounce buffer.  There's two sources of pages for the bounce buffering:
-The allocation in bio_copy_user_iov using alloca_page, and whatever sg
-and st pass in through struct rq_map_data.  A good step to be able
-to validate this would be to kill the mess around struct rq_map_data,
-as in removing that structure.  There's no good reason why these
-drivers should do their own allocations, this has mostly been
-grandfathered in.
+Won't it make sense to actually check fc->sb_flags before we call
+vfs_create_mount()? Otherwise it looks good to me.
 
-> [1] I believe all these bvecs are constructed using
-> blk_rq_map_user_iov() which can end up calling bio_add_vmalloc(),
-> and vmalloc pages will not be folios.
+								Honza
 
-blk_rq_map_user_iov can't call bio_add_vmalloc.  And if you want to make
-the vmalloc backing not folios you will be in a huge world of pain
-anyway, as we expect to back folios using vmap/vm_map_ram and treating
-vmalloc different from this will be extremely messy and invasive.
+> ---
+> [[ I still want to see the rest of the reproducer - report smells like a missing
+> d_can_lookup() somewhere, on top of fsmount(2) bug]]
+> diff --git a/fs/namespace.c b/fs/namespace.c
+> index fe919abd2f01..17777c837683 100644
+> --- a/fs/namespace.c
+> +++ b/fs/namespace.c
+> @@ -4499,6 +4499,10 @@ SYSCALL_DEFINE3(fsmount, int, fs_fd, unsigned int, flags,
+>  	new_mnt = vfs_create_mount(fc);
+>  	if (IS_ERR(new_mnt))
+>  		return PTR_ERR(new_mnt);
+> +	if (new_mnt->mnt_sb->s_flags & SB_NOUSER) {
+> +		mntput(new_mnt);
+> +		return -EINVAL;
+> +	}
+>  	new_mnt->mnt_flags = mnt_flags;
+>  
+>  	new_path.dentry = dget(fc->root);
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
