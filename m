@@ -1,46 +1,46 @@
 Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98DD380FC7
-	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 17:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF203F4DE2
+	for <linux-block@vger.kernel.org>; Tue,  2 Jun 2026 17:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780420121; cv=none; b=FXLuKoYJgwb0FlqXusWbn6gk6eZros6ndHguWcdtU4wKLAq6jqCH57ktCiGRyQgZGjlXYeWfOfYla7oLikeWOLX5nqa/BzJGBPgrdhN27sB0poTSfaOTryq4oRZ917pBTM67AgwuqbcEc9T+NH9lcOFYdNjRm+wYt668eg7GZzQ=
+	t=1780420126; cv=none; b=QlDeutjnGrrLK+Nv34RD2zlygrlC4CHv1tbbY3CGpEuTsCWDeV9rY8VPdEzM9BJ7tOKISQr9oaMEAhhuYpl5b6n5wNjOJxTYVvogyfNEu11hq1N7sCD7qrZHX2aa+bAtuLnHzyYXPbEuwUSm4ZvmEpXkK7w7MIUaz3cyHzJJdm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780420121; c=relaxed/simple;
-	bh=3BU0s+Sa6z/SbkWCLFrt6q2OpCIAG7qAD0uhS7dWLeA=;
+	s=arc-20240116; t=1780420126; c=relaxed/simple;
+	bh=oONaFj2FqSQz65z2kW+SG1QoMGPZ0bLGF8/2DR2xRng=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X5Bvf5kcbsZbSS1LwdibLMBgGfrGtFmleLNnb64saRXL62Hzb1JqhTWsxD0VS9c+HlRmxCrL+P77zoD9uOt+WtG5dEH3NKUA9eBGXWUmqjY7H7c0iOaKKTyPLS0z1HTWcx5UqpNePJnjv2Qfe4a4h8+KxjjQcpW1FwQLq9flhtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Jf831iNl; arc=none smtp.client-ip=199.89.1.14
+	 MIME-Version; b=RLb/7cE35oKyNg2QR4wRqrPLJfNkEfBjSZbV5hveiNUqOfJ2qAMOQrFd2ArW8+8jER+wkOghLXG8OF0OXwd/+ZWprYmUcCShfvprffsMNU7Yr6rpmVdukoW2qF6iwffz7UkeJPCy2B2H6C6bXfTu1K4DxnVWcCwrpNhKh0+aRhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=IcUYsjjJ; arc=none smtp.client-ip=199.89.1.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Jf831iNl"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="IcUYsjjJ"
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gVHNR0khmz1XM0p5;
-	Tue,  2 Jun 2026 17:08:39 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gVHNX643Fz1XM0nw;
+	Tue,  2 Jun 2026 17:08:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:mime-version
-	:references:in-reply-to:x-mailer:message-id:date:date:subject
-	:subject:from:from:received:received; s=mr01; t=1780420109; x=
-	1783012110; bh=YA0OXI9AvLmBUBYfeJ9Mi35OzXmQ1YVQ9Dm8iJA1tMg=; b=J
-	f831iNlsiYYRuhRRmbR/vmjjv/AigwXoTGxEGbSXen0nPbOKNO/SbxCQ62a1/+Gi
-	BJOFsLfvRjsGIHKd8e3IYCjnyfYkGv6DltFQQKN2LQWIeRdDE3S6ZmybaAb+uFPf
-	wgsVPDm0Nk4AY1gLxCvF+yVCzlkmhmqn1zukuRrxkKjfMfIysgerCDOyJPpk9wcY
-	m29JfEFH8E/p24mIYrtp8UpwInchYorZhgdnESY/y2EDMRQ0GKxI0tEiI55obvRr
-	oB6MY2b/u0rmTjTkx4Yly06SJCeQ2jD/78vtErVt+BqpOv5GSJYJfuTCn6umnZr/
-	G//woo8SsrX0Y1Y8tkUHg==
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1780420116; x=1783012117; bh=7sxDz
+	r234ly4JMo61FQM3nkkOybUDS/BD/v33622zU4=; b=IcUYsjjJQtUd0mnugwfB7
+	27Of1Gv1N2v0jza3PPghxg0TrcNxBgkjqN17jvYxiBXTgvlhrc7jufdgFnyORJaf
+	wq8M2L/kWlNMfotmmYqQzMg8wultr6n2+CjgRY0rr5sTEUYQcF+N0hem2H47HWlo
+	vzB6f+kqTBilAx7PyBxB+BC0ZYga5qGzePdZNVMqxu4P6pJoebTI4Je6yZMFwbrp
+	MpjiwknbrejWEIxfprEudC+42UiXxQ6gAxlFp+fWcM/V3IKHHIh1JBnv5fMnoDo6
+	48CnoZE8FWoIzEKRtK778dWxV9RduPEjXSC/EuD2WYLF625sauwD1qgptNflu1tS
+	g==
 X-Virus-Scanned: by MailRoute
 Received: from 011.lax.mailroute.net ([127.0.0.1])
  by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id z4970q2G85D6; Tue,  2 Jun 2026 17:08:29 +0000 (UTC)
+ id cI14BulBs4hk; Tue,  2 Jun 2026 17:08:36 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gVHNC4Wmkz1XM0p8;
-	Tue,  2 Jun 2026 17:08:27 +0000 (UTC)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gVHNM097xz1XM0nn;
+	Tue,  2 Jun 2026 17:08:34 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: linux-block@vger.kernel.org,
 	Bart Van Assche <bvanassche@acm.org>,
 	Tejun Heo <tj@kernel.org>,
 	Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH v6 07/14] block/cgroup: Inline blkg_conf_{open,close}_bdev_frozen()
-Date: Tue,  2 Jun 2026 10:07:36 -0700
-Message-ID: <08f0e3d5f8c01523a66cf55303acfa3c4ff47725.1780419600.git.bvanassche@acm.org>
+Subject: [PATCH v6 10/14] block/blk-iocost: Inline iocg_lock() and iocg_unlock()
+Date: Tue,  2 Jun 2026 10:07:39 -0700
+Message-ID: <e0e81fbd746bfb54c31cb84f8671a0c23dcdedb2.1780419600.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.54.0.1013.g208068f2d8-goog
 In-Reply-To: <cover.1780419600.git.bvanassche@acm.org>
 References: <cover.1780419600.git.bvanassche@acm.org>
@@ -62,171 +62,107 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-The blkg_conf_open_bdev_frozen() calling convention is not compatible
-with lock context annotations. Fold both blkg_conf_open_bdev_frozen()
-and blkg_conf_close_bdev_frozen() into their only caller. This patch
-prepares for enabling lock context analysis.
-
-The type of 'memflags' has been changed from unsigned long into unsigned
-int to match the type of current->flags. See also <linux/sched.h>.
+Both iocg_lock() and iocg_unlock() use conditional locking. Fold these
+functions into their callers such that unlocking becomes unconditional.
 
 Cc: Tejun Heo <tj@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-cgroup.c | 46 ----------------------------------------------
- block/blk-cgroup.h |  4 ----
- block/blk-iocost.c | 25 +++++++++++++++++++------
- 3 files changed, 19 insertions(+), 56 deletions(-)
+ block/blk-iocost.c | 49 +++++++++++++++++++---------------------------
+ 1 file changed, 20 insertions(+), 29 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 86513c54c217..de0f753b8fe5 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -812,39 +812,6 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- }
- EXPORT_SYMBOL_GPL(blkg_conf_open_bdev);
-=20
--/*
-- * Similar to blkg_conf_open_bdev, but additionally freezes the queue,
-- * ensures the correct locking order between freeze queue and q->rq_qos_=
-mutex.
-- *
-- * This function returns negative error on failure. On success it return=
-s
-- * memflags which must be saved and later passed to
-- * blkg_conf_close_bdev_frozen() for restoring the memalloc scope.
-- */
--unsigned long __must_check blkg_conf_open_bdev_frozen(struct blkg_conf_c=
-tx *ctx)
--{
--	int ret;
--	unsigned long memflags;
--
--	if (ctx->bdev)
--		return -EINVAL;
--
--	ret =3D blkg_conf_open_bdev(ctx);
--	if (ret < 0)
--		return ret;
--	/*
--	 * At this point, we haven=E2=80=99t started protecting anything relate=
-d to QoS,
--	 * so we release q->rq_qos_mutex here, which was first acquired in blkg=
-_
--	 * conf_open_bdev. Later, we re-acquire q->rq_qos_mutex after freezing
--	 * the queue to maintain the correct locking order.
--	 */
--	mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
--
--	memflags =3D blk_mq_freeze_queue(ctx->bdev->bd_queue);
--	mutex_lock(&ctx->bdev->bd_queue->rq_qos_mutex);
--
--	return memflags;
--}
--
- /**
-  * blkg_conf_prep - parse and prepare for per-blkg config update
-  * @blkcg: target block cgroup
-@@ -991,19 +958,6 @@ void blkg_conf_close_bdev(struct blkg_conf_ctx *ctx)
- }
- EXPORT_SYMBOL_GPL(blkg_conf_close_bdev);
-=20
--/*
-- * Similar to blkg_close_bdev, but also unfreezes the queue. Should be u=
-sed
-- * when blkg_conf_open_bdev_frozen is used to open the bdev.
-- */
--void blkg_conf_close_bdev_frozen(struct blkg_conf_ctx *ctx,
--				 unsigned long memflags)
--{
--	struct request_queue *q =3D ctx->bdev->bd_queue;
--
--	blkg_conf_close_bdev(ctx);
--	blk_mq_unfreeze_queue(q, memflags);
--}
--
- static void blkg_iostat_add(struct blkg_iostat *dst, struct blkg_iostat =
-*src)
- {
- 	int i;
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index f0a3af520c55..f25fecb87c43 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -220,7 +220,6 @@ struct blkg_conf_ctx {
- void blkg_conf_init(struct blkg_conf_ctx *ctx, char *input);
- int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- 	__cond_acquires(0, &ctx->bdev->bd_queue->rq_qos_mutex);
--unsigned long blkg_conf_open_bdev_frozen(struct blkg_conf_ctx *ctx);
- int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 		   struct blkg_conf_ctx *ctx)
- 	__cond_acquires(0, &ctx->bdev->bd_disk->queue->queue_lock);
-@@ -228,9 +227,6 @@ void blkg_conf_unprep(struct blkg_conf_ctx *ctx)
- 	__releases(ctx->bdev->bd_disk->queue->queue_lock);
- void blkg_conf_close_bdev(struct blkg_conf_ctx *ctx)
- 	__releases(&ctx->bdev->bd_queue->rq_qos_mutex);
--void blkg_conf_close_bdev_frozen(struct blkg_conf_ctx *ctx,
--				 unsigned long memflags)
--	__releases(&ctx->bdev->bd_queue->rq_qos_mutex);
-=20
- /**
-  * bio_issue_as_root_blkg - see if this bio needs to be issued as root b=
-lkg
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 050bfbc6d806..302388e99588 100644
+index 8f1468444e97..e58274bc83e0 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -3233,19 +3233,30 @@ static ssize_t ioc_qos_write(struct kernfs_open_f=
-ile *of, char *input,
- 			     size_t nbytes, loff_t off)
- {
- 	struct blkg_conf_ctx ctx;
-+	struct request_queue *q;
- 	struct gendisk *disk;
- 	struct ioc *ioc;
- 	u32 qos[NR_QOS_PARAMS];
- 	bool enable, user;
- 	char *body, *p;
--	unsigned long memflags;
--	int ret =3D 0;
-+	unsigned int memflags;
-+	int ret;
+@@ -727,26 +727,6 @@ static void iocg_commit_bio(struct ioc_gq *iocg, str=
+uct bio *bio,
+ 	put_cpu_ptr(gcs);
+ }
 =20
- 	blkg_conf_init(&ctx, input);
+-static void iocg_lock(struct ioc_gq *iocg, bool lock_ioc, unsigned long =
+*flags)
+-{
+-	if (lock_ioc) {
+-		spin_lock_irqsave(&iocg->ioc->lock, *flags);
+-		spin_lock(&iocg->waitq.lock);
+-	} else {
+-		spin_lock_irqsave(&iocg->waitq.lock, *flags);
+-	}
+-}
+-
+-static void iocg_unlock(struct ioc_gq *iocg, bool unlock_ioc, unsigned l=
+ong *flags)
+-{
+-	if (unlock_ioc) {
+-		spin_unlock(&iocg->waitq.lock);
+-		spin_unlock_irqrestore(&iocg->ioc->lock, *flags);
+-	} else {
+-		spin_unlock_irqrestore(&iocg->waitq.lock, *flags);
+-	}
+-}
+-
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/iocost.h>
 =20
--	memflags =3D blkg_conf_open_bdev_frozen(&ctx);
--	if (IS_ERR_VALUE(memflags))
--		return memflags;
-+	ret =3D blkg_conf_open_bdev(&ctx);
-+	if (ret)
-+		return ret;
-+	/*
-+	 * At this point, we haven=E2=80=99t started protecting anything relate=
-d to QoS,
-+	 * so we release q->rq_qos_mutex here, which was first acquired in blkg=
-_
-+	 * conf_open_bdev. Later, we re-acquire q->rq_qos_mutex after freezing
-+	 * the queue to maintain the correct locking order.
-+	 */
-+	mutex_unlock(&ctx.bdev->bd_queue->rq_qos_mutex);
-+
-+	memflags =3D blk_mq_freeze_queue(ctx.bdev->bd_queue);
-+	mutex_lock(&ctx.bdev->bd_queue->rq_qos_mutex);
+@@ -1585,13 +1565,17 @@ static enum hrtimer_restart iocg_waitq_timer_fn(s=
+truct hrtimer *timer)
+ 	struct ioc_gq *iocg =3D container_of(timer, struct ioc_gq, waitq_timer)=
+;
+ 	bool pay_debt =3D READ_ONCE(iocg->abs_vdebt);
+ 	struct ioc_now now;
+-	unsigned long flags;
 =20
- 	body =3D ctx.body;
- 	disk =3D ctx.bdev->bd_disk;
-@@ -3363,7 +3374,9 @@ static ssize_t ioc_qos_write(struct kernfs_open_fil=
-e *of, char *input,
- 	blk_mq_unquiesce_queue(disk->queue);
+ 	ioc_now(iocg->ioc, &now);
 =20
- close_bdev:
--	blkg_conf_close_bdev_frozen(&ctx, memflags);
-+	q =3D ctx.bdev->bd_queue;
-+	blkg_conf_close_bdev(&ctx);
-+	blk_mq_unfreeze_queue(q, memflags);
- 	return ret ?: nbytes;
+-	iocg_lock(iocg, pay_debt, &flags);
+-	iocg_kick_waitq(iocg, pay_debt, &now);
+-	iocg_unlock(iocg, pay_debt, &flags);
++	if (pay_debt) {
++		guard(spinlock_irqsave)(&iocg->ioc->lock);
++		guard(spinlock)(&iocg->waitq.lock);
++		iocg_kick_waitq(iocg, pay_debt, &now);
++	} else {
++		guard(spinlock_irqsave)(&iocg->waitq.lock);
++		iocg_kick_waitq(iocg, pay_debt, &now);
++	}
 =20
- einval:
+ 	return HRTIMER_NORESTART;
+ }
+@@ -2706,7 +2690,6 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, =
+struct bio *bio)
+ 	u64 abs_cost, cost, vtime;
+ 	bool use_debt, ioc_locked;
+ 	enum over_budget_action action;
+-	unsigned long flags;
+=20
+ 	/* bypass IOs if disabled, still initializing, or for root cgroup */
+ 	if (!ioc->enabled || !iocg || !iocg->level)
+@@ -2745,10 +2728,18 @@ static void ioc_rqos_throttle(struct rq_qos *rqos=
+, struct bio *bio)
+ 	use_debt =3D bio_issue_as_root_blkg(bio) || fatal_signal_pending(curren=
+t);
+ 	ioc_locked =3D use_debt || READ_ONCE(iocg->abs_vdebt);
+ retry_lock:
+-	iocg_lock(iocg, ioc_locked, &flags);
+-	action =3D iocg_handle_over_budget(rqos, iocg, bio, &now, &wait, use_de=
+bt,
+-					 ioc_locked, abs_cost, cost);
+-	iocg_unlock(iocg, ioc_locked, &flags);
++	if (ioc_locked) {
++		guard(spinlock_irqsave)(&iocg->ioc->lock);
++		guard(spinlock)(&iocg->waitq.lock);
++		action =3D iocg_handle_over_budget(rqos, iocg, bio, &now, &wait,
++						 use_debt, ioc_locked, abs_cost,
++						 cost);
++	} else {
++		guard(spinlock_irqsave)(&iocg->waitq.lock);
++		action =3D iocg_handle_over_budget(rqos, iocg, bio, &now, &wait,
++						 use_debt, ioc_locked, abs_cost,
++						 cost);
++	}
+ 	switch (action) {
+ 	case action_retry:
+ 		ioc_locked =3D true;
