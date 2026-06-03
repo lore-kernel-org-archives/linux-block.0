@@ -1,189 +1,219 @@
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67E537FF53
-	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 06:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3443235A3A4
+	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 09:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780468989; cv=none; b=Ntz2vAfwHC0UhSOI5eu8Ep037ptSoAK0XF8/ahbMJC9kcIhqxFepfg5esCOSqfl3WgTmOSuCAjtyUDQBbHURq7W0gCZcUc4/J7ObJLKOwJuplGSMrzI/eKTN8iWgTPwx8dWSRLMkEI/U0rpSnuJ4LwpsDm7ZmYZ3kEaFhw7pB0w=
+	t=1780479713; cv=none; b=TavD4jIJwrNKGiMROooBd4NoWjFGrSWCDHKzjVUG6XaRZUtpjyJSC1ikSnAtxXK8PISlwtYz1h7f6fDW53dv0yQ4FG7dEeIbGc+MlSemHRityxGSD5MslZ/ONk44PBV3jJ5nsNbNFZdhvtYCfAdmqhqozCba8hsISzFx9ZL4beg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780468989; c=relaxed/simple;
-	bh=CGT7gEJWsfdmL4PputUa7LMdCWKNz5EziUoO4YB1Cv0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=N+JgO8MgOHTg1Lu3ulFZjP5JEFWQU9PDW4GINEl+/f43eY8HTaePOS8FdnT10jmaC9APhMdNzCsVAdvhGq/0cSSksFn6fhRVksz3tMttidRHwZI1FTwaMUqPZHMBOXM7gjhi2TBOyVyx3YVfQEBByjVmW0/D+87qchNSfxBPLmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-43d197b99b8so4630483fac.0
-        for <linux-block@vger.kernel.org>; Tue, 02 Jun 2026 23:43:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780468987; x=1781073787;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BXLTeHlKrc/+j7C9QPbOJLUrs1rqjWUe2L1pYvC54MA=;
-        b=WcbnmB3aNVHhK62iPsMnTqMqv0o4GDgozgmOVsZQwjhV3t3Wmng2gKReRENjRdU8ot
-         0AA8UHpDERStJg8tSPjx+byUKWXA0SxdeKcg87WhnXkq1h3AW3IdvCxyiuBrlAu4HOWS
-         cC8+r2bJQVWdPkkbX/nOZw2nAo3k4tAfrGtAQuZqeGCb4d9A1QljLVh/iVdvWbV0nGVM
-         BJDIeZli3nh1OnUeouljg2qqmeN3btu0mKTjgWrAGxMObgJSfoXyN62F//rm+bZHDxBP
-         CrqxEObVamluMzu+8B+Xy4zBD1obLMVfZ/KmHME6q1lQQ4MBV08ys6C76EBSpYLEiM/f
-         8fvA==
-X-Forwarded-Encrypted: i=1; AFNElJ8LSjMs+vvvh4Udy6YK6pdTIN2KfYPCRsYu/BH8aTBjv1k2APBkm7dRR6cBMlesFTXSAO1yNbkqMwmc6g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFchtB79gXiiPY59hw495ioTV5grWjrlUw7mjCofC/4njtTRwE
-	rZT5KjA2vs9gjSnJWkiWrVjrqm0V00IgZ+R0FHpgLDRNa3KZqzblq+0EasSdOeysOw/jQjOiaDq
-	zSR1jqeyLCniH28+8H4kR3pMk/yqjFJipBx12yFnsOShKyTr4hnsSbS2xz7w=
+	s=arc-20240116; t=1780479713; c=relaxed/simple;
+	bh=qbFSgsTxyZ4Vhq1Vw/I8x+yr1vThhgzZxwAYyshZuGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M4P0vvrBxyXqF3VYQAPlAOoARF+jbCCAyPpY4pxlQ9Cndq8syWGM9aTbteUpNYzJCf49R67FrfBKkXNgdsixUAEEZlZ5su7cyCA3oqTtrF7Csp7wxlvs5N2NArd+o61kf4J5kM/JNAen9sqTl/g+cD1/pCpaT3IRCK9xs2oaxLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RfNCbFBE; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RfNCbFBE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 167E11F00893;
+	Wed,  3 Jun 2026 09:41:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780479711;
+	bh=63211LnYkiUjqO9V3W2tlS45oL0M1lm/njpjy+4Gnfg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=RfNCbFBEaHmRyGCH6pyRnV+DY8NpzyHBZh7DwdPfYVb0Odn9BRLxYHUutQ29olLZx
+	 ZsH29A+/x+8D38wwRUoG9nWCd9lOG7fzCt+oLvlVErrZNuDAUVKWaXmjSOv//EnJkn
+	 Ez7Bdwkj6wPHURCDhzHJFUDP2hNml5b3Xc1AAw2XmHeANhkdj3G+z+pRBDkLFWJn8L
+	 D8IHRRR+RtqV5KbBC40T4//Q3q3j+FbU7iIgYqo+D8MXM/401AuXKXbmiUlebdVIP0
+	 e+QkZLbCWjwA/NJUwMWGVD4qagIZ1Ak+tw3EiYFVFyFTwRbJM0DamhrE83cPiA2mfc
+	 g0uoAGmPh7DOA==
+Message-ID: <64fff44b-27ae-4943-a199-d8764dc28f80@kernel.org>
+Date: Wed, 3 Jun 2026 11:41:48 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:180c:b0:696:637e:4831 with SMTP id
- 006d021491bc7-69e47f0669emr1446323eaf.25.1780468986990; Tue, 02 Jun 2026
- 23:43:06 -0700 (PDT)
-Date: Tue, 02 Jun 2026 23:43:06 -0700
-In-Reply-To: <20260602-work-super-bdev_holder_global-v1-0-bb0fd82f3861@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a1fccfa.278b5b03.2bcf39.0048.GAE@google.com>
-Subject: [syzbot ci] Re: fs: support freeze/thaw/mark_dead/sync with shared devices
-From: syzbot ci <syzbot+ci2e0a11d6a5730bb0@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, brauner@kernel.org, cem@kernel.org, clm@fb.com, 
-	dsterba@suse.com, hch@lst.de, jack@suse.cz, linux-block@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, tytso@mit.edu, 
-	viro@zeniv.linux.org.uk, xiang@kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mm: simplify the mempool_alloc_bulk API
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, harry@kernel.org,
+ akpm@linux-foundation.org
+Cc: hao.li@linux.dev, cl@gentwo.org, rientjes@google.com,
+ roman.gushchin@linux.dev, linux-block@vger.kernel.org, linux-mm@kvack.org
+References: <20260602160038.3976341-1-hch@lst.de>
+From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+Autocrypt: addr=vbabka@kernel.org; keydata=
+ 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
+In-Reply-To: <20260602160038.3976341-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot ci has tested the following series
+On 6/2/26 18:00, Christoph Hellwig wrote:
+> The mempool_alloc_bulk was modelled after the alloc_pages_bulk API,
+> including some misunderstanding of it.
+> 
+> Remove checking for NULL slots in the array, as alloc_pages_bulk and
+> kmem_cache_alloc_bulk always fill the array from the beginning and thus
+> we know the offset of the first failing allocation.  This removes support
+> for working well with alloc_pages_bulk used to refill page arrays that
+> might have an entry removed from in the middle, but that is only used by
+> sunrpc and hopefully on it's way out.
 
-[v1] fs: support freeze/thaw/mark_dead/sync with shared devices
-https://lore.kernel.org/all/20260602-work-super-bdev_holder_global-v1-0-bb0fd82f3861@kernel.org
-* [PATCH RFC 1/8] fs, block: move blk_mode_t and fop_flags_t into <linux/types.h>
-* [PATCH RFC 2/8] fs: add a global device to super block hash table
-* [PATCH RFC 3/8] fs: refuse to claim any frozen block device
-* [PATCH RFC 4/8] xfs: port to fs_bdev_file_open_by_path()
-* [PATCH RFC 5/8] btrfs: open via dedicated fs bdev helpers
-* [PATCH RFC 6/8] ext4: open via dedicated fs bdev helpers
-* [PATCH RFC 7/8] erofs: open via dedicated fs bdev helpers
-* [PATCH RFC 8/8] super: make fs_holder_ops private
+Importantly sunrpc doesn't use mempool_alloc_bulk() so we're not affecting
+it here.
 
-and found the following issue:
-general protection fault in close_fs_devices
+> Also remove the allocated parameter as it is redundant because the caller
+> can simply specific and offset into the entries array.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Full report is available here:
-https://ci.syzbot.org/series/9511f00a-a3c2-44ab-9a0b-2d65de5bbd49
+Somewhat late, but small and affects only one caller. So applied to
+slab/for-7.2/alloc_bulk on top of the kmem_cache_alloc_bulk() change.
 
-***
+> ---
+>  block/blk-crypto-fallback.c |  9 +++++----
+>  include/linux/mempool.h     |  2 +-
+>  mm/mempool.c                | 27 ++++++++++-----------------
+>  3 files changed, 16 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+> index 61f595410832..ab6924fba280 100644
+> --- a/block/blk-crypto-fallback.c
+> +++ b/block/blk-crypto-fallback.c
+> @@ -199,8 +199,8 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
+>  	pages += nr_segs * (PAGE_PTRS_PER_BVEC - 1);
+>  
+>  	/*
+> -	 * Try a bulk allocation first.  This could leave random pages in the
+> -	 * array unallocated, but we'll fix that up later in mempool_alloc_bulk.
+> +	 * Try a bulk allocation first.  This might not fill all allocated
+> +	 * pages, but we'll fix that up later in mempool_alloc_bulk.
+>  	 *
+>  	 * Note: alloc_pages_bulk needs the array to be zeroed, as it assumes
+>  	 * any non-zero slot already contains a valid allocation.
+> @@ -208,8 +208,9 @@ static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
+>  	memset(pages, 0, sizeof(struct page *) * nr_segs);
+>  	nr_allocated = alloc_pages_bulk(GFP_KERNEL, nr_segs, pages);
+>  	if (nr_allocated < nr_segs)
+> -		mempool_alloc_bulk(blk_crypto_bounce_page_pool, (void **)pages,
+> -				nr_segs, nr_allocated);
+> +		mempool_alloc_bulk(blk_crypto_bounce_page_pool,
+> +				(void **)pages + nr_allocated,
+> +				nr_segs - nr_allocated);
+>  	memalloc_noio_restore(memflags);
+>  	*pages_ret = pages;
+>  	return bio;
+> diff --git a/include/linux/mempool.h b/include/linux/mempool.h
+> index e8e440e04a06..a0fa6d43e0dc 100644
+> --- a/include/linux/mempool.h
+> +++ b/include/linux/mempool.h
+> @@ -66,7 +66,7 @@ void *mempool_alloc_noprof(struct mempool *pool, gfp_t gfp_mask) __malloc;
+>  #define mempool_alloc(...)						\
+>  	alloc_hooks(mempool_alloc_noprof(__VA_ARGS__))
+>  int mempool_alloc_bulk_noprof(struct mempool *pool, void **elem,
+> -		unsigned int count, unsigned int allocated);
+> +		unsigned int count);
+>  #define mempool_alloc_bulk(...)						\
+>  	alloc_hooks(mempool_alloc_bulk_noprof(__VA_ARGS__))
+>  
+> diff --git a/mm/mempool.c b/mm/mempool.c
+> index db23e0eef652..473a029fa31f 100644
+> --- a/mm/mempool.c
+> +++ b/mm/mempool.c
+> @@ -419,12 +419,8 @@ static unsigned int mempool_alloc_from_pool(struct mempool *pool, void **elems,
+>  	spin_lock_irqsave(&pool->lock, flags);
+>  	if (unlikely(pool->curr_nr < count - allocated))
+>  		goto fail;
+> -	for (i = 0; i < count; i++) {
+> -		if (!elems[i]) {
+> -			elems[i] = remove_element(pool);
+> -			allocated++;
+> -		}
+> -	}
+> +	while (allocated < count)
+> +		elems[allocated++] = remove_element(pool);
+>  	spin_unlock_irqrestore(&pool->lock, flags);
+>  
+>  	/* Paired with rmb in mempool_free(), read comment there. */
+> @@ -479,22 +475,21 @@ static inline gfp_t mempool_adjust_gfp(gfp_t *gfp_mask)
+>   * @pool:	pointer to the memory pool
+>   * @elems:	partially or fully populated elements array
+>   * @count:	number of entries in @elem that need to be allocated
+> - * @allocated:	number of entries in @elem already allocated
+>   *
+> - * Allocate elements for each slot in @elem that is non-%NULL. This is done by
+> - * first calling into the alloc_fn supplied at pool initialization time, and
+> - * dipping into the reserved pool when alloc_fn fails to allocate an element.
+> + * Allocate @count elements into @elems.  This is done by first calling into the
+> + * alloc_fn supplied at pool initialization time, and dipping into the reserved
+> + * pool when alloc_fn fails to allocate an element.
+>   *
+>   * On return all @count elements in @elems will be populated.
+>   *
+>   * Return: Always 0.  If it wasn't for %$#^$ alloc tags, it would return void.
+>   */
+>  int mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
+> -		unsigned int count, unsigned int allocated)
+> +		unsigned int count)
+>  {
+>  	gfp_t gfp_mask = GFP_KERNEL;
+>  	gfp_t gfp_temp = mempool_adjust_gfp(&gfp_mask);
+> -	unsigned int i = 0;
+> +	unsigned int allocated = 0;
+>  
+>  	VM_WARN_ON_ONCE(count > pool->min_nr);
+>  	might_alloc(gfp_mask);
+> @@ -514,11 +509,9 @@ int mempool_alloc_bulk_noprof(struct mempool *pool, void **elems,
+>  	 * Try to allocate the elements using the allocation callback first as
+>  	 * that might succeed even when the caller's bulk allocation did not.
+>  	 */
+> -	for (i = 0; i < count; i++) {
+> -		if (elems[i])
+> -			continue;
+> -		elems[i] = pool->alloc(gfp_temp, pool->pool_data);
+> -		if (unlikely(!elems[i]))
+> +	while (allocated < count) {
+> +		elems[allocated] = pool->alloc(gfp_temp, pool->pool_data);
+> +		if (unlikely(!elems[allocated]))
+>  			goto use_pool;
+>  		allocated++;
+>  	}
 
-general protection fault in close_fs_devices
-
-tree:      bpf-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/bpf/bpf-next.git
-base:      254f49634ee16a731174d2ae34bc50bd5f45e731
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/4af26755-5773-453e-807d-ee451d2fdec5/config
-syz repro: https://ci.syzbot.org/findings/2d8d96f7-d133-47dc-b4ca-5c0c65e1b6c9/syz_repro
-
-btrfs: Deprecated parameter 'usebackuproot'
-BTRFS warning: 'usebackuproot' is deprecated, use 'rescue=usebackuproot' instead
-BTRFS: device fsid ed167579-eb65-4e76-9a50-61ac97e9b59d devid 1281 transid 8 /dev/loop1 (7:1) scanned by syz.1.18 (5863)
-Oops: general protection fault, probably for non-canonical address 0xdffffc00000000f8: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x00000000000007c0-0x00000000000007c7]
-CPU: 1 UID: 0 PID: 5863 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:btrfs_close_bdev fs/btrfs/volumes.c:1140 [inline]
-RIP: 0010:btrfs_close_one_device fs/btrfs/volumes.c:1161 [inline]
-RIP: 0010:close_fs_devices+0x47c/0x860 fs/btrfs/volumes.c:1204
-Code: 3c 08 00 74 08 48 89 ef e8 b1 95 38 fe 48 8b 6d 00 b8 c0 07 00 00 48 01 c5 48 89 e8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 48 89 ef e8 86 95 38 fe 48 8b 75 00 4c 89 ff e8
-RSP: 0018:ffffc90004007a48 EFLAGS: 00010202
-RAX: 00000000000000f8 RBX: 1ffff110368c440b RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 00000000000007c0 R08: ffff8881b462206f R09: 1ffff110368c440d
-R10: dffffc0000000000 R11: ffffed10368c440e R12: ffff8881b4622000
-R13: ffff8881b4622068 R14: ffff8881b4622058 R15: ffff8881707b7a00
-FS:  00007f849d6ce6c0(0000) GS:ffff8882a9292000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f849c786a00 CR3: 00000001bbbcc000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- btrfs_close_devices+0xcd/0x570 fs/btrfs/volumes.c:1219
- btrfs_free_fs_info+0x4f/0x360 fs/btrfs/disk-io.c:1205
- deactivate_locked_super+0xbc/0x130 fs/super.c:477
- btrfs_get_tree_super fs/btrfs/super.c:-1 [inline]
- btrfs_get_tree_subvol fs/btrfs/super.c:2087 [inline]
- btrfs_get_tree+0xca6/0x1910 fs/btrfs/super.c:2121
- vfs_get_tree+0x92/0x2a0 fs/super.c:1928
- fc_mount fs/namespace.c:1193 [inline]
- do_new_mount_fc fs/namespace.c:3758 [inline]
- do_new_mount+0x341/0xd30 fs/namespace.c:3834
- do_mount fs/namespace.c:4167 [inline]
- __do_sys_mount fs/namespace.c:4383 [inline]
- __se_sys_mount+0x31d/0x420 fs/namespace.c:4360
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15f/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f849c79e0ca
-Code: 48 c7 c2 e8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f849d6cde58 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007f849d6cdee0 RCX: 00007f849c79e0ca
-RDX: 00002000000055c0 RSI: 0000200000000340 RDI: 00007f849d6cdea0
-RBP: 00002000000055c0 R08: 00007f849d6cdee0 R09: 0000000000000408
-R10: 0000000000000408 R11: 0000000000000246 R12: 0000200000000340
-R13: 00007f849d6cdea0 R14: 00000000000055f5 R15: 0000200000000380
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:btrfs_close_bdev fs/btrfs/volumes.c:1140 [inline]
-RIP: 0010:btrfs_close_one_device fs/btrfs/volumes.c:1161 [inline]
-RIP: 0010:close_fs_devices+0x47c/0x860 fs/btrfs/volumes.c:1204
-Code: 3c 08 00 74 08 48 89 ef e8 b1 95 38 fe 48 8b 6d 00 b8 c0 07 00 00 48 01 c5 48 89 e8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 48 89 ef e8 86 95 38 fe 48 8b 75 00 4c 89 ff e8
-RSP: 0018:ffffc90004007a48 EFLAGS: 00010202
-
-RAX: 00000000000000f8 RBX: 1ffff110368c440b RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 00000000000007c0 R08: ffff8881b462206f R09: 1ffff110368c440d
-R10: dffffc0000000000 R11: ffffed10368c440e R12: ffff8881b4622000
-R13: ffff8881b4622068 R14: ffff8881b4622058 R15: ffff8881707b7a00
-FS:  00007f849d6ce6c0(0000) GS:ffff8882a9292000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000557941c2b058 CR3: 00000001bbbcc000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	3c 08                	cmp    $0x8,%al
-   2:	00 74 08 48          	add    %dh,0x48(%rax,%rcx,1)
-   6:	89 ef                	mov    %ebp,%edi
-   8:	e8 b1 95 38 fe       	call   0xfe3895be
-   d:	48 8b 6d 00          	mov    0x0(%rbp),%rbp
-  11:	b8 c0 07 00 00       	mov    $0x7c0,%eax
-  16:	48 01 c5             	add    %rax,%rbp
-  19:	48 89 e8             	mov    %rbp,%rax
-  1c:	48 c1 e8 03          	shr    $0x3,%rax
-  20:	48 b9 00 00 00 00 00 	movabs $0xdffffc0000000000,%rcx
-  27:	fc ff df
-* 2a:	80 3c 08 00          	cmpb   $0x0,(%rax,%rcx,1) <-- trapping instruction
-  2e:	74 08                	je     0x38
-  30:	48 89 ef             	mov    %rbp,%rdi
-  33:	e8 86 95 38 fe       	call   0xfe3895be
-  38:	48 8b 75 00          	mov    0x0(%rbp),%rsi
-  3c:	4c 89 ff             	mov    %r15,%rdi
-  3f:	e8                   	.byte 0xe8
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
-
-To test a patch for this bug, please reply with `#syz test`
-(should be on a separate line).
-
-The patch should be attached to the email.
-Note: arguments like custom git repos and branches are not supported.
