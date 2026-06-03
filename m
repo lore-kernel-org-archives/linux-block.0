@@ -1,67 +1,68 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE3827466A
-	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 14:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EE039A04D
+	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 15:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780497332; cv=none; b=KYfdFHSHtSVe1uhsGmlxeB0cSKtvRjbc0uHUu52GkBOTTJ9Mf8Pg5iZB2rAjLHZSLj7LM8D0cmr+OXT18VUayvU51lYLCaqf4WIiJf9znAayAQzdJTw5Hcu0nYTYw9c1+YBC3tSbpoSnziNYsEr7kztrDYEinq3jquN25yWr4AI=
+	t=1780499343; cv=none; b=nCpQyans6PY7cu5/4uGn1P9GkoxqwttRpWeqO/HKuUydjbBstQw2huLWNdfgcxFUnz+Ev/jZ00Osy5AfrBjV0oLvAiWOqnmNltkGzZV+lhhBHfIcE5q5iRPYL4lPAluX1Nul/4YBh9aF6NiV8/MY5Z/gnSkKCPQshFn5f2cem1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780497332; c=relaxed/simple;
-	bh=PuDTKyv9tfB+xWxUoTe8q848BjQ5X8QmcPoOZoPitcE=;
+	s=arc-20240116; t=1780499343; c=relaxed/simple;
+	bh=VGcwjx3DPZjE2hgdTexOWATae4GqcZm3OWlDTiWj77g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TCNk7pwl9uafTQQykFk9htyvfNtuUlaSKKF4XGFP3R1sBoFVzrTddDM+cAAFds885SBoUcK8j/x7Gmf28AEK+Yxd/rd7PQlb5TXfciO98hcXA2N/oF5FkIIaFdC0B6Op9ZbnyYqE03lezhL7/LCZFJnUB4FVVcGr4nYkflnsRP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=h7GP2m1T; arc=none smtp.client-ip=209.85.167.179
+	 In-Reply-To:Content-Type; b=ARCNAIjeZBs3pOW7dSZiDCcGTXr0sTXlp4Cn7OgT7xlrLrmv9K3ez51lJEGp/2+nZaWIX5M9hSekTIAauZxXEvrIOUgSsVp4OsdZthNB4ahtkxd4HBfMaxpsZripllXdJEL7IgLRxy0B/Ot4rGYo+y5z8R6GER0EC7hAWZ+nq3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=G5IJnpJ1; arc=none smtp.client-ip=209.85.160.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="h7GP2m1T"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-486503ae8f0so1371545b6e.0
-        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2026 07:35:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="G5IJnpJ1"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-440f9c48b85so332091fac.1
+        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2026 08:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780497330; x=1781102130; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780499340; x=1781104140; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=18nx2zWThaM2VYJdQpVl8cS/jzs9v1SzCLV0t+4aIpQ=;
-        b=h7GP2m1TQ59bEN06v9nFX4w6ukml3QA0O3QxIyEdeaSpbXoR5IQlnHrsA6k3Nb+9vT
-         uCZYWfTy43oDmQNYt5wqaYHouJ+gRUT+ZcTNrcyqQFhKyhCZqp3Y5dKKmZvu08p2SFpA
-         umZ/2OzCLvw+v1YJtdrSC5AU5dzLxyLALg5vwZrtk3FCLtSSyKPw4N1aZ5z8rG4zrOOh
-         EGsXA2foMr8g8y1rgRHp+bNvH7pnqVKvpo50/iJMTZsiluLf8vcl6ldGrW7kr+GfGlUn
-         gAyu+sbN/eujvc0l9kDojCD8f8ZACYMhznAuBysFtyZMLrTISbDpv3y2zr4MlwEcqsIE
-         e50g==
+        bh=7Rgl+7P4bys3k8olUkjDrUmY90i/4VEAqR/MuDk3aF4=;
+        b=G5IJnpJ1fpzebgCXZZYBBDP1JPUgcjL1XHLreTHoWERY0Zxub8g4n8/p1U5SSEARfG
+         zCqQfBImBa1qHBfb+vfAPE+1eT71YVdJz2Wgi4IpumpvHoR5nFjqeQIIl0F3JiZ6hBMo
+         91uT/Josj3QjW3NxgXODqwVsbZRC+DMByiRrJ2DUE6nTlE4xBbtdpY1gxJV763Tuqbny
+         lM8fVqEgVXpNOGCpMFHYSdo4uEjgfjuNXzTLRYU45wuzN0h4ptWV7Pg6WPeUK5BLyRww
+         KLKaaNNFPQRRNMJfTEJbehB5WTfU+6XiC+G3VH7w4G/JGEnEiPcZQY6Geqoc6Q4pAd/e
+         8JQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780497330; x=1781102130;
+        d=1e100.net; s=20251104; t=1780499340; x=1781104140;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=18nx2zWThaM2VYJdQpVl8cS/jzs9v1SzCLV0t+4aIpQ=;
-        b=mTbnKpUq3FRtgu1yCOecXBOnI5llx0wrdVeuKa0F+4KF6Q4+cOgn3zuXPFkA/NooYO
-         Te6P2f0jKqvSJNPIqpRPL+p4yuqT6sTNdh5PZ+LYvY7St+sU+QI7AekXVpcfIggbiqwJ
-         FA5TUN0PWOt4W3ioCXHLHKblIN49CsuEFGvJ6rMk/uys5hBkrm/HY7kjHIzZWMb0Umau
-         gyhajG8UMesGkcuxpsHqzf6Pt/MqTQPMhbrSYx5DA313kyU5WrMePFW6as5+AXVU1Swv
-         XbSbJ+UIDd1rk6/RtVEXaWhfzETqmGK4rD3QwFxoLjdDGk6x6bRSMdMjTuQIvEcFkB6p
-         PI6A==
-X-Forwarded-Encrypted: i=1; AFNElJ9Z19Ol9WDhiWVTAcJ92sMt/NmsL72lbZ5JEguoH5yb845B+N+0tfSMnS34l3J3rDB3bzoOxY+S7INZqg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOLehhX7vHeIzpZrbgChLR/0U4FPOSt+CU/adUzHYgZffRKR3V
-	Mudud8/WY6ROCfSXHt602huau/++FPcjONeD7/3CPKZwQGfT6qa0x3EMb04v1mOfHTo=
-X-Gm-Gg: Acq92OG6SmL+IMU/q89izrPDA1h5LDL1LU9jXqCfw6AvHyYKfpazwPYjl/FKhQr2twJ
-	L2jN5J0hawH52oByVz1Wehztu+9dH3i3ACtueqDf7OkyyM1qq9IWYo0jzKUAjyZARpN0X4r4S+g
-	5uguYOPVic3WtfD+dtUIAssv3yiZioybQCBdAT/XMRQzhYg5ZKrhUuV2YukY4uAtVAlG3pjB0Dx
-	rXpawrsJQuskU+A2Mu6DZ0tmvWiphPBTffimbTMk9iAZL8ti4reZ4TCD/KLzjuK1sEW/AnXNmnT
-	lpbQln1T59uOMmEX8Efj6KaNqxGij799EGIyH0F48QGnWXlhG2nld7w5ExiIXW83vgQgTRs9vrk
-	MxE5ZCV6tJpavvNAN45PHhjPrLOQ5eDdK1kXxWrc+1UrnC2Z2+cutUQDWPUViAxJEgX5udIS52H
-	I6F81qfg+GlDm9n1tP+T+RRGOkhPEqB3u4VlwvqgrVXbT1drGYcHXsf9aXygCk3VOzEoYRraLm+
-	Oqc4Qpx4HGzDoSFSUc=
-X-Received: by 2002:a05:6808:2e47:b0:484:e5e2:6b93 with SMTP id 5614622812f47-4865ab9d9d9mr2419978b6e.24.1780497329744;
-        Wed, 03 Jun 2026 07:35:29 -0700 (PDT)
+        bh=7Rgl+7P4bys3k8olUkjDrUmY90i/4VEAqR/MuDk3aF4=;
+        b=liNZC1EZOIV9Iwmv9WMWWTxBQRTleyck7Yu2HAMgWXfEprWm67REgodUKA5sP2g37Y
+         mWIybGiRg9tfyUqjmmLWkDKelKiJWW/R9SSzPieICc8Bw6FDmXwx1u4z0yidFARHQs5/
+         WAuALWP+Y4Ftm5Dhd08t2Aq4ecHEI9/ZJfE+5IMdYpuc60dooqhAEWiatpsxkrUekl2t
+         DhL6G7wCsHJgkH4eWxtIlVwqiwUKinSgJrqCE/sF6CR2NaOCYTsWZrwBgZI4sn/np7bN
+         OVFVasbpauedC7ySMu/kcHCYiFE73kkXPCKo/KnAE8JxL2VBh4VfeF1UGiqN1z2xhK0c
+         zJ0A==
+X-Forwarded-Encrypted: i=1; AFNElJ9bGKk4d4p+cxh2C671yfjVKLeffvmfxcdipWA3TKHNXdD/VjukrRo/zhUDHambHnzmS40mtjyI3r31Lg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTuuBteICgv5n1jYq+fylruXZYjzTOD1yN6XIS1wCHw32y0Ndn
+	FA8iXts7TZDcdVFZ5LDWk1WSXy+7fzoya9Gh3npHIcEyZBlFdrVbCPlQWCWrasVrKkgc3sVlPgw
+	VjohL
+X-Gm-Gg: Acq92OEwQTbMQCBybX07zwjpRN/ucMvnaTHa+l2gy40rjI0cksVQ2mwLiwwD/aUPGu3
+	F1PNfzK4ptlAJgpOE909giHUvXSDvPUu4GjVq95xG+pMvlCRxOSxyzwkOfRKNHG5cpKWhCvWi16
+	KkyTuCDSEQG0HHrdEsI9/h6eGAWfcTD6HdVq1QpZRe1hMEzymQ2tTd6vB1i5wDGIosFYwskrLYz
+	GisQUiuR6H5h5sW6VCz/9vVloZLLCZPvI84evAemIi3bfl/FhO6IHcti4+BN8jbB54IGnzIbSBf
+	7Zr7vf0LsdMg/zL0HBAZfUJNtCjnoO1frbcqpwZES8f0i/loLKS0pEO2VZEgPDNwfag5wusMUwc
+	k2cXj+8wpXwSv8SoHf6hM99Y6/0XwnQ+Ok/68i3mtRsrwnDh1Frux16Vc5AcrbRXabWLa37Moem
+	7l9+k4mv0qo1sJpbVKBLkWPxpo3qn9yRINKdDocTqrI6G6W0khB5ExGxEkRu8Euc13SHaO9a90E
+	JjFZQFmvE10jisCRgI=
+X-Received: by 2002:a05:6870:9d98:b0:43c:33e6:275c with SMTP id 586e51a60fabf-440ddd8f4f0mr1723868fac.9.1780499340586;
+        Wed, 03 Jun 2026 08:09:00 -0700 (PDT)
 Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4865b5a53bcsm1943090b6e.3.2026.06.03.07.35.27
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-440d7c42c33sm2468388fac.6.2026.06.03.08.08.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jun 2026 07:35:28 -0700 (PDT)
-Message-ID: <1686f891-599d-4cef-8f38-420033355f2d@kernel.dk>
-Date: Wed, 3 Jun 2026 08:35:27 -0600
+        Wed, 03 Jun 2026 08:09:00 -0700 (PDT)
+Message-ID: <70200e71-bc14-4f1e-aab9-16b27efbb3ec@kernel.dk>
+Date: Wed, 3 Jun 2026 09:08:58 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -70,29 +71,32 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 0/5] blk-cgroup: fix blkg list and policy data races
-To: Yu Kuai <yukuai@fygo.io>
+To: yukuai <yukuai@fnnas.com>, Yu Kuai <yukuai@fygo.io>
 Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
  Ming Lei <tom.leiming@gmail.com>, Nilay Shroff <nilay@linux.ibm.com>,
  Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
  cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <cover.1780492756.git.yukuai@fygo.io>
+ <1686f891-599d-4cef-8f38-420033355f2d@kernel.dk>
+ <189b8601-87a6-423a-b267-9d550c31c086@fnnas.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <cover.1780492756.git.yukuai@fygo.io>
+In-Reply-To: <189b8601-87a6-423a-b267-9d550c31c086@fnnas.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/3/26 7:27 AM, Yu Kuai wrote:
-> This small series fixes races between blkg destruction, q->blkg_list
-> iteration, and blkcg policy activation.
+On 6/3/26 9:06 AM, yukuai wrote:
+> Hi,
+> 
+> ? 2026/6/3 22:35, Jens Axboe ??:
+>> On 6/3/26 7:27 AM, Yu Kuai wrote:
+>>> This small series fixes races between blkg destruction, q->blkg_list
+>>> iteration, and blkcg policy activation.
+>> In spam: Authentication-Results: mx.google.com <mx.google.com>; spf=pass (google.com: <google.com:> domain of srs0=eh6w=d7=fygo.io=yukuai@kernel.org designates 2600:3c04:e001:324:0:1991:8:25 as permitted sender) smtp.mailfrom="SRS0=EH6w=D7=fygo.io=yukuai@kernel.org"; dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=QUARANTINE) header.from=fygo.io <header.from=fygo.io> if you don't get this sorted out, your messages will be missed as they end up in spam for most people.
+> 
+> Thanks again for the notice. I think I finally figured out why dmarc failed. 
 
-In spam:
-
-Authentication-Results: mx.google.com; spf=pass (google.com: domain of srs0=eh6w=d7=fygo.io=yukuai@kernel.org designates 2600:3c04:e001:324:0:1991:8:25 as permitted sender) smtp.mailfrom="SRS0=EH6w=D7=fygo.io=yukuai@kernel.org"; dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=QUARANTINE) header.from=fygo.io
-
-if you don't get this sorted out, your messages will be missed as they
-end up in spam for most people.
+This email looks better!
 
 -- 
 Jens Axboe
-
