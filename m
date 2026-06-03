@@ -1,134 +1,74 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094892D0625;
-	Wed,  3 Jun 2026 12:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C0D2C21F8;
+	Wed,  3 Jun 2026 13:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780490630; cv=none; b=AxZc7lkiPv31ks+tg3Alw+DU9bHj/NCZhJGZbF5bQNm5UEQfbyBENdreFXFEfNmNIz/U2WVrvIBRakxcbXeJG0gJcRzRDDQuSbJmxrUizocJkLFymkAqas3w7dG077jMPKg8/eW85Dj8m9VzsshtC21sa0tx0WfwhQJ6Wz1qbC8=
+	t=1780493275; cv=none; b=spwJa2OtEM/hQL4E3Tgvp652OtJKNBfUK2Pq0I6pXuEtPtUa4rgL+uZbXrFLCsGEOtb1Qh6yr728W5GStfN5FuCCo4YNgM5WdoEDyv88tjFGLshuMNLMuEMJsyLRhU5cNU4+lypgCNdgo/3hmj0z/QozgKB0JbAEYAMzfIMeteI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780490630; c=relaxed/simple;
-	bh=IIYVr6RbvXUvthp/OaFtZj+uB5wY/D8z731UtHRH2Ww=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ZlB0pRX96trdKxwuMz+qUlKUKXa2aZhvG6LrwoG9FbDcpliLAHDXkLOWXLAXhfiHIAPD0hgmm8qhGaNbiDApQCKh0yC5jfeGrlUQlVIlMXLcv6MjH7kcS5pPRqYxsGvKmEhdFoLvkRraTTlnIizRpN+B1EO5zGGj6d8OX7xXKK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dMr2uM+H; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMr2uM+H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 571ED1F00893;
-	Wed,  3 Jun 2026 12:43:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780490628;
-	bh=hSlKPq/EwdliQicBG142n4MIcXe9Hvj+qJ5zrzWkG8w=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=dMr2uM+HMXmTM8LDb3J+bX3sfxt4mX1Xkqpn7J8iBGmN+/7xnPHt2aDWxBnSpSTpp
-	 +D8heQVrPl+rEhsni0T568ZZvyGIQeapGfjTlhY6O3s+9e1tIxi9w53o/v0ic5rjKH
-	 uNNTcVOAVPfiP9krvWIXGhsFrhISzcWvijeqPpHPv1yu3VKvGeNreGNQqo/7n+/jF4
-	 Q0m71pq+Mozsv2jHy0gGQEVI2p1H+/dAQiAhDg2d2gpH1KqdULYU5r60t6lhTsDvCU
-	 lPbQ11nd76hapbeuTcRhHvRWNsW/cXbPR1P9+x/dYyHTIQILVOGRXOOBtvAchPV3gt
-	 8o9sBOG9jsE/w==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, Miguel
- Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6?=
- =?utf-8?Q?rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, Trevor Gross
- <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, FUJITA Tomonori
- <fujita.tomonori@gmail.com>, Frederic Weisbecker <frederic@kernel.org>,
- Lyude Paul <lyude@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz
- <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>, Lorenzo Stoakes
- <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 26/79] block: rnull: add badblocks support
-In-Reply-To: <abfxSTL2qTMtpnY7@google.com>
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
- <20260216-rnull-v6-19-rc5-send-v1-26-de9a7af4b469@kernel.org>
- <abfxSTL2qTMtpnY7@google.com>
-Date: Wed, 03 Jun 2026 14:43:39 +0200
-Message-ID: <87ecinkd50.fsf@t14s.mail-host-address-is-not-set>
+	s=arc-20240116; t=1780493275; c=relaxed/simple;
+	bh=Tode6jzd2RHWnJg99+/egW5XlPIb2sKjlBLWEkFGGsM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gj+w8kHnI5dWcGgy0FAAAGt4GeC4NthiuykCLSB3CuryKP9LvvXcWAp74vGFXjKMOkhkNJ2IsJ7r80MLQdWS3tlB2dHa2QauXr4X8sJj/Qc51xrXj0NK+2cROmwoHD9Gml4Ek21I0nuBb26XkoAoHvaUQhfzJ4R6V+hfJiIZ4p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 277D21F00893;
+	Wed,  3 Jun 2026 13:27:49 +0000 (UTC)
+From: Yu Kuai <yukuai@fygo.io>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Ming Lei <tom.leiming@gmail.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/5] blk-cgroup: fix blkg list and policy data races
+Date: Wed,  3 Jun 2026 21:27:40 +0800
+Message-ID: <cover.1780492756.git.yukuai@fygo.io>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Alice Ryhl <aliceryhl@google.com> writes:
+This small series fixes races between blkg destruction, q->blkg_list
+iteration, and blkcg policy activation.
 
-> On Mon, Feb 16, 2026 at 12:35:13AM +0100, Andreas Hindborg wrote:
->> Add badblocks support to the rnull driver with a configfs interface for
->> managing bad sectors.
->> 
->> - Configfs attribute for adding/removing bad blocks via "+start-end" and
->>   "-start-end" syntax.
->> - Request handling that checks for bad blocks and returns IO errors.
->> - Updated request completion to handle error status properly.
->> 
->> The badblocks functionality is disabled by default and is enabled when
->> first bad block is added.
->> 
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->
->> +    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
->> +        // This attribute can be set while device is powered.
->> +
->> +        for line in core::str::from_utf8(page)?.lines() {
->> +            let mut chars = line.chars();
->> +            match chars.next() {
->> +                Some(sign @ '+' | sign @ '-') => {
->> +                    if let Some((start, end)) = chars.as_str().split_once('-') {
->> +                        let start: u64 = start.parse().map_err(|_| EINVAL)?;
->> +                        let end: u64 = end.parse().map_err(|_| EINVAL)?;
->> +
->> +                        if start > end {
->> +                            return Err(EINVAL);
->> +                        }
->> +
->> +                        this.data.lock().bad_blocks.enable();
->> +
->> +                        if sign == '+' {
->> +                            this.data.lock().bad_blocks.set_bad(start..=end, true)?;
->> +                        } else {
->> +                            this.data.lock().bad_blocks.set_good(start..=end)?;
->
-> Taking lock twice: TOCTOU.
+The first two patches serialize q->blkg_list walks in blkg_destroy_all()
+and BFQ writeback weight-raising teardown with blkcg_mutex. The next two
+patches close policy activation races with concurrent blkg destruction,
+including skipping blkgs that are already dying. The final patch factors
+the common policy data teardown loop.
 
-I fixed all of these, thanks for reporting.
+This uses blkcg_mutex rather than extending queue_lock coverage because
+the races are about blkg list visibility and policy-data lifetime, not
+request-queue dispatch state. blkg_free_workfn() already uses
+blkcg_mutex to serialize policy-data freeing with policy deactivation
+and removes blkgs from q->blkg_list only after that teardown. Taking the
+same mutex around the remaining q->blkg_list walkers gives one sleepable
+serialization point for blkg lifetime, avoids adding more queue_lock
+nesting, and prepares the follow-up conversion that removes queue_lock
+from blkcg list protection entirely.
 
->
->> @@ -118,6 +125,7 @@ fn make_group(
->>                      home_node: bindings::NUMA_NO_NODE,
->>                      discard: false,
->>                      no_sched: false,
->> +                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
->>                  }),
->>              }),
->>              core::iter::empty(),
->
-> [..]
->
->> @@ -155,6 +160,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
->>                      home_node: *module_parameters::home_node.value(),
->>                      discard: *module_parameters::discard.value() != 0,
->>                      no_sched: *module_parameters::no_sched.value() != 0,
->> +                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
->
-> It seems weird to construct this Arc in two places. Is it shared or not?
+Yu Kuai (2):
+  blk-cgroup: protect q->blkg_list iteration in blkg_destroy_all() with
+    blkcg_mutex
+  bfq: protect q->blkg_list iteration in bfq_end_wr_async() with
+    blkcg_mutex
 
-In the case where the device is created via configfs, the `BadBlocks`
-instance is shared. When the device is constructed via module
-parameters, the `BadBlocks` instance is not shared. In this case it is
-actually not used, as there is no way to enable the code path. But we
-need to provide an instance anyway.
+Zheng Qixing (3):
+  blk-cgroup: fix race between policy activation and blkg destruction
+  blk-cgroup: skip dying blkg in blkcg_activate_policy()
+  blk-cgroup: factor policy pd teardown loop into helper
 
-I did not want to use an Option, because I did not want the checks on
-access.
+ block/bfq-cgroup.c  |  3 ++-
+ block/bfq-iosched.c |  6 +++++
+ block/blk-cgroup.c  | 65 ++++++++++++++++++++++++---------------------
+ 3 files changed, 43 insertions(+), 31 deletions(-)
 
-
-Best regards,
-Andreas Hindborg
-
-
-
+-- 
+2.51.0
