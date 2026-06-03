@@ -1,75 +1,68 @@
-Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021083.outbound.protection.outlook.com [52.101.95.83])
+Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021113.outbound.protection.outlook.com [52.101.100.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C86F47DF8F;
-	Wed,  3 Jun 2026 14:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5BE1E531;
+	Wed,  3 Jun 2026 14:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.113
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780496506; cv=fail; b=gDYBq2RCaLsz1/qTGyuwVdExQTV1hVf4xATFqKWKaFby+dkTMTeLwiH8IzDoPnF3+vjOpKmAQNPeG0gatstm6dlGWw7JDtpJ7Bp2wd6RJyZ5i62HEffj5uImBMju//P7QSyZ6xKWcWADa694y/jKNRNBsJ7s0YlitF856BPKQ9E=
+	t=1780497177; cv=fail; b=Ivw4+Fg1VWo0QoAIOCwitxHv4W6ZuEgukEjAKPGBWhOaU4dmHQPqTS4i5AMgmXJwzvIf3fzzkkusVTLnLpBdNvErYOdr3EEWOc85+Xk26oeDEep83S6yvgW2lgnirZh6uvsVLepX5QSOf8UP0idy4uvOiEyR4SbwDEV4DzUGdqs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780496506; c=relaxed/simple;
-	bh=atrShOJ+8G5tNpaacFOHSZa1r9XwTN4lkrWkfmRF+iU=;
+	s=arc-20240116; t=1780497177; c=relaxed/simple;
+	bh=ryeG837aRW63rl6edtzAniffeNkW5WStpi3Lvck9JOg=;
 	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=ktxGVgEKMZS8arDgsy3/IT6ExnBpZHlSiXEnevoxz6MsL3FqUJsJdOwIvwtiS0zpjALP9KboveRLmWbMqM6GSgZB5KgWM1ms00/EoiCXAeSYqg7hsJtHFq+tezXGr8OExkxQr8Ky+PyEIb8mCUigxN/xd6bh41JTUXS7KQqu0tQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=P2R0u9Jq; arc=fail smtp.client-ip=52.101.95.83
+	 In-Reply-To:MIME-Version; b=cBOCV0FEFiQKhzpFNRJV6BzplreQpPsluW2Fz2hBhd/XqxB/kQ39i80nIRUY6lQVhSsOKhHPZ+UG/5bUecJ6HBdclXLwCfsQEFe10Pj1YyEtODCRK7Rjo+RC0VZ7+NTLPaB4J5SWXzwdYx8liwkh8NEJ6LMau2idVVY/lvZdFIQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=fCx/kipH; arc=fail smtp.client-ip=52.101.100.113
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="P2R0u9Jq"
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="fCx/kipH"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uG7B7NjzDyaBLZbrgN7QvAhOGTGsMybAclv/smTQ3/BXEkkISH5DqkfKMOmyUi75MSAZV6FZ+MQppYOBCQrNVPsJ6AVGTcPOSmrvxbtJ3O0SHxAkIqXFUSdUCGwcgnS+7HzdIU/5AMbzufMJTgm2ofkVnKXY0o5bxzXW0kKwNJRUBz/CZhkEPibmeieUQorm0IpK9FSZMbHzIINCoqr+F9x4Ai96YGXcjd+4tyKSXAClYOU+k5j0j36jQY2Ok6c5jlLa223jLHTJfDYSofmBtEIXeqvVaoUMiAC2fCN5Mbvbltpz+jZ7RAeWG8FHoAlW/pf+XTarNha8H8aQ+RkR7w==
+ b=t5nYwenroB6tKZp0b905dxMqid59XsU2gOE6li7PsocMCvHJNkmW/3vJSf7HL5BeY2cFmQhdiPsKTpLfSgOCmqt7Q6VS0M4ZYXIOSWDjaANKeP5UPHTgMPO4obn2i3c8dbQGj7hsHqBXvQHMAXsjhnGKni+jSmX1hKfiq+4LGLpD16bWY+Vm7nBR9St1bKrWxtCbUMVr8WA5G7+dHagIK+lsWv9m5JiFjUpWKlcBFMuGLIdIHTW1lUhXyfbeRCtSlOwtVGaUD+xayR/8FCPaptbPN0QjA1BnBwbDCb0NPJ8u+4ols25hh/Qca1VjxA9XBovGTDIaOQR+rzSqMAvASw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WbkX2DddI80b4Ml3hfrMZN67jaFvSfHwDGWmdajJXdE=;
- b=F56CHW/FZLbNtta/J43yCnZuYhIlHdLNvsZpqY8wSx4TEJCxEs5s1r2c68g7y969Hfoa32dG7ZIVBzxmayHvycySqmWsDMWrtw6Vo3MIBKtmq21GkdnTmp8ihRLoIPBCE3lsfblteYFvwmgTIka49ine5D8QUk436rScbgdr6YUrLQtbRTPBsk0yyC2noFgPJ3d8B/We16fmKJJDIl/KcKSNd3hN5meg/vkWzITAVIA1tCendzIMH0SSmPs3QYZFce84QTOTo/GfO36ZAx3C6lt95h/WLvxwQCq9YLHevWMyzfILK9AI5XlvZKIx2NIhadZvUrTwRE4lLIKIVwbVgA==
+ bh=Q+QWiy4Woy9MIfhr4Cb1bYq0TI52SjrbDOGZFSFW3rQ=;
+ b=V5R7bVkgHYZnY+C3d/OGlG/fvc2SyYFf7kHShJJN2OUZ9xLZNdMZjRMDVjEF9hcKfJ3LfxFi7+ORk+shBEuIq2iAGr0nj9kwE9AK5fWdI5yc+RILftaPYWo8+dguNySjdWl/pJ58DeeIdcUcJnIT9duSXz5Zp5qQLLT55SWS0uzUEX1GdyI72YeeaQEqCJdGsulHP3UKbFOEyYT2swS/PgSsH/ETn7v4+m4E/7K3ripjHZHJVbBmrY6kgRr2QgwAzl2GVIQvX75PUNQx/LtuThNCZrUvgZEYlZ4iF6EB59uTdDaNgECrssYR106qKBYHU9pLi+ltShkgbqJjXeZs+A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
  dkim=pass header.d=garyguo.net; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbkX2DddI80b4Ml3hfrMZN67jaFvSfHwDGWmdajJXdE=;
- b=P2R0u9JqtIcHrDmydDaNzGByzX3cUhJtbPN3yRStVoxxpWSsZba7ZTd1RZhcZ8Iqjr7cEBlV381cXTA/TGi6pqApb3jG9o2wQ7d3wWYkDXdfW1mcRDIsmog8AAdSDSxegWxV6X6EklZcIydSMVMsv1zHYQLUOuWEvqjWRzu0qbo=
+ bh=Q+QWiy4Woy9MIfhr4Cb1bYq0TI52SjrbDOGZFSFW3rQ=;
+ b=fCx/kipHj3zFyhtRXj1oqcrTOUoKRrE/VLGu18HMsNAgnROfRVCfWWXZgc+kR3NfqcHwWpTSalRtlTIy4bu8t4nINcWmB1qqilUd//xMarenGJmMqIjrMjYECL8qSgBNDznIbgtfQExWnVcbEsA8/G1lLM9S8oRbPpkCy+am/6g=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=garyguo.net;
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by CWXP265MB3032.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:c2::9) with
+ by CWXP265MB5846.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1ab::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.7; Wed, 3 Jun 2026
- 14:21:39 +0000
+ 14:32:51 +0000
 Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.21.0092.006; Wed, 3 Jun 2026
- 14:21:39 +0000
+ 14:32:51 +0000
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Wed, 03 Jun 2026 15:21:36 +0100
-Message-Id: <DIZHBYPMK0L9.3PHF5KXR33QDL@garyguo.net>
-Cc: "Boqun Feng" <boqun.feng@gmail.com>, "Jens Axboe" <axboe@kernel.dk>,
- "Miguel Ojeda" <ojeda@kernel.org>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Trevor Gross" <tmgross@umich.edu>, "Danilo Krummrich"
- <dakr@kernel.org>, "FUJITA Tomonori" <fujita.tomonori@gmail.com>, "Frederic
- Weisbecker" <frederic@kernel.org>, "Lyude Paul" <lyude@redhat.com>, "Thomas
- Gleixner" <tglx@kernel.org>, "Anna-Maria Behnsen"
- <anna-maria@linutronix.de>, "John Stultz" <jstultz@google.com>, "Stephen
- Boyd" <sboyd@kernel.org>, "Lorenzo Stoakes" <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, <linux-block@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-mm@kvack.org>
-Subject: Re: [PATCH 10/79] block: rust: add `command` getter to `Request`
+Date: Wed, 03 Jun 2026 15:32:49 +0100
+Message-Id: <DIZHKJSZXQ4Z.6SPXJVGDV9ZW@garyguo.net>
+Cc: <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2] rust: add procedural macro for declaring configfs
+ attributes
 From: "Gary Guo" <gary@garyguo.net>
-To: "Andreas Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl"
- <aliceryhl@google.com>
+To: "Malte Wechter" <maltewechter@gmail.com>, "Andreas Hindborg"
+ <a.hindborg@kernel.org>, "Breno Leitao" <leitao@debian.org>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Boqun Feng" <boqun@kernel.org>, "Gary Guo"
+ <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
+ Krummrich" <dakr@kernel.org>, "Jens Axboe" <axboe@kernel.dk>
 X-Mailer: aerc 0.21.0
-References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
- <20260216-rnull-v6-19-rc5-send-v1-10-de9a7af4b469@kernel.org>
- <abfbuJVbPtIEyweC@google.com>
- <87mrxbkfme.fsf@t14s.mail-host-address-is-not-set>
-In-Reply-To: <87mrxbkfme.fsf@t14s.mail-host-address-is-not-set>
-X-ClientProxiedBy: DU7P251CA0004.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:10:551::28) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+References: <20260603-configfs-syn-v2-1-cb58489c2647@gmail.com>
+In-Reply-To: <20260603-configfs-syn-v2-1-cb58489c2647@gmail.com>
+X-ClientProxiedBy: LO4P265CA0310.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:391::18) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
  (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -78,121 +71,508 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CWXP265MB3032:EE_
-X-MS-Office365-Filtering-Correlation-Id: 990b1bfe-48b6-49e5-cfb8-08dec17b6d37
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|CWXP265MB5846:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5894d2c5-1e7d-4974-9295-08dec17cfdac
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|56012099006|4143699003|6133799003|22082099003|18002099003;
+	BCL:0;ARA:13230040|1800799024|7416014|366016|376014|921020|56012099006|6133799003|5023799004|3023799007|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	iYQuLw/mlmeVHuzv2AkaToVNTg0x9OwoxHHE7doObCf3HSJoHCa8+v+cHrhVMn5WqKr1LT+DAd0Obz2pC9FcYoe5wkGgX161lS1BvzhpInKgnhRFlSKj+1vxMWvMjnRIWbdYVVGT3O2+dLoaGZeK/3mJlO3jccd6gT+18Z26xKzQK/DO4EfFZbX5DzENf7RuLKknPoAj206v8m9iky6+1e46OoEmLbN4tH63R8ynbCj8g+fnoN7VUYU92GKhyRa66HwoPU2h+XEB6xQKQJg3h0vpL9JyP2QLMiI/61rqanRTDTSrZCzxQwVDiIf7BN9TsweA3pBMgj9MAJAIk44QsuO5DXb/MLzUIQPPM8JvaznkkxyhuCS0pG9vPPaaT1vkGUoa3EpJ7EQkemlvEWMdQWHDjRYIR7EwQNcKHH+rUAHJ13g0voMb1Tc1QbTgn5ruMtYNT+C2cvVGCc1OcBmxWGJI9rl6GaV8zB7bXfNh/G+6jrOxP3OLsuvNqh+9nzjMVfpN+aYp6qoahDw6Gm5sg5u3k9jbVjws1PwterNE0kRgKUlzXyStyzUaN/wGmQ9xw7qGn5HRt7W+6Ubus61VpoZ8pRcwf3uf+stsaGUgM3FRY9Ut4RMWoswgWcygIyCIV67TaqzPxWlNt7CI46nd2Kkgkwq5Nbui1fqvBy6SY1GSP6CmjgIQoCKGayPRtx0v
+	q3GsSxu9/g+F1TJoDNkU5fn0cMeKZdJNigZiYhUiGhx3mlD5hCpFVHjsuT/xyiWp7hLP+6KQosREyrTRWB+KQlushgMTdluUhhVXoZnlnDZfnqdHs8sOhwgixUKM5QLKGGZDQ/fBG9faD1dloI1hXH4VFHV/NoGZONxDD/35Q9Obct0YdprhzWFxibgCr1bMEyeJecUKoq4h45T2OJO5OugsezZ4WCLth92HFXZj/bXkD2WH+LG/zb0eLH/fXdg3xX7dRJtIqg78yOXk77fBQ08O28KdzjGLFPikrIMA0EnsJQIMI7dlUIw3zTr7AT1wsS0fvO6V5rFyNuIQAuJa+eZSZPKUdlGaRoN8qeIVufaapmEHsNFqdhJ2WrXfH0cysQxafQrTORtCsrFWlOrTpUjPrw6vtLPLRxYn0HXhN5iPvOitVav/9VdLIwAkufALjcs7c31W3JGZ/FPqdn95zrQxAQAEoidsrZHYEqHyHTz8w4GG9KfNaSFdLMeByXsw1J5ZPz86Xob+YP0TIdXqC//u+ci2Mj7TDjZKe68sFO/6qVWeFtm8lWaKtqyC6xabu2ooBpD0A0U+TjR7aMvaSKP7fSjttf2zbDMaRcoqrT7vHwYw8Sv0A0sEJW8rdMfaGVW8FHJUBH0EV9/6PDxPmdEXp+d9zXIYYFZ5oMlEYtrokx1QQrkdDUSR/JRQxMVlMi+yeOS6MQ8nN53o8Xfaza4N8kunyuOHd2WfiCIebUTH/ayx0AMUU0/d9K6HdPuT
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(56012099006)(4143699003)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(921020)(56012099006)(6133799003)(5023799004)(3023799007)(22082099003)(18002099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?V204TFFSVFllbVg5a214OG9hV1QxNTdFTkE3OXJ1NmRJcWxINmorTU55TGEr?=
- =?utf-8?B?Y0EwSktKZGxzR1JxWDFRcy9YZ1lhbGRKdE5RR3VXU3NKWjUzMFBDTXVaS2FO?=
- =?utf-8?B?MHc1SjcwK3pEN2RrcGVPOFBMWTlnb0hXZFc2WmZWVm1WK1p6cXZEcmhMWEJF?=
- =?utf-8?B?MW44cS9GYnhQVjczR3ZYR0d5L092YnhpRklhTy9lZ1VOVkZKZzJFQ0dNMWVO?=
- =?utf-8?B?WmI4dE00U0UyWU93b0ZDNE1jWjZMRCt0L005OXFQTGZENUdiM2NhYTZ3YXZ5?=
- =?utf-8?B?MjBTQUx1ZU9JWHNybkZ2Tml0eFBiWDZ5dzhJUHVWQnVLck5Yams0ODMzRnFy?=
- =?utf-8?B?dEZrUEpFQTd3RGdSd1JvcEc2bVBxUENyV2VVYzh6dDhiWG1lWms1Nm1vS1li?=
- =?utf-8?B?dE45NnVKMW9EVWg1VWxMbUo1QkZnKzllUTg0MkFMWW45K2c0V2pJanFXeGp4?=
- =?utf-8?B?Y3I2SVFIdFNzTmpMU3MvUUJBRE4vS2NoU3JSOGhNWFZVYlg0cEJVQzRoU0Vn?=
- =?utf-8?B?TkU1UkRNTVJJclZoQWpUeGdsT1dFK21iNHc2SW02RjQrdVo5QzN1ajhpQVBh?=
- =?utf-8?B?S1l5c1gwdTFLcWlBNllnTDRMeVI1WGY1ZjlOdFZwREhtUjNHODFEdWx5QkdH?=
- =?utf-8?B?eDBWSjFYMUxWSHBqR0JwNmU0RnNlMTNiOVZoVTlacHlOeEh2SVd2SkY3RXNt?=
- =?utf-8?B?WjhQczVCc1VoTU5jWGNyNUZMTkRNNGZqMmdoeUNTejM2cnZCNFNvL2preVRQ?=
- =?utf-8?B?ZTdnL0xQQ2JiV29ockE0YUk4OVo2d0dyL1dudk9zMHZtc0Y4YXdidW5zclNi?=
- =?utf-8?B?UG1oN1lqWUowUG9hUVZPUzZwZml2Y1pONlMrbEh3Skw5bTBWZERzeElNbXNE?=
- =?utf-8?B?VlNxa0hWbldwZWdYMTZKKzJTNVN3VEFoZnhtN0UxTmNZUTI2ZExnRzVMREdQ?=
- =?utf-8?B?VDJ4VW9FdEpKK2p5bVFpOXNzMzF1bVVrVkhWZVhSWnMyaFcvWWU1aVh5VUVw?=
- =?utf-8?B?RCtDNk5uUFZuamtjK3RZeFloc0lFU3R6WXE0cWdLQktCWE9MVnRHdDlOOW9I?=
- =?utf-8?B?a0NON0NVN3M4YVpPN25LZ3U5K2pXYWNaS2RsK293WXhzZ2xEYjl0cXFQVjZ1?=
- =?utf-8?B?K0s3MFlEQ2NXanNuWnZXUk01ZUFDVzBPeXpCdmpkbEhXTFc0Wm5kWG52ZmdE?=
- =?utf-8?B?VlNydjliWHY0RkI0NlRmSkw5UTQwTUNmVTQ0VkRTVU5mT2djUDM1aXBGRmlE?=
- =?utf-8?B?bXlXTU11bVZza3ZhQ1JEMWhDT1FhaThENHVsVU94Q0EyZ0RCUlNZTlNIdlRt?=
- =?utf-8?B?RXJhY3FPYWNKNU5pRFZaQ2xoTGluYXBHWjl6YWcxazhhYUZtOEg0enNPd0Ja?=
- =?utf-8?B?ZlFYK1NXd1M1YTVQSlNpRm1hNnk2RHU0RXRPdnhnTUgxWFpPTGlHTWxWU3dD?=
- =?utf-8?B?YW9BcE9EVktEYUNtdUM3bU40dmdHdGEveVlzNjFrVzM4Z3o3MWJxb0xOdnZi?=
- =?utf-8?B?akp1d21NR2l2YVY2SVFUZzFGa3p1YkFwK0VNQVNQVXVpYnl6K21lZEp3SHZu?=
- =?utf-8?B?YnUrZFRYTGZBa0VOZUQvem5lRWNoV1NCSk1mcElxWVVmcW5YQVdmQXQyYnU4?=
- =?utf-8?B?SGY4MXAyWGd3UmlkaDM1a05vVE4rUDhsa1M0aFp5KzhFWkpZZFVsVzBvZGlS?=
- =?utf-8?B?d09GeWN1cWNkV0w2V3V0TWVLMjFUSTVScG1nc1lnNEl3aEdFZURwU2VVbHRa?=
- =?utf-8?B?L0h4V2QwYUdVdGxHZ051Q0FrRlNMVWhGeTduRDlMNy9Ob05jNjROZUNSOUVM?=
- =?utf-8?B?dVJrTTAwblRweGQzcWdKY2ZMYlFnUzgxb3JXL3RkVXRrRWFtWnFlZmNaM2tr?=
- =?utf-8?B?alNFRCt6aDNQUUxLZWhIbVYvRE5yQlpsT2ZBWktHdTJyYURkTm8rWGIrZVlL?=
- =?utf-8?B?NTB6dnpSekR0WEdDVitDTWg0Q2E3UUtOc05xTXdpWDFlZVR6Rk05QUFIekwy?=
- =?utf-8?B?bncrNnI2T1pXYjYvS0Q3ZUJ3VVljQ29jS0QzcjdhcTAxZ0loYUl1a0swQWlB?=
- =?utf-8?B?YmtxUHNLRDV6V0dZZXF5Y1ZyQUxiNmxKeXBhYmpROXJ4RG50UmpIdElYV3hL?=
- =?utf-8?B?WmxUSnFiMERVRlZaQjBIVGJIUFNYdGN1QVF4bE9Bd3Y5Z2hmUC9MME5TNXpv?=
- =?utf-8?B?UHJDL09lVzMxZHhtUDk2UUYzckxaamF6MHlwRXNydGgvVW44ajJTLzFuYWtU?=
- =?utf-8?B?R2piMjIyV2tveUFEOWpDRHVhcElwN2lJaUxLS0diWUpwQXZRcDdGVWtWQ2hY?=
- =?utf-8?Q?4AT2EN/CFV1+kZWYHT?=
+	=?utf-8?B?WnZtQ0xZUEg1VnJlTjhZNmZaVEc1Nk1Bb09Fa2x1aDY1QTlTV0NMcWN2Uk91?=
+ =?utf-8?B?a2UrQkxwL01SdE13UWliM09PdExUTHF6Z3JJV24wcnRwSFQrMkNjUmQrNXVt?=
+ =?utf-8?B?VXZQQmFpaUJoSmhCSXJ2ellTY1lpRUtjQ2U2eFE5eUhqMUk2b1E5My9qakxp?=
+ =?utf-8?B?TCt5T0lJOCtCRmMwYkJEWHRsS05YMHZIcmFyaWxCU1FScFVwU1BFZ2ZvREN6?=
+ =?utf-8?B?MTZGVlJUcEl4OVh2bm5GQWJ3T3BFRDhzdHVQdm1GL1RBL2V2RHQrR1k0V3ZC?=
+ =?utf-8?B?Y2RZWXJrNzc5VTNXL1RPemZTMnhOa0hhcjMycTAvaG13Rk9Uby9HcW9ZZHZC?=
+ =?utf-8?B?YWEvemszT3E2NmNsMGdtSXNYY1dsU3E3ZS9IWGNkMWlWbWQxODJ1MEY3Tmg3?=
+ =?utf-8?B?WUF2N2FraGwxbldZL2xpK2lUOHdwVFR6eThMSFMySndTdk1ZMmgvQ2hBbk5l?=
+ =?utf-8?B?cm0yWFc5bVpBSXgwSVZCQ1VsdkM5d2k4RmE4ZVdPK24yYTliNnNQd3pDbURG?=
+ =?utf-8?B?THhyWnVZTzJncW83aDdRT0crWmtFU2c2WHBUV0FZQjhpUkRzS0U4SEZ2aTd5?=
+ =?utf-8?B?L3Y4TkdZb29ZejJoN3p0QlQ4NmJmMEJXVEhjTkYvV2RjWXdDeUdJOFFVdHVM?=
+ =?utf-8?B?N2pjZ3RNb09oZ3VvRW9SK1h3MU5NTEh0SEM2Q0MxNnEvRU5uVGp6R2ZkWTc5?=
+ =?utf-8?B?TkZkZ3VpbkpmZVArU285WGRGUFR1NTQ2UHJ3ZEpjVm1FQVcvWGRSemc1YnY3?=
+ =?utf-8?B?VmZkR2VvZUcySUFXaVVINy9NU0FXMVVTUU1zZTAybS9iYmVCckx2VTMvTUF5?=
+ =?utf-8?B?WHczQ0l0UXdHZFpJVkFWVE41enpDcFlVQ21aTW1jQ3lmY21UMGcvWGtEVGtZ?=
+ =?utf-8?B?Qm1aa0UyTjdrWmcyVGhnSlJsOUFEcUcxMUEvdkVFSWNUTklydzhXUERFdElk?=
+ =?utf-8?B?dHZQN1ptSHJPU3M2QVY1cCs0c2dYRDlJV3loangvNzZTcGJCNFNiWUJQQk9t?=
+ =?utf-8?B?aVNOSnVFdEQ3NmM4cHhnMVg4OHhvK2d1TWpmQzRRNkNIc0RhWElGT3JXc0c3?=
+ =?utf-8?B?ZVNqLzFQN1BpQnNxZWdkYzR2S3h2bzBHSTN1STJjRU9vWTNGUm5yRWtVNlJC?=
+ =?utf-8?B?QTZ2bFYxQ0l0NWlDWXVRbGsxN2tFUGo5eFo2MHlGZkxDVCtBS1k0Y0NZc2w3?=
+ =?utf-8?B?YjZPVzk4QWFpeTNPbUQvRTlESUNDRFlQNFBvU0hGZWVoaEZFZUd4NkNTcGlC?=
+ =?utf-8?B?azhiL3RpWHdiTGNaekxWTGlqOW00aTV2MC9uYnFxMkVvSFhkMjVSZlJKQnp4?=
+ =?utf-8?B?Zkp4SEljbVA4SnlzUTVvZWVjOVk3NTlZalVORnNFWUJoQ213bXpEVWsveExa?=
+ =?utf-8?B?anord1g2b1BYOXV5blhLYkt6R3RSZ0czMG9iK1BvYUhuaEtPOHJRaWp0MUlh?=
+ =?utf-8?B?WlQ2NStUY053WWNOeC92bEI3ZitPSjRsb1lJQk9uZE9vcnVjS0oxL294Und6?=
+ =?utf-8?B?WWZ6UUxFZ0FPQzFRZXhaTDhPWEh1dWhwTUZOcnh1UTYxNDZmLzlkajlDZ0Vy?=
+ =?utf-8?B?RU1JUWkyTzJWME5hcld5YTBpRVI2MVFtRlB3cm8xSStBdUxrRU45SnFsN2Ir?=
+ =?utf-8?B?bHJ0TmZ3R3RUV2IrTG5hYkQ2OW9GY3RydWRPWHFtU2cxZFozdStKaXliR1F2?=
+ =?utf-8?B?cDZpNDhXQjBjQ1dzNUpGNExRQjk5MEtWU3VtQWF0Z0FmYjB1bUNMbXRPWm53?=
+ =?utf-8?B?Uml0bjJlOGhXdkVFWDZheEdpaWo4ZlQzNkZiYXR2VnN5QWZubkJZNVYvNll0?=
+ =?utf-8?B?NzVNa0o1ZjNNOEk2dHJNZ1AvbmtPckJQTGVHaHJNdmU0eWNMTE1WSUQyMnlU?=
+ =?utf-8?B?aERjeUpidWVIdmhpOWJsc2FUMUwyZWZSWmMxbzB4TUg4NVltVldBRjIvTDVo?=
+ =?utf-8?B?dkU4TktzbEZBd3p5U1Bqd05wR2J2anNtbFVoSGNrWGpkRzZzWm9jSWZ0Zklv?=
+ =?utf-8?B?bXpwY1FjOFp5L0o3U3o2SXlKSi9rVisvRGhWbzlsaENwTHB5K2pxdzMrUU14?=
+ =?utf-8?B?dzRSWjRnWmxjRUs0WUduejVFeU5XSlZlUnB2TTVJR3FHN0lvc3dZWmYxNUVl?=
+ =?utf-8?B?cUhGVUV3d0xPS1NkSnNsRU5ZeE1MMXpYbVFoZVRIQmJqRHFjTnpZSHBzNndR?=
+ =?utf-8?B?Smt0YlA5cC9OV3ZOOGZHN3lPaVFkbUJzcFhMSVlEeHMrVGppREpmcVV0aTVW?=
+ =?utf-8?B?K1RSZlpuQjNrRWxtKzhFaStPazhZRGRwNVgwNG5qSHROVm96ZWpkcnlEdXcv?=
+ =?utf-8?Q?y49vE/Z06QnLEWjTkA?=
 X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 990b1bfe-48b6-49e5-cfb8-08dec17b6d37
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5894d2c5-1e7d-4974-9295-08dec17cfdac
 X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2026 14:21:39.1606
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2026 14:32:51.0346
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YBIcQEgSja4d3nXqGlJfpQa6Wwv+uU6dPg3Iz/DzlR0wdS+zz09Ilg7eBEBoKMQAOJkYullqzbzUhvo4qRhcug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP265MB3032
+X-MS-Exchange-CrossTenant-UserPrincipalName: npP6hnW6Ju2KEwjaCp43S4EXBt8zKhQ0LY/TETc7AolnIY7IrtmX0PSHF4UHsK3Yux7bz652QNc2xnEhhnk07Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP265MB5846
 
-On Wed Jun 3, 2026 at 12:50 PM BST, Andreas Hindborg wrote:
-> Alice Ryhl <aliceryhl@google.com> writes:
+On Wed Jun 3, 2026 at 3:08 PM BST, Malte Wechter wrote:
+> Implement `configfs_attrs!` as a procedural macro using `syn`, this
+> improves readability and maintainability. Remove the old macro and
+> replace all uses with the new macro. Add the new macro implementation
+> file to MAINTAINERS.
 >
->> On Mon, Feb 16, 2026 at 12:34:57AM +0100, Andreas Hindborg wrote:
->>> Add a method to extract the command operation code from a request. The
->>> command is obtained by masking the lower bits of `cmd_flags` as defined=
- by
->>> `REQ_OP_BITS`. This allows Rust block drivers to determine the type of
->>> operation being requested.
->>>=20
->>> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->>
->> With the nit below fixed:
->> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
->>
->>>  rust/kernel/block/mq/request.rs | 6 ++++++
->>>  1 file changed, 6 insertions(+)
->>>=20
->>> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/req=
-uest.rs
->>> index b49197a0c66d7..0dd329ae93dfc 100644
->>> --- a/rust/kernel/block/mq/request.rs
->>> +++ b/rust/kernel/block/mq/request.rs
->>> @@ -78,6 +78,12 @@ pub(crate) unsafe fn aref_from_raw(ptr: *mut binding=
-s::request) -> ARef<Self> {
->>>          unsafe { ARef::from_raw(NonNull::new_unchecked(ptr.cast())) }
->>>      }
->>> =20
->>> +    /// Get the command identifier for the request
->>> +    pub fn command(&self) -> u32 {
->>> +        // SAFETY: By C API contract and type invariant, `cmd_flags` i=
-s valid for read
->>> +        unsafe { (*self.0.get()).cmd_flags & ((1 << bindings::REQ_OP_B=
-ITS) - 1) }
->>
->> Nit: scope of unsafe
->>
->> 	unsafe { (*self.0.get()).cmd_flags } & ((1 << bindings::REQ_OP_BITS) - =
-1)
+> Signed-off-by: Malte Wechter <maltewechter@gmail.com>
+> ---
+> Changes in v2:
+> - Add a try_parse helper function to macros/helpers.rs
+> - Fix bug where 'child' configuration gets dropped if trailing comma is m=
+issing (sashiko)
+> - Link to v1: https://lore.kernel.org/r/20260520-configfs-syn-v1-1-6c5b80=
+a9cef2@gmail.com
+> ---
+>  MAINTAINERS                     |   1 +
+>  drivers/block/rnull/configfs.rs |   2 +-
+>  rust/kernel/configfs.rs         | 251 ----------------------------------=
+------
+>  rust/macros/configfs_attrs.rs   | 182 +++++++++++++++++++++++++++++
+>  rust/macros/helpers.rs          |  15 +++
+>  rust/macros/lib.rs              |  85 ++++++++++++++
+>  samples/rust/rust_configfs.rs   |   2 +-
+>  7 files changed, 285 insertions(+), 253 deletions(-)
 >
-> The `&` is parsed as reference operator with this change. But we can do
-> this:
->
->         use core::ops::BitAnd;
->         // SAFETY: By C API contract and type invariant, `cmd_flags` is v=
-alid for read
->         unsafe { (*self.0.get()).cmd_flags }.bitand((1u32 << bindings::RE=
-Q_OP_BITS) - 1)
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 2fb1c75afd163..45f7a1ec93b45 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -6464,6 +6464,7 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/gi=
+t/a.hindborg/linux.git config
+>  F:	fs/configfs/
+>  F:	include/linux/configfs.h
+>  F:	rust/kernel/configfs.rs
+> +F:	rust/macros/configfs_attrs.rs
+>  F:	samples/configfs/
+>  F:	samples/rust/rust_configfs.rs
+> =20
+> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/config=
+fs.rs
+> index 7c2eb5c0b7228..f28ec69d79846 100644
+> --- a/drivers/block/rnull/configfs.rs
+> +++ b/drivers/block/rnull/configfs.rs
+> @@ -4,8 +4,8 @@
+>  use kernel::{
+>      block::mq::gen_disk::{GenDisk, GenDiskBuilder},
+>      configfs::{self, AttributeOperations},
+> -    configfs_attrs,
+>      fmt::{self, Write as _},
+> +    macros::configfs_attrs,
+>      new_mutex,
+>      page::PAGE_SIZE,
+>      prelude::*,
+> diff --git a/rust/macros/configfs_attrs.rs b/rust/macros/configfs_attrs.r=
+s
+> new file mode 100644
+> index 0000000000000..a7fc75cdebcc0
+> --- /dev/null
+> +++ b/rust/macros/configfs_attrs.rs
+> @@ -0,0 +1,182 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +use quote::{
+> +    quote, //
+> +    ToTokens,
+> +};
+> +
+> +use proc_macro2::{
+> +    Span, //
+> +};
+> +
+> +use syn::{
+> +    bracketed,
+> +    parse::{
+> +        Parse,
+> +        ParseStream, //
+> +    },
+> +    punctuated::Punctuated,
+> +    spanned::Spanned,
+> +    Ident,
+> +    LitInt,
+> +    Token,
+> +    Type, //
+> +};
+> +
+> +use crate::helpers::try_parse;
+> +
+> +pub(crate) struct ConfigfsAttrs {
+> +    container: Type,
+> +    data: Type,
+> +    child: Option<Type>,
+> +    attributes: Vec<(Ident, LitInt)>,
+> +}
+> +
+> +fn parse_attribute_field(stream: ParseStream<'_>) -> syn::Result<(Ident,=
+ LitInt)> {
+> +    let id =3D stream.parse::<syn::Ident>()?;
+> +    let _colon =3D stream.parse::<Token![:]>()?;
+> +    let v =3D stream.parse::<LitInt>()?;
+> +    Ok((id, v))
+> +}
+> +
+> +fn parse_named_field(stream: ParseStream<'_>, name: &str) -> syn::Result=
+<Type> {
+> +    let name_id =3D stream.parse::<Ident>()?;
+> +    if name_id !=3D name {
+> +        return Err(parse_field_error(name_id.span(), &name_id, name));
+> +    }
+> +    let _colon =3D stream.parse::<Token![:]>()?;
+> +    let v =3D stream.parse::<Type>()?;
+> +    stream.parse::<Token![,]>()?;
+> +    Ok(v)
+> +}
+> +
+> +fn parse_attributes(stream: ParseStream<'_>) -> syn::Result<Vec<(Ident, =
+LitInt)>> {
+> +    let attribute_id =3D stream.parse::<Ident>()?;
+> +    if attribute_id !=3D "attributes" {
+> +        return Err(syn::Error::new(
+> +            attribute_id.span(),
+> +            format!(
+> +                "unexpected identifier: {}, expected: 'attributes'",
+> +                attribute_id
+> +            ),
+> +        ));
+> +    }
+> +    stream.parse::<Token![:]>()?;
+> +    let attr_stream;
+> +    let _bracket =3D bracketed!(attr_stream in stream);
+> +    let attributes =3D Punctuated::<(Ident, LitInt), Token![,]>::parse_t=
+erminated_with(
+> +        &attr_stream,
+> +        parse_attribute_field,
+> +    )?;
+> +    let attributes =3D attributes.into_iter().collect::<Vec<_>>();
+> +
+> +    stream.parse::<Option<Token![,]>>()?;
+> +    Ok(attributes)
+> +}
+> +
+> +fn parse_field_error(span: Span, name: &Ident, expected_name: &str) -> s=
+yn::Error {
+> +    syn::Error::new(
+> +        span,
+> +        format!("Unexpected field name, got: {name} expected: {expected_=
+name}"),
+> +    )
+> +}
+> +
+> +impl Parse for ConfigfsAttrs {
+> +    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
+> +        let container =3D try_parse(input, |s| parse_named_field(s, "con=
+tainer"))?;
+> +        let data =3D try_parse(input, |s| parse_named_field(s, "data"))?=
+;
+> +        let child =3D try_parse(input, |s| parse_named_field(s, "child")=
+).ok();
+> +        let attributes =3D parse_attributes(input)?;
 
-Wrapping the unsafe block in a parenthesis should do the trick.
+I have a `parse_ordered_fields!()` macro in module.rs, please extract it to
+helpers and use it instead of implementing the parsing in an ad-hoc manner.
+
+> +
+> +        Ok(ConfigfsAttrs {
+> +            container,
+> +            data,
+> +            child,
+> +            attributes,
+> +        })
+> +    }
+> +}
+> +
+> +fn make_static_ident<T: ToTokens>(ty: &T, suffix: &str) -> syn::Ident {
+> +    let raw_id =3D quote! { #ty }.to_string();
+> +
+> +    // Sanitizing syn::Type::Path, this is safe since it is
+> +    // only used as the identifier.
+> +    let normalized =3D raw_id
+> +        .split("::")
+> +        .map(|s| String::from(s.trim()))
+> +        .reduce(|a, b| format!("{a}_{b}"))
+> +        .expect("Cannot be empty")
+> +        .to_uppercase()
+> +        .replace(|c: char| !c.is_alphanumeric(), "_");
+> +
+> +    Ident::new(&format!("{}_{}", normalized, suffix), ty.span())
+> +}
+> +
+> +pub(crate) fn configfs_attrs(cfs_attrs: ConfigfsAttrs) -> proc_macro2::T=
+okenStream {
+> +    let (container_ty, data_ty) =3D (&cfs_attrs.container, &cfs_attrs.da=
+ta);
+> +
+> +    let data_tp_ident =3D make_static_ident(data_ty, "TPE");
+> +    let data_attr_ident =3D make_static_ident(data_ty, "ATTR_LIST");
+
+Instead of creating identifers like this, just scope them properly so that
+a fixed identifier is used without colliding.
+
+> +
+> +    let n =3D cfs_attrs.attributes.len() + 1;
+> +
+> +    let attr_list =3D quote! {
+> +        static #data_attr_ident: kernel::configfs::AttributeList<#n, #da=
+ta_ty> =3D
+> +            // SAFETY: We are expanding `configfs_attrs`.
+> +            unsafe { kernel::configfs::AttributeList::new() };
+> +    };
+> +
+> +    let mut attrs =3D Vec::new();
+> +    for (attr_idx, (name, id)) in cfs_attrs.attributes.iter().enumerate(=
+) {
+> +        let name_with_attr =3D make_static_ident(name, "ATTR");
+> +
+> +        let id: u64 =3D match id.base10_parse::<u64>() {
+> +            Ok(v) =3D> v,
+> +            Err(_) =3D> {
+> +                return syn::Error::new(id.span(), "Could not parse attri=
+bute ID as a u64")
+> +                    .to_compile_error();
+> +            }
+> +        };
+
+Why parsing? The ID looks like it's just substituted as is.
 
 Best,
 Gary
+
+> +
+> +        attrs.push(quote! {
+> +        static #name_with_attr: kernel::configfs::Attribute<#id, #data_t=
+y, #data_ty> =3D
+> +            // SAFETY: We are expanding `configfs_attrs`.
+> +            unsafe {
+> +              kernel::configfs::Attribute::new(kernel::c_str!(::core::st=
+ringify!(#name)))
+> +            };
+> +
+> +          // SAFETY: By design of this macro, the name of the variable w=
+e
+> +          // invoke the `add` method on below, is not visible outside of
+> +          // the macro expansion. The macro does not operate concurrentl=
+y
+> +          // on this variable, and thus we have exclusive access to the
+> +          // variable.
+> +          unsafe { #data_attr_ident.add::<#attr_idx, #id, _>(&#name_with=
+_attr) }
+> +        });
+> +    }
+> +
+> +    let has_child_code =3D if let Some(child) =3D cfs_attrs.child {
+> +        quote! { new_with_child_ctor::<#n, #child>}
+> +    } else {
+> +        quote! { new::<#n> }
+> +    };
+> +
+> +    let data_type =3D quote! {
+> +        {
+> +            static #data_tp_ident:
+> +            kernel::configfs::ItemType<#container_ty, #data_ty> =3D
+> +                kernel::configfs::ItemType::<#container_ty, #data_ty>::#=
+has_child_code(
+> +                    &THIS_MODULE, &#data_attr_ident
+> +                );
+> +            &#data_tp_ident
+> +        }
+> +    };
+> +
+> +    quote! {
+> +        {
+> +            #attr_list
+> +            #(#attrs)*
+> +            #data_type
+> +        }
+> +    }
+> +}
+> diff --git a/rust/macros/helpers.rs b/rust/macros/helpers.rs
+> index d18fbf4daa0a5..fdab8804e1ba9 100644
+> --- a/rust/macros/helpers.rs
+> +++ b/rust/macros/helpers.rs
+> @@ -4,6 +4,7 @@
+>  use quote::ToTokens;
+>  use syn::{
+>      parse::{
+> +        discouraged::Speculative,
+>          Parse,
+>          ParseStream, //
+>      },
+> @@ -54,6 +55,20 @@ pub(crate) fn file() -> String {
+>      }
+>  }
+> =20
+> +pub(crate) fn try_parse<T>(
+> +    input: ParseStream<'_>,
+> +    parser: impl FnOnce(ParseStream<'_>) -> Result<T>,
+> +) -> Result<T> {
+> +    let fork =3D input.fork();
+> +    match parser(&fork) {
+> +        Ok(value) =3D> {
+> +            input.advance_to(&fork);
+> +            Ok(value)
+> +        }
+> +        Err(e) =3D> Err(e),
+> +    }
+> +}
+> +
+>  /// Obtain all `#[cfg]` attributes.
+>  pub(crate) fn gather_cfg_attrs(attr: &[Attribute]) -> impl Iterator<Item=
+ =3D &Attribute> + '_ {
+>      attr.iter().filter(|a| a.path().is_ident("cfg"))
+> diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
+> index 2cfd59e0f9e7c..745ba83c828b9 100644
+> --- a/rust/macros/lib.rs
+> +++ b/rust/macros/lib.rs
+> @@ -15,6 +15,8 @@
+>  #![cfg_attr(not(CONFIG_RUSTC_HAS_SPAN_FILE), feature(proc_macro_span))]
+> =20
+>  mod concat_idents;
+> +#[cfg(CONFIG_CONFIGFS_FS)]
+> +mod configfs_attrs;
+>  mod export;
+>  mod fmt;
+>  mod helpers;
+> @@ -489,3 +491,86 @@ pub fn kunit_tests(attr: TokenStream, input: TokenSt=
+ream) -> TokenStream {
+>          .unwrap_or_else(|e| e.into_compile_error())
+>          .into()
+>  }
+> +
+> +/// Define a list of configfs attributes statically.
+> +///
+> +/// # Examples
+> +///
+> +/// ```ignore
+> +/// let item_type =3D configfs_attrs! {
+> +///     container: configfs::Subsystem<Configuration>,
+> +///     data: Configuration,
+> +///     child: Child,
+> +///     attributes: [
+> +///         message: 0,
+> +///         bar: 1,
+> +///     ],
+> +/// };
+> +///```
+> +///
+> +/// Expands the following output:
+> +///    let item_type =3D {
+> +///         static CONFIGURATION_ATTR_LIST: kernel::configfs::AttributeL=
+ist<
+> +///             3usize,
+> +///             Configuration,
+> +///         > =3D unsafe { kernel::configfs::AttributeList::new() };
+> +///         static MESSAGE_ATTR: kernel::configfs::Attribute<
+> +///             0u64,
+> +///             Configuration,
+> +///             Configuration,
+> +///         > =3D unsafe {
+> +///             kernel::configfs::Attribute::new({
+> +///                 const S: &str =3D "message\u{0}";
+> +///                 const C: &kernel::str::CStr =3D match kernel::str::C=
+Str::from_bytes_with_nul(
+> +///                     S.as_bytes(),
+> +///                 ) {
+> +///                     Ok(v) =3D> v,
+> +///                     Err(_) =3D> {
+> +///                         ::core::panicking::panic_fmt(
+> +///                             format_args!("string contains interior N=
+UL"),
+> +///                         );
+> +///                     }
+> +///                 };
+> +///                 C
+> +///             })
+> +///         };
+> +///         unsafe { CONFIGURATION_ATTR_LIST.add::<0usize, 0u64, _>(&MES=
+SAGE_ATTR) }
+> +///         static BAR_ATTR: kernel::configfs::Attribute<
+> +///             1u64,
+> +///             Configuration,
+> +///             Configuration,
+> +///         > =3D unsafe {
+> +///             kernel::configfs::Attribute::new({
+> +///                 const S: &str =3D "bar\u{0}";
+> +///                 const C: &kernel::str::CStr =3D match kernel::str::C=
+Str::from_bytes_with_nul(
+> +///                     S.as_bytes(),
+> +///                 ) {
+> +///                     Ok(v) =3D> v,
+> +///                     Err(_) =3D> {
+> +///                         ::core::panicking::panic_fmt(
+> +///                             format_args!("string contains interior N=
+UL"),
+> +///                         );
+> +///                     }
+> +///                 };
+> +///                 C
+> +///             })
+> +///         };
+> +///         unsafe { CONFIGURATION_ATTR_LIST.add::<1usize, 1u64, _>(&BAR=
+_ATTR) }
+> +///         {
+> +///             static CONFIGURATION_TPE: kernel::configfs::ItemType<
+> +///                 Subsystem<Configuration>,
+> +///                 Configuration,
+> +///             > =3D kernel::configfs::ItemType::<
+> +///                 Subsystem<Configuration>,
+> +///                 Configuration,
+> +///             >::new_with_child_ctor::<3usize, Child>(&THIS_MODULE, &C=
+ONFIGURATION_ATTR_LIST);
+> +///             &CONFIGURATION_TPE
+> +///         }
+> +///     };
+> +///
+> +#[cfg(CONFIG_CONFIGFS_FS)]
+> +#[proc_macro]
+> +pub fn configfs_attrs(input: TokenStream) -> TokenStream {
+> +    configfs_attrs::configfs_attrs(parse_macro_input!(input as configfs_=
+attrs::ConfigfsAttrs))
+> +        .into()
+> +}
+> diff --git a/samples/rust/rust_configfs.rs b/samples/rust/rust_configfs.r=
+s
+> index a1bd9db6010da..876462f7789d1 100644
+> --- a/samples/rust/rust_configfs.rs
+> +++ b/samples/rust/rust_configfs.rs
+> @@ -4,7 +4,7 @@
+> =20
+>  use kernel::alloc::flags;
+>  use kernel::configfs;
+> -use kernel::configfs::configfs_attrs;
+> +use kernel::macros::configfs_attrs;
+>  use kernel::new_mutex;
+>  use kernel::page::PAGE_SIZE;
+>  use kernel::prelude::*;
+>
+> ---
+> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+> change-id: 20260417-configfs-syn-191e07130027
+>
+> Best regards,
 
 
