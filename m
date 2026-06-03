@@ -1,326 +1,248 @@
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73583F8EC2
-	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 06:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5924D367B89
+	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 06:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780467923; cv=none; b=JXbxNxpr0hs+xI/1bj7YYtKiYa44cAkUvy6taNnRc6S9Pibw1AVJjcF2LOoRCDaCQqV+6Rf8/OFb+laMMGoMyuG/4Keq47EV33Hc2C47ZlXmB5AZTtVHrNjXLaSUaU72ueK+tep5ByJeD7EP8I/+weMfp70zIZy2zSmcGn/ZjQU=
+	t=1780468868; cv=none; b=a69GRWEGui+6z/KCVt5w/i5SW/+o9z4v7WST/UMWsBqfwm2tleVSH0rcnXARxtX2NRmgSsNDzRM/ImqyhT+C9ueLTOWZGDJOO0Px/O3kmYaxSe23ySaEP+ICZ7L/oLOPf3dNHcYxQxiFVt8NtQUlvfPu4wC7csYFIdTLX88SJ4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780467923; c=relaxed/simple;
-	bh=/7Kp898NjVD7qOVT2M2PyCIMj+eCtPcUd2OxwKnvCx4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V5Lc1D8Lvri9sLCDDZV5GLwiAm0l3PADMTQd/o55xUteuCj2N59yEvnFgf+jxq0lJIGFTi+y/w9+po9733fZkF69uP7PWEgnuxM20MElhyposXIxPhr1pMFLzHGYbm3swV3Fip4xFXVZAqJsoPRHOTUCZXZW/hBRfiG9DBJtvRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 6536PDaX056561;
-	Wed, 3 Jun 2026 15:25:13 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 6536PDEO056558
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 3 Jun 2026 15:25:13 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <420f723a-8168-4f56-b84a-2a36ecd87fea@I-love.SAKURA.ne.jp>
-Date: Wed, 3 Jun 2026 15:25:12 +0900
+	s=arc-20240116; t=1780468868; c=relaxed/simple;
+	bh=cN5ZuWZDIAU+kQ7Udn5SiYafXl8vRzAvQiLkg2LwMWs=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=WNV/IV4/fx4ukjjkEDQPEY7ozKlb3FMH3KDWKAxso6WD7vpH9MoM68PRoK+a33sNJbTkd6hZksTQqdFHVWisFsRsHTd74JHeQ9KhwcRYldSMEZoHOtPJs1az6FeFo9pmWPflV0pBpYkkgElwqjpIqlFUOZ8a9YlB4Mm+l634jCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-69de11bef3dso9145493eaf.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Jun 2026 23:41:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780468866; x=1781073666;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L/l/m5lHUJsJap9MAms6EJQlc8zuBSTF5f+B8GIWI9o=;
+        b=fiC2I6rbdvepeyNNDyu2UURG6su5JAicB7xciFy60O3YnSNS4Rl6qKPKsNiRWeeTrF
+         vX5uS+yj59I4EDkYtffR094e3TNO5/J4ucP1y91vhpbiBgS32YLW5GDy5dWZDmRoib/i
+         N2yxx/1qXUxTfc3EhEixgnTPsIvH9aLu8FVt0TWVpiuSOaEtEk8DE3oLv15LykC1vX9N
+         vN8t6vrL8uoxlfa6RLVOkveCjdyJwpfHEaW9XXOP3342G7FU55fLEGiiu/JdzsATzwS1
+         kY82N8M4yRiCvos+66uD1nKnSl5Q72yMCUdDa8JlHm8v/Y8zOa3kqH4A+abNxGwnAl7t
+         3nYA==
+X-Forwarded-Encrypted: i=1; AFNElJ+hnBJ5VDEUx8J9OlA0x5aMRbTvRt/+IITrEjgwM2YDumd324FXMB4dOcWNY3ArCHW7v+e5zy8uIQC7nA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXESFL4d1j0bJyCy+GarpvwEm/U3C/MtuWyM1DvMfcYPA9d/fq
+	B+WAekb9Ag4A2zhdpfxOCBaI+7KhmsGgRpakl3vQZaWdS+pv6h62Hy2LI/sWx6mpJRn2uU4odjq
+	EtF9ahCy3HfX5RgKytstxgz1nS3X6amO8g6B3ITG6fBAgq1tv+++hPssg6D4=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH v2] block: assign caller-specific lockdep class to
- disk->open_mutex
-To: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ming Lei <tom.leiming@gmail.com>, Damien Le Moal <dlemoal@kernel.org>,
-        Qu Wenruo <wqu@suse.com>, Hillf Danton <hdanton@sina.com>,
-        Miguel Ojeda <ojeda@kernel.org>
-References: <147ed056-03d9-4214-b925-0f10fc00cf27@I-love.SAKURA.ne.jp>
- <4cf7ecc7-932c-4589-9d0f-3e025e83e27c@acm.org> <20260601071113.GB7468@lst.de>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20260601071113.GB7468@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav303.rs.sakura.ne.jp
-X-Virus-Status: clean
+X-Received: by 2002:a05:6820:8106:b0:696:806e:fd6 with SMTP id
+ 006d021491bc7-69e480b26acmr1483032eaf.40.1780468866505; Tue, 02 Jun 2026
+ 23:41:06 -0700 (PDT)
+Date: Tue, 02 Jun 2026 23:41:06 -0700
+In-Reply-To: <20260603021035.3690601-1-vulab@iscas.ac.cn>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a1fcc82.b4221f80.1326c5.0007.GAE@google.com>
+Subject: [syzbot ci] Re: block/fops: fix refcount underflow in __blkdev_direct_IO()
+From: syzbot ci <syzbot+ci54b64cdbaca88ef6@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, vulab@iscas.ac.cn
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The block core currently allocates a single monolithic lockdep key for
-disk->open_mutex across all callers. This single key conflates locking
-hierarchies between independent block streams. For example, if a stacked
-driver like loop flushes its internal workqueues inside lo_release() while
-holding its own open_mutex, lockdep views this as a potential ABBA deadlock
-against the underlying storage stack, leading to numerous circular
-dependency splats.
+syzbot ci has tested the following series
 
-To structurally reduce false positives, this patch splits the global
-monolithic lock class into distinct, per-caller instances during disk
-allocation. This is done by replacing "struct lock_class_key" with
-"struct gendisk_lkclass", which contains two instances of
-"struct lock_class_key" for the legacy "(bio completion)" map and
-disk->open_mutex respectively.
+[v1] block/fops: fix refcount underflow in __blkdev_direct_IO()
+https://lore.kernel.org/all/20260603021035.3690601-1-vulab@iscas.ac.cn
+* [PATCH] block/fops: fix refcount underflow in __blkdev_direct_IO()
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+and found the following issue:
+KASAN: invalid-free in mempool_free
+
+Full report is available here:
+https://ci.syzbot.org/series/3498c893-003a-4780-92e5-c3090ee3fe45
+
+***
+
+KASAN: invalid-free in mempool_free
+
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      ba3e43a9e601636f5edb54e259a74f96ca3b8fd8
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/0616259e-7b19-4982-aeee-0a50317c4cc6/config
+syz repro: https://ci.syzbot.org/findings/d2d98b4c-c6a9-4ecb-b313-ebd5a6d1b0d8/syz_repro
+
+==================================================================
+BUG: KASAN: double-free in mempool_free+0xec/0x130 mm/mempool.c:711
+Free of addr ffff888177994400 by task syz.0.17/5875
+
+CPU: 1 UID: 0 PID: 5875 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description+0x55/0x1e0 mm/kasan/report.c:378
+ print_report+0x58/0x70 mm/kasan/report.c:482
+ kasan_report_invalid_free+0xea/0x110 mm/kasan/report.c:557
+ check_slab_allocation mm/kasan/common.c:-1 [inline]
+ __kasan_slab_pre_free+0x104/0x120 mm/kasan/common.c:261
+ kasan_slab_pre_free include/linux/kasan.h:199 [inline]
+ slab_free_hook mm/slub.c:2634 [inline]
+ slab_free mm/slub.c:6251 [inline]
+ kmem_cache_free+0x130/0x650 mm/slub.c:6378
+ mempool_free+0xec/0x130 mm/mempool.c:711
+ bio_free+0x1e9/0x330 block/bio.c:205
+ __blkdev_direct_IO+0xd89/0xf40 block/fops.c:290
+ blkdev_direct_IO+0x121a/0x1790 block/fops.c:438
+ blkdev_read_iter+0x23d/0x440 block/fops.c:841
+ do_iter_readv_writev+0x619/0x8c0 fs/read_write.c:-1
+ vfs_readv+0x288/0x840 fs/read_write.c:1020
+ do_preadv fs/read_write.c:1134 [inline]
+ __do_sys_preadv2 fs/read_write.c:1193 [inline]
+ __se_sys_preadv2+0x184/0x2a0 fs/read_write.c:1184
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f125c99ce59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f125d829028 EFLAGS: 00000246 ORIG_RAX: 0000000000000147
+RAX: ffffffffffffffda RBX: 00007f125cc15fa0 RCX: 00007f125c99ce59
+RDX: 0000000000000005 RSI: 0000200000000080 RDI: 0000000000000003
+RBP: 00007f125ca32d6f R08: 0000000000000000 R09: 000000000000001f
+R10: 0000000000002000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f125cc16038 R14: 00007f125cc15fa0 R15: 00007fff02d2e3e8
+ </TASK>
+
+Allocated by task 5875:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ unpoison_slab_object mm/kasan/common.c:340 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4570 [inline]
+ slab_alloc_node mm/slub.c:4899 [inline]
+ kmem_cache_alloc_noprof+0x2bc/0x650 mm/slub.c:4906
+ bio_alloc_bioset+0x599/0xc90 block/bio.c:571
+ __blkdev_direct_IO+0x294/0xf40 block/fops.c:186
+ blkdev_direct_IO+0x121a/0x1790 block/fops.c:438
+ blkdev_read_iter+0x23d/0x440 block/fops.c:841
+ do_iter_readv_writev+0x619/0x8c0 fs/read_write.c:-1
+ vfs_readv+0x288/0x840 fs/read_write.c:1020
+ do_preadv fs/read_write.c:1134 [inline]
+ __do_sys_preadv2 fs/read_write.c:1193 [inline]
+ __se_sys_preadv2+0x184/0x2a0 fs/read_write.c:1184
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 5875:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2689 [inline]
+ slab_free mm/slub.c:6251 [inline]
+ kmem_cache_free+0x182/0x650 mm/slub.c:6378
+ mempool_free+0xec/0x130 mm/mempool.c:711
+ bio_free+0x1e9/0x330 block/bio.c:205
+ __blkdev_direct_IO+0xd6e/0xf40 block/fops.c:288
+ blkdev_direct_IO+0x121a/0x1790 block/fops.c:438
+ blkdev_read_iter+0x23d/0x440 block/fops.c:841
+ do_iter_readv_writev+0x619/0x8c0 fs/read_write.c:-1
+ vfs_readv+0x288/0x840 fs/read_write.c:1020
+ do_preadv fs/read_write.c:1134 [inline]
+ __do_sys_preadv2 fs/read_write.c:1193 [inline]
+ __se_sys_preadv2+0x184/0x2a0 fs/read_write.c:1184
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888177994400
+ which belongs to the cache biovec-max of size 4096
+The buggy address is located 0 bytes inside of
+ 4096-byte region [ffff888177994400, ffff888177995400)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888177990000 pfn:0x177990
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x57ff00000000240(workingset|head|node=1|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 057ff00000000240 ffff8881604148c0 ffff8881622adc48 ffffea0005de5010
+raw: ffff888177990000 0000000800070003 00000000f5000000 0000000000000000
+head: 057ff00000000240 ffff8881604148c0 ffff8881622adc48 ffffea0005de5010
+head: ffff888177990000 0000000800070003 00000000f5000000 0000000000000000
+head: 057ff00000000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd2800(GFP_NOWAIT|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5065, tgid 5065 (udevd), ts 29098398773, free_ts 24434603765
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x22d/0x280 mm/page_alloc.c:1853
+ prep_new_page mm/page_alloc.c:1861 [inline]
+ get_page_from_freelist+0x2593/0x2610 mm/page_alloc.c:3941
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5221
+ alloc_slab_page mm/slub.c:3278 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3467
+ new_slab mm/slub.c:3525 [inline]
+ refill_objects+0x339/0x3d0 mm/slub.c:7272
+ refill_sheaf mm/slub.c:2816 [inline]
+ __pcs_replace_empty_main+0x321/0x720 mm/slub.c:4652
+ alloc_from_pcs mm/slub.c:4750 [inline]
+ slab_alloc_node mm/slub.c:4884 [inline]
+ kmem_cache_alloc_noprof+0x37d/0x650 mm/slub.c:4906
+ bio_alloc_bioset+0x599/0xc90 block/bio.c:571
+ bio_alloc include/linux/bio.h:367 [inline]
+ ext4_mpage_readpages+0x13b5/0x1f30 fs/ext4/readpage.c:355
+ read_pages+0x193/0x5a0 mm/readahead.c:163
+ page_cache_ra_unbounded+0x794/0xa10 mm/readahead.c:304
+ do_page_cache_ra mm/readahead.c:334 [inline]
+ page_cache_ra_order+0xae4/0xe80 mm/readahead.c:538
+ filemap_readahead mm/filemap.c:2664 [inline]
+ filemap_get_pages+0x897/0x1ef0 mm/filemap.c:2710
+ filemap_read+0x447/0x1230 mm/filemap.c:2806
+ __kernel_read+0x504/0x9b0 fs/read_write.c:532
+ integrity_kernel_read+0x89/0xd0 security/integrity/iint.c:28
+page last free pid 10 tgid 10 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1397 [inline]
+ __free_frozen_pages+0xc1c/0xd30 mm/page_alloc.c:2938
+ vfree+0x1d1/0x2f0 mm/vmalloc.c:3472
+ delayed_vfree_work+0x55/0x80 mm/vmalloc.c:3392
+ process_one_work kernel/workqueue.c:3314 [inline]
+ process_scheduled_works+0xb5d/0x1860 kernel/workqueue.c:3397
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3478
+ kthread+0x389/0x470 kernel/kthread.c:436
+ ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Memory state around the buggy address:
+ ffff888177994300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888177994380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff888177994400: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff888177994480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888177994500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
 ---
-Changes in v2:
-- Replaced a two-element array with a struct with two named members, suggested by Bart Van Assche
-  ( https://lore.kernel.org/all/4cf7ecc7-932c-4589-9d0f-3e025e83e27c@acm.org/ ).
-- Added changes needed by Rust block layer bindings and rnull module, pointed out by sashiko
-  ( https://sashiko.dev/#/patchset/147ed056-03d9-4214-b925-0f10fc00cf27%40I-love.SAKURA.ne.jp ).
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
-Testing result of v1:
-- I kept v1 patch in linux-next for several more days, but result was that
-  some of circular dependency splats which I thought this change succeeded to
-  eliminate are still getting reported. That is, we need to determine whether
-  we should make this change without example syzbot reports that demonstrates
-  difference. But in general, keeping locking chains simpler and shorter
-  should be a good change.
+To test a patch for this bug, please reply with `#syz test`
+(should be on a separate line).
 
-Acknowledgment:
-  Since I have no experience with Rust, changes needed by Rust block layer
-  bindings and rnull module are made based on conversation with the Gemini
-  AI collaborator.
-
- block/blk-mq.c                   |  4 ++--
- block/blk.h                      |  2 +-
- block/genhd.c                    |  8 ++++----
- drivers/block/rnull/rnull.rs     |  2 +-
- drivers/scsi/sd.c                |  2 +-
- drivers/scsi/sr.c                |  2 +-
- include/linux/blk-mq.h           |  6 +++---
- include/linux/blkdev.h           |  9 +++++++--
- rust/kernel/block/mq/gen_disk.rs | 17 +++++++++++++++--
- 9 files changed, 35 insertions(+), 17 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a24175441380..5203e8cc6a28 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4492,7 +4492,7 @@ EXPORT_SYMBOL(blk_mq_destroy_queue);
- 
- struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set,
- 		struct queue_limits *lim, void *queuedata,
--		struct lock_class_key *lkclass)
-+		struct gendisk_lkclass *lkclass)
- {
- 	struct request_queue *q;
- 	struct gendisk *disk;
-@@ -4513,7 +4513,7 @@ struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set,
- EXPORT_SYMBOL(__blk_mq_alloc_disk);
- 
- struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
--		struct lock_class_key *lkclass)
-+		struct gendisk_lkclass *lkclass)
- {
- 	struct gendisk *disk;
- 
-diff --git a/block/blk.h b/block/blk.h
-index b998a7761faf..611bcd655357 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -614,7 +614,7 @@ void drop_partition(struct block_device *part);
- void bdev_set_nr_sectors(struct block_device *bdev, sector_t sectors);
- 
- struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
--		struct lock_class_key *lkclass);
-+		struct gendisk_lkclass *lkclass);
- struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id);
- 
- int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode);
-diff --git a/block/genhd.c b/block/genhd.c
-index 7d6854fd28e9..8f4a3d8ca15e 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1444,7 +1444,7 @@ dev_t part_devt(struct gendisk *disk, u8 partno)
- }
- 
- struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
--		struct lock_class_key *lkclass)
-+		struct gendisk_lkclass *lkclass)
- {
- 	struct gendisk *disk;
- 
-@@ -1467,7 +1467,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- 		goto out_free_bdi;
- 
- 	disk->node_id = node_id;
--	mutex_init(&disk->open_mutex);
-+	mutex_init_with_key(&disk->open_mutex, &lkclass->open_mutex_lkclass);
- 	xa_init(&disk->part_tbl);
- 	if (xa_insert(&disk->part_tbl, 0, disk->part0, GFP_KERNEL))
- 		goto out_destroy_part_tbl;
-@@ -1482,7 +1482,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- 	device_initialize(disk_to_dev(disk));
- 	inc_diskseq(disk);
- 	q->disk = disk;
--	lockdep_init_map(&disk->lockdep_map, "(bio completion)", lkclass, 0);
-+	lockdep_init_map(&disk->lockdep_map, "(bio completion)", &lkclass->bio_lkclass, 0);
- #ifdef CONFIG_BLOCK_HOLDER_DEPRECATED
- 	INIT_LIST_HEAD(&disk->slave_bdevs);
- #endif
-@@ -1506,7 +1506,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- }
- 
- struct gendisk *__blk_alloc_disk(struct queue_limits *lim, int node,
--		struct lock_class_key *lkclass)
-+		struct gendisk_lkclass *lkclass)
- {
- 	struct queue_limits default_lim = { };
- 	struct request_queue *q;
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 0ca8715febe8..476a8910c432 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -61,7 +61,7 @@ fn new(
-             .logical_block_size(block_size)?
-             .physical_block_size(block_size)?
-             .rotational(rotational)
--            .build(fmt!("{}", name.to_str()?), tagset, queue_data)
-+            .build(fmt!("{}", name.to_str()?), tagset, queue_data, kernel::my_gendisk_lkclass!())
-     }
- }
- 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 599e75f33334..63fe8c86606a 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -112,7 +112,7 @@ static DEFINE_MUTEX(sd_mutex_lock);
- static mempool_t *sd_page_pool;
- static mempool_t *sd_large_page_pool;
- static atomic_t sd_large_page_pool_users = ATOMIC_INIT(0);
--static struct lock_class_key sd_bio_compl_lkclass;
-+static struct gendisk_lkclass sd_bio_compl_lkclass;
- 
- static const char *sd_cache_types[] = {
- 	"write through", "none", "write back",
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index c36c54ecd354..734567ae0e43 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -106,7 +106,7 @@ static struct scsi_driver sr_template = {
- static unsigned long sr_index_bits[SR_DISKS / BITS_PER_LONG];
- static DEFINE_SPINLOCK(sr_index_lock);
- 
--static struct lock_class_key sr_bio_compl_lkclass;
-+static struct gendisk_lkclass sr_bio_compl_lkclass;
- 
- static int sr_open(struct cdrom_device_info *, int);
- static void sr_release(struct cdrom_device_info *);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 18a2388ba581..5aa17e82c3ba 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -726,15 +726,15 @@ enum {
- 
- struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set,
- 		struct queue_limits *lim, void *queuedata,
--		struct lock_class_key *lkclass);
-+		struct gendisk_lkclass *lkclass);
- #define blk_mq_alloc_disk(set, lim, queuedata)				\
- ({									\
--	static struct lock_class_key __key;				\
-+	static struct gendisk_lkclass __key;				\
- 									\
- 	__blk_mq_alloc_disk(set, lim, queuedata, &__key);		\
- })
- struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
--		struct lock_class_key *lkclass);
-+		struct gendisk_lkclass *lkclass);
- struct request_queue *blk_mq_alloc_queue(struct blk_mq_tag_set *set,
- 		struct queue_limits *lim, void *queuedata);
- int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 890128cdea1c..28b0aee6b3ba 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -49,6 +49,11 @@ extern const struct device_type disk_type;
- extern const struct device_type part_type;
- extern const struct class block_class;
- 
-+struct gendisk_lkclass {
-+	struct lock_class_key bio_lkclass;
-+	struct lock_class_key open_mutex_lkclass;
-+};
-+
- /*
-  * Maximum number of blkcg policies allowed to be registered concurrently.
-  * Defined here to simplify include dependency.
-@@ -974,7 +979,7 @@ int bdev_disk_changed(struct gendisk *disk, bool invalidate);
- 
- void put_disk(struct gendisk *disk);
- struct gendisk *__blk_alloc_disk(struct queue_limits *lim, int node,
--		struct lock_class_key *lkclass);
-+		struct gendisk_lkclass *lkclass);
- 
- /**
-  * blk_alloc_disk - allocate a gendisk structure
-@@ -990,7 +995,7 @@ struct gendisk *__blk_alloc_disk(struct queue_limits *lim, int node,
-  */
- #define blk_alloc_disk(lim, node_id)					\
- ({									\
--	static struct lock_class_key __key;				\
-+	static struct gendisk_lkclass __key;				\
- 									\
- 	__blk_alloc_disk(lim, node_id, &__key);				\
- })
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 912cb805caf5..b4efe4b1b5f6 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -11,7 +11,6 @@
-     error::{self, from_err_ptr, Result},
-     fmt::{self, Write},
-     prelude::*,
--    static_lock_class,
-     str::NullTerminatedFormatter,
-     sync::Arc,
-     types::{ForeignOwnable, ScopeGuard},
-@@ -38,6 +37,19 @@ fn default() -> Self {
-     }
- }
- 
-+/// Helper macro to generate a unique caller-local static lock class struct
-+#[macro_export]
-+macro_rules! my_gendisk_lkclass {
-+    () => {{
-+        static mut LKCLASS: $crate::bindings::gendisk_lkclass = $crate::bindings::gendisk_lkclass {
-+            bio_lkclass: const { unsafe { ::core::mem::zeroed() } },
-+            open_mutex_lkclass: const { unsafe { ::core::mem::zeroed() } },
-+        };
-+
-+        unsafe { &raw mut LKCLASS }
-+    }};
-+}
-+
- impl GenDiskBuilder {
-     /// Create a new instance.
-     pub fn new() -> Self {
-@@ -100,6 +112,7 @@ pub fn build<T: Operations>(
-         name: fmt::Arguments<'_>,
-         tagset: Arc<TagSet<T>>,
-         queue_data: T::QueueData,
-+        lkclass: *mut bindings::gendisk_lkclass,
-     ) -> Result<GenDisk<T>> {
-         let data = queue_data.into_foreign();
-         let recover_data = ScopeGuard::new(|| {
-@@ -121,7 +134,7 @@ pub fn build<T: Operations>(
-                 tagset.raw_tag_set(),
-                 &mut lim,
-                 data,
--                static_lock_class!().as_ptr(),
-+                lkclass,
-             )
-         })?;
- 
--- 
-2.54.0
-
-
+The patch should be attached to the email.
+Note: arguments like custom git repos and branches are not supported.
