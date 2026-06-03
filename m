@@ -1,102 +1,247 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EE039A04D
-	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 15:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E0072603
+	for <linux-block@vger.kernel.org>; Wed,  3 Jun 2026 20:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780499343; cv=none; b=nCpQyans6PY7cu5/4uGn1P9GkoxqwttRpWeqO/HKuUydjbBstQw2huLWNdfgcxFUnz+Ev/jZ00Osy5AfrBjV0oLvAiWOqnmNltkGzZV+lhhBHfIcE5q5iRPYL4lPAluX1Nul/4YBh9aF6NiV8/MY5Z/gnSkKCPQshFn5f2cem1I=
+	t=1780519831; cv=none; b=VNECWMITy2GGCFRr3kTRs481H+DHLsiD5KV3uHOuKDLgy9k1/mTdeOzwkPt+z2unTb5n3dTqFsDAO/1oQQFSc8x1z+Y/E54amE9Otd6eZPd3WGe+SEBgfwuWe7rGzBcEQGr2f9D670FY/rJUdgkFeEgbdXw7/aoXtWtslg6AYJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780499343; c=relaxed/simple;
-	bh=VGcwjx3DPZjE2hgdTexOWATae4GqcZm3OWlDTiWj77g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ARCNAIjeZBs3pOW7dSZiDCcGTXr0sTXlp4Cn7OgT7xlrLrmv9K3ez51lJEGp/2+nZaWIX5M9hSekTIAauZxXEvrIOUgSsVp4OsdZthNB4ahtkxd4HBfMaxpsZripllXdJEL7IgLRxy0B/Ot4rGYo+y5z8R6GER0EC7hAWZ+nq3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=G5IJnpJ1; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1780519831; c=relaxed/simple;
+	bh=uompo60iwQOtWpXlrHzE2THVdlpVUKEPDfzH7BWrsxI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CVpOpn7IUogqO5lCgPGqZGmltCxR/fyuejE7lSVEjWVkWUvAGI12VAlUAbjJaJHU9GAwsFzu8QbbJmIKN0/b8NCpOrm27kTAiBtzHdSxhIiC80uWPM1d8DBDUzsAhWVvfVPJNagZNHTWmHFSCIdYG0Q+3OMibOsOVHCvlxHdcug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=WnM8lya/; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="G5IJnpJ1"
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-440f9c48b85so332091fac.1
-        for <linux-block@vger.kernel.org>; Wed, 03 Jun 2026 08:09:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780499340; x=1781104140; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7Rgl+7P4bys3k8olUkjDrUmY90i/4VEAqR/MuDk3aF4=;
-        b=G5IJnpJ1fpzebgCXZZYBBDP1JPUgcjL1XHLreTHoWERY0Zxub8g4n8/p1U5SSEARfG
-         zCqQfBImBa1qHBfb+vfAPE+1eT71YVdJz2Wgi4IpumpvHoR5nFjqeQIIl0F3JiZ6hBMo
-         91uT/Josj3QjW3NxgXODqwVsbZRC+DMByiRrJ2DUE6nTlE4xBbtdpY1gxJV763Tuqbny
-         lM8fVqEgVXpNOGCpMFHYSdo4uEjgfjuNXzTLRYU45wuzN0h4ptWV7Pg6WPeUK5BLyRww
-         KLKaaNNFPQRRNMJfTEJbehB5WTfU+6XiC+G3VH7w4G/JGEnEiPcZQY6Geqoc6Q4pAd/e
-         8JQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780499340; x=1781104140;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7Rgl+7P4bys3k8olUkjDrUmY90i/4VEAqR/MuDk3aF4=;
-        b=liNZC1EZOIV9Iwmv9WMWWTxBQRTleyck7Yu2HAMgWXfEprWm67REgodUKA5sP2g37Y
-         mWIybGiRg9tfyUqjmmLWkDKelKiJWW/R9SSzPieICc8Bw6FDmXwx1u4z0yidFARHQs5/
-         WAuALWP+Y4Ftm5Dhd08t2Aq4ecHEI9/ZJfE+5IMdYpuc60dooqhAEWiatpsxkrUekl2t
-         DhL6G7wCsHJgkH4eWxtIlVwqiwUKinSgJrqCE/sF6CR2NaOCYTsWZrwBgZI4sn/np7bN
-         OVFVasbpauedC7ySMu/kcHCYiFE73kkXPCKo/KnAE8JxL2VBh4VfeF1UGiqN1z2xhK0c
-         zJ0A==
-X-Forwarded-Encrypted: i=1; AFNElJ9bGKk4d4p+cxh2C671yfjVKLeffvmfxcdipWA3TKHNXdD/VjukrRo/zhUDHambHnzmS40mtjyI3r31Lg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTuuBteICgv5n1jYq+fylruXZYjzTOD1yN6XIS1wCHw32y0Ndn
-	FA8iXts7TZDcdVFZ5LDWk1WSXy+7fzoya9Gh3npHIcEyZBlFdrVbCPlQWCWrasVrKkgc3sVlPgw
-	VjohL
-X-Gm-Gg: Acq92OEwQTbMQCBybX07zwjpRN/ucMvnaTHa+l2gy40rjI0cksVQ2mwLiwwD/aUPGu3
-	F1PNfzK4ptlAJgpOE909giHUvXSDvPUu4GjVq95xG+pMvlCRxOSxyzwkOfRKNHG5cpKWhCvWi16
-	KkyTuCDSEQG0HHrdEsI9/h6eGAWfcTD6HdVq1QpZRe1hMEzymQ2tTd6vB1i5wDGIosFYwskrLYz
-	GisQUiuR6H5h5sW6VCz/9vVloZLLCZPvI84evAemIi3bfl/FhO6IHcti4+BN8jbB54IGnzIbSBf
-	7Zr7vf0LsdMg/zL0HBAZfUJNtCjnoO1frbcqpwZES8f0i/loLKS0pEO2VZEgPDNwfag5wusMUwc
-	k2cXj+8wpXwSv8SoHf6hM99Y6/0XwnQ+Ok/68i3mtRsrwnDh1Frux16Vc5AcrbRXabWLa37Moem
-	7l9+k4mv0qo1sJpbVKBLkWPxpo3qn9yRINKdDocTqrI6G6W0khB5ExGxEkRu8Euc13SHaO9a90E
-	JjFZQFmvE10jisCRgI=
-X-Received: by 2002:a05:6870:9d98:b0:43c:33e6:275c with SMTP id 586e51a60fabf-440ddd8f4f0mr1723868fac.9.1780499340586;
-        Wed, 03 Jun 2026 08:09:00 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-440d7c42c33sm2468388fac.6.2026.06.03.08.08.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jun 2026 08:09:00 -0700 (PDT)
-Message-ID: <70200e71-bc14-4f1e-aab9-16b27efbb3ec@kernel.dk>
-Date: Wed, 3 Jun 2026 09:08:58 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="WnM8lya/"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gW0Fr4PhVz1XM0pG;
+	Wed,  3 Jun 2026 20:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1780519820; x=1783111821; bh=cb1lbaPnO6aaEWyf/wH1MQHWWmur3nFBSTG
+	LC8HJT6k=; b=WnM8lya/Sey/Bs5Y3f+MmmPF4TS2KrywuLZsyLpriCSmmIwxYse
+	pLsqcRO8fyyxkjpvj1skmw3eJJjfauwwkZzM1HRK/EwH+1xvV4/b1LLGWJxnTZ+Y
+	Amg95jopG28vX1dMJrgSPeYE7Yw3nimwgNwYvRjlkahjK7sr3OuteqYX7Gi2gRUe
+	XdoQM6/l12zMp26MY7BsNm2joGkHAUnwTp719zQ5rGPlf9SAGe8bsAZJjFcdvTfp
+	EtFAWWi4wOTXcz2/stQ2h8JRlQ09a51DpWnqpkK2OkwQMuocyR5O7vCR1ft4lReH
+	qPgypIYgymNRd29ZuDUCtucmGs81L2ji7cQ==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id o3yKNKvhrEnZ; Wed,  3 Jun 2026 20:50:20 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gW0Fl3J1rz1XMFjJ;
+	Wed,  3 Jun 2026 20:50:19 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	linux-block@vger.kernel.org,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH blktests] throtl/008: Add a test for the iocost cgroup controller
+Date: Wed,  3 Jun 2026 13:50:07 -0700
+Message-ID: <20260603205007.2654971-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] blk-cgroup: fix blkg list and policy data races
-To: yukuai <yukuai@fnnas.com>, Yu Kuai <yukuai@fygo.io>
-Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
- Ming Lei <tom.leiming@gmail.com>, Nilay Shroff <nilay@linux.ibm.com>,
- Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
- cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1780492756.git.yukuai@fygo.io>
- <1686f891-599d-4cef-8f38-420033355f2d@kernel.dk>
- <189b8601-87a6-423a-b267-9d550c31c086@fnnas.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <189b8601-87a6-423a-b267-9d550c31c086@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 6/3/26 9:06 AM, yukuai wrote:
-> Hi,
-> 
-> ? 2026/6/3 22:35, Jens Axboe ??:
->> On 6/3/26 7:27 AM, Yu Kuai wrote:
->>> This small series fixes races between blkg destruction, q->blkg_list
->>> iteration, and blkcg policy activation.
->> In spam: Authentication-Results: mx.google.com <mx.google.com>; spf=pass (google.com: <google.com:> domain of srs0=eh6w=d7=fygo.io=yukuai@kernel.org designates 2600:3c04:e001:324:0:1991:8:25 as permitted sender) smtp.mailfrom="SRS0=EH6w=D7=fygo.io=yukuai@kernel.org"; dmarc=fail (p=QUARANTINE sp=QUARANTINE dis=QUARANTINE) header.from=fygo.io <header.from=fygo.io> if you don't get this sorted out, your messages will be missed as they end up in spam for most people.
-> 
-> Thanks again for the notice. I think I finally figured out why dmarc failed. 
+Add a test for read and write IOPS throttling. The test implementation
+has been generated by Antigravity and Gemini with a few manual edits.
 
-This email looks better!
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ tests/throtl/008     | 152 +++++++++++++++++++++++++++++++++++++++++++
+ tests/throtl/008.out |   2 +
+ 2 files changed, 154 insertions(+)
+ create mode 100755 tests/throtl/008
+ create mode 100644 tests/throtl/008.out
 
--- 
-Jens Axboe
+diff --git a/tests/throtl/008 b/tests/throtl/008
+new file mode 100755
+index 000000000000..0570fc0188e0
+--- /dev/null
++++ b/tests/throtl/008
+@@ -0,0 +1,152 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2026 Google LLC
++#
++# Test cgroup iocost IOPS limiting.
++
++. tests/block/rc
++. common/null_blk
++. common/cgroup
++. common/fio
++
++DESCRIPTION=3D"test cgroup iocost controller limits"
++
++requires() {
++	_have_cgroup2_controller io
++	_have_null_blk
++	_have_fio
++	_have_program bc
++	if [[ ! -e "$(_cgroup2_base_dir)/io.cost.qos" ]]; then
++		SKIP_REASONS+=3D("iocost controller not supported (CONFIG_BLK_CGROUP_I=
+OCOST)")
++		return 1
++	fi
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	# Create a null_blk instance
++	local null_blk_params=3D(
++		blocksize=3D4096
++		completion_nsec=3D0
++		memory_backed=3D0
++		size=3D1024 # MB
++		submit_queues=3D1
++		power=3D1
++	)
++	_init_null_blk nr_devices=3D0 queue_mode=3D2 &&
++	if ! _configure_null_blk nullb0 "${null_blk_params[@]}"; then
++		echo "Configuring null_blk failed"
++		return 1
++	fi
++
++	local dev_t
++	dev_t=3D$(</sys/block/nullb0/dev)
++	if [[ -z $dev_t ]]; then
++		echo "Failed to get major:minor for nullb0"
++		_exit_null_blk
++		return 1
++	fi
++
++	# Initialize cgroups
++	if ! _init_cgroup2; then
++		echo "Initializing cgroup2 failed"
++		_exit_null_blk
++		return 1
++	fi
++
++	# Enable io controller in the subtree
++	local deactivate_io_ctrlr=3Dfalse
++	if ! grep -wq io "$(_cgroup2_base_dir)/cgroup.subtree_control"; then
++		if ! echo "+io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"; then
++			echo "Failed to enable io controller on cgroup root"
++			_exit_cgroup2
++			_exit_null_blk
++			return 1
++		fi
++		deactivate_io_ctrlr=3Dtrue
++	fi
++
++	if ! echo "+io" > "$CGROUP2_DIR/cgroup.subtree_control"; then
++		echo "Failed to enable io controller on $CGROUP2_DIR"
++		if [[ $deactivate_io_ctrlr =3D=3D true ]]; then
++			echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
++		fi
++		_exit_cgroup2
++		_exit_null_blk
++		return 1
++	fi
++
++	# Configure iocost controller globally for the device
++	# min=3D100.00 max=3D100.00 forces vrate to be fixed at 100%
++	if ! echo "$dev_t enable=3D1 min=3D100.00 max=3D100.00" > "$(_cgroup2_b=
+ase_dir)/io.cost.qos"; then
++		echo "Failed to configure io.cost.qos"
++		if [[ $deactivate_io_ctrlr =3D=3D true ]]; then
++			echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
++		fi
++		_exit_cgroup2
++		_exit_null_blk
++		return 1
++	fi
++
++	# Limit read iops to 100 and write iops to 10.
++	# Setting rbps/wbps to 0 means they are ignored (costs calculated purel=
+y based on IOPS)
++	if ! echo "$dev_t ctrl=3Duser model=3Dlinear rbps=3D0 rseqiops=3D100 rr=
+andiops=3D100 wbps=3D0 wseqiops=3D10 wrandiops=3D10" > "$(_cgroup2_base_d=
+ir)/io.cost.model"; then
++		echo "Failed to configure io.cost.model"
++		echo "$dev_t enable=3D0" > "$(_cgroup2_base_dir)/io.cost.qos"
++		if [[ $deactivate_io_ctrlr =3D=3D true ]]; then
++			echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
++		fi
++		_exit_cgroup2
++		_exit_null_blk
++		return 1
++	fi
++
++	# Create a child cgroup for test
++	local cg_name=3D"testgrp"
++	local cg_path=3D"$CGROUP2_DIR/$cg_name"
++	mkdir "$cg_path"
++
++	# 1. Run FIO read test
++	local -a FIO_PERF_FIELDS
++	FIO_PERF_FIELDS=3D("read iops")
++	if ! _fio_perf --bs=3D4k --rw=3Drandread --name=3Dread-test --filename=3D=
+/dev/nullb0 \
++			--ioengine=3Dlibaio --direct=3D1 --iodepth=3D64 --time_based --runtim=
+e=3D10 \
++			--cgroup=3D"blktests/$cg_name" > /dev/null 2>&1; then
++		echo "FIO read test failed"
++	else
++		local read_iops=3D${TEST_RUN["read iops"]}
++		if [[ -z $read_iops ]]; then
++			echo "Read IOPS is empty"
++		elif (( "$(echo "$read_iops < 90 || $read_iops > 110" | bc -l)" )); th=
+en
++			echo "Read IOPS $read_iops not in expected range [90, 110]"
++		fi
++	fi
++
++	# 2. Run FIO write test
++	FIO_PERF_FIELDS=3D("write iops")
++	if ! _fio_perf --bs=3D4k --rw=3Drandwrite --name=3Dwrite-test --filenam=
+e=3D/dev/nullb0 \
++			--ioengine=3Dlibaio --direct=3D1 --iodepth=3D64 --time_based --runtim=
+e=3D10 \
++			--cgroup=3D"blktests/$cg_name" > /dev/null 2>&1; then
++		echo "FIO write test failed"
++	else
++		local write_iops=3D${TEST_RUN["write iops"]}
++		if [[ -z $write_iops ]]; then
++			echo "Write IOPS is empty"
++		elif (( "$(echo "$write_iops < 8 || $write_iops > 12" | bc -l)" )); th=
+en
++			echo "Write IOPS $write_iops not in expected range [8, 12]"
++		fi
++	fi
++
++	# Clean up cgroups
++	rmdir "$cg_path"
++	if [[ $deactivate_io_ctrlr =3D=3D true ]]; then
++		{ echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"; } &> "${=
+FULL}"
++	fi
++	_exit_cgroup2
++
++	# Clean up null_blk
++	_exit_null_blk
++
++	echo "Test complete"
++}
+diff --git a/tests/throtl/008.out b/tests/throtl/008.out
+new file mode 100644
+index 000000000000..890ff7f226d1
+--- /dev/null
++++ b/tests/throtl/008.out
+@@ -0,0 +1,2 @@
++Running throtl/008
++Test complete
