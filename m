@@ -1,126 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A5B4A2E22;
-	Thu,  4 Jun 2026 20:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB5435B650;
+	Thu,  4 Jun 2026 21:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780604099; cv=none; b=alLoDP2x03ZYEXuT9eMI2Q12NoBgacbaU5Yx2xjUW9gC20+Wda2AdOTk+lmKb6TM+UGcbFgZZ/jBdeO6Y8cdr+NwLjbep+fipQ9tCrVHZ5bTedpwOEgqejKE6SpyOhMlxG+1Pgj34Rd92usN4j/Rq7yRxCcRvqVVnikQ3yTxiZk=
+	t=1780607243; cv=none; b=V/9v6i7eNTewfQDfGQ+IJIDDp3qhl40IHLWsoqjq2opopcUx5fZBGLMEox/lGTB/S1Z05iaOqF1DGiJX+L40Sx58A6Pysy7MV6lApbESzpPjYgwkiCsJcGVcq1339iWAAuOCyU2iALGvzBQ7QwsgCFeStYsmU6b5XSmnTOd06mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780604099; c=relaxed/simple;
-	bh=Yk6QSotN2tq3Mqa2udN0WeFejqVXfRoesEZYyBbnFJ8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gaPt8Wb/ILejREQmFoy8H+KUrilO5ZYtopbazn5r78gu4L6eC8bO3+cmI+z7eKsM33mmg/H5rRJuYjblDJkMPufUEiRZx77n+ATWs+VJa4dKtXJiVJ3BdvAb2AW4bDi6/95cZ1SKu7nQbP4O3IOLLd3HQYj/HT9gFeCs4SlLO5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=emyi1bE3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780607243; c=relaxed/simple;
+	bh=g7GV7VqMpijIW+SNfApb2mbR+GSpP8vpvnWUWnP8eqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bCK7ZqjCXSouA3HXy3XJIbfjph9x3LdfLgOdoJUlCIpIkjVEfNXIvmGMTJ/msNpiJkVWiwK6hydn++or1AlKmyC9BaP/LcPhpJe3zLJNdXMoQe8FWCzepbcWkykZC+24W00MXXsV5TwuY0CXt82GgQ0SnUomgkk2FlmGeFxnlUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npD/qQCX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="emyi1bE3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 946FA1F00898;
-	Thu,  4 Jun 2026 20:14:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npD/qQCX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00B531F00893;
+	Thu,  4 Jun 2026 21:07:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780604095;
-	bh=t4H8eqNZN4/mIO1u313XVeuHkqdUneIpioBG/gGEBMQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=emyi1bE3lT84UiMs0H/e5sWLBpipKD8aP4rx9nCFc5ww2rHWzTrNroixBU1R1eW3k
-	 VvDyq+Y9/EKTN5YutDxaS2ya7aaz09ocK8otk3HD4GePbWSC8Nq3UzR3jpHPJsKnlW
-	 D+G1ixqQ2oKb5RLaZIvJKK62Ge4aMEzL6NR04y47K5UJ14jmX8IhLAu4hN5UEpcV0p
-	 QeUQfwkvgeuV7wWv1oUW5AiTbIKO9lPOEnLAnAOPOPK8bI7//XDk5clHDilppzR/TY
-	 GZxIkL2upvxl1wSbQAKqhnKfs+Sb4dtPjK9uSDcEaZPvRLUc9O84wyUuh3WcYXZw+B
-	 dXBq+GQKoz+hA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Thu, 04 Jun 2026 22:11:22 +0200
-Subject: [PATCH v17 10/10] rust: page: add `from_raw()`
+	s=k20260515; t=1780607241;
+	bh=TNQDzyTjPMOgbDEx67tSPYyxULtyqVXdtuqSOyi2rII=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=npD/qQCXliwX+s1LGnUae8rBscKjT9LqeuyXN2Y+WEUsCfVCvW68Q8iCSCNm1XCV8
+	 NIm/5JSF5mb5VQwS1T+llt+BLnNor8purnG+vKzOJmUspBUXCtJvnZP3ioPo1sktJv
+	 XoTnioM2w/Y/SXH0w0N1i0TPkNkd/pzuriuzadPPT8Zaor60E/yvTn6HfW44MY6uBr
+	 rY2euggspZA+vOCnKYWTy0d8iJG7hyDFOUanrZjJIsaKYiGddxfnEMkZrJZJDf+CHD
+	 4hNO0y4LEiVQt+m5oh8sZhmCPeiiwiwEAk1Zlu3wz/f0Lw07t+i4V2onX6mgAlHceY
+	 UFJS3wUyhlaIg==
+From: Miguel Ojeda <ojeda@kernel.org>
+To: penguin-kernel@i-love.sakura.ne.jp
+Cc: akpm@linux-foundation.org,
+	axboe@kernel.dk,
+	bvanassche@acm.org,
+	dlemoal@kernel.org,
+	hch@lst.de,
+	hdanton@sina.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ojeda@kernel.org,
+	tom.leiming@gmail.com,
+	wqu@suse.com,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	rust-for-linux@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to disk->open_mutex
+Date: Thu,  4 Jun 2026 23:07:04 +0200
+Message-ID: <20260604210704.41751-1-ojeda@kernel.org>
+In-Reply-To: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
+References: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260604-unique-ref-v17-10-7b4c3d2930b9@kernel.org>
-References: <20260604-unique-ref-v17-0-7b4c3d2930b9@kernel.org>
-In-Reply-To: <20260604-unique-ref-v17-0-7b4c3d2930b9@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
- Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
- Serge Hallyn <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Viresh Kumar <vireshk@kernel.org>, Nishanth Menon <nm@ti.com>, 
- Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
- =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
- Boqun Feng <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>, 
- Lorenzo Stoakes <ljs@kernel.org>, Vlastimil Babka <vbabka@kernel.org>, 
- "Liam R. Howlett" <liam@infradead.org>, 
- Igor Korotin <igor.korotin@linux.dev>, 
- Pavel Tikhomirov <ptikhomirov@virtuozzo.com>, Boqun Feng <boqun@kernel.org>, 
- Igor Korotin <igor.korotin@linux.dev>, Lorenzo Stoakes <ljs@kernel.org>, 
- "Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>
-Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
- linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
- Andreas Hindborg <a.hindborg@kernel.org>, driver-core@lists.linux.dev, 
- Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1098; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=MTxQNyPl556p/37N9iYrjSR5gCSkwSCTZpMY90B8pEY=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqIdvvpNub7j04mvxMdRLdPaAd/MQZCqnEQ9G7x
- 6NHPMMF+bKJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaiHb7wAKCRD6UCkIqsW9
- 0MI+D/0QPO+RBFAbjZRXC9pKgYwjFXnKxpO8ZzAKgdud2wdZcrmS6XnxjFCuPYPaFQ93AhOYZJa
- 4HV8ITv5TB34RklZib+C1ex0+Q7HyqZjU22svIR16LfDNFX/PzVeBvcMhmc1WvMZxfKE72VeYMD
- lG1FuQHv/rWnofDymriWJ1qTmmIh7KcWTZTBWOBoRgKjjYMflJitin0NXq39YIxXu1MqcEGW20v
- ceF6r4JVyWfA1qLVdGeuXR56Z/tP/9demSf0WEz4n/JNfPwSO2fQGqgHU5Wl5QkOeyepnUg4nCf
- V7AX9lwpje33yM15jdHfXun61mNZa7LYV/QZyVny/IV39nPfxrEMJMFFzFZhx3H9v6+wmG7Rl7h
- cOtjeMyzfmUxEJ95Tx/gR6H9Lv9v03K0ZTh/L5YdaCZvaNDy0gi0KOnWUL1eP93qbY2kiyZmE5f
- t+Xfj7TX4TebKhIwyEuO/uBVPqXJyZTHt2mkjJ2wP+OAjZlc3btrRL3brJE0UGHxHzedtn8XHk8
- TyidsBvAMRGQ+VtyZO8Vi+OXdrfsKfO4XV4jyBjM1uPFGEafgzam59BvvN/aO0sZQB62OEFCXKc
- SQoUbEQRjie1O1BooUeWFUAPW1OpcbGv5nlsQmCDSxE49cATUzyJjv+bd3ihJjA8yLKgc8vmC5j
- m2qAWViBmLjYVlA==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+Content-Transfer-Encoding: 8bit
 
-From: Andreas Hindborg <a.hindborg@samsung.com>
+On Wed, 03 Jun 2026 20:54:05 +0900 Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp> wrote:
+>
+> Acknowledgment:
+>   Since I have no experience with Rust, changes needed by Rust block layer
+>   bindings and rnull module are made based on conversation with the Gemini
+>   AI collaborator.
 
-Add a method to `Page` that allows construction of an instance from `struct
-page` pointer.
+Then please do Cc the right people as `MAINTAINERS` mentions, including
+"BLOCK LAYER DEVICE DRIVER API [RUST]" and "RUST"...
 
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
- rust/kernel/page.rs | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+I am quite confused. Why was this added to linux-next?
 
-diff --git a/rust/kernel/page.rs b/rust/kernel/page.rs
-index 844c75e54134..d56ae597f692 100644
---- a/rust/kernel/page.rs
-+++ b/rust/kernel/page.rs
-@@ -214,6 +214,18 @@ pub fn nid(&self) -> i32 {
-         unsafe { bindings::page_to_nid(self.as_ptr()) }
-     }
- 
-+    /// Create a `&Page` from a raw `struct page` pointer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// `ptr` must be convertible to a shared reference with a lifetime of `'a`.
-+    #[inline]
-+    pub unsafe fn from_raw<'a>(ptr: *const bindings::page) -> &'a Self {
-+        // SAFETY: By function safety requirements, `ptr` is not null and is convertible to a shared
-+        // reference.
-+        unsafe { &*ptr.cast() }
-+    }
-+
-     /// Runs a piece of code with this page mapped to an address.
-     ///
-     /// The page is unmapped when this call returns.
+It doesn't go through block, nor has an Ack or review and breaks
+the `rustdoc` build in linux-next (and thus rust.docs.kernel.org):
 
--- 
-2.51.2
+    error: unresolved link to `my_gendisk_lkclass`
+      --> rust/kernel/block/mq/gen_disk.rs:42:50
+       |
+    42 | /// This type can only be instantiated via the [`my_gendisk_lkclass!`] macro.
 
+It is also not Clippy-clean -- it doesn't follow our usual conventions
+for safety comments and sections:
 
+    error: unsafe function's docs are missing a `# Safety` section
+      --> rust/kernel/block/mq/gen_disk.rs:59:5
+       |
+    59 |     pub const unsafe fn new_lock_class(ptr: *mut bindings::gendisk_lkclass) -> GenDiskLockClass {
+
+    error: function has unnecessary safety comment
+      --> rust/kernel/block/mq/gen_disk.rs:59:5
+       |
+    58 |     /// SAFETY: `ptr` must point to a valid static `gendisk_lkclass` instance.
+       |         ------- help: consider changing it to a `# Safety` section: `# Safety`
+    59 |     pub const unsafe fn new_lock_class(ptr: *mut bindings::gendisk_lkclass) -> GenDiskLockClass {
+
+Please see:
+
+  https://rust-for-linux.com/contributing#submit-checklist-addendum
+
+In any case, it is also too late in the cycle to be experimenting in
+linux-next.
+
+So what am I missing? What is going on?
+
+(And on top of all that, for some reason I did not receive it even if I
+am apparently in Cc, so I have asked the admins about that.)
+
+Cheers,
+Miguel
+
+Cc: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Boqun Feng <boqun@kernel.org>
+Cc: rust-for-linux@vger.kernel.org
+
+Cc: Mark Brown <broonie@kernel.org>
