@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4793DC4D3;
-	Thu,  4 Jun 2026 20:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2963DA5CC;
+	Thu,  4 Jun 2026 20:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780604017; cv=none; b=FeVQ89kSMeljA75twT90aoEeJ4RKZ7qhd33n5dwGcHQjkbEjGaK6Upp6EKN1i0XCWbGoPxu63myqgl4M8tpZFfxoX3ENvJFBoYoWoc8Rqs8THJkIvxTxSCjtVAdwkTLVAt1WVwviGPhuVvE9jcL6jwe2dPSlxUypoRWPMs+ysE8=
+	t=1780604027; cv=none; b=a3Tvp4841bTE/0B+rGxaGsn0xU3/eynzq2GdsYN1g2/6WYNJpcEbvQp/VNOpx8v9a//opwqafja9sxTYinA49Elvq0MuTfrk9Z7Xtlc6weTYmKrXvte9OMjKznRMf7pAAMvEOSAu9s4jOPPv3TE7D+/XAbSNuD3Dz51ws+d1qho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780604017; c=relaxed/simple;
-	bh=l5c0q5tDqBvfUKptiUH9ujhgGaCW4zeIf26teZmhjjI=;
+	s=arc-20240116; t=1780604027; c=relaxed/simple;
+	bh=gEuAmHDRag4Ff03a/NCEXwn9RGkd0DQ3o5YrrmNIq6w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=C30DZH43EkKCTOKgJstCNASJIxcbIbyQcvqCwfU+BxLODurac5D10E3YEHAMtpNHiZOC+pF7bLbazj6i9CNshX15STvipgeB9mV8IaC+HpgcJgVnG12FI/Mc9GIbGfI/vwZUZTy/fd4MEE2U+T9SwscQidF1tlyJHESh5BJfjJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NMaDa3T3; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=BCv0vkgF6HKXywFOc/IWFw/4zkeNCLmo9TzqoIahqpN9LLKgsuhqA44TV/nPtJmjGpg5pRI2vLWyww/uVqjqaBeJw8qMIZP6wj0Rez13+fghFZCSy192z1Mh0ERqHyPAWTOLWxYjRONHgWOi7TRiMU67liijrfoAVYa4FOb1MIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VkUM5l+n; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NMaDa3T3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34EDF1F00893;
-	Thu,  4 Jun 2026 20:13:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VkUM5l+n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F4AD1F00898;
+	Thu,  4 Jun 2026 20:13:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780604014;
-	bh=NPcZxJix8R8ASgeYRVdWoUpgDuVO0mdlMhZYBbXxkJg=;
+	s=k20260515; t=1780604024;
+	bh=ae09fXAF8LItvvmTTJY28TqpTPDPI0l185oWGkC0Czc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=NMaDa3T3vyLRFmymA/V52rXGwDjbP7qMQN4Wc6U9T7dNibSv9rS4yWTPxKF0xFzfN
-	 dFZOd0Y8wfML/F5N2JdyfxqQMOrT524BxyBbUKRKu4/typQSBoh7ZOcQC5MdBLbD5r
-	 C9zJAYfKCjEVkzTKSipsvwoebejBXmrm2+xD/6QwEn4TFfc2wN8StX1Sz9WdD8podp
-	 spMPdFZLO9/8wFf7L+vHYI9bVVvTww+5hLMn9V3TZzZQohZXAxPSqm0SM6NfrnEkOK
-	 pX49PkQ8gXFAS4hFTKiK9du8Dtl/oCH7bqwbLMSjbXowqz9mGLhnspH9Kps2IJKiI9
-	 ZKCEb3I8LC1ew==
+	b=VkUM5l+n76eAck1/5L8AuHjDCJQ3zxzdGbIdQNsGNkp9tgvla8OKmviv9XxvDfYxh
+	 T5CXiuhoOdul1geAz+UtttAtacasQmLMt+dkZ5upH0R+SLnVIpNgsESP8vA5lskv2e
+	 2eBuAPxWq7RvriIrOBlOS/tkItqOMwkcqthsWouvOY3aTbe8W7fmY79L/SQfGO5PvH
+	 x3TwFW7uWZC5lmZvv9zPCkT/Jz+dklERyIEaoUevYb6HL61n9X++xzKiYJ6N7oOvaW
+	 SnNqXruCFaiUzzbufT/a7XLIAx71EwVG4L6EJ5BrJMPgAbd3pWQowvHnrQlrVyNZaf
+	 aaQMqqE8DhqCw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Thu, 04 Jun 2026 22:11:20 +0200
-Subject: [PATCH v17 08/10] rust: aref: update formatting of use statements
+Date: Thu, 04 Jun 2026 22:11:19 +0200
+Subject: [PATCH v17 07/10] rust: Add missing SAFETY documentation for
+ `ARef` example
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260604-unique-ref-v17-8-7b4c3d2930b9@kernel.org>
+Message-Id: <20260604-unique-ref-v17-7-7b4c3d2930b9@kernel.org>
 References: <20260604-unique-ref-v17-0-7b4c3d2930b9@kernel.org>
 In-Reply-To: <20260604-unique-ref-v17-0-7b4c3d2930b9@kernel.org>
 To: Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
@@ -66,50 +67,62 @@ Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-block@vger.kernel.org, linux-security-module@vger.kernel.org, 
  dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org, 
  linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
- Andreas Hindborg <a.hindborg@kernel.org>, driver-core@lists.linux.dev
+ Andreas Hindborg <a.hindborg@kernel.org>, driver-core@lists.linux.dev, 
+ Oliver Mangold <oliver.mangold@pm.me>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=751; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=l5c0q5tDqBvfUKptiUH9ujhgGaCW4zeIf26teZmhjjI=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqIdvtLrwkUygT4paQMSlPzGAJcExHlfQf51liz
- OCOSDABPJiJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaiHb7QAKCRD6UCkIqsW9
- 0J6WD/0Z8lBgQ1MuPW0rDHqnrcon/KFXZUwq3cjDwyiCbtTXQiqqqEQxzoFn4yoVsgCmwPqmeOm
- Cx8DTKkFZa72O2fudXulQnzc7oh1qvTtZL2jIN9XCKwsrlO7B397BRIbW6DZDciF5UEjT2f2RKq
- 5zYNXCH8IfEgUZMKL78lTl39Rcp6XKKbUoW5PEVlEm73+SKiXHxwzFfJDkH9jcjGprTlztQ0T/4
- DBj4iiOWhCKUfv8pxas1yPG0xsvkuhy2jH2bpT51pe1X9kWG7qV62tbl60SpN/1r4D6NS08pgtE
- /jtE3A+Q+2Ai7gLh+sEwFFLBptTVRkjy+rFiBivZDSkpYmEh4Z3a+FqILoLdN/dcb0zMcUra4a4
- vdzb2MagQbOIERyflkW4Apz1YcbHDkL/895OLyzPFZKeEu6BACgcnvSr7JOca+rn3dccghtl9vs
- 5lbeD662E/jwmvKHa9r6/35yJ0BcM4EZcPeAFvpbHFJjgNA2CYXmZLjWWEuw3bS7+DPTVPSN1s9
- kZ8uc2TYKagptlINpzFfIOqH2ojTx4awhCIuHNDv2K7rqJve7fI+WZewsteU15iOq9AfRec34+u
- Tdpn/pMgwdni2r7UW1vly0W0TNj1enYARL7mXpTRJR0J0On5QpNOeJfBJypkxp5AS6MB1G61dMu
- wuM844VmxxYXIDA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1543; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=5/8RAK1i9EEm+Mr/ISUqH0yYzAzf/u+vK09Vq8P7sDc=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqIdvsYbmmhUSA1BFXpd4LxLHnLV9ib9fde7UdH
+ 17um7HAPqGJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaiHb7AAKCRD6UCkIqsW9
+ 0Nt5EACgOkQIjNes+0YwsSd6rxBD9/YOWxQW20hXwPtAoLhwpn9RDoSA+h4PnOESKPOVrLhGp0Q
+ 6nSJOo2SKyh4+tb4v+lBXt6nuxEXrO7wpnde2auyMfZz635i27etmDlT/litVdyj0fSGXksN3NU
+ oiyshGS1QUb8aHjU+kneBTLgmTBDnsJpS0ZlmB1Z4WUSNySQyXwFBfwMKfd9RBFG2M3Hny10mYK
+ J6tGLqG2IivsvXrJ0IAvzvy9hKmvFdeSr/joWbzooS1g7zHZQ0mRDaZBZecMAicHVmk9w7D7/ZU
+ cYZ1rVnvZ57bH0MzQrNsigGiRaBVDDoxi2TCGz9xjcIBueLMvIB/LcVTuxc123pQr2cZS8FBsQw
+ kDHh1pYRSgAz/5VjCSdNSYCUj4u/isGJptd5igW2nIB62BWy2GG5bCJ3rFJW5srwVKjnG4LA99E
+ YnqqS+eO4npLOjXAJPhZDAIJsXWRFKFOktzb8KVF2raNweS5bB13ZZqG6zk8tKJQ4nr99xNBt+x
+ 4LXjcKQLat/vBvT0r+sOGoTSqyYVlFU+fkky0pdmtCXHib7JSaML7g2b5cGgB6nKrIGZPJcsM17
+ fG8VC8R/HCyJwRk/mISYKNh/sCTlIPi6mIi6d+TAC4q1mH4JQR93mRCahJTE/AG72ip4nEwjfHy
+ MQA6YfVG5t59F1A==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Update formatting if use statements in preparation for next commit.
+From: Oliver Mangold <oliver.mangold@pm.me>
 
+SAFETY comment in rustdoc example was just 'TODO'. Fixed.
+
+Signed-off-by: Oliver Mangold <oliver.mangold@pm.me>
+Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
+Co-developed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/sync/aref.rs | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ rust/kernel/sync/aref.rs | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/rust/kernel/sync/aref.rs b/rust/kernel/sync/aref.rs
-index 7491382bcf29..818c84fa923a 100644
+index 2d656f672b97..7491382bcf29 100644
 --- a/rust/kernel/sync/aref.rs
 +++ b/rust/kernel/sync/aref.rs
-@@ -17,7 +17,12 @@
- //! [`Arc`]: crate::sync::Arc
- //! [`Arc<T>`]: crate::sync::Arc
- 
--use core::{marker::PhantomData, mem::ManuallyDrop, ops::Deref, ptr::NonNull};
-+use core::{
-+    marker::PhantomData,
-+    mem::ManuallyDrop,
-+    ops::Deref,
-+    ptr::NonNull, //
-+};
- 
- /// Types that are internally reference counted.
- ///
+@@ -137,7 +137,9 @@ pub unsafe fn from_raw(ptr: NonNull<T>) -> Self {
+     ///
+     /// struct Empty {}
+     ///
+-    /// # // SAFETY: TODO.
++    /// // SAFETY: The `RefCounted` implementation for `Empty` does not count references and never
++    /// // frees the underlying object. Thus we can act as owning an increment on the refcount for
++    /// // the object that we pass to the newly created `ARef`.
+     /// unsafe impl RefCounted for Empty {
+     ///     fn inc_ref(&self) {}
+     ///     unsafe fn dec_ref(_obj: NonNull<Self>) {}
+@@ -145,7 +147,7 @@ pub unsafe fn from_raw(ptr: NonNull<T>) -> Self {
+     ///
+     /// let mut data = Empty {};
+     /// let ptr = NonNull::<Empty>::new(&mut data).unwrap();
+-    /// # // SAFETY: TODO.
++    /// // SAFETY: We keep `data` around longer than the `ARef`.
+     /// let data_ref: ARef<Empty> = unsafe { ARef::from_raw(ptr) };
+     /// let raw_ptr: NonNull<Empty> = ARef::into_raw(data_ref);
+     ///
 
 -- 
 2.51.2
