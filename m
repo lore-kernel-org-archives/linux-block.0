@@ -1,205 +1,174 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from mail-106120.protonmail.ch (mail-106120.protonmail.ch [79.135.106.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DA94C956C
-	for <linux-block@vger.kernel.org>; Thu,  4 Jun 2026 17:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBEB3C4B8A
+	for <linux-block@vger.kernel.org>; Thu,  4 Jun 2026 19:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780595680; cv=none; b=CzdlY+ZjPAdOhlb3h+EqsONxxed59vBJ8gpKjXSs6IaOa+0YDmf9W7db3Je9btMKn5g5/Y7hd+EFZJET+60yllwLW5MJ2pCeayQU6crNnMdTRmvEEQXnik1vtIxgyLaZJIqukmHqFIhrTN6G5q0cni+cGRgqG6DdmEYgQMhMIoE=
+	t=1780601838; cv=none; b=exhV0xs0WRkSHTm1K7zHm8v3qEtTSqc9Qnn93BF1+UJyG7niQCCjrj2lsestsUhkHF4Rv2lA5yhIFIbbrt9uOjKkUAUZjweHUZmkmrq8NV8Uhig3Wuso9CIgKyvInoWtOBjoqzFd3xf9H/iDgJQ9HLXK/8hA952IgkokWg12L3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780595680; c=relaxed/simple;
-	bh=xq+/fsHU5YTbNaarjqrhZbxsJsxwsijrLql6y6yYau0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bEUFThh6d2C4T6hMK7j7xCXgmBtQleKGqlQJlj8rOIVQrrQ84N39x47vabrtSkFXhQX+qKBt0rbKSjzC88BM048O9WARxdoObZxuiuFkXVpfd1kAaecxHBMCCtZ6UXNzAzDRTgP2baFpOLe/9+ofxPYfi+vp7aqEcS3nI52aHZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=V8Nfubdz; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1780601838; c=relaxed/simple;
+	bh=oS7NxEacAgL0HYtv5WvCgJkETMPNe0vdRBVK6cP564w=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H7uoyVhbeEqgkXWB5ZUFemcgdGvL6v6e/joE3S6Y8TzQIRjmouXZdo6tPf3hGlFksjjNaWsUKY/L1WvkplEp2s57fn3qdWgA3JRFK+Eddmnx2n5QiYuEBD1Yi7uuxgJYuFg1UbzhdFuWKQ2zU1Y9b/jBNPapsFkpwdZy6VPzd98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=gO6rlClG; arc=none smtp.client-ip=79.135.106.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="V8Nfubdz"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gWXJZ3NBRz1XM0pR;
-	Thu,  4 Jun 2026 17:54:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1780595674; x=1783187675; bh=ax4D20sKknU84WP5ia4nhhhRyBqwDnoqdkR
-	tF0XQ6P8=; b=V8Nfubdzgn+49W7sE5oaUtk/Xb794v0KaqTz667ZhIXItnKfiS+
-	TIatfuRReQC7qoJK0WijonI+w9D2e0qSYpE1uE38WT860FJs1KJHyq+jU1TDRO5X
-	+efVsHUHlSvXOvNs2HLO8Cw4C6RjDuqHdkRWBHPhUnja7zba1rU/yZOr0Zh0jgsi
-	gRG7xHxlYLHg4sITplIRtQVAuUIizf1bdk0V7POLXYGrMgvhdqycNcY3Bp+0LAwp
-	2QD2xVENw3Sz9bdDsKQFmuzj+TW4n1+ylD/1yP/ZrO7os2v+dkZYBDgjUGBX8Ilm
-	Y08cFAEA7mRdHVkU2wPxr2mQ/qxtTenm52A==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 4tt7m77e6Cko; Thu,  4 Jun 2026 17:54:34 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gWXJT4M3Rz1XM6Jh;
-	Thu,  4 Jun 2026 17:54:33 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	linux-block@vger.kernel.org,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH blktests v2] throtl/008: Add a test for the iocost cgroup controller
-Date: Thu,  4 Jun 2026 10:54:23 -0700
-Message-ID: <20260604175423.3809638-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.54.0.1032.g2f8565e1d1-goog
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="gO6rlClG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=pidt2ukzyrggdauwg4b2q6m3ty.protonmail; t=1780601819; x=1780861019;
+	bh=ujDKy6SWWWi8FQFzqh264wUeyQqzjQjB5x1dbv93N9A=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=gO6rlClGX2rUj1P/zjADI2XSlrzTs/Z8DIcwM6+vGcKbbPTHF944ed7AHU/svnDAB
+	 lKZdpDbDXFiErt27KaRWARK7g37jnGakUYP7SKuatzc9d0/q6F5fX9mbTOgUVyJJTg
+	 gtxameNyvkRyftqodHv98Tg6ahoZgSu03F8XjQC3OIXEo4EwWSDA2l04HKKxrhNl5n
+	 6STdQgx4i9RvHBTJ1vZCaZmMX95BR9wgLKc8OichtUO1J0CntObHzHt44mnZdWi0DD
+	 76zOssE3t82y4aGjHPGsrN+xhu4EGdGtlYd4O81cIQ26+01LiJeay2tg0pnjRJdfII
+	 G5BSGnLCnUQdw==
+Date: Thu, 04 Jun 2026 19:36:54 +0000
+To: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>
+From: Bryam Vargas <hexlabsecurity@proton.me>
+Cc: linux-nvme@lists.infradead.org, linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH v2] nvmet-rdma: handle inline data with a nonzero offset
+Message-ID: <20260604193645.178350-1-hexlabsecurity@proton.me>
+In-Reply-To: <aiFR81yE9_BIsNbM@kbusch-mbp>
+References: <LM21QIR-1-qJb7PViyJKCnGBnUzizeiNJVWQ3wb7ZwGezodjgKg3f-iobqOyequ-sT1jFCKJImfqNO_BKU3KO80xFITnaI5GTV_GxLUNDDc=@proton.me> <ahm6Ksr3rfGdnOsN@kbusch-mbp> <20260604084624.120032-1-hexlabsecurity@proton.me> <aiFR81yE9_BIsNbM@kbusch-mbp>
+Feedback-ID: 199661219:user:proton
+X-Pm-Message-ID: e669ea10f8438003e78f5e4cf1408c764e65c494
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Add a test for read and write IOPS throttling.
+nvmet_rdma_use_inline_sg() maps the host-controlled inline data offset
+into the per-command inline scatterlist.  The bounds check admits any
+offset with off + len <=3D inline_data_size, but the mapping still assumes
+the data begins in the first inline page:
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+=09sg->offset =3D off;
+=09sg->length =3D min_t(int, len, PAGE_SIZE - off);
+
+When a port is configured with inline_data_size > PAGE_SIZE (settable up
+to max(SZ_16K, PAGE_SIZE)), an offset in (PAGE_SIZE, inline_data_size]
+makes "PAGE_SIZE - off" underflow, so sg->length is set to ~4 GiB and
+the block backend reads far past the first inline page.  num_pages(len)
+also ignores the offset, so an in-bounds offset whose [off, off+len)
+span crosses a page boundary under-counts the scatterlist.
+
+Map the offset properly: split it into a page index and an in-page
+offset, start the scatterlist at that page, and size the page count from
+page_off + len.  Because the request scatterlist may now start at
+inline_sg[page_idx] rather than inline_sg[0], generalize the inline-SGL
+identity test in nvmet_rdma_release_rsp() to a range test; otherwise the
+persistent inline scatterlist is mistaken for an allocated one and
+nvmet_req_free_sgls() frees an inline page (and warns in
+free_large_kmalloc()).
+
+Fixes: 0d5ee2b2ab4f ("nvmet-rdma: support max(16KB, PAGE_SIZE) inline data"=
+)
+Cc: stable@vger.kernel.org
+Suggested-by: Keith Busch <kbusch@kernel.org>
+Reported-by: Bryam Vargas <hexlabsecurity@proton.me>
+Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
 ---
+v1 rejected a nonzero offset; per Keith's note a nonzero in-capsule SGL
+offset is legitimate (it is the per-command SGL Offset field, distinct
+from the controller ICDOFF attribute that nvme_rdma_setup_ctrl() refuses
+when nonzero), so v2 handles it instead, using Keith's suggested
+page_idx/page_off form for nvmet_rdma_use_inline_sg().
 
-Changes compared to v1:
- - Changed ". tests/block/rc" into ". tests/throtl/rc".
- - Split test() into run_test() and test() to eliminate duplicate error h=
-andling
-   code.
- - Made the test whether the iocost controller is supported more robust.
- - Made the test easier to debug.
+Review context (not for the commit log):
 
- tests/throtl/008     | 104 +++++++++++++++++++++++++++++++++++++++++++
- tests/throtl/008.out |   2 +
- 2 files changed, 106 insertions(+)
- create mode 100755 tests/throtl/008
- create mode 100644 tests/throtl/008.out
+Bound safety: with off + len <=3D inline_data_size the highest inline_sg[]
+index touched is page_idx + sg_count - 1 =3D floor((off + len - 1) /
+PAGE_SIZE) <=3D num_pages(inline_data_size) - 1 =3D inline_page_count - 1
+(<=3D NVMET_RDMA_MAX_INLINE_SGE - 1), and page_off < PAGE_SIZE so
+PAGE_SIZE - page_off cannot underflow.  The release_rsp range test is a
+strict generalization of the old "!=3D inline_sg" test: inline_sg[0] is in
+range (unchanged: not freed), allocated/keyed SGLs are outside it (still
+freed), and only the new inline_sg[1..] starts are additionally treated
+as inline.
 
-diff --git a/tests/throtl/008 b/tests/throtl/008
-new file mode 100755
-index 000000000000..f4d3b080797a
---- /dev/null
-+++ b/tests/throtl/008
-@@ -0,0 +1,104 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2026 Google LLC
-+#
-+# Test cgroup iocost IOPS limiting.
-+
-+. tests/throtl/rc
-+. common/fio
-+
-+DESCRIPTION=3D"test cgroup iocost controller limits"
-+
-+requires() {
-+	_have_fio
-+	_have_program bc
-+	_have_kernel_option BLK_CGROUP_IOCOST
-+}
-+
-+run_test() {
-+	# dev_t is global to make it available in the caller.
-+	dev_t=3D$(<"/sys/block/${THROTL_DEV}/dev")
-+	if [[ -z "$dev_t" ]]; then
-+		echo "Failed to get major:minor for ${THROTL_DEV}"
-+		return 1
-+	fi
-+
-+	# Configure iocost controller globally for the device
-+	# min=3D100.00 max=3D100.00 forces vrate to be fixed at 100%
-+	if ! echo "$dev_t enable=3D1 min=3D100.00 max=3D100.00" > "$(_cgroup2_b=
-ase_dir)/io.cost.qos"; then
-+		echo "Failed to configure io.cost.qos"
-+		return 1
-+	fi
-+
-+	# Limit read iops to 100 and write iops to 10.
-+	# Setting rbps/wbps to 0 means they are ignored (costs calculated purel=
-y based on IOPS)
-+	if ! echo "$dev_t ctrl=3Duser model=3Dlinear rbps=3D0 rseqiops=3D100 rr=
-andiops=3D100 wbps=3D0 wseqiops=3D10 wrandiops=3D10" > "$(_cgroup2_base_d=
-ir)/io.cost.model"; then
-+		echo "Failed to configure io.cost.model"
-+		return 1
-+	fi
-+
-+	# 1. Run FIO read test
-+	local -a FIO_PERF_FIELDS
-+	FIO_PERF_FIELDS=3D("read iops")
-+	if ! _fio_perf --bs=3D4k --rw=3Drandread --name=3Dread-test --filename=3D=
-"/dev/${THROTL_DEV}" \
-+			--ioengine=3Dlibaio --direct=3D1 --iodepth=3D64 --time_based --runtim=
-e=3D10 \
-+			--cgroup=3D"blktests/${THROTL_DIR}" &> "${FULL}"; then
-+		echo "FIO read test failed"
-+		return 1
-+	fi
-+	cat "$TMPDIR/fio_perf" >> "$FULL"
-+	local read_iops=3D${TEST_RUN["read iops"]}
-+	if [[ -z "$read_iops" ]]; then
-+		echo "Read IOPS is empty"
-+		return 1
-+	elif (( "$(echo "$read_iops < 90 || $read_iops > 110" | bc -l)" )); the=
-n
-+		echo "Read IOPS $read_iops not in expected range [90, 110]"
-+		return 1
-+	fi
-+
-+	# 2. Run FIO write test
-+	FIO_PERF_FIELDS=3D("write iops")
-+	if ! _fio_perf --bs=3D4k --rw=3Drandwrite --name=3Dwrite-test --filenam=
-e=3D"/dev/${THROTL_DEV}" \
-+			--ioengine=3Dlibaio --direct=3D1 --iodepth=3D64 --time_based --runtim=
-e=3D10 \
-+			--cgroup=3D"blktests/${THROTL_DIR}" &> "${FULL}"; then
-+		echo "FIO write test failed"
-+		return 1
-+	fi
-+	cat "$TMPDIR/fio_perf" >> "$FULL"
-+	local write_iops=3D${TEST_RUN["write iops"]}
-+	if [[ -z "$write_iops" ]]; then
-+		echo "Write IOPS is empty"
-+		return 1
-+	elif (( "$(echo "$write_iops < 8 || $write_iops > 12" | bc -l)" )); the=
-n
-+		echo "Write IOPS $write_iops not in expected range [8, 12]"
-+		return 1
-+	fi
-+}
-+
-+test() {
-+	local test_status
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _set_up_throtl; then
-+		echo "_set_up_throtl failed"
-+		return 1
-+	fi
-+
-+	run_test
-+	test_status=3D$?
-+
-+	if [ -n "$dev_t" ]; then
-+		echo "$dev_t enable=3D0" > "$(_cgroup2_base_dir)/io.cost.qos"
-+		echo "$dev_t ctrl=3Dauto" > "$(_cgroup2_base_dir)/io.cost.model"
-+	fi
-+
-+	_clean_up_throtl
-+
-+	if [ "$test_status" -eq 0 ]; then
-+		echo "Test complete"
-+	else
-+		echo "Test failed"
-+		return 1
-+	fi
-+}
-diff --git a/tests/throtl/008.out b/tests/throtl/008.out
-new file mode 100644
-index 000000000000..890ff7f226d1
---- /dev/null
-+++ b/tests/throtl/008.out
-@@ -0,0 +1,2 @@
-+Running throtl/008
-+Test complete
+Decides identically on 32- and 64-bit builds: off is u64, so the offset
+arithmetic and PAGE_SIZE - page_off are evaluated in 64-bit on both ABIs;
+num_pages() sees page_off + len <=3D 16384 (positive, int-safe on both);
+the release_rsp comparison is a pointer comparison, identical semantics
+on ILP32 and LP64.  (-m32/-m64 model output identical.)
+
+A/B on a KASAN build (inline_data_size =3D 16384) over an rdma_rxe
+loopback nvmet-rdma target with a block backend, inline write:
+  - offset 0: succeeds, clean (control + no regression).
+  - offset 8192: before this patch the block backend reads out of bounds
+      BUG: KASAN: slab-out-of-bounds in copy_folio_from_iter_atomic
+      (sg->length =3D 0xfffff000); with this patch it is served from the
+      correct inline page, in bounds, no KASAN and no free_large_kmalloc
+      warning.
+  - the use_inline_sg() rework alone (without the release_rsp change)
+      trips on offset 8192:
+      WARNING: ... free_large_kmalloc ... Not a kmalloc allocation
+        nvmet_req_free_sgls <- nvmet_rdma_release_rsp <- nvmet_rdma_send_do=
+ne
+
+ drivers/nvme/target/rdma.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+index 565183a20007..eb975fbd74a1 100644
+--- a/drivers/nvme/target/rdma.c
++++ b/drivers/nvme/target/rdma.c
+@@ -666,7 +666,8 @@ static void nvmet_rdma_release_rsp(struct nvmet_rdma_rs=
+p *rsp)
+ =09if (rsp->n_rdma)
+ =09=09nvmet_rdma_rw_ctx_destroy(rsp);
+
+-=09if (rsp->req.sg !=3D rsp->cmd->inline_sg)
++=09if (rsp->req.sg < rsp->cmd->inline_sg ||
++=09    rsp->req.sg >=3D rsp->cmd->inline_sg + queue->dev->inline_page_coun=
+t)
+ =09=09nvmet_req_free_sgls(&rsp->req);
+
+ =09if (unlikely(!list_empty_careful(&queue->rsp_wr_wait_list)))
+@@ -821,24 +822,25 @@ static void nvmet_rdma_write_data_done(struct ib_cq *=
+cq, struct ib_wc *wc)
+ static void nvmet_rdma_use_inline_sg(struct nvmet_rdma_rsp *rsp, u32 len,
+ =09=09u64 off)
+ {
+-=09int sg_count =3D num_pages(len);
++=09u64 page_off =3D off % PAGE_SIZE;
++=09u64 page_idx =3D off / PAGE_SIZE;
++=09int sg_count =3D num_pages(page_off + len);
+ =09struct scatterlist *sg;
+ =09int i;
+
+-=09sg =3D rsp->cmd->inline_sg;
++=09sg =3D &rsp->cmd->inline_sg[page_idx];
+ =09for (i =3D 0; i < sg_count; i++, sg++) {
+ =09=09if (i < sg_count - 1)
+ =09=09=09sg_unmark_end(sg);
+ =09=09else
+ =09=09=09sg_mark_end(sg);
+-=09=09sg->offset =3D off;
+-=09=09sg->length =3D min_t(int, len, PAGE_SIZE - off);
++=09=09sg->offset =3D page_off;
++=09=09sg->length =3D min_t(u64, len, PAGE_SIZE - page_off);
+ =09=09len -=3D sg->length;
+-=09=09if (!i)
+-=09=09=09off =3D 0;
++=09=09page_off =3D 0;
+ =09}
+
+-=09rsp->req.sg =3D rsp->cmd->inline_sg;
++=09rsp->req.sg =3D &rsp->cmd->inline_sg[page_idx];
+ =09rsp->req.sg_cnt =3D sg_count;
+ }
+
+--
+2.43.0
+
