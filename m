@@ -1,108 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68046344025;
-	Thu,  4 Jun 2026 10:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D79402BB1
+	for <linux-block@vger.kernel.org>; Thu,  4 Jun 2026 10:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780568577; cv=none; b=M4YTNlBFMQpRFoTn/MQUMh29UdlYRztCGfHewX7nvGHj9pkhVcIDj2V7Qv6udsbWdYnSB7uPLvoe9Z+3z2JPLCTOg8tpjRuN8CbJ2tFC0y94XseEXV8sDaua1APkGstNrnjGuQEOtoEe9s8nI79QPrRZJIexUFMv2j5P6COJZ98=
+	t=1780570438; cv=none; b=nUs9yvuOTQ/Z/l4mCWCaoY7yTtA/ixyLo+CF7ZZbG2K4IZiDTPefUfpIx6sxrm3broLXLmHzj76dDIXO6h5ouEy7GkujVrblxvvE3r+h8kUlqVJu00HVx89fSp0orp8VLUfZ7gN+pT8NpXTN+gVfjhl3327lewy3Nc9ZC7W10+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780568577; c=relaxed/simple;
-	bh=8RmZYb1pXYEn2wiOpi8FDcyZxFk1G6ZD+2CdQjQrsEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rORq2D5a6BtsUYX5kcGJMdXP81IAHcJHfadWnnv8dLpu06gR79MYtJ07HtdSQBIY4XArwAc71H4Sljk0VTPxf9GJeOHIm1J0BS01p+0w7HHh8xN4dbYg3Zne6KV7cjT0mow/8reJ5S1eFWXA5mMljNQBOcgCSdyI4reUt8idwN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIsGHYA0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780570438; c=relaxed/simple;
+	bh=Io9ITUXSj0LTQnMufvmsQ1CkkL5Mo1qd632MU+iM8n8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Bp+Yi+zWsci6/dSeGZqZ4WBj/t2mFNHsWu0J9HkfrcDo99hrtPMBvWRtt2+fLnKj9k3idoboYskdf7bLYiRLlcsv3jnVfPhaJWciFrzjxdCLJfCJzKJtf07oGSLclKoWRXoSPYHinirGwVja5DUi88RohL3rkmoEbFO1KpClesk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Ky1x4Zy8; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIsGHYA0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D03D61F00893;
-	Thu,  4 Jun 2026 10:22:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780568569;
-	bh=mLduu1BN8oVDlsMVXW9d1+2kTVCOlPEKY23vvFbWsFs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QIsGHYA0WcZE3oERGImpnuJVLx6AJq73KcO/q7CliE8Dn98sagksNM4BE5LaEAEjO
-	 EZwBYc3p4tra7JCHhXHwNr0vf6sthuDgV9MwbMhggawYqGrnkUuhF9DN9OvjwRDIUQ
-	 47d7dqDxFHPmX/GNRqJ5deQsn/+A8LVnQs6XqX23RWV8Zp141Hs5O4W3nN7dSiGwIl
-	 iMHqEVmOBQrzZOfIKq6Smay+Ku+gZWs8cwnf1aiHB6dVjahlXbOqUtBQbGZFEkZW2I
-	 AZibZ+pj/iNXwNAyVIkRm5NOkVIN/6gkyDTWwD/bdWjqO+JqhUeR75C27eFmlw+0D6
-	 nzgoHmFtU4+dg==
-Date: Thu, 4 Jun 2026 11:22:43 +0100
-From: Keith Busch <kbusch@kernel.org>
-To: Bryam Vargas <hexlabsecurity@proton.me>
-Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] nvmet-rdma: reject inline data with a nonzero offset
-Message-ID: <aiFR81yE9_BIsNbM@kbusch-mbp>
-References: <LM21QIR-1-qJb7PViyJKCnGBnUzizeiNJVWQ3wb7ZwGezodjgKg3f-iobqOyequ-sT1jFCKJImfqNO_BKU3KO80xFITnaI5GTV_GxLUNDDc=@proton.me>
- <ahm6Ksr3rfGdnOsN@kbusch-mbp>
- <20260604084624.120032-1-hexlabsecurity@proton.me>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Ky1x4Zy8"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490b613a17bso5410865e9.3
+        for <linux-block@vger.kernel.org>; Thu, 04 Jun 2026 03:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1780570436; x=1781175236; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hv3p41LzNcNXVGo+Q2K308cugCyQNysAliX7a7EgUho=;
+        b=Ky1x4Zy8/M/bCodGBFayfM1b0lVEoxJ7Uu3bGrfetz8Lwb0yJ7OrL4VDDj08uDG4Fu
+         LmJdc12eArui3KbDe2fqhTD1k8DWKTX9yyOZgSGgqspfxZ1VM+uo6ogQGEEv+wXzlBAf
+         l9of+VL05Y4E9KSOe2X+spYhG6b08cTb2ftZAvS06N/sAEuAUY4lGGZnzXW+vI7uYw5D
+         CiI+if2HutpN6Bf+QSBcWVaoUYhdAbGL3hHhUJvz/fGhjlm3sHC+oZlHc1/Lo+mSeC04
+         v8LsmIrxDEAQorNx3KYWqu2UJkqVCaYT0c1LPjQAORkZCorH8owRrmQriRSXVlIGnmR2
+         lsog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780570436; x=1781175236;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hv3p41LzNcNXVGo+Q2K308cugCyQNysAliX7a7EgUho=;
+        b=ZUf0waBRIYDoJtrCLUPKPslgets2Rz2+JIBLKnn4LDYZmU26+N3gHs/gY9Ps+FVOV+
+         o+dWdcchoMGYQJeOfa7BdZV9uOWBPHNTG2HVnJSse6N6ucd5J1nNA1Ij93nBdBzYMqSz
+         Mdrdwecq9PcJCf131zC8FAzAUP+dyL3zH4cXc0g2jHu5gpvaUPsoxD4MFlJPeEcgCtQe
+         mpSFQtMVke1zhC9jOv0zm9E47w6WzwA8R6reC8Vf9jQfQbK4o3yiojxKCUlMkv5DoO/W
+         slX/WxONwV+uGR9Z7+ZynsTHVtayzSJdp7iMz5qLr8SIA/dAMqdAWjsh/rcIrbeUsqIq
+         lxYw==
+X-Forwarded-Encrypted: i=1; AFNElJ/O1ljE+K3ZnsVOJ2j97sSnrlqINQ71BBDCj/UKt8Jom907lCAjdwyg6el5liUhZNNOAwslg1VxrOnm3w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvI2jg+lvzmL0rXF393KgqkdXPzlcnT/ivFU28YcoDEMXZKvoG
+	/msS44BJgIMjmSVJDMrbNyKB19sZrdcoyzBB+Je4ji8MhrGjiy5PUEdPoFS8n1Ofkhw=
+X-Gm-Gg: Acq92OEuKmPYygynjO5/qXpM7L9TJyWGHvWA7+ryfUhDXIc5lvO06VF2NxwQgd/wieA
+	TnwRP3GM834ZAfBWUStTud55ln/5pKD71fgFbpS6SoVLwxrPJGS+SFnzHQMs+sDjI3VPVu+u6Zd
+	ZWe9t9XJk7Tdh0qmVe7xUP319Jpo9CfoIKNKKWRi9Jw3tUlAHGKkLahM1FcX6lCNI75dRXbnqod
+	08He3UTJhJIzt3XbaCfb6oAoOn2LqaMDhq0cofaUBmTWwGuXUTzI6Ai9U4Kf0pXw4BukBm/O8MN
+	zq2UI+3kahvvGybKNSqKvEkpUqmFMGwS6XOqsRfZI0Pnsju48KVzG0r6eb/bLQDh5voTg0Q3/On
+	sJvfc6YeIHgOzRXr96I8gMwYzRPpdKjt8Do5BVfGJi5WK6at0EU/68I0ECc6DCe0u8Vyz85z4QM
+	jhrewooliF72YUI+vWG6WEAEg3KHhbr2bs0jMNmuvtcvifFrvjhzf8iBnuiQ==
+X-Received: by 2002:a05:600c:1f96:b0:490:53d3:47a9 with SMTP id 5b1f17b1804b1-490b5e7962dmr116193935e9.3.1780570435822;
+        Thu, 04 Jun 2026 03:53:55 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc39def5sm58181695e9.5.2026.06.04.03.53.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2026 03:53:55 -0700 (PDT)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: Add WQ_PERCPU to alloc_workqueue users
+Date: Thu,  4 Jun 2026 12:53:47 +0200
+Message-ID: <20260604105347.168322-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260604084624.120032-1-hexlabsecurity@proton.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 04, 2026 at 08:46:33AM +0000, Bryam Vargas wrote:
-> It does stop the u64 overflow, but while testing it I found it is still
-> incomplete when a port is configured with inline_data_size > PAGE_SIZE
-> (it is settable up to max(SZ_16K, PAGE_SIZE)): an offset in
-> (PAGE_SIZE, inline_data_size] passes that bound and then "PAGE_SIZE - off"
-> in nvmet_rdma_use_inline_sg() underflows, leaving scatterlist::length at
-> ~4 GiB pointing past the first inline page.
+This continues the effort to refactor workqueue APIs, which began with
+the introduction of new workqueues and a new alloc_workqueue flag in:
 
-Then the use_inline_sg() should find the appropriate index and offset
-accordingly.
+   commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
+   commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
 
+The refactoring is going to alter the default behavior of
+alloc_workqueue() to be unbound by default.
+
+With the introduction of the WQ_PERCPU flag (equivalent to !WQ_UNBOUND),
+any alloc_workqueue() caller that doesn’t explicitly specify WQ_UNBOUND
+must now use WQ_PERCPU. For more details see the Link tag below.
+
+In order to keep alloc_workqueue() behavior identical, explicitly request
+WQ_PERCPU.
+
+Link: https://lore.kernel.org/all/20250221112003.1dSuoGyc@linutronix.de/
+Suggested-by: Tejun Heo <tj@kernel.org>
+
+Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 ---
-diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
-index 1234567..abcdefg 100644
---- a/drivers/nvme/target/rdma.c
-+++ b/drivers/nvme/target/rdma.c
-@@ -821,22 +821,29 @@ static void nvmet_rdma_use_inline_sg(struct nvmet_rdma_rsp *rsp, u32 len,
- 		u64 off)
- {
--	int sg_count = num_pages(len);
-+	u64 page_off = off % PAGE_SIZE;
-+	u64 page_idx = off / PAGE_SIZE;
-+	int sg_count = num_pages(page_off + len);
- 	struct scatterlist *sg;
- 	int i;
+ block/blk-zoned.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 6a221c180889..bea817f3de56 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -1924,7 +1924,7 @@ static int disk_alloc_zone_resources(struct gendisk *disk,
+ 		goto free_hash;
  
--	sg = rsp->cmd->inline_sg;
-+	sg = &rsp->cmd->inline_sg[page_idx];
- 	for (i = 0; i < sg_count; i++, sg++) {
- 		if (i < sg_count - 1)
- 			sg_unmark_end(sg);
- 		else
- 			sg_mark_end(sg);
--		sg->offset = off;
--		sg->length = min_t(int, len, PAGE_SIZE - off);
-+		sg->offset = page_off;
-+		sg->length = min_t(u64, len, PAGE_SIZE - page_off);
- 		len -= sg->length;
--		if (!i)
--			off = 0;
-+		page_off = 0;
- 	}
- 
--	rsp->req.sg = rsp->cmd->inline_sg;
-+	rsp->req.sg = &rsp->cmd->inline_sg[page_idx];
- 	rsp->req.sg_cnt = sg_count;
- }
- 
-@@ -857,7 +864,8 @@ static u16 nvmet_rdma_map_sgl_inline(struct nvmet_rdma_rsp *rsp)
- 			return NVME_SC_INVALID_FIELD | NVME_STATUS_DNR;
- 	}
- 
--	if (off + len > rsp->queue->dev->inline_data_size) {
-+	if (off > rsp->queue->dev->inline_data_size ||
-+	    len > rsp->queue->dev->inline_data_size - off) {
- 		pr_err("invalid inline data offset!\n");
- 		return NVME_SC_SGL_INVALID_OFFSET | NVME_STATUS_DNR;
- 	}
---
+ 	disk->zone_wplugs_wq =
+-		alloc_workqueue("%s_zwplugs", WQ_MEM_RECLAIM | WQ_HIGHPRI,
++		alloc_workqueue("%s_zwplugs", WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_PERCPU,
+ 				pool_size, disk->disk_name);
+ 	if (!disk->zone_wplugs_wq)
+ 		goto destroy_pool;
+-- 
+2.54.0
+
