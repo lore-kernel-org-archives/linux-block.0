@@ -1,102 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBB33E4C95;
-	Fri,  5 Jun 2026 15:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A183A1687
+	for <linux-block@vger.kernel.org>; Fri,  5 Jun 2026 16:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780671866; cv=none; b=LDdN3aTRwAaFjXpmenf6GjCUY6B2AOMxEY1eg6YNmYhO/nMva9kspouyI5eI7UDZKMp8rGEUcUiAa0IAt1QyJ59duZTow6FSDpu2t5akO7FiZ1ZDUJUdyp014xVgq4+7uBsY245UPXN1HuinKiM0jx26eVU1uxxslEcQRhSnkkE=
+	t=1780675832; cv=none; b=fkZhU38V5KmYLXSB2bWkImq13qEPCMdJDYVq+2x3a9LfpTYg96xJRhCHwwjMJaL03cCZaQuOj5mmS7vPvokgJSEkn/rViEi81esVPQTvpp3e5iIIqAjKUb/asTfuAr4Zsn78xeAW2BTENi1grKEQhNkjrlqpi2vthntihuESCAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780671866; c=relaxed/simple;
-	bh=ryEMFUEaDchoUXL0sJSdp7brVE0ylu17SgmpfZaRkCA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OkTDGqLuRhrluEwaEIeTvILUHcIEnR1eYy5n//5th/D/P4VMcrdWZDKaGMqteHFUsKWwnSHgbkY4N1huNpqgsctueGRTDWyOU+Wno2/r9739GHIaxzfi2YG1FrHrG1hpwHEyAuBuQicL43KeHi2FsVTPpi2YOlDe6/8SBT7yy9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FR3FXAZG; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780675832; c=relaxed/simple;
+	bh=g/veyeW02saFT8Ib0I8nEpXHIh0KLyCMFWPpy1/30hY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UxibrtKg9wd4LoRcBM/GIGSIsha1oUGqlHp+/eKzix65xy692D6pOLfWMvRcSacXNwGQyp+kSXT+A2jAY4gWjz3S5HjOSIGIEdv58t+Gx9n66nmEYGC86RFEOG0Wr3YQCHyHQ1st7NNyiN5r1d9xRSBhz9MIoLykm7oAYkDLEWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RX791Z/s; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FR3FXAZG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 793121F00893;
-	Fri,  5 Jun 2026 15:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780671865;
-	bh=lIhieuhZySU37udxDs0PTOiey7L7Gigisq55o3Bj1Vk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FR3FXAZGI4dJit3dCnF2sGmEPpGMbZc27B68chKM4spY+lHSTZgeCAsYgLkl4RfIm
-	 hb9avy1MgjvPuG8qJeij02l5C+F6c1x9RlCZQDic6WpTSU7fSfSHb4BxCGTXx4NrfT
-	 M2D7f8yPK1QG1En8WId5tcTgZk+i9MN3x8fUo4d1tbuWR0tYiuUoqz1rPLJ5yGNKk6
-	 9cuLOP1NprTCRawjnzBds2/k9jSnHPCdNe/b1pLHFxMnN0oCw9uxDfHRUbCe/66kxf
-	 M4qiimfe372F6zdBSLcTgA7jUW4Pgn0Yd666L3DVoamw6mlD/1c/E2LDs8BFO4Y8W+
-	 tZD6Lm3MJ1m+g==
-Date: Fri, 5 Jun 2026 16:04:18 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Miguel Ojeda <ojeda@kernel.org>, akpm@linux-foundation.org,
-	axboe@kernel.dk, bvanassche@acm.org, dlemoal@kernel.org, hch@lst.de,
-	hdanton@sina.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tom.leiming@gmail.com, wqu@suse.com,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to
- disk->open_mutex
-Message-ID: <1fa6ec8e-59d7-4a53-a241-d55dd3cc0201@sirena.org.uk>
-References: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
- <20260604210704.41751-1-ojeda@kernel.org>
- <89f0f308-2ee7-4c68-b811-8132e5d88530@I-love.SAKURA.ne.jp>
- <CANiq72nGo=F5D7b7Hx8A1jfAJw_72Np+UpRWBRQoPLAE+RAPpA@mail.gmail.com>
- <4ffdbe16-61ab-47e8-b696-e2fcf9a26385@sirena.org.uk>
- <CANiq72nKDpzd9BTPfQ-NhWgcTgWdE=spED_n-idv1Jnekdo=Fw@mail.gmail.com>
- <14686d75-c481-42ba-bbcf-94a4423aeb42@sirena.org.uk>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RX791Z/s"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gX5xz08c7zlfl5x;
+	Fri,  5 Jun 2026 16:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1780675827; x=1783267828; bh=HSMbV8ZGEKwMmgnD2myb/fZR
+	5zDHSN+tYHxEJ5PyYLA=; b=RX791Z/sDztpR+fk+wqWDdth8YgmS9Amc6a8hoFw
+	DxnB9+Di0QQst/ll6sfKSHT1Hjem4kTNw32pCRudTAn6H9ymvE03uf82vOdQHYJx
+	TwBqNzPCoLPrl+x24CsqdfvNDF7EHHtthPX4HaFz523GvZn8aoG176mmK7P8316l
+	iSgPqbGiQIjwyPPVieIw8RhQSGY1LOOyjUKXR9/tgjk3DkjPcHvL/emhPlWjLB7X
+	e8ZIiN3n8SEzY52sNJ5Sx84XSl5hV9D40aNnPiT4n9yqpaokfyusE2UmMFwqVwei
+	3oaw/YL7IjT3LgHSKtU3cY7IBmPv5dGe1coz234OFCCKEw==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id OxI5PDNa2znL; Fri,  5 Jun 2026 16:10:27 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gX5xs5my8zlgyGG;
+	Fri,  5 Jun 2026 16:10:25 +0000 (UTC)
+Message-ID: <7832c371-e005-4da6-974b-2a1eeae5d117@acm.org>
+Date: Fri, 5 Jun 2026 09:10:24 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dnUsds8CTTCUrlnd"
-Content-Disposition: inline
-In-Reply-To: <14686d75-c481-42ba-bbcf-94a4423aeb42@sirena.org.uk>
-X-Cookie: Error in operator: add beer
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 00/14] Enable lock context analysis for the block layer
+ core
+To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Hannes Reinecke <hare@kernel.org>, Damien Le Moal <dlemoal@kernel.org>
+References: <cover.1780419600.git.bvanassche@acm.org>
+ <013ee998-7b98-4870-950b-806eef46cf9c@linux.ibm.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <013ee998-7b98-4870-950b-806eef46cf9c@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 6/5/26 5:45 AM, Nilay Shroff wrote:
+> I have reviewed this series and it looks good to me.
 
---dnUsds8CTTCUrlnd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks!
 
-On Fri, Jun 05, 2026 at 02:03:22PM +0100, Mark Brown wrote:
-> On Fri, Jun 05, 2026 at 02:40:24PM +0200, Miguel Ojeda wrote:
+> One question: I still see a few block-layer functions that document locking
+> requirements with lockdep assertions. Should we also consider adding the
+> corresponding Clang context annotations for these where practical?
 
-> > And, yeah, it is fragile... It is quite a complicated set of Kconfig
-> > relationships, so years ago I also ended up in the same situation and
-> > early on decided to add an explicit grep for `CONFIG_RUST=3Dy` and
-> > certain other bits that I wanted to ensure are in place after the
-> > config phase.
->=20
-> It looks like the breakage is due to 'depends on !RANDSTRUCT' because
-> clang supports randstruct and allmodconfig defaults that to
-> RANDSTRUCT_FULL.  The fact that rust depends on !RANDSTRUCT but
-> randstruct doesn't care about rust means that randstruct wins.  I've got
-> to say rust coverage seems more important than randstruct coverage for
-> -next, others might have different opinions though!
+Compile-time checking is always better than run-time checking so I think
+that would be useful. My goal with this patch series is to do the
+minimum necessary to enable context analysis support for the block layer
+core.
 
-I think I've got a fix which isn't too bad, I'll post it later today.
+> For example, blkg_create() requires q->queue_lock must be held by its 
+> caller, so
+> it could be annotated with __must_hold(&disk->queue->queue_lock). 
+> Similarly,
+> blk_report_disk_dead() asserts that disk->open_mutex must not be held, 
+> so it could
+> be annotated with __must_not_hold(&disk->open_mutex).
 
---dnUsds8CTTCUrlnd
-Content-Type: application/pgp-signature; name="signature.asc"
+There are more lockdep_assert_held() calls for which the __must_hold()
+annotation can be added, e.g. for the functions in block/blk-iocost.c.
+However, adding these __must_hold() annotations without adding new
+lockdep_assert_held() or __assume_ctx_lock() calls is not possible
+without adding more arguments to the functions in that source file.
+That's one of the reasons I'd like to keep such changes out of this
+patch series and for a future patch series.
 
------BEGIN PGP SIGNATURE-----
+Thanks,
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoi5XEACgkQJNaLcl1U
-h9AucAf/TCMResngU+anrz1HMlh9vr5GbohV9uhqNg37kWM2TRzaCvfjbGd/Res/
-YRQ/3GHvrcCF/C3IbDozk+XIEubjr/73Ysmt/Eq1uTqdLtLukVD2X44JOu2cNETn
-rMNxdiMLAl3A17q7mIWykLcobPy85TOayI5+egcmvSsjBTq/AK2nxOYbnt0Z4huq
-Ak+Fx6hYr6HXEI9s4hn1kIamqbLTkv0Uk9/zAybx7Y/9TOioeVOXujJ7tRkOERBQ
-uY8/YQzWfxVFZ/F73ovRwEgvub2lIXWfGOe6p7eUo8ePaWqW5pmTgPkioB55sKqn
-gDbzdWwgnbY0YPv2cZ5IK1AYNdXFzA==
-=UZU3
------END PGP SIGNATURE-----
-
---dnUsds8CTTCUrlnd--
+Bart.
