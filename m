@@ -1,151 +1,123 @@
-Received: from mail-dy1-f177.google.com (mail-dy1-f177.google.com [74.125.82.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D88E4C954D
-	for <linux-block@vger.kernel.org>; Fri,  5 Jun 2026 11:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780657395; cv=pass; b=k+4szVnW8YBL7MQ+YiBvT+FJtSE59/MybpbxFFyPB2WSi+wIkAonlv1fThteJBZpPA3lt4TzcCf8+BNqky9o/jGyISU+BMYwdOZWbfozcVW40HDalhCTipazu0g1jJCd5cvByPfsiOQpxrXxmgc+UXxZzzc5/6fJHvsyIHfqGtw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780657395; c=relaxed/simple;
-	bh=f1MUM6D03lZH8m9sJMdZV49CHTFZPYYABFO8u2/04d0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jTT8s/ggidr2lRm4xtZxNcytlC0ydPXnE/QEfwr0Y1PfhtyjOn/JmAHYzSSJxyJAjfDOq+Fogj+979gveghb9zcC8Qe3hR7Y2KTfnaZu72okWcAzHTM8oqeTA4r2RIvW1XwVkrxiScaYGKGzQInDo9lyiuntydBpDhbpR2du628=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JdT7gPSd; arc=pass smtp.client-ip=74.125.82.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7534DA535;
+	Fri,  5 Jun 2026 12:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780661080; cv=none; b=T+SdkAs3n2goYJK0XKDFSHrp49bzeTj0WGf+xQrR0RSmkC6EkC4OeCMUEHJ0Gx+4ih+tIUffsCFmAbKtyn+zCZBil9XG50G92fQbgAdUoEMvFty4j0JiaGQennd6pKI/Ug0aX97hKT8T/zdoiWafg3V1JEB7XlNPvJ40pyZnD88=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780661080; c=relaxed/simple;
+	bh=CBugO4tBT4tJQHA8HIOOmL0b48mq9HwYuyuQPJ8V4eY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YjD9HIopg2yFzcGSRscaqvs4Hf2m8+QLSXbPTBO4qXa1EMhOw5kjFt7bUV/Kw3IlMHzBWfoPMexys5+3kuLrMxSqTvCamkRWOuwvzUKFznfeOaF8g8QEcwAW2eOiftBVXI3zK3JjZ5g/Om0esyat7aEUT6Tlmc0JPmJqn6dxaIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GIZb/SMN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JdT7gPSd"
-Received: by mail-dy1-f177.google.com with SMTP id 5a478bee46e88-304da3b4508so172290eec.2
-        for <linux-block@vger.kernel.org>; Fri, 05 Jun 2026 04:03:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780657393; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Ly2q9WLUCH/b8idCtPZ7PiIoESiGfkD3NORLMIgvklXDuZBaj4VqgqjmCthrljUROF
-         eaDRon3ZUflmokL0HUoSq2Lru0+c8a/XmurYOXnaIfggisGuF2sAn1gxdqXkyY+22+sV
-         wband2Sf+zf2ZeNOShr8TKjhmczyJJHjM6MtxYGbdFSEHDKnte0vNl3camf0amcxtpmq
-         HrtRnXACjrBiS3BgRE/3G3tEIo5Suhjz1M7m24afyoAjQaCIpx0NAV+cnsynd2APM0Il
-         hP2NmJlYBEOHUwBvb073mDEW0qTN3GfgrfI8MkXN1+hLIliIJQGtWWmjD1RD4lPq2jc7
-         TQpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=f1MUM6D03lZH8m9sJMdZV49CHTFZPYYABFO8u2/04d0=;
-        fh=cefFYAILPYXTC6MYjlZC//5grmUvz7UFO8AIvKFEFhM=;
-        b=NpJ2T37UgWmP6lTzTSZ9S3UjEW1/g7tT3wcOkS6i6Y2zZdMnr39Nze/1txMgWLc8NC
-         k9Z4VpMc7K+cbwAsVK6DRihtlnRj3jyDpxEyquArp3sgeT77QWkucQF/gRnqzTO9AWnS
-         JduM6NI91YijM1AMCBwmrGJCcRaE7Puyr/Z78pU9I7ash3zGMsFfaCCY3J+WH8pL9ort
-         HZRAed7sPRMd9QagaOTfjLwvydhc5c7D8FPK8ZIbNg0jlbQxJr1B9w9MIeSWCxJI1Uiy
-         hvD1oW4gtd/iPnI5WKJhfEsyAfLR/1an7MG2PnUdyxFD1Qv9GDY/jwb/AKmJXVJUQOCE
-         U2TQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780657393; x=1781262193; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f1MUM6D03lZH8m9sJMdZV49CHTFZPYYABFO8u2/04d0=;
-        b=JdT7gPSdXdxzb8+YuwFowHuC/lI1Sm3/kGh9Xj8BdBRBWSJHgplpb1IlCqMeHXbMx3
-         8hf9C29D6on+4K98IIe9PUfMYYY5lJ+fO98lUNVu0YcDsBICMvhken6eSgFpqzIjvjzx
-         Geud/Fu9jWWrpoCtWYAtRC9NrQJUtuMAxB1Ientqi+acYVHnPK9DDcuX0hi1Q8zsUtlh
-         H2coFNgFwhM7EPiyO3IDpKYX4wJM8UMzeYT0fSkMcuf8y+T57Yv30olxxiuIsGB178b1
-         iP8WxWhGyGYgTq/kKaB74/rFlY1Bx2LlEyOeDus+dnNcduTpfS7tjamnqiViGrZFcCMw
-         xYOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780657393; x=1781262193;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=f1MUM6D03lZH8m9sJMdZV49CHTFZPYYABFO8u2/04d0=;
-        b=AWj8sx+W8ILRo0NYjlITewhQVyVCgrnC6/rQgYh5H/ClGbXIwh3pl+C58jEPpWBQrx
-         dOuJrRgM/SMnL8BFCz+Rh2qlxadeomnARvfRF2zAJpQYDyWnpzSgdxZ/Ffz4xG/ZEpMM
-         okFlbe5gNLuz+rVeG33/iLhDgdmW94zPJiVCCI/W2LvPw/Ic+f4GqoWforfcfkw5B+8Z
-         KhXHxfws060RgT5GutbqRtlRrofZ1s0YU3VPMgAFbDnRIreW5C/JGfVxK3qJuMS5hmfL
-         uvB3x9q2CEefZUo63oz20tL7As/FFbuzjetWaMlU4KDUtrqIKm/NRQ2AQkMHjnHtHCzv
-         CeiQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8sisJ0QHWxAqtlRoQf6kwn0DEIPVFA8nf2GsGMUBgKEOgbHm3qr7EJbqEM7j+md/8rXYolo30hBVUkAA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYmIrBNC7GLzz78q5RW+QOUd9RtJ6c8q7Wx6+rb5yiIkCjnk+H
-	9XrF38I+8a6HR8GXP2I6hFi4AzrKkUufF03p1ilH60NgBn0xvXGUOYmwDGZi3zYbhmj/XT+ew4/
-	ZOvDAU9KviTR9OzAdQ6pNm8G7HwzErQQ=
-X-Gm-Gg: Acq92OG+o9rMCtVjRul1zYg+8nQKChknPgs4+M04guyXUn5i2uSAkuoWQkZvtsKw645
-	NvuV5VFs4XbqvjLl6FQWdIjKgrwuefQ4HUYBeruS+D7g0bj3vzD/a2XIOyZtkBSWOsEYThE86YW
-	DWvYauTNsPsJq3bDKOrVJnnL7L/+YoEPKTThoiyfDYcNf0AbtbH29cqUY35Bor1k+0t3KM3pY8Y
-	1xoF/5JqeEdZ+332SJtLbF5m76k6X/mYxgNDQoNCgXQwCe0Gl5IdDpyT6ZTD7KcrezWlLbWZAf4
-	Cj7YBokYJEeQZ8jAmLHR+JF43k+EzOYfWiegTSBM8Xorw6kamZ7TuAcVEz4Vlc5DXrVl68ECjkW
-	JBx5IdGXrOAXETAsOMhbzN/RJiP/HMk9Hzg==
-X-Received: by 2002:a05:7300:bc0c:b0:304:8860:74dd with SMTP id
- 5a478bee46e88-3077b57ff09mr582723eec.8.1780657393363; Fri, 05 Jun 2026
- 04:03:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GIZb/SMN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F88D1F00893;
+	Fri,  5 Jun 2026 12:04:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780661078;
+	bh=cN2I4cs/2c2NI326aH1UOb5eaKWyax4VWbE/kwBA7uM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GIZb/SMNoti/2/xXzFzRffM4bNK3kBGZzB1b2teMeeUuzbqAmze6AEpfIIc+ddZI5
+	 z7z909Q0LT94fu7uRxkh0BKSvOa2O3kF/Gj71UjgdERaBzPnX+03w+q3h8/BT48Pe5
+	 LB2iMfmtn3hA7YA6+7UhGTSTfARzGpi/OuR9o5X6rHeKM6z2nSxHHYUnkDdmS5692z
+	 26ZTamuzggw3mgC1NAL3MER2hdtexMKdMUfuMITqru061SDmb4zcr6Z/awS1LiBbRE
+	 uwXFxaDxIFcNJZaXAfsD8EG52t/CCAmi0Pa3xTDuD6yZqEykj5pMtLR5jUNaPgCMzH
+	 V4gUflPNPKKEA==
+Date: Fri, 5 Jun 2026 13:04:32 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Miguel Ojeda <ojeda@kernel.org>, akpm@linux-foundation.org,
+	axboe@kernel.dk, bvanassche@acm.org, dlemoal@kernel.org, hch@lst.de,
+	hdanton@sina.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tom.leiming@gmail.com, wqu@suse.com,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun@kernel.org>, rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to
+ disk->open_mutex
+Message-ID: <4ffdbe16-61ab-47e8-b696-e2fcf9a26385@sirena.org.uk>
+References: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
+ <20260604210704.41751-1-ojeda@kernel.org>
+ <89f0f308-2ee7-4c68-b811-8132e5d88530@I-love.SAKURA.ne.jp>
+ <CANiq72nGo=F5D7b7Hx8A1jfAJw_72Np+UpRWBRQoPLAE+RAPpA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
- <20260604210704.41751-1-ojeda@kernel.org> <89f0f308-2ee7-4c68-b811-8132e5d88530@I-love.SAKURA.ne.jp>
-In-Reply-To: <89f0f308-2ee7-4c68-b811-8132e5d88530@I-love.SAKURA.ne.jp>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 5 Jun 2026 13:02:59 +0200
-X-Gm-Features: AVVi8CdqkuEhPtbDH0s4twQIZkrvVriRAJrVBmrFnoy9Lj0_mQmQbpOfQv8yYl4
-Message-ID: <CANiq72nGo=F5D7b7Hx8A1jfAJw_72Np+UpRWBRQoPLAE+RAPpA@mail.gmail.com>
-Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to disk->open_mutex
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Miguel Ojeda <ojeda@kernel.org>, akpm@linux-foundation.org, axboe@kernel.dk, 
-	bvanassche@acm.org, dlemoal@kernel.org, hch@lst.de, hdanton@sina.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	tom.leiming@gmail.com, wqu@suse.com, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, rust-for-linux@vger.kernel.org, 
-	Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="StAMqoMBl4zgWmc9"
+Content-Disposition: inline
+In-Reply-To: <CANiq72nGo=F5D7b7Hx8A1jfAJw_72Np+UpRWBRQoPLAE+RAPpA@mail.gmail.com>
+X-Cookie: Error in operator: add beer
+
+
+--StAMqoMBl4zgWmc9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 5, 2026 at 12:15=E2=80=AFPM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> Oops, it seems that I overlooked the rust-for-linux@vger.kernel.org line.
+On Fri, Jun 05, 2026 at 01:02:59PM +0200, Miguel Ojeda wrote:
+> On Fri, Jun 5, 2026 at 12:15=E2=80=AFPM Tetsuo Handa
+> <penguin-kernel@i-love.sakura.ne.jp> wrote:
 
-I am not sure what you mean -- it is not just the mailing list, the
-maintainers and the reviewers of both entries were not Cc'd either.
+> > I am using my tree for allowing syzbot to test debug/experimental patch=
+es in linux-next tree
 
-So like 9 Ccs are missing...
+> linux-next is only meant for patches that are already reviewed, tested
+> and destined for the merge window.
 
-> I am using my tree for allowing syzbot to test debug/experimental patches=
- in linux-next tree
+> It is not meant for experimental patches, and adding those, especially
+> this late in the kernel cycle, can break other people's CIs and
+> systems at the worst possible time. If every maintainers put random
+> patches in linux-next, then it would be unusable...
 
-linux-next is only meant for patches that are already reviewed, tested
-and destined for the merge window.
+> (There are exceptions, of course, but only if people is aware and in
+> agreement...)
 
-It is not meant for experimental patches, and adding those, especially
-this late in the kernel cycle, can break other people's CIs and
-systems at the worst possible time. If every maintainers put random
-patches in linux-next, then it would be unusable...
+In general the sort of testing that it's good for is "this needs more
+exposure" sorts of things - things that look good locally but where
+there's a wide variety of users or affected systems that might be
+affected and where it's hard to judge the impact.
 
-(There are exceptions, of course, but only if people is aware and in
-agreement...)
+> > Do you see any technical problems except comment style problem?
 
-> Do you see any technical problems except comment style problem?
+> The above errors are already a technical problem -- they break the
+> Clippy and docs build!
 
-The above errors are already a technical problem -- they break the
-Clippy and docs build!
+Oh, bah - something turned off RUST in allmodconfig again so we lost
+coverage in -next, sorry about that.  I'll need to work something out to
+make sure I notice that happening and can do something about it.  It's
+kind of worrying that this keeps happening TBH, otherwise rust conflicts
+are likely to result in broken builds.  The dependencies feel really
+fraigle here.
 
-I assume Andreas or Boqun will eventually take a look at the patch now
-that they know about its existence (is there a particular reason to
-rush?).
+> No, please drop it now -- the patch shouldn't have been applied to
+> linux-next yet, since the maintainers didn't ack it (they just
+> realized it exists...), it is not reviewed (apart from Sashiko), it is
+> not tested enough (given the errors above) and not destined for the
+> next merge window (for all the reasons before).
 
-> Nothing bad is going on. The final patch will be sent to linux-next tree =
-via
-> appropriate tree after getting acks from maintainers, and the current pat=
-ch
-> in my tree will be dropped when maintainers accepted the final patch.
+Had the rust builds been enabled for allmodconfig as I had expected the
+tree would have been kept out of -next as a result of this.
 
-No, please drop it now -- the patch shouldn't have been applied to
-linux-next yet, since the maintainers didn't ack it (they just
-realized it exists...), it is not reviewed (apart from Sashiko), it is
-not tested enough (given the errors above) and not destined for the
-next merge window (for all the reasons before).
+--StAMqoMBl4zgWmc9
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks!
+-----BEGIN PGP SIGNATURE-----
 
-Cheers,
-Miguel
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoiu08ACgkQJNaLcl1U
+h9AjUAf+KvxHG2EpNg/5WRLFMD+usuVYU6396FrVd3qAnwYZHZ4NL8YKbVSH0xE0
+BiOzCycX8KKLq55wHPy+v9DB1PUGCHhMHCXbcgMXWUtXNCKXlz3K8lH2btLADSkE
+sS4Fh28CoDPhVREPITYhRb3QwRHtztwqcayblFxM3Epm3cEtJzET5qgFKbGtKbFq
+arb2USdnn0IP5z6FhTxm4Joco+c6QSfHDCCbFXyFfKhIK4lpK0KhJBp675uFTkgH
+RIkRTr6cKEc+yg7wi2koWA/g39rMQxEUHHqVRxu5lsHcXad4ctmFrvnuHP6HvYpP
+V7DbGAnI18515PvWAvMPafYsIY11nQ==
+=qEAs
+-----END PGP SIGNATURE-----
+
+--StAMqoMBl4zgWmc9--
