@@ -1,44 +1,44 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16293E7150;
-	Fri,  5 Jun 2026 18:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F0C3E715A;
+	Fri,  5 Jun 2026 18:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780685091; cv=none; b=sxCYO2ZQiaHqGC5KRvsFfJyfmAsgAD2ZWIddHBfPVNm140Nf2kNhYTBPxACoI4va7nv8ZWQxJ7oKt6kMqYEhyjPEi+/7nha396yXnwQjmkkE5zVi1N1l5FjXhVTF2OnGbqSL2mo3S3APxSBtB9GKlzVo/nqzEuT4AWLc7wjphqA=
+	t=1780685095; cv=none; b=qoglDOYT8Fl6XLR0dU8zanx9eTlKz+EIEbFc+elGlKtUfE+NAuzmphnj5hdgr34eZ8W4qMOpPpK/Kthc20YLOyxyj+KHosKX19xRihXx7NSbDKU30GFEIhVS7Z37egamRIEK6gGNV1S5OYJLNlsBl9eQlkFlr3m/IGAlXhbWDQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780685091; c=relaxed/simple;
-	bh=xOVJrcQJu9wV6njEHpBuISU+KK7OwEhlPBGv4BISme8=;
+	s=arc-20240116; t=1780685095; c=relaxed/simple;
+	bh=9gp7r8gjYnNVIZuo+Rk+PCRN59UW0iVUDFCiJrslEYk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tpzc4ltdfLisMsQBMA5zaU0DTIWQChv7X+0045YURUcrZVqZZtl4Yk7jb5eEzm5uIaHdrf7GflTF8HHQxQ7zBy6l4ZckTbl9kDVxVbq83suQpCbu6V6W0fj7ymIDa8dqTRgX25VhUqrdlhzGcyN4vrI7RVc3E1QrF9VXAgCYw6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ifVnqSb/; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=nUEGbVnplKrpMORdv6gTmDip4RQlcZ48sBJBhxc3ziuC8lglqtO+aKr9UM7NiHaEmtQnxEMpw0+ovXdMgOUSYK0+UkLQQ+Zlpqx8Yn+SALSE91mRvO3ubuK461MEPz8ARHqMjEQi7egWWHItc3GY4WRT7F+QmL2rvrH8N1q/yCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=u/apyIP/; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ifVnqSb/"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="u/apyIP/"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=RQAuudq1KexEjUEwn/6TA+RKjAxrN4T/KI/AypDFr0A=; b=ifVnqSb/pJXQ39+jOpBBifH+Xs
-	BMy+34+jUdwoV0CD7adb2IvC59fNFu60+6/RFMrW83WfeBW8RVbo+wuKSetmKLsi/bz5u8lcQUtHC
-	pERDmA55A1GIqqFE6Jy1wSp9q2i+SYWgPo+kB1U+drc2oVsgFtey0v5Mi769iCE0YdzObgqHogew9
-	h8zD9K7bBkJRolfPqNQpC/GauzGHktNIvO096zdJiNtRdAqUAgvcEAYujzgYE8ePgkGUAnxhqE0yF
-	ZTN3Q+6uGIRinpvDhaSF6LAZDhMYRZcgQHEtK765Gy728WAj29mbW3sjI6ZSrSRe0ErJD+zqFT0TP
-	RCHGoqDA==;
+	bh=JVc5dYNGAfnZ4n31NUzCZhYmbjZa8f+2tpl8e8qhOXQ=; b=u/apyIP/ADHPW1r2XaDKGxAjoz
+	DRH49wPtDDJwKQJLwRGhg7KW4t0aXIt/0oA3QHN5o28Wg4ssuCASGEdsev02AQB7OdREH96rhrnRv
+	mY0All5qE4ZlIOH6m+n4kO7c9SebVMehnalTd4fpA9R0gOOTXF7Uv1bmquzVO2F/SeEGDAxxhIFCx
+	3mjATvVSxFxxHmfT7jqrSHHa+O46rnXQE3vvvwdFQduP9hzO7NWw7o3wb8OjtWbiXOcChrnu3ffvp
+	khBfsOn1af0AlcKD82JJY5tA5PsQYEn+mYnrNsjpSEyzLd3Ph7nF/AX34+PEwnFYLPO4J4cPb51GH
+	pA+B0piA==;
 Received: from 2a02-8389-2341-5b80-decc-1a96-daaa-a2cc.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:decc:1a96:daaa:a2cc] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wVZXE-000000014P5-31SX;
-	Fri, 05 Jun 2026 18:44:49 +0000
+	id 1wVZXI-000000014Pg-13lL;
+	Fri, 05 Jun 2026 18:44:52 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Jonathan Corbet <corbet@lwn.net>,
 	linux-block@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 1/4] block: add a macro to initialize the status table
-Date: Fri,  5 Jun 2026 20:44:27 +0200
-Message-ID: <20260605184441.590927-2-hch@lst.de>
+Subject: [PATCH 2/4] block: add a "tag" for block status codes
+Date: Fri,  5 Jun 2026 20:44:28 +0200
+Message-ID: <20260605184441.590927-3-hch@lst.de>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260605184441.590927-1-hch@lst.de>
 References: <20260605184441.590927-1-hch@lst.de>
@@ -51,84 +51,80 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Prepare for adding a new value to the error table by adding a macro
-to fill it.
+The full name of the status codes is not good for user interfaces as it
+can contain white spaces.  Add the name of the status code without the
+BLK_STS_ prefix as a tag so that it can be used for user interfaces.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- block/blk-core.c | 45 +++++++++++++++++++++++++--------------------
- 1 file changed, 25 insertions(+), 20 deletions(-)
+ block/blk-core.c | 28 ++++++++++++++++++++++++++++
+ block/blk.h      |  2 ++
+ 2 files changed, 30 insertions(+)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index b0f0a304ea0b..1614323282f1 100644
+index 1614323282f1..7aa9cd110bdd 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -132,39 +132,44 @@ inline const char *blk_op_str(enum req_op op)
+@@ -135,10 +135,12 @@ EXPORT_SYMBOL_GPL(blk_op_str);
+ #define ENT(_tag, _errno, _desc)	\
+ [BLK_STS_##_tag] = {				\
+ 	.errno		= _errno,		\
++	.tag		= __stringify(_tag),	\
+ 	.name		= _desc,		\
  }
- EXPORT_SYMBOL_GPL(blk_op_str);
- 
-+#define ENT(_tag, _errno, _desc)	\
-+[BLK_STS_##_tag] = {				\
-+	.errno		= _errno,		\
-+	.name		= _desc,		\
-+}
  static const struct {
  	int		errno;
++	const char	*tag;
  	const char	*name;
  } blk_errors[] = {
--	[BLK_STS_OK]		= { 0,		"" },
--	[BLK_STS_NOTSUPP]	= { -EOPNOTSUPP, "operation not supported" },
--	[BLK_STS_TIMEOUT]	= { -ETIMEDOUT,	"timeout" },
--	[BLK_STS_NOSPC]		= { -ENOSPC,	"critical space allocation" },
--	[BLK_STS_TRANSPORT]	= { -ENOLINK,	"recoverable transport" },
--	[BLK_STS_TARGET]	= { -EREMOTEIO,	"critical target" },
--	[BLK_STS_RESV_CONFLICT]	= { -EBADE,	"reservation conflict" },
--	[BLK_STS_MEDIUM]	= { -ENODATA,	"critical medium" },
--	[BLK_STS_PROTECTION]	= { -EILSEQ,	"protection" },
--	[BLK_STS_RESOURCE]	= { -ENOMEM,	"kernel resource" },
--	[BLK_STS_DEV_RESOURCE]	= { -EBUSY,	"device resource" },
--	[BLK_STS_AGAIN]		= { -EAGAIN,	"nonblocking retry" },
--	[BLK_STS_OFFLINE]	= { -ENODEV,	"device offline" },
-+	ENT(OK,			0,		""),
-+	ENT(NOTSUPP,		-EOPNOTSUPP,	"operation not supported"),
-+	ENT(TIMEOUT,		-ETIMEDOUT,	"timeout"),
-+	ENT(NOSPC,		-ENOSPC,	"critical space allocation"),
-+	ENT(TRANSPORT,		-ENOLINK,	"recoverable transport"),
-+	ENT(TARGET,		-EREMOTEIO,	"critical target"),
-+	ENT(RESV_CONFLICT,	-EBADE,		"reservation conflict"),
-+	ENT(MEDIUM,		-ENODATA,	"critical medium"),
-+	ENT(PROTECTION,		-EILSEQ,	"protection"),
-+	ENT(RESOURCE,		-ENOMEM,	"kernel resource"),
-+	ENT(DEV_RESOURCE,	-EBUSY,		"device resource"),
-+	ENT(AGAIN,		-EAGAIN,	"nonblocking retry"),
-+	ENT(OFFLINE,		-ENODEV,	"device offline"),
+ 	ENT(OK,			0,		""),
+@@ -203,6 +205,32 @@ const char *blk_status_to_str(blk_status_t status)
+ 	return blk_errors[idx].name;
+ }
  
- 	/* device mapper special case, should not leak out: */
--	[BLK_STS_DM_REQUEUE]	= { -EREMCHG, "dm internal retry" },
-+	ENT(DM_REQUEUE,		-EREMCHG,	"dm internal retry"),
++const char *blk_status_to_tag(blk_status_t status)
++{
++	int idx = (__force int)status;
++
++	if (WARN_ON_ONCE(idx >= ARRAY_SIZE(blk_errors)))
++		return "<null>";
++	return blk_errors[idx].tag;
++}
++
++blk_status_t tag_to_blk_status(const char *tag)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(blk_errors); i++) {
++		if (blk_errors[i].tag &&
++		    !strcmp(blk_errors[i].tag, tag))
++			return (__force blk_status_t)i;
++	}
++
++	/*
++	 * Return BLK_STS_OK for mismatches as this function is intended to
++	 * parse error status values.
++	 */
++	return BLK_STS_OK;
++}
++
+ /**
+  * blk_sync_queue - cancel any pending callbacks on a queue
+  * @q: the queue
+diff --git a/block/blk.h b/block/blk.h
+index bf1a80493ff1..10426d23f662 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -50,6 +50,8 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
+ void blk_free_flush_queue(struct blk_flush_queue *q);
  
- 	/* zone device specific errors */
--	[BLK_STS_ZONE_OPEN_RESOURCE]	= { -ETOOMANYREFS, "open zones exceeded" },
--	[BLK_STS_ZONE_ACTIVE_RESOURCE]	= { -EOVERFLOW, "active zones exceeded" },
-+	ENT(ZONE_OPEN_RESOURCE, -ETOOMANYREFS,	"open zones exceeded"),
-+	ENT(ZONE_ACTIVE_RESOURCE, -EOVERFLOW,	"active zones exceeded"),
+ const char *blk_status_to_str(blk_status_t status);
++const char *blk_status_to_tag(blk_status_t status);
++blk_status_t tag_to_blk_status(const char *tag);
  
- 	/* Command duration limit device-side timeout */
--	[BLK_STS_DURATION_LIMIT]	= { -ETIME, "duration limit exceeded" },
--
--	[BLK_STS_INVAL]		= { -EINVAL,	"invalid" },
-+	ENT(DURATION_LIMIT,	-ETIME,		"duration limit exceeded"),
-+	ENT(INVAL,		-EINVAL,	"invalid"),
- 
- 	/* everything else not covered above: */
--	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
-+	ENT(IOERR,		-EIO,		"I/O"),
- };
-+#undef ENT
- 
- blk_status_t errno_to_blk_status(int errno)
- {
+ bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
+ bool blk_queue_start_drain(struct request_queue *q);
 -- 
 2.53.0
 
