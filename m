@@ -1,144 +1,122 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642C22EEE8C
-	for <linux-block@vger.kernel.org>; Fri,  5 Jun 2026 12:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2375F3B14C0;
+	Fri,  5 Jun 2026 13:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780663554; cv=none; b=mje5lmlJ3BvrPUq7l321jQhsQVDpKW34sgEJaWOGfgP4SwkTgaX6/Fp334D/GTQWgBPsyK5THbboQaed+9VwEKPReMazdI/5bFi1DP+YtaDlkbhg/5O5cZ55U1RzDZlzqIV9jKtmQ/qzTIdy0zkRbMm9k40SITQ/W4WKQANzXos=
+	t=1780664604; cv=none; b=fZyD3HJ8im5dOAaZd6631Ql9xhBJE7rUlTSt9qOD6FBNQbo6i95xrTEggSX1in3B0OsGevS4GonUt/6fUebzH6i+T2Dfx8tq6uThpaZ/DLR4pVzBna44snPBitpfboYiSrOqZtNZUsQKWNw1fLmHuvxS6qCziCAtkvpYd41gVic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780663554; c=relaxed/simple;
-	bh=b5sujOasI7BciUkGtvewQcsChUtInmNPyLYwLMKH9Sc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YT+1zg+ZXiLcOXZ6Qgnm0qt5VQy/veTviA6Zkt3VdsE7tcqoZPNy27Dz+o7nx9P0+TeQwEu5bJj6NAliIA+zpj9KGu8XiE4x+MAtQhPqt67+chTKCOtaViSuIPhPiXN3Xt2Id+8fcAcafUQbVfEiog0dEOeMUt38S9jG0BhrOpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gP1b2SwV; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1780664604; c=relaxed/simple;
+	bh=lVjmYJAafcfNRTJdBqdjJ7O56bNKya2KV9tVeNTbUmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rprDIVCikQ4eznl2aEmPsy9V4+nPQPbfRBtpn64CbvTUhFqaUitsm2ZNGNk/VI6ivHO6ZFuKdx2exFGFdUH/XWqNwUPxQJrejVstbzCEZecWpkbXgkrso1WU6ee9qVslR8nK7erQzqQ4V+qRUKuy6BixRGXx9QhYgL4TWbOnA7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=do7oqJ9b; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gP1b2SwV"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6553CP6A3945052;
-	Fri, 5 Jun 2026 12:45:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=DQ2az/
-	GHsAihkVEN30KE0FYJrYyLJJVdcr5bxsqICQk=; b=gP1b2SwVtWY/lOzNKn9/wi
-	0hW541ybSy6lCqK+/iNHmICKlQFRSeRq5GJqBTDTPS+EqLA1pDwITirkG8sVsZcP
-	I9cXwRpg8qWNRM+LGwMVL94pTbH+cSamaXRWKGVbYNk8OhIjV5KFsPu1DgMa4qDA
-	/FDoujaQSdG6kGqyLbiBhVRj7MQuWk1wPl0MB2tJa6JJ/uCP6ABZomKPEPzuy1BJ
-	tLnaBdHX96n3vnZNfW8uyspQSk7oixrJk7flLehjPQz67+WxuDA7OEW7UVSijdjz
-	ARxXqRzTLSFexZldVPIPczCAjuffU6bXAYAOt9/FVv0EsbvWVWh+Q57BCb/OOTUg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4efqd4mhhg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jun 2026 12:45:43 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 655Cd5Ve006541;
-	Fri, 5 Jun 2026 12:45:42 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4egakw9t4u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Jun 2026 12:45:42 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 655CjfuE64094698
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Jun 2026 12:45:42 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CA2365805A;
-	Fri,  5 Jun 2026 12:45:41 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6E51658062;
-	Fri,  5 Jun 2026 12:45:39 +0000 (GMT)
-Received: from [9.43.126.215] (unknown [9.43.126.215])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Jun 2026 12:45:39 +0000 (GMT)
-Message-ID: <013ee998-7b98-4870-950b-806eef46cf9c@linux.ibm.com>
-Date: Fri, 5 Jun 2026 18:15:37 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="do7oqJ9b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC6B1F00893;
+	Fri,  5 Jun 2026 13:03:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780664602;
+	bh=UBr/1zPj5DyYo4cmDts4CxkrR2KDbHvoTJb1mnqCGK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=do7oqJ9bmL0jyi/BSyTxK5f3Ms8VqnLZiLtgoUDXZcApW0jVGoF/OltF9RBghk2KA
+	 GDN/gubiYlPyzA+JRh+ivITZYUUIZwgsNJAEsVHybE+8DLZQlt5adPVJJixlMdp/p2
+	 dXNTDv6QybUPav/jR8pl/zA0pkacdcc1KikOL1K6HwthyTMub5cQa0VmGiCeQjLnNG
+	 5d9+04I7lIbKSMyPEAnTFOqhc56TuODpP/MpuNXtlzx1Qb4IKykD3kV3zRqM1RAFLD
+	 wn16eu5fGXsiimzuCnCSscJEav7dpBFjI0Y4+5jP9bFlJIjbob1zMWigiFJUK1UEjy
+	 9gDLFK2P3/fAw==
+Date: Fri, 5 Jun 2026 14:03:16 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Miguel Ojeda <ojeda@kernel.org>, akpm@linux-foundation.org,
+	axboe@kernel.dk, bvanassche@acm.org, dlemoal@kernel.org, hch@lst.de,
+	hdanton@sina.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, tom.leiming@gmail.com, wqu@suse.com,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Boqun Feng <boqun@kernel.org>, rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to
+ disk->open_mutex
+Message-ID: <14686d75-c481-42ba-bbcf-94a4423aeb42@sirena.org.uk>
+References: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
+ <20260604210704.41751-1-ojeda@kernel.org>
+ <89f0f308-2ee7-4c68-b811-8132e5d88530@I-love.SAKURA.ne.jp>
+ <CANiq72nGo=F5D7b7Hx8A1jfAJw_72Np+UpRWBRQoPLAE+RAPpA@mail.gmail.com>
+ <4ffdbe16-61ab-47e8-b696-e2fcf9a26385@sirena.org.uk>
+ <CANiq72nKDpzd9BTPfQ-NhWgcTgWdE=spED_n-idv1Jnekdo=Fw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 00/14] Enable lock context analysis for the block layer
- core
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@kernel.org>, Damien Le Moal <dlemoal@kernel.org>
-References: <cover.1780419600.git.bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <cover.1780419600.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA1MDEyMyBTYWx0ZWRfXzAB2d3R8Tuzq
- A3bbRRyD6n8wPaxQ+Nzu0qiXgaYNzqN4yliJEH7s1/Eo4N2qMCWHD+AHWHdahSA9rFClNB2T/2A
- WUeqZSheIczZ+PlzklIZCftTe91JC0Cb2CKbqR7nnCsBKQ/J3ibY+8v3vbVhOhtTL6vO5SnJ6qe
- ulBLhfbTYcievsl51pIQLnUHBFoC0pYc9Hy4sGDjwXp7SDFc2yE4M0DHnv5akhNxbaTrB0rfz3/
- h89LbXTF/hrI/x10GK2JiUTblBfnhI9p5pXBSi8MeEu7hlUxSl0FnKNXlZ9BQ0vbpl5W7s6Yuuo
- 6Nr/QWI+cpQL7L4QXTHR4OZlrd204d5EHo+9d41XxoHzZpANyyccS/k8/v40DZja+WTUebfMgl+
- hcEvyl+5V8mj7W3oY3qmWLJAMVVhKXYFq38ZQOWz7lkTVm1X3Lb/rZUMYHXZh6jjyy3bckTX7jM
- 0yb11wYSKb2V4VXusKw==
-X-Proofpoint-GUID: 9eXZ1PuFj8iJKwFoHIP4UHfT5h1WZo7j
-X-Proofpoint-ORIG-GUID: 9eXZ1PuFj8iJKwFoHIP4UHfT5h1WZo7j
-X-Authority-Analysis: v=2.4 cv=DZknbPtW c=1 sm=1 tr=0 ts=6a22c4f7 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
- a=1XWaLZrsAAAA:8 a=kvhjZrD4pgufEI7LdaEA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-05_02,2026-05-28_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1011 suspectscore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606050123
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="q7w0dM811B4jc7oX"
+Content-Disposition: inline
+In-Reply-To: <CANiq72nKDpzd9BTPfQ-NhWgcTgWdE=spED_n-idv1Jnekdo=Fw@mail.gmail.com>
+X-Cookie: Error in operator: add beer
 
-Hi Bart,
 
-On 6/2/26 10:37 PM, Bart Van Assche wrote:
-> Hi Jens,
-> 
-> Recently the following patch series has been merged: [PATCH v5 00/36]
-> Compiler-Based Context- and Locking-Analysis
-> (https://lore.kernel.org/lkml/20251219154418.3592607-1-elver@google.com/). That
-> patch series drops support for verifying lock context annotations with sparse
-> and introduces support for verifying lock context annotations with Clang. The
-> support in Clang for lock context annotation and verification is better than
-> that in sparse. As an example, __cond_acquires() and __guarded_by() are
-> supported by Clang but not by sparse. Hence this patch series that enables lock
-> context analysis for the block layer core.
-> 
-> Note: although the Linux kernel documentation specifies 22 as minimal
-> version for Clang for context analysis support, this patch series requires
-> Clang 23 because it annotates function pointers. As one can see here, a patch
-> has been queued that fixes the kernel documentation:
-> https://lore.kernel.org/all/177926568868.711.3058599932884307249.tip-bot2@tip-bot2/
-> 
-> Please consider this patch series for the next merge window.
-> 
-> Thanks,
-> 
-> Bart.
+--q7w0dM811B4jc7oX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I have reviewed this series and it looks good to me.
+On Fri, Jun 05, 2026 at 02:40:24PM +0200, Miguel Ojeda wrote:
 
-One question: I still see a few block-layer functions that document locking
-requirements with lockdep assertions. Should we also consider adding the
-corresponding Clang context annotations for these where practical?
+Copying in Kees and Gustavo due to a rust/randstruct interaction in
+-next.
 
-For example, blkg_create() requires q->queue_lock must be held by its caller, so
-it could be annotated with __must_hold(&disk->queue->queue_lock). Similarly,
-blk_report_disk_dead() asserts that disk->open_mutex must not be held, so it could
-be annotated with __must_not_hold(&disk->open_mutex).
+> I Cc'd you since I was wondering if your new `LLVM=3D1` build should
+> have caught it (I thought the GCC one wouldn't, since my understanding
+> is that we lost that last week due to the KASAN+RUST patch).
 
-There are a few more similar cases. Would it make sense to cover these in this
-series, or should that be left for follow-up patches?
+Yes, you did loose it so I swapped to LLVM=3D1 in order to try to keep
+coverage.  I didn't specifically verify that it worked though, I only
+noticed that change as I'd been enabling rust for KUnit and that flags
+any missing Kconfig symbol.
 
-Thanks,
---Nilay
+> And, yeah, it is fragile... It is quite a complicated set of Kconfig
+> relationships, so years ago I also ended up in the same situation and
+> early on decided to add an explicit grep for `CONFIG_RUST=3Dy` and
+> certain other bits that I wanted to ensure are in place after the
+> config phase.
 
+It looks like the breakage is due to 'depends on !RANDSTRUCT' because
+clang supports randstruct and allmodconfig defaults that to
+RANDSTRUCT_FULL.  The fact that rust depends on !RANDSTRUCT but
+randstruct doesn't care about rust means that randstruct wins.  I've got
+to say rust coverage seems more important than randstruct coverage for
+-next, others might have different opinions though!
+
+> For you and those building with Rust enabled it would be great to
+> notice when it gets disabled by mistake, but I am not sure if most
+> maintainers (i.e. those without a Rust toolchain but using
+> `all*config` routinely) will appreciate it (or rather, tolerate it...
+> :).
+
+I guess there's a difference between !RUST_IS_AVAILABLE and
+RUST_IS_AVAILABLE && !RUST which is interesting here. =20
+
+I know other people have been caught out by silently not having rust
+coverage in their CI.
+
+--q7w0dM811B4jc7oX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmoiyRMACgkQJNaLcl1U
+h9D8CQf/WpDfeh2TJR2gE7fYiC4pNWeGRiipEcxppGbs7b/pH+fV5WZDGC7mPzas
+4crdh7SZHGnGyqQuNZGX6j+eHvk6gPojdz+D59VPoet0ko3jEKPFDR2E2+PRIMqq
+JOBjEjTCB7fHMPAJ9JoXvCFREwGlymZMBiyoYwMtNSdOir3oV4ambOO4ym4A4j7k
+nV5maj2FFyAb38Ln0gvqqAupyeHDhltc3++zDo1MZTCxzGbTcrVocQvoVJR72VTa
++ZTC0LGct0Du36MGZi015kGlML6WME+/pq9FtrXhoxi6tJcIASOl+WzeToUfbM7y
+FZUeHv0iKx/Ih7muojld2FDepUG8+w==
+=zoZf
+-----END PGP SIGNATURE-----
+
+--q7w0dM811B4jc7oX--
