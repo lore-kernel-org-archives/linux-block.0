@@ -1,113 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB5435B650;
-	Thu,  4 Jun 2026 21:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E63407592;
+	Fri,  5 Jun 2026 06:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780607243; cv=none; b=V/9v6i7eNTewfQDfGQ+IJIDDp3qhl40IHLWsoqjq2opopcUx5fZBGLMEox/lGTB/S1Z05iaOqF1DGiJX+L40Sx58A6Pysy7MV6lApbESzpPjYgwkiCsJcGVcq1339iWAAuOCyU2iALGvzBQ7QwsgCFeStYsmU6b5XSmnTOd06mM=
+	t=1780641254; cv=none; b=lCnUw6nRYh+hB5GtuT8/8sZPnL+E1V0qLn5gyIPSzdd0Bx+2j7TwWYrKbj5do6UhaXFHSOJA31h66tTtuYfs+Qx7TkuAT5tTjB8ZQye9U9NpO0Ly6hwqHLorbSKaYavjFxSZRghzquYMNV5alKFzHXdCtMGClXKHFhXvEf5wqEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780607243; c=relaxed/simple;
-	bh=g7GV7VqMpijIW+SNfApb2mbR+GSpP8vpvnWUWnP8eqk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bCK7ZqjCXSouA3HXy3XJIbfjph9x3LdfLgOdoJUlCIpIkjVEfNXIvmGMTJ/msNpiJkVWiwK6hydn++or1AlKmyC9BaP/LcPhpJe3zLJNdXMoQe8FWCzepbcWkykZC+24W00MXXsV5TwuY0CXt82GgQ0SnUomgkk2FlmGeFxnlUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npD/qQCX; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780641254; c=relaxed/simple;
+	bh=tLaZYVeTaOMoMRVOxRG3tDV+wwu4/EUAlzXG578KDCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LMF4srd3LPs2sFkfPsCLKLm3HZlwUb5vW9481oHOTouR3g3tonMQY+UTeKJ9/aDNCPb14XqLbyD28MeDrc4CirvqMwjHWnb2hacslPx8QJZARSfPfDJ81M7SgGhcSBggusLFKm9XuDTXejFuEE5x+kJf7YYQR/uxh9F+V/TO67c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ez53p94D; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npD/qQCX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00B531F00893;
-	Thu,  4 Jun 2026 21:07:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ez53p94D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15FA81F00893;
+	Fri,  5 Jun 2026 06:34:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780607241;
-	bh=TNQDzyTjPMOgbDEx67tSPYyxULtyqVXdtuqSOyi2rII=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=npD/qQCXliwX+s1LGnUae8rBscKjT9LqeuyXN2Y+WEUsCfVCvW68Q8iCSCNm1XCV8
-	 NIm/5JSF5mb5VQwS1T+llt+BLnNor8purnG+vKzOJmUspBUXCtJvnZP3ioPo1sktJv
-	 XoTnioM2w/Y/SXH0w0N1i0TPkNkd/pzuriuzadPPT8Zaor60E/yvTn6HfW44MY6uBr
-	 rY2euggspZA+vOCnKYWTy0d8iJG7hyDFOUanrZjJIsaKYiGddxfnEMkZrJZJDf+CHD
-	 4hNO0y4LEiVQt+m5oh8sZhmCPeiiwiwEAk1Zlu3wz/f0Lw07t+i4V2onX6mgAlHceY
-	 UFJS3wUyhlaIg==
-From: Miguel Ojeda <ojeda@kernel.org>
-To: penguin-kernel@i-love.sakura.ne.jp
-Cc: akpm@linux-foundation.org,
-	axboe@kernel.dk,
-	bvanassche@acm.org,
-	dlemoal@kernel.org,
-	hch@lst.de,
-	hdanton@sina.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ojeda@kernel.org,
-	tom.leiming@gmail.com,
-	wqu@suse.com,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun@kernel.org>,
-	rust-for-linux@vger.kernel.org,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to disk->open_mutex
-Date: Thu,  4 Jun 2026 23:07:04 +0200
-Message-ID: <20260604210704.41751-1-ojeda@kernel.org>
-In-Reply-To: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
-References: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
+	s=k20260515; t=1780641253;
+	bh=DbfIj55Sv7cmo68RLBus49QLwPGZwaa/3if4NpR3DzE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Ez53p94DSgTTYurFo96qsZkWeYrWBroP5fEk8fTi/eGxAZzxzQD7o1jjNs/B2D1/u
+	 w1I0seOgN18tyP+Ycg1QESHwpMRhEdlUOmVgv2gCm67NzvYnRPz+dZxRiqMabIUkTH
+	 z/xu9XQc+pGWGg7HRwvXRUYfDgfHbnCuepjAuOrNsaIcbPhPE9ivEzvRQeAfh/ZtTv
+	 NBJngUmgPypmZtl4JLdC8jz6sqIMRlQbZAwJzkipaDa1xYinbN6YfkL6GFvdMXasZy
+	 H8h6Y69w9k799hW2QYOFSw/k4b0hSstGTRPj2DXv2hD7pUF4EnPJZwuSYtAfGQ/q6y
+	 sGLizbpu0k3HQ==
+Message-ID: <7bf0c159-b93b-4892-97fb-16b55f236e53@kernel.org>
+Date: Fri, 5 Jun 2026 14:33:50 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Add WQ_PERCPU to alloc_workqueue users
+To: Marco Crivellari <marco.crivellari@suse.com>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Michal Hocko <mhocko@suse.com>, Jens Axboe <axboe@kernel.dk>
+References: <20260604105347.168322-1-marco.crivellari@suse.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260604105347.168322-1-marco.crivellari@suse.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On Wed, 03 Jun 2026 20:54:05 +0900 Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp> wrote:
->
-> Acknowledgment:
->   Since I have no experience with Rust, changes needed by Rust block layer
->   bindings and rnull module are made based on conversation with the Gemini
->   AI collaborator.
+On 2026/06/04 18:53, Marco Crivellari wrote:
+> This continues the effort to refactor workqueue APIs, which began with
+> the introduction of new workqueues and a new alloc_workqueue flag in:
+> 
+>    commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
+>    commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
+> 
+> The refactoring is going to alter the default behavior of
+> alloc_workqueue() to be unbound by default.
+> 
+> With the introduction of the WQ_PERCPU flag (equivalent to !WQ_UNBOUND),
+> any alloc_workqueue() caller that doesn’t explicitly specify WQ_UNBOUND
+> must now use WQ_PERCPU. For more details see the Link tag below.
+> 
+> In order to keep alloc_workqueue() behavior identical, explicitly request
+> WQ_PERCPU.
+> 
+> Link: https://lore.kernel.org/all/20250221112003.1dSuoGyc@linutronix.de/
+> Suggested-by: Tejun Heo <tj@kernel.org>
+> 
+> Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
 
-Then please do Cc the right people as `MAINTAINERS` mentions, including
-"BLOCK LAYER DEVICE DRIVER API [RUST]" and "RUST"...
+Looks good.
 
-I am quite confused. Why was this added to linux-next?
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-It doesn't go through block, nor has an Ack or review and breaks
-the `rustdoc` build in linux-next (and thus rust.docs.kernel.org):
-
-    error: unresolved link to `my_gendisk_lkclass`
-      --> rust/kernel/block/mq/gen_disk.rs:42:50
-       |
-    42 | /// This type can only be instantiated via the [`my_gendisk_lkclass!`] macro.
-
-It is also not Clippy-clean -- it doesn't follow our usual conventions
-for safety comments and sections:
-
-    error: unsafe function's docs are missing a `# Safety` section
-      --> rust/kernel/block/mq/gen_disk.rs:59:5
-       |
-    59 |     pub const unsafe fn new_lock_class(ptr: *mut bindings::gendisk_lkclass) -> GenDiskLockClass {
-
-    error: function has unnecessary safety comment
-      --> rust/kernel/block/mq/gen_disk.rs:59:5
-       |
-    58 |     /// SAFETY: `ptr` must point to a valid static `gendisk_lkclass` instance.
-       |         ------- help: consider changing it to a `# Safety` section: `# Safety`
-    59 |     pub const unsafe fn new_lock_class(ptr: *mut bindings::gendisk_lkclass) -> GenDiskLockClass {
-
-Please see:
-
-  https://rust-for-linux.com/contributing#submit-checklist-addendum
-
-In any case, it is also too late in the cycle to be experimenting in
-linux-next.
-
-So what am I missing? What is going on?
-
-(And on top of all that, for some reason I did not receive it even if I
-am apparently in Cc, so I have asked the admins about that.)
-
-Cheers,
-Miguel
-
-Cc: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun@kernel.org>
-Cc: rust-for-linux@vger.kernel.org
-
-Cc: Mark Brown <broonie@kernel.org>
+-- 
+Damien Le Moal
+Western Digital Research
