@@ -1,31 +1,31 @@
 Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CC8378D9C
-	for <linux-block@vger.kernel.org>; Fri,  5 Jun 2026 10:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B233F4DE7
+	for <linux-block@vger.kernel.org>; Fri,  5 Jun 2026 10:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780654116; cv=none; b=hHR2r1RAhBT+DjJXK6HEPPC8GjMaQXx4+YBL9zGfgKApn7GEelCRfmcPMHpdR9InteYPpcaDzWivlu9AmQ1N8xC5WtDqPZU3fMXZ1sFjHJMZj8BoZL+AVLveb0SDlokIjndnWZ/Icqo7q3Eo6OzNYcLAOE/9MH7Jc1EckLr74hc=
+	t=1780654486; cv=none; b=nKGXh8F18i7WOB1n2U/9d+WwksLHyRN00sbiapPc1U7UQtNrdSvzfgToMXCILQvVDuTlN3nOd14pF6n+TunxCts5henTeG3Z4DJzCgEcg2vK4y2iQcH4RRw4cTOrmEj3xbgc89bDVmLcKWwa1/mHtycLbldMn2+VmmBG2sOoypw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780654116; c=relaxed/simple;
-	bh=Ws7DL6+IsqKE/SeXyr2AzSQmw/g4647ediva3wgyaZs=;
+	s=arc-20240116; t=1780654486; c=relaxed/simple;
+	bh=I3aTSz6zOzPc0D/NuL+1VxgMO2FIdbYzRjE+0iwVZiE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CdClIgCEJIUxPfNUY5/ePB/6VeQip/4oS8V+K3fb7lin4WkJc+15nwDjDO4zg4VdTV8LemXIn006OnsaSyZWLN3G66RhQJrPc365te0pwYvwddjMEuLyS3wge8AqrPrzMBsHaQ99nAPR7v+bTRpLyErRBeiKy3TGF8oXGQr+POw=
+	 In-Reply-To:Content-Type; b=CAa75DnRZaHRDKCVgLd5a3D8TdyTweSqLfyj0JwPSp51Nxj8Eppln962oshuvbLZpL5GaVj0JXWUMWPVJJ8QB+mYhWZXAte9sno5wL7MrNWba9O2oGIAfsaKegHdh0BAbo0HsENUOZT67hNl71ut9lpXa1oYCnrYN8DU25EdEzo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
 Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 655A8QO8065036;
-	Fri, 5 Jun 2026 19:08:26 +0900 (JST)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 655AEgdD067352;
+	Fri, 5 Jun 2026 19:14:42 +0900 (JST)
 	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
 Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
 	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 655A8PpM065028
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 655AEfuN067349
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 5 Jun 2026 19:08:25 +0900 (JST)
+	Fri, 5 Jun 2026 19:14:41 +0900 (JST)
 	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <89f0f308-2ee7-4c68-b811-8132e5d88530@I-love.SAKURA.ne.jp>
-Date: Fri, 5 Jun 2026 19:08:26 +0900
+Message-ID: <9ebc39a8-6025-40e3-a378-ba26bf8d73ae@I-love.SAKURA.ne.jp>
+Date: Fri, 5 Jun 2026 19:14:42 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,96 +35,68 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3] block: assign caller-specific lockdep class to
  disk->open_mutex
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: akpm@linux-foundation.org, axboe@kernel.dk, bvanassche@acm.org,
-        dlemoal@kernel.org, hch@lst.de, hdanton@sina.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tom.leiming@gmail.com, wqu@suse.com,
-        Andreas Hindborg
- <a.hindborg@kernel.org>,
-        Boqun Feng <boqun@kernel.org>, rust-for-linux@vger.kernel.org,
-        Mark Brown <broonie@kernel.org>
-References: <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
- <20260604210704.41751-1-ojeda@kernel.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ming Lei <tom.leiming@gmail.com>, Damien Le Moal <dlemoal@kernel.org>,
+        Qu Wenruo <wqu@suse.com>, Hillf Danton <hdanton@sina.com>,
+        Miguel Ojeda <ojeda@kernel.org>
+References: <147ed056-03d9-4214-b925-0f10fc00cf27@I-love.SAKURA.ne.jp>
+ <4cf7ecc7-932c-4589-9d0f-3e025e83e27c@acm.org> <20260601071113.GB7468@lst.de>
+ <420f723a-8168-4f56-b84a-2a36ecd87fea@I-love.SAKURA.ne.jp>
+ <226152a3-1e4c-4eec-9a17-1d40426a7b18@I-love.SAKURA.ne.jp>
+ <87wlwdifrv.fsf@kernel.org>
 Content-Language: en-US
 From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20260604210704.41751-1-ojeda@kernel.org>
+In-Reply-To: <87wlwdifrv.fsf@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Virus-Status: clean
-X-Anti-Virus-Server: fsav102.rs.sakura.ne.jp
+X-Anti-Virus-Server: fsav301.rs.sakura.ne.jp
 
-On 2026/06/05 6:07, Miguel Ojeda wrote:
-> On Wed, 03 Jun 2026 20:54:05 +0900 Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp> wrote:
+On 2026/06/05 16:54, Andreas Hindborg wrote:
+> Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp> writes:
+> 
+>> The block core currently allocates a single monolithic lockdep key for
+>> disk->open_mutex across all callers. This single key conflates locking
+>> hierarchies between independent block streams. For example, if a stacked
+>> driver like loop flushes its internal workqueues inside lo_release() while
+>> holding its own open_mutex, lockdep views this as a potential ABBA deadlock
+>> against the underlying storage stack, leading to numerous circular
+>> dependency splats.
 >>
->> Acknowledgment:
->>   Since I have no experience with Rust, changes needed by Rust block layer
->>   bindings and rnull module are made based on conversation with the Gemini
->>   AI collaborator.
+>> To structurally reduce false positives, this patch splits the global
+>> monolithic lock class into distinct, per-caller instances during disk
+>> allocation. This is done by replacing "struct lock_class_key" with
+>> "struct gendisk_lkclass", which contains two instances of
+>> "struct lock_class_key" for the legacy "(bio completion)" map and
+>> disk->open_mutex respectively.
+>>
+>> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 > 
-> Then please do Cc the right people as `MAINTAINERS` mentions, including
-> "BLOCK LAYER DEVICE DRIVER API [RUST]" and "RUST"...
+> For the Rust part, we have existing infrastructure for lock class keys
+> [1]. Please take a look how we generate lock class keys elsewhere [2].
 
-Oops, it seems that I overlooked the rust-for-linux@vger.kernel.org line.
+My understanding is that we don't have infrastructure for lock class keys
+that can be applied to
 
-> 
-> I am quite confused. Why was this added to linux-next?
+  +struct gendisk_lkclass {
+  +	struct lock_class_key bio_lkclass;
+  +	struct lock_class_key open_mutex_lkclass;
+  +};
 
-Since sashiko did not find issues on this v3 patch
-( https://sashiko.dev/#/patchset/226152a3-1e4c-4eec-9a17-1d40426a7b18%40I-love.SAKURA.ne.jp ),
-I started pre-testing by syzbot while waiting for responses from maintainers.
+  -	static struct lock_class_key __key;
+  +	static struct gendisk_lkclass __key;
 
-I am using my tree for allowing syzbot to test debug/experimental patches in linux-next tree
-(or to apply workaround patches for bugs that prevent syzbot from testing linux-next tree),
-and therefore my tree is subjected to "git reset --hard" changes.
-
-> 
-> It doesn't go through block, nor has an Ack or review and breaks
-> the `rustdoc` build in linux-next (and thus rust.docs.kernel.org):
-> 
->     error: unresolved link to `my_gendisk_lkclass`
->       --> rust/kernel/block/mq/gen_disk.rs:42:50
->        |
->     42 | /// This type can only be instantiated via the [`my_gendisk_lkclass!`] macro.
-> 
-> It is also not Clippy-clean -- it doesn't follow our usual conventions
-> for safety comments and sections:
-> 
->     error: unsafe function's docs are missing a `# Safety` section
->       --> rust/kernel/block/mq/gen_disk.rs:59:5
->        |
->     59 |     pub const unsafe fn new_lock_class(ptr: *mut bindings::gendisk_lkclass) -> GenDiskLockClass {
-> 
->     error: function has unnecessary safety comment
->       --> rust/kernel/block/mq/gen_disk.rs:59:5
->        |
->     58 |     /// SAFETY: `ptr` must point to a valid static `gendisk_lkclass` instance.
->        |         ------- help: consider changing it to a `# Safety` section: `# Safety`
->     59 |     pub const unsafe fn new_lock_class(ptr: *mut bindings::gendisk_lkclass) -> GenDiskLockClass {
-
-Hmm, I'm not familiar with comment styles for Rust...
-
-Do you see any technical problems except comment style problem?
+change. Alternative approach is welcomed if you have one.
 
 > 
-> Please see:
+> Best regards,
+> Andreas Hindborg
 > 
->   https://rust-for-linux.com/contributing#submit-checklist-addendum
+> [1] https://rust.docs.kernel.org/kernel/sync/struct.LockClassKey.html
+> [2] https://github.com/torvalds/linux/blob/ddd664bbff63e09e7a7f9acae9c43605d4cf185f/rust/kernel/sync/lock/mutex.rs#L12
 > 
-> In any case, it is also too late in the cycle to be experimenting in
-> linux-next.
-> 
-> So what am I missing? What is going on?
-
-Nothing bad is going on. The final patch will be sent to linux-next tree via
-appropriate tree after getting acks from maintainers, and the current patch
-in my tree will be dropped when maintainers accepted the final patch.
-
-> 
-> (And on top of all that, for some reason I did not receive it even if I
-> am apparently in Cc, so I have asked the admins about that.)
-
-I was enabling only SPF, but it seems that gmail started rejecting such mails.
-Therefore, last night I also enabled DKIM/ARC and DMARC. I hope this mail is
-delivered to gmail users.
 
