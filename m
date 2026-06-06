@@ -1,52 +1,54 @@
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F25D3AA507;
-	Sat,  6 Jun 2026 20:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9D33C2770;
+	Sat,  6 Jun 2026 20:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780777634; cv=none; b=Wnh1sE6k1FQvrye6U+za+aY+6nOTVFboYltEiRFDY1PeNteow3n74k4MwaGbRYCnWXbarNhYBXqrKtA9YO4+/vRJLNgPDQi4EnFn9CZMVP7r2D5R/tt2YThA7w2V2yI5LQqwp7K0bSK7VCHGrVwRUJoVCSMeNTIxQllID8mIGII=
+	t=1780777680; cv=none; b=agdZp2ecDQ2NoABnu90gwbtrF7//cisNIHhLM3N6SgzhpPTese2k2xAeqLJMVV3Q3GD74WHHuHH1z0L7/kvI0Q350xnqx+tcwELjYAQtukB1Ku4cGRrdJ6arwf8Yc74xV3Rug0gI/vD2rb9mkj8rUI0XHTebzlau42usy6oXjhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780777634; c=relaxed/simple;
-	bh=R3H4Nm5GY6hOViTdz1W2dueMBBuEo57Z0FQZ8yTbK1s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hGo9dR0BCwZzHDhXvaa4oBFpXdJRtBXYKTK3EcTtZG37enCOv/28FAf/+BQJWpefzjhZFSBM+gkntYQ9YGkzYwpkSZr5nnIyHNVKsYoRma3PoVBSA4VWSgKa3vQewGFv80GXBPEoEkVYCXMyOqtzi22mHfbgPlgH3Bi8P3E6I24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=OsavbeHr; arc=none smtp.client-ip=185.226.149.37
+	s=arc-20240116; t=1780777680; c=relaxed/simple;
+	bh=fKGwdJHoNHUwhOIfKcibhxChzxyiTj8/e8WfrQ9PZFs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hi8HAaYfyMaGZ3MTSVrcEr8CLcYDJgpFbC+6twHIKTuPmzLqX4on/9fZx43nNNFTWm1M9E3e/YI+c3r+v6gFEGKxydBk9w2tjlTvGM3FRE1ffQDmQeL5uLiHaKoIdvVrkSTyVjMPKAFNsGn49o0+J238H+68CB2UEMr9tIqyFPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=oSFBNSUh; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="OsavbeHr"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="oSFBNSUh"
 Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wVxbq-007NPq-KB; Sat, 06 Jun 2026 22:27:10 +0200
+	id 1wVxcb-007cN9-VP; Sat, 06 Jun 2026 22:27:57 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
-	Subject:Cc:To:From; bh=VB6LGWBOBKZK7RdnDMyNXA0acdHX2HSe+usGRca51YI=; b=Osavbe
-	HrnlFBrRqHuE+5Ofn+svghz5Lk0pLKOd9Xb57T9+9qPg6lpcq9L0PCHi7Th/FEyCfDYRTTPMIniqM
-	ltsUn3cPZFacieJ2R6M8dZERbhqtP1hkZ4BXbzxSH2uclbdDylOLGqM6l8IllSeyddURDE8HleZm+
-	ABhCXZ5zyGtEGugB6lx6GDRj8y5/clEZxlhG3AFck0/dRX2r6+qxhG4EfZZTCts+3yv1iYn/U/R9P
-	Lzijg9M5Rzq6SqhBqj0IqlvT2bDluBpD1NtWtXRVjmrd2e2M+2EkTxFUoObm2BvS+3/7eUC5hXdwo
-	4ojLJ47CE483QkeVTUr90+AQBnyA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
+	Subject:Cc:To:From; bh=07AM9jxTS+R70+Fd56Eqvb5JidnnKIlts+qfLPC2V4E=; b=oSFBNS
+	UhFX+16VsHtYj7kY++Jfjfq4p2Cj4afMSOFA0gsCmfteEeCybHEA888ITriDYlBIGSGOEzwyzhVU+
+	DjcM5OmnESNSFLJoB5v+Lu7NvG/h8efpISrDGEBmndiZHQbmlxh7+evkj3g4lJYgH4OwquhJ8v42R
+	wrpNEvjx5ei2DnZPwqvrDmRCPlZ06BkZpiTpaRKWAFYmUw9T7cX7S0EF6DLhArm1sDarzBKjP0z+D
+	kntMB8LvLc+0WM5JMIMwP7Y7wVT5Hok7wLHubZSZJuezJSwXe3iAs37ZxLjf+YMC+RhtsEquhw/EY
+	5nnF0Yf9uns4YNSKiixofu94QS3A==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
 	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1wVxbq-0000t0-6n; Sat, 06 Jun 2026 22:27:10 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	id 1wVxcb-0000vy-Lx; Sat, 06 Jun 2026 22:27:57 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.95)
-	id 1wVxbo-006V18-LQ;
-	Sat, 06 Jun 2026 22:27:08 +0200
+	id 1wVxcV-006elj-Ki;
+	Sat, 06 Jun 2026 22:27:51 +0200
 From: david.laight.linux@gmail.com
 To: Kees Cook <kees@kernel.org>,
 	linux-hardening@vger.kernel.org,
 	Arnd Bergmann <arnd@kernel.org>,
+	ceph-devel@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
+Cc: Ilya Dryomov <idryomov@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>,
 	David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH next] block/early-lookup: Replace strlen() strcpy() pair with strscpy()
-Date: Sat,  6 Jun 2026 21:26:32 +0100
-Message-Id: <20260606202633.5018-38-david.laight.linux@gmail.com>
+Subject: [PATCH next] drivers/block/rbd: Use strscpy() to copy strings into arrays
+Date: Sat,  6 Jun 2026 21:27:44 +0100
+Message-Id: <20260606202744.5113-5-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -58,7 +60,8 @@ Content-Transfer-Encoding: 8bit
 
 From: David Laight <david.laight.linux@gmail.com>
 
-Use the result of strscpy() for the overflow check.
+Replacing strcpy() with strscpy() ensures than overflow of the target
+buffer cannot happen.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
@@ -84,24 +87,22 @@ All the patches are being sent individually to avoid very long cc lists.
 Apologies for the terse commit messages and likely unexpected tags.
 (There are about 100 patches in total.)
 
- block/early-lookup.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/rbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index 3fb57f7d2b12..18ab4a2da676 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -156,9 +156,8 @@ static int __init devt_from_devname(const char *name, dev_t *devt)
- 	char s[32];
- 	char *p;
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 4065336ebd1f..632fa2d56ea0 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -3672,7 +3672,7 @@ static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
+ 	struct rbd_client_id cid = rbd_get_cid(rbd_dev);
  
--	if (strlen(name) > 31)
-+	if (strscpy(s, name) < 0)
- 		return -EINVAL;
--	strcpy(s, name);
- 	for (p = s; *p; p++) {
- 		if (*p == '/')
- 			*p = '!';
+ 	rbd_dev->lock_state = RBD_LOCK_STATE_LOCKED;
+-	strcpy(rbd_dev->lock_cookie, cookie);
++	strscpy(rbd_dev->lock_cookie, cookie);
+ 	rbd_set_owner_cid(rbd_dev, &cid);
+ 	queue_work(rbd_dev->task_wq, &rbd_dev->acquired_lock_work);
+ }
 -- 
 2.39.5
 
