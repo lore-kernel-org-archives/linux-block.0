@@ -1,138 +1,166 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CC41FBEA8
-	for <linux-block@vger.kernel.org>; Sat,  6 Jun 2026 23:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7841DFF0
+	for <linux-block@vger.kernel.org>; Sun,  7 Jun 2026 02:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780790114; cv=none; b=RtOw/qqsvaacODrfrcvNHrPVHELxG23PWwRKIXg4hJ/kLArmYSsIY/sZhcB/6ZhUVfj3ZJLrALGXfmLy77ln9JLRbhZjEWM0r1TiYBAyPtLGEWGsnoSHKystNSFplux+3HWMo4IXkesav5krgZubzMISlr37BW5ZtvWNMu9NTfU=
+	t=1780799016; cv=none; b=tJ8aWSpbtjJ3S5qwiQYkfOoLL/NT+h47pqf83DY4/vQj0P8KqQw5wi81RcIFoX7mEqyVdvUsq91YLyR83pzeGwwAvvcG80O0H6zKt1MJODHHgohbwjrDJ9iR9ofLbkQRlydf86rbkcxnv8Kg7pLKwjTjleEpiP+SPHsWBO2crr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780790114; c=relaxed/simple;
-	bh=K8OYtNJC3IIZRMBqEi51lk43u3HkOmDMFO6SNuAuxjE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X8BWyvngjHbockD7OmnLUpN7FE6ixPl0pqYUp5uHBnub6d5+TKphE3TnWhJB41Gv4rZ+qOWrYIUeiYnvJlhOrgNyXF2Y54ywDqC9TSwkZsYtO3v2YDkU1bhzYW5wg/9vOKuVUnqNmYiH9rBJdatnkZ81GBGHRFj5FrjfQDW80dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=CjTBQgqW; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+	s=arc-20240116; t=1780799016; c=relaxed/simple;
+	bh=saswmV1voX+J31K8+1YYxt1/oMBSX7yd+TmMmd4PTPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YO0tOEYNMIuarnn3VJNczCsM0BuutjK3d3BwfgyXu88UuO2zhe70nLE2tDWEKNIIkR12mNM4//pYv9oQ+sBuOzHAwIS7u4WsgWOnrVYDQrTLAtFZNhBK69ymD707nLgfGTmTKSVxI4SKKhbndwIteduLMtK1V6Wcnr1c7268Y6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SsSWhFYl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=kON2mTCv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="CjTBQgqW"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-4865e953031so3687372b6e.0
-        for <linux-block@vger.kernel.org>; Sat, 06 Jun 2026 16:55:12 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SsSWhFYl";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="kON2mTCv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1780799013;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AkOun8GEXS2QG9yZ2UAlUL4A5OCbW95isM2TUiOZFI0=;
+	b=SsSWhFYlcnDTL08mIPzgxvLVo3Csk9SK8oOqhJ8grTnfN+ODgqMkXf8+V6UirVw9MrQd6w
+	F+A4+7deTVWLsW9vGo+xvrsPZTVMViGliEjtJCgLivX4h34zA61cHd9s3NZcqPMzZEigOH
+	eWDu5DlN0RPCLbkU0zoxmQvxIvsMwB4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-QkTocapxNtSejAH0q-XPow-1; Sat, 06 Jun 2026 22:23:31 -0400
+X-MC-Unique: QkTocapxNtSejAH0q-XPow-1
+X-Mimecast-MFC-AGG-ID: QkTocapxNtSejAH0q-XPow_1780799010
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4600c8cb13aso1858693f8f.1
+        for <linux-block@vger.kernel.org>; Sat, 06 Jun 2026 19:23:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1780790111; x=1781394911; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wVY/Nc3kfIfRXZcic+3QshizwzyK0GaTXzlxRWeoy2E=;
-        b=CjTBQgqWJ1AoG9moWTWz/rQBt2XUZTccRHRslxYYs8rDeuZpPFCHGbg9VlYWySgi/M
-         v+skadR8BA+TmVHyxiH8MN2S9tpcYgaodi+e8NJUN4oT/9dw24a69wRaPWJqVTzFs5El
-         /EI3L5s9ZNmjOQ3JMpDrqny+DSq7+oQcGwt20=
+        d=redhat.com; s=google; t=1780799010; x=1781403810; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AkOun8GEXS2QG9yZ2UAlUL4A5OCbW95isM2TUiOZFI0=;
+        b=kON2mTCvIwurEMexKY+XC//8EuZI9pX0ThSKNWA7VhV9mDkt83pOCqG68dkws+siHB
+         9m8FpgxdeqmiEknMePu3Bm+J+VwYTJjELPNCEzprP5yTLDNVeYg9jj8yX0f8ZMzqay1u
+         8LJ8xZs4J1ErYbVn3Jk6xexFxDdoByMixQyt9bNWDTWCWBARNO0i1uQhN8b7psp0/fBu
+         jvvX9S23Ans54or//IFVZNn5pND59NH9DXPbjjzVjxQy+5xhKS1yEbPFCesrZJWCfqFV
+         u5uhGJpMU11FB2WYdpIdZRgjtYXg/mW48HsydeJ772v78eCORZG5BYbI7UNqh2lbwIeF
+         W3Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780790111; x=1781394911;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wVY/Nc3kfIfRXZcic+3QshizwzyK0GaTXzlxRWeoy2E=;
-        b=PdSEqprwCGkYF4fiem8kbN9FuwLPn2/q9KseEtQJHlpPSn2NY1mt9nvuJG9bIPIsNH
-         PqRBDDeIH4Z7MMde6Gzd5mVaCg3SPPXIHZ937JG5x47ckxOVVjw01YjJhPIQbd9F/anR
-         19uZtCSIgWQRc2E3h6hcYUJkoL+PND7B+nijRyBmfH2+2YMQPiDPspuQB91Z36HidAK9
-         F9BW1VflOSQATa+he8S8WxhtW0lgprcMzygkUiv8m7q3V4ogilG77Yf3w9Fcs7SsvPRD
-         2IEKlKmyCUhw+7WTr2uP+01InK/zEDN+DSNj0Dp2jj9mvA4el0Pml+4v2BnNf9YF5GVK
-         5p+Q==
-X-Forwarded-Encrypted: i=1; AFNElJ/zYdEBMUErJGts3tNDYkf6BehkJmCkhay5qSQSEkk424ch51cVtjOSDK0WRnFFqNf3VgI730ZCiBETMA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnhvWJjJ0GhEQAJ+qlijMSjWSwM7OFqX0wlmIRS+D/DbUcTA6w
-	YX7PSifC3LwNqyXvGfwMp2ycZZP+UTWV2gNLgtSBRJZHzo3KutehWNXzbJ4SW3ZRSzOP+CFSRfF
-	Udp6+XEzl
-X-Gm-Gg: Acq92OE+vlUFeDpUNLZsXkoB2L2TCCG6zX3W1acCkMFW+RcLleLL2BJn+yN38aWnVOJ
-	xdJKpXXDnO1Sh6qfkgWuzhCSNJA2hSxN86QuVTTgUy8Ow+8z5+U6Z+ZJMm4qzINrGhFawr82/gY
-	9qvI3ub3Q6dFYsfVfv8nkSLZiidGAsL49e3VrMTj65lOtuaDr1R7m2Q2j4ZgBkvr0j0KhKVCPE2
-	hdwHbnUv1pk2S9ZHkCTO8R9SMd6RrjQlzGXaiWb7GqiwoKOQYd3etyBe41j7MLsYtTOpRk5zl/W
-	ZpatEiN2WCH7RrNRqOmK/8tNsbCeho9PVLzOPFZ1tF8mRbJgLCbOEnS7AY2CmtVh5XNO93HzD8q
-	FFvCUz2vJvcPCgVliEPuxxdzBtCTjnwIskynk2ujd++vZxTaY43nNFEgW8yv6/I2CiXaFXAaL7r
-	G1KZ688qcaQC1VA5bUv5GRm8k8u02A9x64Ab9630HhmTgqeqbaLBxx
-X-Received: by 2002:a05:6808:15a5:b0:479:d674:dcca with SMTP id 5614622812f47-48692c881fbmr3789772b6e.4.1780790111555;
-        Sat, 06 Jun 2026 16:55:11 -0700 (PDT)
-Received: from [10.211.55.5] ([73.62.185.64])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-4865b5a53bcsm10302924b6e.3.2026.06.06.16.55.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Jun 2026 16:55:10 -0700 (PDT)
-Message-ID: <dcb49836-cebf-40b0-81b7-c06cf84b81a0@ieee.org>
-Date: Sat, 6 Jun 2026 18:55:09 -0500
+        d=1e100.net; s=20251104; t=1780799010; x=1781403810;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AkOun8GEXS2QG9yZ2UAlUL4A5OCbW95isM2TUiOZFI0=;
+        b=GO7a1tyXS4YDszrOLjpN9mbirLKGxlniNrmUKXwHZePIJphSKw7udSJjxngwxMsgyi
+         L5S4NGfzYrZXKnupugzxQMoWWVT3CYlh8DSuaCoYpkDQdVm7l/0EFQ9hjXHqmzf/pPSp
+         OG16DBVsQ9tdEQx/OXzrdElMWB1eASs1NvH7aojRJQuK/GKEVt6J7+w/CnFZ0/wBesvo
+         9ECHLJL+dLNsFLqQT3wck/TmiYEwpT1e+7l9sUKSoPKW9picj0BTWNtl8E4XioojotwZ
+         XTzC0whslw6S2GF0JSQJ2kq1bBeuOq+GERQh1PxmMAxg5/A5fcS0QpiQSgNMxoALlFkr
+         y61g==
+X-Forwarded-Encrypted: i=1; AFNElJ8VhLO0L0inSj4HIZp6VQ2DdjLFE7Qv/VZlENmw2o6TGvcYf/RBo73tLurXDTjh4EZRO4eqO2pLoMEjlQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6BlabWfaAhiVeoN/QOUr0gzsSxq0+aLN7ol52WagMaA99EkAM
+	98+EyfvsaTJLAD9pNp5O75DZ20559aeZ2mkUE4iDZ0SjIg9OxQOn8/rvIYC8Wdw0HLBpfN0t0vC
+	84ipfy2wzCsjz3r7kol6A9FxzUE7imkggatk4SmTz3PDBFbNUE2DvKPu+T6BC5Rqg
+X-Gm-Gg: Acq92OFP1tCHXz4prA89M3L7fetwl2Mp6+9Nej8utM/5YwYe9deyFqA1bWTnyx8uuEw
+	CdiMTZgg5HybxLQo8C82fowhOOVM7qyv7VsjB0eUJCfNxnZzU/aVYA34BRsXpMHveYgiVOVfta9
+	fSEDmEUXQ8ML4wjzBrnlJYfm60O3IPLP70kEzduaA3G6RMS4L18U+RqjgwX6x115aXQtvgD4MTS
+	K02Zu1kIXNF03jBcPcSSBx+hDt1T+DQ7gX8qknDgmQ8g8JeAkqmC0Z4kJSR5M5SmdAUamQFYekr
+	pEpsmGuR6pZG88sVr44qsUesKXDaA0ZZVNBQzJ62/jFmnZ9jSqngY7ZsxNk/w9pr390dn6nrwL1
+	jPND76npyco3edJntfkzPN4Y=
+X-Received: by 2002:adf:f2cf:0:b0:45e:f381:cd85 with SMTP id ffacd0b85a97d-4603050230cmr13522045f8f.20.1780799010192;
+        Sat, 06 Jun 2026 19:23:30 -0700 (PDT)
+X-Received: by 2002:adf:f2cf:0:b0:45e:f381:cd85 with SMTP id ffacd0b85a97d-4603050230cmr13522025f8f.20.1780799009700;
+        Sat, 06 Jun 2026 19:23:29 -0700 (PDT)
+Received: from redhat.com ([31.152.37.159])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f3444fesm40650274f8f.20.2026.06.06.19.23.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jun 2026 19:23:28 -0700 (PDT)
+Date: Sat, 6 Jun 2026 22:23:22 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Michael Bommarito <michael.bommarito@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] virtio-blk: clamp zone report to the report buffer
+ capacity
+Message-ID: <20260606221933-mutt-send-email-mst@kernel.org>
+References: <20260606170415.1523660-1-michael.bommarito@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH next] drivers/block/rbd: Use strscpy() to copy strings
- into arrays
-To: david.laight.linux@gmail.com, Kees Cook <kees@kernel.org>,
- linux-hardening@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>,
- ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Ilya Dryomov <idryomov@gmail.com>, Jens Axboe <axboe@kernel.dk>
-References: <20260606202744.5113-5-david.laight.linux@gmail.com>
-Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20260606202744.5113-5-david.laight.linux@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260606170415.1523660-1-michael.bommarito@gmail.com>
 
-On 6/6/26 3:27 PM, david.laight.linux@gmail.com wrote:
-> From: David Laight <david.laight.linux@gmail.com>
+On Sat, Jun 06, 2026 at 01:04:15PM -0400, Michael Bommarito wrote:
+> virtblk_report_zones() trusts the device-reported number of zones when
+> walking the report buffer:
 > 
-> Replacing strcpy() with strscpy() ensures than overflow of the target
-> buffer cannot happen.
+> 	nz = min_t(u64, virtio64_to_cpu(vblk->vdev, report->nr_zones),
+> 		   nr_zones);
+> 	...
+> 	for (i = 0; i < nz && zone_idx < nr_zones; i++) {
+> 		ret = virtblk_parse_zone(vblk, &report->zones[i], ...);
 > 
-> Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> The buffer is allocated by virtblk_alloc_report_buffer(), whose size is
+> capped by the queue's max hardware sectors and max segments and can
+> therefore hold fewer descriptors than nr_zones. nz is bounded only by
+> the device-supplied report->nr_zones and the requested nr_zones, never
+> by the buffer's descriptor capacity. At probe time the request count is
+> unbounded (blk_revalidate_disk_zones() calls report_zones() with
+> nr_zones == UINT_MAX), so the device-supplied report->nr_zones is the
+> sole gate: a device that reports more zones than fit in the buffer
+> drives the loop to read report->zones[i] past the end of the allocation.
+> 
+> A malicious or buggy virtio-blk device that reports an inflated nr_zones
+> triggers this during zone revalidation at probe. KASAN reports a
+> vmalloc-out-of-bounds read in virtblk_report_zones() against the report
+> buffer allocated a few lines earlier.
+> 
+> Clamp nz to the number of descriptors that actually fit in the report
+> buffer.
+> 
+> Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
+> Assisted-by: Claude:claude-opus-4-8
+> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
 > ---
-> This is one of a group of patches that remove potentially unbounded
-> strcpy() calls.
+>  drivers/block/virtio_blk.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> They are mostly replaced by strscpy() or, when strlen() has just been
-> called, with memcpy() (usually including the '\0').
-> 
-> Calls with copy string literals into arrays are left unchanged.
-> They are safe and easily detected as such.
-> 
-> The changes were made by getting the compiler to detect the calls and
-> then fixing the code by hand.
-> 
-> Note that all the changes are only compile tested.
-> 
-> Some Makefiles were changed to allow files to contain strcpy().
-> As well as 'difficult to fix' files, this included 'show' functions
-> as they really need to use sysfs_emit() or seq_printf().
-> 
-> All the patches are being sent individually to avoid very long cc lists.
-> Apologies for the terse commit messages and likely unexpected tags.
-> (There are about 100 patches in total.)
-> 
->   drivers/block/rbd.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index 4065336ebd1f..632fa2d56ea0 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -3672,7 +3672,7 @@ static void __rbd_lock(struct rbd_device *rbd_dev, const char *cookie)
->   	struct rbd_client_id cid = rbd_get_cid(rbd_dev);
->   
->   	rbd_dev->lock_state = RBD_LOCK_STATE_LOCKED;
-> -	strcpy(rbd_dev->lock_cookie, cookie);
-> +	strscpy(rbd_dev->lock_cookie, cookie);
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index b1c9a27fe00f3..d50aaf956d558 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -689,6 +689,14 @@ static int virtblk_report_zones(struct gendisk *disk, sector_t sector,
+>  
+>  		nz = min_t(u64, virtio64_to_cpu(vblk->vdev, report->nr_zones),
 
-This looks good.  The rbd_device->lock_cookie is a 32 byte
-array.
+I think nr_zones should have been le64, bot virtio64.
 
-Cookies passed in are always a 32 byte array (despite the
-function only requiring a string pointer).
 
-Reviewed-by: Alex Elder <elder@riscstar.com>
+>  			   nr_zones);
+> +		/*
+> +		 * The device-reported nr_zones is untrusted;
 
->   	rbd_set_owner_cid(rbd_dev, &cid);
->   	queue_work(rbd_dev->task_wq, &rbd_dev->acquired_lock_work);
->   }
+this part depends on the config. just drop it.
+
+> clamp it to the
+> +		 * number of descriptors that actually fit in the report buffer
+> +		 * so a malicious or buggy device cannot drive the parse loop
+> +		 * past the allocation.
+> +		 */
+> +		nz = min_t(u64, nz,
+> +			   (buflen - sizeof(*report)) / sizeof(report->zones[0]));
+>  		if (!nz)
+>  			break;
+>  
+> 
+> base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
+> -- 
+> 2.53.0
 
