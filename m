@@ -1,127 +1,209 @@
-Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B943C1DF72C;
-	Sun,  7 Jun 2026 06:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8511287510
+	for <linux-block@vger.kernel.org>; Sun,  7 Jun 2026 10:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780814519; cv=none; b=cFTw6zaiT3aXOC4mfWEw3SFbOzXkVqblriVDZZVvTqm+pwH6PNICEYI/6M7MBHGIwmfLToUTdI20JZ0DHtFS1lRNkFhZ9tFoILNagsylkv0NsSmy2WB0sp5aDsvAv0axxXpQ92sldv8ojs/mnozi8X+S1AOQNmq11LBY1aJb79Y=
+	t=1780829709; cv=none; b=OFXFfQqUyCjRNxjJIx89fQxnY24TyvQEWESvhn7aONdg0/QOvvuRI4xFH06NMkwl/IeAifSJMuhEp0BBV89v2HbQtCeliFMBJqziPThUYd0hlVQvvgKK5Z9bmhPeusihzV9jyAPuyvkYym/RXUd5GXSUTnFG0TYDy+vyWIm3QzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780814519; c=relaxed/simple;
-	bh=oHHJ+Sc2rYBaM3A0kjhc6S4a4tqZmx7TLrTVjEhfNoU=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ryXojoOxGr5seDGVzmkR31KJoUh1xImPqSBpIHG0Ehlr9GEVxGbd3EI0taZdaiJAp3I3eFuYHv7EcZM8htfnTEPrIhyGPslNDFBpwIQ2spNh6Q+khRj+23pjZER7vRfdCrxqIT70w0K5C+X4k3VJTrJc9lPst5MPoQK1PiSxdUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=V6srsEGH; arc=none smtp.client-ip=109.224.244.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="V6srsEGH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=2vu56xwhdzg3rffb2d7mvzc5xe.protonmail; t=1780814510; x=1781073710;
-	bh=OGqXjRWjrutttY1n5fsm0/T9elTRL0atCpK5debHX6g=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=V6srsEGHiwxsgY/0Ja+tDxKune0vJhoCMgxjnyoYTONtv+7OoGN9XEAfKA2RTrhrE
-	 81bsmR9mP428X8IQ69XbgeV0+2ppc9DKTCjiJd3dIUr2QJ7xApQIqgGbTau4XEyrMZ
-	 bNijoVewCPO8IWsDubT5RreE4lLM5WKTCLL8SlPXieZs45GbmwgTZFxNrQnl/oagAO
-	 tcZ9J6SvPMU5OQG2iVuetcbcx/s2fJ1GkXNE6E/6AAv15tQyg9z3/rSfe1FHITFIwv
-	 f3Pvxpcte1UHUyXXPFl2IVhsM227toV+BMbGoDC86HTURWM4Dh0uBU8aeLszf6snUE
-	 57tgbDzmrIcag==
-Date: Sun, 07 Jun 2026 06:41:43 +0000
-To: Jens Axboe <axboe@kernel.dk>
-From: Bryam Vargas <hexlabsecurity@proton.me>
-Cc: Philippe De Muyter <phdm@macqel.be>, Kees Cook <kees@kernel.org>, Michael Bommarito <michael.bommarito@gmail.com>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] partitions: aix: bound the pp_count scan to the ppe array
-Message-ID: <20260607064137.302574-1-hexlabsecurity@proton.me>
-Feedback-ID: 199661219:user:proton
-X-Pm-Message-ID: f9681506637c14767eb4f36722ede7bf39ec4d1b
+	s=arc-20240116; t=1780829709; c=relaxed/simple;
+	bh=2Ke8GL6eZs0K05NJS+Nqfez/Em+cRte7rAqtogW1I8g=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=EYCnncGZEs2/Id3KacecED5TNO6azD+zsJBEHELJ0yhjXlQFN56OD7/1L6drx9MHxluN7SMlyjnq/53ViQUBYV6vKHIAXld8ycitwtNRgc/zQvppgXm/3nf6pdRVjsv4V5g2hv+2Vf2HNqDbqX7Z15c1Iike9Zr+rHA3klnETDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 657AsxJ2063554;
+	Sun, 7 Jun 2026 19:54:59 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.5] (M106072072000.v4.enabler.ne.jp [106.72.72.0])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 657Asxm5063536
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 7 Jun 2026 19:54:59 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <3244d4dd-8254-47c0-9609-b1db53450c7c@I-love.SAKURA.ne.jp>
+Date: Sun, 7 Jun 2026 19:54:58 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH v4] loop: Fix NULL pointer dereference in lo_rw_aio()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <dlemoal@kernel.org>, Ming Lei <tom.leiming@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+        Hillf Danton <hdanton@sina.com>
+References: <20260529220600.1226-1-hdanton@sina.com>
+ <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav404.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-aix_partition() reads the physical volume descriptor into a fixed-size
-struct pvd and then scans its physical-partition-extent array:
+syzbot is reporting NULL pointer dereference in lo_rw_aio() [1][2].
+An analysis by the Gemini AI collaborator [3] considers that this problem
+is caused by a timing shift primarily exposed by commit 65565ca5f99b
+("block: unify the synchronous bi_end_io callbacks"), along with helper
+refactorings like commit 92c3737a2473 ("block: add a bio_submit_or_kill
+helper").
 
-=09int numpps =3D be16_to_cpu(pvd->pp_count);
-=09...
-=09for (i =3D 0; i < numpps; i +=3D 1) {
-=09=09struct ppe *p =3D pvd->ppe + i;
-=09=09...
-=09=09lp_ix =3D be16_to_cpu(p->lp_ix);
+But due to difficulty of reproducing this race, discussion about what is
+happening and how to fix this problem is stalling. Also, we haven't
+identified how many filesystems are subjected to this problem.
 
-pvd points at a single kmalloc()'d struct pvd whose ppe[] member holds a
-fixed ARRAY_SIZE(pvd->ppe) (1016) entries, but the loop runs up to the
-on-disk pp_count.  pp_count is an unvalidated __be16 read straight from
-the descriptor, so a crafted AIX image with pp_count larger than 1016
-drives the loop to read pvd->ppe[i] past the end of the allocation (up to
-65535 entries, ~2 MB out of bounds).
+Therefore, this patch introduces a grace period for flushing pending I/O
+requests (which should be a good thing from the perspective of defensive
+programming) so that we won't hit NULL pointer dereference problem, and
+also emits BUG: message in order to help filesystem developers identify
+the caller of an I/O request that failed to wait for completion so that
+filesystem developers can fix such caller to wait for completion.
 
-The partition scan runs without mounting anything, when a block device
-with a crafted AIX/IBM partition table appears (an attacker-supplied
-image attached with losetup -P, or a device auto-scanned by udev), via
-msdos_partition() -> aix_partition().
+Note that emitting BUG: message is enabled only if CONFIG_KCOV=y, for
+this check is a waste of computation resources for almost all users.
 
-Clamp the scan to the number of entries the ppe[] array can hold.
-
-Fixes: 6ceea22bbbc8 ("partitions: add aix lvm partition support files")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+Link: https://syzkaller.appspot.com/bug?extid=cd8a9a308e879a4e2c28 [1]
+Link: https://syzkaller.appspot.com/bug?extid=bc273027d5643e48e5b3 [2]
+Link: https://lkml.kernel.org/r/fbb3edda-f108-4e5b-acf2-266f043f8125@I-love.SAKURA.ne.jp [3]
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 ---
-Reproduced on v7.1-rc6 with KASAN (CONFIG_PARTITION_ADVANCED +
-CONFIG_AIX_PARTITION).  A crafted disk image whose AIX/IBM partition table
-sets pp_count to 0xffff, attached with `losetup -fP image.img` (in-kernel
-partition scan, no mount), is reported by KASAN:
+ drivers/block/loop.c | 82 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 80 insertions(+), 2 deletions(-)
 
-  BUG: KASAN: slab-out-of-bounds in aix_partition+0xb6e/0xee0
-  Read of size 2 at addr ... by task losetup
-   aix_partition
-   msdos_partition
-   bdev_disk_changed
-   loop_reread_partitions
-   loop_configure
-   lo_ioctl
-   __x64_sys_ioctl
-
-i.e. a read past the end of the kmalloc(sizeof(struct pvd)) object.  A cont=
-rol
-image with pp_count =3D=3D 1016 (=3D=3D ARRAY_SIZE(pvd->ppe)) is clean.  Wi=
-th this
-patch the crafted image is parsed with no out-of-bounds access.
-
-This is the read-loop sibling of the lvd scan bounded by Michael Bommarito'=
-s
-"partitions: aix: bound the lvd scan to one sector"; that change does not
-touch the pp_count/ppe[] loop, so the two are complementary (separate hunks=
-).
-
- block/partitions/aix.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/block/partitions/aix.c b/block/partitions/aix.c
-index 29b8f4cebb63..f3c4174e003e 100644
---- a/block/partitions/aix.c
-+++ b/block/partitions/aix.c
-@@ -226,6 +226,15 @@ int aix_partition(struct parsed_partitions *state)
- =09=09int next_lp_ix =3D 1;
- =09=09int lp_ix;
-=20
-+=09=09/*
-+=09=09 * pvd was read into a fixed-size struct pvd whose ppe[] array
-+=09=09 * holds ARRAY_SIZE(pvd->ppe) entries.  pp_count is an
-+=09=09 * unvalidated on-disk __be16, so clamp the scan to the array
-+=09=09 * size to avoid walking past the allocation.
-+=09=09 */
-+=09=09if (numpps > ARRAY_SIZE(pvd->ppe))
-+=09=09=09numpps =3D ARRAY_SIZE(pvd->ppe);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 0000913f7efc..4ff254d8b623 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -85,8 +85,26 @@ struct loop_cmd {
+ 	struct bio_vec *bvec;
+ 	struct cgroup_subsys_state *blkcg_css;
+ 	struct cgroup_subsys_state *memcg_css;
++#ifdef CONFIG_KCOV
++	unsigned long stack_entries[30];
++	int stack_nr;
++	pid_t pid;
++	char comm[TASK_COMM_LEN];
++#endif
+ };
+ 
++static void loop_check_io_race(struct loop_device *lo, struct loop_cmd *cmd)
++{
++#ifdef CONFIG_KCOV
++	if (unlikely(data_race(READ_ONCE(lo->lo_state)) == Lo_rundown)) {
++		pr_err("BUG: %s/%u is doing I/O request on loop%d in Lo_rundown state.\n",
++		       cmd->comm, cmd->pid, lo->lo_number);
++		printk("Call trace:\n");
++		stack_trace_print(cmd->stack_entries, cmd->stack_nr, 4);
++	}
++#endif
++}
 +
- =09=09for (i =3D 0; i < numpps; i +=3D 1) {
- =09=09=09struct ppe *p =3D pvd->ppe + i;
- =09=09=09unsigned int lv_ix;
---=20
-2.43.0
+ #define LOOP_IDLE_WORKER_TIMEOUT (60 * HZ)
+ #define LOOP_DEFAULT_HW_Q_DEPTH 128
+ 
+@@ -1747,8 +1765,59 @@ static void lo_release(struct gendisk *disk)
+ 	need_clear = (lo->lo_state == Lo_rundown);
+ 	mutex_unlock(&lo->lo_mutex);
+ 
+-	if (need_clear)
++	if (need_clear) {
++		/*
++		 * Temporarily release disk->open_mutex in order to flush pending I/O
++		 * requests before clearing the backing device.
++		 *
++		 * This is a layering violation. But since bdev->bd_disk->fops->release()
++		 * (which is mapped to lo_release()) is the final function which
++		 * blkdev_put_whole() from bdev_release() calls immediately before
++		 * releasing disk->open_mutex, this changes nothing except opens a new
++		 * race window for allowing disk->fops->open() (which is mapped to
++		 * lo_open()) to be called.
++		 *
++		 * Even if lo_open() is called from blkdev_get_whole() due to this race,
++		 * the Lo_rundown state guarantees that lo_open() will fail with -ENXIO.
++		 * Thus, there will be effectively no change caused by this violation.
++		 */
++		mutex_unlock(&lo->lo_disk->open_mutex);
++		/*
++		 * Now that loop_queue_rq() sees lo->lo_state != Lo_bound,
++		 * wait for already started loop_queue_rq() to complete.
++		 */
++		synchronize_rcu();
++		/*
++		 * Now that no more works are scheduled by loop_queue_rq(),
++		 * wait for already scheduled works to complete.
++		 */
++		drain_workqueue(lo->workqueue);
++		/*
++		 * Now that no more AIO requests are scheduled by lo_rw_aio(),
++		 * wait for already started AIO to complete.
++		 *
++		 * Due to synchronize_rcu() + drain_workqueue() sequence above,
++		 * calling blk_mq_unfreeze_queue() immediately after blk_mq_freeze_queue()
++		 * returns has to be safe, for loop_queue_rq() no longer schedules new
++		 * lo_rw_aio() works and lo_rw_aio() no longer submits new AIO requests.
++		 *
++		 * Deferring blk_mq_unfreeze_queue() does not help because we are about
++		 * to clear the backing device and drop the refcount for the backing device.
++		 * There is nothing we can do if blk_mq_freeze_queue() fails to flush.
++		 */
++		blk_mq_unfreeze_queue(lo->lo_queue, blk_mq_freeze_queue(lo->lo_queue));
++		/*
++		 * Perform remaining cleanup, with disk->open_mutex held.
++		 *
++		 * The lo->lo_state should remain Lo_rundown despite we temporarily
++		 * released disk->open_mutex, for I am the only and the last user of
++		 * this loop device because lo_open() cannot succeed.
++		 */
++		mutex_lock(&lo->lo_disk->open_mutex);
++		if (WARN_ON(data_race(READ_ONCE(lo->lo_state)) != Lo_rundown))
++			return;
+ 		__loop_clr_fd(lo);
++	}
+ }
+ 
+ static void lo_free_disk(struct gendisk *disk)
+@@ -1855,10 +1924,18 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct loop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 	struct loop_device *lo = rq->q->queuedata;
+ 
++#ifdef CONFIG_KCOV
++	cmd->stack_nr = stack_trace_save(cmd->stack_entries, ARRAY_SIZE(cmd->stack_entries), 0);
++	cmd->pid = current->pid;
++	get_task_comm(cmd->comm, current);
++#endif
++
+ 	blk_mq_start_request(rq);
+ 
+-	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
++	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound) {
++		loop_check_io_race(lo, cmd);
+ 		return BLK_STS_IOERR;
++	}
+ 
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_FLUSH:
+@@ -1901,6 +1978,7 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+ 	int ret = 0;
+ 	struct mem_cgroup *old_memcg = NULL;
+ 
++	loop_check_io_race(lo, cmd);
+ 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
+ 		ret = -EIO;
+ 		goto failed;
+-- 
+2.47.3
 
 
