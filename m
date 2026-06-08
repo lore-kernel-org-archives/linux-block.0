@@ -1,117 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C8534CFC2;
-	Mon,  8 Jun 2026 03:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FB7351C3B;
+	Mon,  8 Jun 2026 05:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780890214; cv=none; b=MrRxL2mf62CuDMBdGWo3P/P+i/dpRICGlTzbxRKwJAmz3lvPj2xSO+oj93UJCCgfqhEjs8QgYsU23SrbKofYvlJJkFoPfbIcxeoXsRcjDMYZ2zIHPHJr+bA6hoyFIRLE6rw8bwOkpU9Zt5Ep5H25RI6JEq7RTnhYvliy+0R4qaI=
+	t=1780895363; cv=none; b=uerk/MaMuvi0WOdeKoMRMohKwkj2TPEQ2W3Qi5Gd643jreGYK/BNStdeqn5rN3Pyow3aFcRsd5ToYFbVTUt2rXtu7BL+t4qoNMU0OLNW/EqnyriABnhc4G3CYyIlgv8ERL8Z+0+kb3X/2L837q14rJMlVV4l/llfZdiyS1Q4Pq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780890214; c=relaxed/simple;
-	bh=Zb2XE25uaHlK/+opsNgYdYZJXxMxNofDlF0d2ZJgiGw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XHknd98WT451Tv1kpBaw8Al2+4u6jbT7oguDbJjfbu/MZ5irwT1UF7T438/55okQBxmBBaB/XpA7CgeuegH4qMrHfvtlk1Uifdvd/oQr36LukRXCeTkZWLhEUpO/8DNVQa+yVrcTkVzpwvG4GhcgIgMKNNlRQD1g9uvoIRNs65U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/hy1WWM; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/hy1WWM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48FB51F00898;
-	Mon,  8 Jun 2026 03:43:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780890213;
-	bh=AonplpX8sMcYxl+OvnPIJmvLE6nh3WkDiHtVVORseZY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=I/hy1WWM0CXwiJZsze4Z95np3aJq6uUHdKzNYSVT8eFfJc8A8LFQpseaCtzOdOpAb
-	 UE3j53LDXK6ypjGYSIdIPUdfqOMczpANEUCyukcBALvGj1Rv64qZTEfXBixfsMm7Yi
-	 u8J+/5ib6E24hQ/VCBMxIZ6mseDM5o6Rinb3revCHCGp93zLytyucnuMiwzg16L81n
-	 19aTzKCP0MxwTu9WN0iPjTe6QgC4TqCUhKVea7Cj2PeWPAKWZ2A8l2UyiQ+j3k4iX7
-	 ezLRGxkEFmVWu7ajqdqTqn6E9agBUPjnj4s2qGA0uxFvxTFfkwLS6mur1TLoA8CFz5
-	 V8mrh/8dkQdNQ==
-From: Yu Kuai <yukuai@kernel.org>
-To: nilay@linux.ibm.com,
-	tom.leiming@gmail.com,
-	bvanassche@acm.org,
-	tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk,
-	yukuai@fygo.io
-Cc: akpm@linux-foundation.org,
-	chrisl@kernel.org,
-	kasong@tencent.com,
-	shikemeng@huaweicloud.com,
-	nphamcs@gmail.com,
-	bhe@redhat.com,
-	baohua@kernel.org,
-	youngjun.park@lge.com,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 8/8] block, bfq: don't grab queue_lock to initialize bfq
-Date: Mon,  8 Jun 2026 11:42:49 +0800
-Message-ID: <1965073ea20f33114a8d903816b986e483b9bb34.1780621988.git.yukuai@fygo.io>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1780621988.git.yukuai@fygo.io>
-References: <cover.1780621988.git.yukuai@fygo.io>
+	s=arc-20240116; t=1780895363; c=relaxed/simple;
+	bh=0nv6nlIkvBiTD1u3V4UCm9ndYB57nlyx4ezw9HhOQwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RTeCjDXbx9+wa4QDAdDhjlkwr2g2G9GUuIJ/QLk5HKyNt++/o4YAGHSsXmJtlLBbWKFnZC5fMDOnPA5WLSrJNzz0KlnvNO6uIOxw1lhme3n545AIGMjL0FryBEuuekb9onQFj6eR2fZWAUMdHfMphoG3FQEjOkQX+UXB2fnIS84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A67B168B05; Mon,  8 Jun 2026 07:09:11 +0200 (CEST)
+Date: Mon, 8 Jun 2026 07:09:10 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 1/4] block: add a macro to initialize the status table
+Message-ID: <20260608050910.GB21313@lst.de>
+References: <20260605184441.590927-1-hch@lst.de> <20260605184441.590927-2-hch@lst.de> <aiMZ-PXXQ-NxOHT4@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aiMZ-PXXQ-NxOHT4@casper.infradead.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-From: Yu Kuai <yukuai@fygo.io>
+On Fri, Jun 05, 2026 at 07:48:24PM +0100, Matthew Wilcox wrote:
+> On Fri, Jun 05, 2026 at 08:44:27PM +0200, Christoph Hellwig wrote:
+> > Prepare for adding a new value to the error table by adding a macro
+> > to fill it.
+> 
+> > +#define ENT(_tag, _errno, _desc)	\
+> > +[BLK_STS_##_tag] = {				\
+> > +	.errno		= _errno,		\
+> > +	.name		= _desc,		\
+> 
+> Bleh.  I hate this.  Before, I can grep for BLK_STS_NOSPC and find it.
 
-The request_queue is frozen and quiesced while the elevator init_sched()
-method runs, so queue_lock is not needed for BFQ cgroup initialization.
+You will still find BLK_STS_NOSPC itself in include/linux/blk_types.h
 
-Signed-off-by: Yu Kuai <yukuai@fygo.io>
----
- block/bfq-iosched.c | 5 -----
- 1 file changed, 5 deletions(-)
+> After, I can't.  Yes, I know we have a lot of such things already, but
+> I don't like adding more.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 42ccfd0c6140..5cabee2d4e7c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -7207,14 +7207,11 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
- 	bfqd = kzalloc_node(sizeof(*bfqd), GFP_KERNEL, q->node);
- 	if (!bfqd)
- 		return -ENOMEM;
- 
- 	eq->elevator_data = bfqd;
--
--	spin_lock_irq(&q->queue_lock);
- 	q->elevator = eq;
--	spin_unlock_irq(&q->queue_lock);
- 
- 	/*
- 	 * Our fallback bfqq if bfq_find_alloc_queue() runs into OOM issues.
- 	 * Grab a permanent reference to it, so that the normal code flow
- 	 * will not attempt to free it.
-@@ -7243,11 +7240,10 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
- 	bfqd->num_actuators = 1;
- 	/*
- 	 * If the disk supports multiple actuators, copy independent
- 	 * access ranges from the request queue structure.
- 	 */
--	spin_lock_irq(&q->queue_lock);
- 	if (ia_ranges) {
- 		/*
- 		 * Check if the disk ia_ranges size exceeds the current bfq
- 		 * actuator limit.
- 		 */
-@@ -7269,11 +7265,10 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_queue *eq)
- 	/* Otherwise use single-actuator dev info */
- 	if (bfqd->num_actuators == 1) {
- 		bfqd->sector[0] = 0;
- 		bfqd->nr_sectors[0] = get_capacity(q->disk);
- 	}
--	spin_unlock_irq(&q->queue_lock);
- 
- 	INIT_LIST_HEAD(&bfqd->dispatch);
- 
- 	hrtimer_setup(&bfqd->idle_slice_timer, bfq_idle_slice_timer, CLOCK_MONOTONIC,
- 		      HRTIMER_MODE_REL);
--- 
-2.51.0
+I'm not a huge fan off CPP pasting, and especially thing we should never
+use it to define global symbols (hi page/folio flag helpers!), and in
+general try to avoid using them as much as possible.  But I think here
+the need to keep the names in sync with the tags exposed in debugfs is
+more important than the grepability.  Especially as this sits in _the_
+core block file, so it can't be easily missed.
