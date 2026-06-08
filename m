@@ -1,104 +1,178 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2892336680F
-	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 11:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2CA36C0D6
+	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 11:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780918980; cv=none; b=WhB7WSfuHkQ9q+v8eBQUEPHzzvkaQjsPY4nY/zHkvWBDOvxZwmRIX1H6DU4kJ3JEJD8bK+7jc3NcJ7FpCzx6MVZ3Ps3BF112/IpRbo9fE/QP6qjo+U/61iKUUq3oZS7ap4ETr8uAY0yy2OczH7SNIhisLFAlCDLkUIjHH7ZYYnQ=
+	t=1780919028; cv=none; b=Y5vIpThoOkqOA+xsc2q1K3BNe8f5NGSk2YeSBlmBFltEt4Uzyr2/SpmzPJAIhYiVwNwRfZKHouSZiPvjb+w4G3a2VwDoLlcR/kjcDUHF5yMzmVKS+hcbpOvD1QnpxmAo5+0+NBycgXbn7UYI/LiyzjMLH78wlsKweWpRAmf4GeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780918980; c=relaxed/simple;
-	bh=0ExTSIvgOCvddbqVu3Vq3relaC1BNhY7Z3b7v9+cAao=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uVYxOfAMA+2IA7Mfs6s2zVA20vWkAnxzzfhGnh5+7JvEk6cAGdMgllLPnMsFGyAxl3esvxjK7MEDt63exEVfH8yDzYrp9FwtnF+z8aVpqvmOY3kZqQ1GAew2nqJ3YTOLEhCeQjUBWTMwn7UeOCTphKI6tIojozT+yOT4rMYKdvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7Bo1ebm; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7Bo1ebm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05CFC1F00893;
-	Mon,  8 Jun 2026 11:42:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780918978;
-	bh=N+fj1phf5bXza/Z2Qq6aCdEd787CxhYgpMgZvaVm9jk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=V7Bo1ebmZNuKiuPHZjPKvygshZqwB0dk4cqoCNqqqjeNND6SDtMSk7/VAeq4IlIhm
-	 q9qJbPdq7ud34IVVdzMVAHHZEO/kCylu2/R7QmWgxetgO6pk+Y2gZCiSXo8KyWpo+0
-	 QGRGYkuT0KIYlKxQnsXLTUbov6HQwc3tspqu3zZ/hPcycaq8wtL40kMlXMEDK1AIN6
-	 ZDAXvB+f1zCjwO2JwOomuWTPkSis/NQ/P+RGdRVrMCb0YFDq7XmMAjGd06WOcGeyei
-	 t2yrWsya+mbmU+mZ6qCmwMNmXK+GWh5Vq4Hf5A6kZS1e9ENHcEDA4bnEUwVYwBTgdG
-	 xynzv0VgtjXnQ==
-Message-ID: <33035623-1f1b-4391-9212-e2af5fd9457f@kernel.org>
-Date: Mon, 8 Jun 2026 19:42:54 +0800
+	s=arc-20240116; t=1780919028; c=relaxed/simple;
+	bh=T0ZP64EorEPduqrDVPh40Gcjqo4lVu95jaLLfeFHwzg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e0quiD6b59lswBJuzNhInruYRtP6VlIT8xL0dXa9Hb3olUkek8e0QNzxolREiGJABewpu3VvKa3fcPb6dq9eeIWGJbqtpW3SB3+T9j9Q1nxygwUQyNGcrTcF0kKIx0vBuyZ0jVosR0VEI8mOghwVyGRUlG3Y/6EDev3/MjKyeo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gYqtP3vTJzYQvJl
+	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 19:43:25 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 9E06D4056F
+	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 19:43:40 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.132])
+	by APP1 (Coremail) with SMTP id cCh0CgA3OT7sqiZqxMw+BA--.50323S4;
+	Mon, 08 Jun 2026 19:43:40 +0800 (CST)
+From: Ye Bin <yebin@huaweicloud.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	yebin@huaweicloud.com,
+	yebin10@huawei.com
+Cc: kbusch@kernel.org,
+	hch@lst.de,
+	sagi@grimberg.me,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH] blk-flush: fix possibe deadlock when process nvme_timeout()
+Date: Mon,  8 Jun 2026 19:39:23 +0800
+Message-Id: <20260608113923.3893518-1-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: clear zone write plugging flag before failing
- rejected BIOs
-To: Jackie Liu <liu.yun@linux.dev>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-References: <20260607031814.19188-1-liu.yun@linux.dev>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20260607031814.19188-1-liu.yun@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgA3OT7sqiZqxMw+BA--.50323S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxXw1kJryUJw1rZFy5Ar4fKrg_yoWrZw1UpF
+	4Yqa90kr1rWw18tr4xJw4DJr1vvws2yFs3Jrnayr13Zr4DG392kFyrtFyFqF13AF1vvrZ8
+	WFs8K39rZFZFv37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUr2-eDU
+	UUU
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 
-On 2026/06/07 11:18, Jackie Liu wrote:
-> From: Jackie Liu <liuyun01@kylinos.cn>
-> 
-> Commit fe0418eb9bd6 ("block: Prevent potential deadlocks in zone write plug
-> error recovery") changed blk_zone_wplug_handle_write() to fail BIOs
-> directly when blk_zone_wplug_prepare_bio() rejects them, for example
-> because the write is not aligned to the cached write pointer or the plug
-> needs a write pointer update. However, the BIO is already marked with
-> BIO_ZONE_WRITE_PLUGGING at that point even though it is not issued.
-> 
-> Completing such a BIO with bio_io_error() makes bio_endio() call
-> blk_zone_write_plug_bio_endio(), which treats the completion as a failed
-> device write and may poison the cached zone write pointer state by setting
-> BLK_ZONE_WPLUG_NEED_WP_UPDATE.
+From: Ye Bin <yebin10@huawei.com>
 
-Yes, true. But you did not explain clearly why that is a problem. After all, if
-we hit this case, the user issued an unaligned BIO, and so forcing it to do a
-report zones to get everything in sync and the correct write pointer is not a
-bad thing.
+ There's when process nvme_timeout():
+ [  206.734601][ T8184] nvme nvme0: I/O tag 512 (1200) opcode 0x0 (I/O Cmd) QID 3 timeout, aborting req_op:FLUSH(2) size:0
+ [  206.736112][    C0] nvme nvme0: Abort status: 0x0
+ [  208.094637][ T8184] nvme nvme0: I/O tag 512 (1200) opcode 0x0 (I/O Cmd) QID 3 timeout, reset controller
 
-If fe0418eb9bd6 change is actually causing you problems, please describe that
-problem clearly. But ideally, I do not want to special case some error
-completions over others and prefer to have a single error path that result in
-the same state for the zone write plugs, regardless of a write error root cause.
+ [root@localhost ~]# cat /proc/8184/stack
+ [<0>] msleep+0x37/0x50
+ [<0>] blk_mq_tagset_wait_completed_request+0x6f/0xe0
+ [<0>] nvme_cancel_tagset+0x79/0xa0
+ [<0>] nvme_dev_disable+0x55c/0x7e0
+ [<0>] nvme_timeout+0x25b/0x1530
+ [<0>] blk_mq_handle_expired+0x210/0x2c0
+ [<0>] bt_iter+0x2bb/0x360
+ [<0>] blk_mq_queue_tag_busy_iter+0x9f8/0x1f30
+ [<0>] blk_mq_timeout_work+0x5dc/0x7d0
+ [<0>] process_one_work+0xa08/0x1d00
+ [<0>] worker_thread+0x698/0xeb0
+ [<0>] kthread+0x408/0x540
+ [<0>] ret_from_fork+0xa4d/0xdd0
+ [<0>] ret_from_fork_asm+0x1a/0x30
 
-> 
-> Clear BIO_ZONE_WRITE_PLUGGING and drop the zone write plug reference before
-> failing the rejected BIO.
-> 
-> Fixes: fe0418eb9bd6 ("block: Prevent potential deadlocks in zone write plug error recovery")
-> Cc: stable@vger.kernel.org # 6.13+
-> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
-> ---
->  block/blk-zoned.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-> index 6a221c180889..855767d8bfc1 100644
-> --- a/block/blk-zoned.c
-> +++ b/block/blk-zoned.c
-> @@ -1502,7 +1502,9 @@ static bool blk_zone_wplug_handle_write(struct bio *bio, unsigned int nr_segs)
->  		goto queue_bio;
->  
->  	if (!blk_zone_wplug_prepare_bio(zwplug, bio)) {
-> +		bio_clear_flag(bio, BIO_ZONE_WRITE_PLUGGING);
->  		spin_unlock_irqrestore(&zwplug->lock, flags);
-> +		disk_put_zone_wplug(zwplug);
->  		bio_io_error(bio);
->  		return true;
->  	}
+ Above issue may happen as follows:
+ nvme_timeout  // tag 512 request's flush request the first timeout
+   iod->aborted = 1;
+   abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
+          BLK_MQ_REQ_NOWAIT, NVME_QID_ANY);  // Abort tag 512 flush request
+   blk_execute_rq_nowait(abort_req->q, NULL, abort_req, 0, abort_endio);
+      // Abort request completion, will no wait
+         ....
+  ****'abort_req' not complete***
+         ....
+ nvme_timeout  // tag 512 request's flush request the second timeout
+  if (!nvmeq->qid || (iod->flags & IOD_ABORTED))
+    nvme_req(req)->flags |= NVME_REQ_CANCELLED;
+    goto disable;
+      ...
+    **** tag 512 request's flush request end ****
+         nvme_try_complete_req
+          blk_mq_complete_request_remote(req);
+           WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+            ...
+             nvme_end_req(req);
+              blk_mq_end_request(req, status);
+               __blk_mq_end_request(rq, error);
+                if (rq->end_io)
+                 rq->end_io(rq, error);
+                  flush_end_io(rq, error);
+                  // The timeout process holds the reference count.
+                  // so request keep MQ_RQ_COMPLETE state
+                   if (!refcount_dec_and_test(&flush_rq->ref))
+                    fq->rq_status = error;
+                    return;
+    **** tag 512 flush request is MQ_RQ_COMPLETE state ****
+ disable:
+   nvme_dev_disable(dev, false);
+     nvme_cancel_tagset(&dev->ctrl);
+       blk_mq_tagset_busy_iter(&dev->tagset, nvme_cancel_request,
+                               &dev->ctrl);
+         nvme_cancel_request
+           if (blk_mq_request_completed(req))
+             return true;
+      blk_mq_tagset_wait_completed_request(&dev->tagset);
+        while (true)
+          blk_mq_tagset_busy_iter(tagset,
+                           blk_mq_tagset_count_completed_rqs, &count);
+             blk_mq_tagset_count_completed_rqs();
+             // request is MQ_RQ_COMPLETE state
+                if (blk_mq_request_completed(rq))   // return true
+                  (*count)++;
+          if (!count) // So the value of 'count' is never 0, loop endless
+              break;
+          msleep(5);
+The preceding problem occurs because the timeout processing flow holds
+the reference count of the request, and the flush request is always in
+the MQ_RQ_COMPLETE state due to the special nature of the flush request.
+As a result, a dead loop occurs in the nvme_dev_disable() process.
+To solve the preceding problem, if only the timeout processing flow holds
+the reference count when the flush request times out, the request status
+must be changed to MQ_RQ_IDLE in advance. In this way, it is safe to call
+blk_mq_tagset_wait_completed_request () during the timeout processing.
 
+Fixes: e1569a16180a ("nvme: do not restart the request timeout if we're resetting the controller")
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ block/blk-flush.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 403a46c86411..d12839b1fcb5 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -213,6 +213,18 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
+ 
+ 	if (!req_ref_put_and_test(flush_rq)) {
+ 		fq->rq_status = error;
++
++		/*
++		 * The timeout processing flow holds the reference count
++		 * of flush_rq. If the last reference count is held by the
++		 * timeout processing flow, the status of flush_rq must be
++		 * changed to MQ_RQ_IDLE in advance. Otherwise, a deadlock
++		 * occurs when blk_mq_tagset_wait_completed_request() is
++		 * called in the timeout processing flow.
++		 */
++		if (req_ref_read(flush_rq) == 1 &&
++		    flush_rq->rq_flags & RQF_TIMED_OUT)
++			WRITE_ONCE(flush_rq->state, MQ_RQ_IDLE);
+ 		spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+ 		return RQ_END_IO_NONE;
+ 	}
 -- 
-Damien Le Moal
-Western Digital Research
+2.34.1
+
