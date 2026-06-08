@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BEC3ADB94;
-	Mon,  8 Jun 2026 08:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D893B388C;
+	Mon,  8 Jun 2026 08:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780907140; cv=none; b=gPSf2TSFitpMF9Q0XzIBvHhfFGq17sGLUnvpG6frn6QASA+Duj2sI47FDvctkN644jBixhYryUl3zrAkLbmIHmxC9akb652Nw2Q52ZktB/vgaqc8wcy3eMJeFUEc9PWSlrPg6niAEJF3wyvx+aMTBhOdxFrdDO2Ospo5rdrKe8U=
+	t=1780907996; cv=none; b=u9bjfD1Kw8eomZfHagAPjADH3qdDZR/qex0oRD3roLVD9IC8fVk57pnZ36j/Oj9Tm6nlxveuYhZq58zgOEAs4W4uQ4AvEcrtyIA0QIN8EMwd1wO5s/iQwn8MO5h4M/2Z0DmTvt8FesTZQiZMBQm9rPlCoouAYAmhYtE8/hL6un8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780907140; c=relaxed/simple;
-	bh=81tZ6uqr6vxiXYEcG14j37NbBeu1YXEHO1iGp3knNjQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KpW0T/ZXlGrC+iwpfn/7e5l7u2XP8o2e5KjYYQ0w7QBKEzFXLVABy+pZnriM9vF+kmRMPPOA6cqitdWfjZFOpd6gZ3fAyMD6M+ApX4aI5SKdVhoGMnKRAxjJ5kBlFtHDqzCS1ntEsmwEEskSITfPWiLavdjohMYeqBVKNKdpomw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2yWKUSj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780907996; c=relaxed/simple;
+	bh=5bZQEodZYkoQoPTjEr40grAB/HpR0uE3i99cIUUCoNY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fk99olIUG0rw6uEuDfbaVNCgCDQ4tmuBh0ScIcMO1ZQTQ9RjUMEEspKP4md9Pg2Y+pDQLRARVmhkaqI6U0Q/TaA/GT3ByxyHGBjzL7N7FWn4Q+llBvhfb5BUuXrX+MU+GMUyRIz22m5+lNeB9VqvSKLpBlWK0RL0DIbcyASX5D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I3rxYjDj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2yWKUSj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 782FA1F00899;
-	Mon,  8 Jun 2026 08:25:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I3rxYjDj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2CA01F00893;
+	Mon,  8 Jun 2026 08:39:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780907138;
-	bh=UkXpD2yPDo3XPKG6ddQID2Op1OA1vFwtRr7+pDnM+FY=;
+	s=k20260515; t=1780907992;
+	bh=9JSfso993lFR9GmwDHM74cr3hxR62qICnWinSSZM7iA=;
 	h=From:Date:Subject:To:Cc;
-	b=e2yWKUSjFyTfFH0G/TgVNH5bVnQSY0lHNiddneb0NKaWEaY6dwlXZzHm4mCk4AoSr
-	 rJbxPH+8SnALJdmln9S2ItLFkB5xF01OJZWaqsvhzHIJtb9FW4TXy8ZybwRig73NM+
-	 SFVLfFS+vgqZEYsdCvhoZE6GNfjsjESuTYkop5WI0noTHIBTR6uoERHZHFdrl0NAau
-	 j/UdDg/DNuamHsVNyZ3bMfUSIDWdITssJlV2Nc+sHp9TkpSEX/QtWFZMckOMQEMP1q
-	 cPjKzs9w2emRqOI5O42jY/8jzm2mbhewMXhojgK5PyGwdON9bbx25Wfk6PxavpBFO+
-	 wtw6YhsyI5m7A==
+	b=I3rxYjDjdWSxiRTYMdGUXJtuMrUeTUm2C42SshFb5U48Oa4sZaYqWQjBgEjPFS2rJ
+	 KvHzCdZQSe0e0lpGbmP1rY7tdubUjmBfFwCJuB0ii+56fD2EY3TtZpyURKO/qK9SQ0
+	 xKanKtd1hpFp4wNzUErOhdZxQM4blZPsJSUpu9uIGQ2UwJKoCzQRJcPTuBDb3Kjix7
+	 p1nmF1CwAPXwSeu3Cupp3YE2Iya41sv7GFBqtLkATx/7Jzkl4l2N0lSTaC5CFxUmXu
+	 xSfmT+sSQ1+/iMGDy/lD0/x5JFfjyOc7PS+HwDBrETQ8Q9dSEVQVJQQhPrbqcoVru7
+	 NBXVd9WfzDYMw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 08 Jun 2026 10:24:34 +0200
-Subject: [PATCH] rust: block: require `Sync` for `Operations::QueueData`
+Date: Mon, 08 Jun 2026 10:39:43 +0200
+Subject: [PATCH] block: fix arg type in `blk_mq_update_nr_hw_queues`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,73 +36,105 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260608-queue-data-sync-v1-1-0efff051aaf3@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAEF8JmoC/yXMMQ6DMAxA0asgz7UUghQhroI6OMEFM4Q2JgiEu
- DtpO77h/xOUk7BCV52QeBOVJRbUjwrCRHFklKEYrLHOONPiJ3NmHGgl1CMGbI13jnxTWwpQqnf
- il+y/Y//8W7OfOazfDVzXDTeAM/tzAAAA
-X-Change-ID: 20260608-queue-data-sync-80b66ab312ac
-To: Boqun Feng <boqun@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Jens Axboe <axboe@kernel.dk>, Daniel Almeida <daniel.almeida@collabora.com>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
+Message-Id: <20260608-update-hw-nodes-arg-v1-1-19aba440b32e@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAM5/JmoC/yXMQQ6CMBBG4auQWTvJCISgVzEuavsDw6KQDqgJ4
+ e4UXX6L9zYyJIXRvdgo4a2mU8y4Xgryg4s9WEM2lVI20kjL6xzcAh4+HKcAY5d6vtUCDy9VK45
+ yOSd0+v1dH8+/bX2N8Mu5on0/APnTygd3AAAA
+X-Change-ID: 20260608-update-hw-nodes-arg-940ecec0380a
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1827; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=81tZ6uqr6vxiXYEcG14j37NbBeu1YXEHO1iGp3knNjQ=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqJnxEcvTUOxGfHAHKjSzJ5dLQqQJJ5urIlG2FA
- f1KxE4fUDKJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaiZ8RAAKCRD6UCkIqsW9
- 0FlPEACZZLNBWeKuWRs78Umrg5q2Wzmc/vTBJfDz6as9boc49kPDP83g7cJwTh96FZy1oY4hdaf
- 1R81MxGMUZs04JJEIyKUSdT1QOOM+C2okXgvQUakpij1R6Gvnfc1QuXpq2XuuzWoKqGvtrpwGrl
- 3Zpt3d96Pl1BreZ3fWROZKPXGaZFDwmPMqxN+gJ2eZX4+/AEoLpTHbUHzkWS+rsAOY07Dygbdww
- UgOe8Kd7zIznT68MvTGaKz8Spgd1CaLZPD0S00AN40MZjjJgH/W8VTeiIm4WvW92CmqyxzWcDa3
- nWVUoJFjFE57rZ/T0Grqsw4YPqUJQvlw+kJM4P5eC4/ZbGzHOOlM0TtdE0zFBE/V4cpg64c3Y1i
- ytOWcnj9+fNoXdeAGkWWR6VUV2XhK8cG7RdrG8npo8QqznCr8QuPXeY/QBezZZkBnXYcFIiB7LN
- 8u8iW66QEADr0zeB1PJ67Nps6Vxb3yJXQ/0MeK1Q1gqnoeErojBKAFc1D5tOS5mFBxGqF5r7iE+
- jJG/YMuO6E2whHhRNSZvm9CbA/fR4pRK9Pt0Vf/JAzyE4lw59NypQ+dNSbcKzjY8VzVkkru13n/
- /25ysalabSp+nrtZ4QEORmXGOskPa1zTsZqq4T+/4wEapmnsWcSH1BOGZLdGgnEVhzodHUOc1qk
- /9LBnv/uzaAkm2w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2739; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=5bZQEodZYkoQoPTjEr40grAB/HpR0uE3i99cIUUCoNY=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqJn/PQ5ZX3XRCDrW/Z6cEMwU9zYS+NvcidF05p
+ 3EBgXcsSNGJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaiZ/zwAKCRD6UCkIqsW9
+ 0PgCD/9AKpDysDlpGqetru8na5hXfx2eVwQlbIz2K7IIf5dB4eSL8Ty2L4NSRT55545PMpK11q1
+ XZbU/PSudBr3YyxOJqGUuUW+tBqe/Iv9pVRoouWOajqa8NsZ/qksS6qNBFNUjfjoHqvvVBU4Kjf
+ QWwselLvsyTYQVAEdjckad+t0gtZXVG4EBxQfOaD1N3YQeTKW3+Fq9d+WHAXl8y4iC8eWds01iP
+ +bZdut9AEICQzzONMNckaH+jhLU/9kfFKXg/GfYoqYbfffpPUx+gB/1+72apFTLC+hkaL3J6F+N
+ SPzk0RtJRKrCrpcnxwYYpBVufyQjFReNgNEaBrN1d/Fypy1GcuTCRqBZZQKVFsadK87uMDZgYOO
+ UFFytA9zKK0V49xQUV7LZGY0cP9SyvtdT5ohGyEvOsBerVhLmM/c+zuJMJ8nvmowiwGeK1rNV/m
+ ULjz19dIQQyXrRBXu5HVethYRGxkcraMh2BDcUPyHVuvu/QWdf4BjixIQB9Xo5/NHHtDavqHexS
+ 62jJwC5q6C9ecNEddFmjh6odU9mk3WN11MJNfeLG/PjrnaO+VnOAV5YW7F0/BroJAn9Xg35bClF
+ 1pNE3XciZyidPi+1+/VrktBGvQhphGMoE9KK6OlOzUsm0BV55YK0JezFXj/14akV/LqNDEFLuxF
+ 49Cm5EkGLuC5w3A==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-The queue data installed in a `GenDisk` is stored in the request queue and
-handed back to the driver as a shared borrow through the `queue_rq` and
-`commit_rqs` callbacks. Both callbacks obtain that borrow via
-`ForeignOwnable::borrow` and may execute concurrently on several CPUs,
-since the block layer runs one hardware queue per CPU. That means a shared
-reference to the same queue data can be live on multiple threads at once,
-which is only sound when the referent is `Sync`.
+The type of the argument `nr_hw_queues` in the function
+`blk_mq_update_nr_hw_queues` is a signed integer. This is wrong,
+considering the field `nr_hw_queues` of `struct blk_mq_tag_set` is
+unsigned. Thus, change the type of the parameter to unsigned.
 
-The initial `GenDisk` private data support omitted this bound, so a
-driver could install a non-`Sync` type as queue data and then access
-it concurrently from multiple CPUs without synchronization. Add a
-`Sync` bound to the `QueueData` associated type to rule that out.
+Cascade the change to downstream functions.
 
-Fixes: 90d952fac8ac ("rust: block: add `GenDisk` private data support")
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq/operations.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq.c         | 13 +++++++------
+ include/linux/blk-mq.h |  2 +-
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 8ad46129a52c..89029f468f44 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -30,7 +30,7 @@
- pub trait Operations: Sized {
-     /// Data associated with the `struct request_queue` that is allocated for
-     /// the `GenDisk` associated with this `Operations` implementation.
--    type QueueData: ForeignOwnable;
-+    type QueueData: ForeignOwnable + Sync;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4c5c16cce4f8..5eb9b52f3146 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4816,10 +4816,10 @@ static void blk_mq_update_queue_map(struct blk_mq_tag_set *set)
  
-     /// Called by the kernel to queue a request with the driver. If `is_last` is
-     /// `false`, the driver is allowed to defer committing the request.
+ static struct blk_mq_tags **blk_mq_prealloc_tag_set_tags(
+ 				struct blk_mq_tag_set *set,
+-				int new_nr_hw_queues)
++				unsigned int new_nr_hw_queues)
+ {
+ 	struct blk_mq_tags **new_tags;
+-	int i;
++	unsigned int i;
+ 
+ 	if (set->nr_hw_queues >= new_nr_hw_queues)
+ 		return NULL;
+@@ -5134,12 +5134,12 @@ static int blk_mq_elv_switch_none(struct request_queue *q,
+ }
+ 
+ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+-							int nr_hw_queues)
++					 unsigned int nr_hw_queues)
+ {
+ 	struct request_queue *q;
+-	int prev_nr_hw_queues = set->nr_hw_queues;
++	unsigned int prev_nr_hw_queues = set->nr_hw_queues;
+ 	unsigned int memflags;
+-	int i;
++	unsigned int i;
+ 	struct xarray elv_tbl;
+ 	struct blk_mq_tags **new_tags;
+ 	bool queues_frozen = false;
+@@ -5234,7 +5234,8 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 		__blk_mq_free_map_and_rqs(set, i);
+ }
+ 
+-void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
++void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
++				unsigned int nr_hw_queues)
+ {
+ 	down_write(&set->update_nr_hwq_lock);
+ 	mutex_lock(&set->tag_list_lock);
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 18a2388ba581..f73b4a1f16db 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -974,7 +974,7 @@ unsigned int blk_mq_num_online_queues(unsigned int max_queues);
+ void blk_mq_map_queues(struct blk_mq_queue_map *qmap);
+ void blk_mq_map_hw_queues(struct blk_mq_queue_map *qmap,
+ 			  struct device *dev, unsigned int offset);
+-void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
++void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, unsigned int nr_hw_queues);
+ 
+ void blk_mq_quiesce_queue_nowait(struct request_queue *q);
+ 
 
 ---
 base-commit: 7fd2df204f342fc17d1a0bfcd474b24232fb0f32
-change-id: 20260608-queue-data-sync-80b66ab312ac
+change-id: 20260608-update-hw-nodes-arg-940ecec0380a
 
 Best regards,
 --  
