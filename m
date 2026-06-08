@@ -1,82 +1,86 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EC33F7AAD
-	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 15:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C882EEE82
+	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 15:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780931101; cv=none; b=ur+MrzKQUKWNVw9+yhLe8d9u+O8xKtrljeI1y9szvlwtDhjFwFJgEEqalgMz+Da0jyiTLF8qAIuoRwq234bsernHyBocs0CuJNDVZ8S3lP7I+8U/ymJllnYd3HjqH83JJTnE+qdX1mb9xMcjvaQJFEK665gvJpEFK1c05iMB8CE=
+	t=1780931745; cv=none; b=BG6Lv34WXXoCJQgKYVtVhysLs8JuK2Ij0ybguIafFP8EFxONL5MzXZB4u3kfnwpayuSwgneiAEcbsaGSyzuZkAtMIPkxaKQP95Pv8Oryvdt7dBXvnJ3Gcn1jfTKsCMrHFRippMlpd6aI6iCU2MnvKg6g+gwODh4p2PvcHIa11i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780931101; c=relaxed/simple;
-	bh=7SeLp95Vfk6snL09LkKinxfI2r/8HHgazzYIPOcq2EY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AQlpfcnc33VvaAmOYTaNOaGUHnMfKvn+8Hxy+f5mc0BqWlLWyfND7pbWEv198zR66nys8nV50u/EIrRl091HolZtnD9OPOtts1BnCR+ZUal3x81QLFZ9so/6Eoee0mgg01LLH8op5icOz2Hep211EW8HkJ+oVUHPTw506ymIdCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gn3Wy2Pw; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780931745; c=relaxed/simple;
+	bh=2QVwxrh4a/ZZYirQ5m2CzbMgnpm4A1vBhilyI2+vzpw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QoWSD2Yns9tKtgx6teCqvJhFw7kBBorPDhSfi4fdbNIvxwjv9tswhW9RxVN8FEBWq6sOAIomfnGU6mTHfutIki9+PLOIC68WDULQLb//y5JDIABmXR74Bd3ryYeyYOK4Wg8l1HFK9qiEdOXBcusv+Pa2k3fBfAaNrKKG6VHGp0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=z8hMUgra; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gn3Wy2Pw"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7ea6923cc94so44190747b3.3
-        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2026 08:05:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="z8hMUgra"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-4863cd41330so3305460b6e.1
+        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2026 08:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780931099; x=1781535899; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYVqYxcJfgMHzsP2anvp/RrbkY5FndehAHOdAqsvlis=;
-        b=gn3Wy2Pw2ZdWI7IMKuAaJSK4gUXzp5i6SvTl6+k+QmSTeCgyeNSPDDuIs4O83RQOc+
-         vhLc3l+sDgmyPjkM8CJtpeVxGtvIGBY9SC4d0wujhfLBAnAhb3/2fjnYf42HOWaNHTMG
-         189fyeDLy/6NAF/Qt2VJZHVSWnD0rLBp0pYu1BQ47/hMjwxWJZieBP7T52aZAz+Q3mIH
-         4DOLeN4Cs/6Uzw3dGNNMRTuzC0ryWePDyq2CurHDhwlpK2x7RGoEFRwBsC90lfiF9ped
-         Zo8EziUYAarG3PQDvZ1Yurrfh++sug218hKdA5DLHgRYfomp21YdfFojnc4L1mE4VmzT
-         WhLg==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780931741; x=1781536541; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8359BKdjiJzlljcqmkz+cgMu1mtfDcXYE9249W7UZ98=;
+        b=z8hMUgraU9hJul0JH7iF7DPWPg/fcQU/A0Qjq4bhkopzE+YfYGhcogcqsQsIsKUpvT
+         W5lbBtdQkNVNyGBJEySni8wi1Xkt8gEdqqZ37A915Ccr0V/UENGFd/OETTPE6Z+wTLTo
+         WZB16jbIgE1l0w36kR+7od/K4kkkVAduJyvn5jtVlG1HVg/yKFw2M3I38yW+16e30OQs
+         ApS44ID40y+HHmI/wY4u4uG4I9G4haj2ebJOQPap2qXRfT6UEJXSmuolrVzCzSrFYBNe
+         Ezgs3eJ0qnkJiYgqyLknq4qQJYZNQlmFrJmxJn1UXYx9oD63VbRKf/DeHNNfXVuv1VKm
+         UTCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780931099; x=1781535899;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fYVqYxcJfgMHzsP2anvp/RrbkY5FndehAHOdAqsvlis=;
-        b=Zj9xEvvlFIbVZTHDRxqdpnF6XZAAr5pNFLj0gb8NnxDQjowBLil+dQcA4Abt/722C5
-         bOSDeN92Z9qQ9ZR8BEMw6IoTIbTKIAwzRT6q+dwKR8U3HZ/1RL3wJy/+LWjsAGi2eDMu
-         pLiTqBe03yyT606SUphnUwqGz683F6IYZMVa7+rkgB0NMyOWjwOxbtOrP7F5A5wHp1C+
-         tBGR/7QC/C6EAJtnHOrYTVmbdxj9ckKdyQHM5/5gXbRXQj4LW2QCa9A8CCxrkMyLVlpY
-         xABGs7H2/YBDgwO5nFoBGH/EE1ZACGBcajGu0MlBQd3Kka0Lx4owtWqNCzkPHylmOyaS
-         XSzw==
-X-Gm-Message-State: AOJu0Yy5bz1vH+n2T3+B5U/r0bAuh1XCdOZqMcUffvwh77ucTsVmh5vB
-	LolyE/V3lbh+jaMWvX3TG7VgwUEqYOD1oCBpOSERaKG6f+yRfWCAiLnI
-X-Gm-Gg: Acq92OEgVooFNbD695y6+KYrtIbznrY+k1ZwzQxpU+fRFNVdYFjSah3l4NPQzhWN5BC
-	aD/nsaTY1c15+TerNCToil/3YdgoKYkxN3X5yIEpTYp8cvke+OEi8S4JCgjGqJWHG9Ufev9PIG8
-	sEwiRrWs2T0p1GU/nLPHc/+ZK2KqCnpjFvbbvfNsZJWR2DvEdhIp+FtlhEYCnooiK6euKO0MYnS
-	KlG18AysQlegNwGpC0XLK3en5a417G7bE+c56LTH8FqpFmfPhIG0y3XtGPnkCSxIMOVohcfz36r
-	GGFH2pWmH8dRrFWxhw068wFC5We0A2WKUHHfq/ExH2EApoEBuKJ3NRxUa/xE4dq0yvEPfck66PQ
-	6Gdvy1qkzsPA7gVcbwAEsxP3r8zJrCSFy9SLO8hK1IWezAyUY73/hmMmxwMKhc9Rod0ERzJANwD
-	DCrWQdME8yVrVdDs++1rbEL9cCUOweR4Wd6kxw9iEyGZ/yN+nU7nWLPnt+Kr0rk64RC4ypYD9/1
-	1tUvGZTN8XPlmgk6dQqPBt3rCM9Tic+
-X-Received: by 2002:a05:690c:3349:b0:799:198d:8c5a with SMTP id 00721157ae682-7ed0d1d9ccamr158780637b3.34.1780931099494;
-        Mon, 08 Jun 2026 08:04:59 -0700 (PDT)
-Received: from fedora ([172.245.82.59])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7ea23a9946bsm84389287b3.37.2026.06.08.08.04.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 08:04:58 -0700 (PDT)
-Date: Mon, 8 Jun 2026 10:04:51 -0500
-From: Ming Lei <tom.leiming@gmail.com>
-To: wenxiong@linux.ibm.com
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, yukuai@fygo.io,
-	wenxiong@us.ibm.com
-Subject: Re: [PATCH]block: Observing higher CPU utilization during random IO
- testing
-Message-ID: <aibaE-1IARUyTWTg@fedora>
-References: <20260604162709.3006327-1-wenxiong@linux.ibm.com>
+        d=1e100.net; s=20251104; t=1780931741; x=1781536541;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8359BKdjiJzlljcqmkz+cgMu1mtfDcXYE9249W7UZ98=;
+        b=MEjWkvs6dH5f77dlXVfDm8pTkOOn+YRziKvBxJOTfBwsPg/kcqQN9dEuj39GoEn5gJ
+         5zI7wuvW70+y3iZCobRhLjYIQ12FEsM5F3hrjHl3mF6VziAO+V2i3XM6udAk2OpOg7J0
+         9HqP+qZLjk5Na4W+/1SKjwa0CoVsO6vKnpwAPPVflmKbX3IFEo9aXkunso1QEin0sziI
+         Qcewj4HOp/OZbzWb1zj6V1oRbPwjcgZBz7kTgDry9zeYplOUzVmj1AIJNwrpkp8/oubN
+         SB8SFYltxLvrachiFiYTXo65Qh8ADdBvIQ+QI/4OulIATHb8uZ04dZE2EQqHhXun/2J4
+         mUjQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9Ef45nkCnkR/6wa9AM/tdQshSV77RjaNOI/Rvam27pV07GZPOrNvqfPXGfIthHBZzHFmdkvFK9ewQbwA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZvHINVfLT7iMTdwNDWOWg49rdeF0l9qSEbTBn5C3aGmX3GjXO
+	NjiP4tIXKlWHdlFrd9nEXufjKncp9ELArHUkl6ndw2AdWd2DIfSgAh0VUnIRGXrWR+k=
+X-Gm-Gg: Acq92OHTc2rjlvK3wXPv8MLzOUyPrg40/wLTibbj5b9tNgUpVluuQiojVdR3a4sDaqf
+	4eUAQhZ3Ae7dIaIBJpK7/hALXrpmQ4oGODvwV7Yr9cmFuEzKqQU3OcGRpVnFZm/KytNHZp4+qbL
+	+O57OlpowXscm1mF/pIRKv187eQI0OrZAN2QXWxQ7eJesEV7HHDmRgw/YZL77hkrkFWCIGqFvaM
+	Ua5Ng8cQMmrYTGQubCjjDDwqvBybyc43dB5mwVlzWmIvuzYfR3lzjhfSm9oyNg0nT7m47EO0Xah
+	jp8iCafa+607yEB7kOXeefil/M/Q+xLKtlgO8xxY6Rl2LWmypl/y2VRk6B20GPFMkO/Pf3KKE6X
+	Ie2Vm202/sJfAlHa6tC6MvGwPiJqbQbBjs2NF685HNpCE4WGtmDQbPcTGpnlE2IjMeHWb1QO35i
+	r+pXd7/bXpnOTYxfbkmkYkaOXmKQbCCzQIam/Powfad392BVA/8kh1Ow++XFd2BoiM6Cl3vI3c0
+	4jmMlOzCWFt+mJgx1AF4Zc+rVrNeTM=
+X-Received: by 2002:a05:6808:144a:b0:450:b249:71bb with SMTP id 5614622812f47-48692e390c3mr5909165b6e.19.1780931741331;
+        Mon, 08 Jun 2026 08:15:41 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e6e71fe69esm12877934a34.0.2026.06.08.08.15.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2026 08:15:40 -0700 (PDT)
+Message-ID: <76b46c10-201a-4bd1-85a8-49ae6bace572@kernel.dk>
+Date: Mon, 8 Jun 2026 09:15:40 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH]block: Observing higher CPU utilization during random IO
+ testing
+To: wenxiong@linux.ibm.com, linux-block@vger.kernel.org
+Cc: tom.leiming@gmail.com, yukuai@fygo.io, wenxiong@us.ibm.com
+References: <20260604162709.3006327-1-wenxiong@linux.ibm.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
 In-Reply-To: <20260604162709.3006327-1-wenxiong@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 04, 2026 at 12:27:09PM -0400, wenxiong@linux.ibm.com wrote:
+On 6/4/26 10:27 AM, wenxiong@linux.ibm.com wrote:
 > From: Wen Xiong <wenxiong@linux.ibm.com>
 > 
 > Hi All,
@@ -89,10 +93,6 @@ On Thu, Jun 04, 2026 at 12:27:09PM -0400, wenxiong@linux.ibm.com wrote:
 > 
 > Given commit 060406c61c7c ("block: add plug while submitting IO")
 > causes performance regression. This patch reverts it.
-
-One thing is that plugging should be applied in outer io code path, also
-it doesn't make sense to apply this timestamp optimization for single IO batch.
-
 > 
 > Below is performance comparison with the latest upstream kernel.
 > 
@@ -104,14 +104,26 @@ it doesn't make sense to apply this timestamp optimization for single IO batch.
 > Randrw  1    40    70        60%                 26%
 > Randrw  1    20    0         14%                 6%
 > Randrw  1    40    0         20%                 7%
-> 
-> Signed-off-by: Wen Xiong <wenxiong@linux.ibm.com>
-> Suggested-by: Ming Lei <tom.leiming@gmail.com>
 
-With commit log update, this patch looks fine:
+I'm fine with the actual change, but the commit title and commit message
+are pretty abysmal. If you were browsing git log and came across
+something that said
 
-Reviewed-by: Ming Lei <tom.leiming@gmail.com>
+"block: Observing higher CPU utilization during random IO testing"
 
+then what would you think the change did? You would have no idea. That
+title is a bug report title, it's not a git commit title. A good git
+commit message should tell you WHY a change is being made, and the title
+should be a short summary of that change.
 
-Thanks,
-Ming
+I'll rewrite these, but please keep this in mind for future submissions.
+Should not be necessary for me to completely rewrite your git commit
+message.
+
+You also identify 060406c61c7c as the commit that this is fixing. This
+goes into a Fixes line before your signed-off-by. And you would
+presumably want this to go into stable as well, yet that's not tagged.
+Please read the documentation on how to submit patches.
+
+-- 
+Jens Axboe
