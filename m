@@ -1,66 +1,48 @@
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B343F1AA6
-	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 15:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42094285CAD;
+	Mon,  8 Jun 2026 15:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780931912; cv=none; b=V9+jGO36vjb/7uyrje0jlN6lZ4lxtZJVEI5RITNsyEaaDPZAQt9kvIsXc0oPB1wIa8Olttqlik5BGfpvpwgt5JKQHhDimpcBYDJPlFdz7YgbuSyxZXjZNdEh0qg0rqJVogUA+k52UQI7g8vCIKurR6x3UqBirdWYRPoLJh7aoy0=
+	t=1780933856; cv=none; b=VtHqWTQfKaxiKQHCVEcUO6AjQry9d7OJthVUKf1q1T5vsJ3smBn5H7A6yzQHEB8qd9IhEhnM1SuYDZ9demh/U54EYE1KjR7rlwjG5fR7EsQDsd2/z524VQ6ds2+T8YiA1+TbyEOaK7BbXZNOJ22eUDLBBh2dmo+I4tHsM60OZh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780931912; c=relaxed/simple;
-	bh=o0puYPPim4DUrzgBG9/Emc8s91+qJPiAOCOEiacZMTY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DmXnqOO1raZl6z0el4uDbHphJkehEP3xQnwnlnUQsdiHZ7BQ/3jepZVUFzUySGvtjentrjkhwr1LBP/AfGeMc31S37dGkwcS9IaGf1GGdg/ta5+jwBNbseq86sSQMuJTdauGcfnZY9vgzI20dPwNTNwbB+JYeQgsJH7Y8XxWEAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=HoJ0JeMi; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1780933856; c=relaxed/simple;
+	bh=Pu2YAEDcMH/maHI/Lle/4AyF4oPuDsyUwWoKR2PyomQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XXKq5FGieiiyUKFGR2oFFmiPVHZoRNXJBXTLa4rJ/iOeOfflhlzOPCMAUJeKFH+ta+yAdJMGdnncYdfSCafz6DcCsDRwI4BKO7MbJoca6MwgxtKQ3KvFIAfRZ/aU34kpNJIk7l9DCgJf1sH0TtmbA99dozDyCZ7gsrIGtn9QF70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZOcR/PIY; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="HoJ0JeMi"
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-69e7dfcea4dso1124738eaf.1
-        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2026 08:18:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780931909; x=1781536709; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6+aoZLgIF6RxB4GnlL6NukkvD6+OSILH5OgbCqQntZM=;
-        b=HoJ0JeMiR6Y4XuuFjeZ/ScFGK1QPyos6ZJMw/4QpoCcz4aYFCpKpT1FVvI3lkBrok+
-         D9Zt6q+K/K7dNUGxLW+E3d1TdElNv5+1Pwgqrm2IEaHNM4h7D8zUh50PmivUBgSMi4Y8
-         +Q8g4EVXFyYz+BMYGw4yFNt69Ai18Syf8vCsglwFfkBv7iwLkTMBW33KCXC1pi4fhf82
-         8/+WfVi48+2+jGhuWWxy9WAmT8+rAyjar00WF8wAaxPa970Vj3r7zHOTdlLCkN4sTUg+
-         ty3XLVEUjxgbdh4MX2jDwkgFHHXQ0Pt98sIr5dJ7nzzhj6NQJ4AxSujvlHx3mjusUW2D
-         n2pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780931909; x=1781536709;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+aoZLgIF6RxB4GnlL6NukkvD6+OSILH5OgbCqQntZM=;
-        b=spSAEZ1Wh8CWPfn+jBm/G/fJaB8/99+Um0qT7con8irPSOFZrTwG3Na6EORpPblyun
-         3wJKeX1AH+DPz2upoIk5lLVYXS+Gf67iLn5K0bA6haEcN5oOpGHJQZ8SDu0vZfXEkUC5
-         6C/OOdr7eCPMPU+i4iomODN8pRaSWOamtIZoWP3OWXujBSh/KIju8vCbSMonjBHY+NQp
-         U+4T4Z4qyVLYIXoCPcUe2YQK1UdBNwIbb5uMcQis4AwapEjv/S63PpCWPqAzbdJmMc0j
-         diTxveGJeAf2Ffqqy9lfrUVfZG4uIqnTkideK7loNbweyXbebNet4DalyhgtbBfBQ3pH
-         l2WQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+C2Hc3AMhcJFhV8TADM/TWLERzxYP5Y68kaov/vsBJg+NloiePoJa3X7ZrO152l0IFuYMstC3jY8K4eg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6M9TinODd3+VZXW7L9BuSMbPBpgORohRW+PJcOjYK5T3hGdRt
-	9p6gRPc/tzCDGjZKCQOOhaF6XIkvFy/NstscsSYIagqLa86tPYZVk/7ZeV6zu54YT0I=
-X-Gm-Gg: Acq92OHV+gq2BbYTBGpUQNjJZ8iDwA/Py/DtxhTGG24x1u/JaqIfUr6RGZB5kBGI306
-	FXM9B9MSgA9q5n2xZrfvsfbUsEqwaAOBXe3irlefzsXR14YA2UoLABSd6/V4S8hIHRFPYm9XwnW
-	sBHyA7NJy6dn3V8RDbH8PAQfNwC4BDzqXwBmxnbJYfdYopgATZopvwPH8ZAXNOeOSKsPjewS9/w
-	uYJ2PO0j1jt19/3EJuNPFd5SDmh91dXbHzgQ00zCqf4sCT23c7SKO9RUumwLIrtpp1wzmBzdB8g
-	Q2sYm1HpoZtk73EujijYMgYIp0JdhIT1+EYYnz4hhzsIGuRLjs1zsX29otumClNus98CUxCLWFD
-	b/cxiUcCkmheK1Mp8EzF6NlEJQEGDmuQ2zXuNxEdIs+bbN1pyhEavTw9QcnwmT6KwOmmFb0K68J
-	bgs1NQdVmVxhNtuB1mpblQbydxHWmWBnM9OnkVf0vsxmWDllTPHEzOLBLPeIKHK3xoTAQHo6fo2
-	aVzGM9PFfDju450bmaI
-X-Received: by 2002:a05:6820:168b:b0:69d:7777:75a8 with SMTP id 006d021491bc7-69e6d38eaebmr5354332eaf.11.1780931909570;
-        Mon, 08 Jun 2026 08:18:29 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e4605ec33sm10213223eaf.0.2026.06.08.08.18.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2026 08:18:28 -0700 (PDT)
-Message-ID: <138e4acb-1525-4449-848a-d9d07abbe4be@kernel.dk>
-Date: Mon, 8 Jun 2026 09:18:28 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZOcR/PIY"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gYxMy54Ssz1XM0nn;
+	Mon,  8 Jun 2026 15:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1780933852; x=1783525853; bh=Pu2YAEDcMH/maHI/Lle/4AyF
+	4oPuDsyUwWoKR2PyomQ=; b=ZOcR/PIYcOcHG/hOWapJam/z2TWCfMfmOWP6Dvtf
+	+U4+LyG4HQn9H39oUzOEArFdRkH1QJEK3XLFezEqlEfCa+d6x27F8urrvEd0SKZA
+	RC2mtK5F5qtDQWEa4pWLO1JxoCc2Ey0kbkZcBmaG5HcnyaR1FrflemsLQqO7r8fI
+	pnnLqvVP1D0SMEajzB8I5Vu1zk3UMrLyPo0bs0/EyVi573V9AFAMSY55uWIgSA4h
+	Qs/2qcWSMf/8ikBHjZ9l7nHRvfREaqg92X/hduOz0vY3lxRufLMOFfZc2JsKoXi5
+	WTN2w7QLj0bN446AkePdOB8NrqCCc/7nBEaD5+6tfq5NLw==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id E0W8_l2zcB0l; Mon,  8 Jun 2026 15:50:52 +0000 (UTC)
+Received: from [172.20.20.20] (unknown [73.15.154.223])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gYxMv3Hjkz1XM0ty;
+	Mon,  8 Jun 2026 15:50:51 +0000 (UTC)
+Message-ID: <5353c4b0-fc3b-4fa7-bcd6-c8cc490699ea@acm.org>
+Date: Mon, 8 Jun 2026 08:50:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,67 +50,29 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH]block: Observing higher CPU utilization during random IO
- testing
-From: Jens Axboe <axboe@kernel.dk>
-To: wenxiong@linux.ibm.com, linux-block@vger.kernel.org
-Cc: tom.leiming@gmail.com, yukuai@fygo.io, wenxiong@us.ibm.com
-References: <20260604162709.3006327-1-wenxiong@linux.ibm.com>
- <76b46c10-201a-4bd1-85a8-49ae6bace572@kernel.dk>
+Subject: Re: [PATCH] block: fix arg type in `blk_mq_update_nr_hw_queues`
+To: Andreas Hindborg <a.hindborg@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260608-update-hw-nodes-arg-v1-1-19aba440b32e@kernel.org>
 Content-Language: en-US
-In-Reply-To: <76b46c10-201a-4bd1-85a8-49ae6bace572@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260608-update-hw-nodes-arg-v1-1-19aba440b32e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/8/26 9:15 AM, Jens Axboe wrote:
-> On 6/4/26 10:27 AM, wenxiong@linux.ibm.com wrote:
->> From: Wen Xiong <wenxiong@linux.ibm.com>
->>
->> Hi All,
->>
->> Our performance team observed the higher CPU utilization in RHEL10 compared
->> to RHEL9.8, observed the similar issue in upstream kernel(v7.1-rc6) as well
->> when running FIO random IO tests. Random IO tests are more CPU intensive
->> than sequential IO tests due to several factors: more context switching,
->> interrupt Handling, cache Inefficiency etc.
->>
->> Given commit 060406c61c7c ("block: add plug while submitting IO")
->> causes performance regression. This patch reverts it.
->>
->> Below is performance comparison with the latest upstream kernel.
->>
->> Iotype  qd   nj    rmix    mpstat busy        mpstat busy
->>                          with inner plug    without inner plug
->> Randrw  1    20    100       53%                 24%
->> Randrw  1    40    100       70%                 24%
->> Randrw  1    20    70        40%                 24%
->> Randrw  1    40    70        60%                 26%
->> Randrw  1    20    0         14%                 6%
->> Randrw  1    40    0         20%                 7%
-> 
-> I'm fine with the actual change, but the commit title and commit message
-> are pretty abysmal. If you were browsing git log and came across
-> something that said
-> 
-> "block: Observing higher CPU utilization during random IO testing"
-> 
-> then what would you think the change did? You would have no idea. That
-> title is a bug report title, it's not a git commit title. A good git
-> commit message should tell you WHY a change is being made, and the title
-> should be a short summary of that change.
-> 
-> I'll rewrite these, but please keep this in mind for future submissions.
-> Should not be necessary for me to completely rewrite your git commit
-> message.
-> 
-> You also identify 060406c61c7c as the commit that this is fixing. This
-> goes into a Fixes line before your signed-off-by. And you would
-> presumably want this to go into stable as well, yet that's not tagged.
-> Please read the documentation on how to submit patches.
+On 6/8/26 1:39 AM, Andreas Hindborg wrote:
+> The type of the argument `nr_hw_queues` in the function
+> `blk_mq_update_nr_hw_queues` is a signed integer. This is wrong,
+> considering the field `nr_hw_queues` of `struct blk_mq_tag_set` is
+> unsigned. Thus, change the type of the parameter to unsigned.
 
-Patch also doesn't apply without fuzz. Please submit a v2 that's against
-for-7.2/block and heeds the above advice to turn this into something
-that's closer to a good patch submission.
+Will there ever be storage devices that support more than 2**31 hardware
+queues? If not, I think the word "wrong" in the commit message is too
+strong.
 
--- 
-Jens Axboe
+If this patch does not change the behavior of the code for any practical
+use case that would be good to mention.
+
+Thanks,
+
+Bart.
