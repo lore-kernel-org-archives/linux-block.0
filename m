@@ -1,104 +1,117 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CADF3D1AA6
-	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 14:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C86E3EC2F5
+	for <linux-block@vger.kernel.org>; Mon,  8 Jun 2026 14:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780929273; cv=none; b=ScJ2M9cKpdS3aeD6MrsxVN2tHOuVqw37WIYqHaUNeRNuaHG7u9ygCDOfP7Cgj1VVkImrRu5JFpSTZxetZcMC8mCM1LBgpuMmDfqdaB5k8gOpozONhgSplAHh5UbGUmJJPzgOktco2vd5yQ/Li0vvHXMQJpLmfiuRKHF2ZEYmrtw=
+	t=1780930407; cv=none; b=PyWgFehFRC2iqEiq64HwFRKN35sbNNIXLcsgsYGw16XiF8cA+nb51QrkdzmEp13MAtLOCcpID0/qvk/HOAOhtaI0IJH8xNbzwjO4nWuScU4knKZjciuHbTG/Mnx1wmwbeeb3k7LvUJbWJQZPSakI+LL0HVZ+MC//aR9PCgtugak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780929273; c=relaxed/simple;
-	bh=qoYJ4ZOXQM/tDQPzafgbpBJ34Y0uEUc4WCcwNTJifsY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=hqsAwm20tgdUz2hOCm30luEYUi4C/m1TJbJeykPj3nKkrhhv+dcVCe7nlLE8UUyufkkbhXkPd5xwypaYRpCy1AJ+0JayqDnV5qo9jOhVw8Vat0qgFTF93Q+6Xp3xNglW7xfKqxR/9h/tUpsY0mAjnceApzWgd2yKVSjzJEbl0AY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=bQWSASED; arc=none smtp.client-ip=209.85.161.45
+	s=arc-20240116; t=1780930407; c=relaxed/simple;
+	bh=aXBtlEnjwFrQKovFyPfzhs9uZjhW40u8HNLp3IKF/LM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ozYVI1+fxBOzeBzm9EVjHLeursdLvvvhY2qxwLy6NBCJ36rkB5iD6CJnoGw5kp9EzoFRwn5EASr/chlhzPS/mcJJfji+cWUscsaiGdGxZc3BIwNIj6yH1cWqpyuA28d3+l/MImef+ELjdYbl+ezlTnJxTLIVp4tMEfzqu7VAIbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=LS5ktwsI; arc=none smtp.client-ip=209.85.160.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="bQWSASED"
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-69e66e11386so1393054eaf.3
-        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2026 07:34:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="LS5ktwsI"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-43d2ff651f2so3653511fac.2
+        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2026 07:53:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780929271; x=1781534071; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G4ofM2BsLAWXXhsae9VD6Ch8JaXFv1QC90mIszAgAXE=;
-        b=bQWSASED/L6EfkBQpXge4PHqoEAwF1/VNJR8XdOskpT9/9K1t+hkvXZXRik+ZWmhI2
-         R1o+Xe9OSgUxOhkxsp4kSEVOIKtPKuIIySVC5CEnHwSe37peDzFN7l0m2swKs2KvIOuK
-         8n5EvAgQWx6q94QL253k2LvqgB5w5U2QS27jXQqCAy8v++UadX/WiyHyvMv7hwQT16CU
-         1C0JDIHdzHrJx5oYYLVQP4m7T4gvLyagDFX7iPHIffO7ww0r5viNRP2AWsN5/s4I4GE+
-         yW7ZlYMYO+KHn8O82gY2Yu1/KBOqaIA3M/pG90cP/w7GdOUYJ25EVseExNCM/LNGkUc5
-         ECAg==
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1780930404; x=1781535204; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ezWnP2UXKohE5V9tSBhtiAoUtofNw0gKy3ylNXOeXQI=;
+        b=LS5ktwsIwbjkuocNDMmWDEv1Z6U6lJrwQZYoHn3DL+Eo+8EoSe4T50cB0QolIqp9TS
+         QZL2OgNadtSRW1TOtDdPLV7J51fsemuITyBVXJgjja8YiAKpoIw3Evp54AccxHs68Lhu
+         yCcp3oP691G4PbnhOl4awTKooEtEmwKcxKy8FuO4a+ktKNLG+k333K7N9UFPeogR9LWE
+         kKiuR/Z8DDWC31YFJ5B09CPeNFfEQ8ah6QvAb5Sjbs0mhIqpPUXNUA9Wn//LhkyEVE8T
+         Z9thToSn+EiiRT+4ru1NlDn6j+II4OECjNkm+bTtrY8esbxWxJODb2ysQ1w6i5kCW5iv
+         bnXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780929271; x=1781534071;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=G4ofM2BsLAWXXhsae9VD6Ch8JaXFv1QC90mIszAgAXE=;
-        b=lWJrPqrKCd2sQwSMYUMwItfY86+gnIZ5NFkCn4jKnJ5Lpx3cVoO+BUICnbYxjjcmfh
-         OEw8mHGMsby0xjg2zYaXhrOez/kAptQIR0UfeU4oALeUE+TV5v2Aqx3zTjSCy7jX3NZ7
-         eEgJH6h6hdSF3RymCjLYytWFp7f5oRZYShNiHyMiORbu0g51fDwxGBTsUhwi6E1Sy5ET
-         NLn1HLsy5OWA1p4l+vY/X88RKcSzbKnx+k8bGF4PMNC/4zu/paBnK3xae3z/mIPkZXHY
-         NiNMXJ94yAKtzGc/IfZTVh8QnOQ1Y+Z4wMp9Xnwa3nklKB1KNtI4Qez7SHxHJiImVoUS
-         2DnA==
-X-Gm-Message-State: AOJu0YwZpVMao6PAxB5Keu2Y1Xpms3z638KorLyfiD6WFwI8jsApTYyn
-	0AweGw18DoAJhqQ+ZHUEMtXxumKtFve83B8/e5ht2OfarrDW9ELJ+lswxblxvktyXmvyEFBYu2C
-	MQ3w1
-X-Gm-Gg: Acq92OFiGVKp+PKS76kzvmoWa1zPgPE2HiajB7pgoBnqDKb/hCSQA5nfhif43wLZHty
-	HBrTL5XHKqkDHxX4IYo2Ki8wi6Q7H9TDc93oc6i+nzGWNpekwmngh/Q0WkT2/2r11MEoWycHSgf
-	gfUO0f4H2tqV8OesAjPkZiwPoeIOAHKULRZzTwPfrttHwtLbpLGPT5cvIhTow8xnb8XLks0AucJ
-	58XYOOkccTVITD/V0dqsdVBZ401+vi/DHeI6ZQdDrbXX6yKxb2Q4mE6FYQUQ4MpPkQaKxDEFuzu
-	UL4CuuNcJIYJ3GReIkGFdEEq971JCy3G20v2VKWxPUkcPnO4dgsGvULq1XC/iTpkvEXoL2Pe+YT
-	I4yiKR7x7MPvkW3CGIWAiXbQt2hX/M18DFjnvYQWMwmRExHAF5Xouwyp2q1Gz3qWTnlBguwBC69
-	LcIfjnh365WFLg+sWTxBoan0fkrHLRt6rRv/iEfdNb7Okk3MiPw4pYCjTuraWF9EaBjakQixbCz
-	PVzfbRkIaYtpYL9ELpwk6+RwQ==
-X-Received: by 2002:a4a:e053:0:b0:69e:6606:d137 with SMTP id 006d021491bc7-69e68b5f73emr6960852eaf.22.1780929271364;
-        Mon, 08 Jun 2026 07:34:31 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e464050fasm9622409eaf.9.2026.06.08.07.34.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2026 07:34:28 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: Steven Feng <steven@joint-cloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <tencent_79B652BD0CC23E093F27914380F161E7E505@qq.com>
-References: <tencent_79B652BD0CC23E093F27914380F161E7E505@qq.com>
-Subject: Re: [PATCH] block: optimize I/O merge hot path with unlikely()
- hints
-Message-Id: <178092926806.1038952.10749895636675728500.b4-ty@b4>
-Date: Mon, 08 Jun 2026 08:34:28 -0600
+        d=1e100.net; s=20251104; t=1780930404; x=1781535204;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ezWnP2UXKohE5V9tSBhtiAoUtofNw0gKy3ylNXOeXQI=;
+        b=KS6xqroVwDAPdvt+iRBsJ3EBmApLILyb5IBglXCqzb7aRxaKJI7dJWXc0IWr2HZ4pg
+         Tu0IfqJFbP0w+1JYWdtuxMoMe/xcxck0qKH4PjZNRreT7boelqwQ6oWcK5Osli5MmzTt
+         R29fbFnpnpfWOv+0yDJyN5tDpGTR1PQGQNg6pqI+k60prLEIXqC4/DAEr/99lP+UKIoU
+         QRNk2H8mPnNd7jfqrtBUrNSH5sYUXqcho8ZTyPCZdixVxSXq+dHXJeaY/iuekaLbDZYs
+         xE+8N+DHNJyDrGS9pajqym8rsN1AG0mC2h1wP0belchGXgWkNlOXbWNr2nGIJ8FOmzSL
+         KZlA==
+X-Forwarded-Encrypted: i=1; AFNElJ+JBJAKbWPUMnl5HhJ2hjAFkE/Sb1nq1YLIMT/hdaYVYJkW8fqmCWrjR0TifoTD0TKXF0gjJ7AFPyxa8w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YylxJajxYa5CAopk5e3Nbh8k0VAIGfITcClINVbI9MqFTVEXkma
+	TEjmMnzpovuvpu8Hj13Fck7d3TTX5AvX9LLa8h2BjNYaUxQ4RgkeDS6RlFLRnFOuSCs=
+X-Gm-Gg: Acq92OGxxbmMjFhKdNIfrhnNEGEhLpxSmgFouz11lkOv6h3csOPnMtIpItDtVQm7V1r
+	WJj5OKJANrvZSEI0akeY1+Yw/XLQxDTifzpTDCw0LwvBEbQM1pbQ20SLRDhNez/8M5VYOfUNQT2
+	hvkSKbD4yaDnB2kGaP7D7RFmr5bJ0rdls8NBLx7ul73HFQt/i+tcy+4EDaL7fn8SWqfeN/Q1P/V
+	SZKmbx4nXtbIUt8hdgiZgHBGlkosm+QaX9/cs1I24B3k/G9fMu766U3F7jpBgZ/u7cXbbrV3Ucm
+	04vMEVaAG90ZI9zjsoyjqAE9+whm3oFZN1C2vci8H6aiASzBJ6ng2h12NB4QKnkYlMPnpXq3nVH
+	SSdHA/ilbFsATD43228HZqpU/ZI6ob/I5EpkDWpyPWub+AbIRUP8qFG7e9bkGg3RhqMuuY3URqT
+	OtX0Twz9yxHm+ICM1kJ4zFYBDEMcx3Y+DtCi8WAJSldQYRz2ON21t3ViOe6LBmCyKu/N/oDYPeG
+	7tAxxh9QozJpGyhg+h7
+X-Received: by 2002:a05:6870:d6a7:b0:409:5ef5:be0c with SMTP id 586e51a60fabf-4413d3b4b67mr9871451fac.12.1780930404545;
+        Mon, 08 Jun 2026 07:53:24 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-440d8295aaasm16163044fac.9.2026.06.08.07.53.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2026 07:53:23 -0700 (PDT)
+Message-ID: <bac50400-dd86-4c7f-bab3-481c1306877b@kernel.dk>
+Date: Mon, 8 Jun 2026 08:53:22 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] block: add configurable error injection
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>,
+ Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>,
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+ Hannes Reinecke <hare@kernel.org>
+References: <20260608051416.1205282-1-hch@lst.de>
+ <20260608051416.1205282-5-hch@lst.de>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260608051416.1205282-5-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15.2
 
+On 6/7/26 11:14 PM, Christoph Hellwig wrote:
+> diff --git a/block/blk.h b/block/blk.h
+> index e8b7d5517086..10df23b2cb90 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -660,6 +660,18 @@ static inline bool should_fail_request(struct block_device *part,
+>  }
+>  #endif /* CONFIG_FAIL_MAKE_REQUEST */
+>  
+> +void blk_error_injection_init(struct gendisk *disk);
+> +void blk_error_injection_exit(struct gendisk *disk);
+> +bool __blk_error_inject(struct bio *bio);
+> +static inline bool blk_error_inject(struct bio *bio)
+> +{
+> +	if (!IS_ENABLED(CONFIG_BLK_ERROR_INJECTION))
+> +		return false;
+> +	if (!test_bit(GD_ERROR_INJECT, &bio->bi_bdev->bd_disk->state))
+> +		return false;
+> +	return __blk_error_inject(bio);
+> +}
 
-On Sat, 06 Jun 2026 10:42:18 +0800, Steven Feng wrote:
-> Remove redundant '== false' comparisons and add unlikely() branch
-> prediction hints in block I/O merge path functions.
-> 
-> These functions (ll_new_hw_segment, ll_merge_requests_fn, and
-> blk_rq_merge_ok) are executed on every I/O request merge attempt,
-> making them critical hot paths. Data integrity check failures are
-> rare events, so marking these conditions as unlikely() helps the
-> CPU optimize the common case by improving branch prediction.
-> 
-> [...]
+I really hate this part, that's a pretty deep set of pointer chasings to
+figure out if injection is enabled or not, when in practice error
+injection is only ever enabled for specific test cases and distros
+invariably will set CONFIG_BLK_ERROR_INJECTION because they turn on
+every damn thing under the sun.
 
-Applied, thanks!
+IOW, that won't fly for the hot path. Maybe a static key would be useful
+here?
 
-[1/1] block: optimize I/O merge hot path with unlikely() hints
-      commit: 7ed4aab1381f3439f45032eb860f89d9da5e45c2
-
-Best regards,
 -- 
 Jens Axboe
-
-
-
