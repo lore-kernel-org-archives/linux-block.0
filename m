@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4384C3E44FD;
-	Tue,  9 Jun 2026 19:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C716B403B00;
+	Tue,  9 Jun 2026 19:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032555; cv=none; b=rNp9LxwSouxzsUZkFNLyrZ65v4/+8jZmp3v8QBDy1ciwZM7gSbqxqHx+ssPCc58nZ7H96XCGG4bzhxplBBBFZU7G2+3lBUyXCoxqxTGPtV8z1R1H4qFCUBC0+BJuWGeckd00XEzEr/IfM/KU0mKo3q430TQd5QDYKVH6S/BonkE=
+	t=1781032560; cv=none; b=ctvcP3qVcJoZxjuzRa5nMLf3Ad/1/CAQrlliGeZe2+/6NLDpZL53u/IcnAThuLannVjEF96geRnXbPzSzlk+D2HRG5DDdVyqrD81StC+QOcn7QB87G9zgnSs81NvuMi6/pjchkSzF7QmeA6GjwPJ52WALVM8YF9aP5k8j7eFTmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032555; c=relaxed/simple;
-	bh=pjTJV6lpFGJdbnqxGVPCelvpzcvZdwrgNcXyn+EPT0s=;
+	s=arc-20240116; t=1781032560; c=relaxed/simple;
+	bh=AEQaJe7SK7Z/x0RCHvYjLfe6Z+31poYBBz6CEFZucYI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bYcdYmm/NxVKSHygFlCrq9mCPCi74qHgQYbzSkIssYQzY7cqRvol7qH9J9zsi3oCkbYTmUJyDLWzacef5GI0orX9Uet4ZnbnSAa6nzrnMZaCr64MfzUaUWj0ng17U1JU59HQ5iETlD7gulx8jO2juYvTI3LEF0NwwxKJZT2T8Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJRuMeub; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=M6CeLpq4HPreke2K6b0K166W73Nbjj/1f0pLEP4caX+28Vmnh+xhlVr0vJ6BD/Aih1kQMkZ/Xr33ZhAwRnV65tJnVu0VbXFshe7Ufctrq7XbLmDkLoLUNVBLYTKpHCn70pB+eBj86GSADSJ2tP0gvLWg3Q2ZDq6KuwqhRVnRbnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ORLbq2rd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJRuMeub"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67BD01F00893;
-	Tue,  9 Jun 2026 19:15:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ORLbq2rd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD8FE1F00898;
+	Tue,  9 Jun 2026 19:15:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032554;
-	bh=XwkzM7VKd2QXL9hc4jVTBaLQ2ofiUVQa/wzCehzlLfg=;
+	s=k20260515; t=1781032559;
+	bh=kylCIHTIqWZVVqg1E9SzeJnum0Ofj/qvsUr/FLAXqYA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=PJRuMeubNxh1PQSzxL1DyB41AIrvdek8nDKPtSKhm5o0NviyKSTiVrhDLu3iguEBd
-	 0xplh6V9VIdWerS8y8DtTZmmThWVU95nzC9QpGylXKU46KuVuhXlvX1CkzsOu+JoCe
-	 MjbNF4bZ8B7n25zVRSn0JlV/mgNqTLFHn0oOt9AFFFqYQwcGNwNUe07KPJxHyFvlxZ
-	 Uu7ZwCkEGreSa0hJGaoJKGkcUPY8MxZzIjviUr2EHCVUDXUEgt3mRmbGBZP/66UZ2W
-	 OV/8H3/4WZpxm6Pd3jfQqPZJXa4soGpN8YNs6Y1td/O2Drf+0BrX00P4V/lDtDuomn
-	 uR2Eh6VVq7z5g==
+	b=ORLbq2rd9IsQ0KM6VJkQSIi0/UUW9JcgQsqWlCtS4dFjSwrUkEpFwdwYMFe4wqwbs
+	 j8XR9XS1sWdSqZc3q5QMLfS1VJ2GWM+8PHe61CAnVcaRdypxKxtu0bbTZAZDWMk7kL
+	 RdLkzJvjZUir7vsU1jowtfq23armyfMPakzgnD9IEYceS+TvXUpHxTmj3RbmcGnewr
+	 5OBNEN8zLRIBWq0IZl3v+Q3CuK9Wn7ka3SPM9EzJlLfNUJelFXnSb9USQY3Gu9A2be
+	 RM80E96/gwdcWp+a0vekE8wnKQ3CpnoId2e6HEj5Yr4A8JGbmiu0nHM9flEL3oXBVR
+	 6ALdqJmtFh44A==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:08:23 +0200
-Subject: [PATCH v2 44/83] block: rnull: add bandwidth limiting
+Date: Tue, 09 Jun 2026 21:07:45 +0200
+Subject: [PATCH v2 06/83] block: rust: fix generation of bindings to
+ `BLK_STS_.*`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-44-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-6-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -58,338 +59,124 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10642;
- i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=pjTJV6lpFGJdbnqxGVPCelvpzcvZdwrgNcXyn+EPT0s=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTc6+ODZ65AqoAf371RvHz/OnyK5XGNwDbnU
- VCqT77xgpuJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk3AAKCRD6UCkIqsW9
- 0JWaD/9mQPWw4JE9i9ltAG5BKZTUckOkIUd7RZ4WGZ4lMe6tJZhAq3cT8nktOiW9M0bpzIgKIxn
- zvuvxpqbwe8dQplaQYysdwCAGcn+HP0sBEBtscs8KVgMMokJ9nBgmFvYRs6YJ8Tcb+p19D2kyWd
- LTX2g/vNcZpNfuMKQXgkE28gwts3AruCAUXNY9LdMN1JGBp0gCNdVCxArt9xgwk0bXStMYm8e4/
- PvKOSHSdDspS/YiNaqzcXvFuDqiEos9gX6gOGqIo3jw963sZZH3IHmpaQD7MMbUHnfOJqPVrKYh
- vk/0QP3ErfWjqJA2N1BmOVmoOLN0zmzfxNI/tKk2kBrn9mxR7XBVPZA5cJaoVCR2HC9KasgmsOP
- rXaf/U4Mmm5Qxl3koLOoY/6DIXTR6RL8YYB1Hdp0hlI8KjvMoAyVOJ2EmMMq6QjV1hTdSQns+wj
- oMsdvt+nwsXit4Nldq6dvzXVHZYT+5cVPCI8s/B/W1yDFENImrG+c9LwvAjh7lbkpIIbR7jcDiy
- /+u6dLn7ukZ4PLM7XGvfLq5xcPqQterwMaq/Egacm65c5lpeGPrRhcSDdm6YgtIgr57sc2JUkkH
- ytSxT7XAWiHYky9m5qKgtQhOr5Z5/7ST297dsw9YFwT2lLyok596jljmWq8MHMJa83kwIaqKOUA
- GUJBbFBDOVZunyQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4558; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=AEQaJe7SK7Z/x0RCHvYjLfe6Z+31poYBBz6CEFZucYI=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGS5MZAEtPyseKnhLu3ha3HCPw+XFEI2sVTNN
+ RpPLZ/VhfaJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkuQAKCRD6UCkIqsW9
+ 0E9bD/9uFjqpyDnP6ArF+C4Ps9g7VX+5ehlZp5Wge0BITznbNerYO0QBEofxj5R+p+7QOSQHlcM
+ lWX2y4KUeqwioR8dtZiFjPNq2s/EWY0ceeUALCorjFMAoW6JTl0eTX99wUJ92mS4nmTwtemI69L
+ K2fc3Pis9rGscgDoFurnNvd4Szph5Kg4jWAmwX+TL7BBNhPvjM42oEEYQXHVbL4T/zarMe1AsDM
+ 27nefnw/tFHEd3nls3Yvx4eTAYjVwPzD6nPuL37oiXi7++NTGHGBnSe2I/9sjlx5nDRYeFf32Mi
+ URUpGsp0xyV+TUmTyiR3eXTXvbgVBdFutTpQBCifsFsKu9R1KrUi7FXsocbqZuc48QPxQW3G7lc
+ wQXOLbg7i/0AbwVWFFyvH+OzJMYADyt9dU3QbtKtPcCjv7QoyzrjSmpvT+urO7SKRHBBM63IRzb
+ CDGf4gMv3qb5a+jGPzQ14la92avZLuIEj/XrtAcxlQYwyWlYWxiuDNCixROoUFqAqhnnv6FZssx
+ 4DMOjqAhpG09dp3qkjCU9pmGMzpJtNQpe4Hy6XT8omwBYv8faeCttn/JsIXIWHr/Di0Ji9e8+fM
+ WqXl4V39o4hHqpXQy+nu3vVHsB3C3RwHOt7IUAWCzyBUy7K+1O2UTBQPdbsgjKrlGqlHkpItsZK
+ 8Par3G2IHTfF3CA==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add bandwidth limiting support to rnull via the `mbps` configfs
-attribute. When set to a non-zero value, the driver limits I/O
-throughput to the specified rate in megabytes per second.
+Bindgen generates constants for CPP integer literals as u32. The
+`blk_status_t` type is defined as `u8` but the variants of the type are
+defined as integer literals via CPP macros. Thus the defined variants of
+the type are not of the same type as the type itself.
 
-The implementation uses a token bucket algorithm to enforce the rate
-limit, delaying request completion when the limit is exceeded.
+Prevent bindgen from emitting generated bindings for the `BLK_STS_.*`
+defines and instead define constants manually in `bindings_helper.h`
 
+Also remove casts that are no longer necessary.
+
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs |   7 ++-
- drivers/block/rnull/rnull.rs    | 111 +++++++++++++++++++++++++++++++++++-----
- 2 files changed, 105 insertions(+), 13 deletions(-)
+ rust/bindgen_parameters            |  6 ++++++
+ rust/bindings/bindings_helper.h    | 19 +++++++++++++++++++
+ rust/kernel/block/mq/operations.rs | 17 +++++++++++++----
+ 3 files changed, 38 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 4df0b748596a..59217d75f46b 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -104,6 +104,7 @@ fn make_group(
-                 badblocks_once: 13,
-                 badblocks_partial_io: 14,
-                 cache_size_mib: 15,
-+                mbps: 16,
-             ],
-         };
+diff --git a/rust/bindgen_parameters b/rust/bindgen_parameters
+index 6f02d9720ad2..128731e84775 100644
+--- a/rust/bindgen_parameters
++++ b/rust/bindgen_parameters
+@@ -5,6 +5,12 @@
+ --blocklist-type __kernel_s?size_t
+ --blocklist-type __kernel_ptrdiff_t
  
-@@ -135,6 +136,7 @@ fn make_group(
-                         GFP_KERNEL
-                     )?,
-                     cache_size_mib: 0,
-+                    mbps: 0,
-                 }),
-             }),
-             core::iter::empty(),
-@@ -209,6 +211,7 @@ struct DeviceConfigInner {
-     bad_blocks_partial_io: bool,
-     cache_size_mib: u64,
-     disk_storage: Arc<DiskStorage>,
-+    mbps: u32,
- }
- 
- #[vtable]
-@@ -248,6 +251,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                 bad_blocks_once: guard.bad_blocks_once,
-                 bad_blocks_partial_io: guard.bad_blocks_partial_io,
-                 storage: guard.disk_storage.clone(),
-+                bandwidth_limit: u64::from(guard.mbps) * 2u64.pow(20),
-             })?);
-             guard.powered = true;
-         } else if guard.powered && !power_op {
-@@ -259,7 +263,6 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-     }
- }
- 
--// DiskStorage::new(cache_size_mib << 20, block_size as usize),
- configfs_simple_field!(DeviceConfig, 1, block_size, u32, check GenDiskBuilder::validate_block_size);
- configfs_simple_bool_field!(DeviceConfig, 2, rotational);
- configfs_simple_field!(DeviceConfig, 3, capacity_mib, u64);
-@@ -417,3 +420,5 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-         Ok(())
-     })
- );
++# Bindgen cannot extract values from the `((__force blk_status_t)N)`
++# CPP-macro form used by most of these and emits the few it can extract
++# as `u32`. Block them entirely; the `RUST_CONST_HELPER_BLK_STS_*`
++# definitions in `bindings_helper.h` expose them as `blk_status_t`.
++--blocklist-item BLK_STS_.*
 +
-+configfs_simple_field!(DeviceConfig, 16, mbps, u32);
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 6ceba23a4d3e..1dda8d717b95 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -25,7 +25,8 @@
-             self,
-             gen_disk::{
-                 self,
--                GenDisk, //
-+                GenDisk,
-+                GenDiskRef, //
-             },
-             Operations,
-             TagSet, //
-@@ -37,25 +38,32 @@
-         Result, //
-     },
-     ffi,
-+    impl_has_hr_timer,
-     memalloc_scope,
-     new_mutex,
-     new_spinlock,
-     pr_info,
+ --opaque-type xregs_state
+ --opaque-type desc_struct
+ --opaque-type arch_lbr_state
+diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
+index 9da216faad51..b1fb3afee4ca 100644
+--- a/rust/bindings/bindings_helper.h
++++ b/rust/bindings/bindings_helper.h
+@@ -119,6 +119,25 @@ const gfp_t RUST_CONST_HELPER___GFP_ZERO = __GFP_ZERO;
+ const gfp_t RUST_CONST_HELPER___GFP_HIGHMEM = ___GFP_HIGHMEM;
+ const gfp_t RUST_CONST_HELPER___GFP_NOWARN = ___GFP_NOWARN;
+ const blk_features_t RUST_CONST_HELPER_BLK_FEAT_ROTATIONAL = BLK_FEAT_ROTATIONAL;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_OK = BLK_STS_OK;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_NOTSUPP = BLK_STS_NOTSUPP;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_TIMEOUT = BLK_STS_TIMEOUT;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_NOSPC = BLK_STS_NOSPC;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_TRANSPORT = BLK_STS_TRANSPORT;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_TARGET = BLK_STS_TARGET;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_RESV_CONFLICT = BLK_STS_RESV_CONFLICT;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_MEDIUM = BLK_STS_MEDIUM;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_PROTECTION = BLK_STS_PROTECTION;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_RESOURCE = BLK_STS_RESOURCE;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_IOERR = BLK_STS_IOERR;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_DM_REQUEUE = BLK_STS_DM_REQUEUE;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_AGAIN = BLK_STS_AGAIN;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_DEV_RESOURCE = BLK_STS_DEV_RESOURCE;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_ZONE_OPEN_RESOURCE = BLK_STS_ZONE_OPEN_RESOURCE;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_ZONE_ACTIVE_RESOURCE = BLK_STS_ZONE_ACTIVE_RESOURCE;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_OFFLINE = BLK_STS_OFFLINE;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_DURATION_LIMIT = BLK_STS_DURATION_LIMIT;
++const blk_status_t RUST_CONST_HELPER_BLK_STS_INVAL = BLK_STS_INVAL;
+ const fop_flags_t RUST_CONST_HELPER_FOP_UNSIGNED_OFFSET = FOP_UNSIGNED_OFFSET;
+ 
+ const xa_mark_t RUST_CONST_HELPER_XA_PRESENT = XA_PRESENT;
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index 89029f468f44..6b2fcd76372e 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -6,10 +6,19 @@
+ 
+ use crate::{
+     bindings,
+-    block::mq::{request::RequestDataWrapper, Request},
+-    error::{from_result, Result},
++    block::mq::{
++        request::RequestDataWrapper,
++        Request, //
++    },
++    error::{
++        from_result,
++        Result, //
++    },
      prelude::*,
-+    revocable::Revocable,
-     str::CString,
-     sync::{
-         aref::ARef,
-         atomic::{
-             ordering,
-             Atomic, //
--        }, //
-+        },
-         Arc,
-+        ArcBorrow,
-         Mutex,
-+        SetOnce,
-         SpinLock,
--        SpinLockGuard,
-+        SpinLockGuard, //
-     },
-     time::{
-         hrtimer::{
-+            self,
-+            ArcHrTimerHandle,
-+            HrTimer,
-             HrTimerCallback,
-             HrTimerCallbackContext,
-             HrTimerPointer,
-@@ -127,6 +135,10 @@
-             default: false,
-             description: "No IO scheduler",
-         },
-+        mbps: u32 {
-+            default: 0,
-+            description: "Max bandwidth in MiB/s. 0 means no limit.",
-+        },
-     },
- }
- 
-@@ -172,6 +184,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                     bad_blocks_once: false,
-                     bad_blocks_partial_io: false,
-                     storage: Arc::pin_init(DiskStorage::new(0, block_size as usize), GFP_KERNEL)?,
-+                    bandwidth_limit: u64::from(module_parameters::mbps.value()) * 2u64.pow(20),
-                 })?;
-                 disks.push(disk, GFP_KERNEL)?;
-             }
-@@ -202,6 +215,7 @@ struct NullBlkOptions<'a> {
-     bad_blocks_once: bool,
-     bad_blocks_partial_io: bool,
-     storage: Arc<DiskStorage>,
-+    bandwidth_limit: u64,
- }
- 
- #[pin_data]
-@@ -214,9 +228,18 @@ struct NullBlkDevice {
-     bad_blocks: Arc<BadBlocks>,
-     bad_blocks_once: bool,
-     bad_blocks_partial_io: bool,
-+    bandwidth_limit: u64,
-+    #[pin]
-+    bandwidth_timer: HrTimer<Self>,
-+    bandwidth_bytes: Atomic<u64>,
-+    #[pin]
-+    bandwidth_timer_handle: SpinLock<Option<ArcHrTimerHandle<Self>>>,
-+    disk: SetOnce<Arc<Revocable<GenDiskRef<Self>>>>,
- }
- 
- impl NullBlkDevice {
-+    const BANDWIDTH_TIMER_INTERVAL: Delta = Delta::from_millis(20);
-+
-     fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-         let NullBlkOptions {
-             name,
-@@ -234,6 +257,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-             bad_blocks_once,
-             bad_blocks_partial_io,
-             storage,
-+            bandwidth_limit,
-         } = options;
- 
-         let mut flags = mq::tag_set::Flags::default();
-@@ -268,7 +292,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-             GFP_KERNEL,
-         )?;
- 
--        let queue_data = Box::try_pin_init(
-+        let queue_data = Arc::try_pin_init(
-             try_pin_init!(Self {
-                 storage,
-                 irq_mode,
-@@ -278,6 +302,11 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-                 bad_blocks,
-                 bad_blocks_once,
-                 bad_blocks_partial_io,
-+                bandwidth_limit: bandwidth_limit / 50,
-+                bandwidth_timer <- HrTimer::new(),
-+                bandwidth_bytes: Atomic::new(0),
-+                bandwidth_timer_handle <- new_spinlock!(None),
-+                disk: SetOnce::new(),
-             }),
-             GFP_KERNEL,
-         )?;
-@@ -294,7 +323,10 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-                 .max_hw_discard_sectors(ffi::c_uint::MAX >> block::SECTOR_SHIFT);
+-    sync::{aref::ARef, Refcount},
++    sync::{
++        aref::ARef,
++        Refcount, //
++    },
+     types::ForeignOwnable,
+ };
+ use core::marker::PhantomData;
+@@ -124,7 +133,7 @@ impl<T: Operations> OperationsVTable<T> {
+         if let Err(e) = ret {
+             e.to_blk_status()
+         } else {
+-            bindings::BLK_STS_OK as bindings::blk_status_t
++            bindings::BLK_STS_OK
          }
- 
--        builder.build(fmt!("{}", name.to_str()?), tagset, queue_data)
-+        let disk = builder.build(fmt!("{}", name.to_str()?), tagset, queue_data)?;
-+        let queue_data: ArcBorrow<'_, Self> = disk.queue_data();
-+        queue_data.disk.populate(disk.get_ref());
-+        Ok(disk)
      }
  
-     fn sheaf_size() -> usize {
-@@ -522,6 +554,36 @@ fn end_request(rq: Owned<mq::Request<Self>>) {
-     }
- }
- 
-+impl_has_hr_timer! {
-+    impl HasHrTimer<Self> for NullBlkDevice {
-+        mode: hrtimer::RelativeHardMode<kernel::time::Monotonic>,
-+        field: self.bandwidth_timer,
-+    }
-+}
-+
-+impl HrTimerCallback for NullBlkDevice {
-+    type Pointer<'a> = Arc<Self>;
-+
-+    fn run(
-+        this: ArcBorrow<'_, Self>,
-+        mut context: HrTimerCallbackContext<'_, Self>,
-+    ) -> HrTimerRestart {
-+        if this.bandwidth_bytes.load(ordering::Relaxed) == 0 {
-+            return HrTimerRestart::NoRestart;
-+        }
-+
-+        this.disk.as_ref().map(|disk| {
-+            disk.try_access()
-+                .map(|disk| disk.queue().start_stopped_hw_queues_async())
-+        });
-+
-+        this.bandwidth_bytes.store(0, ordering::Relaxed);
-+
-+        context.forward_now(Self::BANDWIDTH_TIMER_INTERVAL);
-+        HrTimerRestart::Restart
-+    }
-+}
-+
- struct HwQueueContext {
-     page: Option<KBox<disk_storage::NullBlockPage>>,
- }
-@@ -529,7 +591,7 @@ struct HwQueueContext {
- #[pin_data]
- struct Pdu {
-     #[pin]
--    timer: kernel::time::hrtimer::HrTimer<Self>,
-+    timer: HrTimer<Self>,
-     error: Atomic<u32>,
- }
- 
-@@ -578,14 +640,14 @@ fn align_down<T>(value: T, to: T) -> T
- 
- #[vtable]
- impl Operations for NullBlkDevice {
--    type QueueData = Pin<KBox<Self>>;
-+    type QueueData = Arc<Self>;
-     type RequestData = Pdu;
-     type TagSetData = ();
-     type HwData = Pin<KBox<SpinLock<HwQueueContext>>>;
- 
-     fn new_request_data() -> impl PinInit<Self::RequestData> {
-         pin_init!(Pdu {
--            timer <- kernel::time::hrtimer::HrTimer::new(),
-+            timer <- HrTimer::new(),
-             error: Atomic::new(0),
-         })
-     }
-@@ -593,14 +655,39 @@ fn new_request_data() -> impl PinInit<Self::RequestData> {
-     #[inline(always)]
-     fn queue_rq(
-         hw_data: Pin<&SpinLock<HwQueueContext>>,
--        this: Pin<&Self>,
-+        this: ArcBorrow<'_, Self>,
-         rq: Owned<mq::IdleRequest<Self>>,
-         _is_last: bool,
-     ) -> BlkResult {
--        let mut rq = rq.start();
-         let mut sectors = rq.sectors();
- 
--        Self::handle_bad_blocks(this.get_ref(), &mut rq, &mut sectors)?;
-+        if this.bandwidth_limit != 0 {
-+            if !this.bandwidth_timer.active() {
-+                drop(this.bandwidth_timer_handle.lock().take());
-+                let arc: Arc<_> = this.into();
-+                *this.bandwidth_timer_handle.lock() =
-+                    Some(arc.start(Self::BANDWIDTH_TIMER_INTERVAL));
-+            }
-+
-+            if this
-+                .bandwidth_bytes
-+                .fetch_add(u64::from(rq.bytes()), ordering::Relaxed)
-+                + u64::from(rq.bytes())
-+                > this.bandwidth_limit
-+            {
-+                rq.queue().stop_hw_queues();
-+                if this.bandwidth_bytes.load(ordering::Relaxed) <= this.bandwidth_limit {
-+                    rq.queue().start_stopped_hw_queues_async();
-+                }
-+
-+                return Err(kernel::block::error::code::BLK_STS_DEV_RESOURCE);
-+            }
-+        }
-+
-+        let mut rq = rq.start();
-+
-+        use core::ops::Deref;
-+        Self::handle_bad_blocks(this.deref(), &mut rq, &mut sectors)?;
- 
-         if this.memory_backed {
-             memalloc_scope!(let _noio: NoIo);
-@@ -623,7 +710,7 @@ fn queue_rq(
-         Ok(())
-     }
- 
--    fn commit_rqs(_hw_data: Pin<&SpinLock<HwQueueContext>>, _queue_data: Pin<&Self>) {}
-+    fn commit_rqs(_hw_data: Pin<&SpinLock<HwQueueContext>>, _queue_data: ArcBorrow<'_, Self>) {}
- 
-     fn init_hctx(_tagset_data: (), _hctx_idx: u32) -> Result<Self::HwData> {
-         KBox::pin_init(new_spinlock!(HwQueueContext { page: None }), GFP_KERNEL)
 
 -- 
 2.51.2
