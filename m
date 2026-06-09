@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E4C4D2EE9;
-	Tue,  9 Jun 2026 19:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA34D4D2EDE;
+	Tue,  9 Jun 2026 19:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032314; cv=none; b=QbPNV1hNVrdSXGvrxAtXA2CTbLlJ0oNsSgfc5Ss5sNhSe20kjdUd7G8g4rTk7BK0LvTnKMeKUD6RBcRNtdUXoBDD0vFd2oBcuSKQOcewFondcAsi1lhh7Nwhkh8gZbrgrbDia7ATHezWKm9rP+/nb5wTtycmMq2i7mVORDYAcdM=
+	t=1781032320; cv=none; b=bOrK8VJzW+mjeSNIXE0f/ZeEDms4UpVJEc1NSekNKKRj3huqWP6XcPU1VvVQuWZqkyGWjpmpdvQflJkEznavd2sxhU+uglJ9kM/nWjZb/nbr7IaafAf/9Q9AB63Cu9Hx/N3EQV36Pf+0OZiTQhYurNQRE23HA3sRnMK0cKlj0DY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032314; c=relaxed/simple;
-	bh=aC+DAIoXKVhLZjQ6VtxK/CU+nypY/dW+t6e//OC/LfI=;
+	s=arc-20240116; t=1781032320; c=relaxed/simple;
+	bh=5tWrOfwAoTdtiugODrPJwqvRH5XTpwTVzL/RkoxFmKQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ST0t+Q858cGPYXkX5ZwwKifaHaRrMrzyQTK7b9LLUj6NLjqAIfVAq2526cqzTFtZTY4jueeTreY2+JZv4MeKaXXU8pT/b6pUXbpSolppXMgaz/18Yd5WcMkUIDH3nP0iIRUdBTmcZp4iot9gvc73y9sBA4D7AzvXGx6v6pb+4dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BBqeDFBO; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=T4X/wvcMdLnhdJuMSkuUej6/SASkJdHMMaosgyx8ANo6mVmB0P/Jse3ZUHg9p4ygt29GlO/J5rjICEvFgrTPoNY9YD5tri5Rd+Ihr1xSSnuY367Gk6rxrIx8MhQQpislmjb8TUJc80jo+nutnsC2KCvux+3qMGhKRb2kRs5I6UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HbkJriII; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBqeDFBO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E8E21F00893;
-	Tue,  9 Jun 2026 19:11:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HbkJriII"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8EE11F00898;
+	Tue,  9 Jun 2026 19:11:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032313;
-	bh=LG6tMe5IWSj2wlms7qY7Y93GPHV0FPQd/hj6Ivr47HU=;
+	s=k20260515; t=1781032318;
+	bh=IkD0QE1JNG+5G4E9lQ6Nh6HgjvnmUhj4qhwVEK7b4Kw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=BBqeDFBO6IhOZgXsVP1UWzizuRgZi3kU7sfun64CmXti2K6oPjtIBK9ig3BdDxI99
-	 cF7sX5GSOB9a6RMswzwGJ7G7wZWyz/OfM3ww7kqrGDbMJUrfhm2MfUAy4dhiIJfUv9
-	 lxKN4uCMP2DKqoRBLiWW+W+lxD3bzRPoS1unHHzrTSIUA5h5UlVsTL+dXBA1j4FZLV
-	 rMUy57xguGXz2SWZBBNK+OUjIdOGj04TXu2YFAKrqi0ypCd7uemPexNeQWMWarv446
-	 GXbWEZYV7iPTK5o/ZILzn8GsZmANF8B20sLgQqjMB8ZeqEKOEZdqbn6/zR5YMgJkYr
-	 bqqCWK/4xzSTA==
+	b=HbkJriII3mozpClgOgi65m6h2a4N5QW7igQRqNhtcRg/1/9VCyekam92oxNs83Vv2
+	 8ZvF5ZsjHQnVxNDCtEQdRGKyzgJ3/iPPhkHsDnJO+d61HEqeSOpIM+myPDxNVkTr+A
+	 A5e2liydG4NK1SLts+w88+lMJ0AErM2/Q16rZP4xSQYJv0CKTs6i8cLvXKWT6uJYCR
+	 eM5CSuk0AtUQk0qW2NMFSjq8VMNMyRNP/XsYZZKEME84eDwrVSf+OgloaEqROe8fah
+	 gCpp5t3MPXJ+StljDASOVhFgkcGDd514WrNe5/cHXTO8/VK95jGEbXiwFKKzldxg/b
+	 +92RzJ2tyv7ew==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:09:01 +0200
-Subject: [PATCH v2 82/83] block: rnull: add `shared_tag_bitmap` config
- option
+Date: Tue, 09 Jun 2026 21:07:55 +0200
+Subject: [PATCH v2 16/83] block: rnull: add memory backing
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-82-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-16-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -59,154 +58,299 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5599; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=aC+DAIoXKVhLZjQ6VtxK/CU+nypY/dW+t6e//OC/LfI=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGT+NlnHQn5rbaLOqNWNJZ4pO68g/2hZz04u7
- eduX1XgsBqJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk/gAKCRD6UCkIqsW9
- 0PeWD/90gWv84QyKgx1/RYvYIvXyS8hP7dIG5obg9kqAuuG0GqZasGqXWQwPi7fElVX7xT3U2jr
- HPB7ByYGppRrwvyHt6ai6tGJAAY8No0tir/Lf5sW+HIZy4rJmWSid+N9fhnWj0yft0TGKqmMx/v
- ucDqJO9i3hfO6qGo/0nFAgB2f4ao7DZ66A3Z494exLc3UvYGIbhgo6Ux1GcY8EZvKmD4Sz2mKDq
- U7Sgv/YbBaacDWVZSopGuy6V3KwESVPjmEUFwVaXxKvgK5enyB+DryohgVsTKzrcZB2Kxi0dIoT
- 42UzjEo+Kw6pNiADr2FvTSzmGfpdGbJta9bdVt/ehnJPf4RYMiaASV3JkY1W5bhaUtqyU6nsvca
- YnW0ymLhTvxVkaaUHODoEyhbMYRpPKoDd/VYXcW37a/QATqEYS0NX5O9j8j/H55gpDRt/SiN9qc
- BsTP/kqQAk3962iTwxTiDEeNfcGbZ/jSszC4svAyMcqMC21DBdq41SrV8fhKOeigFaWuzeilq9U
- PO6lsfFeREpMMJkPbT8hyElT3qnFzQ4qk7MgfpEp+XqZCqyFqKnISg+ECIm8gwcsEYFD3FNukZk
- gqKc75NFApUc40oqvG4e76V8QyYJNVoK6Tg38XcH59mRvwQibccjYe/xcrGVJ7MGeTZmzB4Zo9T
- rtv+TYGXxJnL7zg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9051; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=5tWrOfwAoTdtiugODrPJwqvRH5XTpwTVzL/RkoxFmKQ=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTDlpQLAb1Gdie0mQdmixKF/RmwXPiQ/Q1mE
+ yviretqzF+JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkwwAKCRD6UCkIqsW9
+ 0E5BD/kBzAHZRaW7Q6j0G0U3xNqihtUwFAbCJwp+84ZCx2vnJuP6bH2v801ATOF/7Ik6Gips0mP
+ +46GLnccPBOI5WabhrpnL2CZ2ZSDBbGUoOm2v2n8HsGRyh61KptIriN+blMlb9soc+VrzGNW1To
+ g1B1kBaqYTeVEAPC8iJ5gYzcZTmEwNEIYkHEwT4DlU+OBQpA8/+2cMyJuWrIHXBKe3/z7LgcdnP
+ VFkuPPsHkxklFDpZDCuCWYRH4wKwx4kn3XToD8jS7B4AFDlh4eDimVOzFOr33BnmbPceBK+zQon
+ bBhjFJH4D6gbSmcZ/uCBYq1aPS4Vj3grlTBCX/KmBfBAY3+VJB5i4cuB/am8pIR+CF1J/8JbS6a
+ SO10KADB1axzJrNZLOTOOKQpzRWNvqu7eFtAgdnxkeqaa4Wg4iyrJzvFJSSe1mDYzMYAj2WJOOj
+ 1uXy8L1k6bYhn16XKayO5bwak8fjQMHOpFUAj6HKxLIXMqRDx3emfaDqNTndTkKYQGaf+drMJh6
+ xhn5HyA7xZdrkfBE5n/gQ9j37eojuawnQPcEiGQfIAWuBVX9aFgv/BT5u07a4pD+Z/CBrpOdpDr
+ VTPbIr3B7RLh0Z/hJrmf31ZOEUxysfmNaWOSxYcaPC5gBdCXlYfbJjrWvId0h+DW6PVqkl9a0Pb
+ cmr4YJ0LMImhP7w==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add a configfs attribute and module parameter to enable the
-`BLK_MQ_F_TAG_HCTX_SHARED` flag for the rnull tag set. When enabled,
-a tag bitmap is shared across all hardware queues.
+Add memory backing to the rust null block driver. This implementation will
+always allocate a page on write, even though a page backing the written
+sector is already allocated, in which case the page will be released again.
+A later patch will fix this inefficiency.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs       |  5 +++++
- drivers/block/rnull/rnull.rs          | 12 ++++++++++++
- rust/kernel/block/mq/tag_set/flags.rs |  4 ++++
- 3 files changed, 21 insertions(+)
+ drivers/block/rnull/configfs.rs |   8 ++-
+ drivers/block/rnull/rnull.rs    | 126 ++++++++++++++++++++++++++++++++++------
+ 2 files changed, 116 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 3e054339226c..1bab38c55698 100644
+index 83b474f6da60..8daf2ca409ba 100644
 --- a/drivers/block/rnull/configfs.rs
 +++ b/drivers/block/rnull/configfs.rs
-@@ -134,6 +134,7 @@ fn make_group(
-                 fua: 28,
-                 max_sectors: 29,
-                 virt_boundary: 30,
-+                shared_tag_bitmap: 31,
+@@ -60,7 +60,7 @@ impl AttributeOperations<0> for Config {
+ 
+     fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+         let mut writer = kernel::str::Formatter::new(page);
+-        writer.write_str("blocksize,size,rotational,irqmode,completion_nsec\n")?;
++        writer.write_str("blocksize,size,rotational,irqmode,completion_nsec,memory_backed\n")?;
+         Ok(writer.bytes_written())
+     }
+ }
+@@ -84,6 +84,7 @@ fn make_group(
+                 size: 3,
+                 irqmode: 4,
+                 completion_nsec: 5,
++                memory_backed: 6,
              ],
          };
  
-@@ -223,6 +224,7 @@ fn make_group(
-                     init_hctx_inject,
-                     max_sectors: 0,
-                     virt_boundary: false,
-+                    shared_tag_bitmap: false,
+@@ -101,6 +102,7 @@ fn make_group(
+                     irq_mode: IRQMode::None,
+                     completion_time: time::Delta::ZERO,
+                     name: name.try_into()?,
++                    memory_backed: false,
                  }),
              }),
-             default_groups,
-@@ -318,6 +320,7 @@ struct DeviceConfigInner {
-     init_hctx_inject: Arc<FaultConfig>,
-     max_sectors: u32,
-     virt_boundary: bool,
-+    shared_tag_bitmap: bool,
+             core::iter::empty(),
+@@ -165,6 +167,7 @@ struct DeviceConfigInner {
+     irq_mode: IRQMode,
+     completion_time: time::Delta,
+     disk: Option<GenDisk<NullBlkDevice>>,
++    memory_backed: bool,
  }
  
  #[vtable]
-@@ -374,6 +377,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                     blocking: guard.blocking,
-                     memory_backed: guard.memory_backed,
-                     no_sched: guard.no_sched,
-+                    shared_tag_bitmap: guard.shared_tag_bitmap,
-                     hw_queue_depth: guard.hw_queue_depth,
-                     #[cfg(CONFIG_BLK_DEV_RUST_NULL_FAULT_INJECTION)]
-                     init_hctx_inject: guard.init_hctx_inject.clone(),
-@@ -622,3 +626,4 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
- configfs_simple_bool_field!(DeviceConfig, 28, fua);
- configfs_simple_field!(DeviceConfig, 29, max_sectors, u32);
- configfs_simple_bool_field!(DeviceConfig, 30, virt_boundary);
-+configfs_simple_bool_field!(DeviceConfig, 31, shared_tag_bitmap);
+@@ -195,6 +198,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 guard.capacity_mib,
+                 guard.irq_mode,
+                 guard.completion_time,
++                guard.memory_backed,
+             )?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -226,3 +230,5 @@ fn from_str(s: &str) -> Result<Self> {
+         value.try_into()
+     }
+ }
++
++configfs_simple_bool_field!(DeviceConfig, 6, memory_backed);
 diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 147dc8498c3a..81f9e2d03f31 100644
+index 746ddadd11f0..8e4d2b270bcf 100644
 --- a/drivers/block/rnull/rnull.rs
 +++ b/drivers/block/rnull/rnull.rs
-@@ -216,6 +216,10 @@
-             default: false,
-             description: "Set alignment requirement for IO buffers to be page size.",
+@@ -6,8 +6,10 @@
+ 
+ use configfs::IRQMode;
+ use kernel::{
++    bindings,
+     block::{
+         self,
++        bio::Segment,
+         mq::{
+             self,
+             gen_disk::{
+@@ -19,15 +21,12 @@
          },
-+        shared_tag_bitmap: bool {
+     },
+     error::Result,
+-    new_mutex,
++    memalloc_scope, new_mutex, new_xarray,
++    page::SafePage,
+     pr_info,
+     prelude::*,
+     str::CString,
+-    sync::{
+-        aref::ARef,
+-        Arc,
+-        Mutex, //
+-    },
++    sync::{aref::ARef, Arc, Mutex},
+     time::{
+         hrtimer::{
+             HrTimerCallback,
+@@ -40,7 +39,8 @@
+     types::{
+         OwnableRefCounted,
+         Owned, //
+-    }, //
++    },
++    xarray::XArray,
+ };
+ 
+ module! {
+@@ -74,6 +74,10 @@
+             default: 10_000,
+             description:  "Time in ns to complete a request in hardware. Default: 10,000ns",
+         },
++        memory_backed: bool {
 +            default: false,
-+            description: "Use shared tag bitmap for all submission queues for blk-mq.",
++            description: "Create a memory-backed block device.",
 +        },
      },
  }
  
-@@ -245,6 +249,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-             let memory_backed = module_parameters::memory_backed.value();
-             let no_sched = module_parameters::no_sched.value();
-             let hw_queue_depth = module_parameters::hw_queue_depth.value();
-+            let shared_tag_bitmap = module_parameters::shared_tag_bitmap.value();
- 
-             let shared_tag_set = NullBlkDevice::build_tag_set(TagSetOptions {
-                 home_node,
-@@ -258,6 +263,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                 blocking,
-                 memory_backed,
-                 no_sched,
-+                shared_tag_bitmap,
-                 hw_queue_depth,
-                 #[cfg(CONFIG_BLK_DEV_RUST_NULL_FAULT_INJECTION)]
-                 init_hctx_inject: Arc::pin_init(
-@@ -300,6 +306,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                         blocking,
-                         memory_backed,
-                         no_sched,
-+                        shared_tag_bitmap,
-                         hw_queue_depth,
-                         #[cfg(CONFIG_BLK_DEV_RUST_NULL_FAULT_INJECTION)]
-                         init_hctx_inject: Arc::pin_init(
-@@ -404,6 +411,7 @@ struct TagSetOptions {
-     blocking: bool,
-     memory_backed: bool,
-     no_sched: bool,
-+    shared_tag_bitmap: bool,
-     hw_queue_depth: u32,
-     #[cfg(CONFIG_BLK_DEV_RUST_NULL_FAULT_INJECTION)]
-     init_hctx_inject: Arc<FaultConfig>,
-@@ -419,6 +427,7 @@ fn build_tag_set(options: TagSetOptions) -> Result<Arc<TagSet<Self>>> {
-             blocking,
-             memory_backed,
-             no_sched,
-+            shared_tag_bitmap,
-             hw_queue_depth,
-             #[cfg(CONFIG_BLK_DEV_RUST_NULL_FAULT_INJECTION)]
-             init_hctx_inject,
-@@ -441,6 +450,9 @@ fn build_tag_set(options: TagSetOptions) -> Result<Arc<TagSet<Self>>> {
-         if no_sched {
-             flags |= mq::tag_set::Flag::NoDefaultScheduler;
-         }
-+        if shared_tag_bitmap {
-+            flags |= mq::tag_set::Flag::TagHctxShared;
-+        }
- 
-         let queue_config_guard = queue_config.lock();
-         let submit_queues = queue_config_guard.submit_queues;
-diff --git a/rust/kernel/block/mq/tag_set/flags.rs b/rust/kernel/block/mq/tag_set/flags.rs
-index 2561d7090c49..afc9d31ed998 100644
---- a/rust/kernel/block/mq/tag_set/flags.rs
-+++ b/rust/kernel/block/mq/tag_set/flags.rs
-@@ -21,5 +21,9 @@ pub enum Flag {
-         /// Select 'none' during queue registration in case of a single hwq or shared
-         /// hwqs instead of 'mq-deadline'.
-         NoDefaultScheduler = bindings::BLK_MQ_F_NO_SCHED_BY_DEFAULT,
+@@ -103,6 +107,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     module_parameters::gb.value() * 1024,
+                     module_parameters::irqmode.value().try_into()?,
+                     Delta::from_nanos(completion_time),
++                    module_parameters::memory_backed.value(),
+                 )?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -127,17 +132,23 @@ fn new(
+         capacity_mib: u64,
+         irq_mode: IRQMode,
+         completion_time: Delta,
++        memory_backed: bool,
+     ) -> Result<GenDisk<Self>> {
+-        let tagset = Arc::pin_init(
+-            TagSet::new(1, 256, 1, mq::tag_set::Flags::default()),
+-            GFP_KERNEL,
+-        )?;
++        let flags = if memory_backed {
++            mq::tag_set::Flag::Blocking.into()
++        } else {
++            mq::tag_set::Flags::default()
++        };
 +
-+        /// Use shared tag bitmap for all submission queues.
-+        TagHctxShared = bindings::BLK_MQ_F_TAG_HCTX_SHARED,
-+
++        let tagset = Arc::pin_init(TagSet::new(1, 256, 1, flags), GFP_KERNEL)?;
+ 
+-        let queue_data = Box::new(
+-            QueueData {
++        let queue_data = Box::pin_init(
++            pin_init!(QueueData {
++                tree <- new_xarray!(kernel::xarray::AllocKind::Alloc),
+                 irq_mode,
+                 completion_time,
+-            },
++                memory_backed,
++            }),
+             GFP_KERNEL,
+         )?;
+ 
+@@ -148,11 +159,72 @@ fn new(
+             .rotational(rotational)
+             .build(fmt!("{}", name.to_str()?), tagset, queue_data)
      }
++
++    #[inline(always)]
++    fn write(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -> Result {
++        while !segment.is_empty() {
++            let page = SafePage::alloc_page(GFP_KERNEL)?;
++            let mut tree = tree.lock();
++
++            let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
++
++            let page = if let Some(page) = tree.get_mut(page_idx) {
++                page
++            } else {
++                tree.store(page_idx, page, GFP_KERNEL)?;
++                tree.get_mut(page_idx).unwrap()
++            };
++
++            let page_offset = (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
++            sector += segment.copy_to_page(page, page_offset) >> block::SECTOR_SHIFT;
++        }
++        Ok(())
++    }
++
++    #[inline(always)]
++    fn read(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -> Result {
++        let tree = tree.lock();
++
++        while !segment.is_empty() {
++            let idx = sector >> block::PAGE_SECTORS_SHIFT;
++
++            if let Some(page) = tree.get(idx) {
++                let page_offset =
++                    (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
++                sector += segment.copy_from_page(page, page_offset) >> block::SECTOR_SHIFT;
++            } else {
++                sector += segment.zero_page() >> block::SECTOR_SHIFT;
++            }
++        }
++
++        Ok(())
++    }
++
++    #[inline(never)]
++    fn transfer(
++        command: bindings::req_op,
++        tree: &XArray<TreeNode>,
++        sector: usize,
++        segment: Segment<'_>,
++    ) -> Result {
++        match command {
++            bindings::req_op_REQ_OP_WRITE => Self::write(tree, sector, segment)?,
++            bindings::req_op_REQ_OP_READ => Self::read(tree, sector, segment)?,
++            _ => (),
++        }
++        Ok(())
++    }
  }
+ 
++type TreeNode = Owned<SafePage>;
++
++#[pin_data]
+ struct QueueData {
++    #[pin]
++    tree: XArray<TreeNode>,
+     irq_mode: IRQMode,
+     completion_time: Delta,
++    memory_backed: bool,
+ }
+ 
+ #[pin_data]
+@@ -182,7 +254,7 @@ impl HasHrTimer<Self> for Pdu {
+ 
+ #[vtable]
+ impl Operations for NullBlkDevice {
+-    type QueueData = KBox<QueueData>;
++    type QueueData = Pin<KBox<QueueData>>;
+     type RequestData = Pdu;
+ 
+     fn new_request_data() -> impl PinInit<Self::RequestData> {
+@@ -192,7 +264,27 @@ fn new_request_data() -> impl PinInit<Self::RequestData> {
+     }
+ 
+     #[inline(always)]
+-    fn queue_rq(queue_data: &QueueData, rq: Owned<mq::Request<Self>>, _is_last: bool) -> Result {
++    fn queue_rq(
++        queue_data: Pin<&QueueData>,
++        mut rq: Owned<mq::Request<Self>>,
++        _is_last: bool,
++    ) -> Result {
++        if queue_data.memory_backed {
++            memalloc_scope!(let _noio: NoIo);
++            let tree = &queue_data.tree;
++            let command = rq.command();
++            let mut sector = rq.sector();
++
++            for bio in rq.bio_iter_mut() {
++                let segment_iter = bio.segment_iter();
++                for segment in segment_iter {
++                    let length = segment.len();
++                    Self::transfer(command, tree, sector, segment)?;
++                    sector += length as usize >> block::SECTOR_SHIFT;
++                }
++            }
++        }
++
+         match queue_data.irq_mode {
+             IRQMode::None => rq.end_ok(),
+             IRQMode::Soft => mq::Request::complete(rq.into()),
+@@ -205,7 +297,7 @@ fn queue_rq(queue_data: &QueueData, rq: Owned<mq::Request<Self>>, _is_last: bool
+         Ok(())
+     }
+ 
+-    fn commit_rqs(_queue_data: &QueueData) {}
++    fn commit_rqs(_queue_data: Pin<&QueueData>) {}
+ 
+     fn complete(rq: ARef<mq::Request<Self>>) {
+         OwnableRefCounted::try_from_shared(rq)
 
 -- 
 2.51.2
