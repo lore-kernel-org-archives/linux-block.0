@@ -1,32 +1,32 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755952DB798;
-	Tue,  9 Jun 2026 06:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8653126D0
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780985748; cv=none; b=mQQOH5I13qWPUFXJvvdFr52AqnpRt89a6ZgpIVlYuTjr5idJaXxVjBqziGyrG5UxzLLm4tDOZcBRKXbfzfCq08RmmVX6pbt6cClqSX+UPD1RXdKMvNeMWopXh6IbCCN73TPzx3wkTMgePhlmBT8oBI9IhXkPswsqB1834eByocw=
+	t=1780986413; cv=none; b=WKzqeys1OdCQZ/qRS7w9eSlFXmGv3W6Xz+0Z20xoPYBw5F4+GwCr1++fGYRAz/CBPFD/oCasUJWiI1gtjaOszKpN4IghvBOQUePZ6PJoc3M4KiW6dzb5puL7ba4cMMB9cBo2YAikkIkwV+ftsqvAuU8cMSmEEb5ke4GFOZn2F7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780985748; c=relaxed/simple;
-	bh=cPva2gAmFaYku+W1JPo6ih65+2CyucxGxB/+Epfgxvo=;
+	s=arc-20240116; t=1780986413; c=relaxed/simple;
+	bh=UXvgZ5i39WFb+rtXwEcMt3I1NdMkQHw8ky5ZKPRvCR0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qbjmzJXzdpiDP2fvf8xZsUw3QvHDUXkuccl/hPHu6I1I5MSxnesSQ/m/TiazuWAOk+dwM/nIVw3fDfQP8TgBLWgwVLJy57nrvaVvN3dG8rD9gJTzF9YfE0IUKDhkmahS+VrZgDMpaqi8hwZTlEEWlcV4kmcdSx+NkxTGTPN5MoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mu4x5jso; arc=none smtp.client-ip=91.218.175.177
+	 MIME-Version; b=jcFHwCpmAVHVekNMgD9y8g8Bo8Ic1kUbyAdyVQ8hfqrH1hvlzg00II+rqvn8HwqrjNDxhdgaKQT9k/9VaFYM5GOvm7gBIFn1t1k4+xv/Lu3MHznOlbg7672hq9Mxn3qnVfthUNLGPiuS7N5kBRMQ/F2uBbnmdEjP4klIUNBiYVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hAcwtJDC; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mu4x5jso"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hAcwtJDC"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780985744;
+	t=1780986398;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8IbZbE3jo0O5k9m8Y0Atqn05/3xjZN/raHrVYg8v9cA=;
-	b=mu4x5jsoYo0l0ovgG3zOUnjhNAQicGnTrtTFx6Idq1wmNye60WV1RaPHTgTt8LrIeGV3Rp
-	z1sQSh8qYQYqgD+WB2P0Pz0U+UWtH+CwphgBLPih3SdT7bmzxnYsrxKQ46Ig7exityyWy0
-	/VoZbB9nTPAPZ3JdijaeFc0zLpE0Zho=
+	bh=QgWAksApTGvLxjW8jDqRXxXlqcSTxmsvhz5k9DI0lic=;
+	b=hAcwtJDCWZFRSYLTEPue3KI/vBKMw7McXz6aBCAwYSHGbCZ8691Hb8Q9SEjvRfQxb72Tta
+	DvZFdo/ENYvZXhMqWs/CaNmhp2HC/ZidkwGpdCsM2noviPsBOF++1vKdv+wycU7cucS29B
+	gJe3i3hLPUY6TqgCUx2oYjH058D/AcI=
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Muchun Song <muchun.song@linux.dev>,
@@ -91,9 +91,9 @@ Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
 	Luca Ceresoli <luca.ceresoli@bootlin.com>,
 	Kaitao Cheng <kaitao.cheng@linux.dev>,
 	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v2 02/14] firewire: core: Open-code topology list walk
-Date: Tue,  9 Jun 2026 14:13:35 +0800
-Message-ID: <20260609061347.93688-3-kaitao.cheng@linux.dev>
+Subject: [PATCH v2 03/14] drm/bridge: Open-code bridge chain list walks
+Date: Tue,  9 Jun 2026 14:25:15 +0800
+Message-ID: <20260609062526.94907-1-kaitao.cheng@linux.dev>
 In-Reply-To: <20260609061347.93688-1-kaitao.cheng@linux.dev>
 References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
 Precedence: bulk
@@ -107,35 +107,45 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
-A later change will make list_for_each_entry() cache the next element
-before entering the loop body. for_each_fw_node() intentionally appends
-newly discovered child nodes to the temporary walk list while the list is
-being traversed.
+A later change will make list_for_each_entry_from() and
+list_for_each_entry_reverse() cache the next or previous element before
+entering the loop body. The bridge enable and disable ordering code
+adjusts its cursor to skip ranges that have already been handled.
 
-Keep the loop open-coded so the next node is looked up only after
-children have been appended. This preserves the current breadth-first
-traversal semantics and prepares the code for the list iterator update.
+Keep those walks open-coded so the loop step observes the cursor
+selected by the body. This preserves the existing bridge ordering
+semantics and prepares the code for the list iterator update.
 
 Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
 ---
- drivers/firewire/core-topology.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/gpu/drm/drm_bridge.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/firewire/core-topology.c b/drivers/firewire/core-topology.c
-index bb2d2db30795..df2ac0dab106 100644
---- a/drivers/firewire/core-topology.c
-+++ b/drivers/firewire/core-topology.c
-@@ -272,7 +272,9 @@ static void for_each_fw_node(struct fw_card *card, struct fw_node *root,
- 	fw_node_get(root);
- 	list_add_tail(&root->link, &list);
- 	parent = NULL;
--	list_for_each_entry(node, &list, link) {
-+	for (node = list_first_entry(&list, typeof(*node), link);
-+	     !list_entry_is_head(node, &list, link);
-+	     node = list_next_entry(node, link)) {
- 		node->color = card->color;
+diff --git a/drivers/gpu/drm/drm_bridge.c b/drivers/gpu/drm/drm_bridge.c
+index d6f512b73389..a538aabc4e0b 100644
+--- a/drivers/gpu/drm/drm_bridge.c
++++ b/drivers/gpu/drm/drm_bridge.c
+@@ -868,7 +868,8 @@ void drm_atomic_bridge_chain_post_disable(struct drm_bridge *bridge,
  
- 		for (i = 0; i < node->port_count; i++) {
+ 	encoder = bridge->encoder;
+ 
+-	list_for_each_entry_from(bridge, &encoder->bridge_chain, chain_node) {
++	for (; !list_entry_is_head(bridge, &encoder->bridge_chain, chain_node);
++	     bridge = list_next_entry(bridge, chain_node)) {
+ 		limit = NULL;
+ 
+ 		if (!list_is_last(&bridge->chain_node, &encoder->bridge_chain)) {
+@@ -962,7 +963,9 @@ void drm_atomic_bridge_chain_pre_enable(struct drm_bridge *bridge,
+ 
+ 	encoder = bridge->encoder;
+ 
+-	list_for_each_entry_reverse(iter, &encoder->bridge_chain, chain_node) {
++	for (iter = list_last_entry(&encoder->bridge_chain, typeof(*iter), chain_node);
++	     !list_entry_is_head(iter, &encoder->bridge_chain, chain_node);
++	     iter = list_prev_entry(iter, chain_node)) {
+ 		if (iter->pre_enable_prev_first) {
+ 			next = iter;
+ 			limit = bridge;
 -- 
 2.43.0
 
