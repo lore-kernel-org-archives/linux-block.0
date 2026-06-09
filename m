@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D813749E0;
-	Tue,  9 Jun 2026 19:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC44374A01;
+	Tue,  9 Jun 2026 19:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032437; cv=none; b=Tbb9ZpAnOv6OIm6qJy33/0m4/3+f2kZyPZ/3QpJpnyfrA/jBE/+8cniUJm/8e6hFUNHek9bPWgqrnNREl/GjvIWKLXNTzhCEz4FuqtG7jSruiFLAkROSuCC9woFumT/AhPHafzsoQ7HuO+Rd+t0KMdlkul7GnQhEIr0vzz8Fvcs=
+	t=1781032444; cv=none; b=E3OnceKiOxYgTKecZm1efkG4YEXfbZOguocXcEgYuzr/IsNVDMCb7+nafU6WmVh92TzAj+a+ogaAltx7SWHgr+VCIjtvjEHRU7YyQyGdt3xCPq/WLR4knFPy3abTpe9xTb5tARd/+xDPL0MDaqepNtWvHGnK/iN8Sa9YXN4zb6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032437; c=relaxed/simple;
-	bh=WeYmUyzlnXNFxatIkPpAFWbysNLEuc10mgSTySvU0tw=;
+	s=arc-20240116; t=1781032444; c=relaxed/simple;
+	bh=4KyhpI/ipNtBWo4VfFmPMWE541B+ewaPC0dhOaA747E=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ylte/wn0bTZ9abEsh6dPaeBcW+W7EOlk57QeGpSJ2gtyv2zdcosAovquvNzDakRGSjJ2q23Exrtfm141l+hvaXCtBBcZwUjxQI4K7Bgt3rIFVp5DonnOXUrrB2PwWiOlo7txsuWc53XdVmFSuuMPk+VN1xqC5KoMnt5Qz0UP1nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfcOINeh; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=eZwiBXXGNC15PaRdJf1THLdRkVg56drtJrcMq1BbJNc/Bt0RWHNoAkwrEoZtqjML+Qh2r+dgp+3Gl8tuj1TqIAlM+WN/LM+1p2KEUEwXnACLZ35EAM69IjF80TtX2HsLdK1Qq3xttiaACvmIpyg0MisoHn3/I6e/EEmLhlhASZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GkzrKIe2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfcOINeh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B3FF1F00893;
-	Tue,  9 Jun 2026 19:13:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GkzrKIe2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 391DF1F00898;
+	Tue,  9 Jun 2026 19:13:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032436;
-	bh=75VKKvc6NJYD5SbM7TBq2nTJ46z7L7NmdWlGRZUewiQ=;
+	s=k20260515; t=1781032442;
+	bh=07OL9kcN1ts1JXzzO+dUFMGY2+vD2vNCDEhWdbU7mT4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=kfcOINehWKcp3xHtTXGSLHWSOG52K0OZctFq88FEdbCXodQGd98cSiTeLARe08H/I
-	 WZdb4CcyA44JkRtJQOnH/HoVzi84FyydSlaaxTVzXONcu7HTe4IMNMs9m192s1V4OF
-	 1QhvpFsnOU7Th4JJa/thaqDZrlpgAfjaUMzEFoGsvpqs0Hm/qDgndrXyKY8tDQy/IQ
-	 xQElXKLaImnBu5kviUwfTySaGPDXwGWQfFcjblEEUttXyW68n8jo2WCSM1ZxyGYD6y
-	 W7ZYebArVcSCDN5wNYEE3mToENk/qla4+cSl5PVFg5tTDZe7McNe4oS5YEC6wJdRqE
-	 Co35lL4onwnaA==
+	b=GkzrKIe2u3GY0JbJewS0RuhVNBjw7yRlApgAHzBncBKj0XnPuXad13OLnC7CRwaXG
+	 iMgQ1BzKirKGjzmSiTCjo/1Fs9/L8PDVtB/u0nDJbC37bCWViphuSoV3Cvd3UmrvDj
+	 pME6QGR8NxzFmm0HDLEQWprWgzzml6RxsrCNYnyYa/HOjeT5IflAHk4Gc+lccHR5Vi
+	 VOthBvAe25P+FT/ToGxNyMYpxjHPvckRZAzs9NU/Jcy5K5VwCW8qQLK31VymURNStI
+	 NDGvTJie/NIGPH6KxtT/P0RBcLko0qNzcD+/4wPU5peW1CRKFAmJ+OMnnA6UGIRTP+
+	 XfcBzTDei3a0Q==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:07:48 +0200
-Subject: [PATCH v2 09/83] block: rust: document the lifetime of `Request`
+Date: Tue, 09 Jun 2026 21:08:41 +0200
+Subject: [PATCH v2 62/83] block: rust: allow setting write cache and FUA
+ flags for `GenDisk`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-9-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-62-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -58,67 +59,111 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2300; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=WeYmUyzlnXNFxatIkPpAFWbysNLEuc10mgSTySvU0tw=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGS8pbk0dWGZmS3+sy2e+s65BD8zbm6UgUtCy
- OvQvHcZviCJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkvAAKCRD6UCkIqsW9
- 0GOND/oClSp+fyePfjxASjbnzpRkbpOcYzsPIfJIFLzOEbuxRBKqUBX5gb6z9iM9ekAtle7EjDm
- LgmLhm0/UWbN/qEG/RzRfvXrZkkzRon67UBiFRqCaTGOdCAYMbrJSuUyxdCsf3Tr3lU2rundNb3
- ZxcH9LxUz0Bt2ojKj+vWsVfflJtJzKjap3viiFj8LecPgipAQqexSqDuIn8JC4hOFb2MuvCMuBY
- 1j/QRQ/ZH5DxEfl9E172ZsadOzLm4CNgQeHRznsTqMcqi5iLdG6u1SJ6ReQozO53l0/faq7WhdV
- BF/L0lwriH76mvPK9gueQ4jM0vFUhD6CwrMwHHvEzgq1oSJNITpx9or18C6Dr7o2/AssXrvOz7I
- hc1I/qc5eslTGSkvxp1ftgksTj+cp0ckdVu9Hoo9Ok+UaB7cUHnFxEpmvRj7/x1Z0AiiFimQaJl
- uyLRyDmCazphHvIP3oZ7CwYBfed03bT6/5vKQfqWZQ3nZCShOG6Lq2WKTKkN4NCBGng4/TOdJ3q
- prIb/yRoyDjqzavaK/zyHafEQsUdcKTbO1lzIhC7McNRlpKUf5bt16+nGRdSXbEgfVPiKRd3c60
- vARab+Z3NoVCOPqseBUmafgMa3ay/XiiOb1f6d14r9Jv161VFFrwaww5vGDsLalB+c7IHagEWly
- JokXC674ET8kROQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2966; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=4KyhpI/ipNtBWo4VfFmPMWE541B+ewaPC0dhOaA747E=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTs54UDr8c4HG8t9kjVRyMVGYuBltQmu35Fx
+ kzOC0ur7sGJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk7AAKCRD6UCkIqsW9
+ 0MLED/9uhTnck2NzwFArogG6VlzaQyne7VPrBkfmw6Nv9UnoWpTNUkQfe/CsDpQGsQxLtCmae/z
+ E1C6XowvFBrQtmwJ2gsPnNOe5tmkJuNQOAnrSXGO7sC5OeqlVJ0tgiEO5QGEfp1EQfsLt4qmIvu
+ 3ZEioOmYoItty3EBEvv5H3WyjCSGEdo4pKOewZ+FNfE/rJj0G8lpwsZs24HlwBUaXB847igdfCg
+ Ww3FMnCeM7z37GSPdxmB6OaqZQM91MVDQrBzEQLu3NYjs5SSWknEe948agXVpRo+mI1nr44JdwO
+ ha/ZiVWE5418t6/WrHnzw6UKoj0ALQ00jtulT74X883V9UJqgpSMtGRT/Zx28YdWJCNlG+HkSiJ
+ ZUnN7IyNz5oRD5heUlK+3ymtP/gsAougCbARycu9ziTyMX6e5af8ofNWexv8+7LHjiwhlcCEMp2
+ fUpW47RaTUxN7poQqnXe5JgXfBtdNmAk49uVTVHcFb2OE/FiYzqEJxqQ7fDA3vUS7Vw8fVGI8ti
+ RAf2z/EcyjbByabxIQpiWqLQROy4g8G+IHdgVs+Bu8glPNHc0jzafKewS/RD19YKxcVZcwo+HR+
+ 37VssMaG+PTuLzYSpas3h8u7UljZO0tMrD6jZWTBYCgRlaz8Y1vLONVCt1MMtPYLPiZXT93duaC
+ cq8ynYTAiX1BKag==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-The `struct request` objects backing a `Request` are not allocated and
-freed for each IO. Instead, a fixed pool of requests is allocated when
-the tag set is initialized, and each request is reused to service many
-distinct IO operations over the lifetime of the request queue. It is
-easy to assume from the existing documentation that a request, and in
-particular its private data, is fresh for each IO.
-
-Add a `Lifetime` section to the `Request` documentation describing this
-reuse and its consequence for the lifetime of the request private data.
+Add methods to `GenDiskBuilder` for enabling the write cache and FUA
+feature flags. These flags are set in the `queue_limits` structure
+when building the disk.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq/request.rs | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ rust/kernel/block/mq/gen_disk.rs | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index 1882d697dcf3..a6e757d8755d 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -29,6 +29,24 @@
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index eedba691e167..5367ca92b7aa 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -9,6 +9,7 @@
+     bindings,
+     block::mq::{
+         operations::OperationsVTable,
++        Feature,
+         Operations,
+         RequestQueue,
+         TagSet, //
+@@ -55,6 +56,8 @@ pub struct GenDiskBuilder<T> {
+     zone_size_sectors: u32,
+     #[cfg(CONFIG_BLK_DEV_ZONED)]
+     zone_append_max_sectors: u32,
++    write_cache: bool,
++    forced_unit_access: bool,
+     _p: PhantomData<T>,
+ }
  
- /// A wrapper around a blk-mq [`struct request`]. This represents an IO request.
- ///
-+/// # Lifetime
-+///
-+/// The [`struct request`] backing a [`Request`] is not allocated and freed for
-+/// each IO. Instead, a fixed pool of requests is allocated up front when the
-+/// [`TagSet`](crate::block::mq::TagSet) is initialized, with one request per
-+/// available tag. A single request allocation is then reused to service many
-+/// distinct IO operations over the lifetime of the request queue: when the
-+/// block layer needs to process an IO, it assigns a free tag and hands the
-+/// driver the associated request, and once that IO completes the request is
-+/// returned to the pool to later be handed out again for an unrelated IO.
-+///
-+/// The private data area of the request, which holds the driver defined
-+/// [`Operations::RequestData`], shares this lifetime. It is initialized once
-+/// when the request pool is allocated and dropped once when the pool is torn
-+/// down - not once per IO. As a result, [`Operations::RequestData`] persists
-+/// across the many IO operations that reuse the same request, and a driver must
-+/// not assume that it is reset to a fresh value at the start of each IO.
-+///
- /// # Implementation details
- ///
- /// There are three states for a request that the Rust bindings care about:
+@@ -72,6 +75,8 @@ fn default() -> Self {
+             zone_size_sectors: 0,
+             #[cfg(CONFIG_BLK_DEV_ZONED)]
+             zone_append_max_sectors: 0,
++            write_cache: false,
++            forced_unit_access: false,
+             _p: PhantomData,
+         }
+     }
+@@ -164,6 +169,18 @@ pub fn zone_append_max(mut self, sectors: u32) -> Self {
+         self
+     }
+ 
++    /// Declare that this device supports forced unit access.
++    pub fn forced_unit_access(mut self, enable: bool) -> Self {
++        self.forced_unit_access = enable;
++        self
++    }
++
++    /// Declare that this device has a write-back cache.
++    pub fn write_cache(mut self, enable: bool) -> Self {
++        self.write_cache = enable;
++        self
++    }
++
+     /// Build a new `GenDisk` and add it to the VFS.
+     pub fn build(
+         self,
+@@ -183,7 +200,7 @@ pub fn build(
+         lim.physical_block_size = self.physical_block_size;
+         lim.max_hw_discard_sectors = self.max_hw_discard_sectors;
+         if self.rotational {
+-            lim.features |= bindings::BLK_FEAT_ROTATIONAL;
++            lim.features = Feature::Rotational.into();
+         }
+ 
+         #[cfg(CONFIG_BLK_DEV_ZONED)]
+@@ -192,11 +209,19 @@ pub fn build(
+                 return Err(error::code::EINVAL);
+             }
+ 
+-            lim.features |= bindings::BLK_FEAT_ZONED;
++            lim.features |= Feature::Zoned;
+             lim.chunk_sectors = self.zone_size_sectors;
+             lim.max_hw_zone_append_sectors = self.zone_append_max_sectors;
+         }
+ 
++        if self.write_cache {
++            lim.features |= Feature::WriteCache;
++        }
++
++        if self.forced_unit_access {
++            lim.features |= Feature::ForcedUnitAccess;
++        }
++
+         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
+         let gendisk = from_err_ptr(unsafe {
+             bindings::__blk_mq_alloc_disk(
 
 -- 
 2.51.2
