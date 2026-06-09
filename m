@@ -1,224 +1,101 @@
-Received: from mail-pj1-f100.google.com (mail-pj1-f100.google.com [209.85.216.100])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4430404BC3
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 11:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B192270545
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 12:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781006228; cv=none; b=lXBfGhard3q5INK33vow2HhVk0CtatMpAHoe/nrvC2TgAuf+2CSiBYNVfin0gHyUjB09mNfKdO87BTMv8LeH36kkvE6ZwIOhI2pgVf57sor0Lz0WY8ZL20mbhO6YUB6/RkvmHeL4OvDT7fjnmR0iF58vu0gseKzej5/lGXY9QwM=
+	t=1781008914; cv=none; b=JqZ5h4O4UZyMw8Kvt7zHnuFbmeCi8lB9lk4QTh22BB0GSb80GMQPkyHAE3Sl+3icdN7BswMd4vNK/xgJkn5YDSFfYCnHLy12af4KlrHkrgy533eiiuO2HIhxt+au7kZ6gqb7ZLBXrJoLayvPHv/Vcuj5MIX82e6QbF/YbK1v3ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781006228; c=relaxed/simple;
-	bh=idiuQJNN0GZ7hWFIbxqI9skHLKDG4DRE2a8a21vQ7TQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jcTZdc3zpr0sgpR1mSQV8HlCyKk2jYM1okkN/u3NeDE2555HDPKCfboJx5b/ilCJ1iHTbUR44GDAgPVfyspFsEmnX2Cz0lec2x9fE9zkphAdnfEqjUnAf3Ag9yg8Lla8bsKdoQ+eGSCjmUAC5Ncp/NkPPsPR+oCPIfAP05ZeS4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LWLEMDA/; arc=none smtp.client-ip=209.85.216.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+	s=arc-20240116; t=1781008914; c=relaxed/simple;
+	bh=0sRnAiQwyo5LWQA10od9GdAJyVCjnXzuURU9C000+Vs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PjdJNjSaHH6JmT1087Qy5PudBprDUKZmOJagiSvpVgugkLPgHDD9bl4pJnRluwpCk6b4Se6h9heWrs24I78AfLd79RO2fbPZ3GlFjVI1lGHE4bb2FMjPaNxc5ZgYEy82NBfSVB4UdPfS0+HYaiyLUNCS/vLgrJkPKWr3s3onEcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=v9PB/87+; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LWLEMDA/"
-Received: by mail-pj1-f100.google.com with SMTP id 98e67ed59e1d1-36bb3551f6eso4773999a91.1
-        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 04:57:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781006226; x=1781611026;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cij0f7XK3gPTc98cKs5ll/gp5Fj5YlFQkChYuGOVaaM=;
-        b=N946lZfo2u7I9pX5wiMvm3gEs1WnrJHj2fqmCrguq7zg67DZG9FcLokUm7cyVFzsRF
-         xNqbC2WJuSNHI6zHqIzgUg3kKKmuaRLuOOAtzvtIsxjU/CL8I4yLq2XRwQ3PWEeYXfHI
-         mdXOJeKTGdLjczL/W93f7uHGS1FCMYz2KbriKWmyekgg9xocDcwwGOu5++SEPy7A0I8T
-         Tt1fcPFffcxQhzs5gsxpJhjftWysIfSyrw00aDUzFd/p28hudy3j8IJ5ANt7gjM4fjON
-         +nVIIkVhhKec3GwqK+/5gp2M1QpLn1ZvSKjDr6f3tp8UOPu94QHMjAVOSo3s6KNgRw3b
-         OiUQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/TJrLvUJzSRKsQEtyKNArFIawvg+Lo4SgPaeKTTgj258ri/F8p8LrN3jOn0hmEKKDJEBs0hy4uAoRPMg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy2wHYmuQ9ZDjuKrH/KLRoPjQ9U7CRu5P6/AMXptdhna1aOaMF
-	8NEBXHopoNF3iCFjHyueEf625q+PndH8q8uPxStW3OoTqqX+8s6ESP9zA9Vy7H3x3JoVc/nkKob
-	FS4gy56XEPMqX5aiuDAK4G/ls4TvweF2leIxBQ3XQjG3BCjRfOgJzfndbtLpcllotYOFL3Q6Oa6
-	MhP2jrDDFQzU/et6xYgrqAbSIdsge8+BEjfJd17fITKm8xwX9qVBcqv/WH5IaJTJcCxHLbhfbuf
-	wCervMPvk8V7mvyQQ==
-X-Gm-Gg: Acq92OFfKEcUYEDkvuVJ5eI9Jvwsjeik5nlfrqIjWzz55zjYdtfJywTS0tlImGOHlkf
-	HX6iVzrgEaJTDdXQkD8MLyhisQh18Z34E1a/4Hjy2qVT2X3OGLs43X0MbDPZVNHgmzRgj8B59CL
-	0V2XkgM9fv6V6ZXKoxfo3FcSfMYDUS+s0K4Wtdz+dRP1Pb/Elrtg1hHA5LojndmotRPE0WaJqwr
-	vSj5X3SfZXD8ngZ0dICVcseMUTHwQoXFIQiosV4pFuZWmCcuJFDLSnVpqpnUUA9OxmsoyRJ1TFf
-	hZ7qWis7JGUBAiFkUj+2wXD+r4UL4uufix5bCmBBHUs2OEy7eR9vQ1mQ+w/5UvqB/lL4fQhQHJM
-	od4zz/eVrtf38cG2ypnjbQXFT9TQ1My4YMqqYMlHf4HG80EwoKwHfuchO6bTBRF7f40Nm9oGd9/
-	Rbg4+0Oj+Chse73IacbXNIOu7hgyeKX8JTY2frlsQEF1eVPKARpaVWk1ATiezObNIXhpaGJA==
-X-Received: by 2002:a17:903:1a06:b0:2bf:379b:53d2 with SMTP id d9443c01a7336-2c1e7e866dcmr234603145ad.15.1781006225817;
-        Tue, 09 Jun 2026 04:57:05 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2c16619e213sm19468015ad.40.2026.06.09.04.57.05
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Jun 2026 04:57:05 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-36bc54005a7so7354173a91.0
-        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 04:57:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="v9PB/87+"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7e6d991991dso4640735a34.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 05:41:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1781006224; x=1781611024; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cij0f7XK3gPTc98cKs5ll/gp5Fj5YlFQkChYuGOVaaM=;
-        b=LWLEMDA/wpB8g4YGBvdZyqk8TWktUJJCc5zunrGSLy7YscTMU28NwW4zzXhL7DLtIs
-         2GDWi11jn/XBQI5zThidPET9WMKuWQHQTXbvIzLOMHEQDayxapLIMo2sem/EU2QjJrmP
-         EE8uHLdYlQq4KFuAn8ISaByLi4SyR3bTaOhOE=
-X-Forwarded-Encrypted: i=1; AFNElJ9NZ7QO4RfHtgrMqptyAsxEq6GtgTZnZeDnLH9hRCaGnIgSbQ6a1DsdXBoMbJkbvHSnZvsv5EeIMInggA==@vger.kernel.org
-X-Received: by 2002:a17:90b:5787:b0:36b:8824:d7cc with SMTP id 98e67ed59e1d1-370f057a115mr22377750a91.20.1781005739354;
-        Tue, 09 Jun 2026 04:48:59 -0700 (PDT)
-X-Received: by 2002:a17:90b:5787:b0:36b:8824:d7cc with SMTP id 98e67ed59e1d1-370f057a115mr22377714a91.20.1781005738858;
-        Tue, 09 Jun 2026 04:48:58 -0700 (PDT)
-Received: from sumit_ws.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36f6bf903fasm18898075a91.2.2026.06.09.04.48.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 04:48:57 -0700 (PDT)
-From: Sumit Saxena <sumit.saxena@broadcom.com>
-To: "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: "James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Adam Radford <aradford@gmail.com>,
-	Khalid Aziz <khalid@gonehiking.org>,
-	Adaptec OEM Raid Solutions <aacraid@microsemi.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Hannes Reinecke <hare@suse.com>,
-	"Juergen E . Fischer" <fischer@norbit.de>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Finn Thain <fthain@linux-m68k.org>,
-	Michael Schmitz <schmitzmic@gmail.com>,
-	Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
-	Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
-	Oliver Neukum <oliver@neukum.org>,
-	Ali Akcaagac <aliakc@web.de>,
-	Jamie Lenehan <lenehan@twibble.org>,
-	Ram Vegesna <ram.vegesna@broadcom.com>,
-	target-devel@vger.kernel.org,
-	Bradley Grove <linuxdrivers@attotech.com>,
-	Satish Kharat <satishkh@cisco.com>,
-	Sesidhar Baddela <sebaddel@cisco.com>,
-	Karan Tilak Kumar <kartilak@cisco.com>,
-	Yihang Li <liyihang9@h-partners.com>,
-	Don Brace <don.brace@microchip.com>,
-	storagedev@microchip.com,
-	HighPoint Linux Team <linux@highpoint-tech.com>,
-	Tyrel Datwyler <tyreld@linux.ibm.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	linuxppc-dev@lists.ozlabs.org,
-	Brian King <brking@us.ibm.com>,
-	Lee Duncan <lduncan@suse.com>,
-	Chris Leech <cleech@redhat.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	open-iscsi@googlegroups.com,
-	Justin Tee <justin.tee@broadcom.com>,
-	Paul Ely <paul.ely@broadcom.com>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-	Chandrakanth Patil <chandrakanth.patil@broadcom.com>,
-	megaraidlinux.pdl@broadcom.com,
-	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-	mpi3mr-linuxdrv.pdl@broadcom.com,
-	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-	Ranjan Kumar <ranjan.kumar@broadcom.com>,
-	MPT-FusionLinux.pdl@broadcom.com,
-	Daniel Palmer <daniel@thingy.jp>,
-	GOTO Masanori <gotom@debian.or.jp>,
-	YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>,
-	Jack Wang <jinpu.wang@cloud.ionos.com>,
-	Geoff Levand <geoff@infradead.org>,
-	Michael Reed <mdr@sgi.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Narsimhulu Musini <nmusini@cisco.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	linux-hyperv@vger.kernel.org,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio Perez <eperezma@redhat.com>,
-	virtualization@lists.linux.dev,
-	Vishal Bhakta <vishal.bhakta@broadcom.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	xen-devel@lists.xenproject.org,
-	James Rizzo <james.rizzo@broadcom.com>,
-	Sumit Saxena <sumit.saxena@broadcom.com>
-Subject: [PATCH v3 1/4] scsi: scan: allocate sdev and starget on the NUMA node of the host adapter
-Date: Tue,  9 Jun 2026 17:48:00 +0530
-Message-ID: <20260609121806.2121755-2-sumit.saxena@broadcom.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260609121806.2121755-1-sumit.saxena@broadcom.com>
-References: <20260609121806.2121755-1-sumit.saxena@broadcom.com>
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781008911; x=1781613711; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=qemc36QcctB0mBOvoYkmDPjHz6qq64817hRg4sKK8w8=;
+        b=v9PB/87+PgTMQHSLqlznNgTo58NbwriJNAAnbYxRdA+gYrs074uRS9H39Sw/Ed7dSk
+         K2FdCfZKMQUk3QWmQ7i1Uof4Zc8PNOxwcbfQFE84a0SxHyCnzGEKO+P7UhV+fbl1zPUW
+         RhjVKJ7sHvkwaYXjiERy3PdSzjmwZa0R3dX57g0CHozevqWesn5FqSjVaNIy3DCGxxxG
+         qDlwkdhJvyFT1s94nQbnMfhirGPfo50g/Tjyoa+BAYxi9fHHfJrPcqnvNJ3tPovfRVb3
+         vit+dUqsCkPYHuez63WytGA34oTXJk3fhzNGtFJkyswSIINXhTrX3hvAn6ic/vaRY1dR
+         6How==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781008911; x=1781613711;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qemc36QcctB0mBOvoYkmDPjHz6qq64817hRg4sKK8w8=;
+        b=FWff6h2U8fqLq/+UWSHBiW749oq/2uynN0qYu5ZJiYcUZ7eX5Uw9jZfkPhwZs0FsaF
+         dUhavzBzJCEgnkkXgVI9eVIBBssFod1VfODjHEM8iNeQnSX0qyb3zCdBRwVdGve7fdUr
+         ktdABrDCxdUrV9YvjRgh1wIt3L4gMNqeko2+zLcE3U+1RXu9C+BqXFkeG1820Yb2mrVH
+         jDJYW8y9BcCDEPvR99mW71HO9TorQwhIHtT44ZnWIRreh+iLohH3/PgQivCF+DMVqxpM
+         FSAwpyd3HDPgSOd+PyXrCtPWZdSAi6GZ0XE2RYSx+0CV6lBXBedmhfiIp4WFa8ZS35n+
+         IOeg==
+X-Forwarded-Encrypted: i=1; AFNElJ+OW7lj9uAROD0fXYtTxFPIWCUuMsXnlL6PYYy1tuwk0A9PzlPiJobuTz0/dyGVhGWBktLIGYiVLax7zQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnESIrzXRF9Ec2Cqlp1Ll/2KwsrJPCnGo4ev6BhClzi4GkC+TQ
+	RUa7mUwuRJF/WMLvUTyQX6M9A/BcNevQJBjZcFg3w03Y617U+s9xiiXVDwZDzzhYmNo=
+X-Gm-Gg: Acq92OGmYXv/nJL3WmafQfKcig69pKsGv64zS/hVMICDMs2d3ZY0szCEe81EvgvEton
+	0yvtRvXcrdY/10BVB8Xmth0JjrzA1iKpVHlt2JBZ24K+jebj06ViWpzp/8tEKSGkPJJYFKzI4mS
+	u4hLinAyvQ+tYNy8s4kj89g9m/qLY3qvjkNroJJtYHzEMjJ7hRSbONxtRlnF+Tm2cy14TSNQxNw
+	POncJjXQo7VBE6+5ajksSCROfAwHUeL+2MCY6tO7a6SknPxVPF7ZcKqYUlzF8EAqpVYhAHxUCrw
+	gE2bXZlgsopB7sgWjBjOEQ2Ban/vciSDE2bSBHjzY0g4Oy3jj6K64qOVqgYEOSRTGMYBRYDAl3K
+	9DkWnE9LKb/YeuQVSGbMcUO6ewLHnKZ1Ln3/2797BgPb8CyZOgZ1SQmWj0MFHHTIXtAOaUiwOhq
+	KC/TEJ1kELG+zenm8wGuU70alsVC49aqeoUnx96cnNpktSKcxXfyuoxL4t/IfOBRgcGerM7CLGH
+	Pt+TkyzGDIA+JKaXqBmGd5v8654APg=
+X-Received: by 2002:a05:6830:3491:b0:7d7:f031:37bf with SMTP id 46e09a7af769-7e70c7ebe14mr11914902a34.19.1781008911428;
+        Tue, 09 Jun 2026 05:41:51 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7e6e71fe69esm14843081a34.0.2026.06.09.05.41.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2026 05:41:50 -0700 (PDT)
+Message-ID: <8b2f0830-23cf-4f6f-89a4-1390cb0f2e88@kernel.dk>
+Date: Tue, 9 Jun 2026 06:41:49 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Kernel Bug] INFO: rcu detected stall in disk_check_events
+To: Longxing Li <coregee2000@gmail.com>, syzkaller@googlegroups.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAHPqNmzE6bcNb3T+nJavn-mg=w2B0F1YCv47qv-Tsbn4xOrGmw@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHPqNmzE6bcNb3T+nJavn-mg=w2B0F1YCv47qv-Tsbn4xOrGmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: James Rizzo <james.rizzo@broadcom.com>
+On 6/9/26 5:52 AM, Longxing Li wrote:
+> Dear Linux kernel developers and maintainers,
+> 
+> We would like to report a new kernel bug found by our tool. INFO: rcu
+> detected stall in disk_check_events. Details are as follows.
+> 
+> Kernel commit: v7.0.6
+> Kernel config: see attachment
+> report: see attachment
+> 
+> We are currently analyzing the root cause and  working on a
+> reproducible PoC. We will provide further updates in this thread as
+> soon as we have more information.
 
-When a host adapter is attached to a specific NUMA node, allocating
-scsi_device and scsi_target via kzalloc() may place them on a remote
-node.  All hot-path I/O accesses to these structures then cross the NUMA
-interconnect, adding latency and consuming inter-node bandwidth.
+Please include pertinent information in the email rather than some
+shared drive somewhere.
 
-Use kzalloc_node() with dev_to_node(shost->dma_dev) so allocations land
-on the same node as the HBA, reducing cross-node traffic and improving
-I/O performance on NUMA systems.
-
-Signed-off-by: James Rizzo <james.rizzo@broadcom.com>
-Signed-off-by: Sumit Saxena <sumit.saxena@broadcom.com>
----
- drivers/scsi/scsi_scan.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-index e27da038603a..121a14d5fdb8 100644
---- a/drivers/scsi/scsi_scan.c
-+++ b/drivers/scsi/scsi_scan.c
-@@ -34,6 +34,7 @@
- #include <linux/kthread.h>
- #include <linux/spinlock.h>
- #include <linux/async.h>
-+#include <linux/topology.h>
- #include <linux/slab.h>
- #include <linux/unaligned.h>
- 
-@@ -287,8 +288,8 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
- 	struct Scsi_Host *shost = dev_to_shost(starget->dev.parent);
- 	struct queue_limits lim;
- 
--	sdev = kzalloc(sizeof(*sdev) + shost->transportt->device_size,
--		       GFP_KERNEL);
-+	sdev = kzalloc_node(sizeof(*sdev) + shost->transportt->device_size,
-+		       GFP_KERNEL, dev_to_node(shost->dma_dev));
- 	if (!sdev)
- 		goto out;
- 
-@@ -502,7 +503,7 @@ static struct scsi_target *scsi_alloc_target(struct device *parent,
- 	struct scsi_target *found_target;
- 	int error, ref_got;
- 
--	starget = kzalloc(size, GFP_KERNEL);
-+	starget = kzalloc_node(size, GFP_KERNEL, dev_to_node(shost->dma_dev));
- 	if (!starget) {
- 		printk(KERN_ERR "%s: allocation failure\n", __func__);
- 		return NULL;
 -- 
-2.43.7
+Jens Axboe
 
