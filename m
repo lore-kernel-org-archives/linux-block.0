@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4107D408A25;
-	Tue,  9 Jun 2026 19:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FA4408A3D;
+	Tue,  9 Jun 2026 19:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032660; cv=none; b=LmdhQI2TGNuj5t67ZGhIc6fcOqHQtHdcUWwT10VM+DG7No4PsR7nS3P4+ZCdhQCAc9QZAXUKYgvHOMNNVjnA1rCjS4XIcSvSElXKubTCy43a8jdgMNTiS4OeAzoMu6UKJTvu3HdMKC90nlTOZE03f0/XFeGvPvlzWg6a9SvCwWs=
+	t=1781032666; cv=none; b=H1L+7/OM5kxyMsdM84DX5w9XMoI8ecaJT9NZ5kun2f0tC/MtA3dqai/5GRJb4ahIlZYRG7PFI3VjgJthOs8E0XqocPdGwsfUBNxcS8yr4jkIbYvv8nUEiF7xFig6/6l38Yfa1h7NkBJLa3dLxAKwvVLNj8l8Ov+QQ2xeAoTY6P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032660; c=relaxed/simple;
-	bh=nWZZSuCE7eRuBTdr1Tw1jnn7BhOeTAryxo5+j0nH9IQ=;
+	s=arc-20240116; t=1781032666; c=relaxed/simple;
+	bh=6A74Jcx8EHUn7wYuZ9sgvdf2Nhmf1F3bFtPD29rpOao=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u5y2v7dHD8q9PplomT4M+esTAOEBYZgnVmdSpGHq8VT34YWJYbyrJpwjvGR4HbLFE4ovaH9N5K0C9BWfljgE0gUnlaCzljqpO29s0uzU8y3+jdwGKsBljit3ZLyby11v/PqTXOsB5KO2OdSM2MfagaA2AHS605NXHLhzLlAG7fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yh4qFHgw; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=A5LaewhsPNWK8j40jV2YtIV6acZi9FWp3pYga5y4Wa+/RLHRT61cnyagupbo+dt0nUAMju91V8xJGiv8hzxa4mj5MyBQSsKFu7haI+tz+AHMkcSM/cvQKxddyc3WRQNq91vK+jFQlDY1JDqJ3KHz8PqPQqOCFME2Eb9dWy3Jmc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ef6/ao6J; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yh4qFHgw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06B2B1F00898;
-	Tue,  9 Jun 2026 19:17:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ef6/ao6J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C80781F00899;
+	Tue,  9 Jun 2026 19:17:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032659;
-	bh=F3cUw+ZLEEIEYCWFefqNhKQoFd9lfmv4Djxg5dSyh6Y=;
+	s=k20260515; t=1781032665;
+	bh=yhhiPZN9dpoZ4xyJGnlIqf2UGsG9mC/RzPjjGnQZ8J8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=Yh4qFHgwl9dPDE+Dd804+hehfek3T3KktZ4KLW8E0ND8oPBDHwHPhZK4oxN4Jt9cG
-	 EE0iARjt5TMMkCAoYKrdklnyXyi+i7wv319+qcsz6IBM0GK99bDE5MzRYlBgv1ZmO1
-	 j1YuADV5qkveEai4nkTjSJI6iL0kWqkODtqVr6bj6SaJ5OgO6XjFXWcs6IohWfvxLU
-	 ZGgYe2DY+DClniqoBYYOtq/3PZc7lpl6YRqYN7x2SQCCr3MdD8lyK9N5SABAnhEWVT
-	 zKebynE+sZt7YwTmDKGLRm8D6GCuWXU+uqH+p6zleDLieCbFam4bWKcqtcX7DryVTn
-	 YZ22OhmrgDUcQ==
+	b=Ef6/ao6J/2x2P2Q0Ul+w5+fI3fcDAeHUvj8joaMLKxAOVfCBVdPNot/Dls8xWkw8p
+	 v+JkUcacIS0nQQkJ/g5mHuqZ6LTZavpNlH7Vq7SckIE2cKU70qtoKIoJSOBQsKxLX6
+	 EsGwOEGpGG8IWiJH4xnBt5uAgSQDGPmrzm5TAyXHdJ3csKbYVR2KJyH8LD8yeOaKMB
+	 eO/8GZHy0QdHegguUdWDWs0DcCD1TiXd+Mfco4iYtoI3Z/sXFZ+TpLtsba4Tbw3+7V
+	 cjGLu+gU5awGymhS6I9SChG4YS4j6jqfuQPBSnfW4CFpyz81vaDHIOJ0LNmGEUMY9a
+	 NQ0qZYbWXBpcw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:08:29 +0200
-Subject: [PATCH v2 50/83] block: rust: move gendisk vtable construction to
- separate function
+Date: Tue, 09 Jun 2026 21:08:15 +0200
+Subject: [PATCH v2 36/83] block: rust: implement `Sync` for `GenDisk`.
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-50-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-36-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -59,172 +58,53 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5125; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=nWZZSuCE7eRuBTdr1Tw1jnn7BhOeTAryxo5+j0nH9IQ=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGThwYPLrFFscsf6EbG3+a5iaTayyAq94Nxgz
- iFI6puKAgmJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk4QAKCRD6UCkIqsW9
- 0J3GD/9P/NG4qDSfiZLT6kaSKJVYbPTGQp/wYmerkXDHyXttYDguhsRf0Qbec3e33McsoMnGXdn
- FDVdkp9zxo2TQ9yg/KTko4Kfk/r8uOuKf8LQF1kLfAS7vV5Y5h0WHp/lN3VsGTMD0Oh1TQbr3+t
- mnOhDCph7RJk/hDPa+AQBTo+q6GWMOuATQ9WMJCDb2vmPNVP2y/kyfZTA5Y2RgjJqlGyrA4vkkI
- ibGl+WdC6oa+1nv9sGtlNBDUb76uMcDz8gwvNRtQTDW86JB+Dv5KrdWr/lPgAxgbB+ivkG1iAVl
- wnnitGsYMBoqLT8x53Cgd72es41XV/ZIxXrjHOOvvLrs14Iw3HFDrHQjP/qTdjoAkRfOydVsYT+
- XpiV4YZSkQbdfPIyraHZBqaWmWgb7CvprxvkSNSLJv0WheMyLt0kTBijoO26x7ogyYEEDNrh6Lz
- ZeICGdPddeacasO0sobyJl/FZ4AGx4OdqsBW586ctFoIwwQHQj0SgQKIlvI2IGMxME5pryXnvtT
- np0gGKYMTz63Nqy2l0eOyWgzxyPGL2b/5g6dKZJ2T56cWODWW/Gxnq9bBnVZH2i9JLWm1eB3uM9
- kZusZVyLHqvdEjAJRF5qvdnu67LxpdjEDeb+P8xy2g3S1+b+hYG8TGJ1bogFAC3hn2/3P4kwyMj
- 0EgP1DUWmyYA8zg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1041; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=6A74Jcx8EHUn7wYuZ9sgvdf2Nhmf1F3bFtPD29rpOao=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTVV4QA6fjC6s5QJaM+DuAAdyzosiERGRI2a
+ nDPiCvCHpqJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk1QAKCRD6UCkIqsW9
+ 0ONmD/4z/u7pdgX5Wmx6bwNyWB7SgoBcZbYO0GePl/pxDjGYrsXBAKCaR+jIq7gru/rtRnshdS/
+ S0P4TMMhpGCOhEBoc5NpThiIJBzW3N3u/kL4X9FOxsEs7jdy1tCyUPZrlxWzi5QVbSowIVdo/Mb
+ WVTCRroH4sw+/02YE2fKpBLUhNyzc0GRG5Qu0DdFMrHxJRDsOK0EAFlRvzJ2gb4E16xFBJv8rFg
+ 0qEcfUc+f/5FKhLO8QHeS1qOSPQFC9/AANVaJr8MdbO1NY8BTnLXMf+yuyjr0VdynNTDtInejC5
+ 7+OsySI1f8LWISEwii89pTJ+aey3e9JTXUB44v56mcrUrAA5HwbIxe0QrEZePJWfllIIBUVXK8j
+ SRmyAz1KO6c7xMEgiKtdNeB+3wpH44dMtkiOUIQKUD2Gbt6pJD2T3iBhMv8+hOJlZQHsEOj2LbV
+ GXOrsB75EiLe9qmROJ3RTxojwEA/O3HyReIJhIveUu/5JJSEqTEmUkDMtoexgHbVnK2hD5UGOmM
+ 3TquGBebSsc0PsF7c4v/tR71vnCbhOIcchnkbWsyk3DDItKVKIToZQ7sC3FVAHezHNxEdZS44r3
+ oCQ0x6gzZjYl3a6jO0cPAREwRMDet2vkSIgEqB09MIEIXMHeUl5DGM50Sll8XyZGhVhrIUNr4Nq
+ XxKWA13bCrjnvFw==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Refactor the `GenDiskBuilder::build` method to move the `gendisk`
-vtable construction into a separate helper function. This prepares for
-adding zoned block device support which requires conditional vtable
-setup.
+`GenDisk` is a pointer to a `struct gendisk`. It is safe to reference this
+struct from multiple threads.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs  |  5 ++-
- rust/kernel/block/mq/gen_disk.rs | 67 +++++++++++++++++++++++-----------------
- 2 files changed, 43 insertions(+), 29 deletions(-)
+ rust/kernel/block/mq/gen_disk.rs | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 2dfc87dff66a..8fa16dbc2a75 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -290,7 +290,10 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-     }
- }
- 
--configfs_simple_field!(DeviceConfig, 1, block_size, u32, check GenDiskBuilder::validate_block_size);
-+configfs_simple_field!(DeviceConfig, 1,
-+                       block_size, u32,
-+                       check GenDiskBuilder::<NullBlkDevice>::validate_block_size
-+);
- configfs_simple_bool_field!(DeviceConfig, 2, rotational);
- configfs_simple_field!(DeviceConfig, 3, capacity_mib, u64);
- configfs_simple_field!(DeviceConfig, 4, irq_mode, IRQMode);
 diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 49ce5ac4774d..79a67b545eca 100644
+index 2b204b0ed49a..94af85fe1716 100644
 --- a/rust/kernel/block/mq/gen_disk.rs
 +++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -34,20 +34,24 @@
-         ScopeGuard, //
-     },
- };
--use core::ptr::NonNull;
-+use core::{
-+    marker::PhantomData,
-+    ptr::NonNull, //
-+};
- 
- /// A builder for [`GenDisk`].
- ///
- /// Use this struct to configure and add new [`GenDisk`] to the VFS.
--pub struct GenDiskBuilder {
-+pub struct GenDiskBuilder<T> {
-     rotational: bool,
-     logical_block_size: u32,
-     physical_block_size: u32,
-     capacity_sectors: u64,
-     max_hw_discard_sectors: u32,
-+    _p: PhantomData<T>,
+@@ -234,6 +234,17 @@ unsafe impl<T> Send for GenDisk<T>
+ {
  }
  
--impl Default for GenDiskBuilder {
-+impl<T> Default for GenDiskBuilder<T> {
-     fn default() -> Self {
-         Self {
-             rotational: false,
-@@ -55,11 +59,12 @@ fn default() -> Self {
-             physical_block_size: bindings::PAGE_SIZE as u32,
-             capacity_sectors: 0,
-             max_hw_discard_sectors: 0,
-+            _p: PhantomData,
-         }
-     }
- }
- 
--impl GenDiskBuilder {
-+impl<T: Operations> GenDiskBuilder<T> {
-     /// Create a new instance.
-     pub fn new() -> Self {
-         Self::default()
-@@ -126,7 +131,7 @@ pub fn max_hw_discard_sectors(mut self, max_hw_discard_sectors: u32) -> Self {
-     }
- 
-     /// Build a new `GenDisk` and add it to the VFS.
--    pub fn build<T: Operations>(
-+    pub fn build(
-         self,
-         name: fmt::Arguments<'_>,
-         tagset: Arc<TagSet<T>>,
-@@ -157,30 +162,8 @@ pub fn build<T: Operations>(
-             )
-         })?;
- 
--        const TABLE: bindings::block_device_operations = bindings::block_device_operations {
--            submit_bio: None,
--            open: None,
--            release: None,
--            ioctl: None,
--            compat_ioctl: None,
--            check_events: None,
--            unlock_native_capacity: None,
--            getgeo: None,
--            set_read_only: None,
--            swap_slot_free_notify: None,
--            report_zones: None,
--            devnode: None,
--            alternative_gpt_sector: None,
--            get_unique_id: None,
--            // TODO: Set to `THIS_MODULE`.
--            owner: core::ptr::null_mut(),
--            pr_ops: core::ptr::null_mut(),
--            free_disk: None,
--            poll_bio: None,
--        };
--
-         // SAFETY: `gendisk` is a valid pointer as we initialized it above
--        unsafe { (*gendisk).fops = &TABLE };
-+        unsafe { (*gendisk).fops = Self::build_vtable() };
- 
-         let mut writer = NullTerminatedFormatter::new(
-             // SAFETY: `gendisk` points to a valid and initialized instance. We
-@@ -233,6 +216,34 @@ pub fn build<T: Operations>(
- 
-         Ok(disk.into())
-     }
++// SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a `TagSet`. It is
++// safe to reference these from multiple threads if the `Arc` and the `gendisk` private data is
++// `Sync`.
++unsafe impl<T> Sync for GenDisk<T>
++where
++    T: Operations,
++    T::QueueData: Sync,
++    Arc<TagSet<T>>: Sync,
++{
++}
 +
-+    const VTABLE: bindings::block_device_operations = bindings::block_device_operations {
-+        submit_bio: None,
-+        open: None,
-+        release: None,
-+        ioctl: None,
-+        compat_ioctl: None,
-+        check_events: None,
-+        unlock_native_capacity: None,
-+        getgeo: None,
-+        set_read_only: None,
-+        swap_slot_free_notify: None,
-+        report_zones: None,
-+        devnode: None,
-+        alternative_gpt_sector: None,
-+        get_unique_id: None,
-+        // TODO: Set to THIS_MODULE. Waiting for const_refs_to_static feature to
-+        // be merged (unstable in rustc 1.78 which is staged for linux 6.10)
-+        // <https://github.com/rust-lang/rust/issues/119618>
-+        owner: core::ptr::null_mut(),
-+        pr_ops: core::ptr::null_mut(),
-+        free_disk: None,
-+        poll_bio: None,
-+    };
-+
-+    pub(crate) const fn build_vtable() -> &'static bindings::block_device_operations {
-+        &Self::VTABLE
-+    }
- }
- 
- /// A generic block device.
+ impl<T: Operations> Drop for GenDisk<T> {
+     fn drop(&mut self) {
+         // SAFETY: By type invariant of `Self`, `self.gendisk` points to a valid
 
 -- 
 2.51.2
