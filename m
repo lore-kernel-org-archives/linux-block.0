@@ -1,32 +1,32 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C490430DD1D
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1C03793BE
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780987225; cv=none; b=VtBmve0+y3f8SWtpL9FHtS9ck3DDE8FmhkZG/8U75tIkm1Z319uItwN/IogO8Akqae0d9kBWT7LvueILIUFCVFDvG0VQH/tY0JpOMYy0G8KeR36/xwMOyIoVY462uO8sjgKCBrPgZ1I+3fHqRd/W+499yRBz3X4bK8b2VC8TE8A=
+	t=1780987229; cv=none; b=CPup+FR9MQfghuuhCn4jISUyRkXvnPGU48fa1ebqrck3UhFAbtt3PavTFCUkvRomUiuSCoCk+1sxiFUH5YizqdEKzTPRhdoQhxbWPafETZc5OkEOyJETUsiJJlGEMPkygP1zdQTNfoDYafH00i8VVu0TMJ8jmt2UHVXbkUB2YKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780987225; c=relaxed/simple;
-	bh=aPBObOBjR5NY12msqDbuE4tGfumhN0y2b25ZxwPjOYk=;
+	s=arc-20240116; t=1780987229; c=relaxed/simple;
+	bh=kuZjqpsF9ksADva26wRq636wmK8LkTe7TxbD5XGYMLo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LuVCvFlmlR7rghovVoPqLjUO1yBxp06l13DcaFudd3CkUB7Gs9f3p2x8SoSC9fgogh2eOqTz90TYl+zPYvWPyBdbC7hnklgXgXbnGxJLg6xIJNr2hqVGusWDpuRvlkoz9t/ZbWPR0AdMh1sngrwv+H1J/Hrud3GTdqGWfgjqI70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=id+QT9X5; arc=none smtp.client-ip=95.215.58.178
+	 MIME-Version; b=TmA0/Tipldvf2EfvVIqTNOLJ/rvzxK8jox7LVtbt8gAgTirf3ogAzi5ucPiuQAa/TW4oGESktQC4Ct8M3PuzctdQIFdHTdWJ3wdQQbaS2DRG1c7g++DSwzAkmeiDrcXlwU3U/5IU+hE/xA2BNhgFtObZOjOOBUT/EFD+Udexusk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=he6GgPtP; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="id+QT9X5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="he6GgPtP"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780987210;
+	t=1780987225;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wTuZ/rb+QfWcokK7LysZCAzYrY5sRqAUnm+1GENZ4ls=;
-	b=id+QT9X5+V/ynpRARTKrkCjC0XHu1v1kNLdaLcMXaAcfcSS0RYW9FtMHL4Fw7sKHZNZ3EJ
-	7kQ2nBRANwBC5bdENNCHV6lwZSTUBbqq8sLkaPOj9spm0sgjf1Cj1DxI8wPaCHIVt3GtJ7
-	Oomyi8z2WwWQWTLvMyF263FMUy80nX8=
+	bh=ti3NlENGD1xy6UWHiAqUuIahNtRBbWZIyoTi26e3ue0=;
+	b=he6GgPtPJKyQqbLLyAMCJQtIvKnXUB6fnOtGZjDaTYP/O23mEyYFfmgA7fSp1I5PJAuubz
+	uogDJo9ao5ATKhsgMnU5RoyORS39z6zaONQVyBHWxiqTrRv3UhHxH+rJlHwsb4JDAF2E5W
+	TnJ4U0ZbWnBUHRJ9OloioR+ZJi737mM=
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Muchun Song <muchun.song@linux.dev>,
@@ -91,11 +91,12 @@ Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
 	Luca Ceresoli <luca.ceresoli@bootlin.com>,
 	Kaitao Cheng <kaitao.cheng@linux.dev>,
 	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v2 10/14] spi: tegra210-quad: Open-code message transfer walk
-Date: Tue,  9 Jun 2026 14:38:51 +0800
-Message-ID: <20260609063855.95710-1-kaitao.cheng@linux.dev>
-In-Reply-To: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+Subject: [PATCH v2 11/14] locking/locktorture: Open-code ww mutex list walk
+Date: Tue,  9 Jun 2026 14:38:52 +0800
+Message-ID: <20260609063855.95710-2-kaitao.cheng@linux.dev>
+In-Reply-To: <20260609063855.95710-1-kaitao.cheng@linux.dev>
 References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+ <20260609063855.95710-1-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -108,35 +109,34 @@ X-Migadu-Flow: FLOW_OUT
 From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
 A later change will make list_for_each_entry() cache the next element
-before entering the loop body. tegra_qspi_non_combined_seq_xfer() can
-consume the following transfer as part of the current operation and then
-advance the loop cursor to that entry.
+before entering the loop body. The ww-mutex torture path can move list
+entries while it resolves a wound/wait conflict and then continue from
+the adjusted cursor.
 
-Keep the transfer walk open-coded so the loop step observes that cursor
-update and skips the consumed transfer. This preserves the existing
-message sequencing semantics and prepares the code for the list iterator
-update.
+Keep the list walk open-coded so the loop step observes the cursor
+selected by the body. This preserves the existing stress-test traversal
+semantics and prepares the code for the list iterator update.
 
 Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
 ---
- drivers/spi/spi-tegra210-quad.c | 4 +++-
+ kernel/locking/locktorture.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/spi/spi-tegra210-quad.c b/drivers/spi/spi-tegra210-quad.c
-index db28dd556484..42dd5cf53c67 100644
---- a/drivers/spi/spi-tegra210-quad.c
-+++ b/drivers/spi/spi-tegra210-quad.c
-@@ -1302,7 +1302,9 @@ static int tegra_qspi_non_combined_seq_xfer(struct tegra_qspi *tqspi,
- 	if (tqspi->soc_data->supports_tpm)
- 		val &= ~QSPI_TPM_WAIT_POLL_EN;
- 	tegra_qspi_writel(tqspi, val, QSPI_GLOBAL_CONFIG);
--	list_for_each_entry(transfer, &msg->transfers, transfer_list) {
-+	for (transfer = list_first_entry(&msg->transfers, typeof(*transfer), transfer_list);
-+	     !list_entry_is_head(transfer, &msg->transfers, transfer_list);
-+	     transfer = list_next_entry(transfer, transfer_list)) {
- 		struct spi_transfer *xfer = transfer;
- 		u8 dummy_bytes = 0;
- 		u32 cmd1;
+diff --git a/kernel/locking/locktorture.c b/kernel/locking/locktorture.c
+index e618bcf75e2d..0eb75e9bccaa 100644
+--- a/kernel/locking/locktorture.c
++++ b/kernel/locking/locktorture.c
+@@ -644,7 +644,9 @@ __acquires(torture_ww_mutex_2)
+ 
+ 	ww_acquire_init(ctx, &torture_ww_class);
+ 
+-	list_for_each_entry(ll, &list, link) {
++	for (ll = list_first_entry(&list, typeof(*ll), link);
++	     !list_entry_is_head(ll, &list, link);
++	     ll = list_next_entry(ll, link)) {
+ 		int err;
+ 
+ 		err = ww_mutex_lock(ll->lock, ctx);
 -- 
 2.43.0
 
