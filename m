@@ -1,130 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F050347CC85
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 15:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781017785; cv=none; b=RM7BSAmRkE/VXwrwPryfTARgFeUkX9dNyRbMIM7ob9chb2MFozdHoMhZnKDAt3K9Q7YOIrJgpmQlP/BKwW/e4mdNfv0+s+dQQ4NIFlTuONwTKLXp+la3Wvm0x0jjnPBYTN5KP2A2kbJ73keBy1LAZAQRaub2fmeRpydwtowB93Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781017785; c=relaxed/simple;
-	bh=O5XKRkoQdjmL/UWfTDl12QFCnFMOKjx4BUnWq82ThMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kvl2Ah6QXmwM+XV1/jcj8zEkDuCn6cv08MsUBpm+Il5AK5gB36SUumO+T4KfMApN7RBKuSmfdgyMeoq6PDRXNPkUqWVerykm4w+9ptu7SW9a0WhDBrsQl7w9YEoMTEZddo1dCIdAx5cX6k8mDjJ/fmbD+PRgwtjJSQtHkU8/FH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BONxnPO5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C459C48C404
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 15:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781018149; cv=pass; b=lKUF7JBpBWS7yROJPIvKl9avwRgafc63jFBSYfXc5nuT44ILBG8yQxt2peHMS2Jactk4LoTfek1I9SuodPZW6OlP8K9qlP+scd5A9R+mQPNdi5I1Qs8Pa1dlq5CYWMEFF3AyXfUjQMlEcdxYr+khyI3+7Ino+BWlI/KQ8+ORH2w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781018149; c=relaxed/simple;
+	bh=XAGyGGRCa0i5p0EaF3Q9px7FiGrZLFso6DX4zKKzZD0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MlU7HCrdItFHO4fr+OiIRWoJWhdUlTXUraqNrGi4Vy1snPgjTow1esvFG7kzqMeDvUk+1CfReC3ZNK6CmZEpB1/UJYgFMUUNXfR1c/Uz5EgqoGc/RFU3M4Mn15epUYri1ZX2wGlCOhxWKZLhksswp0KKHkP8UbXSd3Ym/GDdbBU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPdXpHEJ; arc=pass smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BONxnPO5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781017783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VXHffyBCPH7ubBJYAlBJR2395nJNCoGqlGt3bNjYf3Q=;
-	b=BONxnPO50MS0NxEVmhJ8MC6FITovLLez5GhQgKwOtrFSmcrQiqenoNy6e1nLsaDxyCTqaE
-	CQJw5z3LxhpJdvdc+fW/Dxzl7UK9OAsXoXIVNLblgIRFqu6lw0cBMEHixRmOWBS+igbFDQ
-	gmFNEr8updLCUJOWeu4SHDETcPwfDYs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-443-KQp7QHydNGinLi5ysmt3Lw-1; Tue,
- 09 Jun 2026 11:09:40 -0400
-X-MC-Unique: KQp7QHydNGinLi5ysmt3Lw-1
-X-Mimecast-MFC-AGG-ID: KQp7QHydNGinLi5ysmt3Lw_1781017779
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE209195C248;
-	Tue,  9 Jun 2026 15:09:38 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.141])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A22A936927;
-	Tue,  9 Jun 2026 15:09:37 +0000 (UTC)
-Date: Tue, 9 Jun 2026 11:09:36 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] virtio-blk: clamp zone report to the report buffer
- capacity
-Message-ID: <20260609150936.GB57581@fedora>
-References: <20260607124834.3059944-1-michael.bommarito@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPdXpHEJ"
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-48673dc56a8so4774424b6e.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 08:15:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781018144; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SYJ5x9UVlsBroBUgETzI9lAIwPT4NKcDxDtDL4lQBaS4ohfXQDYIhKdXgLUDmDTOqN
+         FxRtbPbuAQHbEazXH3HP4tRJbt2zt/qu+LlpsnJHGmM5mdoW0h9gthFxvZDOuZi1eNI8
+         lbdGNRuZBkee/dpdZmJbkpw0erL4vD9fkNpkf55mWhbyKPFWe6quCCBcrFhUak0pLy3c
+         koqmwmWXhSm051h1Qd+q0lg+679hjdmLLzv0lfbLTEw6pQUO6schvk6BvUNyl6FNTufI
+         vFJ4Qi6tOLixW8hf9WW3ByCVp93tAxSVtl4d91D/igtFeZOzXYMoA5P5X+HhLiO/oE1l
+         nrZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Wt+3EeS6ijMa9x3r8w9B3P8FOrVy6t9nE/xiUFYUoJQ=;
+        fh=hM9FRVlItW8/LqkaTd6P8AUDvhkxD4QqbSkducN/bfk=;
+        b=Pz5QGpQYGOt7JtT63OtHcBNkvW3Ym04L9XwtRRy5e4vpFv0CYdJwWOJb6InyyQ4MYh
+         rNX36OFoQEoaShw4gouP8eb6PQyq2abQqAAo2Q63j1xXy+bbnnTuQMAo9dxwqCqh0VLg
+         M+BbvKhXulNC22PJVsmccSK/VY9x/yx3+qQRudU469pRipoB/KPzBQLJEWWndb8FSCcd
+         riERQ2SeuDUwwNp444Llx1UKjd3GX/msFuXtmv1gcaCUmd4PO2YU3F74hnE47JjuFRw3
+         gWJnMHF5iiWnZ1myJb+izxG7UVRb5dsZGcO/qgM/4LVF4e3+mS5gIWlg3Cay+hYXsgPf
+         taKQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781018144; x=1781622944; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wt+3EeS6ijMa9x3r8w9B3P8FOrVy6t9nE/xiUFYUoJQ=;
+        b=dPdXpHEJCeybVRl2oQEFsBA/t7D0ImSg/33zrvhEW15m7LZAIeKssgC8XjlEogdGd6
+         sjnCfI+WFYC4HWihYTyrVqZ398oF0ibFRODjaV+qZLdLc+AzVGKPjKEYiUEKTFwPH0ZJ
+         NttS/WMLkNpx572r6OWMse4ct45kzsIm6oN89zg533jSazoxAF81vC3q6MizVFEF/M2a
+         uxZ8j2w0/ILZF1J8f6EBzu8QvV0VrXJ54d/Xxv5o3ppPvlzLGHc959iCnp9fqFUZWOeV
+         Bh18B6XSKXZBMM9HbVcfFwTRGfMAmVjIT7FCO3vB4zXM9zB0vYOmi7rrhP7TdRSL40xF
+         /WuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781018144; x=1781622944;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Wt+3EeS6ijMa9x3r8w9B3P8FOrVy6t9nE/xiUFYUoJQ=;
+        b=XT8uVMq+aNDG0WFjwSdF6AthvmScnlXxLZeUozp09aGAmz6V1hK6LpWnJS8RUCNLnT
+         LJtR0M4EsCaa8+1fprj8AGZRo2FzM2uDbx70UEnTnw5T6+5tq1joLCCPijtm7p7QOk72
+         eA2lBx5pyMXE5ER5FNzZhNI5fjHb6NxmuJhThjz9HHd/UBzZ5OarWgHdzhDpyMLwXc82
+         ibrb0x6NNuox2nb6EBFBTyrsF1jd3XtIRRfrwvnQ1gaP01M+b8+9fZ66p+aMK4Egh1rx
+         /nUgTr1dv1R6gcUmGXXcA726SrJtRXIui+ponBLAfTRauvqrLkDYmBzMCrKGAhRMfXiA
+         GnIQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8GetPfDYhA8Ai2sSDDPLX2VuuiXoozdLVBypikT1mSNj6Qkh8mkIiOfJheFtDpATG1t2Ypk+MmAxsplw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzze7frEPN5vh3ULAMIiYzpF4UDddtYba6cNtiDseiGqG2SqrnI
+	l/9dsX1CtAGBGcBOz7kH8DaV3vG+Va+x91lJsTSqpnyWpzFNQCkgwRvFy1mgBU4jAflAexGjg/B
+	zWyoFlUjK2Tc0ie/AP8k0espHl94yA74=
+X-Gm-Gg: Acq92OEWy6I4C95S6DCNiwTl40ckhAfvy69qV8/Pr0Y/K74FDoRqpbZ02qxBY9V8z2y
+	Jn+JtJrIEuAQzpIe4MfyhKIsJ00teiY0fvXuwgiBCC4a0b0rXE3QoVbp+WVI9NaUaH0PAyMOQsU
+	WedtD721ol3LJVBw3u3I1wz+GN6Sf8e27Elg0wIz32W+BM80W44gj5o0YhVC8km9bOfiuiYHhls
+	wQbp0eUkaqomD0ax4zqNWbqsTi/iLa4fYOKDJOfG7QHx5oVRvjtP9qKGqTNU4g0xOOvcTkA2xv+
+	2GDB1O4eP8tsbmQSDrrJ5RvFy8mXwK4v+B20lCXiZcscHR+Ei/h0
+X-Received: by 2002:a05:6808:1454:b0:45e:f0af:5148 with SMTP id
+ 5614622812f47-4868de84142mr11623304b6e.30.1781018144395; Tue, 09 Jun 2026
+ 08:15:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rUlFp7cNxuZOyAbC"
-Content-Disposition: inline
-In-Reply-To: <20260607124834.3059944-1-michael.bommarito@gmail.com>
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
-
-
---rUlFp7cNxuZOyAbC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <cover.1780492756.git.yukuai@fygo.io>
+In-Reply-To: <cover.1780492756.git.yukuai@fygo.io>
+From: Yizhou Tang <tangyeechou@gmail.com>
+Date: Tue, 9 Jun 2026 23:15:33 +0800
+X-Gm-Features: AVVi8CcSfWWILCDELm0SA7ZWJBSUn8yjiqxY_MLXcIuNwEr1ynVC6AyoN5wQ7zg
+Message-ID: <CAOB9oOZ_PMGRmNOSJM=Nda0t2zfxZ4+h7N7tvv_scmJeFfUdiw@mail.gmail.com>
+Subject: Re: [PATCH 0/5] blk-cgroup: fix blkg list and policy data races
+To: Yu Kuai <yukuai@fygo.io>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Ming Lei <tom.leiming@gmail.com>, Nilay Shroff <nilay@linux.ibm.com>, 
+	Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org, cgroups@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 07, 2026 at 08:48:34AM -0400, Michael Bommarito wrote:
-> virtblk_report_zones() trusts the device-reported number of zones when
-> walking the report buffer:
->=20
-> 	nz =3D min_t(u64, virtio64_to_cpu(vblk->vdev, report->nr_zones),
-> 		   nr_zones);
-> 	...
-> 	for (i =3D 0; i < nz && zone_idx < nr_zones; i++) {
-> 		ret =3D virtblk_parse_zone(vblk, &report->zones[i], ...);
->=20
-> The buffer is allocated by virtblk_alloc_report_buffer(), whose size is
-> capped by the queue's max hardware sectors and max segments and can
-> therefore hold fewer descriptors than nr_zones. nz is bounded only by
-> the device-supplied report->nr_zones and the requested nr_zones, never
-> by the buffer's descriptor capacity. At probe time the request count is
-> unbounded (blk_revalidate_disk_zones() calls report_zones() with
-> nr_zones =3D=3D UINT_MAX), so the device-supplied report->nr_zones is the
-> sole gate: a device that reports more zones than fit in the buffer
-> drives the loop to read report->zones[i] past the end of the allocation.
->=20
-> A malicious or buggy virtio-blk device that reports an inflated nr_zones
-> triggers this during zone revalidation at probe. KASAN reports a
-> vmalloc-out-of-bounds read in virtblk_report_zones() against the report
-> buffer allocated a few lines earlier.
->=20
-> Clamp nz to the number of descriptors that actually fit in the report
-> buffer.
->=20
-> Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
-> Assisted-by: Claude:claude-opus-4-8
-> Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
-> ---
-> v2: drop the explanatory comment per Michael S. Tsirkin's review; the
->     clamp itself is unchanged.
->=20
->  drivers/block/virtio_blk.c | 2 ++
->  1 file changed, 2 insertions(+)
+On Wed, Jun 3, 2026 at 9:35=E2=80=AFPM Yu Kuai <yukuai@fygo.io> wrote:
+>
+> This small series fixes races between blkg destruction, q->blkg_list
+> iteration, and blkcg policy activation.
+>
+> The first two patches serialize q->blkg_list walks in blkg_destroy_all()
+> and BFQ writeback weight-raising teardown with blkcg_mutex. The next two
+> patches close policy activation races with concurrent blkg destruction,
+> including skipping blkgs that are already dying. The final patch factors
+> the common policy data teardown loop.
+>
+> This uses blkcg_mutex rather than extending queue_lock coverage because
+> the races are about blkg list visibility and policy-data lifetime, not
+> request-queue dispatch state. blkg_free_workfn() already uses
+> blkcg_mutex to serialize policy-data freeing with policy deactivation
+> and removes blkgs from q->blkg_list only after that teardown. Taking the
+> same mutex around the remaining q->blkg_list walkers gives one sleepable
+> serialization point for blkg lifetime, avoids adding more queue_lock
+> nesting, and prepares the follow-up conversion that removes queue_lock
+> from blkcg list protection entirely.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+LGTM.
 
---rUlFp7cNxuZOyAbC
-Content-Type: application/pgp-signature; name=signature.asc
+I had noticed some time ago that blkcg_activate_policy() did not take
+q->blkcg_mutex, and this patchset nicely resolves my concern.
 
------BEGIN PGP SIGNATURE-----
+Reviewed-by: Tang Yizhou <yizhou.tang@shopee.com>
 
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmooLLAACgkQnKSrs4Gr
-c8iLEQgAhDb1MrzY00/WqtMnXWx3WDfzpd+QbRidYgHKTRfAADkmiU7vFSvCQza6
-otrKhzylaqv9PmUW8L1/SzyiKkjk6omCv+U50xTkbl7fqZONpq1B1DK8L0OZRIIy
-yu4ub39jGWD15NXr0xQvlcWuH/hq+ayEnHKUBe0OyC7oJs3CMSI8LsWR0wFdUWJt
-3o9bG976oo+bsO5JwE95X+YH2fRrHDQlFkdbx4FaQoUtYS6CoVaYtlrY9tqP9YO8
-2HJ88htlUfpw4LdliojMBFvG2FCNkFhlyRBR+ntwGPW6rBOZPnlq/9Fbk6YH4th1
-EDOexdDUD0tc2D2AFoUYt1Sgv/7+Xg==
-=XD3B
------END PGP SIGNATURE-----
+Best regards,
+Yi
 
---rUlFp7cNxuZOyAbC--
 
+>
+> Yu Kuai (2):
+>   blk-cgroup: protect q->blkg_list iteration in blkg_destroy_all() with
+>     blkcg_mutex
+>   bfq: protect q->blkg_list iteration in bfq_end_wr_async() with
+>     blkcg_mutex
+>
+> Zheng Qixing (3):
+>   blk-cgroup: fix race between policy activation and blkg destruction
+>   blk-cgroup: skip dying blkg in blkcg_activate_policy()
+>   blk-cgroup: factor policy pd teardown loop into helper
+>
+>  block/bfq-cgroup.c  |  3 ++-
+>  block/bfq-iosched.c |  6 +++++
+>  block/blk-cgroup.c  | 65 ++++++++++++++++++++++++---------------------
+>  3 files changed, 43 insertions(+), 31 deletions(-)
+>
+> --
+> 2.51.0
+>
