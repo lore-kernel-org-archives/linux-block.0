@@ -1,131 +1,146 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17FD285CAE
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 00:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4CA2472AF
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 00:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780963282; cv=none; b=MYMyLKrvNu50XCRqIP+ZSE+tAp0V9UN9XT2pC1+09A5e/rbgxIDSzRnRT2KrUUbhfn9MqZsGVLFmTKnV0I/F4IaH1qG78J4WXzKGH3qmCjruDY1ABRQ+nGpIhYIYH3tbcTU5XbbvKC5/yCnPj2tmUuvWR9ihR8AL5uxACkEs7F4=
+	t=1780965406; cv=none; b=V95BVWFFyKkTrjb28QxQU49mcNq0dfwe+9nsRm6tiYy0/+4bU+BwFrc9VM0oJdMxsqftSTiVBf3JMYaC34cSBF6ZNBEh9+FZNLmlmXSct5dk8Qw4VhOWz7HpV9cmuq8pMzbuVjotZDoUw1pmFAcBKOtcXHlK94HbOYZjpadEW2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780963282; c=relaxed/simple;
-	bh=XGfoAuoy6Fbz2QGxOiWMtS47obzjiWDB0rco1Qp6Un0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UlQKv7UDrenwHkTjlkWlR+lowrCWoInQtLs9tJYwEPmWP78pAXVVFacf8HKeA6bqAhMj/SZfKGSYvaoLVzQpZ7zG53jH5kY1BrfeZ9mOGfsZuYZp23Yyt0cPPfn6hH5h42W8e7U5A5UHw/rRMUBx6FrhCczy6NwsQ8h3Tv+E2jM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com; spf=pass smtp.mailfrom=trailofbits.com; dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b=B+aSK/GS; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trailofbits.com
+	s=arc-20240116; t=1780965406; c=relaxed/simple;
+	bh=jhMGWb5wU0e//pOq91Ni4U70PjkpDW3s25lSZUhAuhc=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=Ofy1hPSQMAVNynnKJ8/yTJ3cl2dihVDvQdg64ejm7xMwoY9760osy7TaHGvYUOCyFSWF3h9yDsD+WFSM3Z5PuyUdQME32R27iLHd66b0gcNco43QHDKNR8RkxqhGFvxmsQB++dUqSyTnWKnSkFUv34Hao/NQxWHghms5HX6sHbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fUwNQXh1; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=trailofbits.com header.i=@trailofbits.com header.b="B+aSK/GS"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-915671abde5so419502985a.3
-        for <linux-block@vger.kernel.org>; Mon, 08 Jun 2026 17:01:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1780963280; x=1781568080; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IZO5D5jxI24Y187hxcbLYFi5BP46QFssvcuE2eZAoKk=;
-        b=B+aSK/GSnkNnLruWJpwHCcJt6/nf5/DTMRJhxDiFeH/eWCJwJWQXWUPunHwbtUayAO
-         xEQ1h7oGpFqbWDLgARroW1nq2RR7MyhdtyiiAE25rO4iFbekeYCWBYrhRUGjpvw8IJOc
-         u9wydzlxDwP1PbufjKkApnOts/nIlXqpVOIdBYYi/lBpRjJmt/xXU9gXeRg+bhe26qTw
-         yBvAWFnl1pPY4GLZYJt65GJ2L8cp0a/zp4f1NVciA/Zehu5tPHNF+TRrt0/MhJsj0fbR
-         znzzpCq/ysJkSAQeXvUB99YxYZ9ARryMY/8y9DTljz57BvEd61BalXOR2ihwkwsJ/tXT
-         8OTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780963280; x=1781568080;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZO5D5jxI24Y187hxcbLYFi5BP46QFssvcuE2eZAoKk=;
-        b=fd7PMdudCefz18TT3foSok+7IM9u1/X/NmRTFVhAMBQW7KP1YfwjBLK7sHiEtn1ru5
-         XTEbhHYuQaUp0lKE2JW+hUlbAOg5vIWTtEvmydCiPjMiVQ+Eo5z6xtF58GKQbB5sdTSZ
-         eJ2j7iwalPLdUkqwdIDLK485AmK7xcdK0UemzV/hHkL3w3HVtcD5Tm/t3TR9klqwVG/l
-         xbSu4Duw/KT35jCvyuVJUo3LORGdErl1e1JlixA4De8I9KCefA4EO6mJrJBIXdmynN1L
-         DKgiUDcVUHH7wsACg4ZrCusZJzAp8wU5rtd2nBdv/JmamLiJSreZBPM1Njjb0EY6f6g5
-         3K9A==
-X-Forwarded-Encrypted: i=1; AFNElJ+L5hS2s60BZv9P/+L08MmMMg7qqbUSqVaxCTm5weNSaebmu5ju7G1Ro0IGdzc3Z6bcLQHBPPilmoWKwA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgyAEDDCBkIARXjZgTUC1hSTuKBGIqk0matwzSMJN+Mj+KYeAm
-	zpK9fQdBzGtzb3y0qVbvHSt7yqGLnOUy5IUjTXfzvJXCD3uDMB9LGGwfu5N2Y7HrSJs=
-X-Gm-Gg: Acq92OH33CQJGicEnNlsvj5/f6nbkSzzbQK4vWCCMdumbbgpyiJBJ0fV5qLm0EhFBx2
-	A7+DOhL55HKT0y/jrvlgfFgd7TXmGFwfTWl95Qul7iZpxQNT9+0FhK6oouwsmhknInGxSohOLT0
-	Z7bMlnovjP5nvOo5gI5DvJUrwDNqNl+xzKMTpbTYzxf6OsER1tzDuyolE6lDtkhKKLTq+M2U0Mm
-	yk5twVXoV0IOC/wgqrfWfiDqh8kuepz+f5p5auvN2Vsz5vjBCNeK/uIPFi3Sd1eJIaPQm3YTtvc
-	fP5F8OKz+zF8nTRnA7XBIxfsNXSaDET2BkT95uji1Kk4sOItfFSNVLMrDxF/cCzxfYq3NGRPaUK
-	wb7Ka6R6xsb4gcxuXfsrmYajsB+9tUir4I6SCsn+dtjnxFtiCI+LQJcHBGmBJBJ6PVURIc7pGvu
-	p4CULPgljuf03b8GwRcIG7U1eXEdoeb4JFpdOoWw==
-X-Received: by 2002:a05:620a:414f:b0:914:b012:fca6 with SMTP id af79cd13be357-915a9c72067mr2999222385a.14.1780963256865;
-        Mon, 08 Jun 2026 17:00:56 -0700 (PDT)
-Received: from localhost ([161.35.96.86])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-9158a37c4e6sm1887052785a.26.2026.06.08.17.00.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2026 17:00:55 -0700 (PDT)
-From: Samuel Moelius <sam.moelius@trailofbits.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Samuel Moelius <sam.moelius@trailofbits.com>,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] brd: normalize non-positive max_part before rounding it up
-Date: Mon,  8 Jun 2026 23:59:33 +0000
-Message-ID: <20260608235932.1233876.a0685c37c761.brd-negative-max-part-zero-minors@trailofbits.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fUwNQXh1"
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780965400;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NCGhRG1CImeJMpSnliLnjJkZGyrhgZ+lru5auGG2Gio=;
+	b=fUwNQXh1lEooBGZvJLZNoxiuDwcNOOml0nwHWou3dnA0p85p1xJVID3+wiq/X7XEWESCIT
+	eHyyVEDLJJhX0GvVJf+0RYj3j9I5kqD+ZyNSML+aJf3GSGT88N0VNozTBPcMklIR/18Jvd
+	zPey73k1RoTqgxhyL/ZoGa8wExLhA68=
+Date: Tue, 09 Jun 2026 00:36:39 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jackie Liu" <liu.yun@linux.dev>
+Message-ID: <d99eb11c43be22184bd044a16c5968f93b082d3e@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH] block: clear zone write plugging flag before failing
+ rejected BIOs
+To: "Damien Le Moal" <dlemoal@kernel.org>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <33035623-1f1b-4391-9212-e2af5fd9457f@kernel.org>
+References: <20260607031814.19188-1-liu.yun@linux.dev>
+ <33035623-1f1b-4391-9212-e2af5fd9457f@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-`max_part` is an `int` module parameter, but brd only resets zero before
-rounding non-divisor values with `1UL << fls(max_part)`.
+2026=E5=B9=B46=E6=9C=888=E6=97=A5 19:42, "Damien Le Moal" <dlemoal@kernel=
+.org mailto:dlemoal@kernel.org?to=3D%22Damien%20Le%20Moal%22%20%3Cdlemoal=
+%40kernel.org%3E > =E5=86=99=E5=88=B0:
 
-A negative value such as -1 passes the initial zero check.  The modulo
-test then reaches the roundup, where `fls(-1)` yields 32.  On 64-bit
-builds that produces 4294967296, which is then assigned back to `int
-max_part` as zero.  `brd_alloc()` passes that zero value to
-`disk->minors`, and block core warns and rejects the disk.
 
-Normalize non-positive values to the existing one-partition fallback
-before the modulo/roundup, and apply the existing `DISK_MAX_PARTS` clamp
-before the roundup so it only operates on representable, in-range
-values.
+>=20
+>=20On 2026/06/07 11:18, Jackie Liu wrote:
+>=20
+>=20>=20
+>=20> From: Jackie Liu <liuyun01@kylinos.cn>
+> >=20=20
+>=20>  Commit fe0418eb9bd6 ("block: Prevent potential deadlocks in zone w=
+rite plug
+> >  error recovery") changed blk_zone_wplug_handle_write() to fail BIOs
+> >  directly when blk_zone_wplug_prepare_bio() rejects them, for example
+> >  because the write is not aligned to the cached write pointer or the =
+plug
+> >  needs a write pointer update. However, the BIO is already marked wit=
+h
+> >  BIO_ZONE_WRITE_PLUGGING at that point even though it is not issued.
+> >=20=20
+>=20>  Completing such a BIO with bio_io_error() makes bio_endio() call
+> >  blk_zone_write_plug_bio_endio(), which treats the completion as a fa=
+iled
+> >  device write and may poison the cached zone write pointer state by s=
+etting
+> >  BLK_ZONE_WPLUG_NEED_WP_UPDATE.
+> >=20
+>=20Yes, true. But you did not explain clearly why that is a problem. Aft=
+er all, if
+> we hit this case, the user issued an unaligned BIO, and so forcing it t=
+o do a
+> report zones to get everything in sync and the correct write pointer is=
+ not a
+> bad thing.
+>=20
+>=20If fe0418eb9bd6 change is actually causing you problems, please descr=
+ibe that
+> problem clearly. But ideally, I do not want to special case some error
+> completions over others and prefer to have a single error path that res=
+ult in
+> the same state for the zone write plugs, regardless of a write error ro=
+ot cause.
 
-Assisted-by: Codex:gpt-5.5-cyber-preview
-Signed-off-by: Samuel Moelius <sam.moelius@trailofbits.com>
----
- drivers/block/brd.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+Thanks for the review. I agree that the changelog did not describe a
+concrete user-visible problem clearly enough.
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 00cc8122068f..ed9567f74579 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -371,9 +371,15 @@ static void brd_cleanup(void)
- 
- static inline void brd_check_and_reset_par(void)
- {
--	if (unlikely(!max_part))
-+	if (unlikely(max_part <= 0))
- 		max_part = 1;
- 
-+	if (max_part > DISK_MAX_PARTS) {
-+		pr_info("brd: max_part can't be larger than %d, reset max_part = %d.\n",
-+			DISK_MAX_PARTS, DISK_MAX_PARTS);
-+		max_part = DISK_MAX_PARTS;
-+	}
-+
- 	/*
- 	 * make sure 'max_part' can be divided exactly by (1U << MINORBITS),
- 	 * otherwise, it is possiable to get same dev_t when adding partitions.
-@@ -381,11 +387,6 @@ static inline void brd_check_and_reset_par(void)
- 	if ((1U << MINORBITS) % max_part != 0)
- 		max_part = 1UL << fls(max_part);
- 
--	if (max_part > DISK_MAX_PARTS) {
--		pr_info("brd: max_part can't be larger than %d, reset max_part = %d.\n",
--			DISK_MAX_PARTS, DISK_MAX_PARTS);
--		max_part = DISK_MAX_PARTS;
--	}
- }
- 
- static int __init brd_init(void)
--- 
-2.43.0
+I was treating NEED_WP_UPDATE on a BIO rejected before submission as stal=
+e
+state poisoning, because no device write was actually issued. But as you
+pointed out, for an invalid/non-sequential write, forcing the user to
+resynchronize the write pointer through report zones is consistent with t=
+he
+current conservative recovery model.
 
+I do not have a concrete regression from fe0418eb9bd6 beyond that extra
+recovery requirement, so please drop this patch for now.
+
+Thanks.
+
+Jackie
+
+>=20
+>=20>=20
+>=20> Clear BIO_ZONE_WRITE_PLUGGING and drop the zone write plug referenc=
+e before
+> >  failing the rejected BIO.
+> >=20=20
+>=20>  Fixes: fe0418eb9bd6 ("block: Prevent potential deadlocks in zone w=
+rite plug error recovery")
+> >  Cc: stable@vger.kernel.org # 6.13+
+> >  Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+> >  ---
+> >  block/blk-zoned.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >=20=20
+>=20>  diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> >  index 6a221c180889..855767d8bfc1 100644
+> >  --- a/block/blk-zoned.c
+> >  +++ b/block/blk-zoned.c
+> >  @@ -1502,7 +1502,9 @@ static bool blk_zone_wplug_handle_write(struct=
+ bio *bio, unsigned int nr_segs)
+> >  goto queue_bio;
+> >=20=20
+>=20>  if (!blk_zone_wplug_prepare_bio(zwplug, bio)) {
+> >  + bio_clear_flag(bio, BIO_ZONE_WRITE_PLUGGING);
+> >  spin_unlock_irqrestore(&zwplug->lock, flags);
+> >  + disk_put_zone_wplug(zwplug);
+> >  bio_io_error(bio);
+> >  return true;
+> >  }
+> >=20
+>=20--=20
+>=20Damien Le Moal
+> Western Digital Research
+>
