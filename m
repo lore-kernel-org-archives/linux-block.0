@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2488A4D90D7;
-	Tue,  9 Jun 2026 19:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA329373BFE;
+	Tue,  9 Jun 2026 19:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032426; cv=none; b=jz0+RVGLOs0RPGrivG9MTXDfrexAStdlhBjqCc6t22VaU7bw3JpMJ4EGBy+suDUeVbDh4ETFgZ9sfKwN2ulZ4tOx82cvI+daXeYXb5d/LfP7x21spa6NOz6kJ2//2s5mZkckvCW26BgdCkvebWgoHpmip1gDAkrBuOiezOXK39I=
+	t=1781032432; cv=none; b=GdtFA/rTvFwqnIz7yAGEvV+/4eT3JF4uN9NgWpIdoco6XEl+s+/tbV0p3LdBEu/bP6dUtpVa1cC8L8oc8zyMAO2B1X1Yf7CNobjxrWy8s4b7QQzMMcRSRIC0e6hmAeEaNPcXHsLv5kBlQlCTrk/Q7+eevV0KXN6eVE97/1xznOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032426; c=relaxed/simple;
-	bh=MxU/avvgu0ObO+hSiIzPv5Gh1hPwXbxknG4ZgL5JR2I=;
+	s=arc-20240116; t=1781032432; c=relaxed/simple;
+	bh=Z4bTvtitOiRUpVB/vtnTPuYJk3qDeC9v435ynCbwhKQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EGLCMZIrgg6QK9QVtaEbtW2iex2/0tsCjJx4RxssPELNm5tYkt4qcySOSw/8wnYcXSoAhWUTRRXlCZrUiD6y6mSV38ALXWCUGMD2nyAd6fCrRmebatnkXjkJESFKaVRbPTpGDgoSOsrtKWnyQZ58QStt/dEvADLYmvvAE7faCxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfnLzzTx; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=oe+nQbWMdcZJGNQheBNRBPJvFR/Mhuz47nz6hzouvMu5gA1uVMhj79s/9oBaM5S2gADOSqo4yOfzLWmL7HRGJVt2ttFX6U/m6mUaV/N07Xmb8IeZ+YkA5vB4Mipo44R1ez49oBElKJxYgayOsF93GXnvVeLh6Dbnvb7qxbB01JM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uo6CXLUE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfnLzzTx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E3A1F00893;
-	Tue,  9 Jun 2026 19:13:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uo6CXLUE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A95A51F00898;
+	Tue,  9 Jun 2026 19:13:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032425;
-	bh=XPdx1oCo+cDGKHpfIjN0PVTLlY+JG6MdSS1fHOHa1sM=;
+	s=k20260515; t=1781032430;
+	bh=RwDIVImKkZ54sd2q6hPX1oX6gadqlWc4TQjYIjlzw7g=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=AfnLzzTxPZjO9ehKPb9b2SbLpNUEFeuH3N5AStrAtc1iU7GQOokbmWJ0vrkEep7me
-	 LYGxii8ZJ1Lweycf+53XWBXkQT4k/aN1MjrknxAdDKgx1zDZfW+Ogg4XyOgy11UwHp
-	 uEzRtPDDHT+hjlz+GCUjrAE9d4qnc8G1pgLrgXeb2f1p6ZZuJT22q5ISlmqFLe4TGv
-	 Mf1Dxv0FEx96l56ZNL9N9o+rMsa7uf9L2sWaWrK/2P6N1PKnbZ8l/9/r4qglqLBJ+G
-	 aPyiTFjSGKLYnBoSMjZwdUHOo/7pANnZ7IJMwayibLplmz+zpKji9NvtoV4xOd+5nt
-	 RvpDS3daO9tjA==
+	b=Uo6CXLUE1iYXFFn5qXQl5CLsZDNmGC+xqboP+YL55rAJeKIsTQk/GWivS1AXxfkq2
+	 1kH7PaVlLurPRERGkgTZr3YZnqh76Crpc8XcBnoEdSfLgUaJNye6TyQeK8e3/Ts/hq
+	 QvXYSOgwW+NzirJRNfPZ415rJL6il3evGUnDY8WpvVrXrZndDotRqov2kvQLpZMwXB
+	 YpCwL4Vw+OSWK3PCX6Sz8TWyDnDuGoIi0oUxE/jDikq8u7xKMZHllfVgtrBF8pAEv1
+	 5VH3VoPXnhsATsggoSRNz9osQUqshFhQQMJDH49p/vdWSEwTaWFMeBZJN00fawHoqa
+	 0QLq3Ytsf8r7Q==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:07:49 +0200
-Subject: [PATCH v2 10/83] block: rust: allow `hrtimer::Timer` in
- `RequestData`
+Date: Tue, 09 Jun 2026 21:08:08 +0200
+Subject: [PATCH v2 29/83] block: rnull: add badblocks support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-10-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-29-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -59,245 +58,290 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8262; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=MxU/avvgu0ObO+hSiIzPv5Gh1hPwXbxknG4ZgL5JR2I=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGS9QazYsxgfYMLVHCHgKKVjzrf3FJbLdn8ww
- +/TN93edpaJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkvQAKCRD6UCkIqsW9
- 0FJGD/97Fixr3jGIlPgmEP6cWYHvaI4ONk7ITRFh7/tfq5iF7O4OiQV58e9R+Br+J80W8kv8t72
- a9tF07TjgAHAz5j2CtgAghAX2Dog0PE2Y9kPETYarm8PqqG56T43ctr0Z3icnQUGTx8v9OAPJFY
- HezJ/hX7TrE7h/AZlpX02lgY4DAXCpXkqbmoKvTubJRoau5weN4ESUs0OwmZ9hk2fnCgZab8FDN
- eOASHKr+srZAMT8DQM7RU1cfj1UlwYE6smitL195w03eRdDC16SM4O/AbUgEJ+hRq7R2Rq5Fk4D
- DMlI5L9fow6PzL0kU/7IdYYZiF85VPgTqdHwEsRjmYVDlGT1SfgAxlmvsuJdheqAFU0UojAdiAs
- hofFoQj18th6a//f9AtAZMupTeMIF7pM0rGb5LGqyG4A8f94XgtCA0tTNbeJziyQJLR7KcCmQiw
- /fgLN/DbRyt0lojLLFTZMDqGdAi3y8VdlvVxY2txEXn+eL/4n1nVIXQ4F/X5wsAdHdM3yLWS6ri
- NAF6l8ns0rcGkHdC1xNkIwVR6FeAjV661vXf9xEyStqI3OOygyGV6GYCZeA2G3EvlpMMyjLt6wt
- gzFUzDE2E8DVZdZddM9+dzNCXN28y51+7uIjXQF6iJ6O7NMjYY2GbJVl62xBqcCfbDdnxmcmn0E
- CWQNJg/g0Pwbo6w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8576; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=Z4bTvtitOiRUpVB/vtnTPuYJk3qDeC9v435ynCbwhKQ=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTO4SWpDWOTQpKuppQyjtocpGDBfs4l6cpI1
+ YmC6ruiDU2JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkzgAKCRD6UCkIqsW9
+ 0BLTD/4pE5l+jd7Un+rj/Z4vBWnQ2DGFDngPPPqu33XdKQf5Y0H0s2EDGJiLAS66NfHmv9Y3VQy
+ xww7+gqD4l5tCDuKPlt3aDym1hhf9Zn+JY3Tx+RSkJs9yNfPdVyzVTVlzyywVXJ2zdV01JXeN6w
+ cqIK+XCCfOxuOSdObW9Lf6hh3wfobK4V2yAMWJzeYK5c0qvIzQZv94rfupDTcOJXVICOM/2+caW
+ 8b5kyqE4PFOL72KXnavqStdpp9927ASRkZOf2R5iD74pND012qGLwWKokU1E8EoA2DLLyMDXrxz
+ ISK7vfkrfbHWKJUFzdSuMQA06hhccZzWWb7nYo0MBqMIfkVUybvZ/oMNDTqvnEVnakgQjjBYi5m
+ 4d8w7IeN8aqzHhmYR+zWPFSh+YDjrxxnOR7jS1qPRL1+cMutR8B0uLM8Bu2Ibg74/ovVf15aQW4
+ jVwIP5aTUOjNklDtmnFdGnv8XNlTn/PgulHfYdsagNTyUv4R66SkmaCBgeV+iTkOLWvHvki2dOU
+ Dti4t9OJbJpAh6U9Fdw4hSh8hadMvwJVMK+0x6q0WZd410UprMULv3rxZ1IhOjkWVxsGaU/XJ6c
+ 3gwATWIJS8qbbeKEVoX9Bm590uxQULT1/USttL7kxlSueG0cItM4nfP6IPjE6GWLu8Pk872bI1g
+ 6C4dFIesc5G5haw==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-`Request` is essentially a smart pointer that derefs to
-`Operations::RequestData`. To use an `HrTimer` in `Operations::RequestData`
-via the `Request` pointer, we must implement `HrTimerPointer` for
-`Request`.
+Add badblocks support to the rnull driver with a configfs interface for
+managing bad sectors.
 
-Thus, implement `HrTimerPointer` and friends for `ARef<Request>`.
+- Configfs attribute for adding/removing bad blocks via "+start-end" and
+  "-start-end" syntax.
+- Request handling that checks for bad blocks and returns IO errors.
+- Updated request completion to handle error status properly.
 
-Publicly export `HrTimer::raw_cancel` and `HrTimer::into_c`.
+The badblocks functionality is disabled by default and is enabled when
+first bad block is added.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq.rs         |   5 +-
- rust/kernel/block/mq/request.rs | 142 ++++++++++++++++++++++++++++++++++++++++
- rust/kernel/time/hrtimer.rs     |   5 +-
- 3 files changed, 149 insertions(+), 3 deletions(-)
+ drivers/block/rnull/configfs.rs | 63 ++++++++++++++++++++++++++++++++++++++---
+ drivers/block/rnull/rnull.rs    | 46 ++++++++++++++++++++++++++----
+ 2 files changed, 100 insertions(+), 9 deletions(-)
 
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 7718b106eb49..a03d46d274a5 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -107,5 +107,8 @@
- mod tag_set;
- 
- pub use operations::Operations;
--pub use request::Request;
-+pub use request::{
-+    Request,
-+    RequestTimerHandle, //
-+};
- pub use tag_set::TagSet;
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index a6e757d8755d..0b14f584c9d9 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -15,6 +15,14 @@
-         atomic::ordering,
-         Refcount,
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index d9aead646ae0..4db3ba26c2d1 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -6,9 +6,12 @@
+ };
+ use kernel::{
+     bindings,
+-    block::mq::gen_disk::{
+-        GenDisk,
+-        GenDiskBuilder, //
++    block::{
++        badblocks::BadBlocks,
++        mq::gen_disk::{
++            GenDisk,
++            GenDiskBuilder, //
++        }, //
      },
-+    time::hrtimer::{
-+        HasHrTimer,
-+        HrTimer,
-+        HrTimerCallback,
-+        HrTimerHandle,
-+        HrTimerMode,
-+        HrTimerPointer, //
+     configfs::{
+         self,
+@@ -26,7 +29,10 @@
+         kstrtobool_bytes,
+         CString, //
+     },
+-    sync::Mutex,
++    sync::{
++        Arc,
++        Mutex, //
 +    },
-     types::{
-         Opaque,
-         Ownable,
-@@ -23,6 +31,7 @@
+     time, //
+ };
+ use macros::{
+@@ -95,6 +101,7 @@ fn make_group(
+                 home_node: 9,
+                 discard: 10,
+                 no_sched:11,
++                badblocks: 12,
+             ],
+         };
+ 
+@@ -117,6 +124,7 @@ fn make_group(
+                     home_node: bindings::NUMA_NO_NODE,
+                     discard: false,
+                     no_sched: false,
++                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
+                 }),
+             }),
+             core::iter::empty(),
+@@ -186,6 +194,7 @@ struct DeviceConfigInner {
+     home_node: i32,
+     discard: bool,
+     no_sched: bool,
++    bad_blocks: Arc<BadBlocks>,
+ }
+ 
+ #[vtable]
+@@ -221,6 +230,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 home_node: guard.home_node,
+                 discard: guard.discard,
+                 no_sched: guard.no_sched,
++                bad_blocks: guard.bad_blocks.clone(),
+             })?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -328,3 +338,48 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+ );
+ 
+ configfs_simple_bool_field!(DeviceConfig, 11, no_sched);
++
++#[vtable]
++impl configfs::AttributeOperations<12> for DeviceConfig {
++    type Data = DeviceConfig;
++
++    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
++        let ret = this.data.lock().bad_blocks.show(page, false);
++        if ret < 0 {
++            Err(Error::from_errno(ret as c_int))
++        } else {
++            Ok(ret as usize)
++        }
++    }
++
++    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
++        // This attribute can be set while device is powered.
++
++        for line in core::str::from_utf8(page)?.lines() {
++            let mut chars = line.chars();
++            match chars.next() {
++                Some(sign @ '+' | sign @ '-') => {
++                    if let Some((start, end)) = chars.as_str().split_once('-') {
++                        let start: u64 = start.parse().map_err(|_| EINVAL)?;
++                        let end: u64 = end.parse().map_err(|_| EINVAL)?;
++
++                        if start > end {
++                            return Err(EINVAL);
++                        }
++
++                        this.data.lock().bad_blocks.enable();
++
++                        if sign == '+' {
++                            this.data.lock().bad_blocks.set_bad(start..=end, true)?;
++                        } else {
++                            this.data.lock().bad_blocks.set_good(start..=end)?;
++                        }
++                    }
++                }
++                _ => return Err(EINVAL),
++            }
++        }
++
++        Ok(())
++    }
++}
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 73f14d6e379f..90dbf318c2f8 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -9,6 +9,7 @@
+     bindings,
+     block::{
+         self,
++        badblocks::{self, BadBlocks},
+         bio::Segment,
+         mq::{
+             self,
+@@ -38,6 +39,10 @@
+     str::CString,
+     sync::{
+         aref::ARef,
++        atomic::{
++            ordering,
++            Atomic, //
++        },
+         Arc,
+         Mutex, //
      },
- };
- use core::{
-+    ffi::c_void,
-     marker::PhantomData,
-     ptr::NonNull, //
- };
-@@ -145,6 +154,11 @@ pub(crate) fn wrapper_ref(&self) -> &RequestDataWrapper<T> {
-         // valid as a shared reference.
-         unsafe { Self::wrapper_ptr(core::ptr::from_ref(self).cast_mut()).as_ref() }
+@@ -153,6 +158,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     home_node: module_parameters::home_node.value(),
+                     discard: module_parameters::discard.value(),
+                     no_sched: module_parameters::no_sched.value(),
++                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -179,6 +185,7 @@ struct NullBlkOptions<'a> {
+     home_node: i32,
+     discard: bool,
+     no_sched: bool,
++    bad_blocks: Arc<BadBlocks>,
+ }
+ struct NullBlkDevice;
+ 
+@@ -196,6 +203,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+             home_node,
+             discard,
+             no_sched,
++            bad_blocks,
+         } = options;
+ 
+         let mut flags = mq::tag_set::Flags::default();
+@@ -237,6 +245,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+                 completion_time,
+                 memory_backed,
+                 block_size: block_size.into(),
++                bad_blocks,
+             }),
+             GFP_KERNEL,
+         )?;
+@@ -351,6 +360,16 @@ fn transfer(
+         }
+         Ok(())
      }
 +
-+    /// Return a reference to the per-request data associated with this request.
-+    pub fn data_ref(&self) -> &T::RequestData {
-+        &self.wrapper_ref().data
++    fn end_request(rq: Owned<mq::Request<Self>>) {
++        let status = rq.data_ref().error.load(ordering::Relaxed);
++        rq.data_ref().error.store(0, ordering::Relaxed);
++
++        match status {
++            0 => rq.end_ok(),
++            _ => rq.end(bindings::BLK_STS_IOERR),
++        }
 +    }
  }
  
- /// A wrapper around data stored in the private area of the C [`struct request`].
-@@ -329,3 +343,131 @@ fn into_shared(this: Owned<Self>) -> ARef<Self> {
-         unsafe { ARef::from_raw(Owned::into_raw(this)) }
+ static_assert!((PAGE_SIZE >> SECTOR_SHIFT) <= 64);
+@@ -396,12 +415,14 @@ struct QueueData {
+     completion_time: Delta,
+     memory_backed: bool,
+     block_size: u64,
++    bad_blocks: Arc<BadBlocks>,
+ }
+ 
+ #[pin_data]
+ struct Pdu {
+     #[pin]
+     timer: kernel::time::hrtimer::HrTimer<Self>,
++    error: Atomic<u32>,
+ }
+ 
+ impl HrTimerCallback for Pdu {
+@@ -431,6 +452,7 @@ impl Operations for NullBlkDevice {
+     fn new_request_data() -> impl PinInit<Self::RequestData> {
+         pin_init!(Pdu {
+             timer <- kernel::time::hrtimer::HrTimer::new(),
++            error: Atomic::new(0),
+         })
      }
- }
-+
-+/// A handle for a timer that is embedded in a [`Request`] private data area.
-+pub struct RequestTimerHandle<T>
-+where
-+    T: Operations,
-+    T::RequestData: HasHrTimer<T::RequestData>,
-+{
-+    inner: ARef<Request<T>>,
-+}
-+
-+// SAFETY: The drop implementation of `RequestTimerHandle` calls `cancel`, which cancels the timer
-+// if it is running. `drop` will block if the timer handler is running. This is ensured via a call
-+// to `HrTimer::raw_cancel` in the implementation of `cancel`.
-+unsafe impl<T> HrTimerHandle for RequestTimerHandle<T>
-+where
-+    T: Operations,
-+    T::RequestData: HasHrTimer<T::RequestData>,
-+{
-+    fn cancel(&mut self) -> bool {
-+        let request_data_ptr = &self.inner.wrapper_ref().data as *const T::RequestData;
-+
-+        // SAFETY: As we obtained `self_ptr` from a valid reference above, it
-+        // must point to a valid `U`.
-+        let timer_ptr = unsafe {
-+            <T::RequestData as HasHrTimer<T::RequestData>>::raw_get_timer(request_data_ptr)
-+        };
-+
-+        // SAFETY: As `timer_ptr` points into `U` and `U` is valid, `timer_ptr`
-+        // must point to a valid `HrTimer` instance.
-+        unsafe { HrTimer::<T::RequestData>::raw_cancel(timer_ptr) }
-+    }
-+}
-+
-+impl<T> RequestTimerHandle<T>
-+where
-+    T: Operations,
-+    T::RequestData: HasHrTimer<T::RequestData>,
-+{
-+    /// Drop the timer handle without cancelling the timer.
-+    ///
-+    /// This is safe because dropping the last [`ARef<Request>`] does not drop the [`Request`].
-+    pub fn dismiss(mut self) {
-+        let inner = core::ptr::from_mut(&mut self.inner);
-+
-+        // SAFETY: `inner` is valid for reads and writes, is properly aligned and nonnull. We have
-+        // exclusive access to `inner` and we do not access `inner` after this call.
-+        unsafe { core::ptr::drop_in_place(inner) };
-+        core::mem::forget(self);
-+    }
-+}
-+
-+impl<T> Drop for RequestTimerHandle<T>
-+where
-+    T: Operations,
-+    T::RequestData: HasHrTimer<T::RequestData>,
-+{
-+    fn drop(&mut self) {
-+        self.cancel();
-+    }
-+}
-+
-+impl<T> HrTimerPointer for ARef<Request<T>>
-+where
-+    T: Operations,
-+    T::RequestData: HasHrTimer<T::RequestData>,
-+    T::RequestData: Sync,
-+{
-+    type TimerMode = <T::RequestData as HasHrTimer<T::RequestData>>::TimerMode;
-+    type TimerHandle = RequestTimerHandle<T>;
-+
-+    fn start(self, expires: <Self::TimerMode as HrTimerMode>::Expires) -> RequestTimerHandle<T> {
-+        let pdu_ptr = self.data_ref() as *const T::RequestData;
-+
-+        // SAFETY: `pdu_pointer` is coerced from a live reference to a `T` and this points to a
-+        // valid `T`. The reference is valid until `T` is dropped, and the timer will be canceled
-+        // before this.
-+        unsafe { T::RequestData::start(pdu_ptr, expires) };
-+
-+        RequestTimerHandle { inner: self }
-+    }
-+}
-+
-+impl<T> kernel::time::hrtimer::RawHrTimerCallback for ARef<Request<T>>
-+where
-+    T: Operations,
-+    T::RequestData: HasHrTimer<T::RequestData>,
-+    T::RequestData: for<'a> HrTimerCallback<Pointer<'a> = ARef<Request<T>>>,
-+    T::RequestData: Sync,
-+{
-+    type CallbackTarget<'a> = Self;
-+
-+    unsafe extern "C" fn run(ptr: *mut bindings::hrtimer) -> bindings::hrtimer_restart {
-+        // `HrTimer` is `repr(transparent)`
-+        let timer_ptr = ptr.cast::<kernel::time::hrtimer::HrTimer<T::RequestData>>();
-+
-+        // SAFETY: By C API contract `ptr` is the pointer we passed when
-+        // enqueuing the timer, so it is a `HrTimer<T::RequestData>` embedded in a `T::RequestData`
-+        let request_data_ptr = unsafe { T::RequestData::timer_container_of(timer_ptr) };
-+
-+        let offset = core::mem::offset_of!(RequestDataWrapper<T>, data);
-+
-+        // SAFETY: This sub stays within the `bindings::request` allocation and does not wrap.
-+        let pdu_ptr = unsafe {
-+            request_data_ptr
-+                .cast::<u8>()
-+                .sub(offset)
-+                .cast::<RequestDataWrapper<T>>()
-+        };
-+
-+        // SAFETY: This request pointer was passed to us by the kernel in `init_request_callback`.
-+        let request_ptr = unsafe { bindings::blk_mq_rq_from_pdu(pdu_ptr.cast::<c_void>()) };
-+
-+        // SAFETY: By C API contract, we have ownership of the request.
-+        let request_ref = unsafe { &*(request_ptr as *const Request<T>) };
-+
-+        request_ref.inc_ref();
-+        // SAFETY: We just incremented the refcount above.
-+        let aref: ARef<Request<T>> = unsafe { ARef::from_raw(NonNull::from(request_ref)) };
-+
-+        // SAFETY:
-+        // - By C API contract `timer_ptr` is the pointer that we passed when queuing the timer, so
-+        //   it is a valid pointer to a `HrTimer<T>` embedded in a `T`.
-+        // - We are within `RawHrTimerCallback::run`
-+        let context = unsafe { kernel::time::hrtimer::HrTimerCallbackContext::from_raw(timer_ptr) };
-+
-+        T::RequestData::run(aref, context).into_c()
-+    }
-+}
-diff --git a/rust/kernel/time/hrtimer.rs b/rust/kernel/time/hrtimer.rs
-index d57276496ed6..096b18523c73 100644
---- a/rust/kernel/time/hrtimer.rs
-+++ b/rust/kernel/time/hrtimer.rs
-@@ -496,7 +496,7 @@ unsafe fn raw_get(this: *const Self) -> *mut bindings::hrtimer {
-     /// # Safety
-     ///
-     /// `this` must point to a valid `Self`.
--    pub(crate) unsafe fn raw_cancel(this: *const Self) -> bool {
-+    pub unsafe fn raw_cancel(this: *const Self) -> bool {
-         // SAFETY: `this` points to an allocation of at least `HrTimer` size.
-         let c_timer_ptr = unsafe { HrTimer::raw_get(this) };
  
-@@ -900,7 +900,8 @@ pub enum HrTimerRestart {
- }
+@@ -440,6 +462,19 @@ fn queue_rq(
+         mut rq: Owned<mq::Request<Self>>,
+         _is_last: bool,
+     ) -> Result {
++        if queue_data.bad_blocks.enabled() {
++            let start = rq.sector();
++            let end = start + u64::from(rq.sectors());
++            if !matches!(
++                queue_data.bad_blocks.check(start..end),
++                badblocks::BlockStatus::None
++            ) {
++                rq.data_ref().error.store(1, ordering::Relaxed);
++            }
++        }
++
++        // TODO: Skip IO if bad block.
++
+         if queue_data.memory_backed {
+             memalloc_scope!(let _noio: NoIo);
+             let tree = &queue_data.tree;
+@@ -461,7 +496,7 @@ fn queue_rq(
+         }
  
- impl HrTimerRestart {
--    fn into_c(self) -> bindings::hrtimer_restart {
-+    /// Convert `self` into an integer for FFI use.
-+    pub fn into_c(self) -> bindings::hrtimer_restart {
-         self as bindings::hrtimer_restart
+         match queue_data.irq_mode {
+-            IRQMode::None => rq.end_ok(),
++            IRQMode::None => Self::end_request(rq),
+             IRQMode::Soft => mq::Request::complete(rq.into()),
+             IRQMode::Timer => {
+                 OwnableRefCounted::into_shared(rq)
+@@ -475,9 +510,10 @@ fn queue_rq(
+     fn commit_rqs(_queue_data: Pin<&QueueData>) {}
+ 
+     fn complete(rq: ARef<mq::Request<Self>>) {
+-        OwnableRefCounted::try_from_shared(rq)
+-            .map_err(|_e| kernel::error::code::EIO)
+-            .expect("Failed to complete request")
+-            .end_ok();
++        Self::end_request(
++            OwnableRefCounted::try_from_shared(rq)
++                .map_err(|_e| kernel::error::code::EIO)
++                .expect("Failed to complete request"),
++        )
      }
  }
 
