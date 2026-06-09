@@ -1,32 +1,32 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FC533D6F0
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A27D24BD03
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780986422; cv=none; b=kv9XpzlUa7nsr0ah/xaVHbI8UFhfiCV69CEFMOos5Lw00ygmBtQkOiAnLfdAjS++kBPYvNubNQMrTWgpwfBuR+cqy3GQbxI3Nq5BxIcPBrlYQoBWrm1wdB8wzNyjW7oYZamw8dMdYcOn04nnvFmlPH6sUeGX8W7S9AGhrbATLSA=
+	t=1780986440; cv=none; b=qAaETxOEJKJo30ux1ri+ePI31ChEmfp4ZGyEQSwPSv91km8GFp5ufALBO6v8zyb2nm0OL2HyvCRm2UEjDZF4rd42B0iVZk/Gxfk4d6q/sm2FsJbADnolbHm77+KQjJ0T6zQhJsT+/B8+zHkwqc4AAr/8/V0zJCms9+woQwLPU/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780986422; c=relaxed/simple;
-	bh=XWzIn0gVss55nh9DTuI6U4/KN2GlckWN/vemmHVqK4M=;
+	s=arc-20240116; t=1780986440; c=relaxed/simple;
+	bh=lRensNt2qIH2jQU0UaI5dLEk8Ul+weL86uyzgwUnKDM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qt2EJnVIdRhNAmXj39sJ2uBerzhA0z1k6tJsu/sceZEKYns8JtlxiTVGRaGLNYjGKCC1ju6lBvpI5ctu9nTZoU5EpMZOI0SFN0ymd0ld6Xqk1chtcno7fzzkTWRgrQgH7zBFjZ5zee6Zsrsz90uZN504gKH5wsc3NLKTK4hsyoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YYIJiCTk; arc=none smtp.client-ip=95.215.58.189
+	 MIME-Version; b=Xt6LqA7bxL8VkFx4SIQXjO+DW2FqvkjmnSdG46UApUG/ldeZa8t0YwEr9uip2XZdrZEED+CZv54LKqdmpWYTKmKS3zLGcrWnGTvNL0eWmWc2hLAS2mei+R6Qx8uYXziwreV+KybqcQermhyk9b7XnADgstzlTQuHnYlw9hdU8to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UtZFil2Q; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YYIJiCTk"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UtZFil2Q"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780986417;
+	t=1780986436;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Np0x5OABf11sd/lWEcYRius1zQG4TmMrbP89pTQvYBE=;
-	b=YYIJiCTkH8MjZ7BoGs7INCC4Vg7NTV50EYqh5qyQzaNnUUn/ixKMeAHTMaJlWsazr68AZc
-	9cDm4beZcV6ZDk9JRuLp/AOZC3eNoRHb5vZWf2PEag6On3FypjVNmaFjgVo30iqjkj1FaQ
-	vdscYyTKn9RpAnTOcvy8RuzssJ18YbI=
+	bh=ImZshMJ6+rspWDeU8PSyvvgq3b/Nfm8OW56yaLbG3dc=;
+	b=UtZFil2Qiyf1bDjOVvq/sutmRnZDzRBz0mxmZmocH7V7GJ3JZLqhNR8l1YcXQOvn7aT91+
+	3CdWLOMklrI+61UeG3BWmhHLYUDDgSi0l5QZOgmd5IAalJcZZgGNxEgjE6g9mU5olbJqo8
+	QJQ9UeAjc0f/P6GAuyrqcyNXuq5/3yk=
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Muchun Song <muchun.song@linux.dev>,
@@ -91,9 +91,9 @@ Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
 	Luca Ceresoli <luca.ceresoli@bootlin.com>,
 	Kaitao Cheng <kaitao.cheng@linux.dev>,
 	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v2 04/14] drm/i915/gt: Open-code active timeline walk
-Date: Tue,  9 Jun 2026 14:25:16 +0800
-Message-ID: <20260609062526.94907-2-kaitao.cheng@linux.dev>
+Subject: [PATCH v2 05/14] drm/i915: Open-code DFS dependency list walk
+Date: Tue,  9 Jun 2026 14:25:17 +0800
+Message-ID: <20260609062526.94907-3-kaitao.cheng@linux.dev>
 In-Reply-To: <20260609062526.94907-1-kaitao.cheng@linux.dev>
 References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
  <20260609062526.94907-1-kaitao.cheng@linux.dev>
@@ -109,34 +109,33 @@ X-Migadu-Flow: FLOW_OUT
 From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
 A later change will make list_for_each_entry() cache the next element
-before entering the loop body. __intel_gt_unset_wedged() drops
-timelines->lock while waiting on a fence and then restarts the walk from
-the list head after the lock is reacquired.
+before entering the loop body. __i915_schedule() builds its DFS work list
+while walking it by moving newly discovered dependencies to the tail.
 
-Keep the loop open-coded so the next timeline is selected after that
-restart logic has run. This preserves the existing lock-drop traversal
+Keep the DFS walk open-coded so the next dependency is resolved after any
+tail moves performed by the body. This preserves the existing traversal
 semantics and prepares the code for the list iterator update.
 
 Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
 ---
- drivers/gpu/drm/i915/gt/intel_reset.c | 4 +++-
+ drivers/gpu/drm/i915/i915_scheduler.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/gpu/drm/i915/gt/intel_reset.c b/drivers/gpu/drm/i915/gt/intel_reset.c
-index adff482a6c9c..fe0d87e248a7 100644
---- a/drivers/gpu/drm/i915/gt/intel_reset.c
-+++ b/drivers/gpu/drm/i915/gt/intel_reset.c
-@@ -1077,7 +1077,9 @@ static bool __intel_gt_unset_wedged(struct intel_gt *gt)
- 	 * No more can be submitted until we reset the wedged bit.
+diff --git a/drivers/gpu/drm/i915/i915_scheduler.c b/drivers/gpu/drm/i915/i915_scheduler.c
+index aec1342402ca..da1f60282df8 100644
+--- a/drivers/gpu/drm/i915/i915_scheduler.c
++++ b/drivers/gpu/drm/i915/i915_scheduler.c
+@@ -190,7 +190,9 @@ static void __i915_schedule(struct i915_sched_node *node,
+ 	 * end result is a topological list of requests in reverse order, the
+ 	 * last element in the list is the request we must execute first.
  	 */
- 	spin_lock(&timelines->lock);
--	list_for_each_entry(tl, &timelines->active_list, link) {
-+	for (tl = list_first_entry(&timelines->active_list, typeof(*tl), link);
-+	     !list_entry_is_head(tl, &timelines->active_list, link);
-+	     tl = list_next_entry(tl, link)) {
- 		struct dma_fence *fence;
+-	list_for_each_entry(dep, &dfs, dfs_link) {
++	for (dep = list_first_entry(&dfs, typeof(*dep), dfs_link);
++	     !list_entry_is_head(dep, &dfs, dfs_link);
++	     dep = list_next_entry(dep, dfs_link)) {
+ 		struct i915_sched_node *node = dep->signaler;
  
- 		fence = i915_active_fence_get(&tl->last_request);
+ 		/* If we are already flying, we know we have no signalers */
 -- 
 2.43.0
 
