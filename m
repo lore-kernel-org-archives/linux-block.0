@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDA923D2A4;
-	Tue,  9 Jun 2026 19:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F25A4D2ED3;
+	Tue,  9 Jun 2026 19:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032281; cv=none; b=uAiUR/RPRRk6+hps6QaTMDfmgt1iVFa6P1uKZwumTF3iOcRtor/CRiS0V8zb9TdivLnu23Ygv/cdfj/cld2MD90p7e0/g6Yk5xSI3gjAG2EZipDAklaI2fo3WvkPBOf3Cv+ty1SOb+y3rka3mIakIxflQreMCpMHNOWHCFEGJuA=
+	t=1781032287; cv=none; b=UoOTvj4/SbD1PPE3fJOzufVI+p7qz6aLJZosAcw/fA9MaqYBErth42AKWcKjc5xhgWMjaVsf9cQ5R9ZV16mWiVeGnLgi4aKr/tjQqLVtE++XEVlnvIYihbhERp5H6Px7In0mFcWfI508x4+IZi3zgPWqtF0o/5pBWqsbKIh5GCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032281; c=relaxed/simple;
-	bh=mBVFER4nWrZs+8ynhjMfZaNZazMthVQxUgWM919F7I4=;
+	s=arc-20240116; t=1781032287; c=relaxed/simple;
+	bh=qZlgs0sK+HX7M/TrC9q/wYE8rUGAPlyTT8AOUXdX4Yk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=D+y75GUSZO+DiKd+yoMOFrCQRvHgOXtn7nYykhd8IP1in9sxp6/GtsFZBq0Soo5M2IAder4rN3UIGzyqtV5U3HhjxxobdXtwqNu5KaEs1j5NM07bFltzwbrEWARDI5rjfeBemrgBiKYtL8P/thsAqceSgsJo5sYp51NT8A1rCMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BjLr6wq4; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=DD0MLGYqa7x99oWEo2zFaT2blP5iOg1ICvgNin6U4O8kVsQqkQTCyA1wdMm/CqbjFox0hnPC/yjOibTSrgIuHS4/9tA1I7Ny0N+vgsy5FfCZbS0XmhUzCd3nNXHzbJGVoPg3WBMjJItZTaYChTG/aVmlrit+C0FIMBcKzrGwbDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXDYoeVZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BjLr6wq4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8C241F00893;
-	Tue,  9 Jun 2026 19:11:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXDYoeVZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5C771F00898;
+	Tue,  9 Jun 2026 19:11:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032280;
-	bh=KilJT6sKvydSYR5+me7VI/DGNTEVkZbaYVToN0IHPfQ=;
+	s=k20260515; t=1781032285;
+	bh=Genwro56cY+UIXWxa1GkqiC9jUD33al3dVJcd/tkiNo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=BjLr6wq4e25sVTou0OaA6fD+9JF++b1zX3fzRdWtlKGizoHcOiMZQ7eSaLZkaQ/GT
-	 qlTFftploMEN10YzFDj6Edo+qC4MJjG/cS7KqxpRyAgugcKFr1bAHTYjHFmhiZxIee
-	 IlxcTGJBV0ZgmVmbWTjj4jgMP2krdboUiOMkxqG9mIMYBzPrYmcyt44gapjfWXziGY
-	 5tkX0g+Ps3sNKE9uTRpBnvAYCAzQEGfLHiq60I8zC0e++1WYve+FV8N0az+ouabHUO
-	 /OB1c8SRM45bd5k/jAqLzJ8GddId96lhURhdpoqgOpe04dFueNadbtUcjipLX8cOP6
-	 MqpMgzu99sw8g==
+	b=ZXDYoeVZKI30KjnBvSohk8mjBZd6jwRPYFqkUn6nNY0zNisn6gre1LlbDLVxtgxmf
+	 RcGpnkt3BgKupb9mb0Y/848Os7fo6XAmFreBrYorbRAogCKdFwYtGRqH3fEVOMntj6
+	 o+Hgu7cbfGCyJiY7bN7CQFgvxaCns0ZUIeGv5p64GnQBuOIWZhw73oAJw4xnaTOka6
+	 3S7I+6Z4RB8UWZtVdQAzUBXdDzRVMhf/4yz3nMPJTt0znjKbaD+Z6y720cdZo8Cvzm
+	 IJZwVFC0UFK+a6xGbaWv75tNxuAwnyeBy8tn/fRC7fkY47aYPTjyG7xaf9Cgc2kN8B
+	 oiS3/7pGuo5hA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:08:10 +0200
-Subject: [PATCH v2 31/83] block: rust: add `Segment::truncate`
+Date: Tue, 09 Jun 2026 21:08:09 +0200
+Subject: [PATCH v2 30/83] block: rnull: add badblocks_once support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-31-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-30-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -58,62 +58,156 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1671; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=mBVFER4nWrZs+8ynhjMfZaNZazMthVQxUgWM919F7I4=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTQNzHBxSzi8DrV8H8g1Ugz2ZxPBx/cKvwuy
- 5a8kGpX0RWJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk0AAKCRD6UCkIqsW9
- 0Hw5EACkjHqDIlzn7uZ2gAggaV5oUwQ+rp2jrz3Nma9IjCrnBK4Q9p6cn/1CrpI8nyc7uVlIwbC
- 5+Vn+PielpQcAGzBTH55vXrrepSbx+zx4Kue04PX0vNq2Q2lIVlBDPvGg5FajY03X3MtMtTEV6B
- UQSEKX7OUt7j0VUA+wwaLwxw6NZJFvQbIwsfqo7qFPSUakUotBvyxwP0bdpdulzWgxhUgjd4ppx
- nQqzGSG1Pd2TfvNDBubKFRLcOpbSQAtifywnvaNPTHWb2YVEDj541UArVxVoqOCMGJnrQWqf+Xu
- W9QjQoA/HEi8cQ3JMt3JBZlaIWjLT0BagtBWUhfyhaUL62UpsnYP+5WKag7xRI5J8No+Nt2yaQp
- S1pstT1rf7lbQmqjjjX6yEo4+XAiT77Uhc0eMF29yjfUJtfPcN3xs4nwosWa0WIbKr5cSnNH3Wv
- p/9C1a0gK2oCFoYlrkiasejuWjM5YCff8+uI5R90KnFWGrkpuw73yo0ybUed5y61Y0BYpGtk1KN
- t0BHh3h2x8DTu33oax6VhJoH4DKqunh/6ax+B4o8Bqks6KRA3y+KLhZpQTlY2/SobAzBnPH1QCW
- uaaA43Wzb2Uf7FBC7GR1tdXKuKsqs0Y85bpkP5PGeEpINnbwXwpuATZuvfQWVCLzmNYgLVvXgrV
- ts+xMNrZWroS58Q==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4985; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=qZlgs0sK+HX7M/TrC9q/wYE8rUGAPlyTT8AOUXdX4Yk=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTPGfHlAiKSZ2KoOX7dAG1VcEApOjObDwOa2
+ 1pRADm+b/iJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkzwAKCRD6UCkIqsW9
+ 0LTZD/wKvry2ERjhKHe30Tz0FYhDCvD5njsXCp7hpiJ+vTZbjExI1h7XCB2ebt/+VCJz/3m856v
+ A8nO+NsPm8ezrty4X/Pv++6IRkoxFQJI8NDKjqNQde1FrPl1UY/5uxlhtXgEKqDy57jDFjs3Wfc
+ y3n6Xae60waSpqvVrOH5T9Fkk6AQI7loOr+L/4CQuSDeFKVblEhugCUFC7voOocOx6sMSvC+6gS
+ n7LI/bqtdL7SOoe3iD7APjUqn0ulJ/7/imTZqsGIEPaSdD8UE8ft2709LldeVqHMVtduZm9cROI
+ +qXh4ariZkXnuOengqFXoPHFSUfiboSdjFmuyf6gk+xN8ZFfopfuwDLBjzzwG30KFbFcjzFFzcq
+ SrVliLC8au1PDN1SPHSquoeHq4RL0wZEMLt8B/HhyV53jqgVJMRL58iL9a0dACn1eRG7w7gPwo9
+ NihFdSZNh2q5gBHaE9e4D3hp84UqHfcPQnFiyimsfjVujTs0KIFsC7o5TzZ60v2W6ZRtwFGhDJQ
+ fw31v3XM/B3kVAc3oaK8S30Ioy/ed8H7xbRSv8eFWVn1+vTc5qnF/OGzhJSBtPvpZCJpuJHyJm/
+ wL8myMhgNUsDHAw90318RVeRb76yA0xxrb2DWdBLEDcfMQ5NWCqAQmTcG2jGnUlXhxV3JrqT5u1
+ xeFKzNyVK8MqfHQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add a method that limits the remaining length of a `Segment` without
-moving its offset. This complements `Segment::advance`, which can skip
-data at the front but cannot trim data at the back, and gives callers a
-way to clip a segment to a maximum byte count before handing it to the
-existing `copy_to_page` / `copy_from_page` / `zero_page` helpers, which
-already bound themselves by `Segment::len()`.
+Add support for the badblocks_once feature, which automatically clears
+bad blocks after they are encountered during I/O operations. This
+matches the functionality in the C null_blk driver.
 
-This is needed by rnull's partial bad-block I/O path, which needs to
-clamp per-segment work to a sector boundary computed from the bad-block
-range.
+When badblocks_once is enabled:
+- Bad blocks are checked during I/O requests as usual
+- If a bad block is encountered, the I/O is marked as failed
+- The bad block range is immediately cleared from the bad blocks table
+- Subsequent I/O to the same sectors will succeed
+
+This feature is useful for testing scenarios where bad blocks are
+transient or where devices can recover from bad sectors after a single
+access attempt.
+
+The feature is configurable via the configfs badblocks_once attribute
+and disabled by default, maintaining compatibility with existing
+behavior.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/bio/vec.rs | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/block/rnull/configfs.rs |  6 ++++++
+ drivers/block/rnull/rnull.rs    | 21 +++++++++++++++------
+ 2 files changed, 21 insertions(+), 6 deletions(-)
 
-diff --git a/rust/kernel/block/bio/vec.rs b/rust/kernel/block/bio/vec.rs
-index 99ab164d4038..61d83a07397f 100644
---- a/rust/kernel/block/bio/vec.rs
-+++ b/rust/kernel/block/bio/vec.rs
-@@ -81,6 +81,18 @@ pub fn advance(&mut self, count: u32) -> Result {
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 4db3ba26c2d1..05229ba9173a 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -102,6 +102,7 @@ fn make_group(
+                 discard: 10,
+                 no_sched:11,
+                 badblocks: 12,
++                badblocks_once: 13,
+             ],
+         };
+ 
+@@ -125,6 +126,7 @@ fn make_group(
+                     discard: false,
+                     no_sched: false,
+                     bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
++                    bad_blocks_once: false,
+                 }),
+             }),
+             core::iter::empty(),
+@@ -195,6 +197,7 @@ struct DeviceConfigInner {
+     discard: bool,
+     no_sched: bool,
+     bad_blocks: Arc<BadBlocks>,
++    bad_blocks_once: bool,
+ }
+ 
+ #[vtable]
+@@ -231,6 +234,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 discard: guard.discard,
+                 no_sched: guard.no_sched,
+                 bad_blocks: guard.bad_blocks.clone(),
++                bad_blocks_once: guard.bad_blocks_once,
+             })?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -383,3 +387,5 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
          Ok(())
      }
- 
-+    /// Limit the remaining length of the segment.
-+    ///
-+    /// Shortens the segment to at most `new_len` bytes. If `new_len` is
-+    /// greater than or equal to the current remaining length, the segment is
-+    /// left unchanged. The offset is not modified, so subsequent copy
-+    /// operations still start from the current position.
-+    pub fn truncate(&mut self, new_len: u32) {
-+        if new_len < self.len() {
-+            self.bio_vec.bv_len = new_len;
-+        }
-+    }
+ }
 +
-     /// Copy data of this segment into `dst_page`.
-     ///
-     /// Copies data from the current offset to the next page boundary. That is `PAGE_SIZE -
++configfs_simple_bool_field!(DeviceConfig, 13, bad_blocks_once);
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 90dbf318c2f8..5486eb6dd921 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -159,6 +159,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     discard: module_parameters::discard.value(),
+                     no_sched: module_parameters::no_sched.value(),
+                     bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
++                    bad_blocks_once: false,
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -186,6 +187,7 @@ struct NullBlkOptions<'a> {
+     discard: bool,
+     no_sched: bool,
+     bad_blocks: Arc<BadBlocks>,
++    bad_blocks_once: bool,
+ }
+ struct NullBlkDevice;
+ 
+@@ -204,6 +206,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+             discard,
+             no_sched,
+             bad_blocks,
++            bad_blocks_once,
+         } = options;
+ 
+         let mut flags = mq::tag_set::Flags::default();
+@@ -246,6 +249,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+                 memory_backed,
+                 block_size: block_size.into(),
+                 bad_blocks,
++                bad_blocks_once,
+             }),
+             GFP_KERNEL,
+         )?;
+@@ -416,6 +420,7 @@ struct QueueData {
+     memory_backed: bool,
+     block_size: u64,
+     bad_blocks: Arc<BadBlocks>,
++    bad_blocks_once: bool,
+ }
+ 
+ #[pin_data]
+@@ -465,12 +470,16 @@ fn queue_rq(
+         if queue_data.bad_blocks.enabled() {
+             let start = rq.sector();
+             let end = start + u64::from(rq.sectors());
+-            if !matches!(
+-                queue_data.bad_blocks.check(start..end),
+-                badblocks::BlockStatus::None
+-            ) {
+-                rq.data_ref().error.store(1, ordering::Relaxed);
+-            }
++            match queue_data.bad_blocks.check(start..end) {
++                badblocks::BlockStatus::None => {}
++                badblocks::BlockStatus::Acknowledged(range)
++                | badblocks::BlockStatus::Unacknowledged(range) => {
++                    rq.data_ref().error.store(1, ordering::Relaxed);
++                    if queue_data.bad_blocks_once {
++                        queue_data.bad_blocks.set_good(range)?;
++                    }
++                }
++            };
+         }
+ 
+         // TODO: Skip IO if bad block.
 
 -- 
 2.51.2
