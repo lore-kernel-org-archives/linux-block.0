@@ -1,56 +1,62 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45A624BD03
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 22:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403ED24BD03
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 22:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781042811; cv=none; b=ImoQ5REUnuNZYnccOLvBZlCtCQRQN02yzG2Qs5RI6D0b6RiFU4y6CeWbjl4DkNl4Hl4rDZkxMk55b9esbht9SFaEl7paESD4tGyNJyCUwPlliAd8FFz+sssd0fRYSv+QojS1b4OpuFj0j/s7PKGeQMbFw+i4NRaLBMh6ccdu11M=
+	t=1781042814; cv=none; b=CDBXC3fUihGANsq75YmQQieX7cOIKdBKlwklrO1c2wYiv5MX0Yz9wcZqMH4vPOP5qgOdWYHawb7YdNmzBk6272+4LkTEJNOpafsVQeY420Fvi5ZUYNgyS9uff8jK2ge7w/Yx1Bmmyho7d0i22dq6sUwuUmYT4irJTgRjFReq+5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781042811; c=relaxed/simple;
-	bh=sUOjsTIuJDhsBfx2d9y/ug6hGFLLd272FnQhurDUHZY=;
+	s=arc-20240116; t=1781042814; c=relaxed/simple;
+	bh=EsCnyMCXLB9bPfJwqkeOTci2nC5y5ry/jNPxT3GLOAw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ckQfP5Psixl0WgyuXGzEIYLsZ3+gG3Gv2CGRNPxdexzM9DdDLwKvyGxvNWs0KGroX/4clp629q97e1FyoRrCMAPfXZFwLdfjvTo4STuzxIxzpY/u/OhTKLpMofVOmuXAJw2Ayv8gBCqkljT9oNJeWIwnXENsn8n+xldPQhw709M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=s9fIHboa; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=dtcfs5W0tbkLmFiAr+PgP1pFwimqD8B678G0tuhYvT1elcgsH9B5O4Q8l8MkF5DS8pakESBsvGzbd7WgM2xEpJ+O+IkvdpcXTuYtMlFRPUrv/YxP1ieTybxP+Rp9sESbHkSwNdSvVRkQuzwhGxJLD7ELiXQwWYLIdv4cm/dImnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=AgJUQjxR; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="s9fIHboa"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="AgJUQjxR"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gZjgG4W0wzlh2rw;
-	Tue,  9 Jun 2026 22:06:50 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gZjgK0Bg2zlfddr;
+	Tue,  9 Jun 2026 22:06:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1781042806; x=1783634807; bh=VJloy
-	R14ucbIxZTeVpQ/C07pGs9YFTGRkhyon9POBok=; b=s9fIHboaF+Fue2lq/+Wkm
-	OE/RARU2CrF6qxnxIDAj3i+y9XyxOZ4WNuk8bukZ73/APcmFFZ4f5rL8gVNya4sr
-	BGbxVN9GMOYSW3GYDPG+KONuNe8R4BzZcfUC8+ui+qQeF9FEX/MDpZouyJAqRARj
-	qlifft99pt76Jhbojnq6TizbhFN9eyW/MXbExkZxqGgRaj6zpX7CvvaS6oTZrD4H
-	4Gejtup1bRqgcKDselSuqXbV9eOlpO5crjbF3GxXYiDw2QMuY8Fm54r8eD/NRgvq
-	RwgVwZJNYpRH3NSinvQBpuIylcya8rUQ0nihx06elCZ7M70+npsw5oITDyW0Ba/k
-	Q==
+	:received:received; s=mr01; t=1781042804; x=1783634805; bh=zpcLQ
+	vjDzRGcYVfC/Imdad+ULbNep2JC096alxWyoPc=; b=AgJUQjxReD2WY40iVLJq9
+	y4lyPxe7MdGGpZIGUA2A1G7CPAhuLBo6Mut7j0gtaTR5SqkcLe3L9C1wqBYyXPIm
+	Az2OVYsZNtTGxxK7lrjguWkpGKEf9wKIpiC47OIpvF36UhiNXrB4KcUdWSOXLgxV
+	XaeO5z12fr0ncJmktDgv1XsjE2djeI2swWzRrVEKSVjV9lfCyiLafUllVaI/4v1F
+	zp/2XLdGs6ZEXmKTQp8MQZmoe0A/oAoa2o8FAbc6WImwkX53BvOpJ8Ovx7CbRUpM
+	3t2sHMKUxreb5OkfCF8GXWkeGjknVdhQFlFMXkQMltSwCAVpRsSjYIi9wHcG/PFw
+	A==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id msgS-zcGiYcP; Tue,  9 Jun 2026 22:06:46 +0000 (UTC)
+ id 42SQ0xgtKTOs; Tue,  9 Jun 2026 22:06:44 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gZjg911JYzlfpM6;
-	Tue,  9 Jun 2026 22:06:44 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gZjg53f9Qzlh2rF;
+	Tue,  9 Jun 2026 22:06:41 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Marco Elver <elver@google.com>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Ilya Dryomov <idryomov@gmail.com>
-Subject: [PATCH 22/27] rbd: Enable lock context analysis
-Date: Tue,  9 Jun 2026 15:05:09 -0700
-Message-ID: <e239f06e82bb4e6f527a9be87d87dd58ffa265d1.1781042470.git.bvanassche@acm.org>
+	Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Genjian Zhang <zhanggenjian@kylinos.cn>,
+	Kees Cook <kees@kernel.org>
+Subject: [PATCH 21/27] null_blk: Enable lock context analysis
+Date: Tue,  9 Jun 2026 15:05:08 -0700
+Message-ID: <b70422c6f243b9275e336430071b52eb92dd40c4.1781042470.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
 In-Reply-To: <cover.1781042470.git.bvanassche@acm.org>
 References: <cover.1781042470.git.bvanassche@acm.org>
@@ -62,70 +68,103 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add lock context annotations and enable lock context analysis.
+Add __must_hold() annotations where these are missing. Annotate two
+functions that use conditional locking with __context_unsafe(). Enable lo=
+ck
+context analysis in the Makefile.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/rbd.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/block/null_blk/Makefile |  2 ++
+ drivers/block/null_blk/main.c   | 12 ++++++++----
+ drivers/block/null_blk/zoned.c  |  2 ++
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 90c13de47cff..13077d85e8c8 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -4185,6 +4185,7 @@ static void rbd_acquire_lock(struct work_struct *wo=
-rk)
+diff --git a/drivers/block/null_blk/Makefile b/drivers/block/null_blk/Mak=
+efile
+index 84c36e512ab8..282b0d51a477 100644
+--- a/drivers/block/null_blk/Makefile
++++ b/drivers/block/null_blk/Makefile
+@@ -1,5 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+=20
++CONTEXT_ANALYSIS :=3D y
++
+ # needed for trace events
+ ccflags-y			+=3D -I$(src)
+=20
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
+c
+index f8c0fd57e041..bba13b102828 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1038,6 +1038,7 @@ static struct nullb_page *null_insert_page(struct n=
+ullb *nullb,
  }
 =20
- static bool rbd_quiesce_lock(struct rbd_device *rbd_dev)
-+	__must_hold(&rbd_dev->lock_rwsem)
+ static int null_flush_cache_page(struct nullb *nullb, struct nullb_page =
+*c_page)
++	__must_hold(&nullb->lock)
  {
- 	dout("%s rbd_dev %p\n", __func__, rbd_dev);
- 	lockdep_assert_held_write(&rbd_dev->lock_rwsem);
-@@ -4229,6 +4230,7 @@ static void __rbd_release_lock(struct rbd_device *r=
-bd_dev)
-  * lock_rwsem must be held for write
-  */
- static void rbd_release_lock(struct rbd_device *rbd_dev)
-+	__must_hold(&rbd_dev->lock_rwsem)
- {
- 	if (!rbd_quiesce_lock(rbd_dev))
- 		return;
-@@ -4585,6 +4587,7 @@ static void rbd_unregister_watch(struct rbd_device =
-*rbd_dev)
-  * lock_rwsem must be held for write
-  */
- static void rbd_reacquire_lock(struct rbd_device *rbd_dev)
-+	__must_hold(&rbd_dev->lock_rwsem)
- {
- 	struct ceph_osd_client *osdc =3D &rbd_dev->rbd_client->client->osdc;
- 	char cookie[32];
-@@ -6782,6 +6785,7 @@ static void rbd_dev_device_release(struct rbd_devic=
-e *rbd_dev)
-  * upon return.
-  */
- static int rbd_dev_device_setup(struct rbd_device *rbd_dev)
-+	__releases(&rbd_dev->header_rwsem)
- {
- 	int ret;
+ 	int i;
+ 	unsigned int offset;
+@@ -1087,6 +1088,7 @@ static int null_flush_cache_page(struct nullb *null=
+b, struct nullb_page *c_page)
+ }
 =20
-@@ -6883,6 +6887,7 @@ static void rbd_dev_image_release(struct rbd_device=
- *rbd_dev)
-  * with @depth =3D=3D 0.
-  */
- static int rbd_dev_image_probe(struct rbd_device *rbd_dev, int depth)
-+	__context_unsafe(conditional locking on @depth)
+ static int null_make_cache_space(struct nullb *nullb, unsigned long n)
++	__must_hold(&nullb->lock)
  {
- 	bool need_watch =3D !rbd_is_ro(rbd_dev);
- 	int ret;
-@@ -7136,6 +7141,9 @@ static ssize_t do_rbd_add(const char *buf, size_t c=
-ount)
- 	if (rc < 0)
- 		goto err_out_rbd_dev;
+ 	int i, err, nr_pages;
+ 	struct nullb_page *c_pages[FREE_BATCH];
+@@ -1139,8 +1141,9 @@ static int null_make_cache_space(struct nullb *null=
+b, unsigned long n)
+ 	return 0;
+ }
 =20
-+	/* Acquired by rbd_dev_image_probe(rbd_dev, 0) */
-+	__acquire(&rbd_dev->header_rwsem);
-+
- 	if (rbd_dev->opts->alloc_size > rbd_dev->layout.object_size) {
- 		rbd_warn(rbd_dev, "alloc_size adjusted to %u",
- 			 rbd_dev->layout.object_size);
+-static blk_status_t copy_to_nullb(struct nullb *nullb, void *source,
+-				  loff_t pos, size_t n, bool is_fua)
++static blk_status_t copy_to_nullb(struct nullb *nullb, void *source, lof=
+f_t pos,
++				  size_t n, bool is_fua)
++	__must_hold(&nullb->lock)
+ {
+ 	size_t temp, count =3D 0;
+ 	struct nullb_page *t_page;
+@@ -1240,8 +1243,9 @@ static blk_status_t null_handle_flush(struct nullb =
+*nullb)
+ }
+=20
+ static blk_status_t null_transfer(struct nullb *nullb, struct page *page=
+,
+-	unsigned int len, unsigned int off, bool is_write, loff_t pos,
+-	bool is_fua)
++				  unsigned int len, unsigned int off,
++				  bool is_write, loff_t pos, bool is_fua)
++	__must_hold(&nullb->lock)
+ {
+ 	struct nullb_device *dev =3D nullb->dev;
+ 	blk_status_t err =3D BLK_STS_OK;
+diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zone=
+d.c
+index 384bdce6a9b7..12a3534ecb85 100644
+--- a/drivers/block/null_blk/zoned.c
++++ b/drivers/block/null_blk/zoned.c
+@@ -32,6 +32,7 @@ static inline void null_init_zone_lock(struct nullb_dev=
+ice *dev,
+=20
+ static inline void null_lock_zone(struct nullb_device *dev,
+ 				  struct nullb_zone *zone)
++	__context_unsafe(conditional locking)
+ {
+ 	if (!dev->memory_backed)
+ 		spin_lock_irq(&zone->spinlock);
+@@ -41,6 +42,7 @@ static inline void null_lock_zone(struct nullb_device *=
+dev,
+=20
+ static inline void null_unlock_zone(struct nullb_device *dev,
+ 				    struct nullb_zone *zone)
++	__context_unsafe(conditional locking)
+ {
+ 	if (!dev->memory_backed)
+ 		spin_unlock_irq(&zone->spinlock);
