@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4E64D2EFE;
-	Tue,  9 Jun 2026 19:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA384EA37B;
+	Tue,  9 Jun 2026 19:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032375; cv=none; b=KO63x71YrkIEtMj95WNLH9CQbGr+3B2U1yALzwEN3W1OtSTV9gmEKCM//H4U2PisCPgiqNCuqrUK7iUa6V447mqfgIMOmR1O2wW9CEl6ohHfDMzcFHBmD+VPhK2NlMbWJplhWygG1vVQknvApCbkxcoXKxrwSgcQkYSc7HF8Aow=
+	t=1781032380; cv=none; b=UkBSZN8zicKF/gOB1VRpGYYllezF9cLdcwQXzCj5EE0sQAV3KPzlWWF2+unvukCni5xbPuwLfgQDczjZWjZangh/ConKgn1+Iks8V43qquoucZcf/3NxTNINLZpB/orRsV7l+3tjBdy9xIlptbxc1Cv5/TiNB2khV7Bq1ia/Grg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032375; c=relaxed/simple;
-	bh=ZSZBUb37pDZIK0wkAHNaDzISlaNSNKMcCAAG2JILBR0=;
+	s=arc-20240116; t=1781032380; c=relaxed/simple;
+	bh=T3pkCjSoqlz/5eAmoml0zuQJKOlZemt616lr74wbC6g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=edR7c+cUd39u49HzPseDpJ2UEU53Vv3kQPMPTXsbJt0zYp2ZelZHJTIuZOK57Qfr9qFAxHWq1AAW1/JO13P+dJpIr3tz6ULHPmjXu0Y0SblM0bhCaFC23PgWDIKUcrZqaNrIlNdne86DlTztL9YAicAbcHl5aAgSgXlUf8I543s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XmBpTvYQ; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=FuOtRjKbMAHsUpi9/H6ewYOFTYXMBavEuITna+94yG3iTsYgPVxh6pTc5uXnhm7Fe8VcxU59YkFT4uk5B5X8kezUNiDrOf4u6teMncwJ4keTgUnvagzL+wwORGbYAP27lUja+YNfHDAiA9eqW2kCjfQ8jd4n1vup8s+oz2rSYSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H/lEsSss; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XmBpTvYQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 203821F00898;
-	Tue,  9 Jun 2026 19:12:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H/lEsSss"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E301F00893;
+	Tue,  9 Jun 2026 19:12:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032373;
-	bh=Ja5KkFyfig0piS8ccuJVk2LRov2nAywPKm3RKnAniXM=;
+	s=k20260515; t=1781032379;
+	bh=as5ubVXy9pDah6a38S1Rm853FewwW17NrvS6Iq2Oams=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=XmBpTvYQGNYex0G9cDf7mrTcQkE6zSx5BlSiKxiE8zXF7YoKSvcptVWP0ax9KkZpp
-	 WDsBf5/5MNWAIaBKh84619ohb+eA4IgID7EGmF4UaNsE24NYDYjBX9TY1UETt8tFmE
-	 FjBXyZ6dGR/zZuKNKjt70yPp4Oxj1fDfRQmf4m1VG/bCnUo1c6CNdW/uP2n3IYoax9
-	 TXyHequ1+NZ0UDgWekOATHJFJyk20uG/hE99699Ac+RH2ZNPZ5wl9E3MDtfJdyQpIX
-	 S+yIas+hwXklF/uWnIuzkXwNm0Y5yhh3qQBYD5zp++qqDqo7f/c+OrJzKydbHF6Yqy
-	 LbGLPfpgyM7WA==
+	b=H/lEsSssWyII8rY8RleQpGtSmi85awUyW7eU8iflg601qoIsT4qvYikr89gNkQ9En
+	 kpHtW+3/uHGG0TQLBmeLNw4LNRWw9HxF1h1SsrzJVmefWnkA0GJBdqgBqcSDdifXK+
+	 BJ3OGGtsAmojbqYNtD2QRYQoxG2VwRH3b5UaRJp6C1csUcgiQ42EG3BcXVWWfwxJIe
+	 BmF2GyFgl5qXK0j/NGKK8XWulaEixftONEsoWE9ClN+AXkmLxtx7Pfx3/ejBB3vDxX
+	 tneJSr04kv1HM5s95zRZlMrMR7bhLMt3o5nGzJpRo1QEht8RBBtk504u3WHLdFQf6g
+	 4U6JzxI2Ar/Jg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:08:02 +0200
-Subject: [PATCH v2 23/83] block: rnull: add discard support
+Date: Tue, 09 Jun 2026 21:09:02 +0200
+Subject: [PATCH v2 83/83] block: rnull: add zone offline and readonly
+ configfs files
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-23-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-83-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -58,320 +59,435 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10082;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=15517;
  i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=ZSZBUb37pDZIK0wkAHNaDzISlaNSNKMcCAAG2JILBR0=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTJ8uX2fM3Snwr3kQptrqZsMmQScXM8+be4R
- pd3o904NGyJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkyQAKCRD6UCkIqsW9
- 0CgLD/4uNP8wyJjti62HDNzWfcHXuYIe0fxsRoadLQySp324zQzosIaVo4Da3NKHryJDW2/PsWe
- G4Y+n/rpLSJqi7Xhko5+pXFGvE14CBRxN9pUVppbtUzcaFnObe1627rQxutetQyAUD5yN4Va9gK
- hie9Ah2+DaDh6vzNKVhw75qoLIJn9SbsRVxxfH745isLstt6Nuys/8LgMHpmKtpCR+mUVPxQsKV
- CZIh9ylHjWoKeuDvr0lfFtG5sSrQZ4ZmgJ1iZPiCn4OoMD3ICvHA+EVRXn0CPZlC+nukExNaqIY
- nYtqiNY4C6BNegpLk7ndh2if26Iir/ddeqWem8OO7zXy2fzD3ZPSSmFIIs1NlEwrCjXfpRLXKfl
- tJeUfUOl+rruTUB/zKxgfBRU3cnJvr8jjn7dIgdjtVcLGQzlMs6zciaqhVstqgeQXP7Arp6TZe+
- O0GpmbqqxShxg0bP0LR4MFISa+IzPm+OF58yM1vbccbmmcU3LELjWg2U1V073ke6DjfpaMI18OS
- M6qXn0QLQNPwt8AQbLIL0Ewf5Rtwl9BBK/4OoAOmwAWeRf4+800gx+pt0/Im4ZKFiSFQ7N52Spc
- y6gTGRsf9Q8kgF8xk/jQjdLC2mv9BPvlpWTetaXqo8mMwkZKnmS4zIZAoMAz5R7HMid0BhZuUdd
- FZTC5qe9Qyzk8ig==
+ bh=T3pkCjSoqlz/5eAmoml0zuQJKOlZemt616lr74wbC6g=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGT/2B21XD7rkanWLOYqJi6E0g5N/32wBgJiA
+ UCG8Z2zaGOJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk/wAKCRD6UCkIqsW9
+ 0A+vD/4/R6jsny4DtPvTLS1Zr0bhgTMsff+cmB0ZHGOBF9MtJTa/RQYLe0TMvKsNc/IkT+Kgmvm
+ A5i9CAXdoH9F+qJN5qNlaD2zK7Z1OuHFiEP//e3oPSP6dML1WQDU+tQL/podg/speszIl1GvbcY
+ BvDSKpJuEWoNNjKCqTRjJD8LNKMNjTrags41FXp45aiVXyDpR6c3e7nOgjOBHbxMNSnL3D9aEzr
+ zXaxnRtik7GXFMqqggZ9npK1ksk33uqIBLNVWz9TTnlwt7lPph4vfOjBreeKPI5slUKaXv0dOb1
+ 9LBh+pu4tvgbpXJoC1qxZv51uD1g3fP6nXyxBZL5iSLBJGNBRUy8ytmLuAToScyG+NMXMSQymn7
+ L/1gju6Hg7GQWX1PDXvkGpFZhYwZcgq8uH59xstBP80I79wcq3bWBqBbobtIKsfMCEsFxt23ylr
+ JaOG1XYJ0t89feKumt9mtu32Eavil0dSQG2KICfpsAUhDEQFIR4BoiwlMxmOgnO3AMEyWmLupe8
+ 3Mp4lwR3QoWLERLfx1owl6xHJKDTNyjY+IaccJTfGP0cK2ONl56Fe4s26NwF/CwXoKD18W8zbtJ
+ pGeyYuKoT6AppvcmtiANY3tEOldxVP9uH5e8HeoYdl4NnQnS8v35lObymH6iOA+ZUtPAhdPWaC0
+ B5YQyVZzCWRu3zQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add support for discard operations to the rnull block driver:
-- Add discard module parameter and configfs attribute.
-- Set max_hw_discard_sectors when discard is enabled.
-- Add sector occupancy tracking.
-- Add discard handling that frees sectors and removes empty pages.
-- Discard operations require memory backing to function.
-
-The discard feature uses a bitmap to track which sectors in each page are
-occupied, allowing cleanup of pages when they are empty.
+Add configfs attributes for managing zone states in the rnull zoned
+block device emulation. The `zone_offline` and `zone_readonly`
+attributes allow setting specific zones to offline or read-only states,
+which is useful for testing how applications handle degraded zones.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs |  15 +++++
- drivers/block/rnull/rnull.rs    | 120 +++++++++++++++++++++++++++++++++++-----
- 2 files changed, 121 insertions(+), 14 deletions(-)
+ drivers/block/rnull/configfs.rs     | 76 +++++++++++++++++++++++++++++++++
+ drivers/block/rnull/disk_storage.rs | 59 +++++++++++++-------------
+ drivers/block/rnull/rnull.rs        |  2 +-
+ drivers/block/rnull/zoned.rs        | 83 ++++++++++++++++++++++++++-----------
+ 4 files changed, 164 insertions(+), 56 deletions(-)
 
 diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 2f3fa81ea121..e47399cd45a4 100644
+index 1bab38c55698..43d01b419579 100644
 --- a/drivers/block/rnull/configfs.rs
 +++ b/drivers/block/rnull/configfs.rs
-@@ -93,6 +93,7 @@ fn make_group(
-                 submit_queues: 7,
-                 use_per_node_hctx: 8,
-                 home_node: 9,
-+                discard: 10,
+@@ -135,6 +135,8 @@ fn make_group(
+                 max_sectors: 29,
+                 virt_boundary: 30,
+                 shared_tag_bitmap: 31,
++                zone_offline: 32,
++                zone_readonly: 33,
              ],
          };
  
-@@ -113,6 +114,7 @@ fn make_group(
-                     memory_backed: false,
-                     submit_queues: 1,
-                     home_node: bindings::NUMA_NO_NODE,
-+                    discard: false,
-                 }),
-             }),
-             core::iter::empty(),
-@@ -180,6 +182,7 @@ struct DeviceConfigInner {
-     memory_backed: bool,
-     submit_queues: u32,
-     home_node: i32,
-+    discard: bool,
+@@ -627,3 +629,77 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+ configfs_simple_field!(DeviceConfig, 29, max_sectors, u32);
+ configfs_simple_bool_field!(DeviceConfig, 30, virt_boundary);
+ configfs_simple_bool_field!(DeviceConfig, 31, shared_tag_bitmap);
++
++#[cfg(CONFIG_BLK_DEV_ZONED)]
++fn set_zone_condition(
++    this: &DeviceConfig,
++    sector: u64,
++    cb: impl FnOnce(
++        &crate::zoned::ZoneOptions,
++        &DiskStorage,
++        &mut crate::zoned::ZoneDescriptor,
++    ) -> Result,
++) -> Result {
++    use crate::zoned::ZoneType;
++    let data_guard = this.data.lock();
++    let null_disk = data_guard.disk.as_ref().ok_or(EBUSY)?.queue_data();
++    let storage = &null_disk.storage;
++    let zone_options = &null_disk.zoned;
++    zone_options.enabled.then_some(()).ok_or(EINVAL)?;
++    let mut zone = zone_options.zone(sector)?.lock();
++
++    if zone.kind == ZoneType::Conventional {
++        return Err(EINVAL);
++    }
++
++    cb(zone_options, storage, &mut zone)
++}
++
++#[cfg(CONFIG_BLK_DEV_ZONED)]
++configfs_attribute!(
++    DeviceConfig,
++    32,
++    show: |_this, _page| Ok(0),
++    store: |this,page| {
++        let text = core::str::from_utf8(page)?.trim();
++        let sector = text.parse().map_err(|_| EINVAL)?;
++
++        set_zone_condition(this, sector, |zone_options, storage, zone| {
++            zone_options.offline_zone(storage, zone)
++        })?;
++        Ok(())
++    },
++);
++
++#[cfg(CONFIG_BLK_DEV_ZONED)]
++configfs_attribute!(
++    DeviceConfig,
++    33,
++    show: |_this, _page| Ok(0),
++    store: |this,page| {
++        let text = core::str::from_utf8(page)?.trim();
++        let sector = text.parse().map_err(|_| EINVAL)?;
++
++        set_zone_condition(this, sector, |zone_options, storage, zone| {
++            zone_options.read_only_zone(storage, zone)
++        })?;
++
++        Ok(())
++    },
++);
++
++#[cfg(not(CONFIG_BLK_DEV_ZONED))]
++configfs_attribute!(
++    DeviceConfig,
++    32,
++    show: |_this, _page| Ok(0),
++    store: |_this, _page| Err(ENOTSUPP),
++);
++
++#[cfg(not(CONFIG_BLK_DEV_ZONED))]
++configfs_attribute!(
++    DeviceConfig,
++    33,
++    show: |_this, _page| Ok(0),
++    store: |_this, _page| Err(ENOTSUPP),
++);
+diff --git a/drivers/block/rnull/disk_storage.rs b/drivers/block/rnull/disk_storage.rs
+index 6797b7996da3..879dd5d96e65 100644
+--- a/drivers/block/rnull/disk_storage.rs
++++ b/drivers/block/rnull/disk_storage.rs
+@@ -65,27 +65,45 @@ pub(crate) fn lock(&self) -> SpinLockGuard<'_, Pin<KBox<TreeContainer>>> {
+         self.trees.lock()
+     }
+ 
+-    pub(crate) fn discard(
+-        &self,
+-        hw_data: &Pin<&SpinLock<HwQueueContext>>,
+-        mut sector: u64,
+-        sectors: u32,
+-    ) {
+-        let mut tree_guard = self.lock();
+-        let mut hw_data_guard = hw_data.lock();
+-
+-        let mut access = self.access(&mut tree_guard, &mut hw_data_guard, None);
++    pub(crate) fn discard(&self, mut sector: u64, sectors: u32) {
++        let tree_guard = self.lock();
++        let mut cache_guard = tree_guard.cache_tree.lock();
++        let mut disk_guard = tree_guard.cache_tree.lock();
+ 
+         let mut remaining_bytes = sectors_to_bytes(sectors);
+ 
+         while remaining_bytes > 0 {
+-            access.free_sector(sector);
++            self.free_sector(&mut cache_guard, &mut disk_guard, sector);
+             let processed = remaining_bytes.min(self.block_size);
+             sector += Into::<u64>::into(bytes_to_sectors(processed));
+             remaining_bytes -= processed;
+         }
+     }
+ 
++    fn free_sector_tree(tree_access: &mut xarray::Guard<'_, TreeNode>, sector: u64) {
++        let index = DiskStorageAccess::to_index(sector);
++        if let Some(page) = tree_access.get_mut(index) {
++            page.set_free(sector);
++
++            if page.is_empty() {
++                tree_access.remove(index);
++            }
++        }
++    }
++
++    pub(crate) fn free_sector<'a>(
++        &self,
++        cache_guard: &mut xarray::Guard<'a, TreeNode>,
++        disk_guard: &mut xarray::Guard<'a, TreeNode>,
++        sector: u64,
++    ) {
++        if self.cache_size > 0 {
++            Self::free_sector_tree(cache_guard, sector);
++        }
++
++        Self::free_sector_tree(disk_guard, sector);
++    }
++
+     pub(crate) fn flush(&self, hw_data: &Pin<&SpinLock<HwQueueContext>>) {
+         let mut tree_guard = self.lock();
+         let mut hw_data_guard = hw_data.lock();
+@@ -286,25 +304,6 @@ pub(crate) fn get_read_page(&self, sector: u64) -> Option<&NullBlockPage> {
+             self.disk_guard.get(index)
+         }
+     }
+-
+-    fn free_sector_tree(tree_access: &mut xarray::Guard<'_, TreeNode>, sector: u64) {
+-        let index = Self::to_index(sector);
+-        if let Some(page) = tree_access.get_mut(index) {
+-            page.set_free(sector);
+-
+-            if page.is_empty() {
+-                tree_access.remove(index);
+-            }
+-        }
+-    }
+-
+-    pub(crate) fn free_sector(&mut self, sector: u64) {
+-        if self.disk_storage.cache_size > 0 {
+-            Self::free_sector_tree(&mut self.cache_guard, sector);
+-        }
+-
+-        Self::free_sector_tree(&mut self.disk_guard, sector);
+-    }
  }
  
- #[vtable]
-@@ -213,6 +216,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                 memory_backed: guard.memory_backed,
-                 submit_queues: guard.submit_queues,
-                 home_node: guard.home_node,
-+                discard: guard.discard,
-             })?);
-             guard.powered = true;
-         } else if guard.powered && !power_op {
-@@ -307,3 +311,14 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-         }
-     })
- );
-+
-+configfs_attribute!(DeviceConfig, 10,
-+    show: |this, page| show_field(this.data.lock().discard, page),
-+    store: |this, page| store_with_power_check(this, page, |data, page| {
-+        if !data.memory_backed {
-+            return Err(EINVAL);
-+        }
-+        data.discard = kstrtobool_bytes(page)?;
-+        Ok(())
-+    })
-+);
+ type TreeNode = KBox<NullBlockPage>;
 diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 1d0faf524f5c..bdc05b3f6072 100644
+index 81f9e2d03f31..b6371fe4ebeb 100644
 --- a/drivers/block/rnull/rnull.rs
 +++ b/drivers/block/rnull/rnull.rs
-@@ -19,15 +19,20 @@
-             Operations,
-             TagSet, //
-         },
-+        PAGE_SECTOR_MASK, SECTOR_SHIFT,
-     },
-     error::{
-         code,
-         Result, //
-     },
-+    ffi,
-     memalloc_scope,
-     new_mutex,
-     new_xarray,
--    page::SafePage,
-+    page::{
-+        SafePage, //
-+        PAGE_SIZE,
-+    },
-     pr_info,
-     prelude::*,
-     str::CString,
-@@ -100,6 +105,11 @@
-             default: -1,
-             description: "Home node for the device. Default: -1 (no node)",
-         },
-+        discard: bool {
-+            default: false,
-+            description:
-+                "Support discard operations (requires memory-backed null_blk device).",
-+        },
-     },
- }
- 
-@@ -137,6 +147,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                     memory_backed: module_parameters::memory_backed.value(),
-                     submit_queues,
-                     home_node: module_parameters::home_node.value(),
-+                    discard: module_parameters::discard.value(),
-                 })?;
-                 disks.push(disk, GFP_KERNEL)?;
-             }
-@@ -161,6 +172,7 @@ struct NullBlkOptions<'a> {
-     memory_backed: bool,
-     submit_queues: u32,
-     home_node: i32,
-+    discard: bool,
- }
- struct NullBlkDevice;
- 
-@@ -176,6 +188,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-             memory_backed,
-             submit_queues,
-             home_node,
-+            discard,
-         } = options;
- 
-         let flags = if memory_backed {
-@@ -205,22 +218,30 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-                 irq_mode,
-                 completion_time,
-                 memory_backed,
-+                block_size: block_size as usize,
-             }),
-             GFP_KERNEL,
-         )?;
- 
--        gen_disk::GenDiskBuilder::new()
-+        let mut builder = gen_disk::GenDiskBuilder::new()
-             .capacity_sectors(capacity_mib << (20 - block::SECTOR_SHIFT))
-             .logical_block_size(block_size)?
-             .physical_block_size(block_size)?
--            .rotational(rotational)
--            .build(fmt!("{}", name.to_str()?), tagset, queue_data)
-+            .rotational(rotational);
-+
-+        if memory_backed && discard {
-+            builder = builder
-+                // Max IO size is u32::MAX bytes
-+                .max_hw_discard_sectors(ffi::c_uint::MAX >> block::SECTOR_SHIFT);
-+        }
-+
-+        builder.build(fmt!("{}", name.to_str()?), tagset, queue_data)
-     }
- 
-     #[inline(always)]
-     fn write(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -> Result {
-         while !segment.is_empty() {
--            let page = SafePage::alloc_page(GFP_KERNEL)?;
-+            let page = NullBlockPage::new()?;
-             let mut tree = tree.lock();
- 
-             let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
-@@ -232,8 +253,10 @@ fn write(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -
-                 tree.get_mut(page_idx).unwrap()
-             };
- 
-+            page.set_occupied(sector);
-             let page_offset = (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
--            sector += segment.copy_to_page(page, page_offset) >> block::SECTOR_SHIFT;
-+            sector +=
-+                segment.copy_to_page(page.page.as_pin_mut(), page_offset) >> block::SECTOR_SHIFT;
-         }
-         Ok(())
-     }
-@@ -248,7 +271,7 @@ fn read(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) ->
-             if let Some(page) = tree.get(idx) {
-                 let page_offset =
-                     (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
--                sector += segment.copy_from_page(page, page_offset) >> block::SECTOR_SHIFT;
-+                sector += segment.copy_from_page(&page.page, page_offset) >> block::SECTOR_SHIFT;
+@@ -798,7 +798,7 @@ fn handle_regular_command(
+         if self.memory_backed {
+             memalloc_scope!(let _noio: NoIo);
+             if rq.command() == mq::Command::Discard {
+-                self.storage.discard(hw_data, rq.sector(), sectors);
++                self.storage.discard(rq.sector(), sectors);
              } else {
-                 sector += segment.zero_page() >> block::SECTOR_SHIFT;
+                 self.transfer(hw_data, rq, rq.command(), sectors)?;
              }
-@@ -257,6 +280,37 @@ fn read(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) ->
+diff --git a/drivers/block/rnull/zoned.rs b/drivers/block/rnull/zoned.rs
+index 808449cc49e1..cf0eb5d31840 100644
+--- a/drivers/block/rnull/zoned.rs
++++ b/drivers/block/rnull/zoned.rs
+@@ -179,7 +179,7 @@ pub(crate) fn handle_zoned_command(
+         match rq.command() {
+             ZoneAppend | Write => self.zoned_write(hw_data, rq)?,
+             ZoneReset | ZoneResetAll | ZoneOpen | ZoneClose | ZoneFinish => {
+-                self.zone_management(hw_data, rq)?
++                self.zone_management(rq)?
+             }
+             _ => self.zoned_read(hw_data, rq)?,
+         }
+@@ -187,18 +187,14 @@ pub(crate) fn handle_zoned_command(
          Ok(())
      }
  
-+    fn discard(
-+        tree: &XArray<TreeNode>,
-+        mut sector: usize,
-+        sectors: usize,
-+        block_size: usize,
-+    ) -> Result {
-+        let mut remaining_bytes = sectors << SECTOR_SHIFT;
-+        let mut tree = tree.lock();
-+
-+        while remaining_bytes > 0 {
-+            let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
-+            let mut remove = false;
-+            if let Some(page) = tree.get_mut(page_idx) {
-+                page.set_free(sector);
-+                if page.is_empty() {
-+                    remove = true;
-+                }
-+            }
-+
-+            if remove {
-+                drop(tree.remove(page_idx))
-+            }
-+
-+            let processed = remaining_bytes.min(block_size);
-+            sector += processed >> SECTOR_SHIFT;
-+            remaining_bytes -= processed;
-+        }
+-    fn zone_management(
+-        &self,
+-        hw_data: &Pin<&SpinLock<HwQueueContext>>,
+-        rq: &mut Owned<mq::Request<Self>>,
+-    ) -> Result {
++    fn zone_management(&self, rq: &mut Owned<mq::Request<Self>>) -> Result {
+         if rq.command() == mq::Command::ZoneResetAll {
+             for zone in self.zoned.zones_iter() {
+                 let mut zone = zone.lock();
+                 use ZoneCondition::*;
+                 match zone.condition {
+                     Empty | ReadOnly | Offline => continue,
+-                    _ => self.zoned.reset_zone(&self.storage, hw_data, &mut zone)?,
++                    _ => self.zoned.reset_zone(&self.storage, &mut zone)?,
+                 }
+             }
+ 
+@@ -214,10 +210,10 @@ fn zone_management(
+ 
+         use mq::Command::*;
+         match rq.command() {
+-            ZoneOpen => self.zoned.open_zone(&mut zone, rq.sector()),
++            ZoneOpen => self.zoned.open_zone(&mut zone),
+             ZoneClose => self.zoned.close_zone(&mut zone),
+-            ZoneReset => self.zoned.reset_zone(&self.storage, hw_data, &mut zone),
+-            ZoneFinish => self.zoned.finish_zone(&mut zone, rq.sector()),
++            ZoneReset => self.zoned.reset_zone(&self.storage, &mut zone),
++            ZoneFinish => self.zoned.finish_zone(&mut zone),
+             _ => Err(EIO),
+         }
+     }
+@@ -283,7 +279,7 @@ fn zoned_write(
+             if self.zoned.use_accounting() {
+                 let mut accounting = self.zoned.accounting.lock();
+                 self.zoned
+-                    .check_zone_resources(&mut accounting, &mut zone, rq.sector())?;
++                    .check_zone_resources(&mut accounting, &mut zone)?;
+ 
+                 if zone.condition == ZoneCondition::Closed {
+                     accounting.closed -= 1;
+@@ -367,7 +363,7 @@ fn zone_no(&self, sector: u64) -> usize {
+         (sector >> self.size_sectors.ilog2()) as usize
+     }
+ 
+-    fn zone(&self, sector: u64) -> Result<&Mutex<ZoneDescriptor>> {
++    pub(crate) fn zone(&self, sector: u64) -> Result<&Mutex<ZoneDescriptor>> {
+         self.zones.get(self.zone_no(sector)).ok_or(EINVAL)
+     }
+ 
+@@ -420,7 +416,7 @@ fn try_close_implicit_open_zone(&self, accounting: &mut ZoneAccounting, sector:
+         Err(EINVAL)
+     }
+ 
+-    fn open_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
++    fn open_zone(&self, zone: &mut ZoneDescriptor) -> Result {
+         if zone.kind == ZoneType::Conventional {
+             return Err(EINVAL);
+         }
+@@ -436,13 +432,13 @@ fn open_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
+             let mut accounting = self.accounting.lock();
+             match zone.condition {
+                 Empty => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                 }
+                 ImplicitOpen => {
+                     accounting.implicit_open -= 1;
+                 }
+                 Closed => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                     accounting.closed -= 1;
+                 }
+                 _ => (),
+@@ -459,14 +455,13 @@ fn check_zone_resources(
+         &self,
+         accounting: &mut ZoneAccounting,
+         zone: &mut ZoneDescriptor,
+-        sector: u64,
+     ) -> Result {
+         match zone.condition {
+             ZoneCondition::Empty => {
+                 self.check_active_zones(accounting)?;
+-                self.check_open_zones(accounting, sector)
++                self.check_open_zones(accounting, zone.start_sector)
+             }
+-            ZoneCondition::Closed => self.check_open_zones(accounting, sector),
++            ZoneCondition::Closed => self.check_open_zones(accounting, zone.start_sector),
+             _ => Err(EIO),
+         }
+     }
+@@ -535,7 +530,7 @@ fn close_zone(&self, zone: &mut ZoneDescriptor) -> Result {
+         Ok(())
+     }
+ 
+-    fn finish_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
++    fn finish_zone(&self, zone: &mut ZoneDescriptor) -> Result {
+         if zone.kind == ZoneType::Conventional {
+             return Err(EINVAL);
+         }
+@@ -547,12 +542,12 @@ fn finish_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
+             match zone.condition {
+                 Full => return Ok(()),
+                 Empty => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                 }
+                 ImplicitOpen => accounting.implicit_open -= 1,
+                 ExplicitOpen => accounting.explicit_open -= 1,
+                 Closed => {
+-                    self.check_zone_resources(&mut accounting, zone, sector)?;
++                    self.check_zone_resources(&mut accounting, zone)?;
+                     accounting.closed -= 1;
+                 }
+                 _ => return Err(EIO),
+@@ -568,7 +563,6 @@ fn finish_zone(&self, zone: &mut ZoneDescriptor, sector: u64) -> Result {
+     fn reset_zone(
+         &self,
+         storage: &crate::disk_storage::DiskStorage,
+-        hw_data: &Pin<&SpinLock<HwQueueContext>>,
+         zone: &mut ZoneDescriptor,
+     ) -> Result {
+         if zone.kind == ZoneType::Conventional {
+@@ -591,16 +585,55 @@ fn reset_zone(
+         zone.condition = ZoneCondition::Empty;
+         zone.write_pointer = zone.start_sector;
+ 
+-        storage.discard(hw_data, zone.start_sector, zone.size_sectors);
++        storage.discard(zone.start_sector, zone.size_sectors);
 +
 +        Ok(())
 +    }
 +
-     #[inline(never)]
-     fn transfer(
-         command: bindings::req_op,
-@@ -273,7 +327,40 @@ fn transfer(
++    fn set_zone_condition(
++        &self,
++        storage: &crate::disk_storage::DiskStorage,
++        zone: &mut ZoneDescriptor,
++        condition: ZoneCondition,
++    ) -> Result {
++        if zone.condition == condition {
++            zone.condition = ZoneCondition::Empty;
++            zone.write_pointer = zone.start_sector;
++            storage.discard(zone.start_sector, zone.size_sectors);
++        } else {
++            if matches!(
++                zone.condition,
++                ZoneCondition::ReadOnly | ZoneCondition::Offline
++            ) {
++                self.finish_zone(zone)?;
++            }
+ 
++            zone.condition = ZoneCondition::Offline;
++            zone.write_pointer = u64::MAX;
++        }
+         Ok(())
      }
++    pub(crate) fn offline_zone(
++        &self,
++        storage: &crate::disk_storage::DiskStorage,
++        zone: &mut ZoneDescriptor,
++    ) -> Result {
++        self.set_zone_condition(storage, zone, ZoneCondition::Offline)
++    }
++
++    pub(crate) fn read_only_zone(
++        &self,
++        storage: &crate::disk_storage::DiskStorage,
++        zone: &mut ZoneDescriptor,
++    ) -> Result {
++        self.set_zone_condition(storage, zone, ZoneCondition::ReadOnly)
++    }
  }
  
--type TreeNode = Owned<SafePage>;
-+static_assert!((PAGE_SIZE >> SECTOR_SHIFT) <= 64);
-+
-+struct NullBlockPage {
-+    page: Owned<SafePage>,
-+    status: u64,
-+}
-+
-+impl NullBlockPage {
-+    fn new() -> Result<KBox<Self>> {
-+        Ok(KBox::new(
-+            Self {
-+                page: SafePage::alloc_page(GFP_KERNEL | __GFP_ZERO)?,
-+                status: 0,
-+            },
-+            GFP_KERNEL,
-+        )?)
-+    }
-+
-+    fn set_occupied(&mut self, sector: usize) {
-+        let idx = sector & PAGE_SECTOR_MASK as usize;
-+        self.status |= 1 << idx;
-+    }
-+
-+    fn set_free(&mut self, sector: usize) {
-+        let idx = sector & PAGE_SECTOR_MASK as usize;
-+        self.status &= !(1 << idx);
-+    }
-+
-+    fn is_empty(&self) -> bool {
-+        self.status == 0
-+    }
-+}
-+
-+type TreeNode = KBox<NullBlockPage>;
+ pub(crate) struct ZoneDescriptor {
+     start_sector: u64,
+     size_sectors: u32,
+-    kind: ZoneType,
++    pub(crate) kind: ZoneType,
+     capacity_sectors: u32,
+     write_pointer: u64,
+     condition: ZoneCondition,
+@@ -628,7 +661,7 @@ fn check_bounds_read(&self, sector: u64, sectors: u32) -> Result {
  
- #[pin_data]
- struct QueueData {
-@@ -282,6 +369,7 @@ struct QueueData {
-     irq_mode: IRQMode,
-     completion_time: Delta,
-     memory_backed: bool,
-+    block_size: usize,
- }
- 
- #[pin_data]
-@@ -332,12 +420,16 @@ fn queue_rq(
-             let command = rq.command();
-             let mut sector = rq.sector();
- 
--            for bio in rq.bio_iter_mut() {
--                let segment_iter = bio.segment_iter();
--                for segment in segment_iter {
--                    let length = segment.len();
--                    Self::transfer(command, tree, sector, segment)?;
--                    sector += length as usize >> block::SECTOR_SHIFT;
-+            if command == bindings::req_op_REQ_OP_DISCARD {
-+                Self::discard(tree, sector, rq.sectors(), queue_data.block_size)?;
-+            } else {
-+                for bio in rq.bio_iter_mut() {
-+                    let segment_iter = bio.segment_iter();
-+                    for segment in segment_iter {
-+                        let length = segment.len();
-+                        Self::transfer(command, tree, sector, segment)?;
-+                        sector += length as usize >> block::SECTOR_SHIFT;
-+                    }
-                 }
-             }
-         }
+ #[derive(Copy, Clone, PartialEq, Eq, Debug)]
+ #[repr(u32)]
+-enum ZoneType {
++pub(crate) enum ZoneType {
+     Conventional = bindings::blk_zone_type_BLK_ZONE_TYPE_CONVENTIONAL,
+     SequentialWriteRequired = bindings::blk_zone_type_BLK_ZONE_TYPE_SEQWRITE_REQ,
+     #[expect(dead_code)]
 
 -- 
 2.51.2
