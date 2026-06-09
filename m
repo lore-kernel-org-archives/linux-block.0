@@ -1,216 +1,386 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E802BE034
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 09:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780997879; cv=none; b=ImL9Sbv7zzvFQC/ydHml6zTAOEEaoPD6VObUasYCAAVxwhMGy//390t52d9MWb37tEwNBhxRWYSBdPuFSQSjIYBs/79QYBtHdWiqdeyNWJkTACVSAS2ux4P1vtjJSrV5klaa/b64Piao2hSufW+aDW1idk/bCUgbEww8CZDNR7w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780997879; c=relaxed/simple;
-	bh=b5CdQLPvcRYe1PGd2nKQZKptfdznWMZQCESy00m9GG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XmBdSLmVVzsDOykiVNoNDJZIpo8tCnEWPmD6z8/xnL++0Dspc3bojSmn2UhL7dSi3r0gBJMzmvJl6hF9al3mJT5nSc0ao5aU925cO/FmPkUy8qYEiRngbULXGHyzB5kxAZ4r51Co2bATXh3uTNhBVt5E/40NIZZkM1qckAGymag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Nd0L+Y51; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE2B3F2109
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 10:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=205.220.180.131
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781000005; cv=pass; b=EvRq7Ne+jANBKscA2NXPzAxVnntjzxZq6gK8k35Y9MvOVimy6Ijkv2+pYc5rmD0B+shZIujm8O/MP37/ly/9t/ycbYigx5/1NH+5XFCGqy0nFysXZPYHadxSxMr+73tjF4Foio3NLddLRg35BvEWImW10exwPLOqd2a17tONbxY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781000005; c=relaxed/simple;
+	bh=7fiix6VpPjrNUF1iRnoDxKJD/gPxlaVYBSZo5W2eAfQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mrw8icYYfQOcJujqidtEHADmlJ0aLN+SiMd1qSd8T/4GrZT7/sjthFXbDXAqBA29jh/NFMdS3+f5M6crnDrQ+APF59BAl1Y9NjI0aPC9pTveIHdhlof+GrPP2gqylZ4djFrbG+dO/qlCFuh5nOwVkclAMjuhhBEGv5l+7rCRmmM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=NvAGqPmo; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=iWK+kStr; arc=pass smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Nd0L+Y51"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490b1aefe1cso5664535e9.2
-        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 02:37:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="NvAGqPmo";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="iWK+kStr"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6599xPVI2287587
+	for <linux-block@vger.kernel.org>; Tue, 9 Jun 2026 10:13:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	rK5tl4HTNEDD0xETjFdof30J5AtGjM0BvzmgQZhcMUo=; b=NvAGqPmoWex3EasH
+	EHg/9kr+o6cOMRvupu32I4sJwrVclhFU9WJdr4EtMFVruOHd3xOZe8OBdowA78VL
+	iYhUUUl212l1hgQumD6iwgsEC5QwEoKYMUtDbht2jilg9DCHGEH4QWwNkpsnToWo
+	i6AvzzlFu1h2H/+LxA+Mh1amFb8NZkfia71dSsETUrjIjKzf+8g7QuYNqynOaDrn
+	BcbNOs+ZbUBsy2k5ggc73JOmeGSARvC+5wPX5hWC0qveY65EnFUNJ6/4UE4gNv/c
+	7ESdXfUIKQqoWIDhhZjJzCq9Z/LGIBqvzXmpN5z6rzqR2whl4Z367Q8Ri3tW4uYa
+	V29G8A==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4epe25rsm9-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 10:13:22 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-915c364ae3bso572184485a.0
+        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 03:13:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781000002; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dxTP81oaaxUkWKmrsHZunty9G2JgkW/grl+gc5Sllin5Dr5yJ5O/M/diTLjm3/ii30
+         Kc/N8Dv+9MbReRimWHbBCL9TogUXNSqjeR8pGg/u1JhwyUfy76UmpnGTmW0v7mLbzQub
+         mjPuc2lmr4Lkk3VsO0zsp1ie0S4kN2onTnBFUb3ZBOZrSOppLO5n8QWGWALJRMXP+hmV
+         4TebH/ADu6yXWUf9PvVKvgRd1c86QMf6nDOwA9KBkXDxo2vpNgSMII7xIyCjI1QY/O1s
+         R5HUW6kIAKEm6dhDaFE6EzjtTj1M2EzXZDn6uQ1Lg+jZqg1HUmZbR0mb8ENXMbMHHXnD
+         S7Zw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rK5tl4HTNEDD0xETjFdof30J5AtGjM0BvzmgQZhcMUo=;
+        fh=m/gbxfwX3m2xoZZ4Yl3u01DsVbFnJfArpiYRpHYaLsc=;
+        b=WIWmWpRclG1tsItSnKU1bZjNYWa9cnxorvq1Dbg6xP2zGr10j3V8HQYrRg+pkth/GH
+         TB35M+D/RcvSxi91fVPDGIEnbye5CXWy9PW/rXaZ7q59jQtz+1NbKMc+FgmpvLiC8s4A
+         ES5W0dKI5aFCOObUa5EPjLb2cywoExHuqyo8+oF6P4cy4iWVb/z0I+R7uX/9on7gVwTM
+         tY40bbO+j+xubeqp7TNOo4Sv+mDjEVmT6tfhGfIDWumBHCvgg+ZINP8Cc5IrRb31qeL3
+         EkwmdxVu8n8REXLW89pR/7Yi9oePL11iPnoukyzhn/mlIwJFzu+4nFuQ/m/PdP5XIUw1
+         OHXA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1780997876; x=1781602676; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lx1Uj9ALacAYcxK3gPmx8FCujSx8SGCSZJ/pzDLpCcY=;
-        b=Nd0L+Y51uCqqXlHLrzkV+qZJ6WGLN/u1BWvn9oyx/KdcurLt17spul+Cc4vvEiCc52
-         qddF0DjCnYskFcrGdC7GfPd+eykaJPNnDH60FUuym5YJ9z1EWOuITsrtR/1KkFAYg6Fd
-         kcPFQw2mDMcH9GLEEr8YSUw/8owXeaqWC7ttjNoMhSS1NluiclnlmoFkKMhVgDcacrt1
-         8SekPJ7sYtSPoW8qXZqTLpalhVNPbKZ853ErTRtjtRn2mnls4OjcXgBLMUn1zTFPcYag
-         GaE9fPa9XEtX0iBsnELSc8wbJEWEevVwMvRH4IG3+sstpkJqwAHHse7enC31GWbMew1j
-         7HFQ==
+        d=oss.qualcomm.com; s=google; t=1781000002; x=1781604802; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rK5tl4HTNEDD0xETjFdof30J5AtGjM0BvzmgQZhcMUo=;
+        b=iWK+kStr7xI15uKM6ROQDl8PIPwGP2XSjpxNgeLsw74VTGFJiIN38sZYwCNaf5Tftq
+         h1UEx2g+JM5TXs0G/l7ZxYVZXIUH158II4eU2ZR5q7KYTRA9qAVu05b7zZqs+fZQgUUs
+         ovi6kLmI4Dits4fb/7tKXfiuozMujE/qUcBiPIu+al90ekpiaqH/a1iFY5jYnO2OSSFC
+         yCLRQKu3kz4IQt8q+6k5/FGHclWg7XYlwQsJv9odL/rICmCue+5xdaDfm4l9DcgPCvhQ
+         ZCWbBiyhNlxZH/mm02nsZfkA41e2JDnvb2Iv0xHv3lelht+UGTQO6y9LPZU7G8R67VKC
+         x9bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780997876; x=1781602676;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lx1Uj9ALacAYcxK3gPmx8FCujSx8SGCSZJ/pzDLpCcY=;
-        b=i5qdXJVXTRa0/O4HbtBh/QpKpf0GJnId04+6jDDFjgrDRNqx9cWN+4UfEsedDJfC1+
-         fZTiJjUR/+Y51jtIQKycuuykrLPQUuHPLPXD5w8iC0WGnKgekzQKtHqYsgZ1orbWNVdI
-         tfyhqlzkSovn71qL/6QhAJPeIpdStQKovFD6SyjQEVwLLxvrhPEodCLD203noP46AXrJ
-         9XvQofFC1k9djqRokxMIKSvR8NmHzSwYEEq8+HK6DA4wKUAg+Oi81fZML1gdFSCUCbY0
-         pW0DL5URKMKMWS3OW30NcAqH9dr5La8AYBoquv0pj37CW903nI/7UnsL6ZuVB7376EdJ
-         z7dg==
-X-Forwarded-Encrypted: i=1; AFNElJ/HVLZWBYbXbjvBsBysM23+giWpqhy8GHhLBDl2AhZ/3hMvbK03TRIsvNcipMl8a99g264W6DlpXMg8DQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf/cMvvVer5Q4kVAHpW1rkUcyEorQBnYhl4K3QTrV9B2d4AZRQ
-	aob6JrEDoh6OZNeLttuVdkG0kOLbiXdtvQipOvKLYP4vyU+MrbGRqCNOGkIa/WOtdgQ=
-X-Gm-Gg: Acq92OH6mH9Md0kyTLXbMtEpjWXS2+jqJV3PqmJamrhh/VMoFgLz+CXH02eQXaNclcI
-	M3keycIwnKOItyBanmfvtHUhjrEh8aU5vedj0m0WEJv4kzsB5YUIhWtW3s0jytzhk3+cgojMBCN
-	W4810dT88VzLsKxgBCZ7oVJNM78VxciYLTlhQXNDoNRW9jsZT5ooUBGQ9GJ8d4cLHsZKbVqMFqF
-	EklbuvXdSTWkFNlLQifm5vYIxVN6iEoC/GhvFrftYfpQt5CgCujo3GwrzNkQNgXZ7WPSAE1MXtW
-	vIrkIAWr0D/MSyZDrJbV/lhje7thcYYZZu0F9h+8zGMc49kxIrztaqrmHdSaY5rl+qmuup+wA/G
-	fUzKz4CVY0iSJ7qGecNKSTFscZopzOmEu3IZwr98nFEq9J5zq7OzxMc5AxoWK8wnfVOwqnet7hv
-	kQ6JCo+N+ogCGyBXX7YPRhdKpq3c9x
-X-Received: by 2002:a05:600c:8b82:b0:490:abf1:2ddb with SMTP id 5b1f17b1804b1-490c2603825mr139566865e9.6.1780997876074;
-        Tue, 09 Jun 2026 02:37:56 -0700 (PDT)
-Received: from ?IPV6:2001:1a48:8:903::e14? ([2001:1a48:8:903::e14])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f34413csm59623796f8f.21.2026.06.09.02.37.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2026 02:37:55 -0700 (PDT)
-Message-ID: <44bff0d5-3884-45d8-a525-15c6325620ea@suse.com>
-Date: Tue, 9 Jun 2026 11:37:54 +0200
+        d=1e100.net; s=20251104; t=1781000002; x=1781604802;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rK5tl4HTNEDD0xETjFdof30J5AtGjM0BvzmgQZhcMUo=;
+        b=P0o1Yfb0YsHUyUMc+F3aGum745zfa+M9K0Axq1fDjmOgRa7In0lgia8bGtA8AJ3ceY
+         1gVN1N624qs6OmMkRjcYpXZYryG/rNJ6Pc5NKeSURPxFPVi6qkc+I68IPnJ85fpJboXa
+         ornRV6tPLhnC/4xkSymC1HcwLpPdsKVkPpd9bttkq0h1Qrt8IuipnkI35GlbTJkBGEJ4
+         Ik+B4k8nXOFXmp3KT6e6D9bxcu/p0BQDu61Z4M1Y9fGfFFXginU1DK+wOIMHw21eH8UZ
+         I8INQQ0HZBotoYy2f+Be1Avae8IN4qrYCY95kDhkzz+SMdpLNVoL/rzstMf8a1+fzm8u
+         iUIw==
+X-Forwarded-Encrypted: i=1; AFNElJ/hYrUltdFpasoFI2z3j3CcrmTUuuyRyW+RMQ/T3j6KazR7u59MILirsFI351QdkLtGFP8IPNDBFmRVTw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH61biEF/GrpwGi8x9kziJl3BXSUQW7w23UTy3pOg6d2vSpgTH
+	5MQxGIYDXIrPo2MUOqvquvkr1LGObGRQI9MNt5sX+qM6l/drIbW9fC2E/xgCw9ioM+QOpsDQWbg
+	cyWAFzGJd+t+xinqJM6tUlGOT7uQIGmdWeQlVU4QRfscuUbnAk/WPfo+xQP5mbm+TxFkw12YY86
+	Kyf/+q54EXIwxGDEHXuOi0XSvkBGhBDkXcez0UQQbf
+X-Gm-Gg: Acq92OGWqAWRXyLO1jXiW++TxNQoOwcvaeki4ewkwucRCmosfEheRGVduBKmlmo8GiO
+	jhMBGilPLAt0U6mfZtnW4JBgQX5UYY1DJYye6URJX4WXNHidFbdSu8/GxtmBTLcZAKUt8ARo/mR
+	TF7FJX+V8c9ZqHa5f4QeukrTMb6k1JLfQ5CJLW1tXIocsuf7CkPb5O74cwV9BiNvH98dY+4qUwm
+	hGkvA9/Lz/n9hhOlFk6zdJlYcwOXNW6/ykiQm7RCOh04PoATxab+XvcsPFrorgIJn2v7VGWLycG
+	99HTgtIE5ygot3344ShMwmTZhH6m0tuj
+X-Received: by 2002:a05:620a:28d1:b0:915:89d4:df16 with SMTP id af79cd13be357-915a9c2921emr3077670785a.7.1781000001872;
+        Tue, 09 Jun 2026 03:13:21 -0700 (PDT)
+X-Received: by 2002:a05:620a:28d1:b0:915:89d4:df16 with SMTP id
+ af79cd13be357-915a9c2921emr3077666685a.7.1781000001380; Tue, 09 Jun 2026
+ 03:13:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Lsf-pc] [LSF/MM/BPF TOPIC] Memory fragmentation with large block
- sizes
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@infradead.org>
-Cc: lsf-pc <lsf-pc@lists.linux-foundation.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org
-References: <f22caf98-1375-493a-a275-0500ffac3e81@suse.de>
- <aifAm1rRKF75HVeM@infradead.org>
- <1225376d-dc29-44a1-add6-0cb14926a538@suse.de>
-From: Vlastimil Babka <vbabka@suse.com>
-Autocrypt: addr=vbabka@suse.com; keydata=
- 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
- pYekxJujNeEDkUlky0Y=
-In-Reply-To: <1225376d-dc29-44a1-add6-0cb14926a538@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
+ <20260609-block-as-nvmem-v4-4-45712e6b22c6@oss.qualcomm.com> <CAMRc=MfuiPMkSm=-G6VEJpqKhos0TD_pf0ScBGqfwLHT0uk8yQ@mail.gmail.com>
+In-Reply-To: <CAMRc=MfuiPMkSm=-G6VEJpqKhos0TD_pf0ScBGqfwLHT0uk8yQ@mail.gmail.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Tue, 9 Jun 2026 12:13:08 +0200
+X-Gm-Features: AVVi8CdO5YI5NAWSbFzNXGbYum69_nA2LQfVjrd4CKqvNbC45JuBlK0C2ABm878
+Message-ID: <CAFEp6-1syMQsvuQ+dLU39bnDeL5Ok7vK1mA7CS0v1m7cjhyMQw@mail.gmail.com>
+Subject: Re: [PATCH v4 4/8] block: implement NVMEM provider
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, daniel@makrotopia.org,
+        Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saravana Kannan <saravanak@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: olejwnW8hwqg-4rgAx6CvaVDkKHAb2-I
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA5MDA5NSBTYWx0ZWRfX/uxadz4gqxHP
+ NJ9xyJf+378hplwjcEgoHe13jW2To3E7ZXk6TbIk5RbugjDq4AuYHJ6OXwxdJAYG5ePXQfZRA36
+ r5pwOS4+Mug9MVNP1Mweb5YHseSXE6hOeNp4bU0f2FyGXy/sIRtTuzEDpV2dfB5lt3K7+/kvkCu
+ p3UuScHq7ezIA6c7E4iHrKM9HkAWezphgi3KP6AoRQv9fm2AZgVP7UfPfh/2xqzr6xSRGIwHq+r
+ GMJbvh+F1Vwc65h2HbVLt7LUNwZpJt09uz8P+pvzgkZszH6Gi8+IfoQ9kn05ZMqlXcZms4fzhiE
+ 1iu5jk31+m3a6sOzxDgryAO8tK9F7LLk7RIGBzaSolHR2gWJ+VHBzCB1ErQmBquDZD8ySdGD1Pn
+ hsn1XzkXeJ/u5/z315xvVbDRVgeGjCXatr4Y06gXEJRDwJD9LPHR+dfZahGyC8St4kvjFyp/Mo2
+ 0erco5uWFFkAPO7nVWw==
+X-Proofpoint-GUID: olejwnW8hwqg-4rgAx6CvaVDkKHAb2-I
+X-Authority-Analysis: v=2.4 cv=LoqiDHdc c=1 sm=1 tr=0 ts=6a27e742 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=3WHJM1ZQz_JShphwDgj5:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=VT4XjZGOAAAA:8
+ a=nTbZda4seY50gyMA9OkA:9 a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
+ a=6CpsfURP9XNmmWg3j1mJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-09_02,2026-06-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 spamscore=0 bulkscore=0 phishscore=0 impostorscore=0
+ adultscore=0 suspectscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606090095
 
-On 6/9/26 10:39, Hannes Reinecke wrote:
-> On 6/9/26 09:28, Christoph Hellwig wrote:
->> Hannes,
->> 
->> can you share your results on the mailing list?
->> 
-> I sure can.
-> 
-> We have run a simple testcase with on fio job on an LBS-enabled device, 
-> and another job permanently allocating and deallocating arrays of pages
-> of various array lengths.
-> 
-> We then took snapshots of /proc/buddyinfo to track memory pressure
-> over time.
-> 
-> Results are visualized in the attach plot.
-> 
-> With 4k block sizes we have seen a high number of 0- and 1- order pages,
-> and then the expected decline towards higher orders.
-> 
-> With 8k and 16k block sizes a noticeable 'bump' in free pages was 
-> developing in 2- and 3- order pages, which we think is down to 
-> compaction trying to merge pages together.
-> The number of 0- order pages increased slightly, but only half of the
-> maximum number of pages in the 'bump'.
-> 
-> With 32k block sizes the picture changed completely; the 'bump'
-> vanished, and there was only pronounces spike with 0-order pages
-> (about four times the size of the spike with 4k block sizes).
-> 
-> This led me to assume that compaction broke down at 32k block sizes;
-> this assumption was confirmed by Vlastimil Babka who pointed out that
-> there is a maximum order to which page compaction is attempted:
+Hi bartosz,
 
-Yep, but after the LSF/MM session I've realized I made an off-by-one error
-thanks to the misleading name of the define.
+On Tue, Jun 9, 2026 at 10:52=E2=80=AFAM Bartosz Golaszewski <brgl@kernel.or=
+g> wrote:
+>
+> On Tue, 9 Jun 2026 09:52:29 +0200, Loic Poulain
+> <loic.poulain@oss.qualcomm.com> said:
+> > From: Daniel Golle <daniel@makrotopia.org>
+> >
+> > On embedded devices using an eMMC it is common that one or more partiti=
+ons
+> > on the eMMC are used to store MAC addresses and Wi-Fi calibration EEPRO=
+M
+> > data. Allow referencing the partition in device tree for the kernel and
+> > Wi-Fi drivers accessing it via the NVMEM layer.
+> >
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > Co-developed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> > ---
+> >  block/Kconfig     |   9 +++++
+> >  block/Makefile    |   1 +
+> >  block/blk-nvmem.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  3 files changed, 124 insertions(+)
+> >
+> > diff --git a/block/Kconfig b/block/Kconfig
+> > index 15027963472d7b40e27b9097a5993c457b5b3054..0b33747e16dc33473683706=
+f75c92bdf8b648f7c 100644
+> > --- a/block/Kconfig
+> > +++ b/block/Kconfig
+> > @@ -209,6 +209,15 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+> >         by falling back to the kernel crypto API when inline
+> >         encryption hardware is not present.
+> >
+> > +config BLK_NVMEM
+> > +     bool "Block device NVMEM provider"
+> > +     depends on OF
+> > +     depends on NVMEM
+> > +     help
+> > +       Allow block devices (or partitions) to act as NVMEM providers,
+> > +       typically used with eMMC to store MAC addresses or Wi-Fi
+> > +       calibration data on embedded devices.
+> > +
+> >  source "block/partitions/Kconfig"
+> >
+> >  config BLK_PM
+> > diff --git a/block/Makefile b/block/Makefile
+> > index 7dce2e44276c4274c11a0a61121c83d9c43d6e0c..d7ac389e71902bc091a8800=
+ea266190a43b3e63d 100644
+> > --- a/block/Makefile
+> > +++ b/block/Makefile
+> > @@ -36,3 +36,4 @@ obj-$(CONFIG_BLK_INLINE_ENCRYPTION) +=3D blk-crypto.o=
+ blk-crypto-profile.o \
+> >                                          blk-crypto-sysfs.o
+> >  obj-$(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK) +=3D blk-crypto-fallback.=
+o
+> >  obj-$(CONFIG_BLOCK_HOLDER_DEPRECATED)        +=3D holder.o
+> > +obj-$(CONFIG_BLK_NVMEM)                +=3D blk-nvmem.o
+> > diff --git a/block/blk-nvmem.c b/block/blk-nvmem.c
+> > new file mode 100644
+> > index 0000000000000000000000000000000000000000..a6e62fa98675ee9bcb9c703=
+5a611b5a573ab9091
+> > --- /dev/null
+> > +++ b/block/blk-nvmem.c
+> > @@ -0,0 +1,114 @@
+> > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > +/*
+> > + * block device NVMEM provider
+> > + *
+> > + * Copyright (c) 2024 Daniel Golle <daniel@makrotopia.org>
+> > + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+> > + *
+> > + * Useful on devices using a partition on an eMMC for MAC addresses or
+> > + * Wi-Fi calibration EEPROM data.
+> > + */
+> > +
+> > +#include <linux/file.h>
+> > +#include <linux/nvmem-provider.h>
+> > +#include <linux/nvmem-consumer.h>
+> > +#include <linux/of.h>
+> > +#include <linux/pagemap.h>
+> > +#include <linux/property.h>
+> > +
+> > +#include "blk.h"
+> > +
+> > +static int blk_nvmem_reg_read(void *priv, unsigned int from,
+> > +                           void *val, size_t bytes)
+> > +{
+> > +     blk_mode_t mode =3D BLK_OPEN_READ | BLK_OPEN_RESTRICT_WRITES;
+> > +     dev_t devt =3D (dev_t)(uintptr_t)priv;
+> > +     size_t bytes_left =3D bytes;
+> > +     loff_t pos =3D from;
+> > +     int ret =3D 0;
+> > +
+> > +     struct file *bdev_file __free(fput) =3D bdev_file_open_by_dev(dev=
+t, mode, priv, NULL);
+> > +     if (IS_ERR(bdev_file))
+> > +             return PTR_ERR(bdev_file);
+> > +
+> > +     while (bytes_left) {
+> > +             pgoff_t f_index =3D pos >> PAGE_SHIFT;
+> > +             struct folio *folio;
+> > +             size_t folio_off;
+> > +             size_t to_read;
+> > +
+> > +             folio =3D read_mapping_folio(bdev_file->f_mapping, f_inde=
+x, NULL);
+> > +             if (IS_ERR(folio)) {
+> > +                     ret =3D PTR_ERR(folio);
+> > +                     break;
+> > +             }
+> > +
+> > +             folio_off =3D offset_in_folio(folio, pos);
+> > +             to_read =3D min(bytes_left, folio_size(folio) - folio_off=
+);
+> > +             memcpy_from_folio(val, folio, folio_off, to_read);
+> > +             pos +=3D to_read;
+> > +             bytes_left -=3D to_read;
+> > +             val +=3D to_read;
+> > +             folio_put(folio);
+> > +     }
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +static int blk_nvmem_register(struct device *dev)
+> > +{
+> > +     struct block_device *bdev =3D dev_to_bdev(dev);
+> > +     struct nvmem_config config =3D {};
+> > +
+> > +     /* skip devices which do not have a device tree node */
+> > +     if (!dev_of_node(dev))
+> > +             return 0;
+> > +
+> > +     /* skip devices without an nvmem layout defined */
+> > +     struct device_node *child __free(device_node) =3D
+> > +             of_get_child_by_name(dev_of_node(dev), "nvmem-layout");
+> > +     if (!child)
+> > +             return 0;
+> > +
+> > +     /*
+> > +      * skip block device too large to be represented as NVMEM devices=
+,
+> > +      * the NVMEM reg_read callback uses an unsigned int offset
+> > +      */
+> > +     if (bdev_nr_bytes(bdev) > UINT_MAX) {
+> > +             dev_warn(dev, "block device too large to be an NVMEM prov=
+ider\n");
+> > +             return -ENODEV;
+>
+> Wait, I must have suggested -ENODEV here on too little coffee. This callb=
+ack
+> is called from device_add(), not when the device is bound so it's not the=
+ same
+> thing as returning -ENODEV from probe().
+>
+> On the other hand, we don't want to not provide the block device just bec=
+ause
+> someone added a DT property on one that's too big. I'd say: warn, but ret=
+urn 0.
+> Does it make sense?
 
-> include/linux/mmzone.h:
-> /*
->   * PAGE_ALLOC_COSTLY_ORDER is the order at which allocations are deemed
->   * costly to service.  That is between allocation orders which should
->   * coalesce naturally under reasonable reclaim pressure and those which
->   * will not.
->   */
-> #define PAGE_ALLOC_COSTLY_ORDER 3
+It=E2=80=99s still technically an error in the sense that we cannot provide
+the required nvmem feature. However, it only becomes a real issue if a
+consumer actually attempts to use it.
+Also, the block device should still be added, since the return code
+from add_dev is not checked. In any case, I=E2=80=99m fine with either
+approach, as long as we emit a warning message.
 
-Which is 32k
+>
+> > +     }
+> > +
+> > +     config.id =3D NVMEM_DEVID_NONE;
+> > +     config.dev =3D dev;
+> > +     config.name =3D dev_name(dev);
+> > +     config.owner =3D THIS_MODULE;
+> > +     config.priv =3D (void *)(uintptr_t)dev->devt;
+> > +     config.reg_read =3D blk_nvmem_reg_read;
+> > +     config.size =3D bdev_nr_bytes(bdev);
+> > +     config.word_size =3D 1;
+> > +     config.stride =3D 1;
+> > +     config.read_only =3D true;
+> > +     config.root_only =3D true;
+> > +     config.ignore_wp =3D true;
+> > +     config.of_node =3D to_of_node(dev->fwnode);
+> > +
+> > +     return PTR_ERR_OR_ZERO(devm_nvmem_register(dev, &config));
+>
+> And that was a wrong suggestion on my part too because I was under the
+> impression that we're in the probe() path, not device_add(). You can't us=
+e
+> devres here as the device at this point is not yet bound and may never be=
+.
 
-> and it's main usage is 'order > PAGE_ALLOC_COSTLY_ORDER'.
+So I understand The bd_device is purely a class device with no bus, no driv=
+er.
+For driverless devices, devres_release_all() is called explicitly
+within device_del() .
 
-And indeed, this means any changes in behavior due to this should only
-happen at 64k (order 4) or more. The value of 3 is in fact something like
-"PAGE_ALLOC_MAX_CHEAP_ORDER". I'd send a rename patch (Kiryl fixed a similar
-off-by-one gotcha with MAX_ORDER), but I suspect we'll be making more
-involved changes here so I'd wait for that first.
+>
+> Which leads me to the second point: this is not the moment to add the nvm=
+em
+> provider. This should happen at or after probe(). Once nvmem_register()
+> returns, you have a visible nvmem resource but nothing backing it in the =
+block
+> layer.
 
-> Which ties in directly with what we're seeing.
+There is a short window during which a read attempt will 'properly'
+fail, but this does seem somewhat fragile indeed.
 
-So it's probably not that straigtforward. We should investigate more first?
+> Either do this in block core when registering a new device or schedule
+> a notifier here for the BUS_NOTIFY_BOUND_DRIVER event and do it in the no=
+tifier
+> callback.
 
-> It will probably make sense to align the maximum block size which we
-> currently support (ie 64k) with this value to ensure that compaction
-> works with larger block sizes. Or maybe even the other way round;
-> tie the maximum block size which we support to PAGE_ALLOC_COSTLY_ORDER.
-> But that would mean to restrict the blocksize to 16k, whereas xfs
-> works happily with 32k. So we might want to raise PAGE_ALLOC_COSTLY_ORDER.
-> 
-> Question is, though, how could we measure the impact?
-> This particular value has been in since 2007 (commit 5ad333eb66ff1 
-> 'lumpy reclaim V4'), and it might well be that the original
-> reasoning doesn't apply anymore.
-> 
-> At the same time, this value is tied to a _LOT_ of things
-> (not to mention the page allocator itself), so increasing it
-> to '4' has an extremely high chance of impacting mm performance.
-> 
-> I'll probably run mmtests and see what I get.
-> 
-> Cheers,
-> 
-> Hannes
-> 
-> 
-> fragmentation.png
-> 
-> 
-> _______________________________________________
-> Lsf-pc mailing list
-> Lsf-pc@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/lsf-pc
+So in the end, it seems that the simpler and more robust approach is
+probably to move away from the class_interface driver and instead
+register/unregister the nvmem directly in add_disk/del_gendisk.
+If that's ok I will move to this approach in the next version.
 
+Regards,
+Loic
