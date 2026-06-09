@@ -1,49 +1,49 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EF82749CF;
-	Tue,  9 Jun 2026 06:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C02C3161BA;
+	Tue,  9 Jun 2026 07:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780987656; cv=none; b=Jw5aPTIZ2+JfPJNC4Lgk/TwmM8o6c95ehIYZfNuTpjd249ait77zHG0jNqW5W/OFjaBGu5Ywa6jmQp6j/tLIzKcQ+VSU0Nm0+IX1DkDk0Aflh0PXfpKyxi261lBYbar623x9HB/8XFoNEHCmjymes5IyerNEuzrZbmoxlmCR/3g=
+	t=1780988422; cv=none; b=ChLrn1cu9VDFuoPcXtzF8nMK3zgUTxAN8c4NtBmDggYnLM5y5zK5ulwB4pV0CqzqevUeYWPR9T7rMffKTpw3QzxMw1TgkwgZ2qOp+CZx4S+FqGcupTcjtmf2RFbtTV7NhscllkO0mZ8IR65gz5CSxPUXfPgnkJH2YAJ4GM1cUXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780987656; c=relaxed/simple;
-	bh=JtgXQ+CUhI8fqj7NEQN4vNa7+C8S/fPck+oJyjJdK2k=;
+	s=arc-20240116; t=1780988422; c=relaxed/simple;
+	bh=2uFU5Nc5neHcjkdpq8khI2EoQ4OEWJdTXCqvSWCGdV4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MQ5JSz1G4m6K3gPMr6hJCdrcAxDtxd8OfMwPNTVG80NfbvVvKruWeLh5adea316GFQeRnHXgoVys1XkStP5snf8pwpMD68lJbbLH43v6mV7K89WMVfhksKNfyYJKpFTk1yMe79N6WBHxGD92Xs1dOsdAwbrh4yXEG/tXxmEEh5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kpQ3nSGT; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=t3CfC3+ywYr62dbEF90tu7CTQRZEt9TLXocMS00UuhH5DBa00bYnbz3JmZ7KJ3Gwb2GovZ31N6QvsXKJCNBYc/6qBwrxe1BQee0hWRjDc1APkLSWeYQ7cRapUsiKym5TnqkN9pst9nvgWT4RBdEC8ESTJ5RLBDs73ZnFhL0SoU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ge8WQRR4; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kpQ3nSGT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ge8WQRR4"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1780987656; x=1812523656;
+  t=1780988422; x=1812524422;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=JtgXQ+CUhI8fqj7NEQN4vNa7+C8S/fPck+oJyjJdK2k=;
-  b=kpQ3nSGTVttOwWGNobS+IC4i0fCpDM0hevIMLeDnN+FnHSp8Tg+o2+7+
-   iUsl2bsFYQgzGqDCJmiYP2JI+s8uQ3ORT7OiJiPFI8pf5fCypASbgoLQt
-   KSoaWRnfjHwlUWmk1m9OXF7TEkU/q9frDYMyAbqTWmnRlcFyIbsGHNfQL
-   6woofQDB5pHRrQFuvzDaCgylnkMZi2AndsQgHZRc9R3vYHmxV7V75O8ZX
-   m5OqH+3NQeh7He0w+LN/EFlXvmxNneSNq2m6Xyf5+qcDa4TOICmBMz6vn
-   ALcebFmFidcODUCjYvqwgdpnNfQXGV3PZjSBYIAk6UICLScxlOMgPNWLD
+  bh=2uFU5Nc5neHcjkdpq8khI2EoQ4OEWJdTXCqvSWCGdV4=;
+  b=ge8WQRR4VcrmPbPq+fsDeE7duJPhV9EeKrOr6TXurjOrptdb1yPsT4K1
+   l+icar9RusaYYkEc6ojAxzVZj+mdrDZLFMyLrZy/k2xvWDkssb4efHKNE
+   tArYOZUxH+Bwtnb9fi1q3Mf3ULfaC/HDTy1XabA9ahu7DyNNQlndo7j7O
+   gNnN669/wLAoiP9J8hu9GslQNdU+XSHblcbktR7BQ9ZYpdxbDpZk3j5Oh
+   VzypZUVFhTSLVEIoKUaAInhH6cCbAPKDfOw5yQyqLxw7oOw1EKd0LxNar
+   uOIUyzKFQz2KMdSjpFreu3DSXnfqN/qnY0pcx0bda8zazALgKf8vxjy6v
    g==;
-X-CSE-ConnectionGUID: QDUj2fh0S7aVBJXsO1qtFw==
-X-CSE-MsgGUID: 8157XAufR8inDXGuQzb67g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11811"; a="81783717"
+X-CSE-ConnectionGUID: Ev081xT3SHabmdaEgE1BAQ==
+X-CSE-MsgGUID: zUwp9MauRnmSRNZ9d9ZcFA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11811"; a="85364707"
 X-IronPort-AV: E=Sophos;i="6.24,195,1774335600"; 
-   d="scan'208";a="81783717"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 23:47:34 -0700
-X-CSE-ConnectionGUID: +shHRdOKTfGiz+VFC8i6ig==
-X-CSE-MsgGUID: c7oiHZEDR2ikmK04/uJN0A==
+   d="scan'208";a="85364707"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 00:00:21 -0700
+X-CSE-ConnectionGUID: pCChZ3wCTI+GwpURGgDxKg==
+X-CSE-MsgGUID: Ei1KwtbHTi20oALanPWYpA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,195,1774335600"; 
-   d="scan'208";a="250060711"
+   d="scan'208";a="249699387"
 Received: from egrumbac-mobl6.ger.corp.intel.com (HELO localhost) ([10.245.245.39])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2026 23:47:22 -0700
-Date: Tue, 9 Jun 2026 09:47:19 +0300
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2026 00:00:05 -0700
+Date: Tue, 9 Jun 2026 10:00:03 +0300
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Kaitao Cheng <kaitao.cheng@linux.dev>
 Cc: Muchun Song <muchun.song@linux.dev>,
@@ -95,11 +95,12 @@ Cc: Muchun Song <muchun.song@linux.dev>,
 	Christian Brauner <brauner@kernel.org>,
 	David Howells <dhowells@redhat.com>,
 	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Kaito Cheng <chengkaitao@kylinos.cn>
-Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
- state
-Message-ID: <aie299WveL1utNya@ashevche-desk.local>
+	Kaitao Cheng <chengkaitao@kylinos.cn>
+Subject: Re: [PATCH v2 04/14] drm/i915/gt: Open-code active timeline walk
+Message-ID: <aie580RAM3vCunbh@ashevche-desk.local>
 References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+ <20260609062526.94907-1-kaitao.cheng@linux.dev>
+ <20260609062526.94907-2-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -108,33 +109,34 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+In-Reply-To: <20260609062526.94907-2-kaitao.cheng@linux.dev>
 Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
  krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Tue, Jun 09, 2026 at 02:13:33PM +0800, Kaitao Cheng wrote:
+On Tue, Jun 09, 2026 at 02:25:16PM +0800, Kaitao Cheng wrote:
 > 
-> This series prepares for, and then updates, the list_for_each_entry()
-> family so the common entry iterators cache their next or previous cursor
-> before the loop body runs.
+> A later change will make list_for_each_entry() cache the next element
+> before entering the loop body. __intel_gt_unset_wedged() drops
+> timelines->lock while waiting on a fence and then restarts the walk from
+> the list head after the lock is reacquired.
 > 
-> The first 13 patches open-code loops that intentionally depend on the
-> old "derive the next entry from the current cursor at the end of the
-> iteration" behaviour.  These loops append work to the list being walked,
-> restart traversal after dropping a lock, skip an entry consumed by the
-> current iteration, or otherwise adjust the cursor in the loop body.
-> 
-> The final patch changes include/linux/list.h to keep a private cursor in
-> the common entry iterators while preserving the public macro interface.
-> The safe variants remain available when callers need the temporary
-> cursor explicitly or have stronger mutation requirements.
+> Keep the loop open-coded so the next timeline is selected after that
+> restart logic has run. This preserves the existing lock-drop traversal
+> semantics and prepares the code for the list iterator update.
 
-Something is really wrong with the patch series email chaining.
-Patches 3, 10, and 13 start the subthreads. Please, check your
-tools and fix them accordingly.
+...
 
-Note, `git format-patch ...` should not have this "side-effect"
-when used correctly.
+>  	spin_lock(&timelines->lock);
+> -	list_for_each_entry(tl, &timelines->active_list, link) {
+> +	for (tl = list_first_entry(&timelines->active_list, typeof(*tl), link);
+> +	     !list_entry_is_head(tl, &timelines->active_list, link);
+> +	     tl = list_next_entry(tl, link)) {
+
+Yeah, these cases should rather be converted to do {} while or while-loop.
+This will make the intention clearer and reduces the possibility that someone
+mistakenly changes these back to use list_for_each_entry().
+
+See, for example, deferred_probe_work_func() implementation.
 
 -- 
 With Best Regards,
