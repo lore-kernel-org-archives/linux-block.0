@@ -1,88 +1,89 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16533EAC86
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 07:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542E43EDAB1
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 07:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780991599; cv=none; b=K/25xCaTC7QfaAU2qTYQWHTqw296XhfBo7z1/klC88LDB48NxFCrPmeRYz07NEKdg4lhk9kuiuS/iEyPivW9CO17UW+PYISwJJ1RmD5l5sFLo0nCFRNWlP11BJYCwPteW+sCiP9VPb5s4TkgKR44OPAtSamYOydL1hNKj/Xmzdc=
+	t=1780991601; cv=none; b=MEW6UOfOVxr2au0HXxlOQPt4HL+mB3GU0ABNPzJkwnmzG6j8z3Sr3Scn15N/BZmYAgtZanVQabe26snYXP38ncq4qZNAhFCfW7sY+8lTLZYA56eyYksdDBh2z88zldyKD9OudE+fjkN1aDDJhyEV8SXu5PLgGYoZsw1aPaDljxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780991599; c=relaxed/simple;
-	bh=X0Ai0achBf+ZwxyXQCLBkT4mksbIzc1fznSydl00GqA=;
+	s=arc-20240116; t=1780991601; c=relaxed/simple;
+	bh=yYJ5VBN7wBwAYsQ0zlbRkE0xdiTrAcSbG/QNNToAmpg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fAK2VCECVAy+QRyHqYgESSZUmKW2zs/sAw7/zzIpwWTFja6nVDG7lnUmT8J5s5U18GrFeKhe+/oEcMkrehJbIw0VdpMpDuqEdOWT782piSXCXR6ZJ0gsE39rY8J2cMOyZmHxSgy/l+wvTNWWWtgtVPiAwRe9P2pk3fV0hAtIGy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SqtE24s7; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Ty8fvoxX; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:To:Cc; b=X2ijMydaEQvyg/lZF4PAG7ILZ+kbm/actTRHetXWospmVCC0RToU8VxDUHDu2BCAJpT4bjGfS6T/X4I6a7JuAgt2Aro7rbbFa1ie8PB5xuoneBBx55yr0dYJtWdw75FoBl82kKw3VfRJ1K+O3nMJoawGdNibSGUhoS0F1FUtr74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=oGK78Hh2; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=V1L3oOhH; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SqtE24s7";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Ty8fvoxX"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6596xeDS1878367
-	for <linux-block@vger.kernel.org>; Tue, 9 Jun 2026 07:53:17 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="oGK78Hh2";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="V1L3oOhH"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6597fPjQ1491095
+	for <linux-block@vger.kernel.org>; Tue, 9 Jun 2026 07:53:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	/uyx06x8K5ep74cMiQuw/AWSjV6qe5TglOy6xBBnhww=; b=SqtE24s7100dyZVA
-	kTClwnOzW+aY/y+IrQvA5ZuVMmk1ZOt1sngQs7WnSevZ3aqCRg5Cihoa/loxIg+u
-	t3Ru/iPPVx61+14JjwffwlWZ+cKt5bOzhddi9aByGOfrSA0sc0Ie9aB3VDpvhKaF
-	AiDEm4eplPJ+c0qRUnpRGz7DnmIl7lhYgv1Z7+QcMGgR0aJIlUINw7yrp+76RSlN
-	4zeRYaz0U+6sWsAMDijaGiT5YVm8P30VNOGvyfJN6I+uHpugUFRyJSsROI6vKP6h
-	qWd4kKHfEXmpsaq18yY1I0kyTytX5hjNTIlTvzqqQhk/0DASXo4/pgwokj0YDOKn
-	7WZBDQ==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4epe25r720-1
+	aaVv9Eurf6ixxwY7bJNLCZAXbfQRk7/8Rh3U8IOXpwA=; b=oGK78Hh2GvSSk3nx
+	gRnEthzbKV089nIAjT+pSAu6UIWXHONVitXv+kCiYNajab87B+rFJbZw9tkGCq5B
+	j1v0xQtK8QFmGL4AiAHzvO3DrS1j7d0IIx35SbMpvtzTsRXJqzsPsFplwmJ/7Uik
+	xha+82hUokTCipYZ1DCkQE+tum05qEMgwTeSbTBu7/e0n4Qky/Kv7swLuSX18C0g
+	g6uS3XehElds/iQla4W4q4foq9qDeMYFes1lTTi5O9+qZi7jVPiUZhNLFx1xcdtm
+	WR4lK1+q0aM/KbvRlQQeCaaUEpY4u+rq/tDaV0fQr19uQbHeaLK8b943DzeCPHc8
+	vbkc3A==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4epenr81e6-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 07:53:16 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-51760f997fdso160836971cf.2
-        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 00:53:16 -0700 (PDT)
+	for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 07:53:19 +0000 (GMT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-8ccd83d58d9so84562566d6.0
+        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 00:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1780991596; x=1781596396; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1780991598; x=1781596398; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/uyx06x8K5ep74cMiQuw/AWSjV6qe5TglOy6xBBnhww=;
-        b=Ty8fvoxX3z9+aGVH7nrS5wdzT/sN4UXtzTsyATMGtOik0OSqGOAJibNhzJwWtdqUWK
-         HL1FHKzInEaiIJzbjLJICVCb2x9BiPUmINBFHma/p+XfbLH54XUbC5sJP7K3FJxafVNq
-         VNA7jU7jsxRcyiKAeuSVCwuBWcU5ONC+fuGN62nf67r4XHhjkXQ4Ty64K97X0Tjraic9
-         NGTNjfnaAhTwAw2bbbD5Ph0e7H1VvEHkDKiTen6IXXP8GHekK3XbVX7m3qK1VMfLBPXq
-         YKuvIsBq96gHmC2hqDxym83+E8A1qJ3MvyYE0w5kOVj0BleecEszd5XsN624lmJTbSQ+
-         YZKA==
+        bh=aaVv9Eurf6ixxwY7bJNLCZAXbfQRk7/8Rh3U8IOXpwA=;
+        b=V1L3oOhH+pqUN12byo5Nmtn4RJwdRG+59ehbHvN/X2dVdIEWt0SYBuNCeC/25nmRPW
+         8MKbaJrfgXeWi7saPTOq8hHRGHRQQDW2pjiMgH1zswy190UleM0Y14+/bUVS/UZ5OYAF
+         QbT45Xwmbf88kbYKq3zUTPKtFlFj4x/tQiRSrM5tIqnsUEh2/N4qT09wphEIaY1safcD
+         ++voo/p3XpsQPjxpFAfvofRZI7HKZq6JijICU0ICHRYHg7sVNPAoSjqMTSNwN/qHjbqo
+         4FIlWfCTCK0xfWuh3mP1mJIdl3+rIRPYBGPqGRc8b5htK6cga6TaG/sGFMwXPVEBbPi0
+         uYuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780991596; x=1781596396;
+        d=1e100.net; s=20251104; t=1780991598; x=1781596398;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=/uyx06x8K5ep74cMiQuw/AWSjV6qe5TglOy6xBBnhww=;
-        b=SFsvwJyioTly9t9z6Oa8RfBDlNRHY+OIXCVMd9T2uJL0SNUf7lQRLHkTkM92pwXqzk
-         sQD0eiRAybJD08rNfMCKYNEqE879N70NIsQge9M9Yf17IhTx/g+DpR1bftCMTPsqScNo
-         pV/bJ4MUO2+OCXLbNiR6dAc0GgkjtiYkLmb5fCXquxV80P2LDN8Vqe69DttDNQaOw7Rs
-         v3JPCbQyYR9deswopZHp0KfnQNsiqUwFkDGjRD95EK7t2QrtrSTT3fq2SjAJuqu6XJDh
-         zS0cS3ctKFrpc9KgYeqyCKT++vZS5Dncq0+Rf5qYkn6hwb9dIPs7n7JNPgmNga3XsUuX
-         hWsA==
-X-Forwarded-Encrypted: i=1; AFNElJ9ArkrHWj+Kaz8ut0X0lqe6G96TlfcUWUkQHoUJIXDzpO2eCk6zvyfnH8bf6SGMn/xGeJ+C9n3TvrgOfg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8ViYtajXa4pS3WHYjacG5ZEs59+/ZIpzS0xr84uRk5z0Gwzam
-	jZCNtwJO7NloTDR9L1Vd63KB1SnO2RTpwfpdfTwDLhb6duA2no+ZOmuw3oU/5gcpjm0YgNU4Tkm
-	PgVerNyG2CxbzoH9EiYhSE9DyGIthq3QuOTqh78Y+wtKtLIDH19IYIVykbJMjxJZWsg==
-X-Gm-Gg: Acq92OHOZ82PYtLnwzDCPRUs5D09H/2lA8FZ/HEk5San6uPGpNESSOGucc8VfNs3HgD
-	DtRXuoF6MbHBRz6yhVKz+hfWIK/942czGJ5gtg+bd90usYbOv2J1EZwRWMxcVv6/YeDB+WJTAXh
-	LjCqLeqXKbooa12Gby1b2HOpanvecFLQhZoo3zRBUL+VxRzb+jUFfRCY5kB3PGfiujFLaBJv39H
-	/QJYeT+KeIfdI33BDKnBdgONYqADYosh8+cc7sVIRjQJPNlj51B5cbgQqk9wrTSEU5UZoQzIjI3
-	lzxD3ETJ+iL+ADSPr9o9tjnE5RQi+JIBXC9ygriRxgZO0V8Vc/DAz5UZx7/SL2EePJcQfZUiDnO
-	LdAE9k86/P5BjQFcLJtYHIfUEGJa5ThBLoU9UwCwlv7l/1wiZJEe14eATyyf3CV/lRe/J0NCArw
-	W10+CIdHOTkTVfqbFFvWS6unULX7fdyL6OgaXFyDQxiVGr0qebLuLsUuj/du5a6p5eMq38mO665
-	AjgaKKt+Uc8
-X-Received: by 2002:ac8:5852:0:b0:517:599d:ce19 with SMTP id d75a77b69052e-51795cb7901mr276093681cf.48.1780991596100;
-        Tue, 09 Jun 2026 00:53:16 -0700 (PDT)
-X-Received: by 2002:ac8:5852:0:b0:517:599d:ce19 with SMTP id d75a77b69052e-51795cb7901mr276093471cf.48.1780991595695;
-        Tue, 09 Jun 2026 00:53:15 -0700 (PDT)
+        bh=aaVv9Eurf6ixxwY7bJNLCZAXbfQRk7/8Rh3U8IOXpwA=;
+        b=SuRcdnOSUvepB/bhiqYnVSYAYAfAJMkJJSnT25gguIJvoD5zv48h5NWM2PX31kpevH
+         RK2FaMpm/EPqyK18btXRX1nIX4CUctqCNoTaX79TUstoZZfbVdmq73IK4O14gwewBSyw
+         pnZaBE4UWZ/eqG7p/liWnCdXswFpj7T9jboid2KrSETbR4DchTWYy2SuL+eNC9Lw4Gwn
+         eRWyVvNsMJwwvU61gtmdiQshSul1UCcnDEZSrKsB3w+NpYH6/MbSAUI3ryBlZ4j/n1bx
+         DYpJFXAiopA3GY079dzQfk3+sW52WbPeGy5rL12OWUJDD2zw7nGhXAwMVkSfS14O1+0h
+         x/OQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9yVqOvdVIQcbBB3MwxEi0yeckr1Iv6IjeKDk2cTJEpFE0SmRnmmspUN0H6b/luWD5WuGAnwKLXLf7Tpw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8RhVL0pKi2UMtQDfjwTQKU97czGnzCoAygdRYvIWDaQMz1Us9
+	lvfWy/4kdkC9ncI1PSygJyaKYfhSeV0F0Jnw5lCbVNSt6I7+5unm+66zNGiZGffv5jKe1vjrINf
+	xuWP+Ub8rekLFfRzmIoHd+cymFE6CffzuyS1lVt+nZEClqENjRmM0Jx285d+FQN2BeQ==
+X-Gm-Gg: Acq92OEy33L5VEfce9bmF7yVEJlrdsA2a1C1sOOUSr/wou7l0BEOX3/8kAwjti1D3f1
+	UBZYeDeG1aqqSZRsFWhPD1DL3XQ9sJalDErofukmCXi8yj3EeMDSWkHIZqWsnVbiI7YHaWZSk5n
+	GOl67vir9rijd81FFjdGP7JbqVdAWiE8rbVQPEGvpCEcQEN4omJHYcQ9lo4q1zPWUYrJyyrrjLb
+	451CVmQ1It538bIeHInpLSkLyVcTV1GnhSxIaaaLpO8oz6k975XqpOIZgwf7K0akphkBhnzIHEj
+	xOQlWoP5wOaLInfY0QdPiL6ofQLvyiq4zmaU7RDyrf99fKYcVm4YOEOew6S1FHVrbJfTcfZNlTj
+	eC0NVKy2LgVRtfSqGdxoVR6Etdbiqb9UyaW3ad0Sqp/CfudHyVq3bOi6iKPwwXodM9akUfEKtZb
+	1OxG0a+Pay1P8itoh6Pvt8PXTM/cu180h+FSVnAgEzW2kF/9NnAYSdgrD1dH7BWXU7oV4WHKbVu
+	ajHpe3t9ZRv
+X-Received: by 2002:a05:622a:1a98:b0:517:a9ef:ce3c with SMTP id d75a77b69052e-517a9efd0bemr186043561cf.24.1780991598506;
+        Tue, 09 Jun 2026 00:53:18 -0700 (PDT)
+X-Received: by 2002:a05:622a:1a98:b0:517:a9ef:ce3c with SMTP id d75a77b69052e-517a9efd0bemr186042831cf.24.1780991598097;
+        Tue, 09 Jun 2026 00:53:18 -0700 (PDT)
 Received: from QCOM-eG0v1AUPpu.na.qualcomm.com ([2a01:e0a:830:450:cc96:22ae:323b:9eff])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68e64303892sm8121631a12.0.2026.06.09.00.53.13
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-68e64303892sm8121631a12.0.2026.06.09.00.53.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 00:53:14 -0700 (PDT)
+        Tue, 09 Jun 2026 00:53:17 -0700 (PDT)
 From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Tue, 09 Jun 2026 09:52:26 +0200
-Subject: [PATCH v4 1/8] dt-bindings: mmc: Document support for nvmem-layout
+Date: Tue, 09 Jun 2026 09:52:27 +0200
+Subject: [PATCH v4 2/8] dt-bindings: net: wireless: qcom,ath10k: Document
+ NVMEM cells
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -91,7 +92,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-block-as-nvmem-v4-1-45712e6b22c6@oss.qualcomm.com>
+Message-Id: <20260609-block-as-nvmem-v4-2-45712e6b22c6@oss.qualcomm.com>
 References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
 In-Reply-To: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
 To: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -121,91 +122,66 @@ Cc: linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
         Loic Poulain <loic.poulain@oss.qualcomm.com>,
         Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 X-Mailer: b4 0.14.2
-X-Proofpoint-ORIG-GUID: yt7qM2jlPop4QLnV_4LtC629Z7ugSIKa
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA5MDA3MyBTYWx0ZWRfX5oiFUEJiN7Jb
- 3Gvz/vV+KPlf1Xhh4me24nENB8c26ygWvxBIFXwy9lzcxjqY/4VQ7pZzdi9+WlhD8BZ8JygymWw
- JFxx8DvMMHJuwDlEjKv5vAMipYmSKTkyRlKkj+KTAxoQz9NKbI0ros1e84tVCRB8ZNTcRbIghWH
- v60qUoIITQAjMloCpz4RQ9PCgEUXN11gOQQ4BiDO0pLxmn6bDjTT0Wpep8JxnRBIG5RLSQ+Xbpm
- 6JcXS1g0F1ellHM0c6ruSMEMBnsJqB/5hiQTWv8EUqBDCjWLd/0WHVHhGDXvdnZrVSqm+z4TfhC
- mG9lZDo8M/scdKZrGkqWzvwu0uKTY/ae0Zgi8QicJcxVoQt7t7HXJ52kUz1g4poSZ8aK7X+6olO
- 30BZVaIycYf0Cb43fnYNLRrvPAnWwzz1DYrveep/we6+6HmPREuYPH+enFnnfuu9/fvKfoMnbge
- RRdm2mCJc4qixxSlaSA==
-X-Proofpoint-GUID: yt7qM2jlPop4QLnV_4LtC629Z7ugSIKa
-X-Authority-Analysis: v=2.4 cv=LoqiDHdc c=1 sm=1 tr=0 ts=6a27c66c cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+X-Proofpoint-GUID: AVNy4ukHt-tXweGRPQSSq0IaOyS7yrIx
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA5MDA3MyBTYWx0ZWRfX1Ef6bCOqA8Go
+ LI5WEwcaFh1gLcSnjzYu1dbB8HNy0hVHPo7atOgLZnLnLwOz5iYoM53RNVU5SqjAVyvZT5Ta35V
+ xsEc0s0IpYNppjzYXVA+Y1XdJ1nRgw+6QuczDbAGe8p1GnWBMJNenvCJC6FH3+9EuI7KPh8zUV4
+ 0ML5CYvnYJ6lcrpmeonxIzMU0qrMQ2tjhqipjY3cBpRoJJQ22XqYX28klqdi+hRn/2deNI20p9w
+ V0IZDStYRfg7Fucv9WSYKtEhe1YkBvgM7Up6mhDvqRdA3JHrYWeStWPIPY8REyDVALIMkSFJWr8
+ /cYlmue167Iz4J0L/0xMuiIULxdkFIBctFjavePc5jFbW7xFgbU1YZt9qrdKvR0l3DczokecarO
+ 990eqcItBA8MUSZO+O0oJAAD5vE+1D9oe3jc45+UdOwYrw9wSjqKhIgyAF8ZjmS/wVkkV8wq0Wi
+ cIgoIHwP0tjNB4GAScw==
+X-Authority-Analysis: v=2.4 cv=NKPlPU6g c=1 sm=1 tr=0 ts=6a27c66f cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=9i5gzfhGLSn5NVSMExYA:9 a=QEXdDO2ut3YA:10
- a=kacYvNCVWA4VmyqE58fU:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22 a=EUspDBNiAAAA:8
+ a=M8sXMW5dAYDte-7YvdsA:9 a=QEXdDO2ut3YA:10 a=1HOtulTD9v-eNWfpl4qZ:22
+X-Proofpoint-ORIG-GUID: AVNy4ukHt-tXweGRPQSSq0IaOyS7yrIx
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
  definitions=2026-06-09_01,2026-06-09_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 spamscore=0 bulkscore=0 phishscore=0 impostorscore=0
- adultscore=0 suspectscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
+ bulkscore=0 adultscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1015 impostorscore=0 malwarescore=0 phishscore=0 suspectscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606090073
 
-Add support for an nvmem-layout subnode under an eMMC hardware
-partition. This allows the partition to be exposed as an NVMEM
-provider and its internal layout to be described. For example,
-an eMMC boot partition can be used to store device-specific
-information such as a WiFi MAC address.
+Document the NVMEM cells supported by the ath10k driver, the
+mac-address, pre-calibration data, and calibration data.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 ---
- .../devicetree/bindings/mmc/mmc-card.yaml          | 29 ++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ .../devicetree/bindings/net/wireless/qcom,ath10k.yaml    | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-index a61d6c96df759102f9c1fbfd548b026a77921cae..ca907ad73095925b234b119948f94ae81e698c86 100644
---- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-+++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-@@ -40,6 +40,9 @@ patternProperties:
-         contains:
-           const: fixed-partitions
+diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+index c21d66c7cd558ab792524be9afec8b79272d1c87..7391df5e7071e626af4c64b9919d48c41ac09f1e 100644
+--- a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+@@ -92,6 +92,22 @@ properties:
  
-+      nvmem-layout:
-+        $ref: /schemas/nvmem/layouts/nvmem-layout.yaml
-+
- required:
-   - compatible
-   - reg
-@@ -86,6 +89,32 @@ examples:
-                     read-only;
-                 };
-             };
-+
-+            partitions-boot2 {
-+                compatible = "fixed-partitions";
-+
-+                #address-cells = <1>;
-+                #size-cells = <1>;
-+
-+                nvmem-layout {
-+                    compatible = "fixed-layout";
-+
-+                    #address-cells = <1>;
-+                    #size-cells = <1>;
-+
-+                    mac-addr@4400 {
-+                        compatible = "mac-base";
-+                        reg = <0x4400 0x6>;
-+                        #nvmem-cell-cells = <1>;
-+                    };
-+
-+                    bd-addr@5400 {
-+                        compatible = "mac-base";
-+                        reg = <0x5400 0x6>;
-+                        #nvmem-cell-cells = <1>;
-+                    };
-+                };
-+            };
-         };
-     };
+   ieee80211-freq-limit: true
  
++  nvmem-cells:
++    minItems: 1
++    maxItems: 3
++    description: |
++      References to nvmem cells for MAC address and/or calibration data.
++      Supported cell names are mac-address, calibration, and pre-calibration.
++
++  nvmem-cell-names:
++    minItems: 1
++    maxItems: 3
++    items:
++      enum:
++        - mac-address
++        - calibration
++        - pre-calibration
++
+   qcom,calibration-data:
+     $ref: /schemas/types.yaml#/definitions/uint8-array
+     description:
 
 -- 
 2.34.1
