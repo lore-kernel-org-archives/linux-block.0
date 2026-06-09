@@ -1,32 +1,32 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E7C24BD03
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C490430DD1D
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780986517; cv=none; b=D5jxG7fkiwgBT/GWGENklYFVPnsy975qU1+pQlDM4sh8YGS72yfic6MfTF4MZWYdQ40KiKUbF3L+OwuIFe6ngiuJIeRo31F117dxq77w4yWfP2uUzktX+dbPl6JoGKkHeTCZdjp1DI4Hv/DR81wJBnP5SUpsZJX1Rf5T/JJGyAQ=
+	t=1780987225; cv=none; b=VtBmve0+y3f8SWtpL9FHtS9ck3DDE8FmhkZG/8U75tIkm1Z319uItwN/IogO8Akqae0d9kBWT7LvueILIUFCVFDvG0VQH/tY0JpOMYy0G8KeR36/xwMOyIoVY462uO8sjgKCBrPgZ1I+3fHqRd/W+499yRBz3X4bK8b2VC8TE8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780986517; c=relaxed/simple;
-	bh=oASuS6HeDtW7L0Fbwip/A1ymE47X5Ahh2FGn+UQEDRI=;
+	s=arc-20240116; t=1780987225; c=relaxed/simple;
+	bh=aPBObOBjR5NY12msqDbuE4tGfumhN0y2b25ZxwPjOYk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E5gpBgNwWH03kP/lPN1IJnvS99qoBkM2Owzc4GO4g9vADukf8oHASqaLfGrPY1inl2To6bAmEF2Rnte6tLpmo6cfOV0aAAfd7uXLigrbrcH3viwef2fTXMCm6ilVEYTuUiqZqBX/h10U+LsEdIEU8kQh9wNv1OOrY58Nyoi5Fvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CpXqR0D8; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=LuVCvFlmlR7rghovVoPqLjUO1yBxp06l13DcaFudd3CkUB7Gs9f3p2x8SoSC9fgogh2eOqTz90TYl+zPYvWPyBdbC7hnklgXgXbnGxJLg6xIJNr2hqVGusWDpuRvlkoz9t/ZbWPR0AdMh1sngrwv+H1J/Hrud3GTdqGWfgjqI70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=id+QT9X5; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CpXqR0D8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="id+QT9X5"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780986514;
+	t=1780987210;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=smwcSwpSx3877vgkJVhF1DUcaQotbwHyv2wtpxTd7yQ=;
-	b=CpXqR0D8sDUMklAOU53IFxyjHsOAHr7bre1RxmD/ICXb8vVnoTPwyiQ7PJllPlM2do2vji
-	CZWIYF0tP4l5AIedEPdZwtoflwzjSpnKrsJsyiN0Col7fpwtC3VkX3UiTLeELwoG0QQZ8s
-	IRkZWlzKv1ScExqwZEUL82ocOW2B5Z0=
+	bh=wTuZ/rb+QfWcokK7LysZCAzYrY5sRqAUnm+1GENZ4ls=;
+	b=id+QT9X5+V/ynpRARTKrkCjC0XHu1v1kNLdaLcMXaAcfcSS0RYW9FtMHL4Fw7sKHZNZ3EJ
+	7kQ2nBRANwBC5bdENNCHV6lwZSTUBbqq8sLkaPOj9spm0sgjf1Cj1DxI8wPaCHIVt3GtJ7
+	Oomyi8z2WwWQWTLvMyF263FMUy80nX8=
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Muchun Song <muchun.song@linux.dev>,
@@ -91,12 +91,11 @@ Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
 	Luca Ceresoli <luca.ceresoli@bootlin.com>,
 	Kaitao Cheng <kaitao.cheng@linux.dev>,
 	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v2 09/14] spi: stm32-qspi: Open-code message transfer walk
-Date: Tue,  9 Jun 2026 14:25:21 +0800
-Message-ID: <20260609062526.94907-7-kaitao.cheng@linux.dev>
-In-Reply-To: <20260609062526.94907-1-kaitao.cheng@linux.dev>
+Subject: [PATCH v2 10/14] spi: tegra210-quad: Open-code message transfer walk
+Date: Tue,  9 Jun 2026 14:38:51 +0800
+Message-ID: <20260609063855.95710-1-kaitao.cheng@linux.dev>
+In-Reply-To: <20260609061347.93688-1-kaitao.cheng@linux.dev>
 References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <20260609062526.94907-1-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -109,7 +108,7 @@ X-Migadu-Flow: FLOW_OUT
 From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
 A later change will make list_for_each_entry() cache the next element
-before entering the loop body. stm32_qspi_transfer_one_message() can
+before entering the loop body. tegra_qspi_non_combined_seq_xfer() can
 consume the following transfer as part of the current operation and then
 advance the loop cursor to that entry.
 
@@ -120,25 +119,24 @@ update.
 
 Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
 ---
- drivers/spi/spi-stm32-qspi.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/spi/spi-tegra210-quad.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/spi/spi-stm32-qspi.c b/drivers/spi/spi-stm32-qspi.c
-index df1bbacec90a..27d82a578c9f 100644
---- a/drivers/spi/spi-stm32-qspi.c
-+++ b/drivers/spi/spi-stm32-qspi.c
-@@ -577,7 +577,10 @@ static int stm32_qspi_transfer_one_message(struct spi_controller *ctrl,
- 
- 	gpiod_set_value_cansleep(spi_get_csgpiod(spi, 0), true);
- 
+diff --git a/drivers/spi/spi-tegra210-quad.c b/drivers/spi/spi-tegra210-quad.c
+index db28dd556484..42dd5cf53c67 100644
+--- a/drivers/spi/spi-tegra210-quad.c
++++ b/drivers/spi/spi-tegra210-quad.c
+@@ -1302,7 +1302,9 @@ static int tegra_qspi_non_combined_seq_xfer(struct tegra_qspi *tqspi,
+ 	if (tqspi->soc_data->supports_tpm)
+ 		val &= ~QSPI_TPM_WAIT_POLL_EN;
+ 	tegra_qspi_writel(tqspi, val, QSPI_GLOBAL_CONFIG);
 -	list_for_each_entry(transfer, &msg->transfers, transfer_list) {
-+	for (transfer = list_first_entry(&msg->transfers,
-+					 typeof(*transfer), transfer_list);
++	for (transfer = list_first_entry(&msg->transfers, typeof(*transfer), transfer_list);
 +	     !list_entry_is_head(transfer, &msg->transfers, transfer_list);
 +	     transfer = list_next_entry(transfer, transfer_list)) {
+ 		struct spi_transfer *xfer = transfer;
  		u8 dummy_bytes = 0;
- 
- 		memset(&op, 0, sizeof(op));
+ 		u32 cmd1;
 -- 
 2.43.0
 
