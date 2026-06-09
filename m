@@ -1,77 +1,74 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B863446C0
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 16:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D6A37AA7D
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 16:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781020938; cv=none; b=OFIEu3GKlWg80d1wKHhsLlk4zXBcmvjCSq/lmVaD8/4ClHa7YDrFxNeoH6dQO1XBwWb+++Qs0OJemT/v8mYXKPMjuvbJS2LXcRQBqoJstaiyUVPoJxuw9CPYSMoE3oW2w+3KZhu1Obe8vm8EQU9C7U75QfusCQtkO/5JBV/TDVo=
+	t=1781021594; cv=none; b=AwWgd+yTrm9zZomn+dUHQYJo98rLUEgPbllIFAvlNbuBJAmQkKvKEWxLszKmsTsdtPorJp6EiZCdD+jCGeU9qMwlWjV4Sg3RlR3dujSqjKez8Azteserpb/E6OESUi9OC+jofRlf9Uw7n+CyRdhcHUGBPN2QDgd8UV2a3xVHJwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781020938; c=relaxed/simple;
-	bh=yxr+nqFvE05ybrHpLzEUCDLnrFxx9XA8szYp/Y/bI/4=;
+	s=arc-20240116; t=1781021594; c=relaxed/simple;
+	bh=vpW5PJghEiTw9Pq+RXKf8lkYnuoR+8+PrYc9Ipivzmo=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=EaJBM+pCAEsQVO2LdIQavLeTECFU2sojYx3QA2eIRFn9j8o9bPlWfdCUa4z5C+SpxDsCG99mbxsBGON6cnefG/6AdTuMl12Y8Xmp/ahoxLenBO0keAWSeJiTdpUGuRJLOPEAg9NgvfAjM5nbPyu7zjyIMnPOeXxi1F8u7OldFeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=U+aYV/rx; arc=none smtp.client-ip=209.85.160.45
+	 MIME-Version:Content-Type; b=UgqCk5MdKzXRKTevmRU7Z/5V579os01s2NR4xhDySVY4TQ3u35qrWJv1TIVbY6yctdU8k8l9z5hq98jkOy9rUpihcnm5QvyN6U/wt2Ja5MP8oeb3y9Ex8u13zzmNsBosz1qYbDg4gpHLynOlZU83OG5FH4j1F9wQqar1XDMcr6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=r2GGU0Vx; arc=none smtp.client-ip=209.85.161.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="U+aYV/rx"
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-43d23173511so3803338fac.0
-        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 09:02:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="r2GGU0Vx"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-69e9b037d82so1436044eaf.2
+        for <linux-block@vger.kernel.org>; Tue, 09 Jun 2026 09:13:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781020936; x=1781625736; darn=vger.kernel.org;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1781021591; x=1781626391; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Wne9u11eEr8I97omWkO8Al7ip6I2l2rLAsMnhcuURVw=;
-        b=U+aYV/rxDkGbuo9EyZTAJDFYC8OfmJI1H9yJCcvqpYs1mYXmiEo4lTq2qIZmbtSaCI
-         ReIkWmrSiqqQCLtBzkBGPIQHf6hKwoxfHcZh+B0iNM6v9D6AzxVZBHR3VsmVTTR1uGy0
-         mZ1sYNKTunAuB2Og47+ayxrvIeEjLKO7ctmQ7a7vDsYASXM2rdOwpoxr9/Kkn66bUjGe
-         bW7zUFOTnK1iS0NuwkQBsNA1TEQLTwNeZTWx9+rf0gEviT9+UxiKv4rCckNjghNK/R94
-         NAUBvy78gzijI1LnrzsfmVqZq5otJBtyBX4krjGAB5T1dtG2jxBRxLxFi91ppFBLEJQT
-         KeRA==
+        bh=qBWfZ1CbWmvzC+YOoCRLdxmgdDxI9buGTpdr6VHXZm8=;
+        b=r2GGU0VxD6sgZ/MJXEE/1KL0ekEeJtleHxZXNzsHIEeM5a7nwSDfbXT4ZyzYKcHDjC
+         11gfAuTPGqzLwPdn/RkB/cL8itIBqEDQCrU7PkBmF2VJ0dKXM2a1EHNDp0mtE/Mo7fpJ
+         fXCa4wEOh4AN8vJvQyMa5vn4mT3KSfrddBPUmkle4GKRHzWuoHFcyuWJ2vjglCvAebC8
+         XJYsP4+cxVSbmWXVPXM/J5Mh5qHZ8rvVaHx8Lu8uZUyH8CZDVWlPCHfL2PdXh4yx00jY
+         xa1/TeSi1vTDeP5cFR85FHOLcn3B5fuaz/PMtzL+PSX0LdKkoW7sXbeIlN4hT3UnAtFi
+         LcFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781020936; x=1781625736;
+        d=1e100.net; s=20251104; t=1781021591; x=1781626391;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Wne9u11eEr8I97omWkO8Al7ip6I2l2rLAsMnhcuURVw=;
-        b=g1c5t9cfFIoj3TZolT9WNs7hAu8acxT1l58ZoNiJkfTfqGvSMbPyKTzlrc20iYM5d/
-         E8CLt8dnRRQ2JZOWhPTtZ+mmsQOlI3YFAezsgo2kGhKK9bJGZOPIIApQAd5MgHSuJchp
-         NUf9/LjRGfTQwRfIp4yaqKLDGTEke858bWywtFI9sle5uOjFn3WlGdTX0E6j5nFM0ZSX
-         gegf7gebTBCE4uXeBPjGGeVBbU854XMGHUdDdrImXW1KEueFMNQ/+NSt/uoeNQ7tFFH/
-         qi6EkPhxgqtkh7L3WFNUWoQ2+CMAMH8RlF145/z+FphTzHyEr5pn136wjkXMpdZNWV3E
-         W1OQ==
-X-Forwarded-Encrypted: i=1; AFNElJ9J4P7NfEPprGR9aRyn5CdKZnIg+Grt0XuLwZodlEkXYtMM18qLpoXwoCAMyHGb8JY5r0y6I5XXxS82jQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXRhmwv5O4OydRsqC+BWOFpPtlDSyfGBOjledw3HRRWLy8FB7X
-	8aiw1LU9xdkEApPhwqFTtlhT5MiN+HIXP6L3Dm2yBG0ICydjEncgVZb6kO78Yw/BrLQ+kh/yHRg
-	oCDj5
-X-Gm-Gg: Acq92OEqGbf2cXHlJi7j9C4PtnDUR/ktEcqXd7WANvw4S4BsZr8RMVc9K2GTiJ8yevC
-	QSlUULUOrinM8bTk3rbjTi9fGPYj2F9Z7USbqcDOWnvcu4hxZ0TZp/I7RLihVvB0k1A8lK3Safv
-	lCcGcq5HBz5V+rAC8hS0966pjaKez2gb196K6n61HTIPcwiPDgV0Bnvt/QC/MzBdKz4JFWrJ+xb
-	3PmIx3BrrAQe7Ry2nk9WkNg8rtA47qfOkgM0lkr8JIncBmhqMYdK31BkAVMGg8DKv6cjW2U+Jqv
-	by7Lnx0BnIxQo2mzSCj1YoBDQDxEaudZdpHqSJne3GzBZSMDbZgHBJDWKrnjCYOXDH3m9TS73fI
-	mVfIsKxaJ7aZCHRY+1qsbNC3hdRrInm0YKodg4JqSuvmHU+ZlTFwBOSZgSLvYYcMsddTzEjd8KO
-	G8mxjTaYB6iUQRTdDaUhcO3j4x1f+vz7963onXEzjgq8DkVEAAp8grcgt9+lkf3g1QC9WJW30EC
-	09bOo1UIvU6Og==
-X-Received: by 2002:a05:6870:d8c6:b0:439:c2da:7dd2 with SMTP id 586e51a60fabf-441ed982165mr2157518fac.31.1781020933776;
-        Tue, 09 Jun 2026 09:02:13 -0700 (PDT)
+        bh=qBWfZ1CbWmvzC+YOoCRLdxmgdDxI9buGTpdr6VHXZm8=;
+        b=h5F8i9t3Joh6MorbANJZFtVvOgVY+f9DdiZPYy0Syy6LyZEHltoPYu7m+jqMPZq0WB
+         2dGWvGCtkn7LtL1PURke3PG8XyW0FjL+VQKrKh4KrKQf5gg0hIUeMCfQRa6E66ScPCAe
+         D3f/sC9vsWgcIVbRh4IE9FpuV2H7uwWjRVBoYVi9sLaXVsiMjVVCCCBOVtIjBcwYzjrv
+         YKV7iFQnNftwPVHjwMkN/9yzlTh8e1QuzR7vTDRJxQT3TaKqeLyfGt/AlIcRpPPDczc0
+         KQT8CegjLUXfs8OBCiRhzS9lHAo1QUMfl47RAR0U6LX/2CjK4DcjrjhU22aE1caDaT+K
+         3mZQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/rO8uusLs4XtCjOHX5gkuRXu2+7Ws+iFYe5miDpTP1O6pFwc4XCNlQahF0n78NDX83vGNaMWNgz0c39A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJmPLAWS3w/XxQP0lUeotcCr0XnZq0ELvTZSB1aMjjVAM7RBvJ
+	1w+T61WuH8lTxHYiVuFLNJrWVDbeajGymh3GiXy9EQ+qFAOEPDM9XwcfFXH/xmIOY10=
+X-Gm-Gg: Acq92OFlx0xTuswldbCvNHUGxyXOE9c0fd46sEdUaSJ0zQW0CIdBvSzhSAvc26jZyuT
+	3//Otj9m4xYfC2fPCs3X51jEKxqFP9xjzlSuYU9dcgrMM0iK1g7mg4LgScj961+lgJyLjic0WFY
+	gY2r4WwAgPrYsL+O2+SLtfbCo5WiKEZMYzRbL7Hix15MH48w8JDG1MHpyAJ9R4sO6dxfckqeQbI
+	KnYa2CdSvGu36DJOD/FC2y8UwdklsrmtxDn/c40+DRPlPnsG1JGzyUv7gHELs7FH03vgrkvQlk0
+	Lb892/S96DOfpdwcBv+GxFtsytHeJIjYVjxZ+CyCiHG7co/22+G68pxTxZPuWpTQ2cDehrbU8El
+	LMIhoubMycZQK6dsaIbrXJG78u1k3aOYeX+NYDNmOidjIei1lbt+SRki2HvzOZPTzqG2fI+Uj6M
+	Zb4pKpTLw50AWjTQxpcdio2+efUd6wphOVFE1jek/aCbMCMYq/WpR+4RXQQEIJ4Nw/3EZ0Kf/p3
+	UEhR906ZCHJow==
+X-Received: by 2002:a05:6820:3084:b0:69e:461a:d845 with SMTP id 006d021491bc7-69eac8dab29mr2316673eaf.21.1781021591613;
+        Tue, 09 Jun 2026 09:13:11 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-440d8465e00sm16161761fac.15.2026.06.09.09.02.12
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-440d8295aaasm19044837fac.9.2026.06.09.09.13.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2026 09:02:13 -0700 (PDT)
+        Tue, 09 Jun 2026 09:13:10 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: "Michael S . Tsirkin" <mst@redhat.com>, 
- Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
- Michael Bommarito <michael.bommarito@gmail.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260607124834.3059944-1-michael.bommarito@gmail.com>
-References: <20260607124834.3059944-1-michael.bommarito@gmail.com>
-Subject: Re: [PATCH v2] virtio-blk: clamp zone report to the report buffer
- capacity
-Message-Id: <178102093279.1199099.8171367690352183837.b4-ty@b4>
-Date: Tue, 09 Jun 2026 10:02:12 -0600
+To: hch@lst.de, kbusch@kernel.org, Tang Yizhou <yizhou.tang@shopee.com>
+Cc: yukuai@fnnas.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Leon Hwang <leon.huangfu@shopee.com>
+In-Reply-To: <20260526021555.359500-1-yizhou.tang@shopee.com>
+References: <20260526021555.359500-1-yizhou.tang@shopee.com>
+Subject: Re: [PATCH v7] block: propagate in_flight to whole disk on
+ partition I/O
+Message-Id: <178102158990.1202168.3633326270232612056.b4-ty@b4>
+Date: Tue, 09 Jun 2026 10:13:09 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,26 +76,27 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Mailer: b4 0.15.2
 
 
-On Sun, 07 Jun 2026 08:48:34 -0400, Michael Bommarito wrote:
-> virtblk_report_zones() trusts the device-reported number of zones when
-> walking the report buffer:
+On Tue, 26 May 2026 10:15:55 +0800, Tang Yizhou wrote:
+> Now when I/O is submitted to a partition, the per-CPU in_flight[]
+> counter is incremented only on the partition's block_device, not on the
+> underlying whole disk. This leads to a problem which can be shown by a
+> fio test:
 > 
-> 	nz = min_t(u64, virtio64_to_cpu(vblk->vdev, report->nr_zones),
-> 		   nr_zones);
-> 	...
-> 	for (i = 0; i < nz && zone_idx < nr_zones; i++) {
-> 		ret = virtblk_parse_zone(vblk, &report->zones[i], ...);
+> lsblk
+>   NAME     MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+>   mydev    252:1    0   20G  0 disk
+>   └─mydev1 259:0    0   10G  0 part
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] virtio-blk: clamp zone report to the report buffer capacity
-      commit: 0fd835f5e9477ebea2439b8ada58f34e1b8cf25a
+[1/1] block: propagate in_flight to whole disk on partition I/O
+      commit: 5bdb8ec58b54b0e86672ba1991087611c7e52de5
 
 Best regards,
 -- 
