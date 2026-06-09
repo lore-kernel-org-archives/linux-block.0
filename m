@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A5C3EB0F2;
-	Tue,  9 Jun 2026 19:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF6E4DD6C5;
+	Tue,  9 Jun 2026 19:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032331; cv=none; b=oCPE8ePgDmp1bSDpRAZDDwUeUrVxg5Pi6iWHB7E1muZaxU94nE0dUBQeuHu9RV8qz7fp7zaKMJfurI0LdtDApeV18nOgvszM1F5sZruuiRg4wErw6NsPWOjJABbd4KjL1oasgTVQkdTSr/h2SG+A04AG3Nw5o3z3m458aTuq9I8=
+	t=1781032336; cv=none; b=LEyUdp4RMpsjwi5BvlktVlDKlzNSErzBBTKEw0k3LYQuYv5fjTPcODk1L8RqUrQR8T8eO0lW79AdGP7BGfB55ZEAnT/zFPOqK/bgEZzesZv7yDjRD9egilGaUCQPbwU9YJHq4mcosS7M5yaC5GKzpt1eRjPnDNPgyZmm/98d49k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032331; c=relaxed/simple;
-	bh=a+eWU5zLlvyoRr0+a9110st2xDfdKu1tkbHU0hHggYA=;
+	s=arc-20240116; t=1781032336; c=relaxed/simple;
+	bh=cGlJTpA6F6McVlRWYLS3sRK+tr1wvcKBW9jQZlkWj+Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RD1AXBf+ZQa8tR8Ek3PGkS6wtaSb+2KvqK+eiudKAQ8fSH6LOCvmKxA6Z3uo+q3YMhcADqUpPAGMry3Az/tmo86hYumBLix74cfcfdCyTImOG8wXrCY9NlNl6uQEtKg7B+fDk2jr8yd6DjSi1p09raqXPhDg2ijSh1sTeOIxiUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzjF7g8h; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=C3pcL2wtLKDkoqaa4A/ZBPRb/XvqQFqKIIJr1b462qLxfM1UoSyD8NaSdzpczOcePn7DJIyCp8jD3Ss5T1OlrQjey/CFaL0NLWrEBKtADBfXhIm+ovV+10WfgwlvgT/A+Ba+tTJK8NVT7NnTIhukGUijOe2nq/e+q1YVBDub9g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYqk0bMX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzjF7g8h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02C511F00898;
-	Tue,  9 Jun 2026 19:12:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYqk0bMX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 691CD1F00893;
+	Tue,  9 Jun 2026 19:12:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032329;
-	bh=nqc86KcUVxZTdVaOG+SDVXI6QBFEXbnIR9/IB4zof7s=;
+	s=k20260515; t=1781032335;
+	bh=a3jbJNIkhOwxGOU8DfYtnfANfNVtK2eFGYBWmXLcybk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=fzjF7g8hqCBIQqu0hkw28HiFPgTi6wEP/2SThQdUdkG8bwJ+e2esJGkua58Bpc663
-	 eQ0mccMeWcLtwJ7jL4pVOHLXXsn6vcb1OUNRqKFIzDcH2spcjyO1xsZJuF6cts2xQ8
-	 KrKKa2oFJPy2LvVoAZaTqp8DSh75OjA70KiXf85Em3EPDyuZV4Zs/ozZLjIAmBRYMl
-	 0C7nznhMYSNT4GktfNZNw2+gXY4Wf17jndEkxQ9Y3YX2jdNQczeJ8EPM1y8wUiVn0L
-	 ynbpYZuDP4Ix83K5AQy7HzFSi52+FsYssztH7cNPf9qMW4BuGdlsEzz70YdrP4lRCs
-	 ye/y/XEvZcxdg==
+	b=NYqk0bMXBfzUx40NJEmhqEjCWQBmirujxeYo80SxHV6ohWkmH97SeEqumLNc7LQyZ
+	 dbp+zuf7GJroLJhHQj69de+gY7gADe9ctRVyXOn4H90BqAX8MFSZxsMoWFs3jY3UOX
+	 Poq2EMSX3lstrGtLG8lzXVIBH6ccWxPvMWoaLYGCLG4brPsT8jEGhpMGAUuL4N3V1T
+	 qpsExMA2wKtorI0q19REki41bI63shSxBDRzKFtkWvlyEfL5zDA5bLcC5prlbBNb4S
+	 zIaWeVCu+hhBhSRDz9KnLwandfGruIhCw45gX6Q+IVEw9YscNKiHPr7S34u3KTd9t+
+	 UjXvFYZShbjhA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:08:30 +0200
-Subject: [PATCH v2 51/83] block: rust: add zoned block device support
+Date: Tue, 09 Jun 2026 21:08:27 +0200
+Subject: [PATCH v2 48/83] block: rust: add an abstraction for
+ `bindings::req_op`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-51-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-48-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -58,313 +59,194 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10741;
- i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=a+eWU5zLlvyoRr0+a9110st2xDfdKu1tkbHU0hHggYA=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTiFZEVhsuDWxvjg8aek7snzhrQ8IDiU8X+K
- 3NI4zNl2h6JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk4gAKCRD6UCkIqsW9
- 0J14D/409i6f2gq2UFsEg83A5npLQ7XUUl/lMbAv8if9BRE1FRGBbo9zszd4Hb+sq7JUp3ytZE2
- +bRsL3nhWR+BC4X1Jsj/F4bETG/5o66JlOpSXSl8F8dBnLXhkbWqoiyzHMLOLFHV0+gIpQZrj9Q
- tnu41D7jOnya4/4lUw6dPK77WGB/HJcitwAUenDhsl75BBzipcnKpvneAEUsuEVxgkNC5Yr03HO
- 5yQ2lsdhbIGsOEbWWIosSwdCIuiKgARwiJfMWIALm3zYp6jXpA5TDQHaat7mxCPOR2U7t059CZY
- sgt8D8sy7onJF//G7N+N7eMRxra0zi0deRrasV1zQMLL9e4zbjLYBI91QDnA0TsDM7O3+dclNcd
- ziUPx5hMNIxNLnP/Sv8tzNJABzk9K8fJ9LaFmXzfhl9EZFOIheSTWDA+lOX1Udft8aexw1pBqvq
- x9RUemeiQfJhV5dqBD1OiX0Vc/t+q4zOXoYhsrBlTvo54OK4tPUt/35T+SdVjdr5iIleeu5YcBH
- ySyUbu+HIHCjmhCWLGVqAE27gnB/RJkjUcwSWVXsNMn64rt3nWNsp7AZ+8pG8rnkC15hyb47+0F
- PZ0qhAj8A0IDv2MmuicLy0lkD+d2XyBbpYqRkhiyf/bAjRTP+F9UZ8klhY4bGWAJLLtsu8l0Zju
- TtfAW7rKnkP+klQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6975; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=cGlJTpA6F6McVlRWYLS3sRK+tr1wvcKBW9jQZlkWj+Q=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTgxZOVEJMK7I40lvqteErFqI2DYzSNcD5mb
+ 96fFobyPEqJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk4AAKCRD6UCkIqsW9
+ 0AcoEACvXt+Fpn1SP/zeWsAm6kzE6hADdYR61zFif7WrXX2R8MnVpdfi44Qm1pQX+NC8/NrD51P
+ iL6dJThG+xn7f327yeKNTKSCjQ5Z4VDpFWft3dFT3LuuOG+d71+vhEQduwMJPsicGf7D/uchYXa
+ 832XLg5qdGT/7yZWn9VmuabH1J54pYc5T47AOXypstsyyXW25mNE53JWmegX8zsPET3dkW9tGiQ
+ HBCvk2qLSnvzgU0L5ms4SwMiq46GRHjkZJKDq5hPPLNy4M2l9085b53eYe+cyTWJIssY17OctLM
+ grWIcE7baIw7oE0EJ3sk2RNRvNJ2e/eZi5ECOISb7Fk5r2OMoUJpVSdmo5cJeuESQ++Lu0gQDro
+ NfSkpM6Ltj3lwMgw/OuEd34FJtzaM/eYk3qXtLS1VWvft0mp4r31kcU/3bIKzkz3Vyfp9D2ilpw
+ XR2ljhF0TCR+sBwU5oRtGEnDSVdjSbTdFgBcURfXEjJiryySP5BxbXU/M0lhxRyrD/KPAVOSu7T
+ Y7YYq5PSBKuBFlGYF6T0jguUcHFINNQ4hpP2Hsbr4yoUN78SjWzWtzk7uROW3CXkn+y3avJiy1/
+ bJXaDSAcnSJOXt4r9MFq9d8zdiCh57OAgpIA4GDUYnESFSqOyv5qO9JMwqAwVrQy5Izqiw1C+7j
+ V1uHlVY3vP7PZqg==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add support for zoned block devices to the Rust block layer bindings.
-This includes the `report_zones` callback in `Operations` and methods
-in `GenDiskBuilder` to configure zoned device parameters.
+Add the `Command` enum as a Rust abstraction for block request operation
+codes. The enum variants correspond to the C `REQ_OP_*` defines and
+include read, write, flush, discard, and zone management operations.
 
-Drivers can mark a disk as zoned and configure the zone size and
-maximum zone append size. The `report_zones` callback is invoked by
-the block layer to query zone information.
+Also add a `command()` method to `Request` to retrieve the operation
+code.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/bindings/bindings_helper.h    |  1 +
- rust/kernel/block/mq/gen_disk.rs   | 95 +++++++++++++++++++++++++++++++++-----
- rust/kernel/block/mq/operations.rs | 61 +++++++++++++++++++++++-
- 3 files changed, 145 insertions(+), 12 deletions(-)
+ drivers/block/rnull/rnull.rs            |  6 +--
+ rust/kernel/block/mq.rs                 |  1 +
+ rust/kernel/block/mq/request.rs         | 18 +++++----
+ rust/kernel/block/mq/request/command.rs | 65 +++++++++++++++++++++++++++++++++
+ 4 files changed, 79 insertions(+), 11 deletions(-)
 
-diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-index eaf05d60dda9..2a69c17bf271 100644
---- a/rust/bindings/bindings_helper.h
-+++ b/rust/bindings/bindings_helper.h
-@@ -139,6 +139,7 @@ const blk_status_t RUST_CONST_HELPER_BLK_STS_ZONE_ACTIVE_RESOURCE = BLK_STS_ZONE
- const blk_status_t RUST_CONST_HELPER_BLK_STS_OFFLINE = BLK_STS_OFFLINE;
- const blk_status_t RUST_CONST_HELPER_BLK_STS_DURATION_LIMIT = BLK_STS_DURATION_LIMIT;
- const blk_status_t RUST_CONST_HELPER_BLK_STS_INVAL = BLK_STS_INVAL;
-+const blk_features_t RUST_CONST_HELPER_BLK_FEAT_ZONED = BLK_FEAT_ZONED;
- const fop_flags_t RUST_CONST_HELPER_FOP_UNSIGNED_OFFSET = FOP_UNSIGNED_OFFSET;
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 491979daa50e..5ec17a2674b7 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -547,10 +547,10 @@ fn transfer(
+                 let length_sectors_allowed = segment_length_sectors.min(max_remaining_sectors);
+                 segment.truncate(length_sectors_allowed << SECTOR_SHIFT);
+                 match command {
+-                    bindings::req_op_REQ_OP_WRITE => {
++                    mq::Command::Write => {
+                         self.write(&mut tree_guard, &mut hw_data_guard, sector, segment)?
+                     }
+-                    bindings::req_op_REQ_OP_READ => {
++                    mq::Command::Read => {
+                         self.read(&mut tree_guard, &mut hw_data_guard, sector, segment)?
+                     }
+                     _ => (),
+@@ -743,7 +743,7 @@ fn queue_rq(
  
- const xa_mark_t RUST_CONST_HELPER_XA_PRESENT = XA_PRESENT;
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 79a67b545eca..eedba691e167 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -8,6 +8,7 @@
- use crate::{
-     bindings,
-     block::mq::{
-+        operations::OperationsVTable,
-         Operations,
-         RequestQueue,
-         TagSet, //
-@@ -48,6 +49,12 @@ pub struct GenDiskBuilder<T> {
-     physical_block_size: u32,
-     capacity_sectors: u64,
-     max_hw_discard_sectors: u32,
-+    #[cfg(CONFIG_BLK_DEV_ZONED)]
-+    zoned: bool,
-+    #[cfg(CONFIG_BLK_DEV_ZONED)]
-+    zone_size_sectors: u32,
-+    #[cfg(CONFIG_BLK_DEV_ZONED)]
-+    zone_append_max_sectors: u32,
-     _p: PhantomData<T>,
- }
+         if this.memory_backed {
+             memalloc_scope!(let _noio: NoIo);
+-            if rq.command() == bindings::req_op_REQ_OP_DISCARD {
++            if rq.command() == mq::Command::Discard {
+                 this.discard(&hw_data, rq.sector(), sectors)?;
+             } else {
+                 this.transfer(&hw_data, &mut rq, sectors)?;
+diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+index 503623267b19..5bf2cf2736a5 100644
+--- a/rust/kernel/block/mq.rs
++++ b/rust/kernel/block/mq.rs
+@@ -132,6 +132,7 @@
  
-@@ -59,6 +66,12 @@ fn default() -> Self {
-             physical_block_size: bindings::PAGE_SIZE as u32,
-             capacity_sectors: 0,
-             max_hw_discard_sectors: 0,
-+            #[cfg(CONFIG_BLK_DEV_ZONED)]
-+            zoned: false,
-+            #[cfg(CONFIG_BLK_DEV_ZONED)]
-+            zone_size_sectors: 0,
-+            #[cfg(CONFIG_BLK_DEV_ZONED)]
-+            zone_append_max_sectors: 0,
-             _p: PhantomData,
-         }
+ pub use operations::Operations;
+ pub use request::{
++    Command,
+     IdleRequest,
+     Request,
+     RequestTimerHandle, //
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index a05df2351c2c..63e248970ab1 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -45,6 +45,9 @@
+     BioIterator, //
+ };
+ 
++mod command;
++pub use command::Command;
++
+ /// A [`Request`] that a driver has not yet begun to process.
+ ///
+ /// A driver can convert an `IdleRequest` to a [`Request`] by calling [`IdleRequest::start`].
+@@ -111,11 +114,17 @@ fn deref(&self) -> &Self::Target {
+ 
+ impl<T: Operations> RequestInner<T> {
+     /// Get the command identifier for the request
+-    pub fn command(&self) -> u32 {
++    fn command_raw(&self) -> u32 {
+         // SAFETY: By C API contract and type invariant, `cmd_flags` is valid for read
+         unsafe { (*self.0.get()).cmd_flags & ((1 << bindings::REQ_OP_BITS) - 1) }
      }
-@@ -130,6 +143,27 @@ pub fn max_hw_discard_sectors(mut self, max_hw_discard_sectors: u32) -> Self {
-         self
+ 
++    /// Get the command of this request.
++    pub fn command(&self) -> Command {
++        // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
++        unsafe { Command::from_raw(self.command_raw()) }
++    }
++
+     /// Get the target sector for the request.
+     #[inline(always)]
+     pub fn sector(&self) -> u64 {
+@@ -242,13 +251,6 @@ pub(crate) unsafe fn aref_from_raw(ptr: *mut bindings::request) -> ARef<Self> {
+         unsafe { ARef::from_raw(NonNull::new_unchecked(ptr.cast())) }
      }
  
-+    /// Mark this device as a zoned block device.
-+    #[cfg(CONFIG_BLK_DEV_ZONED)]
-+    pub fn zoned(mut self, enable: bool) -> Self {
-+        self.zoned = enable;
-+        self
-+    }
-+
-+    /// Set the zone size of this block device.
-+    #[cfg(CONFIG_BLK_DEV_ZONED)]
-+    pub fn zone_size(mut self, sectors: u32) -> Self {
-+        self.zone_size_sectors = sectors;
-+        self
-+    }
-+
-+    /// Set the max zone append size for this block device.
-+    #[cfg(CONFIG_BLK_DEV_ZONED)]
-+    pub fn zone_append_max(mut self, sectors: u32) -> Self {
-+        self.zone_append_max_sectors = sectors;
-+        self
-+    }
-+
-     /// Build a new `GenDisk` and add it to the VFS.
-     pub fn build(
-         self,
-@@ -149,7 +183,18 @@ pub fn build(
-         lim.physical_block_size = self.physical_block_size;
-         lim.max_hw_discard_sectors = self.max_hw_discard_sectors;
-         if self.rotational {
--            lim.features = bindings::BLK_FEAT_ROTATIONAL;
-+            lim.features |= bindings::BLK_FEAT_ROTATIONAL;
-+        }
-+
-+        #[cfg(CONFIG_BLK_DEV_ZONED)]
-+        if self.zoned {
-+            if !T::HAS_REPORT_ZONES {
-+                return Err(error::code::EINVAL);
-+            }
-+
-+            lim.features |= bindings::BLK_FEAT_ZONED;
-+            lim.chunk_sectors = self.zone_size_sectors;
-+            lim.max_hw_zone_append_sectors = self.zone_append_max_sectors;
-         }
- 
-         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
-@@ -179,14 +224,6 @@ pub fn build(
-         // operation, so we will not race.
-         unsafe { bindings::set_capacity(gendisk, self.capacity_sectors) };
- 
--        crate::error::to_result(
--            // SAFETY: `gendisk` points to a valid and initialized instance of
--            // `struct gendisk`.
--            unsafe {
--                bindings::device_add_disk(core::ptr::null_mut(), gendisk, core::ptr::null_mut())
--            },
--        )?;
+-    /// Get the command identifier for the request
+-    pub fn command(&self) -> u32 {
+-        use core::ops::BitAnd;
+-        // SAFETY: By C API contract and type invariant, `cmd_flags` is valid for read
+-        unsafe { (*self.0 .0.get()).cmd_flags }.bitand((1u32 << bindings::REQ_OP_BITS) - 1)
+-    }
 -
-         recover_data.dismiss();
- 
-         // INVARIANT: `gendisk` was initialized above.
-@@ -214,7 +251,27 @@ pub fn build(
-             GFP_KERNEL,
-         )?;
- 
--        Ok(disk.into())
-+        let disk: Arc<_> = disk.into();
+     /// Complete the request by scheduling `Operations::complete` for
+     /// execution.
+     ///
+diff --git a/rust/kernel/block/mq/request/command.rs b/rust/kernel/block/mq/request/command.rs
+new file mode 100644
+index 000000000000..70a8d67fa35c
+--- /dev/null
++++ b/rust/kernel/block/mq/request/command.rs
+@@ -0,0 +1,65 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+        // SAFETY: `disk.gendisk` is valid for write as we initialized it above. We have exclusive
-+        // access.
-+        unsafe { (*disk.gendisk).private_data = Arc::as_ptr(&disk).cast_mut().cast() };
-+
-+        #[cfg(CONFIG_BLK_DEV_ZONED)]
-+        if self.zoned {
-+            // SAFETY: `disk.gendisk` is valid as we initialized it above. We have exclusive access.
-+            unsafe { bindings::blk_revalidate_disk_zones(gendisk) };
-+        }
-+
-+        crate::error::to_result(
-+            // SAFETY: `gendisk` points to a valid and initialized instance of
-+            // `struct gendisk`.
-+            unsafe {
-+                bindings::device_add_disk(core::ptr::null_mut(), gendisk, core::ptr::null_mut())
-+            },
-+        )?;
-+
-+        Ok(disk)
-     }
- 
-     const VTABLE: bindings::block_device_operations = bindings::block_device_operations {
-@@ -228,7 +285,11 @@ pub fn build(
-         getgeo: None,
-         set_read_only: None,
-         swap_slot_free_notify: None,
--        report_zones: None,
-+        report_zones: if T::HAS_REPORT_ZONES {
-+            Some(OperationsVTable::<T>::report_zones_callback)
-+        } else {
-+            None
-+        },
-         devnode: None,
-         alternative_gpt_sector: None,
-         get_unique_id: None,
-@@ -327,6 +388,18 @@ fn drop(&mut self) {
- /// `self.0` is valid for use as a reference.
- pub struct GenDiskRef<T: Operations>(NonNull<GenDisk<T>>);
- 
-+impl<T: Operations> GenDiskRef<T> {
-+    /// Create a `GenDiskRef` from a pointer to a `GenDisk`.
-+    ///
-+    /// # Safety
-+    ///
-+    /// `ptr` must be valid for use as a `GenDisk` reference for the lifetime of the returned
-+    /// `GenDiskRef`.
-+    pub(crate) unsafe fn from_ptr(ptr: NonNull<GenDisk<T>>) -> GenDiskRef<T> {
-+        Self(ptr)
-+    }
++/// Block I/O operation codes.
++///
++/// This is the Rust abstraction for the C [`enum req_op`].
++///
++/// Operations common to the bio and request structures. The kernel uses 8 bits
++/// for encoding the operation, and the remaining 24 bits for flags.
++///
++/// The least significant bit of the operation number indicates the data
++/// transfer direction:
++///
++/// - If the least significant bit is set, transfers are TO the device.
++/// - If the least significant bit is not set, transfers are FROM the device.
++///
++/// If an operation does not transfer data, the least significant bit has no
++/// meaning.
++///
++/// [`enum req_op`]: srctree/include/linux/blk_types.h
++#[derive(Copy, Clone, Debug, PartialEq, Eq)]
++#[repr(u32)]
++pub enum Command {
++    /// Read sectors from the device.
++    Read = bindings::req_op_REQ_OP_READ,
++    /// Write sectors to the device.
++    Write = bindings::req_op_REQ_OP_WRITE,
++    /// Flush the volatile write cache.
++    Flush = bindings::req_op_REQ_OP_FLUSH,
++    /// Discard sectors.
++    Discard = bindings::req_op_REQ_OP_DISCARD,
++    /// Securely erase sectors.
++    SecureErase = bindings::req_op_REQ_OP_SECURE_ERASE,
++    /// Write data at the current zone write pointer.
++    ZoneAppend = bindings::req_op_REQ_OP_ZONE_APPEND,
++    /// Write zeroes. This allows to implement zeroing for devices that don't use either discard
++    /// with a predictable zero pattern or WRITE SAME of zeroes.
++    WriteZeroes = bindings::req_op_REQ_OP_WRITE_ZEROES,
++    /// Open a zone.
++    ZoneOpen = bindings::req_op_REQ_OP_ZONE_OPEN,
++    /// Close a zone.
++    ZoneClose = bindings::req_op_REQ_OP_ZONE_CLOSE,
++    /// Transition a zone to full.
++    ZoneFinish = bindings::req_op_REQ_OP_ZONE_FINISH,
++    /// Reset a zone write pointer.
++    ZoneReset = bindings::req_op_REQ_OP_ZONE_RESET,
++    /// Reset all the zones present on the device.
++    ZoneResetAll = bindings::req_op_REQ_OP_ZONE_RESET_ALL,
++    /// Driver private request for data transfer to the driver.
++    DriverIn = bindings::req_op_REQ_OP_DRV_IN,
++    /// Driver private request for data transfer from the driver.
++    DriverOut = bindings::req_op_REQ_OP_DRV_OUT,
 +}
 +
- // SAFETY: It is safe to transfer ownership of `GenDiskRef` across thread boundaries.
- unsafe impl<T: Operations> Send for GenDiskRef<T> {}
- 
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index b9a2bf6592b3..71d4192d627f 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -9,6 +9,7 @@
-     block::{
-         error::BlkResult,
-         mq::{
-+            gen_disk::GenDiskRef,
-             request::RequestDataWrapper,
-             IdleRequest,
-             Request, //
-@@ -16,6 +17,7 @@
-     },
-     error::{
-         from_result,
-+        to_result,
-         Result, //
-     },
-     prelude::*,
-@@ -29,7 +31,10 @@
-         Owned, //
-     },
- };
--use core::marker::PhantomData;
-+use core::{
-+    marker::PhantomData,
-+    ptr::NonNull, //
-+};
- use pin_init::PinInit;
- 
- type ForeignBorrowed<'a, T> = <T as ForeignOwnable>::Borrowed<'a>;
-@@ -107,6 +112,20 @@ fn init_hctx(
-     fn poll(_hw_data: ForeignBorrowed<'_, Self::HwData>) -> bool {
-         build_error!(crate::error::VTABLE_DEFAULT_ERROR)
-     }
-+
-+    /// Called by the kernel to get a zone report from the driver.
-+    ///
-+    /// The driver must call `callback` once for each zone on `disk` and populate the first argument
-+    /// with a zone descriptor and the second argument when the zone index.
-+    // TODO: We cannot gate this on CONFIG_BLK_DEV_ZONED due to limitations of the `vtable` macro.
-+    fn report_zones(
-+        _disk: &GenDiskRef<Self>,
-+        _sector: u64,
-+        _nr_zones: u32,
-+        _callback: impl Fn(&bindings::blk_zone, u32) -> Result,
-+    ) -> Result<u32> {
-+        Err(ENOTSUPP)
-+    }
- }
- 
- /// A vtable for blk-mq to interact with a block device driver.
-@@ -359,6 +378,46 @@ impl<T: Operations> OperationsVTable<T> {
-         unsafe { core::ptr::drop_in_place(pdu) };
-     }
- 
-+    /// This function is a callback hook for the C kernel. A pointer to this function is
-+    /// installed in the `blk_mq_ops` vtable for the driver.
++impl Command {
++    /// Creates a [`Command`] from a raw `u32` value.
 +    ///
 +    /// # Safety
 +    ///
-+    /// - This function may only be called by blk-mq C infrastructure.
-+    /// - `disk_ptr` must be a pointer to a gendisk initialized by `GenDisk::build`.
-+    pub(crate) unsafe extern "C" fn report_zones_callback(
-+        disk_ptr: *mut bindings::gendisk,
-+        sector: u64,
-+        nr_zones: u32,
-+        args: *mut bindings::blk_report_zones_args,
-+    ) -> i32 {
-+        // SAFETY: As `disk_ptr` is a gendisk initialized by `GenDisk::build`, `private_data` is not
-+        // null.
-+        let disk_ref_ptr = unsafe { NonNull::new_unchecked((*disk_ptr).private_data.cast()) };
-+
-+        // SAFETY: `disk_ptr.private_data` is a pointer to the `GenDisk` owner of `disk_ptr` that we
-+        // installed when we initialized `disk_ptr`. It is valid for use as a reference for the
-+        // duration of this call.
-+        let disk = unsafe { GenDiskRef::from_ptr(disk_ref_ptr) };
-+
-+        from_result(|| {
-+            T::report_zones(&disk, sector, nr_zones, |zone, idx| -> Result {
-+                to_result(
-+                    // SAFETY: `disk_ptr` is valid by function safety requirements.
-+                    unsafe {
-+                        bindings::disk_report_zone(
-+                            disk_ptr,
-+                            core::ptr::from_ref(zone).cast_mut(),
-+                            idx,
-+                            args,
-+                        )
-+                    },
-+                )
-+            })
-+            .and_then(|v: u32| -> Result<_> { Ok(v.try_into()?) })
-+        })
++    /// The value must be a valid `req_op` operation code.
++    pub unsafe fn from_raw(value: u32) -> Self {
++        // SAFETY: The caller guarantees that the value is a valid operation
++        // code.
++        unsafe { core::mem::transmute(value) }
 +    }
-+
-     const VTABLE: bindings::blk_mq_ops = bindings::blk_mq_ops {
-         queue_rq: Some(Self::queue_rq_callback),
-         queue_rqs: None,
++}
 
 -- 
 2.51.2
