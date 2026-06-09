@@ -1,67 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF37374A16;
-	Tue,  9 Jun 2026 22:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66CF3E5EC5
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 22:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781042451; cv=none; b=AvVKv6D5PlJXczKOyqWznbNhwZG1PltmB074+8zV5LeQpoTfVHWbfaIZYBxYJIYazuknW/dUWphNi58FeMeqxC+DmM1aQmuxZSHtSACVDunU8oMPAQyghJtBh7fValUXNevzKUh9dNfPDCZDgmypUYLNW4VBznIsFdMyLteC4/8=
+	t=1781042750; cv=none; b=U70/uITAbbxfqH59rVZ8Fy7vMa3eZctTjnUhwDXV6pXVQHfMhgnj9FYSGZcr1uvjYbk/pbveqqwlZaql4cBubydKRTGp4+lN+q4SiTvhAdkl+mHXCjPhIv4U6CXUBnoCYmDjvsTrwrdxJ+sHS0g/xToJlaO1BvaY4fQUEdLNE0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781042451; c=relaxed/simple;
-	bh=oe4lddgZZKEfFWqDhCIeacT5D2ccGGi9a8jlXHl9VX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J2J2mR4uO20EJYuhfwjZFBvtPGKAva4ag2exNDqB6acfz0Bsk9JUubsjbuZPgLyeby/CGAeyGW4L1X+AHEfvdvXCIEYAeeOilcJIm91Uui4LEQYikPSbCLyydxyBrnS+bIYF82XduHcZArTyef9A5DUNkboyJDtNBPNQ59cT5us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WwFhBrRS; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781042750; c=relaxed/simple;
+	bh=uPtQRfOZYhHSvYDUkiYXuhtGUs8Flbg4AdWQ/YIVtRw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t5r3ZYPRIyKRPMTa3O0aEEln7tAX5MTo/dlTHYH6hGolrt/qtbP75DIngOXgLqDUqNt8bnQ99N2BCNu21Pep7zrqorDZv+/6s1UNXRIbQ3w8thOFu+S9fqMEyl9Dp+Z0E+qj3OvE0AlzI/7CoEQFsaoKtBoPz7ZOMXsEO7GvLNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=QZpGND7r; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WwFhBrRS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 380151F00893;
-	Tue,  9 Jun 2026 22:00:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781042450;
-	bh=bmEuIigsmL7HWH7m8kxNpsbmaCiGGk7QrPGi54GMZn4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=WwFhBrRSKVYVtdsk3o4dKtmtIbWi7bPypc9T6efDEkS5Zcm8/jYHOg77OBcNVZiRn
-	 g96h+oMy0dRhHDncE/8d8zqsEKcQ2SnFV/L0vC8SnIgG72fXN2r5U9SwjMTgksWqSB
-	 JespkbhbhnA5NIPAn89ZCTvLJ9BPmfXg3C96bOWDCljvwYYm1eHzvphxNnzZuL+L5g
-	 yOqgoY9n1XJaMTiRLm/FIjHk2GDAizI5oRRsQ7pL8Fr4iXcSuML9PbZ18Jt5cus1O5
-	 emNMWZpDHiL8O1lf44m3JxOt5SvHz9ypsbZTN0UvTtgyfsNolC0TyRg38OBg+DKU4h
-	 nRcXpiubKX8yg==
-Date: Tue, 9 Jun 2026 16:00:48 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Bryam Vargas <hexlabsecurity@proton.me>
-Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] nvmet-rdma: handle inline data with a nonzero offset
-Message-ID: <aiiNEEdfVbRvtfuy@kbusch-mbp>
-References: <LM21QIR-1-qJb7PViyJKCnGBnUzizeiNJVWQ3wb7ZwGezodjgKg3f-iobqOyequ-sT1jFCKJImfqNO_BKU3KO80xFITnaI5GTV_GxLUNDDc=@proton.me>
- <ahm6Ksr3rfGdnOsN@kbusch-mbp>
- <20260604084624.120032-1-hexlabsecurity@proton.me>
- <aiFR81yE9_BIsNbM@kbusch-mbp>
- <20260604193645.178350-1-hexlabsecurity@proton.me>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="QZpGND7r"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gZjdy49zKzlffvT;
+	Tue,  9 Jun 2026 22:05:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:mime-version
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1781042738; x=1783634739; bh=/KYMQ
+	qBHHYPSqaf/45Wpbd0jbAJEzrANa/9yFIqIL4E=; b=QZpGND7rhoyidGvVYKYQd
+	+pt2VLqNu5I0i4iwGxOqtfVw0aIeXuzqfZfEr6RQea/sLSlR5MH1R4VZNhwtubZl
+	0Z/Hun4ZHtUXChqeOPtyqFVAsOu2MKJ0ps+wRb3iaXVlFNVrC51UXzVvJHEEmXw/
+	aLvEnCL5tfl9BCFzbmvuZ/MmNryEVbgUJkyehvgEipmvLwk4bErExkYui0yOanPu
+	eZ2fZt3YX+05KN0Zd6P0kkWiEhcykNXC2ElWZHe7eF1UePGEXGRSNzV0caOiU6Nz
+	4MlJAmIFEPkfoHmXeq96PRn2iOI4vFZ4Bp94ea5brhWy24+78ICEHYZk737cR393
+	Q==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id hE5vAPup6PtN; Tue,  9 Jun 2026 22:05:38 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gZjds1hRXzlffvQ;
+	Tue,  9 Jun 2026 22:05:36 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@infradead.org>,
+	Marco Elver <elver@google.com>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 00/27] Enable lock context analysis in drivers/block/
+Date: Tue,  9 Jun 2026 15:04:47 -0700
+Message-ID: <cover.1781042470.git.bvanassche@acm.org>
+X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260604193645.178350-1-hexlabsecurity@proton.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 04, 2026 at 07:36:54PM +0000, Bryam Vargas wrote:
-> nvmet_rdma_use_inline_sg() maps the host-controlled inline data offset
-> into the per-command inline scatterlist.  The bounds check admits any
-> offset with off + len <= inline_data_size, but the mapping still assumes
-> the data begins in the first inline page:
+Hi Jens,
 
-Thanks applied to nvme-7.2.
+This patch series enables lock context analysis in all block drivers in t=
+he
+drivers/block/ directory. Please consider these patches for the next merg=
+e
+window.
 
-And not necessarily directed at you since apparently many people do
-this, but it would help me a great deal if subsequent versions were
-posted as a new thread rather than appending to the previous. The
-interleaving of the intermediate just makes this harder to sift through.
+Thanks,
 
-I'm actually not even sure how so many people converged on this
-anti-pattern, as 'git send-email' would have naturally created a new
-thread for each new version. What exactly are people doing here?
+Bart.
+
+Bart Van Assche (27):
+  aoe: Enable lock context analysis
+  drbd: Remove "extern" from function declarations
+  drbd: Retain one _get_ldev_if_state() implementation
+  drbd: Remove the get_ldev_if_state() macro
+  drbd: Remove the 'local' lock context
+  drbd: Simplify the bitmap locking functions.
+  drbd: Move two declarations
+  drbd: Pass 'resource' directly to complete_conflicting_writes()
+  drbd: Split drbd_nl_get_connections_dumpit()
+  drbd: Make a mutex_unlock() call unconditional
+  drbd: Split drbd_req_state()
+  drbd: Convert drbd_req_state() to unconditional locking
+  drbd: Annotate drbd_bm_{lock,unlock}()
+  drbd: Enable lock context analysis
+  loop: Split loop_change_fd()
+  loop: Split loop_configure()
+  loop: Remove the "bool global" function argument
+  loop: Add lock context annotations
+  mtip32: Enable lock context analysis
+  nbd: Enable lock context analysis
+  null_blk: Enable lock context analysis
+  rbd: Enable lock context analysis
+  ublk: Enable lock context analysis
+  xen-blkback: Enable lock context analysis
+  zram: Enable lock context analysis
+  rnbd: Enable lock context analysis
+  block: Enable lock context analysis for all block drivers
+
+ drivers/block/Makefile                 |   2 +
+ drivers/block/aoe/Makefile             |   2 +
+ drivers/block/aoe/aoecmd.c             |   1 +
+ drivers/block/drbd/Makefile            |   3 +
+ drivers/block/drbd/drbd_bitmap.c       |  43 +-
+ drivers/block/drbd/drbd_config.h       |   2 +-
+ drivers/block/drbd/drbd_int.h          | 594 +++++++++++++------------
+ drivers/block/drbd/drbd_interval.h     |  11 +-
+ drivers/block/drbd/drbd_main.c         |  41 +-
+ drivers/block/drbd/drbd_nl.c           | 117 ++---
+ drivers/block/drbd/drbd_receiver.c     |  27 +-
+ drivers/block/drbd/drbd_req.c          |  10 +-
+ drivers/block/drbd/drbd_req.h          |  24 +-
+ drivers/block/drbd/drbd_state.c        |  50 ++-
+ drivers/block/drbd/drbd_state.h        |  41 +-
+ drivers/block/drbd/drbd_state_change.h |  32 +-
+ drivers/block/drbd/drbd_worker.c       |   6 +-
+ drivers/block/loop.c                   | 251 ++++++-----
+ drivers/block/mtip32xx/Makefile        |   2 +
+ drivers/block/nbd.c                    |   3 +
+ drivers/block/null_blk/Makefile        |   2 +
+ drivers/block/null_blk/main.c          |  12 +-
+ drivers/block/null_blk/zoned.c         |   2 +
+ drivers/block/rbd.c                    |   8 +
+ drivers/block/rnbd/Makefile            |   2 +
+ drivers/block/ublk_drv.c               |   6 +
+ drivers/block/xen-blkback/Makefile     |   3 +
+ drivers/block/zram/Makefile            |   2 +
+ drivers/block/zram/zcomp.c             |   3 +-
+ drivers/block/zram/zcomp.h             |   6 +-
+ 30 files changed, 700 insertions(+), 608 deletions(-)
+
