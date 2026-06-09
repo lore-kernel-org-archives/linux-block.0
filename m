@@ -1,84 +1,107 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E440481259;
-	Tue,  9 Jun 2026 17:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B8248B389;
+	Tue,  9 Jun 2026 19:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781027426; cv=none; b=gJuBE4Qrf7Fq99a7SLAInroiY3tafOI+q89fBK7DKXJcwNCdT7gMAWXyHjmdjyqUL5llBhkZZbBvVAZB6mG3i135rNnCVXE27oS05tKhWztG2/EJuUivLAJ6LIb5PFdqpwQFPGrsGHH26rTO71G/ve1Onhr58oPQZnejYHlINR0=
+	t=1781032224; cv=none; b=WpmR6ReC7s2RD2UK2UKmR43DFqxZzNFAZ8yhe/LkRlCt2SoxDSG6Qep4Fht5kKTOHufblW7K8rMkJd0AhA/EGiWrT69Fu2Pih3mIIZH8ag4IUCaZ/p2Luoaodv9/mSgix2+k9j1xab5vnkMgTpMBRUGIlT2sOyCUmyaMm256gFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781027426; c=relaxed/simple;
-	bh=szuALeMmtswSAm5ZUQxf0VhMw8eSL/O9P3Llp9PZgZ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZA3R5rs5/IUlybAEVEVfIvByo+RgeaOFooc7xk1NHkQyUAucRm2IW6HkpgUlF3S7GWua8SB/A0iRkXyN3zjgziin2RCDlZzTxhrCz1OMpUEmCpSKb0y5WjNZjgUe5nPv216Q55UMs/sJH2TASh0CrhBRH2/RydFE95yICuToEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=b1ahRbQp; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1781032224; c=relaxed/simple;
+	bh=QdUIpX955IjWtpvoketZafjzxxc6bEWigg7uBvUHVaM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Lg/3wQiAhQ1dmQtKj4+K9YsSXYWqCxByttnNs4gfhlOt2gUNYzrHDJy+uT8jVmfcqAoslO0PNzxgya8ZDitzy9gLHNGnQ7ikPa1Jed2Y+dqX+cmdVY37qhygtoruMq88NoVQsu98GENKy6glvwdJ7vwie1S5lRwacFJZNY7Y9hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I4EdEHZ+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="b1ahRbQp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=jrCsj4gn7vi5WO8BmPN7e9LdzveNQRxZdeDb2ikqQ8c=; b=b1ahRbQpgWZaeboUHTlQPeK6QG
-	4C6bX1CjDmyyBL+2vnFNA9juzWdTfpe95sA6bl9DSRjRX8AR2WZX1TqK3QIJzq06zTx65ZB1uerCn
-	rXhIt5aN5/XrR1rCyFXTP/bJaWvM4XuLq31i83tOvBb18FPcl809EzsK3W17mu4JyyHETIh/a2UdZ
-	85TnfU3l3gZRhJOuU+/O7RLKaG2WDbajUlmKXSDgf02Wi2POgV/MnD1YkPH186DDG8C2lq1/pFd5t
-	TzRQijMx49LLlVSXQRm82IUztQRk2CVTaWm+dx+esFY6rY8qLOf0RfRw5en9I5jmeg6jGjLfnGQTL
-	VBFilyCQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.2 #2 (Red Hat Linux))
-	id 1wX0ab-0000000EaZi-3BMR;
-	Tue, 09 Jun 2026 17:50:13 +0000
-Date: Tue, 9 Jun 2026 18:50:13 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
-	Ming Lei <tom.leiming@gmail.com>,
-	linux-block <linux-block@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-btrfs@vger.kernel.org, David Sterba <dsterba@suse.com>,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Hillf Danton <hdanton@sina.com>
-Subject: Re: [PATCH v4] loop: Fix NULL pointer dereference in lo_rw_aio()
-Message-ID: <20260609175013.GH2636677@ZenIV>
-References: <20260529220600.1226-1-hdanton@sina.com>
- <b27609f0-59f0-403d-90af-274c55df817e@I-love.SAKURA.ne.jp>
- <3244d4dd-8254-47c0-9609-b1db53450c7c@I-love.SAKURA.ne.jp>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I4EdEHZ+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86C511F00893;
+	Tue,  9 Jun 2026 19:10:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781032222;
+	bh=iHY5maGdy9Y0fuMpxRd+GJYueXrmulzdgPUuxeFdpc4=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=I4EdEHZ+4mOmI52HAVmdSd2wciDtFR0/Q+5iTwm0ly5YvhTwazYPxYmIXCZDfXVgG
+	 /yWbJXOrQ8VVEfrF56ldHexNv1vKEoGR/BDVNXFAoRcdUFs0hIg33NJWhSorfpLJhj
+	 KiHE791tF/dKvrwu49a0YvcEPMDV0g1LLZ69Rgy4nxvZzFtmKsH/BG/5DxmOk8zyjL
+	 YtlEV63v70Nv13rR2eBVB5qP8EKyqc9II4cD/gxONQFburypTp7oMl+KJx/nBgyLoP
+	 Gcpx/6A/AnoCjUyYM4QxsG50NUdBe46PL8in5Olq8ABlsP/rKX+6L//CUhJwFeu0rI
+	 k4QpjPTh30YVg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Date: Tue, 09 Jun 2026 21:08:22 +0200
+Subject: [PATCH v2 43/83] block: rust: add `GenDisk::queue_data`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3244d4dd-8254-47c0-9609-b1db53450c7c@I-love.SAKURA.ne.jp>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-43-82c7404542e2@kernel.org>
+References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
+In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
+To: "Liam R. Howlett" <liam@infradead.org>, 
+ Alice Ryhl <aliceryhl@google.com>, 
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+ Benno Lossin <lossin@kernel.org>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Boqun Feng <boqun@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Frederic Weisbecker <frederic@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ Jens Axboe <axboe@kernel.dk>, John Stultz <jstultz@google.com>, 
+ Lorenzo Stoakes <ljs@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+ Miguel Ojeda <ojeda@kernel.org>, Stephen Boyd <sboyd@kernel.org>, 
+ Thomas Gleixner <tglx@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+ "Liam R. Howlett" <liam@infradead.org>, Boqun Feng <boqun@kernel.org>, 
+ Lorenzo Stoakes <ljs@kernel.org>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+ rust-for-linux@vger.kernel.org
+X-Mailer: b4 0.16-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1051; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=QdUIpX955IjWtpvoketZafjzxxc6bEWigg7uBvUHVaM=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTbpS7sC8gUW2Adx4HtZ/fpiNOjSfvNGjo6B
+ NBvkfxPGy6JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk2wAKCRD6UCkIqsW9
+ 0GkKD/4jKQPzH7UvTzlymlTkzO6nFr0uD+r+lxJMwBCVa3UJ7O/Hiw74mJ5raWq/ELYiqGwZ17q
+ BK1XKroXvE7lo3/W2fjw41bqrmg1v56WWQQfNlCe/w5rXtisEs7WSUsxgwCTsH8MlMbBxAYiVZG
+ BIgAp9fMcFefidQZ1rioOGGQK7fWOKhtfN5V26APj4FSH2klG8pNPYv8Qwnn1QRljsT6htLvVtA
+ 8agBETAJEBn2/gcReU6RDaUgyv5WTdYOjApi8mzoW0qVVEbCIpAAAAbKOQS2rWMdXdg9kq5mYnG
+ Tw2PhohLdqYMM8qX1sSrGUawgIxfRckb+2DrR21SUtQ1lCAu64PxoOsK1xd79HwdUVxCeO4FJcv
+ uby53gHiQsCDK5U8guolyHcVWzSBlfgq21+1KxTxw+IlDlBA3knAIa5qrr9P3+5XI6mugMLJtyX
+ qtx1NZcFEUEgzSOv8x8/9oKtpIIaV5eiaMsrd2jP9evv3IeFMKt6Tfd9297ONwbX8A6l5J+WgHB
+ FDG2ITMtxPEO99CIBhv3hFdzJeDlUZfp8VC5npQDoZrc4UyRyEVrzgE/1AWgs+JCqqZw2PPQdgO
+ 6KXUT/c+OsYDx+LwGjkGzaUQk9zkDIJyJQMTzczdk2TAJAZyLPhBaQec/R0MrXSL/IxGvyOBlzr
+ Le8kjM8gfkCjTvQ==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-On Sun, Jun 07, 2026 at 07:54:58PM +0900, Tetsuo Handa wrote:
-> syzbot is reporting NULL pointer dereference in lo_rw_aio() [1][2].
-> An analysis by the Gemini AI collaborator [3] considers that this problem
-> is caused by a timing shift primarily exposed by commit 65565ca5f99b
-> ("block: unify the synchronous bi_end_io callbacks"), along with helper
-> refactorings like commit 92c3737a2473 ("block: add a bio_submit_or_kill
-> helper").
-> 
-> But due to difficulty of reproducing this race, discussion about what is
-> happening and how to fix this problem is stalling. Also, we haven't
-> identified how many filesystems are subjected to this problem.
-> 
-> Therefore, this patch introduces a grace period for flushing pending I/O
-> requests (which should be a good thing from the perspective of defensive
-> programming) so that we won't hit NULL pointer dereference problem, and
-> also emits BUG: message in order to help filesystem developers identify
-> the caller of an I/O request that failed to wait for completion so that
-> filesystem developers can fix such caller to wait for completion.
-> 
-> Note that emitting BUG: message is enabled only if CONFIG_KCOV=y, for
-> this check is a waste of computation resources for almost all users.
+Add a method to borrow the private queue data of the queue a `GenDisk` is
+associated with.
 
-Still breaks xfs/259, same as the version in next-20260605...
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+---
+ rust/kernel/block/mq/gen_disk.rs | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index 6ba8d88f63a9..49ce5ac4774d 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -260,6 +260,12 @@ pub fn queue(&self) -> &RequestQueue<T> {
+         // SAFETY: By type invariant, self is a valid gendisk.
+         unsafe { RequestQueue::from_raw((*self.gendisk).queue) }
+     }
++
++    /// Get the queue data associated with this [`GenDisk`].
++    pub fn queue_data(&self) -> <T::QueueData as ForeignOwnable>::Borrowed<'_> {
++        // SAFETY: By type invariant, self is a valid gendisk.
++        unsafe { T::QueueData::borrow((*(*self.gendisk).queue).queuedata) }
++    }
+ }
+ 
+ // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
+
+-- 
+2.51.2
+
+
