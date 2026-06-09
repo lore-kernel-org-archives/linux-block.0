@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49DB41B7F3;
-	Tue,  9 Jun 2026 19:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51D84D8DB1;
+	Tue,  9 Jun 2026 19:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032618; cv=none; b=dJgZv/irUxJKsaG3efBzgrhByrbYMfFKAnuYMBv5BlXlqwmsR11GoROoW4y/sEzCeo9FnVFFLZay1jS+5aDL9tn5oUnJARmP90ZWdhFK2Vg2IHvX092wNIxoNbussB2YoJngYMR/Gu3sORh11DnBKZ6MNDeq5mnB2pU9IDA+nZU=
+	t=1781032625; cv=none; b=FkEJE6lQSeMZCFuMP07B5I97LbAFKSpDRauJ8J7feMTFN8Iw10kOTFpnmi/WjsmVl4d04gw2mNzXLirgdc7ShqfazFkcCttVZ890LaxeBMPzADLHCxJR/E4RDY3ChZbyhOu02KyzfvOg9w/J81g8gQrQvSv1MjpqNQYw5faXoXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032618; c=relaxed/simple;
-	bh=DDAoobr8iByPKaXTjyWraJH4CgIk1Bn8L7BjryKL7CA=;
+	s=arc-20240116; t=1781032625; c=relaxed/simple;
+	bh=v0XQhwyOc620vsCHIPz3I6cOTlfWRB5GqFO9hLn8R5k=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VctnlDkwQQvGhKVj1itV63FHlGgvbnlhdNYr+NdTBbC2CI1ygQaAWwaoeqrM+l0LDaHSJLnUomfpulDRumB0WGEwiZ1o3NdyKkpX5Xn5TSDd2BiK4P6tlgQD0DVbFEMnktz+uw45/DTePNJYNATTibU5Xmma8k8rCCbOj/7z4EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grUeoCqF; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=r1fOtyFsvv/U+cwcIW6tFu2ffiSWIRAr19q0VodBmyolh3CJ6/3sFQGKX5Qm+5zWT3zz4fSuD3Y+eiKVKXvZJ3q8j6jpjfyqTjCRGvJyHHmxXrS3Bk0KBZyXOZXIJVGihsEiBWQWVaCvepgLXqIJ6BgB0xOCuvGoS1yv2Nfh4ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ln4G1iif; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grUeoCqF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 548A91F00899;
-	Tue,  9 Jun 2026 19:16:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ln4G1iif"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 387E71F0089A;
+	Tue,  9 Jun 2026 19:16:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032617;
-	bh=bVoeMqM+4x+DRGTfgue4mO0tQcRwgKzm2C1LaDMHuSY=;
+	s=k20260515; t=1781032623;
+	bh=umeS9rSQGXG+kg9FrmoD3TXShidPIQhNP8+xWx74Hs8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=grUeoCqFABZLR5KpiONwSvirHR19FPTkamv0cIZjpX0X/gJFsc6J8DAxT3mHYNz/s
-	 K+WKEyBCxStr9qDhA4AKiYMvggcCNrO6v6UnzkrnISiu10rCWqg7to8tRjhM9xj6sV
-	 K9lHLn35p3o/MFw0Y4A9fl00SQ/MEhLpXih7Ql/SZ9C6HEECFy8qB8GvXfD4NNW0av
-	 pWuKNQL7J10m3WgHCKMGYvEPnvYbGDAT5pNK4j+B4GQs+PTiLLV5BFoTXxky0YD9Nc
-	 oLgtUe6zgkWCwiq2YfUKd6hVyKuvs75kSN2ef1VTy7Bphc5TTpoQ+Hn5hxFQlX00K3
-	 m+L/lnEHwqixQ==
+	b=Ln4G1iifeGEWneCXz36TrX17jEw24VQfjkiYMflm5rTiRv+zy/knoxB8xHHVS5WE2
+	 NHACg8+KORXckGrd+3swtQYGvjFt/Bun0rrRKsvOCwuLZ9vcsyn9SP8+f2zIQK+i14
+	 gRL9NebxrpbEKYpduWvdDoEX4tayxg/lX5D5p55PgwFfsQabdy47tBoHDSLf12UFbY
+	 SEfSN/O9lj/CTOlCQdRTxYgbzJYxIXcTnp9zV6MR9LyFJTYskw2lo3Hm3DmWxkG+fw
+	 NvdaVeMUaefgcNsgT0DVQ60raX2nPJ0LhBGjHCM9V3nMt8FDGPJ1wWxlBraQ6HEkBD
+	 0mKxdmgJ00z4A==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:08:18 +0200
-Subject: [PATCH v2 39/83] block: rust: add a request queue abstraction
+Date: Tue, 09 Jun 2026 21:08:05 +0200
+Subject: [PATCH v2 26/83] block: rust: change sector type from usize to u64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-39-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-26-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -58,146 +58,231 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4451; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=DDAoobr8iByPKaXTjyWraJH4CgIk1Bn8L7BjryKL7CA=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTY5J/OppOq84fVsvUc70Gv8I7RWlb+IcQ5b
- n+xAAkuUZGJAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk2AAKCRD6UCkIqsW9
- 0JAYD/wNyX5xXqqubNgadeKihqrsjtqz3ydvG9+mnr/DgIpKbh2MXJBs2ZbxSup1esNlSyz3azm
- wbRDBoj9rDXqvqzvH9ysMyCWYxS3Sn4rgwQZaXXCN42BtGM/DBDmIxsHTvAhY7J/zB/bouVZLzb
- q028kd3X0GCrSQCgfrEwBWMLLm24Bb4Slv5vBT5q2Deev7kRhBl0VCntwaRL1I1nCQB9oAMoarB
- 1ZGFqBzMGTshGhaJhTyVdRB7f2ReA2hWS+hj/0TXTgCtrJ5S+i/mS8sOekEOl2hSM1bcpcJzSSV
- IyAyy3RQLQ74RYnO6a1kYNVLV2K+BEZcmwA/1BXTbgkS7DmmPvMf4ew5bf+UhaMIZ0dYmyPABrt
- 0r1owc46JL1Q6OGsB26VudnHZc33zirn0gPeZLO/xJedrSMxEQNReQtBysGuDaH41D+niqYba0/
- 1pp1sCDcdSVdoy8L9rJR3fHictVriecfMxz+zYIRPVFIUct3uOdV/WYdPmcVstBFfEEGSjnJ674
- qxsle7FItS1YuxIFTXLzHCD+mUXvetTRshMhcDzK7uvYW3ChfHzPU6Wzj5k5RhocqFYITVvY9R/
- xzww5zYaJaffKh/KubF/t3/ygNbCtd5r8Sg6PDQ6BWZkf+Ot3OkD6h/sAVanI5YNrKTJoFrg3Yi
- k4HtIwPlH1gz6aQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8857; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=v0XQhwyOc620vsCHIPz3I6cOTlfWRB5GqFO9hLn8R5k=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTMD0m8HIb02rdULtOHdHfQabhQNf3AvX2lP
+ d4k2ie8Ml6JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkzAAKCRD6UCkIqsW9
+ 0DoXEACElQZIRs2ATiX3r5JUC1LZWpwkeycYVxgmZiH95ILTB6Vo8aNShxNEGxNIX6iLJyN8g3e
+ /7+Zy/eDbFG0rdcuAmp4g2zxNhdMCkniFPEx4HueAgAsD5ODQdTD8gD7/+kSz4s7s8SopZEsq3j
+ GDkOd0as0fJqfOscklxZ5+IzLMt1r+G4Ir/RMFzV/0c67wWdXDJQOF764/vzGab5ptBGvNpSiyk
+ KTog832s4Sb5kVjc0fCU3W2JbZyvmYteFCxX/qdWFkHmNsAdmOMzBtS+Da3ka8yRck0BSlmOiC8
+ sEpN364gTrW4uPxZNnUXGGHQ4z87EDUXbzIjikzmNqj9MwVEHBvqHD5EU6y4RLXpa4RohOR3oTc
+ 34UmtfhVsp/a2UgjKCkSyQNt8vlpC1Guh+Pj3/Hse6EnO/ZPudSgZuoaRLCiXQGcJ5im+ChuUbK
+ Lv4kup8LjfrA6C0HIBuWQDQ7j+8RK0oSqu/lcH8g7ToP3yY9gNvOYUsEJwyANWdaY/QfwwMR/Af
+ qYHmqO11qROCmvxB64tjPfaKuq8zsG9WWPKZdKnR0VWMNtAIztfuwXraXOQ8MmSllcaRTJ6dcxA
+ JgyOpET+kgIEnvZfEK6vWb9G0iPTYsTfB3mXk3oreP58i5jXbXltXyJfMLRsMHq+oDaD+HedqIi
+ xAa6WY4KstRaB2w==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add the `RequestQueue` type as a Rust abstraction for `struct
-request_queue`. This type provides methods to access the request queue
-associated with a `GenDisk` or `Request`.
+Change the `sector()` and `sectors()` methods in `Request` to return
+`u64` and `u32` respectively instead of `usize`. This matches the
+underlying kernel types.
 
-The abstraction exposes queue-related functionality needed by block
-device drivers.
+Update rnull driver to handle the new sector types with appropriate
+casting throughout the read, write, and discard operations.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq.rs               |  2 ++
- rust/kernel/block/mq/gen_disk.rs      |  7 ++++
- rust/kernel/block/mq/request_queue.rs | 60 +++++++++++++++++++++++++++++++++++
- 3 files changed, 69 insertions(+)
+ drivers/block/rnull/rnull.rs    | 71 +++++++++++++++++++++++++----------------
+ rust/kernel/block/mq/request.rs |  8 ++---
+ 2 files changed, 47 insertions(+), 32 deletions(-)
 
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 77e3593e8626..e89eb394001f 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -127,6 +127,7 @@
- pub mod gen_disk;
- mod operations;
- mod request;
-+mod request_queue;
- pub mod tag_set;
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index cb5b642f68e5..73f14d6e379f 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -218,6 +218,13 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+             kernel::alloc::NumaNode::new(home_node)?
+         };
  
- pub use operations::Operations;
-@@ -135,4 +136,5 @@
-     Request,
-     RequestTimerHandle, //
- };
-+pub use request_queue::RequestQueue;
- pub use tag_set::TagSet;
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index f51bccb0d2ef..6ba8d88f63a9 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -9,6 +9,7 @@
-     bindings,
-     block::mq::{
-         Operations,
-+        RequestQueue,
-         TagSet, //
-     },
-     error::{
-@@ -253,6 +254,12 @@ impl<T: Operations> GenDisk<T> {
-     pub fn get_ref(&self) -> Arc<Revocable<GenDiskRef<T>>> {
-         self.backref.clone()
-     }
++        let capacity_sectors = capacity_mib << (20 - block::SECTOR_SHIFT);
 +
-+    /// Get the [`RequestQueue`] associated with this [`GenDisk`].
-+    pub fn queue(&self) -> &RequestQueue<T> {
-+        // SAFETY: By type invariant, self is a valid gendisk.
-+        unsafe { RequestQueue::from_raw((*self.gendisk).queue) }
-+    }
++        // Prevent overflow in usize/u64 casts
++        if usize::BITS == 32 && capacity_sectors > u32::MAX.into() {
++            return Err(code::EINVAL);
++        }
++
+         let tagset = Arc::pin_init(
+             TagSet::new(submit_queues, 256, 1, numa_node, flags),
+             GFP_KERNEL,
+@@ -229,13 +236,13 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+                 irq_mode,
+                 completion_time,
+                 memory_backed,
+-                block_size: block_size as usize,
++                block_size: block_size.into(),
+             }),
+             GFP_KERNEL,
+         )?;
+ 
+         let mut builder = gen_disk::GenDiskBuilder::new()
+-            .capacity_sectors(capacity_mib << (20 - block::SECTOR_SHIFT))
++            .capacity_sectors(capacity_sectors)
+             .logical_block_size(block_size)?
+             .physical_block_size(block_size)?
+             .rotational(rotational);
+@@ -250,12 +257,13 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+     }
+ 
+     #[inline(always)]
+-    fn write(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -> Result {
++    fn write(tree: &XArray<TreeNode>, mut sector: u64, mut segment: Segment<'_>) -> Result {
+         while !segment.is_empty() {
+             let page = NullBlockPage::new()?;
+             let mut tree = tree.lock();
+ 
+-            let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
++            // CAST: Device size limited during setup to (2^32)-1 on 32 bit systems.
++            let page_idx = (sector >> block::PAGE_SECTORS_SHIFT) as usize;
+ 
+             let page = if let Some(page) = tree.get_mut(page_idx) {
+                 page
+@@ -265,43 +273,50 @@ fn write(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -
+             };
+ 
+             page.set_occupied(sector);
+-            let page_offset = (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
+-            sector +=
+-                segment.copy_to_page(page.page.as_pin_mut(), page_offset) >> block::SECTOR_SHIFT;
++
++            // CAST: Page offset always fits in 32 bits.
++            let page_offset =
++                ((sector & u64::from(block::PAGE_SECTOR_MASK)) << block::SECTOR_SHIFT) as usize;
++
++            // CAST: Casting from `usize` to `u64` never overflows.
++            sector += segment.copy_to_page(page.page.as_pin_mut(), page_offset) as u64
++                >> block::SECTOR_SHIFT;
+         }
+         Ok(())
+     }
+ 
+     #[inline(always)]
+-    fn read(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -> Result {
++    fn read(tree: &XArray<TreeNode>, mut sector: u64, mut segment: Segment<'_>) -> Result {
+         let tree = tree.lock();
+ 
+         while !segment.is_empty() {
+-            let idx = sector >> block::PAGE_SECTORS_SHIFT;
++            // CAST: Device size limited during setup to (2^32)-1 on 32 bit systems.
++            let page_idx = (sector >> block::PAGE_SECTORS_SHIFT) as usize;
+ 
+-            if let Some(page) = tree.get(idx) {
++            if let Some(page) = tree.get(page_idx) {
++                // CAST: Page offset always fits in 32 bits.
+                 let page_offset =
+-                    (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
+-                sector += segment.copy_from_page(&page.page, page_offset) >> block::SECTOR_SHIFT;
++                    ((sector & u64::from(block::PAGE_SECTOR_MASK)) << block::SECTOR_SHIFT) as usize;
++
++                // CAST: Casting from `usize` to `u64` never overflows.
++                sector +=
++                    segment.copy_from_page(&page.page, page_offset) as u64 >> block::SECTOR_SHIFT;
+             } else {
+-                sector += segment.zero_page() >> block::SECTOR_SHIFT;
++                // CAST: Casting from `usize` to `u64` never overflows.
++                sector += segment.zero_page() as u64 >> block::SECTOR_SHIFT;
+             }
+         }
+ 
+         Ok(())
+     }
+ 
+-    fn discard(
+-        tree: &XArray<TreeNode>,
+-        mut sector: usize,
+-        sectors: usize,
+-        block_size: usize,
+-    ) -> Result {
++    fn discard(tree: &XArray<TreeNode>, mut sector: u64, sectors: u64, block_size: u64) -> Result {
+         let mut remaining_bytes = sectors << SECTOR_SHIFT;
+         let mut tree = tree.lock();
+ 
+         while remaining_bytes > 0 {
+-            let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
++            // CAST: Device size limited during setup to (2^32)-1 on 32 bit systems.
++            let page_idx = (sector >> block::PAGE_SECTORS_SHIFT) as usize;
+             let mut remove = false;
+             if let Some(page) = tree.get_mut(page_idx) {
+                 page.set_free(sector);
+@@ -326,7 +341,7 @@ fn discard(
+     fn transfer(
+         command: bindings::req_op,
+         tree: &XArray<TreeNode>,
+-        sector: usize,
++        sector: u64,
+         segment: Segment<'_>,
+     ) -> Result {
+         match command {
+@@ -356,13 +371,13 @@ fn new() -> Result<KBox<Self>> {
+         )?)
+     }
+ 
+-    fn set_occupied(&mut self, sector: usize) {
+-        let idx = sector & PAGE_SECTOR_MASK as usize;
++    fn set_occupied(&mut self, sector: u64) {
++        let idx = sector & u64::from(PAGE_SECTOR_MASK);
+         self.status |= 1 << idx;
+     }
+ 
+-    fn set_free(&mut self, sector: usize) {
+-        let idx = sector & PAGE_SECTOR_MASK as usize;
++    fn set_free(&mut self, sector: u64) {
++        let idx = sector & u64::from(PAGE_SECTOR_MASK);
+         self.status &= !(1 << idx);
+     }
+ 
+@@ -380,7 +395,7 @@ struct QueueData {
+     irq_mode: IRQMode,
+     completion_time: Delta,
+     memory_backed: bool,
+-    block_size: usize,
++    block_size: u64,
  }
  
- // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
-diff --git a/rust/kernel/block/mq/request_queue.rs b/rust/kernel/block/mq/request_queue.rs
-new file mode 100644
-index 000000000000..45fb55b1a310
---- /dev/null
-+++ b/rust/kernel/block/mq/request_queue.rs
-@@ -0,0 +1,60 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+use super::Operations;
-+use crate::types::{
-+    ForeignOwnable,
-+    Opaque, //
-+};
-+use core::marker::PhantomData;
-+
-+/// A structure describing the queues associated with a block device.
-+///
-+/// Owned by a [`GenDisk`].
-+///
-+/// # Invariants
-+///
-+/// - `self.0` is a valid `bindings::request_queue`.
-+/// - `self.0.queuedata` is a valid `T::QueueData`.
-+#[repr(transparent)]
-+pub struct RequestQueue<T>(Opaque<bindings::request_queue>, PhantomData<T>);
-+
-+impl<T> RequestQueue<T>
-+where
-+    T: Operations,
-+{
-+    /// Create a [`RequestQueue`] from a raw `bindings::request_queue` pointer
-+    ///
-+    /// # Safety
-+    ///
-+    /// - `ptr` must be valid for use as a reference for the duration of `'a`.
-+    /// - `ptr` must have been initialized as part of [`GenDiskBuilder::build`].
-+    pub(crate) unsafe fn from_raw<'a>(ptr: *const bindings::request_queue) -> &'a Self {
-+        // INVARIANT:
-+        // - By function safety requirements, `ptr` is a valid `request_queue`.
-+        // - By function safety requirement `ptr` was initialized by [`GenDiskBuilder::build`], and
-+        //   thus `queuedata` was set to point to a valid `T::QueueData`.
-+        //
-+        // SAFETY: By function safety requirements `ptr` is valid for use as a reference.
-+        unsafe { &*ptr.cast() }
-+    }
-+
-+    /// Get the driver private data associated with this [`RequestQueue`].
-+    pub fn queue_data(&self) -> <T::QueueData as ForeignOwnable>::Borrowed<'_> {
-+        // SAFETY: By type invariant, `queuedata` is a valid `T::QueueData`.
-+        unsafe { T::QueueData::borrow((*self.0.get()).queuedata) }
-+    }
-+
-+    /// Stop all hardware queues of this [`RequestQueue`].
-+    pub fn stop_hw_queues(&self) {
-+        // SAFETY: By type invariant, `self.0` is a valid `request_queue`.
-+        unsafe { bindings::blk_mq_stop_hw_queues(self.0.get()) }
-+    }
-+
-+    /// Start all hardware queues of this [`RequestQueue`].
-+    ///
-+    /// This function will mark the queues as ready and if necessary, schedule the queues to run.
-+    pub fn start_stopped_hw_queues_async(&self) {
-+        // SAFETY: By type invariant, `self.0` is a valid `request_queue`.
-+        unsafe { bindings::blk_mq_start_stopped_hw_queues(self.0.get(), true) }
-+    }
-+}
+ #[pin_data]
+@@ -432,14 +447,14 @@ fn queue_rq(
+             let mut sector = rq.sector();
+ 
+             if command == bindings::req_op_REQ_OP_DISCARD {
+-                Self::discard(tree, sector, rq.sectors(), queue_data.block_size)?;
++                Self::discard(tree, sector, rq.sectors().into(), queue_data.block_size)?;
+             } else {
+                 for bio in rq.bio_iter_mut() {
+                     let segment_iter = bio.segment_iter();
+                     for segment in segment_iter {
+                         let length = segment.len();
+                         Self::transfer(command, tree, sector, segment)?;
+-                        sector += length as usize >> block::SECTOR_SHIFT;
++                        sector += u64::from(length) >> block::SECTOR_SHIFT;
+                     }
+                 }
+             }
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index 54fe580b7b42..9e176f015ab8 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -178,16 +178,16 @@ pub fn bio_iter_mut<'a>(self: &'a mut Owned<Self>) -> BioIterator<'a> {
+ 
+     /// Get the target sector for the request.
+     #[inline(always)]
+-    pub fn sector(&self) -> usize {
++    pub fn sector(&self) -> u64 {
+         // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
+-        unsafe { (*self.0.get()).__sector as usize }
++        unsafe { (*self.0.get()).__sector }
+     }
+ 
+     /// Get the size of the request in number of sectors.
+     #[inline(always)]
+-    pub fn sectors(&self) -> usize {
++    pub fn sectors(&self) -> u32 {
+         // SAFETY: By type invariant of `Self`, `self.0` is valid and live.
+-        (unsafe { (*self.0.get()).__data_len as usize }) >> crate::block::SECTOR_SHIFT
++        (unsafe { (*self.0.get()).__data_len }) >> crate::block::SECTOR_SHIFT
+     }
+ 
+     /// Return a pointer to the [`RequestDataWrapper`] stored in the private area
 
 -- 
 2.51.2
