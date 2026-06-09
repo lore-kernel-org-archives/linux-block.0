@@ -1,46 +1,46 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAAD6369D51
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 22:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD7E411669
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 22:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781042775; cv=none; b=VJvDDtpQfdQbylOARdlsi4V+nOPnAxrJFhln3kA6SwYheo5X/s9gBJePHEVR1gmrSgCS9AXfR2CFyqfkjb9FyFw3Xwy5fR3BouldA6OVEGb5Nh0V8nHBgnDjb3juiQ2osX4WIVDOKorxTC3UNtUEtfobfjfl5U1Qbhj4+hAGoAs=
+	t=1781042776; cv=none; b=gtYZCC1fxC+xagFzTUWSn20B747LXRwW806q03NLHX4xG6eEsn04azo3LQwrpWvPOywp34/HfkH14IMM2fjxtgQLDaXBj9rSUGBFDKeCPUH/r6vlG0ACKYSX532yGlobbIduxU7trb6N4hlD7fBlK9PMz7aBlEGkHVgOK1lO2Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781042775; c=relaxed/simple;
-	bh=O2Q5DXABFMYOHpLaDgXQAgGnf8GjllqKGVRty1uEXYA=;
+	s=arc-20240116; t=1781042776; c=relaxed/simple;
+	bh=gzJ5rXs7/zLxq+wLuL1aHJ41VZwT0qeEYat+4U+EGac=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d9NYY4sEiLDzc3EkkTiX+YrNnEkBfU6/+YQWBfwRVUs06YL0Ovn9UCDDD5TVqcE7GX9ks0WkEmdQYQIXXAGDsjYf3BBVBGnCfhudg4bdINoa8rq2V1zFrGuOPlil56ldkCZdZRQptTZQ4tFpbE/ptgc0HM88K5gPyHnylceyjmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=KVRooQD4; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=kXhLaAq14dJzQFwW6agesGXsf9kIKLXh2njZnqeMdG9ik58Y3V3gu3lbuM2Hi1XWau6+2h+Um5mVUF0bJKPxzw9NWzDN0sCzIwnB7fX/ccqEUFRdjwQvFPNQny8XMfP+lTh9vStdpoe/+x6zJ7ghIo8bbeRvlwbZkfODdocjBKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2V795P65; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="KVRooQD4"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2V795P65"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gZjfV70p2zlh1Rt;
-	Tue,  9 Jun 2026 22:06:10 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gZjfY6scSzlgyGq;
+	Tue,  9 Jun 2026 22:06:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1781042753; x=1783634754; bh=/eKml
-	qlhJpuqhbo3YoHSxAo/+PUWrg8ynxFv4bydsFo=; b=KVRooQD4gL5gXBNXrpZsh
-	pfl1PGRte/pjGKtvcoItcobELabBE/W4oDNJXqb/LQuZsnaFflxyGtI9KjlfLtM1
-	VCVpqGy6v4oZrv57QqhSe65VbdACiFW2ffMfePcmpLukhHCWECSfKnQzOE5/mONN
-	Pr+zKwoJlQ5O2QSQ/pX/IjlZnjNkWFO1nG5EAAuq8scYvdvHFJnxjr0PAuODsy6i
-	WtwbeYrYtTqFgWm9KbaM90FCakwvGfzlZY52jC7D4VheE59czRiNCGOYPByFRd7d
-	lfSjyhJKMcoKIjw/NunZqnHbb5f7LJMY3aGXtOBu5j0nLUKRNa1s27RlQ2nTaavC
-	A==
+	:received:received; s=mr01; t=1781042769; x=1783634770; bh=ADKPB
+	VH1qC4Tu2aj2TTO8qARHY8rwcepjDAuH6hQa9o=; b=2V795P656hB9pLdfH19JI
+	l728hAKs4yUq9qXCfsu7IXMPGa+JjTqb8DjD0FLu7nz3hZ+kTsjhkFPDJvVDpUvp
+	zE+c2Gf49q6ZAjWqYHVNvQ8MS9y8F1SLoiuG/50iUFn55xdrjAebjoZcgb8qX2cO
+	G4LjJi5MqvoZyPby6Ms8A63YrRAKuqhooxKZXlzpMWrVCBKuHwCxykrDL1KpCNU8
+	RP2otkSQYdeSmzQzKsgtXJCfijqPBBDBdqRGbG+zNY9RBL2FxrmlumziatZQEGZi
+	2BpD+uykV9ClcPQas3G4pwBH3Y7tUSueXZpiNdw63HiwCI9HKj5mryb3aH74/o8t
+	g==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id qyHnZ8KT6NYp; Tue,  9 Jun 2026 22:05:53 +0000 (UTC)
+ id hdsrCfukAP31; Tue,  9 Jun 2026 22:06:09 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gZjf73HzMzlfddT;
-	Tue,  9 Jun 2026 22:05:51 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gZjfQ65sDzlgy1v;
+	Tue,  9 Jun 2026 22:06:06 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: linux-block@vger.kernel.org,
 	Philipp Reisner <philipp.reisner@linbit.com>,
 	Lars Ellenberg <lars.ellenberg@linbit.com>,
 	=?UTF-8?q?Christoph=20B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Subject: [PATCH 05/27] drbd: Remove the 'local' lock context
-Date: Tue,  9 Jun 2026 15:04:52 -0700
-Message-ID: <0d220690717c802c4d2b684bf924d134dcd0a929.1781042470.git.bvanassche@acm.org>
+Subject: [PATCH 10/27] drbd: Make a mutex_unlock() call unconditional
+Date: Tue,  9 Jun 2026 15:04:57 -0700
+Message-ID: <803dcc7259a57e513e7ec06a82307e75acd187a6.1781042470.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
 In-Reply-To: <cover.1781042470.git.bvanassche@acm.org>
 References: <cover.1781042470.git.bvanassche@acm.org>
@@ -64,511 +64,52 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-The 'local' lock context represents code sections between get_ldev() and
-put_ldev() calls. Between these two calls the device->ldev pointer is
-valid. Since there are multiple functions with unpaired get_ldev() /
-put_ldev() calls, remove this lock context.
+Only jump to the 'out' label if resource is not NULL such that the
+mutex_unlock() call past the 'out' label can be made unconditional.
 
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/drbd/drbd_bitmap.c   | 17 +++++-----
- drivers/block/drbd/drbd_int.h      | 50 ++++++++++++------------------
- drivers/block/drbd/drbd_main.c     | 20 ++++++------
- drivers/block/drbd/drbd_nl.c       |  7 +++--
- drivers/block/drbd/drbd_receiver.c | 21 +++++++------
- drivers/block/drbd/drbd_worker.c   |  6 ++--
- 6 files changed, 55 insertions(+), 66 deletions(-)
+ drivers/block/drbd/drbd_nl.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_b=
-itmap.c
-index 65ea6ec66bfd..1c68f1774e28 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -987,7 +987,7 @@ static inline sector_t drbd_md_last_bitmap_sector(str=
-uct drbd_backing_dev *bdev)
- 	}
- }
-=20
--static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) _=
-_must_hold(local)
-+static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr)
- {
- 	struct drbd_device *device =3D ctx->device;
- 	enum req_op op =3D ctx->flags & BM_AIO_READ ? REQ_OP_READ : REQ_OP_WRIT=
-E;
-@@ -1060,7 +1060,8 @@ static void bm_page_io_async(struct drbd_bm_aio_ctx=
- *ctx, int page_nr) __must_ho
- /*
-  * bm_rw: read/write the whole bitmap from/to its on disk location.
-  */
--static int bm_rw(struct drbd_device *device, const unsigned int flags, u=
-nsigned lazy_writeout_upper_idx) __must_hold(local)
-+static int bm_rw(struct drbd_device *device, const unsigned int flags,
-+		 unsigned lazy_writeout_upper_idx)
- {
- 	struct drbd_bm_aio_ctx *ctx;
- 	struct drbd_bitmap *b =3D device->bitmap;
-@@ -1215,7 +1216,7 @@ static int bm_rw(struct drbd_device *device, const =
-unsigned int flags, unsigned
-  * @device:	DRBD device.
-  */
- int drbd_bm_read(struct drbd_device *device,
--		 struct drbd_peer_device *peer_device) __must_hold(local)
-+		 struct drbd_peer_device *peer_device)
-=20
- {
- 	return bm_rw(device, BM_AIO_READ, 0);
-@@ -1228,7 +1229,7 @@ int drbd_bm_read(struct drbd_device *device,
-  * Will only write pages that have changed since last IO.
-  */
- int drbd_bm_write(struct drbd_device *device,
--		 struct drbd_peer_device *peer_device) __must_hold(local)
-+		  struct drbd_peer_device *peer_device)
- {
- 	return bm_rw(device, 0, 0);
- }
-@@ -1240,7 +1241,7 @@ int drbd_bm_write(struct drbd_device *device,
-  * Will write all pages.
-  */
- int drbd_bm_write_all(struct drbd_device *device,
--		struct drbd_peer_device *peer_device) __must_hold(local)
-+		      struct drbd_peer_device *peer_device)
- {
- 	return bm_rw(device, BM_AIO_WRITE_ALL_PAGES, 0);
- }
-@@ -1250,7 +1251,7 @@ int drbd_bm_write_all(struct drbd_device *device,
-  * @device:	DRBD device.
-  * @upper_idx:	0: write all changed pages; +ve: page index to stop scann=
-ing for changed pages
-  */
--int drbd_bm_write_lazy(struct drbd_device *device, unsigned upper_idx) _=
-_must_hold(local)
-+int drbd_bm_write_lazy(struct drbd_device *device, unsigned upper_idx)
- {
- 	return bm_rw(device, BM_AIO_COPY_PAGES, upper_idx);
- }
-@@ -1267,7 +1268,7 @@ int drbd_bm_write_lazy(struct drbd_device *device, =
-unsigned upper_idx) __must_ho
-  * pending resync acks are still being processed.
-  */
- int drbd_bm_write_copy_pages(struct drbd_device *device,
--		struct drbd_peer_device *peer_device) __must_hold(local)
-+			     struct drbd_peer_device *peer_device)
- {
- 	return bm_rw(device, BM_AIO_COPY_PAGES, 0);
- }
-@@ -1276,7 +1277,7 @@ int drbd_bm_write_copy_pages(struct drbd_device *de=
-vice,
-  * drbd_bm_write_hinted() - Write bitmap pages with "hint" marks, if the=
-y have changed.
-  * @device:	DRBD device.
-  */
--int drbd_bm_write_hinted(struct drbd_device *device) __must_hold(local)
-+int drbd_bm_write_hinted(struct drbd_device *device)
- {
- 	return bm_rw(device, BM_AIO_WRITE_HINTED | BM_AIO_COPY_PAGES, 0);
- }
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.=
-h
-index 49383c309865..4b9d69adb9d4 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -1064,18 +1064,14 @@ void conn_md_sync(struct drbd_connection *connect=
-ion);
- void drbd_md_write(struct drbd_device *device, void *buffer);
- void drbd_md_sync(struct drbd_device *device);
- int drbd_md_read(struct drbd_device *device, struct drbd_backing_dev *bd=
-ev);
--void drbd_uuid_set(struct drbd_device *device, int idx, u64 val)
--	__must_hold(local);
--void _drbd_uuid_set(struct drbd_device *device, int idx, u64 val)
--	__must_hold(local);
--void drbd_uuid_new_current(struct drbd_device *device) __must_hold(local=
-);
--void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(l=
-ocal);
--void drbd_uuid_move_history(struct drbd_device *device) __must_hold(loca=
-l);
--void __drbd_uuid_set(struct drbd_device *device, int idx, u64 val)
--	__must_hold(local);
--void drbd_md_set_flag(struct drbd_device *device, int flags) __must_hold=
-(local);
--void drbd_md_clear_flag(struct drbd_device *device, int flags)
--	__must_hold(local);
-+void drbd_uuid_set(struct drbd_device *device, int idx, u64 val);
-+void _drbd_uuid_set(struct drbd_device *device, int idx, u64 val);
-+void drbd_uuid_new_current(struct drbd_device *device);
-+void drbd_uuid_set_bm(struct drbd_device *device, u64 val);
-+void drbd_uuid_move_history(struct drbd_device *device);
-+void __drbd_uuid_set(struct drbd_device *device, int idx, u64 val);
-+void drbd_md_set_flag(struct drbd_device *device, int flags);
-+void drbd_md_clear_flag(struct drbd_device *device, int flags);
- int drbd_md_test_flag(struct drbd_backing_dev *, int);
- void drbd_md_mark_dirty(struct drbd_device *device);
- void drbd_queue_bitmap_io(struct drbd_device *device,
-@@ -1095,11 +1091,9 @@ int drbd_bitmap_io_from_worker(struct drbd_device =
-*device,
- 			       char *why, enum bm_flag flags,
- 			       struct drbd_peer_device *peer_device);
- int drbd_bmio_set_n_write(struct drbd_device *device,
--			  struct drbd_peer_device *peer_device)
--	__must_hold(local);
-+			  struct drbd_peer_device *peer_device);
- int drbd_bmio_clear_n_write(struct drbd_device *device,
--			    struct drbd_peer_device *peer_device)
--	__must_hold(local);
-+			    struct drbd_peer_device *peer_device);
-=20
- /* Meta data layout
-  *
-@@ -1310,19 +1304,17 @@ void _drbd_bm_set_bits(struct drbd_device *device=
-, const unsigned long s,
- int drbd_bm_test_bit(struct drbd_device *device, unsigned long bitnr);
- int drbd_bm_e_weight(struct drbd_device *device, unsigned long enr);
- int drbd_bm_read(struct drbd_device *device,
--		 struct drbd_peer_device *peer_device) __must_hold(local);
-+		 struct drbd_peer_device *peer_device);
- void drbd_bm_mark_for_writeout(struct drbd_device *device, int page_nr);
- int drbd_bm_write(struct drbd_device *device,
--		  struct drbd_peer_device *peer_device) __must_hold(local);
--void drbd_bm_reset_al_hints(struct drbd_device *device) __must_hold(loca=
-l);
--int drbd_bm_write_hinted(struct drbd_device *device) __must_hold(local);
--int drbd_bm_write_lazy(struct drbd_device *device, unsigned upper_idx)
--	__must_hold(local);
-+		  struct drbd_peer_device *peer_device);
-+void drbd_bm_reset_al_hints(struct drbd_device *device);
-+int drbd_bm_write_hinted(struct drbd_device *device);
-+int drbd_bm_write_lazy(struct drbd_device *device, unsigned upper_idx);
- int drbd_bm_write_all(struct drbd_device *device,
--		      struct drbd_peer_device *peer_device) __must_hold(local);
-+		      struct drbd_peer_device *peer_device);
- int drbd_bm_write_copy_pages(struct drbd_device *device,
--			     struct drbd_peer_device *peer_device)
--	__must_hold(local);
-+			     struct drbd_peer_device *peer_device);
- size_t drbd_bm_words(struct drbd_device *device);
- unsigned long drbd_bm_bits(struct drbd_device *device);
- sector_t drbd_bm_capacity(struct drbd_device *device);
-@@ -1417,8 +1409,7 @@ enum determine_dev_size {
- };
- enum determine_dev_size drbd_determine_dev_size(struct drbd_device *,
- 						enum dds_flags,
--						struct resize_parms *)
--	__must_hold(local);
-+						struct resize_parms *);
- void resync_after_online_grow(struct drbd_device *);
- void drbd_reconsider_queue_parameters(struct drbd_device *device,
- 				      struct drbd_backing_dev *bdev,
-@@ -1502,8 +1493,7 @@ int drbd_submit_peer_request(struct drbd_peer_reque=
-st *peer_req);
- int drbd_free_peer_reqs(struct drbd_device *, struct list_head *);
- struct drbd_peer_request *drbd_alloc_peer_req(struct drbd_peer_device *,=
- u64,
- 					      sector_t, unsigned int,
--					      unsigned int, gfp_t)
--	__must_hold(local);
-+					      unsigned int, gfp_t);
- void drbd_free_peer_req(struct drbd_device *device,
- 			struct drbd_peer_request *req);
- struct page *drbd_alloc_pages(struct drbd_peer_device *, unsigned int, b=
-ool);
-@@ -1520,7 +1510,6 @@ void drbd_set_my_capacity(struct drbd_device *devic=
-e, sector_t size);
- static inline void drbd_submit_bio_noacct(struct drbd_device *device,
- 					     int fault_type, struct bio *bio)
- {
--	__release(local);
- 	if (!bio->bi_bdev) {
- 		drbd_err(device, "drbd_submit_bio_noacct: bio->bi_bdev =3D=3D NULL\n")=
-;
- 		bio->bi_status =3D BLK_STS_IOERR;
-@@ -2016,7 +2005,6 @@ static inline void put_ldev(struct drbd_device *dev=
-ice)
- 	/* This may be called from some endio handler,
- 	 * so we must not sleep here. */
-=20
--	__release(local);
- 	D_ASSERT(device, i >=3D 0);
- 	if (i =3D=3D 0) {
- 		if (disk_state =3D=3D D_DISKLESS)
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_mai=
-n.c
-index dbf6e413db03..d9eb95aa5c44 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -3263,7 +3263,7 @@ void drbd_md_mark_dirty(struct drbd_device *device)
- 		mod_timer(&device->md_sync_timer, jiffies + 5*HZ);
- }
-=20
--void drbd_uuid_move_history(struct drbd_device *device) __must_hold(loca=
-l)
-+void drbd_uuid_move_history(struct drbd_device *device)
- {
- 	int i;
-=20
-@@ -3271,7 +3271,7 @@ void drbd_uuid_move_history(struct drbd_device *dev=
-ice) __must_hold(local)
- 		device->ldev->md.uuid[i+1] =3D device->ldev->md.uuid[i];
- }
-=20
--void __drbd_uuid_set(struct drbd_device *device, int idx, u64 val) __mus=
-t_hold(local)
-+void __drbd_uuid_set(struct drbd_device *device, int idx, u64 val)
- {
- 	if (idx =3D=3D UI_CURRENT) {
- 		if (device->state.role =3D=3D R_PRIMARY)
-@@ -3286,7 +3286,7 @@ void __drbd_uuid_set(struct drbd_device *device, in=
-t idx, u64 val) __must_hold(l
- 	drbd_md_mark_dirty(device);
- }
-=20
--void _drbd_uuid_set(struct drbd_device *device, int idx, u64 val) __must=
-_hold(local)
-+void _drbd_uuid_set(struct drbd_device *device, int idx, u64 val)
- {
- 	unsigned long flags;
- 	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
-@@ -3294,7 +3294,7 @@ void _drbd_uuid_set(struct drbd_device *device, int=
- idx, u64 val) __must_hold(lo
- 	spin_unlock_irqrestore(&device->ldev->md.uuid_lock, flags);
- }
-=20
--void drbd_uuid_set(struct drbd_device *device, int idx, u64 val) __must_=
-hold(local)
-+void drbd_uuid_set(struct drbd_device *device, int idx, u64 val)
- {
- 	unsigned long flags;
- 	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
-@@ -3313,7 +3313,7 @@ void drbd_uuid_set(struct drbd_device *device, int =
-idx, u64 val) __must_hold(loc
-  * Creates a new current UUID, and rotates the old current UUID into
-  * the bitmap slot. Causes an incremental resync upon next connect.
-  */
--void drbd_uuid_new_current(struct drbd_device *device) __must_hold(local=
-)
-+void drbd_uuid_new_current(struct drbd_device *device)
- {
- 	u64 val;
- 	unsigned long long bm_uuid;
-@@ -3335,7 +3335,7 @@ void drbd_uuid_new_current(struct drbd_device *devi=
-ce) __must_hold(local)
- 	drbd_md_sync(device);
- }
-=20
--void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(l=
-ocal)
-+void drbd_uuid_set_bm(struct drbd_device *device, u64 val)
- {
- 	unsigned long flags;
- 	spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
-@@ -3368,7 +3368,7 @@ void drbd_uuid_set_bm(struct drbd_device *device, u=
-64 val) __must_hold(local)
-  * Sets all bits in the bitmap and writes the whole bitmap to stable sto=
-rage.
-  */
- int drbd_bmio_set_n_write(struct drbd_device *device,
--			  struct drbd_peer_device *peer_device) __must_hold(local)
-+			  struct drbd_peer_device *peer_device)
-=20
- {
- 	int rv =3D -EIO;
-@@ -3395,7 +3395,7 @@ int drbd_bmio_set_n_write(struct drbd_device *devic=
-e,
-  * Clears all bits in the bitmap and writes the whole bitmap to stable s=
-torage.
-  */
- int drbd_bmio_clear_n_write(struct drbd_device *device,
--			  struct drbd_peer_device *peer_device) __must_hold(local)
-+			    struct drbd_peer_device *peer_device)
-=20
- {
- 	drbd_resume_al(device);
-@@ -3522,7 +3522,7 @@ int drbd_bitmap_io(struct drbd_device *device,
- 	return rv;
- }
-=20
--void drbd_md_set_flag(struct drbd_device *device, int flag) __must_hold(=
-local)
-+void drbd_md_set_flag(struct drbd_device *device, int flag)
- {
- 	if ((device->ldev->md.flags & flag) !=3D flag) {
- 		drbd_md_mark_dirty(device);
-@@ -3530,7 +3530,7 @@ void drbd_md_set_flag(struct drbd_device *device, i=
-nt flag) __must_hold(local)
- 	}
- }
-=20
--void drbd_md_clear_flag(struct drbd_device *device, int flag) __must_hol=
-d(local)
-+void drbd_md_clear_flag(struct drbd_device *device, int flag)
- {
- 	if ((device->ldev->md.flags & flag) !=3D 0) {
- 		drbd_md_mark_dirty(device);
 diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index f9ffcd67607b..c44b92856da3 100644
+index 57ab1f1fb1bc..d0a370bd7609 100644
 --- a/drivers/block/drbd/drbd_nl.c
 +++ b/drivers/block/drbd/drbd_nl.c
-@@ -968,8 +968,9 @@ void drbd_resume_io(struct drbd_device *device)
-  * Returns 0 on success, negative return values indicate errors.
-  * You should call drbd_md_sync() after calling this function.
-  */
--enum determine_dev_size
--drbd_determine_dev_size(struct drbd_device *device, enum dds_flags flags=
-, struct resize_parms *rs) __must_hold(local)
-+enum determine_dev_size drbd_determine_dev_size(struct drbd_device *devi=
-ce,
-+						enum dds_flags flags,
-+						struct resize_parms *rs)
- {
- 	struct md_offsets_and_sizes {
- 		u64 last_agreed_sect;
-@@ -3097,7 +3098,7 @@ static int drbd_adm_simple_request_state(struct sk_=
-buff *skb, struct genl_info *
- }
+@@ -3591,15 +3591,18 @@ int drbd_nl_get_connections_dumpit(struct sk_buff=
+ *skb, struct netlink_callback
+ 				err =3D drbd_nl_put_dump_connections_result(
+ 					skb, cb, resource, NULL,
+ 					ERR_RES_NOT_KNOWN);
+-				goto out;
++				rcu_read_unlock();
++				goto ret;
+ 			}
+ 			cb->args[0] =3D (long)resource;
+ 			cb->args[1] =3D SINGLE_RESOURCE;
+ 		}
+ 	}
+ 	if (!resource) {
+-		if (list_empty(&drbd_resources))
+-			goto out;
++		if (list_empty(&drbd_resources)) {
++			rcu_read_unlock();
++			goto ret;
++		}
+ 		resource =3D list_first_entry(&drbd_resources, struct drbd_resource, r=
+esources);
+ 		kref_get(&resource->kref);
+ 		cb->args[0] =3D (long)resource;
+@@ -3653,8 +3656,9 @@ int drbd_nl_get_connections_dumpit(struct sk_buff *=
+skb, struct netlink_callback
 =20
- static int drbd_bmio_set_susp_al(struct drbd_device *device,
--		struct drbd_peer_device *peer_device) __must_hold(local)
-+				 struct drbd_peer_device *peer_device)
- {
- 	int rv;
-=20
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd=
-_receiver.c
-index 58b95bf4bdca..4e04ff2dc65d 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -174,8 +174,9 @@ You must not have the req_lock:
-  * w_same: payload_size =3D=3D logical_block_size
-  * trim: payload_size =3D=3D 0 */
- struct drbd_peer_request *
--drbd_alloc_peer_req(struct drbd_peer_device *peer_device, u64 id, sector=
-_t sector,
--		    unsigned int request_size, unsigned int payload_size, gfp_t gfp_ma=
-sk) __must_hold(local)
-+drbd_alloc_peer_req(struct drbd_peer_device *peer_device, u64 id,
-+		    sector_t sector, unsigned int request_size,
-+		    unsigned int payload_size, gfp_t gfp_mask)
- {
- 	struct drbd_device *device =3D peer_device->device;
- 	struct drbd_peer_request *peer_req;
-@@ -1657,7 +1658,7 @@ static void drbd_csum_ee_size(struct crypto_shash *=
-h,
-  */
- static struct drbd_peer_request *
- read_in_block(struct drbd_peer_device *peer_device, u64 id, sector_t sec=
-tor,
--	      struct packet_info *pi) __must_hold(local)
-+	      struct packet_info *pi)
- {
- 	struct drbd_device *device =3D peer_device->device;
- 	const sector_t capacity =3D get_capacity(device->vdisk);
-@@ -1868,8 +1869,8 @@ static int e_end_resync_block(struct drbd_work *w, =
-int unused)
- 	return err;
- }
-=20
--static int recv_resync_read(struct drbd_peer_device *peer_device, sector=
-_t sector,
--			    struct packet_info *pi) __releases(local)
-+static int recv_resync_read(struct drbd_peer_device *peer_device,
-+			    sector_t sector, struct packet_info *pi)
- {
- 	struct drbd_device *device =3D peer_device->device;
- 	struct drbd_peer_request *peer_req;
-@@ -2826,7 +2827,7 @@ static int receive_DataRequest(struct drbd_connecti=
-on *connection, struct packet
- /*
-  * drbd_asb_recover_0p  -  Recover after split-brain with no remaining p=
-rimaries
-  */
--static int drbd_asb_recover_0p(struct drbd_peer_device *peer_device) __m=
-ust_hold(local)
-+static int drbd_asb_recover_0p(struct drbd_peer_device *peer_device)
- {
- 	struct drbd_device *device =3D peer_device->device;
- 	int self, peer, rv =3D -100;
-@@ -2909,7 +2910,7 @@ static int drbd_asb_recover_0p(struct drbd_peer_dev=
-ice *peer_device) __must_hold
- /*
-  * drbd_asb_recover_1p  -  Recover after split-brain with one remaining =
-primary
-  */
--static int drbd_asb_recover_1p(struct drbd_peer_device *peer_device) __m=
-ust_hold(local)
-+static int drbd_asb_recover_1p(struct drbd_peer_device *peer_device)
- {
- 	struct drbd_device *device =3D peer_device->device;
- 	int hg, rv =3D -100;
-@@ -2966,7 +2967,7 @@ static int drbd_asb_recover_1p(struct drbd_peer_dev=
-ice *peer_device) __must_hold
- /*
-  * drbd_asb_recover_2p  -  Recover after split-brain with two remaining =
-primaries
-  */
--static int drbd_asb_recover_2p(struct drbd_peer_device *peer_device) __m=
-ust_hold(local)
-+static int drbd_asb_recover_2p(struct drbd_peer_device *peer_device)
- {
- 	struct drbd_device *device =3D peer_device->device;
- 	int hg, rv =3D -100;
-@@ -3044,7 +3045,7 @@ static void drbd_uuid_dump(struct drbd_device *devi=
-ce, char *text, u64 *uuid,
-  */
-=20
- static int drbd_uuid_compare(struct drbd_peer_device *const peer_device,
--		enum drbd_role const peer_role, int *rule_nr) __must_hold(local)
-+			     enum drbd_role const peer_role, int *rule_nr)
- {
- 	struct drbd_connection *const connection =3D peer_device->connection;
- 	struct drbd_device *device =3D peer_device->device;
-@@ -3264,7 +3265,7 @@ static int drbd_uuid_compare(struct drbd_peer_devic=
-e *const peer_device,
-  */
- static enum drbd_conns drbd_sync_handshake(struct drbd_peer_device *peer=
-_device,
- 					   enum drbd_role peer_role,
--					   enum drbd_disk_state peer_disk) __must_hold(local)
-+					   enum drbd_disk_state peer_disk)
- {
- 	struct drbd_device *device =3D peer_device->device;
- 	enum drbd_conns rv =3D C_MASK;
-diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_w=
-orker.c
-index 0697f99fed18..6fec59bbf0e9 100644
---- a/drivers/block/drbd/drbd_worker.c
-+++ b/drivers/block/drbd/drbd_worker.c
-@@ -78,7 +78,7 @@ void drbd_md_endio(struct bio *bio)
- /* reads on behalf of the partner,
-  * "submitted" by the receiver
-  */
--static void drbd_endio_read_sec_final(struct drbd_peer_request *peer_req=
-) __releases(local)
-+static void drbd_endio_read_sec_final(struct drbd_peer_request *peer_req=
-)
- {
- 	unsigned long flags =3D 0;
- 	struct drbd_peer_device *peer_device =3D peer_req->peer_device;
-@@ -99,7 +99,7 @@ static void drbd_endio_read_sec_final(struct drbd_peer_=
-request *peer_req) __rele
-=20
- /* writes on behalf of the partner, or resync writes,
-  * "submitted" by the receiver, final stage.  */
--void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req) __re=
-leases(local)
-+void drbd_endio_write_sec_final(struct drbd_peer_request *peer_req)
- {
- 	unsigned long flags =3D 0;
- 	struct drbd_peer_device *peer_device =3D peer_req->peer_device;
-@@ -1923,10 +1923,8 @@ static void drbd_ldev_destroy(struct drbd_device *=
-device)
- 	lc_destroy(device->act_log);
- 	device->act_log =3D NULL;
-=20
--	__acquire(local);
- 	drbd_backing_dev_free(device, device->ldev);
- 	device->ldev =3D NULL;
--	__release(local);
-=20
- 	clear_bit(GOING_DISKLESS, &device->flags);
- 	wake_up(&device->misc_wait);
+ out:
+ 	rcu_read_unlock();
+-	if (resource)
+-		mutex_unlock(&resource->conf_update);
++	mutex_unlock(&resource->conf_update);
++
++ret:
+ 	if (err)
+ 		return err;
+ 	return skb->len;
