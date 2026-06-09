@@ -1,32 +1,32 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D8237CD5C;
-	Tue,  9 Jun 2026 06:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E7C24BD03
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780986501; cv=none; b=PBw42sfNis82ziDMUFXf0LiTMFHhzcuxHtatsg3KIm5r1jHeohV9ufU0sWswMFDVg8IK0mw2QDqoFkeDBAoihn2CxDRU0Eu6rZAOhHuL/CGFZkJrwc3qJSzqq4krmOWj+L7A3eyVCCgIzHP7JNdS3aV4aytxFGVtCTno8effyF8=
+	t=1780986517; cv=none; b=D5jxG7fkiwgBT/GWGENklYFVPnsy975qU1+pQlDM4sh8YGS72yfic6MfTF4MZWYdQ40KiKUbF3L+OwuIFe6ngiuJIeRo31F117dxq77w4yWfP2uUzktX+dbPl6JoGKkHeTCZdjp1DI4Hv/DR81wJBnP5SUpsZJX1Rf5T/JJGyAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780986501; c=relaxed/simple;
-	bh=tgdrHdhK+p636FycCUzkm5akVwJSiiV7lY2q6FqL4EE=;
+	s=arc-20240116; t=1780986517; c=relaxed/simple;
+	bh=oASuS6HeDtW7L0Fbwip/A1ymE47X5Ahh2FGn+UQEDRI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=euMv0+E3ra2Fqm2727KPV/R1FM5oiIhjJAE8dM6Oy7sZOQJj2oWGbA2qQ6PwGLd8P4epwZfotrdaXtrJb6PPAikF03EewLObPZ6+Cf5PO0vcGID4O+cqb4e4g97tbrY/NApSbmyZrCgWxm+cSQKw6dqTYVEUyPSWgE6Ko9AwWDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=isl8KKJu; arc=none smtp.client-ip=95.215.58.174
+	 MIME-Version; b=E5gpBgNwWH03kP/lPN1IJnvS99qoBkM2Owzc4GO4g9vADukf8oHASqaLfGrPY1inl2To6bAmEF2Rnte6tLpmo6cfOV0aAAfd7uXLigrbrcH3viwef2fTXMCm6ilVEYTuUiqZqBX/h10U+LsEdIEU8kQh9wNv1OOrY58Nyoi5Fvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CpXqR0D8; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="isl8KKJu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CpXqR0D8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780986497;
+	t=1780986514;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MR1hTzP95VNUKx7/pKpDVtm2601TjwJtZ4ASjUfdk1Y=;
-	b=isl8KKJuAUNED6y7PqRYss/yrCZzRxABbNH7LLFjXBudV0mEVhbPjitoJS3k0/o1vcGfft
-	s62so6ieDuNj/XVJ1vkk1Q7CcR4Ey2KkfWmakHlovNnr2LJm+7oGH2kB4IAdYCBbQxOFWn
-	FuuaYym3pHtVPMmNAZdGoQnflBzoQlE=
+	bh=smwcSwpSx3877vgkJVhF1DUcaQotbwHyv2wtpxTd7yQ=;
+	b=CpXqR0D8sDUMklAOU53IFxyjHsOAHr7bre1RxmD/ICXb8vVnoTPwyiQ7PJllPlM2do2vji
+	CZWIYF0tP4l5AIedEPdZwtoflwzjSpnKrsJsyiN0Col7fpwtC3VkX3UiTLeELwoG0QQZ8s
+	IRkZWlzKv1ScExqwZEUL82ocOW2B5Z0=
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Muchun Song <muchun.song@linux.dev>,
@@ -91,9 +91,9 @@ Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
 	Luca Ceresoli <luca.ceresoli@bootlin.com>,
 	Kaitao Cheng <kaitao.cheng@linux.dev>,
 	Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v2 08/14] spi: stm32-ospi: Open-code message transfer walk
-Date: Tue,  9 Jun 2026 14:25:20 +0800
-Message-ID: <20260609062526.94907-6-kaitao.cheng@linux.dev>
+Subject: [PATCH v2 09/14] spi: stm32-qspi: Open-code message transfer walk
+Date: Tue,  9 Jun 2026 14:25:21 +0800
+Message-ID: <20260609062526.94907-7-kaitao.cheng@linux.dev>
 In-Reply-To: <20260609062526.94907-1-kaitao.cheng@linux.dev>
 References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
  <20260609062526.94907-1-kaitao.cheng@linux.dev>
@@ -109,7 +109,7 @@ X-Migadu-Flow: FLOW_OUT
 From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
 A later change will make list_for_each_entry() cache the next element
-before entering the loop body. stm32_ospi_transfer_one_message() can
+before entering the loop body. stm32_qspi_transfer_one_message() can
 consume the following transfer as part of the current operation and then
 advance the loop cursor to that entry.
 
@@ -120,19 +120,20 @@ update.
 
 Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
 ---
- drivers/spi/spi-stm32-ospi.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/spi/spi-stm32-qspi.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/spi/spi-stm32-ospi.c b/drivers/spi/spi-stm32-ospi.c
-index 4461c6e24b9e..4dc2b56b4c20 100644
---- a/drivers/spi/spi-stm32-ospi.c
-+++ b/drivers/spi/spi-stm32-ospi.c
-@@ -675,7 +675,9 @@ static int stm32_ospi_transfer_one_message(struct spi_controller *ctrl,
+diff --git a/drivers/spi/spi-stm32-qspi.c b/drivers/spi/spi-stm32-qspi.c
+index df1bbacec90a..27d82a578c9f 100644
+--- a/drivers/spi/spi-stm32-qspi.c
++++ b/drivers/spi/spi-stm32-qspi.c
+@@ -577,7 +577,10 @@ static int stm32_qspi_transfer_one_message(struct spi_controller *ctrl,
  
- 	gpiod_set_value_cansleep(cs_gpiod, true);
+ 	gpiod_set_value_cansleep(spi_get_csgpiod(spi, 0), true);
  
 -	list_for_each_entry(transfer, &msg->transfers, transfer_list) {
-+	for (transfer = list_first_entry(&msg->transfers, typeof(*transfer), transfer_list);
++	for (transfer = list_first_entry(&msg->transfers,
++					 typeof(*transfer), transfer_list);
 +	     !list_entry_is_head(transfer, &msg->transfers, transfer_list);
 +	     transfer = list_next_entry(transfer, transfer_list)) {
  		u8 dummy_bytes = 0;
