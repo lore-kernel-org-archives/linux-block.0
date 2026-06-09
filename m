@@ -1,57 +1,57 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA2A24BD03
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76842421A00
 	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 22:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781042816; cv=none; b=aT428FiJcvGXBDioMKcT//MMFsO3NrhCJ0B0sfJEEBEqXizbTv8UQBuJMV3GGnEmXHawl8ixnco0cWZN3z3SBaRwNDzmMG9JmZsqYUN3ShruyixuDFMxd7ReGDaNwpQ/oQLRHnmjmfchvr9UfWYclnqoVHNe8kqScYnIk2NdTTE=
+	t=1781042816; cv=none; b=RjvWpZ0MTxsfPyv48CeQg6+6DSOkmdP5kt4Js4vgJBbOwYLFvnW/sOfcmzc4uTj8xaLXYfQegjVoPyBBu/0OQBlmk6LhMKWvR+24zLskiKpR5y/Ah//K/GLomOvJLAGuf+70vTmd0f1xm3crucUaeIJLF4/JJ84w5NdNh2jyf7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1781042816; c=relaxed/simple;
-	bh=Sho3G6p14OiZXucBOIa63pRHpyIejlHTxyH4aqKmnIE=;
+	bh=+qNTcdWZ1IsEGJSPGZWNpeC+/zEbJFG5us9dMa70jZ8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hwizfhm1lV5DE9Z6D7fwdAIiboVpEeJoKAh7X6E9zS9p7XkZB5lwL8etxq58vY+7jru0jw/5r7OSWtIboz2L4mPu2lW7Zt+YcFYjM2PS3/smR/3wvOIQRrLy+CXc2Z3y/nrFAphmoMMuX7Nrh2iARXui2hxmFKoi3N2F4BJ0qDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=O3KQNQP4; arc=none smtp.client-ip=199.89.1.16
+	 MIME-Version; b=seIPzrGy5aBPxANdLznvja6qsR04sASC8hUhZG+z/OjvpyjwwzPQNXr0xnPVp9sKInJvjaWttmLNH2+goRrtRnAfGaflMDsWBACPmgJio6CIfnYz2VqRyolM0A/Wni41Pqn6CSJ77P7Bx8fKlI4SpoTlF6pFPNTenCd8emxbkyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=NAeK9vqj; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="O3KQNQP4"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="NAeK9vqj"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gZjgM05bCzlgyGq;
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gZjgM0qn0zlfddT;
 	Tue,  9 Jun 2026 22:06:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:mime-version
-	:references:in-reply-to:x-mailer:message-id:date:date:subject
-	:subject:from:from:received:received; s=mr01; t=1781042811; x=
-	1783634812; bh=9Iq/eMeGA4Sd3ABTqAdypSK1i076JU7WUv8jbEThQa8=; b=O
-	3KQNQP45vsvTUh/v7hV2ay8ENlath81ac+xKbhwo7var68EMTWBg1HznNKY6OLZO
-	r29IELTSJMhdpjdNAiQUk7yUx9ahY7+/xq/o6QMeZvWALV7ABTT8zBbRYg2X3AdO
-	6JscMQ1nwXLKXfJg7RP1klRvBx4HfbPxHxZmNhKdIDucb8qzZZXy8z3UDZpz6Sl5
-	uIb5ZHPNcz9VG9AbjzIWN/wuMuVZtRgPGUPfp2j1UxFhvw8Ajb9MMB3jchayxSQ8
-	sf/mMRaXZ1r4yZonnzgPTj1lA1bKzV8ydGTrgwLF9Tt2OGNEJmjBz8T5/5920bTh
-	9l5+NiohIzGnZW7RlfAkw==
+	content-transfer-encoding:mime-version:references:in-reply-to
+	:x-mailer:message-id:date:date:subject:subject:from:from
+	:received:received; s=mr01; t=1781042810; x=1783634811; bh=2Ufig
+	BaokFgflocWqQ3ViN7dsku1BXVOtVJatlaxNq8=; b=NAeK9vqjj7+8t674pAV4z
+	B55DkjZdaMNlSsTxFBQDDnWjM8DrM+SUuiUETWRE/P2vkE9YjyydzTAcrN7QOUN0
+	nUMiarKo3K7NjSHH+MvV5W646d7UUnobokRLvd9Xq7KCWkeKU1huPJ5z8kLJNCZi
+	E2DbO3+hHVeFBdrxBZHZ3Lwknqla3KgJIvtrVfQVBTNsNO1chDQ8wmswPhCAvmse
+	ovfO+xzycYefFR/5DxIf/4YulKPDQoAzH7yFznsBB8V5RVh4AH0h0LDP4cPnzA75
+	10VldGwHB4yDiyQkhUSmzxwNH9Q7RzW4bAuStCx3OsR6NtdtLEBnaIx/gqQFm4MO
+	A==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id h8EnIHn762_a; Tue,  9 Jun 2026 22:06:51 +0000 (UTC)
+ id awmnbcFbSiRG; Tue,  9 Jun 2026 22:06:50 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gZjgF4DQdzlfddT;
-	Tue,  9 Jun 2026 22:06:49 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gZjgC0FvmzlffvQ;
+	Tue,  9 Jun 2026 22:06:46 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
 	Marco Elver <elver@google.com>,
 	Bart Van Assche <bvanassche@acm.org>,
-	=?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+	Ming Lei <tom.leiming@gmail.com>,
 	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH 24/27] xen-blkback: Enable lock context analysis
-Date: Tue,  9 Jun 2026 15:05:11 -0700
-Message-ID: <1d0c6b40ec040f4db5f996f9c0c88cf7bd683930.1781042470.git.bvanassche@acm.org>
+Subject: [PATCH 23/27] ublk: Enable lock context analysis
+Date: Tue,  9 Jun 2026 15:05:10 -0700
+Message-ID: <0a98c4c6a776f88e8e300ef9b205c190a3857609.1781042470.git.bvanassche@acm.org>
 X-Mailer: git-send-email 2.54.0.1099.g489fc7bff1-goog
 In-Reply-To: <cover.1781042470.git.bvanassche@acm.org>
 References: <cover.1781042470.git.bvanassche@acm.org>
@@ -61,29 +61,70 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Let Clang verify lock and unlock calls. Enable lock context analysis in t=
-he
-Makefile.
+Add the lock context annotations that are required by Clang.
 
-Acked-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/block/xen-blkback/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/block/ublk_drv.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/block/xen-blkback/Makefile b/drivers/block/xen-blkba=
-ck/Makefile
-index b0ea5ab5b9a1..864ef423226c 100644
---- a/drivers/block/xen-blkback/Makefile
-+++ b/drivers/block/xen-blkback/Makefile
-@@ -1,4 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+
-+CONTEXT_ANALYSIS :=3D y
-+
- obj-$(CONFIG_XEN_BLKDEV_BACKEND) :=3D xen-blkback.o
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 4f6d9e652187..1e18bc926dff 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -374,11 +374,13 @@ static inline bool ublk_support_batch_io(const stru=
+ct ublk_queue *ubq)
+ }
 =20
- xen-blkback-y	:=3D blkback.o xenbus.o
+ static inline void ublk_io_lock(struct ublk_io *io)
++	__acquires(&io->lock)
+ {
+ 	spin_lock(&io->lock);
+ }
+=20
+ static inline void ublk_io_unlock(struct ublk_io *io)
++	__releases(&io->lock)
+ {
+ 	spin_unlock(&io->lock);
+ }
+@@ -3263,6 +3265,7 @@ static int ublk_check_fetch_buf(const struct ublk_d=
+evice *ub, __u64 buf_addr)
+=20
+ static int __ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub=
+,
+ 			struct ublk_io *io, u16 q_id)
++	__must_hold(&ub->mutex)
+ {
+ 	/* UBLK_IO_FETCH_REQ is only allowed before dev is setup */
+ 	if (ublk_dev_ready(ub))
+@@ -3686,6 +3689,7 @@ static void ublk_batch_revert_prep_cmd(struct ublk_=
+batch_io_iter *iter,
+ static int ublk_batch_prep_io(struct ublk_queue *ubq,
+ 			      const struct ublk_batch_io_data *data,
+ 			      const struct ublk_elem_header *elem)
++	__must_hold(&data->ub->mutex)
+ {
+ 	struct ublk_io *io =3D &ubq->ios[elem->tag];
+ 	const struct ublk_batch_io *uc =3D &data->header;
+@@ -5290,6 +5294,7 @@ static int ublk_char_dev_permission(struct ublk_dev=
+ice *ub,
+  * already holds ub->mutex when calling del_gendisk() which freezes the =
+queue.
+ */
+ static unsigned int ublk_lock_buf_tree(struct ublk_device *ub)
++	__acquires(&ub->mutex)
+ {
+ 	unsigned int memflags =3D 0;
+=20
+@@ -5301,6 +5306,7 @@ static unsigned int ublk_lock_buf_tree(struct ublk_=
+device *ub)
+ }
+=20
+ static void ublk_unlock_buf_tree(struct ublk_device *ub, unsigned int me=
+mflags)
++	__releases(&ub->mutex)
+ {
+ 	if (ub->ub_disk)
+ 		blk_mq_unfreeze_queue(ub->ub_disk->queue, memflags);
