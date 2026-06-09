@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA34D4D2EDE;
-	Tue,  9 Jun 2026 19:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53144D2EDE;
+	Tue,  9 Jun 2026 19:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781032320; cv=none; b=bOrK8VJzW+mjeSNIXE0f/ZeEDms4UpVJEc1NSekNKKRj3huqWP6XcPU1VvVQuWZqkyGWjpmpdvQflJkEznavd2sxhU+uglJ9kM/nWjZb/nbr7IaafAf/9Q9AB63Cu9Hx/N3EQV36Pf+0OZiTQhYurNQRE23HA3sRnMK0cKlj0DY=
+	t=1781032325; cv=none; b=XAzp3Jfk5YwYIza+gIxhxi9aqNUt8B4MZXhcD7Qwpvm/jvBY7FOIVsQ1/SMcUp4E+UFaB2XqYM0ELdt7ByvAPFJAeN/PeUjqwM3fKWbFtHCFYwk6eHOleIvDsPcyOCZAbyidX26Do506ytiCpcGdpu8Khnw/EDvKLpAULj8kiss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781032320; c=relaxed/simple;
-	bh=5tWrOfwAoTdtiugODrPJwqvRH5XTpwTVzL/RkoxFmKQ=;
+	s=arc-20240116; t=1781032325; c=relaxed/simple;
+	bh=W0O2CczxZDQEXRc15dJETKMQ+dkKiMZR7U8tm411g7s=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=T4X/wvcMdLnhdJuMSkuUej6/SASkJdHMMaosgyx8ANo6mVmB0P/Jse3ZUHg9p4ygt29GlO/J5rjICEvFgrTPoNY9YD5tri5Rd+Ihr1xSSnuY367Gk6rxrIx8MhQQpislmjb8TUJc80jo+nutnsC2KCvux+3qMGhKRb2kRs5I6UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HbkJriII; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=RZfOPN/gL5RJhemES6nb87deyXPZPmiBLYG4teDjSOAplr+5pw2IgU/Lsn4kPBZrwCPoeiY0pfkuzddB6RhmVgm9oi3VDqc+5kiqzuy6FOE3r+xnu3h+gOJQBIvsUniKv2DdURHD8N+/gics+e7rw8XdXnKsm5+UlIXD7A9/zWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KWh84ZQZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HbkJriII"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8EE11F00898;
-	Tue,  9 Jun 2026 19:11:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KWh84ZQZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC0C1F00893;
+	Tue,  9 Jun 2026 19:11:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781032318;
-	bh=IkD0QE1JNG+5G4E9lQ6Nh6HgjvnmUhj4qhwVEK7b4Kw=;
+	s=k20260515; t=1781032324;
+	bh=+YoDlaRXxHkBdL9A3Iy3eyhP/tykMNVFwls11O+PbGw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=HbkJriII3mozpClgOgi65m6h2a4N5QW7igQRqNhtcRg/1/9VCyekam92oxNs83Vv2
-	 8ZvF5ZsjHQnVxNDCtEQdRGKyzgJ3/iPPhkHsDnJO+d61HEqeSOpIM+myPDxNVkTr+A
-	 A5e2liydG4NK1SLts+w88+lMJ0AErM2/Q16rZP4xSQYJv0CKTs6i8cLvXKWT6uJYCR
-	 eM5CSuk0AtUQk0qW2NMFSjq8VMNMyRNP/XsYZZKEME84eDwrVSf+OgloaEqROe8fah
-	 gCpp5t3MPXJ+StljDASOVhFgkcGDd514WrNe5/cHXTO8/VK95jGEbXiwFKKzldxg/b
-	 +92RzJ2tyv7ew==
+	b=KWh84ZQZbd6+abJoZIFIxRUn4c5TrwdxMM/86SAfgZTUh6LojigcMZcS5+SAofC+j
+	 43O9jA6Q0PVLSoLmT5cekTXpstMmziu34IY4oicvKtd4/I28lKCaBG4zG1eWiBasq8
+	 ZmXp24Rb7GmggbZSBZPaT217AwW0dz5zs8OnOgZ+OV6xFD11SFStdpDWVzIkolj5Op
+	 y557TTH3PeayehmmC7aY6efh5NWG00BEEznzp3sEYMtY2EK27SPUMGD97Z8DfGPlO5
+	 V1XXt3jl+BFVTR/wq5KnKladB0fOdbR9OpNv51kuH3rMDxygWm+MUVtecbA37wwcJj
+	 4KGuinCXguuQw==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Tue, 09 Jun 2026 21:07:55 +0200
-Subject: [PATCH v2 16/83] block: rnull: add memory backing
+Date: Tue, 09 Jun 2026 21:08:44 +0200
+Subject: [PATCH v2 65/83] block: rust: add `GenDisk::tag_set`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260609-rnull-v6-19-rc5-send-v2-16-82c7404542e2@kernel.org>
+Message-Id: <20260609-rnull-v6-19-rc5-send-v2-65-82c7404542e2@kernel.org>
 References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 In-Reply-To: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
 To: "Liam R. Howlett" <liam@infradead.org>, 
@@ -58,299 +58,64 @@ Cc: Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  rust-for-linux@vger.kernel.org
 X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9051; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=5tWrOfwAoTdtiugODrPJwqvRH5XTpwTVzL/RkoxFmKQ=;
- b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTDlpQLAb1Gdie0mQdmixKF/RmwXPiQ/Q1mE
- yviretqzF+JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihkwwAKCRD6UCkIqsW9
- 0E5BD/kBzAHZRaW7Q6j0G0U3xNqihtUwFAbCJwp+84ZCx2vnJuP6bH2v801ATOF/7Ik6Gips0mP
- +46GLnccPBOI5WabhrpnL2CZ2ZSDBbGUoOm2v2n8HsGRyh61KptIriN+blMlb9soc+VrzGNW1To
- g1B1kBaqYTeVEAPC8iJ5gYzcZTmEwNEIYkHEwT4DlU+OBQpA8/+2cMyJuWrIHXBKe3/z7LgcdnP
- VFkuPPsHkxklFDpZDCuCWYRH4wKwx4kn3XToD8jS7B4AFDlh4eDimVOzFOr33BnmbPceBK+zQon
- bBhjFJH4D6gbSmcZ/uCBYq1aPS4Vj3grlTBCX/KmBfBAY3+VJB5i4cuB/am8pIR+CF1J/8JbS6a
- SO10KADB1axzJrNZLOTOOKQpzRWNvqu7eFtAgdnxkeqaa4Wg4iyrJzvFJSSe1mDYzMYAj2WJOOj
- 1uXy8L1k6bYhn16XKayO5bwak8fjQMHOpFUAj6HKxLIXMqRDx3emfaDqNTndTkKYQGaf+drMJh6
- xhn5HyA7xZdrkfBE5n/gQ9j37eojuawnQPcEiGQfIAWuBVX9aFgv/BT5u07a4pD+Z/CBrpOdpDr
- VTPbIr3B7RLh0Z/hJrmf31ZOEUxysfmNaWOSxYcaPC5gBdCXlYfbJjrWvId0h+DW6PVqkl9a0Pb
- cmr4YJ0LMImhP7w==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1759; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=W0O2CczxZDQEXRc15dJETKMQ+dkKiMZR7U8tm411g7s=;
+ b=owEBbQKS/ZANAwAKAfpQKQiqxb3QAcsmYgBqKGTvQ1j9ShlTi9k2Sxb2Wf0dabZIrqUisKav9
+ O2siS1ba22JAjMEAAEKAB0WIQRXitnI2WZ2JirAaob6UCkIqsW90AUCaihk7wAKCRD6UCkIqsW9
+ 0FeWD/9yDXxLKGaEABjjYFcFzRClbH4obCRuAURGM/QGNN9G68bjR5xvZgZBY2ro33xcNTNJAJL
+ 40PULazu/7YNQvvPEommrLYYtyhDfbp/IgLzBIOTzp6jwSAfSHAIivLG98wyH/amIbR1vH8yCql
+ SBDdg/alHTtXGCU0q2i+pbsClfWDluhNWB7x4H4UG8+LC5nW6Jud2OXoy3VYZcluv7qanvjUJUg
+ itVhIUBCc0CsZakZ3bAicLz9qx324CAigGnYNBC0XecSxh0jmsIopTMS5Vn3bSQjY8ffpVWI+zz
+ +3K99Hgnhv6uX1VODIAC7V7dp13ZPw9pq1/w8tFFhXa83i42bKeqH4EMDwtArYia/r5UN+8Hxru
+ W/jUOiqtMyP+/6yvN2WWEGIDkCP90nS/ITnMdwqplALX6quStpjIrtpEWHDcJvqGupxXlRnmxoS
+ vxlRuEN9Hci+7AlgG121BQDKaTq/6gR9fZfOpOSa3pO37+JcWv3qNI9wGHa6QY8xtYDF3RWWaAs
+ jOM6ahj8m58s1GqtrBlSzSyFs1JhsSdZoWOgQ1VHhOxANpkNHBqTIuyuEzo9Krvs74mm5LO5KEG
+ jM8F3FHT/n5ck6W8SkIAJahMQV/vvVUYxBdGI6n1+VJuZqib6n1gmfGQWb74cml/ePNiQby0wb8
+ g+x3smGKALfVxkw==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add memory backing to the rust null block driver. This implementation will
-always allocate a page on write, even though a page backing the written
-sector is already allocated, in which case the page will be released again.
-A later patch will fix this inefficiency.
+Add a method to `GenDisk` to obtain a reference to the associated `TagSet`.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs |   8 ++-
- drivers/block/rnull/rnull.rs    | 126 ++++++++++++++++++++++++++++++++++------
- 2 files changed, 116 insertions(+), 18 deletions(-)
+ rust/kernel/block/mq/gen_disk.rs | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 83b474f6da60..8daf2ca409ba 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -60,7 +60,7 @@ impl AttributeOperations<0> for Config {
- 
-     fn show(_this: &Config, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-         let mut writer = kernel::str::Formatter::new(page);
--        writer.write_str("blocksize,size,rotational,irqmode,completion_nsec\n")?;
-+        writer.write_str("blocksize,size,rotational,irqmode,completion_nsec,memory_backed\n")?;
-         Ok(writer.bytes_written())
-     }
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index 5367ca92b7aa..a50ba7b605d7 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -257,7 +257,7 @@ pub fn build(
+         // `__blk_mq_alloc_disk` above.
+         let mut disk = UniqueArc::new(
+             GenDisk {
+-                _tagset: tagset,
++                tag_set: tagset,
+                 gendisk,
+                 backref: Arc::pin_init(
+                     // INVARIANT: We break `GenDiskRef` invariant here, but we restore it below.
+@@ -341,7 +341,7 @@ pub(crate) const fn build_vtable() -> &'static bindings::block_device_operations
+ ///    `bindings::device_add_disk`.
+ ///  - `self.gendisk.queue.queuedata` is initialized by a call to `ForeignOwnable::into_foreign`.
+ pub struct GenDisk<T: Operations> {
+-    _tagset: Arc<TagSet<T>>,
++    tag_set: Arc<TagSet<T>>,
+     gendisk: *mut bindings::gendisk,
+     backref: Arc<Revocable<GenDiskRef<T>>>,
  }
-@@ -84,6 +84,7 @@ fn make_group(
-                 size: 3,
-                 irqmode: 4,
-                 completion_nsec: 5,
-+                memory_backed: 6,
-             ],
-         };
- 
-@@ -101,6 +102,7 @@ fn make_group(
-                     irq_mode: IRQMode::None,
-                     completion_time: time::Delta::ZERO,
-                     name: name.try_into()?,
-+                    memory_backed: false,
-                 }),
-             }),
-             core::iter::empty(),
-@@ -165,6 +167,7 @@ struct DeviceConfigInner {
-     irq_mode: IRQMode,
-     completion_time: time::Delta,
-     disk: Option<GenDisk<NullBlkDevice>>,
-+    memory_backed: bool,
- }
- 
- #[vtable]
-@@ -195,6 +198,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                 guard.capacity_mib,
-                 guard.irq_mode,
-                 guard.completion_time,
-+                guard.memory_backed,
-             )?);
-             guard.powered = true;
-         } else if guard.powered && !power_op {
-@@ -226,3 +230,5 @@ fn from_str(s: &str) -> Result<Self> {
-         value.try_into()
-     }
- }
-+
-+configfs_simple_bool_field!(DeviceConfig, 6, memory_backed);
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 746ddadd11f0..8e4d2b270bcf 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -6,8 +6,10 @@
- 
- use configfs::IRQMode;
- use kernel::{
-+    bindings,
-     block::{
-         self,
-+        bio::Segment,
-         mq::{
-             self,
-             gen_disk::{
-@@ -19,15 +21,12 @@
-         },
-     },
-     error::Result,
--    new_mutex,
-+    memalloc_scope, new_mutex, new_xarray,
-+    page::SafePage,
-     pr_info,
-     prelude::*,
-     str::CString,
--    sync::{
--        aref::ARef,
--        Arc,
--        Mutex, //
--    },
-+    sync::{aref::ARef, Arc, Mutex},
-     time::{
-         hrtimer::{
-             HrTimerCallback,
-@@ -40,7 +39,8 @@
-     types::{
-         OwnableRefCounted,
-         Owned, //
--    }, //
-+    },
-+    xarray::XArray,
- };
- 
- module! {
-@@ -74,6 +74,10 @@
-             default: 10_000,
-             description:  "Time in ns to complete a request in hardware. Default: 10,000ns",
-         },
-+        memory_backed: bool {
-+            default: false,
-+            description: "Create a memory-backed block device.",
-+        },
-     },
- }
- 
-@@ -103,6 +107,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                     module_parameters::gb.value() * 1024,
-                     module_parameters::irqmode.value().try_into()?,
-                     Delta::from_nanos(completion_time),
-+                    module_parameters::memory_backed.value(),
-                 )?;
-                 disks.push(disk, GFP_KERNEL)?;
-             }
-@@ -127,17 +132,23 @@ fn new(
-         capacity_mib: u64,
-         irq_mode: IRQMode,
-         completion_time: Delta,
-+        memory_backed: bool,
-     ) -> Result<GenDisk<Self>> {
--        let tagset = Arc::pin_init(
--            TagSet::new(1, 256, 1, mq::tag_set::Flags::default()),
--            GFP_KERNEL,
--        )?;
-+        let flags = if memory_backed {
-+            mq::tag_set::Flag::Blocking.into()
-+        } else {
-+            mq::tag_set::Flags::default()
-+        };
-+
-+        let tagset = Arc::pin_init(TagSet::new(1, 256, 1, flags), GFP_KERNEL)?;
- 
--        let queue_data = Box::new(
--            QueueData {
-+        let queue_data = Box::pin_init(
-+            pin_init!(QueueData {
-+                tree <- new_xarray!(kernel::xarray::AllocKind::Alloc),
-                 irq_mode,
-                 completion_time,
--            },
-+                memory_backed,
-+            }),
-             GFP_KERNEL,
-         )?;
- 
-@@ -148,11 +159,72 @@ fn new(
-             .rotational(rotational)
-             .build(fmt!("{}", name.to_str()?), tagset, queue_data)
+@@ -363,6 +363,11 @@ pub fn queue_data(&self) -> <T::QueueData as ForeignOwnable>::Borrowed<'_> {
+         // SAFETY: By type invariant, self is a valid gendisk.
+         unsafe { T::QueueData::borrow((*(*self.gendisk).queue).queuedata) }
      }
 +
-+    #[inline(always)]
-+    fn write(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -> Result {
-+        while !segment.is_empty() {
-+            let page = SafePage::alloc_page(GFP_KERNEL)?;
-+            let mut tree = tree.lock();
-+
-+            let page_idx = sector >> block::PAGE_SECTORS_SHIFT;
-+
-+            let page = if let Some(page) = tree.get_mut(page_idx) {
-+                page
-+            } else {
-+                tree.store(page_idx, page, GFP_KERNEL)?;
-+                tree.get_mut(page_idx).unwrap()
-+            };
-+
-+            let page_offset = (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
-+            sector += segment.copy_to_page(page, page_offset) >> block::SECTOR_SHIFT;
-+        }
-+        Ok(())
-+    }
-+
-+    #[inline(always)]
-+    fn read(tree: &XArray<TreeNode>, mut sector: usize, mut segment: Segment<'_>) -> Result {
-+        let tree = tree.lock();
-+
-+        while !segment.is_empty() {
-+            let idx = sector >> block::PAGE_SECTORS_SHIFT;
-+
-+            if let Some(page) = tree.get(idx) {
-+                let page_offset =
-+                    (sector & block::PAGE_SECTOR_MASK as usize) << block::SECTOR_SHIFT;
-+                sector += segment.copy_from_page(page, page_offset) >> block::SECTOR_SHIFT;
-+            } else {
-+                sector += segment.zero_page() >> block::SECTOR_SHIFT;
-+            }
-+        }
-+
-+        Ok(())
-+    }
-+
-+    #[inline(never)]
-+    fn transfer(
-+        command: bindings::req_op,
-+        tree: &XArray<TreeNode>,
-+        sector: usize,
-+        segment: Segment<'_>,
-+    ) -> Result {
-+        match command {
-+            bindings::req_op_REQ_OP_WRITE => Self::write(tree, sector, segment)?,
-+            bindings::req_op_REQ_OP_READ => Self::read(tree, sector, segment)?,
-+            _ => (),
-+        }
-+        Ok(())
++    /// Get a reference to the `TagSet` used by this `GenDisk`.
++    pub fn tag_set(&self) -> &Arc<TagSet<T>> {
++        &self.tag_set
 +    }
  }
  
-+type TreeNode = Owned<SafePage>;
-+
-+#[pin_data]
- struct QueueData {
-+    #[pin]
-+    tree: XArray<TreeNode>,
-     irq_mode: IRQMode,
-     completion_time: Delta,
-+    memory_backed: bool,
- }
- 
- #[pin_data]
-@@ -182,7 +254,7 @@ impl HasHrTimer<Self> for Pdu {
- 
- #[vtable]
- impl Operations for NullBlkDevice {
--    type QueueData = KBox<QueueData>;
-+    type QueueData = Pin<KBox<QueueData>>;
-     type RequestData = Pdu;
- 
-     fn new_request_data() -> impl PinInit<Self::RequestData> {
-@@ -192,7 +264,27 @@ fn new_request_data() -> impl PinInit<Self::RequestData> {
-     }
- 
-     #[inline(always)]
--    fn queue_rq(queue_data: &QueueData, rq: Owned<mq::Request<Self>>, _is_last: bool) -> Result {
-+    fn queue_rq(
-+        queue_data: Pin<&QueueData>,
-+        mut rq: Owned<mq::Request<Self>>,
-+        _is_last: bool,
-+    ) -> Result {
-+        if queue_data.memory_backed {
-+            memalloc_scope!(let _noio: NoIo);
-+            let tree = &queue_data.tree;
-+            let command = rq.command();
-+            let mut sector = rq.sector();
-+
-+            for bio in rq.bio_iter_mut() {
-+                let segment_iter = bio.segment_iter();
-+                for segment in segment_iter {
-+                    let length = segment.len();
-+                    Self::transfer(command, tree, sector, segment)?;
-+                    sector += length as usize >> block::SECTOR_SHIFT;
-+                }
-+            }
-+        }
-+
-         match queue_data.irq_mode {
-             IRQMode::None => rq.end_ok(),
-             IRQMode::Soft => mq::Request::complete(rq.into()),
-@@ -205,7 +297,7 @@ fn queue_rq(queue_data: &QueueData, rq: Owned<mq::Request<Self>>, _is_last: bool
-         Ok(())
-     }
- 
--    fn commit_rqs(_queue_data: &QueueData) {}
-+    fn commit_rqs(_queue_data: Pin<&QueueData>) {}
- 
-     fn complete(rq: ARef<mq::Request<Self>>) {
-         OwnableRefCounted::try_from_shared(rq)
+ // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
 
 -- 
 2.51.2
