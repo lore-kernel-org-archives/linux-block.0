@@ -1,30 +1,32 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4383F2E7391
-	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B052E7391
+	for <linux-block@vger.kernel.org>; Tue,  9 Jun 2026 06:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780985717; cv=none; b=mzEXRUaAtg5eUvjggo7IPkqbQOO4/+uJ7ZupF1vTx8esH+cYAMg6ryiWPu0ax7XYaqHV8wc7DAr4Z7QVJbPfqTdFtXEMV8wq5dn2Di77qwYecZpZBBbwX628vs5vjsV5nVHxm9ThU5rUZRQqBS1NfiZaAB4qMKtF3+nqrcGhrGg=
+	t=1780985732; cv=none; b=EI06hRn7lT1ElaQxGXxzwS7WY9Pfw+Qdrqi4xoDDNu4iV2AfdMXgn5iqRZi+Cce8WrbeUQ1/YBYrrKADrtzjkcKbt0zti5aH2PnFZYEcoa2Fhf2TTAypxWeI/nYzkZrYYgv0I82SDi2MmjKUZGiyuqCqsNe7lwQjGaORlfWKoUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780985717; c=relaxed/simple;
-	bh=BlfHt/EcnceYK964c8b6bJMPVkoV83ARrVpSfVvjqCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k/VKmoWLAvtGJfXS4G/IBb9IRdyALnN0c3lk9rOlgjw1QIHdXxL4I7c0ZILGLzzBwXECeJZvrLpsAAovgRew/sgJwPRo13XyjPaQbyhyrzJ0tFMIQTerzbwvMhMCmh/CZST7hKaXSMVPKCp1GfSCQE3jVHKZIQJ2nLBqkmfvGWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kQ+kUgOr; arc=none smtp.client-ip=91.218.175.171
+	s=arc-20240116; t=1780985732; c=relaxed/simple;
+	bh=UFvl/VyOpDYMjhlydzxQ4k85SuVK3AWcIYyCr3Pr49A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bt7u3u/WotGDDX7Ccp44w8qApuKfbvzrwrSIizvT76jTbxXTKcogSjuK5KtWGoMR5iY3caz1g1akHcu7KmqEtkWm21bYWaY2Q+Sn4LnoxEMltQ/hWjW7oHUMNJEW9wU5/8qa6r0+N9Ta09QPyw3tZZXZI58uVeNPNs6k7nuzgTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z8zV2BjC; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kQ+kUgOr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z8zV2BjC"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780985712;
+	t=1780985728;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=i2jpIDCVnNVhXSYDVvdDiQ1s+6wApppzolFVa3ePcBA=;
-	b=kQ+kUgOrV6W6Jc16Kii3uxt27H6tnGH4ZT13H/tGloTnC2pxAr0+1e0lN87mGDlSsCwwUT
-	byRLJdWy+OF38KcDXWI7VaMSELJjoswljJztiskoxvxrLRlYswbpJIeHHZA8qm2XiuHT4d
-	nSyAaMFF4R+0aR7kWu7ve4uMSn0m2lc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OIHUqXQmUUYiluUxjJGbqlbmrFVz6UQUb/30/LyGMbo=;
+	b=Z8zV2BjCyIIWmJUOuq+lpPC144tcwa3dYQzA0MbEaPU04Q8HQiL3ytDgkjwXu7qSG5Vt1G
+	8EHmclu6rvc8oemzxv47fNi8tHF1o9R4NOTCl0imYYdSuEjWYjWaCaZ0rzlyzknIGPhr36
+	Z9cyhUeg/Vahz+UVQh1W/YpfPZkITdc=
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Muchun Song <muchun.song@linux.dev>,
@@ -88,10 +90,12 @@ Cc: Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
 	David Howells <dhowells@redhat.com>,
 	Luca Ceresoli <luca.ceresoli@bootlin.com>,
 	Kaitao Cheng <kaitao.cheng@linux.dev>,
-	Kaito Cheng <chengkaitao@kylinos.cn>
-Subject: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor state
-Date: Tue,  9 Jun 2026 14:13:33 +0800
-Message-ID: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+	Kaitao Cheng <chengkaitao@kylinos.cn>
+Subject: [PATCH v2 01/14] drbd: Open-code transfer log list walk
+Date: Tue,  9 Jun 2026 14:13:34 +0800
+Message-ID: <20260609061347.93688-2-kaitao.cheng@linux.dev>
+In-Reply-To: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -101,64 +105,38 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Kaito Cheng <chengkaitao@kylinos.cn>
+From: Kaitao Cheng <chengkaitao@kylinos.cn>
 
-This series prepares for, and then updates, the list_for_each_entry()
-family so the common entry iterators cache their next or previous cursor
-before the loop body runs.
+A later change will make list_for_each_entry() cache the next element
+before entering the loop body. That is the desired behaviour for the
+common case, but this transfer log walk temporarily drops
+resource->req_lock and revalidates the cursor before continuing.
 
-The first 13 patches open-code loops that intentionally depend on the
-old "derive the next entry from the current cursor at the end of the
-iteration" behaviour.  These loops append work to the list being walked,
-restart traversal after dropping a lock, skip an entry consumed by the
-current iteration, or otherwise adjust the cursor in the loop body.
+Keep the loop open-coded so the next request is derived after the body
+has completed and after the cursor has been adjusted. This preserves the
+existing traversal semantics and prepares the code for the list iterator
+update.
 
-The final patch changes include/linux/list.h to keep a private cursor in
-the common entry iterators while preserving the public macro interface.
-The safe variants remain available when callers need the temporary
-cursor explicitly or have stronger mutation requirements.
+Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+---
+ drivers/block/drbd/drbd_debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Changes in v2 (Muchun Song, Andy Shevchenko):
- - Drop the list_for_each_entry_mutable*() helpers from v1 and make the
-   cursor change directly in the existing list_for_each_entry*() helpers.
- - Open-code special list walks that rely on updating the loop cursor in
-   the body, preserving their existing traversal semantics.
-
-Link to v1:
-https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
-
-Kaitao Cheng (14):
-  drbd: Open-code transfer log list walk
-  firewire: core: Open-code topology list walk
-  drm/bridge: Open-code bridge chain list walks
-  drm/i915/gt: Open-code active timeline walk
-  drm/i915: Open-code DFS dependency list walk
-  drm/ttm: Open-code reservation list walk
-  spi: fsi: Open-code message transfer walk
-  spi: stm32-ospi: Open-code message transfer walk
-  spi: stm32-qspi: Open-code message transfer walk
-  spi: tegra210-quad: Open-code message transfer walk
-  locking/locktorture: Open-code ww mutex list walk
-  locking/ww_mutex: Open-code stress reorder list walk
-  ASoC: dapm: Open-code widget invalidation walk
-  list: Cache cursors in entry iterators
-
- drivers/block/drbd/drbd_debugfs.c      |  4 ++-
- drivers/firewire/core-topology.c       |  4 ++-
- drivers/gpu/drm/drm_bridge.c           |  7 ++--
- drivers/gpu/drm/i915/gt/intel_reset.c  |  4 ++-
- drivers/gpu/drm/i915/i915_scheduler.c  |  4 ++-
- drivers/gpu/drm/ttm/ttm_execbuf_util.c |  4 ++-
- drivers/spi/spi-fsi.c                  |  5 ++-
- drivers/spi/spi-stm32-ospi.c           |  4 ++-
- drivers/spi/spi-stm32-qspi.c           |  5 ++-
- drivers/spi/spi-tegra210-quad.c        |  4 ++-
- include/linux/list.h                   | 46 ++++++++++++++++++++------
- kernel/locking/locktorture.c           |  4 ++-
- kernel/locking/test-ww_mutex.c         |  4 ++-
- sound/soc/soc-dapm.c                   |  4 ++-
- 14 files changed, 78 insertions(+), 25 deletions(-)
-
+diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
+index 12460b584bcb..e90cead90e9d 100644
+--- a/drivers/block/drbd/drbd_debugfs.c
++++ b/drivers/block/drbd/drbd_debugfs.c
+@@ -308,7 +308,9 @@ static void seq_print_resource_transfer_log_summary(struct seq_file *m,
+ 
+ 	seq_puts(m, "n\tdevice\tvnr\t" RQ_HDR);
+ 	spin_lock_irq(&resource->req_lock);
+-	list_for_each_entry(req, &connection->transfer_log, tl_requests) {
++	for (req = list_first_entry(&connection->transfer_log, typeof(*req), tl_requests);
++	     !list_entry_is_head(req, &connection->transfer_log, tl_requests);
++	     req = list_next_entry(req, tl_requests)) {
+ 		unsigned int tmp = 0;
+ 		unsigned int s;
+ 		++count;
 -- 
 2.43.0
 
