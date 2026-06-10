@@ -1,268 +1,504 @@
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012065.outbound.protection.outlook.com [40.107.200.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA81399358;
-	Wed, 10 Jun 2026 09:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781082718; cv=fail; b=YuEXns1zfyZmJsvHUFYNugNpJi6ToecttsL5AklxQVHz3vskgIKsGd/YfHW0erTbcQ7zJDS/a7nhRr/lDm+xXiuoQ+B1kpmHmG/Ea9t5+NC5FE67tO7hNttLYt/JPr4ouY69msIP6yFuz2O0Dp1wTSP1jrfOrCblDmelQDV0nwY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781082718; c=relaxed/simple;
-	bh=TjeZIGFM+vCDoGGdTdCCExnTd0hEMR5iosc6zTWux2c=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=pnVxdLaDKP9iKptvsgeJo8wt+xzWEmt9pm9a9Axyn7qlsXIr+f7G3Y63pHu20QvGCMfw4v29ZMeUY3Ernoj/LIuWglO5NlPmE3rnbpE4CRpKThPmgUEic0NB5A0vabvO+5t1ReVC4x6+N4S+IFL3PJ+2+CLPFayTcaOLhCZw5YM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LS1aaYZP; arc=fail smtp.client-ip=40.107.200.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387CD3BB9E3
+	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 09:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781082913; cv=none; b=U+a1CGjlElYbPvO1rLmLGjFAzucft1KNzpn4kHF8qvR2TpSfgz/BwJCxZARj5ChSi+Z+zL3YQfPZhzWwySSd8y1ip7Agc4yCU63T/+FDgsbsQ6qcB3VQvcPasYWg0UDS1SRsgZf5NpURsaGcjNfVB2Sz9ty1jdROvk+1mNse4iI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781082913; c=relaxed/simple;
+	bh=1JkR1hbOCLJZoR7hn6Vgwz397nHxcU8TBPRKLnXrRlw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Sa4hfWCGkrWUEUbIeARRm9JuO4/5Z8llDNPViuhGIA/520tccgIPSKLi7nILeMZBKArZeMBzRIvqw8JWkpCpTMsrbJsS/lqegk1iBuGJf1q70wxUk+zL6cf8zxHw33L5O63UAqfptxWPcXhZ18JZ+9BnEvAEnABRJSTg8+7Q7mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lsP9UB1M; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LS1aaYZP"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XLsTWKvOrqNoL5y9vG4BglC5zhVKYY5h48A7r8DKwqouom2PAPCsR8dVUwPuWWjTIXQ+rR+Y39eZy0vH/eH4Qv/lcJVIdbg2Ys++yYssZyfzXKbfYsgSgqKuBwoDqLNldlBFeHSitP5j+5z2bFj6iAOgHdz/UhxDR3fAl0Q5o7l8o/kaHG/qu9RoGjMxQPvo3xB6UwQqHeHwS9GIZcehwHclZIpPwCBs8LxYBKCDZYKr5lehF0FXrU/0aRSenZN6Y1zQQoCCS9YcptXBfEisoZm3l4C/bP5p5B0a8kHvFh9fyk8D+Qant1URttIvpwEjVVLNeJAEjaWJ7KTHFqK04g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gQ+OE8QIAEvordwq9Eu9KduXF7SvGCeNdQFbFKcTS00=;
- b=wcRibGEguqE2bE7UWKzySrTCEBso+kwKN1+W1GZq2EQaQHT/j4u1xOExJhikVdZXlvo6HNeGpbuO+VE9XQ56EyTZBwKck5aNKYNFnaiWCsUqmwbFup4rrWMT33fHKmaT97Oi6nPEYWysY27QUJYeXxUyPPvR3bogoJG9jII/Re6DHAYDCbXsQrst5n8rScy3ntXy7cqe+lyuLjvd4H6mOn40l7kvQUPC/FazuymAe6yoT8b2xO78aULg5Iv533njULkobE67TE9dAlYKjCOU1l2EbwEfaG+2F6ZIvOv3gvo7+qBwE7nuR3Pw2XyfoZKfih2R9bWbSO+7yiUiFalCew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gQ+OE8QIAEvordwq9Eu9KduXF7SvGCeNdQFbFKcTS00=;
- b=LS1aaYZPLyJN1jVGavcWqfLUftprSIQw/07AGkLkBUG0UWQBe9QqfwZxWOEYj4VFh64DyrnQJYH0xIALiwgW/puLyrDEoorDHljrSDr0ymc3cYWk4FSAVMCX/9qWXrDdk8iCY/00P49M5AUe2MTWAOyBUY1Iq2GGPEktW5kxtFU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by CY8PR12MB8241.namprd12.prod.outlook.com (2603:10b6:930:76::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.11; Wed, 10 Jun
- 2026 09:11:52 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0092.006; Wed, 10 Jun 2026
- 09:11:51 +0000
-Message-ID: <d974a2ea-6102-45ff-bf36-3b25a2404e40@amd.com>
-Date: Wed, 10 Jun 2026 11:11:34 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
- state
-To: Kaitao Cheng <kaitao.cheng@linux.dev>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Thierry Reding <thierry.reding@kernel.org>,
- Jonathan Hunter <jonathanh@nvidia.com>,
- Sowjanya Komatineni <skomatineni@nvidia.com>,
- Davidlohr Bueso <dave@stgolabs.net>, "Paul E . McKenney"
- <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Liam Girdwood <lgirdwood@gmail.com>,
- Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
- <tursulin@ursulin.net>, Huang Rui <ray.huang@amd.com>,
- Eddie James <eajames@linux.ibm.com>, Mark Brown <broonie@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Laxman Dewangan <ldewangan@nvidia.com>,
- Neil Armstrong <neil.armstrong@linaro.org>, Robert Foss <rfoss@kernel.org>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
- Jonas Karlman <jonas@kwiboo.se>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Matthew Auld <matthew.auld@intel.com>,
- Matthew Brost <matthew.brost@intel.com>, Waiman Long <longman@redhat.com>,
- drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, linux-spi@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Randy Dunlap <rdunlap@infradead.org>, Christian Brauner
- <brauner@kernel.org>, David Howells <dhowells@redhat.com>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Kaito Cheng <chengkaitao@kylinos.cn>, Muchun Song <muchun.song@linux.dev>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Jens Axboe <axboe@kernel.dk>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
- Andrzej Hajda <andrzej.hajda@intel.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
- <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
- <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
- <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR3P281CA0086.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1f::13) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lsP9UB1M"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490abf12f0fso34121915e9.0
+        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 02:15:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781082907; x=1781687707; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y5Prh1dokxwNfkvG5vetqS1haHW2YH34Ns7htP9isiQ=;
+        b=lsP9UB1MimVu07WpHdjyfBn7NUeruDL5RHFL6tq2/uLal5I7ZELwbBnePNcSDFkybf
+         tUc8wXgiGQDUMB2zFmAzSOwjv3PZRTaLbLy8Xp9pfgqcdI/Qcxyr6niaGf4f6VUymvMs
+         xOnrq9EM54gEHkPbvAUkJ9vLfCUOVOmD9ftCrtLXXQIwPaNjGQMhkQVXf0AHnIX+51Gl
+         KWAj3wlMtm6cuoIHnTVFxkq6gG0NwhutKb9375fGTfT6Mh9KKjQBDH7+KfKjsrqqfgBn
+         KmacWK4JaSyGrfSbsoD0oUQgQ1Wp+Fch3CChPq4iYxzb7aBhbzcKLVfsj6hiL8Hvu8FK
+         bSGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781082907; x=1781687707;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y5Prh1dokxwNfkvG5vetqS1haHW2YH34Ns7htP9isiQ=;
+        b=mjSs1O9T+2L5N43QahvggFiWiNAajTjMwnLJ29hw8qoQIdTJJcZVD5HQi2K/v7z6lk
+         ryqJCLItEmaqa+Tcr8qUlX03qaPC6v6ONDls3kXxhaXiCbSmC15RwK1oqIHBFHfu6Stf
+         YTzaj915aKsH292OnbbO+0VU0SwMCDMb91pe5x4KA9fmYmFurzcDtcZfN+eps6GhxuRr
+         0VgEYEiFydjDAaq54mCv/cuKjE15cJ78EQZwVC0EKaiuHhSYZu4wE0Z6IRVOVCu1whXs
+         OLGW9bMBl4RymEey8Jxg5qQowE8xCZUwO7uw6/I/5r50yath8MFijT0yONRBZIWSWDqO
+         bruQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/at+n2topjkEC2UTMjBiWIlzSbw1pmriUBGZtLtV6I+/YOl2oKcxG5uuYjYFm1kyZ9zlv2mz3toSdiIw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyLVlyRI21a/IQNYSfPucewK5w5ZrnoSY50tLGQAHGqKXapyJl
+	hdUkKqYuBYb8wTHj5qiv/eo3aGLasH5DlUKoku167qJIBtbIUeNO2BH4
+X-Gm-Gg: Acq92OGoUCYwx33i2wjrHHzMFOresthhfZo2/mmfaGmKq7be9/OAKrevDPXKZ6XKjcH
+	fpSE7/3JPVOoKYfpp77sU6KEwFIlgW5KcVhubseX0p5xZoizsNH/uXDzrGVRjqyYn4iGL83qvz7
+	yV6GlXfKjbv2EO7NrmxI3Poaditrq4mjLCF5Jm/sDApsuHgS/cYHjtNA0H/C3LJPZOn1L3RpNFH
+	2lg0XJ/n+XtlxY8qPreerBvvBs2fGTyhrwtyD16Zd1sAw9NmRC1mzLhLzzU3fwUq0lcf786mHAM
+	bGLQFHOZMarSjAoxml1JzvdVXya60924iwppxHkbH7HW0WK6IpJoEpqe5EMxMrusYFSHTOPKgZO
+	Qd+Ee8Z1GoNf7JJx5XjbwQBdn2e7XcKkRWrbhi4tuid7WzA8mUCRLKDtL8abJRotlFI+ilHu149
+	EYXds2dswJBHkL9vYUSHJZR2eBK/lfNDUwJ65lIXQU7IRx/kAQ9ioEAWMmAUTBTNargVaxxAWoE
+	A==
+X-Received: by 2002:a05:600c:6388:b0:48a:53cb:8604 with SMTP id 5b1f17b1804b1-490c2d1412emr306094195e9.14.1781082907244;
+        Wed, 10 Jun 2026 02:15:07 -0700 (PDT)
+Received: from [172.16.16.15] ([195.100.225.50])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490dcaf4548sm28915245e9.2.2026.06.10.02.15.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jun 2026 02:15:06 -0700 (PDT)
+Message-ID: <f6a513e8-227f-4b22-bd4d-81d88536eff1@gmail.com>
+Date: Wed, 10 Jun 2026 11:15:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|CY8PR12MB8241:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7464e8d5-7c24-4f24-2866-08dec6d04ee4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|366016|1800799024|376014|7416014|56012099006|11063799006|5023799004|4143699003|6133799003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	1htKofcJEs3WQFHVpqi/ZmKoxqDUWoziML8B50OQPmpkEjon74KxOB4u+OnvZqitJp3H3n59XEPQXs2ZM4rK2Cs9/Ou7Ts7zj8RPb+qk9qPCE/NwXunHVvwUQiyqyePQ65c9iaUNAAQo7eHgiLuOTtQw2H5ZJXeZXOxx6nr0fe3xuSuA5WIbHeU2MNT8I/ulSp23QMEgjoaSmAlKN2Ng1IXF04RdL/vJgQll0jWEgJUi/o9Me5pxFZxh32wZpQGuzskmyLR5HkeNbjki0A+VlpiqpS+SWNaQnrPd9nOy0zlCn1sNrbtVKSRps52Z8qwUjW3kX841RiI5iCa4+z2na3c9fsjOo0pEcazTH1A/2NtmDXYn+CCqV+mmlL4hUWfUfchpGcHERGgTqKWjLR0vSUWQhqxTuRKGlNNaL/r3Z/eU/6w7ctm28LMvqNedaFsls0VSmuNBDoBZZfPFXGxvihQkIMzL9LR9HZz+omUTgGaG3RH2QyuBsNEeHgs8ex5VN/lyz6QaxSmhBdgD7FvpJ/Kyygo0tUrSneiSOsh1wNaCMMOgsRrhlngP0fIeEF0fA6Xv3GIX3QMVLRUNFhBk83t8fHi22FaSFf8EQfRiIRdZhYZKDzGYqi8pfhxH19Z6LhOQ5adR6YyVHzYys3HMORl3YOwwW9+M45e9KZqFZkv7twfLSeTk6iq2XaSLgMOMEbslKgBFRuPYKVznmbYbtQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(376014)(7416014)(56012099006)(11063799006)(5023799004)(4143699003)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eTVwSGRWQ2NlUmhwb3dVN2M3RjV3SVlsSXRoa3Y2VVVyQWwxaWU0MmhsVTFI?=
- =?utf-8?B?czI5UTFiM29IOEhIOTUxVVpoQjRqbGVMSGV4dWRHNFJZOW9EVG5YczdsbkEw?=
- =?utf-8?B?cVExRk9CZG92emlEM0dLaGRLeDNvazZQclVoSVQ1S25XUWJYVExiVnJabHM5?=
- =?utf-8?B?OFFEdkZmaVFTUnE3enh1aWM0czVlRitQZ0U1c3dDQzdkWXdwUmswRGNzV2th?=
- =?utf-8?B?c0h3RXF5VzlISVk0dW84WGY1Q3ZWTUpKaXhRN0JqMDZzSWFNQ0F5cXpjd0Fm?=
- =?utf-8?B?cDJTb0d2cklGUXJ5UjcxMkVHUWlyRGxZTGlvNjJCZ0xxcVpST0h5bGdFRDY3?=
- =?utf-8?B?Q25mQnpZMDZlVi9LZktkWlkxZmNKNHpuK1F5NzExYjIzUEErNFFFYTBDekpS?=
- =?utf-8?B?aVltbGJyemoyTS8wOVB3dElwUVIwamhJWDR5VUtQeFdoMUtNYXFvVU4ra0Nt?=
- =?utf-8?B?cHJieDJUT3F3NUduSnlyb0dpdFFLTHRaYktmTmlZZ0xEZC9jc21ZU2VEaFNM?=
- =?utf-8?B?ZXBPbHd4TVB0TjA4NVVxVU1hN3Bpem1XUWREQXBoL0tQc1hUVmpOTW9oVTgx?=
- =?utf-8?B?RnIycUtLMTVuRExEYTRFYVZsbVRmRXBzYTRDUFJGMTNnblJYNU9xSDJ0TlhL?=
- =?utf-8?B?YndaVStabGwyRGVzeEZsWG4vUTBDekJ3VjMwdkd2ejV3aUladjlFK0srWXNS?=
- =?utf-8?B?YmVNZmxPd01lVGFLNDhpbFdCZ245bVgyUXJVYnIyR1I5a01lN3dPSmhYbjgr?=
- =?utf-8?B?RUFwNW5XQWNuWnJrYUtKMFEzMFdkZWswdXlIanAwZG5YUzRZWUFiVnMwZDJC?=
- =?utf-8?B?K0dJeGtVdjc0TkhGc0NEU0t3OTVqbWI1azB2eUZZT2prMXM1ZzhqUHR5S0tE?=
- =?utf-8?B?QW5IMWcrUG9weGE4SUJwR0UzMWJocHZreEpwaGJjdThLUExWT0pEYmtpRitl?=
- =?utf-8?B?VXNtQUROUWx2YTVlNFVnRStjVEdsbEtlQTB4Z2FyT2NHcUlWUVE0b2hBTU5O?=
- =?utf-8?B?QWFBZ2EwNDMzRzRGZjF6NEltSU5NcTFyRmFieUF5ZW0rZWRmaHF1U3htNGFT?=
- =?utf-8?B?Qm44cDY0cWFLTVhpK3d2MXlQNzNTNW5EK2liUU02cE93YlpzTVFocDJUei85?=
- =?utf-8?B?Qk1YVnpEVkxyalpoNU1mQnZ5aCtrZFFaUHlQZDRQRVNwMXZpRXVYOUhNMzJK?=
- =?utf-8?B?Qno3MnhwWjFWYXRYNTQ0dUwyMmJCQk10dU5yenQrRXJxRHprcWRaMzZtc3Fs?=
- =?utf-8?B?NStjVlRUNndrS1lrZnNzOEUyckxGUEJTcG9jR2FYVy82UThsYW9MU3V1MXIx?=
- =?utf-8?B?RTdlNHRSMUlyZTBzZXVFSlp0SGF3TmFDWDM4L3J3Ukk4OURQZ1pPOWphNngx?=
- =?utf-8?B?LzVjN0FvWXByTU82WlhYN3B1Ynl6S2NmTUovNGhQMlBEbEo3RVJacFVIUXhE?=
- =?utf-8?B?MGYyV0lCQTBZd2J1VHYwYmJ4V2hiVlpkWGZXVlQrUVZlZEtRa1J6U0h0d00y?=
- =?utf-8?B?V0tLbXhOcTRpNVFXdnZ0QlZ0ZFlRdzVodmNERlJ4Sm5mdkdOclNJTXdRVWR6?=
- =?utf-8?B?eStsdStTQTI2dS9nSCthUVNLYXpacjJXdHQ0UnRuZU1ZZzJXeG9hT3NXeDBM?=
- =?utf-8?B?RjI5dTRXUnN5QkdYQTJ1Q1RQNHNvSUFLWWpSaWppOTBrQjQ3WGgxMnBWSC9G?=
- =?utf-8?B?L0NwOURhSDNGbXVzUHhBb0F4dkZ2SjI1VzdLWXM0Rnd0U3lVdFBmWGpIVHYw?=
- =?utf-8?B?YTZNUjJEUE4xUGdhU2hZYTY0NWtrajNmOEdYL2Zya0dmQWVOL0pRanJyVHpO?=
- =?utf-8?B?N1pUWjFaNWRsU3RxOUh5Tis5K0pTa3NUY2g0TEJndmQyNUttTUt1R3ZzTmFK?=
- =?utf-8?B?NlJjaWM4bTNnTGlUc3pLRk41VkJMcEY1UjdtMHdYZmpuQTZlZURxYU82akVQ?=
- =?utf-8?B?ZXFSQ1ozZmd1MGJFQVJxOEJaeXJLSHVNUGV0T2xuaFJZOG4wWXB2bVkzdC94?=
- =?utf-8?B?dFZvbHlTYjhIdXBPc3UxWFVua1BSSzZWTGg0WnIrQUo5U3NCN3hoYkdJSWU1?=
- =?utf-8?B?MUtOVzNraUR4M0dXTTlUeGl5ZXZuRjhLV0IySi9PUldIc29GR1NvMU51N3lW?=
- =?utf-8?B?bkJWUDliK1JQLzZxOUNGb3NOaFdPeGJxL0kzMmFacEpFMkV3SUZ4OHM2cml1?=
- =?utf-8?B?SkpsNXVBSm04NStnNDRCNmdOZ3V0WmVBTlBxTnZ0RnRRRy9RMW96MThiaERL?=
- =?utf-8?B?cytjMnY5ZUZ4QncxMmJiZ2lXaFRUUEd2R2NDaEQvK29tUm00MVIwWTAyTlp6?=
- =?utf-8?Q?r++g69Ih9P6IalPmUj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7464e8d5-7c24-4f24-2866-08dec6d04ee4
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 09:11:51.3845
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: O2pS5uzv20sPGWEIj7DuFxfVi8xT8GgRzfTSwjQsp7tXU+0BXMaezMEMi/BXG3es
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8241
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] rust: add procedural macro for declaring configfs
+ attributes
+To: Gary Guo <gary@garyguo.net>, Andreas Hindborg <a.hindborg@kernel.org>,
+ Breno Leitao <leitao@debian.org>, Miguel Ojeda <ojeda@kernel.org>,
+ Boqun Feng <boqun@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20260603-configfs-syn-v2-1-cb58489c2647@gmail.com>
+ <DIZHKJSZXQ4Z.6SPXJVGDV9ZW@garyguo.net>
+Content-Language: en-US, en-AU
+From: Malte Wechter <maltewechter@gmail.com>
+In-Reply-To: <DIZHKJSZXQ4Z.6SPXJVGDV9ZW@garyguo.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-
-On 6/10/26 10:18, Kaitao Cheng wrote:
-> 
-> 
-> 在 2026/6/10 16:07, Christian König 写道:
->> On 6/10/26 08:14, Kaitao Cheng wrote:
->>> 在 2026/6/9 18:33, Christian König 写道:
->>>> On 6/9/26 08:13, Kaitao Cheng wrote:
->>>>> From: Kaito Cheng <chengkaitao@kylinos.cn>
->>>>>
->>>>> This series prepares for, and then updates, the list_for_each_entry()
->>>>> family so the common entry iterators cache their next or previous cursor
->>>>> before the loop body runs.
->>>>
->>>> Why in the world would we want to do that?
->>>>
->>>> The safe and non-safe variants have very distinct use cases and that is completely intentional.
->>>>
->>>> What we could improve maybe is the documentation, from my experience an astonishing large amount of people have misconceptions about the safe variants.
->>>>
->>>>> The first 13 patches open-code loops that intentionally depend on the
->>>>> old "derive the next entry from the current cursor at the end of the
->>>>> iteration" behaviour.  These loops append work to the list being walked,
->>>>> restart traversal after dropping a lock, skip an entry consumed by the
->>>>> current iteration, or otherwise adjust the cursor in the loop body.
->>>>
->>>> Well I have to clearly reject the changes for subsystems/components I'm maintaining, that just looks horrible to me and I clearly don't see a good reason for that.
->>>
->>> Hi Christian and Andy Shevchenko,
->>>
->>> Thanks for taking a look. I would like to clarify the point you raised.
->>>
->>> The reason I started looking at this is the original motivation behind
->>> the _safe() variants.  They exist because some users need to remove, move
->>> or otherwise consume the current entry while walking the list.  In that
->>> case the next cursor has to be preserved before the loop body can modify
->>> the current entry.
->>>
->>> The unfortunate part is that this could not be expressed with the
->>> existing list_for_each_entry() interface without changing its calling
->>> convention.  The _safe() variants had to grow an extra argument for the
->>> temporary cursor, and that is why we ended up with a separate family of
->>> macros.
->>>
->>> But conceptually, the distinction does not have to be exposed as two
->>> different iterator families forever.  The difference is an implementation
->>> detail: whether the iterator keeps the next/previous cursor before the
->>> body runs.  This series makes the common list_for_each_entry() iterators
->>> do that internally, so the safe and non-safe forms can effectively be
->>> folded together, or at least the need for a separate public _safe()
->>> interface becomes much weaker.
->>>
->>> There is also a usability issue with the current _safe() interface.  The
->>> caller is forced to define a temporary cursor outside the macro and pass
->>> it in, even though almost all users never use that cursor directly.  It is
->>> just boilerplate required by the macro implementation.  I find that
->>> redundant and awkward: the temporary cursor is an internal detail of the
->>> iteration, but every caller has to spell it out.
->>>
->>> With the updated list_for_each_entry() implementation, that extra cursor
->>> can be kept inside the iterator itself.  Callers that only want to walk
->>> the list, including callers that delete or consume the current entry, no
->>> longer need to carry an otherwise-unused temporary variable just to make
->>> the macro work.
+On 6/3/26 4:32 PM, Gary Guo wrote:
+> On Wed Jun 3, 2026 at 3:08 PM BST, Malte Wechter wrote:
+>> Implement `configfs_attrs!` as a procedural macro using `syn`, this
+>> improves readability and maintainability. Remove the old macro and
+>> replace all uses with the new macro. Add the new macro implementation
+>> file to MAINTAINERS.
 >>
->> Well the distinction between list_for_each_entry() and list_for_each_entry_safe() is *not* there because you need an extra variable to hold the next pointer, but because just 'iterating the list' and 'iterating the list while you modify it' are two distinct use cases.
+>> Signed-off-by: Malte Wechter <maltewechter@gmail.com>
+>> ---
+>> Changes in v2:
+>> - Add a try_parse helper function to macros/helpers.rs
+>> - Fix bug where 'child' configuration gets dropped if trailing comma is missing (sashiko)
+>> - Link to v1: https://lore.kernel.org/r/20260520-configfs-syn-v1-1-6c5b80a9cef2@gmail.com
+>> ---
+>>   MAINTAINERS                     |   1 +
+>>   drivers/block/rnull/configfs.rs |   2 +-
+>>   rust/kernel/configfs.rs         | 251 ----------------------------------------
+>>   rust/macros/configfs_attrs.rs   | 182 +++++++++++++++++++++++++++++
+>>   rust/macros/helpers.rs          |  15 +++
+>>   rust/macros/lib.rs              |  85 ++++++++++++++
+>>   samples/rust/rust_configfs.rs   |   2 +-
+>>   7 files changed, 285 insertions(+), 253 deletions(-)
 >>
->> Apart from the technical implications this also has some documentation value for the code using it.
->>
->> What we could consider with C99 at hand is to have _safe() variants who uses a local hidden variable to hold the next element.
->>
->> Or maybe come up with a better name instead of _safe() because people seem to misunderstand that quite often.
->>
->> But mangling the two use cases together just because it is now technical possible is among the worst ideas I've ever heard.
->>
-> 
-> Should we revert to v1, or keep list_for_each_entry() and
-> list_for_each_entry_safe() as they are, close this thread, and make no
-> changes?
-> 
-> Link to v1:
-> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
-> 
-> Or do you have any better suggestions?
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 2fb1c75afd163..45f7a1ec93b45 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -6464,6 +6464,7 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/a.hindborg/linux.git config
+>>   F:	fs/configfs/
+>>   F:	include/linux/configfs.h
+>>   F:	rust/kernel/configfs.rs
+>> +F:	rust/macros/configfs_attrs.rs
+>>   F:	samples/configfs/
+>>   F:	samples/rust/rust_configfs.rs
+>>   
+>> diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+>> index 7c2eb5c0b7228..f28ec69d79846 100644
+>> --- a/drivers/block/rnull/configfs.rs
+>> +++ b/drivers/block/rnull/configfs.rs
+>> @@ -4,8 +4,8 @@
+>>   use kernel::{
+>>       block::mq::gen_disk::{GenDisk, GenDiskBuilder},
+>>       configfs::{self, AttributeOperations},
+>> -    configfs_attrs,
+>>       fmt::{self, Write as _},
+>> +    macros::configfs_attrs,
+>>       new_mutex,
+>>       page::PAGE_SIZE,
+>>       prelude::*,
+>> diff --git a/rust/macros/configfs_attrs.rs b/rust/macros/configfs_attrs.rs
+>> new file mode 100644
+>> index 0000000000000..a7fc75cdebcc0
+>> --- /dev/null
+>> +++ b/rust/macros/configfs_attrs.rs
+>> @@ -0,0 +1,182 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +
+>> +use quote::{
+>> +    quote, //
+>> +    ToTokens,
+>> +};
+>> +
+>> +use proc_macro2::{
+>> +    Span, //
+>> +};
+>> +
+>> +use syn::{
+>> +    bracketed,
+>> +    parse::{
+>> +        Parse,
+>> +        ParseStream, //
+>> +    },
+>> +    punctuated::Punctuated,
+>> +    spanned::Spanned,
+>> +    Ident,
+>> +    LitInt,
+>> +    Token,
+>> +    Type, //
+>> +};
+>> +
+>> +use crate::helpers::try_parse;
+>> +
+>> +pub(crate) struct ConfigfsAttrs {
+>> +    container: Type,
+>> +    data: Type,
+>> +    child: Option<Type>,
+>> +    attributes: Vec<(Ident, LitInt)>,
+>> +}
+>> +
+>> +fn parse_attribute_field(stream: ParseStream<'_>) -> syn::Result<(Ident, LitInt)> {
+>> +    let id = stream.parse::<syn::Ident>()?;
+>> +    let _colon = stream.parse::<Token![:]>()?;
+>> +    let v = stream.parse::<LitInt>()?;
+>> +    Ok((id, v))
+>> +}
+>> +
+>> +fn parse_named_field(stream: ParseStream<'_>, name: &str) -> syn::Result<Type> {
+>> +    let name_id = stream.parse::<Ident>()?;
+>> +    if name_id != name {
+>> +        return Err(parse_field_error(name_id.span(), &name_id, name));
+>> +    }
+>> +    let _colon = stream.parse::<Token![:]>()?;
+>> +    let v = stream.parse::<Type>()?;
+>> +    stream.parse::<Token![,]>()?;
+>> +    Ok(v)
+>> +}
+>> +
+>> +fn parse_attributes(stream: ParseStream<'_>) -> syn::Result<Vec<(Ident, LitInt)>> {
+>> +    let attribute_id = stream.parse::<Ident>()?;
+>> +    if attribute_id != "attributes" {
+>> +        return Err(syn::Error::new(
+>> +            attribute_id.span(),
+>> +            format!(
+>> +                "unexpected identifier: {}, expected: 'attributes'",
+>> +                attribute_id
+>> +            ),
+>> +        ));
+>> +    }
+>> +    stream.parse::<Token![:]>()?;
+>> +    let attr_stream;
+>> +    let _bracket = bracketed!(attr_stream in stream);
+>> +    let attributes = Punctuated::<(Ident, LitInt), Token![,]>::parse_terminated_with(
+>> +        &attr_stream,
+>> +        parse_attribute_field,
+>> +    )?;
+>> +    let attributes = attributes.into_iter().collect::<Vec<_>>();
+>> +
+>> +    stream.parse::<Option<Token![,]>>()?;
+>> +    Ok(attributes)
+>> +}
+>> +
+>> +fn parse_field_error(span: Span, name: &Ident, expected_name: &str) -> syn::Error {
+>> +    syn::Error::new(
+>> +        span,
+>> +        format!("Unexpected field name, got: {name} expected: {expected_name}"),
+>> +    )
+>> +}
+>> +
+>> +impl Parse for ConfigfsAttrs {
+>> +    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
+>> +        let container = try_parse(input, |s| parse_named_field(s, "container"))?;
+>> +        let data = try_parse(input, |s| parse_named_field(s, "data"))?;
+>> +        let child = try_parse(input, |s| parse_named_field(s, "child")).ok();
+>> +        let attributes = parse_attributes(input)?;
+> I have a `parse_ordered_fields!()` macro in module.rs, please extract it to
+> helpers and use it instead of implementing the parsing in an ad-hoc manner.
 
-v1 looks perfectly reasonable to me.
+That is a good idea.
 
-You should just include some patches in the same patch set to actually use the new macros.
+>> +
+>> +        Ok(ConfigfsAttrs {
+>> +            container,
+>> +            data,
+>> +            child,
+>> +            attributes,
+>> +        })
+>> +    }
+>> +}
+>> +
+>> +fn make_static_ident<T: ToTokens>(ty: &T, suffix: &str) -> syn::Ident {
+>> +    let raw_id = quote! { #ty }.to_string();
+>> +
+>> +    // Sanitizing syn::Type::Path, this is safe since it is
+>> +    // only used as the identifier.
+>> +    let normalized = raw_id
+>> +        .split("::")
+>> +        .map(|s| String::from(s.trim()))
+>> +        .reduce(|a, b| format!("{a}_{b}"))
+>> +        .expect("Cannot be empty")
+>> +        .to_uppercase()
+>> +        .replace(|c: char| !c.is_alphanumeric(), "_");
+>> +
+>> +    Ident::new(&format!("{}_{}", normalized, suffix), ty.span())
+>> +}
+>> +
+>> +pub(crate) fn configfs_attrs(cfs_attrs: ConfigfsAttrs) -> proc_macro2::TokenStream {
+>> +    let (container_ty, data_ty) = (&cfs_attrs.container, &cfs_attrs.data);
+>> +
+>> +    let data_tp_ident = make_static_ident(data_ty, "TPE");
+>> +    let data_attr_ident = make_static_ident(data_ty, "ATTR_LIST");
+> Instead of creating identifers like this, just scope them properly so that
+> a fixed identifier is used without colliding.
 
-If you modify the files under drivers/dma-buf or drivers/gpu/drm/amd to use the new macro I'm happy to review that.
+I believe it is nice to keep the identifiers unique, especially if you
+have many fields
+you can easily differentiate them.
 
-Regards,
-Christian.
+>> +
+>> +    let n = cfs_attrs.attributes.len() + 1;
+>> +
+>> +    let attr_list = quote! {
+>> +        static #data_attr_ident: kernel::configfs::AttributeList<#n, #data_ty> =
+>> +            // SAFETY: We are expanding `configfs_attrs`.
+>> +            unsafe { kernel::configfs::AttributeList::new() };
+>> +    };
+>> +
+>> +    let mut attrs = Vec::new();
+>> +    for (attr_idx, (name, id)) in cfs_attrs.attributes.iter().enumerate() {
+>> +        let name_with_attr = make_static_ident(name, "ATTR");
+>> +
+>> +        let id: u64 = match id.base10_parse::<u64>() {
+>> +            Ok(v) => v,
+>> +            Err(_) => {
+>> +                return syn::Error::new(id.span(), "Could not parse attribute ID as a u64")
+>> +                    .to_compile_error();
+>> +            }
+>> +        };
+> Why parsing? The ID looks like it's just substituted as is.
+
+For correctness, if you pass a negative integer literal it will panic
+without this parsing.
+This is not likely, but it provides a nice error message if this were to happen.
+I can maybe move it to the parsing logic instead.
+
+>
+> Best,
+> Gary
+>
+>> +
+>> +        attrs.push(quote! {
+>> +        static #name_with_attr: kernel::configfs::Attribute<#id, #data_ty, #data_ty> =
+>> +            // SAFETY: We are expanding `configfs_attrs`.
+>> +            unsafe {
+>> +              kernel::configfs::Attribute::new(kernel::c_str!(::core::stringify!(#name)))
+>> +            };
+>> +
+>> +          // SAFETY: By design of this macro, the name of the variable we
+>> +          // invoke the `add` method on below, is not visible outside of
+>> +          // the macro expansion. The macro does not operate concurrently
+>> +          // on this variable, and thus we have exclusive access to the
+>> +          // variable.
+>> +          unsafe { #data_attr_ident.add::<#attr_idx, #id, _>(&#name_with_attr) }
+>> +        });
+>> +    }
+>> +
+>> +    let has_child_code = if let Some(child) = cfs_attrs.child {
+>> +        quote! { new_with_child_ctor::<#n, #child>}
+>> +    } else {
+>> +        quote! { new::<#n> }
+>> +    };
+>> +
+>> +    let data_type = quote! {
+>> +        {
+>> +            static #data_tp_ident:
+>> +            kernel::configfs::ItemType<#container_ty, #data_ty> =
+>> +                kernel::configfs::ItemType::<#container_ty, #data_ty>::#has_child_code(
+>> +                    &THIS_MODULE, &#data_attr_ident
+>> +                );
+>> +            &#data_tp_ident
+>> +        }
+>> +    };
+>> +
+>> +    quote! {
+>> +        {
+>> +            #attr_list
+>> +            #(#attrs)*
+>> +            #data_type
+>> +        }
+>> +    }
+>> +}
+>> diff --git a/rust/macros/helpers.rs b/rust/macros/helpers.rs
+>> index d18fbf4daa0a5..fdab8804e1ba9 100644
+>> --- a/rust/macros/helpers.rs
+>> +++ b/rust/macros/helpers.rs
+>> @@ -4,6 +4,7 @@
+>>   use quote::ToTokens;
+>>   use syn::{
+>>       parse::{
+>> +        discouraged::Speculative,
+>>           Parse,
+>>           ParseStream, //
+>>       },
+>> @@ -54,6 +55,20 @@ pub(crate) fn file() -> String {
+>>       }
+>>   }
+>>   
+>> +pub(crate) fn try_parse<T>(
+>> +    input: ParseStream<'_>,
+>> +    parser: impl FnOnce(ParseStream<'_>) -> Result<T>,
+>> +) -> Result<T> {
+>> +    let fork = input.fork();
+>> +    match parser(&fork) {
+>> +        Ok(value) => {
+>> +            input.advance_to(&fork);
+>> +            Ok(value)
+>> +        }
+>> +        Err(e) => Err(e),
+>> +    }
+>> +}
+>> +
+>>   /// Obtain all `#[cfg]` attributes.
+>>   pub(crate) fn gather_cfg_attrs(attr: &[Attribute]) -> impl Iterator<Item = &Attribute> + '_ {
+>>       attr.iter().filter(|a| a.path().is_ident("cfg"))
+>> diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
+>> index 2cfd59e0f9e7c..745ba83c828b9 100644
+>> --- a/rust/macros/lib.rs
+>> +++ b/rust/macros/lib.rs
+>> @@ -15,6 +15,8 @@
+>>   #![cfg_attr(not(CONFIG_RUSTC_HAS_SPAN_FILE), feature(proc_macro_span))]
+>>   
+>>   mod concat_idents;
+>> +#[cfg(CONFIG_CONFIGFS_FS)]
+>> +mod configfs_attrs;
+>>   mod export;
+>>   mod fmt;
+>>   mod helpers;
+>> @@ -489,3 +491,86 @@ pub fn kunit_tests(attr: TokenStream, input: TokenStream) -> TokenStream {
+>>           .unwrap_or_else(|e| e.into_compile_error())
+>>           .into()
+>>   }
+>> +
+>> +/// Define a list of configfs attributes statically.
+>> +///
+>> +/// # Examples
+>> +///
+>> +/// ```ignore
+>> +/// let item_type = configfs_attrs! {
+>> +///     container: configfs::Subsystem<Configuration>,
+>> +///     data: Configuration,
+>> +///     child: Child,
+>> +///     attributes: [
+>> +///         message: 0,
+>> +///         bar: 1,
+>> +///     ],
+>> +/// };
+>> +///```
+>> +///
+>> +/// Expands the following output:
+>> +///    let item_type = {
+>> +///         static CONFIGURATION_ATTR_LIST: kernel::configfs::AttributeList<
+>> +///             3usize,
+>> +///             Configuration,
+>> +///         > = unsafe { kernel::configfs::AttributeList::new() };
+>> +///         static MESSAGE_ATTR: kernel::configfs::Attribute<
+>> +///             0u64,
+>> +///             Configuration,
+>> +///             Configuration,
+>> +///         > = unsafe {
+>> +///             kernel::configfs::Attribute::new({
+>> +///                 const S: &str = "message\u{0}";
+>> +///                 const C: &kernel::str::CStr = match kernel::str::CStr::from_bytes_with_nul(
+>> +///                     S.as_bytes(),
+>> +///                 ) {
+>> +///                     Ok(v) => v,
+>> +///                     Err(_) => {
+>> +///                         ::core::panicking::panic_fmt(
+>> +///                             format_args!("string contains interior NUL"),
+>> +///                         );
+>> +///                     }
+>> +///                 };
+>> +///                 C
+>> +///             })
+>> +///         };
+>> +///         unsafe { CONFIGURATION_ATTR_LIST.add::<0usize, 0u64, _>(&MESSAGE_ATTR) }
+>> +///         static BAR_ATTR: kernel::configfs::Attribute<
+>> +///             1u64,
+>> +///             Configuration,
+>> +///             Configuration,
+>> +///         > = unsafe {
+>> +///             kernel::configfs::Attribute::new({
+>> +///                 const S: &str = "bar\u{0}";
+>> +///                 const C: &kernel::str::CStr = match kernel::str::CStr::from_bytes_with_nul(
+>> +///                     S.as_bytes(),
+>> +///                 ) {
+>> +///                     Ok(v) => v,
+>> +///                     Err(_) => {
+>> +///                         ::core::panicking::panic_fmt(
+>> +///                             format_args!("string contains interior NUL"),
+>> +///                         );
+>> +///                     }
+>> +///                 };
+>> +///                 C
+>> +///             })
+>> +///         };
+>> +///         unsafe { CONFIGURATION_ATTR_LIST.add::<1usize, 1u64, _>(&BAR_ATTR) }
+>> +///         {
+>> +///             static CONFIGURATION_TPE: kernel::configfs::ItemType<
+>> +///                 Subsystem<Configuration>,
+>> +///                 Configuration,
+>> +///             > = kernel::configfs::ItemType::<
+>> +///                 Subsystem<Configuration>,
+>> +///                 Configuration,
+>> +///             >::new_with_child_ctor::<3usize, Child>(&THIS_MODULE, &CONFIGURATION_ATTR_LIST);
+>> +///             &CONFIGURATION_TPE
+>> +///         }
+>> +///     };
+>> +///
+>> +#[cfg(CONFIG_CONFIGFS_FS)]
+>> +#[proc_macro]
+>> +pub fn configfs_attrs(input: TokenStream) -> TokenStream {
+>> +    configfs_attrs::configfs_attrs(parse_macro_input!(input as configfs_attrs::ConfigfsAttrs))
+>> +        .into()
+>> +}
+>> diff --git a/samples/rust/rust_configfs.rs b/samples/rust/rust_configfs.rs
+>> index a1bd9db6010da..876462f7789d1 100644
+>> --- a/samples/rust/rust_configfs.rs
+>> +++ b/samples/rust/rust_configfs.rs
+>> @@ -4,7 +4,7 @@
+>>   
+>>   use kernel::alloc::flags;
+>>   use kernel::configfs;
+>> -use kernel::configfs::configfs_attrs;
+>> +use kernel::macros::configfs_attrs;
+>>   use kernel::new_mutex;
+>>   use kernel::page::PAGE_SIZE;
+>>   use kernel::prelude::*;
+>>
+>> ---
+>> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+>> change-id: 20260417-configfs-syn-191e07130027
+>>
+>> Best regards,
+Best regards
+>
