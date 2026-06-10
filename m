@@ -1,80 +1,32 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D0C21CC58
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 06:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3817381B10;
+	Wed, 10 Jun 2026 06:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781072474; cv=none; b=YL2icxF3lCYZ06NxWCs3s9xVBY8eVn3sOnKWeB2HsH2gifu1JhdYsJyOWu5+WkmLkI5RNjyuPGa/tdESZlb9gxoHENF/CR88ksGbboLk5twv0jKiL29YG/NumH5sZBDVLxPTCAQrJImanlqBW+IJX6sChscg3vLH3NkPd2XJ3Zk=
+	t=1781074568; cv=none; b=HIPpeupgSTQEVDgRvQsPRJrnON1epPhsR7vQtiPZloOYK8h0rnJMNujW0qPF662+N6Xnmls1+tU9m/fjIU/gZzWsiW0KfV9EdiMoLgA4AjN80CP2xOoARsY2aiXE5h8bDmIkLLFDFIBWxcrZtXSpaZ668x9s75C4znxpSfHTOGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781072474; c=relaxed/simple;
-	bh=b15syD9XJVTyKHxDm4QFDt0FJsK3/KebWv6z20t7bNE=;
+	s=arc-20240116; t=1781074568; c=relaxed/simple;
+	bh=rRDfpSzw3X6enhuhpGqG6t8VOaobODgmutXYPZvFcJg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cJpRwdYiYcWF0bR41h05pXLIPpjBzW5YxYnHBhmxLdsxzHHGAPNxdiRHOG3qQul3CPTKDdsC2wfxYGtq8zKjcd6pZFEBHiCstg5VA9oUqdi6upBFI2tppg7l1F8gT7T+UXZHZHjv4jB/ypgQjGWSqI1CzUAf5B3Pb7KgGnrTCyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=waHJe4W/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=U6EAtjYv; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=waHJe4W/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=U6EAtjYv; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 In-Reply-To:Content-Type; b=BIV4QqlhujrT17+c8450TMq2cE90pC2cpniEEr7pom0515Rh8MqJSQ5cA6UmOD2dlj3Do9et2YkHhxfpPA810P5sU732tPuhUj4SBtX3DfTwuUhOjV6644JZ1DJzARhTaIEtvjzAYE2cck0hRV1NAD9MjoqIs0Kaonli9NjV4cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aNQ7PbRk; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="waHJe4W/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="U6EAtjYv";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="waHJe4W/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="U6EAtjYv"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CA2156AB65;
-	Wed, 10 Jun 2026 06:21:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781072470; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WbCQ0d3zTQZ6CGG+6Az/23i9L/arq92TNEcy3sEelj0=;
-	b=waHJe4W/QB/axCJtQRgAST3/L1ZffdvaSfCdsCopUjv8covGVV5Mu6HHQ5ZlTpiH9EpD9Q
-	zRFQa5HcZmyHm4tz927PKTsOEuhqSbWWv79hnw/iiQtLMoT8Yx5PxmoLIYnQrbZ7E69uds
-	o9AhwRFbIjTMQJ64sGTeky5eMDj3n/c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781072470;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WbCQ0d3zTQZ6CGG+6Az/23i9L/arq92TNEcy3sEelj0=;
-	b=U6EAtjYvBU2LDrzfCGj83Db9o2/YQoljDhw02wO4Suo5f/iMj8UC41aU4G/FsxU6Rl43RT
-	YPgghOAwmqZuiBCQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1781072470; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WbCQ0d3zTQZ6CGG+6Az/23i9L/arq92TNEcy3sEelj0=;
-	b=waHJe4W/QB/axCJtQRgAST3/L1ZffdvaSfCdsCopUjv8covGVV5Mu6HHQ5ZlTpiH9EpD9Q
-	zRFQa5HcZmyHm4tz927PKTsOEuhqSbWWv79hnw/iiQtLMoT8Yx5PxmoLIYnQrbZ7E69uds
-	o9AhwRFbIjTMQJ64sGTeky5eMDj3n/c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1781072470;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WbCQ0d3zTQZ6CGG+6Az/23i9L/arq92TNEcy3sEelj0=;
-	b=U6EAtjYvBU2LDrzfCGj83Db9o2/YQoljDhw02wO4Suo5f/iMj8UC41aU4G/FsxU6Rl43RT
-	YPgghOAwmqZuiBCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 35718779A7;
-	Wed, 10 Jun 2026 06:21:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cGvRC1QCKWqkfwAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 10 Jun 2026 06:21:08 +0000
-Message-ID: <ca44e52a-ddf7-4bf8-9634-5afaf7413176@suse.de>
-Date: Wed, 10 Jun 2026 08:21:07 +0200
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aNQ7PbRk"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1781074556; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=tHKZXlYHzQiuz4CuXIVUBayRBgQEvDJmST6DE9mf+8g=;
+	b=aNQ7PbRkZItFf11r6vye/H8dRDn2Z6ZAjuVVWvn0YNKanggFZPXafrhDoQui5jX0eHL87te9FysI5HQa/o/wTuo4pGFqDZdwSkh4X9Fmze5auj2q9kC249IitnczyEeadQwx8k3Dv6Ayl1JqDryyulYUiVOs5hAajrIAlZLwxGU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R961e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0X4ZbVxy_1781074555;
+Received: from 30.221.130.225(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0X4ZbVxy_1781074555 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 10 Jun 2026 14:55:56 +0800
+Message-ID: <e4aa171b-ac0f-4cd1-8605-91a3f82a4faf@linux.alibaba.com>
+Date: Wed, 10 Jun 2026 14:55:54 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,123 +34,181 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/4] scsi: use percpu counters for iostat counters in
- struct scsi_device
-To: Sumit Saxena <sumit.saxena@broadcom.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: "James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- Adam Radford <aradford@gmail.com>, Khalid Aziz <khalid@gonehiking.org>,
- Adaptec OEM Raid Solutions <aacraid@microsemi.com>,
- Matthew Wilcox <willy@infradead.org>, Hannes Reinecke <hare@suse.com>,
- "Juergen E . Fischer" <fischer@norbit.de>,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Finn Thain <fthain@linux-m68k.org>, Michael Schmitz <schmitzmic@gmail.com>,
- Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
- Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
- Oliver Neukum <oliver@neukum.org>, Ali Akcaagac <aliakc@web.de>,
- Jamie Lenehan <lenehan@twibble.org>, Ram Vegesna <ram.vegesna@broadcom.com>,
- target-devel@vger.kernel.org, Bradley Grove <linuxdrivers@attotech.com>,
- Satish Kharat <satishkh@cisco.com>, Sesidhar Baddela <sebaddel@cisco.com>,
- Karan Tilak Kumar <kartilak@cisco.com>, Yihang Li
- <liyihang9@h-partners.com>, Don Brace <don.brace@microchip.com>,
- storagedev@microchip.com, HighPoint Linux Team <linux@highpoint-tech.com>,
- Tyrel Datwyler <tyreld@linux.ibm.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <chleroy@kernel.org>, linuxppc-dev@lists.ozlabs.org,
- Brian King <brking@us.ibm.com>, Lee Duncan <lduncan@suse.com>,
- Chris Leech <cleech@redhat.com>, Mike Christie
- <michael.christie@oracle.com>, open-iscsi@googlegroups.com,
- Justin Tee <justin.tee@broadcom.com>, Paul Ely <paul.ely@broadcom.com>,
- Kashyap Desai <kashyap.desai@broadcom.com>,
- Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
- Chandrakanth Patil <chandrakanth.patil@broadcom.com>,
- megaraidlinux.pdl@broadcom.com,
- Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
- Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
- mpi3mr-linuxdrv.pdl@broadcom.com,
- Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
- Ranjan Kumar <ranjan.kumar@broadcom.com>, MPT-FusionLinux.pdl@broadcom.com,
- Daniel Palmer <daniel@thingy.jp>, GOTO Masanori <gotom@debian.or.jp>,
- YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>,
- Jack Wang <jinpu.wang@cloud.ionos.com>, Geoff Levand <geoff@infradead.org>,
- Michael Reed <mdr@sgi.com>, Nilesh Javali <njavali@marvell.com>,
- GR-QLogic-Storage-Upstream@marvell.com, Narsimhulu Musini
- <nmusini@cisco.com>, "K . Y . Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- linux-hyperv@vger.kernel.org, "Michael S . Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Eugenio Perez <eperezma@redhat.com>,
- virtualization@lists.linux.dev, Vishal Bhakta <vishal.bhakta@broadcom.com>,
- bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- xen-devel@lists.xenproject.org, John Garry <john.g.garry@oracle.com>
-References: <20260609121806.2121755-1-sumit.saxena@broadcom.com>
- <20260609121806.2121755-5-sumit.saxena@broadcom.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260609121806.2121755-5-sumit.saxena@broadcom.com>
+Subject: Re: [PATCH RFC 7/8] erofs: open via dedicated fs bdev helpers
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Carlos Maiolino <cem@kernel.org>,
+ linux-xfs@vger.kernel.org, Chris Mason <clm@fb.com>,
+ David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+ Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+ Gao Xiang <xiang@kernel.org>, linux-erofs@lists.ozlabs.org,
+ Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
+References: <20260602-work-super-bdev_holder_global-v1-0-bb0fd82f3861@kernel.org>
+ <20260602-work-super-bdev_holder_global-v1-7-bb0fd82f3861@kernel.org>
+ <7c5bfcf0-36a3-4cc6-bf31-6af4fc901c37@linux.alibaba.com>
+ <20260603-nieder-ausdehnen-siebdruck-aa96f40ebec6@brauner>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <20260603-nieder-ausdehnen-siebdruck-aa96f40ebec6@brauner>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[web.de];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RCPT_COUNT_GT_50(0.00)[82];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[HansenPartnership.com,vger.kernel.org,gmail.com,gonehiking.org,microsemi.com,infradead.org,suse.com,norbit.de,armlinux.org.uk,lists.infradead.org,linux-m68k.org,qlogic.com,neukum.org,web.de,twibble.org,broadcom.com,attotech.com,cisco.com,h-partners.com,microchip.com,highpoint-tech.com,linux.ibm.com,ellerman.id.au,kernel.org,lists.ozlabs.org,us.ibm.com,redhat.com,oracle.com,googlegroups.com,thingy.jp,debian.or.jp,netlab.is.tsukuba.ac.jp,cloud.ionos.com,sgi.com,marvell.com,microsoft.com,lists.linux.dev,epam.com,lists.xenproject.org];
-	R_RATELIMIT(0.00)[to_ip_from(RLe7mkytzjcetcarxr9hjfjrzi)];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
-X-Spam-Level: 
-X-Spam-Score: -4.30
+Content-Transfer-Encoding: 7bit
 
-On 6/9/26 14:18, Sumit Saxena wrote:
-> iorequest_cnt and iodone_cnt are updated on every command dispatch and
-> completion, often from different CPUs on high queue depth workloads.
-> Using adjacent atomic_t fields causes cache line contention between the
-> submission and completion paths.
+Hi Christian,
+
+On 2026/6/3 21:42, Christian Brauner wrote:
+>> May I ask if it's an urgent 7.2 work? If not, I could
 > 
-> Extend the same treatment to ioerr_cnt and iotmo_cnt so all four iostat
-> counters in struct scsi_device use struct percpu_counter.
+> No no, it's way too late for that this cycle.
 > 
-> Suggested-by: John Garry <john.g.garry@oracle.com>
-> Signed-off-by: Sumit Saxena <sumit.saxena@broadcom.com>
-> ---
->   drivers/scsi/scsi_error.c  |  4 ++--
->   drivers/scsi/scsi_lib.c    | 10 +++++-----
->   drivers/scsi/scsi_scan.c   |  8 ++++++++
->   drivers/scsi/scsi_sysfs.c  | 23 ++++++++++++++---------
->   drivers/scsi/sd.c          |  2 +-
->   include/scsi/scsi_device.h |  9 +++++----
->   6 files changed, 35 insertions(+), 21 deletions(-)
+>> make a preparation patch for the upcoming 7.2 cycle
+>> to handle erofs_map_dev() failure here so you don't
+>> need to bother with this in this patchset.
 > 
-Good idea.
+> Sounds good. I take it you can just do this yourself without me.
+> 
+>> I will seek more time to resolve the recent todos
+> 
+> Thanks!
+> 
+>> yet always intercepted by other unrelated stuffs.
+> 
+> :)
 
-Reviewed-by: Hannes Reinecke <hare@kernel.org>
+I removed .shutdown() and .remove_bdev() implementations since I
+think it doesn't quite seem necessary for immutable fses, but
+would like to know your thoughts too, my overall own comments are
+documented in the commit message below:
 
-Cheers,
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+ From 933f6c6f2e704116d9a15815c880196bec7b9ee3 Mon Sep 17 00:00:00 2001
+From: Christian Brauner <brauner@kernel.org>
+Date: Tue, 2 Jun 2026 12:10:13 +0200
+Subject: [PATCH] erofs: open via dedicated fs bdev helpers
+
+Route opens through fs_bdev_file_open_by_path() so each external device
+is registered against the correct superblock, and convert the matching
+releases.
+
+Gao Xiang: I think typical immutable filesystems don't need .shutdown()
+and .remove_bdev() for the following reasons:
+
+  - blk_mark_disk_dead() sets GD_DEAD in advance of fs_bdev_mark_dead()
+    so that the following bios will fail immediately; block_device
+    references are still valid so it seems overkill to handle dead
+    blockdevs in the deep filesystem I/O submission path.
+
+  - Immutable filesystems like EROFS don't have write paths and journals,
+    so they don't need to block writes (i.e., new dirty pages), metadata
+    changes, and abort journals.
+
+  - The comment above loop_change_fd() documents a valid read-only use
+    case we need to support anyway, but it calls disk_force_media_change()
+    which will call fs_bdev_mark_dead() later: we don't want loop_change_fd()
+    shutdowns the active filesystems and return -EIO unconditionally.
+
+Currently I think the default behavior (shrink_dcache_sb + evict_inodes)
+in fs_bdev_mark_dead() is enough for immutable filesystems, tried to
+document in the commit here for later reference.
+
+Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+Signed-off-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+---
+  fs/erofs/super.c | 35 +++++++++++++++++++++++------------
+  1 file changed, 23 insertions(+), 12 deletions(-)
+
+diff --git a/fs/erofs/super.c b/fs/erofs/super.c
+index 802add6652fd..def9cbfbc9d8 100644
+--- a/fs/erofs/super.c
++++ b/fs/erofs/super.c
+@@ -153,8 +153,8 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
+  	} else if (!sbi->devs->flatdev) {
+  		file = erofs_is_fileio_mode(sbi) ?
+  				filp_open(dif->path, O_RDONLY | O_LARGEFILE, 0) :
+-				bdev_file_open_by_path(dif->path,
+-						BLK_OPEN_READ, sb->s_type, NULL);
++				fs_bdev_file_open_by_path(dif->path,
++						BLK_OPEN_READ, sb->s_type, sb);
+  		if (IS_ERR(file)) {
+  			if (file == ERR_PTR(-ENOTBLK))
+  				return -EINVAL;
+@@ -843,11 +843,16 @@ static int erofs_fc_reconfigure(struct fs_context *fc)
+
+  static int erofs_release_device_info(int id, void *ptr, void *data)
+  {
++	struct super_block *sb = data;
+  	struct erofs_device_info *dif = ptr;
+
+  	fs_put_dax(dif->dax_dev, NULL);
+-	if (dif->file)
+-		fput(dif->file);
++	if (dif->file) {
++		if (S_ISBLK(file_inode(dif->file)->i_mode))
++			fs_bdev_file_release(dif->file, sb);
++		else
++			fput(dif->file);
++	}
+  	erofs_fscache_unregister_cookie(dif->fscache);
+  	dif->fscache = NULL;
+  	kfree(dif->path);
+@@ -855,18 +860,19 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
+  	return 0;
+  }
+
+-static void erofs_free_dev_context(struct erofs_dev_context *devs)
++static void erofs_free_dev_context(struct erofs_dev_context *devs,
++				   struct super_block *sb)
+  {
+  	if (!devs)
+  		return;
+-	idr_for_each(&devs->tree, &erofs_release_device_info, NULL);
++	idr_for_each(&devs->tree, &erofs_release_device_info, sb);
+  	idr_destroy(&devs->tree);
+  	kfree(devs);
+  }
+
+-static void erofs_sb_free(struct erofs_sb_info *sbi)
++static void erofs_sb_free(struct erofs_sb_info *sbi, struct super_block *sb)
+  {
+-	erofs_free_dev_context(sbi->devs);
++	erofs_free_dev_context(sbi->devs, sb);
+  	kfree(sbi->fsid);
+  	kfree_sensitive(sbi->domain_id);
+  	if (sbi->dif0.file)
+@@ -879,8 +885,13 @@ static void erofs_fc_free(struct fs_context *fc)
+  {
+  	struct erofs_sb_info *sbi = fc->s_fs_info;
+
+-	if (sbi) /* free here if an error occurs before transferring to sb */
+-		erofs_sb_free(sbi);
++	/*
++	 * Freed here only if an error occurs before the sb is set up; at that
++	 * point no block-backed device has been claimed (that happens in
++	 * fill_super), so the NULL sb never reaches fs_bdev_file_release().
++	 */
++	if (sbi)
++		erofs_sb_free(sbi, NULL);
+  }
+
+  static const struct fs_context_operations erofs_context_ops = {
+@@ -936,7 +947,7 @@ static void erofs_kill_sb(struct super_block *sb)
+  	erofs_drop_internal_inodes(sbi);
+  	fs_put_dax(sbi->dif0.dax_dev, NULL);
+  	erofs_fscache_unregister_fs(sb);
+-	erofs_sb_free(sbi);
++	erofs_sb_free(sbi, sb);
+  	sb->s_fs_info = NULL;
+  }
+
+@@ -948,7 +959,7 @@ static void erofs_put_super(struct super_block *sb)
+  	erofs_shrinker_unregister(sb);
+  	erofs_xattr_prefixes_cleanup(sb);
+  	erofs_drop_internal_inodes(sbi);
+-	erofs_free_dev_context(sbi->devs);
++	erofs_free_dev_context(sbi->devs, sb);
+  	sbi->devs = NULL;
+  	erofs_fscache_unregister_fs(sb);
+  }
+--
+2.43.5
+
+
