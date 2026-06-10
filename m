@@ -1,143 +1,151 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09AB411679
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 14:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DB9408639;
+	Wed, 10 Jun 2026 15:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781102902; cv=none; b=PdN/DxY+DCeLn+MEFEJ/B3Kc4IsbQ0RUeHbyE20lHWy0k1M199liVAh611IcbacGLJIiK3RrvKt676fOrRJSig5oayJcaEQVuu/hhgteG/3o2SiIkhWd4jCKxv0b43HDhuYLb3EOfyfrRLJ+pF4zmA+VpjPbwBOQDGbYUjTHfCY=
+	t=1781103771; cv=none; b=m0omgFemG9MtLt2cORSpumBAwW/De2niLLrs9jqjENLHbjjG1GLLPzKLUE3n6QokcGC4PEAwEYNtrXbsYgNCwuZ4Jz1PdMMD/G1VDOEoouBKPO49izL/m2fcIlUPIyLYHnJwX9vT6dlfcj+YPFu0wUCzu4vekKPB85NFD+3XRAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781102902; c=relaxed/simple;
-	bh=wPnpLp8Tkf1EcxdmimD9podW7Pj9Kcz4BTuowIEiEmg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dB3AJ70WzRX9hTV4LEHlSHULsj94lF466TgczV6ISLF7Bx76qaFskooy9m/uAX2TygcehJmrEcpzHX5nHaC10vI4uccrzRu4Pziu/vR8F5/g1Bc55moJbRlXIPa/qcYAsmBvy9BC+HsvgiMOhi46Yx0Aw+ZAH9+xmq4s1EFv5hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FNqcUa72; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781103771; c=relaxed/simple;
+	bh=wdD+yxiW9aVoMld4LMPC1DWLru4HtTsU9EmgfMnk6eg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WTMIJZzNC5XVeHD9t4n2Hk5OqXo9uWeu3DgNd9nYDEcQdEGb1ov1QZnxLqtyeFxoma4XgerrTBcbvKnrwpiT0ixjsun2zi0klCjXpep4p0YNLQLPV3R5ALqEfetyZts1gpGbRVeYJlWgUW++fKoSp5g0VvyKmoOd9KC7xlIkSjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IYWIndeY; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FNqcUa72"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-490a76757e5so45539935e9.2
-        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 07:48:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781102899; x=1781707699; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=arsHl3hytXvoPGGCrzWJqM/sm6/JUsgdcn4JlpnXn2E=;
-        b=FNqcUa72ScWLu0CO27P2nrHmh9XlvJ8GxaOtJAb3/ee4tNYLqEckT0lSgidX9zbI4d
-         qaO1NgQjMRNywFo1Wa6LDjPh9M3hzS76eire4QzHtFg3tL1WrPzGCoaqAB2b5OuByU5t
-         K++Ou7KeluGyISAkCbps3u7DN+NILqnK3e+SOCD+lvxYqtZyvmXX0JXfhyRILkhtM2T/
-         L+mbi+f4QpDN+tuOhJ/h0/Uu/0mcqw/iRK+mRO88o4d/bNKcNYFBftnlnMT3N9cG++MD
-         q1xzNkadajAlTo8AAVFSIxhim4T3wh0t0UGEVl2czjA2FMAhKUM9S6TxbwgHldAgZeEW
-         aDFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781102899; x=1781707699;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=arsHl3hytXvoPGGCrzWJqM/sm6/JUsgdcn4JlpnXn2E=;
-        b=fqg+1Eh3ikDw0ZqlbrQPHuOBwnEqiEtZNW1sl0IUEWzddWsMfew5R+VbtYLXMpMF1l
-         nzN8fv/aF3aC8mH/6/vcDbsU+ydEF8kEq/wIL0a6yNRkQN0k4W9M3n14PDdOdwI+tG79
-         oVeijVi5o4jtlHVeJyqYKDbwahgYRXXB76iufn2QeM8+6AaSLXATJiW1NNwhmqWJkMx8
-         I8A0xH4MXO4Krg7kU9qmlO2ZppGVxsE3kJSPMnjDub7fIeFWM+n5Unl2rZxPyi5XmLqb
-         hZ9xEIrmERQnjy9u12vTdu6HJ5XqoIq+wpOWK/b8V2DuLSeJcegNpEQmBBPaIFJOJfOk
-         H27A==
-X-Forwarded-Encrypted: i=1; AFNElJ9TbLBe22Q8XHca7wYgMq1K6TPpKTlnoe9jRGDiGav6PDwvW8vMhbA9GnScExs2bg7rHZJiSxzvVnsN9w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7pZD7+zZYNjaOJmJUaeCG50iX8hOxNThbZynTIfF0YymugDiR
-	8YSdZuJG742MCBqWO7rw7qz3Rk/g0eySHycFPVowxl4Bv7V7QYuFBmCA
-X-Gm-Gg: Acq92OGvnvxLUKobiCl/IwUM7LNNDrQHVaC9HKX2bH+r5DAKxr11hrnLFb4JBW6RRlP
-	pZlZQ3cwIQW5RLWziezsiQKS7iIYkF8HkhqKyp5Y7/rP4Ou61LqNr+q/rneGGVJQDaRGQvRAtxK
-	q9DRSRkQm6yaKl1Ize2JMKN0wGq6xQlqkFqOgUwGeMDCXG+erNN2AMcbbfnXNmRolKmfN3sNW//
-	/ks+r3wXNPoMrf9TNwsD1vJYNMSC4KKwuPctu80cYpRlqnzRf9qTU7F8WTxpoWEiaS+1oX235p7
-	QBe2A9y7hTHvDSlp587ZNtr9y2VvlTtlapHHCSi8nzgfFLIOoyXUNSQExcLTGykCuJxcBLE160J
-	2aaMy6O+Tmov4As5z22l4ui5VWP25ircUJUx0BlEE1C0+UQ/UM+doUBQCUCKPwirEn2MqahjnzA
-	K3nrJgt+0NYA6o+ciBbup6ZC0HVJZie5Jam3rZB+MN21blWiCGTRore6uFfW6sScwB4N+1STR36
-	A==
-X-Received: by 2002:a05:600c:b93:b0:48a:93f8:dd02 with SMTP id 5b1f17b1804b1-490c4e0414emr409860885e9.14.1781102898732;
-        Wed, 10 Jun 2026 07:48:18 -0700 (PDT)
-Received: from [172.16.16.15] ([195.100.225.50])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490dcab44dfsm69288225e9.2.2026.06.10.07.48.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2026 07:48:18 -0700 (PDT)
-Message-ID: <9627f522-7d94-48c8-9848-30761c9234bd@gmail.com>
-Date: Wed, 10 Jun 2026 16:48:16 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IYWIndeY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781103770; x=1812639770;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=wdD+yxiW9aVoMld4LMPC1DWLru4HtTsU9EmgfMnk6eg=;
+  b=IYWIndeY6xvcOvSzUD3YJRYWYC8lX4SZ+0P/TXyAB1A5m8V2lk6Ienaz
+   1XrZPVFZJkQZEhRQDVjjYmB6WJs3LyTOkJ/fDXgPvml5G8ObipCP/hm2Q
+   b4hrB31D09MtFizWt7LC9koJi6546dcbRgL1DgZh8/56oylxOVSZ4nmNO
+   Vz7FJRd88Ku9xNe7/jiUrlGEXK+6j7hfCByby9uFlNKXtVh/+ssTGbdSf
+   gnlUOHQWDDhkK6s8VgkZKvfeEsynJueDjeIGA7IVyRYbvec8/pdM7NCnC
+   wq6YE60gwbkmqjWbvBHzDmUizGbGatUBrr+eZBGNmI/qbi+yKg/ZUM5yU
+   Q==;
+X-CSE-ConnectionGUID: KcgU0FGrQx+nl55jRFys7A==
+X-CSE-MsgGUID: IY8JNEakTTaKROC01+vL7Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="107334580"
+X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
+   d="scan'208";a="107334580"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 08:02:48 -0700
+X-CSE-ConnectionGUID: vFiAK4i9TuuPvjj1ruVuyA==
+X-CSE-MsgGUID: yPzj5/7BTy26oZg8/7CqtA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
+   d="scan'208";a="251275772"
+Received: from hrotuna-mobl2.ger.corp.intel.com (HELO localhost) ([10.245.244.38])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 08:02:35 -0700
+Date: Wed, 10 Jun 2026 18:02:32 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Kaitao Cheng <kaitao.cheng@linux.dev>,
+	Thierry Reding <thierry.reding@kernel.org>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Sowjanya Komatineni <skomatineni@nvidia.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Huang Rui <ray.huang@amd.com>, Eddie James <eajames@linux.ibm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Laxman Dewangan <ldewangan@nvidia.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Robert Foss <rfoss@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+	Jonas Karlman <jonas@kwiboo.se>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Matthew Auld <matthew.auld@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Waiman Long <longman@redhat.com>, drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+	linux-spi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Kaito Cheng <chengkaitao@kylinos.cn>,
+	Muchun Song <muchun.song@linux.dev>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
+ state
+Message-ID: <ail8iNvPrJnE7p58@ashevche-desk.local>
+References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+ <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
+ <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
+ <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
+ <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
+ <d974a2ea-6102-45ff-bf36-3b25a2404e40@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] rust: add procedural macro for declaring configfs
- attributes
-To: Gary Guo <gary@garyguo.net>, Andreas Hindborg <a.hindborg@kernel.org>,
- Breno Leitao <leitao@debian.org>, Miguel Ojeda <ojeda@kernel.org>,
- Boqun Feng <boqun@kernel.org>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <20260603-configfs-syn-v2-1-cb58489c2647@gmail.com>
- <DIZHKJSZXQ4Z.6SPXJVGDV9ZW@garyguo.net>
- <f6a513e8-227f-4b22-bd4d-81d88536eff1@gmail.com>
- <DJ5A9HIJ43EJ.2K3SCFI7UR3NF@garyguo.net>
-Content-Language: en-US, en-AU
-From: Malte Wechter <maltewechter@gmail.com>
-In-Reply-To: <DJ5A9HIJ43EJ.2K3SCFI7UR3NF@garyguo.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d974a2ea-6102-45ff-bf36-3b25a2404e40@amd.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
+On Wed, Jun 10, 2026 at 11:11:34AM +0200, Christian König wrote:
+> On 6/10/26 10:18, Kaitao Cheng wrote:
+> > 在 2026/6/10 16:07, Christian König 写道:
 
-On 6/10/26 12:05 PM, Gary Guo wrote:
-> On Wed Jun 10, 2026 at 10:15 AM BST, Malte Wechter wrote:
->>>> +
->>>> +        Ok(ConfigfsAttrs {
->>>> +            container,
->>>> +            data,
->>>> +            child,
->>>> +            attributes,
->>>> +        })
->>>> +    }
->>>> +}
->>>> +
->>>> +fn make_static_ident<T: ToTokens>(ty: &T, suffix: &str) -> syn::Ident {
->>>> +    let raw_id = quote! { #ty }.to_string();
->>>> +
->>>> +    // Sanitizing syn::Type::Path, this is safe since it is
->>>> +    // only used as the identifier.
->>>> +    let normalized = raw_id
->>>> +        .split("::")
->>>> +        .map(|s| String::from(s.trim()))
->>>> +        .reduce(|a, b| format!("{a}_{b}"))
->>>> +        .expect("Cannot be empty")
->>>> +        .to_uppercase()
->>>> +        .replace(|c: char| !c.is_alphanumeric(), "_");
->>>> +
->>>> +    Ident::new(&format!("{}_{}", normalized, suffix), ty.span())
->>>> +}
->>>> +
->>>> +pub(crate) fn configfs_attrs(cfs_attrs: ConfigfsAttrs) -> proc_macro2::TokenStream {
->>>> +    let (container_ty, data_ty) = (&cfs_attrs.container, &cfs_attrs.data);
->>>> +
->>>> +    let data_tp_ident = make_static_ident(data_ty, "TPE");
->>>> +    let data_attr_ident = make_static_ident(data_ty, "ATTR_LIST");
->>> Instead of creating identifers like this, just scope them properly so that
->>> a fixed identifier is used without colliding.
->> I believe it is nice to keep the identifiers unique, especially if you
->> have many fields
->> you can easily differentiate them.
-> What make_static_ident is doing I think is quite hacky. I'd rather not having
-> them. Plus, the identifiers are not seen by users anyway.
->
-> Best,
-> Gary
+...
 
-I will simplify the naming of the static variables greatly (removing 
-make_static_ident), but still generate unique identifiers.
+> > Should we revert to v1, or keep list_for_each_entry() and
+> > list_for_each_entry_safe() as they are, close this thread, and make no
+> > changes?
+> > 
+> > Link to v1:
+> > https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+> > 
+> > Or do you have any better suggestions?
+> 
+> v1 looks perfectly reasonable to me.
 
-Best regards,
+But why not just hiding that once for all (in case they don't use the temporary
+iterator)? Easy to automate, robust — everyone is happy?
 
-Malte
+> You should just include some patches in the same patch set to actually use
+> the new macros.
+> 
+> If you modify the files under drivers/dma-buf or drivers/gpu/drm/amd to use
+> the new macro I'm happy to review that.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
 
