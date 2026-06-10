@@ -1,130 +1,114 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34FB385D92
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 07:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7EC2D9787
+	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 07:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781076492; cv=none; b=GPcjphI5SHL/OZMBzpKT6Bee0fq5TkVI/LX3AJtkqRVsuHCJdbCL2yFuskRjyI/RbS7HKYyB3ho5thUgwIZLRsny0vlVg7SvtyUx5AZgYkfIMVJs2HMZyPcInlUqG8qfy61AY84IVQw8F8G/iLm3C/CxysMyrJ8QZsfK1LJ8Q2w=
+	t=1781076518; cv=none; b=G1Uezr/bYtcUPRqXOqxbMA+uD+uHrWCLUfRm5BbgxZbzyLmSAWRKJvbMzNq5oRYxwQkfptkrXWugyFOGnukcGyc77P026haN8ygkZ54Dk4MVdezNTUfJV6+LVbKdo1TtGyB4hq1D/QQWwjRelNQOKQkLM36WowSYyfIvCBwJS4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781076492; c=relaxed/simple;
-	bh=tnhYIZbexmwH4l4TRimSaSmIA4vWf+v04RpPLFtes/c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FP5t+YjrXjWHJ0Dn0xXZpeHxekUWtR0zr4Fxwhjv7mGlk1uTRbDXjB9bTJwG8JHjiyTFoA0VdLi0/+dg17Xsd4DYOvN6xzJNE1ADcp6rnVpwvQDz2qFymI61juqz3q/etNDGZWnXNyDwlQnyB1/rCW5n1J0CdFWoDPiiRTXEVMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=c1xRuTi7; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1781076518; c=relaxed/simple;
+	bh=zR2CpRBE8uqB+148RiY88lhFlrMpiUDuwfcf62SEo1s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kjb3137VeR+arUUGXa8iKFVE5YvzhGRcJe9dwr57W3GHiTMdyhnq/ifKIMzjQLc1VR6TUvifv38zMnki6S6t3NSbppOhjdqMsEdp6jKKhay4ScHLA038OdKB1b46dYGQPEE53ZWn3Ab1HNOBaEMdVXyKlxa/ueBiZG7+r7o6MgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lm6rVkBF; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="c1xRuTi7"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4602e2a0372so4630973f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 00:28:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1781076488; x=1781681288; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FXd9KxkewHf3chFLOC35bnc60+vMTwcuOgv1/AoH/Uo=;
-        b=c1xRuTi7/nW7L4xNfP2MHMgbUR7M541ECwamTZWWPU816R4KYt/iV1hsZ34HxETUxk
-         ildjVTorfpn74Iiw1yiNYmay5qdcBvCXEjtNaOUyNfZUg56kXIA2tct9z07Og6ybDbk0
-         gd2QuNFOhr8pm47Trswct1ac8UVNIds73EVFJfPbjjGc/OuFVSWjylj8aL/Mg+LTP9+X
-         qnO2lLE1hZELL5pn5Vf1SOIh6aoNcWulsTGu4IOrONkxQUErlNg32ORv4S6jENQPhano
-         D58PCUT/NTc+Ns9xXe0cGtbDZg8K5vhW9USLEC0tPQk0PMKI5NptX/CPzHKl8aa0TlX8
-         pXgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781076488; x=1781681288;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FXd9KxkewHf3chFLOC35bnc60+vMTwcuOgv1/AoH/Uo=;
-        b=QRJBwrQ3oflJ8zKBlHpV50ygA8TQkfuv3IwRQxpUKkAV4+w7dvR/rDx2ShhtcMqpRR
-         hW6K0dNV1oFNZjKoEGlOUKm2/0R6oVFlWxbvuWgKI7+dxKQxPYx1Lzq3cVScLenQmrgL
-         0ZhSHK+tR9hStxAWyTmWO4LAgCkaDxqhKJ+PvrJmcVMAXJq1ShreNyr5+HIvCiY5z93N
-         KcqkmjD1YKlBQg3ZOXiUiBwRGYfHtbiklp6H6Oga8M2U6Y4zatqR09dYEVzw8/WGC9k2
-         5iUgVwf0cI0qNH4/c0dpGg+TuSMUfEkOwU5PBem88cYHzPXaTvdL4hLSkOIjvEUgQU+Q
-         S6Cg==
-X-Gm-Message-State: AOJu0YzdaeiiU+NwvFNF7uA4PCLSLpJOGmqHwF4V/+Y4IIgI32KL7trZ
-	LByGUgB86s4zI29L7UqEK/RDve8kd/UzYlSeOGtvlFY7gKy4GEYnb7aP+ZGDY7cvlzU=
-X-Gm-Gg: Acq92OELg+aKvdiCnvCleD3HB/VVvDMJk0aWoZjFTZBXwzMFaNI/ulTg5sFxUBA5KjC
-	8V4rNPeJa1zb4R5X5UJA3TDlYA20q6QJyMiZWOpUJYcbVmtqjopBuUp1lLiYGGhsCly2Btok22l
-	sXY1CdVDCTyPVLdr1p3boolJOimdM5XMJIlGectEqIasxZr2nECkjh/xph+vR69zhXU7UHqL6vH
-	kFYJgOAtuioC5ohnlQlx0aGCslfZiE5aD66xbFUhTXmk+1m7vpVuDb90TppXMrzfiPT6U7yD6NH
-	1sgSQtVYBq3NGFQmYrAN+1/JkQExQxRpE7xrxxYiBjyS6p6YakIqbcEzZs5Bl9Cmmvu9jnqOC3V
-	8Hm/hnTRycprdi1DlxYffdIz/o7gEzqAWoDAPvyJFTrErNYHC/cHrmBIZBHN4FCOMp8z0BKLWVs
-	W1HJHh7w1SsO9BQLF4o6+l3rSLf0V9/IBPMXtN+Iw=
-X-Received: by 2002:adf:e743:0:b0:45e:f1c5:709 with SMTP id ffacd0b85a97d-4603076cb46mr27254307f8f.37.1781076487885;
-        Wed, 10 Jun 2026 00:28:07 -0700 (PDT)
-Received: from localhost ([2a02:8071:56d1:2de0:559d:eec2:887f:c200])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-4601f351d69sm123651994f8f.29.2026.06.10.00.28.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2026 00:28:06 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] floppy: Drop unused pnp driver data
-Date: Wed, 10 Jun 2026 09:27:55 +0200
-Message-ID:  <99dbf851ffb99229ea1dcfd8f58e9ee6a1f05349.1781075967.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lm6rVkBF"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 659IWXfM3398572;
+	Wed, 10 Jun 2026 07:28:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ankVWJ
+	aX/HuXXQzpo01Nk7fS3MBXJyvpxkZu+IJAc+k=; b=lm6rVkBFmbMx4pr/4e/Jlc
+	aHNdtRvtHKc3YJMKbQXalqUMBGTaRNje0C9/hr0AS9GOghc4PBemuBD7cYhrnGNe
+	soplX8+KA09GL/cQ9369lwv2siX/IEy48re+3OOyVQ4v4B+GMDtuoidhyJmMX2ev
+	95karKK6NZaki0z8EQ0RKZMqlgWgcfpcE50Us1VIb/VTQdirr0b2KLkZ7JKvUqgZ
+	+CFsBOun9PcHQy8CrSrLyND7GR+H6TvwgWP0gtcQ3Q1OGqA6JQQl3iGxjjTpPZqt
+	MzXFvLaEToM6UZv2F/ZQt2tKP4lV+D9onQ8AaVdoAy7o8gH18Ju1pbsdJO7C3edA
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4emb7qr08c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jun 2026 07:28:10 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65A7Jm3E024507;
+	Wed, 10 Jun 2026 07:28:09 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4emych5hdn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Jun 2026 07:28:09 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65A7RbH021234212
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Jun 2026 07:27:38 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AD73458056;
+	Wed, 10 Jun 2026 07:28:08 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E636D58052;
+	Wed, 10 Jun 2026 07:28:04 +0000 (GMT)
+Received: from [9.43.34.89] (unknown [9.43.34.89])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 10 Jun 2026 07:28:04 +0000 (GMT)
+Message-ID: <c8d3607c-7854-4723-9f68-2425066beead@linux.ibm.com>
+Date: Wed, 10 Jun 2026 12:58:03 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1675; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=tnhYIZbexmwH4l4TRimSaSmIA4vWf+v04RpPLFtes/c=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqKRH7dMH/5rxc/b3AdszYqPTzbBZ46Gpn4WzAd aKeUbneBTSJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaikR+wAKCRCPgPtYfRL+ Tr2qCACGLybsumZx0CFZ7UZAU07KHx37pMsgCiCZSf9fFz4+NH8fw6gx7dLosonKrz6HQH8UIbK I9tQKl3AXDExAEww//7O9Oe0S/yIiu8vIVpPFxCFD7Uj9B9RT5EEPcNa6lfGmZz/hiV/udecnkq 2+4oJVxC4f9kpULfZ6pA2D412nOI5Om0JUMNLCXOtgovpbg0Q98megzt2RyNeDajdJiUET1wScQ YCLq+aDzqdG4n8+7f/hSJ7behLp0iErxZuhS3+wBdwVpz2PstiasED4UpMSG+RwZbLUfu0o/R+1 AMkLouoqfNxpcaOW+i+tKLQP2qryiDKlKSp2HYYZpd0D5lk+
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 21/27] null_blk: Enable lock context analysis
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Marco Elver <elver@google.com>, Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Genjian Zhang <zhanggenjian@kylinos.cn>, Kees Cook <kees@kernel.org>
+References: <cover.1781042470.git.bvanassche@acm.org>
+ <b70422c6f243b9275e336430071b52eb92dd40c4.1781042470.git.bvanassche@acm.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <b70422c6f243b9275e336430071b52eb92dd40c4.1781042470.git.bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=HppG3UTS c=1 sm=1 tr=0 ts=6a29120a cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=N54-gffFAAAA:8
+ a=VnNF1IyMAAAA:8 a=clIS_Zq-ZQfnoPMRsucA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: jn_tT_VEQaV1g58aocUyLu78AeZ6w6Lp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDA2NSBTYWx0ZWRfX/+Qg6iJINCJu
+ y4r2Q3sB5wA5wH9+dWfzRkl/06GRS/gYjnT4p7RNFRMiYrRfBlE/CDVxsis2B35hLfBAWFKKDOn
+ wZgdnmQGfImlzHSzYTHuifuHN247xxT17uPk5hfJS5a+X2IhKDiItM3/Vj2Yc0qI6ZAzUFzx+Ww
+ y8RN4bt078Lug7Uu1Tms9PteC63SIpOQ1IEg0XWcLoIq2l59CYIGCmf1KURadTxoRafWBIemvhI
+ QaC1nhFgw4o/cpmVJgygfRqw5L2FQJEchbyL4RL8xhgNR12vwZaBjCS9vbYrpSFKPKVNNSGVKYc
+ 5bvFhMqd6tFBleP2LmiA9IS8DcPBwskzwhCBGfHULHKw180PMhgRYp3Va7LcWN/zU/r7AvSxUPZ
+ xga+LD3UjBi+bngfiZw0TQLu6q9xml+pEEcLNl+dXin7eQhw8lclqziz2FHm/ENKYSu+jXn2Wzh
+ cUx2rV1Rxg+JXOeh4jA==
+X-Proofpoint-ORIG-GUID: DTxs39tfNDZ-x-W4m6Z0IbNKtMokjwBj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
+ definitions=2026-06-10_01,2026-06-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 malwarescore=0 impostorscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 spamscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606100065
 
-The pnp_device_id array is only used for module data to support
-auto-loading the floppy module. So the .driver_data member is unused and
-this assignment can be dropped.
-
-While touching that array, align the coding style to what is used most
-for these.
-
-This patch doesn't modify the compiled array, only its representation
-in source form benefits. The former was confirmed with x86 and arm64
-builds.
-
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
-Hello,
-
-I intend to change struct pnp_device_id and for that it's required that
-.driver_data is not assigned using a list initializer. Instead of
-converting it to a named initializer, drop the assignment as the value
-is unused. So this is both a cleanup and a preparation for a later patch
-series.
-
-See
-https://lore.kernel.org/all/cover.1779878004.git.u.kleine-koenig@baylibre.com/
-for a more verbose description on the mentioned change to struct
-pnp_device_id (though this is about platform_device_id, but the idea
-here is the same).
-
-Best regards
-Uwe
-
- drivers/block/floppy.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 0509746f8aed..dca495be0683 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -5012,8 +5012,8 @@ MODULE_LICENSE("GPL");
- 
- /* This doesn't actually get used other than for module information */
- static const struct pnp_device_id floppy_pnpids[] = {
--	{"PNP0700", 0},
--	{}
-+	{ .id = "PNP0700" },
-+	{ }
- };
- 
- MODULE_DEVICE_TABLE(pnp, floppy_pnpids);
-
-base-commit: 49e02880ec0a8c378e811bc9d85da188d7c6204c
--- 
-2.47.3
-
+On 6/10/26 3:35 AM, Bart Van Assche wrote:
+> Add __must_hold() annotations where these are missing. Annotate two
+> functions that use conditional locking with __context_unsafe(). Enable lock
+> context analysis in the Makefile.
+> 
+> Signed-off-by: Bart Van Assche<bvanassche@acm.org>
+> ---
+Looks good to me.
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
