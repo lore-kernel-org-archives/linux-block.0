@@ -1,149 +1,244 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012068.outbound.protection.outlook.com [40.107.200.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D770E39E9CB
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 08:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781078594; cv=none; b=HwKjKD6WOts5hDfurxMSI4ptVPt4nl0Av6oXZue9IxLkr/ObKMe3ig+MBjoYTB9+GfhVb+Nu5L22s6jIn6EcTLJPk+raI0/H+it1gWiguWcoPQbsegUMvhA9aNaJzDEmbE5yvUg2vdcRgFKXHmI+9Lo+ovfWfDKkqz6ug39xmxQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781078594; c=relaxed/simple;
-	bh=CIP8rfcFXABfykDB4gnElLlLCQHNk0ZxctvvwuHmPus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G4n5MIMttp+hErF0bj3kK1p/WOuWfloqffeXyAnrnZHn+nBeQ9TwLbOB6rV4SKwlPfP2HmG9oL0l1S1mVNg6+XUROayyuWdkpyU6GMbmLyIPLsXQ0DnKrqZdwbJAQBl+GNhmB2TXBxTCmAVnsJFBFOyTD9Wqe1dLxNomXLF9VIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EJ7Fgt59; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9484826F47C;
+	Wed, 10 Jun 2026 08:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781078888; cv=fail; b=gVMj0UydKWHCBRCfVK5L1c1/7sOo/djU0WHnlAEOVaE2j4k6zZtD8+VK/kXmH8Yn2t5ZjUwjsNsCnP2DKvyz/vVQYfBKO1deefncbjAgT5JfIWSdlOK2Kz1rcc+uhJ7011flbQpitnOLvJoF3cXokZMSmyzYK5h/xMS6CaPIbo0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781078888; c=relaxed/simple;
+	bh=ihPEvUmaxeU89bxoFtAq7pDocCa0B5i7E/7OI9C/AaA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=NbywvICvXSqd5BiLpyClvBrm1BWUYEdf4/TTSo1LTXOu59BxtRhckGuCPQOgu5esAdQgdZkHtiV/U7hrS7WshkQ7YQgswkn9sVv3545K8ZVtPXpfEx/SxyKs5ATfknU/nzHJ+hfr69pFSMnNkkOeClvCCO8Cz8W3DgRG9AQ9ACk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=U0c85P2n; arc=fail smtp.client-ip=40.107.200.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EJ7Fgt59"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65A0lmCA2990707;
-	Wed, 10 Jun 2026 08:02:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9dEXXD
-	68PnAihTFm8MOHE1m1uEeFNVUPh5IUXcnFixw=; b=EJ7Fgt59xSaJENoBRhXJ3b
-	JubX7jEaw5k8PURhxBSLm6bhpDMrXCnA0YMpzrLTPHr/AAyuazm075FjOovdjt1k
-	DZR0JH0PvXbISQf5gMEQbxGrb97flTyRPCfV83GrO69NIEZ7LQDa76ZMDPOw5Yoq
-	A7tjC50Rb5zBOtoZheAGVBr3oLSlbfvf4npxsDR7bwA07IehIxi0wRqHfKKT65Lt
-	9YWWRrEMUSNyJotbc7gz9/ItBGcrCvUGrwcuu2Hp/ELl6Xf9sbwwHtgFnN1I2+Ep
-	qx2+NHtZy5bdyPVwhMJeXBWhikLpEnsYnLOXSwUzgyt8SJBBZj3TpiXKc6AVX3Hg
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4em8yhyxsf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jun 2026 08:02:52 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65A7nfg1028893;
-	Wed, 10 Jun 2026 08:02:51 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4emxvjwqpr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jun 2026 08:02:51 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65A82oeH6554174
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Jun 2026 08:02:50 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AC7A058056;
-	Wed, 10 Jun 2026 08:02:50 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0344B58067;
-	Wed, 10 Jun 2026 08:02:48 +0000 (GMT)
-Received: from [9.43.34.89] (unknown [9.43.34.89])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 10 Jun 2026 08:02:47 +0000 (GMT)
-Message-ID: <4c8438e3-2415-43c9-ba6a-27321070c58e@linux.ibm.com>
-Date: Wed, 10 Jun 2026 13:32:46 +0530
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="U0c85P2n"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bNkaqkOVFjhH21ZuywHUPXBUtjF8MTKcgGQkSuhllLLaApRDi3lHVndKNiVfs0FXM2M3qNGH+v2m0jV9beNhm1MXmKjNbxmiphDE5Wsn8puQenWoiUShigfkwILE8Ma/6law4RNI7356xTn7tAufJ2QZZY644CjIoUGlTnLVDS0Dr8CsjReulgC4G3P9gy/8uKWy4Ji65HrrQ3Oiozf3zB3WaLbuKAy7Pmervdcm6dbXpNFjD87xjcSIT79LH5fLwXiYSYLn0xdbvs++HP8fgihyW7HbbPWmBNPiiVDZHkX+Z8UGzNGOuii4tvMnJrJ/20wr+IhNpCGwHgUng+jHfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nbGKZZeqXl0I3jIvv4zrXT60WcWn3r0FjCw0D0clQE0=;
+ b=sGXlPtLyvs4dX/m6eFTJZAvr/r4bPCXiE1M29MKB1vGdFYKDVr3g/jbyLqxLtnOzSB09XGrpQ6J8lAqaMbjwKOIbSGIdCsTD91X4BmegXpgDJK8/sIl10vfhZaPzO5xgivTE8weNYvw9gjrwt/Ck5TX5zQGwPNZY6hSFhA4I4lxvmokPeH37Y4lVCIp5/o3hYsu2IpNqXUY3z7mZlE+Fcuy/KDDQ/f2O+oe68+NxgDPtMTZiPe+H4i9I1Kv98O3pH8vRzAQvECyCucCf/QDVLkfMBqmJjaZKmusocBC6Fft0nFnF/hhfX+x1rybK1KNBnPodZdj8ZmuoqdpqJrPvdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nbGKZZeqXl0I3jIvv4zrXT60WcWn3r0FjCw0D0clQE0=;
+ b=U0c85P2nyNZkhOVpCxmQJoVPTwz8wcKJn6VJZN9yOeHvYxEcBcUiJGpUHg0iDI6WXzYt82Uxnn/aWq2TaOPVPrdhlSUQDqkuKDYrrlMQELrQ3Bq/nq4M3xwDV12GiIR8h1DeuGz6rEQ9OdOMPL62tGfJiqvoWYNIAEEy4vjCLeY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by LV9PR12MB9805.namprd12.prod.outlook.com (2603:10b6:408:2ee::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.14; Wed, 10 Jun
+ 2026 08:08:03 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0092.006; Wed, 10 Jun 2026
+ 08:08:03 +0000
+Message-ID: <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
+Date: Wed, 10 Jun 2026 10:07:48 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
+ state
+To: Kaitao Cheng <kaitao.cheng@linux.dev>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Thierry Reding <thierry.reding@kernel.org>,
+ Jonathan Hunter <jonathanh@nvidia.com>,
+ Sowjanya Komatineni <skomatineni@nvidia.com>,
+ Davidlohr Bueso <dave@stgolabs.net>, "Paul E . McKenney"
+ <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>,
+ Liam Girdwood <lgirdwood@gmail.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, Huang Rui <ray.huang@amd.com>,
+ Eddie James <eajames@linux.ibm.com>, Mark Brown <broonie@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Laxman Dewangan <ldewangan@nvidia.com>,
+ Neil Armstrong <neil.armstrong@linaro.org>, Robert Foss <rfoss@kernel.org>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+ Jonas Karlman <jonas@kwiboo.se>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Matthew Auld <matthew.auld@intel.com>,
+ Matthew Brost <matthew.brost@intel.com>, Waiman Long <longman@redhat.com>,
+ drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, linux-spi@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Randy Dunlap <rdunlap@infradead.org>, Christian Brauner
+ <brauner@kernel.org>, David Howells <dhowells@redhat.com>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Kaito Cheng <chengkaitao@kylinos.cn>, Muchun Song <muchun.song@linux.dev>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+ Jens Axboe <axboe@kernel.dk>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Andrzej Hajda <andrzej.hajda@intel.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>
+References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+ <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
+ <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BN0PR04CA0196.namprd04.prod.outlook.com
+ (2603:10b6:408:e9::21) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 20/27] nbd: Enable lock context analysis
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Marco Elver <elver@google.com>, Christoph Hellwig <hch@lst.de>,
-        Josef Bacik <josef@toxicpanda.com>
-References: <cover.1781042470.git.bvanassche@acm.org>
- <5361809d027e772503ca3cc458aaebdf06792e3b.1781042470.git.bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <5361809d027e772503ca3cc458aaebdf06792e3b.1781042470.git.bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjEwMDA3MCBTYWx0ZWRfX/IYMU4drO+sm
- lCE9jzYfsZmhIwDjolNFfS7pts5MgRLya7hxg5/xKnpVmecTa1/TdU8xwFckMjKogAxSf9GZXOL
- 3Z9vo+ETvS+LIOWx4SdubkGA9LFa5v7tAi0V7BvFver6d6Oo3cgth/ZGJ6LrqceIFucymvvFH1x
- RBCL5eqSovIBKAT+77ti5+b9Mr/ScmMADUkJYUGu2tULZBP2wndPByVvtoKlgDC+7sc4dUEQMmo
- fbqBdcuTwVhcTmaPTf5+DFKOPutWk2G6gtSQTZHQgL8zEgeDCT7jmJ2TrJZ/qHM65Q0xcPIavGk
- 8p9nm9AjYrCuKdY116B8NMhUG9nAc8HJITBx6S86PQmAEef9Fnt2YUmmhUfLM40yc0wqoAfOjNx
- yxwQh3tktTfOTO/mmkl+hvXEtvwn5OkT5HMXyMPK+mJso6j2juy1Auxf5gAyR+ohoPJfdlRCqJW
- 0WDF5DdLKgba2NIuplA==
-X-Authority-Analysis: v=2.4 cv=HvFG3UTS c=1 sm=1 tr=0 ts=6a291a2c cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=N54-gffFAAAA:8
- a=hqoLsArdjgmXJpXO1zgA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: AnEI9z7iAEZm3qeoPnyDojntbbIaAoI-
-X-Proofpoint-GUID: o6zVQ74Jqm_vOtLse33s0plaa6vnHlIA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-10_01,2026-06-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 suspectscore=0
- spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606100070
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|LV9PR12MB9805:EE_
+X-MS-Office365-Filtering-Correlation-Id: 85825337-3575-4d69-2f6c-08dec6c76501
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|366016|1800799024|7416014|376014|5023799004|11063799006|56012099006|4143699003|6133799003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	5wK+o6SmdROth+udKW36JmZvOpN+fjaHzQbrcYUJyNcEGhiRBssI2SJ0EaD1hNGYXzVREYz+h4BocGjaRx3o/UpjMzYNiBbfcdQw2sN0FzKSPmFdzJAZe2ErKl4F8mYNr+uckBTtzyhJUa+LhhuoJllvGeVpVdPlS6xYnkjIMMoOw88qhPRzsaTD0ALfQ2gb8pGt4gLcVDtf6KqBvEvEFxyhR5Pxn5lsQWq33cp3Jn97kcQJ2OVKyuaNrMhKB5UXwU4ujhhFLHaRbLwVDAJka9bUUgs49eI2seI0786oN26wnPYyKIFFpEkc1awUFIw/AYuV695XIhwo0UgqnmkFptj+GB8Zs4XUxxdZNbNXS9oGq4PtzZE+FSsnZNN/l4/5EUYIWmVVTHy+j+CTIWEjp2gw5s6hJfqh/q09YZdlMY8AYqVO6RDw2aqxC2ulR9rTHAUg3i31OYTvSelzs7GwhfMiTbGul2GmWFdWIHMsRqNlUlRQ9BcjbUL0dsTZH8cRAbORoStyxGuCRhbO06kkTo14ArelDqKVSSnzyVZosNB5awKMTJjYUkivv3e5KtE/L60J/2aI1wJ7LXosqJBT17uCUscx2YLqE2PCqeSqaAuKjmMsgHF6AlVJBByH5SOyvvcmps8zpc0wkf3h40PUMjsaUBq/l06WzyVOpt9A6KMZliU3ANc5HyxI2YmxSjzs
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(7416014)(376014)(5023799004)(11063799006)(56012099006)(4143699003)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eVpBd1o3RDg3bjVDOFprWEZEQmZqaVUweDBhbFArTkd4dGN1TWtkeEtaQXVO?=
+ =?utf-8?B?NWpacm0xSW00em5DMVIzb2NxMUxKK3ZBQjRNUnY2WWNtcVlVNlkxd1IrcU1Y?=
+ =?utf-8?B?bXdwa1duREZCdDNDQmhaTVkrZW5iMitTV2ljalZhK1k5OGZQZ3NtQ3I3Tktw?=
+ =?utf-8?B?S3BxOERxaWdvMmFvVWxoMTZrOGVOQ3h4L2ZYVjUySWYxNVZOa0laMUxzbjhQ?=
+ =?utf-8?B?ZnQ0T3VMeHRYYS9qdDQwcUJ5MTVrdUVLL2ZuVmFkZTVuYjlzd2ZGTmdtUzFm?=
+ =?utf-8?B?Mm80SHBlUzhjbWg1Zm90eW9JM2F3TjRRajVkckdOaFhyaFNVdmpMM2YvU0RT?=
+ =?utf-8?B?eFZGYk9Jc3hUaU9PcXAyUkV2dE43VDdYNGRmdFpnUG55VmZ0NDgwV2lPMlhM?=
+ =?utf-8?B?aVQyYUo2Yk5MU1RZNGEzMk00WkJvYzBUbnRxTCt0YXo5Z3BXTHM3aGJsc2tH?=
+ =?utf-8?B?T1AzZ3hyeTVBQ2VGOWxSOWs2WUd1MkZqdEF5eGtqZWUwYkQ5QUphZUU5VDBV?=
+ =?utf-8?B?bjIvQU1QWU1TRlNnZm03OGRvYmJjZFE5d0RxRFpCRVczeXowZGwyaUNtbGpS?=
+ =?utf-8?B?RU9xNG5Ga2pLWVNvcTVybEo2SjliRVhCdTEvOFRXcWV5TG9RVDdHWUplWnlJ?=
+ =?utf-8?B?eFpqVnpmUTU5aVFyMnFwVUJKdW9BeWo1UjFKTzI5enF2TEo2MTNTNDhyY0Fx?=
+ =?utf-8?B?QVFxbStDMW1NaE5EVGYybG91eDJKTU9wQ2h1Y3l4TVhqTER5N3VLcG8yOXgz?=
+ =?utf-8?B?azBqRjlYMVJyLzdMNUovOGpLVGJLUkRJYTgyZmVoUEZtRnZnV3lSMDl5Q1RT?=
+ =?utf-8?B?a014SEpDTG40cVdOY3Q0SW5kS3Eya2E4Vi9Oc1FLSHBSbFQ2TWRyMVNpdGFR?=
+ =?utf-8?B?VUVsSVE1eFh4dFFicmVHelNWSDhFbUhGK3hFbDhSUFk1cW5SMDNsWW1LTDg0?=
+ =?utf-8?B?MGR3MDc0TUE1RjM1aXRLODVGSjVKR1Y2V3QzdXVZd3lYUUhueWtBM0cxK0xM?=
+ =?utf-8?B?OWFTc2kvN3B6VEtTN2VRTDI0SFV6TVcrM2loNEN3THdVMmpMTC96c2t1dnc0?=
+ =?utf-8?B?WGF4WCtRMWNkS0xhUVFPMndvWHhDWVpnS1kwNDJWTTZlQ0Y4di94cUptV3ZE?=
+ =?utf-8?B?YzNIcE5wL0ZrZjl5cEJiMjBVMXhkRjZSWUZMY0o1MnFUa0FtQjluQkQxTTVD?=
+ =?utf-8?B?VVJSMng0UkMxc01hbDNxbEZvcVJrVmNKdUF4RitZNU1uVjR3KzJGZjNKYk5S?=
+ =?utf-8?B?dVIrb3lFTkJyWFlmQmxqSFJmRzNlYnRKc2d6cUdKN1JDQTdLOW9Zc01GZEEw?=
+ =?utf-8?B?WkJIcjFJbGM3UkV3SjFXM05XNS8yZEM5T3NsOE5KOFh3V3lWakJMbUlDajJn?=
+ =?utf-8?B?dU9IWE05L2NQd213THRxV05SanR4L3pPQjUzbEgvN2Z0c09NV0JsOTNMbGt2?=
+ =?utf-8?B?UEpsbTZNZmdURDcwR1ZRM2NPQTdSTW5mY0VDS2dBUTIrVG5WZFlqRTltTTlj?=
+ =?utf-8?B?ZU11WmJZMjlvcWhPeXVEWklBQjZoaEVNUFVZbU5DcVlKcTJ1R05oVVNsRUht?=
+ =?utf-8?B?RjBjL0oraHNyOUk4bmY0K1d5YThrRXB6M0trZ3JNTXFjNnF2eUd5RW9LZks3?=
+ =?utf-8?B?V2lyRVkybEtJUXJ3ZVpyekYzT1B3dXBmMFFadFJOclhoN2dQNWxYWVJkb2Q5?=
+ =?utf-8?B?Y2wxVS95U1BlL3RkLy9haE15NTlVUmdmckVOZmhxWW0xVEtrNkdjQktxVW1o?=
+ =?utf-8?B?UWljT0xZUGtQYnJ3UkxKOUFaQ2ZlUjUydEJKcXJpeU45c1h5QmRZeWllZ0sx?=
+ =?utf-8?B?N2EyS0lvOHEwVkpqRmYzcE1HVGppOHBrOWRCZjNnSkhHQUZJQ0MxRDJPN1hr?=
+ =?utf-8?B?UngwVWhwWTlxS2pFeGpzclVQVlZMMmVMT0lycklYTGRhUTlteVc3MGNicUJ3?=
+ =?utf-8?B?OUxqTU9IV2tySnVGQ2FKemx4cmUxa0U4M0EwODM3OHpSaG1HcnNKekRHTk1K?=
+ =?utf-8?B?eVNCdUovS29vallVVHZLaTIrV0ZQc1FtZWZlMEtaZFhXODF4VnBuZGZZSGZL?=
+ =?utf-8?B?ZEE2aHl4Yy8zVlBtTXhqMnRqcnM2YkhaQmxIVTRmNkRrMHF6K2pLV0Uxc3h0?=
+ =?utf-8?B?ZENCR0JUVkRqeUVmOUx4VlYyaVdma0M4Y2lhOG5Qc3A5SVhrMVJJSEtSNFdz?=
+ =?utf-8?B?cUhqTGdhalBNdjlubzkxK21IQWpnV3VpNTdtZzV4N1ZPTHNGN0tjWjlXZThW?=
+ =?utf-8?B?MmtHVW0vbjdsSmx0MExDRUJaY2lBTC9Ob3g4aVhYdXExMi9iME1BUEJhR1NH?=
+ =?utf-8?Q?gICrX7V/d0oA5xIALp?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85825337-3575-4d69-2f6c-08dec6c76501
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 08:08:03.0363
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a1kD1DwgCZ8NV+dNiKiLTLuFtF7gCyir3WjITMUCRWSkOHA9QLpUHImJK7ekUjTo
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR12MB9805
 
-On 6/10/26 3:35 AM, Bart Van Assche wrote:
-> Add the missing __must_hold() annotations. Enable lock context analysis in
-> the Makefile.
+On 6/10/26 08:14, Kaitao Cheng wrote:
+> 在 2026/6/9 18:33, Christian König 写道:
+>> On 6/9/26 08:13, Kaitao Cheng wrote:
+>>> From: Kaito Cheng <chengkaitao@kylinos.cn>
+>>>
+>>> This series prepares for, and then updates, the list_for_each_entry()
+>>> family so the common entry iterators cache their next or previous cursor
+>>> before the loop body runs.
+>>
+>> Why in the world would we want to do that?
+>>
+>> The safe and non-safe variants have very distinct use cases and that is completely intentional.
+>>
+>> What we could improve maybe is the documentation, from my experience an astonishing large amount of people have misconceptions about the safe variants.
+>>
+>>> The first 13 patches open-code loops that intentionally depend on the
+>>> old "derive the next entry from the current cursor at the end of the
+>>> iteration" behaviour.  These loops append work to the list being walked,
+>>> restart traversal after dropping a lock, skip an entry consumed by the
+>>> current iteration, or otherwise adjust the cursor in the loop body.
+>>
+>> Well I have to clearly reject the changes for subsystems/components I'm maintaining, that just looks horrible to me and I clearly don't see a good reason for that.
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/block/nbd.c | 3 +++
->   1 file changed, 3 insertions(+)
+> Hi Christian and Andy Shevchenko,
 > 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index e2fe9e3308fc..345e4b73009d 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -1469,6 +1469,7 @@ static void nbd_config_put(struct nbd_device *nbd)
->   }
->   
->   static int nbd_start_device(struct nbd_device *nbd)
-> +	__must_hold(&nbd->config_lock)
->   {
->   	struct nbd_config *config = nbd->config;
->   	int num_connections = config->num_connections;
-> @@ -1541,6 +1542,7 @@ static int nbd_start_device(struct nbd_device *nbd)
->   }
->   
->   static int nbd_start_device_ioctl(struct nbd_device *nbd)
-> +	__must_hold(nbd->config_lock)
->   {
->   	struct nbd_config *config = nbd->config;
->   	int ret;
-> @@ -1592,6 +1594,7 @@ static void nbd_set_cmd_timeout(struct nbd_device *nbd, u64 timeout)
->   /* Must be called with config_lock held */
->   static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
->   		       unsigned int cmd, unsigned long arg)
-> +	__must_hold(nbd->config_lock)
->   {
->   	struct nbd_config *config = nbd->config;
->   	loff_t bytesize;
+> Thanks for taking a look. I would like to clarify the point you raised.
 > 
+> The reason I started looking at this is the original motivation behind
+> the _safe() variants.  They exist because some users need to remove, move
+> or otherwise consume the current entry while walking the list.  In that
+> case the next cursor has to be preserved before the loop body can modify
+> the current entry.
+> 
+> The unfortunate part is that this could not be expressed with the
+> existing list_for_each_entry() interface without changing its calling
+> convention.  The _safe() variants had to grow an extra argument for the
+> temporary cursor, and that is why we ended up with a separate family of
+> macros.
+> 
+> But conceptually, the distinction does not have to be exposed as two
+> different iterator families forever.  The difference is an implementation
+> detail: whether the iterator keeps the next/previous cursor before the
+> body runs.  This series makes the common list_for_each_entry() iterators
+> do that internally, so the safe and non-safe forms can effectively be
+> folded together, or at least the need for a separate public _safe()
+> interface becomes much weaker.
+> 
+> There is also a usability issue with the current _safe() interface.  The
+> caller is forced to define a temporary cursor outside the macro and pass
+> it in, even though almost all users never use that cursor directly.  It is
+> just boilerplate required by the macro implementation.  I find that
+> redundant and awkward: the temporary cursor is an internal detail of the
+> iteration, but every caller has to spell it out.
+> 
+> With the updated list_for_each_entry() implementation, that extra cursor
+> can be kept inside the iterator itself.  Callers that only want to walk
+> the list, including callers that delete or consume the current entry, no
+> longer need to carry an otherwise-unused temporary variable just to make
+> the macro work.
 
-Above changes are good, however I see nbd also uses @nbd_index_mutex
-which guards @nbd_index_idr. So should we also annotate @nbd_index_idr
-using __guarded_by(&nbd_index_mutex)?
+Well the distinction between list_for_each_entry() and list_for_each_entry_safe() is *not* there because you need an extra variable to hold the next pointer, but because just 'iterating the list' and 'iterating the list while you modify it' are two distinct use cases.
 
-Thanks,
---Nilay
+Apart from the technical implications this also has some documentation value for the code using it.
 
+What we could consider with C99 at hand is to have _safe() variants who uses a local hidden variable to hold the next element.
+
+Or maybe come up with a better name instead of _safe() because people seem to misunderstand that quite often.
+
+But mangling the two use cases together just because it is now technical possible is among the worst ideas I've ever heard.
+
+Regards,
+Christian.
