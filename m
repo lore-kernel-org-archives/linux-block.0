@@ -1,88 +1,107 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE5031F99B
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 07:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774A329BDBF;
+	Wed, 10 Jun 2026 07:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781075298; cv=none; b=E4Dc+VcW6ZRKgNRUliuuEtEDFVwPF8JE9bwrWtXOCQAsInZxG04reoE+9pwuQwrDEekd9GkIK/QstWqMJYgOaYSXDhExOZVDX7Y+cUUNoJ3JY5cBlpvFjhyvudnAvz/Bc2uqAVYClltoC7P7r5NyVQfKj5A2Np1jiEcDv6BIIDg=
+	t=1781075794; cv=none; b=Z5uR95V4zeM7uxKifoeHL2ZwxcyLAbGnq5JW4mmZfVgGoNUVJog6elSxZdhjxI5rnaIhPRut5QgIzTuuOCYVKPdKTQH6y9uglasWAeAnSYiLuTD7NxF2DehxCzs7EMNJBl0phJmODMGIPm+X7d/SCczfvmKS8HCRHnZX/jMuzo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781075298; c=relaxed/simple;
-	bh=TFiWa1rmDutUcjN10SiRILNiRj4mDgrPIXrEwbSEiIM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ILQq/j3MDjMPD0kJQmSvOUZgnxBheYZlSoWGxLrm8pSUEomGVQM4Ybrq6o7Z6EzJdgu7NfsALLarR3Za81HSd0MmGIUAMtp7YY7GHom39kG9GvoGKWs7hJNdHU/yV1oWeNaQbAAFH0Vcf4tPALLynOBM6SPgz8XNTKTOrjSsIrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ujMqllwA; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+	s=arc-20240116; t=1781075794; c=relaxed/simple;
+	bh=IKSvTWxUBmjeVnmCYv6+YZYdwIrH5X0fWcQqB93TaLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l74r0pDxocGYUH4yEG0+qFsHemgDu/qje9L5oVc6rWCVO6gu2KocX+YpENy62wXA3B0iFTRG3y4chl5IiGFgVVTIQUnVeDcPCTRcHzWz+hhIRI3Wm8sc3c3pMNvgGt0ZR3LkYPaeS6uQzlwBpgJi8jecVwg5rtAsHZ+ZMGx5mvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kEh5J4MY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ujMqllwA"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-490b37e1f47so55724715e9.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 00:08:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1781075296; x=1781680096; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y2yBT45LsQrwZS6wwOfSrpTFpnj8Zde3n5eqn2ah4Ag=;
-        b=ujMqllwAmLcqKdvryCC+/cmjQ3mv3BQzLcfbdO1E/ClpHo42obXaE40bxD4tpwCmtn
-         xVk8hBrdnaUr5jRk1hsAUNCv+gcxIIwV7wIOspPnz9PUjInyPW9dMjNe6oeVLC7mmQ+G
-         q7o08AJqWRLqoxCMW3irPdTVTWaNOR2JVlwkEZL7TeOV+NZeEzlzUwoHI507OwCc2K8l
-         CUIz2X+oWnkOVvykudmfiRBQifq0pqxWuHWihHn+tWVLcGCp/5sG8+wZ9KoH3ZV0rYpe
-         fZBoc6HG9fV9q3lV5VAqn3k9tlYBgqw1/5SAeGLsz3kGyM5E4azPSkgbo8hzKnJxA4+n
-         Bzww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781075296; x=1781680096;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y2yBT45LsQrwZS6wwOfSrpTFpnj8Zde3n5eqn2ah4Ag=;
-        b=FQWX6krBLzXf1UWTq+BVE+tttz2mfF3eNi/pJ1m2S3wyf+fFXli9erteK1rDPYnEJD
-         FGguYqgHNuzWxn30q1UIOAEFThG2JQ4R/3p52EAQQ9rOcP9XPYlpotdyJsAKTVktwSW5
-         006UfTamP748CiBr2Ntf07p5wTuvm2kRYZHdfKtoyeBesWqX08mieQ3ANptNpUFDXARA
-         XTgM5zK2ZnOEXj6Vwat0L+XcT2FhHhhbE1bxILWS4XUCy0DMJ02x2JFsb0FTRVwVRqax
-         B8CCg/wBa45RkcamFA5Fg7GVRbimi9rP6TvC8fysSsXKHHH8xp65hs2keKRVn3iI7YyB
-         IQCw==
-X-Forwarded-Encrypted: i=1; AFNElJ9Ihughp7TXUkDTx42pi8FXu0LBuXpyZ5e2UDmqt81YW23iXJ6j8hiCbHqpLYX3PXMe286Q0wEf+iIrzg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFmkryNxjb4fxzeLOMGQ3zZ5cPMcMO3H5J97/2SbstONLcXKbA
-	YaJ+Yyj1O37iiFEqcSG0762+ZQRQKEay7OIms3pzciY2Z0nA/Kb9WL08pa0PpXhpXtHVZXZ9fXi
-	BRjOdOo6Vrlq4JFaaOw==
-X-Received: from wmbjl6.prod.google.com ([2002:a05:600c:6a86:b0:48a:7f8c:a95a])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:190b:b0:490:9804:afdc with SMTP id 5b1f17b1804b1-490c25ff35dmr400245265e9.23.1781075295394;
- Wed, 10 Jun 2026 00:08:15 -0700 (PDT)
-Date: Wed, 10 Jun 2026 07:08:14 +0000
-In-Reply-To: <20260608-queue-data-sync-v1-1-0efff051aaf3@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kEh5J4MY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E4511F00893;
+	Wed, 10 Jun 2026 07:16:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781075793;
+	bh=f3pyLsJp/Pig7PJGNaXCWFzykMjoyznELiFBpvDKD50=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kEh5J4MYt6AOcTW92yTfwHs7vsfXTGiCqD9ezn/PNbI3JWrXg4/8tr03WT6qdTNpS
+	 PAtYXXZDgPka9aZwUbI+DBa6wtCiTAIsQGRmXXaBPgcpzA28huYukZQXWGyz0yvVIW
+	 MJU9oHaPP9viU8aSsW6rlLH6xGNGZACpXj7MiV0FtCcymsGKjvyVqZD18HVrh5Eb9c
+	 H0by8hO8bDMIkvcQuscIdnJgzExUBtpjrNV0ge9SvQmhZMxLrkH1RoKe2C0aYinjXB
+	 BQpQmxWyxvNkGUNbqj0qSQ3R2MiTBOBLx5T2FPGE5kaSM8Ii3Iz+GHR5Vp3Kh5qxah
+	 rslGwKgr5JbDw==
+Date: Wed, 10 Jun 2026 09:16:29 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Ulf Hansson <ulfh@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Johannes Berg <johannes@sipsolutions.net>, 
+	Jeff Johnson <jjohnson@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Srinivas Kandagatla <srini@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Saravana Kannan <saravanak@kernel.org>, linux-mmc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, daniel@makrotopia.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Subject: Re: [PATCH v4 2/8] dt-bindings: net: wireless: qcom,ath10k: Document
+ NVMEM cells
+Message-ID: <20260610-funny-paper-warthog-25fa0a@quoll>
+References: <20260609-block-as-nvmem-v4-0-45712e6b22c6@oss.qualcomm.com>
+ <20260609-block-as-nvmem-v4-2-45712e6b22c6@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260608-queue-data-sync-v1-1-0efff051aaf3@kernel.org>
-Message-ID: <aikNXs-cmeqZn2Ky@google.com>
-Subject: Re: [PATCH] rust: block: require `Sync` for `Operations::QueueData`
-From: Alice Ryhl <aliceryhl@google.com>
-To: Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, linux-block@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260609-block-as-nvmem-v4-2-45712e6b22c6@oss.qualcomm.com>
 
-On Mon, Jun 08, 2026 at 10:24:34AM +0200, Andreas Hindborg wrote:
-> The queue data installed in a `GenDisk` is stored in the request queue and
-> handed back to the driver as a shared borrow through the `queue_rq` and
-> `commit_rqs` callbacks. Both callbacks obtain that borrow via
-> `ForeignOwnable::borrow` and may execute concurrently on several CPUs,
-> since the block layer runs one hardware queue per CPU. That means a shared
-> reference to the same queue data can be live on multiple threads at once,
-> which is only sound when the referent is `Sync`.
+On Tue, Jun 09, 2026 at 09:52:27AM +0200, Loic Poulain wrote:
+> Document the NVMEM cells supported by the ath10k driver, the
+> mac-address, pre-calibration data, and calibration data.
 > 
-> The initial `GenDisk` private data support omitted this bound, so a
-> driver could install a non-`Sync` type as queue data and then access
-> it concurrently from multiple CPUs without synchronization. Add a
-> `Sync` bound to the `QueueData` associated type to rule that out.
+> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> Signed-off-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> ---
+>  .../devicetree/bindings/net/wireless/qcom,ath10k.yaml    | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
-> Fixes: 90d952fac8ac ("rust: block: add `GenDisk` private data support")
-> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+> index c21d66c7cd558ab792524be9afec8b79272d1c87..7391df5e7071e626af4c64b9919d48c41ac09f1e 100644
+> --- a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
+> @@ -92,6 +92,22 @@ properties:
+>  
+>    ieee80211-freq-limit: true
+>  
+> +  nvmem-cells:
+> +    minItems: 1
+> +    maxItems: 3
+> +    description: |
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+If there is going to be resend:
+Do not need '|' unless you need to preserve formatting.
+
+> +      References to nvmem cells for MAC address and/or calibration data.
+> +      Supported cell names are mac-address, calibration, and pre-calibration.
+> +
+> +  nvmem-cell-names:
+> +    minItems: 1
+> +    maxItems: 3
+> +    items:
+> +      enum:
+> +        - mac-address
+> +        - calibration
+> +        - pre-calibration
+
+This means you expect random order with variable number of items. Is
+that intentional? If yes, please provide short explanation in the commit
+msg.
+
+Best regards,
+Krzysztof
+
