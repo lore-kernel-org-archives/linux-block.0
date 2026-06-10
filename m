@@ -1,151 +1,139 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DB9408639;
-	Wed, 10 Jun 2026 15:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8489331ECF
+	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 15:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781103771; cv=none; b=m0omgFemG9MtLt2cORSpumBAwW/De2niLLrs9jqjENLHbjjG1GLLPzKLUE3n6QokcGC4PEAwEYNtrXbsYgNCwuZ4Jz1PdMMD/G1VDOEoouBKPO49izL/m2fcIlUPIyLYHnJwX9vT6dlfcj+YPFu0wUCzu4vekKPB85NFD+3XRAA=
+	t=1781105268; cv=none; b=olZxun0yPP+O6Jluq0zxaWgPEMWfv+wmxQ4EqVNtcjdrjC2eyejlOxC8tDzHipoubyqdW0SomyVhRt8USCXazHwCYJsW5TAgpNUQr7oclCLfFGep3i1HaAN9a54e07W1M6PpsLDuto5p6FWE/1EHxtJAqpeHVmuItDUC3CxwWuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781103771; c=relaxed/simple;
-	bh=wdD+yxiW9aVoMld4LMPC1DWLru4HtTsU9EmgfMnk6eg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WTMIJZzNC5XVeHD9t4n2Hk5OqXo9uWeu3DgNd9nYDEcQdEGb1ov1QZnxLqtyeFxoma4XgerrTBcbvKnrwpiT0ixjsun2zi0klCjXpep4p0YNLQLPV3R5ALqEfetyZts1gpGbRVeYJlWgUW++fKoSp5g0VvyKmoOd9KC7xlIkSjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IYWIndeY; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1781105268; c=relaxed/simple;
+	bh=NMuBllCuAlqdMOMV6EFUWHe57zX3Lqw91yMl1pa/vmk=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VBU9nVJq7upbeTFDVpjCJCAYjsAU2RGFBN6Qm2hxSXbN+Sl2zrma+VqNALuaokNiahokK4hGnp7D1MqHF1rpwDM7tWG5QCRqQIbs898vOlOcD6VwHwL/MGhfpdRJDzf2F44yFyanw7r5ndKgC2rJ0jB91nv5USft2XiexDRipZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yz8zhXAz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IYWIndeY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781103770; x=1812639770;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=wdD+yxiW9aVoMld4LMPC1DWLru4HtTsU9EmgfMnk6eg=;
-  b=IYWIndeY6xvcOvSzUD3YJRYWYC8lX4SZ+0P/TXyAB1A5m8V2lk6Ienaz
-   1XrZPVFZJkQZEhRQDVjjYmB6WJs3LyTOkJ/fDXgPvml5G8ObipCP/hm2Q
-   b4hrB31D09MtFizWt7LC9koJi6546dcbRgL1DgZh8/56oylxOVSZ4nmNO
-   Vz7FJRd88Ku9xNe7/jiUrlGEXK+6j7hfCByby9uFlNKXtVh/+ssTGbdSf
-   gnlUOHQWDDhkK6s8VgkZKvfeEsynJueDjeIGA7IVyRYbvec8/pdM7NCnC
-   wq6YE60gwbkmqjWbvBHzDmUizGbGatUBrr+eZBGNmI/qbi+yKg/ZUM5yU
-   Q==;
-X-CSE-ConnectionGUID: KcgU0FGrQx+nl55jRFys7A==
-X-CSE-MsgGUID: IY8JNEakTTaKROC01+vL7Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="107334580"
-X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
-   d="scan'208";a="107334580"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 08:02:48 -0700
-X-CSE-ConnectionGUID: vFiAK4i9TuuPvjj1ruVuyA==
-X-CSE-MsgGUID: yPzj5/7BTy26oZg8/7CqtA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,197,1774335600"; 
-   d="scan'208";a="251275772"
-Received: from hrotuna-mobl2.ger.corp.intel.com (HELO localhost) ([10.245.244.38])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2026 08:02:35 -0700
-Date: Wed, 10 Jun 2026 18:02:32 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Kaitao Cheng <kaitao.cheng@linux.dev>,
-	Thierry Reding <thierry.reding@kernel.org>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Sowjanya Komatineni <skomatineni@nvidia.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Huang Rui <ray.huang@amd.com>, Eddie James <eajames@linux.ibm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Laxman Dewangan <ldewangan@nvidia.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Robert Foss <rfoss@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
-	Jonas Karlman <jonas@kwiboo.se>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Matthew Auld <matthew.auld@intel.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Waiman Long <longman@redhat.com>, drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-spi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
-	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Kaito Cheng <chengkaitao@kylinos.cn>,
-	Muchun Song <muchun.song@linux.dev>,
-	Philipp Reisner <philipp.reisner@linbit.com>,
-	Lars Ellenberg <lars.ellenberg@linbit.com>,
-	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
- state
-Message-ID: <ail8iNvPrJnE7p58@ashevche-desk.local>
-References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
- <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
- <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
- <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
- <d974a2ea-6102-45ff-bf36-3b25a2404e40@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yz8zhXAz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB4251F00893;
+	Wed, 10 Jun 2026 15:27:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781105266;
+	bh=Kf1Md4tIVYsRG2xAOI87q3wWQnNIX7a/zTfDmD7RcIE=;
+	h=Date:From:To:Subject;
+	b=Yz8zhXAzj+f9NGDopIqBJKhx6YPWaNG4k3VE9A0Pegay0lVkOrswC3JsWNPZ0oAu2
+	 N18OcTyYLpE9rH2k9j5ZJaaXFbRDeo8NIRuRNDAHnMk8ao5QR8Jb/QyH0Ep3VcQpxh
+	 WLeCWtJXNu4y4YLofdEDLIOATCcoUjW8OYUKShFQwh8VNrSGS9WvUigwhK27HLYig9
+	 M/iw2BA3AxXrVn1F5SHAmYaTYJ2tJN40Q4zwGFQcRbmB4oSA/54D82r7zF6dp23sEX
+	 tNBxPRFnar9UifSXgpbD2K3ByrczUByNveT3Lub9S2jab6s3di+PK/MgpgHZeWThoC
+	 aNEG3fmRsuG2w==
+Date: Wed, 10 Jun 2026 17:27:42 +0200
+From: Carlos Maiolino <cem@kernel.org>
+To: brauner@kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH] iomap: enforce DIO alignment check in iomap]
+Message-ID: <aimCIEpCwUUyoORf@nidhogg.toxiclabs.cc>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d974a2ea-6102-45ff-bf36-3b25a2404e40@amd.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Jun 10, 2026 at 11:11:34AM +0200, Christian König wrote:
-> On 6/10/26 10:18, Kaitao Cheng wrote:
-> > 在 2026/6/10 16:07, Christian König 写道:
+Sorry, I screwed up two addresses, bouncing them to the right addresses
+to avoid spamming the lists again.
 
-...
+----- Forwarded message from cem@kernel.org -----
 
-> > Should we revert to v1, or keep list_for_each_entry() and
-> > list_for_each_entry_safe() as they are, close this thread, and make no
-> > changes?
-> > 
-> > Link to v1:
-> > https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
-> > 
-> > Or do you have any better suggestions?
-> 
-> v1 looks perfectly reasonable to me.
+Date: Wed, 10 Jun 2026 16:52:11 +0200
+From: cem@kernel.org
+To: brauner@vger.kernel.org
+Cc: linux-block@vger.kernel.devel, linux-fsdevel@vger.kernel.org,
+  linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org, Carlos Maiolino
+ <cem@kernel.org>,  Keith Busch <kbusch@kernel.org>, Hannes Reinecke
+ <hare@suse.de>,  "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] iomap: enforce DIO alignment check in iomap
+Message-ID: <20260610145218.141369-1-cem@kernel.org>
+X-Mailer: git-send-email 2.54.0
+Tags: sent
 
-But why not just hiding that once for all (in case they don't use the temporary
-iterator)? Easy to automate, robust — everyone is happy?
+From: Carlos Maiolino <cem@kernel.org>
 
-> You should just include some patches in the same patch set to actually use
-> the new macros.
-> 
-> If you modify the files under drivers/dma-buf or drivers/gpu/drm/amd to use
-> the new macro I'm happy to review that.
+The DIO alignment check has been lifted from iomap layer to rely on the
+block layer to enforce proper alignment when issuing direct IO
+operations. This though, depending on the IO size and buffer address
+passed to the IO operation may lead to user-visible behavior change.
 
+This has been caught initially by LTP test diotest4 running on
+PPC architecture, where the test fails because a read() operation
+with a supposedly misaligned buffer succeeds instead of an expected
+-EINVAL.
+This has no direct relationship with PPC, but seems to do with the
+IO size crossing page borders or not.
+
+The test allocates a 4k buffer, and then increments the buffer pointer
+by a single byte to enforce a misaligned address. It then issues a 4k
+read() using such buffer. The read is supposed to return an -EINVAL but
+it ends up succeeding.
+
+The allocated buffer is at least a single page, so the read() size being
+smaller will end up most of the time within the very same page initially
+allocated which seems to suffice the block layer to accept the IO.
+
+On x86 though, the same 4k read will end up crossing page boundaries
+causing a bio_split which ends up properly checking the address and
+rejecting it due to misalignment.
+The test itself is buggy (which seems by design) because it ends up
+attempting to read 4096 bytes into a 4095, but I believe the test
+expected the address to be rejected prior to any write attempt.
+
+The problematic behavior is reproducible on x86 by reducing the IO size
+to something < PAGE_SIZE, so the misaligned read()s will also be accepted
+by the block layer.
+
+Fixing this is just a matter of enforcing daddr and memory
+alignment back into iomap.
+
+This behavior is reproducible in ext4 and xfs due to both relying on
+iomap layer, btrfs does not present this behavior change as it does its
+own DIO alignment checking.
+
+Fixes: 7eac33186957 ("iomap: simplify direct io validity check")
+Cc: Keith Busch <kbusch@kernel.org>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Carlos Maiolino <cmaiolino@redhat.com>
+Signed-off-by: Carlos Maiolino <cem@kernel.org>
+---
+
+While I didn't spot any memory/disk corruption looking into this, it
+changes the user behavior that dictates buffer addresses must be
+properly aligned when issuing direct IO operations so I thought making
+iomap check again for the buffer address alignment is reasonable.
+
+ fs/iomap/direct-io.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index 95254aa1b654..0064984e64e5 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -400,6 +400,9 @@ static int iomap_dio_bio_iter(struct iomap_iter *iter, struct iomap_dio *dio)
+ 	if ((pos | length) & (alignment - 1))
+ 		return -EINVAL;
+ 
++	if (iov_iter_alignment(dio->submit.iter) & (alignment - 1))
++		return -EINVAL;
++
+ 	if (dio->flags & IOMAP_DIO_WRITE) {
+ 		bool need_completion_work = true;
+ 
 -- 
-With Best Regards,
-Andy Shevchenko
+2.54.0
 
 
+
+----- End forwarded message -----
