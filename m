@@ -1,125 +1,57 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3429C3A8735
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 10:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160B13C0624
+	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 11:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781089190; cv=none; b=alje3L8f2tqH5/kq770zs8dOotjC6ch/nV55PLlvJtfrtg7QN8m9Sif+7PozugnBsCXNGV4kdsnjxe5KM9f62nFtXA4d1aYHE/9YE7ulL4L4lF2wstussmToCtMtgxKiTuIKSBQUqW3wOk6foo2Ww3HoQxVOMkO/hO/IhE41Vgg=
+	t=1781091058; cv=none; b=T5AxxyOHwYPJqMlLVyiZ+mbAWFIzUp3nOvhUig0wyu1m/X7GVbylIdnLVT+kqFH+kXDzB72PAhvKrXimRsVsjOy2+aujcMR2QHY0JxhkY+b61RXAw62kskKDR0q84L658yOZGQrU79JfA7WMZuq3uJG3iYZvsTZJJQ+uaZZOb3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781089190; c=relaxed/simple;
-	bh=QqkdOP1zhQ8kNAHcIw4gTfAacQ4D4WVk9zHFNJp0za8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XCmFIjb3+yQTMQ+ozf51YMf5ZdAPt8qRQuKX2uq0LyqFIGr5mZBiQJEUNJ2pRgc7pgg284JcyJ+ALgJnfr43YTo/dRqz0TqaDin9+8Wt6R4ea0R+yAMuy0r1VYLpYnSd4FVduZuHgJyiVaEQrX1Fnj0eV0PsyYbZXUBP+RlHY8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-45eecb8bf67so4986623f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 03:59:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781089188; x=1781693988;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pHtohPpXGahlOenhXvNIAGjZSypHtfodeQ5qiGu/QPA=;
-        b=diPwvXLfs7itin0i9buDvWqkaYfM2R5SLPAnK2VJZh6b5Ydj2MXCR/InghNk5NiGW1
-         1CNZs1SMAAT60AFqKwy6cDClWxe/ptDqANWA6A2ukhaiYBglR94QLxU/hFmqVjEAvCtv
-         iTDe6U3PvvomsvMAANRW82wyIx+Z5Mq6sfisii/C9Y1shP00YRWtStlZ/aP4Gyy2VJes
-         5LXUwn7ju/Rbwn+KroQPxPT5ulp0Yv0QKIQU8m8Wi7QhXOq2ZWdAdx18SN3XOC6Z0xWd
-         QHGSiq9kGqEm4klvRSreD0So/jMq+uaGOStqxhlJMkXTdolAWrPygZ8RJwjmqhSZAbeb
-         Up0Q==
-X-Gm-Message-State: AOJu0YxviIRa4ro2HBEkfNKrEVc8p76oNGFQQX6rwr5syCZph6rWmKcy
-	Tn/rCZxmMsfmnkUzVQcd5f6bW4QjiPugWudeQa0cUfNoesJz4uZMdVpo
-X-Gm-Gg: Acq92OE7cExI5WMJMhCTU0gU/7H9i7WU8Ww9UMylc5d3pwKDPZ0H6flDwMLvmiAj3es
-	vA4RToDEGPJ9BjBclnSonCAKQgcvupuUIHyd1CvpetWM9rA+NiSmd9WTJt3oRy6lvTU3RDA6pFh
-	HQB4Bu4PO10lgdFEIGhOhDd8t19lfbXPszY03PEGNmYCdpGFgVijZnQmMTUX4nzeg7JE6Vo7Y+o
-	CvO60pY4PWOj7uYOcG85InsfI9DQvX/27u3ihL8j6k+TqtPT9iZkRcClB3eRGdceUq8+BBBbAW3
-	KcsGjH8UjWrqpD//rgRNzbeoRQdmYGVlLEA/BKyuj5e0IjXsLbTiUnSjdx2us4v5VNSE7UvQS/f
-	BRS3/wqz4vVoqAr9tJ6RwPc49g+g28s98CW0pYdSidEUKFo4IJFJFF3X4PzguY6QY27KS+WiACd
-	U7wGlWeKDGOFeJyTp5zQJwmwiFnEr0X7jFUBN7NeyJmbM1k8oJVimHOgmOJ4wGWIpkzPBeZ9u57
-	dW2igRcCHP6
-X-Received: by 2002:a5d:6644:0:b0:45e:f780:6181 with SMTP id ffacd0b85a97d-46030501958mr26460720f8f.23.1781089187489;
-        Wed, 10 Jun 2026 03:59:47 -0700 (PDT)
-Received: from [10.68.32.41] (bba-217-164-201-253.alshamil.net.ae. [217.164.201.253])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46028a6dce6sm63499684f8f.30.2026.06.10.03.59.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2026 03:59:46 -0700 (PDT)
-Message-ID: <6330395a-15a5-43bd-a2fa-69fb24eef76e@linux.com>
-Date: Wed, 10 Jun 2026 14:59:44 +0400
+	s=arc-20240116; t=1781091058; c=relaxed/simple;
+	bh=Aa56S4Taa1J7Hz/Y8RiJ/JjeSZA75qQvMwBp2tsd3pU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UKOFFcfHFh3irc2ooL/vr/E177WHEZunS3pqzcUwfHEkAD7I2aaN5fPuIGTZMDBPzPhmPlXzhY+328liFlyxUbSyi6mmmhJ6x9Trv1VHagk7w8FN1sLuGKfQhdmU7SPr97VcaIXCB7BrInawMpcCmEKabvBgnzRWuBPYakJgq1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LOBi0yDc; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LOBi0yDc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Aa56S4Taa1J7Hz/Y8RiJ/JjeSZA75qQvMwBp2tsd3pU=; b=LOBi0yDcBc7XIqjN1/zlOhpQCs
+	+UVuoJoRgO6mozz3ZbH1qCXzUVgO67BT2IqIDL6BkMthVcX3D6aR1jc86cj9A9blMRqCxRXqAH8S4
+	wz0sZDdfjQGHPKIeZKmn6mnssrZHYMtYtutzDG95k9ab+wHwoRrO8/EvjfEcTgpguEUPXB2jeWqnX
+	O95CCQ0LEV5St0GpxlyXD3+hA9VyYPFXQxPbpzcdMZt6TcJPfbzjpRu6BYrp3VENgDq1MqR0tg28p
+	PkrTA3/BucEn3hJNj3uErhYoytc73EAV5M0Vc62uFTgI12PMTEh5CVzrmOoU9dcJ4N75683i4beY3
+	Xm/9Ai3A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wXH8z-00000007Xrl-1QvG;
+	Wed, 10 Jun 2026 11:30:49 +0000
+Date: Wed, 10 Jun 2026 04:30:49 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Marco Elver <elver@google.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 00/27] Enable lock context analysis in drivers/block/
+Message-ID: <ailK6eqeWrwRLPkz@infradead.org>
+References: <cover.1781042470.git.bvanassche@acm.org>
+ <aij3e1WKFQunNUS2@infradead.org>
+ <CANpmjNORsF2oExcOphnGgnTt3hJEWP0tB6zua0sTG=n7gJbEZA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: efremov@linux.com
-Subject: Re: [PATCH v1] floppy: Drop unused pnp driver data
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig_=28The_Capable_Hub=29?=
- <u.kleine-koenig@baylibre.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <99dbf851ffb99229ea1dcfd8f58e9ee6a1f05349.1781075967.git.u.kleine-koenig@baylibre.com>
-Content-Language: en-US, ru-RU
-From: "Denis Efremov (Oracle)" <efremov@linux.com>
-In-Reply-To: <99dbf851ffb99229ea1dcfd8f58e9ee6a1f05349.1781075967.git.u.kleine-koenig@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANpmjNORsF2oExcOphnGgnTt3hJEWP0tB6zua0sTG=n7gJbEZA@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+Cool, thanks!
 
-
-On 10/06/2026 11:27, Uwe Kleine-König (The Capable Hub) wrote:
-> The pnp_device_id array is only used for module data to support
-> auto-loading the floppy module. So the .driver_data member is unused and
-> this assignment can be dropped.
-> 
-> While touching that array, align the coding style to what is used most
-> for these.
-> 
-> This patch doesn't modify the compiled array, only its representation
-> in source form benefits. The former was confirmed with x86 and arm64
-> builds.
-> 
-> Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
-
-Reviewed-by: Denis Efremov (Oracle) <efremov@linux.com>
-
-> ---
-> Hello,
-> 
-> I intend to change struct pnp_device_id and for that it's required that
-> .driver_data is not assigned using a list initializer. Instead of
-> converting it to a named initializer, drop the assignment as the value
-> is unused. So this is both a cleanup and a preparation for a later patch
-> series.
-> 
-> See
-> https://lore.kernel.org/all/cover.1779878004.git.u.kleine-koenig@baylibre.com/
-> for a more verbose description on the mentioned change to struct
-> pnp_device_id (though this is about platform_device_id, but the idea
-> here is the same).
-> 
-> Best regards
-> Uwe
-> 
->  drivers/block/floppy.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index 0509746f8aed..dca495be0683 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -5012,8 +5012,8 @@ MODULE_LICENSE("GPL");
->  
->  /* This doesn't actually get used other than for module information */
->  static const struct pnp_device_id floppy_pnpids[] = {
-> -	{"PNP0700", 0},
-> -	{}
-> +	{ .id = "PNP0700" },
-> +	{ }
->  };
->  
->  MODULE_DEVICE_TABLE(pnp, floppy_pnpids);
-> 
-> base-commit: 49e02880ec0a8c378e811bc9d85da188d7c6204c
-
+Bart: maytbe for next version just enable it on a per-driver basis.
+Once all are covered we can switch to directory-wide.
