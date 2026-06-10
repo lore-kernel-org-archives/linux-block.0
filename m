@@ -1,72 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5967E2772D
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 17:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1712C21E8
+	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 17:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781111673; cv=none; b=VxoY1GfAY8lfUvJ4WJOQin94un4gM42DDnPSYY2j8ArCsWtNzlGsKpQ1Q5fukxK2h82Hiw/9hA7MAq1Z5c34CA3fnfi+QhCNxSUZgdFQ4PXSEnzdX8Inr1WnsRrd3HJ319pszIye4MlOFKwujPak0fCV3dPYcOCSHmvFYXQbocs=
+	t=1781111789; cv=none; b=dnJ+4h1eNG/8goH8c7epOjX0RWchspyP0o8Me+Uj2/ExESqLV018FmqDHU7OMNd+X13ROtjtg8o//lDRGtC5E2Ie2a8P8iLXTH5jQI1kZUkOv2StCjfLEcNYXL/0SmLFTGTbeF0W4m49iY5pW46GT2Ln7Z17jRRzFpc9fCI8OgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781111673; c=relaxed/simple;
-	bh=ViyPAkS0JiwqM5uiHpeS7Gd0RzPFotqJ/9ZwkLQnd60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pX9o4EPITVCsT0J2v6vZX9UFmCsnUSsNRaIn0htQC/z5Jws41LjBYnnVNqFJBAqpNZ5fO6Sp6p7H9whesQV08AVU8qI+1MrpJn+i67M0948h6ypi5xjnOR23l+tknkgJT+W48K8FaCELoyMhI9azr2mxKulISvSwy66U+mClb4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OCiIsJfL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781111789; c=relaxed/simple;
+	bh=2HJAYbdKVUMuetzViHjt+DE3c7FCAOCxRvpEqFNRkm8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s5P44pBi8MDPzmQg+jl5O97GNPwfAdFik8Kqz+kI79FWiakJ57jq7vuGuKE/GcPg9y9m1tXBldygD8VobXPxMQ1OXAq7s4hlXAL0viWFdx3yCDTCNcKGGvp7PgpNP1/zJL/uuMJKx10kINDmtW+pyWxWmuqvyXwP0Cz8Ve3o0V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZBudK8sW; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OCiIsJfL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A13C1F00893;
-	Wed, 10 Jun 2026 17:14:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781111672;
-	bh=cnMgFnGvSZFZjZOSVqZ7r3+Zr5F5ejnrlX5AjXwRLWY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OCiIsJfLHuwsZJHNGBHT8sl0GzdawcA5yXf4ldAKhN6/jRASulHEXoBOCplsmPqVz
-	 1c9l8JZZtfVZzTA20Nag2aa9Qq/8pPuSZ7btxAS/7tH7I9dZMMb2RMM6NLlbWJ90CO
-	 75l/JKLiBY43inAZGMXWyO5xwX8ZYxfU3le3/1iRz8R1ABHcB+9f/jzxTTv4WItaNl
-	 fmP8gnOi/T7F5FHiGfTPacFBfxave2Gy25kr9fhkfApN+d/ff8h0K8leOdkJRaxJxH
-	 jzBZOHDlxlF9sh4/gCCbih5v9yMIXVGHUFxu/ApujCK1eLCNLchQ1/UkBXv4NHqtjP
-	 xAEx0u4SD3bLA==
-Date: Wed, 10 Jun 2026 11:14:30 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Carlos Maiolino <cem@kernel.org>
-Cc: brauner@kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] iomap: enforce DIO alignment check in iomap]
-Message-ID: <aimbdmqC10uXrZuo@kbusch-mbp>
-References: <aimCIEpCwUUyoORf@nidhogg.toxiclabs.cc>
- <aimErft1NoW-4Map@kbusch-mbp>
- <aimGzU_UY3jV-ece@nidhogg.toxiclabs.cc>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZBudK8sW"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4gbC9l5MRQzlfdvh;
+	Wed, 10 Jun 2026 17:16:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1781111784; x=1783703785; bh=wmCgffaXPtNsWoqtqq6Mrgfd
+	zXQr/xR8gbh/QbDb3lc=; b=ZBudK8sW1uvGAhGLLOiC70hJo0wU7Zgkc4qkoXv2
+	2ESrkC6X71silJQV5mxuE8WkE34H1Hv2vqSZr/e8miILtz4DDB8ymYQinERaeEKc
+	GckqQ2ML6mkm8p5uWHgrWN5EAH77oVIRWHAK3ZFCuulAbihwfw3fFofiwPyASFvk
+	EMApRqwfNFxts0eTxuUWit8oBKq7B07Eqd296ATT2SbG8tBRT2HqLk0S08ZqSHii
+	CZLOvO6mJ0nvM87j4+E32vIrCPsGaHZ3/UdW2XtoZWbq+Bl3c+5vaa+uyi5LdST9
+	DEyXot3cwWkY2qe68WZ50CuLFYOLmR+9wYTVSdgD0a8bvg==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 2Z3SIjXZLm6e; Wed, 10 Jun 2026 17:16:24 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4gbC9f2SSTzlfdds;
+	Wed, 10 Jun 2026 17:16:22 +0000 (UTC)
+Message-ID: <ba18cfd5-0a52-4e2e-85a1-a9f0a20ff957@acm.org>
+Date: Wed, 10 Jun 2026 10:16:21 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aimGzU_UY3jV-ece@nidhogg.toxiclabs.cc>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 20/27] nbd: Enable lock context analysis
+To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ Marco Elver <elver@google.com>, Christoph Hellwig <hch@lst.de>,
+ Josef Bacik <josef@toxicpanda.com>
+References: <cover.1781042470.git.bvanassche@acm.org>
+ <5361809d027e772503ca3cc458aaebdf06792e3b.1781042470.git.bvanassche@acm.org>
+ <4c8438e3-2415-43c9-ba6a-27321070c58e@linux.ibm.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4c8438e3-2415-43c9-ba6a-27321070c58e@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 10, 2026 at 06:58:13PM +0200, Carlos Maiolino wrote:
-> On Wed, Jun 10, 2026 at 09:37:17AM -0600, Keith Busch wrote:
-> > On Wed, Jun 10, 2026 at 05:27:42PM +0200, Carlos Maiolino wrote:
-> > > The DIO alignment check has been lifted from iomap layer to rely on the
-> > > block layer to enforce proper alignment when issuing direct IO
-> > > operations. This though, depending on the IO size and buffer address
-> > > passed to the IO operation may lead to user-visible behavior change.
-> > > 
-> > > This has been caught initially by LTP test diotest4 running on
-> > > PPC architecture, where the test fails because a read() operation
-> > > with a supposedly misaligned buffer succeeds instead of an expected
-> > > -EINVAL.
-> > 
-> > It's not supposed to matter where in the stack we determined this be an
-> > invalid request: it should still fail if it's misaligned. Could you
-> > clarify how this is succeeding?
-> 
-> Fair enough, can you point me to where the alignment is supposed to be
-> checked? 
+On 6/10/26 1:02 AM, Nilay Shroff wrote:
+> Above changes are good, however I see nbd also uses @nbd_index_mutex
+> which guards @nbd_index_idr. So should we also annotate @nbd_index_idr
+> using __guarded_by(&nbd_index_mutex)?
 
-https://elixir.bootlin.com/linux/v7.1-rc7/source/block/blk-merge.c#L352
+How about adding these changes as an additional patch?
 
-It does require that someone calls the bio split-to-limits routine,
-which I had taken for granted as a given, but I realize that some
-drivers don't do that. What block device are you using for your test?
+Thanks,
+
+Bart.
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 345e4b73009d..b9e0ad0b3ca0 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -49,8 +49,8 @@
+  #define CREATE_TRACE_POINTS
+  #include <trace/events/nbd.h>
+
+-static DEFINE_IDR(nbd_index_idr);
+  static DEFINE_MUTEX(nbd_index_mutex);
++static __guarded_by(&nbd_index_mutex) DEFINE_IDR(nbd_index_idr);
+  static struct workqueue_struct *nbd_del_wq;
+  static int nbd_total_devices = 0;
+
+@@ -2739,7 +2739,9 @@ static void __exit nbd_cleanup(void)
+  	/* Also wait for nbd_dev_remove_work() completes */
+  	destroy_workqueue(nbd_del_wq);
+
+-	idr_destroy(&nbd_index_idr);
++	scoped_guard(mutex_init, &nbd_index_mutex)
++		idr_destroy(&nbd_index_idr);
++
+  	unregister_blkdev(NBD_MAJOR, "nbd");
+  }
+
+
