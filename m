@@ -1,205 +1,163 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465F32F12AB
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 06:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F04F3624D3
+	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 06:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781072109; cv=none; b=nQNf9EtV9eJvrA/JXvaK63nhgWsTv/rK4h2j5fmCqMdrCK1cb3AMAIpLljE0TciFeiVORluLjFQO3BOUrQGxRNkLRdIuD77Jm62m9Kcv+7gU8dNuXP9dQxjj2MEufRTCmqeFCkTkNObH+eRRnFUw+wOG4GWNwCd3JFm+8jY6N28=
+	t=1781072323; cv=none; b=GK01zuoWdGbsH22DjC+dcBiG8WoMBUMXAGJXbA7UTnOB8gozgp9Jnurqr90AVFQLoN7HWVAtk523v5p1XFkNjN3aKE0UDV3RTzr072K0JzV/OY/PDRqAkZL57hHHd7F6CLEyYZKnAKSf9j/p6V0JjJB82cTUQXi9sprBdcOqh98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781072109; c=relaxed/simple;
-	bh=Am80scJm7qZln289j193oDacMGxPd50Xb+X58U16Q+c=;
+	s=arc-20240116; t=1781072323; c=relaxed/simple;
+	bh=1/856M6PqZ/8zjVZbqXQWpXYXTBEd3pLgjIjMgZCn4Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mGOJCEPZIZKJV+0pMHLMqI0EZCy4JGJSOL+h6si0Lzma+LABSVFAqdShXmf8wBmx2Oe6Ew1N8j3J4bpalHPSHNr6f7cu0m4kzdspXr5Lnn8KsQrH66p15SINvZ5nNQnvlLZDlIwrXKjNbcJ2QA4bj9V833V5qHMqfLHw4sMAXHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S/EuK96p; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S/EuK96p"
-Message-ID: <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781072103;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GCPO9v7e2NaYcPW5zVGvXXPxzu/fCfdM58tRqJXSo9A=;
-	b=S/EuK96pTXAWUBg+8TCiJYM+danZr1codL6zDdrR1CXWZbSAz8OZt88gSb3T73P2+Oj0bR
-	ye5UJbetTGxWmds/F2K/tlbDAkWts/YSgQ0PrY0mv2jpzcQt2r4zQh26U4ohdHNt5eRxKb
-	jqr9Nyh610YgX0sau/FOqrE+b1XuGGI=
-Date: Wed, 10 Jun 2026 14:14:06 +0800
+	 In-Reply-To:Content-Type; b=ITEYShh+Gcdy8ndF+SNkbzL9aPNF/I5Zb5nj40LOX6UTEoczmDMtOSvRWNDgM4uG1vH4WDDGgggZE1SYntEdHutUFLCEsoQSX+jSkDlOxbzWilFzPc0O1yBsI/jCAZmsQab2T5j+sTZvObrfrxCubK0mVO93r2V8iYIWet+3IVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8AA8575A9A;
+	Wed, 10 Jun 2026 06:18:35 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5D489779A7;
+	Wed, 10 Jun 2026 06:18:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id esOfFbkBKWoafQAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 10 Jun 2026 06:18:33 +0000
+Message-ID: <93a82831-608d-4462-a019-26b3adc7089c@suse.de>
+Date: Wed, 10 Jun 2026 08:18:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
- state
-To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Thierry Reding <thierry.reding@kernel.org>,
- Jonathan Hunter <jonathanh@nvidia.com>,
- Sowjanya Komatineni <skomatineni@nvidia.com>,
- Davidlohr Bueso <dave@stgolabs.net>, "Paul E . McKenney"
- <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Liam Girdwood <lgirdwood@gmail.com>,
- Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
- <tursulin@ursulin.net>, Huang Rui <ray.huang@amd.com>,
- Eddie James <eajames@linux.ibm.com>, Mark Brown <broonie@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Laxman Dewangan <ldewangan@nvidia.com>,
- Neil Armstrong <neil.armstrong@linaro.org>, Robert Foss <rfoss@kernel.org>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
- Jonas Karlman <jonas@kwiboo.se>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Matthew Auld <matthew.auld@intel.com>,
- Matthew Brost <matthew.brost@intel.com>, Waiman Long <longman@redhat.com>,
- drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, linux-spi@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Randy Dunlap <rdunlap@infradead.org>, Christian Brauner
- <brauner@kernel.org>, David Howells <dhowells@redhat.com>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Kaito Cheng <chengkaitao@kylinos.cn>, Muchun Song <muchun.song@linux.dev>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Jens Axboe <axboe@kernel.dk>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
- Andrzej Hajda <andrzej.hajda@intel.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/4] block: drop shared-tag fairness throttling
+To: Sumit Saxena <sumit.saxena@broadcom.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: "James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+ linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+ Adam Radford <aradford@gmail.com>, Khalid Aziz <khalid@gonehiking.org>,
+ Adaptec OEM Raid Solutions <aacraid@microsemi.com>,
+ Matthew Wilcox <willy@infradead.org>, Hannes Reinecke <hare@suse.com>,
+ "Juergen E . Fischer" <fischer@norbit.de>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Finn Thain <fthain@linux-m68k.org>, Michael Schmitz <schmitzmic@gmail.com>,
+ Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
+ Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
+ Oliver Neukum <oliver@neukum.org>, Ali Akcaagac <aliakc@web.de>,
+ Jamie Lenehan <lenehan@twibble.org>, Ram Vegesna <ram.vegesna@broadcom.com>,
+ target-devel@vger.kernel.org, Bradley Grove <linuxdrivers@attotech.com>,
+ Satish Kharat <satishkh@cisco.com>, Sesidhar Baddela <sebaddel@cisco.com>,
+ Karan Tilak Kumar <kartilak@cisco.com>, Yihang Li
+ <liyihang9@h-partners.com>, Don Brace <don.brace@microchip.com>,
+ storagedev@microchip.com, HighPoint Linux Team <linux@highpoint-tech.com>,
+ Tyrel Datwyler <tyreld@linux.ibm.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <chleroy@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+ Brian King <brking@us.ibm.com>, Lee Duncan <lduncan@suse.com>,
+ Chris Leech <cleech@redhat.com>, Mike Christie
+ <michael.christie@oracle.com>, open-iscsi@googlegroups.com,
+ Justin Tee <justin.tee@broadcom.com>, Paul Ely <paul.ely@broadcom.com>,
+ Kashyap Desai <kashyap.desai@broadcom.com>,
+ Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+ Chandrakanth Patil <chandrakanth.patil@broadcom.com>,
+ megaraidlinux.pdl@broadcom.com,
+ Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+ Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+ mpi3mr-linuxdrv.pdl@broadcom.com,
+ Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+ Ranjan Kumar <ranjan.kumar@broadcom.com>, MPT-FusionLinux.pdl@broadcom.com,
+ Daniel Palmer <daniel@thingy.jp>, GOTO Masanori <gotom@debian.or.jp>,
+ YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Geoff Levand <geoff@infradead.org>,
+ Michael Reed <mdr@sgi.com>, Nilesh Javali <njavali@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com, Narsimhulu Musini
+ <nmusini@cisco.com>, "K . Y . Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+ linux-hyperv@vger.kernel.org, "Michael S . Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Eugenio Perez <eperezma@redhat.com>,
+ virtualization@lists.linux.dev, Vishal Bhakta <vishal.bhakta@broadcom.com>,
+ bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+ xen-devel@lists.xenproject.org, Bart Van Assche <bvanassche@acm.org>
+References: <20260609121806.2121755-1-sumit.saxena@broadcom.com>
+ <20260609121806.2121755-4-sumit.saxena@broadcom.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260609121806.2121755-4-sumit.saxena@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Rspamd-Queue-Id: 8AA8575A9A
+X-Rspamd-Action: no action
 
-在 2026/6/9 18:33, Christian König 写道:
-> On 6/9/26 08:13, Kaitao Cheng wrote:
->> From: Kaito Cheng <chengkaitao@kylinos.cn>
->>
->> This series prepares for, and then updates, the list_for_each_entry()
->> family so the common entry iterators cache their next or previous cursor
->> before the loop body runs.
+On 6/9/26 14:18, Sumit Saxena wrote:
+> From: Bart Van Assche <bvanassche@acm.org>
 > 
-> Why in the world would we want to do that?
+> Original patch [1] by Bart Van Assche; this version is rebased onto the
+> current tree.  In testing it improves IOPS by roughly 16-18% by removing
+> the fair-sharing throttle on shared tag queues.
 > 
-> The safe and non-safe variants have very distinct use cases and that is completely intentional.
+> This patch removes the following code and structure members:
+> - The function hctx_may_queue().
+> - blk_mq_hw_ctx.nr_active and request_queue.nr_active_requests_shared_tags
+>    and also all the code that modifies these two member variables.
 > 
-> What we could improve maybe is the documentation, from my experience an astonishing large amount of people have misconceptions about the safe variants.
+> [1]: https://lore.kernel.org/linux-block/20240529213921.3166462-1-bvanassche@acm.org/
 > 
->> The first 13 patches open-code loops that intentionally depend on the
->> old "derive the next entry from the current cursor at the end of the
->> iteration" behaviour.  These loops append work to the list being walked,
->> restart traversal after dropping a lock, skip an entry consumed by the
->> current iteration, or otherwise adjust the cursor in the loop body.
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Sumit Saxena <sumit.saxena@broadcom.com>
+> ---
+>   block/blk-core.c       |   2 -
+>   block/blk-mq-debugfs.c |  22 ++++++++-
+>   block/blk-mq-tag.c     |   4 --
+>   block/blk-mq.c         |  17 +------
+>   block/blk-mq.h         | 100 -----------------------------------------
+>   include/linux/blk-mq.h |   6 ---
+>   include/linux/blkdev.h |   2 -
+>   7 files changed, 22 insertions(+), 131 deletions(-)
 > 
-> Well I have to clearly reject the changes for subsystems/components I'm maintaining, that just looks horrible to me and I clearly don't see a good reason for that.
+What tests did you perform?
+I'm pretty sure you see an improvement when having just a few drives,
+but what about having a lot of them (ie tens of drives)?
+The whole point of this was to increase fairness between drives, so
+of course removing it will make an individual drive going faster ...
 
-Hi Christian and Andy Shevchenko,
+Maybe it's an idea to move the fairness algorithm into an I/O scheduler;
+that way we can keep the original behaviour yet get the performance
+increase if people want it.
 
-Thanks for taking a look. I would like to clarify the point you raised.
+Cheers,
 
-The reason I started looking at this is the original motivation behind
-the _safe() variants.  They exist because some users need to remove, move
-or otherwise consume the current entry while walking the list.  In that
-case the next cursor has to be preserved before the loop body can modify
-the current entry.
-
-The unfortunate part is that this could not be expressed with the
-existing list_for_each_entry() interface without changing its calling
-convention.  The _safe() variants had to grow an extra argument for the
-temporary cursor, and that is why we ended up with a separate family of
-macros.
-
-But conceptually, the distinction does not have to be exposed as two
-different iterator families forever.  The difference is an implementation
-detail: whether the iterator keeps the next/previous cursor before the
-body runs.  This series makes the common list_for_each_entry() iterators
-do that internally, so the safe and non-safe forms can effectively be
-folded together, or at least the need for a separate public _safe()
-interface becomes much weaker.
-
-There is also a usability issue with the current _safe() interface.  The
-caller is forced to define a temporary cursor outside the macro and pass
-it in, even though almost all users never use that cursor directly.  It is
-just boilerplate required by the macro implementation.  I find that
-redundant and awkward: the temporary cursor is an internal detail of the
-iteration, but every caller has to spell it out.
-
-With the updated list_for_each_entry() implementation, that extra cursor
-can be kept inside the iterator itself.  Callers that only want to walk
-the list, including callers that delete or consume the current entry, no
-longer need to carry an otherwise-unused temporary variable just to make
-the macro work.
-
->>
->> The final patch changes include/linux/list.h to keep a private cursor in
->> the common entry iterators while preserving the public macro interface.
->> The safe variants remain available when callers need the temporary
->> cursor explicitly or have stronger mutation requirements.
->>
->> Changes in v2 (Muchun Song, Andy Shevchenko):
->>  - Drop the list_for_each_entry_mutable*() helpers from v1 and make the
->>    cursor change directly in the existing list_for_each_entry*() helpers.
->>  - Open-code special list walks that rely on updating the loop cursor in
->>    the body, preserving their existing traversal semantics.
->>
->> Link to v1:
->> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
->>
->> Kaitao Cheng (14):
->>   drbd: Open-code transfer log list walk
->>   firewire: core: Open-code topology list walk
->>   drm/bridge: Open-code bridge chain list walks
->>   drm/i915/gt: Open-code active timeline walk
->>   drm/i915: Open-code DFS dependency list walk
->>   drm/ttm: Open-code reservation list walk
->>   spi: fsi: Open-code message transfer walk
->>   spi: stm32-ospi: Open-code message transfer walk
->>   spi: stm32-qspi: Open-code message transfer walk
->>   spi: tegra210-quad: Open-code message transfer walk
->>   locking/locktorture: Open-code ww mutex list walk
->>   locking/ww_mutex: Open-code stress reorder list walk
->>   ASoC: dapm: Open-code widget invalidation walk
->>   list: Cache cursors in entry iterators
->>
->>  drivers/block/drbd/drbd_debugfs.c      |  4 ++-
->>  drivers/firewire/core-topology.c       |  4 ++-
->>  drivers/gpu/drm/drm_bridge.c           |  7 ++--
->>  drivers/gpu/drm/i915/gt/intel_reset.c  |  4 ++-
->>  drivers/gpu/drm/i915/i915_scheduler.c  |  4 ++-
->>  drivers/gpu/drm/ttm/ttm_execbuf_util.c |  4 ++-
->>  drivers/spi/spi-fsi.c                  |  5 ++-
->>  drivers/spi/spi-stm32-ospi.c           |  4 ++-
->>  drivers/spi/spi-stm32-qspi.c           |  5 ++-
->>  drivers/spi/spi-tegra210-quad.c        |  4 ++-
->>  include/linux/list.h                   | 46 ++++++++++++++++++++------
->>  kernel/locking/locktorture.c           |  4 ++-
->>  kernel/locking/test-ww_mutex.c         |  4 ++-
->>  sound/soc/soc-dapm.c                   |  4 ++-
->>  14 files changed, 78 insertions(+), 25 deletions(-)
->>
->> --
->> 2.43.0
->>
-> 
-
+Hannes
 -- 
-Thanks
-Kaitao Cheng
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
