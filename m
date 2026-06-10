@@ -1,44 +1,50 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3061B4F0A
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 05:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C8A1DF25C
+	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 05:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781069441; cv=none; b=h3KroY4PmX19/syKXUP77ty1DYpAvn2mdLYDg/2mK9SGxTjaOeKO6BFTJld0Pefx5hxjtqCELAtcO14b5GYxSRHqrnit6sA+O7mv1t8oSFl0PVaKFkoEhRD4+9pBKBPVrCHz5Jc3Ih26Fjqa9YQL3GdZw9SuHe86pH7AssyQsAg=
+	t=1781069514; cv=none; b=bMQ6cbSMJ25MCL3vaaAfd2LC4d1b6daeV/VJyQdUP9SLEXypsPf2Uyh2DKZGuy3hHMglTiaJzIjgxI0OPoEBOpKtHtE81JvsFjCa5z48nzXdi80raNE60hXjjfR+ypdAUQLnVbaTH2CVMuJ2zX0ZaDmNgniBZsmWKh7r1NNgY5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781069441; c=relaxed/simple;
-	bh=AOThTDT62sMkcc7KruWBpFBaDeCZ/buTP+ChDmED5Sk=;
+	s=arc-20240116; t=1781069514; c=relaxed/simple;
+	bh=hCN3vOqZE/aZETQC9aFfuZZPyE7rXw3WySAR/0hy+Uk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kNYp2/DJM1jnT7JGb9wxbvDHilaYHKU0iUJMM6sQeEBfrIhc+MN+yeJusSTFymUDgpc4xKHzoJgluzWMmxT4frRZRIPmxqIyo1yiOBA8RgaucMEGyuCpA0BFdpfuGDrriMhLXdXdb0bv/7s1DHpHKrogGvPapmt7vSqF73QLriU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SweU3zjB; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=tcFbeZMdv3M+aCF/8O5afR5ad1cXf5vTKfZ0wKpUT/Uhym6mIWOMewbtVRuhaq7x1gWzM8/fVFLxkaVTOhcqc7mN3qsHYWrGqCHIgGj1R9FBl9jxHiG1Cyd4ISbvq24R0aHBK6/IQD9r7G+iGeM0Ul2xy3pSUL+BNb2sD4t9qIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WetgRqGP; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SweU3zjB"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WetgRqGP"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=jhlleyT4OWEygTVz0DEKmomoSEt08R1kx7Eeqj9y5Ww=; b=SweU3zjBcwVDtaUSVCTxK3baRw
-	aMwvIQYd/pxhrbt9n/lD4PPZSEEGnd49B8wUpBkt4RU2PVlxf+JwpR2eB57wfqOXKPf4yR/m8mH/Y
-	ASYzjdsQsw33hIKtJiHYlpFdnsHuj8xy5cPMO8gh7d3Se7AmtgKpskk9tMip9g82BuZ+UzaP2jsBU
-	2B4V5LcT3jMljJ0idH/MG+X4Exhz6XBHICVXNozqsDTyJd9aOfRC3MPF3VwgrCCtkEginjRuD4w+y
-	o2/BOwixrlze0jO/sG0XZMFHpjf66re6tPJBnbeiLGVBefxjGum1sujQ1BAwDC+PKRfgDJMwtSGX7
-	8gDuWSZA==;
+	bh=ObHtvbMkAC0FpC2QnEH8f0yiany2W4382iUdsNImNZk=; b=WetgRqGPlsmej5yHehagd3pnRZ
+	5FQ1c2XtCVJUU5El1crxDC0KxQwXzCUmK1SWvQMMlq+ii6RPIyd8lyt76w8OpHtSuQsKmQcK9zbcr
+	tUoUamu4/6eIpyxbZRwHGruqbDsJZ1WCSlYIONvqebWwwl23QFX9PKZtYkzEBOM3CsL45yT2z/zX1
+	omrYuOI4N3jkTeQCy8q9rD/Hq/MEHvRlb8Xi029J6HDQLlz0ZO6udtc8NP4kexVkqA49tAL03RGo3
+	qEGtu2cJbVO4+rt/yIBltkxDQyHJoaKSXayxjYdfKPFBp2/89u0nvWyk+PQP1y3MUIBL5iy4urfHz
+	yBi7/+yQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wXBWS-00000006pGs-0jDq;
-	Wed, 10 Jun 2026 05:30:40 +0000
-Date: Tue, 9 Jun 2026 22:30:40 -0700
+	id 1wXBXc-00000006pLZ-1eI5;
+	Wed, 10 Jun 2026 05:31:52 +0000
+Date: Tue, 9 Jun 2026 22:31:52 -0700
 From: Christoph Hellwig <hch@infradead.org>
 To: Bart Van Assche <bvanassche@acm.org>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>,
-	Marco Elver <elver@google.com>
-Subject: Re: [PATCH 15/27] loop: Split loop_change_fd()
-Message-ID: <aij2gBmDwQl7AxTl@infradead.org>
+	Marco Elver <elver@google.com>, Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Genjian Zhang <zhanggenjian@kylinos.cn>,
+	Kees Cook <kees@kernel.org>
+Subject: Re: [PATCH 21/27] null_blk: Enable lock context analysis
+Message-ID: <aij2yP1Y1Dven4Bz@infradead.org>
 References: <cover.1781042470.git.bvanassche@acm.org>
- <f835863049bc0364d80c69a7eeb9514e2a698ae2.1781042470.git.bvanassche@acm.org>
+ <b70422c6f243b9275e336430071b52eb92dd40c4.1781042470.git.bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,15 +53,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f835863049bc0364d80c69a7eeb9514e2a698ae2.1781042470.git.bvanassche@acm.org>
+In-Reply-To: <b70422c6f243b9275e336430071b52eb92dd40c4.1781042470.git.bvanassche@acm.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Jun 09, 2026 at 03:05:02PM -0700, Bart Van Assche wrote:
-> Prepare for adding a second call of __loop_change_fd().
+On Tue, Jun 09, 2026 at 03:05:08PM -0700, Bart Van Assche wrote:
+> Add __must_hold() annotations where these are missing. Annotate two
+> functions that use conditional locking with __context_unsafe().
 
-A bit confusing message.  Yes, you latter add another call, but it's
-from the same caller to sort out the locking mess, and that is directly
-relevant to the scope of the factored out helper.  So please state
-that.  Same for the next patch.  All in merging the first free loop
-patches would probably be easier to follow.
+Please explain why that is needed and there is no better way to have
+proper annotations.  Both here and in a comment in the code.
 
