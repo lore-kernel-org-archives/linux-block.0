@@ -1,179 +1,118 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2543E33F58B
-	for <linux-block@vger.kernel.org>; Wed, 10 Jun 2026 08:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638161D6BB;
+	Wed, 10 Jun 2026 09:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781079595; cv=none; b=hdkZRSd8M5WVYlktgLOMTk6k4r1uWwoj4l5dPRFVqT2AaWXaJqPmDIAMin6Q1J44pvaLIS92REr9qYC7Rl3p66rbQZgMibgKQkW8/zAQMBCoHfSa27qhYuAzSqVj1zdAHtauW0NQtHQUYElnAZeUvNsNqOf9h+WQULtGFE5og3w=
+	t=1781082052; cv=none; b=fhxmte3QUU8ZjwvtUiiqOdULvL8haW6+ZWQqcrmaFMi5yP9l0E0tinuN5rifO3kpQF4IbxVIyS9NpkO4fuOTcho1GOyQvrG9YxjzgDIN9/tLYa1HAf+I2qBZFA/ULprJAgF0Erny8vOVfI1Pnmhs+GINSSH5mpGcY51X/XngjGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781079595; c=relaxed/simple;
-	bh=Jyc91vyJ7ndQgFlz+YZrGZa32ZyUmsV/OWq4Besj+oQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O/fvzbVc9x5gOG4g9msQV+7cFlARD9Gly6W1xN9P32XblCxcYkMfgpFQkLAbRWINtIIwbC4O/Lu9eV9CDD1nCU7AnLoPu/Oi/kbiCAenbQY21/5i9amTt1dhonCXI1u4IMefH2+iyF4/0NxUqt047CuhIRvNzlnUd27Xu0q5o9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=b+KKxMDO; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1781082052; c=relaxed/simple;
+	bh=tiOydzZ3dGouBDJ5gNoI3WoKFWG5GSSkN9FaLALzY1E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ZIZC7Lh26xHtt/3hiGDGj+wWXVsuxHBJyfjaZnmQt7Eft2m3Y1d0NTwF0JgNbcJ2ZNGrQKKn1WGxhJKPEV08IdAfVEO5/94QsmZegn9h7bPOLvZs/AbFgLzZKFqDuPgENGhbt7csRSci96Fuym7FQsyxq8IqweSS5o7DcJvUz38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOrtrCec; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="b+KKxMDO"
-Message-ID: <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781079581;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vgeT73qC1JMBtqJB2TUIr+4bit/wHx6kJFn5Pav/2f4=;
-	b=b+KKxMDOPPD9issjhumw6+KGbYM7wMtezvy5jEnscI0CZYz2NKMOHn33g1ku+yIj4Y2DTn
-	+Yag6Z6BDFL2Y2GchMx0dVC5s3t6GNYZv4TV2TeNkysaubM7HMus5UBFldLUBxBN8KRyYZ
-	t05b5xvQnStTsnzUuvWsLluFbGiay9I=
-Date: Wed, 10 Jun 2026 16:18:28 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOrtrCec"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93AD31F00893;
+	Wed, 10 Jun 2026 09:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781082051;
+	bh=tiOydzZ3dGouBDJ5gNoI3WoKFWG5GSSkN9FaLALzY1E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=oOrtrCecZ1/1S/jm0lzpOyrLHHWmGV4pfQC7Asj81mRDFXy48a1f/rBtiLJk4WPpf
+	 g1eCPvVJ9DJMgC7WFpzHOeA2uvz415UEJiQY/rHi8pUm/RJBeRn8RMecGR8g1bO3yV
+	 eZwyZG92FRvD5X9r14yhr/SW6IyBBuG1E4GVPX2qrQfmK71uP0Jt9lTBtxRH6d53Ec
+	 P3+5gT1ya6f3i9Pu5Ulyi+19+wTV6bcQ9T+MwU+q/e4RqONNVDrYDXE0d3rzQtiwfp
+	 BsTM8LTK0r0d28/qEvIE6Zv1naanu9TWae+dpRiwVSeeO1qHpQXxcLPIreviq1Jw0N
+	 FZ4oyEYIrEzmg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Yuan Tan <ytan089@ucr.edu>
+Cc: "Liam R. Howlett" <liam@infradead.org>, Alice Ryhl
+ <aliceryhl@google.com>, Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Benno Lossin <lossin@kernel.org>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Boqun Feng <boqun@kernel.org>, Danilo
+ Krummrich <dakr@kernel.org>, FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ Frederic Weisbecker <frederic@kernel.org>, Gary Guo <gary@garyguo.net>,
+ Jens Axboe <axboe@kernel.dk>, John Stultz <jstultz@google.com>, Lorenzo
+ Stoakes <ljs@kernel.org>, Lyude Paul <lyude@redhat.com>, Miguel Ojeda
+ <ojeda@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner
+ <tglx@kernel.org>, Trevor Gross <tmgross@umich.edu>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, rust-for-linux@vger.kernel.org, Priya Bala Govindasamy
+ <pgovind2@uci.edu>, Dylan Zueck <dzueck@uci.edu>, Yuan Tan
+ <ytan089@ucr.edu>
+Subject: Re: [PATCH v2 01/83] block: rust: fix `Send` bound for `GenDisk`
+In-Reply-To: <CABrc2FU9HuRp4tVEU_R1RdMMRkkS=tM4Uv70WG3UBTeho_C42Q@mail.gmail.com>
+References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
+ <20260609-rnull-v6-19-rc5-send-v2-1-82c7404542e2@kernel.org>
+ <CABrc2FU9HuRp4tVEU_R1RdMMRkkS=tM4Uv70WG3UBTeho_C42Q@mail.gmail.com>
+Date: Wed, 10 Jun 2026 11:00:37 +0200
+Message-ID: <877bo6hiru.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
- state
-To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Thierry Reding <thierry.reding@kernel.org>,
- Jonathan Hunter <jonathanh@nvidia.com>,
- Sowjanya Komatineni <skomatineni@nvidia.com>,
- Davidlohr Bueso <dave@stgolabs.net>, "Paul E . McKenney"
- <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Liam Girdwood <lgirdwood@gmail.com>,
- Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
- <tursulin@ursulin.net>, Huang Rui <ray.huang@amd.com>,
- Eddie James <eajames@linux.ibm.com>, Mark Brown <broonie@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Laxman Dewangan <ldewangan@nvidia.com>,
- Neil Armstrong <neil.armstrong@linaro.org>, Robert Foss <rfoss@kernel.org>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
- Jonas Karlman <jonas@kwiboo.se>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Matthew Auld <matthew.auld@intel.com>,
- Matthew Brost <matthew.brost@intel.com>, Waiman Long <longman@redhat.com>,
- drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, linux-spi@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Randy Dunlap <rdunlap@infradead.org>, Christian Brauner
- <brauner@kernel.org>, David Howells <dhowells@redhat.com>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Kaito Cheng <chengkaitao@kylinos.cn>, Muchun Song <muchun.song@linux.dev>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Jens Axboe <axboe@kernel.dk>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
- Andrzej Hajda <andrzej.hajda@intel.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
- <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
- <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+Yuan Tan <ytan089@ucr.edu> writes:
 
+> On Tue, Jun 9, 2026 at 12:13=E2=80=AFPM Andreas Hindborg <a.hindborg@kern=
+el.org> wrote:
+>>
+>> The `Send` implementation for `GenDisk<T>` was conditioned on `T: Send`.
+>> This constrains the wrong type. `T` is the `Operations` implementation,
+>> which is typically a zero-sized marker type that carries no data, so `T:
+>> Send` says nothing about whether the data a `GenDisk` actually owns can =
+be
+>> moved to another thread.
+>>
+>> A `GenDisk<T>` owns the queue data `T::QueueData` (stored as the
+>> `gendisk`'s `queuedata` and dropped when the `GenDisk` is dropped) and an
+>> `Arc<TagSet<T>>`. These are the values transferred when a `GenDisk` is s=
+ent
+>> across a thread boundary, so the `Send` bound must constrain exactly the=
+m.
+>> Bound `T::QueueData: Send` and `Arc<TagSet<T>>: Send` instead.
+>>
+>> Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
+>> Suggested-by: Yuan Tan <ytan089@ucr.edu>
+>> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+>> ---
+>>
+>> Please take patch from Yuan instead of this one, if they send a fixed
+>> version [1].
+>>
+>> [1] https://lore.kernel.org/r/8839ddc5ff54bf454d508cde91d27d00fc3e2dd8.1=
+780633578.git.ytan089@ucr.edu
+>
+> My last email mistakenly enabled html. So I am here to resend it. Hope
+> it doesn't disturb anyone.
+>
+> Sorry, I've been busy with other things and haven't had the chance to
+> send the fixed version.
+>
+> Thank you very much for reviewing the patch and for preparing the v2 vers=
+ion.
+>
+> Could you please add the following when applying this patch?
+> Reported-by: Priya Bala Govindasamy <pgovind2@uci.edu>
+> Reported-by: Dylan Zueck <dzueck@uci.edu>
+>
+> I didn't discover this issue myself. I just helped write the patch and
+> I don't want them to lose their credit for it.
+>
+> Please let me know if you would prefer that I send a v3 instead.
 
-在 2026/6/10 16:07, Christian König 写道:
-> On 6/10/26 08:14, Kaitao Cheng wrote:
->> 在 2026/6/9 18:33, Christian König 写道:
->>> On 6/9/26 08:13, Kaitao Cheng wrote:
->>>> From: Kaito Cheng <chengkaitao@kylinos.cn>
->>>>
->>>> This series prepares for, and then updates, the list_for_each_entry()
->>>> family so the common entry iterators cache their next or previous cursor
->>>> before the loop body runs.
->>>
->>> Why in the world would we want to do that?
->>>
->>> The safe and non-safe variants have very distinct use cases and that is completely intentional.
->>>
->>> What we could improve maybe is the documentation, from my experience an astonishing large amount of people have misconceptions about the safe variants.
->>>
->>>> The first 13 patches open-code loops that intentionally depend on the
->>>> old "derive the next entry from the current cursor at the end of the
->>>> iteration" behaviour.  These loops append work to the list being walked,
->>>> restart traversal after dropping a lock, skip an entry consumed by the
->>>> current iteration, or otherwise adjust the cursor in the loop body.
->>>
->>> Well I have to clearly reject the changes for subsystems/components I'm maintaining, that just looks horrible to me and I clearly don't see a good reason for that.
->>
->> Hi Christian and Andy Shevchenko,
->>
->> Thanks for taking a look. I would like to clarify the point you raised.
->>
->> The reason I started looking at this is the original motivation behind
->> the _safe() variants.  They exist because some users need to remove, move
->> or otherwise consume the current entry while walking the list.  In that
->> case the next cursor has to be preserved before the loop body can modify
->> the current entry.
->>
->> The unfortunate part is that this could not be expressed with the
->> existing list_for_each_entry() interface without changing its calling
->> convention.  The _safe() variants had to grow an extra argument for the
->> temporary cursor, and that is why we ended up with a separate family of
->> macros.
->>
->> But conceptually, the distinction does not have to be exposed as two
->> different iterator families forever.  The difference is an implementation
->> detail: whether the iterator keeps the next/previous cursor before the
->> body runs.  This series makes the common list_for_each_entry() iterators
->> do that internally, so the safe and non-safe forms can effectively be
->> folded together, or at least the need for a separate public _safe()
->> interface becomes much weaker.
->>
->> There is also a usability issue with the current _safe() interface.  The
->> caller is forced to define a temporary cursor outside the macro and pass
->> it in, even though almost all users never use that cursor directly.  It is
->> just boilerplate required by the macro implementation.  I find that
->> redundant and awkward: the temporary cursor is an internal detail of the
->> iteration, but every caller has to spell it out.
->>
->> With the updated list_for_each_entry() implementation, that extra cursor
->> can be kept inside the iterator itself.  Callers that only want to walk
->> the list, including callers that delete or consume the current entry, no
->> longer need to carry an otherwise-unused temporary variable just to make
->> the macro work.
-> 
-> Well the distinction between list_for_each_entry() and list_for_each_entry_safe() is *not* there because you need an extra variable to hold the next pointer, but because just 'iterating the list' and 'iterating the list while you modify it' are two distinct use cases.
-> 
-> Apart from the technical implications this also has some documentation value for the code using it.
-> 
-> What we could consider with C99 at hand is to have _safe() variants who uses a local hidden variable to hold the next element.
-> 
-> Or maybe come up with a better name instead of _safe() because people seem to misunderstand that quite often.
-> 
-> But mangling the two use cases together just because it is now technical possible is among the worst ideas I've ever heard.
-> 
+I would absolutely encourage you to send a v3 so we can pick that one.
 
-Should we revert to v1, or keep list_for_each_entry() and
-list_for_each_entry_safe() as they are, close this thread, and make no
-changes?
+Your emails are not arriving in my inbox though. I only see this one on
+the list. Please check your setup for outgoing email.
 
-Link to v1:
-https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+Best regards,
+Andreas Hindborg
 
-Or do you have any better suggestions?
-
--- 
-Thanks
-Kaitao Cheng
 
