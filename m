@@ -1,118 +1,268 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012065.outbound.protection.outlook.com [40.107.200.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638161D6BB;
-	Wed, 10 Jun 2026 09:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781082052; cv=none; b=fhxmte3QUU8ZjwvtUiiqOdULvL8haW6+ZWQqcrmaFMi5yP9l0E0tinuN5rifO3kpQF4IbxVIyS9NpkO4fuOTcho1GOyQvrG9YxjzgDIN9/tLYa1HAf+I2qBZFA/ULprJAgF0Erny8vOVfI1Pnmhs+GINSSH5mpGcY51X/XngjGE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781082052; c=relaxed/simple;
-	bh=tiOydzZ3dGouBDJ5gNoI3WoKFWG5GSSkN9FaLALzY1E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ZIZC7Lh26xHtt/3hiGDGj+wWXVsuxHBJyfjaZnmQt7Eft2m3Y1d0NTwF0JgNbcJ2ZNGrQKKn1WGxhJKPEV08IdAfVEO5/94QsmZegn9h7bPOLvZs/AbFgLzZKFqDuPgENGhbt7csRSci96Fuym7FQsyxq8IqweSS5o7DcJvUz38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOrtrCec; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA81399358;
+	Wed, 10 Jun 2026 09:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781082718; cv=fail; b=YuEXns1zfyZmJsvHUFYNugNpJi6ToecttsL5AklxQVHz3vskgIKsGd/YfHW0erTbcQ7zJDS/a7nhRr/lDm+xXiuoQ+B1kpmHmG/Ea9t5+NC5FE67tO7hNttLYt/JPr4ouY69msIP6yFuz2O0Dp1wTSP1jrfOrCblDmelQDV0nwY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781082718; c=relaxed/simple;
+	bh=TjeZIGFM+vCDoGGdTdCCExnTd0hEMR5iosc6zTWux2c=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=pnVxdLaDKP9iKptvsgeJo8wt+xzWEmt9pm9a9Axyn7qlsXIr+f7G3Y63pHu20QvGCMfw4v29ZMeUY3Ernoj/LIuWglO5NlPmE3rnbpE4CRpKThPmgUEic0NB5A0vabvO+5t1ReVC4x6+N4S+IFL3PJ+2+CLPFayTcaOLhCZw5YM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LS1aaYZP; arc=fail smtp.client-ip=40.107.200.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOrtrCec"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93AD31F00893;
-	Wed, 10 Jun 2026 09:00:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781082051;
-	bh=tiOydzZ3dGouBDJ5gNoI3WoKFWG5GSSkN9FaLALzY1E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=oOrtrCecZ1/1S/jm0lzpOyrLHHWmGV4pfQC7Asj81mRDFXy48a1f/rBtiLJk4WPpf
-	 g1eCPvVJ9DJMgC7WFpzHOeA2uvz415UEJiQY/rHi8pUm/RJBeRn8RMecGR8g1bO3yV
-	 eZwyZG92FRvD5X9r14yhr/SW6IyBBuG1E4GVPX2qrQfmK71uP0Jt9lTBtxRH6d53Ec
-	 P3+5gT1ya6f3i9Pu5Ulyi+19+wTV6bcQ9T+MwU+q/e4RqONNVDrYDXE0d3rzQtiwfp
-	 BsTM8LTK0r0d28/qEvIE6Zv1naanu9TWae+dpRiwVSeeO1qHpQXxcLPIreviq1Jw0N
-	 FZ4oyEYIrEzmg==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Yuan Tan <ytan089@ucr.edu>
-Cc: "Liam R. Howlett" <liam@infradead.org>, Alice Ryhl
- <aliceryhl@google.com>, Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Benno Lossin <lossin@kernel.org>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
- <bjorn3_gh@protonmail.com>, Boqun Feng <boqun@kernel.org>, Danilo
- Krummrich <dakr@kernel.org>, FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Frederic Weisbecker <frederic@kernel.org>, Gary Guo <gary@garyguo.net>,
- Jens Axboe <axboe@kernel.dk>, John Stultz <jstultz@google.com>, Lorenzo
- Stoakes <ljs@kernel.org>, Lyude Paul <lyude@redhat.com>, Miguel Ojeda
- <ojeda@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner
- <tglx@kernel.org>, Trevor Gross <tmgross@umich.edu>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, rust-for-linux@vger.kernel.org, Priya Bala Govindasamy
- <pgovind2@uci.edu>, Dylan Zueck <dzueck@uci.edu>, Yuan Tan
- <ytan089@ucr.edu>
-Subject: Re: [PATCH v2 01/83] block: rust: fix `Send` bound for `GenDisk`
-In-Reply-To: <CABrc2FU9HuRp4tVEU_R1RdMMRkkS=tM4Uv70WG3UBTeho_C42Q@mail.gmail.com>
-References: <20260609-rnull-v6-19-rc5-send-v2-0-82c7404542e2@kernel.org>
- <20260609-rnull-v6-19-rc5-send-v2-1-82c7404542e2@kernel.org>
- <CABrc2FU9HuRp4tVEU_R1RdMMRkkS=tM4Uv70WG3UBTeho_C42Q@mail.gmail.com>
-Date: Wed, 10 Jun 2026 11:00:37 +0200
-Message-ID: <877bo6hiru.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LS1aaYZP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XLsTWKvOrqNoL5y9vG4BglC5zhVKYY5h48A7r8DKwqouom2PAPCsR8dVUwPuWWjTIXQ+rR+Y39eZy0vH/eH4Qv/lcJVIdbg2Ys++yYssZyfzXKbfYsgSgqKuBwoDqLNldlBFeHSitP5j+5z2bFj6iAOgHdz/UhxDR3fAl0Q5o7l8o/kaHG/qu9RoGjMxQPvo3xB6UwQqHeHwS9GIZcehwHclZIpPwCBs8LxYBKCDZYKr5lehF0FXrU/0aRSenZN6Y1zQQoCCS9YcptXBfEisoZm3l4C/bP5p5B0a8kHvFh9fyk8D+Qant1URttIvpwEjVVLNeJAEjaWJ7KTHFqK04g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gQ+OE8QIAEvordwq9Eu9KduXF7SvGCeNdQFbFKcTS00=;
+ b=wcRibGEguqE2bE7UWKzySrTCEBso+kwKN1+W1GZq2EQaQHT/j4u1xOExJhikVdZXlvo6HNeGpbuO+VE9XQ56EyTZBwKck5aNKYNFnaiWCsUqmwbFup4rrWMT33fHKmaT97Oi6nPEYWysY27QUJYeXxUyPPvR3bogoJG9jII/Re6DHAYDCbXsQrst5n8rScy3ntXy7cqe+lyuLjvd4H6mOn40l7kvQUPC/FazuymAe6yoT8b2xO78aULg5Iv533njULkobE67TE9dAlYKjCOU1l2EbwEfaG+2F6ZIvOv3gvo7+qBwE7nuR3Pw2XyfoZKfih2R9bWbSO+7yiUiFalCew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gQ+OE8QIAEvordwq9Eu9KduXF7SvGCeNdQFbFKcTS00=;
+ b=LS1aaYZPLyJN1jVGavcWqfLUftprSIQw/07AGkLkBUG0UWQBe9QqfwZxWOEYj4VFh64DyrnQJYH0xIALiwgW/puLyrDEoorDHljrSDr0ymc3cYWk4FSAVMCX/9qWXrDdk8iCY/00P49M5AUe2MTWAOyBUY1Iq2GGPEktW5kxtFU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by CY8PR12MB8241.namprd12.prod.outlook.com (2603:10b6:930:76::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.11; Wed, 10 Jun
+ 2026 09:11:52 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0092.006; Wed, 10 Jun 2026
+ 09:11:51 +0000
+Message-ID: <d974a2ea-6102-45ff-bf36-3b25a2404e40@amd.com>
+Date: Wed, 10 Jun 2026 11:11:34 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
+ state
+To: Kaitao Cheng <kaitao.cheng@linux.dev>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Thierry Reding <thierry.reding@kernel.org>,
+ Jonathan Hunter <jonathanh@nvidia.com>,
+ Sowjanya Komatineni <skomatineni@nvidia.com>,
+ Davidlohr Bueso <dave@stgolabs.net>, "Paul E . McKenney"
+ <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>,
+ Liam Girdwood <lgirdwood@gmail.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, Huang Rui <ray.huang@amd.com>,
+ Eddie James <eajames@linux.ibm.com>, Mark Brown <broonie@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Laxman Dewangan <ldewangan@nvidia.com>,
+ Neil Armstrong <neil.armstrong@linaro.org>, Robert Foss <rfoss@kernel.org>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+ Jonas Karlman <jonas@kwiboo.se>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Matthew Auld <matthew.auld@intel.com>,
+ Matthew Brost <matthew.brost@intel.com>, Waiman Long <longman@redhat.com>,
+ drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, linux-spi@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Randy Dunlap <rdunlap@infradead.org>, Christian Brauner
+ <brauner@kernel.org>, David Howells <dhowells@redhat.com>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Kaito Cheng <chengkaitao@kylinos.cn>, Muchun Song <muchun.song@linux.dev>,
+ Philipp Reisner <philipp.reisner@linbit.com>,
+ Lars Ellenberg <lars.ellenberg@linbit.com>,
+ =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
+ Jens Axboe <axboe@kernel.dk>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Andrzej Hajda <andrzej.hajda@intel.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>
+References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+ <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
+ <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
+ <6b2efdee-95b0-4306-a682-0d0466497ddb@amd.com>
+ <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <2399841f-d834-4652-8285-4a15c7d9a9b9@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0086.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1f::13) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|CY8PR12MB8241:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7464e8d5-7c24-4f24-2866-08dec6d04ee4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|366016|1800799024|376014|7416014|56012099006|11063799006|5023799004|4143699003|6133799003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	1htKofcJEs3WQFHVpqi/ZmKoxqDUWoziML8B50OQPmpkEjon74KxOB4u+OnvZqitJp3H3n59XEPQXs2ZM4rK2Cs9/Ou7Ts7zj8RPb+qk9qPCE/NwXunHVvwUQiyqyePQ65c9iaUNAAQo7eHgiLuOTtQw2H5ZJXeZXOxx6nr0fe3xuSuA5WIbHeU2MNT8I/ulSp23QMEgjoaSmAlKN2Ng1IXF04RdL/vJgQll0jWEgJUi/o9Me5pxFZxh32wZpQGuzskmyLR5HkeNbjki0A+VlpiqpS+SWNaQnrPd9nOy0zlCn1sNrbtVKSRps52Z8qwUjW3kX841RiI5iCa4+z2na3c9fsjOo0pEcazTH1A/2NtmDXYn+CCqV+mmlL4hUWfUfchpGcHERGgTqKWjLR0vSUWQhqxTuRKGlNNaL/r3Z/eU/6w7ctm28LMvqNedaFsls0VSmuNBDoBZZfPFXGxvihQkIMzL9LR9HZz+omUTgGaG3RH2QyuBsNEeHgs8ex5VN/lyz6QaxSmhBdgD7FvpJ/Kyygo0tUrSneiSOsh1wNaCMMOgsRrhlngP0fIeEF0fA6Xv3GIX3QMVLRUNFhBk83t8fHi22FaSFf8EQfRiIRdZhYZKDzGYqi8pfhxH19Z6LhOQ5adR6YyVHzYys3HMORl3YOwwW9+M45e9KZqFZkv7twfLSeTk6iq2XaSLgMOMEbslKgBFRuPYKVznmbYbtQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(376014)(7416014)(56012099006)(11063799006)(5023799004)(4143699003)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eTVwSGRWQ2NlUmhwb3dVN2M3RjV3SVlsSXRoa3Y2VVVyQWwxaWU0MmhsVTFI?=
+ =?utf-8?B?czI5UTFiM29IOEhIOTUxVVpoQjRqbGVMSGV4dWRHNFJZOW9EVG5YczdsbkEw?=
+ =?utf-8?B?cVExRk9CZG92emlEM0dLaGRLeDNvazZQclVoSVQ1S25XUWJYVExiVnJabHM5?=
+ =?utf-8?B?OFFEdkZmaVFTUnE3enh1aWM0czVlRitQZ0U1c3dDQzdkWXdwUmswRGNzV2th?=
+ =?utf-8?B?c0h3RXF5VzlISVk0dW84WGY1Q3ZWTUpKaXhRN0JqMDZzSWFNQ0F5cXpjd0Fm?=
+ =?utf-8?B?cDJTb0d2cklGUXJ5UjcxMkVHUWlyRGxZTGlvNjJCZ0xxcVpST0h5bGdFRDY3?=
+ =?utf-8?B?Q25mQnpZMDZlVi9LZktkWlkxZmNKNHpuK1F5NzExYjIzUEErNFFFYTBDekpS?=
+ =?utf-8?B?aVltbGJyemoyTS8wOVB3dElwUVIwamhJWDR5VUtQeFdoMUtNYXFvVU4ra0Nt?=
+ =?utf-8?B?cHJieDJUT3F3NUduSnlyb0dpdFFLTHRaYktmTmlZZ0xEZC9jc21ZU2VEaFNM?=
+ =?utf-8?B?ZXBPbHd4TVB0TjA4NVVxVU1hN3Bpem1XUWREQXBoL0tQc1hUVmpOTW9oVTgx?=
+ =?utf-8?B?RnIycUtLMTVuRExEYTRFYVZsbVRmRXBzYTRDUFJGMTNnblJYNU9xSDJ0TlhL?=
+ =?utf-8?B?YndaVStabGwyRGVzeEZsWG4vUTBDekJ3VjMwdkd2ejV3aUladjlFK0srWXNS?=
+ =?utf-8?B?YmVNZmxPd01lVGFLNDhpbFdCZ245bVgyUXJVYnIyR1I5a01lN3dPSmhYbjgr?=
+ =?utf-8?B?RUFwNW5XQWNuWnJrYUtKMFEzMFdkZWswdXlIanAwZG5YUzRZWUFiVnMwZDJC?=
+ =?utf-8?B?K0dJeGtVdjc0TkhGc0NEU0t3OTVqbWI1azB2eUZZT2prMXM1ZzhqUHR5S0tE?=
+ =?utf-8?B?QW5IMWcrUG9weGE4SUJwR0UzMWJocHZreEpwaGJjdThLUExWT0pEYmtpRitl?=
+ =?utf-8?B?VXNtQUROUWx2YTVlNFVnRStjVEdsbEtlQTB4Z2FyT2NHcUlWUVE0b2hBTU5O?=
+ =?utf-8?B?QWFBZ2EwNDMzRzRGZjF6NEltSU5NcTFyRmFieUF5ZW0rZWRmaHF1U3htNGFT?=
+ =?utf-8?B?Qm44cDY0cWFLTVhpK3d2MXlQNzNTNW5EK2liUU02cE93YlpzTVFocDJUei85?=
+ =?utf-8?B?Qk1YVnpEVkxyalpoNU1mQnZ5aCtrZFFaUHlQZDRQRVNwMXZpRXVYOUhNMzJK?=
+ =?utf-8?B?Qno3MnhwWjFWYXRYNTQ0dUwyMmJCQk10dU5yenQrRXJxRHprcWRaMzZtc3Fs?=
+ =?utf-8?B?NStjVlRUNndrS1lrZnNzOEUyckxGUEJTcG9jR2FYVy82UThsYW9MU3V1MXIx?=
+ =?utf-8?B?RTdlNHRSMUlyZTBzZXVFSlp0SGF3TmFDWDM4L3J3Ukk4OURQZ1pPOWphNngx?=
+ =?utf-8?B?LzVjN0FvWXByTU82WlhYN3B1Ynl6S2NmTUovNGhQMlBEbEo3RVJacFVIUXhE?=
+ =?utf-8?B?MGYyV0lCQTBZd2J1VHYwYmJ4V2hiVlpkWGZXVlQrUVZlZEtRa1J6U0h0d00y?=
+ =?utf-8?B?V0tLbXhOcTRpNVFXdnZ0QlZ0ZFlRdzVodmNERlJ4Sm5mdkdOclNJTXdRVWR6?=
+ =?utf-8?B?eStsdStTQTI2dS9nSCthUVNLYXpacjJXdHQ0UnRuZU1ZZzJXeG9hT3NXeDBM?=
+ =?utf-8?B?RjI5dTRXUnN5QkdYQTJ1Q1RQNHNvSUFLWWpSaWppOTBrQjQ3WGgxMnBWSC9G?=
+ =?utf-8?B?L0NwOURhSDNGbXVzUHhBb0F4dkZ2SjI1VzdLWXM0Rnd0U3lVdFBmWGpIVHYw?=
+ =?utf-8?B?YTZNUjJEUE4xUGdhU2hZYTY0NWtrajNmOEdYL2Zya0dmQWVOL0pRanJyVHpO?=
+ =?utf-8?B?N1pUWjFaNWRsU3RxOUh5Tis5K0pTa3NUY2g0TEJndmQyNUttTUt1R3ZzTmFK?=
+ =?utf-8?B?NlJjaWM4bTNnTGlUc3pLRk41VkJMcEY1UjdtMHdYZmpuQTZlZURxYU82akVQ?=
+ =?utf-8?B?ZXFSQ1ozZmd1MGJFQVJxOEJaeXJLSHVNUGV0T2xuaFJZOG4wWXB2bVkzdC94?=
+ =?utf-8?B?dFZvbHlTYjhIdXBPc3UxWFVua1BSSzZWTGg0WnIrQUo5U3NCN3hoYkdJSWU1?=
+ =?utf-8?B?MUtOVzNraUR4M0dXTTlUeGl5ZXZuRjhLV0IySi9PUldIc29GR1NvMU51N3lW?=
+ =?utf-8?B?bkJWUDliK1JQLzZxOUNGb3NOaFdPeGJxL0kzMmFacEpFMkV3SUZ4OHM2cml1?=
+ =?utf-8?B?SkpsNXVBSm04NStnNDRCNmdOZ3V0WmVBTlBxTnZ0RnRRRy9RMW96MThiaERL?=
+ =?utf-8?B?cytjMnY5ZUZ4QncxMmJiZ2lXaFRUUEd2R2NDaEQvK29tUm00MVIwWTAyTlp6?=
+ =?utf-8?Q?r++g69Ih9P6IalPmUj?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7464e8d5-7c24-4f24-2866-08dec6d04ee4
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2026 09:11:51.3845
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O2pS5uzv20sPGWEIj7DuFxfVi8xT8GgRzfTSwjQsp7tXU+0BXMaezMEMi/BXG3es
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8241
 
-Yuan Tan <ytan089@ucr.edu> writes:
 
-> On Tue, Jun 9, 2026 at 12:13=E2=80=AFPM Andreas Hindborg <a.hindborg@kern=
-el.org> wrote:
+
+On 6/10/26 10:18, Kaitao Cheng wrote:
+> 
+> 
+> 在 2026/6/10 16:07, Christian König 写道:
+>> On 6/10/26 08:14, Kaitao Cheng wrote:
+>>> 在 2026/6/9 18:33, Christian König 写道:
+>>>> On 6/9/26 08:13, Kaitao Cheng wrote:
+>>>>> From: Kaito Cheng <chengkaitao@kylinos.cn>
+>>>>>
+>>>>> This series prepares for, and then updates, the list_for_each_entry()
+>>>>> family so the common entry iterators cache their next or previous cursor
+>>>>> before the loop body runs.
+>>>>
+>>>> Why in the world would we want to do that?
+>>>>
+>>>> The safe and non-safe variants have very distinct use cases and that is completely intentional.
+>>>>
+>>>> What we could improve maybe is the documentation, from my experience an astonishing large amount of people have misconceptions about the safe variants.
+>>>>
+>>>>> The first 13 patches open-code loops that intentionally depend on the
+>>>>> old "derive the next entry from the current cursor at the end of the
+>>>>> iteration" behaviour.  These loops append work to the list being walked,
+>>>>> restart traversal after dropping a lock, skip an entry consumed by the
+>>>>> current iteration, or otherwise adjust the cursor in the loop body.
+>>>>
+>>>> Well I have to clearly reject the changes for subsystems/components I'm maintaining, that just looks horrible to me and I clearly don't see a good reason for that.
+>>>
+>>> Hi Christian and Andy Shevchenko,
+>>>
+>>> Thanks for taking a look. I would like to clarify the point you raised.
+>>>
+>>> The reason I started looking at this is the original motivation behind
+>>> the _safe() variants.  They exist because some users need to remove, move
+>>> or otherwise consume the current entry while walking the list.  In that
+>>> case the next cursor has to be preserved before the loop body can modify
+>>> the current entry.
+>>>
+>>> The unfortunate part is that this could not be expressed with the
+>>> existing list_for_each_entry() interface without changing its calling
+>>> convention.  The _safe() variants had to grow an extra argument for the
+>>> temporary cursor, and that is why we ended up with a separate family of
+>>> macros.
+>>>
+>>> But conceptually, the distinction does not have to be exposed as two
+>>> different iterator families forever.  The difference is an implementation
+>>> detail: whether the iterator keeps the next/previous cursor before the
+>>> body runs.  This series makes the common list_for_each_entry() iterators
+>>> do that internally, so the safe and non-safe forms can effectively be
+>>> folded together, or at least the need for a separate public _safe()
+>>> interface becomes much weaker.
+>>>
+>>> There is also a usability issue with the current _safe() interface.  The
+>>> caller is forced to define a temporary cursor outside the macro and pass
+>>> it in, even though almost all users never use that cursor directly.  It is
+>>> just boilerplate required by the macro implementation.  I find that
+>>> redundant and awkward: the temporary cursor is an internal detail of the
+>>> iteration, but every caller has to spell it out.
+>>>
+>>> With the updated list_for_each_entry() implementation, that extra cursor
+>>> can be kept inside the iterator itself.  Callers that only want to walk
+>>> the list, including callers that delete or consume the current entry, no
+>>> longer need to carry an otherwise-unused temporary variable just to make
+>>> the macro work.
 >>
->> The `Send` implementation for `GenDisk<T>` was conditioned on `T: Send`.
->> This constrains the wrong type. `T` is the `Operations` implementation,
->> which is typically a zero-sized marker type that carries no data, so `T:
->> Send` says nothing about whether the data a `GenDisk` actually owns can =
-be
->> moved to another thread.
+>> Well the distinction between list_for_each_entry() and list_for_each_entry_safe() is *not* there because you need an extra variable to hold the next pointer, but because just 'iterating the list' and 'iterating the list while you modify it' are two distinct use cases.
 >>
->> A `GenDisk<T>` owns the queue data `T::QueueData` (stored as the
->> `gendisk`'s `queuedata` and dropped when the `GenDisk` is dropped) and an
->> `Arc<TagSet<T>>`. These are the values transferred when a `GenDisk` is s=
-ent
->> across a thread boundary, so the `Send` bound must constrain exactly the=
-m.
->> Bound `T::QueueData: Send` and `Arc<TagSet<T>>: Send` instead.
+>> Apart from the technical implications this also has some documentation value for the code using it.
 >>
->> Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
->> Suggested-by: Yuan Tan <ytan089@ucr.edu>
->> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
->> ---
+>> What we could consider with C99 at hand is to have _safe() variants who uses a local hidden variable to hold the next element.
 >>
->> Please take patch from Yuan instead of this one, if they send a fixed
->> version [1].
+>> Or maybe come up with a better name instead of _safe() because people seem to misunderstand that quite often.
 >>
->> [1] https://lore.kernel.org/r/8839ddc5ff54bf454d508cde91d27d00fc3e2dd8.1=
-780633578.git.ytan089@ucr.edu
->
-> My last email mistakenly enabled html. So I am here to resend it. Hope
-> it doesn't disturb anyone.
->
-> Sorry, I've been busy with other things and haven't had the chance to
-> send the fixed version.
->
-> Thank you very much for reviewing the patch and for preparing the v2 vers=
-ion.
->
-> Could you please add the following when applying this patch?
-> Reported-by: Priya Bala Govindasamy <pgovind2@uci.edu>
-> Reported-by: Dylan Zueck <dzueck@uci.edu>
->
-> I didn't discover this issue myself. I just helped write the patch and
-> I don't want them to lose their credit for it.
->
-> Please let me know if you would prefer that I send a v3 instead.
+>> But mangling the two use cases together just because it is now technical possible is among the worst ideas I've ever heard.
+>>
+> 
+> Should we revert to v1, or keep list_for_each_entry() and
+> list_for_each_entry_safe() as they are, close this thread, and make no
+> changes?
+> 
+> Link to v1:
+> https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+> 
+> Or do you have any better suggestions?
 
-I would absolutely encourage you to send a v3 so we can pick that one.
+v1 looks perfectly reasonable to me.
 
-Your emails are not arriving in my inbox though. I only see this one on
-the list. Please check your setup for outgoing email.
+You should just include some patches in the same patch set to actually use the new macros.
 
-Best regards,
-Andreas Hindborg
+If you modify the files under drivers/dma-buf or drivers/gpu/drm/amd to use the new macro I'm happy to review that.
 
-
+Regards,
+Christian.
