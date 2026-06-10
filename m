@@ -1,78 +1,141 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEDE42EEB8;
-	Wed, 10 Jun 2026 16:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E9A29D26E;
+	Wed, 10 Jun 2026 16:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781107545; cv=none; b=bT+7M9dJqAAlpb4gqWTi7EYK+okEN3Jc+J2BwXdkvP1U9sto4J4ag4MCNgqeT8rLGM0NCADkrswciyKM30z6A63fzh1URK4vkrtQaCHoSwwtgQ0qT+dLNLSQhP0y+H87ZWneKAF8Z/P7Or2u6Ii0q05/It8l4H/MfxQfLPpzZWQ=
+	t=1781109365; cv=none; b=tUslUKp1eqF9qdgLJnqFRIKAKyMTnjAM3yyPWX9eOwEAvBQrGi7AwwI1sa9V0JEWcdX3DvIX6fx9ibUuvOJgrUVcDAnTqg93LVDC0SQonKKzkK23fNZExqnmAx0j16XTIJ+JIVgqWlSjnrjsk6yFD42CwQY9sZlmxF7BIaKraCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781107545; c=relaxed/simple;
-	bh=4g06kR2RckvBV7kCGKvXj9C1F/7q+DmeXmWHnyrFlTA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ByGje9GIGqsA9d6f1ZtgKnggWsbsdKN4A+UQ9glIvrMZt0iyC3N/pCXMn8dm28v+lTfIbfMR70FyxBBj1t+QNzBV13HFB82M1Au+aXJe/PtKIjVbvzgIBg89B/wDESjk6KZy/moCVqy7BFDppjO3dgLoZ5UtPczcNOgfdDqJ83k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=fkbj5R4t; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1781109365; c=relaxed/simple;
+	bh=Ub3aJDzQfV3ndDy3RlbrtoMFR4cZS0ws3oiDXOTKo58=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l1YSoOPv65VP/yjqZGuI7ndP5S6BuJ+kmbmiTbPS8kcT4BWIfU60ToER5wywp/7rNa8+N4uN15iLmvR5Yv8di4JEGiTAjOX6zRRZRlbJwA68KcNn6BhANePT25C2Phsn1ZzhA0MG+kVQJjheW93jEywWawbyBpiyL81W8u7leP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYINVrSZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="fkbj5R4t"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4gb9c56Zp1z1XLyhV;
-	Wed, 10 Jun 2026 16:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1781107538; x=1783699539; bh=4g06kR2RckvBV7kCGKvXj9C1
-	F/7q+DmeXmWHnyrFlTA=; b=fkbj5R4tOI5lubOPFat6/GZdWo+ycb3oJo7xk1fr
-	b658P0CtpayqRMiKyXjB2QQ1dmvJ71GfYwEZHQPnG1vwmyImHMdQtR0S0A/GjkH9
-	mLGI5dkr9OIOjx4fLhZ+WKys3xMHs07JAPPLvMk/ma53H6NY5Boaw8r/QJcnqF8t
-	pVlWTlZKRhbSmzX+1LyFWsXgV34EIahLS4Sz8mTBOduLQVXdHK0HCzgPSulGTGrk
-	Qh18HyjMZxxtcK+uay2jL0KE7v9FbF7VUSagPaidN+ZpJqtrPh/DZGz7cZyK7OJO
-	g55/ILtj2t4FZCYWAXdhoyn+E77thZyhI/WpdnAoC5FC2A==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Zdm7l2cw2X3o; Wed, 10 Jun 2026 16:05:38 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4gb9bz5MFLz1XLyhT;
-	Wed, 10 Jun 2026 16:05:35 +0000 (UTC)
-Message-ID: <3086f8a4-1f0b-4261-a19f-1ec0f4d2af80@acm.org>
-Date: Wed, 10 Jun 2026 09:05:34 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYINVrSZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E40111F00893;
+	Wed, 10 Jun 2026 16:36:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781109364;
+	bh=nh8wY943fEj9O68DsnnpwY2/V+toQvePmwkX7p5hMSw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=dYINVrSZftHL1+14yqMRRxzqdHQ5Aru2hX4Xj5usxEkwHzPmZX+0xwOsW6Dztp5wP
+	 buvP2PuA+QV5xPj78OletWBvmwhb43jqvV5GFsrZnuZuAMghgSwQoh0S8sgN+S9BTm
+	 ixgW2hKOY1IFxC79EBrsQJFmBJhTgHzktayoDV1vYQ6PUatVZ8z/Tcr6XFUKU/a9/Z
+	 pheURjB4DZFygToELeoT3p6Kl+8pJ6zz/rbZLD4ZtWjHEo3RFM2sDUxPLErYC7D1UE
+	 E752J6xO3yZ8ppjwDDHNoD60M4V39r80G3RPynl7+S0nx3QFq8NW+mgS9cg+pAi3HA
+	 Rq8MlrT88sswQ==
+Date: Wed, 10 Jun 2026 10:35:59 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Sumit Saxena <sumit.saxena@broadcom.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	Adam Radford <aradford@gmail.com>,
+	Khalid Aziz <khalid@gonehiking.org>,
+	Adaptec OEM Raid Solutions <aacraid@microsemi.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Hannes Reinecke <hare@suse.com>,
+	"Juergen E . Fischer" <fischer@norbit.de>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Finn Thain <fthain@linux-m68k.org>,
+	Michael Schmitz <schmitzmic@gmail.com>,
+	Anil Gurumurthy <anil.gurumurthy@qlogic.com>,
+	Sudarsana Kalluru <sudarsana.kalluru@qlogic.com>,
+	Oliver Neukum <oliver@neukum.org>, Ali Akcaagac <aliakc@web.de>,
+	Jamie Lenehan <lenehan@twibble.org>,
+	Ram Vegesna <ram.vegesna@broadcom.com>,
+	target-devel@vger.kernel.org,
+	Bradley Grove <linuxdrivers@attotech.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	Karan Tilak Kumar <kartilak@cisco.com>,
+	Yihang Li <liyihang9@h-partners.com>,
+	Don Brace <don.brace@microchip.com>, storagedev@microchip.com,
+	HighPoint Linux Team <linux@highpoint-tech.com>,
+	Tyrel Datwyler <tyreld@linux.ibm.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	linuxppc-dev@lists.ozlabs.org, Brian King <brking@us.ibm.com>,
+	Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	open-iscsi@googlegroups.com, Justin Tee <justin.tee@broadcom.com>,
+	Paul Ely <paul.ely@broadcom.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+	Chandrakanth Patil <chandrakanth.patil@broadcom.com>,
+	megaraidlinux.pdl@broadcom.com,
+	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	mpi3mr-linuxdrv.pdl@broadcom.com,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	Ranjan Kumar <ranjan.kumar@broadcom.com>,
+	MPT-FusionLinux.pdl@broadcom.com, Daniel Palmer <daniel@thingy.jp>,
+	GOTO Masanori <gotom@debian.or.jp>,
+	YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Geoff Levand <geoff@infradead.org>, Michael Reed <mdr@sgi.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Narsimhulu Musini <nmusini@cisco.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>, linux-hyperv@vger.kernel.org,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio Perez <eperezma@redhat.com>, virtualization@lists.linux.dev,
+	Vishal Bhakta <vishal.bhakta@broadcom.com>,
+	bcm-kernel-feedback-list@broadcom.com,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	xen-devel@lists.xenproject.org,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v3 3/4] block: drop shared-tag fairness throttling
+Message-ID: <aimSb9I0Vl-68hy9@kbusch-mbp>
+References: <20260609121806.2121755-1-sumit.saxena@broadcom.com>
+ <20260609121806.2121755-4-sumit.saxena@broadcom.com>
+ <aikAs4X-2NWTuwCc@infradead.org>
+ <CAL2rwxr1uGshb1o=jvP2OnBffNz2cKXj8tHuAUCN5HFuy2vB_g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/4] block: drop shared-tag fairness throttling
-To: open-iscsi@googlegroups.com, Hannes Reinecke <hare@suse.de>,
- Sumit Saxena <sumit.saxena@broadcom.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Jens Axboe <axboe@kernel.dk>
-Cc: "James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
- linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20260609121806.2121755-1-sumit.saxena@broadcom.com>
- <20260609121806.2121755-4-sumit.saxena@broadcom.com>
- <93a82831-608d-4462-a019-26b3adc7089c@suse.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <93a82831-608d-4462-a019-26b3adc7089c@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL2rwxr1uGshb1o=jvP2OnBffNz2cKXj8tHuAUCN5HFuy2vB_g@mail.gmail.com>
 
-On 6/9/26 11:18 PM, Hannes Reinecke wrote:
-> The whole point of this was to increase fairness between drives, so
-> of course removing it will make an individual drive going faster ...
-Data that shows that fairness is preserved even with this patch applied
-is available here:
-https://lore.kernel.org/linux-block/20240529213921.3166462-1-bvanassche@acm.org/
+On Wed, Jun 10, 2026 at 09:16:11PM +0530, Sumit Saxena wrote:
+> The motivation for this change stems from performance issue we
+> encountered due to false sharing of the 'nr_active_requests_shared_tags'
+> counter
+> on certain CPU architectures. I initially submitted a patch to move that
+> counter to
+> its own cache line to avoid conflicts with 'nr_requests' and other hot
+> fields
+> (see:
+> https://patchwork.kernel.org/project/linux-scsi/patch/20260402074637.92417-3-sumit.saxena@broadcom.com/
+> ).
+> 
+> During the review, Bart shared his work, which eliminates the
+> counter entirely by removing the fairness throttling. My testing confirmed
+> that
+> this approach resolved the performance issues and improved IOPS.
+> This patch is part of a larger set, and I have reported the cumulative
+> performance
+> improvements in the cover letter.
 
-Thanks,
-
-Bart.
+So the problem is just the atomic operation accounting overhead? I
+previously thought the device just really needed to consume all the tags
+to hit performance.
