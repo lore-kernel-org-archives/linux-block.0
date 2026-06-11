@@ -1,207 +1,256 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AEA3C2B80;
-	Thu, 11 Jun 2026 07:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6457367F3D
+	for <linux-block@vger.kernel.org>; Thu, 11 Jun 2026 07:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781163438; cv=none; b=NqT2n2sjWRCCvD7xyd51giK8DoUxVrKtBC4CeHXi4XdH1V7t5egMvkdPKE9+f9hSt155ziljecyqzI6IOwfJXXBJ+497RI4sd/kZzc/UufLwM57AIWJf579/PPapXQ/OsTDobggOaHJST6scjr5M6mU9z7Smbl+e8RzNV61U8O8=
+	t=1781163749; cv=none; b=BiklbdYQtQoZH1V8WWsuO8P58eduDI9dVJ/7Ao0gdH/iRwNrtpo5Z7RZ8n13Xl/23ENLX4dIarFLixpELnS1kaLKF/QSmSCWnsWiaYrGBVRKlGmuk0GIxk9bzNNqDCnGDZZV8UfLPPX0G+8EbJuqvBV287in2SDaImTILwfqh7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781163438; c=relaxed/simple;
-	bh=ZwNEwqWqAH0rsH4PZBcwMWBYPkJpG1mgM+qtK5FzCsA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OqEjSFlPyTDOSUP8nvqevjgfzE905hnNBofBSIcaMPcDid7SZ39RDF1oeke87XH4ddANoo/Ks0IQGV+rY5y8SypmF7V0L2pRyFt1Pc6vPB/Sr35C5RitE8sKBr5+0MaOSXBlhhH6bsbYF5uSCasOCj2NjQKZrBXnFbb1ZVMdbK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=b+1Jxg9v; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1781163749; c=relaxed/simple;
+	bh=9GxDRaCywwOpTuvoSFTJce7vCpkaF0H+U1t5TPoeuKs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qRD5At69JYvPNWz0mHC/BWsh9fFVwrzQmyv7x1aeDG3fobNGcds/6PdGd3ToMamnJq5GCMEB1sW48ur1gjIhd/CI4Rm9TPpiQCzhsPsa60kVxmlk+pO+FwnDcx9oHR4quDwjhHrY+Gh/KVFR7gLHgblZ8JDOLi7QI6+QLD381GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=bSfUvHPo; arc=none smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="b+1Jxg9v"
-Message-ID: <83ba73d8-27d3-4ee9-a143-7dfe4cb827be@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781163433;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tji7AgabbUATaghWjiZhwDG13hGWICfhuUb1cXJUTp0=;
-	b=b+1Jxg9vc+lk8oLrl2ryGqge56LyQH0x4/uvTPLXuGWJDiCSo1AJ26eK71wWGJMLHgc5YA
-	D2g9Os8SKNpzlPOeVTmKlEyQlBDJ6RLe9mhavwKS7JCSSpe+hqtIo/4pQdus2a3B30mWlp
-	pk5eWE7R7j9MPWT1A6e1TVgUEm2OqoA=
-Date: Thu, 11 Jun 2026 15:36:01 +0800
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="bSfUvHPo"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1781163747; x=1812699747;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9GxDRaCywwOpTuvoSFTJce7vCpkaF0H+U1t5TPoeuKs=;
+  b=bSfUvHPoO9fHnbCLyDnw/Ir9AkxcHvwPzi23IYD/crafzYcS7aTOR2qp
+   QI/G1B33far6iSw67edi76HlAw5h/Smt8PV2g/x+XdebfFrRKXFCUvmwr
+   Auu0M6o9TdCoMvg2EOgcQrwvh0efShF82rQcEzZW6Uqgfwkcr8+eVLX0A
+   CakVkO2NXg+JiZf0UeQ/F067BtobPmStojJmLWDqQyq2AZ6Y+QkxBY+tQ
+   swKkFFE5qDOxDYyQZbp19teyXE1vvjto4J+Ob86y1obyIl0bylWFdKJH4
+   imiZt1gRJfzQSf8YxWVpBapfIj3Zbvx3czrYloWNetfTQ3c/XSPRwLqPZ
+   A==;
+X-CSE-ConnectionGUID: icBSLomgRha533UJwgJ7sA==
+X-CSE-MsgGUID: 8HwdiLiDR7yA6GnQFXkErA==
+X-IronPort-AV: E=Sophos;i="6.24,198,1774281600"; 
+   d="scan'208";a="147412566"
+Received: from unknown (HELO uls-op-esad2-o.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2026 15:42:21 +0800
+X-CSE-ConnectionGUID: CWf6rS9KTDu0bUpUGiyyQQ==
+X-CSE-MsgGUID: jGHidibXTEOv3blkklc+tA==
+IronPort-SDR: 6a2a66c9_e5EA96BrRG1pw3Z1SJpiN6SbLvr/gJyIBYyQWpPeGE15rJS
+ Rv1owMHB+ccHXrjPttXpZRex7cdSsDZMutGgr5Q==
+Received: from uls-op-esai1-o.wdc.com ([10.248.3.45])
+  by uls-op-esad2-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Jun 2026 00:42:01 -0700
+X-CSE-ConnectionGUID: gmPXiLXQTx6juLWvHRNTNA==
+X-CSE-MsgGUID: X4UU+5WxTQepn6Uq5IAX3w==
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.67.30])
+  by uls-op-esai1-o.wdc.com with ESMTP; 11 Jun 2026 00:42:00 -0700
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <tom.leiming@gmail.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH RFC 0/1] block: fix concurrent elevator change failure
+Date: Thu, 11 Jun 2026 16:41:59 +0900
+Message-ID: <20260611074200.474676-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
- state
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Thierry Reding <thierry.reding@kernel.org>,
- Jonathan Hunter <jonathanh@nvidia.com>,
- Sowjanya Komatineni <skomatineni@nvidia.com>,
- Davidlohr Bueso <dave@stgolabs.net>, "Paul E . McKenney"
- <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Liam Girdwood <lgirdwood@gmail.com>,
- Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
- <tursulin@ursulin.net>, Huang Rui <ray.huang@amd.com>,
- Eddie James <eajames@linux.ibm.com>, Mark Brown <broonie@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Laxman Dewangan <ldewangan@nvidia.com>,
- Neil Armstrong <neil.armstrong@linaro.org>, Robert Foss <rfoss@kernel.org>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
- Jonas Karlman <jonas@kwiboo.se>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Matthew Auld <matthew.auld@intel.com>,
- Matthew Brost <matthew.brost@intel.com>, Waiman Long <longman@redhat.com>,
- drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, dri-devel@lists.freedesktop.org,
- intel-gfx@lists.freedesktop.org, linux-spi@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Randy Dunlap <rdunlap@infradead.org>, Christian Brauner
- <brauner@kernel.org>, David Howells <dhowells@redhat.com>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Kaito Cheng <chengkaitao@kylinos.cn>, Muchun Song <muchun.song@linux.dev>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>,
- =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>,
- Jens Axboe <axboe@kernel.dk>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
- Andrzej Hajda <andrzej.hajda@intel.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
- <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
- <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
- <ail4AvzqAOXNaU6N@ashevche-desk.local>
- <9b98e860-11df-44bf-9a95-3046d2c274a6@linux.dev>
- <aipbojSeMH-usARY@ashevche-desk.local>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <aipbojSeMH-usARY@ashevche-desk.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-在 2026/6/11 14:54, Andy Shevchenko 写道:
-> On Thu, Jun 11, 2026 at 12:42:02PM +0800, Kaitao Cheng wrote:
->> 在 2026/6/10 22:43, Andy Shevchenko 写道:
->>> On Wed, Jun 10, 2026 at 02:14:06PM +0800, Kaitao Cheng wrote:
->>>> 在 2026/6/9 18:33, Christian König 写道:
->>>>> On 6/9/26 08:13, Kaitao Cheng wrote:
-> 
->>>>>> This series prepares for, and then updates, the list_for_each_entry()
->>>>>> family so the common entry iterators cache their next or previous cursor
->>>>>> before the loop body runs.
->>>>>
->>>>> Why in the world would we want to do that?
->>>>>
->>>>> The safe and non-safe variants have very distinct use cases and that is completely intentional.
->>>>>
->>>>> What we could improve maybe is the documentation, from my experience an astonishing large amount of people have misconceptions about the safe variants.
->>>>>
->>>>>> The first 13 patches open-code loops that intentionally depend on the
->>>>>> old "derive the next entry from the current cursor at the end of the
->>>>>> iteration" behaviour.  These loops append work to the list being walked,
->>>>>> restart traversal after dropping a lock, skip an entry consumed by the
->>>>>> current iteration, or otherwise adjust the cursor in the loop body.
->>>>>
->>>>> Well I have to clearly reject the changes for subsystems/components I'm maintaining, that just looks horrible to me and I clearly don't see a good reason for that.
->>>>
->>>> Hi Christian and Andy Shevchenko,
->>>>
->>>> Thanks for taking a look. I would like to clarify the point you raised.
->>>>
->>>> The reason I started looking at this is the original motivation behind
->>>> the _safe() variants.  They exist because some users need to remove, move
->>>> or otherwise consume the current entry while walking the list.  In that
->>>> case the next cursor has to be preserved before the loop body can modify
->>>> the current entry.
->>>>
->>>> The unfortunate part is that this could not be expressed with the
->>>> existing list_for_each_entry() interface without changing its calling
->>>> convention.  The _safe() variants had to grow an extra argument for the
->>>> temporary cursor, and that is why we ended up with a separate family of
->>>> macros.
->>>>
->>>> But conceptually, the distinction does not have to be exposed as two
->>>> different iterator families forever.  The difference is an implementation
->>>> detail: whether the iterator keeps the next/previous cursor before the
->>>> body runs.  This series makes the common list_for_each_entry() iterators
->>>> do that internally, so the safe and non-safe forms can effectively be
->>>> folded together, or at least the need for a separate public _safe()
->>>> interface becomes much weaker.
->>>>
->>>> There is also a usability issue with the current _safe() interface.  The
->>>> caller is forced to define a temporary cursor outside the macro and pass
->>>> it in, even though almost all users never use that cursor directly.  It is
->>>> just boilerplate required by the macro implementation.  I find that
->>>> redundant and awkward: the temporary cursor is an internal detail of the
->>>> iteration, but every caller has to spell it out.
->>>
->>> Ah, I think the distinct macro families is that what we want.
->>> But the hiding of the parameter can be done inside list_for_each_*_safe().
->>> You can do a treewide change with coccinelle.
->>>
->>> Sorry if I didn't get the whole idea from your previous contributions.
->>>
->>> Note, even cases that would need a temporary cursor may be switched to
->>> new list_for_each_*_safe(), see how PCI macros for iterating over resources
->>> are implemented (include/linux/pci.h).
->>
->> Thanks for your suggestions. I've written a demo based on your feedback.
->> Could you please review it and share your thoughts on this approach?
-> 
-> Have you checked how many users actually need the temporary storage?
+I observed that the blktests test case block/005 hangs on a specific
+server hardware using a specific HDD as a block device. During the test
+case run, the kernel reported a KASAN null-ptr-deref (and other memory
+corruption symptoms) [2]. This failure looked sporadic and hardware-
+dependent.
 
-In Muchun's reply, he mentioned the following:
+From the kernel message, I noticed that udev-worker wrote to the
+queue/scheduler sysfs attribute to change the IO scheduler, or elevator.
+The test case block/005 also wrote to the same sysfs attribute, which
+indicated that a concurrent elevator change caused the failure. I
+created a new blktests test case that simply does the concurrent
+elevator change with a null_blk device [1]. It recreates the failure in
+a stable manner on various server hardware.
 
-There are 9,925 list_for_each_entry() call sites in total. Among them,
-9,919 do not require any adaptation, and only 6 need to be refactored:
+Using the new test case, I bisected and found that the failure first
+appears at the commit 370ac285f23a ("block: avoid cpu_hotplug_lock
+depedency on freeze_lock") in the kernel tag v6.17-rc3. However, that
+commit does not appear to explain the failure by itself: it changed the
+queue freeze behavior and only unveiled a race, probably. Looking back
+at the changes to elevator_change(), I think the actual cause is the
+commit 559dc11143eb ("block: move elv_register[unregister]_queue out of
+elevator_lock") in the kernel tag v6.16-rc1. This commit moved
+elevator_change_done() out of the guard of ->elevator_lock and the queue
+freeze. As a result, when two threads write to the same queue/scheduler
+attribute concurrently, elevator_change_done() runs in parallel causing
+the memory corruption and the hang.
 
-As for list_for_each_entry_safe(), there are 4,572 callers. 4,550 of them
-can be directly replaced by the new list_for_each_entry(), while 22 cannot
-be replaced
+As the fix attempt, I created the patch in this series. It adds a new
+mutex that serializes the whole elevator switch sequence, including the
+elevator_change_done() call. I ran the reproducer with lockdep enabled
+and confirmed that the patch avoids the failure and new WARN was not
+observed.
 
-https://lore.kernel.org/all/2B3BFA1E-08B8-42AB-87D6-A28BF15E5C58@linux.dev/
+However, the fix patch adds a new lock, and I'm not sure if it is the best
+solution. Comments on the patch, or suggestions for a better solution,
+would be appreciated.
+
+[1] https://github.com/kawasaki/blktests/commit/4f8c63ed7d049f5e9c935c3fe00=
+142b2a3629826
+
+[2]
+
+[30102.760660] [ T186170] run blktests block/005 at 2026-05-11 05:53:53
+[30104.969837] [ T186111] Oops: general protection fault, probably for non-=
+canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
+[30104.983590] [ T186111] KASAN: null-ptr-deref in range [0x000000000000000=
+0-0x0000000000000007]
+[30104.992929] [ T186111] CPU: 2 UID: 0 PID: 186111 Comm: (udev-worker) Not=
+ tainted 7.1.0-rc2-kts+ #1 PREEMPT(lazy)
+[30105.004019] [ T186111] Hardware name: Supermicro Super Server/X10SRL-F, =
+BIOS 2.0 12/17/2015
+[30105.013216] [ T186111] RIP: 0010:blk_mq_debugfs_register_sched+0x46/0x210
+[30105.020667] [ T186111] Code: 48 89 fa 48 c1 ea 03 48 83 ec 10 80 3c 02 0=
+0 0f 85 83 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b 6b 08 48 89 ea 48 c=
+1 ea 03 <80> 3c 02 00 0f 85 57 01 00 00 48 c7 c0 24 a3 b3 97 4
+8 8b 6d 00 48
+[30105.041036] [ T186111] RSP: 0018:ffff88816b9c7708 EFLAGS: 00010246
+[30105.048111] [ T186111] RAX: dffffc0000000000 RBX: ffff888117f18000 RCX: =
+0000000000000000
+[30105.057097] [ T186111] RDX: 0000000000000000 RSI: 0000000000000008 RDI: =
+ffff888117f18008
+[30105.066086] [ T186111] RBP: 0000000000000000 R08: ffffffff957c47ac R09: =
+fffffbfff2f6633c
+[30105.075083] [ T186111] R10: ffff88816b9c7730 R11: 0000000000000001 R12: =
+ffff88814c1f2000
+[30105.084088] [ T186111] R13: ffff88814c1f2018 R14: ffff8881b8a336ac R15: =
+ffffffff95bfae30
+[30105.093111] [ T186111] FS:  00007fc1c7970c40(0000) GS:ffff8887c534e000(0=
+000) knlGS:0000000000000000
+[30105.103093] [ T186111] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[30105.110751] [ T186111] CR2: 000055fa37e182c0 CR3: 0000000108350003 CR4: =
+00000000001726f0
+[30105.119796] [ T186111] Call Trace:
+[30105.124154] [ T186111]  <TASK>
+[30105.128301] [ T186111]  blk_mq_sched_reg_debugfs+0x8d/0x1a0
+[30105.134193] [ T186111]  elevator_change_done+0x2f2/0x610
+[30105.140037] [ T186111]  ? __pfx_elevator_change_done+0x10/0x10
+[30105.146409] [ T186111]  ? __pfx_sysfs_kf_write+0x10/0x10
+[30105.152246] [ T186111]  ? __pfx_sysfs_kf_write+0x10/0x10
+[30105.158189] [ T186111]  elevator_change+0x283/0x4f0
+[30105.163342] [ T186111]  ? __pfx_sysfs_kf_write+0x10/0x10
+[30105.168932] [ T186111]  elv_iosched_store+0x30c/0x3a0
+[30105.174265] [ T186111]  ? __pfx_elv_iosched_store+0x10/0x10
+[30105.180797] [ T186111]  ? lock_acquire.part.0+0xb8/0x230
+[30105.187066] [ T186111]  ? kernfs_fop_write_iter+0x25b/0x5e0
+[30105.193594] [ T186111]  ? lock_acquire.part.0+0xb8/0x230
+[30105.199931] [ T186111]  ? lock_acquire+0x126/0x140
+[30105.205683] [ T186111]  ? __pfx_sysfs_kf_write+0x10/0x10
+[30105.211924] [ T186111]  queue_attr_store+0x23f/0x360
+[30105.217796] [ T186111]  ? __pfx_queue_attr_store+0x10/0x10
+[30105.224180] [ T186111]  ? __lock_acquire+0x55d/0xbd0
+[30105.230049] [ T186111]  ? lock_acquire.part.0+0xb8/0x230
+[30105.236247] [ T186111]  ? sysfs_file_kobj+0x1d/0x1b0
+[30105.242093] [ T186111]  ? find_held_lock+0x2b/0x80
+[30105.247763] [ T186111]  ? __lock_release.isra.0+0x59/0x170
+[30105.254122] [ T186111]  ? lock_release.part.0+0x1c/0x50
+[30105.260226] [ T186111]  ? sysfs_file_kobj+0xb9/0x1b0
+[30105.266048] [ T186111]  ? sysfs_kf_write+0x65/0x170
+[30105.271778] [ T186111]  ? __pfx_sysfs_kf_write+0x10/0x10
+[30105.277934] [ T186111]  kernfs_fop_write_iter+0x3da/0x5e0
+[30105.284173] [ T186111]  ? __pfx_kernfs_fop_write_iter+0x10/0x10
+[30105.290926] [ T186111]  vfs_write+0x524/0x1010
+[30105.296215] [ T186111]  ? __pfx_vfs_write+0x10/0x10
+[30105.301905] [ T186111]  ? kasan_quarantine_put+0xf5/0x240
+[30105.308092] [ T186111]  ? kasan_quarantine_put+0xf5/0x240
+[30105.314246] [ T186111]  ksys_write+0xff/0x200
+[30105.319331] [ T186111]  ? __pfx_ksys_write+0x10/0x10
+[30105.325007] [ T186111]  do_syscall_64+0xf4/0x1550
+[30105.330407] [ T186111]  ? __pfx___x64_sys_openat+0x10/0x10
+[30105.336566] [ T186111]  ? seccomp_run_filters+0xeb/0x560
+[30105.342517] [ T186111]  ? do_syscall_64+0x1d7/0x1550
+[30105.348096] [ T186111]  ? __seccomp_filter+0xa2/0x920
+[30105.353749] [ T186111]  ? __pfx___seccomp_filter+0x10/0x10
+[30105.359830] [ T186111]  ? trace_hardirqs_on_prepare+0x150/0x1a0
+[30105.366344] [ T186111]  ? do_syscall_64+0x1b9/0x1550
+[30105.371892] [ T186111]  ? do_syscall_64+0x1d7/0x1550
+[30105.377422] [ T186111]  ? do_syscall_64+0x1d7/0x1550
+[30105.382922] [ T186111]  ? do_syscall_64+0x1b9/0x1550
+[30105.388401] [ T186111]  ? do_syscall_64+0x34/0x1550
+[30105.393777] [ T186111]  ? do_syscall_64+0xab/0x1550
+[30105.399129] [ T186111]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[30105.405624] [ T186111] RIP: 0033:0x7fc1c7c4fbbe
+[30105.410647] [ T186111] Code: 4d 89 d8 e8 34 bd 00 00 4c 8b 5d f8 41 8b 9=
+3 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 1=
+0 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 13 ff ff ff 0f 1f 00 f3 0f 1e fa
+[30105.431611] [ T186111] RSP: 002b:00007ffefd3bdd90 EFLAGS: 00000202 ORIG_=
+RAX: 0000000000000001
+[30105.440716] [ T186111] RAX: ffffffffffffffda RBX: 000055fa3f0f4b80 RCX: =
+00007fc1c7c4fbbe
+[30105.449404] [ T186111] RDX: 000000000000000b RSI: 000055fa3ed9d550 RDI: =
+0000000000000015
+[30105.458090] [ T186111] RBP: 00007ffefd3bdda0 R08: 0000000000000000 R09: =
+0000000000000000
+[30105.466787] [ T186111] R10: 0000000000000000 R11: 0000000000000202 R12: =
+000000000000000b
+[30105.475479] [ T186111] R13: 000000000000000b R14: 000055fa3ed9d550 R15: =
+000055fa3ed9d550
+[30105.484182] [ T186111]  </TASK>
+[30105.487920] [ T186111] Modules linked in: iscsi_target_mod tcm_loop targ=
+et_core_pscsi target_core_file target_core_iblock xfs nft_masq nft_reject_i=
+pv4 act_csum cls_u32 sch_htb nf_nat_tftp nf_conntrack_tftp bridge stp llc t=
+arget_core_user target_core_mod rfkill nf_conntrack_netbios_ns nf_conntrack=
+_broadcast nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet n=
+f_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat ip6table_nat i=
+p6table_mangle ip6table_raw ip6table_security iptable_nat nf_nat nf_conntra=
+ck nf_defrag_ipv6 nf_defrag_ipv4 iptable_mangle iptable_raw iptable_securit=
+y nf_tables ip6table_filter ip6_tables iptable_filter ip_tables qrtr intel_=
+rapl_msr intel_rapl_common sb_edac x86_pkg_temp_thermal intel_powerclamp co=
+retemp iTCO_wdt intel_pmc_bxt kvm_intel kvm irqbypass rapl sunrpc intel_cst=
+ate intel_uncore pcspkr i2c_i801 i2c_smbus mei_me igb lpc_ich mei ioatdma d=
+ca wmi binfmt_misc joydev acpi_power_meter acpi_pad btrfs raid6_pq xor ses =
+enclosure loop dm_multipath nfnetlink zram lz4hc_compress lz4_compress
+[30105.488278] [ T186111]  zstd_compress ast drm_client_lib i2c_algo_bit dr=
+m_shmem_helper drm_kms_helper mpt3sas drm mpi3mr raid_class scsi_transport_=
+sas scsi_dh_rdac scsi_dh_emc scsi_dh_alua i2c_dev fuse [last unloaded: zone=
+fs]
+[30105.609649] [ T186111] ---[ end trace 0000000000000000 ]---
+[30105.648290] [ T186111] pstore: backend (erst) writing error (-28)
+[30105.654739] [ T186111] RIP: 0010:blk_mq_debugfs_register_sched+0x46/0x210
+[30105.662519] [ T186111] Code: 48 89 fa 48 c1 ea 03 48 83 ec 10 80 3c 02 0=
+0 0f 85 83 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b 6b 08 48 89 ea 48 c=
+1 ea 03 <80> 3c 02 00 0f 85 57 01 00 00 48 c7 c0 24 a3 b3 97 48 8b 6d 00 48
+[30105.683653] [ T186111] RSP: 0018:ffff88816b9c7708 EFLAGS: 00010246
+[30105.691248] [ T186111] RAX: dffffc0000000000 RBX: ffff888117f18000 RCX: =
+0000000000000000
+[30105.700121] [ T186111] RDX: 0000000000000000 RSI: 0000000000000008 RDI: =
+ffff888117f18008
+[30105.708841] [ T186111] RBP: 0000000000000000 R08: ffffffff957c47ac R09: =
+fffffbfff2f6633c
+[30105.717829] [ T186111] R10: ffff88816b9c7730 R11: 0000000000000001 R12: =
+ffff88814c1f2000
+[30105.726550] [ T186111] R13: ffff88814c1f2018 R14: ffff8881b8a336ac R15: =
+ffffffff95bfae30
+[30105.735306] [ T186111] FS:  00007fc1c7970c40(0000) GS:ffff8887c54ce000(0=
+000) knlGS:0000000000000000
+[30105.745003] [ T186111] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[30105.752368] [ T186111] CR2: 00007f251f9bc0e8 CR3: 0000000108350002 CR4: =
+00000000001726f0
 
 
-I only used Coccinelle to scan for list_for_each_entry() call sites, and
-found the 13 call sites shown in the current patch series, which cover
-the 6 cases mentioned in Muchun's email. I have not yet run the Coccinelle
-scan for list_for_each_entry_safe().
+Shin'ichiro Kawasaki (1):
+  block: serialize whole elevator change steps for the same queue
 
-If we need to handle all 9,925 list_for_each_entry() call sites or all 4,572
-list_for_each_entry_safe() call sites in one go, would such a change be too
-large? I expect it would affect almost every kernel subsystem.
+ block/blk-core.c       | 1 +
+ block/elevator.c       | 9 +++++++++
+ include/linux/blkdev.h | 7 +++++++
+ 3 files changed, 17 insertions(+)
 
-I wonder whether it would be better to first provide the necessary
-compatibility APIs, and then let each subsystem owner update their code as
-appropriate. That would make the impact more controlled, similar to how
-the current folio replacement of page is being handled.
-
->>>> With the updated list_for_each_entry() implementation, that extra cursor
->>>> can be kept inside the iterator itself.  Callers that only want to walk
->>>> the list, including callers that delete or consume the current entry, no
->>>> longer need to carry an otherwise-unused temporary variable just to make
->>>> the macro work.
->>>>
->>>>>> The final patch changes include/linux/list.h to keep a private cursor in
->>>>>> the common entry iterators while preserving the public macro interface.
->>>>>> The safe variants remain available when callers need the temporary
->>>>>> cursor explicitly or have stronger mutation requirements.
-> 
-
--- 
-Thanks
-Kaitao Cheng
+--=20
+2.54.0
 
