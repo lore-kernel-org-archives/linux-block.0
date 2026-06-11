@@ -1,158 +1,240 @@
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F976368D49
-	for <linux-block@vger.kernel.org>; Thu, 11 Jun 2026 07:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8243F2C0F6D;
+	Thu, 11 Jun 2026 07:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781163750; cv=none; b=TJRe0kGN6GyNsLQaYdXM7elj4NfMvqsOWP8YkXWROpdFzNYwP8XVZa40hjV64znjl/AKs/cfO3kq5rbc5WBRM6KLyDDKUkzMNJccAmkby7jfEI2/MTse60QUoVn/9V3xZe4QNjkmS75MwXg0dWb2D/a0I31O3RoRnS96Hoix89w=
+	t=1781164393; cv=none; b=ay4cp8Z0scp+vdq6vIIfJ68Y4aP2iWs7PvbftDhBTwfKm0Bm/sjS9yVZYDFN3r2mhv0sw80o9XVRTvZ2xOmW2IQS/tvV8K8l7Yme7+GY1GxSV/fpJWBvrLOfjombHawxVU3nF8L/hkoHuGYrXzm+vxeaGAnsQslibn2b5kvIAVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781163750; c=relaxed/simple;
-	bh=5L4SO/49ff+vr91M5IIOTrTOod3ojk/RYbJSS9hnzhI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HWHsfhFlHjyZoAcXZKcrl0br52IzdqudzUX85WI/5O6rFJ1mVKzV/kzEDy8elEQHEizxmtr8qEf/k+7CRvywfWY6GEIZvEvhYXsJNBqr2NqACzsGFku3AZq5c7lXkps7K5/rICWD3iJwTiWDKr0Vf8dzI3facNeAaaRXS9LtJ4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Ytf5TrT9; arc=none smtp.client-ip=216.71.154.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1781164393; c=relaxed/simple;
+	bh=WodgeCwMhxs/nQa2II6pfVewJYMMJPHkCdCGsJ449YA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SU/JO13hzfDGujaThZCPVANDnVRiriUtLp0ddwU+IvR7AeJbRjKkayBj/be6+0C8/rxtBapv/PVMw2VDhBVmFeu1xA5FGJfuv305BEmNRVptA4fO6CLmJ/3I48FdJ5VBf28RFmBUz5UKH8tcYbLNy5KloUdgDbOTnIYcZbVh2gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iwgmEEsB; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ytf5TrT9"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1781163749; x=1812699749;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5L4SO/49ff+vr91M5IIOTrTOod3ojk/RYbJSS9hnzhI=;
-  b=Ytf5TrT95gtbAMcW5fhPBaUhGGHdsE3zrn0maI4duco8FKsMH8x7UCp4
-   yyyax66ldMq0lVp7xBrDs+IsKkHqZYtuM6PSNM5pQqjJB6VFF6wW4ggL6
-   x8eyLSKcSyO3rwLjuW16aPTG1CC0limZLosFYroXL74e4+BzeyyxdH2uw
-   tBmT4DfPD/CgYjXMhrIZP9CkD/Fntg3FGBM9ZxSYn+JsOmVwBdM7N/Aks
-   Y3lIyh5YYpglMfBiZRmi4a14Q5Ky1Xwkj+iw9MvQ6lGLGs8DiCh/mPIHS
-   ohxNhtgYo+DJ8CDXVMiOJTtQvxx/cF8YkO4pHE+/NFZ96xXDouVSIUN9Z
-   w==;
-X-CSE-ConnectionGUID: FrY8WIaYRYqBO5NHXCni4w==
-X-CSE-MsgGUID: 5f2z8W6TTAy+40D3xXyT5Q==
-X-IronPort-AV: E=Sophos;i="6.24,198,1774281600"; 
-   d="scan'208";a="147412567"
-Received: from unknown (HELO uls-op-esad2-o.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 11 Jun 2026 15:42:21 +0800
-X-CSE-ConnectionGUID: ncvNs7EpTPqse9zE4WXf6A==
-X-CSE-MsgGUID: XmoJnr3wSWaCAA/qRfI2Sg==
-IronPort-SDR: 6a2a66cb_DOUcuB8a2LVrOMRR31GCn2X2pWcObMPfdBS0AP/JVow/8Of
- hSCbxCTVKtyQbQyT0P93HlOYfop8haB72lhp4vQ==
-Received: from uls-op-esai1-o.wdc.com ([10.248.3.45])
-  by uls-op-esad2-o.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Jun 2026 00:42:03 -0700
-X-CSE-ConnectionGUID: UV5sIO9BQma4lshxpfJTAQ==
-X-CSE-MsgGUID: XCPWcC0LQJuQKyGxdjva2Q==
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.67.30])
-  by uls-op-esai1-o.wdc.com with ESMTP; 11 Jun 2026 00:42:01 -0700
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Ming Lei <tom.leiming@gmail.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH RFC 1/1] block: serialize whole elevator change steps for the same queue
-Date: Thu, 11 Jun 2026 16:42:00 +0900
-Message-ID: <20260611074200.474676-2-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260611074200.474676-1-shinichiro.kawasaki@wdc.com>
-References: <20260611074200.474676-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iwgmEEsB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1781164392; x=1812700392;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=WodgeCwMhxs/nQa2II6pfVewJYMMJPHkCdCGsJ449YA=;
+  b=iwgmEEsBM+CfT5QZkI2aHs17D+0UCQCGdSWoN2CubsS2ctCP3VRdqKMB
+   NV7IO/zOE73PPsq8pwd9QV721jBWstoNenkiGsRC1xXZcjfBSddgvZPcw
+   0cJo9VEUJpIfLOd33pEL3grZUJIeXZZA8UK4y3HJz2o7/6xgUyarMBFE9
+   G9FevRfep5gM/qIAUvAemwMqnHTvv8UwUnhvbHd2UUz2eDICOzZ1ky/2z
+   xogV/9DrPhTXdjaPFO/lUuYzE9PT2JqnKAjRXNXkMgEDYSF3k6/aZMHbT
+   StT7CI5t+6iZM4S7PkD7WF5X23Ty6IJGH09lZNkID+N4+DYtjCRH1zUsT
+   A==;
+X-CSE-ConnectionGUID: anB8n/ulRimp4u9qFR2bfw==
+X-CSE-MsgGUID: SNYDZIu6TPuzvrz/6rp6ZA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11813"; a="80986593"
+X-IronPort-AV: E=Sophos;i="6.24,198,1774335600"; 
+   d="scan'208";a="80986593"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 00:53:09 -0700
+X-CSE-ConnectionGUID: 7kx+48t4ShyPZDKBg37+Vg==
+X-CSE-MsgGUID: bmL7KCWdSnqhurymMySuZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,198,1774335600"; 
+   d="scan'208";a="250689566"
+Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.123])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2026 00:52:54 -0700
+Date: Thu, 11 Jun 2026 10:52:52 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Kaitao Cheng <kaitao.cheng@linux.dev>
+Cc: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Thierry Reding <thierry.reding@kernel.org>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Sowjanya Komatineni <skomatineni@nvidia.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Boqun Feng <boqun@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Huang Rui <ray.huang@amd.com>, Eddie James <eajames@linux.ibm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Laxman Dewangan <ldewangan@nvidia.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Robert Foss <rfoss@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>,
+	Jonas Karlman <jonas@kwiboo.se>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Matthew Auld <matthew.auld@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Waiman Long <longman@redhat.com>, drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+	linux-spi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Kaito Cheng <chengkaitao@kylinos.cn>,
+	Muchun Song <muchun.song@linux.dev>,
+	Philipp Reisner <philipp.reisner@linbit.com>,
+	Lars Ellenberg <lars.ellenberg@linbit.com>,
+	Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Subject: Re: [PATCH v2 00/14] list: Prepare entry iterators to cache cursor
+ state
+Message-ID: <aippVAj83dCzscTN@ashevche-desk.local>
+References: <20260609061347.93688-1-kaitao.cheng@linux.dev>
+ <bd0b7393-8ccb-4d67-8bfc-18c68347122c@amd.com>
+ <5152089a-2808-4fe9-b633-b03018105dd2@linux.dev>
+ <ail4AvzqAOXNaU6N@ashevche-desk.local>
+ <9b98e860-11df-44bf-9a95-3046d2c274a6@linux.dev>
+ <aipbojSeMH-usARY@ashevche-desk.local>
+ <83ba73d8-27d3-4ee9-a143-7dfe4cb827be@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <83ba73d8-27d3-4ee9-a143-7dfe4cb827be@linux.dev>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-When elevator_change() is called concurrently for the same queue, the
-elevator_change_done() function runs concurrently as well. This function
-adds or deletes kobjects for the debugfs entry of the queue. Then the
-concurrent calls cause memory corruption of the kobjects and result in a
-process hang. The core part of the elevator switch is protected by queue
-freeze and q->elevator_lock. However, since the commit 559dc11143eb
-("block: move elv_register[unregister]_queue out of elevator_lock"), the
-elevator_change_done() is not serialized. Hence the memory corruption
-and the hang.
+On Thu, Jun 11, 2026 at 03:36:01PM +0800, Kaitao Cheng wrote:
+> 在 2026/6/11 14:54, Andy Shevchenko 写道:
+> > On Thu, Jun 11, 2026 at 12:42:02PM +0800, Kaitao Cheng wrote:
+> >> 在 2026/6/10 22:43, Andy Shevchenko 写道:
+> >>> On Wed, Jun 10, 2026 at 02:14:06PM +0800, Kaitao Cheng wrote:
+> >>>> 在 2026/6/9 18:33, Christian König 写道:
+> >>>>> On 6/9/26 08:13, Kaitao Cheng wrote:
+> > 
+> >>>>>> This series prepares for, and then updates, the list_for_each_entry()
+> >>>>>> family so the common entry iterators cache their next or previous cursor
+> >>>>>> before the loop body runs.
+> >>>>>
+> >>>>> Why in the world would we want to do that?
+> >>>>>
+> >>>>> The safe and non-safe variants have very distinct use cases and that is completely intentional.
+> >>>>>
+> >>>>> What we could improve maybe is the documentation, from my experience an astonishing large amount of people have misconceptions about the safe variants.
+> >>>>>
+> >>>>>> The first 13 patches open-code loops that intentionally depend on the
+> >>>>>> old "derive the next entry from the current cursor at the end of the
+> >>>>>> iteration" behaviour.  These loops append work to the list being walked,
+> >>>>>> restart traversal after dropping a lock, skip an entry consumed by the
+> >>>>>> current iteration, or otherwise adjust the cursor in the loop body.
+> >>>>>
+> >>>>> Well I have to clearly reject the changes for subsystems/components I'm maintaining, that just looks horrible to me and I clearly don't see a good reason for that.
+> >>>>
+> >>>> Hi Christian and Andy Shevchenko,
+> >>>>
+> >>>> Thanks for taking a look. I would like to clarify the point you raised.
+> >>>>
+> >>>> The reason I started looking at this is the original motivation behind
+> >>>> the _safe() variants.  They exist because some users need to remove, move
+> >>>> or otherwise consume the current entry while walking the list.  In that
+> >>>> case the next cursor has to be preserved before the loop body can modify
+> >>>> the current entry.
+> >>>>
+> >>>> The unfortunate part is that this could not be expressed with the
+> >>>> existing list_for_each_entry() interface without changing its calling
+> >>>> convention.  The _safe() variants had to grow an extra argument for the
+> >>>> temporary cursor, and that is why we ended up with a separate family of
+> >>>> macros.
+> >>>>
+> >>>> But conceptually, the distinction does not have to be exposed as two
+> >>>> different iterator families forever.  The difference is an implementation
+> >>>> detail: whether the iterator keeps the next/previous cursor before the
+> >>>> body runs.  This series makes the common list_for_each_entry() iterators
+> >>>> do that internally, so the safe and non-safe forms can effectively be
+> >>>> folded together, or at least the need for a separate public _safe()
+> >>>> interface becomes much weaker.
+> >>>>
+> >>>> There is also a usability issue with the current _safe() interface.  The
+> >>>> caller is forced to define a temporary cursor outside the macro and pass
+> >>>> it in, even though almost all users never use that cursor directly.  It is
+> >>>> just boilerplate required by the macro implementation.  I find that
+> >>>> redundant and awkward: the temporary cursor is an internal detail of the
+> >>>> iteration, but every caller has to spell it out.
+> >>>
+> >>> Ah, I think the distinct macro families is that what we want.
+> >>> But the hiding of the parameter can be done inside list_for_each_*_safe().
+> >>> You can do a treewide change with coccinelle.
+> >>>
+> >>> Sorry if I didn't get the whole idea from your previous contributions.
+> >>>
+> >>> Note, even cases that would need a temporary cursor may be switched to
+> >>> new list_for_each_*_safe(), see how PCI macros for iterating over resources
+> >>> are implemented (include/linux/pci.h).
+> >>
+> >> Thanks for your suggestions. I've written a demo based on your feedback.
+> >> Could you please review it and share your thoughts on this approach?
+> > 
+> > Have you checked how many users actually need the temporary storage?
+> 
+> In Muchun's reply, he mentioned the following:
+> 
+> There are 9,925 list_for_each_entry() call sites in total. Among them,
+> 9,919 do not require any adaptation, and only 6 need to be refactored:
+> 
+> As for list_for_each_entry_safe(), there are 4,572 callers. 4,550 of them
+> can be directly replaced by the new list_for_each_entry(), while 22 cannot
+> be replaced
+> 
+> https://lore.kernel.org/all/2B3BFA1E-08B8-42AB-87D6-A28BF15E5C58@linux.dev/
+> 
+> I only used Coccinelle to scan for list_for_each_entry() call sites, and
+> found the 13 call sites shown in the current patch series, which cover
+> the 6 cases mentioned in Muchun's email. I have not yet run the Coccinelle
+> scan for list_for_each_entry_safe().
+> 
+> If we need to handle all 9,925 list_for_each_entry() call sites or all 4,572
+> list_for_each_entry_safe() call sites in one go, would such a change be too
+> large? I expect it would affect almost every kernel subsystem.
 
-The failures are observed when udev-worker writes to a sysfs
-queue/scheduler attribute file while the blktests test case block/005
-writes to the same attribute file. The failure also can be recreated by
-running two processes that write to the same queue/scheduler file
-concurrently. The failure is observed since another commit 370ac285f23a
-("block: avoid cpu_hotplug_lock depedency on freeze_lock"). This commit
-changed the behavior of queue freeze and it unveiled the failure.
+If it's done by Linus himself during the day when he prepares -rc1, it's fine.
+You would need to provide a good justification for the change, though.
 
-Fix the failure by adding a new per-queue lock 'elevator_queue_lock',
-which serializes the whole elevator switch steps for the same queue
-including the elevator_change_done() call.
+But in the above statistics the 4572 vs 4550, so the first step is to investigate
+why temporary cursor is used in those 22 cases and what we can do to avoid that.
 
-Fixes: 559dc11143eb ("block: move elv_register[unregister]_queue out of elevator_lock")
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- block/blk-core.c       | 1 +
- block/elevator.c       | 9 +++++++++
- include/linux/blkdev.h | 7 +++++++
- 3 files changed, 17 insertions(+)
+> I wonder whether it would be better to first provide the necessary
+> compatibility APIs, and then let each subsystem owner update their code as
+> appropriate. That would make the impact more controlled, similar to how
+> the current folio replacement of page is being handled.
+> 
+> >>>> With the updated list_for_each_entry() implementation, that extra cursor
+> >>>> can be kept inside the iterator itself.  Callers that only want to walk
+> >>>> the list, including callers that delete or consume the current entry, no
+> >>>> longer need to carry an otherwise-unused temporary variable just to make
+> >>>> the macro work.
+> >>>>
+> >>>>>> The final patch changes include/linux/list.h to keep a private cursor in
+> >>>>>> the common entry iterators while preserving the public macro interface.
+> >>>>>> The safe variants remain available when callers need the temporary
+> >>>>>> cursor explicitly or have stronger mutation requirements.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 17450058ea6d..c6418889897a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -430,6 +430,7 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
- 	refcount_set(&q->refs, 1);
- 	mutex_init(&q->debugfs_mutex);
- 	mutex_init(&q->elevator_lock);
-+	mutex_init(&q->elevator_queue_lock);
- 	mutex_init(&q->sysfs_lock);
- 	mutex_init(&q->limits_lock);
- 	mutex_init(&q->rq_qos_mutex);
-diff --git a/block/elevator.c b/block/elevator.c
-index 3bcd37c2aa34..65bdea27aa8a 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -665,6 +665,13 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
- 			return ret;
- 	}
- 
-+	/*
-+	 * Acquire elevator_queue_lock to serialize the debugfs (un)register
-+	 * steps for the same queue. The elevator switch core part is protected
-+	 * by queue freezing and ->elevator_lock.
-+	 */
-+	mutex_lock(&q->elevator_queue_lock);
-+
- 	memflags = blk_mq_freeze_queue(q);
- 	/*
- 	 * May be called before adding disk, when there isn't any FS I/O,
-@@ -690,6 +697,8 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
- 	if (!ctx->new)
- 		blk_mq_free_sched_res(&ctx->res, ctx->type, set);
- 
-+	mutex_unlock(&q->elevator_queue_lock);
-+
- 	return ret;
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 890128cdea1c..cfeddd3ded95 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -606,6 +606,13 @@ struct request_queue {
- 	 */
- 	struct mutex		elevator_lock;
- 
-+	/*
-+	 * Serializes the whole elevator change operation for the same queue,
-+	 * including the debugfs (un)register steps. Must be acquired before
-+	 * freezing the queue and acquiring elevator_lock.
-+	 */
-+	struct mutex		elevator_queue_lock;
-+
- 	struct mutex		sysfs_lock;
- 	/*
- 	 * Protects queue limits and also sysfs attribute read_ahead_kb.
 -- 
-2.54.0
+With Best Regards,
+Andy Shevchenko
+
 
